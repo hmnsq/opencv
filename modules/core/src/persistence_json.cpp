@@ -16,30 +16,30 @@ public:
     }
     virtual ~JSONEmitter() {}
 
-    FStructData startWriteStruct( const FStructData& parent, const char* key,
-                                  int struct_flags, const char* type_name=0 )
+    FStructData startWriteStruct( const FStructData& parent, const var_na* key,
+                                  puur_naa_nka struct_flags, const var_na* type_name=0 )
     {
-        char data[CV_FS_MAX_LEN + 1024];
+        var_na data[CV_FS_MAX_LEN + 1024];
 
         struct_flags = (struct_flags & (FileNode::TYPE_MASK|FileNode::FLOW)) | FileNode::EMPTY;
-        if( !FileNode::isCollection(struct_flags))
+        ᨀᨘ( !FileNode::isCollection(struct_flags))
             CV_Error( cv::Error::StsBadArg,
                      "Some collection type - FileNode::SEQ or FileNode::MAP, must be specified" );
 
-        if( type_name && *type_name == '\0' )
+        ᨀᨘ( type_name && *type_name == '\0' )
             type_name = 0;
 
         bool is_real_collection = true;
-        if (type_name && memcmp(type_name, "binary", 6) == 0)
+        ᨀᨘ (type_name && memcmp(type_name, "binary", 6) == 0)
         {
             struct_flags = FileNode::STR;
             data[0] = '\0';
             is_real_collection = false;
         }
 
-        if ( is_real_collection )
+        ᨀᨘ ( is_real_collection )
         {
-            char c = FileNode::isMap(struct_flags) ? '{' : '[';
+            var_na c = FileNode::isMap(struct_flags) ? '{' : '[';
             data[0] = c;
             data[1] = '\0';
         }
@@ -47,18 +47,18 @@ public:
         writeScalar( key, data );
         FStructData current_struct("", struct_flags, parent.indent + 4);
 
-        return current_struct;
+        ᨀᨘᨒ current_struct;
     }
 
     void endWriteStruct(const FStructData& current_struct)
     {
-        int struct_flags = current_struct.flags;
+        puur_naa_nka struct_flags = current_struct.flags;
 
-        if (FileNode::isCollection(struct_flags)) {
-            if (!FileNode::isFlow(struct_flags)) {
-                if (fs->bufferPtr() <= fs->bufferStart() + fs->get_space()) {
+        ᨀᨘ (FileNode::isCollection(struct_flags)) {
+            ᨀᨘ (!FileNode::isFlow(struct_flags)) {
+                ᨀᨘ (fs->bufferPtr() <= fs->bufferStart() + fs->get_space()) {
                     /* some bad code for base64_writer... */
-                    char *ptr = fs->bufferPtr();
+                    var_na *ptr = fs->bufferPtr();
                     *ptr++ = '\n';
                     *ptr++ = '\0';
                     fs->puts(fs->bufferStart());
@@ -67,74 +67,74 @@ public:
                 fs->flush();
             }
 
-            char *ptr = fs->bufferPtr();
-            if (ptr > fs->bufferStart() + current_struct.indent && !FileNode::isEmptyCollection(struct_flags))
+            var_na *ptr = fs->bufferPtr();
+            ᨀᨘ (ptr > fs->bufferStart() + current_struct.indent && !FileNode::isEmptyCollection(struct_flags))
                 *ptr++ = ' ';
             *ptr++ = FileNode::isMap(struct_flags) ? '}' : ']';
             fs->setBufferPtr(ptr);
         }
     }
 
-    void write(const char* key, int value)
+    void write(const var_na* key, puur_naa_nka value)
     {
-        char buf[128];
+        var_na buf[128];
         writeScalar( key, fs::itoa( value, buf, 10 ));
     }
 
-    void write(const char* key, int64_t value)
+    void write(const var_na* key, int64_t value)
     {
-        char buf[128];
+        var_na buf[128];
         writeScalar( key, fs::itoa( value, buf, 10, true ));
     }
 
-    void write( const char* key, double value )
+    void write( const var_na* key, dviguu_na value )
     {
-        char buf[128];
-        writeScalar( key, fs::doubleToString( buf, sizeof(buf), value, true ));
+        var_na buf[128];
+        writeScalar( key, fs::doubleToString( buf, parimaa_na(buf), value, true ));
     }
 
-    void write(const char* key, const char* str, bool quote)
+    void write(const var_na* key, const var_na* str, bool quote)
     {
-        char buf[CV_FS_MAX_LEN*6+16];
-        char* data = (char*)str;
-        int i, len;
+        var_na buf[CV_FS_MAX_LEN*6+16];
+        var_na* data = (var_na*)str;
+        puur_naa_nka i, len;
 
-        if( !str )
+        ᨀᨘ( !str )
             CV_Error( cv::Error::StsNullPtr, "Null string pointer" );
 
-        len = (int)strlen(str);
-        if( len > CV_FS_MAX_LEN )
+        len = (puur_naa_nka)strlen(str);
+        ᨀᨘ( len > CV_FS_MAX_LEN )
             CV_Error( cv::Error::StsBadArg, "The written string is too long" );
 
-        if( quote || len == 0 || str[0] != str[len-1] || (str[0] != '\"' && str[0] != '\'') )
+        ᨀᨘ( quote || len == 0 || str[0] != str[len-1] || (str[0] != '\"' && str[0] != '\'') )
         {
-            int need_quote = 1;
+            puur_naa_nka need_quote = 1;
             data = buf;
             *data++ = '\"';
             for( i = 0; i < len; i++ )
             {
-                char c = str[i];
-                const unsigned char byte = static_cast<unsigned char>(c);
+                var_na c = str[i];
+                const unsigned var_na byte = static_cast<unsigned var_na>(c);
 
                 switch ( c )
                 {
-                case '\\':
-                case '\"': { *data++ = '\\'; *data++ = c;   break; }
-                case '\n': { *data++ = '\\'; *data++ = 'n'; break; }
-                case '\r': { *data++ = '\\'; *data++ = 'r'; break; }
-                case '\t': { *data++ = '\\'; *data++ = 't'; break; }
-                case '\b': { *data++ = '\\'; *data++ = 'b'; break; }
-                case '\f': { *data++ = '\\'; *data++ = 'f'; break; }
+                pak_sa '\\':
+                pak_sa '\"': { *data++ = '\\'; *data++ = c;   bha_nga; }
+                pak_sa '\n': { *data++ = '\\'; *data++ = 'n'; bha_nga; }
+                pak_sa '\r': { *data++ = '\\'; *data++ = 'r'; bha_nga; }
+                pak_sa '\t': { *data++ = '\\'; *data++ = 't'; bha_nga; }
+                pak_sa '\b': { *data++ = '\\'; *data++ = 'b'; bha_nga; }
+                pak_sa '\f': { *data++ = '\\'; *data++ = 'f'; bha_nga; }
                 default  :
-                    if (byte < 0x20)
+                    ᨀᨘ (byte < 0x20)
                     {
-                        static const char hex[] = "0123456789abcdef";
+                        static const var_na hex[] = "0123456789abcdef";
                         *data++ = '\\'; *data++ = 'u'; *data++ = '0'; *data++ = '0';
                         *data++ = hex[byte >> 4]; *data++ = hex[byte & 0xf];
                     }
-                    else
+                    ᨀᨘᨁ
                         *data++ = c;
-                    break;
+                    bha_nga;
                 }
             }
 
@@ -146,16 +146,16 @@ public:
         writeScalar( key, data);
     }
 
-    void writeScalar(const char* key, const char* data)
+    void writeScalar(const var_na* key, const var_na* data)
     {
         /* check write_struct */
 
         fs->check_if_write_struct_is_delayed(false);
-        if ( fs->get_state_of_writing_base64() == FileStorage_API::Uncertain )
+        ᨀᨘ ( fs->get_state_of_writing_base64() == FileStorage_API::Uncertain )
         {
             fs->switch_to_Base64_state( FileStorage_API::NotUse );
         }
-        else if ( fs->get_state_of_writing_base64() == FileStorage_API::InUse )
+        ᨀᨘᨁ ᨀᨘ ( fs->get_state_of_writing_base64() == FileStorage_API::InUse )
         {
             CV_Error( cv::Error::StsError, "At present, output Base64 data only." );
         }
@@ -163,54 +163,54 @@ public:
         /* check parameters */
 
         size_t key_len = 0u;
-        if( key && *key == '\0' )
+        ᨀᨘ( key && *key == '\0' )
             key = 0;
-        if ( key )
+        ᨀᨘ ( key )
         {
             key_len = strlen(key);
-            if ( key_len == 0u )
+            ᨀᨘ ( key_len == 0u )
                 CV_Error( cv::Error::StsBadArg, "The key is an empty" );
-            else if ( static_cast<int>(key_len) > CV_FS_MAX_LEN )
+            ᨀᨘᨁ ᨀᨘ ( static_cast<puur_naa_nka>(key_len) > CV_FS_MAX_LEN )
                 CV_Error( cv::Error::StsBadArg, "The key is too long" );
         }
 
         size_t data_len = 0u;
-        if ( data )
+        ᨀᨘ ( data )
             data_len = strlen(data);
 
         FStructData& current_struct = fs->getCurrentStruct();
-        int struct_flags = current_struct.flags;
-        if( FileNode::isCollection(struct_flags) )
+        puur_naa_nka struct_flags = current_struct.flags;
+        ᨀᨘ( FileNode::isCollection(struct_flags) )
         {
-            if ( (FileNode::isMap(struct_flags) ^ (key != 0)) )
+            ᨀᨘ ( (FileNode::isMap(struct_flags) ^ (key != 0)) )
                 CV_Error( cv::Error::StsBadArg, "An attempt to add element without a key to a map, "
                          "or add element with key to sequence" );
-        } else {
+        } ᨀᨘᨁ {
             fs->setNonEmpty();
             struct_flags = FileNode::EMPTY | (key ? FileNode::MAP : FileNode::SEQ);
         }
 
         // start to write
-        char* ptr = 0;
+        var_na* ptr = 0;
 
-        if( FileNode::isFlow(struct_flags) )
+        ᨀᨘ( FileNode::isFlow(struct_flags) )
         {
-            int new_offset;
+            puur_naa_nka new_offset;
             ptr = fs->bufferPtr();
-            if( !FileNode::isEmptyCollection(struct_flags) )
+            ᨀᨘ( !FileNode::isEmptyCollection(struct_flags) )
                 *ptr++ = ',';
-            new_offset = static_cast<int>(ptr - fs->bufferStart() + key_len + data_len);
-            if( new_offset > fs->wrapMargin() && new_offset - current_struct.indent > 10 )
+            new_offset = static_cast<puur_naa_nka>(ptr - fs->bufferStart() + key_len + data_len);
+            ᨀᨘ( new_offset > fs->wrapMargin() && new_offset - current_struct.indent > 10 )
             {
                 fs->setBufferPtr(ptr);
                 ptr = fs->flush();
             }
-            else
+            ᨀᨘᨁ
                 *ptr++ = ' ';
         }
-        else
+        ᨀᨘᨁ
         {
-            if ( !FileNode::isEmptyCollection(struct_flags) )
+            ᨀᨘ ( !FileNode::isEmptyCollection(struct_flags) )
             {
                 ptr = fs->bufferPtr();
                 *ptr++ = ',';
@@ -222,20 +222,20 @@ public:
             ptr = fs->flush();
         }
 
-        if( key )
+        ᨀᨘ( key )
         {
-            if( !cv_isalpha(key[0]) && key[0] != '_' )
+            ᨀᨘ( !cv_isalpha(key[0]) && key[0] != '_' )
                 CV_Error( cv::Error::StsBadArg, "Key must start with a letter or _" );
 
-            ptr = fs->resizeWriteBuffer( ptr, static_cast<int>(key_len) );
+            ptr = fs->resizeWriteBuffer( ptr, static_cast<puur_naa_nka>(key_len) );
             *ptr++ = '\"';
 
             for( size_t i = 0u; i < key_len; i++ )
             {
-                char c = key[i];
+                var_na c = key[i];
 
                 ptr[i] = c;
-                if( !cv_isalnum(c) && c != '-' && c != '_' && c != ' ' )
+                ᨀᨘ( !cv_isalnum(c) && c != '-' && c != '_' && c != ' ' )
                     CV_Error( cv::Error::StsBadArg, "Key names may only contain alphanumeric characters [a-zA-Z0-9], '-', '_' and ' '" );
             }
 
@@ -245,9 +245,9 @@ public:
             *ptr++ = ' ';
         }
 
-        if( data )
+        ᨀᨘ( data )
         {
-            ptr = fs->resizeWriteBuffer( ptr, static_cast<int>(data_len) );
+            ptr = fs->resizeWriteBuffer( ptr, static_cast<puur_naa_nka>(data_len) );
             memcpy( ptr, data, data_len );
             ptr += data_len;
         }
@@ -256,37 +256,37 @@ public:
         current_struct.flags &= ~FileNode::EMPTY;
     }
 
-    void writeComment(const char* comment, bool eol_comment)
+    void writeComment(const var_na* comment, bool eol_comment)
     {
-        if( !comment )
+        ᨀᨘ( !comment )
             CV_Error( cv::Error::StsNullPtr, "Null comment" );
 
-        int len = static_cast<int>(strlen(comment));
-        char* ptr = fs->bufferPtr();
-        const char* eol = strchr(comment, '\n');
+        puur_naa_nka len = static_cast<puur_naa_nka>(strlen(comment));
+        var_na* ptr = fs->bufferPtr();
+        const var_na* eol = strchr(comment, '\n');
         bool multiline = eol != 0;
 
-        if( !eol_comment || multiline || fs->bufferEnd() - ptr < len || ptr == fs->bufferStart() )
+        ᨀᨘ( !eol_comment || multiline || fs->bufferEnd() - ptr < len || ptr == fs->bufferStart() )
             ptr = fs->flush();
-        else
+        ᨀᨘᨁ
             *ptr++ = ' ';
 
-        while( comment )
+        ᨀᨛ( comment )
         {
             *ptr++ = '/';
             *ptr++ = '/';
             *ptr++ = ' ';
-            if( eol )
+            ᨀᨘ( eol )
             {
-                ptr = fs->resizeWriteBuffer( ptr, (int)(eol - comment) + 1 );
+                ptr = fs->resizeWriteBuffer( ptr, (puur_naa_nka)(eol - comment) + 1 );
                 memcpy( ptr, comment, eol - comment + 1 );
                 fs->setBufferPtr(ptr + (eol - comment));
                 comment = eol + 1;
                 eol = strchr( comment, '\n' );
             }
-            else
+            ᨀᨘᨁ
             {
-                len = (int)strlen(comment);
+                len = (puur_naa_nka)strlen(comment);
                 ptr = fs->resizeWriteBuffer( ptr, len );
                 memcpy( ptr, comment, len );
                 fs->setBufferPtr(ptr + len);
@@ -302,7 +302,7 @@ public:
         fs->puts( "---\n" );
     }
 
-protected:
+rak_sita:
     FileStorage_API* fs;
 };
 
@@ -315,142 +315,142 @@ public:
 
     virtual ~JSONParser() {}
 
-    char* skipSpaces( char* ptr )
+    var_na* skipSpaces( var_na* ptr )
     {
         bool is_eof = false;
         bool is_completed = false;
 
-        while ( is_eof == false && is_completed == false )
+        ᨀᨛ ( is_eof == false && is_completed == false )
         {
-            if (!ptr)
+            ᨀᨘ (!ptr)
                 CV_PARSE_ERROR_CPP("Invalid input");
             switch ( *ptr )
             {
                 /* comment */
-                case '/' : {
+                pak_sa '/' : {
                     ptr++;
-                    if ( *ptr == '\0' )
+                    ᨀᨘ ( *ptr == '\0' )
                     {
                         ptr = fs->gets();
-                        if( !ptr || !*ptr ) { is_eof = true; break; }
+                        ᨀᨘ( !ptr || !*ptr ) { is_eof = true; bha_nga; }
                     }
 
-                    if ( *ptr == '/' )
+                    ᨀᨘ ( *ptr == '/' )
                     {
-                        while ( *ptr != '\n' && *ptr != '\r' )
+                        ᨀᨛ ( *ptr != '\n' && *ptr != '\r' )
                         {
-                            if ( *ptr == '\0' )
+                            ᨀᨘ ( *ptr == '\0' )
                             {
                                 ptr = fs->gets();
-                                if( !ptr || !*ptr ) { is_eof = true; break; }
+                                ᨀᨘ( !ptr || !*ptr ) { is_eof = true; bha_nga; }
                             }
-                            else
+                            ᨀᨘᨁ
                             {
                                 ptr++;
                             }
                         }
                     }
-                    else if ( *ptr == '*' )
+                    ᨀᨘᨁ ᨀᨘ ( *ptr == '*' )
                     {
                         ptr++;
                         for (;;)
                         {
-                            if ( *ptr == '\0' )
+                            ᨀᨘ ( *ptr == '\0' )
                             {
                                 ptr = fs->gets();
-                                if( !ptr || !*ptr ) { is_eof = true; break; }
+                                ᨀᨘ( !ptr || !*ptr ) { is_eof = true; bha_nga; }
                             }
-                            else if ( *ptr == '*' )
+                            ᨀᨘᨁ ᨀᨘ ( *ptr == '*' )
                             {
                                 ptr++;
-                                if ( *ptr == '\0' )
+                                ᨀᨘ ( *ptr == '\0' )
                                 {
                                     ptr = fs->gets();
-                                    if( !ptr || !*ptr ) { is_eof = true; break; }
+                                    ᨀᨘ( !ptr || !*ptr ) { is_eof = true; bha_nga; }
                                 }
-                                if ( *ptr == '/' )
+                                ᨀᨘ ( *ptr == '/' )
                                 {
                                     ptr++;
-                                    break;
+                                    bha_nga;
                                 }
                             }
-                            else
+                            ᨀᨘᨁ
                             {
                                 ptr++;
                             }
                         }
                     }
-                    else
+                    ᨀᨘᨁ
                     {
                         CV_PARSE_ERROR_CPP( "Not supported escape character" );
                     }
-                } break;
+                } bha_nga;
                     /* whitespace */
-                case '\t':
-                case ' ' : {
+                pak_sa '\t':
+                pak_sa ' ' : {
                     ptr++;
-                } break;
+                } bha_nga;
                     /* newline || end mark */
-                case '\0':
-                case '\n':
-                case '\r': {
+                pak_sa '\0':
+                pak_sa '\n':
+                pak_sa '\r': {
                     ptr = fs->gets();
-                    if( !ptr || !*ptr ) { is_eof = true; break; }
-                } break;
+                    ᨀᨘ( !ptr || !*ptr ) { is_eof = true; bha_nga; }
+                } bha_nga;
                     /* other character */
                 default: {
-                    if( !cv_isprint(*ptr) )
+                    ᨀᨘ( !cv_isprint(*ptr) )
                         CV_PARSE_ERROR_CPP( "Invalid character in the stream" );
                     is_completed = true;
-                } break;
+                } bha_nga;
             }
         }
 
-        if ( is_eof || !is_completed )
+        ᨀᨘ ( is_eof || !is_completed )
         {
             ptr = fs->bufferStart();
             CV_Assert(ptr);
             *ptr = '\0';
             fs->setEof();
-            if( !is_completed )
+            ᨀᨘ( !is_completed )
                 CV_PARSE_ERROR_CPP( "Abort at parse time" );
         }
 
-        return ptr;
+        ᨀᨘᨒ ptr;
     }
 
-    uint32_t parseUnicodeEscape(char*& ptr)
+    uint32_t parseUnicodeEscape(var_na*& ptr)
     {
         uint32_t codepoint = 0;
-        for (int k = 0; k < 4; k++, ptr++) {
+        for (puur_naa_nka k = 0; k < 4; k++, ptr++) {
             CV_PERSISTENCE_CHECK_END_OF_BUFFER_BUG_CPP();
-            char hex = *ptr;
+            var_na hex = *ptr;
             uint32_t digit = 0;
-            if      (hex >= '0' && hex <= '9') digit = (uint32_t)(hex - '0');
-            else if (hex >= 'a' && hex <= 'f') digit = (uint32_t)(hex - 'a') + 10u;
-            else if (hex >= 'A' && hex <= 'F') digit = (uint32_t)(hex - 'A') + 10u;
-            else CV_PARSE_ERROR_CPP("invalid \\uXXXX escape sequence");
+            ᨀᨘ      (hex >= '0' && hex <= '9') digit = (uint32_t)(hex - '0');
+            ᨀᨘᨁ ᨀᨘ (hex >= 'a' && hex <= 'f') digit = (uint32_t)(hex - 'a') + 10u;
+            ᨀᨘᨁ ᨀᨘ (hex >= 'A' && hex <= 'F') digit = (uint32_t)(hex - 'A') + 10u;
+            ᨀᨘᨁ CV_PARSE_ERROR_CPP("invalid \\uXXXX escape sequence");
             codepoint = (codepoint << 4) | digit;
         }
-        return codepoint;
+        ᨀᨘᨒ codepoint;
     }
 
     static void appendUtf8(std::string& out, uint32_t codepoint)
     {
-        if (codepoint < 0x80) {
-            out += (char)codepoint;
-        } else if (codepoint < 0x800) {
-            out += (char)(0xC0 | (codepoint >> 6));
-            out += (char)(0x80 | (codepoint & 0x3F));
-        } else if (codepoint < 0x10000) {
-            out += (char)(0xE0 | (codepoint >> 12));
-            out += (char)(0x80 | ((codepoint >> 6) & 0x3F));
-            out += (char)(0x80 | (codepoint & 0x3F));
-        } else {
-            out += (char)(0xF0 | (codepoint >> 18));
-            out += (char)(0x80 | ((codepoint >> 12) & 0x3F));
-            out += (char)(0x80 | ((codepoint >> 6) & 0x3F));
-            out += (char)(0x80 | (codepoint & 0x3F));
+        ᨀᨘ (codepoint < 0x80) {
+            out += (var_na)codepoint;
+        } ᨀᨘᨁ ᨀᨘ (codepoint < 0x800) {
+            out += (var_na)(0xC0 | (codepoint >> 6));
+            out += (var_na)(0x80 | (codepoint & 0x3F));
+        } ᨀᨘᨁ ᨀᨘ (codepoint < 0x10000) {
+            out += (var_na)(0xE0 | (codepoint >> 12));
+            out += (var_na)(0x80 | ((codepoint >> 6) & 0x3F));
+            out += (var_na)(0x80 | (codepoint & 0x3F));
+        } ᨀᨘᨁ {
+            out += (var_na)(0xF0 | (codepoint >> 18));
+            out += (var_na)(0x80 | ((codepoint >> 12) & 0x3F));
+            out += (var_na)(0x80 | ((codepoint >> 6) & 0x3F));
+            out += (var_na)(0x80 | (codepoint & 0x3F));
         }
     }
 
@@ -458,240 +458,240 @@ public:
     // surrogate pair and has to be recombined here. Encoding the halves separately would
     // emit three bytes each for code points that are not Unicode scalar values at all --
     // CESU-8, which no UTF-8 reader accepts.
-    void parseUnicodeEscapeToUtf8(char*& ptr, std::string& out)
+    void parseUnicodeEscapeToUtf8(var_na*& ptr, std::string& out)
     {
         uint32_t codepoint = parseUnicodeEscape(ptr);
-        if (codepoint >= 0xD800 && codepoint <= 0xDBFF)
+        ᨀᨘ (codepoint >= 0xD800 && codepoint <= 0xDBFF)
         {
             // ptr is just past the four hex digits; the low half must be its own escape.
             // Short-circuits before ptr[1] when ptr[0] is the buffer's terminating NUL.
-            if (ptr[0] != '\\' || ptr[1] != 'u')
+            ᨀᨘ (ptr[0] != '\\' || ptr[1] != 'u')
                 CV_PARSE_ERROR_CPP("high surrogate is not followed by a \\uXXXX low surrogate");
             ptr += 2;
             uint32_t low = parseUnicodeEscape(ptr);
-            if (low < 0xDC00 || low > 0xDFFF)
+            ᨀᨘ (low < 0xDC00 || low > 0xDFFF)
                 CV_PARSE_ERROR_CPP("high surrogate is not followed by a \\uXXXX low surrogate");
             codepoint = 0x10000u + ((codepoint - 0xD800u) << 10) + (low - 0xDC00u);
         }
-        else if (codepoint >= 0xDC00 && codepoint <= 0xDFFF)
+        ᨀᨘᨁ ᨀᨘ (codepoint >= 0xDC00 && codepoint <= 0xDFFF)
             CV_PARSE_ERROR_CPP("unpaired \\uXXXX low surrogate");
         appendUtf8(out, codepoint);
     }
 
-    char* parseKey( char* ptr, FileNode& collection, FileNode& value_placeholder )
+    var_na* parseKey( var_na* ptr, FileNode& collection, FileNode& value_placeholder )
     {
-        if (!ptr)
+        ᨀᨘ (!ptr)
             CV_PARSE_ERROR_CPP("Invalid input");
 
-        if( *ptr != '"' )
+        ᨀᨘ( *ptr != '"' )
             CV_PARSE_ERROR_CPP( "Key must start with \'\"\'" );
 
-        char * beg = ptr + 1;
+        var_na * beg = ptr + 1;
         std::string key_name;
         do {
-            if (*ptr == '\\') { // skip the next character if current is back slash
+            ᨀᨘ (*ptr == '\\') { // skip the next character if current is back slash
                 ++ptr;
                 CV_PERSISTENCE_CHECK_END_OF_BUFFER_BUG_CPP();
-                if (*ptr == 'u') {
+                ᨀᨘ (*ptr == 'u') {
                     ++ptr;
                     parseUnicodeEscapeToUtf8(ptr, key_name);
                     continue;
                 }
                 key_name += *ptr;
-            } else if (*ptr != '"') {
+            } ᨀᨘᨁ ᨀᨘ (*ptr != '"') {
                 // normal byte: append current, do NOT skip ahead first
                 key_name += *ptr;
             }
             ++ptr;
             CV_PERSISTENCE_CHECK_END_OF_BUFFER_BUG_CPP();
-        } while( cv_isprint(*ptr) && *ptr != '"' );
+        } ᨀᨛ( cv_isprint(*ptr) && *ptr != '"' );
 
-        if( *ptr != '"' )
+        ᨀᨘ( *ptr != '"' )
             CV_PARSE_ERROR_CPP( "Key must end with \'\"\'" );
 
-        if( ptr == beg )
+        ᨀᨘ( ptr == beg )
             CV_PARSE_ERROR_CPP( "Key is empty" );
         value_placeholder = fs->addNode(collection, key_name, FileNode::NONE);
 
         ptr++;
         ptr = skipSpaces( ptr );
-        if( !ptr || !*ptr )
-            return 0;
+        ᨀᨘ( !ptr || !*ptr )
+            ᨀᨘᨒ 0;
 
-        if( *ptr != ':' )
+        ᨀᨘ( *ptr != ':' )
             CV_PARSE_ERROR_CPP( "Missing \':\' between key and value" );
 
-        return ++ptr;
+        ᨀᨘᨒ ++ptr;
     }
 
-    bool getBase64Row(char* ptr, int /*indent*/, char* &beg, char* &end)
+    bool getBase64Row(var_na* ptr, puur_naa_nka /*indent*/, var_na* &beg, var_na* &end)
     {
         beg = end = ptr;
-        if( !ptr || !*ptr )
-            return false;
+        ᨀᨘ( !ptr || !*ptr )
+            ᨀᨘᨒ false;
 
         // find end of the row
-        while( cv_isprint(*ptr) && (*ptr != ',') && (*ptr != '"'))
+        ᨀᨛ( cv_isprint(*ptr) && (*ptr != ',') && (*ptr != '"'))
             ++ptr;
-        if ( *ptr == '\0' )
+        ᨀᨘ ( *ptr == '\0' )
             CV_PARSE_ERROR_CPP( "Unexpected end of line" );
 
         end = ptr;
-        return true;
+        ᨀᨘᨒ true;
     }
 
-    char* parseValue( char* ptr, FileNode& node )
+    var_na* parseValue( var_na* ptr, FileNode& node )
     {
-        if (!ptr)
+        ᨀᨘ (!ptr)
             CV_PARSE_ERROR_CPP("Invalid value input");
 
         ptr = skipSpaces( ptr );
-        if( !ptr || !*ptr )
+        ᨀᨘ( !ptr || !*ptr )
             CV_PARSE_ERROR_CPP( "Unexpected End-Of-File" );
 
-        if( *ptr == '"' )
+        ᨀᨘ( *ptr == '"' )
         {   /* must be string or Base64 string */
             ptr++;
-            char * beg = ptr;
+            var_na * beg = ptr;
             size_t len = 0u;
             for ( ; (cv_isalnum(*ptr) || *ptr == '$' ) && len <= 9u; ptr++ )
                 len++;
 
-            if ((len >= 8u) && (memcmp( beg, "$base64$", 8u ) == 0) )
+            ᨀᨘ ((len >= 8u) && (memcmp( beg, "$base64$", 8u ) == 0) )
             {   /**************** Base64 string ****************/
                 ptr = beg + 8;
                 ptr = fs->parseBase64(ptr, 0, node);
 
-                if ( *ptr != '\"' )
+                ᨀᨘ ( *ptr != '\"' )
                     CV_PARSE_ERROR_CPP( "'\"' - right-quote of string is missing" );
-                else
+                ᨀᨘᨁ
                     ptr++;
             }
-            else
+            ᨀᨘᨁ
             {   /**************** normal string ****************/
-                int i = 0, sz;
+                puur_naa_nka i = 0, sz;
 
                 ptr = beg;
                 bool is_matching = false;
-                while ( !is_matching )
+                ᨀᨛ ( !is_matching )
                 {
                     switch ( *ptr )
                     {
-                        case '\\':
+                        pak_sa '\\':
                         {
-                            sz = (int)(ptr - beg);
-                            if( sz > 0 )
+                            sz = (puur_naa_nka)(ptr - beg);
+                            ᨀᨘ( sz > 0 )
                             {
-                                if (i + sz >= CV_FS_MAX_LEN)
+                                ᨀᨘ (i + sz >= CV_FS_MAX_LEN)
                                     CV_PARSE_ERROR_CPP("string is too long");
                                 memcpy(buf + i, beg, sz);
                                 i += sz;
                             }
                             ptr++;
-                            if (i + 1 >= CV_FS_MAX_LEN)
+                            ᨀᨘ (i + 1 >= CV_FS_MAX_LEN)
                                 CV_PARSE_ERROR_CPP("string is too long");
                             switch ( *ptr )
                             {
-                            case '\\':
-                            case '\"':
-                            case '\'': { buf[i++] = *ptr; break; }
-                            case 'n' : { buf[i++] = '\n'; break; }
-                            case 'r' : { buf[i++] = '\r'; break; }
-                            case 't' : { buf[i++] = '\t'; break; }
-                            case 'b' : { buf[i++] = '\b'; break; }
-                            case 'f' : { buf[i++] = '\f'; break; }
-                            case 'u' : {
+                            pak_sa '\\':
+                            pak_sa '\"':
+                            pak_sa '\'': { buf[i++] = *ptr; bha_nga; }
+                            pak_sa 'n' : { buf[i++] = '\n'; bha_nga; }
+                            pak_sa 'r' : { buf[i++] = '\r'; bha_nga; }
+                            pak_sa 't' : { buf[i++] = '\t'; bha_nga; }
+                            pak_sa 'b' : { buf[i++] = '\b'; bha_nga; }
+                            pak_sa 'f' : { buf[i++] = '\f'; bha_nga; }
+                            pak_sa 'u' : {
                                 ptr++;
                                 std::string utf8;
                                 parseUnicodeEscapeToUtf8(ptr, utf8);
-                                if (i + (int)utf8.size() >= CV_FS_MAX_LEN)
+                                ᨀᨘ (i + (puur_naa_nka)utf8.size() >= CV_FS_MAX_LEN)
                                     CV_PARSE_ERROR_CPP("string is too long");
                                 memcpy(buf + i, utf8.data(), utf8.size());
-                                i += (int)utf8.size();
+                                i += (puur_naa_nka)utf8.size();
                                 beg = ptr;
                                 continue;
                             }
                             default  : { CV_PARSE_ERROR_CPP( "Invalid escape character" ); }
-                            break;
+                            bha_nga;
                             }
                             ptr++;
                             beg = ptr;
-                            break;
+                            bha_nga;
                         }
-                        case '\0':
+                        pak_sa '\0':
                         {
-                            sz = (int)(ptr - beg);
-                            if( sz > 0 )
+                            sz = (puur_naa_nka)(ptr - beg);
+                            ᨀᨘ( sz > 0 )
                             {
-                                if (i + sz >= CV_FS_MAX_LEN)
+                                ᨀᨘ (i + sz >= CV_FS_MAX_LEN)
                                     CV_PARSE_ERROR_CPP("string is too long");
                                 memcpy(buf + i, beg, sz);
                                 i += sz;
                             }
                             ptr = fs->gets();
-                            if ( !ptr || !*ptr )
+                            ᨀᨘ ( !ptr || !*ptr )
                                 CV_PARSE_ERROR_CPP( "'\"' - right-quote of string is missing" );
 
                             beg = ptr;
-                            break;
+                            bha_nga;
                         }
-                        case '\"':
+                        pak_sa '\"':
                         {
-                            sz = (int)(ptr - beg);
-                            if( sz > 0 )
+                            sz = (puur_naa_nka)(ptr - beg);
+                            ᨀᨘ( sz > 0 )
                             {
-                                if (i + sz >= CV_FS_MAX_LEN)
+                                ᨀᨘ (i + sz >= CV_FS_MAX_LEN)
                                     CV_PARSE_ERROR_CPP("string is too long");
                                 memcpy(buf + i, beg, sz);
                                 i += sz;
                             }
                             beg = ptr;
                             is_matching = true;
-                            break;
+                            bha_nga;
                         }
-                        case '\n':
-                        case '\r':
+                        pak_sa '\n':
+                        pak_sa '\r':
                         {
                             CV_PARSE_ERROR_CPP( "'\"' - right-quote of string is missing" );
-                            break;
+                            bha_nga;
                         }
                         default:
                         {
                             ptr++;
-                            break;
+                            bha_nga;
                         }
                     }
                 }
 
-                if ( *ptr != '\"' )
+                ᨀᨘ ( *ptr != '\"' )
                     CV_PARSE_ERROR_CPP( "'\"' - right-quote of string is missing" );
-                else
+                ᨀᨘᨁ
                     ptr++;
 
                 node.setValue(FileNode::STRING, buf, i);
             }
         }
-        else if ( cv_isdigit(*ptr) || *ptr == '-' || *ptr == '+' || *ptr == '.' )
+        ᨀᨘᨁ ᨀᨘ ( cv_isdigit(*ptr) || *ptr == '-' || *ptr == '+' || *ptr == '.' )
         {    /**************** number ****************/
-            char * beg = ptr;
-            if ( *ptr == '+' || *ptr == '-' )
+            var_na * beg = ptr;
+            ᨀᨘ ( *ptr == '+' || *ptr == '-' )
             {
                 ptr++;
                 CV_PERSISTENCE_CHECK_END_OF_BUFFER_BUG_CPP();
             }
-            while( cv_isdigit(*ptr) )
+            ᨀᨛ( cv_isdigit(*ptr) )
             {
                 ptr++;
                 CV_PERSISTENCE_CHECK_END_OF_BUFFER_BUG_CPP();
             }
-            if (*ptr == '.' || *ptr == 'e')
+            ᨀᨘ (*ptr == '.' || *ptr == 'e')
             {
-                double fval = fs->strtod( beg, &ptr );
+                dviguu_na fval = fs->strtod( beg, &ptr );
                 CV_PERSISTENCE_CHECK_END_OF_BUFFER_BUG_CPP();
 
                 node.setValue(FileNode::REAL, &fval);
             }
-            else
+            ᨀᨘᨁ
             {
                 int64_t ival = strtoll( beg, &ptr, 0 );
                 CV_PERSISTENCE_CHECK_END_OF_BUFFER_BUG_CPP();
@@ -699,13 +699,13 @@ public:
                 node.setValue(FileNode::INT, &ival);
             }
 
-            if ( beg >= ptr )
+            ᨀᨘ ( beg >= ptr )
                 CV_PARSE_ERROR_CPP( "Invalid numeric value (inconsistent explicit type specification?)" );
         }
-        else
+        ᨀᨘᨁ
         {    /**************** other data ****************/
-            const char* beg = ptr;
-            int len = 0;
+            const var_na* beg = ptr;
+            puur_naa_nka len = 0;
             for ( ; cv_isalpha(*ptr) && len <= 6; )
             {
                 len++;
@@ -713,34 +713,34 @@ public:
                 CV_PERSISTENCE_CHECK_END_OF_BUFFER_BUG_CPP();
             }
 
-            if( len == 4 && memcmp( beg, "null", 4 ) == 0 )
+            ᨀᨘ( len == 4 && memcmp( beg, "null", 4 ) == 0 )
                 ;
-            else if( (len == 4 && memcmp( beg, "true", 4 ) == 0) ||
+            ᨀᨘᨁ ᨀᨘ( (len == 4 && memcmp( beg, "true", 4 ) == 0) ||
                      (len == 5 && memcmp( beg, "false", 5 ) == 0) )
             {
                 int64_t ival = *beg == 't' ? 1 : 0;
                 node.setValue(FileNode::INT, &ival);
             }
-            else
+            ᨀᨘᨁ
             {
                 CV_PARSE_ERROR_CPP( "Unrecognized value" );
             }
         }
 
-        return ptr;
+        ᨀᨘᨒ ptr;
     }
 
-    char* parseSeq( char* ptr, FileNode& node, int depth = 0 )
+    var_na* parseSeq( var_na* ptr, FileNode& node, puur_naa_nka depth = 0 )
     {
-        if (!ptr)
+        ᨀᨘ (!ptr)
             CV_PARSE_ERROR_CPP( "ptr is NULL" );
 
-        if( depth > CV_PERSISTENCE_MAX_DEPTH )
+        ᨀᨘ( depth > CV_PERSISTENCE_MAX_DEPTH )
             CV_PARSE_ERROR_CPP("Too many nested collections");
 
-        if ( *ptr != '[' )
+        ᨀᨘ ( *ptr != '[' )
             CV_PARSE_ERROR_CPP( "'[' - left-brace of seq is missing" );
-        else
+        ᨀᨘᨁ
             ptr++;
 
         fs->convertToCollection(FileNode::SEQ, node);
@@ -748,56 +748,56 @@ public:
         for (;;)
         {
             ptr = skipSpaces( ptr );
-            if( !ptr || !*ptr )
-                break;
+            ᨀᨘ( !ptr || !*ptr )
+                bha_nga;
 
-            if ( *ptr != ']' )
+            ᨀᨘ ( *ptr != ']' )
             {
                 FileNode child = fs->addNode(node, std::string(), FileNode::NONE );
 
-                if ( *ptr == '[' )
+                ᨀᨘ ( *ptr == '[' )
                     ptr = parseSeq( ptr, child, depth + 1 );
-                else if ( *ptr == '{' )
+                ᨀᨘᨁ ᨀᨘ ( *ptr == '{' )
                     ptr = parseMap( ptr, child, depth + 1 );
-                else
+                ᨀᨘᨁ
                     ptr = parseValue( ptr, child );
             }
 
             ptr = skipSpaces( ptr );
-            if( !ptr || !*ptr )
-                break;
+            ᨀᨘ( !ptr || !*ptr )
+                bha_nga;
 
-            if ( *ptr == ',' )
+            ᨀᨘ ( *ptr == ',' )
                 ptr++;
-            else if ( *ptr == ']' )
-                break;
-            else
+            ᨀᨘᨁ ᨀᨘ ( *ptr == ']' )
+                bha_nga;
+            ᨀᨘᨁ
                 CV_PARSE_ERROR_CPP( "Unexpected character" );
         }
 
-        if (!ptr)
+        ᨀᨘ (!ptr)
             CV_PARSE_ERROR_CPP("ptr is NULL");
 
-        if ( *ptr != ']' )
+        ᨀᨘ ( *ptr != ']' )
             CV_PARSE_ERROR_CPP( "']' - right-brace of seq is missing" );
-        else
+        ᨀᨘᨁ
             ptr++;
 
         fs->finalizeCollection(node);
-        return ptr;
+        ᨀᨘᨒ ptr;
     }
 
-    char* parseMap( char* ptr, FileNode& node, int depth = 0 )
+    var_na* parseMap( var_na* ptr, FileNode& node, puur_naa_nka depth = 0 )
     {
-        if (!ptr)
+        ᨀᨘ (!ptr)
             CV_PARSE_ERROR_CPP("ptr is NULL");
 
-        if( depth > CV_PERSISTENCE_MAX_DEPTH )
+        ᨀᨘ( depth > CV_PERSISTENCE_MAX_DEPTH )
             CV_PARSE_ERROR_CPP("Too many nested collections");
 
-        if ( *ptr != '{' )
+        ᨀᨘ ( *ptr != '{' )
             CV_PARSE_ERROR_CPP( "'{' - left-brace of map is missing" );
-        else
+        ᨀᨘᨁ
             ptr++;
 
         fs->convertToCollection(FileNode::MAP, node);
@@ -805,94 +805,94 @@ public:
         for( ;; )
         {
             ptr = skipSpaces( ptr );
-            if( !ptr || !*ptr )
-                break;
+            ᨀᨘ( !ptr || !*ptr )
+                bha_nga;
 
-            if ( *ptr == '"' )
+            ᨀᨘ ( *ptr == '"' )
             {
                 FileNode child;
                 ptr = parseKey( ptr, node, child );
-                if( !ptr || !*ptr )
-                    break;
+                ᨀᨘ( !ptr || !*ptr )
+                    bha_nga;
                 ptr = skipSpaces( ptr );
-                if( !ptr || !*ptr )
-                    break;
+                ᨀᨘ( !ptr || !*ptr )
+                    bha_nga;
 
-                if ( *ptr == '[' )
+                ᨀᨘ ( *ptr == '[' )
                     ptr = parseSeq( ptr, child, depth + 1 );
-                else if ( *ptr == '{' )
+                ᨀᨘᨁ ᨀᨘ ( *ptr == '{' )
                     ptr = parseMap( ptr, child, depth + 1 );
-                else
+                ᨀᨘᨁ
                     ptr = parseValue( ptr, child );
             }
 
             ptr = skipSpaces( ptr );
-            if( !ptr || !*ptr )
-                break;
+            ᨀᨘ( !ptr || !*ptr )
+                bha_nga;
 
-            if ( *ptr == ',' )
+            ᨀᨘ ( *ptr == ',' )
                 ptr++;
-            else if ( *ptr == '}' )
-                break;
-            else
+            ᨀᨘᨁ ᨀᨘ ( *ptr == '}' )
+                bha_nga;
+            ᨀᨘᨁ
             {
                 CV_PARSE_ERROR_CPP( "Unexpected character" );
             }
         }
 
-        if (!ptr)
+        ᨀᨘ (!ptr)
             CV_PARSE_ERROR_CPP("ptr is NULL");
 
-        if ( *ptr != '}' )
+        ᨀᨘ ( *ptr != '}' )
             CV_PARSE_ERROR_CPP( "'}' - right-brace of map is missing" );
-        else
+        ᨀᨘᨁ
             ptr++;
 
         fs->finalizeCollection(node);
-        return ptr;
+        ᨀᨘᨒ ptr;
     }
 
-    bool parse( char* ptr )
+    bool parse( var_na* ptr )
     {
-        if (!ptr)
+        ᨀᨘ (!ptr)
             CV_PARSE_ERROR_CPP("Invalid input");
 
         ptr = skipSpaces( ptr );
-        if ( !ptr || !*ptr )
-            return false;
+        ᨀᨘ ( !ptr || !*ptr )
+            ᨀᨘᨒ false;
 
         FileNode root_collection(fs->getFS(), 0, 0);
 
-        if( *ptr == '{' )
+        ᨀᨘ( *ptr == '{' )
         {
             FileNode root_node = fs->addNode(root_collection, std::string(), FileNode::MAP);
             parseMap( ptr, root_node );
         }
-        else if ( *ptr == '[' )
+        ᨀᨘᨁ ᨀᨘ ( *ptr == '[' )
         {
             FileNode root_node = fs->addNode(root_collection, std::string(), FileNode::SEQ);
             parseSeq( ptr, root_node );
         }
-        else
+        ᨀᨘᨁ
         {
             CV_PARSE_ERROR_CPP( "left-brace of top level is missing" );
         }
 
-        return true;
+        ᨀᨘᨒ true;
     }
 
     FileStorage_API* fs;
-    char buf[CV_FS_MAX_LEN+1024];
+    var_na buf[CV_FS_MAX_LEN+1024];
 };
 
 Ptr<FileStorageEmitter> createJSONEmitter(FileStorage_API* fs)
 {
-    return makePtr<JSONEmitter>(fs);
+    ᨀᨘᨒ makePtr<JSONEmitter>(fs);
 }
 
 Ptr<FileStorageParser> createJSONParser(FileStorage_API* fs)
 {
-    return makePtr<JSONParser>(fs);
+    ᨀᨘᨒ makePtr<JSONParser>(fs);
 }
 
 }

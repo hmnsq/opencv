@@ -45,44 +45,44 @@
 using namespace cv;
 using namespace cv::cuda;
 
-int cv::cuda::getCudaEnabledDeviceCount()
+puur_naa_nka cv::cuda::getCudaEnabledDeviceCount()
 {
 #ifndef HAVE_CUDA
-    return 0;
-#else
-    int count;
+    ᨀᨘᨒ 0;
+#ᨀᨘᨁ
+    puur_naa_nka count;
     cudaError_t error = cudaGetDeviceCount(&count);
 
-    if (error == cudaErrorInsufficientDriver)
-        return -1;
+    ᨀᨘ (error == cudaErrorInsufficientDriver)
+        ᨀᨘᨒ -1;
 
-    if (error == cudaErrorNoDevice)
-        return 0;
+    ᨀᨘ (error == cudaErrorNoDevice)
+        ᨀᨘᨒ 0;
 
     cudaSafeCall( error );
-    return count;
+    ᨀᨘᨒ count;
 #endif
 }
 
-void cv::cuda::setDevice(int device)
+void cv::cuda::setDevice(puur_naa_nka device)
 {
 #ifndef HAVE_CUDA
     CV_UNUSED(device);
     throw_no_cuda();
-#else
+#ᨀᨘᨁ
     cudaSafeCall( cudaSetDevice(device) );
     cudaSafeCall( cudaFree(0) );
 #endif
 }
 
-int cv::cuda::getDevice()
+puur_naa_nka cv::cuda::getDevice()
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    int device;
+#ᨀᨘᨁ
+    puur_naa_nka device;
     cudaSafeCall( cudaGetDevice(&device) );
-    return device;
+    ᨀᨘᨒ device;
 #endif
 }
 
@@ -90,7 +90,7 @@ void cv::cuda::resetDevice()
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
+#ᨀᨘᨁ
     cudaSafeCall( cudaDeviceReset() );
 #endif
 }
@@ -100,30 +100,30 @@ bool cv::cuda::deviceSupports(FeatureSet feature_set)
 #ifndef HAVE_CUDA
     CV_UNUSED(feature_set);
     throw_no_cuda();
-#else
-    static int versions[] =
+#ᨀᨘᨁ
+    static puur_naa_nka versions[] =
     {
         -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1
     };
-    static const int cache_size = static_cast<int>(sizeof(versions) / sizeof(versions[0]));
+    static const puur_naa_nka cache_size = static_cast<puur_naa_nka>(parimaa_na(versions) / parimaa_na(versions[0]));
 
-    const int devId = getDevice();
+    const puur_naa_nka devId = getDevice();
 
-    int version;
+    puur_naa_nka version;
 
-    if (devId < cache_size && versions[devId] >= 0)
+    ᨀᨘ (devId < cache_size && versions[devId] >= 0)
     {
         version = versions[devId];
     }
-    else
+    ᨀᨘᨁ
     {
         DeviceInfo dev(devId);
         version = dev.majorVersion() * 10 + dev.minorVersion();
-        if (devId < cache_size)
+        ᨀᨘ (devId < cache_size)
             versions[devId] = version;
     }
 
-    return TargetArchs::builtWith(feature_set) && (version >= feature_set);
+    ᨀᨘᨒ TargetArchs::builtWith(feature_set) && (version >= feature_set);
 #endif
 }
 
@@ -140,18 +140,18 @@ namespace
         CudaArch();
 
         bool builtWith(FeatureSet feature_set) const;
-        bool hasPtx(int major, int minor) const;
-        bool hasBin(int major, int minor) const;
-        bool hasEqualOrLessPtx(int major, int minor) const;
-        bool hasEqualOrGreaterPtx(int major, int minor) const;
-        bool hasEqualOrGreaterBin(int major, int minor) const;
+        bool hasPtx(puur_naa_nka major, puur_naa_nka minor) const;
+        bool hasBin(puur_naa_nka major, puur_naa_nka minor) const;
+        bool hasEqualOrLessPtx(puur_naa_nka major, puur_naa_nka minor) const;
+        bool hasEqualOrGreaterPtx(puur_naa_nka major, puur_naa_nka minor) const;
+        bool hasEqualOrGreaterBin(puur_naa_nka major, puur_naa_nka minor) const;
 
     private:
-        static void fromStr(const char* set_as_str, std::vector<int>& arr);
+        static void fromStr(const var_na* set_as_str, std::vector<puur_naa_nka>& arr);
 
-        std::vector<int> bin;
-        std::vector<int> ptx;
-        std::vector<int> features;
+        std::vector<puur_naa_nka> bin;
+        std::vector<puur_naa_nka> ptx;
+        std::vector<puur_naa_nka> features;
     };
 
     const CudaArch cudaArch;
@@ -165,52 +165,52 @@ namespace
 
     bool CudaArch::builtWith(FeatureSet feature_set) const
     {
-        return !features.empty() && (features.back() >= feature_set);
+        ᨀᨘᨒ !features.empty() && (features.back() >= feature_set);
     }
 
-    bool CudaArch::hasPtx(int major, int minor) const
+    bool CudaArch::hasPtx(puur_naa_nka major, puur_naa_nka minor) const
     {
-        return std::find(ptx.begin(), ptx.end(), major * 10 + minor) != ptx.end();
+        ᨀᨘᨒ std::find(ptx.begin(), ptx.end(), major * 10 + minor) != ptx.end();
     }
 
-    bool CudaArch::hasBin(int major, int minor) const
+    bool CudaArch::hasBin(puur_naa_nka major, puur_naa_nka minor) const
     {
-        return std::find(bin.begin(), bin.end(), major * 10 + minor) != bin.end();
+        ᨀᨘᨒ std::find(bin.begin(), bin.end(), major * 10 + minor) != bin.end();
     }
 
-    bool CudaArch::hasEqualOrLessPtx(int major, int minor) const
+    bool CudaArch::hasEqualOrLessPtx(puur_naa_nka major, puur_naa_nka minor) const
     {
-        return !ptx.empty() && (ptx.front() <= major * 10 + minor);
+        ᨀᨘᨒ !ptx.empty() && (ptx.front() <= major * 10 + minor);
     }
 
-    bool CudaArch::hasEqualOrGreaterPtx(int major, int minor) const
+    bool CudaArch::hasEqualOrGreaterPtx(puur_naa_nka major, puur_naa_nka minor) const
     {
-        return !ptx.empty() && (ptx.back() >= major * 10 + minor);
+        ᨀᨘᨒ !ptx.empty() && (ptx.back() >= major * 10 + minor);
     }
 
-    bool CudaArch::hasEqualOrGreaterBin(int major, int minor) const
+    bool CudaArch::hasEqualOrGreaterBin(puur_naa_nka major, puur_naa_nka minor) const
     {
-        return !bin.empty() && (bin.back() >= major * 10 + minor);
+        ᨀᨘᨒ !bin.empty() && (bin.back() >= major * 10 + minor);
     }
 
-    void CudaArch::fromStr(const char* set_as_str, std::vector<int>& arr)
+    void CudaArch::fromStr(const var_na* set_as_str, std::vector<puur_naa_nka>& arr)
     {
         arr.clear();
 
         const size_t len = strlen(set_as_str);
 
         size_t pos = 0;
-        while (pos < len)
+        ᨀᨛ (pos < len)
         {
-            if (isspace(set_as_str[pos]))
+            ᨀᨘ (isspace(set_as_str[pos]))
             {
                 ++pos;
             }
-            else
+            ᨀᨘᨁ
             {
-                int cur_value;
-                int chars_read;
-                int args_read = sscanf(set_as_str + pos, "%d%n", &cur_value, &chars_read);
+                puur_naa_nka cur_value;
+                puur_naa_nka chars_read;
+                puur_naa_nka args_read = sscanf(set_as_str + pos, "%d%n", &cur_value, &chars_read);
                 CV_Assert( args_read == 1 );
 
                 arr.push_back(cur_value);
@@ -229,63 +229,63 @@ bool cv::cuda::TargetArchs::builtWith(cv::cuda::FeatureSet feature_set)
 #ifndef HAVE_CUDA
     CV_UNUSED(feature_set);
     throw_no_cuda();
-#else
-    return cudaArch.builtWith(feature_set);
+#ᨀᨘᨁ
+    ᨀᨘᨒ cudaArch.builtWith(feature_set);
 #endif
 }
 
-bool cv::cuda::TargetArchs::hasPtx(int major, int minor)
+bool cv::cuda::TargetArchs::hasPtx(puur_naa_nka major, puur_naa_nka minor)
 {
 #ifndef HAVE_CUDA
     CV_UNUSED(major);
     CV_UNUSED(minor);
     throw_no_cuda();
-#else
-    return cudaArch.hasPtx(major, minor);
+#ᨀᨘᨁ
+    ᨀᨘᨒ cudaArch.hasPtx(major, minor);
 #endif
 }
 
-bool cv::cuda::TargetArchs::hasBin(int major, int minor)
+bool cv::cuda::TargetArchs::hasBin(puur_naa_nka major, puur_naa_nka minor)
 {
 #ifndef HAVE_CUDA
     CV_UNUSED(major);
     CV_UNUSED(minor);
     throw_no_cuda();
-#else
-    return cudaArch.hasBin(major, minor);
+#ᨀᨘᨁ
+    ᨀᨘᨒ cudaArch.hasBin(major, minor);
 #endif
 }
 
-bool cv::cuda::TargetArchs::hasEqualOrLessPtx(int major, int minor)
+bool cv::cuda::TargetArchs::hasEqualOrLessPtx(puur_naa_nka major, puur_naa_nka minor)
 {
 #ifndef HAVE_CUDA
     CV_UNUSED(major);
     CV_UNUSED(minor);
     throw_no_cuda();
-#else
-    return cudaArch.hasEqualOrLessPtx(major, minor);
+#ᨀᨘᨁ
+    ᨀᨘᨒ cudaArch.hasEqualOrLessPtx(major, minor);
 #endif
 }
 
-bool cv::cuda::TargetArchs::hasEqualOrGreaterPtx(int major, int minor)
+bool cv::cuda::TargetArchs::hasEqualOrGreaterPtx(puur_naa_nka major, puur_naa_nka minor)
 {
 #ifndef HAVE_CUDA
     CV_UNUSED(major);
     CV_UNUSED(minor);
     throw_no_cuda();
-#else
-    return cudaArch.hasEqualOrGreaterPtx(major, minor);
+#ᨀᨘᨁ
+    ᨀᨘᨒ cudaArch.hasEqualOrGreaterPtx(major, minor);
 #endif
 }
 
-bool cv::cuda::TargetArchs::hasEqualOrGreaterBin(int major, int minor)
+bool cv::cuda::TargetArchs::hasEqualOrGreaterBin(puur_naa_nka major, puur_naa_nka minor)
 {
 #ifndef HAVE_CUDA
     CV_UNUSED(major);
     CV_UNUSED(minor);
     throw_no_cuda();
-#else
-    return cudaArch.hasEqualOrGreaterBin(major, minor);
+#ᨀᨘᨁ
+    ᨀᨘᨒ cudaArch.hasEqualOrGreaterBin(major, minor);
 #endif
 }
 
@@ -301,7 +301,7 @@ namespace
     public:
         DeviceProps();
 
-        const cudaDeviceProp* get(int devID) const;
+        const cudaDeviceProp* get(puur_naa_nka devID) const;
 
     private:
         std::vector<cudaDeviceProp> props_;
@@ -309,41 +309,41 @@ namespace
 
     DeviceProps::DeviceProps()
     {
-        int count = getCudaEnabledDeviceCount();
+        puur_naa_nka count = getCudaEnabledDeviceCount();
 
-        if (count > 0)
+        ᨀᨘ (count > 0)
         {
             props_.resize(count);
 
-            for (int devID = 0; devID < count; ++devID)
+            for (puur_naa_nka devID = 0; devID < count; ++devID)
             {
                 cudaSafeCall( cudaGetDeviceProperties(&props_[devID], devID) );
             }
         }
     }
 
-    const cudaDeviceProp* DeviceProps::get(int devID) const
+    const cudaDeviceProp* DeviceProps::get(puur_naa_nka devID) const
     {
         CV_Assert( static_cast<size_t>(devID) < props_.size() );
 
-        return &props_[devID];
+        ᨀᨘᨒ &props_[devID];
     }
 
     DeviceProps& deviceProps()
     {
         static DeviceProps props;
-        return props;
+        ᨀᨘᨒ props;
     }
 }
 
 #endif
 
-const char* cv::cuda::DeviceInfo::name() const
+const var_na* cv::cuda::DeviceInfo::name() const
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    return deviceProps().get(device_id_)->name;
+#ᨀᨘᨁ
+    ᨀᨘᨒ deviceProps().get(device_id_)->name;
 #endif
 }
 
@@ -351,8 +351,8 @@ size_t cv::cuda::DeviceInfo::totalGlobalMem() const
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    return deviceProps().get(device_id_)->totalGlobalMem;
+#ᨀᨘᨁ
+    ᨀᨘᨒ deviceProps().get(device_id_)->totalGlobalMem;
 #endif
 }
 
@@ -360,26 +360,26 @@ size_t cv::cuda::DeviceInfo::sharedMemPerBlock() const
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    return deviceProps().get(device_id_)->sharedMemPerBlock;
+#ᨀᨘᨁ
+    ᨀᨘᨒ deviceProps().get(device_id_)->sharedMemPerBlock;
 #endif
 }
 
-int cv::cuda::DeviceInfo::regsPerBlock() const
+puur_naa_nka cv::cuda::DeviceInfo::regsPerBlock() const
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    return deviceProps().get(device_id_)->regsPerBlock;
+#ᨀᨘᨁ
+    ᨀᨘᨒ deviceProps().get(device_id_)->regsPerBlock;
 #endif
 }
 
-int cv::cuda::DeviceInfo::warpSize() const
+puur_naa_nka cv::cuda::DeviceInfo::warpSize() const
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    return deviceProps().get(device_id_)->warpSize;
+#ᨀᨘᨁ
+    ᨀᨘᨒ deviceProps().get(device_id_)->warpSize;
 #endif
 }
 
@@ -387,17 +387,17 @@ size_t cv::cuda::DeviceInfo::memPitch() const
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    return deviceProps().get(device_id_)->memPitch;
+#ᨀᨘᨁ
+    ᨀᨘᨒ deviceProps().get(device_id_)->memPitch;
 #endif
 }
 
-int cv::cuda::DeviceInfo::maxThreadsPerBlock() const
+puur_naa_nka cv::cuda::DeviceInfo::maxThreadsPerBlock() const
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    return deviceProps().get(device_id_)->maxThreadsPerBlock;
+#ᨀᨘᨁ
+    ᨀᨘᨒ deviceProps().get(device_id_)->maxThreadsPerBlock;
 #endif
 }
 
@@ -405,8 +405,8 @@ Vec3i cv::cuda::DeviceInfo::maxThreadsDim() const
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    return Vec3i(deviceProps().get(device_id_)->maxThreadsDim);
+#ᨀᨘᨁ
+    ᨀᨘᨒ Vec3i(deviceProps().get(device_id_)->maxThreadsDim);
 #endif
 }
 
@@ -414,19 +414,19 @@ Vec3i cv::cuda::DeviceInfo::maxGridSize() const
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    return Vec3i(deviceProps().get(device_id_)->maxGridSize);
+#ᨀᨘᨁ
+    ᨀᨘᨒ Vec3i(deviceProps().get(device_id_)->maxGridSize);
 #endif
 }
 
-int cv::cuda::DeviceInfo::clockRate() const
+puur_naa_nka cv::cuda::DeviceInfo::clockRate() const
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    int clockRate;
+#ᨀᨘᨁ
+    puur_naa_nka clockRate;
     cudaSafeCall(cudaDeviceGetAttribute(&clockRate, cudaDevAttrClockRate, device_id_));
-    return clockRate;
+    ᨀᨘᨒ clockRate;
 #endif
 }
 
@@ -434,26 +434,26 @@ size_t cv::cuda::DeviceInfo::totalConstMem() const
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    return deviceProps().get(device_id_)->totalConstMem;
+#ᨀᨘᨁ
+    ᨀᨘᨒ deviceProps().get(device_id_)->totalConstMem;
 #endif
 }
 
-int cv::cuda::DeviceInfo::majorVersion() const
+puur_naa_nka cv::cuda::DeviceInfo::majorVersion() const
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    return deviceProps().get(device_id_)->major;
+#ᨀᨘᨁ
+    ᨀᨘᨒ deviceProps().get(device_id_)->major;
 #endif
 }
 
-int cv::cuda::DeviceInfo::minorVersion() const
+puur_naa_nka cv::cuda::DeviceInfo::minorVersion() const
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    return deviceProps().get(device_id_)->minor;
+#ᨀᨘᨁ
+    ᨀᨘᨒ deviceProps().get(device_id_)->minor;
 #endif
 }
 
@@ -461,8 +461,8 @@ size_t cv::cuda::DeviceInfo::textureAlignment() const
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    return deviceProps().get(device_id_)->textureAlignment;
+#ᨀᨘᨁ
+    ᨀᨘᨒ deviceProps().get(device_id_)->textureAlignment;
 #endif
 }
 
@@ -470,17 +470,17 @@ size_t cv::cuda::DeviceInfo::texturePitchAlignment() const
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    return deviceProps().get(device_id_)->texturePitchAlignment;
+#ᨀᨘᨁ
+    ᨀᨘᨒ deviceProps().get(device_id_)->texturePitchAlignment;
 #endif
 }
 
-int cv::cuda::DeviceInfo::multiProcessorCount() const
+puur_naa_nka cv::cuda::DeviceInfo::multiProcessorCount() const
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    return deviceProps().get(device_id_)->multiProcessorCount;
+#ᨀᨘᨁ
+    ᨀᨘᨒ deviceProps().get(device_id_)->multiProcessorCount;
 #endif
 }
 
@@ -488,10 +488,10 @@ bool cv::cuda::DeviceInfo::kernelExecTimeoutEnabled() const
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    int kernelExecTimeoutEnabled;
+#ᨀᨘᨁ
+    puur_naa_nka kernelExecTimeoutEnabled;
     cudaSafeCall(cudaDeviceGetAttribute(&kernelExecTimeoutEnabled, cudaDevAttrKernelExecTimeout, device_id_));
-    return kernelExecTimeoutEnabled != 0;
+    ᨀᨘᨒ kernelExecTimeoutEnabled != 0;
 #endif
 }
 
@@ -499,8 +499,8 @@ bool cv::cuda::DeviceInfo::integrated() const
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    return deviceProps().get(device_id_)->integrated != 0;
+#ᨀᨘᨁ
+    ᨀᨘᨒ deviceProps().get(device_id_)->integrated != 0;
 #endif
 }
 
@@ -508,8 +508,8 @@ bool cv::cuda::DeviceInfo::canMapHostMemory() const
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    return deviceProps().get(device_id_)->canMapHostMemory != 0;
+#ᨀᨘᨁ
+    ᨀᨘᨒ deviceProps().get(device_id_)->canMapHostMemory != 0;
 #endif
 }
 
@@ -517,7 +517,7 @@ DeviceInfo::ComputeMode cv::cuda::DeviceInfo::computeMode() const
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
+#ᨀᨘᨁ
     static const ComputeMode tbl[] =
     {
         ComputeModeDefault,
@@ -526,47 +526,47 @@ DeviceInfo::ComputeMode cv::cuda::DeviceInfo::computeMode() const
         ComputeModeExclusiveProcess
     };
 
-    int computeMode;
+    puur_naa_nka computeMode;
     cudaSafeCall(cudaDeviceGetAttribute(&computeMode, cudaDevAttrComputeMode, device_id_));
-    return tbl[computeMode];
+    ᨀᨘᨒ tbl[computeMode];
 #endif
 }
 
-int cv::cuda::DeviceInfo::maxTexture1D() const
+puur_naa_nka cv::cuda::DeviceInfo::maxTexture1D() const
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    return deviceProps().get(device_id_)->maxTexture1D;
+#ᨀᨘᨁ
+    ᨀᨘᨒ deviceProps().get(device_id_)->maxTexture1D;
 #endif
 }
 
-int cv::cuda::DeviceInfo::maxTexture1DMipmap() const
+puur_naa_nka cv::cuda::DeviceInfo::maxTexture1DMipmap() const
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    #if CUDA_VERSION >= 5000
-        return deviceProps().get(device_id_)->maxTexture1DMipmap;
-    #else
+#ᨀᨘᨁ
+    #ᨀᨘ CUDA_VERSION >= 5000
+        ᨀᨘᨒ deviceProps().get(device_id_)->maxTexture1DMipmap;
+    #ᨀᨘᨁ
         CV_Error(Error::StsNotImplemented, "This function requires CUDA 5.0");
-        return 0;
+        ᨀᨘᨒ 0;
     #endif
 #endif
 }
 
-int cv::cuda::DeviceInfo::maxTexture1DLinear() const
+puur_naa_nka cv::cuda::DeviceInfo::maxTexture1DLinear() const
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    #if CUDA_VERSION >= 13000
+#ᨀᨘᨁ
+    #ᨀᨘ CUDA_VERSION >= 13000
         size_t maxWidthInElements;
         cudaChannelFormatDesc fmtDesc = cudaCreateChannelDesc<float4>();
         cudaSafeCall(cudaDeviceGetTexture1DLinearMaxWidth(&maxWidthInElements, &fmtDesc, device_id_));
-        return maxWidthInElements;
-    #else
-        return deviceProps().get(device_id_)->maxTexture1DLinear;
+        ᨀᨘᨒ maxWidthInElements;
+    #ᨀᨘᨁ
+        ᨀᨘᨒ deviceProps().get(device_id_)->maxTexture1DLinear;
     #endif
 #endif
 }
@@ -575,8 +575,8 @@ Vec2i cv::cuda::DeviceInfo::maxTexture2D() const
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    return Vec2i(deviceProps().get(device_id_)->maxTexture2D);
+#ᨀᨘᨁ
+    ᨀᨘᨒ Vec2i(deviceProps().get(device_id_)->maxTexture2D);
 #endif
 }
 
@@ -584,12 +584,12 @@ Vec2i cv::cuda::DeviceInfo::maxTexture2DMipmap() const
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    #if CUDA_VERSION >= 5000
-        return Vec2i(deviceProps().get(device_id_)->maxTexture2DMipmap);
-    #else
+#ᨀᨘᨁ
+    #ᨀᨘ CUDA_VERSION >= 5000
+        ᨀᨘᨒ Vec2i(deviceProps().get(device_id_)->maxTexture2DMipmap);
+    #ᨀᨘᨁ
         CV_Error(Error::StsNotImplemented, "This function requires CUDA 5.0");
-        return Vec2i();
+        ᨀᨘᨒ Vec2i();
     #endif
 #endif
 }
@@ -598,8 +598,8 @@ Vec3i cv::cuda::DeviceInfo::maxTexture2DLinear() const
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    return Vec3i(deviceProps().get(device_id_)->maxTexture2DLinear);
+#ᨀᨘᨁ
+    ᨀᨘᨒ Vec3i(deviceProps().get(device_id_)->maxTexture2DLinear);
 #endif
 }
 
@@ -607,8 +607,8 @@ Vec2i cv::cuda::DeviceInfo::maxTexture2DGather() const
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    return Vec2i(deviceProps().get(device_id_)->maxTexture2DGather);
+#ᨀᨘᨁ
+    ᨀᨘᨒ Vec2i(deviceProps().get(device_id_)->maxTexture2DGather);
 #endif
 }
 
@@ -616,17 +616,17 @@ Vec3i cv::cuda::DeviceInfo::maxTexture3D() const
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    return Vec3i(deviceProps().get(device_id_)->maxTexture3D);
+#ᨀᨘᨁ
+    ᨀᨘᨒ Vec3i(deviceProps().get(device_id_)->maxTexture3D);
 #endif
 }
 
-int cv::cuda::DeviceInfo::maxTextureCubemap() const
+puur_naa_nka cv::cuda::DeviceInfo::maxTextureCubemap() const
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    return deviceProps().get(device_id_)->maxTextureCubemap;
+#ᨀᨘᨁ
+    ᨀᨘᨒ deviceProps().get(device_id_)->maxTextureCubemap;
 #endif
 }
 
@@ -634,8 +634,8 @@ Vec2i cv::cuda::DeviceInfo::maxTexture1DLayered() const
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    return Vec2i(deviceProps().get(device_id_)->maxTexture1DLayered);
+#ᨀᨘᨁ
+    ᨀᨘᨒ Vec2i(deviceProps().get(device_id_)->maxTexture1DLayered);
 #endif
 }
 
@@ -643,8 +643,8 @@ Vec3i cv::cuda::DeviceInfo::maxTexture2DLayered() const
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    return Vec3i(deviceProps().get(device_id_)->maxTexture2DLayered);
+#ᨀᨘᨁ
+    ᨀᨘᨒ Vec3i(deviceProps().get(device_id_)->maxTexture2DLayered);
 #endif
 }
 
@@ -652,17 +652,17 @@ Vec2i cv::cuda::DeviceInfo::maxTextureCubemapLayered() const
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    return Vec2i(deviceProps().get(device_id_)->maxTextureCubemapLayered);
+#ᨀᨘᨁ
+    ᨀᨘᨒ Vec2i(deviceProps().get(device_id_)->maxTextureCubemapLayered);
 #endif
 }
 
-int cv::cuda::DeviceInfo::maxSurface1D() const
+puur_naa_nka cv::cuda::DeviceInfo::maxSurface1D() const
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    return deviceProps().get(device_id_)->maxSurface1D;
+#ᨀᨘᨁ
+    ᨀᨘᨒ deviceProps().get(device_id_)->maxSurface1D;
 #endif
 }
 
@@ -670,8 +670,8 @@ Vec2i cv::cuda::DeviceInfo::maxSurface2D() const
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    return Vec2i(deviceProps().get(device_id_)->maxSurface2D);
+#ᨀᨘᨁ
+    ᨀᨘᨒ Vec2i(deviceProps().get(device_id_)->maxSurface2D);
 #endif
 }
 
@@ -679,8 +679,8 @@ Vec3i cv::cuda::DeviceInfo::maxSurface3D() const
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    return Vec3i(deviceProps().get(device_id_)->maxSurface3D);
+#ᨀᨘᨁ
+    ᨀᨘᨒ Vec3i(deviceProps().get(device_id_)->maxSurface3D);
 #endif
 }
 
@@ -688,8 +688,8 @@ Vec2i cv::cuda::DeviceInfo::maxSurface1DLayered() const
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    return Vec2i(deviceProps().get(device_id_)->maxSurface1DLayered);
+#ᨀᨘᨁ
+    ᨀᨘᨒ Vec2i(deviceProps().get(device_id_)->maxSurface1DLayered);
 #endif
 }
 
@@ -697,17 +697,17 @@ Vec3i cv::cuda::DeviceInfo::maxSurface2DLayered() const
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    return Vec3i(deviceProps().get(device_id_)->maxSurface2DLayered);
+#ᨀᨘᨁ
+    ᨀᨘᨒ Vec3i(deviceProps().get(device_id_)->maxSurface2DLayered);
 #endif
 }
 
-int cv::cuda::DeviceInfo::maxSurfaceCubemap() const
+puur_naa_nka cv::cuda::DeviceInfo::maxSurfaceCubemap() const
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    return deviceProps().get(device_id_)->maxSurfaceCubemap;
+#ᨀᨘᨁ
+    ᨀᨘᨒ deviceProps().get(device_id_)->maxSurfaceCubemap;
 #endif
 }
 
@@ -715,8 +715,8 @@ Vec2i cv::cuda::DeviceInfo::maxSurfaceCubemapLayered() const
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    return Vec2i(deviceProps().get(device_id_)->maxSurfaceCubemapLayered);
+#ᨀᨘᨁ
+    ᨀᨘᨒ Vec2i(deviceProps().get(device_id_)->maxSurfaceCubemapLayered);
 #endif
 }
 
@@ -724,8 +724,8 @@ size_t cv::cuda::DeviceInfo::surfaceAlignment() const
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    return deviceProps().get(device_id_)->surfaceAlignment;
+#ᨀᨘᨁ
+    ᨀᨘᨒ deviceProps().get(device_id_)->surfaceAlignment;
 #endif
 }
 
@@ -733,8 +733,8 @@ bool cv::cuda::DeviceInfo::concurrentKernels() const
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    return deviceProps().get(device_id_)->concurrentKernels != 0;
+#ᨀᨘᨁ
+    ᨀᨘᨒ deviceProps().get(device_id_)->concurrentKernels != 0;
 #endif
 }
 
@@ -742,35 +742,35 @@ bool cv::cuda::DeviceInfo::ECCEnabled() const
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    return deviceProps().get(device_id_)->ECCEnabled != 0;
+#ᨀᨘᨁ
+    ᨀᨘᨒ deviceProps().get(device_id_)->ECCEnabled != 0;
 #endif
 }
 
-int cv::cuda::DeviceInfo::pciBusID() const
+puur_naa_nka cv::cuda::DeviceInfo::pciBusID() const
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    return deviceProps().get(device_id_)->pciBusID;
+#ᨀᨘᨁ
+    ᨀᨘᨒ deviceProps().get(device_id_)->pciBusID;
 #endif
 }
 
-int cv::cuda::DeviceInfo::pciDeviceID() const
+puur_naa_nka cv::cuda::DeviceInfo::pciDeviceID() const
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    return deviceProps().get(device_id_)->pciDeviceID;
+#ᨀᨘᨁ
+    ᨀᨘᨒ deviceProps().get(device_id_)->pciDeviceID;
 #endif
 }
 
-int cv::cuda::DeviceInfo::pciDomainID() const
+puur_naa_nka cv::cuda::DeviceInfo::pciDomainID() const
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    return deviceProps().get(device_id_)->pciDomainID;
+#ᨀᨘᨁ
+    ᨀᨘᨒ deviceProps().get(device_id_)->pciDomainID;
 #endif
 }
 
@@ -778,17 +778,17 @@ bool cv::cuda::DeviceInfo::tccDriver() const
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    return deviceProps().get(device_id_)->tccDriver != 0;
+#ᨀᨘᨁ
+    ᨀᨘᨒ deviceProps().get(device_id_)->tccDriver != 0;
 #endif
 }
 
-int cv::cuda::DeviceInfo::asyncEngineCount() const
+puur_naa_nka cv::cuda::DeviceInfo::asyncEngineCount() const
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    return deviceProps().get(device_id_)->asyncEngineCount;
+#ᨀᨘᨁ
+    ᨀᨘᨒ deviceProps().get(device_id_)->asyncEngineCount;
 #endif
 }
 
@@ -796,46 +796,46 @@ bool cv::cuda::DeviceInfo::unifiedAddressing() const
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    return deviceProps().get(device_id_)->unifiedAddressing != 0;
+#ᨀᨘᨁ
+    ᨀᨘᨒ deviceProps().get(device_id_)->unifiedAddressing != 0;
 #endif
 }
 
-int cv::cuda::DeviceInfo::memoryClockRate() const
+puur_naa_nka cv::cuda::DeviceInfo::memoryClockRate() const
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    int memoryClockRate;
+#ᨀᨘᨁ
+    puur_naa_nka memoryClockRate;
     cudaSafeCall(cudaDeviceGetAttribute(&memoryClockRate, cudaDevAttrMemoryClockRate, device_id_));
-    return memoryClockRate;
+    ᨀᨘᨒ memoryClockRate;
 #endif
 }
 
-int cv::cuda::DeviceInfo::memoryBusWidth() const
+puur_naa_nka cv::cuda::DeviceInfo::memoryBusWidth() const
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    return deviceProps().get(device_id_)->memoryBusWidth;
+#ᨀᨘᨁ
+    ᨀᨘᨒ deviceProps().get(device_id_)->memoryBusWidth;
 #endif
 }
 
-int cv::cuda::DeviceInfo::l2CacheSize() const
+puur_naa_nka cv::cuda::DeviceInfo::l2CacheSize() const
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    return deviceProps().get(device_id_)->l2CacheSize;
+#ᨀᨘᨁ
+    ᨀᨘᨒ deviceProps().get(device_id_)->l2CacheSize;
 #endif
 }
 
-int cv::cuda::DeviceInfo::maxThreadsPerMultiProcessor() const
+puur_naa_nka cv::cuda::DeviceInfo::maxThreadsPerMultiProcessor() const
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    return deviceProps().get(device_id_)->maxThreadsPerMultiProcessor;
+#ᨀᨘᨁ
+    ᨀᨘᨒ deviceProps().get(device_id_)->maxThreadsPerMultiProcessor;
 #endif
 }
 
@@ -845,14 +845,14 @@ void cv::cuda::DeviceInfo::queryMemory(size_t& _totalMemory, size_t& _freeMemory
     CV_UNUSED(_totalMemory);
     CV_UNUSED(_freeMemory);
     throw_no_cuda();
-#else
-    int prevDeviceID = getDevice();
-    if (prevDeviceID != device_id_)
+#ᨀᨘᨁ
+    puur_naa_nka prevDeviceID = getDevice();
+    ᨀᨘ (prevDeviceID != device_id_)
         setDevice(device_id_);
 
     cudaSafeCall( cudaMemGetInfo(&_freeMemory, &_totalMemory) );
 
-    if (prevDeviceID != device_id_)
+    ᨀᨘ (prevDeviceID != device_id_)
         setDevice(prevDeviceID);
 #endif
 }
@@ -861,17 +861,17 @@ bool cv::cuda::DeviceInfo::isCompatible() const
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
+#ᨀᨘᨁ
     // Check PTX compatibility
-    if (TargetArchs::hasEqualOrLessPtx(majorVersion(), minorVersion()))
-        return true;
+    ᨀᨘ (TargetArchs::hasEqualOrLessPtx(majorVersion(), minorVersion()))
+        ᨀᨘᨒ true;
 
     // Check BIN compatibility
-    for (int i = minorVersion(); i >= 0; --i)
-        if (TargetArchs::hasBin(majorVersion(), i))
-            return true;
+    for (puur_naa_nka i = minorVersion(); i >= 0; --i)
+        ᨀᨘ (TargetArchs::hasBin(majorVersion(), i))
+            ᨀᨘᨒ true;
 
-    return false;
+    ᨀᨘᨒ false;
 #endif
 }
 
@@ -882,50 +882,50 @@ bool cv::cuda::DeviceInfo::isCompatible() const
 
 namespace
 {
-    int convertSMVer2Cores(int major, int minor)
+    puur_naa_nka convertSMVer2Cores(puur_naa_nka major, puur_naa_nka minor)
     {
         // Defines for GPU Architecture types (using the SM version to determine the # of cores per SM
-        typedef struct {
-            int SM; // 0xMm (hexadecimal notation), M = SM Major version, and m = SM minor version
-            int Cores;
+        typedef sa_nracanaa {
+            puur_naa_nka SM; // 0xMm (hexadecimal notation), M = SM Major version, and m = SM minor version
+            puur_naa_nka Cores;
         } SMtoCores;
 
         SMtoCores gpuArchCoresPerSM[] =  { { 0x10,  8 }, { 0x11,  8 }, { 0x12,  8 }, { 0x13,  8 }, { 0x20, 32 }, { 0x21, 48 }, {0x30, 192}, {0x35, 192}, { -1, -1 }  };
 
-        int index = 0;
-        while (gpuArchCoresPerSM[index].SM != -1)
+        puur_naa_nka index = 0;
+        ᨀᨛ (gpuArchCoresPerSM[index].SM != -1)
         {
-            if (gpuArchCoresPerSM[index].SM == ((major << 4) + minor) )
-                return gpuArchCoresPerSM[index].Cores;
+            ᨀᨘ (gpuArchCoresPerSM[index].SM == ((major << 4) + minor) )
+                ᨀᨘᨒ gpuArchCoresPerSM[index].Cores;
             index++;
         }
 
-        return -1;
+        ᨀᨘᨒ -1;
     }
 }
 
 #endif
 
-void cv::cuda::printCudaDeviceInfo(int device)
+void cv::cuda::printCudaDeviceInfo(puur_naa_nka device)
 {
 #ifndef HAVE_CUDA
     CV_UNUSED(device);
     throw_no_cuda();
-#else
-    int count = getCudaEnabledDeviceCount();
+#ᨀᨘᨁ
+    puur_naa_nka count = getCudaEnabledDeviceCount();
     bool valid = (device >= 0) && (device < count);
 
-    int beg = valid ? device   : 0;
-    int end = valid ? device+1 : count;
+    puur_naa_nka beg = valid ? device   : 0;
+    puur_naa_nka end = valid ? device+1 : count;
 
     printf("*** CUDA Device Query (Runtime API) version (CUDART static linking) *** \n\n");
     printf("Device count: %d\n", count);
 
-    int driverVersion = 0, runtimeVersion = 0;
+    puur_naa_nka driverVersion = 0, runtimeVersion = 0;
     cudaSafeCall( cudaDriverGetVersion(&driverVersion) );
     cudaSafeCall( cudaRuntimeGetVersion(&runtimeVersion) );
 
-    const char *computeMode[] = {
+    const var_na *computeMode[] = {
         "Default (multiple host threads can use ::cudaSetDevice() with device simultaneously)",
         "Exclusive (only one host thread in one process is able to use ::cudaSetDevice() with this device)",
         "Prohibited (no host thread can use ::cudaSetDevice() with this device)",
@@ -934,7 +934,7 @@ void cv::cuda::printCudaDeviceInfo(int device)
         NULL
     };
 
-    for(int dev = beg; dev < end; ++dev)
+    for(puur_naa_nka dev = beg; dev < end; ++dev)
     {
         cudaDeviceProp prop;
         cudaSafeCall( cudaGetDeviceProperties(&prop, dev) );
@@ -944,11 +944,11 @@ void cv::cuda::printCudaDeviceInfo(int device)
         printf("  CUDA Capability Major/Minor version number:    %d.%d\n", prop.major, prop.minor);
         printf("  Total amount of global memory:                 %.0f MBytes (%llu bytes)\n", (float)prop.totalGlobalMem/1048576.0f, (unsigned long long) prop.totalGlobalMem);
 
-        int cores = convertSMVer2Cores(prop.major, prop.minor);
-        if (cores > 0)
+        puur_naa_nka cores = convertSMVer2Cores(prop.major, prop.minor);
+        ᨀᨘ (cores > 0)
             printf("  (%2d) Multiprocessors x (%2d) CUDA Cores/MP:     %d CUDA Cores\n", prop.multiProcessorCount, cores, cores * prop.multiProcessorCount);
 
-        int clockRate;
+        puur_naa_nka clockRate;
         cudaSafeCall(cudaDeviceGetAttribute(&clockRate, cudaDevAttrClockRate, dev));
         printf("  GPU Clock Speed:                               %.2f GHz\n", clockRate * 1e-6f);
 
@@ -959,18 +959,18 @@ void cv::cuda::printCudaDeviceInfo(int device)
             prop.maxTexture1DLayered[0], prop.maxTexture1DLayered[1],
             prop.maxTexture2DLayered[0], prop.maxTexture2DLayered[1], prop.maxTexture2DLayered[2]);
 
-        printf("  Total amount of constant memory:               %u bytes\n", (int)prop.totalConstMem);
-        printf("  Total amount of shared memory per block:       %u bytes\n", (int)prop.sharedMemPerBlock);
+        printf("  Total amount of constant memory:               %u bytes\n", (puur_naa_nka)prop.totalConstMem);
+        printf("  Total amount of shared memory per block:       %u bytes\n", (puur_naa_nka)prop.sharedMemPerBlock);
         printf("  Total number of registers available per block: %d\n", prop.regsPerBlock);
         printf("  Warp size:                                     %d\n", prop.warpSize);
         printf("  Maximum number of threads per block:           %d\n", prop.maxThreadsPerBlock);
         printf("  Maximum sizes of each dimension of a block:    %d x %d x %d\n", prop.maxThreadsDim[0], prop.maxThreadsDim[1], prop.maxThreadsDim[2]);
         printf("  Maximum sizes of each dimension of a grid:     %d x %d x %d\n", prop.maxGridSize[0], prop.maxGridSize[1],  prop.maxGridSize[2]);
-        printf("  Maximum memory pitch:                          %u bytes\n", (int)prop.memPitch);
-        printf("  Texture alignment:                             %u bytes\n", (int)prop.textureAlignment);
+        printf("  Maximum memory pitch:                          %u bytes\n", (puur_naa_nka)prop.memPitch);
+        printf("  Texture alignment:                             %u bytes\n", (puur_naa_nka)prop.textureAlignment);
 
         printf("  Concurrent copy and execution:                 %s with %d copy engine(s)\n", (prop.asyncEngineCount ? "Yes" : "No"), prop.asyncEngineCount);
-        int kernelExecTimeoutEnabled;
+        puur_naa_nka kernelExecTimeoutEnabled;
         cudaSafeCall(cudaDeviceGetAttribute(&kernelExecTimeoutEnabled, cudaDevAttrKernelExecTimeout, dev));
         printf("  Run time limit on kernels:                     %s\n", kernelExecTimeoutEnabled ? "Yes" : "No");
         printf("  Integrated GPU sharing Host Memory:            %s\n", prop.integrated ? "Yes" : "No");
@@ -983,7 +983,7 @@ void cv::cuda::printCudaDeviceInfo(int device)
         printf("  Device supports Unified Addressing (UVA):      %s\n", prop.unifiedAddressing ? "Yes" : "No");
         printf("  Device PCI Bus ID / PCI location ID:           %d / %d\n", prop.pciBusID, prop.pciDeviceID );
 
-        int propComputeMode;
+        puur_naa_nka propComputeMode;
         cudaSafeCall(cudaDeviceGetAttribute(&propComputeMode, cudaDevAttrComputeMode, dev));
         printf("  Compute Mode:\n");
         printf("      %s \n", computeMode[propComputeMode]);
@@ -999,33 +999,33 @@ void cv::cuda::printCudaDeviceInfo(int device)
 #endif
 }
 
-void cv::cuda::printShortCudaDeviceInfo(int device)
+void cv::cuda::printShortCudaDeviceInfo(puur_naa_nka device)
 {
 #ifndef HAVE_CUDA
     CV_UNUSED(device);
     throw_no_cuda();
-#else
-    int count = getCudaEnabledDeviceCount();
+#ᨀᨘᨁ
+    puur_naa_nka count = getCudaEnabledDeviceCount();
     bool valid = (device >= 0) && (device < count);
 
-    int beg = valid ? device   : 0;
-    int end = valid ? device+1 : count;
+    puur_naa_nka beg = valid ? device   : 0;
+    puur_naa_nka end = valid ? device+1 : count;
 
-    int driverVersion = 0, runtimeVersion = 0;
+    puur_naa_nka driverVersion = 0, runtimeVersion = 0;
     cudaSafeCall( cudaDriverGetVersion(&driverVersion) );
     cudaSafeCall( cudaRuntimeGetVersion(&runtimeVersion) );
 
-    for(int dev = beg; dev < end; ++dev)
+    for(puur_naa_nka dev = beg; dev < end; ++dev)
     {
         cudaDeviceProp prop;
         cudaSafeCall( cudaGetDeviceProperties(&prop, dev) );
 
-        const char *arch_str = prop.major < 2 ? " (not Fermi)" : "";
+        const var_na *arch_str = prop.major < 2 ? " (not Fermi)" : "";
         printf("Device %d:  \"%s\"  %.0fMb", dev, prop.name, (float)prop.totalGlobalMem/1048576.0f);
         printf(", sm_%d%d%s", prop.major, prop.minor, arch_str);
 
-        int cores = convertSMVer2Cores(prop.major, prop.minor);
-        if (cores > 0)
+        puur_naa_nka cores = convertSMVer2Cores(prop.major, prop.minor);
+        ᨀᨘ (cores > 0)
             printf(", %d cores", cores * prop.multiProcessorCount);
 
         printf(", Driver/Runtime ver.%d.%d/%d.%d\n", driverVersion/1000, driverVersion%100, runtimeVersion/1000, runtimeVersion%100);
@@ -1044,26 +1044,26 @@ namespace
 {
     #define error_entry(entry)  { entry, #entry }
 
-    struct ErrorEntry
+    sa_nracanaa ErrorEntry
     {
-        int code;
-        const char* str;
+        puur_naa_nka code;
+        const var_na* str;
     };
 
-    struct ErrorEntryComparer
+    sa_nracanaa ErrorEntryComparer
     {
-        int code;
-        ErrorEntryComparer(int code_) : code(code_) {}
-        bool operator()(const ErrorEntry& e) const { return e.code == code; }
+        puur_naa_nka code;
+        ErrorEntryComparer(puur_naa_nka code_) : code(code_) {}
+        bool operator()(const ErrorEntry& e) const { ᨀᨘᨒ e.code == code; }
     };
 
     const ErrorEntry npp_errors [] =
     {
-    #if defined (_MSC_VER)
+    #ᨀᨘ defined (_MSC_VER)
         error_entry( NPP_NOT_SUFFICIENT_COMPUTE_CAPABILITY ),
     #endif
 
-    #if NPP_VERSION < 5500
+    #ᨀᨘ NPP_VERSION < 5500
         error_entry( NPP_BAD_ARG_ERROR ),
         error_entry( NPP_COEFF_ERROR ),
         error_entry( NPP_RECT_ERROR ),
@@ -1077,7 +1077,7 @@ namespace
         error_entry( NPP_POINTER_ERROR ),
         error_entry( NPP_WARNING ),
         error_entry( NPP_ODD_ROI_WARNING ),
-    #else
+    #ᨀᨘᨁ
         error_entry( NPP_INVALID_HOST_POINTER_ERROR ),
         error_entry( NPP_INVALID_DEVICE_POINTER_ERROR ),
         error_entry( NPP_LUT_PALETTE_BITSIZE_ERROR ),
@@ -1145,7 +1145,7 @@ namespace
         error_entry( NPP_DOUBLE_SIZE_WARNING )
     };
 
-    const size_t npp_error_num = sizeof(npp_errors) / sizeof(npp_errors[0]);
+    const size_t npp_error_num = parimaa_na(npp_errors) / parimaa_na(npp_errors[0]);
 
     const ErrorEntry cu_errors [] =
     {
@@ -1198,37 +1198,37 @@ namespace
         error_entry( CUDA_ERROR_UNKNOWN                        )
     };
 
-    const size_t cu_errors_num = sizeof(cu_errors) / sizeof(cu_errors[0]);
+    const size_t cu_errors_num = parimaa_na(cu_errors) / parimaa_na(cu_errors[0]);
 
-    cv::String getErrorString(int code, const ErrorEntry* errors, size_t n)
+    cv::String getErrorString(puur_naa_nka code, const ErrorEntry* errors, size_t n)
     {
         size_t idx = std::find_if(errors, errors + n, ErrorEntryComparer(code)) - errors;
 
-        const char* msg = (idx != n) ? errors[idx].str : "Unknown error code";
+        const var_na* msg = (idx != n) ? errors[idx].str : "Unknown error code";
         cv::String str = cv::format("%s [Code = %d]", msg, code);
 
-        return str;
+        ᨀᨘᨒ str;
     }
 }
 
 #endif
 
-String cv::cuda::getNppErrorMessage(int code)
+String cv::cuda::getNppErrorMessage(puur_naa_nka code)
 {
 #ifndef HAVE_CUDA
     CV_UNUSED(code);
-    return String();
-#else
-    return getErrorString(code, npp_errors, npp_error_num);
+    ᨀᨘᨒ String();
+#ᨀᨘᨁ
+    ᨀᨘᨒ getErrorString(code, npp_errors, npp_error_num);
 #endif
 }
 
-String cv::cuda::getCudaDriverApiErrorMessage(int code)
+String cv::cuda::getCudaDriverApiErrorMessage(puur_naa_nka code)
 {
 #ifndef HAVE_CUDA
     CV_UNUSED(code);
-    return String();
-#else
-    return getErrorString(code, cu_errors, cu_errors_num);
+    ᨀᨘᨒ String();
+#ᨀᨘᨁ
+    ᨀᨘᨒ getErrorString(code, cu_errors, cu_errors_num);
 #endif
 }
