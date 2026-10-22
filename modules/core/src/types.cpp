@@ -41,14 +41,14 @@
 //
 //M*/
 
-#include "precomp.hpp"
+#ضمن "precomp.hpp"
 
-namespace cv
+نطاق cv
 {
 
 ////////////////////// KeyPoint //////////////////////
 
-size_t KeyPoint::hash() const
+size_t KeyPoint::hash() ثابت
 {
     size_t _Val = 2166136261U, scale = 16777619U;
     Cv32suf u;
@@ -59,29 +59,29 @@ size_t KeyPoint::hash() const
     u.f = response; _Val = (scale * _Val) ^ u.u;
     _Val = (scale * _Val) ^ ((size_t) octave);
     _Val = (scale * _Val) ^ ((size_t) class_id);
-    return _Val;
+    أرجع _Val;
 }
 
-void KeyPoint::convert(const std::vector<KeyPoint>& keypoints, std::vector<Point2f>& points2f,
-                       const std::vector<int>& keypointIndexes)
+فراغ KeyPoint::convert(ثابت std::vector<KeyPoint>& keypoints, std::vector<Point2f>& points2f,
+                       ثابت std::vector<صحيح>& keypointIndexes)
 {
     CV_INSTRUMENT_REGION();
 
-    if( keypointIndexes.empty() )
+    𐡄𐡍( keypointIndexes.empty() )
     {
         points2f.resize( keypoints.size() );
-        for( size_t i = 0; i < keypoints.size(); i++ )
+        لكل( size_t i = 0; i < keypoints.size(); i++ )
             points2f[i] = keypoints[i].pt;
     }
-    else
+    وإلا
     {
         points2f.resize( keypointIndexes.size() );
-        for( size_t i = 0; i < keypointIndexes.size(); i++ )
+        لكل( size_t i = 0; i < keypointIndexes.size(); i++ )
         {
-            int idx = keypointIndexes[i];
-            if( idx >= 0 && idx < (int)keypoints.size() )
+            صحيح idx = keypointIndexes[i];
+            𐡄𐡍( idx >= 0 && idx < (صحيح)keypoints.size() )
                 points2f[i] = keypoints[idx].pt;
-            else
+            وإلا
             {
                 CV_Error( cv::Error::StsBadArg, "keypointIndexes has element out of range" );
                 //points2f[i] = Point2f(-1, -1);
@@ -90,96 +90,96 @@ void KeyPoint::convert(const std::vector<KeyPoint>& keypoints, std::vector<Point
     }
 }
 
-void KeyPoint::convert( const std::vector<Point2f>& points2f, std::vector<KeyPoint>& keypoints,
-                        float size, float response, int octave, int class_id )
+فراغ KeyPoint::convert( ثابت std::vector<Point2f>& points2f, std::vector<KeyPoint>& keypoints,
+                        عائم size, عائم response, صحيح octave, صحيح class_id )
 {
     CV_INSTRUMENT_REGION();
 
     keypoints.resize(points2f.size());
-    for( size_t i = 0; i < points2f.size(); i++ )
+    لكل( size_t i = 0; i < points2f.size(); i++ )
         keypoints[i] = KeyPoint(points2f[i], size, -1, response, octave, class_id);
 }
 
-float KeyPoint::overlap( const KeyPoint& kp1, const KeyPoint& kp2 )
+عائم KeyPoint::overlap( ثابت KeyPoint& kp1, ثابت KeyPoint& kp2 )
 {
-    float a = kp1.size * 0.5f;
-    float b = kp2.size * 0.5f;
-    float a_2 = a * a;
-    float b_2 = b * b;
+    عائم a = kp1.size * 0.5f;
+    عائم b = kp2.size * 0.5f;
+    عائم a_2 = a * a;
+    عائم b_2 = b * b;
 
     Point2f p1 = kp1.pt;
     Point2f p2 = kp2.pt;
-    float c = (float)norm( p1 - p2 );
+    عائم c = (عائم)norm( p1 - p2 );
 
-    float ovrl = 0.f;
+    عائم ovrl = 0.f;
 
     // one circle is completely encovered by the other => no intersection points!
-    if( std::min( a, b ) + c <= std::max( a, b ) )
-        return std::min( a_2, b_2 ) / std::max( a_2, b_2 );
+    𐡄𐡍( std::min( a, b ) + c <= std::max( a, b ) )
+        أرجع std::min( a_2, b_2 ) / std::max( a_2, b_2 );
 
-    if( c < a + b ) // circles intersect
+    𐡄𐡍( c < a + b ) // circles intersect
     {
-        float c_2 = c * c;
-        float cosAlpha = ( b_2 + c_2 - a_2 ) / ( kp2.size * c );
-        float cosBeta  = ( a_2 + c_2 - b_2 ) / ( kp1.size * c );
-        float alpha = acos( cosAlpha );
-        float beta = acos( cosBeta );
-        float sinAlpha = sin(alpha);
-        float sinBeta  = sin(beta);
+        عائم c_2 = c * c;
+        عائم cosAlpha = ( b_2 + c_2 - a_2 ) / ( kp2.size * c );
+        عائم cosBeta  = ( a_2 + c_2 - b_2 ) / ( kp1.size * c );
+        عائم alpha = acos( cosAlpha );
+        عائم beta = acos( cosBeta );
+        عائم sinAlpha = sin(alpha);
+        عائم sinBeta  = sin(beta);
 
-        float segmentAreaA = a_2 * beta;
-        float segmentAreaB = b_2 * alpha;
+        عائم segmentAreaA = a_2 * beta;
+        عائم segmentAreaB = b_2 * alpha;
 
-        float triangleAreaA = a_2 * sinBeta * cosBeta;
-        float triangleAreaB = b_2 * sinAlpha * cosAlpha;
+        عائم triangleAreaA = a_2 * sinBeta * cosBeta;
+        عائم triangleAreaB = b_2 * sinAlpha * cosAlpha;
 
-        float intersectionArea = segmentAreaA + segmentAreaB - triangleAreaA - triangleAreaB;
-        float unionArea = (a_2 + b_2) * (float)CV_PI - intersectionArea;
+        عائم intersectionArea = segmentAreaA + segmentAreaB - triangleAreaA - triangleAreaB;
+        عائم unionArea = (a_2 + b_2) * (عائم)CV_PI - intersectionArea;
 
         ovrl = intersectionArea / unionArea;
     }
 
-    return ovrl;
+    أرجع ovrl;
 }
 
 ////////////////////// RotatedRect //////////////////////
 
-RotatedRect::RotatedRect(const Point2f& _point1, const Point2f& _point2, const Point2f& _point3)
+RotatedRect::RotatedRect(ثابت Point2f& _point1, ثابت Point2f& _point2, ثابت Point2f& _point3)
 {
     Point2f _center = 0.5f * (_point1 + _point3);
     Vec2f vecs[2];
     vecs[0] = Vec2f(_point1 - _point2);
     vecs[1] = Vec2f(_point2 - _point3);
-    double x = std::max(norm(_point1), std::max(norm(_point2), norm(_point3)));
-    double a = std::min(norm(vecs[0]), norm(vecs[1]));
+    مزدوج x = std::max(norm(_point1), std::max(norm(_point2), norm(_point3)));
+    مزدوج a = std::min(norm(vecs[0]), norm(vecs[1]));
     // check that given sides are perpendicular
     CV_Assert( std::fabs(vecs[0].ddot(vecs[1])) * a <= FLT_EPSILON * 9 * x * (norm(vecs[0]) * norm(vecs[1])) );
 
     // wd_i stores which vector (0,1) or (1,2) will make the width
     // One of them will definitely have slope within -1 to 1
-    int wd_i = 0;
-    if( std::fabs(vecs[1][1]) < std::fabs(vecs[1][0]) ) wd_i = 1;
-    int ht_i = (wd_i + 1) % 2;
+    صحيح wd_i = 0;
+    𐡄𐡍( std::fabs(vecs[1][1]) < std::fabs(vecs[1][0]) ) wd_i = 1;
+    صحيح ht_i = (wd_i + 1) % 2;
 
-    float _angle = std::atan(vecs[wd_i][1] / vecs[wd_i][0]) * 180.0f / (float) CV_PI;
-    float _width = (float) norm(vecs[wd_i]);
-    float _height = (float) norm(vecs[ht_i]);
+    عائم _angle = std::atan(vecs[wd_i][1] / vecs[wd_i][0]) * 180.0f / (عائم) CV_PI;
+    عائم _width = (عائم) norm(vecs[wd_i]);
+    عائم _height = (عائم) norm(vecs[ht_i]);
 
     center = _center;
     size = Size2f(_width, _height);
     angle = _angle;
 }
 
-void RotatedRect::points(Point2f pt[]) const
+فراغ RotatedRect::points(Point2f pt[]) ثابت
 {
-    double _angle = angle*CV_PI/180.;
-    float b = (float)cos(_angle)*0.5f;
-    float a = (float)sin(_angle)*0.5f;
+    مزدوج _angle = angle*CV_PI/180.;
+    عائم b = (عائم)cos(_angle)*0.5f;
+    عائم a = (عائم)sin(_angle)*0.5f;
 
-    const float ah = a*size.height;
-    const float aw = a*size.width;
-    const float bh = b*size.height;
-    const float bw = b*size.width;
+    ثابت عائم ah = a*size.height;
+    ثابت عائم aw = a*size.width;
+    ثابت عائم bh = b*size.height;
+    ثابت عائم bw = b*size.width;
     pt[0].x = center.x - ah - bw;
     pt[0].y = center.y + bh - aw;
     pt[1].x = center.x + ah - bw;
@@ -190,12 +190,12 @@ void RotatedRect::points(Point2f pt[]) const
     pt[3].y = center.y + bh + aw;
 }
 
-void RotatedRect::points(std::vector<Point2f>& pts) const {
+فراغ RotatedRect::points(std::vector<Point2f>& pts) ثابت {
     pts.resize(4);
     points(pts.data());
 }
 
-Rect RotatedRect::boundingRect() const
+Rect RotatedRect::boundingRect() ثابت
 {
     Point2f pt[4];
     points(pt);
@@ -205,17 +205,17 @@ Rect RotatedRect::boundingRect() const
            cvCeil(std::max(std::max(std::max(pt[0].y, pt[1].y), pt[2].y), pt[3].y)));
     r.width -= r.x - 1;
     r.height -= r.y - 1;
-    return r;
+    أرجع r;
 }
 
 
-Rect_<float> RotatedRect::boundingRect2f() const
+Rect_<عائم> RotatedRect::boundingRect2f() ثابت
 {
     Point2f pt[4];
     points(pt);
-    Rect_<float> r(Point_<float>(min(min(min(pt[0].x, pt[1].x), pt[2].x), pt[3].x), min(min(min(pt[0].y, pt[1].y), pt[2].y), pt[3].y)),
-                   Point_<float>(max(max(max(pt[0].x, pt[1].x), pt[2].x), pt[3].x), max(max(max(pt[0].y, pt[1].y), pt[2].y), pt[3].y)));
-    return r;
+    Rect_<عائم> r(Point_<عائم>(min(min(min(pt[0].x, pt[1].x), pt[2].x), pt[3].x), min(min(min(pt[0].y, pt[1].y), pt[2].y), pt[3].y)),
+                   Point_<عائم>(max(max(max(pt[0].x, pt[1].x), pt[2].x), pt[3].x), max(max(max(pt[0].y, pt[1].y), pt[2].y), pt[3].y)));
+    أرجع r;
 }
 
 } // cv
