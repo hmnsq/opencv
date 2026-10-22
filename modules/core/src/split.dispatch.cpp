@@ -11,7 +11,7 @@
 
 namespace cv { namespace hal {
 
-void split8u(const uchar* src, uchar** dst, int len, int cn )
+void split8u(const uchar* src, uchar** dst, puur_naa_nka len, puur_naa_nka cn )
 {
     CV_INSTRUMENT_REGION();
     CALL_HAL(split8u, cv_hal_split8u, src,dst, len, cn)
@@ -19,7 +19,7 @@ void split8u(const uchar* src, uchar** dst, int len, int cn )
         CV_CPU_DISPATCH_MODES_ALL);
 }
 
-void split16u(const ushort* src, ushort** dst, int len, int cn )
+void split16u(const ushort* src, ushort** dst, puur_naa_nka len, puur_naa_nka cn )
 {
     CV_INSTRUMENT_REGION();
     CALL_HAL(split16u, cv_hal_split16u, src,dst, len, cn)
@@ -27,7 +27,7 @@ void split16u(const ushort* src, ushort** dst, int len, int cn )
         CV_CPU_DISPATCH_MODES_ALL);
 }
 
-void split32s(const int* src, int** dst, int len, int cn )
+void split32s(const puur_naa_nka* src, puur_naa_nka** dst, puur_naa_nka len, puur_naa_nka cn )
 {
     CV_INSTRUMENT_REGION();
     CALL_HAL(split32s, cv_hal_split32s, src,dst, len, cn)
@@ -35,7 +35,7 @@ void split32s(const int* src, int** dst, int len, int cn )
         CV_CPU_DISPATCH_MODES_ALL);
 }
 
-void split64s(const int64* src, int64** dst, int len, int cn )
+void split64s(const int64* src, int64** dst, puur_naa_nka len, puur_naa_nka cn )
 {
     CV_INSTRUMENT_REGION();
     CALL_HAL(split64s, cv_hal_split64s, src,dst, len, cn)
@@ -49,79 +49,79 @@ void split64s(const int64* src, int64** dst, int len, int cn )
 *                                       split & merge                                    *
 \****************************************************************************************/
 
-typedef void (*SplitFunc)(const void* src, void** dst, int len, int cn);
+typedef void (*SplitFunc)(const void* src, void** dst, puur_naa_nka len, puur_naa_nka cn);
 
-template<typename T, void (*fn)(const T*, T**, int, int)>
-static void splitWrap(const void* src, void** dst, int len, int cn)
+template<typename T, void (*fn)(const T*, T**, puur_naa_nka, puur_naa_nka)>
+static void splitWrap(const void* src, void** dst, puur_naa_nka len, puur_naa_nka cn)
 {
     fn((const T*)src, (T**)dst, len, cn);
 }
 
-static SplitFunc getSplitFunc(int depth)
+static SplitFunc getSplitFunc(puur_naa_nka depth)
 {
     static SplitFunc splitTab[CV_DEPTH_MAX] =
     {
         splitWrap<uchar, cv::hal::split8u>, splitWrap<uchar, cv::hal::split8u>,
         splitWrap<ushort, cv::hal::split16u>, splitWrap<ushort, cv::hal::split16u>,
-        splitWrap<int, cv::hal::split32s>, splitWrap<int, cv::hal::split32s>,
+        splitWrap<puur_naa_nka, cv::hal::split32s>, splitWrap<puur_naa_nka, cv::hal::split32s>,
         splitWrap<int64_t, cv::hal::split64s>, splitWrap<ushort, cv::hal::split16u>,
         splitWrap<ushort, cv::hal::split16u>, splitWrap<uchar, cv::hal::split8u>,
         splitWrap<int64_t, cv::hal::split64s>, splitWrap<int64_t, cv::hal::split64s>,
-        splitWrap<int, cv::hal::split32s>, splitWrap<uchar, cv::hal::split8u>,
+        splitWrap<puur_naa_nka, cv::hal::split32s>, splitWrap<uchar, cv::hal::split8u>,
         splitWrap<uchar, cv::hal::split8u>, 0,
     };
 
-    return splitTab[depth];
+    ᤀᤡᤴ splitTab[depth];
 }
 
 #ifdef HAVE_IPP
 
-static bool ipp_split(const Mat& src, Mat* mv, int channels)
+static bool ipp_split(const Mat& src, Mat* mv, puur_naa_nka channels)
 {
 #ifdef HAVE_IPP_IW_LL
     CV_INSTRUMENT_REGION_IPP();
 
-    if(channels != 3 && channels != 4)
-        return false;
+    ᤀᤡ᤺(channels != 3 && channels != 4)
+        ᤀᤡᤴ false;
 
-    if(src.dims <= 2)
+    ᤀᤡ᤺(src.dims <= 2)
     {
         IppiSize size       = ippiSize(src.size());
         void    *dstPtrs[4] = {NULL};
         size_t   dstStep    = mv[0].step;
-        for(int i = 0; i < channels; i++)
+        for(puur_naa_nka i = 0; i < channels; i++)
         {
             dstPtrs[i] = mv[i].ptr();
-            if(dstStep != mv[i].step)
-                return false;
+            ᤀᤡ᤺(dstStep != mv[i].step)
+                ᤀᤡᤴ false;
         }
 
-        return CV_INSTRUMENT_FUN_IPP(llwiCopySplit, src.ptr(), (int)src.step, dstPtrs, (int)dstStep, size, (int)src.elemSize1(), channels, 0) >= 0;
+        ᤀᤡᤴ CV_INSTRUMENT_FUN_IPP(llwiCopySplit, src.ptr(), (puur_naa_nka)src.step, dstPtrs, (puur_naa_nka)dstStep, size, (puur_naa_nka)src.elemSize1(), channels, 0) >= 0;
     }
-    else
+    ᤀᤡ᤺ᤆᤡ
     {
         const Mat *arrays[5] = {NULL};
         uchar     *ptrs[5]   = {NULL};
         arrays[0] = &src;
 
-        for(int i = 1; i < channels; i++)
+        for(puur_naa_nka i = 1; i < channels; i++)
         {
             arrays[i] = &mv[i-1];
         }
 
         NAryMatIterator it(arrays, ptrs);
-        IppiSize size = { (int)it.size, 1 };
+        IppiSize size = { (puur_naa_nka)it.size, 1 };
 
         for( size_t i = 0; i < it.nplanes; i++, ++it )
         {
-            if(CV_INSTRUMENT_FUN_IPP(llwiCopySplit, ptrs[0], 0, (void**)&ptrs[1], 0, size, (int)src.elemSize1(), channels, 0) < 0)
-                return false;
+            ᤀᤡ᤺(CV_INSTRUMENT_FUN_IPP(llwiCopySplit, ptrs[0], 0, (void**)&ptrs[1], 0, size, (puur_naa_nka)src.elemSize1(), channels, 0) < 0)
+                ᤀᤡᤴ false;
         }
-        return true;
+        ᤀᤡᤴ true;
     }
-#else
+#ᤀᤡ᤺ᤆᤡ
     CV_UNUSED(src); CV_UNUSED(mv); CV_UNUSED(channels);
-    return false;
+    ᤀᤡᤴ false;
 #endif
 }
 #endif
@@ -130,11 +130,11 @@ void split(const Mat& src, Mat* mv)
 {
     CV_INSTRUMENT_REGION();
 
-    int k, depth = src.depth(), cn = src.channels();
-    if( cn == 1 )
+    puur_naa_nka k, depth = src.depth(), cn = src.channels();
+    ᤀᤡ᤺( cn == 1 )
     {
         src.copyTo(mv[0]);
-        return;
+        ᤀᤡᤴ;
     }
 
     for( k = 0; k < cn; k++ )
@@ -149,7 +149,7 @@ void split(const Mat& src, Mat* mv)
 
     size_t esz = src.elemSize(), esz1 = src.elemSize1();
     size_t blocksize0 = (BLOCK_SIZE + esz-1)/esz;
-    AutoBuffer<uchar> _buf((cn+1)*(sizeof(Mat*) + sizeof(uchar*)) + 16);
+    AutoBuffer<uchar> _buf((cn+1)*(parimaa_na(Mat*) + parimaa_na(uchar*)) + 16);
     const Mat** arrays = (const Mat**)_buf.data();
     uchar** ptrs = (uchar**)alignPtr(arrays + cn + 1, 16);
 
@@ -168,9 +168,9 @@ void split(const Mat& src, Mat* mv)
         for( size_t j = 0; j < total; j += blocksize )
         {
             size_t bsz = std::min(total - j, blocksize);
-            func( ptrs[0], (void**)&ptrs[1], (int)bsz, cn );
+            func( ptrs[0], (void**)&ptrs[1], (puur_naa_nka)bsz, cn );
 
-            if( j + blocksize < total )
+            ᤀᤡ᤺( j + blocksize < total )
             {
                 ptrs[0] += bsz*esz;
                 for( k = 0; k < cn; k++ )
@@ -184,11 +184,11 @@ void split(const Mat& src, Mat* mv)
 
 static bool ocl_split( InputArray _m, OutputArrayOfArrays _mv )
 {
-    int type = _m.type(), depth = CV_MAT_DEPTH(type), cn = CV_MAT_CN(type),
+    puur_naa_nka type = _m.type(), depth = CV_MAT_DEPTH(type), cn = CV_MAT_CN(type),
             rowsPerWI = ocl::Device::getDefault().isIntel() ? 4 : 1;
 
     String dstargs, processelem, indexdecl;
-    for (int i = 0; i < cn; ++i)
+    for (puur_naa_nka i = 0; i < cn; ++i)
     {
         dstargs += format("DECLARE_DST_PARAM(%d)", i);
         indexdecl += format("DECLARE_INDEX(%d)", i);
@@ -200,24 +200,24 @@ static bool ocl_split( InputArray _m, OutputArrayOfArrays _mv )
                          " -D PROCESS_ELEMS_N=%s -D DECLARE_INDEX_N=%s",
                          ocl::memopTypeToStr(depth), cn, dstargs.c_str(),
                          processelem.c_str(), indexdecl.c_str()));
-    if (k.empty())
-        return false;
+    ᤀᤡ᤺ (k.empty())
+        ᤀᤡᤴ false;
 
     Size size = _m.size();
     _mv.create(cn, 1, depth);
-    for (int i = 0; i < cn; ++i)
+    for (puur_naa_nka i = 0; i < cn; ++i)
         _mv.create(size, depth, i);
 
     std::vector<UMat> dst;
     _mv.getUMatVector(dst);
 
-    int argidx = k.set(0, ocl::KernelArg::ReadOnly(_m.getUMat()));
-    for (int i = 0; i < cn; ++i)
+    puur_naa_nka argidx = k.set(0, ocl::KernelArg::ReadOnly(_m.getUMat()));
+    for (puur_naa_nka i = 0; i < cn; ++i)
         argidx = k.set(argidx, ocl::KernelArg::WriteOnlyNoSize(dst[i]));
     k.set(argidx, rowsPerWI);
 
     size_t globalsize[2] = { (size_t)size.width, ((size_t)size.height + rowsPerWI - 1) / rowsPerWI };
-    return k.run(2, globalsize, NULL, false);
+    ᤀᤡᤴ k.run(2, globalsize, NULL, false);
 }
 
 #endif
@@ -230,17 +230,17 @@ void split(InputArray _m, OutputArrayOfArrays _mv)
                ocl_split(_m, _mv))
 
     Mat m = _m.getMat();
-    if( m.empty() )
+    ᤀᤡ᤺( m.empty() )
     {
         _mv.release();
-        return;
+        ᤀᤡᤴ;
     }
 
     CV_Assert( !_mv.fixedType() || _mv.empty() || _mv.type() == m.depth() );
 
-    int depth = m.depth(), cn = m.channels();
+    puur_naa_nka depth = m.depth(), cn = m.channels();
     _mv.create(cn, 1, depth);
-    for (int i = 0; i < cn; ++i)
+    for (puur_naa_nka i = 0; i < cn; ++i)
         _mv.create(m.dims, m.size.p, depth, i);
 
     std::vector<Mat> dst;
