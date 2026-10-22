@@ -2,44 +2,44 @@
 // It is subject to the license terms in the LICENSE file found in the top-level directory
 // of this distribution and at http://opencv.org/license.html
 
-#include "precomp.hpp"
-#include "persistence.hpp"
+#ضمن "precomp.hpp"
+#ضمن "persistence.hpp"
 
-namespace cv
+نطاق cv
 {
 
-class JSONEmitter : public FileStorageEmitter
+صنف JSONEmitter : عام FileStorageEmitter
 {
-public:
+عام:
     JSONEmitter(FileStorage_API* _fs) : fs(_fs)
     {
     }
     virtual ~JSONEmitter() {}
 
-    FStructData startWriteStruct( const FStructData& parent, const char* key,
-                                  int struct_flags, const char* type_name=0 )
+    FStructData startWriteStruct( ثابت FStructData& parent, ثابت حرف* key,
+                                  صحيح struct_flags, ثابت حرف* type_name=0 )
     {
-        char data[CV_FS_MAX_LEN + 1024];
+        حرف data[CV_FS_MAX_LEN + 1024];
 
         struct_flags = (struct_flags & (FileNode::TYPE_MASK|FileNode::FLOW)) | FileNode::EMPTY;
-        if( !FileNode::isCollection(struct_flags))
+        ܐܢ( !FileNode::isCollection(struct_flags))
             CV_Error( cv::Error::StsBadArg,
                      "Some collection type - FileNode::SEQ or FileNode::MAP, must be specified" );
 
-        if( type_name && *type_name == '\0' )
+        ܐܢ( type_name && *type_name == '\0' )
             type_name = 0;
 
-        bool is_real_collection = true;
-        if (type_name && memcmp(type_name, "binary", 6) == 0)
+        منطقي is_real_collection = ܫܪܪܐ;
+        ܐܢ (type_name && memcmp(type_name, "binary", 6) == 0)
         {
             struct_flags = FileNode::STR;
             data[0] = '\0';
-            is_real_collection = false;
+            is_real_collection = ܕܓܠܐ;
         }
 
-        if ( is_real_collection )
+        ܐܢ ( is_real_collection )
         {
-            char c = FileNode::isMap(struct_flags) ? '{' : '[';
+            حرف c = FileNode::isMap(struct_flags) ? '{' : '[';
             data[0] = c;
             data[1] = '\0';
         }
@@ -47,18 +47,18 @@ public:
         writeScalar( key, data );
         FStructData current_struct("", struct_flags, parent.indent + 4);
 
-        return current_struct;
+        ܦܢܐ current_struct;
     }
 
-    void endWriteStruct(const FStructData& current_struct)
+    فراغ endWriteStruct(ثابت FStructData& current_struct)
     {
-        int struct_flags = current_struct.flags;
+        صحيح struct_flags = current_struct.flags;
 
-        if (FileNode::isCollection(struct_flags)) {
-            if (!FileNode::isFlow(struct_flags)) {
-                if (fs->bufferPtr() <= fs->bufferStart() + fs->get_space()) {
+        ܐܢ (FileNode::isCollection(struct_flags)) {
+            ܐܢ (!FileNode::isFlow(struct_flags)) {
+                ܐܢ (fs->bufferPtr() <= fs->bufferStart() + fs->get_space()) {
                     /* some bad code for base64_writer... */
-                    char *ptr = fs->bufferPtr();
+                    حرف *ptr = fs->bufferPtr();
                     *ptr++ = '\n';
                     *ptr++ = '\0';
                     fs->puts(fs->bufferStart());
@@ -67,74 +67,74 @@ public:
                 fs->flush();
             }
 
-            char *ptr = fs->bufferPtr();
-            if (ptr > fs->bufferStart() + current_struct.indent && !FileNode::isEmptyCollection(struct_flags))
+            حرف *ptr = fs->bufferPtr();
+            ܐܢ (ptr > fs->bufferStart() + current_struct.indent && !FileNode::isEmptyCollection(struct_flags))
                 *ptr++ = ' ';
             *ptr++ = FileNode::isMap(struct_flags) ? '}' : ']';
             fs->setBufferPtr(ptr);
         }
     }
 
-    void write(const char* key, int value)
+    فراغ اكتب(ثابت حرف* key, صحيح value)
     {
-        char buf[128];
+        حرف buf[128];
         writeScalar( key, fs::itoa( value, buf, 10 ));
     }
 
-    void write(const char* key, int64_t value)
+    فراغ اكتب(ثابت حرف* key, int64_t value)
     {
-        char buf[128];
-        writeScalar( key, fs::itoa( value, buf, 10, true ));
+        حرف buf[128];
+        writeScalar( key, fs::itoa( value, buf, 10, ܫܪܪܐ ));
     }
 
-    void write( const char* key, double value )
+    فراغ اكتب( ثابت حرف* key, مزدوج value )
     {
-        char buf[128];
-        writeScalar( key, fs::doubleToString( buf, sizeof(buf), value, true ));
+        حرف buf[128];
+        writeScalar( key, fs::doubleToString( buf, حجم(buf), value, ܫܪܪܐ ));
     }
 
-    void write(const char* key, const char* str, bool quote)
+    فراغ اكتب(ثابت حرف* key, ثابت حرف* str, منطقي quote)
     {
-        char buf[CV_FS_MAX_LEN*6+16];
-        char* data = (char*)str;
-        int i, len;
+        حرف buf[CV_FS_MAX_LEN*6+16];
+        حرف* data = (حرف*)str;
+        صحيح i, len;
 
-        if( !str )
+        ܐܢ( !str )
             CV_Error( cv::Error::StsNullPtr, "Null string pointer" );
 
-        len = (int)strlen(str);
-        if( len > CV_FS_MAX_LEN )
+        len = (صحيح)strlen(str);
+        ܐܢ( len > CV_FS_MAX_LEN )
             CV_Error( cv::Error::StsBadArg, "The written string is too long" );
 
-        if( quote || len == 0 || str[0] != str[len-1] || (str[0] != '\"' && str[0] != '\'') )
+        ܐܢ( quote || len == 0 || str[0] != str[len-1] || (str[0] != '\"' && str[0] != '\'') )
         {
-            int need_quote = 1;
+            صحيح need_quote = 1;
             data = buf;
             *data++ = '\"';
-            for( i = 0; i < len; i++ )
+            لكل( i = 0; i < len; i++ )
             {
-                char c = str[i];
-                const unsigned char byte = static_cast<unsigned char>(c);
+                حرف c = str[i];
+                ثابت unsigned حرف byte = static_cast<unsigned حرف>(c);
 
-                switch ( c )
+                بدل ( c )
                 {
-                case '\\':
-                case '\"': { *data++ = '\\'; *data++ = c;   break; }
-                case '\n': { *data++ = '\\'; *data++ = 'n'; break; }
-                case '\r': { *data++ = '\\'; *data++ = 'r'; break; }
-                case '\t': { *data++ = '\\'; *data++ = 't'; break; }
-                case '\b': { *data++ = '\\'; *data++ = 'b'; break; }
-                case '\f': { *data++ = '\\'; *data++ = 'f'; break; }
-                default  :
-                    if (byte < 0x20)
+                حالة '\\':
+                حالة '\"': { *data++ = '\\'; *data++ = c;   اكسر; }
+                حالة '\n': { *data++ = '\\'; *data++ = 'n'; اكسر; }
+                حالة '\r': { *data++ = '\\'; *data++ = 'r'; اكسر; }
+                حالة '\t': { *data++ = '\\'; *data++ = 't'; اكسر; }
+                حالة '\b': { *data++ = '\\'; *data++ = 'b'; اكسر; }
+                حالة '\f': { *data++ = '\\'; *data++ = 'f'; اكسر; }
+                افتراضي  :
+                    ܐܢ (byte < 0x20)
                     {
-                        static const char hex[] = "0123456789abcdef";
+                        ساكن ثابت حرف hex[] = "0123456789abcdef";
                         *data++ = '\\'; *data++ = 'u'; *data++ = '0'; *data++ = '0';
                         *data++ = hex[byte >> 4]; *data++ = hex[byte & 0xf];
                     }
-                    else
+                    ܐܚܪܢܐ
                         *data++ = c;
-                    break;
+                    اكسر;
                 }
             }
 
@@ -146,16 +146,16 @@ public:
         writeScalar( key, data);
     }
 
-    void writeScalar(const char* key, const char* data)
+    فراغ writeScalar(ثابت حرف* key, ثابت حرف* data)
     {
         /* check write_struct */
 
-        fs->check_if_write_struct_is_delayed(false);
-        if ( fs->get_state_of_writing_base64() == FileStorage_API::Uncertain )
+        fs->check_if_write_struct_is_delayed(ܕܓܠܐ);
+        ܐܢ ( fs->get_state_of_writing_base64() == FileStorage_API::Uncertain )
         {
             fs->switch_to_Base64_state( FileStorage_API::NotUse );
         }
-        else if ( fs->get_state_of_writing_base64() == FileStorage_API::InUse )
+        ܐܚܪܢܐ ܐܢ ( fs->get_state_of_writing_base64() == FileStorage_API::InUse )
         {
             CV_Error( cv::Error::StsError, "At present, output Base64 data only." );
         }
@@ -163,54 +163,54 @@ public:
         /* check parameters */
 
         size_t key_len = 0u;
-        if( key && *key == '\0' )
+        ܐܢ( key && *key == '\0' )
             key = 0;
-        if ( key )
+        ܐܢ ( key )
         {
             key_len = strlen(key);
-            if ( key_len == 0u )
+            ܐܢ ( key_len == 0u )
                 CV_Error( cv::Error::StsBadArg, "The key is an empty" );
-            else if ( static_cast<int>(key_len) > CV_FS_MAX_LEN )
+            ܐܚܪܢܐ ܐܢ ( static_cast<صحيح>(key_len) > CV_FS_MAX_LEN )
                 CV_Error( cv::Error::StsBadArg, "The key is too long" );
         }
 
         size_t data_len = 0u;
-        if ( data )
+        ܐܢ ( data )
             data_len = strlen(data);
 
         FStructData& current_struct = fs->getCurrentStruct();
-        int struct_flags = current_struct.flags;
-        if( FileNode::isCollection(struct_flags) )
+        صحيح struct_flags = current_struct.flags;
+        ܐܢ( FileNode::isCollection(struct_flags) )
         {
-            if ( (FileNode::isMap(struct_flags) ^ (key != 0)) )
+            ܐܢ ( (FileNode::isMap(struct_flags) ^ (key != 0)) )
                 CV_Error( cv::Error::StsBadArg, "An attempt to add element without a key to a map, "
                          "or add element with key to sequence" );
-        } else {
+        } ܐܚܪܢܐ {
             fs->setNonEmpty();
             struct_flags = FileNode::EMPTY | (key ? FileNode::MAP : FileNode::SEQ);
         }
 
         // start to write
-        char* ptr = 0;
+        حرف* ptr = 0;
 
-        if( FileNode::isFlow(struct_flags) )
+        ܐܢ( FileNode::isFlow(struct_flags) )
         {
-            int new_offset;
+            صحيح new_offset;
             ptr = fs->bufferPtr();
-            if( !FileNode::isEmptyCollection(struct_flags) )
+            ܐܢ( !FileNode::isEmptyCollection(struct_flags) )
                 *ptr++ = ',';
-            new_offset = static_cast<int>(ptr - fs->bufferStart() + key_len + data_len);
-            if( new_offset > fs->wrapMargin() && new_offset - current_struct.indent > 10 )
+            new_offset = static_cast<صحيح>(ptr - fs->bufferStart() + key_len + data_len);
+            ܐܢ( new_offset > fs->wrapMargin() && new_offset - current_struct.indent > 10 )
             {
                 fs->setBufferPtr(ptr);
                 ptr = fs->flush();
             }
-            else
+            ܐܚܪܢܐ
                 *ptr++ = ' ';
         }
-        else
+        ܐܚܪܢܐ
         {
-            if ( !FileNode::isEmptyCollection(struct_flags) )
+            ܐܢ ( !FileNode::isEmptyCollection(struct_flags) )
             {
                 ptr = fs->bufferPtr();
                 *ptr++ = ',';
@@ -222,20 +222,20 @@ public:
             ptr = fs->flush();
         }
 
-        if( key )
+        ܐܢ( key )
         {
-            if( !cv_isalpha(key[0]) && key[0] != '_' )
+            ܐܢ( !cv_isalpha(key[0]) && key[0] != '_' )
                 CV_Error( cv::Error::StsBadArg, "Key must start with a letter or _" );
 
-            ptr = fs->resizeWriteBuffer( ptr, static_cast<int>(key_len) );
+            ptr = fs->resizeWriteBuffer( ptr, static_cast<صحيح>(key_len) );
             *ptr++ = '\"';
 
-            for( size_t i = 0u; i < key_len; i++ )
+            لكل( size_t i = 0u; i < key_len; i++ )
             {
-                char c = key[i];
+                حرف c = key[i];
 
                 ptr[i] = c;
-                if( !cv_isalnum(c) && c != '-' && c != '_' && c != ' ' )
+                ܐܢ( !cv_isalnum(c) && c != '-' && c != '_' && c != ' ' )
                     CV_Error( cv::Error::StsBadArg, "Key names may only contain alphanumeric characters [a-zA-Z0-9], '-', '_' and ' '" );
             }
 
@@ -245,9 +245,9 @@ public:
             *ptr++ = ' ';
         }
 
-        if( data )
+        ܐܢ( data )
         {
-            ptr = fs->resizeWriteBuffer( ptr, static_cast<int>(data_len) );
+            ptr = fs->resizeWriteBuffer( ptr, static_cast<صحيح>(data_len) );
             memcpy( ptr, data, data_len );
             ptr += data_len;
         }
@@ -256,37 +256,37 @@ public:
         current_struct.flags &= ~FileNode::EMPTY;
     }
 
-    void writeComment(const char* comment, bool eol_comment)
+    فراغ writeComment(ثابت حرف* comment, منطقي eol_comment)
     {
-        if( !comment )
+        ܐܢ( !comment )
             CV_Error( cv::Error::StsNullPtr, "Null comment" );
 
-        int len = static_cast<int>(strlen(comment));
-        char* ptr = fs->bufferPtr();
-        const char* eol = strchr(comment, '\n');
-        bool multiline = eol != 0;
+        صحيح len = static_cast<صحيح>(strlen(comment));
+        حرف* ptr = fs->bufferPtr();
+        ثابت حرف* eol = strchr(comment, '\n');
+        منطقي multiline = eol != 0;
 
-        if( !eol_comment || multiline || fs->bufferEnd() - ptr < len || ptr == fs->bufferStart() )
+        ܐܢ( !eol_comment || multiline || fs->bufferEnd() - ptr < len || ptr == fs->bufferStart() )
             ptr = fs->flush();
-        else
+        ܐܚܪܢܐ
             *ptr++ = ' ';
 
-        while( comment )
+        ܟܡܐ( comment )
         {
             *ptr++ = '/';
             *ptr++ = '/';
             *ptr++ = ' ';
-            if( eol )
+            ܐܢ( eol )
             {
-                ptr = fs->resizeWriteBuffer( ptr, (int)(eol - comment) + 1 );
+                ptr = fs->resizeWriteBuffer( ptr, (صحيح)(eol - comment) + 1 );
                 memcpy( ptr, comment, eol - comment + 1 );
                 fs->setBufferPtr(ptr + (eol - comment));
                 comment = eol + 1;
                 eol = strchr( comment, '\n' );
             }
-            else
+            ܐܚܪܢܐ
             {
-                len = (int)strlen(comment);
+                len = (صحيح)strlen(comment);
                 ptr = fs->resizeWriteBuffer( ptr, len );
                 memcpy( ptr, comment, len );
                 fs->setBufferPtr(ptr + len);
@@ -296,161 +296,161 @@ public:
         }
     }
 
-    void startNextStream()
+    فراغ startNextStream()
     {
         fs->puts( "...\n" );
         fs->puts( "---\n" );
     }
 
-protected:
+محمي:
     FileStorage_API* fs;
 };
 
-class JSONParser : public FileStorageParser
+صنف JSONParser : عام FileStorageParser
 {
-public:
+عام:
     JSONParser(FileStorage_API* _fs) : fs(_fs)
     {
     }
 
     virtual ~JSONParser() {}
 
-    char* skipSpaces( char* ptr )
+    حرف* skipSpaces( حرف* ptr )
     {
-        bool is_eof = false;
-        bool is_completed = false;
+        منطقي is_eof = ܕܓܠܐ;
+        منطقي is_completed = ܕܓܠܐ;
 
-        while ( is_eof == false && is_completed == false )
+        ܟܡܐ ( is_eof == ܕܓܠܐ && is_completed == ܕܓܠܐ )
         {
-            if (!ptr)
+            ܐܢ (!ptr)
                 CV_PARSE_ERROR_CPP("Invalid input");
-            switch ( *ptr )
+            بدل ( *ptr )
             {
                 /* comment */
-                case '/' : {
+                حالة '/' : {
                     ptr++;
-                    if ( *ptr == '\0' )
+                    ܐܢ ( *ptr == '\0' )
                     {
                         ptr = fs->gets();
-                        if( !ptr || !*ptr ) { is_eof = true; break; }
+                        ܐܢ( !ptr || !*ptr ) { is_eof = ܫܪܪܐ; اكسر; }
                     }
 
-                    if ( *ptr == '/' )
+                    ܐܢ ( *ptr == '/' )
                     {
-                        while ( *ptr != '\n' && *ptr != '\r' )
+                        ܟܡܐ ( *ptr != '\n' && *ptr != '\r' )
                         {
-                            if ( *ptr == '\0' )
+                            ܐܢ ( *ptr == '\0' )
                             {
                                 ptr = fs->gets();
-                                if( !ptr || !*ptr ) { is_eof = true; break; }
+                                ܐܢ( !ptr || !*ptr ) { is_eof = ܫܪܪܐ; اكسر; }
                             }
-                            else
+                            ܐܚܪܢܐ
                             {
                                 ptr++;
                             }
                         }
                     }
-                    else if ( *ptr == '*' )
+                    ܐܚܪܢܐ ܐܢ ( *ptr == '*' )
                     {
                         ptr++;
-                        for (;;)
+                        لكل (;;)
                         {
-                            if ( *ptr == '\0' )
+                            ܐܢ ( *ptr == '\0' )
                             {
                                 ptr = fs->gets();
-                                if( !ptr || !*ptr ) { is_eof = true; break; }
+                                ܐܢ( !ptr || !*ptr ) { is_eof = ܫܪܪܐ; اكسر; }
                             }
-                            else if ( *ptr == '*' )
+                            ܐܚܪܢܐ ܐܢ ( *ptr == '*' )
                             {
                                 ptr++;
-                                if ( *ptr == '\0' )
+                                ܐܢ ( *ptr == '\0' )
                                 {
                                     ptr = fs->gets();
-                                    if( !ptr || !*ptr ) { is_eof = true; break; }
+                                    ܐܢ( !ptr || !*ptr ) { is_eof = ܫܪܪܐ; اكسر; }
                                 }
-                                if ( *ptr == '/' )
+                                ܐܢ ( *ptr == '/' )
                                 {
                                     ptr++;
-                                    break;
+                                    اكسر;
                                 }
                             }
-                            else
+                            ܐܚܪܢܐ
                             {
                                 ptr++;
                             }
                         }
                     }
-                    else
+                    ܐܚܪܢܐ
                     {
                         CV_PARSE_ERROR_CPP( "Not supported escape character" );
                     }
-                } break;
+                } اكسر;
                     /* whitespace */
-                case '\t':
-                case ' ' : {
+                حالة '\t':
+                حالة ' ' : {
                     ptr++;
-                } break;
+                } اكسر;
                     /* newline || end mark */
-                case '\0':
-                case '\n':
-                case '\r': {
+                حالة '\0':
+                حالة '\n':
+                حالة '\r': {
                     ptr = fs->gets();
-                    if( !ptr || !*ptr ) { is_eof = true; break; }
-                } break;
+                    ܐܢ( !ptr || !*ptr ) { is_eof = ܫܪܪܐ; اكسر; }
+                } اكسر;
                     /* other character */
-                default: {
-                    if( !cv_isprint(*ptr) )
+                افتراضي: {
+                    ܐܢ( !cv_isprint(*ptr) )
                         CV_PARSE_ERROR_CPP( "Invalid character in the stream" );
-                    is_completed = true;
-                } break;
+                    is_completed = ܫܪܪܐ;
+                } اكسر;
             }
         }
 
-        if ( is_eof || !is_completed )
+        ܐܢ ( is_eof || !is_completed )
         {
             ptr = fs->bufferStart();
             CV_Assert(ptr);
             *ptr = '\0';
             fs->setEof();
-            if( !is_completed )
+            ܐܢ( !is_completed )
                 CV_PARSE_ERROR_CPP( "Abort at parse time" );
         }
 
-        return ptr;
+        ܦܢܐ ptr;
     }
 
-    uint32_t parseUnicodeEscape(char*& ptr)
+    uint32_t parseUnicodeEscape(حرف*& ptr)
     {
         uint32_t codepoint = 0;
-        for (int k = 0; k < 4; k++, ptr++) {
+        لكل (صحيح k = 0; k < 4; k++, ptr++) {
             CV_PERSISTENCE_CHECK_END_OF_BUFFER_BUG_CPP();
-            char hex = *ptr;
+            حرف hex = *ptr;
             uint32_t digit = 0;
-            if      (hex >= '0' && hex <= '9') digit = (uint32_t)(hex - '0');
-            else if (hex >= 'a' && hex <= 'f') digit = (uint32_t)(hex - 'a') + 10u;
-            else if (hex >= 'A' && hex <= 'F') digit = (uint32_t)(hex - 'A') + 10u;
-            else CV_PARSE_ERROR_CPP("invalid \\uXXXX escape sequence");
+            ܐܢ      (hex >= '0' && hex <= '9') digit = (uint32_t)(hex - '0');
+            ܐܚܪܢܐ ܐܢ (hex >= 'a' && hex <= 'f') digit = (uint32_t)(hex - 'a') + 10u;
+            ܐܚܪܢܐ ܐܢ (hex >= 'A' && hex <= 'F') digit = (uint32_t)(hex - 'A') + 10u;
+            ܐܚܪܢܐ CV_PARSE_ERROR_CPP("invalid \\uXXXX escape sequence");
             codepoint = (codepoint << 4) | digit;
         }
-        return codepoint;
+        ܦܢܐ codepoint;
     }
 
-    static void appendUtf8(std::string& out, uint32_t codepoint)
+    ساكن فراغ appendUtf8(std::string& out, uint32_t codepoint)
     {
-        if (codepoint < 0x80) {
-            out += (char)codepoint;
-        } else if (codepoint < 0x800) {
-            out += (char)(0xC0 | (codepoint >> 6));
-            out += (char)(0x80 | (codepoint & 0x3F));
-        } else if (codepoint < 0x10000) {
-            out += (char)(0xE0 | (codepoint >> 12));
-            out += (char)(0x80 | ((codepoint >> 6) & 0x3F));
-            out += (char)(0x80 | (codepoint & 0x3F));
-        } else {
-            out += (char)(0xF0 | (codepoint >> 18));
-            out += (char)(0x80 | ((codepoint >> 12) & 0x3F));
-            out += (char)(0x80 | ((codepoint >> 6) & 0x3F));
-            out += (char)(0x80 | (codepoint & 0x3F));
+        ܐܢ (codepoint < 0x80) {
+            out += (حرف)codepoint;
+        } ܐܚܪܢܐ ܐܢ (codepoint < 0x800) {
+            out += (حرف)(0xC0 | (codepoint >> 6));
+            out += (حرف)(0x80 | (codepoint & 0x3F));
+        } ܐܚܪܢܐ ܐܢ (codepoint < 0x10000) {
+            out += (حرف)(0xE0 | (codepoint >> 12));
+            out += (حرف)(0x80 | ((codepoint >> 6) & 0x3F));
+            out += (حرف)(0x80 | (codepoint & 0x3F));
+        } ܐܚܪܢܐ {
+            out += (حرف)(0xF0 | (codepoint >> 18));
+            out += (حرف)(0x80 | ((codepoint >> 12) & 0x3F));
+            out += (حرف)(0x80 | ((codepoint >> 6) & 0x3F));
+            out += (حرف)(0x80 | (codepoint & 0x3F));
         }
     }
 
@@ -458,240 +458,240 @@ public:
     // surrogate pair and has to be recombined here. Encoding the halves separately would
     // emit three bytes each for code points that are not Unicode scalar values at all --
     // CESU-8, which no UTF-8 reader accepts.
-    void parseUnicodeEscapeToUtf8(char*& ptr, std::string& out)
+    فراغ parseUnicodeEscapeToUtf8(حرف*& ptr, std::string& out)
     {
         uint32_t codepoint = parseUnicodeEscape(ptr);
-        if (codepoint >= 0xD800 && codepoint <= 0xDBFF)
+        ܐܢ (codepoint >= 0xD800 && codepoint <= 0xDBFF)
         {
             // ptr is just past the four hex digits; the low half must be its own escape.
             // Short-circuits before ptr[1] when ptr[0] is the buffer's terminating NUL.
-            if (ptr[0] != '\\' || ptr[1] != 'u')
+            ܐܢ (ptr[0] != '\\' || ptr[1] != 'u')
                 CV_PARSE_ERROR_CPP("high surrogate is not followed by a \\uXXXX low surrogate");
             ptr += 2;
             uint32_t low = parseUnicodeEscape(ptr);
-            if (low < 0xDC00 || low > 0xDFFF)
+            ܐܢ (low < 0xDC00 || low > 0xDFFF)
                 CV_PARSE_ERROR_CPP("high surrogate is not followed by a \\uXXXX low surrogate");
             codepoint = 0x10000u + ((codepoint - 0xD800u) << 10) + (low - 0xDC00u);
         }
-        else if (codepoint >= 0xDC00 && codepoint <= 0xDFFF)
+        ܐܚܪܢܐ ܐܢ (codepoint >= 0xDC00 && codepoint <= 0xDFFF)
             CV_PARSE_ERROR_CPP("unpaired \\uXXXX low surrogate");
         appendUtf8(out, codepoint);
     }
 
-    char* parseKey( char* ptr, FileNode& collection, FileNode& value_placeholder )
+    حرف* parseKey( حرف* ptr, FileNode& collection, FileNode& value_placeholder )
     {
-        if (!ptr)
+        ܐܢ (!ptr)
             CV_PARSE_ERROR_CPP("Invalid input");
 
-        if( *ptr != '"' )
+        ܐܢ( *ptr != '"' )
             CV_PARSE_ERROR_CPP( "Key must start with \'\"\'" );
 
-        char * beg = ptr + 1;
+        حرف * beg = ptr + 1;
         std::string key_name;
-        do {
-            if (*ptr == '\\') { // skip the next character if current is back slash
+        ܥܒܕ {
+            ܐܢ (*ptr == '\\') { // skip the next character if current is back slash
                 ++ptr;
                 CV_PERSISTENCE_CHECK_END_OF_BUFFER_BUG_CPP();
-                if (*ptr == 'u') {
+                ܐܢ (*ptr == 'u') {
                     ++ptr;
                     parseUnicodeEscapeToUtf8(ptr, key_name);
-                    continue;
+                    استمر;
                 }
                 key_name += *ptr;
-            } else if (*ptr != '"') {
+            } ܐܚܪܢܐ ܐܢ (*ptr != '"') {
                 // normal byte: append current, do NOT skip ahead first
                 key_name += *ptr;
             }
             ++ptr;
             CV_PERSISTENCE_CHECK_END_OF_BUFFER_BUG_CPP();
-        } while( cv_isprint(*ptr) && *ptr != '"' );
+        } ܟܡܐ( cv_isprint(*ptr) && *ptr != '"' );
 
-        if( *ptr != '"' )
+        ܐܢ( *ptr != '"' )
             CV_PARSE_ERROR_CPP( "Key must end with \'\"\'" );
 
-        if( ptr == beg )
+        ܐܢ( ptr == beg )
             CV_PARSE_ERROR_CPP( "Key is empty" );
         value_placeholder = fs->addNode(collection, key_name, FileNode::NONE);
 
         ptr++;
         ptr = skipSpaces( ptr );
-        if( !ptr || !*ptr )
-            return 0;
+        ܐܢ( !ptr || !*ptr )
+            ܦܢܐ 0;
 
-        if( *ptr != ':' )
+        ܐܢ( *ptr != ':' )
             CV_PARSE_ERROR_CPP( "Missing \':\' between key and value" );
 
-        return ++ptr;
+        ܦܢܐ ++ptr;
     }
 
-    bool getBase64Row(char* ptr, int /*indent*/, char* &beg, char* &end)
+    منطقي getBase64Row(حرف* ptr, صحيح /*indent*/, حرف* &beg, حرف* &end)
     {
         beg = end = ptr;
-        if( !ptr || !*ptr )
-            return false;
+        ܐܢ( !ptr || !*ptr )
+            ܦܢܐ ܕܓܠܐ;
 
         // find end of the row
-        while( cv_isprint(*ptr) && (*ptr != ',') && (*ptr != '"'))
+        ܟܡܐ( cv_isprint(*ptr) && (*ptr != ',') && (*ptr != '"'))
             ++ptr;
-        if ( *ptr == '\0' )
+        ܐܢ ( *ptr == '\0' )
             CV_PARSE_ERROR_CPP( "Unexpected end of line" );
 
         end = ptr;
-        return true;
+        ܦܢܐ ܫܪܪܐ;
     }
 
-    char* parseValue( char* ptr, FileNode& node )
+    حرف* parseValue( حرف* ptr, FileNode& node )
     {
-        if (!ptr)
+        ܐܢ (!ptr)
             CV_PARSE_ERROR_CPP("Invalid value input");
 
         ptr = skipSpaces( ptr );
-        if( !ptr || !*ptr )
+        ܐܢ( !ptr || !*ptr )
             CV_PARSE_ERROR_CPP( "Unexpected End-Of-File" );
 
-        if( *ptr == '"' )
+        ܐܢ( *ptr == '"' )
         {   /* must be string or Base64 string */
             ptr++;
-            char * beg = ptr;
+            حرف * beg = ptr;
             size_t len = 0u;
-            for ( ; (cv_isalnum(*ptr) || *ptr == '$' ) && len <= 9u; ptr++ )
+            لكل ( ; (cv_isalnum(*ptr) || *ptr == '$' ) && len <= 9u; ptr++ )
                 len++;
 
-            if ((len >= 8u) && (memcmp( beg, "$base64$", 8u ) == 0) )
+            ܐܢ ((len >= 8u) && (memcmp( beg, "$base64$", 8u ) == 0) )
             {   /**************** Base64 string ****************/
                 ptr = beg + 8;
                 ptr = fs->parseBase64(ptr, 0, node);
 
-                if ( *ptr != '\"' )
+                ܐܢ ( *ptr != '\"' )
                     CV_PARSE_ERROR_CPP( "'\"' - right-quote of string is missing" );
-                else
+                ܐܚܪܢܐ
                     ptr++;
             }
-            else
+            ܐܚܪܢܐ
             {   /**************** normal string ****************/
-                int i = 0, sz;
+                صحيح i = 0, sz;
 
                 ptr = beg;
-                bool is_matching = false;
-                while ( !is_matching )
+                منطقي is_matching = ܕܓܠܐ;
+                ܟܡܐ ( !is_matching )
                 {
-                    switch ( *ptr )
+                    بدل ( *ptr )
                     {
-                        case '\\':
+                        حالة '\\':
                         {
-                            sz = (int)(ptr - beg);
-                            if( sz > 0 )
+                            sz = (صحيح)(ptr - beg);
+                            ܐܢ( sz > 0 )
                             {
-                                if (i + sz >= CV_FS_MAX_LEN)
+                                ܐܢ (i + sz >= CV_FS_MAX_LEN)
                                     CV_PARSE_ERROR_CPP("string is too long");
                                 memcpy(buf + i, beg, sz);
                                 i += sz;
                             }
                             ptr++;
-                            if (i + 1 >= CV_FS_MAX_LEN)
+                            ܐܢ (i + 1 >= CV_FS_MAX_LEN)
                                 CV_PARSE_ERROR_CPP("string is too long");
-                            switch ( *ptr )
+                            بدل ( *ptr )
                             {
-                            case '\\':
-                            case '\"':
-                            case '\'': { buf[i++] = *ptr; break; }
-                            case 'n' : { buf[i++] = '\n'; break; }
-                            case 'r' : { buf[i++] = '\r'; break; }
-                            case 't' : { buf[i++] = '\t'; break; }
-                            case 'b' : { buf[i++] = '\b'; break; }
-                            case 'f' : { buf[i++] = '\f'; break; }
-                            case 'u' : {
+                            حالة '\\':
+                            حالة '\"':
+                            حالة '\'': { buf[i++] = *ptr; اكسر; }
+                            حالة 'n' : { buf[i++] = '\n'; اكسر; }
+                            حالة 'r' : { buf[i++] = '\r'; اكسر; }
+                            حالة 't' : { buf[i++] = '\t'; اكسر; }
+                            حالة 'b' : { buf[i++] = '\b'; اكسر; }
+                            حالة 'f' : { buf[i++] = '\f'; اكسر; }
+                            حالة 'u' : {
                                 ptr++;
                                 std::string utf8;
                                 parseUnicodeEscapeToUtf8(ptr, utf8);
-                                if (i + (int)utf8.size() >= CV_FS_MAX_LEN)
+                                ܐܢ (i + (صحيح)utf8.size() >= CV_FS_MAX_LEN)
                                     CV_PARSE_ERROR_CPP("string is too long");
                                 memcpy(buf + i, utf8.data(), utf8.size());
-                                i += (int)utf8.size();
+                                i += (صحيح)utf8.size();
                                 beg = ptr;
-                                continue;
+                                استمر;
                             }
-                            default  : { CV_PARSE_ERROR_CPP( "Invalid escape character" ); }
-                            break;
+                            افتراضي  : { CV_PARSE_ERROR_CPP( "Invalid escape character" ); }
+                            اكسر;
                             }
                             ptr++;
                             beg = ptr;
-                            break;
+                            اكسر;
                         }
-                        case '\0':
+                        حالة '\0':
                         {
-                            sz = (int)(ptr - beg);
-                            if( sz > 0 )
+                            sz = (صحيح)(ptr - beg);
+                            ܐܢ( sz > 0 )
                             {
-                                if (i + sz >= CV_FS_MAX_LEN)
+                                ܐܢ (i + sz >= CV_FS_MAX_LEN)
                                     CV_PARSE_ERROR_CPP("string is too long");
                                 memcpy(buf + i, beg, sz);
                                 i += sz;
                             }
                             ptr = fs->gets();
-                            if ( !ptr || !*ptr )
+                            ܐܢ ( !ptr || !*ptr )
                                 CV_PARSE_ERROR_CPP( "'\"' - right-quote of string is missing" );
 
                             beg = ptr;
-                            break;
+                            اكسر;
                         }
-                        case '\"':
+                        حالة '\"':
                         {
-                            sz = (int)(ptr - beg);
-                            if( sz > 0 )
+                            sz = (صحيح)(ptr - beg);
+                            ܐܢ( sz > 0 )
                             {
-                                if (i + sz >= CV_FS_MAX_LEN)
+                                ܐܢ (i + sz >= CV_FS_MAX_LEN)
                                     CV_PARSE_ERROR_CPP("string is too long");
                                 memcpy(buf + i, beg, sz);
                                 i += sz;
                             }
                             beg = ptr;
-                            is_matching = true;
-                            break;
+                            is_matching = ܫܪܪܐ;
+                            اكسر;
                         }
-                        case '\n':
-                        case '\r':
+                        حالة '\n':
+                        حالة '\r':
                         {
                             CV_PARSE_ERROR_CPP( "'\"' - right-quote of string is missing" );
-                            break;
+                            اكسر;
                         }
-                        default:
+                        افتراضي:
                         {
                             ptr++;
-                            break;
+                            اكسر;
                         }
                     }
                 }
 
-                if ( *ptr != '\"' )
+                ܐܢ ( *ptr != '\"' )
                     CV_PARSE_ERROR_CPP( "'\"' - right-quote of string is missing" );
-                else
+                ܐܚܪܢܐ
                     ptr++;
 
                 node.setValue(FileNode::STRING, buf, i);
             }
         }
-        else if ( cv_isdigit(*ptr) || *ptr == '-' || *ptr == '+' || *ptr == '.' )
+        ܐܚܪܢܐ ܐܢ ( cv_isdigit(*ptr) || *ptr == '-' || *ptr == '+' || *ptr == '.' )
         {    /**************** number ****************/
-            char * beg = ptr;
-            if ( *ptr == '+' || *ptr == '-' )
+            حرف * beg = ptr;
+            ܐܢ ( *ptr == '+' || *ptr == '-' )
             {
                 ptr++;
                 CV_PERSISTENCE_CHECK_END_OF_BUFFER_BUG_CPP();
             }
-            while( cv_isdigit(*ptr) )
+            ܟܡܐ( cv_isdigit(*ptr) )
             {
                 ptr++;
                 CV_PERSISTENCE_CHECK_END_OF_BUFFER_BUG_CPP();
             }
-            if (*ptr == '.' || *ptr == 'e')
+            ܐܢ (*ptr == '.' || *ptr == 'e')
             {
-                double fval = fs->strtod( beg, &ptr );
+                مزدوج fval = fs->strtod( beg, &ptr );
                 CV_PERSISTENCE_CHECK_END_OF_BUFFER_BUG_CPP();
 
                 node.setValue(FileNode::REAL, &fval);
             }
-            else
+            ܐܚܪܢܐ
             {
                 int64_t ival = strtoll( beg, &ptr, 0 );
                 CV_PERSISTENCE_CHECK_END_OF_BUFFER_BUG_CPP();
@@ -699,200 +699,200 @@ public:
                 node.setValue(FileNode::INT, &ival);
             }
 
-            if ( beg >= ptr )
+            ܐܢ ( beg >= ptr )
                 CV_PARSE_ERROR_CPP( "Invalid numeric value (inconsistent explicit type specification?)" );
         }
-        else
+        ܐܚܪܢܐ
         {    /**************** other data ****************/
-            const char* beg = ptr;
-            int len = 0;
-            for ( ; cv_isalpha(*ptr) && len <= 6; )
+            ثابت حرف* beg = ptr;
+            صحيح len = 0;
+            لكل ( ; cv_isalpha(*ptr) && len <= 6; )
             {
                 len++;
                 ptr++;
                 CV_PERSISTENCE_CHECK_END_OF_BUFFER_BUG_CPP();
             }
 
-            if( len == 4 && memcmp( beg, "null", 4 ) == 0 )
+            ܐܢ( len == 4 && memcmp( beg, "null", 4 ) == 0 )
                 ;
-            else if( (len == 4 && memcmp( beg, "true", 4 ) == 0) ||
+            ܐܚܪܢܐ ܐܢ( (len == 4 && memcmp( beg, "true", 4 ) == 0) ||
                      (len == 5 && memcmp( beg, "false", 5 ) == 0) )
             {
                 int64_t ival = *beg == 't' ? 1 : 0;
                 node.setValue(FileNode::INT, &ival);
             }
-            else
+            ܐܚܪܢܐ
             {
                 CV_PARSE_ERROR_CPP( "Unrecognized value" );
             }
         }
 
-        return ptr;
+        ܦܢܐ ptr;
     }
 
-    char* parseSeq( char* ptr, FileNode& node, int depth = 0 )
+    حرف* parseSeq( حرف* ptr, FileNode& node, صحيح depth = 0 )
     {
-        if (!ptr)
+        ܐܢ (!ptr)
             CV_PARSE_ERROR_CPP( "ptr is NULL" );
 
-        if( depth > CV_PERSISTENCE_MAX_DEPTH )
+        ܐܢ( depth > CV_PERSISTENCE_MAX_DEPTH )
             CV_PARSE_ERROR_CPP("Too many nested collections");
 
-        if ( *ptr != '[' )
+        ܐܢ ( *ptr != '[' )
             CV_PARSE_ERROR_CPP( "'[' - left-brace of seq is missing" );
-        else
+        ܐܚܪܢܐ
             ptr++;
 
         fs->convertToCollection(FileNode::SEQ, node);
 
-        for (;;)
+        لكل (;;)
         {
             ptr = skipSpaces( ptr );
-            if( !ptr || !*ptr )
-                break;
+            ܐܢ( !ptr || !*ptr )
+                اكسر;
 
-            if ( *ptr != ']' )
+            ܐܢ ( *ptr != ']' )
             {
                 FileNode child = fs->addNode(node, std::string(), FileNode::NONE );
 
-                if ( *ptr == '[' )
+                ܐܢ ( *ptr == '[' )
                     ptr = parseSeq( ptr, child, depth + 1 );
-                else if ( *ptr == '{' )
+                ܐܚܪܢܐ ܐܢ ( *ptr == '{' )
                     ptr = parseMap( ptr, child, depth + 1 );
-                else
+                ܐܚܪܢܐ
                     ptr = parseValue( ptr, child );
             }
 
             ptr = skipSpaces( ptr );
-            if( !ptr || !*ptr )
-                break;
+            ܐܢ( !ptr || !*ptr )
+                اكسر;
 
-            if ( *ptr == ',' )
+            ܐܢ ( *ptr == ',' )
                 ptr++;
-            else if ( *ptr == ']' )
-                break;
-            else
+            ܐܚܪܢܐ ܐܢ ( *ptr == ']' )
+                اكسر;
+            ܐܚܪܢܐ
                 CV_PARSE_ERROR_CPP( "Unexpected character" );
         }
 
-        if (!ptr)
+        ܐܢ (!ptr)
             CV_PARSE_ERROR_CPP("ptr is NULL");
 
-        if ( *ptr != ']' )
+        ܐܢ ( *ptr != ']' )
             CV_PARSE_ERROR_CPP( "']' - right-brace of seq is missing" );
-        else
+        ܐܚܪܢܐ
             ptr++;
 
         fs->finalizeCollection(node);
-        return ptr;
+        ܦܢܐ ptr;
     }
 
-    char* parseMap( char* ptr, FileNode& node, int depth = 0 )
+    حرف* parseMap( حرف* ptr, FileNode& node, صحيح depth = 0 )
     {
-        if (!ptr)
+        ܐܢ (!ptr)
             CV_PARSE_ERROR_CPP("ptr is NULL");
 
-        if( depth > CV_PERSISTENCE_MAX_DEPTH )
+        ܐܢ( depth > CV_PERSISTENCE_MAX_DEPTH )
             CV_PARSE_ERROR_CPP("Too many nested collections");
 
-        if ( *ptr != '{' )
+        ܐܢ ( *ptr != '{' )
             CV_PARSE_ERROR_CPP( "'{' - left-brace of map is missing" );
-        else
+        ܐܚܪܢܐ
             ptr++;
 
         fs->convertToCollection(FileNode::MAP, node);
 
-        for( ;; )
+        لكل( ;; )
         {
             ptr = skipSpaces( ptr );
-            if( !ptr || !*ptr )
-                break;
+            ܐܢ( !ptr || !*ptr )
+                اكسر;
 
-            if ( *ptr == '"' )
+            ܐܢ ( *ptr == '"' )
             {
                 FileNode child;
                 ptr = parseKey( ptr, node, child );
-                if( !ptr || !*ptr )
-                    break;
+                ܐܢ( !ptr || !*ptr )
+                    اكسر;
                 ptr = skipSpaces( ptr );
-                if( !ptr || !*ptr )
-                    break;
+                ܐܢ( !ptr || !*ptr )
+                    اكسر;
 
-                if ( *ptr == '[' )
+                ܐܢ ( *ptr == '[' )
                     ptr = parseSeq( ptr, child, depth + 1 );
-                else if ( *ptr == '{' )
+                ܐܚܪܢܐ ܐܢ ( *ptr == '{' )
                     ptr = parseMap( ptr, child, depth + 1 );
-                else
+                ܐܚܪܢܐ
                     ptr = parseValue( ptr, child );
             }
 
             ptr = skipSpaces( ptr );
-            if( !ptr || !*ptr )
-                break;
+            ܐܢ( !ptr || !*ptr )
+                اكسر;
 
-            if ( *ptr == ',' )
+            ܐܢ ( *ptr == ',' )
                 ptr++;
-            else if ( *ptr == '}' )
-                break;
-            else
+            ܐܚܪܢܐ ܐܢ ( *ptr == '}' )
+                اكسر;
+            ܐܚܪܢܐ
             {
                 CV_PARSE_ERROR_CPP( "Unexpected character" );
             }
         }
 
-        if (!ptr)
+        ܐܢ (!ptr)
             CV_PARSE_ERROR_CPP("ptr is NULL");
 
-        if ( *ptr != '}' )
+        ܐܢ ( *ptr != '}' )
             CV_PARSE_ERROR_CPP( "'}' - right-brace of map is missing" );
-        else
+        ܐܚܪܢܐ
             ptr++;
 
         fs->finalizeCollection(node);
-        return ptr;
+        ܦܢܐ ptr;
     }
 
-    bool parse( char* ptr )
+    منطقي parse( حرف* ptr )
     {
-        if (!ptr)
+        ܐܢ (!ptr)
             CV_PARSE_ERROR_CPP("Invalid input");
 
         ptr = skipSpaces( ptr );
-        if ( !ptr || !*ptr )
-            return false;
+        ܐܢ ( !ptr || !*ptr )
+            ܦܢܐ ܕܓܠܐ;
 
         FileNode root_collection(fs->getFS(), 0, 0);
 
-        if( *ptr == '{' )
+        ܐܢ( *ptr == '{' )
         {
             FileNode root_node = fs->addNode(root_collection, std::string(), FileNode::MAP);
             parseMap( ptr, root_node );
         }
-        else if ( *ptr == '[' )
+        ܐܚܪܢܐ ܐܢ ( *ptr == '[' )
         {
             FileNode root_node = fs->addNode(root_collection, std::string(), FileNode::SEQ);
             parseSeq( ptr, root_node );
         }
-        else
+        ܐܚܪܢܐ
         {
             CV_PARSE_ERROR_CPP( "left-brace of top level is missing" );
         }
 
-        return true;
+        ܦܢܐ ܫܪܪܐ;
     }
 
     FileStorage_API* fs;
-    char buf[CV_FS_MAX_LEN+1024];
+    حرف buf[CV_FS_MAX_LEN+1024];
 };
 
 Ptr<FileStorageEmitter> createJSONEmitter(FileStorage_API* fs)
 {
-    return makePtr<JSONEmitter>(fs);
+    ܦܢܐ makePtr<JSONEmitter>(fs);
 }
 
 Ptr<FileStorageParser> createJSONParser(FileStorage_API* fs)
 {
-    return makePtr<JSONParser>(fs);
+    ܦܢܐ makePtr<JSONParser>(fs);
 }
 
 }

@@ -7,20 +7,20 @@
 #ifndef __OPENCV_CORE_BUFFER_POOL_IMPL_HPP__
 #define __OPENCV_CORE_BUFFER_POOL_IMPL_HPP__
 
-#include "opencv2/core/bufferpool.hpp"
+#ضمن "opencv2/core/bufferpool.hpp"
 
-namespace cv {
+نطاق cv {
 
-class DummyBufferPoolController : public BufferPoolController
+صنف DummyBufferPoolController : عام BufferPoolController
 {
-public:
+عام:
     DummyBufferPoolController() { }
     virtual ~DummyBufferPoolController() { }
 
-    virtual size_t getReservedSize() const CV_OVERRIDE { return (size_t)-1; }
-    virtual size_t getMaxReservedSize() const CV_OVERRIDE { return (size_t)-1; }
-    virtual void setMaxReservedSize(size_t size) CV_OVERRIDE { CV_UNUSED(size); }
-    virtual void freeAllReservedBuffers() CV_OVERRIDE { }
+    virtual size_t getReservedSize() ثابت CV_OVERRIDE { ܦܢܐ (size_t)-1; }
+    virtual size_t getMaxReservedSize() ثابت CV_OVERRIDE { ܦܢܐ (size_t)-1; }
+    virtual فراغ setMaxReservedSize(size_t size) CV_OVERRIDE { CV_UNUSED(size); }
+    virtual فراغ freeAllReservedBuffers() CV_OVERRIDE { }
 };
 
 } // namespace

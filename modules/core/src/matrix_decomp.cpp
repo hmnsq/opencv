@@ -3,128 +3,128 @@
 // of this distribution and at http://opencv.org/license.html
 
 
-#include "precomp.hpp"
+#ضمن "precomp.hpp"
 
-namespace cv { namespace hal {
+نطاق cv { نطاق hal {
 
 /****************************************************************************************\
 *                     LU & Cholesky implementation for small matrices                    *
 \****************************************************************************************/
 
-template<typename _Tp> static inline int
-LUImpl(_Tp* A, size_t astep, int m, _Tp* b, size_t bstep, int n, _Tp eps)
+template<typename _Tp> ساكن مضمن صحيح
+LUImpl(_Tp* A, size_t astep, صحيح m, _Tp* b, size_t bstep, صحيح n, _Tp eps)
 {
-    int i, j, k, p = 1;
-    astep /= sizeof(A[0]);
-    bstep /= sizeof(b[0]);
+    صحيح i, j, k, p = 1;
+    astep /= حجم(A[0]);
+    bstep /= حجم(b[0]);
 
-    for( i = 0; i < m; i++ )
+    لكل( i = 0; i < m; i++ )
     {
         k = i;
 
-        for( j = i+1; j < m; j++ )
-            if( std::abs(A[j*astep + i]) > std::abs(A[k*astep + i]) )
+        لكل( j = i+1; j < m; j++ )
+            ܐܢ( std::abs(A[j*astep + i]) > std::abs(A[k*astep + i]) )
                 k = j;
 
-        if( std::abs(A[k*astep + i]) < eps )
-            return 0;
+        ܐܢ( std::abs(A[k*astep + i]) < eps )
+            ܦܢܐ 0;
 
-        if( k != i )
+        ܐܢ( k != i )
         {
-            for( j = i; j < m; j++ )
+            لكل( j = i; j < m; j++ )
                 std::swap(A[i*astep + j], A[k*astep + j]);
-            if( b )
-                for( j = 0; j < n; j++ )
+            ܐܢ( b )
+                لكل( j = 0; j < n; j++ )
                     std::swap(b[i*bstep + j], b[k*bstep + j]);
             p = -p;
         }
 
         _Tp d = -1/A[i*astep + i];
 
-        for( j = i+1; j < m; j++ )
+        لكل( j = i+1; j < m; j++ )
         {
             _Tp alpha = A[j*astep + i]*d;
 
-            for( k = i+1; k < m; k++ )
+            لكل( k = i+1; k < m; k++ )
                 A[j*astep + k] += alpha*A[i*astep + k];
 
-            if( b )
-                for( k = 0; k < n; k++ )
+            ܐܢ( b )
+                لكل( k = 0; k < n; k++ )
                     b[j*bstep + k] += alpha*b[i*bstep + k];
         }
     }
 
-    if( b )
+    ܐܢ( b )
     {
-        for( i = m-1; i >= 0; i-- )
-            for( j = 0; j < n; j++ )
+        لكل( i = m-1; i >= 0; i-- )
+            لكل( j = 0; j < n; j++ )
             {
                 _Tp s = b[i*bstep + j];
-                for( k = i+1; k < m; k++ )
+                لكل( k = i+1; k < m; k++ )
                     s -= A[i*astep + k]*b[k*bstep + j];
                 b[i*bstep + j] = s/A[i*astep + i];
             }
     }
 
-    return p;
+    ܦܢܐ p;
 }
 
 
-int LU32f(float* A, size_t astep, int m, float* b, size_t bstep, int n)
+صحيح LU32f(عائم* A, size_t astep, صحيح m, عائم* b, size_t bstep, صحيح n)
 {
     CV_INSTRUMENT_REGION();
 
-    int output;
+    صحيح output;
     CALL_HAL_RET(LU32f, cv_hal_LU32f, output, A, astep, m, b, bstep, n)
     output = LUImpl(A, astep, m, b, bstep, n, FLT_EPSILON*10);
-    return output;
+    ܦܢܐ output;
 }
 
 
-int LU64f(double* A, size_t astep, int m, double* b, size_t bstep, int n)
+صحيح LU64f(مزدوج* A, size_t astep, صحيح m, مزدوج* b, size_t bstep, صحيح n)
 {
     CV_INSTRUMENT_REGION();
 
-    int output;
+    صحيح output;
     CALL_HAL_RET(LU64f, cv_hal_LU64f, output, A, astep, m, b, bstep, n)
     output = LUImpl(A, astep, m, b, bstep, n, DBL_EPSILON*100);
-    return output;
+    ܦܢܐ output;
 }
 
-template<typename _Tp> static inline bool
-CholImpl(_Tp* A, size_t astep, int m, _Tp* b, size_t bstep, int n)
+template<typename _Tp> ساكن مضمن منطقي
+CholImpl(_Tp* A, size_t astep, صحيح m, _Tp* b, size_t bstep, صحيح n)
 {
     _Tp* L = A;
-    int i, j, k;
-    double s;
-    astep /= sizeof(A[0]);
-    bstep /= sizeof(b[0]);
+    صحيح i, j, k;
+    مزدوج s;
+    astep /= حجم(A[0]);
+    bstep /= حجم(b[0]);
 
-    for( i = 0; i < m; i++ )
+    لكل( i = 0; i < m; i++ )
     {
-        for( j = 0; j < i; j++ )
+        لكل( j = 0; j < i; j++ )
         {
             s = A[i*astep + j];
-            for( k = 0; k < j; k++ )
+            لكل( k = 0; k < j; k++ )
                 s -= L[i*astep + k]*L[j*astep + k];
             L[i*astep + j] = (_Tp)(s*L[j*astep + j]);
         }
         s = A[i*astep + i];
-        for( k = 0; k < j; k++ )
+        لكل( k = 0; k < j; k++ )
         {
-            double t = L[i*astep + k];
+            مزدوج t = L[i*astep + k];
             s -= t*t;
         }
-        if( s < std::numeric_limits<_Tp>::epsilon() )
-            return false;
+        ܐܢ( s < std::numeric_limits<_Tp>::epsilon() )
+            ܦܢܐ ܕܓܠܐ;
         L[i*astep + i] = (_Tp)(1./std::sqrt(s));
     }
 
-    if (!b)
+    ܐܢ (!b)
     {
-        for( i = 0; i < m; i++ )
+        لكل( i = 0; i < m; i++ )
              L[i*astep + i]=1/L[i*astep + i];
-        return true;
+        ܦܢܐ ܫܪܪܐ;
    }
 
     // LLt x = b
@@ -143,79 +143,79 @@ CholImpl(_Tp* A, size_t astep, int m, _Tp* b, size_t bstep, int n)
      [             L33 ]  x3   y3
      */
 
-    for( i = 0; i < m; i++ )
+    لكل( i = 0; i < m; i++ )
     {
-        for( j = 0; j < n; j++ )
+        لكل( j = 0; j < n; j++ )
         {
             s = b[i*bstep + j];
-            for( k = 0; k < i; k++ )
+            لكل( k = 0; k < i; k++ )
                 s -= L[i*astep + k]*b[k*bstep + j];
             b[i*bstep + j] = (_Tp)(s*L[i*astep + i]);
         }
     }
 
-    for( i = m-1; i >= 0; i-- )
+    لكل( i = m-1; i >= 0; i-- )
     {
-        for( j = 0; j < n; j++ )
+        لكل( j = 0; j < n; j++ )
         {
             s = b[i*bstep + j];
-            for( k = m-1; k > i; k-- )
+            لكل( k = m-1; k > i; k-- )
                 s -= L[k*astep + i]*b[k*bstep + j];
             b[i*bstep + j] = (_Tp)(s*L[i*astep + i]);
         }
     }
-    for( i = 0; i < m; i++ )
+    لكل( i = 0; i < m; i++ )
             L[i*astep + i]=1/L[i*astep + i];
 
-    return true;
+    ܦܢܐ ܫܪܪܐ;
 }
 
-bool Cholesky32f(float* A, size_t astep, int m, float* b, size_t bstep, int n)
+منطقي Cholesky32f(عائم* A, size_t astep, صحيح m, عائم* b, size_t bstep, صحيح n)
 {
     CV_INSTRUMENT_REGION();
 
-    bool output;
+    منطقي output;
     CALL_HAL_RET(Cholesky32f, cv_hal_Cholesky32f, output, A, astep, m, b, bstep, n)
-    return CholImpl(A, astep, m, b, bstep, n);
+    ܦܢܐ CholImpl(A, astep, m, b, bstep, n);
 }
 
-bool Cholesky64f(double* A, size_t astep, int m, double* b, size_t bstep, int n)
+منطقي Cholesky64f(مزدوج* A, size_t astep, صحيح m, مزدوج* b, size_t bstep, صحيح n)
 {
     CV_INSTRUMENT_REGION();
 
-    bool output;
+    منطقي output;
     CALL_HAL_RET(Cholesky64f, cv_hal_Cholesky64f, output, A, astep, m, b, bstep, n)
-    return CholImpl(A, astep, m, b, bstep, n);
+    ܦܢܐ CholImpl(A, astep, m, b, bstep, n);
 }
 
-template<typename _Tp> inline static int
+template<typename _Tp> مضمن ساكن صحيح
 sign(_Tp x)
 {
-    if (x >= (_Tp)0)
-        return 1;
-    else
-        return -1;
+    ܐܢ (x >= (_Tp)0)
+        ܦܢܐ 1;
+    ܐܚܪܢܐ
+        ܦܢܐ -1;
 }
 
-template<typename _Tp> static inline int
-QRImpl(_Tp* A, size_t astep, int m, int n, int k, _Tp* b, size_t bstep, _Tp* hFactors, _Tp eps)
+template<typename _Tp> ساكن مضمن صحيح
+QRImpl(_Tp* A, size_t astep, صحيح m, صحيح n, صحيح k, _Tp* b, size_t bstep, _Tp* hFactors, _Tp eps)
 {
-    astep /= sizeof(_Tp);
-    bstep /= sizeof(_Tp);
+    astep /= حجم(_Tp);
+    bstep /= حجم(_Tp);
 
     cv::AutoBuffer<_Tp> buffer;
-    size_t buf_size = m ? m + n : hFactors != NULL;
+    size_t buf_size = m ? m + n : hFactors != عدم;
     buffer.allocate(buf_size);
     _Tp* vl = buffer.data();
-    if (hFactors == NULL)
+    ܐܢ (hFactors == عدم)
         hFactors = vl + m;
 
-    for (int l = 0; l < n; l++)
+    لكل (صحيح l = 0; l < n; l++)
     {
         //generate vl
-        int vlSize = m - l;
+        صحيح vlSize = m - l;
         _Tp vlNorm = (_Tp)0;
-        for (int i = 0; i < vlSize; i++)
+        لكل (صحيح i = 0; i < vlSize; i++)
         {
             vl[i] = A[(l + i)*astep + l];
             vlNorm += vl[i] * vl[i];
@@ -223,20 +223,20 @@ QRImpl(_Tp* A, size_t astep, int m, int n, int k, _Tp* b, size_t bstep, _Tp* hFa
         _Tp tmpV = vl[0];
         vl[0] = vl[0] + sign(vl[0])*std::sqrt(vlNorm);
         vlNorm = std::sqrt(vlNorm + vl[0] * vl[0] - tmpV*tmpV);
-        for (int i = 0; i < vlSize; i++)
+        لكل (صحيح i = 0; i < vlSize; i++)
         {
             vl[i] /= vlNorm;
         }
         //multiply A_l*vl
-        for (int j = l; j < n; j++)
+        لكل (صحيح j = l; j < n; j++)
         {
             _Tp v_lA = (_Tp)0;
-            for (int i = l; i < m; i++)
+            لكل (صحيح i = l; i < m; i++)
             {
                 v_lA += vl[i - l] * A[i*astep + j];
             }
 
-            for (int i = l; i < m; i++)
+            لكل (صحيح i = l; i < m; i++)
             {
                 A[i*astep + j] -= 2 * vl[i - l] * v_lA;
             }
@@ -244,94 +244,94 @@ QRImpl(_Tp* A, size_t astep, int m, int n, int k, _Tp* b, size_t bstep, _Tp* hFa
 
         //save vl and factors
         hFactors[l] = vl[0] * vl[0];
-        for (int i = 1; i < vlSize; i++)
+        لكل (صحيح i = 1; i < vlSize; i++)
         {
             A[(l + i)*astep + l] = vl[i] / vl[0];
         }
     }
 
-    if (b)
+    ܐܢ (b)
     {
         //generate new rhs
-        for (int l = 0; l < n; l++)
+        لكل (صحيح l = 0; l < n; l++)
         {
             //unpack vl
             vl[0] = (_Tp)1;
-            for (int j = 1; j < m - l; j++)
+            لكل (صحيح j = 1; j < m - l; j++)
             {
               vl[j] = A[(j + l)*astep + l];
             }
 
             //h_l*x
-            for (int j = 0; j < k; j++)
+            لكل (صحيح j = 0; j < k; j++)
             {
                 _Tp v_lB = (_Tp)0;
-                for (int i = l; i < m; i++)
+                لكل (صحيح i = l; i < m; i++)
                   v_lB += vl[i - l] * b[i*bstep + j];
 
-                for (int i = l; i < m; i++)
+                لكل (صحيح i = l; i < m; i++)
                     b[i*bstep + j] -= 2 * vl[i - l] * v_lB * hFactors[l];
             }
         }
         //do back substitution
-        for (int i = n - 1; i >= 0; i--)
+        لكل (صحيح i = n - 1; i >= 0; i--)
         {
-            for (int j = n - 1; j > i; j--)
+            لكل (صحيح j = n - 1; j > i; j--)
             {
-                for (int p = 0; p < k; p++)
+                لكل (صحيح p = 0; p < k; p++)
                     b[i*bstep + p] -= b[j*bstep + p] * A[i*astep + j];
             }
-            if (std::abs(A[i*astep + i]) < eps)
-                return 0;
-            for (int p = 0; p < k; p++)
+            ܐܢ (std::abs(A[i*astep + i]) < eps)
+                ܦܢܐ 0;
+            لكل (صحيح p = 0; p < k; p++)
                 b[i*bstep + p] /= A[i*astep + i];
         }
     }
 
-    return 1;
+    ܦܢܐ 1;
 }
 
-int QR32f(float* A, size_t astep, int m, int n, int k, float* b, size_t bstep, float* hFactors)
+صحيح QR32f(عائم* A, size_t astep, صحيح m, صحيح n, صحيح k, عائم* b, size_t bstep, عائم* hFactors)
 {
     CV_INSTRUMENT_REGION();
 
-    int output;
+    صحيح output;
     CALL_HAL_RET(QR32f, cv_hal_QR32f, output, A, astep, m, n, k, b, bstep, hFactors);
     output = QRImpl(A, astep, m, n, k, b, bstep, hFactors, FLT_EPSILON * 10);
-    return output;
+    ܦܢܐ output;
 }
 
-int QR64f(double* A, size_t astep, int m, int n, int k, double* b, size_t bstep, double* hFactors)
+صحيح QR64f(مزدوج* A, size_t astep, صحيح m, صحيح n, صحيح k, مزدوج* b, size_t bstep, مزدوج* hFactors)
 {
     CV_INSTRUMENT_REGION();
 
-    int output;
+    صحيح output;
     CALL_HAL_RET(QR64f, cv_hal_QR64f, output, A, astep, m, n, k, b, bstep, hFactors)
     output = QRImpl(A, astep, m, n, k, b, bstep, hFactors, DBL_EPSILON * 100);
-    return output;
+    ܦܢܐ output;
 }
 
 //=============================================================================
 // for compatibility with 3.0
 
-int LU(float* A, size_t astep, int m, float* b, size_t bstep, int n)
+صحيح LU(عائم* A, size_t astep, صحيح m, عائم* b, size_t bstep, صحيح n)
 {
-    return LUImpl(A, astep, m, b, bstep, n, FLT_EPSILON*10);
+    ܦܢܐ LUImpl(A, astep, m, b, bstep, n, FLT_EPSILON*10);
 }
 
-int LU(double* A, size_t astep, int m, double* b, size_t bstep, int n)
+صحيح LU(مزدوج* A, size_t astep, صحيح m, مزدوج* b, size_t bstep, صحيح n)
 {
-    return LUImpl(A, astep, m, b, bstep, n, DBL_EPSILON*100);
+    ܦܢܐ LUImpl(A, astep, m, b, bstep, n, DBL_EPSILON*100);
 }
 
-bool Cholesky(float* A, size_t astep, int m, float* b, size_t bstep, int n)
+منطقي Cholesky(عائم* A, size_t astep, صحيح m, عائم* b, size_t bstep, صحيح n)
 {
-    return CholImpl(A, astep, m, b, bstep, n);
+    ܦܢܐ CholImpl(A, astep, m, b, bstep, n);
 }
 
-bool Cholesky(double* A, size_t astep, int m, double* b, size_t bstep, int n)
+منطقي Cholesky(مزدوج* A, size_t astep, صحيح m, مزدوج* b, size_t bstep, صحيح n)
 {
-    return CholImpl(A, astep, m, b, bstep, n);
+    ܦܢܐ CholImpl(A, astep, m, b, bstep, n);
 }
 
 }} // cv::hal::

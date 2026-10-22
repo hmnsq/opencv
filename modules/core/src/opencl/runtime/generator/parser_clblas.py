@@ -1,47 +1,47 @@
 #!/bin/python
 # usage:
 #     cat clBLAS.h | $0
-from __future__ import print_function
-import sys, re;
+من __future__ استورد print_function
+استورد sys, re;
 
-from common import remove_comments, getTokens, getParameters, postProcessParameters
+من common استورد remove_comments, getTokens, getParameters, postProcessParameters
 
-try:
-    if len(sys.argv) > 1:
+حاول:
+    ܐܢ len(sys.argv) > 1:
         f = open(sys.argv[1], "r")
-    else:
+    ܐܚܪܢܐ:
         f = sys.stdin
-except:
+استثناء:
     sys.exit("ERROR. Can't open input file")
 
 fns = []
 
-while True:
+ܟܡܐ ܫܪܪܐ:
     line = f.readline()
-    if len(line) == 0:
-        break
-    assert isinstance(line, str)
+    ܐܢ len(line) == 0:
+        اكسر
+    أكد isinstance(line, str)
     line = line.strip()
     parts = line.split();
-    if (line.startswith('clblas') or line.startswith('cl_') or line == 'void') and len(line.split()) == 1 and line.find('(') == -1:
+    ܐܢ (line.startswith('clblas') ܐܘ line.startswith('cl_') ܐܘ line == 'void') ܘ len(line.split()) == 1 ܘ line.find('(') == -1:
         fn = {}
         modifiers = []
         ret = []
         calling = []
         i = 0
-        while (i < len(parts)):
-            if parts[i].startswith('CL_'):
+        ܟܡܐ (i < len(parts)):
+            ܐܢ parts[i].startswith('CL_'):
                 modifiers.append(parts[i])
-            else:
-                break
+            ܐܚܪܢܐ:
+                اكسر
             i += 1
-        while (i < len(parts)):
-            if not parts[i].startswith('CL_'):
+        ܟܡܐ (i < len(parts)):
+            ܐܢ ܠܐ parts[i].startswith('CL_'):
                 ret.append(parts[i])
-            else:
-                break
+            ܐܚܪܢܐ:
+                اكسر
             i += 1
-        while (i < len(parts)):
+        ܟܡܐ (i < len(parts)):
             calling.append(parts[i])
             i += 1
         fn['modifiers'] = []  # modifiers
@@ -54,12 +54,12 @@ while True:
 
         # read block of lines
         line = f.readline()
-        while True:
+        ܟܡܐ ܫܪܪܐ:
             nl = f.readline()
             nl = nl.strip()
             nl = re.sub(r'\n', r'', nl)
-            if len(nl) == 0:
-                break;
+            ܐܢ len(nl) == 0:
+                اكسر;
             line += ' ' + nl
 
         line = remove_comments(line)
@@ -85,17 +85,17 @@ print('Found %d functions' % len(fns))
 
 postProcessParameters(fns)
 
-from pprint import pprint
+من pprint استورد pprint
 pprint(fns)
 
-from common import *
+من common استورد *
 
 filterFileName='./filter/opencl_clblas_functions.list'
 numEnabled = readFunctionFilter(fns, filterFileName)
 
 functionsFilter = generateFilterNames(fns)
 filter_file = open(filterFileName, 'w')
-filter_file.write(functionsFilter)
+filter_file.اكتب(functionsFilter)
 
 ctx = {}
 ctx['CLAMDBLAS_REMAP_ORIGIN'] = generateRemapOrigin(fns)

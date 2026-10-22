@@ -2,64 +2,64 @@
 // It is subject to the license terms in the LICENSE file found in the top-level directory
 // of this distribution and at http://opencv.org/license.html
 
-#include "precomp.hpp"
-#include "persistence.hpp"
+#ضمن "precomp.hpp"
+#ضمن "persistence.hpp"
 
-enum
+تعداد
 {
     CV_YML_INDENT = 3,
     CV_YML_INDENT_FLOW = 1
 };
 
-namespace cv
+نطاق cv
 {
 
-class YAMLEmitter : public FileStorageEmitter
+صنف YAMLEmitter : عام FileStorageEmitter
 {
-public:
+عام:
     YAMLEmitter(FileStorage_API* _fs) : fs(_fs)
     {
     }
     virtual ~YAMLEmitter() {}
 
-    FStructData startWriteStruct(const FStructData& parent, const char* key,
-                                 int struct_flags, const char* type_name=0)
+    FStructData startWriteStruct(ثابت FStructData& parent, ثابت حرف* key,
+                                 صحيح struct_flags, ثابت حرف* type_name=0)
     {
-        char buf[CV_FS_MAX_LEN + 1024];
-        const char* data = 0;
+        حرف buf[CV_FS_MAX_LEN + 1024];
+        ثابت حرف* data = 0;
 
-        if ( type_name && *type_name == '\0' )
+        ܐܢ ( type_name && *type_name == '\0' )
             type_name = 0;
 
         struct_flags = (struct_flags & (FileNode::TYPE_MASK|FileNode::FLOW)) | FileNode::EMPTY;
-        if( !FileNode::isCollection(struct_flags))
+        ܐܢ( !FileNode::isCollection(struct_flags))
             CV_Error( cv::Error::StsBadArg,
                      "Some collection type - FileNode::SEQ or FileNode::MAP, must be specified" );
 
-        if (type_name && memcmp(type_name, "binary", 6) == 0)
+        ܐܢ (type_name && memcmp(type_name, "binary", 6) == 0)
         {
             /* reset struct flag. in order not to print ']' */
             struct_flags = FileNode::SEQ;
-            snprintf(buf, sizeof(buf), "!!binary |");
+            snprintf(buf, حجم(buf), "!!binary |");
             data = buf;
         }
-        else if( FileNode::isFlow(struct_flags))
+        ܐܚܪܢܐ ܐܢ( FileNode::isFlow(struct_flags))
         {
-            char c = FileNode::isMap(struct_flags) ? '{' : '[';
+            حرف c = FileNode::isMap(struct_flags) ? '{' : '[';
             struct_flags |= FileNode::FLOW;
 
-            if( type_name )
-                snprintf( buf, sizeof(buf), "!!%s %c", type_name, c );
-            else
+            ܐܢ( type_name )
+                snprintf( buf, حجم(buf), "!!%s %c", type_name, c );
+            ܐܚܪܢܐ
             {
                 buf[0] = c;
                 buf[1] = '\0';
             }
             data = buf;
         }
-        else if( type_name )
+        ܐܚܪܢܐ ܐܢ( type_name )
         {
-            snprintf( buf, sizeof(buf), "!!%s", type_name );
+            snprintf( buf, حجم(buf), "!!%s", type_name );
             data = buf;
         }
 
@@ -69,27 +69,27 @@ public:
         fsd.indent = parent.indent;
         fsd.flags = struct_flags;
 
-        if( !FileNode::isFlow(parent.flags) )
+        ܐܢ( !FileNode::isFlow(parent.flags) )
             fsd.indent += CV_YML_INDENT + FileNode::isFlow(struct_flags);
 
-        return fsd;
+        ܦܢܐ fsd;
     }
 
-    void endWriteStruct(const FStructData& current_struct)
+    فراغ endWriteStruct(ثابت FStructData& current_struct)
     {
-        char* ptr;
+        حرف* ptr;
 
-        int struct_flags = current_struct.flags;
+        صحيح struct_flags = current_struct.flags;
 
-        if( FileNode::isFlow(struct_flags) )
+        ܐܢ( FileNode::isFlow(struct_flags) )
         {
             ptr = fs->bufferPtr();
-            if( ptr > fs->bufferStart() + current_struct.indent && !FileNode::isEmptyCollection(struct_flags) )
+            ܐܢ( ptr > fs->bufferStart() + current_struct.indent && !FileNode::isEmptyCollection(struct_flags) )
                 *ptr++ = ' ';
             *ptr++ = FileNode::isMap(struct_flags) ? '}' : ']';
             fs->setBufferPtr(ptr);
         }
-        else if( FileNode::isEmptyCollection(struct_flags) )
+        ܐܚܪܢܐ ܐܢ( FileNode::isEmptyCollection(struct_flags) )
         {
             ptr = fs->flush();
             memcpy( ptr, FileNode::isMap(struct_flags) ? "{}" : "[]", 2 );
@@ -101,75 +101,75 @@ public:
         CV_Assert( fs->struct_indent >= 0 );*/
     }
 
-    void write(const char* key, int value)
+    فراغ اكتب(ثابت حرف* key, صحيح value)
     {
-        char buf[128];
+        حرف buf[128];
         writeScalar( key, fs::itoa( value, buf, 10 ));
     }
 
-    void write(const char* key, int64_t value)
+    فراغ اكتب(ثابت حرف* key, int64_t value)
     {
-        char buf[128];
-        writeScalar( key, fs::itoa( value, buf, 10, true ));
+        حرف buf[128];
+        writeScalar( key, fs::itoa( value, buf, 10, ܫܪܪܐ ));
     }
 
-    void write( const char* key, double value )
+    فراغ اكتب( ثابت حرف* key, مزدوج value )
     {
-        char buf[128];
-        writeScalar( key, fs::doubleToString( buf, sizeof(buf), value, false ));
+        حرف buf[128];
+        writeScalar( key, fs::doubleToString( buf, حجم(buf), value, ܕܓܠܐ ));
     }
 
-    void write(const char* key, const char* str, bool quote)
+    فراغ اكتب(ثابت حرف* key, ثابت حرف* str, منطقي quote)
     {
-        char buf[CV_FS_MAX_LEN*4+16];
-        char* data = (char*)str;
-        int i, len;
+        حرف buf[CV_FS_MAX_LEN*4+16];
+        حرف* data = (حرف*)str;
+        صحيح i, len;
 
-        if( !str )
+        ܐܢ( !str )
             CV_Error( cv::Error::StsNullPtr, "Null string pointer" );
 
-        len = (int)strlen(str);
-        if( len > CV_FS_MAX_LEN )
+        len = (صحيح)strlen(str);
+        ܐܢ( len > CV_FS_MAX_LEN )
             CV_Error( cv::Error::StsBadArg, "The written string is too long" );
 
-        if( quote || len == 0 || str[0] != str[len-1] || (str[0] != '\"' && str[0] != '\'') )
+        ܐܢ( quote || len == 0 || str[0] != str[len-1] || (str[0] != '\"' && str[0] != '\'') )
         {
-            int need_quote = quote || len == 0 || str[0] == ' ';
+            صحيح need_quote = quote || len == 0 || str[0] == ' ';
             data = buf;
             *data++ = '\"';
-            for( i = 0; i < len; i++ )
+            لكل( i = 0; i < len; i++ )
             {
-                char c = str[i];
+                حرف c = str[i];
 
-                if( !need_quote && !cv_isalnum(c) && c != '_' && c != ' ' && c != '-' &&
+                ܐܢ( !need_quote && !cv_isalnum(c) && c != '_' && c != ' ' && c != '-' &&
                    c != '(' && c != ')' && c != '/' && c != '+' && c != ';' )
                     need_quote = 1;
 
-                if( !cv_isalnum(c) && (!cv_isprint(c) || c == '\\' || c == '\'' || c == '\"') )
+                ܐܢ( !cv_isalnum(c) && (!cv_isprint(c) || c == '\\' || c == '\'' || c == '\"') )
                 {
                     *data++ = '\\';
-                    if( cv_isprint(c) )
+                    ܐܢ( cv_isprint(c) )
                         *data++ = c;
-                    else if( c == '\n' )
+                    ܐܚܪܢܐ ܐܢ( c == '\n' )
                         *data++ = 'n';
-                    else if( c == '\r' )
+                    ܐܚܪܢܐ ܐܢ( c == '\r' )
                         *data++ = 'r';
-                    else if( c == '\t' )
+                    ܐܚܪܢܐ ܐܢ( c == '\t' )
                         *data++ = 't';
-                    else
+                    ܐܚܪܢܐ
                     {
-                        snprintf( data, sizeof(buf) - (data - buf), "x%02x", c );
+                        snprintf( data, حجم(buf) - (data - buf), "x%02x", c );
                         data += 3;
                     }
                 }
-                else
+                ܐܚܪܢܐ
                     *data++ = c;
             }
-            if( !need_quote && (cv_isdigit(str[0]) ||
+            ܐܢ( !need_quote && (cv_isdigit(str[0]) ||
                                 str[0] == '+' || str[0] == '-' || str[0] == '.' ))
                 need_quote = 1;
 
-            if( need_quote )
+            ܐܢ( need_quote )
                 *data++ = '\"';
             *data++ = '\0';
             data = buf + !need_quote;
@@ -178,102 +178,102 @@ public:
         writeScalar( key, data);
     }
 
-    void writeScalar(const char* key, const char* data)
+    فراغ writeScalar(ثابت حرف* key, ثابت حرف* data)
     {
-        fs->check_if_write_struct_is_delayed(false);
-        if ( fs->get_state_of_writing_base64() == FileStorage_API::Uncertain )
+        fs->check_if_write_struct_is_delayed(ܕܓܠܐ);
+        ܐܢ ( fs->get_state_of_writing_base64() == FileStorage_API::Uncertain )
         {
             fs->switch_to_Base64_state( FileStorage_API::NotUse );
         }
-        else if ( fs->get_state_of_writing_base64() == FileStorage_API::InUse )
+        ܐܚܪܢܐ ܐܢ ( fs->get_state_of_writing_base64() == FileStorage_API::InUse )
         {
             CV_Error( cv::Error::StsError, "At present, output Base64 data only." );
         }
 
-        int i, keylen = 0;
-        int datalen = 0;
-        char* ptr;
+        صحيح i, keylen = 0;
+        صحيح datalen = 0;
+        حرف* ptr;
 
         FStructData& current_struct = fs->getCurrentStruct();
 
-        int struct_flags = current_struct.flags;
+        صحيح struct_flags = current_struct.flags;
 
-        if( key && key[0] == '\0' )
+        ܐܢ( key && key[0] == '\0' )
             key = 0;
 
-        if( FileNode::isCollection(struct_flags) )
+        ܐܢ( FileNode::isCollection(struct_flags) )
         {
-            if( (FileNode::isMap(struct_flags) ^ (key != 0)) )
+            ܐܢ( (FileNode::isMap(struct_flags) ^ (key != 0)) )
                 CV_Error( cv::Error::StsBadArg, "An attempt to add element without a key to a map, "
                          "or add element with key to sequence" );
         }
-        else
+        ܐܚܪܢܐ
         {
             fs->setNonEmpty();
             struct_flags = FileNode::EMPTY | (key ? FileNode::MAP : FileNode::SEQ);
         }
 
-        if( key )
+        ܐܢ( key )
         {
-            keylen = (int)strlen(key);
-            if( keylen == 0 )
+            keylen = (صحيح)strlen(key);
+            ܐܢ( keylen == 0 )
                 CV_Error( cv::Error::StsBadArg, "The key is an empty" );
 
-            if( keylen > CV_FS_MAX_LEN )
+            ܐܢ( keylen > CV_FS_MAX_LEN )
                 CV_Error( cv::Error::StsBadArg, "The key is too long" );
         }
 
-        if( data )
-            datalen = (int)strlen(data);
+        ܐܢ( data )
+            datalen = (صحيح)strlen(data);
 
-        if( FileNode::isFlow(struct_flags) )
+        ܐܢ( FileNode::isFlow(struct_flags) )
         {
             ptr = fs->bufferPtr();
-            if( !FileNode::isEmptyCollection(struct_flags) )
+            ܐܢ( !FileNode::isEmptyCollection(struct_flags) )
                 *ptr++ = ',';
-            int new_offset = (int)(ptr - fs->bufferStart()) + keylen + datalen;
-            if( new_offset > fs->wrapMargin() && new_offset - current_struct.indent > 10 )
+            صحيح new_offset = (صحيح)(ptr - fs->bufferStart()) + keylen + datalen;
+            ܐܢ( new_offset > fs->wrapMargin() && new_offset - current_struct.indent > 10 )
             {
                 fs->setBufferPtr(ptr);
                 ptr = fs->flush();
             }
-            else
+            ܐܚܪܢܐ
                 *ptr++ = ' ';
         }
-        else
+        ܐܚܪܢܐ
         {
             ptr = fs->flush();
-            if( !FileNode::isMap(struct_flags) )
+            ܐܢ( !FileNode::isMap(struct_flags) )
             {
                 *ptr++ = '-';
-                if( data )
+                ܐܢ( data )
                     *ptr++ = ' ';
             }
         }
 
-        if( key )
+        ܐܢ( key )
         {
-            if( !cv_isalpha(key[0]) && key[0] != '_' )
+            ܐܢ( !cv_isalpha(key[0]) && key[0] != '_' )
                 CV_Error( cv::Error::StsBadArg, "Key must start with a letter or _" );
 
             ptr = fs->resizeWriteBuffer( ptr, keylen );
 
-            for( i = 0; i < keylen; i++ )
+            لكل( i = 0; i < keylen; i++ )
             {
-                char c = key[i];
+                حرف c = key[i];
 
                 ptr[i] = c;
-                if( !cv_isalnum(c) && c != '-' && c != '_' && c != ' ' )
+                ܐܢ( !cv_isalnum(c) && c != '-' && c != '_' && c != ' ' )
                     CV_Error( cv::Error::StsBadArg, "Key names may only contain alphanumeric characters [a-zA-Z0-9], '-', '_' and ' '" );
             }
 
             ptr += keylen;
             *ptr++ = ':';
-            if( !FileNode::isFlow(struct_flags) && data )
+            ܐܢ( !FileNode::isFlow(struct_flags) && data )
                 *ptr++ = ' ';
         }
 
-        if( data )
+        ܐܢ( data )
         {
             ptr = fs->resizeWriteBuffer( ptr, datalen );
             memcpy( ptr, data, datalen );
@@ -284,37 +284,37 @@ public:
         current_struct.flags &= ~FileNode::EMPTY;
     }
 
-    void writeComment(const char* comment, bool eol_comment)
+    فراغ writeComment(ثابت حرف* comment, منطقي eol_comment)
     {
-        if( !comment )
+        ܐܢ( !comment )
             CV_Error( cv::Error::StsNullPtr, "Null comment" );
 
-        int len = (int)strlen(comment);
-        const char* eol = strchr(comment, '\n');
-        bool multiline = eol != 0;
-        char* ptr = fs->bufferPtr();
+        صحيح len = (صحيح)strlen(comment);
+        ثابت حرف* eol = strchr(comment, '\n');
+        منطقي multiline = eol != 0;
+        حرف* ptr = fs->bufferPtr();
 
-        if( !eol_comment || multiline ||
+        ܐܢ( !eol_comment || multiline ||
             fs->bufferEnd() - ptr < len || ptr == fs->bufferStart() )
             ptr = fs->flush();
-        else
+        ܐܚܪܢܐ
             *ptr++ = ' ';
 
-        while( comment )
+        ܟܡܐ( comment )
         {
             *ptr++ = '#';
             *ptr++ = ' ';
-            if( eol )
+            ܐܢ( eol )
             {
-                ptr = fs->resizeWriteBuffer( ptr, (int)(eol - comment) + 1 );
+                ptr = fs->resizeWriteBuffer( ptr, (صحيح)(eol - comment) + 1 );
                 memcpy( ptr, comment, eol - comment + 1 );
                 fs->setBufferPtr(ptr + (eol - comment));
                 comment = eol + 1;
                 eol = strchr( comment, '\n' );
             }
-            else
+            ܐܚܪܢܐ
             {
-                len = (int)strlen(comment);
+                len = (صحيح)strlen(comment);
                 ptr = fs->resizeWriteBuffer( ptr, len );
                 memcpy( ptr, comment, len );
                 fs->setBufferPtr(ptr + len);
@@ -324,214 +324,214 @@ public:
         }
     }
 
-    void startNextStream()
+    فراغ startNextStream()
     {
         fs->puts( "...\n" );
         fs->puts( "---\n" );
     }
 
-protected:
+محمي:
     FileStorage_API* fs;
 };
 
 
-class YAMLParser : public FileStorageParser
+صنف YAMLParser : عام FileStorageParser
 {
-public:
+عام:
     YAMLParser(FileStorage_API* _fs) : fs(_fs)
     {
     }
 
     virtual ~YAMLParser() {}
 
-    char* skipSpaces( char* ptr, int min_indent, int max_comment_indent )
+    حرف* skipSpaces( حرف* ptr, صحيح min_indent, صحيح max_comment_indent )
     {
-        if (!ptr)
+        ܐܢ (!ptr)
             CV_PARSE_ERROR_CPP("Invalid input");
 
-        for(;;)
+        لكل(;;)
         {
-            while( *ptr == ' ' )
+            ܟܡܐ( *ptr == ' ' )
                 ptr++;
-            if( *ptr == '#' )
+            ܐܢ( *ptr == '#' )
             {
-                if( ptr - fs->bufferStart() > max_comment_indent )
-                    return ptr;
+                ܐܢ( ptr - fs->bufferStart() > max_comment_indent )
+                    ܦܢܐ ptr;
                 *ptr = '\0';
             }
-            else if( cv_isprint(*ptr) )
+            ܐܚܪܢܐ ܐܢ( cv_isprint(*ptr) )
             {
-                if( ptr - fs->bufferStart() < min_indent )
+                ܐܢ( ptr - fs->bufferStart() < min_indent )
                     CV_PARSE_ERROR_CPP( "Incorrect indentation" );
-                break;
+                اكسر;
             }
-            else if( *ptr == '\0' || *ptr == '\n' || *ptr == '\r' )
+            ܐܚܪܢܐ ܐܢ( *ptr == '\0' || *ptr == '\n' || *ptr == '\r' )
             {
                 ptr = fs->gets();
-                if( !ptr )
+                ܐܢ( !ptr )
                 {
                     // emulate end of stream
                     ptr = fs->bufferStart();
                     ptr[0] = ptr[1] = ptr[2] = '.';
                     ptr[3] = '\0';
                     fs->setEof();
-                    break;
+                    اكسر;
                 }
-                else
+                ܐܚܪܢܐ
                 {
-                    int l = (int)strlen(ptr);
-                    if( ptr[l-1] != '\n' && ptr[l-1] != '\r' && !fs->eof() )
+                    صحيح l = (صحيح)strlen(ptr);
+                    ܐܢ( ptr[l-1] != '\n' && ptr[l-1] != '\r' && !fs->eof() )
                         CV_PARSE_ERROR_CPP( "Too long string or a last string w/o newline" );
                 }
             }
-            else
+            ܐܚܪܢܐ
                 CV_PARSE_ERROR_CPP( *ptr == '\t' ? "Tabs are prohibited in YAML!" : "Invalid character" );
         }
 
-        return ptr;
+        ܦܢܐ ptr;
     }
 
-    bool getBase64Row(char* ptr, int indent, char* &beg, char* &end)
+    منطقي getBase64Row(حرف* ptr, صحيح indent, حرف* &beg, حرف* &end)
     {
-        if (!ptr)
+        ܐܢ (!ptr)
             CV_PARSE_ERROR_CPP("Invalid input");
 
         beg = end = ptr = skipSpaces(ptr, 0, INT_MAX);
-        if (!ptr || !*ptr)
-            return false; // end of file
+        ܐܢ (!ptr || !*ptr)
+            ܦܢܐ ܕܓܠܐ; // end of file
 
-        if (ptr - fs->bufferStart() != indent)
-            return false; // end of base64 data
+        ܐܢ (ptr - fs->bufferStart() != indent)
+            ܦܢܐ ܕܓܠܐ; // end of base64 data
 
         /* find end */
-        while(cv_isprint(*ptr)) /* no check for base64 string */
+        ܟܡܐ(cv_isprint(*ptr)) /* no check for base64 string */
             ++ptr;
-        if (*ptr == '\0')
+        ܐܢ (*ptr == '\0')
             CV_PARSE_ERROR_CPP("Unexpected end of line");
 
         end = ptr;
-        return true;
+        ܦܢܐ ܫܪܪܐ;
     }
 
 
-    char* parseKey( char* ptr, FileNode& map_node, FileNode& value_placeholder )
+    حرف* parseKey( حرف* ptr, FileNode& map_node, FileNode& value_placeholder )
     {
-        if (!ptr)
+        ܐܢ (!ptr)
             CV_PARSE_ERROR_CPP("Invalid input");
 
-        char c;
-        char *endptr = ptr - 1, *saveptr;
+        حرف c;
+        حرف *endptr = ptr - 1, *saveptr;
 
-        if( *ptr == '-' )
+        ܐܢ( *ptr == '-' )
             CV_PARSE_ERROR_CPP( "Key may not start with \'-\'" );
 
-        do c = *++endptr;
-        while( cv_isprint(c) && c != ':' );
+        ܥܒܕ c = *++endptr;
+        ܟܡܐ( cv_isprint(c) && c != ':' );
 
-        if( c != ':' )
+        ܐܢ( c != ':' )
             CV_PARSE_ERROR_CPP( "Missing \':\'" );
 
         saveptr = endptr + 1;
-        if( endptr == ptr )
+        ܐܢ( endptr == ptr )
             CV_PARSE_ERROR_CPP( "An empty key" );
 
-        do c = *--endptr;
-        while( c == ' ' );
+        ܥܒܕ c = *--endptr;
+        ܟܡܐ( c == ' ' );
 
         ++endptr;
 
         value_placeholder = fs->addNode(map_node, std::string(ptr, endptr - ptr), FileNode::NONE);
         ptr = saveptr;
 
-        return ptr;
+        ܦܢܐ ptr;
     }
 
-    char* parseValue( char* ptr, FileNode& node, int min_indent, bool is_parent_flow, int depth = 0 )
+    حرف* parseValue( حرف* ptr, FileNode& node, صحيح min_indent, منطقي is_parent_flow, صحيح depth = 0 )
     {
-        if (!ptr)
+        ܐܢ (!ptr)
             CV_PARSE_ERROR_CPP("Invalid input");
 
-        if( depth > CV_PERSISTENCE_MAX_DEPTH )
+        ܐܢ( depth > CV_PERSISTENCE_MAX_DEPTH )
             CV_PARSE_ERROR_CPP("Too many nested collections");
 
-        char* endptr = 0;
-        char c = ptr[0], d = ptr[1];
-        int value_type = FileNode::NONE;
-        int len;
-        bool is_binary_string = false;
-        bool is_user = false;
+        حرف* endptr = 0;
+        حرف c = ptr[0], d = ptr[1];
+        صحيح value_type = FileNode::NONE;
+        صحيح len;
+        منطقي is_binary_string = ܕܓܠܐ;
+        منطقي is_user = ܕܓܠܐ;
 
-        if( c == '!' ) // handle explicit type specification
+        ܐܢ( c == '!' ) // handle explicit type specification
         {
-            if( d == '!' || d == '^' )
+            ܐܢ( d == '!' || d == '^' )
             {
                 ptr++;
-                is_user = true;
+                is_user = ܫܪܪܐ;
                 //value_type |= FileNode::USER;
             }
-            if ( d == '<') //support of full type heading from YAML 1.2
+            ܐܢ ( d == '<') //support of full type heading from YAML 1.2
             {
-                const char* yamlTypeHeading = "<tag:yaml.org,2002:";
-                const size_t headingLength = strlen(yamlTypeHeading);
+                ثابت حرف* yamlTypeHeading = "<tag:yaml.org,2002:";
+                ثابت size_t headingLength = strlen(yamlTypeHeading);
 
-                char* typeEndPtr = ++ptr;
+                حرف* typeEndPtr = ++ptr;
 
-                do d = *++typeEndPtr;
-                while( cv_isprint(d) && d != ' ' && d != '>' );
+                ܥܒܕ d = *++typeEndPtr;
+                ܟܡܐ( cv_isprint(d) && d != ' ' && d != '>' );
 
-                if ( d == '>' && (size_t)(typeEndPtr - ptr) > headingLength )
+                ܐܢ ( d == '>' && (size_t)(typeEndPtr - ptr) > headingLength )
                 {
-                    if ( memcmp(ptr, yamlTypeHeading, headingLength) == 0 )
+                    ܐܢ ( memcmp(ptr, yamlTypeHeading, headingLength) == 0 )
                     {
                         *typeEndPtr = ' ';
                         ptr += headingLength - 1;
-                        is_user = true;
+                        is_user = ܫܪܪܐ;
                         //value_type |= FileNode::USER;
                     }
                 }
             }
 
             endptr = ptr++;
-            do d = *++endptr;
-            while( cv_isprint(d) && d != ' ' );
-            len = (int)(endptr - ptr);
-            if( len == 0 )
+            ܥܒܕ d = *++endptr;
+            ܟܡܐ( cv_isprint(d) && d != ' ' );
+            len = (صحيح)(endptr - ptr);
+            ܐܢ( len == 0 )
                 CV_PARSE_ERROR_CPP( "Empty type name" );
             d = *endptr;
             *endptr = '\0';
 
-            if( len == 3 && !is_user )
+            ܐܢ( len == 3 && !is_user )
             {
-                if( memcmp( ptr, "str", 3 ) == 0 )
+                ܐܢ( memcmp( ptr, "str", 3 ) == 0 )
                     value_type = FileNode::STRING;
-                else if( memcmp( ptr, "int", 3 ) == 0 )
+                ܐܚܪܢܐ ܐܢ( memcmp( ptr, "int", 3 ) == 0 )
                     value_type = FileNode::INT;
-                else if( memcmp( ptr, "seq", 3 ) == 0 )
+                ܐܚܪܢܐ ܐܢ( memcmp( ptr, "seq", 3 ) == 0 )
                     value_type = FileNode::SEQ;
-                else if( memcmp( ptr, "map", 3 ) == 0 )
+                ܐܚܪܢܐ ܐܢ( memcmp( ptr, "map", 3 ) == 0 )
                     value_type = FileNode::MAP;
             }
-            else if( len == 5 && !is_user )
+            ܐܚܪܢܐ ܐܢ( len == 5 && !is_user )
             {
-                if( memcmp( ptr, "float", 5 ) == 0 )
+                ܐܢ( memcmp( ptr, "float", 5 ) == 0 )
                     value_type = FileNode::REAL;
             }
-            else if (len == 6 && is_user)
+            ܐܚܪܢܐ ܐܢ (len == 6 && is_user)
             {
-                if( memcmp( ptr, "binary", 6 ) == 0 ) {
+                ܐܢ( memcmp( ptr, "binary", 6 ) == 0 ) {
                     value_type = FileNode::SEQ;
-                    is_binary_string = true;
+                    is_binary_string = ܫܪܪܐ;
 
                     /* for ignore '|' */
 
                     /**** operation with endptr ****/
                     *endptr = d;
 
-                    do {
+                    ܥܒܕ {
                         d = *++endptr;
-                        if (d == '|')
-                            break;
-                    } while (d == ' ');
+                        ܐܢ (d == '|')
+                            اكسر;
+                    } ܟܡܐ (d == ' ');
 
                     d = *++endptr;
                     *endptr = '\0';
@@ -540,363 +540,363 @@ public:
 
             *endptr = d;
             ptr = skipSpaces( endptr, min_indent, INT_MAX );
-            if (!ptr)
+            ܐܢ (!ptr)
                 CV_PARSE_ERROR_CPP("Invalid input");
 
             c = *ptr;
 
-            if( !is_user )
+            ܐܢ( !is_user )
             {
-                if (value_type == FileNode::STRING && c != '\'' && c != '\"')
-                    goto force_string;
-                if( value_type == FileNode::INT )
-                    goto force_int;
-                if( value_type == FileNode::REAL )
-                    goto force_real;
+                ܐܢ (value_type == FileNode::STRING && c != '\'' && c != '\"')
+                    اذهب force_string;
+                ܐܢ( value_type == FileNode::INT )
+                    اذهب force_int;
+                ܐܢ( value_type == FileNode::REAL )
+                    اذهب force_real;
             }
         }
 
-        if (is_binary_string)
+        ܐܢ (is_binary_string)
         {
-            int indent = static_cast<int>(ptr - fs->bufferStart());
+            صحيح indent = static_cast<صحيح>(ptr - fs->bufferStart());
             ptr = fs->parseBase64(ptr, indent, node);
         }
-        else if( cv_isdigit(c) ||
+        ܐܚܪܢܐ ܐܢ( cv_isdigit(c) ||
                 ((c == '-' || c == '+') && (cv_isdigit(d) || d == '.')) ||
                 (c == '.' && cv_isalnum(d))) // a number
         {
             endptr = ptr + (c == '-' || c == '+');
-            while( cv_isdigit(*endptr) )
+            ܟܡܐ( cv_isdigit(*endptr) )
                 endptr++;
-            if( *endptr == '.' || *endptr == 'e' )
+            ܐܢ( *endptr == '.' || *endptr == 'e' )
             {
             force_real:
-                double fval = fs->strtod( ptr, &endptr );
+                مزدوج fval = fs->strtod( ptr, &endptr );
                 node.setValue(FileNode::REAL, &fval);
             }
-            else
+            ܐܚܪܢܐ
             {
             force_int:
                 int64_t ival = strtoll( ptr, &endptr, 0 );
                 node.setValue(FileNode::INT, &ival);
             }
 
-            if( !endptr || endptr == ptr )
+            ܐܢ( !endptr || endptr == ptr )
                 CV_PARSE_ERROR_CPP( "Invalid numeric value (inconsistent explicit type specification?)" );
 
             ptr = endptr;
             CV_PERSISTENCE_CHECK_END_OF_BUFFER_BUG_CPP();
         }
-        else if( c == '\'' || c == '\"' ) // an explicit string
+        ܐܚܪܢܐ ܐܢ( c == '\'' || c == '\"' ) // an explicit string
         {
-            if( c == '\'' )
-                for( len = 0; len < CV_FS_MAX_LEN; )
+            ܐܢ( c == '\'' )
+                لكل( len = 0; len < CV_FS_MAX_LEN; )
                 {
                     c = *++ptr;
-                    if( cv_isalnum(c) || (c != '\'' && cv_isprint(c)))
+                    ܐܢ( cv_isalnum(c) || (c != '\'' && cv_isprint(c)))
                         buf[len++] = c;
-                    else if( c == '\'' )
+                    ܐܚܪܢܐ ܐܢ( c == '\'' )
                     {
                         c = *++ptr;
-                        if( c != '\'' )
-                            break;
+                        ܐܢ( c != '\'' )
+                            اكسر;
                         buf[len++] = c;
                     }
-                    else
+                    ܐܚܪܢܐ
                         CV_PARSE_ERROR_CPP( "Invalid character" );
                 }
-            else
-                for( len = 0; len < CV_FS_MAX_LEN; )
+            ܐܚܪܢܐ
+                لكل( len = 0; len < CV_FS_MAX_LEN; )
                 {
                     c = *++ptr;
-                    if( cv_isalnum(c) || (c != '\\' && c != '\"' && cv_isprint(c)))
+                    ܐܢ( cv_isalnum(c) || (c != '\\' && c != '\"' && cv_isprint(c)))
                         buf[len++] = c;
-                    else if( c == '\"' )
+                    ܐܚܪܢܐ ܐܢ( c == '\"' )
                     {
                         ++ptr;
-                        break;
+                        اكسر;
                     }
-                    else if( c == '\\' )
+                    ܐܚܪܢܐ ܐܢ( c == '\\' )
                     {
                         d = *++ptr;
-                        if( d == '\'' )
+                        ܐܢ( d == '\'' )
                             buf[len++] = d;
-                        else if( d == '\"' || d == '\\' || d == '\'' )
+                        ܐܚܪܢܐ ܐܢ( d == '\"' || d == '\\' || d == '\'' )
                             buf[len++] = d;
-                        else if( d == 'n' )
+                        ܐܚܪܢܐ ܐܢ( d == 'n' )
                             buf[len++] = '\n';
-                        else if( d == 'r' )
+                        ܐܚܪܢܐ ܐܢ( d == 'r' )
                             buf[len++] = '\r';
-                        else if( d == 't' )
+                        ܐܚܪܢܐ ܐܢ( d == 't' )
                             buf[len++] = '\t';
-                        else if( d == 'x' || (cv_isdigit(d) && d < '8') )
+                        ܐܚܪܢܐ ܐܢ( d == 'x' || (cv_isdigit(d) && d < '8') )
                         {
-                            int val, is_hex = d == 'x';
+                            صحيح val, is_hex = d == 'x';
                             c = ptr[3];
                             ptr[3] = '\0';
-                            val = (int)strtol( ptr + is_hex, &endptr, is_hex ? 8 : 16 );
+                            val = (صحيح)strtol( ptr + is_hex, &endptr, is_hex ? 8 : 16 );
                             ptr[3] = c;
-                            if( endptr == ptr + is_hex )
+                            ܐܢ( endptr == ptr + is_hex )
                                 buf[len++] = 'x';
-                            else
+                            ܐܚܪܢܐ
                             {
-                                buf[len++] = (char)val;
+                                buf[len++] = (حرف)val;
                                 ptr = endptr;
                             }
                         }
                     }
-                    else
+                    ܐܚܪܢܐ
                         CV_PARSE_ERROR_CPP( "Invalid character" );
                 }
 
-            if( len >= CV_FS_MAX_LEN )
+            ܐܢ( len >= CV_FS_MAX_LEN )
                 CV_PARSE_ERROR_CPP( "Too long string literal" );
 
             node.setValue(FileNode::STRING, buf, len);
         }
-        else if( c == '[' || c == '{' ) // collection as a flow
+        ܐܚܪܢܐ ܐܢ( c == '[' || c == '{' ) // collection as a flow
         {
-            int new_min_indent = min_indent + !is_parent_flow;
-            int struct_type = c == '{' ? FileNode::MAP : FileNode::SEQ;
-            int nelems = 0;
+            صحيح new_min_indent = min_indent + !is_parent_flow;
+            صحيح struct_type = c == '{' ? FileNode::MAP : FileNode::SEQ;
+            صحيح nelems = 0;
 
             fs->convertToCollection(struct_type, node);
             d = c == '[' ? ']' : '}';
 
-            for( ++ptr ;; nelems++ )
+            لكل( ++ptr ;; nelems++ )
             {
                 FileNode elem;
 
                 ptr = skipSpaces( ptr, new_min_indent, INT_MAX );
-                if (!ptr)
+                ܐܢ (!ptr)
                     CV_PARSE_ERROR_CPP("Invalid input");
-                if( *ptr == '}' || *ptr == ']' )
+                ܐܢ( *ptr == '}' || *ptr == ']' )
                 {
-                    if( *ptr != d )
+                    ܐܢ( *ptr != d )
                         CV_PARSE_ERROR_CPP( "The wrong closing bracket" );
                     ptr++;
-                    break;
+                    اكسر;
                 }
 
-                if( nelems != 0 )
+                ܐܢ( nelems != 0 )
                 {
-                    if( *ptr != ',' )
+                    ܐܢ( *ptr != ',' )
                         CV_PARSE_ERROR_CPP( "Missing , between the elements" );
                     ptr = skipSpaces( ptr + 1, new_min_indent, INT_MAX );
-                    if (!ptr)
+                    ܐܢ (!ptr)
                         CV_PARSE_ERROR_CPP("Invalid input");
                 }
 
-                if( struct_type == FileNode::MAP )
+                ܐܢ( struct_type == FileNode::MAP )
                 {
                     ptr = parseKey( ptr, node, elem );
                     ptr = skipSpaces( ptr, new_min_indent, INT_MAX );
                 }
-                else
+                ܐܚܪܢܐ
                 {
-                    if( *ptr == ']' )
-                        break;
+                    ܐܢ( *ptr == ']' )
+                        اكسر;
                     elem = fs->addNode(node, std::string(), FileNode::NONE);
                 }
-                ptr = parseValue( ptr, elem, new_min_indent, true, depth + 1 );
+                ptr = parseValue( ptr, elem, new_min_indent, ܫܪܪܐ, depth + 1 );
             }
             fs->finalizeCollection(node);
         }
-        else
+        ܐܚܪܢܐ
         {
-            int indent, struct_type;
+            صحيح indent, struct_type;
 
-            if( is_parent_flow || c != '-' )
+            ܐܢ( is_parent_flow || c != '-' )
             {
                 // implicit (one-line) string or nested block-style collection
-                if( !is_parent_flow )
+                ܐܢ( !is_parent_flow )
                 {
-                    if( c == '?' )
+                    ܐܢ( c == '?' )
                         CV_PARSE_ERROR_CPP( "Complex keys are not supported" );
-                    if( c == '|' || c == '>' )
+                    ܐܢ( c == '|' || c == '>' )
                         CV_PARSE_ERROR_CPP( "Multi-line text literals are not supported" );
                 }
 
             force_string:
                 endptr = ptr - 1;
 
-                do c = *++endptr;
-                while( cv_isprint(c) &&
+                ܥܒܕ c = *++endptr;
+                ܟܡܐ( cv_isprint(c) &&
                       (!is_parent_flow || (c != ',' && c != '}' && c != ']')) &&
                       (is_parent_flow || c != ':' || value_type == FileNode::STRING));
 
-                if( endptr == ptr )
+                ܐܢ( endptr == ptr )
                     CV_PARSE_ERROR_CPP( "Invalid character" );
 
-                if( is_parent_flow || c != ':' )
+                ܐܢ( is_parent_flow || c != ':' )
                 {
-                    char* str_end = endptr;
-                    do c = *--str_end;
-                    while( str_end > ptr && c == ' ' );
+                    حرف* str_end = endptr;
+                    ܥܒܕ c = *--str_end;
+                    ܟܡܐ( str_end > ptr && c == ' ' );
                     str_end++;
-                    if ((fs->getFormat() & FileStorage::FORMAT_MASK) != FileStorage::FORMAT_YAML_1_0)
+                    ܐܢ ((fs->getFormat() & FileStorage::FORMAT_MASK) != FileStorage::FORMAT_YAML_1_0)
                     {
                         size_t llen = str_end - ptr;
-                        if (llen == 4 && memcmp(ptr, "true", 4) == 0) {
+                        ܐܢ (llen == 4 && memcmp(ptr, "true", 4) == 0) {
                             int64_t ival = 1;
                             node.setValue(FileNode::INT, &ival);
                             ptr = endptr;
-                            return ptr;
+                            ܦܢܐ ptr;
                         }
-                        else if (llen == 5 && memcmp(ptr, "false", 5) == 0) {
+                        ܐܚܪܢܐ ܐܢ (llen == 5 && memcmp(ptr, "false", 5) == 0) {
                             int64_t ival = 0;
                             node.setValue(FileNode::INT, &ival);
                             ptr = endptr;
-                            return ptr;
+                            ܦܢܐ ptr;
                         }
-                        else if (llen == 4 && memcmp(ptr, "null", 4) == 0) {
+                        ܐܚܪܢܐ ܐܢ (llen == 4 && memcmp(ptr, "null", 4) == 0) {
                             ptr = endptr;
-                            return ptr;
+                            ܦܢܐ ptr;
                         }
                     }
 
-                    node.setValue(FileNode::STRING, ptr, (int)(str_end - ptr));
+                    node.setValue(FileNode::STRING, ptr, (صحيح)(str_end - ptr));
                     ptr = endptr;
-                    return ptr;
+                    ܦܢܐ ptr;
                 }
                 struct_type = FileNode::MAP;
             }
-            else
+            ܐܚܪܢܐ
                 struct_type = FileNode::SEQ;
 
             fs->convertToCollection( struct_type, node );
-            indent = (int)(ptr - fs->bufferStart());
+            indent = (صحيح)(ptr - fs->bufferStart());
 
-            for(;;)
+            لكل(;;)
             {
                 FileNode elem;
 
-                if( struct_type == FileNode::MAP )
+                ܐܢ( struct_type == FileNode::MAP )
                 {
                     ptr = parseKey( ptr, node, elem );
                 }
-                else
+                ܐܚܪܢܐ
                 {
                     c = *ptr++;
-                    if( c != '-' )
+                    ܐܢ( c != '-' )
                         CV_PARSE_ERROR_CPP( "Block sequence elements must be preceded with \'-\'" );
 
                     elem = fs->addNode(node, std::string(), FileNode::NONE);
                 }
                 ptr = skipSpaces( ptr, indent + 1, INT_MAX );
-                ptr = parseValue( ptr, elem, indent + 1, false, depth + 1 );
+                ptr = parseValue( ptr, elem, indent + 1, ܕܓܠܐ, depth + 1 );
                 ptr = skipSpaces( ptr, 0, INT_MAX );
-                if( ptr - fs->bufferStart() != indent )
+                ܐܢ( ptr - fs->bufferStart() != indent )
                 {
-                    if( ptr - fs->bufferStart() < indent )
-                        break;
-                    else
+                    ܐܢ( ptr - fs->bufferStart() < indent )
+                        اكسر;
+                    ܐܚܪܢܐ
                         CV_PARSE_ERROR_CPP( "Incorrect indentation" );
                 }
-                if( memcmp( ptr, "...", 3 ) == 0 )
-                    break;
+                ܐܢ( memcmp( ptr, "...", 3 ) == 0 )
+                    اكسر;
             }
             fs->finalizeCollection(node);
         }
 
-        return ptr;
+        ܦܢܐ ptr;
     }
 
-    bool parse( char* ptr )
+    منطقي parse( حرف* ptr )
     {
-        if (!ptr)
+        ܐܢ (!ptr)
             CV_PARSE_ERROR_CPP("Invalid input");
 
-        bool first = true;
-        bool ok = true;
+        منطقي first = ܫܪܪܐ;
+        منطقي ok = ܫܪܪܐ;
         FileNode root_collection(fs->getFS(), 0, 0);
 
-        for(;;)
+        لكل(;;)
         {
             // 0. skip leading comments and directives  and ...
             // 1. reach the first item
-            for(;;)
+            لكل(;;)
             {
                 ptr = skipSpaces( ptr, 0, INT_MAX );
-                if( !ptr || *ptr == '\0' )
+                ܐܢ( !ptr || *ptr == '\0' )
                 {
                     ok = !first;
-                    break;
+                    اكسر;
                 }
 
-                if( *ptr == '%' )
+                ܐܢ( *ptr == '%' )
                 {
-                    if( memcmp( ptr, "%YAML", 5 ) == 0 &&
+                    ܐܢ( memcmp( ptr, "%YAML", 5 ) == 0 &&
                         memcmp( ptr, "%YAML:1.", 8 ) != 0 &&
                         memcmp( ptr, "%YAML 1.", 8 ) != 0)
                     {
-                        if ((fs->getFormat() & FileStorage::FORMAT_MASK) == FileStorage::FORMAT_YAML_1_0)
+                        ܐܢ ((fs->getFormat() & FileStorage::FORMAT_MASK) == FileStorage::FORMAT_YAML_1_0)
                             CV_PARSE_ERROR_CPP( "Unsupported YAML version (it must be 1.x)" );
                     }
                     *ptr = '\0';
                 }
-                else if( *ptr == '-' )
+                ܐܚܪܢܐ ܐܢ( *ptr == '-' )
                 {
-                    if( memcmp(ptr, "---", 3) == 0 )
+                    ܐܢ( memcmp(ptr, "---", 3) == 0 )
                     {
                         ptr += 3;
-                        break;
+                        اكسر;
                     }
-                    else if( first )
-                        break;
+                    ܐܚܪܢܐ ܐܢ( first )
+                        اكسر;
                 }
-                else if( cv_isalnum(*ptr) || *ptr=='_')
+                ܐܚܪܢܐ ܐܢ( cv_isalnum(*ptr) || *ptr=='_')
                 {
-                    if( !first )
+                    ܐܢ( !first )
                         CV_PARSE_ERROR_CPP( "The YAML streams must start with '---', except the first one" );
-                    break;
+                    اكسر;
                 }
-                else if( fs->eof() )
-                    break;
-                else
+                ܐܚܪܢܐ ܐܢ( fs->eof() )
+                    اكسر;
+                ܐܚܪܢܐ
                     CV_PARSE_ERROR_CPP( "Invalid or unsupported syntax" );
             }
 
-            if( ptr )
+            ܐܢ( ptr )
                 ptr = skipSpaces( ptr, 0, INT_MAX );
-            if( !ptr || !ptr[0] )
-                break;
-            if( memcmp( ptr, "...", 3 ) != 0 )
+            ܐܢ( !ptr || !ptr[0] )
+                اكسر;
+            ܐܢ( memcmp( ptr, "...", 3 ) != 0 )
             {
                 // 2. parse the collection
                 FileNode root_node = fs->addNode(root_collection, std::string(), FileNode::NONE);
 
-                ptr = parseValue( ptr, root_node, 0, false );
-                if( !root_node.isMap() && !root_node.isSeq() )
+                ptr = parseValue( ptr, root_node, 0, ܕܓܠܐ );
+                ܐܢ( !root_node.isMap() && !root_node.isSeq() )
                     CV_PARSE_ERROR_CPP( "Only collections as YAML streams are supported by this parser" );
 
                 // 3. parse until the end of file or next collection
                 ptr = skipSpaces( ptr, 0, INT_MAX );
-                if( !ptr )
-                    break;
+                ܐܢ( !ptr )
+                    اكسر;
             }
 
-            if( fs->eof() )
-                break;
+            ܐܢ( fs->eof() )
+                اكسر;
             ptr += 3;
-            first = false;
+            first = ܕܓܠܐ;
         }
 
-        return ok;
+        ܦܢܐ ok;
     }
 
     FileStorage_API* fs;
-    char buf[CV_FS_MAX_LEN+1024];
+    حرف buf[CV_FS_MAX_LEN+1024];
 };
 
 Ptr<FileStorageEmitter> createYAMLEmitter(FileStorage_API* fs)
 {
-    return makePtr<YAMLEmitter>(fs);
+    ܦܢܐ makePtr<YAMLEmitter>(fs);
 }
 
 Ptr<FileStorageParser> createYAMLParser(FileStorage_API* fs)
 {
-    return makePtr<YAMLParser>(fs);
+    ܦܢܐ makePtr<YAMLParser>(fs);
 }
 
 }

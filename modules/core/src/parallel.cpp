@@ -40,44 +40,44 @@
 //
 //M*/
 
-#include "precomp.hpp"
+#ضمن "precomp.hpp"
 
-#include <opencv2/core/utils/configuration.private.hpp>
-#include <opencv2/core/utils/trace.private.hpp>
+#ضمن <opencv2/core/utils/configuration.private.hpp>
+#ضمن <opencv2/core/utils/trace.private.hpp>
 
-#include "opencv2/core/parallel/parallel_backend.hpp"
-#include "parallel/parallel.hpp"
+#ضمن "opencv2/core/parallel/parallel_backend.hpp"
+#ضمن "parallel/parallel.hpp"
 
-#if defined _WIN32 || defined WINCE
-    #include <windows.h>
+#ܐܢ defined _WIN32 || defined WINCE
+    #ضمن <windows.h>
     #undef small
     #undef min
     #undef max
     #undef abs
 #endif
 
-#if defined __unix__ || defined __APPLE__ || defined __GLIBC__ \
+#ܐܢ defined __unix__ || defined __APPLE__ || defined __GLIBC__ \
     || defined __HAIKU__ || defined __EMSCRIPTEN__ \
     || defined __FreeBSD__ || defined __NetBSD__ || defined __OpenBSD__
-    #include <unistd.h>
-    #include <stdio.h>
-    #include <sys/types.h>
-    #include <fstream>
-    #if defined __ANDROID__
-        #include <sys/sysconf.h>
-        #include <sys/syscall.h>
-        #include <sched.h>
-    #elif defined __APPLE__
-        #include <sys/sysctl.h>
+    #ضمن <unistd.h>
+    #ضمن <stdio.h>
+    #ضمن <sys/types.h>
+    #ضمن <fstream>
+    #ܐܢ defined __ANDROID__
+        #ضمن <sys/sysconf.h>
+        #ضمن <sys/syscall.h>
+        #ضمن <sched.h>
+    #وإلاإذا defined __APPLE__
+        #ضمن <sys/sysctl.h>
     #endif
 #endif
 
-#if defined (__QNX__)
-    #include <sys/syspage.h>
+#ܐܢ defined (__QNX__)
+    #ضمن <sys/syspage.h>
 #endif
 
 #ifndef OPENCV_DISABLE_THREAD_SUPPORT
-    #include <thread>
+    #ضمن <thread>
 #endif
 
 #ifdef _OPENMP
@@ -88,7 +88,7 @@
     #define HAVE_GCD
 #endif
 
-#if defined _MSC_VER
+#ܐܢ defined _MSC_VER
     #define HAVE_CONCURRENCY
 #endif
 
@@ -102,85 +102,85 @@
    - HAVE_PTHREADS_PF - pthreads if available
 */
 
-#if defined HAVE_TBB
+#ܐܢ defined HAVE_TBB
     #ifndef TBB_SUPPRESS_DEPRECATED_MESSAGES  // supress warning
     #define TBB_SUPPRESS_DEPRECATED_MESSAGES 1
     #endif
-    #include "tbb/tbb.h"
-    #include "tbb/task.h"
-    #if TBB_INTERFACE_VERSION >= 8000
-        #include "tbb/task_arena.h"
+    #ضمن "tbb/tbb.h"
+    #ضمن "tbb/task.h"
+    #ܐܢ TBB_INTERFACE_VERSION >= 8000
+        #ضمن "tbb/task_arena.h"
     #endif
     #undef min
     #undef max
-#elif defined HAVE_HPX
-    #include <hpx/parallel/algorithms/for_loop.hpp>
-    #include <hpx/parallel/execution.hpp>
+#وإلاإذا defined HAVE_HPX
+    #ضمن <hpx/parallel/algorithms/for_loop.hpp>
+    #ضمن <hpx/parallel/execution.hpp>
     //
-    #include <hpx/hpx_start.hpp>
-    #include <hpx/hpx_suspend.hpp>
-    #include <hpx/include/apply.hpp>
-    #include <hpx/util/yield_while.hpp>
-    #include <hpx/include/threadmanager.hpp>
+    #ضمن <hpx/hpx_start.hpp>
+    #ضمن <hpx/hpx_suspend.hpp>
+    #ضمن <hpx/include/apply.hpp>
+    #ضمن <hpx/util/yield_while.hpp>
+    #ضمن <hpx/include/threadmanager.hpp>
 
-#elif defined HAVE_OPENMP
-    #include <omp.h>
-#elif defined HAVE_GCD
-    #include <dispatch/dispatch.h>
-    #include <pthread.h>
-#elif defined HAVE_CONCURRENCY
-    #include <ppl.h>
-#elif defined HAVE_PTHREADS_PF
-    #include <pthread.h>
+#وإلاإذا defined HAVE_OPENMP
+    #ضمن <omp.h>
+#وإلاإذا defined HAVE_GCD
+    #ضمن <dispatch/dispatch.h>
+    #ضمن <pthread.h>
+#وإلاإذا defined HAVE_CONCURRENCY
+    #ضمن <ppl.h>
+#وإلاإذا defined HAVE_PTHREADS_PF
+    #ضمن <pthread.h>
 #endif
 
 
-#if defined HAVE_TBB
+#ܐܢ defined HAVE_TBB
 #  define CV_PARALLEL_FRAMEWORK "tbb"
-#elif defined HAVE_HPX
+#وإلاإذا defined HAVE_HPX
 #  define CV_PARALLEL_FRAMEWORK "hpx"
-#elif defined HAVE_OPENMP
+#وإلاإذا defined HAVE_OPENMP
 #  define CV_PARALLEL_FRAMEWORK "openmp"
-#elif defined HAVE_GCD
+#وإلاإذا defined HAVE_GCD
 #  define CV_PARALLEL_FRAMEWORK "gcd"
-#elif defined WINRT
+#وإلاإذا defined WINRT
 #  define CV_PARALLEL_FRAMEWORK "winrt-concurrency"
-#elif defined HAVE_CONCURRENCY
+#وإلاإذا defined HAVE_CONCURRENCY
 #  define CV_PARALLEL_FRAMEWORK "ms-concurrency"
-#elif defined HAVE_PTHREADS_PF
+#وإلاإذا defined HAVE_PTHREADS_PF
 #  define CV_PARALLEL_FRAMEWORK "pthreads"
 #endif
 
-#include <atomic>
+#ضمن <atomic>
 
-#include "parallel_impl.hpp"
+#ضمن "parallel_impl.hpp"
 
-#include "opencv2/core/detail/exception_ptr.hpp"  // CV__EXCEPTION_PTR = 1 if std::exception_ptr is available
+#ضمن "opencv2/core/detail/exception_ptr.hpp"  // CV__EXCEPTION_PTR = 1 if std::exception_ptr is available
 
-#include <opencv2/core/utils/fp_control_utils.hpp>
-#include <opencv2/core/utils/fp_control.private.hpp>
+#ضمن <opencv2/core/utils/fp_control_utils.hpp>
+#ضمن <opencv2/core/utils/fp_control.private.hpp>
 
-using namespace cv;
+using نطاق cv;
 
-namespace cv {
+نطاق cv {
 
 ParallelLoopBody::~ParallelLoopBody() {}
 
-using namespace cv::parallel;
+using نطاق cv::parallel;
 
-namespace {
+نطاق {
 
 #ifdef ENABLE_INSTRUMENTATION
-    static void SyncNodes(cv::instr::InstrNode *pNode)
+    ساكن فراغ SyncNodes(cv::instr::InstrNode *pNode)
     {
         std::vector<cv::instr::NodeDataTls*> data;
         pNode->m_payload.m_tls.gather(data);
 
         uint64 ticksMax = 0;
-        int    threads  = 0;
-        for(size_t i = 0; i < data.size(); i++)
+        صحيح    threads  = 0;
+        لكل(size_t i = 0; i < data.size(); i++)
         {
-            if(data[i] && data[i]->m_ticksTotal)
+            ܐܢ(data[i] && data[i]->m_ticksTotal)
             {
                 ticksMax = MAX(ticksMax, data[i]->m_ticksTotal);
                 pNode->m_payload.m_ticksTotal -= data[i]->m_ticksTotal;
@@ -191,26 +191,26 @@ namespace {
         pNode->m_payload.m_ticksTotal += ticksMax;
         pNode->m_payload.m_threads = MAX(pNode->m_payload.m_threads, threads);
 
-        for(size_t i = 0; i < pNode->m_childs.size(); i++)
+        لكل(size_t i = 0; i < pNode->m_childs.size(); i++)
             SyncNodes(pNode->m_childs[i]);
     }
 #endif
 
-    class ParallelLoopBodyWrapperContext
+    صنف ParallelLoopBodyWrapperContext
     {
-    public:
-        ParallelLoopBodyWrapperContext(const cv::ParallelLoopBody& _body, const cv::Range& _r, double _nstripes) :
-            is_rng_used(false), hasException(false)
+    عام:
+        ParallelLoopBodyWrapperContext(ثابت cv::ParallelLoopBody& _body, ثابت cv::Range& _r, مزدوج _nstripes) :
+            is_rng_used(ܕܓܠܐ), hasException(ܕܓܠܐ)
         {
 
             body = &_body;
             wholeRange = _r;
-            double len = wholeRange.end - wholeRange.start;
+            مزدوج len = wholeRange.end - wholeRange.start;
             nstripes = cvRound(_nstripes <= 0 ? len : MIN(MAX(_nstripes, 1.), len));
 
             // propagate main thread state
             rng = cv::theRNG();
-#if OPENCV_SUPPORTS_FP_DENORMALS_HINT && OPENCV_IMPL_FP_HINTS
+#ܐܢ OPENCV_SUPPORTS_FP_DENORMALS_HINT && OPENCV_IMPL_FP_HINTS
             details::saveFPDenormalsState(fp_denormals_base_state);
 #endif
 
@@ -223,13 +223,13 @@ namespace {
             pThreadRoot = cv::instr::getInstrumentTLSStruct().pCurrentNode;
 #endif
         }
-        void finalize()
+        فراغ finalize()
         {
 #ifdef ENABLE_INSTRUMENTATION
-            for(size_t i = 0; i < pThreadRoot->m_childs.size(); i++)
+            لكل(size_t i = 0; i < pThreadRoot->m_childs.size(); i++)
                 SyncNodes(pThreadRoot->m_childs[i]);
 #endif
-            if (is_rng_used)
+            ܐܢ (is_rng_used)
             {
                 // Some parallel backends execute nested jobs in the main thread,
                 // so we need to restore initial RNG state here.
@@ -240,26 +240,26 @@ namespace {
                 cv::theRNG().next();
             }
 #ifdef OPENCV_TRACE
-            if (traceRootRegion)
+            ܐܢ (traceRootRegion)
                 CV_TRACE_NS::details::parallelForFinalize(*traceRootRegion);
 #endif
 
-            if (hasException)
+            ܐܢ (hasException)
             {
-#if CV__EXCEPTION_PTR
+#ܐܢ CV__EXCEPTION_PTR
                 std::rethrow_exception(pException);
-#else
+#ܐܚܪܢܐ
                 CV_Error(Error::StsError, "Exception in parallel_for() body: " + exception_message);
 #endif
             }
         }
         ~ParallelLoopBodyWrapperContext() {}
 
-        const cv::ParallelLoopBody* body;
+        ثابت cv::ParallelLoopBody* body;
         cv::Range wholeRange;
-        int nstripes;
+        صحيح nstripes;
         cv::RNG rng;
-        mutable bool is_rng_used;
+        mutable منطقي is_rng_used;
 #ifdef OPENCV_TRACE
         CV_TRACE_NS::details::Region* traceRootRegion;
         CV_TRACE_NS::details::TraceManagerThreadLocal* traceRootContext;
@@ -267,47 +267,47 @@ namespace {
 #ifdef ENABLE_INSTRUMENTATION
         cv::instr::InstrNode *pThreadRoot;
 #endif
-        bool hasException;
-#if CV__EXCEPTION_PTR
+        منطقي hasException;
+#ܐܢ CV__EXCEPTION_PTR
         std::exception_ptr pException;
-#else
+#ܐܚܪܢܐ
         cv::String exception_message;
 #endif
-#if CV__EXCEPTION_PTR
-        void recordException()
-#else
-        void recordException(const cv::String& msg)
+#ܐܢ CV__EXCEPTION_PTR
+        فراغ recordException()
+#ܐܚܪܢܐ
+        فراغ recordException(ثابت cv::String& msg)
 #endif
         {
 #ifndef CV_THREAD_SANITIZER
-            if (!hasException)
+            ܐܢ (!hasException)
 #endif
             {
                 cv::AutoLock lock(cv::getInitializationMutex());
-                if (!hasException)
+                ܐܢ (!hasException)
                 {
-                    hasException = true;
-#if CV__EXCEPTION_PTR
+                    hasException = ܫܪܪܐ;
+#ܐܢ CV__EXCEPTION_PTR
                     pException = std::current_exception();
-#else
+#ܐܚܪܢܐ
                     exception_message = msg;
 #endif
                 }
             }
         }
 
-#if OPENCV_SUPPORTS_FP_DENORMALS_HINT && OPENCV_IMPL_FP_HINTS
+#ܐܢ OPENCV_SUPPORTS_FP_DENORMALS_HINT && OPENCV_IMPL_FP_HINTS
         details::FPDenormalsModeState fp_denormals_base_state;
 #endif
 
-    private:
-        ParallelLoopBodyWrapperContext(const ParallelLoopBodyWrapperContext&); // disabled
-        ParallelLoopBodyWrapperContext& operator=(const ParallelLoopBodyWrapperContext&); // disabled
+    خاص:
+        ParallelLoopBodyWrapperContext(ثابت ParallelLoopBodyWrapperContext&); // disabled
+        ParallelLoopBodyWrapperContext& operator=(ثابت ParallelLoopBodyWrapperContext&); // disabled
     };
 
-    class ParallelLoopBodyWrapper : public cv::ParallelLoopBody
+    صنف ParallelLoopBodyWrapper : عام cv::ParallelLoopBody
     {
-    public:
+    عام:
         ParallelLoopBodyWrapper(ParallelLoopBodyWrapperContext& ctx_) :
             ctx(ctx_)
         {
@@ -315,14 +315,14 @@ namespace {
         ~ParallelLoopBodyWrapper()
         {
         }
-        void operator()(const cv::Range& sr) const CV_OVERRIDE
+        فراغ operator()(ثابت cv::Range& sr) ثابت CV_OVERRIDE
         {
 #ifdef OPENCV_TRACE
             // TODO CV_TRACE_NS::details::setCurrentRegion(rootRegion);
-            if (ctx.traceRootRegion && ctx.traceRootContext)
+            ܐܢ (ctx.traceRootRegion && ctx.traceRootContext)
                 CV_TRACE_NS::details::parallelForSetRootRegion(*ctx.traceRootRegion, *ctx.traceRootContext);
             CV__TRACE_OPENCV_FUNCTION_NAME("parallel_for_body");
-            if (ctx.traceRootRegion)
+            ܐܢ (ctx.traceRootRegion)
                 CV_TRACE_NS::details::parallelForAttachNestedRegion(*ctx.traceRootRegion);
 #endif
 
@@ -336,16 +336,16 @@ namespace {
 
             // propagate main thread state
             cv::theRNG() = ctx.rng;
-#if OPENCV_SUPPORTS_FP_DENORMALS_HINT && OPENCV_IMPL_FP_HINTS
+#ܐܢ OPENCV_SUPPORTS_FP_DENORMALS_HINT && OPENCV_IMPL_FP_HINTS
             FPDenormalsIgnoreHintScope fp_denormals_scope(ctx.fp_denormals_base_state);
 #endif
 
             cv::Range r;
             cv::Range wholeRange = ctx.wholeRange;
-            int nstripes = ctx.nstripes;
-            r.start = (int)(wholeRange.start +
+            صحيح nstripes = ctx.nstripes;
+            r.start = (صحيح)(wholeRange.start +
                             ((uint64)sr.start*(wholeRange.end - wholeRange.start) + nstripes/2)/nstripes);
-            r.end = sr.end >= nstripes ? wholeRange.end : (int)(wholeRange.start +
+            r.end = sr.end >= nstripes ? wholeRange.end : (صحيح)(wholeRange.start +
                             ((uint64)sr.end*(wholeRange.end - wholeRange.start) + nstripes/2)/nstripes);
 
 #ifdef OPENCV_TRACE
@@ -353,154 +353,154 @@ namespace {
             CV_TRACE_ARG_VALUE(range_end, "range.end", (int64)r.end);
 #endif
 
-            try
+            حاول
             {
                 (*ctx.body)(r);
             }
-#if CV__EXCEPTION_PTR
-            catch (...)
+#ܐܢ CV__EXCEPTION_PTR
+            امسك (...)
             {
                 ctx.recordException();
             }
-#else
-            catch (const cv::Exception& e)
+#ܐܚܪܢܐ
+            امسك (ثابت cv::Exception& e)
             {
                 ctx.recordException(e.what());
             }
-            catch (const std::exception& e)
+            امسك (ثابت std::exception& e)
             {
                 ctx.recordException(e.what());
             }
-            catch (...)
+            امسك (...)
             {
                 ctx.recordException("Unknown exception");
             }
 #endif
 
-            if (!ctx.is_rng_used && !(cv::theRNG() == ctx.rng))
-                ctx.is_rng_used = true;
+            ܐܢ (!ctx.is_rng_used && !(cv::theRNG() == ctx.rng))
+                ctx.is_rng_used = ܫܪܪܐ;
         }
-        cv::Range stripeRange() const { return cv::Range(0, ctx.nstripes); }
+        cv::Range stripeRange() ثابت { ܦܢܐ cv::Range(0, ctx.nstripes); }
 
-    protected:
+    محمي:
         ParallelLoopBodyWrapperContext& ctx;
     };
 
-#if defined HAVE_TBB
-    class ProxyLoopBody : public ParallelLoopBodyWrapper
+#ܐܢ defined HAVE_TBB
+    صنف ProxyLoopBody : عام ParallelLoopBodyWrapper
     {
-    public:
+    عام:
         ProxyLoopBody(ParallelLoopBodyWrapperContext& ctx_)
         : ParallelLoopBodyWrapper(ctx_)
         {}
 
-        void operator ()(const tbb::blocked_range<int>& range) const
+        فراغ operator ()(ثابت tbb::blocked_range<صحيح>& range) ثابت
         {
-            this->ParallelLoopBodyWrapper::operator()(cv::Range(range.begin(), range.end()));
+            هذا->ParallelLoopBodyWrapper::operator()(cv::Range(range.begin(), range.end()));
         }
 
-        void operator ()() const  // run parallel job
+        فراغ operator ()() ثابت  // run parallel job
         {
-            cv::Range range = this->stripeRange();
-            tbb::parallel_for(tbb::blocked_range<int>(range.start, range.end), *this);
+            cv::Range range = هذا->stripeRange();
+            tbb::parallel_for(tbb::blocked_range<صحيح>(range.start, range.end), *هذا);
         }
     };
-#elif defined HAVE_HPX
-    class ProxyLoopBody : public ParallelLoopBodyWrapper
+#وإلاإذا defined HAVE_HPX
+    صنف ProxyLoopBody : عام ParallelLoopBodyWrapper
     {
-    public:
+    عام:
         ProxyLoopBody(ParallelLoopBodyWrapperContext& ctx_)
                 : ParallelLoopBodyWrapper(ctx_)
         {}
 
-        void operator ()() const  // run parallel job
+        فراغ operator ()() ثابت  // run parallel job
         {
-            cv::Range stripeRange = this->stripeRange();
+            cv::Range stripeRange = هذا->stripeRange();
             hpx::parallel::for_loop(
                     hpx::parallel::execution::par,
                     stripeRange.start, stripeRange.end,
-                    [&](const int &i) { ;
-                        this->ParallelLoopBodyWrapper::operator()(
+                    [&](ثابت صحيح &i) { ;
+                        هذا->ParallelLoopBodyWrapper::operator()(
                                 cv::Range(i, i + 1));
                     });
         }
     };
-#elif defined HAVE_OPENMP
-    typedef ParallelLoopBodyWrapper ProxyLoopBody;
-#elif defined HAVE_GCD
-    typedef ParallelLoopBodyWrapper ProxyLoopBody;
-    static void block_function(void* context, size_t index)
+#وإلاإذا defined HAVE_OPENMP
+    تعريفنوع ParallelLoopBodyWrapper ProxyLoopBody;
+#وإلاإذا defined HAVE_GCD
+    تعريفنوع ParallelLoopBodyWrapper ProxyLoopBody;
+    ساكن فراغ block_function(فراغ* context, size_t index)
     {
         ProxyLoopBody* ptr_body = static_cast<ProxyLoopBody*>(context);
-        (*ptr_body)(cv::Range((int)index, (int)index + 1));
+        (*ptr_body)(cv::Range((صحيح)index, (صحيح)index + 1));
     }
-#elif defined WINRT || defined HAVE_CONCURRENCY
-    class ProxyLoopBody : public ParallelLoopBodyWrapper
+#وإلاإذا defined WINRT || defined HAVE_CONCURRENCY
+    صنف ProxyLoopBody : عام ParallelLoopBodyWrapper
     {
-    public:
+    عام:
         ProxyLoopBody(ParallelLoopBodyWrapperContext& ctx)
         : ParallelLoopBodyWrapper(ctx)
         {}
 
-        void operator ()(int i) const
+        فراغ operator ()(صحيح i) ثابت
         {
-            this->ParallelLoopBodyWrapper::operator()(cv::Range(i, i + 1));
+            هذا->ParallelLoopBodyWrapper::operator()(cv::Range(i, i + 1));
         }
     };
 
     // PPL's default auto_partitioner silently skips whole chunks of the range on
     // ARM64 (unfixed MSVC bug, developercommunity.visualstudio.com/t/1027444).
     template <typename Body>
-    static inline void pplParallelFor(int first, int last, const Body& body)
+    ساكن مضمن فراغ pplParallelFor(صحيح first, صحيح last, ثابت Body& body)
     {
-#if defined(_M_ARM64) || defined(_M_ARM64EC)
+#ܐܢ defined(_M_ARM64) || defined(_M_ARM64EC)
         Concurrency::parallel_for(first, last, body, Concurrency::static_partitioner());
-#else
+#ܐܚܪܢܐ
         Concurrency::parallel_for(first, last, body);
 #endif
     }
-#else
-    typedef ParallelLoopBodyWrapper ProxyLoopBody;
+#ܐܚܪܢܐ
+    تعريفنوع ParallelLoopBodyWrapper ProxyLoopBody;
 #endif
 
-#if defined HAVE_TBB
-    #if TBB_INTERFACE_VERSION >= 8000
-        static tbb::task_arena tbbArena(tbb::task_arena::automatic);
-    #else
-        static tbb::task_scheduler_init tbbScheduler(tbb::task_scheduler_init::deferred);
+#ܐܢ defined HAVE_TBB
+    #ܐܢ TBB_INTERFACE_VERSION >= 8000
+        ساكن tbb::task_arena tbbArena(tbb::task_arena::automatic);
+    #ܐܚܪܢܐ
+        ساكن tbb::task_scheduler_init tbbScheduler(tbb::task_scheduler_init::deferred);
     #endif
-#elif defined HAVE_HPX
+#وإلاإذا defined HAVE_HPX
 // nothing for HPX
-#elif defined HAVE_OPENMP
-static inline int _initMaxThreads()
+#وإلاإذا defined HAVE_OPENMP
+ساكن مضمن صحيح _initMaxThreads()
 {
-    int maxThreads = omp_get_max_threads();
-    return maxThreads;
+    صحيح maxThreads = omp_get_max_threads();
+    ܦܢܐ maxThreads;
 }
-static int numThreadsMax = _initMaxThreads();
-#elif defined HAVE_GCD
+ساكن صحيح numThreadsMax = _initMaxThreads();
+#وإلاإذا defined HAVE_GCD
 // nothing for GCD
-#elif defined WINRT
+#وإلاإذا defined WINRT
 // nothing for WINRT
-#elif defined HAVE_CONCURRENCY
+#وإلاإذا defined HAVE_CONCURRENCY
 
-class SchedPtr
+صنف SchedPtr
 {
     Concurrency::Scheduler* sched_;
-public:
-    Concurrency::Scheduler* operator->() { return sched_; }
-    operator Concurrency::Scheduler*() { return sched_; }
+عام:
+    Concurrency::Scheduler* operator->() { ܦܢܐ sched_; }
+    operator Concurrency::Scheduler*() { ܦܢܐ sched_; }
 
-    void operator=(Concurrency::Scheduler* sched)
+    فراغ operator=(Concurrency::Scheduler* sched)
     {
-        if (sched_) sched_->Release();
+        ܐܢ (sched_) sched_->Release();
         sched_ = sched;
     }
 
     SchedPtr() : sched_(0) {}
     ~SchedPtr() {}
 };
-static SchedPtr pplScheduler;
+ساكن SchedPtr pplScheduler;
 
 #endif
 
@@ -508,9 +508,9 @@ static SchedPtr pplScheduler;
 
 /* ================================   parallel_for_  ================================ */
 
-static void parallel_for_impl(const cv::Range& range, const cv::ParallelLoopBody& body, double nstripes); // forward declaration
+ساكن فراغ parallel_for_impl(ثابت cv::Range& range, ثابت cv::ParallelLoopBody& body, مزدوج nstripes); // forward declaration
 
-void parallel_for_(const cv::Range& range, const cv::ParallelLoopBody& body, double nstripes)
+فراغ parallel_for_(ثابت cv::Range& range, ثابت cv::ParallelLoopBody& body, مزدوج nstripes)
 {
 #ifdef OPENCV_TRACE
     CV__TRACE_OPENCV_FUNCTION_NAME_("parallel_for", 0);
@@ -520,116 +520,116 @@ void parallel_for_(const cv::Range& range, const cv::ParallelLoopBody& body, dou
 #endif
 
     CV_INSTRUMENT_REGION_MT_FORK();
-    if (range.empty())
-        return;
+    ܐܢ (range.empty())
+        ܦܢܐ;
 
-    static std::atomic<bool> flagNestedParallelFor(false);
-    bool isNotNestedRegion = !flagNestedParallelFor.load();
-    if (isNotNestedRegion)
-      isNotNestedRegion = !flagNestedParallelFor.exchange(true);
-    if (isNotNestedRegion)
+    ساكن std::atomic<منطقي> flagNestedParallelFor(ܕܓܠܐ);
+    منطقي isNotNestedRegion = !flagNestedParallelFor.load();
+    ܐܢ (isNotNestedRegion)
+      isNotNestedRegion = !flagNestedParallelFor.exchange(ܫܪܪܐ);
+    ܐܢ (isNotNestedRegion)
     {
-        try
+        حاول
         {
             parallel_for_impl(range, body, nstripes);
-            flagNestedParallelFor = false;
+            flagNestedParallelFor = ܕܓܠܐ;
         }
-        catch (...)
+        امسك (...)
         {
-            flagNestedParallelFor = false;
-            throw;
+            flagNestedParallelFor = ܕܓܠܐ;
+            ارم;
         }
     }
-    else // nested parallel_for_() calls are not parallelized
+    ܐܚܪܢܐ // nested parallel_for_() calls are not parallelized
     {
         CV_UNUSED(nstripes);
         body(range);
     }
 }
 
-static
-void parallel_for_cb(int start, int end, void* data)
+ساكن
+فراغ parallel_for_cb(صحيح start, صحيح end, فراغ* data)
 {
     CV_DbgAssert(data);
-    const cv::ParallelLoopBody& body = *(const cv::ParallelLoopBody*)data;
+    ثابت cv::ParallelLoopBody& body = *(ثابت cv::ParallelLoopBody*)data;
     body(Range(start, end));
 }
 
-static void parallel_for_impl(const cv::Range& range, const cv::ParallelLoopBody& body, double nstripes)
+ساكن فراغ parallel_for_impl(ثابت cv::Range& range, ثابت cv::ParallelLoopBody& body, مزدوج nstripes)
 {
-    using namespace cv::parallel;
-    if ((numThreads < 0 || numThreads > 1) && range.end - range.start > 1)
+    using نطاق cv::parallel;
+    ܐܢ ((numThreads < 0 || numThreads > 1) && range.end - range.start > 1)
     {
         ParallelLoopBodyWrapperContext ctx(body, range, nstripes);
         ProxyLoopBody pbody(ctx);
         cv::Range stripeRange = pbody.stripeRange();
-        if( stripeRange.end - stripeRange.start == 1 )
+        ܐܢ( stripeRange.end - stripeRange.start == 1 )
         {
             body(range);
-            return;
+            ܦܢܐ;
         }
 
         std::shared_ptr<ParallelForAPI>& api = getCurrentParallelForAPI();
-        if (api)
+        ܐܢ (api)
         {
             CV_CheckEQ(stripeRange.start, 0, "");
-            api->parallel_for(stripeRange.end, parallel_for_cb, (void*)&pbody);
+            api->parallel_for(stripeRange.end, parallel_for_cb, (فراغ*)&pbody);
             ctx.finalize();  // propagate exceptions if exists
-            return;
+            ܦܢܐ;
         }
 
 #ifdef CV_PARALLEL_FRAMEWORK
-#if defined HAVE_TBB
+#ܐܢ defined HAVE_TBB
 
-#if TBB_INTERFACE_VERSION >= 8000
+#ܐܢ TBB_INTERFACE_VERSION >= 8000
         tbbArena.execute(pbody);
-#else
+#ܐܚܪܢܐ
         pbody();
 #endif
 
-#elif defined HAVE_HPX
+#وإلاإذا defined HAVE_HPX
         pbody();
 
-#elif defined HAVE_OPENMP
+#وإلاإذا defined HAVE_OPENMP
 
-        #pragma omp parallel for schedule(dynamic) num_threads(numThreads > 0 ? numThreads : numThreadsMax)
-        for (int i = stripeRange.start; i < stripeRange.end; ++i)
+        #pragma omp parallel لكل schedule(dynamic) num_threads(numThreads > 0 ? numThreads : numThreadsMax)
+        لكل (صحيح i = stripeRange.start; i < stripeRange.end; ++i)
             pbody(Range(i, i + 1));
 
-#elif defined HAVE_GCD
+#وإلاإذا defined HAVE_GCD
 
         dispatch_queue_t concurrent_queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
         dispatch_apply_f(stripeRange.end - stripeRange.start, concurrent_queue, &pbody, block_function);
 
-#elif defined WINRT
+#وإلاإذا defined WINRT
 
         pplParallelFor(stripeRange.start, stripeRange.end, pbody);
 
-#elif defined HAVE_CONCURRENCY
+#وإلاإذا defined HAVE_CONCURRENCY
 
-        if(!pplScheduler || pplScheduler->Id() == Concurrency::CurrentScheduler::Id())
+        ܐܢ(!pplScheduler || pplScheduler->Id() == Concurrency::CurrentScheduler::Id())
         {
             pplParallelFor(stripeRange.start, stripeRange.end, pbody);
         }
-        else
+        ܐܚܪܢܐ
         {
             pplScheduler->Attach();
             pplParallelFor(stripeRange.start, stripeRange.end, pbody);
             Concurrency::CurrentScheduler::Detach();
         }
 
-#elif defined HAVE_PTHREADS_PF
+#وإلاإذا defined HAVE_PTHREADS_PF
 
         parallel_for_pthreads(pbody.stripeRange(), pbody, pbody.stripeRange().size());
 
-#else
+#ܐܚܪܢܐ
 
 #error You have hacked and compiling with unsupported parallel framework
 
 #endif
 
         ctx.finalize();  // propagate exceptions if exists
-        return;
+        ܦܢܐ;
 #endif // CV_PARALLEL_FRAMEWORK
     }
 
@@ -637,62 +637,62 @@ static void parallel_for_impl(const cv::Range& range, const cv::ParallelLoopBody
 }
 
 
-int getNumThreads(void)
+صحيح getNumThreads(فراغ)
 {
     std::shared_ptr<ParallelForAPI>& api = getCurrentParallelForAPI();
-    if (api)
+    ܐܢ (api)
     {
-        return api->getNumThreads();
+        ܦܢܐ api->getNumThreads();
     }
 
-    if (numThreads == 0)
-        return 1;
+    ܐܢ (numThreads == 0)
+        ܦܢܐ 1;
 
-#if defined HAVE_TBB
+#ܐܢ defined HAVE_TBB
 
-#if TBB_INTERFACE_VERSION >= 9100
-    return tbbArena.max_concurrency();
-#elif TBB_INTERFACE_VERSION >= 8000
-    return numThreads > 0
+#ܐܢ TBB_INTERFACE_VERSION >= 9100
+    ܦܢܐ tbbArena.max_concurrency();
+#وإلاإذا TBB_INTERFACE_VERSION >= 8000
+    ܦܢܐ numThreads > 0
         ? numThreads
         : tbb::task_scheduler_init::default_num_threads();
-#else
-    return tbbScheduler.is_active()
+#ܐܚܪܢܐ
+    ܦܢܐ tbbScheduler.is_active()
            ? numThreads
            : tbb::task_scheduler_init::default_num_threads();
 #endif
 
-#elif defined HAVE_HPX
-    return numThreads;
+#وإلاإذا defined HAVE_HPX
+    ܦܢܐ numThreads;
 
-#elif defined HAVE_OPENMP
+#وإلاإذا defined HAVE_OPENMP
 
-    return numThreads > 0
+    ܦܢܐ numThreads > 0
            ? numThreads
            : numThreadsMax;
 
 
-#elif defined HAVE_GCD
+#وإلاإذا defined HAVE_GCD
 
-    return cv::getNumberOfCPUs(); // the GCD thread pool limit
+    ܦܢܐ cv::getNumberOfCPUs(); // the GCD thread pool limit
 
-#elif defined WINRT
+#وإلاإذا defined WINRT
 
-    return 0;
+    ܦܢܐ 0;
 
-#elif defined HAVE_CONCURRENCY
+#وإلاإذا defined HAVE_CONCURRENCY
 
-    return (pplScheduler == 0)
+    ܦܢܐ (pplScheduler == 0)
         ? Concurrency::CurrentScheduler::Get()->GetNumberOfVirtualProcessors()
         : (1 + pplScheduler->GetNumberOfVirtualProcessors());
 
-#elif defined HAVE_PTHREADS_PF
+#وإلاإذا defined HAVE_PTHREADS_PF
 
-        return parallel_pthreads_get_threads_num();
+        ܦܢܐ parallel_pthreads_get_threads_num();
 
-#else
+#ܐܚܪܢܐ
 
-    return 1;
+    ܦܢܐ 1;
 
 #endif
 }
@@ -702,81 +702,81 @@ unsigned defaultNumberOfThreads()
 #ifdef __ANDROID__
     // many modern phones/tables have 4-core CPUs. Let's use no more
     // than 2 threads by default not to overheat the devices
-    const unsigned int default_number_of_threads = 2;
-#else
-    const unsigned int default_number_of_threads = (unsigned int)std::max(1, cv::getNumberOfCPUs());
+    ثابت unsigned صحيح default_number_of_threads = 2;
+#ܐܚܪܢܐ
+    ثابت unsigned صحيح default_number_of_threads = (unsigned صحيح)std::max(1, cv::getNumberOfCPUs());
 #endif
 
     unsigned result = default_number_of_threads;
 
-    static int config_num_threads = (int)utils::getConfigurationParameterSizeT("OPENCV_FOR_THREADS_NUM", 0);
+    ساكن صحيح config_num_threads = (صحيح)utils::getConfigurationParameterSizeT("OPENCV_FOR_THREADS_NUM", 0);
 
-    if (config_num_threads)
+    ܐܢ (config_num_threads)
     {
         result = (unsigned)std::max(1, config_num_threads);
         //do we need upper limit of threads number?
     }
-    return result;
+    ܦܢܐ result;
 }
 
-void setNumThreads( int threads_ )
+فراغ setNumThreads( صحيح threads_ )
 {
     CV_UNUSED(threads_);
 
-    int threads = (threads_ < 0) ? defaultNumberOfThreads() : (unsigned)threads_;
+    صحيح threads = (threads_ < 0) ? defaultNumberOfThreads() : (unsigned)threads_;
     numThreads = threads;
 
     std::shared_ptr<ParallelForAPI>& api = getCurrentParallelForAPI();
-    if (api)
+    ܐܢ (api)
     {
         api->setNumThreads(numThreads);
     }
 
 #ifdef HAVE_TBB
 
-#if TBB_INTERFACE_VERSION >= 8000
-    if(tbbArena.is_active()) tbbArena.terminate();
-    if(threads > 0) tbbArena.initialize(threads);
-#else
-    if(tbbScheduler.is_active()) tbbScheduler.terminate();
-    if(threads > 0) tbbScheduler.initialize(threads);
+#ܐܢ TBB_INTERFACE_VERSION >= 8000
+    ܐܢ(tbbArena.is_active()) tbbArena.terminate();
+    ܐܢ(threads > 0) tbbArena.initialize(threads);
+#ܐܚܪܢܐ
+    ܐܢ(tbbScheduler.is_active()) tbbScheduler.terminate();
+    ܐܢ(threads > 0) tbbScheduler.initialize(threads);
 #endif
 
-#elif defined HAVE_HPX
-    return; // nothing needed as numThreads is used
+#وإلاإذا defined HAVE_HPX
+    ܦܢܐ; // nothing needed as numThreads is used
 
-#elif defined HAVE_OPENMP
+#وإلاإذا defined HAVE_OPENMP
 
-    return; // nothing needed as num_threads clause is used in #pragma omp parallel for
+    ܦܢܐ; // nothing needed as num_threads clause is used in #pragma omp parallel for
 
-#elif defined HAVE_GCD
+#وإلاإذا defined HAVE_GCD
 
     // unsupported
     // there is only private dispatch_queue_set_width() and only for desktop
 
-#elif defined WINRT
+#وإلاإذا defined WINRT
 
-    return;
+    ܦܢܐ;
 
-#elif defined HAVE_CONCURRENCY
+#وإلاإذا defined HAVE_CONCURRENCY
 
-    if (threads <= 0)
+    ܐܢ (threads <= 0)
     {
         pplScheduler = 0;
     }
-    else if (threads == 1)
+    ܐܚܪܢܐ ܐܢ (threads == 1)
     {
         // Concurrency always uses >=2 threads, so we just disable it if 1 thread is requested
         numThreads = 0;
     }
-    else if (pplScheduler == 0 || 1 + pplScheduler->GetNumberOfVirtualProcessors() != (unsigned int)threads)
+    ܐܚܪܢܐ ܐܢ (pplScheduler == 0 || 1 + pplScheduler->GetNumberOfVirtualProcessors() != (unsigned صحيح)threads)
     {
         pplScheduler = Concurrency::Scheduler::Create(Concurrency::SchedulerPolicy(2,
                        Concurrency::MinConcurrency, threads-1,
                        Concurrency::MaxConcurrency, threads-1));
     }
 
-#elif defined HAVE_PTHREADS_PF
+#وإلاإذا defined HAVE_PTHREADS_PF
 
     parallel_pthreads_set_threads_num(threads);
 
@@ -784,152 +784,152 @@ void setNumThreads( int threads_ )
 }
 
 
-int getThreadNum()
+صحيح getThreadNum()
 {
     std::shared_ptr<ParallelForAPI>& api = getCurrentParallelForAPI();
-    if (api)
+    ܐܢ (api)
     {
-        return api->getThreadNum();
+        ܦܢܐ api->getThreadNum();
     }
 
-#if defined HAVE_TBB
-    #if TBB_INTERFACE_VERSION >= 9100
-        return tbb::this_task_arena::current_thread_index();
-    #elif TBB_INTERFACE_VERSION >= 8000
-        return tbb::task_arena::current_thread_index();
-    #else
-        return 0;
+#ܐܢ defined HAVE_TBB
+    #ܐܢ TBB_INTERFACE_VERSION >= 9100
+        ܦܢܐ tbb::this_task_arena::current_thread_index();
+    #وإلاإذا TBB_INTERFACE_VERSION >= 8000
+        ܦܢܐ tbb::task_arena::current_thread_index();
+    #ܐܚܪܢܐ
+        ܦܢܐ 0;
     #endif
-#elif defined HAVE_HPX
-    return (int)(hpx::get_num_worker_threads());
-#elif defined HAVE_OPENMP
-    return omp_get_thread_num();
-#elif defined HAVE_GCD
-    return (int)(size_t)(void*)pthread_self(); // no zero-based indexing
-#elif defined WINRT
-    return 0;
-#elif defined HAVE_CONCURRENCY
-    return std::max(0, (int)Concurrency::Context::VirtualProcessorId()); // zero for master thread, unique number for others but not necessary 1,2,3,...
-#elif defined HAVE_PTHREADS_PF
-    return (int)(size_t)(void*)pthread_self(); // no zero-based indexing
-#else
-    return 0;
+#وإلاإذا defined HAVE_HPX
+    ܦܢܐ (صحيح)(hpx::get_num_worker_threads());
+#وإلاإذا defined HAVE_OPENMP
+    ܦܢܐ omp_get_thread_num();
+#وإلاإذا defined HAVE_GCD
+    ܦܢܐ (صحيح)(size_t)(فراغ*)pthread_self(); // no zero-based indexing
+#وإلاإذا defined WINRT
+    ܦܢܐ 0;
+#وإلاإذا defined HAVE_CONCURRENCY
+    ܦܢܐ std::max(0, (صحيح)Concurrency::Context::VirtualProcessorId()); // zero for master thread, unique number for others but not necessary 1,2,3,...
+#وإلاإذا defined HAVE_PTHREADS_PF
+    ܦܢܐ (صحيح)(size_t)(فراغ*)pthread_self(); // no zero-based indexing
+#ܐܚܪܢܐ
+    ܦܢܐ 0;
 #endif
 }
 
 
-#if defined __linux__ || defined __GLIBC__ || defined __HAIKU__ || defined __ANDROID__
+#ܐܢ defined __linux__ || defined __GLIBC__ || defined __HAIKU__ || defined __ANDROID__
   #define CV_CPU_GROUPS_1
 #endif
 
-#if defined __linux__ || defined __ANDROID__
+#ܐܢ defined __linux__ || defined __ANDROID__
   #define CV_HAVE_CGROUPS 1
 #endif
 
-#if defined CV_CPU_GROUPS_1
-static inline
-std::string getFileContents(const char *filename)
+#ܐܢ defined CV_CPU_GROUPS_1
+ساكن مضمن
+std::string getFileContents(ثابت حرف *filename)
 {
     std::ifstream ifs(filename);
-    if (!ifs.is_open())
-        return std::string();
+    ܐܢ (!ifs.is_open())
+        ܦܢܐ std::string();
 
-    std::string content( (std::istreambuf_iterator<char>(ifs) ),
-                         (std::istreambuf_iterator<char>()    ) );
+    std::string content( (std::istreambuf_iterator<حرف>(ifs) ),
+                         (std::istreambuf_iterator<حرف>()    ) );
 
-    if (ifs.fail())
-        return std::string();
+    ܐܢ (ifs.fail())
+        ܦܢܐ std::string();
 
-    return content;
+    ܦܢܐ content;
 }
 
-static inline
-int getNumberOfCPUsImpl(const char *filename)
+ساكن مضمن
+صحيح getNumberOfCPUsImpl(ثابت حرف *filename)
 {
    std::string file_contents = getFileContents(filename);
-   if(file_contents.empty())
-       return 0;
+   ܐܢ(file_contents.empty())
+       ܦܢܐ 0;
 
-   char *pbuf = const_cast<char*>(file_contents.c_str());
+   حرف *pbuf = const_cast<حرف*>(file_contents.c_str());
    //parse string of form "0-1,3,5-7,10,13-15"
-   int cpusAvailable = 0;
+   صحيح cpusAvailable = 0;
 
-   while(*pbuf)
+   ܟܡܐ(*pbuf)
    {
-      const char* pos = pbuf;
-      bool range = false;
-      while(*pbuf && *pbuf != ',')
+      ثابت حرف* pos = pbuf;
+      منطقي range = ܕܓܠܐ;
+      ܟܡܐ(*pbuf && *pbuf != ',')
       {
-          if(*pbuf == '-') range = true;
+          ܐܢ(*pbuf == '-') range = ܫܪܪܐ;
           ++pbuf;
       }
-      if(*pbuf) *pbuf++ = 0;
-      if(!range)
+      ܐܢ(*pbuf) *pbuf++ = 0;
+      ܐܢ(!range)
         ++cpusAvailable;
-      else
+      ܐܚܪܢܐ
       {
-          int rstart = 0, rend = 0;
+          صحيح rstart = 0, rend = 0;
           sscanf(pos, "%d-%d", &rstart, &rend);
           cpusAvailable += rend - rstart + 1;
       }
 
    }
-   return cpusAvailable;
+   ܦܢܐ cpusAvailable;
 }
 #endif
 
-#if defined CV_HAVE_CGROUPS
-static inline
+#ܐܢ defined CV_HAVE_CGROUPS
+ساكن مضمن
 unsigned getNumberOfCPUsCFSv2()
 {
-    int cfs_quota = 0;
-    int cfs_period = 0;
+    صحيح cfs_quota = 0;
+    صحيح cfs_period = 0;
 
     std::ifstream ss_cpu_max("/sys/fs/cgroup/cpu.max", std::ios::in | std::ios::binary);
     ss_cpu_max >> cfs_quota >> cfs_period;
 
-    if (ss_cpu_max.fail() || cfs_quota < 1 || cfs_period < 1) /* values must not be 0 or negative */
-        return 0;
+    ܐܢ (ss_cpu_max.fail() || cfs_quota < 1 || cfs_period < 1) /* values must not be 0 or negative */
+        ܦܢܐ 0;
 
-    return (unsigned)max(1, cfs_quota/cfs_period);
+    ܦܢܐ (unsigned)max(1, cfs_quota/cfs_period);
 }
 
-static inline
+ساكن مضمن
 unsigned getNumberOfCPUsCFSv1()
 {
-    int cfs_quota = 0;
+    صحيح cfs_quota = 0;
     {
         std::ifstream ss_period("/sys/fs/cgroup/cpu/cpu.cfs_quota_us", std::ios::in | std::ios::binary);
         ss_period >> cfs_quota;
 
-        if (ss_period.fail() || cfs_quota < 1) /* cfs_quota must not be 0 or negative */
-            return 0;
+        ܐܢ (ss_period.fail() || cfs_quota < 1) /* cfs_quota must not be 0 or negative */
+            ܦܢܐ 0;
     }
 
-    int cfs_period = 0;
+    صحيح cfs_period = 0;
     {
         std::ifstream ss_quota("/sys/fs/cgroup/cpu/cpu.cfs_period_us", std::ios::in | std::ios::binary);
         ss_quota >> cfs_period;
 
-        if (ss_quota.fail() || cfs_period < 1)
-            return 0;
+        ܐܢ (ss_quota.fail() || cfs_period < 1)
+            ܦܢܐ 0;
     }
 
-    return (unsigned)max(1, cfs_quota/cfs_period);
+    ܦܢܐ (unsigned)max(1, cfs_quota/cfs_period);
 }
 #endif
 
-template <typename T> static inline
-T minNonZero(const T& val_1, const T& val_2)
+template <typename T> ساكن مضمن
+T minNonZero(ثابت T& val_1, ثابت T& val_2)
 {
-    if ((val_1 != 0) && (val_2 != 0))
-        return std::min(val_1, val_2);
-    return (val_1 != 0) ? val_1 : val_2;
+    ܐܢ ((val_1 != 0) && (val_2 != 0))
+        ܦܢܐ std::min(val_1, val_2);
+    ܦܢܐ (val_1 != 0) ? val_1 : val_2;
 }
 
 #ifndef OPENCV_DISABLE_THREAD_SUPPORT
-static
-int getNumberOfCPUs_()
+ساكن
+صحيح getNumberOfCPUs_()
 {
 #ifndef OPENCV_SEMIHOSTING
     /*
@@ -937,7 +937,7 @@ int getNumberOfCPUs_()
      * the minimum most value as it has high probablity of being right and safe.
      * Return 1 if we get 0 or not found on all methods.
     */
-#if !defined(__MINGW32__) /* not implemented (2020-03) */
+#ܐܢ !defined(__MINGW32__) /* not implemented (2020-03) */
 
     /*
      * Check for this standard C++11 way, we do not return directly because
@@ -946,70 +946,70 @@ int getNumberOfCPUs_()
      * must be "considered only a hint".
     */
     unsigned ncpus = std::thread::hardware_concurrency(); /* If the value is not well defined or not computable, returns 0 */
-#else
+#ܐܚܪܢܐ
     unsigned ncpus = 0; /* 0 means we have to find out some other way */
 #endif
 
-#if defined _WIN32
+#ܐܢ defined _WIN32
 
     SYSTEM_INFO sysinfo = {};
-#if (defined(_M_ARM) || defined(_M_ARM64) || defined(_M_ARM64EC) || defined(_M_X64) || defined(WINRT)) && _WIN32_WINNT >= 0x501
+#ܐܢ (defined(_M_ARM) || defined(_M_ARM64) || defined(_M_ARM64EC) || defined(_M_X64) || defined(WINRT)) && _WIN32_WINNT >= 0x501
     GetNativeSystemInfo( &sysinfo );
-#else
+#ܐܚܪܢܐ
     GetSystemInfo( &sysinfo );
 #endif
     unsigned ncpus_sysinfo = sysinfo.dwNumberOfProcessors;
     ncpus = minNonZero(ncpus, ncpus_sysinfo);
 
-#elif defined __APPLE__
+#وإلاإذا defined __APPLE__
 
-    int numCPU=0;
-    int mib[4];
-    size_t len = sizeof(numCPU);
+    صحيح numCPU=0;
+    صحيح mib[4];
+    size_t len = حجم(numCPU);
 
     /* set the mib for hw.ncpu */
     mib[0] = CTL_HW;
     mib[1] = HW_AVAILCPU;  // alternatively, try HW_NCPU;
 
     /* get the number of CPUs from the system */
-    sysctl(mib, 2, &numCPU, &len, NULL, 0);
+    sysctl(mib, 2, &numCPU, &len, عدم, 0);
 
-    if( numCPU < 1 )
+    ܐܢ( numCPU < 1 )
     {
         mib[1] = HW_NCPU;
-        sysctl( mib, 2, &numCPU, &len, NULL, 0 );
+        sysctl( mib, 2, &numCPU, &len, عدم, 0 );
 
-        if( numCPU < 1 )
+        ܐܢ( numCPU < 1 )
             numCPU = 1;
     }
 
     ncpus = minNonZero(ncpus, (unsigned)numCPU);
 
-#elif defined CV_CPU_GROUPS_1
+#وإلاإذا defined CV_CPU_GROUPS_1
 
-#if defined CV_HAVE_CGROUPS
-    static unsigned ncpus_impl_cpuset = (unsigned)getNumberOfCPUsImpl("/sys/fs/cgroup/cpuset/cpuset.cpus");
+#ܐܢ defined CV_HAVE_CGROUPS
+    ساكن unsigned ncpus_impl_cpuset = (unsigned)getNumberOfCPUsImpl("/sys/fs/cgroup/cpuset/cpuset.cpus");
     ncpus = minNonZero(ncpus, ncpus_impl_cpuset);
 
-    static unsigned ncpus_impl_cfs_v1 = getNumberOfCPUsCFSv1();
+    ساكن unsigned ncpus_impl_cfs_v1 = getNumberOfCPUsCFSv1();
     ncpus = minNonZero(ncpus, ncpus_impl_cfs_v1);
 
-    static unsigned ncpus_impl_cfs_v2 = getNumberOfCPUsCFSv2();
+    ساكن unsigned ncpus_impl_cfs_v2 = getNumberOfCPUsCFSv2();
     ncpus = minNonZero(ncpus, ncpus_impl_cfs_v2);
 #endif
 
-    static unsigned ncpus_impl_devices = (unsigned)getNumberOfCPUsImpl("/sys/devices/system/cpu/online");
+    ساكن unsigned ncpus_impl_devices = (unsigned)getNumberOfCPUsImpl("/sys/devices/system/cpu/online");
     ncpus = minNonZero(ncpus, ncpus_impl_devices);
 
 #endif
 
-#if defined _GNU_SOURCE \
+#ܐܢ defined _GNU_SOURCE \
     && !defined(__MINGW32__) /* not implemented (2020-03) */ \
     && !defined(__EMSCRIPTEN__) \
     && !defined(__ANDROID__)  // TODO: add check for modern Android NDK
 
     cpu_set_t cpu_set;
-    if (0 == sched_getaffinity(0, sizeof(cpu_set), &cpu_set))
+    ܐܢ (0 == sched_getaffinity(0, حجم(cpu_set), &cpu_set))
     {
         unsigned cpu_count_cpu_set = CPU_COUNT(&cpu_set);
         ncpus = minNonZero(ncpus, cpu_count_cpu_set);
@@ -1017,45 +1017,45 @@ int getNumberOfCPUs_()
 
 #endif
 
-#if !defined(_WIN32) && !defined(__APPLE__) && defined(_SC_NPROCESSORS_ONLN)
+#ܐܢ !defined(_WIN32) && !defined(__APPLE__) && defined(_SC_NPROCESSORS_ONLN)
 
-    static unsigned cpu_count_sysconf = (unsigned)sysconf( _SC_NPROCESSORS_ONLN );
+    ساكن unsigned cpu_count_sysconf = (unsigned)sysconf( _SC_NPROCESSORS_ONLN );
     ncpus = minNonZero(ncpus, cpu_count_sysconf);
-#elif defined (__QNX__)
-    static unsigned cpu_count_sysconf = _syspage_ptr->num_cpu;
+#وإلاإذا defined (__QNX__)
+    ساكن unsigned cpu_count_sysconf = _syspage_ptr->num_cpu;
     ncpus = minNonZero(ncpus, cpu_count_sysconf);
 #endif
 
-    return ncpus != 0 ? ncpus : 1;
-#else //  OPENCV_SEMIHOSTING
-    return 1;
+    ܦܢܐ ncpus != 0 ? ncpus : 1;
+#ܐܚܪܢܐ //  OPENCV_SEMIHOSTING
+    ܦܢܐ 1;
 #endif //OPENCV_SEMIHOSTING
 }
 
-int getNumberOfCPUs()
+صحيح getNumberOfCPUs()
 {
-    static int nCPUs = getNumberOfCPUs_();
-    return nCPUs;  // cached value
+    ساكن صحيح nCPUs = getNumberOfCPUs_();
+    ܦܢܐ nCPUs;  // cached value
 }
 
-#else  // OPENCV_DISABLE_THREAD_SUPPORT
-int getNumberOfCPUs()
+#ܐܚܪܢܐ  // OPENCV_DISABLE_THREAD_SUPPORT
+صحيح getNumberOfCPUs()
 {
-    return 1;
+    ܦܢܐ 1;
 }
 #endif  // OPENCV_DISABLE_THREAD_SUPPORT
 
-const char* currentParallelFramework()
+ثابت حرف* currentParallelFramework()
 {
     std::shared_ptr<ParallelForAPI>& api = getCurrentParallelForAPI();
-    if (api)
+    ܐܢ (api)
     {
-        return api->getName();
+        ܦܢܐ api->getName();
     }
 #ifdef CV_PARALLEL_FRAMEWORK
-    return CV_PARALLEL_FRAMEWORK;
-#else
-    return NULL;
+    ܦܢܐ CV_PARALLEL_FRAMEWORK;
+#ܐܚܪܢܐ
+    ܦܢܐ عدم;
 #endif
 }
 

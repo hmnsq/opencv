@@ -24,144 +24,144 @@
 
 #ifdef HAVE_OPENCL
 
-namespace cv
+نطاق cv
 {
 
-static bool intel_gpu_gemm(
+ساكن منطقي intel_gpu_gemm(
     UMat A, Size sizeA,
     UMat B, Size sizeB,
     UMat D, Size sizeD,
-    double alpha, double beta,
-    bool atrans, bool btrans,
-    bool& isPropagatedC2D
+    مزدوج alpha, مزدوج beta,
+    منطقي atrans, منطقي btrans,
+    منطقي& isPropagatedC2D
 )
 {
     CV_UNUSED(sizeB);
 
-    int M = sizeD.height, N = sizeD.width, K = ((atrans)? sizeA.height : sizeA.width);
+    صحيح M = sizeD.height, N = sizeD.width, K = ((atrans)? sizeA.height : sizeA.width);
 
-    if (M < 4 || N < 4 || K < 4)  // vload4
-        return false;
+    ܐܢ (M < 4 || N < 4 || K < 4)  // vload4
+        ܦܢܐ ܕܓܠܐ;
 
-    CV_LOG_VERBOSE(NULL, 0, "M=" << M << " N=" << N << " K=" << K);
+    CV_LOG_VERBOSE(عدم, 0, "M=" << M << " N=" << N << " K=" << K);
 
     std::string kernelName;
 
-    unsigned int lx = 8, ly = 4;
-    unsigned int dx = 4, dy = 8;
+    unsigned صحيح lx = 8, ly = 4;
+    unsigned صحيح dx = 4, dy = 8;
 
-    if(!atrans && !btrans)
+    ܐܢ(!atrans && !btrans)
     {
-        if (M % 32 == 0 && N % 32 == 0 && K % 16 == 0)
+        ܐܢ (M % 32 == 0 && N % 32 == 0 && K % 16 == 0)
         {
             kernelName = "intelblas_gemm_buffer_NN_sp";
         }
-        else
+        ܐܚܪܢܐ
         {
-            if (M % 2 != 0)
-                return false;
+            ܐܢ (M % 2 != 0)
+                ܦܢܐ ܕܓܠܐ;
             // vload4(0, dst_write0) - 4 cols
             // multiply by lx: 8
-            if (N % (4*8) != 0)
-                return false;
+            ܐܢ (N % (4*8) != 0)
+                ܦܢܐ ܕܓܠܐ;
             kernelName = "intelblas_gemm_buffer_NN";
         }
     }
-    else if(atrans && !btrans)
+    ܐܚܪܢܐ ܐܢ(atrans && !btrans)
     {
-        if (M % 32 != 0)
-            return false;
-        if (N % 32 != 0)
-            return false;
+        ܐܢ (M % 32 != 0)
+            ܦܢܐ ܕܓܠܐ;
+        ܐܢ (N % 32 != 0)
+            ܦܢܐ ܕܓܠܐ;
         kernelName = "intelblas_gemm_buffer_TN";
     }
-    else if(!atrans && btrans)
+    ܐܚܪܢܐ ܐܢ(!atrans && btrans)
     {
-        if (K % 4 != 0)
-            return false;
+        ܐܢ (K % 4 != 0)
+            ܦܢܐ ܕܓܠܐ;
         kernelName = "intelblas_gemm_buffer_NT";
         ly = 16;
         dx = 1;
     }
-    else
+    ܐܚܪܢܐ
     {
-        if (M % 32 != 0)
-            return false;
-        if (N % 32 != 0)
-            return false;
-        if (K % 16 != 0)
-            return false;
+        ܐܢ (M % 32 != 0)
+            ܦܢܐ ܕܓܠܐ;
+        ܐܢ (N % 32 != 0)
+            ܦܢܐ ܕܓܠܐ;
+        ܐܢ (K % 16 != 0)
+            ܦܢܐ ܕܓܠܐ;
         kernelName = "intelblas_gemm_buffer_TT";
     }
 
-    CV_LOG_DEBUG(NULL, "kernel: " << kernelName << "  (M=" << M << " N=" << N << " K=" << K << ")");
+    CV_LOG_DEBUG(عدم, "kernel: " << kernelName << "  (M=" << M << " N=" << N << " K=" << K << ")");
 
-    const size_t gx = divUp((size_t)N, dx);
-    const size_t gy = divUp((size_t)M, dy);
+    ثابت size_t gx = divUp((size_t)N, dx);
+    ثابت size_t gy = divUp((size_t)M, dy);
 
     size_t local[] = {lx, ly, 1};
     size_t global[] = {roundUp(gx, lx), roundUp(gy, ly), 1};
 
     ocl::Queue q;
     String errmsg;
-    const ocl::Program program = ocl::Context::getDefault().getProg(ocl::core::intel_gemm_oclsrc, "", errmsg);
+    ثابت ocl::Program program = ocl::Context::getDefault().getProg(ocl::core::intel_gemm_oclsrc, "", errmsg);
 
-    if(!atrans && btrans)
+    ܐܢ(!atrans && btrans)
     {
         ocl::Kernel k(kernelName.c_str(), program);
-        if (k.empty())
+        ܐܢ (k.empty())
         {
-            return false;
+            ܦܢܐ ܕܓܠܐ;
         }
 
         k.args(ocl::KernelArg::PtrReadOnly(A),
-               (int) (A.offset / sizeof(float)),
+               (صحيح) (A.offset / حجم(عائم)),
                ocl::KernelArg::PtrReadOnly(B),
-               (int) (B.offset / sizeof(float)),
+               (صحيح) (B.offset / حجم(عائم)),
                ocl::KernelArg::PtrWriteOnly(D),
-               (int) (D.offset / sizeof(float)),
+               (صحيح) (D.offset / حجم(عائم)),
                M, N, K,
-               (float)alpha,
-               (float)beta,
-               (int)(A.step / sizeof(float)),
-               (int)(B.step / sizeof(float)),
-               (int)(D.step / sizeof(float))
+               (عائم)alpha,
+               (عائم)beta,
+               (صحيح)(A.step / حجم(عائم)),
+               (صحيح)(B.step / حجم(عائم)),
+               (صحيح)(D.step / حجم(عائم))
         );
 
-        bool ret = k.run(2, global, local, false, q);
-        return ret;
+        منطقي ret = k.run(2, global, local, ܕܓܠܐ, q);
+        ܦܢܐ ret;
     }
-    else
+    ܐܚܪܢܐ
     {
-        int stride = (M * N < 1024 * 1024) ? 10000000 : 256;
+        صحيح stride = (M * N < 1024 * 1024) ? 10000000 : 256;
 
-        for(int start_index = 0; start_index < K; start_index += stride)
+        لكل(صحيح start_index = 0; start_index < K; start_index += stride)
         {
              ocl::Kernel k(kernelName.c_str(), program);
              k.args(ocl::KernelArg::PtrReadOnly(A),
-                    (int) (A.offset / sizeof(float)),
+                    (صحيح) (A.offset / حجم(عائم)),
                     ocl::KernelArg::PtrReadOnly(B),
-                    (int) (B.offset / sizeof(float)),
+                    (صحيح) (B.offset / حجم(عائم)),
                     ocl::KernelArg::PtrWriteOnly(D),
-                    (int) (D.offset / sizeof(float)),
+                    (صحيح) (D.offset / حجم(عائم)),
                     M, N, K,
-                    (float)alpha,
-                    (float)beta,
-                    (int)(A.step / sizeof(float)),
-                    (int)(B.step / sizeof(float)),
-                    (int)(D.step / sizeof(float)),
-                    (int) start_index,                          // 14 start_index
+                    (عائم)alpha,
+                    (عائم)beta,
+                    (صحيح)(A.step / حجم(عائم)),
+                    (صحيح)(B.step / حجم(عائم)),
+                    (صحيح)(D.step / حجم(عائم)),
+                    (صحيح) start_index,                          // 14 start_index
                     stride);
 
-            bool ret = k.run(2, global, local, false, q);
-            if (!ret)
+            منطقي ret = k.run(2, global, local, ܕܓܠܐ, q);
+            ܐܢ (!ret)
             {
-                if (start_index != 0)
-                    isPropagatedC2D = false;  // D array content is changed, need to rewrite
-                return false;
+                ܐܢ (start_index != 0)
+                    isPropagatedC2D = ܕܓܠܐ;  // D array content is changed, need to rewrite
+                ܦܢܐ ܕܓܠܐ;
             }
         }
-        return true;
+        ܦܢܐ ܫܪܪܐ;
     }
 }
 
