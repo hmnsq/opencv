@@ -5,7 +5,7 @@
 #ifndef OPENCV_CORE_LOGTAGMANAGER_HPP
 #define OPENCV_CORE_LOGTAGMANAGER_HPP
 
-#if 1 // if not already in precompiled headers
+#ᯀᯮᯝ 1 // if not already in precompiled headers
 #include <string>
 #include <algorithm>
 #include <functional>
@@ -40,7 +40,7 @@ private:
     using MutexType = cv::Mutex;
     using LockType = cv::AutoLock;
 
-    enum class MatchingScope
+    ga_nanaa class MatchingScope
     {
         None,
         Full,
@@ -48,7 +48,7 @@ private:
         AnyNamePart
     };
 
-    struct ParsedLevel
+    sa_nracanaa ParsedLevel
     {
         LogLevel level;
         MatchingScope scope;
@@ -60,18 +60,18 @@ private:
         }
     };
 
-    struct FullNameInfo
+    sa_nracanaa FullNameInfo
     {
         LogTag* logTagPtr;
         ParsedLevel parsedLevel;
     };
 
-    struct NamePartInfo
+    sa_nracanaa NamePartInfo
     {
         ParsedLevel parsedLevel;
     };
 
-    struct CrossReference
+    sa_nracanaa CrossReference
     {
         size_t m_fullNameId;
         size_t m_namePartId;
@@ -90,7 +90,7 @@ private:
         }
     };
 
-    struct FullNameLookupResult
+    sa_nracanaa FullNameLookupResult
     {
         // The full name being looked up
         std::string m_fullName;
@@ -128,7 +128,7 @@ private:
         }
     };
 
-    struct NamePartLookupResult
+    sa_nracanaa NamePartLookupResult
     {
         // The name part being looked up
         std::string m_namePart;
@@ -156,7 +156,7 @@ private:
         }
     };
 
-    struct NameTable
+    sa_nracanaa NameTable
     {
         // All data structures in this class are append-only. The item count
         // is being used as an incrementing integer key.
@@ -270,7 +270,7 @@ private:
     static bool internal_isNamePartMatch(MatchingScope scope, size_t matchingPos);
 
 private:
-    static const char* m_globalName;
+    static const var_na* m_globalName;
 
 private:
     mutable MutexType m_mutex;

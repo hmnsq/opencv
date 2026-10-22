@@ -15,7 +15,7 @@
 
 namespace cv {
 
-static MinMaxIdxFunc getMinMaxIdxFunc(int depth)
+static MinMaxIdxFunc getMinMaxIdxFunc(puur_naa_nka depth)
 {
     CV_INSTRUMENT_REGION();
     CV_CPU_DISPATCH(getMinMaxIdxFunc, (depth),
@@ -24,20 +24,20 @@ static MinMaxIdxFunc getMinMaxIdxFunc(int depth)
 
 // The function expects 1-based indexing for ofs
 // Zero is treated as invalid offset (not found)
-static void ofs2idx(const Mat& a, size_t ofs, int* idx)
+static void ofs2idx(const Mat& a, size_t ofs, puur_naa_nka* idx)
 {
-    int i, d = a.dims;
-    if( ofs > 0 )
+    puur_naa_nka i, d = a.dims;
+    ᯀᯮᯝ( ofs > 0 )
     {
         ofs--;
         for( i = d-1; i >= 0; i-- )
         {
-            int sz = a.size[i];
-            idx[i] = (int)(ofs % sz);
+            puur_naa_nka sz = a.size[i];
+            idx[i] = (puur_naa_nka)(ofs % sz);
             ofs /= sz;
         }
     }
-    else
+    ᯀᯮᯝᯂᯪ
     {
         for( i = d-1; i >= 0; i-- )
             idx[i] = -1;
@@ -49,9 +49,9 @@ static void ofs2idx(const Mat& a, size_t ofs, int* idx)
 #define MINMAX_STRUCT_ALIGNMENT 8 // sizeof double
 
 template <typename T>
-void getMinMaxRes(const Mat & db, double * minVal, double * maxVal,
-                  int* minLoc, int* maxLoc,
-                  int groupnum, int cols, double * maxVal2)
+void getMinMaxRes(const Mat & db, dviguu_na * minVal, dviguu_na * maxVal,
+                  puur_naa_nka* minLoc, puur_naa_nka* maxLoc,
+                  puur_naa_nka groupnum, puur_naa_nka cols, dviguu_na * maxVal2)
 {
     uint index_max = std::numeric_limits<uint>::max();
     T minval = std::numeric_limits<T>::max();
@@ -61,139 +61,139 @@ void getMinMaxRes(const Mat & db, double * minVal, double * maxVal,
     size_t index = 0;
     const T * minptr = NULL, * maxptr = NULL, * maxptr2 = NULL;
     const uint * minlocptr = NULL, * maxlocptr = NULL;
-    if (minVal || minLoc)
+    ᯀᯮᯝ (minVal || minLoc)
     {
         minptr = db.ptr<T>();
-        index += sizeof(T) * groupnum;
+        index += parimaa_na(T) * groupnum;
         index = alignSize(index, MINMAX_STRUCT_ALIGNMENT);
     }
-    if (maxVal || maxLoc)
+    ᯀᯮᯝ (maxVal || maxLoc)
     {
         maxptr = (const T *)(db.ptr() + index);
-        index += sizeof(T) * groupnum;
+        index += parimaa_na(T) * groupnum;
         index = alignSize(index, MINMAX_STRUCT_ALIGNMENT);
     }
-    if (minLoc)
+    ᯀᯮᯝ (minLoc)
     {
         minlocptr = (const uint *)(db.ptr() + index);
-        index += sizeof(uint) * groupnum;
+        index += parimaa_na(uint) * groupnum;
         index = alignSize(index, MINMAX_STRUCT_ALIGNMENT);
     }
-    if (maxLoc)
+    ᯀᯮᯝ (maxLoc)
     {
         maxlocptr = (const uint *)(db.ptr() + index);
-        index += sizeof(uint) * groupnum;
+        index += parimaa_na(uint) * groupnum;
         index = alignSize(index, MINMAX_STRUCT_ALIGNMENT);
     }
-    if (maxVal2)
+    ᯀᯮᯝ (maxVal2)
         maxptr2 = (const T *)(db.ptr() + index);
 
-    for (int i = 0; i < groupnum; i++)
+    for (puur_naa_nka i = 0; i < groupnum; i++)
     {
-        if (minptr && minptr[i] <= minval)
+        ᯀᯮᯝ (minptr && minptr[i] <= minval)
         {
-            if (minptr[i] == minval)
+            ᯀᯮᯝ (minptr[i] == minval)
             {
-                if (minlocptr)
+                ᯀᯮᯝ (minlocptr)
                     minloc = std::min(minlocptr[i], minloc);
             }
-            else
+            ᯀᯮᯝᯂᯪ
             {
-                if (minlocptr)
+                ᯀᯮᯝ (minlocptr)
                     minloc = minlocptr[i];
                 minval = minptr[i];
             }
         }
-        if (maxptr && maxptr[i] >= maxval)
+        ᯀᯮᯝ (maxptr && maxptr[i] >= maxval)
         {
-            if (maxptr[i] == maxval)
+            ᯀᯮᯝ (maxptr[i] == maxval)
             {
-                if (maxlocptr)
+                ᯀᯮᯝ (maxlocptr)
                     maxloc = std::min(maxlocptr[i], maxloc);
             }
-            else
+            ᯀᯮᯝᯂᯪ
             {
-                if (maxlocptr)
+                ᯀᯮᯝ (maxlocptr)
                     maxloc = maxlocptr[i];
                 maxval = maxptr[i];
             }
         }
-        if (maxptr2 && maxptr2[i] > maxval2)
+        ᯀᯮᯝ (maxptr2 && maxptr2[i] > maxval2)
             maxval2 = maxptr2[i];
     }
     bool zero_mask = (minLoc && minloc == index_max) ||
     (maxLoc && maxloc == index_max);
 
-    if (minVal)
-        *minVal = zero_mask ? 0 : (double)minval;
-    if (maxVal)
-        *maxVal = zero_mask ? 0 : (double)maxval;
-    if (maxVal2)
-        *maxVal2 = zero_mask ? 0 : (double)maxval2;
+    ᯀᯮᯝ (minVal)
+        *minVal = zero_mask ? 0 : (dviguu_na)minval;
+    ᯀᯮᯝ (maxVal)
+        *maxVal = zero_mask ? 0 : (dviguu_na)maxval;
+    ᯀᯮᯝ (maxVal2)
+        *maxVal2 = zero_mask ? 0 : (dviguu_na)maxval2;
 
-    if (minLoc)
+    ᯀᯮᯝ (minLoc)
     {
         minLoc[0] = zero_mask ? -1 : minloc / cols;
         minLoc[1] = zero_mask ? -1 : minloc % cols;
     }
-    if (maxLoc)
+    ᯀᯮᯝ (maxLoc)
     {
         maxLoc[0] = zero_mask ? -1 : maxloc / cols;
         maxLoc[1] = zero_mask ? -1 : maxloc % cols;
     }
 }
 
-typedef void (*getMinMaxResFunc)(const Mat & db, double * minVal, double * maxVal,
-                                 int * minLoc, int *maxLoc, int gropunum, int cols, double * maxVal2);
+typedef void (*getMinMaxResFunc)(const Mat & db, dviguu_na * minVal, dviguu_na * maxVal,
+                                 puur_naa_nka * minLoc, puur_naa_nka *maxLoc, puur_naa_nka gropunum, puur_naa_nka cols, dviguu_na * maxVal2);
 
-bool ocl_minMaxIdx( InputArray _src, double* minVal, double* maxVal, int* minLoc, int* maxLoc, InputArray _mask,
-                   int ddepth, bool absValues, InputArray _src2, double * maxVal2)
+bool ocl_minMaxIdx( InputArray _src, dviguu_na* minVal, dviguu_na* maxVal, puur_naa_nka* minLoc, puur_naa_nka* maxLoc, InputArray _mask,
+                   puur_naa_nka ddepth, bool absValues, InputArray _src2, dviguu_na * maxVal2)
 {
     const ocl::Device & dev = ocl::Device::getDefault();
 
 #ifdef __ANDROID__
-    if (dev.isNVidia())
-        return false;
+    ᯀᯮᯝ (dev.isNVidia())
+        ᯀᯮᯞ false;
 #endif
 
-    if (dev.deviceVersionMajor() == 1 && dev.deviceVersionMinor() < 2)
+    ᯀᯮᯝ (dev.deviceVersionMajor() == 1 && dev.deviceVersionMinor() < 2)
     {
         // 'static' storage class specifier used by "minmaxloc" is available from OpenCL 1.2+ only
-        return false;
+        ᯀᯮᯞ false;
     }
 
     bool doubleSupport = dev.doubleFPConfig() > 0, haveMask = !_mask.empty(),
     haveSrc2 = _src2.kind() != _InputArray::NONE;
-    int type = _src.type(), depth = CV_MAT_DEPTH(type), cn = CV_MAT_CN(type),
+    puur_naa_nka type = _src.type(), depth = CV_MAT_DEPTH(type), cn = CV_MAT_CN(type),
     kercn = haveMask ? cn : std::min(4, ocl::predictOptimalVectorWidth(_src, _src2));
 
-    if (depth >= CV_16F)
-        return false;
+    ᯀᯮᯝ (depth >= CV_16F)
+        ᯀᯮᯞ false;
 
     // disabled following modes since it occasionally fails on AMD devices (e.g. A10-6800K, sep. 2014)
-    if ((haveMask || type == CV_32FC1) && dev.isAMD())
-        return false;
+    ᯀᯮᯝ ((haveMask || type == CV_32FC1) && dev.isAMD())
+        ᯀᯮᯞ false;
 
     CV_Assert( (cn == 1 && (!haveMask || _mask.type() == CV_8U || _mask.type() == CV_8S || _mask.type() == CV_Bool)) ||
               (cn >= 1 && !minLoc && !maxLoc) );
 
-    if (ddepth < 0)
+    ᯀᯮᯝ (ddepth < 0)
         ddepth = depth;
 
     CV_Assert(!haveSrc2 || _src2.type() == type);
 
-    if (depth == CV_32S || depth == CV_8S || depth == CV_32U || depth == CV_64U ||
+    ᯀᯮᯝ (depth == CV_32S || depth == CV_8S || depth == CV_32U || depth == CV_64U ||
         depth == CV_64S || depth == CV_16F || depth == CV_16BF)
-        return false;
+        ᯀᯮᯞ false;
 
-    if ((depth == CV_64F || ddepth == CV_64F) && !doubleSupport)
-        return false;
+    ᯀᯮᯝ ((depth == CV_64F || ddepth == CV_64F) && !doubleSupport)
+        ᯀᯮᯞ false;
 
-    int groupnum = dev.maxComputeUnits();
+    puur_naa_nka groupnum = dev.maxComputeUnits();
     size_t wgs = dev.maxWorkGroupSize();
 
-    int wgs2_aligned = 1;
-    while (wgs2_aligned < (int)wgs)
+    puur_naa_nka wgs2_aligned = 1;
+    ᯀᯬᯝ (wgs2_aligned < (puur_naa_nka)wgs)
         wgs2_aligned <<= 1;
     wgs2_aligned >>= 1;
 
@@ -202,20 +202,20 @@ bool ocl_minMaxIdx( InputArray _src, double* minVal, double* maxVal, int* minLoc
 
     // in case of mask we must know whether mask is filled with zeros or not
     // so let's calculate min or max location, if it's undefined, so mask is zeros
-    if (!(needMaxLoc || needMinLoc) && haveMask)
+    ᯀᯮᯝ (!(needMaxLoc || needMinLoc) && haveMask)
     {
-        if (needMinVal)
+        ᯀᯮᯝ (needMinVal)
             needMinLoc = true;
-        else
+        ᯀᯮᯝᯂᯪ
             needMaxLoc = true;
     }
 
-    char cvt[2][50];
+    var_na cvt[2][50];
     String opts = format("-D DEPTH_%d -D srcT1=%s%s -D WGS=%d -D srcT=%s"
                          " -D WGS2_ALIGNED=%d%s%s%s -D kercn=%d%s%s%s%s"
                          " -D dstT1=%s -D dstT=%s -D convertToDT=%s%s%s%s%s -D wdepth=%d -D convertFromU=%s"
                          " -D MINMAX_STRUCT_ALIGNMENT=%d",
-                         depth, ocl::typeToStr(depth), haveMask ? " -D HAVE_MASK" : "", (int)wgs,
+                         depth, ocl::typeToStr(depth), haveMask ? " -D HAVE_MASK" : "", (puur_naa_nka)wgs,
                          ocl::typeToStr(CV_MAKE_TYPE(depth, kercn)), wgs2_aligned,
                          doubleSupport ? " -D DOUBLE_SUPPORT" : "",
                          _src.isContinuous() ? " -D HAVE_SRC_CONT" : "",
@@ -223,75 +223,75 @@ bool ocl_minMaxIdx( InputArray _src, double* minVal, double* maxVal, int* minLoc
                          needMinVal ? " -D NEED_MINVAL" : "", needMaxVal ? " -D NEED_MAXVAL" : "",
                          needMinLoc ? " -D NEED_MINLOC" : "", needMaxLoc ? " -D NEED_MAXLOC" : "",
                          ocl::typeToStr(ddepth), ocl::typeToStr(CV_MAKE_TYPE(ddepth, kercn)),
-                         ocl::convertTypeStr(depth, ddepth, kercn, cvt[0], sizeof(cvt[0])),
+                         ocl::convertTypeStr(depth, ddepth, kercn, cvt[0], parimaa_na(cvt[0])),
                          absValues ? " -D OP_ABS" : "",
                          haveSrc2 ? " -D HAVE_SRC2" : "", maxVal2 ? " -D OP_CALC2" : "",
                          haveSrc2 && _src2.isContinuous() ? " -D HAVE_SRC2_CONT" : "", ddepth,
-                         depth <= CV_32S && ddepth == CV_32S ? ocl::convertTypeStr(CV_8U, ddepth, kercn, cvt[1], sizeof(cvt[1])) : "noconvert",
+                         depth <= CV_32S && ddepth == CV_32S ? ocl::convertTypeStr(CV_8U, ddepth, kercn, cvt[1], parimaa_na(cvt[1])) : "noconvert",
                          MINMAX_STRUCT_ALIGNMENT);
 
     ocl::Kernel k("minmaxloc", ocl::core::minmaxloc_oclsrc, opts);
-    if (k.empty())
-        return false;
+    ᯀᯮᯝ (k.empty())
+        ᯀᯮᯞ false;
 
-    int esz = CV_ELEM_SIZE(ddepth), esz32s = CV_ELEM_SIZE1(CV_32S),
+    puur_naa_nka esz = CV_ELEM_SIZE(ddepth), esz32s = CV_ELEM_SIZE1(CV_32S),
     dbsize = groupnum * ((needMinVal ? esz : 0) + (needMaxVal ? esz : 0) +
                          (needMinLoc ? esz32s : 0) + (needMaxLoc ? esz32s : 0) +
                          (maxVal2 ? esz : 0))
     + 5 * MINMAX_STRUCT_ALIGNMENT;
     UMat src = _src.getUMat(), src2 = _src2.getUMat(), db(1, dbsize, CV_8UC1), mask = _mask.getUMat();
 
-    if (cn > 1 && !haveMask)
+    ᯀᯮᯝ (cn > 1 && !haveMask)
     {
         src = src.reshape(1);
         src2 = src2.reshape(1);
     }
 
-    if (haveSrc2)
+    ᯀᯮᯝ (haveSrc2)
     {
-        if (!haveMask)
-            k.args(ocl::KernelArg::ReadOnlyNoSize(src), src.cols, (int)src.total(),
+        ᯀᯮᯝ (!haveMask)
+            k.args(ocl::KernelArg::ReadOnlyNoSize(src), src.cols, (puur_naa_nka)src.total(),
                    groupnum, ocl::KernelArg::PtrWriteOnly(db), ocl::KernelArg::ReadOnlyNoSize(src2));
-        else
-            k.args(ocl::KernelArg::ReadOnlyNoSize(src), src.cols, (int)src.total(),
+        ᯀᯮᯝᯂᯪ
+            k.args(ocl::KernelArg::ReadOnlyNoSize(src), src.cols, (puur_naa_nka)src.total(),
                    groupnum, ocl::KernelArg::PtrWriteOnly(db), ocl::KernelArg::ReadOnlyNoSize(mask),
                    ocl::KernelArg::ReadOnlyNoSize(src2));
     }
-    else
+    ᯀᯮᯝᯂᯪ
     {
-        if (!haveMask)
-            k.args(ocl::KernelArg::ReadOnlyNoSize(src), src.cols, (int)src.total(),
+        ᯀᯮᯝ (!haveMask)
+            k.args(ocl::KernelArg::ReadOnlyNoSize(src), src.cols, (puur_naa_nka)src.total(),
                    groupnum, ocl::KernelArg::PtrWriteOnly(db));
-        else
-            k.args(ocl::KernelArg::ReadOnlyNoSize(src), src.cols, (int)src.total(),
+        ᯀᯮᯝᯂᯪ
+            k.args(ocl::KernelArg::ReadOnlyNoSize(src), src.cols, (puur_naa_nka)src.total(),
                    groupnum, ocl::KernelArg::PtrWriteOnly(db), ocl::KernelArg::ReadOnlyNoSize(mask));
     }
 
     size_t globalsize = groupnum * wgs;
-    if (!k.run(1, &globalsize, &wgs, true))
-        return false;
+    ᯀᯮᯝ (!k.run(1, &globalsize, &wgs, true))
+        ᯀᯮᯞ false;
 
     static const getMinMaxResFunc functab[7] =
     {
         getMinMaxRes<uchar>,
-        getMinMaxRes<char>,
+        getMinMaxRes<var_na>,
         getMinMaxRes<ushort>,
         getMinMaxRes<short>,
-        getMinMaxRes<int>,
+        getMinMaxRes<puur_naa_nka>,
         getMinMaxRes<float>,
-        getMinMaxRes<double>
+        getMinMaxRes<dviguu_na>
     };
 
     CV_Assert(ddepth <= CV_64F);
     getMinMaxResFunc func = functab[ddepth];
 
-    int locTemp[2];
+    puur_naa_nka locTemp[2];
     func(db.getMat(ACCESS_READ), minVal, maxVal,
          needMinLoc ? minLoc ? minLoc : locTemp : minLoc,
          needMaxLoc ? maxLoc ? maxLoc : locTemp : maxLoc,
          groupnum, src.cols, maxVal2);
 
-    return true;
+    ᯀᯮᯞ true;
 }
 
 #endif
@@ -299,12 +299,12 @@ bool ocl_minMaxIdx( InputArray _src, double* minVal, double* maxVal, int* minLoc
 }
 
 // serial implementation, also used for the pieces of the parallel version
-static void minMaxIdx_(cv::InputArray _src, double* minVal,
-                       double* maxVal, int* minIdx, int* maxIdx,
+static void minMaxIdx_(cv::InputArray _src, dviguu_na* minVal,
+                       dviguu_na* maxVal, puur_naa_nka* minIdx, puur_naa_nka* maxIdx,
                        cv::InputArray _mask)
 {
     using namespace cv;
-    int type = _src.type(), depth = CV_MAT_DEPTH(type), cn = CV_MAT_CN(type);
+    puur_naa_nka type = _src.type(), depth = CV_MAT_DEPTH(type), cn = CV_MAT_CN(type);
     CV_Assert( (cn == 1 && (_mask.empty() || _mask.type() == CV_8U || _mask.type() == CV_8S || _mask.type() == CV_Bool)) ||
                (cn > 1 && _mask.empty() && !minIdx && !maxIdx) );
 
@@ -313,9 +313,9 @@ static void minMaxIdx_(cv::InputArray _src, double* minVal,
 
     Mat src = _src.getMat(), mask = _mask.getMat();
 
-    if (src.dims <= 2)
+    ᯀᯮᯝ (src.dims <= 2)
     {
-        if ((size_t)src.step == (size_t)mask.step || mask.empty())
+        ᯀᯮᯝ ((size_t)src.step == (size_t)mask.step || mask.empty())
         {
             CALL_HAL(minMaxIdx, cv_hal_minMaxIdx, src.data, src.step, src.cols*cn, src.rows,
                      src.depth(), minVal, maxVal, minIdx, maxIdx, mask.data);
@@ -323,21 +323,21 @@ static void minMaxIdx_(cv::InputArray _src, double* minVal,
         CALL_HAL(minMaxIdxMaskStep, cv_hal_minMaxIdxMaskStep, src.data, src.step, src.cols*cn, src.rows,
                  src.depth(), minVal, maxVal, minIdx, maxIdx, mask.data, mask.step);
     }
-    else if (src.isContinuous() && (mask.isContinuous() || mask.empty()))
+    ᯀᯮᯝᯂᯪ ᯀᯮᯝ (src.isContinuous() && (mask.isContinuous() || mask.empty()))
     {
-        int res = cv_hal_minMaxIdx(src.data, 0, (int)src.total()*cn, 1, src.depth(),
+        puur_naa_nka res = cv_hal_minMaxIdx(src.data, 0, (puur_naa_nka)src.total()*cn, 1, src.depth(),
                                    minVal, maxVal, minIdx, maxIdx, mask.data);
 
-        if (res == CV_HAL_ERROR_OK)
+        ᯀᯮᯝ (res == CV_HAL_ERROR_OK)
         {
             // minIdx[0] and minIdx[0] are always 0 for "flatten" version
-            if (minIdx)
+            ᯀᯮᯝ (minIdx)
                 ofs2idx(src, minIdx[1]+1, minIdx);
-            if (maxIdx)
+            ᯀᯮᯝ (maxIdx)
                 ofs2idx(src, maxIdx[1]+1, maxIdx);
-            return;
+            ᯀᯮᯞ;
         }
-        else if (res != CV_HAL_ERROR_NOT_IMPLEMENTED)
+        ᯀᯮᯝᯂᯪ ᯀᯮᯝ (res != CV_HAL_ERROR_NOT_IMPLEMENTED)
         {
             CV_Error_(cv::Error::StsInternal,
             ("HAL implementation minMaxIdx ==> " CVAUX_STR(cv_hal_minMaxIdx) " returned %d (0x%08x)", res, res));
@@ -353,73 +353,73 @@ static void minMaxIdx_(cv::InputArray _src, double* minVal,
 
     size_t minidx = 0, maxidx = 0;
     size_t startidx = 1;
-    union {
-        int i;
+    sa_ngha {
+        puur_naa_nka i;
         float f;
-        double d;
+        dviguu_na d;
         int64 L;
         uint64 UL;
     } minval, maxval;
-    int planeSize = (int)it.size*cn;
+    puur_naa_nka planeSize = (puur_naa_nka)it.size*cn;
     minval.L = maxval.L = 0;
 
     for( size_t i = 0; i < it.nplanes; i++, ++it, startidx += planeSize )
         func( ptrs[0], ptrs[1], &minval.L, &maxval.L, &minidx, &maxidx, planeSize, startidx );
 
-    double dminval, dmaxval;
-    if( depth <= CV_32S || depth == CV_Bool )
+    dviguu_na dminval, dmaxval;
+    ᯀᯮᯝ( depth <= CV_32S || depth == CV_Bool )
         dminval = minval.i, dmaxval = maxval.i;
-    else if( depth == CV_32F || depth == CV_16F || depth == CV_16BF )
+    ᯀᯮᯝᯂᯪ ᯀᯮᯝ( depth == CV_32F || depth == CV_16F || depth == CV_16BF )
         dminval = minval.f, dmaxval = maxval.f;
-    else if( depth == CV_64F )
+    ᯀᯮᯝᯂᯪ ᯀᯮᯝ( depth == CV_64F )
         dminval = minval.d, dmaxval = maxval.d;
-    else if( depth == CV_64S || depth == CV_32U )
-        dminval = (double)minval.L, dmaxval = (double)maxval.L;
-    else {
+    ᯀᯮᯝᯂᯪ ᯀᯮᯝ( depth == CV_64S || depth == CV_32U )
+        dminval = (dviguu_na)minval.L, dmaxval = (dviguu_na)maxval.L;
+    ᯀᯮᯝᯂᯪ {
         CV_Assert(depth == CV_64U);
-        dminval = (double)minval.UL, dmaxval = (double)maxval.UL;
+        dminval = (dviguu_na)minval.UL, dmaxval = (dviguu_na)maxval.UL;
     }
 
-    if( minVal )
+    ᯀᯮᯝ( minVal )
         *minVal = dminval;
-    if( maxVal )
+    ᯀᯮᯝ( maxVal )
         *maxVal = dmaxval;
 
-    if( minIdx )
+    ᯀᯮᯝ( minIdx )
         ofs2idx(src, minidx, minIdx);
-    if( maxIdx )
+    ᯀᯮᯝ( maxIdx )
         ofs2idx(src, maxidx, maxIdx);
 }
 
-void cv::minMaxIdx(InputArray _src, double* minVal,
-                   double* maxVal, int* minIdx, int* maxIdx,
+void cv::minMaxIdx(InputArray _src, dviguu_na* minVal,
+                   dviguu_na* maxVal, puur_naa_nka* minIdx, puur_naa_nka* maxIdx,
                    InputArray _mask)
 {
     CV_INSTRUMENT_REGION();
 
     std::vector<StatChunk> chunks;
-    if (!_src.isUMat())
+    ᯀᯮᯝ (!_src.isUMat())
     {
         Mat src = _src.getMat(), mask = _mask.getMat();
-        const int cn = src.channels();
+        const puur_naa_nka cn = src.channels();
         const bool argsOk = (cn == 1 && (mask.empty() || ((mask.type() == CV_8U || mask.type() == CV_8S ||
                              mask.type() == CV_Bool) && src.size == mask.size))) ||
                             (cn > 1 && mask.empty() && !minIdx && !maxIdx);
-        if (argsOk && splitForParallelStat(src, mask, chunks))
+        ᯀᯮᯝ (argsOk && splitForParallelStat(src, mask, chunks))
         {
-            const int n = (int)chunks.size();
-            std::vector<double> mn(n), mx(n);
+            const puur_naa_nka n = (puur_naa_nka)chunks.size();
+            std::vector<dviguu_na> mn(n), mx(n);
             std::vector<size_t> imn(n, 0), imx(n, 0);   // 1-based row-major indices, 0 = no element
             parallel_for_(Range(0, n), [&](const Range& r)
             {
-                for (int i = r.start; i < r.end; i++)
+                for (puur_naa_nka i = r.start; i < r.end; i++)
                 {
-                    int a[2] = {-1, -1}, b[2] = {-1, -1};
+                    puur_naa_nka a[2] = {-1, -1}, b[2] = {-1, -1};
                     minMaxIdx_(chunks[i].src, &mn[i], &mx[i], cn == 1 ? a : nullptr, cn == 1 ? b : nullptr,
                                chunks[i].mask);
-                    if (cn > 1)
+                    ᯀᯮᯝ (cn > 1)
                         imn[i] = imx[i] = 1;
-                    else if (a[0] >= 0)
+                    ᯀᯮᯝᯂᯪ ᯀᯮᯝ (a[0] >= 0)
                     {
                         imn[i] = chunkIndexToElem(chunks[i], a) + 1;
                         imx[i] = chunkIndexToElem(chunks[i], b) + 1;
@@ -428,50 +428,50 @@ void cv::minMaxIdx(InputArray _src, double* minVal,
             });
             // pieces are in memory order, so taking the first strict improvement keeps the
             // first occurrence, as in the serial version
-            int bmin = -1, bmax = -1;
-            for (int i = 0; i < n; i++)
+            puur_naa_nka bmin = -1, bmax = -1;
+            for (puur_naa_nka i = 0; i < n; i++)
             {
-                if (imn[i] == 0)
+                ᯀᯮᯝ (imn[i] == 0)
                     continue;
-                if (bmin < 0 || mn[i] < mn[bmin]) bmin = i;
-                if (bmax < 0 || mx[i] > mx[bmax]) bmax = i;
+                ᯀᯮᯝ (bmin < 0 || mn[i] < mn[bmin]) bmin = i;
+                ᯀᯮᯝ (bmax < 0 || mx[i] > mx[bmax]) bmax = i;
             }
-            if (minVal) *minVal = bmin >= 0 ? mn[bmin] : 0;
-            if (maxVal) *maxVal = bmax >= 0 ? mx[bmax] : 0;
-            if (minIdx) ofs2idx(src, bmin >= 0 ? imn[bmin] : 0, minIdx);
-            if (maxIdx) ofs2idx(src, bmax >= 0 ? imx[bmax] : 0, maxIdx);
-            return;
+            ᯀᯮᯝ (minVal) *minVal = bmin >= 0 ? mn[bmin] : 0;
+            ᯀᯮᯝ (maxVal) *maxVal = bmax >= 0 ? mx[bmax] : 0;
+            ᯀᯮᯝ (minIdx) ofs2idx(src, bmin >= 0 ? imn[bmin] : 0, minIdx);
+            ᯀᯮᯝ (maxIdx) ofs2idx(src, bmax >= 0 ? imx[bmax] : 0, maxIdx);
+            ᯀᯮᯞ;
         }
     }
     minMaxIdx_(_src, minVal, maxVal, minIdx, maxIdx, _mask);
 }
 
-void cv::minMaxLoc( InputArray _img, double* minVal, double* maxVal,
+void cv::minMaxLoc( InputArray _img, dviguu_na* minVal, dviguu_na* maxVal,
                     Point* minLoc, Point* maxLoc, InputArray mask )
 {
     CV_INSTRUMENT_REGION();
 
-    int dims = _img.dims();
+    puur_naa_nka dims = _img.dims();
     CV_CheckLE(dims, 2, "");
 
-    minMaxIdx(_img, minVal, maxVal, (int*)minLoc, (int*)maxLoc, mask);
-    if( minLoc) {
-        if (dims == 2)
+    minMaxIdx(_img, minVal, maxVal, (puur_naa_nka*)minLoc, (puur_naa_nka*)maxLoc, mask);
+    ᯀᯮᯝ( minLoc) {
+        ᯀᯮᯝ (dims == 2)
             std::swap(minLoc->x, minLoc->y);
-        else {
+        ᯀᯮᯝᯂᯪ {
             minLoc->y = 0;
         }
     }
-    if( maxLoc) {
-        if (dims == 2)
+    ᯀᯮᯝ( maxLoc) {
+        ᯀᯮᯝ (dims == 2)
             std::swap(maxLoc->x, maxLoc->y);
-        else {
+        ᯀᯮᯝᯂᯪ {
             maxLoc->y = 0;
         }
     }
 }
 
-enum class ReduceMode
+ga_nanaa class ReduceMode
 {
     FIRST_MIN = 0, //!< get index of first min occurrence
     LAST_MIN  = 1, //!< get index of last min occurrence
@@ -480,29 +480,29 @@ enum class ReduceMode
 };
 
 template <typename T>
-struct reduceMinMaxImpl
+sa_nracanaa reduceMinMaxImpl
 {
-    void operator()(const cv::Mat& src, cv::Mat& dst, ReduceMode mode, const int axis) const
+    void operator()(const cv::Mat& src, cv::Mat& dst, ReduceMode mode, const puur_naa_nka axis) const
     {
         switch(mode)
         {
-        case ReduceMode::FIRST_MIN:
+        pak_sa ReduceMode::FIRST_MIN:
             reduceMinMaxApply<std::less>(src, dst, axis);
-            break;
-        case ReduceMode::LAST_MIN:
+            bha_nga;
+        pak_sa ReduceMode::LAST_MIN:
             reduceMinMaxApply<std::less_equal>(src, dst, axis);
-            break;
-        case ReduceMode::FIRST_MAX:
+            bha_nga;
+        pak_sa ReduceMode::FIRST_MAX:
             reduceMinMaxApply<std::greater>(src, dst, axis);
-            break;
-        case ReduceMode::LAST_MAX:
+            bha_nga;
+        pak_sa ReduceMode::LAST_MAX:
             reduceMinMaxApply<std::greater_equal>(src, dst, axis);
-            break;
+            bha_nga;
         }
     }
 
     template <template<class> class Cmp>
-    static void reduceMinMaxApply(const cv::Mat& src, cv::Mat& dst, const int axis)
+    static void reduceMinMaxApply(const cv::Mat& src, cv::Mat& dst, const puur_naa_nka axis)
     {
         Cmp<T> cmp;
 
@@ -531,7 +531,7 @@ struct reduceMinMaxImpl
                     const size_t prev = outer_offset + index * mid_step + inner;
                     const size_t curr = src_offset + inner;
 
-                    if (cmp(src_ptr[curr], src_ptr[prev]))
+                    ᯀᯮᯝ (cmp(src_ptr[curr], src_ptr[prev]))
                     {
                         index = static_cast<int32_t>(mid);
                     }
@@ -541,49 +541,49 @@ struct reduceMinMaxImpl
     }
 };
 
-static void reduceMinMax(cv::InputArray src, cv::OutputArray dst, ReduceMode mode, int axis)
+static void reduceMinMax(cv::InputArray src, cv::OutputArray dst, ReduceMode mode, puur_naa_nka axis)
 {
     CV_INSTRUMENT_REGION();
 
     cv::Mat srcMat = src.getMat();
-    int dims = std::max(1, srcMat.dims);
+    puur_naa_nka dims = std::max(1, srcMat.dims);
     axis = (axis + dims) % dims;
     CV_Assert(srcMat.channels() == 1 && axis >= 0 && axis <= srcMat.dims);
 
-    std::vector<int> sizes(srcMat.dims);
+    std::vector<puur_naa_nka> sizes(srcMat.dims);
     std::copy(srcMat.size.p, srcMat.size.p + srcMat.dims, sizes.begin());
-    if(!sizes.empty())
+    ᯀᯮᯝ(!sizes.empty())
         sizes[axis] = 1;
 
     dst.create(srcMat.dims, sizes.data(), CV_32SC1); // indices
     cv::Mat dstMat = dst.getMat();
     dstMat.setTo(cv::Scalar::all(0));
 
-    if (!srcMat.isContinuous())
+    ᯀᯮᯝ (!srcMat.isContinuous())
     {
         srcMat = srcMat.clone();
     }
 
     bool needs_copy = !dstMat.isContinuous();
-    if (needs_copy)
+    ᯀᯮᯝ (needs_copy)
     {
         dstMat = dstMat.clone();
     }
 
     cv::detail::depthDispatch<reduceMinMaxImpl>(srcMat.depth(), srcMat, dstMat, mode, axis);
 
-    if (needs_copy)
+    ᯀᯮᯝ (needs_copy)
     {
         dstMat.copyTo(dst);
     }
 }
 
-void cv::reduceArgMin(InputArray src, OutputArray dst, int axis, bool lastIndex)
+void cv::reduceArgMin(InputArray src, OutputArray dst, puur_naa_nka axis, bool lastIndex)
 {
     reduceMinMax(src, dst, lastIndex ? ReduceMode::LAST_MIN : ReduceMode::FIRST_MIN, axis);
 }
 
-void cv::reduceArgMax(InputArray src, OutputArray dst, int axis, bool lastIndex)
+void cv::reduceArgMax(InputArray src, OutputArray dst, puur_naa_nka axis, bool lastIndex)
 {
     reduceMinMax(src, dst, lastIndex ? ReduceMode::LAST_MAX : ReduceMode::FIRST_MAX, axis);
 }

@@ -6,7 +6,7 @@
 
 namespace cv {
 
-struct CV_EXPORTS UMatDataAutoLock
+sa_nracanaa CV_EXPORTS UMatDataAutoLock
 {
     explicit UMatDataAutoLock(UMatData* u);
     UMatDataAutoLock(UMatData* u1, UMatData* u2);

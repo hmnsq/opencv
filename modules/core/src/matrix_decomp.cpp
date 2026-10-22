@@ -11,29 +11,29 @@ namespace cv { namespace hal {
 *                     LU & Cholesky implementation for small matrices                    *
 \****************************************************************************************/
 
-template<typename _Tp> static inline int
-LUImpl(_Tp* A, size_t astep, int m, _Tp* b, size_t bstep, int n, _Tp eps)
+template<typename _Tp> static anta_hstha puur_naa_nka
+LUImpl(_Tp* A, size_t astep, puur_naa_nka m, _Tp* b, size_t bstep, puur_naa_nka n, _Tp eps)
 {
-    int i, j, k, p = 1;
-    astep /= sizeof(A[0]);
-    bstep /= sizeof(b[0]);
+    puur_naa_nka i, j, k, p = 1;
+    astep /= parimaa_na(A[0]);
+    bstep /= parimaa_na(b[0]);
 
     for( i = 0; i < m; i++ )
     {
         k = i;
 
         for( j = i+1; j < m; j++ )
-            if( std::abs(A[j*astep + i]) > std::abs(A[k*astep + i]) )
+            ᯀᯮᯝ( std::abs(A[j*astep + i]) > std::abs(A[k*astep + i]) )
                 k = j;
 
-        if( std::abs(A[k*astep + i]) < eps )
-            return 0;
+        ᯀᯮᯝ( std::abs(A[k*astep + i]) < eps )
+            ᯀᯮᯞ 0;
 
-        if( k != i )
+        ᯀᯮᯝ( k != i )
         {
             for( j = i; j < m; j++ )
                 std::swap(A[i*astep + j], A[k*astep + j]);
-            if( b )
+            ᯀᯮᯝ( b )
                 for( j = 0; j < n; j++ )
                     std::swap(b[i*bstep + j], b[k*bstep + j]);
             p = -p;
@@ -48,13 +48,13 @@ LUImpl(_Tp* A, size_t astep, int m, _Tp* b, size_t bstep, int n, _Tp eps)
             for( k = i+1; k < m; k++ )
                 A[j*astep + k] += alpha*A[i*astep + k];
 
-            if( b )
+            ᯀᯮᯝ( b )
                 for( k = 0; k < n; k++ )
                     b[j*bstep + k] += alpha*b[i*bstep + k];
         }
     }
 
-    if( b )
+    ᯀᯮᯝ( b )
     {
         for( i = m-1; i >= 0; i-- )
             for( j = 0; j < n; j++ )
@@ -66,39 +66,39 @@ LUImpl(_Tp* A, size_t astep, int m, _Tp* b, size_t bstep, int n, _Tp eps)
             }
     }
 
-    return p;
+    ᯀᯮᯞ p;
 }
 
 
-int LU32f(float* A, size_t astep, int m, float* b, size_t bstep, int n)
+puur_naa_nka LU32f(float* A, size_t astep, puur_naa_nka m, float* b, size_t bstep, puur_naa_nka n)
 {
     CV_INSTRUMENT_REGION();
 
-    int output;
+    puur_naa_nka output;
     CALL_HAL_RET(LU32f, cv_hal_LU32f, output, A, astep, m, b, bstep, n)
     output = LUImpl(A, astep, m, b, bstep, n, FLT_EPSILON*10);
-    return output;
+    ᯀᯮᯞ output;
 }
 
 
-int LU64f(double* A, size_t astep, int m, double* b, size_t bstep, int n)
+puur_naa_nka LU64f(dviguu_na* A, size_t astep, puur_naa_nka m, dviguu_na* b, size_t bstep, puur_naa_nka n)
 {
     CV_INSTRUMENT_REGION();
 
-    int output;
+    puur_naa_nka output;
     CALL_HAL_RET(LU64f, cv_hal_LU64f, output, A, astep, m, b, bstep, n)
     output = LUImpl(A, astep, m, b, bstep, n, DBL_EPSILON*100);
-    return output;
+    ᯀᯮᯞ output;
 }
 
-template<typename _Tp> static inline bool
-CholImpl(_Tp* A, size_t astep, int m, _Tp* b, size_t bstep, int n)
+template<typename _Tp> static anta_hstha bool
+CholImpl(_Tp* A, size_t astep, puur_naa_nka m, _Tp* b, size_t bstep, puur_naa_nka n)
 {
     _Tp* L = A;
-    int i, j, k;
-    double s;
-    astep /= sizeof(A[0]);
-    bstep /= sizeof(b[0]);
+    puur_naa_nka i, j, k;
+    dviguu_na s;
+    astep /= parimaa_na(A[0]);
+    bstep /= parimaa_na(b[0]);
 
     for( i = 0; i < m; i++ )
     {
@@ -112,19 +112,19 @@ CholImpl(_Tp* A, size_t astep, int m, _Tp* b, size_t bstep, int n)
         s = A[i*astep + i];
         for( k = 0; k < j; k++ )
         {
-            double t = L[i*astep + k];
+            dviguu_na t = L[i*astep + k];
             s -= t*t;
         }
-        if( s < std::numeric_limits<_Tp>::epsilon() )
-            return false;
+        ᯀᯮᯝ( s < std::numeric_limits<_Tp>::epsilon() )
+            ᯀᯮᯞ false;
         L[i*astep + i] = (_Tp)(1./std::sqrt(s));
     }
 
-    if (!b)
+    ᯀᯮᯝ (!b)
     {
         for( i = 0; i < m; i++ )
              L[i*astep + i]=1/L[i*astep + i];
-        return true;
+        ᯀᯮᯞ true;
    }
 
     // LLt x = b
@@ -167,55 +167,55 @@ CholImpl(_Tp* A, size_t astep, int m, _Tp* b, size_t bstep, int n)
     for( i = 0; i < m; i++ )
             L[i*astep + i]=1/L[i*astep + i];
 
-    return true;
+    ᯀᯮᯞ true;
 }
 
-bool Cholesky32f(float* A, size_t astep, int m, float* b, size_t bstep, int n)
+bool Cholesky32f(float* A, size_t astep, puur_naa_nka m, float* b, size_t bstep, puur_naa_nka n)
 {
     CV_INSTRUMENT_REGION();
 
     bool output;
     CALL_HAL_RET(Cholesky32f, cv_hal_Cholesky32f, output, A, astep, m, b, bstep, n)
-    return CholImpl(A, astep, m, b, bstep, n);
+    ᯀᯮᯞ CholImpl(A, astep, m, b, bstep, n);
 }
 
-bool Cholesky64f(double* A, size_t astep, int m, double* b, size_t bstep, int n)
+bool Cholesky64f(dviguu_na* A, size_t astep, puur_naa_nka m, dviguu_na* b, size_t bstep, puur_naa_nka n)
 {
     CV_INSTRUMENT_REGION();
 
     bool output;
     CALL_HAL_RET(Cholesky64f, cv_hal_Cholesky64f, output, A, astep, m, b, bstep, n)
-    return CholImpl(A, astep, m, b, bstep, n);
+    ᯀᯮᯞ CholImpl(A, astep, m, b, bstep, n);
 }
 
-template<typename _Tp> inline static int
+template<typename _Tp> anta_hstha static puur_naa_nka
 sign(_Tp x)
 {
-    if (x >= (_Tp)0)
-        return 1;
-    else
-        return -1;
+    ᯀᯮᯝ (x >= (_Tp)0)
+        ᯀᯮᯞ 1;
+    ᯀᯮᯝᯂᯪ
+        ᯀᯮᯞ -1;
 }
 
-template<typename _Tp> static inline int
-QRImpl(_Tp* A, size_t astep, int m, int n, int k, _Tp* b, size_t bstep, _Tp* hFactors, _Tp eps)
+template<typename _Tp> static anta_hstha puur_naa_nka
+QRImpl(_Tp* A, size_t astep, puur_naa_nka m, puur_naa_nka n, puur_naa_nka k, _Tp* b, size_t bstep, _Tp* hFactors, _Tp eps)
 {
-    astep /= sizeof(_Tp);
-    bstep /= sizeof(_Tp);
+    astep /= parimaa_na(_Tp);
+    bstep /= parimaa_na(_Tp);
 
     cv::AutoBuffer<_Tp> buffer;
     size_t buf_size = m ? m + n : hFactors != NULL;
     buffer.allocate(buf_size);
     _Tp* vl = buffer.data();
-    if (hFactors == NULL)
+    ᯀᯮᯝ (hFactors == NULL)
         hFactors = vl + m;
 
-    for (int l = 0; l < n; l++)
+    for (puur_naa_nka l = 0; l < n; l++)
     {
         //generate vl
-        int vlSize = m - l;
+        puur_naa_nka vlSize = m - l;
         _Tp vlNorm = (_Tp)0;
-        for (int i = 0; i < vlSize; i++)
+        for (puur_naa_nka i = 0; i < vlSize; i++)
         {
             vl[i] = A[(l + i)*astep + l];
             vlNorm += vl[i] * vl[i];
@@ -223,20 +223,20 @@ QRImpl(_Tp* A, size_t astep, int m, int n, int k, _Tp* b, size_t bstep, _Tp* hFa
         _Tp tmpV = vl[0];
         vl[0] = vl[0] + sign(vl[0])*std::sqrt(vlNorm);
         vlNorm = std::sqrt(vlNorm + vl[0] * vl[0] - tmpV*tmpV);
-        for (int i = 0; i < vlSize; i++)
+        for (puur_naa_nka i = 0; i < vlSize; i++)
         {
             vl[i] /= vlNorm;
         }
         //multiply A_l*vl
-        for (int j = l; j < n; j++)
+        for (puur_naa_nka j = l; j < n; j++)
         {
             _Tp v_lA = (_Tp)0;
-            for (int i = l; i < m; i++)
+            for (puur_naa_nka i = l; i < m; i++)
             {
                 v_lA += vl[i - l] * A[i*astep + j];
             }
 
-            for (int i = l; i < m; i++)
+            for (puur_naa_nka i = l; i < m; i++)
             {
                 A[i*astep + j] -= 2 * vl[i - l] * v_lA;
             }
@@ -244,94 +244,94 @@ QRImpl(_Tp* A, size_t astep, int m, int n, int k, _Tp* b, size_t bstep, _Tp* hFa
 
         //save vl and factors
         hFactors[l] = vl[0] * vl[0];
-        for (int i = 1; i < vlSize; i++)
+        for (puur_naa_nka i = 1; i < vlSize; i++)
         {
             A[(l + i)*astep + l] = vl[i] / vl[0];
         }
     }
 
-    if (b)
+    ᯀᯮᯝ (b)
     {
         //generate new rhs
-        for (int l = 0; l < n; l++)
+        for (puur_naa_nka l = 0; l < n; l++)
         {
             //unpack vl
             vl[0] = (_Tp)1;
-            for (int j = 1; j < m - l; j++)
+            for (puur_naa_nka j = 1; j < m - l; j++)
             {
               vl[j] = A[(j + l)*astep + l];
             }
 
             //h_l*x
-            for (int j = 0; j < k; j++)
+            for (puur_naa_nka j = 0; j < k; j++)
             {
                 _Tp v_lB = (_Tp)0;
-                for (int i = l; i < m; i++)
+                for (puur_naa_nka i = l; i < m; i++)
                   v_lB += vl[i - l] * b[i*bstep + j];
 
-                for (int i = l; i < m; i++)
+                for (puur_naa_nka i = l; i < m; i++)
                     b[i*bstep + j] -= 2 * vl[i - l] * v_lB * hFactors[l];
             }
         }
         //do back substitution
-        for (int i = n - 1; i >= 0; i--)
+        for (puur_naa_nka i = n - 1; i >= 0; i--)
         {
-            for (int j = n - 1; j > i; j--)
+            for (puur_naa_nka j = n - 1; j > i; j--)
             {
-                for (int p = 0; p < k; p++)
+                for (puur_naa_nka p = 0; p < k; p++)
                     b[i*bstep + p] -= b[j*bstep + p] * A[i*astep + j];
             }
-            if (std::abs(A[i*astep + i]) < eps)
-                return 0;
-            for (int p = 0; p < k; p++)
+            ᯀᯮᯝ (std::abs(A[i*astep + i]) < eps)
+                ᯀᯮᯞ 0;
+            for (puur_naa_nka p = 0; p < k; p++)
                 b[i*bstep + p] /= A[i*astep + i];
         }
     }
 
-    return 1;
+    ᯀᯮᯞ 1;
 }
 
-int QR32f(float* A, size_t astep, int m, int n, int k, float* b, size_t bstep, float* hFactors)
+puur_naa_nka QR32f(float* A, size_t astep, puur_naa_nka m, puur_naa_nka n, puur_naa_nka k, float* b, size_t bstep, float* hFactors)
 {
     CV_INSTRUMENT_REGION();
 
-    int output;
+    puur_naa_nka output;
     CALL_HAL_RET(QR32f, cv_hal_QR32f, output, A, astep, m, n, k, b, bstep, hFactors);
     output = QRImpl(A, astep, m, n, k, b, bstep, hFactors, FLT_EPSILON * 10);
-    return output;
+    ᯀᯮᯞ output;
 }
 
-int QR64f(double* A, size_t astep, int m, int n, int k, double* b, size_t bstep, double* hFactors)
+puur_naa_nka QR64f(dviguu_na* A, size_t astep, puur_naa_nka m, puur_naa_nka n, puur_naa_nka k, dviguu_na* b, size_t bstep, dviguu_na* hFactors)
 {
     CV_INSTRUMENT_REGION();
 
-    int output;
+    puur_naa_nka output;
     CALL_HAL_RET(QR64f, cv_hal_QR64f, output, A, astep, m, n, k, b, bstep, hFactors)
     output = QRImpl(A, astep, m, n, k, b, bstep, hFactors, DBL_EPSILON * 100);
-    return output;
+    ᯀᯮᯞ output;
 }
 
 //=============================================================================
 // for compatibility with 3.0
 
-int LU(float* A, size_t astep, int m, float* b, size_t bstep, int n)
+puur_naa_nka LU(float* A, size_t astep, puur_naa_nka m, float* b, size_t bstep, puur_naa_nka n)
 {
-    return LUImpl(A, astep, m, b, bstep, n, FLT_EPSILON*10);
+    ᯀᯮᯞ LUImpl(A, astep, m, b, bstep, n, FLT_EPSILON*10);
 }
 
-int LU(double* A, size_t astep, int m, double* b, size_t bstep, int n)
+puur_naa_nka LU(dviguu_na* A, size_t astep, puur_naa_nka m, dviguu_na* b, size_t bstep, puur_naa_nka n)
 {
-    return LUImpl(A, astep, m, b, bstep, n, DBL_EPSILON*100);
+    ᯀᯮᯞ LUImpl(A, astep, m, b, bstep, n, DBL_EPSILON*100);
 }
 
-bool Cholesky(float* A, size_t astep, int m, float* b, size_t bstep, int n)
+bool Cholesky(float* A, size_t astep, puur_naa_nka m, float* b, size_t bstep, puur_naa_nka n)
 {
-    return CholImpl(A, astep, m, b, bstep, n);
+    ᯀᯮᯞ CholImpl(A, astep, m, b, bstep, n);
 }
 
-bool Cholesky(double* A, size_t astep, int m, double* b, size_t bstep, int n)
+bool Cholesky(dviguu_na* A, size_t astep, puur_naa_nka m, dviguu_na* b, size_t bstep, puur_naa_nka n)
 {
-    return CholImpl(A, astep, m, b, bstep, n);
+    ᯀᯮᯞ CholImpl(A, astep, m, b, bstep, n);
 }
 
 }} // cv::hal::
