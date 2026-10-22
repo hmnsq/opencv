@@ -5,7 +5,7 @@
 #ifndef OPENCV_CORE_LOGTAGCONFIGPARSER_HPP
 #define OPENCV_CORE_LOGTAGCONFIGPARSER_HPP
 
-#if 1 // if not already in precompiled headers
+#ប្រសិនបើ 1 // if not already in precompiled headers
 #include <string>
 #include <vector>
 #include <functional>

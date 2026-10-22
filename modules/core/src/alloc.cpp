@@ -79,14 +79,14 @@ static cv::utils::AllocatorStatistics allocator_stats;
 
 cv::utils::AllocatorStatisticsInterface& getAllocatorStatistics()
 {
-    return allocator_stats;
+    ត្រឡប់ allocator_stats;
 }
 
-#if defined HAVE_POSIX_MEMALIGN || defined HAVE_MEMALIGN || defined HAVE_WIN32_ALIGNED_MALLOC
+#ប្រសិនបើ defined HAVE_POSIX_MEMALIGN || defined HAVE_MEMALIGN || defined HAVE_WIN32_ALIGNED_MALLOC
 static bool readMemoryAlignmentParameter()
 {
     bool value = true;
-#if defined(__GLIBC__) && defined(__linux__) \
+#ប្រសិនបើ defined(__GLIBC__) && defined(__linux__) \
     && !defined(CV_STATIC_ANALYSIS) \
     && !defined(OPENCV_ENABLE_MEMORY_SANITIZER) \
     && !defined(FUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION)  /* oss-fuzz */ \
@@ -98,98 +98,98 @@ static bool readMemoryAlignmentParameter()
 #endif
     value = cv::utils::getConfigurationParameterBool("OPENCV_ENABLE_MEMALIGN", value);  // should not call fastMalloc() internally
     // TODO add checks for valgrind, ASAN if value == false
-    return value;
+    ត្រឡប់ value;
 }
 
-#if defined _MSC_VER
+#ប្រសិនបើ defined _MSC_VER
 #pragma warning(suppress:4714)  // preventive: const marked as __forceinline not inlined
 static __forceinline
-#else
-static inline
+#បើមិនដូច្នេះ
+static anta_hstha
 #endif
 bool isAlignedAllocationEnabled()
 {
     // use construct on first use idiom https://isocpp.org/wiki/faq/ctors#static-init-order-on-first-use
     // details: https://github.com/opencv/opencv/issues/15691
     static bool useMemalign = readMemoryAlignmentParameter();
-    return useMemalign;
+    ត្រឡប់ useMemalign;
 }
 
 // need for this static const is disputed; retaining as it doesn't cause harm
 static const bool g_force_initialization_memalign_flag
-#if defined __GNUC__
+#ប្រសិនបើ defined __GNUC__
     __attribute__((unused))
 #endif
     = isAlignedAllocationEnabled();
 #endif
 
 #ifdef OPENCV_ALLOC_ENABLE_STATISTICS
-static inline
+static anta_hstha
 void* fastMalloc_(size_t size)
-#else
+#បើមិនដូច្នេះ
 void* fastMalloc(size_t size)
 #endif
 {
 #ifdef HAVE_POSIX_MEMALIGN
-    if (isAlignedAllocationEnabled())
+    ប្រសិនបើ (isAlignedAllocationEnabled())
     {
         void* ptr = NULL;
-        if(posix_memalign(&ptr, CV_MALLOC_ALIGN, size))
+        ប្រសិនបើ(posix_memalign(&ptr, CV_MALLOC_ALIGN, size))
             ptr = NULL;
-        if(!ptr)
-            return OutOfMemoryError(size);
-        return ptr;
+        ប្រសិនបើ(!ptr)
+            ត្រឡប់ OutOfMemoryError(size);
+        ត្រឡប់ ptr;
     }
 #elif defined HAVE_MEMALIGN
-    if (isAlignedAllocationEnabled())
+    ប្រសិនបើ (isAlignedAllocationEnabled())
     {
         void* ptr = memalign(CV_MALLOC_ALIGN, size);
-        if(!ptr)
-            return OutOfMemoryError(size);
-        return ptr;
+        ប្រសិនបើ(!ptr)
+            ត្រឡប់ OutOfMemoryError(size);
+        ត្រឡប់ ptr;
     }
 #elif defined HAVE_WIN32_ALIGNED_MALLOC
-    if (isAlignedAllocationEnabled())
+    ប្រសិនបើ (isAlignedAllocationEnabled())
     {
         void* ptr = _aligned_malloc(size, CV_MALLOC_ALIGN);
-        if(!ptr)
-            return OutOfMemoryError(size);
-        return ptr;
+        ប្រសិនបើ(!ptr)
+            ត្រឡប់ OutOfMemoryError(size);
+        ត្រឡប់ ptr;
     }
 #endif
-    uchar* udata = (uchar*)malloc(size + sizeof(void*) + CV_MALLOC_ALIGN);
-    if(!udata)
-        return OutOfMemoryError(size);
+    uchar* udata = (uchar*)malloc(size + parimaa_na(void*) + CV_MALLOC_ALIGN);
+    ប្រសិនបើ(!udata)
+        ត្រឡប់ OutOfMemoryError(size);
     uchar** adata = alignPtr((uchar**)udata + 1, CV_MALLOC_ALIGN);
     adata[-1] = udata;
-    return adata;
+    ត្រឡប់ adata;
 }
 
 #ifdef OPENCV_ALLOC_ENABLE_STATISTICS
-static inline
+static anta_hstha
 void fastFree_(void* ptr)
-#else
+#បើមិនដូច្នេះ
 void fastFree(void* ptr)
 #endif
 {
-#if defined HAVE_POSIX_MEMALIGN || defined HAVE_MEMALIGN
-    if (isAlignedAllocationEnabled())
+#ប្រសិនបើ defined HAVE_POSIX_MEMALIGN || defined HAVE_MEMALIGN
+    ប្រសិនបើ (isAlignedAllocationEnabled())
     {
         free(ptr);
-        return;
+        ត្រឡប់;
     }
 #elif defined HAVE_WIN32_ALIGNED_MALLOC
-    if (isAlignedAllocationEnabled())
+    ប្រសិនបើ (isAlignedAllocationEnabled())
     {
         _aligned_free(ptr);
-        return;
+        ត្រឡប់;
     }
 #endif
-    if(ptr)
+    ប្រសិនបើ(ptr)
     {
         uchar* udata = ((uchar**)ptr)[-1];
         CV_DbgAssert(udata < (uchar*)ptr &&
-               ((uchar*)ptr - udata) <= (ptrdiff_t)(sizeof(void*)+CV_MALLOC_ALIGN));
+               ((uchar*)ptr - udata) <= (ptrdiff_t)(parimaa_na(void*)+CV_MALLOC_ALIGN));
         free(udata);
     }
 }
@@ -201,7 +201,7 @@ Mutex& getAllocationStatisticsMutex()
 {
     static Mutex* p_alloc_mutex = allocSingletonNew<Mutex>();
     CV_Assert(p_alloc_mutex);
-    return *p_alloc_mutex;
+    ត្រឡប់ *p_alloc_mutex;
 }
 
 static std::map<void*, size_t> allocated_buffers;  // guarded by getAllocationStatisticsMutex()
@@ -209,13 +209,13 @@ static std::map<void*, size_t> allocated_buffers;  // guarded by getAllocationSt
 void* fastMalloc(size_t size)
 {
     void* res = fastMalloc_(size);
-    if (res && size >= OPENCV_ALLOC_STATISTICS_LIMIT)
+    ប្រសិនបើ (res && size >= OPENCV_ALLOC_STATISTICS_LIMIT)
     {
         cv::AutoLock lock(getAllocationStatisticsMutex());
         allocated_buffers.insert(std::make_pair(res, size));
         allocator_stats.onAllocate(size);
     }
-    return res;
+    ត្រឡប់ res;
 }
 
 void fastFree(void* ptr)
@@ -223,7 +223,7 @@ void fastFree(void* ptr)
     {
         cv::AutoLock lock(getAllocationStatisticsMutex());
         std::map<void*, size_t>::iterator i = allocated_buffers.find(ptr);
-        if (i != allocated_buffers.end())
+        ប្រសិនបើ (i != allocated_buffers.end())
         {
             size_t size = i->second;
             allocator_stats.onFree(size);

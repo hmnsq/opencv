@@ -10,25 +10,25 @@
 namespace cv {
 
 typedef void (*ReduceSumFunc)(const Mat& src, Mat& dst);
-ReduceSumFunc getReduceCSumFunc(int sdepth, int ddepth);
-ReduceSumFunc getReduceRSumFunc(int sdepth, int ddepth);
-ReduceSumFunc getReduceRSum2Func(int sdepth, int ddepth);
+ReduceSumFunc getReduceCSumFunc(ចំនួនគត់ sdepth, ចំនួនគត់ ddepth);
+ReduceSumFunc getReduceRSumFunc(ចំនួនគត់ sdepth, ចំនួនគត់ ddepth);
+ReduceSumFunc getReduceRSum2Func(ចំនួនគត់ sdepth, ចំនួនគត់ ddepth);
 
-ReduceSumFunc getReduceCSumFunc(int sdepth, int ddepth)
+ReduceSumFunc getReduceCSumFunc(ចំនួនគត់ sdepth, ចំនួនគត់ ddepth)
 {
     CV_INSTRUMENT_REGION();
     CV_CPU_DISPATCH(getReduceCSumFunc, (sdepth, ddepth),
         CV_CPU_DISPATCH_MODES_ALL);
 }
 
-ReduceSumFunc getReduceRSumFunc(int sdepth, int ddepth)
+ReduceSumFunc getReduceRSumFunc(ចំនួនគត់ sdepth, ចំនួនគត់ ddepth)
 {
     CV_INSTRUMENT_REGION();
     CV_CPU_DISPATCH(getReduceRSumFunc, (sdepth, ddepth),
         CV_CPU_DISPATCH_MODES_ALL);
 }
 
-ReduceSumFunc getReduceRSum2Func(int sdepth, int ddepth)
+ReduceSumFunc getReduceRSum2Func(ចំនួនគត់ sdepth, ចំនួនគត់ ddepth)
 {
     CV_INSTRUMENT_REGION();
     CV_CPU_DISPATCH(getReduceRSum2Func, (sdepth, ddepth),

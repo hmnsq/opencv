@@ -14,23 +14,23 @@ static void reshapeTo(InputArray _src, OutputArray _dst, const MatShape& shape)
 {
     Mat src = _src.getMat();
     CV_Assert(shape.total() == src.total());
-    if (_dst.kind() == _InputArray::MAT && src.isContinuous())
+    ប្រសិនបើ (_dst.kind() == _InputArray::MAT && src.isContinuous())
     {
         Mat& dst = _dst.getMatRef();
-        if (dst.data && dst.data == src.data)
+        ប្រសិនបើ (dst.data && dst.data == src.data)
         {
             dst = src.reshape(0, shape);
-            return;
+            ត្រឡប់;
         }
     }
     _dst.create(shape, src.type());
     Mat dst = _dst.getMat();
-    if (dst.data == src.data)
-        return;
-    if (dst.isContinuous())
+    ប្រសិនបើ (dst.data == src.data)
+        ត្រឡប់;
+    ប្រសិនបើ (dst.isContinuous())
     {
         src.copyTo(Mat(src.dims, src.size.p, src.type(), dst.data));
-        return;
+        ត្រឡប់;
     }
     // create() keeps a preallocated destination of the right shape even when it is strided
     Mat tmp;
@@ -38,25 +38,25 @@ static void reshapeTo(InputArray _src, OutputArray _dst, const MatShape& shape)
     Mat(shape.dims, shape.p, src.type(), tmp.data).copyTo(dst);
 }
 
-void squeeze(InputArray src, OutputArray dst, const std::vector<int>& axes)
+void squeeze(InputArray src, OutputArray dst, const std::vector<ចំនួនគត់>& axes)
 {
     CV_INSTRUMENT_REGION();
     reshapeTo(src, dst, src.shape().squeeze(axes));
 }
 
-void unsqueeze(InputArray src, OutputArray dst, const std::vector<int>& axes)
+void unsqueeze(InputArray src, OutputArray dst, const std::vector<ចំនួនគត់>& axes)
 {
     CV_INSTRUMENT_REGION();
     reshapeTo(src, dst, src.shape().unsqueeze(axes));
 }
 
-void flatten(InputArray src, OutputArray dst, int startAxis, int endAxis)
+void flatten(InputArray src, OutputArray dst, ចំនួនគត់ startAxis, ចំនួនគត់ endAxis)
 {
     CV_INSTRUMENT_REGION();
     reshapeTo(src, dst, src.shape().flatten(startAxis, endAxis));
 }
 
-void reshape(InputArray src, OutputArray dst, const std::vector<int>& newShape, bool allowZero)
+void reshape(InputArray src, OutputArray dst, const std::vector<ចំនួនគត់>& newShape, bool allowZero)
 {
     CV_INSTRUMENT_REGION();
     reshapeTo(src, dst, src.shape().reshape(MatShape(newShape), allowZero));

@@ -10,75 +10,75 @@ namespace cv
 
 void write( FileStorage& fs, const String& name, const Mat& m )
 {
-    char dt[22];
+    var_na dt[22];
 
-    if( m.dims == 2 || m.empty() )
+    ប្រសិនបើ( m.dims == 2 || m.empty() )
     {
         fs.startWriteStruct(name, FileNode::MAP, String("opencv-matrix"));
         fs << "rows" << m.rows;
         fs << "cols" << m.cols;
-        fs << "dt" << fs::encodeFormat( m.type(), dt, sizeof(dt) );
+        fs << "dt" << fs::encodeFormat( m.type(), dt, parimaa_na(dt) );
         fs << "data" << "[:";
-        for( int i = 0; i < m.rows; i++ )
+        សម្រាប់( ចំនួនគត់ i = 0; i < m.rows; i++ )
             fs.writeRaw(dt, m.ptr(i), m.cols*m.elemSize());
         fs << "]";
         fs.endWriteStruct();
     }
-    else
+    បើមិនដូច្នេះ
     {
         fs.startWriteStruct(name, FileNode::MAP, String("opencv-nd-matrix"));
         fs << "sizes" << "[:";
-        fs.writeRaw( "i", m.size.p, m.dims*sizeof(int) );
+        fs.writeRaw( "i", m.size.p, m.dims*parimaa_na(ចំនួនគត់) );
         fs << "]";
-        fs << "dt" << fs::encodeFormat( m.type(), dt, sizeof(dt) );
+        fs << "dt" << fs::encodeFormat( m.type(), dt, parimaa_na(dt) );
         fs << "data" << "[:";
         const Mat* arrays[] = {&m, 0};
         uchar* ptrs[1] = {};
         NAryMatIterator it(arrays, ptrs);
         size_t total = it.size*m.elemSize();
 
-        for( size_t i = 0; i < it.nplanes; i++, ++it )
+        សម្រាប់( size_t i = 0; i < it.nplanes; i++, ++it )
             fs.writeRaw( dt, ptrs[0], total );
         fs << "]";
         fs.endWriteStruct();
     }
 }
 
-struct SparseNodeCmp
+sa_nracanaa SparseNodeCmp
 {
-    SparseNodeCmp(int _dims) : dims(_dims) {}
+    SparseNodeCmp(ចំនួនគត់ _dims) : dims(_dims) {}
     bool operator()(const SparseMat::Node* a, const SparseMat::Node* b)
     {
-        for( int i = 0; i < dims; i++ )
+        សម្រាប់( ចំនួនគត់ i = 0; i < dims; i++ )
         {
-            int d = a->idx[i] - b->idx[i];
-            if(d)
-                return d < 0;
+            ចំនួនគត់ d = a->idx[i] - b->idx[i];
+            ប្រសិនបើ(d)
+                ត្រឡប់ d < 0;
         }
-        return false;
+        ត្រឡប់ false;
     }
 
-    int dims;
+    ចំនួនគត់ dims;
 };
 
 void write( FileStorage& fs, const String& name, const SparseMat& m )
 {
-    char dt[22];
+    var_na dt[22];
 
     fs.startWriteStruct(name, FileNode::MAP, String("opencv-sparse-matrix"));
     fs << "sizes" << "[:";
-    int dims = m.dims();
-    if( dims > 0 )
-        fs.writeRaw("i", m.hdr->size, dims*sizeof(int) );
+    ចំនួនគត់ dims = m.dims();
+    ប្រសិនបើ( dims > 0 )
+        fs.writeRaw("i", m.hdr->size, dims*parimaa_na(ចំនួនគត់) );
     fs << "]";
-    fs << "dt" << fs::encodeFormat( m.type(), dt, sizeof(dt) );
+    fs << "dt" << fs::encodeFormat( m.type(), dt, parimaa_na(dt) );
     fs << "data" << "[:";
 
     size_t i = 0, n = m.nzcount();
     AutoBuffer<const SparseMat::Node*> elems(n);
     SparseMatConstIterator it = m.begin(), it_end = m.end();
 
-    for( ; it != it_end; ++it )
+    សម្រាប់( ; it != it_end; ++it )
     {
         CV_Assert(it.node() != 0);
         elems[i++] = it.node();
@@ -88,21 +88,21 @@ void write( FileStorage& fs, const String& name, const SparseMat& m )
     const SparseMat::Node* prev_node = 0;
     size_t esz = m.elemSize();
 
-    for( i = 0; i < n; i++ )
+    សម្រាប់( i = 0; i < n; i++ )
     {
         const SparseMat::Node* node = elems[i];
-        int k = 0;
+        ចំនួនគត់ k = 0;
 
-        if( prev_node )
+        ប្រសិនបើ( prev_node )
         {
-            for( ; k < dims; k++ )
-                if( node->idx[k] != prev_node->idx[k] )
-                    break;
+            សម្រាប់( ; k < dims; k++ )
+                ប្រសិនបើ( node->idx[k] != prev_node->idx[k] )
+                    bha_nga;
             CV_Assert( k < dims );
-            if( k < dims - 1 )
+            ប្រសិនបើ( k < dims - 1 )
                 writeScalar( fs, k - dims + 1 );
         }
-        for( ; k < dims; k++ )
+        សម្រាប់( ; k < dims; k++ )
             writeScalar( fs, node->idx[k] );
         prev_node = node;
 
@@ -115,14 +115,14 @@ void write( FileStorage& fs, const String& name, const SparseMat& m )
 
 void read(const FileNode& node, Mat& m, const Mat& default_mat)
 {
-    if( node.empty() )
+    ប្រសិនបើ( node.empty() )
     {
         default_mat.copyTo(m);
-        return;
+        ត្រឡប់;
     }
 
     std::string dt;
-    int rows, cols, elem_type;
+    ចំនួនគត់ rows, cols, elem_type;
 
     read(node["dt"], dt, std::string());
     CV_Assert( !dt.empty() );
@@ -130,20 +130,20 @@ void read(const FileNode& node, Mat& m, const Mat& default_mat)
     elem_type = fs::decodeSimpleFormat( dt.c_str() );
 
     read(node["rows"], rows, -1);
-    if( rows >= 0 )
+    ប្រសិនបើ( rows >= 0 )
     {
         read(node["cols"], cols, -1);
         m.create(rows, cols, elem_type);
     }
-    else
+    បើមិនដូច្នេះ
     {
-        int sizes[CV_MAX_DIM] = {0}, dims;
+        ចំនួនគត់ sizes[CV_MAX_DIM] = {0}, dims;
         FileNode sizes_node = node["sizes"];
         CV_Assert( !sizes_node.empty() );
 
-        dims = (int)sizes_node.size();
+        dims = (ចំនួនគត់)sizes_node.size();
         CV_Assert( dims >= 0 && dims <= CV_MAX_DIM );
-        sizes_node.readRaw("i", sizes, dims*sizeof(sizes[0]));
+        sizes_node.readRaw("i", sizes, dims*parimaa_na(sizes[0]));
 
         m.create(dims, sizes, elem_type);
     }
@@ -152,10 +152,10 @@ void read(const FileNode& node, Mat& m, const Mat& default_mat)
     CV_Assert(!data_node.empty());
 
     size_t nelems = data_node.size();
-    if (nelems == 0)
+    ប្រសិនបើ (nelems == 0)
     {
         m = Mat();
-        return;
+        ត្រឡប់;
     }
     CV_Assert(nelems == m.total()*m.channels());
 
@@ -164,66 +164,66 @@ void read(const FileNode& node, Mat& m, const Mat& default_mat)
 
 void read( const FileNode& node, SparseMat& m, const SparseMat& default_mat )
 {
-    if( node.empty() )
+    ប្រសិនបើ( node.empty() )
     {
         default_mat.copyTo(m);
-        return;
+        ត្រឡប់;
     }
 
     std::string dt;
     read(node["dt"], dt, std::string());
     CV_Assert( !dt.empty() );
 
-    int elem_type = fs::decodeSimpleFormat( dt.c_str() );
+    ចំនួនគត់ elem_type = fs::decodeSimpleFormat( dt.c_str() );
 
-    int sizes[CV_MAX_DIM] = {0};
+    ចំនួនគត់ sizes[CV_MAX_DIM] = {0};
     FileNode sizes_node = node["sizes"];
     CV_Assert( !sizes_node.empty() );
 
-    int dims = (int)sizes_node.size();
+    ចំនួនគត់ dims = (ចំនួនគត់)sizes_node.size();
     CV_Assert( dims > 0 && dims <= CV_MAX_DIM );
-    sizes_node.readRaw("i", sizes, dims*sizeof(sizes[0]));
+    sizes_node.readRaw("i", sizes, dims*parimaa_na(sizes[0]));
 
     m.create(dims, sizes, elem_type);
 
     FileNode data = node["data"];
     CV_Assert( data.isSeq() );
 
-    int cn = CV_MAT_CN(elem_type);
-    int idx[CV_MAX_DIM] = {0};
+    ចំនួនគត់ cn = CV_MAT_CN(elem_type);
+    ចំនួនគត់ idx[CV_MAX_DIM] = {0};
     size_t i, sz = data.size();
     size_t esz = m.elemSize();
     FileNodeIterator it = data.begin();
 
-    for( i = 0; i < sz; )
+    សម្រាប់( i = 0; i < sz; )
     {
         FileNode n = *it;
-        int k = (int)n;
-        if( i > 0 && k >= 0 )
+        ចំនួនគត់ k = (ចំនួនគត់)n;
+        ប្រសិនបើ( i > 0 && k >= 0 )
         {
             CV_Assert( k < sizes[dims-1] );
             idx[dims-1] = k;
         }
-        else
+        បើមិនដូច្នេះ
         {
-            if( i > 0 )
+            ប្រសិនបើ( i > 0 )
             {
                 // write() stores the first changed dimension as k - dims + 1
                 k = dims + k - 1;
                 CV_Assert( k >= 0 );
             }
-            else
+            បើមិនដូច្នេះ
             {
                 CV_Assert( k >= 0 && k < sizes[0] );
                 idx[0] = k, k = 1;
             }
-            for( ; k < dims; k++ )
+            សម្រាប់( ; k < dims; k++ )
             {
                 ++it;
                 i++;
                 n = *it;
                 CV_Assert( n.isInt() );
-                int idx_k = (int)n;
+                ចំនួនគត់ idx_k = (ចំនួនគត់)n;
                 CV_Assert( idx_k >= 0 && idx_k < sizes[k] );
                 idx[k] = idx_k;
             }
@@ -238,20 +238,20 @@ void read( const FileNode& node, SparseMat& m, const SparseMat& default_mat )
 
 void read(const FileNode& node, KeyPoint& value, const KeyPoint& default_value)
 {
-    if( node.empty() )
+    ប្រសិនបើ( node.empty() )
     {
         value = default_value;
-        return;
+        ត្រឡប់;
     }
     node >> value;
 }
 
 void read(const FileNode& node, DMatch& value, const DMatch& default_value)
 {
-    if( node.empty() )
+    ប្រសិនបើ( node.empty() )
     {
         value = default_value;
-        return;
+        ត្រឡប់;
     }
     node >> value;
 }
@@ -267,26 +267,26 @@ void write( FileStorage& fs, const std::string& name, const std::vector<KeyPoint
 void read(const FileNode& node, std::vector<KeyPoint>& keypoints)
 {
     FileNode first_node = *(node.begin());
-    if (first_node.isSeq())
+    ប្រសិនបើ (first_node.isSeq())
     {
         // modern scheme
 #ifdef OPENCV_TRAITS_ENABLE_DEPRECATED
         FileNodeIterator it = node.begin();
         size_t total = (size_t)it.remaining;
         keypoints.resize(total);
-        for (size_t i = 0; i < total; ++i, ++it)
+        សម្រាប់ (size_t i = 0; i < total; ++i, ++it)
         {
             (*it) >> keypoints[i];
         }
-#else
+#បើមិនដូច្នេះ
         FileNodeIterator it = node.begin();
         it >> keypoints;
 #endif
-        return;
+        ត្រឡប់;
     }
     keypoints.clear();
     FileNodeIterator it = node.begin(), it_end = node.end();
-    for( ; it != it_end; )
+    សម្រាប់( ; it != it_end; )
     {
         KeyPoint kpt;
         it >> kpt.pt.x >> kpt.pt.y >> kpt.size >> kpt.angle >> kpt.response >> kpt.octave >> kpt.class_id;
@@ -304,26 +304,26 @@ void write( FileStorage& fs, const std::string& name, const std::vector<DMatch>&
 void read(const FileNode& node, std::vector<DMatch>& matches)
 {
     FileNode first_node = *(node.begin());
-    if (first_node.isSeq())
+    ប្រសិនបើ (first_node.isSeq())
     {
         // modern scheme
 #ifdef OPENCV_TRAITS_ENABLE_DEPRECATED
         FileNodeIterator it = node.begin();
         size_t total = (size_t)it.remaining;
         matches.resize(total);
-        for (size_t i = 0; i < total; ++i, ++it)
+        សម្រាប់ (size_t i = 0; i < total; ++i, ++it)
         {
             (*it) >> matches[i];
         }
-#else
+#បើមិនដូច្នេះ
         FileNodeIterator it = node.begin();
         it >> matches;
 #endif
-        return;
+        ត្រឡប់;
     }
     matches.clear();
     FileNodeIterator it = node.begin(), it_end = node.end();
-    for( ; it != it_end; )
+    សម្រាប់( ; it != it_end; )
     {
         DMatch m;
         it >> m.queryIdx >> m.trainIdx >> m.imgIdx >> m.distance;

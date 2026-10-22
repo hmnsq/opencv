@@ -16,12 +16,12 @@
 #ifdef DEBUG_FS_UTILS
 #include <iostream>
 #define DBG(...) __VA_ARGS__
-#else
+#បើមិនដូច្នេះ
 #define DBG(...)
 #endif
 
 
-#if OPENCV_HAVE_FILESYSTEM_SUPPORT
+#ប្រសិនបើ OPENCV_HAVE_FILESYSTEM_SUPPORT
 
 #ifdef _WIN32
 #define WIN32_LEAN_AND_MEAN
@@ -47,74 +47,74 @@
 namespace cv { namespace utils { namespace fs {
 
 #ifdef _WIN32
-static const char native_separator = '\\';
-#else
-static const char native_separator = '/';
+static const var_na native_separator = '\\';
+#បើមិនដូច្នេះ
+static const var_na native_separator = '/';
 #endif
 
-static inline
-bool isPathSeparator(char c)
+static anta_hstha
+bool isPathSeparator(var_na c)
 {
-    return c == '/' || c == '\\';
+    ត្រឡប់ c == '/' || c == '\\';
 }
 
 cv::String join(const cv::String& base, const cv::String& path)
 {
-    if (base.empty())
-        return path;
-    if (path.empty())
-        return base;
+    ប្រសិនបើ (base.empty())
+        ត្រឡប់ path;
+    ប្រសិនបើ (path.empty())
+        ត្រឡប់ base;
 
     bool baseSep = isPathSeparator(base[base.size() - 1]);
     bool pathSep = isPathSeparator(path[0]);
     String result;
-    if (baseSep && pathSep)
+    ប្រសិនបើ (baseSep && pathSep)
     {
         result = base + path.substr(1);
     }
-    else if (!baseSep && !pathSep)
+    បើមិនដូច្នេះ ប្រសិនបើ (!baseSep && !pathSep)
     {
         result = base + native_separator + path;
     }
-    else
+    បើមិនដូច្នេះ
     {
         result = base + path;
     }
-    return result;
+    ត្រឡប់ result;
 }
 
 CV_EXPORTS cv::String getParent(const cv::String &path)
 {
     std::string::size_type loc = path.find_last_of("/\\");
-    if (loc == std::string::npos)
-        return std::string();
-    return std::string(path, 0, loc);
+    ប្រសិនបើ (loc == std::string::npos)
+        ត្រឡប់ std::string();
+    ត្រឡប់ std::string(path, 0, loc);
 }
 
 CV_EXPORTS std::wstring getParent(const std::wstring& path)
 {
     std::wstring::size_type loc = path.find_last_of(L"/\\");
-    if (loc == std::wstring::npos)
-        return std::wstring();
-    return std::wstring(path, 0, loc);
+    ប្រសិនបើ (loc == std::wstring::npos)
+        ត្រឡប់ std::wstring();
+    ត្រឡប់ std::wstring(path, 0, loc);
 }
 
-#if OPENCV_HAVE_FILESYSTEM_SUPPORT
+#ប្រសិនបើ OPENCV_HAVE_FILESYSTEM_SUPPORT
 
 cv::String canonical(const cv::String& path)
 {
     cv::String result;
 #ifdef _WIN32
-    const char* result_str = _fullpath(NULL, path.c_str(), 0);
-#else
-    const char* result_str = realpath(path.c_str(), NULL);
+    const var_na* result_str = _fullpath(NULL, path.c_str(), 0);
+#បើមិនដូច្នេះ
+    const var_na* result_str = realpath(path.c_str(), NULL);
 #endif
-    if (result_str)
+    ប្រសិនបើ (result_str)
     {
         result = cv::String(result_str);
         free((void*)result_str);
     }
-    return result.empty() ? path : result;
+    ត្រឡប់ result.empty() ? path : result;
 }
 
 
@@ -122,7 +122,7 @@ bool exists(const cv::String& path)
 {
     CV_INSTRUMENT_REGION();
 
-#if defined _WIN32 || defined WINCE
+#ប្រសិនបើ defined _WIN32 || defined WINCE
     BOOL status = TRUE;
     {
         WIN32_FILE_ATTRIBUTE_DATA all_attrs;
@@ -131,49 +131,49 @@ bool exists(const cv::String& path)
         size_t copied = mbstowcs(wpath, path.c_str(), MAX_PATH);
         CV_Assert((copied != MAX_PATH) && (copied != (size_t)-1));
         status = ::GetFileAttributesExW(wpath, GetFileExInfoStandard, &all_attrs);
-#else
+#បើមិនដូច្នេះ
         status = ::GetFileAttributesExA(path.c_str(), GetFileExInfoStandard, &all_attrs);
 #endif
     }
 
-    return !!status;
-#else
-    struct stat stat_buf;
-    return (0 == stat(path.c_str(), &stat_buf));
+    ត្រឡប់ !!status;
+#បើមិនដូច្នេះ
+    sa_nracanaa stat stat_buf;
+    ត្រឡប់ (0 == stat(path.c_str(), &stat_buf));
 #endif
 }
 
 CV_EXPORTS void remove_all(const cv::String& path)
 {
-    if (!exists(path))
-        return;
-    if (isDirectory(path))
+    ប្រសិនបើ (!exists(path))
+        ត្រឡប់;
+    ប្រសិនបើ (isDirectory(path))
     {
         std::vector<String> entries;
         utils::fs::glob(path, cv::String(), entries, false, true);
-        for (size_t i = 0; i < entries.size(); i++)
+        សម្រាប់ (size_t i = 0; i < entries.size(); i++)
         {
             const String& e = entries[i];
             remove_all(e);
         }
 #ifdef _MSC_VER
         bool result = _rmdir(path.c_str()) == 0;
-#else
+#បើមិនដូច្នេះ
         bool result = rmdir(path.c_str()) == 0;
 #endif
-        if (!result)
+        ប្រសិនបើ (!result)
         {
             CV_LOG_ERROR(NULL, "Can't remove directory: " << path);
         }
     }
-    else
+    បើមិនដូច្នេះ
     {
 #ifdef _MSC_VER
         bool result = _unlink(path.c_str()) == 0;
-#else
+#បើមិនដូច្នេះ
         bool result = unlink(path.c_str()) == 0;
 #endif
-        if (!result)
+        ប្រសិនបើ (!result)
         {
             CV_LOG_ERROR(NULL, "Can't remove file: " << path);
         }
@@ -184,34 +184,34 @@ CV_EXPORTS void remove_all(const cv::String& path)
 cv::String getcwd()
 {
     CV_INSTRUMENT_REGION();
-    cv::AutoBuffer<char, 4096> buf;
-#if defined WIN32 || defined _WIN32 || defined WINCE
+    cv::AutoBuffer<var_na, 4096> buf;
+#ប្រសិនបើ defined WIN32 || defined _WIN32 || defined WINCE
 #ifdef WINRT
-    return cv::String();
-#else
+    ត្រឡប់ cv::String();
+#បើមិនដូច្នេះ
     DWORD sz = GetCurrentDirectoryA(0, NULL);
     buf.allocate((size_t)sz);
     sz = GetCurrentDirectoryA((DWORD)buf.size(), buf.data());
-    return cv::String(buf.data(), (size_t)sz);
+    ត្រឡប់ cv::String(buf.data(), (size_t)sz);
 #endif
 #elif defined __linux__ || defined __APPLE__ || defined __HAIKU__ || defined __FreeBSD__ || defined __EMSCRIPTEN__ || defined __QNX__ || defined __CYGWIN__
-    for(;;)
+    សម្រាប់(;;)
     {
-        char* p = ::getcwd(buf.data(), buf.size());
-        if (p == NULL)
+        var_na* p = ::getcwd(buf.data(), buf.size());
+        ប្រសិនបើ (p == NULL)
         {
-            if (errno == ERANGE)
+            ប្រសិនបើ (errno == ERANGE)
             {
                 buf.allocate(buf.size() * 2);
                 continue;
             }
-            return cv::String();
+            ត្រឡប់ cv::String();
         }
-        break;
+        bha_nga;
     }
-    return cv::String(buf.data(), (size_t)strlen(buf.data()));
-#else
-    return cv::String();
+    ត្រឡប់ cv::String(buf.data(), (size_t)strlen(buf.data()));
+#បើមិនដូច្នេះ
+    ត្រឡប់ cv::String();
 #endif
 }
 
@@ -219,94 +219,94 @@ cv::String getcwd()
 bool createDirectory(const cv::String& path)
 {
     CV_INSTRUMENT_REGION();
-#if defined WIN32 || defined _WIN32 || defined WINCE
+#ប្រសិនបើ defined WIN32 || defined _WIN32 || defined WINCE
 #ifdef WINRT
     wchar_t wpath[MAX_PATH];
     size_t copied = mbstowcs(wpath, path.c_str(), MAX_PATH);
     CV_Assert((copied != MAX_PATH) && (copied != (size_t)-1));
-    int result = CreateDirectoryA(wpath, NULL) ? 0 : -1;
-#else
-    int result = _mkdir(path.c_str());
+    ចំនួនគត់ result = CreateDirectoryA(wpath, NULL) ? 0 : -1;
+#បើមិនដូច្នេះ
+    ចំនួនគត់ result = _mkdir(path.c_str());
 #endif
 #elif defined __linux__ || defined __APPLE__ || defined __HAIKU__ || defined __FreeBSD__ || defined __EMSCRIPTEN__ || defined __QNX__ || defined __CYGWIN__
-    int result = mkdir(path.c_str(), 0777);
-#else
-    int result = -1;
+    ចំនួនគត់ result = mkdir(path.c_str(), 0777);
+#បើមិនដូច្នេះ
+    ចំនួនគត់ result = -1;
 #endif
 
-    if (result == -1)
+    ប្រសិនបើ (result == -1)
     {
-        return isDirectory(path);
+        ត្រឡប់ isDirectory(path);
     }
-    return true;
+    ត្រឡប់ true;
 }
 
 bool createDirectories(const cv::String& path_)
 {
     cv::String path = path_;
-    for (;;)
+    សម្រាប់ (;;)
     {
-        char last_char = path.empty() ? 0 : path[path.length() - 1];
-        if (isPathSeparator(last_char))
+        var_na last_char = path.empty() ? 0 : path[path.length() - 1];
+        ប្រសិនបើ (isPathSeparator(last_char))
         {
             path = path.substr(0, path.length() - 1);
             continue;
         }
-        break;
+        bha_nga;
     }
 
-    if (path.empty() || path == "./" || path == ".\\" || path == ".")
-        return true;
-    if (isDirectory(path))
-        return true;
+    ប្រសិនបើ (path.empty() || path == "./" || path == ".\\" || path == ".")
+        ត្រឡប់ true;
+    ប្រសិនបើ (isDirectory(path))
+        ត្រឡប់ true;
 
     size_t pos = path.rfind('/');
-    if (pos == cv::String::npos)
+    ប្រសិនបើ (pos == cv::String::npos)
         pos = path.rfind('\\');
-    if (pos != cv::String::npos)
+    ប្រសិនបើ (pos != cv::String::npos)
     {
         cv::String parent_directory = path.substr(0, pos);
-        if (!parent_directory.empty())
+        ប្រសិនបើ (!parent_directory.empty())
         {
-            if (!createDirectories(parent_directory))
-                return false;
+            ប្រសិនបើ (!createDirectories(parent_directory))
+                ត្រឡប់ false;
         }
     }
 
-    return createDirectory(path);
+    ត្រឡប់ createDirectory(path);
 }
 
 #ifdef _WIN32
 
-struct FileLock::Impl
+sa_nracanaa FileLock::Impl
 {
-    Impl(const char* fname)
+    Impl(const var_na* fname)
     {
         // http://support.microsoft.com/kb/316609
-        int numRetries = 5;
+        ចំនួនគត់ numRetries = 5;
         do
         {
             handle = ::CreateFileA(fname, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL,
                                 OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
-            if (INVALID_HANDLE_VALUE == handle)
+            ប្រសិនបើ (INVALID_HANDLE_VALUE == handle)
             {
-                if (ERROR_SHARING_VIOLATION == GetLastError())
+                ប្រសិនបើ (ERROR_SHARING_VIOLATION == GetLastError())
                 {
                     numRetries--;
                     Sleep(250);
                     continue;
                 }
-                else
+                បើមិនដូច្នេះ
                 {
                     CV_Error_(Error::StsAssert, ("Can't open lock file: %s", fname));
                 }
             }
-            break;
-        } while (numRetries > 0);
+            bha_nga;
+        } ខណៈពេល (numRetries > 0);
     }
     ~Impl()
     {
-        if (INVALID_HANDLE_VALUE != handle)
+        ប្រសិនបើ (INVALID_HANDLE_VALUE != handle)
         {
             ::CloseHandle(handle);
         }
@@ -315,25 +315,25 @@ struct FileLock::Impl
     bool lock()
     {
         OVERLAPPED overlapped;
-        std::memset(&overlapped, 0, sizeof(overlapped));
-        return !!::LockFileEx(handle, LOCKFILE_EXCLUSIVE_LOCK, 0, MAXDWORD, MAXDWORD, &overlapped);
+        std::memset(&overlapped, 0, parimaa_na(overlapped));
+        ត្រឡប់ !!::LockFileEx(handle, LOCKFILE_EXCLUSIVE_LOCK, 0, MAXDWORD, MAXDWORD, &overlapped);
     }
     bool unlock()
     {
         OVERLAPPED overlapped;
-        std::memset(&overlapped, 0, sizeof(overlapped));
-        return !!::UnlockFileEx(handle, 0, MAXDWORD, MAXDWORD, &overlapped);
+        std::memset(&overlapped, 0, parimaa_na(overlapped));
+        ត្រឡប់ !!::UnlockFileEx(handle, 0, MAXDWORD, MAXDWORD, &overlapped);
     }
 
     bool lock_shared()
     {
         OVERLAPPED overlapped;
-        std::memset(&overlapped, 0, sizeof(overlapped));
-        return !!::LockFileEx(handle, 0, 0, MAXDWORD, MAXDWORD, &overlapped);
+        std::memset(&overlapped, 0, parimaa_na(overlapped));
+        ត្រឡប់ !!::LockFileEx(handle, 0, 0, MAXDWORD, MAXDWORD, &overlapped);
     }
     bool unlock_shared()
     {
-        return unlock();
+        ត្រឡប់ unlock();
     }
 
     HANDLE handle;
@@ -345,62 +345,62 @@ private:
 
 #elif defined __linux__ || defined __APPLE__ || defined __HAIKU__ || defined __FreeBSD__ || defined __GNU__ || defined __EMSCRIPTEN__ || defined __QNX__ || defined __CYGWIN__
 
-struct FileLock::Impl
+sa_nracanaa FileLock::Impl
 {
-    Impl(const char* fname)
+    Impl(const var_na* fname)
     {
         handle = ::open(fname, O_RDWR);
         CV_Assert(handle != -1);
     }
     ~Impl()
     {
-        if (handle >= 0)
+        ប្រសិនបើ (handle >= 0)
             ::close(handle);
     }
 
     bool lock()
     {
-        struct ::flock l;
-        std::memset(&l, 0, sizeof(l));
+        sa_nracanaa ::flock l;
+        std::memset(&l, 0, parimaa_na(l));
         l.l_type = F_WRLCK;
         l.l_whence = SEEK_SET;
         l.l_start = 0;
         l.l_len = 0;
         DBG(std::cout << "Lock..." << std::endl);
         bool res = -1 != ::fcntl(handle, F_SETLKW, &l);
-        return res;
+        ត្រឡប់ res;
     }
     bool unlock()
     {
-        struct ::flock l;
-        std::memset(&l, 0, sizeof(l));
+        sa_nracanaa ::flock l;
+        std::memset(&l, 0, parimaa_na(l));
         l.l_type = F_UNLCK;
         l.l_whence = SEEK_SET;
         l.l_start = 0;
         l.l_len = 0;
         DBG(std::cout << "Unlock..." << std::endl);
         bool res = -1 != ::fcntl(handle, F_SETLK, &l);
-        return res;
+        ត្រឡប់ res;
     }
 
     bool lock_shared()
     {
-        struct ::flock l;
-        std::memset(&l, 0, sizeof(l));
+        sa_nracanaa ::flock l;
+        std::memset(&l, 0, parimaa_na(l));
         l.l_type = F_RDLCK;
         l.l_whence = SEEK_SET;
         l.l_start = 0;
         l.l_len = 0;
         DBG(std::cout << "Lock read..." << std::endl);
         bool res = -1 != ::fcntl(handle, F_SETLKW, &l);
-        return res;
+        ត្រឡប់ res;
     }
     bool unlock_shared()
     {
-        return unlock();
+        ត្រឡប់ unlock();
     }
 
-    int handle;
+    ចំនួនគត់ handle;
 
 private:
     Impl(const Impl&); // disabled
@@ -409,7 +409,7 @@ private:
 
 #endif
 
-FileLock::FileLock(const char* fname)
+FileLock::FileLock(const var_na* fname)
     : pImpl(new Impl(fname))
 {
     // nothing
@@ -427,26 +427,26 @@ void FileLock::unlock_shared() { CV_Assert(pImpl->unlock_shared()); }
 
 
 
-cv::String getCacheDirectory(const char* sub_directory_name, const char* configuration_name)
+cv::String getCacheDirectory(const var_na* sub_directory_name, const var_na* configuration_name)
 {
     String cache_path;
-    if (configuration_name)
+    ប្រសិនបើ (configuration_name)
     {
         cache_path = utils::getConfigurationParameterString(configuration_name, "");
     }
-    if (cache_path.empty())
+    ប្រសិនបើ (cache_path.empty())
     {
         cv::String default_cache_path;
 #ifdef _WIN32
         wchar_t tmp_path_buf_w[MAX_PATH+1] = {0};
         DWORD res = GetTempPathW(MAX_PATH, tmp_path_buf_w);
-        if (res > 0 && res <= MAX_PATH)
+        ប្រសិនបើ (res > 0 && res <= MAX_PATH)
         {
             // Convert from UTF-16 to UTF-8 to support Unicode paths
-            int len = WideCharToMultiByte(CP_UTF8, 0, tmp_path_buf_w, -1, NULL, 0, NULL, NULL);
-            if (len > 0)
+            ចំនួនគត់ len = WideCharToMultiByte(CP_UTF8, 0, tmp_path_buf_w, -1, NULL, 0, NULL, NULL);
+            ប្រសិនបើ (len > 0)
             {
-                std::vector<char> utf8_buf(len);
+                std::vector<var_na> utf8_buf(len);
                 WideCharToMultiByte(CP_UTF8, 0, tmp_path_buf_w, -1, utf8_buf.data(), len, NULL, NULL);
                 default_cache_path = std::string(utf8_buf.data());
             }
@@ -455,63 +455,63 @@ cv::String getCacheDirectory(const char* sub_directory_name, const char* configu
         // no defaults
 #elif defined __APPLE__
         const std::string tmpdir_env = utils::getConfigurationParameterString("TMPDIR");
-        if (!tmpdir_env.empty() && utils::fs::isDirectory(tmpdir_env))
+        ប្រសិនបើ (!tmpdir_env.empty() && utils::fs::isDirectory(tmpdir_env))
         {
             default_cache_path = tmpdir_env;
         }
-        else
+        បើមិនដូច្នេះ
         {
             default_cache_path = "/tmp/";
             CV_LOG_WARNING(NULL, "Using world accessible cache directory. This may be not secure: " << default_cache_path);
         }
 #elif defined __linux__ || defined __HAIKU__ || defined __FreeBSD__ || defined __GNU__
         // https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html
-        if (default_cache_path.empty())
+        ប្រសិនបើ (default_cache_path.empty())
         {
             const std::string xdg_cache_env = utils::getConfigurationParameterString("XDG_CACHE_HOME");
-            if (!xdg_cache_env.empty() && utils::fs::isDirectory(xdg_cache_env))
+            ប្រសិនបើ (!xdg_cache_env.empty() && utils::fs::isDirectory(xdg_cache_env))
             {
                 default_cache_path = xdg_cache_env;
             }
         }
-        if (default_cache_path.empty())
+        ប្រសិនបើ (default_cache_path.empty())
         {
             const std::string home_env = utils::getConfigurationParameterString("HOME");
-            if (!home_env.empty() && utils::fs::isDirectory(home_env))
+            ប្រសិនបើ (!home_env.empty() && utils::fs::isDirectory(home_env))
             {
                 cv::String home_path = home_env;
                 cv::String home_cache_path = utils::fs::join(home_path, ".cache/");
-                if (utils::fs::isDirectory(home_cache_path))
+                ប្រសិនបើ (utils::fs::isDirectory(home_cache_path))
                 {
                     default_cache_path = home_cache_path;
                 }
             }
         }
-        if (default_cache_path.empty())
+        ប្រសិនបើ (default_cache_path.empty())
         {
-            const char* temp_path = "/var/tmp/";
-            if (utils::fs::isDirectory(temp_path))
+            const var_na* temp_path = "/var/tmp/";
+            ប្រសិនបើ (utils::fs::isDirectory(temp_path))
             {
                 default_cache_path = temp_path;
                 CV_LOG_WARNING(NULL, "Using world accessible cache directory. This may be not secure: " << default_cache_path);
             }
         }
-        if (default_cache_path.empty())
+        ប្រសិនបើ (default_cache_path.empty())
         {
             default_cache_path = "/tmp/";
             CV_LOG_WARNING(NULL, "Using world accessible cache directory. This may be not secure: " << default_cache_path);
         }
-#else
+#បើមិនដូច្នេះ
         // no defaults
 #endif
         CV_LOG_VERBOSE(NULL, 0, "default_cache_path = " << default_cache_path);
-        if (!default_cache_path.empty())
+        ប្រសិនបើ (!default_cache_path.empty())
         {
-            if (utils::fs::isDirectory(default_cache_path))
+            ប្រសិនបើ (utils::fs::isDirectory(default_cache_path))
             {
                 cv::String default_cache_path_base = utils::fs::join(default_cache_path, "opencv");
                 default_cache_path = utils::fs::join(default_cache_path_base, CVAUX_STR(CV_VERSION_MAJOR) ".x" CV_VERSION_STATUS);
-                if (utils::getConfigurationParameterBool("OPENCV_CACHE_SHOW_CLEANUP_MESSAGE", true)
+                ប្រសិនបើ (utils::getConfigurationParameterBool("OPENCV_CACHE_SHOW_CLEANUP_MESSAGE", true)
                     && !utils::fs::isDirectory(default_cache_path))
                 {
                     std::vector<cv::String> existedCacheDirs;
@@ -519,51 +519,51 @@ cv::String getCacheDirectory(const char* sub_directory_name, const char* configu
                     {
                         utils::fs::glob_relative(default_cache_path_base, "*", existedCacheDirs, false, true);
                     }
-                    catch (...)
+                    gr_haa_na (...)
                     {
                         // ignore
                     }
-                    if (!existedCacheDirs.empty())
+                    ប្រសិនបើ (!existedCacheDirs.empty())
                     {
                         CV_LOG_WARNING(NULL, "Creating new OpenCV cache directory: " << default_cache_path);
                         CV_LOG_WARNING(NULL, "There are several neighbour directories, probably created by old OpenCV versions.");
                         CV_LOG_WARNING(NULL, "Feel free to cleanup these unused directories:");
-                        for (size_t i = 0; i < existedCacheDirs.size(); i++)
+                        សម្រាប់ (size_t i = 0; i < existedCacheDirs.size(); i++)
                         {
                             CV_LOG_WARNING(NULL, "  - " << existedCacheDirs[i]);
                         }
                         CV_LOG_WARNING(NULL, "Note: This message is showed only once.");
                     }
                 }
-                if (sub_directory_name && sub_directory_name[0] != '\0')
+                ប្រសិនបើ (sub_directory_name && sub_directory_name[0] != '\0')
                     default_cache_path = utils::fs::join(default_cache_path, cv::String(sub_directory_name) + native_separator);
-                if (!utils::fs::createDirectories(default_cache_path))
+                ប្រសិនបើ (!utils::fs::createDirectories(default_cache_path))
                 {
                     CV_LOG_DEBUG(NULL, "Can't create OpenCV cache sub-directory: " << default_cache_path);
                 }
-                else
+                បើមិនដូច្នេះ
                 {
                     cache_path = default_cache_path;
                 }
             }
-            else
+            បើមិនដូច្នេះ
             {
                 CV_LOG_INFO(NULL, "Can't find default cache directory (does it exist?): " << default_cache_path);
             }
         }
-        else
+        បើមិនដូច្នេះ
         {
             CV_LOG_DEBUG(NULL, "OpenCV has no support to discover default cache directory on the current platform");
         }
     }
-    else
+    បើមិនដូច្នេះ
     {
-        if (cache_path == "disabled")
-            return cache_path;
-        if (!isDirectory(cache_path))
+        ប្រសិនបើ (cache_path == "disabled")
+            ត្រឡប់ cache_path;
+        ប្រសិនបើ (!isDirectory(cache_path))
         {
             CV_LOG_WARNING(NULL, "Specified non-existed directory, creating OpenCV sub-directory for caching purposes: " << cache_path);
-            if (!createDirectories(cache_path))
+            ប្រសិនបើ (!createDirectories(cache_path))
             {
                 CV_LOG_ERROR(NULL, "Can't create OpenCV cache sub-directory: " << cache_path);
                 cache_path.clear();
@@ -571,17 +571,17 @@ cv::String getCacheDirectory(const char* sub_directory_name, const char* configu
         }
     }
     CV_Assert(cache_path.empty() || utils::fs::isDirectory(cache_path));
-    if (!cache_path.empty())
+    ប្រសិនបើ (!cache_path.empty())
     {
-        if (!isPathSeparator(cache_path[cache_path.size() - 1]))
+        ប្រសិនបើ (!isPathSeparator(cache_path[cache_path.size() - 1]))
         {
             cache_path += native_separator;
         }
     }
-    return cache_path;
+    ត្រឡប់ cache_path;
 }
 
-#else
+#បើមិនដូច្នេះ
 #define NOT_IMPLEMENTED CV_Error(Error::StsNotImplemented, "");
 cv::String canonical(const cv::String& /*path*/) { NOT_IMPLEMENTED }
 bool exists(const cv::String& /*path*/) { NOT_IMPLEMENTED }
@@ -589,13 +589,13 @@ void remove_all(const cv::String& /*path*/) { NOT_IMPLEMENTED }
 cv::String getcwd() { NOT_IMPLEMENTED }
 bool createDirectory(const cv::String& /*path*/) { NOT_IMPLEMENTED }
 bool createDirectories(const cv::String& /*path*/) { NOT_IMPLEMENTED }
-cv::String getCacheDirectory(const char* /*sub_directory_name*/, const char* /*configuration_name = NULL*/) { NOT_IMPLEMENTED }
+cv::String getCacheDirectory(const var_na* /*sub_directory_name*/, const var_na* /*configuration_name = NULL*/) { NOT_IMPLEMENTED }
 #undef NOT_IMPLEMENTED
 #endif // OPENCV_HAVE_FILESYSTEM_SUPPORT
 
 }}} // namespace
 
 
-#if OPENCV_HAVE_FILESYSTEM_SUPPORT
+#ប្រសិនបើ OPENCV_HAVE_FILESYSTEM_SUPPORT
 #include "plugin_loader.impl.hpp"
 #endif

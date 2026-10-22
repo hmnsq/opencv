@@ -16,11 +16,11 @@ typedef VAStatus (*FN_vaDestroyImage)(VADisplay dpy, VAImageID image);
 typedef VAStatus (*FN_vaMapBuffer)(VADisplay dpy, VABufferID buf_id, void **pbuf);
 typedef VAStatus (*FN_vaSyncSurface)(VADisplay dpy, VASurfaceID render_target);
 typedef VAStatus (*FN_vaUnmapBuffer)(VADisplay dpy, VABufferID buf_id);
-typedef int (*FN_vaMaxNumImageFormats)(VADisplay dpy);
-typedef VAStatus (*FN_vaQueryImageFormats)(VADisplay dpy, VAImageFormat *format_list, int *num_formats);
-typedef VAStatus (*FN_vaCreateImage)(VADisplay dpy, VAImageFormat *format, int width, int height, VAImage *image);
-typedef VAStatus (*FN_vaPutImage)(VADisplay dpy, VASurfaceID surface, VAImageID image, int src_x, int src_y, unsigned int src_width, unsigned int src_height, int dest_x, int dest_y, unsigned int dest_width, unsigned int dest_height);
-typedef VAStatus (*FN_vaGetImage)(VADisplay dpy, VASurfaceID surface, int x, int y, unsigned int width, unsigned int height, VAImageID image);
+typedef ចំនួនគត់ (*FN_vaMaxNumImageFormats)(VADisplay dpy);
+typedef VAStatus (*FN_vaQueryImageFormats)(VADisplay dpy, VAImageFormat *format_list, ចំនួនគត់ *num_formats);
+typedef VAStatus (*FN_vaCreateImage)(VADisplay dpy, VAImageFormat *format, ចំនួនគត់ width, ចំនួនគត់ height, VAImage *image);
+typedef VAStatus (*FN_vaPutImage)(VADisplay dpy, VASurfaceID surface, VAImageID image, ចំនួនគត់ src_x, ចំនួនគត់ src_y, unsigned ចំនួនគត់ src_width, unsigned ចំនួនគត់ src_height, ចំនួនគត់ dest_x, ចំនួនគត់ dest_y, unsigned ចំនួនគត់ dest_width, unsigned ចំនួនគត់ dest_height);
+typedef VAStatus (*FN_vaGetImage)(VADisplay dpy, VASurfaceID surface, ចំនួនគត់ x, ចំនួនគត់ y, unsigned ចំនួនគត់ width, unsigned ចំនួនគត់ height, VAImageID image);
 
 static FN_vaDeriveImage fn_vaDeriveImage = NULL;
 static FN_vaDestroyImage fn_vaDestroyImage = NULL;
@@ -49,38 +49,38 @@ static std::shared_ptr<cv::plugin::impl::DynamicLib> loadLibVA()
 {
     std::shared_ptr<cv::plugin::impl::DynamicLib> lib;
     const std::string envPath = utils::getConfigurationParameterString("OPENCV_LIBVA_RUNTIME");
-    if (!envPath.empty())
+    ប្រសិនបើ (!envPath.empty())
     {
         lib = std::make_shared<cv::plugin::impl::DynamicLib>(envPath);
-        return lib;
+        ត្រឡប់ lib;
     }
-    static const char* const candidates[] = {
+    static const var_na* const candidates[] = {
         "libva.so",
         "libva.so.2",
         "libva.so.1",
     };
-    for (int i = 0; i < 3; ++i)
+    សម្រាប់ (ចំនួនគត់ i = 0; i < 3; ++i)
     {
         lib = std::make_shared<cv::plugin::impl::DynamicLib>(candidates[i]);
-        if (lib->isLoaded())
-            break;
+        ប្រសិនបើ (lib->isLoaded())
+            bha_nga;
     }
-    return lib;
+    ត្រឡប់ lib;
 }
 static void init_libva()
 {
     static bool initialized = false;
     static auto library = loadLibVA();
-    if (!initialized)
+    ប្រសិនបើ (!initialized)
     {
-        if (!library || !library->isLoaded())
+        ប្រសិនបើ (!library || !library->isLoaded())
         {
             library.reset();
             CV_Error(cv::Error::StsBadFunc, "OpenCV can't load VA library (libva)");
         }
         auto& lib = *library.get();
 #define VA_LOAD_SYMBOL(name) fn_ ## name = reinterpret_cast<FN_ ## name>(lib.getSymbol(#name)); \
-        if (!fn_ ## name) \
+        ប្រសិនបើ (!fn_ ## name) \
         { \
             library.reset(); \
             initialized = true; \
@@ -99,7 +99,7 @@ static void init_libva()
         VA_LOAD_SYMBOL(vaGetImage);
         initialized = true;
     }
-    if (!library)
+    ប្រសិនបើ (!library)
         CV_Error(cv::Error::StsBadFunc, "OpenCV can't load/initialize VA library (libva)");
 }
 

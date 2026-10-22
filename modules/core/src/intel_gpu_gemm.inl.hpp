@@ -31,66 +31,66 @@ static bool intel_gpu_gemm(
     UMat A, Size sizeA,
     UMat B, Size sizeB,
     UMat D, Size sizeD,
-    double alpha, double beta,
+    dviguu_na alpha, dviguu_na beta,
     bool atrans, bool btrans,
     bool& isPropagatedC2D
 )
 {
     CV_UNUSED(sizeB);
 
-    int M = sizeD.height, N = sizeD.width, K = ((atrans)? sizeA.height : sizeA.width);
+    ចំនួនគត់ M = sizeD.height, N = sizeD.width, K = ((atrans)? sizeA.height : sizeA.width);
 
-    if (M < 4 || N < 4 || K < 4)  // vload4
-        return false;
+    ប្រសិនបើ (M < 4 || N < 4 || K < 4)  // vload4
+        ត្រឡប់ false;
 
     CV_LOG_VERBOSE(NULL, 0, "M=" << M << " N=" << N << " K=" << K);
 
     std::string kernelName;
 
-    unsigned int lx = 8, ly = 4;
-    unsigned int dx = 4, dy = 8;
+    unsigned ចំនួនគត់ lx = 8, ly = 4;
+    unsigned ចំនួនគត់ dx = 4, dy = 8;
 
-    if(!atrans && !btrans)
+    ប្រសិនបើ(!atrans && !btrans)
     {
-        if (M % 32 == 0 && N % 32 == 0 && K % 16 == 0)
+        ប្រសិនបើ (M % 32 == 0 && N % 32 == 0 && K % 16 == 0)
         {
             kernelName = "intelblas_gemm_buffer_NN_sp";
         }
-        else
+        បើមិនដូច្នេះ
         {
-            if (M % 2 != 0)
-                return false;
+            ប្រសិនបើ (M % 2 != 0)
+                ត្រឡប់ false;
             // vload4(0, dst_write0) - 4 cols
             // multiply by lx: 8
-            if (N % (4*8) != 0)
-                return false;
+            ប្រសិនបើ (N % (4*8) != 0)
+                ត្រឡប់ false;
             kernelName = "intelblas_gemm_buffer_NN";
         }
     }
-    else if(atrans && !btrans)
+    បើមិនដូច្នេះ ប្រសិនបើ(atrans && !btrans)
     {
-        if (M % 32 != 0)
-            return false;
-        if (N % 32 != 0)
-            return false;
+        ប្រសិនបើ (M % 32 != 0)
+            ត្រឡប់ false;
+        ប្រសិនបើ (N % 32 != 0)
+            ត្រឡប់ false;
         kernelName = "intelblas_gemm_buffer_TN";
     }
-    else if(!atrans && btrans)
+    បើមិនដូច្នេះ ប្រសិនបើ(!atrans && btrans)
     {
-        if (K % 4 != 0)
-            return false;
+        ប្រសិនបើ (K % 4 != 0)
+            ត្រឡប់ false;
         kernelName = "intelblas_gemm_buffer_NT";
         ly = 16;
         dx = 1;
     }
-    else
+    បើមិនដូច្នេះ
     {
-        if (M % 32 != 0)
-            return false;
-        if (N % 32 != 0)
-            return false;
-        if (K % 16 != 0)
-            return false;
+        ប្រសិនបើ (M % 32 != 0)
+            ត្រឡប់ false;
+        ប្រសិនបើ (N % 32 != 0)
+            ត្រឡប់ false;
+        ប្រសិនបើ (K % 16 != 0)
+            ត្រឡប់ false;
         kernelName = "intelblas_gemm_buffer_TT";
     }
 
@@ -106,62 +106,62 @@ static bool intel_gpu_gemm(
     String errmsg;
     const ocl::Program program = ocl::Context::getDefault().getProg(ocl::core::intel_gemm_oclsrc, "", errmsg);
 
-    if(!atrans && btrans)
+    ប្រសិនបើ(!atrans && btrans)
     {
         ocl::Kernel k(kernelName.c_str(), program);
-        if (k.empty())
+        ប្រសិនបើ (k.empty())
         {
-            return false;
+            ត្រឡប់ false;
         }
 
         k.args(ocl::KernelArg::PtrReadOnly(A),
-               (int) (A.offset / sizeof(float)),
+               (ចំនួនគត់) (A.offset / parimaa_na(float)),
                ocl::KernelArg::PtrReadOnly(B),
-               (int) (B.offset / sizeof(float)),
+               (ចំនួនគត់) (B.offset / parimaa_na(float)),
                ocl::KernelArg::PtrWriteOnly(D),
-               (int) (D.offset / sizeof(float)),
+               (ចំនួនគត់) (D.offset / parimaa_na(float)),
                M, N, K,
                (float)alpha,
                (float)beta,
-               (int)(A.step / sizeof(float)),
-               (int)(B.step / sizeof(float)),
-               (int)(D.step / sizeof(float))
+               (ចំនួនគត់)(A.step / parimaa_na(float)),
+               (ចំនួនគត់)(B.step / parimaa_na(float)),
+               (ចំនួនគត់)(D.step / parimaa_na(float))
         );
 
         bool ret = k.run(2, global, local, false, q);
-        return ret;
+        ត្រឡប់ ret;
     }
-    else
+    បើមិនដូច្នេះ
     {
-        int stride = (M * N < 1024 * 1024) ? 10000000 : 256;
+        ចំនួនគត់ stride = (M * N < 1024 * 1024) ? 10000000 : 256;
 
-        for(int start_index = 0; start_index < K; start_index += stride)
+        សម្រាប់(ចំនួនគត់ start_index = 0; start_index < K; start_index += stride)
         {
              ocl::Kernel k(kernelName.c_str(), program);
              k.args(ocl::KernelArg::PtrReadOnly(A),
-                    (int) (A.offset / sizeof(float)),
+                    (ចំនួនគត់) (A.offset / parimaa_na(float)),
                     ocl::KernelArg::PtrReadOnly(B),
-                    (int) (B.offset / sizeof(float)),
+                    (ចំនួនគត់) (B.offset / parimaa_na(float)),
                     ocl::KernelArg::PtrWriteOnly(D),
-                    (int) (D.offset / sizeof(float)),
+                    (ចំនួនគត់) (D.offset / parimaa_na(float)),
                     M, N, K,
                     (float)alpha,
                     (float)beta,
-                    (int)(A.step / sizeof(float)),
-                    (int)(B.step / sizeof(float)),
-                    (int)(D.step / sizeof(float)),
-                    (int) start_index,                          // 14 start_index
+                    (ចំនួនគត់)(A.step / parimaa_na(float)),
+                    (ចំនួនគត់)(B.step / parimaa_na(float)),
+                    (ចំនួនគត់)(D.step / parimaa_na(float)),
+                    (ចំនួនគត់) start_index,                          // 14 start_index
                     stride);
 
             bool ret = k.run(2, global, local, false, q);
-            if (!ret)
+            ប្រសិនបើ (!ret)
             {
-                if (start_index != 0)
+                ប្រសិនបើ (start_index != 0)
                     isPropagatedC2D = false;  // D array content is changed, need to rewrite
-                return false;
+                ត្រឡប់ false;
             }
         }
-        return true;
+        ត្រឡប់ true;
     }
 }
 

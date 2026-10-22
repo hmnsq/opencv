@@ -12,40 +12,40 @@ namespace cv {
 
 #ifdef HAVE_OPENCL
 
-static bool ocl_patchNaNs( InputOutputArray _a, double value )
+static bool ocl_patchNaNs( InputOutputArray _a, dviguu_na value )
 {
-    int ftype = _a.depth();
+    ចំនួនគត់ ftype = _a.depth();
 
     const ocl::Device d = ocl::Device::getDefault();
     bool doubleSupport = d.doubleFPConfig() > 0;
-    if (!doubleSupport && ftype == CV_64F)
+    ប្រសិនបើ (!doubleSupport && ftype == CV_64F)
     {
-        return false;
+        ត្រឡប់ false;
     }
 
-    int rowsPerWI = ocl::Device::getDefault().isIntel() ? 4 : 1;
+    ចំនួនគត់ rowsPerWI = ocl::Device::getDefault().isIntel() ? 4 : 1;
     ocl::Kernel k("KF", ocl::core::arithm_oclsrc,
                      format("-D UNARY_OP -D OP_PATCH_NANS -D dstT=%s -D DEPTH_dst=%d -D rowsPerWI=%d %s",
                             ftype == CV_64F ? "double" : "float", ftype, rowsPerWI,
                             doubleSupport ? "-D DOUBLE_SUPPORT" : ""));
-    if (k.empty())
-        return false;
+    ប្រសិនបើ (k.empty())
+        ត្រឡប់ false;
 
     UMat a = _a.getUMat();
-    int cn = a.channels();
+    ចំនួនគត់ cn = a.channels();
 
     // to pass float or double to args
-    if (ftype == CV_32F)
+    ប្រសិនបើ (ftype == CV_32F)
     {
         k.args(ocl::KernelArg::ReadOnlyNoSize(a), ocl::KernelArg::WriteOnly(a, cn), (float)value);
     }
-    else // CV_64F
+    បើមិនដូច្នេះ // CV_64F
     {
         k.args(ocl::KernelArg::ReadOnlyNoSize(a), ocl::KernelArg::WriteOnly(a, cn), value);
     }
 
     size_t globalsize[2] = { (size_t)a.cols * cn, ((size_t)a.rows + rowsPerWI - 1) / rowsPerWI };
-    return k.run(2, globalsize, NULL, false);
+    ត្រឡប់ k.run(2, globalsize, NULL, false);
 }
 
 #endif
@@ -56,7 +56,7 @@ static PatchNanFunc getPatchNanFunc(bool isDouble)
     CV_CPU_DISPATCH(getPatchNanFunc, (isDouble), CV_CPU_DISPATCH_MODES_ALL);
 }
 
-void patchNaNs( InputOutputArray _a, double _val )
+void patchNaNs( InputOutputArray _a, dviguu_na _val )
 {
     CV_INSTRUMENT_REGION();
     CV_Assert( _a.depth() == CV_32F || _a.depth() == CV_64F);
@@ -72,7 +72,7 @@ void patchNaNs( InputOutputArray _a, double _val )
 
     PatchNanFunc func = getPatchNanFunc(_a.depth() == CV_64F);
 
-    for (size_t i = 0; i < it.nplanes; i++, ++it)
+    សម្រាប់ (size_t i = 0; i < it.nplanes; i++, ++it)
     {
         func(ptrs[0], len, _val);
     }
@@ -83,33 +83,33 @@ void patchNaNs( InputOutputArray _a, double _val )
 
 static bool ocl_finiteMask(const UMat img, UMat mask)
 {
-    int channels = img.channels();
-    int depth = img.depth();
+    ចំនួនគត់ channels = img.channels();
+    ចំនួនគត់ depth = img.depth();
 
     const ocl::Device d = ocl::Device::getDefault();
     bool doubleSupport = d.doubleFPConfig() > 0;
-    if (!doubleSupport && depth == CV_64F)
+    ប្រសិនបើ (!doubleSupport && depth == CV_64F)
     {
-        return false;
+        ត្រឡប់ false;
     }
 
-    int rowsPerWI = ocl::Device::getDefault().isIntel() ? 4 : 1;
+    ចំនួនគត់ rowsPerWI = ocl::Device::getDefault().isIntel() ? 4 : 1;
     ocl::Kernel k("finiteMask", ocl::core::finitemask_oclsrc,
                   format("-D srcT=%s -D cn=%d -D rowsPerWI=%d %s",
                          depth == CV_32F ? "float" : "double", channels, rowsPerWI,
                          doubleSupport ? "-D DOUBLE_SUPPORT" : ""));
-    if (k.empty())
-        return false;
+    ប្រសិនបើ (k.empty())
+        ត្រឡប់ false;
 
     k.args(ocl::KernelArg::ReadOnlyNoSize(img), ocl::KernelArg::WriteOnly(mask));
 
     size_t globalsize[2] = { (size_t)img.cols, ((size_t)img.rows + rowsPerWI - 1) / rowsPerWI };
-    return k.run(2, globalsize, NULL, false);
+    ត្រឡប់ k.run(2, globalsize, NULL, false);
 }
 
 #endif
 
-static FiniteMaskFunc getFiniteMaskFunc(bool isDouble, int cn)
+static FiniteMaskFunc getFiniteMaskFunc(bool isDouble, ចំនួនគត់ cn)
 {
     CV_INSTRUMENT_REGION();
     CV_CPU_DISPATCH(getFiniteMaskFunc, (isDouble, cn), CV_CPU_DISPATCH_MODES_ALL);
@@ -119,11 +119,11 @@ void finiteMask(InputArray _src, OutputArray _mask)
 {
     CV_INSTRUMENT_REGION();
 
-    int channels = _src.channels();
-    int depth = _src.depth();
+    ចំនួនគត់ channels = _src.channels();
+    ចំនួនគត់ depth = _src.depth();
     CV_Assert( channels > 0 && channels <= 4);
     CV_Assert( depth == CV_32F || depth == CV_64F );
-    std::vector<int> vsz(_src.dims());
+    std::vector<ចំនួនគត់> vsz(_src.dims());
     _src.sizend(vsz.data());
     _mask.create(_src.dims(), vsz.data(), CV_8UC1);
 
@@ -141,7 +141,7 @@ void finiteMask(InputArray _src, OutputArray _mask)
 
     FiniteMaskFunc func = getFiniteMaskFunc((depth == CV_64F), channels);
 
-    for( i = 0; i < nplanes; i++, ++it )
+    សម្រាប់( i = 0; i < nplanes; i++, ++it )
     {
         const uchar* sptr = planes[0].ptr();
         uchar* dptr = planes[1].ptr();

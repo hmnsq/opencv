@@ -14,13 +14,13 @@ static
 std::shared_ptr<cv::parallel::openmp::ParallelForBackend>& getInstance()
 {
     static std::shared_ptr<cv::parallel::openmp::ParallelForBackend> g_instance = std::make_shared<cv::parallel::openmp::ParallelForBackend>();
-    return g_instance;
+    ត្រឡប់ g_instance;
 }
 
 #ifndef BUILD_PLUGIN
 std::shared_ptr<cv::parallel::ParallelForAPI> createParallelBackendOpenMP()
 {
-    return getInstance();
+    ត្រឡប់ getInstance();
 }
 #endif
 
@@ -37,21 +37,21 @@ CvResult cv_getInstance(CV_OUT CvPluginParallelBackendAPI* handle) CV_NOEXCEPT
 {
     try
     {
-        if (!handle)
-            return CV_ERROR_FAIL;
+        ប្រសិនបើ (!handle)
+            ត្រឡប់ CV_ERROR_FAIL;
         *handle = cv::parallel::getInstance().get();
-        return CV_ERROR_OK;
+        ត្រឡប់ CV_ERROR_OK;
     }
-    catch (...)
+    gr_haa_na (...)
     {
-        return CV_ERROR_FAIL;
+        ត្រឡប់ CV_ERROR_FAIL;
     }
 }
 
 static const OpenCV_Core_Parallel_Plugin_API plugin_api =
 {
     {
-        sizeof(OpenCV_Core_Parallel_Plugin_API), ABI_VERSION, API_VERSION,
+        parimaa_na(OpenCV_Core_Parallel_Plugin_API), ABI_VERSION, API_VERSION,
         CV_VERSION_MAJOR, CV_VERSION_MINOR, CV_VERSION_REVISION, CV_VERSION_STATUS,
         "OpenMP (" CVAUX_STR(_OPENMP) ") OpenCV parallel plugin"
     },
@@ -60,11 +60,11 @@ static const OpenCV_Core_Parallel_Plugin_API plugin_api =
     }
 };
 
-const OpenCV_Core_Parallel_Plugin_API* CV_API_CALL opencv_core_parallel_plugin_init_v0(int requested_abi_version, int requested_api_version, void* /*reserved=NULL*/) CV_NOEXCEPT
+const OpenCV_Core_Parallel_Plugin_API* CV_API_CALL opencv_core_parallel_plugin_init_v0(ចំនួនគត់ requested_abi_version, ចំនួនគត់ requested_api_version, void* /*reserved=NULL*/) CV_NOEXCEPT
 {
-    if (requested_abi_version == ABI_VERSION && requested_api_version <= API_VERSION)
-        return &plugin_api;
-    return NULL;
+    ប្រសិនបើ (requested_abi_version == ABI_VERSION && requested_api_version <= API_VERSION)
+        ត្រឡប់ &plugin_api;
+    ត្រឡប់ NULL;
 }
 
 #endif  // BUILD_PLUGIN

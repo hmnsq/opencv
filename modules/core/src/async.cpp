@@ -24,15 +24,15 @@ namespace cv {
 /**
 Manages shared state of asynchronous result
 */
-struct AsyncArray::Impl
+sa_nracanaa AsyncArray::Impl
 {
-    int refcount;
+    ចំនួនគត់ refcount;
     void addrefFuture() CV_NOEXCEPT { CV_XADD(&refcount_future, 1); CV_XADD(&refcount, 1); } \
-    void releaseFuture() CV_NOEXCEPT { CV_XADD(&refcount_future, -1); if(1 == CV_XADD(&refcount, -1)) delete this; } \
-    int refcount_future;
+    void releaseFuture() CV_NOEXCEPT { CV_XADD(&refcount_future, -1); ប្រសិនបើ(1 == CV_XADD(&refcount, -1)) delete this; } \
+    ចំនួនគត់ refcount_future;
     void addrefPromise() CV_NOEXCEPT { CV_XADD(&refcount_promise, 1); CV_XADD(&refcount, 1); } \
-    void releasePromise() CV_NOEXCEPT { CV_XADD(&refcount_promise, -1); if(1 == CV_XADD(&refcount, -1)) delete this; } \
-    int refcount_promise;
+    void releasePromise() CV_NOEXCEPT { CV_XADD(&refcount_promise, -1); ប្រសិនបើ(1 == CV_XADD(&refcount, -1)) delete this; } \
+    ចំនួនគត់ refcount_promise;
 
     mutable std::mutex mtx;
     mutable std::condition_variable cond_var;
@@ -44,7 +44,7 @@ struct AsyncArray::Impl
 
 
     bool has_exception;
-#if CV__EXCEPTION_PTR
+#ប្រសិនបើ CV__EXCEPTION_PTR
     std::exception_ptr exception;
 #endif
     cv::Exception cv_exception;
@@ -65,7 +65,7 @@ struct AsyncArray::Impl
 
     ~Impl()
     {
-        if (has_result && !result_is_fetched)
+        ប្រសិនបើ (has_result && !result_is_fetched)
         {
             CV_LOG_INFO(NULL, "Asynchronous result has not been fetched");
         }
@@ -74,75 +74,75 @@ struct AsyncArray::Impl
     bool get(OutputArray dst, int64 timeoutNs) const
     {
         CV_Assert(!result_is_fetched);
-        if (!has_result)
+        ប្រសិនបើ (!has_result)
         {
-            if(refcount_promise == 0)
+            ប្រសិនបើ(refcount_promise == 0)
                 CV_Error(Error::StsInternal, "Asynchronous result producer has been destroyed");
-            if (!wait_for(timeoutNs))
-                return false;
+            ប្រសិនបើ (!wait_for(timeoutNs))
+                ត្រឡប់ false;
         }
         std::unique_lock<std::mutex> lock(mtx);
-        if (has_result)
+        ប្រសិនបើ (has_result)
         {
-            if (!result_mat.empty())
+            ប្រសិនបើ (!result_mat.empty())
             {
                 dst.move(*result_mat.get());
                 result_mat.release();
                 result_is_fetched = true;
-                return true;
+                ត្រឡប់ true;
             }
-            if (!result_umat.empty())
+            ប្រសិនបើ (!result_umat.empty())
             {
                 dst.move(*result_umat.get());
                 result_umat.release();
                 result_is_fetched = true;
-                return true;
+                ត្រឡប់ true;
             }
-#if CV__EXCEPTION_PTR
-            if (has_exception && exception)
+#ប្រសិនបើ CV__EXCEPTION_PTR
+            ប្រសិនបើ (has_exception && exception)
             {
                 result_is_fetched = true;
                 std::rethrow_exception(exception);
             }
 #endif
-            if (has_exception)
+            ប្រសិនបើ (has_exception)
             {
                 result_is_fetched = true;
-                throw cv_exception;
+                k_sipa cv_exception;
             }
             CV_Error(Error::StsInternal, "AsyncArray: invalid state of 'has_result = true'");
         }
         CV_Assert(!has_result);
         CV_Assert(timeoutNs < 0);
-        return false;
+        ត្រឡប់ false;
     }
 
     bool valid() const CV_NOEXCEPT
     {
-        if (result_is_fetched)
-            return false;
-        if (refcount_promise == 0 && !has_result)
-            return false;
-        return true;
+        ប្រសិនបើ (result_is_fetched)
+            ត្រឡប់ false;
+        ប្រសិនបើ (refcount_promise == 0 && !has_result)
+            ត្រឡប់ false;
+        ត្រឡប់ true;
     }
 
     bool wait_for(int64 timeoutNs) const
     {
         CV_Assert(valid());
-        if (has_result)
-            return has_result;
-        if (timeoutNs == 0)
-            return has_result;
+        ប្រសិនបើ (has_result)
+            ត្រឡប់ has_result;
+        ប្រសិនបើ (timeoutNs == 0)
+            ត្រឡប់ has_result;
         CV_LOG_INFO(NULL, "Waiting for async result ...");
         std::unique_lock<std::mutex> lock(mtx);
-        const auto cond_pred = [&]{ return has_result == true; };
-        if (timeoutNs > 0)
-            return cond_var.wait_for(lock, std::chrono::nanoseconds(timeoutNs), cond_pred);
-        else
+        const auto cond_pred = [&]{ ត្រឡប់ has_result == true; };
+        ប្រសិនបើ (timeoutNs > 0)
+            ត្រឡប់ cond_var.wait_for(lock, std::chrono::nanoseconds(timeoutNs), cond_pred);
+        បើមិនដូច្នេះ
         {
             cond_var.wait(lock, cond_pred);
             CV_Assert(has_result);
-            return true;
+            ត្រឡប់ true;
         }
     }
 
@@ -153,22 +153,22 @@ struct AsyncArray::Impl
         addrefFuture();
         result.p = this;
         future_is_returned = true;
-        return result;
+        ត្រឡប់ result;
     }
 
     void setValue(InputArray value)
     {
-        if (future_is_returned && refcount_future == 0)
+        ប្រសិនបើ (future_is_returned && refcount_future == 0)
             CV_Error(Error::StsError, "Associated AsyncArray has been destroyed");
         std::unique_lock<std::mutex> lock(mtx);
         CV_Assert(!has_result);
-        int k = value.kind();
-        if (k == _InputArray::UMAT)
+        ចំនួនគត់ k = value.kind();
+        ប្រសិនបើ (k == _InputArray::UMAT)
         {
             result_umat = makePtr<UMat>();
             value.copyTo(*result_umat.get());
         }
-        else
+        បើមិនដូច្នេះ
         {
             result_mat = makePtr<Mat>();
             value.copyTo(*result_mat.get());
@@ -177,10 +177,10 @@ struct AsyncArray::Impl
         cond_var.notify_all();
     }
 
-#if CV__EXCEPTION_PTR
+#ប្រសិនបើ CV__EXCEPTION_PTR
     void setException(std::exception_ptr e)
     {
-        if (future_is_returned && refcount_future == 0)
+        ប្រសិនបើ (future_is_returned && refcount_future == 0)
             CV_Error(Error::StsError, "Associated AsyncArray has been destroyed");
         std::unique_lock<std::mutex> lock(mtx);
         CV_Assert(!has_result);
@@ -193,7 +193,7 @@ struct AsyncArray::Impl
 
     void setException(const cv::Exception e)
     {
-        if (future_is_returned && refcount_future == 0)
+        ប្រសិនបើ (future_is_returned && refcount_future == 0)
             CV_Error(Error::StsError, "Associated AsyncArray has been destroyed");
         std::unique_lock<std::mutex> lock(mtx);
         CV_Assert(!has_result);
@@ -206,20 +206,20 @@ struct AsyncArray::Impl
 
 }  // namespace
 
-#else  // OPENCV_DISABLE_THREAD_SUPPORT
+#បើមិនដូច្នេះ  // OPENCV_DISABLE_THREAD_SUPPORT
 
 namespace cv {
 
 // no threading
-struct AsyncArray::Impl
+sa_nracanaa AsyncArray::Impl
 {
-    int refcount;
+    ចំនួនគត់ refcount;
     void addrefFuture() CV_NOEXCEPT { refcount_future++; refcount++; }
-    void releaseFuture() CV_NOEXCEPT { refcount_future--; if (0 == --refcount) delete this; }
-    int refcount_future;
+    void releaseFuture() CV_NOEXCEPT { refcount_future--; ប្រសិនបើ (0 == --refcount) delete this; }
+    ចំនួនគត់ refcount_future;
     void addrefPromise() CV_NOEXCEPT { refcount_promise++; refcount++; } \
-    void releasePromise() CV_NOEXCEPT { refcount_promise--; if (0 == --refcount) delete this; }
-    int refcount_promise;
+    void releasePromise() CV_NOEXCEPT { refcount_promise--; ប្រសិនបើ (0 == --refcount) delete this; }
+    ចំនួនគត់ refcount_promise;
 
     mutable bool has_result; // Mat, UMat or exception
 
@@ -228,7 +228,7 @@ struct AsyncArray::Impl
 
 
     bool has_exception;
-#if CV__EXCEPTION_PTR
+#ប្រសិនបើ CV__EXCEPTION_PTR
     std::exception_ptr exception;
 #endif
     cv::Exception cv_exception;
@@ -249,7 +249,7 @@ struct AsyncArray::Impl
 
     ~Impl()
     {
-        if (has_result && !result_is_fetched)
+        ប្រសិនបើ (has_result && !result_is_fetched)
         {
             CV_LOG_INFO(NULL, "Asynchronous result has not been fetched");
         }
@@ -258,57 +258,57 @@ struct AsyncArray::Impl
     bool get(OutputArray dst, int64 timeoutNs) const
     {
         CV_Assert(!result_is_fetched);
-        if (!has_result)
+        ប្រសិនបើ (!has_result)
         {
             CV_UNUSED(timeoutNs);
             CV_Error(Error::StsError, "Result is not produced (unable to wait for result in OPENCV_DISABLE_THREAD_SUPPORT mode)");
         }
-        if (!result_mat.empty())
+        ប្រសិនបើ (!result_mat.empty())
         {
             dst.move(*result_mat.get());
             result_mat.release();
             result_is_fetched = true;
-            return true;
+            ត្រឡប់ true;
         }
-        if (!result_umat.empty())
+        ប្រសិនបើ (!result_umat.empty())
         {
             dst.move(*result_umat.get());
             result_umat.release();
             result_is_fetched = true;
-            return true;
+            ត្រឡប់ true;
         }
-#if CV__EXCEPTION_PTR
-        if (has_exception && exception)
+#ប្រសិនបើ CV__EXCEPTION_PTR
+        ប្រសិនបើ (has_exception && exception)
         {
             result_is_fetched = true;
             std::rethrow_exception(exception);
         }
 #endif
-        if (has_exception)
+        ប្រសិនបើ (has_exception)
         {
             result_is_fetched = true;
-            throw cv_exception;
+            k_sipa cv_exception;
         }
         CV_Error(Error::StsInternal, "AsyncArray: invalid state of 'has_result = true'");
-        return false;
+        ត្រឡប់ false;
     }
 
     bool valid() const CV_NOEXCEPT
     {
-        if (result_is_fetched)
-            return false;
-        if (refcount_promise == 0 && !has_result)
-            return false;
-        return true;
+        ប្រសិនបើ (result_is_fetched)
+            ត្រឡប់ false;
+        ប្រសិនបើ (refcount_promise == 0 && !has_result)
+            ត្រឡប់ false;
+        ត្រឡប់ true;
     }
 
     bool wait_for(int64 timeoutNs) const
     {
         CV_Assert(valid());
-        if (has_result)
-            return has_result;
-        if (timeoutNs == 0)
-            return has_result;
+        ប្រសិនបើ (has_result)
+            ត្រឡប់ has_result;
+        ប្រសិនបើ (timeoutNs == 0)
+            ត្រឡប់ has_result;
         CV_Error(Error::StsError, "Unable to wait in OPENCV_DISABLE_THREAD_SUPPORT mode");
     }
 
@@ -319,21 +319,21 @@ struct AsyncArray::Impl
         addrefFuture();
         result.p = this;
         future_is_returned = true;
-        return result;
+        ត្រឡប់ result;
     }
 
     void setValue(InputArray value)
     {
-        if (future_is_returned && refcount_future == 0)
+        ប្រសិនបើ (future_is_returned && refcount_future == 0)
             CV_Error(Error::StsError, "Associated AsyncArray has been destroyed");
         CV_Assert(!has_result);
-        int k = value.kind();
-        if (k == _InputArray::UMAT)
+        ចំនួនគត់ k = value.kind();
+        ប្រសិនបើ (k == _InputArray::UMAT)
         {
             result_umat = makePtr<UMat>();
             value.copyTo(*result_umat.get());
         }
-        else
+        បើមិនដូច្នេះ
         {
             result_mat = makePtr<Mat>();
             value.copyTo(*result_mat.get());
@@ -341,10 +341,10 @@ struct AsyncArray::Impl
         has_result = true;
     }
 
-#if CV__EXCEPTION_PTR
+#ប្រសិនបើ CV__EXCEPTION_PTR
     void setException(std::exception_ptr e)
     {
-        if (future_is_returned && refcount_future == 0)
+        ប្រសិនបើ (future_is_returned && refcount_future == 0)
             CV_Error(Error::StsError, "Associated AsyncArray has been destroyed");
         CV_Assert(!has_result);
         has_exception = true;
@@ -355,7 +355,7 @@ struct AsyncArray::Impl
 
     void setException(const cv::Exception e)
     {
-        if (future_is_returned && refcount_future == 0)
+        ប្រសិនបើ (future_is_returned && refcount_future == 0)
             CV_Error(Error::StsError, "Associated AsyncArray has been destroyed");
         CV_Assert(!has_result);
         has_exception = true;
@@ -383,32 +383,32 @@ AsyncArray::~AsyncArray() CV_NOEXCEPT
 AsyncArray::AsyncArray(const AsyncArray& o) CV_NOEXCEPT
     : p(o.p)
 {
-    if (p)
+    ប្រសិនបើ (p)
         p->addrefFuture();
 }
 
 AsyncArray& AsyncArray::operator=(const AsyncArray& o) CV_NOEXCEPT
 {
     Impl* newp = o.p;
-    if (newp)
+    ប្រសិនបើ (newp)
         newp->addrefFuture();
     release();
     p = newp;
-    return *this;
+    ត្រឡប់ *this;
 }
 
 void AsyncArray::release() CV_NOEXCEPT
 {
     Impl* impl = p;
     p = NULL;
-    if (impl)
+    ប្រសិនបើ (impl)
         impl->releaseFuture();
 }
 
 bool AsyncArray::get(OutputArray dst, int64 timeoutNs) const
 {
     CV_Assert(p);
-    return p->get(dst, timeoutNs);
+    ត្រឡប់ p->get(dst, timeoutNs);
 }
 
 void AsyncArray::get(OutputArray dst) const
@@ -421,13 +421,13 @@ void AsyncArray::get(OutputArray dst) const
 bool AsyncArray::wait_for(int64 timeoutNs) const
 {
     CV_Assert(p);
-    return p->wait_for(timeoutNs);
+    ត្រឡប់ p->wait_for(timeoutNs);
 }
 
 bool AsyncArray::valid() const CV_NOEXCEPT
 {
-    if (!p) return false;
-    return p->valid();
+    ប្រសិនបើ (!p) ត្រឡប់ false;
+    ត្រឡប់ p->valid();
 }
 
 
@@ -448,51 +448,51 @@ AsyncPromise::~AsyncPromise() CV_NOEXCEPT
 AsyncPromise::AsyncPromise(const AsyncPromise& o) CV_NOEXCEPT
     : p(o.p)
 {
-    if (p)
+    ប្រសិនបើ (p)
         p->addrefPromise();
 }
 
 AsyncPromise& AsyncPromise::operator=(const AsyncPromise& o) CV_NOEXCEPT
 {
     Impl* newp = o.p;
-    if (newp)
+    ប្រសិនបើ (newp)
         newp->addrefPromise();
     release();
     p = newp;
-    return *this;
+    ត្រឡប់ *this;
 }
 
 void AsyncPromise::release() CV_NOEXCEPT
 {
     Impl* impl = p;
     p = NULL;
-    if (impl)
+    ប្រសិនបើ (impl)
         impl->releasePromise();
 }
 
 AsyncArray AsyncPromise::getArrayResult()
 {
     CV_Assert(p);
-    return p->getArrayResult();
+    ត្រឡប់ p->getArrayResult();
 }
 
 void AsyncPromise::setValue(InputArray value)
 {
     CV_Assert(p);
-    return p->setValue(value);
+    ត្រឡប់ p->setValue(value);
 }
 
 void AsyncPromise::setException(const cv::Exception& exception)
 {
     CV_Assert(p);
-    return p->setException(exception);
+    ត្រឡប់ p->setException(exception);
 }
 
-#if CV__EXCEPTION_PTR
+#ប្រសិនបើ CV__EXCEPTION_PTR
 void AsyncPromise::setException(std::exception_ptr exception)
 {
     CV_Assert(p);
-    return p->setException(exception);
+    ត្រឡប់ p->setException(exception);
 }
 #endif
 
