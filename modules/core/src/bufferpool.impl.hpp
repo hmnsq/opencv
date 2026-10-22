@@ -17,8 +17,8 @@ public:
     DummyBufferPoolController() { }
     virtual ~DummyBufferPoolController() { }
 
-    virtual size_t getReservedSize() const CV_OVERRIDE { return (size_t)-1; }
-    virtual size_t getMaxReservedSize() const CV_OVERRIDE { return (size_t)-1; }
+    virtual size_t getReservedSize() const CV_OVERRIDE { 반환 (size_t)-1; }
+    virtual size_t getMaxReservedSize() const CV_OVERRIDE { 반환 (size_t)-1; }
     virtual void setMaxReservedSize(size_t size) CV_OVERRIDE { CV_UNUSED(size); }
     virtual void freeAllReservedBuffers() CV_OVERRIDE { }
 };

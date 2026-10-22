@@ -18,27 +18,27 @@ enum { MAX_VIEW_DIMS = CV_MAX_DIM };
 struct View
 {
     uchar* data = nullptr;
-    int dims = 0;
+    정수 dims = 0;
     size_t esz = 0;                    // element size in bytes, channels included
-    int size[MAX_VIEW_DIMS];
+    정수 size[MAX_VIEW_DIMS];
     ptrdiff_t step[MAX_VIEW_DIMS];     // in bytes; 0 = broadcast, negative = reversed
 };
 
 View viewOf(const Mat& m);
 
 // The i-th axis of the result is the order[i]-th axis of v.
-View permute(const View& v, const int* order);
+View permute(const View& v, const 정수* order);
 
-void flip(View& v, int axis);
+void flip(View& v, 정수 axis);
 
 // Keep `count` elements along the axis, starting at `start`; `step` may be negative.
-void slice(View& v, int axis, int start, int step, int count);
+void slice(View& v, 정수 axis, 정수 start, 정수 step, 정수 count);
 
 // The views must have the same dims, sizes and esz. Overlapping views are allowed.
 void copy(const View& src, const View& dst);
 
 // n independent copies executed in one parallel pass.
-void copyBatch(const View* src, const View* dst, int n);
+void copyBatch(const View* src, const View* dst, 정수 n);
 
 // cv::transpose kernel for the element size, or nullptr; defined in matrix_transform.cpp.
 typedef void (*TransposeFunc)(const uchar* src, size_t sstep, uchar* dst, size_t dstep, Size sz);

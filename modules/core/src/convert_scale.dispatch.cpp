@@ -12,14 +12,14 @@
 namespace cv
 {
 
-static BinaryFunc getCvtScaleAbsFunc(int depth)
+static BinaryFunc getCvtScaleAbsFunc(정수 depth)
 {
     CV_INSTRUMENT_REGION();
     CV_CPU_DISPATCH(getCvtScaleAbsFunc, (depth),
         CV_CPU_DISPATCH_MODES_ALL);
 }
 
-BinaryFunc getConvertScaleFunc(int sdepth, int ddepth)
+BinaryFunc getConvertScaleFunc(정수 sdepth, 정수 ddepth)
 {
     CV_INSTRUMENT_REGION();
     CV_CPU_DISPATCH(getConvertScaleFunc, (sdepth, ddepth),
@@ -32,27 +32,27 @@ static bool ocl_convertScaleAbs( InputArray _src, OutputArray _dst, double alpha
 {
     const ocl::Device & d = ocl::Device::getDefault();
 
-    int type = _src.type(), depth = CV_MAT_DEPTH(type), cn = CV_MAT_CN(type);
+    정수 type = _src.type(), depth = CV_MAT_DEPTH(type), cn = CV_MAT_CN(type);
     bool doubleSupport = d.doubleFPConfig() > 0;
-    if (!doubleSupport && depth == CV_64F)
-        return false;
+    만약 (!doubleSupport && depth == CV_64F)
+        반환 false;
 
     _dst.createSameSize(_src, CV_8UC(cn));
-    int kercn = 1;
-    if (d.isIntel())
+    정수 kercn = 1;
+    만약 (d.isIntel())
     {
-        static const int vectorWidths[] = {4, 4, 4, 4, 4, 4, 4, -1};
+        static const 정수 vectorWidths[] = {4, 4, 4, 4, 4, 4, 4, -1};
         kercn = ocl::checkOptimalVectorWidth( vectorWidths, _src, _dst,
                                               noArray(), noArray(), noArray(),
                                               noArray(), noArray(), noArray(),
                                               noArray(), ocl::OCL_VECTOR_MAX);
     }
-    else
+    아니면
         kercn = ocl::predictOptimalVectorWidthMax(_src, _dst);
 
-    int rowsPerWI = d.isIntel() ? 4 : 1;
+    정수 rowsPerWI = d.isIntel() ? 4 : 1;
     char cvt[2][50];
-    int wdepth = std::max(depth, CV_32F);
+    정수 wdepth = std::max(depth, CV_32F);
     String build_opt = format("-D OP_CONVERT_SCALE_ABS -D UNARY_OP -D dstT=%s -D DEPTH_dst=%d -D srcT1=%s"
                          " -D workT=%s -D wdepth=%d -D convertToWT1=%s -D convertToDT=%s"
                          " -D workT1=%s -D rowsPerWI=%d%s",
@@ -64,8 +64,8 @@ static bool ocl_convertScaleAbs( InputArray _src, OutputArray _dst, double alpha
                          ocl::typeToStr(wdepth), rowsPerWI,
                          doubleSupport ? " -D DOUBLE_SUPPORT" : "");
     ocl::Kernel k("KF", ocl::core::arithm_oclsrc, build_opt);
-    if (k.empty())
-        return false;
+    만약 (k.empty())
+        반환 false;
 
     UMat src = _src.getUMat();
     UMat dst = _dst.getUMat();
@@ -73,13 +73,13 @@ static bool ocl_convertScaleAbs( InputArray _src, OutputArray _dst, double alpha
     ocl::KernelArg srcarg = ocl::KernelArg::ReadOnlyNoSize(src),
             dstarg = ocl::KernelArg::WriteOnly(dst, cn, kercn);
 
-    if (wdepth == CV_32F)
+    만약 (wdepth == CV_32F)
         k.args(srcarg, dstarg, (float)alpha, (float)beta);
-    else if (wdepth == CV_64F)
+    아니면 만약 (wdepth == CV_64F)
         k.args(srcarg, dstarg, alpha, beta);
 
     size_t globalsize[2] = { (size_t)src.cols * cn / kercn, ((size_t)src.rows + rowsPerWI - 1) / rowsPerWI };
-    return k.run(2, globalsize, NULL, false);
+    반환 k.run(2, globalsize, NULL, false);
 }
 
 #endif
@@ -92,26 +92,26 @@ void convertScaleAbs(InputArray _src, OutputArray _dst, double alpha, double bet
                ocl_convertScaleAbs(_src, _dst, alpha, beta))
 
     Mat src = _src.getMat();
-    int cn = src.channels();
+    정수 cn = src.channels();
     double scale[] = {alpha, beta};
     _dst.create( src.size, CV_8UC(cn) );
     Mat dst = _dst.getMat();
     BinaryFunc func = getCvtScaleAbsFunc(src.depth());
     CV_Assert( func != 0 );
 
-    if( src.dims <= 2 )
+    만약( src.dims <= 2 )
     {
         Size sz = getContinuousSize2D(src, dst, cn);
         func( src.ptr(), src.step, 0, 0, dst.ptr(), dst.step, sz, scale );
     }
-    else
+    아니면
     {
         const Mat* arrays[] = {&src, &dst, 0};
         uchar* ptrs[2] = {};
         NAryMatIterator it(arrays, ptrs);
-        Size sz((int)it.size*cn, 1);
+        Size sz((정수)it.size*cn, 1);
 
-        for( size_t i = 0; i < it.nplanes; i++, ++it )
+        위해( size_t i = 0; i < it.nplanes; i++, ++it )
             func( ptrs[0], 0, 0, 0, ptrs[1], 0, sz, scale );
     }
 }

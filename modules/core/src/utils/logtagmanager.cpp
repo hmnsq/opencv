@@ -29,13 +29,13 @@ LogTagManager::~LogTagManager()
 void LogTagManager::setConfigString(const std::string& configString, bool apply /*true*/)
 {
     m_config->parse(configString);
-    if (m_config->hasMalformed())
+    만약 (m_config->hasMalformed())
     {
-        return;
+        반환;
     }
-    if (!apply)
+    만약 (!apply)
     {
-        return;
+        반환;
     }
     // The following code is arranged with "priority by overwriting",
     // where when the same log tag has multiple matches, the last code
@@ -48,15 +48,15 @@ void LogTagManager::setConfigString(const std::string& configString, bool apply 
     //
     const auto& globalConfig = m_config->getGlobalConfig();
     m_globalLogTag->level = globalConfig.level;
-    for (const auto& config : m_config->getFirstPartConfigs())
+    위해 (const auto& config : m_config->getFirstPartConfigs())
     {
         setLevelByFirstPart(config.namePart, config.level);
     }
-    for (const auto& config : m_config->getAnyPartConfigs())
+    위해 (const auto& config : m_config->getAnyPartConfigs())
     {
         setLevelByAnyPart(config.namePart, config.level);
     }
-    for (const auto& config : m_config->getFullNameConfigs())
+    위해 (const auto& config : m_config->getFullNameConfigs())
     {
         setLevelByFullName(config.namePart, config.level);
     }
@@ -64,7 +64,7 @@ void LogTagManager::setConfigString(const std::string& configString, bool apply 
 
 LogTagConfigParser& LogTagManager::getConfigParser() const
 {
-    return *m_config;
+    반환 *m_config;
 }
 
 void LogTagManager::assign(const std::string& fullName, LogTag* ptr)
@@ -76,19 +76,19 @@ void LogTagManager::assign(const std::string& fullName, LogTag* ptr)
     m_nameTable.addOrLookupFullName(result);
     FullNameInfo& fullNameInfo = *result.m_fullNameInfoPtr;
     const bool isPtrChanged = (fullNameInfo.logTagPtr != ptr);
-    if (!isPtrChanged)
+    만약 (!isPtrChanged)
     {
-        return;
+        반환;
     }
     fullNameInfo.logTagPtr = ptr;
-    if (!ptr)
+    만약 (!ptr)
     {
-        return;
+        반환;
     }
     const bool hasAppliedFullNameConfig = internal_applyFullNameConfigToTag(fullNameInfo);
-    if (hasAppliedFullNameConfig)
+    만약 (hasAppliedFullNameConfig)
     {
-        return;
+        반환;
     }
     internal_applyNamePartConfigToSpecificTag(result);
 }
@@ -104,11 +104,11 @@ LogTag* LogTagManager::get(const std::string& fullName)
     CV_TRACE_FUNCTION();
     LockType lock(m_mutex);
     FullNameInfo* fullNameInfoPtr = m_nameTable.getFullNameInfo(fullName);
-    if (fullNameInfoPtr && fullNameInfoPtr->logTagPtr)
+    만약 (fullNameInfoPtr && fullNameInfoPtr->logTagPtr)
     {
-        return fullNameInfoPtr->logTagPtr;
+        반환 fullNameInfoPtr->logTagPtr;
     }
-    return nullptr;
+    반환 nullptr;
 }
 
 void LogTagManager::setLevelByFullName(const std::string& fullName, LogLevel level)
@@ -119,18 +119,18 @@ void LogTagManager::setLevelByFullName(const std::string& fullName, LogLevel lev
     result.m_findCrossReferences = false;
     m_nameTable.addOrLookupFullName(result);
     FullNameInfo& fullNameInfo = *result.m_fullNameInfoPtr;
-    if (fullNameInfo.parsedLevel.scope == MatchingScope::Full &&
+    만약 (fullNameInfo.parsedLevel.scope == MatchingScope::Full &&
         fullNameInfo.parsedLevel.level == level)
     {
         // skip additional processing if nothing changes.
-        return;
+        반환;
     }
     // update the cached configured value.
     fullNameInfo.parsedLevel.scope = MatchingScope::Full;
     fullNameInfo.parsedLevel.level = level;
     // update the actual tag, if already registered.
     LogTag* logTagPtr = fullNameInfo.logTagPtr;
-    if (logTagPtr)
+    만약 (logTagPtr)
     {
         logTagPtr->level = level;
     }
@@ -156,11 +156,11 @@ void LogTagManager::setLevelByNamePart(const std::string& namePart, LogLevel lev
     result.m_findCrossReferences = true;
     m_nameTable.addOrLookupNamePart(result);
     NamePartInfo& namePartInfo = *result.m_namePartInfoPtr;
-    if (namePartInfo.parsedLevel.scope == scope &&
+    만약 (namePartInfo.parsedLevel.scope == scope &&
         namePartInfo.parsedLevel.level == level)
     {
         // skip additional processing if nothing changes.
-        return;
+        반환;
     }
     namePartInfo.parsedLevel.scope = scope;
     namePartInfo.parsedLevel.level = level;
@@ -173,20 +173,20 @@ std::vector<std::string> LogTagManager::splitNameParts(const std::string& fullNa
     const size_t len = fullName.length();
     std::vector<std::string> nameParts;
     size_t start = 0u;
-    while (start < len)
+    동안 (start < len)
     {
         size_t nextPeriod = fullName.find('.', start);
-        if (nextPeriod == npos)
+        만약 (nextPeriod == npos)
         {
             nextPeriod = len;
         }
-        if (nextPeriod >= start + 1u)
+        만약 (nextPeriod >= start + 1u)
         {
             nameParts.emplace_back(fullName.substr(start, nextPeriod - start));
         }
         start = nextPeriod + 1u;
     }
-    return nameParts;
+    반환 nameParts;
 }
 
 bool LogTagManager::internal_isNamePartMatch(MatchingScope scope, size_t matchingPos)
@@ -194,42 +194,42 @@ bool LogTagManager::internal_isNamePartMatch(MatchingScope scope, size_t matchin
     switch (scope)
     {
     case MatchingScope::FirstNamePart:
-        return (matchingPos == 0u);
+        반환 (matchingPos == 0u);
     case MatchingScope::AnyNamePart:
-        return true;
+        반환 true;
     case MatchingScope::None:
     case MatchingScope::Full:
     default:
-        return false;
+        반환 false;
     }
 }
 
 bool LogTagManager::internal_applyFullNameConfigToTag(FullNameInfo& fullNameInfo)
 {
-    if (!fullNameInfo.logTagPtr)
+    만약 (!fullNameInfo.logTagPtr)
     {
-        return false;
+        반환 false;
     }
-    if (fullNameInfo.parsedLevel.scope == MatchingScope::Full)
+    만약 (fullNameInfo.parsedLevel.scope == MatchingScope::Full)
     {
         fullNameInfo.logTagPtr->level = fullNameInfo.parsedLevel.level;
-        return true;
+        반환 true;
     }
-    return false;
+    반환 false;
 }
 
 bool LogTagManager::internal_applyNamePartConfigToSpecificTag(FullNameLookupResult& fullNameResult)
 {
     const FullNameInfo& fullNameInfo = *fullNameResult.m_fullNameInfoPtr;
     LogTag* const logTag = fullNameInfo.logTagPtr;
-    if (!logTag)
+    만약 (!logTag)
     {
-        return false;
+        반환 false;
     }
     CV_Assert(fullNameResult.m_findCrossReferences);
     const auto& crossReferences = fullNameResult.m_crossReferences;
     const size_t matchingNamePartCount = crossReferences.size();
-    for (size_t k = 0u; k < matchingNamePartCount; ++k)
+    위해 (size_t k = 0u; k < matchingNamePartCount; ++k)
     {
         const auto& match = crossReferences.at(k);
         const auto& namePartInfo = *match.m_namePartInfo;
@@ -238,13 +238,13 @@ bool LogTagManager::internal_applyNamePartConfigToSpecificTag(FullNameLookupResu
         const LogLevel level = parsedLevel.level;
         const size_t matchingPos = match.m_matchingPos;
         const bool isMatch = internal_isNamePartMatch(scope, matchingPos);
-        if (isMatch)
+        만약 (isMatch)
         {
             logTag->level = level;
-            return true;
+            반환 true;
         }
     }
-    return false;
+    반환 false;
 }
 
 void LogTagManager::internal_applyNamePartConfigToMatchingTags(NamePartLookupResult& namePartResult)
@@ -255,21 +255,21 @@ void LogTagManager::internal_applyNamePartConfigToMatchingTags(NamePartLookupRes
     NamePartInfo& namePartInfo = *namePartResult.m_namePartInfoPtr;
     const MatchingScope scope = namePartInfo.parsedLevel.scope;
     CV_Assert(scope != MatchingScope::Full);
-    if (scope == MatchingScope::None)
+    만약 (scope == MatchingScope::None)
     {
-        return;
+        반환;
     }
     const LogLevel level = namePartInfo.parsedLevel.level;
-    for (size_t k = 0u; k < matchingFullNameCount; ++k)
+    위해 (size_t k = 0u; k < matchingFullNameCount; ++k)
     {
         const auto& match = crossReferences.at(k);
         FullNameInfo& fullNameInfo = *match.m_fullNameInfo;
         LogTag* logTagPtr = fullNameInfo.logTagPtr;
-        if (!logTagPtr)
+        만약 (!logTagPtr)
         {
             continue;
         }
-        if (fullNameInfo.parsedLevel.scope == MatchingScope::Full)
+        만약 (fullNameInfo.parsedLevel.scope == MatchingScope::Full)
         {
             // If the full name already has valid config, that full name config
             // has precedence over name part config.
@@ -277,7 +277,7 @@ void LogTagManager::internal_applyNamePartConfigToMatchingTags(NamePartLookupRes
         }
         const size_t matchingPos = match.m_matchingPos;
         const bool isMatch = internal_isNamePartMatch(scope, matchingPos);
-        if (!isMatch)
+        만약 (!isMatch)
         {
             continue;
         }
@@ -292,7 +292,7 @@ void LogTagManager::NameTable::addOrLookupFullName(FullNameLookupResult& result)
     result.m_nameParts = LogTagManager::splitNameParts(result.m_fullName);
     internal_addOrLookupNameParts(result.m_nameParts, result.m_namePartIds);
     const bool isNew = fullNameIdAndFlag.second;
-    if (isNew)
+    만약 (isNew)
     {
         internal_addCrossReference(result.m_fullNameId, result.m_namePartIds);
     }
@@ -302,7 +302,7 @@ void LogTagManager::NameTable::addOrLookupFullName(FullNameLookupResult& result)
     // by the vector append operations earlier in this function.
     // ======
     result.m_fullNameInfoPtr = internal_getFullNameInfo(result.m_fullNameId);
-    if (result.m_findCrossReferences)
+    만약 (result.m_findCrossReferences)
     {
         internal_findMatchingNamePartsForFullName(result);
     }
@@ -312,7 +312,7 @@ void LogTagManager::NameTable::addOrLookupNamePart(NamePartLookupResult& result)
 {
     result.m_namePartId = internal_addOrLookupNamePart(result.m_namePart);
     result.m_namePartInfoPtr = internal_getNamePartInfo(result.m_namePartId);
-    if (result.m_findCrossReferences)
+    만약 (result.m_findCrossReferences)
     {
         internal_findMatchingFullNamesForNamePart(result);
     }
@@ -321,14 +321,14 @@ void LogTagManager::NameTable::addOrLookupNamePart(NamePartLookupResult& result)
 std::pair<size_t, bool> LogTagManager::NameTable::internal_addOrLookupFullName(const std::string& fullName)
 {
     const auto fullNameIdIter = m_fullNameIds.find(fullName);
-    if (fullNameIdIter != m_fullNameIds.end())
+    만약 (fullNameIdIter != m_fullNameIds.end())
     {
-        return std::make_pair(fullNameIdIter->second, false);
+        반환 std::make_pair(fullNameIdIter->second, false);
     }
     const size_t fullNameId = m_fullNameInfos.size();
     m_fullNameInfos.emplace_back(FullNameInfo{});
     m_fullNameIds.emplace(fullName, fullNameId);
-    return std::make_pair(fullNameId, true);
+    반환 std::make_pair(fullNameId, true);
 }
 
 void LogTagManager::NameTable::internal_addOrLookupNameParts(const std::vector<std::string>& nameParts,
@@ -336,7 +336,7 @@ void LogTagManager::NameTable::internal_addOrLookupNameParts(const std::vector<s
 {
     const size_t namePartCount = nameParts.size();
     namePartIds.resize(namePartCount, ~(size_t)0u);
-    for (size_t namePartIndex = 0u; namePartIndex < namePartCount; ++namePartIndex)
+    위해 (size_t namePartIndex = 0u; namePartIndex < namePartCount; ++namePartIndex)
     {
         const std::string& namePart = nameParts.at(namePartIndex);
         const size_t namePartId = internal_addOrLookupNamePart(namePart);
@@ -347,20 +347,20 @@ void LogTagManager::NameTable::internal_addOrLookupNameParts(const std::vector<s
 size_t LogTagManager::NameTable::internal_addOrLookupNamePart(const std::string& namePart)
 {
     const auto namePartIter = m_namePartIds.find(namePart);
-    if (namePartIter != m_namePartIds.end())
+    만약 (namePartIter != m_namePartIds.end())
     {
-        return namePartIter->second;
+        반환 namePartIter->second;
     }
     const size_t namePartId = m_namePartInfos.size();
     m_namePartInfos.emplace_back(NamePartInfo{});
     m_namePartIds.emplace(namePart, namePartId);
-    return namePartId;
+    반환 namePartId;
 }
 
 void LogTagManager::NameTable::internal_addCrossReference(size_t fullNameId, const std::vector<size_t>& namePartIds)
 {
     const size_t namePartCount = namePartIds.size();
-    for (size_t namePartPos = 0u; namePartPos < namePartCount; ++namePartPos)
+    위해 (size_t namePartPos = 0u; namePartPos < namePartCount; ++namePartPos)
     {
         const size_t namePartId = namePartIds.at(namePartPos);
         m_fullNameToNamePartIds.emplace(fullNameId, std::make_pair(namePartId, namePartPos));
@@ -371,22 +371,22 @@ void LogTagManager::NameTable::internal_addCrossReference(size_t fullNameId, con
 LogTagManager::FullNameInfo* LogTagManager::NameTable::getFullNameInfo(const std::string& fullName)
 {
     const auto fullNameIdIter = m_fullNameIds.find(fullName);
-    if (fullNameIdIter == m_fullNameIds.end())
+    만약 (fullNameIdIter == m_fullNameIds.end())
     {
-        return nullptr;
+        반환 nullptr;
     }
     const size_t fullNameId = fullNameIdIter->second;
-    return internal_getFullNameInfo(fullNameId);
+    반환 internal_getFullNameInfo(fullNameId);
 }
 
 LogTagManager::FullNameInfo* LogTagManager::NameTable::internal_getFullNameInfo(size_t fullNameId)
 {
-    return std::addressof(m_fullNameInfos.at(fullNameId));
+    반환 std::addressof(m_fullNameInfos.at(fullNameId));
 }
 
 LogTagManager::NamePartInfo* LogTagManager::NameTable::internal_getNamePartInfo(size_t namePartId)
 {
-    return std::addressof(m_namePartInfos.at(namePartId));
+    반환 std::addressof(m_namePartInfos.at(namePartId));
 }
 
 void LogTagManager::NameTable::internal_findMatchingNamePartsForFullName(FullNameLookupResult& fullNameResult)
@@ -398,7 +398,7 @@ void LogTagManager::NameTable::internal_findMatchingNamePartsForFullName(FullNam
     auto& crossReferences = fullNameResult.m_crossReferences;
     crossReferences.clear();
     crossReferences.reserve(namePartCount);
-    for (size_t matchingPos = 0u; matchingPos < namePartCount; ++matchingPos)
+    위해 (size_t matchingPos = 0u; matchingPos < namePartCount; ++matchingPos)
     {
         const size_t namePartId = namePartIds.at(matchingPos);
         NamePartInfo* namePartInfo = internal_getNamePartInfo(namePartId);
@@ -417,7 +417,7 @@ void LogTagManager::NameTable::internal_findMatchingFullNamesForNamePart(NamePar
     const auto namePartToFullNameIterPair = m_namePartToFullNameIds.equal_range(result.m_namePartId);
     const auto iterBegin = namePartToFullNameIterPair.first;
     const auto iterEnd = namePartToFullNameIterPair.second;
-    for (auto iter = iterBegin; iter != iterEnd; ++iter)
+    위해 (auto iter = iterBegin; iter != iterEnd; ++iter)
     {
         const size_t fullNameId = iter->second.first;
         const size_t matchingPos = iter->second.second;

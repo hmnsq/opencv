@@ -58,10 +58,10 @@ Algorithm::~Algorithm()
 void Algorithm::write(FileStorage& fs, const String& name) const
 {
     CV_TRACE_FUNCTION();
-    if(name.empty())
+    만약(name.empty())
     {
         write(fs);
-        return;
+        반환;
     }
     fs << name << "{";
     write(fs);
@@ -80,13 +80,13 @@ void Algorithm::save(const String& filename) const
 String Algorithm::getDefaultName() const
 {
     CV_TRACE_FUNCTION();
-    return String("my_object");
+    반환 String("my_object");
 }
 
 void Algorithm::writeFormat(FileStorage& fs) const
 {
     CV_TRACE_FUNCTION();
-    fs << "format" << (int)3;
+    fs << "format" << (정수)3;
 }
 
 }

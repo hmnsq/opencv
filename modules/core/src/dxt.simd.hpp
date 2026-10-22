@@ -26,7 +26,7 @@
 namespace cv {
 CV_CPU_OPTIMIZATION_NAMESPACE_BEGIN
 
-DFTKernels getDFTKernels_(int depth);
+DFTKernels getDFTKernels_(정수 depth);
 
 #ifndef CV_CPU_OPTIMIZATION_DECLARATIONS_ONLY
 
@@ -53,13 +53,13 @@ template<typename T> const T DftConst<T>::sin45  = (T)0.707106781186547524400844
         X1r = _t1r + _t3i; X1i = _t1i - _t3r; X3r = _t1r - _t3i; X3i = _t1i + _t3r; \
     }
 
-#if (CV_SIMD || CV_SIMD_SCALABLE)
-inline v_float32 v_setall_(float x) { return vx_setall_f32(x); }
+#만약 (CV_SIMD || CV_SIMD_SCALABLE)
+inline v_float32 v_setall_(float x) { 반환 vx_setall_f32(x); }
 // all-lanes sign-bit mask (when neg) or zero: x ^ mask negates x when neg, keeps it otherwise
-inline v_float32 v_signmask_(bool neg, float) { return v_reinterpret_as_f32(vx_setall_u32(neg ? 0x80000000u : 0u)); }
-#if (CV_SIMD_64F || CV_SIMD_SCALABLE_64F)
-inline v_float64 v_setall_(double x) { return vx_setall_f64(x); }
-inline v_float64 v_signmask_(bool neg, double) { return v_reinterpret_as_f64(vx_setall_u64(neg ? 0x8000000000000000ULL : 0ULL)); }
+inline v_float32 v_signmask_(bool neg, float) { 반환 v_reinterpret_as_f32(vx_setall_u32(neg ? 0x80000000u : 0u)); }
+#만약 (CV_SIMD_64F || CV_SIMD_SCALABLE_64F)
+inline v_float64 v_setall_(double x) { 반환 vx_setall_f64(x); }
+inline v_float64 v_signmask_(bool neg, double) { 반환 v_reinterpret_as_f64(vx_setall_u64(neg ? 0x8000000000000000ULL : 0ULL)); }
 #endif
 #endif
 
@@ -82,27 +82,27 @@ void preprocRadix0_(const DftPlan& plan, const void* _src, size_t sstep, void* _
 {
     const T* src = (const T*)_src;
     T* re = (T*)_re; T* im = (T*)_im;
-    const int* itab = plan.itab.data();
-    int nc = plan.nc;
-    if (plan.real_input)
+    const 정수* itab = plan.itab.data();
+    정수 nc = plan.nc;
+    만약 (plan.real_input)
     {
-        for (int i = 0; i < nc; i++)
+        위해 (정수 i = 0; i < nc; i++)
         {
             re[i] = src[itab[i*2]*sstep];
             im[i] = 0;
         }
     }
-    else if (!conj)
+    아니면 만약 (!conj)
     {
-        for (int i = 0; i < nc; i++)
+        위해 (정수 i = 0; i < nc; i++)
         {
             re[i] = src[itab[i*2]*sstep];
             im[i] = src[itab[i*2+1]*sstep];
         }
     }
-    else
+    아니면
     {
-        for (int i = 0; i < nc; i++)
+        위해 (정수 i = 0; i < nc; i++)
         {
             re[i] = src[itab[i*2]*sstep];
             im[i] = -src[itab[i*2+1]*sstep];
@@ -112,7 +112,7 @@ void preprocRadix0_(const DftPlan& plan, const void* _src, size_t sstep, void* _
 
 // scalar r0-point DFTs of one column j (used for the vector tail and the no-SIMD build)
 template<typename T>
-static inline void firstStage2_scalar(const T* x, int M, int j, T* re, T* im, T conjsign)
+static inline void firstStage2_scalar(const T* x, 정수 M, 정수 j, T* re, T* im, T conjsign)
 {
     T x0r = x[j*2], x0i = conjsign*x[j*2+1], x1r = x[(j+M)*2], x1i = conjsign*x[(j+M)*2+1];
     re[0] = x0r + x1r; im[0] = x0i + x1i;
@@ -120,7 +120,7 @@ static inline void firstStage2_scalar(const T* x, int M, int j, T* re, T* im, T 
 }
 
 template<typename T>
-static inline void firstStage4_scalar(const T* x, int M, int j, T* re, T* im, T conjsign)
+static inline void firstStage4_scalar(const T* x, 정수 M, 정수 j, T* re, T* im, T conjsign)
 {
     T x0r = x[j*2], x0i = conjsign*x[j*2+1];
     T x1r = x[(j+M)*2], x1i = conjsign*x[(j+M)*2+1];
@@ -130,11 +130,11 @@ static inline void firstStage4_scalar(const T* x, int M, int j, T* re, T* im, T 
 }
 
 template<typename T>
-static inline void firstStage8_scalar(const T* x, int M, int j, T* re, T* im, T conjsign)
+static inline void firstStage8_scalar(const T* x, 정수 M, 정수 j, T* re, T* im, T conjsign)
 {
     const T c = DftConst<T>::sin45;
     T xr[8], xi[8];
-    for (int q = 0; q < 8; q++)
+    위해 (정수 q = 0; q < 8; q++)
     {
         xr[q] = x[(j + q*M)*2];
         xi[q] = conjsign*x[(j + q*M)*2 + 1];
@@ -152,7 +152,7 @@ static inline void firstStage8_scalar(const T* x, int M, int j, T* re, T* im, T 
     re[3] = e3r + t3r; im[3] = e3i + t3i; re[7] = e3r - t3r; im[7] = e3i - t3i;
 }
 
-#if (CV_SIMD || CV_SIMD_SCALABLE)
+#만약 (CV_SIMD || CV_SIMD_SCALABLE)
 
 // 4-point forward DFT on vectors
 #define DFT4_VEC(x0r,x0i,x1r,x1i,x2r,x2i,x3r,x3i, X0r,X0i,X1r,X1i,X2r,X2i,X3r,X3i) \
@@ -170,25 +170,25 @@ static inline void firstStage8_scalar(const T* x, int M, int j, T* re, T* im, T 
     xi = v_xor(xi, imsign);
 
 // scatters the r0 outputs of every lane: buf holds them lane-major (r0 consecutive values per lane)
-template<typename T, int R0>
-static inline void scatterLanes(const T* bufr, const T* bufi, T* re, T* im, const int* gtab, int VL)
+template<typename T, 정수 R0>
+static inline void scatterLanes(const T* bufr, const T* bufi, T* re, T* im, const 정수* gtab, 정수 VL)
 {
-    for (int l = 0; l < VL; l++)
+    위해 (정수 l = 0; l < VL; l++)
     {
-        int base = gtab[l];
+        정수 base = gtab[l];
         memcpy(re + base, bufr + l*R0, R0*sizeof(T));
         memcpy(im + base, bufi + l*R0, R0*sizeof(T));
     }
 }
 
 template<typename T, typename VT>
-static void firstStage2_vec(const T* x, int M, const int* gtab, T* re, T* im, bool conj)
+static void firstStage2_vec(const T* x, 정수 M, const 정수* gtab, T* re, T* im, bool conj)
 {
-    const int VL = VTraits<VT>::vlanes();
+    const 정수 VL = VTraits<VT>::vlanes();
     const VT imsign = v_signmask_(conj, (T)0);
     T bufr[2*VTraits<VT>::max_nlanes], bufi[2*VTraits<VT>::max_nlanes];
-    int j = 0;
-    for (; j + VL <= M; j += VL)
+    정수 j = 0;
+    위해 (; j + VL <= M; j += VL)
     {
         VT x0r, x0i, x1r, x1i;
         DFT_LOAD_LEG(0, x0r, x0i)
@@ -198,18 +198,18 @@ static void firstStage2_vec(const T* x, int M, const int* gtab, T* re, T* im, bo
         scatterLanes<T, 2>(bufr, bufi, re, im, gtab + j, VL);
     }
     T conjsign = conj ? (T)-1 : (T)1;
-    for (; j < M; j++)
+    위해 (; j < M; j++)
         firstStage2_scalar(x, M, j, re + gtab[j], im + gtab[j], conjsign);
 }
 
 template<typename T, typename VT>
-static void firstStage4_vec(const T* x, int M, const int* gtab, T* re, T* im, bool conj)
+static void firstStage4_vec(const T* x, 정수 M, const 정수* gtab, T* re, T* im, bool conj)
 {
-    const int VL = VTraits<VT>::vlanes();
+    const 정수 VL = VTraits<VT>::vlanes();
     const VT imsign = v_signmask_(conj, (T)0);
     T bufr[4*VTraits<VT>::max_nlanes], bufi[4*VTraits<VT>::max_nlanes];
-    int j = 0;
-    for (; j + VL <= M; j += VL)
+    정수 j = 0;
+    위해 (; j + VL <= M; j += VL)
     {
         VT x0r, x0i, x1r, x1i, x2r, x2i, x3r, x3i, y0r, y0i, y1r, y1i, y2r, y2i, y3r, y3i;
         DFT_LOAD_LEG(0, x0r, x0i)
@@ -222,19 +222,19 @@ static void firstStage4_vec(const T* x, int M, const int* gtab, T* re, T* im, bo
         scatterLanes<T, 4>(bufr, bufi, re, im, gtab + j, VL);
     }
     T conjsign = conj ? (T)-1 : (T)1;
-    for (; j < M; j++)
+    위해 (; j < M; j++)
         firstStage4_scalar(x, M, j, re + gtab[j], im + gtab[j], conjsign);
 }
 
 template<typename T, typename VT>
-static void firstStage8_vec(const T* x, int M, const int* gtab, T* re, T* im, bool conj)
+static void firstStage8_vec(const T* x, 정수 M, const 정수* gtab, T* re, T* im, bool conj)
 {
-    const int VL = VTraits<VT>::vlanes();
+    const 정수 VL = VTraits<VT>::vlanes();
     const VT zero = v_setall_((T)0), imsign = v_signmask_(conj, (T)0);
     const VT c = v_setall_((T)DftConst<T>::sin45);
     T bufr[8*VTraits<VT>::max_nlanes], bufi[8*VTraits<VT>::max_nlanes];
-    int j = 0;
-    for (; j + VL <= M; j += VL)
+    정수 j = 0;
+    위해 (; j + VL <= M; j += VL)
     {
         VT x0r, x0i, x1r, x1i, x2r, x2i, x3r, x3i, x4r, x4i, x5r, x5i, x6r, x6i, x7r, x7i;
         VT e0r, e0i, e1r, e1i, e2r, e2i, e3r, e3i, o0r, o0i, o1r, o1i, o2r, o2i, o3r, o3i;
@@ -257,9 +257,9 @@ static void firstStage8_vec(const T* x, int M, const int* gtab, T* re, T* im, bo
         v_store_interleave(bufi, v_add(e0i, o0i), v_add(e1i, t1i), v_add(e2i, t2i), v_add(e3i, t3i));
         v_store_interleave(bufr + 4*VL, v_sub(e0r, o0r), v_sub(e1r, t1r), v_sub(e2r, t2r), v_sub(e3r, t3r));
         v_store_interleave(bufi + 4*VL, v_sub(e0i, o0i), v_sub(e1i, t1i), v_sub(e2i, t2i), v_sub(e3i, t3i));
-        for (int l = 0; l < VL; l++)
+        위해 (정수 l = 0; l < VL; l++)
         {
-            int base = gtab[j + l];
+            정수 base = gtab[j + l];
             memcpy(re + base, bufr + l*4, 4*sizeof(T));
             memcpy(re + base + 4, bufr + 4*VL + l*4, 4*sizeof(T));
             memcpy(im + base, bufi + l*4, 4*sizeof(T));
@@ -267,7 +267,7 @@ static void firstStage8_vec(const T* x, int M, const int* gtab, T* re, T* im, bo
         }
     }
     T conjsign = conj ? (T)-1 : (T)1;
-    for (; j < M; j++)
+    위해 (; j < M; j++)
         firstStage8_scalar(x, M, j, re + gtab[j], im + gtab[j], conjsign);
 }
 
@@ -282,16 +282,16 @@ void preprocRadix2_(const DftPlan& plan, const void* _src, size_t sstep, void* _
     CV_DbgAssert(sstep == 1); CV_UNUSED(sstep);
     const T* x = (const T*)_src;
     T* re = (T*)_re; T* im = (T*)_im;
-    const int* gtab = plan.itab.data();
-    int M = plan.nc/2;
-#if (CV_SIMD || CV_SIMD_SCALABLE)
-    if constexpr (haveSIMD)
+    const 정수* gtab = plan.itab.data();
+    정수 M = plan.nc/2;
+#만약 (CV_SIMD || CV_SIMD_SCALABLE)
+    만약 constexpr (haveSIMD)
         firstStage2_vec<T, VT>(x, M, gtab, re, im, conj);
-    else
+    아니면
 #endif
     {
         T conjsign = conj ? (T)-1 : (T)1;
-        for (int j = 0; j < M; j++)
+        위해 (정수 j = 0; j < M; j++)
             firstStage2_scalar(x, M, j, re + gtab[j], im + gtab[j], conjsign);
     }
 }
@@ -302,16 +302,16 @@ void preprocRadix4_(const DftPlan& plan, const void* _src, size_t sstep, void* _
     CV_DbgAssert(sstep == 1); CV_UNUSED(sstep);
     const T* x = (const T*)_src;
     T* re = (T*)_re; T* im = (T*)_im;
-    const int* gtab = plan.itab.data();
-    int M = plan.nc/4;
-#if (CV_SIMD || CV_SIMD_SCALABLE)
-    if constexpr (haveSIMD)
+    const 정수* gtab = plan.itab.data();
+    정수 M = plan.nc/4;
+#만약 (CV_SIMD || CV_SIMD_SCALABLE)
+    만약 constexpr (haveSIMD)
         firstStage4_vec<T, VT>(x, M, gtab, re, im, conj);
-    else
+    아니면
 #endif
     {
         T conjsign = conj ? (T)-1 : (T)1;
-        for (int j = 0; j < M; j++)
+        위해 (정수 j = 0; j < M; j++)
             firstStage4_scalar(x, M, j, re + gtab[j], im + gtab[j], conjsign);
     }
 }
@@ -322,16 +322,16 @@ void preprocRadix8_(const DftPlan& plan, const void* _src, size_t sstep, void* _
     CV_DbgAssert(sstep == 1); CV_UNUSED(sstep);
     const T* x = (const T*)_src;
     T* re = (T*)_re; T* im = (T*)_im;
-    const int* gtab = plan.itab.data();
-    int M = plan.nc/8;
-#if (CV_SIMD || CV_SIMD_SCALABLE)
-    if constexpr (haveSIMD)
+    const 정수* gtab = plan.itab.data();
+    정수 M = plan.nc/8;
+#만약 (CV_SIMD || CV_SIMD_SCALABLE)
+    만약 constexpr (haveSIMD)
         firstStage8_vec<T, VT>(x, M, gtab, re, im, conj);
-    else
+    아니면
 #endif
     {
         T conjsign = conj ? (T)-1 : (T)1;
-        for (int j = 0; j < M; j++)
+        위해 (정수 j = 0; j < M; j++)
             firstStage8_scalar(x, M, j, re + gtab[j], im + gtab[j], conjsign);
     }
 }
@@ -342,14 +342,14 @@ void preprocDCT_(const DftPlan& plan, const void* _src, size_t sstep, void* _tmp
 {
     const T* x = (const T*)_src;
     T* v = (T*)_tmp;
-    int n = plan.n, nc = plan.nc, j = 0;
-#if (CV_SIMD || CV_SIMD_SCALABLE)
-    if constexpr (haveSIMD)
+    정수 n = plan.n, nc = plan.nc, j = 0;
+#만약 (CV_SIMD || CV_SIMD_SCALABLE)
+    만약 constexpr (haveSIMD)
     {
-        if (sstep == 1)
+        만약 (sstep == 1)
         {
-            const int VL = VTraits<VT>::vlanes();
-            for (; j + VL <= nc; j += VL)
+            const 정수 VL = VTraits<VT>::vlanes();
+            위해 (; j + VL <= nc; j += VL)
             {
                 VT even, odd;
                 v_load_deinterleave(x + j*2, even, odd);
@@ -359,7 +359,7 @@ void preprocDCT_(const DftPlan& plan, const void* _src, size_t sstep, void* _tmp
         }
     }
 #endif
-    for (; j < nc; j++)
+    위해 (; j < nc; j++)
     {
         v[j] = x[(2*j)*sstep];
         v[n - 1 - j] = x[(2*j + 1)*sstep];
@@ -374,7 +374,7 @@ void preprocDCT_(const DftPlan& plan, const void* _src, size_t sstep, void* _tmp
     T Br = akr - amr, Bi = aki + ami; \
     T Cr = wr[k]*Br + wi[k]*Bi, Ci = wr[k]*Bi - wi[k]*Br; \
     T zkr = Ar - Ci, zki = Ai + Cr, zmr = Ar + Ci, zmi = Cr - Ai;
-#if (CV_SIMD || CV_SIMD_SCALABLE)
+#만약 (CV_SIMD || CV_SIMD_SCALABLE)
 #define DFT_UNTANGLE_INV_VEC(k, akr, aki, amr, ami, zkr, zki, zmr, zmi) \
     VT Ar = v_add(akr, amr), Ai = v_sub(aki, ami); \
     VT Br = v_sub(akr, amr), Bi = v_add(aki, ami); \
@@ -390,17 +390,17 @@ void preprocDCT_(const DftPlan& plan, const void* _src, size_t sstep, void* _tmp
 template<typename T, typename VT, bool haveSIMD>
 static inline void ccsUntangleInv(const DftPlan& plan, T X0, T Xnc, const T* x, T* tmp)
 {
-    int nc = plan.nc;
+    정수 nc = plan.nc;
     const T* wr = (const T*)plan.rtw_re;
     const T* wi = (const T*)plan.rtw_im;
     tmp[0] = X0 + Xnc;
     tmp[1] = X0 - Xnc;
-    int k = 1, m = nc - 1;
-#if (CV_SIMD || CV_SIMD_SCALABLE)
-    if constexpr (haveSIMD)
+    정수 k = 1, m = nc - 1;
+#만약 (CV_SIMD || CV_SIMD_SCALABLE)
+    만약 constexpr (haveSIMD)
     {
-        const int VL = VTraits<VT>::vlanes();
-        for (; m - k + 1 >= 2*VL; k += VL, m -= VL)
+        const 정수 VL = VTraits<VT>::vlanes();
+        위해 (; m - k + 1 >= 2*VL; k += VL, m -= VL)
         {
             VT akr, aki, amr, ami;
             v_load_deinterleave(x + k*2, akr, aki);
@@ -412,14 +412,14 @@ static inline void ccsUntangleInv(const DftPlan& plan, T X0, T Xnc, const T* x, 
         }
     }
 #endif
-    for (; k < m; k++, m--)
+    위해 (; k < m; k++, m--)
     {
         T akr = x[k*2], aki = x[k*2+1], amr = x[m*2], ami = x[m*2+1];
         DFT_UNTANGLE_INV_SCALAR(k, akr, aki, amr, ami, zkr, zki, zmr, zmi)
         tmp[k*2] = zkr; tmp[k*2+1] = zki;
         tmp[m*2] = zmr; tmp[m*2+1] = zmi;
     }
-    if ((nc & 1) == 0 && nc >= 2)
+    만약 ((nc & 1) == 0 && nc >= 2)
     {
         k = nc/2;
         tmp[k*2] = x[k*2]*2;
@@ -432,19 +432,19 @@ void preprocCCS_(const DftPlan& plan, const void* _src, void* _tmp, bool complex
 {
     const T* src = (const T*)_src;
     T* tmp = (T*)_tmp;
-    int n = plan.n, nc = plan.nc;
-    if (nc == n)
+    정수 n = plan.n, nc = plan.nc;
+    만약 (nc == n)
     {
         // odd n: expand the packed half-spectrum into the full conjugate-symmetric spectrum
         tmp[0] = src[0]; tmp[1] = 0;
         const T* x = complex_input ? src + 2 : src + 1;   // X[k] = (x[2(k-1)], x[2(k-1)+1])
-        for (int k = 1; k <= (n-1)/2; k++)
+        위해 (정수 k = 1; k <= (n-1)/2; k++)
         {
             T xr = x[(k-1)*2], xi = x[(k-1)*2+1];
             tmp[k*2] = xr; tmp[k*2+1] = xi;
             tmp[(n-k)*2] = xr; tmp[(n-k)*2+1] = -xi;
         }
-        return;
+        반환;
     }
     T X0 = src[0], Xnc = complex_input ? src[n] : src[n-1];
     // CCS: X[k] = (src[2k-1], src[2k]); complex: X[k] = (src[2k], src[2k+1])
@@ -456,7 +456,7 @@ void preprocIDCT_(const DftPlan& plan, const void* _src, size_t sstep, void* _tm
 {
     const T* src = (const T*)_src;
     T* tmp = (T*)_tmp;
-    int n = plan.n, nc = plan.nc;
+    정수 n = plan.n, nc = plan.nc;
     const T* dr = (const T*)plan.dct_re;
     const T* di = (const T*)plan.dct_im;
     const T* wr = (const T*)plan.rtw_re;
@@ -467,14 +467,14 @@ void preprocIDCT_(const DftPlan& plan, const void* _src, size_t sstep, void* _tm
     T Xnc = src[nc*sstep]*2*dr[nc];
     tmp[0] = X0 + Xnc;
     tmp[1] = X0 - Xnc;
-    int k = 1, m = nc - 1;
-#if (CV_SIMD || CV_SIMD_SCALABLE)
-    if constexpr (haveSIMD)
+    정수 k = 1, m = nc - 1;
+#만약 (CV_SIMD || CV_SIMD_SCALABLE)
+    만약 constexpr (haveSIMD)
     {
-        if (sstep == 1)
+        만약 (sstep == 1)
         {
-            const int VL = VTraits<VT>::vlanes();
-            for (; m - k + 1 >= 2*VL; k += VL, m -= VL)
+            const 정수 VL = VTraits<VT>::vlanes();
+            위해 (; m - k + 1 >= 2*VL; k += VL, m -= VL)
             {
                 VT a = vx_load(src + k), b = v_reverse(vx_load(src + n - k - VL + 1));   // src[k+l], src[n-k-l]
                 VT dkr = vx_load(dr + k), dki = vx_load(di + k);
@@ -489,7 +489,7 @@ void preprocIDCT_(const DftPlan& plan, const void* _src, size_t sstep, void* _tm
         }
     }
 #endif
-    for (; k < m; k++, m--)
+    위해 (; k < m; k++, m--)
     {
         T a = src[k*sstep], b = src[(n-k)*sstep];
         T akr = dr[k]*a - di[k]*b, aki = -dr[k]*b - di[k]*a;
@@ -499,7 +499,7 @@ void preprocIDCT_(const DftPlan& plan, const void* _src, size_t sstep, void* _tm
         tmp[k*2] = zkr; tmp[k*2+1] = zki;
         tmp[m*2] = zmr; tmp[m*2+1] = zmi;
     }
-    if ((nc & 1) == 0 && nc >= 2)
+    만약 ((nc & 1) == 0 && nc >= 2)
     {
         k = nc/2;
         T a = src[k*sstep], b = src[(n-k)*sstep];
@@ -529,14 +529,14 @@ template<typename T>
 void radix3_scalar(const DftStage& st, const T* sre, const T* sim, T* dre, T* dim)
 {
     const T* twr = (const T*)st.tw_re; const T* twi = (const T*)st.tw_im;
-    int L = st.span, G = st.ngroups, ts = st.tw_stride;
+    정수 L = st.span, G = st.ngroups, ts = st.tw_stride;
     const T s120 = DftConst<T>::sin120;
-    for (int g = 0; g < G; g++)
+    위해 (정수 g = 0; g < G; g++)
     {
-        int base = g*3*L;
-        for (int j = 0; j < L; j++)
+        정수 base = g*3*L;
+        위해 (정수 j = 0; j < L; j++)
         {
-            int i0 = base + j, i1 = i0 + L, i2 = i1 + L;
+            정수 i0 = base + j, i1 = i0 + L, i2 = i1 + L;
             T x0r = sre[i0], x0i = sim[i0], x1r, x1i, x2r, x2i;
             DFT_CMUL(x1r, x1i, sre[i1], sim[i1], twr[j], twi[j]);
             DFT_CMUL(x2r, x2i, sre[i2], sim[i2], twr[ts + j], twi[ts + j]);
@@ -554,13 +554,13 @@ template<typename T>
 void radix4_scalar(const DftStage& st, const T* sre, const T* sim, T* dre, T* dim)
 {
     const T* twr = (const T*)st.tw_re; const T* twi = (const T*)st.tw_im;
-    int L = st.span, G = st.ngroups, ts = st.tw_stride;
-    for (int g = 0; g < G; g++)
+    정수 L = st.span, G = st.ngroups, ts = st.tw_stride;
+    위해 (정수 g = 0; g < G; g++)
     {
-        int base = g*4*L;
-        for (int j = 0; j < L; j++)
+        정수 base = g*4*L;
+        위해 (정수 j = 0; j < L; j++)
         {
-            int i0 = base + j, i1 = i0 + L, i2 = i1 + L, i3 = i2 + L;
+            정수 i0 = base + j, i1 = i0 + L, i2 = i1 + L, i3 = i2 + L;
             T x0r = sre[i0], x0i = sim[i0], x1r, x1i, x2r, x2i, x3r, x3i;
             DFT_CMUL(x1r, x1i, sre[i1], sim[i1], twr[j], twi[j]);
             DFT_CMUL(x2r, x2i, sre[i2], sim[i2], twr[ts + j], twi[ts + j]);
@@ -575,14 +575,14 @@ template<typename T>
 void radix5_scalar(const DftStage& st, const T* sre, const T* sim, T* dre, T* dim)
 {
     const T* twr = (const T*)st.tw_re; const T* twi = (const T*)st.tw_im;
-    int L = st.span, G = st.ngroups, ts = st.tw_stride;
+    정수 L = st.span, G = st.ngroups, ts = st.tw_stride;
     const T c5 = DftConst<T>::fft5_2, s1 = DftConst<T>::sin72, s2 = DftConst<T>::sin144;
-    for (int g = 0; g < G; g++)
+    위해 (정수 g = 0; g < G; g++)
     {
-        int base = g*5*L;
-        for (int j = 0; j < L; j++)
+        정수 base = g*5*L;
+        위해 (정수 j = 0; j < L; j++)
         {
-            int i0 = base + j, i1 = i0 + L, i2 = i1 + L, i3 = i2 + L, i4 = i3 + L;
+            정수 i0 = base + j, i1 = i0 + L, i2 = i1 + L, i3 = i2 + L, i4 = i3 + L;
             T x0r = sre[i0], x0i = sim[i0], x1r, x1i, x2r, x2i, x3r, x3i, x4r, x4i;
             DFT_CMUL(x1r, x1i, sre[i1], sim[i1], twr[j], twi[j]);
             DFT_CMUL(x2r, x2i, sre[i2], sim[i2], twr[ts + j], twi[ts + j]);
@@ -611,19 +611,19 @@ void radixOdd_scalar(const DftStage& st, const T* sre, const T* sim, T* dre, T* 
 {
     const T* twr = (const T*)st.tw_re; const T* twi = (const T*)st.tw_im;
     const T* cs = (const T*)st.cs; const T* sn = (const T*)st.sn;
-    int L = st.span, G = st.ngroups, ts = st.tw_stride, r = st.radix, h = (r - 1)/2;
+    정수 L = st.span, G = st.ngroups, ts = st.tw_stride, r = st.radix, h = (r - 1)/2;
     T* ar = scratch; T* ai = ar + h; T* br = ai + h; T* bi = br + h;
-    for (int g = 0; g < G; g++)
+    위해 (정수 g = 0; g < G; g++)
     {
-        int base = g*r*L;
-        for (int j = 0; j < L; j++)
+        정수 base = g*r*L;
+        위해 (정수 j = 0; j < L; j++)
         {
-            int i0 = base + j;
+            정수 i0 = base + j;
             T x0r = sre[i0], x0i = sim[i0];
             T X0r = x0r, X0i = x0i;
-            for (int p = 1; p <= h; p++)
+            위해 (정수 p = 1; p <= h; p++)
             {
-                int ip = i0 + p*L, iq = i0 + (r-p)*L;
+                정수 ip = i0 + p*L, iq = i0 + (r-p)*L;
                 T xpr, xpi, xqr, xqi;
                 DFT_CMUL(xpr, xpi, sre[ip], sim[ip], twr[(p-1)*ts + j], twi[(p-1)*ts + j]);
                 DFT_CMUL(xqr, xqi, sre[iq], sim[iq], twr[(r-p-1)*ts + j], twi[(r-p-1)*ts + j]);
@@ -632,10 +632,10 @@ void radixOdd_scalar(const DftStage& st, const T* sre, const T* sim, T* dre, T* 
                 X0r += ar[p-1]; X0i += ai[p-1];
             }
             dre[i0] = X0r; dim[i0] = X0i;
-            for (int k = 1; k <= h; k++)
+            위해 (정수 k = 1; k <= h; k++)
             {
                 T sr = x0r, si = x0i, tr = 0, ti = 0;
-                for (int p = 1; p <= h; p++)
+                위해 (정수 p = 1; p <= h; p++)
                 {
                     T c = cs[(p-1)*h + (k-1)], s = sn[(p-1)*h + (k-1)];
                     sr += c*ar[p-1]; si += c*ai[p-1];
@@ -650,11 +650,11 @@ void radixOdd_scalar(const DftStage& st, const T* sre, const T* sim, T* dre, T* 
 
 #undef DFT_CMUL
 
-#if (CV_SIMD || CV_SIMD_SCALABLE)
+#만약 (CV_SIMD || CV_SIMD_SCALABLE)
 
 // dst = a*s + c, s is a scalar constant of the stage (the compiler hoists the broadcast)
 template<typename VT, typename T>
-inline VT v_fma_n(const VT& a, T s, const VT& c) { return v_fma(a, v_setall_(s), c); }
+inline VT v_fma_n(const VT& a, T s, const VT& c) { 반환 v_fma(a, v_setall_(s), c); }
 
 // (xr, xi) = (ar, ai) * (wr, wi)
 #define DFT_VCMUL(xr, xi, ar, ai, wr, wi) \
@@ -662,13 +662,13 @@ inline VT v_fma_n(const VT& a, T s, const VT& c) { return v_fma(a, v_setall_(s),
 
 // the flat loop of the brief (section 5): clamp, body, branchless wrap
 #define DFT_VLOOP_BEGIN(r) \
-    int j = 0, base = 0; \
-    for (int t = 0; t < st.nsteps; t++) \
+    정수 j = 0, base = 0; \
+    위해 (정수 t = 0; t < st.nsteps; t++) \
     { \
         j = std::min(j, L - VL);
 #define DFT_VLOOP_END(r) \
-        int nj = j + VL; \
-        int wrap = -(int)(nj >= L); \
+        정수 nj = j + VL; \
+        정수 wrap = -(정수)(nj >= L); \
         base += ((r)*L) & wrap; \
         j = nj & ~wrap; \
     }
@@ -677,10 +677,10 @@ template<typename T, typename VT>
 void radix3_vec(const DftStage& st, const T* sre, const T* sim, T* dre, T* dim)
 {
     const T* twr = (const T*)st.tw_re; const T* twi = (const T*)st.tw_im;
-    const int L = st.span, ts = st.tw_stride, VL = VTraits<VT>::vlanes();
+    const 정수 L = st.span, ts = st.tw_stride, VL = VTraits<VT>::vlanes();
     const VT s120 = v_setall_((T)DftConst<T>::sin120), half = v_setall_((T)0.5);
     DFT_VLOOP_BEGIN(3)
-        int i0 = base + j, i1 = i0 + L, i2 = i1 + L;
+        정수 i0 = base + j, i1 = i0 + L, i2 = i1 + L;
         VT x0r = vx_load(sre + i0), x0i = vx_load(sim + i0), x1r, x1i, x2r, x2i;
         DFT_VCMUL(x1r, x1i, vx_load(sre + i1), vx_load(sim + i1), vx_load(twr + j), vx_load(twi + j));
         DFT_VCMUL(x2r, x2i, vx_load(sre + i2), vx_load(sim + i2), vx_load(twr + ts + j), vx_load(twi + ts + j));
@@ -697,9 +697,9 @@ template<typename T, typename VT>
 void radix4_vec(const DftStage& st, const T* sre, const T* sim, T* dre, T* dim)
 {
     const T* twr = (const T*)st.tw_re; const T* twi = (const T*)st.tw_im;
-    const int L = st.span, ts = st.tw_stride, VL = VTraits<VT>::vlanes();
+    const 정수 L = st.span, ts = st.tw_stride, VL = VTraits<VT>::vlanes();
     DFT_VLOOP_BEGIN(4)
-        int i0 = base + j, i1 = i0 + L, i2 = i1 + L, i3 = i2 + L;
+        정수 i0 = base + j, i1 = i0 + L, i2 = i1 + L, i3 = i2 + L;
         VT x0r = vx_load(sre + i0), x0i = vx_load(sim + i0), x1r, x1i, x2r, x2i, x3r, x3i;
         DFT_VCMUL(x1r, x1i, vx_load(sre + i1), vx_load(sim + i1), vx_load(twr + j), vx_load(twi + j));
         DFT_VCMUL(x2r, x2i, vx_load(sre + i2), vx_load(sim + i2), vx_load(twr + ts + j), vx_load(twi + ts + j));
@@ -717,11 +717,11 @@ template<typename T, typename VT>
 void radix5_vec(const DftStage& st, const T* sre, const T* sim, T* dre, T* dim)
 {
     const T* twr = (const T*)st.tw_re; const T* twi = (const T*)st.tw_im;
-    const int L = st.span, ts = st.tw_stride, VL = VTraits<VT>::vlanes();
+    const 정수 L = st.span, ts = st.tw_stride, VL = VTraits<VT>::vlanes();
     const T c5 = DftConst<T>::fft5_2, s1 = DftConst<T>::sin72, s2 = DftConst<T>::sin144;
     const VT quarter = v_setall_((T)0.25);
     DFT_VLOOP_BEGIN(5)
-        int i0 = base + j, i1 = i0 + L, i2 = i1 + L, i3 = i2 + L, i4 = i3 + L;
+        정수 i0 = base + j, i1 = i0 + L, i2 = i1 + L, i3 = i2 + L, i4 = i3 + L;
         VT x0r = vx_load(sre + i0), x0i = vx_load(sim + i0), x1r, x1i, x2r, x2i, x3r, x3i, x4r, x4i;
         DFT_VCMUL(x1r, x1i, vx_load(sre + i1), vx_load(sim + i1), vx_load(twr + j), vx_load(twi + j));
         DFT_VCMUL(x2r, x2i, vx_load(sre + i2), vx_load(sim + i2), vx_load(twr + ts + j), vx_load(twi + ts + j));
@@ -750,15 +750,15 @@ void radixOdd_vec(const DftStage& st, const T* sre, const T* sim, T* dre, T* dim
 {
     const T* twr = (const T*)st.tw_re; const T* twi = (const T*)st.tw_im;
     const T* cs = (const T*)st.cs; const T* sn = (const T*)st.sn;
-    const int L = st.span, ts = st.tw_stride, VL = VTraits<VT>::vlanes(), r = st.radix, h = (r - 1)/2;
+    const 정수 L = st.span, ts = st.tw_stride, VL = VTraits<VT>::vlanes(), r = st.radix, h = (r - 1)/2;
     T* ar = scratch; T* ai = ar + h*VL; T* br = ai + h*VL; T* bi = br + h*VL;
     DFT_VLOOP_BEGIN(r)
-        int i0 = base + j;
+        정수 i0 = base + j;
         VT x0r = vx_load(sre + i0), x0i = vx_load(sim + i0);
         VT X0r = x0r, X0i = x0i;
-        for (int p = 1; p <= h; p++)
+        위해 (정수 p = 1; p <= h; p++)
         {
-            int ip = i0 + p*L, iq = i0 + (r-p)*L;
+            정수 ip = i0 + p*L, iq = i0 + (r-p)*L;
             VT xpr, xpi, xqr, xqi;
             DFT_VCMUL(xpr, xpi, vx_load(sre + ip), vx_load(sim + ip),
                       vx_load(twr + (p-1)*ts + j), vx_load(twi + (p-1)*ts + j));
@@ -770,10 +770,10 @@ void radixOdd_vec(const DftStage& st, const T* sre, const T* sim, T* dre, T* dim
             X0r = v_add(X0r, apr); X0i = v_add(X0i, api);
         }
         v_store(dre + i0, X0r); v_store(dim + i0, X0i);
-        for (int k = 1; k <= h; k++)
+        위해 (정수 k = 1; k <= h; k++)
         {
             VT sr = x0r, si = x0i, tr = v_setall_((T)0), ti = tr;
-            for (int p = 1; p <= h; p++)
+            위해 (정수 p = 1; p <= h; p++)
             {
                 T c = cs[(p-1)*h + (k-1)], s = sn[(p-1)*h + (k-1)];
                 sr = v_fma_n(vx_load(ar + (p-1)*VL), c, sr); si = v_fma_n(vx_load(ai + (p-1)*VL), c, si);
@@ -795,13 +795,13 @@ void radixOdd_vec(const DftStage& st, const T* sre, const T* sim, T* dre, T* dim
 template<typename T, typename VT, bool haveSIMD>
 void radix3_(const DftStage& st, const void* sre, const void* sim, void* dre, void* dim, void*)
 {
-#if (CV_SIMD || CV_SIMD_SCALABLE)
-    if constexpr (haveSIMD)
+#만약 (CV_SIMD || CV_SIMD_SCALABLE)
+    만약 constexpr (haveSIMD)
     {
-        if (st.mode == DFT_STAGE_FULL)
+        만약 (st.mode == DFT_STAGE_FULL)
         {
             radix3_vec<T, VT>(st, (const T*)sre, (const T*)sim, (T*)dre, (T*)dim);
-            return;
+            반환;
         }
     }
 #endif
@@ -811,13 +811,13 @@ void radix3_(const DftStage& st, const void* sre, const void* sim, void* dre, vo
 template<typename T, typename VT, bool haveSIMD>
 void radix4_(const DftStage& st, const void* sre, const void* sim, void* dre, void* dim, void*)
 {
-#if (CV_SIMD || CV_SIMD_SCALABLE)
-    if constexpr (haveSIMD)
+#만약 (CV_SIMD || CV_SIMD_SCALABLE)
+    만약 constexpr (haveSIMD)
     {
-        if (st.mode == DFT_STAGE_FULL)
+        만약 (st.mode == DFT_STAGE_FULL)
         {
             radix4_vec<T, VT>(st, (const T*)sre, (const T*)sim, (T*)dre, (T*)dim);
-            return;
+            반환;
         }
     }
 #endif
@@ -827,13 +827,13 @@ void radix4_(const DftStage& st, const void* sre, const void* sim, void* dre, vo
 template<typename T, typename VT, bool haveSIMD>
 void radix5_(const DftStage& st, const void* sre, const void* sim, void* dre, void* dim, void*)
 {
-#if (CV_SIMD || CV_SIMD_SCALABLE)
-    if constexpr (haveSIMD)
+#만약 (CV_SIMD || CV_SIMD_SCALABLE)
+    만약 constexpr (haveSIMD)
     {
-        if (st.mode == DFT_STAGE_FULL)
+        만약 (st.mode == DFT_STAGE_FULL)
         {
             radix5_vec<T, VT>(st, (const T*)sre, (const T*)sim, (T*)dre, (T*)dim);
-            return;
+            반환;
         }
     }
 #endif
@@ -844,13 +844,13 @@ void radix5_(const DftStage& st, const void* sre, const void* sim, void* dre, vo
 template<typename T, typename VT, bool haveSIMD>
 void radixOdd_(const DftStage& st, const void* sre, const void* sim, void* dre, void* dim, void* scratch)
 {
-#if (CV_SIMD || CV_SIMD_SCALABLE)
-    if constexpr (haveSIMD)
+#만약 (CV_SIMD || CV_SIMD_SCALABLE)
+    만약 constexpr (haveSIMD)
     {
-        if (st.mode == DFT_STAGE_FULL)
+        만약 (st.mode == DFT_STAGE_FULL)
         {
             radixOdd_vec<T, VT>(st, (const T*)sre, (const T*)sim, (T*)dre, (T*)dim, (T*)scratch);
-            return;
+            반환;
         }
     }
 #endif
@@ -871,18 +871,18 @@ void postprocDFT_(const DftPlan& plan, const void* _re, const void* _im, void* _
 {
     const T* re = (const T*)_re; const T* im = (const T*)_im;
     T* dst = (T*)_dst;
-    int nc = plan.nc, i = 0;
+    정수 nc = plan.nc, i = 0;
     T rs = (T)re_scale, is = (T)im_scale;
-#if (CV_SIMD || CV_SIMD_SCALABLE)
-    if constexpr (haveSIMD)
+#만약 (CV_SIMD || CV_SIMD_SCALABLE)
+    만약 constexpr (haveSIMD)
     {
-        const int VL = VTraits<VT>::vlanes();
+        const 정수 VL = VTraits<VT>::vlanes();
         VT vrs = v_setall_(rs), vis = v_setall_(is);
-        for (; i + VL <= nc; i += VL)
+        위해 (; i + VL <= nc; i += VL)
             v_store_interleave(dst + i*2, v_mul(vx_load(re + i), vrs), v_mul(vx_load(im + i), vis));
     }
 #endif
-    for (; i < nc; i++)
+    위해 (; i < nc; i++)
     {
         dst[i*2] = re[i]*rs;
         dst[i*2+1] = im[i]*is;
@@ -894,18 +894,18 @@ void postprocReal_(const DftPlan& plan, const void* _re, void* _dst, double scal
 {
     const T* re = (const T*)_re;
     T* dst = (T*)_dst;
-    int nc = plan.nc, i = 0;
+    정수 nc = plan.nc, i = 0;
     T s = (T)scale;
-#if (CV_SIMD || CV_SIMD_SCALABLE)
-    if constexpr (haveSIMD)
+#만약 (CV_SIMD || CV_SIMD_SCALABLE)
+    만약 constexpr (haveSIMD)
     {
-        const int VL = VTraits<VT>::vlanes();
+        const 정수 VL = VTraits<VT>::vlanes();
         VT vs = v_setall_(s);
-        for (; i + VL <= nc; i += VL)
+        위해 (; i + VL <= nc; i += VL)
             v_store(dst + i, v_mul(vx_load(re + i), vs));
     }
 #endif
-    for (; i < nc; i++)
+    위해 (; i < nc; i++)
         dst[i] = re[i]*s;
 }
 
@@ -920,7 +920,7 @@ void postprocReal_(const DftPlan& plan, const void* _re, void* _dst, double scal
     T Pr = wr[k]*Or - wi[k]*Oi, Pi = wr[k]*Oi + wi[k]*Or; \
     T Xkr = Er + Pr, Xki = Ei + Pi, Xmr = Er - Pr, Xmi = Pi - Ei;
 
-#if (CV_SIMD || CV_SIMD_SCALABLE)
+#만약 (CV_SIMD || CV_SIMD_SCALABLE)
 // vector version: lanes l = 0..VL-1 hold k+l (ascending) and m-l (descending; loaded reversed)
 #define DFT_UNTANGLE_FWD_VEC(k, m, Xkr, Xki, Xmr, Xmi) \
     VT rk = vx_load(re + (k)), ik = vx_load(im + (k)); \
@@ -935,16 +935,16 @@ void postprocReal_(const DftPlan& plan, const void* _re, void* _dst, double scal
 template<typename T, typename VT, bool haveSIMD>
 static inline void ccsUntangleFwd(const DftPlan& plan, const T* re, const T* im, T s, T* out)
 {
-    int nc = plan.nc;
+    정수 nc = plan.nc;
     const T* wr = (const T*)plan.rtw_re;
     const T* wi = (const T*)plan.rtw_im;
-    int k = 1, m = nc - 1;
-#if (CV_SIMD || CV_SIMD_SCALABLE)
-    if constexpr (haveSIMD)
+    정수 k = 1, m = nc - 1;
+#만약 (CV_SIMD || CV_SIMD_SCALABLE)
+    만약 constexpr (haveSIMD)
     {
-        const int VL = VTraits<VT>::vlanes();
+        const 정수 VL = VTraits<VT>::vlanes();
         const VT half = v_setall_((T)0.5), vs = v_setall_(s);
-        for (; m - k + 1 >= 2*VL; k += VL, m -= VL)
+        위해 (; m - k + 1 >= 2*VL; k += VL, m -= VL)
         {
             DFT_UNTANGLE_FWD_VEC(k, m, Xkr, Xki, Xmr, Xmi)
             v_store_interleave(out + k*2 - 1, v_mul(Xkr, vs), v_mul(Xki, vs));
@@ -952,13 +952,13 @@ static inline void ccsUntangleFwd(const DftPlan& plan, const T* re, const T* im,
         }
     }
 #endif
-    for (; k < m; k++, m--)
+    위해 (; k < m; k++, m--)
     {
         DFT_UNTANGLE_FWD_SCALAR(k, m, Xkr, Xki, Xmr, Xmi)
         out[k*2-1] = Xkr*s; out[k*2] = Xki*s;
         out[m*2-1] = Xmr*s; out[m*2] = Xmi*s;
     }
-    if ((nc & 1) == 0 && nc >= 2)
+    만약 ((nc & 1) == 0 && nc >= 2)
     {
         k = nc/2;
         out[k*2-1] = re[k]*s; out[k*2] = -im[k]*s;
@@ -971,32 +971,32 @@ void postprocRealDFT_(const DftPlan& plan, const void* _re, const void* _im, voi
 {
     const T* re = (const T*)_re; const T* im = (const T*)_im;
     T* dst = (T*)_dst;
-    int n = plan.n, nc = plan.nc;
+    정수 n = plan.n, nc = plan.nc;
     T s = (T)scale;
-    if (nc == n)
+    만약 (nc == n)
     {
         // odd n: the full complex spectrum was computed
-        if (complex_output)
+        만약 (complex_output)
             postprocDFT_<T, VT, haveSIMD>(plan, _re, _im, _dst, scale, scale);
-        else
+        아니면
         {
             dst[0] = re[0]*s;
-            for (int k = 1; k <= (n-1)/2; k++)
+            위해 (정수 k = 1; k <= (n-1)/2; k++)
             {
                 dst[k*2-1] = re[k]*s;
                 dst[k*2] = im[k]*s;
             }
         }
-        return;
+        반환;
     }
     T X0 = (re[0] + im[0])*s, Xnc = (re[0] - im[0])*s;
     ccsUntangleFwd<T, VT, haveSIMD>(plan, re, im, s, complex_output ? dst + 1 : dst);
-    if (complex_output)
+    만약 (complex_output)
     {
         dst[0] = X0; dst[1] = 0;
         dst[n] = Xnc; dst[n+1] = 0;
     }
-    else
+    아니면
     {
         dst[0] = X0;
         dst[n-1] = Xnc;
@@ -1008,7 +1008,7 @@ void postprocDCT_(const DftPlan& plan, const void* _re, const void* _im, void* _
 {
     const T* re = (const T*)_re; const T* im = (const T*)_im;
     T* dst = (T*)_dst;
-    int n = plan.n, nc = plan.nc;
+    정수 n = plan.n, nc = plan.nc;
     const T* wr = (const T*)plan.rtw_re;
     const T* wi = (const T*)plan.rtw_im;
     const T* dr = (const T*)plan.dct_re;
@@ -1018,15 +1018,15 @@ void postprocDCT_(const DftPlan& plan, const void* _re, const void* _im, void* _
     T X0 = re[0] + im[0], Xnc = re[0] - im[0];
     dst[0] = X0*dr[0]*DftConst<T>::sin45;
     dst[nc*dstep] = Xnc*dr[nc];
-    int k = 1, m = nc - 1;
-#if (CV_SIMD || CV_SIMD_SCALABLE)
-    if constexpr (haveSIMD)
+    정수 k = 1, m = nc - 1;
+#만약 (CV_SIMD || CV_SIMD_SCALABLE)
+    만약 constexpr (haveSIMD)
     {
-        if (dstep == 1)
+        만약 (dstep == 1)
         {
-            const int VL = VTraits<VT>::vlanes();
+            const 정수 VL = VTraits<VT>::vlanes();
             const VT half = v_setall_((T)0.5);
-            for (; m - k + 1 >= 2*VL; k += VL, m -= VL)
+            위해 (; m - k + 1 >= 2*VL; k += VL, m -= VL)
             {
                 DFT_UNTANGLE_FWD_VEC(k, m, Xkr, Xki, Xmr, Xmi)
                 VT dkr = vx_load(dr + k), dki = vx_load(di + k);
@@ -1039,7 +1039,7 @@ void postprocDCT_(const DftPlan& plan, const void* _re, const void* _im, void* _
         }
     }
 #endif
-    for (; k < m; k++, m--)
+    위해 (; k < m; k++, m--)
     {
         DFT_UNTANGLE_FWD_SCALAR(k, m, Xkr, Xki, Xmr, Xmi)
         dst[k*dstep] = Xkr*dr[k] - Xki*di[k];
@@ -1047,7 +1047,7 @@ void postprocDCT_(const DftPlan& plan, const void* _re, const void* _im, void* _
         dst[m*dstep] = Xmr*dr[m] - Xmi*di[m];
         dst[(n-m)*dstep] = -(Xmr*di[m] + Xmi*dr[m]);
     }
-    if ((nc & 1) == 0 && nc >= 2)
+    만약 ((nc & 1) == 0 && nc >= 2)
     {
         k = nc/2;
         T Xkr = re[k], Xki = -im[k];
@@ -1064,20 +1064,20 @@ void postprocIDCT_(const DftPlan& plan, const void* _re, const void* _im, void* 
 {
     const T* re = (const T*)_re; const T* im = (const T*)_im;
     T* dst = (T*)_dst;
-    int n = plan.n, nc = plan.nc;
+    정수 n = plan.n, nc = plan.nc;
     // out[2m] = re[m], out[2m+1] = -im[m] (conjugation trick) is the CCS inverse result;
     // Makhoul reordering: dst[2j] = out[j], dst[2j+1] = out[n-1-j], i.e. for j = 2m, 2m+1:
     // dst[4m..4m+3] = (re[m], -im[nc-1-m], -im[m], re[nc-1-m]).
-    int j = 0;
-#if (CV_SIMD || CV_SIMD_SCALABLE)
-    if constexpr (haveSIMD)
+    정수 j = 0;
+#만약 (CV_SIMD || CV_SIMD_SCALABLE)
+    만약 constexpr (haveSIMD)
     {
-        if (dstep == 1)
+        만약 (dstep == 1)
         {
-            const int VL = VTraits<VT>::vlanes();
+            const 정수 VL = VTraits<VT>::vlanes();
             const VT zero = v_setall_((T)0);
-            int m = 0;
-            for (; m + VL <= nc/2; m += VL)
+            정수 m = 0;
+            위해 (; m + VL <= nc/2; m += VL)
             {
                 VT a = vx_load(re + m);
                 VT b = v_sub(zero, v_reverse(vx_load(im + nc - m - VL)));
@@ -1090,17 +1090,17 @@ void postprocIDCT_(const DftPlan& plan, const void* _re, const void* _im, void* 
     }
 #endif
     // j even: out[j] = re[j/2], out[n-1-j] = -im[(n-1-j)/2]; j odd: out[j] = -im[j/2], out[n-1-j] = re[(n-1-j)/2]
-    for (; j + 1 < nc; j += 2)
+    위해 (; j + 1 < nc; j += 2)
     {
-        int m = j >> 1, q = (n - 1 - j) >> 1;
+        정수 m = j >> 1, q = (n - 1 - j) >> 1;
         dst[(2*j)*dstep] = re[m];
         dst[(2*j+1)*dstep] = -im[q];
         dst[(2*j+2)*dstep] = -im[m];
         dst[(2*j+3)*dstep] = re[q];
     }
-    if (j < nc)     // nc odd: the last j is even
+    만약 (j < nc)     // nc odd: the last j is even
     {
-        int m = j >> 1, q = (n - 1 - j) >> 1;
+        정수 m = j >> 1, q = (n - 1 - j) >> 1;
         dst[(2*j)*dstep] = re[m];
         dst[(2*j+1)*dstep] = -im[q];
     }
@@ -1128,30 +1128,30 @@ DFTKernels makeKernels()
     k.postprocReal = postprocReal_<T, VT, haveSIMD>;
     k.postprocDCT = postprocDCT_<T, VT, haveSIMD>;
     k.postprocIDCT = postprocIDCT_<T, VT, haveSIMD>;
-    if constexpr (haveSIMD)
+    만약 constexpr (haveSIMD)
         k.vlanes = VTraits<VT>::vlanes();
-    else
+    아니면
         k.vlanes = 1;
-    return k;
+    반환 k;
 }
 
 } // namespace
 
-DFTKernels getDFTKernels_(int depth)
+DFTKernels getDFTKernels_(정수 depth)
 {
-    if (depth == CV_32F)
+    만약 (depth == CV_32F)
     {
-#if (CV_SIMD || CV_SIMD_SCALABLE)
-        return makeKernels<float, v_float32, true>();
-#else
-        return makeKernels<float, float, false>();
+#만약 (CV_SIMD || CV_SIMD_SCALABLE)
+        반환 makeKernels<float, v_float32, true>();
+#아니면
+        반환 makeKernels<float, float, false>();
 #endif
     }
     CV_Assert(depth == CV_64F);
-#if (CV_SIMD_64F || CV_SIMD_SCALABLE_64F)
-    return makeKernels<double, v_float64, true>();
-#else
-    return makeKernels<double, double, false>();
+#만약 (CV_SIMD_64F || CV_SIMD_SCALABLE_64F)
+    반환 makeKernels<double, v_float64, true>();
+#아니면
+    반환 makeKernels<double, double, false>();
 #endif
 }
 

@@ -16,12 +16,12 @@
 #ifdef DEBUG_FS_UTILS
 #include <iostream>
 #define DBG(...) __VA_ARGS__
-#else
+#아니면
 #define DBG(...)
 #endif
 
 
-#if OPENCV_HAVE_FILESYSTEM_SUPPORT
+#만약 OPENCV_HAVE_FILESYSTEM_SUPPORT
 
 #ifdef _WIN32
 #define WIN32_LEAN_AND_MEAN
@@ -48,73 +48,73 @@ namespace cv { namespace utils { namespace fs {
 
 #ifdef _WIN32
 static const char native_separator = '\\';
-#else
+#아니면
 static const char native_separator = '/';
 #endif
 
 static inline
 bool isPathSeparator(char c)
 {
-    return c == '/' || c == '\\';
+    반환 c == '/' || c == '\\';
 }
 
 cv::String join(const cv::String& base, const cv::String& path)
 {
-    if (base.empty())
-        return path;
-    if (path.empty())
-        return base;
+    만약 (base.empty())
+        반환 path;
+    만약 (path.empty())
+        반환 base;
 
     bool baseSep = isPathSeparator(base[base.size() - 1]);
     bool pathSep = isPathSeparator(path[0]);
     String result;
-    if (baseSep && pathSep)
+    만약 (baseSep && pathSep)
     {
         result = base + path.substr(1);
     }
-    else if (!baseSep && !pathSep)
+    아니면 만약 (!baseSep && !pathSep)
     {
         result = base + native_separator + path;
     }
-    else
+    아니면
     {
         result = base + path;
     }
-    return result;
+    반환 result;
 }
 
 CV_EXPORTS cv::String getParent(const cv::String &path)
 {
     std::string::size_type loc = path.find_last_of("/\\");
-    if (loc == std::string::npos)
-        return std::string();
-    return std::string(path, 0, loc);
+    만약 (loc == std::string::npos)
+        반환 std::string();
+    반환 std::string(path, 0, loc);
 }
 
 CV_EXPORTS std::wstring getParent(const std::wstring& path)
 {
     std::wstring::size_type loc = path.find_last_of(L"/\\");
-    if (loc == std::wstring::npos)
-        return std::wstring();
-    return std::wstring(path, 0, loc);
+    만약 (loc == std::wstring::npos)
+        반환 std::wstring();
+    반환 std::wstring(path, 0, loc);
 }
 
-#if OPENCV_HAVE_FILESYSTEM_SUPPORT
+#만약 OPENCV_HAVE_FILESYSTEM_SUPPORT
 
 cv::String canonical(const cv::String& path)
 {
     cv::String result;
 #ifdef _WIN32
     const char* result_str = _fullpath(NULL, path.c_str(), 0);
-#else
+#아니면
     const char* result_str = realpath(path.c_str(), NULL);
 #endif
-    if (result_str)
+    만약 (result_str)
     {
         result = cv::String(result_str);
         free((void*)result_str);
     }
-    return result.empty() ? path : result;
+    반환 result.empty() ? path : result;
 }
 
 
@@ -122,7 +122,7 @@ bool exists(const cv::String& path)
 {
     CV_INSTRUMENT_REGION();
 
-#if defined _WIN32 || defined WINCE
+#만약 defined _WIN32 || defined WINCE
     BOOL status = TRUE;
     {
         WIN32_FILE_ATTRIBUTE_DATA all_attrs;
@@ -131,49 +131,49 @@ bool exists(const cv::String& path)
         size_t copied = mbstowcs(wpath, path.c_str(), MAX_PATH);
         CV_Assert((copied != MAX_PATH) && (copied != (size_t)-1));
         status = ::GetFileAttributesExW(wpath, GetFileExInfoStandard, &all_attrs);
-#else
+#아니면
         status = ::GetFileAttributesExA(path.c_str(), GetFileExInfoStandard, &all_attrs);
 #endif
     }
 
-    return !!status;
-#else
+    반환 !!status;
+#아니면
     struct stat stat_buf;
-    return (0 == stat(path.c_str(), &stat_buf));
+    반환 (0 == stat(path.c_str(), &stat_buf));
 #endif
 }
 
 CV_EXPORTS void remove_all(const cv::String& path)
 {
-    if (!exists(path))
-        return;
-    if (isDirectory(path))
+    만약 (!exists(path))
+        반환;
+    만약 (isDirectory(path))
     {
         std::vector<String> entries;
         utils::fs::glob(path, cv::String(), entries, false, true);
-        for (size_t i = 0; i < entries.size(); i++)
+        위해 (size_t i = 0; i < entries.size(); i++)
         {
             const String& e = entries[i];
             remove_all(e);
         }
 #ifdef _MSC_VER
         bool result = _rmdir(path.c_str()) == 0;
-#else
+#아니면
         bool result = rmdir(path.c_str()) == 0;
 #endif
-        if (!result)
+        만약 (!result)
         {
             CV_LOG_ERROR(NULL, "Can't remove directory: " << path);
         }
     }
-    else
+    아니면
     {
 #ifdef _MSC_VER
         bool result = _unlink(path.c_str()) == 0;
-#else
+#아니면
         bool result = unlink(path.c_str()) == 0;
 #endif
-        if (!result)
+        만약 (!result)
         {
             CV_LOG_ERROR(NULL, "Can't remove file: " << path);
         }
@@ -185,33 +185,33 @@ cv::String getcwd()
 {
     CV_INSTRUMENT_REGION();
     cv::AutoBuffer<char, 4096> buf;
-#if defined WIN32 || defined _WIN32 || defined WINCE
+#만약 defined WIN32 || defined _WIN32 || defined WINCE
 #ifdef WINRT
-    return cv::String();
-#else
+    반환 cv::String();
+#아니면
     DWORD sz = GetCurrentDirectoryA(0, NULL);
     buf.allocate((size_t)sz);
     sz = GetCurrentDirectoryA((DWORD)buf.size(), buf.data());
-    return cv::String(buf.data(), (size_t)sz);
+    반환 cv::String(buf.data(), (size_t)sz);
 #endif
 #elif defined __linux__ || defined __APPLE__ || defined __HAIKU__ || defined __FreeBSD__ || defined __EMSCRIPTEN__ || defined __QNX__ || defined __CYGWIN__
-    for(;;)
+    위해(;;)
     {
         char* p = ::getcwd(buf.data(), buf.size());
-        if (p == NULL)
+        만약 (p == NULL)
         {
-            if (errno == ERANGE)
+            만약 (errno == ERANGE)
             {
                 buf.allocate(buf.size() * 2);
                 continue;
             }
-            return cv::String();
+            반환 cv::String();
         }
         break;
     }
-    return cv::String(buf.data(), (size_t)strlen(buf.data()));
-#else
-    return cv::String();
+    반환 cv::String(buf.data(), (size_t)strlen(buf.data()));
+#아니면
+    반환 cv::String();
 #endif
 }
 
@@ -219,35 +219,35 @@ cv::String getcwd()
 bool createDirectory(const cv::String& path)
 {
     CV_INSTRUMENT_REGION();
-#if defined WIN32 || defined _WIN32 || defined WINCE
+#만약 defined WIN32 || defined _WIN32 || defined WINCE
 #ifdef WINRT
     wchar_t wpath[MAX_PATH];
     size_t copied = mbstowcs(wpath, path.c_str(), MAX_PATH);
     CV_Assert((copied != MAX_PATH) && (copied != (size_t)-1));
-    int result = CreateDirectoryA(wpath, NULL) ? 0 : -1;
-#else
-    int result = _mkdir(path.c_str());
+    정수 result = CreateDirectoryA(wpath, NULL) ? 0 : -1;
+#아니면
+    정수 result = _mkdir(path.c_str());
 #endif
 #elif defined __linux__ || defined __APPLE__ || defined __HAIKU__ || defined __FreeBSD__ || defined __EMSCRIPTEN__ || defined __QNX__ || defined __CYGWIN__
-    int result = mkdir(path.c_str(), 0777);
-#else
-    int result = -1;
+    정수 result = mkdir(path.c_str(), 0777);
+#아니면
+    정수 result = -1;
 #endif
 
-    if (result == -1)
+    만약 (result == -1)
     {
-        return isDirectory(path);
+        반환 isDirectory(path);
     }
-    return true;
+    반환 true;
 }
 
 bool createDirectories(const cv::String& path_)
 {
     cv::String path = path_;
-    for (;;)
+    위해 (;;)
     {
         char last_char = path.empty() ? 0 : path[path.length() - 1];
-        if (isPathSeparator(last_char))
+        만약 (isPathSeparator(last_char))
         {
             path = path.substr(0, path.length() - 1);
             continue;
@@ -255,25 +255,25 @@ bool createDirectories(const cv::String& path_)
         break;
     }
 
-    if (path.empty() || path == "./" || path == ".\\" || path == ".")
-        return true;
-    if (isDirectory(path))
-        return true;
+    만약 (path.empty() || path == "./" || path == ".\\" || path == ".")
+        반환 true;
+    만약 (isDirectory(path))
+        반환 true;
 
     size_t pos = path.rfind('/');
-    if (pos == cv::String::npos)
+    만약 (pos == cv::String::npos)
         pos = path.rfind('\\');
-    if (pos != cv::String::npos)
+    만약 (pos != cv::String::npos)
     {
         cv::String parent_directory = path.substr(0, pos);
-        if (!parent_directory.empty())
+        만약 (!parent_directory.empty())
         {
-            if (!createDirectories(parent_directory))
-                return false;
+            만약 (!createDirectories(parent_directory))
+                반환 false;
         }
     }
 
-    return createDirectory(path);
+    반환 createDirectory(path);
 }
 
 #ifdef _WIN32
@@ -283,30 +283,30 @@ struct FileLock::Impl
     Impl(const char* fname)
     {
         // http://support.microsoft.com/kb/316609
-        int numRetries = 5;
+        정수 numRetries = 5;
         do
         {
             handle = ::CreateFileA(fname, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL,
                                 OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
-            if (INVALID_HANDLE_VALUE == handle)
+            만약 (INVALID_HANDLE_VALUE == handle)
             {
-                if (ERROR_SHARING_VIOLATION == GetLastError())
+                만약 (ERROR_SHARING_VIOLATION == GetLastError())
                 {
                     numRetries--;
                     Sleep(250);
                     continue;
                 }
-                else
+                아니면
                 {
                     CV_Error_(Error::StsAssert, ("Can't open lock file: %s", fname));
                 }
             }
             break;
-        } while (numRetries > 0);
+        } 동안 (numRetries > 0);
     }
     ~Impl()
     {
-        if (INVALID_HANDLE_VALUE != handle)
+        만약 (INVALID_HANDLE_VALUE != handle)
         {
             ::CloseHandle(handle);
         }
@@ -316,24 +316,24 @@ struct FileLock::Impl
     {
         OVERLAPPED overlapped;
         std::memset(&overlapped, 0, sizeof(overlapped));
-        return !!::LockFileEx(handle, LOCKFILE_EXCLUSIVE_LOCK, 0, MAXDWORD, MAXDWORD, &overlapped);
+        반환 !!::LockFileEx(handle, LOCKFILE_EXCLUSIVE_LOCK, 0, MAXDWORD, MAXDWORD, &overlapped);
     }
     bool unlock()
     {
         OVERLAPPED overlapped;
         std::memset(&overlapped, 0, sizeof(overlapped));
-        return !!::UnlockFileEx(handle, 0, MAXDWORD, MAXDWORD, &overlapped);
+        반환 !!::UnlockFileEx(handle, 0, MAXDWORD, MAXDWORD, &overlapped);
     }
 
     bool lock_shared()
     {
         OVERLAPPED overlapped;
         std::memset(&overlapped, 0, sizeof(overlapped));
-        return !!::LockFileEx(handle, 0, 0, MAXDWORD, MAXDWORD, &overlapped);
+        반환 !!::LockFileEx(handle, 0, 0, MAXDWORD, MAXDWORD, &overlapped);
     }
     bool unlock_shared()
     {
-        return unlock();
+        반환 unlock();
     }
 
     HANDLE handle;
@@ -354,7 +354,7 @@ struct FileLock::Impl
     }
     ~Impl()
     {
-        if (handle >= 0)
+        만약 (handle >= 0)
             ::close(handle);
     }
 
@@ -368,7 +368,7 @@ struct FileLock::Impl
         l.l_len = 0;
         DBG(std::cout << "Lock..." << std::endl);
         bool res = -1 != ::fcntl(handle, F_SETLKW, &l);
-        return res;
+        반환 res;
     }
     bool unlock()
     {
@@ -380,7 +380,7 @@ struct FileLock::Impl
         l.l_len = 0;
         DBG(std::cout << "Unlock..." << std::endl);
         bool res = -1 != ::fcntl(handle, F_SETLK, &l);
-        return res;
+        반환 res;
     }
 
     bool lock_shared()
@@ -393,14 +393,14 @@ struct FileLock::Impl
         l.l_len = 0;
         DBG(std::cout << "Lock read..." << std::endl);
         bool res = -1 != ::fcntl(handle, F_SETLKW, &l);
-        return res;
+        반환 res;
     }
     bool unlock_shared()
     {
-        return unlock();
+        반환 unlock();
     }
 
-    int handle;
+    정수 handle;
 
 private:
     Impl(const Impl&); // disabled
@@ -430,21 +430,21 @@ void FileLock::unlock_shared() { CV_Assert(pImpl->unlock_shared()); }
 cv::String getCacheDirectory(const char* sub_directory_name, const char* configuration_name)
 {
     String cache_path;
-    if (configuration_name)
+    만약 (configuration_name)
     {
         cache_path = utils::getConfigurationParameterString(configuration_name, "");
     }
-    if (cache_path.empty())
+    만약 (cache_path.empty())
     {
         cv::String default_cache_path;
 #ifdef _WIN32
         wchar_t tmp_path_buf_w[MAX_PATH+1] = {0};
         DWORD res = GetTempPathW(MAX_PATH, tmp_path_buf_w);
-        if (res > 0 && res <= MAX_PATH)
+        만약 (res > 0 && res <= MAX_PATH)
         {
             // Convert from UTF-16 to UTF-8 to support Unicode paths
-            int len = WideCharToMultiByte(CP_UTF8, 0, tmp_path_buf_w, -1, NULL, 0, NULL, NULL);
-            if (len > 0)
+            정수 len = WideCharToMultiByte(CP_UTF8, 0, tmp_path_buf_w, -1, NULL, 0, NULL, NULL);
+            만약 (len > 0)
             {
                 std::vector<char> utf8_buf(len);
                 WideCharToMultiByte(CP_UTF8, 0, tmp_path_buf_w, -1, utf8_buf.data(), len, NULL, NULL);
@@ -455,63 +455,63 @@ cv::String getCacheDirectory(const char* sub_directory_name, const char* configu
         // no defaults
 #elif defined __APPLE__
         const std::string tmpdir_env = utils::getConfigurationParameterString("TMPDIR");
-        if (!tmpdir_env.empty() && utils::fs::isDirectory(tmpdir_env))
+        만약 (!tmpdir_env.empty() && utils::fs::isDirectory(tmpdir_env))
         {
             default_cache_path = tmpdir_env;
         }
-        else
+        아니면
         {
             default_cache_path = "/tmp/";
             CV_LOG_WARNING(NULL, "Using world accessible cache directory. This may be not secure: " << default_cache_path);
         }
 #elif defined __linux__ || defined __HAIKU__ || defined __FreeBSD__ || defined __GNU__
         // https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html
-        if (default_cache_path.empty())
+        만약 (default_cache_path.empty())
         {
             const std::string xdg_cache_env = utils::getConfigurationParameterString("XDG_CACHE_HOME");
-            if (!xdg_cache_env.empty() && utils::fs::isDirectory(xdg_cache_env))
+            만약 (!xdg_cache_env.empty() && utils::fs::isDirectory(xdg_cache_env))
             {
                 default_cache_path = xdg_cache_env;
             }
         }
-        if (default_cache_path.empty())
+        만약 (default_cache_path.empty())
         {
             const std::string home_env = utils::getConfigurationParameterString("HOME");
-            if (!home_env.empty() && utils::fs::isDirectory(home_env))
+            만약 (!home_env.empty() && utils::fs::isDirectory(home_env))
             {
                 cv::String home_path = home_env;
                 cv::String home_cache_path = utils::fs::join(home_path, ".cache/");
-                if (utils::fs::isDirectory(home_cache_path))
+                만약 (utils::fs::isDirectory(home_cache_path))
                 {
                     default_cache_path = home_cache_path;
                 }
             }
         }
-        if (default_cache_path.empty())
+        만약 (default_cache_path.empty())
         {
             const char* temp_path = "/var/tmp/";
-            if (utils::fs::isDirectory(temp_path))
+            만약 (utils::fs::isDirectory(temp_path))
             {
                 default_cache_path = temp_path;
                 CV_LOG_WARNING(NULL, "Using world accessible cache directory. This may be not secure: " << default_cache_path);
             }
         }
-        if (default_cache_path.empty())
+        만약 (default_cache_path.empty())
         {
             default_cache_path = "/tmp/";
             CV_LOG_WARNING(NULL, "Using world accessible cache directory. This may be not secure: " << default_cache_path);
         }
-#else
+#아니면
         // no defaults
 #endif
         CV_LOG_VERBOSE(NULL, 0, "default_cache_path = " << default_cache_path);
-        if (!default_cache_path.empty())
+        만약 (!default_cache_path.empty())
         {
-            if (utils::fs::isDirectory(default_cache_path))
+            만약 (utils::fs::isDirectory(default_cache_path))
             {
                 cv::String default_cache_path_base = utils::fs::join(default_cache_path, "opencv");
                 default_cache_path = utils::fs::join(default_cache_path_base, CVAUX_STR(CV_VERSION_MAJOR) ".x" CV_VERSION_STATUS);
-                if (utils::getConfigurationParameterBool("OPENCV_CACHE_SHOW_CLEANUP_MESSAGE", true)
+                만약 (utils::getConfigurationParameterBool("OPENCV_CACHE_SHOW_CLEANUP_MESSAGE", true)
                     && !utils::fs::isDirectory(default_cache_path))
                 {
                     std::vector<cv::String> existedCacheDirs;
@@ -523,47 +523,47 @@ cv::String getCacheDirectory(const char* sub_directory_name, const char* configu
                     {
                         // ignore
                     }
-                    if (!existedCacheDirs.empty())
+                    만약 (!existedCacheDirs.empty())
                     {
                         CV_LOG_WARNING(NULL, "Creating new OpenCV cache directory: " << default_cache_path);
                         CV_LOG_WARNING(NULL, "There are several neighbour directories, probably created by old OpenCV versions.");
                         CV_LOG_WARNING(NULL, "Feel free to cleanup these unused directories:");
-                        for (size_t i = 0; i < existedCacheDirs.size(); i++)
+                        위해 (size_t i = 0; i < existedCacheDirs.size(); i++)
                         {
                             CV_LOG_WARNING(NULL, "  - " << existedCacheDirs[i]);
                         }
                         CV_LOG_WARNING(NULL, "Note: This message is showed only once.");
                     }
                 }
-                if (sub_directory_name && sub_directory_name[0] != '\0')
+                만약 (sub_directory_name && sub_directory_name[0] != '\0')
                     default_cache_path = utils::fs::join(default_cache_path, cv::String(sub_directory_name) + native_separator);
-                if (!utils::fs::createDirectories(default_cache_path))
+                만약 (!utils::fs::createDirectories(default_cache_path))
                 {
                     CV_LOG_DEBUG(NULL, "Can't create OpenCV cache sub-directory: " << default_cache_path);
                 }
-                else
+                아니면
                 {
                     cache_path = default_cache_path;
                 }
             }
-            else
+            아니면
             {
                 CV_LOG_INFO(NULL, "Can't find default cache directory (does it exist?): " << default_cache_path);
             }
         }
-        else
+        아니면
         {
             CV_LOG_DEBUG(NULL, "OpenCV has no support to discover default cache directory on the current platform");
         }
     }
-    else
+    아니면
     {
-        if (cache_path == "disabled")
-            return cache_path;
-        if (!isDirectory(cache_path))
+        만약 (cache_path == "disabled")
+            반환 cache_path;
+        만약 (!isDirectory(cache_path))
         {
             CV_LOG_WARNING(NULL, "Specified non-existed directory, creating OpenCV sub-directory for caching purposes: " << cache_path);
-            if (!createDirectories(cache_path))
+            만약 (!createDirectories(cache_path))
             {
                 CV_LOG_ERROR(NULL, "Can't create OpenCV cache sub-directory: " << cache_path);
                 cache_path.clear();
@@ -571,17 +571,17 @@ cv::String getCacheDirectory(const char* sub_directory_name, const char* configu
         }
     }
     CV_Assert(cache_path.empty() || utils::fs::isDirectory(cache_path));
-    if (!cache_path.empty())
+    만약 (!cache_path.empty())
     {
-        if (!isPathSeparator(cache_path[cache_path.size() - 1]))
+        만약 (!isPathSeparator(cache_path[cache_path.size() - 1]))
         {
             cache_path += native_separator;
         }
     }
-    return cache_path;
+    반환 cache_path;
 }
 
-#else
+#아니면
 #define NOT_IMPLEMENTED CV_Error(Error::StsNotImplemented, "");
 cv::String canonical(const cv::String& /*path*/) { NOT_IMPLEMENTED }
 bool exists(const cv::String& /*path*/) { NOT_IMPLEMENTED }
@@ -596,6 +596,6 @@ cv::String getCacheDirectory(const char* /*sub_directory_name*/, const char* /*c
 }}} // namespace
 
 
-#if OPENCV_HAVE_FILESYSTEM_SUPPORT
+#만약 OPENCV_HAVE_FILESYSTEM_SUPPORT
 #include "plugin_loader.impl.hpp"
 #endif

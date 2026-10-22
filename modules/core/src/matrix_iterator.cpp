@@ -12,22 +12,22 @@ NAryMatIterator::NAryMatIterator()
 {
 }
 
-NAryMatIterator::NAryMatIterator(const Mat** _arrays, Mat* _planes, int _narrays)
+NAryMatIterator::NAryMatIterator(const Mat** _arrays, Mat* _planes, 정수 _narrays)
 : arrays(0), planes(0), ptrs(0), narrays(0), nplanes(0), size(0), iterdepth(0), idx(0)
 {
     init(_arrays, _planes, 0, _narrays);
 }
 
-NAryMatIterator::NAryMatIterator(const Mat** _arrays, uchar** _ptrs, int _narrays)
+NAryMatIterator::NAryMatIterator(const Mat** _arrays, uchar** _ptrs, 정수 _narrays)
     : arrays(0), planes(0), ptrs(0), narrays(0), nplanes(0), size(0), iterdepth(0), idx(0)
 {
     init(_arrays, 0, _ptrs, _narrays);
 }
 
-void NAryMatIterator::init(const Mat** _arrays, Mat* _planes, uchar** _ptrs, int _narrays)
+void NAryMatIterator::init(const Mat** _arrays, Mat* _planes, uchar** _ptrs, 정수 _narrays)
 {
     CV_Assert( _arrays && (_ptrs || _planes) );
-    int i, j, d1=0, i0 = -1, d = -1;
+    정수 i, j, d1=0, i0 = -1, d = -1;
 
     arrays = _arrays;
     ptrs = _ptrs;
@@ -36,9 +36,9 @@ void NAryMatIterator::init(const Mat** _arrays, Mat* _planes, uchar** _ptrs, int
     nplanes = 0;
     size = 0;
 
-    if( narrays < 0 )
+    만약( narrays < 0 )
     {
-        for( i = 0; _arrays[i] != 0; i++ )
+        위해( i = 0; _arrays[i] != 0; i++ )
             ;
         narrays = i;
         CV_Assert(narrays <= 1000);
@@ -46,261 +46,261 @@ void NAryMatIterator::init(const Mat** _arrays, Mat* _planes, uchar** _ptrs, int
 
     iterdepth = 0;
 
-    for( i = 0; i < narrays; i++ )
+    위해( i = 0; i < narrays; i++ )
     {
         CV_Assert(arrays[i] != 0);
         const Mat& A = *arrays[i];
-        if( ptrs )
+        만약( ptrs )
             ptrs[i] = A.data;
 
-        if( !A.data )
+        만약( !A.data )
             continue;
 
-        if( i0 < 0 )
+        만약( i0 < 0 )
         {
             i0 = i;
             d = A.dims;
 
             // find the first dimensionality which is different from 1;
             // in any of the arrays the first "d1" step do not affect the continuity
-            for( d1 = 0; d1 < d; d1++ )
-                if( A.size[d1] > 1 )
+            위해( d1 = 0; d1 < d; d1++ )
+                만약( A.size[d1] > 1 )
                     break;
         }
-        else
+        아니면
             CV_Assert( A.size == arrays[i0]->size );
 
-        if( !A.isContinuous() )
+        만약( !A.isContinuous() )
         {
             CV_Assert( A.step[d-1] == A.elemSize() );
-            for( j = d-1; j > d1; j-- )
-                if( A.step[j]*A.size[j] < A.step[j-1] )
+            위해( j = d-1; j > d1; j-- )
+                만약( A.step[j]*A.size[j] < A.step[j-1] )
                     break;
             iterdepth = std::max(iterdepth, j);
         }
     }
 
-    if( i0 >= 0 )
+    만약( i0 >= 0 )
     {
         size = arrays[i0]->size[std::max(d-1, 0)];
-        for( j = d-1; j > iterdepth; j-- )
+        위해( j = d-1; j > iterdepth; j-- )
         {
             int64 total1 = (int64)size*arrays[i0]->size[j-1];
-            if( total1 != (int)total1 )
+            만약( total1 != (정수)total1 )
                 break;
-            size = (int)total1;
+            size = (정수)total1;
         }
 
         iterdepth = j;
-        if( iterdepth == d1 )
+        만약( iterdepth == d1 )
             iterdepth = 0;
 
         nplanes = 1;
-        for( j = iterdepth-1; j >= 0; j-- )
+        위해( j = iterdepth-1; j >= 0; j-- )
             nplanes *= arrays[i0]->size[j];
     }
-    else
+    아니면
         iterdepth = 0;
 
     idx = 0;
 
-    if( !planes )
-        return;
+    만약( !planes )
+        반환;
 
-    for( i = 0; i < narrays; i++ )
+    위해( i = 0; i < narrays; i++ )
     {
         CV_Assert(arrays[i] != 0);
         const Mat& A = *arrays[i];
 
-        if( !A.data )
+        만약( !A.data )
         {
             planes[i] = Mat();
             continue;
         }
 
-        planes[i] = Mat(1, (int)size, A.type(), A.data);
+        planes[i] = Mat(1, (정수)size, A.type(), A.data);
     }
 }
 
 
 NAryMatIterator& NAryMatIterator::operator ++()
 {
-    if( idx >= nplanes-1 )
-        return *this;
+    만약( idx >= nplanes-1 )
+        반환 *this;
     ++idx;
 
-    if( iterdepth == 1 )
+    만약( iterdepth == 1 )
     {
-        if( ptrs )
+        만약( ptrs )
         {
-            for( int i = 0; i < narrays; i++ )
+            위해( 정수 i = 0; i < narrays; i++ )
             {
-                if( !ptrs[i] )
+                만약( !ptrs[i] )
                     continue;
                 ptrs[i] = arrays[i]->data + arrays[i]->step[0]*idx;
             }
         }
-        if( planes )
+        만약( planes )
         {
-            for( int i = 0; i < narrays; i++ )
+            위해( 정수 i = 0; i < narrays; i++ )
             {
-                if( !planes[i].data )
+                만약( !planes[i].data )
                     continue;
                 planes[i].data = arrays[i]->data + arrays[i]->step[0]*idx;
             }
         }
     }
-    else
+    아니면
     {
-        for( int i = 0; i < narrays; i++ )
+        위해( 정수 i = 0; i < narrays; i++ )
         {
             const Mat& A = *arrays[i];
-            if( !A.data )
+            만약( !A.data )
                 continue;
-            int _idx = (int)idx;
+            정수 _idx = (정수)idx;
             uchar* data = A.data;
-            for( int j = iterdepth-1; j >= 0 && _idx > 0; j-- )
+            위해( 정수 j = iterdepth-1; j >= 0 && _idx > 0; j-- )
             {
-                int szi = A.size[j], t = _idx/szi;
+                정수 szi = A.size[j], t = _idx/szi;
                 data += (_idx - t * szi)*A.step[j];
                 _idx = t;
             }
-            if( ptrs )
+            만약( ptrs )
                 ptrs[i] = data;
-            if( planes )
+            만약( planes )
                 planes[i].data = data;
         }
     }
 
-    return *this;
+    반환 *this;
 }
 
-NAryMatIterator NAryMatIterator::operator ++(int)
+NAryMatIterator NAryMatIterator::operator ++(정수)
 {
     NAryMatIterator it = *this;
     ++*this;
-    return it;
+    반환 it;
 }
 
 //==================================================================================================
 
 Point MatConstIterator::pos() const
 {
-    if( !m )
-        return Point();
+    만약( !m )
+        반환 Point();
     CV_DbgAssert(m->dims <= 2);
 
     ptrdiff_t ofs = ptr - m->ptr();
-    int y = (int)(ofs/m->step[0]);
-    return Point((int)((ofs - y*m->step[0])/elemSize), y);
+    정수 y = (정수)(ofs/m->step[0]);
+    반환 Point((정수)((ofs - y*m->step[0])/elemSize), y);
 }
 
-void MatConstIterator::pos(int* _idx) const
+void MatConstIterator::pos(정수* _idx) const
 {
     CV_Assert(m != 0 && _idx);
     ptrdiff_t ofs = ptr - m->ptr();
-    for( int i = 0; i < m->dims; i++ )
+    위해( 정수 i = 0; i < m->dims; i++ )
     {
         size_t s = m->step[i], v = ofs/s;
         ofs -= v*s;
-        _idx[i] = (int)v;
+        _idx[i] = (정수)v;
     }
 }
 
 ptrdiff_t MatConstIterator::lpos() const
 {
-    if(!m)
-        return 0;
-    if( m->isContinuous() )
-        return (ptr - sliceStart)/elemSize;
+    만약(!m)
+        반환 0;
+    만약( m->isContinuous() )
+        반환 (ptr - sliceStart)/elemSize;
     ptrdiff_t ofs = ptr - m->ptr();
-    int i, d = m->dims;
-    if( d == 2 )
+    정수 i, d = m->dims;
+    만약( d == 2 )
     {
         ptrdiff_t y = ofs/m->step[0];
-        return y*m->cols + (ofs - y*m->step[0])/elemSize;
+        반환 y*m->cols + (ofs - y*m->step[0])/elemSize;
     }
     ptrdiff_t result = 0;
-    for( i = 0; i < d; i++ )
+    위해( i = 0; i < d; i++ )
     {
         size_t s = m->step[i], v = ofs/s;
         ofs -= v*s;
         result = result*m->size[i] + v;
     }
-    return result;
+    반환 result;
 }
 
 void MatConstIterator::seek(ptrdiff_t ofs, bool relative)
 {
-    if( m->isContinuous() )
+    만약( m->isContinuous() )
     {
         ptr = (relative ? ptr : sliceStart) + ofs*elemSize;
-        if( ptr < sliceStart )
+        만약( ptr < sliceStart )
             ptr = sliceStart;
-        else if( ptr > sliceEnd )
+        아니면 만약( ptr > sliceEnd )
             ptr = sliceEnd;
-        return;
+        반환;
     }
 
-    int d = m->dims;
-    if( d == 2 )
+    정수 d = m->dims;
+    만약( d == 2 )
     {
         ptrdiff_t ofs0, y;
-        if( relative )
+        만약( relative )
         {
             ofs0 = ptr - m->ptr();
             y = ofs0/m->step[0];
             ofs += y*m->cols + (ofs0 - y*m->step[0])/elemSize;
         }
         y = ofs/m->cols;
-        int y1 = std::min(std::max((int)y, 0), m->rows-1);
+        정수 y1 = std::min(std::max((정수)y, 0), m->rows-1);
         sliceStart = m->ptr(y1);
         sliceEnd = sliceStart + m->cols*elemSize;
         ptr = y < 0 ? sliceStart : y >= m->rows ? sliceEnd :
             sliceStart + (ofs - y*m->cols)*elemSize;
-        return;
+        반환;
     }
 
-    if( relative )
+    만약( relative )
         ofs += lpos();
 
-    if( ofs < 0 )
+    만약( ofs < 0 )
         ofs = 0;
 
-    int szi = m->size[d-1];
+    정수 szi = m->size[d-1];
     ptrdiff_t t = ofs/szi;
-    int v = (int)(ofs - t*szi);
+    정수 v = (정수)(ofs - t*szi);
     ofs = t;
     ptr = m->ptr() + v*elemSize;
     sliceStart = m->ptr();
 
-    for( int i = d-2; i >= 0; i-- )
+    위해( 정수 i = d-2; i >= 0; i-- )
     {
         szi = m->size[i];
         t = ofs/szi;
-        v = (int)(ofs - t*szi);
+        v = (정수)(ofs - t*szi);
         ofs = t;
         sliceStart += v*m->step[i];
     }
 
     sliceEnd = sliceStart + m->size[d-1]*elemSize;
-    if( ofs > 0 )
+    만약( ofs > 0 )
         ptr = sliceEnd;
-    else
+    아니면
         ptr = sliceStart + (ptr - m->ptr());
 }
 
-void MatConstIterator::seek(const int* _idx, bool relative)
+void MatConstIterator::seek(const 정수* _idx, bool relative)
 {
-    int d = m->dims;
+    정수 d = m->dims;
     ptrdiff_t ofs = 0;
-    if( !_idx )
+    만약( !_idx )
         ;
-    else if( d == 2 )
+    아니면 만약( d == 2 )
         ofs = _idx[0]*m->size[1] + _idx[1];
-    else
+    아니면
     {
-        for( int i = 0; i < d; i++ )
+        위해( 정수 i = 0; i < d; i++ )
             ofs = ofs*m->size[i] + _idx[i];
     }
     seek(ofs, relative);
@@ -310,48 +310,48 @@ void MatConstIterator::seek(const int* _idx, bool relative)
 
 SparseMatConstIterator::SparseMatConstIterator(const SparseMat* _m) : m((SparseMat*)_m), hashidx(0), ptr(0)
 {
-    if(!_m || !_m->hdr)
-        return;
+    만약(!_m || !_m->hdr)
+        반환;
     SparseMat::Hdr& hdr = *m->hdr;
     const std::vector<size_t>& htab = hdr.hashtab;
     size_t i, hsize = htab.size();
-    for( i = 0; i < hsize; i++ )
+    위해( i = 0; i < hsize; i++ )
     {
         size_t nidx = htab[i];
-        if( nidx )
+        만약( nidx )
         {
             hashidx = i;
             ptr = &hdr.pool[nidx] + hdr.valueOffset;
-            return;
+            반환;
         }
     }
 }
 
 SparseMatConstIterator& SparseMatConstIterator::operator ++()
 {
-    if( !ptr || !m || !m->hdr )
-        return *this;
+    만약( !ptr || !m || !m->hdr )
+        반환 *this;
     SparseMat::Hdr& hdr = *m->hdr;
     size_t next = ((const SparseMat::Node*)(ptr - hdr.valueOffset))->next;
-    if( next )
+    만약( next )
     {
         ptr = &hdr.pool[next] + hdr.valueOffset;
-        return *this;
+        반환 *this;
     }
     size_t i = hashidx + 1, sz = hdr.hashtab.size();
-    for( ; i < sz; i++ )
+    위해( ; i < sz; i++ )
     {
         size_t nidx = hdr.hashtab[i];
-        if( nidx )
+        만약( nidx )
         {
             hashidx = i;
             ptr = &hdr.pool[nidx] + hdr.valueOffset;
-            return *this;
+            반환 *this;
         }
     }
     hashidx = sz;
     ptr = 0;
-    return *this;
+    반환 *this;
 }
 
 } // cv::

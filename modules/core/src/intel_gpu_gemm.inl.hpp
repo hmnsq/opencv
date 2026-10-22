@@ -38,59 +38,59 @@ static bool intel_gpu_gemm(
 {
     CV_UNUSED(sizeB);
 
-    int M = sizeD.height, N = sizeD.width, K = ((atrans)? sizeA.height : sizeA.width);
+    정수 M = sizeD.height, N = sizeD.width, K = ((atrans)? sizeA.height : sizeA.width);
 
-    if (M < 4 || N < 4 || K < 4)  // vload4
-        return false;
+    만약 (M < 4 || N < 4 || K < 4)  // vload4
+        반환 false;
 
     CV_LOG_VERBOSE(NULL, 0, "M=" << M << " N=" << N << " K=" << K);
 
     std::string kernelName;
 
-    unsigned int lx = 8, ly = 4;
-    unsigned int dx = 4, dy = 8;
+    unsigned 정수 lx = 8, ly = 4;
+    unsigned 정수 dx = 4, dy = 8;
 
-    if(!atrans && !btrans)
+    만약(!atrans && !btrans)
     {
-        if (M % 32 == 0 && N % 32 == 0 && K % 16 == 0)
+        만약 (M % 32 == 0 && N % 32 == 0 && K % 16 == 0)
         {
             kernelName = "intelblas_gemm_buffer_NN_sp";
         }
-        else
+        아니면
         {
-            if (M % 2 != 0)
-                return false;
+            만약 (M % 2 != 0)
+                반환 false;
             // vload4(0, dst_write0) - 4 cols
             // multiply by lx: 8
-            if (N % (4*8) != 0)
-                return false;
+            만약 (N % (4*8) != 0)
+                반환 false;
             kernelName = "intelblas_gemm_buffer_NN";
         }
     }
-    else if(atrans && !btrans)
+    아니면 만약(atrans && !btrans)
     {
-        if (M % 32 != 0)
-            return false;
-        if (N % 32 != 0)
-            return false;
+        만약 (M % 32 != 0)
+            반환 false;
+        만약 (N % 32 != 0)
+            반환 false;
         kernelName = "intelblas_gemm_buffer_TN";
     }
-    else if(!atrans && btrans)
+    아니면 만약(!atrans && btrans)
     {
-        if (K % 4 != 0)
-            return false;
+        만약 (K % 4 != 0)
+            반환 false;
         kernelName = "intelblas_gemm_buffer_NT";
         ly = 16;
         dx = 1;
     }
-    else
+    아니면
     {
-        if (M % 32 != 0)
-            return false;
-        if (N % 32 != 0)
-            return false;
-        if (K % 16 != 0)
-            return false;
+        만약 (M % 32 != 0)
+            반환 false;
+        만약 (N % 32 != 0)
+            반환 false;
+        만약 (K % 16 != 0)
+            반환 false;
         kernelName = "intelblas_gemm_buffer_TT";
     }
 
@@ -106,62 +106,62 @@ static bool intel_gpu_gemm(
     String errmsg;
     const ocl::Program program = ocl::Context::getDefault().getProg(ocl::core::intel_gemm_oclsrc, "", errmsg);
 
-    if(!atrans && btrans)
+    만약(!atrans && btrans)
     {
         ocl::Kernel k(kernelName.c_str(), program);
-        if (k.empty())
+        만약 (k.empty())
         {
-            return false;
+            반환 false;
         }
 
         k.args(ocl::KernelArg::PtrReadOnly(A),
-               (int) (A.offset / sizeof(float)),
+               (정수) (A.offset / sizeof(float)),
                ocl::KernelArg::PtrReadOnly(B),
-               (int) (B.offset / sizeof(float)),
+               (정수) (B.offset / sizeof(float)),
                ocl::KernelArg::PtrWriteOnly(D),
-               (int) (D.offset / sizeof(float)),
+               (정수) (D.offset / sizeof(float)),
                M, N, K,
                (float)alpha,
                (float)beta,
-               (int)(A.step / sizeof(float)),
-               (int)(B.step / sizeof(float)),
-               (int)(D.step / sizeof(float))
+               (정수)(A.step / sizeof(float)),
+               (정수)(B.step / sizeof(float)),
+               (정수)(D.step / sizeof(float))
         );
 
         bool ret = k.run(2, global, local, false, q);
-        return ret;
+        반환 ret;
     }
-    else
+    아니면
     {
-        int stride = (M * N < 1024 * 1024) ? 10000000 : 256;
+        정수 stride = (M * N < 1024 * 1024) ? 10000000 : 256;
 
-        for(int start_index = 0; start_index < K; start_index += stride)
+        위해(정수 start_index = 0; start_index < K; start_index += stride)
         {
              ocl::Kernel k(kernelName.c_str(), program);
              k.args(ocl::KernelArg::PtrReadOnly(A),
-                    (int) (A.offset / sizeof(float)),
+                    (정수) (A.offset / sizeof(float)),
                     ocl::KernelArg::PtrReadOnly(B),
-                    (int) (B.offset / sizeof(float)),
+                    (정수) (B.offset / sizeof(float)),
                     ocl::KernelArg::PtrWriteOnly(D),
-                    (int) (D.offset / sizeof(float)),
+                    (정수) (D.offset / sizeof(float)),
                     M, N, K,
                     (float)alpha,
                     (float)beta,
-                    (int)(A.step / sizeof(float)),
-                    (int)(B.step / sizeof(float)),
-                    (int)(D.step / sizeof(float)),
-                    (int) start_index,                          // 14 start_index
+                    (정수)(A.step / sizeof(float)),
+                    (정수)(B.step / sizeof(float)),
+                    (정수)(D.step / sizeof(float)),
+                    (정수) start_index,                          // 14 start_index
                     stride);
 
             bool ret = k.run(2, global, local, false, q);
-            if (!ret)
+            만약 (!ret)
             {
-                if (start_index != 0)
+                만약 (start_index != 0)
                     isPropagatedC2D = false;  // D array content is changed, need to rewrite
-                return false;
+                반환 false;
             }
         }
-        return true;
+        반환 true;
     }
 }
 

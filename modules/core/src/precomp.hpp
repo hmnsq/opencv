@@ -50,7 +50,7 @@
 
 #ifdef BUILD_PLUGIN
 #include "opencv2/core/utility.hpp"
-#else  // BUILD_PLUGIN
+#아니면  // BUILD_PLUGIN
 
 #include "opencv2/opencv_modules.hpp"
 #include "cvconfig.h"
@@ -115,7 +115,7 @@ template<typename T1, typename T2=T1, typename T3=T1> struct OpNop
     typedef T1 type1;
     typedef T2 type2;
     typedef T3 rtype;
-    T3 operator ()(const T1 a) const { return saturate_cast<T3>(a); }
+    T3 operator ()(const T1 a) const { 반환 saturate_cast<T3>(a); }
 };
 
 template<typename T1, typename T2=T1, typename T3=T1> struct OpSqr
@@ -123,7 +123,7 @@ template<typename T1, typename T2=T1, typename T3=T1> struct OpSqr
     typedef T1 type1;
     typedef T2 type2;
     typedef T3 rtype;
-    T3 operator ()(const T1 a) const { return saturate_cast<T3>(a)*saturate_cast<T3>(a); }
+    T3 operator ()(const T1 a) const { 반환 saturate_cast<T3>(a)*saturate_cast<T3>(a); }
 };
 
 template<typename T1, typename T2=T1, typename T3=T1> struct OpAdd
@@ -131,7 +131,7 @@ template<typename T1, typename T2=T1, typename T3=T1> struct OpAdd
     typedef T1 type1;
     typedef T2 type2;
     typedef T3 rtype;
-    T3 operator ()(const T1 a, const T2 b) const { return saturate_cast<T3>(a + b); }
+    T3 operator ()(const T1 a, const T2 b) const { 반환 saturate_cast<T3>(a + b); }
 };
 
 template<typename T1, typename T2=T1, typename T3=T1> struct OpAddSqr
@@ -139,7 +139,7 @@ template<typename T1, typename T2=T1, typename T3=T1> struct OpAddSqr
     typedef T1 type1;
     typedef T2 type2;
     typedef T3 rtype;
-    T3 operator ()(const T1 a, const T2 b) const { return saturate_cast<T3>(a + saturate_cast<T3>(b)*saturate_cast<T3>(b)); }
+    T3 operator ()(const T1 a, const T2 b) const { 반환 saturate_cast<T3>(a + saturate_cast<T3>(b)*saturate_cast<T3>(b)); }
 };
 
 template<typename T1, typename T2=T1, typename T3=T1> struct OpSub
@@ -147,7 +147,7 @@ template<typename T1, typename T2=T1, typename T3=T1> struct OpSub
     typedef T1 type1;
     typedef T2 type2;
     typedef T3 rtype;
-    T3 operator ()(const T1 a, const T2 b) const { return saturate_cast<T3>(a - b); }
+    T3 operator ()(const T1 a, const T2 b) const { 반환 saturate_cast<T3>(a - b); }
 };
 
 template<typename T1, typename T2=T1, typename T3=T1> struct OpRSub
@@ -155,7 +155,7 @@ template<typename T1, typename T2=T1, typename T3=T1> struct OpRSub
     typedef T1 type1;
     typedef T2 type2;
     typedef T3 rtype;
-    T3 operator ()(const T1 a, const T2 b) const { return saturate_cast<T3>(b - a); }
+    T3 operator ()(const T1 a, const T2 b) const { 반환 saturate_cast<T3>(b - a); }
 };
 
 template<typename T> struct OpMin
@@ -163,7 +163,7 @@ template<typename T> struct OpMin
     typedef T type1;
     typedef T type2;
     typedef T rtype;
-    T operator ()(const T a, const T b) const { return std::min(a, b); }
+    T operator ()(const T a, const T b) const { 반환 std::min(a, b); }
 };
 
 template<typename T> struct OpMax
@@ -171,7 +171,7 @@ template<typename T> struct OpMax
     typedef T type1;
     typedef T type2;
     typedef T rtype;
-    T operator ()(const T a, const T b) const { return std::max(a, b); }
+    T operator ()(const T a, const T b) const { 반환 std::max(a, b); }
 };
 
 template<typename T> struct OpAbsDiff
@@ -179,7 +179,7 @@ template<typename T> struct OpAbsDiff
     typedef T type1;
     typedef T type2;
     typedef T rtype;
-    T operator()(T a, T b) const { return a > b ? a - b : b - a; }
+    T operator()(T a, T b) const { 반환 a > b ? a - b : b - a; }
 };
 
 // specializations to prevent "-0" results
@@ -188,14 +188,14 @@ template<> struct OpAbsDiff<float>
     typedef float type1;
     typedef float type2;
     typedef float rtype;
-    float operator()(float a, float b) const { return std::abs(a - b); }
+    float operator()(float a, float b) const { 반환 std::abs(a - b); }
 };
 template<> struct OpAbsDiff<double>
 {
     typedef double type1;
     typedef double type2;
     typedef double rtype;
-    double operator()(double a, double b) const { return std::abs(a - b); }
+    double operator()(double a, double b) const { 반환 std::abs(a - b); }
 };
 
 template<typename T> struct OpAnd
@@ -203,7 +203,7 @@ template<typename T> struct OpAnd
     typedef T type1;
     typedef T type2;
     typedef T rtype;
-    T operator()( T a, T b ) const { return a & b; }
+    T operator()( T a, T b ) const { 반환 a & b; }
 };
 
 template<typename T> struct OpOr
@@ -211,7 +211,7 @@ template<typename T> struct OpOr
     typedef T type1;
     typedef T type2;
     typedef T rtype;
-    T operator()( T a, T b ) const { return a | b; }
+    T operator()( T a, T b ) const { 반환 a | b; }
 };
 
 template<typename T> struct OpXor
@@ -219,7 +219,7 @@ template<typename T> struct OpXor
     typedef T type1;
     typedef T type2;
     typedef T rtype;
-    T operator()( T a, T b ) const { return a ^ b; }
+    T operator()( T a, T b ) const { 반환 a ^ b; }
 };
 
 template<typename T> struct OpNot
@@ -227,24 +227,24 @@ template<typename T> struct OpNot
     typedef T type1;
     typedef T type2;
     typedef T rtype;
-    T operator()( T a, T ) const { return ~a; }
+    T operator()( T a, T ) const { 반환 ~a; }
 };
 
 template<> inline uchar OpAdd<uchar>::operator ()(uchar a, uchar b) const
-{ return CV_FAST_CAST_8U(a + b); }
+{ 반환 CV_FAST_CAST_8U(a + b); }
 
 template<> inline uchar OpSub<uchar>::operator ()(uchar a, uchar b) const
-{ return CV_FAST_CAST_8U(a - b); }
+{ 반환 CV_FAST_CAST_8U(a - b); }
 
 template<> inline short OpAbsDiff<short>::operator ()(short a, short b) const
-{ return saturate_cast<short>(std::abs(a - b)); }
+{ 반환 saturate_cast<short>(std::abs(a - b)); }
 
 template<> inline schar OpAbsDiff<schar>::operator ()(schar a, schar b) const
-{ return saturate_cast<schar>(std::abs(a - b)); }
+{ 반환 saturate_cast<schar>(std::abs(a - b)); }
 
-template<> inline uchar OpMin<uchar>::operator ()(uchar a, uchar b) const { return CV_MIN_8U(a, b); }
+template<> inline uchar OpMin<uchar>::operator ()(uchar a, uchar b) const { 반환 CV_MIN_8U(a, b); }
 
-template<> inline uchar OpMax<uchar>::operator ()(uchar a, uchar b) const { return CV_MAX_8U(a, b); }
+template<> inline uchar OpMax<uchar>::operator ()(uchar a, uchar b) const { 반환 CV_MAX_8U(a, b); }
 
 typedef void (*UnaryFunc)(const uchar* src1, size_t step1,
                        uchar* dst, size_t step, Size sz,
@@ -257,15 +257,15 @@ typedef void (*BinaryFunc)(const uchar* src1, size_t step1,
 
 typedef void (*BinaryFuncC)(const void* src1, size_t step1,
                        const void* src2, size_t step2,
-                       void* dst, size_t step, int width, int height,
+                       void* dst, size_t step, 정수 width, 정수 height,
                        void*);
 
 // Exported so the new element-wise expression engine can reuse the already-optimized,
 // CPU-dispatched convert / convert-scale kernels through a thin ElemwiseFunc adapter,
 // instead of re-implementing the whole cast matrix. (Prototype: declarations are mirrored
 // engine-side; relocate into a public core header at integration time.)
-CV_EXPORTS BinaryFunc getConvertFunc(int sdepth, int ddepth);
-CV_EXPORTS BinaryFunc getConvertScaleFunc(int sdepth, int ddepth);
+CV_EXPORTS BinaryFunc getConvertFunc(정수 sdepth, 정수 ddepth);
+CV_EXPORTS BinaryFunc getConvertScaleFunc(정수 sdepth, 정수 ddepth);
 BinaryFunc getCopyMaskFunc(size_t esz);
 
 /* default memory block for sparse array elements */
@@ -280,54 +280,54 @@ BinaryFunc getCopyMaskFunc(size_t esz);
 // There is some mess in code with vectors representation.
 // Both vector-column / vector-rows are used with dims=2 (as Mat2D always).
 // Reshape matrices if necessary (in case of vectors) and returns size with scaled width.
-Size getContinuousSize2D(Mat& m1, int widthScale=1);
-Size getContinuousSize2D(Mat& m1, Mat& m2, int widthScale=1);
-Size getContinuousSize2D(Mat& m1, Mat& m2, Mat& m3, int widthScale=1);
+Size getContinuousSize2D(Mat& m1, 정수 widthScale=1);
+Size getContinuousSize2D(Mat& m1, Mat& m2, 정수 widthScale=1);
+Size getContinuousSize2D(Mat& m1, Mat& m2, Mat& m3, 정수 widthScale=1);
 
-void setSize( Mat& m, int _dims, const int* _sz, const size_t* _steps, bool autoSteps=false );
+void setSize( Mat& m, 정수 _dims, const 정수* _sz, const size_t* _steps, bool autoSteps=false );
 void finalizeHdr(Mat& m);
-int updateContinuityFlag(int flags, int dims, const int* size, const size_t* step);
+정수 updateContinuityFlag(정수 flags, 정수 dims, const 정수* size, const size_t* step);
 
 struct NoVec
 {
-    size_t operator()(const void*, const void*, void*, size_t) const { return 0; }
+    size_t operator()(const void*, const void*, void*, size_t) const { 반환 0; }
 };
 
 #define CV_SPLIT_MERGE_MAX_BLOCK_SIZE(cn) ((INT_MAX/4)/(cn)) // HAL implementation accepts 'int' len, so INT_MAX doesn't work here
 
 enum { BLOCK_SIZE = 1024 };
 
-#if defined HAVE_IPP && (IPP_VERSION_X100 >= 700)
+#만약 defined HAVE_IPP && (IPP_VERSION_X100 >= 700)
 #define ARITHM_USE_IPP 1
-#else
+#아니면
 #define ARITHM_USE_IPP 0
 #endif
 
-inline bool checkScalar(const Mat& sc, int atype, _InputArray::KindFlag sckind, _InputArray::KindFlag akind)
+inline bool checkScalar(const Mat& sc, 정수 atype, _InputArray::KindFlag sckind, _InputArray::KindFlag akind)
 {
-    if( sc.dims > 2 || !sc.isContinuous() )
-        return false;
+    만약( sc.dims > 2 || !sc.isContinuous() )
+        반환 false;
     Size sz = sc.size();
-    if(sz.width != 1 && sz.height != 1)
-        return false;
-    int cn = CV_MAT_CN(atype);
-    if( akind == _InputArray::MATX && sckind != _InputArray::MATX )
-        return false;
-    return sz == Size(1, 1) || sz == Size(1, cn) || sz == Size(cn, 1) ||
+    만약(sz.width != 1 && sz.height != 1)
+        반환 false;
+    정수 cn = CV_MAT_CN(atype);
+    만약( akind == _InputArray::MATX && sckind != _InputArray::MATX )
+        반환 false;
+    반환 sz == Size(1, 1) || sz == Size(1, cn) || sz == Size(cn, 1) ||
            (sz == Size(1, 4) && sc.type() == CV_64F && cn <= 4);
 }
 
-inline bool checkScalar(InputArray sc, int atype, _InputArray::KindFlag sckind, _InputArray::KindFlag akind)
+inline bool checkScalar(InputArray sc, 정수 atype, _InputArray::KindFlag sckind, _InputArray::KindFlag akind)
 {
-    if( sc.dims() > 2 || !sc.isContinuous() )
-        return false;
+    만약( sc.dims() > 2 || !sc.isContinuous() )
+        반환 false;
     Size sz = sc.size();
-    if(sz.width != 1 && sz.height != 1)
-        return false;
-    int cn = CV_MAT_CN(atype);
-    if( akind == _InputArray::MATX && sckind != _InputArray::MATX )
-        return false;
-    return sz == Size(1, 1) || sz == Size(1, cn) || sz == Size(cn, 1) ||
+    만약(sz.width != 1 && sz.height != 1)
+        반환 false;
+    정수 cn = CV_MAT_CN(atype);
+    만약( akind == _InputArray::MATX && sckind != _InputArray::MATX )
+        반환 false;
+    반환 sz == Size(1, 1) || sz == Size(1, cn) || sz == Size(cn, 1) ||
            (sz == Size(1, 4) && sc.type() == CV_64F && cn <= 4);
 }
 
@@ -335,7 +335,7 @@ inline bool checkScalar(InputArray sc, int atype, _InputArray::KindFlag sckind, 
 // single channel.
 inline bool sameShapeAsArg(const _InputArray& sc, const _InputArray& arr)
 {
-    return arr.channels() == 1 && sc.sameSize(arr);
+    반환 arr.channels() == 1 && sc.sameSize(arr);
 }
 
 // New element-wise engine scalar handling. A genuine number / Scalar / Vec / Matx operand to an
@@ -351,19 +351,19 @@ inline bool sameShapeAsArg(const _InputArray& sc, const _InputArray& arr)
 inline bool isScalarArg(const _InputArray& sc, const _InputArray& arr)
 {
     const _InputArray::KindFlag kind = sc.kind();
-    const int cn = arr.channels();
-    if (kind == _InputArray::MATX)
+    const 정수 cn = arr.channels();
+    만약 (kind == _InputArray::MATX)
     {
         Size sz = sc.getSz();
-        int scn0 = sz.width * sz.height;
+        정수 scn0 = sz.width * sz.height;
         // A genuine scalar is a 1D MATX (a Vec/Scalar/number: one of width/height is 1). A 2D MATX
         // (e.g. a Matx33) is a real matrix operand and rides broadcasting - never a scalar.
-        if (scn0 != sz.width + sz.height - 1)
-            return false;
+        만약 (scn0 != sz.width + sz.height - 1)
+            반환 false;
         // Per-channel match (incl. Vec<_,N> for an N-channel array), a 4-elem Scalar on a <4-channel
         // array, or a single broadcast value. No 4-channel cap: a multichannel scalar rides as a 0-dim
         // per-channel CONST over the caller's data (not squeezed into a 4-slot Scalar).
-        return scn0 == cn || (cn < 4 && scn0 == 4) || scn0 == 1;
+        반환 scn0 == cn || (cn < 4 && scn0 == 4) || scn0 == 1;
     }
     // the bindings-style Scalar column. dims must be exactly 2: a 1-D [4] CV_64F array is an honest
     // broadcast operand. Direct field reads (no _InputArray getter dispatch) - this runs on EVERY
@@ -372,19 +372,19 @@ inline bool isScalarArg(const _InputArray& sc, const _InputArray& arr)
     // element-wise, exactly as in 4.x (see sameShapeAsArg). That covers both the non-continuous
     // partner that fails this very test (e.g. P.col(0)) and a genuine Scalar partner, which keeps
     // its per-channel semantics because only the Mat/UMat side is demoted.
-    if (kind == _InputArray::MAT)
+    만약 (kind == _InputArray::MAT)
     {
         const Mat& m = *(const Mat*)sc.getObj();
-        return m.rows == 4 && m.cols == 1 && cn <= 4 && m.dims == 2 &&
+        반환 m.rows == 4 && m.cols == 1 && cn <= 4 && m.dims == 2 &&
                m.type() == CV_64F && m.isContinuous() && !sameShapeAsArg(sc, arr);
     }
-    if (kind == _InputArray::UMAT)
+    만약 (kind == _InputArray::UMAT)
     {
         const UMat& m = *(const UMat*)sc.getObj();
-        return m.rows == 4 && m.cols == 1 && cn <= 4 && m.dims == 2 &&
+        반환 m.rows == 4 && m.cols == 1 && cn <= 4 && m.dims == 2 &&
                m.type() == CV_64F && m.isContinuous() && !sameShapeAsArg(sc, arr);
     }
-    return false;
+    반환 false;
 }
 
 // The remaining old arithm_op checkScalar geometry: a real Mat/UMat that LOOKS like a scalar - 1x1
@@ -392,30 +392,30 @@ inline bool isScalarArg(const _InputArray& sc, const _InputArray& arr)
 // arithm_op treats such an operand as a per-channel scalar ONLY as a fallback, when the shapes are
 // not broadcast-compatible - a call that is valid under numpy rules keeps its numpy meaning, one
 // that would throw gets the 4.x scalar semantics instead.
-inline bool isScalarLikeMat(const _InputArray& sc, int cn)
+inline bool isScalarLikeMat(const _InputArray& sc, 정수 cn)
 {
     // direct field reads, like isScalarArg: this probe also runs per engine call (see arithm_op's
     // compat fallback). `rows != 1 && cols != 1` exits in two inline compares for ordinary arrays.
-    int rows, cols, nval;
+    정수 rows, cols, nval;
     bool continuous;
     const _InputArray::KindFlag kind = sc.kind();
-    if (kind == _InputArray::MAT)
+    만약 (kind == _InputArray::MAT)
     {
         const Mat& m = *(const Mat*)sc.getObj();
-        if ((m.rows != 1 && m.cols != 1) || m.dims > 2) return false;
+        만약 ((m.rows != 1 && m.cols != 1) || m.dims > 2) 반환 false;
         rows = m.rows; cols = m.cols; nval = rows * cols * m.channels(); continuous = m.isContinuous();
     }
-    else if (kind == _InputArray::UMAT)
+    아니면 만약 (kind == _InputArray::UMAT)
     {
         const UMat& m = *(const UMat*)sc.getObj();
-        if ((m.rows != 1 && m.cols != 1) || m.dims > 2) return false;
+        만약 ((m.rows != 1 && m.cols != 1) || m.dims > 2) 반환 false;
         rows = m.rows; cols = m.cols; nval = rows * cols * m.channels(); continuous = m.isContinuous();
     }
-    else
-        return false;
-    if (!continuous || nval > 4 || (nval != 1 && nval != cn))
-        return false;
-    return (rows == 1 && cols == 1) || (rows == cn && cols == 1) || (rows == 1 && cols == cn);
+    아니면
+        반환 false;
+    만약 (!continuous || nval > 4 || (nval != 1 && nval != cn))
+        반환 false;
+    반환 (rows == 1 && cols == 1) || (rows == cn && cols == 1) || (rows == 1 && cols == cn);
 }
 
 // The size of the caller-provided stack buffer for scalarArgElems (4 slots of the widest depth).
@@ -426,69 +426,69 @@ enum { EW_SCALAR_BUF_SIZE = 4 * sizeof(double) };
 // A UMAT scalar's values are copied device->host into `scbuf` (>= EW_SCALAR_BUF_SIZE bytes, on the
 // CALLER's stack - no heap, no UMat::getMat mapping machinery for 32 bytes of data).
 // p/d receive the data pointer and depth; returns the value count (elems x channels).
-inline int scalarArgElems(const _InputArray& sc, const uchar*& p, int& d, uchar* scbuf)
+inline 정수 scalarArgElems(const _InputArray& sc, const uchar*& p, 정수& d, uchar* scbuf)
 {
     const _InputArray::KindFlag kind = sc.kind();
-    if (kind == _InputArray::MAT)
+    만약 (kind == _InputArray::MAT)
     {
         const Mat& m = *(const Mat*)sc.getObj();
         p = m.data;
         d = m.depth();
-        return (int)m.total() * m.channels();
+        반환 (정수)m.total() * m.channels();
     }
-    if (kind == _InputArray::UMAT)
+    만약 (kind == _InputArray::UMAT)
     {
         const UMat& u = *(const UMat*)sc.getObj();
         d = u.depth();
-        int n = (int)u.total() * u.channels();
-        CV_Assert(n * (int)CV_ELEM_SIZE1(d) <= (int)EW_SCALAR_BUF_SIZE);
+        정수 n = (정수)u.total() * u.channels();
+        CV_Assert(n * (정수)CV_ELEM_SIZE1(d) <= (정수)EW_SCALAR_BUF_SIZE);
         Mat header(u.dims, u.size.p, u.type(), scbuf);   // header over the caller's stack buffer
         u.copyTo(header);                                // create() is a no-op (exact match) -> the
         p = scbuf;                                       // copy lands straight in scbuf
-        return n;
+        반환 n;
     }
     p = (const uchar*)sc.getObj();
     d = sc.depth();
     Size sz = sc.getSz();
-    return sz.width * sz.height;
+    반환 sz.width * sz.height;
 }
 
 // Read one element of depth `d` at p as a double (no Mat, no convertTo, no dispatcher).
-inline double elemToDouble(int d, const uchar* p)
+inline double elemToDouble(정수 d, const uchar* p)
 {
     switch (d)
     {
-    case CV_8U:   return *(const uchar*)p;
-    case CV_8S:   return *(const schar*)p;
-    case CV_16U:  return *(const ushort*)p;
-    case CV_16S:  return *(const short*)p;
-    case CV_32U:  return *(const unsigned*)p;
-    case CV_32S:  return *(const int*)p;
-    case CV_64U:  return (double)*(const uint64_t*)p;
-    case CV_64S:  return (double)*(const int64_t*)p;
-    case CV_16F:  return (float)*(const hfloat*)p;
-    case CV_16BF: return (float)*(const bfloat*)p;
-    case CV_32F:  return *(const float*)p;
-    case CV_64F:  return *(const double*)p;
+    case CV_8U:   반환 *(const uchar*)p;
+    case CV_8S:   반환 *(const schar*)p;
+    case CV_16U:  반환 *(const ushort*)p;
+    case CV_16S:  반환 *(const short*)p;
+    case CV_32U:  반환 *(const unsigned*)p;
+    case CV_32S:  반환 *(const 정수*)p;
+    case CV_64U:  반환 (double)*(const uint64_t*)p;
+    case CV_64S:  반환 (double)*(const int64_t*)p;
+    case CV_16F:  반환 (float)*(const hfloat*)p;
+    case CV_16BF: 반환 (float)*(const bfloat*)p;
+    case CV_32F:  반환 *(const float*)p;
+    case CV_64F:  반환 *(const double*)p;
     default:      CV_Error(Error::StsUnsupportedFormat, "unsupported scalar depth");
     }
 }
 
 // Extract a scalar operand's values (see isScalarArg) as up to 4 doubles, straight from its
 // storage. Returns the element count.
-inline int readScalarArg(const _InputArray& sc, Scalar& out)
+inline 정수 readScalarArg(const _InputArray& sc, Scalar& out)
 {
     out = Scalar();                      // unused channels stay 0 (independent of the caller's Scalar)
-    const uchar* p; int d; uchar scbuf[EW_SCALAR_BUF_SIZE];
-    int n = scalarArgElems(sc, p, d, scbuf);
+    const uchar* p; 정수 d; uchar scbuf[EW_SCALAR_BUF_SIZE];
+    정수 n = scalarArgElems(sc, p, d, scbuf);
     CV_Assert(n <= 4);                   // Scalar holds 4 slots; isScalarArg admits more only for MATX
     size_t esz = CV_ELEM_SIZE1(d);
-    for (int i = 0; i < n; i++)
+    위해 (정수 i = 0; i < n; i++)
         out[i] = elemToDouble(d, p + (size_t)i * esz);
-    return n;
+    반환 n;
 }
 
-void convertAndUnrollScalar( const Mat& sc, int buftype, uchar* scbuf, size_t blocksize );
+void convertAndUnrollScalar( const Mat& sc, 정수 buftype, uchar* scbuf, size_t blocksize );
 
 #ifdef CV_COLLECT_IMPL_DATA
 struct ImplCollector
@@ -500,8 +500,8 @@ struct ImplCollector
     }
     bool useCollection; // enable/disable impl data collection
 
-    int implFlags;
-    std::vector<int>    implCode;
+    정수 implFlags;
+    std::vector<정수>    implCode;
     std::vector<String> implFun;
 
     cv::Mutex mutex;
@@ -522,23 +522,23 @@ struct CoreTLSData
 //#ifdef HAVE_OPENCL
     ocl::OpenCLExecutionContext oclExecutionContext;
     bool oclExecutionContextInitialized;
-    int useOpenCL; // 1 - use, 0 - do not use, -1 - auto/not initialized
+    정수 useOpenCL; // 1 - use, 0 - do not use, -1 - auto/not initialized
 //#endif
-    int useIPP;    // 1 - use, 0 - do not use, -1 - auto/not initialized
-    int useIPP_NE; // 1 - use, 0 - do not use, -1 - auto/not initialized
+    정수 useIPP;    // 1 - use, 0 - do not use, -1 - auto/not initialized
+    정수 useIPP_NE; // 1 - use, 0 - do not use, -1 - auto/not initialized
 };
 
 CoreTLSData& getCoreTlsData();
 
-#if defined(BUILD_SHARED_LIBS)
-#if defined _WIN32 || defined WINCE
+#만약 defined(BUILD_SHARED_LIBS)
+#만약 defined _WIN32 || defined WINCE
 #define CL_RUNTIME_EXPORT __declspec(dllexport)
 #elif defined __GNUC__
 #define CL_RUNTIME_EXPORT __attribute__ ((visibility ("default")))
-#else
+#아니면
 #define CL_RUNTIME_EXPORT
 #endif
-#else
+#아니면
 #define CL_RUNTIME_EXPORT
 #endif
 
@@ -555,15 +555,15 @@ int64 getTimestampNS();
 
 #define CV_SINGLETON_LAZY_INIT_(TYPE, INITIALIZER, RET_VALUE) \
     static TYPE* const instance = INITIALIZER; \
-    return RET_VALUE;
+    반환 RET_VALUE;
 
 #define CV_SINGLETON_LAZY_INIT(TYPE, INITIALIZER) CV_SINGLETON_LAZY_INIT_(TYPE, INITIALIZER, instance)
 #define CV_SINGLETON_LAZY_INIT_REF(TYPE, INITIALIZER) CV_SINGLETON_LAZY_INIT_(TYPE, INITIALIZER, *instance)
 
 CV_EXPORTS void releaseTlsStorageThread();
 
-int cv_snprintf(char* buf, int len, const char* fmt, ...);
-int cv_vsnprintf(char* buf, int len, const char* fmt, va_list args);
+정수 cv_snprintf(char* buf, 정수 len, const char* fmt, ...);
+정수 cv_vsnprintf(char* buf, 정수 len, const char* fmt, va_list args);
 }
 
 #endif  // BUILD_PLUGIN

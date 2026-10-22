@@ -56,27 +56,27 @@ namespace cv
         char buf[32];   // enough for double with precision up to 20
 
         Mat mtx;
-        int mcn; // == mtx.channels()
+        정수 mcn; // == mtx.channels()
         bool singleLine;
         bool alignOrder;    // true when cn first order
 
-        int state;
-        int row;
-        int col;
-        int cn;
+        정수 state;
+        정수 row;
+        정수 col;
+        정수 cn;
 
         String prologue;
         String epilogue;
         char braces[5];
 
         void (FormattedImpl::*valueToStr)();
-        void valueToStrBool() { snprintf(buf, sizeof(buf), "%d", (int)mtx.ptr<uchar>(row, col)[cn] != 0); }
-        void valueToStr8u()  { snprintf(buf, sizeof(buf), "%3d", (int)mtx.ptr<uchar>(row, col)[cn]); }
-        void valueToStr8s()  { snprintf(buf, sizeof(buf), "%3d", (int)mtx.ptr<schar>(row, col)[cn]); }
-        void valueToStr16u() { snprintf(buf, sizeof(buf), "%d", (int)mtx.ptr<ushort>(row, col)[cn]); }
-        void valueToStr16s() { snprintf(buf, sizeof(buf), "%d", (int)mtx.ptr<short>(row, col)[cn]); }
+        void valueToStrBool() { snprintf(buf, sizeof(buf), "%d", (정수)mtx.ptr<uchar>(row, col)[cn] != 0); }
+        void valueToStr8u()  { snprintf(buf, sizeof(buf), "%3d", (정수)mtx.ptr<uchar>(row, col)[cn]); }
+        void valueToStr8s()  { snprintf(buf, sizeof(buf), "%3d", (정수)mtx.ptr<schar>(row, col)[cn]); }
+        void valueToStr16u() { snprintf(buf, sizeof(buf), "%d", (정수)mtx.ptr<ushort>(row, col)[cn]); }
+        void valueToStr16s() { snprintf(buf, sizeof(buf), "%d", (정수)mtx.ptr<short>(row, col)[cn]); }
         void valueToStr32u() { snprintf(buf, sizeof(buf), "%u", mtx.ptr<unsigned>(row, col)[cn]); }
-        void valueToStr32s() { snprintf(buf, sizeof(buf), "%d", mtx.ptr<int>(row, col)[cn]); }
+        void valueToStr32s() { snprintf(buf, sizeof(buf), "%d", mtx.ptr<정수>(row, col)[cn]); }
         void valueToStr32f() { snprintf(buf, sizeof(buf), floatFormat, mtx.ptr<float>(row, col)[cn]); }
         void valueToStr64f() { snprintf(buf, sizeof(buf), floatFormat, mtx.ptr<double>(row, col)[cn]); }
         void valueToStr64u() { snprintf(buf, sizeof(buf), "%llu", (unsigned long long)mtx.ptr<uint64_t>(row, col)[cn]); }
@@ -89,7 +89,7 @@ namespace cv
 
     public:
 
-        FormattedImpl(String pl, String el, Mat m, char br[5], bool sLine, bool aOrder, int precision)
+        FormattedImpl(String pl, String el, Mat m, char br[5], bool sLine, bool aOrder, 정수 precision)
         {
             CV_Assert(m.dims <= 2);
 
@@ -103,13 +103,13 @@ namespace cv
             alignOrder = aOrder;
             row = col = cn =0;
 
-            if (precision < 0)
+            만약 (precision < 0)
             {
                 floatFormat[0] = '%';
                 floatFormat[1] = 'a';
                 floatFormat[2] = 0;
             }
-            else
+            아니면
             {
                 cv_snprintf(floatFormat, sizeof(floatFormat), "%%.%dg", std::min(precision, 20));
             }
@@ -147,126 +147,126 @@ namespace cv
             {
                 case STATE_PROLOGUE:
                     row = 0;
-                    if (mtx.empty())
+                    만약 (mtx.empty())
                         state = STATE_EPILOGUE;
-                    else if (alignOrder)
+                    아니면 만약 (alignOrder)
                         state = STATE_INTERLUDE;
-                    else
+                    아니면
                         state = STATE_ROW_OPEN;
-                    return prologue.c_str();
+                    반환 prologue.c_str();
                 case STATE_INTERLUDE:
                     state = STATE_ROW_OPEN;
-                    if (row >= mtx.rows)
+                    만약 (row >= mtx.rows)
                     {
-                        if (++cn >= mcn)
+                        만약 (++cn >= mcn)
                         {
                             state = STATE_EPILOGUE;
                             buf[0] = 0;
-                            return buf;
+                            반환 buf;
                         }
-                        else
+                        아니면
                             row = 0;
                         snprintf(buf, sizeof(buf), "\n(:, :, %d) = \n", cn+1);
-                        return buf;
+                        반환 buf;
                     }
                     snprintf(buf, sizeof(buf), "(:, :, %d) = \n", cn+1);
-                    return buf;
+                    반환 buf;
                 case STATE_EPILOGUE:
                     state = STATE_FINISHED;
-                    return epilogue.c_str();
+                    반환 epilogue.c_str();
                 case STATE_ROW_OPEN:
                     col = 0;
                     state = STATE_CN_OPEN;
                     {
                         size_t pos = 0;
-                        if (row > 0)
-                            while(pos < prologue.size() && pos < sizeof(buf) - 2)
+                        만약 (row > 0)
+                            동안(pos < prologue.size() && pos < sizeof(buf) - 2)
                                 buf[pos++] = ' ';
-                        if (braces[BRACE_ROW_OPEN])
+                        만약 (braces[BRACE_ROW_OPEN])
                             buf[pos++] = braces[BRACE_ROW_OPEN];
-                        if(!pos)
-                            return next();
+                        만약(!pos)
+                            반환 next();
                         buf[pos] = 0;
                     }
-                    return buf;
+                    반환 buf;
                 case STATE_ROW_CLOSE:
                     state = STATE_LINE_SEPARATOR;
                     ++row;
-                    if (braces[BRACE_ROW_CLOSE])
+                    만약 (braces[BRACE_ROW_CLOSE])
                     {
                         buf[0] = braces[BRACE_ROW_CLOSE];
                         buf[1] = row < mtx.rows ? ',' : '\0';
                         buf[2] = 0;
-                        return buf;
+                        반환 buf;
                     }
-                    else if(braces[BRACE_ROW_SEP] && row < mtx.rows)
+                    아니면 만약(braces[BRACE_ROW_SEP] && row < mtx.rows)
                     {
                         buf[0] = braces[BRACE_ROW_SEP];
                         buf[1] = 0;
-                        return buf;
+                        반환 buf;
                     }
-                    return next();
+                    반환 next();
                 case STATE_CN_OPEN:
                     state = STATE_VALUE;
-                    if (!alignOrder)
+                    만약 (!alignOrder)
                         cn = 0;
-                    if (mcn > 1 && braces[BRACE_CN_OPEN])
+                    만약 (mcn > 1 && braces[BRACE_CN_OPEN])
                     {
                         buf[0] = braces[BRACE_CN_OPEN];
                         buf[1] = 0;
-                        return buf;
+                        반환 buf;
                     }
-                    return next();
+                    반환 next();
                 case STATE_CN_CLOSE:
                     ++col;
-                    if (col >= mtx.cols)
+                    만약 (col >= mtx.cols)
                         state = STATE_ROW_CLOSE;
-                    else
+                    아니면
                         state = STATE_CN_SEPARATOR;
-                    if (mcn > 1 && braces[BRACE_CN_CLOSE])
+                    만약 (mcn > 1 && braces[BRACE_CN_CLOSE])
                     {
                         buf[0] = braces[BRACE_CN_CLOSE];
                         buf[1] = 0;
-                        return buf;
+                        반환 buf;
                     }
-                    return next();
+                    반환 next();
                 case STATE_VALUE:
                     (this->*valueToStr)();
                     state = STATE_CN_CLOSE;
-                    if (alignOrder)
-                        return buf;
-                    if (++cn < mcn)
+                    만약 (alignOrder)
+                        반환 buf;
+                    만약 (++cn < mcn)
                         state = STATE_VALUE_SEPARATOR;
-                    return buf;
+                    반환 buf;
                 case STATE_FINISHED:
-                    return 0;
+                    반환 0;
                 case STATE_LINE_SEPARATOR:
-                    if (row >= mtx.rows)
+                    만약 (row >= mtx.rows)
                     {
-                        if (alignOrder)
+                        만약 (alignOrder)
                             state = STATE_INTERLUDE;
-                        else
+                        아니면
                             state = STATE_EPILOGUE;
-                        return next();
+                        반환 next();
                     }
                     state = STATE_ROW_OPEN;
                     buf[0] = singleLine ? ' ' : '\n';
                     buf[1] = 0;
-                    return buf;
+                    반환 buf;
                 case STATE_CN_SEPARATOR:
                     state = STATE_CN_OPEN;
                     buf[0] = ',';
                     buf[1] = ' ';
                     buf[2] = 0;
-                    return buf;
+                    반환 buf;
                 case STATE_VALUE_SEPARATOR:
                     state = STATE_VALUE;
                     buf[0] = ',';
                     buf[1] = ' ';
                     buf[2] = 0;
-                    return buf;
+                    반환 buf;
             }
-            return 0;
+            반환 0;
         }
     };
 
@@ -275,17 +275,17 @@ namespace cv
     public:
         FormatterBase() : prec16f(4), prec32f(8), prec64f(16), multiline(true) {}
 
-        void set16fPrecision(int p) CV_OVERRIDE
+        void set16fPrecision(정수 p) CV_OVERRIDE
         {
             prec16f = p;
         }
 
-        void set32fPrecision(int p) CV_OVERRIDE
+        void set32fPrecision(정수 p) CV_OVERRIDE
         {
             prec32f = p;
         }
 
-        void set64fPrecision(int p) CV_OVERRIDE
+        void set64fPrecision(정수 p) CV_OVERRIDE
         {
             prec64f = p;
         }
@@ -296,10 +296,10 @@ namespace cv
         }
 
     protected:
-        int prec16f;
-        int prec32f;
-        int prec64f;
-        int multiline;
+        정수 prec16f;
+        정수 prec32f;
+        정수 prec64f;
+        정수 multiline;
     };
 
     class DefaultFormatter CV_FINAL : public FormatterBase
@@ -309,7 +309,7 @@ namespace cv
         Ptr<Formatted> format(const Mat& mtx) const CV_OVERRIDE
         {
             char braces[5] = {'\0', '\0', ';', '\0', '\0'};
-            return makePtr<FormattedImpl>("[", "]", mtx, &*braces,
+            반환 makePtr<FormattedImpl>("[", "]", mtx, &*braces,
                 mtx.rows == 1 || !multiline, false, mtx.depth() == CV_64F ? prec64f : prec32f );
         }
     };
@@ -321,7 +321,7 @@ namespace cv
         Ptr<Formatted> format(const Mat& mtx) const CV_OVERRIDE
         {
             char braces[5] = {'\0', '\0', ';', '\0', '\0'};
-            return makePtr<FormattedImpl>("", "", mtx, &*braces,
+            반환 makePtr<FormattedImpl>("", "", mtx, &*braces,
                 mtx.rows == 1 || !multiline, true, mtx.depth() == CV_64F ? prec64f : prec32f );
         }
     };
@@ -333,9 +333,9 @@ namespace cv
         Ptr<Formatted> format(const Mat& mtx) const CV_OVERRIDE
         {
             char braces[5] = {'[', ']', ',', '[', ']'};
-            if (mtx.cols == 1)
+            만약 (mtx.cols == 1)
                 braces[0] = braces[1] = '\0';
-            return makePtr<FormattedImpl>("[", "]", mtx, &*braces,
+            반환 makePtr<FormattedImpl>("[", "]", mtx, &*braces,
                 mtx.rows == 1 || !multiline, false, mtx.depth() == CV_64F ? prec64f : prec32f );
         }
     };
@@ -353,9 +353,9 @@ namespace cv
                 "float8_e4m3fn", "float8_e4m3fnuz"
             };
             char braces[5] = {'[', ']', ',', '[', ']'};
-            if (mtx.cols == 1)
+            만약 (mtx.cols == 1)
                 braces[0] = braces[1] = '\0';
-            return makePtr<FormattedImpl>("array([",
+            반환 makePtr<FormattedImpl>("array([",
                 cv::format("], dtype='%s')", numpyTypes[mtx.depth()]), mtx, &*braces,
                 mtx.rows == 1 || !multiline, false, mtx.depth() == CV_64F ? prec64f : prec32f );
         }
@@ -368,7 +368,7 @@ namespace cv
         Ptr<Formatted> format(const Mat& mtx) const CV_OVERRIDE
         {
             char braces[5] = {'\0', '\0', '\0', '\0', '\0'};
-            return makePtr<FormattedImpl>(String(),
+            반환 makePtr<FormattedImpl>(String(),
                 mtx.rows > 1 ? String("\n") : String(), mtx, &*braces,
                 mtx.rows == 1 || !multiline, false, mtx.depth() == CV_64F ? prec64f : prec32f );
         }
@@ -381,7 +381,7 @@ namespace cv
         Ptr<Formatted> format(const Mat& mtx) const CV_OVERRIDE
         {
             char braces[5] = {'\0', '\0', ',', '\0', '\0'};
-            return makePtr<FormattedImpl>("{", "}", mtx, &*braces,
+            반환 makePtr<FormattedImpl>("{", "}", mtx, &*braces,
                 mtx.rows == 1 || !multiline, false, mtx.depth() == CV_64F ? prec64f : prec32f );
         }
     };
@@ -394,172 +394,172 @@ namespace cv
         switch(fmt)
         {
             case FMT_DEFAULT:
-                return makePtr<DefaultFormatter>();
+                반환 makePtr<DefaultFormatter>();
             case FMT_MATLAB:
-                return makePtr<MatlabFormatter>();
+                반환 makePtr<MatlabFormatter>();
             case FMT_CSV:
-                return makePtr<CSVFormatter>();
+                반환 makePtr<CSVFormatter>();
             case FMT_PYTHON:
-                return makePtr<PythonFormatter>();
+                반환 makePtr<PythonFormatter>();
             case FMT_NUMPY:
-                return makePtr<NumpyFormatter>();
+                반환 makePtr<NumpyFormatter>();
             case FMT_C:
-                return makePtr<CFormatter>();
+                반환 makePtr<CFormatter>();
         }
-        return makePtr<DefaultFormatter>();
+        반환 makePtr<DefaultFormatter>();
     }
 
     template<typename _Tp> struct Fmt
     {
-        typedef int temp_type;
-        static const char* fmt() { return "%d"; }
+        typedef 정수 temp_type;
+        static const char* fmt() { 반환 "%d"; }
     };
 
     template<> struct Fmt<uint32_t>
     {
         typedef unsigned temp_type;
-        static const char* fmt() { return "%u"; }
+        static const char* fmt() { 반환 "%u"; }
     };
 
     template<> struct Fmt<int64_t>
     {
         typedef long long temp_type;
-        static const char* fmt() { return "%lld"; }
+        static const char* fmt() { 반환 "%lld"; }
     };
 
     template<> struct Fmt<uint64_t>
     {
         typedef unsigned long long temp_type;
-        static const char* fmt() { return "%llu"; }
+        static const char* fmt() { 반환 "%llu"; }
     };
 
     template<> struct Fmt<float>
     {
         typedef float temp_type;
-        static const char* fmt() { return "%.5g"; }
+        static const char* fmt() { 반환 "%.5g"; }
     };
 
     template<> struct Fmt<double>
     {
         typedef double temp_type;
-        static const char* fmt() { return "%.5g"; }
+        static const char* fmt() { 반환 "%.5g"; }
     };
 
     template<> struct Fmt<hfloat>
     {
         typedef float temp_type;
-        static const char* fmt() { return "%.5g"; }
+        static const char* fmt() { 반환 "%.5g"; }
     };
 
     template<> struct Fmt<bfloat>
     {
         typedef float temp_type;
-        static const char* fmt() { return "%.4g"; }
+        static const char* fmt() { 반환 "%.4g"; }
     };
 
     template<> struct Fmt<fp8_t>
     {
         typedef float temp_type;
-        static const char* fmt() { return "%.4g"; }
+        static const char* fmt() { 반환 "%.4g"; }
     };
 
     template<> struct Fmt<fp8a_t>
     {
         typedef float temp_type;
-        static const char* fmt() { return "%.4g"; }
+        static const char* fmt() { 반환 "%.4g"; }
     };
 
     template <typename _Tp>
-    static void pprintRow(std::ostream& strm, const _Tp* ptr, int n, size_t ofs, int edge)
+    static void pprintRow(std::ostream& strm, const _Tp* ptr, 정수 n, size_t ofs, 정수 edge)
     {
         char buf[128];
         const char* fmt = Fmt<_Tp>::fmt();
-        int i, ndump = edge > 0 ? std::min(n, edge*2+1) : n;
-        if (edge == 0)
+        정수 i, ndump = edge > 0 ? std::min(n, edge*2+1) : n;
+        만약 (edge == 0)
             edge = ndump;
-        for (i = 0; i < ndump; i++) {
-            int j = n == ndump || i < edge ? i : i == edge ? -1 : n-edge*2-1+i;
-            if (i > 0)
+        위해 (i = 0; i < ndump; i++) {
+            정수 j = n == ndump || i < edge ? i : i == edge ? -1 : n-edge*2-1+i;
+            만약 (i > 0)
                 strm << ", ";
-            if (j >= 0) {
+            만약 (j >= 0) {
                 snprintf(buf, sizeof(buf), fmt, (typename Fmt<_Tp>::temp_type)ptr[ofs + j]);
                 strm << buf;
-            } else
+            } 아니면
                 strm << "... ";
         }
     }
 
     static void pprintSlice(std::ostream& strm, const Mat& tensor,
-                            const size_t* step, int d,
-                            size_t ofs, int edge)
+                            const size_t* step, 정수 d,
+                            size_t ofs, 정수 edge)
     {
         MatShape shape = tensor.shape();
-        int ndims = shape.dims;
-        int n = d >= ndims ? 1 : shape[d];
-        if (d >= ndims - 1) {
-            int typ = tensor.depth();
+        정수 ndims = shape.dims;
+        정수 n = d >= ndims ? 1 : shape[d];
+        만약 (d >= ndims - 1) {
+            정수 typ = tensor.depth();
             void* data = tensor.data;
             CV_Assert(data);
             n *= tensor.channels();
-            if (typ == CV_8U)
+            만약 (typ == CV_8U)
                 pprintRow(strm, (const uint8_t*)data, n, ofs, edge);
-            else if (typ == CV_8S)
+            아니면 만약 (typ == CV_8S)
                 pprintRow(strm, (const int8_t*)data, n, ofs, edge);
-            else if (typ == CV_16U)
+            아니면 만약 (typ == CV_16U)
                 pprintRow(strm, (const uint16_t*)data, n, ofs, edge);
-            else if (typ == CV_16S)
+            아니면 만약 (typ == CV_16S)
                 pprintRow(strm, (const int16_t*)data, n, ofs, edge);
-            else if (typ == CV_32U)
+            아니면 만약 (typ == CV_32U)
                 pprintRow(strm, (const unsigned*)data, n, ofs, edge);
-            else if (typ == CV_32S)
-                pprintRow(strm, (const int*)data, n, ofs, edge);
-            else if (typ == CV_64U)
+            아니면 만약 (typ == CV_32S)
+                pprintRow(strm, (const 정수*)data, n, ofs, edge);
+            아니면 만약 (typ == CV_64U)
                 pprintRow(strm, (const uint64_t*)data, n, ofs, edge);
-            else if (typ == CV_64S)
+            아니면 만약 (typ == CV_64S)
                 pprintRow(strm, (const int64_t*)data, n, ofs, edge);
-            else if (typ == CV_32F)
+            아니면 만약 (typ == CV_32F)
                 pprintRow(strm, (const float*)data, n, ofs, edge);
-            else if (typ == CV_64F)
+            아니면 만약 (typ == CV_64F)
                 pprintRow(strm, (const double*)data, n, ofs, edge);
-            else if (typ == CV_16F)
+            아니면 만약 (typ == CV_16F)
                 pprintRow(strm, (const hfloat*)data, n, ofs, edge);
-            else if (typ == CV_16BF)
+            아니면 만약 (typ == CV_16BF)
                 pprintRow(strm, (const bfloat*)data, n, ofs, edge);
-            else if (typ == CV_Bool)
+            아니면 만약 (typ == CV_Bool)
                 pprintRow(strm, (const bool*)data, n, ofs, edge);
-            else if (typ == CV_8F_E4M3FN)
+            아니면 만약 (typ == CV_8F_E4M3FN)
                 pprintRow(strm, (const fp8_t*)data, n, ofs, edge);
-            else if (typ == CV_8F_E4M3FNUZ)
+            아니면 만약 (typ == CV_8F_E4M3FNUZ)
                 pprintRow(strm, (const fp8a_t*)data, n, ofs, edge);
-            else {
+            아니면 {
                 CV_Error(Error::StsNotImplemented, "unsupported type");
             }
-        } else {
-            int i, ndump = edge > 0 ? std::min(n, edge*2+1) : n;
+        } 아니면 {
+            정수 i, ndump = edge > 0 ? std::min(n, edge*2+1) : n;
             bool dots = false;
-            for (i = 0; i < ndump; i++) {
-                if (i > 0 && !dots) {
-                    int nempty_lines = ndims - 2 - d;
-                    for (int k = 0; k < nempty_lines; k++)
+            위해 (i = 0; i < ndump; i++) {
+                만약 (i > 0 && !dots) {
+                    정수 nempty_lines = ndims - 2 - d;
+                    위해 (정수 k = 0; k < nempty_lines; k++)
                         strm << "\n";
                 }
-                if (i > 0)
+                만약 (i > 0)
                     strm << "\n";
-                int j = n == ndump || i < edge ? i :
+                정수 j = n == ndump || i < edge ? i :
                         i == edge ? -1 :
                         n - edge*2 - 1 + i;
                 dots = j < 0;
-                if (!dots)
+                만약 (!dots)
                     pprintSlice(strm, tensor, step, d+1, ofs + j*step[d], edge);
-                else
+                아니면
                     strm << "...";
             }
         }
     }
 
     std::ostream& pprint(std::ostream& strm, InputArray array,
-                         int /*indent*/, int edge_,
-                         int wholeTensorThreshold,
+                         정수 /*indent*/, 정수 edge_,
+                         정수 wholeTensorThreshold,
                          char parens)
     {
         char oparen = parens;
@@ -568,11 +568,11 @@ namespace cv
                       parens == '{' ? '}' :
                       parens == '<' ? '>' :
                       parens;
-        int edge = edge_ > 0 ? edge_ : 3;
+        정수 edge = edge_ > 0 ? edge_ : 3;
         wholeTensorThreshold = wholeTensorThreshold > 0 ? wholeTensorThreshold : 100;
 
         Mat tensor = array.getMat();
-        if (!tensor.isContinuous()) {
+        만약 (!tensor.isContinuous()) {
             // [TODO] print non-continous arrays without copy
             Mat temp;
             tensor.copyTo(temp);
@@ -582,28 +582,28 @@ namespace cv
         MatShape shape = tensor.shape();
         size_t sz_all = tensor.total();
 
-        if (parens)
+        만약 (parens)
             strm << oparen;
-        if (sz_all == 0) {
-            if (!parens)
+        만약 (sz_all == 0) {
+            만약 (!parens)
                 strm << "<empty>";
-        } else {
-            if (sz_all <= (size_t)wholeTensorThreshold)
+        } 아니면 {
+            만약 (sz_all <= (size_t)wholeTensorThreshold)
                 edge = 0;
 
-            int ndims = shape.dims;
-            int cn = tensor.channels();
+            정수 ndims = shape.dims;
+            정수 cn = tensor.channels();
             size_t step[MatShape::MAX_DIMS];
             step[std::max(ndims-1, 0)] = 1;
-            for (int i = ndims-2; i >= 0; i--) {
+            위해 (정수 i = ndims-2; i >= 0; i--) {
                 step[i] = step[i+1]*shape[i+1]*cn;
                 cn = 1;
             }
             pprintSlice(strm, tensor, step, 0, 0, edge);
         }
-        if (parens)
+        만약 (parens)
             strm << cparen;
-        return strm;
+        반환 strm;
     }
 
 } // cv

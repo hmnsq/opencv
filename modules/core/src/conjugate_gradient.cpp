@@ -46,16 +46,16 @@
 
 namespace cv
 {
-    double MinProblemSolver::Function::getGradientEps() const { return 1e-3; }
+    double MinProblemSolver::Function::getGradientEps() const { 반환 1e-3; }
     void MinProblemSolver::Function::getGradient(const double* x, double* grad)
     {
         double eps = getGradientEps();
-        int i, n = getDims();
+        정수 i, n = getDims();
         AutoBuffer<double> x_buf(n);
         double* x_ = x_buf.data();
-        for( i = 0; i < n; i++ )
+        위해( i = 0; i < n; i++ )
             x_[i] = x[i];
-        for( i = 0; i < n; i++ )
+        위해( i = 0; i < n; i++ )
         {
             x_[i] = x[i] + eps;
             double y1 = calc(x_);
@@ -98,7 +98,7 @@ namespace cv
         dprintf(("d:\n"));
         print_matrix(d);
 
-        for(int i=0;i<SEC_METHOD_ITERATIONS;i++){
+        위해(정수 i=0;i<SEC_METHOD_ITERATIONS;i++){
             _f->getGradient((double*)x.data,(double*)buf1.data);
             dprintf(("buf1:\n"));
             print_matrix(buf1);
@@ -107,7 +107,7 @@ namespace cv
             dprintf(("buf2:\n"));
             print_matrix(buf2);
             double d1=buf1.dot(d), d2=buf2.dot(d);
-            if((d1-d2)==0){
+            만약((d1-d2)==0){
                 break;
             }
             double alpha=-sigma*d1/(d2-d1);
@@ -126,10 +126,10 @@ namespace cv
 
         Mat x_mat=x.getMat();
         CV_Assert(MIN(x_mat.rows,x_mat.cols)==1);
-        int ndim=MAX(x_mat.rows,x_mat.cols);
+        정수 ndim=MAX(x_mat.rows,x_mat.cols);
         CV_Assert(x_mat.type()==CV_64FC1);
 
-        if(d.cols!=ndim){
+        만약(d.cols!=ndim){
             d.create(1,ndim);
             r.create(1,ndim);
             r_old.create(1,ndim);
@@ -138,12 +138,12 @@ namespace cv
         }
 
         Mat_<double> proxy_x;
-        if(x_mat.rows>1){
+        만약(x_mat.rows>1){
             buf_x.create(1,ndim);
             Mat_<double> proxy(ndim,1,buf_x.ptr<double>());
             x_mat.copyTo(proxy);
             proxy_x=buf_x;
-        }else{
+        }아니면{
             proxy_x=x_mat;
         }
         _Function->getGradient(proxy_x.ptr<double>(),d.ptr<double>());
@@ -155,13 +155,13 @@ namespace cv
         dprintf(("d first time\n"));print_matrix(d);
         dprintf(("r\n"));print_matrix(r);
 
-        for(int count=0;count<_termcrit.maxCount;count++){
+        위해(정수 count=0;count<_termcrit.maxCount;count++){
             minimizeOnTheLine(_Function,proxy_x,d,minimizeOnTheLine_buf1,minimizeOnTheLine_buf2);
             r.copyTo(r_old);
             _Function->getGradient(proxy_x.ptr<double>(),r.ptr<double>());
             r*=-1.0;
             double r_norm_sq=norm(r);
-            if(_termcrit.type==(TermCriteria::MAX_ITER+TermCriteria::EPS) && r_norm_sq<_termcrit.epsilon){
+            만약(_termcrit.type==(TermCriteria::MAX_ITER+TermCriteria::EPS) && r_norm_sq<_termcrit.epsilon){
                 break;
             }
             r_norm_sq=r_norm_sq*r_norm_sq;
@@ -171,23 +171,23 @@ namespace cv
 
 
 
-        if(x_mat.rows>1){
+        만약(x_mat.rows>1){
             Mat(ndim, 1, CV_64F, proxy_x.ptr<double>()).copyTo(x);
         }
-        return _Function->calc(proxy_x.ptr<double>());
+        반환 _Function->calc(proxy_x.ptr<double>());
     }
 
     ConjGradSolverImpl::ConjGradSolverImpl(){
         _Function=Ptr<Function>();
     }
     Ptr<MinProblemSolver::Function> ConjGradSolverImpl::getFunction()const{
-        return _Function;
+        반환 _Function;
     }
     void ConjGradSolverImpl::setFunction(const Ptr<Function>& f){
         _Function=f;
     }
     TermCriteria ConjGradSolverImpl::getTermCriteria()const{
-        return _termcrit;
+        반환 _termcrit;
     }
     void ConjGradSolverImpl::setTermCriteria(const TermCriteria& termcrit){
         CV_Assert((termcrit.type==(TermCriteria::MAX_ITER+TermCriteria::EPS) && termcrit.epsilon>0 && termcrit.maxCount>0) ||
@@ -199,6 +199,6 @@ namespace cv
         Ptr<ConjGradSolver> CG = makePtr<ConjGradSolverImpl>();
         CG->setFunction(f);
         CG->setTermCriteria(termcrit);
-        return CG;
+        반환 CG;
     }
 }
