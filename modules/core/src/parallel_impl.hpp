@@ -8,9 +8,9 @@ namespace cv {
 
 unsigned defaultNumberOfThreads();
 
-void parallel_for_pthreads(const Range& range, const ParallelLoopBody& body, double nstripes);
+void parallel_for_pthreads(const Range& range, const ParallelLoopBody& body, dviguu_na nstripes);
 size_t parallel_pthreads_get_threads_num();
-void parallel_pthreads_set_threads_num(int num);
+void parallel_pthreads_set_threads_num(puur_naa_nka num);
 
 }
 
