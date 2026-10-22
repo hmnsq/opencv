@@ -16,36 +16,36 @@
 //  - A kernel processes one 2D tile of a single slice; broadcasting is per-operand y/x steps
 //    (step 0 = re-read). Steps are in ELEMENTS; dst is contiguous in x (dst.stepx == 1).
 
-#ifndef OPENCV_CORE_ARITHM_EXPR_HPP
-#define OPENCV_CORE_ARITHM_EXPR_HPP
+#ifndef OPENCV_CORE_ARITHM_व्यंजक_HPP
+#define OPENCV_CORE_ARITHM_व्यंजक_HPP
 
-#include <array>
-#include <iosfwd>
-#include <string_view>
-#include <utility>
-#include <vector>
+#अन्तर्भाव <array>
+#अन्तर्भाव <iosfwd>
+#अन्तर्भाव <string_view>
+#अन्तर्भाव <utility>
+#अन्तर्भाव <vector>
 
-namespace cv { namespace ew {
+नामाकाश cv { नामाकाश ew {
 
 // Sentinel depth for an unused operand (note: CV_8U == 0 is a *valid* depth,
 // so the "no operand" marker must be negative).
-enum { EW_DEPTH_NONE = -1 };
+गणना { EW_DEPTH_NONE = -1 };
 
 // Each op carries a fixed numerical value whose high bits encode its arity, so the arity
 // can be recovered with a shift and no lookup table:  arity = (op >> OP_ARITY_SHIFT) & 7.
 // The ops are grouped into contiguous arity blocks (unary = 1<<10, binary = 2<<10,
 // ternary = 3<<10); within a block the low bits are just a running index.
-enum { OP_ARITY_SHIFT = 10 };
-enum
+गणना { OP_ARITY_SHIFT = 10 };
+गणना
 {
     OP_UNARY_BASE   = 1 << OP_ARITY_SHIFT,   // 0x400
-    OP_BINARY_BASE  = 2 << OP_ARITY_SHIFT,   // 0x800
+    OP_द्विआधारी_BASE  = 2 << OP_ARITY_SHIFT,   // 0x800
     OP_TERNARY_BASE = 3 << OP_ARITY_SHIFT    // 0xC00
 };
 
 // The single enumeration of element-wise operations, used both in the IR and by the
 // kernel dispatcher.
-enum TOp
+गणना शीर्ष
 {
     OP_NOP = 0,
 
@@ -56,7 +56,7 @@ enum TOp
     OP_CAST,            // saturating type conversion, no scaling
 
     // ---------------- binary (arity 2) ----------------
-    OP_ADD = OP_BINARY_BASE, OP_SUB, OP_MUL, OP_DIV, OP_POW,
+    OP_ADD = OP_द्विआधारी_BASE, OP_SUB, OP_MUL, OP_DIV, OP_POW,
     OP_MIN, OP_MAX, OP_ABSDIFF,
     OP_AND, OP_OR, OP_XOR,
     // compare -> mask (result depth given explicitly, e.g. CV_Bool/CV_8U)
@@ -83,10 +83,10 @@ enum TOp
 };
 
 // Arity from the encoding above (0 for OP_NOP). No table to keep in lock-step with the enum.
-inline int opArity(TOp op) { return ((int)op >> OP_ARITY_SHIFT) & 7; }
+अन्तःस्थ पूर्णाङ्क opArity(शीर्ष op) { प्रत्यागम ((पूर्णाङ्क)op >> OP_ARITY_SHIFT) & 7; }
 
 // Operation category — the graph compiler's type-inference rules differ per category.
-enum ElemwiseCategory
+गणना ElemwiseCategory
 {
     CAT_ARITH = 0,  // numeric, result type follows promotion rules
     CAT_BITWISE,    // integer-only, same-type
@@ -97,24 +97,24 @@ enum ElemwiseCategory
 };
 
 // Op metadata (implemented in arithm_expr.cpp).
-CV_EXPORTS const char* opName(TOp op);
-CV_EXPORTS ElemwiseCategory opCategory(TOp op);
+CV_EXPORTS ध्रुव वर्ण* opName(शीर्ष op);
+CV_EXPORTS ElemwiseCategory opCategory(शीर्ष op);
 
 // numpy-style arithmetic promotion of two depths (see arithm_expr.cpp): INTEGER-PRESERVING and
 // COMMUTATIVE; mixed sign -> a wide-enough signed type; any float -> the smallest covering float.
 // EW_DEPTH_NONE on one side returns the other. The rdepth==-1 auto result-depth rule.
-CV_EXPORTS int promoteArith(int a, int b);
+CV_EXPORTS पूर्णाङ्क promoteArith(पूर्णाङ्क a, पूर्णाङ्क b);
 
 // The 'safe' result depth of absdiff over a value of `depth`: a SIGNED integer difference can reach
 // 2^width-1 (|(-128)-127| = 255), so it needs the UNSIGNED type of the same width (8s->8u, 16s->16u,
 // 32s->32u, 64s->64u) to hold it without saturation. Unsigned/float depths keep their type.
-CV_EXPORTS int absdiffResultDepth(int depth);
+CV_EXPORTS पूर्णाङ्क absdiffResultDepth(पूर्णाङ्क depth);
 
 // ---------------------------------------------------------------------------
 // Steps for one operand, in elemsize1 units, one entry per shape dim (parallel to a
 // MatShape). A 0 entry means broadcast along that axis. Heap-free, like MatShape.
 // ---------------------------------------------------------------------------
-typedef std::array<size_t, MatShape::MAX_DIMS> EwSteps;
+प्रकारनिर्देश std::array<माप_प्रकार, MatShape::MAX_DIMS> EwSteps;
 
 // ---------------------------------------------------------------------------
 // The low-level kernel contract.
@@ -129,17 +129,17 @@ typedef std::array<size_t, MatShape::MAX_DIMS> EwSteps;
 // 4 doubles): mul/div read params[0] as a scale (1.0 = none). `flags` carries small per-kernel options
 // (e.g. a compare op's 0/1-vs-0/255 mask value); `userdata` carries a wrapped core BinaryFunc for casts.
 // ---------------------------------------------------------------------------
-typedef int (*KernelFunc)(
-    const void* src0, size_t step0y, size_t step0x,
-    const void* src1, size_t step1y, size_t step1x,
-    const void* src2, size_t step2y, size_t step2x,
-    void*       dst,  size_t dstepy,
-    int width, int height, const double* params,
-    int flags, void* userdata);
+प्रकारनिर्देश पूर्णाङ्क (*KernelFunc)(
+    ध्रुव शून्य* src0, माप_प्रकार step0y, माप_प्रकार step0x,
+    ध्रुव शून्य* src1, माप_प्रकार step1y, माप_प्रकार step1x,
+    ध्रुव शून्य* src2, माप_प्रकार step2y, माप_प्रकार step2x,
+    शून्य*       dst,  माप_प्रकार dstepy,
+    पूर्णाङ्क width, पूर्णाङ्क height, ध्रुव द्विगुण* params,
+    पूर्णाङ्क flags, शून्य* userdata);
 
 // TKernel::flags - small per-kernel options, interpreted by the kernel itself (so the meaning is
 // per-kernel: the cast kernels read it as the dst element size, the compare kernels as the bits below).
-enum TKernelFlags
+गणना TKernelFlags
 {
     EW_KERNEL_MASK1  = 1,   // compare: emit a 0/1 mask instead of the default 0/255 (cv::compare)
     EW_KERNEL_SWAP01 = 2,   // compare: the kernel swaps its own src0<->src1 (with their steps), so
@@ -154,13 +154,13 @@ enum TKernelFlags
 };
 
 // Decode a 2-bit patch field (0->0, 1->1, else 255) - shared by the compare kernel and its builder.
-inline int cmpPatchByte(int twoBits) { return twoBits == 0 ? 0 : twoBits == 1 ? 1 : 255; }
+अन्तःस्थ पूर्णाङ्क cmpPatchByte(पूर्णाङ्क twoBits) { प्रत्यागम twoBits == 0 ? 0 : twoBits == 1 ? 1 : 255; }
 
-struct TKernel
+संरचना TKernel
 {
     KernelFunc fptr = nullptr;
-    void* userdata = nullptr;
-    int flags = 0;
+    शून्य* userdata = nullptr;
+    पूर्णाङ्क flags = 0;
 };
 
 // ---- per-op kernel entry points (implemented in arithm.dispatch.cpp) ----------------------
@@ -169,35 +169,35 @@ struct TKernel
 // depth, `R` the result depth; EW_DEPTH_NONE marks an unused operand. A null fptr means "no exact
 // kernel for this combination" - the compiler then inserts OP_CAST and retries with a working type.
 // These are the useful, op-specific intermediaries (candidates for CV_EXPORTS later).
-CV_EXPORTS TKernel getAddFunc(int T, int R);
-CV_EXPORTS TKernel getSubFunc(int T, int R);
-CV_EXPORTS TKernel getMulFunc(int T, int R);
-CV_EXPORTS TKernel getDivFunc(int T, int R, bool checked);   // `checked` => guard b==0 -> 0 (integer divide)
-CV_EXPORTS TKernel getPowFunc(int T, int R);
-CV_EXPORTS TKernel getMinFunc(int T, int R);
-CV_EXPORTS TKernel getMaxFunc(int T, int R);
-CV_EXPORTS TKernel getAbsdiffFunc(int T, int R);
-CV_EXPORTS TKernel getHypotFunc(int T, int R);               // OP_HYPOT, T x T -> T (float depths)
-CV_EXPORTS TKernel getAtan2Func(int T, int R);               // OP_ATAN2, T x T -> T (float depths)
-CV_EXPORTS TKernel getCmpFunc(TOp op, int T);                // T x T -> u8 mask (op = OP_CMP_*)
-CV_EXPORTS TKernel getBitwiseFunc(TOp op, int esz);          // OP_AND / OP_OR / OP_XOR, by element size
-CV_EXPORTS TKernel getNotFunc(int esz);                      // OP_NOT, by element size
-CV_EXPORTS TKernel getAddWeightedFunc(int T, int R);         // OP_ADDW, a*alpha+b*beta+gamma (T x T -> R)
-CV_EXPORTS TKernel getSelectFunc(int mdepth, int T);         // OP_SELECT: 1-byte mask, a/b/dst of T
-CV_EXPORTS TKernel getClampFunc(int T);                      // OP_CLAMP: min(max(x, lo), hi), all of T
+CV_EXPORTS TKernel getAddFunc(पूर्णाङ्क T, पूर्णाङ्क R);
+CV_EXPORTS TKernel getSubFunc(पूर्णाङ्क T, पूर्णाङ्क R);
+CV_EXPORTS TKernel getMulFunc(पूर्णाङ्क T, पूर्णाङ्क R);
+CV_EXPORTS TKernel getDivFunc(पूर्णाङ्क T, पूर्णाङ्क R, तार्किक checked);   // `checked` => guard b==0 -> 0 (integer divide)
+CV_EXPORTS TKernel getPowFunc(पूर्णाङ्क T, पूर्णाङ्क R);
+CV_EXPORTS TKernel getMinFunc(पूर्णाङ्क T, पूर्णाङ्क R);
+CV_EXPORTS TKernel getMaxFunc(पूर्णाङ्क T, पूर्णाङ्क R);
+CV_EXPORTS TKernel getAbsdiffFunc(पूर्णाङ्क T, पूर्णाङ्क R);
+CV_EXPORTS TKernel getHypotFunc(पूर्णाङ्क T, पूर्णाङ्क R);               // OP_HYPOT, T x T -> T (float depths)
+CV_EXPORTS TKernel getAtan2Func(पूर्णाङ्क T, पूर्णाङ्क R);               // OP_ATAN2, T x T -> T (float depths)
+CV_EXPORTS TKernel getCmpFunc(शीर्ष op, पूर्णाङ्क T);                // T x T -> u8 mask (op = OP_CMP_*)
+CV_EXPORTS TKernel getBitwiseFunc(शीर्ष op, पूर्णाङ्क esz);          // OP_AND / OP_OR / OP_XOR, by element size
+CV_EXPORTS TKernel getNotFunc(पूर्णाङ्क esz);                      // OP_NOT, by element size
+CV_EXPORTS TKernel getAddWeightedFunc(पूर्णाङ्क T, पूर्णाङ्क R);         // OP_ADDW, a*alpha+b*beta+gamma (T x T -> R)
+CV_EXPORTS TKernel getSelectFunc(पूर्णाङ्क mdepth, पूर्णाङ्क T);         // OP_SELECT: 1-byte mask, a/b/dst of T
+CV_EXPORTS TKernel getClampFunc(पूर्णाङ्क T);                      // OP_CLAMP: min(max(x, lo), hi), all of T
 // math.dispatch.cpp (kernels in math.simd.hpp):
-CV_EXPORTS TKernel getMathFunc(TOp op, int T);               // unary math (OP_SQRT..OP_RELU), T -> T,
+CV_EXPORTS TKernel getMathFunc(शीर्ष op, पूर्णाङ्क T);               // unary math (OP_SQRT..OP_RELU), T -> T,
                                                              // T in {f16, bf16, f32, f64}; exp/log at
                                                              // f32/f64 route through HAL/IPP when installed
 // the engine's OWN vector kernel over one contiguous span - the built-in implementation behind
 // cv::hal::exp32f & co (their table kernels are gone), and getMathFunc's final fallback
-CV_EXPORTS void mathSpanEngine(TOp op, int depth, const void* src, void* dst, int n);
+CV_EXPORTS शून्य mathSpanEngine(शीर्ष op, पूर्णाङ्क depth, ध्रुव शून्य* src, शून्य* dst, पूर्णाङ्क n);
 // getPowFunc is declared above with the arithm getters but LIVES in math.dispatch.cpp too
 // (powKernel: special-cased scalar exponents + the exp(y*log(x)) general path)
 
 // The op-level dispatcher: routes (op, depths) to the right get*Func above. nullptr if the exact
 // combination is not provided. Unused operand depths are EW_DEPTH_NONE.
-CV_EXPORTS TKernel getElemwiseFunc(TOp op, int depth0, int depth1, int depth2, int rdepth);
+CV_EXPORTS TKernel getElemwiseFunc(शीर्ष op, पूर्णाङ्क depth0, पूर्णाङ्क depth1, पूर्णाङ्क depth2, पूर्णाङ्क rdepth);
 
 // An element-wise expression as ONE flat program (the analogue of cv::MatExpr for element-wise ops):
 // an arg table (`arginfo`, the typed operands) + an instruction list (`prog`). The program IS the
@@ -213,35 +213,35 @@ CV_EXPORTS TKernel getElemwiseFunc(TOp op, int depth0, int depth1, int depth2, i
 // insns/slots inline on the stack and only spills to the heap for large expressions; it is copyable,
 // so TExpr is still returned/passed by value. A default-constructed AutoBuffer is empty (size()==0)
 // and grows like std::vector (push_back amortized 1.5x); clear() resets the size to 0.
-struct CV_EXPORTS TExpr
+संरचना CV_EXPORTS TExpr
 {
     // Static (shape-independent) classification of an arg slot.
-    enum ArgKind
+    गणना ArgKind
     {
         NONE = 0,   // the reserved empty operand (slot 0)
-        INPUT,
+        निवेश,
         CONST,
         TEMP,
         OUTPUT
     };
 
-    struct Arg
+    संरचना Arg
     {
         ArgKind kind = NONE;
-        int depth = EW_DEPTH_NONE;  // EW_DEPTH_NONE on a CONST = "flexible" (the emit* layers type it per use)
-        int channels = 0;           // for CONST: # of per-channel values (0/1 => single broadcast value)
-        int index = -1;             // input#/output#/temp-id depending on kind
+        पूर्णाङ्क depth = EW_DEPTH_NONE;  // EW_DEPTH_NONE on a CONST = "flexible" (the emit* layers type it per use)
+        पूर्णाङ्क channels = 0;           // for CONST: # of per-channel values (0/1 => single broadcast value)
+        पूर्णाङ्क index = -1;             // input#/output#/temp-id depending on kind
         // CONST only: the constant's values live in TExpr::constbuf (in `srcdepth` until compile(),
         // which converts them to the resolved `depth`). constofs = offset into constbuf, in uint64_t
         // units. A per-channel scalar of any width is carried this way (no 4-channel Scalar limit).
-        int srcdepth = EW_DEPTH_NONE;
-        size_t constofs = 0;
+        पूर्णाङ्क srcdepth = EW_DEPTH_NONE;
+        माप_प्रकार constofs = 0;
         // Set on a value the parser bound to a name ("t = ...;"). Such a value may be referenced
         // any number of times later, so the two retire-the-slot manoeuvres (moveToOutput's MOVE and
         // emitUnary's abs(x-y) peephole) must leave it alone: they reclassify the slot to NONE,
         // which a later reference would then read as the reserved empty operand. Both take their
         // non-destructive path (a copy / the plain absdiff form) when this is set.
-        bool pinned = false;
+        तार्किक pinned = असत्य;
     };
 
     // One compiled instruction: the op + arg-table indices + a resolved kernel (TKernel: fptr +
@@ -249,11 +249,11 @@ struct CV_EXPORTS TExpr
     // OP_CAST / OP_CONVERT_SCALE bind castKernel, which carries the core convert BinaryFunc in
     // kernel.userdata. `params` is the per-instruction scalar block (mul/div scale in params[0];
     // convert_scale {scale, offset} in params[0..1]). The kernel is bound by addInsn at build time.
-    struct Insn
+    संरचना Insn
     {
         TKernel kernel;
-        TOp op = OP_NOP;
-        int arg0 = 0, arg1 = 0, arg2 = 0, result = 0;
+        शीर्ष op = OP_NOP;
+        पूर्णाङ्क arg0 = 0, arg1 = 0, arg2 = 0, result = 0;
         Scalar params = Scalar(1);          // op scalars; params[0]=scale defaults to 1 (identity)
     };
 
@@ -261,88 +261,88 @@ struct CV_EXPORTS TExpr
     AutoBuffer<Arg, 16>    arginfo;          // slot 0 is always NONE
     AutoBuffer<uint64_t, 16> constbuf;       // CONST value store (uint64-aligned slots); Arg::constofs
                                              // indexes it. Source values on build, resolved-type after compile()
-    int ninputs = 0;
-    int noutputs = 0;
-    int ntemps = 0;
-    int nbuffers = 0;                        // distinct physical temp buffers after liveness
-    int nconsts = 0;                         // # materialized CONST slots (set by compile()) - sizes
+    पूर्णाङ्क ninputs = 0;
+    पूर्णाङ्क noutputs = 0;
+    पूर्णाङ्क ntemps = 0;
+    पूर्णाङ्क nbuffers = 0;                        // distinct physical temp buffers after liveness
+    पूर्णाङ्क nconsts = 0;                         // # materialized CONST slots (set by compile()) - sizes
                                              // the const store; nconsts==0 enables exec()'s fast path
-    int capElems = 0;                        // # elements one ~16KB L1 scratch fragment holds (set by
+    पूर्णाङ्क capElems = 0;                        // # elements one ~16KB L1 scratch fragment holds (set by
                                              // compile()); INT_MAX when there are no temps.
-    AutoBuffer<int, 16>    bufferOfTemp;     // temp-id -> physical buffer id
-    AutoBuffer<int, 8>     bufEszPrefix;     // [nbuffers+1] prefix sums of each physical temp buffer's
+    AutoBuffer<पूर्णाङ्क, 16>    bufferOfTemp;     // temp-id -> physical buffer id
+    AutoBuffer<पूर्णाङ्क, 8>     bufEszPrefix;     // [nbuffers+1] prefix sums of each physical temp buffer's
                                              // elem size (set by compile()); [nbuffers] = temp bytes
                                              // per output element.
 
     TExpr();
-    void clear();                            // reset to an empty program (slot 0 = NONE)
-    void dump(std::ostream& os) const;       // human-readable slot table + instruction list (debug)
+    शून्य clear();                            // reset to an empty program (slot 0 = NONE)
+    शून्य dump(std::ostream& os) ध्रुव;       // human-readable slot table + instruction list (debug)
 
     // ---- operand / instruction builders (return the new slot / instruction index) ----
-    int  addInput(int depth);
-    int  addConst(int depth, const Scalar& v, int channels = 1);   // source = Scalar (f64); depth NONE => flexible
-    int  addConst(int depth, int srcdepth, const void* data, int channels);   // source = native bytes
+    पूर्णाङ्क  add_निवेश(पूर्णाङ्क depth);
+    पूर्णाङ्क  addConst(पूर्णाङ्क depth, ध्रुव Scalar& v, पूर्णाङ्क channels = 1);   // source = Scalar (f64); depth NONE => flexible
+    पूर्णाङ्क  addConst(पूर्णाङ्क depth, पूर्णाङ्क srcdepth, ध्रुव शून्य* data, पूर्णाङ्क channels);   // source = native bytes
     // A typed copy of a flexible CONST `srcSlot` at the resolved `depth` (shares its source values;
     // compile() converts them). Used by the emit* layers / parser cast where addConst(depth, cval) was.
-    int  typedConstFrom(int srcSlot, int depth);
-    int  addTemp(int depth);
-    int  addOutput(int depth);
+    पूर्णाङ्क  typedConstFrom(पूर्णाङ्क srcSlot, पूर्णाङ्क depth);
+    पूर्णाङ्क  addTemp(पूर्णाङ्क depth);
+    पूर्णाङ्क  addOutput(पूर्णाङ्क depth);
     // addInsn resolves the instruction's kernel NOW from the operand/result depths (final at build
     // time). The 2nd form takes a pre-resolved kernel, for callers that already probed getElemwiseFunc.
-    int  addInsn(TOp op, int a0, int a1, int a2, int result, const Scalar& params = Scalar(1));
-    int  addInsn(TOp op, int a0, int a1, int a2, int result, const TKernel& kernel,
-                 const Scalar& params = Scalar(1));
+    पूर्णाङ्क  addInsn(शीर्ष op, पूर्णाङ्क a0, पूर्णाङ्क a1, पूर्णाङ्क a2, पूर्णाङ्क result, ध्रुव Scalar& params = Scalar(1));
+    पूर्णाङ्क  addInsn(शीर्ष op, पूर्णाङ्क a0, पूर्णाङ्क a1, पूर्णाङ्क a2, पूर्णाङ्क result, ध्रुव TKernel& kernel,
+                 ध्रुव Scalar& params = Scalar(1));
 
     // Return `arg` unchanged if it is already of depth `depth`; otherwise append an OP_CAST into a
     // fresh temp of that depth and return the temp's slot. The one place casts are inserted.
-    int  maybeAddCast(int arg, int depth);
+    पूर्णाङ्क  maybeAddCast(पूर्णाङ्क arg, पूर्णाङ्क depth);
 
     // ---- type-inference + cast-insertion policy layers (parser + hand builders) ----
     // Each derives the result depth (promotion, or a forced `rdepth`), picks the compute depth and a
     // wide fallback per op family, materializes flexible CONST operands, casts every operand to the
     // compute depth, then emits `op` (direct when a kernel exists, else compute wide and cast down).
     // Returns the slot holding the result. `rdepth` EW_DEPTH_NONE = auto.
-    int  emitUnary(TOp op, int a, int rdepth = EW_DEPTH_NONE, const Scalar& params = Scalar(1));
-    int  emitBinary(TOp op, int a, int b, int rdepth = EW_DEPTH_NONE, const Scalar& params = Scalar(1));
-    int  emitTernary(TOp op, int a, int b, int c, int rdepth = EW_DEPTH_NONE);
+    पूर्णाङ्क  emitUnary(शीर्ष op, पूर्णाङ्क a, पूर्णाङ्क rdepth = EW_DEPTH_NONE, ध्रुव Scalar& params = Scalar(1));
+    पूर्णाङ्क  emit_द्विआधारी(शीर्ष op, पूर्णाङ्क a, पूर्णाङ्क b, पूर्णाङ्क rdepth = EW_DEPTH_NONE, ध्रुव Scalar& params = Scalar(1));
+    पूर्णाङ्क  emitTernary(शीर्ष op, पूर्णाङ्क a, पूर्णाङ्क b, पूर्णाङ्क c, पूर्णाङ्क rdepth = EW_DEPTH_NONE);
 
     // Land `temp` in the existing slot `out`: redirect temp's single producer to write `out` directly
     // (dropping a dead last temp so compile() keeps its no-temp fast exit); otherwise copy via OP_CAST.
-    int  moveToOutput(int temp, int out);
+    पूर्णाङ्क  moveToOutput(पूर्णाङ्क temp, पूर्णाङ्क out);
 
     // Declare a result tensor fed by `rootSlot` (a fresh OUTPUT of its depth) and moveToOutput into it.
-    int  output(int rootSlot);
+    पूर्णाङ्क  output(पूर्णाङ्क मूल_Slot);
 
     // Finalize: pack temps into physical buffers (liveness), count consts, size the L1 fragment cap.
-    void compile();
+    शून्य compile();
 
     // The broadcast output geometry for the given inputs (spatial dims + channel count, channels
     // innermost). All outputs share it; their depth comes from arginfo. Lets a caller pre-create the
     // destination (dst.create(spatial, CV_MAKETYPE(depth, channels))) before exec writes into it.
     // Inputs are passed as an array of pointers (no Mat-header copies in the hot path).
-    void outputShape(const Mat* const* inputs, MatShape& spatial, int& channels) const;
+    शून्य outputShape(ध्रुव Mat* ध्रुव* inputs, MatShape& spatial, पूर्णाङ्क& channels) ध्रुव;
 
     // Execute the compiled program over a set of input Mats, producing the broadcast result(s). If an
     // output Mat already has the right shape/type it is reused (not reallocated). Inputs are passed as
     // an array of pointers.
-    void exec(const Mat* const* inputs, Mat* outputs);
+    शून्य exec(ध्रुव Mat* ध्रुव* inputs, Mat* outputs);
 
     // Convenience overloads: inputs as a contiguous array of Mats (builds the pointer array + forwards).
     // Handy for callers holding a Mat[]/vector<Mat>; the hot path should pass pointers directly.
-    void outputShape(const Mat* inputs, MatShape& spatial, int& channels) const;
-    void exec(const Mat* inputs, Mat* outputs);
+    शून्य outputShape(ध्रुव Mat* inputs, MatShape& spatial, पूर्णाङ्क& channels) ध्रुव;
+    शून्य exec(ध्रुव Mat* inputs, Mat* outputs);
 };
 
 // ---- hand builders (the stand-ins the future engine-backed cv::add etc. are built on) ----
 // Compose a binary op (ADD/SUB/MUL/DIV/MIN/MAX/ABSDIFF/CMP_*) for any (depth0, depth1, rdepth):
 // cast operands to a common type, op direct-or-wide-then-cast. maskDepth != EW_DEPTH_NONE adds a
 // write-mask input (#2); scale != 1 (mul/div) rides the instruction's params[0].
-CV_EXPORTS void makeBinaryArithProgram(TExpr& p, TOp op, int depth0, int depth1, int rdepth,
-                                       int maskDepth = EW_DEPTH_NONE, double scale = 1.0);
+CV_EXPORTS शून्य make_द्विआधारी_Arith_Program(TExpr& p, शीर्ष op, पूर्णाङ्क depth0, पूर्णाङ्क depth1, पूर्णाङ्क rdepth,
+                                       पूर्णाङ्क maskDepth = EW_DEPTH_NONE, द्विगुण scale = 1.0);
 
 // addWeighted(a,alpha,b,beta,gamma) = a*alpha + b*beta + gamma (two fused convert_scale MACs + add).
-CV_EXPORTS void makeAddWeightedProgram(TExpr& p, int depth0, int depth1, int rdepth,
-                                       double alpha, double beta, double gamma);
+CV_EXPORTS शून्य makeAddWeightedProgram(TExpr& p, पूर्णाङ्क depth0, पूर्णाङ्क depth1, पूर्णाङ्क rdepth,
+                                       द्विगुण alpha, द्विगुण beta, द्विगुण gamma);
 
 // NOTE: the string front-end is the PUBLIC cv::texpr() (declared in opencv2/core.hpp, defined in
 // arithm_expr.cpp) - there is no cv::ew::expression() indirection.
