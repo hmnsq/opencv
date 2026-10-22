@@ -2,47 +2,47 @@
 // It is subject to the license terms in the LICENSE file found in the top-level directory
 // of this distribution and at http://opencv.org/license.html
 // Copyright (C) 2026, Advanced Micro Devices, Inc., all rights reserved.
-#include "precomp.hpp"
-#include "opencl_kernels_core.hpp"
-#include "hal_replacement.hpp"
-#include "opencv2/core/detail/dispatch_helper.impl.hpp"
+#ضمن "precomp.hpp"
+#ضمن "opencl_kernels_core.hpp"
+#ضمن "hal_replacement.hpp"
+#ضمن "opencv2/core/detail/dispatch_helper.impl.hpp"
 
-#include "transpose.simd.hpp"
-#include "transpose.simd_declarations.hpp"
-#include "nd_copy.hpp"
+#ضمن "transpose.simd.hpp"
+#ضمن "transpose.simd_declarations.hpp"
+#ضمن "nd_copy.hpp"
 
-#include <algorithm> // std::swap_ranges
-#include <numeric> // std::accumulate
+#ضمن <algorithm> // std::swap_ranges
+#ضمن <numeric> // std::accumulate
 
-namespace cv {
+نطاق cv {
 
 ////////////////////////////////////// transpose /////////////////////////////////////////
-#if CV_SIMD128
-static void transpose_8bit_simd(const uchar* src, size_t sstep, uchar* dst, size_t dstep, Size sz)
+#إذا CV_SIMD128
+ساكن فراغ transpose_8bit_simd(ثابت uchar* src, size_t sstep, uchar* dst, size_t dstep, ناپ sz)
 {
-    const int m = sz.width, n = sz.height;
-    int i = 0;
-    for (; i <= m - 16; i += 16)
+    ثابت صحيح m = sz.چوڑائی, n = sz.اچائی;
+    صحيح i = 0;
+    لكل (; i <= m - 16; i += 16)
     {
-        int j = 0;
-        for (; j <= n - 16; j += 16)
+        صحيح j = 0;
+        لكل (; j <= n - 16; j += 16)
         {
-            v_uint8x16 r0  = v_load(src + i + sstep*(j+ 0));
-            v_uint8x16 r1  = v_load(src + i + sstep*(j+ 1));
-            v_uint8x16 r2  = v_load(src + i + sstep*(j+ 2));
-            v_uint8x16 r3  = v_load(src + i + sstep*(j+ 3));
-            v_uint8x16 r4  = v_load(src + i + sstep*(j+ 4));
-            v_uint8x16 r5  = v_load(src + i + sstep*(j+ 5));
-            v_uint8x16 r6  = v_load(src + i + sstep*(j+ 6));
-            v_uint8x16 r7  = v_load(src + i + sstep*(j+ 7));
-            v_uint8x16 r8  = v_load(src + i + sstep*(j+ 8));
-            v_uint8x16 r9  = v_load(src + i + sstep*(j+ 9));
-            v_uint8x16 r10 = v_load(src + i + sstep*(j+10));
-            v_uint8x16 r11 = v_load(src + i + sstep*(j+11));
-            v_uint8x16 r12 = v_load(src + i + sstep*(j+12));
-            v_uint8x16 r13 = v_load(src + i + sstep*(j+13));
-            v_uint8x16 r14 = v_load(src + i + sstep*(j+14));
-            v_uint8x16 r15 = v_load(src + i + sstep*(j+15));
+            v_uint8x16 r0  = v_لدو(src + i + sstep*(j+ 0));
+            v_uint8x16 r1  = v_لدو(src + i + sstep*(j+ 1));
+            v_uint8x16 r2  = v_لدو(src + i + sstep*(j+ 2));
+            v_uint8x16 r3  = v_لدو(src + i + sstep*(j+ 3));
+            v_uint8x16 r4  = v_لدو(src + i + sstep*(j+ 4));
+            v_uint8x16 r5  = v_لدو(src + i + sstep*(j+ 5));
+            v_uint8x16 r6  = v_لدو(src + i + sstep*(j+ 6));
+            v_uint8x16 r7  = v_لدو(src + i + sstep*(j+ 7));
+            v_uint8x16 r8  = v_لدو(src + i + sstep*(j+ 8));
+            v_uint8x16 r9  = v_لدو(src + i + sstep*(j+ 9));
+            v_uint8x16 r10 = v_لدو(src + i + sstep*(j+10));
+            v_uint8x16 r11 = v_لدو(src + i + sstep*(j+11));
+            v_uint8x16 r12 = v_لدو(src + i + sstep*(j+12));
+            v_uint8x16 r13 = v_لدو(src + i + sstep*(j+13));
+            v_uint8x16 r14 = v_لدو(src + i + sstep*(j+14));
+            v_uint8x16 r15 = v_لدو(src + i + sstep*(j+15));
 
             v_uint8x16 t0, t1, t2, t3, t4, t5, t6, t7,
                        t8, t9, t10, t11, t12, t13, t14, t15;
@@ -79,22 +79,22 @@ static void transpose_8bit_simd(const uchar* src, size_t sstep, uchar* dst, size
             v_zip(v_reinterpret_as_u32(s10), v_reinterpret_as_u32(s14), u12, u13);
             v_zip(v_reinterpret_as_u32(s11), v_reinterpret_as_u32(s15), u14, u15);
 
-            v_uint32x4 v0  = v_combine_low (u0,  u8);
-            v_uint32x4 v1  = v_combine_high(u0,  u8);
-            v_uint32x4 v2  = v_combine_low (u1,  u9);
-            v_uint32x4 v3  = v_combine_high(u1,  u9);
-            v_uint32x4 v4  = v_combine_low (u2,  u10);
-            v_uint32x4 v5  = v_combine_high(u2,  u10);
-            v_uint32x4 v6  = v_combine_low (u3,  u11);
-            v_uint32x4 v7  = v_combine_high(u3,  u11);
-            v_uint32x4 v8  = v_combine_low (u4,  u12);
-            v_uint32x4 v9  = v_combine_high(u4,  u12);
-            v_uint32x4 v10 = v_combine_low (u5,  u13);
-            v_uint32x4 v11 = v_combine_high(u5,  u13);
-            v_uint32x4 v12 = v_combine_low (u6,  u14);
-            v_uint32x4 v13 = v_combine_high(u6,  u14);
-            v_uint32x4 v14 = v_combine_low (u7,  u15);
-            v_uint32x4 v15 = v_combine_high(u7,  u15);
+            v_uint32x4 v0  = v_combine_کم (u0,  u8);
+            v_uint32x4 v1  = v_combine_بلند(u0,  u8);
+            v_uint32x4 v2  = v_combine_کم (u1,  u9);
+            v_uint32x4 v3  = v_combine_بلند(u1,  u9);
+            v_uint32x4 v4  = v_combine_کم (u2,  u10);
+            v_uint32x4 v5  = v_combine_بلند(u2,  u10);
+            v_uint32x4 v6  = v_combine_کم (u3,  u11);
+            v_uint32x4 v7  = v_combine_بلند(u3,  u11);
+            v_uint32x4 v8  = v_combine_کم (u4,  u12);
+            v_uint32x4 v9  = v_combine_بلند(u4,  u12);
+            v_uint32x4 v10 = v_combine_کم (u5,  u13);
+            v_uint32x4 v11 = v_combine_بلند(u5,  u13);
+            v_uint32x4 v12 = v_combine_کم (u6,  u14);
+            v_uint32x4 v13 = v_combine_بلند(u6,  u14);
+            v_uint32x4 v14 = v_combine_کم (u7,  u15);
+            v_uint32x4 v15 = v_combine_بلند(u7,  u15);
 
             v_store(dst + dstep*(i+ 0) + j, v_reinterpret_as_u8(v0));
             v_store(dst + dstep*(i+ 1) + j, v_reinterpret_as_u8(v1));
@@ -113,39 +113,39 @@ static void transpose_8bit_simd(const uchar* src, size_t sstep, uchar* dst, size
             v_store(dst + dstep*(i+14) + j, v_reinterpret_as_u8(v14));
             v_store(dst + dstep*(i+15) + j, v_reinterpret_as_u8(v15));
         }
-        for (; j < n; j++)
-            for (int k = 0; k < 16; k++)
+        لكل (; j < n; j++)
+            لكل (صحيح k = 0; k < 16; k++)
                 dst[dstep*(i+k) + j] = src[i + sstep*j + k];
     }
-    for (; i < m; i++)
-        for (int j = 0; j < n; j++)
+    لكل (; i < m; i++)
+        لكل (صحيح j = 0; j < n; j++)
             dst[dstep*i + j] = src[i + sstep*j];
 }
 
-static void transpose_16bit_simd(const uchar* src, size_t sstep, uchar* dst, size_t dstep, Size sz)
+ساكن فراغ transpose_16bit_simd(ثابت uchar* src, size_t sstep, uchar* dst, size_t dstep, ناپ sz)
 {
-    const ushort* src16 = reinterpret_cast<const ushort*>(src);
+    ثابت ushort* src16 = reinterpret_cast<ثابت ushort*>(src);
     ushort* dst16 = reinterpret_cast<ushort*>(dst);
 
-    const size_t sstep_e = sstep / sizeof(ushort);
-    const size_t dstep_e = dstep / sizeof(ushort);
+    ثابت size_t sstep_e = sstep / حجم(ushort);
+    ثابت size_t dstep_e = dstep / حجم(ushort);
 
-    const int m = sz.width, n = sz.height;
-    int i = 0;
+    ثابت صحيح m = sz.چوڑائی, n = sz.اچائی;
+    صحيح i = 0;
 
-    for (; i <= m - 8; i += 8)
+    لكل (; i <= m - 8; i += 8)
     {
-        int j = 0;
-        for (; j <= n - 8; j += 8)
+        صحيح j = 0;
+        لكل (; j <= n - 8; j += 8)
         {
-            v_uint16x8 r0 = v_load(src16 + i + sstep_e*(j+0));
-            v_uint16x8 r1 = v_load(src16 + i + sstep_e*(j+1));
-            v_uint16x8 r2 = v_load(src16 + i + sstep_e*(j+2));
-            v_uint16x8 r3 = v_load(src16 + i + sstep_e*(j+3));
-            v_uint16x8 r4 = v_load(src16 + i + sstep_e*(j+4));
-            v_uint16x8 r5 = v_load(src16 + i + sstep_e*(j+5));
-            v_uint16x8 r6 = v_load(src16 + i + sstep_e*(j+6));
-            v_uint16x8 r7 = v_load(src16 + i + sstep_e*(j+7));
+            v_uint16x8 r0 = v_لدو(src16 + i + sstep_e*(j+0));
+            v_uint16x8 r1 = v_لدو(src16 + i + sstep_e*(j+1));
+            v_uint16x8 r2 = v_لدو(src16 + i + sstep_e*(j+2));
+            v_uint16x8 r3 = v_لدو(src16 + i + sstep_e*(j+3));
+            v_uint16x8 r4 = v_لدو(src16 + i + sstep_e*(j+4));
+            v_uint16x8 r5 = v_لدو(src16 + i + sstep_e*(j+5));
+            v_uint16x8 r6 = v_لدو(src16 + i + sstep_e*(j+6));
+            v_uint16x8 r7 = v_لدو(src16 + i + sstep_e*(j+7));
 
             v_uint16x8 t0, t1, t2, t3, t4, t5, t6, t7;
             v_zip(r0, r1, t0, t1);
@@ -172,38 +172,38 @@ static void transpose_16bit_simd(const uchar* src, size_t sstep, uchar* dst, siz
             v_store(dst16 + dstep_e*(i+6) + j, v_reinterpret_as_u16(v6));
             v_store(dst16 + dstep_e*(i+7) + j, v_reinterpret_as_u16(v7));
         }
-        for (; j < n; j++)
-            for (int k = 0; k < 8; k++)
+        لكل (; j < n; j++)
+            لكل (صحيح k = 0; k < 8; k++)
                 dst16[dstep_e*(i+k) + j] = src16[i + sstep_e*j + k];
     }
-    for (; i < m; i++)
-        for (int j = 0; j < n; j++)
+    لكل (; i < m; i++)
+        لكل (صحيح j = 0; j < n; j++)
             dst16[dstep_e*i + j] = src16[i + sstep_e*j];
 }
 
-static void transpose_32bit_simd(const uchar* src, size_t sstep, uchar* dst, size_t dstep, Size sz)
+ساكن فراغ transpose_32bit_simd(ثابت uchar* src, size_t sstep, uchar* dst, size_t dstep, ناپ sz)
 {
     // Cache-blocked + AVX2-aware path lives in transpose.simd.hpp; pick the
     // best variant available at runtime.
-    CV_CPU_DISPATCH(transpose_32bit_blocks_simd, (src, sstep, dst, dstep, sz),
+    CV_CPU_DISPATCH(transpose_32bit_بلاکاں_simd, (src, sstep, dst, dstep, sz),
                     CV_CPU_DISPATCH_MODES_ALL);
 }
 
-static void transpose_48bit_simd(const uchar* src, size_t sstep, uchar* dst, size_t dstep, Size sz)
+ساكن فراغ transpose_48bit_simd(ثابت uchar* src, size_t sstep, uchar* dst, size_t dstep, ناپ sz)
 {
-    const short* src16 = reinterpret_cast<const short*>(src);
-    short* dst16 = reinterpret_cast<short*>(dst);
+    ثابت چھوٹا* src16 = reinterpret_cast<ثابت چھوٹا*>(src);
+    چھوٹا* dst16 = reinterpret_cast<چھوٹا*>(dst);
 
-    const size_t sstep_e = sstep / sizeof(short);
-    const size_t dstep_e = dstep / sizeof(short);
+    ثابت size_t sstep_e = sstep / حجم(چھوٹا);
+    ثابت size_t dstep_e = dstep / حجم(چھوٹا);
 
-    const int m = sz.width, n = sz.height;
-    int i = 0;
+    ثابت صحيح m = sz.چوڑائی, n = sz.اچائی;
+    صحيح i = 0;
 
-    for (; i <= m - 8; i += 8)
+    لكل (; i <= m - 8; i += 8)
     {
-        int j = 0;
-        for (; j <= n - 8; j += 8)
+        صحيح j = 0;
+        لكل (; j <= n - 8; j += 8)
         {
             v_int16x8 C0_0, C1_0, C2_0;
             v_int16x8 C0_1, C1_1, C2_1;
@@ -214,14 +214,14 @@ static void transpose_48bit_simd(const uchar* src, size_t sstep, uchar* dst, siz
             v_int16x8 C0_6, C1_6, C2_6;
             v_int16x8 C0_7, C1_7, C2_7;
 
-            v_load_deinterleave(src16 + sstep_e*(j+0) + i*3, C0_0, C1_0, C2_0);
-            v_load_deinterleave(src16 + sstep_e*(j+1) + i*3, C0_1, C1_1, C2_1);
-            v_load_deinterleave(src16 + sstep_e*(j+2) + i*3, C0_2, C1_2, C2_2);
-            v_load_deinterleave(src16 + sstep_e*(j+3) + i*3, C0_3, C1_3, C2_3);
-            v_load_deinterleave(src16 + sstep_e*(j+4) + i*3, C0_4, C1_4, C2_4);
-            v_load_deinterleave(src16 + sstep_e*(j+5) + i*3, C0_5, C1_5, C2_5);
-            v_load_deinterleave(src16 + sstep_e*(j+6) + i*3, C0_6, C1_6, C2_6);
-            v_load_deinterleave(src16 + sstep_e*(j+7) + i*3, C0_7, C1_7, C2_7);
+            v_لدو_deinterleave(src16 + sstep_e*(j+0) + i*3, C0_0, C1_0, C2_0);
+            v_لدو_deinterleave(src16 + sstep_e*(j+1) + i*3, C0_1, C1_1, C2_1);
+            v_لدو_deinterleave(src16 + sstep_e*(j+2) + i*3, C0_2, C1_2, C2_2);
+            v_لدو_deinterleave(src16 + sstep_e*(j+3) + i*3, C0_3, C1_3, C2_3);
+            v_لدو_deinterleave(src16 + sstep_e*(j+4) + i*3, C0_4, C1_4, C2_4);
+            v_لدو_deinterleave(src16 + sstep_e*(j+5) + i*3, C0_5, C1_5, C2_5);
+            v_لدو_deinterleave(src16 + sstep_e*(j+6) + i*3, C0_6, C1_6, C2_6);
+            v_لدو_deinterleave(src16 + sstep_e*(j+7) + i*3, C0_7, C1_7, C2_7);
 
             v_uint16x8 t0, t1, t2, t3, t4, t5, t6, t7;
             v_zip(v_reinterpret_as_u16(C0_0), v_reinterpret_as_u16(C0_1), t0, t1);
@@ -280,54 +280,54 @@ static void transpose_48bit_simd(const uchar* src, size_t sstep, uchar* dst, siz
             v_store_interleave(dst16 + dstep_e*(i+6) + j*3, r0_6, r1_6, r2_6);
             v_store_interleave(dst16 + dstep_e*(i+7) + j*3, r0_7, r1_7, r2_7);
         }
-        for (; j < n; j++)
-            for (int k = 0; k < 8; k++)
+        لكل (; j < n; j++)
+            لكل (صحيح k = 0; k < 8; k++)
             {
                 dst16[dstep_e*(i+k) + j*3 + 0] = src16[sstep_e*j + (i+k)*3 + 0];
                 dst16[dstep_e*(i+k) + j*3 + 1] = src16[sstep_e*j + (i+k)*3 + 1];
                 dst16[dstep_e*(i+k) + j*3 + 2] = src16[sstep_e*j + (i+k)*3 + 2];
             }
     }
-    for (; i < m; i++)
-        for (int j = 0; j < n; j++)
+    لكل (; i < m; i++)
+        لكل (صحيح j = 0; j < n; j++)
         {
             dst16[dstep_e*i + j*3 + 0] = src16[sstep_e*j + i*3 + 0];
             dst16[dstep_e*i + j*3 + 1] = src16[sstep_e*j + i*3 + 1];
             dst16[dstep_e*i + j*3 + 2] = src16[sstep_e*j + i*3 + 2];
         }
 }
-#endif
+#جے_انت
 
-template<typename T> static void
-transpose_( const uchar* src, size_t sstep, uchar* dst, size_t dstep, Size sz )
+سانچا<قسم_ناں T> ساكن فراغ
+transpose_( ثابت uchar* src, size_t sstep, uchar* dst, size_t dstep, ناپ sz )
 {
-#if CV_SIMD128
-    switch (sizeof(T))
+#إذا CV_SIMD128
+    بدل (حجم(T))
     {
-        case 1: transpose_8bit_simd(src, sstep, dst, dstep, sz);  return;
-        case 2: transpose_16bit_simd(src, sstep, dst, dstep, sz); return;
-        case 4: transpose_32bit_simd(src, sstep, dst, dstep, sz); return;
-        case 6: transpose_48bit_simd(src, sstep, dst, dstep, sz); return;
-        default: break;
+        حالة 1: transpose_8bit_simd(src, sstep, dst, dstep, sz);  أرجع;
+        حالة 2: transpose_16bit_simd(src, sstep, dst, dstep, sz); أرجع;
+        حالة 4: transpose_32bit_simd(src, sstep, dst, dstep, sz); أرجع;
+        حالة 6: transpose_48bit_simd(src, sstep, dst, dstep, sz); أرجع;
+        افتراضي: اكسر;
     }
-#endif
+#جے_انت
 
-    int i = 0, j, m = sz.width, n = sz.height;
+    صحيح i = 0, j, m = sz.چوڑائی, n = sz.اچائی;
 
-    #if CV_ENABLE_UNROLLED
-    for(; i <= m - 4; i += 4 )
+    #إذا CV_ENABLE_UNROLLED
+    لكل(; i <= m - 4; i += 4 )
     {
         T* d0 = (T*)(dst + dstep*i);
         T* d1 = (T*)(dst + dstep*(i+1));
         T* d2 = (T*)(dst + dstep*(i+2));
         T* d3 = (T*)(dst + dstep*(i+3));
 
-        for( j = 0; j <= n - 4; j += 4 )
+        لكل( j = 0; j <= n - 4; j += 4 )
         {
-            const T* s0 = (const T*)(src + i*sizeof(T) + sstep*j);
-            const T* s1 = (const T*)(src + i*sizeof(T) + sstep*(j+1));
-            const T* s2 = (const T*)(src + i*sizeof(T) + sstep*(j+2));
-            const T* s3 = (const T*)(src + i*sizeof(T) + sstep*(j+3));
+            ثابت T* s0 = (ثابت T*)(src + i*حجم(T) + sstep*j);
+            ثابت T* s1 = (ثابت T*)(src + i*حجم(T) + sstep*(j+1));
+            ثابت T* s2 = (ثابت T*)(src + i*حجم(T) + sstep*(j+2));
+            ثابت T* s3 = (ثابت T*)(src + i*حجم(T) + sstep*(j+3));
 
             d0[j] = s0[0]; d0[j+1] = s1[0]; d0[j+2] = s2[0]; d0[j+3] = s3[0];
             d1[j] = s0[1]; d1[j+1] = s1[1]; d1[j+2] = s2[1]; d1[j+3] = s3[1];
@@ -335,62 +335,62 @@ transpose_( const uchar* src, size_t sstep, uchar* dst, size_t dstep, Size sz )
             d3[j] = s0[3]; d3[j+1] = s1[3]; d3[j+2] = s2[3]; d3[j+3] = s3[3];
         }
 
-        for( ; j < n; j++ )
+        لكل( ; j < n; j++ )
         {
-            const T* s0 = (const T*)(src + i*sizeof(T) + j*sstep);
+            ثابت T* s0 = (ثابت T*)(src + i*حجم(T) + j*sstep);
             d0[j] = s0[0]; d1[j] = s0[1]; d2[j] = s0[2]; d3[j] = s0[3];
         }
     }
-    #endif
-    for( ; i < m; i++ )
+    #جے_انت
+    لكل( ; i < m; i++ )
     {
         T* d0 = (T*)(dst + dstep*i);
         j = 0;
-        #if CV_ENABLE_UNROLLED
-        for(; j <= n - 4; j += 4 )
+        #إذا CV_ENABLE_UNROLLED
+        لكل(; j <= n - 4; j += 4 )
         {
-            const T* s0 = (const T*)(src + i*sizeof(T) + sstep*j);
-            const T* s1 = (const T*)(src + i*sizeof(T) + sstep*(j+1));
-            const T* s2 = (const T*)(src + i*sizeof(T) + sstep*(j+2));
-            const T* s3 = (const T*)(src + i*sizeof(T) + sstep*(j+3));
+            ثابت T* s0 = (ثابت T*)(src + i*حجم(T) + sstep*j);
+            ثابت T* s1 = (ثابت T*)(src + i*حجم(T) + sstep*(j+1));
+            ثابت T* s2 = (ثابت T*)(src + i*حجم(T) + sstep*(j+2));
+            ثابت T* s3 = (ثابت T*)(src + i*حجم(T) + sstep*(j+3));
 
             d0[j] = s0[0]; d0[j+1] = s1[0]; d0[j+2] = s2[0]; d0[j+3] = s3[0];
         }
-        #endif
-        for( ; j < n; j++ )
+        #جے_انت
+        لكل( ; j < n; j++ )
         {
-            const T* s0 = (const T*)(src + i*sizeof(T) + j*sstep);
+            ثابت T* s0 = (ثابت T*)(src + i*حجم(T) + j*sstep);
             d0[j] = s0[0];
         }
     }
 }
 
-template<typename T> static void
-transposeI_( uchar* data, size_t step, int n )
+سانچا<قسم_ناں T> ساكن فراغ
+transposeI_( uchar* انکڑے, size_t قدم, صحيح n )
 {
-    for( int i = 0; i < n; i++ )
+    لكل( صحيح i = 0; i < n; i++ )
     {
-        T* row = (T*)(data + step*i);
-        uchar* data1 = data + i*sizeof(T);
-        for( int j = i+1; j < n; j++ )
-            std::swap( row[j], *(T*)(data1 + step*j) );
+        T* صف = (T*)(انکڑے + قدم*i);
+        uchar* data1 = انکڑے + i*حجم(T);
+        لكل( صحيح j = i+1; j < n; j++ )
+            std::swap( صف[j], *(T*)(data1 + قدم*j) );
     }
 }
 
-typedef void (*TransposeFunc)( const uchar* src, size_t sstep, uchar* dst, size_t dstep, Size sz );
-typedef void (*TransposeInplaceFunc)( uchar* data, size_t step, int n );
+تعريفنوع فراغ (*TransposeFunc)( ثابت uchar* src, size_t sstep, uchar* dst, size_t dstep, ناپ sz );
+تعريفنوع فراغ (*TransposeInplaceFunc)( uchar* انکڑے, size_t قدم, صحيح n );
 
-#define DEF_TRANSPOSE_FUNC(suffix, type) \
-static void transpose_##suffix( const uchar* src, size_t sstep, uchar* dst, size_t dstep, Size sz ) \
+#تعریف_کرو DEF_TRANSPOSE_FUNC(suffix, type) \
+ساكن فراغ transpose_##suffix( ثابت uchar* src, size_t sstep, uchar* dst, size_t dstep, ناپ sz ) \
 { transpose_<type>(src, sstep, dst, dstep, sz); } \
 \
-static void transposeI_##suffix( uchar* data, size_t step, int n ) \
-{ transposeI_<type>(data, step, n); }
+ساكن فراغ transposeI_##suffix( uchar* انکڑے, size_t قدم, صحيح n ) \
+{ transposeI_<type>(انکڑے, قدم, n); }
 
 DEF_TRANSPOSE_FUNC(8u, uchar)
 DEF_TRANSPOSE_FUNC(16u, ushort)
 DEF_TRANSPOSE_FUNC(8uC3, Vec3b)
-DEF_TRANSPOSE_FUNC(32s, int)
+DEF_TRANSPOSE_FUNC(32s, صحيح)
 DEF_TRANSPOSE_FUNC(16uC3, Vec3s)
 DEF_TRANSPOSE_FUNC(32sC2, Vec2i)
 DEF_TRANSPOSE_FUNC(32sC3, Vec3i)
@@ -398,7 +398,7 @@ DEF_TRANSPOSE_FUNC(32sC4, Vec4i)
 DEF_TRANSPOSE_FUNC(32sC6, Vec6i)
 DEF_TRANSPOSE_FUNC(32sC8, Vec8i)
 
-static TransposeFunc transposeTab[] =
+ساكن TransposeFunc transposeTab[] =
 {
     0, transpose_8u, transpose_16u, transpose_8uC3, transpose_32s, 0, transpose_16uC3, 0,
     transpose_32sC2, 0, 0, 0, transpose_32sC3, 0, 0, 0, transpose_32sC4,
@@ -407,179 +407,179 @@ static TransposeFunc transposeTab[] =
 
 nd::TransposeFunc nd::getTransposeFunc(size_t esz)
 {
-    return esz < sizeof(transposeTab)/sizeof(transposeTab[0]) ? transposeTab[esz] : nullptr;
+    أرجع esz < حجم(transposeTab)/حجم(transposeTab[0]) ? transposeTab[esz] : خالی_سوچک;
 }
 
-static TransposeInplaceFunc transposeInplaceTab[] =
+ساكن TransposeInplaceFunc transposeInplaceTab[] =
 {
     0, transposeI_8u, transposeI_16u, transposeI_8uC3, transposeI_32s, 0, transposeI_16uC3, 0,
     transposeI_32sC2, 0, 0, 0, transposeI_32sC3, 0, 0, 0, transposeI_32sC4,
     0, 0, 0, 0, 0, 0, 0, transposeI_32sC6, 0, 0, 0, 0, 0, 0, 0, transposeI_32sC8
 };
 
-#ifdef HAVE_OPENCL
+#جے_تعریف_شدہ HAVE_OPENCL
 
-static bool ocl_transpose( InputArray _src, OutputArray _dst )
+ساكن منطقي ocl_transpose( داخلہ_Array _src, OutputArray _dst )
 {
-    const ocl::Device & dev = ocl::Device::getDefault();
-    const int TILE_DIM = 32, BLOCK_ROWS = 8;
-    int type = _src.type(), cn = CV_MAT_CN(type), depth = CV_MAT_DEPTH(type),
-        rowsPerWI = dev.isIntel() ? 4 : 1;
+    ثابت ocl::Device & dev = ocl::Device::getDefault();
+    ثابت صحيح TILE_DIM = 32, بلاک_صفاں = 8;
+    صحيح type = _src.type(), cn = CV_MAT_CN(type), ڈونگھائی = CV_MAT_ڈونگھائی(type),
+        صفاں_فی_WI = dev.isIntel() ? 4 : 1;
 
     UMat src = _src.getUMat();
-    _dst.create(src.cols, src.rows, type);
+    _dst.create(src.خانے_گنتی, src.صفاں, type);
     UMat dst = _dst.getUMat();
 
     String kernelName("transpose");
-    bool inplace = dst.u == src.u;
+    منطقي inplace = dst.u == src.u;
 
-    if (inplace)
+    إذا (inplace)
     {
-        CV_Assert(dst.cols == dst.rows);
+        CV_Assert(dst.خانے_گنتی == dst.صفاں);
         kernelName += "_inplace";
     }
-    else
+    وإلا
     {
         // check required local memory size
-        size_t required_local_memory = (size_t) TILE_DIM*(TILE_DIM+1)*CV_ELEM_SIZE(type);
-        if (required_local_memory > ocl::Device::getDefault().localMemSize())
-            return false;
+        size_t required_local_حافظہ = (size_t) TILE_DIM*(TILE_DIM+1)*CV_ELEM_ناپ(type);
+        إذا (required_local_حافظہ > ocl::Device::getDefault().local_Mem_ناپ())
+            أرجع خطأ;
     }
 
     String deviceMacro;
-    if (dev.isIntel())
+    إذا (dev.isIntel())
         deviceMacro = " -D INTEL_GPU";
-    else
+    وإلا
         deviceMacro = "";
 
     ocl::Kernel k(kernelName.c_str(), ocl::core::transpose_oclsrc,
                   format("-D T=%s -D T1=%s -D cn=%d -D TILE_DIM=%d -D BLOCK_ROWS=%d -D rowsPerWI=%d%s%s",
-                         ocl::memopTypeToStr(type), ocl::memopTypeToStr(depth),
-                         cn, TILE_DIM, BLOCK_ROWS, rowsPerWI, inplace ? " -D INPLACE" : "", deviceMacro.c_str()));
-    if (k.empty())
-        return false;
+                         ocl::memop_Type_منزل_Str(type), ocl::memop_Type_منزل_Str(ڈونگھائی),
+                         cn, TILE_DIM, بلاک_صفاں, صفاں_فی_WI, inplace ? " -D INPLACE" : "", deviceMacro.c_str()));
+    إذا (k.empty())
+        أرجع خطأ;
 
-    if (inplace)
-        k.args(ocl::KernelArg::ReadWriteNoSize(dst), dst.rows);
-    else
-        k.args(ocl::KernelArg::ReadOnly(src),
-               ocl::KernelArg::WriteOnlyNoSize(dst));
+    إذا (inplace)
+        k.دلیلاں(ocl::KernelArg::Read_Write_No_ناپ(dst), dst.صفاں);
+    وإلا
+        k.دلیلاں(ocl::KernelArg::ReadOnly(src),
+               ocl::KernelArg::Write_Only_No_ناپ(dst));
 
-    size_t localsize[2]  = { TILE_DIM, BLOCK_ROWS };
-    size_t globalsize[2] = { (size_t)src.cols, inplace ? ((size_t)src.rows + rowsPerWI - 1) / rowsPerWI : (divUp((size_t)src.rows, TILE_DIM) * BLOCK_ROWS) };
+    size_t localsize[2]  = { TILE_DIM, بلاک_صفاں };
+    size_t globalsize[2] = { (size_t)src.خانے_گنتی, inplace ? ((size_t)src.صفاں + صفاں_فی_WI - 1) / صفاں_فی_WI : (div_اتے((size_t)src.صفاں, TILE_DIM) * بلاک_صفاں) };
 
-    if (inplace && dev.isIntel())
+    إذا (inplace && dev.isIntel())
     {
         localsize[0] = 16;
-        localsize[1] = dev.maxWorkGroupSize() / localsize[0];
+        localsize[1] = dev.max_Work_گروہ_ناپ() / localsize[0];
     }
 
-    return k.run(2, globalsize, localsize, false);
+    أرجع k.لگاتار(2, globalsize, localsize, خطأ);
 }
 
-#endif
+#جے_انت
 
-void transpose( InputArray _src, OutputArray _dst )
+فراغ transpose( داخلہ_Array _src, OutputArray _dst )
 {
     CV_INSTRUMENT_REGION();
 
-    int type = _src.type(), esz = CV_ELEM_SIZE(type);
+    صحيح type = _src.type(), esz = CV_ELEM_ناپ(type);
     CV_Assert( _src.dims() <= 2 && esz <= 32 );
 
-    CV_OCL_RUN(_dst.isUMat(),
+    CV_OCL_لگاتار(_dst.isUMat(),
                ocl_transpose(_src, _dst))
 
     Mat src = _src.getMat();
-    if( src.empty() )
+    إذا( src.empty() )
     {
         _dst.release();
-        return;
+        أرجع;
     }
 
-    _dst.create(src.cols, src.rows, src.type());
+    _dst.create(src.خانے_گنتی, src.صفاں, src.type());
     Mat dst = _dst.getMat();
 
     // handle the case of single-column/single-row matrices, stored in STL vectors.
-    if( src.rows != dst.cols || src.cols != dst.rows )
+    إذا( src.صفاں != dst.خانے_گنتی || src.خانے_گنتی != dst.صفاں )
     {
-        CV_Assert( src.size() == dst.size() && (src.cols == 1 || src.rows == 1) );
-        src.copyTo(dst);
-        return;
+        CV_Assert( src.size() == dst.size() && (src.خانے_گنتی == 1 || src.صفاں == 1) );
+        src.copy_منزل(dst);
+        أرجع;
     }
 
-    CALL_HAL(transpose2d, cv_hal_transpose2d, src.data, src.step, dst.data, dst.step, src.cols, src.rows, esz);
+    CALL_HAL(transpose2d, cv_hal_transpose2d, src.انکڑے, src.قدم, dst.انکڑے, dst.قدم, src.خانے_گنتی, src.صفاں, esz);
 
-    if( dst.data == src.data )
+    إذا( dst.انکڑے == src.انکڑے )
     {
         TransposeInplaceFunc func = transposeInplaceTab[esz];
         CV_Assert( func != 0 );
-        CV_Assert( dst.cols == dst.rows );
-        func( dst.ptr(), dst.step, dst.rows );
+        CV_Assert( dst.خانے_گنتی == dst.صفاں );
+        func( dst.ptr(), dst.قدم, dst.صفاں );
     }
-    else
+    وإلا
     {
         TransposeFunc func = transposeTab[esz];
         CV_Assert( func != 0 );
-        func( src.ptr(), src.step, dst.ptr(), dst.step, src.size() );
+        func( src.ptr(), src.قدم, dst.ptr(), dst.قدم, src.size() );
     }
 }
 
 
-void transpose(InputArray src_, const std::vector<int>& order, OutputArray dst_)
+فراغ transpose(داخلہ_Array src_, ثابت std::vector<صحيح>& ترتیب, OutputArray dst_)
 {
     CV_INSTRUMENT_REGION();
 
     Mat inp = src_.getMat();
-    const int ndims = inp.dims;
+    ثابت صحيح ndims = inp.dims;
     CV_Assert(!(ndims == 0 && inp.empty()));
-    CV_CheckEQ(order.size(), static_cast<size_t>(ndims), "Number of dimensions shouldn't change");
+    CV_CheckEQ(ترتیب.size(), static_cast<size_t>(ndims), "Number of dimensions shouldn't change");
 
-    bool used[CV_MAX_DIM] = {false};
-    int newShape[CV_MAX_DIM];
-    for (int i = 0; i < ndims; i++)
+    منطقي ورتیا[CV_MAX_DIM] = {خطأ};
+    صحيح newShape[CV_MAX_DIM];
+    لكل (صحيح i = 0; i < ndims; i++)
     {
-        int j = order[i];
-        CV_Check(j, 0 <= j && j < ndims && !used[j], "New order should be a valid permutation of the old one");
-        used[j] = true;
+        صحيح j = ترتیب[i];
+        CV_Check(j, 0 <= j && j < ndims && !ورتیا[j], "New order should be a valid permutation of the old one");
+        ورتیا[j] = سچ;
         newShape[i] = inp.size[j];
     }
 
     // plain 2D transpose keeps using cv::transpose (HAL, in-place square case);
     // not for an empty input, which cv::transpose would answer by releasing dst
-    if (ndims == 2 && order[0] == 1 && !inp.empty() && nd::getTransposeFunc(inp.elemSize()))
+    إذا (ndims == 2 && ترتیب[0] == 1 && !inp.empty() && nd::getTransposeFunc(inp.elem_ناپ()))
     {
         transpose(inp, dst_);
-        return;
+        أرجع;
     }
 
     dst_.create(ndims, newShape, inp.type());
     Mat out = dst_.getMat();
-    if (out.total() == 0)
-        return;
-    nd::copy(nd::permute(nd::viewOf(inp), order.data()), nd::viewOf(out));
+    إذا (out.کل() == 0)
+        أرجع;
+    nd::copy(nd::ترتیب_بدلو(nd::view_دا(inp), ترتیب.انکڑے()), nd::view_دا(out));
 }
 
-void transposeND(InputArray src, const std::vector<int>& order, OutputArray dst)
+فراغ transposeND(داخلہ_Array src, ثابت std::vector<صحيح>& ترتیب, OutputArray dst)
 {
-    transpose(src, order, dst);
+    transpose(src, ترتیب, dst);
 }
 
 
 // Generic scalar fallback
-CV_ALWAYS_INLINE void flipHoriz_generic( const uchar* src, size_t sstep, uchar* dst, size_t dstep, Size size, size_t esz )
+CV_ALWAYS_INLINE فراغ flipHoriz_generic( ثابت uchar* src, size_t sstep, uchar* dst, size_t dstep, ناپ size, size_t esz )
 {
-    int i, j, limit = (int)(((size.width + 1)/2)*esz);
-    int height = size.height;
-    AutoBuffer<int> _tab(size.width*esz);
-    int* tab = _tab.data();
+    صحيح i, j, حد_بندی = (صحيح)(((size.چوڑائی + 1)/2)*esz);
+    صحيح اچائی = size.اچائی;
+    Auto_بفر<صحيح> _tab(size.چوڑائی*esz);
+    صحيح* tab = _tab.انکڑے();
 
-    for( i = 0; i < size.width; i++ )
-        for( size_t k = 0; k < esz; k++ )
-            tab[i*esz + k] = (int)((size.width - i - 1)*esz + k);
+    لكل( i = 0; i < size.چوڑائی; i++ )
+        لكل( size_t k = 0; k < esz; k++ )
+            tab[i*esz + k] = (صحيح)((size.چوڑائی - i - 1)*esz + k);
 
-    for( ; height--; src += sstep, dst += dstep )
+    لكل( ; اچائی--; src += sstep, dst += dstep )
     {
-        for( i = 0; i < limit; i++ )
+        لكل( i = 0; i < حد_بندی; i++ )
         {
             j = tab[i];
             uchar t0 = src[i], t1 = src[j];
@@ -588,51 +588,51 @@ CV_ALWAYS_INLINE void flipHoriz_generic( const uchar* src, size_t sstep, uchar* 
     }
 }
 
-#if CV_SIMD || CV_SIMD_SCALABLE
-template<typename V> CV_ALWAYS_INLINE void flipHoriz_single( const uchar* src, size_t sstep, uchar* dst, size_t dstep, Size size )
+#إذا CV_SIMD || CV_SIMD_SCALABLE
+سانچا<قسم_ناں V> CV_ALWAYS_INLINE فراغ flipHoriz_single( ثابت uchar* src, size_t sstep, uchar* dst, size_t dstep, ناپ size )
 {
-    typedef typename VTraits<V>::lane_type T;
-    const int vlanes = VTraits<v_uint8>::vlanes();
-    int end = (int)(size.width * sizeof(T));
-    int width = (end + 1) / 2;
-    int width_simd = width & -vlanes;
-    int height = size.height;
+    تعريفنوع قسم_ناں VTraits<V>::lane_type T;
+    ثابت صحيح vlanes = VTraits<v_uint8>::vlanes();
+    صحيح end = (صحيح)(size.چوڑائی * حجم(T));
+    صحيح چوڑائی = (end + 1) / 2;
+    صحيح چوڑائی_simd = چوڑائی & -vlanes;
+    صحيح اچائی = size.اچائی;
 
-    CV_DbgAssert(!CV_STRONG_ALIGNMENT || isAligned<sizeof(T)>(src, dst));
+    CV_DbgAssert(!CV_STRONG_ALIGNMENT || isAligned<حجم(T)>(src, dst));
 
-    for( ; height--; src += sstep, dst += dstep )
+    لكل( ; اچائی--; src += sstep, dst += dstep )
     {
-        int i = 0, j = end;
-        for( ; i < width_simd; i += vlanes, j -= vlanes )
+        صحيح i = 0, j = end;
+        لكل( ; i < چوڑائی_simd; i += vlanes, j -= vlanes )
         {
-            V t0 = vx_load((const T*)(src + i));
-            V t1 = vx_load((const T*)(src + j - vlanes));
-            t0 = v_reverse(t0);
-            t1 = v_reverse(t1);
+            V t0 = vx_لدو((ثابت T*)(src + i));
+            V t1 = vx_لدو((ثابت T*)(src + j - vlanes));
+            t0 = v_الٹ(t0);
+            t1 = v_الٹ(t1);
             v_store((T*)(dst + j - vlanes), t0);
             v_store((T*)(dst + i), t1);
         }
 
         // Scalar tail loop
-        if (isAligned<sizeof(T)>(src, dst))
+        إذا (isAligned<حجم(T)>(src, dst))
         {
-            for ( ; i < width; i += sizeof(T), j -= sizeof(T) )
+            لكل ( ; i < چوڑائی; i += حجم(T), j -= حجم(T) )
             {
-                T t0 = *((const T*)(src + i));
-                T t1 = *((const T*)(src + j - sizeof(T)));
-                *((T*)(dst + j - sizeof(T))) = t0;
+                T t0 = *((ثابت T*)(src + i));
+                T t1 = *((ثابت T*)(src + j - حجم(T)));
+                *((T*)(dst + j - حجم(T))) = t0;
                 *((T*)(dst + i)) = t1;
             }
         }
-        else
+        وإلا
         {
-            for ( ; i < width; i += sizeof(T), j -= sizeof(T) )
+            لكل ( ; i < چوڑائی; i += حجم(T), j -= حجم(T) )
             {
-                for (int k = 0; k < (int)sizeof(T); k++)
+                لكل (صحيح k = 0; k < (صحيح)حجم(T); k++)
                 {
                     uchar t0 = src[i + k];
-                    uchar t1 = src[j + k - sizeof(T)];
-                    dst[j + k - sizeof(T)] = t0;
+                    uchar t1 = src[j + k - حجم(T)];
+                    dst[j + k - حجم(T)] = t0;
                     dst[i + k] = t1;
                 }
             }
@@ -641,45 +641,45 @@ template<typename V> CV_ALWAYS_INLINE void flipHoriz_single( const uchar* src, s
 }
 
 // SIMD for C3
-template<typename V>
-CV_ALWAYS_INLINE void flipHoriz_c3( const uchar* src, size_t sstep, uchar* dst, size_t dstep, Size size )
+سانچا<قسم_ناں V>
+CV_ALWAYS_INLINE فراغ flipHoriz_c3( ثابت uchar* src, size_t sstep, uchar* dst, size_t dstep, ناپ size )
 {
-    typedef typename VTraits<V>::lane_type T;
-    const int vlanes = VTraits<V>::vlanes();
-    const int stride = 3 * sizeof(T);
-    int width = size.width;
-    int centre = (width + 1) / 2;
-    int width_simd = (centre / vlanes) * vlanes;
-    int height = size.height;
+    تعريفنوع قسم_ناں VTraits<V>::lane_type T;
+    ثابت صحيح vlanes = VTraits<V>::vlanes();
+    ثابت صحيح stride = 3 * حجم(T);
+    صحيح چوڑائی = size.چوڑائی;
+    صحيح centre = (چوڑائی + 1) / 2;
+    صحيح چوڑائی_simd = (centre / vlanes) * vlanes;
+    صحيح اچائی = size.اچائی;
 
-    for( ; height--; src += sstep, dst += dstep )
+    لكل( ; اچائی--; src += sstep, dst += dstep )
     {
-        int i = 0;
-        for( ; i < width_simd; i += vlanes )
+        صحيح i = 0;
+        لكل( ; i < چوڑائی_simd; i += vlanes )
         {
             V r0, g0, b0;
-            v_load_deinterleave((const T*)(src + i * stride), r0, g0, b0);
+            v_لدو_deinterleave((ثابت T*)(src + i * stride), r0, g0, b0);
             V r1, g1, b1;
-            v_load_deinterleave((const T*)(src + (width - i - vlanes) * stride), r1, g1, b1);
-            r0 = v_reverse(r0);
-            g0 = v_reverse(g0);
-            b0 = v_reverse(b0);
-            r1 = v_reverse(r1);
-            g1 = v_reverse(g1);
-            b1 = v_reverse(b1);
-            v_store_interleave((T*)(dst + (width - i - vlanes) * stride), r0, g0, b0);
+            v_لدو_deinterleave((ثابت T*)(src + (چوڑائی - i - vlanes) * stride), r1, g1, b1);
+            r0 = v_الٹ(r0);
+            g0 = v_الٹ(g0);
+            b0 = v_الٹ(b0);
+            r1 = v_الٹ(r1);
+            g1 = v_الٹ(g1);
+            b1 = v_الٹ(b1);
+            v_store_interleave((T*)(dst + (چوڑائی - i - vlanes) * stride), r0, g0, b0);
             v_store_interleave((T*)(dst + i * stride), r1, g1, b1);
         }
         // Scalar tail loop for remaining pixels
-        for( ; i < centre; i++ )
+        لكل( ; i < centre; i++ )
         {
-            int j = width - i - 1;
-            T c0 = ((const T*)(src + i * stride))[0];
-            T c1 = ((const T*)(src + i * stride))[1];
-            T c2 = ((const T*)(src + i * stride))[2];
-            T c3 = ((const T*)(src + j * stride))[0];
-            T c4 = ((const T*)(src + j * stride))[1];
-            T c5 = ((const T*)(src + j * stride))[2];
+            صحيح j = چوڑائی - i - 1;
+            T c0 = ((ثابت T*)(src + i * stride))[0];
+            T c1 = ((ثابت T*)(src + i * stride))[1];
+            T c2 = ((ثابت T*)(src + i * stride))[2];
+            T c3 = ((ثابت T*)(src + j * stride))[0];
+            T c4 = ((ثابت T*)(src + j * stride))[1];
+            T c5 = ((ثابت T*)(src + j * stride))[2];
             ((T*)(dst + j * stride))[0] = c0;
             ((T*)(dst + j * stride))[1] = c1;
             ((T*)(dst + j * stride))[2] = c2;
@@ -691,22 +691,22 @@ CV_ALWAYS_INLINE void flipHoriz_c3( const uchar* src, size_t sstep, uchar* dst, 
 }
 
 // SIMD flip when ESZ multiple of vlanes
-template<size_t ESZ>
-CV_ALWAYS_INLINE void flipHoriz_vlanes_match( const uchar* src, size_t sstep, uchar* dst, size_t dstep, Size size)
+سانچا<size_t ESZ>
+CV_ALWAYS_INLINE فراغ flip_Horiz_vlanes_میل( ثابت uchar* src, size_t sstep, uchar* dst, size_t dstep, ناپ size)
 {
-    const int vlanes = VTraits<v_uint8>::vlanes();
-    int end = (int)(size.width * ESZ);
-    int width = end / 2;
-    int height = size.height;
-    int eSize = (int)ESZ;
-    for( ; height--; src += sstep, dst += dstep )
+    ثابت صحيح vlanes = VTraits<v_uint8>::vlanes();
+    صحيح end = (صحيح)(size.چوڑائی * ESZ);
+    صحيح چوڑائی = end / 2;
+    صحيح اچائی = size.اچائی;
+    صحيح e_ناپ = (صحيح)ESZ;
+    لكل( ; اچائی--; src += sstep, dst += dstep )
     {
-        for( int i = 0, j = end - eSize; i < width; i += eSize, j -= eSize )
+        لكل( صحيح i = 0, j = end - e_ناپ; i < چوڑائی; i += e_ناپ, j -= e_ناپ )
         {
-            for( int k = 0; k < eSize; k += vlanes )
+            لكل( صحيح k = 0; k < e_ناپ; k += vlanes )
             {
-                v_uint8 t0 = vx_load(src + i + k);
-                v_uint8 t1 = vx_load(src + j + k);
+                v_uint8 t0 = vx_لدو(src + i + k);
+                v_uint8 t1 = vx_لدو(src + j + k);
                 v_store(dst + j + k, t0);
                 v_store(dst + i + k, t1);
             }
@@ -714,69 +714,69 @@ CV_ALWAYS_INLINE void flipHoriz_vlanes_match( const uchar* src, size_t sstep, uc
     }
 }
 
-#if CV_SIMD128
+#إذا CV_SIMD128
 // SIMD flip when ESZ=16 (128-bit)
-template<size_t ESZ>
-CV_ALWAYS_INLINE void flipHoriz_vlanes_match_128( const uchar* src, size_t sstep, uchar* dst, size_t dstep, Size size)
+سانچا<size_t ESZ>
+CV_ALWAYS_INLINE فراغ flip_Horiz_vlanes_میل_128( ثابت uchar* src, size_t sstep, uchar* dst, size_t dstep, ناپ size)
 {
-    const int vlanes16 = VTraits<v_uint8x16>::vlanes();
-    int end = (int)(size.width * ESZ);
-    int width = end / 2;
-    int height = size.height;
-    for( ; height--; src += sstep, dst += dstep )
+    ثابت صحيح vlanes16 = VTraits<v_uint8x16>::vlanes();
+    صحيح end = (صحيح)(size.چوڑائی * ESZ);
+    صحيح چوڑائی = end / 2;
+    صحيح اچائی = size.اچائی;
+    لكل( ; اچائی--; src += sstep, dst += dstep )
     {
-        for( int i = 0, j = end - vlanes16; i < width; i += vlanes16, j -= vlanes16 )
+        لكل( صحيح i = 0, j = end - vlanes16; i < چوڑائی; i += vlanes16, j -= vlanes16 )
         {
-            v_uint8x16 t0 = v_load(src + i);
-            v_uint8x16 t1 = v_load(src + j);
+            v_uint8x16 t0 = v_لدو(src + i);
+            v_uint8x16 t1 = v_لدو(src + j);
             v_store(dst + j, t0);
             v_store(dst + i, t1);
         }
     }
 }
-#endif // CV_SIMD128
+#جے_انت // CV_SIMD128
 
 // SIMD flip for ESZ=16,32
-template<size_t ESZ>
-CV_ALWAYS_INLINE void flipHoriz_vlanes_dispatch( const uchar* src, size_t sstep, uchar* dst, size_t dstep, Size size )
+سانچا<size_t ESZ>
+CV_ALWAYS_INLINE فراغ flipHoriz_vlanes_dispatch( ثابت uchar* src, size_t sstep, uchar* dst, size_t dstep, ناپ size )
 {
-    const int vlanes = VTraits<v_uint8>::vlanes();
-#if CV_SIMD128
-    const int vlanes16 = VTraits<v_uint8x16>::vlanes();
-#endif
-    if ( (ESZ == (size_t)vlanes) || (ESZ == 2 * (size_t)vlanes))
+    ثابت صحيح vlanes = VTraits<v_uint8>::vlanes();
+#إذا CV_SIMD128
+    ثابت صحيح vlanes16 = VTraits<v_uint8x16>::vlanes();
+#جے_انت
+    إذا ( (ESZ == (size_t)vlanes) || (ESZ == 2 * (size_t)vlanes))
     {
-        flipHoriz_vlanes_match<ESZ>(src, sstep, dst, dstep, size);
-        return;
+        flip_Horiz_vlanes_میل<ESZ>(src, sstep, dst, dstep, size);
+        أرجع;
     }
-#if CV_SIMD128
-    else if (ESZ == vlanes16)
+#إذا CV_SIMD128
+    وإلا إذا (ESZ == vlanes16)
     {
-        flipHoriz_vlanes_match_128<ESZ>(src, sstep, dst, dstep, size);
-        return;
+        flip_Horiz_vlanes_میل_128<ESZ>(src, sstep, dst, dstep, size);
+        أرجع;
     }
-#endif
+#جے_انت
     flipHoriz_generic(src, sstep, dst, dstep, size, ESZ);
 }
 
-#if CV_SIMD128
+#إذا CV_SIMD128
 // SIMD flip for ESZ=24 (CV_64FC3)
-CV_ALWAYS_INLINE void flipHoriz_24( const uchar* src, size_t sstep, uchar* dst, size_t dstep, Size size )
+CV_ALWAYS_INLINE فراغ flipHoriz_24( ثابت uchar* src, size_t sstep, uchar* dst, size_t dstep, ناپ size )
 {
     CV_DbgAssert(!CV_STRONG_ALIGNMENT || isAligned<8>(((size_t)src)|((size_t)dst)|sstep|dstep));
 
-    const int lanes16 = 16;
-    int end = (int)(size.width * 24);
-    int width = (end + 1) / 2;
-    int height = size.height;
-    for( ; height--; src += sstep, dst += dstep )
+    ثابت صحيح lanes16 = 16;
+    صحيح end = (صحيح)(size.چوڑائی * 24);
+    صحيح چوڑائی = (end + 1) / 2;
+    صحيح اچائی = size.اچائی;
+    لكل( ; اچائی--; src += sstep, dst += dstep )
     {
-        for ( int i = 0, j = end; i < width; i += lanes16 + 8, j -= lanes16 + 8 )
+        لكل ( صحيح i = 0, j = end; i < چوڑائی; i += lanes16 + 8, j -= lanes16 + 8 )
         {
-            v_uint8x16 t0 = v_load(src + i);
-            uint64_t t2 = *reinterpret_cast<const uint64_t*>(src + i + lanes16);
-            v_uint8x16 t1 = v_load(src + j - lanes16 - 8);
-            uint64_t t3 = *reinterpret_cast<const uint64_t*>(src + j - 8);
+            v_uint8x16 t0 = v_لدو(src + i);
+            uint64_t t2 = *reinterpret_cast<ثابت uint64_t*>(src + i + lanes16);
+            v_uint8x16 t1 = v_لدو(src + j - lanes16 - 8);
+            uint64_t t3 = *reinterpret_cast<ثابت uint64_t*>(src + j - 8);
             v_store(dst + j - lanes16 - 8, t0);
             *reinterpret_cast<uint64_t*>(dst + j - 8) = t2;
             v_store(dst + i, t1);
@@ -784,135 +784,135 @@ CV_ALWAYS_INLINE void flipHoriz_24( const uchar* src, size_t sstep, uchar* dst, 
         }
     }
 }
-#endif // CV_SIMD128
-#endif // CV_SIMD || CV_SIMD_SCALABLE
+#جے_انت // CV_SIMD128
+#جے_انت // CV_SIMD || CV_SIMD_SCALABLE
 
-static void flipHoriz( const uchar* src, size_t sstep, uchar* dst, size_t dstep, Size size, size_t esz )
+ساكن فراغ flipHoriz( ثابت uchar* src, size_t sstep, uchar* dst, size_t dstep, ناپ size, size_t esz )
 {
-#if CV_SIMD || CV_SIMD_SCALABLE
-#if CV_STRONG_ALIGNMENT
-    const size_t alignMark = ((size_t)src)|((size_t)dst)|sstep|dstep;
-#else
-    const size_t alignMark = 0; // unaligned access is allowed: all the checks below fold to true
-#endif
+#إذا CV_SIMD || CV_SIMD_SCALABLE
+#إذا CV_STRONG_ALIGNMENT
+    ثابت size_t alignMark = ((size_t)src)|((size_t)dst)|sstep|dstep;
+#وإلا
+    ثابت size_t alignMark = 0; // unaligned access is allowed: all the checks below fold to true
+#جے_انت
 
     // SIMD-optimized dispatch
-    switch(esz)
+    بدل(esz)
     {
-        case 1:                                                                               // CV_8UC1: 8-bit, 1 channel
-            flipHoriz_single<v_uint8>(src, sstep, dst, dstep, size); return;
-        case 2:                                                                               // CV_8UC2, CV_16UC1: 8-bit 2-channel or 16-bit 1-channel
-            if (isAligned<2>(alignMark)) { flipHoriz_single<v_uint16>(src, sstep, dst, dstep, size); return; }
-            break;
-        case 3:                                                                               // CV_8UC3: 8-bit, 3 channels
-            flipHoriz_c3<v_uint8>(src, sstep, dst, dstep, size); return;
-        case 4:                                                                               // CV_8UC4, CV_16UC2, CV_32SC1, CV_32FC1: 8-bit 4-channel, 16-bit 2-channel, or 32-bit 1-channel
-            if (isAligned<4>(alignMark)) { flipHoriz_single<v_uint32>(src, sstep, dst, dstep, size); return; }
-            break;
-        case 6:                                                                               // CV_16UC3, CV_16SC3: 16-bit, 3 channels
-            if (isAligned<2>(alignMark)) { flipHoriz_c3<v_uint16>(src, sstep, dst, dstep, size); return; }
-            break;
-        case 8:                                                                               // CV_16UC4, CV_32SC2, CV_32FC2, CV_64FC1: 16-bit 4-channel, 32-bit 2-channel, or 64-bit 1-channel
-            if (isAligned<8>(alignMark)) { flipHoriz_single<v_uint64>(src, sstep, dst, dstep, size); return; }
-            break;
-        case 12:                                                                              // CV_32SC3, CV_32FC3: 32-bit, 3 channels
-            if (isAligned<4>(alignMark)) { flipHoriz_c3<v_uint32>(src, sstep, dst, dstep, size); return; }
-            break;
-        case 16:                                                                              // CV_32SC4, CV_32FC4, CV_64FC2: 32-bit 4-channel or 64-bit 2-channel
-            flipHoriz_vlanes_dispatch<16>(src, sstep, dst, dstep, size); return;               // byte-wise access only
-#if CV_SIMD128
-        case 24:                                                                              // CV_64FC3: 64-bit, 3 channels
-            if (isAligned<8>(alignMark)) { flipHoriz_24(src, sstep, dst, dstep, size); return; }
-            break;
-#endif
-        case 32:                                                                              // CV_64FC4: 64-bit, 4 channels
-            flipHoriz_vlanes_dispatch<32>(src, sstep, dst, dstep, size); return;               // byte-wise access only
-        default:
-            break; // Fall through to generic implementation
+        حالة 1:                                                                               // CV_8UC1: 8-bit, 1 channel
+            flipHoriz_single<v_uint8>(src, sstep, dst, dstep, size); أرجع;
+        حالة 2:                                                                               // CV_8UC2, CV_16UC1: 8-bit 2-channel or 16-bit 1-channel
+            إذا (isAligned<2>(alignMark)) { flipHoriz_single<v_uint16>(src, sstep, dst, dstep, size); أرجع; }
+            اكسر;
+        حالة 3:                                                                               // CV_8UC3: 8-bit, 3 channels
+            flipHoriz_c3<v_uint8>(src, sstep, dst, dstep, size); أرجع;
+        حالة 4:                                                                               // CV_8UC4, CV_16UC2, CV_32SC1, CV_32FC1: 8-bit 4-channel, 16-bit 2-channel, or 32-bit 1-channel
+            إذا (isAligned<4>(alignMark)) { flipHoriz_single<v_uint32>(src, sstep, dst, dstep, size); أرجع; }
+            اكسر;
+        حالة 6:                                                                               // CV_16UC3, CV_16SC3: 16-bit, 3 channels
+            إذا (isAligned<2>(alignMark)) { flipHoriz_c3<v_uint16>(src, sstep, dst, dstep, size); أرجع; }
+            اكسر;
+        حالة 8:                                                                               // CV_16UC4, CV_32SC2, CV_32FC2, CV_64FC1: 16-bit 4-channel, 32-bit 2-channel, or 64-bit 1-channel
+            إذا (isAligned<8>(alignMark)) { flipHoriz_single<v_uint64>(src, sstep, dst, dstep, size); أرجع; }
+            اكسر;
+        حالة 12:                                                                              // CV_32SC3, CV_32FC3: 32-bit, 3 channels
+            إذا (isAligned<4>(alignMark)) { flipHoriz_c3<v_uint32>(src, sstep, dst, dstep, size); أرجع; }
+            اكسر;
+        حالة 16:                                                                              // CV_32SC4, CV_32FC4, CV_64FC2: 32-bit 4-channel or 64-bit 2-channel
+            flipHoriz_vlanes_dispatch<16>(src, sstep, dst, dstep, size); أرجع;               // byte-wise access only
+#إذا CV_SIMD128
+        حالة 24:                                                                              // CV_64FC3: 64-bit, 3 channels
+            إذا (isAligned<8>(alignMark)) { flipHoriz_24(src, sstep, dst, dstep, size); أرجع; }
+            اكسر;
+#جے_انت
+        حالة 32:                                                                              // CV_64FC4: 64-bit, 4 channels
+            flipHoriz_vlanes_dispatch<32>(src, sstep, dst, dstep, size); أرجع;               // byte-wise access only
+        افتراضي:
+            اكسر; // Fall through to generic implementation
     }
-#endif
+#جے_انت
     // Fallback: generic scalar
     flipHoriz_generic(src, sstep, dst, dstep, size, esz);
 }
 
-static void
-flipVert( const uchar* src0, size_t sstep, uchar* dst0, size_t dstep, Size size, size_t esz )
+ساكن فراغ
+flipVert( ثابت uchar* src0, size_t sstep, uchar* dst0, size_t dstep, ناپ size, size_t esz )
 {
-    const uchar* src1 = src0 + (size.height - 1)*sstep;
-    uchar* dst1 = dst0 + (size.height - 1)*dstep;
-    size.width *= (int)esz;
+    ثابت uchar* src1 = src0 + (size.اچائی - 1)*sstep;
+    uchar* dst1 = dst0 + (size.اچائی - 1)*dstep;
+    size.چوڑائی *= (صحيح)esz;
 
-    for( int y = 0; y < (size.height + 1)/2; y++, src0 += sstep, src1 -= sstep,
+    لكل( صحيح y = 0; y < (size.اچائی + 1)/2; y++, src0 += sstep, src1 -= sstep,
                                                   dst0 += dstep, dst1 -= dstep )
     {
-        int i = 0;
-#if (CV_SIMD || CV_SIMD_SCALABLE)
-#if CV_STRONG_ALIGNMENT
-        if (isAligned<sizeof(int)>(src0, src1, dst0, dst1))
-#endif
+        صحيح i = 0;
+#إذا (CV_SIMD || CV_SIMD_SCALABLE)
+#إذا CV_STRONG_ALIGNMENT
+        إذا (isAligned<حجم(صحيح)>(src0, src1, dst0, dst1))
+#جے_انت
         {
-            for (; i <= size.width - VTraits<v_uint8>::vlanes(); i += VTraits<v_uint8>::vlanes())
+            لكل (; i <= size.چوڑائی - VTraits<v_uint8>::vlanes(); i += VTraits<v_uint8>::vlanes())
             {
-                v_int32 t0 = v_reinterpret_as_s32(vx_load(src0 + i));
-                v_int32 t1 = v_reinterpret_as_s32(vx_load(src1 + i));
+                v_int32 t0 = v_reinterpret_as_s32(vx_لدو(src0 + i));
+                v_int32 t1 = v_reinterpret_as_s32(vx_لدو(src1 + i));
                 v_store(dst0 + i, v_reinterpret_as_u8(t1));
                 v_store(dst1 + i, v_reinterpret_as_u8(t0));
             }
         }
-#if CV_STRONG_ALIGNMENT
-        else
+#إذا CV_STRONG_ALIGNMENT
+        وإلا
         {
-            for (; i <= size.width - VTraits<v_uint8>::vlanes(); i += VTraits<v_uint8>::vlanes())
+            لكل (; i <= size.چوڑائی - VTraits<v_uint8>::vlanes(); i += VTraits<v_uint8>::vlanes())
             {
-                v_uint8 t0 = vx_load(src0 + i);
-                v_uint8 t1 = vx_load(src1 + i);
+                v_uint8 t0 = vx_لدو(src0 + i);
+                v_uint8 t1 = vx_لدو(src1 + i);
                 v_store(dst0 + i, t1);
                 v_store(dst1 + i, t0);
             }
         }
-#endif
-#endif
+#جے_انت
+#جے_انت
 
-        if (isAligned<sizeof(int)>(src0, src1, dst0, dst1))
+        إذا (isAligned<حجم(صحيح)>(src0, src1, dst0, dst1))
         {
-            for( ; i <= size.width - 16; i += 16 )
+            لكل( ; i <= size.چوڑائی - 16; i += 16 )
             {
-                int t0 = ((int*)(src0 + i))[0];
-                int t1 = ((int*)(src1 + i))[0];
+                صحيح t0 = ((صحيح*)(src0 + i))[0];
+                صحيح t1 = ((صحيح*)(src1 + i))[0];
 
-                ((int*)(dst0 + i))[0] = t1;
-                ((int*)(dst1 + i))[0] = t0;
+                ((صحيح*)(dst0 + i))[0] = t1;
+                ((صحيح*)(dst1 + i))[0] = t0;
 
-                t0 = ((int*)(src0 + i))[1];
-                t1 = ((int*)(src1 + i))[1];
+                t0 = ((صحيح*)(src0 + i))[1];
+                t1 = ((صحيح*)(src1 + i))[1];
 
-                ((int*)(dst0 + i))[1] = t1;
-                ((int*)(dst1 + i))[1] = t0;
+                ((صحيح*)(dst0 + i))[1] = t1;
+                ((صحيح*)(dst1 + i))[1] = t0;
 
-                t0 = ((int*)(src0 + i))[2];
-                t1 = ((int*)(src1 + i))[2];
+                t0 = ((صحيح*)(src0 + i))[2];
+                t1 = ((صحيح*)(src1 + i))[2];
 
-                ((int*)(dst0 + i))[2] = t1;
-                ((int*)(dst1 + i))[2] = t0;
+                ((صحيح*)(dst0 + i))[2] = t1;
+                ((صحيح*)(dst1 + i))[2] = t0;
 
-                t0 = ((int*)(src0 + i))[3];
-                t1 = ((int*)(src1 + i))[3];
+                t0 = ((صحيح*)(src0 + i))[3];
+                t1 = ((صحيح*)(src1 + i))[3];
 
-                ((int*)(dst0 + i))[3] = t1;
-                ((int*)(dst1 + i))[3] = t0;
+                ((صحيح*)(dst0 + i))[3] = t1;
+                ((صحيح*)(dst1 + i))[3] = t0;
             }
 
-            for( ; i <= size.width - 4; i += 4 )
+            لكل( ; i <= size.چوڑائی - 4; i += 4 )
             {
-                int t0 = ((int*)(src0 + i))[0];
-                int t1 = ((int*)(src1 + i))[0];
+                صحيح t0 = ((صحيح*)(src0 + i))[0];
+                صحيح t1 = ((صحيح*)(src1 + i))[0];
 
-                ((int*)(dst0 + i))[0] = t1;
-                ((int*)(dst1 + i))[0] = t0;
+                ((صحيح*)(dst0 + i))[0] = t1;
+                ((صحيح*)(dst1 + i))[0] = t0;
             }
         }
 
-        for( ; i < size.width; i++ )
+        لكل( ; i < size.چوڑائی; i++ )
         {
             uchar t0 = src0[i];
             uchar t1 = src1[i];
@@ -923,322 +923,322 @@ flipVert( const uchar* src0, size_t sstep, uchar* dst0, size_t dstep, Size size,
     }
 }
 
-#ifdef HAVE_OPENCL
+#جے_تعریف_شدہ HAVE_OPENCL
 
-enum { FLIP_COLS = 1 << 0, FLIP_ROWS = 1 << 1, FLIP_BOTH = FLIP_ROWS | FLIP_COLS };
+تعداد { FLIP_خانے_گنتی = 1 << 0, FLIP_صفاں = 1 << 1, FLIP_BOTH = FLIP_صفاں | FLIP_خانے_گنتی };
 
-static bool ocl_flip(InputArray _src, OutputArray _dst, int flipCode )
+ساكن منطقي ocl_flip(داخلہ_Array _src, OutputArray _dst, صحيح flip_کوڈ )
 {
-    CV_Assert(flipCode >= -1 && flipCode <= 1);
+    CV_Assert(flip_کوڈ >= -1 && flip_کوڈ <= 1);
 
-    const ocl::Device & dev = ocl::Device::getDefault();
-    int type = _src.type(), depth = CV_MAT_DEPTH(type), cn = CV_MAT_CN(type),
-            flipType, kercn = std::min(ocl::predictOptimalVectorWidth(_src, _dst), 4);
+    ثابت ocl::Device & dev = ocl::Device::getDefault();
+    صحيح type = _src.type(), ڈونگھائی = CV_MAT_ڈونگھائی(type), cn = CV_MAT_CN(type),
+            flipType, kercn = std::min(ocl::predict_Optimal_سمتیہ_چوڑائی(_src, _dst), 4);
 
-    bool doubleSupport = dev.doubleFPConfig() > 0;
-    if (!doubleSupport && depth == CV_64F)
+    منطقي doubleSupport = dev.doubleFPConfig() > 0;
+    إذا (!doubleSupport && ڈونگھائی == CV_64F)
         kercn = cn;
 
-    if (cn > 4)
-        return false;
+    إذا (cn > 4)
+        أرجع خطأ;
 
-    Size size = _src.size();
+    ناپ size = _src.size();
     _dst.create(size, type);
     UMat src = _src.getUMat(), dst = _dst.getUMat();
-    bool inplace = (dst.u == src.u);
+    منطقي inplace = (dst.u == src.u);
 
     String kernelName;
-    if (flipCode == 0)
-        kernelName = "arithm_flip_rows", flipType = FLIP_ROWS;
-    else if (flipCode > 0)
-        kernelName = "arithm_flip_cols", flipType = FLIP_COLS;
-    else
+    إذا (flip_کوڈ == 0)
+        kernelName = "arithm_flip_rows", flipType = FLIP_صفاں;
+    وإلا إذا (flip_کوڈ > 0)
+        kernelName = "arithm_flip_cols", flipType = FLIP_خانے_گنتی;
+    وإلا
         kernelName = "arithm_flip_rows_cols", flipType = FLIP_BOTH;
 
-    if(inplace)
+    إذا(inplace)
         kernelName += "_inplace";
 
-    int pxPerWIy = (dev.isIntel() && (dev.type() & ocl::Device::TYPE_GPU)) ? 4 : 1;
-    kercn = (cn!=3 || flipType == FLIP_ROWS) ? std::max(kercn, cn) : cn;
-    const int TILE_SIZE = 32, BLOCK_ROWS = 8;
+    صحيح px_فی_WIy = (dev.isIntel() && (dev.type() & ocl::Device::TYPE_GPU)) ? 4 : 1;
+    kercn = (cn!=3 || flipType == FLIP_صفاں) ? std::max(kercn, cn) : cn;
+    ثابت صحيح TILE_ناپ = 32, بلاک_صفاں = 8;
 
     ocl::Kernel k(kernelName.c_str(), ocl::core::flip_oclsrc,
                 format( "-D T=%s -D T1=%s -D DEPTH=%d -D cn=%d -D PIX_PER_WI_Y=%d -D kercn=%d -D TILE_SIZE=%d -D BLOCK_ROWS=%d%s",
-                kercn != cn ? ocl::typeToStr(CV_MAKE_TYPE(depth, kercn)) : ocl::vecopTypeToStr(CV_MAKE_TYPE(depth, kercn)),
-                kercn != cn ? ocl::typeToStr(depth) : ocl::vecopTypeToStr(depth), depth, cn, pxPerWIy, kercn, TILE_SIZE, BLOCK_ROWS,
+                kercn != cn ? ocl::type_منزل_Str(CV_MAKE_TYPE(ڈونگھائی, kercn)) : ocl::vecop_Type_منزل_Str(CV_MAKE_TYPE(ڈونگھائی, kercn)),
+                kercn != cn ? ocl::type_منزل_Str(ڈونگھائی) : ocl::vecop_Type_منزل_Str(ڈونگھائی), ڈونگھائی, cn, px_فی_WIy, kercn, TILE_ناپ, بلاک_صفاں,
                 inplace ? " -D INPLACE" : ""));
-    if (k.empty())
-        return false;
+    إذا (k.empty())
+        أرجع خطأ;
 
-    int cols = size.width * cn / kercn, rows = size.height;
-    int work_cols = flipType == FLIP_COLS ? (cols + 1) >> 1 : cols;
-    int work_rows = flipType & FLIP_ROWS ? (rows + 1) >> 1 : rows;
+    صحيح خانے_گنتی = size.چوڑائی * cn / kercn, صفاں = size.اچائی;
+    صحيح work_خانے_گنتی = flipType == FLIP_خانے_گنتی ? (خانے_گنتی + 1) >> 1 : خانے_گنتی;
+    صحيح work_صفاں = flipType & FLIP_صفاں ? (صفاں + 1) >> 1 : صفاں;
 
-    if (inplace)
+    إذا (inplace)
     {
-        k.args(ocl::KernelArg::ReadWriteNoSize(dst), rows, cols);
+        k.دلیلاں(ocl::KernelArg::Read_Write_No_ناپ(dst), صفاں, خانے_گنتی);
 
-        int gs_cols, gs_rows;
-        if (flipType == FLIP_COLS)
+        صحيح gs_خانے_گنتی, gs_صفاں;
+        إذا (flipType == FLIP_خانے_گنتی)
         {
-            gs_cols = work_cols;
-            gs_rows = rows;
+            gs_خانے_گنتی = work_خانے_گنتی;
+            gs_صفاں = صفاں;
         }
-        else if (flipType == FLIP_ROWS)
+        وإلا إذا (flipType == FLIP_صفاں)
         {
-            gs_cols = cols;
-            gs_rows = work_rows;
+            gs_خانے_گنتی = خانے_گنتی;
+            gs_صفاں = work_صفاں;
         }
-        else // FLIP_BOTH
+        وإلا // FLIP_BOTH
         {
-            gs_cols = cols;
-            gs_rows = rows;
+            gs_خانے_گنتی = خانے_گنتی;
+            gs_صفاں = صفاں;
         }
 
         size_t globalsize[2] = {
-            (size_t)divUp(gs_cols, TILE_SIZE) * TILE_SIZE,
-            (size_t)divUp(gs_rows, TILE_SIZE) * BLOCK_ROWS
+            (size_t)div_اتے(gs_خانے_گنتی, TILE_ناپ) * TILE_ناپ,
+            (size_t)div_اتے(gs_صفاں, TILE_ناپ) * بلاک_صفاں
         };
-        size_t localsize[2] = { TILE_SIZE, BLOCK_ROWS };
-        return k.run(2, globalsize, localsize, false);
+        size_t localsize[2] = { TILE_ناپ, بلاک_صفاں };
+        أرجع k.لگاتار(2, globalsize, localsize, خطأ);
     }
-    else
+    وإلا
     {
-        k.args(ocl::KernelArg::ReadOnlyNoSize(src),
-           ocl::KernelArg::WriteOnly(dst, cn, kercn), work_rows, work_cols);
+        k.دلیلاں(ocl::KernelArg::Read_Only_No_ناپ(src),
+           ocl::KernelArg::WriteOnly(dst, cn, kercn), work_صفاں, work_خانے_گنتی);
 
-        size_t maxWorkGroupSize = dev.maxWorkGroupSize();
-        CV_Assert(maxWorkGroupSize % 4 == 0);
+        size_t max_Work_گروہ_ناپ = dev.max_Work_گروہ_ناپ();
+        CV_Assert(max_Work_گروہ_ناپ % 4 == 0);
 
-        size_t globalsize[2] = { (size_t)work_cols, ((size_t)work_rows + pxPerWIy - 1) / pxPerWIy };
-        size_t localsize[2]  = { maxWorkGroupSize / 4, 4 };
-        return k.run(2, globalsize, (flipType == FLIP_COLS) && !dev.isIntel() ? localsize : NULL, false);
+        size_t globalsize[2] = { (size_t)work_خانے_گنتی, ((size_t)work_صفاں + px_فی_WIy - 1) / px_فی_WIy };
+        size_t localsize[2]  = { max_Work_گروہ_ناپ / 4, 4 };
+        أرجع k.لگاتار(2, globalsize, (flipType == FLIP_خانے_گنتی) && !dev.isIntel() ? localsize : عدم, خطأ);
     }
 }
 
-#endif
+#جے_انت
 
-void flip( InputArray _src, OutputArray _dst, int flip_mode )
+فراغ flip( داخلہ_Array _src, OutputArray _dst, صحيح flip_منوال )
 {
     CV_INSTRUMENT_REGION();
 
     CV_Assert( _src.dims() <= 2 );
-    Size size = _src.size();
+    ناپ size = _src.size();
 
-    if (flip_mode < 0)
+    إذا (flip_منوال < 0)
     {
-        if (size.width == 1)
-            flip_mode = 0;
-        if (size.height == 1)
-            flip_mode = 1;
+        إذا (size.چوڑائی == 1)
+            flip_منوال = 0;
+        إذا (size.اچائی == 1)
+            flip_منوال = 1;
     }
 
-    if ((size.width == 1 && flip_mode > 0) ||
-        (size.height == 1 && flip_mode == 0))
+    إذا ((size.چوڑائی == 1 && flip_منوال > 0) ||
+        (size.اچائی == 1 && flip_منوال == 0))
     {
-        return _src.copyTo(_dst);
+        أرجع _src.copy_منزل(_dst);
     }
 
-    CV_OCL_RUN( _dst.isUMat(), ocl_flip(_src, _dst, flip_mode))
+    CV_OCL_لگاتار( _dst.isUMat(), ocl_flip(_src, _dst, flip_منوال))
 
     Mat src = _src.getMat();
-    int type = src.type();
+    صحيح type = src.type();
     _dst.create( size, type );
     Mat dst = _dst.getMat();
 
-    CALL_HAL(flip, cv_hal_flip, type, src.ptr(), src.step, src.cols, src.rows,
-             dst.ptr(), dst.step, flip_mode);
+    CALL_HAL(flip, cv_hal_flip, type, src.ptr(), src.قدم, src.خانے_گنتی, src.صفاں,
+             dst.ptr(), dst.قدم, flip_منوال);
 
-    size_t esz = CV_ELEM_SIZE(type);
+    size_t esz = CV_ELEM_ناپ(type);
 
-    if( flip_mode <= 0 )
-        flipVert( src.ptr(), src.step, dst.ptr(), dst.step, src.size(), esz );
-    else
-        flipHoriz( src.ptr(), src.step, dst.ptr(), dst.step, src.size(), esz );
+    إذا( flip_منوال <= 0 )
+        flipVert( src.ptr(), src.قدم, dst.ptr(), dst.قدم, src.size(), esz );
+    وإلا
+        flipHoriz( src.ptr(), src.قدم, dst.ptr(), dst.قدم, src.size(), esz );
 
-    if( flip_mode < 0 )
-        flipHoriz( dst.ptr(), dst.step, dst.ptr(), dst.step, dst.size(), esz );
+    إذا( flip_منوال < 0 )
+        flipHoriz( dst.ptr(), dst.قدم, dst.ptr(), dst.قدم, dst.size(), esz );
 }
 
 // In-place flip of a continuous array: swap the slices along the axis, no temporary copy.
-static void flipNDInplace(Mat& m, int axis)
+ساكن فراغ flipNDInplace(Mat& m, صحيح axis)
 {
     size_t nouter = 1;
-    for (int i = 0; i < axis; i++)
+    لكل (صحيح i = 0; i < axis; i++)
         nouter *= (size_t)m.size[i];
-    const int n = m.size[axis];
-    const size_t step = m.step[axis];
-    uchar* data = m.ptr();
-    for (size_t i = 0; i < nouter; i++, data += n*step)
-        for (int j = 0, k = n - 1; j < k; j++, k--)
-            std::swap_ranges(data + j*step, data + (j + 1)*step, data + k*step);
+    ثابت صحيح n = m.size[axis];
+    ثابت size_t قدم = m.قدم[axis];
+    uchar* انکڑے = m.ptr();
+    لكل (size_t i = 0; i < nouter; i++, انکڑے += n*قدم)
+        لكل (صحيح j = 0, k = n - 1; j < k; j++, k--)
+            std::swap_ranges(انکڑے + j*قدم, انکڑے + (j + 1)*قدم, انکڑے + k*قدم);
 }
 
-void flipND(InputArray _src, OutputArray _dst, int _axis)
+فراغ flipND(داخلہ_Array _src, OutputArray _dst, صحيح _axis)
 {
     CV_INSTRUMENT_REGION();
 
     Mat src = _src.getMat();
 
     // verify axis
-    int ndim = src.dims;
+    صحيح ndim = src.dims;
     CV_CheckLT(_axis, ndim, "flipND: given axis is out of range");
     CV_CheckGE(_axis, -ndim, "flipND: given axis is out of range");
-    int axis = (_axis + ndim) % ndim;
+    صحيح axis = (_axis + ndim) % ndim;
 
     _dst.create(ndim, src.size.p, src.type());
     Mat dst = _dst.getMat();
-    if (dst.data == src.data && src.isContinuous() && dst.isContinuous())
+    إذا (dst.انکڑے == src.انکڑے && src.isContinuous() && dst.isContinuous())
     {
         flipNDInplace(dst, axis);
-        return;
+        أرجع;
     }
 
-    nd::View v = nd::viewOf(src);
+    nd::View v = nd::view_دا(src);
     nd::flip(v, axis);
-    nd::copy(v, nd::viewOf(dst));
+    nd::copy(v, nd::view_دا(dst));
 }
 
-void concat(InputArrayOfArrays _src, int axis, OutputArray _dst)
+فراغ concat(داخلہ_Array_دا_Arrays _src, صحيح axis, OutputArray _dst)
 {
     CV_INSTRUMENT_REGION();
 
     std::vector<Mat> src;
-    _src.getMatVector(src);
+    _src.get_Mat_سمتیہ(src);
     CV_Assert(!src.empty());
 
-    const Mat& src0 = src[0];
-    const int ndims = src0.dims, type = src0.type(), ninputs = (int)src.size();
+    ثابت Mat& src0 = src[0];
+    ثابت صحيح ndims = src0.dims, type = src0.type(), ninputs = (صحيح)src.size();
     CV_CheckGE(ndims, 1, "concat: 0-dimensional arrays are not supported");
     CV_CheckGE(axis, -ndims, "concat: axis is out of range");
     CV_CheckLT(axis, ndims, "concat: axis is out of range");
-    if (axis < 0)
+    إذا (axis < 0)
         axis += ndims;
 
-    int outShape[CV_MAX_DIM];
-    for (int i = 0; i < ndims; i++)
-        outShape[i] = src0.size[i];
-    int64 axisSize = 0;
-    for (int k = 0; k < ninputs; k++)
+    صحيح باہرلا_Shape[CV_MAX_DIM];
+    لكل (صحيح i = 0; i < ndims; i++)
+        باہرلا_Shape[i] = src0.size[i];
+    int64 axis_ناپ = 0;
+    لكل (صحيح k = 0; k < ninputs; k++)
     {
-        const Mat& m = src[k];
+        ثابت Mat& m = src[k];
         CV_CheckEQ(m.type(), type, "concat: all the input arrays must have the same type");
         CV_CheckEQ(m.dims, ndims, "concat: all the input arrays must have the same number of dimensions");
-        for (int i = 0; i < ndims; i++)
-            if (i != axis)
-                CV_CheckEQ(m.size[i], outShape[i], "concat: the input shapes must match except along the axis");
-        axisSize += m.size[axis];
+        لكل (صحيح i = 0; i < ndims; i++)
+            إذا (i != axis)
+                CV_CheckEQ(m.size[i], باہرلا_Shape[i], "concat: the input shapes must match except along the axis");
+        axis_ناپ += m.size[axis];
     }
-    CV_CheckLE((size_t)axisSize, (size_t)INT_MAX, "concat: the output is too big");
-    outShape[axis] = (int)axisSize;
+    CV_CheckLE((size_t)axis_ناپ, (size_t)ودھ_توں_ودھ_عدد, "concat: the output is too big");
+    باہرلا_Shape[axis] = (صحيح)axis_ناپ;
 
-    _dst.create(ndims, outShape, type);
+    _dst.create(ndims, باہرلا_Shape, type);
     Mat dst = _dst.getMat();
 
-    AutoBuffer<nd::View, 4> sv(ninputs), dv(ninputs);
-    const nd::View dst0 = nd::viewOf(dst);
-    int ofs = 0;
-    for (int k = 0; k < ninputs; k++)
+    Auto_بفر<nd::View, 4> sv(ninputs), dv(ninputs);
+    ثابت nd::View dst0 = nd::view_دا(dst);
+    صحيح ofs = 0;
+    لكل (صحيح k = 0; k < ninputs; k++)
     {
-        const int sz = src[k].size[axis];
-        sv[k] = nd::viewOf(src[k]);
+        ثابت صحيح sz = src[k].size[axis];
+        sv[k] = nd::view_دا(src[k]);
         dv[k] = dst0;
-        nd::slice(dv[k], axis, ofs, 1, sz);
+        nd::ٹکڑا_2(dv[k], axis, ofs, 1, sz);
         ofs += sz;
     }
-    nd::copyBatch(sv.data(), dv.data(), ninputs);
+    nd::copyBatch(sv.انکڑے(), dv.انکڑے(), ninputs);
 }
 
-void split(InputArray _src, int axis, const std::vector<int>& sizes, OutputArrayOfArrays _dst)
+فراغ ونڈو(داخلہ_Array _src, صحيح axis, ثابت std::vector<صحيح>& sizes, Output_Array_دا_Arrays _dst)
 {
     CV_INSTRUMENT_REGION();
 
     Mat src = _src.getMat();
-    const int ndims = src.dims, type = src.type(), noutputs = (int)sizes.size();
+    ثابت صحيح ndims = src.dims, type = src.type(), noutputs = (صحيح)sizes.size();
     CV_CheckGE(ndims, 1, "split: 0-dimensional arrays are not supported");
     CV_CheckGE(axis, -ndims, "split: axis is out of range");
     CV_CheckLT(axis, ndims, "split: axis is out of range");
-    if (axis < 0)
+    إذا (axis < 0)
         axis += ndims;
     CV_Assert(noutputs > 0);
 
-    int64 axisSize = 0;
-    for (int k = 0; k < noutputs; k++)
+    int64 axis_ناپ = 0;
+    لكل (صحيح k = 0; k < noutputs; k++)
     {
         CV_CheckGE(sizes[k], 0, "split: the sizes must be non-negative");
-        axisSize += sizes[k];
+        axis_ناپ += sizes[k];
     }
-    CV_CheckEQ((size_t)axisSize, (size_t)src.size[axis], "split: the sizes must sum up to the size of the axis");
+    CV_CheckEQ((size_t)axis_ناپ, (size_t)src.size[axis], "split: the sizes must sum up to the size of the axis");
 
-    int outShape[CV_MAX_DIM];
-    for (int i = 0; i < ndims; i++)
-        outShape[i] = src.size[i];
+    صحيح باہرلا_Shape[CV_MAX_DIM];
+    لكل (صحيح i = 0; i < ndims; i++)
+        باہرلا_Shape[i] = src.size[i];
 
-    _dst.create(noutputs, 1, type, -1, true);
-    AutoBuffer<nd::View, 4> sv(noutputs), dv(noutputs);
+    _dst.create(noutputs, 1, type, -1, سچ);
+    Auto_بفر<nd::View, 4> sv(noutputs), dv(noutputs);
     std::vector<Mat> dst(noutputs);
-    const nd::View src0 = nd::viewOf(src);
-    int ofs = 0;
-    for (int k = 0; k < noutputs; k++)
+    ثابت nd::View src0 = nd::view_دا(src);
+    صحيح ofs = 0;
+    لكل (صحيح k = 0; k < noutputs; k++)
     {
-        outShape[axis] = sizes[k];
-        _dst.create(ndims, outShape, type, k);
+        باہرلا_Shape[axis] = sizes[k];
+        _dst.create(ndims, باہرلا_Shape, type, k);
         dst[k] = _dst.getMat(k);
         sv[k] = src0;
-        nd::slice(sv[k], axis, ofs, 1, sizes[k]);
-        dv[k] = nd::viewOf(dst[k]);
+        nd::ٹکڑا_2(sv[k], axis, ofs, 1, sizes[k]);
+        dv[k] = nd::view_دا(dst[k]);
         ofs += sizes[k];
     }
-    nd::copyBatch(sv.data(), dv.data(), noutputs);
+    nd::copyBatch(sv.انکڑے(), dv.انکڑے(), noutputs);
 }
 
-void repeat(InputArray _src, const std::vector<int>& repeats, OutputArray _dst)
+فراغ repeat(داخلہ_Array _src, ثابت std::vector<صحيح>& repeats, OutputArray _dst)
 {
     CV_INSTRUMENT_REGION();
 
     Mat src = _src.getMat();
-    const int ndims = src.dims;
+    ثابت صحيح ndims = src.dims;
     CV_Assert(!(ndims == 0 && src.empty()));
     CV_CheckEQ(repeats.size(), (size_t)ndims, "repeat: the number of repeats must match the number of dimensions");
 
-    int outShape[CV_MAX_DIM];
-    for (int i = 0; i < ndims; i++)
+    صحيح باہرلا_Shape[CV_MAX_DIM];
+    لكل (صحيح i = 0; i < ndims; i++)
     {
         CV_CheckGE(repeats[i], 0, "repeat: the repeats must be non-negative");
         int64 sz = (int64)src.size[i]*repeats[i];
-        CV_CheckLE((size_t)sz, (size_t)INT_MAX, "repeat: the output is too big");
-        outShape[i] = (int)sz;
+        CV_CheckLE((size_t)sz, (size_t)ودھ_توں_ودھ_عدد, "repeat: the output is too big");
+        باہرلا_Shape[i] = (صحيح)sz;
     }
 
-    _dst.create(ndims, outShape, src.type());
+    _dst.create(ndims, باہرلا_Shape, src.type());
     Mat dst = _dst.getMat();
-    if (dst.total() == 0 || src.empty())
-        return;
+    إذا (dst.کل() == 0 || src.empty())
+        أرجع;
 
     // Each repeated output axis is split into (repeat index, position), the former
     // with source step 0, so the whole tile is one broadcasting copy.
     nd::View sv, dv;
-    sv.data = src.data;
-    dv.data = dst.data;
-    sv.esz = dv.esz = src.elemSize();
-    int n = 0;
-    for (int i = 0; i < ndims; i++)
+    sv.انکڑے = src.انکڑے;
+    dv.انکڑے = dst.انکڑے;
+    sv.esz = dv.esz = src.elem_ناپ();
+    صحيح n = 0;
+    لكل (صحيح i = 0; i < ndims; i++)
     {
-        const int sz = src.size[i], r = repeats[i];
-        if (r != 1)
+        ثابت صحيح sz = src.size[i], r = repeats[i];
+        إذا (r != 1)
         {
-            CV_CheckLT(n, (int)nd::MAX_VIEW_DIMS, "repeat: too many dimensions");
+            CV_CheckLT(n, (صحيح)nd::MAX_VIEW_DIMS, "repeat: too many dimensions");
             sv.size[n] = dv.size[n] = r;
-            sv.step[n] = 0;
-            dv.step[n] = (ptrdiff_t)dst.step[i]*sz;
+            sv.قدم[n] = 0;
+            dv.قدم[n] = (ptrdiff_t)dst.قدم[i]*sz;
             n++;
         }
-        if (sz != 1 || r == 1)
+        إذا (sz != 1 || r == 1)
         {
-            CV_CheckLT(n, (int)nd::MAX_VIEW_DIMS, "repeat: too many dimensions");
+            CV_CheckLT(n, (صحيح)nd::MAX_VIEW_DIMS, "repeat: too many dimensions");
             sv.size[n] = dv.size[n] = sz;
-            sv.step[n] = (ptrdiff_t)src.step[i];
-            dv.step[n] = (ptrdiff_t)dst.step[i];
+            sv.قدم[n] = (ptrdiff_t)src.قدم[i];
+            dv.قدم[n] = (ptrdiff_t)dst.قدم[i];
             n++;
         }
     }
@@ -1246,72 +1246,72 @@ void repeat(InputArray _src, const std::vector<int>& repeats, OutputArray _dst)
     nd::copy(sv, dv);
 }
 
-void slice(InputArray _src, const std::vector<int>& starts, const std::vector<int>& ends,
-             const std::vector<int>& steps, OutputArray _dst)
+فراغ ٹکڑا_2(داخلہ_Array _src, ثابت std::vector<صحيح>& starts, ثابت std::vector<صحيح>& ends,
+             ثابت std::vector<صحيح>& قدماں, OutputArray _dst)
 {
     CV_INSTRUMENT_REGION();
 
     Mat src = _src.getMat();
-    const int ndims = src.dims, nslices = (int)starts.size();
+    ثابت صحيح ndims = src.dims, nslices = (صحيح)starts.size();
     CV_Assert(!(ndims == 0 && src.empty()));
     CV_CheckLE(nslices, ndims, "slice: too many starts");
     CV_CheckEQ(ends.size(), starts.size(), "slice: starts and ends must have the same size");
-    CV_Check(steps.size(), steps.empty() || steps.size() == starts.size(),
+    CV_Check(قدماں.size(), قدماں.empty() || قدماں.size() == starts.size(),
              "slice: steps must be empty or have the same size as starts");
 
-    nd::View sv = nd::viewOf(src);
-    int outShape[CV_MAX_DIM];
-    for (int i = 0; i < ndims; i++)
-        outShape[i] = src.size[i];
+    nd::View sv = nd::view_دا(src);
+    صحيح باہرلا_Shape[CV_MAX_DIM];
+    لكل (صحيح i = 0; i < ndims; i++)
+        باہرلا_Shape[i] = src.size[i];
 
-    for (int i = 0; i < nslices; i++)
+    لكل (صحيح i = 0; i < nslices; i++)
     {
-        const int n = src.size[i], start = starts[i], end = ends[i];
-        const int step = steps.empty() ? 1 : steps[i];
-        CV_CheckNE(step, 0, "slice: step must not be zero");
-        int count;
-        if (step > 0)
+        ثابت صحيح n = src.size[i], شروع = starts[i], end = ends[i];
+        ثابت صحيح قدم = قدماں.empty() ? 1 : قدماں[i];
+        CV_CheckNE(قدم, 0, "slice: step must not be zero");
+        صحيح گنتی_2;
+        إذا (قدم > 0)
         {
-            CV_Check(start, 0 <= start && start <= n, "slice: start is out of range");
+            CV_Check(شروع, 0 <= شروع && شروع <= n, "slice: start is out of range");
             CV_Check(end, 0 <= end && end <= n, "slice: end is out of range");
-            count = end > start ? (int)(((int64)end - start + step - 1)/step) : 0;
+            گنتی_2 = end > شروع ? (صحيح)(((int64)end - شروع + قدم - 1)/قدم) : 0;
         }
-        else
+        وإلا
         {
-            CV_Check(start, -1 <= start && start < n, "slice: start is out of range");
+            CV_Check(شروع, -1 <= شروع && شروع < n, "slice: start is out of range");
             CV_Check(end, -1 <= end && end < n, "slice: end is out of range");
-            count = start > end ? (int)(((int64)start - end - step - 1)/(-step)) : 0;
+            گنتی_2 = شروع > end ? (صحيح)(((int64)شروع - end - قدم - 1)/(-قدم)) : 0;
         }
-        nd::slice(sv, i, start, step, count);
-        outShape[i] = count;
+        nd::ٹکڑا_2(sv, i, شروع, قدم, گنتی_2);
+        باہرلا_Shape[i] = گنتی_2;
     }
 
-    _dst.create(ndims, outShape, src.type());
+    _dst.create(ndims, باہرلا_Shape, src.type());
     Mat dst = _dst.getMat();
-    if (dst.total() == 0 || src.empty())
-        return;
-    nd::copy(sv, nd::viewOf(dst));
+    إذا (dst.کل() == 0 || src.empty())
+        أرجع;
+    nd::copy(sv, nd::view_دا(dst));
 }
 
 /*
     This function first prepends 1 to each tensor shape to have a common max_ndims dimension, then flatten non-broadcast dimensions.
 */
-static bool _flatten_for_broadcast(int narrays, int max_ndims, const int* ndims, const int** orig_shape,
-                                   int** flatten_shape, size_t** flatten_step) {
-    int i, j, k;
+ساكن منطقي flatten_for_نشر(صحيح narrays, صحيح max_ndims, ثابت صحيح* ndims, ثابت صحيح** orig_shape,
+                                   صحيح** flatten_shape, size_t** flatten_قدم) {
+    صحيح i, j, k;
 
     // step 1.
     // * make all inputs and the output max_ndims-dimensional.
     // * compute proper step's
-    for (i = max_ndims - 1; i >= 0; i-- ) {
-        for (k = 0; k < narrays; k++) {
+    لكل (i = max_ndims - 1; i >= 0; i-- ) {
+        لكل (k = 0; k < narrays; k++) {
             j = ndims[k] - (max_ndims - i);
-            int sz_i = j >= 0 ? orig_shape[k][j] : 1;
-            size_t st_i = i == max_ndims - 1 ? 1 : flatten_step[k][i+1] * flatten_shape[k][i+1];
+            صحيح sz_i = j >= 0 ? orig_shape[k][j] : 1;
+            size_t st_i = i == max_ndims - 1 ? 1 : flatten_قدم[k][i+1] * flatten_shape[k][i+1];
             flatten_shape[k][i] = sz_i;
-            flatten_step[k][i] = st_i;
-            if (flatten_shape[k][i] == 0)
-                return false;
+            flatten_قدم[k][i] = st_i;
+            إذا (flatten_shape[k][i] == 0)
+                أرجع خطأ;
         }
     }
 
@@ -1320,45 +1320,45 @@ static bool _flatten_for_broadcast(int narrays, int max_ndims, const int* ndims,
     // this loop is probably the most tricky part
     // in the whole implementation of broadcasting.
     j = max_ndims-1;
-    for (i = j - 1; i >= 0; i--) {
-        bool all_contiguous = true, all_scalars = true, all_consistent = true;
-        for(k = 0; k < narrays; k++) {
-            size_t st = flatten_step[k][j] * flatten_shape[k][j];
-            bool prev_scalar = flatten_shape[k][j] == 1;
-            bool scalar = flatten_shape[k][i] == 1;
-            all_contiguous = all_contiguous && (st == flatten_step[k][i]);
+    لكل (i = j - 1; i >= 0; i--) {
+        منطقي all_contiguous = سچ, all_scalars = سچ, all_consistent = سچ;
+        لكل(k = 0; k < narrays; k++) {
+            size_t st = flatten_قدم[k][j] * flatten_shape[k][j];
+            منطقي prev_scalar = flatten_shape[k][j] == 1;
+            منطقي scalar = flatten_shape[k][i] == 1;
+            all_contiguous = all_contiguous && (st == flatten_قدم[k][i]);
             all_scalars = all_scalars && scalar;
             all_consistent = all_consistent && (scalar == prev_scalar);
         }
-        if (all_contiguous && (all_consistent || all_scalars)) {
-            for(k = 0; k < narrays; k++)
+        إذا (all_contiguous && (all_consistent || all_scalars)) {
+            لكل(k = 0; k < narrays; k++)
                 flatten_shape[k][j] *= flatten_shape[k][i];
-        } else {
+        } وإلا {
             j--;
-            if (i < j) {
-                for(k = 0; k < narrays; k++) {
+            إذا (i < j) {
+                لكل(k = 0; k < narrays; k++) {
                     flatten_shape[k][j] = flatten_shape[k][i];
-                    flatten_step[k][j] = flatten_step[k][i];
+                    flatten_قدم[k][j] = flatten_قدم[k][i];
                 }
             }
         }
     }
 
     // step 3. Set some step's to 0's.
-    for (i = max_ndims-1; i >= j; i--) {
-        for (k = 0; k < narrays; k++)
-            flatten_step[k][i] = flatten_shape[k][i] == 1 ? 0 : flatten_step[k][i];
+    لكل (i = max_ndims-1; i >= j; i--) {
+        لكل (k = 0; k < narrays; k++)
+            flatten_قدم[k][i] = flatten_shape[k][i] == 1 ? 0 : flatten_قدم[k][i];
     }
-    for (; i >= 0; i--) {
-        for (k = 0; k < narrays; k++) {
-            flatten_step[k][i] = 0;
+    لكل (; i >= 0; i--) {
+        لكل (k = 0; k < narrays; k++) {
+            flatten_قدم[k][i] = 0;
             flatten_shape[k][i] = 1;
         }
     }
-    return true;
+    أرجع سچ;
 }
 
-void broadcast(InputArray _src, InputArray _shape, OutputArray _dst) {
+فراغ نشر(داخلہ_Array _src, داخلہ_Array _shape, OutputArray _dst) {
     CV_INSTRUMENT_REGION();
 
     Mat src = _src.getMat();
@@ -1367,236 +1367,236 @@ void broadcast(InputArray _src, InputArray _shape, OutputArray _dst) {
 
     Mat shape = _shape.getMat();
     CV_CheckTypeEQ(shape.type(), CV_32S, "broadcast: target shape must be of type int32");
-    const auto dims_shape = static_cast<int>(shape.total());
-    const auto *ptr_shape = shape.ptr<int>();
+    ثابت خودکار dims_shape = static_cast<صحيح>(shape.کل());
+    ثابت خودکار *ptr_shape = shape.ptr<صحيح>();
 
     // check valid shape, 1D/0D Mat would fail in the following checks
-    const auto dims_src = src.dims;
+    ثابت خودکار dims_src = src.dims;
     CV_CheckLE(dims_src, dims_shape,
                "broadcast: dimension of input array must be less than or equal to dimension of target shape");
-    std::vector<int> shape_src{src.size.p, src.size.p + dims_src};
-    if (shape_src.size() < static_cast<size_t>(dims_shape)) {
+    std::vector<صحيح> shape_src{src.size.p, src.size.p + dims_src};
+    إذا (shape_src.size() < static_cast<size_t>(dims_shape)) {
         shape_src.insert(shape_src.begin(), dims_shape - shape_src.size(), 1);
     }
-    for (int i = 0; i < static_cast<int>(shape_src.size()); ++i) {
-        const auto *shape_target = ptr_shape;
-        if (shape_src[i] != 1) {
-            CV_CheckEQ(shape_src[i], shape_target[i], "target shape must be equal to input shape or 1");
+    لكل (صحيح i = 0; i < static_cast<صحيح>(shape_src.size()); ++i) {
+        ثابت خودکار *shape_نشانہ = ptr_shape;
+        إذا (shape_src[i] != 1) {
+            CV_CheckEQ(shape_src[i], shape_نشانہ[i], "target shape must be equal to input shape or 1");
         }
     }
 
     // impl
-    _dst.create(dims_shape, shape.ptr<int>(), src.type());
+    _dst.create(dims_shape, shape.ptr<صحيح>(), src.type());
     Mat dst = _dst.getMat();
-    if (dst.total() == 0)
-        return;
-    cv::AutoBuffer<int> is_same_shape(dims_shape, 0);
-    for (int i = 0; i < static_cast<int>(shape_src.size()); ++i) {
-        if (shape_src[i] == ptr_shape[i]) {
+    إذا (dst.کل() == 0)
+        أرجع;
+    cv::Auto_بفر<صحيح> is_same_shape(dims_shape, 0);
+    لكل (صحيح i = 0; i < static_cast<صحيح>(shape_src.size()); ++i) {
+        إذا (shape_src[i] == ptr_shape[i]) {
             is_same_shape[i] = 1;
         }
     }
     // copy if same shape
-    if (std::accumulate(is_same_shape.begin(), is_same_shape.end(), 1, std::multiplies<int>()) != 0) {
-        const auto *p_src = src.ptr<const char>();
-        auto *p_dst = dst.ptr<char>();
-        std::memcpy(p_dst, p_src, dst.total() * dst.elemSize());
-        return;
+    إذا (std::accumulate(is_same_shape.begin(), is_same_shape.end(), 1, std::multiplies<صحيح>()) != 0) {
+        ثابت خودکار *p_src = src.ptr<ثابت حرف>();
+        خودکار *p_dst = dst.ptr<حرف>();
+        std::حافظہ_نقل(p_dst, p_src, dst.کل() * dst.elem_ناپ());
+        أرجع;
     }
     // other cases
-    int max_ndims = std::max(dims_src, dims_shape);
-    if (max_ndims < 2 && src.total() == 1) {
-        const char* p_src = src.ptr<const char>();
-        char* p_dst = dst.ptr<char>();
-        size_t esz = src.elemSize();
-        for (size_t j = 0; j < dst.total(); j++)
-            std::memcpy(p_dst + j * esz, p_src, esz);
-        return;
+    صحيح max_ndims = std::max(dims_src, dims_shape);
+    إذا (max_ndims < 2 && src.کل() == 1) {
+        ثابت حرف* p_src = src.ptr<ثابت حرف>();
+        حرف* p_dst = dst.ptr<حرف>();
+        size_t esz = src.elem_ناپ();
+        لكل (size_t j = 0; j < dst.کل(); j++)
+            std::حافظہ_نقل(p_dst + j * esz, p_src, esz);
+        أرجع;
     }
-    const int all_ndims[2] = {src.dims, dst.dims};
-    const int* orig_shapes[2] = {src.size.p, dst.size.p};
-    cv::AutoBuffer<size_t> buff(max_ndims * 4);
-    int* flatten_shapes[2] = {(int*)buff.data(), (int*)(buff.data() + max_ndims)};
-    size_t* flatten_steps[2] = {(size_t*)(buff.data() + 2 * max_ndims), (size_t*)(buff.data() + 3 * max_ndims)};
-    if (_flatten_for_broadcast(2, max_ndims, all_ndims, orig_shapes, flatten_shapes, flatten_steps)) {
-        size_t src_dp = flatten_steps[0][max_ndims - 1];
-        size_t dst_dp = flatten_steps[1][max_ndims - 1];
+    ثابت صحيح all_ndims[2] = {src.dims, dst.dims};
+    ثابت صحيح* orig_shapes[2] = {src.size.p, dst.size.p};
+    cv::Auto_بفر<size_t> buff(max_ndims * 4);
+    صحيح* flatten_shapes[2] = {(صحيح*)buff.انکڑے(), (صحيح*)(buff.انکڑے() + max_ndims)};
+    size_t* flatten_قدماں[2] = {(size_t*)(buff.انکڑے() + 2 * max_ndims), (size_t*)(buff.انکڑے() + 3 * max_ndims)};
+    إذا (flatten_for_نشر(2, max_ndims, all_ndims, orig_shapes, flatten_shapes, flatten_قدماں)) {
+        size_t src_dp = flatten_قدماں[0][max_ndims - 1];
+        size_t dst_dp = flatten_قدماں[1][max_ndims - 1];
         CV_Assert(dst_dp == 1 || dst_dp == 0);
         CV_Assert(max_ndims >= 2); // >= 3?
-        size_t rowstep_src = flatten_steps[0][max_ndims - 2];
-        size_t rowstep_dst = flatten_steps[1][max_ndims - 2];
-        const char* ptr_src = src.ptr<const char>();
-        char* ptr_dst = dst.ptr<char>();
-        size_t esz = src.elemSize();
-        int nrows = flatten_shapes[1][max_ndims - 2];
-        int ncols = flatten_shapes[1][max_ndims - 1];
-        int nplanes = 1;
+        size_t rowstep_src = flatten_قدماں[0][max_ndims - 2];
+        size_t rowstep_dst = flatten_قدماں[1][max_ndims - 2];
+        ثابت حرف* ptr_src = src.ptr<ثابت حرف>();
+        حرف* ptr_dst = dst.ptr<حرف>();
+        size_t esz = src.elem_ناپ();
+        صحيح nrows = flatten_shapes[1][max_ndims - 2];
+        صحيح ncols = flatten_shapes[1][max_ndims - 1];
+        صحيح nplanes = 1;
         CV_Check(esz, esz == 1 || esz == 2 || esz == 4 || esz == 8, "broadcast: not supported data type");
 
-        for (int k = 0; k < max_ndims - 2; k++) {
+        لكل (صحيح k = 0; k < max_ndims - 2; k++) {
             nplanes *= flatten_shapes[1][k];
         }
-        for (int plane_idx = 0; plane_idx < nplanes; plane_idx++) {
-            size_t offset_src = 0, offset_dst = 0;
+        لكل (صحيح plane_idx = 0; plane_idx < nplanes; plane_idx++) {
+            size_t وتھ_src = 0, وتھ_dst = 0;
             size_t idx = (size_t)plane_idx;
-            for (int k = max_ndims - 3; k >= 0; k--) {
+            لكل (صحيح k = max_ndims - 3; k >= 0; k--) {
                 size_t prev_idx = idx / flatten_shapes[1][k];
-                size_t i_k = (int)(idx - prev_idx * flatten_shapes[1][k]);
-                offset_src += i_k * flatten_steps[0][k];
-                offset_dst += i_k * flatten_steps[1][k];
+                size_t i_k = (صحيح)(idx - prev_idx * flatten_shapes[1][k]);
+                وتھ_src += i_k * flatten_قدماں[0][k];
+                وتھ_dst += i_k * flatten_قدماں[1][k];
                 idx = prev_idx;
             }
 
-            #define OPENCV_CORE_BROADCAST_LOOP(_Tp) \
-                for (int i = 0; i < nrows; i++) {   \
-                    const _Tp *ptr_src_ = (const _Tp*)ptr_src + offset_src + rowstep_src * i; \
-                    _Tp *ptr_dst_ = (_Tp*)ptr_dst + offset_dst + rowstep_dst * i; \
-                    if (src_dp == 1) { \
-                        for (int j = 0; j < ncols; j++) { \
+            #تعریف_کرو OPENCV_CORE_نشر_LOOP(_Tp) \
+                لكل (صحيح i = 0; i < nrows; i++) {   \
+                    ثابت _Tp *ptr_src_ = (ثابت _Tp*)ptr_src + وتھ_src + rowstep_src * i; \
+                    _Tp *ptr_dst_ = (_Tp*)ptr_dst + وتھ_dst + rowstep_dst * i; \
+                    إذا (src_dp == 1) { \
+                        لكل (صحيح j = 0; j < ncols; j++) { \
                             ptr_dst_[j] = ptr_src_[j]; \
                         } \
-                    } else { \
+                    } وإلا { \
                         _Tp x = *ptr_src_; \
-                        for (int j = 0; j < ncols; j++) { \
+                        لكل (صحيح j = 0; j < ncols; j++) { \
                             ptr_dst_[j] = x; \
                         } \
                     } \
                 }
 
-            if (esz == 1) {
-                OPENCV_CORE_BROADCAST_LOOP(int8_t);
-            } else if (esz == 2) {
-                OPENCV_CORE_BROADCAST_LOOP(int16_t);
-            } else if (esz == 4) {
-                OPENCV_CORE_BROADCAST_LOOP(int32_t);
-            } else if (esz == 8) {
-                OPENCV_CORE_BROADCAST_LOOP(int64_t);
-            } else {
+            إذا (esz == 1) {
+                OPENCV_CORE_نشر_LOOP(int8_t);
+            } وإلا إذا (esz == 2) {
+                OPENCV_CORE_نشر_LOOP(int16_t);
+            } وإلا إذا (esz == 4) {
+                OPENCV_CORE_نشر_LOOP(int32_t);
+            } وإلا إذا (esz == 8) {
+                OPENCV_CORE_نشر_LOOP(int64_t);
+            } وإلا {
                 CV_Error(cv::Error::StsNotImplemented, "");
             }
-            #undef OPENCV_CORE_BROADCAST_LOOP
+            #تعریف_رد OPENCV_CORE_نشر_LOOP
         }
-    } else {
-        if (dst.total() == 0)
-            return;
+    } وإلا {
+        إذا (dst.کل() == 0)
+            أرجع;
         // initial copy (src to dst)
-        std::vector<size_t> step_src{src.step.p, src.step.p + dims_src};
-        if (step_src.size() < static_cast<size_t>(dims_shape)) {
-            step_src.insert(step_src.begin(), dims_shape - step_src.size(), step_src[0]);
+        std::vector<size_t> قدم_src{src.قدم.p, src.قدم.p + dims_src};
+        إذا (قدم_src.size() < static_cast<size_t>(dims_shape)) {
+            قدم_src.insert(قدم_src.begin(), dims_shape - قدم_src.size(), قدم_src[0]);
         }
-        for (size_t i = 0; i < src.total(); ++i) {
+        لكل (size_t i = 0; i < src.کل(); ++i) {
             size_t t = i;
-            size_t src_offset = 0, dst_offset = 0;
-            for (int j = static_cast<int>(shape_src.size() - 1); j >= 0; --j) {
+            size_t src_وتھ = 0, dst_وتھ = 0;
+            لكل (صحيح j = static_cast<صحيح>(shape_src.size() - 1); j >= 0; --j) {
                 size_t idx = t / shape_src[j];
                 size_t offset = static_cast<size_t>(t - idx * shape_src[j]);
-                src_offset += offset * step_src[j];
-                dst_offset += offset * dst.step[j];
+                src_وتھ += offset * قدم_src[j];
+                dst_وتھ += offset * dst.قدم[j];
                 t = idx;
             }
-            const auto *p_src = src.ptr<const char>();
-            auto *p_dst = dst.ptr<char>();
-            std::memcpy(p_dst + dst_offset, p_src + src_offset, dst.elemSize());
+            ثابت خودکار *p_src = src.ptr<ثابت حرف>();
+            خودکار *p_dst = dst.ptr<حرف>();
+            std::حافظہ_نقل(p_dst + dst_وتھ, p_src + src_وتھ, dst.elem_ناپ());
         }
         // broadcast copy (dst inplace)
-        AutoBuffer<int> cumulative_shape(dims_shape, 1);
-        int total = static_cast<int>(dst.total());
-        for (int i = dims_shape - 1; i >= 0; --i) {
-            cumulative_shape[i] = static_cast<int>(total / ptr_shape[i]);
-            total = cumulative_shape[i];
+        Auto_بفر<صحيح> cumulative_shape(dims_shape, 1);
+        صحيح کل = static_cast<صحيح>(dst.کل());
+        لكل (صحيح i = dims_shape - 1; i >= 0; --i) {
+            cumulative_shape[i] = static_cast<صحيح>(کل / ptr_shape[i]);
+            کل = cumulative_shape[i];
         }
-        for (int i = dims_shape - 1; i >= 0; --i) {
-            if (is_same_shape[i] == 1) {
-                continue;
+        لكل (صحيح i = dims_shape - 1; i >= 0; --i) {
+            إذا (is_same_shape[i] == 1) {
+                استمر;
             }
-            auto step = dst.step[i];
-            auto *p_dst = dst.ptr<char>();
-            for (int j = 0; j < cumulative_shape[i]; j++) {
-                for (int k = 0; k < ptr_shape[i] - 1; k++) {
-                    std::memcpy(p_dst + step, p_dst, step);
-                    p_dst += step;
+            خودکار قدم = dst.قدم[i];
+            خودکار *p_dst = dst.ptr<حرف>();
+            لكل (صحيح j = 0; j < cumulative_shape[i]; j++) {
+                لكل (صحيح k = 0; k < ptr_shape[i] - 1; k++) {
+                    std::حافظہ_نقل(p_dst + قدم, p_dst, قدم);
+                    p_dst += قدم;
                 }
-                p_dst += step;
+                p_dst += قدم;
             }
         }
     }
 }
 
-void broadcast(InputArray _src, const MatShape& _shape, OutputArray _dst)
+فراغ نشر(داخلہ_Array _src, ثابت MatShape& _shape, OutputArray _dst)
 {
-    if (_shape.dims < 0) {
+    إذا (_shape.dims < 0) {
         _dst.release();
-    } else {
-        Mat shape(1, _shape.dims, CV_32S, (int*)_shape.p);
-        broadcast(_src, shape, _dst);
+    } وإلا {
+        Mat shape(1, _shape.dims, CV_32S, (صحيح*)_shape.p);
+        نشر(_src, shape, _dst);
     }
 }
 
-static void rotateImpl(InputArray _src, OutputArray _dst, int rotateMode)
+ساكن فراغ rotateImpl(داخلہ_Array _src, OutputArray _dst, صحيح rotate_منوال)
 {
-    switch (rotateMode)
+    بدل (rotate_منوال)
     {
-    case ROTATE_90_CLOCKWISE:
+    حالة ROTATE_90_CLOCKWISE:
         transpose(_src, _dst);
         flip(_dst, _dst, 1);
-        break;
-    case ROTATE_180:
+        اكسر;
+    حالة ROTATE_180:
         flip(_src, _dst, -1);
-        break;
-    case ROTATE_90_COUNTERCLOCKWISE:
+        اكسر;
+    حالة ROTATE_90_COUNTERCLOCKWISE:
         transpose(_src, _dst);
         flip(_dst, _dst, 0);
-        break;
-    default:
-        break;
+        اكسر;
+    افتراضي:
+        اكسر;
     }
 }
 
-void rotate(InputArray _src, OutputArray _dst, int rotateMode)
+فراغ rotate(داخلہ_Array _src, OutputArray _dst, صحيح rotate_منوال)
 {
     CV_Assert(_src.dims() <= 2);
-    int angle;
+    صحيح angle;
 
-    if (_dst.isUMat())
+    إذا (_dst.isUMat())
     {
-        rotateImpl(_src, _dst, rotateMode);
-        return;
+        rotateImpl(_src, _dst, rotate_منوال);
+        أرجع;
     }
 
     Mat src = _src.getMat();
-    int type = src.type();
-    if( src.empty() )
+    صحيح type = src.type();
+    إذا( src.empty() )
     {
         _dst.release();
-        return;
+        أرجع;
     }
 
-    switch (rotateMode)
+    بدل (rotate_منوال)
     {
-    case ROTATE_90_CLOCKWISE:
-        _dst.create(src.cols, src.rows, type);
+    حالة ROTATE_90_CLOCKWISE:
+        _dst.create(src.خانے_گنتی, src.صفاں, type);
         angle = 90;
-        break;
-    case ROTATE_180:
-        _dst.create(src.rows, src.cols, type);
+        اكسر;
+    حالة ROTATE_180:
+        _dst.create(src.صفاں, src.خانے_گنتی, type);
         angle = 180;
-        break;
-    case ROTATE_90_COUNTERCLOCKWISE:
-        _dst.create(src.cols, src.rows, type);
+        اكسر;
+    حالة ROTATE_90_COUNTERCLOCKWISE:
+        _dst.create(src.خانے_گنتی, src.صفاں, type);
         angle = 270;
-        break;
-    default:
-        _dst.create(src.rows, src.cols, type);
+        اكسر;
+    افتراضي:
+        _dst.create(src.صفاں, src.خانے_گنتی, type);
         angle = 0;
-        break;
+        اكسر;
     }
 
     Mat dst = _dst.getMat();
-    CALL_HAL(rotate90, cv_hal_rotate90, type, src.ptr(), src.step, src.cols, src.rows,
-             dst.ptr(), dst.step, angle);
+    CALL_HAL(rotate90, cv_hal_rotate90, type, src.ptr(), src.قدم, src.خانے_گنتی, src.صفاں,
+             dst.ptr(), dst.قدم, angle);
 
     // use src (Mat) since _src (InputArray) is updated by _dst.create() when in-place
-    rotateImpl(src, _dst, rotateMode);
+    rotateImpl(src, _dst, rotate_منوال);
 }
 
 }  // namespace

@@ -2,111 +2,111 @@
 // It is subject to the license terms in the LICENSE file found in the top-level directory
 // of this distribution and at http://opencv.org/license.html
 
-#include "precomp.hpp"
+#ضمن "precomp.hpp"
 
-namespace cv {
+نطاق cv {
 
-typedef int (*CountNonZeroFunc)(const void*, int);
+تعريفنوع صحيح (*گنتی_Non_Zero_Func)(ثابت فراغ*, صحيح);
 
 CV_CPU_OPTIMIZATION_NAMESPACE_BEGIN
 
-CountNonZeroFunc getCountNonZeroTab(int depth);
+گنتی_Non_Zero_Func get_گنتی_Non_Zero_Tab(صحيح ڈونگھائی);
 
-#ifndef CV_CPU_OPTIMIZATION_DECLARATIONS_ONLY
+#جے_بنا_تعریف CV_CPU_OPTIMIZATION_DECLARATIONS_ONLY
 
-template<typename T>
-static int countNonZero_(const T* src, int len )
+سانچا<قسم_ناں T>
+ساكن صحيح گنتی_Non_Zero_2(ثابت T* src, صحيح len )
 {
-    int nz = 0;
-    for( int i = 0; i < len; i++ )
+    صحيح nz = 0;
+    لكل( صحيح i = 0; i < len; i++ )
         nz += src[i] != 0;
-    return nz;
+    أرجع nz;
 }
 
-#undef SIMD_ONLY
-#if (CV_SIMD || CV_SIMD_SCALABLE)
-#define SIMD_ONLY(expr) expr
-#else
-#define SIMD_ONLY(expr)
-#endif
+#تعریف_رد SIMD_ONLY
+#إذا (CV_SIMD || CV_SIMD_SCALABLE)
+#تعریف_کرو SIMD_ONLY(اظہاریہ) اظہاریہ
+#وإلا
+#تعریف_کرو SIMD_ONLY(اظہاریہ)
+#جے_انت
 
 // AVX-512 exposes wide per-lane mask registers, so counting zero lanes with
 // v_signmask()+popcount is cheaper than the batched add-based reduction.
 // Narrower SIMD (AVX2, NEON, LASX, ...) keeps the legacy batched kernel to
 // avoid regressions on smaller vector widths.
-#undef CV_COUNTNONZERO_AVX512
-#if defined(CV_CPU_COMPILE_AVX512_SKX) || defined(CV_CPU_COMPILE_AVX512_ICL)
-#define CV_COUNTNONZERO_AVX512 1
-#else
-#define CV_COUNTNONZERO_AVX512 0
-#endif
+#تعریف_رد CV_COUNTNONZERO_AVX512
+#إذا defined(CV_CPU_COMPILE_AVX512_SKX) || defined(CV_CPU_COMPILE_AVX512_ICL)
+#تعریف_کرو CV_COUNTNONZERO_AVX512 1
+#وإلا
+#تعریف_کرو CV_COUNTNONZERO_AVX512 0
+#جے_انت
 
-#if CV_COUNTNONZERO_AVX512
-static inline int cnz_popcount32(unsigned x)
+#إذا CV_COUNTNONZERO_AVX512
+ساكن مضمن صحيح cnz_popcount32(بنانشانی x)
 {
-#if defined(__GNUC__) || defined(__clang__)
-    return __builtin_popcount(x);
-#else
-    int c = 0;
-    for (; x; x &= x - 1)
+#إذا defined(__GNUC__) || defined(__clang__)
+    أرجع __builtin_popcount(x);
+#وإلا
+    صحيح c = 0;
+    لكل (; x; x &= x - 1)
         ++c;
-    return c;
-#endif
+    أرجع c;
+#جے_انت
 }
 
-static inline int cnz_popcount64(uint64 x)
+ساكن مضمن صحيح cnz_popcount64(uint64 x)
 {
-#if defined(__GNUC__) || defined(__clang__)
-    return (int)__builtin_popcountll((unsigned long long)x);
-#else
-    int c = 0;
-    for (; x; x &= x - 1)
+#إذا defined(__GNUC__) || defined(__clang__)
+    أرجع (صحيح)__builtin_popcountll((بنانشانی لما لما)x);
+#وإلا
+    صحيح c = 0;
+    لكل (; x; x &= x - 1)
         ++c;
-    return c;
-#endif
+    أرجع c;
+#جے_انت
 }
 
-static inline int cnz_lane_pop(int m) { return cnz_popcount32((unsigned)m); }
-static inline int cnz_lane_pop(int64 m) { return cnz_popcount64((uint64)m); }
-#endif // CV_COUNTNONZERO_AVX512
+ساكن مضمن صحيح cnz_lane_نکالو(صحيح m) { أرجع cnz_popcount32((بنانشانی)m); }
+ساكن مضمن صحيح cnz_lane_نکالو(int64 m) { أرجع cnz_popcount64((uint64)m); }
+#جے_انت // CV_COUNTNONZERO_AVX512
 
 // SIMD body of the countNonZero kernels. The AVX-512 variant counts zero lanes
 // via signmask+popcount; every other target keeps the legacy batched add kernel.
-#undef CNZ_SIMD_BODY
-#if CV_COUNTNONZERO_AVX512
-#define CNZ_SIMD_BODY(suffix, ssuffix, rsuffix, VT, ST, cmp_op, add_op, update_sum) \
-    const int vlanes = VTraits<VT>::vlanes(); \
+#تعریف_رد CNZ_SIMD_BODY
+#إذا CV_COUNTNONZERO_AVX512
+#تعریف_کرو CNZ_SIMD_BODY(suffix, ssuffix, rsuffix, VT, ST, cmp_op, جوڑو_op, update_جوڑ) \
+    ثابت صحيح vlanes = VTraits<VT>::vlanes(); \
     VT v_zero = vx_setzero_##suffix(); \
-    int nzeros = 0; \
-    for (; i <= len - vlanes*2; i += vlanes*2) \
+    صحيح nzeros = 0; \
+    لكل (; i <= len - vlanes*2; i += vlanes*2) \
     { \
-        nzeros += cnz_lane_pop(v_signmask(v_reinterpret_as_##rsuffix(cmp_op(vx_load(src + i), v_zero)))); \
-        nzeros += cnz_lane_pop(v_signmask(v_reinterpret_as_##rsuffix(cmp_op(vx_load(src + i + vlanes), v_zero)))); \
+        nzeros += cnz_lane_نکالو(v_signmask(v_reinterpret_as_##rsuffix(cmp_op(vx_لدو(src + i), v_zero)))); \
+        nzeros += cnz_lane_نکالو(v_signmask(v_reinterpret_as_##rsuffix(cmp_op(vx_لدو(src + i + vlanes), v_zero)))); \
     } \
-    for (; i <= len - vlanes; i += vlanes) \
+    لكل (; i <= len - vlanes; i += vlanes) \
     { \
-        nzeros += cnz_lane_pop(v_signmask(v_reinterpret_as_##rsuffix(cmp_op(vx_load(src + i), v_zero)))); \
+        nzeros += cnz_lane_نکالو(v_signmask(v_reinterpret_as_##rsuffix(cmp_op(vx_لدو(src + i), v_zero)))); \
     } \
     nz += i - nzeros; \
     v_cleanup();
-#else
-#define CNZ_SIMD_BODY(suffix, ssuffix, rsuffix, VT, ST, cmp_op, add_op, update_sum) \
-    const int vlanes = VTraits<VT>::vlanes(); \
+#وإلا
+#تعریف_کرو CNZ_SIMD_BODY(suffix, ssuffix, rsuffix, VT, ST, cmp_op, جوڑو_op, update_جوڑ) \
+    ثابت صحيح vlanes = VTraits<VT>::vlanes(); \
     VT v_zero = vx_setzero_##suffix(); \
     VT v_1 = vx_setall_##suffix(1); \
     VT v_8 = vx_setall_##suffix(8); \
     ST v_sum0 = vx_setzero_##ssuffix(); \
     ST v_sum1 = v_sum0; \
-    for (i = 0; i <= len - vlanes*8; i += vlanes*8) \
+    لكل (i = 0; i <= len - vlanes*8; i += vlanes*8) \
     { \
-        VT x0 = vx_load(src + i); \
-        VT x1 = vx_load(src + i + vlanes); \
-        VT x2 = vx_load(src + i + vlanes*2); \
-        VT x3 = vx_load(src + i + vlanes*3); \
-        VT x4 = vx_load(src + i + vlanes*4); \
-        VT x5 = vx_load(src + i + vlanes*5); \
-        VT x6 = vx_load(src + i + vlanes*6); \
-        VT x7 = vx_load(src + i + vlanes*7); \
+        VT x0 = vx_لدو(src + i); \
+        VT x1 = vx_لدو(src + i + vlanes); \
+        VT x2 = vx_لدو(src + i + vlanes*2); \
+        VT x3 = vx_لدو(src + i + vlanes*3); \
+        VT x4 = vx_لدو(src + i + vlanes*4); \
+        VT x5 = vx_لدو(src + i + vlanes*5); \
+        VT x6 = vx_لدو(src + i + vlanes*6); \
+        VT x7 = vx_لدو(src + i + vlanes*7); \
         x0 = cmp_op(x0, v_zero); \
         x1 = cmp_op(x1, v_zero); \
         x2 = cmp_op(x2, v_zero); \
@@ -115,135 +115,135 @@ static inline int cnz_lane_pop(int64 m) { return cnz_popcount64((uint64)m); }
         x5 = cmp_op(x5, v_zero); \
         x6 = cmp_op(x6, v_zero); \
         x7 = cmp_op(x7, v_zero); \
-        x0 = add_op(x0, x1); \
-        x2 = add_op(x2, x3); \
-        x4 = add_op(x4, x5); \
-        x6 = add_op(x6, x7); \
-        x0 = add_op(x0, x2); \
-        x4 = add_op(x4, x6); \
-        x0 = add_op(add_op(x0, x4), v_8); \
-        update_sum(v_sum0, v_sum1, x0); \
+        x0 = جوڑو_op(x0, x1); \
+        x2 = جوڑو_op(x2, x3); \
+        x4 = جوڑو_op(x4, x5); \
+        x6 = جوڑو_op(x6, x7); \
+        x0 = جوڑو_op(x0, x2); \
+        x4 = جوڑو_op(x4, x6); \
+        x0 = جوڑو_op(جوڑو_op(x0, x4), v_8); \
+        update_جوڑ(v_sum0, v_sum1, x0); \
     } \
-    for (; i <= len - vlanes; i += vlanes) \
+    لكل (; i <= len - vlanes; i += vlanes) \
     { \
-        VT x0 = vx_load(src + i); \
-        x0 = add_op(cmp_op(x0, v_zero), v_1); \
-        update_sum(v_sum0, v_sum1, x0); \
+        VT x0 = vx_لدو(src + i); \
+        x0 = جوڑو_op(cmp_op(x0, v_zero), v_1); \
+        update_جوڑ(v_sum0, v_sum1, x0); \
     } \
-    nz += (int)v_reduce_sum(v_add(v_sum0, v_sum1)); \
+    nz += (صحيح)v_reduce_جوڑ(v_جوڑو(v_sum0, v_sum1)); \
     v_cleanup();
-#endif
+#جے_انت
 
-#undef DEFINE_NONZERO_FUNC
-#define DEFINE_NONZERO_FUNC(funcname, suffix, ssuffix, rsuffix, T, VT, ST, cmp_op, add_op, update_sum, scalar_cmp_op) \
-static int funcname( const void* src_ptr, int len ) \
+#تعریف_رد DEFINE_NONZERO_FUNC
+#تعریف_کرو DEFINE_NONZERO_FUNC(funcname, suffix, ssuffix, rsuffix, T, VT, ST, cmp_op, جوڑو_op, update_جوڑ, scalar_cmp_op) \
+ساكن صحيح funcname( ثابت فراغ* src_ptr, صحيح len ) \
 { \
-    const T* src = static_cast<const T*>(src_ptr); \
-    int i = 0, nz = 0; \
-    SIMD_ONLY( CNZ_SIMD_BODY(suffix, ssuffix, rsuffix, VT, ST, cmp_op, add_op, update_sum) ) \
-    for( ; i < len; i++ ) \
+    ثابت T* src = static_cast<ثابت T*>(src_ptr); \
+    صحيح i = 0, nz = 0; \
+    SIMD_ONLY( CNZ_SIMD_BODY(suffix, ssuffix, rsuffix, VT, ST, cmp_op, جوڑو_op, update_جوڑ) ) \
+    لكل( ; i < len; i++ ) \
     { \
         nz += scalar_cmp_op(src[i]); \
     } \
-    return nz; \
+    أرجع nz; \
 }
 
-#undef CHECK_NZ_INT
-#define CHECK_NZ_INT(x) ((x) != 0)
-#undef CHECK_NZ_FP
-#define CHECK_NZ_FP(x) ((x)*2 != 0)
+#تعریف_رد CHECK_NZ_INT
+#تعریف_کرو CHECK_NZ_INT(x) ((x) != 0)
+#تعریف_رد CHECK_NZ_FP
+#تعریف_کرو CHECK_NZ_FP(x) ((x)*2 != 0)
 // 16-bit float: mask the sign bit so -0.0 (0x8000) reads as zero.
-#undef CHECK_NZ_FP16
-#define CHECK_NZ_FP16(x) (((x) & 0x7fff) != 0)
-#undef VEC_CMP_EQ_Z_FP16
-#define VEC_CMP_EQ_Z_FP16(x, z) v_eq(v_add_wrap(x, x), z)
-#undef VEC_CMP_EQ_Z_FP
-#define VEC_CMP_EQ_Z_FP(x, z) v_eq(v_add(x, x), z)
+#تعریف_رد CHECK_NZ_FP16
+#تعریف_کرو CHECK_NZ_FP16(x) (((x) & 0x7fff) != 0)
+#تعریف_رد VEC_CMP_EQ_Z_FP16
+#تعریف_کرو VEC_CMP_EQ_Z_FP16(x, z) v_eq(v_جوڑو_wrap(x, x), z)
+#تعریف_رد VEC_CMP_EQ_Z_FP
+#تعریف_کرو VEC_CMP_EQ_Z_FP(x, z) v_eq(v_جوڑو(x, x), z)
 
-#undef UPDATE_SUM_U8
-#define UPDATE_SUM_U8(v_sum0, v_sum1, x0) \
-    v_uint16 w0 = v_expand_low(x0); \
-    v_uint16 w1 = v_expand_high(x0); \
-    v_sum0 = v_add(v_sum0, v_expand_low(w0)); \
-    v_sum1 = v_add(v_sum1, v_expand_high(w0)); \
-    v_sum0 = v_add(v_sum0, v_expand_low(w1)); \
-    v_sum1 = v_add(v_sum1, v_expand_high(w1))
+#تعریف_رد UPDATE_جوڑ_U8
+#تعریف_کرو UPDATE_جوڑ_U8(v_sum0, v_sum1, x0) \
+    v_uint16 w0 = v_expand_کم(x0); \
+    v_uint16 w1 = v_expand_بلند(x0); \
+    v_sum0 = v_جوڑو(v_sum0, v_expand_کم(w0)); \
+    v_sum1 = v_جوڑو(v_sum1, v_expand_بلند(w0)); \
+    v_sum0 = v_جوڑو(v_sum0, v_expand_کم(w1)); \
+    v_sum1 = v_جوڑو(v_sum1, v_expand_بلند(w1))
 
-#undef UPDATE_SUM_U16
-#define UPDATE_SUM_U16(v_sum0, v_sum1, x0) \
-    v_sum0 = v_add(v_sum0, v_expand_low(x0)); \
-    v_sum1 = v_add(v_sum1, v_expand_high(x0))
+#تعریف_رد UPDATE_جوڑ_U16
+#تعریف_کرو UPDATE_جوڑ_U16(v_sum0, v_sum1, x0) \
+    v_sum0 = v_جوڑو(v_sum0, v_expand_کم(x0)); \
+    v_sum1 = v_جوڑو(v_sum1, v_expand_بلند(x0))
 
-#undef UPDATE_SUM_S32
-#define UPDATE_SUM_S32(v_sum0, v_sum1, x0) \
-    v_sum0 = v_add(v_sum0, x0)
+#تعریف_رد UPDATE_جوڑ_S32
+#تعریف_کرو UPDATE_جوڑ_S32(v_sum0, v_sum1, x0) \
+    v_sum0 = v_جوڑو(v_sum0, x0)
 
-DEFINE_NONZERO_FUNC(countNonZero8u, u8, u32, s8, uchar, v_uint8, v_uint32, v_eq, v_add_wrap, UPDATE_SUM_U8, CHECK_NZ_INT)
-DEFINE_NONZERO_FUNC(countNonZero16u, u16, u32, s16, ushort, v_uint16, v_uint32, v_eq, v_add_wrap, UPDATE_SUM_U16, CHECK_NZ_INT)
-DEFINE_NONZERO_FUNC(countNonZero32s, s32, s32, s32, int, v_int32, v_int32, v_eq, v_add, UPDATE_SUM_S32, CHECK_NZ_INT)
-DEFINE_NONZERO_FUNC(countNonZero32f, u32, u32, s32, uint, v_uint32, v_uint32, VEC_CMP_EQ_Z_FP, v_add, UPDATE_SUM_S32, CHECK_NZ_FP)
-DEFINE_NONZERO_FUNC(countNonZero16f, u16, u32, s16, ushort, v_uint16, v_uint32, VEC_CMP_EQ_Z_FP16, v_add_wrap, UPDATE_SUM_U16, CHECK_NZ_FP16)
+DEFINE_NONZERO_FUNC(گنتی_Non_Zero8u, u8, u32, s8, uchar, v_uint8, v_uint32, v_eq, v_جوڑو_wrap, UPDATE_جوڑ_U8, CHECK_NZ_INT)
+DEFINE_NONZERO_FUNC(گنتی_Non_Zero16u, u16, u32, s16, ushort, v_uint16, v_uint32, v_eq, v_جوڑو_wrap, UPDATE_جوڑ_U16, CHECK_NZ_INT)
+DEFINE_NONZERO_FUNC(گنتی_Non_Zero32s, s32, s32, s32, صحيح, v_int32, v_int32, v_eq, v_جوڑو, UPDATE_جوڑ_S32, CHECK_NZ_INT)
+DEFINE_NONZERO_FUNC(گنتی_Non_Zero32f, u32, u32, s32, uint, v_uint32, v_uint32, VEC_CMP_EQ_Z_FP, v_جوڑو, UPDATE_جوڑ_S32, CHECK_NZ_FP)
+DEFINE_NONZERO_FUNC(گنتی_Non_Zero16f, u16, u32, s16, ushort, v_uint16, v_uint32, VEC_CMP_EQ_Z_FP16, v_جوڑو_wrap, UPDATE_جوڑ_U16, CHECK_NZ_FP16)
 
-#undef DEFINE_NONZERO_FUNC_NOSIMD
-#define DEFINE_NONZERO_FUNC_NOSIMD(funcname, T) \
-static int funcname(const void* src, int len) \
+#تعریف_رد DEFINE_NONZERO_FUNC_NOSIMD
+#تعریف_کرو DEFINE_NONZERO_FUNC_NOSIMD(funcname, T) \
+ساكن صحيح funcname(ثابت فراغ* src, صحيح len) \
 { \
-    return countNonZero_(static_cast<const T*>(src), len); \
+    أرجع گنتی_Non_Zero_2(static_cast<ثابت T*>(src), len); \
 }
 
-DEFINE_NONZERO_FUNC_NOSIMD(countNonZero64s, int64)
+DEFINE_NONZERO_FUNC_NOSIMD(گنتی_Non_Zero64s, int64)
 
-#if CV_COUNTNONZERO_AVX512 && (CV_SIMD_64F || CV_SIMD_SCALABLE_64F)
+#إذا CV_COUNTNONZERO_AVX512 && (CV_SIMD_64F || CV_SIMD_SCALABLE_64F)
 // 64-bit floats: FP compare against zero treats -0.0 as zero, matching the
 // scalar `src[i] != 0` path.
-static int countNonZero64f( const void* src_ptr, int len )
+ساكن صحيح گنتی_Non_Zero64f( ثابت فراغ* src_ptr, صحيح len )
 {
-    const double* src = static_cast<const double*>(src_ptr);
-    int i = 0, nz = 0;
-    const int vlanes = VTraits<v_float64>::vlanes();
+    ثابت مزدوج* src = static_cast<ثابت مزدوج*>(src_ptr);
+    صحيح i = 0, nz = 0;
+    ثابت صحيح vlanes = VTraits<v_float64>::vlanes();
     v_float64 v_zero = vx_setzero_f64();
-    int nzeros = 0;
-    for (; i <= len - vlanes*2; i += vlanes*2)
+    صحيح nzeros = 0;
+    لكل (; i <= len - vlanes*2; i += vlanes*2)
     {
-        nzeros += cnz_lane_pop(v_signmask(v_eq(vx_load(src + i), v_zero)));
-        nzeros += cnz_lane_pop(v_signmask(v_eq(vx_load(src + i + vlanes), v_zero)));
+        nzeros += cnz_lane_نکالو(v_signmask(v_eq(vx_لدو(src + i), v_zero)));
+        nzeros += cnz_lane_نکالو(v_signmask(v_eq(vx_لدو(src + i + vlanes), v_zero)));
     }
-    for (; i <= len - vlanes; i += vlanes)
-        nzeros += cnz_lane_pop(v_signmask(v_eq(vx_load(src + i), v_zero)));
+    لكل (; i <= len - vlanes; i += vlanes)
+        nzeros += cnz_lane_نکالو(v_signmask(v_eq(vx_لدو(src + i), v_zero)));
     nz += i - nzeros;
     v_cleanup();
-    for (; i < len; i++)
+    لكل (; i < len; i++)
         nz += src[i] != 0;
-    return nz;
+    أرجع nz;
 }
-#else
-DEFINE_NONZERO_FUNC_NOSIMD(countNonZero64f, double)
-#endif
+#وإلا
+DEFINE_NONZERO_FUNC_NOSIMD(گنتی_Non_Zero64f, مزدوج)
+#جے_انت
 
-CountNonZeroFunc getCountNonZeroTab(int depth)
+گنتی_Non_Zero_Func get_گنتی_Non_Zero_Tab(صحيح ڈونگھائی)
 {
-    static CountNonZeroFunc countNonZeroTab[CV_DEPTH_MAX] =
+    ساكن گنتی_Non_Zero_Func گنتی_Non_Zero_Tab[CV_ڈونگھائی_MAX] =
     {
-        countNonZero8u,
-        countNonZero8u,
-        countNonZero16u,
-        countNonZero16u,
-        countNonZero32s,
-        countNonZero32f,
-        countNonZero64f,
-        countNonZero16f,
-        countNonZero16f, // for bf16 it's the same code as for f16
-        countNonZero8u,
-        countNonZero64s,
-        countNonZero64s,
-        countNonZero32s,
+        گنتی_Non_Zero8u,
+        گنتی_Non_Zero8u,
+        گنتی_Non_Zero16u,
+        گنتی_Non_Zero16u,
+        گنتی_Non_Zero32s,
+        گنتی_Non_Zero32f,
+        گنتی_Non_Zero64f,
+        گنتی_Non_Zero16f,
+        گنتی_Non_Zero16f, // for bf16 it's the same code as for f16
+        گنتی_Non_Zero8u,
+        گنتی_Non_Zero64s,
+        گنتی_Non_Zero64s,
+        گنتی_Non_Zero32s,
         0
     };
 
-    return countNonZeroTab[depth];
+    أرجع گنتی_Non_Zero_Tab[ڈونگھائی];
 }
 
-#endif
+#جے_انت
 
-CV_CPU_OPTIMIZATION_NAMESPACE_END
+CV_CPU_OPTIMIZATION_NAMESPACE_سرا
 } // namespace

@@ -42,60 +42,60 @@
 //
 //M*/
 
-#ifndef OPENCV_CORE_HAL_INTERNAL_HPP
-#define OPENCV_CORE_HAL_INTERNAL_HPP
+#جے_بنا_تعریف OPENCV_CORE_HAL_اندرونی_HPP
+#تعریف_کرو OPENCV_CORE_HAL_اندرونی_HPP
 
-#ifdef HAVE_LAPACK
+#جے_تعریف_شدہ HAVE_LAPACK
 
-int lapack_LU32f(float* a, size_t a_step, int m, float* b, size_t b_step, int n, int* info);
-int lapack_LU64f(double* a, size_t a_step, int m, double* b, size_t b_step, int n, int* info);
-int lapack_Cholesky32f(float* a, size_t a_step, int m, float* b, size_t b_step, int n, bool* info);
-int lapack_Cholesky64f(double* a, size_t a_step, int m, double* b, size_t b_step, int n, bool* info);
-int lapack_SVD32f(float* a, size_t a_step, float* w, float* u, size_t u_step, float* vt, size_t v_step, int m, int n, int flags);
-int lapack_SVD64f(double* a, size_t a_step, double* w, double* u, size_t u_step, double* vt, size_t v_step, int m, int n, int flags);
-int lapack_QR32f(float* src1, size_t src1_step, int m, int n, int k, float* src2, size_t src2_step, float* dst, int* info);
-int lapack_QR64f(double* src1, size_t src1_step, int m, int n, int k, double* src2, size_t src2_step, double* dst, int* info);
-int lapack_gemm32f(const float* src1, size_t src1_step, const float* src2, size_t src2_step,
-                   float alpha, const float* src3, size_t src3_step, float beta, float* dst, size_t dst_step,
-                   int m, int n, int k, int flags);
-int lapack_gemm64f(const double* src1, size_t src1_step, const double* src2, size_t src2_step,
-                   double alpha, const double* src3, size_t src3_step, double beta, double* dst, size_t dst_step,
-                   int m, int n, int k, int flags);
-int lapack_gemm32fc(const float* src1, size_t src1_step, const float* src2, size_t src2_step,
-                   float alpha, const float* src3, size_t src3_step, float beta, float* dst, size_t dst_step,
-                   int m, int n, int k, int flags);
-int lapack_gemm64fc(const double* src1, size_t src1_step, const double* src2, size_t src2_step,
-                   double alpha, const double* src3, size_t src3_step, double beta, double* dst, size_t dst_step,
-                   int m, int n, int k, int flags);
+صحيح lapack_LU32f(عائم* a, size_t a_قدم, صحيح m, عائم* b, size_t b_قدم, صحيح n, صحيح* info);
+صحيح lapack_LU64f(مزدوج* a, size_t a_قدم, صحيح m, مزدوج* b, size_t b_قدم, صحيح n, صحيح* info);
+صحيح lapack_Cholesky32f(عائم* a, size_t a_قدم, صحيح m, عائم* b, size_t b_قدم, صحيح n, منطقي* info);
+صحيح lapack_Cholesky64f(مزدوج* a, size_t a_قدم, صحيح m, مزدوج* b, size_t b_قدم, صحيح n, منطقي* info);
+صحيح lapack_SVD32f(عائم* a, size_t a_قدم, عائم* w, عائم* u, size_t u_قدم, عائم* vt, size_t v_قدم, صحيح m, صحيح n, صحيح flags);
+صحيح lapack_SVD64f(مزدوج* a, size_t a_قدم, مزدوج* w, مزدوج* u, size_t u_قدم, مزدوج* vt, size_t v_قدم, صحيح m, صحيح n, صحيح flags);
+صحيح lapack_QR32f(عائم* src1, size_t src1_قدم, صحيح m, صحيح n, صحيح k, عائم* src2, size_t src2_قدم, عائم* dst, صحيح* info);
+صحيح lapack_QR64f(مزدوج* src1, size_t src1_قدم, صحيح m, صحيح n, صحيح k, مزدوج* src2, size_t src2_قدم, مزدوج* dst, صحيح* info);
+صحيح lapack_gemm32f(ثابت عائم* src1, size_t src1_قدم, ثابت عائم* src2, size_t src2_قدم,
+                   عائم alpha, ثابت عائم* src3, size_t src3_قدم, عائم beta, عائم* dst, size_t dst_قدم,
+                   صحيح m, صحيح n, صحيح k, صحيح flags);
+صحيح lapack_gemm64f(ثابت مزدوج* src1, size_t src1_قدم, ثابت مزدوج* src2, size_t src2_قدم,
+                   مزدوج alpha, ثابت مزدوج* src3, size_t src3_قدم, مزدوج beta, مزدوج* dst, size_t dst_قدم,
+                   صحيح m, صحيح n, صحيح k, صحيح flags);
+صحيح lapack_gemm32fc(ثابت عائم* src1, size_t src1_قدم, ثابت عائم* src2, size_t src2_قدم,
+                   عائم alpha, ثابت عائم* src3, size_t src3_قدم, عائم beta, عائم* dst, size_t dst_قدم,
+                   صحيح m, صحيح n, صحيح k, صحيح flags);
+صحيح lapack_gemm64fc(ثابت مزدوج* src1, size_t src1_قدم, ثابت مزدوج* src2, size_t src2_قدم,
+                   مزدوج alpha, ثابت مزدوج* src3, size_t src3_قدم, مزدوج beta, مزدوج* dst, size_t dst_قدم,
+                   صحيح m, صحيح n, صحيح k, صحيح flags);
 
-#undef cv_hal_LU32f
-#define cv_hal_LU32f lapack_LU32f
-#undef cv_hal_LU64f
-#define cv_hal_LU64f lapack_LU64f
+#تعریف_رد cv_hal_LU32f
+#تعریف_کرو cv_hal_LU32f lapack_LU32f
+#تعریف_رد cv_hal_LU64f
+#تعریف_کرو cv_hal_LU64f lapack_LU64f
 
-#undef cv_hal_Cholesky32f
-#define cv_hal_Cholesky32f lapack_Cholesky32f
-#undef cv_hal_Cholesky64f
-#define cv_hal_Cholesky64f lapack_Cholesky64f
+#تعریف_رد cv_hal_Cholesky32f
+#تعریف_کرو cv_hal_Cholesky32f lapack_Cholesky32f
+#تعریف_رد cv_hal_Cholesky64f
+#تعریف_کرو cv_hal_Cholesky64f lapack_Cholesky64f
 
-#undef cv_hal_SVD32f
-#define cv_hal_SVD32f lapack_SVD32f
-#undef cv_hal_SVD64f
-#define cv_hal_SVD64f lapack_SVD64f
+#تعریف_رد cv_hal_SVD32f
+#تعریف_کرو cv_hal_SVD32f lapack_SVD32f
+#تعریف_رد cv_hal_SVD64f
+#تعریف_کرو cv_hal_SVD64f lapack_SVD64f
 
-#undef cv_hal_QR32f
-#define cv_hal_QR32f lapack_QR32f
-#undef cv_hal_QR64f
-#define cv_hal_QR64f lapack_QR64f
+#تعریف_رد cv_hal_QR32f
+#تعریف_کرو cv_hal_QR32f lapack_QR32f
+#تعریف_رد cv_hal_QR64f
+#تعریف_کرو cv_hal_QR64f lapack_QR64f
 
-#undef cv_hal_gemm32f
-#define cv_hal_gemm32f lapack_gemm32f
-#undef cv_hal_gemm64f
-#define cv_hal_gemm64f lapack_gemm64f
-#undef cv_hal_gemm32fc
-#define cv_hal_gemm32fc lapack_gemm32fc
-#undef cv_hal_gemm64fc
-#define cv_hal_gemm64fc lapack_gemm64fc
+#تعریف_رد cv_hal_gemm32f
+#تعریف_کرو cv_hal_gemm32f lapack_gemm32f
+#تعریف_رد cv_hal_gemm64f
+#تعریف_کرو cv_hal_gemm64f lapack_gemm64f
+#تعریف_رد cv_hal_gemm32fc
+#تعریف_کرو cv_hal_gemm32fc lapack_gemm32fc
+#تعریف_رد cv_hal_gemm64fc
+#تعریف_کرو cv_hal_gemm64fc lapack_gemm64fc
 
-#endif //HAVE_LAPACK
-#endif //OPENCV_CORE_HAL_INTERNAL_HPP
+#جے_انت //HAVE_LAPACK
+#جے_انت //OPENCV_CORE_HAL_INTERNAL_HPP

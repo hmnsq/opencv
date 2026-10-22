@@ -3,41 +3,41 @@
 // of this distribution and at http://opencv.org/license.html
 
 
-#ifndef SRC_STAT_HPP
-#define SRC_STAT_HPP
+#جے_بنا_تعریف SRC_STAT_HPP
+#تعریف_کرو SRC_STAT_HPP
 
-#include "opencv2/core/mat.hpp"
+#ضمن "opencv2/core/mat.hpp"
 
-namespace cv {
+نطاق cv {
 
-#ifdef HAVE_OPENCL
+#جے_تعریف_شدہ HAVE_OPENCL
 
-enum { OCL_OP_SUM = 0, OCL_OP_SUM_ABS =  1, OCL_OP_SUM_SQR = 2 };
-bool ocl_sum( InputArray _src, Scalar & res, int sum_op, InputArray _mask = noArray(),
-                     InputArray _src2 = noArray(), bool calc2 = false, const Scalar & res2 = Scalar() );
-bool ocl_minMaxIdx( InputArray _src, double* minVal, double* maxVal, int* minLoc, int* maxLoc, InputArray _mask,
-                           int ddepth = -1, bool absValues = false, InputArray _src2 = noArray(), double * maxVal2 = NULL);
+تعداد { OCL_OP_جوڑ = 0, OCL_OP_جوڑ_ABS =  1, OCL_OP_جوڑ_SQR = 2 };
+منطقي ocl_جوڑ( داخلہ_Array _src, Scalar & res, صحيح جوڑ_op, داخلہ_Array نقاب_2 = noArray(),
+                     داخلہ_Array _src2 = noArray(), منطقي calc2 = خطأ, ثابت Scalar & res2 = Scalar() );
+منطقي ocl_minMaxIdx( داخلہ_Array _src, مزدوج* minVal, مزدوج* maxVal, صحيح* minLoc, صحيح* maxLoc, داخلہ_Array نقاب_2,
+                           صحيح ddepth = -1, منطقي abs_اقدار = خطأ, داخلہ_Array _src2 = noArray(), مزدوج * maxVal2 = عدم);
 
-template <typename T> Scalar ocl_part_sum(Mat m)
+سانچا <قسم_ناں T> Scalar ocl_part_جوڑ(Mat m)
 {
-    CV_Assert(m.rows == 1);
+    CV_Assert(m.صفاں == 1);
 
     Scalar s = Scalar::all(0);
-    int cn = m.channels();
-    const T * const ptr = m.ptr<T>(0);
+    صحيح cn = m.channels();
+    ثابت T * ثابت ptr = m.ptr<T>(0);
 
-    for (int x = 0, w = m.cols * cn; x < w; )
-        for (int c = 0; c < cn; ++c, ++x)
+    لكل (صحيح x = 0, w = m.خانے_گنتی * cn; x < w; )
+        لكل (صحيح c = 0; c < cn; ++c, ++x)
             s[c] += ptr[x];
 
-    return s;
+    أرجع s;
 }
 
-#endif
+#جے_انت
 
-typedef int (*SumFunc)(const uchar*, const uchar* mask, uchar*, int, int);
-SumFunc getSumFunc(int depth);
+تعريفنوع صحيح (*جوڑ_Func)(ثابت uchar*, ثابت uchar* نقاب, uchar*, صحيح, صحيح);
+جوڑ_Func get_جوڑ_Func(صحيح ڈونگھائی);
 
 }
 
-#endif // SRC_STAT_HPP
+#جے_انت // SRC_STAT_HPP

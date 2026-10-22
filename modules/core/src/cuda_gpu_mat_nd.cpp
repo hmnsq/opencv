@@ -2,222 +2,222 @@
 // It is subject to the license terms in the LICENSE file found in the top-level directory
 // of this distribution and at http://opencv.org/license.html.
 
-#include "precomp.hpp"
+#ضمن "precomp.hpp"
 
-using namespace cv;
-using namespace cv::cuda;
+ورتوں نطاق cv;
+ورتوں نطاق cv::cuda;
 
-GpuMatND::~GpuMatND() = default;
+GpuMatND::~GpuMatND() = افتراضي;
 
-GpuMatND::GpuMatND(const MatShape& _shape, int _type, void* _data, StepArray _step) :
-    flags(0), dims(0), data(static_cast<uchar*>(_data)), offset(0)
+GpuMatND::GpuMatND(ثابت MatShape& _shape, صحيح _type, فراغ* انکڑے_3, قدم_Array قدم_3) :
+    flags(0), dims(0), انکڑے(static_cast<uchar*>(انکڑے_3)), offset(0)
 {
-    CV_Assert(_step.empty() || _shape.size() == _step.size() + 1 ||
-              (_shape.size() == _step.size() && _step.back() == (size_t)CV_ELEM_SIZE(_type)));
+    CV_Assert(قدم_3.empty() || _shape.size() == قدم_3.size() + 1 ||
+              (_shape.size() == قدم_3.size() && قدم_3.back() == (size_t)CV_ELEM_ناپ(_type)));
 
-    setFields(_shape, _type, std::move(_step));
+    سیٹ_Fields(_shape, _type, std::move(قدم_3));
 }
 
-GpuMatND GpuMatND::operator()(const std::vector<Range>& ranges) const
+GpuMatND GpuMatND::عامل()(ثابت std::vector<Range>& ranges) ثابت
 {
-    CV_Assert(dims == (int)ranges.size());
+    CV_Assert(dims == (صحيح)ranges.size());
 
-    for (int i = 0; i < dims; ++i)
+    لكل (صحيح i = 0; i < dims; ++i)
     {
         Range r = ranges[i];
-        CV_Assert(r == Range::all() || (0 <= r.start && r.start < r.end && r.end <= size[i]));
+        CV_Assert(r == Range::all() || (0 <= r.شروع && r.شروع < r.end && r.end <= size[i]));
     }
 
-    GpuMatND ret = *this;
+    GpuMatND ret = *هذا;
 
-    for (int i = 0; i < dims; ++i)
+    لكل (صحيح i = 0; i < dims; ++i)
     {
         Range r = ranges[i];
-        if (r != Range::all() && r != Range(0, ret.size[i]))
+        إذا (r != Range::all() && r != Range(0, ret.size[i]))
         {
-            ret.offset += r.start * ret.step[i];
+            ret.offset += r.شروع * ret.قدم[i];
             ret.size[i] = r.size();
             ret.flags |= Mat::SUBMATRIX_FLAG;
         }
     }
 
-    ret.flags = cv::updateContinuityFlag(ret.flags, dims, ret.size.data(), ret.step.data());
+    ret.flags = cv::updateContinuityFlag(ret.flags, dims, ret.size.انکڑے(), ret.قدم.انکڑے());
 
-    return ret;
+    أرجع ret;
 }
 
-GpuMat GpuMatND::createGpuMatHeader(IndexArray idx, Range rowRange, Range colRange) const
+GpuMat GpuMatND::create_Gpu_Mat_سرخی(اشاریہ_Array idx, Range صف_Range_2, Range خانہ_Range_2) ثابت
 {
-    CV_Assert((int)idx.size() == dims - 2);
+    CV_Assert((صحيح)idx.size() == dims - 2);
 
     std::vector<Range> ranges;
-    for (int i : idx)
+    لكل (صحيح i : idx)
         ranges.emplace_back(i, i+1);
-    ranges.push_back(rowRange);
-    ranges.push_back(colRange);
+    ranges.push_back(صف_Range_2);
+    ranges.push_back(خانہ_Range_2);
 
-    return (*this)(ranges).createGpuMatHeader();
+    أرجع (*هذا)(ranges).create_Gpu_Mat_سرخی();
 }
 
-GpuMat GpuMatND::createGpuMatHeader() const
+GpuMat GpuMatND::create_Gpu_Mat_سرخی() ثابت
 {
-    auto Effectively2D = [](GpuMatND m)
+    خودکار Effectively2D = [](GpuMatND m)
     {
-        for (int i = 0; i < m.dims - 2; ++i)
-            if (m.size[i] > 1)
-                return false;
-        return true;
+        لكل (صحيح i = 0; i < m.dims - 2; ++i)
+            إذا (m.size[i] > 1)
+                أرجع خطأ;
+        أرجع سچ;
     };
-    CV_Assert(Effectively2D(*this));
-    int rows_, cols_ = dims >= 1 ? size[dims - 1] : 1;
-    size_t step_;
-    if (dims >= 2)
+    CV_Assert(Effectively2D(*هذا));
+    صحيح صفاں_2, خانے_گنتی_2 = dims >= 1 ? size[dims - 1] : 1;
+    size_t قدم_2;
+    إذا (dims >= 2)
     {
-        rows_ = size[dims - 2];
-        step_ = step[dims - 2];
+        صفاں_2 = size[dims - 2];
+        قدم_2 = قدم[dims - 2];
     }
-    else
+    وإلا
     {
-        rows_ = 1;
-        step_ = cols_ * elemSize();
+        صفاں_2 = 1;
+        قدم_2 = خانے_گنتی_2 * elem_ناپ();
     }
 
-    return GpuMat(rows_, cols_, type(), getDevicePtr(), step_);
+    أرجع GpuMat(صفاں_2, خانے_گنتی_2, type(), getDevicePtr(), قدم_2);
 }
 
-GpuMat GpuMatND::operator()(IndexArray idx, Range rowRange, Range colRange) const
+GpuMat GpuMatND::عامل()(اشاریہ_Array idx, Range صف_Range_2, Range خانہ_Range_2) ثابت
 {
-    return createGpuMatHeader(idx, rowRange, colRange).clone();
+    أرجع create_Gpu_Mat_سرخی(idx, صف_Range_2, خانہ_Range_2).clone();
 }
 
-GpuMatND::operator GpuMat() const
+GpuMatND::عامل GpuMat() ثابت
 {
-    return createGpuMatHeader().clone();
+    أرجع create_Gpu_Mat_سرخی().clone();
 }
 
-void GpuMatND::setFields(MatShape _size, int _type, StepArray _step)
+فراغ GpuMatND::سیٹ_Fields(MatShape ناپ_4, صحيح _type, قدم_Array قدم_3)
 {
-    _type &= Mat::TYPE_MASK;
+    _type &= Mat::TYPE_نقاب;
 
     flags = Mat::MAGIC_VAL + _type;
-    dims = static_cast<int>(_size.size());
-    size = std::move(_size);
+    dims = static_cast<صحيح>(ناپ_4.size());
+    size = std::move(ناپ_4);
 
-    if (_step.empty())
+    إذا (قدم_3.empty())
     {
-        step = StepArray(dims);
+        قدم = قدم_Array(dims);
 
-        step.back() = elemSize();
-        for (int _i = dims - 2; _i >= 0; --_i)
+        قدم.back() = elem_ناپ();
+        لكل (صحيح _i = dims - 2; _i >= 0; --_i)
         {
-            const size_t i = _i;
-            step[i] = step[i+1] * size[i+1];
+            ثابت size_t i = _i;
+            قدم[i] = قدم[i+1] * size[i+1];
         }
 
         flags |= Mat::CONTINUOUS_FLAG;
     }
-    else
+    وإلا
     {
-        step = std::move(_step);
-        if (step.size() < size.size())
-          step.push_back(elemSize());
+        قدم = std::move(قدم_3);
+        إذا (قدم.size() < size.size())
+          قدم.push_back(elem_ناپ());
 
-        flags = cv::updateContinuityFlag(flags, dims, size.data(), step.data());
+        flags = cv::updateContinuityFlag(flags, dims, size.انکڑے(), قدم.انکڑے());
     }
 
-    CV_Assert(size.size() == step.size());
-    CV_Assert(step.back() == elemSize());
+    CV_Assert(size.size() == قدم.size());
+    CV_Assert(قدم.back() == elem_ناپ());
 }
 
-#ifndef HAVE_CUDA
+#جے_بنا_تعریف HAVE_CUDA
 
-GpuData::GpuData(const size_t _size)
-    : data(nullptr), size(0)
+Gpu_انکڑے::Gpu_انکڑے(ثابت size_t ناپ_4)
+    : انکڑے(خالی_سوچک), size(0)
 {
-    CV_UNUSED(_size);
+    CV_بن_ورتیا(ناپ_4);
     throw_no_cuda();
 }
 
-GpuData::~GpuData()
+Gpu_انکڑے::~Gpu_انکڑے()
 {
 }
 
-void GpuMatND::create(const MatShape& _shape, int _type)
+فراغ GpuMatND::create(ثابت MatShape& _shape, صحيح _type)
 {
-    CV_UNUSED(_shape);
-    CV_UNUSED(_type);
+    CV_بن_ورتیا(_shape);
+    CV_بن_ورتیا(_type);
     throw_no_cuda();
 }
 
-void GpuMatND::release()
-{
-    throw_no_cuda();
-}
-
-GpuMatND GpuMatND::clone() const
+فراغ GpuMatND::release()
 {
     throw_no_cuda();
 }
 
-GpuMatND GpuMatND::clone(Stream& stream) const
+GpuMatND GpuMatND::clone() ثابت
 {
-    CV_UNUSED(stream);
     throw_no_cuda();
 }
 
-void GpuMatND::upload(InputArray src)
+GpuMatND GpuMatND::clone(دھارا& stream) ثابت
 {
-    CV_UNUSED(src);
+    CV_بن_ورتیا(stream);
     throw_no_cuda();
 }
 
-void GpuMatND::upload(InputArray src, Stream& stream)
+فراغ GpuMatND::upload(داخلہ_Array src)
 {
-    CV_UNUSED(src);
-    CV_UNUSED(stream);
+    CV_بن_ورتیا(src);
     throw_no_cuda();
 }
 
-void GpuMatND::download(OutputArray dst) const
+فراغ GpuMatND::upload(داخلہ_Array src, دھارا& stream)
 {
-    CV_UNUSED(dst);
+    CV_بن_ورتیا(src);
+    CV_بن_ورتیا(stream);
     throw_no_cuda();
 }
 
-void GpuMatND::download(OutputArray dst, Stream& stream) const
+فراغ GpuMatND::download(OutputArray dst) ثابت
 {
-    CV_UNUSED(dst);
-    CV_UNUSED(stream);
+    CV_بن_ورتیا(dst);
     throw_no_cuda();
 }
 
-void GpuMatND::fit(const MatShape& _shape, int _type)
+فراغ GpuMatND::download(OutputArray dst, دھارا& stream) ثابت
 {
-    auto elements_nonzero = [](const MatShape& v)
+    CV_بن_ورتیا(dst);
+    CV_بن_ورتیا(stream);
+    throw_no_cuda();
+}
+
+فراغ GpuMatND::fit(ثابت MatShape& _shape, صحيح _type)
+{
+    خودکار elements_nonzero = [](ثابت MatShape& v)
     {
-        return std::all_of(v.begin(), v.end(), [](int u){ return u > 0; });
+        أرجع std::all_of(v.begin(), v.end(), [](صحيح u){ أرجع u > 0; });
     };
     CV_Assert(!_shape.empty());
     CV_Assert(elements_nonzero(_shape));
 
-    _type &= Mat::TYPE_MASK;
+    _type &= Mat::TYPE_نقاب;
 
-    const size_t esz = (size_t)CV_ELEM_SIZE(_type);
+    ثابت size_t esz = (size_t)CV_ELEM_ناپ(_type);
     size_t step0 = esz;
-    for (int i = (int)_shape.size() - 2; i >= 0; --i)
+    لكل (صحيح i = (صحيح)_shape.size() - 2; i >= 0; --i)
         step0 *= (size_t)_shape[(size_t)i + 1];
-    const size_t requiredBytes = (size_t)_shape[0] * step0;
+    ثابت size_t required_بائٹاں = (size_t)_shape[0] * step0;
 
-    const bool canReuse = !empty() && !external() && isContinuous() && !isSubmatrix() && offset == 0;
-    const size_t oldCapacity = canReuse ? totalMemSize() : 0;
+    ثابت منطقي canReuse = !empty() && !external() && isContinuous() && !isSubmatrix() && offset == 0;
+    ثابت size_t old_سمرتھا = canReuse ? کل_Mem_ناپ() : 0;
 
-    if (!canReuse || requiredBytes > oldCapacity)
+    إذا (!canReuse || required_بائٹاں > old_سمرتھا)
     {
         create(_shape, _type);
-        return;
+        أرجع;
     }
 
-    setFields(_shape, _type);
+    سیٹ_Fields(_shape, _type);
 }
 
-#endif
+#جے_انت
