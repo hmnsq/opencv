@@ -5,25 +5,25 @@
 #ifndef OPENCV_CORE_PARALLEL_FACTORY_HPP
 #define OPENCV_CORE_PARALLEL_FACTORY_HPP
 
-#include "opencv2/core/parallel/parallel_backend.hpp"
+#ضمن "opencv2/core/parallel/parallel_backend.hpp"
 
-namespace cv { namespace parallel {
+نطاق cv { نطاق parallel {
 
-class IParallelBackendFactory
+מחלקה IParallelBackendFactory
 {
-public:
+عام:
     virtual ~IParallelBackendFactory() {}
-    virtual std::shared_ptr<cv::parallel::ParallelForAPI> create() const = 0;
+    virtual std::shared_ptr<cv::parallel::ParallelForAPI> create() ثابت = 0;
 };
 
 
-class StaticBackendFactory CV_FINAL: public IParallelBackendFactory
+מחלקה StaticBackendFactory CV_FINAL: عام IParallelBackendFactory
 {
-protected:
-    std::function<std::shared_ptr<cv::parallel::ParallelForAPI>(void)> create_fn_;
+محمي:
+    std::function<std::shared_ptr<cv::parallel::ParallelForAPI>(فراغ)> create_fn_;
 
-public:
-    StaticBackendFactory(std::function<std::shared_ptr<cv::parallel::ParallelForAPI>(void)>&& create_fn)
+عام:
+    StaticBackendFactory(std::function<std::shared_ptr<cv::parallel::ParallelForAPI>(فراغ)>&& create_fn)
         : create_fn_(create_fn)
     {
         // nothing
@@ -31,9 +31,9 @@ public:
 
     ~StaticBackendFactory() CV_OVERRIDE {}
 
-    std::shared_ptr<cv::parallel::ParallelForAPI> create() const CV_OVERRIDE
+    std::shared_ptr<cv::parallel::ParallelForAPI> create() ثابت CV_OVERRIDE
     {
-        return create_fn_();
+        החזר create_fn_();
     }
 };
 
@@ -41,7 +41,7 @@ public:
 // PluginBackendFactory is implemented in plugin_wrapper.cpp
 //
 
-std::shared_ptr<IParallelBackendFactory> createPluginParallelBackendFactory(const std::string& baseName);
+std::shared_ptr<IParallelBackendFactory> createPluginParallelBackendFactory(ثابت std::string& baseName);
 
 }}  // namespace
 

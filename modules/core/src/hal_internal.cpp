@@ -42,19 +42,19 @@
 //
 //M*/
 
-#include "precomp.hpp"
-#include "hal_internal.hpp"
+#ضمن "precomp.hpp"
+#ضمن "hal_internal.hpp"
 
 #ifdef HAVE_LAPACK
 
-#include "opencv_lapack.h"
+#ضمن "opencv_lapack.h"
 
-#include <cmath>
-#include <algorithm>
-#include <typeinfo>
-#include <limits>
-#include <complex>
-#include <vector>
+#ضمن <cmath>
+#ضمن <algorithm>
+#ضمن <typeinfo>
+#ضمن <limits>
+#ضمن <complex>
+#ضمن <vector>
 
 #define HAL_GEMM_SMALL_COMPLEX_MATRIX_THRESH 100
 #define HAL_GEMM_SMALL_MATRIX_THRESH 100
@@ -63,304 +63,304 @@
 #define HAL_LU_SMALL_MATRIX_THRESH 100
 #define HAL_CHOLESKY_SMALL_MATRIX_THRESH 100
 
-#if defined(__clang__) && defined(__has_feature)
-#if __has_feature(memory_sanitizer)
-#include <sanitizer/msan_interface.h>
+#אם defined(__clang__) && defined(__has_feature)
+#אם __has_feature(memory_sanitizer)
+#ضمن <sanitizer/msan_interface.h>
 #define CV_ANNOTATE_MEMORY_IS_INITIALIZED(address, size) \
 __msan_unpoison(address, size)
 #define CV_ANNOTATE_NO_SANITIZE_MEMORY __attribute__((no_sanitize("memory")))
 #endif
 #endif
 #ifndef CV_ANNOTATE_MEMORY_IS_INITIALIZED
-#define CV_ANNOTATE_MEMORY_IS_INITIALIZED(address, size) do { } while(0)
+#define CV_ANNOTATE_MEMORY_IS_INITIALIZED(address, size) עשה { } כלעוד(0)
 #define CV_ANNOTATE_NO_SANITIZE_MEMORY
 #endif
 
-#if defined(__APPLE__) && defined(__clang__)
+#אם defined(__APPLE__) && defined(__clang__)
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
 #endif
 
 //lapack stores matrices in column-major order so transposing is needed everywhere
-template <typename fptype> static inline void
+template <typename fptype> ساكن مضمن فراغ
 transpose_square_inplace(fptype *src, size_t src_ld, size_t m)
 {
-    for(size_t i = 0; i < m - 1; i++)
-        for(size_t j = i + 1; j < m; j++)
+    עבור(size_t i = 0; i < m - 1; i++)
+        עבור(size_t j = i + 1; j < m; j++)
             std::swap(src[j*src_ld + i], src[i*src_ld + j]);
 }
 
-template <typename fptype> static inline void
-transpose(const fptype *src, size_t src_ld, fptype* dst, size_t dst_ld, size_t m, size_t n)
+template <typename fptype> ساكن مضمن فراغ
+transpose(ثابت fptype *src, size_t src_ld, fptype* dst, size_t dst_ld, size_t m, size_t n)
 {
-    for(size_t i = 0; i < m; i++)
-        for(size_t j = 0; j < n; j++)
+    עבור(size_t i = 0; i < m; i++)
+        עבור(size_t j = 0; j < n; j++)
             dst[j*dst_ld + i] = src[i*src_ld + j];
 }
 
-template <typename fptype> static inline void
-copy_matrix(const fptype *src, size_t src_ld, fptype* dst, size_t dst_ld, size_t m, size_t n)
+template <typename fptype> ساكن مضمن فراغ
+copy_matrix(ثابت fptype *src, size_t src_ld, fptype* dst, size_t dst_ld, size_t m, size_t n)
 {
-    for(size_t i = 0; i < m; i++)
-        for(size_t j = 0; j < n; j++)
+    עבור(size_t i = 0; i < m; i++)
+        עבור(size_t j = 0; j < n; j++)
             dst[i*dst_ld + j] = src[i*src_ld + j];
 }
 
-template <typename fptype> static inline void
+template <typename fptype> ساكن مضمن فراغ
 set_value(fptype *dst, size_t dst_ld, fptype value, size_t m, size_t n)
 {
-    for(size_t i = 0; i < m; i++)
-        for(size_t j = 0; j < n; j++)
+    עבור(size_t i = 0; i < m; i++)
+        עבור(size_t j = 0; j < n; j++)
             dst[i*dst_ld + j] = value;
 }
 
 // MSAN can't see that the fortran LAPACK functions initialize `info`
-template <typename fptype> static inline int
-CV_ANNOTATE_NO_SANITIZE_MEMORY lapack_LU(fptype* a, size_t a_step, int m, fptype* b, size_t b_step, int n, int* info)
+template <typename fptype> ساكن مضمن صحيح
+CV_ANNOTATE_NO_SANITIZE_MEMORY lapack_LU(fptype* a, size_t a_step, صحيح m, fptype* b, size_t b_step, صحيح n, صحيح* info)
 {
-#if defined (ACCELERATE_NEW_LAPACK) && defined (ACCELERATE_LAPACK_ILP64)
+#אם defined (ACCELERATE_NEW_LAPACK) && defined (ACCELERATE_LAPACK_ILP64)
     cv::AutoBuffer<long> piv_buff(m);
-    long lda = (long)(a_step / sizeof(fptype));
+    long lda = (long)(a_step / حجم(fptype));
     long _m = static_cast<long>(m), _n = static_cast<long>(n);
     long _info[1];
-#else
-    cv::AutoBuffer<int> piv_buff(m);
-    int lda = (int)(a_step / sizeof(fptype));
-    int _m = m, _n = n;
-    int* _info = info;
+#אחרת
+    cv::AutoBuffer<صحيح> piv_buff(m);
+    صحيح lda = (صحيح)(a_step / حجم(fptype));
+    صحيح _m = m, _n = n;
+    صحيح* _info = info;
 #endif
     auto piv = piv_buff.data();
 
     transpose_square_inplace(a, lda, m);
 
-    if(b)
+    אם(b)
     {
-        if(n == 1 && b_step == sizeof(fptype))
+        אם(n == 1 && b_step == حجم(fptype))
         {
-            if(typeid(fptype) == typeid(float))
-                sgesv_(&_m, &_n, (float*)a, &lda, piv, (float*)b, &_m, _info);
-            else if(typeid(fptype) == typeid(double))
-                dgesv_(&_m, &_n, (double*)a, &lda, piv, (double*)b, &_m, _info);
+            אם(typeid(fptype) == typeid(عائم))
+                sgesv_(&_m, &_n, (عائم*)a, &lda, piv, (عائم*)b, &_m, _info);
+            אחרת אם(typeid(fptype) == typeid(مزدوج))
+                dgesv_(&_m, &_n, (مزدوج*)a, &lda, piv, (مزدوج*)b, &_m, _info);
         }
-        else
+        אחרת
         {
-            int ldb = (int)(b_step / sizeof(fptype));
+            صحيح ldb = (صحيح)(b_step / حجم(fptype));
             std::vector<fptype> tmpB(m*n+1);
 
             transpose(b, ldb, &tmpB[0], m, m, n);
 
-            if(typeid(fptype) == typeid(float))
-                sgesv_(&_m, &_n, (float*)a, &lda, piv, (float*)&tmpB[0], &_m, _info);
-            else if(typeid(fptype) == typeid(double))
-                dgesv_(&_m, &_n, (double*)a, &lda, piv, (double*)&tmpB[0], &_m, _info);
+            אם(typeid(fptype) == typeid(عائم))
+                sgesv_(&_m, &_n, (عائم*)a, &lda, piv, (عائم*)&tmpB[0], &_m, _info);
+            אחרת אם(typeid(fptype) == typeid(مزدوج))
+                dgesv_(&_m, &_n, (مزدوج*)a, &lda, piv, (مزدوج*)&tmpB[0], &_m, _info);
 
             transpose(&tmpB[0], m, b, ldb, n, m);
         }
     }
-    else
+    אחרת
     {
-        if(typeid(fptype) == typeid(float))
-            sgetrf_(&_m, &_m, (float*)a, &lda, piv, _info);
-        else if(typeid(fptype) == typeid(double))
-            dgetrf_(&_m, &_m, (double*)a, &lda, piv, _info);
+        אם(typeid(fptype) == typeid(عائم))
+            sgetrf_(&_m, &_m, (عائم*)a, &lda, piv, _info);
+        אחרת אם(typeid(fptype) == typeid(مزدوج))
+            dgetrf_(&_m, &_m, (مزدوج*)a, &lda, piv, _info);
     }
 
-#if defined (ACCELERATE_NEW_LAPACK) && defined (ACCELERATE_LAPACK_ILP64)
-    *info = static_cast<int>(_info[0]);
+#אם defined (ACCELERATE_NEW_LAPACK) && defined (ACCELERATE_LAPACK_ILP64)
+    *info = static_cast<صحيح>(_info[0]);
 #endif
-    int retcode = *info >= 0 ? CV_HAL_ERROR_OK : CV_HAL_ERROR_NOT_IMPLEMENTED;
+    صحيح retcode = *info >= 0 ? CV_HAL_ERROR_OK : CV_HAL_ERROR_NOT_IMPLEMENTED;
 
-    int sign = 0;
-    if(*info == 0)
+    صحيح sign = 0;
+    אם(*info == 0)
     {
-        for(int i = 0; i < m; i++)
+        עבור(صحيح i = 0; i < m; i++)
             sign ^= piv[i] != i + 1;
         *info = sign ? -1 : 1;
     }
-    else
+    אחרת
         *info = 0; //in opencv LU function zero means error
 
-    return retcode;
+    החזר retcode;
 }
 
-template <typename fptype> static inline int
-lapack_Cholesky(fptype* a, size_t a_step, int m, fptype* b, size_t b_step, int n, bool* info)
+template <typename fptype> ساكن مضمن صحيح
+lapack_Cholesky(fptype* a, size_t a_step, صحيح m, fptype* b, size_t b_step, صحيح n, منطقي* info)
 {
-#if defined (ACCELERATE_NEW_LAPACK) && defined (ACCELERATE_LAPACK_ILP64)
+#אם defined (ACCELERATE_NEW_LAPACK) && defined (ACCELERATE_LAPACK_ILP64)
     long _m = static_cast<long>(m), _n = static_cast<long>(n);
     long lapackStatus = 0;
-    long lda = (long)(a_step / sizeof(fptype));
-#else
-    int _m = m, _n = n;
-    int lapackStatus = 0;
-    int lda = (int)(a_step / sizeof(fptype));
+    long lda = (long)(a_step / حجم(fptype));
+#אחרת
+    صحيح _m = m, _n = n;
+    صحيح lapackStatus = 0;
+    صحيح lda = (صحيح)(a_step / حجم(fptype));
 #endif
-    char L[] = {'L', '\0'};
+    حرف L[] = {'L', '\0'};
 
-    if(b)
+    אם(b)
     {
-        if(n == 1 && b_step == sizeof(fptype))
+        אם(n == 1 && b_step == حجم(fptype))
         {
-            if(typeid(fptype) == typeid(float))
-                OCV_LAPACK_FUNC(sposv)(L, &_m, &_n, (float*)a, &lda, (float*)b, &_m, &lapackStatus);
-            else if(typeid(fptype) == typeid(double))
-                OCV_LAPACK_FUNC(dposv)(L, &_m, &_n, (double*)a, &lda, (double*)b, &_m, &lapackStatus);
+            אם(typeid(fptype) == typeid(عائم))
+                OCV_LAPACK_FUNC(sposv)(L, &_m, &_n, (عائم*)a, &lda, (عائم*)b, &_m, &lapackStatus);
+            אחרת אם(typeid(fptype) == typeid(مزدوج))
+                OCV_LAPACK_FUNC(dposv)(L, &_m, &_n, (مزدوج*)a, &lda, (مزدوج*)b, &_m, &lapackStatus);
         }
-        else
+        אחרת
         {
-            int ldb = (int)(b_step / sizeof(fptype));
-            fptype* tmpB = new fptype[m*n];
+            صحيح ldb = (صحيح)(b_step / حجم(fptype));
+            fptype* tmpB = جديد fptype[m*n];
             transpose(b, ldb, tmpB, m, m, n);
 
-            if(typeid(fptype) == typeid(float))
-                OCV_LAPACK_FUNC(sposv)(L, &_m, &_n, (float*)a, &lda, (float*)tmpB, &_m, &lapackStatus);
-            else if(typeid(fptype) == typeid(double))
-                OCV_LAPACK_FUNC(dposv)(L, &_m, &_n, (double*)a, &lda, (double*)tmpB, &_m, &lapackStatus);
+            אם(typeid(fptype) == typeid(عائم))
+                OCV_LAPACK_FUNC(sposv)(L, &_m, &_n, (عائم*)a, &lda, (عائم*)tmpB, &_m, &lapackStatus);
+            אחרת אם(typeid(fptype) == typeid(مزدوج))
+                OCV_LAPACK_FUNC(dposv)(L, &_m, &_n, (مزدوج*)a, &lda, (مزدوج*)tmpB, &_m, &lapackStatus);
 
             transpose(tmpB, m, b, ldb, n, m);
             delete[] tmpB;
         }
     }
-    else
+    אחרת
     {
-        if(typeid(fptype) == typeid(float))
-            OCV_LAPACK_FUNC(spotrf)(L, &_m, (float*)a, &lda, &lapackStatus);
-        else if(typeid(fptype) == typeid(double))
-            OCV_LAPACK_FUNC(dpotrf)(L, &_m, (double*)a, &lda, &lapackStatus);
+        אם(typeid(fptype) == typeid(عائم))
+            OCV_LAPACK_FUNC(spotrf)(L, &_m, (عائم*)a, &lda, &lapackStatus);
+        אחרת אם(typeid(fptype) == typeid(مزدوج))
+            OCV_LAPACK_FUNC(dpotrf)(L, &_m, (مزدوج*)a, &lda, &lapackStatus);
     }
 
-    if(lapackStatus == 0) *info = true;
-    else *info = false; //in opencv Cholesky function false means error
+    אם(lapackStatus == 0) *info = אמת;
+    אחרת *info = שקר; //in opencv Cholesky function false means error
 
-    return lapackStatus >= 0 ? CV_HAL_ERROR_OK : CV_HAL_ERROR_NOT_IMPLEMENTED;
+    החזר lapackStatus >= 0 ? CV_HAL_ERROR_OK : CV_HAL_ERROR_NOT_IMPLEMENTED;
 }
 
-template <typename fptype> static inline int
-lapack_SVD(fptype* a, size_t a_step, fptype *w, fptype* u, size_t u_step, fptype* vt, size_t v_step, int m, int n, int flags, int* info)
+template <typename fptype> ساكن مضمن صحيح
+lapack_SVD(fptype* a, size_t a_step, fptype *w, fptype* u, size_t u_step, fptype* vt, size_t v_step, صحيح m, صحيح n, صحيح flags, صحيح* info)
 {
-#if defined (ACCELERATE_NEW_LAPACK) && defined (ACCELERATE_LAPACK_ILP64)
+#אם defined (ACCELERATE_NEW_LAPACK) && defined (ACCELERATE_LAPACK_ILP64)
     long _m = static_cast<long>(m), _n = static_cast<long>(n);
     long _info[1];
-    long lda = (long)(a_step / sizeof(fptype));
-    long ldv = (long)(v_step / sizeof(fptype));
-    long ldu = (long)(u_step / sizeof(fptype));
+    long lda = (long)(a_step / حجم(fptype));
+    long ldv = (long)(v_step / حجم(fptype));
+    long ldu = (long)(u_step / حجم(fptype));
     long lwork = -1;
     cv::AutoBuffer<long> iworkBuf_(8 * std::min(m, n));
-#else
-    int _m = m, _n = n;
-    int* _info = info;
-    int lda = (int)(a_step / sizeof(fptype));
-    int ldv = (int)(v_step / sizeof(fptype));
-    int ldu = (int)(u_step / sizeof(fptype));
-    int lwork = -1;
-    cv::AutoBuffer<int> iworkBuf_(8 * std::min(m, n));
+#אחרת
+    صحيح _m = m, _n = n;
+    صحيح* _info = info;
+    صحيح lda = (صحيح)(a_step / حجم(fptype));
+    صحيح ldv = (صحيح)(v_step / حجم(fptype));
+    صحيح ldu = (صحيح)(u_step / حجم(fptype));
+    صحيح lwork = -1;
+    cv::AutoBuffer<صحيح> iworkBuf_(8 * std::min(m, n));
 #endif
     auto iworkBuf = iworkBuf_.data();
     std::vector<fptype> ubuf;
     fptype work1 = 0;
 
     //A already transposed and m>=n
-    char mode[] = { ' ', '\0'};
-    if(flags & CV_HAL_SVD_NO_UV)
+    حرف mode[] = { ' ', '\0'};
+    אם(flags & CV_HAL_SVD_NO_UV)
     {
         ldv = 1;
         mode[0] = 'N';
     }
-    else if((flags & CV_HAL_SVD_SHORT_UV) && (flags & CV_HAL_SVD_MODIFY_A)) //short SVD, U stored in a
+    אחרת אם((flags & CV_HAL_SVD_SHORT_UV) && (flags & CV_HAL_SVD_MODIFY_A)) //short SVD, U stored in a
         mode[0] = 'O';
-    else if((flags & CV_HAL_SVD_SHORT_UV) && !(flags & CV_HAL_SVD_MODIFY_A)) //short SVD, U stored in u if m>=n
+    אחרת אם((flags & CV_HAL_SVD_SHORT_UV) && !(flags & CV_HAL_SVD_MODIFY_A)) //short SVD, U stored in u if m>=n
         mode[0] = 'S';
-    else if(flags & CV_HAL_SVD_FULL_UV) //full SVD, U stored in u or in a
+    אחרת אם(flags & CV_HAL_SVD_FULL_UV) //full SVD, U stored in u or in a
         mode[0] = 'A';
 
-    if((flags & CV_HAL_SVD_MODIFY_A) && (flags & CV_HAL_SVD_FULL_UV)) //U stored in a
+    אם((flags & CV_HAL_SVD_MODIFY_A) && (flags & CV_HAL_SVD_FULL_UV)) //U stored in a
     {
         ubuf.resize(m*m);
         u = &ubuf[0];
         ldu = m;
     }
 
-    if(typeid(fptype) == typeid(float))
-        OCV_LAPACK_FUNC(sgesdd)(mode, &_m, &_n, (float*)a, &lda, (float*)w, (float*)u, &ldu, (float*)vt, &ldv, (float*)&work1, &lwork, iworkBuf, _info);
-    else if(typeid(fptype) == typeid(double))
-        OCV_LAPACK_FUNC(dgesdd)(mode, &_m, &_n, (double*)a, &lda, (double*)w, (double*)u, &ldu, (double*)vt, &ldv, (double*)&work1, &lwork, iworkBuf, _info);
+    אם(typeid(fptype) == typeid(عائم))
+        OCV_LAPACK_FUNC(sgesdd)(mode, &_m, &_n, (عائم*)a, &lda, (عائم*)w, (عائم*)u, &ldu, (عائم*)vt, &ldv, (عائم*)&work1, &lwork, iworkBuf, _info);
+    אחרת אם(typeid(fptype) == typeid(مزدوج))
+        OCV_LAPACK_FUNC(dgesdd)(mode, &_m, &_n, (مزدوج*)a, &lda, (مزدوج*)w, (مزدوج*)u, &ldu, (مزدوج*)vt, &ldv, (مزدوج*)&work1, &lwork, iworkBuf, _info);
 
-    if(*info < 0)
-        return CV_HAL_ERROR_NOT_IMPLEMENTED;
+    אם(*info < 0)
+        החזר CV_HAL_ERROR_NOT_IMPLEMENTED;
 
-    lwork = (int)round(work1); //optimal buffer size
+    lwork = (صحيح)round(work1); //optimal buffer size
     std::vector<fptype> buffer(lwork + 1);
 
     // Make sure MSAN sees the memory as having been written.
     // MSAN does not think it has been written because a different language is called.
     // Note: we do this here because if dgesdd is C++, MSAN errors can be reported within it.
-    CV_ANNOTATE_MEMORY_IS_INITIALIZED(buffer.data(), sizeof(fptype) * (lwork + 1));
+    CV_ANNOTATE_MEMORY_IS_INITIALIZED(buffer.data(), حجم(fptype) * (lwork + 1));
 
-    if(typeid(fptype) == typeid(float))
-        OCV_LAPACK_FUNC(sgesdd)(mode, &_m, &_n, (float*)a, &lda, (float*)w, (float*)u, &ldu, (float*)vt, &ldv, (float*)&buffer[0], &lwork, iworkBuf, _info);
-    else if(typeid(fptype) == typeid(double))
-        OCV_LAPACK_FUNC(dgesdd)(mode, &_m, &_n, (double*)a, &lda, (double*)w, (double*)u, &ldu, (double*)vt, &ldv, (double*)&buffer[0], &lwork, iworkBuf, _info);
+    אם(typeid(fptype) == typeid(عائم))
+        OCV_LAPACK_FUNC(sgesdd)(mode, &_m, &_n, (عائم*)a, &lda, (عائم*)w, (عائم*)u, &ldu, (عائم*)vt, &ldv, (عائم*)&buffer[0], &lwork, iworkBuf, _info);
+    אחרת אם(typeid(fptype) == typeid(مزدوج))
+        OCV_LAPACK_FUNC(dgesdd)(mode, &_m, &_n, (مزدوج*)a, &lda, (مزدوج*)w, (مزدوج*)u, &ldu, (مزدوج*)vt, &ldv, (مزدوج*)&buffer[0], &lwork, iworkBuf, _info);
 
-#if defined (ACCELERATE_NEW_LAPACK) && defined (ACCELERATE_LAPACK_ILP64)
-    *info = static_cast<int>(_info[0]);
+#אם defined (ACCELERATE_NEW_LAPACK) && defined (ACCELERATE_LAPACK_ILP64)
+    *info = static_cast<صحيح>(_info[0]);
 #endif
 
     // Make sure MSAN sees the memory as having been written.
     // MSAN does not think it has been written because a different language was called.
     CV_ANNOTATE_MEMORY_IS_INITIALIZED(a, a_step * n);
-    if (u)
+    אם (u)
       CV_ANNOTATE_MEMORY_IS_INITIALIZED(u, u_step * m);
-    if (vt)
+    אם (vt)
       CV_ANNOTATE_MEMORY_IS_INITIALIZED(vt, v_step * n);
-    if (w)
-      CV_ANNOTATE_MEMORY_IS_INITIALIZED(w, sizeof(fptype) * std::min(m, n));
+    אם (w)
+      CV_ANNOTATE_MEMORY_IS_INITIALIZED(w, حجم(fptype) * std::min(m, n));
 
-    if(!(flags & CV_HAL_SVD_NO_UV))
+    אם(!(flags & CV_HAL_SVD_NO_UV))
         transpose_square_inplace(vt, ldv, n);
 
-    if((flags & CV_HAL_SVD_MODIFY_A) && (flags & CV_HAL_SVD_FULL_UV))
+    אם((flags & CV_HAL_SVD_MODIFY_A) && (flags & CV_HAL_SVD_FULL_UV))
     {
-        for(int i = 0; i < m; i++)
-            for(int j = 0; j < m; j++)
+        עבור(صحيح i = 0; i < m; i++)
+            עבור(صحيح j = 0; j < m; j++)
                 a[i*lda + j] = u[i*m + j];
     }
 
-    if(*info < 0)
-        return CV_HAL_ERROR_NOT_IMPLEMENTED;
-    return CV_HAL_ERROR_OK;
+    אם(*info < 0)
+        החזר CV_HAL_ERROR_NOT_IMPLEMENTED;
+    החזר CV_HAL_ERROR_OK;
 }
 
-template <typename fptype> static inline int
-lapack_QR(fptype* a, size_t a_step, int m, int n, int k, fptype* b, size_t b_step, fptype* dst, int* info)
+template <typename fptype> ساكن مضمن صحيح
+lapack_QR(fptype* a, size_t a_step, صحيح m, صحيح n, صحيح k, fptype* b, size_t b_step, fptype* dst, صحيح* info)
 {
-#if defined (ACCELERATE_NEW_LAPACK) && defined (ACCELERATE_LAPACK_ILP64)
+#אם defined (ACCELERATE_NEW_LAPACK) && defined (ACCELERATE_LAPACK_ILP64)
     long _m = static_cast<long>(m), _n = static_cast<long>(n), _k = static_cast<long>(k);
     long _info[1];
-    long lda = (long)(a_step / sizeof(fptype));
+    long lda = (long)(a_step / حجم(fptype));
     long lwork = -1;
     long ldtmpA;
-#else
-    int _m = m, _n = n, _k = k;
-    int* _info = info;
-    int lda = (int)(a_step / sizeof(fptype));
-    int lwork = -1;
-    int ldtmpA;
+#אחרת
+    صحيح _m = m, _n = n, _k = k;
+    صحيح* _info = info;
+    صحيح lda = (صحيح)(a_step / حجم(fptype));
+    صحيح lwork = -1;
+    صحيح ldtmpA;
 #endif
 
-    char mode[] = { 'N', '\0' };
-    if(m < n)
-        return CV_HAL_ERROR_NOT_IMPLEMENTED;
+    حرف mode[] = { 'N', '\0' };
+    אם(m < n)
+        החזר CV_HAL_ERROR_NOT_IMPLEMENTED;
 
     std::vector<fptype> tmpAMemHolder;
     fptype* tmpA;
 
-    if (m == n)
+    אם (m == n)
     {
         transpose_square_inplace(a, lda, m);
         tmpA = a;
         ldtmpA = lda;
     }
-    else
+    אחרת
     {
         tmpAMemHolder.resize(m*n);
         tmpA = &tmpAMemHolder.front();
@@ -370,357 +370,357 @@ lapack_QR(fptype* a, size_t a_step, int m, int n, int k, fptype* b, size_t b_ste
 
     fptype work1 = 0.;
 
-    if (b)
+    אם (b)
     {
-        if (k == 1 && b_step == sizeof(fptype))
+        אם (k == 1 && b_step == حجم(fptype))
         {
-            if (typeid(fptype) == typeid(float))
-                OCV_LAPACK_FUNC(sgels)(mode, &_m, &_n, &_k, (float*)tmpA, &ldtmpA, (float*)b, &_m, (float*)&work1, &lwork, _info);
-            else if (typeid(fptype) == typeid(double))
-                OCV_LAPACK_FUNC(dgels)(mode, &_m, &_n, &_k, (double*)tmpA, &ldtmpA, (double*)b, &_m, (double*)&work1, &lwork, _info);
+            אם (typeid(fptype) == typeid(عائم))
+                OCV_LAPACK_FUNC(sgels)(mode, &_m, &_n, &_k, (عائم*)tmpA, &ldtmpA, (عائم*)b, &_m, (عائم*)&work1, &lwork, _info);
+            אחרת אם (typeid(fptype) == typeid(مزدوج))
+                OCV_LAPACK_FUNC(dgels)(mode, &_m, &_n, &_k, (مزدوج*)tmpA, &ldtmpA, (مزدوج*)b, &_m, (مزدوج*)&work1, &lwork, _info);
 
-            CV_ANNOTATE_MEMORY_IS_INITIALIZED(info, sizeof(int));
-            if (*info < 0)
-                return CV_HAL_ERROR_NOT_IMPLEMENTED;
+            CV_ANNOTATE_MEMORY_IS_INITIALIZED(info, حجم(صحيح));
+            אם (*info < 0)
+                החזר CV_HAL_ERROR_NOT_IMPLEMENTED;
 
             lwork = cvRound(work1); //optimal buffer size
             std::vector<fptype> workBufMemHolder(lwork + 1);
             fptype* buffer = &workBufMemHolder.front();
 
-            if (typeid(fptype) == typeid(float))
-                OCV_LAPACK_FUNC(sgels)(mode, &_m, &_n, &_k, (float*)tmpA, &ldtmpA, (float*)b, &_m, (float*)buffer, &lwork, _info);
-            else if (typeid(fptype) == typeid(double))
-                OCV_LAPACK_FUNC(dgels)(mode, &_m, &_n, &_k, (double*)tmpA, &ldtmpA, (double*)b, &_m, (double*)buffer, &lwork, _info);
+            אם (typeid(fptype) == typeid(عائم))
+                OCV_LAPACK_FUNC(sgels)(mode, &_m, &_n, &_k, (عائم*)tmpA, &ldtmpA, (عائم*)b, &_m, (عائم*)buffer, &lwork, _info);
+            אחרת אם (typeid(fptype) == typeid(مزدوج))
+                OCV_LAPACK_FUNC(dgels)(mode, &_m, &_n, &_k, (مزدوج*)tmpA, &ldtmpA, (مزدوج*)b, &_m, (مزدوج*)buffer, &lwork, _info);
         }
-        else
+        אחרת
         {
             std::vector<fptype> tmpBMemHolder(m*k);
             fptype* tmpB = &tmpBMemHolder.front();
-            int ldb = (int)(b_step / sizeof(fptype));
+            صحيح ldb = (صحيح)(b_step / حجم(fptype));
             transpose(b, ldb, tmpB, m, m, k);
 
-            if (typeid(fptype) == typeid(float))
-                OCV_LAPACK_FUNC(sgels)(mode, &_m, &_n, &_k, (float*)tmpA, &ldtmpA, (float*)tmpB, &_m, (float*)&work1, &lwork, _info);
-            else if (typeid(fptype) == typeid(double))
-                OCV_LAPACK_FUNC(dgels)(mode, &_m, &_n, &_k, (double*)tmpA, &ldtmpA, (double*)tmpB, &_m, (double*)&work1, &lwork, _info);
+            אם (typeid(fptype) == typeid(عائم))
+                OCV_LAPACK_FUNC(sgels)(mode, &_m, &_n, &_k, (عائم*)tmpA, &ldtmpA, (عائم*)tmpB, &_m, (عائم*)&work1, &lwork, _info);
+            אחרת אם (typeid(fptype) == typeid(مزدوج))
+                OCV_LAPACK_FUNC(dgels)(mode, &_m, &_n, &_k, (مزدوج*)tmpA, &ldtmpA, (مزدوج*)tmpB, &_m, (مزدوج*)&work1, &lwork, _info);
 
-            CV_ANNOTATE_MEMORY_IS_INITIALIZED(info, sizeof(int));
-            if (*info < 0)
-                return CV_HAL_ERROR_NOT_IMPLEMENTED;
+            CV_ANNOTATE_MEMORY_IS_INITIALIZED(info, حجم(صحيح));
+            אם (*info < 0)
+                החזר CV_HAL_ERROR_NOT_IMPLEMENTED;
 
             lwork = cvRound(work1); //optimal buffer size
             std::vector<fptype> workBufMemHolder(lwork + 1);
             fptype* buffer = &workBufMemHolder.front();
 
-            if (typeid(fptype) == typeid(float))
-                OCV_LAPACK_FUNC(sgels)(mode, &_m, &_n, &_k, (float*)tmpA, &ldtmpA, (float*)tmpB, &_m, (float*)buffer, &lwork, _info);
-            else if (typeid(fptype) == typeid(double))
-                OCV_LAPACK_FUNC(dgels)(mode, &_m, &_n, &_k, (double*)tmpA, &ldtmpA, (double*)tmpB, &_m, (double*)buffer, &lwork, _info);
+            אם (typeid(fptype) == typeid(عائم))
+                OCV_LAPACK_FUNC(sgels)(mode, &_m, &_n, &_k, (عائم*)tmpA, &ldtmpA, (عائم*)tmpB, &_m, (عائم*)buffer, &lwork, _info);
+            אחרת אם (typeid(fptype) == typeid(مزدوج))
+                OCV_LAPACK_FUNC(dgels)(mode, &_m, &_n, &_k, (مزدوج*)tmpA, &ldtmpA, (مزدوج*)tmpB, &_m, (مزدوج*)buffer, &lwork, _info);
 
             transpose(tmpB, m, b, ldb, k, m);
         }
     }
-    else
+    אחרת
     {
-        if (typeid(fptype) == typeid(float))
-            sgeqrf_(&_m, &_n, (float*)tmpA, &ldtmpA, (float*)dst, (float*)&work1, &lwork, _info);
-        else if (typeid(fptype) == typeid(double))
-            dgeqrf_(&_m, &_n, (double*)tmpA, &ldtmpA, (double*)dst, (double*)&work1, &lwork, _info);
+        אם (typeid(fptype) == typeid(عائم))
+            sgeqrf_(&_m, &_n, (عائم*)tmpA, &ldtmpA, (عائم*)dst, (عائم*)&work1, &lwork, _info);
+        אחרת אם (typeid(fptype) == typeid(مزدوج))
+            dgeqrf_(&_m, &_n, (مزدوج*)tmpA, &ldtmpA, (مزدوج*)dst, (مزدوج*)&work1, &lwork, _info);
 
-        CV_ANNOTATE_MEMORY_IS_INITIALIZED(info, sizeof(int));
-        if (*info < 0)
-            return CV_HAL_ERROR_NOT_IMPLEMENTED;
+        CV_ANNOTATE_MEMORY_IS_INITIALIZED(info, حجم(صحيح));
+        אם (*info < 0)
+            החזר CV_HAL_ERROR_NOT_IMPLEMENTED;
 
         lwork = cvRound(work1); //optimal buffer size
         std::vector<fptype> workBufMemHolder(lwork + 1);
         fptype* buffer = &workBufMemHolder.front();
 
-        if (typeid(fptype) == typeid(float))
-            sgeqrf_(&_m, &_n, (float*)tmpA, &ldtmpA, (float*)dst, (float*)buffer, &lwork, _info);
-        else if (typeid(fptype) == typeid(double))
-            dgeqrf_(&_m, &_n, (double*)tmpA, &ldtmpA, (double*)dst, (double*)buffer, &lwork, _info);
+        אם (typeid(fptype) == typeid(عائم))
+            sgeqrf_(&_m, &_n, (عائم*)tmpA, &ldtmpA, (عائم*)dst, (عائم*)buffer, &lwork, _info);
+        אחרת אם (typeid(fptype) == typeid(مزدوج))
+            dgeqrf_(&_m, &_n, (مزدوج*)tmpA, &ldtmpA, (مزدوج*)dst, (مزدوج*)buffer, &lwork, _info);
     }
 
-    CV_ANNOTATE_MEMORY_IS_INITIALIZED(info, sizeof(int));
-    if (m == n)
+    CV_ANNOTATE_MEMORY_IS_INITIALIZED(info, حجم(صحيح));
+    אם (m == n)
         transpose_square_inplace(a, lda, m);
-    else
+    אחרת
         transpose(tmpA, m, a, lda, n, m);
 
-#if defined (ACCELERATE_NEW_LAPACK) && defined (ACCELERATE_LAPACK_ILP64)
-    *info = static_cast<int>(_info[0]);
+#אם defined (ACCELERATE_NEW_LAPACK) && defined (ACCELERATE_LAPACK_ILP64)
+    *info = static_cast<صحيح>(_info[0]);
 #endif
 
-    if (*info != 0)
+    אם (*info != 0)
         *info = 0;
-    else
+    אחרת
         *info = 1;
 
-    return CV_HAL_ERROR_OK;
+    החזר CV_HAL_ERROR_OK;
 }
 
-template <typename fptype> static inline int
-lapack_gemm(const fptype *src1, size_t src1_step, const fptype *src2, size_t src2_step, fptype alpha,
-            const fptype *src3, size_t src3_step, fptype beta, fptype *dst, size_t dst_step, int a_m, int a_n, int d_n, int flags)
+template <typename fptype> ساكن مضمن صحيح
+lapack_gemm(ثابت fptype *src1, size_t src1_step, ثابت fptype *src2, size_t src2_step, fptype alpha,
+            ثابت fptype *src3, size_t src3_step, fptype beta, fptype *dst, size_t dst_step, صحيح a_m, صحيح a_n, صحيح d_n, صحيح flags)
 {
-    int ldsrc1 = (int)(src1_step / sizeof(fptype));
-    int ldsrc2 = (int)(src2_step / sizeof(fptype));
-    int ldsrc3 = (int)(src3_step / sizeof(fptype));
-    int lddst = (int)(dst_step / sizeof(fptype));
-    int c_m, c_n, d_m;
+    صحيح ldsrc1 = (صحيح)(src1_step / حجم(fptype));
+    صحيح ldsrc2 = (صحيح)(src2_step / حجم(fptype));
+    صحيح ldsrc3 = (صحيح)(src3_step / حجم(fptype));
+    صحيح lddst = (صحيح)(dst_step / حجم(fptype));
+    صحيح c_m, c_n, d_m;
     CBLAS_TRANSPOSE transA, transB;
 
-    if(flags & CV_HAL_GEMM_2_T)
+    אם(flags & CV_HAL_GEMM_2_T)
     {
         transB = CblasTrans;
-        if(flags & CV_HAL_GEMM_1_T )
+        אם(flags & CV_HAL_GEMM_1_T )
         {
             d_m = a_n;
         }
-        else
+        אחרת
         {
             d_m = a_m;
         }
     }
-    else
+    אחרת
     {
         transB = CblasNoTrans;
-        if(flags & CV_HAL_GEMM_1_T )
+        אם(flags & CV_HAL_GEMM_1_T )
         {
             d_m = a_n;
         }
-        else
+        אחרת
         {
             d_m = a_m;
         }
     }
 
-    if(flags & CV_HAL_GEMM_3_T)
+    אם(flags & CV_HAL_GEMM_3_T)
     {
         c_m = d_n;
         c_n = d_m;
     }
-    else
+    אחרת
     {
         c_m = d_m;
         c_n = d_n;
     }
 
-    if(flags & CV_HAL_GEMM_1_T )
+    אם(flags & CV_HAL_GEMM_1_T )
     {
         transA = CblasTrans;
         std::swap(a_n, a_m);
     }
-    else
+    אחרת
     {
         transA = CblasNoTrans;
     }
 
-    if(src3 != dst && beta != 0.0 && src3_step != 0) {
-        if(flags & CV_HAL_GEMM_3_T)
+    אם(src3 != dst && beta != 0.0 && src3_step != 0) {
+        אם(flags & CV_HAL_GEMM_3_T)
             transpose(src3, ldsrc3, dst, lddst, c_m, c_n);
-        else
+        אחרת
             copy_matrix(src3, ldsrc3, dst, lddst, c_m, c_n);
     }
-    else if (src3 == dst && (flags & CV_HAL_GEMM_3_T)) //actually transposing C in this case done by openCV
-        return CV_HAL_ERROR_NOT_IMPLEMENTED;
-    else if(src3_step == 0 && beta != 0.0)
+    אחרת אם (src3 == dst && (flags & CV_HAL_GEMM_3_T)) //actually transposing C in this case done by openCV
+        החזר CV_HAL_ERROR_NOT_IMPLEMENTED;
+    אחרת אם(src3_step == 0 && beta != 0.0)
         set_value(dst, lddst, (fptype)0.0, d_m, d_n);
 
-    if(typeid(fptype) == typeid(float))
-        cblas_sgemm(CblasRowMajor, transA, transB, a_m, d_n, a_n, (float)alpha, (float*)src1, ldsrc1, (float*)src2, ldsrc2, (float)beta, (float*)dst, lddst);
-    else if(typeid(fptype) == typeid(double))
-        cblas_dgemm(CblasRowMajor, transA, transB, a_m, d_n, a_n, (double)alpha, (double*)src1, ldsrc1, (double*)src2, ldsrc2, (double)beta, (double*)dst, lddst);
+    אם(typeid(fptype) == typeid(عائم))
+        cblas_sgemm(CblasRowMajor, transA, transB, a_m, d_n, a_n, (عائم)alpha, (عائم*)src1, ldsrc1, (عائم*)src2, ldsrc2, (عائم)beta, (عائم*)dst, lddst);
+    אחרת אם(typeid(fptype) == typeid(مزدوج))
+        cblas_dgemm(CblasRowMajor, transA, transB, a_m, d_n, a_n, (مزدوج)alpha, (مزدوج*)src1, ldsrc1, (مزدوج*)src2, ldsrc2, (مزدوج)beta, (مزدوج*)dst, lddst);
 
-    return CV_HAL_ERROR_OK;
+    החזר CV_HAL_ERROR_OK;
 }
 
-template <typename fptype> static inline int
-lapack_gemm_c(const fptype *src1, size_t src1_step, const fptype *src2, size_t src2_step, fptype alpha,
-            const fptype *src3, size_t src3_step, fptype beta, fptype *dst, size_t dst_step, int a_m, int a_n, int d_n, int flags)
+template <typename fptype> ساكن مضمن صحيح
+lapack_gemm_c(ثابت fptype *src1, size_t src1_step, ثابت fptype *src2, size_t src2_step, fptype alpha,
+            ثابت fptype *src3, size_t src3_step, fptype beta, fptype *dst, size_t dst_step, صحيح a_m, صحيح a_n, صحيح d_n, صحيح flags)
 {
-    int ldsrc1 = (int)(src1_step / sizeof(std::complex<fptype>));
-    int ldsrc2 = (int)(src2_step / sizeof(std::complex<fptype>));
-    int ldsrc3 = (int)(src3_step / sizeof(std::complex<fptype>));
-    int lddst = (int)(dst_step / sizeof(std::complex<fptype>));
-    int c_m, c_n, d_m;
+    صحيح ldsrc1 = (صحيح)(src1_step / حجم(std::complex<fptype>));
+    صحيح ldsrc2 = (صحيح)(src2_step / حجم(std::complex<fptype>));
+    صحيح ldsrc3 = (صحيح)(src3_step / حجم(std::complex<fptype>));
+    صحيح lddst = (صحيح)(dst_step / حجم(std::complex<fptype>));
+    صحيح c_m, c_n, d_m;
     CBLAS_TRANSPOSE transA, transB;
     std::complex<fptype> cAlpha(alpha, 0.0);
     std::complex<fptype> cBeta(beta, 0.0);
 
-    if(flags & CV_HAL_GEMM_2_T)
+    אם(flags & CV_HAL_GEMM_2_T)
     {
         transB = CblasTrans;
-        if(flags & CV_HAL_GEMM_1_T )
+        אם(flags & CV_HAL_GEMM_1_T )
         {
             d_m = a_n;
         }
-        else
+        אחרת
         {
             d_m = a_m;
         }
     }
-    else
+    אחרת
     {
         transB = CblasNoTrans;
-        if(flags & CV_HAL_GEMM_1_T )
+        אם(flags & CV_HAL_GEMM_1_T )
         {
             d_m = a_n;
         }
-        else
+        אחרת
         {
             d_m = a_m;
         }
     }
 
-    if(flags & CV_HAL_GEMM_3_T)
+    אם(flags & CV_HAL_GEMM_3_T)
     {
         c_m = d_n;
         c_n = d_m;
     }
-    else
+    אחרת
     {
         c_m = d_m;
         c_n = d_n;
     }
 
-    if(flags & CV_HAL_GEMM_1_T )
+    אם(flags & CV_HAL_GEMM_1_T )
     {
         transA = CblasTrans;
         std::swap(a_n, a_m);
     }
-    else
+    אחרת
     {
         transA = CblasNoTrans;
     }
 
-    if(src3 != dst && beta != 0.0 && src3_step != 0) {
-        if(flags & CV_HAL_GEMM_3_T)
+    אם(src3 != dst && beta != 0.0 && src3_step != 0) {
+        אם(flags & CV_HAL_GEMM_3_T)
             transpose((std::complex<fptype>*)src3, ldsrc3, (std::complex<fptype>*)dst, lddst, c_m, c_n);
-        else
+        אחרת
             copy_matrix((std::complex<fptype>*)src3, ldsrc3, (std::complex<fptype>*)dst, lddst, c_m, c_n);
     }
-    else if (src3 == dst && (flags & CV_HAL_GEMM_3_T)) //actually transposing C in this case done by openCV
-        return CV_HAL_ERROR_NOT_IMPLEMENTED;
-    else if(src3_step == 0 && beta != 0.0)
+    אחרת אם (src3 == dst && (flags & CV_HAL_GEMM_3_T)) //actually transposing C in this case done by openCV
+        החזר CV_HAL_ERROR_NOT_IMPLEMENTED;
+    אחרת אם(src3_step == 0 && beta != 0.0)
         set_value((std::complex<fptype>*)dst, lddst, std::complex<fptype>(0.0, 0.0), d_m, d_n);
 
     // FIXME: this is a workaround. Support ILP64 in HAL API.
-#if defined (ACCELERATE_NEW_LAPACK) && defined (ACCELERATE_LAPACK_ILP64)
-    int M = a_m, N = d_n, K = a_n;
-    if(typeid(fptype) == typeid(float)) {
-        auto src1_cast = (std::complex<float>*)(src1);
-        auto src2_cast = (std::complex<float>*)(src2);
-        auto dst_cast = (std::complex<float>*)(dst);
+#אם defined (ACCELERATE_NEW_LAPACK) && defined (ACCELERATE_LAPACK_ILP64)
+    صحيح M = a_m, N = d_n, K = a_n;
+    אם(typeid(fptype) == typeid(عائم)) {
+        auto src1_cast = (std::complex<عائم>*)(src1);
+        auto src2_cast = (std::complex<عائم>*)(src2);
+        auto dst_cast = (std::complex<عائم>*)(dst);
         long lda = ldsrc1, ldb = ldsrc2, ldc = lddst;
-        cblas_cgemm(CblasRowMajor, transA, transB, M, N, K, (std::complex<float>*)&cAlpha, src1_cast, lda, src2_cast, ldb, (std::complex<float>*)&cBeta, dst_cast, ldc);
+        cblas_cgemm(CblasRowMajor, transA, transB, M, N, K, (std::complex<عائم>*)&cAlpha, src1_cast, lda, src2_cast, ldb, (std::complex<عائم>*)&cBeta, dst_cast, ldc);
     }
-    else if(typeid(fptype) == typeid(double)) {
-        auto src1_cast = (std::complex<double>*)(src1);
-        auto src2_cast = (std::complex<double>*)(src2);
-        auto dst_cast = (std::complex<double>*)(dst);
+    אחרת אם(typeid(fptype) == typeid(مزدوج)) {
+        auto src1_cast = (std::complex<مزدوج>*)(src1);
+        auto src2_cast = (std::complex<مزدوج>*)(src2);
+        auto dst_cast = (std::complex<مزدوج>*)(dst);
         long lda = ldsrc1, ldb = ldsrc2, ldc = lddst;
-        cblas_zgemm(CblasRowMajor, transA, transB, M, N, K, (std::complex<double>*)&cAlpha, src1_cast, lda, src2_cast, ldb, (std::complex<double>*)&cBeta, dst_cast, ldc);
+        cblas_zgemm(CblasRowMajor, transA, transB, M, N, K, (std::complex<مزدوج>*)&cAlpha, src1_cast, lda, src2_cast, ldb, (std::complex<مزدوج>*)&cBeta, dst_cast, ldc);
     }
-#else
-    if(typeid(fptype) == typeid(float))
-        cblas_cgemm(CblasRowMajor, transA, transB, a_m, d_n, a_n, (float*)reinterpret_cast<fptype(&)[2]>(cAlpha), (float*)src1, ldsrc1, (float*)src2, ldsrc2, (float*)reinterpret_cast<fptype(&)[2]>(cBeta), (float*)dst, lddst);
-    else if(typeid(fptype) == typeid(double))
-        cblas_zgemm(CblasRowMajor, transA, transB, a_m, d_n, a_n, (double*)reinterpret_cast<fptype(&)[2]>(cAlpha), (double*)src1, ldsrc1, (double*)src2, ldsrc2, (double*)reinterpret_cast<fptype(&)[2]>(cBeta), (double*)dst, lddst);
+#אחרת
+    אם(typeid(fptype) == typeid(عائم))
+        cblas_cgemm(CblasRowMajor, transA, transB, a_m, d_n, a_n, (عائم*)reinterpret_cast<fptype(&)[2]>(cAlpha), (عائم*)src1, ldsrc1, (عائم*)src2, ldsrc2, (عائم*)reinterpret_cast<fptype(&)[2]>(cBeta), (عائم*)dst, lddst);
+    אחרת אם(typeid(fptype) == typeid(مزدوج))
+        cblas_zgemm(CblasRowMajor, transA, transB, a_m, d_n, a_n, (مزدوج*)reinterpret_cast<fptype(&)[2]>(cAlpha), (مزدوج*)src1, ldsrc1, (مزدوج*)src2, ldsrc2, (مزدوج*)reinterpret_cast<fptype(&)[2]>(cBeta), (مزدوج*)dst, lddst);
 #endif
 
-    return CV_HAL_ERROR_OK;
+    החזר CV_HAL_ERROR_OK;
 }
-int lapack_LU32f(float* a, size_t a_step, int m, float* b, size_t b_step, int n, int* info)
+صحيح lapack_LU32f(عائم* a, size_t a_step, صحيح m, عائم* b, size_t b_step, صحيح n, صحيح* info)
 {
-    if(m < HAL_LU_SMALL_MATRIX_THRESH)
-        return CV_HAL_ERROR_NOT_IMPLEMENTED;
-    return lapack_LU(a, a_step, m, b, b_step, n, info);
+    אם(m < HAL_LU_SMALL_MATRIX_THRESH)
+        החזר CV_HAL_ERROR_NOT_IMPLEMENTED;
+    החזר lapack_LU(a, a_step, m, b, b_step, n, info);
 }
 
-int lapack_LU64f(double* a, size_t a_step, int m, double* b, size_t b_step, int n, int* info)
+صحيح lapack_LU64f(مزدوج* a, size_t a_step, صحيح m, مزدوج* b, size_t b_step, صحيح n, صحيح* info)
 {
-    if(m < HAL_LU_SMALL_MATRIX_THRESH)
-        return CV_HAL_ERROR_NOT_IMPLEMENTED;
-    return lapack_LU(a, a_step, m, b, b_step, n, info);
+    אם(m < HAL_LU_SMALL_MATRIX_THRESH)
+        החזר CV_HAL_ERROR_NOT_IMPLEMENTED;
+    החזר lapack_LU(a, a_step, m, b, b_step, n, info);
 }
 
-int lapack_Cholesky32f(float* a, size_t a_step, int m, float* b, size_t b_step, int n, bool *info)
+صحيح lapack_Cholesky32f(عائم* a, size_t a_step, صحيح m, عائم* b, size_t b_step, صحيح n, منطقي *info)
 {
-    if(m < HAL_CHOLESKY_SMALL_MATRIX_THRESH)
-        return CV_HAL_ERROR_NOT_IMPLEMENTED;
-    return lapack_Cholesky(a, a_step, m, b, b_step, n, info);
+    אם(m < HAL_CHOLESKY_SMALL_MATRIX_THRESH)
+        החזר CV_HAL_ERROR_NOT_IMPLEMENTED;
+    החזר lapack_Cholesky(a, a_step, m, b, b_step, n, info);
 }
 
-int lapack_Cholesky64f(double* a, size_t a_step, int m, double* b, size_t b_step, int n, bool *info)
+صحيح lapack_Cholesky64f(مزدوج* a, size_t a_step, صحيح m, مزدوج* b, size_t b_step, صحيح n, منطقي *info)
 {
-    if(m < HAL_CHOLESKY_SMALL_MATRIX_THRESH)
-        return CV_HAL_ERROR_NOT_IMPLEMENTED;
-    return lapack_Cholesky(a, a_step, m, b, b_step, n, info);
+    אם(m < HAL_CHOLESKY_SMALL_MATRIX_THRESH)
+        החזר CV_HAL_ERROR_NOT_IMPLEMENTED;
+    החזר lapack_Cholesky(a, a_step, m, b, b_step, n, info);
 }
 
-int lapack_SVD32f(float* a, size_t a_step, float *w, float* u, size_t u_step, float* vt, size_t v_step, int m, int n, int flags)
+صحيح lapack_SVD32f(عائم* a, size_t a_step, عائم *w, عائم* u, size_t u_step, عائم* vt, size_t v_step, صحيح m, صحيح n, صحيح flags)
 {
-    if(m < HAL_SVD_SMALL_MATRIX_THRESH || n <= 0)
-        return CV_HAL_ERROR_NOT_IMPLEMENTED;
-    int info = 0;
-    return lapack_SVD(a, a_step, w, u, u_step, vt, v_step, m, n, flags, &info);
+    אם(m < HAL_SVD_SMALL_MATRIX_THRESH || n <= 0)
+        החזר CV_HAL_ERROR_NOT_IMPLEMENTED;
+    صحيح info = 0;
+    החזר lapack_SVD(a, a_step, w, u, u_step, vt, v_step, m, n, flags, &info);
 }
 
-int lapack_SVD64f(double* a, size_t a_step, double *w, double* u, size_t u_step, double* vt, size_t v_step, int m, int n, int flags)
+صحيح lapack_SVD64f(مزدوج* a, size_t a_step, مزدوج *w, مزدوج* u, size_t u_step, مزدوج* vt, size_t v_step, صحيح m, صحيح n, صحيح flags)
 {
-    if(m < HAL_SVD_SMALL_MATRIX_THRESH || n <= 0)
-        return CV_HAL_ERROR_NOT_IMPLEMENTED;
-    int info = 0;
-    return lapack_SVD(a, a_step, w, u, u_step, vt, v_step, m, n, flags, &info);
+    אם(m < HAL_SVD_SMALL_MATRIX_THRESH || n <= 0)
+        החזר CV_HAL_ERROR_NOT_IMPLEMENTED;
+    صحيح info = 0;
+    החזר lapack_SVD(a, a_step, w, u, u_step, vt, v_step, m, n, flags, &info);
 }
 
-int lapack_QR32f(float* src1, size_t src1_step, int m, int n, int k, float* src2, size_t src2_step, float* dst, int* info)
+صحيح lapack_QR32f(عائم* src1, size_t src1_step, صحيح m, صحيح n, صحيح k, عائم* src2, size_t src2_step, عائم* dst, صحيح* info)
 {
-    if (m < HAL_QR_SMALL_MATRIX_THRESH)
-      return CV_HAL_ERROR_NOT_IMPLEMENTED;
-    return lapack_QR(src1, src1_step, m, n, k, src2, src2_step, dst, info);
+    אם (m < HAL_QR_SMALL_MATRIX_THRESH)
+      החזר CV_HAL_ERROR_NOT_IMPLEMENTED;
+    החזר lapack_QR(src1, src1_step, m, n, k, src2, src2_step, dst, info);
 }
 
-int lapack_QR64f(double* src1, size_t src1_step, int m, int n, int k, double* src2, size_t src2_step, double* dst, int* info)
+صحيح lapack_QR64f(مزدوج* src1, size_t src1_step, صحيح m, صحيح n, صحيح k, مزدوج* src2, size_t src2_step, مزدوج* dst, صحيح* info)
 {
-    if (m < HAL_QR_SMALL_MATRIX_THRESH)
-      return CV_HAL_ERROR_NOT_IMPLEMENTED;
-    return lapack_QR(src1, src1_step, m, n, k, src2, src2_step, dst, info);
+    אם (m < HAL_QR_SMALL_MATRIX_THRESH)
+      החזר CV_HAL_ERROR_NOT_IMPLEMENTED;
+    החזר lapack_QR(src1, src1_step, m, n, k, src2, src2_step, dst, info);
 }
 
-int lapack_gemm32f(const float *src1, size_t src1_step, const float *src2, size_t src2_step, float alpha,
-                   const float *src3, size_t src3_step, float beta, float *dst, size_t dst_step, int m, int n, int k, int flags)
+صحيح lapack_gemm32f(ثابت عائم *src1, size_t src1_step, ثابت عائم *src2, size_t src2_step, عائم alpha,
+                   ثابت عائم *src3, size_t src3_step, عائم beta, عائم *dst, size_t dst_step, صحيح m, صحيح n, صحيح k, صحيح flags)
 {
-    if(m < HAL_GEMM_SMALL_MATRIX_THRESH)
-        return CV_HAL_ERROR_NOT_IMPLEMENTED;
-    return lapack_gemm(src1, src1_step, src2, src2_step, alpha, src3, src3_step, beta, dst, dst_step, m, n, k, flags);
+    אם(m < HAL_GEMM_SMALL_MATRIX_THRESH)
+        החזר CV_HAL_ERROR_NOT_IMPLEMENTED;
+    החזר lapack_gemm(src1, src1_step, src2, src2_step, alpha, src3, src3_step, beta, dst, dst_step, m, n, k, flags);
 }
 
-int lapack_gemm64f(const double *src1, size_t src1_step, const double *src2, size_t src2_step, double alpha,
-                   const double *src3, size_t src3_step, double beta, double *dst, size_t dst_step, int m, int n, int k, int flags)
+صحيح lapack_gemm64f(ثابت مزدوج *src1, size_t src1_step, ثابت مزدوج *src2, size_t src2_step, مزدوج alpha,
+                   ثابت مزدوج *src3, size_t src3_step, مزدوج beta, مزدوج *dst, size_t dst_step, صحيح m, صحيح n, صحيح k, صحيح flags)
 {
-    if(m < HAL_GEMM_SMALL_MATRIX_THRESH)
-        return CV_HAL_ERROR_NOT_IMPLEMENTED;
-    return lapack_gemm(src1, src1_step, src2, src2_step, alpha, src3, src3_step, beta, dst, dst_step, m, n, k, flags);
+    אם(m < HAL_GEMM_SMALL_MATRIX_THRESH)
+        החזר CV_HAL_ERROR_NOT_IMPLEMENTED;
+    החזר lapack_gemm(src1, src1_step, src2, src2_step, alpha, src3, src3_step, beta, dst, dst_step, m, n, k, flags);
 }
 
-int lapack_gemm32fc(const float *src1, size_t src1_step, const float *src2, size_t src2_step, float alpha,
-                   const float *src3, size_t src3_step, float beta, float *dst, size_t dst_step, int m, int n, int k, int flags)
+صحيح lapack_gemm32fc(ثابت عائم *src1, size_t src1_step, ثابت عائم *src2, size_t src2_step, عائم alpha,
+                   ثابت عائم *src3, size_t src3_step, عائم beta, عائم *dst, size_t dst_step, صحيح m, صحيح n, صحيح k, صحيح flags)
 {
-    if(m < HAL_GEMM_SMALL_COMPLEX_MATRIX_THRESH)
-        return CV_HAL_ERROR_NOT_IMPLEMENTED;
-    return lapack_gemm_c(src1, src1_step, src2, src2_step, alpha, src3, src3_step, beta, dst, dst_step, m, n, k, flags);
+    אם(m < HAL_GEMM_SMALL_COMPLEX_MATRIX_THRESH)
+        החזר CV_HAL_ERROR_NOT_IMPLEMENTED;
+    החזר lapack_gemm_c(src1, src1_step, src2, src2_step, alpha, src3, src3_step, beta, dst, dst_step, m, n, k, flags);
 }
-int lapack_gemm64fc(const double *src1, size_t src1_step, const double *src2, size_t src2_step, double alpha,
-                   const double *src3, size_t src3_step, double beta, double *dst, size_t dst_step, int m, int n, int k, int flags)
+صحيح lapack_gemm64fc(ثابت مزدوج *src1, size_t src1_step, ثابت مزدوج *src2, size_t src2_step, مزدوج alpha,
+                   ثابت مزدوج *src3, size_t src3_step, مزدوج beta, مزدوج *dst, size_t dst_step, صحيح m, صحيح n, صحيح k, صحيح flags)
 {
-    if(m < HAL_GEMM_SMALL_COMPLEX_MATRIX_THRESH)
-        return CV_HAL_ERROR_NOT_IMPLEMENTED;
-    return lapack_gemm_c(src1, src1_step, src2, src2_step, alpha, src3, src3_step, beta, dst, dst_step, m, n, k, flags);
+    אם(m < HAL_GEMM_SMALL_COMPLEX_MATRIX_THRESH)
+        החזר CV_HAL_ERROR_NOT_IMPLEMENTED;
+    החזר lapack_gemm_c(src1, src1_step, src2, src2_step, alpha, src3, src3_step, beta, dst, dst_step, m, n, k, flags);
 }
 
-#if defined(__APPLE__) && defined(__clang__)
+#אם defined(__APPLE__) && defined(__clang__)
 #pragma clang diagnostic pop
 #endif
 

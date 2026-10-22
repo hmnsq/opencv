@@ -2,72 +2,72 @@
 // It is subject to the license terms in the LICENSE file found in the top-level directory
 // of this distribution and at http://opencv.org/license.html.
 
-#include "precomp.hpp"
+#ضمن "precomp.hpp"
 
-#include <opencv2/core/utils/configuration.private.hpp>
-#include <opencv2/core/utils/logger.hpp>
-#include "utils/logtagmanager.hpp"
-#include "utils/logtagconfigparser.hpp"
+#ضمن <opencv2/core/utils/configuration.private.hpp>
+#ضمن <opencv2/core/utils/logger.hpp>
+#ضمن "utils/logtagmanager.hpp"
+#ضمن "utils/logtagconfigparser.hpp"
 
-#include <sstream>
-#include <iostream>
-#include <fstream>
-#include <atomic>
+#ضمن <sstream>
+#ضمن <iostream>
+#ضمن <fstream>
+#ضمن <atomic>
 
 #ifdef __ANDROID__
 # include <android/log.h>
 #endif
 
-namespace cv {
-namespace utils {
-namespace logging {
+نطاق cv {
+نطاق utils {
+نطاق logging {
 
-namespace internal
+نطاق internal
 {
 
 // Combining several things that require static dynamic initialization in a
 // well-defined order into a struct.
 //
-struct GlobalLoggingInitStruct
+بنية GlobalLoggingInitStruct
 {
-public:
-#if defined NDEBUG
-    static const bool m_isDebugBuild = false;
-#else
-    static const bool m_isDebugBuild = true;
+عام:
+#אם defined NDEBUG
+    ساكن ثابت منطقي m_isDebugBuild = שקר;
+#אחרת
+    ساكن ثابت منطقي m_isDebugBuild = אמת;
 #endif
 
-public:
-    static LogLevel m_defaultUnconfiguredGlobalLevel;
+عام:
+    ساكن LogLevel m_defaultUnconfiguredGlobalLevel;
 
-public:
+عام:
     LogTagManager logTagManager;
 
     GlobalLoggingInitStruct()
         : logTagManager(m_defaultUnconfiguredGlobalLevel)
     {
-        (void)getInitializationMutex();  // ensure initialization of global objects
+        (فراغ)getInitializationMutex();  // ensure initialization of global objects
 
         applyConfigString();
         handleMalformed();
     }
 
-private:
-    void applyConfigString()
+خاص:
+    فراغ applyConfigString()
     {
         logTagManager.setConfigString(utils::getConfigurationParameterString("OPENCV_LOG_LEVEL", ""));
     }
 
-    void handleMalformed()
+    فراغ handleMalformed()
     {
         // need to print warning for malformed log tag config strings?
-        if (m_isDebugBuild)
+        אם (m_isDebugBuild)
         {
-            const auto& parser = logTagManager.getConfigParser();
-            if (parser.hasMalformed())
+            ثابت auto& parser = logTagManager.getConfigParser();
+            אם (parser.hasMalformed())
             {
-                const auto& malformedList = parser.getMalformed();
-                for (const auto& malformed : malformedList)
+                ثابت auto& malformedList = parser.getMalformed();
+                עבור (ثابت auto& malformed : malformedList)
                 {
                     std::cout << "Malformed log level config: \"" << malformed << "\"\n";
                 }
@@ -93,9 +93,9 @@ LogLevel GlobalLoggingInitStruct::m_defaultUnconfiguredGlobalLevel = GlobalLoggi
 // An initialization guard function only guarantees initialization upon
 // the first call to this function.
 //
-static GlobalLoggingInitStruct& getGlobalLoggingInitStruct()
+ساكن GlobalLoggingInitStruct& getGlobalLoggingInitStruct()
 {
-    CV_SINGLETON_LAZY_INIT_REF(GlobalLoggingInitStruct, new GlobalLoggingInitStruct());
+    CV_SINGLETON_LAZY_INIT_REF(GlobalLoggingInitStruct, جديد GlobalLoggingInitStruct());
 }
 
 // To ensure that the combined struct defined above is initialized even
@@ -103,193 +103,193 @@ static GlobalLoggingInitStruct& getGlobalLoggingInitStruct()
 // instance of a struct is defined below, which will call the
 // initialization guard function.
 //
-struct GlobalLoggingInitCall
+بنية GlobalLoggingInitCall
 {
     GlobalLoggingInitCall()
     {
         getGlobalLoggingInitStruct();
-        (void)getGlobalLogTag();  // complete initialization of logger structures
+        (فراغ)getGlobalLogTag();  // complete initialization of logger structures
     }
 };
 
-static GlobalLoggingInitCall globalLoggingInitCall;
+ساكن GlobalLoggingInitCall globalLoggingInitCall;
 
-static LogTagManager& getLogTagManager()
+ساكن LogTagManager& getLogTagManager()
 {
-    static LogTagManager& logTagManagerInstance = getGlobalLoggingInitStruct().logTagManager;
-    return logTagManagerInstance;
+    ساكن LogTagManager& logTagManagerInstance = getGlobalLoggingInitStruct().logTagManager;
+    החזר logTagManagerInstance;
 }
 
-static LogLevel& getLogLevelVariable()
+ساكن LogLevel& getLogLevelVariable()
 {
-    static LogLevel& refGlobalLogLevel = getGlobalLogTag()->level;
-    return refGlobalLogLevel;
+    ساكن LogLevel& refGlobalLogLevel = getGlobalLogTag()->level;
+    החזר refGlobalLogLevel;
 }
 
 LogTag* getGlobalLogTag()
 {
-    static LogTag* globalLogTagPtr = getGlobalLoggingInitStruct().logTagManager.get("global");
-    return globalLogTagPtr;
+    ساكن LogTag* globalLogTagPtr = getGlobalLoggingInitStruct().logTagManager.get("global");
+    החזר globalLogTagPtr;
 }
 
 } // namespace
 
-void registerLogTag(LogTag* plogtag)
+فراغ registerLogTag(LogTag* plogtag)
 {
-    if (!plogtag || !plogtag->name)
+    אם (!plogtag || !plogtag->name)
     {
-        return;
+        החזר;
     }
     internal::getLogTagManager().assign(plogtag->name, plogtag);
 }
 
-void setLogTagLevel(const char* tag, LogLevel level)
+فراغ setLogTagLevel(ثابت حرف* tag, LogLevel level)
 {
-    if (!tag)
+    אם (!tag)
     {
-        return;
+        החזר;
     }
     internal::getLogTagManager().setLevelByFullName(std::string(tag), level);
 }
 
-LogLevel getLogTagLevel(const char* tag)
+LogLevel getLogTagLevel(ثابت حرف* tag)
 {
-    if (!tag)
+    אם (!tag)
     {
-        return getLogLevel();
+        החזר getLogLevel();
     }
-    const LogTag* ptr = internal::getLogTagManager().get(std::string(tag));
-    if (!ptr)
+    ثابت LogTag* ptr = internal::getLogTagManager().get(std::string(tag));
+    אם (!ptr)
     {
-        return getLogLevel();
+        החזר getLogLevel();
     }
-    return ptr->level;
+    החזר ptr->level;
 }
 
 LogLevel setLogLevel(LogLevel logLevel)
 {
     // note: not thread safe, use sparingly and do not critically depend on outcome
     LogLevel& refGlobalLevel = internal::getLogLevelVariable();
-    const LogLevel old = refGlobalLevel;
+    ثابت LogLevel old = refGlobalLevel;
     refGlobalLevel = logLevel;
-    return old;
+    החזר old;
 }
 
 LogLevel getLogLevel()
 {
-    return internal::getLogLevelVariable();
+    החזר internal::getLogLevelVariable();
 }
 
-namespace internal {
+نطاق internal {
 
-namespace //unnamed
+نطاق //unnamed
 {
     std::atomic<WriteLogMessageFuncType> stc_userWriteLogMessageFunc{};
     std::atomic<WriteLogMessageExFuncType> stc_userWriteLogMessageExFunc{};
 } //unnamed
 
-static int getShowTimestampMode()
+ساكن صحيح getShowTimestampMode()
 {
-    static bool param_timestamp_enable = utils::getConfigurationParameterBool("OPENCV_LOG_TIMESTAMP", true);
-    static bool param_timestamp_ns_enable = utils::getConfigurationParameterBool("OPENCV_LOG_TIMESTAMP_NS", false);
-    return (param_timestamp_enable ? 1 : 0) + (param_timestamp_ns_enable ? 2 : 0);
+    ساكن منطقي param_timestamp_enable = utils::getConfigurationParameterBool("OPENCV_LOG_TIMESTAMP", אמת);
+    ساكن منطقي param_timestamp_ns_enable = utils::getConfigurationParameterBool("OPENCV_LOG_TIMESTAMP_NS", שקר);
+    החזר (param_timestamp_enable ? 1 : 0) + (param_timestamp_ns_enable ? 2 : 0);
 }
 
-void writeLogMessage(LogLevel logLevel, const char* message)
+فراغ writeLogMessage(LogLevel logLevel, ثابت حرف* message)
 {
     WriteLogMessageFuncType userFunc = stc_userWriteLogMessageFunc.load();
-    if (userFunc && userFunc != writeLogMessage)
+    אם (userFunc && userFunc != writeLogMessage)
     {
         (*userFunc)(logLevel, message);
-        return;
+        החזר;
     }
 
-    const int threadID = cv::utils::getThreadID();
+    ثابت صحيح threadID = cv::utils::getThreadID();
 
     std::string message_id;
-    switch (getShowTimestampMode())
+    بدل (getShowTimestampMode())
     {
-        case 1: message_id = cv::format("%d@%0.3f", threadID, getTimestampNS() * 1e-9); break;
-        case 1+2: message_id = cv::format("%d@%llu", threadID, (long long unsigned int)getTimestampNS()); break;
-        default: message_id = cv::format("%d", threadID); break;
+        حالة 1: message_id = cv::format("%d@%0.3f", threadID, getTimestampNS() * 1e-9); اكسر;
+        حالة 1+2: message_id = cv::format("%d@%llu", threadID, (long long unsigned صحيح)getTimestampNS()); اكسر;
+        افتراضي: message_id = cv::format("%d", threadID); اكسر;
     }
 
     std::ostringstream ss;
-    switch (logLevel)
+    بدل (logLevel)
     {
-    case LOG_LEVEL_FATAL:   ss << "[FATAL:" << message_id << "] " << message << std::endl; break;
-    case LOG_LEVEL_ERROR:   ss << "[ERROR:" << message_id << "] " << message << std::endl; break;
-    case LOG_LEVEL_WARNING: ss << "[ WARN:" << message_id << "] " << message << std::endl; break;
-    case LOG_LEVEL_INFO:    ss << "[ INFO:" << message_id << "] " << message << std::endl; break;
-    case LOG_LEVEL_DEBUG:   ss << "[DEBUG:" << message_id << "] " << message << std::endl; break;
-    case LOG_LEVEL_VERBOSE: ss << message << std::endl; break;
-    case LOG_LEVEL_SILENT: return;  // avoid compiler warning about incomplete switch
-    case ENUM_LOG_LEVEL_FORCE_INT: return;  // avoid compiler warning about incomplete switch
+    حالة LOG_LEVEL_FATAL:   ss << "[FATAL:" << message_id << "] " << message << std::endl; اكسر;
+    حالة LOG_LEVEL_ERROR:   ss << "[ERROR:" << message_id << "] " << message << std::endl; اكسر;
+    حالة LOG_LEVEL_WARNING: ss << "[ WARN:" << message_id << "] " << message << std::endl; اكسر;
+    حالة LOG_LEVEL_INFO:    ss << "[ INFO:" << message_id << "] " << message << std::endl; اكسر;
+    حالة LOG_LEVEL_DEBUG:   ss << "[DEBUG:" << message_id << "] " << message << std::endl; اكسر;
+    حالة LOG_LEVEL_VERBOSE: ss << message << std::endl; اكسر;
+    حالة LOG_LEVEL_SILENT: החזר;  // avoid compiler warning about incomplete switch
+    حالة ENUM_LOG_LEVEL_FORCE_INT: החזר;  // avoid compiler warning about incomplete switch
     }
 #ifdef __ANDROID__
-    int android_logLevel = ANDROID_LOG_INFO;
-    switch (logLevel)
+    صحيح android_logLevel = ANDROID_LOG_INFO;
+    بدل (logLevel)
     {
-    case LOG_LEVEL_FATAL:   android_logLevel = ANDROID_LOG_FATAL; break;
-    case LOG_LEVEL_ERROR:   android_logLevel = ANDROID_LOG_ERROR; break;
-    case LOG_LEVEL_WARNING: android_logLevel = ANDROID_LOG_WARN; break;
-    case LOG_LEVEL_INFO:    android_logLevel = ANDROID_LOG_INFO; break;
-    case LOG_LEVEL_DEBUG:   android_logLevel = ANDROID_LOG_DEBUG; break;
-    case LOG_LEVEL_VERBOSE: android_logLevel = ANDROID_LOG_VERBOSE; break;
-    default:
-        break;
+    حالة LOG_LEVEL_FATAL:   android_logLevel = ANDROID_LOG_FATAL; اكسر;
+    حالة LOG_LEVEL_ERROR:   android_logLevel = ANDROID_LOG_ERROR; اكسر;
+    حالة LOG_LEVEL_WARNING: android_logLevel = ANDROID_LOG_WARN; اكسر;
+    حالة LOG_LEVEL_INFO:    android_logLevel = ANDROID_LOG_INFO; اكسر;
+    حالة LOG_LEVEL_DEBUG:   android_logLevel = ANDROID_LOG_DEBUG; اكسر;
+    حالة LOG_LEVEL_VERBOSE: android_logLevel = ANDROID_LOG_VERBOSE; اكسر;
+    افتراضي:
+        اكسر;
     }
     __android_log_print(android_logLevel, "OpenCV/" CV_VERSION, "%s", ss.str().c_str());
 #endif
     std::ostream* out = (logLevel <= LOG_LEVEL_WARNING) ? &std::cerr : &std::cout;
     (*out) << ss.str();
-    if (logLevel <= LOG_LEVEL_WARNING)
+    אם (logLevel <= LOG_LEVEL_WARNING)
     {
         (*out) << std::flush;
     }
 }
 
-static const char* stripSourceFilePathPrefix(const char* file)
+ساكن ثابت حرف* stripSourceFilePathPrefix(ثابت حرف* file)
 {
     CV_Assert(file);
-    const char* pos = file;
-    const char* strip_pos = NULL;
-    char ch = 0;
-    while ((ch = pos[0]) != 0)
+    ثابت حرف* pos = file;
+    ثابت حرف* strip_pos = عدم;
+    حرف ch = 0;
+    כלעוד ((ch = pos[0]) != 0)
     {
         ++pos;
-        if (ch == '/' || ch == '\\')
+        אם (ch == '/' || ch == '\\')
             strip_pos = pos;
     }
-    if (strip_pos == NULL || strip_pos == pos/*eos*/)
-        return file;
-    return strip_pos;
+    אם (strip_pos == عدم || strip_pos == pos/*eos*/)
+        החזר file;
+    החזר strip_pos;
 }
 
-void writeLogMessageEx(LogLevel logLevel, const char* tag, const char* file, int line, const char* func, const char* message)
+فراغ writeLogMessageEx(LogLevel logLevel, ثابت حرف* tag, ثابت حرف* file, صحيح line, ثابت حرف* func, ثابت حرف* message)
 {
     WriteLogMessageExFuncType userFunc = stc_userWriteLogMessageExFunc.load();
-    if (userFunc && userFunc != writeLogMessageEx)
+    אם (userFunc && userFunc != writeLogMessageEx)
     {
         (*userFunc)(logLevel, tag, file, line, func, message);
-        return;
+        החזר;
     }
 
     std::ostringstream strm;
-    if (tag)
+    אם (tag)
     {
         strm << tag << ' ';
     }
-    if (file)
+    אם (file)
     {
         strm << stripSourceFilePathPrefix(file);
-        if (line > 0)
+        אם (line > 0)
         {
             strm << ':' << line;
         }
         strm << ' ';
     }
-    if (func)
+    אם (func)
     {
         strm << func << ' ';
     }
@@ -297,18 +297,18 @@ void writeLogMessageEx(LogLevel logLevel, const char* tag, const char* file, int
     writeLogMessage(logLevel, strm.str().c_str());
 }
 
-void replaceWriteLogMessage(WriteLogMessageFuncType f)
+فراغ replaceWriteLogMessage(WriteLogMessageFuncType f)
 {
-    if (f == writeLogMessage)
+    אם (f == writeLogMessage)
     {
         f = nullptr;
     }
     stc_userWriteLogMessageFunc.store(f);
 }
 
-void replaceWriteLogMessageEx(WriteLogMessageExFuncType f)
+فراغ replaceWriteLogMessageEx(WriteLogMessageExFuncType f)
 {
-    if (f == writeLogMessageEx)
+    אם (f == writeLogMessageEx)
     {
         f = nullptr;
     }

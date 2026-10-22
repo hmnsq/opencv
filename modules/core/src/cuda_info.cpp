@@ -40,90 +40,90 @@
 //
 //M*/
 
-#include "precomp.hpp"
+#ضمن "precomp.hpp"
 
-using namespace cv;
-using namespace cv::cuda;
+using نطاق cv;
+using نطاق cv::cuda;
 
-int cv::cuda::getCudaEnabledDeviceCount()
+صحيح cv::cuda::getCudaEnabledDeviceCount()
 {
 #ifndef HAVE_CUDA
-    return 0;
-#else
-    int count;
+    החזר 0;
+#אחרת
+    صحيح count;
     cudaError_t error = cudaGetDeviceCount(&count);
 
-    if (error == cudaErrorInsufficientDriver)
-        return -1;
+    אם (error == cudaErrorInsufficientDriver)
+        החזר -1;
 
-    if (error == cudaErrorNoDevice)
-        return 0;
+    אם (error == cudaErrorNoDevice)
+        החזר 0;
 
     cudaSafeCall( error );
-    return count;
+    החזר count;
 #endif
 }
 
-void cv::cuda::setDevice(int device)
+فراغ cv::cuda::setDevice(صحيح device)
 {
 #ifndef HAVE_CUDA
     CV_UNUSED(device);
     throw_no_cuda();
-#else
+#אחרת
     cudaSafeCall( cudaSetDevice(device) );
     cudaSafeCall( cudaFree(0) );
 #endif
 }
 
-int cv::cuda::getDevice()
+صحيح cv::cuda::getDevice()
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    int device;
+#אחרת
+    صحيح device;
     cudaSafeCall( cudaGetDevice(&device) );
-    return device;
+    החזר device;
 #endif
 }
 
-void cv::cuda::resetDevice()
+فراغ cv::cuda::resetDevice()
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
+#אחרת
     cudaSafeCall( cudaDeviceReset() );
 #endif
 }
 
-bool cv::cuda::deviceSupports(FeatureSet feature_set)
+منطقي cv::cuda::deviceSupports(FeatureSet feature_set)
 {
 #ifndef HAVE_CUDA
     CV_UNUSED(feature_set);
     throw_no_cuda();
-#else
-    static int versions[] =
+#אחרת
+    ساكن صحيح versions[] =
     {
         -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1
     };
-    static const int cache_size = static_cast<int>(sizeof(versions) / sizeof(versions[0]));
+    ساكن ثابت صحيح cache_size = static_cast<صحيح>(حجم(versions) / حجم(versions[0]));
 
-    const int devId = getDevice();
+    ثابت صحيح devId = getDevice();
 
-    int version;
+    صحيح version;
 
-    if (devId < cache_size && versions[devId] >= 0)
+    אם (devId < cache_size && versions[devId] >= 0)
     {
         version = versions[devId];
     }
-    else
+    אחרת
     {
         DeviceInfo dev(devId);
         version = dev.majorVersion() * 10 + dev.minorVersion();
-        if (devId < cache_size)
+        אם (devId < cache_size)
             versions[devId] = version;
     }
 
-    return TargetArchs::builtWith(feature_set) && (version >= feature_set);
+    החזר TargetArchs::builtWith(feature_set) && (version >= feature_set);
 #endif
 }
 
@@ -132,29 +132,29 @@ bool cv::cuda::deviceSupports(FeatureSet feature_set)
 
 #ifdef HAVE_CUDA
 
-namespace
+نطاق
 {
-    class CudaArch
+    מחלקה CudaArch
     {
-    public:
+    عام:
         CudaArch();
 
-        bool builtWith(FeatureSet feature_set) const;
-        bool hasPtx(int major, int minor) const;
-        bool hasBin(int major, int minor) const;
-        bool hasEqualOrLessPtx(int major, int minor) const;
-        bool hasEqualOrGreaterPtx(int major, int minor) const;
-        bool hasEqualOrGreaterBin(int major, int minor) const;
+        منطقي builtWith(FeatureSet feature_set) ثابت;
+        منطقي hasPtx(صحيح major, صحيح minor) ثابت;
+        منطقي hasBin(صحيح major, صحيح minor) ثابت;
+        منطقي hasEqualOrLessPtx(صحيح major, صحيح minor) ثابت;
+        منطقي hasEqualOrGreaterPtx(صحيح major, صحيح minor) ثابت;
+        منطقي hasEqualOrGreaterBin(صحيح major, صحيح minor) ثابت;
 
-    private:
-        static void fromStr(const char* set_as_str, std::vector<int>& arr);
+    خاص:
+        ساكن فراغ fromStr(ثابت حرف* set_as_str, std::vector<صحيح>& arr);
 
-        std::vector<int> bin;
-        std::vector<int> ptx;
-        std::vector<int> features;
+        std::vector<صحيح> bin;
+        std::vector<صحيح> ptx;
+        std::vector<صحيح> features;
     };
 
-    const CudaArch cudaArch;
+    ثابت CudaArch cudaArch;
 
     CudaArch::CudaArch()
     {
@@ -163,54 +163,54 @@ namespace
         fromStr(CUDA_ARCH_FEATURES, features);
     }
 
-    bool CudaArch::builtWith(FeatureSet feature_set) const
+    منطقي CudaArch::builtWith(FeatureSet feature_set) ثابت
     {
-        return !features.empty() && (features.back() >= feature_set);
+        החזר !features.empty() && (features.back() >= feature_set);
     }
 
-    bool CudaArch::hasPtx(int major, int minor) const
+    منطقي CudaArch::hasPtx(صحيح major, صحيح minor) ثابت
     {
-        return std::find(ptx.begin(), ptx.end(), major * 10 + minor) != ptx.end();
+        החזר std::find(ptx.begin(), ptx.end(), major * 10 + minor) != ptx.end();
     }
 
-    bool CudaArch::hasBin(int major, int minor) const
+    منطقي CudaArch::hasBin(صحيح major, صحيح minor) ثابت
     {
-        return std::find(bin.begin(), bin.end(), major * 10 + minor) != bin.end();
+        החזר std::find(bin.begin(), bin.end(), major * 10 + minor) != bin.end();
     }
 
-    bool CudaArch::hasEqualOrLessPtx(int major, int minor) const
+    منطقي CudaArch::hasEqualOrLessPtx(صحيح major, صحيح minor) ثابت
     {
-        return !ptx.empty() && (ptx.front() <= major * 10 + minor);
+        החזר !ptx.empty() && (ptx.front() <= major * 10 + minor);
     }
 
-    bool CudaArch::hasEqualOrGreaterPtx(int major, int minor) const
+    منطقي CudaArch::hasEqualOrGreaterPtx(صحيح major, صحيح minor) ثابت
     {
-        return !ptx.empty() && (ptx.back() >= major * 10 + minor);
+        החזר !ptx.empty() && (ptx.back() >= major * 10 + minor);
     }
 
-    bool CudaArch::hasEqualOrGreaterBin(int major, int minor) const
+    منطقي CudaArch::hasEqualOrGreaterBin(صحيح major, صحيح minor) ثابت
     {
-        return !bin.empty() && (bin.back() >= major * 10 + minor);
+        החזר !bin.empty() && (bin.back() >= major * 10 + minor);
     }
 
-    void CudaArch::fromStr(const char* set_as_str, std::vector<int>& arr)
+    فراغ CudaArch::fromStr(ثابت حرف* set_as_str, std::vector<صحيح>& arr)
     {
         arr.clear();
 
-        const size_t len = strlen(set_as_str);
+        ثابت size_t len = strlen(set_as_str);
 
         size_t pos = 0;
-        while (pos < len)
+        כלעוד (pos < len)
         {
-            if (isspace(set_as_str[pos]))
+            אם (isspace(set_as_str[pos]))
             {
                 ++pos;
             }
-            else
+            אחרת
             {
-                int cur_value;
-                int chars_read;
-                int args_read = sscanf(set_as_str + pos, "%d%n", &cur_value, &chars_read);
+                صحيح cur_value;
+                صحيح chars_read;
+                صحيح args_read = sscanf(set_as_str + pos, "%d%n", &cur_value, &chars_read);
                 CV_Assert( args_read == 1 );
 
                 arr.push_back(cur_value);
@@ -224,68 +224,68 @@ namespace
 
 #endif
 
-bool cv::cuda::TargetArchs::builtWith(cv::cuda::FeatureSet feature_set)
+منطقي cv::cuda::TargetArchs::builtWith(cv::cuda::FeatureSet feature_set)
 {
 #ifndef HAVE_CUDA
     CV_UNUSED(feature_set);
     throw_no_cuda();
-#else
-    return cudaArch.builtWith(feature_set);
+#אחרת
+    החזר cudaArch.builtWith(feature_set);
 #endif
 }
 
-bool cv::cuda::TargetArchs::hasPtx(int major, int minor)
+منطقي cv::cuda::TargetArchs::hasPtx(صحيح major, صحيح minor)
 {
 #ifndef HAVE_CUDA
     CV_UNUSED(major);
     CV_UNUSED(minor);
     throw_no_cuda();
-#else
-    return cudaArch.hasPtx(major, minor);
+#אחרת
+    החזר cudaArch.hasPtx(major, minor);
 #endif
 }
 
-bool cv::cuda::TargetArchs::hasBin(int major, int minor)
+منطقي cv::cuda::TargetArchs::hasBin(صحيح major, صحيح minor)
 {
 #ifndef HAVE_CUDA
     CV_UNUSED(major);
     CV_UNUSED(minor);
     throw_no_cuda();
-#else
-    return cudaArch.hasBin(major, minor);
+#אחרת
+    החזר cudaArch.hasBin(major, minor);
 #endif
 }
 
-bool cv::cuda::TargetArchs::hasEqualOrLessPtx(int major, int minor)
+منطقي cv::cuda::TargetArchs::hasEqualOrLessPtx(صحيح major, صحيح minor)
 {
 #ifndef HAVE_CUDA
     CV_UNUSED(major);
     CV_UNUSED(minor);
     throw_no_cuda();
-#else
-    return cudaArch.hasEqualOrLessPtx(major, minor);
+#אחרת
+    החזר cudaArch.hasEqualOrLessPtx(major, minor);
 #endif
 }
 
-bool cv::cuda::TargetArchs::hasEqualOrGreaterPtx(int major, int minor)
+منطقي cv::cuda::TargetArchs::hasEqualOrGreaterPtx(صحيح major, صحيح minor)
 {
 #ifndef HAVE_CUDA
     CV_UNUSED(major);
     CV_UNUSED(minor);
     throw_no_cuda();
-#else
-    return cudaArch.hasEqualOrGreaterPtx(major, minor);
+#אחרת
+    החזר cudaArch.hasEqualOrGreaterPtx(major, minor);
 #endif
 }
 
-bool cv::cuda::TargetArchs::hasEqualOrGreaterBin(int major, int minor)
+منطقي cv::cuda::TargetArchs::hasEqualOrGreaterBin(صحيح major, صحيح minor)
 {
 #ifndef HAVE_CUDA
     CV_UNUSED(major);
     CV_UNUSED(minor);
     throw_no_cuda();
-#else
-    return cudaArch.hasEqualOrGreaterBin(major, minor);
+#אחרת
+    החזר cudaArch.hasEqualOrGreaterBin(major, minor);
 #endif
 }
 
@@ -294,231 +294,231 @@ bool cv::cuda::TargetArchs::hasEqualOrGreaterBin(int major, int minor)
 
 #ifdef HAVE_CUDA
 
-namespace
+نطاق
 {
-    class DeviceProps
+    מחלקה DeviceProps
     {
-    public:
+    عام:
         DeviceProps();
 
-        const cudaDeviceProp* get(int devID) const;
+        ثابت cudaDeviceProp* get(صحيح devID) ثابت;
 
-    private:
+    خاص:
         std::vector<cudaDeviceProp> props_;
     };
 
     DeviceProps::DeviceProps()
     {
-        int count = getCudaEnabledDeviceCount();
+        صحيح count = getCudaEnabledDeviceCount();
 
-        if (count > 0)
+        אם (count > 0)
         {
             props_.resize(count);
 
-            for (int devID = 0; devID < count; ++devID)
+            עבור (صحيح devID = 0; devID < count; ++devID)
             {
                 cudaSafeCall( cudaGetDeviceProperties(&props_[devID], devID) );
             }
         }
     }
 
-    const cudaDeviceProp* DeviceProps::get(int devID) const
+    ثابت cudaDeviceProp* DeviceProps::get(صحيح devID) ثابت
     {
         CV_Assert( static_cast<size_t>(devID) < props_.size() );
 
-        return &props_[devID];
+        החזר &props_[devID];
     }
 
     DeviceProps& deviceProps()
     {
-        static DeviceProps props;
-        return props;
+        ساكن DeviceProps props;
+        החזר props;
     }
 }
 
 #endif
 
-const char* cv::cuda::DeviceInfo::name() const
+ثابت حرف* cv::cuda::DeviceInfo::name() ثابت
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    return deviceProps().get(device_id_)->name;
+#אחרת
+    החזר deviceProps().get(device_id_)->name;
 #endif
 }
 
-size_t cv::cuda::DeviceInfo::totalGlobalMem() const
+size_t cv::cuda::DeviceInfo::totalGlobalMem() ثابت
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    return deviceProps().get(device_id_)->totalGlobalMem;
+#אחרת
+    החזר deviceProps().get(device_id_)->totalGlobalMem;
 #endif
 }
 
-size_t cv::cuda::DeviceInfo::sharedMemPerBlock() const
+size_t cv::cuda::DeviceInfo::sharedMemPerBlock() ثابت
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    return deviceProps().get(device_id_)->sharedMemPerBlock;
+#אחרת
+    החזר deviceProps().get(device_id_)->sharedMemPerBlock;
 #endif
 }
 
-int cv::cuda::DeviceInfo::regsPerBlock() const
+صحيح cv::cuda::DeviceInfo::regsPerBlock() ثابت
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    return deviceProps().get(device_id_)->regsPerBlock;
+#אחרת
+    החזר deviceProps().get(device_id_)->regsPerBlock;
 #endif
 }
 
-int cv::cuda::DeviceInfo::warpSize() const
+صحيح cv::cuda::DeviceInfo::warpSize() ثابت
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    return deviceProps().get(device_id_)->warpSize;
+#אחרת
+    החזר deviceProps().get(device_id_)->warpSize;
 #endif
 }
 
-size_t cv::cuda::DeviceInfo::memPitch() const
+size_t cv::cuda::DeviceInfo::memPitch() ثابت
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    return deviceProps().get(device_id_)->memPitch;
+#אחרת
+    החזר deviceProps().get(device_id_)->memPitch;
 #endif
 }
 
-int cv::cuda::DeviceInfo::maxThreadsPerBlock() const
+صحيح cv::cuda::DeviceInfo::maxThreadsPerBlock() ثابت
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    return deviceProps().get(device_id_)->maxThreadsPerBlock;
+#אחרת
+    החזר deviceProps().get(device_id_)->maxThreadsPerBlock;
 #endif
 }
 
-Vec3i cv::cuda::DeviceInfo::maxThreadsDim() const
+Vec3i cv::cuda::DeviceInfo::maxThreadsDim() ثابت
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    return Vec3i(deviceProps().get(device_id_)->maxThreadsDim);
+#אחרת
+    החזר Vec3i(deviceProps().get(device_id_)->maxThreadsDim);
 #endif
 }
 
-Vec3i cv::cuda::DeviceInfo::maxGridSize() const
+Vec3i cv::cuda::DeviceInfo::maxGridSize() ثابت
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    return Vec3i(deviceProps().get(device_id_)->maxGridSize);
+#אחרת
+    החזר Vec3i(deviceProps().get(device_id_)->maxGridSize);
 #endif
 }
 
-int cv::cuda::DeviceInfo::clockRate() const
+صحيح cv::cuda::DeviceInfo::clockRate() ثابت
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    int clockRate;
+#אחרת
+    صحيح clockRate;
     cudaSafeCall(cudaDeviceGetAttribute(&clockRate, cudaDevAttrClockRate, device_id_));
-    return clockRate;
+    החזר clockRate;
 #endif
 }
 
-size_t cv::cuda::DeviceInfo::totalConstMem() const
+size_t cv::cuda::DeviceInfo::totalConstMem() ثابت
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    return deviceProps().get(device_id_)->totalConstMem;
+#אחרת
+    החזר deviceProps().get(device_id_)->totalConstMem;
 #endif
 }
 
-int cv::cuda::DeviceInfo::majorVersion() const
+صحيح cv::cuda::DeviceInfo::majorVersion() ثابت
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    return deviceProps().get(device_id_)->major;
+#אחרת
+    החזר deviceProps().get(device_id_)->major;
 #endif
 }
 
-int cv::cuda::DeviceInfo::minorVersion() const
+صحيح cv::cuda::DeviceInfo::minorVersion() ثابت
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    return deviceProps().get(device_id_)->minor;
+#אחרת
+    החזר deviceProps().get(device_id_)->minor;
 #endif
 }
 
-size_t cv::cuda::DeviceInfo::textureAlignment() const
+size_t cv::cuda::DeviceInfo::textureAlignment() ثابت
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    return deviceProps().get(device_id_)->textureAlignment;
+#אחרת
+    החזר deviceProps().get(device_id_)->textureAlignment;
 #endif
 }
 
-size_t cv::cuda::DeviceInfo::texturePitchAlignment() const
+size_t cv::cuda::DeviceInfo::texturePitchAlignment() ثابت
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    return deviceProps().get(device_id_)->texturePitchAlignment;
+#אחרת
+    החזר deviceProps().get(device_id_)->texturePitchAlignment;
 #endif
 }
 
-int cv::cuda::DeviceInfo::multiProcessorCount() const
+صحيح cv::cuda::DeviceInfo::multiProcessorCount() ثابت
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    return deviceProps().get(device_id_)->multiProcessorCount;
+#אחרת
+    החזר deviceProps().get(device_id_)->multiProcessorCount;
 #endif
 }
 
-bool cv::cuda::DeviceInfo::kernelExecTimeoutEnabled() const
+منطقي cv::cuda::DeviceInfo::kernelExecTimeoutEnabled() ثابت
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    int kernelExecTimeoutEnabled;
+#אחרת
+    صحيح kernelExecTimeoutEnabled;
     cudaSafeCall(cudaDeviceGetAttribute(&kernelExecTimeoutEnabled, cudaDevAttrKernelExecTimeout, device_id_));
-    return kernelExecTimeoutEnabled != 0;
+    החזר kernelExecTimeoutEnabled != 0;
 #endif
 }
 
-bool cv::cuda::DeviceInfo::integrated() const
+منطقي cv::cuda::DeviceInfo::integrated() ثابت
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    return deviceProps().get(device_id_)->integrated != 0;
+#אחרת
+    החזר deviceProps().get(device_id_)->integrated != 0;
 #endif
 }
 
-bool cv::cuda::DeviceInfo::canMapHostMemory() const
+منطقي cv::cuda::DeviceInfo::canMapHostMemory() ثابت
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    return deviceProps().get(device_id_)->canMapHostMemory != 0;
+#אחרת
+    החזר deviceProps().get(device_id_)->canMapHostMemory != 0;
 #endif
 }
 
-DeviceInfo::ComputeMode cv::cuda::DeviceInfo::computeMode() const
+DeviceInfo::ComputeMode cv::cuda::DeviceInfo::computeMode() ثابت
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    static const ComputeMode tbl[] =
+#אחרת
+    ساكن ثابت ComputeMode tbl[] =
     {
         ComputeModeDefault,
         ComputeModeExclusive,
@@ -526,352 +526,352 @@ DeviceInfo::ComputeMode cv::cuda::DeviceInfo::computeMode() const
         ComputeModeExclusiveProcess
     };
 
-    int computeMode;
+    صحيح computeMode;
     cudaSafeCall(cudaDeviceGetAttribute(&computeMode, cudaDevAttrComputeMode, device_id_));
-    return tbl[computeMode];
+    החזר tbl[computeMode];
 #endif
 }
 
-int cv::cuda::DeviceInfo::maxTexture1D() const
+صحيح cv::cuda::DeviceInfo::maxTexture1D() ثابت
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    return deviceProps().get(device_id_)->maxTexture1D;
+#אחרת
+    החזר deviceProps().get(device_id_)->maxTexture1D;
 #endif
 }
 
-int cv::cuda::DeviceInfo::maxTexture1DMipmap() const
+صحيح cv::cuda::DeviceInfo::maxTexture1DMipmap() ثابت
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    #if CUDA_VERSION >= 5000
-        return deviceProps().get(device_id_)->maxTexture1DMipmap;
-    #else
+#אחרת
+    #אם CUDA_VERSION >= 5000
+        החזר deviceProps().get(device_id_)->maxTexture1DMipmap;
+    #אחרת
         CV_Error(Error::StsNotImplemented, "This function requires CUDA 5.0");
-        return 0;
+        החזר 0;
     #endif
 #endif
 }
 
-int cv::cuda::DeviceInfo::maxTexture1DLinear() const
+صحيح cv::cuda::DeviceInfo::maxTexture1DLinear() ثابت
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    #if CUDA_VERSION >= 13000
+#אחרת
+    #אם CUDA_VERSION >= 13000
         size_t maxWidthInElements;
         cudaChannelFormatDesc fmtDesc = cudaCreateChannelDesc<float4>();
         cudaSafeCall(cudaDeviceGetTexture1DLinearMaxWidth(&maxWidthInElements, &fmtDesc, device_id_));
-        return maxWidthInElements;
-    #else
-        return deviceProps().get(device_id_)->maxTexture1DLinear;
+        החזר maxWidthInElements;
+    #אחרת
+        החזר deviceProps().get(device_id_)->maxTexture1DLinear;
     #endif
 #endif
 }
 
-Vec2i cv::cuda::DeviceInfo::maxTexture2D() const
+Vec2i cv::cuda::DeviceInfo::maxTexture2D() ثابت
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    return Vec2i(deviceProps().get(device_id_)->maxTexture2D);
+#אחרת
+    החזר Vec2i(deviceProps().get(device_id_)->maxTexture2D);
 #endif
 }
 
-Vec2i cv::cuda::DeviceInfo::maxTexture2DMipmap() const
+Vec2i cv::cuda::DeviceInfo::maxTexture2DMipmap() ثابت
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    #if CUDA_VERSION >= 5000
-        return Vec2i(deviceProps().get(device_id_)->maxTexture2DMipmap);
-    #else
+#אחרת
+    #אם CUDA_VERSION >= 5000
+        החזר Vec2i(deviceProps().get(device_id_)->maxTexture2DMipmap);
+    #אחרת
         CV_Error(Error::StsNotImplemented, "This function requires CUDA 5.0");
-        return Vec2i();
+        החזר Vec2i();
     #endif
 #endif
 }
 
-Vec3i cv::cuda::DeviceInfo::maxTexture2DLinear() const
+Vec3i cv::cuda::DeviceInfo::maxTexture2DLinear() ثابت
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    return Vec3i(deviceProps().get(device_id_)->maxTexture2DLinear);
+#אחרת
+    החזר Vec3i(deviceProps().get(device_id_)->maxTexture2DLinear);
 #endif
 }
 
-Vec2i cv::cuda::DeviceInfo::maxTexture2DGather() const
+Vec2i cv::cuda::DeviceInfo::maxTexture2DGather() ثابت
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    return Vec2i(deviceProps().get(device_id_)->maxTexture2DGather);
+#אחרת
+    החזר Vec2i(deviceProps().get(device_id_)->maxTexture2DGather);
 #endif
 }
 
-Vec3i cv::cuda::DeviceInfo::maxTexture3D() const
+Vec3i cv::cuda::DeviceInfo::maxTexture3D() ثابت
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    return Vec3i(deviceProps().get(device_id_)->maxTexture3D);
+#אחרת
+    החזר Vec3i(deviceProps().get(device_id_)->maxTexture3D);
 #endif
 }
 
-int cv::cuda::DeviceInfo::maxTextureCubemap() const
+صحيح cv::cuda::DeviceInfo::maxTextureCubemap() ثابت
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    return deviceProps().get(device_id_)->maxTextureCubemap;
+#אחרת
+    החזר deviceProps().get(device_id_)->maxTextureCubemap;
 #endif
 }
 
-Vec2i cv::cuda::DeviceInfo::maxTexture1DLayered() const
+Vec2i cv::cuda::DeviceInfo::maxTexture1DLayered() ثابت
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    return Vec2i(deviceProps().get(device_id_)->maxTexture1DLayered);
+#אחרת
+    החזר Vec2i(deviceProps().get(device_id_)->maxTexture1DLayered);
 #endif
 }
 
-Vec3i cv::cuda::DeviceInfo::maxTexture2DLayered() const
+Vec3i cv::cuda::DeviceInfo::maxTexture2DLayered() ثابت
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    return Vec3i(deviceProps().get(device_id_)->maxTexture2DLayered);
+#אחרת
+    החזר Vec3i(deviceProps().get(device_id_)->maxTexture2DLayered);
 #endif
 }
 
-Vec2i cv::cuda::DeviceInfo::maxTextureCubemapLayered() const
+Vec2i cv::cuda::DeviceInfo::maxTextureCubemapLayered() ثابت
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    return Vec2i(deviceProps().get(device_id_)->maxTextureCubemapLayered);
+#אחרת
+    החזר Vec2i(deviceProps().get(device_id_)->maxTextureCubemapLayered);
 #endif
 }
 
-int cv::cuda::DeviceInfo::maxSurface1D() const
+صحيح cv::cuda::DeviceInfo::maxSurface1D() ثابت
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    return deviceProps().get(device_id_)->maxSurface1D;
+#אחרת
+    החזר deviceProps().get(device_id_)->maxSurface1D;
 #endif
 }
 
-Vec2i cv::cuda::DeviceInfo::maxSurface2D() const
+Vec2i cv::cuda::DeviceInfo::maxSurface2D() ثابت
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    return Vec2i(deviceProps().get(device_id_)->maxSurface2D);
+#אחרת
+    החזר Vec2i(deviceProps().get(device_id_)->maxSurface2D);
 #endif
 }
 
-Vec3i cv::cuda::DeviceInfo::maxSurface3D() const
+Vec3i cv::cuda::DeviceInfo::maxSurface3D() ثابت
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    return Vec3i(deviceProps().get(device_id_)->maxSurface3D);
+#אחרת
+    החזר Vec3i(deviceProps().get(device_id_)->maxSurface3D);
 #endif
 }
 
-Vec2i cv::cuda::DeviceInfo::maxSurface1DLayered() const
+Vec2i cv::cuda::DeviceInfo::maxSurface1DLayered() ثابت
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    return Vec2i(deviceProps().get(device_id_)->maxSurface1DLayered);
+#אחרת
+    החזר Vec2i(deviceProps().get(device_id_)->maxSurface1DLayered);
 #endif
 }
 
-Vec3i cv::cuda::DeviceInfo::maxSurface2DLayered() const
+Vec3i cv::cuda::DeviceInfo::maxSurface2DLayered() ثابت
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    return Vec3i(deviceProps().get(device_id_)->maxSurface2DLayered);
+#אחרת
+    החזר Vec3i(deviceProps().get(device_id_)->maxSurface2DLayered);
 #endif
 }
 
-int cv::cuda::DeviceInfo::maxSurfaceCubemap() const
+صحيح cv::cuda::DeviceInfo::maxSurfaceCubemap() ثابت
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    return deviceProps().get(device_id_)->maxSurfaceCubemap;
+#אחרת
+    החזר deviceProps().get(device_id_)->maxSurfaceCubemap;
 #endif
 }
 
-Vec2i cv::cuda::DeviceInfo::maxSurfaceCubemapLayered() const
+Vec2i cv::cuda::DeviceInfo::maxSurfaceCubemapLayered() ثابت
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    return Vec2i(deviceProps().get(device_id_)->maxSurfaceCubemapLayered);
+#אחרת
+    החזר Vec2i(deviceProps().get(device_id_)->maxSurfaceCubemapLayered);
 #endif
 }
 
-size_t cv::cuda::DeviceInfo::surfaceAlignment() const
+size_t cv::cuda::DeviceInfo::surfaceAlignment() ثابت
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    return deviceProps().get(device_id_)->surfaceAlignment;
+#אחרת
+    החזר deviceProps().get(device_id_)->surfaceAlignment;
 #endif
 }
 
-bool cv::cuda::DeviceInfo::concurrentKernels() const
+منطقي cv::cuda::DeviceInfo::concurrentKernels() ثابت
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    return deviceProps().get(device_id_)->concurrentKernels != 0;
+#אחרת
+    החזר deviceProps().get(device_id_)->concurrentKernels != 0;
 #endif
 }
 
-bool cv::cuda::DeviceInfo::ECCEnabled() const
+منطقي cv::cuda::DeviceInfo::ECCEnabled() ثابت
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    return deviceProps().get(device_id_)->ECCEnabled != 0;
+#אחרת
+    החזר deviceProps().get(device_id_)->ECCEnabled != 0;
 #endif
 }
 
-int cv::cuda::DeviceInfo::pciBusID() const
+صحيح cv::cuda::DeviceInfo::pciBusID() ثابت
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    return deviceProps().get(device_id_)->pciBusID;
+#אחרת
+    החזר deviceProps().get(device_id_)->pciBusID;
 #endif
 }
 
-int cv::cuda::DeviceInfo::pciDeviceID() const
+صحيح cv::cuda::DeviceInfo::pciDeviceID() ثابت
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    return deviceProps().get(device_id_)->pciDeviceID;
+#אחרת
+    החזר deviceProps().get(device_id_)->pciDeviceID;
 #endif
 }
 
-int cv::cuda::DeviceInfo::pciDomainID() const
+صحيح cv::cuda::DeviceInfo::pciDomainID() ثابت
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    return deviceProps().get(device_id_)->pciDomainID;
+#אחרת
+    החזר deviceProps().get(device_id_)->pciDomainID;
 #endif
 }
 
-bool cv::cuda::DeviceInfo::tccDriver() const
+منطقي cv::cuda::DeviceInfo::tccDriver() ثابت
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    return deviceProps().get(device_id_)->tccDriver != 0;
+#אחרת
+    החזר deviceProps().get(device_id_)->tccDriver != 0;
 #endif
 }
 
-int cv::cuda::DeviceInfo::asyncEngineCount() const
+صحيح cv::cuda::DeviceInfo::asyncEngineCount() ثابت
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    return deviceProps().get(device_id_)->asyncEngineCount;
+#אחרת
+    החזר deviceProps().get(device_id_)->asyncEngineCount;
 #endif
 }
 
-bool cv::cuda::DeviceInfo::unifiedAddressing() const
+منطقي cv::cuda::DeviceInfo::unifiedAddressing() ثابت
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    return deviceProps().get(device_id_)->unifiedAddressing != 0;
+#אחרת
+    החזר deviceProps().get(device_id_)->unifiedAddressing != 0;
 #endif
 }
 
-int cv::cuda::DeviceInfo::memoryClockRate() const
+صحيح cv::cuda::DeviceInfo::memoryClockRate() ثابت
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    int memoryClockRate;
+#אחרת
+    صحيح memoryClockRate;
     cudaSafeCall(cudaDeviceGetAttribute(&memoryClockRate, cudaDevAttrMemoryClockRate, device_id_));
-    return memoryClockRate;
+    החזר memoryClockRate;
 #endif
 }
 
-int cv::cuda::DeviceInfo::memoryBusWidth() const
+صحيح cv::cuda::DeviceInfo::memoryBusWidth() ثابت
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    return deviceProps().get(device_id_)->memoryBusWidth;
+#אחרת
+    החזר deviceProps().get(device_id_)->memoryBusWidth;
 #endif
 }
 
-int cv::cuda::DeviceInfo::l2CacheSize() const
+صحيح cv::cuda::DeviceInfo::l2CacheSize() ثابت
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    return deviceProps().get(device_id_)->l2CacheSize;
+#אחרת
+    החזר deviceProps().get(device_id_)->l2CacheSize;
 #endif
 }
 
-int cv::cuda::DeviceInfo::maxThreadsPerMultiProcessor() const
+صحيح cv::cuda::DeviceInfo::maxThreadsPerMultiProcessor() ثابت
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    return deviceProps().get(device_id_)->maxThreadsPerMultiProcessor;
+#אחרת
+    החזר deviceProps().get(device_id_)->maxThreadsPerMultiProcessor;
 #endif
 }
 
-void cv::cuda::DeviceInfo::queryMemory(size_t& _totalMemory, size_t& _freeMemory) const
+فراغ cv::cuda::DeviceInfo::queryMemory(size_t& _totalMemory, size_t& _freeMemory) ثابت
 {
 #ifndef HAVE_CUDA
     CV_UNUSED(_totalMemory);
     CV_UNUSED(_freeMemory);
     throw_no_cuda();
-#else
-    int prevDeviceID = getDevice();
-    if (prevDeviceID != device_id_)
+#אחרת
+    صحيح prevDeviceID = getDevice();
+    אם (prevDeviceID != device_id_)
         setDevice(device_id_);
 
     cudaSafeCall( cudaMemGetInfo(&_freeMemory, &_totalMemory) );
 
-    if (prevDeviceID != device_id_)
+    אם (prevDeviceID != device_id_)
         setDevice(prevDeviceID);
 #endif
 }
 
-bool cv::cuda::DeviceInfo::isCompatible() const
+منطقي cv::cuda::DeviceInfo::isCompatible() ثابت
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
+#אחרת
     // Check PTX compatibility
-    if (TargetArchs::hasEqualOrLessPtx(majorVersion(), minorVersion()))
-        return true;
+    אם (TargetArchs::hasEqualOrLessPtx(majorVersion(), minorVersion()))
+        החזר אמת;
 
     // Check BIN compatibility
-    for (int i = minorVersion(); i >= 0; --i)
-        if (TargetArchs::hasBin(majorVersion(), i))
-            return true;
+    עבור (صحيح i = minorVersion(); i >= 0; --i)
+        אם (TargetArchs::hasBin(majorVersion(), i))
+            החזר אמת;
 
-    return false;
+    החזר שקר;
 #endif
 }
 
@@ -880,61 +880,61 @@ bool cv::cuda::DeviceInfo::isCompatible() const
 
 #ifdef HAVE_CUDA
 
-namespace
+نطاق
 {
-    int convertSMVer2Cores(int major, int minor)
+    صحيح convertSMVer2Cores(صحيح major, صحيح minor)
     {
         // Defines for GPU Architecture types (using the SM version to determine the # of cores per SM
-        typedef struct {
-            int SM; // 0xMm (hexadecimal notation), M = SM Major version, and m = SM minor version
-            int Cores;
+        تعريفنوع بنية {
+            صحيح SM; // 0xMm (hexadecimal notation), M = SM Major version, and m = SM minor version
+            صحيح Cores;
         } SMtoCores;
 
         SMtoCores gpuArchCoresPerSM[] =  { { 0x10,  8 }, { 0x11,  8 }, { 0x12,  8 }, { 0x13,  8 }, { 0x20, 32 }, { 0x21, 48 }, {0x30, 192}, {0x35, 192}, { -1, -1 }  };
 
-        int index = 0;
-        while (gpuArchCoresPerSM[index].SM != -1)
+        صحيح index = 0;
+        כלעוד (gpuArchCoresPerSM[index].SM != -1)
         {
-            if (gpuArchCoresPerSM[index].SM == ((major << 4) + minor) )
-                return gpuArchCoresPerSM[index].Cores;
+            אם (gpuArchCoresPerSM[index].SM == ((major << 4) + minor) )
+                החזר gpuArchCoresPerSM[index].Cores;
             index++;
         }
 
-        return -1;
+        החזר -1;
     }
 }
 
 #endif
 
-void cv::cuda::printCudaDeviceInfo(int device)
+فراغ cv::cuda::printCudaDeviceInfo(صحيح device)
 {
 #ifndef HAVE_CUDA
     CV_UNUSED(device);
     throw_no_cuda();
-#else
-    int count = getCudaEnabledDeviceCount();
-    bool valid = (device >= 0) && (device < count);
+#אחרת
+    صحيح count = getCudaEnabledDeviceCount();
+    منطقي valid = (device >= 0) && (device < count);
 
-    int beg = valid ? device   : 0;
-    int end = valid ? device+1 : count;
+    صحيح beg = valid ? device   : 0;
+    صحيح end = valid ? device+1 : count;
 
     printf("*** CUDA Device Query (Runtime API) version (CUDART static linking) *** \n\n");
     printf("Device count: %d\n", count);
 
-    int driverVersion = 0, runtimeVersion = 0;
+    صحيح driverVersion = 0, runtimeVersion = 0;
     cudaSafeCall( cudaDriverGetVersion(&driverVersion) );
     cudaSafeCall( cudaRuntimeGetVersion(&runtimeVersion) );
 
-    const char *computeMode[] = {
+    ثابت حرف *computeMode[] = {
         "Default (multiple host threads can use ::cudaSetDevice() with device simultaneously)",
         "Exclusive (only one host thread in one process is able to use ::cudaSetDevice() with this device)",
         "Prohibited (no host thread can use ::cudaSetDevice() with this device)",
         "Exclusive Process (many threads in one process is able to use ::cudaSetDevice() with this device)",
         "Unknown",
-        NULL
+        عدم
     };
 
-    for(int dev = beg; dev < end; ++dev)
+    עבור(صحيح dev = beg; dev < end; ++dev)
     {
         cudaDeviceProp prop;
         cudaSafeCall( cudaGetDeviceProperties(&prop, dev) );
@@ -942,13 +942,13 @@ void cv::cuda::printCudaDeviceInfo(int device)
         printf("\nDevice %d: \"%s\"\n", dev, prop.name);
         printf("  CUDA Driver Version / Runtime Version          %d.%d / %d.%d\n", driverVersion/1000, driverVersion%100, runtimeVersion/1000, runtimeVersion%100);
         printf("  CUDA Capability Major/Minor version number:    %d.%d\n", prop.major, prop.minor);
-        printf("  Total amount of global memory:                 %.0f MBytes (%llu bytes)\n", (float)prop.totalGlobalMem/1048576.0f, (unsigned long long) prop.totalGlobalMem);
+        printf("  Total amount of global memory:                 %.0f MBytes (%llu bytes)\n", (عائم)prop.totalGlobalMem/1048576.0f, (unsigned long long) prop.totalGlobalMem);
 
-        int cores = convertSMVer2Cores(prop.major, prop.minor);
-        if (cores > 0)
+        صحيح cores = convertSMVer2Cores(prop.major, prop.minor);
+        אם (cores > 0)
             printf("  (%2d) Multiprocessors x (%2d) CUDA Cores/MP:     %d CUDA Cores\n", prop.multiProcessorCount, cores, cores * prop.multiProcessorCount);
 
-        int clockRate;
+        صحيح clockRate;
         cudaSafeCall(cudaDeviceGetAttribute(&clockRate, cudaDevAttrClockRate, dev));
         printf("  GPU Clock Speed:                               %.2f GHz\n", clockRate * 1e-6f);
 
@@ -959,18 +959,18 @@ void cv::cuda::printCudaDeviceInfo(int device)
             prop.maxTexture1DLayered[0], prop.maxTexture1DLayered[1],
             prop.maxTexture2DLayered[0], prop.maxTexture2DLayered[1], prop.maxTexture2DLayered[2]);
 
-        printf("  Total amount of constant memory:               %u bytes\n", (int)prop.totalConstMem);
-        printf("  Total amount of shared memory per block:       %u bytes\n", (int)prop.sharedMemPerBlock);
+        printf("  Total amount of constant memory:               %u bytes\n", (صحيح)prop.totalConstMem);
+        printf("  Total amount of shared memory per block:       %u bytes\n", (صحيح)prop.sharedMemPerBlock);
         printf("  Total number of registers available per block: %d\n", prop.regsPerBlock);
         printf("  Warp size:                                     %d\n", prop.warpSize);
         printf("  Maximum number of threads per block:           %d\n", prop.maxThreadsPerBlock);
         printf("  Maximum sizes of each dimension of a block:    %d x %d x %d\n", prop.maxThreadsDim[0], prop.maxThreadsDim[1], prop.maxThreadsDim[2]);
         printf("  Maximum sizes of each dimension of a grid:     %d x %d x %d\n", prop.maxGridSize[0], prop.maxGridSize[1],  prop.maxGridSize[2]);
-        printf("  Maximum memory pitch:                          %u bytes\n", (int)prop.memPitch);
-        printf("  Texture alignment:                             %u bytes\n", (int)prop.textureAlignment);
+        printf("  Maximum memory pitch:                          %u bytes\n", (صحيح)prop.memPitch);
+        printf("  Texture alignment:                             %u bytes\n", (صحيح)prop.textureAlignment);
 
         printf("  Concurrent copy and execution:                 %s with %d copy engine(s)\n", (prop.asyncEngineCount ? "Yes" : "No"), prop.asyncEngineCount);
-        int kernelExecTimeoutEnabled;
+        صحيح kernelExecTimeoutEnabled;
         cudaSafeCall(cudaDeviceGetAttribute(&kernelExecTimeoutEnabled, cudaDevAttrKernelExecTimeout, dev));
         printf("  Run time limit on kernels:                     %s\n", kernelExecTimeoutEnabled ? "Yes" : "No");
         printf("  Integrated GPU sharing Host Memory:            %s\n", prop.integrated ? "Yes" : "No");
@@ -983,7 +983,7 @@ void cv::cuda::printCudaDeviceInfo(int device)
         printf("  Device supports Unified Addressing (UVA):      %s\n", prop.unifiedAddressing ? "Yes" : "No");
         printf("  Device PCI Bus ID / PCI location ID:           %d / %d\n", prop.pciBusID, prop.pciDeviceID );
 
-        int propComputeMode;
+        صحيح propComputeMode;
         cudaSafeCall(cudaDeviceGetAttribute(&propComputeMode, cudaDevAttrComputeMode, dev));
         printf("  Compute Mode:\n");
         printf("      %s \n", computeMode[propComputeMode]);
@@ -999,33 +999,33 @@ void cv::cuda::printCudaDeviceInfo(int device)
 #endif
 }
 
-void cv::cuda::printShortCudaDeviceInfo(int device)
+فراغ cv::cuda::printShortCudaDeviceInfo(صحيح device)
 {
 #ifndef HAVE_CUDA
     CV_UNUSED(device);
     throw_no_cuda();
-#else
-    int count = getCudaEnabledDeviceCount();
-    bool valid = (device >= 0) && (device < count);
+#אחרת
+    صحيح count = getCudaEnabledDeviceCount();
+    منطقي valid = (device >= 0) && (device < count);
 
-    int beg = valid ? device   : 0;
-    int end = valid ? device+1 : count;
+    صحيح beg = valid ? device   : 0;
+    صحيح end = valid ? device+1 : count;
 
-    int driverVersion = 0, runtimeVersion = 0;
+    صحيح driverVersion = 0, runtimeVersion = 0;
     cudaSafeCall( cudaDriverGetVersion(&driverVersion) );
     cudaSafeCall( cudaRuntimeGetVersion(&runtimeVersion) );
 
-    for(int dev = beg; dev < end; ++dev)
+    עבור(صحيح dev = beg; dev < end; ++dev)
     {
         cudaDeviceProp prop;
         cudaSafeCall( cudaGetDeviceProperties(&prop, dev) );
 
-        const char *arch_str = prop.major < 2 ? " (not Fermi)" : "";
-        printf("Device %d:  \"%s\"  %.0fMb", dev, prop.name, (float)prop.totalGlobalMem/1048576.0f);
+        ثابت حرف *arch_str = prop.major < 2 ? " (not Fermi)" : "";
+        printf("Device %d:  \"%s\"  %.0fMb", dev, prop.name, (عائم)prop.totalGlobalMem/1048576.0f);
         printf(", sm_%d%d%s", prop.major, prop.minor, arch_str);
 
-        int cores = convertSMVer2Cores(prop.major, prop.minor);
-        if (cores > 0)
+        صحيح cores = convertSMVer2Cores(prop.major, prop.minor);
+        אם (cores > 0)
             printf(", %d cores", cores * prop.multiProcessorCount);
 
         printf(", Driver/Runtime ver.%d.%d/%d.%d\n", driverVersion/1000, driverVersion%100, runtimeVersion/1000, runtimeVersion%100);
@@ -1040,30 +1040,30 @@ void cv::cuda::printShortCudaDeviceInfo(int device)
 
 #ifdef HAVE_CUDA
 
-namespace
+نطاق
 {
     #define error_entry(entry)  { entry, #entry }
 
-    struct ErrorEntry
+    بنية ErrorEntry
     {
-        int code;
-        const char* str;
+        صحيح code;
+        ثابت حرف* str;
     };
 
-    struct ErrorEntryComparer
+    بنية ErrorEntryComparer
     {
-        int code;
-        ErrorEntryComparer(int code_) : code(code_) {}
-        bool operator()(const ErrorEntry& e) const { return e.code == code; }
+        صحيح code;
+        ErrorEntryComparer(صحيح code_) : code(code_) {}
+        منطقي operator()(ثابت ErrorEntry& e) ثابت { החזר e.code == code; }
     };
 
-    const ErrorEntry npp_errors [] =
+    ثابت ErrorEntry npp_errors [] =
     {
-    #if defined (_MSC_VER)
+    #אם defined (_MSC_VER)
         error_entry( NPP_NOT_SUFFICIENT_COMPUTE_CAPABILITY ),
     #endif
 
-    #if NPP_VERSION < 5500
+    #אם NPP_VERSION < 5500
         error_entry( NPP_BAD_ARG_ERROR ),
         error_entry( NPP_COEFF_ERROR ),
         error_entry( NPP_RECT_ERROR ),
@@ -1077,7 +1077,7 @@ namespace
         error_entry( NPP_POINTER_ERROR ),
         error_entry( NPP_WARNING ),
         error_entry( NPP_ODD_ROI_WARNING ),
-    #else
+    #אחרת
         error_entry( NPP_INVALID_HOST_POINTER_ERROR ),
         error_entry( NPP_INVALID_DEVICE_POINTER_ERROR ),
         error_entry( NPP_LUT_PALETTE_BITSIZE_ERROR ),
@@ -1145,9 +1145,9 @@ namespace
         error_entry( NPP_DOUBLE_SIZE_WARNING )
     };
 
-    const size_t npp_error_num = sizeof(npp_errors) / sizeof(npp_errors[0]);
+    ثابت size_t npp_error_num = حجم(npp_errors) / حجم(npp_errors[0]);
 
-    const ErrorEntry cu_errors [] =
+    ثابت ErrorEntry cu_errors [] =
     {
         error_entry( CUDA_SUCCESS                              ),
         error_entry( CUDA_ERROR_INVALID_VALUE                  ),
@@ -1198,37 +1198,37 @@ namespace
         error_entry( CUDA_ERROR_UNKNOWN                        )
     };
 
-    const size_t cu_errors_num = sizeof(cu_errors) / sizeof(cu_errors[0]);
+    ثابت size_t cu_errors_num = حجم(cu_errors) / حجم(cu_errors[0]);
 
-    cv::String getErrorString(int code, const ErrorEntry* errors, size_t n)
+    cv::String getErrorString(صحيح code, ثابت ErrorEntry* errors, size_t n)
     {
         size_t idx = std::find_if(errors, errors + n, ErrorEntryComparer(code)) - errors;
 
-        const char* msg = (idx != n) ? errors[idx].str : "Unknown error code";
+        ثابت حرف* msg = (idx != n) ? errors[idx].str : "Unknown error code";
         cv::String str = cv::format("%s [Code = %d]", msg, code);
 
-        return str;
+        החזר str;
     }
 }
 
 #endif
 
-String cv::cuda::getNppErrorMessage(int code)
+String cv::cuda::getNppErrorMessage(صحيح code)
 {
 #ifndef HAVE_CUDA
     CV_UNUSED(code);
-    return String();
-#else
-    return getErrorString(code, npp_errors, npp_error_num);
+    החזר String();
+#אחרת
+    החזר getErrorString(code, npp_errors, npp_error_num);
 #endif
 }
 
-String cv::cuda::getCudaDriverApiErrorMessage(int code)
+String cv::cuda::getCudaDriverApiErrorMessage(صحيح code)
 {
 #ifndef HAVE_CUDA
     CV_UNUSED(code);
-    return String();
-#else
-    return getErrorString(code, cu_errors, cu_errors_num);
+    החזר String();
+#אחרת
+    החזר getErrorString(code, cu_errors, cu_errors_num);
 #endif
 }

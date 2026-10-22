@@ -2,64 +2,64 @@
 // It is subject to the license terms in the LICENSE file found in the top-level directory
 // of this distribution and at http://opencv.org/license.html
 
-#include "precomp.hpp"
-#include "persistence.hpp"
+#ضمن "precomp.hpp"
+#ضمن "persistence.hpp"
 
-enum
+تعداد
 {
     CV_YML_INDENT = 3,
     CV_YML_INDENT_FLOW = 1
 };
 
-namespace cv
+نطاق cv
 {
 
-class YAMLEmitter : public FileStorageEmitter
+מחלקה YAMLEmitter : عام FileStorageEmitter
 {
-public:
+عام:
     YAMLEmitter(FileStorage_API* _fs) : fs(_fs)
     {
     }
     virtual ~YAMLEmitter() {}
 
-    FStructData startWriteStruct(const FStructData& parent, const char* key,
-                                 int struct_flags, const char* type_name=0)
+    FStructData startWriteStruct(ثابت FStructData& parent, ثابت حرف* key,
+                                 صحيح struct_flags, ثابت حرف* type_name=0)
     {
-        char buf[CV_FS_MAX_LEN + 1024];
-        const char* data = 0;
+        حرف buf[CV_FS_MAX_LEN + 1024];
+        ثابت حرف* data = 0;
 
-        if ( type_name && *type_name == '\0' )
+        אם ( type_name && *type_name == '\0' )
             type_name = 0;
 
         struct_flags = (struct_flags & (FileNode::TYPE_MASK|FileNode::FLOW)) | FileNode::EMPTY;
-        if( !FileNode::isCollection(struct_flags))
+        אם( !FileNode::isCollection(struct_flags))
             CV_Error( cv::Error::StsBadArg,
                      "Some collection type - FileNode::SEQ or FileNode::MAP, must be specified" );
 
-        if (type_name && memcmp(type_name, "binary", 6) == 0)
+        אם (type_name && memcmp(type_name, "binary", 6) == 0)
         {
             /* reset struct flag. in order not to print ']' */
             struct_flags = FileNode::SEQ;
-            snprintf(buf, sizeof(buf), "!!binary |");
+            snprintf(buf, حجم(buf), "!!binary |");
             data = buf;
         }
-        else if( FileNode::isFlow(struct_flags))
+        אחרת אם( FileNode::isFlow(struct_flags))
         {
-            char c = FileNode::isMap(struct_flags) ? '{' : '[';
+            حرف c = FileNode::isMap(struct_flags) ? '{' : '[';
             struct_flags |= FileNode::FLOW;
 
-            if( type_name )
-                snprintf( buf, sizeof(buf), "!!%s %c", type_name, c );
-            else
+            אם( type_name )
+                snprintf( buf, حجم(buf), "!!%s %c", type_name, c );
+            אחרת
             {
                 buf[0] = c;
                 buf[1] = '\0';
             }
             data = buf;
         }
-        else if( type_name )
+        אחרת אם( type_name )
         {
-            snprintf( buf, sizeof(buf), "!!%s", type_name );
+            snprintf( buf, حجم(buf), "!!%s", type_name );
             data = buf;
         }
 
@@ -69,27 +69,27 @@ public:
         fsd.indent = parent.indent;
         fsd.flags = struct_flags;
 
-        if( !FileNode::isFlow(parent.flags) )
+        אם( !FileNode::isFlow(parent.flags) )
             fsd.indent += CV_YML_INDENT + FileNode::isFlow(struct_flags);
 
-        return fsd;
+        החזר fsd;
     }
 
-    void endWriteStruct(const FStructData& current_struct)
+    فراغ endWriteStruct(ثابت FStructData& current_struct)
     {
-        char* ptr;
+        حرف* ptr;
 
-        int struct_flags = current_struct.flags;
+        صحيح struct_flags = current_struct.flags;
 
-        if( FileNode::isFlow(struct_flags) )
+        אם( FileNode::isFlow(struct_flags) )
         {
             ptr = fs->bufferPtr();
-            if( ptr > fs->bufferStart() + current_struct.indent && !FileNode::isEmptyCollection(struct_flags) )
+            אם( ptr > fs->bufferStart() + current_struct.indent && !FileNode::isEmptyCollection(struct_flags) )
                 *ptr++ = ' ';
             *ptr++ = FileNode::isMap(struct_flags) ? '}' : ']';
             fs->setBufferPtr(ptr);
         }
-        else if( FileNode::isEmptyCollection(struct_flags) )
+        אחרת אם( FileNode::isEmptyCollection(struct_flags) )
         {
             ptr = fs->flush();
             memcpy( ptr, FileNode::isMap(struct_flags) ? "{}" : "[]", 2 );
@@ -101,75 +101,75 @@ public:
         CV_Assert( fs->struct_indent >= 0 );*/
     }
 
-    void write(const char* key, int value)
+    فراغ اكتب(ثابت حرف* key, صحيح value)
     {
-        char buf[128];
+        حرف buf[128];
         writeScalar( key, fs::itoa( value, buf, 10 ));
     }
 
-    void write(const char* key, int64_t value)
+    فراغ اكتب(ثابت حرف* key, int64_t value)
     {
-        char buf[128];
-        writeScalar( key, fs::itoa( value, buf, 10, true ));
+        حرف buf[128];
+        writeScalar( key, fs::itoa( value, buf, 10, אמת ));
     }
 
-    void write( const char* key, double value )
+    فراغ اكتب( ثابت حرف* key, مزدوج value )
     {
-        char buf[128];
-        writeScalar( key, fs::doubleToString( buf, sizeof(buf), value, false ));
+        حرف buf[128];
+        writeScalar( key, fs::doubleToString( buf, حجم(buf), value, שקר ));
     }
 
-    void write(const char* key, const char* str, bool quote)
+    فراغ اكتب(ثابت حرف* key, ثابت حرف* str, منطقي quote)
     {
-        char buf[CV_FS_MAX_LEN*4+16];
-        char* data = (char*)str;
-        int i, len;
+        حرف buf[CV_FS_MAX_LEN*4+16];
+        حرف* data = (حرف*)str;
+        صحيح i, len;
 
-        if( !str )
+        אם( !str )
             CV_Error( cv::Error::StsNullPtr, "Null string pointer" );
 
-        len = (int)strlen(str);
-        if( len > CV_FS_MAX_LEN )
+        len = (صحيح)strlen(str);
+        אם( len > CV_FS_MAX_LEN )
             CV_Error( cv::Error::StsBadArg, "The written string is too long" );
 
-        if( quote || len == 0 || str[0] != str[len-1] || (str[0] != '\"' && str[0] != '\'') )
+        אם( quote || len == 0 || str[0] != str[len-1] || (str[0] != '\"' && str[0] != '\'') )
         {
-            int need_quote = quote || len == 0 || str[0] == ' ';
+            صحيح need_quote = quote || len == 0 || str[0] == ' ';
             data = buf;
             *data++ = '\"';
-            for( i = 0; i < len; i++ )
+            עבור( i = 0; i < len; i++ )
             {
-                char c = str[i];
+                حرف c = str[i];
 
-                if( !need_quote && !cv_isalnum(c) && c != '_' && c != ' ' && c != '-' &&
+                אם( !need_quote && !cv_isalnum(c) && c != '_' && c != ' ' && c != '-' &&
                    c != '(' && c != ')' && c != '/' && c != '+' && c != ';' )
                     need_quote = 1;
 
-                if( !cv_isalnum(c) && (!cv_isprint(c) || c == '\\' || c == '\'' || c == '\"') )
+                אם( !cv_isalnum(c) && (!cv_isprint(c) || c == '\\' || c == '\'' || c == '\"') )
                 {
                     *data++ = '\\';
-                    if( cv_isprint(c) )
+                    אם( cv_isprint(c) )
                         *data++ = c;
-                    else if( c == '\n' )
+                    אחרת אם( c == '\n' )
                         *data++ = 'n';
-                    else if( c == '\r' )
+                    אחרת אם( c == '\r' )
                         *data++ = 'r';
-                    else if( c == '\t' )
+                    אחרת אם( c == '\t' )
                         *data++ = 't';
-                    else
+                    אחרת
                     {
-                        snprintf( data, sizeof(buf) - (data - buf), "x%02x", c );
+                        snprintf( data, حجم(buf) - (data - buf), "x%02x", c );
                         data += 3;
                     }
                 }
-                else
+                אחרת
                     *data++ = c;
             }
-            if( !need_quote && (cv_isdigit(str[0]) ||
+            אם( !need_quote && (cv_isdigit(str[0]) ||
                                 str[0] == '+' || str[0] == '-' || str[0] == '.' ))
                 need_quote = 1;
 
-            if( need_quote )
+            אם( need_quote )
                 *data++ = '\"';
             *data++ = '\0';
             data = buf + !need_quote;
@@ -178,102 +178,102 @@ public:
         writeScalar( key, data);
     }
 
-    void writeScalar(const char* key, const char* data)
+    فراغ writeScalar(ثابت حرف* key, ثابت حرف* data)
     {
-        fs->check_if_write_struct_is_delayed(false);
-        if ( fs->get_state_of_writing_base64() == FileStorage_API::Uncertain )
+        fs->check_if_write_struct_is_delayed(שקר);
+        אם ( fs->get_state_of_writing_base64() == FileStorage_API::Uncertain )
         {
             fs->switch_to_Base64_state( FileStorage_API::NotUse );
         }
-        else if ( fs->get_state_of_writing_base64() == FileStorage_API::InUse )
+        אחרת אם ( fs->get_state_of_writing_base64() == FileStorage_API::InUse )
         {
             CV_Error( cv::Error::StsError, "At present, output Base64 data only." );
         }
 
-        int i, keylen = 0;
-        int datalen = 0;
-        char* ptr;
+        صحيح i, keylen = 0;
+        صحيح datalen = 0;
+        حرف* ptr;
 
         FStructData& current_struct = fs->getCurrentStruct();
 
-        int struct_flags = current_struct.flags;
+        صحيح struct_flags = current_struct.flags;
 
-        if( key && key[0] == '\0' )
+        אם( key && key[0] == '\0' )
             key = 0;
 
-        if( FileNode::isCollection(struct_flags) )
+        אם( FileNode::isCollection(struct_flags) )
         {
-            if( (FileNode::isMap(struct_flags) ^ (key != 0)) )
+            אם( (FileNode::isMap(struct_flags) ^ (key != 0)) )
                 CV_Error( cv::Error::StsBadArg, "An attempt to add element without a key to a map, "
                          "or add element with key to sequence" );
         }
-        else
+        אחרת
         {
             fs->setNonEmpty();
             struct_flags = FileNode::EMPTY | (key ? FileNode::MAP : FileNode::SEQ);
         }
 
-        if( key )
+        אם( key )
         {
-            keylen = (int)strlen(key);
-            if( keylen == 0 )
+            keylen = (صحيح)strlen(key);
+            אם( keylen == 0 )
                 CV_Error( cv::Error::StsBadArg, "The key is an empty" );
 
-            if( keylen > CV_FS_MAX_LEN )
+            אם( keylen > CV_FS_MAX_LEN )
                 CV_Error( cv::Error::StsBadArg, "The key is too long" );
         }
 
-        if( data )
-            datalen = (int)strlen(data);
+        אם( data )
+            datalen = (صحيح)strlen(data);
 
-        if( FileNode::isFlow(struct_flags) )
+        אם( FileNode::isFlow(struct_flags) )
         {
             ptr = fs->bufferPtr();
-            if( !FileNode::isEmptyCollection(struct_flags) )
+            אם( !FileNode::isEmptyCollection(struct_flags) )
                 *ptr++ = ',';
-            int new_offset = (int)(ptr - fs->bufferStart()) + keylen + datalen;
-            if( new_offset > fs->wrapMargin() && new_offset - current_struct.indent > 10 )
+            صحيح new_offset = (صحيح)(ptr - fs->bufferStart()) + keylen + datalen;
+            אם( new_offset > fs->wrapMargin() && new_offset - current_struct.indent > 10 )
             {
                 fs->setBufferPtr(ptr);
                 ptr = fs->flush();
             }
-            else
+            אחרת
                 *ptr++ = ' ';
         }
-        else
+        אחרת
         {
             ptr = fs->flush();
-            if( !FileNode::isMap(struct_flags) )
+            אם( !FileNode::isMap(struct_flags) )
             {
                 *ptr++ = '-';
-                if( data )
+                אם( data )
                     *ptr++ = ' ';
             }
         }
 
-        if( key )
+        אם( key )
         {
-            if( !cv_isalpha(key[0]) && key[0] != '_' )
+            אם( !cv_isalpha(key[0]) && key[0] != '_' )
                 CV_Error( cv::Error::StsBadArg, "Key must start with a letter or _" );
 
             ptr = fs->resizeWriteBuffer( ptr, keylen );
 
-            for( i = 0; i < keylen; i++ )
+            עבור( i = 0; i < keylen; i++ )
             {
-                char c = key[i];
+                حرف c = key[i];
 
                 ptr[i] = c;
-                if( !cv_isalnum(c) && c != '-' && c != '_' && c != ' ' )
+                אם( !cv_isalnum(c) && c != '-' && c != '_' && c != ' ' )
                     CV_Error( cv::Error::StsBadArg, "Key names may only contain alphanumeric characters [a-zA-Z0-9], '-', '_' and ' '" );
             }
 
             ptr += keylen;
             *ptr++ = ':';
-            if( !FileNode::isFlow(struct_flags) && data )
+            אם( !FileNode::isFlow(struct_flags) && data )
                 *ptr++ = ' ';
         }
 
-        if( data )
+        אם( data )
         {
             ptr = fs->resizeWriteBuffer( ptr, datalen );
             memcpy( ptr, data, datalen );
@@ -284,37 +284,37 @@ public:
         current_struct.flags &= ~FileNode::EMPTY;
     }
 
-    void writeComment(const char* comment, bool eol_comment)
+    فراغ writeComment(ثابت حرف* comment, منطقي eol_comment)
     {
-        if( !comment )
+        אם( !comment )
             CV_Error( cv::Error::StsNullPtr, "Null comment" );
 
-        int len = (int)strlen(comment);
-        const char* eol = strchr(comment, '\n');
-        bool multiline = eol != 0;
-        char* ptr = fs->bufferPtr();
+        صحيح len = (صحيح)strlen(comment);
+        ثابت حرف* eol = strchr(comment, '\n');
+        منطقي multiline = eol != 0;
+        حرف* ptr = fs->bufferPtr();
 
-        if( !eol_comment || multiline ||
+        אם( !eol_comment || multiline ||
             fs->bufferEnd() - ptr < len || ptr == fs->bufferStart() )
             ptr = fs->flush();
-        else
+        אחרת
             *ptr++ = ' ';
 
-        while( comment )
+        כלעוד( comment )
         {
             *ptr++ = '#';
             *ptr++ = ' ';
-            if( eol )
+            אם( eol )
             {
-                ptr = fs->resizeWriteBuffer( ptr, (int)(eol - comment) + 1 );
+                ptr = fs->resizeWriteBuffer( ptr, (صحيح)(eol - comment) + 1 );
                 memcpy( ptr, comment, eol - comment + 1 );
                 fs->setBufferPtr(ptr + (eol - comment));
                 comment = eol + 1;
                 eol = strchr( comment, '\n' );
             }
-            else
+            אחרת
             {
-                len = (int)strlen(comment);
+                len = (صحيح)strlen(comment);
                 ptr = fs->resizeWriteBuffer( ptr, len );
                 memcpy( ptr, comment, len );
                 fs->setBufferPtr(ptr + len);
@@ -324,214 +324,214 @@ public:
         }
     }
 
-    void startNextStream()
+    فراغ startNextStream()
     {
         fs->puts( "...\n" );
         fs->puts( "---\n" );
     }
 
-protected:
+محمي:
     FileStorage_API* fs;
 };
 
 
-class YAMLParser : public FileStorageParser
+מחלקה YAMLParser : عام FileStorageParser
 {
-public:
+عام:
     YAMLParser(FileStorage_API* _fs) : fs(_fs)
     {
     }
 
     virtual ~YAMLParser() {}
 
-    char* skipSpaces( char* ptr, int min_indent, int max_comment_indent )
+    حرف* skipSpaces( حرف* ptr, صحيح min_indent, صحيح max_comment_indent )
     {
-        if (!ptr)
+        אם (!ptr)
             CV_PARSE_ERROR_CPP("Invalid input");
 
-        for(;;)
+        עבור(;;)
         {
-            while( *ptr == ' ' )
+            כלעוד( *ptr == ' ' )
                 ptr++;
-            if( *ptr == '#' )
+            אם( *ptr == '#' )
             {
-                if( ptr - fs->bufferStart() > max_comment_indent )
-                    return ptr;
+                אם( ptr - fs->bufferStart() > max_comment_indent )
+                    החזר ptr;
                 *ptr = '\0';
             }
-            else if( cv_isprint(*ptr) )
+            אחרת אם( cv_isprint(*ptr) )
             {
-                if( ptr - fs->bufferStart() < min_indent )
+                אם( ptr - fs->bufferStart() < min_indent )
                     CV_PARSE_ERROR_CPP( "Incorrect indentation" );
-                break;
+                اكسر;
             }
-            else if( *ptr == '\0' || *ptr == '\n' || *ptr == '\r' )
+            אחרת אם( *ptr == '\0' || *ptr == '\n' || *ptr == '\r' )
             {
                 ptr = fs->gets();
-                if( !ptr )
+                אם( !ptr )
                 {
                     // emulate end of stream
                     ptr = fs->bufferStart();
                     ptr[0] = ptr[1] = ptr[2] = '.';
                     ptr[3] = '\0';
                     fs->setEof();
-                    break;
+                    اكسر;
                 }
-                else
+                אחרת
                 {
-                    int l = (int)strlen(ptr);
-                    if( ptr[l-1] != '\n' && ptr[l-1] != '\r' && !fs->eof() )
+                    صحيح l = (صحيح)strlen(ptr);
+                    אם( ptr[l-1] != '\n' && ptr[l-1] != '\r' && !fs->eof() )
                         CV_PARSE_ERROR_CPP( "Too long string or a last string w/o newline" );
                 }
             }
-            else
+            אחרת
                 CV_PARSE_ERROR_CPP( *ptr == '\t' ? "Tabs are prohibited in YAML!" : "Invalid character" );
         }
 
-        return ptr;
+        החזר ptr;
     }
 
-    bool getBase64Row(char* ptr, int indent, char* &beg, char* &end)
+    منطقي getBase64Row(حرف* ptr, صحيح indent, حرف* &beg, حرف* &end)
     {
-        if (!ptr)
+        אם (!ptr)
             CV_PARSE_ERROR_CPP("Invalid input");
 
         beg = end = ptr = skipSpaces(ptr, 0, INT_MAX);
-        if (!ptr || !*ptr)
-            return false; // end of file
+        אם (!ptr || !*ptr)
+            החזר שקר; // end of file
 
-        if (ptr - fs->bufferStart() != indent)
-            return false; // end of base64 data
+        אם (ptr - fs->bufferStart() != indent)
+            החזר שקר; // end of base64 data
 
         /* find end */
-        while(cv_isprint(*ptr)) /* no check for base64 string */
+        כלעוד(cv_isprint(*ptr)) /* no check for base64 string */
             ++ptr;
-        if (*ptr == '\0')
+        אם (*ptr == '\0')
             CV_PARSE_ERROR_CPP("Unexpected end of line");
 
         end = ptr;
-        return true;
+        החזר אמת;
     }
 
 
-    char* parseKey( char* ptr, FileNode& map_node, FileNode& value_placeholder )
+    حرف* parseKey( حرف* ptr, FileNode& map_node, FileNode& value_placeholder )
     {
-        if (!ptr)
+        אם (!ptr)
             CV_PARSE_ERROR_CPP("Invalid input");
 
-        char c;
-        char *endptr = ptr - 1, *saveptr;
+        حرف c;
+        حرف *endptr = ptr - 1, *saveptr;
 
-        if( *ptr == '-' )
+        אם( *ptr == '-' )
             CV_PARSE_ERROR_CPP( "Key may not start with \'-\'" );
 
-        do c = *++endptr;
-        while( cv_isprint(c) && c != ':' );
+        עשה c = *++endptr;
+        כלעוד( cv_isprint(c) && c != ':' );
 
-        if( c != ':' )
+        אם( c != ':' )
             CV_PARSE_ERROR_CPP( "Missing \':\'" );
 
         saveptr = endptr + 1;
-        if( endptr == ptr )
+        אם( endptr == ptr )
             CV_PARSE_ERROR_CPP( "An empty key" );
 
-        do c = *--endptr;
-        while( c == ' ' );
+        עשה c = *--endptr;
+        כלעוד( c == ' ' );
 
         ++endptr;
 
         value_placeholder = fs->addNode(map_node, std::string(ptr, endptr - ptr), FileNode::NONE);
         ptr = saveptr;
 
-        return ptr;
+        החזר ptr;
     }
 
-    char* parseValue( char* ptr, FileNode& node, int min_indent, bool is_parent_flow, int depth = 0 )
+    حرف* parseValue( حرف* ptr, FileNode& node, صحيح min_indent, منطقي is_parent_flow, صحيح depth = 0 )
     {
-        if (!ptr)
+        אם (!ptr)
             CV_PARSE_ERROR_CPP("Invalid input");
 
-        if( depth > CV_PERSISTENCE_MAX_DEPTH )
+        אם( depth > CV_PERSISTENCE_MAX_DEPTH )
             CV_PARSE_ERROR_CPP("Too many nested collections");
 
-        char* endptr = 0;
-        char c = ptr[0], d = ptr[1];
-        int value_type = FileNode::NONE;
-        int len;
-        bool is_binary_string = false;
-        bool is_user = false;
+        حرف* endptr = 0;
+        حرف c = ptr[0], d = ptr[1];
+        صحيح value_type = FileNode::NONE;
+        صحيح len;
+        منطقي is_binary_string = שקר;
+        منطقي is_user = שקר;
 
-        if( c == '!' ) // handle explicit type specification
+        אם( c == '!' ) // handle explicit type specification
         {
-            if( d == '!' || d == '^' )
+            אם( d == '!' || d == '^' )
             {
                 ptr++;
-                is_user = true;
+                is_user = אמת;
                 //value_type |= FileNode::USER;
             }
-            if ( d == '<') //support of full type heading from YAML 1.2
+            אם ( d == '<') //support of full type heading from YAML 1.2
             {
-                const char* yamlTypeHeading = "<tag:yaml.org,2002:";
-                const size_t headingLength = strlen(yamlTypeHeading);
+                ثابت حرف* yamlTypeHeading = "<tag:yaml.org,2002:";
+                ثابت size_t headingLength = strlen(yamlTypeHeading);
 
-                char* typeEndPtr = ++ptr;
+                حرف* typeEndPtr = ++ptr;
 
-                do d = *++typeEndPtr;
-                while( cv_isprint(d) && d != ' ' && d != '>' );
+                עשה d = *++typeEndPtr;
+                כלעוד( cv_isprint(d) && d != ' ' && d != '>' );
 
-                if ( d == '>' && (size_t)(typeEndPtr - ptr) > headingLength )
+                אם ( d == '>' && (size_t)(typeEndPtr - ptr) > headingLength )
                 {
-                    if ( memcmp(ptr, yamlTypeHeading, headingLength) == 0 )
+                    אם ( memcmp(ptr, yamlTypeHeading, headingLength) == 0 )
                     {
                         *typeEndPtr = ' ';
                         ptr += headingLength - 1;
-                        is_user = true;
+                        is_user = אמת;
                         //value_type |= FileNode::USER;
                     }
                 }
             }
 
             endptr = ptr++;
-            do d = *++endptr;
-            while( cv_isprint(d) && d != ' ' );
-            len = (int)(endptr - ptr);
-            if( len == 0 )
+            עשה d = *++endptr;
+            כלעוד( cv_isprint(d) && d != ' ' );
+            len = (صحيح)(endptr - ptr);
+            אם( len == 0 )
                 CV_PARSE_ERROR_CPP( "Empty type name" );
             d = *endptr;
             *endptr = '\0';
 
-            if( len == 3 && !is_user )
+            אם( len == 3 && !is_user )
             {
-                if( memcmp( ptr, "str", 3 ) == 0 )
+                אם( memcmp( ptr, "str", 3 ) == 0 )
                     value_type = FileNode::STRING;
-                else if( memcmp( ptr, "int", 3 ) == 0 )
+                אחרת אם( memcmp( ptr, "int", 3 ) == 0 )
                     value_type = FileNode::INT;
-                else if( memcmp( ptr, "seq", 3 ) == 0 )
+                אחרת אם( memcmp( ptr, "seq", 3 ) == 0 )
                     value_type = FileNode::SEQ;
-                else if( memcmp( ptr, "map", 3 ) == 0 )
+                אחרת אם( memcmp( ptr, "map", 3 ) == 0 )
                     value_type = FileNode::MAP;
             }
-            else if( len == 5 && !is_user )
+            אחרת אם( len == 5 && !is_user )
             {
-                if( memcmp( ptr, "float", 5 ) == 0 )
+                אם( memcmp( ptr, "float", 5 ) == 0 )
                     value_type = FileNode::REAL;
             }
-            else if (len == 6 && is_user)
+            אחרת אם (len == 6 && is_user)
             {
-                if( memcmp( ptr, "binary", 6 ) == 0 ) {
+                אם( memcmp( ptr, "binary", 6 ) == 0 ) {
                     value_type = FileNode::SEQ;
-                    is_binary_string = true;
+                    is_binary_string = אמת;
 
                     /* for ignore '|' */
 
                     /**** operation with endptr ****/
                     *endptr = d;
 
-                    do {
+                    עשה {
                         d = *++endptr;
-                        if (d == '|')
-                            break;
-                    } while (d == ' ');
+                        אם (d == '|')
+                            اكسر;
+                    } כלעוד (d == ' ');
 
                     d = *++endptr;
                     *endptr = '\0';
@@ -540,363 +540,363 @@ public:
 
             *endptr = d;
             ptr = skipSpaces( endptr, min_indent, INT_MAX );
-            if (!ptr)
+            אם (!ptr)
                 CV_PARSE_ERROR_CPP("Invalid input");
 
             c = *ptr;
 
-            if( !is_user )
+            אם( !is_user )
             {
-                if (value_type == FileNode::STRING && c != '\'' && c != '\"')
-                    goto force_string;
-                if( value_type == FileNode::INT )
-                    goto force_int;
-                if( value_type == FileNode::REAL )
-                    goto force_real;
+                אם (value_type == FileNode::STRING && c != '\'' && c != '\"')
+                    اذهب force_string;
+                אם( value_type == FileNode::INT )
+                    اذهب force_int;
+                אם( value_type == FileNode::REAL )
+                    اذهب force_real;
             }
         }
 
-        if (is_binary_string)
+        אם (is_binary_string)
         {
-            int indent = static_cast<int>(ptr - fs->bufferStart());
+            صحيح indent = static_cast<صحيح>(ptr - fs->bufferStart());
             ptr = fs->parseBase64(ptr, indent, node);
         }
-        else if( cv_isdigit(c) ||
+        אחרת אם( cv_isdigit(c) ||
                 ((c == '-' || c == '+') && (cv_isdigit(d) || d == '.')) ||
                 (c == '.' && cv_isalnum(d))) // a number
         {
             endptr = ptr + (c == '-' || c == '+');
-            while( cv_isdigit(*endptr) )
+            כלעוד( cv_isdigit(*endptr) )
                 endptr++;
-            if( *endptr == '.' || *endptr == 'e' )
+            אם( *endptr == '.' || *endptr == 'e' )
             {
             force_real:
-                double fval = fs->strtod( ptr, &endptr );
+                مزدوج fval = fs->strtod( ptr, &endptr );
                 node.setValue(FileNode::REAL, &fval);
             }
-            else
+            אחרת
             {
             force_int:
                 int64_t ival = strtoll( ptr, &endptr, 0 );
                 node.setValue(FileNode::INT, &ival);
             }
 
-            if( !endptr || endptr == ptr )
+            אם( !endptr || endptr == ptr )
                 CV_PARSE_ERROR_CPP( "Invalid numeric value (inconsistent explicit type specification?)" );
 
             ptr = endptr;
             CV_PERSISTENCE_CHECK_END_OF_BUFFER_BUG_CPP();
         }
-        else if( c == '\'' || c == '\"' ) // an explicit string
+        אחרת אם( c == '\'' || c == '\"' ) // an explicit string
         {
-            if( c == '\'' )
-                for( len = 0; len < CV_FS_MAX_LEN; )
+            אם( c == '\'' )
+                עבור( len = 0; len < CV_FS_MAX_LEN; )
                 {
                     c = *++ptr;
-                    if( cv_isalnum(c) || (c != '\'' && cv_isprint(c)))
+                    אם( cv_isalnum(c) || (c != '\'' && cv_isprint(c)))
                         buf[len++] = c;
-                    else if( c == '\'' )
+                    אחרת אם( c == '\'' )
                     {
                         c = *++ptr;
-                        if( c != '\'' )
-                            break;
+                        אם( c != '\'' )
+                            اكسر;
                         buf[len++] = c;
                     }
-                    else
+                    אחרת
                         CV_PARSE_ERROR_CPP( "Invalid character" );
                 }
-            else
-                for( len = 0; len < CV_FS_MAX_LEN; )
+            אחרת
+                עבור( len = 0; len < CV_FS_MAX_LEN; )
                 {
                     c = *++ptr;
-                    if( cv_isalnum(c) || (c != '\\' && c != '\"' && cv_isprint(c)))
+                    אם( cv_isalnum(c) || (c != '\\' && c != '\"' && cv_isprint(c)))
                         buf[len++] = c;
-                    else if( c == '\"' )
+                    אחרת אם( c == '\"' )
                     {
                         ++ptr;
-                        break;
+                        اكسر;
                     }
-                    else if( c == '\\' )
+                    אחרת אם( c == '\\' )
                     {
                         d = *++ptr;
-                        if( d == '\'' )
+                        אם( d == '\'' )
                             buf[len++] = d;
-                        else if( d == '\"' || d == '\\' || d == '\'' )
+                        אחרת אם( d == '\"' || d == '\\' || d == '\'' )
                             buf[len++] = d;
-                        else if( d == 'n' )
+                        אחרת אם( d == 'n' )
                             buf[len++] = '\n';
-                        else if( d == 'r' )
+                        אחרת אם( d == 'r' )
                             buf[len++] = '\r';
-                        else if( d == 't' )
+                        אחרת אם( d == 't' )
                             buf[len++] = '\t';
-                        else if( d == 'x' || (cv_isdigit(d) && d < '8') )
+                        אחרת אם( d == 'x' || (cv_isdigit(d) && d < '8') )
                         {
-                            int val, is_hex = d == 'x';
+                            صحيح val, is_hex = d == 'x';
                             c = ptr[3];
                             ptr[3] = '\0';
-                            val = (int)strtol( ptr + is_hex, &endptr, is_hex ? 8 : 16 );
+                            val = (صحيح)strtol( ptr + is_hex, &endptr, is_hex ? 8 : 16 );
                             ptr[3] = c;
-                            if( endptr == ptr + is_hex )
+                            אם( endptr == ptr + is_hex )
                                 buf[len++] = 'x';
-                            else
+                            אחרת
                             {
-                                buf[len++] = (char)val;
+                                buf[len++] = (حرف)val;
                                 ptr = endptr;
                             }
                         }
                     }
-                    else
+                    אחרת
                         CV_PARSE_ERROR_CPP( "Invalid character" );
                 }
 
-            if( len >= CV_FS_MAX_LEN )
+            אם( len >= CV_FS_MAX_LEN )
                 CV_PARSE_ERROR_CPP( "Too long string literal" );
 
             node.setValue(FileNode::STRING, buf, len);
         }
-        else if( c == '[' || c == '{' ) // collection as a flow
+        אחרת אם( c == '[' || c == '{' ) // collection as a flow
         {
-            int new_min_indent = min_indent + !is_parent_flow;
-            int struct_type = c == '{' ? FileNode::MAP : FileNode::SEQ;
-            int nelems = 0;
+            صحيح new_min_indent = min_indent + !is_parent_flow;
+            صحيح struct_type = c == '{' ? FileNode::MAP : FileNode::SEQ;
+            صحيح nelems = 0;
 
             fs->convertToCollection(struct_type, node);
             d = c == '[' ? ']' : '}';
 
-            for( ++ptr ;; nelems++ )
+            עבור( ++ptr ;; nelems++ )
             {
                 FileNode elem;
 
                 ptr = skipSpaces( ptr, new_min_indent, INT_MAX );
-                if (!ptr)
+                אם (!ptr)
                     CV_PARSE_ERROR_CPP("Invalid input");
-                if( *ptr == '}' || *ptr == ']' )
+                אם( *ptr == '}' || *ptr == ']' )
                 {
-                    if( *ptr != d )
+                    אם( *ptr != d )
                         CV_PARSE_ERROR_CPP( "The wrong closing bracket" );
                     ptr++;
-                    break;
+                    اكسر;
                 }
 
-                if( nelems != 0 )
+                אם( nelems != 0 )
                 {
-                    if( *ptr != ',' )
+                    אם( *ptr != ',' )
                         CV_PARSE_ERROR_CPP( "Missing , between the elements" );
                     ptr = skipSpaces( ptr + 1, new_min_indent, INT_MAX );
-                    if (!ptr)
+                    אם (!ptr)
                         CV_PARSE_ERROR_CPP("Invalid input");
                 }
 
-                if( struct_type == FileNode::MAP )
+                אם( struct_type == FileNode::MAP )
                 {
                     ptr = parseKey( ptr, node, elem );
                     ptr = skipSpaces( ptr, new_min_indent, INT_MAX );
                 }
-                else
+                אחרת
                 {
-                    if( *ptr == ']' )
-                        break;
+                    אם( *ptr == ']' )
+                        اكسر;
                     elem = fs->addNode(node, std::string(), FileNode::NONE);
                 }
-                ptr = parseValue( ptr, elem, new_min_indent, true, depth + 1 );
+                ptr = parseValue( ptr, elem, new_min_indent, אמת, depth + 1 );
             }
             fs->finalizeCollection(node);
         }
-        else
+        אחרת
         {
-            int indent, struct_type;
+            صحيح indent, struct_type;
 
-            if( is_parent_flow || c != '-' )
+            אם( is_parent_flow || c != '-' )
             {
                 // implicit (one-line) string or nested block-style collection
-                if( !is_parent_flow )
+                אם( !is_parent_flow )
                 {
-                    if( c == '?' )
+                    אם( c == '?' )
                         CV_PARSE_ERROR_CPP( "Complex keys are not supported" );
-                    if( c == '|' || c == '>' )
+                    אם( c == '|' || c == '>' )
                         CV_PARSE_ERROR_CPP( "Multi-line text literals are not supported" );
                 }
 
             force_string:
                 endptr = ptr - 1;
 
-                do c = *++endptr;
-                while( cv_isprint(c) &&
+                עשה c = *++endptr;
+                כלעוד( cv_isprint(c) &&
                       (!is_parent_flow || (c != ',' && c != '}' && c != ']')) &&
                       (is_parent_flow || c != ':' || value_type == FileNode::STRING));
 
-                if( endptr == ptr )
+                אם( endptr == ptr )
                     CV_PARSE_ERROR_CPP( "Invalid character" );
 
-                if( is_parent_flow || c != ':' )
+                אם( is_parent_flow || c != ':' )
                 {
-                    char* str_end = endptr;
-                    do c = *--str_end;
-                    while( str_end > ptr && c == ' ' );
+                    حرف* str_end = endptr;
+                    עשה c = *--str_end;
+                    כלעוד( str_end > ptr && c == ' ' );
                     str_end++;
-                    if ((fs->getFormat() & FileStorage::FORMAT_MASK) != FileStorage::FORMAT_YAML_1_0)
+                    אם ((fs->getFormat() & FileStorage::FORMAT_MASK) != FileStorage::FORMAT_YAML_1_0)
                     {
                         size_t llen = str_end - ptr;
-                        if (llen == 4 && memcmp(ptr, "true", 4) == 0) {
+                        אם (llen == 4 && memcmp(ptr, "true", 4) == 0) {
                             int64_t ival = 1;
                             node.setValue(FileNode::INT, &ival);
                             ptr = endptr;
-                            return ptr;
+                            החזר ptr;
                         }
-                        else if (llen == 5 && memcmp(ptr, "false", 5) == 0) {
+                        אחרת אם (llen == 5 && memcmp(ptr, "false", 5) == 0) {
                             int64_t ival = 0;
                             node.setValue(FileNode::INT, &ival);
                             ptr = endptr;
-                            return ptr;
+                            החזר ptr;
                         }
-                        else if (llen == 4 && memcmp(ptr, "null", 4) == 0) {
+                        אחרת אם (llen == 4 && memcmp(ptr, "null", 4) == 0) {
                             ptr = endptr;
-                            return ptr;
+                            החזר ptr;
                         }
                     }
 
-                    node.setValue(FileNode::STRING, ptr, (int)(str_end - ptr));
+                    node.setValue(FileNode::STRING, ptr, (صحيح)(str_end - ptr));
                     ptr = endptr;
-                    return ptr;
+                    החזר ptr;
                 }
                 struct_type = FileNode::MAP;
             }
-            else
+            אחרת
                 struct_type = FileNode::SEQ;
 
             fs->convertToCollection( struct_type, node );
-            indent = (int)(ptr - fs->bufferStart());
+            indent = (صحيح)(ptr - fs->bufferStart());
 
-            for(;;)
+            עבור(;;)
             {
                 FileNode elem;
 
-                if( struct_type == FileNode::MAP )
+                אם( struct_type == FileNode::MAP )
                 {
                     ptr = parseKey( ptr, node, elem );
                 }
-                else
+                אחרת
                 {
                     c = *ptr++;
-                    if( c != '-' )
+                    אם( c != '-' )
                         CV_PARSE_ERROR_CPP( "Block sequence elements must be preceded with \'-\'" );
 
                     elem = fs->addNode(node, std::string(), FileNode::NONE);
                 }
                 ptr = skipSpaces( ptr, indent + 1, INT_MAX );
-                ptr = parseValue( ptr, elem, indent + 1, false, depth + 1 );
+                ptr = parseValue( ptr, elem, indent + 1, שקר, depth + 1 );
                 ptr = skipSpaces( ptr, 0, INT_MAX );
-                if( ptr - fs->bufferStart() != indent )
+                אם( ptr - fs->bufferStart() != indent )
                 {
-                    if( ptr - fs->bufferStart() < indent )
-                        break;
-                    else
+                    אם( ptr - fs->bufferStart() < indent )
+                        اكسر;
+                    אחרת
                         CV_PARSE_ERROR_CPP( "Incorrect indentation" );
                 }
-                if( memcmp( ptr, "...", 3 ) == 0 )
-                    break;
+                אם( memcmp( ptr, "...", 3 ) == 0 )
+                    اكسر;
             }
             fs->finalizeCollection(node);
         }
 
-        return ptr;
+        החזר ptr;
     }
 
-    bool parse( char* ptr )
+    منطقي parse( حرف* ptr )
     {
-        if (!ptr)
+        אם (!ptr)
             CV_PARSE_ERROR_CPP("Invalid input");
 
-        bool first = true;
-        bool ok = true;
+        منطقي first = אמת;
+        منطقي ok = אמת;
         FileNode root_collection(fs->getFS(), 0, 0);
 
-        for(;;)
+        עבור(;;)
         {
             // 0. skip leading comments and directives  and ...
             // 1. reach the first item
-            for(;;)
+            עבור(;;)
             {
                 ptr = skipSpaces( ptr, 0, INT_MAX );
-                if( !ptr || *ptr == '\0' )
+                אם( !ptr || *ptr == '\0' )
                 {
                     ok = !first;
-                    break;
+                    اكسر;
                 }
 
-                if( *ptr == '%' )
+                אם( *ptr == '%' )
                 {
-                    if( memcmp( ptr, "%YAML", 5 ) == 0 &&
+                    אם( memcmp( ptr, "%YAML", 5 ) == 0 &&
                         memcmp( ptr, "%YAML:1.", 8 ) != 0 &&
                         memcmp( ptr, "%YAML 1.", 8 ) != 0)
                     {
-                        if ((fs->getFormat() & FileStorage::FORMAT_MASK) == FileStorage::FORMAT_YAML_1_0)
+                        אם ((fs->getFormat() & FileStorage::FORMAT_MASK) == FileStorage::FORMAT_YAML_1_0)
                             CV_PARSE_ERROR_CPP( "Unsupported YAML version (it must be 1.x)" );
                     }
                     *ptr = '\0';
                 }
-                else if( *ptr == '-' )
+                אחרת אם( *ptr == '-' )
                 {
-                    if( memcmp(ptr, "---", 3) == 0 )
+                    אם( memcmp(ptr, "---", 3) == 0 )
                     {
                         ptr += 3;
-                        break;
+                        اكسر;
                     }
-                    else if( first )
-                        break;
+                    אחרת אם( first )
+                        اكسر;
                 }
-                else if( cv_isalnum(*ptr) || *ptr=='_')
+                אחרת אם( cv_isalnum(*ptr) || *ptr=='_')
                 {
-                    if( !first )
+                    אם( !first )
                         CV_PARSE_ERROR_CPP( "The YAML streams must start with '---', except the first one" );
-                    break;
+                    اكسر;
                 }
-                else if( fs->eof() )
-                    break;
-                else
+                אחרת אם( fs->eof() )
+                    اكسر;
+                אחרת
                     CV_PARSE_ERROR_CPP( "Invalid or unsupported syntax" );
             }
 
-            if( ptr )
+            אם( ptr )
                 ptr = skipSpaces( ptr, 0, INT_MAX );
-            if( !ptr || !ptr[0] )
-                break;
-            if( memcmp( ptr, "...", 3 ) != 0 )
+            אם( !ptr || !ptr[0] )
+                اكسر;
+            אם( memcmp( ptr, "...", 3 ) != 0 )
             {
                 // 2. parse the collection
                 FileNode root_node = fs->addNode(root_collection, std::string(), FileNode::NONE);
 
-                ptr = parseValue( ptr, root_node, 0, false );
-                if( !root_node.isMap() && !root_node.isSeq() )
+                ptr = parseValue( ptr, root_node, 0, שקר );
+                אם( !root_node.isMap() && !root_node.isSeq() )
                     CV_PARSE_ERROR_CPP( "Only collections as YAML streams are supported by this parser" );
 
                 // 3. parse until the end of file or next collection
                 ptr = skipSpaces( ptr, 0, INT_MAX );
-                if( !ptr )
-                    break;
+                אם( !ptr )
+                    اكسر;
             }
 
-            if( fs->eof() )
-                break;
+            אם( fs->eof() )
+                اكسر;
             ptr += 3;
-            first = false;
+            first = שקר;
         }
 
-        return ok;
+        החזר ok;
     }
 
     FileStorage_API* fs;
-    char buf[CV_FS_MAX_LEN+1024];
+    حرف buf[CV_FS_MAX_LEN+1024];
 };
 
 Ptr<FileStorageEmitter> createYAMLEmitter(FileStorage_API* fs)
 {
-    return makePtr<YAMLEmitter>(fs);
+    החזר makePtr<YAMLEmitter>(fs);
 }
 
 Ptr<FileStorageParser> createYAMLParser(FileStorage_API* fs)
 {
-    return makePtr<YAMLParser>(fs);
+    החזר makePtr<YAMLParser>(fs);
 }
 
 }
