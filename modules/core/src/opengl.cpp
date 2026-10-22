@@ -42,16 +42,16 @@
 
 #include "precomp.hpp"
 
-#if defined (__APPLE__) || defined(MACOSX)
+#もし defined (__APPLE__) || defined(MACOSX)
    #define GL_SHARING_EXTENSION "cl_APPLE_gl_sharing"
-#else
+#否则
    #define GL_SHARING_EXTENSION "cl_khr_gl_sharing"
 #endif
 
 #ifdef HAVE_OPENGL
 #  include "gl_core_3_1.hpp"
 #  ifdef HAVE_CUDA
-#    if (defined(__arm__) || defined(__aarch64__)) \
+#    もし (defined(__arm__) || defined(__aarch64__)) \
          && !defined(OPENCV_SKIP_CUDA_OPENGL_ARM_WORKAROUND)
 #      include <GL/gl.h>
 #      ifndef GL_VERSION
@@ -60,14 +60,14 @@
 #    endif
 #    include <cuda_gl_interop.h>
 #  endif
-#else // HAVE_OPENGL
+#否则 // HAVE_OPENGL
 #  define NO_OPENGL_SUPPORT_ERROR CV_Error(cv::Error::StsBadFunc, "OpenCV was build without OpenGL support")
 #endif // HAVE_OPENGL
 
 using namespace cv;
 using namespace cv::cuda;
 
-#if defined(_MSC_VER)
+#もし defined(_MSC_VER)
 #pragma warning(disable : 4702)  // unreachable code
 #endif
 
@@ -76,10 +76,10 @@ namespace
 #ifndef HAVE_OPENGL
 inline static CV_NORETURN void throw_no_ogl() { CV_Error(cv::Error::OpenGlNotSupported, "The library is compiled without OpenGL support"); }
 #elif defined _DEBUG
-inline static bool checkError(const char* file, const int line, const char* func = 0)
+inline static bool checkError(const char* file, const 整数 line, const char* func = 0)
 {
     GLenum err = gl::GetError();
-    if (err != gl::NO_ERROR_)
+    もし (err != gl::NO_ERROR_)
     {
         const char* msg;
         switch (err)
@@ -101,7 +101,7 @@ inline static bool checkError(const char* file, const int line, const char* func
         };
         cv::error(Error::OpenGlApiCallError, func, msg, file, line);
     }
-    return true;
+    戻る true;
 }
 #endif // HAVE_OPENGL
 } // namespace
@@ -118,16 +118,16 @@ namespace
 ////////////////////////////////////////////////////////////////////////
 // setGlDevice
 
-void cv::cuda::setGlDevice(int device)
+void cv::cuda::setGlDevice(整数 device)
 {
 #ifndef HAVE_OPENGL
     CV_UNUSED(device);
     throw_no_ogl();
-#else
+#否则
     #ifndef HAVE_CUDA
         CV_UNUSED(device);
         throw_no_cuda();
-    #else
+    #否则
         cudaSafeCall( cudaGLSetGLDevice(device) );
     #endif
 #endif
@@ -136,7 +136,7 @@ void cv::cuda::setGlDevice(int device)
 ////////////////////////////////////////////////////////////////////////
 // CudaResource
 
-#if defined(HAVE_OPENGL) && defined(HAVE_CUDA)
+#もし defined(HAVE_OPENGL) && defined(HAVE_CUDA)
 
 namespace
 {
@@ -175,8 +175,8 @@ namespace
     {
         CV_DbgAssert( buffer != 0 );
 
-        if (buffer_ == buffer)
-            return;
+        もし (buffer_ == buffer)
+            戻る;
 
         cudaGraphicsResource_t resource;
         cudaSafeCall( cudaGraphicsGLRegisterBuffer(&resource, buffer, cudaGraphicsMapFlagsNone) );
@@ -189,7 +189,7 @@ namespace
 
     void CudaResource::release()
     {
-        if (resource_)
+        もし (resource_)
             cudaGraphicsUnregisterResource(resource_);
 
         resource_ = 0;
@@ -211,13 +211,13 @@ namespace
 
     CudaResource::GraphicsMapHolder::GraphicsMapHolder(cudaGraphicsResource_t* resource, cudaStream_t stream) : resource_(resource), stream_(stream)
     {
-        if (resource_)
+        もし (resource_)
             cudaSafeCall( cudaGraphicsMapResources(1, resource_, stream_) );
     }
 
     CudaResource::GraphicsMapHolder::~GraphicsMapHolder()
     {
-        if (resource_)
+        もし (resource_)
             cudaGraphicsUnmapResources(1, resource_, stream_);
     }
 
@@ -239,9 +239,9 @@ namespace
 
         CV_DbgAssert( width * height == size );
 
-        if (stream == 0)
+        もし (stream == 0)
             cudaSafeCall( cudaMemcpy2D(dst, width, src, spitch, width, height, cudaMemcpyDeviceToDevice) );
-        else
+        否则
             cudaSafeCall( cudaMemcpy2DAsync(dst, width, src, spitch, width, height, cudaMemcpyDeviceToDevice, stream) );
     }
 
@@ -258,9 +258,9 @@ namespace
 
         CV_DbgAssert( width * height == size );
 
-        if (stream == 0)
+        もし (stream == 0)
             cudaSafeCall( cudaMemcpy2D(dst, dpitch, src, width, width, height, cudaMemcpyDeviceToDevice) );
-        else
+        否则
             cudaSafeCall( cudaMemcpy2DAsync(dst, dpitch, src, width, width, height, cudaMemcpyDeviceToDevice, stream) );
     }
 
@@ -276,7 +276,7 @@ namespace
 
         h.reset();
 
-        return ptr;
+        戻る ptr;
     }
 
     void CudaResource::unmap(cudaStream_t stream)
@@ -298,7 +298,7 @@ class cv::ogl::Buffer::Impl
 {
 };
 
-#else
+#否则
 
 class cv::ogl::Buffer::Impl
 {
@@ -331,7 +331,7 @@ public:
 
     void setAutoRelease(bool flag) { autoRelease_ = flag; }
 
-    GLuint bufId() const { return bufId_; }
+    GLuint bufId() const { 戻る bufId_; }
 
 private:
     Impl();
@@ -347,7 +347,7 @@ private:
 const Ptr<cv::ogl::Buffer::Impl>& cv::ogl::Buffer::Impl::empty()
 {
     static Ptr<Impl> p(new Impl);
-    return p;
+    戻る p;
 }
 
 cv::ogl::Buffer::Impl::Impl() : bufId_(0), autoRelease_(false)
@@ -378,7 +378,7 @@ cv::ogl::Buffer::Impl::Impl(GLsizeiptr size, const GLvoid* data, GLenum target, 
 
 cv::ogl::Buffer::Impl::~Impl()
 {
-    if (autoRelease_ && bufId_)
+    もし (autoRelease_ && bufId_)
         gl::DeleteBuffers(1, &bufId_);
 }
 
@@ -439,7 +439,7 @@ void* cv::ogl::Buffer::Impl::mapHost(GLenum access)
     GLvoid* data = gl::MapBuffer(gl::COPY_READ_BUFFER, access);
     CV_CheckGlError();
 
-    return data;
+    戻る data;
 }
 
 void cv::ogl::Buffer::Impl::unmapHost()
@@ -464,7 +464,7 @@ void cv::ogl::Buffer::Impl::copyTo(void* dst, size_t dpitch, size_t width, size_
 void* cv::ogl::Buffer::Impl::mapDevice(cudaStream_t stream)
 {
     cudaResource_.registerBuffer(bufId_);
-    return cudaResource_.map(stream);
+    戻る cudaResource_.map(stream);
 }
 
 void cv::ogl::Buffer::Impl::unmapDevice(cudaStream_t stream)
@@ -480,12 +480,12 @@ cv::ogl::Buffer::Buffer() : rows_(0), cols_(0), type_(0)
 {
 #ifndef HAVE_OPENGL
     throw_no_ogl();
-#else
+#否则
     impl_ = Impl::empty();
 #endif
 }
 
-cv::ogl::Buffer::Buffer(int arows, int acols, int atype, unsigned int abufId, bool autoRelease) : rows_(0), cols_(0), type_(0)
+cv::ogl::Buffer::Buffer(整数 arows, 整数 acols, 整数 atype, unsigned 整数 abufId, bool autoRelease) : rows_(0), cols_(0), type_(0)
 {
 #ifndef HAVE_OPENGL
     CV_UNUSED(arows);
@@ -494,7 +494,7 @@ cv::ogl::Buffer::Buffer(int arows, int acols, int atype, unsigned int abufId, bo
     CV_UNUSED(abufId);
     CV_UNUSED(autoRelease);
     throw_no_ogl();
-#else
+#否则
     impl_.reset(new Impl(abufId, autoRelease));
     rows_ = arows;
     cols_ = acols;
@@ -502,7 +502,7 @@ cv::ogl::Buffer::Buffer(int arows, int acols, int atype, unsigned int abufId, bo
 #endif
 }
 
-cv::ogl::Buffer::Buffer(Size asize, int atype, unsigned int abufId, bool autoRelease) : rows_(0), cols_(0), type_(0)
+cv::ogl::Buffer::Buffer(Size asize, 整数 atype, unsigned 整数 abufId, bool autoRelease) : rows_(0), cols_(0), type_(0)
 {
 #ifndef HAVE_OPENGL
     CV_UNUSED(asize);
@@ -510,7 +510,7 @@ cv::ogl::Buffer::Buffer(Size asize, int atype, unsigned int abufId, bool autoRel
     CV_UNUSED(abufId);
     CV_UNUSED(autoRelease);
     throw_no_ogl();
-#else
+#否则
     impl_.reset(new Impl(abufId, autoRelease));
     rows_ = asize.height;
     cols_ = asize.width;
@@ -525,8 +525,8 @@ cv::ogl::Buffer::Buffer(InputArray arr, Target target, bool autoRelease) : rows_
     CV_UNUSED(target);
     CV_UNUSED(autoRelease);
     throw_no_ogl();
-#else
-    const int kind = arr.kind();
+#否则
+    const 整数 kind = arr.kind();
 
     switch (kind)
     {
@@ -550,7 +550,7 @@ cv::ogl::Buffer::Buffer(InputArray arr, Target target, bool autoRelease) : rows_
 #endif
 }
 
-void cv::ogl::Buffer::create(int arows, int acols, int atype, Target target, bool autoRelease)
+void cv::ogl::Buffer::create(整数 arows, 整数 acols, 整数 atype, Target target, bool autoRelease)
 {
 #ifndef HAVE_OPENGL
     CV_UNUSED(arows);
@@ -559,17 +559,17 @@ void cv::ogl::Buffer::create(int arows, int acols, int atype, Target target, boo
     CV_UNUSED(target);
     CV_UNUSED(autoRelease);
     throw_no_ogl();
-#else
-    if (rows_ != arows || cols_ != acols || type_ != atype)
+#否则
+    もし (rows_ != arows || cols_ != acols || type_ != atype)
     {
         const GLsizeiptr asize = (GLsizeiptr)arows * acols * CV_ELEM_SIZE(atype);
         // resize in place when sole owner (keeps the GL id); else allocate fresh (copy-on-write)
-        if (impl_->bufId() != 0 && impl_.use_count() == 1)
+        もし (impl_->bufId() != 0 && impl_.use_count() == 1)
         {
             impl_->resize(asize, target);
             impl_->setAutoRelease(autoRelease);
         }
-        else
+        否则
             impl_.reset(new Impl(asize, 0, target, autoRelease));
         rows_ = arows;
         cols_ = acols;
@@ -581,7 +581,7 @@ void cv::ogl::Buffer::create(int arows, int acols, int atype, Target target, boo
 void cv::ogl::Buffer::release()
 {
 #ifdef HAVE_OPENGL
-    if (impl_)
+    もし (impl_)
         impl_->setAutoRelease(true);
     impl_ = Impl::empty();
     rows_ = 0;
@@ -595,7 +595,7 @@ void cv::ogl::Buffer::setAutoRelease(bool flag)
 #ifndef HAVE_OPENGL
     CV_UNUSED(flag);
     throw_no_ogl();
-#else
+#否则
     impl_->setAutoRelease(flag);
 #endif
 }
@@ -607,11 +607,11 @@ void cv::ogl::Buffer::copyFrom(InputArray arr, Target target, bool autoRelease)
     CV_UNUSED(target);
     CV_UNUSED(autoRelease);
     throw_no_ogl();
-#else
-    const int kind = arr.kind();
+#否则
+    const 整数 kind = arr.kind();
 
     const Size asize = arr.size();
-    const int atype = arr.type();
+    const 整数 atype = arr.type();
     create(asize, atype, target, autoRelease);
 
     switch (kind)
@@ -627,7 +627,7 @@ void cv::ogl::Buffer::copyFrom(InputArray arr, Target target, bool autoRelease)
         {
             #ifndef HAVE_CUDA
                 throw_no_cuda();
-            #else
+            #否则
                 GpuMat dmat = arr.getGpuMat();
                 impl_->copyFrom(dmat.data, dmat.step, dmat.cols * dmat.elemSize(), dmat.rows);
             #endif
@@ -653,14 +653,14 @@ void cv::ogl::Buffer::copyFrom(InputArray arr, cuda::Stream& stream, Target targ
     CV_UNUSED(target);
     CV_UNUSED(autoRelease);
     throw_no_ogl();
-#else
+#否则
     #ifndef HAVE_CUDA
         CV_UNUSED(arr);
         CV_UNUSED(stream);
         CV_UNUSED(target);
         CV_UNUSED(autoRelease);
         throw_no_cuda();
-    #else
+    #否则
         GpuMat dmat = arr.getGpuMat();
 
         create(dmat.size(), dmat.type(), target, autoRelease);
@@ -675,8 +675,8 @@ void cv::ogl::Buffer::copyTo(OutputArray arr) const
 #ifndef HAVE_OPENGL
     CV_UNUSED(arr);
     throw_no_ogl();
-#else
-    const int kind = arr.kind();
+#否则
+    const 整数 kind = arr.kind();
 
     switch (kind)
     {
@@ -690,7 +690,7 @@ void cv::ogl::Buffer::copyTo(OutputArray arr) const
         {
             #ifndef HAVE_CUDA
                 throw_no_cuda();
-            #else
+            #否则
                 GpuMat& dmat = arr.getGpuMatRef();
                 dmat.create(rows_, cols_, type_);
                 impl_->copyTo(dmat.data, dmat.step, dmat.cols * dmat.elemSize(), dmat.rows);
@@ -716,12 +716,12 @@ void cv::ogl::Buffer::copyTo(OutputArray arr, cuda::Stream& stream) const
     CV_UNUSED(arr);
     CV_UNUSED(stream);
     throw_no_ogl();
-#else
+#否则
     #ifndef HAVE_CUDA
         CV_UNUSED(arr);
         CV_UNUSED(stream);
         throw_no_cuda();
-    #else
+    #否则
         arr.create(rows_, cols_, type_);
         GpuMat dmat = arr.getGpuMat();
         impl_->copyTo(dmat.data, dmat.step, dmat.cols * dmat.elemSize(), dmat.rows, cuda::StreamAccessor::getStream(stream));
@@ -735,10 +735,10 @@ cv::ogl::Buffer cv::ogl::Buffer::clone(Target target, bool autoRelease) const
     CV_UNUSED(target);
     CV_UNUSED(autoRelease);
     throw_no_ogl();
-#else
+#否则
     ogl::Buffer buf;
     buf.copyFrom(*this, target, autoRelease);
-    return buf;
+    戻る buf;
 #endif
 }
 
@@ -747,7 +747,7 @@ void cv::ogl::Buffer::bind(Target target) const
 #ifndef HAVE_OPENGL
     CV_UNUSED(target);
     throw_no_ogl();
-#else
+#否则
     impl_->bind(target);
 #endif
 }
@@ -757,7 +757,7 @@ void cv::ogl::Buffer::unbind(Target target)
 #ifndef HAVE_OPENGL
     CV_UNUSED(target);
     throw_no_ogl();
-#else
+#否则
     gl::BindBuffer(target, 0);
     CV_CheckGlError();
 #endif
@@ -768,8 +768,8 @@ Mat cv::ogl::Buffer::mapHost(Access access)
 #ifndef HAVE_OPENGL
     CV_UNUSED(access);
     throw_no_ogl();
-#else
-    return Mat(rows_, cols_, type_, impl_->mapHost(access));
+#否则
+    戻る Mat(rows_, cols_, type_, impl_->mapHost(access));
 #endif
 }
 
@@ -777,8 +777,8 @@ void cv::ogl::Buffer::unmapHost()
 {
 #ifndef HAVE_OPENGL
     throw_no_ogl();
-#else
-    return impl_->unmapHost();
+#否则
+    戻る impl_->unmapHost();
 #endif
 }
 
@@ -786,11 +786,11 @@ GpuMat cv::ogl::Buffer::mapDevice()
 {
 #ifndef HAVE_OPENGL
     throw_no_ogl();
-#else
+#否则
     #ifndef HAVE_CUDA
         throw_no_cuda();
-    #else
-        return GpuMat(rows_, cols_, type_, impl_->mapDevice());
+    #否则
+        戻る GpuMat(rows_, cols_, type_, impl_->mapDevice());
     #endif
 #endif
 }
@@ -799,10 +799,10 @@ void cv::ogl::Buffer::unmapDevice()
 {
 #ifndef HAVE_OPENGL
     throw_no_ogl();
-#else
+#否则
     #ifndef HAVE_CUDA
         throw_no_cuda();
-    #else
+    #否则
         impl_->unmapDevice();
     #endif
 #endif
@@ -813,12 +813,12 @@ cuda::GpuMat cv::ogl::Buffer::mapDevice(cuda::Stream& stream)
 #ifndef HAVE_OPENGL
     CV_UNUSED(stream);
     throw_no_ogl();
-#else
+#否则
     #ifndef HAVE_CUDA
         CV_UNUSED(stream);
         throw_no_cuda();
-    #else
-        return GpuMat(rows_, cols_, type_, impl_->mapDevice(cuda::StreamAccessor::getStream(stream)));
+    #否则
+        戻る GpuMat(rows_, cols_, type_, impl_->mapDevice(cuda::StreamAccessor::getStream(stream)));
     #endif
 #endif
 }
@@ -828,22 +828,22 @@ void cv::ogl::Buffer::unmapDevice(cuda::Stream& stream)
 #ifndef HAVE_OPENGL
     CV_UNUSED(stream);
     throw_no_ogl();
-#else
+#否则
     #ifndef HAVE_CUDA
         CV_UNUSED(stream);
         throw_no_cuda();
-    #else
+    #否则
         impl_->unmapDevice(cuda::StreamAccessor::getStream(stream));
     #endif
 #endif
 }
 
-unsigned int cv::ogl::Buffer::bufId() const
+unsigned 整数 cv::ogl::Buffer::bufId() const
 {
 #ifndef HAVE_OPENGL
     throw_no_ogl();
-#else
-    return impl_->bufId();
+#否则
+    戻る impl_->bufId();
 #endif
 }
 
@@ -857,7 +857,7 @@ class cv::ogl::Texture2D::Impl
 {
 };
 
-#else
+#否则
 
 class cv::ogl::Texture2D::Impl
 {
@@ -875,7 +875,7 @@ public:
 
     void setAutoRelease(bool flag) { autoRelease_ = flag; }
 
-    GLuint texId() const { return texId_; }
+    GLuint texId() const { 戻る texId_; }
 
 private:
     Impl();
@@ -887,7 +887,7 @@ private:
 const Ptr<cv::ogl::Texture2D::Impl> cv::ogl::Texture2D::Impl::empty()
 {
     static Ptr<Impl> p(new Impl);
-    return p;
+    戻る p;
 }
 
 cv::ogl::Texture2D::Impl::Impl() : texId_(0), autoRelease_(false)
@@ -921,7 +921,7 @@ cv::ogl::Texture2D::Impl::Impl(GLint internalFormat, GLsizei width, GLsizei heig
 
 cv::ogl::Texture2D::Impl::~Impl()
 {
-    if (autoRelease_ && texId_)
+    もし (autoRelease_ && texId_)
         gl::DeleteTextures(1, &texId_);
 }
 
@@ -964,12 +964,12 @@ cv::ogl::Texture2D::Texture2D() : rows_(0), cols_(0), format_(NONE)
 {
 #ifndef HAVE_OPENGL
     throw_no_ogl();
-#else
+#否则
     impl_ = Impl::empty();
 #endif
 }
 
-cv::ogl::Texture2D::Texture2D(int arows, int acols, Format aformat, unsigned int atexId, bool autoRelease) : rows_(0), cols_(0), format_(NONE)
+cv::ogl::Texture2D::Texture2D(整数 arows, 整数 acols, Format aformat, unsigned 整数 atexId, bool autoRelease) : rows_(0), cols_(0), format_(NONE)
 {
 #ifndef HAVE_OPENGL
     CV_UNUSED(arows);
@@ -978,7 +978,7 @@ cv::ogl::Texture2D::Texture2D(int arows, int acols, Format aformat, unsigned int
     CV_UNUSED(atexId);
     CV_UNUSED(autoRelease);
     throw_no_ogl();
-#else
+#否则
     impl_.reset(new Impl(atexId, autoRelease));
     rows_ = arows;
     cols_ = acols;
@@ -986,7 +986,7 @@ cv::ogl::Texture2D::Texture2D(int arows, int acols, Format aformat, unsigned int
 #endif
 }
 
-cv::ogl::Texture2D::Texture2D(Size asize, Format aformat, unsigned int atexId, bool autoRelease) : rows_(0), cols_(0), format_(NONE)
+cv::ogl::Texture2D::Texture2D(Size asize, Format aformat, unsigned 整数 atexId, bool autoRelease) : rows_(0), cols_(0), format_(NONE)
 {
 #ifndef HAVE_OPENGL
     CV_UNUSED(asize);
@@ -994,7 +994,7 @@ cv::ogl::Texture2D::Texture2D(Size asize, Format aformat, unsigned int atexId, b
     CV_UNUSED(atexId);
     CV_UNUSED(autoRelease);
     throw_no_ogl();
-#else
+#否则
     impl_.reset(new Impl(atexId, autoRelease));
     rows_ = asize.height;
     cols_ = asize.width;
@@ -1008,14 +1008,14 @@ cv::ogl::Texture2D::Texture2D(InputArray arr, bool autoRelease) : rows_(0), cols
     CV_UNUSED(arr);
     CV_UNUSED(autoRelease);
     throw_no_ogl();
-#else
-    const int kind = arr.kind();
+#否则
+    const 整数 kind = arr.kind();
 
     const Size asize = arr.size();
-    const int atype = arr.type();
+    const 整数 atype = arr.type();
 
-    const int depth = CV_MAT_DEPTH(atype);
-    const int cn = CV_MAT_CN(atype);
+    const 整数 depth = CV_MAT_DEPTH(atype);
+    const 整数 cn = CV_MAT_CN(atype);
 
     CV_Assert( depth <= CV_32F );
     CV_Assert( cn == 1 || cn == 3 || cn == 4 );
@@ -1044,7 +1044,7 @@ cv::ogl::Texture2D::Texture2D(InputArray arr, bool autoRelease) : rows_(0), cols
         {
             #ifndef HAVE_CUDA
                 throw_no_cuda();
-            #else
+            #否则
                 GpuMat dmat = arr.getGpuMat();
                 ogl::Buffer buf(dmat, ogl::Buffer::PIXEL_UNPACK_BUFFER);
                 buf.setAutoRelease(true);
@@ -1072,7 +1072,7 @@ cv::ogl::Texture2D::Texture2D(InputArray arr, bool autoRelease) : rows_(0), cols
 #endif
 }
 
-void cv::ogl::Texture2D::create(int arows, int acols, Format aformat, bool autoRelease)
+void cv::ogl::Texture2D::create(整数 arows, 整数 acols, Format aformat, bool autoRelease)
 {
 #ifndef HAVE_OPENGL
     CV_UNUSED(arows);
@@ -1080,8 +1080,8 @@ void cv::ogl::Texture2D::create(int arows, int acols, Format aformat, bool autoR
     CV_UNUSED(aformat);
     CV_UNUSED(autoRelease);
     throw_no_ogl();
-#else
-    if (rows_ != arows || cols_ != acols || format_ != aformat)
+#否则
+    もし (rows_ != arows || cols_ != acols || format_ != aformat)
     {
         ogl::Buffer::unbind(ogl::Buffer::PIXEL_UNPACK_BUFFER);
         impl_.reset(new Impl(aformat, acols, arows, aformat, gl::FLOAT, 0, autoRelease));
@@ -1095,7 +1095,7 @@ void cv::ogl::Texture2D::create(int arows, int acols, Format aformat, bool autoR
 void cv::ogl::Texture2D::release()
 {
 #ifdef HAVE_OPENGL
-    if (impl_)
+    もし (impl_)
         impl_->setAutoRelease(true);
     impl_ = Impl::empty();
     rows_ = 0;
@@ -1109,7 +1109,7 @@ void cv::ogl::Texture2D::setAutoRelease(bool flag)
 #ifndef HAVE_OPENGL
     CV_UNUSED(flag);
     throw_no_ogl();
-#else
+#否则
     impl_->setAutoRelease(flag);
 #endif
 }
@@ -1120,14 +1120,14 @@ void cv::ogl::Texture2D::copyFrom(InputArray arr, bool autoRelease)
     CV_UNUSED(arr);
     CV_UNUSED(autoRelease);
     throw_no_ogl();
-#else
-    const int kind = arr.kind();
+#否则
+    const 整数 kind = arr.kind();
 
     const Size asize = arr.size();
-    const int atype = arr.type();
+    const 整数 atype = arr.type();
 
-    const int depth = CV_MAT_DEPTH(atype);
-    const int cn = CV_MAT_CN(atype);
+    const 整数 depth = CV_MAT_DEPTH(atype);
+    const 整数 cn = CV_MAT_CN(atype);
 
     CV_Assert( depth <= CV_32F );
     CV_Assert( cn == 1 || cn == 3 || cn == 4 );
@@ -1158,7 +1158,7 @@ void cv::ogl::Texture2D::copyFrom(InputArray arr, bool autoRelease)
         {
             #ifndef HAVE_CUDA
                 throw_no_cuda();
-            #else
+            #否则
                 GpuMat dmat = arr.getGpuMat();
                 ogl::Buffer buf(dmat, ogl::Buffer::PIXEL_UNPACK_BUFFER);
                 buf.setAutoRelease(true);
@@ -1181,17 +1181,17 @@ void cv::ogl::Texture2D::copyFrom(InputArray arr, bool autoRelease)
 #endif
 }
 
-void cv::ogl::Texture2D::copyTo(OutputArray arr, int ddepth, bool autoRelease) const
+void cv::ogl::Texture2D::copyTo(OutputArray arr, 整数 ddepth, bool autoRelease) const
 {
 #ifndef HAVE_OPENGL
     CV_UNUSED(arr);
     CV_UNUSED(ddepth);
     CV_UNUSED(autoRelease);
     throw_no_ogl();
-#else
-    const int kind = arr.kind();
+#否则
+    const 整数 kind = arr.kind();
 
-    const int cn = format_ == DEPTH_COMPONENT ? 1: format_ == RGB ? 3 : 4;
+    const 整数 cn = format_ == DEPTH_COMPONENT ? 1: format_ == RGB ? 3 : 4;
     const GLenum dstFormat = format_ == DEPTH_COMPONENT ? gl::DEPTH_COMPONENT : format_ == RGB ? gl::BGR : gl::BGRA;
 
     switch(kind)
@@ -1210,7 +1210,7 @@ void cv::ogl::Texture2D::copyTo(OutputArray arr, int ddepth, bool autoRelease) c
         {
             #ifndef HAVE_CUDA
                 throw_no_cuda();
-            #else
+            #否则
                 ogl::Buffer buf(rows_, cols_, CV_MAKE_TYPE(ddepth, cn), ogl::Buffer::PIXEL_PACK_BUFFER);
                 buf.setAutoRelease(true);
                 buf.bind(ogl::Buffer::PIXEL_PACK_BUFFER);
@@ -1238,17 +1238,17 @@ void cv::ogl::Texture2D::bind() const
 {
 #ifndef HAVE_OPENGL
     throw_no_ogl();
-#else
+#否则
     impl_->bind();
 #endif
 }
 
-unsigned int cv::ogl::Texture2D::texId() const
+unsigned 整数 cv::ogl::Texture2D::texId() const
 {
 #ifndef HAVE_OPENGL
     throw_no_ogl();
-#else
-    return impl_->texId();
+#否则
+    戻る impl_->texId();
 #endif
 }
 
@@ -1262,7 +1262,7 @@ class cv::ogl::TextureBuffer::Impl
 {
 };
 
-#else
+#否则
 
 class cv::ogl::TextureBuffer::Impl
 {
@@ -1277,7 +1277,7 @@ public:
 
     void setAutoRelease(bool flag) { autoRelease_ = flag; }
 
-    GLuint texId() const { return texId_; }
+    GLuint texId() const { 戻る texId_; }
 
 private:
     GLuint texId_;
@@ -1287,7 +1287,7 @@ private:
 const Ptr<cv::ogl::TextureBuffer::Impl> cv::ogl::TextureBuffer::Impl::empty()
 {
     static Ptr<Impl> p = makePtr<Impl>();
-    return p;
+    戻る p;
 }
 
 cv::ogl::TextureBuffer::Impl::Impl() : texId_(0), autoRelease_(false)
@@ -1313,7 +1313,7 @@ cv::ogl::TextureBuffer::Impl::Impl(GLenum internalFormat, GLuint bufId, bool aut
 
 cv::ogl::TextureBuffer::Impl::~Impl()
 {
-    if (autoRelease_ && texId_)
+    もし (autoRelease_ && texId_)
         gl::DeleteTextures(1, &texId_);
 }
 
@@ -1332,7 +1332,7 @@ cv::ogl::TextureBuffer::TextureBuffer() : format_(NONE)
 {
 #ifndef HAVE_OPENGL
     throw_no_ogl();
-#else
+#否则
     impl_ = Impl::empty();
 #endif
 }
@@ -1344,7 +1344,7 @@ cv::ogl::TextureBuffer::TextureBuffer(const Buffer& buf, Format aformat, bool au
     CV_UNUSED(aformat);
     CV_UNUSED(autoRelease);
     throw_no_ogl();
-#else
+#否则
     impl_ = Impl::empty();
     create(buf, aformat, autoRelease);
 #endif
@@ -1357,7 +1357,7 @@ void cv::ogl::TextureBuffer::create(const Buffer& buf, Format aformat, bool auto
     CV_UNUSED(aformat);
     CV_UNUSED(autoRelease);
     throw_no_ogl();
-#else
+#否则
     CV_Assert( !buf.empty() );
     CV_Assert( aformat != NONE );
 
@@ -1370,7 +1370,7 @@ void cv::ogl::TextureBuffer::create(const Buffer& buf, Format aformat, bool auto
 void cv::ogl::TextureBuffer::release()
 {
 #ifdef HAVE_OPENGL
-    if (impl_)
+    もし (impl_)
         impl_->setAutoRelease(true);
     impl_ = Impl::empty();
 #endif
@@ -1383,17 +1383,17 @@ void cv::ogl::TextureBuffer::setAutoRelease(bool flag)
 #ifndef HAVE_OPENGL
     CV_UNUSED(flag);
     throw_no_ogl();
-#else
+#否则
     impl_->setAutoRelease(flag);
 #endif
 }
 
-void cv::ogl::TextureBuffer::bind(int unit) const
+void cv::ogl::TextureBuffer::bind(整数 unit) const
 {
 #ifndef HAVE_OPENGL
     CV_UNUSED(unit);
     throw_no_ogl();
-#else
+#否则
     CV_Assert( unit >= 0 );
     impl_->bind(unit);
 #endif
@@ -1401,20 +1401,20 @@ void cv::ogl::TextureBuffer::bind(int unit) const
 
 cv::ogl::TextureBuffer::Format cv::ogl::TextureBuffer::format() const
 {
-    return format_;
+    戻る format_;
 }
 
 bool cv::ogl::TextureBuffer::empty() const
 {
-    return format_ == NONE;
+    戻る format_ == NONE;
 }
 
-unsigned int cv::ogl::TextureBuffer::texId() const
+unsigned 整数 cv::ogl::TextureBuffer::texId() const
 {
 #ifndef HAVE_OPENGL
     throw_no_ogl();
-#else
-    return impl_->texId();
+#否则
+    戻る impl_->texId();
 #endif
 }
 
@@ -1424,15 +1424,15 @@ unsigned int cv::ogl::TextureBuffer::texId() const
 
 void cv::ogl::Arrays::setVertexArray(InputArray vertex)
 {
-    const int cn = vertex.channels();
-    const int depth = vertex.depth();
+    const 整数 cn = vertex.channels();
+    const 整数 depth = vertex.depth();
 
     CV_Assert( cn == 2 || cn == 3 || cn == 4 );
     CV_Assert( depth == CV_16S || depth == CV_32S || depth == CV_32F || depth == CV_64F );
 
-    if (vertex.kind() == _InputArray::OPENGL_BUFFER)
+    もし (vertex.kind() == _InputArray::OPENGL_BUFFER)
         vertex_ = vertex.getOGlBuffer();
-    else
+    否则
         vertex_.copyFrom(vertex);
 
     size_ = vertex_.size().area();
@@ -1446,13 +1446,13 @@ void cv::ogl::Arrays::resetVertexArray()
 
 void cv::ogl::Arrays::setColorArray(InputArray color)
 {
-    const int cn = color.channels();
+    const 整数 cn = color.channels();
 
     CV_Assert( cn == 3 || cn == 4 );
 
-    if (color.kind() == _InputArray::OPENGL_BUFFER)
+    もし (color.kind() == _InputArray::OPENGL_BUFFER)
         color_ = color.getOGlBuffer();
-    else
+    否则
         color_.copyFrom(color);
 }
 
@@ -1463,15 +1463,15 @@ void cv::ogl::Arrays::resetColorArray()
 
 void cv::ogl::Arrays::setNormalArray(InputArray normal)
 {
-    const int cn = normal.channels();
-    const int depth = normal.depth();
+    const 整数 cn = normal.channels();
+    const 整数 depth = normal.depth();
 
     CV_Assert( cn == 3 );
     CV_Assert( depth == CV_8S || depth == CV_16S || depth == CV_32S || depth == CV_32F || depth == CV_64F );
 
-    if (normal.kind() == _InputArray::OPENGL_BUFFER)
+    もし (normal.kind() == _InputArray::OPENGL_BUFFER)
         normal_ = normal.getOGlBuffer();
-    else
+    否则
         normal_.copyFrom(normal);
 }
 
@@ -1482,15 +1482,15 @@ void cv::ogl::Arrays::resetNormalArray()
 
 void cv::ogl::Arrays::setTexCoordArray(InputArray texCoord)
 {
-    const int cn = texCoord.channels();
-    const int depth = texCoord.depth();
+    const 整数 cn = texCoord.channels();
+    const 整数 depth = texCoord.depth();
 
     CV_Assert( cn >= 1 && cn <= 4 );
     CV_Assert( depth == CV_16S || depth == CV_32S || depth == CV_32F || depth == CV_64F );
 
-    if (texCoord.kind() == _InputArray::OPENGL_BUFFER)
+    もし (texCoord.kind() == _InputArray::OPENGL_BUFFER)
         texCoord_ = texCoord.getOGlBuffer();
-    else
+    否则
         texCoord_.copyFrom(texCoord);
 }
 
@@ -1512,7 +1512,7 @@ void cv::ogl::Arrays::setAutoRelease(bool flag)
 #ifndef HAVE_OPENGL
     CV_UNUSED(flag);
     throw_no_ogl();
-#else
+#否则
     vertex_.setAutoRelease(flag);
     color_.setAutoRelease(flag);
     normal_.setAutoRelease(flag);
@@ -1524,17 +1524,17 @@ void cv::ogl::Arrays::bind() const
 {
 #ifndef HAVE_OPENGL
     throw_no_ogl();
-#else
+#否则
     CV_Assert( texCoord_.empty() || texCoord_.size().area() == size_ );
     CV_Assert( normal_.empty() || normal_.size().area() == size_ );
     CV_Assert( color_.empty() || color_.size().area() == size_ );
 
-    if (texCoord_.empty())
+    もし (texCoord_.empty())
     {
         gl::DisableClientState(gl::TEXTURE_COORD_ARRAY);
         CV_CheckGlError();
     }
-    else
+    否则
     {
         gl::EnableClientState(gl::TEXTURE_COORD_ARRAY);
         CV_CheckGlError();
@@ -1545,12 +1545,12 @@ void cv::ogl::Arrays::bind() const
         CV_CheckGlError();
     }
 
-    if (normal_.empty())
+    もし (normal_.empty())
     {
         gl::DisableClientState(gl::NORMAL_ARRAY);
         CV_CheckGlError();
     }
-    else
+    否则
     {
         gl::EnableClientState(gl::NORMAL_ARRAY);
         CV_CheckGlError();
@@ -1561,30 +1561,30 @@ void cv::ogl::Arrays::bind() const
         CV_CheckGlError();
     }
 
-    if (color_.empty())
+    もし (color_.empty())
     {
         gl::DisableClientState(gl::COLOR_ARRAY);
         CV_CheckGlError();
     }
-    else
+    否则
     {
         gl::EnableClientState(gl::COLOR_ARRAY);
         CV_CheckGlError();
 
         color_.bind(ogl::Buffer::ARRAY_BUFFER);
 
-        const int cn = color_.channels();
+        const 整数 cn = color_.channels();
 
         gl::ColorPointer(cn, gl_types[color_.depth()], 0, 0);
         CV_CheckGlError();
     }
 
-    if (vertex_.empty())
+    もし (vertex_.empty())
     {
         gl::DisableClientState(gl::VERTEX_ARRAY);
         CV_CheckGlError();
     }
-    else
+    否则
     {
         gl::EnableClientState(gl::VERTEX_ARRAY);
         CV_CheckGlError();
@@ -1608,7 +1608,7 @@ class cv::ogl::VertexArray::Impl
 {
 };
 
-#else
+#否则
 
 class cv::ogl::VertexArray::Impl
 {
@@ -1623,7 +1623,7 @@ public:
 
     void setAutoRelease(bool flag) { autoRelease_ = flag; }
 
-    GLuint vaId() const { return vaId_; }
+    GLuint vaId() const { 戻る vaId_; }
 
 private:
     Impl();
@@ -1635,7 +1635,7 @@ private:
 const Ptr<cv::ogl::VertexArray::Impl>& cv::ogl::VertexArray::Impl::empty()
 {
     static Ptr<Impl> p(new Impl);
-    return p;
+    戻る p;
 }
 
 cv::ogl::VertexArray::Impl::Impl() : vaId_(0), autoRelease_(false)
@@ -1656,10 +1656,10 @@ cv::ogl::VertexArray::Impl::Impl(std::initializer_list<Attribute> attributes, bo
     gl::BindVertexArray(vaId_);
     CV_CheckGlError();
 
-    for (auto& attribute : attributes)
+    ために (auto& attribute : attributes)
     {
         attribute.buffer_.bind(Buffer::ARRAY_BUFFER);
-        if (attribute.integer_)
+        もし (attribute.integer_)
         {
             gl::VertexAttribIPointer(
                 attribute.shader_loc_,
@@ -1670,7 +1670,7 @@ cv::ogl::VertexArray::Impl::Impl(std::initializer_list<Attribute> attributes, bo
             );
             CV_CheckGlError();
         }
-        else
+        否则
         {
             gl::VertexAttribPointer(
                 attribute.shader_loc_,
@@ -1690,7 +1690,7 @@ cv::ogl::VertexArray::Impl::Impl(std::initializer_list<Attribute> attributes, bo
 
 cv::ogl::VertexArray::Impl::~Impl()
 {
-    if (autoRelease_ && vaId_)
+    もし (autoRelease_ && vaId_)
         gl::DeleteVertexArrays(1, &vaId_);
 }
 
@@ -1706,7 +1706,7 @@ cv::ogl::VertexArray::VertexArray()
 {
 #ifndef HAVE_OPENGL
     throw_no_ogl();
-#else
+#否则
     impl_ = Impl::empty();
 #endif
 }
@@ -1716,7 +1716,7 @@ cv::ogl::VertexArray::VertexArray(std::initializer_list<Attribute> attributes, b
 #ifndef HAVE_OPENGL
     CV_UNUSED(attributes); CV_UNUSED(autoRelease);
     throw_no_ogl();
-#else
+#否则
     impl_.reset(new Impl(attributes, autoRelease));
 #endif
 }
@@ -1726,7 +1726,7 @@ void cv::ogl::VertexArray::create(std::initializer_list<Attribute> attributes, b
 #ifndef HAVE_OPENGL
     CV_UNUSED(attributes); CV_UNUSED(autoRelease);
     throw_no_ogl();
-#else
+#否则
     impl_.reset(new Impl(attributes, autoRelease));
 #endif
 }
@@ -1734,7 +1734,7 @@ void cv::ogl::VertexArray::create(std::initializer_list<Attribute> attributes, b
 void cv::ogl::VertexArray::release()
 {
 #ifdef HAVE_OPENGL
-    if (impl_)
+    もし (impl_)
         impl_->setAutoRelease(true);
     impl_ = Impl::empty();
 #endif
@@ -1745,7 +1745,7 @@ void cv::ogl::VertexArray::setAutoRelease(bool flag)
 #ifndef HAVE_OPENGL
     CV_UNUSED(flag);
     throw_no_ogl();
-#else
+#否则
     impl_->setAutoRelease(flag);
 #endif
 }
@@ -1754,7 +1754,7 @@ void cv::ogl::VertexArray::bind() const
 {
 #ifndef HAVE_OPENGL
     throw_no_ogl();
-#else
+#否则
     impl_->bind();
 #endif
 }
@@ -1763,17 +1763,17 @@ void cv::ogl::VertexArray::unbind()
 {
 #ifndef HAVE_OPENGL
     throw_no_ogl();
-#else
+#否则
     gl::BindVertexArray(0);
 #endif
 }
 
-unsigned int cv::ogl::VertexArray::vaId() const
+unsigned 整数 cv::ogl::VertexArray::vaId() const
 {
 #ifndef HAVE_OPENGL
     throw_no_ogl();
-#else
-    return impl_->vaId();
+#否则
+    戻る impl_->vaId();
 #endif
 }
 
@@ -1786,7 +1786,7 @@ class cv::ogl::Shader::Impl
 {
 };
 
-#else
+#否则
 
 class cv::ogl::Shader::Impl
 {
@@ -1799,7 +1799,7 @@ public:
 
     void setAutoRelease(bool flag) { autoRelease_ = flag; }
 
-    GLuint shaderId() const { return shaderId_; }
+    GLuint shaderId() const { 戻る shaderId_; }
 
 private:
     Impl();
@@ -1811,7 +1811,7 @@ private:
 const Ptr<cv::ogl::Shader::Impl>& cv::ogl::Shader::Impl::empty()
 {
     static Ptr<Impl> p(new Impl);
-    return p;
+    戻る p;
 }
 
 cv::ogl::Shader::Impl::Impl() : shaderId_(0), autoRelease_(false)
@@ -1834,7 +1834,7 @@ cv::ogl::Shader::Impl::Impl(const char* src, GLenum type, bool autoRelease) : sh
     gl::ShaderSource(shaderId_, 1, &src, 0);
     gl::CompileShader(shaderId_);
     gl::GetShaderiv(shaderId_, gl::COMPILE_STATUS, &status);
-    if (!status) {
+    もし (!status) {
         String info_log;
         gl::GetShaderiv(shaderId_, gl::INFO_LOG_LENGTH, &status);
         info_log.resize(status);
@@ -1847,7 +1847,7 @@ cv::ogl::Shader::Impl::Impl(const char* src, GLenum type, bool autoRelease) : sh
 
 cv::ogl::Shader::Impl::~Impl()
 {
-    if (autoRelease_ && shaderId_)
+    もし (autoRelease_ && shaderId_)
         gl::DeleteShader(shaderId_);
 }
 
@@ -1857,7 +1857,7 @@ cv::ogl::Shader::Shader() : type_(ShaderType::VERTEX)
 {
 #ifndef HAVE_OPENGL
     throw_no_ogl();
-#else
+#否则
     impl_ = Impl::empty();
 #endif
 }
@@ -1867,7 +1867,7 @@ cv::ogl::Shader::Shader(const char* src, ShaderType type, bool autoRelease) : ty
 #ifndef HAVE_OPENGL
     CV_UNUSED(src); CV_UNUSED(type); CV_UNUSED(autoRelease);
     throw_no_ogl();
-#else
+#否则
     impl_.reset(new Impl(src, type, autoRelease));
 #endif
 }
@@ -1877,7 +1877,7 @@ void cv::ogl::Shader::create(const char* src, ShaderType type, bool autoRelease)
 #ifndef HAVE_OPENGL
     CV_UNUSED(src); CV_UNUSED(type); CV_UNUSED(autoRelease);
     throw_no_ogl();
-#else
+#否则
     impl_.reset(new Impl(src, type, autoRelease));
     type_ = type;
 #endif
@@ -1886,7 +1886,7 @@ void cv::ogl::Shader::create(const char* src, ShaderType type, bool autoRelease)
 void cv::ogl::Shader::release()
 {
 #ifdef HAVE_OPENGL
-    if (impl_)
+    もし (impl_)
         impl_->setAutoRelease(true);
     impl_ = Impl::empty();
 #endif
@@ -1897,23 +1897,23 @@ void cv::ogl::Shader::setAutoRelease(bool flag)
 #ifndef HAVE_OPENGL
     CV_UNUSED(flag);
     throw_no_ogl();
-#else
+#否则
     impl_->setAutoRelease(flag);
 #endif
 }
 
-unsigned int cv::ogl::Shader::shaderId() const
+unsigned 整数 cv::ogl::Shader::shaderId() const
 {
 #ifndef HAVE_OPENGL
     throw_no_ogl();
-#else
-    return impl_->shaderId();
+#否则
+    戻る impl_->shaderId();
 #endif
 }
 
 cv::ogl::Shader::ShaderType cv::ogl::Shader::type() const
 {
-    return type_;
+    戻る type_;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1925,7 +1925,7 @@ class cv::ogl::Program::Impl
 {
 };
 
-#else
+#否则
 
 class cv::ogl::Program::Impl
 {
@@ -1938,12 +1938,12 @@ public:
 
     void bind();
 
-    int getAttributeLocation(const char* name) const;
-    int getUniformLocation(const char* name) const;
+    整数 getAttributeLocation(const char* name) const;
+    整数 getUniformLocation(const char* name) const;
 
     void setAutoRelease(bool flag) { autoRelease_ = flag; }
 
-    GLuint programId() const { return programId_; }
+    GLuint programId() const { 戻る programId_; }
 
 private:
     Impl();
@@ -1957,7 +1957,7 @@ private:
 const Ptr<cv::ogl::Program::Impl>& cv::ogl::Program::Impl::empty()
 {
     static Ptr<Impl> p(new Impl);
-    return p;
+    戻る p;
 }
 
 cv::ogl::Program::Impl::Impl() : programId_(0), autoRelease_(false)
@@ -1985,7 +1985,7 @@ cv::ogl::Program::Impl::Impl(const Shader& vert, const Shader& frag, bool autoRe
     GLint status;
     gl::LinkProgram(programId_);
     gl::GetProgramiv(programId_, gl::LINK_STATUS, &status);
-    if (!status) {
+    もし (!status) {
         String info_log;
         gl::GetProgramiv(programId_, gl::INFO_LOG_LENGTH, &status);
         info_log.resize(status);
@@ -2001,7 +2001,7 @@ cv::ogl::Program::Impl::Impl(const Shader& vert, const Shader& frag, bool autoRe
 
 cv::ogl::Program::Impl::~Impl()
 {
-    if (autoRelease_ && programId_)
+    もし (autoRelease_ && programId_)
         gl::DeleteProgram(programId_);
 }
 
@@ -2011,20 +2011,20 @@ void cv::ogl::Program::Impl::bind()
     CV_CheckGlError();
 }
 
-int cv::ogl::Program::Impl::getAttributeLocation(const char* name) const
+整数 cv::ogl::Program::Impl::getAttributeLocation(const char* name) const
 {
     // -1 if absent (e.g. optimized out); caller decides.
-    int location = gl::GetAttribLocation(programId_, name);
+    整数 location = gl::GetAttribLocation(programId_, name);
     CV_CheckGlError();
-    return location;
+    戻る location;
 }
 
-int cv::ogl::Program::Impl::getUniformLocation(const char* name) const
+整数 cv::ogl::Program::Impl::getUniformLocation(const char* name) const
 {
     // -1 if absent (e.g. optimized out); caller decides.
-    int location = gl::GetUniformLocation(programId_, name);
+    整数 location = gl::GetUniformLocation(programId_, name);
     CV_CheckGlError();
-    return location;
+    戻る location;
 }
 
 #endif // HAVE_OPENGL
@@ -2033,7 +2033,7 @@ cv::ogl::Program::Program()
 {
 #ifndef HAVE_OPENGL
     throw_no_ogl();
-#else
+#否则
     impl_ = Impl::empty();
 #endif
 }
@@ -2043,7 +2043,7 @@ cv::ogl::Program::Program(const Shader& vert, const Shader& frag, bool autoRelea
 #ifndef HAVE_OPENGL
     CV_UNUSED(vert); CV_UNUSED(frag); CV_UNUSED(autoRelease);
     throw_no_ogl();
-#else
+#否则
     impl_.reset(new Impl(vert, frag, autoRelease));
 #endif
 }
@@ -2053,7 +2053,7 @@ void cv::ogl::Program::create(const Shader& vert, const Shader& frag, bool autoR
 #ifndef HAVE_OPENGL
     CV_UNUSED(vert); CV_UNUSED(frag); CV_UNUSED(autoRelease);
     throw_no_ogl();
-#else
+#否则
     impl_.reset(new Impl(vert, frag, autoRelease));
 #endif
 }
@@ -2061,7 +2061,7 @@ void cv::ogl::Program::create(const Shader& vert, const Shader& frag, bool autoR
 void cv::ogl::Program::release()
 {
 #ifdef HAVE_OPENGL
-    if (impl_)
+    もし (impl_)
         impl_->setAutoRelease(true);
     impl_ = Impl::empty();
 #endif
@@ -2072,7 +2072,7 @@ void cv::ogl::Program::setAutoRelease(bool flag)
 #ifndef HAVE_OPENGL
     CV_UNUSED(flag);
     throw_no_ogl();
-#else
+#否则
     impl_->setAutoRelease(flag);
 #endif
 }
@@ -2081,7 +2081,7 @@ void cv::ogl::Program::bind() const
 {
 #ifndef HAVE_OPENGL
     throw_no_ogl();
-#else
+#否则
     impl_->bind();
 #endif
 }
@@ -2090,97 +2090,97 @@ void cv::ogl::Program::unbind()
 {
 #ifndef HAVE_OPENGL
     throw_no_ogl();
-#else
+#否则
     gl::UseProgram(0);
 #endif
 }
 
-int cv::ogl::Program::getAttributeLocation(const char* name) const
+整数 cv::ogl::Program::getAttributeLocation(const char* name) const
 {
 #ifndef HAVE_OPENGL
     CV_UNUSED(name);
     throw_no_ogl();
-#else
-    return impl_->getAttributeLocation(name);
+#否则
+    戻る impl_->getAttributeLocation(name);
 #endif
 }
 
-int cv::ogl::Program::getUniformLocation(const char* name) const
+整数 cv::ogl::Program::getUniformLocation(const char* name) const
 {
 #ifndef HAVE_OPENGL
     CV_UNUSED(name);
     throw_no_ogl();
-#else
-    return impl_->getUniformLocation(name);
+#否则
+    戻る impl_->getUniformLocation(name);
 #endif
 }
 
-void cv::ogl::Program::setUniformVec3(int loc, Vec3f vec)
+void cv::ogl::Program::setUniformVec3(整数 loc, Vec3f vec)
 {
 #ifndef HAVE_OPENGL
     CV_UNUSED(loc); CV_UNUSED(vec);
     throw_no_ogl();
-#else
+#否则
     gl::Uniform3f(loc, vec(0), vec(1), vec(2));
 #endif
 }
 
-void cv::ogl::Program::setUniformVec2(int loc, Vec2f vec)
+void cv::ogl::Program::setUniformVec2(整数 loc, Vec2f vec)
 {
 #ifndef HAVE_OPENGL
     CV_UNUSED(loc); CV_UNUSED(vec);
     throw_no_ogl();
-#else
+#否则
     gl::Uniform2f(loc, vec(0), vec(1));
 #endif
 }
 
-void cv::ogl::Program::setUniformVec4(int loc, Vec4f vec)
+void cv::ogl::Program::setUniformVec4(整数 loc, Vec4f vec)
 {
 #ifndef HAVE_OPENGL
     CV_UNUSED(loc); CV_UNUSED(vec);
     throw_no_ogl();
-#else
+#否则
     gl::Uniform4f(loc, vec(0), vec(1), vec(2), vec(3));
 #endif
 }
 
-void cv::ogl::Program::setUniformMat4x4(int loc, Matx44f mat)
+void cv::ogl::Program::setUniformMat4x4(整数 loc, Matx44f mat)
 {
 #ifndef HAVE_OPENGL
     CV_UNUSED(loc); CV_UNUSED(mat);
     throw_no_ogl();
-#else
+#否则
     gl::UniformMatrix4fv(loc, 1, true, mat.val);
 #endif
 }
 
-void cv::ogl::Program::setUniform1f(int loc, float value)
+void cv::ogl::Program::setUniform1f(整数 loc, float value)
 {
 #ifndef HAVE_OPENGL
     CV_UNUSED(loc); CV_UNUSED(value);
     throw_no_ogl();
-#else
+#否则
     gl::Uniform1f(loc, value);
 #endif
 }
 
-void cv::ogl::Program::setUniform1i(int loc, int value)
+void cv::ogl::Program::setUniform1i(整数 loc, 整数 value)
 {
 #ifndef HAVE_OPENGL
     CV_UNUSED(loc); CV_UNUSED(value);
     throw_no_ogl();
-#else
+#否则
     gl::Uniform1i(loc, value);
 #endif
 }
 
-unsigned int cv::ogl::Program::programId() const
+unsigned 整数 cv::ogl::Program::programId() const
 {
 #ifndef HAVE_OPENGL
     throw_no_ogl();
-#else
-    return impl_->programId();
+#否则
+    戻る impl_->programId();
 #endif
 }
 
@@ -2194,8 +2194,8 @@ void cv::ogl::render(const ogl::Texture2D& tex, Rect_<double> wndRect, Rect_<dou
     CV_UNUSED(wndRect);
     CV_UNUSED(texRect);
     throw_no_ogl();
-#else
-    if (!tex.empty())
+#否则
+    もし (!tex.empty())
     {
         gl::MatrixMode(gl::PROJECTION);
         gl::LoadIdentity();
@@ -2259,15 +2259,15 @@ void cv::ogl::render(const ogl::Texture2D& tex, Rect_<double> wndRect, Rect_<dou
 #endif
 }
 
-void cv::ogl::render(const ogl::Arrays& arr, int mode, Scalar color)
+void cv::ogl::render(const ogl::Arrays& arr, 整数 mode, Scalar color)
 {
 #ifndef HAVE_OPENGL
     CV_UNUSED(arr);
     CV_UNUSED(mode);
     CV_UNUSED(color);
     throw_no_ogl();
-#else
-    if (!arr.empty())
+#否则
+    もし (!arr.empty())
     {
         gl::Color3d(color[0] / 255.0, color[1] / 255.0, color[2] / 255.0);
 
@@ -2278,7 +2278,7 @@ void cv::ogl::render(const ogl::Arrays& arr, int mode, Scalar color)
 #endif
 }
 
-void cv::ogl::render(const ogl::Arrays& arr, InputArray indices, int mode, Scalar color)
+void cv::ogl::render(const ogl::Arrays& arr, InputArray indices, 整数 mode, Scalar color)
 {
 #ifndef HAVE_OPENGL
     CV_UNUSED(arr);
@@ -2286,14 +2286,14 @@ void cv::ogl::render(const ogl::Arrays& arr, InputArray indices, int mode, Scala
     CV_UNUSED(mode);
     CV_UNUSED(color);
     throw_no_ogl();
-#else
-    if (!arr.empty() && !indices.empty())
+#否则
+    もし (!arr.empty() && !indices.empty())
     {
         gl::Color3d(color[0] / 255.0, color[1] / 255.0, color[2] / 255.0);
 
         arr.bind();
 
-        const int kind = indices.kind();
+        const 整数 kind = indices.kind();
 
         switch (kind)
         {
@@ -2301,17 +2301,17 @@ void cv::ogl::render(const ogl::Arrays& arr, InputArray indices, int mode, Scala
             {
                 ogl::Buffer buf = indices.getOGlBuffer();
 
-                const int depth = buf.depth();
+                const 整数 depth = buf.depth();
 
                 CV_Assert( buf.channels() == 1 );
                 CV_Assert( depth <= CV_32S );
 
                 GLenum type;
-                if (depth < CV_16U)
+                もし (depth < CV_16U)
                     type = gl::UNSIGNED_BYTE;
-                else if (depth < CV_32S)
+                否则 もし (depth < CV_32S)
                     type = gl::UNSIGNED_SHORT;
-                else
+                否则
                     type = gl::UNSIGNED_INT;
 
                 buf.bind(ogl::Buffer::ELEMENT_ARRAY_BUFFER);
@@ -2327,18 +2327,18 @@ void cv::ogl::render(const ogl::Arrays& arr, InputArray indices, int mode, Scala
             {
                 Mat mat = indices.getMat();
 
-                const int depth = mat.depth();
+                const 整数 depth = mat.depth();
 
                 CV_Assert( mat.channels() == 1 );
                 CV_Assert( depth <= CV_32S );
                 CV_Assert( mat.isContinuous() );
 
                 GLenum type;
-                if (depth < CV_16U)
+                もし (depth < CV_16U)
                     type = gl::UNSIGNED_BYTE;
-                else if (depth < CV_32S)
+                否则 もし (depth < CV_32S)
                     type = gl::UNSIGNED_SHORT;
-                else
+                否则
                     type = gl::UNSIGNED_INT;
 
                 ogl::Buffer::unbind(ogl::Buffer::ELEMENT_ARRAY_BUFFER);
@@ -2355,7 +2355,7 @@ void cv::ogl::clearColor(Scalar color)
 #ifndef HAVE_OPENGL
     CV_UNUSED(color);
     throw_no_ogl();
-#else
+#否则
     gl::ClearColor(static_cast<GLfloat>(color[0] / 255.0), static_cast<GLfloat>(color[1] / 255.0),
                    static_cast<GLfloat>(color[2] / 255.0), static_cast<GLfloat>(color[3] / 255.0));
     gl::Clear(gl::COLOR_BUFFER_BIT);
@@ -2367,49 +2367,49 @@ void cv::ogl::clearDepth(float depth)
 #ifndef HAVE_OPENGL
     CV_UNUSED(depth);
     throw_no_ogl();
-#else
+#否则
     gl::ClearDepth(depth);
     gl::Clear(gl::DEPTH_BUFFER_BIT);
 #endif // HAVE_OPENGL
 }
 
-void cv::ogl::drawArrays(int first, int count, int mode)
+void cv::ogl::drawArrays(整数 first, 整数 count, 整数 mode)
 {
 #ifndef HAVE_OPENGL
     CV_UNUSED(first); CV_UNUSED(count); CV_UNUSED(mode);
     throw_no_ogl();
-#else
+#否则
     gl::DrawArrays(mode, first, count);
 #endif // HAVE_OPENGL
 }
 
-void cv::ogl::drawElements(int first, int count, int type, int mode)
+void cv::ogl::drawElements(整数 first, 整数 count, 整数 type, 整数 mode)
 {
 #ifndef HAVE_OPENGL
     CV_UNUSED(first); CV_UNUSED(count); CV_UNUSED(type); CV_UNUSED(mode);
     throw_no_ogl();
-#else
+#否则
     gl::DrawElements(mode, count, type, reinterpret_cast<const void*>(static_cast<size_t>(first)));
 #endif
 }
 
-void cv::ogl::drawElementsInstanced(int first, int count, int type, int mode, int instanceCount)
+void cv::ogl::drawElementsInstanced(整数 first, 整数 count, 整数 type, 整数 mode, 整数 instanceCount)
 {
 #ifndef HAVE_OPENGL
     CV_UNUSED(first); CV_UNUSED(count); CV_UNUSED(type); CV_UNUSED(mode); CV_UNUSED(instanceCount);
     throw_no_ogl();
-#else
+#否则
     gl::DrawElementsInstanced(mode, count, type, reinterpret_cast<const void*>(static_cast<size_t>(first)), instanceCount);
     CV_CheckGlError();
 #endif
 }
 
-void cv::ogl::blendFunc(int sfactor, int dfactor)
+void cv::ogl::blendFunc(整数 sfactor, 整数 dfactor)
 {
 #ifndef HAVE_OPENGL
     CV_UNUSED(sfactor); CV_UNUSED(dfactor);
     throw_no_ogl();
-#else
+#否则
     gl::BlendFunc(sfactor, dfactor);
 #endif
 }
@@ -2419,27 +2419,27 @@ void cv::ogl::depthMask(bool flag)
 #ifndef HAVE_OPENGL
     CV_UNUSED(flag);
     throw_no_ogl();
-#else
+#否则
     gl::DepthMask(flag ? gl::TRUE_ : gl::FALSE_);
 #endif
 }
 
-void cv::ogl::enable(int cap)
+void cv::ogl::enable(整数 cap)
 {
 #ifndef HAVE_OPENGL
     CV_UNUSED(cap);
     throw_no_ogl();
-#else
+#否则
     gl::Enable(cap);
 #endif
 }
 
-void cv::ogl::disable(int cap)
+void cv::ogl::disable(整数 cap)
 {
 #ifndef HAVE_OPENGL
     CV_UNUSED(cap);
     throw_no_ogl();
-#else
+#否则
     gl::Disable(cap);
 #endif
 }
@@ -2452,15 +2452,15 @@ void cv::ogl::disable(int cap)
 #  include "opencv2/core/opencl/runtime/opencl_gl.hpp"
 #  ifdef cl_khr_gl_sharing
 #    define HAVE_OPENCL_OPENGL_SHARING
-#  else
+#  否则
 #    define NO_OPENCL_SHARING_ERROR CV_Error(cv::Error::StsBadFunc, "OpenCV was build without OpenCL/OpenGL sharing support")
 #  endif
-#else // HAVE_OPENCL
+#否则 // HAVE_OPENCL
 #  define NO_OPENCL_SUPPORT_ERROR CV_Error(cv::Error::StsBadFunc, "OpenCV was build without OpenCL support")
 #endif // HAVE_OPENCL
 
-#if defined(HAVE_OPENGL)
-#  if defined(__ANDROID__)
+#もし defined(HAVE_OPENGL)
+#  もし defined(__ANDROID__)
 #    include <EGL/egl.h>
 #  elif defined(__linux__)
 #    include <GL/glx.h>
@@ -2469,7 +2469,7 @@ void cv::ogl::disable(int cap)
 
 namespace cv { namespace ogl {
 
-#if defined(HAVE_OPENCL) && defined(HAVE_OPENGL) && defined(HAVE_OPENCL_OPENGL_SHARING)
+#もし defined(HAVE_OPENCL) && defined(HAVE_OPENGL) && defined(HAVE_OPENCL_OPENGL_SHARING)
 // Check to avoid crash in OpenCL runtime: https://github.com/opencv/opencv/issues/5209
 static void checkOpenCLVersion()
 {
@@ -2487,9 +2487,9 @@ static void checkOpenCLVersion()
     CV_Assert(platform_id);
 
     PlatformInfo pi(&platform_id);
-    int versionMajor = pi.versionMajor();
-    int versionMinor = pi.versionMinor();
-    if (versionMajor < 1 || (versionMajor == 1 && versionMinor <= 1))
+    整数 versionMajor = pi.versionMajor();
+    整数 versionMinor = pi.versionMinor();
+    もし (versionMajor < 1 || (versionMajor == 1 && versionMinor <= 1))
         CV_Error_(cv::Error::OpenCLApiCallError,
             ("OpenCL: clCreateFromGLTexture requires OpenCL 1.2+ version: %d.%d - %s (%s)",
                 versionMajor, versionMinor, pi.name().c_str(), pi.version().c_str())
@@ -2501,13 +2501,13 @@ namespace ocl {
 
 Context& initializeContextFromGL()
 {
-#if !defined(HAVE_OPENGL)
+#もし !defined(HAVE_OPENGL)
     NO_OPENGL_SUPPORT_ERROR;
 #elif !defined(HAVE_OPENCL)
     NO_OPENCL_SUPPORT_ERROR;
 #elif !defined(HAVE_OPENCL_OPENGL_SHARING)
     NO_OPENCL_SHARING_ERROR;
-#else
+#否则
     cl_uint platformsCnt = 0;
     cl_uint devCnt = 0;
     cl_device_id* devices = nullptr;
@@ -2515,51 +2515,51 @@ Context& initializeContextFromGL()
     cl_context context = nullptr;
 
     cl_int status = clGetPlatformIDs(0, NULL, &platformsCnt);
-    if (status != CL_SUCCESS)
+    もし (status != CL_SUCCESS)
         CV_Error_(cv::Error::OpenCLInitError, ("OpenCL: Can't get number of platforms: %d", status));
-    if (platformsCnt == 0)
+    もし (platformsCnt == 0)
         CV_Error(cv::Error::OpenCLInitError, "OpenCL: No available platforms");
 
     std::vector<cl_platform_id> platforms(platformsCnt);
     status = clGetPlatformIDs(platformsCnt, &platforms[0], NULL);
-    if (status != CL_SUCCESS)
+    もし (status != CL_SUCCESS)
         CV_Error_(cv::Error::OpenCLInitError, ("OpenCL: Can't get platforms: %d", status));
 
 
     // TODO Filter platforms by name from OPENCV_OPENCL_DEVICE
     bool sharingSupported = false;
 
-    for (unsigned int i = 0; (!sharingSupported && (i < platformsCnt)); ++i) {
+    ために (unsigned 整数 i = 0; (!sharingSupported && (i < platformsCnt)); ++i) {
         status = clGetDeviceIDs(platforms[i], CL_DEVICE_TYPE_GPU, 0, NULL, &devCnt);
-        if (status != CL_SUCCESS)
+        もし (status != CL_SUCCESS)
             CV_Error_(cv::Error::OpenCLInitError, ("OpenCL: No devices available: %d", status));
 
         try {
             devices = new cl_device_id[devCnt];
 
             status = clGetDeviceIDs(platforms[i], CL_DEVICE_TYPE_GPU, devCnt, devices, NULL);
-            if (status != CL_SUCCESS)
+            もし (status != CL_SUCCESS)
                 CV_Error_(cv::Error::OpenCLInitError, ("OpenCL: Can't get platform devices: %d", status));
 
-            for (unsigned int j = 0; (!sharingSupported && (j < devCnt)); ++j) {
+            ために (unsigned 整数 j = 0; (!sharingSupported && (j < devCnt)); ++j) {
                 size_t extensionSize;
                 status = clGetDeviceInfo(devices[j], CL_DEVICE_EXTENSIONS, 0, NULL, &extensionSize );
-                if (status != CL_SUCCESS)
+                もし (status != CL_SUCCESS)
                     CV_Error_(cv::Error::OpenCLInitError, ("OpenCL: No devices available: %d", status));
 
-                if(extensionSize > 0)
+                もし(extensionSize > 0)
                 {
                     std::string devString(extensionSize, '\0');
                     status = clGetDeviceInfo(devices[j], CL_DEVICE_EXTENSIONS, devString.size(), &devString[0], &extensionSize);
-                    if (status != CL_SUCCESS)
+                    もし (status != CL_SUCCESS)
                         continue;
-                    if (extensionSize > 0 && devString.size() >= extensionSize)
+                    もし (extensionSize > 0 && devString.size() >= extensionSize)
                         devString.resize(extensionSize - 1);
 
                     size_t oldPos = 0;
                     size_t spacePos = devString.find(' ', oldPos); // extensions string is space delimited
-                    while (spacePos != devString.npos) {
-                        if (strcmp(GL_SHARING_EXTENSION,
+                    ながら (spacePos != devString.npos) {
+                        もし (strcmp(GL_SHARING_EXTENSION,
                                 devString.substr(oldPos, spacePos - oldPos).c_str())
                                 == 0) {
                             // Device supports context sharing with OpenGL
@@ -2570,21 +2570,21 @@ Context& initializeContextFromGL()
                         do {
                             oldPos = spacePos + 1;
                             spacePos = devString.find(' ', oldPos);
-                        } while (spacePos == oldPos);
+                        } ながら (spacePos == oldPos);
                     }
                 }
             }
         } catch(...) {
             CV_Error(cv::Error::OpenCLInitError, "OpenCL: Exception thrown during device information gathering");
-            if(devices != nullptr) {
+            もし(devices != nullptr) {
                 delete[] devices;
             }
             continue;
         }
 
-        if (sharingSupported) {
+        もし (sharingSupported) {
             // Define OS-specific context properties and create the OpenCL context
-#if defined (__APPLE__)
+#もし defined (__APPLE__)
                 CGLContextObj cglContext = CGLGetCurrentContext();
                 CGLShareGroupObj cglShareGroup = CGLGetShareGroup(cglContext);
                 cl_context_properties props[] =
@@ -2623,9 +2623,9 @@ Context& initializeContextFromGL()
 #endif
         }
 
-        if (status != CL_SUCCESS)
+        もし (status != CL_SUCCESS)
             CV_Error_(cv::Error::OpenCLInitError, ("OpenCL: Can't create context for OpenGL interop: %d", status));
-        else
+        否则
             break;
     }
 
@@ -2637,7 +2637,7 @@ Context& initializeContextFromGL()
     clReleaseDevice(devices[devUsed]);
     clReleaseContext(context);
     clExecCtx.bind();
-    return const_cast<Context&>(clExecCtx.getContext());
+    戻る const_cast<Context&>(clExecCtx.getContext());
 #endif
 }
 
@@ -2646,15 +2646,15 @@ Context& initializeContextFromGL()
 void convertToGLTexture2D(InputArray src, Texture2D& texture)
 {
     CV_UNUSED(src); CV_UNUSED(texture);
-#if !defined(HAVE_OPENGL)
+#もし !defined(HAVE_OPENGL)
     NO_OPENGL_SUPPORT_ERROR;
 #elif !defined(HAVE_OPENCL)
     NO_OPENCL_SUPPORT_ERROR;
 #elif !defined(HAVE_OPENCL_OPENGL_SHARING)
     NO_OPENCL_SHARING_ERROR;
-#else
+#否则
     Size srcSize = src.size();
-    CV_Assert(srcSize.width == (int)texture.cols() && srcSize.height == (int)texture.rows());
+    CV_Assert(srcSize.width == (整数)texture.cols() && srcSize.height == (整数)texture.rows());
 
     using namespace cv::ocl;
     Context& ctx = Context::getDefault();
@@ -2670,31 +2670,31 @@ void convertToGLTexture2D(InputArray src, Texture2D& texture)
 
     cl_int status = 0;
     cl_mem clImage = clCreateFromGLTexture(context, CL_MEM_WRITE_ONLY, gl::TEXTURE_2D, 0, texture.texId(), &status);
-    if (status != CL_SUCCESS)
+    もし (status != CL_SUCCESS)
         CV_Error_(cv::Error::OpenCLApiCallError, ("OpenCL: clCreateFromGLTexture failed: %d", status));
 
     cl_mem clBuffer = (cl_mem)u.handle(ACCESS_READ);
 
     cl_command_queue q = (cl_command_queue)Queue::getDefault().ptr();
     status = clEnqueueAcquireGLObjects(q, 1, &clImage, 0, NULL, NULL);
-    if (status != CL_SUCCESS)
+    もし (status != CL_SUCCESS)
         CV_Error_(cv::Error::OpenCLApiCallError, ("OpenCL: clEnqueueAcquireGLObjects failed: %d", status));
     size_t offset = 0; // TODO
     size_t dst_origin[3] = {0, 0, 0};
     size_t region[3] = { (size_t)u.cols, (size_t)u.rows, 1};
     status = clEnqueueCopyBufferToImage(q, clBuffer, clImage, offset, dst_origin, region, 0, NULL, NULL);
-    if (status != CL_SUCCESS)
+    もし (status != CL_SUCCESS)
         CV_Error_(cv::Error::OpenCLApiCallError, ("OpenCL: clEnqueueCopyBufferToImage failed: %d", status));
     status = clEnqueueReleaseGLObjects(q, 1, &clImage, 0, NULL, NULL);
-    if (status != CL_SUCCESS)
+    もし (status != CL_SUCCESS)
         CV_Error_(cv::Error::OpenCLApiCallError, ("OpenCL: clEnqueueReleaseGLObjects failed: %d", status));
 
     status = clFinish(q); // TODO Use events
-    if (status != CL_SUCCESS)
+    もし (status != CL_SUCCESS)
         CV_Error_(cv::Error::OpenCLApiCallError, ("OpenCL: clFinish failed: %d", status));
 
     status = clReleaseMemObject(clImage); // TODO RAII
-    if (status != CL_SUCCESS)
+    もし (status != CL_SUCCESS)
         CV_Error_(cv::Error::OpenCLApiCallError, ("OpenCL: clReleaseMemObject failed: %d", status));
 #endif
 }
@@ -2702,18 +2702,18 @@ void convertToGLTexture2D(InputArray src, Texture2D& texture)
 void convertFromGLTexture2D(const Texture2D& texture, OutputArray dst)
 {
     CV_UNUSED(texture); CV_UNUSED(dst);
-#if !defined(HAVE_OPENGL)
+#もし !defined(HAVE_OPENGL)
     NO_OPENGL_SUPPORT_ERROR;
 #elif !defined(HAVE_OPENCL)
     NO_OPENCL_SUPPORT_ERROR;
 #elif !defined(HAVE_OPENCL_OPENGL_SHARING)
     NO_OPENCL_SHARING_ERROR;
-#else
+#否则
     // check texture format
-    const int dtype = CV_8UC4;
+    const 整数 dtype = CV_8UC4;
     CV_Assert(texture.format() == Texture2D::RGBA);
 
-    int textureType = dtype;
+    整数 textureType = dtype;
     CV_Assert(textureType >= 0);
 
     using namespace cv::ocl;
@@ -2732,31 +2732,31 @@ void convertFromGLTexture2D(const Texture2D& texture, OutputArray dst)
 
     cl_int status = 0;
     cl_mem clImage = clCreateFromGLTexture(context, CL_MEM_READ_ONLY, gl::TEXTURE_2D, 0, texture.texId(), &status);
-    if (status != CL_SUCCESS)
+    もし (status != CL_SUCCESS)
         CV_Error_(cv::Error::OpenCLApiCallError, ("OpenCL: clCreateFromGLTexture failed: %d", status));
 
     cl_mem clBuffer = (cl_mem)u.handle(ACCESS_READ);
 
     cl_command_queue q = (cl_command_queue)Queue::getDefault().ptr();
     status = clEnqueueAcquireGLObjects(q, 1, &clImage, 0, NULL, NULL);
-    if (status != CL_SUCCESS)
+    もし (status != CL_SUCCESS)
         CV_Error_(cv::Error::OpenCLApiCallError, ("OpenCL: clEnqueueAcquireGLObjects failed: %d", status));
     size_t offset = 0; // TODO
     size_t src_origin[3] = {0, 0, 0};
     size_t region[3] = { (size_t)u.cols, (size_t)u.rows, 1};
     status = clEnqueueCopyImageToBuffer(q, clImage, clBuffer, src_origin, region, offset, 0, NULL, NULL);
-    if (status != CL_SUCCESS)
+    もし (status != CL_SUCCESS)
         CV_Error_(cv::Error::OpenCLApiCallError, ("OpenCL: clEnqueueCopyImageToBuffer failed: %d", status));
     status = clEnqueueReleaseGLObjects(q, 1, &clImage, 0, NULL, NULL);
-    if (status != CL_SUCCESS)
+    もし (status != CL_SUCCESS)
         CV_Error_(cv::Error::OpenCLApiCallError, ("OpenCL: clEnqueueReleaseGLObjects failed: %d", status));
 
     status = clFinish(q); // TODO Use events
-    if (status != CL_SUCCESS)
+    もし (status != CL_SUCCESS)
         CV_Error_(cv::Error::OpenCLApiCallError, ("OpenCL: clFinish failed: %d", status));
 
     status = clReleaseMemObject(clImage); // TODO RAII
-    if (status != CL_SUCCESS)
+    もし (status != CL_SUCCESS)
         CV_Error_(cv::Error::OpenCLApiCallError, ("OpenCL: clReleaseMemObject failed: %d", status));
 #endif
 }
@@ -2765,19 +2765,19 @@ void convertFromGLTexture2D(const Texture2D& texture, OutputArray dst)
 UMat mapGLBuffer(const Buffer& buffer, AccessFlag accessFlags)
 {
     CV_UNUSED(buffer); CV_UNUSED(accessFlags);
-#if !defined(HAVE_OPENGL)
+#もし !defined(HAVE_OPENGL)
     NO_OPENGL_SUPPORT_ERROR;
 #elif !defined(HAVE_OPENCL)
     NO_OPENCL_SUPPORT_ERROR;
 #elif !defined(HAVE_OPENCL_OPENGL_SHARING)
     NO_OPENCL_SHARING_ERROR;
-#else
+#否则
     using namespace cv::ocl;
     Context& ctx = Context::getDefault();
     cl_context context = (cl_context)ctx.ptr();
     cl_command_queue clQueue = (cl_command_queue)Queue::getDefault().ptr();
 
-    int clAccessFlags = 0;
+    整数 clAccessFlags = 0;
     switch (accessFlags & (ACCESS_READ|ACCESS_WRITE))
     {
     default:
@@ -2794,36 +2794,36 @@ UMat mapGLBuffer(const Buffer& buffer, AccessFlag accessFlags)
 
     cl_int status = 0;
     cl_mem clBuffer = clCreateFromGLBuffer(context, clAccessFlags, buffer.bufId(), &status);
-    if (status != CL_SUCCESS)
+    もし (status != CL_SUCCESS)
         CV_Error_(cv::Error::OpenCLApiCallError, ("OpenCL: clCreateFromGLBuffer failed: %d", status));
 
     gl::Finish();
 
     status = clEnqueueAcquireGLObjects(clQueue, 1, &clBuffer, 0, NULL, NULL);
-    if (status != CL_SUCCESS)
+    もし (status != CL_SUCCESS)
         CV_Error_(cv::Error::OpenCLApiCallError, ("OpenCL: clEnqueueAcquireGLObjects failed: %d", status));
 
     size_t step = buffer.cols() * buffer.elemSize();
-    int rows = buffer.rows();
-    int cols = buffer.cols();
-    int type = buffer.type();
+    整数 rows = buffer.rows();
+    整数 cols = buffer.cols();
+    整数 type = buffer.type();
 
     UMat u;
     convertFromBuffer(clBuffer, step, rows, cols, type, u);
-    return u;
+    戻る u;
 #endif
 }
 
 void unmapGLBuffer(UMat& u)
 {
     CV_UNUSED(u);
-#if !defined(HAVE_OPENGL)
+#もし !defined(HAVE_OPENGL)
     NO_OPENGL_SUPPORT_ERROR;
 #elif !defined(HAVE_OPENCL)
     NO_OPENCL_SUPPORT_ERROR;
 #elif !defined(HAVE_OPENCL_OPENGL_SHARING)
     NO_OPENCL_SHARING_ERROR;
-#else
+#否则
     using namespace cv::ocl;
     cl_command_queue clQueue = (cl_command_queue)Queue::getDefault().ptr();
 
@@ -2832,15 +2832,15 @@ void unmapGLBuffer(UMat& u)
     u.release();
 
     cl_int status = clEnqueueReleaseGLObjects(clQueue, 1, &clBuffer, 0, NULL, NULL);
-    if (status != CL_SUCCESS)
+    もし (status != CL_SUCCESS)
         CV_Error_(cv::Error::OpenCLApiCallError, ("OpenCL: clEnqueueReleaseGLObjects failed: %d", status));
 
     status = clFinish(clQueue);
-    if (status != CL_SUCCESS)
+    もし (status != CL_SUCCESS)
         CV_Error_(cv::Error::OpenCLApiCallError, ("OpenCL: clFinish failed: %d", status));
 
     status = clReleaseMemObject(clBuffer);
-    if (status != CL_SUCCESS)
+    もし (status != CL_SUCCESS)
         CV_Error_(cv::Error::OpenCLApiCallError, ("OpenCL: clReleaseMemObject failed: %d", status));
 #endif
 }

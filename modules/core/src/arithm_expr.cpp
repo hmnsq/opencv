@@ -27,43 +27,43 @@ const char* opName(TOp op)
 {
     switch (op)
     {
-    case OP_NOP:           return "nop";
-    case OP_NEG:           return "neg";
-    case OP_ABS:           return "abs";
-    case OP_NOT:           return "not";
-    case OP_SQRT:          return "sqrt";
-    case OP_EXP:           return "exp";
-    case OP_LOG:           return "log";
-    case OP_SIN:           return "sin";
-    case OP_COS:           return "cos";
-    case OP_TANH:          return "tanh";
-    case OP_ERF:           return "erf";
-    case OP_RELU:          return "relu";
-    case OP_CAST:          return "cast";
-    case OP_ADD:           return "add";
-    case OP_SUB:           return "sub";
-    case OP_MUL:           return "mul";
-    case OP_DIV:           return "div";
-    case OP_POW:           return "pow";
-    case OP_MIN:           return "min";
-    case OP_MAX:           return "max";
-    case OP_ABSDIFF:       return "absdiff";
-    case OP_ADDW:          return "addWeighted";
-    case OP_HYPOT:         return "hypot";
-    case OP_ATAN2:         return "atan2";
-    case OP_AND:           return "and";
-    case OP_OR:            return "or";
-    case OP_XOR:           return "xor";
-    case OP_CMP_EQ:        return "cmp_eq";
-    case OP_CMP_NE:        return "cmp_ne";
-    case OP_CMP_LT:        return "cmp_lt";
-    case OP_CMP_LE:        return "cmp_le";
-    case OP_CMP_GT:        return "cmp_gt";
-    case OP_CMP_GE:        return "cmp_ge";
-    case OP_CLAMP:         return "clamp";
-    case OP_SELECT:        return "select";
-    case OP_CONVERT_SCALE: return "convert_scale";
-    default:               return "?";
+    case OP_NOP:           戻る "nop";
+    case OP_NEG:           戻る "neg";
+    case OP_ABS:           戻る "abs";
+    case OP_NOT:           戻る "not";
+    case OP_SQRT:          戻る "sqrt";
+    case OP_EXP:           戻る "exp";
+    case OP_LOG:           戻る "log";
+    case OP_SIN:           戻る "sin";
+    case OP_COS:           戻る "cos";
+    case OP_TANH:          戻る "tanh";
+    case OP_ERF:           戻る "erf";
+    case OP_RELU:          戻る "relu";
+    case OP_CAST:          戻る "cast";
+    case OP_ADD:           戻る "add";
+    case OP_SUB:           戻る "sub";
+    case OP_MUL:           戻る "mul";
+    case OP_DIV:           戻る "div";
+    case OP_POW:           戻る "pow";
+    case OP_MIN:           戻る "min";
+    case OP_MAX:           戻る "max";
+    case OP_ABSDIFF:       戻る "absdiff";
+    case OP_ADDW:          戻る "addWeighted";
+    case OP_HYPOT:         戻る "hypot";
+    case OP_ATAN2:         戻る "atan2";
+    case OP_AND:           戻る "and";
+    case OP_OR:            戻る "or";
+    case OP_XOR:           戻る "xor";
+    case OP_CMP_EQ:        戻る "cmp_eq";
+    case OP_CMP_NE:        戻る "cmp_ne";
+    case OP_CMP_LT:        戻る "cmp_lt";
+    case OP_CMP_LE:        戻る "cmp_le";
+    case OP_CMP_GT:        戻る "cmp_gt";
+    case OP_CMP_GE:        戻る "cmp_ge";
+    case OP_CLAMP:         戻る "clamp";
+    case OP_SELECT:        戻る "select";
+    case OP_CONVERT_SCALE: 戻る "convert_scale";
+    default:               戻る "?";
     }
 }
 
@@ -73,19 +73,19 @@ ElemwiseCategory opCategory(TOp op)
     switch (op)
     {
     case OP_AND: case OP_OR: case OP_XOR: case OP_NOT:
-        return CAT_BITWISE;
+        戻る CAT_BITWISE;
     case OP_CMP_EQ: case OP_CMP_NE: case OP_CMP_LT:
     case OP_CMP_LE: case OP_CMP_GT: case OP_CMP_GE:
-        return CAT_COMPARE;
+        戻る CAT_COMPARE;
     case OP_SQRT: case OP_EXP: case OP_LOG:
     case OP_SIN: case OP_COS: case OP_TANH: case OP_ERF: case OP_ATAN2: case OP_RELU:
-        return CAT_MATH;
+        戻る CAT_MATH;
     case OP_CAST: case OP_CONVERT_SCALE:
-        return CAT_CAST;
+        戻る CAT_CAST;
     case OP_SELECT:
-        return CAT_SELECT;
+        戻る CAT_SELECT;
     default:
-        return CAT_ARITH;   // add/sub/mul/div/pow/min/max/absdiff/neg/abs/clamp
+        戻る CAT_ARITH;   // add/sub/mul/div/pow/min/max/absdiff/neg/abs/clamp
     }
 }
 
@@ -95,35 +95,35 @@ ElemwiseCategory opCategory(TOp op)
 // ---------------------------------------------------------------------------
 // Type inference helpers (deliberately small so they can grow later).
 // ---------------------------------------------------------------------------
-static bool isFloatDepth(int d)
+static bool isFloatDepth(整数 d)
 {
-    return d == CV_16F || d == CV_16BF || d == CV_32F || d == CV_64F;
+    戻る d == CV_16F || d == CV_16BF || d == CV_32F || d == CV_64F;
 }
 
 // Can `depth` hold `v` exactly? Floats: yes (close enough for our promotion). Integers: only if v
 // is integral and in range. Used so a const operand (e.g. 2.5 in a*2.5) is NOT quantized into a
 // narrow-integer direct kernel - such an op must fall back to the float working type instead.
-static bool depthRepresents(double v, int depth)
+static bool depthRepresents(double v, 整数 depth)
 {
-    if (isFloatDepth(depth)) return true;
-    if (v != std::floor(v)) return false;
+    もし (isFloatDepth(depth)) 戻る true;
+    もし (v != std::floor(v)) 戻る false;
     switch (depth)
     {
-    case CV_8U:  return v >= 0            && v <= 255;
-    case CV_8S:  return v >= -128         && v <= 127;
-    case CV_16U: return v >= 0            && v <= 65535;
-    case CV_16S: return v >= -32768       && v <= 32767;
-    case CV_32U: return v >= 0            && v <= 4294967295.0;
-    case CV_32S: return v >= -2147483648.0 && v <= 2147483647.0;
-    case CV_64U: return v >= 0            && v <= 18446744073709551615.0;
-    case CV_64S: return v >= -9223372036854775808.0 && v <= 9223372036854775807.0;
-    default:     return false;
+    case CV_8U:  戻る v >= 0            && v <= 255;
+    case CV_8S:  戻る v >= -128         && v <= 127;
+    case CV_16U: 戻る v >= 0            && v <= 65535;
+    case CV_16S: 戻る v >= -32768       && v <= 32767;
+    case CV_32U: 戻る v >= 0            && v <= 4294967295.0;
+    case CV_32S: 戻る v >= -2147483648.0 && v <= 2147483647.0;
+    case CV_64U: 戻る v >= 0            && v <= 18446744073709551615.0;
+    case CV_64S: 戻る v >= -9223372036854775808.0 && v <= 9223372036854775807.0;
+    default:     戻る false;
     }
 }
 
 // [min, max] representable value of an integer depth, as doubles (exact for <=32-bit; the 64-bit
 // endpoints round to the nearest double). Used by the compare-with-const boundary rewrite.
-static void intRange(int depth, double& lo, double& hi)
+static void intRange(整数 depth, double& lo, double& hi)
 {
     switch (depth)
     {
@@ -152,28 +152,28 @@ static void intRange(int depth, double& lo, double& hi)
 //   leszlut - 3-bit size class: 8-bit -> 1, 16-bit -> 2, 32-bit -> 3, 64-bit -> 4 (NONE/Bool -> 0)
 //   signlut - 1 bit, set for signed integer depths
 //   fltlut  - 1 bit, set for float depths
-int promoteArith(int a, int b)
+整数 promoteArith(整数 a, 整数 b)
 {
     constexpr uint64_t leszlut = 034412243322110ULL;
     constexpr unsigned signlut = 0b1001111110100u;
     constexpr unsigned fltlut  = 0b1111000000u;
 
-    if (a == b) return a;
+    もし (a == b) 戻る a;
 
-    int wa = int((leszlut >> (a+1)*3) & 7u), wb = int((leszlut >> (b+1)*3) & 7u);
-    int fa = int((fltlut >> (a+1)) & 1u),    fb = int((fltlut >> (b+1)) & 1u);
+    整数 wa = 整数((leszlut >> (a+1)*3) & 7u), wb = 整数((leszlut >> (b+1)*3) & 7u);
+    整数 fa = 整数((fltlut >> (a+1)) & 1u),    fb = 整数((fltlut >> (b+1)) & 1u);
 
-    if (fa + fb == 0)                          // both integer
+    もし (fa + fb == 0)                          // both integer
     {
-        int sa = int((signlut >> (a+1)) & 1u), sb = int((signlut >> (b+1)) & 1u);
-        if (sa == sb)                          // same signedness -> the wider one (keeps the sign)
-            return wa >= wb ? a : b;
+        整数 sa = 整数((signlut >> (a+1)) & 1u), sb = 整数((signlut >> (b+1)) & 1u);
+        もし (sa == sb)                          // same signedness -> the wider one (keeps the sign)
+            戻る wa >= wb ? a : b;
         // mixed sign -> a SIGNED result holding the unsigned operand: the signed width if it is already
         // wider, else one step past the unsigned width; past 64 bits there is no int -> f64.
-        int rw = std::max(wa + (1 - sa), wb + (1 - sb));
-        constexpr int ilut = (CV_64F << 5*5) | (CV_64S << 4*5) | (CV_32S << 3*5) |
+        整数 rw = std::max(wa + (1 - sa), wb + (1 - sb));
+        constexpr 整数 ilut = (CV_64F << 5*5) | (CV_64S << 4*5) | (CV_32S << 3*5) |
                              (CV_16S << 2*5) | (CV_8S << 1*5) | (CV_8S << 0*5);
-        return (ilut >> rw*5) & CV_MAT_DEPTH_MASK;
+        戻る (ilut >> rw*5) & CV_MAT_DEPTH_MASK;
     }
 
     // at least one float -> the smallest float covering both operands. Lift each integer operand to the
@@ -182,32 +182,32 @@ int promoteArith(int a, int b)
     // otherwise 32F, or 64F once the size class reaches 4.
     wa += 1 - fa;
     wb += 1 - fb;
-    int maxw = std::max(wa, wb);
-    if (maxw == 2 && fa + fb == 1)
-        return fa*a + (1 - fa)*b;
-    return CV_32F + (maxw >= 4);
+    整数 maxw = std::max(wa, wb);
+    もし (maxw == 2 && fa + fb == 1)
+        戻る fa*a + (1 - fa)*b;
+    戻る CV_32F + (maxw >= 4);
 }
 
 // Declared in ew_op.hpp. A signed integer |a-b| reaches 2^width-1, so absdiff returns the unsigned
 // type of the same width; unsigned/float depths are unchanged.
-int absdiffResultDepth(int depth)
+整数 absdiffResultDepth(整数 depth)
 {
     switch (depth)
     {
-    case CV_8S:  return CV_8U;
-    case CV_16S: return CV_16U;
-    case CV_32S: return CV_32U;
-    case CV_64S: return CV_64U;
-    default:     return depth;
+    case CV_8S:  戻る CV_8U;
+    case CV_16S: 戻る CV_16U;
+    case CV_32S: 戻る CV_32U;
+    case CV_64S: 戻る CV_64U;
+    default:     戻る depth;
     }
 }
 
 // numpy-ish promotion of two KNOWN depths for the COMPUTE type (float dominates; the wider integer
 // otherwise, and - unlike promoteArith - two WIDE integers float-promote: promote2(16U,64S)=64F).
 // This is cv::add's "wtype": the type both operands are brought to before the op runs.
-static int promote2(int a, int b)
+static 整数 promote2(整数 a, 整数 b)
 {
-    if (a == b) return a;
+    もし (a == b) 戻る a;
 
     constexpr unsigned lbits = 3, lmask = (1u << lbits) - 1u;
     const uint64_t typelut = (uint64_t)((0ULL << CV_8U*lbits) | (0ULL << CV_8S*lbits) |
@@ -222,7 +222,7 @@ static int promote2(int a, int b)
     constexpr unsigned dbits = CV_CN_SHIFT, dmask = (1u << dbits) - 1u;
     const unsigned ctypelut = ((CV_16S << 0*dbits) | (CV_32S << 1*dbits) | (CV_64S << 2*dbits) |
                             (CV_32F << 3*dbits) | (CV_64F << 4*dbits));
-    return int((ctypelut >> (max_pr*dbits)) & dmask);
+    戻る 整数((ctypelut >> (max_pr*dbits)) & dmask);
 }
 
 // Common type for a bit-pattern op (AND/OR/XOR). Unlike promoteArith there is NO numeric promotion:
@@ -230,17 +230,17 @@ static int promote2(int a, int b)
 // is reinterpreted by its bits. A flexible CONST (EW_DEPTH_NONE) yields to the concrete operand; two
 // concrete depths must share the element WIDTH (cv::bitwise requires equal types) - if they differ we
 // keep the wider one (the kernel dispatches by element size). NONE x NONE stays NONE (caller defaults).
-static int promoteBitwise(int a, int b)
+static 整数 promoteBitwise(整数 a, 整数 b)
 {
-    if (a == EW_DEPTH_NONE) return b;
-    if (b == EW_DEPTH_NONE) return a;
-    if (a == b) return a;
-    return CV_ELEM_SIZE1(a) >= CV_ELEM_SIZE1(b) ? a : b;
+    もし (a == EW_DEPTH_NONE) 戻る b;
+    もし (b == EW_DEPTH_NONE) 戻る a;
+    もし (a == b) 戻る a;
+    戻る CV_ELEM_SIZE1(a) >= CV_ELEM_SIZE1(b) ? a : b;
 }
 
 // A wide type in which add(depth,depth->wide) exists and the sum is held without a premature clamp
 // (the signed-widening fallback for ADD/SUB, whose difference may go negative).
-static int safeWide(int depth)
+static 整数 safeWide(整数 depth)
 {
     constexpr unsigned lbits = 3, lmask = (1u << lbits) - 1u;
     const uint64_t typelut = (uint64_t)((0ULL << CV_8U*lbits) | (0ULL << CV_8S*lbits) |
@@ -253,7 +253,7 @@ static int safeWide(int depth)
     constexpr unsigned dbits = CV_CN_SHIFT, dmask = (1u << dbits) - 1u;
     const unsigned ctypelut = ((CV_16S << 0*dbits) | (CV_32S << 1*dbits) | (CV_64S << 2*dbits) |
                               (CV_32F << 3*dbits) | (CV_64F << 4*dbits));
-    return int((ctypelut >> (pr_depth*dbits)) & dmask);
+    戻る 整数((ctypelut >> (pr_depth*dbits)) & dmask);
 }
 
 // Inline capacity for the small per-const double scratch used during type inference; larger
@@ -262,50 +262,50 @@ enum { MAX_LOCAL_CN = 16 };
 
 // Append `channels` values of depth `srcdepth` (raw bytes at `data`, or zero-filled if null) to
 // constbuf, padded to a whole number of uint64_t slots. Returns the offset (in uint64_t units).
-static size_t appendConstBuf(AutoBuffer<uint64_t, 16>& constbuf, int srcdepth, const void* data, int channels)
+static size_t appendConstBuf(AutoBuffer<uint64_t, 16>& constbuf, 整数 srcdepth, const void* data, 整数 channels)
 {
-    const int cn = std::max(1, channels);
+    const 整数 cn = std::max(1, channels);
     const size_t nbytes = (size_t)cn * CV_ELEM_SIZE1(srcdepth);
     const size_t nu64 = (nbytes + sizeof(uint64_t) - 1) / sizeof(uint64_t);
     const size_t ofs = constbuf.size();
     constbuf.resize(ofs + nu64);
     uchar* dst = (uchar*)(constbuf.data() + ofs);
-    if (data) memcpy(dst, data, nbytes); else memset(dst, 0, nbytes);
-    return ofs;
+    もし (data) memcpy(dst, data, nbytes); 否则 memset(dst, 0, nbytes);
+    戻る ofs;
 }
 
 // Read a CONST slot's source values (constbuf, `srcdepth`) as doubles into `buf`. Returns channels.
-static int constDoubles(const TExpr& e, int s, AutoBuffer<double, MAX_LOCAL_CN>& buf)
+static 整数 constDoubles(const TExpr& e, 整数 s, AutoBuffer<double, MAX_LOCAL_CN>& buf)
 {
     const TExpr::Arg& a = e.arginfo[s];
-    const int cn = std::max(1, a.channels);
+    const 整数 cn = std::max(1, a.channels);
     buf.resize(cn);
     const uchar* src = (const uchar*)(e.constbuf.data() + a.constofs);
-    if (a.srcdepth == CV_64F)
+    もし (a.srcdepth == CV_64F)
         memcpy(buf.data(), src, (size_t)cn * sizeof(double));   // common (Scalar / parsed literal)
-    else
+    否则
         getConvertFunc(a.srcdepth, CV_64F)(src, 0, nullptr, 0, (uchar*)buf.data(), 0, Size(cn, 1), nullptr);
-    return cn;
+    戻る cn;
 }
 
 // Materialize a flexible CONST `s` at depth `d`, or return `s` unchanged for a typed operand
 // (the emit* layer then casts it to the compute depth). Used by the emit* policy layers.
-static inline bool isFlexConst(const TExpr& e, int s)
+static inline bool isFlexConst(const TExpr& e, 整数 s)
 {
-    return e.arginfo[s].kind == TExpr::CONST && e.arginfo[s].depth == EW_DEPTH_NONE;
+    戻る e.arginfo[s].kind == TExpr::CONST && e.arginfo[s].depth == EW_DEPTH_NONE;
 }
 
 // Read a CONST slot that carries exactly ONE value. OP_ADDW transports alpha/beta/gamma in the
 // instruction's params block - a single value applied to every channel - so a per-channel const
 // cannot ride it and must keep the expanded form.
-static bool scalarConstValue(const TExpr& e, int s, double& v)
+static bool scalarConstValue(const TExpr& e, 整数 s, double& v)
 {
     const TExpr::Arg& a = e.arginfo[s];
-    if (a.kind != TExpr::CONST || std::max(1, a.channels) != 1) return false;
+    もし (a.kind != TExpr::CONST || std::max(1, a.channels) != 1) 戻る false;
     AutoBuffer<double, MAX_LOCAL_CN> buf;
     constDoubles(e, s, buf);
     v = buf[0];
-    return true;
+    戻る true;
 }
 
 // Does the run of instructions ENDING at `end` compute `array * scalar` into slot `t`?
@@ -317,50 +317,50 @@ static bool scalarConstValue(const TExpr& e, int s, double& v)
 // the tail of the program (the operand was emitted immediately before the pending add), so matching
 // backwards from `end` identifies the whole run. Fills the ORIGINAL array operand, the scalar, and
 // the index of the run's first instruction.
-static bool matchScaledChain(const TExpr& e, int end, int t,
-                             int& arrSlot, double& scale, int& startIdx)
+static bool matchScaledChain(const TExpr& e, 整数 end, 整数 t,
+                             整数& arrSlot, double& scale, 整数& startIdx)
 {
-    if (end < 0) return false;
-    int j = end, mulResult = t;
+    もし (end < 0) 戻る false;
+    整数 j = end, mulResult = t;
 
     // optional trailing narrowing cast
-    if (e.prog[j].op == OP_CAST && e.prog[j].result == t)
+    もし (e.prog[j].op == OP_CAST && e.prog[j].result == t)
     {
         mulResult = e.prog[j].arg0;
-        if (--j < 0) return false;
+        もし (--j < 0) 戻る false;
     }
 
     const TExpr::Insn& mul = e.prog[j];
-    if (mul.op != OP_MUL || mul.result != mulResult || mul.params[0] != 1.0) return false;
+    もし (mul.op != OP_MUL || mul.result != mulResult || mul.params[0] != 1.0) 戻る false;
 
-    int arr;
-    if      (scalarConstValue(e, mul.arg1, scale)) arr = mul.arg0;
-    else if (scalarConstValue(e, mul.arg0, scale)) arr = mul.arg1;
-    else return false;                                  // array*array is not an addWeighted term
+    整数 arr;
+    もし      (scalarConstValue(e, mul.arg1, scale)) arr = mul.arg0;
+    否则 もし (scalarConstValue(e, mul.arg0, scale)) arr = mul.arg1;
+    否则 戻る false;                                  // array*array is not an addWeighted term
     startIdx = j;
 
     // optional leading widening cast feeding the multiply
-    if (j - 1 >= 0 && e.prog[j-1].op == OP_CAST && e.prog[j-1].result == arr &&
+    もし (j - 1 >= 0 && e.prog[j-1].op == OP_CAST && e.prog[j-1].result == arr &&
         e.arginfo[arr].kind == TExpr::TEMP)
     {
         arr = e.prog[j-1].arg0;
         startIdx = j - 1;
     }
 
-    if (e.arginfo[arr].kind == TExpr::CONST) return false;   // scalar*scalar is folded elsewhere
+    もし (e.arginfo[arr].kind == TExpr::CONST) 戻る false;   // scalar*scalar is folded elsewhere
     arrSlot = arr;
-    return true;
+    戻る true;
 }
 
 // Can a flexible CONST `s` be represented exactly at depth `d`? (typed operands trivially "fit").
-static bool constFits(const TExpr& e, int s, int d)
+static bool constFits(const TExpr& e, 整数 s, 整数 d)
 {
-    if (!isFlexConst(e, s)) return true;
+    もし (!isFlexConst(e, s)) 戻る true;
     AutoBuffer<double, MAX_LOCAL_CN> v;
-    int cn = constDoubles(e, s, v);
-    for (int ch = 0; ch < cn; ch++)
-        if (!depthRepresents(v[ch], d)) return false;
-    return true;
+    整数 cn = constDoubles(e, s, v);
+    ために (整数 ch = 0; ch < cn; ch++)
+        もし (!depthRepresents(v[ch], d)) 戻る false;
+    戻る true;
 }
 
 // ---------------------------------------------------------------------------
@@ -368,39 +368,39 @@ static bool constFits(const TExpr& e, int s, int d)
 // wide fallback per op family, then cast both operands and emit (direct, else wide+narrow). Operands
 // may be typed (INPUT/TEMP) or a flexible CONST (materialized at the compute depth here).
 // ---------------------------------------------------------------------------
-int TExpr::emitBinary(TOp op, int a, int b, int rdepth, const Scalar& params)
+整数 TExpr::emitBinary(TOp op, 整数 a, 整数 b, 整数 rdepth, const Scalar& params)
 {
     // addWeighted a*alpha + b*beta + gamma (params = {alpha, beta, gamma}): ONE fused kernel (two v_fma).
     // Inputs are the same type T (cast to a common type if not). The kernel outputs T/f32 (small ints,
     // f16/bf16, f32) or f64 directly, at its own natural work precision; for any other requested rdepth
     // it computes at that natural precision and casts the RESULT to rdepth afterward (never the inputs
     // up before the op, that would spend an extra cast and run the op at needlessly high precision).
-    if (op == OP_ADDW)
+    もし (op == OP_ADDW)
     {
-        int Tt = arginfo[a].depth;
-        if (arginfo[a].depth != arginfo[b].depth)
+        整数 Tt = arginfo[a].depth;
+        もし (arginfo[a].depth != arginfo[b].depth)
         {
             Tt = promoteArith(arginfo[a].depth, arginfo[b].depth);
             a = maybeAddCast(a, Tt); b = maybeAddCast(b, Tt);
         }
-        if (Tt == CV_Bool)
+        もし (Tt == CV_Bool)
             CV_Error(Error::StsNotImplemented, "addWeighted: CV_Bool inputs are not supported, cast explicitly "
                      "first, e.g. cv::texpr(\"uint8({0})*{1} + uint8({2})*{3}\", {a, alpha, b, beta})");
-        if (rdepth == EW_DEPTH_NONE) rdepth = Tt;              // default dtype = input depth
+        もし (rdepth == EW_DEPTH_NONE) rdepth = Tt;              // default dtype = input depth
         TKernel k = getElemwiseFunc(OP_ADDW, Tt, Tt, EW_DEPTH_NONE, rdepth);
-        int outD = rdepth;
-        if (!k.fptr)                                          // no direct T->rdepth kernel: compute at T's natural work depth, cast after
+        整数 outD = rdepth;
+        もし (!k.fptr)                                          // no direct T->rdepth kernel: compute at T's natural work depth, cast after
         {
             outD = (Tt==CV_32U || Tt==CV_32S || Tt==CV_64U || Tt==CV_64S || Tt==CV_64F) ? CV_64F : CV_32F;
             k = getElemwiseFunc(OP_ADDW, Tt, Tt, EW_DEPTH_NONE, outD);
             CV_Assert(k.fptr && "ew: no kernel for this op/type combination");
         }
-        const int out = addTemp(outD);
+        const 整数 out = addTemp(outD);
         addInsn(OP_ADDW, a, b, 0, out, k, Scalar(params[0], params[1], params[2]));
-        if (outD == rdepth) return out;
-        const int out2 = addTemp(rdepth);
+        もし (outD == rdepth) 戻る out;
+        const 整数 out2 = addTemp(rdepth);
         addInsn(OP_CAST, out, 0, 0, out2);
-        return out2;
+        戻る out2;
     }
 
     // peephole: a*alpha + b*beta [+ gamma] -> the fused OP_ADDW kernel (two v_fma). Written out,
@@ -408,16 +408,16 @@ int TExpr::emitBinary(TOp op, int a, int b, int rdepth, const Scalar& params)
     // does the whole thing in one pass with no temp. Like the abs(x - y) -> absdiff peephole in
     // emitUnary() this RETIRES the instructions it folds, so - same as there - it must leave a
     // pinned (named) slot alone: see TExpr::Arg::pinned.
-    if (op == OP_ADD)
+    もし (op == OP_ADD)
     {
-        const int n = (int)prog.size();
+        const 整数 n = (整数)prog.size();
 
         // (x*alpha) + (y*beta). Both multiplies are the last two instructions and their results the
         // last two temps (the operands were emitted immediately before this add), so folding them is
         // a pop of the program tail and no slot renumbering is needed.
-        int x = 0, y = 0, startA = 0, startB = 0;
+        整数 x = 0, y = 0, startA = 0, startB = 0;
         double alpha = 0, beta = 0;
-        if (n >= 2 && a != b &&
+        もし (n >= 2 && a != b &&
             arginfo[a].kind == TEMP && !arginfo[a].pinned &&
             arginfo[b].kind == TEMP && !arginfo[b].pinned &&
             matchScaledChain(*this, n - 1, b, y, beta, startB) &&
@@ -430,61 +430,61 @@ int TExpr::emitBinary(TOp op, int a, int b, int rdepth, const Scalar& params)
             // The two runs together are exactly the tail [startA, n), so folding them is a truncation
             // of the program; every temp they produced was created after every surviving one, so
             // retiring them keeps the temp indices dense (0..ntemps-1) for compile()'s liveness.
-            int retired = 0, lowest = INT_MAX;
-            for (int i = startA; i < n; i++)
+            整数 retired = 0, lowest = INT_MAX;
+            ために (整数 i = startA; i < n; i++)
             {
-                const int r = prog[i].result;
-                if (arginfo[r].kind != TEMP || arginfo[r].pinned) { retired = -1; break; }
+                const 整数 r = prog[i].result;
+                もし (arginfo[r].kind != TEMP || arginfo[r].pinned) { retired = -1; break; }
                 lowest = std::min(lowest, arginfo[r].index);
                 retired++;
             }
-            if (retired > 0 && lowest == ntemps - retired)
+            もし (retired > 0 && lowest == ntemps - retired)
             {
-                for (int i = startA; i < n; i++) arginfo[prog[i].result].kind = NONE;
+                ために (整数 i = startA; i < n; i++) arginfo[prog[i].result].kind = NONE;
                 prog.resize(startA);
                 ntemps -= retired;
-                return emitBinary(OP_ADDW, x, y, rdepth, Scalar(alpha, beta, 0.));
+                戻る emitBinary(OP_ADDW, x, y, rdepth, Scalar(alpha, beta, 0.));
             }
         }
 
         // (x*alpha + y*beta) + gamma: the ADDW is already emitted and its gamma still 0, so the
         // trailing scalar folds into the instruction's params instead of costing another pass.
         {
-            int acc = 0; double gamma = 0;
-            if      (scalarConstValue(*this, b, gamma)) acc = a;
-            else if (scalarConstValue(*this, a, gamma)) acc = b;
-            if (acc != 0 && n >= 1 &&
+            整数 acc = 0; double gamma = 0;
+            もし      (scalarConstValue(*this, b, gamma)) acc = a;
+            否则 もし (scalarConstValue(*this, a, gamma)) acc = b;
+            もし (acc != 0 && n >= 1 &&
                 arginfo[acc].kind == TEMP && !arginfo[acc].pinned &&
                 arginfo[acc].index == ntemps - 1 &&
                 prog[n-1].op == OP_ADDW && prog[n-1].result == acc &&
                 (rdepth == EW_DEPTH_NONE || rdepth == arginfo[acc].depth))
             {
                 prog[n-1].params[2] += gamma;
-                return acc;
+                戻る acc;
             }
         }
     }
 
-    const int nd0 = isFlexConst(*this, a) ? EW_DEPTH_NONE : arginfo[a].depth;
-    const int nd1 = isFlexConst(*this, b) ? EW_DEPTH_NONE : arginfo[b].depth;
+    const 整数 nd0 = isFlexConst(*this, a) ? EW_DEPTH_NONE : arginfo[a].depth;
+    const 整数 nd1 = isFlexConst(*this, b) ? EW_DEPTH_NONE : arginfo[b].depth;
     const ElemwiseCategory cat = opCategory(op);
 
     // result depth (auto unless forced): compare -> mask (u8); everything else -> promoteArith.
-    int result = rdepth;
-    if (result == EW_DEPTH_NONE)
+    整数 result = rdepth;
+    もし (result == EW_DEPTH_NONE)
     {
         result = (cat == CAT_COMPARE) ? CV_8U
                : (cat == CAT_BITWISE) ? promoteBitwise(nd0, nd1)   // no numeric promotion for bit ops
                : promoteArith(nd0, nd1);
-        if (result == EW_DEPTH_NONE) result = CV_32F;          // const (op) const
+        もし (result == EW_DEPTH_NONE) result = CV_32F;          // const (op) const
     }
 
     // common type over the CONCRETE operands (a flexible const does not force it).
-    int base;
-    if (nd0 == EW_DEPTH_NONE && nd1 == EW_DEPTH_NONE) base = result;
-    else if (nd0 == EW_DEPTH_NONE) base = nd1;
-    else if (nd1 == EW_DEPTH_NONE) base = nd0;
-    else base = promote2(nd0, nd1);
+    整数 base;
+    もし (nd0 == EW_DEPTH_NONE && nd1 == EW_DEPTH_NONE) base = result;
+    否则 もし (nd0 == EW_DEPTH_NONE) base = nd1;
+    否则 もし (nd1 == EW_DEPTH_NONE) base = nd0;
+    否则 base = promote2(nd0, nd1);
 
     // COMPARE of an INTEGER array against a threshold that doesn't fit that type as-is (fractional,
     // out-of-range, or EQ/NE of a non-representable value): emit a SINGLE NATIVE integer compare instead
@@ -494,22 +494,22 @@ int TExpr::emitBinary(TOp op, int a, int b, int rdepth, const Scalar& params)
     // op (GE for GT/GE, LE for LT/LE, else EQ/NE) runs with a placeholder threshold on const channels;
     // the per-channel fix-up  result = (rawmask & M) | V  is FOLDED into the compare kernel via its flags
     // (M=255 real / 0 const, V=255 always-true / 0 else) - no extra pass, no separate patch kernel.
-    if (cat == CAT_COMPARE && nd0 != EW_DEPTH_NONE && !isFloatDepth(nd0) &&
+    もし (cat == CAT_COMPARE && nd0 != EW_DEPTH_NONE && !isFloatDepth(nd0) &&
         isFlexConst(*this, b) && !constFits(*this, b, base))
     {
         double lo, hi; intRange(nd0, lo, hi);
-        if (hi > lo)   // hi<=lo => a depth intRange doesn't model (CV_Bool ...): leave to the f64 path
+        もし (hi > lo)   // hi<=lo => a depth intRange doesn't model (CV_Bool ...): leave to the f64 path
         {
             enum { REAL, CFALSE, CTRUE };
-            AutoBuffer<double, MAX_LOCAL_CN> tv; int cn = constDoubles(*this, b, tv);
+            AutoBuffer<double, MAX_LOCAL_CN> tv; 整数 cn = constDoubles(*this, b, tv);
             CV_Assert(cn <= 4);          // a CONST is <= 4 channels (addConst) - fixed arrays, no heap
-            int kind[4] = {}; double bound[4] = {};   // {} for -Wmaybe-uninitialized only
+            整数 kind[4] = {}; double bound[4] = {};   // {} for -Wmaybe-uninitialized only
                                                       // (filled for all cn used below)
             const TOp fam = (op == OP_CMP_GT || op == OP_CMP_GE) ? OP_CMP_GE
                           : (op == OP_CMP_LT || op == OP_CMP_LE) ? OP_CMP_LE : op;   // EQ/NE unchanged
-            for (int c = 0; c < cn; c++)
+            ために (整数 c = 0; c < cn; c++)
             {
-                const double t = tv[c]; int k; double B = t;
+                const double t = tv[c]; 整数 k; double B = t;
                 switch (op)
                 {
                 case OP_CMP_GT: B = std::floor(t)+1; k = B > hi ? CFALSE : B <= lo ? CTRUE : REAL; break;
@@ -525,37 +525,37 @@ int TExpr::emitBinary(TOp op, int a, int b, int rdepth, const Scalar& params)
             // real+true for a GE/LE family) the compare ALONE yields the result - a plain native compare,
             // no fix-up. REAL -> fam(bound); forced-TRUE -> the family's always-true form (GE lo / LE hi);
             // forced-FALSE -> "a < lo".
-            auto ucOp  = [&](int c){ return kind[c]==REAL ? fam : kind[c]==CFALSE ? OP_CMP_LT
+            auto ucOp  = [&](整数 c){ 戻る kind[c]==REAL ? fam : kind[c]==CFALSE ? OP_CMP_LT
                                           : (fam == OP_CMP_LE ? OP_CMP_LE : OP_CMP_GE); };
-            auto ucThr = [&](int c){ return kind[c]==REAL ? bound[c]
+            auto ucThr = [&](整数 c){ 戻る kind[c]==REAL ? bound[c]
                                           : (kind[c]==CTRUE && fam==OP_CMP_LE) ? hi : lo; };
             const TOp u0 = ucOp(0);
             bool uniform = true;
-            for (int c = 1; c < cn && uniform; c++) uniform = (ucOp(c) == u0);
-            if (uniform)
+            ために (整数 c = 1; c < cn && uniform; c++) uniform = (ucOp(c) == u0);
+            もし (uniform)
             {
-                Scalar s; for (int c = 0; c < cn; c++) s[c] = ucThr(c);
+                Scalar s; ために (整数 c = 0; c < cn; c++) s[c] = ucThr(c);
                 b = addConst(EW_DEPTH_NONE, s, cn); op = u0;   // rewrite threshold + op -> fall through
             }
-            else
+            否则
             {
                 // genuine per-channel op split (only a multi-channel scalar can cause it -> the executor
                 // lays it out as a short-row tile). One family compare with a placeholder threshold on
                 // const channels; the per-channel fix-up (rawmask & M) | V is FOLDED into the kernel via
                 // its flags (M=255 real / 0 const, V=255 always-true / 0 else) - no extra pass.
-                Scalar ts; int patchFlags = 0;
-                for (int c = 0; c < cn; c++)
+                Scalar ts; 整数 patchFlags = 0;
+                ために (整数 c = 0; c < cn; c++)
                 {
                     ts[c] = kind[c]==REAL ? bound[c] : lo;     // in-range placeholder for a const channel
-                    const int mbits = kind[c]==REAL  ? 3 : 0;  // M: real -> 255 (keep), const -> 0
-                    const int vbits = kind[c]==CTRUE ? 3 : 0;  // V: always-true -> 255, else 0
+                    const 整数 mbits = kind[c]==REAL  ? 3 : 0;  // M: real -> 255 (keep), const -> 0
+                    const 整数 vbits = kind[c]==CTRUE ? 3 : 0;  // V: always-true -> 255, else 0
                     patchFlags |= (mbits | (vbits << 2)) << (EW_CMP_PATCH_SHIFT + c*4);
                 }
                 TKernel kern = getElemwiseFunc(fam, base, base, EW_DEPTH_NONE, result);
                 kern.flags |= EW_CMP_PATCH | patchFlags;
-                const int out = addTemp(result);
+                const 整数 out = addTemp(result);
                 addInsn(fam, a, addConst(base, ts, cn), 0, out, kern);
-                return out;
+                戻る out;
             }
         }
     }
@@ -567,7 +567,7 @@ int TExpr::emitBinary(TOp op, int a, int b, int rdepth, const Scalar& params)
     //   MUL/DIV                     : float work (f64 if wide)   (matches cv::multiply/divide)
     //   POW                         : float work
     //   ADD/SUB                     : common type, signed wide fallback
-    int depth, wide;
+    整数 depth, wide;
     bool divGuard = false;
     switch (op)
     {
@@ -578,12 +578,12 @@ int TExpr::emitBinary(TOp op, int a, int b, int rdepth, const Scalar& params)
     {
         // operands meet at the integer-preserving common type; |a-b| of a signed integer needs the
         // UNSIGNED type of the same width (8s->8u, ...), which is both the result and the safe type.
-        int common = (nd0 == EW_DEPTH_NONE) ? nd1
+        整数 common = (nd0 == EW_DEPTH_NONE) ? nd1
                    : (nd1 == EW_DEPTH_NONE) ? nd0 : promoteArith(nd0, nd1);
-        if (common == EW_DEPTH_NONE) common = result;          // both operands flexible consts
+        もし (common == EW_DEPTH_NONE) common = result;          // both operands flexible consts
         depth = common;
         wide  = absdiffResultDepth(common);
-        if (rdepth == EW_DEPTH_NONE) result = wide;            // auto result: unsigned same width
+        もし (rdepth == EW_DEPTH_NONE) result = wide;            // auto result: unsigned same width
         break;
     }
     case OP_CMP_EQ: case OP_CMP_NE: case OP_CMP_LT:
@@ -600,15 +600,15 @@ int TExpr::emitBinary(TOp op, int a, int b, int rdepth, const Scalar& params)
         const bool w = (depth==CV_32U || depth==CV_32S || depth==CV_64U ||
                         depth==CV_64S || depth==CV_64F);
         wide = w ? CV_64F : CV_32F;
-        if (op == OP_DIV)
+        もし (op == OP_DIV)
         {
             // guard b==0 -> 0 when BOTH operands are integer (matches cv::divide); a flexible const
             // counts as integer iff its value is integral. promote2 can float two wide ints, so this
             // must read the ORIGINAL operands, not `depth`.
-            auto intOperand = [&](int s, int nd) {
-                if (nd != EW_DEPTH_NONE) return !isFloatDepth(nd);
+            auto intOperand = [&](整数 s, 整数 nd) {
+                もし (nd != EW_DEPTH_NONE) 戻る !isFloatDepth(nd);
                 AutoBuffer<double, MAX_LOCAL_CN> v; constDoubles(*this, s, v);
-                return v[0] == std::floor(v[0]); };
+                戻る v[0] == std::floor(v[0]); };
             divGuard = intOperand(a, nd0) && intOperand(b, nd1);
         }
         break;
@@ -622,53 +622,53 @@ int TExpr::emitBinary(TOp op, int a, int b, int rdepth, const Scalar& params)
     // a flexible const that can't be represented exactly at `depth` (e.g. 2.5 in a u8 op) forces the
     // wide working path; a NON-INTEGRAL const additionally forces a FLOAT compute (an integer wide
     // would quantize the fraction - e.g. add(u8, 1.7) must not round 1.7 to 2).
-    auto fracConst = [&](int s) {
-        if (!isFlexConst(*this, s)) return false;
-        AutoBuffer<double, MAX_LOCAL_CN> v; int n = constDoubles(*this, s, v);
-        for (int ch = 0; ch < n; ch++)
-            if (v[ch] != std::floor(v[ch])) return true;
-        return false;
+    auto fracConst = [&](整数 s) {
+        もし (!isFlexConst(*this, s)) 戻る false;
+        AutoBuffer<double, MAX_LOCAL_CN> v; 整数 n = constDoubles(*this, s, v);
+        ために (整数 ch = 0; ch < n; ch++)
+            もし (v[ch] != std::floor(v[ch])) 戻る true;
+        戻る false;
     };
     // BITWISE never widens or floats: a bit-pattern op keeps the array's own integer type, and an
     // out-of-range/fractional scalar is just saturate/round-cast into it (matching scalarToRawData /
     // cv::bitwise's classic convertAndUnrollScalar). Skipping the widening below leaves depth == result.
-    if (cat != CAT_BITWISE && (!constFits(*this, a, depth) || !constFits(*this, b, depth)))
+    もし (cat != CAT_BITWISE && (!constFits(*this, a, depth) || !constFits(*this, b, depth)))
     {
         depth = wide;
         const bool frac = fracConst(a) || fracConst(b);
         // MIN/MAX just SELECT an operand, so a fractional scalar threshold is round-cast into the
         // array type (min(u8, 3.7) == min(u8, 4)) - matching the classic cv::min/max - instead of
         // promoting the whole op to float (add/sub/absdiff DO need the float path to keep the fraction).
-        if (frac && !isFloatDepth(depth) && op != OP_MIN && op != OP_MAX)
+        もし (frac && !isFloatDepth(depth) && op != OP_MIN && op != OP_MAX)
             depth = wide = (result == CV_64F || base == CV_64F) ? CV_64F : CV_32F;
         // mul/div carry a scale-like float const at full f64 precision (cv::multiply/divide compute in
         // f64), so don't settle for f32 - e.g. 110 * 147.2863... must round to 16201, not 16202.
-        if (frac && (op == OP_MUL || op == OP_DIV) && depth == CV_32F)
+        もし (frac && (op == OP_MUL || op == OP_DIV) && depth == CV_32F)
             depth = wide = CV_64F;
     }
 
-    int s0 = isFlexConst(*this, a) ? typedConstFrom(a, depth) : a;
-    int s1 = isFlexConst(*this, b) ? typedConstFrom(b, depth) : b;
-    int c0 = maybeAddCast(s0, depth), c1 = maybeAddCast(s1, depth);
+    整数 s0 = isFlexConst(*this, a) ? typedConstFrom(a, depth) : a;
+    整数 s1 = isFlexConst(*this, b) ? typedConstFrom(b, depth) : b;
+    整数 c0 = maybeAddCast(s0, depth), c1 = maybeAddCast(s1, depth);
 
     // emit `depth -> result` directly when a kernel exists, else compute in `wide` and cast down.
     // OP_DIV resolves via getDivFunc (carrying the /0 guard); every other op via getElemwiseFunc.
-    auto resolve = [&](int rd) {
-        return op == OP_DIV ? getDivFunc(depth, rd, divGuard)
+    auto resolve = [&](整数 rd) {
+        戻る op == OP_DIV ? getDivFunc(depth, rd, divGuard)
                             : getElemwiseFunc(op, depth, depth, EW_DEPTH_NONE, rd);
     };
     TKernel k = resolve(result);
-    if (k.fptr)
+    もし (k.fptr)
     {
-        int res = addTemp(result);
+        整数 res = addTemp(result);
         addInsn(op, c0, c1, 0, res, k, params);
-        return res;
+        戻る res;
     }
     k = resolve(wide);
     CV_Assert(k.fptr && "ew: no kernel for this op/type combination");
-    int w = addTemp(wide);
+    整数 w = addTemp(wide);
     addInsn(op, c0, c1, 0, w, k, params);
-    return maybeAddCast(w, result);
+    戻る maybeAddCast(w, result);
 }
 
 // ---------------------------------------------------------------------------
@@ -676,16 +676,16 @@ int TExpr::emitBinary(TOp op, int a, int b, int rdepth, const Scalar& params)
 // domain; NEG/ABS keep the operand type; NOT stays integer. (OP_CAST is not routed here - an explicit
 // cast is just maybeAddCast / a typed addConst at the call site.)
 // ---------------------------------------------------------------------------
-int TExpr::emitUnary(TOp op, int a, int rdepth, const Scalar& params)
+整数 TExpr::emitUnary(TOp op, 整数 a, 整数 rdepth, const Scalar& params)
 {
-    const int nd = isFlexConst(*this, a) ? EW_DEPTH_NONE : arginfo[a].depth;
+    const 整数 nd = isFlexConst(*this, a) ? EW_DEPTH_NONE : arginfo[a].depth;
     const ElemwiseCategory cat = opCategory(op);
 
     // NEG and ABS have no kernels of their own - they are compositions over the binary family
     // with a zero constant (flexible, so emitBinary types it as the operand's own type).
-    if (op == OP_NEG)
-        return emitBinary(OP_SUB, addConst(EW_DEPTH_NONE, Scalar(0.), 1), a, rdepth, params);
-    if (op == OP_ABS)
+    もし (op == OP_NEG)
+        戻る emitBinary(OP_SUB, addConst(EW_DEPTH_NONE, Scalar(0.), 1), a, rdepth, params);
+    もし (op == OP_ABS)
     {
         // peephole: abs(x - y) -> absdiff(x, y), ALWAYS. Strictly speaking the two differ on
         // integers - the literal subtract saturates first (u8: max(x-y, 0); signed: clipped
@@ -694,24 +694,24 @@ int TExpr::emitUnary(TOp op, int a, int rdepth, const Scalar& params)
         // "don't notice" the difference and hand out the useful semantics. The sub is necessarily
         // the last instruction and its result the last temp (abs is emitted right after its
         // argument) - retire both, the moveToOutput manoeuvre.
-        if (!prog.empty() && arginfo[a].kind == TEMP && !arginfo[a].pinned &&
+        もし (!prog.empty() && arginfo[a].kind == TEMP && !arginfo[a].pinned &&
             prog.back().op == OP_SUB && prog.back().result == a &&
             arginfo[a].index == ntemps - 1)
         {
-            const int x = prog.back().arg0, y = prog.back().arg1;
+            const 整数 x = prog.back().arg0, y = prog.back().arg1;
             prog.pop_back();
             arginfo[a].kind = NONE;
             ntemps--;
-            return emitBinary(OP_ABSDIFF, x, y, rdepth, params);
+            戻る emitBinary(OP_ABSDIFF, x, y, rdepth, params);
         }
         // abs IS absdiff(a, 0), including the auto result type: a signed |a| lands in the
         // UNSIGNED type of the same width (|-128| = 128 fits u8 exactly; pinning the result to
         // the signed operand type would saturate it to 127). Fully uniform with the peephole.
-        return emitBinary(OP_ABSDIFF, a, addConst(EW_DEPTH_NONE, Scalar(0.), 1), rdepth, params);
+        戻る emitBinary(OP_ABSDIFF, a, addConst(EW_DEPTH_NONE, Scalar(0.), 1), rdepth, params);
     }
 
-    int result = rdepth;
-    if (result == EW_DEPTH_NONE)
+    整数 result = rdepth;
+    もし (result == EW_DEPTH_NONE)
     {
         switch (cat)
         {
@@ -723,7 +723,7 @@ int TExpr::emitUnary(TOp op, int a, int rdepth, const Scalar& params)
         }
     }
 
-    int depth, wide;
+    整数 depth, wide;
     switch (cat)
     {
     case CAT_MATH:
@@ -737,22 +737,22 @@ int TExpr::emitUnary(TOp op, int a, int rdepth, const Scalar& params)
     default:          depth = (nd == EW_DEPTH_NONE) ? result : nd; wide = result; break;  // NEG/ABS
     }
 
-    if (!constFits(*this, a, depth)) depth = (cat == CAT_MATH) ? depth : CV_32F;
-    int s0 = isFlexConst(*this, a) ? typedConstFrom(a, depth) : a;
-    int c0 = maybeAddCast(s0, depth);
+    もし (!constFits(*this, a, depth)) depth = (cat == CAT_MATH) ? depth : CV_32F;
+    整数 s0 = isFlexConst(*this, a) ? typedConstFrom(a, depth) : a;
+    整数 c0 = maybeAddCast(s0, depth);
 
     TKernel k = getElemwiseFunc(op, depth, EW_DEPTH_NONE, EW_DEPTH_NONE, result);
-    if (k.fptr)
+    もし (k.fptr)
     {
-        int res = addTemp(result);
+        整数 res = addTemp(result);
         addInsn(op, c0, 0, 0, res, k, params);
-        return res;
+        戻る res;
     }
     k = getElemwiseFunc(op, depth, EW_DEPTH_NONE, EW_DEPTH_NONE, wide);
     CV_Assert(k.fptr && "ew: no kernel for this op/type combination");
-    int w = addTemp(wide);
+    整数 w = addTemp(wide);
     addInsn(op, c0, 0, 0, w, k, params);
-    return maybeAddCast(w, result);
+    戻る maybeAddCast(w, result);
 }
 
 // ---------------------------------------------------------------------------
@@ -760,43 +760,43 @@ int TExpr::emitUnary(TOp op, int a, int rdepth, const Scalar& params)
 // a common type and emits there; select keeps arg0 (the mask) untouched and only unifies the two
 // branches. (Both are minimal: not yet test-covered, no kernels wired up.)
 // ---------------------------------------------------------------------------
-int TExpr::emitTernary(TOp op, int a, int b, int c, int rdepth)
+整数 TExpr::emitTernary(TOp op, 整数 a, 整数 b, 整数 c, 整数 rdepth)
 {
-    auto dep = [&](int s) { return isFlexConst(*this, s) ? EW_DEPTH_NONE : arginfo[s].depth; };
+    auto dep = [&](整数 s) { 戻る isFlexConst(*this, s) ? EW_DEPTH_NONE : arginfo[s].depth; };
 
-    if (op == OP_SELECT)                         // select(mask=a, x=b, y=c)
+    もし (op == OP_SELECT)                         // select(mask=a, x=b, y=c)
     {
         // the kernel consumes a 1-byte mask as-is (u8/s8/bool, mask != 0 semantics). Any other
         // mask type - a wider array or a literal - is normalized by an explicit `mask != 0`
         // compare (u8 result), NOT by a value cast (which would saturate/round the values).
-        if (isFlexConst(*this, a) || CV_ELEM_SIZE1(arginfo[a].depth) != 1)
+        もし (isFlexConst(*this, a) || CV_ELEM_SIZE1(arginfo[a].depth) != 1)
             a = emitBinary(OP_CMP_NE, a, addConst(EW_DEPTH_NONE, Scalar(0.), 1), CV_8U, Scalar());
-        int result = rdepth != EW_DEPTH_NONE ? rdepth : promoteArith(dep(b), dep(c));
-        if (result == EW_DEPTH_NONE) result = CV_32F;
+        整数 result = rdepth != EW_DEPTH_NONE ? rdepth : promoteArith(dep(b), dep(c));
+        もし (result == EW_DEPTH_NONE) result = CV_32F;
         // a literal branch (select(m, x, 0)) is a flexible const: type it at `result` directly
         // (a value conversion in constbuf), never through an OP_CAST of a depth-less slot
-        int sb = isFlexConst(*this, b) ? typedConstFrom(b, result) : maybeAddCast(b, result);
-        int sc = isFlexConst(*this, c) ? typedConstFrom(c, result) : maybeAddCast(c, result);
-        int res = addTemp(result);
+        整数 sb = isFlexConst(*this, b) ? typedConstFrom(b, result) : maybeAddCast(b, result);
+        整数 sc = isFlexConst(*this, c) ? typedConstFrom(c, result) : maybeAddCast(c, result);
+        整数 res = addTemp(result);
         addInsn(OP_SELECT, a, sb, sc, res);
-        return res;
+        戻る res;
     }
 
     // clamp(x,lo,hi): unify all three operands at `result` (compute == result, no wide fallback).
     // The x operand dominates the auto type: clamp(u8_img, 10, 200) must stay u8, and literal
     // bounds are flexible consts typed at `result` directly (never OP_CAST of a depth-less slot).
-    int result = rdepth != EW_DEPTH_NONE ? rdepth
+    整数 result = rdepth != EW_DEPTH_NONE ? rdepth
                                          : promoteArith(promoteArith(dep(a), dep(b)), dep(c));
-    if (result == EW_DEPTH_NONE) result = CV_32F;
-    auto typed = [&](int s) {
-        return isFlexConst(*this, s) ? typedConstFrom(s, result) : maybeAddCast(s, result);
+    もし (result == EW_DEPTH_NONE) result = CV_32F;
+    auto typed = [&](整数 s) {
+        戻る isFlexConst(*this, s) ? typedConstFrom(s, result) : maybeAddCast(s, result);
     };
-    int c0 = typed(a), c1 = typed(b), c2 = typed(c);
+    整数 c0 = typed(a), c1 = typed(b), c2 = typed(c);
     TKernel k = getElemwiseFunc(op, result, result, result, result);
     CV_Assert(k.fptr && "ew: no kernel for this op/type combination");
-    int res = addTemp(result);
+    整数 res = addTemp(result);
     addInsn(op, c0, c1, c2, res, k);
-    return res;
+    戻る res;
 }
 
 // ---------------------------------------------------------------------------
@@ -804,18 +804,18 @@ int TExpr::emitTernary(TOp op, int a, int b, int c, int rdepth)
 // producer to write `out` directly (no copy), dropping `temp` when it was the last-added slot so
 // ntemps stays minimal (keeps compile()'s no-temp fast exit for single-op programs). Otherwise copy.
 // ---------------------------------------------------------------------------
-int TExpr::moveToOutput(int temp, int out)
+整数 TExpr::moveToOutput(整数 temp, 整数 out)
 {
-    const int ninsn = (int)prog.size();
-    int producer = -1;
+    const 整数 ninsn = (整数)prog.size();
+    整数 producer = -1;
     bool usedAsArg = false;
-    for (int i = 0; i < ninsn; i++)
+    ために (整数 i = 0; i < ninsn; i++)
     {
         const TExpr::Insn& ins = prog[i];
-        if (ins.result == temp) producer = i;
-        if (ins.arg0 == temp || ins.arg1 == temp || ins.arg2 == temp) usedAsArg = true;
+        もし (ins.result == temp) producer = i;
+        もし (ins.arg0 == temp || ins.arg1 == temp || ins.arg2 == temp) usedAsArg = true;
     }
-    if (arginfo[temp].kind == TEMP && producer >= 0 && !usedAsArg && !arginfo[temp].pinned &&
+    もし (arginfo[temp].kind == TEMP && producer >= 0 && !usedAsArg && !arginfo[temp].pinned &&
         arginfo[temp].depth == arginfo[out].depth)
     {
         // MOVE semantics: redirect `temp`'s single producer to write `out` directly, then leave the
@@ -830,18 +830,18 @@ int TExpr::moveToOutput(int temp, int out)
         prog[producer].result = out;
         arginfo[temp].kind = NONE;
         ntemps--;
-        return out;
+        戻る out;
     }
     addInsn(OP_CAST, temp, 0, 0, out);                     // same/different depth copy into `out`
-    return out;
+    戻る out;
 }
 
 // ---------------------------------------------------------------------------
 // TExpr::output(): declare a fresh OUTPUT of `rootSlot`'s depth and moveToOutput into it.
 // ---------------------------------------------------------------------------
-int TExpr::output(int rootSlot)
+整数 TExpr::output(整数 rootSlot)
 {
-    return moveToOutput(rootSlot, addOutput(arginfo[rootSlot].depth));
+    戻る moveToOutput(rootSlot, addOutput(arginfo[rootSlot].depth));
 }
 
 // ---------------------------------------------------------------------------
@@ -851,7 +851,7 @@ int TExpr::output(int rootSlot)
 // ---------------------------------------------------------------------------
 void TExpr::compile()
 {
-    const int ninsn = (int)prog.size();
+    const 整数 ninsn = (整数)prog.size();
 
     // Kernels are bound eagerly by addInsn at build time, so there is no binding pass here - compile()
     // only counts consts and packs temp buffers.
@@ -862,13 +862,13 @@ void TExpr::compile()
     // emit* layers replaced them with typed copies - and are skipped. nconsts sizes exec's per-const
     // header buffer and gates the fast path. (getConvertFunc may reallocate constbuf, so snapshot the
     // source bytes first.)
-    const int nslots = (int)arginfo.size();
+    const 整数 nslots = (整数)arginfo.size();
     nconsts = 0;
-    for (int s = 1; s < nslots; s++)
+    ために (整数 s = 1; s < nslots; s++)
     {
         Arg& a = arginfo[s];
-        if (a.kind != CONST || a.depth == EW_DEPTH_NONE) continue;
-        const int cn = std::max(1, a.channels), sd = a.srcdepth, dd = a.depth;
+        もし (a.kind != CONST || a.depth == EW_DEPTH_NONE) continue;
+        const 整数 cn = std::max(1, a.channels), sd = a.srcdepth, dd = a.depth;
         const size_t sesz = CV_ELEM_SIZE1(sd), desz = CV_ELEM_SIZE1(dd);
         // uint64_t element type is used for buffer alignment on worst case
         AutoBuffer<uint64_t, sizeof(uint64_t)> srcbuf(divUp((size_t)cn * sesz, (unsigned)sizeof(uint64_t)));
@@ -876,8 +876,8 @@ void TExpr::compile()
         memcpy(srcbytes, (const uchar*)(constbuf.data() + a.constofs), (size_t)cn * sesz);
         const size_t ofs = appendConstBuf(constbuf, dd, nullptr, cn);   // reserve converted region
         uchar* dst = (uchar*)(constbuf.data() + ofs);
-        if (sd == dd) memcpy(dst, srcbytes, (size_t)cn * desz);
-        else getConvertFunc(sd, dd)(srcbytes, 0, nullptr, 0, dst, 0, Size(cn, 1), nullptr);
+        もし (sd == dd) memcpy(dst, srcbytes, (size_t)cn * desz);
+        否则 getConvertFunc(sd, dd)(srcbytes, 0, nullptr, 0, dst, 0, Size(cn, 1), nullptr);
         a.constofs = ofs; a.srcdepth = dd;
         nconsts++;
     }
@@ -889,38 +889,38 @@ void TExpr::compile()
     nbuffers = 0;
     bufEszPrefix.resize(1); bufEszPrefix[0] = 0;
     capElems = INT_MAX;                       // no temps => exec runs each tile in one block, no scratch
-    if (ntemps == 0) return;
+    もし (ntemps == 0) 戻る;
 
-    AutoBuffer<int, 32> tempOfSlot(nslots);
-    for (int s = 0; s < nslots; s++) tempOfSlot[s] = -1;
-    for (int s = 1; s < nslots; s++)
-        if (arginfo[s].kind == TEMP) tempOfSlot[s] = arginfo[s].index;
+    AutoBuffer<整数, 32> tempOfSlot(nslots);
+    ために (整数 s = 0; s < nslots; s++) tempOfSlot[s] = -1;
+    ために (整数 s = 1; s < nslots; s++)
+        もし (arginfo[s].kind == TEMP) tempOfSlot[s] = arginfo[s].index;
 
-    AutoBuffer<int, 16> lastUse(ntemps);
-    for (int t = 0; t < ntemps; t++) lastUse[t] = -1;
-    for (int i = 0; i < ninsn; i++)
+    AutoBuffer<整数, 16> lastUse(ntemps);
+    ために (整数 t = 0; t < ntemps; t++) lastUse[t] = -1;
+    ために (整数 i = 0; i < ninsn; i++)
     {
         const TExpr::Insn& ins = prog[i];
-        int as[3] = { ins.arg0, ins.arg1, ins.arg2 };
-        for (int k = 0; k < 3; k++)
-            if (tempOfSlot[as[k]] >= 0) lastUse[tempOfSlot[as[k]]] = i;
+        整数 as[3] = { ins.arg0, ins.arg1, ins.arg2 };
+        ために (整数 k = 0; k < 3; k++)
+            もし (tempOfSlot[as[k]] >= 0) lastUse[tempOfSlot[as[k]]] = i;
     }
 
     bufferOfTemp.resize(ntemps);
-    for (int t = 0; t < ntemps; t++) bufferOfTemp[t] = -1;
-    AutoBuffer<int, 16> freeBufs(ntemps);
-    int nfree = 0, nbuf = 0;
-    for (int i = 0; i < ninsn; i++)
+    ために (整数 t = 0; t < ntemps; t++) bufferOfTemp[t] = -1;
+    AutoBuffer<整数, 16> freeBufs(ntemps);
+    整数 nfree = 0, nbuf = 0;
+    ために (整数 i = 0; i < ninsn; i++)
     {
         const TExpr::Insn& ins = prog[i];
-        int rt = tempOfSlot[ins.result];
-        if (rt >= 0 && bufferOfTemp[rt] < 0)
+        整数 rt = tempOfSlot[ins.result];
+        もし (rt >= 0 && bufferOfTemp[rt] < 0)
             bufferOfTemp[rt] = nfree > 0 ? freeBufs[--nfree] : nbuf++;
-        int as[3] = { ins.arg0, ins.arg1, ins.arg2 };
-        for (int k = 0; k < 3; k++)
+        整数 as[3] = { ins.arg0, ins.arg1, ins.arg2 };
+        ために (整数 k = 0; k < 3; k++)
         {
-            int t = tempOfSlot[as[k]];
-            if (t >= 0 && lastUse[t] == i)
+            整数 t = tempOfSlot[as[k]];
+            もし (t >= 0 && lastUse[t] == i)
             {
                 freeBufs[nfree++] = bufferOfTemp[t];
                 lastUse[t] = -1;   // the same temp may be several args of this insn ("d*d") -
@@ -936,18 +936,18 @@ void TExpr::compile()
     // total temp bytes/element. Precomputed here (depths are build-time) so exec()/its fast path
     // never recompute it per call, and the fast path can size its scratch in O(1).
     bufEszPrefix.resize(nbuffers + 1);
-    for (int b = 0; b <= nbuffers; b++) bufEszPrefix[b] = 0;
-    for (int s = 1; s < nslots; s++)
-        if (arginfo[s].kind == TEMP)
+    ために (整数 b = 0; b <= nbuffers; b++) bufEszPrefix[b] = 0;
+    ために (整数 s = 1; s < nslots; s++)
+        もし (arginfo[s].kind == TEMP)
         {
-            int b = bufferOfTemp[arginfo[s].index], e = (int)CV_ELEM_SIZE1(arginfo[s].depth);
-            if (e > bufEszPrefix[b + 1]) bufEszPrefix[b + 1] = e;     // max elem size in buffer b
+            整数 b = bufferOfTemp[arginfo[s].index], e = (整数)CV_ELEM_SIZE1(arginfo[s].depth);
+            もし (e > bufEszPrefix[b + 1]) bufEszPrefix[b + 1] = e;     // max elem size in buffer b
         }
-    for (int b = 0; b < nbuffers; b++) bufEszPrefix[b + 1] += bufEszPrefix[b];   // -> prefix sums
+    ために (整数 b = 0; b < nbuffers; b++) bufEszPrefix[b + 1] += bufEszPrefix[b];   // -> prefix sums
 
     // L1 fragment cap: # elements one ~4KB scratch fragment holds (exec fragments the strip so the
     // intermediates stay hot). Pure function of the temp byte layout, hence computed here once.
-    const int totalEsz = bufEszPrefix[nbuffers];
+    const 整数 totalEsz = bufEszPrefix[nbuffers];
     capElems = totalEsz > 0 ? std::max(64, (4 * 1024) / totalEsz) : INT_MAX;
 }
 
@@ -957,12 +957,12 @@ void TExpr::compile()
 // Logical shape of a Mat with channels as the innermost dimension; steps in elemsize1 units.
 // Used here only to infer the broadcast RESULT shape (spatial + channels) for output allocation;
 // broadcastOp does its own channel-aware layout for the traversal itself.
-static void matLogical(const Mat& m, MatShape& shp, EwSteps& step, int& esz1)
+static void matLogical(const Mat& m, MatShape& shp, EwSteps& step, 整数& esz1)
 {
-    esz1 = (int)m.elemSize1();
-    int nd = m.dims, cn = m.channels();
+    esz1 = (整数)m.elemSize1();
+    整数 nd = m.dims, cn = m.channels();
     shp.resize(nd + 1);
-    for (int i = 0; i < nd; i++)
+    ために (整数 i = 0; i < nd; i++)
     {
         shp[i] = m.size[i];
         step[i] = m.step[i] / esz1;
@@ -972,23 +972,23 @@ static void matLogical(const Mat& m, MatShape& shp, EwSteps& step, int& esz1)
 }
 
 // numpy-style broadcast of several right-aligned shapes.
-static bool broadcastShape(const MatShape* shps, int K, MatShape& out)
+static bool broadcastShape(const MatShape* shps, 整数 K, MatShape& out)
 {
-    int nd = 0;
-    for (int k = 0; k < K; k++) nd = std::max(nd, shps[k].dims);
+    整数 nd = 0;
+    ために (整数 k = 0; k < K; k++) nd = std::max(nd, shps[k].dims);
     out.assign(nd, 1);
-    for (int k = 0; k < K; k++)
+    ために (整数 k = 0; k < K; k++)
     {
         const MatShape& s = shps[k];
-        int off = nd - s.dims;
-        for (int i = 0; i < s.dims; i++)
+        整数 off = nd - s.dims;
+        ために (整数 i = 0; i < s.dims; i++)
         {
-            int d = s[i], &o = out[off + i];
-            if (o == 1) o = d;
-            else if (d != 1 && d != o) return false;
+            整数 d = s[i], &o = out[off + i];
+            もし (o == 1) o = d;
+            否则 もし (d != 1 && d != o) 戻る false;
         }
     }
-    return true;
+    戻る true;
 }
 
 // Rough per-element cost of an op for the parallel_for_ stripe-count hint, in units of ~1/4 cycle
@@ -996,7 +996,7 @@ static bool broadcastShape(const MatShape* shps, int K, MatShape& out)
 // run at ~1.5 cycles/element, not the ~30 a scalar-cost model would suggest - the old values
 // over-split the work into stripes too small to amortize the per-job dispatch overhead).
 // Unknown ops default to ~division. cv::expression will own this once it drives broadcastOp.
-static int opCost(TOp op)
+static 整数 opCost(TOp op)
 {
     switch (op)
     {
@@ -1004,11 +1004,11 @@ static int opCost(TOp op)
     case OP_ABSDIFF: case OP_AND: case OP_OR: case OP_XOR: case OP_NOT:
     case OP_NEG: case OP_ABS: case OP_CAST: case OP_RELU: case OP_SELECT:
     case OP_CMP_EQ: case OP_CMP_NE: case OP_CMP_LT:
-    case OP_CMP_LE: case OP_CMP_GT: case OP_CMP_GE: return 1;
-    case OP_DIV: case OP_SQRT: case OP_HYPOT: case OP_CONVERT_SCALE: return 3;
+    case OP_CMP_LE: case OP_CMP_GT: case OP_CMP_GE: 戻る 1;
+    case OP_DIV: case OP_SQRT: case OP_HYPOT: case OP_CONVERT_SCALE: 戻る 3;
     case OP_SIN: case OP_COS: case OP_TANH: case OP_ERF: case OP_ATAN2:
-    case OP_EXP: case OP_LOG: case OP_POW:           return 6;
-    default:                                         return 3;
+    case OP_EXP: case OP_LOG: case OP_POW:           戻る 6;
+    default:                                         戻る 3;
     }
 }
 
@@ -1032,137 +1032,137 @@ void TExpr::clear()
 // Human-readable dump of the program (slot table + instruction list). Const values are shown in f64.
 void TExpr::dump(std::ostream& os) const
 {
-    auto dn = [](int d) -> const char* {
+    auto dn = [](整数 d) -> const char* {
         switch (d) {
-        case EW_DEPTH_NONE: return "flex";
-        case CV_8U:  return "u8";  case CV_8S:  return "s8";
-        case CV_16U: return "u16"; case CV_16S: return "s16";
-        case CV_32U: return "u32"; case CV_32S: return "s32";
-        case CV_64U: return "u64"; case CV_64S: return "s64";
-        case CV_16F: return "f16"; case CV_16BF:return "bf16";
-        case CV_32F: return "f32"; case CV_64F: return "f64";
-        case CV_Bool:return "bool";
-        default:     return "?"; }
+        case EW_DEPTH_NONE: 戻る "flex";
+        case CV_8U:  戻る "u8";  case CV_8S:  戻る "s8";
+        case CV_16U: 戻る "u16"; case CV_16S: 戻る "s16";
+        case CV_32U: 戻る "u32"; case CV_32S: 戻る "s32";
+        case CV_64U: 戻る "u64"; case CV_64S: 戻る "s64";
+        case CV_16F: 戻る "f16"; case CV_16BF:戻る "bf16";
+        case CV_32F: 戻る "f32"; case CV_64F: 戻る "f64";
+        case CV_Bool:戻る "bool";
+        default:     戻る "?"; }
     };
     auto kn = [](ArgKind k) -> const char* {
-        switch (k) { case NONE: return "none"; case INPUT: return "in"; case CONST: return "const";
-                     case TEMP: return "temp"; case OUTPUT: return "out"; } return "?";
+        switch (k) { case NONE: 戻る "none"; case INPUT: 戻る "in"; case CONST: 戻る "const";
+                     case TEMP: 戻る "temp"; case OUTPUT: 戻る "out"; } 戻る "?";
     };
     os << "TExpr: inputs=" << ninputs << " outputs=" << noutputs << " temps=" << ntemps
-       << " buffers=" << nbuffers << " consts=" << nconsts << " insns=" << (int)prog.size() << "\n";
+       << " buffers=" << nbuffers << " consts=" << nconsts << " insns=" << (整数)prog.size() << "\n";
     os << "  slots:\n";
-    for (int s = 0; s < (int)arginfo.size(); s++) {
+    ために (整数 s = 0; s < (整数)arginfo.size(); s++) {
         const Arg& a = arginfo[s];
         os << "    [" << s << "] " << kn(a.kind);
-        if (a.kind != NONE) os << " " << dn(a.depth);
-        if (a.kind == INPUT || a.kind == OUTPUT || a.kind == TEMP) os << " idx=" << a.index;
-        if (a.kind == CONST) {
-            const int cn = std::max(1, a.channels);
+        もし (a.kind != NONE) os << " " << dn(a.depth);
+        もし (a.kind == INPUT || a.kind == OUTPUT || a.kind == TEMP) os << " idx=" << a.index;
+        もし (a.kind == CONST) {
+            const 整数 cn = std::max(1, a.channels);
             AutoBuffer<double, MAX_LOCAL_CN> v(cn);
             const uchar* src = (const uchar*)(constbuf.data() + a.constofs);
-            if (a.srcdepth == CV_64F) memcpy(v.data(), src, (size_t)cn * sizeof(double));
-            else getConvertFunc(a.srcdepth, CV_64F)(src, 0, nullptr, 0, (uchar*)v.data(), 0, Size(cn, 1), nullptr);
+            もし (a.srcdepth == CV_64F) memcpy(v.data(), src, (size_t)cn * sizeof(double));
+            否则 getConvertFunc(a.srcdepth, CV_64F)(src, 0, nullptr, 0, (uchar*)v.data(), 0, Size(cn, 1), nullptr);
             os << " cn=" << cn << " src=" << dn(a.srcdepth) << " {";
-            for (int c = 0; c < cn; c++) os << (c ? "," : "") << v[c];
+            ために (整数 c = 0; c < cn; c++) os << (c ? "," : "") << v[c];
             os << "}";
         }
         os << "\n";
     }
     os << "  prog:\n";
-    for (int i = 0; i < (int)prog.size(); i++) {
+    ために (整数 i = 0; i < (整数)prog.size(); i++) {
         const Insn& ins = prog[i];
         os << "    " << i << ": " << opName(ins.op) << "(" << ins.arg0;
-        if (ins.arg1) os << ", " << ins.arg1;
-        if (ins.arg2) os << ", " << ins.arg2;
+        もし (ins.arg1) os << ", " << ins.arg1;
+        もし (ins.arg2) os << ", " << ins.arg2;
         os << ") -> " << ins.result;
-        if (ins.kernel.flags) os << " kflags=" << ins.kernel.flags;
-        if (ins.params[0] != 1.0 || ins.params[1] != 0.0)
+        もし (ins.kernel.flags) os << " kflags=" << ins.kernel.flags;
+        もし (ins.params[0] != 1.0 || ins.params[1] != 0.0)
             os << " params=[" << ins.params[0] << "," << ins.params[1] << "," << ins.params[2] << "]";
-        if (!ins.kernel.fptr) os << " [UNBOUND]";
+        もし (!ins.kernel.fptr) os << " [UNBOUND]";
         os << "\n";
     }
 }
 
 // ---- program builders: append a slot / instruction, return its index ----
-int TExpr::addInput(int depth)
+整数 TExpr::addInput(整数 depth)
 {
     Arg a; a.kind = INPUT; a.depth = depth; a.index = ninputs++;
-    arginfo.push_back(a); return (int)arginfo.size() - 1;
+    arginfo.push_back(a); 戻る (整数)arginfo.size() - 1;
 }
 
-int TExpr::addOutput(int depth)
+整数 TExpr::addOutput(整数 depth)
 {
     Arg a; a.kind = OUTPUT; a.depth = depth; a.index = noutputs++;
-    arginfo.push_back(a); return (int)arginfo.size() - 1;
+    arginfo.push_back(a); 戻る (整数)arginfo.size() - 1;
 }
 
-int TExpr::addTemp(int depth)
+整数 TExpr::addTemp(整数 depth)
 {
     Arg a; a.kind = TEMP; a.depth = depth; a.index = ntemps++;
-    arginfo.push_back(a); return (int)arginfo.size() - 1;
+    arginfo.push_back(a); 戻る (整数)arginfo.size() - 1;
 }
 
 // Source = a cv::Scalar (f64, up to 4 channels): stored as CV_64F in constbuf.
-int TExpr::addConst(int depth, const Scalar& v, int channels)
+整数 TExpr::addConst(整数 depth, const Scalar& v, 整数 channels)
 {
     CV_Assert(channels <= 4);
     Arg a; a.kind = CONST; a.depth = depth; a.channels = channels; a.srcdepth = CV_64F;
     a.constofs = appendConstBuf(constbuf, CV_64F, v.val, channels);
-    arginfo.push_back(a); return (int)arginfo.size() - 1;
+    arginfo.push_back(a); 戻る (整数)arginfo.size() - 1;
 }
 
 // Source = native bytes of any depth/channel-count (e.g. a Vec<_,N> scalar): stored as-is.
-int TExpr::addConst(int depth, int srcdepth, const void* data, int channels)
+整数 TExpr::addConst(整数 depth, 整数 srcdepth, const void* data, 整数 channels)
 {
     // A CONST is a broadcast scalar - capped at 4 channels (a Scalar). Need more? Pass a 0-D Mat with
     // the desired channel count as an INPUT: broadcasting handles it, and it isn't limited to 4.
     CV_Assert(channels <= 4);
     Arg a; a.kind = CONST; a.depth = depth; a.channels = channels; a.srcdepth = srcdepth;
     a.constofs = appendConstBuf(constbuf, srcdepth, data, channels);
-    arginfo.push_back(a); return (int)arginfo.size() - 1;
+    arginfo.push_back(a); 戻る (整数)arginfo.size() - 1;
 }
 
 // A typed copy of flexible CONST `srcSlot` at the resolved `depth`, sharing its (still-source)
 // values in constbuf; compile() converts each such slot's values to its `depth`.
-int TExpr::typedConstFrom(int srcSlot, int depth)
+整数 TExpr::typedConstFrom(整数 srcSlot, 整数 depth)
 {
     const Arg& src = arginfo[srcSlot];
     Arg a; a.kind = CONST; a.depth = depth; a.channels = src.channels;
     a.srcdepth = src.srcdepth; a.constofs = src.constofs;    // shares the source region
-    arginfo.push_back(a); return (int)arginfo.size() - 1;
+    arginfo.push_back(a); 戻る (整数)arginfo.size() - 1;
 }
 
 // Append one instruction with a pre-resolved kernel (the caller probed getElemwiseFunc, or knows
 // the kernel - e.g. div's /0-aware kernel). No re-resolution.
-int TExpr::addInsn(TOp op, int a0, int a1, int a2, int result, const TKernel& kernel, const Scalar& params)
+整数 TExpr::addInsn(TOp op, 整数 a0, 整数 a1, 整数 a2, 整数 result, const TKernel& kernel, const Scalar& params)
 {
     TExpr::Insn ins; ins.op = op; ins.arg0 = a0; ins.arg1 = a1; ins.arg2 = a2; ins.result = result;
     ins.params = params; ins.kernel = kernel;
     prog.push_back(ins);
-    return (int)prog.size() - 1;
+    戻る (整数)prog.size() - 1;
 }
 
 // Append one instruction, resolving its kernel NOW from the operand/result depths (final at build
 // time). compile() therefore never re-resolves. A builder that needs a specific kernel (div's /0
 // policy) pushes a pre-bound Insn directly instead.
-int TExpr::addInsn(TOp op, int a0, int a1, int a2, int result, const Scalar& params)
+整数 TExpr::addInsn(TOp op, 整数 a0, 整数 a1, 整数 a2, 整数 result, const Scalar& params)
 {
-    int d0 = a0 ? arginfo[a0].depth : EW_DEPTH_NONE;
-    int d1 = a1 ? arginfo[a1].depth : EW_DEPTH_NONE;
-    int d2 = a2 ? arginfo[a2].depth : EW_DEPTH_NONE;
+    整数 d0 = a0 ? arginfo[a0].depth : EW_DEPTH_NONE;
+    整数 d1 = a1 ? arginfo[a1].depth : EW_DEPTH_NONE;
+    整数 d2 = a2 ? arginfo[a2].depth : EW_DEPTH_NONE;
     TKernel k = getElemwiseFunc(op, d0, d1, d2, arginfo[result].depth);
     CV_Assert(k.fptr && "ew: no kernel for this op/type combination");
-    return addInsn(op, a0, a1, a2, result, k, params);
+    戻る addInsn(op, a0, a1, a2, result, k, params);
 }
 
 // Cast `arg` to `depth` only if it is not already that depth (the sole cast-insertion helper for
 // the hand builders and the emit* layers); returns the slot holding the value at `depth`.
-int TExpr::maybeAddCast(int arg, int depth)
+整数 TExpr::maybeAddCast(整数 arg, 整数 depth)
 {
-    if (arginfo[arg].depth == depth) return arg;
-    int t = addTemp(depth);
+    もし (arginfo[arg].depth == depth) 戻る arg;
+    整数 t = addTemp(depth);
     addInsn(OP_CAST, arg, 0, 0, t);
-    return t;
+    戻る t;
 }
 
 // Run one resolved instruction over a width x height tile. Every kernel uses ONE calling
@@ -1174,9 +1174,9 @@ static inline void runInsn(const TExpr::Insn& ins,
                            const void* p0, size_t y0, size_t x0,
                            const void* p1, size_t y1, size_t x1,
                            const void* p2, size_t y2, size_t x2,
-                           void* pr, size_t yr, int w, int h)
+                           void* pr, size_t yr, 整数 w, 整数 h)
 {
-    int code = ins.kernel.fptr(p0, y0, x0, p1, y1, x1, p2, y2, x2, pr, yr, w, h,
+    整数 code = ins.kernel.fptr(p0, y0, x0, p1, y1, x1, p2, y2, x2, pr, yr, w, h,
                                 ins.params.val, ins.kernel.flags, ins.kernel.userdata);
     CV_Assert(code >= 0);
 }
@@ -1187,55 +1187,55 @@ struct EwBody {
     //   TExpr::INPUT / TExpr::OUTPUT : index into tile.slices (the broadcast operand list; consts,
     //                                 now 0-dim broadcast operands, are relabeled INPUT and live here)
     //   TExpr::TEMP               : physical temp-buffer id
-    const int* slotMap;
+    const 整数* slotMap;
     const signed char* slotKind; // [nslots] arginfo[s].kind, for resolving slotMap[s]
-    const int* bufEszPrefix;  // [nbuffers+1] prefix sums of temp elem sizes; [nbuffers] = total
-    int ninsn, nslots, nbuffers, capElems;   // capElems: L1 fragment element cap (0 if no temps)
+    const 整数* bufEszPrefix;  // [nbuffers+1] prefix sums of temp elem sizes; [nbuffers] = total
+    整数 ninsn, nslots, nbuffers, capElems;   // capElems: L1 fragment element cap (0 if no temps)
 };
 
-void TExpr::outputShape(const Mat* const* inputs, MatShape& spatial, int& channels) const
+void TExpr::outputShape(const Mat* const* inputs, MatShape& spatial, 整数& channels) const
 {
     // Fast path: every real input shares one shape + channel count => the result IS inputs[0]'s
     // (consts add no dims/channels). Otherwise re-broadcast the logical (spatial + channel) shapes.
-    const int rcn0 = ninputs >= 1 ? inputs[0]->channels() : 1;
+    const 整数 rcn0 = ninputs >= 1 ? inputs[0]->channels() : 1;
     bool sameShape = ninputs >= 1;
-    for (int i = 1; sameShape && i < ninputs; i++)
+    ために (整数 i = 1; sameShape && i < ninputs; i++)
     {
         const Mat& a = *inputs[i];
-        if (a.dims != inputs[0]->dims || a.channels() != rcn0) sameShape = false;
-        else for (int d = 0; d < a.dims; d++) if (a.size[d] != inputs[0]->size[d]) { sameShape = false; break; }
+        もし (a.dims != inputs[0]->dims || a.channels() != rcn0) sameShape = false;
+        否则 ために (整数 d = 0; d < a.dims; d++) もし (a.size[d] != inputs[0]->size[d]) { sameShape = false; break; }
     }
-    if (sameShape) { spatial = inputs[0]->size; channels = rcn0; return; }
+    もし (sameShape) { spatial = inputs[0]->size; channels = rcn0; 戻る; }
 
     AutoBuffer<MatShape, 16> bshapes(std::max(ninputs, 1));
-    MatShape shp; EwSteps step; int esz1;
-    for (int i = 0; i < ninputs; i++) { matLogical(*inputs[i], shp, step, esz1); bshapes[i] = shp; }
+    MatShape shp; EwSteps step; 整数 esz1;
+    ために (整数 i = 0; i < ninputs; i++) { matLogical(*inputs[i], shp, step, esz1); bshapes[i] = shp; }
     MatShape full;
     CV_Assert(broadcastShape(bshapes.data(), ninputs, full) && "ew: inputs not broadcast-compatible");
-    const int ndFull = (int)full.size();
+    const 整数 ndFull = (整数)full.size();
     channels = full[ndFull - 1];
     spatial = full; spatial.resize(ndFull - 1);
 }
 
 // Convenience overload: inputs as a contiguous Mat array -> build the pointer array + forward.
-void TExpr::outputShape(const Mat* inputs, MatShape& spatial, int& channels) const
+void TExpr::outputShape(const Mat* inputs, MatShape& spatial, 整数& channels) const
 {
     AutoBuffer<const Mat*, 16> ptrs(std::max(ninputs, 1));
-    for (int i = 0; i < ninputs; i++) ptrs[i] = &inputs[i];
+    ために (整数 i = 0; i < ninputs; i++) ptrs[i] = &inputs[i];
     outputShape(ptrs.data(), spatial, channels);
 }
 
 // At namespace scope, NOT inside exec(): MSVC 2019 loses the constexpr-ness of function-local
 // constants used as template arguments inside a lambda (C2975).
-static constexpr int LOCAL_HDRS = 3;
-static constexpr int LOCAL_CONSTS = 4;
-static constexpr int LOCAL_OPS = 16;
+static constexpr 整数 LOCAL_HDRS = 3;
+static constexpr 整数 LOCAL_CONSTS = 4;
+static constexpr 整数 LOCAL_OPS = 16;
 
 void TExpr::exec(const Mat* const* inputs, Mat* outputs)
 {
     using BrTile = BroadcastOp::Tile;
     using BrSlice = BroadcastOp::Slice;
-    const int nslots = (int)arginfo.size();
+    const 整数 nslots = (整数)arginfo.size();
     CV_Assert(nslots >= 1 && arginfo[0].kind == TExpr::NONE);
 
     // ---- cheap fast path: a const-free program over small, same-shape, continuous arrays. Channels
@@ -1245,13 +1245,13 @@ void TExpr::exec(const Mat* const* inputs, Mat* outputs)
     //      byte layout (bufEszPrefix) is known from compile(), so we size an L1 scratch in O(1) and
     //      walk the strip in L1-sized fragments (the intermediates stay hot). nconsts/nbuffers/
     //      bufEszPrefix come from compile(); the rest is a quick check of the args. ----
-    if (nconsts == 0 && ninputs >= 1)
+    もし (nconsts == 0 && ninputs >= 1)
     {
         constexpr size_t EW_FASTPATH_MAX = 1u << 17;   // above this the tiled/parallel path wins
         const Mat& r = *inputs[0];
-        const int rcn = r.channels();
+        const 整数 rcn = r.channels();
         bool ok = r.isContinuous();
-        for (int i = 1; ok && i < ninputs; i++)
+        ために (整数 i = 1; ok && i < ninputs; i++)
         {
             const Mat& a = *inputs[i];
             ok = ok && a.isContinuous() && a.channels() == rcn && a.size == r.size;
@@ -1259,52 +1259,52 @@ void TExpr::exec(const Mat* const* inputs, Mat* outputs)
         // the flat strip writes the output(s) contiguously too, so it can't serve a non-contiguous
         // (cropped-ROI) destination - those fall to the general strided path below (an empty output,
         // which exec will allocate contiguous, counts as continuous here).
-        for (int s = 1; ok && s < nslots; s++)
-            if (arginfo[s].kind == OUTPUT) ok = ok && outputs[arginfo[s].index].isContinuous();
+        ために (整数 s = 1; ok && s < nslots; s++)
+            もし (arginfo[s].kind == OUTPUT) ok = ok && outputs[arginfo[s].index].isContinuous();
         const size_t total = ok ? r.total() * rcn : 0;
-        if (ok && total == 0)
+        もし (ok && total == 0)
         {
             const MatShape rshape = r.size;
-            for (int s = 1; s < nslots; s++)
-                if (arginfo[s].kind == OUTPUT)
+            ために (整数 s = 1; s < nslots; s++)
+                もし (arginfo[s].kind == OUTPUT)
                     outputs[arginfo[s].index].create(rshape, CV_MAKETYPE(arginfo[s].depth, rcn));
-            return;
+            戻る;
         }
-        if (ok && total <= EW_FASTPATH_MAX)
+        もし (ok && total <= EW_FASTPATH_MAX)
         {
             const MatShape rshape = r.size;   // spatial dims (channels separate), as a MatShape
-            for (int s = 1; s < nslots; s++)
-                if (arginfo[s].kind == OUTPUT)
+            ために (整数 s = 1; s < nslots; s++)
+                もし (arginfo[s].kind == OUTPUT)
                     outputs[arginfo[s].index].create(rshape, CV_MAKETYPE(arginfo[s].depth, rcn));
-            const int ninsn = (int)prog.size();
+            const 整数 ninsn = (整数)prog.size();
 
-            if (nbuffers == 0)
+            もし (nbuffers == 0)
             {
                 // No temps (single-op add/sub/mul/...): one flat (total x 1) pass, operands point
                 // straight at the Mat data - no scratch, no fragment loop. Referenced slots are INPUT/
                 // OUTPUT (a moved-from NONE slot may exist but is never an instruction argument).
-                auto ptrOf = [&](int s) -> void* {
-                    if (s <= 0) return nullptr;
+                auto ptrOf = [&](整数 s) -> void* {
+                    もし (s <= 0) 戻る nullptr;
                     const Arg& ai = arginfo[s];
-                    if (ai.kind == INPUT)  return (void*)inputs[ai.index]->data;
-                    if (ai.kind == OUTPUT) return (void*)outputs[ai.index].data;
-                    return nullptr;   // NONE
+                    もし (ai.kind == INPUT)  戻る (void*)inputs[ai.index]->data;
+                    もし (ai.kind == OUTPUT) 戻る (void*)outputs[ai.index].data;
+                    戻る nullptr;   // NONE
                 };
-                const int w = (int)total;
-                for (int n = 0; n < ninsn; n++)
+                const 整数 w = (整数)total;
+                ために (整数 n = 0; n < ninsn; n++)
                 {
                     const Insn& ins = prog[n];
                     runInsn(ins, ptrOf(ins.arg0), 0, 1, ptrOf(ins.arg1), 0, 1,
                             ptrOf(ins.arg2), 0, 1, ptrOf(ins.result), 0, w, 1);
                 }
-                return;
+                戻る;
             }
 
             // Temps present: walk the strip in L1-sized fragments so the intermediates stay hot.
             // Byte layout (bufEszPrefix) and the fragment cap (capElems) both come from compile();
             // scratch is totalEsz*wf0 (<= ~4KB).
-            const int totalEsz = bufEszPrefix[nbuffers];
-            const int wf0 = std::min((int)total, capElems);
+            const 整数 totalEsz = bufEszPrefix[nbuffers];
+            const 整数 wf0 = std::min((整数)total, capElems);
 
             const size_t region = alignSize((size_t)wf0, 8);
             // Scratch for the temp buffers. AutoBuffer no longer value-inits its tail, so a fresh per-call
@@ -1313,27 +1313,27 @@ void TExpr::exec(const Mat* const* inputs, Mat* outputs)
             AutoBuffer<uint64_t, (4*1024 + 256)/sizeof(uint64_t)> scratchBuf(
                 divUp((size_t)totalEsz * region, (unsigned)sizeof(uint64_t)));
             uchar* scratch = (uchar*)scratchBuf.data();
-            for (int x0 = 0; x0 < (int)total; x0 += wf0)
+            ために (整数 x0 = 0; x0 < (整数)total; x0 += wf0)
             {
-                const int wf = std::min(wf0, (int)total - x0);
-                auto ptrOf = [&](int s) -> void* {
-                    if (s <= 0) return nullptr;
+                const 整数 wf = std::min(wf0, (整数)total - x0);
+                auto ptrOf = [&](整数 s) -> void* {
+                    もし (s <= 0) 戻る nullptr;
                     const Arg& ai = arginfo[s];
                     size_t esz = CV_ELEM_SIZE1(ai.depth);
-                    if (ai.kind == INPUT)  return (uchar*)inputs[ai.index]->data  + (size_t)x0 * esz;
-                    if (ai.kind == OUTPUT) return (uchar*)outputs[ai.index].data + (size_t)x0 * esz;
-                    if (ai.kind != TEMP)   return nullptr;                                    // NONE: moved-from
-                    const int b = bufferOfTemp.empty() ? ai.index : bufferOfTemp[ai.index];  // TEMP
-                    return scratch + (size_t)bufEszPrefix[b] * region;                        // fragment-local
+                    もし (ai.kind == INPUT)  戻る (uchar*)inputs[ai.index]->data  + (size_t)x0 * esz;
+                    もし (ai.kind == OUTPUT) 戻る (uchar*)outputs[ai.index].data + (size_t)x0 * esz;
+                    もし (ai.kind != TEMP)   戻る nullptr;                                    // NONE: moved-from
+                    const 整数 b = bufferOfTemp.empty() ? ai.index : bufferOfTemp[ai.index];  // TEMP
+                    戻る scratch + (size_t)bufEszPrefix[b] * region;                        // fragment-local
                 };
-                for (int n = 0; n < ninsn; n++)
+                ために (整数 n = 0; n < ninsn; n++)
                 {
                     const Insn& ins = prog[n];
                     runInsn(ins, ptrOf(ins.arg0), 0, 1, ptrOf(ins.arg1), 0, 1,
                             ptrOf(ins.arg2), 0, 1, ptrOf(ins.result), 0, wf, 1);
                 }
             }
-            return;
+            戻る;
         }
     }
 
@@ -1347,7 +1347,7 @@ void TExpr::exec(const Mat* const* inputs, Mat* outputs)
     // the matLogical + broadcastShape rebuild/re-broadcast done only to size the output. Consts are
     // irrelevant here (they don't add dims/channels), so they never break the fast path.
     MatShape spatial;
-    int rchannels;
+    整数 rchannels;
     outputShape(inputs, spatial, rchannels);
 
     // ---- 2. ONE pass over slots: allocate outputs, build the operand pointer list + slot map,
@@ -1361,56 +1361,56 @@ void TExpr::exec(const Mat* const* inputs, Mat* outputs)
     // buffer while an input still needs the old contents, so we incref (header-copy) every input and
     // read through the copies. Cheap data-pointer aliasing test (nullptr data => never matches).
     bool inplace = false;
-    for (int i = 0; i < ninputs && !inplace; i++)
-        for (int j = 0; j < noutputs; j++)
-            if (inputs[i]->data && inputs[i]->data == outputs[j].data) { inplace = true; break; }
-    int nhdrs = inplace ? ninputs : 0;
+    ために (整数 i = 0; i < ninputs && !inplace; i++)
+        ために (整数 j = 0; j < noutputs; j++)
+            もし (inputs[i]->data && inputs[i]->data == outputs[j].data) { inplace = true; break; }
+    整数 nhdrs = inplace ? ninputs : 0;
 
     AutoBuffer<const Mat*, LOCAL_OPS> arr(ninputs + noutputs + nconsts);
     AutoBuffer<Mat, LOCAL_HDRS> hdrs(std::max(nhdrs, 1));   // non-owning input headers (in-place incref)
     AutoBuffer<const Mat*, LOCAL_HDRS> inptr(std::max(nhdrs, 1));  // repointed input list (in-place only)
     AutoBuffer<Mat, LOCAL_CONSTS> constHdrBuf(std::max(nconsts, 1));  // 0-dim headers over constbuf
-    AutoBuffer<int, LOCAL_OPS> slotMap(nslots);
+    AutoBuffer<整数, LOCAL_OPS> slotMap(nslots);
     AutoBuffer<signed char, LOCAL_OPS> slotKind(nslots);
-    int narr = 0, nc = 0;
-    if (inplace) {
+    整数 narr = 0, nc = 0;
+    もし (inplace) {
         // save (incref) inputs in the case of in-place operation
         // to protect them from premature deallocation
-        for (int j = 0; j < ninputs; j++) { hdrs[j] = *inputs[j]; inptr[j] = &hdrs[j]; }
+        ために (整数 j = 0; j < ninputs; j++) { hdrs[j] = *inputs[j]; inptr[j] = &hdrs[j]; }
         inputs = inptr.data();
     }
     slotKind[0] = (signed char)TExpr::NONE;
-    for (int s = 1; s < nslots; s++)
+    ために (整数 s = 1; s < nslots; s++)
     {
         const TExpr::Arg& ai = arginfo[s];
         slotKind[s] = (signed char)ai.kind;
-        if (ai.kind == TExpr::INPUT) {
+        もし (ai.kind == TExpr::INPUT) {
             slotMap[s] = narr;
             arr[narr++] = inputs[ai.index];
         }
-        else if (ai.kind == TExpr::OUTPUT) {
+        否则 もし (ai.kind == TExpr::OUTPUT) {
             outputs[ai.index].create(spatial, CV_MAKETYPE(ai.depth, rchannels));
             slotMap[s] = narr; arr[narr++] = &outputs[ai.index];
         }
-        else if (ai.kind == TExpr::CONST && ai.depth == EW_DEPTH_NONE) {
+        否则 もし (ai.kind == TExpr::CONST && ai.depth == EW_DEPTH_NONE) {
             slotKind[s] = (signed char)TExpr::NONE;   // dead flexible literal: never referenced
             slotMap[s] = 0;
         }
-        else if (ai.kind == TExpr::CONST) {
+        否则 もし (ai.kind == TExpr::CONST) {
             // a materialized const rides the broadcast machinery as a 0-dim, per-channel operand: a
             // multichannel const forces CH_DIM (per-channel scalars); a single value broadcasts
             // everywhere. compile() already converted its values (in constbuf) to ai.depth.
-            const int c = std::max(1, ai.channels);
+            const 整数 c = std::max(1, ai.channels);
             constHdrBuf[nc] = Mat(MatShape::scalar(), CV_MAKETYPE(ai.depth, c),
                                   (void*)(constbuf.data() + ai.constofs));
             slotKind[s] = (signed char)TExpr::INPUT;   // to the body it is just an array operand
             slotMap[s] = narr; arr[narr++] = &constHdrBuf[nc];
             nc++;
         }
-        else if (ai.kind == TExpr::TEMP) {
+        否则 もし (ai.kind == TExpr::TEMP) {
             slotMap[s] = bufferOfTemp.empty() ? ai.index : bufferOfTemp[ai.index];  // physical buffer id
         }
-        else {  // TExpr::NONE: a moved-from temp (or dead literal) - inert, no operand, no buffer. Never
+        否则 {  // TExpr::NONE: a moved-from temp (or dead literal) - inert, no operand, no buffer. Never
                 // referenced by any instruction; do NOT touch bufferOfTemp (its retired index may be >= ntemps).
             slotMap[s] = 0;
         }
@@ -1422,16 +1422,16 @@ void TExpr::exec(const Mat* const* inputs, Mat* outputs)
     // single block (no scratch).
 
     // ---- 3. ONE pass over instructions: summed per-element cost (kernels were bound at compile()). ----
-    const int ninsn = (int)prog.size();
+    const 整数 ninsn = (整数)prog.size();
     long long costPerElem = 0;
-    for (int n = 0; n < ninsn; n++)
+    ために (整数 n = 0; n < ninsn; n++)
         costPerElem += opCost(prog[n].op);
 
     // ---- 4. parallel work hint: total output scalars x summed per-element op cost / budget. ----
     long long otot = (long long)rchannels;
-    for (int d = 0; d < (int)spatial.size(); d++) otot *= spatial[d];
-    if (otot == 0)
-        return;
+    ために (整数 d = 0; d < (整数)spatial.size(); d++) otot *= spatial[d];
+    もし (otot == 0)
+        戻る;
     // One stripe per 2^16 cost units. The unit is ~1/4 cycle of the VECTORIZED kernel, but
     // element-wise work is memory-bound, so a stripe costs several times what that model says -
     // a coarser budget leaves a 32-core box running 2 stripes on DNN-sized tensors (1-4 MB).
@@ -1470,10 +1470,10 @@ void TExpr::exec(const Mat* const* inputs, Mat* outputs)
     {
         EwBody& bc = body;
         const TExpr::Insn* insns = bc.prog;            // hot fields -> locals (registers/stack)
-        const int* const smap  = bc.slotMap;
+        const 整数* const smap  = bc.slotMap;
         const signed char* const skind = bc.slotKind;
-        const int nin = bc.ninsn, nsl = bc.nslots;
-        const int w = tile.width, h = tile.height;
+        const 整数 nin = bc.ninsn, nsl = bc.nslots;
+        const 整数 w = tile.width, h = tile.height;
 
         // Run the program over L1-sized 2D blocks so the intermediates stay in cache. ONE rule covers
         // every tile shape: keep the strip as WIDE as fits L1 (long inner loop => good SIMD + hits the
@@ -1484,9 +1484,9 @@ void TExpr::exec(const Mat* const* inputs, Mat* outputs)
         // => bw=w, bh=h: one block over the whole tile, region temp store is empty (zero bytes), and
         // each operand slot is re-pointed once straight at its tile slice. Each temp buffer occupies
         // [bufEszPrefix[buf]*region, ...) bytes in tstore; region = bw*bh.
-        const int* const eszPrefix = bc.bufEszPrefix;
-        const int bw = std::min(w, bc.capElems);
-        const int bh = std::min(h, std::max(1, bc.capElems / std::max(1, bw)));
+        const 整数* const eszPrefix = bc.bufEszPrefix;
+        const 整数 bw = std::min(w, bc.capElems);
+        const 整数 bh = std::min(h, std::max(1, bc.capElems / std::max(1, bw)));
         const size_t region = alignSize((size_t)bw * bh, 8);
         // uint64_t elements (see the note on scratchBuf above): keeps the block-local temp store
         // 8-byte aligned, which the 64-bit-lane kernels require on 32-bit ABIs.
@@ -1495,23 +1495,23 @@ void TExpr::exec(const Mat* const* inputs, Mat* outputs)
         uchar* tstore = (uchar*)tstoreBuf.data();
 
         AutoBuffer<BrSlice, LOCAL_OPS> args(nsl);
-        for (int y0 = 0; y0 < h; y0 += bh)
+        ために (整数 y0 = 0; y0 < h; y0 += bh)
         {
-            const int hf = std::min(bh, h - y0);
-            for (int x0 = 0; x0 < w; x0 += bw)
+            const 整数 hf = std::min(bh, h - y0);
+            ために (整数 x0 = 0; x0 < w; x0 += bw)
             {
-                const int wf = std::min(bw, w - x0);
-                for (int s = 1; s < nsl; s++)
+                const 整数 wf = std::min(bw, w - x0);
+                ために (整数 s = 1; s < nsl; s++)
                 {
                     BrSlice& a = args[s];
-                    const int k = skind[s];
+                    const 整数 k = skind[s];
                     size_t esz = CV_ELEM_SIZE1(arginfo[s].depth);
-                    if (k == TExpr::TEMP)                      // contiguous block-local buffer
+                    もし (k == TExpr::TEMP)                      // contiguous block-local buffer
                     {
                         a.ptr = tstore + (size_t)eszPrefix[smap[s]] * region;
                         a.stepy = (size_t)wf*esz; a.stepx = 1;
                     }
-                    else                                    // array operand (incl. 0-dim consts): this
+                    否则                                    // array operand (incl. 0-dim consts): this
                                                             // block of the broadcast slice
                     {
                         const BrSlice& sl = tile.slices[smap[s]];
@@ -1521,7 +1521,7 @@ void TExpr::exec(const Mat* const* inputs, Mat* outputs)
                     }
                 }
 
-                for (int n = 0; n < nin; n++)
+                ために (整数 n = 0; n < nin; n++)
                 {
                     const TExpr::Insn& ins = insns[n];
                     const BrSlice& a0 = args[ins.arg0]; const BrSlice& a1 = args[ins.arg1];
@@ -1538,7 +1538,7 @@ void TExpr::exec(const Mat* const* inputs, Mat* outputs)
 void TExpr::exec(const Mat* inputs, Mat* outputs)
 {
     AutoBuffer<const Mat*, 16> ptrs(std::max(ninputs, 1));
-    for (int i = 0; i < ninputs; i++) ptrs[i] = &inputs[i];
+    ために (整数 i = 0; i < ninputs; i++) ptrs[i] = &inputs[i];
     exec(ptrs.data(), outputs);
 }
 
@@ -1558,30 +1558,30 @@ void TExpr::exec(const Mat* inputs, Mat* outputs)
 // select's arg2 and its result (the kernel is alias-safe). select is always the LAST instruction.
 // The mask is a single-channel 1-byte array (bool/u8/s8) the size of the output spatial shape; it
 // rides the normal broadcast machinery, so nothing special is needed in the executor.
-void makeBinaryArithProgram(TExpr& p, TOp op, int depth0, int depth1, int rdepth,
-                            int maskDepth, double scale)
+void makeBinaryArithProgram(TExpr& p, TOp op, 整数 depth0, 整数 depth1, 整数 rdepth,
+                            整数 maskDepth, double scale)
 {
     p.clear();
-    if (rdepth < 0)                                          // rdepth == -1 => auto (like cv::'s dtype=-1)
+    もし (rdepth < 0)                                          // rdepth == -1 => auto (like cv::'s dtype=-1)
     {
-        if (opCategory(op) == CAT_COMPARE)
+        もし (opCategory(op) == CAT_COMPARE)
             rdepth = CV_8U;                                  // compare -> u8 mask
-        else
+        否则
         {
             rdepth = promoteArith(depth0, depth1);
-            if (op == OP_ABSDIFF) rdepth = absdiffResultDepth(rdepth);   // signed |a-b| -> unsigned same width
+            もし (op == OP_ABSDIFF) rdepth = absdiffResultDepth(rdepth);   // signed |a-b| -> unsigned same width
         }
     }
     const bool masked = maskDepth != EW_DEPTH_NONE;
-    int sIn0  = p.addInput(depth0);
-    int sIn1  = p.addInput(depth1);
-    int sMask = masked ? p.addInput(maskDepth) : 0;
-    int sOut  = p.addOutput(rdepth);
+    整数 sIn0  = p.addInput(depth0);
+    整数 sIn1  = p.addInput(depth1);
+    整数 sMask = masked ? p.addInput(maskDepth) : 0;
+    整数 sOut  = p.addOutput(rdepth);
 
-    int r = p.emitBinary(op, sIn0, sIn1, rdepth, Scalar(scale));
-    if (masked)
+    整数 r = p.emitBinary(op, sIn0, sIn1, rdepth, Scalar(scale));
+    もし (masked)
         p.addInsn(OP_SELECT, sMask, r, sOut, sOut);          // dst = mask ? r : dst
-    else
+    否则
         p.moveToOutput(r, sOut);                             // straight into the output, no dead temp
 
     p.compile();    // pack temp buffers + count consts (kernels already bound by addInsn)
@@ -1590,14 +1590,14 @@ void makeBinaryArithProgram(TExpr& p, TOp op, int depth0, int depth1, int rdepth
 // addWeighted(a, alpha, b, beta, gamma) = a*alpha + b*beta + gamma. One fused kernel (two v_fma) via
 // emitBinary(OP_ADDW); a final cast is appended only when the requested rdepth isn't a type the kernel
 // emits directly. alpha/beta/gamma travel in the instruction's params block, not as operands.
-void makeAddWeightedProgram(TExpr& p, int depth0, int depth1, int rdepth,
+void makeAddWeightedProgram(TExpr& p, 整数 depth0, 整数 depth1, 整数 rdepth,
                             double alpha, double beta, double gamma)
 {
     p.clear();
-    int sA   = p.addInput(depth0);
-    int sB   = p.addInput(depth1);
-    int sOut = p.addOutput(rdepth);
-    int r = p.emitBinary(OP_ADDW, sA, sB, rdepth, Scalar(alpha, beta, gamma));
+    整数 sA   = p.addInput(depth0);
+    整数 sB   = p.addInput(depth1);
+    整数 sOut = p.addOutput(rdepth);
+    整数 r = p.emitBinary(OP_ADDW, sA, sB, rdepth, Scalar(alpha, beta, gamma));
     p.moveToOutput(r, sOut);
     p.compile();    // pack temp buffers + count consts (kernels already bound by addInsn)
 }
@@ -1614,7 +1614,7 @@ struct Token
 {
     TokType type = T_END;
     double num = 0;
-    int input = 0;
+    整数 input = 0;
     std::string text;     // identifier or operator spelling
 };
 
@@ -1626,29 +1626,29 @@ struct Lexer
 
     explicit Lexer(std::string_view src) : s(src) {}
 
-    static bool isIdentStart(char c) { return std::isalpha((unsigned char)c) || c == '_'; }
-    static bool isIdentChar(char c)  { return std::isalnum((unsigned char)c) || c == '_'; }
+    static bool isIdentStart(char c) { 戻る std::isalpha((unsigned char)c) || c == '_'; }
+    static bool isIdentChar(char c)  { 戻る std::isalnum((unsigned char)c) || c == '_'; }
 
     Token next()
     {
-        while (pos < s.size() && std::isspace((unsigned char)s[pos])) pos++;
+        ながら (pos < s.size() && std::isspace((unsigned char)s[pos])) pos++;
         Token t;
-        if (pos >= s.size()) { t.type = T_END; return t; }
+        もし (pos >= s.size()) { t.type = T_END; 戻る t; }
 
         char c = s[pos];
 
-        if (c == '{')                       // input placeholder {N}
+        もし (c == '{')                       // input placeholder {N}
         {
             pos++;
             size_t start = pos;
-            while (pos < s.size() && s[pos] != '}') pos++;
+            ながら (pos < s.size() && s[pos] != '}') pos++;
             CV_Assert(pos < s.size() && "ew::expression: unterminated '{'");
             t.type = T_INPUT;
             t.input = std::atoi(std::string(s.substr(start, pos - start)).c_str());
             pos++;                          // consume '}'
-            return t;
+            戻る t;
         }
-        if (std::isdigit((unsigned char)c) || (c == '.' && pos + 1 < s.size() &&
+        もし (std::isdigit((unsigned char)c) || (c == '.' && pos + 1 < s.size() &&
                                                std::isdigit((unsigned char)s[pos + 1])))
         {
             char* end = nullptr;
@@ -1656,90 +1656,90 @@ struct Lexer
             t.type = T_NUM;
             t.num = std::strtod(num.c_str(), &end);
             pos += (size_t)(end - num.c_str());
-            return t;
+            戻る t;
         }
-        if (isIdentStart(c))
+        もし (isIdentStart(c))
         {
             size_t start = pos;
-            while (pos < s.size() && isIdentChar(s[pos])) pos++;
+            ながら (pos < s.size() && isIdentChar(s[pos])) pos++;
             t.type = T_IDENT;
             t.text.assign(s.substr(start, pos - start));
-            return t;
+            戻る t;
         }
         switch (c)
         {
-        case '(': pos++; t.type = T_LPAREN; return t;
-        case ')': pos++; t.type = T_RPAREN; return t;
-        case ',': pos++; t.type = T_COMMA;  return t;
-        case ';': pos++; t.type = T_SEMI;   return t;
+        case '(': pos++; t.type = T_LPAREN; 戻る t;
+        case ')': pos++; t.type = T_RPAREN; 戻る t;
+        case ',': pos++; t.type = T_COMMA;  戻る t;
+        case ';': pos++; t.type = T_SEMI;   戻る t;
         }
         // multi/!single-char operators
         auto two = [&](const char* op) {
-            return pos + 1 < s.size() && s[pos] == op[0] && s[pos + 1] == op[1];
+            戻る pos + 1 < s.size() && s[pos] == op[0] && s[pos + 1] == op[1];
         };
         t.type = T_OP;
-        if (two("<=") || two(">=") || two("==") || two("!=") || two("**"))
-        { t.text.assign(s.substr(pos, 2)); pos += 2; return t; }
-        if (c == '=') { pos++; t.type = T_ASSIGN; return t; }
+        もし (two("<=") || two(">=") || two("==") || two("!=") || two("**"))
+        { t.text.assign(s.substr(pos, 2)); pos += 2; 戻る t; }
+        もし (c == '=') { pos++; t.type = T_ASSIGN; 戻る t; }
         CV_Assert(std::strchr("+-*/<>&|^!?:", c) && "ew::expression: unexpected character");
         t.text.assign(1, c); pos++;
-        return t;
+        戻る t;
     }
 };
 
 // --- operator / function tables ----------------------------------------------------------
-static int binPrec(const std::string& op)
+static 整数 binPrec(const std::string& op)
 {
-    if (op == "**") return 8;              // power binds tighter than '*'; RIGHT-associative
-    if (op == "*" || op == "/") return 7;
-    if (op == "+" || op == "-") return 6;
-    if (op == "<" || op == "<=" || op == ">" || op == ">=") return 5;
-    if (op == "==" || op == "!=") return 4;
-    if (op == "&") return 3;
-    if (op == "^") return 2;
-    if (op == "|") return 1;
-    return -1;
+    もし (op == "**") 戻る 8;              // power binds tighter than '*'; RIGHT-associative
+    もし (op == "*" || op == "/") 戻る 7;
+    もし (op == "+" || op == "-") 戻る 6;
+    もし (op == "<" || op == "<=" || op == ">" || op == ">=") 戻る 5;
+    もし (op == "==" || op == "!=") 戻る 4;
+    もし (op == "&") 戻る 3;
+    もし (op == "^") 戻る 2;
+    もし (op == "|") 戻る 1;
+    戻る -1;
 }
 
 static TOp binOp(const std::string& op)
 {
-    if (op == "**") return OP_POW;
-    if (op == "+")  return OP_ADD;
-    if (op == "-")  return OP_SUB;
-    if (op == "*")  return OP_MUL;
-    if (op == "/")  return OP_DIV;
-    if (op == "<")  return OP_CMP_LT;
-    if (op == "<=") return OP_CMP_LE;
-    if (op == ">")  return OP_CMP_GT;
-    if (op == ">=") return OP_CMP_GE;
-    if (op == "==") return OP_CMP_EQ;
-    if (op == "!=") return OP_CMP_NE;
-    if (op == "&")  return OP_AND;
-    if (op == "|")  return OP_OR;
-    if (op == "^")  return OP_XOR;
+    もし (op == "**") 戻る OP_POW;
+    もし (op == "+")  戻る OP_ADD;
+    もし (op == "-")  戻る OP_SUB;
+    もし (op == "*")  戻る OP_MUL;
+    もし (op == "/")  戻る OP_DIV;
+    もし (op == "<")  戻る OP_CMP_LT;
+    もし (op == "<=") 戻る OP_CMP_LE;
+    もし (op == ">")  戻る OP_CMP_GT;
+    もし (op == ">=") 戻る OP_CMP_GE;
+    もし (op == "==") 戻る OP_CMP_EQ;
+    もし (op == "!=") 戻る OP_CMP_NE;
+    もし (op == "&")  戻る OP_AND;
+    もし (op == "|")  戻る OP_OR;
+    もし (op == "^")  戻る OP_XOR;
     CV_Error(Error::StsParseError, "ew::expression: bad binary operator");
 }
 
 // type-cast function name -> depth, or -1 if not a type name
-static int typeDepth(const std::string& name)
+static 整数 typeDepth(const std::string& name)
 {
-    if (name == "float")    return CV_32F;
-    if (name == "double")   return CV_64F;
-    if (name == "half" || name == "float16") return CV_16F;
-    if (name == "bfloat16") return CV_16BF;
-    if (name == "uint8")    return CV_8U;
-    if (name == "int8")     return CV_8S;
-    if (name == "uint16")   return CV_16U;
-    if (name == "int16")    return CV_16S;
-    if (name == "uint32")   return CV_32U;
-    if (name == "int32")    return CV_32S;
-    if (name == "uint64")   return CV_64U;
-    if (name == "int64")    return CV_64S;
-    return -1;
+    もし (name == "float")    戻る CV_32F;
+    もし (name == "double")   戻る CV_64F;
+    もし (name == "half" || name == "float16") 戻る CV_16F;
+    もし (name == "bfloat16") 戻る CV_16BF;
+    もし (name == "uint8")    戻る CV_8U;
+    もし (name == "int8")     戻る CV_8S;
+    もし (name == "uint16")   戻る CV_16U;
+    もし (name == "int16")    戻る CV_16S;
+    もし (name == "uint32")   戻る CV_32U;
+    もし (name == "int32")    戻る CV_32S;
+    もし (name == "uint64")   戻る CV_64U;
+    もし (name == "int64")    戻る CV_64S;
+    戻る -1;
 }
 
 // element-wise op function name -> (op, arity), or arity 0 if unknown
-static TOp fnOp(const std::string& name, int& arity)
+static TOp fnOp(const std::string& name, 整数& arity)
 {
     struct E { const char* n; TOp op; };
     static const E unary[]  = { {"abs",OP_ABS},{"sqrt",OP_SQRT},{"exp",OP_EXP},{"log",OP_LOG},
@@ -1749,10 +1749,10 @@ static TOp fnOp(const std::string& name, int& arity)
                                 {"hypot",OP_HYPOT},{"mag",OP_HYPOT},     // mag = the cv::magnitude-flavored alias
                                 {"atan2",OP_ATAN2} };
     static const E tern[]   = { {"clamp",OP_CLAMP},{"select",OP_SELECT} };
-    for (const E& e : unary)  if (name == e.n) { arity = 1; return e.op; }
-    for (const E& e : binary) if (name == e.n) { arity = 2; return e.op; }
-    for (const E& e : tern)   if (name == e.n) { arity = 3; return e.op; }
-    arity = 0; return OP_NOP;
+    ために (const E& e : unary)  もし (name == e.n) { arity = 1; 戻る e.op; }
+    ために (const E& e : binary) もし (name == e.n) { arity = 2; 戻る e.op; }
+    ために (const E& e : tern)   もし (name == e.n) { arity = 3; 戻る e.op; }
+    arity = 0; 戻る OP_NOP;
 }
 
 // --- parser ------------------------------------------------------------------------------
@@ -1765,15 +1765,15 @@ struct Parser
     Lexer lex;
     Token cur;
     TExpr& e;
-    const int* inputSlot;                 // slot id of each external input (precreated)
-    int ninputs;
-    std::map<std::string, int> env;       // named temporaries -> slot
+    const 整数* inputSlot;                 // slot id of each external input (precreated)
+    整数 ninputs;
+    std::map<std::string, 整数> env;       // named temporaries -> slot
 
-    Parser(std::string_view src, TExpr& expr, const int* islot, int nin)
+    Parser(std::string_view src, TExpr& expr, const 整数* islot, 整数 nin)
         : lex(src), e(expr), inputSlot(islot), ninputs(nin) { cur = lex.next(); }
 
     void advance() { cur = lex.next(); }
-    bool isOp(const char* op) const { return cur.type == T_OP && cur.text == op; }
+    bool isOp(const char* op) const { 戻る cur.type == T_OP && cur.text == op; }
 
     void expect(TokType t, const char* what)
     {
@@ -1782,125 +1782,125 @@ struct Parser
     }
 
     // A flexible CONST slot holds a literal whose depth the emit* layers pick per use.
-    bool isFlexConst(int slot) const
+    bool isFlexConst(整数 slot) const
     {
-        return e.arginfo[slot].kind == TExpr::CONST && e.arginfo[slot].depth == EW_DEPTH_NONE;
+        戻る e.arginfo[slot].kind == TExpr::CONST && e.arginfo[slot].depth == EW_DEPTH_NONE;
     }
 
-    int parsePrimary()
+    整数 parsePrimary()
     {
-        if (cur.type == T_NUM)   { int s = e.addConst(EW_DEPTH_NONE, Scalar(cur.num), 1); advance(); return s; }
-        if (cur.type == T_INPUT) { int idx = cur.input; advance();
+        もし (cur.type == T_NUM)   { 整数 s = e.addConst(EW_DEPTH_NONE, Scalar(cur.num), 1); advance(); 戻る s; }
+        もし (cur.type == T_INPUT) { 整数 idx = cur.input; advance();
                                    CV_Assert(idx >= 0 && idx < ninputs && "ew::expression: input index out of range");
-                                   return inputSlot[idx]; }
-        if (cur.type == T_LPAREN){ advance(); int x = parseTernary(); expect(T_RPAREN, "expected ')'"); return x; }
-        if (cur.type == T_IDENT)
+                                   戻る inputSlot[idx]; }
+        もし (cur.type == T_LPAREN){ advance(); 整数 x = parseTernary(); expect(T_RPAREN, "expected ')'"); 戻る x; }
+        もし (cur.type == T_IDENT)
         {
             std::string name = cur.text; advance();
-            if (cur.type != T_LPAREN)             // variable reference
+            もし (cur.type != T_LPAREN)             // variable reference
             {
                 auto it = env.find(name);
                 CV_Assert(it != env.end() && "ew::expression: undefined name");
-                return it->second;
+                戻る it->second;
             }
             advance();                            // consume '('
             // every function takes <= 3 args (clamp/select); a stack buffer avoids a std::vector
             // heap alloc. The {} is for gcc's -Wmaybe-uninitialized only.
-            std::array<int, 8> args = {}; int nargs = 0;
-            if (cur.type != T_RPAREN)
+            std::array<整数, 8> args = {}; 整数 nargs = 0;
+            もし (cur.type != T_RPAREN)
             {
                 args[nargs++] = parseTernary();
-                while (cur.type == T_COMMA) { advance();
-                    CV_Assert(nargs < (int)args.size() && "ew::expression: too many arguments");
+                ながら (cur.type == T_COMMA) { advance();
+                    CV_Assert(nargs < (整数)args.size() && "ew::expression: too many arguments");
                     args[nargs++] = parseTernary(); }
             }
             expect(T_RPAREN, "expected ')'");
 
-            int td = typeDepth(name);
-            if (td >= 0)
+            整数 td = typeDepth(name);
+            もし (td >= 0)
             {
                 CV_Assert(nargs == 1);                       // type cast: just convert the operand
-                int s = args[0];
-                return isFlexConst(s) ? e.typedConstFrom(s, td)
+                整数 s = args[0];
+                戻る isFlexConst(s) ? e.typedConstFrom(s, td)
                                       : e.maybeAddCast(s, td);
             }
 
-            int arity = 0; TOp op = fnOp(name, arity);
+            整数 arity = 0; TOp op = fnOp(name, arity);
             CV_Assert(arity != 0 && "ew::expression: unknown function");
             CV_Assert(nargs == arity && "ew::expression: wrong number of arguments");
-            if (arity == 1) return e.emitUnary(op, args[0]);
-            if (arity == 2) return e.emitBinary(op, args[0], args[1]);
-            return e.emitTernary(op, args[0], args[1], args[2]);
+            もし (arity == 1) 戻る e.emitUnary(op, args[0]);
+            もし (arity == 2) 戻る e.emitBinary(op, args[0], args[1]);
+            戻る e.emitTernary(op, args[0], args[1], args[2]);
         }
         CV_Error(Error::StsParseError, "ew::expression: expected a primary expression");
     }
 
-    int parseUnary()
+    整数 parseUnary()
     {
-        if (isOp("-") || isOp("!"))
+        もし (isOp("-") || isOp("!"))
         {
             std::string op = cur.text; advance();
-            int operand = parseUnary();
+            整数 operand = parseUnary();
             // constant-fold a leading sign so that "-1.5" does not need an OP_NEG kernel
-            if (op == "-" && isFlexConst(operand))
+            もし (op == "-" && isFlexConst(operand))
             {
-                AutoBuffer<double, MAX_LOCAL_CN> v; int cn = constDoubles(e, operand, v);
-                Scalar neg; for (int i = 0; i < cn && i < 4; i++) neg[i] = -v[i];
-                return e.addConst(EW_DEPTH_NONE, neg, std::min(cn, 4));
+                AutoBuffer<double, MAX_LOCAL_CN> v; 整数 cn = constDoubles(e, operand, v);
+                Scalar neg; ために (整数 i = 0; i < cn && i < 4; i++) neg[i] = -v[i];
+                戻る e.addConst(EW_DEPTH_NONE, neg, std::min(cn, 4));
             }
-            return e.emitUnary(op == "-" ? OP_NEG : OP_NOT, operand);
+            戻る e.emitUnary(op == "-" ? OP_NEG : OP_NOT, operand);
         }
-        return parsePrimary();
+        戻る parsePrimary();
     }
 
-    int parseExpr(int minPrec)
+    整数 parseExpr(整数 minPrec)
     {
-        int left = parseUnary();
-        while (cur.type == T_OP)
+        整数 left = parseUnary();
+        ながら (cur.type == T_OP)
         {
-            int p = binPrec(cur.text);
-            if (p < minPrec) break;
+            整数 p = binPrec(cur.text);
+            もし (p < minPrec) break;
             std::string op = cur.text; advance();
             // '**' is right-associative (a ** b ** c == a ** (b ** c)): recurse at the SAME
             // precedence so the right side swallows further '**'s; everything else at p+1.
-            int right = parseExpr(op == "**" ? p : p + 1);
+            整数 right = parseExpr(op == "**" ? p : p + 1);
             left = e.emitBinary(binOp(op), left, right);
         }
-        return left;
+        戻る left;
     }
 
     // The ternary conditional  cond ? a : b  == select(cond, a, b). Lowest precedence (below all
     // arithmetic/compare/bitwise), right-associative: f1 ? a : f2 ? b : c groups as
     // f1 ? a : (f2 ? b : c). This is the general expression entry point.
-    int parseTernary()
+    整数 parseTernary()
     {
-        int cond = parseExpr(0);
-        if (!isOp("?")) return cond;
+        整数 cond = parseExpr(0);
+        もし (!isOp("?")) 戻る cond;
         advance();
-        int thenv = parseTernary();
+        整数 thenv = parseTernary();
         CV_Assert(isOp(":") && "ew::expression: expected ':' in a ?: conditional");
         advance();
-        int elsev = parseTernary();               // right-associative chain
-        return e.emitTernary(OP_SELECT, cond, thenv, elsev);
+        整数 elsev = parseTernary();               // right-associative chain
+        戻る e.emitTernary(OP_SELECT, cond, thenv, elsev);
     }
 
     // final result: a single expression, or a top-level tuple (e0, e1, ...).
     void parseResult()
     {
-        if (cur.type == T_LPAREN)
+        もし (cur.type == T_LPAREN)
         {
             // backtrack point: save the lexer AND the program length, since the trial parse below
             // emits instructions/slots that must be rolled back if this turns out NOT to be a tuple.
             Lexer save = lex; Token savedCur = cur;
-            size_t nInsn = e.prog.size(), nArg = e.arginfo.size(); int nTemp = e.ntemps;
+            size_t nInsn = e.prog.size(), nArg = e.arginfo.size(); 整数 nTemp = e.ntemps;
             advance();
-            int e0 = parseTernary();
-            if (cur.type == T_COMMA)
+            整数 e0 = parseTernary();
+            もし (cur.type == T_COMMA)
             {
                 e.output(e0);
-                while (cur.type == T_COMMA) { advance(); e.output(parseTernary()); }
+                ながら (cur.type == T_COMMA) { advance(); e.output(parseTernary()); }
                 expect(T_RPAREN, "expected ')'");
-                return;
+                戻る;
             }
             lex = save; cur = savedCur;                   // not a tuple -> undo the trial parse
             e.prog.resize(nInsn); e.arginfo.resize(nArg); e.ntemps = nTemp;
@@ -1910,16 +1910,16 @@ struct Parser
 
     void parse()
     {
-        while (true)
+        ながら (true)
         {
-            if (cur.type == T_IDENT)
+            もし (cur.type == T_IDENT)
             {
                 Lexer save = lex; Token savedCur = cur;   // lexer-only backtrack (nothing emitted yet)
                 std::string name = cur.text; advance();
-                if (cur.type == T_ASSIGN)
+                もし (cur.type == T_ASSIGN)
                 {
                     advance();
-                    const int slot = parseTernary();
+                    const 整数 slot = parseTernary();
                     // The name can be used any number of times below (including not at all), so the
                     // value must outlive the expression that produced it: pin the slot so the
                     // retire-the-temp optimizations skip it.
@@ -1931,7 +1931,7 @@ struct Parser
                 lex = save; cur = savedCur;               // not an assignment
             }
             parseResult();
-            if (cur.type == T_SEMI) advance();
+            もし (cur.type == T_SEMI) advance();
             break;
         }
         CV_Assert(cur.type == T_END && "ew::expression: trailing tokens");
@@ -1954,24 +1954,24 @@ void texpr(const std::string& expr, InputArrayOfArrays _inputs, OutputArrayOfArr
     CV_INSTRUMENT_REGION();
     CV_Assert(_inputs.kind() == _InputArray::STD_VECTOR_MAT);
     const std::vector<Mat>& inps = *(const std::vector<Mat>*)_inputs.getObj();
-    const int ninputs = (int)inps.size();
-    for (int i = 0; i < ninputs; i++)
+    const 整数 ninputs = (整数)inps.size();
+    ために (整数 i = 0; i < ninputs; i++)
         CV_Assert(!inps[i].empty());
 
     // Input depths are known now, so build a fully-typed program straight away: one INPUT slot per
     // input (slot index i carries input i's depth), then parse the expression into instructions.
     TExpr e;
-    AutoBuffer<int> islot(std::max(ninputs, 1));
-    for (int i = 0; i < ninputs; i++) islot[i] = e.addInput(inps[i].depth());
+    AutoBuffer<整数> islot(std::max(ninputs, 1));
+    ために (整数 i = 0; i < ninputs; i++) islot[i] = e.addInput(inps[i].depth());
     Parser(expr, e, islot.data(), ninputs).parse();
     e.compile();
 
     auto kind = _outputs.kind();
-    if (kind == _InputArray::STD_VECTOR_MAT) {
+    もし (kind == _InputArray::STD_VECTOR_MAT) {
         std::vector<Mat>& outs = _outputs.getMatVecRef();
         outs.resize(e.noutputs);
         e.exec(inps.data(), outs.data());
-    } else {
+    } 否则 {
         CV_Error(Error::StsNotImplemented, "vector<Mat> is expected as output of texpr");
     }
 }

@@ -55,37 +55,37 @@ static const uchar popCountTable4[] =
 };
 
 
-int normHamming(const uchar* a, int n, int cellSize)
+整数 normHamming(const uchar* a, 整数 n, 整数 cellSize)
 {
-    int output;
+    整数 output;
     CALL_HAL_RET(normHamming8u, cv_hal_normHamming8u, output, a, n, cellSize);
 
-    if( cellSize == 1 )
-        return normHamming(a, n);
+    もし( cellSize == 1 )
+        戻る normHamming(a, n);
     const uchar* tab = 0;
-    if( cellSize == 2 )
+    もし( cellSize == 2 )
         tab = popCountTable2;
-    else if( cellSize == 4 )
+    否则 もし( cellSize == 4 )
         tab = popCountTable4;
-    else
-        return -1;
-    int i = 0;
-    int result = 0;
-#if (CV_SIMD || CV_SIMD_SCALABLE)
+    否则
+        戻る -1;
+    整数 i = 0;
+    整数 result = 0;
+#もし (CV_SIMD || CV_SIMD_SCALABLE)
     v_uint64 t = vx_setzero_u64();
-    if ( cellSize == 2)
+    もし ( cellSize == 2)
     {
         v_uint16 mask = v_reinterpret_as_u16(vx_setall_u8(0x55));
-        for(; i <= n - VTraits<v_uint8>::vlanes(); i += VTraits<v_uint8>::vlanes())
+        ために(; i <= n - VTraits<v_uint8>::vlanes(); i += VTraits<v_uint8>::vlanes())
         {
             v_uint16 a0 = v_reinterpret_as_u16(vx_load(a + i));
             t = v_add(t, v_popcount(v_reinterpret_as_u64(v_and(v_or(a0, v_shr<1>(a0)), mask))));
         }
     }
-    else    // cellSize == 4
+    否则    // cellSize == 4
     {
         v_uint16 mask = v_reinterpret_as_u16(vx_setall_u8(0x11));
-        for(; i <= n - VTraits<v_uint8>::vlanes(); i += VTraits<v_uint8>::vlanes())
+        ために(; i <= n - VTraits<v_uint8>::vlanes(); i += VTraits<v_uint8>::vlanes())
         {
             v_uint16 a0 = v_reinterpret_as_u16(vx_load(a + i));
             v_uint16 a1 = v_or(a0, v_shr<2>(a0));
@@ -93,74 +93,74 @@ int normHamming(const uchar* a, int n, int cellSize)
 
         }
     }
-    result += (int)v_reduce_sum(t);
+    result += (整数)v_reduce_sum(t);
     vx_cleanup();
 #elif CV_ENABLE_UNROLLED
-    for( ; i <= n - 4; i += 4 )
+    ために( ; i <= n - 4; i += 4 )
         result += tab[a[i]] + tab[a[i+1]] + tab[a[i+2]] + tab[a[i+3]];
 #endif
-    for( ; i < n; i++ )
+    ために( ; i < n; i++ )
         result += tab[a[i]];
-    return result;
+    戻る result;
 }
 
-int normHamming(const uchar* a, const uchar* b, int n, int cellSize)
+整数 normHamming(const uchar* a, const uchar* b, 整数 n, 整数 cellSize)
 {
-    int output;
+    整数 output;
     CALL_HAL_RET(normHammingDiff8u, cv_hal_normHammingDiff8u, output, a, b, n, cellSize);
 
-    if( cellSize == 1 )
-        return normHamming(a, b, n);
+    もし( cellSize == 1 )
+        戻る normHamming(a, b, n);
     const uchar* tab = 0;
-    if( cellSize == 2 )
+    もし( cellSize == 2 )
         tab = popCountTable2;
-    else if( cellSize == 4 )
+    否则 もし( cellSize == 4 )
         tab = popCountTable4;
-    else
-        return -1;
-    int i = 0;
-    int result = 0;
-#if (CV_SIMD || CV_SIMD_SCALABLE)
+    否则
+        戻る -1;
+    整数 i = 0;
+    整数 result = 0;
+#もし (CV_SIMD || CV_SIMD_SCALABLE)
     v_uint64 t = vx_setzero_u64();
-    if ( cellSize == 2)
+    もし ( cellSize == 2)
     {
         v_uint16 mask = v_reinterpret_as_u16(vx_setall_u8(0x55));
-        for(; i <= n - VTraits<v_uint8>::vlanes(); i += VTraits<v_uint8>::vlanes())
+        ために(; i <= n - VTraits<v_uint8>::vlanes(); i += VTraits<v_uint8>::vlanes())
         {
             v_uint16 ab0 = v_reinterpret_as_u16(v_xor(vx_load(a + i), vx_load(b + i)));
             t = v_add(t, v_popcount(v_reinterpret_as_u64(v_and(v_or(ab0, v_shr<1>(ab0)), mask))));
         }
     }
-    else    // cellSize == 4
+    否则    // cellSize == 4
     {
         v_uint16 mask = v_reinterpret_as_u16(vx_setall_u8(0x11));
-        for(; i <= n - VTraits<v_uint8>::vlanes(); i += VTraits<v_uint8>::vlanes())
+        ために(; i <= n - VTraits<v_uint8>::vlanes(); i += VTraits<v_uint8>::vlanes())
         {
             v_uint16 ab0 = v_reinterpret_as_u16(v_xor(vx_load(a + i), vx_load(b + i)));
             v_uint16 ab1 = v_or(ab0, v_shr<2>(ab0));
             t = v_add(t, v_popcount(v_reinterpret_as_u64(v_and(v_or(ab1, v_shr<1>(ab1)), mask))));
         }
     }
-    result += (int)v_reduce_sum(t);
+    result += (整数)v_reduce_sum(t);
     vx_cleanup();
 #elif CV_ENABLE_UNROLLED
-    for( ; i <= n - 4; i += 4 )
+    ために( ; i <= n - 4; i += 4 )
         result += tab[a[i] ^ b[i]] + tab[a[i+1] ^ b[i+1]] +
                 tab[a[i+2] ^ b[i+2]] + tab[a[i+3] ^ b[i+3]];
 #endif
-    for( ; i < n; i++ )
+    ために( ; i < n; i++ )
         result += tab[a[i] ^ b[i]];
-    return result;
+    戻る result;
 }
 
-float normL2Sqr_(const float* a, const float* b, int n)
+float normL2Sqr_(const float* a, const float* b, 整数 n)
 {
-    int j = 0; float d = 0.f;
-#if (CV_SIMD || CV_SIMD_SCALABLE)
-    const int vl = VTraits<v_float32>::vlanes();
+    整数 j = 0; float d = 0.f;
+#もし (CV_SIMD || CV_SIMD_SCALABLE)
+    const 整数 vl = VTraits<v_float32>::vlanes();
     v_float32 v_d0 = vx_setzero_f32(), v_d1 = vx_setzero_f32();
     v_float32 v_d2 = vx_setzero_f32(), v_d3 = vx_setzero_f32();
-    for (; j <= n - 4 * vl; j += 4 * vl)
+    ために (; j <= n - 4 * vl; j += 4 * vl)
     {
         v_float32 t0 = v_sub(vx_load(a + j), vx_load(b + j));
         v_float32 t1 = v_sub(vx_load(a + j + vl), vx_load(b + j + vl));
@@ -172,30 +172,30 @@ float normL2Sqr_(const float* a, const float* b, int n)
         v_d3 = v_muladd(t3, t3, v_d3);
     }
     v_d0 = v_add(v_add(v_d0, v_d1), v_add(v_d2, v_d3));
-    for (; j <= n - vl; j += vl)
+    ために (; j <= n - vl; j += vl)
     {
         v_float32 t0 = v_sub(vx_load(a + j), vx_load(b + j));
         v_d0 = v_muladd(t0, t0, v_d0);
     }
     d = v_reduce_sum(v_d0);
 #endif
-    for( ; j < n; j++ )
+    ために( ; j < n; j++ )
     {
         float t = a[j] - b[j];
         d += t*t;
     }
-    return d;
+    戻る d;
 }
 
 
-float normL1_(const float* a, const float* b, int n)
+float normL1_(const float* a, const float* b, 整数 n)
 {
-    int j = 0; float d = 0.f;
-#if (CV_SIMD || CV_SIMD_SCALABLE)
-    const int vl = VTraits<v_float32>::vlanes();
+    整数 j = 0; float d = 0.f;
+#もし (CV_SIMD || CV_SIMD_SCALABLE)
+    const 整数 vl = VTraits<v_float32>::vlanes();
     v_float32 v_d0 = vx_setzero_f32(), v_d1 = vx_setzero_f32();
     v_float32 v_d2 = vx_setzero_f32(), v_d3 = vx_setzero_f32();
-    for (; j <= n - 4 * vl; j += 4 * vl)
+    ために (; j <= n - 4 * vl; j += 4 * vl)
     {
         v_d0 = v_add(v_d0, v_absdiff(vx_load(a + j), vx_load(b + j)));
         v_d1 = v_add(v_d1, v_absdiff(vx_load(a + j + vl), vx_load(b + j + vl)));
@@ -203,103 +203,103 @@ float normL1_(const float* a, const float* b, int n)
         v_d3 = v_add(v_d3, v_absdiff(vx_load(a + j + 3 * vl), vx_load(b + j + 3 * vl)));
     }
     v_d0 = v_add(v_add(v_d0, v_d1), v_add(v_d2, v_d3));
-    for (; j <= n - vl; j += vl)
+    ために (; j <= n - vl; j += vl)
         v_d0 = v_add(v_d0, v_absdiff(vx_load(a + j), vx_load(b + j)));
     d = v_reduce_sum(v_d0);
 #endif
-    for( ; j < n; j++ )
+    ために( ; j < n; j++ )
         d += std::abs(a[j] - b[j]);
-    return d;
+    戻る d;
 }
 
-int normL1_(const uchar* a, const uchar* b, int n)
+整数 normL1_(const uchar* a, const uchar* b, 整数 n)
 {
-    int j = 0, d = 0;
-#if (CV_SIMD || CV_SIMD_SCALABLE)
-    const int vl = VTraits<v_uint8>::vlanes();
-    for (; j <= n - 4 * vl; j += 4 * vl)
+    整数 j = 0, d = 0;
+#もし (CV_SIMD || CV_SIMD_SCALABLE)
+    const 整数 vl = VTraits<v_uint8>::vlanes();
+    ために (; j <= n - 4 * vl; j += 4 * vl)
         d += v_reduce_sad(vx_load(a + j), vx_load(b + j)) +
              v_reduce_sad(vx_load(a + j + vl), vx_load(b + j + vl)) +
              v_reduce_sad(vx_load(a + j + 2 * vl), vx_load(b + j + 2 * vl)) +
              v_reduce_sad(vx_load(a + j + 3 * vl), vx_load(b + j + 3 * vl));
-    for (; j <= n - vl; j += vl)
+    ために (; j <= n - vl; j += vl)
         d += v_reduce_sad(vx_load(a + j), vx_load(b + j));
 #endif
-    for( ; j < n; j++ )
+    ために( ; j < n; j++ )
         d += std::abs(a[j] - b[j]);
-    return d;
+    戻る d;
 }
 
 } //cv::hal
 
 //==================================================================================================
 
-typedef int (*NormFunc)(const uchar*, const uchar*, uchar*, int, int);
-typedef int (*NormDiffFunc)(const uchar*, const uchar*, const uchar*, uchar*, int, int);
+typedef 整数 (*NormFunc)(const uchar*, const uchar*, uchar*, 整数, 整数);
+typedef 整数 (*NormDiffFunc)(const uchar*, const uchar*, const uchar*, uchar*, 整数, 整数);
 
 #ifdef HAVE_OPENCL
 
-static bool ocl_norm( InputArray _src, int normType, InputArray _mask, double & result )
+static bool ocl_norm( InputArray _src, 整数 normType, InputArray _mask, double & result )
 {
     const ocl::Device & d = ocl::Device::getDefault();
 
 #ifdef __ANDROID__
-    if (d.isNVidia())
-        return false;
+    もし (d.isNVidia())
+        戻る false;
 #endif
-    const int cn = _src.channels();
-    if (cn > 4)
-        return false;
-    int type = _src.type(), depth = CV_MAT_DEPTH(type);
+    const 整数 cn = _src.channels();
+    もし (cn > 4)
+        戻る false;
+    整数 type = _src.type(), depth = CV_MAT_DEPTH(type);
     bool doubleSupport = d.doubleFPConfig() > 0,
             haveMask = _mask.kind() != _InputArray::NONE;
 
-    if (depth >= CV_16F)
-        return false;  // TODO: support FP16
+    もし (depth >= CV_16F)
+        戻る false;  // TODO: support FP16
 
-    if ( !(normType == NORM_INF || normType == NORM_L1 || normType == NORM_L2 || normType == NORM_L2SQR) ||
+    もし ( !(normType == NORM_INF || normType == NORM_L1 || normType == NORM_L2 || normType == NORM_L2SQR) ||
          (!doubleSupport && depth == CV_64F))
-        return false;
+        戻る false;
 
     UMat src = _src.getUMat();
 
-    if (normType == NORM_INF)
+    もし (normType == NORM_INF)
     {
-        if (!ocl_minMaxIdx(_src, NULL, &result, NULL, NULL, _mask,
+        もし (!ocl_minMaxIdx(_src, NULL, &result, NULL, NULL, _mask,
                            std::max(depth, CV_32S), depth != CV_8U && depth != CV_16U))
-            return false;
+            戻る false;
     }
-    else if (normType == NORM_L1 || normType == NORM_L2 || normType == NORM_L2SQR)
+    否则 もし (normType == NORM_L1 || normType == NORM_L2 || normType == NORM_L2SQR)
     {
         Scalar sc;
         bool unstype = depth == CV_8U || depth == CV_16U;
 
-        if ( !ocl_sum(haveMask ? src : src.reshape(1), sc, normType == NORM_L2 || normType == NORM_L2SQR ?
+        もし ( !ocl_sum(haveMask ? src : src.reshape(1), sc, normType == NORM_L2 || normType == NORM_L2SQR ?
                     OCL_OP_SUM_SQR : (unstype ? OCL_OP_SUM : OCL_OP_SUM_ABS), _mask) )
-            return false;
+            戻る false;
 
         double s = 0.0;
-        for (int i = 0; i < (haveMask ? cn : 1); ++i)
+        ために (整数 i = 0; i < (haveMask ? cn : 1); ++i)
             s += sc[i];
 
         result = normType == NORM_L1 || normType == NORM_L2SQR ? s : std::sqrt(s);
     }
 
-    return true;
+    戻る true;
 }
 
 #endif
 
-static NormFunc getNormFunc(int normType, int depth) {
+static NormFunc getNormFunc(整数 normType, 整数 depth) {
     CV_INSTRUMENT_REGION();
     CV_CPU_DISPATCH(getNormFunc, (normType, depth), CV_CPU_DISPATCH_MODES_ALL);
 }
-static NormDiffFunc getNormDiffFunc(int normType, int depth) {
+static NormDiffFunc getNormDiffFunc(整数 normType, 整数 depth) {
     CV_INSTRUMENT_REGION();
     CV_CPU_DISPATCH(getNormDiffFunc, (normType, depth), CV_CPU_DISPATCH_MODES_ALL);
 }
 
-double norm( InputArray _src, int normType, InputArray _mask )
+double norm( InputArray _src, 整数 normType, InputArray _mask )
 {
     CV_INSTRUMENT_REGION();
 
@@ -308,7 +308,7 @@ double norm( InputArray _src, int normType, InputArray _mask )
                normType == NORM_L2 || normType == NORM_L2SQR ||
                ((normType == NORM_HAMMING || normType == NORM_HAMMING2) && _src.type() == CV_8U) );
 
-#if defined HAVE_OPENCL
+#もし defined HAVE_OPENCL
     double _result = 0;
 #endif
 
@@ -320,57 +320,57 @@ double norm( InputArray _src, int normType, InputArray _mask )
 
     Mat src = _src.getMat(), mask = _mask.getMat();
     CV_Assert( mask.empty() || ((mask.type() == CV_8U || mask.type() == CV_8S || mask.type() == CV_Bool) && src.size == mask.size) );
-    if( src.empty() )
-        return 0.0;
-    int depth = src.depth(), cn = src.channels();
-    if( src.dims <= 2 )
+    もし( src.empty() )
+        戻る 0.0;
+    整数 depth = src.depth(), cn = src.channels();
+    もし( src.dims <= 2 )
     {
         double result;
         CALL_HAL_RET(norm, cv_hal_norm, result, src.data, src.step, mask.data, mask.step, src.cols, src.rows, src.type(), normType);
     }
-    else if( src.isContinuous() && mask.isContinuous() )
+    否则 もし( src.isContinuous() && mask.isContinuous() )
     {
         double result;
-        CALL_HAL_RET(norm, cv_hal_norm, result, src.data, 0, mask.data, 0, (int)src.total(), 1, src.type(), normType);
+        CALL_HAL_RET(norm, cv_hal_norm, result, src.data, 0, mask.data, 0, (整数)src.total(), 1, src.type(), normType);
     }
 
     NormFunc func = getNormFunc(normType >> 1, depth);
     CV_Assert( (normType >> 1) >= 3 || func != 0 );
 
-    if( src.isContinuous() && mask.empty() )
+    もし( src.isContinuous() && mask.empty() )
     {
         size_t len = src.total()*cn;
-        if( len == (size_t)(int)len )
+        もし( len == (size_t)(整数)len )
         {
-            if( depth == CV_32F )
+            もし( depth == CV_32F )
             {
                 const uchar* data = src.ptr<const uchar>();
 
-                if( normType == NORM_L2 || normType == NORM_L2SQR || normType == NORM_L1 )
+                もし( normType == NORM_L2 || normType == NORM_L2SQR || normType == NORM_L1 )
                 {
                     double result = 0;
-                    func(data, 0, (uchar*)&result, (int)len, 1);
-                    return normType == NORM_L2 ? std::sqrt(result) : result;
+                    func(data, 0, (uchar*)&result, (整数)len, 1);
+                    戻る normType == NORM_L2 ? std::sqrt(result) : result;
                 }
-                if( normType == NORM_INF )
+                もし( normType == NORM_INF )
                 {
                     float result = 0;
-                    func(data, 0, (uchar*)&result, (int)len, 1);
-                    return result;
+                    func(data, 0, (uchar*)&result, (整数)len, 1);
+                    戻る result;
                 }
             }
-            if( depth == CV_8U )
+            もし( depth == CV_8U )
             {
                 const uchar* data = src.ptr<uchar>();
 
-                if( normType == NORM_HAMMING )
+                もし( normType == NORM_HAMMING )
                 {
-                    return hal::normHamming(data, (int)len, 1);
+                    戻る hal::normHamming(data, (整数)len, 1);
                 }
 
-                if( normType == NORM_HAMMING2 )
+                もし( normType == NORM_HAMMING2 )
                 {
-                    return hal::normHamming(data, (int)len, 2);
+                    戻る hal::normHamming(data, (整数)len, 2);
                 }
             }
         }
@@ -378,28 +378,28 @@ double norm( InputArray _src, int normType, InputArray _mask )
 
     CV_Assert( mask.empty() || mask.type() == CV_8U || mask.type() == CV_8S || mask.type() == CV_Bool );
 
-    if( normType == NORM_HAMMING || normType == NORM_HAMMING2 )
+    もし( normType == NORM_HAMMING || normType == NORM_HAMMING2 )
     {
-        if( !mask.empty() )
+        もし( !mask.empty() )
         {
             Mat temp;
             bitwise_and(src, mask, temp);
-            return norm(temp, normType);
+            戻る norm(temp, normType);
         }
-        int cellSize = normType == NORM_HAMMING ? 1 : 2;
+        整数 cellSize = normType == NORM_HAMMING ? 1 : 2;
 
         const Mat* arrays[] = {&src, 0};
         uchar* ptrs[1] = {};
         NAryMatIterator it(arrays, ptrs);
-        int total = (int)it.size;
-        int result = 0;
+        整数 total = (整数)it.size;
+        整数 result = 0;
 
-        for( size_t i = 0; i < it.nplanes; i++, ++it )
+        ために( size_t i = 0; i < it.nplanes; i++, ++it )
         {
             result += hal::normHamming(ptrs[0], total, cellSize);
         }
 
-        return result;
+        戻る result;
     }
 
     const Mat* arrays[] = {&src, &mask, 0};
@@ -417,134 +417,134 @@ double norm( InputArray _src, int normType, InputArray _mask )
     CV_CheckLT((size_t)it.size, (size_t)INT_MAX, "");
     bool is_fp16 = depth == CV_16F || depth == CV_16BF;
 
-    if ((normType == NORM_L1 && (depth <= CV_16S || depth == CV_Bool || is_fp16)) ||
+    もし ((normType == NORM_L1 && (depth <= CV_16S || depth == CV_Bool || is_fp16)) ||
         ((normType == NORM_L2 || normType == NORM_L2SQR) && (depth <= CV_8S || depth == CV_Bool || is_fp16)))
     {
         // special case to handle "integer" overflow in accumulator
         const size_t esz = src.elemSize();
-        const int total = (int)it.size;
-        const int blockSize0 = (is_fp16 ? (1 << 10) :
+        const 整数 total = (整数)it.size;
+        const 整数 blockSize0 = (is_fp16 ? (1 << 10) :
             depth == CV_Bool ? (1 << 30) :
             normType == NORM_L1 && depth <= CV_8S ? (1 << 23) : (1 << 15))/cn;
-        const int blockSize = std::min(total, blockSize0);
+        const 整数 blockSize = std::min(total, blockSize0);
         union {
-            int i;
+            整数 i;
             float f;
         } blocksum;
         blocksum.i = 0;
-        int count = 0;
+        整数 count = 0;
 
-        for (size_t i = 0; i < it.nplanes; i++, ++it)
+        ために (size_t i = 0; i < it.nplanes; i++, ++it)
         {
-            for (int j = 0; j < total; j += blockSize)
+            ために (整数 j = 0; j < total; j += blockSize)
             {
-                int bsz = std::min(total - j, blockSize);
+                整数 bsz = std::min(total - j, blockSize);
                 func(ptrs[0], ptrs[1], (uchar*)&blocksum, bsz, cn);
                 count += bsz;
-                if (count + blockSize >= blockSize0 || (i+1 >= it.nplanes && j+bsz >= total))
+                もし (count + blockSize >= blockSize0 || (i+1 >= it.nplanes && j+bsz >= total))
                 {
                     result.d += is_fp16 ? (double)blocksum.f : (double)blocksum.i;
                     blocksum.i = 0;
                     count = 0;
                 }
                 ptrs[0] += bsz*esz;
-                if (ptrs[1])
+                もし (ptrs[1])
                     ptrs[1] += bsz;
             }
         }
     }
-    else
+    否则
     {
         // generic implementation
-        for (size_t i = 0; i < it.nplanes; i++, ++it)
+        ために (size_t i = 0; i < it.nplanes; i++, ++it)
         {
-            func(ptrs[0], ptrs[1], (uchar*)&result, (int)it.size, cn);
+            func(ptrs[0], ptrs[1], (uchar*)&result, (整数)it.size, cn);
         }
     }
 
-    if( normType == NORM_INF )
+    もし( normType == NORM_INF )
     {
-        if(depth <= CV_32S || depth == CV_32U || depth == CV_Bool)
-            return result.u;
-        if (depth == CV_32F || is_fp16)
-            return result.f;
-        if (depth == CV_64U || depth == CV_64S)
-            return (double)result.UL;
+        もし(depth <= CV_32S || depth == CV_32U || depth == CV_Bool)
+            戻る result.u;
+        もし (depth == CV_32F || is_fp16)
+            戻る result.f;
+        もし (depth == CV_64U || depth == CV_64S)
+            戻る (double)result.UL;
     }
-    if( normType == NORM_L2 )
-        return std::sqrt(result.d);
+    もし( normType == NORM_L2 )
+        戻る std::sqrt(result.d);
 
-    return result.d;
+    戻る result.d;
 }
 
 //==================================================================================================
 
 #ifdef HAVE_OPENCL
-static bool ocl_norm( InputArray _src1, InputArray _src2, int normType, InputArray _mask, double & result )
+static bool ocl_norm( InputArray _src1, InputArray _src2, 整数 normType, InputArray _mask, double & result )
 {
 #ifdef __ANDROID__
-    if (ocl::Device::getDefault().isNVidia())
-        return false;
+    もし (ocl::Device::getDefault().isNVidia())
+        戻る false;
 #endif
 
     Scalar sc1, sc2;
-    int cn = _src1.channels();
-    if (cn > 4)
-        return false;
-    int type = _src1.type(), depth = CV_MAT_DEPTH(type);
+    整数 cn = _src1.channels();
+    もし (cn > 4)
+        戻る false;
+    整数 type = _src1.type(), depth = CV_MAT_DEPTH(type);
     bool relative = (normType & NORM_RELATIVE) != 0;
     normType &= ~NORM_RELATIVE;
     bool normsum = normType == NORM_L1 || normType == NORM_L2 || normType == NORM_L2SQR;
 
 #ifdef __APPLE__
-    if(normType == NORM_L1 && type == CV_16UC3 && !_mask.empty())
-        return false;
+    もし(normType == NORM_L1 && type == CV_16UC3 && !_mask.empty())
+        戻る false;
 #endif
 
-    if (normsum)
+    もし (normsum)
     {
-        if (!ocl_sum(_src1, sc1, normType == NORM_L2 || normType == NORM_L2SQR ?
+        もし (!ocl_sum(_src1, sc1, normType == NORM_L2 || normType == NORM_L2SQR ?
                      OCL_OP_SUM_SQR : OCL_OP_SUM, _mask, _src2, relative, sc2))
-            return false;
+            戻る false;
     }
-    else
+    否则
     {
-        if (!ocl_minMaxIdx(_src1, NULL, &sc1[0], NULL, NULL, _mask, std::max(CV_32S, depth),
+        もし (!ocl_minMaxIdx(_src1, NULL, &sc1[0], NULL, NULL, _mask, std::max(CV_32S, depth),
                            false, _src2, relative ? &sc2[0] : NULL))
-            return false;
+            戻る false;
         cn = 1;
     }
 
     double s2 = 0;
-    for (int i = 0; i < cn; ++i)
+    ために (整数 i = 0; i < cn; ++i)
     {
         result += sc1[i];
-        if (relative)
+        もし (relative)
             s2 += sc2[i];
     }
 
-    if (normType == NORM_L2)
+    もし (normType == NORM_L2)
     {
         result = std::sqrt(result);
-        if (relative)
+        もし (relative)
             s2 = std::sqrt(s2);
     }
 
-    if (relative)
+    もし (relative)
         result /= (s2 + DBL_EPSILON);
 
-    return true;
+    戻る true;
 }  // ocl_norm()
 #endif  // HAVE_OPENCL
 
-double norm( InputArray _src1, InputArray _src2, int normType, InputArray _mask )
+double norm( InputArray _src1, InputArray _src2, 整数 normType, InputArray _mask )
 {
     CV_INSTRUMENT_REGION();
 
     CV_CheckTypeEQ(_src1.type(), _src2.type(), "Input type mismatch");
     CV_Assert(_src1.sameSize(_src2));
 
-#if defined HAVE_OPENCL
+#もし defined HAVE_OPENCL
     double _result = 0;
 #endif
 
@@ -556,23 +556,23 @@ double norm( InputArray _src1, InputArray _src2, int normType, InputArray _mask 
 
     Mat src1 = _src1.getMat(), src2 = _src2.getMat(), mask = _mask.getMat();
     CV_Assert( mask.empty() || ((mask.type() == CV_8U || mask.type() == CV_8S || mask.type() == CV_Bool) && src1.size == mask.size) );
-    if( src1.empty() || src2.empty() )
-        return 0.0;
-    int depth = src1.depth(), cn = src1.channels();
-    if( src1.dims <= 2 )
+    もし( src1.empty() || src2.empty() )
+        戻る 0.0;
+    整数 depth = src1.depth(), cn = src1.channels();
+    もし( src1.dims <= 2 )
     {
         double result;
         CALL_HAL_RET(normDiff, cv_hal_normDiff, result, src1.data, src1.step, src2.data, src2.step, mask.data, mask.step, src1.cols, src1.rows, src1.type(), normType);
     }
-    else if( src1.isContinuous() && src2.isContinuous() && mask.isContinuous() )
+    否则 もし( src1.isContinuous() && src2.isContinuous() && mask.isContinuous() )
     {
         double result;
-        CALL_HAL_RET(normDiff, cv_hal_normDiff, result, src1.data, 0, src2.data, 0, mask.data, 0, (int)src1.total(), 1, src1.type(), normType);
+        CALL_HAL_RET(normDiff, cv_hal_normDiff, result, src1.data, 0, src2.data, 0, mask.data, 0, (整数)src1.total(), 1, src1.type(), normType);
     }
 
-    if( normType & NORM_RELATIVE )
+    もし( normType & NORM_RELATIVE )
     {
-        return norm(_src1, _src2, normType & ~NORM_RELATIVE, _mask)/(norm(_src2, normType, _mask) + DBL_EPSILON);
+        戻る norm(_src1, _src2, normType & ~NORM_RELATIVE, _mask)/(norm(_src2, normType, _mask) + DBL_EPSILON);
     }
 
     normType &= 7;
@@ -583,27 +583,27 @@ double norm( InputArray _src1, InputArray _src2, int normType, InputArray _mask 
     NormDiffFunc func = getNormDiffFunc(normType >> 1, depth);
     CV_Assert( (normType >> 1) >= 3 || func != 0 );
 
-    if( src1.isContinuous() && src2.isContinuous() && mask.empty() )
+    もし( src1.isContinuous() && src2.isContinuous() && mask.empty() )
     {
         size_t len = src1.total()*src1.channels();
-        if( len == (size_t)(int)len )
+        もし( len == (size_t)(整数)len )
         {
-            if( src1.depth() == CV_32F )
+            もし( src1.depth() == CV_32F )
             {
                 const uchar* data1 = src1.ptr<const uchar>();
                 const uchar* data2 = src2.ptr<const uchar>();
 
-                if( normType == NORM_L2 || normType == NORM_L2SQR || normType == NORM_L1 )
+                もし( normType == NORM_L2 || normType == NORM_L2SQR || normType == NORM_L1 )
                 {
                     double result = 0;
-                    func(data1, data2, 0, (uchar*)&result, (int)len, 1);
-                    return normType == NORM_L2 ? std::sqrt(result) : result;
+                    func(data1, data2, 0, (uchar*)&result, (整数)len, 1);
+                    戻る normType == NORM_L2 ? std::sqrt(result) : result;
                 }
-                if( normType == NORM_INF )
+                もし( normType == NORM_INF )
                 {
                     float result = 0;
-                    func(data1, data2, 0, (uchar*)&result, (int)len, 1);
-                    return result;
+                    func(data1, data2, 0, (uchar*)&result, (整数)len, 1);
+                    戻る result;
                 }
             }
         }
@@ -611,29 +611,29 @@ double norm( InputArray _src1, InputArray _src2, int normType, InputArray _mask 
 
     CV_Assert( mask.empty() || mask.type() == CV_8U || mask.type() == CV_8S || mask.type() == CV_Bool );
 
-    if( normType == NORM_HAMMING || normType == NORM_HAMMING2 )
+    もし( normType == NORM_HAMMING || normType == NORM_HAMMING2 )
     {
-        if( !mask.empty() )
+        もし( !mask.empty() )
         {
             Mat temp;
             bitwise_xor(src1, src2, temp);
             bitwise_and(temp, mask, temp);
-            return norm(temp, normType);
+            戻る norm(temp, normType);
         }
-        int cellSize = normType == NORM_HAMMING ? 1 : 2;
+        整数 cellSize = normType == NORM_HAMMING ? 1 : 2;
 
         const Mat* arrays[] = {&src1, &src2, 0};
         uchar* ptrs[2] = {};
         NAryMatIterator it(arrays, ptrs);
-        int total = (int)it.size;
-        int result = 0;
+        整数 total = (整数)it.size;
+        整数 result = 0;
 
-        for( size_t i = 0; i < it.nplanes; i++, ++it )
+        ために( size_t i = 0; i < it.nplanes; i++, ++it )
         {
             result += hal::normHamming(ptrs[0], ptrs[1], total, cellSize);
         }
 
-        return result;
+        戻る result;
     }
 
     const Mat* arrays[] = {&src1, &src2, &mask, 0};
@@ -652,31 +652,31 @@ double norm( InputArray _src1, InputArray _src2, int normType, InputArray _mask 
 
     bool is_fp16 = depth == CV_16F || depth == CV_16BF;
 
-    if ((normType == NORM_L1 && (depth <= CV_16S || depth == CV_Bool || is_fp16)) ||
+    もし ((normType == NORM_L1 && (depth <= CV_16S || depth == CV_Bool || is_fp16)) ||
         ((normType == NORM_L2 || normType == NORM_L2SQR) && (depth <= CV_8S || depth == CV_Bool || is_fp16)))
     {
         // special case to handle "integer" overflow in accumulator
         const size_t esz = src1.elemSize();
-        const int total = (int)it.size;
-        const int blockSize0 = (is_fp16 ? (1 << 10) :
+        const 整数 total = (整数)it.size;
+        const 整数 blockSize0 = (is_fp16 ? (1 << 10) :
             depth == CV_Bool ? (1 << 30) :
             normType == NORM_L1 && depth <= CV_8S ? (1 << 23) : (1 << 15))/cn;
-        const int blockSize = std::min(total, blockSize0);
+        const 整数 blockSize = std::min(total, blockSize0);
         union {
-            int i;
+            整数 i;
             float f;
         } blocksum;
         blocksum.i = 0;
-        int count = 0;
+        整数 count = 0;
 
-        for (size_t i = 0; i < it.nplanes; i++, ++it)
+        ために (size_t i = 0; i < it.nplanes; i++, ++it)
         {
-            for (int j = 0; j < total; j += blockSize)
+            ために (整数 j = 0; j < total; j += blockSize)
             {
-                int bsz = std::min(total - j, blockSize);
+                整数 bsz = std::min(total - j, blockSize);
                 func(ptrs[0], ptrs[1], ptrs[2], (uchar*)&blocksum, bsz, cn);
                 count += bsz;
-                if (count + blockSize >= blockSize0 || (i+1 >= it.nplanes && j+bsz >= total))
+                もし (count + blockSize >= blockSize0 || (i+1 >= it.nplanes && j+bsz >= total))
                 {
                     result.d += is_fp16 ? (double)blocksum.f : (double)blocksum.i;
                     blocksum.i = 0;
@@ -684,38 +684,38 @@ double norm( InputArray _src1, InputArray _src2, int normType, InputArray _mask 
                 }
                 ptrs[0] += bsz*esz;
                 ptrs[1] += bsz*esz;
-                if (ptrs[2])
+                もし (ptrs[2])
                     ptrs[2] += bsz;
             }
         }
     }
-    else
+    否则
     {
         // generic implementation
-        for (size_t i = 0; i < it.nplanes; i++, ++it)
+        ために (size_t i = 0; i < it.nplanes; i++, ++it)
         {
-            func(ptrs[0], ptrs[1], ptrs[2], (uchar*)&result, (int)it.size, cn);
+            func(ptrs[0], ptrs[1], ptrs[2], (uchar*)&result, (整数)it.size, cn);
         }
     }
 
-    if( normType == NORM_INF )
+    もし( normType == NORM_INF )
     {
-        if (depth <= CV_32S || depth == CV_32U || depth == CV_Bool)
-            return result.u;
-        if (depth == CV_32F || is_fp16)
-            return result.f;
-        if (depth == CV_64U || depth == CV_64S)
-            return (double)result.UL;
+        もし (depth <= CV_32S || depth == CV_32U || depth == CV_Bool)
+            戻る result.u;
+        もし (depth == CV_32F || is_fp16)
+            戻る result.f;
+        もし (depth == CV_64U || depth == CV_64S)
+            戻る (double)result.UL;
     }
-    if( normType == NORM_L2 )
-        return std::sqrt(result.d);
+    もし( normType == NORM_L2 )
+        戻る std::sqrt(result.d);
 
-    return result.d;
+    戻る result.d;
 }
 
-cv::Hamming::ResultType Hamming::operator()( const unsigned char* a, const unsigned char* b, int size ) const
+cv::Hamming::ResultType Hamming::operator()( const unsigned char* a, const unsigned char* b, 整数 size ) const
 {
-    return cv::hal::normHamming(a, b, size);
+    戻る cv::hal::normHamming(a, b, size);
 }
 
 double PSNR(InputArray _src1, InputArray _src2, double R)
@@ -726,23 +726,23 @@ double PSNR(InputArray _src1, InputArray _src2, double R)
     CV_Assert( _src1.type() == _src2.type() );
 
     double diff = std::sqrt(norm(_src1, _src2, NORM_L2SQR)/(_src1.total()*_src1.channels()));
-    return 20*log10(R/(diff+DBL_EPSILON));
+    戻る 20*log10(R/(diff+DBL_EPSILON));
 }
 
 
 #ifdef HAVE_OPENCL
-static bool ocl_normalize( InputArray _src, InputOutputArray _dst, InputArray _mask, int dtype,
+static bool ocl_normalize( InputArray _src, InputOutputArray _dst, InputArray _mask, 整数 dtype,
                            double scale, double delta )
 {
     UMat src = _src.getUMat();
 
-    if( _mask.empty() )
+    もし( _mask.empty() )
         src.convertTo( _dst, dtype, scale, delta );
-    else if (src.channels() <= 4)
+    否则 もし (src.channels() <= 4)
     {
         const ocl::Device & dev = ocl::Device::getDefault();
 
-        int stype = _src.type(), sdepth = CV_MAT_DEPTH(stype), cn = CV_MAT_CN(stype),
+        整数 stype = _src.type(), sdepth = CV_MAT_DEPTH(stype), cn = CV_MAT_CN(stype),
                 ddepth = CV_MAT_DEPTH(dtype), wdepth = std::max(CV_32F, std::max(sdepth, ddepth)),
                 rowsPerWI = dev.isIntel() ? 4 : 1;
 
@@ -752,19 +752,19 @@ static bool ocl_normalize( InputArray _src, InputOutputArray _dst, InputArray _m
                 haveDelta = std::fabs(delta) > DBL_EPSILON,
                 doubleSupport = dev.doubleFPConfig() > 0;
 
-        if (!haveScale && !haveDelta && stype == dtype)
+        もし (!haveScale && !haveDelta && stype == dtype)
         {
             _src.copyTo(_dst, _mask);
-            return true;
+            戻る true;
         }
-        if (haveZeroScale)
+        もし (haveZeroScale)
         {
             _dst.setTo(Scalar(delta), _mask);
-            return true;
+            戻る true;
         }
 
-        if ((sdepth == CV_64F || ddepth == CV_64F) && !doubleSupport)
-            return false;
+        もし ((sdepth == CV_64F || ddepth == CV_64F) && !doubleSupport)
+            戻る false;
 
         char cvt[2][50];
         String opts = format("-D srcT=%s -D dstT=%s -D convertToWT=%s -D cn=%d -D rowsPerWI=%d"
@@ -779,8 +779,8 @@ static bool ocl_normalize( InputArray _src, InputOutputArray _dst, InputArray _m
                              ocl::typeToStr(sdepth), ocl::typeToStr(ddepth));
 
         ocl::Kernel k("normalizek", ocl::core::normalize_oclsrc, opts);
-        if (k.empty())
-            return false;
+        もし (k.empty())
+            戻る false;
 
         UMat mask = _mask.getUMat(), dst = _dst.getUMat();
 
@@ -788,76 +788,76 @@ static bool ocl_normalize( InputArray _src, InputOutputArray _dst, InputArray _m
                 maskarg = ocl::KernelArg::ReadOnlyNoSize(mask),
                 dstarg = ocl::KernelArg::ReadWrite(dst);
 
-        if (haveScale)
+        もし (haveScale)
         {
-            if (haveDelta)
+            もし (haveDelta)
                 k.args(srcarg, maskarg, dstarg, fscale, fdelta);
-            else
+            否则
                 k.args(srcarg, maskarg, dstarg, fscale);
         }
-        else
+        否则
         {
-            if (haveDelta)
+            もし (haveDelta)
                 k.args(srcarg, maskarg, dstarg, fdelta);
-            else
+            否则
                 k.args(srcarg, maskarg, dstarg);
         }
 
         size_t globalsize[2] = { (size_t)src.cols, ((size_t)src.rows + rowsPerWI - 1) / rowsPerWI };
-        return k.run(2, globalsize, NULL, false);
+        戻る k.run(2, globalsize, NULL, false);
     }
-    else
+    否则
     {
         UMat temp;
         src.convertTo( temp, dtype, scale, delta );
         temp.copyTo( _dst, _mask );
     }
 
-    return true;
+    戻る true;
 }  // ocl_normalize
 #endif  // HAVE_OPENCL
 
 void normalize(InputArray _src, InputOutputArray _dst, double a, double b,
-               int norm_type, int rtype, InputArray _mask)
+               整数 norm_type, 整数 rtype, InputArray _mask)
 {
     CV_INSTRUMENT_REGION();
 
     double scale = 1, shift = 0;
-    int type = _src.type(), depth = CV_MAT_DEPTH(type);
+    整数 type = _src.type(), depth = CV_MAT_DEPTH(type);
 
-    if( rtype < 0 )
+    もし( rtype < 0 )
         rtype = _dst.fixedType() ? _dst.depth() : depth;
 
-    if( norm_type == NORM_MINMAX )
+    もし( norm_type == NORM_MINMAX )
     {
         double smin = 0, smax = 0;
         double dmin = MIN( a, b ), dmax = MAX( a, b );
         minMaxIdx( _src, &smin, &smax, 0, 0, _mask );
         scale = (dmax - dmin)*(smax - smin > DBL_EPSILON ? 1./(smax - smin) : 0);
-        if( rtype == CV_32F )
+        もし( rtype == CV_32F )
         {
             scale = (float)scale;
             shift = (float)dmin - (float)(smin*scale);
         }
-        else
+        否则
             shift = dmin - smin*scale;
     }
-    else if( norm_type == NORM_L2 || norm_type == NORM_L1 || norm_type == NORM_INF )
+    否则 もし( norm_type == NORM_L2 || norm_type == NORM_L1 || norm_type == NORM_INF )
     {
         scale = norm( _src, norm_type, _mask );
         scale = scale > DBL_EPSILON ? a/scale : 0.;
         shift = 0;
     }
-    else
+    否则
         CV_Error( cv::Error::StsBadArg, "Unknown/unsupported norm type" );
 
     CV_OCL_RUN(_dst.isUMat(),
                ocl_normalize(_src, _dst, _mask, rtype, scale, shift))
 
     Mat src = _src.getMat();
-    if( _mask.empty() )
+    もし( _mask.empty() )
         src.convertTo( _dst, rtype, scale, shift );
-    else
+    否则
     {
         Mat temp;
         src.convertTo( temp, rtype, scale, shift );

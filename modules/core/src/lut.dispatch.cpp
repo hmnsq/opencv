@@ -12,41 +12,41 @@ namespace cv {
 
 namespace {
 
-typedef void (*LUT8uFunc)( const uchar*, const uchar*, uchar*, int, int, int );
-typedef void (*LUT16uFunc)( const uchar*, const ushort*, ushort*, int, int, int );
+typedef void (*LUT8uFunc)( const uchar*, const uchar*, uchar*, 整数, 整数, 整数 );
+typedef void (*LUT16uFunc)( const uchar*, const ushort*, ushort*, 整数, 整数, 整数 );
 
 static LUT8uFunc resolveLUT8uFunc()
 {
-#if CV_TRY_AVX512_ICL
-    if (cv::checkHardwareSupport(CV_CPU_AVX512_ICL))
-        return opt_AVX512_ICL::LUT8u_;
+#もし CV_TRY_AVX512_ICL
+    もし (cv::checkHardwareSupport(CV_CPU_AVX512_ICL))
+        戻る opt_AVX512_ICL::LUT8u_;
 #endif
-    return cpu_baseline::LUT8u_;
+    戻る cpu_baseline::LUT8u_;
 }
 
 static LUT16uFunc resolveLUT16uFunc()
 {
-#if CV_TRY_AVX512_ICL
-    if (cv::checkHardwareSupport(CV_CPU_AVX512_ICL))
-        return opt_AVX512_ICL::LUT16u_;
+#もし CV_TRY_AVX512_ICL
+    もし (cv::checkHardwareSupport(CV_CPU_AVX512_ICL))
+        戻る opt_AVX512_ICL::LUT16u_;
 #endif
-    return cpu_baseline::LUT16u_;
+    戻る cpu_baseline::LUT16u_;
 }
 
 } // namespace
 
-void LUT8u_dispatch( const uchar* src, const uchar* lut, uchar* dst, int len, int cn, int lutcn );
+void LUT8u_dispatch( const uchar* src, const uchar* lut, uchar* dst, 整数 len, 整数 cn, 整数 lutcn );
 
-void LUT8u_dispatch( const uchar* src, const uchar* lut, uchar* dst, int len, int cn, int lutcn )
+void LUT8u_dispatch( const uchar* src, const uchar* lut, uchar* dst, 整数 len, 整数 cn, 整数 lutcn )
 {
     CV_INSTRUMENT_REGION();
     static LUT8uFunc fn = resolveLUT8uFunc();
     fn(src, lut, dst, len, cn, lutcn);
 }
 
-void LUT16u_dispatch( const uchar* src, const ushort* lut, ushort* dst, int len, int cn, int lutcn );
+void LUT16u_dispatch( const uchar* src, const ushort* lut, ushort* dst, 整数 len, 整数 cn, 整数 lutcn );
 
-void LUT16u_dispatch( const uchar* src, const ushort* lut, ushort* dst, int len, int cn, int lutcn )
+void LUT16u_dispatch( const uchar* src, const ushort* lut, ushort* dst, 整数 len, 整数 cn, 整数 lutcn )
 {
     CV_INSTRUMENT_REGION();
     static LUT16uFunc fn = resolveLUT16uFunc();

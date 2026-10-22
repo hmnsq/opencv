@@ -40,10 +40,10 @@
 //M*/
 #include "precomp.hpp"
 
-#if 0
+#もし 0
 #define dprintf(x) printf x
 #define print_matrix(x) print(x)
-#else
+#否则
 #define dprintf(x)
 #define print_matrix(x)
 #endif
@@ -155,17 +155,17 @@ public:
         // set dimensionality and make a deep copy of step
         Mat m = step.getMat();
         dprintf(("m.cols=%d\nm.rows=%d\n", m.cols, m.rows));
-        if( m.rows == 1 )
+        もし( m.rows == 1 )
             m.copyTo(_step);
-        else
+        否则
             transpose(m, _step);
     }
 
-    Ptr<MinProblemSolver::Function> getFunction() const CV_OVERRIDE { return _Function; }
+    Ptr<MinProblemSolver::Function> getFunction() const CV_OVERRIDE { 戻る _Function; }
 
     void setFunction(const Ptr<Function>& f) CV_OVERRIDE { _Function=f; }
 
-    TermCriteria getTermCriteria() const CV_OVERRIDE { return _termcrit; }
+    TermCriteria getTermCriteria() const CV_OVERRIDE { 戻る _termcrit; }
 
     void setTermCriteria( const TermCriteria& termcrit ) CV_OVERRIDE
     {
@@ -189,22 +189,22 @@ public:
         Mat x = x_.getMat(), simplex;
 
         createInitialSimplex(x, simplex, _step);
-        int count = 0;
+        整数 count = 0;
         double res = innerDownhillSimplex(simplex,_termcrit.epsilon, _termcrit.epsilon,
                                           count, _termcrit.maxCount);
         dprintf(("%d iterations done\n",count));
 
-        if( !x.empty() )
+        もし( !x.empty() )
         {
             Mat simplex_0m(x.rows, x.cols, CV_64F, simplex.ptr<double>());
             simplex_0m.convertTo(x, x.type());
         }
-        else
+        否则
         {
-            int x_type = x_.fixedType() ? x_.type() : CV_64F;
+            整数 x_type = x_.fixedType() ? x_.type() : CV_64F;
             simplex.row(0).convertTo(x_, x_type);
         }
-        return res;
+        戻る res;
     }
 protected:
     Ptr<MinProblemSolver::Function> _Function;
@@ -213,17 +213,17 @@ protected:
 
     inline void updateCoordSum(const Mat& p, Mat& coord_sum)
     {
-        int i, j, m = p.rows, n = p.cols;
+        整数 i, j, m = p.rows, n = p.cols;
         double* coord_sum_ = coord_sum.ptr<double>();
         CV_Assert( coord_sum.cols == n && coord_sum.rows == 1 );
 
-        for( j = 0; j < n; j++ )
+        ために( j = 0; j < n; j++ )
             coord_sum_[j] = 0.;
 
-        for( i = 0; i < m; i++ )
+        ために( i = 0; i < m; i++ )
         {
             const double* p_i = p.ptr<double>(i);
-            for( j = 0; j < n; j++ )
+            ために( j = 0; j < n; j++ )
                 coord_sum_[j] += p_i[j];
         }
 
@@ -234,10 +234,10 @@ protected:
 
     inline void createInitialSimplex( const Mat& x0, Mat& simplex, Mat& step )
     {
-        int i, j, ndim = step.cols;
+        整数 i, j, ndim = step.cols;
         CV_Assert( _Function->getDims() == ndim );
         Mat x = x0;
-        if( x0.empty() )
+        もし( x0.empty() )
             x = Mat::zeros(1, ndim, CV_64F);
         CV_Assert( (x.cols == 1 && x.rows == ndim) || (x.cols == ndim && x.rows == 1) );
         CV_Assert( x.type() == CV_32F || x.type() == CV_64F );
@@ -248,14 +248,14 @@ protected:
         x.convertTo(simplex_0m, CV_64F);
         double* simplex_0 = simplex.ptr<double>();
         const double* step_ = step.ptr<double>();
-        for( i = 1; i <= ndim; i++ )
+        ために( i = 1; i <= ndim; i++ )
         {
             double* simplex_i = simplex.ptr<double>(i);
-            for( j = 0; j < ndim; j++ )
+            ために( j = 0; j < ndim; j++ )
                 simplex_i[j] = simplex_0[j];
             simplex_i[i-1] += 0.5*step_[i-1];
         }
-        for( j = 0; j < ndim; j++ )
+        ために( j = 0; j < ndim; j++ )
             simplex_0[j] -= 0.5*step_[j];
 
         dprintf(("\nthis is simplex\n"));
@@ -269,51 +269,51 @@ protected:
      form a simplex - each row is an ndim vector.
      On output, fcount gives the number of function evaluations taken.
     */
-    double innerDownhillSimplex( Mat& p, double MinRange, double MinError, int& fcount, int nmax )
+    double innerDownhillSimplex( Mat& p, double MinRange, double MinError, 整数& fcount, 整数 nmax )
     {
-        int i, j, ndim = p.cols;
+        整数 i, j, ndim = p.cols;
         Mat coord_sum(1, ndim, CV_64F), buf(1, ndim, CV_64F), y(1, ndim+1, CV_64F);
         double* y_ = y.ptr<double>();
 
         fcount = ndim+1;
-        for( i = 0; i <= ndim; i++ )
+        ために( i = 0; i <= ndim; i++ )
             y_[i] = calc_f(p.ptr<double>(i));
 
         updateCoordSum(p, coord_sum);
 
-        for (;;)
+        ために (;;)
         {
             // find highest (worst), next-to-worst, and lowest
             // (best) points by going through all of them.
-            int ilo = 0, ihi, inhi;
-            if( y_[0] > y_[1] )
+            整数 ilo = 0, ihi, inhi;
+            もし( y_[0] > y_[1] )
             {
                 ihi = 0; inhi = 1;
             }
-            else
+            否则
             {
                 ihi = 1; inhi = 0;
             }
-            for( i = 0; i <= ndim; i++ )
+            ために( i = 0; i <= ndim; i++ )
             {
                 double yval = y_[i];
-                if (yval <= y_[ilo])
+                もし (yval <= y_[ilo])
                     ilo = i;
-                if (yval > y_[ihi])
+                もし (yval > y_[ihi])
                 {
                     inhi = ihi;
                     ihi = i;
                 }
-                else if (yval > y_[inhi] && i != ihi)
+                否则 もし (yval > y_[inhi] && i != ihi)
                     inhi = i;
             }
             CV_Assert( ihi != inhi );
-            if( ilo == inhi || ilo == ihi )
+            もし( ilo == inhi || ilo == ihi )
             {
-                for( i = 0; i <= ndim; i++ )
+                ために( i = 0; i <= ndim; i++ )
                 {
                     double yval = y_[i];
-                    if( yval == y_[ilo] && i != ihi && i != inhi )
+                    もし( yval == y_[ilo] && i != ihi && i != inhi )
                     {
                         ilo = i;
                         break;
@@ -326,11 +326,11 @@ protected:
             // check stop criterion
             double error = fabs(y_[ihi] - y_[ilo]);
             double range = 0;
-            for( j = 0; j < ndim; j++ )
+            ために( j = 0; j < ndim; j++ )
             {
                 double minval, maxval;
                 minval = maxval = p.at<double>(0, j);
-                for( i = 1; i <= ndim; i++ )
+                ために( i = 1; i <= ndim; i++ )
                 {
                     double pval = p.at<double>(i, j);
                     minval = std::min(minval, pval);
@@ -339,11 +339,11 @@ protected:
                 range = std::max(range, fabs(maxval - minval));
             }
 
-            if( range <= MinRange || error <= MinError || fcount >= nmax )
+            もし( range <= MinRange || error <= MinError || fcount >= nmax )
             {
                 // Put best point and value in first slot.
                 std::swap(y_[0], y_[ilo]);
-                for( j = 0; j < ndim; j++ )
+                ために( j = 0; j < ndim; j++ )
                 {
                     std::swap(p.at<double>(0, j), p.at<double>(ilo, j));
                 }
@@ -358,16 +358,16 @@ protected:
             dprintf(("\ny_lo=%g, y_nhi=%g, y_hi=%g, y_alpha=%g, p_alpha:\n", y_lo, y_nhi, y_hi, y_alpha));
             print_matrix(buf);
 
-            if( y_alpha < y_nhi )
+            もし( y_alpha < y_nhi )
             {
-                if( y_alpha < y_lo )
+                もし( y_alpha < y_lo )
                 {
                     // If that's better than the best point, go twice as far in that direction
                     double beta = -2.0;
                     double y_beta = tryNewPoint(p, coord_sum, ihi, beta, buf, fcount);
                     dprintf(("\ny_beta=%g, p_beta:\n", y_beta));
                     print_matrix(buf);
-                    if( y_beta < y_alpha )
+                    もし( y_beta < y_alpha )
                     {
                         alpha = beta;
                         y_alpha = y_beta;
@@ -375,7 +375,7 @@ protected:
                 }
                 replacePoint(p, coord_sum, y, ihi, alpha, y_alpha);
             }
-            else
+            否则
             {
                 // The new point is worse than the second-highest,
                 // do not go so far in that direction
@@ -383,18 +383,18 @@ protected:
                 double y_gamma = tryNewPoint(p, coord_sum, ihi, gamma, buf, fcount);
                 dprintf(("\ny_gamma=%g, p_gamma:\n", y_gamma));
                 print_matrix(buf);
-                if( y_gamma < y_hi )
+                もし( y_gamma < y_hi )
                     replacePoint(p, coord_sum, y, ihi, gamma, y_gamma);
-                else
+                否则
                 {
                     // Can't seem to improve things.
                     // Contract the simplex to good point
                     // in hope to find a simplex landscape.
-                    for( i = 0; i <= ndim; i++ )
+                    ために( i = 0; i <= ndim; i++ )
                     {
-                        if (i != ilo)
+                        もし (i != ilo)
                         {
-                            for( j = 0; j < ndim; j++ )
+                            ために( j = 0; j < ndim; j++ )
                                 p.at<double>(i, j) = 0.5*(p.at<double>(i, j) + p.at<double>(ilo, j));
                             y_[i] = calc_f(p.ptr<double>(i));
                         }
@@ -406,19 +406,19 @@ protected:
             dprintf(("\nthis is simplex on iteration %d\n",fcount));
             print_matrix(p);
         }
-        return y_[0];
+        戻る y_[0];
     }
 
     inline double calc_f(const double* ptr)
     {
         double res = _Function->calc(ptr);
         CV_Assert( !cvIsNaN(res) && !cvIsInf(res) );
-        return res;
+        戻る res;
     }
 
-    double tryNewPoint( Mat& p, Mat& coord_sum, int ihi, double alpha_, Mat& ptry, int& fcount )
+    double tryNewPoint( Mat& p, Mat& coord_sum, 整数 ihi, double alpha_, Mat& ptry, 整数& fcount )
     {
-        int j, ndim = p.cols;
+        整数 j, ndim = p.cols;
 
         double alpha = (1.0 - alpha_)/ndim;
         double beta = alpha - alpha_;
@@ -426,23 +426,23 @@ protected:
         double* ptry_ = ptry.ptr<double>();
         double* coord_sum_ = coord_sum.ptr<double>();
 
-        for( j = 0; j < ndim; j++ )
+        ために( j = 0; j < ndim; j++ )
             ptry_[j] = coord_sum_[j]*alpha - p_ihi[j]*beta;
 
         fcount++;
-        return calc_f(ptry_);
+        戻る calc_f(ptry_);
     }
 
-    void replacePoint( Mat& p, Mat& coord_sum, Mat& y, int ihi, double alpha_, double ytry )
+    void replacePoint( Mat& p, Mat& coord_sum, Mat& y, 整数 ihi, double alpha_, double ytry )
     {
-        int j, ndim = p.cols;
+        整数 j, ndim = p.cols;
 
         double alpha = (1.0 - alpha_)/ndim;
         double beta = alpha - alpha_;
         double* p_ihi = p.ptr<double>(ihi);
         double* coord_sum_ = coord_sum.ptr<double>();
 
-        for( j = 0; j < ndim; j++ )
+        ために( j = 0; j < ndim; j++ )
             p_ihi[j] = coord_sum_[j]*alpha - p_ihi[j]*beta;
         y.at<double>(ihi) = ytry;
         updateCoordSum(p, coord_sum);
@@ -459,7 +459,7 @@ Ptr<DownhillSolver> DownhillSolver::create( const Ptr<MinProblemSolver::Function
     DS->setFunction(f);
     DS->setInitStep(initStep);
     DS->setTermCriteria(termcrit);
-    return DS;
+    戻る DS;
 }
 
 }

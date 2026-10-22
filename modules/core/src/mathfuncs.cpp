@@ -54,7 +54,7 @@
 namespace cv
 {
 
-typedef void (*MathFunc)(const void* src, void* dst, int len);
+typedef void (*MathFunc)(const void* src, void* dst, 整数 len);
 
 #ifdef HAVE_OPENCL
 
@@ -62,24 +62,24 @@ enum { OCL_OP_LOG=0, OCL_OP_EXP=1, OCL_OP_MAG=2, OCL_OP_PHASE_DEGREES=3, OCL_OP_
 
 static const char* oclop2str[] = { "OP_LOG", "OP_EXP", "OP_MAG", "OP_PHASE_DEGREES", "OP_PHASE_RADIANS", 0 };
 
-static bool ocl_math_op(InputArray _src1, InputArray _src2, OutputArray _dst, int oclop)
+static bool ocl_math_op(InputArray _src1, InputArray _src2, OutputArray _dst, 整数 oclop)
 {
-    int type = _src1.type(), depth = CV_MAT_DEPTH(type), cn = CV_MAT_CN(type);
-    int kercn = oclop == OCL_OP_PHASE_DEGREES ||
+    整数 type = _src1.type(), depth = CV_MAT_DEPTH(type), cn = CV_MAT_CN(type);
+    整数 kercn = oclop == OCL_OP_PHASE_DEGREES ||
             oclop == OCL_OP_PHASE_RADIANS ? 1 : ocl::predictOptimalVectorWidth(_src1, _src2, _dst);
 
     const ocl::Device d = ocl::Device::getDefault();
     bool double_support = d.doubleFPConfig() > 0;
-    if (!double_support && depth == CV_64F)
-        return false;
-    int rowsPerWI = d.isIntel() ? 4 : 1;
+    もし (!double_support && depth == CV_64F)
+        戻る false;
+    整数 rowsPerWI = d.isIntel() ? 4 : 1;
 
     ocl::Kernel k("KF", ocl::core::arithm_oclsrc,
                   format("-D %s -D %s -D dstT=%s -D DEPTH_dst=%d -D rowsPerWI=%d%s", _src2.empty() ? "UNARY_OP" : "BINARY_OP",
                          oclop2str[oclop], ocl::typeToStr(CV_MAKE_TYPE(depth, kercn)), depth, rowsPerWI,
                          double_support ? " -D DOUBLE_SUPPORT" : ""));
-    if (k.empty())
-        return false;
+    もし (k.empty())
+        戻る false;
 
     UMat src1 = _src1.getUMat(), src2 = _src2.getUMat();
     _dst.createSameSize(src1, type);
@@ -89,13 +89,13 @@ static bool ocl_math_op(InputArray _src1, InputArray _src2, OutputArray _dst, in
             src2arg = ocl::KernelArg::ReadOnlyNoSize(src2),
             dstarg = ocl::KernelArg::WriteOnly(dst, cn, kercn);
 
-    if (src2.empty())
+    もし (src2.empty())
         k.args(src1arg, dstarg);
-    else
+    否则
         k.args(src1arg, src2arg, dstarg);
 
     size_t globalsize[] = { (size_t)src1.cols * cn / kercn, ((size_t)src1.rows + rowsPerWI - 1) / rowsPerWI };
-    return k.run(2, globalsize, 0, false);
+    戻る k.run(2, globalsize, 0, false);
 }
 
 #endif
@@ -110,8 +110,8 @@ CV_DISABLE_UBSAN float cubeRoot( float value )
 
     float fr;
     Cv32suf v, m;
-    int ix, s;
-    int ex, shx;
+    整数 ix, s;
+    整数 ex, shx;
 
     v.f = value;
     ix = v.i & 0x7fffffff;
@@ -140,7 +140,7 @@ CV_DISABLE_UBSAN float cubeRoot( float value )
     m.f = value;
     v.f = fr;
     v.i = (v.i + (ex << 23) + s) & (m.i*2 != 0 ? -1 : 0);
-    return v.f;
+    戻る v.f;
 }
 
 /****************************************************************************************\
@@ -151,7 +151,7 @@ void magnitude( InputArray src1, InputArray src2, OutputArray dst )
 {
     CV_INSTRUMENT_REGION();
 
-    int type = src1.type(), depth = src1.depth(), cn = src1.channels();
+    整数 type = src1.type(), depth = src1.depth(), cn = src1.channels();
     CV_Assert( src1.size() == src2.size() && type == src2.type() && (depth == CV_32F || depth == CV_64F));
 
     CV_OCL_RUN(dst.isUMat() && src1.dims() <= 2 && src2.dims() <= 2,
@@ -164,17 +164,17 @@ void magnitude( InputArray src1, InputArray src2, OutputArray dst )
     const Mat* arrays[] = {&X, &Y, &Mag, 0};
     uchar* ptrs[3] = {};
     NAryMatIterator it(arrays, ptrs);
-    int len = (int)it.size*cn;
+    整数 len = (整数)it.size*cn;
 
-    for( size_t i = 0; i < it.nplanes; i++, ++it )
+    ために( size_t i = 0; i < it.nplanes; i++, ++it )
     {
-        if( depth == CV_32F )
+        もし( depth == CV_32F )
         {
             const float *x = (const float*)ptrs[0], *y = (const float*)ptrs[1];
             float *mag = (float*)ptrs[2];
             hal::magnitude32f( x, y, mag, len );
         }
-        else
+        否则
         {
             const double *x = (const double*)ptrs[0], *y = (const double*)ptrs[1];
             double *mag = (double*)ptrs[2];
@@ -187,7 +187,7 @@ void phase( InputArray src1, InputArray src2, OutputArray dst, bool angleInDegre
 {
     CV_INSTRUMENT_REGION();
 
-    int type = src1.type(), depth = src1.depth(), cn = src1.channels();
+    整数 type = src1.type(), depth = src1.depth(), cn = src1.channels();
     CV_Assert( src1.size() == src2.size() && type == src2.type() && (depth == CV_32F || depth == CV_64F));
 
     CV_OCL_RUN(dst.isUMat() && src1.dims() <= 2 && src2.dims() <= 2,
@@ -200,20 +200,20 @@ void phase( InputArray src1, InputArray src2, OutputArray dst, bool angleInDegre
     const Mat* arrays[] = {&X, &Y, &Angle, 0};
     uchar* ptrs[3] = {};
     NAryMatIterator it(arrays, ptrs);
-    int j, total = (int)(it.size*cn), blockSize = total;
+    整数 j, total = (整数)(it.size*cn), blockSize = total;
     size_t esz1 = X.elemSize1();
-    for( size_t i = 0; i < it.nplanes; i++, ++it )
+    ために( size_t i = 0; i < it.nplanes; i++, ++it )
     {
-        for( j = 0; j < total; j += blockSize )
+        ために( j = 0; j < total; j += blockSize )
         {
-            int len = std::min(total - j, blockSize);
-            if( depth == CV_32F )
+            整数 len = std::min(total - j, blockSize);
+            もし( depth == CV_32F )
             {
                 const float *x = (const float*)ptrs[0], *y = (const float*)ptrs[1];
                 float *angle = (float*)ptrs[2];
                 hal::fastAtan32f( y, x, angle, len, angleInDegrees );
             }
-            else
+            否则
             {
                 const double *x = (const double*)ptrs[0], *y = (const double*)ptrs[1];
                 double *angle = (double*)ptrs[2];
@@ -232,7 +232,7 @@ static bool ocl_cartToPolar( InputArray _src1, InputArray _src2,
                              OutputArray _dst1, OutputArray _dst2, bool angleInDegrees )
 {
     const ocl::Device & d = ocl::Device::getDefault();
-    int type = _src1.type(), depth = CV_MAT_DEPTH(type), cn = CV_MAT_CN(type),
+    整数 type = _src1.type(), depth = CV_MAT_DEPTH(type), cn = CV_MAT_CN(type),
             rowsPerWI = d.isIntel() ? 4 : 1;
     bool doubleSupport = d.doubleFPConfig() > 0;
 
@@ -241,10 +241,10 @@ static bool ocl_cartToPolar( InputArray _src1, InputArray _src2,
     const bool _src2IsDstMag = (_src2.getObj() == _dst1.getObj());
     const bool _src2IsDstAngle = (_src2.getObj() == _dst2.getObj());
 
-    if ( !(_src1.dims() <= 2 && _src2.dims() <= 2 &&
+    もし ( !(_src1.dims() <= 2 && _src2.dims() <= 2 &&
            (depth == CV_32F || depth == CV_64F) && type == _src2.type()) ||
          (depth == CV_64F && !doubleSupport) )
-        return false;
+        戻る false;
 
     ocl::Kernel k("KF", ocl::core::arithm_oclsrc,
                   format("-D BINARY_OP -D dstT=%s -D DEPTH_dst=%d -D rowsPerWI=%d -D OP_CTP_%s%s%s%s%s%s",
@@ -256,8 +256,8 @@ static bool ocl_cartToPolar( InputArray _src1, InputArray _src2,
                          _src2IsDstMag   ? " -D SRC2_IS_DST_MAG" : "",
                          _src2IsDstAngle ? " -D SRC2_IS_DST_ANGLE" : ""
                          ));
-    if (k.empty())
-        return false;
+    もし (k.empty())
+        戻る false;
 
     UMat src1 = _src1.getUMat(), src2 = _src2.getUMat();
     Size size = src1.size();
@@ -273,7 +273,7 @@ static bool ocl_cartToPolar( InputArray _src1, InputArray _src2,
            ocl::KernelArg::WriteOnlyNoSize(dst2));
 
     size_t globalsize[2] = { (size_t)dst1.cols * cn, ((size_t)dst1.rows + rowsPerWI - 1) / rowsPerWI };
-    return k.run(2, globalsize, NULL, false);
+    戻る k.run(2, globalsize, NULL, false);
 }
 
 #endif
@@ -289,7 +289,7 @@ void cartToPolar( InputArray src1, InputArray src2,
             ocl_cartToPolar(src1, src2, dst1, dst2, angleInDegrees))
 
     Mat X = src1.getMat(), Y = src2.getMat();
-    int type = X.type(), depth = X.depth(), cn = X.channels();
+    整数 type = X.type(), depth = X.depth(), cn = X.channels();
     CV_Assert( X.size == Y.size && type == Y.type() && (depth == CV_32F || depth == CV_64F));
     dst1.create( X.size, type );
     dst2.create( X.size, type );
@@ -298,21 +298,21 @@ void cartToPolar( InputArray src1, InputArray src2,
     const Mat* arrays[] = {&X, &Y, &Mag, &Angle, 0};
     uchar* ptrs[4] = {};
     NAryMatIterator it(arrays, ptrs);
-    int j, total = (int)(it.size*cn), blockSize = std::min(total, ((BLOCK_SIZE+cn-1)/cn)*cn);
+    整数 j, total = (整数)(it.size*cn), blockSize = std::min(total, ((BLOCK_SIZE+cn-1)/cn)*cn);
     size_t esz1 = X.elemSize1();
 
-    for( size_t i = 0; i < it.nplanes; i++, ++it )
+    ために( size_t i = 0; i < it.nplanes; i++, ++it )
     {
-        for( j = 0; j < total; j += blockSize )
+        ために( j = 0; j < total; j += blockSize )
         {
-            int len = std::min(total - j, blockSize);
-            if( depth == CV_32F )
+            整数 len = std::min(total - j, blockSize);
+            もし( depth == CV_32F )
             {
                 const float *x = (const float*)ptrs[0], *y = (const float*)ptrs[1];
                 float *mag = (float*)ptrs[2], *angle = (float*)ptrs[3];
                 hal::cartToPolar32f( x, y, mag, angle, len, angleInDegrees );
             }
-            else
+            否则
             {
                 const double *x = (const double*)ptrs[0], *y = (const double*)ptrs[1];
                 double *mag = (double*)ptrs[2], *angle = (double*)ptrs[3];
@@ -337,7 +337,7 @@ static bool ocl_polarToCart( InputArray _mag, InputArray _angle,
                              OutputArray _dst1, OutputArray _dst2, bool angleInDegrees )
 {
     const ocl::Device & d = ocl::Device::getDefault();
-    int type = _angle.type(), depth = CV_MAT_DEPTH(type), cn = CV_MAT_CN(type),
+    整数 type = _angle.type(), depth = CV_MAT_DEPTH(type), cn = CV_MAT_CN(type),
             rowsPerWI = d.isIntel() ? 4 : 1;
     bool doubleSupport = d.doubleFPConfig() > 0;
 
@@ -346,8 +346,8 @@ static bool ocl_polarToCart( InputArray _mag, InputArray _angle,
     const bool _src2IsDstX = (_angle.getObj() == _dst1.getObj());
     const bool _src2IsDstY = (_angle.getObj() == _dst2.getObj());
 
-    if ( !doubleSupport && depth == CV_64F )
-        return false;
+    もし ( !doubleSupport && depth == CV_64F )
+        戻る false;
 
     ocl::Kernel k("KF", ocl::core::arithm_oclsrc,
                   format("-D dstT=%s -D DEPTH_dst=%d -D rowsPerWI=%d -D BINARY_OP -D OP_PTC_%s%s%s%s%s%s",
@@ -359,8 +359,8 @@ static bool ocl_polarToCart( InputArray _mag, InputArray _angle,
                          _src1IsDstY ? " -D SRC1_IS_DST_Y" : "",
                          _src2IsDstX   ? " -D SRC2_IS_DST_X" : "",
                          _src2IsDstY ? " -D SRC2_IS_DST_Y" : ""));
-    if (k.empty())
-        return false;
+    もし (k.empty())
+        戻る false;
 
     UMat mag = _mag.getUMat(), angle = _angle.getUMat();
     Size size = angle.size();
@@ -376,7 +376,7 @@ static bool ocl_polarToCart( InputArray _mag, InputArray _angle,
            ocl::KernelArg::WriteOnlyNoSize(dst2));
 
     size_t globalsize[2] = { (size_t)dst1.cols * cn, ((size_t)dst1.rows + rowsPerWI - 1) / rowsPerWI };
-    return k.run(2, globalsize, NULL, false);
+    戻る k.run(2, globalsize, NULL, false);
 }
 
 #endif
@@ -388,7 +388,7 @@ void polarToCart( InputArray src1, InputArray src2,
 
     CV_Assert(dst1.getObj() != dst2.getObj());
 
-    int type = src2.type(), depth = CV_MAT_DEPTH(type), cn = CV_MAT_CN(type);
+    整数 type = src2.type(), depth = CV_MAT_DEPTH(type), cn = CV_MAT_CN(type);
     CV_Assert((depth == CV_32F || depth == CV_64F) && (src1.empty() || src1.type() == type));
 
     CV_OCL_RUN(!src1.empty() && src2.dims() <= 2 && dst1.isUMat() && dst2.isUMat(),
@@ -403,28 +403,28 @@ void polarToCart( InputArray src1, InputArray src2,
     const Mat* arrays[] = {&Mag, &Angle, &X, &Y, 0};
     uchar* ptrs[4] = {};
     NAryMatIterator it(arrays, ptrs);
-    int j, total = (int)(it.size*cn), blockSize = std::min(total, ((BLOCK_SIZE+cn-1)/cn)*cn);
+    整数 j, total = (整数)(it.size*cn), blockSize = std::min(total, ((BLOCK_SIZE+cn-1)/cn)*cn);
     size_t esz1 = Angle.elemSize1();
 
-    for( size_t i = 0; i < it.nplanes; i++, ++it )
+    ために( size_t i = 0; i < it.nplanes; i++, ++it )
     {
-        for( j = 0; j < total; j += blockSize )
+        ために( j = 0; j < total; j += blockSize )
         {
-            int len = std::min(total - j, blockSize);
-            if ( depth == CV_32F )
+            整数 len = std::min(total - j, blockSize);
+            もし ( depth == CV_32F )
             {
                 const float *mag = (const float*)ptrs[0], *angle = (const float*)ptrs[1];
                 float *x = (float*)ptrs[2], *y = (float*)ptrs[3];
                 hal::polarToCart32f( mag, angle, x, y, len, angleInDegrees );
             }
-            else
+            否则
             {
                 const double *mag = (const double*)ptrs[0], *angle = (const double*)ptrs[1];
                 double *x = (double*)ptrs[2], *y = (double*)ptrs[3];
                 hal::polarToCart64f( mag, angle, x, y, len, angleInDegrees );
             }
 
-            if( ptrs[0] )
+            もし( ptrs[0] )
                 ptrs[0] += len*esz1;
             ptrs[1] += len*esz1;
             ptrs[2] += len*esz1;
@@ -449,29 +449,29 @@ enum { MATH_OP_SMALL = 100000 };     // elements; tune with a benchmark if the c
 
 static void math_op(ew::TOp op, InputArray _src, OutputArray _dst)
 {
-    int type = _src.type(), depth = CV_MAT_DEPTH(type);
+    整数 type = _src.type(), depth = CV_MAT_DEPTH(type);
     CV_Assert(depth == CV_16F || depth == CV_16BF || depth == CV_32F || depth == CV_64F);
 
     Mat src = _src.getMat();
     _dst.createSameSize(_src, type);   // whole-shape transfer (layout & future metadata included)
     Mat dst = _dst.getMat();
-    if (src.empty())
-        return;
+    もし (src.empty())
+        戻る;
 
     const size_t total = src.total() * src.channels();
-    if (src.isContinuous() && dst.isContinuous() && total <= (size_t)MATH_OP_SMALL)
+    もし (src.isContinuous() && dst.isContinuous() && total <= (size_t)MATH_OP_SMALL)
     {
         ew::TKernel k = ew::getMathFunc(op, depth);
         CV_Assert(k.fptr);
         static const double noparams[4] = {};
         k.fptr(src.data, 0, 1, nullptr, 0, 0, nullptr, 0, 0,
-               dst.data, 0, (int)total, 1, noparams, k.flags, k.userdata);
-        return;
+               dst.data, 0, (整数)total, 1, noparams, k.flags, k.userdata);
+        戻る;
     }
 
     ew::TExpr p;
-    const int a = p.addInput(depth);
-    const int out = p.addOutput(depth);
+    const 整数 a = p.addInput(depth);
+    const 整数 out = p.addOutput(depth);
     p.moveToOutput(p.emitUnary(op, a, depth), out);
     p.compile();
     const Mat* inputs[] = { &src };
@@ -482,7 +482,7 @@ void exp( InputArray _src, OutputArray _dst )
 {
     CV_INSTRUMENT_REGION();
 
-    [[maybe_unused]] int depth = _src.depth();   // consumed by CV_OCL_RUN only
+    [[maybe_unused]] 整数 depth = _src.depth();   // consumed by CV_OCL_RUN only
 
     CV_OCL_RUN(_dst.isUMat() && _src.dims() <= 2 && (depth == CV_32F || depth == CV_64F),
                ocl_math_op(_src, noArray(), _dst, OCL_OP_EXP))
@@ -499,7 +499,7 @@ void log( InputArray _src, OutputArray _dst )
 {
     CV_INSTRUMENT_REGION();
 
-    [[maybe_unused]] int depth = _src.depth();   // consumed by CV_OCL_RUN only
+    [[maybe_unused]] 整数 depth = _src.depth();   // consumed by CV_OCL_RUN only
 
     CV_OCL_RUN( _dst.isUMat() && _src.dims() <= 2 && (depth == CV_32F || depth == CV_64F),
                 ocl_math_op(_src, noArray(), _dst, OCL_OP_LOG))
@@ -514,33 +514,33 @@ void log( InputArray _src, OutputArray _dst )
 template <typename T, typename WT>
 struct iPow_SIMD
 {
-    int operator() ( const T *, T *, int, int)
+    整数 operator() ( const T *, T *, 整数, 整数)
     {
-        return 0;
+        戻る 0;
     }
 };
 
-#if (CV_SIMD || CV_SIMD_SCALABLE)
+#もし (CV_SIMD || CV_SIMD_SCALABLE)
 
 template <>
 struct iPow_SIMD<uchar, unsigned>
 {
-    int operator() ( const uchar * src, uchar * dst, int len, int power )
+    整数 operator() ( const uchar * src, uchar * dst, 整数 len, 整数 power )
     {
-        int i = 0;
+        整数 i = 0;
         v_uint32 v_1 = vx_setall_u32(1u);
 
-        for ( ; i <= len - VTraits<v_uint16>::vlanes(); i += VTraits<v_uint16>::vlanes())
+        ために ( ; i <= len - VTraits<v_uint16>::vlanes(); i += VTraits<v_uint16>::vlanes())
         {
             v_uint32 v_a1 = v_1, v_a2 = v_1;
             v_uint16 v = vx_load_expand(src + i);
             v_uint32 v_b1, v_b2;
             v_expand(v, v_b1, v_b2);
-            int p = power;
+            整数 p = power;
 
-            while( p > 1 )
+            ながら( p > 1 )
             {
-                if (p & 1)
+                もし (p & 1)
                 {
                     v_a1 = v_mul(v_a1, v_b1);
                     v_a2 = v_mul(v_a2, v_b2);
@@ -558,29 +558,29 @@ struct iPow_SIMD<uchar, unsigned>
         }
         vx_cleanup();
 
-        return i;
+        戻る i;
     }
 };
 
 template <>
-struct iPow_SIMD<schar, int>
+struct iPow_SIMD<schar, 整数>
 {
-    int operator() ( const schar * src, schar * dst, int len, int power)
+    整数 operator() ( const schar * src, schar * dst, 整数 len, 整数 power)
     {
-        int i = 0;
+        整数 i = 0;
         v_int32 v_1 = vx_setall_s32(1);
 
-        for ( ; i <= len - VTraits<v_int16>::vlanes(); i += VTraits<v_int16>::vlanes())
+        ために ( ; i <= len - VTraits<v_int16>::vlanes(); i += VTraits<v_int16>::vlanes())
         {
             v_int32 v_a1 = v_1, v_a2 = v_1;
             v_int16 v = vx_load_expand(src + i);
             v_int32 v_b1, v_b2;
             v_expand(v, v_b1, v_b2);
-            int p = power;
+            整数 p = power;
 
-            while( p > 1 )
+            ながら( p > 1 )
             {
-                if (p & 1)
+                もし (p & 1)
                 {
                     v_a1 = v_mul(v_a1, v_b1);
                     v_a2 = v_mul(v_a2, v_b2);
@@ -598,29 +598,29 @@ struct iPow_SIMD<schar, int>
         }
         vx_cleanup();
 
-        return i;
+        戻る i;
     }
 };
 
 template <>
 struct iPow_SIMD<ushort, unsigned>
 {
-    int operator() ( const ushort * src, ushort * dst, int len, int power)
+    整数 operator() ( const ushort * src, ushort * dst, 整数 len, 整数 power)
     {
-        int i = 0;
+        整数 i = 0;
         v_uint32 v_1 = vx_setall_u32(1u);
 
-        for ( ; i <= len - VTraits<v_uint16>::vlanes(); i += VTraits<v_uint16>::vlanes())
+        ために ( ; i <= len - VTraits<v_uint16>::vlanes(); i += VTraits<v_uint16>::vlanes())
         {
             v_uint32 v_a1 = v_1, v_a2 = v_1;
             v_uint16 v = vx_load(src + i);
             v_uint32 v_b1, v_b2;
             v_expand(v, v_b1, v_b2);
-            int p = power;
+            整数 p = power;
 
-            while( p > 1 )
+            ながら( p > 1 )
             {
-                if (p & 1)
+                もし (p & 1)
                 {
                     v_a1 = v_mul(v_a1, v_b1);
                     v_a2 = v_mul(v_a2, v_b2);
@@ -638,29 +638,29 @@ struct iPow_SIMD<ushort, unsigned>
         }
         vx_cleanup();
 
-        return i;
+        戻る i;
     }
 };
 
 template <>
-struct iPow_SIMD<short, int>
+struct iPow_SIMD<short, 整数>
 {
-    int operator() ( const short * src, short * dst, int len, int power)
+    整数 operator() ( const short * src, short * dst, 整数 len, 整数 power)
     {
-        int i = 0;
+        整数 i = 0;
         v_int32 v_1 = vx_setall_s32(1);
 
-        for ( ; i <= len - VTraits<v_int16>::vlanes(); i += VTraits<v_int16>::vlanes())
+        ために ( ; i <= len - VTraits<v_int16>::vlanes(); i += VTraits<v_int16>::vlanes())
         {
             v_int32 v_a1 = v_1, v_a2 = v_1;
             v_int16 v = vx_load(src + i);
             v_int32 v_b1, v_b2;
             v_expand(v, v_b1, v_b2);
-            int p = power;
+            整数 p = power;
 
-            while( p > 1 )
+            ながら( p > 1 )
             {
-                if (p & 1)
+                もし (p & 1)
                 {
                     v_a1 = v_mul(v_a1, v_b1);
                     v_a2 = v_mul(v_a2, v_b2);
@@ -678,27 +678,27 @@ struct iPow_SIMD<short, int>
         }
         vx_cleanup();
 
-        return i;
+        戻る i;
     }
 };
 
 template <>
-struct iPow_SIMD<int, int>
+struct iPow_SIMD<整数, 整数>
 {
-    int operator() ( const int * src, int * dst, int len, int power)
+    整数 operator() ( const 整数 * src, 整数 * dst, 整数 len, 整数 power)
     {
-        int i = 0;
+        整数 i = 0;
         v_int32 v_1 = vx_setall_s32(1);
 
-        for ( ; i <= len - VTraits<v_int32>::vlanes()*2; i += VTraits<v_int32>::vlanes()*2)
+        ために ( ; i <= len - VTraits<v_int32>::vlanes()*2; i += VTraits<v_int32>::vlanes()*2)
         {
             v_int32 v_a1 = v_1, v_a2 = v_1;
             v_int32 v_b1 = vx_load(src + i), v_b2 = vx_load(src + i + VTraits<v_int32>::vlanes());
-            int p = power;
+            整数 p = power;
 
-            while( p > 1 )
+            ながら( p > 1 )
             {
-                if (p & 1)
+                もし (p & 1)
                 {
                     v_a1 = v_mul(v_a1, v_b1);
                     v_a2 = v_mul(v_a2, v_b2);
@@ -716,32 +716,32 @@ struct iPow_SIMD<int, int>
         }
         vx_cleanup();
 
-        return i;
+        戻る i;
     }
 };
 
 template <>
 struct iPow_SIMD<float, float>
 {
-    int operator() ( const float * src, float * dst, int len, int power)
+    整数 operator() ( const float * src, float * dst, 整数 len, 整数 power)
     {
-        int i = 0;
+        整数 i = 0;
         v_float32 v_1 = vx_setall_f32(1.f);
 
-        for ( ; i <= len - VTraits<v_float32>::vlanes()*2; i += VTraits<v_float32>::vlanes()*2)
+        ために ( ; i <= len - VTraits<v_float32>::vlanes()*2; i += VTraits<v_float32>::vlanes()*2)
         {
             v_float32 v_a1 = v_1, v_a2 = v_1;
             v_float32 v_b1 = vx_load(src + i), v_b2 = vx_load(src + i + VTraits<v_float32>::vlanes());
-            int p = std::abs(power);
-            if( power < 0 )
+            整数 p = std::abs(power);
+            もし( power < 0 )
             {
                 v_b1 = v_div(v_1, v_b1);
                 v_b2 = v_div(v_1, v_b2);
             }
 
-            while( p > 1 )
+            ながら( p > 1 )
             {
-                if (p & 1)
+                もし (p & 1)
                 {
                     v_a1 = v_mul(v_a1, v_b1);
                     v_a2 = v_mul(v_a2, v_b2);
@@ -759,33 +759,33 @@ struct iPow_SIMD<float, float>
         }
         vx_cleanup();
 
-        return i;
+        戻る i;
     }
 };
 
-#if (CV_SIMD_64F || CV_SIMD_SCALABLE_64F)
+#もし (CV_SIMD_64F || CV_SIMD_SCALABLE_64F)
 template <>
 struct iPow_SIMD<double, double>
 {
-    int operator() ( const double * src, double * dst, int len, int power)
+    整数 operator() ( const double * src, double * dst, 整数 len, 整数 power)
     {
-        int i = 0;
+        整数 i = 0;
         v_float64 v_1 = vx_setall_f64(1.);
 
-        for ( ; i <= len - VTraits<v_float64>::vlanes()*2; i += VTraits<v_float64>::vlanes()*2)
+        ために ( ; i <= len - VTraits<v_float64>::vlanes()*2; i += VTraits<v_float64>::vlanes()*2)
         {
             v_float64 v_a1 = v_1, v_a2 = v_1;
             v_float64 v_b1 = vx_load(src + i), v_b2 = vx_load(src + i + VTraits<v_float64>::vlanes());
-            int p = std::abs(power);
-            if( power < 0 )
+            整数 p = std::abs(power);
+            もし( power < 0 )
             {
                 v_b1 = v_div(v_1, v_b1);
                 v_b2 = v_div(v_1, v_b2);
             }
 
-            while( p > 1 )
+            ながら( p > 1 )
             {
-                if (p & 1)
+                もし (p & 1)
                 {
                     v_a1 = v_mul(v_a1, v_b1);
                     v_a2 = v_mul(v_a2, v_b2);
@@ -803,7 +803,7 @@ struct iPow_SIMD<double, double>
         }
         vx_cleanup();
 
-        return i;
+        戻る i;
     }
 };
 #endif
@@ -812,35 +812,35 @@ struct iPow_SIMD<double, double>
 
 template<typename T, typename WT>
 static void
-iPow_i( const void* _src, void* _dst, int len, int power )
+iPow_i( const void* _src, void* _dst, 整数 len, 整数 power )
 {
     const T* src = (const T*)_src;
     T* dst = (T*)_dst;
-    if( power < 0 )
+    もし( power < 0 )
     {
         T tab[5] =
         {
             saturate_cast<T>(power == -1 ? -1 : 0), saturate_cast<T>((power & 1) ? -1 : 1),
             std::numeric_limits<T>::max(), 1, saturate_cast<T>(power == -1 ? 1 : 0)
         };
-        for( int i = 0; i < len; i++ )
+        ために( 整数 i = 0; i < len; i++ )
         {
             T val = src[i];
             dst[i] = cv_abs(val) <= 2 ? tab[val + 2] : (T)0;
         }
     }
-    else
+    否则
     {
         iPow_SIMD<T, WT> vop;
-        int i = vop(src, dst, len, power);
+        整数 i = vop(src, dst, len, power);
 
-        for( ; i < len; i++ )
+        ために( ; i < len; i++ )
         {
             WT a = 1, b = src[i];
-            int p = power;
-            while( p > 1 )
+            整数 p = power;
+            ながら( p > 1 )
             {
-                if( p & 1 )
+                もし( p & 1 )
                     a *= b;
                 b *= b;
                 p >>= 1;
@@ -854,24 +854,24 @@ iPow_i( const void* _src, void* _dst, int len, int power )
 
 template<typename T>
 static void
-iPow_f( const void* _src, void* _dst, int len, int power0 )
+iPow_f( const void* _src, void* _dst, 整数 len, 整数 power0 )
 {
     const T* src = (const T*)_src;
     T* dst = (T*)_dst;
     iPow_SIMD<T, T> vop;
-    int i = vop(src, dst, len, power0);
-    int power = std::abs(power0);
+    整数 i = vop(src, dst, len, power0);
+    整数 power = std::abs(power0);
 
-    for( ; i < len; i++ )
+    ために( ; i < len; i++ )
     {
         T a = 1, b = src[i];
-        int p = power;
-        if( power0 < 0 )
+        整数 p = power;
+        もし( power0 < 0 )
             b = 1/b;
 
-        while( p > 1 )
+        ながら( p > 1 )
         {
-            if( p & 1 )
+            もし( p & 1 )
                 a *= b;
             b *= b;
             p >>= 1;
@@ -882,38 +882,38 @@ iPow_f( const void* _src, void* _dst, int len, int power0 )
     }
 }
 
-typedef void (*IPowFunc)( const void* src, void* dst, int len, int power );
+typedef void (*IPowFunc)( const void* src, void* dst, 整数 len, 整数 power );
 
 static IPowFunc ipowTab[CV_DEPTH_MAX] =
 {
-    iPow_i<uchar, unsigned>, iPow_i<schar, int>, iPow_i<ushort, unsigned>, iPow_i<short, int>,
-    iPow_i<int, int>, iPow_f<float>, iPow_f<double>, 0
+    iPow_i<uchar, unsigned>, iPow_i<schar, 整数>, iPow_i<ushort, unsigned>, iPow_i<short, 整数>,
+    iPow_i<整数, 整数>, iPow_f<float>, iPow_f<double>, 0
 };
 
 #ifdef HAVE_OPENCL
 
 static bool ocl_pow(InputArray _src, double power, OutputArray _dst,
-                    bool is_ipower, int ipower)
+                    bool is_ipower, 整数 ipower)
 {
     const ocl::Device & d = ocl::Device::getDefault();
-    int type = _src.type(), depth = CV_MAT_DEPTH(type), cn = CV_MAT_CN(type),
+    整数 type = _src.type(), depth = CV_MAT_DEPTH(type), cn = CV_MAT_CN(type),
             rowsPerWI = d.isIntel() ? 4 : 1;
     bool doubleSupport = d.doubleFPConfig() > 0;
 
     _dst.createSameSize(_src, type);
-    if (is_ipower)
+    もし (is_ipower)
     {
-        if( ipower < 0 )
+        もし( ipower < 0 )
         {
-            if( depth == CV_32F || depth == CV_64F )
+            もし( depth == CV_32F || depth == CV_64F )
                 is_ipower = false;
-            else
-                return false;
+            否则
+                戻る false;
         }
     }
 
-    if (depth == CV_64F && !doubleSupport)
-        return false;
+    もし (depth == CV_64F && !doubleSupport)
+        戻る false;
 
     bool issqrt = std::abs(power - 0.5) < DBL_EPSILON;
     const char * const op = issqrt ? "OP_SQRT" : is_ipower ? "OP_POWN" : "OP_POW";
@@ -921,12 +921,12 @@ static bool ocl_pow(InputArray _src, double power, OutputArray _dst,
     // Note: channels are unrolled
 
     std::string extra_opts ="";
-    if (is_ipower)
+    もし (is_ipower)
     {
-        int wdepth = CV_32F;
-        if (depth == CV_64F)
+        整数 wdepth = CV_32F;
+        もし (depth == CV_64F)
             wdepth = CV_64F;
-        else if (depth == CV_16F)
+        否则 もし (depth == CV_16F)
             wdepth = CV_16F;
 
         char cvt[2][50];
@@ -953,8 +953,8 @@ static bool ocl_pow(InputArray _src, double power, OutputArray _dst,
                          " -D UNARY_OP=1",
                          extra_opts.empty() ? "" : extra_opts.c_str(),
                          doubleSupport ? " -D DOUBLE_SUPPORT" : ""));
-    if (k.empty())
-        return false;
+    もし (k.empty())
+        戻る false;
 
     UMat src = _src.getUMat();
     _dst.createSameSize(src, type);
@@ -963,20 +963,20 @@ static bool ocl_pow(InputArray _src, double power, OutputArray _dst,
     ocl::KernelArg srcarg = ocl::KernelArg::ReadOnlyNoSize(src),
             dstarg = ocl::KernelArg::WriteOnly(dst, cn);
 
-    if (issqrt)
+    もし (issqrt)
         k.args(srcarg, dstarg);
-    else if (is_ipower)
+    否则 もし (is_ipower)
         k.args(srcarg, dstarg, ipower);
-    else
+    否则
     {
-        if (depth == CV_32F)
+        もし (depth == CV_32F)
             k.args(srcarg, dstarg, (float)power);
-        else
+        否则
             k.args(srcarg, dstarg, power);
     }
 
     size_t globalsize[2] = { (size_t)dst.cols *  cn, ((size_t)dst.rows + rowsPerWI - 1) / rowsPerWI };
-    return k.run(2, globalsize, NULL, false);
+    戻る k.run(2, globalsize, NULL, false);
 }
 
 #endif
@@ -985,27 +985,27 @@ void pow( InputArray _src, double power, OutputArray _dst )
 {
     CV_INSTRUMENT_REGION();
 
-    int type = _src.type(), depth = CV_MAT_DEPTH(type),
+    整数 type = _src.type(), depth = CV_MAT_DEPTH(type),
             cn = CV_MAT_CN(type), ipower = cvRound(power);
     bool is_ipower = fabs(ipower - power) < DBL_EPSILON;
 #ifdef HAVE_OPENCL
     bool useOpenCL = _dst.isUMat() && _src.dims() <= 2;
 #endif
 
-    if (is_ipower)
+    もし (is_ipower)
     {
         switch( ipower )
         {
         case 0:
             _dst.createSameSize(_src, type);
             _dst.setTo(Scalar::all(1));
-            return;
+            戻る;
         case 1:
             _src.copyTo(_dst);
-            return;
+            戻る;
         case 2:
             multiply(_src, _src, _dst);
-            return;
+            戻る;
         }
     }
 
@@ -1018,7 +1018,7 @@ void pow( InputArray _src, double power, OutputArray _dst )
     // Everything else - any power on a float array, a fractional power on an integer one (computed
     // in the float domain and saturated back), plus the 32U/64-bit depths iPow never supported -
     // goes through the engine below.
-    if( is_ipower && !floatDepth && ipowTab[depth] )
+    もし( is_ipower && !floatDepth && ipowTab[depth] )
     {
         Mat src = _src.getMat();
         _dst.createSameSize(_src, type);
@@ -1027,12 +1027,12 @@ void pow( InputArray _src, double power, OutputArray _dst )
         const Mat* arrays[] = {&src, &dst, 0};
         uchar* ptrs[2] = {};
         NAryMatIterator it(arrays, ptrs);
-        int len = (int)(it.size*cn);
+        整数 len = (整数)(it.size*cn);
         IPowFunc func = ipowTab[depth];
 
-        for( size_t i = 0; i < it.nplanes; i++, ++it )
+        ために( size_t i = 0; i < it.nplanes; i++, ++it )
             func( ptrs[0], ptrs[1], len, ipower );
-        return;
+        戻る;
     }
 
     // The engine path, two tiers like math_op: the pow kernel special-cases the exponents
@@ -1041,14 +1041,14 @@ void pow( InputArray _src, double power, OutputArray _dst )
     Mat src = _src.getMat();
     _dst.createSameSize(_src, type);
     Mat dst = _dst.getMat();
-    if (src.empty())
-        return;
+    もし (src.empty())
+        戻る;
 
     const size_t total = src.total() * cn;
-    if (floatDepth && src.isContinuous() && dst.isContinuous() && total <= (size_t)MATH_OP_SMALL)
+    もし (floatDepth && src.isContinuous() && dst.isContinuous() && total <= (size_t)MATH_OP_SMALL)
     {
         ew::TKernel k = ew::getPowFunc(depth, depth);
-        if (k.fptr)
+        もし (k.fptr)
         {
             double pvstore;                    // the broadcast exponent, stored as T
             void* pv = &pvstore;
@@ -1061,15 +1061,15 @@ void pow( InputArray _src, double power, OutputArray _dst )
             }
             static const double noparams[4] = {};
             k.fptr(src.data, 0, 1, pv, 0, 0, nullptr, 0, 0,
-                   dst.data, 0, (int)total, 1, noparams, k.flags, k.userdata);
-            return;
+                   dst.data, 0, (整数)total, 1, noparams, k.flags, k.userdata);
+            戻る;
         }
     }
 
     ew::TExpr prog;
-    const int a = prog.addInput(depth);
-    const int c = prog.addConst(ew::EW_DEPTH_NONE, Scalar(power), 1);
-    const int out = prog.addOutput(depth);
+    const 整数 a = prog.addInput(depth);
+    const 整数 c = prog.addConst(ew::EW_DEPTH_NONE, Scalar(power), 1);
+    const 整数 out = prog.addOutput(depth);
     prog.moveToOutput(prog.emitBinary(ew::OP_POW, a, c, depth), out);
     prog.compile();
     const Mat* inputs[] = { &src };
@@ -1080,17 +1080,17 @@ void sqrt(InputArray a, OutputArray b)
 {
     CV_INSTRUMENT_REGION();
 
-    if (b.isUMat() && a.dims() <= 2)     // the OpenCL route (via ocl_pow) is unchanged
+    もし (b.isUMat() && a.dims() <= 2)     // the OpenCL route (via ocl_pow) is unchanged
     {
         cv::pow(a, 0.5, b);
-        return;
+        戻る;
     }
     math_op(ew::OP_SQRT, a, b);
 }
 
 /************************** CheckArray for NaN's, Inf's *********************************/
 
-template<int cv_mat_type> struct mat_type_assotiations{};
+template<整数 cv_mat_type> struct mat_type_assotiations{};
 
 template<> struct mat_type_assotiations<CV_8U>
 {
@@ -1121,43 +1121,43 @@ template<> struct mat_type_assotiations<CV_16S>
 
 template<> struct mat_type_assotiations<CV_32S>
 {
-    typedef int type;
+    typedef 整数 type;
     static const type min_allowable = (-INT_MAX - 1);
     static const type max_allowable = INT_MAX;
 };
 
-template<int depth>
-static bool checkIntegerRange(cv::Mat src, Point& bad_pt, int minVal, int maxVal)
+template<整数 depth>
+static bool checkIntegerRange(cv::Mat src, Point& bad_pt, 整数 minVal, 整数 maxVal)
 {
     typedef mat_type_assotiations<depth> type_ass;
 
-    if (minVal < type_ass::min_allowable && maxVal > type_ass::max_allowable)
+    もし (minVal < type_ass::min_allowable && maxVal > type_ass::max_allowable)
     {
-        return true;
+        戻る true;
     }
-    else if (minVal > type_ass::max_allowable || maxVal < type_ass::min_allowable || maxVal < minVal)
+    否则 もし (minVal > type_ass::max_allowable || maxVal < type_ass::min_allowable || maxVal < minVal)
     {
         bad_pt = cv::Point(0,0);
-        return false;
+        戻る false;
     }
     cv::Mat as_one_channel = src.reshape(1,0);
 
-    for (int j = 0; j < as_one_channel.rows; ++j)
-        for (int i = 0; i < as_one_channel.cols; ++i)
+    ために (整数 j = 0; j < as_one_channel.rows; ++j)
+        ために (整数 i = 0; i < as_one_channel.cols; ++i)
         {
             typename type_ass::type v = as_one_channel.at<typename type_ass::type>(j ,i);
-            if (v < minVal || v > maxVal)
+            もし (v < minVal || v > maxVal)
             {
                 bad_pt.y = j;
                 bad_pt.x = i / src.channels();
-                return false;
+                戻る false;
             }
         }
 
-    return true;
+    戻る true;
 }
 
-typedef bool (*check_range_function)(cv::Mat src, Point& bad_pt, int minVal, int maxVal);
+typedef bool (*check_range_function)(cv::Mat src, Point& bad_pt, 整数 minVal, 整数 maxVal);
 
 check_range_function check_range_functions[] =
 {
@@ -1171,20 +1171,20 @@ check_range_function check_range_functions[] =
 template<typename T>
 static void checkTypedRange(Mat& src, Point& badPt, double minVal, double maxVal)
 {
-    int loc = 0;
-    int cn = src.channels();
+    整数 loc = 0;
+    整数 cn = src.channels();
     Size size = getContinuousSize2D(src, cn);
     const T* isrc = src.ptr<T>();
     size_t step = src.step / sizeof(isrc[0]);
 
-    for( ; badPt.x < 0 && size.height--; loc += size.width, isrc += step )
+    ために( ; badPt.x < 0 && size.height--; loc += size.width, isrc += step )
     {
-        for( int i = 0; i < size.width; i++ )
+        ために( 整数 i = 0; i < size.width; i++ )
         {
             double val = (double)isrc[i];
-            if( !(val >= minVal && val < maxVal) )
+            もし( !(val >= minVal && val < maxVal) )
             {
-                int pixelId = (loc + i) / cn;
+                整数 pixelId = (loc + i) / cn;
                 badPt = Point(pixelId % src.cols, pixelId / src.cols);
                 break;
             }
@@ -1198,7 +1198,7 @@ bool checkRange(InputArray _src, bool quiet, Point* pt, double minVal, double ma
 
     Mat src = _src.getMat();
 
-    if ( src.dims > 2 )
+    もし ( src.dims > 2 )
     {
         CV_Assert(pt == NULL); // no way to provide location info
 
@@ -1206,45 +1206,45 @@ bool checkRange(InputArray _src, bool quiet, Point* pt, double minVal, double ma
         Mat planes[1];
         NAryMatIterator it(arrays, planes);
 
-        for ( size_t i = 0; i < it.nplanes; i++, ++it )
+        ために ( size_t i = 0; i < it.nplanes; i++, ++it )
         {
-            if (!checkRange( it.planes[0], quiet, NULL, minVal, maxVal ))
+            もし (!checkRange( it.planes[0], quiet, NULL, minVal, maxVal ))
             {
-                return false;
+                戻る false;
             }
         }
-        return true;
+        戻る true;
     }
 
-    int depth = src.depth();
+    整数 depth = src.depth();
     Point badPt(-1, -1);
 
-    if (depth < CV_32F)
+    もし (depth < CV_32F)
     {
-        int minVali = minVal <= INT_MIN ? INT_MIN : cvFloor(minVal);
-        int maxVali = maxVal > INT_MAX ? INT_MAX : cvCeil(maxVal) - 1;
+        整数 minVali = minVal <= INT_MIN ? INT_MIN : cvFloor(minVal);
+        整数 maxVali = maxVal > INT_MAX ? INT_MAX : cvCeil(maxVal) - 1;
 
         (check_range_functions[depth])(src, badPt, minVali, maxVali);
     }
-    else
+    否则
     {
-        int i, loc = 0;
-        int cn = src.channels();
+        整数 i, loc = 0;
+        整数 cn = src.channels();
         Size size = getContinuousSize2D(src, cn);
 
-        if( depth == CV_16F )
+        もし( depth == CV_16F )
         {
             checkTypedRange<hfloat>(src, badPt, minVal, maxVal);
         }
-        else if( depth == CV_16BF )
+        否则 もし( depth == CV_16BF )
         {
             checkTypedRange<bfloat>(src, badPt, minVal, maxVal);
         }
-        else if( depth == CV_32F )
+        否则 もし( depth == CV_32F )
         {
             Cv32suf a, b;
-            int ia, ib;
-            const int* isrc = src.ptr<int>();
+            整数 ia, ib;
+            const 整数* isrc = src.ptr<整数>();
             size_t step = src.step/sizeof(isrc[0]);
 
             a.f = (float)std::max(minVal, (double)-FLT_MAX);
@@ -1253,23 +1253,23 @@ bool checkRange(InputArray _src, bool quiet, Point* pt, double minVal, double ma
             ia = CV_TOGGLE_FLT(a.i);
             ib = CV_TOGGLE_FLT(b.i);
 
-            for( ; badPt.x < 0 && size.height--; loc += size.width, isrc += step )
+            ために( ; badPt.x < 0 && size.height--; loc += size.width, isrc += step )
             {
-                for( i = 0; i < size.width; i++ )
+                ために( i = 0; i < size.width; i++ )
                 {
-                    int val = isrc[i];
+                    整数 val = isrc[i];
                     val = CV_TOGGLE_FLT(val);
 
-                    if( val < ia || val >= ib )
+                    もし( val < ia || val >= ib )
                     {
-                        int pixelId = (loc + i) / cn;
+                        整数 pixelId = (loc + i) / cn;
                         badPt = Point(pixelId % src.cols, pixelId / src.cols);
                         break;
                     }
                 }
             }
         }
-        else if( depth == CV_64F )
+        否则 もし( depth == CV_64F )
         {
             Cv64suf a, b;
             int64 ia, ib;
@@ -1282,58 +1282,58 @@ bool checkRange(InputArray _src, bool quiet, Point* pt, double minVal, double ma
             ia = CV_TOGGLE_DBL(a.i);
             ib = CV_TOGGLE_DBL(b.i);
 
-            for( ; badPt.x < 0 && size.height--; loc += size.width, isrc += step )
+            ために( ; badPt.x < 0 && size.height--; loc += size.width, isrc += step )
             {
-                for( i = 0; i < size.width; i++ )
+                ために( i = 0; i < size.width; i++ )
                 {
                     int64 val = isrc[i];
                     val = CV_TOGGLE_DBL(val);
 
-                    if( val < ia || val >= ib )
+                    もし( val < ia || val >= ib )
                     {
-                        int pixelId = (loc + i) / cn;
+                        整数 pixelId = (loc + i) / cn;
                         badPt = Point(pixelId % src.cols, pixelId / src.cols);
                         break;
                     }
                 }
             }
         }
-        else if( depth == CV_Bool )
+        否则 もし( depth == CV_Bool )
         {
             checkTypedRange<uchar>(src, badPt, minVal, maxVal);
         }
-        else if( depth == CV_32U )
+        否则 もし( depth == CV_32U )
         {
             checkTypedRange<uint32_t>(src, badPt, minVal, maxVal);
         }
-        else if( depth == CV_64U )
+        否则 もし( depth == CV_64U )
         {
             checkTypedRange<uint64_t>(src, badPt, minVal, maxVal);
         }
-        else if( depth == CV_64S )
+        否则 もし( depth == CV_64S )
         {
             checkTypedRange<int64_t>(src, badPt, minVal, maxVal);
         }
-        else
+        否则
         {
             CV_Error(Error::StsUnsupportedFormat, "Unsupported matrix depth in checkRange");
         }
     }
 
-    if( badPt.x >= 0 )
+    もし( badPt.x >= 0 )
     {
-        if( pt )
+        もし( pt )
             *pt = badPt;
-        if( !quiet )
+        もし( !quiet )
         {
             cv::String value_str;
             value_str << src(cv::Range(badPt.y, badPt.y + 1), cv::Range(badPt.x, badPt.x + 1));
             CV_Error_( cv::Error::StsOutOfRange,
             ("the value at (%d, %d)=%s is out of range [%f, %f)", badPt.x, badPt.y, value_str.c_str(), minVal, maxVal));
         }
-        return false;
+        戻る false;
     }
-    return true;
+    戻る true;
 }
 
 } // namespace cv
@@ -1362,13 +1362,13 @@ bool checkRange(InputArray _src, bool quiet, Point* pt, double minVal, double ma
   -----------------------------------------------------------------------
 */
 
-int cv::solveCubic( InputArray _coeffs, OutputArray _roots )
+整数 cv::solveCubic( InputArray _coeffs, OutputArray _roots )
 {
     CV_INSTRUMENT_REGION();
 
-    const int n0 = 3;
+    const 整数 n0 = 3;
     Mat coeffs = _coeffs.getMat();
-    int ctype = coeffs.type();
+    整数 ctype = coeffs.type();
 
     CV_Assert( ctype == CV_32F || ctype == CV_64F );
     CV_Assert( (coeffs.size() == Size(n0, 1) ||
@@ -1379,23 +1379,23 @@ int cv::solveCubic( InputArray _coeffs, OutputArray _roots )
     _roots.create(n0, 1, ctype, -1, true, _OutputArray::DEPTH_MASK_FLT);
     Mat roots = _roots.getMat();
 
-    int i = -1, n = 0;
+    整数 i = -1, n = 0;
     double a0 = 1., a1, a2, a3;
     double x0 = 0., x1 = 0., x2 = 0.;
-    int ncoeffs = coeffs.rows + coeffs.cols - 1;
+    整数 ncoeffs = coeffs.rows + coeffs.cols - 1;
 
-    if( ctype == CV_32FC1 )
+    もし( ctype == CV_32FC1 )
     {
-        if( ncoeffs == 4 )
+        もし( ncoeffs == 4 )
             a0 = coeffs.at<float>(++i);
 
         a1 = coeffs.at<float>(i+1);
         a2 = coeffs.at<float>(i+2);
         a3 = coeffs.at<float>(i+3);
     }
-    else
+    否则
     {
-        if( ncoeffs == 4 )
+        もし( ncoeffs == 4 )
             a0 = coeffs.at<double>(++i);
 
         a1 = coeffs.at<double>(i+1);
@@ -1408,38 +1408,38 @@ int cv::solveCubic( InputArray _coeffs, OutputArray _roots )
     double max_coeff = std::max({std::abs(a0), std::abs(a1), std::abs(a2), std::abs(a3)});
 
     // If max_coeff is effectively zero, the equation is 0=0
-    if (max_coeff < std::numeric_limits<double>::epsilon())
-        return -1;
+    もし (max_coeff < std::numeric_limits<double>::epsilon())
+        戻る -1;
 
     // Check if the cubic term is negligible relative to the largest coefficient
-    if( std::abs(a0) < std::numeric_limits<double>::epsilon() * max_coeff )
+    もし( std::abs(a0) < std::numeric_limits<double>::epsilon() * max_coeff )
     {
-        if( std::abs(a1) < std::numeric_limits<double>::epsilon() * max_coeff )
+        もし( std::abs(a1) < std::numeric_limits<double>::epsilon() * max_coeff )
         {
-            if( std::abs(a2) < std::numeric_limits<double>::epsilon() * max_coeff )
+            もし( std::abs(a2) < std::numeric_limits<double>::epsilon() * max_coeff )
                 n = std::abs(a3) < std::numeric_limits<double>::epsilon() * max_coeff ? -1 : 0;
-            else
+            否则
             {
                 // linear equation
                 x0 = -a3/a2;
                 n = 1;
             }
         }
-        else
+        否则
         {
             // quadratic equation
             double d = a2*a2 - 4*a1*a3;
-            if( d >= 0 )
+            もし( d >= 0 )
             {
                 d = std::sqrt(d);
                 double q1 = (-a2 + d) * 0.5;
                 double q2 = (a2 + d) * -0.5;
-                if( std::abs(q1) > std::abs(q2) )
+                もし( std::abs(q1) > std::abs(q2) )
                 {
                     x0 = q1 / a1;
                     x1 = a3 / q1;
                 }
-                else
+                否则
                 {
                     x0 = q2 / a1;
                     x1 = a3 / q2;
@@ -1448,7 +1448,7 @@ int cv::solveCubic( InputArray _coeffs, OutputArray _roots )
             }
         }
     }
-    else
+    否则
     {
         // cubic equation
         // Normalize coefficients in-place to prevent overflow/instability
@@ -1476,7 +1476,7 @@ int cv::solveCubic( InputArray _coeffs, OutputArray _roots )
         */
         double d = (a1 * a1 * (a2 * a2 - 4 * a1 * a3) + 2 * a2 * (9 * a1 * a3 - 2 * a2 * a2) - 27 * a3 * a3) * (1./108);
 
-        if( d > 0 )
+        もし( d > 0 )
         {
             double theta = acos(R / sqrt(Qcubed));
             double sqrtQ = sqrt(Q);
@@ -1488,7 +1488,7 @@ int cv::solveCubic( InputArray _coeffs, OutputArray _roots )
             x2 = t0 * cos(t1 + (4.*CV_PI/3)) - t2;
             n = 3;
         }
-        else if( d == 0 )
+        否则 もし( d == 0 )
         {
             x0 = -2*std::cbrt(R) - a1/3;
             x1 = std::cbrt(R) - a1/3;
@@ -1496,52 +1496,52 @@ int cv::solveCubic( InputArray _coeffs, OutputArray _roots )
             n = x0 == x1 ? 1 : 2;
             x1 = x0 == x1 ? 0 : x1;
         }
-        else
+        否则
         {
             double e;
             d = sqrt(-d);
             e = std::cbrt(d + fabs(R));
-            if( R > 0 )
+            もし( R > 0 )
                 e = -e;
             x0 = (e + Q / e) - a1 * (1./3);
             n = 1;
         }
     }
 
-    if( roots.type() == CV_32FC1 )
+    もし( roots.type() == CV_32FC1 )
     {
         roots.at<float>(0) = (float)x0;
         roots.at<float>(1) = (float)x1;
         roots.at<float>(2) = (float)x2;
     }
-    else
+    否则
     {
         roots.at<double>(0) = x0;
         roots.at<double>(1) = x1;
         roots.at<double>(2) = x2;
     }
 
-    return n;
+    戻る n;
 }
 
 /* finds complex roots of a polynomial using Durand-Kerner method:
    http://en.wikipedia.org/wiki/Durand%E2%80%93Kerner_method */
-double cv::solvePoly( InputArray _coeffs0, OutputArray _roots0, int maxIters )
+double cv::solvePoly( InputArray _coeffs0, OutputArray _roots0, 整数 maxIters )
 {
     CV_INSTRUMENT_REGION();
 
     typedef Complex<double> C;
 
     double maxDiff = 0;
-    int iter, i, j;
+    整数 iter, i, j;
     Mat coeffs0 = _coeffs0.getMat();
-    int ctype = _coeffs0.type();
-    int cdepth = CV_MAT_DEPTH(ctype);
+    整数 ctype = _coeffs0.type();
+    整数 cdepth = CV_MAT_DEPTH(ctype);
 
     CV_Assert( CV_MAT_DEPTH(ctype) >= CV_32F && CV_MAT_CN(ctype) <= 2 );
     CV_Assert( (coeffs0.rows == 1 || coeffs0.cols == 1) && coeffs0.total() >= 2 );
 
-    int n0 = coeffs0.cols + coeffs0.rows - 2, n = n0;
+    整数 n0 = coeffs0.cols + coeffs0.rows - 2, n = n0;
 
     _roots0.create(n, 1, CV_MAKETYPE(cdepth, 2), -1, true, _OutputArray::DEPTH_MASK_FLT);
     Mat roots0 = _roots0.getMat();
@@ -1550,16 +1550,16 @@ double cv::solvePoly( InputArray _coeffs0, OutputArray _roots0, int maxIters )
     C *coeffs = buf.data(), *roots = coeffs + n + 1;
     Mat coeffs1(coeffs0.size(), CV_MAKETYPE(CV_64F, coeffs0.channels()), coeffs0.channels() == 2 ? coeffs : roots);
     coeffs0.convertTo(coeffs1, coeffs1.type());
-    if( coeffs0.channels() == 1 )
+    もし( coeffs0.channels() == 1 )
     {
         const double* rcoeffs = (const double*)roots;
-        for( i = 0; i <= n; i++ )
+        ために( i = 0; i <= n; i++ )
             coeffs[i] = C(rcoeffs[i], 0);
     }
 
-    for( ; n > 1; n-- )
+    ために( ; n > 1; n-- )
     {
-        if( std::abs(coeffs[n].re) + std::abs(coeffs[n].im) > DBL_EPSILON )
+        もし( std::abs(coeffs[n].re) + std::abs(coeffs[n].im) > DBL_EPSILON )
             break;
     }
     CV_Assert( std::abs(coeffs[n].re) + std::abs(coeffs[n].im) > DBL_EPSILON );
@@ -1569,25 +1569,25 @@ double cv::solvePoly( InputArray _coeffs0, OutputArray _roots0, int maxIters )
     // https://link.springer.com/article/10.1007/BF01935059
     // We put the initial points equidistantly on a circle on the complex plane. This code computes the circle radius as in the paper.
     Mat absCoeffs(n + 1, 1, CV_64F);
-    for( i = 0; i <= n; i++ )
+    ために( i = 0; i <= n; i++ )
         absCoeffs.at<double>(i) = abs(coeffs[i]);
 
-    int nonZeroCoeffs = 0;
+    整数 nonZeroCoeffs = 0;
     Mat u(n, 1, CV_64F, Scalar(0)), v(n, 1, CV_64F, Scalar(0));
-    for( i = 0; i <= n; i++ )
+    ために( i = 0; i <= n; i++ )
     {
         double coeff = absCoeffs.at<double>(i);
-        if( coeff > DBL_EPSILON )
+        もし( coeff > DBL_EPSILON )
         {
-            if( i != n )
+            もし( i != n )
                 u.at<double>(i) = 2.0 * pow(coeff / absCoeffs.at<double>(n), 1.0 / (n - i));
-            if( i != 0 )
+            もし( i != 0 )
                 v.at<double>(i - 1) = 0.5 * pow(absCoeffs.at<double>(0) / coeff, 1.0 / i);
             nonZeroCoeffs++;
         }
     }
     double scale = 1;
-    if( nonZeroCoeffs > 2 )
+    もし( nonZeroCoeffs > 2 )
     {
         Point maxU, minV;
         minMaxLoc(u, nullptr, nullptr, nullptr, &maxU);
@@ -1599,40 +1599,40 @@ double cv::solvePoly( InputArray _coeffs0, OutputArray _roots0, int maxIters )
 
     C p(scale, 0), r(cos(CV_2PI / n), sin(CV_2PI / n));
 
-    for( i = 0; i < n; i++ )
+    ために( i = 0; i < n; i++ )
     {
         roots[i] = p;
         p = p * r;
     }
 
     maxIters = maxIters <= 0 ? 1000 : maxIters;
-    for( iter = 0; iter < maxIters; iter++ )
+    ために( iter = 0; iter < maxIters; iter++ )
     {
         maxDiff = 0;
-        for( i = 0; i < n; i++ )
+        ために( i = 0; i < n; i++ )
         {
             p = roots[i];
             C num = coeffs[n], denom = coeffs[n];
-            int num_same_root = 1;
-            for( j = 0; j < n; j++ )
+            整数 num_same_root = 1;
+            ために( j = 0; j < n; j++ )
             {
                 num = num*p + coeffs[n-j-1];
-                if( j != i )
+                もし( j != i )
                 {
-                    if ( (p - roots[j]).re != 0 || (p - roots[j]).im != 0 )
+                    もし ( (p - roots[j]).re != 0 || (p - roots[j]).im != 0 )
                         denom = denom * (p - roots[j]);
-                    else
+                    否则
                         num_same_root++;
                 }
             }
             num /= denom;
-            if( num_same_root > 1)
+            もし( num_same_root > 1)
             {
                 double old_num_re = num.re;
                 double old_num_im = num.im;
-                int square_root_times = num_same_root % 2 == 0 ? num_same_root / 2 : num_same_root / 2 - 1;
+                整数 square_root_times = num_same_root % 2 == 0 ? num_same_root / 2 : num_same_root / 2 - 1;
 
-                for( j = 0; j < square_root_times; j++)
+                ために( j = 0; j < square_root_times; j++)
                 {
                     num.re = old_num_re*old_num_re + old_num_im*old_num_im;
                     num.re = sqrt(num.re);
@@ -1643,10 +1643,10 @@ double cv::solvePoly( InputArray _coeffs0, OutputArray _roots0, int maxIters )
 
                     num.im /= 2;
                     num.im = sqrt(num.im);
-                    if( old_num_re < 0 ) num.im = -num.im;
+                    もし( old_num_re < 0 ) num.im = -num.im;
                 }
 
-                if( num_same_root % 2 != 0){
+                もし( num_same_root % 2 != 0){
                     Mat cube_coefs(4, 1, CV_64FC1);
                     Mat cube_roots(3, 1, CV_64FC2);
                     cube_coefs.at<double>(3) = -(std::pow(old_num_re, 3));
@@ -1662,23 +1662,23 @@ double cv::solvePoly( InputArray _coeffs0, OutputArray _roots0, int maxIters )
             roots[i] = p - num;
             maxDiff = std::max(maxDiff, cv::abs(num));
         }
-        if( maxDiff <= 0 )
+        もし( maxDiff <= 0 )
             break;
     }
 
-    if( coeffs0.channels() == 1 )
+    もし( coeffs0.channels() == 1 )
     {
         const double verySmallEps = 1e-100;
-        for( i = 0; i < n; i++ )
-            if( fabs(roots[i].im) < verySmallEps )
+        ために( i = 0; i < n; i++ )
+            もし( fabs(roots[i].im) < verySmallEps )
                 roots[i].im = 0;
     }
 
-    for( ; n < n0; n++ )
+    ために( ; n < n0; n++ )
         roots[n+1] = roots[n];
 
     Mat(roots0.size(), CV_64FC2, roots).convertTo(roots0, roots0.type());
-    return maxDiff;
+    戻る maxDiff;
 }
 
 

@@ -8,28 +8,28 @@ from common import remove_comments, getTokens, getParameters, postProcessParamet
 
 
 try:
-    if len(sys.argv) > 1:
+    もし len(sys.argv) > 1:
         f = open(sys.argv[1], "r")
-    else:
+    否则:
         f = sys.stdin
 except:
     sys.exit("ERROR. Can't open input file")
 
 fns = []
 
-while True:
+ながら True:
     line = f.readline()
-    if len(line) == 0:
+    もし len(line) == 0:
         break
     assert isinstance(line, str)
     line = line.strip()
-    if line.startswith('CLFFTAPI'):
+    もし line.startswith('CLFFTAPI'):
         line = re.sub(r'\n', r'', line)
-        while True:
+        ながら True:
             nl = f.readline()
             nl = nl.strip()
             nl = re.sub(r'\n', r'', nl)
-            if len(nl) == 0:
+            もし len(nl) == 0:
                 break;
             line += ' ' + nl
 
@@ -43,16 +43,16 @@ while True:
         calling = []
 
         i = 0
-        while True:
-            if parts[i] == "CLFFTAPI":
+        ながら True:
+            もし parts[i] == "CLFFTAPI":
                 modifiers.append(parts[i])
-            else:
+            否则:
                 break
             i += 1
-        while (i < len(parts)):
-            if not parts[i] == '(':
+        ながら (i < len(parts)):
+            もし not parts[i] == '(':
                 ret.append(parts[i])
-            else:
+            否则:
                 del ret[-1]
                 i -= 1
                 break
@@ -68,7 +68,7 @@ while True:
 
         params = getParameters(i, parts)
 
-        if len(params) > 0 and params[0] == 'void':
+        もし len(params) > 0 and params[0] == 'void':
             del params[0]
 
         fn['params'] = params

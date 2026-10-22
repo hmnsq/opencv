@@ -51,7 +51,7 @@ namespace cv
 using std::vector;
 
 #ifdef ALEX_DEBUG
-static void print_simplex_state(const Mat& c,const Mat& b,double v,const std::vector<int> N,const std::vector<int> B){
+static void print_simplex_state(const Mat& c,const Mat& b,double v,const std::vector<整数> N,const std::vector<整数> B){
     printf("\tprint simplex state\n");
 
     printf("v=%g\n",v);
@@ -70,7 +70,7 @@ static void print_simplex_state(const Mat& c,const Mat& b,double v,const std::ve
     print(Mat(B));
     printf("\n");
 }
-#else
+#否则
 #define print_simplex_state(c,b,v,N,B)
 #endif
 
@@ -80,17 +80,17 @@ static void print_simplex_state(const Mat& c,const Mat& b,double v,const std::ve
  it also initializes N and B and does not make any assumptions about their init values
  * @return SOLVELP_UNFEASIBLE if problem is unfeasible, 0 if feasible.
 */
-static int initialize_simplex(Mat_<double>& c, Mat_<double>& b,double& v,vector<int>& N,vector<int>& B,vector<unsigned int>& indexToRow);
-static inline void pivot(Mat_<double>& c,Mat_<double>& b,double& v,vector<int>& N,vector<int>& B,int leaving_index,
-        int entering_index,vector<unsigned int>& indexToRow);
+static 整数 initialize_simplex(Mat_<double>& c, Mat_<double>& b,double& v,vector<整数>& N,vector<整数>& B,vector<unsigned 整数>& indexToRow);
+static inline void pivot(Mat_<double>& c,Mat_<double>& b,double& v,vector<整数>& N,vector<整数>& B,整数 leaving_index,
+        整数 entering_index,vector<unsigned 整数>& indexToRow);
 /**@return SOLVELP_UNBOUNDED means the problem is unbdd, SOLVELP_MULTI means multiple solutions, SOLVELP_SINGLE means one solution.
  */
-static int inner_simplex(Mat_<double>& c, Mat_<double>& b,double& v,vector<int>& N,vector<int>& B,vector<unsigned int>& indexToRow);
-static void swap_columns(Mat_<double>& A,int col1,int col2);
+static 整数 inner_simplex(Mat_<double>& c, Mat_<double>& b,double& v,vector<整数>& N,vector<整数>& B,vector<unsigned 整数>& indexToRow);
+static void swap_columns(Mat_<double>& A,整数 col1,整数 col2);
 #define SWAP(type,a,b) {type tmp=(a);(a)=(b);(b)=tmp;}
 
 //return codes:-2 (no_sol - unbdd),-1(no_sol - unfsbl), 0(single_sol), 1(multiple_sol=>least_l2_norm)
-int solveLP(InputArray Func_, InputArray Constr_, OutputArray z_, double constr_eps)
+整数 solveLP(InputArray Func_, InputArray Constr_, OutputArray z_, double constr_eps)
 {
     dprintf(("call to solveLP\n"));
 
@@ -99,7 +99,7 @@ int solveLP(InputArray Func_, InputArray Constr_, OutputArray z_, double constr_
     CV_Assert(Constr_.type()==CV_64FC1 || Constr_.type()==CV_32FC1);
     CV_Assert((Func_.rows()==1 && (Constr_.cols()-Func_.cols()==1))||
             (Func_.cols()==1 && (Constr_.cols()-Func_.rows()==1)));
-    if (z_.fixedType())
+    もし (z_.fixedType())
         CV_CheckType(z_.type(), z_.type() == CV_64FC1 || z_.type() == CV_32FC1 || z_.type() == CV_32SC1, "");
 
     Mat Func = Func_.getMat();
@@ -108,36 +108,36 @@ int solveLP(InputArray Func_, InputArray Constr_, OutputArray z_, double constr_
     //copy arguments for we will shall modify them
     Mat_<double> bigC=Mat_<double>(1,(Func.rows==1?Func.cols:Func.rows)+1),
         bigB=Mat_<double>(Constr.rows,Constr.cols+1);
-    if(Func.rows==1){
+    もし(Func.rows==1){
         Func.convertTo(bigC.colRange(1,bigC.cols),CV_64FC1);
-    }else{
+    }否则{
         Mat FuncT=Func.t();
         FuncT.convertTo(bigC.colRange(1,bigC.cols),CV_64FC1);
     }
     Constr.convertTo(bigB.colRange(1,bigB.cols),CV_64FC1);
     double v=0;
-    vector<int> N,B;
-    vector<unsigned int> indexToRow;
+    vector<整数> N,B;
+    vector<unsigned 整数> indexToRow;
 
-    if(initialize_simplex(bigC,bigB,v,N,B,indexToRow)==SOLVELP_UNFEASIBLE){
-        return SOLVELP_UNFEASIBLE;
+    もし(initialize_simplex(bigC,bigB,v,N,B,indexToRow)==SOLVELP_UNFEASIBLE){
+        戻る SOLVELP_UNFEASIBLE;
     }
     Mat_<double> c=bigC.colRange(1,bigC.cols),
         b=bigB.colRange(1,bigB.cols);
 
-    int res=0;
-    if((res=inner_simplex(c,b,v,N,B,indexToRow))==SOLVELP_UNBOUNDED){
-        return SOLVELP_UNBOUNDED;
+    整数 res=0;
+    もし((res=inner_simplex(c,b,v,N,B,indexToRow))==SOLVELP_UNBOUNDED){
+        戻る SOLVELP_UNBOUNDED;
     }
 
     //return the optimal solution
     Mat z(c.cols,1,CV_64FC1);
     MatIterator_<double> it=z.begin<double>();
-    unsigned int nsize = (unsigned int)N.size();
-    for(int i=1;i<=c.cols;i++,it++){
-        if(indexToRow[i]<nsize){
+    unsigned 整数 nsize = (unsigned 整数)N.size();
+    ために(整数 i=1;i<=c.cols;i++,it++){
+        もし(indexToRow[i]<nsize){
             *it=0;
-        }else{
+        }否则{
             *it=b.at<double>(indexToRow[i]-nsize,b.cols-1);
         }
     }
@@ -149,60 +149,60 @@ int solveLP(InputArray Func_, InputArray Constr_, OutputArray z_, double constr_
     Mat constr_check = Constr.col(Constr.cols - 1) - prod;
     double min_value = 0.0;
     minMaxIdx(constr_check, &min_value);
-    if (min_value < -constr_eps)
+    もし (min_value < -constr_eps)
     {
-        return SOLVELP_LOST;
+        戻る SOLVELP_LOST;
     }
 
-    return res;
+    戻る res;
 }
 
-int solveLP(InputArray Func, InputArray Constr, OutputArray z)
+整数 solveLP(InputArray Func, InputArray Constr, OutputArray z)
 {
-    return solveLP(Func, Constr, z, 1e-12);
+    戻る solveLP(Func, Constr, z, 1e-12);
 }
 
-static int initialize_simplex(Mat_<double>& c, Mat_<double>& b,double& v,vector<int>& N,vector<int>& B,vector<unsigned int>& indexToRow){
+static 整数 initialize_simplex(Mat_<double>& c, Mat_<double>& b,double& v,vector<整数>& N,vector<整数>& B,vector<unsigned 整数>& indexToRow){
     N.resize(c.cols);
     N[0]=0;
-    for (std::vector<int>::iterator it = N.begin()+1 ; it != N.end(); ++it){
+    ために (std::vector<整数>::iterator it = N.begin()+1 ; it != N.end(); ++it){
         *it=it[-1]+1;
     }
     B.resize(b.rows);
-    B[0]=(int)N.size();
-    for (std::vector<int>::iterator it = B.begin()+1 ; it != B.end(); ++it){
+    B[0]=(整数)N.size();
+    ために (std::vector<整数>::iterator it = B.begin()+1 ; it != B.end(); ++it){
         *it=it[-1]+1;
     }
     indexToRow.resize(c.cols+b.rows);
     indexToRow[0]=0;
-    for (std::vector<unsigned int>::iterator it = indexToRow.begin()+1 ; it != indexToRow.end(); ++it){
+    ために (std::vector<unsigned 整数>::iterator it = indexToRow.begin()+1 ; it != indexToRow.end(); ++it){
         *it=it[-1]+1;
     }
     v=0;
 
-    int k=0;
+    整数 k=0;
     {
         double min=DBL_MAX;
-        for(int i=0;i<b.rows;i++){
-            if(b(i,b.cols-1)<min){
+        ために(整数 i=0;i<b.rows;i++){
+            もし(b(i,b.cols-1)<min){
                 min=b(i,b.cols-1);
                 k=i;
             }
         }
     }
 
-    if(b(k,b.cols-1)>=0){
+    もし(b(k,b.cols-1)>=0){
         N.erase(N.begin());
-        for (std::vector<unsigned int>::iterator it = indexToRow.begin()+1 ; it != indexToRow.end(); ++it){
+        ために (std::vector<unsigned 整数>::iterator it = indexToRow.begin()+1 ; it != indexToRow.end(); ++it){
             --(*it);
         }
-        return 0;
+        戻る 0;
     }
 
     Mat_<double> old_c=c.clone();
     c=0;
     c(0,0)=-1;
-    for(int i=0;i<b.rows;i++){
+    ために(整数 i=0;i<b.rows;i++){
         b(i,0)=-1;
     }
 
@@ -218,21 +218,21 @@ static int initialize_simplex(Mat_<double>& c, Mat_<double>& b,double& v,vector<
     dprintf(("\tAFTER INNER_SIMPLEX\n"));
     print_simplex_state(c,b,v,N,B);
 
-    unsigned int nsize = (unsigned int)N.size();
-    if(indexToRow[0]>=nsize){
-        int iterator_offset=indexToRow[0]-nsize;
-        if(b(iterator_offset,b.cols-1)>0){
-            return SOLVELP_UNFEASIBLE;
+    unsigned 整数 nsize = (unsigned 整数)N.size();
+    もし(indexToRow[0]>=nsize){
+        整数 iterator_offset=indexToRow[0]-nsize;
+        もし(b(iterator_offset,b.cols-1)>0){
+            戻る SOLVELP_UNFEASIBLE;
         }
         pivot(c,b,v,N,B,iterator_offset,0,indexToRow);
     }
 
-    vector<int>::iterator iterator;
+    vector<整数>::iterator iterator;
     {
-        int iterator_offset=indexToRow[0];
+        整数 iterator_offset=indexToRow[0];
         iterator=N.begin()+iterator_offset;
         std::iter_swap(iterator,N.begin());
-        SWAP(int,indexToRow[*iterator],indexToRow[0]);
+        SWAP(整数,indexToRow[*iterator],indexToRow[0]);
         swap_columns(c,iterator_offset,0);
         swap_columns(b,iterator_offset,0);
     }
@@ -243,15 +243,15 @@ static int initialize_simplex(Mat_<double>& c, Mat_<double>& b,double& v,vector<
     //start from 1, because we ignore x_0
     c=0;
     v=0;
-    for(int I=1;I<old_c.cols;I++){
-        if(indexToRow[I]<nsize){
+    ために(整数 I=1;I<old_c.cols;I++){
+        もし(indexToRow[I]<nsize){
             dprintf(("I=%d from nonbasic\n",I));
-            int iterator_offset=indexToRow[I];
+            整数 iterator_offset=indexToRow[I];
             c(0,iterator_offset)+=old_c(0,I);
             print_matrix(c);
-        }else{
+        }否则{
             dprintf(("I=%d from basic\n",I));
-            int iterator_offset=indexToRow[I]-nsize;
+            整数 iterator_offset=indexToRow[I]-nsize;
             c-=old_c(0,I)*b.row(iterator_offset).colRange(0,b.cols-1);
             v+=old_c(0,I)*b(iterator_offset,b.cols-1);
             print_matrix(c);
@@ -262,50 +262,50 @@ static int initialize_simplex(Mat_<double>& c, Mat_<double>& b,double& v,vector<
     print_simplex_state(c,b,v,N,B);
 
     N.erase(N.begin());
-    for (std::vector<unsigned int>::iterator it = indexToRow.begin()+1 ; it != indexToRow.end(); ++it){
+    ために (std::vector<unsigned 整数>::iterator it = indexToRow.begin()+1 ; it != indexToRow.end(); ++it){
         --(*it);
     }
-    return 0;
+    戻る 0;
 }
 
-static int inner_simplex(Mat_<double>& c, Mat_<double>& b,double& v,vector<int>& N,vector<int>& B,vector<unsigned int>& indexToRow){
+static 整数 inner_simplex(Mat_<double>& c, Mat_<double>& b,double& v,vector<整数>& N,vector<整数>& B,vector<unsigned 整数>& indexToRow){
 
-    for(;;){
+    ために(;;){
         MatIterator_<double> pos_ptr;
-        int e=-1,pos_ctr=0,min_var=INT_MAX;
+        整数 e=-1,pos_ctr=0,min_var=INT_MAX;
         bool all_nonzero=true;
-        for(pos_ptr=c.begin();pos_ptr!=c.end();pos_ptr++,pos_ctr++){
-            if(*pos_ptr==0){
+        ために(pos_ptr=c.begin();pos_ptr!=c.end();pos_ptr++,pos_ctr++){
+            もし(*pos_ptr==0){
                 all_nonzero=false;
             }
-            if(*pos_ptr>0){
-                if(N[pos_ctr]<min_var){
+            もし(*pos_ptr>0){
+                もし(N[pos_ctr]<min_var){
                     e=pos_ctr;
                     min_var=N[pos_ctr];
                 }
             }
         }
-        if(e==-1){
+        もし(e==-1){
             dprintf(("hello from e==-1\n"));
             print_matrix(c);
-            if(all_nonzero==true){
-                return SOLVELP_SINGLE;
-            }else{
-                return SOLVELP_MULTI;
+            もし(all_nonzero==true){
+                戻る SOLVELP_SINGLE;
+            }否则{
+                戻る SOLVELP_MULTI;
             }
         }
 
-        int l=-1;
+        整数 l=-1;
         min_var=INT_MAX;
         double min=DBL_MAX;
-        int row_it=0;
+        整数 row_it=0;
         MatIterator_<double> min_row_ptr=b.begin();
-        for(MatIterator_<double> it=b.begin();it!=b.end();it+=b.cols,row_it++){
+        ために(MatIterator_<double> it=b.begin();it!=b.end();it+=b.cols,row_it++){
             double myite=0;
             //check constraints, select the tightest one, reinforcing Bland's rule
-            if((myite=it[e])>0){
+            もし((myite=it[e])>0){
                 double val=it[b.cols-1]/myite;
-                if(val<min || (val==min && B[row_it]<min_var)){
+                もし(val<min || (val==min && B[row_it]<min_var)){
                     min_var=B[row_it];
                     min_row_ptr=it;
                     min=val;
@@ -313,8 +313,8 @@ static int inner_simplex(Mat_<double>& c, Mat_<double>& b,double& v,vector<int>&
                 }
             }
         }
-        if(l==-1){
-            return SOLVELP_UNBOUNDED;
+        もし(l==-1){
+            戻る SOLVELP_UNBOUNDED;
         }
         dprintf(("the tightest constraint is in row %d with %g\n",l,min));
 
@@ -331,24 +331,24 @@ static int inner_simplex(Mat_<double>& c, Mat_<double>& b,double& v,vector<int>&
     }
 }
 
-static inline void pivot(Mat_<double>& c,Mat_<double>& b,double& v,vector<int>& N,vector<int>& B,
-        int leaving_index,int entering_index,vector<unsigned int>& indexToRow){
+static inline void pivot(Mat_<double>& c,Mat_<double>& b,double& v,vector<整数>& N,vector<整数>& B,
+        整数 leaving_index,整数 entering_index,vector<unsigned 整数>& indexToRow){
     double Coef=b(leaving_index,entering_index);
-    for(int i=0;i<b.cols;i++){
-        if(i==entering_index){
+    ために(整数 i=0;i<b.cols;i++){
+        もし(i==entering_index){
             b(leaving_index,i)=1/Coef;
-        }else{
+        }否则{
             b(leaving_index,i)/=Coef;
         }
     }
 
-    for(int i=0;i<b.rows;i++){
-        if(i!=leaving_index){
+    ために(整数 i=0;i<b.rows;i++){
+        もし(i!=leaving_index){
             double coef=b(i,entering_index);
-            for(int j=0;j<b.cols;j++){
-                if(j==entering_index){
+            ために(整数 j=0;j<b.cols;j++){
+                もし(j==entering_index){
                     b(i,j)=-coef*b(leaving_index,j);
-                }else{
+                }否则{
                     b(i,j)-=(coef*b(leaving_index,j));
                 }
             }
@@ -357,22 +357,22 @@ static inline void pivot(Mat_<double>& c,Mat_<double>& b,double& v,vector<int>& 
 
     //objective function
     Coef=c(0,entering_index);
-    for(int i=0;i<(b.cols-1);i++){
-        if(i==entering_index){
+    ために(整数 i=0;i<(b.cols-1);i++){
+        もし(i==entering_index){
             c(0,i)=-Coef*b(leaving_index,i);
-        }else{
+        }否则{
             c(0,i)-=Coef*b(leaving_index,i);
         }
     }
     dprintf(("v was %g\n",v));
     v+=Coef*b(leaving_index,b.cols-1);
 
-    SWAP(int,N[entering_index],B[leaving_index]);
-    SWAP(int,indexToRow[N[entering_index]],indexToRow[B[leaving_index]]);
+    SWAP(整数,N[entering_index],B[leaving_index]);
+    SWAP(整数,indexToRow[N[entering_index]],indexToRow[B[leaving_index]]);
 }
 
-static inline void swap_columns(Mat_<double>& A,int col1,int col2){
-    for(int i=0;i<A.rows;i++){
+static inline void swap_columns(Mat_<double>& A,整数 col1,整数 col2){
+    ために(整数 i=0;i<A.rows;i++){
         double tmp=A(i,col1);
         A(i,col1)=A(i,col2);
         A(i,col2)=tmp;

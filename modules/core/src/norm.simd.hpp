@@ -10,235 +10,235 @@
 
 namespace cv {
 
-using NormFunc = int (*)(const uchar*, const uchar*, uchar*, int, int);
-using NormDiffFunc = int (*)(const uchar*, const uchar*, const uchar*, uchar*, int, int);
+using NormFunc = 整数 (*)(const uchar*, const uchar*, uchar*, 整数, 整数);
+using NormDiffFunc = 整数 (*)(const uchar*, const uchar*, const uchar*, uchar*, 整数, 整数);
 
 CV_CPU_OPTIMIZATION_NAMESPACE_BEGIN
 
-template<typename T, typename RT, int (*fn)(const T*, const uchar*, RT*, int, int)>
-static int normWrap(const uchar* src1, const uchar* src2, uchar* res, int len, int cn)
+template<typename T, typename RT, 整数 (*fn)(const T*, const uchar*, RT*, 整数, 整数)>
+static 整数 normWrap(const uchar* src1, const uchar* src2, uchar* res, 整数 len, 整数 cn)
 {
-    return fn((const T*)src1, src2, (RT*)res, len, cn);
+    戻る fn((const T*)src1, src2, (RT*)res, len, cn);
 }
 
-template<typename T, typename RT, int (*fn)(const T*, const T*, const uchar*, RT*, int, int)>
-static int normDiffWrap(const uchar* src1, const uchar* src2, const uchar* src3, uchar* res, int len, int cn)
+template<typename T, typename RT, 整数 (*fn)(const T*, const T*, const uchar*, RT*, 整数, 整数)>
+static 整数 normDiffWrap(const uchar* src1, const uchar* src2, const uchar* src3, uchar* res, 整数 len, 整数 cn)
 {
-    return fn((const T*)src1, (const T*)src2, src3, (RT*)res, len, cn);
+    戻る fn((const T*)src1, (const T*)src2, src3, (RT*)res, len, cn);
 }
 
-NormFunc getNormFunc(int normType, int depth);
-NormDiffFunc getNormDiffFunc(int normType, int depth);
+NormFunc getNormFunc(整数 normType, 整数 depth);
+NormDiffFunc getNormDiffFunc(整数 normType, 整数 depth);
 
 #ifndef CV_CPU_OPTIMIZATION_DECLARATIONS_ONLY
 
 template <typename T, typename ST>
 struct NormInf_SIMD {
-    inline ST operator() (const T* src, int n) const {
+    inline ST operator() (const T* src, 整数 n) const {
         ST s = 0;
-        for (int i = 0; i < n; i++) {
+        ために (整数 i = 0; i < n; i++) {
             s = std::max(s, (ST)cv_abs(src[i]));
         }
-        return s;
+        戻る s;
     }
 };
 
 template <typename T, typename ST>
 struct NormL1_SIMD {
-    inline ST operator() (const T* src, int n) const {
+    inline ST operator() (const T* src, 整数 n) const {
         ST s = 0;
-        for (int i = 0; i < n; i++) {
+        ために (整数 i = 0; i < n; i++) {
             s += cv_abs(src[i]);
         }
-        return s;
+        戻る s;
     }
 };
 
 template <typename T, typename ST>
 struct NormL2_SIMD {
-    inline ST operator() (const T* src, int n) const {
+    inline ST operator() (const T* src, 整数 n) const {
         ST s = 0;
-        for (int i = 0; i < n; i++) {
+        ために (整数 i = 0; i < n; i++) {
             ST v = (ST)src[i];
             s += v * v;
         }
-        return s;
+        戻る s;
     }
 };
 
 template <typename T, typename ST>
 struct NormDiffInf_SIMD {
-    inline ST operator() (const T* src1, const T* src2, int n) const {
+    inline ST operator() (const T* src1, const T* src2, 整数 n) const {
         ST s = 0;
-        for (int i = 0; i < n; i++) {
+        ために (整数 i = 0; i < n; i++) {
             ST v = (ST)cv_absdiff(src1[i], src2[i]);
             s = std::max(s, v);
         }
-        return s;
+        戻る s;
     }
 };
 
 template <typename T, typename ST>
 struct NormDiffL1_SIMD {
-    inline ST operator() (const T* src1, const T* src2, int n) const {
+    inline ST operator() (const T* src1, const T* src2, 整数 n) const {
         ST s = 0;
-        for (int i = 0; i < n; i++) {
+        ために (整数 i = 0; i < n; i++) {
             ST v = (ST)cv_absdiff(src1[i], src2[i]);
             s += v;
         }
-        return s;
+        戻る s;
     }
 };
 
 template <typename T, typename ST>
 struct NormDiffL2_SIMD {
-    inline ST operator() (const T* src1, const T* src2, int n) const {
+    inline ST operator() (const T* src1, const T* src2, 整数 n) const {
         ST s = 0;
-        for (int i = 0; i < n; i++) {
+        ために (整数 i = 0; i < n; i++) {
             ST v = (ST)src1[i] - (ST)src2[i];
             s += v * v;
         }
-        return s;
+        戻る s;
     }
 };
 
-#if (CV_SIMD || CV_SIMD_SCALABLE)
+#もし (CV_SIMD || CV_SIMD_SCALABLE)
 
 template<>
-struct NormInf_SIMD<uchar, int> {
-    int operator() (const uchar* src, int n) const {
-        int j = 0;
-        int s = 0;
+struct NormInf_SIMD<uchar, 整数> {
+    整数 operator() (const uchar* src, 整数 n) const {
+        整数 j = 0;
+        整数 s = 0;
         v_uint8 r0 = vx_setzero_u8(), r1 = vx_setzero_u8();
         v_uint8 r2 = vx_setzero_u8(), r3 = vx_setzero_u8();
-        for (; j <= n - 4 * VTraits<v_uint8>::vlanes(); j += 4 * VTraits<v_uint8>::vlanes()) {
+        ために (; j <= n - 4 * VTraits<v_uint8>::vlanes(); j += 4 * VTraits<v_uint8>::vlanes()) {
             r0 = v_max(r0, vx_load(src + j                                 ));
             r1 = v_max(r1, vx_load(src + j +     VTraits<v_uint8>::vlanes()));
             r2 = v_max(r2, vx_load(src + j + 2 * VTraits<v_uint8>::vlanes()));
             r3 = v_max(r3, vx_load(src + j + 3 * VTraits<v_uint8>::vlanes()));
         }
         r0 = v_max(r0, v_max(r1, v_max(r2, r3)));
-        for (; j < n; j++) {
-            s = std::max(s, (int)src[j]);
+        ために (; j < n; j++) {
+            s = std::max(s, (整数)src[j]);
         }
-        return std::max(s, (int)v_reduce_max(r0));
+        戻る std::max(s, (整数)v_reduce_max(r0));
     }
 };
 
 template<>
-struct NormInf_SIMD<schar, int> {
-    int operator() (const schar* src, int n) const {
-        int j = 0;
-        int s = 0;
+struct NormInf_SIMD<schar, 整数> {
+    整数 operator() (const schar* src, 整数 n) const {
+        整数 j = 0;
+        整数 s = 0;
         v_uint8 r0 = vx_setzero_u8(), r1 = vx_setzero_u8();
         v_uint8 r2 = vx_setzero_u8(), r3 = vx_setzero_u8();
-        for (; j <= n - 4 * VTraits<v_int8>::vlanes(); j += 4 * VTraits<v_int8>::vlanes()) {
+        ために (; j <= n - 4 * VTraits<v_int8>::vlanes(); j += 4 * VTraits<v_int8>::vlanes()) {
             r0 = v_max(r0, v_abs(vx_load(src + j                                )));
             r1 = v_max(r1, v_abs(vx_load(src + j +     VTraits<v_int8>::vlanes())));
             r2 = v_max(r2, v_abs(vx_load(src + j + 2 * VTraits<v_int8>::vlanes())));
             r3 = v_max(r3, v_abs(vx_load(src + j + 3 * VTraits<v_int8>::vlanes())));
         }
         r0 = v_max(r0, v_max(r1, v_max(r2, r3)));
-        for (; j < n; j++) {
+        ために (; j < n; j++) {
             s = std::max(s, cv_abs(src[j]));
         }
-        return std::max(s, saturate_cast<int>(v_reduce_max(r0)));
+        戻る std::max(s, saturate_cast<整数>(v_reduce_max(r0)));
     }
 };
 
 template<>
-struct NormInf_SIMD<ushort, int> {
-    int operator() (const ushort* src, int n) const {
-        int j = 0;
-        int s = 0;
+struct NormInf_SIMD<ushort, 整数> {
+    整数 operator() (const ushort* src, 整数 n) const {
+        整数 j = 0;
+        整数 s = 0;
         v_uint16 d0 = vx_setzero_u16(), d1 = vx_setzero_u16();
         v_uint16 d2 = vx_setzero_u16(), d3 = vx_setzero_u16();
-        for (; j <= n - 4 * VTraits<v_uint16>::vlanes(); j += 4 * VTraits<v_uint16>::vlanes()) {
+        ために (; j <= n - 4 * VTraits<v_uint16>::vlanes(); j += 4 * VTraits<v_uint16>::vlanes()) {
             d0 = v_max(d0, vx_load(src + j                                  ));
             d1 = v_max(d1, vx_load(src + j +     VTraits<v_uint16>::vlanes()));
             d2 = v_max(d2, vx_load(src + j + 2 * VTraits<v_uint16>::vlanes()));
             d3 = v_max(d3, vx_load(src + j + 3 * VTraits<v_uint16>::vlanes()));
         }
         d0 = v_max(d0, v_max(d1, v_max(d2, d3)));
-        for (; j < n; j++) {
-            s = std::max(s, (int)src[j]);
+        ために (; j < n; j++) {
+            s = std::max(s, (整数)src[j]);
         }
-        return std::max(s, (int)v_reduce_max(d0));
+        戻る std::max(s, (整数)v_reduce_max(d0));
     }
 };
 
 template<>
-struct NormInf_SIMD<short, int> {
-    int operator() (const short* src, int n) const {
-        int j = 0;
-        int s = 0;
+struct NormInf_SIMD<short, 整数> {
+    整数 operator() (const short* src, 整数 n) const {
+        整数 j = 0;
+        整数 s = 0;
         v_uint16 d0 = vx_setzero_u16(), d1 = vx_setzero_u16();
         v_uint16 d2 = vx_setzero_u16(), d3 = vx_setzero_u16();
-        for (; j <= n - 4 * VTraits<v_int16>::vlanes(); j += 4 * VTraits<v_int16>::vlanes()) {
+        ために (; j <= n - 4 * VTraits<v_int16>::vlanes(); j += 4 * VTraits<v_int16>::vlanes()) {
             d0 = v_max(d0, v_abs(vx_load(src + j                                  )));
             d1 = v_max(d1, v_abs(vx_load(src + j +     VTraits<v_int16>::vlanes())));
             d2 = v_max(d2, v_abs(vx_load(src + j + 2 * VTraits<v_int16>::vlanes())));
             d3 = v_max(d3, v_abs(vx_load(src + j + 3 * VTraits<v_int16>::vlanes())));
         }
         d0 = v_max(d0, v_max(d1, v_max(d2, d3)));
-        for (; j < n; j++) {
-            s = std::max(s, saturate_cast<int>(cv_abs(src[j])));
+        ために (; j < n; j++) {
+            s = std::max(s, saturate_cast<整数>(cv_abs(src[j])));
         }
-        return std::max(s, saturate_cast<int>(v_reduce_max(d0)));
+        戻る std::max(s, saturate_cast<整数>(v_reduce_max(d0)));
     }
 };
 
 template<>
-struct NormInf_SIMD<int, int> {
-    int operator() (const int* src, int n) const {
-        int j = 0;
-        int s = 0;
+struct NormInf_SIMD<整数, 整数> {
+    整数 operator() (const 整数* src, 整数 n) const {
+        整数 j = 0;
+        整数 s = 0;
         v_uint32 r0 = vx_setzero_u32(), r1 = vx_setzero_u32();
         v_uint32 r2 = vx_setzero_u32(), r3 = vx_setzero_u32();
-        for (; j <= n - 4 * VTraits<v_int32>::vlanes(); j += 4 * VTraits<v_int32>::vlanes()) {
+        ために (; j <= n - 4 * VTraits<v_int32>::vlanes(); j += 4 * VTraits<v_int32>::vlanes()) {
             r0 = v_max(r0, v_abs(vx_load(src + j                                 )));
             r1 = v_max(r1, v_abs(vx_load(src + j +     VTraits<v_int32>::vlanes())));
             r2 = v_max(r2, v_abs(vx_load(src + j + 2 * VTraits<v_int32>::vlanes())));
             r3 = v_max(r3, v_abs(vx_load(src + j + 3 * VTraits<v_int32>::vlanes())));
         }
         r0 = v_max(r0, v_max(r1, v_max(r2, r3)));
-        s = std::max(s, saturate_cast<int>(v_reduce_max(r0)));
-        for (; j < n; j++) {
+        s = std::max(s, saturate_cast<整数>(v_reduce_max(r0)));
+        ために (; j < n; j++) {
             s = std::max(s, std::abs(src[j]));
         }
-        return s;
+        戻る s;
     }
 };
 
 template<>
 struct NormInf_SIMD<float, float> {
-    float operator() (const float* src, int n) const {
-        int j = 0;
+    float operator() (const float* src, 整数 n) const {
+        整数 j = 0;
         float s = 0.f;
         v_float32 r0 = vx_setzero_f32(), r1 = vx_setzero_f32();
         v_float32 r2 = vx_setzero_f32(), r3 = vx_setzero_f32();
-        for (; j <= n - 4 * VTraits<v_float32>::vlanes(); j += 4 * VTraits<v_float32>::vlanes()) {
+        ために (; j <= n - 4 * VTraits<v_float32>::vlanes(); j += 4 * VTraits<v_float32>::vlanes()) {
             r0 = v_max(r0, v_abs(vx_load(src + j                                   )));
             r1 = v_max(r1, v_abs(vx_load(src + j +     VTraits<v_float32>::vlanes())));
             r2 = v_max(r2, v_abs(vx_load(src + j + 2 * VTraits<v_float32>::vlanes())));
             r3 = v_max(r3, v_abs(vx_load(src + j + 3 * VTraits<v_float32>::vlanes())));
         }
         r0 = v_max(r0, v_max(r1, v_max(r2, r3)));
-        for (; j < n; j++) {
+        ために (; j < n; j++) {
             s = std::max(s, cv_abs(src[j]));
         }
-        return std::max(s, v_reduce_max(r0));
+        戻る std::max(s, v_reduce_max(r0));
     }
 };
 
 template<>
-struct NormL1_SIMD<uchar, int> {
-    int operator() (const uchar* src, int n) const {
-        int j = 0;
-        int s = 0;
+struct NormL1_SIMD<uchar, 整数> {
+    整数 operator() (const uchar* src, 整数 n) const {
+        整数 j = 0;
+        整数 s = 0;
         v_uint32 r0 = vx_setzero_u32(), r1 = vx_setzero_u32();
         v_uint8  one = vx_setall_u8(1);
-        for (; j<= n - 2 * VTraits<v_uint8>::vlanes(); j += 2 * VTraits<v_uint8>::vlanes()) {
+        ために (; j<= n - 2 * VTraits<v_uint8>::vlanes(); j += 2 * VTraits<v_uint8>::vlanes()) {
             v_uint8 v0 = vx_load(src + j);
             r0 = v_dotprod_expand_fast(v0, one, r0);
 
@@ -246,21 +246,21 @@ struct NormL1_SIMD<uchar, int> {
             r1 = v_dotprod_expand_fast(v1, one, r1);
         }
         s += v_reduce_sum(v_add(r0, r1));
-        for (; j < n; j++) {
+        ために (; j < n; j++) {
             s += src[j];
         }
-        return s;
+        戻る s;
     }
 };
 
 template<>
-struct NormL1_SIMD<schar, int> {
-    int operator() (const schar* src, int n) const {
-        int j = 0;
-        int s = 0;
+struct NormL1_SIMD<schar, 整数> {
+    整数 operator() (const schar* src, 整数 n) const {
+        整数 j = 0;
+        整数 s = 0;
         v_uint32 r0 = vx_setzero_u32(), r1 = vx_setzero_u32();
         v_uint8  one = vx_setall_u8(1);
-        for (; j<= n - 2 * VTraits<v_int8>::vlanes(); j += 2 * VTraits<v_int8>::vlanes()) {
+        ために (; j<= n - 2 * VTraits<v_int8>::vlanes(); j += 2 * VTraits<v_int8>::vlanes()) {
             v_uint8 v0 = v_abs(vx_load(src + j));
             r0 = v_dotprod_expand_fast(v0, one, r0);
 
@@ -268,21 +268,21 @@ struct NormL1_SIMD<schar, int> {
             r1 = v_dotprod_expand_fast(v1, one, r1);
         }
         s += v_reduce_sum(v_add(r0, r1));
-        for (; j < n; j++) {
-            s += saturate_cast<int>(cv_abs(src[j]));
+        ために (; j < n; j++) {
+            s += saturate_cast<整数>(cv_abs(src[j]));
         }
-        return s;
+        戻る s;
     }
 };
 
 template<>
-struct NormL1_SIMD<ushort, int> {
-    int operator() (const ushort* src, int n) const {
-        int j = 0;
-        int s = 0;
+struct NormL1_SIMD<ushort, 整数> {
+    整数 operator() (const ushort* src, 整数 n) const {
+        整数 j = 0;
+        整数 s = 0;
         v_uint32 r00 = vx_setzero_u32(), r01 = vx_setzero_u32();
         v_uint32 r10 = vx_setzero_u32(), r11 = vx_setzero_u32();
-        for (; j<= n - 2 * VTraits<v_uint16>::vlanes(); j += 2 * VTraits<v_uint16>::vlanes()) {
+        ために (; j<= n - 2 * VTraits<v_uint16>::vlanes(); j += 2 * VTraits<v_uint16>::vlanes()) {
             v_uint16 v0 = vx_load(src + j);
             v_uint32 v00, v01;
             v_expand(v0, v00, v01);
@@ -295,22 +295,22 @@ struct NormL1_SIMD<ushort, int> {
             r10 = v_add(r10, v10);
             r11 = v_add(r11, v11);
         }
-        s += (int)v_reduce_sum(v_add(v_add(v_add(r00, r01), r10), r11));
-        for (; j < n; j++) {
+        s += (整数)v_reduce_sum(v_add(v_add(v_add(r00, r01), r10), r11));
+        ために (; j < n; j++) {
             s += src[j];
         }
-        return s;
+        戻る s;
     }
 };
 
 template<>
-struct NormL1_SIMD<short, int> {
-    int operator() (const short* src, int n) const {
-        int j = 0;
-        int s = 0;
+struct NormL1_SIMD<short, 整数> {
+    整数 operator() (const short* src, 整数 n) const {
+        整数 j = 0;
+        整数 s = 0;
         v_uint32 r00 = vx_setzero_u32(), r01 = vx_setzero_u32();
         v_uint32 r10 = vx_setzero_u32(), r11 = vx_setzero_u32();
-        for (; j<= n - 2 * VTraits<v_int16>::vlanes(); j += 2 * VTraits<v_int16>::vlanes()) {
+        ために (; j<= n - 2 * VTraits<v_int16>::vlanes(); j += 2 * VTraits<v_int16>::vlanes()) {
             v_uint16 v0 = v_abs(vx_load(src + j));
             v_uint32 v00, v01;
             v_expand(v0, v00, v01);
@@ -323,21 +323,21 @@ struct NormL1_SIMD<short, int> {
             r10 = v_add(r10, v10);
             r11 = v_add(r11, v11);
         }
-        s += (int)v_reduce_sum(v_add(v_add(v_add(r00, r01), r10), r11));
-        for (; j < n; j++) {
-            s += saturate_cast<int>(cv_abs(src[j]));
+        s += (整数)v_reduce_sum(v_add(v_add(v_add(r00, r01), r10), r11));
+        ために (; j < n; j++) {
+            s += saturate_cast<整数>(cv_abs(src[j]));
         }
-        return s;
+        戻る s;
     }
 };
 
 template<>
-struct NormL2_SIMD<uchar, int> {
-    int operator() (const uchar* src, int n) const {
-        int j = 0;
-        int s = 0;
+struct NormL2_SIMD<uchar, 整数> {
+    整数 operator() (const uchar* src, 整数 n) const {
+        整数 j = 0;
+        整数 s = 0;
         v_uint32 r0 = vx_setzero_u32(), r1 = vx_setzero_u32();
-        for (; j <= n - 2 * VTraits<v_uint8>::vlanes(); j += 2 * VTraits<v_uint8>::vlanes()) {
+        ために (; j <= n - 2 * VTraits<v_uint8>::vlanes(); j += 2 * VTraits<v_uint8>::vlanes()) {
             v_uint8 v0 = vx_load(src + j);
             r0 = v_dotprod_expand_fast(v0, v0, r0);
 
@@ -345,43 +345,43 @@ struct NormL2_SIMD<uchar, int> {
             r1 = v_dotprod_expand_fast(v1, v1, r1);
         }
         s += v_reduce_sum(v_add(r0, r1));
-        for (; j < n; j++) {
-            int v = saturate_cast<int>(src[j]);
+        ために (; j < n; j++) {
+            整数 v = saturate_cast<整数>(src[j]);
             s += v * v;
         }
-        return s;
+        戻る s;
     }
 };
 
 template<>
-struct NormL2_SIMD<schar, int> {
-    int operator() (const schar* src, int n) const {
-        int j = 0;
-        int s = 0;
+struct NormL2_SIMD<schar, 整数> {
+    整数 operator() (const schar* src, 整数 n) const {
+        整数 j = 0;
+        整数 s = 0;
         v_int32 r0 = vx_setzero_s32(), r1 = vx_setzero_s32();
-        for (; j <= n - 2 * VTraits<v_int8>::vlanes(); j += 2 * VTraits<v_int8>::vlanes()) {
+        ために (; j <= n - 2 * VTraits<v_int8>::vlanes(); j += 2 * VTraits<v_int8>::vlanes()) {
             v_int8 v0 = vx_load(src + j);
             r0 = v_dotprod_expand_fast(v0, v0, r0);
             v_int8 v1 = vx_load(src + j + VTraits<v_int8>::vlanes());
             r1 = v_dotprod_expand_fast(v1, v1, r1);
         }
         s += v_reduce_sum(v_add(r0, r1));
-        for (; j < n; j++) {
-            int v = saturate_cast<int>(src[j]);
+        ために (; j < n; j++) {
+            整数 v = saturate_cast<整数>(src[j]);
             s += v * v;
         }
-        return s;
+        戻る s;
     }
 };
 
 template<>
-struct NormDiffInf_SIMD<uchar, int> {
-    int operator() (const uchar* src1, const uchar* src2, int n) const {
-        int j = 0;
-        int s = 0;
+struct NormDiffInf_SIMD<uchar, 整数> {
+    整数 operator() (const uchar* src1, const uchar* src2, 整数 n) const {
+        整数 j = 0;
+        整数 s = 0;
         v_uint8 r0 = vx_setzero_u8(), r1 = vx_setzero_u8();
         v_uint8 r2 = vx_setzero_u8(), r3 = vx_setzero_u8();
-        for (; j <= n - 4 * VTraits<v_uint8>::vlanes(); j += 4 * VTraits<v_uint8>::vlanes()) {
+        ために (; j <= n - 4 * VTraits<v_uint8>::vlanes(); j += 4 * VTraits<v_uint8>::vlanes()) {
             v_uint8 v01 = vx_load(src1 + j), v02 = vx_load(src2 + j);
             r0 = v_max(r0, v_absdiff(v01, v02));
 
@@ -397,23 +397,23 @@ struct NormDiffInf_SIMD<uchar, int> {
                     v32 = vx_load(src2 + j + 3 * VTraits<v_uint8>::vlanes());
             r3 = v_max(r3, v_absdiff(v31, v32));
         }
-        s = (int)v_reduce_max(v_max(v_max(v_max(r0, r1), r2), r3));
-        for (; j < n; j++) {
-            int v = (int)cv_absdiff(src1[j], src2[j]);
+        s = (整数)v_reduce_max(v_max(v_max(v_max(r0, r1), r2), r3));
+        ために (; j < n; j++) {
+            整数 v = (整数)cv_absdiff(src1[j], src2[j]);
             s = std::max(s, v);
         }
-        return s;
+        戻る s;
     }
 };
 
 template<>
-struct NormDiffInf_SIMD<schar, int> {
-    int operator() (const schar* src1, const schar* src2, int n) const {
-        int j = 0;
-        int s = 0;
+struct NormDiffInf_SIMD<schar, 整数> {
+    整数 operator() (const schar* src1, const schar* src2, 整数 n) const {
+        整数 j = 0;
+        整数 s = 0;
         v_uint8 r0 = vx_setzero_u8(), r1 = vx_setzero_u8();
         v_uint8 r2 = vx_setzero_u8(), r3 = vx_setzero_u8();
-        for (; j <= n - 4 * VTraits<v_int8>::vlanes(); j += 4 * VTraits<v_int8>::vlanes()) {
+        ために (; j <= n - 4 * VTraits<v_int8>::vlanes(); j += 4 * VTraits<v_int8>::vlanes()) {
             v_int8 v01 = vx_load(src1 + j), v02 = vx_load(src2 + j);
             r0 = v_max(r0, v_absdiff(v01, v02));
 
@@ -429,23 +429,23 @@ struct NormDiffInf_SIMD<schar, int> {
                    v32 = vx_load(src2 + j + 3 * VTraits<v_int8>::vlanes());
             r3 = v_max(r3, v_absdiff(v31, v32));
         }
-        s = (int)v_reduce_max(v_max(v_max(v_max(r0, r1), r2), r3));
-        for (; j < n; j++) {
-            int v = (int)cv_absdiff(src1[j], src2[j]);
+        s = (整数)v_reduce_max(v_max(v_max(v_max(r0, r1), r2), r3));
+        ために (; j < n; j++) {
+            整数 v = (整数)cv_absdiff(src1[j], src2[j]);
             s = std::max(s, v);
         }
-        return s;
+        戻る s;
     }
 };
 
 template<>
-struct NormDiffInf_SIMD<ushort, int> {
-    int operator() (const ushort* src1, const ushort* src2, int n) const {
-        int j = 0;
-        int s = 0;
+struct NormDiffInf_SIMD<ushort, 整数> {
+    整数 operator() (const ushort* src1, const ushort* src2, 整数 n) const {
+        整数 j = 0;
+        整数 s = 0;
         v_uint16 r0 = vx_setzero_u16(), r1 = vx_setzero_u16();
         v_uint16 r2 = vx_setzero_u16(), r3 = vx_setzero_u16();
-        for (; j <= n - 4 * VTraits<v_uint16>::vlanes(); j += 4 * VTraits<v_uint16>::vlanes()) {
+        ために (; j <= n - 4 * VTraits<v_uint16>::vlanes(); j += 4 * VTraits<v_uint16>::vlanes()) {
             v_uint16 v01 = vx_load(src1 + j), v02 = vx_load(src2 + j);
             r0 = v_max(r0, v_absdiff(v01, v02));
 
@@ -461,23 +461,23 @@ struct NormDiffInf_SIMD<ushort, int> {
                      v32 = vx_load(src2 + j + 3 * VTraits<v_uint16>::vlanes());
             r3 = v_max(r3, v_absdiff(v31, v32));
         }
-        s = (int)v_reduce_max(v_max(v_max(v_max(r0, r1), r2), r3));
-        for (; j < n; j++) {
-            int v = (int)cv_absdiff(src1[j], src2[j]);
+        s = (整数)v_reduce_max(v_max(v_max(v_max(r0, r1), r2), r3));
+        ために (; j < n; j++) {
+            整数 v = (整数)cv_absdiff(src1[j], src2[j]);
             s = std::max(s, v);
         }
-        return s;
+        戻る s;
     }
 };
 
 template<>
-struct NormDiffInf_SIMD<short, int> {
-    int operator() (const short* src1, const short* src2, int n) const {
-        int j = 0;
-        int s = 0;
+struct NormDiffInf_SIMD<short, 整数> {
+    整数 operator() (const short* src1, const short* src2, 整数 n) const {
+        整数 j = 0;
+        整数 s = 0;
         v_uint16 r0 = vx_setzero_u16(), r1 = vx_setzero_u16();
         v_uint16 r2 = vx_setzero_u16(), r3 = vx_setzero_u16();
-        for (; j <= n - 4 * VTraits<v_int16>::vlanes(); j += 4 * VTraits<v_int16>::vlanes()) {
+        ために (; j <= n - 4 * VTraits<v_int16>::vlanes(); j += 4 * VTraits<v_int16>::vlanes()) {
             v_int16 v01 = vx_load(src1 + j), v02 = vx_load(src2 + j);
             r0 = v_max(r0, v_absdiff(v01, v02));
 
@@ -493,23 +493,23 @@ struct NormDiffInf_SIMD<short, int> {
                     v32 = vx_load(src2 + j + 3 * VTraits<v_int16>::vlanes());
             r3 = v_max(r3, v_absdiff(v31, v32));
         }
-        s = (int)v_reduce_max(v_max(v_max(v_max(r0, r1), r2), r3));
-        for (; j < n; j++) {
-            int v = (int)cv_absdiff(src1[j], src2[j]);
+        s = (整数)v_reduce_max(v_max(v_max(v_max(r0, r1), r2), r3));
+        ために (; j < n; j++) {
+            整数 v = (整数)cv_absdiff(src1[j], src2[j]);
             s = std::max(s, v);
         }
-        return s;
+        戻る s;
     }
 };
 
 template<>
-struct NormDiffInf_SIMD<int, unsigned> {
-    unsigned operator() (const int* src1, const int* src2, int n) const {
-        int j = 0;
+struct NormDiffInf_SIMD<整数, unsigned> {
+    unsigned operator() (const 整数* src1, const 整数* src2, 整数 n) const {
+        整数 j = 0;
         unsigned s = 0;
         v_uint32 r0 = vx_setzero_u32(), r1 = vx_setzero_u32();
         v_uint32 r2 = vx_setzero_u32(), r3 = vx_setzero_u32();
-        for (; j <= n - 4 * VTraits<v_int32>::vlanes(); j += 4 * VTraits<v_int32>::vlanes()) {
+        ために (; j <= n - 4 * VTraits<v_int32>::vlanes(); j += 4 * VTraits<v_int32>::vlanes()) {
             v_int32 v01 = vx_load(src1 + j), v02 = vx_load(src2 + j);
             r0 = v_max(r0, v_absdiff(v01, v02));
 
@@ -525,22 +525,22 @@ struct NormDiffInf_SIMD<int, unsigned> {
                     v32 = vx_load(src2 + j + 3 * VTraits<v_int32>::vlanes());
             r3 = v_max(r3, v_absdiff(v31, v32));
         }
-        s = (int)v_reduce_max(v_max(v_max(v_max(r0, r1), r2), r3));
-        for (; j < n; j++) {
+        s = (整数)v_reduce_max(v_max(v_max(v_max(r0, r1), r2), r3));
+        ために (; j < n; j++) {
             unsigned v = (unsigned)cv_absdiff(src1[j], src2[j]);
             s = std::max(s, v);
         }
-        return s;
+        戻る s;
     }
 };
 
 template<>
 struct NormDiffInf_SIMD<float, float> {
-    float operator() (const float* src1, const float* src2, int n) const {
-        int j = 0;
+    float operator() (const float* src1, const float* src2, 整数 n) const {
+        整数 j = 0;
         float s = 0;
         v_float32 r0 = vx_setzero_f32(), r1 = vx_setzero_f32();
-        for (; j <= n - 2 * VTraits<v_float32>::vlanes(); j += 2 * VTraits<v_float32>::vlanes()) {
+        ために (; j <= n - 2 * VTraits<v_float32>::vlanes(); j += 2 * VTraits<v_float32>::vlanes()) {
             v_float32 v01 = vx_load(src1 + j), v02 = vx_load(src2 + j);
             r0 = v_max(r0, v_absdiff(v01, v02));
 
@@ -549,22 +549,22 @@ struct NormDiffInf_SIMD<float, float> {
             r1 = v_max(r1, v_absdiff(v11, v12));
         }
         s = v_reduce_max(v_max(r0, r1));
-        for (; j < n; j++) {
+        ために (; j < n; j++) {
             float v = (float)cv_absdiff(src1[j], src2[j]);
             s = std::max(s, v);
         }
-        return s;
+        戻る s;
     }
 };
 
 template<>
-struct NormDiffL1_SIMD<uchar, int> {
-    int operator() (const uchar* src1, const uchar* src2, int n) const {
-        int j = 0;
-        int s = 0;
+struct NormDiffL1_SIMD<uchar, 整数> {
+    整数 operator() (const uchar* src1, const uchar* src2, 整数 n) const {
+        整数 j = 0;
+        整数 s = 0;
         v_uint32 r0 = vx_setzero_u32(), r1 = vx_setzero_u32();
         v_uint8  one = vx_setall_u8(1);
-        for (; j<= n - 2 * VTraits<v_uint8>::vlanes(); j += 2 * VTraits<v_uint8>::vlanes()) {
+        ために (; j<= n - 2 * VTraits<v_uint8>::vlanes(); j += 2 * VTraits<v_uint8>::vlanes()) {
             v_uint8 v01 = vx_load(src1 + j), v02 = vx_load(src2 + j);
             r0 = v_dotprod_expand_fast(v_absdiff(v01, v02), one, r0);
 
@@ -573,22 +573,22 @@ struct NormDiffL1_SIMD<uchar, int> {
             r1 = v_dotprod_expand_fast(v_absdiff(v11, v12), one, r1);
         }
         s += v_reduce_sum(v_add(r0, r1));
-        for (; j < n; j++) {
-            int v = (int)cv_absdiff(src1[j], src2[j]);
+        ために (; j < n; j++) {
+            整数 v = (整数)cv_absdiff(src1[j], src2[j]);
             s += v;
         }
-        return s;
+        戻る s;
     }
 };
 
 template<>
-struct NormDiffL1_SIMD<schar, int> {
-    int operator() (const schar* src1, const schar* src2, int n) const {
-        int j = 0;
-        int s = 0;
+struct NormDiffL1_SIMD<schar, 整数> {
+    整数 operator() (const schar* src1, const schar* src2, 整数 n) const {
+        整数 j = 0;
+        整数 s = 0;
         v_uint32 r0 = vx_setzero_u32(), r1 = vx_setzero_u32();
         v_uint8  one = vx_setall_u8(1);
-        for (; j<= n - 2 * VTraits<v_int8>::vlanes(); j += 2 * VTraits<v_int8>::vlanes()) {
+        ために (; j<= n - 2 * VTraits<v_int8>::vlanes(); j += 2 * VTraits<v_int8>::vlanes()) {
             v_int8 v01 = vx_load(src1 + j), v02 = vx_load(src2 + j);
             r0 = v_dotprod_expand_fast(v_absdiff(v01, v02), one, r0);
 
@@ -597,22 +597,22 @@ struct NormDiffL1_SIMD<schar, int> {
             r1 = v_dotprod_expand_fast(v_absdiff(v11, v12), one, r1);
         }
         s += v_reduce_sum(v_add(r0, r1));
-        for (; j < n; j++) {
-            int v = (int)cv_absdiff(src1[j], src2[j]);
+        ために (; j < n; j++) {
+            整数 v = (整数)cv_absdiff(src1[j], src2[j]);
             s += v;
         }
-        return s;
+        戻る s;
     }
 };
 
 template<>
-struct NormDiffL1_SIMD<ushort, int> {
-    int operator() (const ushort* src1, const ushort* src2, int n) const {
-        int j = 0;
-        int s = 0;
+struct NormDiffL1_SIMD<ushort, 整数> {
+    整数 operator() (const ushort* src1, const ushort* src2, 整数 n) const {
+        整数 j = 0;
+        整数 s = 0;
         v_uint32 r0 = vx_setzero_u32(), r1 = vx_setzero_u32();
         v_uint32 r2 = vx_setzero_u32(), r3 = vx_setzero_u32();
-        for (; j<= n - 4 * VTraits<v_uint16>::vlanes(); j += 4 * VTraits<v_uint16>::vlanes()) {
+        ために (; j<= n - 4 * VTraits<v_uint16>::vlanes(); j += 4 * VTraits<v_uint16>::vlanes()) {
             v_uint16 v01 = vx_load(src1 + j), v02 = vx_load(src2 + j);
             v_uint32 u00, u01;
             v_expand(v_absdiff(v01, v02), u00, u01);
@@ -636,23 +636,23 @@ struct NormDiffL1_SIMD<ushort, int> {
             v_expand(v_absdiff(v31, v32), u30, u31);
             r3 = v_add(r3, v_add(u30, u31));
         }
-        s += (int)v_reduce_sum(v_add(v_add(v_add(r0, r1), r2), r3));
-        for (; j < n; j++) {
-            int v = (int)cv_absdiff(src1[j], src2[j]);
+        s += (整数)v_reduce_sum(v_add(v_add(v_add(r0, r1), r2), r3));
+        ために (; j < n; j++) {
+            整数 v = (整数)cv_absdiff(src1[j], src2[j]);
             s += v;
         }
-        return s;
+        戻る s;
     }
 };
 
 template<>
-struct NormDiffL1_SIMD<short, int> {
-    int operator() (const short* src1, const short* src2, int n) const {
-        int j = 0;
-        int s = 0;
+struct NormDiffL1_SIMD<short, 整数> {
+    整数 operator() (const short* src1, const short* src2, 整数 n) const {
+        整数 j = 0;
+        整数 s = 0;
         v_uint32 r0 = vx_setzero_u32(), r1 = vx_setzero_u32();
         v_uint32 r2 = vx_setzero_u32(), r3 = vx_setzero_u32();
-        for (; j<= n - 4 * VTraits<v_int16>::vlanes(); j += 4 * VTraits<v_int16>::vlanes()) {
+        ために (; j<= n - 4 * VTraits<v_int16>::vlanes(); j += 4 * VTraits<v_int16>::vlanes()) {
             v_int16 v01 = vx_load(src1 + j), v02 = vx_load(src2 + j);
             v_uint32 u00, u01;
             v_expand(v_absdiff(v01, v02), u00, u01);
@@ -676,22 +676,22 @@ struct NormDiffL1_SIMD<short, int> {
             v_expand(v_absdiff(v31, v32), u30, u31);
             r3 = v_add(r3, v_add(u30, u31));
         }
-        s += (int)v_reduce_sum(v_add(v_add(v_add(r0, r1), r2), r3));
-        for (; j < n; j++) {
-            int v = (int)cv_absdiff(src1[j], src2[j]);
+        s += (整数)v_reduce_sum(v_add(v_add(v_add(r0, r1), r2), r3));
+        ために (; j < n; j++) {
+            整数 v = (整数)cv_absdiff(src1[j], src2[j]);
             s += v;
         }
-        return s;
+        戻る s;
     }
 };
 
 template<>
-struct NormDiffL2_SIMD<uchar, int> {
-    int operator() (const uchar* src1, const uchar* src2, int n) const {
-        int j = 0;
-        int s = 0;
+struct NormDiffL2_SIMD<uchar, 整数> {
+    整数 operator() (const uchar* src1, const uchar* src2, 整数 n) const {
+        整数 j = 0;
+        整数 s = 0;
         v_uint32 r0 = vx_setzero_u32(), r1 = vx_setzero_u32();
-        for (; j <= n - 2 * VTraits<v_uint8>::vlanes(); j += 2 * VTraits<v_uint8>::vlanes()) {
+        ために (; j <= n - 2 * VTraits<v_uint8>::vlanes(); j += 2 * VTraits<v_uint8>::vlanes()) {
             v_uint8 v01 = vx_load(src1 + j), v02 = vx_load(src2 + j);
             v_uint8 v0 = v_absdiff(v01, v02);
             r0 = v_dotprod_expand_fast(v0, v0, r0);
@@ -702,21 +702,21 @@ struct NormDiffL2_SIMD<uchar, int> {
             r1 = v_dotprod_expand_fast(v1, v1, r1);
         }
         s += v_reduce_sum(v_add(r0, r1));
-        for (; j < n; j++) {
-            int v = (int)src1[j] - (int)src2[j];
+        ために (; j < n; j++) {
+            整数 v = (整数)src1[j] - (整数)src2[j];
             s += v * v;
         }
-        return s;
+        戻る s;
     }
 };
 
 template<>
-struct NormDiffL2_SIMD<schar, int> {
-    int operator() (const schar* src1, const schar* src2, int n) const {
-        int j = 0;
-        int s = 0;
+struct NormDiffL2_SIMD<schar, 整数> {
+    整数 operator() (const schar* src1, const schar* src2, 整数 n) const {
+        整数 j = 0;
+        整数 s = 0;
         v_uint32 r0 = vx_setzero_u32(), r1 = vx_setzero_u32();
-        for (; j <= n - 2 * VTraits<v_int8>::vlanes(); j += 2 * VTraits<v_int8>::vlanes()) {
+        ために (; j <= n - 2 * VTraits<v_int8>::vlanes(); j += 2 * VTraits<v_int8>::vlanes()) {
             v_int8 v01 = vx_load(src1 + j), v02 = vx_load(src2 + j);
             v_uint8 v0 = v_absdiff(v01, v02);
             r0 = v_dotprod_expand_fast(v0, v0, r0);
@@ -727,53 +727,53 @@ struct NormDiffL2_SIMD<schar, int> {
             r1 = v_dotprod_expand_fast(v1, v1, r1);
         }
         s += v_reduce_sum(v_add(r0, r1));
-        for (; j < n; j++) {
-            int v = (int)src1[j] - (int)src2[j];
+        ために (; j < n; j++) {
+            整数 v = (整数)src1[j] - (整数)src2[j];
             s += v * v;
         }
-        return s;
+        戻る s;
     }
 };
 
 #endif
 
-#if (CV_SIMD_64F || CV_SIMD_SCALABLE_64F)
+#もし (CV_SIMD_64F || CV_SIMD_SCALABLE_64F)
 
 template<>
 struct NormInf_SIMD<double, double> {
-    double operator() (const double* src, int n) const {
-        int j = 0;
+    double operator() (const double* src, 整数 n) const {
+        整数 j = 0;
         double s = 0.f;
         v_float64 r0 = vx_setzero_f64(), r1 = vx_setzero_f64();
         v_float64 r2 = vx_setzero_f64(), r3 = vx_setzero_f64();
-        for (; j <= n - 4 * VTraits<v_float64>::vlanes(); j += 4 * VTraits<v_float64>::vlanes()) {
+        ために (; j <= n - 4 * VTraits<v_float64>::vlanes(); j += 4 * VTraits<v_float64>::vlanes()) {
             r0 = v_max(r0, v_abs(vx_load(src + j                                   )));
             r1 = v_max(r1, v_abs(vx_load(src + j +     VTraits<v_float64>::vlanes())));
             r2 = v_max(r2, v_abs(vx_load(src + j + 2 * VTraits<v_float64>::vlanes())));
             r3 = v_max(r3, v_abs(vx_load(src + j + 3 * VTraits<v_float64>::vlanes())));
         }
         r0 = v_max(r0, v_max(r1, v_max(r2, r3)));
-        for (; j < n; j++) {
+        ために (; j < n; j++) {
             s = std::max(s, cv_abs(src[j]));
         }
         // [TODO]: use v_reduce_max when it supports float64
         double t[VTraits<v_float64>::max_nlanes];
         vx_store(t, r0);
-        for (int i = 0; i < VTraits<v_float64>::vlanes(); i++) {
+        ために (整数 i = 0; i < VTraits<v_float64>::vlanes(); i++) {
             s = std::max(s, cv_abs(t[i]));
         }
-        return s;
+        戻る s;
     }
 };
 
 template<>
-struct NormL1_SIMD<int, double> {
-    double operator() (const int* src, int n) const {
-        int j = 0;
+struct NormL1_SIMD<整数, double> {
+    double operator() (const 整数* src, 整数 n) const {
+        整数 j = 0;
         double s = 0.f;
         v_float64 r00 = vx_setzero_f64(), r01 = vx_setzero_f64();
         v_float64 r10 = vx_setzero_f64(), r11 = vx_setzero_f64();
-        for (; j <= n - 2 * VTraits<v_int32>::vlanes(); j += 2 * VTraits<v_int32>::vlanes()) {
+        ために (; j <= n - 2 * VTraits<v_int32>::vlanes(); j += 2 * VTraits<v_int32>::vlanes()) {
             // Widen to double before taking the magnitude: exact over the whole int32 range,
             // INT_MIN included, which a float intermediate would not be above 2^24.
             v_int32 i0 = vx_load(src + j), i1 = vx_load(src + j + VTraits<v_int32>::vlanes());
@@ -781,23 +781,23 @@ struct NormL1_SIMD<int, double> {
             r10 = v_add(r10, v_abs(v_cvt_f64(i1))); r11 = v_add(r11, v_abs(v_cvt_f64_high(i1)));
         }
         s += v_reduce_sum(v_add(v_add(v_add(r00, r01), r10), r11));
-        for (; j < n; j++) {
+        ために (; j < n; j++) {
             s += cv_abs(src[j]);
         }
-        return s;
+        戻る s;
     }
 };
 
 template<>
 struct NormL1_SIMD<float, double> {
-    double operator() (const float* src, int n) const {
-        int j = 0;
+    double operator() (const float* src, 整数 n) const {
+        整数 j = 0;
         double s = 0.f;
         v_float64 r00 = vx_setzero_f64(), r01 = vx_setzero_f64();
         v_float64 r10 = vx_setzero_f64(), r11 = vx_setzero_f64();
         v_float64 r20 = vx_setzero_f64(), r21 = vx_setzero_f64();
         v_float64 r30 = vx_setzero_f64(), r31 = vx_setzero_f64();
-        for (; j <= n - 4 * VTraits<v_float32>::vlanes(); j += 4 * VTraits<v_float32>::vlanes()) {
+        ために (; j <= n - 4 * VTraits<v_float32>::vlanes(); j += 4 * VTraits<v_float32>::vlanes()) {
             v_float32 v0 = v_abs(vx_load(src + j)), v1 = v_abs(vx_load(src + j + VTraits<v_float32>::vlanes()));
             r00 = v_add(r00, v_cvt_f64(v0)); r01 = v_add(r01, v_cvt_f64_high(v0));
             r10 = v_add(r10, v_cvt_f64(v1)); r11 = v_add(r11, v_cvt_f64_high(v1));
@@ -808,20 +808,20 @@ struct NormL1_SIMD<float, double> {
         }
         s += v_reduce_sum(v_add(v_add(v_add(r00, r01), r10), r11));
         s += v_reduce_sum(v_add(v_add(v_add(r20, r21), r30), r31));
-        for (; j < n; j++) {
+        ために (; j < n; j++) {
             s += cv_abs(src[j]);
         }
-        return s;
+        戻る s;
     }
 };
 
 template<>
 struct NormL2_SIMD<ushort, double> {
-    double operator() (const ushort* src, int n) const {
-        int j = 0;
+    double operator() (const ushort* src, 整数 n) const {
+        整数 j = 0;
         double s = 0.f;
         v_float64 r0 = vx_setzero_f64(), r1 = vx_setzero_f64();
-        for (; j <= n - 2 * VTraits<v_uint16>::vlanes(); j += 2 * VTraits<v_uint16>::vlanes()) {
+        ために (; j <= n - 2 * VTraits<v_uint16>::vlanes(); j += 2 * VTraits<v_uint16>::vlanes()) {
             v_uint16 v0 = vx_load(src + j);
             v_uint64 u0 = v_dotprod_expand_fast(v0, v0);
             r0 = v_add(r0, v_cvt_f64(v_reinterpret_as_s64(u0)));
@@ -831,21 +831,21 @@ struct NormL2_SIMD<ushort, double> {
             r1 = v_add(r1, v_cvt_f64(v_reinterpret_as_s64(u1)));
         }
         s += v_reduce_sum(v_add(r0, r1));
-        for (; j < n; j++) {
+        ために (; j < n; j++) {
             double v = saturate_cast<double>(src[j]);
             s += v * v;
         }
-        return s;
+        戻る s;
     }
 };
 
 template<>
 struct NormL2_SIMD<short, double> {
-    double operator() (const short* src, int n) const {
-        int j = 0;
+    double operator() (const short* src, 整数 n) const {
+        整数 j = 0;
         double s = 0.f;
         v_float64 r0 = vx_setzero_f64(), r1 = vx_setzero_f64();
-        for (; j <= n - 2 * VTraits<v_int16>::vlanes(); j += 2 * VTraits<v_int16>::vlanes()) {
+        ために (; j <= n - 2 * VTraits<v_int16>::vlanes(); j += 2 * VTraits<v_int16>::vlanes()) {
             v_int16 v0 = vx_load(src + j);
             r0 = v_add(r0, v_cvt_f64(v_dotprod_expand_fast(v0, v0)));
 
@@ -853,21 +853,21 @@ struct NormL2_SIMD<short, double> {
             r1 = v_add(r1, v_cvt_f64(v_dotprod_expand_fast(v1, v1)));
         }
         s += v_reduce_sum(v_add(r0, r1));
-        for (; j < n; j++) {
+        ために (; j < n; j++) {
             double v = saturate_cast<double>(src[j]);
             s += v * v;
         }
-        return s;
+        戻る s;
     }
 };
 
 template<>
-struct NormL2_SIMD<int, double> {
-    double operator() (const int* src, int n) const {
-        int j = 0;
+struct NormL2_SIMD<整数, double> {
+    double operator() (const 整数* src, 整数 n) const {
+        整数 j = 0;
         double s = 0.f;
         v_float64 r0 = vx_setzero_f64(), r1 = vx_setzero_f64();
-        for (; j <= n - 2 * VTraits<v_int32>::vlanes(); j += 2 * VTraits<v_int32>::vlanes()) {
+        ために (; j <= n - 2 * VTraits<v_int32>::vlanes(); j += 2 * VTraits<v_int32>::vlanes()) {
             v_int32 v0 = vx_load(src + j);
             r0 = v_dotprod_expand_fast(v0, v0, r0);
 
@@ -875,22 +875,22 @@ struct NormL2_SIMD<int, double> {
             r1 = v_dotprod_expand_fast(v1, v1, r1);
         }
         s += v_reduce_sum(v_add(r0, r1));
-        for (; j < n; j++) {
+        ために (; j < n; j++) {
             double v = src[j];
             s += v * v;
         }
-        return s;
+        戻る s;
     }
 };
 
 template<>
 struct NormL2_SIMD<float, double> {
-    double operator() (const float* src, int n) const {
-        int j = 0;
+    double operator() (const float* src, 整数 n) const {
+        整数 j = 0;
         double s = 0.f;
         v_float64 r00 = vx_setzero_f64(), r01 = vx_setzero_f64();
         v_float64 r10 = vx_setzero_f64(), r11 = vx_setzero_f64();
-        for (; j <= n - 2 * VTraits<v_float32>::vlanes(); j += 2 * VTraits<v_float32>::vlanes()) {
+        ために (; j <= n - 2 * VTraits<v_float32>::vlanes(); j += 2 * VTraits<v_float32>::vlanes()) {
             v_float32 v0 = vx_load(src + j), v1 = vx_load(src + j + VTraits<v_float32>::vlanes());
             v_float64 v00 = v_cvt_f64(v0), v01 = v_cvt_f64_high(v0);
             v_float64 v10 = v_cvt_f64(v1), v11 = v_cvt_f64_high(v1);
@@ -898,47 +898,47 @@ struct NormL2_SIMD<float, double> {
             r10 = v_fma(v10, v10, r10); r11 = v_fma(v11, v11, r11);
         }
         s += v_reduce_sum(v_add(v_add(v_add(r00, r01), r10), r11));
-        for (; j < n; j++) {
+        ために (; j < n; j++) {
             double v = src[j];
             s += v * v;
         }
-        return s;
+        戻る s;
     }
 };
 
 #endif
 
-#if CV_SIMD_64F // CV_SIMD_SCALABLE_64F has accuracy problem with the following kernels on ci
+#もし CV_SIMD_64F // CV_SIMD_SCALABLE_64F has accuracy problem with the following kernels on ci
 
 template<>
 struct NormL1_SIMD<double, double> {
-    double operator() (const double* src, int n) const {
-        int j = 0;
+    double operator() (const double* src, 整数 n) const {
+        整数 j = 0;
         double s = 0.f;
         v_float64 r00 = vx_setzero_f64(), r01 = vx_setzero_f64();
         v_float64 r10 = vx_setzero_f64(), r11 = vx_setzero_f64();
-        for (; j <= n - 4 * VTraits<v_float64>::vlanes(); j += 4 * VTraits<v_float64>::vlanes()) {
+        ために (; j <= n - 4 * VTraits<v_float64>::vlanes(); j += 4 * VTraits<v_float64>::vlanes()) {
             r00 = v_add(r00, v_abs(vx_load(src + j                                   )));
             r01 = v_add(r01, v_abs(vx_load(src + j +     VTraits<v_float64>::vlanes())));
             r10 = v_add(r10, v_abs(vx_load(src + j + 2 * VTraits<v_float64>::vlanes())));
             r11 = v_add(r11, v_abs(vx_load(src + j + 3 * VTraits<v_float64>::vlanes())));
         }
         s += v_reduce_sum(v_add(v_add(v_add(r00, r01), r10), r11));
-        for (; j < n; j++) {
+        ために (; j < n; j++) {
             s += cv_abs(src[j]);
         }
-        return s;
+        戻る s;
     }
 };
 
 template<>
 struct NormL2_SIMD<double, double> {
-    double operator() (const double* src, int n) const {
-        int j = 0;
+    double operator() (const double* src, 整数 n) const {
+        整数 j = 0;
         double s = 0.f;
         v_float64 r00 = vx_setzero_f64(), r01 = vx_setzero_f64();
         v_float64 r10 = vx_setzero_f64(), r11 = vx_setzero_f64();
-        for (; j <= n - 4 * VTraits<v_float64>::vlanes(); j += 4 * VTraits<v_float64>::vlanes()) {
+        ために (; j <= n - 4 * VTraits<v_float64>::vlanes(); j += 4 * VTraits<v_float64>::vlanes()) {
             v_float64 v00 = vx_load(src + j                                   );
             v_float64 v01 = vx_load(src + j +     VTraits<v_float64>::vlanes());
             v_float64 v10 = vx_load(src + j + 2 * VTraits<v_float64>::vlanes());
@@ -947,21 +947,21 @@ struct NormL2_SIMD<double, double> {
             r10 = v_fma(v10, v10, r10); r11 = v_fma(v11, v11, r11);
         }
         s += v_reduce_sum(v_add(v_add(v_add(r00, r01), r10), r11));
-        for (; j < n; j++) {
+        ために (; j < n; j++) {
             double v = src[j];
             s += v * v;
         }
-        return s;
+        戻る s;
     }
 };
 
 template<>
 struct NormDiffInf_SIMD<double, double> {
-    double operator() (const double* src1, const double* src2, int n) const {
-        int j = 0;
+    double operator() (const double* src1, const double* src2, 整数 n) const {
+        整数 j = 0;
         double s = 0;
         v_float64 r0 = vx_setzero_f64(), r1 = vx_setzero_f64();
-        for (; j <= n - 2 * VTraits<v_float64>::vlanes(); j += 2 * VTraits<v_float64>::vlanes()) {
+        ために (; j <= n - 2 * VTraits<v_float64>::vlanes(); j += 2 * VTraits<v_float64>::vlanes()) {
             v_float64 v01 = vx_load(src1 + j), v02 = vx_load(src2 + j);
             r0 = v_max(r0, v_absdiff(v01, v02));
 
@@ -972,25 +972,25 @@ struct NormDiffInf_SIMD<double, double> {
         // [TODO]: use v_reduce_max when it supports float64
         double t[VTraits<v_float64>::max_nlanes];
         vx_store(t, v_max(r0, r1));
-        for (int i = 0; i < VTraits<v_float64>::vlanes(); i++) {
+        ために (整数 i = 0; i < VTraits<v_float64>::vlanes(); i++) {
             s = std::max(s, t[i]);
         }
-        for (; j < n; j++) {
+        ために (; j < n; j++) {
             double v = (double)cv_absdiff(src1[j], src2[j]);
             s = std::max(s, v);
         }
-        return s;
+        戻る s;
     }
 };
 
 template<>
 struct NormDiffL1_SIMD<float, double> {
-    double operator() (const float* src1, const float* src2, int n) const {
-        int j = 0;
+    double operator() (const float* src1, const float* src2, 整数 n) const {
+        整数 j = 0;
         double s = 0.f;
         v_float64 r0 = vx_setzero_f64(), r1 = vx_setzero_f64();
         v_float64 r2 = vx_setzero_f64(), r3 = vx_setzero_f64();
-        for (; j <= n - 2 * VTraits<v_float32>::vlanes(); j += 2 * VTraits<v_float32>::vlanes()) {
+        ために (; j <= n - 2 * VTraits<v_float32>::vlanes(); j += 2 * VTraits<v_float32>::vlanes()) {
             v_float32 v01 = vx_load(src1 + j), v02 = vx_load(src2 + j);
             v_float32 v0 = v_absdiff(v01, v02);
             r0 = v_add(r0, v_cvt_f64(v0)); r1 = v_add(r1, v_cvt_f64_high(v0));
@@ -1001,21 +1001,21 @@ struct NormDiffL1_SIMD<float, double> {
             r2 = v_add(r2, v_cvt_f64(v1)); r3 = v_add(r3, v_cvt_f64_high(v1));
         }
         s += v_reduce_sum(v_add(v_add(v_add(r0, r1), r2), r3));
-        for (; j < n; j++) {
+        ために (; j < n; j++) {
             double v = (double)cv_absdiff(src1[j], src2[j]);
             s += v;
         }
-        return s;
+        戻る s;
     }
 };
 
 template<>
 struct NormDiffL1_SIMD<double, double> {
-    double operator() (const double* src1, const double* src2, int n) const {
-        int j = 0;
+    double operator() (const double* src1, const double* src2, 整数 n) const {
+        整数 j = 0;
         double s = 0.f;
         v_float64 r0 = vx_setzero_f64(), r1 = vx_setzero_f64();
-        for (; j <= n - 2 * VTraits<v_float64>::vlanes(); j += 2 * VTraits<v_float64>::vlanes()) {
+        ために (; j <= n - 2 * VTraits<v_float64>::vlanes(); j += 2 * VTraits<v_float64>::vlanes()) {
             v_float64 v01 = vx_load(src1 + j), v02 = vx_load(src2 + j);
             r0 = v_add(r0, v_absdiff(v01, v02));
 
@@ -1024,21 +1024,21 @@ struct NormDiffL1_SIMD<double, double> {
             r1 = v_add(r1, v_absdiff(v11, v12));
         }
         s += v_reduce_sum(v_add(r0, r1));
-        for (; j < n; j++) {
+        ために (; j < n; j++) {
             double v = (double)cv_absdiff(src1[j], src2[j]);
             s += v;
         }
-        return s;
+        戻る s;
     }
 };
 
 template<>
 struct NormDiffL2_SIMD<ushort, double> {
-    double operator() (const ushort* src1, const ushort* src2, int n) const {
-        int j = 0;
+    double operator() (const ushort* src1, const ushort* src2, 整数 n) const {
+        整数 j = 0;
         double s = 0.f;
         v_float64 r0 = vx_setzero_f64(), r1 = vx_setzero_f64();
-        for (; j <= n - 2 * VTraits<v_uint16>::vlanes(); j += 2 * VTraits<v_uint16>::vlanes()) {
+        ために (; j <= n - 2 * VTraits<v_uint16>::vlanes(); j += 2 * VTraits<v_uint16>::vlanes()) {
             v_uint16 v01 = vx_load(src1 + j), v02 = vx_load(src2 + j);
             v_uint16 v0 = v_absdiff(v01, v02);
             v_uint64 u0 = v_dotprod_expand_fast(v0, v0);
@@ -1051,21 +1051,21 @@ struct NormDiffL2_SIMD<ushort, double> {
             r1 = v_add(r1, v_cvt_f64(v_reinterpret_as_s64(u1)));
         }
         s += v_reduce_sum(v_add(r0, r1));
-        for (; j < n; j++) {
+        ために (; j < n; j++) {
             double v = (double)src1[j] - (double)src2[j];
             s += v * v;
         }
-        return s;
+        戻る s;
     }
 };
 
 template<>
 struct NormDiffL2_SIMD<short, double> {
-    double operator() (const short* src1, const short* src2, int n) const {
-        int j = 0;
+    double operator() (const short* src1, const short* src2, 整数 n) const {
+        整数 j = 0;
         double s = 0.f;
         v_float64 r0 = vx_setzero_f64(), r1 = vx_setzero_f64();
-        for (; j <= n - 2 * VTraits<v_int16>::vlanes(); j += 2 * VTraits<v_int16>::vlanes()) {
+        ために (; j <= n - 2 * VTraits<v_int16>::vlanes(); j += 2 * VTraits<v_int16>::vlanes()) {
             v_int16 v01 = vx_load(src1 + j), v02 = vx_load(src2 + j);
             v_uint16 v0 = v_absdiff(v01, v02);
             v_uint64 u0 = v_dotprod_expand_fast(v0, v0);
@@ -1078,21 +1078,21 @@ struct NormDiffL2_SIMD<short, double> {
             r1 = v_add(r1, v_cvt_f64(v_reinterpret_as_s64(u1)));
         }
         s += v_reduce_sum(v_add(r0, r1));
-        for (; j < n; j++) {
+        ために (; j < n; j++) {
             double v = (double)src1[j] - (double)src2[j];
             s += v * v;
         }
-        return s;
+        戻る s;
     }
 };
 
 template<>
-struct NormDiffL2_SIMD<int, double> {
-    double operator() (const int* src1, const int* src2, int n) const {
-        int j = 0;
+struct NormDiffL2_SIMD<整数, double> {
+    double operator() (const 整数* src1, const 整数* src2, 整数 n) const {
+        整数 j = 0;
         double s = 0.f;
         v_float64 r0 = vx_setzero_f64(), r1 = vx_setzero_f64();
-        for (; j <= n - VTraits<v_int32>::vlanes(); j += VTraits<v_int32>::vlanes()) {
+        ために (; j <= n - VTraits<v_int32>::vlanes(); j += VTraits<v_int32>::vlanes()) {
             v_int32 v01 = vx_load(src1 + j), v02 = vx_load(src2 + j);
             v_uint32 v0 = v_absdiff(v01, v02);
             v_uint64 ev0, ev1;
@@ -1101,22 +1101,22 @@ struct NormDiffL2_SIMD<int, double> {
             r0 = v_fma(f0, f0, r0); r1 = v_fma(f1, f1, r1);
         }
         s += v_reduce_sum(v_add(r0, r1));
-        for (; j < n; j++) {
+        ために (; j < n; j++) {
             double v = (double)src1[j] - (double)src2[j];
             s += v * v;
         }
-        return s;
+        戻る s;
     }
 };
 
 template<>
 struct NormDiffL2_SIMD<float, double> {
-    double operator() (const float* src1, const float* src2, int n) const {
-        int j = 0;
+    double operator() (const float* src1, const float* src2, 整数 n) const {
+        整数 j = 0;
         double s = 0.f;
         v_float64 r0 = vx_setzero_f64(), r1 = vx_setzero_f64();
         v_float64 r2 = vx_setzero_f64(), r3 = vx_setzero_f64();
-        for (; j <= n - 2 * VTraits<v_float32>::vlanes(); j += 2 * VTraits<v_float32>::vlanes()) {
+        ために (; j <= n - 2 * VTraits<v_float32>::vlanes(); j += 2 * VTraits<v_float32>::vlanes()) {
             v_float32 v01 = vx_load(src1 + j), v02 = vx_load(src2 + j);
             v_float32 v0 = v_absdiff(v01, v02);
             v_float64 f01 = v_cvt_f64(v0), f02 = v_cvt_f64_high(v0);
@@ -1129,22 +1129,22 @@ struct NormDiffL2_SIMD<float, double> {
             r2 = v_fma(f11, f11, r2); r3 = v_fma(f12, f12, r3);
         }
         s += v_reduce_sum(v_add(v_add(v_add(r0, r1), r2), r3));
-        for (; j < n; j++) {
+        ために (; j < n; j++) {
             double v = (double)src1[j] - (double)src2[j];
             s += v * v;
         }
-        return s;
+        戻る s;
     }
 };
 
 template<>
 struct NormDiffL2_SIMD<double, double> {
-    double operator() (const double* src1, const double* src2, int n) const {
-        int j = 0;
+    double operator() (const double* src1, const double* src2, 整数 n) const {
+        整数 j = 0;
         double s = 0.f;
         v_float64 r0 = vx_setzero_f64(), r1 = vx_setzero_f64();
         v_float64 r2 = vx_setzero_f64(), r3 = vx_setzero_f64();
-        for (; j <= n - 4 * VTraits<v_float64>::vlanes(); j += 4 * VTraits<v_float64>::vlanes()) {
+        ために (; j <= n - 4 * VTraits<v_float64>::vlanes(); j += 4 * VTraits<v_float64>::vlanes()) {
             v_float64 v01 = vx_load(src1 + j), v02 = vx_load(src2 + j);
             v_float64 v0 = v_absdiff(v01, v02);
             r0 = v_fma(v0, v0, r0);
@@ -1165,11 +1165,11 @@ struct NormDiffL2_SIMD<double, double> {
             r3 = v_fma(v3, v3, r3);
         }
         s += v_reduce_sum(v_add(v_add(v_add(r0, r1), r2), r3));
-        for (; j < n; j++) {
+        ために (; j < n; j++) {
             double v = (double)src1[j] - (double)src2[j];
             s += v * v;
         }
-        return s;
+        戻る s;
     }
 };
 
@@ -1177,107 +1177,107 @@ struct NormDiffL2_SIMD<double, double> {
 
 template <typename T, typename ST>
 struct MaskedNormInf_SIMD {
-    inline ST operator() (const T* src, const uchar* mask, int len, int cn) const {
+    inline ST operator() (const T* src, const uchar* mask, 整数 len, 整数 cn) const {
         ST s = 0;
-        if (cn == 1) {
-            for (int i = 0; i < len; i++) {
-                if (mask[i]) {
+        もし (cn == 1) {
+            ために (整数 i = 0; i < len; i++) {
+                もし (mask[i]) {
                     s = std::max(s, (ST)cv_abs(src[i]));
                 }
             }
         }
-        else {
-            for (int i = 0; i < len; i++) {
-                if (mask[i]) {
+        否则 {
+            ために (整数 i = 0; i < len; i++) {
+                もし (mask[i]) {
                     const T* elem = src + i * cn;
-                    int k = 0;
-                #if CV_ENABLE_UNROLLED && !CV_SIMD_SCALABLE
-                    for (; k <= cn - 4; k += 4) {
+                    整数 k = 0;
+                #もし CV_ENABLE_UNROLLED && !CV_SIMD_SCALABLE
+                    ために (; k <= cn - 4; k += 4) {
                         s = std::max(s, (ST)cv_abs(elem[k]));
                         s = std::max(s, (ST)cv_abs(elem[k + 1]));
                         s = std::max(s, (ST)cv_abs(elem[k + 2]));
                         s = std::max(s, (ST)cv_abs(elem[k + 3]));
                     }
                 #endif
-                    for (; k < cn; k++) {
+                    ために (; k < cn; k++) {
                         s = std::max(s, (ST)cv_abs(elem[k]));
                     }
                 }
             }
         }
-        return s;
+        戻る s;
     }
 };
 
 template <typename T, typename ST>
 struct MaskedNormL1_SIMD {
-    inline ST operator() (const T* src, const uchar* mask, int len, int cn) const {
+    inline ST operator() (const T* src, const uchar* mask, 整数 len, 整数 cn) const {
         ST s = 0;
-        if (cn == 1) {
-            for (int i = 0; i < len; i++) {
-                if (mask[i]) {
+        もし (cn == 1) {
+            ために (整数 i = 0; i < len; i++) {
+                もし (mask[i]) {
                     s += (ST)cv_abs(src[i]);
                 }
             }
         }
-        else {
-            for (int i = 0; i < len; i++) {
-                if (mask[i]) {
+        否则 {
+            ために (整数 i = 0; i < len; i++) {
+                もし (mask[i]) {
                     const T* elem = src + i * cn;
-                    int k = 0;
-                #if CV_ENABLE_UNROLLED && !CV_SIMD_SCALABLE
-                    for (; k <= cn - 4; k += 4) {
+                    整数 k = 0;
+                #もし CV_ENABLE_UNROLLED && !CV_SIMD_SCALABLE
+                    ために (; k <= cn - 4; k += 4) {
                         s += (ST)cv_abs(elem[k]);
                         s += (ST)cv_abs(elem[k + 1]);
                         s += (ST)cv_abs(elem[k + 2]);
                         s += (ST)cv_abs(elem[k + 3]);
                     }
                 #endif
-                    for (; k < cn; k++) {
+                    ために (; k < cn; k++) {
                         s += (ST)cv_abs(elem[k]);
                     }
                 }
             }
         }
-        return s;
+        戻る s;
     }
 };
 
 template <typename T, typename ST>
 struct MaskedNormL2_SIMD {
-    inline ST operator() (const T* src, const uchar* mask, int len, int cn) const {
+    inline ST operator() (const T* src, const uchar* mask, 整数 len, 整数 cn) const {
         ST s = 0;
-        if (cn == 1) {
-            int i = 0;
-        #if CV_ENABLE_UNROLLED && !CV_SIMD_SCALABLE
-            for (; i <= len - 4; i += 4) {
-                if (mask[i])     { T v0 = src[i];     s += (ST)v0 * v0; }
-                if (mask[i + 1]) { T v1 = src[i + 1]; s += (ST)v1 * v1; }
-                if (mask[i + 2]) { T v2 = src[i + 2]; s += (ST)v2 * v2; }
-                if (mask[i + 3]) { T v3 = src[i + 3]; s += (ST)v3 * v3; }
+        もし (cn == 1) {
+            整数 i = 0;
+        #もし CV_ENABLE_UNROLLED && !CV_SIMD_SCALABLE
+            ために (; i <= len - 4; i += 4) {
+                もし (mask[i])     { T v0 = src[i];     s += (ST)v0 * v0; }
+                もし (mask[i + 1]) { T v1 = src[i + 1]; s += (ST)v1 * v1; }
+                もし (mask[i + 2]) { T v2 = src[i + 2]; s += (ST)v2 * v2; }
+                もし (mask[i + 3]) { T v3 = src[i + 3]; s += (ST)v3 * v3; }
             }
         #endif
-            for (; i < len; i++) {
-                if (mask[i]) {
+            ために (; i < len; i++) {
+                もし (mask[i]) {
                     T v = src[i];
                     s += (ST)v * v;
                 }
             }
         }
-        else {
-            for (int i = 0; i < len; i++) {
-                if (mask[i]) {
+        否则 {
+            ために (整数 i = 0; i < len; i++) {
+                もし (mask[i]) {
                     const T* elem = src + i * cn;
-                    int k = 0;
-                #if CV_ENABLE_UNROLLED && !CV_SIMD_SCALABLE
-                    for (; k <= cn - 4; k += 4) {
+                    整数 k = 0;
+                #もし CV_ENABLE_UNROLLED && !CV_SIMD_SCALABLE
+                    ために (; k <= cn - 4; k += 4) {
                         T v0 = elem[k];     s += (ST)v0 * v0;
                         T v1 = elem[k + 1]; s += (ST)v1 * v1;
                         T v2 = elem[k + 2]; s += (ST)v2 * v2;
                         T v3 = elem[k + 3]; s += (ST)v3 * v3;
                     }
                 #endif
-                    for (; k < cn; k++) {
+                    ために (; k < cn; k++) {
                         T v = elem[k];
                         s += (ST)v * v;
                     }
@@ -1285,14 +1285,14 @@ struct MaskedNormL2_SIMD {
             }
         }
 
-        return s;
+        戻る s;
     }
 };
 
-#if (CV_SIMD || CV_SIMD_SCALABLE)
-static inline v_uint8  v_normmask_u8 (const uchar* m) { return v_gt(vx_load(m),          vx_setzero_u8());  }
-static inline v_uint16 v_normmask_u16(const uchar* m) { return v_gt(vx_load_expand(m),   vx_setzero_u16()); }
-static inline v_uint32 v_normmask_u32(const uchar* m) { return v_gt(vx_load_expand_q(m), vx_setzero_u32()); }
+#もし (CV_SIMD || CV_SIMD_SCALABLE)
+static inline v_uint8  v_normmask_u8 (const uchar* m) { 戻る v_gt(vx_load(m),          vx_setzero_u8());  }
+static inline v_uint16 v_normmask_u16(const uchar* m) { 戻る v_gt(vx_load_expand(m),   vx_setzero_u16()); }
+static inline v_uint32 v_normmask_u32(const uchar* m) { 戻る v_gt(vx_load_expand_q(m), vx_setzero_u32()); }
 static inline void v_normmask_u64(const uchar* m, v_uint64& m0, v_uint64& m1) {
     v_uint64 e0, e1;
     v_expand(v_normmask_u32(m), e0, e1);
@@ -1302,14 +1302,14 @@ static inline void v_normmask_u64(const uchar* m, v_uint64& m0, v_uint64& m1) {
 
 template <>
 struct MaskedNormInf_SIMD<float, float> {
-    inline float operator()(const float* src, const uchar* mask, int len, int cn) const {
+    inline float operator()(const float* src, const uchar* mask, 整数 len, 整数 cn) const {
         float result = 0.0f;
-        if (cn == 1) {
-            int i = 0;
-            const int vstep = VTraits<v_float32>::vlanes();
+        もし (cn == 1) {
+            整数 i = 0;
+            const 整数 vstep = VTraits<v_float32>::vlanes();
             v_float32 acc = vx_setzero_f32();
 
-            for (; i <= len - vstep; i += vstep) {
+            ために (; i <= len - vstep; i += vstep) {
                 v_uint32 m = vx_load_expand_q(mask + i);
                 v_uint32 cmp = v_gt(m, vx_setzero_u32());
                 v_float32 s = vx_load(src + i);
@@ -1319,47 +1319,47 @@ struct MaskedNormInf_SIMD<float, float> {
             }
             result = v_reduce_max(acc);
 
-            for (; i < len; i++) {
-                if (mask[i])
+            ために (; i < len; i++) {
+                もし (mask[i])
                     result = std::max(result, std::abs(src[i]));
             }
         }
-        else {
-            for (int i = 0; i < len; i++) {
-                if (mask[i]) {
+        否则 {
+            ために (整数 i = 0; i < len; i++) {
+                もし (mask[i]) {
                     const float* elem = src + i * cn;
-                    int k = 0;
-                    const int vstep = VTraits<v_float32>::vlanes();
+                    整数 k = 0;
+                    const 整数 vstep = VTraits<v_float32>::vlanes();
                     v_float32 acc = vx_setzero_f32();
 
-                    for (; k <= cn - vstep; k += vstep) {
+                    ために (; k <= cn - vstep; k += vstep) {
                         v_float32 s = vx_load(elem + k);
                         acc = v_max(acc, v_abs(s));
                     }
 
                     result = std::max(result, v_reduce_max(acc));
 
-                    for (; k < cn; k++)
+                    ために (; k < cn; k++)
                         result = std::max(result, std::abs(elem[k]));
                 }
             }
         }
-        return result;
+        戻る result;
     }
 };
 
-#if CV_SIMD_64F
+#もし CV_SIMD_64F
 template <>
 struct MaskedNormL1_SIMD<float, double> {
-    inline double operator()(const float* src, const uchar* mask, int len, int cn) const {
+    inline double operator()(const float* src, const uchar* mask, 整数 len, 整数 cn) const {
         double result = 0.0;
-        if (cn == 1) {
-            int i = 0;
-            const int vstep = VTraits<v_float32>::vlanes();
+        もし (cn == 1) {
+            整数 i = 0;
+            const 整数 vstep = VTraits<v_float32>::vlanes();
             v_float64 acc0 = vx_setzero_f64(), acc1 = vx_setzero_f64();
             v_float64 acc2 = vx_setzero_f64(), acc3 = vx_setzero_f64();
 
-            for (; i <= len - 2*vstep; i += 2*vstep) {
+            ために (; i <= len - 2*vstep; i += 2*vstep) {
                 v_float32 s0 = v_and(v_abs(vx_load(src + i)),
                                      v_reinterpret_as_f32(v_normmask_u32(mask + i)));
                 v_float32 s1 = v_and(v_abs(vx_load(src + i + vstep)),
@@ -1369,7 +1369,7 @@ struct MaskedNormL1_SIMD<float, double> {
                 acc2 = v_add(acc2, v_cvt_f64(s1));
                 acc3 = v_add(acc3, v_cvt_f64_high(s1));
             }
-            for (; i <= len - vstep; i += vstep) {
+            ために (; i <= len - vstep; i += vstep) {
                 v_float32 s = v_and(v_abs(vx_load(src + i)),
                                     v_reinterpret_as_f32(v_normmask_u32(mask + i)));
                 acc0 = v_add(acc0, v_cvt_f64(s));
@@ -1377,20 +1377,20 @@ struct MaskedNormL1_SIMD<float, double> {
             }
             result = v_reduce_sum(v_add(v_add(acc0, acc1), v_add(acc2, acc3)));
 
-            for (; i < len; i++) {
-                if (mask[i])
+            ために (; i < len; i++) {
+                もし (mask[i])
                     result += std::abs(src[i]);
             }
         }
-        else {
-            for (int i = 0; i < len; i++) {
-                if (mask[i]) {
+        否则 {
+            ために (整数 i = 0; i < len; i++) {
+                もし (mask[i]) {
                     const float* elem = src + i * cn;
-                    int k = 0;
-                    const int vstep = VTraits<v_float32>::vlanes();
+                    整数 k = 0;
+                    const 整数 vstep = VTraits<v_float32>::vlanes();
                     v_float64 acc = vx_setzero_f64();
 
-                    for (; k <= cn - vstep; k += vstep) {
+                    ために (; k <= cn - vstep; k += vstep) {
                         v_float32 s = v_abs(vx_load(elem + k));
                         acc = v_add(acc, v_cvt_f64(s));
                         acc = v_add(acc, v_cvt_f64_high(s));
@@ -1398,28 +1398,28 @@ struct MaskedNormL1_SIMD<float, double> {
 
                     result += v_reduce_sum(acc);
 
-                    for (; k < cn; k++)
+                    ために (; k < cn; k++)
                         result += std::abs(elem[k]);
                 }
             }
         }
-        return result;
+        戻る result;
     }
 };
 
 template <>
 struct MaskedNormL2_SIMD<float, double> {
-    inline double operator()(const float* src, const uchar* mask, int len, int cn) const {
+    inline double operator()(const float* src, const uchar* mask, 整数 len, 整数 cn) const {
         double result = 0.0;
-        if (cn == 1) {
-            int i = 0;
-            const int vstep = VTraits<v_float32>::vlanes();
+        もし (cn == 1) {
+            整数 i = 0;
+            const 整数 vstep = VTraits<v_float32>::vlanes();
             v_float32 facc = vx_setzero_f32();
             v_float64 dacc = vx_setzero_f64();
-            int flush = 0;
+            整数 flush = 0;
 
-            for (; i <= len - vstep; i += vstep, flush += vstep) {
-                if (flush >= 64) {
+            ために (; i <= len - vstep; i += vstep, flush += vstep) {
+                もし (flush >= 64) {
                     dacc = v_add(dacc, v_cvt_f64(facc));
                     dacc = v_add(dacc, v_cvt_f64_high(facc));
                     facc = vx_setzero_f32();
@@ -1434,22 +1434,22 @@ struct MaskedNormL2_SIMD<float, double> {
             dacc = v_add(dacc, v_cvt_f64_high(facc));
             result = v_reduce_sum(dacc);
 
-            for (; i < len; i++) {
-                if (mask[i]) {
+            ために (; i < len; i++) {
+                もし (mask[i]) {
                     double v = src[i];
                     result += v * v;
                 }
             }
         }
-        else {
-            for (int i = 0; i < len; i++) {
-                if (mask[i]) {
+        否则 {
+            ために (整数 i = 0; i < len; i++) {
+                もし (mask[i]) {
                     const float* elem = src + i * cn;
-                    int k = 0;
-                    const int vstep = VTraits<v_float32>::vlanes();
+                    整数 k = 0;
+                    const 整数 vstep = VTraits<v_float32>::vlanes();
                     v_float32 facc = vx_setzero_f32();
 
-                    for (; k <= cn - vstep; k += vstep) {
+                    ために (; k <= cn - vstep; k += vstep) {
                         v_float32 s = vx_load(elem + k);
                         facc = v_add(facc, v_mul(s, s));
                     }
@@ -1457,105 +1457,105 @@ struct MaskedNormL2_SIMD<float, double> {
                     v_float64 dacc = v_add(v_cvt_f64(facc), v_cvt_f64_high(facc));
                     result += v_reduce_sum(dacc);
 
-                    for (; k < cn; k++) {
+                    ために (; k < cn; k++) {
                         double v = elem[k];
                         result += v * v;
                     }
                 }
             }
         }
-        return result;
+        戻る result;
     }
 };
 
 #endif
 
 template <>
-struct MaskedNormInf_SIMD<uchar, int> {
-    inline int operator()(const uchar* src, const uchar* mask, int len, int cn) const {
-        int result = 0;
-        if (cn == 1) {
-            int i = 0;
-            const int vstep = VTraits<v_uint8>::vlanes();
+struct MaskedNormInf_SIMD<uchar, 整数> {
+    inline 整数 operator()(const uchar* src, const uchar* mask, 整数 len, 整数 cn) const {
+        整数 result = 0;
+        もし (cn == 1) {
+            整数 i = 0;
+            const 整数 vstep = VTraits<v_uint8>::vlanes();
             v_uint8 acc = vx_setzero_u8();
 
-            for (; i <= len - vstep; i += vstep) {
+            ために (; i <= len - vstep; i += vstep) {
                 v_uint8 m   = vx_load(mask + i);
                 v_uint8 s   = vx_load(src + i);
                 v_uint8 sel = v_and(s, v_gt(m, vx_setzero_u8()));
                 acc = v_max(acc, sel);
             }
 
-            result = (int)v_reduce_max(acc);
+            result = (整数)v_reduce_max(acc);
 
-            for (; i < len; i++) {
-                if (mask[i])
-                    result = std::max(result, (int)src[i]);
+            ために (; i < len; i++) {
+                もし (mask[i])
+                    result = std::max(result, (整数)src[i]);
             }
         }
-        else if (cn == 4 && len >= VTraits<v_uint8>::vlanes()) {
-            const int vstep = VTraits<v_uint8>::vlanes();
+        否则 もし (cn == 4 && len >= VTraits<v_uint8>::vlanes()) {
+            const 整数 vstep = VTraits<v_uint8>::vlanes();
             v_uint8 acc = vx_setzero_u8();
-            int i = 0;
-            for (;;) {
-                if (i > len - vstep)
+            整数 i = 0;
+            ために (;;) {
+                もし (i > len - vstep)
                     i = len - vstep; // back-step (max is idempotent)
                 v_uint8 c0, c1, c2, c3;
                 v_load_deinterleave(src + i * 4, c0, c1, c2, c3);
                 v_uint8 pmax = v_max(v_max(c0, c1), v_max(c2, c3));
                 v_uint8 m = v_gt(vx_load(mask + i), vx_setzero_u8());
                 acc = v_max(acc, v_and(pmax, m));
-                if (i >= len - vstep)
+                もし (i >= len - vstep)
                     break;
                 i += vstep;
             }
-            result = (int)v_reduce_max(acc);
+            result = (整数)v_reduce_max(acc);
         }
-        else if (cn == 4) {
-            for (int i = 0; i < len; i++) {
-                if (mask[i]) {
+        否则 もし (cn == 4) {
+            ために (整数 i = 0; i < len; i++) {
+                もし (mask[i]) {
                     const uchar* elem = src + i * 4;
-                    result = std::max(result, (int)std::max(std::max(elem[0], elem[1]),
+                    result = std::max(result, (整数)std::max(std::max(elem[0], elem[1]),
                                                             std::max(elem[2], elem[3])));
                 }
             }
         }
-        else {
-            for (int i = 0; i < len; i++) {
-                if (mask[i]) {
+        否则 {
+            ために (整数 i = 0; i < len; i++) {
+                もし (mask[i]) {
                     const uchar* elem = src + i * cn;
-                    for (int k = 0; k < cn; k++)
-                        result = std::max(result, (int)elem[k]);
+                    ために (整数 k = 0; k < cn; k++)
+                        result = std::max(result, (整数)elem[k]);
                 }
             }
         }
-        return result;
+        戻る result;
     }
 };
 
 template <>
-struct MaskedNormL1_SIMD<uchar, int> {
-    inline int operator()(const uchar* src, const uchar* mask, int len, int cn) const {
-        int result = 0;
-        const int vstep = VTraits<v_uint8>::vlanes();
+struct MaskedNormL1_SIMD<uchar, 整数> {
+    inline 整数 operator()(const uchar* src, const uchar* mask, 整数 len, 整数 cn) const {
+        整数 result = 0;
+        const 整数 vstep = VTraits<v_uint8>::vlanes();
         const v_uint8 one = vx_setall_u8(1);
-        if (cn == 1) {
-            int i = 0;
+        もし (cn == 1) {
+            整数 i = 0;
             v_uint32 acc = vx_setzero_u32();
-            for (; i <= len - vstep; i += vstep) {
+            ために (; i <= len - vstep; i += vstep) {
                 v_uint8 s = v_and(vx_load(src + i), v_normmask_u8(mask + i));
                 acc = v_dotprod_expand_fast(s, one, acc);
             }
-            result = (int)v_reduce_sum(acc);
-            for (; i < len; i++) {
-                if (mask[i])
+            result = (整数)v_reduce_sum(acc);
+            ために (; i < len; i++) {
+                もし (mask[i])
                     result += src[i];
             }
         }
-        else if (cn == 4) {
-            int i = 0;
+        否则 もし (cn == 4) {
+            整数 i = 0;
             v_uint32 acc = vx_setzero_u32();
-            for (; i <= len - vstep; i += vstep) {
+            ために (; i <= len - vstep; i += vstep) {
                 v_uint8 c0, c1, c2, c3;
                 v_load_deinterleave(src + i * 4, c0, c1, c2, c3);
                 v_uint8 m = v_normmask_u8(mask + i);
@@ -1564,37 +1564,37 @@ struct MaskedNormL1_SIMD<uchar, int> {
                 acc = v_dotprod_expand_fast(v_and(c2, m), one, acc);
                 acc = v_dotprod_expand_fast(v_and(c3, m), one, acc);
             }
-            result = (int)v_reduce_sum(acc);
-            for (; i < len; i++) {
-                if (mask[i]) {
+            result = (整数)v_reduce_sum(acc);
+            ために (; i < len; i++) {
+                もし (mask[i]) {
                     const uchar* elem = src + i * 4;
                     result += elem[0] + elem[1] + elem[2] + elem[3];
                 }
             }
         }
-        else {
-            for (int i = 0; i < len; i++) {
-                if (mask[i]) {
+        否则 {
+            ために (整数 i = 0; i < len; i++) {
+                もし (mask[i]) {
                     const uchar* elem = src + i * cn;
-                    for (int k = 0; k < cn; k++)
+                    ために (整数 k = 0; k < cn; k++)
                         result += elem[k];
                 }
             }
         }
-        return result;
+        戻る result;
     }
 };
 
 template <>
-struct MaskedNormInf_SIMD<ushort, int> {
-    inline int operator()(const ushort* src, const uchar* mask, int len, int cn) const {
-        int result = 0;
-        if (cn == 1) {
-            int i = 0;
-            const int vstep = VTraits<v_uint16>::vlanes();
+struct MaskedNormInf_SIMD<ushort, 整数> {
+    inline 整数 operator()(const ushort* src, const uchar* mask, 整数 len, 整数 cn) const {
+        整数 result = 0;
+        もし (cn == 1) {
+            整数 i = 0;
+            const 整数 vstep = VTraits<v_uint16>::vlanes();
             v_uint16 acc = vx_setzero_u16();
 
-            for (; i <= len - vstep; i += vstep) {
+            ために (; i <= len - vstep; i += vstep) {
                 v_uint16 m   = vx_load_expand(mask + i);
                 v_uint16 cmp = v_gt(m, vx_setzero_u16());
                 v_uint16 s   = vx_load(src + i);
@@ -1602,49 +1602,49 @@ struct MaskedNormInf_SIMD<ushort, int> {
                 acc = v_max(acc, sel);
             }
 
-            result = (int)v_reduce_max(acc);
+            result = (整数)v_reduce_max(acc);
 
-            for (; i < len; i++) {
-                if (mask[i])
-                    result = std::max(result, (int)src[i]);
+            ために (; i < len; i++) {
+                もし (mask[i])
+                    result = std::max(result, (整数)src[i]);
             }
         }
-        else {
-            for (int i = 0; i < len; i++) {
-                if (mask[i]) {
+        否则 {
+            ために (整数 i = 0; i < len; i++) {
+                もし (mask[i]) {
                     const ushort* elem = src + i * cn;
-                    int k = 0;
-                    const int vstep = VTraits<v_uint16>::vlanes();
+                    整数 k = 0;
+                    const 整数 vstep = VTraits<v_uint16>::vlanes();
                     v_uint16 acc = vx_setzero_u16();
 
-                    for (; k <= cn - vstep; k += vstep) {
+                    ために (; k <= cn - vstep; k += vstep) {
                         acc = v_max(acc, vx_load(elem + k));
                     }
 
-                    result = std::max(result, (int)v_reduce_max(acc));
+                    result = std::max(result, (整数)v_reduce_max(acc));
 
-                    for (; k < cn; k++)
-                        result = std::max(result, (int)elem[k]);
+                    ために (; k < cn; k++)
+                        result = std::max(result, (整数)elem[k]);
                 }
             }
         }
-        return result;
+        戻る result;
     }
 };
 
 template <>
-struct MaskedNormL1_SIMD<ushort, int> {
-    inline int operator()(const ushort* src, const uchar* mask, int len, int cn) const {
-        int result = 0;
-        if (cn == 1) {
-            int i = 0;
-            const int vstep = VTraits<v_uint16>::vlanes();
+struct MaskedNormL1_SIMD<ushort, 整数> {
+    inline 整数 operator()(const ushort* src, const uchar* mask, 整数 len, 整数 cn) const {
+        整数 result = 0;
+        もし (cn == 1) {
+            整数 i = 0;
+            const 整数 vstep = VTraits<v_uint16>::vlanes();
             v_uint32 acc32 = vx_setzero_u32();
             v_uint64 acc64 = vx_setzero_u64();
-            int acc32_elems = 0;
+            整数 acc32_elems = 0;
 
-            for (; i <= len - vstep; i += vstep, acc32_elems += vstep) {
-                if (acc32_elems >= 512) {
+            ために (; i <= len - vstep; i += vstep, acc32_elems += vstep) {
+                もし (acc32_elems >= 512) {
                     v_uint64 lo64, hi64;
                     v_expand(acc32, lo64, hi64);
                     acc64 = v_add(acc64, v_add(lo64, hi64));
@@ -1662,47 +1662,47 @@ struct MaskedNormL1_SIMD<ushort, int> {
             v_uint64 lo64, hi64;
             v_expand(acc32, lo64, hi64);
             acc64 = v_add(acc64, v_add(lo64, hi64));
-            result = (int)v_reduce_sum(acc64);
+            result = (整数)v_reduce_sum(acc64);
 
-            for (; i < len; i++) {
-                if (mask[i])
+            ために (; i < len; i++) {
+                もし (mask[i])
                     result += src[i];
             }
         }
-        else {
-            for (int i = 0; i < len; i++) {
-                if (mask[i]) {
+        否则 {
+            ために (整数 i = 0; i < len; i++) {
+                もし (mask[i]) {
                     const ushort* elem = src + i * cn;
-                    int k = 0;
-                    const int vstep = VTraits<v_uint16>::vlanes();
+                    整数 k = 0;
+                    const 整数 vstep = VTraits<v_uint16>::vlanes();
                     v_uint32 acc = vx_setzero_u32();
 
-                    for (; k <= cn - vstep; k += vstep) {
+                    ために (; k <= cn - vstep; k += vstep) {
                         v_uint32 lo32, hi32;
                         v_expand(vx_load(elem + k), lo32, hi32);
                         acc = v_add(acc, v_add(lo32, hi32));
                     }
 
-                    result += (int)v_reduce_sum(acc);
+                    result += (整数)v_reduce_sum(acc);
 
-                    for (; k < cn; k++)
+                    ために (; k < cn; k++)
                         result += elem[k];
                 }
             }
         }
-        return result;
+        戻る result;
     }
 };
 
 template <>
 struct MaskedNormL2_SIMD<ushort, double> {
-    inline double operator()(const ushort* src, const uchar* mask, int len, int cn) const {
+    inline double operator()(const ushort* src, const uchar* mask, 整数 len, 整数 cn) const {
         double result = 0.0;
-        if (cn == 1) {
-            int i = 0;
-            const int vstep = VTraits<v_uint16>::vlanes();
+        もし (cn == 1) {
+            整数 i = 0;
+            const 整数 vstep = VTraits<v_uint16>::vlanes();
             v_uint64 acc = vx_setzero_u64();
-            for (; i <= len - vstep; i += vstep) {
+            ために (; i <= len - vstep; i += vstep) {
                 v_uint16 m   = vx_load_expand(mask + i);
                 v_uint16 cmp = v_gt(m, vx_setzero_u16());
                 v_uint16 s   = v_and(vx_load(src + i), cmp);
@@ -1714,21 +1714,21 @@ struct MaskedNormL2_SIMD<ushort, double> {
                 acc = v_add(acc, v_add(v_add(lo64a, lo64b), v_add(hi64a, hi64b)));
             }
             result = (double)v_reduce_sum(acc);
-            for (; i < len; i++) {
-                if (mask[i]) {
+            ために (; i < len; i++) {
+                もし (mask[i]) {
                     double v = src[i];
                     result += v * v;
                 }
             }
         }
-        else {
-            for (int i = 0; i < len; i++) {
-                if (mask[i]) {
+        否则 {
+            ために (整数 i = 0; i < len; i++) {
+                もし (mask[i]) {
                     const ushort* elem = src + i * cn;
-                    int k = 0;
-                    const int vstep = VTraits<v_uint16>::vlanes();
+                    整数 k = 0;
+                    const 整数 vstep = VTraits<v_uint16>::vlanes();
                     v_uint64 acc = vx_setzero_u64();
-                    for (; k <= cn - vstep; k += vstep) {
+                    ために (; k <= cn - vstep; k += vstep) {
                         v_uint32 lo32, hi32;
                         v_expand(vx_load(elem + k), lo32, hi32);
                         v_uint64 lo64a, lo64b, hi64a, hi64b;
@@ -1739,117 +1739,117 @@ struct MaskedNormL2_SIMD<ushort, double> {
 
                     result += (double)v_reduce_sum(acc);
 
-                    for (; k < cn; k++) {
+                    ために (; k < cn; k++) {
                         double v = elem[k];
                         result += v * v;
                     }
                 }
             }
         }
-        return result;
+        戻る result;
     }
 };
 
 template <>
-struct MaskedNormInf_SIMD<schar, int> {
-    inline int operator()(const schar* src, const uchar* mask, int len, int cn) const {
-        int result = 0;
-        if (cn == 1) {
-            const int vstep = VTraits<v_int8>::vlanes();
-            int i = 0;
+struct MaskedNormInf_SIMD<schar, 整数> {
+    inline 整数 operator()(const schar* src, const uchar* mask, 整数 len, 整数 cn) const {
+        整数 result = 0;
+        もし (cn == 1) {
+            const 整数 vstep = VTraits<v_int8>::vlanes();
+            整数 i = 0;
             v_uint8 acc = vx_setzero_u8();
-            for (; i <= len - vstep; i += vstep)
+            ために (; i <= len - vstep; i += vstep)
                 acc = v_max(acc, v_and(v_abs(vx_load(src + i)), v_normmask_u8(mask + i)));
-            result = (int)v_reduce_max(acc);
-            for (; i < len; i++)
-                if (mask[i]) result = std::max(result, cv_abs(src[i]));
+            result = (整数)v_reduce_max(acc);
+            ために (; i < len; i++)
+                もし (mask[i]) result = std::max(result, cv_abs(src[i]));
         }
-        else {
-            for (int i = 0; i < len; i++)
-                if (mask[i]) {
+        否则 {
+            ために (整数 i = 0; i < len; i++)
+                もし (mask[i]) {
                     const schar* elem = src + i * cn;
-                    for (int k = 0; k < cn; k++)
+                    ために (整数 k = 0; k < cn; k++)
                         result = std::max(result, cv_abs(elem[k]));
                 }
         }
-        return result;
+        戻る result;
     }
 };
 
 template <>
-struct MaskedNormL1_SIMD<schar, int> {
-    inline int operator()(const schar* src, const uchar* mask, int len, int cn) const {
-        int result = 0;
-        if (cn == 1) {
-            const int vstep = VTraits<v_int8>::vlanes();
+struct MaskedNormL1_SIMD<schar, 整数> {
+    inline 整数 operator()(const schar* src, const uchar* mask, 整数 len, 整数 cn) const {
+        整数 result = 0;
+        もし (cn == 1) {
+            const 整数 vstep = VTraits<v_int8>::vlanes();
             const v_uint8 one = vx_setall_u8(1);
-            int i = 0;
+            整数 i = 0;
             v_uint32 acc = vx_setzero_u32();
-            for (; i <= len - vstep; i += vstep)
+            ために (; i <= len - vstep; i += vstep)
                 acc = v_dotprod_expand_fast(v_and(v_abs(vx_load(src + i)), v_normmask_u8(mask + i)), one, acc);
-            result = (int)v_reduce_sum(acc);
-            for (; i < len; i++)
-                if (mask[i]) result += cv_abs(src[i]);
+            result = (整数)v_reduce_sum(acc);
+            ために (; i < len; i++)
+                もし (mask[i]) result += cv_abs(src[i]);
         }
-        else {
-            for (int i = 0; i < len; i++)
-                if (mask[i]) {
+        否则 {
+            ために (整数 i = 0; i < len; i++)
+                もし (mask[i]) {
                     const schar* elem = src + i * cn;
-                    for (int k = 0; k < cn; k++)
+                    ために (整数 k = 0; k < cn; k++)
                         result += cv_abs(elem[k]);
                 }
         }
-        return result;
+        戻る result;
     }
 };
 
 template <>
-struct MaskedNormL2_SIMD<schar, int> {
-    inline int operator()(const schar* src, const uchar* mask, int len, int cn) const {
-        int result = 0;
-        if (cn == 1) {
-            const int vstep = VTraits<v_int8>::vlanes();
-            int i = 0;
+struct MaskedNormL2_SIMD<schar, 整数> {
+    inline 整数 operator()(const schar* src, const uchar* mask, 整数 len, 整数 cn) const {
+        整数 result = 0;
+        もし (cn == 1) {
+            const 整数 vstep = VTraits<v_int8>::vlanes();
+            整数 i = 0;
             v_int32 acc = vx_setzero_s32();
-            for (; i <= len - vstep; i += vstep) {
+            ために (; i <= len - vstep; i += vstep) {
                 v_int8 s = v_and(vx_load(src + i), v_reinterpret_as_s8(v_normmask_u8(mask + i)));
                 acc = v_dotprod_expand_fast(s, s, acc);
             }
-            result = (int)v_reduce_sum(acc);
-            for (; i < len; i++)
-                if (mask[i]) { int v = src[i]; result += v * v; }
+            result = (整数)v_reduce_sum(acc);
+            ために (; i < len; i++)
+                もし (mask[i]) { 整数 v = src[i]; result += v * v; }
         }
-        else {
-            for (int i = 0; i < len; i++)
-                if (mask[i]) {
+        否则 {
+            ために (整数 i = 0; i < len; i++)
+                もし (mask[i]) {
                     const schar* elem = src + i * cn;
-                    for (int k = 0; k < cn; k++) { int v = elem[k]; result += v * v; }
+                    ために (整数 k = 0; k < cn; k++) { 整数 v = elem[k]; result += v * v; }
                 }
         }
-        return result;
+        戻る result;
     }
 };
 
 template <>
-struct MaskedNormL2_SIMD<uchar, int> {
-    inline int operator()(const uchar* src, const uchar* mask, int len, int cn) const {
-        int result = 0;
-        const int vstep = VTraits<v_uint8>::vlanes();
-        if (cn == 1) {
-            int i = 0;
+struct MaskedNormL2_SIMD<uchar, 整数> {
+    inline 整数 operator()(const uchar* src, const uchar* mask, 整数 len, 整数 cn) const {
+        整数 result = 0;
+        const 整数 vstep = VTraits<v_uint8>::vlanes();
+        もし (cn == 1) {
+            整数 i = 0;
             v_uint32 acc = vx_setzero_u32();
-            for (; i <= len - vstep; i += vstep) {
+            ために (; i <= len - vstep; i += vstep) {
                 v_uint8 s = v_and(vx_load(src + i), v_normmask_u8(mask + i));
                 acc = v_dotprod_expand_fast(s, s, acc);
             }
-            result = (int)v_reduce_sum(acc);
-            for (; i < len; i++)
-                if (mask[i]) { int v = src[i]; result += v * v; }
+            result = (整数)v_reduce_sum(acc);
+            ために (; i < len; i++)
+                もし (mask[i]) { 整数 v = src[i]; result += v * v; }
         }
-        else if (cn == 4) {
-            int i = 0;
+        否则 もし (cn == 4) {
+            整数 i = 0;
             v_uint32 acc = vx_setzero_u32();
-            for (; i <= len - vstep; i += vstep) {
+            ために (; i <= len - vstep; i += vstep) {
                 v_uint8 c0, c1, c2, c3;
                 v_load_deinterleave(src + i * 4, c0, c1, c2, c3);
                 v_uint8 m = v_normmask_u8(mask + i);
@@ -1860,145 +1860,145 @@ struct MaskedNormL2_SIMD<uchar, int> {
                 acc = v_dotprod_expand_fast(c2, c2, acc);
                 acc = v_dotprod_expand_fast(c3, c3, acc);
             }
-            result = (int)v_reduce_sum(acc);
-            for (; i < len; i++)
-                if (mask[i]) {
+            result = (整数)v_reduce_sum(acc);
+            ために (; i < len; i++)
+                もし (mask[i]) {
                     const uchar* elem = src + i * 4;
-                    for (int k = 0; k < 4; k++) { int v = elem[k]; result += v * v; }
+                    ために (整数 k = 0; k < 4; k++) { 整数 v = elem[k]; result += v * v; }
                 }
         }
-        else {
-            for (int i = 0; i < len; i++)
-                if (mask[i]) {
+        否则 {
+            ために (整数 i = 0; i < len; i++)
+                もし (mask[i]) {
                     const uchar* elem = src + i * cn;
-                    for (int k = 0; k < cn; k++) { int v = elem[k]; result += v * v; }
+                    ために (整数 k = 0; k < cn; k++) { 整数 v = elem[k]; result += v * v; }
                 }
         }
-        return result;
+        戻る result;
     }
 };
 
 template <>
-struct MaskedNormInf_SIMD<short, int> {
-    inline int operator()(const short* src, const uchar* mask, int len, int cn) const {
-        int result = 0;
-        if (cn == 1) {
-            const int vstep = VTraits<v_int16>::vlanes();
-            int i = 0;
+struct MaskedNormInf_SIMD<short, 整数> {
+    inline 整数 operator()(const short* src, const uchar* mask, 整数 len, 整数 cn) const {
+        整数 result = 0;
+        もし (cn == 1) {
+            const 整数 vstep = VTraits<v_int16>::vlanes();
+            整数 i = 0;
             v_uint16 acc = vx_setzero_u16();
-            for (; i <= len - vstep; i += vstep)
+            ために (; i <= len - vstep; i += vstep)
                 acc = v_max(acc, v_and(v_abs(vx_load(src + i)), v_normmask_u16(mask + i)));
-            result = (int)v_reduce_max(acc);
-            for (; i < len; i++)
-                if (mask[i]) result = std::max(result, cv_abs(src[i]));
+            result = (整数)v_reduce_max(acc);
+            ために (; i < len; i++)
+                もし (mask[i]) result = std::max(result, cv_abs(src[i]));
         }
-        else {
-            for (int i = 0; i < len; i++)
-                if (mask[i]) {
+        否则 {
+            ために (整数 i = 0; i < len; i++)
+                もし (mask[i]) {
                     const short* elem = src + i * cn;
-                    for (int k = 0; k < cn; k++)
+                    ために (整数 k = 0; k < cn; k++)
                         result = std::max(result, cv_abs(elem[k]));
                 }
         }
-        return result;
+        戻る result;
     }
 };
 
 template <>
-struct MaskedNormL1_SIMD<short, int> {
-    inline int operator()(const short* src, const uchar* mask, int len, int cn) const {
-        int result = 0;
-        if (cn == 1) {
-            const int vstep = VTraits<v_int16>::vlanes();
-            int i = 0;
+struct MaskedNormL1_SIMD<short, 整数> {
+    inline 整数 operator()(const short* src, const uchar* mask, 整数 len, 整数 cn) const {
+        整数 result = 0;
+        もし (cn == 1) {
+            const 整数 vstep = VTraits<v_int16>::vlanes();
+            整数 i = 0;
             v_uint32 acc0 = vx_setzero_u32(), acc1 = vx_setzero_u32();
-            for (; i <= len - vstep; i += vstep) {
+            ために (; i <= len - vstep; i += vstep) {
                 v_uint16 s = v_and(v_abs(vx_load(src + i)), v_normmask_u16(mask + i));
                 v_uint32 lo, hi;
                 v_expand(s, lo, hi);
                 acc0 = v_add(acc0, lo);
                 acc1 = v_add(acc1, hi);
             }
-            result = (int)v_reduce_sum(v_add(acc0, acc1));
-            for (; i < len; i++)
-                if (mask[i]) result += cv_abs(src[i]);
+            result = (整数)v_reduce_sum(v_add(acc0, acc1));
+            ために (; i < len; i++)
+                もし (mask[i]) result += cv_abs(src[i]);
         }
-        else {
-            for (int i = 0; i < len; i++)
-                if (mask[i]) {
+        否则 {
+            ために (整数 i = 0; i < len; i++)
+                もし (mask[i]) {
                     const short* elem = src + i * cn;
-                    for (int k = 0; k < cn; k++)
+                    ために (整数 k = 0; k < cn; k++)
                         result += cv_abs(elem[k]);
                 }
         }
-        return result;
+        戻る result;
     }
 };
 
 template <>
 struct MaskedNormL2_SIMD<short, double> {
-    inline double operator()(const short* src, const uchar* mask, int len, int cn) const {
+    inline double operator()(const short* src, const uchar* mask, 整数 len, 整数 cn) const {
         double result = 0.0;
-        if (cn == 1) {
-            const int vstep = VTraits<v_int16>::vlanes();
-            int i = 0;
+        もし (cn == 1) {
+            const 整数 vstep = VTraits<v_int16>::vlanes();
+            整数 i = 0;
             v_uint64 acc = vx_setzero_u64();
-            for (; i <= len - vstep; i += vstep) {
+            ために (; i <= len - vstep; i += vstep) {
                 v_uint16 s = v_and(v_abs(vx_load(src + i)), v_normmask_u16(mask + i));
                 acc = v_add(acc, v_dotprod_expand_fast(s, s));
             }
             result = (double)v_reduce_sum(acc);
-            for (; i < len; i++)
-                if (mask[i]) { double v = src[i]; result += v * v; }
+            ために (; i < len; i++)
+                もし (mask[i]) { double v = src[i]; result += v * v; }
         }
-        else {
-            for (int i = 0; i < len; i++)
-                if (mask[i]) {
+        否则 {
+            ために (整数 i = 0; i < len; i++)
+                もし (mask[i]) {
                     const short* elem = src + i * cn;
-                    for (int k = 0; k < cn; k++) { double v = elem[k]; result += v * v; }
+                    ために (整数 k = 0; k < cn; k++) { double v = elem[k]; result += v * v; }
                 }
         }
-        return result;
+        戻る result;
     }
 };
 
 template <>
-struct MaskedNormInf_SIMD<int, unsigned> {
-    inline unsigned operator()(const int* src, const uchar* mask, int len, int cn) const {
+struct MaskedNormInf_SIMD<整数, unsigned> {
+    inline unsigned operator()(const 整数* src, const uchar* mask, 整数 len, 整数 cn) const {
         unsigned result = 0;
-        if (cn == 1) {
-            const int vstep = VTraits<v_int32>::vlanes();
-            int i = 0;
+        もし (cn == 1) {
+            const 整数 vstep = VTraits<v_int32>::vlanes();
+            整数 i = 0;
             v_uint32 acc = vx_setzero_u32();
-            for (; i <= len - vstep; i += vstep)
+            ために (; i <= len - vstep; i += vstep)
                 acc = v_max(acc, v_and(v_abs(vx_load(src + i)), v_normmask_u32(mask + i)));
             result = v_reduce_max(acc);
-            for (; i < len; i++)
-                if (mask[i]) result = std::max(result, cv_abs(src[i]));
+            ために (; i < len; i++)
+                もし (mask[i]) result = std::max(result, cv_abs(src[i]));
         }
-        else {
-            for (int i = 0; i < len; i++)
-                if (mask[i]) {
-                    const int* elem = src + i * cn;
-                    for (int k = 0; k < cn; k++)
+        否则 {
+            ために (整数 i = 0; i < len; i++)
+                もし (mask[i]) {
+                    const 整数* elem = src + i * cn;
+                    ために (整数 k = 0; k < cn; k++)
                         result = std::max(result, cv_abs(elem[k]));
                 }
         }
-        return result;
+        戻る result;
     }
 };
 
-#if CV_SIMD_64F || CV_SIMD_SCALABLE_64F
+#もし CV_SIMD_64F || CV_SIMD_SCALABLE_64F
 
 template <>
-struct MaskedNormL1_SIMD<int, double> {
-    inline double operator()(const int* src, const uchar* mask, int len, int cn) const {
+struct MaskedNormL1_SIMD<整数, double> {
+    inline double operator()(const 整数* src, const uchar* mask, 整数 len, 整数 cn) const {
         double result = 0.0;
-        if (cn == 1) {
-            const int vstep = VTraits<v_int32>::vlanes();
-            int i = 0;
+        もし (cn == 1) {
+            const 整数 vstep = VTraits<v_int32>::vlanes();
+            整数 i = 0;
             v_float64 acc0 = vx_setzero_f64(), acc1 = vx_setzero_f64();
-            for (; i <= len - vstep; i += vstep) {
+            ために (; i <= len - vstep; i += vstep) {
                 // Mask the value, then widen and take the magnitude in double. v_abs() does give
                 // |INT_MIN| as an unsigned 2147483648, but reinterpreting that back as int32 turns
                 // it negative again, and the widening then carries the sign into the accumulator.
@@ -2008,30 +2008,30 @@ struct MaskedNormL1_SIMD<int, double> {
                 acc1 = v_add(acc1, v_abs(v_cvt_f64_high(s)));
             }
             result = v_reduce_sum(v_add(acc0, acc1));
-            for (; i < len; i++)
-                if (mask[i]) result += cv_abs(src[i]);
+            ために (; i < len; i++)
+                もし (mask[i]) result += cv_abs(src[i]);
         }
-        else {
-            for (int i = 0; i < len; i++)
-                if (mask[i]) {
-                    const int* elem = src + i * cn;
-                    for (int k = 0; k < cn; k++)
+        否则 {
+            ために (整数 i = 0; i < len; i++)
+                もし (mask[i]) {
+                    const 整数* elem = src + i * cn;
+                    ために (整数 k = 0; k < cn; k++)
                         result += cv_abs(elem[k]);
                 }
         }
-        return result;
+        戻る result;
     }
 };
 
 template <>
-struct MaskedNormL2_SIMD<int, double> {
-    inline double operator()(const int* src, const uchar* mask, int len, int cn) const {
+struct MaskedNormL2_SIMD<整数, double> {
+    inline double operator()(const 整数* src, const uchar* mask, 整数 len, 整数 cn) const {
         double result = 0.0;
-        if (cn == 1) {
-            const int vstep = VTraits<v_int32>::vlanes();
-            int i = 0;
+        もし (cn == 1) {
+            const 整数 vstep = VTraits<v_int32>::vlanes();
+            整数 i = 0;
             v_float64 acc0 = vx_setzero_f64(), acc1 = vx_setzero_f64();
-            for (; i <= len - vstep; i += vstep) {
+            ために (; i <= len - vstep; i += vstep) {
                 v_uint32 s = v_and(v_abs(vx_load(src + i)), v_normmask_u32(mask + i));
                 v_uint64 e0, e1;
                 v_expand(s, e0, e1);
@@ -2041,29 +2041,29 @@ struct MaskedNormL2_SIMD<int, double> {
                 acc1 = v_fma(f1, f1, acc1);
             }
             result = v_reduce_sum(v_add(acc0, acc1));
-            for (; i < len; i++)
-                if (mask[i]) { double v = src[i]; result += v * v; }
+            ために (; i < len; i++)
+                もし (mask[i]) { double v = src[i]; result += v * v; }
         }
-        else {
-            for (int i = 0; i < len; i++)
-                if (mask[i]) {
-                    const int* elem = src + i * cn;
-                    for (int k = 0; k < cn; k++) { double v = elem[k]; result += v * v; }
+        否则 {
+            ために (整数 i = 0; i < len; i++)
+                もし (mask[i]) {
+                    const 整数* elem = src + i * cn;
+                    ために (整数 k = 0; k < cn; k++) { double v = elem[k]; result += v * v; }
                 }
         }
-        return result;
+        戻る result;
     }
 };
 
 template <>
 struct MaskedNormInf_SIMD<double, double> {
-    inline double operator()(const double* src, const uchar* mask, int len, int cn) const {
+    inline double operator()(const double* src, const uchar* mask, 整数 len, 整数 cn) const {
         double result = 0.0;
-        if (cn == 1) {
-            const int vstep = VTraits<v_float64>::vlanes();
-            int i = 0;
+        もし (cn == 1) {
+            const 整数 vstep = VTraits<v_float64>::vlanes();
+            整数 i = 0;
             v_float64 acc0 = vx_setzero_f64(), acc1 = vx_setzero_f64();
-            for (; i <= len - 2*vstep; i += 2*vstep) {
+            ために (; i <= len - 2*vstep; i += 2*vstep) {
                 v_uint64 m0, m1;
                 v_normmask_u64(mask + i, m0, m1);
                 acc0 = v_max(acc0, v_reinterpret_as_f64(v_and(v_reinterpret_as_u64(v_abs(vx_load(src + i))), m0)));
@@ -2071,62 +2071,62 @@ struct MaskedNormInf_SIMD<double, double> {
             }
             double t[VTraits<v_float64>::max_nlanes];
             vx_store(t, v_max(acc0, acc1));
-            for (int k = 0; k < vstep; k++)
+            ために (整数 k = 0; k < vstep; k++)
                 result = std::max(result, t[k]);
-            for (; i < len; i++)
-                if (mask[i]) result = std::max(result, cv_abs(src[i]));
+            ために (; i < len; i++)
+                もし (mask[i]) result = std::max(result, cv_abs(src[i]));
         }
-        else {
-            for (int i = 0; i < len; i++)
-                if (mask[i]) {
+        否则 {
+            ために (整数 i = 0; i < len; i++)
+                もし (mask[i]) {
                     const double* elem = src + i * cn;
-                    for (int k = 0; k < cn; k++)
+                    ために (整数 k = 0; k < cn; k++)
                         result = std::max(result, cv_abs(elem[k]));
                 }
         }
-        return result;
+        戻る result;
     }
 };
 
 template <>
 struct MaskedNormL1_SIMD<double, double> {
-    inline double operator()(const double* src, const uchar* mask, int len, int cn) const {
+    inline double operator()(const double* src, const uchar* mask, 整数 len, 整数 cn) const {
         double result = 0.0;
-        if (cn == 1) {
-            const int vstep = VTraits<v_float64>::vlanes();
-            int i = 0;
+        もし (cn == 1) {
+            const 整数 vstep = VTraits<v_float64>::vlanes();
+            整数 i = 0;
             v_float64 acc0 = vx_setzero_f64(), acc1 = vx_setzero_f64();
-            for (; i <= len - 2*vstep; i += 2*vstep) {
+            ために (; i <= len - 2*vstep; i += 2*vstep) {
                 v_uint64 m0, m1;
                 v_normmask_u64(mask + i, m0, m1);
                 acc0 = v_add(acc0, v_reinterpret_as_f64(v_and(v_reinterpret_as_u64(v_abs(vx_load(src + i))), m0)));
                 acc1 = v_add(acc1, v_reinterpret_as_f64(v_and(v_reinterpret_as_u64(v_abs(vx_load(src + i + vstep))), m1)));
             }
             result = v_reduce_sum(v_add(acc0, acc1));
-            for (; i < len; i++)
-                if (mask[i]) result += cv_abs(src[i]);
+            ために (; i < len; i++)
+                もし (mask[i]) result += cv_abs(src[i]);
         }
-        else {
-            for (int i = 0; i < len; i++)
-                if (mask[i]) {
+        否则 {
+            ために (整数 i = 0; i < len; i++)
+                もし (mask[i]) {
                     const double* elem = src + i * cn;
-                    for (int k = 0; k < cn; k++)
+                    ために (整数 k = 0; k < cn; k++)
                         result += cv_abs(elem[k]);
                 }
         }
-        return result;
+        戻る result;
     }
 };
 
 template <>
 struct MaskedNormL2_SIMD<double, double> {
-    inline double operator()(const double* src, const uchar* mask, int len, int cn) const {
+    inline double operator()(const double* src, const uchar* mask, 整数 len, 整数 cn) const {
         double result = 0.0;
-        if (cn == 1) {
-            const int vstep = VTraits<v_float64>::vlanes();
-            int i = 0;
+        もし (cn == 1) {
+            const 整数 vstep = VTraits<v_float64>::vlanes();
+            整数 i = 0;
             v_float64 acc0 = vx_setzero_f64(), acc1 = vx_setzero_f64();
-            for (; i <= len - 2*vstep; i += 2*vstep) {
+            ために (; i <= len - 2*vstep; i += 2*vstep) {
                 v_uint64 m0, m1;
                 v_normmask_u64(mask + i, m0, m1);
                 v_float64 s0 = v_reinterpret_as_f64(v_and(v_reinterpret_as_u64(vx_load(src + i)), m0));
@@ -2135,126 +2135,126 @@ struct MaskedNormL2_SIMD<double, double> {
                 acc1 = v_fma(s1, s1, acc1);
             }
             result = v_reduce_sum(v_add(acc0, acc1));
-            for (; i < len; i++)
-                if (mask[i]) { double v = src[i]; result += v * v; }
+            ために (; i < len; i++)
+                もし (mask[i]) { double v = src[i]; result += v * v; }
         }
-        else {
-            for (int i = 0; i < len; i++)
-                if (mask[i]) {
+        否则 {
+            ために (整数 i = 0; i < len; i++)
+                もし (mask[i]) {
                     const double* elem = src + i * cn;
-                    for (int k = 0; k < cn; k++) { double v = elem[k]; result += v * v; }
+                    ために (整数 k = 0; k < cn; k++) { double v = elem[k]; result += v * v; }
                 }
         }
-        return result;
+        戻る result;
     }
 };
 
 #endif // CV_SIMD_64F || CV_SIMD_SCALABLE_64F
 #endif // CV_SIMD || CV_SIMD_SCALABLE
 
-template<typename T, typename ST> int
-normInf_(const T* src, const uchar* mask, ST* _result, int len, int cn)
+template<typename T, typename ST> 整数
+normInf_(const T* src, const uchar* mask, ST* _result, 整数 len, 整数 cn)
 {
     ST result = *_result;
-    if( !mask )
+    もし( !mask )
     {
         NormInf_SIMD<T, ST> op;
         result = std::max(result, op(src, len*cn));
-    } else {
+    } 否则 {
         MaskedNormInf_SIMD<T, ST> op;
         result = std::max(result, op(src, mask, len, cn));
     }
     *_result = result;
-    return 0;
+    戻る 0;
 }
 
-template<typename T, typename ST> int
-normL1_(const T* src, const uchar* mask, ST* _result, int len, int cn)
+template<typename T, typename ST> 整数
+normL1_(const T* src, const uchar* mask, ST* _result, 整数 len, 整数 cn)
 {
     ST result = *_result;
-    if( !mask )
+    もし( !mask )
     {
         NormL1_SIMD<T, ST> op;
         result += op(src, len*cn);
-    } else {
+    } 否则 {
         MaskedNormL1_SIMD<T, ST> op;
         result += op(src, mask, len, cn);
     }
     *_result = result;
-    return 0;
+    戻る 0;
 }
 
-template<typename T, typename ST> int
-normL2_(const T* src, const uchar* mask, ST* _result, int len, int cn)
+template<typename T, typename ST> 整数
+normL2_(const T* src, const uchar* mask, ST* _result, 整数 len, 整数 cn)
 {
     ST result = *_result;
-    if( !mask )
+    もし( !mask )
     {
         NormL2_SIMD<T, ST> op;
         result += op(src, len*cn);
     }
-    else
+    否则
     {
         MaskedNormL2_SIMD<T, ST> op;
         result += op(src, mask, len, cn);
     }
     *_result = result;
-    return 0;
+    戻る 0;
 }
 
-static int
-normInf_Bool(const uchar* src, const uchar* mask, int* _result, int len, int cn)
+static 整数
+normInf_Bool(const uchar* src, const uchar* mask, 整数* _result, 整数 len, 整数 cn)
 {
-    int result = *_result;
-    if( !mask )
+    整数 result = *_result;
+    もし( !mask )
     {
-        for ( int i = 0; i < len*cn; i++ ) {
-            result = std::max(result, (int)(src[i] != 0));
-            if (result != 0)
+        ために ( 整数 i = 0; i < len*cn; i++ ) {
+            result = std::max(result, (整数)(src[i] != 0));
+            もし (result != 0)
                 break;
         }
     }
-    else
+    否则
     {
-        for( int i = 0; i < len; i++, src += cn )
-            if( mask[i] )
+        ために( 整数 i = 0; i < len; i++, src += cn )
+            もし( mask[i] )
             {
-                for( int k = 0; k < cn; k++ )
-                    result = std::max(result, (int)(src[k] != 0));
-                if (result != 0)
+                ために( 整数 k = 0; k < cn; k++ )
+                    result = std::max(result, (整数)(src[k] != 0));
+                もし (result != 0)
                     break;
             }
     }
     *_result = result;
-    return 0;
+    戻る 0;
 }
 
-static int
-normL1_Bool(const uchar* src, const uchar* mask, int* _result, int len, int cn)
+static 整数
+normL1_Bool(const uchar* src, const uchar* mask, 整数* _result, 整数 len, 整数 cn)
 {
-    int result = *_result;
-    if( !mask )
+    整数 result = *_result;
+    もし( !mask )
     {
-        for ( int i = 0; i < len*cn; i++ )
-            result += (int)(src[i] != 0);
+        ために ( 整数 i = 0; i < len*cn; i++ )
+            result += (整数)(src[i] != 0);
     }
-    else
+    否则
     {
-        for( int i = 0; i < len; i++, src += cn )
-            if( mask[i] )
+        ために( 整数 i = 0; i < len; i++, src += cn )
+            もし( mask[i] )
             {
-                for( int k = 0; k < cn; k++ )
-                    result += (int)(src[k] != 0);
+                ために( 整数 k = 0; k < cn; k++ )
+                    result += (整数)(src[k] != 0);
             }
     }
     *_result = result;
-    return 0;
+    戻る 0;
 }
 
-static int
-normL2_Bool(const uchar* src, const uchar* mask, int* _result, int len, int cn)
+static 整数
+normL2_Bool(const uchar* src, const uchar* mask, 整数* _result, 整数 len, 整数 cn)
 {
-    return normL1_Bool(src, mask, _result, len, cn);
+    戻る normL1_Bool(src, mask, _result, len, cn);
 }
 
 // ====================================================================
@@ -2265,146 +2265,146 @@ normL2_Bool(const uchar* src, const uchar* mask, int* _result, int len, int cn)
 // ====================================================================
 template <typename T, typename ST>
 struct MaskedNormDiffInf_SIMD {
-    inline ST operator()(const T* s1, const T* s2, const uchar* mask, int len, int cn) const {
+    inline ST operator()(const T* s1, const T* s2, const uchar* mask, 整数 len, 整数 cn) const {
         ST result = 0;
-        for (int i = 0; i < len; i++) if (mask[i]) {
+        ために (整数 i = 0; i < len; i++) もし (mask[i]) {
             const T* e1 = s1 + i*cn; const T* e2 = s2 + i*cn;
-            for (int k = 0; k < cn; k++)
+            ために (整数 k = 0; k < cn; k++)
                 result = std::max(result, (ST)cv_absdiff(e1[k], e2[k]));
         }
-        return result;
+        戻る result;
     }
 };
 template <typename T, typename ST>
 struct MaskedNormDiffL1_SIMD {
-    inline ST operator()(const T* s1, const T* s2, const uchar* mask, int len, int cn) const {
+    inline ST operator()(const T* s1, const T* s2, const uchar* mask, 整数 len, 整数 cn) const {
         ST result = 0;
-        for (int i = 0; i < len; i++) if (mask[i]) {
+        ために (整数 i = 0; i < len; i++) もし (mask[i]) {
             const T* e1 = s1 + i*cn; const T* e2 = s2 + i*cn;
-            for (int k = 0; k < cn; k++)
+            ために (整数 k = 0; k < cn; k++)
                 result += (ST)cv_absdiff(e1[k], e2[k]);
         }
-        return result;
+        戻る result;
     }
 };
 template <typename T, typename ST>
 struct MaskedNormDiffL2_SIMD {
-    inline ST operator()(const T* s1, const T* s2, const uchar* mask, int len, int cn) const {
+    inline ST operator()(const T* s1, const T* s2, const uchar* mask, 整数 len, 整数 cn) const {
         ST result = 0;
-        for (int i = 0; i < len; i++) if (mask[i]) {
+        ために (整数 i = 0; i < len; i++) もし (mask[i]) {
             const T* e1 = s1 + i*cn; const T* e2 = s2 + i*cn;
-            for (int k = 0; k < cn; k++) { ST v = (ST)e1[k] - (ST)e2[k]; result += v*v; }
+            ために (整数 k = 0; k < cn; k++) { ST v = (ST)e1[k] - (ST)e2[k]; result += v*v; }
         }
-        return result;
+        戻る result;
     }
 };
 
-#if (CV_SIMD || CV_SIMD_SCALABLE)
+#もし (CV_SIMD || CV_SIMD_SCALABLE)
 // AND a per-lane diff vector with the (expanded) mask>0 predicate.
-inline v_uint8  v_diffmask(const v_uint8&  d, const uchar* m) { return v_and(d, v_gt(vx_load(m),          vx_setzero_u8())); }
-inline v_uint16 v_diffmask(const v_uint16& d, const uchar* m) { return v_and(d, v_gt(vx_load_expand(m),   vx_setzero_u16())); }
-inline v_uint32 v_diffmask(const v_uint32& d, const uchar* m) { return v_and(d, v_gt(vx_load_expand_q(m), vx_setzero_u32())); }
+inline v_uint8  v_diffmask(const v_uint8&  d, const uchar* m) { 戻る v_and(d, v_gt(vx_load(m),          vx_setzero_u8())); }
+inline v_uint16 v_diffmask(const v_uint16& d, const uchar* m) { 戻る v_and(d, v_gt(vx_load_expand(m),   vx_setzero_u16())); }
+inline v_uint32 v_diffmask(const v_uint32& d, const uchar* m) { 戻る v_and(d, v_gt(vx_load_expand_q(m), vx_setzero_u32())); }
 inline v_float32 v_diffmask(const v_float32& d, const uchar* m) {
     v_uint32 cm = v_gt(vx_load_expand_q(m), vx_setzero_u32());
-    return v_reinterpret_as_f32(v_and(v_reinterpret_as_u32(d), cm));
+    戻る v_reinterpret_as_f32(v_and(v_reinterpret_as_u32(d), cm));
 }
 
 // Shared scalar cn>1 fallbacks (match the base templates' cv_absdiff semantics).
 template<typename T, typename RT>
-static inline RT maskedNormDiffInfTail(const T* s1, const T* s2, const uchar* mask, int len, int cn, RT result) {
-    for (int i = 0; i < len; i++) if (mask[i]) {
+static inline RT maskedNormDiffInfTail(const T* s1, const T* s2, const uchar* mask, 整数 len, 整数 cn, RT result) {
+    ために (整数 i = 0; i < len; i++) もし (mask[i]) {
         const T* e1 = s1 + i*cn; const T* e2 = s2 + i*cn;
-        for (int k = 0; k < cn; k++) result = std::max(result, (RT)cv_absdiff(e1[k], e2[k]));
+        ために (整数 k = 0; k < cn; k++) result = std::max(result, (RT)cv_absdiff(e1[k], e2[k]));
     }
-    return result;
+    戻る result;
 }
 template<typename T, typename RT>
-static inline RT maskedNormDiffL1Tail(const T* s1, const T* s2, const uchar* mask, int len, int cn, RT result) {
-    for (int i = 0; i < len; i++) if (mask[i]) {
+static inline RT maskedNormDiffL1Tail(const T* s1, const T* s2, const uchar* mask, 整数 len, 整数 cn, RT result) {
+    ために (整数 i = 0; i < len; i++) もし (mask[i]) {
         const T* e1 = s1 + i*cn; const T* e2 = s2 + i*cn;
-        for (int k = 0; k < cn; k++) result += (RT)cv_absdiff(e1[k], e2[k]);
+        ために (整数 k = 0; k < cn; k++) result += (RT)cv_absdiff(e1[k], e2[k]);
     }
-    return result;
+    戻る result;
 }
 template<typename T, typename RT>
-static inline RT maskedNormDiffL2Tail(const T* s1, const T* s2, const uchar* mask, int len, int cn, RT result) {
-    for (int i = 0; i < len; i++) if (mask[i]) {
+static inline RT maskedNormDiffL2Tail(const T* s1, const T* s2, const uchar* mask, 整数 len, 整数 cn, RT result) {
+    ために (整数 i = 0; i < len; i++) もし (mask[i]) {
         const T* e1 = s1 + i*cn; const T* e2 = s2 + i*cn;
-        for (int k = 0; k < cn; k++) { RT v = (RT)e1[k] - (RT)e2[k]; result += v*v; }
+        ために (整数 k = 0; k < cn; k++) { RT v = (RT)e1[k] - (RT)e2[k]; result += v*v; }
     }
-    return result;
+    戻る result;
 }
 
 // Inf (cn==1): reduce_max of masked |a-b|. Shared across SIMD-capable depths.
 template<typename T, typename ST>
-static inline ST maskedNormDiffInfCn1(const T* s1, const T* s2, const uchar* mask, int len) {
-    const int vstep = VTraits<decltype(vx_load(s1))>::vlanes();
+static inline ST maskedNormDiffInfCn1(const T* s1, const T* s2, const uchar* mask, 整数 len) {
+    const 整数 vstep = VTraits<decltype(vx_load(s1))>::vlanes();
     ST result = 0;
-    int i = 0;
-    if (len >= vstep) {
+    整数 i = 0;
+    もし (len >= vstep) {
         auto acc = v_diffmask(v_absdiff(vx_load(s1), vx_load(s2)), mask);
-        for (i = vstep; i <= len - vstep; i += vstep)
+        ために (i = vstep; i <= len - vstep; i += vstep)
             acc = v_max(acc, v_diffmask(v_absdiff(vx_load(s1 + i), vx_load(s2 + i)), mask + i));
         result = (ST)v_reduce_max(acc);
     }
-    for (; i < len; i++) if (mask[i]) result = std::max(result, (ST)cv_absdiff(s1[i], s2[i]));
-    return result;
+    ために (; i < len; i++) もし (mask[i]) result = std::max(result, (ST)cv_absdiff(s1[i], s2[i]));
+    戻る result;
 }
 
 // Shared 8-bit cn==1 masked L1/L2 kernels (uchar/schar): v_absdiff yields v_uint8 for both.
 template<typename T>
-static inline int maskedNormDiffL1_8(const T* s1, const T* s2, const uchar* mask, int len) {
-    int i = 0; const int vstep = VTraits<v_uint8>::vlanes();
+static inline 整数 maskedNormDiffL1_8(const T* s1, const T* s2, const uchar* mask, 整数 len) {
+    整数 i = 0; const 整数 vstep = VTraits<v_uint8>::vlanes();
     const v_uint8 one = vx_setall_u8(1);
     v_uint32 acc = vx_setzero_u32();
-    for (; i <= len - vstep; i += vstep) {
+    ために (; i <= len - vstep; i += vstep) {
         v_uint8 m  = v_gt(vx_load(mask + i), vx_setzero_u8());
         v_uint8 ad = v_and(v_absdiff(vx_load(s1 + i), vx_load(s2 + i)), m);
         acc = v_dotprod_expand_fast(ad, one, acc);
     }
-    int result = (int)v_reduce_sum(acc);
-    for (; i < len; i++) if (mask[i]) result += (int)cv_absdiff(s1[i], s2[i]);
-    return result;
+    整数 result = (整数)v_reduce_sum(acc);
+    ために (; i < len; i++) もし (mask[i]) result += (整数)cv_absdiff(s1[i], s2[i]);
+    戻る result;
 }
 template<typename T>
-static inline int maskedNormDiffL2_8(const T* s1, const T* s2, const uchar* mask, int len) {
-    int i = 0; const int vstep = VTraits<v_uint8>::vlanes();
+static inline 整数 maskedNormDiffL2_8(const T* s1, const T* s2, const uchar* mask, 整数 len) {
+    整数 i = 0; const 整数 vstep = VTraits<v_uint8>::vlanes();
     v_uint32 acc = vx_setzero_u32();
-    for (; i <= len - vstep; i += vstep) {
+    ために (; i <= len - vstep; i += vstep) {
         v_uint8 m  = v_gt(vx_load(mask + i), vx_setzero_u8());
         v_uint8 ad = v_and(v_absdiff(vx_load(s1 + i), vx_load(s2 + i)), m);
         acc = v_dotprod_expand_fast(ad, ad, acc);
     }
-    int result = (int)v_reduce_sum(acc);
-    for (; i < len; i++) if (mask[i]) { int v = (int)s1[i] - (int)s2[i]; result += v*v; }
-    return result;
+    整数 result = (整数)v_reduce_sum(acc);
+    ために (; i < len; i++) もし (mask[i]) { 整数 v = (整数)s1[i] - (整数)s2[i]; result += v*v; }
+    戻る result;
 }
 
 // Shared 16-bit cn==1 masked L1 kernel (ushort/short): v_absdiff yields v_uint16 for both.
 template<typename T>
-static inline int maskedNormDiffL1_16(const T* s1, const T* s2, const uchar* mask, int len) {
-    int i = 0; const int vstep = VTraits<v_uint16>::vlanes();
+static inline 整数 maskedNormDiffL1_16(const T* s1, const T* s2, const uchar* mask, 整数 len) {
+    整数 i = 0; const 整数 vstep = VTraits<v_uint16>::vlanes();
     v_uint32 acc = vx_setzero_u32();
-    for (; i <= len - vstep; i += vstep) {
+    ために (; i <= len - vstep; i += vstep) {
         v_uint16 m  = v_gt(vx_load_expand(mask + i), vx_setzero_u16());
         v_uint16 ad = v_and(v_absdiff(vx_load(s1 + i), vx_load(s2 + i)), m);
         v_uint32 lo, hi; v_expand(ad, lo, hi);
         acc = v_add(acc, v_add(lo, hi));
     }
-    int result = (int)v_reduce_sum(acc);
-    for (; i < len; i++) if (mask[i]) result += (int)cv_absdiff(s1[i], s2[i]);
-    return result;
+    整数 result = (整数)v_reduce_sum(acc);
+    ために (; i < len; i++) もし (mask[i]) result += (整数)cv_absdiff(s1[i], s2[i]);
+    戻る result;
 }
 
-template<> struct MaskedNormDiffInf_SIMD<uchar, int> {
-    int operator()(const uchar* s1, const uchar* s2, const uchar* mask, int len, int cn) const {
-        if (cn == 1) return maskedNormDiffInfCn1<uchar, int>(s1, s2, mask, len);
-        if (cn == 4 && len >= VTraits<v_uint8>::vlanes()) {
-            const int vstep = VTraits<v_uint8>::vlanes();
+template<> struct MaskedNormDiffInf_SIMD<uchar, 整数> {
+    整数 operator()(const uchar* s1, const uchar* s2, const uchar* mask, 整数 len, 整数 cn) const {
+        もし (cn == 1) 戻る maskedNormDiffInfCn1<uchar, 整数>(s1, s2, mask, len);
+        もし (cn == 4 && len >= VTraits<v_uint8>::vlanes()) {
+            const 整数 vstep = VTraits<v_uint8>::vlanes();
             v_uint8 acc = vx_setzero_u8();
-            int i = 0;
-            for (;;) {
-                if (i > len - vstep) i = len - vstep; // back-step (max is idempotent)
+            整数 i = 0;
+            ために (;;) {
+                もし (i > len - vstep) i = len - vstep; // back-step (max is idempotent)
                 v_uint8 a0,a1,a2,a3,b0,b1,b2,b3;
                 v_load_deinterleave(s1 + i*4, a0,a1,a2,a3);
                 v_load_deinterleave(s2 + i*4, b0,b1,b2,b3);
@@ -2412,53 +2412,53 @@ template<> struct MaskedNormDiffInf_SIMD<uchar, int> {
                                    v_max(v_absdiff(a2,b2), v_absdiff(a3,b3)));
                 v_uint8 m = v_gt(vx_load(mask + i), vx_setzero_u8());
                 acc = v_max(acc, v_and(ad, m));
-                if (i >= len - vstep) break;
+                もし (i >= len - vstep) break;
                 i += vstep;
             }
-            return (int)v_reduce_max(acc);
+            戻る (整数)v_reduce_max(acc);
         }
-        return maskedNormDiffInfTail<uchar, int>(s1, s2, mask, len, cn, 0);
+        戻る maskedNormDiffInfTail<uchar, 整数>(s1, s2, mask, len, cn, 0);
     }
 };
-template<> struct MaskedNormDiffInf_SIMD<schar, int> {
-    int operator()(const schar* s1, const schar* s2, const uchar* mask, int len, int cn) const {
-        if (cn == 1) return maskedNormDiffInfCn1<schar, int>(s1, s2, mask, len);
-        return maskedNormDiffInfTail<schar, int>(s1, s2, mask, len, cn, 0);
+template<> struct MaskedNormDiffInf_SIMD<schar, 整数> {
+    整数 operator()(const schar* s1, const schar* s2, const uchar* mask, 整数 len, 整数 cn) const {
+        もし (cn == 1) 戻る maskedNormDiffInfCn1<schar, 整数>(s1, s2, mask, len);
+        戻る maskedNormDiffInfTail<schar, 整数>(s1, s2, mask, len, cn, 0);
     }
 };
-template<> struct MaskedNormDiffInf_SIMD<ushort, int> {
-    int operator()(const ushort* s1, const ushort* s2, const uchar* mask, int len, int cn) const {
-        if (cn == 1) return maskedNormDiffInfCn1<ushort, int>(s1, s2, mask, len);
-        return maskedNormDiffInfTail<ushort, int>(s1, s2, mask, len, cn, 0);
+template<> struct MaskedNormDiffInf_SIMD<ushort, 整数> {
+    整数 operator()(const ushort* s1, const ushort* s2, const uchar* mask, 整数 len, 整数 cn) const {
+        もし (cn == 1) 戻る maskedNormDiffInfCn1<ushort, 整数>(s1, s2, mask, len);
+        戻る maskedNormDiffInfTail<ushort, 整数>(s1, s2, mask, len, cn, 0);
     }
 };
-template<> struct MaskedNormDiffInf_SIMD<short, int> {
-    int operator()(const short* s1, const short* s2, const uchar* mask, int len, int cn) const {
-        if (cn == 1) return maskedNormDiffInfCn1<short, int>(s1, s2, mask, len);
-        return maskedNormDiffInfTail<short, int>(s1, s2, mask, len, cn, 0);
+template<> struct MaskedNormDiffInf_SIMD<short, 整数> {
+    整数 operator()(const short* s1, const short* s2, const uchar* mask, 整数 len, 整数 cn) const {
+        もし (cn == 1) 戻る maskedNormDiffInfCn1<short, 整数>(s1, s2, mask, len);
+        戻る maskedNormDiffInfTail<short, 整数>(s1, s2, mask, len, cn, 0);
     }
 };
-template<> struct MaskedNormDiffInf_SIMD<int, unsigned> {
-    unsigned operator()(const int* s1, const int* s2, const uchar* mask, int len, int cn) const {
-        if (cn == 1) return maskedNormDiffInfCn1<int, unsigned>(s1, s2, mask, len);
-        return maskedNormDiffInfTail<int, unsigned>(s1, s2, mask, len, cn, 0u);
+template<> struct MaskedNormDiffInf_SIMD<整数, unsigned> {
+    unsigned operator()(const 整数* s1, const 整数* s2, const uchar* mask, 整数 len, 整数 cn) const {
+        もし (cn == 1) 戻る maskedNormDiffInfCn1<整数, unsigned>(s1, s2, mask, len);
+        戻る maskedNormDiffInfTail<整数, unsigned>(s1, s2, mask, len, cn, 0u);
     }
 };
 template<> struct MaskedNormDiffInf_SIMD<float, float> {
-    float operator()(const float* s1, const float* s2, const uchar* mask, int len, int cn) const {
-        if (cn == 1) return maskedNormDiffInfCn1<float, float>(s1, s2, mask, len);
-        return maskedNormDiffInfTail<float, float>(s1, s2, mask, len, cn, 0.0f);
+    float operator()(const float* s1, const float* s2, const uchar* mask, 整数 len, 整数 cn) const {
+        もし (cn == 1) 戻る maskedNormDiffInfCn1<float, float>(s1, s2, mask, len);
+        戻る maskedNormDiffInfTail<float, float>(s1, s2, mask, len, cn, 0.0f);
     }
 };
 
-template<> struct MaskedNormDiffL1_SIMD<uchar, int> {
-    int operator()(const uchar* s1, const uchar* s2, const uchar* mask, int len, int cn) const {
-        if (cn == 1) return maskedNormDiffL1_8(s1, s2, mask, len);
-        if (cn == 4) {
-            int i = 0; const int vstep = VTraits<v_uint8>::vlanes();
+template<> struct MaskedNormDiffL1_SIMD<uchar, 整数> {
+    整数 operator()(const uchar* s1, const uchar* s2, const uchar* mask, 整数 len, 整数 cn) const {
+        もし (cn == 1) 戻る maskedNormDiffL1_8(s1, s2, mask, len);
+        もし (cn == 4) {
+            整数 i = 0; const 整数 vstep = VTraits<v_uint8>::vlanes();
             const v_uint8 one = vx_setall_u8(1);
             v_uint32 acc = vx_setzero_u32();
-            for (; i <= len - vstep; i += vstep) {
+            ために (; i <= len - vstep; i += vstep) {
                 v_uint8 a0,a1,a2,a3,b0,b1,b2,b3;
                 v_load_deinterleave(s1 + i*4, a0,a1,a2,a3);
                 v_load_deinterleave(s2 + i*4, b0,b1,b2,b3);
@@ -2468,42 +2468,42 @@ template<> struct MaskedNormDiffL1_SIMD<uchar, int> {
                 acc = v_dotprod_expand_fast(v_and(v_absdiff(a2,b2), m), one, acc);
                 acc = v_dotprod_expand_fast(v_and(v_absdiff(a3,b3), m), one, acc);
             }
-            int result = (int)v_reduce_sum(acc);
-            for (; i < len; i++) if (mask[i]) {
+            整数 result = (整数)v_reduce_sum(acc);
+            ために (; i < len; i++) もし (mask[i]) {
                 const uchar* e1 = s1 + i*4; const uchar* e2 = s2 + i*4;
-                for (int k = 0; k < 4; k++) result += (int)cv_absdiff(e1[k], e2[k]);
+                ために (整数 k = 0; k < 4; k++) result += (整数)cv_absdiff(e1[k], e2[k]);
             }
-            return result;
+            戻る result;
         }
-        return maskedNormDiffL1Tail<uchar, int>(s1, s2, mask, len, cn, 0);
+        戻る maskedNormDiffL1Tail<uchar, 整数>(s1, s2, mask, len, cn, 0);
     }
 };
-template<> struct MaskedNormDiffL1_SIMD<schar, int> {
-    int operator()(const schar* s1, const schar* s2, const uchar* mask, int len, int cn) const {
-        if (cn == 1) return maskedNormDiffL1_8(s1, s2, mask, len);
-        return maskedNormDiffL1Tail<schar, int>(s1, s2, mask, len, cn, 0);
+template<> struct MaskedNormDiffL1_SIMD<schar, 整数> {
+    整数 operator()(const schar* s1, const schar* s2, const uchar* mask, 整数 len, 整数 cn) const {
+        もし (cn == 1) 戻る maskedNormDiffL1_8(s1, s2, mask, len);
+        戻る maskedNormDiffL1Tail<schar, 整数>(s1, s2, mask, len, cn, 0);
     }
 };
-template<> struct MaskedNormDiffL1_SIMD<ushort, int> {
-    int operator()(const ushort* s1, const ushort* s2, const uchar* mask, int len, int cn) const {
-        if (cn == 1) return maskedNormDiffL1_16(s1, s2, mask, len);
-        return maskedNormDiffL1Tail<ushort, int>(s1, s2, mask, len, cn, 0);
+template<> struct MaskedNormDiffL1_SIMD<ushort, 整数> {
+    整数 operator()(const ushort* s1, const ushort* s2, const uchar* mask, 整数 len, 整数 cn) const {
+        もし (cn == 1) 戻る maskedNormDiffL1_16(s1, s2, mask, len);
+        戻る maskedNormDiffL1Tail<ushort, 整数>(s1, s2, mask, len, cn, 0);
     }
 };
-template<> struct MaskedNormDiffL1_SIMD<short, int> {
-    int operator()(const short* s1, const short* s2, const uchar* mask, int len, int cn) const {
-        if (cn == 1) return maskedNormDiffL1_16(s1, s2, mask, len);
-        return maskedNormDiffL1Tail<short, int>(s1, s2, mask, len, cn, 0);
+template<> struct MaskedNormDiffL1_SIMD<short, 整数> {
+    整数 operator()(const short* s1, const short* s2, const uchar* mask, 整数 len, 整数 cn) const {
+        もし (cn == 1) 戻る maskedNormDiffL1_16(s1, s2, mask, len);
+        戻る maskedNormDiffL1Tail<short, 整数>(s1, s2, mask, len, cn, 0);
     }
 };
 
-template<> struct MaskedNormDiffL2_SIMD<uchar, int> {
-    int operator()(const uchar* s1, const uchar* s2, const uchar* mask, int len, int cn) const {
-        if (cn == 1) return maskedNormDiffL2_8(s1, s2, mask, len);
-        if (cn == 4) {
-            int i = 0; const int vstep = VTraits<v_uint8>::vlanes();
+template<> struct MaskedNormDiffL2_SIMD<uchar, 整数> {
+    整数 operator()(const uchar* s1, const uchar* s2, const uchar* mask, 整数 len, 整数 cn) const {
+        もし (cn == 1) 戻る maskedNormDiffL2_8(s1, s2, mask, len);
+        もし (cn == 4) {
+            整数 i = 0; const 整数 vstep = VTraits<v_uint8>::vlanes();
             v_uint32 acc = vx_setzero_u32();
-            for (; i <= len - vstep; i += vstep) {
+            ために (; i <= len - vstep; i += vstep) {
                 v_uint8 a0,a1,a2,a3,b0,b1,b2,b3;
                 v_load_deinterleave(s1 + i*4, a0,a1,a2,a3);
                 v_load_deinterleave(s2 + i*4, b0,b1,b2,b3);
@@ -2515,31 +2515,31 @@ template<> struct MaskedNormDiffL2_SIMD<uchar, int> {
                 acc = v_dotprod_expand_fast(d2, d2, acc);
                 acc = v_dotprod_expand_fast(d3, d3, acc);
             }
-            int result = (int)v_reduce_sum(acc);
-            for (; i < len; i++) if (mask[i]) {
+            整数 result = (整数)v_reduce_sum(acc);
+            ために (; i < len; i++) もし (mask[i]) {
                 const uchar* e1 = s1 + i*4; const uchar* e2 = s2 + i*4;
-                for (int k = 0; k < 4; k++) { int v = (int)e1[k] - (int)e2[k]; result += v*v; }
+                ために (整数 k = 0; k < 4; k++) { 整数 v = (整数)e1[k] - (整数)e2[k]; result += v*v; }
             }
-            return result;
+            戻る result;
         }
-        return maskedNormDiffL2Tail<uchar, int>(s1, s2, mask, len, cn, 0);
+        戻る maskedNormDiffL2Tail<uchar, 整数>(s1, s2, mask, len, cn, 0);
     }
 };
-template<> struct MaskedNormDiffL2_SIMD<schar, int> {
-    int operator()(const schar* s1, const schar* s2, const uchar* mask, int len, int cn) const {
-        if (cn == 1) return maskedNormDiffL2_8(s1, s2, mask, len);
-        return maskedNormDiffL2Tail<schar, int>(s1, s2, mask, len, cn, 0);
+template<> struct MaskedNormDiffL2_SIMD<schar, 整数> {
+    整数 operator()(const schar* s1, const schar* s2, const uchar* mask, 整数 len, 整数 cn) const {
+        もし (cn == 1) 戻る maskedNormDiffL2_8(s1, s2, mask, len);
+        戻る maskedNormDiffL2Tail<schar, 整数>(s1, s2, mask, len, cn, 0);
     }
 };
 
-#if CV_SIMD_64F
+#もし CV_SIMD_64F
 // Depths whose L1/L2 accumulate in double.
-template<> struct MaskedNormDiffL1_SIMD<int, double> {
-    double operator()(const int* s1, const int* s2, const uchar* mask, int len, int cn) const {
-        if (cn != 1) return maskedNormDiffL1Tail<int, double>(s1, s2, mask, len, cn, 0.0);
-        int i = 0; const int vstep = VTraits<v_int32>::vlanes();
+template<> struct MaskedNormDiffL1_SIMD<整数, double> {
+    double operator()(const 整数* s1, const 整数* s2, const uchar* mask, 整数 len, 整数 cn) const {
+        もし (cn != 1) 戻る maskedNormDiffL1Tail<整数, double>(s1, s2, mask, len, cn, 0.0);
+        整数 i = 0; const 整数 vstep = VTraits<v_int32>::vlanes();
         v_float64 acc = vx_setzero_f64();
-        for (; i <= len - vstep; i += vstep) {
+        ために (; i <= len - vstep; i += vstep) {
             v_uint32 m  = v_gt(vx_load_expand_q(mask + i), vx_setzero_u32());
             v_uint32 ad = v_and(v_absdiff(vx_load(s1 + i), vx_load(s2 + i)), m);
             v_uint64 e0, e1; v_expand(ad, e0, e1);
@@ -2547,55 +2547,55 @@ template<> struct MaskedNormDiffL1_SIMD<int, double> {
             acc = v_add(acc, v_cvt_f64(v_reinterpret_as_s64(e1)));
         }
         double result = v_reduce_sum(acc);
-        for (; i < len; i++) if (mask[i]) result += (double)cv_absdiff(s1[i], s2[i]);
-        return result;
+        ために (; i < len; i++) もし (mask[i]) result += (double)cv_absdiff(s1[i], s2[i]);
+        戻る result;
     }
 };
 template<> struct MaskedNormDiffL1_SIMD<float, double> {
-    double operator()(const float* s1, const float* s2, const uchar* mask, int len, int cn) const {
-        if (cn != 1) return maskedNormDiffL1Tail<float, double>(s1, s2, mask, len, cn, 0.0);
-        int i = 0; const int vstep = VTraits<v_float32>::vlanes();
+    double operator()(const float* s1, const float* s2, const uchar* mask, 整数 len, 整数 cn) const {
+        もし (cn != 1) 戻る maskedNormDiffL1Tail<float, double>(s1, s2, mask, len, cn, 0.0);
+        整数 i = 0; const 整数 vstep = VTraits<v_float32>::vlanes();
         v_float64 acc0 = vx_setzero_f64(), acc1 = vx_setzero_f64();
-        for (; i <= len - vstep; i += vstep) {
+        ために (; i <= len - vstep; i += vstep) {
             v_float32 m  = v_reinterpret_as_f32(v_gt(vx_load_expand_q(mask + i), vx_setzero_u32()));
             v_float32 ad = v_and(v_absdiff(vx_load(s1 + i), vx_load(s2 + i)), m);
             acc0 = v_add(acc0, v_cvt_f64(ad));
             acc1 = v_add(acc1, v_cvt_f64_high(ad));
         }
         double result = v_reduce_sum(v_add(acc0, acc1));
-        for (; i < len; i++) if (mask[i]) result += (double)cv_absdiff(s1[i], s2[i]);
-        return result;
+        ために (; i < len; i++) もし (mask[i]) result += (double)cv_absdiff(s1[i], s2[i]);
+        戻る result;
     }
 };
 
 template<typename T>
-static inline double maskedNormDiffL2_16(const T* s1, const T* s2, const uchar* mask, int len, int cn) {
-    if (cn != 1) return maskedNormDiffL2Tail<T, double>(s1, s2, mask, len, cn, 0.0);
-    int i = 0; const int vstep = VTraits<v_uint16>::vlanes();
+static inline double maskedNormDiffL2_16(const T* s1, const T* s2, const uchar* mask, 整数 len, 整数 cn) {
+    もし (cn != 1) 戻る maskedNormDiffL2Tail<T, double>(s1, s2, mask, len, cn, 0.0);
+    整数 i = 0; const 整数 vstep = VTraits<v_uint16>::vlanes();
     v_float64 acc = vx_setzero_f64();
-    for (; i <= len - vstep; i += vstep) {
+    ために (; i <= len - vstep; i += vstep) {
         v_uint16 m  = v_gt(vx_load_expand(mask + i), vx_setzero_u16());
         v_uint16 ad = v_and(v_absdiff(vx_load(s1 + i), vx_load(s2 + i)), m);
         v_uint64 u = v_dotprod_expand_fast(ad, ad);
         acc = v_add(acc, v_cvt_f64(v_reinterpret_as_s64(u)));
     }
     double result = v_reduce_sum(acc);
-    for (; i < len; i++) if (mask[i]) { double v = (double)s1[i] - (double)s2[i]; result += v*v; }
-    return result;
+    ために (; i < len; i++) もし (mask[i]) { double v = (double)s1[i] - (double)s2[i]; result += v*v; }
+    戻る result;
 }
 template<> struct MaskedNormDiffL2_SIMD<ushort, double> {
-    double operator()(const ushort* s1, const ushort* s2, const uchar* mask, int len, int cn) const
-    { return maskedNormDiffL2_16(s1, s2, mask, len, cn); } };
+    double operator()(const ushort* s1, const ushort* s2, const uchar* mask, 整数 len, 整数 cn) const
+    { 戻る maskedNormDiffL2_16(s1, s2, mask, len, cn); } };
 template<> struct MaskedNormDiffL2_SIMD<short, double> {
-    double operator()(const short* s1, const short* s2, const uchar* mask, int len, int cn) const
-    { return maskedNormDiffL2_16(s1, s2, mask, len, cn); } };
+    double operator()(const short* s1, const short* s2, const uchar* mask, 整数 len, 整数 cn) const
+    { 戻る maskedNormDiffL2_16(s1, s2, mask, len, cn); } };
 
-template<> struct MaskedNormDiffL2_SIMD<int, double> {
-    double operator()(const int* s1, const int* s2, const uchar* mask, int len, int cn) const {
-        if (cn != 1) return maskedNormDiffL2Tail<int, double>(s1, s2, mask, len, cn, 0.0);
-        int i = 0; const int vstep = VTraits<v_int32>::vlanes();
+template<> struct MaskedNormDiffL2_SIMD<整数, double> {
+    double operator()(const 整数* s1, const 整数* s2, const uchar* mask, 整数 len, 整数 cn) const {
+        もし (cn != 1) 戻る maskedNormDiffL2Tail<整数, double>(s1, s2, mask, len, cn, 0.0);
+        整数 i = 0; const 整数 vstep = VTraits<v_int32>::vlanes();
         v_float64 r0 = vx_setzero_f64(), r1 = vx_setzero_f64();
-        for (; i <= len - vstep; i += vstep) {
+        ために (; i <= len - vstep; i += vstep) {
             v_uint32 m  = v_gt(vx_load_expand_q(mask + i), vx_setzero_u32());
             v_uint32 ad = v_and(v_absdiff(vx_load(s1 + i), vx_load(s2 + i)), m);
             v_uint64 e0, e1; v_expand(ad, e0, e1);
@@ -2603,36 +2603,36 @@ template<> struct MaskedNormDiffL2_SIMD<int, double> {
             r0 = v_fma(f0, f0, r0); r1 = v_fma(f1, f1, r1);
         }
         double result = v_reduce_sum(v_add(r0, r1));
-        for (; i < len; i++) if (mask[i]) { double v = (double)s1[i] - (double)s2[i]; result += v*v; }
-        return result;
+        ために (; i < len; i++) もし (mask[i]) { double v = (double)s1[i] - (double)s2[i]; result += v*v; }
+        戻る result;
     }
 };
 template<> struct MaskedNormDiffL2_SIMD<float, double> {
-    double operator()(const float* s1, const float* s2, const uchar* mask, int len, int cn) const {
-        if (cn != 1) return maskedNormDiffL2Tail<float, double>(s1, s2, mask, len, cn, 0.0);
-        int i = 0; const int vstep = VTraits<v_float32>::vlanes();
+    double operator()(const float* s1, const float* s2, const uchar* mask, 整数 len, 整数 cn) const {
+        もし (cn != 1) 戻る maskedNormDiffL2Tail<float, double>(s1, s2, mask, len, cn, 0.0);
+        整数 i = 0; const 整数 vstep = VTraits<v_float32>::vlanes();
         v_float64 r0 = vx_setzero_f64(), r1 = vx_setzero_f64();
-        for (; i <= len - vstep; i += vstep) {
+        ために (; i <= len - vstep; i += vstep) {
             v_float32 m  = v_reinterpret_as_f32(v_gt(vx_load_expand_q(mask + i), vx_setzero_u32()));
             v_float32 ad = v_and(v_absdiff(vx_load(s1 + i), vx_load(s2 + i)), m);
             v_float64 f0 = v_cvt_f64(ad), f1 = v_cvt_f64_high(ad);
             r0 = v_fma(f0, f0, r0); r1 = v_fma(f1, f1, r1);
         }
         double result = v_reduce_sum(v_add(r0, r1));
-        for (; i < len; i++) if (mask[i]) { double v = (double)s1[i] - (double)s2[i]; result += v*v; }
-        return result;
+        ために (; i < len; i++) もし (mask[i]) { double v = (double)s1[i] - (double)s2[i]; result += v*v; }
+        戻る result;
     }
 };
 template<>
 struct MaskedNormDiffInf_SIMD<double, double> {
-    inline double operator()(const double* s1, const double* s2, const uchar* mask, int len, int cn) const {
+    inline double operator()(const double* s1, const double* s2, const uchar* mask, 整数 len, 整数 cn) const {
         double result = 0.0;
-        int i = 0;
-#if CV_SIMD_64F || CV_SIMD_SCALABLE_64F
-        if (cn == 1) {
-            const int vstep = VTraits<v_float64>::vlanes();
+        整数 i = 0;
+#もし CV_SIMD_64F || CV_SIMD_SCALABLE_64F
+        もし (cn == 1) {
+            const 整数 vstep = VTraits<v_float64>::vlanes();
             v_float64 acc0 = vx_setzero_f64(), acc1 = vx_setzero_f64();
-            for (; i <= len - 2*vstep; i += 2*vstep) {
+            ために (; i <= len - 2*vstep; i += 2*vstep) {
                 v_uint64 m0, m1;
                 v_normmask_u64(mask + i, m0, m1);
                 v_float64 d0 = v_absdiff(vx_load(s1 + i), vx_load(s2 + i));
@@ -2642,27 +2642,27 @@ struct MaskedNormDiffInf_SIMD<double, double> {
             }
             double t[VTraits<v_float64>::max_nlanes];
             vx_store(t, v_max(acc0, acc1));
-            for (int k = 0; k < vstep; k++)
+            ために (整数 k = 0; k < vstep; k++)
                 result = std::max(result, t[k]);
         }
 #endif
-        for (; i < len; i++) if (mask[i]) {
+        ために (; i < len; i++) もし (mask[i]) {
             const double* e1 = s1 + i*cn; const double* e2 = s2 + i*cn;
-            for (int k = 0; k < cn; k++) result = std::max(result, std::abs(e1[k] - e2[k]));
+            ために (整数 k = 0; k < cn; k++) result = std::max(result, std::abs(e1[k] - e2[k]));
         }
-        return result;
+        戻る result;
     }
 };
 
 template<>
 struct MaskedNormDiffL1_SIMD<double, double> {
-    double operator()(const double* s1, const double* s2, const uchar* mask, int len, int cn) const {
+    double operator()(const double* s1, const double* s2, const uchar* mask, 整数 len, 整数 cn) const {
         double result = 0.0;
-        if (cn == 1) {
-            const int vstep = VTraits<v_float64>::vlanes();
-            int i = 0;
+        もし (cn == 1) {
+            const 整数 vstep = VTraits<v_float64>::vlanes();
+            整数 i = 0;
             v_float64 acc0 = vx_setzero_f64(), acc1 = vx_setzero_f64();
-            for (; i <= len - 2*vstep; i += 2*vstep) {
+            ために (; i <= len - 2*vstep; i += 2*vstep) {
                 v_uint64 m0, m1;
                 v_normmask_u64(mask + i, m0, m1);
                 v_float64 d0 = v_absdiff(vx_load(s1 + i), vx_load(s2 + i));
@@ -2671,23 +2671,23 @@ struct MaskedNormDiffL1_SIMD<double, double> {
                 acc1 = v_add(acc1, v_reinterpret_as_f64(v_and(v_reinterpret_as_u64(d1), m1)));
             }
             result = v_reduce_sum(v_add(acc0, acc1));
-            for (; i < len; i++) if (mask[i]) result += std::abs(s1[i] - s2[i]);
-        } else {
+            ために (; i < len; i++) もし (mask[i]) result += std::abs(s1[i] - s2[i]);
+        } 否则 {
             result = maskedNormDiffL1Tail<double, double>(s1, s2, mask, len, cn, 0.0);
         }
-        return result;
+        戻る result;
     }
 };
 
 template<>
 struct MaskedNormDiffL2_SIMD<double, double> {
-    double operator()(const double* s1, const double* s2, const uchar* mask, int len, int cn) const {
+    double operator()(const double* s1, const double* s2, const uchar* mask, 整数 len, 整数 cn) const {
         double result = 0.0;
-        if (cn == 1) {
-            const int vstep = VTraits<v_float64>::vlanes();
-            int i = 0;
+        もし (cn == 1) {
+            const 整数 vstep = VTraits<v_float64>::vlanes();
+            整数 i = 0;
             v_float64 acc0 = vx_setzero_f64(), acc1 = vx_setzero_f64();
-            for (; i <= len - 2*vstep; i += 2*vstep) {
+            ために (; i <= len - 2*vstep; i += 2*vstep) {
                 v_uint64 m0, m1;
                 v_normmask_u64(mask + i, m0, m1);
                 v_float64 d0 = v_sub(vx_load(s1 + i), vx_load(s2 + i));
@@ -2698,131 +2698,131 @@ struct MaskedNormDiffL2_SIMD<double, double> {
                 acc1 = v_fma(d1, d1, acc1);
             }
             result = v_reduce_sum(v_add(acc0, acc1));
-            for (; i < len; i++) if (mask[i]) { double v = s1[i] - s2[i]; result += v*v; }
-        } else {
+            ために (; i < len; i++) もし (mask[i]) { double v = s1[i] - s2[i]; result += v*v; }
+        } 否则 {
             result = maskedNormDiffL2Tail<double, double>(s1, s2, mask, len, cn, 0.0);
         }
-        return result;
+        戻る result;
     }
 };
 #endif // CV_SIMD_64F
 #endif // CV_SIMD
 
-template<typename T, typename ST> int
-normDiffInf_(const T* src1, const T* src2, const uchar* mask, ST* _result, int len, int cn) {
+template<typename T, typename ST> 整数
+normDiffInf_(const T* src1, const T* src2, const uchar* mask, ST* _result, 整数 len, 整数 cn) {
     ST result = *_result;
-    if( !mask ) {
+    もし( !mask ) {
         NormDiffInf_SIMD<T, ST> op;
         result = std::max(result, op(src1, src2, len*cn));
-    } else {
+    } 否则 {
         MaskedNormDiffInf_SIMD<T, ST> op;
         result = std::max(result, op(src1, src2, mask, len, cn));
     }
     *_result = result;
-    return 0;
+    戻る 0;
 }
 
-template<typename T, typename ST> int
-normDiffL1_(const T* src1, const T* src2, const uchar* mask, ST* _result, int len, int cn) {
+template<typename T, typename ST> 整数
+normDiffL1_(const T* src1, const T* src2, const uchar* mask, ST* _result, 整数 len, 整数 cn) {
     ST result = *_result;
-    if( !mask ) {
+    もし( !mask ) {
         NormDiffL1_SIMD<T, ST> op;
         result += op(src1, src2, len*cn);
-    } else {
+    } 否则 {
         MaskedNormDiffL1_SIMD<T, ST> op;
         result += op(src1, src2, mask, len, cn);
     }
     *_result = result;
-    return 0;
+    戻る 0;
 }
 
-template<typename T, typename ST> int
-normDiffL2_(const T* src1, const T* src2, const uchar* mask, ST* _result, int len, int cn) {
+template<typename T, typename ST> 整数
+normDiffL2_(const T* src1, const T* src2, const uchar* mask, ST* _result, 整数 len, 整数 cn) {
     ST result = *_result;
-    if( !mask ) {
+    もし( !mask ) {
         NormDiffL2_SIMD<T, ST> op;
         result += op(src1, src2, len*cn);
-    } else {
+    } 否则 {
         MaskedNormDiffL2_SIMD<T, ST> op;
         result += op(src1, src2, mask, len, cn);
     }
     *_result = result;
-    return 0;
+    戻る 0;
 }
 
-static int
-normDiffInf_Bool(const uchar* src1, const uchar* src2, const uchar* mask, int* _result, int len, int cn)
+static 整数
+normDiffInf_Bool(const uchar* src1, const uchar* src2, const uchar* mask, 整数* _result, 整数 len, 整数 cn)
 {
-    int result = *_result;
-    if( !mask )
+    整数 result = *_result;
+    もし( !mask )
     {
-        for( int i = 0; i < len*cn; i++ ) {
-            result = std::max(result, (int)((src1[i] != 0) != (src2[i] != 0)));
-            if (result != 0)
+        ために( 整数 i = 0; i < len*cn; i++ ) {
+            result = std::max(result, (整数)((src1[i] != 0) != (src2[i] != 0)));
+            もし (result != 0)
                 break;
         }
     }
-    else
+    否则
     {
-        for( int i = 0; i < len; i++, src1 += cn, src2 += cn )
-            if( mask[i] )
+        ために( 整数 i = 0; i < len; i++, src1 += cn, src2 += cn )
+            もし( mask[i] )
             {
-                for( int k = 0; k < cn; k++ )
-                    result = std::max(result, (int)((src1[k] != 0) != (src2[k] != 0)));
-                if (result != 0)
+                ために( 整数 k = 0; k < cn; k++ )
+                    result = std::max(result, (整数)((src1[k] != 0) != (src2[k] != 0)));
+                もし (result != 0)
                     break;
             }
     }
     *_result = result;
-    return 0;
+    戻る 0;
 }
 
-static int
-normDiffL1_Bool(const uchar* src1, const uchar* src2, const uchar* mask, int* _result, int len, int cn)
+static 整数
+normDiffL1_Bool(const uchar* src1, const uchar* src2, const uchar* mask, 整数* _result, 整数 len, 整数 cn)
 {
-    int result = *_result;
-    if( !mask )
+    整数 result = *_result;
+    もし( !mask )
     {
-        for( int i = 0; i < len*cn; i++ )
-            result += (int)((src1[i] != 0) != (src2[i] != 0));
+        ために( 整数 i = 0; i < len*cn; i++ )
+            result += (整数)((src1[i] != 0) != (src2[i] != 0));
     }
-    else
+    否则
     {
-        for( int i = 0; i < len; i++, src1 += cn, src2 += cn )
-            if( mask[i] )
+        ために( 整数 i = 0; i < len; i++, src1 += cn, src2 += cn )
+            もし( mask[i] )
             {
-                for( int k = 0; k < cn; k++ )
-                    result += (int)((src1[k] != 0) != (src2[k] != 0));
+                ために( 整数 k = 0; k < cn; k++ )
+                    result += (整数)((src1[k] != 0) != (src2[k] != 0));
             }
     }
     *_result = result;
-    return 0;
+    戻る 0;
 }
 
-static int
-normDiffL2_Bool(const uchar* src1, const uchar* src2, const uchar* mask, int* _result, int len, int cn)
+static 整数
+normDiffL2_Bool(const uchar* src1, const uchar* src2, const uchar* mask, 整数* _result, 整数 len, 整数 cn)
 {
-    return normDiffL1_Bool(src1, src2, mask, _result, len, cn);
+    戻る normDiffL1_Bool(src1, src2, mask, _result, len, cn);
 }
 
 #define CV_DEF_NORM_FUNC(L, suffix, type, ntype) \
-    static int norm##L##_##suffix(const type* src, const uchar* mask, ntype* r, int len, int cn) \
-{ CV_INSTRUMENT_REGION(); return norm##L##_(src, mask, r, len, cn); } \
-    static int normDiff##L##_##suffix(const type* src1, const type* src2, \
-    const uchar* mask, ntype* r, int len, int cn) \
-{ return normDiff##L##_(src1, src2, mask, r, (int)len, cn); }
+    static 整数 norm##L##_##suffix(const type* src, const uchar* mask, ntype* r, 整数 len, 整数 cn) \
+{ CV_INSTRUMENT_REGION(); 戻る norm##L##_(src, mask, r, len, cn); } \
+    static 整数 normDiff##L##_##suffix(const type* src1, const type* src2, \
+    const uchar* mask, ntype* r, 整数 len, 整数 cn) \
+{ 戻る normDiff##L##_(src1, src2, mask, r, (整数)len, cn); }
 
 #define CV_DEF_NORM_ALL(suffix, type, inftype, l1type, l2type) \
     CV_DEF_NORM_FUNC(Inf, suffix, type, inftype) \
     CV_DEF_NORM_FUNC(L1, suffix, type, l1type) \
     CV_DEF_NORM_FUNC(L2, suffix, type, l2type)
 
-CV_DEF_NORM_ALL(8u, uchar, int, int, int)
-CV_DEF_NORM_ALL(8s, schar, int, int, int)
-CV_DEF_NORM_ALL(16u, ushort, int, int, double)
-CV_DEF_NORM_ALL(16s, short, int, int, double)
+CV_DEF_NORM_ALL(8u, uchar, 整数, 整数, 整数)
+CV_DEF_NORM_ALL(8s, schar, 整数, 整数, 整数)
+CV_DEF_NORM_ALL(16u, ushort, 整数, 整数, double)
+CV_DEF_NORM_ALL(16s, short, 整数, 整数, double)
 CV_DEF_NORM_ALL(32u, unsigned, unsigned, double, double)
-CV_DEF_NORM_ALL(32s, int, unsigned, double, double)
+CV_DEF_NORM_ALL(32s, 整数, unsigned, double, double)
 CV_DEF_NORM_ALL(32f, float, float, double, double)
 CV_DEF_NORM_ALL(64f, double, double, double, double)
 CV_DEF_NORM_ALL(64u, uint64, uint64, double, double)
@@ -2830,55 +2830,55 @@ CV_DEF_NORM_ALL(64s, int64, uint64, double, double)
 CV_DEF_NORM_ALL(16f, hfloat, float, float, float)
 CV_DEF_NORM_ALL(16bf, bfloat, float, float, float)
 
-NormFunc getNormFunc(int normType, int depth)
+NormFunc getNormFunc(整数 normType, 整数 depth)
 {
     CV_INSTRUMENT_REGION();
 
     static NormFunc normTab[3][CV_DEPTH_MAX] =
     {
         {
-            normWrap<uchar, int, normInf_8u>,
-            normWrap<schar, int, normInf_8s>,
-            normWrap<ushort, int, normInf_16u>,
-            normWrap<short, int, normInf_16s>,
-            normWrap<int, unsigned, normInf_32s>,
+            normWrap<uchar, 整数, normInf_8u>,
+            normWrap<schar, 整数, normInf_8s>,
+            normWrap<ushort, 整数, normInf_16u>,
+            normWrap<short, 整数, normInf_16s>,
+            normWrap<整数, unsigned, normInf_32s>,
             normWrap<float, float, normInf_32f>,
             normWrap<double, double, normInf_64f>,
             normWrap<hfloat, float, normInf_16f>,
             normWrap<bfloat, float, normInf_16bf>,
-            normWrap<uchar, int, normInf_Bool>,
+            normWrap<uchar, 整数, normInf_Bool>,
             normWrap<uint64, uint64, normInf_64u>,
             normWrap<int64, uint64, normInf_64s>,
             normWrap<unsigned, unsigned, normInf_32u>,
             0
         },
         {
-            normWrap<uchar, int, normL1_8u>,
-            normWrap<schar, int, normL1_8s>,
-            normWrap<ushort, int, normL1_16u>,
-            normWrap<short, int, normL1_16s>,
-            normWrap<int, double, normL1_32s>,
+            normWrap<uchar, 整数, normL1_8u>,
+            normWrap<schar, 整数, normL1_8s>,
+            normWrap<ushort, 整数, normL1_16u>,
+            normWrap<short, 整数, normL1_16s>,
+            normWrap<整数, double, normL1_32s>,
             normWrap<float, double, normL1_32f>,
             normWrap<double, double, normL1_64f>,
             normWrap<hfloat, float, normL1_16f>,
             normWrap<bfloat, float, normL1_16bf>,
-            normWrap<uchar, int, normL1_Bool>,
+            normWrap<uchar, 整数, normL1_Bool>,
             normWrap<uint64, double, normL1_64u>,
             normWrap<int64, double, normL1_64s>,
             normWrap<unsigned, double, normL1_32u>,
             0
         },
         {
-            normWrap<uchar, int, normL2_8u>,
-            normWrap<schar, int, normL2_8s>,
+            normWrap<uchar, 整数, normL2_8u>,
+            normWrap<schar, 整数, normL2_8s>,
             normWrap<ushort, double, normL2_16u>,
             normWrap<short, double, normL2_16s>,
-            normWrap<int, double, normL2_32s>,
+            normWrap<整数, double, normL2_32s>,
             normWrap<float, double, normL2_32f>,
             normWrap<double, double, normL2_64f>,
             normWrap<hfloat, float, normL2_16f>,
             normWrap<bfloat, float, normL2_16bf>,
-            normWrap<uchar, int, normL2_Bool>,
+            normWrap<uchar, 整数, normL2_Bool>,
             normWrap<uint64, double, normL2_64u>,
             normWrap<int64, double, normL2_64s>,
             normWrap<unsigned, double, normL2_32u>,
@@ -2886,67 +2886,67 @@ NormFunc getNormFunc(int normType, int depth)
         }
     };
 
-    if (normType >= 3 || normType < 0) return nullptr;
+    もし (normType >= 3 || normType < 0) 戻る nullptr;
 
-    return normTab[normType][depth];
+    戻る normTab[normType][depth];
 }
 
-NormDiffFunc getNormDiffFunc(int normType, int depth)
+NormDiffFunc getNormDiffFunc(整数 normType, 整数 depth)
 {
     static NormDiffFunc normDiffTab[3][CV_DEPTH_MAX] =
     {
         {
-            normDiffWrap<uchar, int, normDiffInf_8u>,
-            normDiffWrap<schar, int, normDiffInf_8s>,
-            normDiffWrap<ushort, int, normDiffInf_16u>,
-            normDiffWrap<short, int, normDiffInf_16s>,
-            normDiffWrap<int, unsigned, normDiffInf_32s>,
+            normDiffWrap<uchar, 整数, normDiffInf_8u>,
+            normDiffWrap<schar, 整数, normDiffInf_8s>,
+            normDiffWrap<ushort, 整数, normDiffInf_16u>,
+            normDiffWrap<short, 整数, normDiffInf_16s>,
+            normDiffWrap<整数, unsigned, normDiffInf_32s>,
             normDiffWrap<float, float, normDiffInf_32f>,
             normDiffWrap<double, double, normDiffInf_64f>,
             normDiffWrap<hfloat, float, normDiffInf_16f>,
             normDiffWrap<bfloat, float, normDiffInf_16bf>,
-            normDiffWrap<uchar, int, normDiffInf_Bool>,
+            normDiffWrap<uchar, 整数, normDiffInf_Bool>,
             normDiffWrap<uint64, uint64, normDiffInf_64u>,
             normDiffWrap<int64, uint64, normDiffInf_64s>,
             normDiffWrap<unsigned, unsigned, normDiffInf_32u>,
             0
         },
         {
-            normDiffWrap<uchar, int, normDiffL1_8u>,
-            normDiffWrap<schar, int, normDiffL1_8s>,
-            normDiffWrap<ushort, int, normDiffL1_16u>,
-            normDiffWrap<short, int, normDiffL1_16s>,
-            normDiffWrap<int, double, normDiffL1_32s>,
+            normDiffWrap<uchar, 整数, normDiffL1_8u>,
+            normDiffWrap<schar, 整数, normDiffL1_8s>,
+            normDiffWrap<ushort, 整数, normDiffL1_16u>,
+            normDiffWrap<short, 整数, normDiffL1_16s>,
+            normDiffWrap<整数, double, normDiffL1_32s>,
             normDiffWrap<float, double, normDiffL1_32f>,
             normDiffWrap<double, double, normDiffL1_64f>,
             normDiffWrap<hfloat, float, normDiffL1_16f>,
             normDiffWrap<bfloat, float, normDiffL1_16bf>,
-            normDiffWrap<uchar, int, normDiffL1_Bool>,
+            normDiffWrap<uchar, 整数, normDiffL1_Bool>,
             normDiffWrap<uint64, double, normDiffL1_64u>,
             normDiffWrap<int64, double, normDiffL1_64s>,
             normDiffWrap<unsigned, double, normDiffL1_32u>,
             0
         },
         {
-            normDiffWrap<uchar, int, normDiffL2_8u>,
-            normDiffWrap<schar, int, normDiffL2_8s>,
+            normDiffWrap<uchar, 整数, normDiffL2_8u>,
+            normDiffWrap<schar, 整数, normDiffL2_8s>,
             normDiffWrap<ushort, double, normDiffL2_16u>,
             normDiffWrap<short, double, normDiffL2_16s>,
-            normDiffWrap<int, double, normDiffL2_32s>,
+            normDiffWrap<整数, double, normDiffL2_32s>,
             normDiffWrap<float, double, normDiffL2_32f>,
             normDiffWrap<double, double, normDiffL2_64f>,
             normDiffWrap<hfloat, float, normDiffL2_16f>,
             normDiffWrap<bfloat, float, normDiffL2_16bf>,
-            normDiffWrap<uchar, int, normDiffL2_Bool>,
+            normDiffWrap<uchar, 整数, normDiffL2_Bool>,
             normDiffWrap<uint64, double, normDiffL2_64u>,
             normDiffWrap<int64, double, normDiffL2_64s>,
             normDiffWrap<unsigned, double, normDiffL2_32u>,
             0
         },
     };
-    if (normType >= 3 || normType < 0) return nullptr;
+    もし (normType >= 3 || normType < 0) 戻る nullptr;
 
-    return normDiffTab[normType][depth];
+    戻る normDiffTab[normType][depth];
 }
 
 #endif // CV_CPU_OPTIMIZATION_DECLARATIONS_ONLY

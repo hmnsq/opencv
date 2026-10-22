@@ -38,59 +38,59 @@ static bool intel_gpu_gemm(
 {
     CV_UNUSED(sizeB);
 
-    int M = sizeD.height, N = sizeD.width, K = ((atrans)? sizeA.height : sizeA.width);
+    整数 M = sizeD.height, N = sizeD.width, K = ((atrans)? sizeA.height : sizeA.width);
 
-    if (M < 4 || N < 4 || K < 4)  // vload4
-        return false;
+    もし (M < 4 || N < 4 || K < 4)  // vload4
+        戻る false;
 
     CV_LOG_VERBOSE(NULL, 0, "M=" << M << " N=" << N << " K=" << K);
 
     std::string kernelName;
 
-    unsigned int lx = 8, ly = 4;
-    unsigned int dx = 4, dy = 8;
+    unsigned 整数 lx = 8, ly = 4;
+    unsigned 整数 dx = 4, dy = 8;
 
-    if(!atrans && !btrans)
+    もし(!atrans && !btrans)
     {
-        if (M % 32 == 0 && N % 32 == 0 && K % 16 == 0)
+        もし (M % 32 == 0 && N % 32 == 0 && K % 16 == 0)
         {
             kernelName = "intelblas_gemm_buffer_NN_sp";
         }
-        else
+        否则
         {
-            if (M % 2 != 0)
-                return false;
+            もし (M % 2 != 0)
+                戻る false;
             // vload4(0, dst_write0) - 4 cols
             // multiply by lx: 8
-            if (N % (4*8) != 0)
-                return false;
+            もし (N % (4*8) != 0)
+                戻る false;
             kernelName = "intelblas_gemm_buffer_NN";
         }
     }
-    else if(atrans && !btrans)
+    否则 もし(atrans && !btrans)
     {
-        if (M % 32 != 0)
-            return false;
-        if (N % 32 != 0)
-            return false;
+        もし (M % 32 != 0)
+            戻る false;
+        もし (N % 32 != 0)
+            戻る false;
         kernelName = "intelblas_gemm_buffer_TN";
     }
-    else if(!atrans && btrans)
+    否则 もし(!atrans && btrans)
     {
-        if (K % 4 != 0)
-            return false;
+        もし (K % 4 != 0)
+            戻る false;
         kernelName = "intelblas_gemm_buffer_NT";
         ly = 16;
         dx = 1;
     }
-    else
+    否则
     {
-        if (M % 32 != 0)
-            return false;
-        if (N % 32 != 0)
-            return false;
-        if (K % 16 != 0)
-            return false;
+        もし (M % 32 != 0)
+            戻る false;
+        もし (N % 32 != 0)
+            戻る false;
+        もし (K % 16 != 0)
+            戻る false;
         kernelName = "intelblas_gemm_buffer_TT";
     }
 
@@ -106,62 +106,62 @@ static bool intel_gpu_gemm(
     String errmsg;
     const ocl::Program program = ocl::Context::getDefault().getProg(ocl::core::intel_gemm_oclsrc, "", errmsg);
 
-    if(!atrans && btrans)
+    もし(!atrans && btrans)
     {
         ocl::Kernel k(kernelName.c_str(), program);
-        if (k.empty())
+        もし (k.empty())
         {
-            return false;
+            戻る false;
         }
 
         k.args(ocl::KernelArg::PtrReadOnly(A),
-               (int) (A.offset / sizeof(float)),
+               (整数) (A.offset / sizeof(float)),
                ocl::KernelArg::PtrReadOnly(B),
-               (int) (B.offset / sizeof(float)),
+               (整数) (B.offset / sizeof(float)),
                ocl::KernelArg::PtrWriteOnly(D),
-               (int) (D.offset / sizeof(float)),
+               (整数) (D.offset / sizeof(float)),
                M, N, K,
                (float)alpha,
                (float)beta,
-               (int)(A.step / sizeof(float)),
-               (int)(B.step / sizeof(float)),
-               (int)(D.step / sizeof(float))
+               (整数)(A.step / sizeof(float)),
+               (整数)(B.step / sizeof(float)),
+               (整数)(D.step / sizeof(float))
         );
 
         bool ret = k.run(2, global, local, false, q);
-        return ret;
+        戻る ret;
     }
-    else
+    否则
     {
-        int stride = (M * N < 1024 * 1024) ? 10000000 : 256;
+        整数 stride = (M * N < 1024 * 1024) ? 10000000 : 256;
 
-        for(int start_index = 0; start_index < K; start_index += stride)
+        ために(整数 start_index = 0; start_index < K; start_index += stride)
         {
              ocl::Kernel k(kernelName.c_str(), program);
              k.args(ocl::KernelArg::PtrReadOnly(A),
-                    (int) (A.offset / sizeof(float)),
+                    (整数) (A.offset / sizeof(float)),
                     ocl::KernelArg::PtrReadOnly(B),
-                    (int) (B.offset / sizeof(float)),
+                    (整数) (B.offset / sizeof(float)),
                     ocl::KernelArg::PtrWriteOnly(D),
-                    (int) (D.offset / sizeof(float)),
+                    (整数) (D.offset / sizeof(float)),
                     M, N, K,
                     (float)alpha,
                     (float)beta,
-                    (int)(A.step / sizeof(float)),
-                    (int)(B.step / sizeof(float)),
-                    (int)(D.step / sizeof(float)),
-                    (int) start_index,                          // 14 start_index
+                    (整数)(A.step / sizeof(float)),
+                    (整数)(B.step / sizeof(float)),
+                    (整数)(D.step / sizeof(float)),
+                    (整数) start_index,                          // 14 start_index
                     stride);
 
             bool ret = k.run(2, global, local, false, q);
-            if (!ret)
+            もし (!ret)
             {
-                if (start_index != 0)
+                もし (start_index != 0)
                     isPropagatedC2D = false;  // D array content is changed, need to rewrite
-                return false;
+                戻る false;
             }
         }
-        return true;
+        戻る true;
     }
 }
 

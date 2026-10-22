@@ -43,117 +43,117 @@ namespace {
 #define openclamdfft_fn0(ID, _R, decl_args) \
     typedef _R (*ID##FN)decl_args; \
     static _R ID##_switch_fn decl_args \
-    { return ((ID##FN)openclamdfft_check_fn(ID))(); } \
+    { 戻る ((ID##FN)openclamdfft_check_fn(ID))(); } \
 
 #define openclamdfft_fn1(ID, _R, decl_args) \
     typedef _R (*ID##FN)decl_args; \
     static _R ID##_switch_fn decl_args \
-    { return ((ID##FN)openclamdfft_check_fn(ID))(p1); } \
+    { 戻る ((ID##FN)openclamdfft_check_fn(ID))(p1); } \
 
 #define openclamdfft_fn2(ID, _R, decl_args) \
     typedef _R (*ID##FN)decl_args; \
     static _R ID##_switch_fn decl_args \
-    { return ((ID##FN)openclamdfft_check_fn(ID))(p1, p2); } \
+    { 戻る ((ID##FN)openclamdfft_check_fn(ID))(p1, p2); } \
 
 #define openclamdfft_fn3(ID, _R, decl_args) \
     typedef _R (*ID##FN)decl_args; \
     static _R ID##_switch_fn decl_args \
-    { return ((ID##FN)openclamdfft_check_fn(ID))(p1, p2, p3); } \
+    { 戻る ((ID##FN)openclamdfft_check_fn(ID))(p1, p2, p3); } \
 
 #define openclamdfft_fn4(ID, _R, decl_args) \
     typedef _R (*ID##FN)decl_args; \
     static _R ID##_switch_fn decl_args \
-    { return ((ID##FN)openclamdfft_check_fn(ID))(p1, p2, p3, p4); } \
+    { 戻る ((ID##FN)openclamdfft_check_fn(ID))(p1, p2, p3, p4); } \
 
 #define openclamdfft_fn5(ID, _R, decl_args) \
     typedef _R (*ID##FN)decl_args; \
     static _R ID##_switch_fn decl_args \
-    { return ((ID##FN)openclamdfft_check_fn(ID))(p1, p2, p3, p4, p5); } \
+    { 戻る ((ID##FN)openclamdfft_check_fn(ID))(p1, p2, p3, p4, p5); } \
 
 #define openclamdfft_fn6(ID, _R, decl_args) \
     typedef _R (*ID##FN)decl_args; \
     static _R ID##_switch_fn decl_args \
-    { return ((ID##FN)openclamdfft_check_fn(ID))(p1, p2, p3, p4, p5, p6); } \
+    { 戻る ((ID##FN)openclamdfft_check_fn(ID))(p1, p2, p3, p4, p5, p6); } \
 
 #define openclamdfft_fn7(ID, _R, decl_args) \
     typedef _R (*ID##FN)decl_args; \
     static _R ID##_switch_fn decl_args \
-    { return ((ID##FN)openclamdfft_check_fn(ID))(p1, p2, p3, p4, p5, p6, p7); } \
+    { 戻る ((ID##FN)openclamdfft_check_fn(ID))(p1, p2, p3, p4, p5, p6, p7); } \
 
 #define openclamdfft_fn8(ID, _R, decl_args) \
     typedef _R (*ID##FN)decl_args; \
     static _R ID##_switch_fn decl_args \
-    { return ((ID##FN)openclamdfft_check_fn(ID))(p1, p2, p3, p4, p5, p6, p7, p8); } \
+    { 戻る ((ID##FN)openclamdfft_check_fn(ID))(p1, p2, p3, p4, p5, p6, p7, p8); } \
 
 #define openclamdfft_fn9(ID, _R, decl_args) \
     typedef _R (*ID##FN)decl_args; \
     static _R ID##_switch_fn decl_args \
-    { return ((ID##FN)openclamdfft_check_fn(ID))(p1, p2, p3, p4, p5, p6, p7, p8, p9); } \
+    { 戻る ((ID##FN)openclamdfft_check_fn(ID))(p1, p2, p3, p4, p5, p6, p7, p8, p9); } \
 
 #define openclamdfft_fn10(ID, _R, decl_args) \
     typedef _R (*ID##FN)decl_args; \
     static _R ID##_switch_fn decl_args \
-    { return ((ID##FN)openclamdfft_check_fn(ID))(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10); } \
+    { 戻る ((ID##FN)openclamdfft_check_fn(ID))(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10); } \
 
 #define openclamdfft_fn11(ID, _R, decl_args) \
     typedef _R (*ID##FN)decl_args; \
     static _R ID##_switch_fn decl_args \
-    { return ((ID##FN)openclamdfft_check_fn(ID))(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11); } \
+    { 戻る ((ID##FN)openclamdfft_check_fn(ID))(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11); } \
 
 #define openclamdfft_fn12(ID, _R, decl_args) \
     typedef _R (*ID##FN)decl_args; \
     static _R ID##_switch_fn decl_args \
-    { return ((ID##FN)openclamdfft_check_fn(ID))(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12); } \
+    { 戻る ((ID##FN)openclamdfft_check_fn(ID))(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12); } \
 
 #define openclamdfft_fn13(ID, _R, decl_args) \
     typedef _R (*ID##FN)decl_args; \
     static _R ID##_switch_fn decl_args \
-    { return ((ID##FN)openclamdfft_check_fn(ID))(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13); } \
+    { 戻る ((ID##FN)openclamdfft_check_fn(ID))(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13); } \
 
 #define openclamdfft_fn14(ID, _R, decl_args) \
     typedef _R (*ID##FN)decl_args; \
     static _R ID##_switch_fn decl_args \
-    { return ((ID##FN)openclamdfft_check_fn(ID))(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14); } \
+    { 戻る ((ID##FN)openclamdfft_check_fn(ID))(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14); } \
 
 #define openclamdfft_fn15(ID, _R, decl_args) \
     typedef _R (*ID##FN)decl_args; \
     static _R ID##_switch_fn decl_args \
-    { return ((ID##FN)openclamdfft_check_fn(ID))(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p15); } \
+    { 戻る ((ID##FN)openclamdfft_check_fn(ID))(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p15); } \
 
 #define openclamdfft_fn16(ID, _R, decl_args) \
     typedef _R (*ID##FN)decl_args; \
     static _R ID##_switch_fn decl_args \
-    { return ((ID##FN)openclamdfft_check_fn(ID))(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p15, p16); } \
+    { 戻る ((ID##FN)openclamdfft_check_fn(ID))(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p15, p16); } \
 
 #define openclamdfft_fn17(ID, _R, decl_args) \
     typedef _R (*ID##FN)decl_args; \
     static _R ID##_switch_fn decl_args \
-    { return ((ID##FN)openclamdfft_check_fn(ID))(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p15, p16, p17); } \
+    { 戻る ((ID##FN)openclamdfft_check_fn(ID))(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p15, p16, p17); } \
 
 #define openclamdfft_fn18(ID, _R, decl_args) \
     typedef _R (*ID##FN)decl_args; \
     static _R ID##_switch_fn decl_args \
-    { return ((ID##FN)openclamdfft_check_fn(ID))(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p15, p16, p17, p18); } \
+    { 戻る ((ID##FN)openclamdfft_check_fn(ID))(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p15, p16, p17, p18); } \
 
 #define openclamdfft_fn19(ID, _R, decl_args) \
     typedef _R (*ID##FN)decl_args; \
     static _R ID##_switch_fn decl_args \
-    { return ((ID##FN)openclamdfft_check_fn(ID))(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p15, p16, p17, p18, p19); } \
+    { 戻る ((ID##FN)openclamdfft_check_fn(ID))(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p15, p16, p17, p18, p19); } \
 
 #define openclamdfft_fn20(ID, _R, decl_args) \
     typedef _R (*ID##FN)decl_args; \
     static _R ID##_switch_fn decl_args \
-    { return ((ID##FN)openclamdfft_check_fn(ID))(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p15, p16, p17, p18, p19, p20); } \
+    { 戻る ((ID##FN)openclamdfft_check_fn(ID))(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p15, p16, p17, p18, p19, p20); } \
 
 #define openclamdfft_fn21(ID, _R, decl_args) \
     typedef _R (*ID##FN)decl_args; \
     static _R ID##_switch_fn decl_args \
-    { return ((ID##FN)openclamdfft_check_fn(ID))(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p15, p16, p17, p18, p19, p20, p21); } \
+    { 戻る ((ID##FN)openclamdfft_check_fn(ID))(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p15, p16, p17, p18, p19, p20, p21); } \
 
 #define openclamdfft_fn22(ID, _R, decl_args) \
     typedef _R (*ID##FN)decl_args; \
     static _R ID##_switch_fn decl_args \
-    { return ((ID##FN)openclamdfft_check_fn(ID))(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p15, p16, p17, p18, p19, p20, p21, p22); } \
+    { 戻る ((ID##FN)openclamdfft_check_fn(ID))(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p15, p16, p17, p18, p19, p20, p21, p22); } \
 
 }
 
