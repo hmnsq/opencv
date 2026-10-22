@@ -41,55 +41,55 @@
 //
 //M*/
 
-#include "precomp.hpp"
+#ಅನ್ತರ್ಭಾವ "precomp.hpp"
 
-namespace cv
+ನಾಮಾಕಾಶ cv
 {
-    class FormattedImpl CV_FINAL : public Formatted
+    ವರ್ಗ FormattedImpl CV_FINAL : ಸಾರ್ವಜನಿಕ Formatted
     {
-        enum { STATE_PROLOGUE, STATE_EPILOGUE, STATE_INTERLUDE,
-               STATE_ROW_OPEN, STATE_ROW_CLOSE, STATE_CN_OPEN, STATE_CN_CLOSE, STATE_VALUE, STATE_FINISHED,
-               STATE_LINE_SEPARATOR, STATE_CN_SEPARATOR, STATE_VALUE_SEPARATOR };
-        enum {BRACE_ROW_OPEN = 0, BRACE_ROW_CLOSE = 1, BRACE_ROW_SEP=2, BRACE_CN_OPEN=3, BRACE_CN_CLOSE=4 };
+        ಗಣನಾ { STATE_PROLOGUE, STATE_EPILOGUE, STATE_INTERLUDE,
+               STATE_ROW_OPEN, STATE_ROW_CLOSE, STATE_CN_OPEN, STATE_CN_CLOSE, STATE_ಮೌಲ್ಯ, STATE_FINISHED,
+               STATE_ಸಾಲು_SEPARATOR, STATE_CN_SEPARATOR, STATE_ಮೌಲ್ಯ_SEPARATOR };
+        ಗಣನಾ {BRACE_ROW_OPEN = 0, BRACE_ROW_CLOSE = 1, BRACE_ROW_SEP=2, BRACE_CN_OPEN=3, BRACE_CN_CLOSE=4 };
 
-        char floatFormat[8];
-        char buf[32];   // enough for double with precision up to 20
+        ವರ್ಣ floatFormat[8];
+        ವರ್ಣ buf[32];   // enough for double with precision up to 20
 
         Mat mtx;
-        int mcn; // == mtx.channels()
-        bool singleLine;
-        bool alignOrder;    // true when cn first order
+        ಪೂರ್ಣಾಙ್ಕ mcn; // == mtx.channels()
+        ತಾರ್ಕಿಕ single_ಸಾಲು;
+        ತಾರ್ಕಿಕ alignOrder;    // true when cn first order
 
-        int state;
-        int row;
-        int col;
-        int cn;
+        ಪೂರ್ಣಾಙ್ಕ state;
+        ಪೂರ್ಣಾಙ್ಕ row;
+        ಪೂರ್ಣಾಙ್ಕ col;
+        ಪೂರ್ಣಾಙ್ಕ cn;
 
         String prologue;
         String epilogue;
-        char braces[5];
+        ವರ್ಣ braces[5];
 
-        void (FormattedImpl::*valueToStr)();
-        void valueToStrBool() { snprintf(buf, sizeof(buf), "%d", (int)mtx.ptr<uchar>(row, col)[cn] != 0); }
-        void valueToStr8u()  { snprintf(buf, sizeof(buf), "%3d", (int)mtx.ptr<uchar>(row, col)[cn]); }
-        void valueToStr8s()  { snprintf(buf, sizeof(buf), "%3d", (int)mtx.ptr<schar>(row, col)[cn]); }
-        void valueToStr16u() { snprintf(buf, sizeof(buf), "%d", (int)mtx.ptr<ushort>(row, col)[cn]); }
-        void valueToStr16s() { snprintf(buf, sizeof(buf), "%d", (int)mtx.ptr<short>(row, col)[cn]); }
-        void valueToStr32u() { snprintf(buf, sizeof(buf), "%u", mtx.ptr<unsigned>(row, col)[cn]); }
-        void valueToStr32s() { snprintf(buf, sizeof(buf), "%d", mtx.ptr<int>(row, col)[cn]); }
-        void valueToStr32f() { snprintf(buf, sizeof(buf), floatFormat, mtx.ptr<float>(row, col)[cn]); }
-        void valueToStr64f() { snprintf(buf, sizeof(buf), floatFormat, mtx.ptr<double>(row, col)[cn]); }
-        void valueToStr64u() { snprintf(buf, sizeof(buf), "%llu", (unsigned long long)mtx.ptr<uint64_t>(row, col)[cn]); }
-        void valueToStr64s() { snprintf(buf, sizeof(buf), "%lld", (long long)mtx.ptr<int64_t>(row, col)[cn]); }
-        void valueToStr16f() { snprintf(buf, sizeof(buf), floatFormat, (float)mtx.ptr<hfloat>(row, col)[cn]); }
-        void valueToStr16bf() { snprintf(buf, sizeof(buf), floatFormat, (float)mtx.ptr<bfloat>(row, col)[cn]); }
-        void valueToStr8f()   { snprintf(buf, sizeof(buf), floatFormat, (float)mtx.ptr<fp8_t>(row, col)[cn]); }
-        void valueToStr8fnuz() { snprintf(buf, sizeof(buf), floatFormat, (float)mtx.ptr<fp8a_t>(row, col)[cn]); }
-        void valueToStrOther() { buf[0] = 0; }
+        ಶೂನ್ಯ (FormattedImpl::*ಮೌಲ್ಯ_To_Str)();
+        ಶೂನ್ಯ ಮೌಲ್ಯ_To_Str_Bool() { snprintf(buf, ಪರಿಮಾಣ(buf), "%d", (ಪೂರ್ಣಾಙ್ಕ)mtx.ptr<uchar>(row, col)[cn] != 0); }
+        ಶೂನ್ಯ ಮೌಲ್ಯ_To_Str8u()  { snprintf(buf, ಪರಿಮಾಣ(buf), "%3d", (ಪೂರ್ಣಾಙ್ಕ)mtx.ptr<uchar>(row, col)[cn]); }
+        ಶೂನ್ಯ ಮೌಲ್ಯ_To_Str8s()  { snprintf(buf, ಪರಿಮಾಣ(buf), "%3d", (ಪೂರ್ಣಾಙ್ಕ)mtx.ptr<schar>(row, col)[cn]); }
+        ಶೂನ್ಯ ಮೌಲ್ಯ_To_Str16u() { snprintf(buf, ಪರಿಮಾಣ(buf), "%d", (ಪೂರ್ಣಾಙ್ಕ)mtx.ptr<ushort>(row, col)[cn]); }
+        ಶೂನ್ಯ ಮೌಲ್ಯ_To_Str16s() { snprintf(buf, ಪರಿಮಾಣ(buf), "%d", (ಪೂರ್ಣಾಙ್ಕ)mtx.ptr<short>(row, col)[cn]); }
+        ಶೂನ್ಯ ಮೌಲ್ಯ_To_Str32u() { snprintf(buf, ಪರಿಮಾಣ(buf), "%u", mtx.ptr<unsigned>(row, col)[cn]); }
+        ಶೂನ್ಯ ಮೌಲ್ಯ_To_Str32s() { snprintf(buf, ಪರಿಮಾಣ(buf), "%d", mtx.ptr<ಪೂರ್ಣಾಙ್ಕ>(row, col)[cn]); }
+        ಶೂನ್ಯ ಮೌಲ್ಯ_To_Str32f() { snprintf(buf, ಪರಿಮಾಣ(buf), floatFormat, mtx.ptr<ಭಿನ್ನ>(row, col)[cn]); }
+        ಶೂನ್ಯ ಮೌಲ್ಯ_To_Str64f() { snprintf(buf, ಪರಿಮಾಣ(buf), floatFormat, mtx.ptr<ದ್ವಿಗುಣ>(row, col)[cn]); }
+        ಶೂನ್ಯ ಮೌಲ್ಯ_To_Str64u() { snprintf(buf, ಪರಿಮಾಣ(buf), "%llu", (unsigned long long)mtx.ptr<uint64_t>(row, col)[cn]); }
+        ಶೂನ್ಯ ಮೌಲ್ಯ_To_Str64s() { snprintf(buf, ಪರಿಮಾಣ(buf), "%lld", (long long)mtx.ptr<int64_t>(row, col)[cn]); }
+        ಶೂನ್ಯ ಮೌಲ್ಯ_To_Str16f() { snprintf(buf, ಪರಿಮಾಣ(buf), floatFormat, (ಭಿನ್ನ)mtx.ptr<hfloat>(row, col)[cn]); }
+        ಶೂನ್ಯ ಮೌಲ್ಯ_To_Str16bf() { snprintf(buf, ಪರಿಮಾಣ(buf), floatFormat, (ಭಿನ್ನ)mtx.ptr<bfloat>(row, col)[cn]); }
+        ಶೂನ್ಯ ಮೌಲ್ಯ_To_Str8f()   { snprintf(buf, ಪರಿಮಾಣ(buf), floatFormat, (ಭಿನ್ನ)mtx.ptr<fp8_t>(row, col)[cn]); }
+        ಶೂನ್ಯ ಮೌಲ್ಯ_To_Str8fnuz() { snprintf(buf, ಪರಿಮಾಣ(buf), floatFormat, (ಭಿನ್ನ)mtx.ptr<fp8a_t>(row, col)[cn]); }
+        ಶೂನ್ಯ ಮೌಲ್ಯ_To_Str_Other() { buf[0] = 0; }
 
-    public:
+    ಸಾರ್ವಜನಿಕ:
 
-        FormattedImpl(String pl, String el, Mat m, char br[5], bool sLine, bool aOrder, int precision)
+        FormattedImpl(String pl, String el, Mat m, ವರ್ಣ br[5], ತಾರ್ಕಿಕ s_ಸಾಲು, ತಾರ್ಕಿಕ aOrder, ಪೂರ್ಣಾಙ್ಕ precision)
         {
             CV_Assert(m.dims <= 2);
 
@@ -99,290 +99,290 @@ namespace cv
             mcn = m.channels();
             memcpy(braces, br, 5);
             state = STATE_PROLOGUE;
-            singleLine = sLine;
+            single_ಸಾಲು = s_ಸಾಲು;
             alignOrder = aOrder;
             row = col = cn =0;
 
-            if (precision < 0)
+            ಯದಿ (precision < 0)
             {
                 floatFormat[0] = '%';
                 floatFormat[1] = 'a';
                 floatFormat[2] = 0;
             }
-            else
+            ಅನ್ಯಥಾ
             {
-                cv_snprintf(floatFormat, sizeof(floatFormat), "%%.%dg", std::min(precision, 20));
+                cv_snprintf(floatFormat, ಪರಿಮಾಣ(floatFormat), "%%.%dg", std::min(precision, 20));
             }
 
-            switch(mtx.depth())
+            ವಿಕಲ್ಪ(mtx.depth())
             {
-                case CV_8U:  valueToStr = &FormattedImpl::valueToStr8u; break;
-                case CV_8S:  valueToStr = &FormattedImpl::valueToStr8s; break;
-                case CV_Bool: valueToStr = &FormattedImpl::valueToStrBool; break;
-                case CV_16U: valueToStr = &FormattedImpl::valueToStr16u; break;
-                case CV_16S: valueToStr = &FormattedImpl::valueToStr16s; break;
-                case CV_32U: valueToStr = &FormattedImpl::valueToStr32u; break;
-                case CV_32S: valueToStr = &FormattedImpl::valueToStr32s; break;
-                case CV_32F: valueToStr = &FormattedImpl::valueToStr32f; break;
-                case CV_64F: valueToStr = &FormattedImpl::valueToStr64f; break;
-                case CV_64U: valueToStr = &FormattedImpl::valueToStr64u; break;
-                case CV_64S: valueToStr = &FormattedImpl::valueToStr64s; break;
-                case CV_16F: valueToStr = &FormattedImpl::valueToStr16f; break;
-                case CV_16BF: valueToStr = &FormattedImpl::valueToStr16bf; break;
-                case CV_8F_E4M3FN:   valueToStr = &FormattedImpl::valueToStr8f; break;
-                case CV_8F_E4M3FNUZ: valueToStr = &FormattedImpl::valueToStr8fnuz; break;
-                default:
+                ಪಕ್ಷ CV_8U:  ಮೌಲ್ಯ_To_Str = &FormattedImpl::ಮೌಲ್ಯ_To_Str8u; ಭಙ್ಗ;
+                ಪಕ್ಷ CV_8S:  ಮೌಲ್ಯ_To_Str = &FormattedImpl::ಮೌಲ್ಯ_To_Str8s; ಭಙ್ಗ;
+                ಪಕ್ಷ CV_Bool: ಮೌಲ್ಯ_To_Str = &FormattedImpl::ಮೌಲ್ಯ_To_Str_Bool; ಭಙ್ಗ;
+                ಪಕ್ಷ CV_16U: ಮೌಲ್ಯ_To_Str = &FormattedImpl::ಮೌಲ್ಯ_To_Str16u; ಭಙ್ಗ;
+                ಪಕ್ಷ CV_16S: ಮೌಲ್ಯ_To_Str = &FormattedImpl::ಮೌಲ್ಯ_To_Str16s; ಭಙ್ಗ;
+                ಪಕ್ಷ CV_32U: ಮೌಲ್ಯ_To_Str = &FormattedImpl::ಮೌಲ್ಯ_To_Str32u; ಭಙ್ಗ;
+                ಪಕ್ಷ CV_32S: ಮೌಲ್ಯ_To_Str = &FormattedImpl::ಮೌಲ್ಯ_To_Str32s; ಭಙ್ಗ;
+                ಪಕ್ಷ CV_32F: ಮೌಲ್ಯ_To_Str = &FormattedImpl::ಮೌಲ್ಯ_To_Str32f; ಭಙ್ಗ;
+                ಪಕ್ಷ CV_64F: ಮೌಲ್ಯ_To_Str = &FormattedImpl::ಮೌಲ್ಯ_To_Str64f; ಭಙ್ಗ;
+                ಪಕ್ಷ CV_64U: ಮೌಲ್ಯ_To_Str = &FormattedImpl::ಮೌಲ್ಯ_To_Str64u; ಭಙ್ಗ;
+                ಪಕ್ಷ CV_64S: ಮೌಲ್ಯ_To_Str = &FormattedImpl::ಮೌಲ್ಯ_To_Str64s; ಭಙ್ಗ;
+                ಪಕ್ಷ CV_16F: ಮೌಲ್ಯ_To_Str = &FormattedImpl::ಮೌಲ್ಯ_To_Str16f; ಭಙ್ಗ;
+                ಪಕ್ಷ CV_16BF: ಮೌಲ್ಯ_To_Str = &FormattedImpl::ಮೌಲ್ಯ_To_Str16bf; ಭಙ್ಗ;
+                ಪಕ್ಷ CV_8F_E4M3FN:   ಮೌಲ್ಯ_To_Str = &FormattedImpl::ಮೌಲ್ಯ_To_Str8f; ಭಙ್ಗ;
+                ಪಕ್ಷ CV_8F_E4M3FNUZ: ಮೌಲ್ಯ_To_Str = &FormattedImpl::ಮೌಲ್ಯ_To_Str8fnuz; ಭಙ್ಗ;
+                ಸ್ವಭಾವ:
                     CV_Error_(Error::StsError, ("unsupported matrix type %d\n", mtx.depth()));
             }
         }
 
-        void reset() CV_OVERRIDE
+        ಶೂನ್ಯ reset() CV_OVERRIDE
         {
             state = STATE_PROLOGUE;
         }
 
-        const char* next() CV_OVERRIDE
+        ಧ್ರುವ ವರ್ಣ* next() CV_OVERRIDE
         {
-            switch(state)
+            ವಿಕಲ್ಪ(state)
             {
-                case STATE_PROLOGUE:
+                ಪಕ್ಷ STATE_PROLOGUE:
                     row = 0;
-                    if (mtx.empty())
+                    ಯದಿ (mtx.empty())
                         state = STATE_EPILOGUE;
-                    else if (alignOrder)
+                    ಅನ್ಯಥಾ ಯದಿ (alignOrder)
                         state = STATE_INTERLUDE;
-                    else
+                    ಅನ್ಯಥಾ
                         state = STATE_ROW_OPEN;
-                    return prologue.c_str();
-                case STATE_INTERLUDE:
+                    ಪ್ರತ್ಯಾಗಮ prologue.c_str();
+                ಪಕ್ಷ STATE_INTERLUDE:
                     state = STATE_ROW_OPEN;
-                    if (row >= mtx.rows)
+                    ಯದಿ (row >= mtx.rows)
                     {
-                        if (++cn >= mcn)
+                        ಯದಿ (++cn >= mcn)
                         {
                             state = STATE_EPILOGUE;
                             buf[0] = 0;
-                            return buf;
+                            ಪ್ರತ್ಯಾಗಮ buf;
                         }
-                        else
+                        ಅನ್ಯಥಾ
                             row = 0;
-                        snprintf(buf, sizeof(buf), "\n(:, :, %d) = \n", cn+1);
-                        return buf;
+                        snprintf(buf, ಪರಿಮಾಣ(buf), "\n(:, :, %d) = \n", cn+1);
+                        ಪ್ರತ್ಯಾಗಮ buf;
                     }
-                    snprintf(buf, sizeof(buf), "(:, :, %d) = \n", cn+1);
-                    return buf;
-                case STATE_EPILOGUE:
+                    snprintf(buf, ಪರಿಮಾಣ(buf), "(:, :, %d) = \n", cn+1);
+                    ಪ್ರತ್ಯಾಗಮ buf;
+                ಪಕ್ಷ STATE_EPILOGUE:
                     state = STATE_FINISHED;
-                    return epilogue.c_str();
-                case STATE_ROW_OPEN:
+                    ಪ್ರತ್ಯಾಗಮ epilogue.c_str();
+                ಪಕ್ಷ STATE_ROW_OPEN:
                     col = 0;
                     state = STATE_CN_OPEN;
                     {
                         size_t pos = 0;
-                        if (row > 0)
-                            while(pos < prologue.size() && pos < sizeof(buf) - 2)
+                        ಯದಿ (row > 0)
+                            ಯಾವತ್(pos < prologue.size() && pos < ಪರಿಮಾಣ(buf) - 2)
                                 buf[pos++] = ' ';
-                        if (braces[BRACE_ROW_OPEN])
+                        ಯದಿ (braces[BRACE_ROW_OPEN])
                             buf[pos++] = braces[BRACE_ROW_OPEN];
-                        if(!pos)
-                            return next();
+                        ಯದಿ(!pos)
+                            ಪ್ರತ್ಯಾಗಮ next();
                         buf[pos] = 0;
                     }
-                    return buf;
-                case STATE_ROW_CLOSE:
-                    state = STATE_LINE_SEPARATOR;
+                    ಪ್ರತ್ಯಾಗಮ buf;
+                ಪಕ್ಷ STATE_ROW_CLOSE:
+                    state = STATE_ಸಾಲು_SEPARATOR;
                     ++row;
-                    if (braces[BRACE_ROW_CLOSE])
+                    ಯದಿ (braces[BRACE_ROW_CLOSE])
                     {
                         buf[0] = braces[BRACE_ROW_CLOSE];
                         buf[1] = row < mtx.rows ? ',' : '\0';
                         buf[2] = 0;
-                        return buf;
+                        ಪ್ರತ್ಯಾಗಮ buf;
                     }
-                    else if(braces[BRACE_ROW_SEP] && row < mtx.rows)
+                    ಅನ್ಯಥಾ ಯದಿ(braces[BRACE_ROW_SEP] && row < mtx.rows)
                     {
                         buf[0] = braces[BRACE_ROW_SEP];
                         buf[1] = 0;
-                        return buf;
+                        ಪ್ರತ್ಯಾಗಮ buf;
                     }
-                    return next();
-                case STATE_CN_OPEN:
-                    state = STATE_VALUE;
-                    if (!alignOrder)
+                    ಪ್ರತ್ಯಾಗಮ next();
+                ಪಕ್ಷ STATE_CN_OPEN:
+                    state = STATE_ಮೌಲ್ಯ;
+                    ಯದಿ (!alignOrder)
                         cn = 0;
-                    if (mcn > 1 && braces[BRACE_CN_OPEN])
+                    ಯದಿ (mcn > 1 && braces[BRACE_CN_OPEN])
                     {
                         buf[0] = braces[BRACE_CN_OPEN];
                         buf[1] = 0;
-                        return buf;
+                        ಪ್ರತ್ಯಾಗಮ buf;
                     }
-                    return next();
-                case STATE_CN_CLOSE:
+                    ಪ್ರತ್ಯಾಗಮ next();
+                ಪಕ್ಷ STATE_CN_CLOSE:
                     ++col;
-                    if (col >= mtx.cols)
+                    ಯದಿ (col >= mtx.cols)
                         state = STATE_ROW_CLOSE;
-                    else
+                    ಅನ್ಯಥಾ
                         state = STATE_CN_SEPARATOR;
-                    if (mcn > 1 && braces[BRACE_CN_CLOSE])
+                    ಯದಿ (mcn > 1 && braces[BRACE_CN_CLOSE])
                     {
                         buf[0] = braces[BRACE_CN_CLOSE];
                         buf[1] = 0;
-                        return buf;
+                        ಪ್ರತ್ಯಾಗಮ buf;
                     }
-                    return next();
-                case STATE_VALUE:
-                    (this->*valueToStr)();
+                    ಪ್ರತ್ಯಾಗಮ next();
+                ಪಕ್ಷ STATE_ಮೌಲ್ಯ:
+                    (ಏತತ್->*ಮೌಲ್ಯ_To_Str)();
                     state = STATE_CN_CLOSE;
-                    if (alignOrder)
-                        return buf;
-                    if (++cn < mcn)
-                        state = STATE_VALUE_SEPARATOR;
-                    return buf;
-                case STATE_FINISHED:
-                    return 0;
-                case STATE_LINE_SEPARATOR:
-                    if (row >= mtx.rows)
+                    ಯದಿ (alignOrder)
+                        ಪ್ರತ್ಯಾಗಮ buf;
+                    ಯದಿ (++cn < mcn)
+                        state = STATE_ಮೌಲ್ಯ_SEPARATOR;
+                    ಪ್ರತ್ಯಾಗಮ buf;
+                ಪಕ್ಷ STATE_FINISHED:
+                    ಪ್ರತ್ಯಾಗಮ 0;
+                ಪಕ್ಷ STATE_ಸಾಲು_SEPARATOR:
+                    ಯದಿ (row >= mtx.rows)
                     {
-                        if (alignOrder)
+                        ಯದಿ (alignOrder)
                             state = STATE_INTERLUDE;
-                        else
+                        ಅನ್ಯಥಾ
                             state = STATE_EPILOGUE;
-                        return next();
+                        ಪ್ರತ್ಯಾಗಮ next();
                     }
                     state = STATE_ROW_OPEN;
-                    buf[0] = singleLine ? ' ' : '\n';
+                    buf[0] = single_ಸಾಲು ? ' ' : '\n';
                     buf[1] = 0;
-                    return buf;
-                case STATE_CN_SEPARATOR:
+                    ಪ್ರತ್ಯಾಗಮ buf;
+                ಪಕ್ಷ STATE_CN_SEPARATOR:
                     state = STATE_CN_OPEN;
                     buf[0] = ',';
                     buf[1] = ' ';
                     buf[2] = 0;
-                    return buf;
-                case STATE_VALUE_SEPARATOR:
-                    state = STATE_VALUE;
+                    ಪ್ರತ್ಯಾಗಮ buf;
+                ಪಕ್ಷ STATE_ಮೌಲ್ಯ_SEPARATOR:
+                    state = STATE_ಮೌಲ್ಯ;
                     buf[0] = ',';
                     buf[1] = ' ';
                     buf[2] = 0;
-                    return buf;
+                    ಪ್ರತ್ಯಾಗಮ buf;
             }
-            return 0;
+            ಪ್ರತ್ಯಾಗಮ 0;
         }
     };
 
-    class FormatterBase : public Formatter
+    ವರ್ಗ FormatterBase : ಸಾರ್ವಜನಿಕ Formatter
     {
-    public:
-        FormatterBase() : prec16f(4), prec32f(8), prec64f(16), multiline(true) {}
+    ಸಾರ್ವಜನಿಕ:
+        FormatterBase() : prec16f(4), prec32f(8), prec64f(16), multiline(ಸತ್ಯ) {}
 
-        void set16fPrecision(int p) CV_OVERRIDE
+        ಶೂನ್ಯ set16fPrecision(ಪೂರ್ಣಾಙ್ಕ p) CV_OVERRIDE
         {
             prec16f = p;
         }
 
-        void set32fPrecision(int p) CV_OVERRIDE
+        ಶೂನ್ಯ set32fPrecision(ಪೂರ್ಣಾಙ್ಕ p) CV_OVERRIDE
         {
             prec32f = p;
         }
 
-        void set64fPrecision(int p) CV_OVERRIDE
+        ಶೂನ್ಯ set64fPrecision(ಪೂರ್ಣಾಙ್ಕ p) CV_OVERRIDE
         {
             prec64f = p;
         }
 
-        void setMultiline(bool ml) CV_OVERRIDE
+        ಶೂನ್ಯ setMultiline(ತಾರ್ಕಿಕ ml) CV_OVERRIDE
         {
             multiline = ml;
         }
 
-    protected:
-        int prec16f;
-        int prec32f;
-        int prec64f;
-        int multiline;
+    ರಕ್ಷಿತ:
+        ಪೂರ್ಣಾಙ್ಕ prec16f;
+        ಪೂರ್ಣಾಙ್ಕ prec32f;
+        ಪೂರ್ಣಾಙ್ಕ prec64f;
+        ಪೂರ್ಣಾಙ್ಕ multiline;
     };
 
-    class DefaultFormatter CV_FINAL : public FormatterBase
+    ವರ್ಗ DefaultFormatter CV_FINAL : ಸಾರ್ವಜನಿಕ FormatterBase
     {
-    public:
+    ಸಾರ್ವಜನಿಕ:
 
-        Ptr<Formatted> format(const Mat& mtx) const CV_OVERRIDE
+        Ptr<Formatted> format(ಧ್ರುವ Mat& mtx) ಧ್ರುವ CV_OVERRIDE
         {
-            char braces[5] = {'\0', '\0', ';', '\0', '\0'};
-            return makePtr<FormattedImpl>("[", "]", mtx, &*braces,
-                mtx.rows == 1 || !multiline, false, mtx.depth() == CV_64F ? prec64f : prec32f );
+            ವರ್ಣ braces[5] = {'\0', '\0', ';', '\0', '\0'};
+            ಪ್ರತ್ಯಾಗಮ makePtr<FormattedImpl>("[", "]", mtx, &*braces,
+                mtx.rows == 1 || !multiline, ಅಸತ್ಯ, mtx.depth() == CV_64F ? prec64f : prec32f );
         }
     };
 
-    class MatlabFormatter CV_FINAL : public FormatterBase
+    ವರ್ಗ MatlabFormatter CV_FINAL : ಸಾರ್ವಜನಿಕ FormatterBase
     {
-    public:
+    ಸಾರ್ವಜನಿಕ:
 
-        Ptr<Formatted> format(const Mat& mtx) const CV_OVERRIDE
+        Ptr<Formatted> format(ಧ್ರುವ Mat& mtx) ಧ್ರುವ CV_OVERRIDE
         {
-            char braces[5] = {'\0', '\0', ';', '\0', '\0'};
-            return makePtr<FormattedImpl>("", "", mtx, &*braces,
-                mtx.rows == 1 || !multiline, true, mtx.depth() == CV_64F ? prec64f : prec32f );
+            ವರ್ಣ braces[5] = {'\0', '\0', ';', '\0', '\0'};
+            ಪ್ರತ್ಯಾಗಮ makePtr<FormattedImpl>("", "", mtx, &*braces,
+                mtx.rows == 1 || !multiline, ಸತ್ಯ, mtx.depth() == CV_64F ? prec64f : prec32f );
         }
     };
 
-    class PythonFormatter CV_FINAL : public FormatterBase
+    ವರ್ಗ PythonFormatter CV_FINAL : ಸಾರ್ವಜನಿಕ FormatterBase
     {
-    public:
+    ಸಾರ್ವಜನಿಕ:
 
-        Ptr<Formatted> format(const Mat& mtx) const CV_OVERRIDE
+        Ptr<Formatted> format(ಧ್ರುವ Mat& mtx) ಧ್ರುವ CV_OVERRIDE
         {
-            char braces[5] = {'[', ']', ',', '[', ']'};
-            if (mtx.cols == 1)
+            ವರ್ಣ braces[5] = {'[', ']', ',', '[', ']'};
+            ಯದಿ (mtx.cols == 1)
                 braces[0] = braces[1] = '\0';
-            return makePtr<FormattedImpl>("[", "]", mtx, &*braces,
-                mtx.rows == 1 || !multiline, false, mtx.depth() == CV_64F ? prec64f : prec32f );
+            ಪ್ರತ್ಯಾಗಮ makePtr<FormattedImpl>("[", "]", mtx, &*braces,
+                mtx.rows == 1 || !multiline, ಅಸತ್ಯ, mtx.depth() == CV_64F ? prec64f : prec32f );
         }
     };
 
-    class NumpyFormatter CV_FINAL : public FormatterBase
+    ವರ್ಗ NumpyFormatter CV_FINAL : ಸಾರ್ವಜನಿಕ FormatterBase
     {
-    public:
+    ಸಾರ್ವಜನಿಕ:
 
-        Ptr<Formatted> format(const Mat& mtx) const CV_OVERRIDE
+        Ptr<Formatted> format(ಧ್ರುವ Mat& mtx) ಧ್ರುವ CV_OVERRIDE
         {
-            static const char* numpyTypes[CV_DEPTH_MAX] =
+            ಸ್ಥಿರ ಧ್ರುವ ವರ್ಣ* numpyTypes[CV_DEPTH_MAX] =
             {
                 "uint8", "int8", "uint16", "int16", "int32", "float32", "float64",
                 "float16", "bfloat16", "bool", "uint64", "int64", "uint32",
                 "float8_e4m3fn", "float8_e4m3fnuz"
             };
-            char braces[5] = {'[', ']', ',', '[', ']'};
-            if (mtx.cols == 1)
+            ವರ್ಣ braces[5] = {'[', ']', ',', '[', ']'};
+            ಯದಿ (mtx.cols == 1)
                 braces[0] = braces[1] = '\0';
-            return makePtr<FormattedImpl>("array([",
+            ಪ್ರತ್ಯಾಗಮ makePtr<FormattedImpl>("array([",
                 cv::format("], dtype='%s')", numpyTypes[mtx.depth()]), mtx, &*braces,
-                mtx.rows == 1 || !multiline, false, mtx.depth() == CV_64F ? prec64f : prec32f );
+                mtx.rows == 1 || !multiline, ಅಸತ್ಯ, mtx.depth() == CV_64F ? prec64f : prec32f );
         }
     };
 
-    class CSVFormatter CV_FINAL : public FormatterBase
+    ವರ್ಗ CSVFormatter CV_FINAL : ಸಾರ್ವಜನಿಕ FormatterBase
     {
-    public:
+    ಸಾರ್ವಜನಿಕ:
 
-        Ptr<Formatted> format(const Mat& mtx) const CV_OVERRIDE
+        Ptr<Formatted> format(ಧ್ರುವ Mat& mtx) ಧ್ರುವ CV_OVERRIDE
         {
-            char braces[5] = {'\0', '\0', '\0', '\0', '\0'};
-            return makePtr<FormattedImpl>(String(),
+            ವರ್ಣ braces[5] = {'\0', '\0', '\0', '\0', '\0'};
+            ಪ್ರತ್ಯಾಗಮ makePtr<FormattedImpl>(String(),
                 mtx.rows > 1 ? String("\n") : String(), mtx, &*braces,
-                mtx.rows == 1 || !multiline, false, mtx.depth() == CV_64F ? prec64f : prec32f );
+                mtx.rows == 1 || !multiline, ಅಸತ್ಯ, mtx.depth() == CV_64F ? prec64f : prec32f );
         }
     };
 
-    class CFormatter CV_FINAL : public FormatterBase
+    ವರ್ಗ CFormatter CV_FINAL : ಸಾರ್ವಜನಿಕ FormatterBase
     {
-    public:
+    ಸಾರ್ವಜನಿಕ:
 
-        Ptr<Formatted> format(const Mat& mtx) const CV_OVERRIDE
+        Ptr<Formatted> format(ಧ್ರುವ Mat& mtx) ಧ್ರುವ CV_OVERRIDE
         {
-            char braces[5] = {'\0', '\0', ',', '\0', '\0'};
-            return makePtr<FormattedImpl>("{", "}", mtx, &*braces,
-                mtx.rows == 1 || !multiline, false, mtx.depth() == CV_64F ? prec64f : prec32f );
+            ವರ್ಣ braces[5] = {'\0', '\0', ',', '\0', '\0'};
+            ಪ್ರತ್ಯಾಗಮ makePtr<FormattedImpl>("{", "}", mtx, &*braces,
+                mtx.rows == 1 || !multiline, ಅಸತ್ಯ, mtx.depth() == CV_64F ? prec64f : prec32f );
         }
     };
 
@@ -391,188 +391,188 @@ namespace cv
 
     Ptr<Formatter> Formatter::get(Formatter::FormatType fmt)
     {
-        switch(fmt)
+        ವಿಕಲ್ಪ(fmt)
         {
-            case FMT_DEFAULT:
-                return makePtr<DefaultFormatter>();
-            case FMT_MATLAB:
-                return makePtr<MatlabFormatter>();
-            case FMT_CSV:
-                return makePtr<CSVFormatter>();
-            case FMT_PYTHON:
-                return makePtr<PythonFormatter>();
-            case FMT_NUMPY:
-                return makePtr<NumpyFormatter>();
-            case FMT_C:
-                return makePtr<CFormatter>();
+            ಪಕ್ಷ FMT_DEFAULT:
+                ಪ್ರತ್ಯಾಗಮ makePtr<DefaultFormatter>();
+            ಪಕ್ಷ FMT_MATLAB:
+                ಪ್ರತ್ಯಾಗಮ makePtr<MatlabFormatter>();
+            ಪಕ್ಷ FMT_CSV:
+                ಪ್ರತ್ಯಾಗಮ makePtr<CSVFormatter>();
+            ಪಕ್ಷ FMT_PYTHON:
+                ಪ್ರತ್ಯಾಗಮ makePtr<PythonFormatter>();
+            ಪಕ್ಷ FMT_NUMPY:
+                ಪ್ರತ್ಯಾಗಮ makePtr<NumpyFormatter>();
+            ಪಕ್ಷ FMT_C:
+                ಪ್ರತ್ಯಾಗಮ makePtr<CFormatter>();
         }
-        return makePtr<DefaultFormatter>();
+        ಪ್ರತ್ಯಾಗಮ makePtr<DefaultFormatter>();
     }
 
-    template<typename _Tp> struct Fmt
+    template<typename _Tp> ಸಂರಚನಾ Fmt
     {
-        typedef int temp_type;
-        static const char* fmt() { return "%d"; }
+        ಪ್ರಕಾರನಿರ್ದೇಶ ಪೂರ್ಣಾಙ್ಕ temp_type;
+        ಸ್ಥಿರ ಧ್ರುವ ವರ್ಣ* fmt() { ಪ್ರತ್ಯಾಗಮ "%d"; }
     };
 
-    template<> struct Fmt<uint32_t>
+    template<> ಸಂರಚನಾ Fmt<uint32_t>
     {
-        typedef unsigned temp_type;
-        static const char* fmt() { return "%u"; }
+        ಪ್ರಕಾರನಿರ್ದೇಶ unsigned temp_type;
+        ಸ್ಥಿರ ಧ್ರುವ ವರ್ಣ* fmt() { ಪ್ರತ್ಯಾಗಮ "%u"; }
     };
 
-    template<> struct Fmt<int64_t>
+    template<> ಸಂರಚನಾ Fmt<int64_t>
     {
-        typedef long long temp_type;
-        static const char* fmt() { return "%lld"; }
+        ಪ್ರಕಾರನಿರ್ದೇಶ long long temp_type;
+        ಸ್ಥಿರ ಧ್ರುವ ವರ್ಣ* fmt() { ಪ್ರತ್ಯಾಗಮ "%lld"; }
     };
 
-    template<> struct Fmt<uint64_t>
+    template<> ಸಂರಚನಾ Fmt<uint64_t>
     {
-        typedef unsigned long long temp_type;
-        static const char* fmt() { return "%llu"; }
+        ಪ್ರಕಾರನಿರ್ದೇಶ unsigned long long temp_type;
+        ಸ್ಥಿರ ಧ್ರುವ ವರ್ಣ* fmt() { ಪ್ರತ್ಯಾಗಮ "%llu"; }
     };
 
-    template<> struct Fmt<float>
+    template<> ಸಂರಚನಾ Fmt<ಭಿನ್ನ>
     {
-        typedef float temp_type;
-        static const char* fmt() { return "%.5g"; }
+        ಪ್ರಕಾರನಿರ್ದೇಶ ಭಿನ್ನ temp_type;
+        ಸ್ಥಿರ ಧ್ರುವ ವರ್ಣ* fmt() { ಪ್ರತ್ಯಾಗಮ "%.5g"; }
     };
 
-    template<> struct Fmt<double>
+    template<> ಸಂರಚನಾ Fmt<ದ್ವಿಗುಣ>
     {
-        typedef double temp_type;
-        static const char* fmt() { return "%.5g"; }
+        ಪ್ರಕಾರನಿರ್ದೇಶ ದ್ವಿಗುಣ temp_type;
+        ಸ್ಥಿರ ಧ್ರುವ ವರ್ಣ* fmt() { ಪ್ರತ್ಯಾಗಮ "%.5g"; }
     };
 
-    template<> struct Fmt<hfloat>
+    template<> ಸಂರಚನಾ Fmt<hfloat>
     {
-        typedef float temp_type;
-        static const char* fmt() { return "%.5g"; }
+        ಪ್ರಕಾರನಿರ್ದೇಶ ಭಿನ್ನ temp_type;
+        ಸ್ಥಿರ ಧ್ರುವ ವರ್ಣ* fmt() { ಪ್ರತ್ಯಾಗಮ "%.5g"; }
     };
 
-    template<> struct Fmt<bfloat>
+    template<> ಸಂರಚನಾ Fmt<bfloat>
     {
-        typedef float temp_type;
-        static const char* fmt() { return "%.4g"; }
+        ಪ್ರಕಾರನಿರ್ದೇಶ ಭಿನ್ನ temp_type;
+        ಸ್ಥಿರ ಧ್ರುವ ವರ್ಣ* fmt() { ಪ್ರತ್ಯಾಗಮ "%.4g"; }
     };
 
-    template<> struct Fmt<fp8_t>
+    template<> ಸಂರಚನಾ Fmt<fp8_t>
     {
-        typedef float temp_type;
-        static const char* fmt() { return "%.4g"; }
+        ಪ್ರಕಾರನಿರ್ದೇಶ ಭಿನ್ನ temp_type;
+        ಸ್ಥಿರ ಧ್ರುವ ವರ್ಣ* fmt() { ಪ್ರತ್ಯಾಗಮ "%.4g"; }
     };
 
-    template<> struct Fmt<fp8a_t>
+    template<> ಸಂರಚನಾ Fmt<fp8a_t>
     {
-        typedef float temp_type;
-        static const char* fmt() { return "%.4g"; }
+        ಪ್ರಕಾರನಿರ್ದೇಶ ಭಿನ್ನ temp_type;
+        ಸ್ಥಿರ ಧ್ರುವ ವರ್ಣ* fmt() { ಪ್ರತ್ಯಾಗಮ "%.4g"; }
     };
 
     template <typename _Tp>
-    static void pprintRow(std::ostream& strm, const _Tp* ptr, int n, size_t ofs, int edge)
+    ಸ್ಥಿರ ಶೂನ್ಯ pprintRow(std::ostream& strm, ಧ್ರುವ _Tp* ptr, ಪೂರ್ಣಾಙ್ಕ n, size_t ofs, ಪೂರ್ಣಾಙ್ಕ edge)
     {
-        char buf[128];
-        const char* fmt = Fmt<_Tp>::fmt();
-        int i, ndump = edge > 0 ? std::min(n, edge*2+1) : n;
-        if (edge == 0)
+        ವರ್ಣ buf[128];
+        ಧ್ರುವ ವರ್ಣ* fmt = Fmt<_Tp>::fmt();
+        ಪೂರ್ಣಾಙ್ಕ i, ndump = edge > 0 ? std::min(n, edge*2+1) : n;
+        ಯದಿ (edge == 0)
             edge = ndump;
-        for (i = 0; i < ndump; i++) {
-            int j = n == ndump || i < edge ? i : i == edge ? -1 : n-edge*2-1+i;
-            if (i > 0)
+        ಪ್ರತಿ (i = 0; i < ndump; i++) {
+            ಪೂರ್ಣಾಙ್ಕ j = n == ndump || i < edge ? i : i == edge ? -1 : n-edge*2-1+i;
+            ಯದಿ (i > 0)
                 strm << ", ";
-            if (j >= 0) {
-                snprintf(buf, sizeof(buf), fmt, (typename Fmt<_Tp>::temp_type)ptr[ofs + j]);
+            ಯದಿ (j >= 0) {
+                snprintf(buf, ಪರಿಮಾಣ(buf), fmt, (typename Fmt<_Tp>::temp_type)ptr[ofs + j]);
                 strm << buf;
-            } else
+            } ಅನ್ಯಥಾ
                 strm << "... ";
         }
     }
 
-    static void pprintSlice(std::ostream& strm, const Mat& tensor,
-                            const size_t* step, int d,
-                            size_t ofs, int edge)
+    ಸ್ಥಿರ ಶೂನ್ಯ pprintSlice(std::ostream& strm, ಧ್ರುವ Mat& tensor,
+                            ಧ್ರುವ size_t* step, ಪೂರ್ಣಾಙ್ಕ d,
+                            size_t ofs, ಪೂರ್ಣಾಙ್ಕ edge)
     {
         MatShape shape = tensor.shape();
-        int ndims = shape.dims;
-        int n = d >= ndims ? 1 : shape[d];
-        if (d >= ndims - 1) {
-            int typ = tensor.depth();
-            void* data = tensor.data;
+        ಪೂರ್ಣಾಙ್ಕ ndims = shape.dims;
+        ಪೂರ್ಣಾಙ್ಕ n = d >= ndims ? 1 : shape[d];
+        ಯದಿ (d >= ndims - 1) {
+            ಪೂರ್ಣಾಙ್ಕ typ = tensor.depth();
+            ಶೂನ್ಯ* data = tensor.data;
             CV_Assert(data);
             n *= tensor.channels();
-            if (typ == CV_8U)
-                pprintRow(strm, (const uint8_t*)data, n, ofs, edge);
-            else if (typ == CV_8S)
-                pprintRow(strm, (const int8_t*)data, n, ofs, edge);
-            else if (typ == CV_16U)
-                pprintRow(strm, (const uint16_t*)data, n, ofs, edge);
-            else if (typ == CV_16S)
-                pprintRow(strm, (const int16_t*)data, n, ofs, edge);
-            else if (typ == CV_32U)
-                pprintRow(strm, (const unsigned*)data, n, ofs, edge);
-            else if (typ == CV_32S)
-                pprintRow(strm, (const int*)data, n, ofs, edge);
-            else if (typ == CV_64U)
-                pprintRow(strm, (const uint64_t*)data, n, ofs, edge);
-            else if (typ == CV_64S)
-                pprintRow(strm, (const int64_t*)data, n, ofs, edge);
-            else if (typ == CV_32F)
-                pprintRow(strm, (const float*)data, n, ofs, edge);
-            else if (typ == CV_64F)
-                pprintRow(strm, (const double*)data, n, ofs, edge);
-            else if (typ == CV_16F)
-                pprintRow(strm, (const hfloat*)data, n, ofs, edge);
-            else if (typ == CV_16BF)
-                pprintRow(strm, (const bfloat*)data, n, ofs, edge);
-            else if (typ == CV_Bool)
-                pprintRow(strm, (const bool*)data, n, ofs, edge);
-            else if (typ == CV_8F_E4M3FN)
-                pprintRow(strm, (const fp8_t*)data, n, ofs, edge);
-            else if (typ == CV_8F_E4M3FNUZ)
-                pprintRow(strm, (const fp8a_t*)data, n, ofs, edge);
-            else {
+            ಯದಿ (typ == CV_8U)
+                pprintRow(strm, (ಧ್ರುವ uint8_t*)data, n, ofs, edge);
+            ಅನ್ಯಥಾ ಯದಿ (typ == CV_8S)
+                pprintRow(strm, (ಧ್ರುವ int8_t*)data, n, ofs, edge);
+            ಅನ್ಯಥಾ ಯದಿ (typ == CV_16U)
+                pprintRow(strm, (ಧ್ರುವ uint16_t*)data, n, ofs, edge);
+            ಅನ್ಯಥಾ ಯದಿ (typ == CV_16S)
+                pprintRow(strm, (ಧ್ರುವ int16_t*)data, n, ofs, edge);
+            ಅನ್ಯಥಾ ಯದಿ (typ == CV_32U)
+                pprintRow(strm, (ಧ್ರುವ unsigned*)data, n, ofs, edge);
+            ಅನ್ಯಥಾ ಯದಿ (typ == CV_32S)
+                pprintRow(strm, (ಧ್ರುವ ಪೂರ್ಣಾಙ್ಕ*)data, n, ofs, edge);
+            ಅನ್ಯಥಾ ಯದಿ (typ == CV_64U)
+                pprintRow(strm, (ಧ್ರುವ uint64_t*)data, n, ofs, edge);
+            ಅನ್ಯಥಾ ಯದಿ (typ == CV_64S)
+                pprintRow(strm, (ಧ್ರುವ int64_t*)data, n, ofs, edge);
+            ಅನ್ಯಥಾ ಯದಿ (typ == CV_32F)
+                pprintRow(strm, (ಧ್ರುವ ಭಿನ್ನ*)data, n, ofs, edge);
+            ಅನ್ಯಥಾ ಯದಿ (typ == CV_64F)
+                pprintRow(strm, (ಧ್ರುವ ದ್ವಿಗುಣ*)data, n, ofs, edge);
+            ಅನ್ಯಥಾ ಯದಿ (typ == CV_16F)
+                pprintRow(strm, (ಧ್ರುವ hfloat*)data, n, ofs, edge);
+            ಅನ್ಯಥಾ ಯದಿ (typ == CV_16BF)
+                pprintRow(strm, (ಧ್ರುವ bfloat*)data, n, ofs, edge);
+            ಅನ್ಯಥಾ ಯದಿ (typ == CV_Bool)
+                pprintRow(strm, (ಧ್ರುವ ತಾರ್ಕಿಕ*)data, n, ofs, edge);
+            ಅನ್ಯಥಾ ಯದಿ (typ == CV_8F_E4M3FN)
+                pprintRow(strm, (ಧ್ರುವ fp8_t*)data, n, ofs, edge);
+            ಅನ್ಯಥಾ ಯದಿ (typ == CV_8F_E4M3FNUZ)
+                pprintRow(strm, (ಧ್ರುವ fp8a_t*)data, n, ofs, edge);
+            ಅನ್ಯಥಾ {
                 CV_Error(Error::StsNotImplemented, "unsupported type");
             }
-        } else {
-            int i, ndump = edge > 0 ? std::min(n, edge*2+1) : n;
-            bool dots = false;
-            for (i = 0; i < ndump; i++) {
-                if (i > 0 && !dots) {
-                    int nempty_lines = ndims - 2 - d;
-                    for (int k = 0; k < nempty_lines; k++)
+        } ಅನ್ಯಥಾ {
+            ಪೂರ್ಣಾಙ್ಕ i, ndump = edge > 0 ? std::min(n, edge*2+1) : n;
+            ತಾರ್ಕಿಕ dots = ಅಸತ್ಯ;
+            ಪ್ರತಿ (i = 0; i < ndump; i++) {
+                ಯದಿ (i > 0 && !dots) {
+                    ಪೂರ್ಣಾಙ್ಕ nempty_ಸಾಲುಗಳು = ndims - 2 - d;
+                    ಪ್ರತಿ (ಪೂರ್ಣಾಙ್ಕ k = 0; k < nempty_ಸಾಲುಗಳು; k++)
                         strm << "\n";
                 }
-                if (i > 0)
+                ಯದಿ (i > 0)
                     strm << "\n";
-                int j = n == ndump || i < edge ? i :
+                ಪೂರ್ಣಾಙ್ಕ j = n == ndump || i < edge ? i :
                         i == edge ? -1 :
                         n - edge*2 - 1 + i;
                 dots = j < 0;
-                if (!dots)
+                ಯದಿ (!dots)
                     pprintSlice(strm, tensor, step, d+1, ofs + j*step[d], edge);
-                else
+                ಅನ್ಯಥಾ
                     strm << "...";
             }
         }
     }
 
-    std::ostream& pprint(std::ostream& strm, InputArray array,
-                         int /*indent*/, int edge_,
-                         int wholeTensorThreshold,
-                         char parens)
+    std::ostream& pprint(std::ostream& strm, ಒಳಹರಿವು_Array array,
+                         ಪೂರ್ಣಾಙ್ಕ /*indent*/, ಪೂರ್ಣಾಙ್ಕ edge_,
+                         ಪೂರ್ಣಾಙ್ಕ wholeTensorThreshold,
+                         ವರ್ಣ parens)
     {
-        char oparen = parens;
-        char cparen = parens == '(' ? ')' :
+        ವರ್ಣ oparen = parens;
+        ವರ್ಣ cparen = parens == '(' ? ')' :
                       parens == '[' ? ']' :
                       parens == '{' ? '}' :
                       parens == '<' ? '>' :
                       parens;
-        int edge = edge_ > 0 ? edge_ : 3;
+        ಪೂರ್ಣಾಙ್ಕ edge = edge_ > 0 ? edge_ : 3;
         wholeTensorThreshold = wholeTensorThreshold > 0 ? wholeTensorThreshold : 100;
 
         Mat tensor = array.getMat();
-        if (!tensor.isContinuous()) {
+        ಯದಿ (!tensor.isContinuous()) {
             // [TODO] print non-continous arrays without copy
             Mat temp;
             tensor.copyTo(temp);
@@ -582,28 +582,28 @@ namespace cv
         MatShape shape = tensor.shape();
         size_t sz_all = tensor.total();
 
-        if (parens)
+        ಯದಿ (parens)
             strm << oparen;
-        if (sz_all == 0) {
-            if (!parens)
+        ಯದಿ (sz_all == 0) {
+            ಯದಿ (!parens)
                 strm << "<empty>";
-        } else {
-            if (sz_all <= (size_t)wholeTensorThreshold)
+        } ಅನ್ಯಥಾ {
+            ಯದಿ (sz_all <= (size_t)wholeTensorThreshold)
                 edge = 0;
 
-            int ndims = shape.dims;
-            int cn = tensor.channels();
+            ಪೂರ್ಣಾಙ್ಕ ndims = shape.dims;
+            ಪೂರ್ಣಾಙ್ಕ cn = tensor.channels();
             size_t step[MatShape::MAX_DIMS];
             step[std::max(ndims-1, 0)] = 1;
-            for (int i = ndims-2; i >= 0; i--) {
+            ಪ್ರತಿ (ಪೂರ್ಣಾಙ್ಕ i = ndims-2; i >= 0; i--) {
                 step[i] = step[i+1]*shape[i+1]*cn;
                 cn = 1;
             }
             pprintSlice(strm, tensor, step, 0, 0, edge);
         }
-        if (parens)
+        ಯದಿ (parens)
             strm << cparen;
-        return strm;
+        ಪ್ರತ್ಯಾಗಮ strm;
     }
 
 } // cv

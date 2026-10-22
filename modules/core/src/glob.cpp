@@ -40,93 +40,93 @@
 //
 //M*/
 
-#include "precomp.hpp"
+#ಅನ್ತರ್ಭಾವ "precomp.hpp"
 
-#include "opencv2/core/utils/filesystem.hpp"
-#include "opencv2/core/utils/filesystem.private.hpp"
+#ಅನ್ತರ್ಭಾವ "opencv2/core/utils/filesystem.hpp"
+#ಅನ್ತರ್ಭಾವ "opencv2/core/utils/filesystem.private.hpp"
 
-#if OPENCV_HAVE_FILESYSTEM_SUPPORT
-#if defined _WIN32 || defined WINCE
+#ಯದಿ OPENCV_HAVE_FILESYSTEM_SUPPORT
+#ಯದಿ defined _WIN32 || defined WINCE
 # include <windows.h>
-const char dir_separators[] = "/\\";
+ಧ್ರುವ ವರ್ಣ dir_separators[] = "/\\";
 
-namespace
+ನಾಮಾಕಾಶ
 {
-    struct dirent
+    ಸಂರಚನಾ dirent
     {
-        const char* d_name;
+        ಧ್ರುವ ವರ್ಣ* d_name;
     };
 
-    struct DIR
+    ಸಂರಚನಾ DIR
     {
-#if defined(WINRT) || defined(_WIN32_WCE)
+#ಯದಿ defined(WINRT) || defined(_WIN32_WCE)
         WIN32_FIND_DATAW data;
-#else
+#ಅನ್ಯಥಾ
         WIN32_FIND_DATAA data;
 #endif
         HANDLE handle;
         dirent ent;
-#if defined(WINRT) || defined(_WIN32_WCE)
+#ಯದಿ defined(WINRT) || defined(_WIN32_WCE)
         DIR() { }
         ~DIR()
         {
-            if (ent.d_name)
+            ಯದಿ (ent.d_name)
                 delete[] ent.d_name;
         }
 #endif
     };
 
-    DIR* opendir(const char* path)
+    DIR* opendir(ಧ್ರುವ ವರ್ಣ* path)
     {
-        DIR* dir = new DIR;
+        DIR* dir = ನೂತನ DIR;
         dir->ent.d_name = 0;
-#if defined(WINRT) || defined(_WIN32_WCE)
+#ಯದಿ defined(WINRT) || defined(_WIN32_WCE)
         cv::String full_path = cv::String(path) + "\\*";
         wchar_t wfull_path[MAX_PATH];
         size_t copied = mbstowcs(wfull_path, full_path.c_str(), MAX_PATH);
         CV_Assert((copied != MAX_PATH) && (copied != (size_t)-1));
         dir->handle = ::FindFirstFileExW(wfull_path, FindExInfoStandard,
-                        &dir->data, FindExSearchNameMatch, NULL, 0);
-#else
+                        &dir->data, Find_Ex_ಹುಡುಕು_Name_Match, ರಿಕ್ತ, 0);
+#ಅನ್ಯಥಾ
         dir->handle = ::FindFirstFileExA((cv::String(path) + "\\*").c_str(),
-            FindExInfoStandard, &dir->data, FindExSearchNameMatch, NULL, 0);
+            FindExInfoStandard, &dir->data, Find_Ex_ಹುಡುಕು_Name_Match, ರಿಕ್ತ, 0);
 #endif
-        if(dir->handle == INVALID_HANDLE_VALUE)
+        ಯದಿ(dir->handle == INVALID_HANDLE_ಮೌಲ್ಯ)
         {
             /*closedir will do all cleanup*/
             delete dir;
-            return 0;
+            ಪ್ರತ್ಯಾಗಮ 0;
         }
-        return dir;
+        ಪ್ರತ್ಯಾಗಮ dir;
     }
 
     dirent* readdir(DIR* dir)
     {
-#if defined(WINRT) || defined(_WIN32_WCE)
-        if (dir->ent.d_name != 0)
+#ಯದಿ defined(WINRT) || defined(_WIN32_WCE)
+        ಯದಿ (dir->ent.d_name != 0)
         {
-            if (::FindNextFileW(dir->handle, &dir->data) != TRUE)
-                return 0;
+            ಯದಿ (::FindNextFileW(dir->handle, &dir->data) != TRUE)
+                ಪ್ರತ್ಯಾಗಮ 0;
         }
-        size_t asize = wcstombs(NULL, dir->data.cFileName, 0);
+        size_t asize = wcstombs(ರಿಕ್ತ, dir->data.cFileName, 0);
         CV_Assert((asize != 0) && (asize != (size_t)-1));
-        char* aname = new char[asize+1];
+        ವರ್ಣ* aname = ನೂತನ ವರ್ಣ[asize+1];
         aname[asize] = 0;
         wcstombs(aname, dir->data.cFileName, asize);
         delete[] dir->ent.d_name;
         dir->ent.d_name = aname;
-#else
-        if (dir->ent.d_name != 0)
+#ಅನ್ಯಥಾ
+        ಯದಿ (dir->ent.d_name != 0)
         {
-            if (::FindNextFileA(dir->handle, &dir->data) != TRUE)
-                return 0;
+            ಯದಿ (::FindNextFileA(dir->handle, &dir->data) != TRUE)
+                ಪ್ರತ್ಯಾಗಮ 0;
         }
         dir->ent.d_name = dir->data.cFileName;
 #endif
-        return &dir->ent;
+        ಪ್ರತ್ಯಾಗಮ &dir->ent;
     }
 
-    void closedir(DIR* dir)
+    ಶೂನ್ಯ closedir(DIR* dir)
     {
         ::FindClose(dir->handle);
         delete dir;
@@ -134,191 +134,191 @@ namespace
 
 
 }
-#else // defined _WIN32 || defined WINCE
+#ಅನ್ಯಥಾ // defined _WIN32 || defined WINCE
 # include <dirent.h>
 # include <sys/stat.h>
-const char dir_separators[] = "/";
+ಧ್ರುವ ವರ್ಣ dir_separators[] = "/";
 #endif // defined _WIN32 || defined WINCE
 #endif // OPENCV_HAVE_FILESYSTEM_SUPPORT
 
 
-#if OPENCV_HAVE_FILESYSTEM_SUPPORT
-static bool isDir(const cv::String& path, DIR* dir)
+#ಯದಿ OPENCV_HAVE_FILESYSTEM_SUPPORT
+ಸ್ಥಿರ ತಾರ್ಕಿಕ isDir(ಧ್ರುವ cv::String& path, DIR* dir)
 {
-#if defined _WIN32 || defined _WIN32_WCE
+#ಯದಿ defined _WIN32 || defined _WIN32_WCE
     DWORD attributes;
     BOOL status = TRUE;
-    if (dir)
+    ಯದಿ (dir)
         attributes = dir->data.dwFileAttributes;
-    else
+    ಅನ್ಯಥಾ
     {
         WIN32_FILE_ATTRIBUTE_DATA all_attrs;
-#if defined WINRT || defined _WIN32_WCE
+#ಯದಿ defined WINRT || defined _WIN32_WCE
         wchar_t wpath[MAX_PATH];
         size_t copied = mbstowcs(wpath, path.c_str(), MAX_PATH);
         CV_Assert((copied != MAX_PATH) && (copied != (size_t)-1));
         status = ::GetFileAttributesExW(wpath, GetFileExInfoStandard, &all_attrs);
-#else
+#ಅನ್ಯಥಾ
         status = ::GetFileAttributesExA(path.c_str(), GetFileExInfoStandard, &all_attrs);
 #endif
         attributes = all_attrs.dwFileAttributes;
     }
 
-    return status && ((attributes & FILE_ATTRIBUTE_DIRECTORY) != 0);
-#else
+    ಪ್ರತ್ಯಾಗಮ status && ((attributes & FILE_ATTRIBUTE_DIRECTORY) != 0);
+#ಅನ್ಯಥಾ
     CV_UNUSED(dir);
-    struct stat stat_buf;
-    if (0 != stat( path.c_str(), &stat_buf))
-        return false;
-    int is_dir = S_ISDIR( stat_buf.st_mode);
-    return is_dir != 0;
+    ಸಂರಚನಾ stat stat_buf;
+    ಯದಿ (0 != stat( path.c_str(), &stat_buf))
+        ಪ್ರತ್ಯಾಗಮ ಅಸತ್ಯ;
+    ಪೂರ್ಣಾಙ್ಕ is_dir = S_ISDIR( stat_buf.st_mode);
+    ಪ್ರತ್ಯಾಗಮ is_dir != 0;
 #endif
 }
 #endif // OPENCV_HAVE_FILESYSTEM_SUPPORT
 
-bool cv::utils::fs::isDirectory(const cv::String& path)
+ತಾರ್ಕಿಕ cv::utils::fs::isDirectory(ಧ್ರುವ cv::String& path)
 {
-#if OPENCV_HAVE_FILESYSTEM_SUPPORT
+#ಯದಿ OPENCV_HAVE_FILESYSTEM_SUPPORT
     CV_INSTRUMENT_REGION();
-    return isDir(path, NULL);
-#else
+    ಪ್ರತ್ಯಾಗಮ isDir(path, ರಿಕ್ತ);
+#ಅನ್ಯಥಾ
     CV_UNUSED(path);
     CV_Error(Error::StsNotImplemented, "File system support is disabled in this OpenCV build!");
 #endif
 }
 
-#if OPENCV_HAVE_FILESYSTEM_SUPPORT
-static bool wildcmp(const char *string, const char *wild)
+#ಯದಿ OPENCV_HAVE_FILESYSTEM_SUPPORT
+ಸ್ಥಿರ ತಾರ್ಕಿಕ wildcmp(ಧ್ರುವ ವರ್ಣ *string, ಧ್ರುವ ವರ್ಣ *wild)
 {
     // Based on wildcmp written by Jack Handy - <A href="mailto:jakkhandy@hotmail.com">jakkhandy@hotmail.com</A>
-    const char *cp = 0, *mp = 0;
+    ಧ್ರುವ ವರ್ಣ *cp = 0, *mp = 0;
 
-    while ((*string) && (*wild != '*'))
+    ಯಾವತ್ ((*string) && (*wild != '*'))
     {
-        if ((*wild != *string) && (*wild != '?'))
+        ಯದಿ ((*wild != *string) && (*wild != '?'))
         {
-            return false;
+            ಪ್ರತ್ಯಾಗಮ ಅಸತ್ಯ;
         }
 
         wild++;
         string++;
     }
 
-    while (*string)
+    ಯಾವತ್ (*string)
     {
-        if (*wild == '*')
+        ಯದಿ (*wild == '*')
         {
-            if (!*++wild)
+            ಯದಿ (!*++wild)
             {
-                return true;
+                ಪ್ರತ್ಯಾಗಮ ಸತ್ಯ;
             }
 
             mp = wild;
             cp = string + 1;
         }
-        else if ((*wild == *string) || (*wild == '?'))
+        ಅನ್ಯಥಾ ಯದಿ ((*wild == *string) || (*wild == '?'))
         {
             wild++;
             string++;
         }
-        else
+        ಅನ್ಯಥಾ
         {
             wild = mp;
             string = cp++;
         }
     }
 
-    while (*wild == '*')
+    ಯಾವತ್ (*wild == '*')
     {
         wild++;
     }
 
-    return *wild == 0;
+    ಪ್ರತ್ಯಾಗಮ *wild == 0;
 }
 
-static void glob_rec(const cv::String& directory, const cv::String& wildchart, std::vector<cv::String>& result,
-        bool recursive, bool includeDirectories, const cv::String& pathPrefix)
+ಸ್ಥಿರ ಶೂನ್ಯ glob_rec(ಧ್ರುವ cv::String& directory, ಧ್ರುವ cv::String& wildchart, std::vector<cv::String>& result,
+        ತಾರ್ಕಿಕ recursive, ತಾರ್ಕಿಕ includeDirectories, ಧ್ರುವ cv::String& pathPrefix)
 {
     DIR *dir;
 
-    if ((dir = opendir (directory.c_str())) != 0)
+    ಯದಿ ((dir = opendir (directory.c_str())) != 0)
     {
         /* find all the files and directories within directory */
-        try
+        ಯತ್ನ
         {
-            struct dirent *ent;
-            while ((ent = readdir (dir)) != 0)
+            ಸಂರಚನಾ dirent *ent;
+            ಯಾವತ್ ((ent = readdir (dir)) != 0)
             {
-                const char* name = ent->d_name;
-                if((name[0] == 0) || (name[0] == '.' && name[1] == 0) || (name[0] == '.' && name[1] == '.' && name[2] == 0))
-                    continue;
+                ಧ್ರುವ ವರ್ಣ* name = ent->d_name;
+                ಯದಿ((name[0] == 0) || (name[0] == '.' && name[1] == 0) || (name[0] == '.' && name[1] == '.' && name[2] == 0))
+                    ಅನುವರ್ತ;
 
                 cv::String path = cv::utils::fs::join(directory, name);
                 cv::String entry = cv::utils::fs::join(pathPrefix, name);
 
-                if (isDir(path, dir))
+                ಯದಿ (isDir(path, dir))
                 {
-                    if (recursive)
+                    ಯದಿ (recursive)
                         glob_rec(path, wildchart, result, recursive, includeDirectories, entry);
-                    if (!includeDirectories)
-                        continue;
+                    ಯದಿ (!includeDirectories)
+                        ಅನುವರ್ತ;
                 }
 
-                if (wildchart.empty() || wildcmp(name, wildchart.c_str()))
+                ಯದಿ (wildchart.empty() || wildcmp(name, wildchart.c_str()))
                     result.push_back(entry);
             }
         }
-        catch (...)
+        ಗೃಹಾಣ (...)
         {
             closedir(dir);
-            throw;
+            ಕ್ಷಿಪ;
         }
         closedir(dir);
     }
-    else
+    ಅನ್ಯಥಾ
     {
         CV_Error_(cv::Error::StsObjectNotFound, ("could not open directory: %s", directory.c_str()));
     }
 }
 #endif // OPENCV_HAVE_FILESYSTEM_SUPPORT
 
-void cv::glob(String pattern, std::vector<String>& result, bool recursive)
+ಶೂನ್ಯ cv::glob(String pattern, std::vector<String>& result, ತಾರ್ಕಿಕ recursive)
 {
-#if OPENCV_HAVE_FILESYSTEM_SUPPORT
+#ಯದಿ OPENCV_HAVE_FILESYSTEM_SUPPORT
     CV_INSTRUMENT_REGION();
 
     result.clear();
     String path, wildchart;
 
-    if (isDir(pattern, 0))
+    ಯದಿ (isDir(pattern, 0))
     {
-        if(strchr(dir_separators, pattern[pattern.size() - 1]) != 0)
+        ಯದಿ(strchr(dir_separators, pattern[pattern.size() - 1]) != 0)
         {
             path = pattern.substr(0, pattern.size() - 1);
         }
-        else
+        ಅನ್ಯಥಾ
         {
             path = pattern;
         }
     }
-    else
+    ಅನ್ಯಥಾ
     {
         size_t pos = pattern.find_last_of(dir_separators);
-        if (pos == String::npos)
+        ಯದಿ (pos == String::npos)
         {
             wildchart = pattern;
             path = ".";
         }
-        else
+        ಅನ್ಯಥಾ
         {
             path = pattern.substr(0, pos);
             wildchart = pattern.substr(pos + 1);
         }
     }
 
-    glob_rec(path, wildchart, result, recursive, false, path);
+    glob_rec(path, wildchart, result, recursive, ಅಸತ್ಯ, path);
     std::sort(result.begin(), result.end());
-#else // OPENCV_HAVE_FILESYSTEM_SUPPORT
+#ಅನ್ಯಥಾ // OPENCV_HAVE_FILESYSTEM_SUPPORT
     CV_UNUSED(pattern);
     CV_UNUSED(result);
     CV_UNUSED(recursive);
@@ -326,14 +326,14 @@ void cv::glob(String pattern, std::vector<String>& result, bool recursive)
 #endif // OPENCV_HAVE_FILESYSTEM_SUPPORT
 }
 
-void cv::utils::fs::glob(const cv::String& directory, const cv::String& pattern,
+ಶೂನ್ಯ cv::utils::fs::glob(ಧ್ರುವ cv::String& directory, ಧ್ರುವ cv::String& pattern,
         std::vector<cv::String>& result,
-        bool recursive, bool includeDirectories)
+        ತಾರ್ಕಿಕ recursive, ತಾರ್ಕಿಕ includeDirectories)
 {
-#if OPENCV_HAVE_FILESYSTEM_SUPPORT
+#ಯದಿ OPENCV_HAVE_FILESYSTEM_SUPPORT
     glob_rec(directory, pattern, result, recursive, includeDirectories, directory);
     std::sort(result.begin(), result.end());
-#else // OPENCV_HAVE_FILESYSTEM_SUPPORT
+#ಅನ್ಯಥಾ // OPENCV_HAVE_FILESYSTEM_SUPPORT
     CV_UNUSED(directory);
     CV_UNUSED(pattern);
     CV_UNUSED(result);
@@ -343,14 +343,14 @@ void cv::utils::fs::glob(const cv::String& directory, const cv::String& pattern,
 #endif // OPENCV_HAVE_FILESYSTEM_SUPPORT
 }
 
-void cv::utils::fs::glob_relative(const cv::String& directory, const cv::String& pattern,
+ಶೂನ್ಯ cv::utils::fs::glob_relative(ಧ್ರುವ cv::String& directory, ಧ್ರುವ cv::String& pattern,
         std::vector<cv::String>& result,
-        bool recursive, bool includeDirectories)
+        ತಾರ್ಕಿಕ recursive, ತಾರ್ಕಿಕ includeDirectories)
 {
-#if OPENCV_HAVE_FILESYSTEM_SUPPORT
+#ಯದಿ OPENCV_HAVE_FILESYSTEM_SUPPORT
     glob_rec(directory, pattern, result, recursive, includeDirectories, cv::String());
     std::sort(result.begin(), result.end());
-#else // OPENCV_HAVE_FILESYSTEM_SUPPORT
+#ಅನ್ಯಥಾ // OPENCV_HAVE_FILESYSTEM_SUPPORT
     CV_UNUSED(directory);
     CV_UNUSED(pattern);
     CV_UNUSED(result);

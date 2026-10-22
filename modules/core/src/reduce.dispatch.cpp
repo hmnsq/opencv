@@ -2,33 +2,33 @@
 // It is subject to the license terms in the LICENSE file found in the top-level directory
 // of this distribution and at http://opencv.org/license.html
 
-#include "precomp.hpp"
+#ಅನ್ತರ್ಭಾವ "precomp.hpp"
 
-#include "reduce.simd.hpp"
-#include "reduce.simd_declarations.hpp"
+#ಅನ್ತರ್ಭಾವ "reduce.simd.hpp"
+#ಅನ್ತರ್ಭಾವ "reduce.simd_declarations.hpp"
 
-namespace cv {
+ನಾಮಾಕಾಶ cv {
 
-typedef void (*ReduceSumFunc)(const Mat& src, Mat& dst);
-ReduceSumFunc getReduceCSumFunc(int sdepth, int ddepth);
-ReduceSumFunc getReduceRSumFunc(int sdepth, int ddepth);
-ReduceSumFunc getReduceRSum2Func(int sdepth, int ddepth);
+ಪ್ರಕಾರನಿರ್ದೇಶ ಶೂನ್ಯ (*ReduceSumFunc)(ಧ್ರುವ Mat& src, Mat& dst);
+ReduceSumFunc getReduceCSumFunc(ಪೂರ್ಣಾಙ್ಕ sdepth, ಪೂರ್ಣಾಙ್ಕ ddepth);
+ReduceSumFunc getReduceRSumFunc(ಪೂರ್ಣಾಙ್ಕ sdepth, ಪೂರ್ಣಾಙ್ಕ ddepth);
+ReduceSumFunc getReduceRSum2Func(ಪೂರ್ಣಾಙ್ಕ sdepth, ಪೂರ್ಣಾಙ್ಕ ddepth);
 
-ReduceSumFunc getReduceCSumFunc(int sdepth, int ddepth)
+ReduceSumFunc getReduceCSumFunc(ಪೂರ್ಣಾಙ್ಕ sdepth, ಪೂರ್ಣಾಙ್ಕ ddepth)
 {
     CV_INSTRUMENT_REGION();
     CV_CPU_DISPATCH(getReduceCSumFunc, (sdepth, ddepth),
         CV_CPU_DISPATCH_MODES_ALL);
 }
 
-ReduceSumFunc getReduceRSumFunc(int sdepth, int ddepth)
+ReduceSumFunc getReduceRSumFunc(ಪೂರ್ಣಾಙ್ಕ sdepth, ಪೂರ್ಣಾಙ್ಕ ddepth)
 {
     CV_INSTRUMENT_REGION();
     CV_CPU_DISPATCH(getReduceRSumFunc, (sdepth, ddepth),
         CV_CPU_DISPATCH_MODES_ALL);
 }
 
-ReduceSumFunc getReduceRSum2Func(int sdepth, int ddepth)
+ReduceSumFunc getReduceRSum2Func(ಪೂರ್ಣಾಙ್ಕ sdepth, ಪೂರ್ಣಾಙ್ಕ ddepth)
 {
     CV_INSTRUMENT_REGION();
     CV_CPU_DISPATCH(getReduceRSum2Func, (sdepth, ddepth),

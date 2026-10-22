@@ -3,37 +3,37 @@
 // of this distribution and at http://opencv.org/license.html
 
 
-#include "precomp.hpp"
+#ಅನ್ತರ್ಭಾವ "precomp.hpp"
 
-namespace cv {
+ನಾಮಾಕಾಶ cv {
 
-typedef void (*PatchNanFunc)(uchar* tptr, size_t len, double newVal);
-typedef void (*FiniteMaskFunc)(const uchar *src, uchar *dst, size_t total);
+ಪ್ರಕಾರನಿರ್ದೇಶ ಶೂನ್ಯ (*PatchNanFunc)(uchar* tptr, size_t len, ದ್ವಿಗುಣ newVal);
+ಪ್ರಕಾರನಿರ್ದೇಶ ಶೂನ್ಯ (*FiniteMaskFunc)(ಧ್ರುವ uchar *src, uchar *dst, size_t total);
 
 CV_CPU_OPTIMIZATION_NAMESPACE_BEGIN
 
-PatchNanFunc getPatchNanFunc(bool isDouble);
-FiniteMaskFunc getFiniteMaskFunc(bool isDouble, int cn);
+PatchNanFunc getPatchNanFunc(ತಾರ್ಕಿಕ isDouble);
+FiniteMaskFunc getFiniteMaskFunc(ತಾರ್ಕಿಕ isDouble, ಪೂರ್ಣಾಙ್ಕ cn);
 
 #ifndef CV_CPU_OPTIMIZATION_DECLARATIONS_ONLY
 
-static void patchNaNs_32f(uchar* ptr, size_t ulen, double newVal)
+ಸ್ಥಿರ ಶೂನ್ಯ patchNaNs_32f(uchar* ptr, size_t ulen, ದ್ವಿಗುಣ newVal)
 {
     CV_INSTRUMENT_REGION();
 
     int32_t* tptr = (int32_t*)ptr;
     Cv32suf val;
-    val.f = (float)newVal;
+    val.f = (ಭಿನ್ನ)newVal;
 
-    int j = 0;
-    int len = (int)ulen;
+    ಪೂರ್ಣಾಙ್ಕ j = 0;
+    ಪೂರ್ಣಾಙ್ಕ len = (ಪೂರ್ಣಾಙ್ಕ)ulen;
 
-#if (CV_SIMD || CV_SIMD_SCALABLE)
+#ಯದಿ (CV_SIMD || CV_SIMD_SCALABLE)
     v_int32 v_pos_mask = vx_setall_s32(0x7fffffff), v_exp_mask = vx_setall_s32(0x7f800000);
     v_int32 v_val = vx_setall_s32(val.i);
 
-    int cWidth = VTraits<v_int32>::vlanes();
-    for (; j < len - cWidth*2 + 1; j += cWidth*2)
+    ಪೂರ್ಣಾಙ್ಕ cWidth = VTraits<v_int32>::vlanes();
+    ಪ್ರತಿ (; j < len - cWidth*2 + 1; j += cWidth*2)
     {
         v_int32 v_src0 = vx_load(tptr + j);
         v_int32 v_src1 = vx_load(tptr + j + cWidth);
@@ -41,7 +41,7 @@ static void patchNaNs_32f(uchar* ptr, size_t ulen, double newVal)
         v_int32 v_cmp_mask0 = v_lt(v_exp_mask, v_and(v_src0, v_pos_mask));
         v_int32 v_cmp_mask1 = v_lt(v_exp_mask, v_and(v_src1, v_pos_mask));
 
-        if (v_check_any(v_or(v_cmp_mask0, v_cmp_mask1)))
+        ಯದಿ (v_check_any(v_or(v_cmp_mask0, v_cmp_mask1)))
         {
             v_int32 v_dst0 = v_select(v_cmp_mask0, v_val, v_src0);
             v_int32 v_dst1 = v_select(v_cmp_mask1, v_val, v_src1);
@@ -52,9 +52,9 @@ static void patchNaNs_32f(uchar* ptr, size_t ulen, double newVal)
     }
 #endif
 
-    for (; j < len; j++)
+    ಪ್ರತಿ (; j < len; j++)
     {
-        if ((tptr[j] & 0x7fffffff) > 0x7f800000)
+        ಯದಿ ((tptr[j] & 0x7fffffff) > 0x7f800000)
         {
             tptr[j] = val.i;
         }
@@ -62,7 +62,7 @@ static void patchNaNs_32f(uchar* ptr, size_t ulen, double newVal)
 }
 
 
-static void patchNaNs_64f(uchar* ptr, size_t ulen, double newVal)
+ಸ್ಥಿರ ಶೂನ್ಯ patchNaNs_64f(uchar* ptr, size_t ulen, ದ್ವಿಗುಣ newVal)
 {
     CV_INSTRUMENT_REGION();
 
@@ -70,16 +70,16 @@ static void patchNaNs_64f(uchar* ptr, size_t ulen, double newVal)
     Cv64suf val;
     val.f = newVal;
 
-    int j = 0;
-    int len = (int)ulen;
+    ಪೂರ್ಣಾಙ್ಕ j = 0;
+    ಪೂರ್ಣಾಙ್ಕ len = (ಪೂರ್ಣಾಙ್ಕ)ulen;
 
-#if (CV_SIMD || CV_SIMD_SCALABLE)
+#ಯದಿ (CV_SIMD || CV_SIMD_SCALABLE)
     v_int64 v_exp_mask = vx_setall_s64(0x7FF0000000000000);
     v_int64 v_pos_mask = vx_setall_s64(0x7FFFFFFFFFFFFFFF);
     v_int64 v_val = vx_setall_s64(val.i);
 
-    int cWidth = VTraits<v_int64>::vlanes();
-    for (; j < len - cWidth * 2 + 1; j += cWidth*2)
+    ಪೂರ್ಣಾಙ್ಕ cWidth = VTraits<v_int64>::vlanes();
+    ಪ್ರತಿ (; j < len - cWidth * 2 + 1; j += cWidth*2)
     {
         v_int64 v_src0 = vx_load(tptr + j);
         v_int64 v_src1 = vx_load(tptr + j + cWidth);
@@ -87,7 +87,7 @@ static void patchNaNs_64f(uchar* ptr, size_t ulen, double newVal)
         v_int64 v_cmp_mask0 = v_lt(v_exp_mask, v_and(v_src0, v_pos_mask));
         v_int64 v_cmp_mask1 = v_lt(v_exp_mask, v_and(v_src1, v_pos_mask));
 
-        if (v_check_any(v_cmp_mask0) || v_check_any(v_cmp_mask1))
+        ಯದಿ (v_check_any(v_cmp_mask0) || v_check_any(v_cmp_mask1))
         {
             // v_select is not available for v_int64, emulating it
             v_int32 val32 = v_reinterpret_as_s32(v_val);
@@ -100,34 +100,34 @@ static void patchNaNs_64f(uchar* ptr, size_t ulen, double newVal)
     }
 #endif
 
-    for (; j < len; j++)
-        if ((tptr[j] & 0x7FFFFFFFFFFFFFFF) > 0x7FF0000000000000)
+    ಪ್ರತಿ (; j < len; j++)
+        ಯದಿ ((tptr[j] & 0x7FFFFFFFFFFFFFFF) > 0x7FF0000000000000)
             tptr[j] = val.i;
 }
 
-PatchNanFunc getPatchNanFunc(bool isDouble)
+PatchNanFunc getPatchNanFunc(ತಾರ್ಕಿಕ isDouble)
 {
-    return isDouble ? patchNaNs_64f
+    ಪ್ರತ್ಯಾಗಮ isDouble ? patchNaNs_64f
                     : patchNaNs_32f;
 }
 
 ////// finiteMask //////
 
-#if (CV_SIMD || CV_SIMD_SCALABLE)
+#ಯದಿ (CV_SIMD || CV_SIMD_SCALABLE)
 
-template <typename _Tp, int cn>
-int finiteMaskSIMD_(const _Tp *src, uchar *dst, size_t total);
+template <typename _Tp, ಪೂರ್ಣಾಙ್ಕ cn>
+ಪೂರ್ಣಾಙ್ಕ finiteMaskSIMD_(ಧ್ರುವ _Tp *src, uchar *dst, size_t total);
 
 template <>
-int finiteMaskSIMD_<float, 1>(const float *fsrc, uchar *dst, size_t utotal)
+ಪೂರ್ಣಾಙ್ಕ finiteMaskSIMD_<ಭಿನ್ನ, 1>(ಧ್ರುವ ಭಿನ್ನ *fsrc, uchar *dst, size_t utotal)
 {
-    const uint32_t* src = (const uint32_t*)fsrc;
-    const int osize = VTraits<v_uint8>::vlanes();
+    ಧ್ರುವ uint32_t* src = (ಧ್ರುವ uint32_t*)fsrc;
+    ಧ್ರುವ ಪೂರ್ಣಾಙ್ಕ osize = VTraits<v_uint8>::vlanes();
     v_uint32 vmaskExp = vx_setall_u32(0x7f800000);
 
-    int i = 0;
-    int total = (int)utotal;
-    for(; i < total - osize + 1; i += osize )
+    ಪೂರ್ಣಾಙ್ಕ i = 0;
+    ಪೂರ್ಣಾಙ್ಕ total = (ಪೂರ್ಣಾಙ್ಕ)utotal;
+    ಪ್ರತಿ(; i < total - osize + 1; i += osize )
     {
         v_uint32 vv0, vv1, vv2, vv3;
         vv0 = v_ne(v_and(vx_load(src + i              ), vmaskExp), vmaskExp);
@@ -138,21 +138,21 @@ int finiteMaskSIMD_<float, 1>(const float *fsrc, uchar *dst, size_t utotal)
         v_store(dst + i, v_pack_b(vv0, vv1, vv2, vv3));
     }
 
-    return i;
+    ಪ್ರತ್ಯಾಗಮ i;
 }
 
 
 template <>
-int finiteMaskSIMD_<float, 2>(const float *fsrc, uchar *dst, size_t utotal)
+ಪೂರ್ಣಾಙ್ಕ finiteMaskSIMD_<ಭಿನ್ನ, 2>(ಧ್ರುವ ಭಿನ್ನ *fsrc, uchar *dst, size_t utotal)
 {
-    const uint32_t* src = (const uint32_t*)fsrc;
-    const int size8 = VTraits<v_uint8>::vlanes();
+    ಧ್ರುವ uint32_t* src = (ಧ್ರುವ uint32_t*)fsrc;
+    ಧ್ರುವ ಪೂರ್ಣಾಙ್ಕ size8 = VTraits<v_uint8>::vlanes();
     v_uint32 vmaskExp = vx_setall_u32(0x7f800000);
     v_uint16 vmaskBoth = vx_setall_u16(0xffff);
 
-    int i = 0;
-    int total = (int)utotal;
-    for(; i < total - (size8 / 2) + 1; i += (size8 / 2) )
+    ಪೂರ್ಣಾಙ್ಕ i = 0;
+    ಪೂರ್ಣಾಙ್ಕ total = (ಪೂರ್ಣಾಙ್ಕ)utotal;
+    ಪ್ರತಿ(; i < total - (size8 / 2) + 1; i += (size8 / 2) )
     {
         v_uint32 vv0, vv1, vv2, vv3;
         vv0 = v_ne(v_and(vx_load(src + i*2                ), vmaskExp), vmaskExp);
@@ -163,24 +163,24 @@ int finiteMaskSIMD_<float, 2>(const float *fsrc, uchar *dst, size_t utotal)
         v_uint16 vfinite = v_eq(v_reinterpret_as_u16(velems), vmaskBoth);
 
         // 2nd argument in vfinite is useless
-        v_store_low(dst + i, v_pack(vfinite, vfinite));
+        v_store_ಕೆಳಗಿನ(dst + i, v_pack(vfinite, vfinite));
     }
 
-    return i;
+    ಪ್ರತ್ಯಾಗಮ i;
 }
 
 
 template <>
-int finiteMaskSIMD_<float, 3>(const float *fsrc, uchar *dst, size_t utotal)
+ಪೂರ್ಣಾಙ್ಕ finiteMaskSIMD_<ಭಿನ್ನ, 3>(ಧ್ರುವ ಭಿನ್ನ *fsrc, uchar *dst, size_t utotal)
 {
-    const uint32_t* src = (const uint32_t*)fsrc;
-    const int npixels = VTraits<v_float32>::vlanes();
+    ಧ್ರುವ uint32_t* src = (ಧ್ರುವ uint32_t*)fsrc;
+    ಧ್ರುವ ಪೂರ್ಣಾಙ್ಕ npixels = VTraits<v_float32>::vlanes();
     v_uint32 vmaskExp = vx_setall_u32(0x7f800000);
     v_uint32 z = vx_setzero_u32();
 
-    int i = 0;
-    int total = (int)utotal;
-    for (; i < total - npixels + 1; i += npixels)
+    ಪೂರ್ಣಾಙ್ಕ i = 0;
+    ಪೂರ್ಣಾಙ್ಕ total = (ಪೂರ್ಣಾಙ್ಕ)utotal;
+    ಪ್ರತಿ (; i < total - npixels + 1; i += npixels)
     {
         v_uint32 vv0, vv1, vv2;
         vv0 = v_ne(v_and(vx_load(src + i*3            ), vmaskExp), vmaskExp);
@@ -194,7 +194,7 @@ int finiteMaskSIMD_<float, 3>(const float *fsrc, uchar *dst, size_t utotal)
         v_uint8 vsh2 = v_extract<2>(velems, velems);
 
         v_uint8 vres3 = v_and(v_and(velems, vsh1), vsh2);
-        for (int j = 0; j < npixels; j++)
+        ಪ್ರತಿ (ಪೂರ್ಣಾಙ್ಕ j = 0; j < npixels; j++)
         {
             dst[i + j] = v_get0(vres3);
             // 2nd arg is useless
@@ -202,22 +202,22 @@ int finiteMaskSIMD_<float, 3>(const float *fsrc, uchar *dst, size_t utotal)
         }
     }
 
-    return i;
+    ಪ್ರತ್ಯಾಗಮ i;
 }
 
 
 template <>
-int finiteMaskSIMD_<float, 4>(const float *fsrc, uchar *dst, size_t utotal)
+ಪೂರ್ಣಾಙ್ಕ finiteMaskSIMD_<ಭಿನ್ನ, 4>(ಧ್ರುವ ಭಿನ್ನ *fsrc, uchar *dst, size_t utotal)
 {
-    const uint32_t* src = (const uint32_t*)fsrc;
-    const int npixels = VTraits<v_uint8>::vlanes() / 2;
-    const int nfloats = VTraits<v_uint32>::vlanes();
-    const v_uint32 vMaskExp = vx_setall_u32(0x7f800000);
+    ಧ್ರುವ uint32_t* src = (ಧ್ರುವ uint32_t*)fsrc;
+    ಧ್ರುವ ಪೂರ್ಣಾಙ್ಕ npixels = VTraits<v_uint8>::vlanes() / 2;
+    ಧ್ರುವ ಪೂರ್ಣಾಙ್ಕ nfloats = VTraits<v_uint32>::vlanes();
+    ಧ್ರುವ v_uint32 vMaskExp = vx_setall_u32(0x7f800000);
     v_uint32 vmaskAll4 = vx_setall_u32(0xFFFFFFFF);
 
-    int i = 0;
-    int total = (int)utotal;
-    for(; i < total - npixels + 1; i += npixels )
+    ಪೂರ್ಣಾಙ್ಕ i = 0;
+    ಪೂರ್ಣಾಙ್ಕ total = (ಪೂರ್ಣಾಙ್ಕ)utotal;
+    ಪ್ರತಿ(; i < total - npixels + 1; i += npixels )
     {
         v_uint32 v0 = vx_load(src + i * 4 + 0*nfloats);
         v_uint32 v1 = vx_load(src + i * 4 + 1*nfloats);
@@ -246,25 +246,25 @@ int finiteMaskSIMD_<float, 4>(const float *fsrc, uchar *dst, size_t utotal)
         // last 2 args are useless
         v_uint8 vres = v_pack_b(vresWide0, vresWide1, vresWide0, vresWide1);
 
-        v_store_low(dst + i, vres);
+        v_store_ಕೆಳಗಿನ(dst + i, vres);
     }
 
-    return i;
+    ಪ್ರತ್ಯಾಗಮ i;
 }
 
 
 template <>
-int finiteMaskSIMD_<double, 1>(const double *dsrc, uchar *dst, size_t utotal)
+ಪೂರ್ಣಾಙ್ಕ finiteMaskSIMD_<ದ್ವಿಗುಣ, 1>(ಧ್ರುವ ದ್ವಿಗುಣ *dsrc, uchar *dst, size_t utotal)
 {
-    const uint64_t* src = (const uint64_t*)dsrc;
-    const int size8 = VTraits<v_uint8>::vlanes();
-    int i = 0;
-    int total = (int)utotal;
+    ಧ್ರುವ uint64_t* src = (ಧ್ರುವ uint64_t*)dsrc;
+    ಧ್ರುವ ಪೂರ್ಣಾಙ್ಕ size8 = VTraits<v_uint8>::vlanes();
+    ಪೂರ್ಣಾಙ್ಕ i = 0;
+    ಪೂರ್ಣಾಙ್ಕ total = (ಪೂರ್ಣಾಙ್ಕ)utotal;
 
     v_uint64 vmaskExp = vx_setall_u64(0x7ff0000000000000);
     v_uint64 z = vx_setzero_u64();
 
-    for(; i < total - (size8 / 2) + 1; i += (size8 / 2) )
+    ಪ್ರತಿ(; i < total - (size8 / 2) + 1; i += (size8 / 2) )
     {
         v_uint64 vv0, vv1, vv2, vv3;
         vv0 = v_ne(v_and(vx_load(src + i                ), vmaskExp), vmaskExp);
@@ -274,24 +274,24 @@ int finiteMaskSIMD_<double, 1>(const double *dsrc, uchar *dst, size_t utotal)
 
         v_uint8 v = v_pack_b(vv0, vv1, vv2, vv3, z, z, z, z);
 
-        v_store_low(dst + i, v);
+        v_store_ಕೆಳಗಿನ(dst + i, v);
     }
 
-    return i;
+    ಪ್ರತ್ಯಾಗಮ i;
 }
 
 template <>
-int finiteMaskSIMD_<double, 2>(const double *dsrc, uchar *dst, size_t utotal)
+ಪೂರ್ಣಾಙ್ಕ finiteMaskSIMD_<ದ್ವಿಗುಣ, 2>(ಧ್ರುವ ದ್ವಿಗುಣ *dsrc, uchar *dst, size_t utotal)
 {
-    const uint64_t* src = (const uint64_t*)dsrc;
-    const int npixels = VTraits<v_uint8>::vlanes() / 2;
-    const int ndoubles = VTraits<v_uint64>::vlanes();
+    ಧ್ರುವ uint64_t* src = (ಧ್ರುವ uint64_t*)dsrc;
+    ಧ್ರುವ ಪೂರ್ಣಾಙ್ಕ npixels = VTraits<v_uint8>::vlanes() / 2;
+    ಧ್ರುವ ಪೂರ್ಣಾಙ್ಕ ndoubles = VTraits<v_uint64>::vlanes();
     v_uint64 vmaskExp = vx_setall_u64(0x7ff0000000000000);
     v_uint16 vmaskBoth = vx_setall_u16(0xffff);
 
-    int i = 0;
-    int total = (int)utotal;
-    for(; i < total - npixels + 1; i += npixels )
+    ಪೂರ್ಣಾಙ್ಕ i = 0;
+    ಪೂರ್ಣಾಙ್ಕ total = (ಪೂರ್ಣಾಙ್ಕ)utotal;
+    ಪ್ರತಿ(; i < total - npixels + 1; i += npixels )
     {
         v_uint64 vv0 = v_ne(v_and(vx_load(src + i*2 + 0*ndoubles), vmaskExp), vmaskExp);
         v_uint64 vv1 = v_ne(v_and(vx_load(src + i*2 + 1*ndoubles), vmaskExp), vmaskExp);
@@ -308,33 +308,33 @@ int finiteMaskSIMD_<double, 2>(const double *dsrc, uchar *dst, size_t utotal)
 
         // 2nd arg is useless
         v_uint8 vres = v_pack(vfinite0, vfinite0);
-        v_store_low(dst + i, vres);
+        v_store_ಕೆಳಗಿನ(dst + i, vres);
     }
 
-    return i;
+    ಪ್ರತ್ಯಾಗಮ i;
 }
 
 
 template <>
-int finiteMaskSIMD_<double, 3>(const double *dsrc, uchar *dst, size_t utotal)
+ಪೂರ್ಣಾಙ್ಕ finiteMaskSIMD_<ದ್ವಿಗುಣ, 3>(ಧ್ರುವ ದ್ವಿಗುಣ *dsrc, uchar *dst, size_t utotal)
 {
     //TODO: vectorize it properly
 
-    const uint64_t* src = (const uint64_t*)dsrc;
-    const int npixels = VTraits<v_uint8>::vlanes() / 2;
+    ಧ್ರುವ uint64_t* src = (ಧ್ರುವ uint64_t*)dsrc;
+    ಧ್ರುವ ಪೂರ್ಣಾಙ್ಕ npixels = VTraits<v_uint8>::vlanes() / 2;
     uint64_t maskExp = 0x7ff0000000000000;
 
-    int i = 0;
-    int total = (int)utotal;
-    for(; i < total - npixels + 1; i += npixels )
+    ಪೂರ್ಣಾಙ್ಕ i = 0;
+    ಪೂರ್ಣಾಙ್ಕ total = (ಪೂರ್ಣಾಙ್ಕ)utotal;
+    ಪ್ರತಿ(; i < total - npixels + 1; i += npixels )
     {
-        for (int j = 0; j < npixels; j++)
+        ಪ್ರತಿ (ಪೂರ್ಣಾಙ್ಕ j = 0; j < npixels; j++)
         {
             uint64_t val0 = src[i * 3 + j * 3 + 0];
             uint64_t val1 = src[i * 3 + j * 3 + 1];
             uint64_t val2 = src[i * 3 + j * 3 + 2];
 
-            bool finite = ((val0 & maskExp) != maskExp) &&
+            ತಾರ್ಕಿಕ finite = ((val0 & maskExp) != maskExp) &&
                           ((val1 & maskExp) != maskExp) &&
                           ((val2 & maskExp) != maskExp);
 
@@ -342,23 +342,23 @@ int finiteMaskSIMD_<double, 3>(const double *dsrc, uchar *dst, size_t utotal)
         }
     }
 
-    return i;
+    ಪ್ರತ್ಯಾಗಮ i;
 }
 
 template <>
-int finiteMaskSIMD_<double, 4>(const double *dsrc, uchar *dst, size_t utotal)
+ಪೂರ್ಣಾಙ್ಕ finiteMaskSIMD_<ದ್ವಿಗುಣ, 4>(ಧ್ರುವ ದ್ವಿಗುಣ *dsrc, uchar *dst, size_t utotal)
 {
     //TODO: vectorize it properly
 
     uint64_t* src = (uint64_t*)dsrc;
-    const int npixels = VTraits<v_uint8>::vlanes() / 2;
-    const int ndoubles = VTraits<v_uint64>::vlanes();
+    ಧ್ರುವ ಪೂರ್ಣಾಙ್ಕ npixels = VTraits<v_uint8>::vlanes() / 2;
+    ಧ್ರುವ ಪೂರ್ಣಾಙ್ಕ ndoubles = VTraits<v_uint64>::vlanes();
     v_uint16 vmaskExp16 = vx_setall_u16(0x7ff0);
     v_uint32 z = vx_setzero_u32();
 
-    int i = 0;
-    int total = (int)utotal;
-    for(; i < total - npixels + 1; i += npixels )
+    ಪೂರ್ಣಾಙ್ಕ i = 0;
+    ಪೂರ್ಣಾಙ್ಕ total = (ಪೂರ್ಣಾಙ್ಕ)utotal;
+    ಪ್ರತಿ(; i < total - npixels + 1; i += npixels )
     {
         v_uint16 vexpb0, vexpb1, vexpb2, vexpb3;
         v_uint16 dummy;
@@ -382,33 +382,33 @@ int finiteMaskSIMD_<double, 4>(const double *dsrc, uchar *dst, size_t utotal)
 
         // 2nd arg is useless
         v_uint8 vres = v_pack(vp16, vp16);
-        v_store_low(dst, vres);
+        v_store_ಕೆಳಗಿನ(dst, vres);
 
         src += npixels * 4;
         dst += npixels;
     }
 
-    return i;
+    ಪ್ರತ್ಯಾಗಮ i;
 }
 
 #endif
 
 
-template <typename _Tp, int cn>
-void finiteMask_(const uchar *src, uchar *dst, size_t total)
+template <typename _Tp, ಪೂರ್ಣಾಙ್ಕ cn>
+ಶೂನ್ಯ finiteMask_(ಧ್ರುವ uchar *src, uchar *dst, size_t total)
 {
     CV_INSTRUMENT_REGION();
     size_t i = 0;
-    const _Tp* tsrc = (const _Tp*) src;
+    ಧ್ರುವ _Tp* tsrc = (ಧ್ರುವ _Tp*) src;
 
-#if (CV_SIMD || CV_SIMD_SCALABLE)
+#ಯದಿ (CV_SIMD || CV_SIMD_SCALABLE)
     i = finiteMaskSIMD_<_Tp, cn>(tsrc, dst, total);
 #endif
 
-    for(; i < total; i++ )
+    ಪ್ರತಿ(; i < total; i++ )
     {
-        bool finite = true;
-        for (int c = 0; c < cn; c++)
+        ತಾರ್ಕಿಕ finite = ಸತ್ಯ;
+        ಪ್ರತಿ (ಪೂರ್ಣಾಙ್ಕ c = 0; c < cn; c++)
         {
             _Tp val = tsrc[i * cn + c];
             finite = finite && !cvIsNaN(val) && !cvIsInf(val);
@@ -417,22 +417,22 @@ void finiteMask_(const uchar *src, uchar *dst, size_t total)
     }
 }
 
-FiniteMaskFunc getFiniteMaskFunc(bool isDouble, int cn)
+FiniteMaskFunc getFiniteMaskFunc(ತಾರ್ಕಿಕ isDouble, ಪೂರ್ಣಾಙ್ಕ cn)
 {
-    static FiniteMaskFunc tab[CV_DEPTH_MAX] =
+    ಸ್ಥಿರ FiniteMaskFunc tab[CV_DEPTH_MAX] =
     {
-        finiteMask_<float,  1>,
-        finiteMask_<float,  2>,
-        finiteMask_<float,  3>,
-        finiteMask_<float,  4>,
-        finiteMask_<double, 1>,
-        finiteMask_<double, 2>,
-        finiteMask_<double, 3>,
-        finiteMask_<double, 4>,
+        finiteMask_<ಭಿನ್ನ,  1>,
+        finiteMask_<ಭಿನ್ನ,  2>,
+        finiteMask_<ಭಿನ್ನ,  3>,
+        finiteMask_<ಭಿನ್ನ,  4>,
+        finiteMask_<ದ್ವಿಗುಣ, 1>,
+        finiteMask_<ದ್ವಿಗುಣ, 2>,
+        finiteMask_<ದ್ವಿಗುಣ, 3>,
+        finiteMask_<ದ್ವಿಗುಣ, 4>,
     };
 
-    int idx = (isDouble ? 4 : 0) + cn - 1;
-    return tab[idx];
+    ಪೂರ್ಣಾಙ್ಕ idx = (isDouble ? 4 : 0) + cn - 1;
+    ಪ್ರತ್ಯಾಗಮ tab[idx];
 }
 
 #endif

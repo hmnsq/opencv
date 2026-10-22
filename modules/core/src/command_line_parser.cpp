@@ -1,250 +1,250 @@
 // This file is part of OpenCV project.
 // It is subject to the license terms in the LICENSE file found in the top-level directory
 // of this distribution and at http://opencv.org/license.html.
-#include "precomp.hpp"
-#include <sstream>
+#ಅನ್ತರ್ಭಾವ "precomp.hpp"
+#ಅನ್ತರ್ಭಾವ <sstream>
 
-namespace cv
+ನಾಮಾಕಾಶ cv
 {
 
-namespace {
-static const char* noneValue = "<none>";
+ನಾಮಾಕಾಶ {
+ಸ್ಥಿರ ಧ್ರುವ ವರ್ಣ* none_ಮೌಲ್ಯ = "<none>";
 
-static String cat_string(const String& str)
+ಸ್ಥಿರ String cat_string(ಧ್ರುವ String& str)
 {
-    int left = 0, right = (int)str.length();
-    while( left < right && str[left] == ' ' )
-        left++;
-    while( right > left && str[right-1] == ' ' )
-        right--;
-    return left >= right ? String("") : str.substr(left, right-left);
+    ಪೂರ್ಣಾಙ್ಕ ಎಡ = 0, ಬಲ = (ಪೂರ್ಣಾಙ್ಕ)str.length();
+    ಯಾವತ್( ಎಡ < ಬಲ && str[ಎಡ] == ' ' )
+        ಎಡ++;
+    ಯಾವತ್( ಬಲ > ಎಡ && str[ಬಲ-1] == ' ' )
+        ಬಲ--;
+    ಪ್ರತ್ಯಾಗಮ ಎಡ >= ಬಲ ? String("") : str.substr(ಎಡ, ಬಲ-ಎಡ);
 }
 }
 
-struct CommandLineParserParams
+ಸಂರಚನಾ Command_ಸಾಲು_Parser_Params
 {
-public:
+ಸಾರ್ವಜನಿಕ:
     String help_message;
-    String def_value;
-    std::vector<String> keys;
-    int number;
+    String def_ಮೌಲ್ಯ;
+    std::vector<String> ಕೀಲಿಗಳು;
+    ಪೂರ್ಣಾಙ್ಕ ಸಂಖ್ಯೆ;
 };
 
 
-struct CommandLineParser::Impl
+ಸಂರಚನಾ Command_ಸಾಲು_Parser::Impl
 {
-    bool error;
+    ತಾರ್ಕಿಕ error;
     String error_message;
     String about_message;
 
     String path_to_app;
     String app_name;
 
-    std::vector<CommandLineParserParams> data;
+    std::vector<Command_ಸಾಲು_Parser_Params> data;
 
-    std::vector<String> split_range_string(const String& str, char fs, char ss) const;
-    std::vector<String> split_string(const String& str, char symbol = ' ', bool create_empty_item = false) const;
+    std::vector<String> split_range_string(ಧ್ರುವ String& str, ವರ್ಣ fs, ವರ್ಣ ss) ಧ್ರುವ;
+    std::vector<String> split_string(ಧ್ರುವ String& str, ವರ್ಣ ಚಿಹ್ನೆ = ' ', ತಾರ್ಕಿಕ create_empty_item = ಅಸತ್ಯ) ಧ್ರುವ;
 
-    void apply_params(const String& key, const String& value);
-    void apply_params(int i, String value);
+    ಶೂನ್ಯ apply_params(ಧ್ರುವ String& ಕೀಲಿ, ಧ್ರುವ String& value);
+    ಶೂನ್ಯ apply_params(ಪೂರ್ಣಾಙ್ಕ i, String value);
 
-    void sort_params();
-    int refcount;
+    ಶೂನ್ಯ sort_params();
+    ಪೂರ್ಣಾಙ್ಕ refcount;
 };
 
 
-static const char* get_type_name(Param type)
+ಸ್ಥಿರ ಧ್ರುವ ವರ್ಣ* get_type_name(Param type)
 {
-    if( type == Param::INT )
-        return "int";
-    if( type == Param::BOOLEAN )
-        return "bool";
-    if( type == Param::UNSIGNED_INT )
-        return "unsigned";
-    if( type == Param::UINT64 )
-        return "unsigned long long";
-    if( type == Param::FLOAT )
-        return "float";
-    if( type == Param::REAL )
-        return "double";
-    if( type == Param::STRING )
-        return "string";
-    return "unknown";
+    ಯದಿ( type == Param::INT )
+        ಪ್ರತ್ಯಾಗಮ "int";
+    ಯದಿ( type == Param::BOOLEAN )
+        ಪ್ರತ್ಯಾಗಮ "bool";
+    ಯದಿ( type == Param::UNSIGNED_INT )
+        ಪ್ರತ್ಯಾಗಮ "unsigned";
+    ಯದಿ( type == Param::UINT64 )
+        ಪ್ರತ್ಯಾಗಮ "unsigned long long";
+    ಯದಿ( type == Param::FLOAT )
+        ಪ್ರತ್ಯಾಗಮ "float";
+    ಯದಿ( type == Param::REAL )
+        ಪ್ರತ್ಯಾಗಮ "double";
+    ಯದಿ( type == Param::STRING )
+        ಪ್ರತ್ಯಾಗಮ "string";
+    ಪ್ರತ್ಯಾಗಮ "unknown";
 }
 
-static bool parse_bool(std::string str)
+ಸ್ಥಿರ ತಾರ್ಕಿಕ parse_bool(std::string str)
 {
     std::transform(str.begin(), str.end(), str.begin(), details::char_tolower);
     std::istringstream is(str);
-    bool value = false;
+    ತಾರ್ಕಿಕ value = ಅಸತ್ಯ;
     is >> (str.size() > 1 ? std::boolalpha : std::noboolalpha) >> value;
 
-    if (is.fail())
+    ಯದಿ (is.fail())
         CV_Error_(Error::StsBadArg, ("can not convert: [%s] to [bool]", str.c_str()));
 
-    return value;
+    ಪ್ರತ್ಯಾಗಮ value;
 }
 
-static void from_str(const String& str, Param type, void* dst)
+ಸ್ಥಿರ ಶೂನ್ಯ from_str(ಧ್ರುವ String& str, Param type, ಶೂನ್ಯ* dst)
 {
     std::stringstream ss(str.c_str());
-    if( type == Param::INT )
-        ss >> *(int*)dst;
-    else if( type == Param::BOOLEAN )
+    ಯದಿ( type == Param::INT )
+        ss >> *(ಪೂರ್ಣಾಙ್ಕ*)dst;
+    ಅನ್ಯಥಾ ಯದಿ( type == Param::BOOLEAN )
     {
         std::string temp;
         ss >> temp;
-        *(bool*) dst = parse_bool(temp);
+        *(ತಾರ್ಕಿಕ*) dst = parse_bool(temp);
     }
-    else if( type == Param::UNSIGNED_INT )
+    ಅನ್ಯಥಾ ಯದಿ( type == Param::UNSIGNED_INT )
         ss >> *(unsigned*)dst;
-    else if( type == Param::UINT64 )
+    ಅನ್ಯಥಾ ಯದಿ( type == Param::UINT64 )
         ss >> *(uint64*)dst;
-    else if( type == Param::FLOAT )
-        ss >> *(float*)dst;
-    else if( type == Param::REAL )
-        ss >> *(double*)dst;
-    else if( type == Param::STRING )
+    ಅನ್ಯಥಾ ಯದಿ( type == Param::FLOAT )
+        ss >> *(ಭಿನ್ನ*)dst;
+    ಅನ್ಯಥಾ ಯದಿ( type == Param::REAL )
+        ss >> *(ದ್ವಿಗುಣ*)dst;
+    ಅನ್ಯಥಾ ಯದಿ( type == Param::STRING )
         *(String*)dst = str;
-    else if( type == Param::SCALAR)
+    ಅನ್ಯಥಾ ಯದಿ( type == Param::SCALAR)
     {
         Scalar& scalar = *(Scalar*)dst;
-        for (int i = 0; i < 4 && !ss.eof(); ++i)
+        ಪ್ರತಿ (ಪೂರ್ಣಾಙ್ಕ i = 0; i < 4 && !ss.eof(); ++i)
             ss >> scalar[i];
     }
-    else
+    ಅನ್ಯಥಾ
         CV_Error(Error::StsBadArg, "unknown/unsupported parameter type");
 
-    if (ss.fail())
+    ಯದಿ (ss.fail())
     {
         CV_Error_(Error::StsBadArg, ("can not convert: [%s] to [%s]", str.c_str(), get_type_name(type)));
     }
 }
 
-void CommandLineParser::getByName(const String& name, bool space_delete, Param type, void* dst) const
+ಶೂನ್ಯ Command_ಸಾಲು_Parser::getByName(ಧ್ರುವ String& name, ತಾರ್ಕಿಕ space_delete, Param type, ಶೂನ್ಯ* dst) ಧ್ರುವ
 {
-    try
+    ಯತ್ನ
     {
-        for (size_t i = 0; i < impl->data.size(); i++)
+        ಪ್ರತಿ (size_t i = 0; i < impl->data.size(); i++)
         {
-            for (size_t j = 0; j < impl->data[i].keys.size(); j++)
+            ಪ್ರತಿ (size_t j = 0; j < impl->data[i].ಕೀಲಿಗಳು.size(); j++)
             {
-                if (name == impl->data[i].keys[j])
+                ಯದಿ (name == impl->data[i].ಕೀಲಿಗಳು[j])
                 {
-                    String v = impl->data[i].def_value;
-                    if (space_delete)
+                    String v = impl->data[i].def_ಮೌಲ್ಯ;
+                    ಯದಿ (space_delete)
                         v = cat_string(v);
 
                     // the key was neither specified nor has a default value
-                    if((v.empty() && type != Param::STRING) || v == noneValue) {
-                        impl->error = true;
+                    ಯದಿ((v.empty() && type != Param::STRING) || v == none_ಮೌಲ್ಯ) {
+                        impl->error = ಸತ್ಯ;
                         impl->error_message = impl->error_message + "Missing parameter: '" + name + "'\n";
-                        return;
+                        ಪ್ರತ್ಯಾಗಮ;
                     }
 
                     from_str(v, type, dst);
-                    return;
+                    ಪ್ರತ್ಯಾಗಮ;
                 }
             }
         }
     }
-    catch (const Exception& e)
+    ಗೃಹಾಣ (ಧ್ರುವ Exception& e)
     {
-        impl->error = true;
+        impl->error = ಸತ್ಯ;
         impl->error_message = impl->error_message + "Parameter '"+ name + "': " + e.err + "\n";
-        return;
+        ಪ್ರತ್ಯಾಗಮ;
     }
 
     CV_Error_(Error::StsBadArg, ("undeclared key '%s' requested", name.c_str()));
 }
 
 
-void CommandLineParser::getByIndex(int index, bool space_delete, Param type, void* dst) const
+ಶೂನ್ಯ Command_ಸಾಲು_Parser::getByIndex(ಪೂರ್ಣಾಙ್ಕ index, ತಾರ್ಕಿಕ space_delete, Param type, ಶೂನ್ಯ* dst) ಧ್ರುವ
 {
-    try
+    ಯತ್ನ
     {
-        for (size_t i = 0; i < impl->data.size(); i++)
+        ಪ್ರತಿ (size_t i = 0; i < impl->data.size(); i++)
         {
-            if (impl->data[i].number == index)
+            ಯದಿ (impl->data[i].ಸಂಖ್ಯೆ == index)
             {
-                String v = impl->data[i].def_value;
-                if (space_delete == true) v = cat_string(v);
+                String v = impl->data[i].def_ಮೌಲ್ಯ;
+                ಯದಿ (space_delete == ಸತ್ಯ) v = cat_string(v);
 
                 // the key was neither specified nor has a default value
-                if((v.empty() && type != Param::STRING) || v == noneValue) {
-                    impl->error = true;
+                ಯದಿ((v.empty() && type != Param::STRING) || v == none_ಮೌಲ್ಯ) {
+                    impl->error = ಸತ್ಯ;
                     impl->error_message = impl->error_message + format("Missing parameter #%d\n", index);
-                    return;
+                    ಪ್ರತ್ಯಾಗಮ;
                 }
                 from_str(v, type, dst);
-                return;
+                ಪ್ರತ್ಯಾಗಮ;
             }
         }
     }
-    catch (const Exception& e)
+    ಗೃಹಾಣ (ಧ್ರುವ Exception& e)
     {
-        impl->error = true;
+        impl->error = ಸತ್ಯ;
         impl->error_message = impl->error_message + format("Parameter #%d: ", index) + e.err + "\n";
-        return;
+        ಪ್ರತ್ಯಾಗಮ;
     }
 
     CV_Error_(Error::StsBadArg, ("undeclared position %d requested", index));
 }
 
-static bool cmp_params(const CommandLineParserParams & p1, const CommandLineParserParams & p2)
+ಸ್ಥಿರ ತಾರ್ಕಿಕ cmp_params(ಧ್ರುವ Command_ಸಾಲು_Parser_Params & p1, ಧ್ರುವ Command_ಸಾಲು_Parser_Params & p2)
 {
-    if (p1.number < p2.number)
-        return true;
+    ಯದಿ (p1.ಸಂಖ್ಯೆ < p2.ಸಂಖ್ಯೆ)
+        ಪ್ರತ್ಯಾಗಮ ಸತ್ಯ;
 
-    if (p1.number > p2.number)
-        return false;
+    ಯದಿ (p1.ಸಂಖ್ಯೆ > p2.ಸಂಖ್ಯೆ)
+        ಪ್ರತ್ಯಾಗಮ ಅಸತ್ಯ;
 
-    return p1.keys[0].compare(p2.keys[0]) < 0;
+    ಪ್ರತ್ಯಾಗಮ p1.ಕೀಲಿಗಳು[0].compare(p2.ಕೀಲಿಗಳು[0]) < 0;
 }
 
-CommandLineParser::CommandLineParser(int argc, const char* const argv[], const String& keys)
+Command_ಸಾಲು_Parser::Command_ಸಾಲು_Parser(ಪೂರ್ಣಾಙ್ಕ argc, ಧ್ರುವ ವರ್ಣ* ಧ್ರುವ argv[], ಧ್ರುವ String& ಕೀಲಿಗಳು)
 {
-    impl = new Impl;
+    impl = ನೂತನ Impl;
     impl->refcount = 1;
 
     // path to application
     size_t pos_s = String(argv[0]).find_last_of("/\\");
-    if (pos_s == String::npos)
+    ಯದಿ (pos_s == String::npos)
     {
         impl->path_to_app = "";
         impl->app_name = String(argv[0]);
     }
-    else
+    ಅನ್ಯಥಾ
     {
         impl->path_to_app = String(argv[0]).substr(0, pos_s);
         impl->app_name = String(argv[0]).substr(pos_s + 1, String(argv[0]).length() - pos_s);
     }
 
-    impl->error = false;
+    impl->error = ಅಸತ್ಯ;
     impl->error_message = "";
 
     // parse keys
-    std::vector<String> k = impl->split_range_string(keys, '{', '}');
+    std::vector<String> k = impl->split_range_string(ಕೀಲಿಗಳು, '{', '}');
 
-    int jj = 0;
-    for (size_t i = 0; i < k.size(); i++)
+    ಪೂರ್ಣಾಙ್ಕ jj = 0;
+    ಪ್ರತಿ (size_t i = 0; i < k.size(); i++)
     {
-        std::vector<String> l = impl->split_string(k[i], '|', true);
-        CommandLineParserParams p;
-        p.keys = impl->split_string(l[0]);
-        p.def_value = l[1];
+        std::vector<String> l = impl->split_string(k[i], '|', ಸತ್ಯ);
+        Command_ಸಾಲು_Parser_Params p;
+        p.ಕೀಲಿಗಳು = impl->split_string(l[0]);
+        p.def_ಮೌಲ್ಯ = l[1];
         p.help_message = cat_string(l[2]);
-        p.number = -1;
-        if (p.keys.size() <= 0)
+        p.ಸಂಖ್ಯೆ = -1;
+        ಯದಿ (p.ಕೀಲಿಗಳು.size() <= 0)
         {
-            impl->error = true;
+            impl->error = ಸತ್ಯ;
             impl->error_message = "Field KEYS could not be empty\n";
         }
-        else
+        ಅನ್ಯಥಾ
         {
-            if (p.keys[0][0] == '@')
+            ಯದಿ (p.ಕೀಲಿಗಳು[0][0] == '@')
             {
-                p.number = jj;
+                p.ಸಂಖ್ಯೆ = jj;
                 jj++;
             }
 
@@ -254,25 +254,25 @@ CommandLineParser::CommandLineParser(int argc, const char* const argv[], const S
 
     // parse argv
     jj = 0;
-    for (int i = 1; i < argc; i++)
+    ಪ್ರತಿ (ಪೂರ್ಣಾಙ್ಕ i = 1; i < argc; i++)
     {
         String s(argv[i]);
-        bool hasSingleDash = s.length() > 1 && s[0] == '-';
+        ತಾರ್ಕಿಕ hasSingleDash = s.length() > 1 && s[0] == '-';
 
-        if (hasSingleDash)
+        ಯದಿ (hasSingleDash)
         {
-            bool hasDoubleDash = s.length() > 2 && s[1] == '-';
-            String key = s.substr(hasDoubleDash ? 2 : 1);
+            ತಾರ್ಕಿಕ hasDoubleDash = s.length() > 2 && s[1] == '-';
+            String ಕೀಲಿ = s.substr(hasDoubleDash ? 2 : 1);
             String value = "true";
-            size_t equalsPos = key.find('=');
+            size_t equalsPos = ಕೀಲಿ.find('=');
 
-            if(equalsPos != String::npos) {
-                value = key.substr(equalsPos + 1);
-                key = key.substr(0, equalsPos);
+            ಯದಿ(equalsPos != String::npos) {
+                value = ಕೀಲಿ.substr(equalsPos + 1);
+                ಕೀಲಿ = ಕೀಲಿ.substr(0, equalsPos);
             }
-            impl->apply_params(key, value);
+            impl->apply_params(ಕೀಲಿ, value);
         }
-        else
+        ಅನ್ಯಥಾ
         {
             impl->apply_params(jj, s);
             jj++;
@@ -282,87 +282,87 @@ CommandLineParser::CommandLineParser(int argc, const char* const argv[], const S
     impl->sort_params();
 }
 
-CommandLineParser::~CommandLineParser()
+Command_ಸಾಲು_Parser::~Command_ಸಾಲು_Parser()
 {
-    if (CV_XADD(&impl->refcount, -1) == 1)
+    ಯದಿ (CV_XADD(&impl->refcount, -1) == 1)
         delete impl;
 }
 
-CommandLineParser::CommandLineParser(const CommandLineParser& parser)
+Command_ಸಾಲು_Parser::Command_ಸಾಲು_Parser(ಧ್ರುವ Command_ಸಾಲು_Parser& parser)
 {
     impl = parser.impl;
     CV_XADD(&impl->refcount, 1);
 }
 
-CommandLineParser& CommandLineParser::operator = (const CommandLineParser& parser)
+Command_ಸಾಲು_Parser& Command_ಸಾಲು_Parser::operator = (ಧ್ರುವ Command_ಸಾಲು_Parser& parser)
 {
-    if( this != &parser )
+    ಯದಿ( ಏತತ್ != &parser )
     {
         CV_XADD(&parser.impl->refcount, 1);
-        if(CV_XADD(&impl->refcount, -1) == 1)
+        ಯದಿ(CV_XADD(&impl->refcount, -1) == 1)
             delete impl;
         impl = parser.impl;
     }
-    return *this;
+    ಪ್ರತ್ಯಾಗಮ *ಏತತ್;
 }
 
-void CommandLineParser::about(const String& message)
+ಶೂನ್ಯ Command_ಸಾಲು_Parser::about(ಧ್ರುವ String& message)
 {
     impl->about_message = message;
 }
 
-void CommandLineParser::Impl::apply_params(const String& key, const String& value)
+ಶೂನ್ಯ Command_ಸಾಲು_Parser::Impl::apply_params(ಧ್ರುವ String& ಕೀಲಿ, ಧ್ರುವ String& value)
 {
-    for (size_t i = 0; i < data.size(); i++)
+    ಪ್ರತಿ (size_t i = 0; i < data.size(); i++)
     {
-        for (size_t k = 0; k < data[i].keys.size(); k++)
+        ಪ್ರತಿ (size_t k = 0; k < data[i].ಕೀಲಿಗಳು.size(); k++)
         {
-            if (key.compare(data[i].keys[k]) == 0)
+            ಯದಿ (ಕೀಲಿ.compare(data[i].ಕೀಲಿಗಳು[k]) == 0)
             {
-                data[i].def_value = value;
-                break;
+                data[i].def_ಮೌಲ್ಯ = value;
+                ಭಙ್ಗ;
             }
         }
     }
 }
 
-void CommandLineParser::Impl::apply_params(int i, String value)
+ಶೂನ್ಯ Command_ಸಾಲು_Parser::Impl::apply_params(ಪೂರ್ಣಾಙ್ಕ i, String value)
 {
-    for (size_t j = 0; j < data.size(); j++)
+    ಪ್ರತಿ (size_t j = 0; j < data.size(); j++)
     {
-        if (data[j].number == i)
+        ಯದಿ (data[j].ಸಂಖ್ಯೆ == i)
         {
-            data[j].def_value = value;
-            break;
+            data[j].def_ಮೌಲ್ಯ = value;
+            ಭಙ್ಗ;
         }
     }
 }
 
-void CommandLineParser::Impl::sort_params()
+ಶೂನ್ಯ Command_ಸಾಲು_Parser::Impl::sort_params()
 {
-    for (size_t i = 0; i < data.size(); i++)
+    ಪ್ರತಿ (size_t i = 0; i < data.size(); i++)
     {
-        std::sort(data[i].keys.begin(), data[i].keys.end());
+        std::sort(data[i].ಕೀಲಿಗಳು.begin(), data[i].ಕೀಲಿಗಳು.end());
     }
 
     std::sort (data.begin(), data.end(), cmp_params);
 }
 
-String CommandLineParser::getPathToApplication() const
+String Command_ಸಾಲು_Parser::getPathToApplication() ಧ್ರುವ
 {
-    return impl->path_to_app;
+    ಪ್ರತ್ಯಾಗಮ impl->path_to_app;
 }
 
-bool CommandLineParser::has(const String& name) const
+ತಾರ್ಕಿಕ Command_ಸಾಲು_Parser::has(ಧ್ರುವ String& name) ಧ್ರುವ
 {
-    for (size_t i = 0; i < impl->data.size(); i++)
+    ಪ್ರತಿ (size_t i = 0; i < impl->data.size(); i++)
     {
-        for (size_t j = 0; j < impl->data[i].keys.size(); j++)
+        ಪ್ರತಿ (size_t j = 0; j < impl->data[i].ಕೀಲಿಗಳು.size(); j++)
         {
-            if (name == impl->data[i].keys[j])
+            ಯದಿ (name == impl->data[i].ಕೀಲಿಗಳು[j])
             {
-                const String v = cat_string(impl->data[i].def_value);
-                return !v.empty() && v != noneValue;
+                ಧ್ರುವ String v = cat_string(impl->data[i].def_ಮೌಲ್ಯ);
+                ಪ್ರತ್ಯಾಗಮ !v.empty() && v != none_ಮೌಲ್ಯ;
             }
         }
     }
@@ -370,63 +370,63 @@ bool CommandLineParser::has(const String& name) const
     CV_Error_(Error::StsBadArg, ("undeclared key '%s' requested", name.c_str()));
 }
 
-bool CommandLineParser::check() const
+ತಾರ್ಕಿಕ Command_ಸಾಲು_Parser::check() ಧ್ರುವ
 {
-    return impl->error == false;
+    ಪ್ರತ್ಯಾಗಮ impl->error == ಅಸತ್ಯ;
 }
 
-void CommandLineParser::printErrors() const
+ಶೂನ್ಯ Command_ಸಾಲು_Parser::printErrors() ಧ್ರುವ
 {
-    if (impl->error)
+    ಯದಿ (impl->error)
     {
         printf("\nERRORS:\n%s\n", impl->error_message.c_str());
         fflush(stdout);
     }
 }
 
-void CommandLineParser::printMessage() const
+ಶೂನ್ಯ Command_ಸಾಲು_Parser::printMessage() ಧ್ರುವ
 {
-    if (impl->about_message != "")
+    ಯದಿ (impl->about_message != "")
         printf("%s\n", impl->about_message.c_str());
 
     printf("Usage: %s [params] ", impl->app_name.c_str());
 
-    for (size_t i = 0; i < impl->data.size(); i++)
+    ಪ್ರತಿ (size_t i = 0; i < impl->data.size(); i++)
     {
-        if (impl->data[i].number > -1)
+        ಯದಿ (impl->data[i].ಸಂಖ್ಯೆ > -1)
         {
-            String name = impl->data[i].keys[0].substr(1, impl->data[i].keys[0].length() - 1);
+            String name = impl->data[i].ಕೀಲಿಗಳು[0].substr(1, impl->data[i].ಕೀಲಿಗಳು[0].length() - 1);
             printf("%s ", name.c_str());
         }
     }
 
     printf("\n\n");
 
-    for (size_t i = 0; i < impl->data.size(); i++)
+    ಪ್ರತಿ (size_t i = 0; i < impl->data.size(); i++)
     {
-        if (impl->data[i].number == -1)
+        ಯದಿ (impl->data[i].ಸಂಖ್ಯೆ == -1)
         {
             printf("\t");
-            for (size_t j = 0; j < impl->data[i].keys.size(); j++)
+            ಪ್ರತಿ (size_t j = 0; j < impl->data[i].ಕೀಲಿಗಳು.size(); j++)
             {
-                String k = impl->data[i].keys[j];
-                if (k.length() > 1)
+                String k = impl->data[i].ಕೀಲಿಗಳು[j];
+                ಯದಿ (k.length() > 1)
                 {
                     printf("--");
                 }
-                else
+                ಅನ್ಯಥಾ
                 {
                     printf("-");
                 }
                 printf("%s", k.c_str());
 
-                if (j != impl->data[i].keys.size() - 1)
+                ಯದಿ (j != impl->data[i].ಕೀಲಿಗಳು.size() - 1)
                 {
                     printf(", ");
                 }
             }
-            String dv = cat_string(impl->data[i].def_value);
-            if (dv.compare("") != 0)
+            String dv = cat_string(impl->data[i].def_ಮೌಲ್ಯ);
+            ಯದಿ (dv.compare("") != 0)
             {
                 printf(" (value:%s)", dv.c_str());
             }
@@ -435,18 +435,18 @@ void CommandLineParser::printMessage() const
     }
     printf("\n");
 
-    for (size_t i = 0; i < impl->data.size(); i++)
+    ಪ್ರತಿ (size_t i = 0; i < impl->data.size(); i++)
     {
-        if (impl->data[i].number != -1)
+        ಯದಿ (impl->data[i].ಸಂಖ್ಯೆ != -1)
         {
             printf("\t");
-            String k = impl->data[i].keys[0];
+            String k = impl->data[i].ಕೀಲಿಗಳು[0];
             k = k.substr(1, k.length() - 1);
 
             printf("%s", k.c_str());
 
-            String dv = cat_string(impl->data[i].def_value);
-            if (dv.compare("") != 0)
+            String dv = cat_string(impl->data[i].def_ಮೌಲ್ಯ);
+            ಯದಿ (dv.compare("") != 0)
             {
                 printf(" (value:%s)", dv.c_str());
             }
@@ -455,20 +455,20 @@ void CommandLineParser::printMessage() const
     }
 }
 
-std::vector<String> CommandLineParser::Impl::split_range_string(const String& _str, char fs, char ss) const
+std::vector<String> Command_ಸಾಲು_Parser::Impl::split_range_string(ಧ್ರುವ String& _str, ವರ್ಣ fs, ವರ್ಣ ss) ಧ್ರುವ
 {
     String str = _str;
     std::vector<String> vec;
     String word = "";
-    bool begin = false;
+    ತಾರ್ಕಿಕ begin = ಅಸತ್ಯ;
 
-    while (!str.empty())
+    ಯಾವತ್ (!str.empty())
     {
-        if (str[0] == fs)
+        ಯದಿ (str[0] == fs)
         {
-            if (begin == true)
+            ಯದಿ (begin == ಸತ್ಯ)
             {
-                throw cv::Exception(cv::Error::StsParseError,
+                ಕ್ಷಿಪ cv::Exception(cv::Error::StsParseError,
                          String("error in split_range_string(")
                          + str
                          + String(", ")
@@ -479,16 +479,16 @@ std::vector<String> CommandLineParser::Impl::split_range_string(const String& _s
                          "", __FILE__, __LINE__
                          );
             }
-            begin = true;
+            begin = ಸತ್ಯ;
             word = "";
             str = str.substr(1, str.length() - 1);
         }
 
-        if (str[0] == ss)
+        ಯದಿ (str[0] == ss)
         {
-            if (begin == false)
+            ಯದಿ (begin == ಅಸತ್ಯ)
             {
-                throw cv::Exception(cv::Error::StsParseError,
+                ಕ್ಷಿಪ cv::Exception(cv::Error::StsParseError,
                          String("error in split_range_string(")
                          + str
                          + String(", ")
@@ -499,20 +499,20 @@ std::vector<String> CommandLineParser::Impl::split_range_string(const String& _s
                          "", __FILE__, __LINE__
                          );
             }
-            begin = false;
+            begin = ಅಸತ್ಯ;
             vec.push_back(word);
         }
 
-        if (begin == true)
+        ಯದಿ (begin == ಸತ್ಯ)
         {
             word = word + str[0];
         }
         str = str.substr(1, str.length() - 1);
     }
 
-    if (begin == true)
+    ಯದಿ (begin == ಸತ್ಯ)
     {
-        throw cv::Exception(cv::Error::StsParseError,
+        ಕ್ಷಿಪ cv::Exception(cv::Error::StsParseError,
                  String("error in split_range_string(")
                  + str
                  + String(", ")
@@ -524,38 +524,38 @@ std::vector<String> CommandLineParser::Impl::split_range_string(const String& _s
                 );
     }
 
-    return vec;
+    ಪ್ರತ್ಯಾಗಮ vec;
 }
 
-std::vector<String> CommandLineParser::Impl::split_string(const String& _str, char symbol, bool create_empty_item) const
+std::vector<String> Command_ಸಾಲು_Parser::Impl::split_string(ಧ್ರುವ String& _str, ವರ್ಣ ಚಿಹ್ನೆ, ತಾರ್ಕಿಕ create_empty_item) ಧ್ರುವ
 {
     String str = _str;
     std::vector<String> vec;
     String word = "";
 
-    while (!str.empty())
+    ಯಾವತ್ (!str.empty())
     {
-        if (str[0] == symbol)
+        ಯದಿ (str[0] == ಚಿಹ್ನೆ)
         {
-            if (!word.empty() || create_empty_item)
+            ಯದಿ (!word.empty() || create_empty_item)
             {
                 vec.push_back(word);
                 word = "";
             }
         }
-        else
+        ಅನ್ಯಥಾ
         {
             word = word + str[0];
         }
         str = str.substr(1, str.length() - 1);
     }
 
-    if (word != "" || create_empty_item)
+    ಯದಿ (word != "" || create_empty_item)
     {
         vec.push_back(word);
     }
 
-    return vec;
+    ಪ್ರತ್ಯಾಗಮ vec;
 }
 
 }

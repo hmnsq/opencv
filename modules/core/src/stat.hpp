@@ -6,37 +6,37 @@
 #ifndef SRC_STAT_HPP
 #define SRC_STAT_HPP
 
-#include "opencv2/core/mat.hpp"
+#ಅನ್ತರ್ಭಾವ "opencv2/core/mat.hpp"
 
-namespace cv {
+ನಾಮಾಕಾಶ cv {
 
 #ifdef HAVE_OPENCL
 
-enum { OCL_OP_SUM = 0, OCL_OP_SUM_ABS =  1, OCL_OP_SUM_SQR = 2 };
-bool ocl_sum( InputArray _src, Scalar & res, int sum_op, InputArray _mask = noArray(),
-                     InputArray _src2 = noArray(), bool calc2 = false, const Scalar & res2 = Scalar() );
-bool ocl_minMaxIdx( InputArray _src, double* minVal, double* maxVal, int* minLoc, int* maxLoc, InputArray _mask,
-                           int ddepth = -1, bool absValues = false, InputArray _src2 = noArray(), double * maxVal2 = NULL);
+ಗಣನಾ { OCL_OP_SUM = 0, OCL_OP_SUM_ABS =  1, OCL_OP_SUM_SQR = 2 };
+ತಾರ್ಕಿಕ ocl_sum( ಒಳಹರಿವು_Array _src, Scalar & res, ಪೂರ್ಣಾಙ್ಕ sum_op, ಒಳಹರಿವು_Array _mask = noArray(),
+                     ಒಳಹರಿವು_Array _src2 = noArray(), ತಾರ್ಕಿಕ calc2 = ಅಸತ್ಯ, ಧ್ರುವ Scalar & res2 = Scalar() );
+ತಾರ್ಕಿಕ ocl_minMaxIdx( ಒಳಹರಿವು_Array _src, ದ್ವಿಗುಣ* minVal, ದ್ವಿಗುಣ* maxVal, ಪೂರ್ಣಾಙ್ಕ* minLoc, ಪೂರ್ಣಾಙ್ಕ* maxLoc, ಒಳಹರಿವು_Array _mask,
+                           ಪೂರ್ಣಾಙ್ಕ ddepth = -1, ತಾರ್ಕಿಕ abs_ಮೌಲ್ಯಗಳು = ಅಸತ್ಯ, ಒಳಹರಿವು_Array _src2 = noArray(), ದ್ವಿಗುಣ * maxVal2 = ರಿಕ್ತ);
 
 template <typename T> Scalar ocl_part_sum(Mat m)
 {
     CV_Assert(m.rows == 1);
 
     Scalar s = Scalar::all(0);
-    int cn = m.channels();
-    const T * const ptr = m.ptr<T>(0);
+    ಪೂರ್ಣಾಙ್ಕ cn = m.channels();
+    ಧ್ರುವ T * ಧ್ರುವ ptr = m.ptr<T>(0);
 
-    for (int x = 0, w = m.cols * cn; x < w; )
-        for (int c = 0; c < cn; ++c, ++x)
+    ಪ್ರತಿ (ಪೂರ್ಣಾಙ್ಕ x = 0, w = m.cols * cn; x < w; )
+        ಪ್ರತಿ (ಪೂರ್ಣಾಙ್ಕ c = 0; c < cn; ++c, ++x)
             s[c] += ptr[x];
 
-    return s;
+    ಪ್ರತ್ಯಾಗಮ s;
 }
 
 #endif
 
-typedef int (*SumFunc)(const uchar*, const uchar* mask, uchar*, int, int);
-SumFunc getSumFunc(int depth);
+ಪ್ರಕಾರನಿರ್ದೇಶ ಪೂರ್ಣಾಙ್ಕ (*SumFunc)(ಧ್ರುವ uchar*, ಧ್ರುವ uchar* mask, uchar*, ಪೂರ್ಣಾಙ್ಕ, ಪೂರ್ಣಾಙ್ಕ);
+SumFunc getSumFunc(ಪೂರ್ಣಾಙ್ಕ depth);
 
 }
 

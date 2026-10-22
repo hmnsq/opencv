@@ -2,80 +2,80 @@
 // It is subject to the license terms in the LICENSE file found in the top-level directory
 // of this distribution and at http://opencv.org/license.html.
 
-#include "mathfuncs.hpp"
+#ಅನ್ತರ್ಭಾವ "mathfuncs.hpp"
 
-namespace cv { namespace hal {
+ನಾಮಾಕಾಶ cv { ನಾಮಾಕಾಶ hal {
 
 CV_CPU_OPTIMIZATION_NAMESPACE_BEGIN
 
 // forward declarations
-void cartToPolar32f(const float *X, const float *Y, float* mag, float *angle, int len, bool angleInDegrees);
-void cartToPolar64f(const double *X, const double *Y, double* mag, double *angle, int len, bool angleInDegrees);
-void polarToCart32f(const float *mag, const float *angle, float *X, float *Y, int len, bool angleInDegrees);
-void polarToCart64f(const double *mag, const double *angle, double *X, double *Y, int len, bool angleInDegrees);
-void fastAtan32f(const float *Y, const float *X, float *angle, int len, bool angleInDegrees);
-void fastAtan64f(const double *Y, const double *X, double *angle, int len, bool angleInDegrees);
-void fastAtan2(const float *Y, const float *X, float *angle, int len, bool angleInDegrees);
-void magnitude32f(const float* x, const float* y, float* mag, int len);
-void magnitude64f(const double* x, const double* y, double* mag, int len);
-void invSqrt32f(const float* src, float* dst, int len);
-void invSqrt64f(const double* src, double* dst, int len);
-void sqrt32f(const float* src, float* dst, int len);
-void sqrt64f(const double* src, double* dst, int len);
-float fastAtan2(float y, float x);
+ಶೂನ್ಯ cartToPolar32f(ಧ್ರುವ ಭಿನ್ನ *X, ಧ್ರುವ ಭಿನ್ನ *Y, ಭಿನ್ನ* mag, ಭಿನ್ನ *angle, ಪೂರ್ಣಾಙ್ಕ len, ತಾರ್ಕಿಕ angleInDegrees);
+ಶೂನ್ಯ cartToPolar64f(ಧ್ರುವ ದ್ವಿಗುಣ *X, ಧ್ರುವ ದ್ವಿಗುಣ *Y, ದ್ವಿಗುಣ* mag, ದ್ವಿಗುಣ *angle, ಪೂರ್ಣಾಙ್ಕ len, ತಾರ್ಕಿಕ angleInDegrees);
+ಶೂನ್ಯ polarToCart32f(ಧ್ರುವ ಭಿನ್ನ *mag, ಧ್ರುವ ಭಿನ್ನ *angle, ಭಿನ್ನ *X, ಭಿನ್ನ *Y, ಪೂರ್ಣಾಙ್ಕ len, ತಾರ್ಕಿಕ angleInDegrees);
+ಶೂನ್ಯ polarToCart64f(ಧ್ರುವ ದ್ವಿಗುಣ *mag, ಧ್ರುವ ದ್ವಿಗುಣ *angle, ದ್ವಿಗುಣ *X, ದ್ವಿಗುಣ *Y, ಪೂರ್ಣಾಙ್ಕ len, ತಾರ್ಕಿಕ angleInDegrees);
+ಶೂನ್ಯ fastAtan32f(ಧ್ರುವ ಭಿನ್ನ *Y, ಧ್ರುವ ಭಿನ್ನ *X, ಭಿನ್ನ *angle, ಪೂರ್ಣಾಙ್ಕ len, ತಾರ್ಕಿಕ angleInDegrees);
+ಶೂನ್ಯ fastAtan64f(ಧ್ರುವ ದ್ವಿಗುಣ *Y, ಧ್ರುವ ದ್ವಿಗುಣ *X, ದ್ವಿಗುಣ *angle, ಪೂರ್ಣಾಙ್ಕ len, ತಾರ್ಕಿಕ angleInDegrees);
+ಶೂನ್ಯ fastAtan2(ಧ್ರುವ ಭಿನ್ನ *Y, ಧ್ರುವ ಭಿನ್ನ *X, ಭಿನ್ನ *angle, ಪೂರ್ಣಾಙ್ಕ len, ತಾರ್ಕಿಕ angleInDegrees);
+ಶೂನ್ಯ magnitude32f(ಧ್ರುವ ಭಿನ್ನ* x, ಧ್ರುವ ಭಿನ್ನ* y, ಭಿನ್ನ* mag, ಪೂರ್ಣಾಙ್ಕ len);
+ಶೂನ್ಯ magnitude64f(ಧ್ರುವ ದ್ವಿಗುಣ* x, ಧ್ರುವ ದ್ವಿಗುಣ* y, ದ್ವಿಗುಣ* mag, ಪೂರ್ಣಾಙ್ಕ len);
+ಶೂನ್ಯ invSqrt32f(ಧ್ರುವ ಭಿನ್ನ* src, ಭಿನ್ನ* dst, ಪೂರ್ಣಾಙ್ಕ len);
+ಶೂನ್ಯ invSqrt64f(ಧ್ರುವ ದ್ವಿಗುಣ* src, ದ್ವಿಗುಣ* dst, ಪೂರ್ಣಾಙ್ಕ len);
+ಶೂನ್ಯ sqrt32f(ಧ್ರುವ ಭಿನ್ನ* src, ಭಿನ್ನ* dst, ಪೂರ್ಣಾಙ್ಕ len);
+ಶೂನ್ಯ sqrt64f(ಧ್ರುವ ದ್ವಿಗುಣ* src, ದ್ವಿಗುಣ* dst, ಪೂರ್ಣಾಙ್ಕ len);
+ಭಿನ್ನ fastAtan2(ಭಿನ್ನ y, ಭಿನ್ನ x);
 
 #ifndef CV_CPU_OPTIMIZATION_DECLARATIONS_ONLY
 
-using namespace std;
-using namespace cv;
+using ನಾಮಾಕಾಶ std;
+using ನಾಮಾಕಾಶ cv;
 
-namespace {
+ನಾಮಾಕಾಶ {
 
-static const float atan2_p1 = 0.9997878412794807f*(float)(180/CV_PI);
-static const float atan2_p3 = -0.3258083974640975f*(float)(180/CV_PI);
-static const float atan2_p5 = 0.1555786518463281f*(float)(180/CV_PI);
-static const float atan2_p7 = -0.04432655554792128f*(float)(180/CV_PI);
+ಸ್ಥಿರ ಧ್ರುವ ಭಿನ್ನ atan2_p1 = 0.9997878412794807f*(ಭಿನ್ನ)(180/CV_PI);
+ಸ್ಥಿರ ಧ್ರುವ ಭಿನ್ನ atan2_p3 = -0.3258083974640975f*(ಭಿನ್ನ)(180/CV_PI);
+ಸ್ಥಿರ ಧ್ರುವ ಭಿನ್ನ atan2_p5 = 0.1555786518463281f*(ಭಿನ್ನ)(180/CV_PI);
+ಸ್ಥಿರ ಧ್ರುವ ಭಿನ್ನ atan2_p7 = -0.04432655554792128f*(ಭಿನ್ನ)(180/CV_PI);
 
 #ifdef __EMSCRIPTEN__
-static inline float atan_f32(float y, float x)
+ಸ್ಥಿರ ಅನ್ತಃಸ್ಥ ಭಿನ್ನ atan_f32(ಭಿನ್ನ y, ಭಿನ್ನ x)
 {
-    float a = atan2(y, x) * 180.0f / CV_PI;
-    if (a < 0.0f)
+    ಭಿನ್ನ a = atan2(y, x) * 180.0f / CV_PI;
+    ಯದಿ (a < 0.0f)
         a += 360.0f;
-    if (a >= 360.0f)
+    ಯದಿ (a >= 360.0f)
         a -= 360.0f;
-    return a; // range [0; 360)
+    ಪ್ರತ್ಯಾಗಮ a; // range [0; 360)
 }
-#else
-static inline float atan_f32(float y, float x)
+#ಅನ್ಯಥಾ
+ಸ್ಥಿರ ಅನ್ತಃಸ್ಥ ಭಿನ್ನ atan_f32(ಭಿನ್ನ y, ಭಿನ್ನ x)
 {
-    float ax = std::abs(x), ay = std::abs(y);
-    float a, c, c2;
-    if( ax >= ay )
+    ಭಿನ್ನ ax = std::abs(x), ay = std::abs(y);
+    ಭಿನ್ನ a, c, c2;
+    ಯದಿ( ax >= ay )
     {
-        c = ay/(ax + (float)DBL_EPSILON);
+        c = ay/(ax + (ಭಿನ್ನ)DBL_EPSILON);
         c2 = c*c;
         a = (((atan2_p7*c2 + atan2_p5)*c2 + atan2_p3)*c2 + atan2_p1)*c;
     }
-    else
+    ಅನ್ಯಥಾ
     {
-        c = ax/(ay + (float)DBL_EPSILON);
+        c = ax/(ay + (ಭಿನ್ನ)DBL_EPSILON);
         c2 = c*c;
         a = 90.f - (((atan2_p7*c2 + atan2_p5)*c2 + atan2_p3)*c2 + atan2_p1)*c;
     }
-    if( x < 0 )
+    ಯದಿ( x < 0 )
         a = 180.f - a;
-    if( y < 0 )
+    ಯದಿ( y < 0 )
         a = 360.f - a;
-    return a;
+    ಪ್ರತ್ಯಾಗಮ a;
 }
 #endif
 
-#if (CV_SIMD || CV_SIMD_SCALABLE)
+#ಯದಿ (CV_SIMD || CV_SIMD_SCALABLE)
 
-v_float32 v_atan_f32(const v_float32& y, const v_float32& x)
+v_float32 v_atan_f32(ಧ್ರುವ v_float32& y, ಧ್ರುವ v_float32& x)
 {
-    v_float32 eps = vx_setall_f32((float)DBL_EPSILON);
+    v_float32 eps = vx_setall_f32((ಭಿನ್ನ)DBL_EPSILON);
     v_float32 z = vx_setzero_f32();
     v_float32 p7 = vx_setall_f32(atan2_p7);
     v_float32 p5 = vx_setall_f32(atan2_p5);
@@ -93,30 +93,30 @@ v_float32 v_atan_f32(const v_float32& y, const v_float32& x)
     a = v_select(v_ge(ax, ay), a, v_sub(val90, a));
     a = v_select(v_lt(x, z), v_sub(val180, a), a);
     a = v_select(v_lt(y, z), v_sub(val360, a), a);
-    return a;
+    ಪ್ರತ್ಯಾಗಮ a;
 }
 
 #endif
 
 } // anonymous::
 
-static void cartToPolar32f_(const float *X, const float *Y, float *mag, float *angle, int len, bool angleInDegrees )
+ಸ್ಥಿರ ಶೂನ್ಯ cartToPolar32f_(ಧ್ರುವ ಭಿನ್ನ *X, ಧ್ರುವ ಭಿನ್ನ *Y, ಭಿನ್ನ *mag, ಭಿನ್ನ *angle, ಪೂರ್ಣಾಙ್ಕ len, ತಾರ್ಕಿಕ angleInDegrees )
 {
-    float scale = angleInDegrees ? 1.f : (float)(CV_PI/180);
-    int i = 0;
-#if (CV_SIMD || CV_SIMD_SCALABLE)
-    const int VECSZ = VTraits<v_float32>::vlanes();
+    ಭಿನ್ನ scale = angleInDegrees ? 1.f : (ಭಿನ್ನ)(CV_PI/180);
+    ಪೂರ್ಣಾಙ್ಕ i = 0;
+#ಯದಿ (CV_SIMD || CV_SIMD_SCALABLE)
+    ಧ್ರುವ ಪೂರ್ಣಾಙ್ಕ VECSZ = VTraits<v_float32>::vlanes();
     v_float32 s = vx_setall_f32(scale);
 
-    for( ; i < len; i += VECSZ*2 )
+    ಪ್ರತಿ( ; i < len; i += VECSZ*2 )
     {
-        if( i + VECSZ*2 > len )
+        ಯದಿ( i + VECSZ*2 > len )
         {
             // if it's inplace operation, we cannot repeatedly process
             // the tail for the second time, so we have to use the
             // scalar code
-            if( i == 0 || angle == X || angle == Y )
-                break;
+            ಯದಿ( i == 0 || angle == X || angle == Y )
+                ಭಙ್ಗ;
             i = len - VECSZ*2;
         }
 
@@ -140,49 +140,49 @@ static void cartToPolar32f_(const float *X, const float *Y, float *mag, float *a
     vx_cleanup();
 #endif
 
-    for( ; i < len; i++ )
+    ಪ್ರತಿ( ; i < len; i++ )
     {
-        float x0 = X[i], y0 = Y[i];
+        ಭಿನ್ನ x0 = X[i], y0 = Y[i];
         mag[i] = std::sqrt(x0*x0 + y0*y0);
         angle[i] = atan_f32(y0, x0)*scale;
     }
 }
 
-void cartToPolar32f(const float *X, const float *Y, float *mag, float *angle, int len, bool angleInDegrees )
+ಶೂನ್ಯ cartToPolar32f(ಧ್ರುವ ಭಿನ್ನ *X, ಧ್ರುವ ಭಿನ್ನ *Y, ಭಿನ್ನ *mag, ಭಿನ್ನ *angle, ಪೂರ್ಣಾಙ್ಕ len, ತಾರ್ಕಿಕ angleInDegrees )
 {
     CV_INSTRUMENT_REGION();
     cartToPolar32f_(X, Y, mag, angle, len, angleInDegrees );
 }
 
-void cartToPolar64f(const double *X, const double *Y, double *mag, double *angle, int len, bool angleInDegrees)
+ಶೂನ್ಯ cartToPolar64f(ಧ್ರುವ ದ್ವಿಗುಣ *X, ಧ್ರುವ ದ್ವಿಗುಣ *Y, ದ್ವಿಗುಣ *mag, ದ್ವಿಗುಣ *angle, ಪೂರ್ಣಾಙ್ಕ len, ತಾರ್ಕಿಕ angleInDegrees)
 {
     CV_INSTRUMENT_REGION();
 
-    const int BLKSZ = 128;
-    float ybuf[BLKSZ], xbuf[BLKSZ], mbuf[BLKSZ], abuf[BLKSZ];
-    for( int i = 0; i < len; i += BLKSZ )
+    ಧ್ರುವ ಪೂರ್ಣಾಙ್ಕ BLKSZ = 128;
+    ಭಿನ್ನ ybuf[BLKSZ], xbuf[BLKSZ], mbuf[BLKSZ], abuf[BLKSZ];
+    ಪ್ರತಿ( ಪೂರ್ಣಾಙ್ಕ i = 0; i < len; i += BLKSZ )
     {
-        int j, blksz = std::min(BLKSZ, len - i);
-        for( j = 0; j < blksz; j++ )
+        ಪೂರ್ಣಾಙ್ಕ j, blksz = std::min(BLKSZ, len - i);
+        ಪ್ರತಿ( j = 0; j < blksz; j++ )
         {
-            xbuf[j] = (float)X[i + j];
-            ybuf[j] = (float)Y[i + j];
+            xbuf[j] = (ಭಿನ್ನ)X[i + j];
+            ybuf[j] = (ಭಿನ್ನ)Y[i + j];
         }
         cartToPolar32f_(xbuf, ybuf, mbuf, abuf, blksz, angleInDegrees);
-        for( j = 0; j < blksz; j++ )
+        ಪ್ರತಿ( j = 0; j < blksz; j++ )
             mag[i + j] = mbuf[j];
-        for( j = 0; j < blksz; j++ )
+        ಪ್ರತಿ( j = 0; j < blksz; j++ )
             angle[i + j] = abuf[j];
     }
 }
 
-namespace {
+ನಾಮಾಕಾಶ {
 
-static inline void SinCos_32f(const float* mag, const float* angle, float* cosval, float* sinval, int len, int angle_in_degrees)
+ಸ್ಥಿರ ಅನ್ತಃಸ್ಥ ಶೂನ್ಯ SinCos_32f(ಧ್ರುವ ಭಿನ್ನ* mag, ಧ್ರುವ ಭಿನ್ನ* angle, ಭಿನ್ನ* cosval, ಭಿನ್ನ* sinval, ಪೂರ್ಣಾಙ್ಕ len, ಪೂರ್ಣಾಙ್ಕ angle_in_degrees)
 {
-    const int N = 64;
+    ಧ್ರುವ ಪೂರ್ಣಾಙ್ಕ N = 64;
 
-    static const double sin_table[] =
+    ಸ್ಥಿರ ಧ್ರುವ ದ್ವಿಗುಣ sin_table[] =
     {
      0.00000000000000000000,     0.09801714032956060400,
      0.19509032201612825000,     0.29028467725446233000,
@@ -218,35 +218,35 @@ static inline void SinCos_32f(const float* mag, const float* angle, float* cosva
     -0.19509032201612872000,    -0.09801714032956050600,
     };
 
-    static const double k2 = (2*CV_PI)/N;
+    ಸ್ಥಿರ ಧ್ರುವ ದ್ವಿಗುಣ k2 = (2*CV_PI)/N;
 
-    static const double sin_a0 = -0.166630293345647*k2*k2*k2;
-    static const double sin_a2 = k2;
+    ಸ್ಥಿರ ಧ್ರುವ ದ್ವಿಗುಣ sin_a0 = -0.166630293345647*k2*k2*k2;
+    ಸ್ಥಿರ ಧ್ರುವ ದ್ವಿಗುಣ sin_a2 = k2;
 
-    static const double cos_a0 = -0.499818138450326*k2*k2;
+    ಸ್ಥಿರ ಧ್ರುವ ದ್ವಿಗುಣ cos_a0 = -0.499818138450326*k2*k2;
     /*static const double cos_a2 =  1;*/
 
-    double k1;
-    int i = 0;
+    ದ್ವಿಗುಣ k1;
+    ಪೂರ್ಣಾಙ್ಕ i = 0;
 
-    if( !angle_in_degrees )
+    ಯದಿ( !angle_in_degrees )
         k1 = N/(2*CV_PI);
-    else
+    ಅನ್ಯಥಾ
         k1 = N/360.;
 
-#if (CV_SIMD || CV_SIMD_SCALABLE)
-    const int VECSZ = VTraits<v_float32>::vlanes();
-    const v_float32 scale = vx_setall_f32(angle_in_degrees ? (float)CV_PI / 180.f : 1.f);
+#ಯದಿ (CV_SIMD || CV_SIMD_SCALABLE)
+    ಧ್ರುವ ಪೂರ್ಣಾಙ್ಕ VECSZ = VTraits<v_float32>::vlanes();
+    ಧ್ರುವ v_float32 scale = vx_setall_f32(angle_in_degrees ? (ಭಿನ್ನ)CV_PI / 180.f : 1.f);
 
-    for( ; i < len; i += VECSZ*2 )
+    ಪ್ರತಿ( ; i < len; i += VECSZ*2 )
     {
-        if( i + VECSZ*2 > len )
+        ಯದಿ( i + VECSZ*2 > len )
         {
             // if it's inplace operation, we cannot repeatedly process
             // the tail for the second time, so we have to use the
             // scalar code
-            if( i == 0 || angle == cosval || angle == sinval || mag == cosval || mag == sinval )
-                break;
+            ಯದಿ( i == 0 || angle == cosval || angle == sinval || mag == cosval || mag == sinval )
+                ಭಙ್ಗ;
             i = len - VECSZ*2;
         }
 
@@ -257,7 +257,7 @@ static inline void SinCos_32f(const float* mag, const float* angle, float* cosva
         v_sincos(r0, s0, c0);
         v_sincos(r1, s1, c1);
 
-        if( mag )
+        ಯದಿ( mag )
         {
             v_float32 m0 = vx_load(mag + i);
             v_float32 m1 = vx_load(mag + i + VECSZ);
@@ -276,84 +276,84 @@ static inline void SinCos_32f(const float* mag, const float* angle, float* cosva
     vx_cleanup();
 #endif
 
-    for( ; i < len; i++ )
+    ಪ್ರತಿ( ; i < len; i++ )
     {
-        double t = angle[i]*k1;
-        int it = cvRound(t);
+        ದ್ವಿಗುಣ t = angle[i]*k1;
+        ಪೂರ್ಣಾಙ್ಕ it = cvRound(t);
         t -= it;
-        int sin_idx = it & (N - 1);
-        int cos_idx = (N/4 - sin_idx) & (N - 1);
+        ಪೂರ್ಣಾಙ್ಕ sin_idx = it & (N - 1);
+        ಪೂರ್ಣಾಙ್ಕ cos_idx = (N/4 - sin_idx) & (N - 1);
 
-        double sin_b = (sin_a0*t*t + sin_a2)*t;
-        double cos_b = cos_a0*t*t + 1;
+        ದ್ವಿಗುಣ sin_b = (sin_a0*t*t + sin_a2)*t;
+        ದ್ವಿಗುಣ cos_b = cos_a0*t*t + 1;
 
-        double sin_a = sin_table[sin_idx];
-        double cos_a = sin_table[cos_idx];
+        ದ್ವಿಗುಣ sin_a = sin_table[sin_idx];
+        ದ್ವಿಗುಣ cos_a = sin_table[cos_idx];
 
-        double sin_val = sin_a*cos_b + cos_a*sin_b;
-        double cos_val = cos_a*cos_b - sin_a*sin_b;
+        ದ್ವಿಗುಣ sin_val = sin_a*cos_b + cos_a*sin_b;
+        ದ್ವಿಗುಣ cos_val = cos_a*cos_b - sin_a*sin_b;
 
-        if (mag)
+        ಯದಿ (mag)
         {
-            double mag_val = mag[i];
+            ದ್ವಿಗುಣ mag_val = mag[i];
             sin_val *= mag_val;
             cos_val *= mag_val;
         }
 
-        sinval[i] = (float)sin_val;
-        cosval[i] = (float)cos_val;
+        sinval[i] = (ಭಿನ್ನ)sin_val;
+        cosval[i] = (ಭಿನ್ನ)cos_val;
     }
 }
 
 } // anonymous::
 
-void polarToCart32f(const float *mag, const float *angle, float *X, float *Y, int len, bool angleInDegrees)
+ಶೂನ್ಯ polarToCart32f(ಧ್ರುವ ಭಿನ್ನ *mag, ಧ್ರುವ ಭಿನ್ನ *angle, ಭಿನ್ನ *X, ಭಿನ್ನ *Y, ಪೂರ್ಣಾಙ್ಕ len, ತಾರ್ಕಿಕ angleInDegrees)
 {
     CV_INSTRUMENT_REGION();
     SinCos_32f(mag, angle, X, Y, len, angleInDegrees);
 }
 
-void polarToCart64f(const double *mag, const double *angle, double *X, double *Y, int len, bool angleInDegrees)
+ಶೂನ್ಯ polarToCart64f(ಧ್ರುವ ದ್ವಿಗುಣ *mag, ಧ್ರುವ ದ್ವಿಗುಣ *angle, ದ್ವಿಗುಣ *X, ದ್ವಿಗುಣ *Y, ಪೂರ್ಣಾಙ್ಕ len, ತಾರ್ಕಿಕ angleInDegrees)
 {
     CV_INSTRUMENT_REGION();
 
-    const int BLKSZ = 128;
-    float ybuf[BLKSZ], xbuf[BLKSZ], _mbuf[BLKSZ], abuf[BLKSZ];
-    float* mbuf = mag ? _mbuf : nullptr;
-    for( int i = 0; i < len; i += BLKSZ )
+    ಧ್ರುವ ಪೂರ್ಣಾಙ್ಕ BLKSZ = 128;
+    ಭಿನ್ನ ybuf[BLKSZ], xbuf[BLKSZ], _mbuf[BLKSZ], abuf[BLKSZ];
+    ಭಿನ್ನ* mbuf = mag ? _mbuf : nullptr;
+    ಪ್ರತಿ( ಪೂರ್ಣಾಙ್ಕ i = 0; i < len; i += BLKSZ )
     {
-        int j, blksz = std::min(BLKSZ, len - i);
-        for( j = 0; j < blksz; j++ )
+        ಪೂರ್ಣಾಙ್ಕ j, blksz = std::min(BLKSZ, len - i);
+        ಪ್ರತಿ( j = 0; j < blksz; j++ )
         {
-            if (mbuf)
-                mbuf[j] = (float)mag[i + j];
-            abuf[j] = (float)angle[i + j];
+            ಯದಿ (mbuf)
+                mbuf[j] = (ಭಿನ್ನ)mag[i + j];
+            abuf[j] = (ಭಿನ್ನ)angle[i + j];
         }
         SinCos_32f(mbuf, abuf, xbuf, ybuf, blksz, angleInDegrees);
-        for( j = 0; j < blksz; j++ )
+        ಪ್ರತಿ( j = 0; j < blksz; j++ )
             X[i + j] = xbuf[j];
-        for( j = 0; j < blksz; j++ )
+        ಪ್ರತಿ( j = 0; j < blksz; j++ )
             Y[i + j] = ybuf[j];
     }
 }
 
-static void fastAtan32f_(const float *Y, const float *X, float *angle, int len, bool angleInDegrees )
+ಸ್ಥಿರ ಶೂನ್ಯ fastAtan32f_(ಧ್ರುವ ಭಿನ್ನ *Y, ಧ್ರುವ ಭಿನ್ನ *X, ಭಿನ್ನ *angle, ಪೂರ್ಣಾಙ್ಕ len, ತಾರ್ಕಿಕ angleInDegrees )
 {
-    float scale = angleInDegrees ? 1.f : (float)(CV_PI/180);
-    int i = 0;
-#if (CV_SIMD || CV_SIMD_SCALABLE)
-    const int VECSZ = VTraits<v_float32>::vlanes();
+    ಭಿನ್ನ scale = angleInDegrees ? 1.f : (ಭಿನ್ನ)(CV_PI/180);
+    ಪೂರ್ಣಾಙ್ಕ i = 0;
+#ಯದಿ (CV_SIMD || CV_SIMD_SCALABLE)
+    ಧ್ರುವ ಪೂರ್ಣಾಙ್ಕ VECSZ = VTraits<v_float32>::vlanes();
     v_float32 s = vx_setall_f32(scale);
 
-    for( ; i < len; i += VECSZ*2 )
+    ಪ್ರತಿ( ; i < len; i += VECSZ*2 )
     {
-        if( i + VECSZ*2 > len )
+        ಯದಿ( i + VECSZ*2 > len )
         {
             // if it's inplace operation, we cannot repeatedly process
             // the tail for the second time, so we have to use the
             // scalar code
-            if( i == 0 || angle == X || angle == Y )
-                break;
+            ಯದಿ( i == 0 || angle == X || angle == Y )
+                ಭಙ್ಗ;
             i = len - VECSZ*2;
         }
 
@@ -371,57 +371,57 @@ static void fastAtan32f_(const float *Y, const float *X, float *angle, int len, 
     vx_cleanup();
 #endif
 
-    for( ; i < len; i++ )
+    ಪ್ರತಿ( ; i < len; i++ )
         angle[i] = atan_f32(Y[i], X[i])*scale;
 }
 
-void fastAtan32f(const float *Y, const float *X, float *angle, int len, bool angleInDegrees )
+ಶೂನ್ಯ fastAtan32f(ಧ್ರುವ ಭಿನ್ನ *Y, ಧ್ರುವ ಭಿನ್ನ *X, ಭಿನ್ನ *angle, ಪೂರ್ಣಾಙ್ಕ len, ತಾರ್ಕಿಕ angleInDegrees )
 {
     CV_INSTRUMENT_REGION();
     fastAtan32f_(Y, X, angle, len, angleInDegrees );
 }
 
-void fastAtan64f(const double *Y, const double *X, double *angle, int len, bool angleInDegrees)
+ಶೂನ್ಯ fastAtan64f(ಧ್ರುವ ದ್ವಿಗುಣ *Y, ಧ್ರುವ ದ್ವಿಗುಣ *X, ದ್ವಿಗುಣ *angle, ಪೂರ್ಣಾಙ್ಕ len, ತಾರ್ಕಿಕ angleInDegrees)
 {
     CV_INSTRUMENT_REGION();
 
-    const int BLKSZ = 128;
-    float ybuf[BLKSZ], xbuf[BLKSZ], abuf[BLKSZ];
-    for( int i = 0; i < len; i += BLKSZ )
+    ಧ್ರುವ ಪೂರ್ಣಾಙ್ಕ BLKSZ = 128;
+    ಭಿನ್ನ ybuf[BLKSZ], xbuf[BLKSZ], abuf[BLKSZ];
+    ಪ್ರತಿ( ಪೂರ್ಣಾಙ್ಕ i = 0; i < len; i += BLKSZ )
     {
-        int j, blksz = std::min(BLKSZ, len - i);
-        for( j = 0; j < blksz; j++ )
+        ಪೂರ್ಣಾಙ್ಕ j, blksz = std::min(BLKSZ, len - i);
+        ಪ್ರತಿ( j = 0; j < blksz; j++ )
         {
-            ybuf[j] = (float)Y[i + j];
-            xbuf[j] = (float)X[i + j];
+            ybuf[j] = (ಭಿನ್ನ)Y[i + j];
+            xbuf[j] = (ಭಿನ್ನ)X[i + j];
         }
         fastAtan32f_(ybuf, xbuf, abuf, blksz, angleInDegrees);
-        for( j = 0; j < blksz; j++ )
+        ಪ್ರತಿ( j = 0; j < blksz; j++ )
             angle[i + j] = abuf[j];
     }
 }
 
 // deprecated
-void fastAtan2(const float *Y, const float *X, float *angle, int len, bool angleInDegrees )
+ಶೂನ್ಯ fastAtan2(ಧ್ರುವ ಭಿನ್ನ *Y, ಧ್ರುವ ಭಿನ್ನ *X, ಭಿನ್ನ *angle, ಪೂರ್ಣಾಙ್ಕ len, ತಾರ್ಕಿಕ angleInDegrees )
 {
     CV_INSTRUMENT_REGION();
     fastAtan32f(Y, X, angle, len, angleInDegrees);
 }
 
-void magnitude32f(const float* x, const float* y, float* mag, int len)
+ಶೂನ್ಯ magnitude32f(ಧ್ರುವ ಭಿನ್ನ* x, ಧ್ರುವ ಭಿನ್ನ* y, ಭಿನ್ನ* mag, ಪೂರ್ಣಾಙ್ಕ len)
 {
     CV_INSTRUMENT_REGION();
 
-    int i = 0;
+    ಪೂರ್ಣಾಙ್ಕ i = 0;
 
-#if (CV_SIMD || CV_SIMD_SCALABLE)
-    const int VECSZ = VTraits<v_float32>::vlanes();
-    for( ; i < len; i += VECSZ*2 )
+#ಯದಿ (CV_SIMD || CV_SIMD_SCALABLE)
+    ಧ್ರುವ ಪೂರ್ಣಾಙ್ಕ VECSZ = VTraits<v_float32>::vlanes();
+    ಪ್ರತಿ( ; i < len; i += VECSZ*2 )
     {
-        if( i + VECSZ*2 > len )
+        ಯದಿ( i + VECSZ*2 > len )
         {
-            if( i == 0 || mag == x || mag == y )
-                break;
+            ಯದಿ( i == 0 || mag == x || mag == y )
+                ಭಙ್ಗ;
             i = len - VECSZ*2;
         }
         v_float32 x0 = vx_load(x + i), x1 = vx_load(x + i + VECSZ);
@@ -434,27 +434,27 @@ void magnitude32f(const float* x, const float* y, float* mag, int len)
     vx_cleanup();
 #endif
 
-    for( ; i < len; i++ )
+    ಪ್ರತಿ( ; i < len; i++ )
     {
-        float x0 = x[i], y0 = y[i];
+        ಭಿನ್ನ x0 = x[i], y0 = y[i];
         mag[i] = std::sqrt(x0*x0 + y0*y0);
     }
 }
 
-void magnitude64f(const double* x, const double* y, double* mag, int len)
+ಶೂನ್ಯ magnitude64f(ಧ್ರುವ ದ್ವಿಗುಣ* x, ಧ್ರುವ ದ್ವಿಗುಣ* y, ದ್ವಿಗುಣ* mag, ಪೂರ್ಣಾಙ್ಕ len)
 {
     CV_INSTRUMENT_REGION();
 
-    int i = 0;
+    ಪೂರ್ಣಾಙ್ಕ i = 0;
 
-#if (CV_SIMD_64F || CV_SIMD_SCALABLE_64F)
-    const int VECSZ = VTraits<v_float64>::vlanes();
-    for( ; i < len; i += VECSZ*2 )
+#ಯದಿ (CV_SIMD_64F || CV_SIMD_SCALABLE_64F)
+    ಧ್ರುವ ಪೂರ್ಣಾಙ್ಕ VECSZ = VTraits<v_float64>::vlanes();
+    ಪ್ರತಿ( ; i < len; i += VECSZ*2 )
     {
-        if( i + VECSZ*2 > len )
+        ಯದಿ( i + VECSZ*2 > len )
         {
-            if( i == 0 || mag == x || mag == y )
-                break;
+            ಯದಿ( i == 0 || mag == x || mag == y )
+                ಭಙ್ಗ;
             i = len - VECSZ*2;
         }
         v_float64 x0 = vx_load(x + i), x1 = vx_load(x + i + VECSZ);
@@ -467,28 +467,28 @@ void magnitude64f(const double* x, const double* y, double* mag, int len)
     vx_cleanup();
 #endif
 
-    for( ; i < len; i++ )
+    ಪ್ರತಿ( ; i < len; i++ )
     {
-        double x0 = x[i], y0 = y[i];
+        ದ್ವಿಗುಣ x0 = x[i], y0 = y[i];
         mag[i] = std::sqrt(x0*x0 + y0*y0);
     }
 }
 
 
-void invSqrt32f(const float* src, float* dst, int len)
+ಶೂನ್ಯ invSqrt32f(ಧ್ರುವ ಭಿನ್ನ* src, ಭಿನ್ನ* dst, ಪೂರ್ಣಾಙ್ಕ len)
 {
     CV_INSTRUMENT_REGION();
 
-    int i = 0;
+    ಪೂರ್ಣಾಙ್ಕ i = 0;
 
-#if (CV_SIMD || CV_SIMD_SCALABLE)
-    const int VECSZ = VTraits<v_float32>::vlanes();
-    for( ; i < len; i += VECSZ*2 )
+#ಯದಿ (CV_SIMD || CV_SIMD_SCALABLE)
+    ಧ್ರುವ ಪೂರ್ಣಾಙ್ಕ VECSZ = VTraits<v_float32>::vlanes();
+    ಪ್ರತಿ( ; i < len; i += VECSZ*2 )
     {
-        if( i + VECSZ*2 > len )
+        ಯದಿ( i + VECSZ*2 > len )
         {
-            if( i == 0 || src == dst )
-                break;
+            ಯದಿ( i == 0 || src == dst )
+                ಭಙ್ಗ;
             i = len - VECSZ*2;
         }
         v_float32 t0 = vx_load(src + i), t1 = vx_load(src + i + VECSZ);
@@ -499,24 +499,24 @@ void invSqrt32f(const float* src, float* dst, int len)
     vx_cleanup();
 #endif
 
-    for( ; i < len; i++ )
+    ಪ್ರತಿ( ; i < len; i++ )
         dst[i] = 1/std::sqrt(src[i]);
 }
 
 
-void invSqrt64f(const double* src, double* dst, int len)
+ಶೂನ್ಯ invSqrt64f(ಧ್ರುವ ದ್ವಿಗುಣ* src, ದ್ವಿಗುಣ* dst, ಪೂರ್ಣಾಙ್ಕ len)
 {
     CV_INSTRUMENT_REGION();
-    int i = 0;
+    ಪೂರ್ಣಾಙ್ಕ i = 0;
 
-#if (CV_SIMD_64F || CV_SIMD_SCALABLE_64F)
-    const int VECSZ = VTraits<v_float64>::vlanes();
-    for ( ; i < len; i += VECSZ*2)
+#ಯದಿ (CV_SIMD_64F || CV_SIMD_SCALABLE_64F)
+    ಧ್ರುವ ಪೂರ್ಣಾಙ್ಕ VECSZ = VTraits<v_float64>::vlanes();
+    ಪ್ರತಿ ( ; i < len; i += VECSZ*2)
     {
-        if( i + VECSZ*2 > len )
+        ಯದಿ( i + VECSZ*2 > len )
         {
-            if( i == 0 || src == dst )
-                break;
+            ಯದಿ( i == 0 || src == dst )
+                ಭಙ್ಗ;
             i = len - VECSZ*2;
         }
         v_float64 t0 = vx_load(src + i), t1 = vx_load(src + i + VECSZ);
@@ -526,25 +526,25 @@ void invSqrt64f(const double* src, double* dst, int len)
     }
 #endif
 
-    for( ; i < len; i++ )
+    ಪ್ರತಿ( ; i < len; i++ )
         dst[i] = 1/std::sqrt(src[i]);
 }
 
 
-void sqrt32f(const float* src, float* dst, int len)
+ಶೂನ್ಯ sqrt32f(ಧ್ರುವ ಭಿನ್ನ* src, ಭಿನ್ನ* dst, ಪೂರ್ಣಾಙ್ಕ len)
 {
     CV_INSTRUMENT_REGION();
 
-    int i = 0;
+    ಪೂರ್ಣಾಙ್ಕ i = 0;
 
-#if (CV_SIMD || CV_SIMD_SCALABLE)
-    const int VECSZ = VTraits<v_float32>::vlanes();
-    for( ; i < len; i += VECSZ*2 )
+#ಯದಿ (CV_SIMD || CV_SIMD_SCALABLE)
+    ಧ್ರುವ ಪೂರ್ಣಾಙ್ಕ VECSZ = VTraits<v_float32>::vlanes();
+    ಪ್ರತಿ( ; i < len; i += VECSZ*2 )
     {
-        if( i + VECSZ*2 > len )
+        ಯದಿ( i + VECSZ*2 > len )
         {
-            if( i == 0 || src == dst )
-                break;
+            ಯದಿ( i == 0 || src == dst )
+                ಭಙ್ಗ;
             i = len - VECSZ*2;
         }
         v_float32 t0 = vx_load(src + i), t1 = vx_load(src + i + VECSZ);
@@ -555,25 +555,25 @@ void sqrt32f(const float* src, float* dst, int len)
     vx_cleanup();
 #endif
 
-    for( ; i < len; i++ )
+    ಪ್ರತಿ( ; i < len; i++ )
         dst[i] = std::sqrt(src[i]);
 }
 
 
-void sqrt64f(const double* src, double* dst, int len)
+ಶೂನ್ಯ sqrt64f(ಧ್ರುವ ದ್ವಿಗುಣ* src, ದ್ವಿಗುಣ* dst, ಪೂರ್ಣಾಙ್ಕ len)
 {
     CV_INSTRUMENT_REGION();
 
-    int i = 0;
+    ಪೂರ್ಣಾಙ್ಕ i = 0;
 
-#if (CV_SIMD_64F || CV_SIMD_SCALABLE_64F)
-    const int VECSZ = VTraits<v_float64>::vlanes();
-    for( ; i < len; i += VECSZ*2 )
+#ಯದಿ (CV_SIMD_64F || CV_SIMD_SCALABLE_64F)
+    ಧ್ರುವ ಪೂರ್ಣಾಙ್ಕ VECSZ = VTraits<v_float64>::vlanes();
+    ಪ್ರತಿ( ; i < len; i += VECSZ*2 )
     {
-        if( i + VECSZ*2 > len )
+        ಯದಿ( i + VECSZ*2 > len )
         {
-            if( i == 0 || src == dst )
-                break;
+            ಯದಿ( i == 0 || src == dst )
+                ಭಙ್ಗ;
             i = len - VECSZ*2;
         }
         v_float64 t0 = vx_load(src + i), t1 = vx_load(src + i + VECSZ);
@@ -584,62 +584,62 @@ void sqrt64f(const double* src, double* dst, int len)
     vx_cleanup();
 #endif
 
-    for( ; i < len; i++ )
+    ಪ್ರತಿ( ; i < len; i++ )
         dst[i] = std::sqrt(src[i]);
 }
 
 // Workaround for ICE in MSVS 2015 update 3 (issue #7795)
 // CV_AVX is not used here, because generated code is faster in non-AVX mode.
 // (tested with disabled IPP on i5-6300U)
-#if (defined _MSC_VER && _MSC_VER >= 1900 && (defined(_M_IX86) || defined(_M_X64))) || defined(__EMSCRIPTEN__)
-void exp32f(const float *src, float *dst, int n)
+#ಯದಿ (defined _MSC_VER && _MSC_VER >= 1900 && (defined(_M_IX86) || defined(_M_X64))) || defined(__EMSCRIPTEN__)
+ಶೂನ್ಯ exp32f(ಧ್ರುವ ಭಿನ್ನ *src, ಭಿನ್ನ *dst, ಪೂರ್ಣಾಙ್ಕ n)
 {
     CV_INSTRUMENT_REGION();
 
-    for (int i = 0; i < n; i++)
+    ಪ್ರತಿ (ಪೂರ್ಣಾಙ್ಕ i = 0; i < n; i++)
     {
         dst[i] = std::exp(src[i]);
     }
 }
 
-void exp64f(const double *src, double *dst, int n)
+ಶೂನ್ಯ exp64f(ಧ್ರುವ ದ್ವಿಗುಣ *src, ದ್ವಿಗುಣ *dst, ಪೂರ್ಣಾಙ್ಕ n)
 {
     CV_INSTRUMENT_REGION();
 
-    for (int i = 0; i < n; i++)
+    ಪ್ರತಿ (ಪೂರ್ಣಾಙ್ಕ i = 0; i < n; i++)
     {
         dst[i] = std::exp(src[i]);
     }
 }
 
-void log32f(const float *src, float *dst, int n)
+ಶೂನ್ಯ log32f(ಧ್ರುವ ಭಿನ್ನ *src, ಭಿನ್ನ *dst, ಪೂರ್ಣಾಙ್ಕ n)
 {
     CV_INSTRUMENT_REGION();
 
-    for (int i = 0; i < n; i++)
+    ಪ್ರತಿ (ಪೂರ್ಣಾಙ್ಕ i = 0; i < n; i++)
     {
         dst[i] = std::log(src[i]);
     }
 }
-void log64f(const double *src, double *dst, int n)
+ಶೂನ್ಯ log64f(ಧ್ರುವ ದ್ವಿಗುಣ *src, ದ್ವಿಗುಣ *dst, ಪೂರ್ಣಾಙ್ಕ n)
 {
     CV_INSTRUMENT_REGION();
 
-    for (int i = 0; i < n; i++)
+    ಪ್ರತಿ (ಪೂರ್ಣಾಙ್ಕ i = 0; i < n; i++)
     {
         dst[i] = std::log(src[i]);
     }
 }
-#else
+#ಅನ್ಯಥಾ
 
 ////////////////////////////////////// EXP /////////////////////////////////////
 
 
 #endif // issue 7795
 
-float fastAtan2( float y, float x )
+ಭಿನ್ನ fastAtan2( ಭಿನ್ನ y, ಭಿನ್ನ x )
 {
-    return atan_f32(y, x);
+    ಪ್ರತ್ಯಾಗಮ atan_f32(y, x);
 }
 
 #endif // CV_CPU_OPTIMIZATION_DECLARATIONS_ONLY

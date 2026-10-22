@@ -5,24 +5,24 @@
 #ifndef OPENCV_CORE_LOGTAGMANAGER_HPP
 #define OPENCV_CORE_LOGTAGMANAGER_HPP
 
-#if 1 // if not already in precompiled headers
-#include <string>
-#include <algorithm>
-#include <functional>
-#include <unordered_map>
-#include <mutex>
-#include <memory>
+#ಯದಿ 1 // if not already in precompiled headers
+#ಅನ್ತರ್ಭಾವ <string>
+#ಅನ್ತರ್ಭಾವ <algorithm>
+#ಅನ್ತರ್ಭಾವ <functional>
+#ಅನ್ತರ್ಭಾವ <unordered_map>
+#ಅನ್ತರ್ಭಾವ <mutex>
+#ಅನ್ತರ್ಭಾವ <memory>
 #endif
 
-#include <opencv2/core/utils/logtag.hpp>
-#include "logtagconfig.hpp"
+#ಅನ್ತರ್ಭಾವ <opencv2/core/utils/logtag.hpp>
+#ಅನ್ತರ್ಭಾವ "logtagconfig.hpp"
 
-namespace cv {
-namespace utils {
-namespace logging {
+ನಾಮಾಕಾಶ cv {
+ನಾಮಾಕಾಶ utils {
+ನಾಮಾಕಾಶ logging {
 
 // forward declaration
-class LogTagConfigParser;
+ವರ್ಗ LogTagConfigParser;
 
 // A lookup table of LogTags using full name, first part of name, and any part of name.
 // The name parts of a LogTag is delimited by period.
@@ -30,9 +30,9 @@ class LogTagConfigParser;
 // This class does not handle wildcard characters. The name-matching method can only be
 // selected by calling the appropriate function.
 //
-class LogTagManager
+ವರ್ಗ LogTagManager
 {
-private:
+ಗುಪ್ತ:
     // Current implementation does not seem to require recursive mutex;
     // also, extensible functions (accepting user-provided callback) are not allowed
     // to call LogTagManger (to prevent iterator invalidation), which needs enforced
@@ -40,7 +40,7 @@ private:
     using MutexType = cv::Mutex;
     using LockType = cv::AutoLock;
 
-    enum class MatchingScope
+    ಗಣನಾ ವರ್ಗ MatchingScope
     {
         None,
         Full,
@@ -48,7 +48,7 @@ private:
         AnyNamePart
     };
 
-    struct ParsedLevel
+    ಸಂರಚನಾ ParsedLevel
     {
         LogLevel level;
         MatchingScope scope;
@@ -60,18 +60,18 @@ private:
         }
     };
 
-    struct FullNameInfo
+    ಸಂರಚನಾ FullNameInfo
     {
         LogTag* logTagPtr;
         ParsedLevel parsedLevel;
     };
 
-    struct NamePartInfo
+    ಸಂರಚನಾ NamePartInfo
     {
         ParsedLevel parsedLevel;
     };
 
-    struct CrossReference
+    ಸಂರಚನಾ CrossReference
     {
         size_t m_fullNameId;
         size_t m_namePartId;
@@ -90,7 +90,7 @@ private:
         }
     };
 
-    struct FullNameLookupResult
+    ಸಂರಚನಾ FullNameLookupResult
     {
         // The full name being looked up
         std::string m_fullName;
@@ -110,13 +110,13 @@ private:
 
         // Specifies whether cross references (full names that match the name part)
         // should be computed.
-        bool m_findCrossReferences;
+        ತಾರ್ಕಿಕ m_findCrossReferences;
 
         // List of all full names that match the given name part.
         // This field is computed only if m_findCrossReferences is true.
         std::vector<CrossReference> m_crossReferences;
 
-        explicit FullNameLookupResult(const std::string& fullName)
+        explicit FullNameLookupResult(ಧ್ರುವ std::string& fullName)
             : m_fullName(fullName)
             , m_nameParts()
             , m_fullNameId()
@@ -128,7 +128,7 @@ private:
         }
     };
 
-    struct NamePartLookupResult
+    ಸಂರಚನಾ NamePartLookupResult
     {
         // The name part being looked up
         std::string m_namePart;
@@ -140,13 +140,13 @@ private:
         NamePartInfo* m_namePartInfoPtr;
 
         // Specifies whether cross references (full names that match the name part) should be computed.
-        bool m_findCrossReferences;
+        ತಾರ್ಕಿಕ m_findCrossReferences;
 
         // List of all full names that match the given name part.
         // This field is computed only if m_findCrossReferences is true.
         std::vector<CrossReference> m_crossReferences;
 
-        explicit NamePartLookupResult(const std::string& namePart)
+        explicit NamePartLookupResult(ಧ್ರುವ std::string& namePart)
             : m_namePart(namePart)
             , m_namePartId()
             , m_namePartInfoPtr()
@@ -156,12 +156,12 @@ private:
         }
     };
 
-    struct NameTable
+    ಸಂರಚನಾ NameTable
     {
         // All data structures in this class are append-only. The item count
         // is being used as an incrementing integer key.
 
-    public:
+    ಸಾರ್ವಜನಿಕ:
         // Full name information struct.
         std::vector<FullNameInfo> m_fullNameInfos;
 
@@ -192,25 +192,25 @@ private:
         // value.second: occurrence position of name part in the full name
         std::unordered_multimap<size_t, std::pair<size_t, size_t>> m_namePartToFullNameIds;
 
-    public:
-        void addOrLookupFullName(FullNameLookupResult& result);
-        void addOrLookupNamePart(NamePartLookupResult& result);
-        FullNameInfo* getFullNameInfo(const std::string& fullName);
+    ಸಾರ್ವಜನಿಕ:
+        ಶೂನ್ಯ addOrLookupFullName(FullNameLookupResult& result);
+        ಶೂನ್ಯ addOrLookupNamePart(NamePartLookupResult& result);
+        FullNameInfo* getFullNameInfo(ಧ್ರುವ std::string& fullName);
 
-    private:
+    ಗುಪ್ತ:
         // Add or get full name. Does not compute name parts or access them in the table.
         // Returns the full name ID, and a bool indicating if the full name is new.
-        std::pair<size_t, bool> internal_addOrLookupFullName(const std::string& fullName);
+        std::pair<size_t, ತಾರ್ಕಿಕ> internal_addOrLookupFullName(ಧ್ರುವ std::string& fullName);
 
         // Add or get multiple name parts. Saves name part IDs into a vector.
-        void internal_addOrLookupNameParts(const std::vector<std::string>& nameParts, std::vector<size_t>& namePartIds);
+        ಶೂನ್ಯ internal_addOrLookupNameParts(ಧ್ರುವ std::vector<std::string>& nameParts, std::vector<size_t>& namePartIds);
 
         // Add or get name part. Returns namePartId.
-        size_t internal_addOrLookupNamePart(const std::string& namePart);
+        size_t internal_addOrLookupNamePart(ಧ್ರುವ std::string& namePart);
 
         // For each name part ID, insert the tuples (full name, name part ID, name part position)
         // into the cross reference table
-        void internal_addCrossReference(size_t fullNameId, const std::vector<size_t>& namePartIds);
+        ಶೂನ್ಯ internal_addCrossReference(size_t fullNameId, ಧ್ರುವ std::vector<size_t>& namePartIds);
 
         // Gather pointer for full name info struct.
         // Note: The pointer is interior to the table vector. The pointers are invalidated
@@ -222,57 +222,57 @@ private:
         // if the table is modified.
         NamePartInfo* internal_getNamePartInfo(size_t namePartId);
 
-        void internal_findMatchingNamePartsForFullName(FullNameLookupResult& fullNameResult);
-        void internal_findMatchingFullNamesForNamePart(NamePartLookupResult& result);
+        ಶೂನ್ಯ internal_findMatchingNamePartsForFullName(FullNameLookupResult& fullNameResult);
+        ಶೂನ್ಯ internal_findMatchingFullNamesForNamePart(NamePartLookupResult& result);
     };
 
-public:
+ಸಾರ್ವಜನಿಕ:
     LogTagManager(LogLevel defaultUnconfiguredGlobalLevel);
     ~LogTagManager();
 
-public:
+ಸಾರ್ವಜನಿಕ:
     // Parse and apply the config string.
-    void setConfigString(const std::string& configString, bool apply = true);
+    ಶೂನ್ಯ setConfigString(ಧ್ರುವ std::string& configString, ತಾರ್ಕಿಕ apply = ಸತ್ಯ);
 
     // Gets the config parser. This is necessary to retrieve the list of malformed strings.
-    LogTagConfigParser& getConfigParser() const;
+    LogTagConfigParser& getConfigParser() ಧ್ರುವ;
 
     // Add (register) the log tag.
     // Note, passing in nullptr as value is equivalent to unassigning.
-    void assign(const std::string& fullName, LogTag* ptr);
+    ಶೂನ್ಯ assign(ಧ್ರುವ std::string& fullName, LogTag* ptr);
 
     // Unassign the log tag. This is equivalent to calling assign with nullptr value.
-    void unassign(const std::string& fullName);
+    ಶೂನ್ಯ unassign(ಧ್ರುವ std::string& fullName);
 
     // Retrieve the log tag by exact name.
-    LogTag* get(const std::string& fullName);
+    LogTag* get(ಧ್ರುವ std::string& fullName);
 
     // Changes the log level of the tag having the exact full name.
-    void setLevelByFullName(const std::string& fullName, LogLevel level);
+    ಶೂನ್ಯ setLevelByFullName(ಧ್ರುವ std::string& fullName, LogLevel level);
 
     // Changes the log level of the tags matching the first part of the name.
-    void setLevelByFirstPart(const std::string& firstPart, LogLevel level);
+    ಶೂನ್ಯ setLevelByFirstPart(ಧ್ರುವ std::string& firstPart, LogLevel level);
 
     // Changes the log level of the tags matching any part of the name.
-    void setLevelByAnyPart(const std::string& anyPart, LogLevel level);
+    ಶೂನ್ಯ setLevelByAnyPart(ಧ್ರುವ std::string& anyPart, LogLevel level);
 
     // Changes the log level of the tags with matching name part according
     // to the specified scope.
-    void setLevelByNamePart(const std::string& namePart, LogLevel level, MatchingScope scope);
+    ಶೂನ್ಯ setLevelByNamePart(ಧ್ರುವ std::string& namePart, LogLevel level, MatchingScope scope);
 
-private:
-    bool internal_applyFullNameConfigToTag(FullNameInfo& fullNameInfo);
-    bool internal_applyNamePartConfigToSpecificTag(FullNameLookupResult& fullNameResult);
-    void internal_applyNamePartConfigToMatchingTags(NamePartLookupResult& namePartResult);
+ಗುಪ್ತ:
+    ತಾರ್ಕಿಕ internal_applyFullNameConfigToTag(FullNameInfo& fullNameInfo);
+    ತಾರ್ಕಿಕ internal_applyNamePartConfigToSpecificTag(FullNameLookupResult& fullNameResult);
+    ಶೂನ್ಯ internal_applyNamePartConfigToMatchingTags(NamePartLookupResult& namePartResult);
 
-private:
-    static std::vector<std::string> splitNameParts(const std::string& fullName);
-    static bool internal_isNamePartMatch(MatchingScope scope, size_t matchingPos);
+ಗುಪ್ತ:
+    ಸ್ಥಿರ std::vector<std::string> splitNameParts(ಧ್ರುವ std::string& fullName);
+    ಸ್ಥಿರ ತಾರ್ಕಿಕ internal_isNamePartMatch(MatchingScope scope, size_t matchingPos);
 
-private:
-    static const char* m_globalName;
+ಗುಪ್ತ:
+    ಸ್ಥಿರ ಧ್ರುವ ವರ್ಣ* m_globalName;
 
-private:
+ಗುಪ್ತ:
     mutable MutexType m_mutex;
     std::unique_ptr<LogTag> m_globalLogTag;
     NameTable m_nameTable;

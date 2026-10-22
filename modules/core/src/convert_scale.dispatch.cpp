@@ -3,23 +3,23 @@
 // of this distribution and at http://opencv.org/license.html
 
 
-#include "precomp.hpp"
-#include "opencl_kernels_core.hpp"
+#ಅನ್ತರ್ಭಾವ "precomp.hpp"
+#ಅನ್ತರ್ಭಾವ "opencl_kernels_core.hpp"
 
-#include "convert_scale.simd.hpp"
-#include "convert_scale.simd_declarations.hpp" // defines CV_CPU_DISPATCH_MODES_ALL=AVX2,...,BASELINE based on CMakeLists.txt content
+#ಅನ್ತರ್ಭಾವ "convert_scale.simd.hpp"
+#ಅನ್ತರ್ಭಾವ "convert_scale.simd_declarations.hpp" // defines CV_CPU_DISPATCH_MODES_ALL=AVX2,...,BASELINE based on CMakeLists.txt content
 
-namespace cv
+ನಾಮಾಕಾಶ cv
 {
 
-static BinaryFunc getCvtScaleAbsFunc(int depth)
+ಸ್ಥಿರ ದ್ವಿಮಾನ_Func getCvtScaleAbsFunc(ಪೂರ್ಣಾಙ್ಕ depth)
 {
     CV_INSTRUMENT_REGION();
     CV_CPU_DISPATCH(getCvtScaleAbsFunc, (depth),
         CV_CPU_DISPATCH_MODES_ALL);
 }
 
-BinaryFunc getConvertScaleFunc(int sdepth, int ddepth)
+ದ್ವಿಮಾನ_Func getConvertScaleFunc(ಪೂರ್ಣಾಙ್ಕ sdepth, ಪೂರ್ಣಾಙ್ಕ ddepth)
 {
     CV_INSTRUMENT_REGION();
     CV_CPU_DISPATCH(getConvertScaleFunc, (sdepth, ddepth),
@@ -28,44 +28,44 @@ BinaryFunc getConvertScaleFunc(int sdepth, int ddepth)
 
 #ifdef HAVE_OPENCL
 
-static bool ocl_convertScaleAbs( InputArray _src, OutputArray _dst, double alpha, double beta )
+ಸ್ಥಿರ ತಾರ್ಕಿಕ ocl_convertScaleAbs( ಒಳಹರಿವು_Array _src, OutputArray _dst, ದ್ವಿಗುಣ alpha, ದ್ವಿಗುಣ beta )
 {
-    const ocl::Device & d = ocl::Device::getDefault();
+    ಧ್ರುವ ocl::Device & d = ocl::Device::getDefault();
 
-    int type = _src.type(), depth = CV_MAT_DEPTH(type), cn = CV_MAT_CN(type);
-    bool doubleSupport = d.doubleFPConfig() > 0;
-    if (!doubleSupport && depth == CV_64F)
-        return false;
+    ಪೂರ್ಣಾಙ್ಕ type = _src.type(), depth = CV_MAT_DEPTH(type), cn = CV_MAT_CN(type);
+    ತಾರ್ಕಿಕ doubleSupport = d.doubleFPConfig() > 0;
+    ಯದಿ (!doubleSupport && depth == CV_64F)
+        ಪ್ರತ್ಯಾಗಮ ಅಸತ್ಯ;
 
     _dst.createSameSize(_src, CV_8UC(cn));
-    int kercn = 1;
-    if (d.isIntel())
+    ಪೂರ್ಣಾಙ್ಕ kercn = 1;
+    ಯದಿ (d.isIntel())
     {
-        static const int vectorWidths[] = {4, 4, 4, 4, 4, 4, 4, -1};
+        ಸ್ಥಿರ ಧ್ರುವ ಪೂರ್ಣಾಙ್ಕ vectorWidths[] = {4, 4, 4, 4, 4, 4, 4, -1};
         kercn = ocl::checkOptimalVectorWidth( vectorWidths, _src, _dst,
                                               noArray(), noArray(), noArray(),
                                               noArray(), noArray(), noArray(),
                                               noArray(), ocl::OCL_VECTOR_MAX);
     }
-    else
+    ಅನ್ಯಥಾ
         kercn = ocl::predictOptimalVectorWidthMax(_src, _dst);
 
-    int rowsPerWI = d.isIntel() ? 4 : 1;
-    char cvt[2][50];
-    int wdepth = std::max(depth, CV_32F);
+    ಪೂರ್ಣಾಙ್ಕ rowsPerWI = d.isIntel() ? 4 : 1;
+    ವರ್ಣ cvt[2][50];
+    ಪೂರ್ಣಾಙ್ಕ wdepth = std::max(depth, CV_32F);
     String build_opt = format("-D OP_CONVERT_SCALE_ABS -D UNARY_OP -D dstT=%s -D DEPTH_dst=%d -D srcT1=%s"
                          " -D workT=%s -D wdepth=%d -D convertToWT1=%s -D convertToDT=%s"
                          " -D workT1=%s -D rowsPerWI=%d%s",
                          ocl::typeToStr(CV_8UC(kercn)), CV_8U,
                          ocl::typeToStr(CV_MAKE_TYPE(depth, kercn)),
                          ocl::typeToStr(CV_MAKE_TYPE(wdepth, kercn)), wdepth,
-                         ocl::convertTypeStr(depth, wdepth, kercn, cvt[0], sizeof(cvt[0])),
-                         ocl::convertTypeStr(wdepth, CV_8U, kercn, cvt[1], sizeof(cvt[1])),
+                         ocl::convertTypeStr(depth, wdepth, kercn, cvt[0], ಪರಿಮಾಣ(cvt[0])),
+                         ocl::convertTypeStr(wdepth, CV_8U, kercn, cvt[1], ಪರಿಮಾಣ(cvt[1])),
                          ocl::typeToStr(wdepth), rowsPerWI,
                          doubleSupport ? " -D DOUBLE_SUPPORT" : "");
     ocl::Kernel k("KF", ocl::core::arithm_oclsrc, build_opt);
-    if (k.empty())
-        return false;
+    ಯದಿ (k.empty())
+        ಪ್ರತ್ಯಾಗಮ ಅಸತ್ಯ;
 
     UMat src = _src.getUMat();
     UMat dst = _dst.getUMat();
@@ -73,18 +73,18 @@ static bool ocl_convertScaleAbs( InputArray _src, OutputArray _dst, double alpha
     ocl::KernelArg srcarg = ocl::KernelArg::ReadOnlyNoSize(src),
             dstarg = ocl::KernelArg::WriteOnly(dst, cn, kercn);
 
-    if (wdepth == CV_32F)
-        k.args(srcarg, dstarg, (float)alpha, (float)beta);
-    else if (wdepth == CV_64F)
+    ಯದಿ (wdepth == CV_32F)
+        k.args(srcarg, dstarg, (ಭಿನ್ನ)alpha, (ಭಿನ್ನ)beta);
+    ಅನ್ಯಥಾ ಯದಿ (wdepth == CV_64F)
         k.args(srcarg, dstarg, alpha, beta);
 
     size_t globalsize[2] = { (size_t)src.cols * cn / kercn, ((size_t)src.rows + rowsPerWI - 1) / rowsPerWI };
-    return k.run(2, globalsize, NULL, false);
+    ಪ್ರತ್ಯಾಗಮ k.run(2, globalsize, ರಿಕ್ತ, ಅಸತ್ಯ);
 }
 
 #endif
 
-void convertScaleAbs(InputArray _src, OutputArray _dst, double alpha, double beta)
+ಶೂನ್ಯ convertScaleAbs(ಒಳಹರಿವು_Array _src, OutputArray _dst, ದ್ವಿಗುಣ alpha, ದ್ವಿಗುಣ beta)
 {
     CV_INSTRUMENT_REGION();
 
@@ -92,26 +92,26 @@ void convertScaleAbs(InputArray _src, OutputArray _dst, double alpha, double bet
                ocl_convertScaleAbs(_src, _dst, alpha, beta))
 
     Mat src = _src.getMat();
-    int cn = src.channels();
-    double scale[] = {alpha, beta};
+    ಪೂರ್ಣಾಙ್ಕ cn = src.channels();
+    ದ್ವಿಗುಣ scale[] = {alpha, beta};
     _dst.create( src.size, CV_8UC(cn) );
     Mat dst = _dst.getMat();
-    BinaryFunc func = getCvtScaleAbsFunc(src.depth());
+    ದ್ವಿಮಾನ_Func func = getCvtScaleAbsFunc(src.depth());
     CV_Assert( func != 0 );
 
-    if( src.dims <= 2 )
+    ಯದಿ( src.dims <= 2 )
     {
         Size sz = getContinuousSize2D(src, dst, cn);
         func( src.ptr(), src.step, 0, 0, dst.ptr(), dst.step, sz, scale );
     }
-    else
+    ಅನ್ಯಥಾ
     {
-        const Mat* arrays[] = {&src, &dst, 0};
+        ಧ್ರುವ Mat* arrays[] = {&src, &dst, 0};
         uchar* ptrs[2] = {};
         NAryMatIterator it(arrays, ptrs);
-        Size sz((int)it.size*cn, 1);
+        Size sz((ಪೂರ್ಣಾಙ್ಕ)it.size*cn, 1);
 
-        for( size_t i = 0; i < it.nplanes; i++, ++it )
+        ಪ್ರತಿ( size_t i = 0; i < it.nplanes; i++, ++it )
             func( ptrs[0], 0, 0, 0, ptrs[1], 0, sz, scale );
     }
 }

@@ -3,37 +3,37 @@
 // of this distribution and at http://opencv.org/license.html
 
 
-#include "precomp.hpp"
-#include "opencl_kernels_core.hpp"
-#include "stat.hpp"
-#include "stat_parallel.hpp"
+#ಅನ್ತರ್ಭಾವ "precomp.hpp"
+#ಅನ್ತರ್ಭಾವ "opencl_kernels_core.hpp"
+#ಅನ್ತರ್ಭಾವ "stat.hpp"
+#ಅನ್ತರ್ಭಾವ "stat_parallel.hpp"
 
-#include "mean.simd.hpp"
-#include "mean.simd_declarations.hpp" // defines CV_CPU_DISPATCH_MODES_ALL=AVX2,...,BASELINE based on CMakeLists.txt content
+#ಅನ್ತರ್ಭಾವ "mean.simd.hpp"
+#ಅನ್ತರ್ಭಾವ "mean.simd_declarations.hpp" // defines CV_CPU_DISPATCH_MODES_ALL=AVX2,...,BASELINE based on CMakeLists.txt content
 
 
-namespace cv {
+ನಾಮಾಕಾಶ cv {
 
 // serial implementation, also used for the pieces of the parallel version
-static Scalar mean_(const Mat& src, const Mat& mask)
+ಸ್ಥಿರ Scalar mean_(ಧ್ರುವ Mat& src, ಧ್ರುವ Mat& mask)
 {
     CV_Assert( mask.empty() || ((mask.type() == CV_8U || mask.type() == CV_8S || mask.type() == CV_Bool) && src.size == mask.size) );
-    if (src.empty())
-        return Scalar::all(0.0);
+    ಯದಿ (src.empty())
+        ಪ್ರತ್ಯಾಗಮ Scalar::all(0.0);
 
-    int k, cn = src.channels(), depth = src.depth();
+    ಪೂರ್ಣಾಙ್ಕ k, cn = src.channels(), depth = src.depth();
     Scalar s = Scalar::all(0.0);
 
     CV_Assert( cn <= 4 );
 
-    if (src.isContinuous() && mask.isContinuous())
+    ಯದಿ (src.isContinuous() && mask.isContinuous())
     {
-        CALL_HAL_RET2(meanStdDev, cv_hal_meanStdDev, s, src.data, 0, (int)src.total(), 1, src.type(),
+        CALL_HAL_RET2(meanStdDev, cv_hal_meanStdDev, s, src.data, 0, (ಪೂರ್ಣಾಙ್ಕ)src.total(), 1, src.type(),
                       &s[0], nullptr /*stddev*/, mask.data, 0);
     }
-    else
+    ಅನ್ಯಥಾ
     {
-        if (src.dims <= 2)
+        ಯದಿ (src.dims <= 2)
         {
             CALL_HAL_RET2(meanStdDev, cv_hal_meanStdDev, s, src.data, src.step, src.cols, src.rows, src.type(),
                           &s[0], nullptr, mask.data, mask.step);
@@ -44,67 +44,67 @@ static Scalar mean_(const Mat& src, const Mat& mask)
 
     CV_Assert( func != 0 );
 
-    const Mat* arrays[] = {&src, &mask, 0};
+    ಧ್ರುವ Mat* arrays[] = {&src, &mask, 0};
     uchar* ptrs[2] = {};
     NAryMatIterator it(arrays, ptrs);
-    int total = (int)it.size, blockSize = total, partialBlockSize = 0;
-    int j, count = 0;
-    int _buf[CV_CN_MAX];
-    int* buf = (int*)&s[0];
-    bool partialSumIsInt = depth < CV_32S;
-    bool blockSum = partialSumIsInt || depth == CV_16F || depth == CV_16BF;
+    ಪೂರ್ಣಾಙ್ಕ total = (ಪೂರ್ಣಾಙ್ಕ)it.size, blockSize = total, partialBlockSize = 0;
+    ಪೂರ್ಣಾಙ್ಕ j, ಎಣಿಕೆ_2 = 0;
+    ಪೂರ್ಣಾಙ್ಕ _buf[CV_CN_MAX];
+    ಪೂರ್ಣಾಙ್ಕ* buf = (ಪೂರ್ಣಾಙ್ಕ*)&s[0];
+    ತಾರ್ಕಿಕ partialSumIsInt = depth < CV_32S;
+    ತಾರ್ಕಿಕ blockSum = partialSumIsInt || depth == CV_16F || depth == CV_16BF;
     size_t esz = 0, nz0 = 0;
 
-    if( blockSum )
+    ಯದಿ( blockSum )
     {
         partialBlockSize = depth <= CV_8S ? (1 << 23) : (1 << 15);
         blockSize = std::min(blockSize, partialBlockSize);
         buf = _buf;
-        for( k = 0; k < cn; k++ )
+        ಪ್ರತಿ( k = 0; k < cn; k++ )
             buf[k] = 0;
         esz = src.elemSize();
     }
 
-    for( size_t i = 0; i < it.nplanes; i++, ++it )
+    ಪ್ರತಿ( size_t i = 0; i < it.nplanes; i++, ++it )
     {
-        for( j = 0; j < total; j += blockSize )
+        ಪ್ರತಿ( j = 0; j < total; j += blockSize )
         {
-            int bsz = std::min(total - j, blockSize);
-            int nz = func( ptrs[0], ptrs[1], (uchar*)buf, bsz, cn );
-            count += nz;
+            ಪೂರ್ಣಾಙ್ಕ bsz = std::min(total - j, blockSize);
+            ಪೂರ್ಣಾಙ್ಕ nz = func( ptrs[0], ptrs[1], (uchar*)buf, bsz, cn );
+            ಎಣಿಕೆ_2 += nz;
             nz0 += nz;
-            if( blockSum && (count + blockSize >= partialBlockSize || (i+1 >= it.nplanes && j+bsz >= total)) )
+            ಯದಿ( blockSum && (ಎಣಿಕೆ_2 + blockSize >= partialBlockSize || (i+1 >= it.nplanes && j+bsz >= total)) )
             {
-                if (partialSumIsInt) {
-                    for( k = 0; k < cn; k++ )
+                ಯದಿ (partialSumIsInt) {
+                    ಪ್ರತಿ( k = 0; k < cn; k++ )
                     {
                         s[k] += buf[k];
                         buf[k] = 0;
                     }
-                } else {
-                    for( k = 0; k < cn; k++ )
+                } ಅನ್ಯಥಾ {
+                    ಪ್ರತಿ( k = 0; k < cn; k++ )
                     {
-                        s[k] += ((float*)buf)[k];
+                        s[k] += ((ಭಿನ್ನ*)buf)[k];
                         buf[k] = 0;
                     }
                 }
-                count = 0;
+                ಎಣಿಕೆ_2 = 0;
             }
             ptrs[0] += bsz*esz;
-            if( ptrs[1] )
+            ಯದಿ( ptrs[1] )
                 ptrs[1] += bsz;
         }
     }
-    return s*(nz0 ? 1./nz0 : 0);
+    ಪ್ರತ್ಯಾಗಮ s*(nz0 ? 1./nz0 : 0);
 }
 
 // number of elements a piece contributes to the mean
-static double statCount(const StatChunk& c)
+ಸ್ಥಿರ ದ್ವಿಗುಣ stat_ಎಣಿಕೆ(ಧ್ರುವ StatChunk& c)
 {
-    return c.mask.empty() ? (double)c.src.total() : (double)countNonZero(c.mask);
+    ಪ್ರತ್ಯಾಗಮ c.mask.empty() ? (ದ್ವಿಗುಣ)c.src.total() : (ದ್ವಿಗುಣ)ಎಣಿಕೆ_Non_Zero(c.mask);
 }
 
-Scalar mean(InputArray _src, InputArray _mask)
+Scalar mean(ಒಳಹರಿವು_Array _src, ಒಳಹರಿವು_Array _mask)
 {
     CV_INSTRUMENT_REGION();
 
@@ -112,31 +112,31 @@ Scalar mean(InputArray _src, InputArray _mask)
     CV_Assert( mask.empty() || mask.type() == CV_8U || mask.type() == CV_8S || mask.type() == CV_Bool);
 
     std::vector<StatChunk> chunks;
-    if (src.channels() > 4 || !splitForParallelStat(src, mask, chunks))
-        return mean_(src, mask);
+    ಯದಿ (src.channels() > 4 || !splitForParallelStat(src, mask, chunks))
+        ಪ್ರತ್ಯಾಗಮ mean_(src, mask);
 
-    const int n = (int)chunks.size();
+    ಧ್ರುವ ಪೂರ್ಣಾಙ್ಕ n = (ಪೂರ್ಣಾಙ್ಕ)chunks.size();
     std::vector<Scalar> part(n);
-    std::vector<double> cnt(n);
-    parallel_for_(Range(0, n), [&](const Range& r)
+    std::vector<ದ್ವಿಗುಣ> cnt(n);
+    parallel_for_(Range(0, n), [&](ಧ್ರುವ Range& r)
     {
-        for (int i = r.start; i < r.end; i++)
+        ಪ್ರತಿ (ಪೂರ್ಣಾಙ್ಕ i = r.start; i < r.end; i++)
         {
             part[i] = mean_(chunks[i].src, chunks[i].mask);
-            cnt[i] = statCount(chunks[i]);
+            cnt[i] = stat_ಎಣಿಕೆ(chunks[i]);
         }
     });
     Scalar s = Scalar::all(0.0);
-    double total = 0;
-    for (int i = 0; i < n; i++)
+    ದ್ವಿಗುಣ total = 0;
+    ಪ್ರತಿ (ಪೂರ್ಣಾಙ್ಕ i = 0; i < n; i++)
     {
         s += part[i]*cnt[i];
         total += cnt[i];
     }
-    return s*(total > 0 ? 1./total : 0);
+    ಪ್ರತ್ಯಾಗಮ s*(total > 0 ? 1./total : 0);
 }
 
-static SumSqrFunc getSumSqrFunc(int depth)
+ಸ್ಥಿರ SumSqrFunc getSumSqrFunc(ಪೂರ್ಣಾಙ್ಕ depth)
 {
     CV_INSTRUMENT_REGION();
     CV_CPU_DISPATCH(getSumSqrFunc, (depth),
@@ -144,63 +144,63 @@ static SumSqrFunc getSumSqrFunc(int depth)
 }
 
 #ifdef HAVE_OPENCL
-static bool ocl_meanStdDev( InputArray _src, OutputArray _mean, OutputArray _sdv, InputArray _mask )
+ಸ್ಥಿರ ತಾರ್ಕಿಕ ocl_meanStdDev( ಒಳಹರಿವು_Array _src, OutputArray _mean, OutputArray _sdv, ಒಳಹರಿವು_Array _mask )
 {
     CV_INSTRUMENT_REGION_OPENCL();
 
-    bool haveMask = _mask.kind() != _InputArray::NONE;
-    int nz = haveMask ? -1 : (int)_src.total();
+    ತಾರ್ಕಿಕ haveMask = _mask.kind() != ಒಳಹರಿವು_Array_2::NONE;
+    ಪೂರ್ಣಾಙ್ಕ nz = haveMask ? -1 : (ಪೂರ್ಣಾಙ್ಕ)_src.total();
     Scalar mean(0), stddev(0);
-    const int cn = _src.channels();
-    if (cn > 4)
-        return false;
+    ಧ್ರುವ ಪೂರ್ಣಾಙ್ಕ cn = _src.channels();
+    ಯದಿ (cn > 4)
+        ಪ್ರತ್ಯಾಗಮ ಅಸತ್ಯ;
 
     {
-        int type = _src.type(), depth = CV_MAT_DEPTH(type);
-        bool doubleSupport = ocl::Device::getDefault().doubleFPConfig() > 0,
+        ಪೂರ್ಣಾಙ್ಕ type = _src.type(), depth = CV_MAT_DEPTH(type);
+        ತಾರ್ಕಿಕ doubleSupport = ocl::Device::getDefault().doubleFPConfig() > 0,
                 isContinuous = _src.isContinuous(),
                 isMaskContinuous = _mask.isContinuous();
-        const ocl::Device &defDev = ocl::Device::getDefault();
-        int groups = defDev.maxComputeUnits();
-        if (defDev.isIntel())
+        ಧ್ರುವ ocl::Device &defDev = ocl::Device::getDefault();
+        ಪೂರ್ಣಾಙ್ಕ groups = defDev.maxComputeUnits();
+        ಯದಿ (defDev.isIntel())
         {
-            static const int subSliceEUCount = 10;
+            ಸ್ಥಿರ ಧ್ರುವ ಪೂರ್ಣಾಙ್ಕ subSliceEUCount = 10;
             groups = (groups / subSliceEUCount) * 2;
         }
         size_t wgs = defDev.maxWorkGroupSize();
 
-        int ddepth = std::max(CV_32S, depth), sqddepth = std::max(CV_32F, depth),
+        ಪೂರ್ಣಾಙ್ಕ ddepth = std::max(CV_32S, depth), sqddepth = std::max(CV_32F, depth),
                 dtype = CV_MAKE_TYPE(ddepth, cn),
                 sqdtype = CV_MAKETYPE(sqddepth, cn);
         CV_Assert(!haveMask || _mask.type() == CV_8U || _mask.type() == CV_8S || _mask.type() == CV_Bool);
 
-        int wgs2_aligned = 1;
-        while (wgs2_aligned < (int)wgs)
+        ಪೂರ್ಣಾಙ್ಕ wgs2_aligned = 1;
+        ಯಾವತ್ (wgs2_aligned < (ಪೂರ್ಣಾಙ್ಕ)wgs)
             wgs2_aligned <<= 1;
         wgs2_aligned >>= 1;
 
-        if ( (!doubleSupport && depth == CV_64F) )
-            return false;
+        ಯದಿ ( (!doubleSupport && depth == CV_64F) )
+            ಪ್ರತ್ಯಾಗಮ ಅಸತ್ಯ;
 
-        char cvt[2][50];
+        ವರ್ಣ cvt[2][50];
         String opts = format("-D srcT=%s -D srcT1=%s -D dstT=%s -D dstT1=%s -D sqddepth=%d"
                              " -D sqdstT=%s -D sqdstT1=%s -D convertToSDT=%s -D cn=%d%s%s"
                              " -D convertToDT=%s -D WGS=%d -D WGS2_ALIGNED=%d%s%s",
                              ocl::typeToStr(type), ocl::typeToStr(depth),
                              ocl::typeToStr(dtype), ocl::typeToStr(ddepth), sqddepth,
                              ocl::typeToStr(sqdtype), ocl::typeToStr(sqddepth),
-                             ocl::convertTypeStr(depth, sqddepth, cn, cvt[0], sizeof(cvt[0])),
+                             ocl::convertTypeStr(depth, sqddepth, cn, cvt[0], ಪರಿಮಾಣ(cvt[0])),
                              cn, isContinuous ? " -D HAVE_SRC_CONT" : "",
                              isMaskContinuous ? " -D HAVE_MASK_CONT" : "",
-                             ocl::convertTypeStr(depth, ddepth, cn, cvt[1], sizeof(cvt[1])),
-                             (int)wgs, wgs2_aligned, haveMask ? " -D HAVE_MASK" : "",
+                             ocl::convertTypeStr(depth, ddepth, cn, cvt[1], ಪರಿಮಾಣ(cvt[1])),
+                             (ಪೂರ್ಣಾಙ್ಕ)wgs, wgs2_aligned, haveMask ? " -D HAVE_MASK" : "",
                              doubleSupport ? " -D DOUBLE_SUPPORT" : "");
 
         ocl::Kernel k("meanStdDev", ocl::core::meanstddev_oclsrc, opts);
-        if (k.empty())
-            return false;
+        ಯದಿ (k.empty())
+            ಪ್ರತ್ಯಾಗಮ ಅಸತ್ಯ;
 
-        int dbsize = groups * ((haveMask ? CV_ELEM_SIZE1(CV_32S) : 0) +
+        ಪೂರ್ಣಾಙ್ಕ dbsize = groups * ((haveMask ? CV_ELEM_SIZE1(CV_32S) : 0) +
                                CV_ELEM_SIZE(sqdtype) + CV_ELEM_SIZE(dtype));
         UMat src = _src.getUMat(), db(1, dbsize, CV_8UC1), mask = _mask.getUMat();
 
@@ -208,63 +208,63 @@ static bool ocl_meanStdDev( InputArray _src, OutputArray _mean, OutputArray _sdv
                 dbarg = ocl::KernelArg::PtrWriteOnly(db),
                 maskarg = ocl::KernelArg::ReadOnlyNoSize(mask);
 
-        if (haveMask)
-            k.args(srcarg, src.cols, (int)src.total(), groups, dbarg, maskarg);
-        else
-            k.args(srcarg, src.cols, (int)src.total(), groups, dbarg);
+        ಯದಿ (haveMask)
+            k.args(srcarg, src.cols, (ಪೂರ್ಣಾಙ್ಕ)src.total(), groups, dbarg, maskarg);
+        ಅನ್ಯಥಾ
+            k.args(srcarg, src.cols, (ಪೂರ್ಣಾಙ್ಕ)src.total(), groups, dbarg);
 
         size_t globalsize = groups * wgs;
 
-        if(!k.run(1, &globalsize, &wgs, false))
-            return false;
+        ಯದಿ(!k.run(1, &globalsize, &wgs, ಅಸತ್ಯ))
+            ಪ್ರತ್ಯಾಗಮ ಅಸತ್ಯ;
 
-        typedef Scalar (* part_sum)(Mat m);
-        part_sum funcs[3] = { ocl_part_sum<int>, ocl_part_sum<float>, ocl_part_sum<double> };
+        ಪ್ರಕಾರನಿರ್ದೇಶ Scalar (* part_sum)(Mat m);
+        part_sum funcs[3] = { ocl_part_sum<ಪೂರ್ಣಾಙ್ಕ>, ocl_part_sum<ಭಿನ್ನ>, ocl_part_sum<ದ್ವಿಗುಣ> };
         Mat dbm = db.getMat(ACCESS_READ);
 
         mean = funcs[ddepth - CV_32S](Mat(1, groups, dtype, dbm.ptr()));
         stddev = funcs[sqddepth - CV_32S](Mat(1, groups, sqdtype, dbm.ptr() + groups * CV_ELEM_SIZE(dtype)));
 
-        if (haveMask)
-            nz = saturate_cast<int>(funcs[0](Mat(1, groups, CV_32SC1, dbm.ptr() +
+        ಯದಿ (haveMask)
+            nz = saturate_cast<ಪೂರ್ಣಾಙ್ಕ>(funcs[0](Mat(1, groups, CV_32SC1, dbm.ptr() +
                                                  groups * (CV_ELEM_SIZE(dtype) +
                                                            CV_ELEM_SIZE(sqdtype))))[0]);
     }
 
-    double total = nz != 0 ? 1.0 / nz : 0;
-    int k, j;
-    for (int i = 0; i < cn; ++i)
+    ದ್ವಿಗುಣ total = nz != 0 ? 1.0 / nz : 0;
+    ಪೂರ್ಣಾಙ್ಕ k, j;
+    ಪ್ರತಿ (ಪೂರ್ಣಾಙ್ಕ i = 0; i < cn; ++i)
     {
         mean[i] *= total;
         stddev[i] = std::sqrt(std::max(stddev[i] * total - mean[i] * mean[i] , 0.));
     }
 
-    for( j = 0; j < 2; j++ )
+    ಪ್ರತಿ( j = 0; j < 2; j++ )
     {
-        const double * const sptr = j == 0 ? &mean[0] : &stddev[0];
+        ಧ್ರುವ ದ್ವಿಗುಣ * ಧ್ರುವ sptr = j == 0 ? &mean[0] : &stddev[0];
         _OutputArray _dst = j == 0 ? _mean : _sdv;
-        if( !_dst.needed() )
-            continue;
+        ಯದಿ( !_dst.needed() )
+            ಅನುವರ್ತ;
 
-        if( !_dst.fixedSize() )
-            _dst.create(cn, 1, CV_64F, -1, true);
+        ಯದಿ( !_dst.fixedSize() )
+            _dst.create(cn, 1, CV_64F, -1, ಸತ್ಯ);
         Mat dst = _dst.getMat();
-        int dcn = (int)dst.total();
+        ಪೂರ್ಣಾಙ್ಕ dcn = (ಪೂರ್ಣಾಙ್ಕ)dst.total();
         CV_Assert( dst.type() == CV_64F && dst.isContinuous() &&
                    (dst.cols == 1 || dst.rows == 1) && dcn >= cn );
-        double* dptr = dst.ptr<double>();
-        for( k = 0; k < cn; k++ )
+        ದ್ವಿಗುಣ* dptr = dst.ptr<ದ್ವಿಗುಣ>();
+        ಪ್ರತಿ( k = 0; k < cn; k++ )
             dptr[k] = sptr[k];
-        for( ; k < dcn; k++ )
+        ಪ್ರತಿ( ; k < dcn; k++ )
             dptr[k] = 0;
     }
 
-    return true;
+    ಪ್ರತ್ಯಾಗಮ ಸತ್ಯ;
 }
 #endif
 
 // serial implementation, also used for the pieces of the parallel version
-static void meanStdDev_(InputArray _src, OutputArray _mean, OutputArray _sdv, InputArray _mask)
+ಸ್ಥಿರ ಶೂನ್ಯ meanStdDev_(ಒಳಹರಿವು_Array _src, OutputArray _mean, OutputArray _sdv, ಒಳಹರಿವು_Array _mask)
 {
     CV_Assert(!_src.empty());
     CV_Assert( _mask.empty() || _mask.type() == CV_8U || _mask.type() == CV_8S || _mask.type() == CV_Bool );
@@ -276,54 +276,54 @@ static void meanStdDev_(InputArray _src, OutputArray _mean, OutputArray _sdv, In
 
     CV_Assert(mask.empty() || ((mask.type() == CV_8U || mask.type() == CV_8S || mask.type() == CV_Bool) && src.size == mask.size));
 
-    int k, cn = src.channels(), depth = src.depth();
+    ಪೂರ್ಣಾಙ್ಕ k, cn = src.channels(), depth = src.depth();
     Mat mean_mat, stddev_mat;
 
-    if(_mean.needed())
+    ಯದಿ(_mean.needed())
     {
-        if( !_mean.fixedSize() )
-            _mean.create(cn, 1, CV_64F, -1, true);
+        ಯದಿ( !_mean.fixedSize() )
+            _mean.create(cn, 1, CV_64F, -1, ಸತ್ಯ);
 
         mean_mat = _mean.getMat();
-        int dcn = (int)mean_mat.total();
+        ಪೂರ್ಣಾಙ್ಕ dcn = (ಪೂರ್ಣಾಙ್ಕ)mean_mat.total();
         CV_Assert( mean_mat.type() == CV_64F && mean_mat.isContinuous() &&
                    (mean_mat.cols == 1 || mean_mat.rows == 1) && dcn >= cn );
 
-        double* dptr = mean_mat.ptr<double>();
-        for(k = cn ; k < dcn; k++ )
+        ದ್ವಿಗುಣ* dptr = mean_mat.ptr<ದ್ವಿಗುಣ>();
+        ಪ್ರತಿ(k = cn ; k < dcn; k++ )
             dptr[k] = 0;
     }
 
-    if (_sdv.needed())
+    ಯದಿ (_sdv.needed())
     {
-        if( !_sdv.fixedSize() )
-            _sdv.create(cn, 1, CV_64F, -1, true);
+        ಯದಿ( !_sdv.fixedSize() )
+            _sdv.create(cn, 1, CV_64F, -1, ಸತ್ಯ);
 
         stddev_mat = _sdv.getMat();
-        int dcn = (int)stddev_mat.total();
+        ಪೂರ್ಣಾಙ್ಕ dcn = (ಪೂರ್ಣಾಙ್ಕ)stddev_mat.total();
         CV_Assert( stddev_mat.type() == CV_64F && stddev_mat.isContinuous() &&
                    (stddev_mat.cols == 1 || stddev_mat.rows == 1) && dcn >= cn );
 
-        double* dptr = stddev_mat.ptr<double>();
-        for(k = cn ; k < dcn; k++ )
+        ದ್ವಿಗುಣ* dptr = stddev_mat.ptr<ದ್ವಿಗುಣ>();
+        ಪ್ರತಿ(k = cn ; k < dcn; k++ )
             dptr[k] = 0;
 
     }
 
-    if (src.isContinuous() && mask.isContinuous())
+    ಯದಿ (src.isContinuous() && mask.isContinuous())
     {
-        CALL_HAL(meanStdDev, cv_hal_meanStdDev, src.data, 0, (int)src.total(), 1, src.type(),
-                 _mean.needed() ? mean_mat.ptr<double>() : nullptr,
-                 _sdv.needed() ? stddev_mat.ptr<double>() : nullptr,
+        CALL_HAL(meanStdDev, cv_hal_meanStdDev, src.data, 0, (ಪೂರ್ಣಾಙ್ಕ)src.total(), 1, src.type(),
+                 _mean.needed() ? mean_mat.ptr<ದ್ವಿಗುಣ>() : nullptr,
+                 _sdv.needed() ? stddev_mat.ptr<ದ್ವಿಗುಣ>() : nullptr,
                  mask.data, 0);
     }
-    else
+    ಅನ್ಯಥಾ
     {
-        if (src.dims <= 2)
+        ಯದಿ (src.dims <= 2)
         {
             CALL_HAL(meanStdDev, cv_hal_meanStdDev, src.data, src.step, src.cols, src.rows, src.type(),
-                     _mean.needed() ? mean_mat.ptr<double>() : nullptr,
-                     _sdv.needed() ? stddev_mat.ptr<double>() : nullptr,
+                     _mean.needed() ? mean_mat.ptr<ದ್ವಿಗುಣ>() : nullptr,
+                     _sdv.needed() ? stddev_mat.ptr<ದ್ವಿಗುಣ>() : nullptr,
                      mask.data, mask.step);
         }
     }
@@ -332,165 +332,165 @@ static void meanStdDev_(InputArray _src, OutputArray _mean, OutputArray _sdv, In
 
     CV_Assert( func != 0 );
 
-    const Mat* arrays[] = {&src, &mask, 0};
+    ಧ್ರುವ Mat* arrays[] = {&src, &mask, 0};
     uchar* ptrs[2] = {};
     NAryMatIterator it(arrays, ptrs);
-    int total = (int)it.size, blockSize = total, partialBlockSize = 0;
-    int j;
-    int64_t count = 0, nz0 = 0;
-    double _buf[CV_CN_MAX*4];
-    double *s = _buf, *sq = s + cn;
-    int *sbuf = (int*)s, *sqbuf = (int*)sq;
-    bool partialSumIsInt = depth < CV_32S;
-    bool blockSum = partialSumIsInt || depth == CV_16F || depth == CV_16BF;
-    bool blockSqSum = depth <= CV_8S;
+    ಪೂರ್ಣಾಙ್ಕ total = (ಪೂರ್ಣಾಙ್ಕ)it.size, blockSize = total, partialBlockSize = 0;
+    ಪೂರ್ಣಾಙ್ಕ j;
+    int64_t ಎಣಿಕೆ_2 = 0, nz0 = 0;
+    ದ್ವಿಗುಣ _buf[CV_CN_MAX*4];
+    ದ್ವಿಗುಣ *s = _buf, *sq = s + cn;
+    ಪೂರ್ಣಾಙ್ಕ *sbuf = (ಪೂರ್ಣಾಙ್ಕ*)s, *sqbuf = (ಪೂರ್ಣಾಙ್ಕ*)sq;
+    ತಾರ್ಕಿಕ partialSumIsInt = depth < CV_32S;
+    ತಾರ್ಕಿಕ blockSum = partialSumIsInt || depth == CV_16F || depth == CV_16BF;
+    ತಾರ್ಕಿಕ blockSqSum = depth <= CV_8S;
     size_t esz = 0;
 
-    for( k = 0; k < cn; k++ )
+    ಪ್ರತಿ( k = 0; k < cn; k++ )
         s[k] = sq[k] = 0;
 
-    if( blockSum )
+    ಯದಿ( blockSum )
     {
         partialBlockSize = 1 << 15;
         blockSize = std::min(blockSize, partialBlockSize);
-        sbuf = (int*)(sq + cn);
-        if( blockSqSum )
+        sbuf = (ಪೂರ್ಣಾಙ್ಕ*)(sq + cn);
+        ಯದಿ( blockSqSum )
             sqbuf = sbuf + cn;
-        for( k = 0; k < cn; k++ )
+        ಪ್ರತಿ( k = 0; k < cn; k++ )
             sbuf[k] = sqbuf[k] = 0;
         esz = src.elemSize();
     }
 
-    for( size_t i = 0; i < it.nplanes; i++, ++it )
+    ಪ್ರತಿ( size_t i = 0; i < it.nplanes; i++, ++it )
     {
-        for( j = 0; j < total; j += blockSize )
+        ಪ್ರತಿ( j = 0; j < total; j += blockSize )
         {
-            int bsz = std::min(total - j, blockSize);
-            int nz = func( ptrs[0], ptrs[1], (uchar*)sbuf, (uchar*)sqbuf, bsz, cn );
-            count += nz;
+            ಪೂರ್ಣಾಙ್ಕ bsz = std::min(total - j, blockSize);
+            ಪೂರ್ಣಾಙ್ಕ nz = func( ptrs[0], ptrs[1], (uchar*)sbuf, (uchar*)sqbuf, bsz, cn );
+            ಎಣಿಕೆ_2 += nz;
             nz0 += nz;
-            if( blockSum && (count + blockSize >= partialBlockSize || (i+1 >= it.nplanes && j+bsz >= total)) )
+            ಯದಿ( blockSum && (ಎಣಿಕೆ_2 + blockSize >= partialBlockSize || (i+1 >= it.nplanes && j+bsz >= total)) )
             {
-                if (partialSumIsInt) {
-                    for( k = 0; k < cn; k++ )
+                ಯದಿ (partialSumIsInt) {
+                    ಪ್ರತಿ( k = 0; k < cn; k++ )
                     {
                         s[k] += sbuf[k];
                         sbuf[k] = 0;
                     }
-                } else {
-                    for( k = 0; k < cn; k++ )
+                } ಅನ್ಯಥಾ {
+                    ಪ್ರತಿ( k = 0; k < cn; k++ )
                     {
-                        s[k] += ((float*)sbuf)[k];
+                        s[k] += ((ಭಿನ್ನ*)sbuf)[k];
                         sbuf[k] = 0;
                     }
                 }
-                if( blockSqSum )
+                ಯದಿ( blockSqSum )
                 {
-                    for( k = 0; k < cn; k++ )
+                    ಪ್ರತಿ( k = 0; k < cn; k++ )
                     {
                         sq[k] += sqbuf[k];
                         sqbuf[k] = 0;
                     }
                 }
-                count = 0;
+                ಎಣಿಕೆ_2 = 0;
             }
             ptrs[0] += bsz*esz;
-            if( ptrs[1] )
+            ಯದಿ( ptrs[1] )
                 ptrs[1] += bsz;
         }
     }
 
-    double scale = nz0 ? 1./nz0 : 0.;
-    for( k = 0; k < cn; k++ )
+    ದ್ವಿಗುಣ scale = nz0 ? 1./nz0 : 0.;
+    ಪ್ರತಿ( k = 0; k < cn; k++ )
     {
         s[k] *= scale;
         sq[k] = std::sqrt(std::max(sq[k]*scale - s[k]*s[k], 0.));
     }
 
-    if (_mean.needed())
+    ಯದಿ (_mean.needed())
     {
-        const double* sptr = s;
-        double* dptr = mean_mat.ptr<double>();
-        for( k = 0; k < cn; k++ )
+        ಧ್ರುವ ದ್ವಿಗುಣ* sptr = s;
+        ದ್ವಿಗುಣ* dptr = mean_mat.ptr<ದ್ವಿಗುಣ>();
+        ಪ್ರತಿ( k = 0; k < cn; k++ )
             dptr[k] = sptr[k];
     }
 
-    if (_sdv.needed())
+    ಯದಿ (_sdv.needed())
     {
-        const double* sptr = sq;
-        double* dptr = stddev_mat.ptr<double>();
-        for( k = 0; k < cn; k++ )
+        ಧ್ರುವ ದ್ವಿಗುಣ* sptr = sq;
+        ದ್ವಿಗುಣ* dptr = stddev_mat.ptr<ದ್ವಿಗುಣ>();
+        ಪ್ರತಿ( k = 0; k < cn; k++ )
             dptr[k] = sptr[k];
     }
 }
 
-static void writeStatResult(OutputArray _dst, int cn, const Scalar& v)
+ಸ್ಥಿರ ಶೂನ್ಯ writeStatResult(OutputArray _dst, ಪೂರ್ಣಾಙ್ಕ cn, ಧ್ರುವ Scalar& v)
 {
-    if (!_dst.needed())
-        return;
-    if (!_dst.fixedSize())
-        _dst.create(cn, 1, CV_64F, -1, true);
+    ಯದಿ (!_dst.needed())
+        ಪ್ರತ್ಯಾಗಮ;
+    ಯದಿ (!_dst.fixedSize())
+        _dst.create(cn, 1, CV_64F, -1, ಸತ್ಯ);
     Mat d = _dst.getMat();
-    int dcn = (int)d.total();
+    ಪೂರ್ಣಾಙ್ಕ dcn = (ಪೂರ್ಣಾಙ್ಕ)d.total();
     CV_Assert( d.type() == CV_64F && d.isContinuous() && (d.cols == 1 || d.rows == 1) && dcn >= cn );
-    double* p = d.ptr<double>();
-    for (int k = 0; k < dcn; k++)
+    ದ್ವಿಗುಣ* p = d.ptr<ದ್ವಿಗುಣ>();
+    ಪ್ರತಿ (ಪೂರ್ಣಾಙ್ಕ k = 0; k < dcn; k++)
         p[k] = k < cn ? v[k] : 0;
 }
 
-void meanStdDev(InputArray _src, OutputArray _mean, OutputArray _sdv, InputArray _mask)
+ಶೂನ್ಯ meanStdDev(ಒಳಹರಿವು_Array _src, OutputArray _mean, OutputArray _sdv, ಒಳಹರಿವು_Array _mask)
 {
     CV_INSTRUMENT_REGION();
 
     std::vector<StatChunk> chunks;
-    if (!_src.isUMat() && !_src.empty())
+    ಯದಿ (!_src.isUMat() && !_src.empty())
     {
         Mat src = _src.getMat(), mask = _mask.getMat();
-        const int cn = src.channels();
-        const bool maskOk = mask.empty() || ((mask.type() == CV_8U || mask.type() == CV_8S || mask.type() == CV_Bool) &&
+        ಧ್ರುವ ಪೂರ್ಣಾಙ್ಕ cn = src.channels();
+        ಧ್ರುವ ತಾರ್ಕಿಕ maskOk = mask.empty() || ((mask.type() == CV_8U || mask.type() == CV_8S || mask.type() == CV_Bool) &&
                                              src.size == mask.size);
-        if (cn <= 4 && maskOk && splitForParallelStat(src, mask, chunks))
+        ಯದಿ (cn <= 4 && maskOk && splitForParallelStat(src, mask, chunks))
         {
-            const int n = (int)chunks.size();
+            ಧ್ರುವ ಪೂರ್ಣಾಙ್ಕ n = (ಪೂರ್ಣಾಙ್ಕ)chunks.size();
             std::vector<Scalar> m(n), sd(n);
-            std::vector<double> cnt(n);
-            parallel_for_(Range(0, n), [&](const Range& r)
+            std::vector<ದ್ವಿಗುಣ> cnt(n);
+            parallel_for_(Range(0, n), [&](ಧ್ರುವ Range& r)
             {
-                for (int i = r.start; i < r.end; i++)
+                ಪ್ರತಿ (ಪೂರ್ಣಾಙ್ಕ i = r.start; i < r.end; i++)
                 {
                     Mat mi, si;
                     meanStdDev_(chunks[i].src, mi, si, chunks[i].mask);
-                    for (int k = 0; k < cn; k++)
+                    ಪ್ರತಿ (ಪೂರ್ಣಾಙ್ಕ k = 0; k < cn; k++)
                     {
-                        m[i][k] = mi.at<double>(k);
-                        sd[i][k] = si.at<double>(k);
+                        m[i][k] = mi.at<ದ್ವಿಗುಣ>(k);
+                        sd[i][k] = si.at<ದ್ವಿಗುಣ>(k);
                     }
-                    cnt[i] = statCount(chunks[i]);
+                    cnt[i] = stat_ಎಣಿಕೆ(chunks[i]);
                 }
             });
             // combine the pieces: the variance is the mean of the piece variances plus the
             // variance of the piece means, both weighted by the piece sizes
-            double total = 0;
+            ದ್ವಿಗುಣ total = 0;
             Scalar M = Scalar::all(0.0), V = Scalar::all(0.0);
-            for (int i = 0; i < n; i++)
+            ಪ್ರತಿ (ಪೂರ್ಣಾಙ್ಕ i = 0; i < n; i++)
             {
                 M += m[i]*cnt[i];
                 total += cnt[i];
             }
-            if (total > 0)
+            ಯದಿ (total > 0)
                 M *= 1./total;
-            for (int i = 0; i < n; i++)
-                for (int k = 0; k < cn; k++)
+            ಪ್ರತಿ (ಪೂರ್ಣಾಙ್ಕ i = 0; i < n; i++)
+                ಪ್ರತಿ (ಪೂರ್ಣಾಙ್ಕ k = 0; k < cn; k++)
                 {
-                    double dm = m[i][k] - M[k];
+                    ದ್ವಿಗುಣ dm = m[i][k] - M[k];
                     V[k] += cnt[i]*(sd[i][k]*sd[i][k] + dm*dm);
                 }
             Scalar SD;
-            for (int k = 0; k < cn; k++)
+            ಪ್ರತಿ (ಪೂರ್ಣಾಙ್ಕ k = 0; k < cn; k++)
                 SD[k] = total > 0 ? std::sqrt(std::max(V[k]/total, 0.)) : 0;
             writeStatResult(_mean, cn, M);
             writeStatResult(_sdv, cn, SD);
-            return;
+            ಪ್ರತ್ಯಾಗಮ;
         }
     }
     meanStdDev_(_src, _mean, _sdv, _mask);

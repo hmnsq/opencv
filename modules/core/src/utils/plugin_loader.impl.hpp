@@ -6,72 +6,72 @@
 // Not a standalone header, part of filesystem.cpp
 //
 
-#include "opencv2/core/utils/plugin_loader.private.hpp"
+#ಅನ್ತರ್ಭಾವ "opencv2/core/utils/plugin_loader.private.hpp"
 
-#if !OPENCV_HAVE_FILESYSTEM_SUPPORT
+#ಯದಿ !OPENCV_HAVE_FILESYSTEM_SUPPORT
 #error "Invalid build configuration"
 #endif
 
-#if 0  // TODO
+#ಯದಿ 0  // TODO
 #ifdef NDEBUG
 #define CV_LOG_STRIP_LEVEL CV_LOG_LEVEL_DEBUG + 1
-#else
+#ಅನ್ಯಥಾ
 #define CV_LOG_STRIP_LEVEL CV_LOG_LEVEL_VERBOSE + 1
 #endif
-#include <opencv2/core/utils/logger.hpp>
+#ಅನ್ತರ್ಭಾವ <opencv2/core/utils/logger.hpp>
 #endif
 
-namespace cv { namespace plugin { namespace impl {
+ನಾಮಾಕಾಶ cv { ನಾಮಾಕಾಶ plugin { ನಾಮಾಕಾಶ impl {
 
-DynamicLib::DynamicLib(const FileSystemPath_t& filename)
-    : handle(0), fname(filename), disableAutoUnloading_(false)
+DynamicLib::DynamicLib(ಧ್ರುವ FileSystemPath_t& filename)
+    : handle(0), fname(filename), disableAutoUnloading_(ಅಸತ್ಯ)
 {
     libraryLoad(filename);
 }
 
 DynamicLib::~DynamicLib()
 {
-    if (!disableAutoUnloading_)
+    ಯದಿ (!disableAutoUnloading_)
     {
         libraryRelease();
     }
-    else if (handle)
+    ಅನ್ಯಥಾ ಯದಿ (handle)
     {
-        CV_LOG_INFO(NULL, "skip auto unloading (disabled): " << toPrintablePath(fname));
+        CV_LOG_INFO(ರಿಕ್ತ, "skip auto unloading (disabled): " << toPrintablePath(fname));
         handle = 0;
     }
 }
 
-void* DynamicLib::getSymbol(const char* symbolName) const
+ಶೂನ್ಯ* DynamicLib::get_ಚಿಹ್ನೆ(ಧ್ರುವ ವರ್ಣ* ಚಿಹ್ನೆ_Name) ಧ್ರುವ
 {
-    if (!handle)
+    ಯದಿ (!handle)
     {
-        return 0;
+        ಪ್ರತ್ಯಾಗಮ 0;
     }
-    void* res = getSymbol_(handle, symbolName);
-    if (!res)
+    ಶೂನ್ಯ* res = get_ಚಿಹ್ನೆ_2(handle, ಚಿಹ್ನೆ_Name);
+    ಯದಿ (!res)
     {
-        CV_LOG_DEBUG(NULL, "No symbol '" << symbolName << "' in " << toPrintablePath(fname));
+        CV_LOG_DEBUG(ರಿಕ್ತ, "No symbol '" << ಚಿಹ್ನೆ_Name << "' in " << toPrintablePath(fname));
     }
-    return res;
+    ಪ್ರತ್ಯಾಗಮ res;
 }
 
-std::string DynamicLib::getName() const
+std::string DynamicLib::getName() ಧ್ರುವ
 {
-    return toPrintablePath(fname);
+    ಪ್ರತ್ಯಾಗಮ toPrintablePath(fname);
 }
 
-void DynamicLib::libraryLoad(const FileSystemPath_t& filename)
+ಶೂನ್ಯ DynamicLib::libraryLoad(ಧ್ರುವ FileSystemPath_t& filename)
 {
     handle = libraryLoad_(filename);
-    CV_LOG_INFO(NULL, "load " << toPrintablePath(filename) << " => " << (handle ? "OK" : "FAILED"));
+    CV_LOG_INFO(ರಿಕ್ತ, "load " << toPrintablePath(filename) << " => " << (handle ? "OK" : "FAILED"));
 }
 
-void DynamicLib::libraryRelease()
+ಶೂನ್ಯ DynamicLib::libraryRelease()
 {
-    if (handle)
+    ಯದಿ (handle)
     {
-        CV_LOG_INFO(NULL, "unload "<< toPrintablePath(fname));
+        CV_LOG_INFO(ರಿಕ್ತ, "unload "<< toPrintablePath(fname));
         libraryRelease_(handle);
         handle = 0;
     }

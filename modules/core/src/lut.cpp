@@ -4,171 +4,171 @@
 // Copyright (C) 2026, Advanced Micro Devices, Inc., all rights reserved.
 
 
-#include "precomp.hpp"
-#include "opencl_kernels_core.hpp"
-#include "convert.hpp"
-#include <sys/types.h>
+#ಅನ್ತರ್ಭಾವ "precomp.hpp"
+#ಅನ್ತರ್ಭಾವ "opencl_kernels_core.hpp"
+#ಅನ್ತರ್ಭಾವ "convert.hpp"
+#ಅನ್ತರ್ಭಾವ <sys/types.h>
 
-namespace cv {
-void LUT8u_dispatch( const uchar* src, const uchar* lut, uchar* dst, int len, int cn, int lutcn );
-void LUT16u_dispatch( const uchar* src, const ushort* lut, ushort* dst, int len, int cn, int lutcn );
+ನಾಮಾಕಾಶ cv {
+ಶೂನ್ಯ LUT8u_dispatch( ಧ್ರುವ uchar* src, ಧ್ರುವ uchar* lut, uchar* dst, ಪೂರ್ಣಾಙ್ಕ len, ಪೂರ್ಣಾಙ್ಕ cn, ಪೂರ್ಣಾಙ್ಕ lutcn );
+ಶೂನ್ಯ LUT16u_dispatch( ಧ್ರುವ uchar* src, ಧ್ರುವ ushort* lut, ushort* dst, ಪೂರ್ಣಾಙ್ಕ len, ಪೂರ್ಣಾಙ್ಕ cn, ಪೂರ್ಣಾಙ್ಕ lutcn );
 } // namespace cv
 
 /****************************************************************************************\
 *                                    LUT Transform                                       *
 \****************************************************************************************/
 
-namespace cv
+ನಾಮಾಕಾಶ cv
 {
 
-template<typename Ti, typename T> static void
-LUT_( const void* _src, const void* _lut, void* _dst, int len, int cn, int lutcn )
+template<typename Ti, typename T> ಸ್ಥಿರ ಶೂನ್ಯ
+LUT_( ಧ್ರುವ ಶೂನ್ಯ* _src, ಧ್ರುವ ಶೂನ್ಯ* _lut, ಶೂನ್ಯ* _dst, ಪೂರ್ಣಾಙ್ಕ len, ಪೂರ್ಣಾಙ್ಕ cn, ಪೂರ್ಣಾಙ್ಕ lutcn )
 {
-    const Ti* src = (const Ti*)_src;
-    const T* lut = (const T*)_lut;
+    ಧ್ರುವ Ti* src = (ಧ್ರುವ Ti*)_src;
+    ಧ್ರುವ T* lut = (ಧ್ರುವ T*)_lut;
     T* dst = (T*)_dst;
-    if( lutcn == 1 )
+    ಯದಿ( lutcn == 1 )
     {
-        for( int i = 0; i < len*cn; i++ )
+        ಪ್ರತಿ( ಪೂರ್ಣಾಙ್ಕ i = 0; i < len*cn; i++ )
             dst[i] = lut[src[i]];
     }
-    else
+    ಅನ್ಯಥಾ
     {
-        for( int i = 0; i < len*cn; i += cn )
-            for( int k = 0; k < cn; k++ )
+        ಪ್ರತಿ( ಪೂರ್ಣಾಙ್ಕ i = 0; i < len*cn; i += cn )
+            ಪ್ರತಿ( ಪೂರ್ಣಾಙ್ಕ k = 0; k < cn; k++ )
                 dst[i+k] = lut[src[i+k]*cn+k];
     }
 }
 
-template<typename T, void (*fn)(const uchar*, const T*, T*, int, int, int)>
-static void lutDispatchWrap( const void* src, const void* lut, void* dst, int len, int cn, int lutcn )
+template<typename T, ಶೂನ್ಯ (*fn)(ಧ್ರುವ uchar*, ಧ್ರುವ T*, T*, ಪೂರ್ಣಾಙ್ಕ, ಪೂರ್ಣಾಙ್ಕ, ಪೂರ್ಣಾಙ್ಕ)>
+ಸ್ಥಿರ ಶೂನ್ಯ lutDispatchWrap( ಧ್ರುವ ಶೂನ್ಯ* src, ಧ್ರುವ ಶೂನ್ಯ* lut, ಶೂನ್ಯ* dst, ಪೂರ್ಣಾಙ್ಕ len, ಪೂರ್ಣಾಙ್ಕ cn, ಪೂರ್ಣಾಙ್ಕ lutcn )
 {
-    fn((const uchar*)src, (const T*)lut, (T*)dst, len, cn, lutcn);
+    fn((ಧ್ರುವ uchar*)src, (ಧ್ರುವ T*)lut, (T*)dst, len, cn, lutcn);
 }
 
-typedef void (*LUTFunc)( const void* src, const void* lut, void* dst, int len, int cn, int lutcn );
+ಪ್ರಕಾರನಿರ್ದೇಶ ಶೂನ್ಯ (*LUTFunc)( ಧ್ರುವ ಶೂನ್ಯ* src, ಧ್ರುವ ಶೂನ್ಯ* lut, ಶೂನ್ಯ* dst, ಪೂರ್ಣಾಙ್ಕ len, ಪೂರ್ಣಾಙ್ಕ cn, ಪೂರ್ಣಾಙ್ಕ lutcn );
 
-static LUTFunc getLUTFunc(const int srcDepth, const int dstDepth)
+ಸ್ಥಿರ LUTFunc getLUTFunc(ಧ್ರುವ ಪೂರ್ಣಾಙ್ಕ srcDepth, ಧ್ರುವ ಪೂರ್ಣಾಙ್ಕ dstDepth)
 {
     LUTFunc ret = nullptr;
-    if((srcDepth == CV_8U) || (srcDepth == CV_8S))
+    ಯದಿ((srcDepth == CV_8U) || (srcDepth == CV_8S))
     {
-        switch(dstDepth)
+        ವಿಕಲ್ಪ(dstDepth)
         {
-            case CV_8U:   ret = lutDispatchWrap<uchar, LUT8u_dispatch>;   break;
-            case CV_8S:   ret = LUT_<uint8_t, int8_t>;    break;
-            case CV_16U:  ret = lutDispatchWrap<ushort, LUT16u_dispatch>; break;
-            case CV_16S:  ret = LUT_<uint8_t, int16_t>;   break;
-            case CV_32S:  ret = LUT_<uint8_t, int32_t>;   break;
-            case CV_32F:  ret = LUT_<uint8_t, int32_t>;   break; // float
-            case CV_64F:  ret = LUT_<uint8_t, int64_t>;   break; // double
-            case CV_16F:  ret = LUT_<uint8_t, int16_t>;   break; // hfloat
-            case CV_16BF: ret = LUT_<uint8_t, int16_t>;   break; // bfloat
-            case CV_Bool: ret = LUT_<uint8_t, uint8_t>;   break; // bool
-            case CV_64U:  ret = LUT_<uint8_t, uint64_t>;  break;
-            case CV_64S:  ret = LUT_<uint8_t, int64_t>;   break;
-            case CV_32U:  ret = LUT_<uint8_t, uint32_t>;  break;
-            default:      ret = nullptr;                  break;
+            ಪಕ್ಷ CV_8U:   ret = lutDispatchWrap<uchar, LUT8u_dispatch>;   ಭಙ್ಗ;
+            ಪಕ್ಷ CV_8S:   ret = LUT_<uint8_t, int8_t>;    ಭಙ್ಗ;
+            ಪಕ್ಷ CV_16U:  ret = lutDispatchWrap<ushort, LUT16u_dispatch>; ಭಙ್ಗ;
+            ಪಕ್ಷ CV_16S:  ret = LUT_<uint8_t, int16_t>;   ಭಙ್ಗ;
+            ಪಕ್ಷ CV_32S:  ret = LUT_<uint8_t, int32_t>;   ಭಙ್ಗ;
+            ಪಕ್ಷ CV_32F:  ret = LUT_<uint8_t, int32_t>;   ಭಙ್ಗ; // float
+            ಪಕ್ಷ CV_64F:  ret = LUT_<uint8_t, int64_t>;   ಭಙ್ಗ; // double
+            ಪಕ್ಷ CV_16F:  ret = LUT_<uint8_t, int16_t>;   ಭಙ್ಗ; // hfloat
+            ಪಕ್ಷ CV_16BF: ret = LUT_<uint8_t, int16_t>;   ಭಙ್ಗ; // bfloat
+            ಪಕ್ಷ CV_Bool: ret = LUT_<uint8_t, uint8_t>;   ಭಙ್ಗ; // bool
+            ಪಕ್ಷ CV_64U:  ret = LUT_<uint8_t, uint64_t>;  ಭಙ್ಗ;
+            ಪಕ್ಷ CV_64S:  ret = LUT_<uint8_t, int64_t>;   ಭಙ್ಗ;
+            ಪಕ್ಷ CV_32U:  ret = LUT_<uint8_t, uint32_t>;  ಭಙ್ಗ;
+            ಸ್ವಭಾವ:      ret = nullptr;                  ಭಙ್ಗ;
         }
     }
-    else if((srcDepth == CV_16U) || (srcDepth == CV_16S))
+    ಅನ್ಯಥಾ ಯದಿ((srcDepth == CV_16U) || (srcDepth == CV_16S))
     {
-        switch(dstDepth)
+        ವಿಕಲ್ಪ(dstDepth)
         {
-            case CV_8U:   ret = LUT_<uint16_t, uint8_t>;  break;
-            case CV_8S:   ret = LUT_<uint16_t, int8_t>;   break;
-            case CV_16U:  ret = LUT_<uint16_t, uint16_t>; break;
-            case CV_16S:  ret = LUT_<uint16_t, int16_t>;  break;
-            case CV_32S:  ret = LUT_<uint16_t, int32_t>;  break;
-            case CV_32F:  ret = LUT_<uint16_t, int32_t>;  break; // float
-            case CV_64F:  ret = LUT_<uint16_t, int64_t>;  break; // double
-            case CV_16F:  ret = LUT_<uint16_t, int16_t>;  break; // hfloat
-            case CV_16BF: ret = LUT_<uint16_t, int16_t>;  break; // bfloat
-            case CV_Bool: ret = LUT_<uint16_t, uint8_t>;  break; // bool
-            case CV_64U:  ret = LUT_<uint16_t, uint64_t>; break;
-            case CV_64S:  ret = LUT_<uint16_t, int64_t>;  break;
-            case CV_32U:  ret = LUT_<uint16_t, uint32_t>; break;
-            default:      ret = nullptr;                  break;
+            ಪಕ್ಷ CV_8U:   ret = LUT_<uint16_t, uint8_t>;  ಭಙ್ಗ;
+            ಪಕ್ಷ CV_8S:   ret = LUT_<uint16_t, int8_t>;   ಭಙ್ಗ;
+            ಪಕ್ಷ CV_16U:  ret = LUT_<uint16_t, uint16_t>; ಭಙ್ಗ;
+            ಪಕ್ಷ CV_16S:  ret = LUT_<uint16_t, int16_t>;  ಭಙ್ಗ;
+            ಪಕ್ಷ CV_32S:  ret = LUT_<uint16_t, int32_t>;  ಭಙ್ಗ;
+            ಪಕ್ಷ CV_32F:  ret = LUT_<uint16_t, int32_t>;  ಭಙ್ಗ; // float
+            ಪಕ್ಷ CV_64F:  ret = LUT_<uint16_t, int64_t>;  ಭಙ್ಗ; // double
+            ಪಕ್ಷ CV_16F:  ret = LUT_<uint16_t, int16_t>;  ಭಙ್ಗ; // hfloat
+            ಪಕ್ಷ CV_16BF: ret = LUT_<uint16_t, int16_t>;  ಭಙ್ಗ; // bfloat
+            ಪಕ್ಷ CV_Bool: ret = LUT_<uint16_t, uint8_t>;  ಭಙ್ಗ; // bool
+            ಪಕ್ಷ CV_64U:  ret = LUT_<uint16_t, uint64_t>; ಭಙ್ಗ;
+            ಪಕ್ಷ CV_64S:  ret = LUT_<uint16_t, int64_t>;  ಭಙ್ಗ;
+            ಪಕ್ಷ CV_32U:  ret = LUT_<uint16_t, uint32_t>; ಭಙ್ಗ;
+            ಸ್ವಭಾವ:      ret = nullptr;                  ಭಙ್ಗ;
         }
     }
 
     CV_CheckTrue(ret != nullptr, "An unexpected type combination was specified.");
-    return ret;
+    ಪ್ರತ್ಯಾಗಮ ret;
 }
 
 #ifdef HAVE_OPENCL
 
-static bool ocl_LUT(InputArray _src, InputArray _lut, OutputArray _dst)
+ಸ್ಥಿರ ತಾರ್ಕಿಕ ocl_LUT(ಒಳಹರಿವು_Array _src, ಒಳಹರಿವು_Array _lut, OutputArray _dst)
 {
-    int lcn = _lut.channels(), dcn = _src.channels(), ddepth = _lut.depth();
+    ಪೂರ್ಣಾಙ್ಕ lcn = _lut.channels(), dcn = _src.channels(), ddepth = _lut.depth();
 
     UMat src = _src.getUMat(), lut = _lut.getUMat();
     _dst.createSameSize(src, CV_MAKETYPE(ddepth, dcn));
     UMat dst = _dst.getUMat();
-    int kercn = lcn == 1 ? std::min(4, ocl::predictOptimalVectorWidth(_src, _dst)) : dcn;
+    ಪೂರ್ಣಾಙ್ಕ kercn = lcn == 1 ? std::min(4, ocl::predictOptimalVectorWidth(_src, _dst)) : dcn;
 
     ocl::Kernel k("LUT", ocl::core::lut_oclsrc,
                   format("-D dcn=%d -D lcn=%d -D srcT=%s -D dstT=%s", kercn, lcn,
                          ocl::typeToStr(src.depth()), ocl::memopTypeToStr(ddepth)));
-    if (k.empty())
-        return false;
+    ಯದಿ (k.empty())
+        ಪ್ರತ್ಯಾಗಮ ಅಸತ್ಯ;
 
     k.args(ocl::KernelArg::ReadOnlyNoSize(src), ocl::KernelArg::ReadOnlyNoSize(lut),
         ocl::KernelArg::WriteOnly(dst, dcn, kercn));
 
     size_t globalSize[2] = { (size_t)dst.cols * dcn / kercn, ((size_t)dst.rows + 3) / 4 };
-    return k.run(2, globalSize, NULL, false);
+    ಪ್ರತ್ಯಾಗಮ k.run(2, globalSize, ರಿಕ್ತ, ಅಸತ್ಯ);
 }
 
 #endif
 
-class LUTParallelBody : public ParallelLoopBody
+ವರ್ಗ LUTParallelBody : ಸಾರ್ವಜನಿಕ ParallelLoopBody
 {
-public:
-    const Mat& src_;
-    const Mat& lut_;
+ಸಾರ್ವಜನಿಕ:
+    ಧ್ರುವ Mat& src_;
+    ಧ್ರುವ Mat& lut_;
     Mat& dst_;
 
     LUTFunc func_;
 
-    LUTParallelBody(const Mat& src, const Mat& lut, Mat& dst, LUTFunc func)
+    LUTParallelBody(ಧ್ರುವ Mat& src, ಧ್ರುವ Mat& lut, Mat& dst, LUTFunc func)
         : src_(src), lut_(lut), dst_(dst), func_(func)
     {
     }
 
-    void operator()( const cv::Range& range ) const CV_OVERRIDE
+    ಶೂನ್ಯ operator()( ಧ್ರುವ cv::Range& range ) ಧ್ರುವ CV_OVERRIDE
     {
-        const int row0 = range.start;
-        const int row1 = range.end;
+        ಧ್ರುವ ಪೂರ್ಣಾಙ್ಕ row0 = range.start;
+        ಧ್ರುವ ಪೂರ್ಣಾಙ್ಕ row1 = range.end;
 
         Mat src = src_.rowRange(row0, row1);
         Mat dst = dst_.rowRange(row0, row1);
 
-        int cn = src.channels();
-        int lutcn = lut_.channels();
+        ಪೂರ್ಣಾಙ್ಕ cn = src.channels();
+        ಪೂರ್ಣಾಙ್ಕ lutcn = lut_.channels();
 
-        const Mat* arrays[] = {&src, &dst, 0};
+        ಧ್ರುವ Mat* arrays[] = {&src, &dst, 0};
         uchar* ptrs[2] = {};
         NAryMatIterator it(arrays, ptrs);
-        int len = (int)it.size;
+        ಪೂರ್ಣಾಙ್ಕ len = (ಪೂರ್ಣಾಙ್ಕ)it.size;
 
-        for( size_t i = 0; i < it.nplanes; i++, ++it )
+        ಪ್ರತಿ( size_t i = 0; i < it.nplanes; i++, ++it )
             func_(ptrs[0], lut_.ptr(), ptrs[1], len, cn, lutcn);
     }
-private:
-    LUTParallelBody(const LUTParallelBody&);
-    LUTParallelBody& operator=(const LUTParallelBody&);
+ಗುಪ್ತ:
+    LUTParallelBody(ಧ್ರುವ LUTParallelBody&);
+    LUTParallelBody& operator=(ಧ್ರುವ LUTParallelBody&);
 };
 
 } // cv::
 
-void cv::LUT( InputArray _src, InputArray _lut, OutputArray _dst )
+ಶೂನ್ಯ cv::LUT( ಒಳಹರಿವು_Array _src, ಒಳಹರಿವು_Array _lut, OutputArray _dst )
 {
     CV_INSTRUMENT_REGION();
 
-    int cn = _src.channels(), depth = _src.depth();
-    int lutcn = _lut.channels();
-    const size_t lut_size = _lut.total();
+    ಪೂರ್ಣಾಙ್ಕ cn = _src.channels(), depth = _src.depth();
+    ಪೂರ್ಣಾಙ್ಕ lutcn = _lut.channels();
+    ಧ್ರುವ size_t lut_size = _lut.total();
 
     CV_Assert( (lutcn == cn || lutcn == 1) && _lut.isContinuous() &&
         (
@@ -184,37 +184,37 @@ void cv::LUT( InputArray _src, InputArray _lut, OutputArray _dst )
     _dst.createSameSize(_src, CV_MAKETYPE(_lut.depth(), cn));
     Mat dst = _dst.getMat();
 
-    if(lut_size == 256)
+    ಯದಿ(lut_size == 256)
     {
         CALL_HAL(LUT, cv_hal_lut, src.data, src.step, src.type(), lut.data,
                  lut.elemSize1(), lutcn, dst.data, dst.step, src.cols, src.rows);
     }
-    else
+    ಅನ್ಯಥಾ
     {
         CALL_HAL(LUT16, cv_hal_lut16, src.ptr<ushort>(), src.step, src.type(), lut.data,
                  lut.elemSize1(), lutcn, dst.data, dst.step, src.cols, src.rows);
     }
 
-    const LUTFunc func = getLUTFunc(src.depth(), dst.depth());
+    ಧ್ರುವ LUTFunc func = getLUTFunc(src.depth(), dst.depth());
     CV_Assert( func != nullptr );
 
-    if (_src.dims() <= 2)
+    ಯದಿ (_src.dims() <= 2)
     {
         LUTParallelBody body(src, lut, dst, func);
         Range all(0, dst.rows);
-        if (dst.total() >= (size_t)(1<<18))
-            parallel_for_(all, body, (double)std::max((size_t)1, dst.total()>>16));
-        else
+        ಯದಿ (dst.total() >= (size_t)(1<<18))
+            parallel_for_(all, body, (ದ್ವಿಗುಣ)std::max((size_t)1, dst.total()>>16));
+        ಅನ್ಯಥಾ
             body(all);
 
-        return;
+        ಪ್ರತ್ಯಾಗಮ;
     }
 
-    const Mat* arrays[] = {&src, &dst, 0};
+    ಧ್ರುವ Mat* arrays[] = {&src, &dst, 0};
     uchar* ptrs[2] = {};
     NAryMatIterator it(arrays, ptrs);
-    int len = (int)it.size;
+    ಪೂರ್ಣಾಙ್ಕ len = (ಪೂರ್ಣಾಙ್ಕ)it.size;
 
-    for( size_t i = 0; i < it.nplanes; i++, ++it )
+    ಪ್ರತಿ( size_t i = 0; i < it.nplanes; i++, ++it )
         func(ptrs[0], lut.ptr(), ptrs[1], len, cn, lutcn);
 }

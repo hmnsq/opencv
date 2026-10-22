@@ -6,80 +6,80 @@
 
 // Jonker-Volgenant rectangular assignment. See @cite Crouse2016 and @cite Jonker1987.
 
-#include "precomp.hpp"
+#ಅನ್ತರ್ಭಾವ "precomp.hpp"
 
-#include <algorithm>
-#include <limits>
+#ಅನ್ತರ್ಭಾವ <algorithm>
+#ಅನ್ತರ್ಭಾವ <limits>
 
-namespace cv {
+ನಾಮಾಕಾಶ cv {
 
 // cvIsNaN/cvIsInf inspect the bit pattern, so unlike std::isfinite they still work under
 // -ffast-math.
-static inline bool isFiniteVal(double x)
+ಸ್ಥಿರ ಅನ್ತಃಸ್ಥ ತಾರ್ಕಿಕ isFiniteVal(ದ್ವಿಗುಣ x)
 {
-    return !cvIsNaN(x) && !cvIsInf(x);
+    ಪ್ರತ್ಯಾಗಮ !cvIsNaN(x) && !cvIsInf(x);
 }
 
 // Type the duals and the running sums are kept in. double suits all three inputs: it holds every
 // int and float value exactly, so the integer path needs no arithmetic of its own.
-template <typename T> struct LapAccumulator { typedef double type; };
+template <typename T> ಸಂರಚನಾ LapAccumulator { ಪ್ರಕಾರನಿರ್ದೇಶ ದ್ವಿಗುಣ type; };
 
 // A cell is usable only if it is a real cost within the threshold. Check finiteness first:
 // NaN > costThreshold is false, so a bare comparison would let NaN through as allowed.
 template <typename T>
-static inline bool cellAllowed(T value, double costThreshold)
+ಸ್ಥಿರ ಅನ್ತಃಸ್ಥ ತಾರ್ಕಿಕ cellAllowed(T value, ದ್ವಿಗುಣ costThreshold)
 {
-    const double v = (double)value;
-    return isFiniteVal(v) && v <= costThreshold;
+    ಧ್ರುವ ದ್ವಿಗುಣ v = (ದ್ವಿಗುಣ)value;
+    ಪ್ರತ್ಯಾಗಮ isFiniteVal(v) && v <= costThreshold;
 }
 
 // Assigns every row to its own column at the lowest total. `work` is nrows x ncols, rows <= cols,
 // all finite. Each pass adds one row by a Dijkstra search over the reduced costs.
 template <typename Acc>
-static void solveJV(const std::vector<Acc>& work, int nrows, int ncols, std::vector<int>& colOfRow)
+ಸ್ಥಿರ ಶೂನ್ಯ solveJV(ಧ್ರುವ std::vector<Acc>& work, ಪೂರ್ಣಾಙ್ಕ nrows, ಪೂರ್ಣಾಙ್ಕ ncols, std::vector<ಪೂರ್ಣಾಙ್ಕ>& colOfRow)
 {
     CV_DbgAssert(nrows <= ncols);
 
     std::vector<Acc> u((size_t)nrows, Acc(0));
     std::vector<Acc> v((size_t)ncols, Acc(0));
     std::vector<Acc> dist((size_t)ncols);
-    std::vector<int> rowOfCol((size_t)ncols, -1);
-    std::vector<int> prevRow((size_t)ncols);
+    std::vector<ಪೂರ್ಣಾಙ್ಕ> rowOfCol((size_t)ncols, -1);
+    std::vector<ಪೂರ್ಣಾಙ್ಕ> prevRow((size_t)ncols);
     std::vector<uchar> labelled((size_t)ncols);
-    std::vector<int> remaining((size_t)ncols);   // columns not yet labelled, in no order
+    std::vector<ಪೂರ್ಣಾಙ್ಕ> remaining((size_t)ncols);   // columns not yet labelled, in no order
 
     colOfRow.assign((size_t)nrows, -1);
 
-    for (int freeRow = 0; freeRow < nrows; freeRow++)
+    ಪ್ರತಿ (ಪೂರ್ಣಾಙ್ಕ freeRow = 0; freeRow < nrows; freeRow++)
     {
         std::fill(dist.begin(), dist.end(), std::numeric_limits<Acc>::max());
         std::fill(labelled.begin(), labelled.end(), (uchar)0);
-        for (int j = 0; j < ncols; j++)
+        ಪ್ರತಿ (ಪೂರ್ಣಾಙ್ಕ j = 0; j < ncols; j++)
             remaining[j] = j;
-        int nremaining = ncols;
+        ಪೂರ್ಣಾಙ್ಕ nremaining = ncols;
 
-        int row = freeRow;      // row currently being expanded
+        ಪೂರ್ಣಾಙ್ಕ row = freeRow;      // row currently being expanded
         Acc delta = Acc(0);     // length of the shortest path found so far
-        int sink = -1;          // free column that ends the augmenting path
+        ಪೂರ್ಣಾಙ್ಕ sink = -1;          // free column that ends the augmenting path
 
-        while (sink < 0)
+        ಯಾವತ್ (sink < 0)
         {
-            const Acc* rowPtr = &work[(size_t)row * ncols];
-            const Acc urow = u[row];
+            ಧ್ರುವ Acc* rowPtr = &work[(size_t)row * ncols];
+            ಧ್ರುವ Acc urow = u[row];
             // One pass over the unlabelled columns relaxes them and picks the nearest. A settled
             // column is swapped off the tail so it is never read again.
-            int best = 0;
+            ಪೂರ್ಣಾಙ್ಕ best = 0;
             Acc bestDist = std::numeric_limits<Acc>::max();
-            for (int k = 0; k < nremaining; k++)
+            ಪ್ರತಿ (ಪೂರ್ಣಾಙ್ಕ k = 0; k < nremaining; k++)
             {
-                const int j = remaining[k];
-                const Acc cand = delta + rowPtr[j] - urow - v[j];
-                if (cand < dist[j])
+                ಧ್ರುವ ಪೂರ್ಣಾಙ್ಕ j = remaining[k];
+                ಧ್ರುವ Acc cand = delta + rowPtr[j] - urow - v[j];
+                ಯದಿ (cand < dist[j])
                 {
                     dist[j] = cand;
                     prevRow[j] = row;
                 }
-                if (dist[j] < bestDist)
+                ಯದಿ (dist[j] < bestDist)
                 {
                     bestDist = dist[j];
                     best = k;
@@ -89,39 +89,39 @@ static void solveJV(const std::vector<Acc>& work, int nrows, int ncols, std::vec
             // search can always reach it.
             CV_Assert(bestDist < std::numeric_limits<Acc>::max());
 
-            const int next = remaining[best];
+            ಧ್ರುವ ಪೂರ್ಣಾಙ್ಕ next = remaining[best];
             remaining[best] = remaining[--nremaining];
             labelled[next] = 1;    // still needed by the dual update below
             delta = bestDist;
 
-            if (rowOfCol[next] < 0)
+            ಯದಿ (rowOfCol[next] < 0)
                 sink = next;
-            else
+            ಅನ್ಯಥಾ
                 row = rowOfCol[next];   // occupied, so keep going through its row
         }
 
         // Shift the duals so the path edges land at zero without disturbing the matched pairs.
         // Must run before the matching below, which it reads.
         u[freeRow] += delta;
-        for (int j = 0; j < ncols; j++)
+        ಪ್ರತಿ (ಪೂರ್ಣಾಙ್ಕ j = 0; j < ncols; j++)
         {
-            if (labelled[j] && j != sink)
+            ಯದಿ (labelled[j] && j != sink)
             {
-                const Acc shift = delta - dist[j];
+                ಧ್ರುವ Acc shift = delta - dist[j];
                 v[j] -= shift;
                 u[rowOfCol[j]] += shift;
             }
         }
 
         // Walk the path back from the free column, flipping each edge.
-        for (int j = sink;;)
+        ಪ್ರತಿ (ಪೂರ್ಣಾಙ್ಕ j = sink;;)
         {
-            const int i = prevRow[j];
+            ಧ್ರುವ ಪೂರ್ಣಾಙ್ಕ i = prevRow[j];
             rowOfCol[j] = i;
-            const int jPrev = colOfRow[i];
+            ಧ್ರುವ ಪೂರ್ಣಾಙ್ಕ jPrev = colOfRow[i];
             colOfRow[i] = j;
-            if (i == freeRow)
-                break;
+            ಯದಿ (i == freeRow)
+                ಭಙ್ಗ;
             j = jPrev;
         }
     }
@@ -130,85 +130,85 @@ static void solveJV(const std::vector<Acc>& work, int nrows, int ncols, std::vec
 // Solves for one input type. `src` is read in its own type, so the padded working matrix is the
 // only copy made and no promoted duplicate of the input is allocated.
 template <typename T>
-static double solveTyped(const Mat& src, bool transposed, std::vector<int>& assignment,
-                         double costThreshold)
+ಸ್ಥಿರ ದ್ವಿಗುಣ solveTyped(ಧ್ರುವ Mat& src, ತಾರ್ಕಿಕ transposed, std::vector<ಪೂರ್ಣಾಙ್ಕ>& assignment,
+                         ದ್ವಿಗುಣ costThreshold)
 {
-    typedef typename LapAccumulator<T>::type Acc;
+    ಪ್ರಕಾರನಿರ್ದೇಶ typename LapAccumulator<T>::type Acc;
 
-    const int nrows = src.rows;
-    const int nreal = src.cols;
+    ಧ್ರುವ ಪೂರ್ಣಾಙ್ಕ nrows = src.rows;
+    ಧ್ರುವ ಪೂರ್ಣಾಙ್ಕ nreal = src.cols;
 
     Mat allowed(nrows, nreal, CV_8U);
     Acc absSum = Acc(0);
-    double maxCost = -std::numeric_limits<double>::max();
-    bool anyForbidden = false;
-    for (int i = 0; i < nrows; i++)
+    ದ್ವಿಗುಣ maxCost = -std::numeric_limits<ದ್ವಿಗುಣ>::max();
+    ತಾರ್ಕಿಕ anyForbidden = ಅಸತ್ಯ;
+    ಪ್ರತಿ (ಪೂರ್ಣಾಙ್ಕ i = 0; i < nrows; i++)
     {
-        const T* s = src.ptr<T>(i);
+        ಧ್ರುವ T* s = src.ptr<T>(i);
         uchar* a = allowed.ptr<uchar>(i);
-        for (int j = 0; j < nreal; j++)
+        ಪ್ರತಿ (ಪೂರ್ಣಾಙ್ಕ j = 0; j < nreal; j++)
         {
-            const bool ok = cellAllowed<T>(s[j], costThreshold);
+            ಧ್ರುವ ತಾರ್ಕಿಕ ok = cellAllowed<T>(s[j], costThreshold);
             a[j] = ok ? 1 : 0;
-            if (ok)
+            ಯದಿ (ok)
             {
-                absSum += (Acc)std::abs((double)s[j]);
-                maxCost = std::max(maxCost, (double)s[j]);
+                absSum += (Acc)std::abs((ದ್ವಿಗುಣ)s[j]);
+                maxCost = std::max(maxCost, (ದ್ವಿಗುಣ)s[j]);
             }
-            else
-                anyForbidden = true;
+            ಅನ್ಯಥಾ
+                anyForbidden = ಸತ್ಯ;
         }
     }
 
     // Price of leaving a row unmatched, clamped so the DBL_MAX default stays finite.
     // The 2 is required: k -> k+1 augments a path, so the delta is 2*absSum, not one edge.
     Acc dummy = Acc(2) * absSum + Acc(1);
-    if (costThreshold < (double)dummy)
+    ಯದಿ (costThreshold < (ದ್ವಿಗುಣ)dummy)
         dummy = (Acc)costThreshold;
-    CV_Assert(isFiniteVal((double)dummy));
+    CV_Assert(isFiniteVal((ದ್ವಿಗುಣ)dummy));
 
     // A forbidden cell only has to lose to a dummy, and every row has one. The margin scales
     // because adding 1 to a very large dummy changes nothing.
-    const Acc forbidden = dummy + (Acc)std::max(1.0, std::abs((double)dummy) * 1e-12);
-    CV_Assert(isFiniteVal((double)forbidden) && forbidden > dummy);
+    ಧ್ರುವ Acc forbidden = dummy + (Acc)std::max(1.0, std::abs((ದ್ವಿಗುಣ)dummy) * 1e-12);
+    CV_Assert(isFiniteVal((ದ್ವಿಗುಣ)forbidden) && forbidden > dummy);
 
     // Drop the dummy columns when no row can go unmatched: nothing forbidden, every cost below the
     // no-pair price. Halves the columns on square input; a cost equal to that price is a tie.
-    const int ndummy = (anyForbidden || !(maxCost < (double)dummy)) ? nrows : 0;
-    const int ncols = nreal + ndummy;
+    ಧ್ರುವ ಪೂರ್ಣಾಙ್ಕ ndummy = (anyForbidden || !(maxCost < (ದ್ವಿಗುಣ)dummy)) ? nrows : 0;
+    ಧ್ರುವ ಪೂರ್ಣಾಙ್ಕ ncols = nreal + ndummy;
 
     std::vector<Acc> work((size_t)nrows * ncols);
-    for (int i = 0; i < nrows; i++)
+    ಪ್ರತಿ (ಪೂರ್ಣಾಙ್ಕ i = 0; i < nrows; i++)
     {
-        const T* s = src.ptr<T>(i);
-        const uchar* a = allowed.ptr<uchar>(i);
+        ಧ್ರುವ T* s = src.ptr<T>(i);
+        ಧ್ರುವ uchar* a = allowed.ptr<uchar>(i);
         Acc* w = &work[(size_t)i * ncols];
-        for (int j = 0; j < nreal; j++)
+        ಪ್ರತಿ (ಪೂರ್ಣಾಙ್ಕ j = 0; j < nreal; j++)
             w[j] = a[j] ? (Acc)s[j] : forbidden;
-        for (int j = nreal; j < ncols; j++)
+        ಪ್ರತಿ (ಪೂರ್ಣಾಙ್ಕ j = nreal; j < ncols; j++)
             w[j] = dummy;
     }
 
-    std::vector<int> colOfRow;
+    std::vector<ಪೂರ್ಣಾಙ್ಕ> colOfRow;
     solveJV<Acc>(work, nrows, ncols, colOfRow);
 
-    double total = 0.0;
-    for (int i = 0; i < nrows; i++)
+    ದ್ವಿಗುಣ total = 0.0;
+    ಪ್ರತಿ (ಪೂರ್ಣಾಙ್ಕ i = 0; i < nrows; i++)
     {
-        const int j = colOfRow[i];
+        ಧ್ರುವ ಪೂರ್ಣಾಙ್ಕ j = colOfRow[i];
         CV_DbgAssert(j >= 0 && j < ncols);      // solveJV gives every row a column
-        if (j >= nreal || !allowed.at<uchar>(i, j))
-            continue;   // landed on a dummy column or a forbidden cell, so it stays unmatched
+        ಯದಿ (j >= nreal || !allowed.at<uchar>(i, j))
+            ಅನುವರ್ತ;   // landed on a dummy column or a forbidden cell, so it stays unmatched
 
-        total += (double)src.ptr<T>(i)[j];
-        const int row = transposed ? j : i;
+        total += (ದ್ವಿಗುಣ)src.ptr<T>(i)[j];
+        ಧ್ರುವ ಪೂರ್ಣಾಙ್ಕ row = transposed ? j : i;
         CV_DbgAssert(row >= 0 && (size_t)row < assignment.size());
         assignment[(size_t)row] = transposed ? i : j;
     }
-    return total;
+    ಪ್ರತ್ಯಾಗಮ total;
 }
 
-double linearAssignment(InputArray _cost, std::vector<int>& assignment, double costThreshold)
+ದ್ವಿಗುಣ linearAssignment(ಒಳಹರಿವು_Array _cost, std::vector<ಪೂರ್ಣಾಙ್ಕ>& assignment, ದ್ವಿಗುಣ costThreshold)
 {
     CV_INSTRUMENT_REGION();
 
@@ -225,19 +225,19 @@ double linearAssignment(InputArray _cost, std::vector<int>& assignment, double c
 
     // The solver assigns every row, so it needs rows <= cols. Transposing also makes A and its
     // transpose give the same answer, since min(M,N) is the same either way.
-    const bool transposed = cost.rows > cost.cols;
+    ಧ್ರುವ ತಾರ್ಕಿಕ transposed = cost.rows > cost.cols;
     Mat src;
-    if (transposed)
+    ಯದಿ (transposed)
         cv::transpose(cost, src);
-    else
+    ಅನ್ಯಥಾ
         src = cost;
 
-    switch (cost.depth())
+    ವಿಕಲ್ಪ (cost.depth())
     {
-    case CV_32F: return solveTyped<float>(src, transposed, assignment, costThreshold);
-    case CV_64F: return solveTyped<double>(src, transposed, assignment, costThreshold);
-    case CV_32S: return solveTyped<int>(src, transposed, assignment, costThreshold);
-    default:     CV_Error(Error::StsUnsupportedFormat, "unsupported cost matrix type");
+    ಪಕ್ಷ CV_32F: ಪ್ರತ್ಯಾಗಮ solveTyped<ಭಿನ್ನ>(src, transposed, assignment, costThreshold);
+    ಪಕ್ಷ CV_64F: ಪ್ರತ್ಯಾಗಮ solveTyped<ದ್ವಿಗುಣ>(src, transposed, assignment, costThreshold);
+    ಪಕ್ಷ CV_32S: ಪ್ರತ್ಯಾಗಮ solveTyped<ಪೂರ್ಣಾಙ್ಕ>(src, transposed, assignment, costThreshold);
+    ಸ್ವಭಾವ:     CV_Error(Error::StsUnsupportedFormat, "unsupported cost matrix type");
     }
 }
 

@@ -47,141 +47,141 @@
 //
 // */
 
-#include "precomp.hpp"
-#include "opencl_kernels_core.hpp"
+#ಅನ್ತರ್ಭಾವ "precomp.hpp"
+#ಅನ್ತರ್ಭಾವ "opencl_kernels_core.hpp"
 
-namespace cv
+ನಾಮಾಕಾಶ cv
 {
 
-template <typename T> static inline
-void scalarToRawData_(const Scalar& s, T * const buf, const int cn, const int unroll_to)
+template <typename T> ಸ್ಥಿರ ಅನ್ತಃಸ್ಥ
+ಶೂನ್ಯ scalarToRawData_(ಧ್ರುವ Scalar& s, T * ಧ್ರುವ buf, ಧ್ರುವ ಪೂರ್ಣಾಙ್ಕ cn, ಧ್ರುವ ಪೂರ್ಣಾಙ್ಕ unroll_to)
 {
-    int i = 0;
-    for(; i < cn; i++)
+    ಪೂರ್ಣಾಙ್ಕ i = 0;
+    ಪ್ರತಿ(; i < cn; i++)
         buf[i] = saturate_cast<T>(s.val[i]);
-    for(; i < unroll_to; i++)
+    ಪ್ರತಿ(; i < unroll_to; i++)
         buf[i] = buf[i-cn];
 }
 
-void scalarToRawData(const Scalar& s, void* _buf, int type, int unroll_to)
+ಶೂನ್ಯ scalarToRawData(ಧ್ರುವ Scalar& s, ಶೂನ್ಯ* _buf, ಪೂರ್ಣಾಙ್ಕ type, ಪೂರ್ಣಾಙ್ಕ unroll_to)
 {
     CV_INSTRUMENT_REGION();
 
-    const int depth = CV_MAT_DEPTH(type), cn = CV_MAT_CN(type);
+    ಧ್ರುವ ಪೂರ್ಣಾಙ್ಕ depth = CV_MAT_DEPTH(type), cn = CV_MAT_CN(type);
     CV_Assert(cn <= 4);
-    switch(depth)
+    ವಿಕಲ್ಪ(depth)
     {
-    case CV_8U:
+    ಪಕ್ಷ CV_8U:
         scalarToRawData_(s, (uchar*)_buf, cn, unroll_to);
-        break;
-    case CV_8S:
+        ಭಙ್ಗ;
+    ಪಕ್ಷ CV_8S:
         scalarToRawData_(s, (schar*)_buf, cn, unroll_to);
-        break;
-    case CV_Bool:
-        scalarToRawData_(s, (bool*)_buf, cn, unroll_to);
-        break;
-    case CV_16U:
+        ಭಙ್ಗ;
+    ಪಕ್ಷ CV_Bool:
+        scalarToRawData_(s, (ತಾರ್ಕಿಕ*)_buf, cn, unroll_to);
+        ಭಙ್ಗ;
+    ಪಕ್ಷ CV_16U:
         scalarToRawData_(s, (ushort*)_buf, cn, unroll_to);
-        break;
-    case CV_16S:
+        ಭಙ್ಗ;
+    ಪಕ್ಷ CV_16S:
         scalarToRawData_(s, (short*)_buf, cn, unroll_to);
-        break;
-    case CV_16F:
+        ಭಙ್ಗ;
+    ಪಕ್ಷ CV_16F:
         scalarToRawData_(s, (hfloat*)_buf, cn, unroll_to);
-        break;
-    case CV_16BF:
+        ಭಙ್ಗ;
+    ಪಕ್ಷ CV_16BF:
         scalarToRawData_(s, (bfloat*)_buf, cn, unroll_to);
-        break;
-    case CV_8F_E4M3FN:
+        ಭಙ್ಗ;
+    ಪಕ್ಷ CV_8F_E4M3FN:
         scalarToRawData_(s, (fp8_t*)_buf, cn, unroll_to);
-        break;
-    case CV_8F_E4M3FNUZ:
+        ಭಙ್ಗ;
+    ಪಕ್ಷ CV_8F_E4M3FNUZ:
         scalarToRawData_(s, (fp8a_t*)_buf, cn, unroll_to);
-        break;
-    case CV_32U:
+        ಭಙ್ಗ;
+    ಪಕ್ಷ CV_32U:
         scalarToRawData_(s, (unsigned*)_buf, cn, unroll_to);
-        break;
-    case CV_32S:
-        scalarToRawData_(s, (int*)_buf, cn, unroll_to);
-        break;
-    case CV_32F:
-        scalarToRawData_(s, (float*)_buf, cn, unroll_to);
-        break;
-    case CV_64U:
+        ಭಙ್ಗ;
+    ಪಕ್ಷ CV_32S:
+        scalarToRawData_(s, (ಪೂರ್ಣಾಙ್ಕ*)_buf, cn, unroll_to);
+        ಭಙ್ಗ;
+    ಪಕ್ಷ CV_32F:
+        scalarToRawData_(s, (ಭಿನ್ನ*)_buf, cn, unroll_to);
+        ಭಙ್ಗ;
+    ಪಕ್ಷ CV_64U:
         scalarToRawData_(s, (uint64_t*)_buf, cn, unroll_to);
-        break;
-    case CV_64S:
+        ಭಙ್ಗ;
+    ಪಕ್ಷ CV_64S:
         scalarToRawData_(s, (int64_t*)_buf, cn, unroll_to);
-        break;
-    case CV_64F:
-        scalarToRawData_(s, (double*)_buf, cn, unroll_to);
-        break;
-    default:
+        ಭಙ್ಗ;
+    ಪಕ್ಷ CV_64F:
+        scalarToRawData_(s, (ದ್ವಿಗುಣ*)_buf, cn, unroll_to);
+        ಭಙ್ಗ;
+    ಸ್ವಭಾವ:
         CV_Error(cv::Error::StsUnsupportedFormat,"");
     }
 }
 
-void convertAndUnrollScalar( const Mat& sc, int buftype, uchar* scbuf, size_t blocksize )
+ಶೂನ್ಯ convertAndUnrollScalar( ಧ್ರುವ Mat& sc, ಪೂರ್ಣಾಙ್ಕ buftype, uchar* scbuf, size_t blocksize )
 {
-    int scn = (int)sc.total(), cn = CV_MAT_CN(buftype);
+    ಪೂರ್ಣಾಙ್ಕ scn = (ಪೂರ್ಣಾಙ್ಕ)sc.total(), cn = CV_MAT_CN(buftype);
     size_t esz = CV_ELEM_SIZE(buftype);
-    BinaryFunc cvtFn = getConvertFunc(sc.depth(), buftype);
+    ದ್ವಿಮಾನ_Func cvtFn = getConvertFunc(sc.depth(), buftype);
     CV_Assert(cvtFn);
     cvtFn(sc.ptr(), 1, 0, 1, scbuf, 1, Size(std::min(cn, scn), 1), 0);
     // unroll the scalar
-    if( scn < cn )
+    ಯದಿ( scn < cn )
     {
         CV_Assert( scn == 1 );
         size_t esz1 = CV_ELEM_SIZE1(buftype);
-        for( size_t i = esz1; i < esz; i++ )
+        ಪ್ರತಿ( size_t i = esz1; i < esz; i++ )
             scbuf[i] = scbuf[i - esz1];
     }
-    for( size_t i = esz; i < blocksize*esz; i++ )
+    ಪ್ರತಿ( size_t i = esz; i < blocksize*esz; i++ )
         scbuf[i] = scbuf[i - esz];
 }
 
-template<typename T> static void
-copyMask_(const uchar* _src, size_t sstep, const uchar* mask, size_t mstep, uchar* _dst, size_t dstep, Size size)
+template<typename T> ಸ್ಥಿರ ಶೂನ್ಯ
+copyMask_(ಧ್ರುವ uchar* _src, size_t sstep, ಧ್ರುವ uchar* mask, size_t mstep, uchar* _dst, size_t dstep, Size size)
 {
-    for( ; size.height--; mask += mstep, _src += sstep, _dst += dstep )
+    ಪ್ರತಿ( ; size.height--; mask += mstep, _src += sstep, _dst += dstep )
     {
-        const T* src = (const T*)_src;
+        ಧ್ರುವ T* src = (ಧ್ರುವ T*)_src;
         T* dst = (T*)_dst;
-        int x = 0;
-         #if CV_ENABLE_UNROLLED
-        for( ; x <= size.width - 4; x += 4 )
+        ಪೂರ್ಣಾಙ್ಕ x = 0;
+         #ಯದಿ CV_ENABLE_UNROLLED
+        ಪ್ರತಿ( ; x <= size.width - 4; x += 4 )
         {
-            if( mask[x] )
+            ಯದಿ( mask[x] )
                 dst[x] = src[x];
-            if( mask[x+1] )
+            ಯದಿ( mask[x+1] )
                 dst[x+1] = src[x+1];
-            if( mask[x+2] )
+            ಯದಿ( mask[x+2] )
                 dst[x+2] = src[x+2];
-            if( mask[x+3] )
+            ಯದಿ( mask[x+3] )
                 dst[x+3] = src[x+3];
         }
         #endif
-        for( ; x < size.width; x++ )
-            if( mask[x] )
+        ಪ್ರತಿ( ; x < size.width; x++ )
+            ಯದಿ( mask[x] )
                 dst[x] = src[x];
     }
 }
 
-template<> void
-copyMask_<uchar>(const uchar* _src, size_t sstep, const uchar* mask, size_t mstep, uchar* _dst, size_t dstep, Size size)
+template<> ಶೂನ್ಯ
+copyMask_<uchar>(ಧ್ರುವ uchar* _src, size_t sstep, ಧ್ರುವ uchar* mask, size_t mstep, uchar* _dst, size_t dstep, Size size)
 {
-    CV_IPP_RUN_FAST(CV_INSTRUMENT_FUN_IPP(ippiCopy_8u_C1MR, _src, (int)sstep, _dst, (int)dstep, ippiSize(size), mask, (int)mstep) >= 0)
+    CV_IPP_RUN_FAST(CV_INSTRUMENT_FUN_IPP(ippiCopy_8u_C1MR, _src, (ಪೂರ್ಣಾಙ್ಕ)sstep, _dst, (ಪೂರ್ಣಾಙ್ಕ)dstep, ippiSize(size), mask, (ಪೂರ್ಣಾಙ್ಕ)mstep) >= 0)
 
-    for( ; size.height--; mask += mstep, _src += sstep, _dst += dstep )
+    ಪ್ರತಿ( ; size.height--; mask += mstep, _src += sstep, _dst += dstep )
     {
-        const uchar* src = (const uchar*)_src;
+        ಧ್ರುವ uchar* src = (ಧ್ರುವ uchar*)_src;
         uchar* dst = (uchar*)_dst;
-        int x = 0;
-        #if (CV_SIMD || CV_SIMD_SCALABLE)
+        ಪೂರ್ಣಾಙ್ಕ x = 0;
+        #ಯದಿ (CV_SIMD || CV_SIMD_SCALABLE)
         {
             v_uint8 v_zero = vx_setzero_u8();
 
-            for( ; x <= size.width - VTraits<v_uint8>::vlanes(); x += VTraits<v_uint8>::vlanes() )
+            ಪ್ರತಿ( ; x <= size.width - VTraits<v_uint8>::vlanes(); x += VTraits<v_uint8>::vlanes() )
             {
                 v_uint8 v_src   = vx_load(src  + x),
                         v_dst   = vx_load(dst  + x),
@@ -193,22 +193,22 @@ copyMask_<uchar>(const uchar* _src, size_t sstep, const uchar* mask, size_t mste
         }
         vx_cleanup();
         #endif
-        for( ; x < size.width; x++ )
-            if( mask[x] )
+        ಪ್ರತಿ( ; x < size.width; x++ )
+            ಯದಿ( mask[x] )
                 dst[x] = src[x];
     }
 }
 
-template<> void
-copyMask_<Vec3b>(const uchar* _src, size_t sstep, const uchar* mask, size_t mstep, uchar* _dst, size_t dstep, Size size)
+template<> ಶೂನ್ಯ
+copyMask_<Vec3b>(ಧ್ರುವ uchar* _src, size_t sstep, ಧ್ರುವ uchar* mask, size_t mstep, uchar* _dst, size_t dstep, Size size)
 {
-    for( ; size.height--; mask += mstep, _src += sstep, _dst += dstep )
+    ಪ್ರತಿ( ; size.height--; mask += mstep, _src += sstep, _dst += dstep )
     {
-        const uchar* src = (const uchar*)_src;
+        ಧ್ರುವ uchar* src = (ಧ್ರುವ uchar*)_src;
         uchar* dst = (uchar*)_dst;
-        int x = 0;
-#if (CV_SIMD || CV_SIMD_SCALABLE)
-        for( ; x <= size.width - VTraits<v_uint8>::vlanes(); x += VTraits<v_uint8>::vlanes() )
+        ಪೂರ್ಣಾಙ್ಕ x = 0;
+#ಯದಿ (CV_SIMD || CV_SIMD_SCALABLE)
+        ಪ್ರತಿ( ; x <= size.width - VTraits<v_uint8>::vlanes(); x += VTraits<v_uint8>::vlanes() )
         {
             v_uint8 v_nmask = v_eq(vx_load(mask + x), vx_setzero_u8());
 
@@ -225,8 +225,8 @@ copyMask_<Vec3b>(const uchar* _src, size_t sstep, const uchar* mask, size_t mste
         }
         vx_cleanup();
 #endif
-        for( ; x < size.width; x++ )
-            if( mask[x] ) {
+        ಪ್ರತಿ( ; x < size.width; x++ )
+            ಯದಿ( mask[x] ) {
                 dst[3 * x] = src[3 * x];
                 dst[3 * x + 1] = src[3 * x + 1];
                 dst[3 * x + 2] = src[3 * x + 2];
@@ -234,21 +234,21 @@ copyMask_<Vec3b>(const uchar* _src, size_t sstep, const uchar* mask, size_t mste
     }
 }
 
-template<> void
-copyMask_<ushort>(const uchar* _src, size_t sstep, const uchar* mask, size_t mstep, uchar* _dst, size_t dstep, Size size)
+template<> ಶೂನ್ಯ
+copyMask_<ushort>(ಧ್ರುವ uchar* _src, size_t sstep, ಧ್ರುವ uchar* mask, size_t mstep, uchar* _dst, size_t dstep, Size size)
 {
-    CV_IPP_RUN_FAST(CV_INSTRUMENT_FUN_IPP(ippiCopy_16u_C1MR, (const Ipp16u *)_src, (int)sstep, (Ipp16u *)_dst, (int)dstep, ippiSize(size), mask, (int)mstep) >= 0)
+    CV_IPP_RUN_FAST(CV_INSTRUMENT_FUN_IPP(ippiCopy_16u_C1MR, (ಧ್ರುವ Ipp16u *)_src, (ಪೂರ್ಣಾಙ್ಕ)sstep, (Ipp16u *)_dst, (ಪೂರ್ಣಾಙ್ಕ)dstep, ippiSize(size), mask, (ಪೂರ್ಣಾಙ್ಕ)mstep) >= 0)
 
-    for( ; size.height--; mask += mstep, _src += sstep, _dst += dstep )
+    ಪ್ರತಿ( ; size.height--; mask += mstep, _src += sstep, _dst += dstep )
     {
-        const ushort* src = (const ushort*)_src;
+        ಧ್ರುವ ushort* src = (ಧ್ರುವ ushort*)_src;
         ushort* dst = (ushort*)_dst;
-        int x = 0;
-        #if (CV_SIMD || CV_SIMD_SCALABLE)
+        ಪೂರ್ಣಾಙ್ಕ x = 0;
+        #ಯದಿ (CV_SIMD || CV_SIMD_SCALABLE)
         {
             v_uint8 v_zero = vx_setzero_u8();
 
-            for( ; x <= size.width - VTraits<v_uint8>::vlanes(); x += VTraits<v_uint8>::vlanes() )
+            ಪ್ರತಿ( ; x <= size.width - VTraits<v_uint8>::vlanes(); x += VTraits<v_uint8>::vlanes() )
             {
                 v_uint16 v_src1 = vx_load(src + x), v_src2 = vx_load(src + x + VTraits<v_uint16>::vlanes()),
                          v_dst1 = vx_load(dst + x), v_dst2 = vx_load(dst + x + VTraits<v_uint16>::vlanes());
@@ -265,22 +265,22 @@ copyMask_<ushort>(const uchar* _src, size_t sstep, const uchar* mask, size_t mst
         }
         vx_cleanup();
         #endif
-        for( ; x < size.width; x++ )
-            if( mask[x] )
+        ಪ್ರತಿ( ; x < size.width; x++ )
+            ಯದಿ( mask[x] )
                 dst[x] = src[x];
     }
 }
 
-template<> void
-copyMask_<Vec3s>(const uchar* _src, size_t sstep, const uchar* mask, size_t mstep, uchar* _dst, size_t dstep, Size size)
+template<> ಶೂನ್ಯ
+copyMask_<Vec3s>(ಧ್ರುವ uchar* _src, size_t sstep, ಧ್ರುವ uchar* mask, size_t mstep, uchar* _dst, size_t dstep, Size size)
 {
-    for( ; size.height--; mask += mstep, _src += sstep, _dst += dstep )
+    ಪ್ರತಿ( ; size.height--; mask += mstep, _src += sstep, _dst += dstep )
     {
-        const ushort* src = (const ushort*)_src;
+        ಧ್ರುವ ushort* src = (ಧ್ರುವ ushort*)_src;
         ushort* dst = (ushort*)_dst;
-        int x = 0;
-#if (CV_SIMD || CV_SIMD_SCALABLE)
-        for( ; x <= size.width - VTraits<v_uint8>::vlanes(); x += VTraits<v_uint8>::vlanes() )
+        ಪೂರ್ಣಾಙ್ಕ x = 0;
+#ಯದಿ (CV_SIMD || CV_SIMD_SCALABLE)
+        ಪ್ರತಿ( ; x <= size.width - VTraits<v_uint8>::vlanes(); x += VTraits<v_uint8>::vlanes() )
         {
             v_uint8 v_nmask = v_eq(vx_load(mask + x), vx_setzero_u8());
             v_uint8 v_nmask0, v_nmask1;
@@ -307,8 +307,8 @@ copyMask_<Vec3s>(const uchar* _src, size_t sstep, const uchar* mask, size_t mste
         }
         vx_cleanup();
 #endif
-        for( ; x < size.width; x++ )
-            if( mask[x] ) {
+        ಪ್ರತಿ( ; x < size.width; x++ )
+            ಯದಿ( mask[x] ) {
                 dst[3 * x] = src[3 * x];
                 dst[3 * x + 1] = src[3 * x + 1];
                 dst[3 * x + 2] = src[3 * x + 2];
@@ -316,16 +316,16 @@ copyMask_<Vec3s>(const uchar* _src, size_t sstep, const uchar* mask, size_t mste
     }
 }
 
-template<> void
-copyMask_<int>(const uchar* _src, size_t sstep, const uchar* mask, size_t mstep, uchar* _dst, size_t dstep, Size size)
+template<> ಶೂನ್ಯ
+copyMask_<ಪೂರ್ಣಾಙ್ಕ>(ಧ್ರುವ uchar* _src, size_t sstep, ಧ್ರುವ uchar* mask, size_t mstep, uchar* _dst, size_t dstep, Size size)
 {
-    for( ; size.height--; mask += mstep, _src += sstep, _dst += dstep )
+    ಪ್ರತಿ( ; size.height--; mask += mstep, _src += sstep, _dst += dstep )
     {
-        const int* src = (const int*)_src;
-        int* dst = (int*)_dst;
-        int x = 0;
-#if (CV_SIMD || CV_SIMD_SCALABLE)
-        for (; x <= size.width - VTraits<v_uint8>::vlanes(); x += VTraits<v_uint8>::vlanes())
+        ಧ್ರುವ ಪೂರ್ಣಾಙ್ಕ* src = (ಧ್ರುವ ಪೂರ್ಣಾಙ್ಕ*)_src;
+        ಪೂರ್ಣಾಙ್ಕ* dst = (ಪೂರ್ಣಾಙ್ಕ*)_dst;
+        ಪೂರ್ಣಾಙ್ಕ x = 0;
+#ಯದಿ (CV_SIMD || CV_SIMD_SCALABLE)
+        ಪ್ರತಿ (; x <= size.width - VTraits<v_uint8>::vlanes(); x += VTraits<v_uint8>::vlanes())
         {
             v_int32 v_src0 = vx_load(src + x), v_dst0 = vx_load(dst + x);
             v_int32 v_src1 = vx_load(src + x +     VTraits<v_int32>::vlanes()), v_dst1 = vx_load(dst + x +     VTraits<v_int32>::vlanes());
@@ -351,26 +351,26 @@ copyMask_<int>(const uchar* _src, size_t sstep, const uchar* mask, size_t mstep,
         }
         vx_cleanup();
 #endif
-        for (; x < size.width; x++)
-            if ( mask[x] )
+        ಪ್ರತಿ (; x < size.width; x++)
+            ಯದಿ ( mask[x] )
                 dst[x] = src[x];
     }
 }
 
-static void
-copyMaskGeneric(const uchar* _src, size_t sstep, const uchar* mask, size_t mstep, uchar* _dst, size_t dstep, Size size, void* _esz)
+ಸ್ಥಿರ ಶೂನ್ಯ
+copyMaskGeneric(ಧ್ರುವ uchar* _src, size_t sstep, ಧ್ರುವ uchar* mask, size_t mstep, uchar* _dst, size_t dstep, Size size, ಶೂನ್ಯ* _esz)
 {
     size_t k, esz = *(size_t*)_esz;
-    for( ; size.height--; mask += mstep, _src += sstep, _dst += dstep )
+    ಪ್ರತಿ( ; size.height--; mask += mstep, _src += sstep, _dst += dstep )
     {
-        const uchar* src = _src;
+        ಧ್ರುವ uchar* src = _src;
         uchar* dst = _dst;
-        int x = 0;
-        for( ; x < size.width; x++, src += esz, dst += esz )
+        ಪೂರ್ಣಾಙ್ಕ x = 0;
+        ಪ್ರತಿ( ; x < size.width; x++, src += esz, dst += esz )
         {
-            if( !mask[x] )
-                continue;
-            for( k = 0; k < esz; k++ )
+            ಯದಿ( !mask[x] )
+                ಅನುವರ್ತ;
+            ಪ್ರತಿ( k = 0; k < esz; k++ )
                 dst[k] = src[k];
         }
     }
@@ -378,46 +378,46 @@ copyMaskGeneric(const uchar* _src, size_t sstep, const uchar* mask, size_t mstep
 
 
 #define DEF_COPY_MASK(suffix, type) \
-static void copyMask##suffix(const uchar* src, size_t sstep, const uchar* mask, size_t mstep, \
-                             uchar* dst, size_t dstep, Size size, void*) \
+ಸ್ಥಿರ ಶೂನ್ಯ copyMask##suffix(ಧ್ರುವ uchar* src, size_t sstep, ಧ್ರುವ uchar* mask, size_t mstep, \
+                             uchar* dst, size_t dstep, Size size, ಶೂನ್ಯ*) \
 { \
     copyMask_<type>(src, sstep, mask, mstep, dst, dstep, size); \
 }
 
-#if defined HAVE_IPP
+#ಯದಿ defined HAVE_IPP
 #define DEF_COPY_MASK_F(suffix, type, ippfavor, ipptype) \
-static void copyMask##suffix(const uchar* src, size_t sstep, const uchar* mask, size_t mstep, \
-                             uchar* dst, size_t dstep, Size size, void*) \
+ಸ್ಥಿರ ಶೂನ್ಯ copyMask##suffix(ಧ್ರುವ uchar* src, size_t sstep, ಧ್ರುವ uchar* mask, size_t mstep, \
+                             uchar* dst, size_t dstep, Size size, ಶೂನ್ಯ*) \
 { \
-    CV_IPP_RUN_FAST(CV_INSTRUMENT_FUN_IPP(ippiCopy_##ippfavor, (const ipptype *)src, (int)sstep, (ipptype *)dst, (int)dstep, ippiSize(size), (const Ipp8u *)mask, (int)mstep) >= 0)\
+    CV_IPP_RUN_FAST(CV_INSTRUMENT_FUN_IPP(ippiCopy_##ippfavor, (ಧ್ರುವ ipptype *)src, (ಪೂರ್ಣಾಙ್ಕ)sstep, (ipptype *)dst, (ಪೂರ್ಣಾಙ್ಕ)dstep, ippiSize(size), (ಧ್ರುವ Ipp8u *)mask, (ಪೂರ್ಣಾಙ್ಕ)mstep) >= 0)\
     copyMask_<type>(src, sstep, mask, mstep, dst, dstep, size); \
 }
-#else
+#ಅನ್ಯಥಾ
 #define DEF_COPY_MASK_F(suffix, type, ippfavor, ipptype) \
-static void copyMask##suffix(const uchar* src, size_t sstep, const uchar* mask, size_t mstep, \
-                             uchar* dst, size_t dstep, Size size, void*) \
+ಸ್ಥಿರ ಶೂನ್ಯ copyMask##suffix(ಧ್ರುವ uchar* src, size_t sstep, ಧ್ರುವ uchar* mask, size_t mstep, \
+                             uchar* dst, size_t dstep, Size size, ಶೂನ್ಯ*) \
 { \
     copyMask_<type>(src, sstep, mask, mstep, dst, dstep, size); \
 }
 #endif
 
-#if IPP_VERSION_X100 == 901 // bug in IPP 9.0.1
+#ಯದಿ IPP_VERSION_X100 == 901 // bug in IPP 9.0.1
 DEF_COPY_MASK(32sC3, Vec3i)
 DEF_COPY_MASK(8uC3, Vec3b)
-#else
+#ಅನ್ಯಥಾ
 DEF_COPY_MASK_F(8uC3, Vec3b, 8u_C3MR, Ipp8u)
 DEF_COPY_MASK_F(32sC3, Vec3i, 32s_C3MR, Ipp32s)
 #endif
 DEF_COPY_MASK(8u, uchar)
 DEF_COPY_MASK(16u, ushort)
-DEF_COPY_MASK_F(32s, int, 32s_C1MR, Ipp32s)
+DEF_COPY_MASK_F(32s, ಪೂರ್ಣಾಙ್ಕ, 32s_C1MR, Ipp32s)
 DEF_COPY_MASK_F(16uC3, Vec3s, 16u_C3MR, Ipp16u)
 DEF_COPY_MASK(32sC2, Vec2i)
 DEF_COPY_MASK_F(32sC4, Vec4i, 32s_C4MR, Ipp32s)
 DEF_COPY_MASK(32sC6, Vec6i)
 DEF_COPY_MASK(32sC8, Vec8i)
 
-BinaryFunc copyMaskTab[] =
+ದ್ವಿಮಾನ_Func copyMaskTab[] =
 {
     0,
     copyMask8u,
@@ -438,162 +438,162 @@ BinaryFunc copyMaskTab[] =
     copyMask32sC8
 };
 
-BinaryFunc getCopyMaskFunc(size_t esz)
+ದ್ವಿಮಾನ_Func getCopyMaskFunc(size_t esz)
 {
-    return esz <= 32 && copyMaskTab[esz] ? copyMaskTab[esz] : copyMaskGeneric;
+    ಪ್ರತ್ಯಾಗಮ esz <= 32 && copyMaskTab[esz] ? copyMaskTab[esz] : copyMaskGeneric;
 }
 
 /* dst = src */
-void Mat::copyTo( OutputArray _dst ) const
+ಶೂನ್ಯ Mat::copyTo( OutputArray _dst ) ಧ್ರುವ
 {
     CV_INSTRUMENT_REGION();
 
 #ifdef HAVE_CUDA
-    if (_dst.isGpuMat())
+    ಯದಿ (_dst.isGpuMat())
     {
-        _dst.getGpuMat().upload(*this);
-        return;
+        _dst.getGpuMat().upload(*ಏತತ್);
+        ಪ್ರತ್ಯಾಗಮ;
     }
 #endif
 
-    int stype = type();
-    int dtype = _dst.type();
-    if( _dst.fixedType() && dtype != stype )
+    ಪೂರ್ಣಾಙ್ಕ stype = type();
+    ಪೂರ್ಣಾಙ್ಕ dtype = _dst.type();
+    ಯದಿ( _dst.fixedType() && dtype != stype )
     {
         CV_Assert( CV_MAT_CN(stype) == CV_MAT_CN(dtype) );
         convertTo( _dst, dtype );
-        return;
+        ಪ್ರತ್ಯಾಗಮ;
     }
 
-    if( dims == 0 && empty() )
+    ಯದಿ( dims == 0 && empty() )
     {
         _dst.release();
-        void* obj = _dst.getObj();
-        if (_dst.isMat())
+        ಶೂನ್ಯ* obj = _dst.getObj();
+        ಯದಿ (_dst.isMat())
             reinterpret_cast<Mat*>(obj)->flags = Mat::MAGIC_VAL | Mat::CONTINUOUS_FLAG | stype;
-        else if (_dst.isUMat())
+        ಅನ್ಯಥಾ ಯದಿ (_dst.isUMat())
             reinterpret_cast<UMat*>(obj)->flags = UMat::MAGIC_VAL | UMat::CONTINUOUS_FLAG | stype;
-        else if (_dst.isGpuMat())
+        ಅನ್ಯಥಾ ಯದಿ (_dst.isGpuMat())
             reinterpret_cast<cuda::GpuMat*>(obj)->flags = stype;
-        return;
+        ಪ್ರತ್ಯಾಗಮ;
     }
 
-    bool allowTransposed = dims == 1 ||
-        _dst.kind() == _InputArray::STD_VECTOR ||
+    ತಾರ್ಕಿಕ allowTransposed = dims == 1 ||
+        _dst.kind() == ಒಳಹರಿವು_Array_2::STD_VECTOR ||
         (_dst.fixedSize() && _dst.dims() == 1);
-    if( _dst.isUMat() )
+    ಯದಿ( _dst.isUMat() )
     {
         _dst.create( dims, size.p, stype, -1, allowTransposed );
-        if (empty())
-            return;
+        ಯದಿ (empty())
+            ಪ್ರತ್ಯಾಗಮ;
         UMat dst = _dst.getUMat();
-        CV_Assert(dst.u != NULL);
+        CV_Assert(dst.u != ರಿಕ್ತ);
         size_t i, sz[CV_MAX_DIM] = {1}, dstofs[CV_MAX_DIM] = {0}, esz = CV_ELEM_SIZE(stype);
         CV_Assert(dims >= 0 && dims < CV_MAX_DIM);
-        for( i = 0; i < (size_t)dims; i++ )
+        ಪ್ರತಿ( i = 0; i < (size_t)dims; i++ )
             sz[i] = size.p[i];
-        int lastdim = dims >= 1 ? dims-1 : 0;
+        ಪೂರ್ಣಾಙ್ಕ lastdim = dims >= 1 ? dims-1 : 0;
         sz[lastdim] *= esz;
         dst.ndoffset(dstofs);
         dstofs[lastdim] *= esz;
         dst.u->currAllocator->upload(dst.u, data, std::max(dims, 1), sz, dstofs, dst.step.p, step.p);
-        return;
+        ಪ್ರತ್ಯಾಗಮ;
     }
 
-    if( dims <= 2 )
+    ಯದಿ( dims <= 2 )
     {
         _dst.create( dims, size.p, stype, -1, allowTransposed );
         Mat dst = _dst.getMat();
-        if( data == dst.data )
-            return;
+        ಯದಿ( data == dst.data )
+            ಪ್ರತ್ಯಾಗಮ;
 
-        if( rows > 0 && cols > 0 )
+        ಯದಿ( rows > 0 && cols > 0 )
         {
-            Mat src = *this;
-            Size sz = getContinuousSize2D(src, dst, (int)elemSize());
+            Mat src = *ಏತತ್;
+            Size sz = getContinuousSize2D(src, dst, (ಪೂರ್ಣಾಙ್ಕ)elemSize());
             CV_CheckGE(sz.width, 0, "");
 
-            const uchar* sptr = src.data;
+            ಧ್ರುವ uchar* sptr = src.data;
             uchar* dptr = dst.data;
 
-#if IPP_VERSION_X100 >= 201700
-            CV_IPP_RUN_FAST(CV_INSTRUMENT_FUN_IPP(ippiCopy_8u_C1R_L, sptr, (int)src.step, dptr, (int)dst.step, ippiSizeL(sz.width, sz.height)) >= 0)
+#ಯದಿ IPP_VERSION_X100 >= 201700
+            CV_IPP_RUN_FAST(CV_INSTRUMENT_FUN_IPP(ippiCopy_8u_C1R_L, sptr, (ಪೂರ್ಣಾಙ್ಕ)src.step, dptr, (ಪೂರ್ಣಾಙ್ಕ)dst.step, ippiSizeL(sz.width, sz.height)) >= 0)
 #endif
 
-            for (; sz.height--; sptr += src.step, dptr += dst.step)
+            ಪ್ರತಿ (; sz.height--; sptr += src.step, dptr += dst.step)
                 memcpy(dptr, sptr, sz.width);
         }
-        return;
+        ಪ್ರತ್ಯಾಗಮ;
     }
 
     _dst.create( size, stype );
     Mat dst = _dst.getMat();
-    if( data == dst.data )
-        return;
+    ಯದಿ( data == dst.data )
+        ಪ್ರತ್ಯಾಗಮ;
 
-    if( total() != 0 )
+    ಯದಿ( total() != 0 )
     {
-        const Mat* arrays[] = { this, &dst };
+        ಧ್ರುವ Mat* arrays[] = { ಏತತ್, &dst };
         uchar* ptrs[2] = {};
         NAryMatIterator it(arrays, ptrs, 2);
         size_t sz = it.size*elemSize();
 
-        for( size_t i = 0; i < it.nplanes; i++, ++it )
+        ಪ್ರತಿ( size_t i = 0; i < it.nplanes; i++, ++it )
             memcpy(ptrs[1], ptrs[0], sz);
     }
 }
 
 #ifdef HAVE_IPP
-static bool ipp_copyTo(const Mat &src, Mat &dst, const Mat &mask)
+ಸ್ಥಿರ ತಾರ್ಕಿಕ ipp_copyTo(ಧ್ರುವ Mat &src, Mat &dst, ಧ್ರುವ Mat &mask)
 {
 #ifdef HAVE_IPP_IW_LL
     CV_INSTRUMENT_REGION_IPP();
 
-    if(mask.channels() > 1 || mask.depth() != CV_8U)
-        return false;
+    ಯದಿ(mask.channels() > 1 || mask.depth() != CV_8U)
+        ಪ್ರತ್ಯಾಗಮ ಅಸತ್ಯ;
 
-    if (src.dims <= 2)
+    ಯದಿ (src.dims <= 2)
     {
         IppiSize size = ippiSize(src.size());
-        return CV_INSTRUMENT_FUN_IPP(llwiCopyMask, src.ptr(), (int)src.step, dst.ptr(), (int)dst.step, size, (int)src.elemSize1(), src.channels(), mask.ptr(), (int)mask.step) >= 0;
+        ಪ್ರತ್ಯಾಗಮ CV_INSTRUMENT_FUN_IPP(llwiCopyMask, src.ptr(), (ಪೂರ್ಣಾಙ್ಕ)src.step, dst.ptr(), (ಪೂರ್ಣಾಙ್ಕ)dst.step, size, (ಪೂರ್ಣಾಙ್ಕ)src.elemSize1(), src.channels(), mask.ptr(), (ಪೂರ್ಣಾಙ್ಕ)mask.step) >= 0;
     }
-    else
+    ಅನ್ಯಥಾ
     {
-        const Mat      *arrays[] = {&src, &dst, &mask, NULL};
-        uchar          *ptrs[3]  = {NULL};
+        ಧ್ರುವ Mat      *arrays[] = {&src, &dst, &mask, ರಿಕ್ತ};
+        uchar          *ptrs[3]  = {ರಿಕ್ತ};
         NAryMatIterator it(arrays, ptrs);
 
         IppiSize size = ippiSize(it.size, 1);
 
-        for (size_t i = 0; i < it.nplanes; i++, ++it)
+        ಪ್ರತಿ (size_t i = 0; i < it.nplanes; i++, ++it)
         {
-            if(CV_INSTRUMENT_FUN_IPP(llwiCopyMask, ptrs[0], 0, ptrs[1], 0, size, (int)src.elemSize1(), src.channels(), ptrs[2], 0) < 0)
-                return false;
+            ಯದಿ(CV_INSTRUMENT_FUN_IPP(llwiCopyMask, ptrs[0], 0, ptrs[1], 0, size, (ಪೂರ್ಣಾಙ್ಕ)src.elemSize1(), src.channels(), ptrs[2], 0) < 0)
+                ಪ್ರತ್ಯಾಗಮ ಅಸತ್ಯ;
         }
-        return true;
+        ಪ್ರತ್ಯಾಗಮ ಸತ್ಯ;
     }
-#else
+#ಅನ್ಯಥಾ
     CV_UNUSED(src); CV_UNUSED(dst); CV_UNUSED(mask);
-    return false;
+    ಪ್ರತ್ಯಾಗಮ ಅಸತ್ಯ;
 #endif
 }
 #endif
 
-void Mat::copyTo( OutputArray _dst, InputArray _mask ) const
+ಶೂನ್ಯ Mat::copyTo( OutputArray _dst, ಒಳಹರಿವು_Array _mask ) ಧ್ರುವ
 {
     CV_INSTRUMENT_REGION();
 
     Mat mask = _mask.getMat();
-    if( !mask.data )
+    ಯದಿ( !mask.data )
     {
         copyTo(_dst);
-        return;
+        ಪ್ರತ್ಯಾಗಮ;
     }
 
-    int cn = channels(), mcn = mask.channels();
+    ಪೂರ್ಣಾಙ್ಕ cn = channels(), mcn = mask.channels();
     CV_Assert( (mask.depth() == CV_8U || mask.depth() == CV_8S || mask.depth() == CV_Bool) && (mcn == 1 || mcn == cn) );
-    bool colorMask = mcn > 1;
-    if( dims <= 2 )
+    ತಾರ್ಕಿಕ colorMask = mcn > 1;
+    ಯದಿ( dims <= 2 )
     {
         CV_Assert( size() == mask.size() );
     }
@@ -604,7 +604,7 @@ void Mat::copyTo( OutputArray _dst, InputArray _mask ) const
         _dst.create(size, type()); // TODO Prohibit 'dst' re-creation, user should pass it explicitly with correct size/type or empty
         dst = _dst.getMat();
 
-        if (dst.data != dst0.data) // re-allocation happened
+        ಯದಿ (dst.data != dst0.data) // re-allocation happened
         {
 #ifdef OPENCV_FUTURE
             CV_Assert(dst0.empty() &&
@@ -614,42 +614,42 @@ void Mat::copyTo( OutputArray _dst, InputArray _mask ) const
         }
     }
 
-    CV_IPP_RUN_FAST(ipp_copyTo(*this, dst, mask))
-    if ( this->dims <= 2 ) {
-        if ( this->size() == dst.size() && this->size() == dst.size() ) {
-            CALL_HAL(copyToMask, cv_hal_copyToMasked, this->data, this->step, dst.data, dst.step, this->cols, this->rows, this->type(), mask.data, mask.step, mask.type());
+    CV_IPP_RUN_FAST(ipp_copyTo(*ಏತತ್, dst, mask))
+    ಯದಿ ( ಏತತ್->dims <= 2 ) {
+        ಯದಿ ( ಏತತ್->size() == dst.size() && ಏತತ್->size() == dst.size() ) {
+            CALL_HAL(copyToMask, cv_hal_copyToMasked, ಏತತ್->data, ಏತತ್->step, dst.data, dst.step, ಏತತ್->cols, ಏತತ್->rows, ಏತತ್->type(), mask.data, mask.step, mask.type());
         }
     }
-    else if ( this->isContinuous() && dst.isContinuous() && mask.isContinuous() )
+    ಅನ್ಯಥಾ ಯದಿ ( ಏತತ್->isContinuous() && dst.isContinuous() && mask.isContinuous() )
     {
-        size_t sz = this->total();
-        if (sz < INT_MAX) {
-            CALL_HAL(copyToMask, cv_hal_copyToMasked, this->data, 0, dst.data, 0, (int)sz, 1, this->type(), mask.data, 0, mask.type());
+        size_t sz = ಏತತ್->total();
+        ಯದಿ (sz < INT_MAX) {
+            CALL_HAL(copyToMask, cv_hal_copyToMasked, ಏತತ್->data, 0, dst.data, 0, (ಪೂರ್ಣಾಙ್ಕ)sz, 1, ಏತತ್->type(), mask.data, 0, mask.type());
         }
     }
 
     size_t esz = colorMask ? elemSize1() : elemSize();
-    BinaryFunc copymask = getCopyMaskFunc(esz);
+    ದ್ವಿಮಾನ_Func copymask = getCopyMaskFunc(esz);
 
-    if( dims <= 2 )
+    ಯದಿ( dims <= 2 )
     {
-        Mat src = *this;
+        Mat src = *ಏತತ್;
         Size sz = getContinuousSize2D(src, dst, mask, mcn);
         copymask(src.data, src.step, mask.data, mask.step, dst.data, dst.step, sz, &esz);
-        return;
+        ಪ್ರತ್ಯಾಗಮ;
     }
 
-    const Mat* arrays[] = { this, &dst, &mask, 0 };
+    ಧ್ರುವ Mat* arrays[] = { ಏತತ್, &dst, &mask, 0 };
     uchar* ptrs[3] = {};
     NAryMatIterator it(arrays, ptrs);
-    Size sz((int)(it.size*mcn), 1);
+    Size sz((ಪೂರ್ಣಾಙ್ಕ)(it.size*mcn), 1);
 
-    for( size_t i = 0; i < it.nplanes; i++, ++it )
+    ಪ್ರತಿ( size_t i = 0; i < it.nplanes; i++, ++it )
         copymask(ptrs[0], 0, ptrs[2], 0, ptrs[1], 0, sz, &esz);
 }
 
 /* dst = src */
-void Mat::copyAt( OutputArray _dst ) const
+ಶೂನ್ಯ Mat::copyAt( OutputArray _dst ) ಧ್ರುವ
 {
     CV_INSTRUMENT_REGION();
 
@@ -659,7 +659,7 @@ void Mat::copyAt( OutputArray _dst ) const
     CV_CheckEQ(size(), dst.size(), "Make the size of dst the same as src");
     copyTo(_dst);
 }
-void Mat::copyAt( OutputArray _dst, InputArray _mask ) const
+ಶೂನ್ಯ Mat::copyAt( OutputArray _dst, ಒಳಹರಿವು_Array _mask ) ಧ್ರುವ
 {
     CV_INSTRUMENT_REGION();
 
@@ -671,184 +671,184 @@ void Mat::copyAt( OutputArray _dst, InputArray _mask ) const
 }
 
 
-static bool can_apply_memset(const Mat &mat, const Scalar &s, int &fill_value)
+ಸ್ಥಿರ ತಾರ್ಕಿಕ can_apply_memset(ಧ್ರುವ Mat &mat, ಧ್ರುವ Scalar &s, ಪೂರ್ಣಾಙ್ಕ &fill_ಮೌಲ್ಯ)
 {
     // check if depth is 1 byte.
-    switch (mat.depth())
+    ವಿಕಲ್ಪ (mat.depth())
     {
-    case CV_8U: fill_value = saturate_cast<uchar>( s.val[0] ); break;
-    case CV_8S: fill_value = saturate_cast<schar>( s.val[0] ); break;
-    default: return false;
+    ಪಕ್ಷ CV_8U: fill_ಮೌಲ್ಯ = saturate_cast<uchar>( s.val[0] ); ಭಙ್ಗ;
+    ಪಕ್ಷ CV_8S: fill_ಮೌಲ್ಯ = saturate_cast<schar>( s.val[0] ); ಭಙ್ಗ;
+    ಸ್ವಭಾವ: ಪ್ರತ್ಯಾಗಮ ಅಸತ್ಯ;
     }
 
     // check if all element is same.
-    const int64* is = (const int64*)&s.val[0];
-    switch (mat.channels())
+    ಧ್ರುವ int64* is = (ಧ್ರುವ int64*)&s.val[0];
+    ವಿಕಲ್ಪ (mat.channels())
     {
-    case 1: return true;
-    case 2: return (is[0] == is[1]);
-    case 3: return (is[0] == is[1] && is[1] == is[2]);
-    case 4: return (is[0] == is[1] && is[1] == is[2] && is[2] == is[3]);
-    default: return false;
+    ಪಕ್ಷ 1: ಪ್ರತ್ಯಾಗಮ ಸತ್ಯ;
+    ಪಕ್ಷ 2: ಪ್ರತ್ಯಾಗಮ (is[0] == is[1]);
+    ಪಕ್ಷ 3: ಪ್ರತ್ಯಾಗಮ (is[0] == is[1] && is[1] == is[2]);
+    ಪಕ್ಷ 4: ಪ್ರತ್ಯಾಗಮ (is[0] == is[1] && is[1] == is[2] && is[2] == is[3]);
+    ಸ್ವಭಾವ: ಪ್ರತ್ಯಾಗಮ ಅಸತ್ಯ;
     }
 }
 
-Mat& Mat::operator = (const Scalar& s)
+Mat& Mat::operator = (ಧ್ರುವ Scalar& s)
 {
     CV_INSTRUMENT_REGION();
 
-    if (this->empty())
-        return *this;
+    ಯದಿ (ಏತತ್->empty())
+        ಪ್ರತ್ಯಾಗಮ *ಏತತ್;
 
-    const Mat* arrays[] = { this };
+    ಧ್ರುವ Mat* arrays[] = { ಏತತ್ };
     uchar* dptr;
     NAryMatIterator it(arrays, &dptr, 1);
     size_t elsize = it.size*elemSize();
-    const int64* is = (const int64*)&s.val[0];
+    ಧ್ರುವ int64* is = (ಧ್ರುವ int64*)&s.val[0];
 
-    if( is[0] == 0 && is[1] == 0 && is[2] == 0 && is[3] == 0 )
+    ಯದಿ( is[0] == 0 && is[1] == 0 && is[2] == 0 && is[3] == 0 )
     {
-        for( size_t i = 0; i < it.nplanes; i++, ++it )
+        ಪ್ರತಿ( size_t i = 0; i < it.nplanes; i++, ++it )
             memset( dptr, 0, elsize );
     }
-    else
+    ಅನ್ಯಥಾ
     {
-        int fill_value = 0;
-        if ( can_apply_memset(*this, s, fill_value) )
+        ಪೂರ್ಣಾಙ್ಕ fill_ಮೌಲ್ಯ = 0;
+        ಯದಿ ( can_apply_memset(*ಏತತ್, s, fill_ಮೌಲ್ಯ) )
         {
-            for (size_t i = 0; i < it.nplanes; i++, ++it)
-                memset(dptr, fill_value, elsize);
-            return *this;
+            ಪ್ರತಿ (size_t i = 0; i < it.nplanes; i++, ++it)
+                memset(dptr, fill_ಮೌಲ್ಯ, elsize);
+            ಪ್ರತ್ಯಾಗಮ *ಏತತ್;
         }
 
-        if( it.nplanes > 0 )
+        ಯದಿ( it.nplanes > 0 )
         {
-            double scalar[12];
+            ದ್ವಿಗುಣ scalar[12];
             scalarToRawData(s, scalar, type(), 12);
             size_t blockSize = 12*elemSize1();
 
-            for( size_t j = 0; j < elsize; j += blockSize )
+            ಪ್ರತಿ( size_t j = 0; j < elsize; j += blockSize )
             {
                 size_t sz = MIN(blockSize, elsize - j);
-                CV_Assert(sz <= sizeof(scalar));
+                CV_Assert(sz <= ಪರಿಮಾಣ(scalar));
                 memcpy( dptr + j, scalar, sz );
             }
         }
 
-        for( size_t i = 1; i < it.nplanes; i++ )
+        ಪ್ರತಿ( size_t i = 1; i < it.nplanes; i++ )
         {
             ++it;
             memcpy( dptr, data, elsize );
         }
     }
-    return *this;
+    ಪ್ರತ್ಯಾಗಮ *ಏತತ್;
 }
 
 #ifdef HAVE_IPP
-static bool ipp_Mat_setTo_Mat(Mat &dst, Mat &_val, Mat &mask)
+ಸ್ಥಿರ ತಾರ್ಕಿಕ ipp_Mat_setTo_Mat(Mat &dst, Mat &_val, Mat &mask)
 {
 #ifdef HAVE_IPP_IW_LL
     CV_INSTRUMENT_REGION_IPP();
 
-    if(mask.empty())
-        return false;
+    ಯದಿ(mask.empty())
+        ಪ್ರತ್ಯಾಗಮ ಅಸತ್ಯ;
 
-    if(mask.depth() != CV_8U || mask.channels() > 1)
-        return false;
+    ಯದಿ(mask.depth() != CV_8U || mask.channels() > 1)
+        ಪ್ರತ್ಯಾಗಮ ಅಸತ್ಯ;
 
-    if(dst.channels() > 4)
-        return false;
+    ಯದಿ(dst.channels() > 4)
+        ಪ್ರತ್ಯಾಗಮ ಅಸತ್ಯ;
 
-    if (dst.depth() == CV_32F)
+    ಯದಿ (dst.depth() == CV_32F)
     {
-        for (int i = 0; i < (int)(_val.total()); i++)
+        ಪ್ರತಿ (ಪೂರ್ಣಾಙ್ಕ i = 0; i < (ಪೂರ್ಣಾಙ್ಕ)(_val.total()); i++)
         {
-            float v = (float)(_val.at<double>(i));  // cast to float
-            if (cvIsNaN(v) || cvIsInf(v))  // accept finite numbers only
-                return false;
+            ಭಿನ್ನ v = (ಭಿನ್ನ)(_val.at<ದ್ವಿಗುಣ>(i));  // cast to float
+            ಯದಿ (cvIsNaN(v) || cvIsInf(v))  // accept finite numbers only
+                ಪ್ರತ್ಯಾಗಮ ಅಸತ್ಯ;
         }
     }
 
-    if(dst.dims <= 2)
+    ಯದಿ(dst.dims <= 2)
     {
         IppiSize            size     = ippiSize(dst.size());
         IppDataType         dataType = ippiGetDataType(dst.depth());
-        ::ipp::IwValueFloat s;
+        ::ipp::Iw_ಮೌಲ್ಯ_Float s;
         convertAndUnrollScalar(_val, CV_MAKETYPE(CV_64F, dst.channels()), (uchar*)((Ipp64f*)s), 1);
 
-        return CV_INSTRUMENT_FUN_IPP(llwiSetMask, s, dst.ptr(), (int)dst.step, size, dataType, dst.channels(), mask.ptr(), (int)mask.step) >= 0;
+        ಪ್ರತ್ಯಾಗಮ CV_INSTRUMENT_FUN_IPP(llwiSetMask, s, dst.ptr(), (ಪೂರ್ಣಾಙ್ಕ)dst.step, size, dataType, dst.channels(), mask.ptr(), (ಪೂರ್ಣಾಙ್ಕ)mask.step) >= 0;
     }
-    else
+    ಅನ್ಯಥಾ
     {
-        const Mat      *arrays[] = {&dst, mask.empty()?NULL:&mask, NULL};
-        uchar          *ptrs[2]  = {NULL};
+        ಧ್ರುವ Mat      *arrays[] = {&dst, mask.empty()?ರಿಕ್ತ:&mask, ರಿಕ್ತ};
+        uchar          *ptrs[2]  = {ರಿಕ್ತ};
         NAryMatIterator it(arrays, ptrs);
 
-        IppiSize            size     = {(int)it.size, 1};
+        IppiSize            size     = {(ಪೂರ್ಣಾಙ್ಕ)it.size, 1};
         IppDataType         dataType = ippiGetDataType(dst.depth());
-        ::ipp::IwValueFloat s;
+        ::ipp::Iw_ಮೌಲ್ಯ_Float s;
         convertAndUnrollScalar(_val, CV_MAKETYPE(CV_64F, dst.channels()), (uchar*)((Ipp64f*)s), 1);
 
-        for( size_t i = 0; i < it.nplanes; i++, ++it)
+        ಪ್ರತಿ( size_t i = 0; i < it.nplanes; i++, ++it)
         {
-            if(CV_INSTRUMENT_FUN_IPP(llwiSetMask, s, ptrs[0], 0, size, dataType, dst.channels(), ptrs[1], 0) < 0)
-                return false;
+            ಯದಿ(CV_INSTRUMENT_FUN_IPP(llwiSetMask, s, ptrs[0], 0, size, dataType, dst.channels(), ptrs[1], 0) < 0)
+                ಪ್ರತ್ಯಾಗಮ ಅಸತ್ಯ;
         }
-        return true;
+        ಪ್ರತ್ಯಾಗಮ ಸತ್ಯ;
     }
-#else
+#ಅನ್ಯಥಾ
     CV_UNUSED(dst); CV_UNUSED(_val); CV_UNUSED(mask);
-    return false;
+    ಪ್ರತ್ಯಾಗಮ ಅಸತ್ಯ;
 #endif
 }
 #endif
 
-Mat& Mat::setTo(InputArray _value, InputArray _mask)
+Mat& Mat::setTo(ಒಳಹರಿವು_Array ಮೌಲ್ಯ, ಒಳಹರಿವು_Array _mask)
 {
     CV_INSTRUMENT_REGION();
 
-    if( empty() )
-        return *this;
+    ಯದಿ( empty() )
+        ಪ್ರತ್ಯಾಗಮ *ಏತತ್;
 
-    Mat value = _value.getMat(), mask = _mask.getMat();
+    Mat value = ಮೌಲ್ಯ.getMat(), mask = _mask.getMat();
 
-    CV_Assert( checkScalar(value, type(), _value.kind(), _InputArray::MAT ));
-    int cn = channels(), mcn = mask.channels();
+    CV_Assert( checkScalar(value, type(), ಮೌಲ್ಯ.kind(), ಒಳಹರಿವು_Array_2::MAT ));
+    ಪೂರ್ಣಾಙ್ಕ cn = channels(), mcn = mask.channels();
     CV_Assert( mask.empty() || ((mask.depth() == CV_8U || mask.depth() == CV_8S || mask.depth() == CV_Bool) &&
                (mcn == 1 || mcn == cn) && size == mask.size) );
 
-    CV_IPP_RUN_FAST(ipp_Mat_setTo_Mat(*this, value, mask), *this)
+    CV_IPP_RUN_FAST(ipp_Mat_setTo_Mat(*ಏತತ್, value, mask), *ಏತತ್)
 
     size_t esz = mcn > 1 ? elemSize1() : elemSize();
-    BinaryFunc copymask = getCopyMaskFunc(esz);
+    ದ್ವಿಮಾನ_Func copymask = getCopyMaskFunc(esz);
 
-    const Mat* arrays[] = { this, !mask.empty() ? &mask : 0, 0 };
+    ಧ್ರುವ Mat* arrays[] = { ಏತತ್, !mask.empty() ? &mask : 0, 0 };
     uchar* ptrs[2]={0,0};
     NAryMatIterator it(arrays, ptrs);
-    int totalsz = (int)it.size*mcn;
-    int blockSize0 = std::min(totalsz, (int)((BLOCK_SIZE + esz-1)/esz));
+    ಪೂರ್ಣಾಙ್ಕ totalsz = (ಪೂರ್ಣಾಙ್ಕ)it.size*mcn;
+    ಪೂರ್ಣಾಙ್ಕ blockSize0 = std::min(totalsz, (ಪೂರ್ಣಾಙ್ಕ)((BLOCK_SIZE + esz-1)/esz));
     blockSize0 -= blockSize0 % mcn;    // must be divisible without remainder for unrolling and advancing
     AutoBuffer<uchar> _scbuf(blockSize0*esz + 32);
-    uchar* scbuf = alignPtr((uchar*)_scbuf.data(), (int)sizeof(double));
+    uchar* scbuf = alignPtr((uchar*)_scbuf.data(), (ಪೂರ್ಣಾಙ್ಕ)ಪರಿಮಾಣ(ದ್ವಿಗುಣ));
     convertAndUnrollScalar( value, type(), scbuf, blockSize0/mcn );
 
-    for( size_t i = 0; i < it.nplanes; i++, ++it )
+    ಪ್ರತಿ( size_t i = 0; i < it.nplanes; i++, ++it )
     {
-        for( int j = 0; j < totalsz; j += blockSize0 )
+        ಪ್ರತಿ( ಪೂರ್ಣಾಙ್ಕ j = 0; j < totalsz; j += blockSize0 )
         {
             Size sz(std::min(blockSize0, totalsz - j), 1);
             size_t blockSize = sz.width*esz;
-            if( ptrs[1] )
+            ಯದಿ( ptrs[1] )
             {
                 copymask(scbuf, 0, ptrs[1], 0, ptrs[0], 0, sz, &esz);
                 ptrs[1] += sz.width;
             }
-            else
+            ಅನ್ಯಥಾ
                 memcpy(ptrs[0], scbuf, blockSize);
             ptrs[0] += blockSize;
         }
     }
-    return *this;
+    ಪ್ರತ್ಯಾಗಮ *ಏತತ್;
 }
 
 
@@ -856,32 +856,32 @@ Mat& Mat::setZero()
 {
     CV_INSTRUMENT_REGION();
 
-    if( empty() )
-        return *this;
+    ಯದಿ( empty() )
+        ಪ್ರತ್ಯಾಗಮ *ಏತತ್;
 
     size_t esz = elemSize();
 
-    const Mat* arrays[] = { this, 0 };
+    ಧ್ರುವ Mat* arrays[] = { ಏತತ್, 0 };
     uchar* ptrs[]={0};
     NAryMatIterator it(arrays, ptrs);
 
-    for( size_t i = 0; i < it.nplanes; i++, ++it )
+    ಪ್ರತಿ( size_t i = 0; i < it.nplanes; i++, ++it )
         memset(ptrs[0], 0, esz*it.size);
-    return *this;
+    ಪ್ರತ್ಯಾಗಮ *ಏತತ್;
 }
 
 
-#if defined HAVE_OPENCL && !defined __APPLE__
+#ಯದಿ defined HAVE_OPENCL && !defined __APPLE__
 
-static bool ocl_repeat(InputArray _src, int ny, int nx, OutputArray _dst)
+ಸ್ಥಿರ ತಾರ್ಕಿಕ ocl_repeat(ಒಳಹರಿವು_Array _src, ಪೂರ್ಣಾಙ್ಕ ny, ಪೂರ್ಣಾಙ್ಕ nx, OutputArray _dst)
 {
-    if (ny == 1 && nx == 1)
+    ಯದಿ (ny == 1 && nx == 1)
     {
         _src.copyTo(_dst);
-        return true;
+        ಪ್ರತ್ಯಾಗಮ ಸತ್ಯ;
     }
 
-    int type = _src.type(), depth = CV_MAT_DEPTH(type), cn = CV_MAT_CN(type),
+    ಪೂರ್ಣಾಙ್ಕ type = _src.type(), depth = CV_MAT_DEPTH(type), cn = CV_MAT_CN(type),
             rowsPerWI = ocl::Device::getDefault().isIntel() ? 4 : 1,
             kercn = ocl::predictOptimalVectorWidth(_src, _dst);
 
@@ -889,19 +889,19 @@ static bool ocl_repeat(InputArray _src, int ny, int nx, OutputArray _dst)
                   format("-D T=%s -D nx=%d -D ny=%d -D rowsPerWI=%d -D cn=%d",
                          ocl::memopTypeToStr(CV_MAKE_TYPE(depth, kercn)),
                          nx, ny, rowsPerWI, kercn));
-    if (k.empty())
-        return false;
+    ಯದಿ (k.empty())
+        ಪ್ರತ್ಯಾಗಮ ಅಸತ್ಯ;
 
     UMat src = _src.getUMat(), dst = _dst.getUMat();
     k.args(ocl::KernelArg::ReadOnly(src, cn, kercn), ocl::KernelArg::WriteOnlyNoSize(dst));
 
     size_t globalsize[] = { (size_t)src.cols * cn / kercn, ((size_t)src.rows + rowsPerWI - 1) / rowsPerWI };
-    return k.run(2, globalsize, NULL, false);
+    ಪ್ರತ್ಯಾಗಮ k.run(2, globalsize, ರಿಕ್ತ, ಅಸತ್ಯ);
 }
 
 #endif
 
-void repeat(InputArray _src, int ny, int nx, OutputArray _dst)
+ಶೂನ್ಯ repeat(ಒಳಹರಿವು_Array _src, ಪೂರ್ಣಾಙ್ಕ ny, ಪೂರ್ಣಾಙ್ಕ nx, OutputArray _dst)
 {
     CV_INSTRUMENT_REGION();
 
@@ -910,42 +910,42 @@ void repeat(InputArray _src, int ny, int nx, OutputArray _dst)
     CV_Assert( ny > 0 && nx > 0 );
 
     Size ssize = _src.size();
-    if( ssize.empty() )
+    ಯದಿ( ssize.empty() )
     {
         _dst.create(0, 0, _src.type());
-        return;
+        ಪ್ರತ್ಯಾಗಮ;
     }
     CV_Assert( (int64_t)ssize.height * ny <= INT_MAX && (int64_t)ssize.width * nx <= INT_MAX );
     _dst.create(ssize.height*ny, ssize.width*nx, _src.type());
 
-#if !defined __APPLE__
+#ಯದಿ !defined __APPLE__
     CV_OCL_RUN(_dst.isUMat(),
                ocl_repeat(_src, ny, nx, _dst))
 #endif
 
     Mat src = _src.getMat(), dst = _dst.getMat();
     Size dsize = dst.size();
-    int esz = (int)src.elemSize();
-    int x, y;
+    ಪೂರ್ಣಾಙ್ಕ esz = (ಪೂರ್ಣಾಙ್ಕ)src.elemSize();
+    ಪೂರ್ಣಾಙ್ಕ x, y;
     ssize.width *= esz; dsize.width *= esz;
 
-    for( y = 0; y < ssize.height; y++ )
+    ಪ್ರತಿ( y = 0; y < ssize.height; y++ )
     {
-        for( x = 0; x < dsize.width; x += ssize.width )
+        ಪ್ರತಿ( x = 0; x < dsize.width; x += ssize.width )
             memcpy( dst.ptr(y) + x, src.ptr(y), ssize.width );
     }
 
-    for( ; y < dsize.height; y++ )
+    ಪ್ರತಿ( ; y < dsize.height; y++ )
         memcpy( dst.ptr(y), dst.ptr(y - ssize.height), dsize.width );
 }
 
-Mat repeat(const Mat& src, int ny, int nx)
+Mat repeat(ಧ್ರುವ Mat& src, ಪೂರ್ಣಾಙ್ಕ ny, ಪೂರ್ಣಾಙ್ಕ nx)
 {
-    if( nx == 1 && ny == 1 )
-        return src;
+    ಯದಿ( nx == 1 && ny == 1 )
+        ಪ್ರತ್ಯಾಗಮ src;
     Mat dst;
     repeat(src, ny, nx, dst);
-    return dst;
+    ಪ್ರತ್ಯಾಗಮ dst;
 }
 
 
@@ -961,134 +961,134 @@ Mat repeat(const Mat& src, int ny, int nx)
  * BORDER_WRAP:          cdefgh|abcdefgh|abcdefg
  * BORDER_CONSTANT:      iiiiii|abcdefgh|iiiiiii  with some specified 'i'
  */
-int cv::borderInterpolate( int p, int len, int borderType )
+ಪೂರ್ಣಾಙ್ಕ cv::borderInterpolate( ಪೂರ್ಣಾಙ್ಕ p, ಪೂರ್ಣಾಙ್ಕ len, ಪೂರ್ಣಾಙ್ಕ borderType )
 {
     CV_TRACE_FUNCTION_VERBOSE();
 
     CV_DbgAssert(len > 0);
 
 #ifdef CV_STATIC_ANALYSIS
-    if(p >= 0 && p < len)
-#else
-    if( (unsigned)p < (unsigned)len )
+    ಯದಿ(p >= 0 && p < len)
+#ಅನ್ಯಥಾ
+    ಯದಿ( (unsigned)p < (unsigned)len )
 #endif
         ;
-    else if( borderType == BORDER_REPLICATE )
+    ಅನ್ಯಥಾ ಯದಿ( borderType == BORDER_REPLICATE )
         p = p < 0 ? 0 : len - 1;
-    else if( borderType == BORDER_REFLECT || borderType == BORDER_REFLECT_101 )
+    ಅನ್ಯಥಾ ಯದಿ( borderType == BORDER_REFLECT || borderType == BORDER_REFLECT_101 )
     {
-        int delta = borderType == BORDER_REFLECT_101;
-        if( len == 1 )
-            return 0;
-        do
+        ಪೂರ್ಣಾಙ್ಕ delta = borderType == BORDER_REFLECT_101;
+        ಯದಿ( len == 1 )
+            ಪ್ರತ್ಯಾಗಮ 0;
+        ಕುರು
         {
-            if( p < 0 )
+            ಯದಿ( p < 0 )
                 p = -p - 1 + delta;
-            else
+            ಅನ್ಯಥಾ
                 p = len - 1 - (p - len) - delta;
         }
 #ifdef CV_STATIC_ANALYSIS
-        while(p < 0 || p >= len);
-#else
-        while( (unsigned)p >= (unsigned)len );
+        ಯಾವತ್(p < 0 || p >= len);
+#ಅನ್ಯಥಾ
+        ಯಾವತ್( (unsigned)p >= (unsigned)len );
 #endif
     }
-    else if( borderType == BORDER_WRAP )
+    ಅನ್ಯಥಾ ಯದಿ( borderType == BORDER_WRAP )
     {
         CV_Assert(len > 0);
-        if( p < 0 || p >= len )
+        ಯದಿ( p < 0 || p >= len )
         {
             int64_t p64 = p;
             p64 %= (int64_t)len;
-            if( p64 < 0 )
+            ಯದಿ( p64 < 0 )
                 p64 += len;
-            p = (int)p64;
+            p = (ಪೂರ್ಣಾಙ್ಕ)p64;
         }
     }
-    else if( borderType == BORDER_CONSTANT )
+    ಅನ್ಯಥಾ ಯದಿ( borderType == BORDER_CONSTANT )
         p = -1;
-    else
+    ಅನ್ಯಥಾ
         CV_Error( cv::Error::StsBadArg, "Unknown/unsupported border type" );
-    return p;
+    ಪ್ರತ್ಯಾಗಮ p;
 }
 
-namespace
+ನಾಮಾಕಾಶ
 {
 
-void copyMakeBorder_8u( const uchar* src, size_t srcstep, cv::Size srcroi,
+ಶೂನ್ಯ copyMakeBorder_8u( ಧ್ರುವ uchar* src, size_t srcstep, cv::Size srcroi,
                         uchar* dst, size_t dststep, cv::Size dstroi,
-                        int top, int left, int cn, int borderType )
+                        ಪೂರ್ಣಾಙ್ಕ ತುದಿ_2, ಪೂರ್ಣಾಙ್ಕ ಎಡ, ಪೂರ್ಣಾಙ್ಕ cn, ಪೂರ್ಣಾಙ್ಕ borderType )
 {
-    const int isz = (int)sizeof(int);
-    int i, j, k, elemSize = 1;
-    bool intMode = false;
+    ಧ್ರುವ ಪೂರ್ಣಾಙ್ಕ isz = (ಪೂರ್ಣಾಙ್ಕ)ಪರಿಮಾಣ(ಪೂರ್ಣಾಙ್ಕ);
+    ಪೂರ್ಣಾಙ್ಕ i, j, k, elemSize = 1;
+    ತಾರ್ಕಿಕ intMode = ಅಸತ್ಯ;
 
-    if( (cn | srcstep | dststep | (size_t)src | (size_t)dst) % isz == 0 )
+    ಯದಿ( (cn | srcstep | dststep | (size_t)src | (size_t)dst) % isz == 0 )
     {
         cn /= isz;
         elemSize = isz;
-        intMode = true;
+        intMode = ಸತ್ಯ;
     }
 
-    cv::AutoBuffer<int> _tab((dstroi.width - srcroi.width)*cn);
-    int* tab = _tab.data();
-    int right = dstroi.width - srcroi.width - left;
-    int bottom = dstroi.height - srcroi.height - top;
+    cv::AutoBuffer<ಪೂರ್ಣಾಙ್ಕ> _tab((dstroi.width - srcroi.width)*cn);
+    ಪೂರ್ಣಾಙ್ಕ* tab = _tab.data();
+    ಪೂರ್ಣಾಙ್ಕ ಬಲ = dstroi.width - srcroi.width - ಎಡ;
+    ಪೂರ್ಣಾಙ್ಕ bottom = dstroi.height - srcroi.height - ತುದಿ_2;
 
-    for( i = 0; i < left; i++ )
+    ಪ್ರತಿ( i = 0; i < ಎಡ; i++ )
     {
-        j = cv::borderInterpolate(i - left, srcroi.width, borderType)*cn;
-        for( k = 0; k < cn; k++ )
+        j = cv::borderInterpolate(i - ಎಡ, srcroi.width, borderType)*cn;
+        ಪ್ರತಿ( k = 0; k < cn; k++ )
             tab[i*cn + k] = j + k;
     }
 
-    for( i = 0; i < right; i++ )
+    ಪ್ರತಿ( i = 0; i < ಬಲ; i++ )
     {
         j = cv::borderInterpolate(srcroi.width + i, srcroi.width, borderType)*cn;
-        for( k = 0; k < cn; k++ )
-            tab[(i+left)*cn + k] = j + k;
+        ಪ್ರತಿ( k = 0; k < cn; k++ )
+            tab[(i+ಎಡ)*cn + k] = j + k;
     }
 
     srcroi.width *= cn;
     dstroi.width *= cn;
-    left *= cn;
-    right *= cn;
+    ಎಡ *= cn;
+    ಬಲ *= cn;
 
-    uchar* dstInner = dst + dststep*top + left*elemSize;
+    uchar* dstInner = dst + dststep*ತುದಿ_2 + ಎಡ*elemSize;
 
-    for( i = 0; i < srcroi.height; i++, dstInner += dststep, src += srcstep )
+    ಪ್ರತಿ( i = 0; i < srcroi.height; i++, dstInner += dststep, src += srcstep )
     {
-        if( dstInner != src )
+        ಯದಿ( dstInner != src )
             memcpy(dstInner, src, srcroi.width*elemSize);
 
-        if( intMode )
+        ಯದಿ( intMode )
         {
-            const int* isrc = (int*)src;
-            int* idstInner = (int*)dstInner;
-            for( j = 0; j < left; j++ )
-                idstInner[j - left] = isrc[tab[j]];
-            for( j = 0; j < right; j++ )
-                idstInner[j + srcroi.width] = isrc[tab[j + left]];
+            ಧ್ರುವ ಪೂರ್ಣಾಙ್ಕ* isrc = (ಪೂರ್ಣಾಙ್ಕ*)src;
+            ಪೂರ್ಣಾಙ್ಕ* idstInner = (ಪೂರ್ಣಾಙ್ಕ*)dstInner;
+            ಪ್ರತಿ( j = 0; j < ಎಡ; j++ )
+                idstInner[j - ಎಡ] = isrc[tab[j]];
+            ಪ್ರತಿ( j = 0; j < ಬಲ; j++ )
+                idstInner[j + srcroi.width] = isrc[tab[j + ಎಡ]];
         }
-        else
+        ಅನ್ಯಥಾ
         {
-            for( j = 0; j < left; j++ )
-                dstInner[j - left] = src[tab[j]];
-            for( j = 0; j < right; j++ )
-                dstInner[j + srcroi.width] = src[tab[j + left]];
+            ಪ್ರತಿ( j = 0; j < ಎಡ; j++ )
+                dstInner[j - ಎಡ] = src[tab[j]];
+            ಪ್ರತಿ( j = 0; j < ಬಲ; j++ )
+                dstInner[j + srcroi.width] = src[tab[j + ಎಡ]];
         }
     }
 
     dstroi.width *= elemSize;
 
-    for( i = 0; i < top; i++ )
+    ಪ್ರತಿ( i = 0; i < ತುದಿ_2; i++ )
     {
-        j = cv::borderInterpolate(i - top, srcroi.height, borderType);
-        memcpy(dst + i*dststep, dst + (top+j)*dststep, dstroi.width);
+        j = cv::borderInterpolate(i - ತುದಿ_2, srcroi.height, borderType);
+        memcpy(dst + i*dststep, dst + (ತುದಿ_2+j)*dststep, dstroi.width);
     }
 
-    dst += dststep*top;
-    for( i = 0; i < bottom; i++ )
+    dst += dststep*ತುದಿ_2;
+    ಪ್ರತಿ( i = 0; i < bottom; i++ )
     {
         j = cv::borderInterpolate(i + srcroi.height, srcroi.height, borderType);
         memcpy(dst + (i + srcroi.height)*dststep, dst + j*dststep, dstroi.width);
@@ -1096,42 +1096,42 @@ void copyMakeBorder_8u( const uchar* src, size_t srcstep, cv::Size srcroi,
 }
 
 
-void copyMakeConstBorder_8u( const uchar* src, size_t srcstep, cv::Size srcroi,
+ಶೂನ್ಯ copyMakeConstBorder_8u( ಧ್ರುವ uchar* src, size_t srcstep, cv::Size srcroi,
                              uchar* dst, size_t dststep, cv::Size dstroi,
-                             int top, int left, int cn, const uchar* value )
+                             ಪೂರ್ಣಾಙ್ಕ ತುದಿ_2, ಪೂರ್ಣಾಙ್ಕ ಎಡ, ಪೂರ್ಣಾಙ್ಕ cn, ಧ್ರುವ uchar* value )
 {
-    int i, j;
+    ಪೂರ್ಣಾಙ್ಕ i, j;
     cv::AutoBuffer<uchar> _constBuf(dstroi.width*cn);
     uchar* constBuf = _constBuf.data();
-    int right = dstroi.width - srcroi.width - left;
-    int bottom = dstroi.height - srcroi.height - top;
+    ಪೂರ್ಣಾಙ್ಕ ಬಲ = dstroi.width - srcroi.width - ಎಡ;
+    ಪೂರ್ಣಾಙ್ಕ bottom = dstroi.height - srcroi.height - ತುದಿ_2;
 
-    for( i = 0; i < dstroi.width; i++ )
+    ಪ್ರತಿ( i = 0; i < dstroi.width; i++ )
     {
-        for( j = 0; j < cn; j++ )
+        ಪ್ರತಿ( j = 0; j < cn; j++ )
             constBuf[i*cn + j] = value[j];
     }
 
     srcroi.width *= cn;
     dstroi.width *= cn;
-    left *= cn;
-    right *= cn;
+    ಎಡ *= cn;
+    ಬಲ *= cn;
 
-    uchar* dstInner = dst + dststep*top + left;
+    uchar* dstInner = dst + dststep*ತುದಿ_2 + ಎಡ;
 
-    for( i = 0; i < srcroi.height; i++, dstInner += dststep, src += srcstep )
+    ಪ್ರತಿ( i = 0; i < srcroi.height; i++, dstInner += dststep, src += srcstep )
     {
-        if( dstInner != src )
+        ಯದಿ( dstInner != src )
             memcpy( dstInner, src, srcroi.width );
-        memcpy( dstInner - left, constBuf, left );
-        memcpy( dstInner + srcroi.width, constBuf, right );
+        memcpy( dstInner - ಎಡ, constBuf, ಎಡ );
+        memcpy( dstInner + srcroi.width, constBuf, ಬಲ );
     }
 
-    for( i = 0; i < top; i++ )
+    ಪ್ರತಿ( i = 0; i < ತುದಿ_2; i++ )
         memcpy(dst + i * dststep, constBuf, dstroi.width);
 
-    dst += (top + srcroi.height) * dststep;
-    for( i = 0; i < bottom; i++ )
+    dst += (ತುದಿ_2 + srcroi.height) * dststep;
+    ಪ್ರತಿ( i = 0; i < bottom; i++ )
         memcpy(dst + i * dststep, constBuf, dstroi.width);
 }
 
@@ -1139,160 +1139,160 @@ void copyMakeConstBorder_8u( const uchar* src, size_t srcstep, cv::Size srcroi,
 
 #ifdef HAVE_OPENCL
 
-namespace cv {
+ನಾಮಾಕಾಶ cv {
 
-static bool ocl_copyMakeBorder( InputArray _src, OutputArray _dst, int top, int bottom,
-                                int left, int right, int borderType, const Scalar& value )
+ಸ್ಥಿರ ತಾರ್ಕಿಕ ocl_copyMakeBorder( ಒಳಹರಿವು_Array _src, OutputArray _dst, ಪೂರ್ಣಾಙ್ಕ ತುದಿ_2, ಪೂರ್ಣಾಙ್ಕ bottom,
+                                ಪೂರ್ಣಾಙ್ಕ ಎಡ, ಪೂರ್ಣಾಙ್ಕ ಬಲ, ಪೂರ್ಣಾಙ್ಕ borderType, ಧ್ರುವ Scalar& value )
 {
-    int type = _src.type(), cn = CV_MAT_CN(type), depth = CV_MAT_DEPTH(type),
+    ಪೂರ್ಣಾಙ್ಕ type = _src.type(), cn = CV_MAT_CN(type), depth = CV_MAT_DEPTH(type),
             rowsPerWI = ocl::Device::getDefault().isIntel() ? 4 : 1;
-    bool isolated = (borderType & BORDER_ISOLATED) != 0;
+    ತಾರ್ಕಿಕ isolated = (borderType & BORDER_ISOLATED) != 0;
     borderType &= ~cv::BORDER_ISOLATED;
 
-    if ( !(borderType == BORDER_CONSTANT || borderType == BORDER_REPLICATE || borderType == BORDER_REFLECT ||
+    ಯದಿ ( !(borderType == BORDER_CONSTANT || borderType == BORDER_REPLICATE || borderType == BORDER_REFLECT ||
            borderType == BORDER_WRAP || borderType == BORDER_REFLECT_101) ||
          cn > 4)
-        return false;
+        ಪ್ರತ್ಯಾಗಮ ಅಸತ್ಯ;
 
-    const char * const borderMap[] = { "BORDER_CONSTANT", "BORDER_REPLICATE", "BORDER_REFLECT", "BORDER_WRAP", "BORDER_REFLECT_101" };
-    int scalarcn = cn == 3 ? 4 : cn;
-    int sctype = CV_MAKETYPE(depth, scalarcn);
+    ಧ್ರುವ ವರ್ಣ * ಧ್ರುವ borderMap[] = { "BORDER_CONSTANT", "BORDER_REPLICATE", "BORDER_REFLECT", "BORDER_WRAP", "BORDER_REFLECT_101" };
+    ಪೂರ್ಣಾಙ್ಕ scalarcn = cn == 3 ? 4 : cn;
+    ಪೂರ್ಣಾಙ್ಕ sctype = CV_MAKETYPE(depth, scalarcn);
     String buildOptions = format("-D T=%s -D %s -D T1=%s -D cn=%d -D ST=%s -D rowsPerWI=%d",
                                  ocl::memopTypeToStr(type), borderMap[borderType],
                                  ocl::memopTypeToStr(depth), cn,
                                  ocl::memopTypeToStr(sctype), rowsPerWI);
 
     ocl::Kernel k("copyMakeBorder", ocl::core::copymakeborder_oclsrc, buildOptions);
-    if (k.empty())
-        return false;
+    ಯದಿ (k.empty())
+        ಪ್ರತ್ಯಾಗಮ ಅಸತ್ಯ;
 
     UMat src = _src.getUMat();
-    if( src.isSubmatrix() && !isolated )
+    ಯದಿ( src.isSubmatrix() && !isolated )
     {
         Size wholeSize;
         Point ofs;
         src.locateROI(wholeSize, ofs);
-        int dtop = std::min(ofs.y, top);
-        int dbottom = std::min(wholeSize.height - src.rows - ofs.y, bottom);
-        int dleft = std::min(ofs.x, left);
-        int dright = std::min(wholeSize.width - src.cols - ofs.x, right);
+        ಪೂರ್ಣಾಙ್ಕ dtop = std::min(ofs.y, ತುದಿ_2);
+        ಪೂರ್ಣಾಙ್ಕ dbottom = std::min(wholeSize.height - src.rows - ofs.y, bottom);
+        ಪೂರ್ಣಾಙ್ಕ dleft = std::min(ofs.x, ಎಡ);
+        ಪೂರ್ಣಾಙ್ಕ dright = std::min(wholeSize.width - src.cols - ofs.x, ಬಲ);
         src.adjustROI(dtop, dbottom, dleft, dright);
-        top -= dtop;
-        left -= dleft;
+        ತುದಿ_2 -= dtop;
+        ಎಡ -= dleft;
         bottom -= dbottom;
-        right -= dright;
+        ಬಲ -= dright;
     }
 
-    _dst.create(src.rows + top + bottom, src.cols + left + right, type);
+    _dst.create(src.rows + ತುದಿ_2 + bottom, src.cols + ಎಡ + ಬಲ, type);
     UMat dst = _dst.getUMat();
 
-    if (top == 0 && left == 0 && bottom == 0 && right == 0)
+    ಯದಿ (ತುದಿ_2 == 0 && ಎಡ == 0 && bottom == 0 && ಬಲ == 0)
     {
-        if(src.u != dst.u || src.step != dst.step)
+        ಯದಿ(src.u != dst.u || src.step != dst.step)
             src.copyTo(dst);
-        return true;
+        ಪ್ರತ್ಯಾಗಮ ಸತ್ಯ;
     }
 
     k.args(ocl::KernelArg::ReadOnly(src), ocl::KernelArg::WriteOnly(dst),
-           top, left, ocl::KernelArg::Constant(Mat(1, 1, sctype, value)));
+           ತುದಿ_2, ಎಡ, ocl::KernelArg::Constant(Mat(1, 1, sctype, value)));
 
     size_t globalsize[2] = { (size_t)dst.cols, ((size_t)dst.rows + rowsPerWI - 1) / rowsPerWI };
-    return k.run(2, globalsize, NULL, false);
+    ಪ್ರತ್ಯಾಗಮ k.run(2, globalsize, ರಿಕ್ತ, ಅಸತ್ಯ);
 }
 
 }
 #endif
 
 #ifdef HAVE_IPP
-namespace cv {
+ನಾಮಾಕಾಶ cv {
 
-static bool ipp_copyMakeBorder( Mat &_src, Mat &_dst, int top, int bottom,
-                                int left, int right, int _borderType, const Scalar& value )
+ಸ್ಥಿರ ತಾರ್ಕಿಕ ipp_copyMakeBorder( Mat &_src, Mat &_dst, ಪೂರ್ಣಾಙ್ಕ ತುದಿ_2, ಪೂರ್ಣಾಙ್ಕ bottom,
+                                ಪೂರ್ಣಾಙ್ಕ ಎಡ, ಪೂರ್ಣಾಙ್ಕ ಬಲ, ಪೂರ್ಣಾಙ್ಕ _borderType, ಧ್ರುವ Scalar& value )
 {
-#if defined HAVE_IPP_IW_LL && !IPP_DISABLE_PERF_COPYMAKE
+#ಯದಿ defined HAVE_IPP_IW_LL && !IPP_DISABLE_PERF_COPYMAKE
     CV_INSTRUMENT_REGION_IPP();
 
-    ::ipp::IwiBorderSize borderSize(left, top, right, bottom);
+    ::ipp::IwiBorderSize borderSize(ಎಡ, ತುದಿ_2, ಬಲ, bottom);
     ::ipp::IwiSize       size(_src.cols, _src.rows);
     IppDataType          dataType   = ippiGetDataType(_src.depth());
     IppiBorderType       borderType = ippiGetBorderType(_borderType);
-    if((int)borderType == -1)
-        return false;
+    ಯದಿ((ಪೂರ್ಣಾಙ್ಕ)borderType == -1)
+        ಪ್ರತ್ಯಾಗಮ ಅಸತ್ಯ;
 
-    if(_src.dims > 2)
-        return false;
+    ಯದಿ(_src.dims > 2)
+        ಪ್ರತ್ಯಾಗಮ ಅಸತ್ಯ;
 
-    Rect dstRect(borderSize.left, borderSize.top,
-        _dst.cols - borderSize.right - borderSize.left,
-        _dst.rows - borderSize.bottom - borderSize.top);
+    Rect dstRect(borderSize.ಎಡ, borderSize.ತುದಿ_2,
+        _dst.cols - borderSize.ಬಲ - borderSize.ಎಡ,
+        _dst.rows - borderSize.bottom - borderSize.ತುದಿ_2);
     Mat  subDst = Mat(_dst, dstRect);
     Mat *pSrc   = &_src;
 
-    return CV_INSTRUMENT_FUN_IPP(llwiCopyMakeBorder, pSrc->ptr(), pSrc->step, subDst.ptr(), subDst.step, size, dataType, _src.channels(), borderSize, borderType, &value[0]) >= 0;
-#else
-    CV_UNUSED(_src); CV_UNUSED(_dst); CV_UNUSED(top); CV_UNUSED(bottom); CV_UNUSED(left); CV_UNUSED(right);
+    ಪ್ರತ್ಯಾಗಮ CV_INSTRUMENT_FUN_IPP(llwiCopyMakeBorder, pSrc->ptr(), pSrc->step, subDst.ptr(), subDst.step, size, dataType, _src.channels(), borderSize, borderType, &value[0]) >= 0;
+#ಅನ್ಯಥಾ
+    CV_UNUSED(_src); CV_UNUSED(_dst); CV_UNUSED(ತುದಿ_2); CV_UNUSED(bottom); CV_UNUSED(ಎಡ); CV_UNUSED(ಬಲ);
     CV_UNUSED(_borderType); CV_UNUSED(value);
-    return false;
+    ಪ್ರತ್ಯಾಗಮ ಅಸತ್ಯ;
 #endif
 }
 }
 #endif
 
-void cv::copyMakeBorder( InputArray _src, OutputArray _dst, int top, int bottom,
-                         int left, int right, int borderType, const Scalar& value )
+ಶೂನ್ಯ cv::copyMakeBorder( ಒಳಹರಿವು_Array _src, OutputArray _dst, ಪೂರ್ಣಾಙ್ಕ ತುದಿ_2, ಪೂರ್ಣಾಙ್ಕ bottom,
+                         ಪೂರ್ಣಾಙ್ಕ ಎಡ, ಪೂರ್ಣಾಙ್ಕ ಬಲ, ಪೂರ್ಣಾಙ್ಕ borderType, ಧ್ರುವ Scalar& value )
 {
     CV_INSTRUMENT_REGION();
 
-    CV_Assert( top >= 0 && bottom >= 0 && left >= 0 && right >= 0 && _src.dims() <= 2 );
+    CV_Assert( ತುದಿ_2 >= 0 && bottom >= 0 && ಎಡ >= 0 && ಬಲ >= 0 && _src.dims() <= 2 );
     CV_Assert( !_src.empty() );
 
     Mat src = _src.getMat();
-    CV_Assert( (int64_t)src.rows + top + bottom <= INT_MAX );
-    CV_Assert( (int64_t)src.cols + left + right <= INT_MAX );
+    CV_Assert( (int64_t)src.rows + ತುದಿ_2 + bottom <= INT_MAX );
+    CV_Assert( (int64_t)src.cols + ಎಡ + ಬಲ <= INT_MAX );
 
     CV_OCL_RUN(_dst.isUMat(),
-               ocl_copyMakeBorder(_src, _dst, top, bottom, left, right, borderType, value))
-    int type = src.type();
+               ocl_copyMakeBorder(_src, _dst, ತುದಿ_2, bottom, ಎಡ, ಬಲ, borderType, value))
+    ಪೂರ್ಣಾಙ್ಕ type = src.type();
 
-    if( src.isSubmatrix() && (borderType & BORDER_ISOLATED) == 0 )
+    ಯದಿ( src.isSubmatrix() && (borderType & BORDER_ISOLATED) == 0 )
     {
         Size wholeSize;
         Point ofs;
         src.locateROI(wholeSize, ofs);
-        int dtop = std::min(ofs.y, top);
-        int dbottom = std::min(wholeSize.height - src.rows - ofs.y, bottom);
-        int dleft = std::min(ofs.x, left);
-        int dright = std::min(wholeSize.width - src.cols - ofs.x, right);
+        ಪೂರ್ಣಾಙ್ಕ dtop = std::min(ofs.y, ತುದಿ_2);
+        ಪೂರ್ಣಾಙ್ಕ dbottom = std::min(wholeSize.height - src.rows - ofs.y, bottom);
+        ಪೂರ್ಣಾಙ್ಕ dleft = std::min(ofs.x, ಎಡ);
+        ಪೂರ್ಣಾಙ್ಕ dright = std::min(wholeSize.width - src.cols - ofs.x, ಬಲ);
         src.adjustROI(dtop, dbottom, dleft, dright);
-        top -= dtop;
-        left -= dleft;
+        ತುದಿ_2 -= dtop;
+        ಎಡ -= dleft;
         bottom -= dbottom;
-        right -= dright;
+        ಬಲ -= dright;
     }
 
-    _dst.create( src.rows + top + bottom, src.cols + left + right, type );
+    _dst.create( src.rows + ತುದಿ_2 + bottom, src.cols + ಎಡ + ಬಲ, type );
     Mat dst = _dst.getMat();
 
-    if(top == 0 && left == 0 && bottom == 0 && right == 0)
+    ಯದಿ(ತುದಿ_2 == 0 && ಎಡ == 0 && bottom == 0 && ಬಲ == 0)
     {
-        if(src.data != dst.data || src.step != dst.step)
+        ಯದಿ(src.data != dst.data || src.step != dst.step)
             src.copyTo(dst);
-        return;
+        ಪ್ರತ್ಯಾಗಮ;
     }
 
     borderType &= ~BORDER_ISOLATED;
 
-    CV_IPP_RUN_FAST(ipp_copyMakeBorder(src, dst, top, bottom, left, right, borderType, value))
+    CV_IPP_RUN_FAST(ipp_copyMakeBorder(src, dst, ತುದಿ_2, bottom, ಎಡ, ಬಲ, borderType, value))
 
-    if( borderType != BORDER_CONSTANT )
+    ಯದಿ( borderType != BORDER_CONSTANT )
         copyMakeBorder_8u( src.ptr(), src.step, src.size(),
                            dst.ptr(), dst.step, dst.size(),
-                           top, left, (int)src.elemSize(), borderType );
-    else
+                           ತುದಿ_2, ಎಡ, (ಪೂರ್ಣಾಙ್ಕ)src.elemSize(), borderType );
+    ಅನ್ಯಥಾ
     {
-        int cn = src.channels(), cn1 = cn;
-        AutoBuffer<double> buf(cn);
-        if( cn > 4 )
+        ಪೂರ್ಣಾಙ್ಕ cn = src.channels(), cn1 = cn;
+        AutoBuffer<ದ್ವಿಗುಣ> buf(cn);
+        ಯದಿ( cn > 4 )
         {
             CV_Assert( value[0] == value[1] && value[0] == value[2] && value[0] == value[3] );
             cn1 = 1;
@@ -1300,7 +1300,7 @@ void cv::copyMakeBorder( InputArray _src, OutputArray _dst, int top, int bottom,
         scalarToRawData(value, buf.data(), CV_MAKETYPE(src.depth(), cn1), cn);
         copyMakeConstBorder_8u( src.ptr(), src.step, src.size(),
                                 dst.ptr(), dst.step, dst.size(),
-                                top, left, (int)src.elemSize(), (uchar*)buf.data() );
+                                ತುದಿ_2, ಎಡ, (ಪೂರ್ಣಾಙ್ಕ)src.elemSize(), (uchar*)buf.data() );
     }
 }
 /* End of file. */

@@ -41,14 +41,14 @@
 //
 //M*/
 
-#include "precomp.hpp"
+#ಅನ್ತರ್ಭಾವ "precomp.hpp"
 
-namespace cv
+ನಾಮಾಕಾಶ cv
 {
 
 ////////////////////// KeyPoint //////////////////////
 
-size_t KeyPoint::hash() const
+size_t ಕೀಲಿ_Point::hash() ಧ್ರುವ
 {
     size_t _Val = 2166136261U, scale = 16777619U;
     Cv32suf u;
@@ -59,29 +59,29 @@ size_t KeyPoint::hash() const
     u.f = response; _Val = (scale * _Val) ^ u.u;
     _Val = (scale * _Val) ^ ((size_t) octave);
     _Val = (scale * _Val) ^ ((size_t) class_id);
-    return _Val;
+    ಪ್ರತ್ಯಾಗಮ _Val;
 }
 
-void KeyPoint::convert(const std::vector<KeyPoint>& keypoints, std::vector<Point2f>& points2f,
-                       const std::vector<int>& keypointIndexes)
+ಶೂನ್ಯ ಕೀಲಿ_Point::convert(ಧ್ರುವ std::vector<ಕೀಲಿ_Point>& keypoints, std::vector<Point2f>& points2f,
+                       ಧ್ರುವ std::vector<ಪೂರ್ಣಾಙ್ಕ>& keypointIndexes)
 {
     CV_INSTRUMENT_REGION();
 
-    if( keypointIndexes.empty() )
+    ಯದಿ( keypointIndexes.empty() )
     {
         points2f.resize( keypoints.size() );
-        for( size_t i = 0; i < keypoints.size(); i++ )
+        ಪ್ರತಿ( size_t i = 0; i < keypoints.size(); i++ )
             points2f[i] = keypoints[i].pt;
     }
-    else
+    ಅನ್ಯಥಾ
     {
         points2f.resize( keypointIndexes.size() );
-        for( size_t i = 0; i < keypointIndexes.size(); i++ )
+        ಪ್ರತಿ( size_t i = 0; i < keypointIndexes.size(); i++ )
         {
-            int idx = keypointIndexes[i];
-            if( idx >= 0 && idx < (int)keypoints.size() )
+            ಪೂರ್ಣಾಙ್ಕ idx = keypointIndexes[i];
+            ಯದಿ( idx >= 0 && idx < (ಪೂರ್ಣಾಙ್ಕ)keypoints.size() )
                 points2f[i] = keypoints[idx].pt;
-            else
+            ಅನ್ಯಥಾ
             {
                 CV_Error( cv::Error::StsBadArg, "keypointIndexes has element out of range" );
                 //points2f[i] = Point2f(-1, -1);
@@ -90,96 +90,96 @@ void KeyPoint::convert(const std::vector<KeyPoint>& keypoints, std::vector<Point
     }
 }
 
-void KeyPoint::convert( const std::vector<Point2f>& points2f, std::vector<KeyPoint>& keypoints,
-                        float size, float response, int octave, int class_id )
+ಶೂನ್ಯ ಕೀಲಿ_Point::convert( ಧ್ರುವ std::vector<Point2f>& points2f, std::vector<ಕೀಲಿ_Point>& keypoints,
+                        ಭಿನ್ನ size, ಭಿನ್ನ response, ಪೂರ್ಣಾಙ್ಕ octave, ಪೂರ್ಣಾಙ್ಕ class_id )
 {
     CV_INSTRUMENT_REGION();
 
     keypoints.resize(points2f.size());
-    for( size_t i = 0; i < points2f.size(); i++ )
-        keypoints[i] = KeyPoint(points2f[i], size, -1, response, octave, class_id);
+    ಪ್ರತಿ( size_t i = 0; i < points2f.size(); i++ )
+        keypoints[i] = ಕೀಲಿ_Point(points2f[i], size, -1, response, octave, class_id);
 }
 
-float KeyPoint::overlap( const KeyPoint& kp1, const KeyPoint& kp2 )
+ಭಿನ್ನ ಕೀಲಿ_Point::overlap( ಧ್ರುವ ಕೀಲಿ_Point& kp1, ಧ್ರುವ ಕೀಲಿ_Point& kp2 )
 {
-    float a = kp1.size * 0.5f;
-    float b = kp2.size * 0.5f;
-    float a_2 = a * a;
-    float b_2 = b * b;
+    ಭಿನ್ನ a = kp1.size * 0.5f;
+    ಭಿನ್ನ b = kp2.size * 0.5f;
+    ಭಿನ್ನ a_2 = a * a;
+    ಭಿನ್ನ b_2 = b * b;
 
     Point2f p1 = kp1.pt;
     Point2f p2 = kp2.pt;
-    float c = (float)norm( p1 - p2 );
+    ಭಿನ್ನ c = (ಭಿನ್ನ)norm( p1 - p2 );
 
-    float ovrl = 0.f;
+    ಭಿನ್ನ ovrl = 0.f;
 
     // one circle is completely encovered by the other => no intersection points!
-    if( std::min( a, b ) + c <= std::max( a, b ) )
-        return std::min( a_2, b_2 ) / std::max( a_2, b_2 );
+    ಯದಿ( std::min( a, b ) + c <= std::max( a, b ) )
+        ಪ್ರತ್ಯಾಗಮ std::min( a_2, b_2 ) / std::max( a_2, b_2 );
 
-    if( c < a + b ) // circles intersect
+    ಯದಿ( c < a + b ) // circles intersect
     {
-        float c_2 = c * c;
-        float cosAlpha = ( b_2 + c_2 - a_2 ) / ( kp2.size * c );
-        float cosBeta  = ( a_2 + c_2 - b_2 ) / ( kp1.size * c );
-        float alpha = acos( cosAlpha );
-        float beta = acos( cosBeta );
-        float sinAlpha = sin(alpha);
-        float sinBeta  = sin(beta);
+        ಭಿನ್ನ c_2 = c * c;
+        ಭಿನ್ನ cosAlpha = ( b_2 + c_2 - a_2 ) / ( kp2.size * c );
+        ಭಿನ್ನ cosBeta  = ( a_2 + c_2 - b_2 ) / ( kp1.size * c );
+        ಭಿನ್ನ alpha = acos( cosAlpha );
+        ಭಿನ್ನ beta = acos( cosBeta );
+        ಭಿನ್ನ sinAlpha = sin(alpha);
+        ಭಿನ್ನ sinBeta  = sin(beta);
 
-        float segmentAreaA = a_2 * beta;
-        float segmentAreaB = b_2 * alpha;
+        ಭಿನ್ನ segmentAreaA = a_2 * beta;
+        ಭಿನ್ನ segmentAreaB = b_2 * alpha;
 
-        float triangleAreaA = a_2 * sinBeta * cosBeta;
-        float triangleAreaB = b_2 * sinAlpha * cosAlpha;
+        ಭಿನ್ನ triangleAreaA = a_2 * sinBeta * cosBeta;
+        ಭಿನ್ನ triangleAreaB = b_2 * sinAlpha * cosAlpha;
 
-        float intersectionArea = segmentAreaA + segmentAreaB - triangleAreaA - triangleAreaB;
-        float unionArea = (a_2 + b_2) * (float)CV_PI - intersectionArea;
+        ಭಿನ್ನ intersectionArea = segmentAreaA + segmentAreaB - triangleAreaA - triangleAreaB;
+        ಭಿನ್ನ unionArea = (a_2 + b_2) * (ಭಿನ್ನ)CV_PI - intersectionArea;
 
         ovrl = intersectionArea / unionArea;
     }
 
-    return ovrl;
+    ಪ್ರತ್ಯಾಗಮ ovrl;
 }
 
 ////////////////////// RotatedRect //////////////////////
 
-RotatedRect::RotatedRect(const Point2f& _point1, const Point2f& _point2, const Point2f& _point3)
+RotatedRect::RotatedRect(ಧ್ರುವ Point2f& _point1, ಧ್ರುವ Point2f& _point2, ಧ್ರುವ Point2f& _point3)
 {
     Point2f _center = 0.5f * (_point1 + _point3);
     Vec2f vecs[2];
     vecs[0] = Vec2f(_point1 - _point2);
     vecs[1] = Vec2f(_point2 - _point3);
-    double x = std::max(norm(_point1), std::max(norm(_point2), norm(_point3)));
-    double a = std::min(norm(vecs[0]), norm(vecs[1]));
+    ದ್ವಿಗುಣ x = std::max(norm(_point1), std::max(norm(_point2), norm(_point3)));
+    ದ್ವಿಗುಣ a = std::min(norm(vecs[0]), norm(vecs[1]));
     // check that given sides are perpendicular
     CV_Assert( std::fabs(vecs[0].ddot(vecs[1])) * a <= FLT_EPSILON * 9 * x * (norm(vecs[0]) * norm(vecs[1])) );
 
     // wd_i stores which vector (0,1) or (1,2) will make the width
     // One of them will definitely have slope within -1 to 1
-    int wd_i = 0;
-    if( std::fabs(vecs[1][1]) < std::fabs(vecs[1][0]) ) wd_i = 1;
-    int ht_i = (wd_i + 1) % 2;
+    ಪೂರ್ಣಾಙ್ಕ wd_i = 0;
+    ಯದಿ( std::fabs(vecs[1][1]) < std::fabs(vecs[1][0]) ) wd_i = 1;
+    ಪೂರ್ಣಾಙ್ಕ ht_i = (wd_i + 1) % 2;
 
-    float _angle = std::atan(vecs[wd_i][1] / vecs[wd_i][0]) * 180.0f / (float) CV_PI;
-    float _width = (float) norm(vecs[wd_i]);
-    float _height = (float) norm(vecs[ht_i]);
+    ಭಿನ್ನ _angle = std::atan(vecs[wd_i][1] / vecs[wd_i][0]) * 180.0f / (ಭಿನ್ನ) CV_PI;
+    ಭಿನ್ನ _width = (ಭಿನ್ನ) norm(vecs[wd_i]);
+    ಭಿನ್ನ _height = (ಭಿನ್ನ) norm(vecs[ht_i]);
 
     center = _center;
     size = Size2f(_width, _height);
     angle = _angle;
 }
 
-void RotatedRect::points(Point2f pt[]) const
+ಶೂನ್ಯ RotatedRect::points(Point2f pt[]) ಧ್ರುವ
 {
-    double _angle = angle*CV_PI/180.;
-    float b = (float)cos(_angle)*0.5f;
-    float a = (float)sin(_angle)*0.5f;
+    ದ್ವಿಗುಣ _angle = angle*CV_PI/180.;
+    ಭಿನ್ನ b = (ಭಿನ್ನ)cos(_angle)*0.5f;
+    ಭಿನ್ನ a = (ಭಿನ್ನ)sin(_angle)*0.5f;
 
-    const float ah = a*size.height;
-    const float aw = a*size.width;
-    const float bh = b*size.height;
-    const float bw = b*size.width;
+    ಧ್ರುವ ಭಿನ್ನ ah = a*size.height;
+    ಧ್ರುವ ಭಿನ್ನ aw = a*size.width;
+    ಧ್ರುವ ಭಿನ್ನ bh = b*size.height;
+    ಧ್ರುವ ಭಿನ್ನ bw = b*size.width;
     pt[0].x = center.x - ah - bw;
     pt[0].y = center.y + bh - aw;
     pt[1].x = center.x + ah - bw;
@@ -190,12 +190,12 @@ void RotatedRect::points(Point2f pt[]) const
     pt[3].y = center.y + bh + aw;
 }
 
-void RotatedRect::points(std::vector<Point2f>& pts) const {
+ಶೂನ್ಯ RotatedRect::points(std::vector<Point2f>& pts) ಧ್ರುವ {
     pts.resize(4);
     points(pts.data());
 }
 
-Rect RotatedRect::boundingRect() const
+Rect RotatedRect::boundingRect() ಧ್ರುವ
 {
     Point2f pt[4];
     points(pt);
@@ -205,17 +205,17 @@ Rect RotatedRect::boundingRect() const
            cvCeil(std::max(std::max(std::max(pt[0].y, pt[1].y), pt[2].y), pt[3].y)));
     r.width -= r.x - 1;
     r.height -= r.y - 1;
-    return r;
+    ಪ್ರತ್ಯಾಗಮ r;
 }
 
 
-Rect_<float> RotatedRect::boundingRect2f() const
+Rect_<ಭಿನ್ನ> RotatedRect::boundingRect2f() ಧ್ರುವ
 {
     Point2f pt[4];
     points(pt);
-    Rect_<float> r(Point_<float>(min(min(min(pt[0].x, pt[1].x), pt[2].x), pt[3].x), min(min(min(pt[0].y, pt[1].y), pt[2].y), pt[3].y)),
-                   Point_<float>(max(max(max(pt[0].x, pt[1].x), pt[2].x), pt[3].x), max(max(max(pt[0].y, pt[1].y), pt[2].y), pt[3].y)));
-    return r;
+    Rect_<ಭಿನ್ನ> r(Point_<ಭಿನ್ನ>(min(min(min(pt[0].x, pt[1].x), pt[2].x), pt[3].x), min(min(min(pt[0].y, pt[1].y), pt[2].y), pt[3].y)),
+                   Point_<ಭಿನ್ನ>(max(max(max(pt[0].x, pt[1].x), pt[2].x), pt[3].x), max(max(max(pt[0].y, pt[1].y), pt[2].y), pt[3].y)));
+    ಪ್ರತ್ಯಾಗಮ r;
 }
 
 } // cv

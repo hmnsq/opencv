@@ -9,209 +9,209 @@
 //
 // */
 
-#include "precomp.hpp"
-#include <opencv2/core/utils/logger.hpp>
+#ಅನ್ತರ್ಭಾವ "precomp.hpp"
+#ಅನ್ತರ್ಭಾವ <opencv2/core/utils/logger.hpp>
 
-namespace cv
+ನಾಮಾಕಾಶ cv
 {
 
 //This and its overload below are used in various MatExpr operator overloads
 //implemented to check that Matrix operands exist.
-static void checkOperandsExist(const Mat& a)
+ಸ್ಥಿರ ಶೂನ್ಯ checkOperandsExist(ಧ್ರುವ Mat& a)
 {
-    if (a.empty())
+    ಯದಿ (a.empty())
     {
         CV_Error(cv::Error::StsBadArg, "Matrix operand is an empty matrix.");
     }
 }
 
-static void checkOperandsExist(const Mat& a, const Mat& b)
+ಸ್ಥಿರ ಶೂನ್ಯ checkOperandsExist(ಧ್ರುವ Mat& a, ಧ್ರುವ Mat& b)
 {
-    if (a.empty() || b.empty())
+    ಯದಿ (a.empty() || b.empty())
     {
         CV_Error(cv::Error::StsBadArg, "One or more matrix operands are empty.");
     }
 }
 
 
-class MatOp_Identity CV_FINAL : public MatOp
+ವರ್ಗ MatOp_Identity CV_FINAL : ಸಾರ್ವಜನಿಕ MatOp
 {
-public:
+ಸಾರ್ವಜನಿಕ:
     MatOp_Identity() {}
-    virtual ~MatOp_Identity() {}
+    ಆಭಾಸ ~MatOp_Identity() {}
 
-    bool elementWise(const MatExpr& /*expr*/) const CV_OVERRIDE { return true; }
-    void assign(const MatExpr& expr, Mat& m, int type=-1) const CV_OVERRIDE;
+    ತಾರ್ಕಿಕ elementWise(ಧ್ರುವ Mat_ಅಭಿವ್ಯಕ್ತಿ& /*ಅಭಿವ್ಯಕ್ತಿ*/) ಧ್ರುವ CV_OVERRIDE { ಪ್ರತ್ಯಾಗಮ ಸತ್ಯ; }
+    ಶೂನ್ಯ assign(ಧ್ರುವ Mat_ಅಭಿವ್ಯಕ್ತಿ& ಅಭಿವ್ಯಕ್ತಿ, Mat& m, ಪೂರ್ಣಾಙ್ಕ type=-1) ಧ್ರುವ CV_OVERRIDE;
 
-    static void makeExpr(MatExpr& res, const Mat& m);
+    ಸ್ಥಿರ ಶೂನ್ಯ make_ಅಭಿವ್ಯಕ್ತಿ(Mat_ಅಭಿವ್ಯಕ್ತಿ& res, ಧ್ರುವ Mat& m);
 };
 
-static MatOp_Identity g_MatOp_Identity;
+ಸ್ಥಿರ MatOp_Identity g_MatOp_Identity;
 
-class MatOp_AddEx CV_FINAL : public MatOp
+ವರ್ಗ MatOp_AddEx CV_FINAL : ಸಾರ್ವಜನಿಕ MatOp
 {
-public:
+ಸಾರ್ವಜನಿಕ:
     MatOp_AddEx() {}
-    virtual ~MatOp_AddEx() {}
+    ಆಭಾಸ ~MatOp_AddEx() {}
 
-    bool elementWise(const MatExpr& /*expr*/) const CV_OVERRIDE { return true; }
-    void assign(const MatExpr& expr, Mat& m, int type=-1) const CV_OVERRIDE;
+    ತಾರ್ಕಿಕ elementWise(ಧ್ರುವ Mat_ಅಭಿವ್ಯಕ್ತಿ& /*ಅಭಿವ್ಯಕ್ತಿ*/) ಧ್ರುವ CV_OVERRIDE { ಪ್ರತ್ಯಾಗಮ ಸತ್ಯ; }
+    ಶೂನ್ಯ assign(ಧ್ರುವ Mat_ಅಭಿವ್ಯಕ್ತಿ& ಅಭಿವ್ಯಕ್ತಿ, Mat& m, ಪೂರ್ಣಾಙ್ಕ type=-1) ಧ್ರುವ CV_OVERRIDE;
 
-    void add(const MatExpr& e1, const Scalar& s, MatExpr& res) const CV_OVERRIDE;
-    void subtract(const Scalar& s, const MatExpr& expr, MatExpr& res) const CV_OVERRIDE;
-    void multiply(const MatExpr& e1, double s, MatExpr& res) const CV_OVERRIDE;
-    void divide(double s, const MatExpr& e, MatExpr& res) const CV_OVERRIDE;
+    ಶೂನ್ಯ add(ಧ್ರುವ Mat_ಅಭಿವ್ಯಕ್ತಿ& e1, ಧ್ರುವ Scalar& s, Mat_ಅಭಿವ್ಯಕ್ತಿ& res) ಧ್ರುವ CV_OVERRIDE;
+    ಶೂನ್ಯ subtract(ಧ್ರುವ Scalar& s, ಧ್ರುವ Mat_ಅಭಿವ್ಯಕ್ತಿ& ಅಭಿವ್ಯಕ್ತಿ, Mat_ಅಭಿವ್ಯಕ್ತಿ& res) ಧ್ರುವ CV_OVERRIDE;
+    ಶೂನ್ಯ multiply(ಧ್ರುವ Mat_ಅಭಿವ್ಯಕ್ತಿ& e1, ದ್ವಿಗುಣ s, Mat_ಅಭಿವ್ಯಕ್ತಿ& res) ಧ್ರುವ CV_OVERRIDE;
+    ಶೂನ್ಯ divide(ದ್ವಿಗುಣ s, ಧ್ರುವ Mat_ಅಭಿವ್ಯಕ್ತಿ& e, Mat_ಅಭಿವ್ಯಕ್ತಿ& res) ಧ್ರುವ CV_OVERRIDE;
 
-    void transpose(const MatExpr& e1, MatExpr& res) const CV_OVERRIDE;
-    void abs(const MatExpr& expr, MatExpr& res) const CV_OVERRIDE;
+    ಶೂನ್ಯ transpose(ಧ್ರುವ Mat_ಅಭಿವ್ಯಕ್ತಿ& e1, Mat_ಅಭಿವ್ಯಕ್ತಿ& res) ಧ್ರುವ CV_OVERRIDE;
+    ಶೂನ್ಯ abs(ಧ್ರುವ Mat_ಅಭಿವ್ಯಕ್ತಿ& ಅಭಿವ್ಯಕ್ತಿ, Mat_ಅಭಿವ್ಯಕ್ತಿ& res) ಧ್ರುವ CV_OVERRIDE;
 
-    static void makeExpr(MatExpr& res, const Mat& a, const Mat& b, double alpha, double beta, const Scalar& s=Scalar());
+    ಸ್ಥಿರ ಶೂನ್ಯ make_ಅಭಿವ್ಯಕ್ತಿ(Mat_ಅಭಿವ್ಯಕ್ತಿ& res, ಧ್ರುವ Mat& a, ಧ್ರುವ Mat& b, ದ್ವಿಗುಣ alpha, ದ್ವಿಗುಣ beta, ಧ್ರುವ Scalar& s=Scalar());
 };
 
-static MatOp_AddEx g_MatOp_AddEx;
+ಸ್ಥಿರ MatOp_AddEx g_MatOp_AddEx;
 
-class MatOp_Bin CV_FINAL : public MatOp
+ವರ್ಗ MatOp_Bin CV_FINAL : ಸಾರ್ವಜನಿಕ MatOp
 {
-public:
+ಸಾರ್ವಜನಿಕ:
     MatOp_Bin() {}
-    virtual ~MatOp_Bin() {}
+    ಆಭಾಸ ~MatOp_Bin() {}
 
-    bool elementWise(const MatExpr& /*expr*/) const CV_OVERRIDE { return true; }
-    void assign(const MatExpr& expr, Mat& m, int type=-1) const CV_OVERRIDE;
+    ತಾರ್ಕಿಕ elementWise(ಧ್ರುವ Mat_ಅಭಿವ್ಯಕ್ತಿ& /*ಅಭಿವ್ಯಕ್ತಿ*/) ಧ್ರುವ CV_OVERRIDE { ಪ್ರತ್ಯಾಗಮ ಸತ್ಯ; }
+    ಶೂನ್ಯ assign(ಧ್ರುವ Mat_ಅಭಿವ್ಯಕ್ತಿ& ಅಭಿವ್ಯಕ್ತಿ, Mat& m, ಪೂರ್ಣಾಙ್ಕ type=-1) ಧ್ರುವ CV_OVERRIDE;
 
-    void multiply(const MatExpr& e1, double s, MatExpr& res) const CV_OVERRIDE;
-    void divide(double s, const MatExpr& e, MatExpr& res) const CV_OVERRIDE;
+    ಶೂನ್ಯ multiply(ಧ್ರುವ Mat_ಅಭಿವ್ಯಕ್ತಿ& e1, ದ್ವಿಗುಣ s, Mat_ಅಭಿವ್ಯಕ್ತಿ& res) ಧ್ರುವ CV_OVERRIDE;
+    ಶೂನ್ಯ divide(ದ್ವಿಗುಣ s, ಧ್ರುವ Mat_ಅಭಿವ್ಯಕ್ತಿ& e, Mat_ಅಭಿವ್ಯಕ್ತಿ& res) ಧ್ರುವ CV_OVERRIDE;
 
-    static void makeExpr(MatExpr& res, char op, const Mat& a, const Mat& b, double scale=1);
-    static void makeExpr(MatExpr& res, char op, const Mat& a, const Scalar& s);
+    ಸ್ಥಿರ ಶೂನ್ಯ make_ಅಭಿವ್ಯಕ್ತಿ(Mat_ಅಭಿವ್ಯಕ್ತಿ& res, ವರ್ಣ op, ಧ್ರುವ Mat& a, ಧ್ರುವ Mat& b, ದ್ವಿಗುಣ scale=1);
+    ಸ್ಥಿರ ಶೂನ್ಯ make_ಅಭಿವ್ಯಕ್ತಿ(Mat_ಅಭಿವ್ಯಕ್ತಿ& res, ವರ್ಣ op, ಧ್ರುವ Mat& a, ಧ್ರುವ Scalar& s);
 };
 
-static MatOp_Bin g_MatOp_Bin;
+ಸ್ಥಿರ MatOp_Bin g_MatOp_Bin;
 
-class MatOp_Cmp CV_FINAL : public MatOp
+ವರ್ಗ MatOp_Cmp CV_FINAL : ಸಾರ್ವಜನಿಕ MatOp
 {
-public:
+ಸಾರ್ವಜನಿಕ:
     MatOp_Cmp() {}
-    virtual ~MatOp_Cmp() {}
+    ಆಭಾಸ ~MatOp_Cmp() {}
 
-    bool elementWise(const MatExpr& /*expr*/) const CV_OVERRIDE { return true; }
-    void assign(const MatExpr& expr, Mat& m, int type=-1) const CV_OVERRIDE;
+    ತಾರ್ಕಿಕ elementWise(ಧ್ರುವ Mat_ಅಭಿವ್ಯಕ್ತಿ& /*ಅಭಿವ್ಯಕ್ತಿ*/) ಧ್ರುವ CV_OVERRIDE { ಪ್ರತ್ಯಾಗಮ ಸತ್ಯ; }
+    ಶೂನ್ಯ assign(ಧ್ರುವ Mat_ಅಭಿವ್ಯಕ್ತಿ& ಅಭಿವ್ಯಕ್ತಿ, Mat& m, ಪೂರ್ಣಾಙ್ಕ type=-1) ಧ್ರುವ CV_OVERRIDE;
 
-    static void makeExpr(MatExpr& res, int cmpop, const Mat& a, const Mat& b);
-    static void makeExpr(MatExpr& res, int cmpop, const Mat& a, double alpha);
+    ಸ್ಥಿರ ಶೂನ್ಯ make_ಅಭಿವ್ಯಕ್ತಿ(Mat_ಅಭಿವ್ಯಕ್ತಿ& res, ಪೂರ್ಣಾಙ್ಕ cmpop, ಧ್ರುವ Mat& a, ಧ್ರುವ Mat& b);
+    ಸ್ಥಿರ ಶೂನ್ಯ make_ಅಭಿವ್ಯಕ್ತಿ(Mat_ಅಭಿವ್ಯಕ್ತಿ& res, ಪೂರ್ಣಾಙ್ಕ cmpop, ಧ್ರುವ Mat& a, ದ್ವಿಗುಣ alpha);
 };
 
-static MatOp_Cmp g_MatOp_Cmp;
+ಸ್ಥಿರ MatOp_Cmp g_MatOp_Cmp;
 
-class MatOp_GEMM CV_FINAL : public MatOp
+ವರ್ಗ MatOp_GEMM CV_FINAL : ಸಾರ್ವಜನಿಕ MatOp
 {
-public:
+ಸಾರ್ವಜನಿಕ:
     MatOp_GEMM() {}
-    virtual ~MatOp_GEMM() {}
+    ಆಭಾಸ ~MatOp_GEMM() {}
 
-    bool elementWise(const MatExpr& /*expr*/) const CV_OVERRIDE { return false; }
-    void assign(const MatExpr& expr, Mat& m, int type=-1) const CV_OVERRIDE;
+    ತಾರ್ಕಿಕ elementWise(ಧ್ರುವ Mat_ಅಭಿವ್ಯಕ್ತಿ& /*ಅಭಿವ್ಯಕ್ತಿ*/) ಧ್ರುವ CV_OVERRIDE { ಪ್ರತ್ಯಾಗಮ ಅಸತ್ಯ; }
+    ಶೂನ್ಯ assign(ಧ್ರುವ Mat_ಅಭಿವ್ಯಕ್ತಿ& ಅಭಿವ್ಯಕ್ತಿ, Mat& m, ಪೂರ್ಣಾಙ್ಕ type=-1) ಧ್ರುವ CV_OVERRIDE;
 
-    void add(const MatExpr& e1, const MatExpr& e2, MatExpr& res) const CV_OVERRIDE;
-    void subtract(const MatExpr& e1, const MatExpr& e2, MatExpr& res) const CV_OVERRIDE;
-    void multiply(const MatExpr& e, double s, MatExpr& res) const CV_OVERRIDE;
+    ಶೂನ್ಯ add(ಧ್ರುವ Mat_ಅಭಿವ್ಯಕ್ತಿ& e1, ಧ್ರುವ Mat_ಅಭಿವ್ಯಕ್ತಿ& e2, Mat_ಅಭಿವ್ಯಕ್ತಿ& res) ಧ್ರುವ CV_OVERRIDE;
+    ಶೂನ್ಯ subtract(ಧ್ರುವ Mat_ಅಭಿವ್ಯಕ್ತಿ& e1, ಧ್ರುವ Mat_ಅಭಿವ್ಯಕ್ತಿ& e2, Mat_ಅಭಿವ್ಯಕ್ತಿ& res) ಧ್ರುವ CV_OVERRIDE;
+    ಶೂನ್ಯ multiply(ಧ್ರುವ Mat_ಅಭಿವ್ಯಕ್ತಿ& e, ದ್ವಿಗುಣ s, Mat_ಅಭಿವ್ಯಕ್ತಿ& res) ಧ್ರುವ CV_OVERRIDE;
 
-    void transpose(const MatExpr& expr, MatExpr& res) const CV_OVERRIDE;
+    ಶೂನ್ಯ transpose(ಧ್ರುವ Mat_ಅಭಿವ್ಯಕ್ತಿ& ಅಭಿವ್ಯಕ್ತಿ, Mat_ಅಭಿವ್ಯಕ್ತಿ& res) ಧ್ರುವ CV_OVERRIDE;
 
-    Size size(const MatExpr& expr) const CV_OVERRIDE
+    Size size(ಧ್ರುವ Mat_ಅಭಿವ್ಯಕ್ತಿ& ಅಭಿವ್ಯಕ್ತಿ) ಧ್ರುವ CV_OVERRIDE
     {
-        return Size(
-            (expr.flags & GEMM_2_T) ? expr.b.rows : expr.b.cols,
-            (expr.flags & GEMM_1_T) ? expr.a.cols : expr.a.rows
+        ಪ್ರತ್ಯಾಗಮ Size(
+            (ಅಭಿವ್ಯಕ್ತಿ.flags & GEMM_2_T) ? ಅಭಿವ್ಯಕ್ತಿ.b.rows : ಅಭಿವ್ಯಕ್ತಿ.b.cols,
+            (ಅಭಿವ್ಯಕ್ತಿ.flags & GEMM_1_T) ? ಅಭಿವ್ಯಕ್ತಿ.a.cols : ಅಭಿವ್ಯಕ್ತಿ.a.rows
         );
     }
 
-    static void makeExpr(MatExpr& res, int flags, const Mat& a, const Mat& b,
-                         double alpha=1, const Mat& c=Mat(), double beta=1);
+    ಸ್ಥಿರ ಶೂನ್ಯ make_ಅಭಿವ್ಯಕ್ತಿ(Mat_ಅಭಿವ್ಯಕ್ತಿ& res, ಪೂರ್ಣಾಙ್ಕ flags, ಧ್ರುವ Mat& a, ಧ್ರುವ Mat& b,
+                         ದ್ವಿಗುಣ alpha=1, ಧ್ರುವ Mat& c=Mat(), ದ್ವಿಗುಣ beta=1);
 
 };
 
-static MatOp_GEMM g_MatOp_GEMM;
+ಸ್ಥಿರ MatOp_GEMM g_MatOp_GEMM;
 
-class MatOp_Invert CV_FINAL : public MatOp
+ವರ್ಗ MatOp_Invert CV_FINAL : ಸಾರ್ವಜನಿಕ MatOp
 {
-public:
+ಸಾರ್ವಜನಿಕ:
     MatOp_Invert() {}
-    virtual ~MatOp_Invert() {}
+    ಆಭಾಸ ~MatOp_Invert() {}
 
-    bool elementWise(const MatExpr& /*expr*/) const CV_OVERRIDE { return false; }
-    void assign(const MatExpr& expr, Mat& m, int type=-1) const CV_OVERRIDE;
+    ತಾರ್ಕಿಕ elementWise(ಧ್ರುವ Mat_ಅಭಿವ್ಯಕ್ತಿ& /*ಅಭಿವ್ಯಕ್ತಿ*/) ಧ್ರುವ CV_OVERRIDE { ಪ್ರತ್ಯಾಗಮ ಅಸತ್ಯ; }
+    ಶೂನ್ಯ assign(ಧ್ರುವ Mat_ಅಭಿವ್ಯಕ್ತಿ& ಅಭಿವ್ಯಕ್ತಿ, Mat& m, ಪೂರ್ಣಾಙ್ಕ type=-1) ಧ್ರುವ CV_OVERRIDE;
 
-    void matmul(const MatExpr& expr1, const MatExpr& expr2, MatExpr& res) const CV_OVERRIDE;
+    ಶೂನ್ಯ matmul(ಧ್ರುವ Mat_ಅಭಿವ್ಯಕ್ತಿ& expr1, ಧ್ರುವ Mat_ಅಭಿವ್ಯಕ್ತಿ& expr2, Mat_ಅಭಿವ್ಯಕ್ತಿ& res) ಧ್ರುವ CV_OVERRIDE;
 
-    static void makeExpr(MatExpr& res, int method, const Mat& m);
+    ಸ್ಥಿರ ಶೂನ್ಯ make_ಅಭಿವ್ಯಕ್ತಿ(Mat_ಅಭಿವ್ಯಕ್ತಿ& res, ಪೂರ್ಣಾಙ್ಕ method, ಧ್ರುವ Mat& m);
 };
 
-static MatOp_Invert g_MatOp_Invert;
+ಸ್ಥಿರ MatOp_Invert g_MatOp_Invert;
 
-class MatOp_T CV_FINAL : public MatOp
+ವರ್ಗ MatOp_T CV_FINAL : ಸಾರ್ವಜನಿಕ MatOp
 {
-public:
+ಸಾರ್ವಜನಿಕ:
     MatOp_T() {}
-    virtual ~MatOp_T() {}
+    ಆಭಾಸ ~MatOp_T() {}
 
-    bool elementWise(const MatExpr& /*expr*/) const CV_OVERRIDE { return false; }
-    void assign(const MatExpr& expr, Mat& m, int type=-1) const CV_OVERRIDE;
+    ತಾರ್ಕಿಕ elementWise(ಧ್ರುವ Mat_ಅಭಿವ್ಯಕ್ತಿ& /*ಅಭಿವ್ಯಕ್ತಿ*/) ಧ್ರುವ CV_OVERRIDE { ಪ್ರತ್ಯಾಗಮ ಅಸತ್ಯ; }
+    ಶೂನ್ಯ assign(ಧ್ರುವ Mat_ಅಭಿವ್ಯಕ್ತಿ& ಅಭಿವ್ಯಕ್ತಿ, Mat& m, ಪೂರ್ಣಾಙ್ಕ type=-1) ಧ್ರುವ CV_OVERRIDE;
 
-    void multiply(const MatExpr& e1, double s, MatExpr& res) const CV_OVERRIDE;
-    void transpose(const MatExpr& expr, MatExpr& res) const CV_OVERRIDE;
+    ಶೂನ್ಯ multiply(ಧ್ರುವ Mat_ಅಭಿವ್ಯಕ್ತಿ& e1, ದ್ವಿಗುಣ s, Mat_ಅಭಿವ್ಯಕ್ತಿ& res) ಧ್ರುವ CV_OVERRIDE;
+    ಶೂನ್ಯ transpose(ಧ್ರುವ Mat_ಅಭಿವ್ಯಕ್ತಿ& ಅಭಿವ್ಯಕ್ತಿ, Mat_ಅಭಿವ್ಯಕ್ತಿ& res) ಧ್ರುವ CV_OVERRIDE;
 
-    static void makeExpr(MatExpr& res, const Mat& a, double alpha=1);
+    ಸ್ಥಿರ ಶೂನ್ಯ make_ಅಭಿವ್ಯಕ್ತಿ(Mat_ಅಭಿವ್ಯಕ್ತಿ& res, ಧ್ರುವ Mat& a, ದ್ವಿಗುಣ alpha=1);
 };
 
-static MatOp_T g_MatOp_T;
+ಸ್ಥಿರ MatOp_T g_MatOp_T;
 
-class MatOp_Solve CV_FINAL : public MatOp
+ವರ್ಗ MatOp_Solve CV_FINAL : ಸಾರ್ವಜನಿಕ MatOp
 {
-public:
+ಸಾರ್ವಜನಿಕ:
     MatOp_Solve() {}
-    virtual ~MatOp_Solve() {}
+    ಆಭಾಸ ~MatOp_Solve() {}
 
-    bool elementWise(const MatExpr& /*expr*/) const CV_OVERRIDE { return false; }
-    void assign(const MatExpr& expr, Mat& m, int type=-1) const CV_OVERRIDE;
+    ತಾರ್ಕಿಕ elementWise(ಧ್ರುವ Mat_ಅಭಿವ್ಯಕ್ತಿ& /*ಅಭಿವ್ಯಕ್ತಿ*/) ಧ್ರುವ CV_OVERRIDE { ಪ್ರತ್ಯಾಗಮ ಅಸತ್ಯ; }
+    ಶೂನ್ಯ assign(ಧ್ರುವ Mat_ಅಭಿವ್ಯಕ್ತಿ& ಅಭಿವ್ಯಕ್ತಿ, Mat& m, ಪೂರ್ಣಾಙ್ಕ type=-1) ಧ್ರುವ CV_OVERRIDE;
 
-    static void makeExpr(MatExpr& res, int method, const Mat& a, const Mat& b);
+    ಸ್ಥಿರ ಶೂನ್ಯ make_ಅಭಿವ್ಯಕ್ತಿ(Mat_ಅಭಿವ್ಯಕ್ತಿ& res, ಪೂರ್ಣಾಙ್ಕ method, ಧ್ರುವ Mat& a, ಧ್ರುವ Mat& b);
 };
 
-static MatOp_Solve g_MatOp_Solve;
+ಸ್ಥಿರ MatOp_Solve g_MatOp_Solve;
 
-class MatOp_Initializer CV_FINAL : public MatOp
+ವರ್ಗ MatOp_Initializer CV_FINAL : ಸಾರ್ವಜನಿಕ MatOp
 {
-public:
+ಸಾರ್ವಜನಿಕ:
     MatOp_Initializer() {}
-    virtual ~MatOp_Initializer() {}
+    ಆಭಾಸ ~MatOp_Initializer() {}
 
-    bool elementWise(const MatExpr& /*expr*/) const CV_OVERRIDE { return false; }
-    void assign(const MatExpr& expr, Mat& m, int type=-1) const CV_OVERRIDE;
+    ತಾರ್ಕಿಕ elementWise(ಧ್ರುವ Mat_ಅಭಿವ್ಯಕ್ತಿ& /*ಅಭಿವ್ಯಕ್ತಿ*/) ಧ್ರುವ CV_OVERRIDE { ಪ್ರತ್ಯಾಗಮ ಅಸತ್ಯ; }
+    ಶೂನ್ಯ assign(ಧ್ರುವ Mat_ಅಭಿವ್ಯಕ್ತಿ& ಅಭಿವ್ಯಕ್ತಿ, Mat& m, ಪೂರ್ಣಾಙ್ಕ type=-1) ಧ್ರುವ CV_OVERRIDE;
 
-    void multiply(const MatExpr& e, double s, MatExpr& res) const CV_OVERRIDE;
+    ಶೂನ್ಯ multiply(ಧ್ರುವ Mat_ಅಭಿವ್ಯಕ್ತಿ& e, ದ್ವಿಗುಣ s, Mat_ಅಭಿವ್ಯಕ್ತಿ& res) ಧ್ರುವ CV_OVERRIDE;
 
-    static void makeExpr(MatExpr& res, int method, Size sz, int type, double alpha=1);
-    static void makeExpr(MatExpr& res, int method, int ndims, const int* sizes, int type, double alpha=1);
+    ಸ್ಥಿರ ಶೂನ್ಯ make_ಅಭಿವ್ಯಕ್ತಿ(Mat_ಅಭಿವ್ಯಕ್ತಿ& res, ಪೂರ್ಣಾಙ್ಕ method, Size sz, ಪೂರ್ಣಾಙ್ಕ type, ದ್ವಿಗುಣ alpha=1);
+    ಸ್ಥಿರ ಶೂನ್ಯ make_ಅಭಿವ್ಯಕ್ತಿ(Mat_ಅಭಿವ್ಯಕ್ತಿ& res, ಪೂರ್ಣಾಙ್ಕ method, ಪೂರ್ಣಾಙ್ಕ ndims, ಧ್ರುವ ಪೂರ್ಣಾಙ್ಕ* sizes, ಪೂರ್ಣಾಙ್ಕ type, ದ್ವಿಗುಣ alpha=1);
 };
 
-static MatOp_Initializer* getGlobalMatOpInitializer()
+ಸ್ಥಿರ MatOp_Initializer* getGlobalMatOpInitializer()
 {
-    CV_SINGLETON_LAZY_INIT(MatOp_Initializer, new MatOp_Initializer())
+    CV_SINGLETON_LAZY_INIT(MatOp_Initializer, ನೂತನ MatOp_Initializer())
 }
 
-static inline bool isIdentity(const MatExpr& e) { return e.op == &g_MatOp_Identity; }
-static inline bool isAddEx(const MatExpr& e) { return e.op == &g_MatOp_AddEx; }
-static inline bool isScaled(const MatExpr& e) { return isAddEx(e) && (!e.b.data || e.beta == 0) && e.s == Scalar(); }
-static inline bool isBin(const MatExpr& e, char c) { return e.op == &g_MatOp_Bin && e.flags == c; }
-static inline bool isCmp(const MatExpr& e) { return e.op == &g_MatOp_Cmp; }
-static inline bool isReciprocal(const MatExpr& e) { return isBin(e,'/') && (!e.b.data || e.beta == 0); }
-static inline bool isT(const MatExpr& e) { return e.op == &g_MatOp_T; }
-static inline bool isInv(const MatExpr& e) { return e.op == &g_MatOp_Invert; }
-static inline bool isSolve(const MatExpr& e) { return e.op == &g_MatOp_Solve; }
+ಸ್ಥಿರ ಅನ್ತಃಸ್ಥ ತಾರ್ಕಿಕ isIdentity(ಧ್ರುವ Mat_ಅಭಿವ್ಯಕ್ತಿ& e) { ಪ್ರತ್ಯಾಗಮ e.op == &g_MatOp_Identity; }
+ಸ್ಥಿರ ಅನ್ತಃಸ್ಥ ತಾರ್ಕಿಕ isAddEx(ಧ್ರುವ Mat_ಅಭಿವ್ಯಕ್ತಿ& e) { ಪ್ರತ್ಯಾಗಮ e.op == &g_MatOp_AddEx; }
+ಸ್ಥಿರ ಅನ್ತಃಸ್ಥ ತಾರ್ಕಿಕ isScaled(ಧ್ರುವ Mat_ಅಭಿವ್ಯಕ್ತಿ& e) { ಪ್ರತ್ಯಾಗಮ isAddEx(e) && (!e.b.data || e.beta == 0) && e.s == Scalar(); }
+ಸ್ಥಿರ ಅನ್ತಃಸ್ಥ ತಾರ್ಕಿಕ isBin(ಧ್ರುವ Mat_ಅಭಿವ್ಯಕ್ತಿ& e, ವರ್ಣ c) { ಪ್ರತ್ಯಾಗಮ e.op == &g_MatOp_Bin && e.flags == c; }
+ಸ್ಥಿರ ಅನ್ತಃಸ್ಥ ತಾರ್ಕಿಕ isCmp(ಧ್ರುವ Mat_ಅಭಿವ್ಯಕ್ತಿ& e) { ಪ್ರತ್ಯಾಗಮ e.op == &g_MatOp_Cmp; }
+ಸ್ಥಿರ ಅನ್ತಃಸ್ಥ ತಾರ್ಕಿಕ isReciprocal(ಧ್ರುವ Mat_ಅಭಿವ್ಯಕ್ತಿ& e) { ಪ್ರತ್ಯಾಗಮ isBin(e,'/') && (!e.b.data || e.beta == 0); }
+ಸ್ಥಿರ ಅನ್ತಃಸ್ಥ ತಾರ್ಕಿಕ isT(ಧ್ರುವ Mat_ಅಭಿವ್ಯಕ್ತಿ& e) { ಪ್ರತ್ಯಾಗಮ e.op == &g_MatOp_T; }
+ಸ್ಥಿರ ಅನ್ತಃಸ್ಥ ತಾರ್ಕಿಕ isInv(ಧ್ರುವ Mat_ಅಭಿವ್ಯಕ್ತಿ& e) { ಪ್ರತ್ಯಾಗಮ e.op == &g_MatOp_Invert; }
+ಸ್ಥಿರ ಅನ್ತಃಸ್ಥ ತಾರ್ಕಿಕ isSolve(ಧ್ರುವ Mat_ಅಭಿವ್ಯಕ್ತಿ& e) { ಪ್ರತ್ಯಾಗಮ e.op == &g_MatOp_Solve; }
 //static inline bool isGEMM(const MatExpr& e) { return e.op == &g_MatOp_GEMM; }
-static inline bool isMatProd(const MatExpr& e) { return e.op == &g_MatOp_GEMM && (!e.c.data || e.beta == 0); }
-static inline bool isInitializer(const MatExpr& e) { return e.op == getGlobalMatOpInitializer(); }
+ಸ್ಥಿರ ಅನ್ತಃಸ್ಥ ತಾರ್ಕಿಕ isMatProd(ಧ್ರುವ Mat_ಅಭಿವ್ಯಕ್ತಿ& e) { ಪ್ರತ್ಯಾಗಮ e.op == &g_MatOp_GEMM && (!e.c.data || e.beta == 0); }
+ಸ್ಥಿರ ಅನ್ತಃಸ್ಥ ತಾರ್ಕಿಕ isInitializer(ಧ್ರುವ Mat_ಅಭಿವ್ಯಕ್ತಿ& e) { ಪ್ರತ್ಯಾಗಮ e.op == getGlobalMatOpInitializer(); }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -219,1138 +219,1138 @@ MatOp::MatOp() {}
 MatOp::~MatOp() {}
 
 
-bool MatOp::elementWise(const MatExpr& /*expr*/) const
+ತಾರ್ಕಿಕ MatOp::elementWise(ಧ್ರುವ Mat_ಅಭಿವ್ಯಕ್ತಿ& /*ಅಭಿವ್ಯಕ್ತಿ*/) ಧ್ರುವ
 {
-    return false;
+    ಪ್ರತ್ಯಾಗಮ ಅಸತ್ಯ;
 }
 
-void MatOp::roi(const MatExpr& expr, const Range& rowRange, const Range& colRange, MatExpr& e) const
+ಶೂನ್ಯ MatOp::roi(ಧ್ರುವ Mat_ಅಭಿವ್ಯಕ್ತಿ& ಅಭಿವ್ಯಕ್ತಿ, ಧ್ರುವ Range& rowRange, ಧ್ರುವ Range& colRange, Mat_ಅಭಿವ್ಯಕ್ತಿ& e) ಧ್ರುವ
 {
-    if( elementWise(expr) )
+    ಯದಿ( elementWise(ಅಭಿವ್ಯಕ್ತಿ) )
     {
-        e = MatExpr(expr.op, expr.flags, Mat(), Mat(), Mat(),
-                    expr.alpha, expr.beta, expr.s);
-        if(expr.a.data)
-            e.a = expr.a(rowRange, colRange);
-        if(expr.b.data)
-            e.b = expr.b(rowRange, colRange);
-        if(expr.c.data)
-            e.c = expr.c(rowRange, colRange);
+        e = Mat_ಅಭಿವ್ಯಕ್ತಿ(ಅಭಿವ್ಯಕ್ತಿ.op, ಅಭಿವ್ಯಕ್ತಿ.flags, Mat(), Mat(), Mat(),
+                    ಅಭಿವ್ಯಕ್ತಿ.alpha, ಅಭಿವ್ಯಕ್ತಿ.beta, ಅಭಿವ್ಯಕ್ತಿ.s);
+        ಯದಿ(ಅಭಿವ್ಯಕ್ತಿ.a.data)
+            e.a = ಅಭಿವ್ಯಕ್ತಿ.a(rowRange, colRange);
+        ಯದಿ(ಅಭಿವ್ಯಕ್ತಿ.b.data)
+            e.b = ಅಭಿವ್ಯಕ್ತಿ.b(rowRange, colRange);
+        ಯದಿ(ಅಭಿವ್ಯಕ್ತಿ.c.data)
+            e.c = ಅಭಿವ್ಯಕ್ತಿ.c(rowRange, colRange);
     }
-    else
+    ಅನ್ಯಥಾ
     {
         Mat m;
-        expr.op->assign(expr, m);
-        e = MatExpr(&g_MatOp_Identity, 0, m(rowRange, colRange), Mat(), Mat());
+        ಅಭಿವ್ಯಕ್ತಿ.op->assign(ಅಭಿವ್ಯಕ್ತಿ, m);
+        e = Mat_ಅಭಿವ್ಯಕ್ತಿ(&g_MatOp_Identity, 0, m(rowRange, colRange), Mat(), Mat());
     }
 }
 
-void MatOp::diag(const MatExpr& expr, int d, MatExpr& e) const
+ಶೂನ್ಯ MatOp::diag(ಧ್ರುವ Mat_ಅಭಿವ್ಯಕ್ತಿ& ಅಭಿವ್ಯಕ್ತಿ, ಪೂರ್ಣಾಙ್ಕ d, Mat_ಅಭಿವ್ಯಕ್ತಿ& e) ಧ್ರುವ
 {
-    if( elementWise(expr) )
+    ಯದಿ( elementWise(ಅಭಿವ್ಯಕ್ತಿ) )
     {
-        e = MatExpr(expr.op, expr.flags, Mat(), Mat(), Mat(),
-                    expr.alpha, expr.beta, expr.s);
-        if(expr.a.data)
-            e.a = expr.a.diag(d);
-        if(expr.b.data)
-            e.b = expr.b.diag(d);
-        if(expr.c.data)
-            e.c = expr.c.diag(d);
+        e = Mat_ಅಭಿವ್ಯಕ್ತಿ(ಅಭಿವ್ಯಕ್ತಿ.op, ಅಭಿವ್ಯಕ್ತಿ.flags, Mat(), Mat(), Mat(),
+                    ಅಭಿವ್ಯಕ್ತಿ.alpha, ಅಭಿವ್ಯಕ್ತಿ.beta, ಅಭಿವ್ಯಕ್ತಿ.s);
+        ಯದಿ(ಅಭಿವ್ಯಕ್ತಿ.a.data)
+            e.a = ಅಭಿವ್ಯಕ್ತಿ.a.diag(d);
+        ಯದಿ(ಅಭಿವ್ಯಕ್ತಿ.b.data)
+            e.b = ಅಭಿವ್ಯಕ್ತಿ.b.diag(d);
+        ಯದಿ(ಅಭಿವ್ಯಕ್ತಿ.c.data)
+            e.c = ಅಭಿವ್ಯಕ್ತಿ.c.diag(d);
     }
-    else
+    ಅನ್ಯಥಾ
     {
         Mat m;
-        expr.op->assign(expr, m);
-        e = MatExpr(&g_MatOp_Identity, 0, m.diag(d), Mat(), Mat());
+        ಅಭಿವ್ಯಕ್ತಿ.op->assign(ಅಭಿವ್ಯಕ್ತಿ, m);
+        e = Mat_ಅಭಿವ್ಯಕ್ತಿ(&g_MatOp_Identity, 0, m.diag(d), Mat(), Mat());
     }
 }
 
 
-void MatOp::augAssignAdd(const MatExpr& expr, Mat& m) const
+ಶೂನ್ಯ MatOp::augAssignAdd(ಧ್ರುವ Mat_ಅಭಿವ್ಯಕ್ತಿ& ಅಭಿವ್ಯಕ್ತಿ, Mat& m) ಧ್ರುವ
 {
     Mat temp;
-    expr.op->assign(expr, temp);
+    ಅಭಿವ್ಯಕ್ತಿ.op->assign(ಅಭಿವ್ಯಕ್ತಿ, temp);
     m += temp;
 }
 
 
-void MatOp::augAssignSubtract(const MatExpr& expr, Mat& m) const
+ಶೂನ್ಯ MatOp::augAssignSubtract(ಧ್ರುವ Mat_ಅಭಿವ್ಯಕ್ತಿ& ಅಭಿವ್ಯಕ್ತಿ, Mat& m) ಧ್ರುವ
 {
     Mat temp;
-    expr.op->assign(expr, temp);
+    ಅಭಿವ್ಯಕ್ತಿ.op->assign(ಅಭಿವ್ಯಕ್ತಿ, temp);
     m -= temp;
 }
 
 
-void MatOp::augAssignMultiply(const MatExpr& expr, Mat& m) const
+ಶೂನ್ಯ MatOp::augAssignMultiply(ಧ್ರುವ Mat_ಅಭಿವ್ಯಕ್ತಿ& ಅಭಿವ್ಯಕ್ತಿ, Mat& m) ಧ್ರುವ
 {
     Mat temp;
-    expr.op->assign(expr, temp);
+    ಅಭಿವ್ಯಕ್ತಿ.op->assign(ಅಭಿವ್ಯಕ್ತಿ, temp);
     m *= temp;
 }
 
 
-void MatOp::augAssignDivide(const MatExpr& expr, Mat& m) const
+ಶೂನ್ಯ MatOp::augAssignDivide(ಧ್ರುವ Mat_ಅಭಿವ್ಯಕ್ತಿ& ಅಭಿವ್ಯಕ್ತಿ, Mat& m) ಧ್ರುವ
 {
     Mat temp;
-    expr.op->assign(expr, temp);
+    ಅಭಿವ್ಯಕ್ತಿ.op->assign(ಅಭಿವ್ಯಕ್ತಿ, temp);
     m /= temp;
 }
 
 
-void MatOp::augAssignAnd(const MatExpr& expr, Mat& m) const
+ಶೂನ್ಯ MatOp::augAssignAnd(ಧ್ರುವ Mat_ಅಭಿವ್ಯಕ್ತಿ& ಅಭಿವ್ಯಕ್ತಿ, Mat& m) ಧ್ರುವ
 {
     Mat temp;
-    expr.op->assign(expr, temp);
+    ಅಭಿವ್ಯಕ್ತಿ.op->assign(ಅಭಿವ್ಯಕ್ತಿ, temp);
     m &= temp;
 }
 
 
-void MatOp::augAssignOr(const MatExpr& expr, Mat& m) const
+ಶೂನ್ಯ MatOp::augAssignOr(ಧ್ರುವ Mat_ಅಭಿವ್ಯಕ್ತಿ& ಅಭಿವ್ಯಕ್ತಿ, Mat& m) ಧ್ರುವ
 {
     Mat temp;
-    expr.op->assign(expr, temp);
+    ಅಭಿವ್ಯಕ್ತಿ.op->assign(ಅಭಿವ್ಯಕ್ತಿ, temp);
     m |= temp;
 }
 
 
-void MatOp::augAssignXor(const MatExpr& expr, Mat& m) const
+ಶೂನ್ಯ MatOp::augAssignXor(ಧ್ರುವ Mat_ಅಭಿವ್ಯಕ್ತಿ& ಅಭಿವ್ಯಕ್ತಿ, Mat& m) ಧ್ರುವ
 {
     Mat temp;
-    expr.op->assign(expr, temp);
+    ಅಭಿವ್ಯಕ್ತಿ.op->assign(ಅಭಿವ್ಯಕ್ತಿ, temp);
     m ^= temp;
 }
 
 
-void MatOp::add(const MatExpr& e1, const MatExpr& e2, MatExpr& res) const
+ಶೂನ್ಯ MatOp::add(ಧ್ರುವ Mat_ಅಭಿವ್ಯಕ್ತಿ& e1, ಧ್ರುವ Mat_ಅಭಿವ್ಯಕ್ತಿ& e2, Mat_ಅಭಿವ್ಯಕ್ತಿ& res) ಧ್ರುವ
 {
     CV_INSTRUMENT_REGION();
 
-    if( this == e2.op )
+    ಯದಿ( ಏತತ್ == e2.op )
     {
-        double alpha = 1, beta = 1;
+        ದ್ವಿಗುಣ alpha = 1, beta = 1;
         Scalar s;
         Mat m1, m2;
-        if( isAddEx(e1) && (!e1.b.data || e1.beta == 0) )
+        ಯದಿ( isAddEx(e1) && (!e1.b.data || e1.beta == 0) )
         {
             m1 = e1.a;
             alpha = e1.alpha;
             s = e1.s;
         }
-        else
+        ಅನ್ಯಥಾ
             e1.op->assign(e1, m1);
 
-        if( isAddEx(e2) && (!e2.b.data || e2.beta == 0) )
+        ಯದಿ( isAddEx(e2) && (!e2.b.data || e2.beta == 0) )
         {
             m2 = e2.a;
             beta = e2.alpha;
             s += e2.s;
         }
-        else
+        ಅನ್ಯಥಾ
             e2.op->assign(e2, m2);
-        MatOp_AddEx::makeExpr(res, m1, m2, alpha, beta, s);
+        MatOp_AddEx::make_ಅಭಿವ್ಯಕ್ತಿ(res, m1, m2, alpha, beta, s);
     }
-    else
+    ಅನ್ಯಥಾ
         e2.op->add(e1, e2, res);
 }
 
 
-void MatOp::add(const MatExpr& expr1, const Scalar& s, MatExpr& res) const
+ಶೂನ್ಯ MatOp::add(ಧ್ರುವ Mat_ಅಭಿವ್ಯಕ್ತಿ& expr1, ಧ್ರುವ Scalar& s, Mat_ಅಭಿವ್ಯಕ್ತಿ& res) ಧ್ರುವ
 {
     CV_INSTRUMENT_REGION();
 
     Mat m1;
     expr1.op->assign(expr1, m1);
-    MatOp_AddEx::makeExpr(res, m1, Mat(), 1, 0, s);
+    MatOp_AddEx::make_ಅಭಿವ್ಯಕ್ತಿ(res, m1, Mat(), 1, 0, s);
 }
 
 
-void MatOp::subtract(const MatExpr& e1, const MatExpr& e2, MatExpr& res) const
+ಶೂನ್ಯ MatOp::subtract(ಧ್ರುವ Mat_ಅಭಿವ್ಯಕ್ತಿ& e1, ಧ್ರುವ Mat_ಅಭಿವ್ಯಕ್ತಿ& e2, Mat_ಅಭಿವ್ಯಕ್ತಿ& res) ಧ್ರುವ
 {
     CV_INSTRUMENT_REGION();
 
-    if( this == e2.op )
+    ಯದಿ( ಏತತ್ == e2.op )
     {
-        double alpha = 1, beta = -1;
+        ದ್ವಿಗುಣ alpha = 1, beta = -1;
         Scalar s;
         Mat m1, m2;
-        if( isAddEx(e1) && (!e1.b.data || e1.beta == 0) )
+        ಯದಿ( isAddEx(e1) && (!e1.b.data || e1.beta == 0) )
         {
             m1 = e1.a;
             alpha = e1.alpha;
             s = e1.s;
         }
-        else
+        ಅನ್ಯಥಾ
             e1.op->assign(e1, m1);
 
-        if( isAddEx(e2) && (!e2.b.data || e2.beta == 0) )
+        ಯದಿ( isAddEx(e2) && (!e2.b.data || e2.beta == 0) )
         {
             m2 = e2.a;
             beta = -e2.alpha;
             s -= e2.s;
         }
-        else
+        ಅನ್ಯಥಾ
             e2.op->assign(e2, m2);
-        MatOp_AddEx::makeExpr(res, m1, m2, alpha, beta, s);
+        MatOp_AddEx::make_ಅಭಿವ್ಯಕ್ತಿ(res, m1, m2, alpha, beta, s);
     }
-    else
+    ಅನ್ಯಥಾ
         e2.op->subtract(e1, e2, res);
 }
 
 
-void MatOp::subtract(const Scalar& s, const MatExpr& expr, MatExpr& res) const
+ಶೂನ್ಯ MatOp::subtract(ಧ್ರುವ Scalar& s, ಧ್ರುವ Mat_ಅಭಿವ್ಯಕ್ತಿ& ಅಭಿವ್ಯಕ್ತಿ, Mat_ಅಭಿವ್ಯಕ್ತಿ& res) ಧ್ರುವ
 {
     CV_INSTRUMENT_REGION();
 
     Mat m;
-    expr.op->assign(expr, m);
-    MatOp_AddEx::makeExpr(res, m, Mat(), -1, 0, s);
+    ಅಭಿವ್ಯಕ್ತಿ.op->assign(ಅಭಿವ್ಯಕ್ತಿ, m);
+    MatOp_AddEx::make_ಅಭಿವ್ಯಕ್ತಿ(res, m, Mat(), -1, 0, s);
 }
 
 
-void MatOp::multiply(const MatExpr& e1, const MatExpr& e2, MatExpr& res, double scale) const
+ಶೂನ್ಯ MatOp::multiply(ಧ್ರುವ Mat_ಅಭಿವ್ಯಕ್ತಿ& e1, ಧ್ರುವ Mat_ಅಭಿವ್ಯಕ್ತಿ& e2, Mat_ಅಭಿವ್ಯಕ್ತಿ& res, ದ್ವಿಗುಣ scale) ಧ್ರುವ
 {
     CV_INSTRUMENT_REGION();
 
-    if( this == e2.op )
+    ಯದಿ( ಏತತ್ == e2.op )
     {
         Mat m1, m2;
 
-        if( isReciprocal(e1) )
+        ಯದಿ( isReciprocal(e1) )
         {
-            if( isScaled(e2) )
+            ಯದಿ( isScaled(e2) )
             {
                 scale *= e2.alpha;
                 m2 = e2.a;
             }
-            else
+            ಅನ್ಯಥಾ
                 e2.op->assign(e2, m2);
 
-            MatOp_Bin::makeExpr(res, '/', m2, e1.a, scale/e1.alpha);
+            MatOp_Bin::make_ಅಭಿವ್ಯಕ್ತಿ(res, '/', m2, e1.a, scale/e1.alpha);
         }
-        else
+        ಅನ್ಯಥಾ
         {
-            char op = '*';
-            if( isScaled(e1) )
+            ವರ್ಣ op = '*';
+            ಯದಿ( isScaled(e1) )
             {
                 m1 = e1.a;
                 scale *= e1.alpha;
             }
-            else
+            ಅನ್ಯಥಾ
                 e1.op->assign(e1, m1);
 
-            if( isScaled(e2) )
+            ಯದಿ( isScaled(e2) )
             {
                 m2 = e2.a;
                 scale *= e2.alpha;
             }
-            else if( isReciprocal(e2) )
+            ಅನ್ಯಥಾ ಯದಿ( isReciprocal(e2) )
             {
                 op = '/';
                 m2 = e2.a;
                 scale *= e2.alpha;
             }
-            else
+            ಅನ್ಯಥಾ
                 e2.op->assign(e2, m2);
 
-            MatOp_Bin::makeExpr(res, op, m1, m2, scale);
+            MatOp_Bin::make_ಅಭಿವ್ಯಕ್ತಿ(res, op, m1, m2, scale);
         }
     }
-    else
+    ಅನ್ಯಥಾ
         e2.op->multiply(e1, e2, res, scale);
 }
 
 
-void MatOp::multiply(const MatExpr& expr, double s, MatExpr& res) const
+ಶೂನ್ಯ MatOp::multiply(ಧ್ರುವ Mat_ಅಭಿವ್ಯಕ್ತಿ& ಅಭಿವ್ಯಕ್ತಿ, ದ್ವಿಗುಣ s, Mat_ಅಭಿವ್ಯಕ್ತಿ& res) ಧ್ರುವ
 {
     CV_INSTRUMENT_REGION();
 
     Mat m;
-    expr.op->assign(expr, m);
-    MatOp_AddEx::makeExpr(res, m, Mat(), s, 0);
+    ಅಭಿವ್ಯಕ್ತಿ.op->assign(ಅಭಿವ್ಯಕ್ತಿ, m);
+    MatOp_AddEx::make_ಅಭಿವ್ಯಕ್ತಿ(res, m, Mat(), s, 0);
 }
 
 
-void MatOp::divide(const MatExpr& e1, const MatExpr& e2, MatExpr& res, double scale) const
+ಶೂನ್ಯ MatOp::divide(ಧ್ರುವ Mat_ಅಭಿವ್ಯಕ್ತಿ& e1, ಧ್ರುವ Mat_ಅಭಿವ್ಯಕ್ತಿ& e2, Mat_ಅಭಿವ್ಯಕ್ತಿ& res, ದ್ವಿಗುಣ scale) ಧ್ರುವ
 {
     CV_INSTRUMENT_REGION();
 
-    if( this == e2.op )
+    ಯದಿ( ಏತತ್ == e2.op )
     {
-        if( isReciprocal(e1) && isReciprocal(e2) )
-            MatOp_Bin::makeExpr(res, '/', e2.a, e1.a, e1.alpha/e2.alpha);
-        else
+        ಯದಿ( isReciprocal(e1) && isReciprocal(e2) )
+            MatOp_Bin::make_ಅಭಿವ್ಯಕ್ತಿ(res, '/', e2.a, e1.a, e1.alpha/e2.alpha);
+        ಅನ್ಯಥಾ
         {
             Mat m1, m2;
-            char op = '/';
+            ವರ್ಣ op = '/';
 
-            if( isScaled(e1) )
+            ಯದಿ( isScaled(e1) )
             {
                 m1 = e1.a;
                 scale *= e1.alpha;
             }
-            else
+            ಅನ್ಯಥಾ
                 e1.op->assign(e1, m1);
 
-            if( isScaled(e2) )
+            ಯದಿ( isScaled(e2) )
             {
                 m2 = e2.a;
                 scale /= e2.alpha;
             }
-            else if( isReciprocal(e2) )
+            ಅನ್ಯಥಾ ಯದಿ( isReciprocal(e2) )
             {
                 m2 = e2.a;
                 scale /= e2.alpha;
                 op = '*';
             }
-            else
+            ಅನ್ಯಥಾ
                 e2.op->assign(e2, m2);
-            MatOp_Bin::makeExpr(res, op, m1, m2, scale);
+            MatOp_Bin::make_ಅಭಿವ್ಯಕ್ತಿ(res, op, m1, m2, scale);
         }
     }
-    else
+    ಅನ್ಯಥಾ
         e2.op->divide(e1, e2, res, scale);
 }
 
 
-void MatOp::divide(double s, const MatExpr& expr, MatExpr& res) const
+ಶೂನ್ಯ MatOp::divide(ದ್ವಿಗುಣ s, ಧ್ರುವ Mat_ಅಭಿವ್ಯಕ್ತಿ& ಅಭಿವ್ಯಕ್ತಿ, Mat_ಅಭಿವ್ಯಕ್ತಿ& res) ಧ್ರುವ
 {
     CV_INSTRUMENT_REGION();
 
     Mat m;
-    expr.op->assign(expr, m);
-    MatOp_Bin::makeExpr(res, '/', m, Mat(), s);
+    ಅಭಿವ್ಯಕ್ತಿ.op->assign(ಅಭಿವ್ಯಕ್ತಿ, m);
+    MatOp_Bin::make_ಅಭಿವ್ಯಕ್ತಿ(res, '/', m, Mat(), s);
 }
 
 
-void MatOp::abs(const MatExpr& expr, MatExpr& res) const
+ಶೂನ್ಯ MatOp::abs(ಧ್ರುವ Mat_ಅಭಿವ್ಯಕ್ತಿ& ಅಭಿವ್ಯಕ್ತಿ, Mat_ಅಭಿವ್ಯಕ್ತಿ& res) ಧ್ರುವ
 {
     CV_INSTRUMENT_REGION();
 
     Mat m;
-    expr.op->assign(expr, m);
-    MatOp_Bin::makeExpr(res, 'a', m, Mat());
+    ಅಭಿವ್ಯಕ್ತಿ.op->assign(ಅಭಿವ್ಯಕ್ತಿ, m);
+    MatOp_Bin::make_ಅಭಿವ್ಯಕ್ತಿ(res, 'a', m, Mat());
 }
 
 
-void MatOp::transpose(const MatExpr& expr, MatExpr& res) const
+ಶೂನ್ಯ MatOp::transpose(ಧ್ರುವ Mat_ಅಭಿವ್ಯಕ್ತಿ& ಅಭಿವ್ಯಕ್ತಿ, Mat_ಅಭಿವ್ಯಕ್ತಿ& res) ಧ್ರುವ
 {
     CV_INSTRUMENT_REGION();
 
     Mat m;
-    expr.op->assign(expr, m);
-    MatOp_T::makeExpr(res, m, 1);
+    ಅಭಿವ್ಯಕ್ತಿ.op->assign(ಅಭಿವ್ಯಕ್ತಿ, m);
+    MatOp_T::make_ಅಭಿವ್ಯಕ್ತಿ(res, m, 1);
 }
 
 
-void MatOp::matmul(const MatExpr& e1, const MatExpr& e2, MatExpr& res) const
+ಶೂನ್ಯ MatOp::matmul(ಧ್ರುವ Mat_ಅಭಿವ್ಯಕ್ತಿ& e1, ಧ್ರುವ Mat_ಅಭಿವ್ಯಕ್ತಿ& e2, Mat_ಅಭಿವ್ಯಕ್ತಿ& res) ಧ್ರುವ
 {
-    if( this == e2.op )
+    ಯದಿ( ಏತತ್ == e2.op )
     {
-        double scale = 1;
-        int flags = 0;
+        ದ್ವಿಗುಣ scale = 1;
+        ಪೂರ್ಣಾಙ್ಕ flags = 0;
         Mat m1, m2;
 
-        if( isT(e1) )
+        ಯದಿ( isT(e1) )
         {
             flags = cv::GEMM_1_T;
             scale = e1.alpha;
             m1 = e1.a;
         }
-        else if( isScaled(e1) )
+        ಅನ್ಯಥಾ ಯದಿ( isScaled(e1) )
         {
             scale = e1.alpha;
             m1 = e1.a;
         }
-        else
+        ಅನ್ಯಥಾ
             e1.op->assign(e1, m1);
 
-        if( isT(e2) )
+        ಯದಿ( isT(e2) )
         {
             flags |= cv::GEMM_2_T;
             scale *= e2.alpha;
             m2 = e2.a;
         }
-        else if( isScaled(e2) )
+        ಅನ್ಯಥಾ ಯದಿ( isScaled(e2) )
         {
             scale *= e2.alpha;
             m2 = e2.a;
         }
-        else
+        ಅನ್ಯಥಾ
             e2.op->assign(e2, m2);
 
-        MatOp_GEMM::makeExpr(res, flags, m1, m2, scale);
+        MatOp_GEMM::make_ಅಭಿವ್ಯಕ್ತಿ(res, flags, m1, m2, scale);
     }
-    else
+    ಅನ್ಯಥಾ
         e2.op->matmul(e1, e2, res);
 }
 
 
-void MatOp::invert(const MatExpr& expr, int method, MatExpr& res) const
+ಶೂನ್ಯ MatOp::invert(ಧ್ರುವ Mat_ಅಭಿವ್ಯಕ್ತಿ& ಅಭಿವ್ಯಕ್ತಿ, ಪೂರ್ಣಾಙ್ಕ method, Mat_ಅಭಿವ್ಯಕ್ತಿ& res) ಧ್ರುವ
 {
     Mat m;
-    expr.op->assign(expr, m);
-    MatOp_Invert::makeExpr(res, method, m);
+    ಅಭಿವ್ಯಕ್ತಿ.op->assign(ಅಭಿವ್ಯಕ್ತಿ, m);
+    MatOp_Invert::make_ಅಭಿವ್ಯಕ್ತಿ(res, method, m);
 }
 
 
-Size MatOp::size(const MatExpr& expr) const
+Size MatOp::size(ಧ್ರುವ Mat_ಅಭಿವ್ಯಕ್ತಿ& ಅಭಿವ್ಯಕ್ತಿ) ಧ್ರುವ
 {
-    return !expr.a.empty() ? expr.a.size() : expr.b.empty() ? expr.b.size() : expr.c.size();
+    ಪ್ರತ್ಯಾಗಮ !ಅಭಿವ್ಯಕ್ತಿ.a.empty() ? ಅಭಿವ್ಯಕ್ತಿ.a.size() : ಅಭಿವ್ಯಕ್ತಿ.b.empty() ? ಅಭಿವ್ಯಕ್ತಿ.b.size() : ಅಭಿವ್ಯಕ್ತಿ.c.size();
 }
 
-int MatOp::type(const MatExpr& expr) const
+ಪೂರ್ಣಾಙ್ಕ MatOp::type(ಧ್ರುವ Mat_ಅಭಿವ್ಯಕ್ತಿ& ಅಭಿವ್ಯಕ್ತಿ) ಧ್ರುವ
 {
     CV_INSTRUMENT_REGION();
 
-    return !expr.a.empty() ? expr.a.type() : expr.b.empty() ? expr.b.type() : expr.c.type();
+    ಪ್ರತ್ಯಾಗಮ !ಅಭಿವ್ಯಕ್ತಿ.a.empty() ? ಅಭಿವ್ಯಕ್ತಿ.a.type() : ಅಭಿವ್ಯಕ್ತಿ.b.empty() ? ಅಭಿವ್ಯಕ್ತಿ.b.type() : ಅಭಿವ್ಯಕ್ತಿ.c.type();
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////
 
-MatExpr::MatExpr(const Mat& m) : op(&g_MatOp_Identity), flags(0), a(m), b(Mat()), c(Mat()), alpha(1), beta(0), s(Scalar())
+Mat_ಅಭಿವ್ಯಕ್ತಿ::Mat_ಅಭಿವ್ಯಕ್ತಿ(ಧ್ರುವ Mat& m) : op(&g_MatOp_Identity), flags(0), a(m), b(Mat()), c(Mat()), alpha(1), beta(0), s(Scalar())
 {
 }
 
-MatExpr MatExpr::row(int y) const
+Mat_ಅಭಿವ್ಯಕ್ತಿ Mat_ಅಭಿವ್ಯಕ್ತಿ::row(ಪೂರ್ಣಾಙ್ಕ y) ಧ್ರುವ
 {
-    MatExpr e;
-    op->roi(*this, Range(y, y+1), Range::all(), e);
-    return e;
+    Mat_ಅಭಿವ್ಯಕ್ತಿ e;
+    op->roi(*ಏತತ್, Range(y, y+1), Range::all(), e);
+    ಪ್ರತ್ಯಾಗಮ e;
 }
 
-MatExpr MatExpr::col(int x) const
+Mat_ಅಭಿವ್ಯಕ್ತಿ Mat_ಅಭಿವ್ಯಕ್ತಿ::col(ಪೂರ್ಣಾಙ್ಕ x) ಧ್ರುವ
 {
-    MatExpr e;
-    op->roi(*this, Range::all(), Range(x, x+1), e);
-    return e;
+    Mat_ಅಭಿವ್ಯಕ್ತಿ e;
+    op->roi(*ಏತತ್, Range::all(), Range(x, x+1), e);
+    ಪ್ರತ್ಯಾಗಮ e;
 }
 
-MatExpr MatExpr::diag(int d) const
+Mat_ಅಭಿವ್ಯಕ್ತಿ Mat_ಅಭಿವ್ಯಕ್ತಿ::diag(ಪೂರ್ಣಾಙ್ಕ d) ಧ್ರುವ
 {
-    MatExpr e;
-    op->diag(*this, d, e);
-    return e;
+    Mat_ಅಭಿವ್ಯಕ್ತಿ e;
+    op->diag(*ಏತತ್, d, e);
+    ಪ್ರತ್ಯಾಗಮ e;
 }
 
-MatExpr MatExpr::operator()( const Range& rowRange, const Range& colRange ) const
+Mat_ಅಭಿವ್ಯಕ್ತಿ Mat_ಅಭಿವ್ಯಕ್ತಿ::operator()( ಧ್ರುವ Range& rowRange, ಧ್ರುವ Range& colRange ) ಧ್ರುವ
 {
-    MatExpr e;
-    op->roi(*this, rowRange, colRange, e);
-    return e;
+    Mat_ಅಭಿವ್ಯಕ್ತಿ e;
+    op->roi(*ಏತತ್, rowRange, colRange, e);
+    ಪ್ರತ್ಯಾಗಮ e;
 }
 
-MatExpr MatExpr::operator()( const Rect& roi ) const
+Mat_ಅಭಿವ್ಯಕ್ತಿ Mat_ಅಭಿವ್ಯಕ್ತಿ::operator()( ಧ್ರುವ Rect& roi ) ಧ್ರುವ
 {
-    MatExpr e;
-    op->roi(*this, Range(roi.y, roi.y + roi.height), Range(roi.x, roi.x + roi.width), e);
-    return e;
+    Mat_ಅಭಿವ್ಯಕ್ತಿ e;
+    op->roi(*ಏತತ್, Range(roi.y, roi.y + roi.height), Range(roi.x, roi.x + roi.width), e);
+    ಪ್ರತ್ಯಾಗಮ e;
 }
 
-Mat MatExpr::cross(const Mat& m) const
+Mat Mat_ಅಭಿವ್ಯಕ್ತಿ::cross(ಧ್ರುವ Mat& m) ಧ್ರುವ
 {
-    return ((Mat)*this).cross(m);
+    ಪ್ರತ್ಯಾಗಮ ((Mat)*ಏತತ್).cross(m);
 }
 
-double MatExpr::dot(const Mat& m) const
+ದ್ವಿಗುಣ Mat_ಅಭಿವ್ಯಕ್ತಿ::dot(ಧ್ರುವ Mat& m) ಧ್ರುವ
 {
-    return ((Mat)*this).dot(m);
+    ಪ್ರತ್ಯಾಗಮ ((Mat)*ಏತತ್).dot(m);
 }
 
-MatExpr MatExpr::t() const
+Mat_ಅಭಿವ್ಯಕ್ತಿ Mat_ಅಭಿವ್ಯಕ್ತಿ::t() ಧ್ರುವ
 {
-    MatExpr e;
-    op->transpose(*this, e);
-    return e;
+    Mat_ಅಭಿವ್ಯಕ್ತಿ e;
+    op->transpose(*ಏತತ್, e);
+    ಪ್ರತ್ಯಾಗಮ e;
 }
 
-MatExpr MatExpr::inv(int method) const
+Mat_ಅಭಿವ್ಯಕ್ತಿ Mat_ಅಭಿವ್ಯಕ್ತಿ::inv(ಪೂರ್ಣಾಙ್ಕ method) ಧ್ರುವ
 {
-    MatExpr e;
-    op->invert(*this, method, e);
-    return e;
+    Mat_ಅಭಿವ್ಯಕ್ತಿ e;
+    op->invert(*ಏತತ್, method, e);
+    ಪ್ರತ್ಯಾಗಮ e;
 }
 
-MatExpr MatExpr::mul(const MatExpr& e, double scale) const
+Mat_ಅಭಿವ್ಯಕ್ತಿ Mat_ಅಭಿವ್ಯಕ್ತಿ::mul(ಧ್ರುವ Mat_ಅಭಿವ್ಯಕ್ತಿ& e, ದ್ವಿಗುಣ scale) ಧ್ರುವ
 {
-    MatExpr en;
-    op->multiply(*this, e, en, scale);
-    return en;
+    Mat_ಅಭಿವ್ಯಕ್ತಿ en;
+    op->multiply(*ಏತತ್, e, en, scale);
+    ಪ್ರತ್ಯಾಗಮ en;
 }
 
-MatExpr MatExpr::mul(const Mat& m, double scale) const
+Mat_ಅಭಿವ್ಯಕ್ತಿ Mat_ಅಭಿವ್ಯಕ್ತಿ::mul(ಧ್ರುವ Mat& m, ದ್ವಿಗುಣ scale) ಧ್ರುವ
 {
-    MatExpr e;
-    op->multiply(*this, MatExpr(m), e, scale);
-    return e;
+    Mat_ಅಭಿವ್ಯಕ್ತಿ e;
+    op->multiply(*ಏತತ್, Mat_ಅಭಿವ್ಯಕ್ತಿ(m), e, scale);
+    ಪ್ರತ್ಯಾಗಮ e;
 }
 
-MatExpr operator + (const Mat& a, const Mat& b)
+Mat_ಅಭಿವ್ಯಕ್ತಿ operator + (ಧ್ರುವ Mat& a, ಧ್ರುವ Mat& b)
 {
     checkOperandsExist(a, b);
-    MatExpr e;
-    MatOp_AddEx::makeExpr(e, a, b, 1, 1);
-    return e;
+    Mat_ಅಭಿವ್ಯಕ್ತಿ e;
+    MatOp_AddEx::make_ಅಭಿವ್ಯಕ್ತಿ(e, a, b, 1, 1);
+    ಪ್ರತ್ಯಾಗಮ e;
 }
 
-MatExpr operator + (const Mat& a, const Scalar& s)
+Mat_ಅಭಿವ್ಯಕ್ತಿ operator + (ಧ್ರುವ Mat& a, ಧ್ರುವ Scalar& s)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_AddEx::makeExpr(e, a, Mat(), 1, 0, s);
-    return e;
+    Mat_ಅಭಿವ್ಯಕ್ತಿ e;
+    MatOp_AddEx::make_ಅಭಿವ್ಯಕ್ತಿ(e, a, Mat(), 1, 0, s);
+    ಪ್ರತ್ಯಾಗಮ e;
 }
 
-MatExpr operator + (const Scalar& s, const Mat& a)
+Mat_ಅಭಿವ್ಯಕ್ತಿ operator + (ಧ್ರುವ Scalar& s, ಧ್ರುವ Mat& a)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_AddEx::makeExpr(e, a, Mat(), 1, 0, s);
-    return e;
+    Mat_ಅಭಿವ್ಯಕ್ತಿ e;
+    MatOp_AddEx::make_ಅಭಿವ್ಯಕ್ತಿ(e, a, Mat(), 1, 0, s);
+    ಪ್ರತ್ಯಾಗಮ e;
 }
 
-MatExpr operator + (const MatExpr& e, const Mat& m)
+Mat_ಅಭಿವ್ಯಕ್ತಿ operator + (ಧ್ರುವ Mat_ಅಭಿವ್ಯಕ್ತಿ& e, ಧ್ರುವ Mat& m)
 {
-    MatExpr en;
-    e.op->add(e, MatExpr(m), en);
-    return en;
+    Mat_ಅಭಿವ್ಯಕ್ತಿ en;
+    e.op->add(e, Mat_ಅಭಿವ್ಯಕ್ತಿ(m), en);
+    ಪ್ರತ್ಯಾಗಮ en;
 }
 
-MatExpr operator + (const Mat& m, const MatExpr& e)
+Mat_ಅಭಿವ್ಯಕ್ತಿ operator + (ಧ್ರುವ Mat& m, ಧ್ರುವ Mat_ಅಭಿವ್ಯಕ್ತಿ& e)
 {
     checkOperandsExist(m);
-    MatExpr en;
-    e.op->add(e, MatExpr(m), en);
-    return en;
+    Mat_ಅಭಿವ್ಯಕ್ತಿ en;
+    e.op->add(e, Mat_ಅಭಿವ್ಯಕ್ತಿ(m), en);
+    ಪ್ರತ್ಯಾಗಮ en;
 }
 
-MatExpr operator + (const MatExpr& e, const Scalar& s)
+Mat_ಅಭಿವ್ಯಕ್ತಿ operator + (ಧ್ರುವ Mat_ಅಭಿವ್ಯಕ್ತಿ& e, ಧ್ರುವ Scalar& s)
 {
-    MatExpr en;
+    Mat_ಅಭಿವ್ಯಕ್ತಿ en;
     e.op->add(e, s, en);
-    return en;
+    ಪ್ರತ್ಯಾಗಮ en;
 }
 
-MatExpr operator + (const Scalar& s, const MatExpr& e)
+Mat_ಅಭಿವ್ಯಕ್ತಿ operator + (ಧ್ರುವ Scalar& s, ಧ್ರುವ Mat_ಅಭಿವ್ಯಕ್ತಿ& e)
 {
-    MatExpr en;
+    Mat_ಅಭಿವ್ಯಕ್ತಿ en;
     e.op->add(e, s, en);
-    return en;
+    ಪ್ರತ್ಯಾಗಮ en;
 }
 
-MatExpr operator + (const MatExpr& e1, const MatExpr& e2)
+Mat_ಅಭಿವ್ಯಕ್ತಿ operator + (ಧ್ರುವ Mat_ಅಭಿವ್ಯಕ್ತಿ& e1, ಧ್ರುವ Mat_ಅಭಿವ್ಯಕ್ತಿ& e2)
 {
-    MatExpr en;
+    Mat_ಅಭಿವ್ಯಕ್ತಿ en;
     e1.op->add(e1, e2, en);
-    return en;
+    ಪ್ರತ್ಯಾಗಮ en;
 }
 
-MatExpr operator - (const Mat& a, const Mat& b)
+Mat_ಅಭಿವ್ಯಕ್ತಿ operator - (ಧ್ರುವ Mat& a, ಧ್ರುವ Mat& b)
 {
     checkOperandsExist(a, b);
-    MatExpr e;
-    MatOp_AddEx::makeExpr(e, a, b, 1, -1);
-    return e;
+    Mat_ಅಭಿವ್ಯಕ್ತಿ e;
+    MatOp_AddEx::make_ಅಭಿವ್ಯಕ್ತಿ(e, a, b, 1, -1);
+    ಪ್ರತ್ಯಾಗಮ e;
 }
 
-MatExpr operator - (const Mat& a, const Scalar& s)
+Mat_ಅಭಿವ್ಯಕ್ತಿ operator - (ಧ್ರುವ Mat& a, ಧ್ರುವ Scalar& s)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_AddEx::makeExpr(e, a, Mat(), 1, 0, -s);
-    return e;
+    Mat_ಅಭಿವ್ಯಕ್ತಿ e;
+    MatOp_AddEx::make_ಅಭಿವ್ಯಕ್ತಿ(e, a, Mat(), 1, 0, -s);
+    ಪ್ರತ್ಯಾಗಮ e;
 }
 
-MatExpr operator - (const Scalar& s, const Mat& a)
+Mat_ಅಭಿವ್ಯಕ್ತಿ operator - (ಧ್ರುವ Scalar& s, ಧ್ರುವ Mat& a)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_AddEx::makeExpr(e, a, Mat(), -1, 0, s);
-    return e;
+    Mat_ಅಭಿವ್ಯಕ್ತಿ e;
+    MatOp_AddEx::make_ಅಭಿವ್ಯಕ್ತಿ(e, a, Mat(), -1, 0, s);
+    ಪ್ರತ್ಯಾಗಮ e;
 }
 
-MatExpr operator - (const MatExpr& e, const Mat& m)
+Mat_ಅಭಿವ್ಯಕ್ತಿ operator - (ಧ್ರುವ Mat_ಅಭಿವ್ಯಕ್ತಿ& e, ಧ್ರುವ Mat& m)
 {
     checkOperandsExist(m);
-    MatExpr en;
-    e.op->subtract(e, MatExpr(m), en);
-    return en;
+    Mat_ಅಭಿವ್ಯಕ್ತಿ en;
+    e.op->subtract(e, Mat_ಅಭಿವ್ಯಕ್ತಿ(m), en);
+    ಪ್ರತ್ಯಾಗಮ en;
 }
 
-MatExpr operator - (const Mat& m, const MatExpr& e)
+Mat_ಅಭಿವ್ಯಕ್ತಿ operator - (ಧ್ರುವ Mat& m, ಧ್ರುವ Mat_ಅಭಿವ್ಯಕ್ತಿ& e)
 {
     checkOperandsExist(m);
-    MatExpr en;
-    e.op->subtract(MatExpr(m), e, en);
-    return en;
+    Mat_ಅಭಿವ್ಯಕ್ತಿ en;
+    e.op->subtract(Mat_ಅಭಿವ್ಯಕ್ತಿ(m), e, en);
+    ಪ್ರತ್ಯಾಗಮ en;
 }
 
-MatExpr operator - (const MatExpr& e, const Scalar& s)
+Mat_ಅಭಿವ್ಯಕ್ತಿ operator - (ಧ್ರುವ Mat_ಅಭಿವ್ಯಕ್ತಿ& e, ಧ್ರುವ Scalar& s)
 {
-    MatExpr en;
+    Mat_ಅಭಿವ್ಯಕ್ತಿ en;
     e.op->add(e, -s, en);
-    return en;
+    ಪ್ರತ್ಯಾಗಮ en;
 }
 
-MatExpr operator - (const Scalar& s, const MatExpr& e)
+Mat_ಅಭಿವ್ಯಕ್ತಿ operator - (ಧ್ರುವ Scalar& s, ಧ್ರುವ Mat_ಅಭಿವ್ಯಕ್ತಿ& e)
 {
-    MatExpr en;
+    Mat_ಅಭಿವ್ಯಕ್ತಿ en;
     e.op->subtract(s, e, en);
-    return en;
+    ಪ್ರತ್ಯಾಗಮ en;
 }
 
-MatExpr operator - (const MatExpr& e1, const MatExpr& e2)
+Mat_ಅಭಿವ್ಯಕ್ತಿ operator - (ಧ್ರುವ Mat_ಅಭಿವ್ಯಕ್ತಿ& e1, ಧ್ರುವ Mat_ಅಭಿವ್ಯಕ್ತಿ& e2)
 {
-    MatExpr en;
+    Mat_ಅಭಿವ್ಯಕ್ತಿ en;
     e1.op->subtract(e1, e2, en);
-    return en;
+    ಪ್ರತ್ಯಾಗಮ en;
 }
 
-MatExpr operator - (const Mat& m)
+Mat_ಅಭಿವ್ಯಕ್ತಿ operator - (ಧ್ರುವ Mat& m)
 {
     checkOperandsExist(m);
-    MatExpr e;
-    MatOp_AddEx::makeExpr(e, m, Mat(), -1, 0);
-    return e;
+    Mat_ಅಭಿವ್ಯಕ್ತಿ e;
+    MatOp_AddEx::make_ಅಭಿವ್ಯಕ್ತಿ(e, m, Mat(), -1, 0);
+    ಪ್ರತ್ಯಾಗಮ e;
 }
 
-MatExpr operator - (const MatExpr& e)
+Mat_ಅಭಿವ್ಯಕ್ತಿ operator - (ಧ್ರುವ Mat_ಅಭಿವ್ಯಕ್ತಿ& e)
 {
-    MatExpr en;
+    Mat_ಅಭಿವ್ಯಕ್ತಿ en;
     e.op->subtract(Scalar(0), e, en);
-    return en;
+    ಪ್ರತ್ಯಾಗಮ en;
 }
 
-MatExpr operator * (const Mat& a, const Mat& b)
+Mat_ಅಭಿವ್ಯಕ್ತಿ operator * (ಧ್ರುವ Mat& a, ಧ್ರುವ Mat& b)
 {
     checkOperandsExist(a, b);
-    MatExpr e;
-    MatOp_GEMM::makeExpr(e, 0, a, b);
-    return e;
+    Mat_ಅಭಿವ್ಯಕ್ತಿ e;
+    MatOp_GEMM::make_ಅಭಿವ್ಯಕ್ತಿ(e, 0, a, b);
+    ಪ್ರತ್ಯಾಗಮ e;
 }
 
-MatExpr operator * (const Mat& a, double s)
+Mat_ಅಭಿವ್ಯಕ್ತಿ operator * (ಧ್ರುವ Mat& a, ದ್ವಿಗುಣ s)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_AddEx::makeExpr(e, a, Mat(), s, 0);
-    return e;
+    Mat_ಅಭಿವ್ಯಕ್ತಿ e;
+    MatOp_AddEx::make_ಅಭಿವ್ಯಕ್ತಿ(e, a, Mat(), s, 0);
+    ಪ್ರತ್ಯಾಗಮ e;
 }
 
-MatExpr operator * (double s, const Mat& a)
+Mat_ಅಭಿವ್ಯಕ್ತಿ operator * (ದ್ವಿಗುಣ s, ಧ್ರುವ Mat& a)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_AddEx::makeExpr(e, a, Mat(), s, 0);
-    return e;
+    Mat_ಅಭಿವ್ಯಕ್ತಿ e;
+    MatOp_AddEx::make_ಅಭಿವ್ಯಕ್ತಿ(e, a, Mat(), s, 0);
+    ಪ್ರತ್ಯಾಗಮ e;
 }
 
-MatExpr operator * (const MatExpr& e, const Mat& m)
+Mat_ಅಭಿವ್ಯಕ್ತಿ operator * (ಧ್ರುವ Mat_ಅಭಿವ್ಯಕ್ತಿ& e, ಧ್ರುವ Mat& m)
 {
-    MatExpr en;
-    e.op->matmul(e, MatExpr(m), en);
-    return en;
+    Mat_ಅಭಿವ್ಯಕ್ತಿ en;
+    e.op->matmul(e, Mat_ಅಭಿವ್ಯಕ್ತಿ(m), en);
+    ಪ್ರತ್ಯಾಗಮ en;
 }
 
-MatExpr operator * (const Mat& m, const MatExpr& e)
+Mat_ಅಭಿವ್ಯಕ್ತಿ operator * (ಧ್ರುವ Mat& m, ಧ್ರುವ Mat_ಅಭಿವ್ಯಕ್ತಿ& e)
 {
     checkOperandsExist(m);
-    MatExpr en;
-    e.op->matmul(MatExpr(m), e, en);
-    return en;
+    Mat_ಅಭಿವ್ಯಕ್ತಿ en;
+    e.op->matmul(Mat_ಅಭಿವ್ಯಕ್ತಿ(m), e, en);
+    ಪ್ರತ್ಯಾಗಮ en;
 }
 
-MatExpr operator * (const MatExpr& e, double s)
+Mat_ಅಭಿವ್ಯಕ್ತಿ operator * (ಧ್ರುವ Mat_ಅಭಿವ್ಯಕ್ತಿ& e, ದ್ವಿಗುಣ s)
 {
-    MatExpr en;
+    Mat_ಅಭಿವ್ಯಕ್ತಿ en;
     e.op->multiply(e, s, en);
-    return en;
+    ಪ್ರತ್ಯಾಗಮ en;
 }
 
-MatExpr operator * (double s, const MatExpr& e)
+Mat_ಅಭಿವ್ಯಕ್ತಿ operator * (ದ್ವಿಗುಣ s, ಧ್ರುವ Mat_ಅಭಿವ್ಯಕ್ತಿ& e)
 {
-    MatExpr en;
+    Mat_ಅಭಿವ್ಯಕ್ತಿ en;
     e.op->multiply(e, s, en);
-    return en;
+    ಪ್ರತ್ಯಾಗಮ en;
 }
 
-MatExpr operator * (const MatExpr& e1, const MatExpr& e2)
+Mat_ಅಭಿವ್ಯಕ್ತಿ operator * (ಧ್ರುವ Mat_ಅಭಿವ್ಯಕ್ತಿ& e1, ಧ್ರುವ Mat_ಅಭಿವ್ಯಕ್ತಿ& e2)
 {
-    MatExpr en;
+    Mat_ಅಭಿವ್ಯಕ್ತಿ en;
     e1.op->matmul(e1, e2, en);
-    return en;
+    ಪ್ರತ್ಯಾಗಮ en;
 }
 
-MatExpr operator / (const Mat& a, const Mat& b)
+Mat_ಅಭಿವ್ಯಕ್ತಿ operator / (ಧ್ರುವ Mat& a, ಧ್ರುವ Mat& b)
 {
     checkOperandsExist(a, b);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, '/', a, b);
-    return e;
+    Mat_ಅಭಿವ್ಯಕ್ತಿ e;
+    MatOp_Bin::make_ಅಭಿವ್ಯಕ್ತಿ(e, '/', a, b);
+    ಪ್ರತ್ಯಾಗಮ e;
 }
 
-MatExpr operator / (const Mat& a, double s)
+Mat_ಅಭಿವ್ಯಕ್ತಿ operator / (ಧ್ರುವ Mat& a, ದ್ವಿಗುಣ s)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_AddEx::makeExpr(e, a, Mat(), 1./s, 0);
-    return e;
+    Mat_ಅಭಿವ್ಯಕ್ತಿ e;
+    MatOp_AddEx::make_ಅಭಿವ್ಯಕ್ತಿ(e, a, Mat(), 1./s, 0);
+    ಪ್ರತ್ಯಾಗಮ e;
 }
 
-MatExpr operator / (double s, const Mat& a)
+Mat_ಅಭಿವ್ಯಕ್ತಿ operator / (ದ್ವಿಗುಣ s, ಧ್ರುವ Mat& a)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, '/', a, Mat(), s);
-    return e;
+    Mat_ಅಭಿವ್ಯಕ್ತಿ e;
+    MatOp_Bin::make_ಅಭಿವ್ಯಕ್ತಿ(e, '/', a, Mat(), s);
+    ಪ್ರತ್ಯಾಗಮ e;
 }
 
-MatExpr operator / (const MatExpr& e, const Mat& m)
+Mat_ಅಭಿವ್ಯಕ್ತಿ operator / (ಧ್ರುವ Mat_ಅಭಿವ್ಯಕ್ತಿ& e, ಧ್ರುವ Mat& m)
 {
-    MatExpr en;
-    e.op->divide(e, MatExpr(m), en);
-    return en;
+    Mat_ಅಭಿವ್ಯಕ್ತಿ en;
+    e.op->divide(e, Mat_ಅಭಿವ್ಯಕ್ತಿ(m), en);
+    ಪ್ರತ್ಯಾಗಮ en;
 }
 
-MatExpr operator / (const Mat& m, const MatExpr& e)
+Mat_ಅಭಿವ್ಯಕ್ತಿ operator / (ಧ್ರುವ Mat& m, ಧ್ರುವ Mat_ಅಭಿವ್ಯಕ್ತಿ& e)
 {
     checkOperandsExist(m);
-    MatExpr en;
-    e.op->divide(MatExpr(m), e, en);
-    return en;
+    Mat_ಅಭಿವ್ಯಕ್ತಿ en;
+    e.op->divide(Mat_ಅಭಿವ್ಯಕ್ತಿ(m), e, en);
+    ಪ್ರತ್ಯಾಗಮ en;
 }
 
-MatExpr operator / (const MatExpr& e, double s)
+Mat_ಅಭಿವ್ಯಕ್ತಿ operator / (ಧ್ರುವ Mat_ಅಭಿವ್ಯಕ್ತಿ& e, ದ್ವಿಗುಣ s)
 {
-    MatExpr en;
+    Mat_ಅಭಿವ್ಯಕ್ತಿ en;
     e.op->multiply(e, 1./s, en);
-    return en;
+    ಪ್ರತ್ಯಾಗಮ en;
 }
 
-MatExpr operator / (double s, const MatExpr& e)
+Mat_ಅಭಿವ್ಯಕ್ತಿ operator / (ದ್ವಿಗುಣ s, ಧ್ರುವ Mat_ಅಭಿವ್ಯಕ್ತಿ& e)
 {
-    MatExpr en;
+    Mat_ಅಭಿವ್ಯಕ್ತಿ en;
     e.op->divide(s, e, en);
-    return en;
+    ಪ್ರತ್ಯಾಗಮ en;
 }
 
-MatExpr operator / (const MatExpr& e1, const MatExpr& e2)
+Mat_ಅಭಿವ್ಯಕ್ತಿ operator / (ಧ್ರುವ Mat_ಅಭಿವ್ಯಕ್ತಿ& e1, ಧ್ರುವ Mat_ಅಭಿವ್ಯಕ್ತಿ& e2)
 {
-    MatExpr en;
+    Mat_ಅಭಿವ್ಯಕ್ತಿ en;
     e1.op->divide(e1, e2, en);
-    return en;
+    ಪ್ರತ್ಯಾಗಮ en;
 }
 
-MatExpr operator < (const Mat& a, const Mat& b)
+Mat_ಅಭಿವ್ಯಕ್ತಿ operator < (ಧ್ರುವ Mat& a, ಧ್ರುವ Mat& b)
 {
     checkOperandsExist(a, b);
-    MatExpr e;
-    MatOp_Cmp::makeExpr(e, cv::CMP_LT, a, b);
-    return e;
+    Mat_ಅಭಿವ್ಯಕ್ತಿ e;
+    MatOp_Cmp::make_ಅಭಿವ್ಯಕ್ತಿ(e, cv::CMP_LT, a, b);
+    ಪ್ರತ್ಯಾಗಮ e;
 }
 
-MatExpr operator < (const Mat& a, double s)
+Mat_ಅಭಿವ್ಯಕ್ತಿ operator < (ಧ್ರುವ Mat& a, ದ್ವಿಗುಣ s)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Cmp::makeExpr(e, cv::CMP_LT, a, s);
-    return e;
+    Mat_ಅಭಿವ್ಯಕ್ತಿ e;
+    MatOp_Cmp::make_ಅಭಿವ್ಯಕ್ತಿ(e, cv::CMP_LT, a, s);
+    ಪ್ರತ್ಯಾಗಮ e;
 }
 
-MatExpr operator < (double s, const Mat& a)
+Mat_ಅಭಿವ್ಯಕ್ತಿ operator < (ದ್ವಿಗುಣ s, ಧ್ರುವ Mat& a)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Cmp::makeExpr(e, cv::CMP_GT, a, s);
-    return e;
+    Mat_ಅಭಿವ್ಯಕ್ತಿ e;
+    MatOp_Cmp::make_ಅಭಿವ್ಯಕ್ತಿ(e, cv::CMP_GT, a, s);
+    ಪ್ರತ್ಯಾಗಮ e;
 }
 
-MatExpr operator <= (const Mat& a, const Mat& b)
+Mat_ಅಭಿವ್ಯಕ್ತಿ operator <= (ಧ್ರುವ Mat& a, ಧ್ರುವ Mat& b)
 {
     checkOperandsExist(a, b);
-    MatExpr e;
-    MatOp_Cmp::makeExpr(e, cv::CMP_LE, a, b);
-    return e;
+    Mat_ಅಭಿವ್ಯಕ್ತಿ e;
+    MatOp_Cmp::make_ಅಭಿವ್ಯಕ್ತಿ(e, cv::CMP_LE, a, b);
+    ಪ್ರತ್ಯಾಗಮ e;
 }
 
-MatExpr operator <= (const Mat& a, double s)
+Mat_ಅಭಿವ್ಯಕ್ತಿ operator <= (ಧ್ರುವ Mat& a, ದ್ವಿಗುಣ s)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Cmp::makeExpr(e, cv::CMP_LE, a, s);
-    return e;
+    Mat_ಅಭಿವ್ಯಕ್ತಿ e;
+    MatOp_Cmp::make_ಅಭಿವ್ಯಕ್ತಿ(e, cv::CMP_LE, a, s);
+    ಪ್ರತ್ಯಾಗಮ e;
 }
 
-MatExpr operator <= (double s, const Mat& a)
+Mat_ಅಭಿವ್ಯಕ್ತಿ operator <= (ದ್ವಿಗುಣ s, ಧ್ರುವ Mat& a)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Cmp::makeExpr(e, cv::CMP_GE, a, s);
-    return e;
+    Mat_ಅಭಿವ್ಯಕ್ತಿ e;
+    MatOp_Cmp::make_ಅಭಿವ್ಯಕ್ತಿ(e, cv::CMP_GE, a, s);
+    ಪ್ರತ್ಯಾಗಮ e;
 }
 
-MatExpr operator == (const Mat& a, const Mat& b)
+Mat_ಅಭಿವ್ಯಕ್ತಿ operator == (ಧ್ರುವ Mat& a, ಧ್ರುವ Mat& b)
 {
     checkOperandsExist(a, b);
-    MatExpr e;
-    MatOp_Cmp::makeExpr(e, cv::CMP_EQ, a, b);
-    return e;
+    Mat_ಅಭಿವ್ಯಕ್ತಿ e;
+    MatOp_Cmp::make_ಅಭಿವ್ಯಕ್ತಿ(e, cv::CMP_EQ, a, b);
+    ಪ್ರತ್ಯಾಗಮ e;
 }
 
-MatExpr operator == (const Mat& a, double s)
+Mat_ಅಭಿವ್ಯಕ್ತಿ operator == (ಧ್ರುವ Mat& a, ದ್ವಿಗುಣ s)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Cmp::makeExpr(e, cv::CMP_EQ, a, s);
-    return e;
+    Mat_ಅಭಿವ್ಯಕ್ತಿ e;
+    MatOp_Cmp::make_ಅಭಿವ್ಯಕ್ತಿ(e, cv::CMP_EQ, a, s);
+    ಪ್ರತ್ಯಾಗಮ e;
 }
 
-MatExpr operator == (double s, const Mat& a)
+Mat_ಅಭಿವ್ಯಕ್ತಿ operator == (ದ್ವಿಗುಣ s, ಧ್ರುವ Mat& a)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Cmp::makeExpr(e, cv::CMP_EQ, a, s);
-    return e;
+    Mat_ಅಭಿವ್ಯಕ್ತಿ e;
+    MatOp_Cmp::make_ಅಭಿವ್ಯಕ್ತಿ(e, cv::CMP_EQ, a, s);
+    ಪ್ರತ್ಯಾಗಮ e;
 }
 
-MatExpr operator != (const Mat& a, const Mat& b)
+Mat_ಅಭಿವ್ಯಕ್ತಿ operator != (ಧ್ರುವ Mat& a, ಧ್ರುವ Mat& b)
 {
     checkOperandsExist(a, b);
-    MatExpr e;
-    MatOp_Cmp::makeExpr(e, cv::CMP_NE, a, b);
-    return e;
+    Mat_ಅಭಿವ್ಯಕ್ತಿ e;
+    MatOp_Cmp::make_ಅಭಿವ್ಯಕ್ತಿ(e, cv::CMP_NE, a, b);
+    ಪ್ರತ್ಯಾಗಮ e;
 }
 
-MatExpr operator != (const Mat& a, double s)
+Mat_ಅಭಿವ್ಯಕ್ತಿ operator != (ಧ್ರುವ Mat& a, ದ್ವಿಗುಣ s)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Cmp::makeExpr(e, cv::CMP_NE, a, s);
-    return e;
+    Mat_ಅಭಿವ್ಯಕ್ತಿ e;
+    MatOp_Cmp::make_ಅಭಿವ್ಯಕ್ತಿ(e, cv::CMP_NE, a, s);
+    ಪ್ರತ್ಯಾಗಮ e;
 }
 
-MatExpr operator != (double s, const Mat& a)
+Mat_ಅಭಿವ್ಯಕ್ತಿ operator != (ದ್ವಿಗುಣ s, ಧ್ರುವ Mat& a)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Cmp::makeExpr(e, cv::CMP_NE, a, s);
-    return e;
+    Mat_ಅಭಿವ್ಯಕ್ತಿ e;
+    MatOp_Cmp::make_ಅಭಿವ್ಯಕ್ತಿ(e, cv::CMP_NE, a, s);
+    ಪ್ರತ್ಯಾಗಮ e;
 }
 
-MatExpr operator >= (const Mat& a, const Mat& b)
+Mat_ಅಭಿವ್ಯಕ್ತಿ operator >= (ಧ್ರುವ Mat& a, ಧ್ರುವ Mat& b)
 {
     checkOperandsExist(a, b);
-    MatExpr e;
-    MatOp_Cmp::makeExpr(e, cv::CMP_GE, a, b);
-    return e;
+    Mat_ಅಭಿವ್ಯಕ್ತಿ e;
+    MatOp_Cmp::make_ಅಭಿವ್ಯಕ್ತಿ(e, cv::CMP_GE, a, b);
+    ಪ್ರತ್ಯಾಗಮ e;
 }
 
-MatExpr operator >= (const Mat& a, double s)
+Mat_ಅಭಿವ್ಯಕ್ತಿ operator >= (ಧ್ರುವ Mat& a, ದ್ವಿಗುಣ s)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Cmp::makeExpr(e, cv::CMP_GE, a, s);
-    return e;
+    Mat_ಅಭಿವ್ಯಕ್ತಿ e;
+    MatOp_Cmp::make_ಅಭಿವ್ಯಕ್ತಿ(e, cv::CMP_GE, a, s);
+    ಪ್ರತ್ಯಾಗಮ e;
 }
 
-MatExpr operator >= (double s, const Mat& a)
+Mat_ಅಭಿವ್ಯಕ್ತಿ operator >= (ದ್ವಿಗುಣ s, ಧ್ರುವ Mat& a)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Cmp::makeExpr(e, cv::CMP_LE, a, s);
-    return e;
+    Mat_ಅಭಿವ್ಯಕ್ತಿ e;
+    MatOp_Cmp::make_ಅಭಿವ್ಯಕ್ತಿ(e, cv::CMP_LE, a, s);
+    ಪ್ರತ್ಯಾಗಮ e;
 }
 
-MatExpr operator > (const Mat& a, const Mat& b)
+Mat_ಅಭಿವ್ಯಕ್ತಿ operator > (ಧ್ರುವ Mat& a, ಧ್ರುವ Mat& b)
 {
     checkOperandsExist(a, b);
-    MatExpr e;
-    MatOp_Cmp::makeExpr(e, cv::CMP_GT, a, b);
-    return e;
+    Mat_ಅಭಿವ್ಯಕ್ತಿ e;
+    MatOp_Cmp::make_ಅಭಿವ್ಯಕ್ತಿ(e, cv::CMP_GT, a, b);
+    ಪ್ರತ್ಯಾಗಮ e;
 }
 
-MatExpr operator > (const Mat& a, double s)
+Mat_ಅಭಿವ್ಯಕ್ತಿ operator > (ಧ್ರುವ Mat& a, ದ್ವಿಗುಣ s)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Cmp::makeExpr(e, cv::CMP_GT, a, s);
-    return e;
+    Mat_ಅಭಿವ್ಯಕ್ತಿ e;
+    MatOp_Cmp::make_ಅಭಿವ್ಯಕ್ತಿ(e, cv::CMP_GT, a, s);
+    ಪ್ರತ್ಯಾಗಮ e;
 }
 
-MatExpr operator > (double s, const Mat& a)
+Mat_ಅಭಿವ್ಯಕ್ತಿ operator > (ದ್ವಿಗುಣ s, ಧ್ರುವ Mat& a)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Cmp::makeExpr(e, cv::CMP_LT, a, s);
-    return e;
+    Mat_ಅಭಿವ್ಯಕ್ತಿ e;
+    MatOp_Cmp::make_ಅಭಿವ್ಯಕ್ತಿ(e, cv::CMP_LT, a, s);
+    ಪ್ರತ್ಯಾಗಮ e;
 }
 
-MatExpr min(const Mat& a, const Mat& b)
+Mat_ಅಭಿವ್ಯಕ್ತಿ min(ಧ್ರುವ Mat& a, ಧ್ರುವ Mat& b)
 {
     CV_INSTRUMENT_REGION();
 
     checkOperandsExist(a, b);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, 'm', a, b);
-    return e;
+    Mat_ಅಭಿವ್ಯಕ್ತಿ e;
+    MatOp_Bin::make_ಅಭಿವ್ಯಕ್ತಿ(e, 'm', a, b);
+    ಪ್ರತ್ಯಾಗಮ e;
 }
 
-MatExpr min(const Mat& a, double s)
+Mat_ಅಭಿವ್ಯಕ್ತಿ min(ಧ್ರುವ Mat& a, ದ್ವಿಗುಣ s)
 {
     CV_INSTRUMENT_REGION();
 
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, 'n', a, s);
-    return e;
+    Mat_ಅಭಿವ್ಯಕ್ತಿ e;
+    MatOp_Bin::make_ಅಭಿವ್ಯಕ್ತಿ(e, 'n', a, s);
+    ಪ್ರತ್ಯಾಗಮ e;
 }
 
-MatExpr min(double s, const Mat& a)
+Mat_ಅಭಿವ್ಯಕ್ತಿ min(ದ್ವಿಗುಣ s, ಧ್ರುವ Mat& a)
 {
     CV_INSTRUMENT_REGION();
 
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, 'n', a, s);
-    return e;
+    Mat_ಅಭಿವ್ಯಕ್ತಿ e;
+    MatOp_Bin::make_ಅಭಿವ್ಯಕ್ತಿ(e, 'n', a, s);
+    ಪ್ರತ್ಯಾಗಮ e;
 }
 
-MatExpr max(const Mat& a, const Mat& b)
+Mat_ಅಭಿವ್ಯಕ್ತಿ max(ಧ್ರುವ Mat& a, ಧ್ರುವ Mat& b)
 {
     CV_INSTRUMENT_REGION();
 
     checkOperandsExist(a, b);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, 'M', a, b);
-    return e;
+    Mat_ಅಭಿವ್ಯಕ್ತಿ e;
+    MatOp_Bin::make_ಅಭಿವ್ಯಕ್ತಿ(e, 'M', a, b);
+    ಪ್ರತ್ಯಾಗಮ e;
 }
 
-MatExpr max(const Mat& a, double s)
+Mat_ಅಭಿವ್ಯಕ್ತಿ max(ಧ್ರುವ Mat& a, ದ್ವಿಗುಣ s)
 {
     CV_INSTRUMENT_REGION();
 
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, 'N', a, s);
-    return e;
+    Mat_ಅಭಿವ್ಯಕ್ತಿ e;
+    MatOp_Bin::make_ಅಭಿವ್ಯಕ್ತಿ(e, 'N', a, s);
+    ಪ್ರತ್ಯಾಗಮ e;
 }
 
-MatExpr max(double s, const Mat& a)
+Mat_ಅಭಿವ್ಯಕ್ತಿ max(ದ್ವಿಗುಣ s, ಧ್ರುವ Mat& a)
 {
     CV_INSTRUMENT_REGION();
 
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, 'N', a, s);
-    return e;
+    Mat_ಅಭಿವ್ಯಕ್ತಿ e;
+    MatOp_Bin::make_ಅಭಿವ್ಯಕ್ತಿ(e, 'N', a, s);
+    ಪ್ರತ್ಯಾಗಮ e;
 }
 
-MatExpr operator & (const Mat& a, const Mat& b)
+Mat_ಅಭಿವ್ಯಕ್ತಿ operator & (ಧ್ರುವ Mat& a, ಧ್ರುವ Mat& b)
 {
     checkOperandsExist(a, b);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, '&', a, b);
-    return e;
+    Mat_ಅಭಿವ್ಯಕ್ತಿ e;
+    MatOp_Bin::make_ಅಭಿವ್ಯಕ್ತಿ(e, '&', a, b);
+    ಪ್ರತ್ಯಾಗಮ e;
 }
 
-MatExpr operator & (const Mat& a, const Scalar& s)
+Mat_ಅಭಿವ್ಯಕ್ತಿ operator & (ಧ್ರುವ Mat& a, ಧ್ರುವ Scalar& s)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, '&', a, s);
-    return e;
+    Mat_ಅಭಿವ್ಯಕ್ತಿ e;
+    MatOp_Bin::make_ಅಭಿವ್ಯಕ್ತಿ(e, '&', a, s);
+    ಪ್ರತ್ಯಾಗಮ e;
 }
 
-MatExpr operator & (const Scalar& s, const Mat& a)
+Mat_ಅಭಿವ್ಯಕ್ತಿ operator & (ಧ್ರುವ Scalar& s, ಧ್ರುವ Mat& a)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, '&', a, s);
-    return e;
+    Mat_ಅಭಿವ್ಯಕ್ತಿ e;
+    MatOp_Bin::make_ಅಭಿವ್ಯಕ್ತಿ(e, '&', a, s);
+    ಪ್ರತ್ಯಾಗಮ e;
 }
 
-MatExpr operator | (const Mat& a, const Mat& b)
+Mat_ಅಭಿವ್ಯಕ್ತಿ operator | (ಧ್ರುವ Mat& a, ಧ್ರುವ Mat& b)
 {
     checkOperandsExist(a, b);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, '|', a, b);
-    return e;
+    Mat_ಅಭಿವ್ಯಕ್ತಿ e;
+    MatOp_Bin::make_ಅಭಿವ್ಯಕ್ತಿ(e, '|', a, b);
+    ಪ್ರತ್ಯಾಗಮ e;
 }
 
-MatExpr operator | (const Mat& a, const Scalar& s)
+Mat_ಅಭಿವ್ಯಕ್ತಿ operator | (ಧ್ರುವ Mat& a, ಧ್ರುವ Scalar& s)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, '|', a, s);
-    return e;
+    Mat_ಅಭಿವ್ಯಕ್ತಿ e;
+    MatOp_Bin::make_ಅಭಿವ್ಯಕ್ತಿ(e, '|', a, s);
+    ಪ್ರತ್ಯಾಗಮ e;
 }
 
-MatExpr operator | (const Scalar& s, const Mat& a)
+Mat_ಅಭಿವ್ಯಕ್ತಿ operator | (ಧ್ರುವ Scalar& s, ಧ್ರುವ Mat& a)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, '|', a, s);
-    return e;
+    Mat_ಅಭಿವ್ಯಕ್ತಿ e;
+    MatOp_Bin::make_ಅಭಿವ್ಯಕ್ತಿ(e, '|', a, s);
+    ಪ್ರತ್ಯಾಗಮ e;
 }
 
-MatExpr operator ^ (const Mat& a, const Mat& b)
+Mat_ಅಭಿವ್ಯಕ್ತಿ operator ^ (ಧ್ರುವ Mat& a, ಧ್ರುವ Mat& b)
 {
     checkOperandsExist(a, b);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, '^', a, b);
-    return e;
+    Mat_ಅಭಿವ್ಯಕ್ತಿ e;
+    MatOp_Bin::make_ಅಭಿವ್ಯಕ್ತಿ(e, '^', a, b);
+    ಪ್ರತ್ಯಾಗಮ e;
 }
 
-MatExpr operator ^ (const Mat& a, const Scalar& s)
+Mat_ಅಭಿವ್ಯಕ್ತಿ operator ^ (ಧ್ರುವ Mat& a, ಧ್ರುವ Scalar& s)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, '^', a, s);
-    return e;
+    Mat_ಅಭಿವ್ಯಕ್ತಿ e;
+    MatOp_Bin::make_ಅಭಿವ್ಯಕ್ತಿ(e, '^', a, s);
+    ಪ್ರತ್ಯಾಗಮ e;
 }
 
-MatExpr operator ^ (const Scalar& s, const Mat& a)
+Mat_ಅಭಿವ್ಯಕ್ತಿ operator ^ (ಧ್ರುವ Scalar& s, ಧ್ರುವ Mat& a)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, '^', a, s);
-    return e;
+    Mat_ಅಭಿವ್ಯಕ್ತಿ e;
+    MatOp_Bin::make_ಅಭಿವ್ಯಕ್ತಿ(e, '^', a, s);
+    ಪ್ರತ್ಯಾಗಮ e;
 }
 
-MatExpr operator ~(const Mat& a)
+Mat_ಅಭಿವ್ಯಕ್ತಿ operator ~(ಧ್ರುವ Mat& a)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, '~', a, Scalar());
-    return e;
+    Mat_ಅಭಿವ್ಯಕ್ತಿ e;
+    MatOp_Bin::make_ಅಭಿವ್ಯಕ್ತಿ(e, '~', a, Scalar());
+    ಪ್ರತ್ಯಾಗಮ e;
 }
 
-MatExpr abs(const Mat& a)
+Mat_ಅಭಿವ್ಯಕ್ತಿ abs(ಧ್ರುವ Mat& a)
 {
     CV_INSTRUMENT_REGION();
 
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, 'a', a, Scalar());
-    return e;
+    Mat_ಅಭಿವ್ಯಕ್ತಿ e;
+    MatOp_Bin::make_ಅಭಿವ್ಯಕ್ತಿ(e, 'a', a, Scalar());
+    ಪ್ರತ್ಯಾಗಮ e;
 }
 
-MatExpr abs(const MatExpr& e)
+Mat_ಅಭಿವ್ಯಕ್ತಿ abs(ಧ್ರುವ Mat_ಅಭಿವ್ಯಕ್ತಿ& e)
 {
     CV_INSTRUMENT_REGION();
 
-    MatExpr en;
+    Mat_ಅಭಿವ್ಯಕ್ತಿ en;
     e.op->abs(e, en);
-    return en;
+    ಪ್ರತ್ಯಾಗಮ en;
 }
 
 
-Size MatExpr::size() const
+Size Mat_ಅಭಿವ್ಯಕ್ತಿ::size() ಧ್ರುವ
 {
-    if( isT(*this) || isInv(*this) )
-        return Size(a.rows, a.cols);
-    if( isSolve(*this) )
-        return Size(b.cols, a.cols);
-    if( isInitializer(*this) )
-        return a.size();
-    return op ? op->size(*this) : Size();
+    ಯದಿ( isT(*ಏತತ್) || isInv(*ಏತತ್) )
+        ಪ್ರತ್ಯಾಗಮ Size(a.rows, a.cols);
+    ಯದಿ( isSolve(*ಏತತ್) )
+        ಪ್ರತ್ಯಾಗಮ Size(b.cols, a.cols);
+    ಯದಿ( isInitializer(*ಏತತ್) )
+        ಪ್ರತ್ಯಾಗಮ a.size();
+    ಪ್ರತ್ಯಾಗಮ op ? op->size(*ಏತತ್) : Size();
 }
 
 
-int MatExpr::type() const
+ಪೂರ್ಣಾಙ್ಕ Mat_ಅಭಿವ್ಯಕ್ತಿ::type() ಧ್ರುವ
 {
     CV_INSTRUMENT_REGION();
 
-    if( isInitializer(*this) )
-        return a.type();
-    if( isCmp(*this) )
-        return CV_MAKETYPE(CV_8U, a.channels());
-    return op ? op->type(*this) : -1;
+    ಯದಿ( isInitializer(*ಏತತ್) )
+        ಪ್ರತ್ಯಾಗಮ a.type();
+    ಯದಿ( isCmp(*ಏತತ್) )
+        ಪ್ರತ್ಯಾಗಮ CV_MAKETYPE(CV_8U, a.channels());
+    ಪ್ರತ್ಯಾಗಮ op ? op->type(*ಏತತ್) : -1;
 }
 
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void MatOp_Identity::assign(const MatExpr& e, Mat& m, int _type) const
+ಶೂನ್ಯ MatOp_Identity::assign(ಧ್ರುವ Mat_ಅಭಿವ್ಯಕ್ತಿ& e, Mat& m, ಪೂರ್ಣಾಙ್ಕ _type) ಧ್ರುವ
 {
-    if( _type == -1 || _type == e.a.type() )
+    ಯದಿ( _type == -1 || _type == e.a.type() )
         m = e.a;
-    else
+    ಅನ್ಯಥಾ
     {
         CV_Assert( CV_MAT_CN(_type) == e.a.channels() );
         e.a.convertTo(m, _type);
     }
 }
 
-inline void MatOp_Identity::makeExpr(MatExpr& res, const Mat& m)
+ಅನ್ತಃಸ್ಥ ಶೂನ್ಯ MatOp_Identity::make_ಅಭಿವ್ಯಕ್ತಿ(Mat_ಅಭಿವ್ಯಕ್ತಿ& res, ಧ್ರುವ Mat& m)
 {
-    res = MatExpr(&g_MatOp_Identity, 0, m, Mat(), Mat(), 1, 0);
+    res = Mat_ಅಭಿವ್ಯಕ್ತಿ(&g_MatOp_Identity, 0, m, Mat(), Mat(), 1, 0);
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void MatOp_AddEx::assign(const MatExpr& e, Mat& m, int _type) const
+ಶೂನ್ಯ MatOp_AddEx::assign(ಧ್ರುವ Mat_ಅಭಿವ್ಯಕ್ತಿ& e, Mat& m, ಪೂರ್ಣಾಙ್ಕ _type) ಧ್ರುವ
 {
     Mat temp, &dst = _type == -1 || e.a.type() == _type ? m : temp;
-    if( e.b.data )
+    ಯದಿ( e.b.data )
     {
-        if( e.s == Scalar() || !e.s.isReal() )
+        ಯದಿ( e.s == Scalar() || !e.s.isReal() )
         {
-            if( e.alpha == 1 )
+            ಯದಿ( e.alpha == 1 )
             {
-                if( e.beta == 1 )
+                ಯದಿ( e.beta == 1 )
                     cv::add(e.a, e.b, dst);
-                else if( e.beta == -1 )
+                ಅನ್ಯಥಾ ಯದಿ( e.beta == -1 )
                     cv::subtract(e.a, e.b, dst);
-                else
+                ಅನ್ಯಥಾ
                     cv::scaleAdd(e.b, e.beta, e.a, dst);
             }
-            else if( e.beta == 1 )
+            ಅನ್ಯಥಾ ಯದಿ( e.beta == 1 )
             {
-                if( e.alpha == -1 )
+                ಯದಿ( e.alpha == -1 )
                     cv::subtract(e.b, e.a, dst);
-                else
+                ಅನ್ಯಥಾ
                     cv::scaleAdd(e.a, e.alpha, e.b, dst);
             }
-            else
+            ಅನ್ಯಥಾ
                 cv::addWeighted(e.a, e.alpha, e.b, e.beta, 0, dst);
 
-            if( !e.s.isReal() )
+            ಯದಿ( !e.s.isReal() )
                 cv::add(dst, e.s, dst);
         }
-        else
+        ಅನ್ಯಥಾ
         {
-            if (e.a.channels() > 1)
-                CV_LOG_ONCE_WARNING(NULL, "OpenCV/MatExpr: processing of multi-channel arrays might be changed in the future: "
+            ಯದಿ (e.a.channels() > 1)
+                CV_LOG_ONCE_WARNING(ರಿಕ್ತ, "OpenCV/MatExpr: processing of multi-channel arrays might be changed in the future: "
                                           "https://github.com/opencv/opencv/issues/16739");
             cv::addWeighted(e.a, e.alpha, e.b, e.beta, e.s[0], dst);
         }
     }
-    else if( e.s.isReal() && (dst.data != m.data || fabs(e.alpha) != 1))
+    ಅನ್ಯಥಾ ಯದಿ( e.s.isReal() && (dst.data != m.data || fabs(e.alpha) != 1))
     {
-        if (e.a.channels() > 1 && e.s[0] != 0.0)
-            CV_LOG_ONCE_WARNING(NULL, "OpenCV/MatExpr: processing of multi-channel arrays might be changed in the future: "
+        ಯದಿ (e.a.channels() > 1 && e.s[0] != 0.0)
+            CV_LOG_ONCE_WARNING(ರಿಕ್ತ, "OpenCV/MatExpr: processing of multi-channel arrays might be changed in the future: "
                                       "https://github.com/opencv/opencv/issues/16739");
         e.a.convertTo(m, _type, e.alpha, e.s[0]);
-        return;
+        ಪ್ರತ್ಯಾಗಮ;
     }
-    else if( e.alpha == 1 )
+    ಅನ್ಯಥಾ ಯದಿ( e.alpha == 1 )
         cv::add(e.a, e.s, dst);
-    else if( e.alpha == -1 )
+    ಅನ್ಯಥಾ ಯದಿ( e.alpha == -1 )
         cv::subtract(e.s, e.a, dst);
-    else
+    ಅನ್ಯಥಾ
     {
         e.a.convertTo(dst, e.a.type(), e.alpha);
         cv::add(dst, e.s, dst);
     }
 
-    if( dst.data != m.data )
+    ಯದಿ( dst.data != m.data )
         dst.convertTo(m, m.type());
 }
 
 
-void MatOp_AddEx::add(const MatExpr& e, const Scalar& s, MatExpr& res) const
+ಶೂನ್ಯ MatOp_AddEx::add(ಧ್ರುವ Mat_ಅಭಿವ್ಯಕ್ತಿ& e, ಧ್ರುವ Scalar& s, Mat_ಅಭಿವ್ಯಕ್ತಿ& res) ಧ್ರುವ
 {
     CV_INSTRUMENT_REGION();
 
@@ -1359,7 +1359,7 @@ void MatOp_AddEx::add(const MatExpr& e, const Scalar& s, MatExpr& res) const
 }
 
 
-void MatOp_AddEx::subtract(const Scalar& s, const MatExpr& e, MatExpr& res) const
+ಶೂನ್ಯ MatOp_AddEx::subtract(ಧ್ರುವ Scalar& s, ಧ್ರುವ Mat_ಅಭಿವ್ಯಕ್ತಿ& e, Mat_ಅಭಿವ್ಯಕ್ತಿ& res) ಧ್ರುವ
 {
     CV_INSTRUMENT_REGION();
 
@@ -1369,7 +1369,7 @@ void MatOp_AddEx::subtract(const Scalar& s, const MatExpr& e, MatExpr& res) cons
     res.s = s - res.s;
 }
 
-void MatOp_AddEx::multiply(const MatExpr& e, double s, MatExpr& res) const
+ಶೂನ್ಯ MatOp_AddEx::multiply(ಧ್ರುವ Mat_ಅಭಿವ್ಯಕ್ತಿ& e, ದ್ವಿಗುಣ s, Mat_ಅಭಿವ್ಯಕ್ತಿ& res) ಧ್ರುವ
 {
     CV_INSTRUMENT_REGION();
 
@@ -1379,160 +1379,160 @@ void MatOp_AddEx::multiply(const MatExpr& e, double s, MatExpr& res) const
     res.s *= s;
 }
 
-void MatOp_AddEx::divide(double s, const MatExpr& e, MatExpr& res) const
+ಶೂನ್ಯ MatOp_AddEx::divide(ದ್ವಿಗುಣ s, ಧ್ರುವ Mat_ಅಭಿವ್ಯಕ್ತಿ& e, Mat_ಅಭಿವ್ಯಕ್ತಿ& res) ಧ್ರುವ
 {
     CV_INSTRUMENT_REGION();
 
-    if( isScaled(e) )
-        MatOp_Bin::makeExpr(res, '/', e.a, Mat(), s/e.alpha);
-    else
+    ಯದಿ( isScaled(e) )
+        MatOp_Bin::make_ಅಭಿವ್ಯಕ್ತಿ(res, '/', e.a, Mat(), s/e.alpha);
+    ಅನ್ಯಥಾ
         MatOp::divide(s, e, res);
 }
 
 
-void MatOp_AddEx::transpose(const MatExpr& e, MatExpr& res) const
+ಶೂನ್ಯ MatOp_AddEx::transpose(ಧ್ರುವ Mat_ಅಭಿವ್ಯಕ್ತಿ& e, Mat_ಅಭಿವ್ಯಕ್ತಿ& res) ಧ್ರುವ
 {
     CV_INSTRUMENT_REGION();
 
-    if( isScaled(e) )
-        MatOp_T::makeExpr(res, e.a, e.alpha);
-    else
+    ಯದಿ( isScaled(e) )
+        MatOp_T::make_ಅಭಿವ್ಯಕ್ತಿ(res, e.a, e.alpha);
+    ಅನ್ಯಥಾ
         MatOp::transpose(e, res);
 }
 
-void MatOp_AddEx::abs(const MatExpr& e, MatExpr& res) const
+ಶೂನ್ಯ MatOp_AddEx::abs(ಧ್ರುವ Mat_ಅಭಿವ್ಯಕ್ತಿ& e, Mat_ಅಭಿವ್ಯಕ್ತಿ& res) ಧ್ರುವ
 {
     CV_INSTRUMENT_REGION();
 
-    if( (!e.b.data || e.beta == 0) && fabs(e.alpha) == 1 )
-        MatOp_Bin::makeExpr(res, 'a', e.a, -e.s*e.alpha);
-    else if( e.b.data && e.alpha + e.beta == 0 && e.alpha*e.beta == -1 )
-        MatOp_Bin::makeExpr(res, 'a', e.a, e.b);
-    else
+    ಯದಿ( (!e.b.data || e.beta == 0) && fabs(e.alpha) == 1 )
+        MatOp_Bin::make_ಅಭಿವ್ಯಕ್ತಿ(res, 'a', e.a, -e.s*e.alpha);
+    ಅನ್ಯಥಾ ಯದಿ( e.b.data && e.alpha + e.beta == 0 && e.alpha*e.beta == -1 )
+        MatOp_Bin::make_ಅಭಿವ್ಯಕ್ತಿ(res, 'a', e.a, e.b);
+    ಅನ್ಯಥಾ
         MatOp::abs(e, res);
 }
 
-inline void MatOp_AddEx::makeExpr(MatExpr& res, const Mat& a, const Mat& b, double alpha, double beta, const Scalar& s)
+ಅನ್ತಃಸ್ಥ ಶೂನ್ಯ MatOp_AddEx::make_ಅಭಿವ್ಯಕ್ತಿ(Mat_ಅಭಿವ್ಯಕ್ತಿ& res, ಧ್ರುವ Mat& a, ಧ್ರುವ Mat& b, ದ್ವಿಗುಣ alpha, ದ್ವಿಗುಣ beta, ಧ್ರುವ Scalar& s)
 {
-    res = MatExpr(&g_MatOp_AddEx, 0, a, b, Mat(), alpha, beta, s);
+    res = Mat_ಅಭಿವ್ಯಕ್ತಿ(&g_MatOp_AddEx, 0, a, b, Mat(), alpha, beta, s);
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void MatOp_Bin::assign(const MatExpr& e, Mat& m, int _type) const
+ಶೂನ್ಯ MatOp_Bin::assign(ಧ್ರುವ Mat_ಅಭಿವ್ಯಕ್ತಿ& e, Mat& m, ಪೂರ್ಣಾಙ್ಕ _type) ಧ್ರುವ
 {
     Mat temp, &dst = _type == -1 || e.a.type() == _type ? m : temp;
 
-    if( e.flags == '*' )
+    ಯದಿ( e.flags == '*' )
         cv::multiply(e.a, e.b, dst, e.alpha);
-    else if( e.flags == '/' && e.b.data )
+    ಅನ್ಯಥಾ ಯದಿ( e.flags == '/' && e.b.data )
         cv::divide(e.a, e.b, dst, e.alpha);
-    else if( e.flags == '/' && !e.b.data )
+    ಅನ್ಯಥಾ ಯದಿ( e.flags == '/' && !e.b.data )
         cv::divide(e.alpha, e.a, dst );
-    else if( e.flags == '&' && e.b.data )
+    ಅನ್ಯಥಾ ಯದಿ( e.flags == '&' && e.b.data )
         bitwise_and(e.a, e.b, dst);
-    else if( e.flags == '&' && !e.b.data )
+    ಅನ್ಯಥಾ ಯದಿ( e.flags == '&' && !e.b.data )
         bitwise_and(e.a, e.s, dst);
-    else if( e.flags == '|' && e.b.data )
+    ಅನ್ಯಥಾ ಯದಿ( e.flags == '|' && e.b.data )
         bitwise_or(e.a, e.b, dst);
-    else if( e.flags == '|' && !e.b.data )
+    ಅನ್ಯಥಾ ಯದಿ( e.flags == '|' && !e.b.data )
         bitwise_or(e.a, e.s, dst);
-    else if( e.flags == '^' && e.b.data )
+    ಅನ್ಯಥಾ ಯದಿ( e.flags == '^' && e.b.data )
         bitwise_xor(e.a, e.b, dst);
-    else if( e.flags == '^' && !e.b.data )
+    ಅನ್ಯಥಾ ಯದಿ( e.flags == '^' && !e.b.data )
         bitwise_xor(e.a, e.s, dst);
-    else if( e.flags == '~' && !e.b.data )
+    ಅನ್ಯಥಾ ಯದಿ( e.flags == '~' && !e.b.data )
         bitwise_not(e.a, dst);
-    else if( e.flags == 'm' )
+    ಅನ್ಯಥಾ ಯದಿ( e.flags == 'm' )
         cv::min(e.a, e.b, dst);
-    else if( e.flags == 'n' )
+    ಅನ್ಯಥಾ ಯದಿ( e.flags == 'n' )
         cv::min(e.a, e.s[0], dst);
-    else if( e.flags == 'M' )
+    ಅನ್ಯಥಾ ಯದಿ( e.flags == 'M' )
         cv::max(e.a, e.b, dst);
-    else if( e.flags == 'N' )
+    ಅನ್ಯಥಾ ಯದಿ( e.flags == 'N' )
         cv::max(e.a, e.s[0], dst);
-    else if( e.flags == 'a' && e.b.data )
+    ಅನ್ಯಥಾ ಯದಿ( e.flags == 'a' && e.b.data )
         cv::absdiff(e.a, e.b, dst);
-    else if( e.flags == 'a' && !e.b.data )
+    ಅನ್ಯಥಾ ಯದಿ( e.flags == 'a' && !e.b.data )
         cv::absdiff(e.a, e.s, dst);
-    else
+    ಅನ್ಯಥಾ
         CV_Error(cv::Error::StsError, "Unknown operation");
 
-    if( dst.data != m.data )
+    ಯದಿ( dst.data != m.data )
         dst.convertTo(m, _type);
 }
 
-void MatOp_Bin::multiply(const MatExpr& e, double s, MatExpr& res) const
+ಶೂನ್ಯ MatOp_Bin::multiply(ಧ್ರುವ Mat_ಅಭಿವ್ಯಕ್ತಿ& e, ದ್ವಿಗುಣ s, Mat_ಅಭಿವ್ಯಕ್ತಿ& res) ಧ್ರುವ
 {
     CV_INSTRUMENT_REGION();
 
-    if( e.flags == '*' || e.flags == '/' )
+    ಯದಿ( e.flags == '*' || e.flags == '/' )
     {
         res = e;
         res.alpha *= s;
     }
-    else
+    ಅನ್ಯಥಾ
         MatOp::multiply(e, s, res);
 }
 
-void MatOp_Bin::divide(double s, const MatExpr& e, MatExpr& res) const
+ಶೂನ್ಯ MatOp_Bin::divide(ದ್ವಿಗುಣ s, ಧ್ರುವ Mat_ಅಭಿವ್ಯಕ್ತಿ& e, Mat_ಅಭಿವ್ಯಕ್ತಿ& res) ಧ್ರುವ
 {
     CV_INSTRUMENT_REGION();
 
-    if( e.flags == '/' && (!e.b.data || e.beta == 0) )
-        MatOp_AddEx::makeExpr(res, e.a, Mat(), s/e.alpha, 0);
-    else
+    ಯದಿ( e.flags == '/' && (!e.b.data || e.beta == 0) )
+        MatOp_AddEx::make_ಅಭಿವ್ಯಕ್ತಿ(res, e.a, Mat(), s/e.alpha, 0);
+    ಅನ್ಯಥಾ
         MatOp::divide(s, e, res);
 }
 
-inline void MatOp_Bin::makeExpr(MatExpr& res, char op, const Mat& a, const Mat& b, double scale)
+ಅನ್ತಃಸ್ಥ ಶೂನ್ಯ MatOp_Bin::make_ಅಭಿವ್ಯಕ್ತಿ(Mat_ಅಭಿವ್ಯಕ್ತಿ& res, ವರ್ಣ op, ಧ್ರುವ Mat& a, ಧ್ರುವ Mat& b, ದ್ವಿಗುಣ scale)
 {
-    res = MatExpr(&g_MatOp_Bin, op, a, b, Mat(), scale, b.data ? 1 : 0);
+    res = Mat_ಅಭಿವ್ಯಕ್ತಿ(&g_MatOp_Bin, op, a, b, Mat(), scale, b.data ? 1 : 0);
 }
 
-inline void MatOp_Bin::makeExpr(MatExpr& res, char op, const Mat& a, const Scalar& s)
+ಅನ್ತಃಸ್ಥ ಶೂನ್ಯ MatOp_Bin::make_ಅಭಿವ್ಯಕ್ತಿ(Mat_ಅಭಿವ್ಯಕ್ತಿ& res, ವರ್ಣ op, ಧ್ರುವ Mat& a, ಧ್ರುವ Scalar& s)
 {
-    res = MatExpr(&g_MatOp_Bin, op, a, Mat(), Mat(), 1, 0, s);
+    res = Mat_ಅಭಿವ್ಯಕ್ತಿ(&g_MatOp_Bin, op, a, Mat(), Mat(), 1, 0, s);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void MatOp_Cmp::assign(const MatExpr& e, Mat& m, int _type) const
+ಶೂನ್ಯ MatOp_Cmp::assign(ಧ್ರುವ Mat_ಅಭಿವ್ಯಕ್ತಿ& e, Mat& m, ಪೂರ್ಣಾಙ್ಕ _type) ಧ್ರುವ
 {
     Mat temp, &dst = _type == -1 || _type == CV_8U ? m : temp;
 
-    if( e.b.data )
+    ಯದಿ( e.b.data )
         cv::compare(e.a, e.b, dst, e.flags);
-    else
+    ಅನ್ಯಥಾ
         cv::compare(e.a, e.alpha, dst, e.flags);
 
-    if( dst.data != m.data )
+    ಯದಿ( dst.data != m.data )
         dst.convertTo(m, _type);
 }
 
-inline void MatOp_Cmp::makeExpr(MatExpr& res, int cmpop, const Mat& a, const Mat& b)
+ಅನ್ತಃಸ್ಥ ಶೂನ್ಯ MatOp_Cmp::make_ಅಭಿವ್ಯಕ್ತಿ(Mat_ಅಭಿವ್ಯಕ್ತಿ& res, ಪೂರ್ಣಾಙ್ಕ cmpop, ಧ್ರುವ Mat& a, ಧ್ರುವ Mat& b)
 {
-    res = MatExpr(&g_MatOp_Cmp, cmpop, a, b, Mat(), 1, 1);
+    res = Mat_ಅಭಿವ್ಯಕ್ತಿ(&g_MatOp_Cmp, cmpop, a, b, Mat(), 1, 1);
 }
 
-inline void MatOp_Cmp::makeExpr(MatExpr& res, int cmpop, const Mat& a, double alpha)
+ಅನ್ತಃಸ್ಥ ಶೂನ್ಯ MatOp_Cmp::make_ಅಭಿವ್ಯಕ್ತಿ(Mat_ಅಭಿವ್ಯಕ್ತಿ& res, ಪೂರ್ಣಾಙ್ಕ cmpop, ಧ್ರುವ Mat& a, ದ್ವಿಗುಣ alpha)
 {
-    res = MatExpr(&g_MatOp_Cmp, cmpop, a, Mat(), Mat(), alpha, 1);
+    res = Mat_ಅಭಿವ್ಯಕ್ತಿ(&g_MatOp_Cmp, cmpop, a, Mat(), Mat(), alpha, 1);
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void MatOp_T::assign(const MatExpr& e, Mat& m, int _type) const
+ಶೂನ್ಯ MatOp_T::assign(ಧ್ರುವ Mat_ಅಭಿವ್ಯಕ್ತಿ& e, Mat& m, ಪೂರ್ಣಾಙ್ಕ _type) ಧ್ರುವ
 {
     Mat temp, &dst = _type == -1 || _type == e.a.type() ? m : temp;
 
     cv::transpose(e.a, dst);
 
-    if( dst.data != m.data || e.alpha != 1 )
+    ಯದಿ( dst.data != m.data || e.alpha != 1 )
         dst.convertTo(m, _type, e.alpha);
 }
 
-void MatOp_T::multiply(const MatExpr& e, double s, MatExpr& res) const
+ಶೂನ್ಯ MatOp_T::multiply(ಧ್ರುವ Mat_ಅಭಿವ್ಯಕ್ತಿ& e, ದ್ವಿಗುಣ s, Mat_ಅಭಿವ್ಯಕ್ತಿ& res) ಧ್ರುವ
 {
     CV_INSTRUMENT_REGION();
 
@@ -1540,71 +1540,71 @@ void MatOp_T::multiply(const MatExpr& e, double s, MatExpr& res) const
     res.alpha *= s;
 }
 
-void MatOp_T::transpose(const MatExpr& e, MatExpr& res) const
+ಶೂನ್ಯ MatOp_T::transpose(ಧ್ರುವ Mat_ಅಭಿವ್ಯಕ್ತಿ& e, Mat_ಅಭಿವ್ಯಕ್ತಿ& res) ಧ್ರುವ
 {
     CV_INSTRUMENT_REGION();
 
-    if( e.alpha == 1 )
-        MatOp_Identity::makeExpr(res, e.a);
-    else
-        MatOp_AddEx::makeExpr(res, e.a, Mat(), e.alpha, 0);
+    ಯದಿ( e.alpha == 1 )
+        MatOp_Identity::make_ಅಭಿವ್ಯಕ್ತಿ(res, e.a);
+    ಅನ್ಯಥಾ
+        MatOp_AddEx::make_ಅಭಿವ್ಯಕ್ತಿ(res, e.a, Mat(), e.alpha, 0);
 }
 
-inline void MatOp_T::makeExpr(MatExpr& res, const Mat& a, double alpha)
+ಅನ್ತಃಸ್ಥ ಶೂನ್ಯ MatOp_T::make_ಅಭಿವ್ಯಕ್ತಿ(Mat_ಅಭಿವ್ಯಕ್ತಿ& res, ಧ್ರುವ Mat& a, ದ್ವಿಗುಣ alpha)
 {
-    res = MatExpr(&g_MatOp_T, 0, a, Mat(), Mat(), alpha, 0);
+    res = Mat_ಅಭಿವ್ಯಕ್ತಿ(&g_MatOp_T, 0, a, Mat(), Mat(), alpha, 0);
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void MatOp_GEMM::assign(const MatExpr& e, Mat& m, int _type) const
+ಶೂನ್ಯ MatOp_GEMM::assign(ಧ್ರುವ Mat_ಅಭಿವ್ಯಕ್ತಿ& e, Mat& m, ಪೂರ್ಣಾಙ್ಕ _type) ಧ್ರುವ
 {
     Mat temp, &dst = _type == -1 || _type == e.a.type() ? m : temp;
 
     cv::gemm(e.a, e.b, e.alpha, e.c, e.beta, dst, e.flags);
-    if( dst.data != m.data )
+    ಯದಿ( dst.data != m.data )
         dst.convertTo(m, _type);
 }
 
-void MatOp_GEMM::add(const MatExpr& e1, const MatExpr& e2, MatExpr& res) const
+ಶೂನ್ಯ MatOp_GEMM::add(ಧ್ರುವ Mat_ಅಭಿವ್ಯಕ್ತಿ& e1, ಧ್ರುವ Mat_ಅಭಿವ್ಯಕ್ತಿ& e2, Mat_ಅಭಿವ್ಯಕ್ತಿ& res) ಧ್ರುವ
 {
     CV_INSTRUMENT_REGION();
 
-    bool i1 = isIdentity(e1), i2 = isIdentity(e2);
-    double alpha1 = i1 ? 1 : e1.alpha, alpha2 = i2 ? 1 : e2.alpha;
+    ತಾರ್ಕಿಕ i1 = isIdentity(e1), i2 = isIdentity(e2);
+    ದ್ವಿಗುಣ alpha1 = i1 ? 1 : e1.alpha, alpha2 = i2 ? 1 : e2.alpha;
 
-    if( isMatProd(e1) && (i2 || isScaled(e2) || isT(e2)) )
-        MatOp_GEMM::makeExpr(res, (e1.flags & ~cv::GEMM_3_T)|(isT(e2) ? cv::GEMM_3_T : 0),
+    ಯದಿ( isMatProd(e1) && (i2 || isScaled(e2) || isT(e2)) )
+        MatOp_GEMM::make_ಅಭಿವ್ಯಕ್ತಿ(res, (e1.flags & ~cv::GEMM_3_T)|(isT(e2) ? cv::GEMM_3_T : 0),
                              e1.a, e1.b, alpha1, e2.a, alpha2);
-    else if( isMatProd(e2) && (i1 || isScaled(e1) || isT(e1)) )
-        MatOp_GEMM::makeExpr(res, (e2.flags & ~cv::GEMM_3_T)|(isT(e1) ? cv::GEMM_3_T : 0),
+    ಅನ್ಯಥಾ ಯದಿ( isMatProd(e2) && (i1 || isScaled(e1) || isT(e1)) )
+        MatOp_GEMM::make_ಅಭಿವ್ಯಕ್ತಿ(res, (e2.flags & ~cv::GEMM_3_T)|(isT(e1) ? cv::GEMM_3_T : 0),
                              e2.a, e2.b, alpha2, e1.a, alpha1);
-    else if( this == e2.op )
+    ಅನ್ಯಥಾ ಯದಿ( ಏತತ್ == e2.op )
         MatOp::add(e1, e2, res);
-    else
+    ಅನ್ಯಥಾ
         e2.op->add(e1, e2, res);
 }
 
-void MatOp_GEMM::subtract(const MatExpr& e1, const MatExpr& e2, MatExpr& res) const
+ಶೂನ್ಯ MatOp_GEMM::subtract(ಧ್ರುವ Mat_ಅಭಿವ್ಯಕ್ತಿ& e1, ಧ್ರುವ Mat_ಅಭಿವ್ಯಕ್ತಿ& e2, Mat_ಅಭಿವ್ಯಕ್ತಿ& res) ಧ್ರುವ
 {
     CV_INSTRUMENT_REGION();
 
-    bool i1 = isIdentity(e1), i2 = isIdentity(e2);
-    double alpha1 = i1 ? 1 : e1.alpha, alpha2 = i2 ? 1 : e2.alpha;
+    ತಾರ್ಕಿಕ i1 = isIdentity(e1), i2 = isIdentity(e2);
+    ದ್ವಿಗುಣ alpha1 = i1 ? 1 : e1.alpha, alpha2 = i2 ? 1 : e2.alpha;
 
-    if( isMatProd(e1) && (i2 || isScaled(e2) || isT(e2)) )
-        MatOp_GEMM::makeExpr(res, (e1.flags & ~cv::GEMM_3_T)|(isT(e2) ? cv::GEMM_3_T : 0),
+    ಯದಿ( isMatProd(e1) && (i2 || isScaled(e2) || isT(e2)) )
+        MatOp_GEMM::make_ಅಭಿವ್ಯಕ್ತಿ(res, (e1.flags & ~cv::GEMM_3_T)|(isT(e2) ? cv::GEMM_3_T : 0),
                              e1.a, e1.b, alpha1, e2.a, -alpha2);
-    else if( isMatProd(e2) && (i1 || isScaled(e1) || isT(e1)) )
-        MatOp_GEMM::makeExpr(res, (e2.flags & ~cv::GEMM_3_T)|(isT(e1) ? cv::GEMM_3_T : 0),
+    ಅನ್ಯಥಾ ಯದಿ( isMatProd(e2) && (i1 || isScaled(e1) || isT(e1)) )
+        MatOp_GEMM::make_ಅಭಿವ್ಯಕ್ತಿ(res, (e2.flags & ~cv::GEMM_3_T)|(isT(e1) ? cv::GEMM_3_T : 0),
                             e2.a, e2.b, -alpha2, e1.a, alpha1);
-    else if( this == e2.op )
+    ಅನ್ಯಥಾ ಯದಿ( ಏತತ್ == e2.op )
         MatOp::subtract(e1, e2, res);
-    else
+    ಅನ್ಯಥಾ
         e2.op->subtract(e1, e2, res);
 }
 
-void MatOp_GEMM::multiply(const MatExpr& e, double s, MatExpr& res) const
+ಶೂನ್ಯ MatOp_GEMM::multiply(ಧ್ರುವ Mat_ಅಭಿವ್ಯಕ್ತಿ& e, ದ್ವಿಗುಣ s, Mat_ಅಭಿವ್ಯಕ್ತಿ& res) ಧ್ರುವ
 {
     CV_INSTRUMENT_REGION();
 
@@ -1613,7 +1613,7 @@ void MatOp_GEMM::multiply(const MatExpr& e, double s, MatExpr& res) const
     res.beta *= s;
 }
 
-void MatOp_GEMM::transpose(const MatExpr& e, MatExpr& res) const
+ಶೂನ್ಯ MatOp_GEMM::transpose(ಧ್ರುವ Mat_ಅಭಿವ್ಯಕ್ತಿ& e, Mat_ಅಭಿವ್ಯಕ್ತಿ& res) ಧ್ರುವ
 {
     CV_INSTRUMENT_REGION();
 
@@ -1624,74 +1624,74 @@ void MatOp_GEMM::transpose(const MatExpr& e, MatExpr& res) const
     swap(res.a, res.b);
 }
 
-inline void MatOp_GEMM::makeExpr(MatExpr& res, int flags, const Mat& a, const Mat& b,
-                                 double alpha, const Mat& c, double beta)
+ಅನ್ತಃಸ್ಥ ಶೂನ್ಯ MatOp_GEMM::make_ಅಭಿವ್ಯಕ್ತಿ(Mat_ಅಭಿವ್ಯಕ್ತಿ& res, ಪೂರ್ಣಾಙ್ಕ flags, ಧ್ರುವ Mat& a, ಧ್ರುವ Mat& b,
+                                 ದ್ವಿಗುಣ alpha, ಧ್ರುವ Mat& c, ದ್ವಿಗುಣ beta)
 {
-    res = MatExpr(&g_MatOp_GEMM, flags, a, b, c, alpha, beta);
+    res = Mat_ಅಭಿವ್ಯಕ್ತಿ(&g_MatOp_GEMM, flags, a, b, c, alpha, beta);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void MatOp_Invert::assign(const MatExpr& e, Mat& m, int _type) const
+ಶೂನ್ಯ MatOp_Invert::assign(ಧ್ರುವ Mat_ಅಭಿವ್ಯಕ್ತಿ& e, Mat& m, ಪೂರ್ಣಾಙ್ಕ _type) ಧ್ರುವ
 {
     Mat temp, &dst = _type == -1 || _type == e.a.type() ? m : temp;
 
     cv::invert(e.a, dst, e.flags);
-    if( dst.data != m.data )
+    ಯದಿ( dst.data != m.data )
         dst.convertTo(m, _type);
 }
 
-void MatOp_Invert::matmul(const MatExpr& e1, const MatExpr& e2, MatExpr& res) const
+ಶೂನ್ಯ MatOp_Invert::matmul(ಧ್ರುವ Mat_ಅಭಿವ್ಯಕ್ತಿ& e1, ಧ್ರುವ Mat_ಅಭಿವ್ಯಕ್ತಿ& e2, Mat_ಅಭಿವ್ಯಕ್ತಿ& res) ಧ್ರುವ
 {
-    if( isInv(e1) && isIdentity(e2) )
-        MatOp_Solve::makeExpr(res, e1.flags, e1.a, e2.a);
-    else if( this == e2.op )
+    ಯದಿ( isInv(e1) && isIdentity(e2) )
+        MatOp_Solve::make_ಅಭಿವ್ಯಕ್ತಿ(res, e1.flags, e1.a, e2.a);
+    ಅನ್ಯಥಾ ಯದಿ( ಏತತ್ == e2.op )
         MatOp::matmul(e1, e2, res);
-    else
+    ಅನ್ಯಥಾ
         e2.op->matmul(e1, e2, res);
 }
 
-inline void MatOp_Invert::makeExpr(MatExpr& res, int method, const Mat& m)
+ಅನ್ತಃಸ್ಥ ಶೂನ್ಯ MatOp_Invert::make_ಅಭಿವ್ಯಕ್ತಿ(Mat_ಅಭಿವ್ಯಕ್ತಿ& res, ಪೂರ್ಣಾಙ್ಕ method, ಧ್ರುವ Mat& m)
 {
-    res = MatExpr(&g_MatOp_Invert, method, m, Mat(), Mat(), 1, 0);
+    res = Mat_ಅಭಿವ್ಯಕ್ತಿ(&g_MatOp_Invert, method, m, Mat(), Mat(), 1, 0);
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void MatOp_Solve::assign(const MatExpr& e, Mat& m, int _type) const
+ಶೂನ್ಯ MatOp_Solve::assign(ಧ್ರುವ Mat_ಅಭಿವ್ಯಕ್ತಿ& e, Mat& m, ಪೂರ್ಣಾಙ್ಕ _type) ಧ್ರುವ
 {
     Mat temp, &dst = _type == -1 || _type == e.a.type() ? m : temp;
 
     cv::solve(e.a, e.b, dst, e.flags);
-    if( dst.data != m.data )
+    ಯದಿ( dst.data != m.data )
         dst.convertTo(m, _type);
 }
 
-inline void MatOp_Solve::makeExpr(MatExpr& res, int method, const Mat& a, const Mat& b)
+ಅನ್ತಃಸ್ಥ ಶೂನ್ಯ MatOp_Solve::make_ಅಭಿವ್ಯಕ್ತಿ(Mat_ಅಭಿವ್ಯಕ್ತಿ& res, ಪೂರ್ಣಾಙ್ಕ method, ಧ್ರುವ Mat& a, ಧ್ರುವ Mat& b)
 {
-    res = MatExpr(&g_MatOp_Solve, method, a, b, Mat(), 1, 1);
+    res = Mat_ಅಭಿವ್ಯಕ್ತಿ(&g_MatOp_Solve, method, a, b, Mat(), 1, 1);
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void MatOp_Initializer::assign(const MatExpr& e, Mat& m, int _type) const
+ಶೂನ್ಯ MatOp_Initializer::assign(ಧ್ರುವ Mat_ಅಭಿವ್ಯಕ್ತಿ& e, Mat& m, ಪೂರ್ಣಾಙ್ಕ _type) ಧ್ರುವ
 {
-    if( _type == -1 )
+    ಯದಿ( _type == -1 )
         _type = e.a.type();
 
     m.create(e.a.size, _type);
 
-    if( e.flags == 'I' && e.a.dims <= 2 )
+    ಯದಿ( e.flags == 'I' && e.a.dims <= 2 )
         setIdentity(m, Scalar(e.alpha));
-    else if( e.flags == '0' )
+    ಅನ್ಯಥಾ ಯದಿ( e.flags == '0' )
         m = Scalar();
-    else if( e.flags == '1' )
+    ಅನ್ಯಥಾ ಯದಿ( e.flags == '1' )
         m = Scalar(e.alpha);
-    else
+    ಅನ್ಯಥಾ
         CV_Error(cv::Error::StsError, "Invalid matrix initializer type");
 }
 
-void MatOp_Initializer::multiply(const MatExpr& e, double s, MatExpr& res) const
+ಶೂನ್ಯ MatOp_Initializer::multiply(ಧ್ರುವ Mat_ಅಭಿವ್ಯಕ್ತಿ& e, ದ್ವಿಗುಣ s, Mat_ಅಭಿವ್ಯಕ್ತಿ& res) ಧ್ರುವ
 {
     CV_INSTRUMENT_REGION();
 
@@ -1699,39 +1699,39 @@ void MatOp_Initializer::multiply(const MatExpr& e, double s, MatExpr& res) const
     res.alpha *= s;
 }
 
-inline void MatOp_Initializer::makeExpr(MatExpr& res, int method, Size sz, int type, double alpha)
+ಅನ್ತಃಸ್ಥ ಶೂನ್ಯ MatOp_Initializer::make_ಅಭಿವ್ಯಕ್ತಿ(Mat_ಅಭಿವ್ಯಕ್ತಿ& res, ಪೂರ್ಣಾಙ್ಕ method, Size sz, ಪೂರ್ಣಾಙ್ಕ type, ದ್ವಿಗುಣ alpha)
 {
-    res = MatExpr(getGlobalMatOpInitializer(), method, Mat(sz, type, (void*)(size_t)0xEEEEEEEE), Mat(), Mat(), alpha, 0);
+    res = Mat_ಅಭಿವ್ಯಕ್ತಿ(getGlobalMatOpInitializer(), method, Mat(sz, type, (ಶೂನ್ಯ*)(size_t)0xEEEEEEEE), Mat(), Mat(), alpha, 0);
 }
 
-inline void MatOp_Initializer::makeExpr(MatExpr& res, int method, int ndims, const int* sizes, int type, double alpha)
+ಅನ್ತಃಸ್ಥ ಶೂನ್ಯ MatOp_Initializer::make_ಅಭಿವ್ಯಕ್ತಿ(Mat_ಅಭಿವ್ಯಕ್ತಿ& res, ಪೂರ್ಣಾಙ್ಕ method, ಪೂರ್ಣಾಙ್ಕ ndims, ಧ್ರುವ ಪೂರ್ಣಾಙ್ಕ* sizes, ಪೂರ್ಣಾಙ್ಕ type, ದ್ವಿಗುಣ alpha)
 {
-    res = MatExpr(getGlobalMatOpInitializer(), method, Mat(ndims, sizes, type, (void*)(size_t)0xEEEEEEEE), Mat(), Mat(), alpha, 0);
+    res = Mat_ಅಭಿವ್ಯಕ್ತಿ(getGlobalMatOpInitializer(), method, Mat(ndims, sizes, type, (ಶೂನ್ಯ*)(size_t)0xEEEEEEEE), Mat(), Mat(), alpha, 0);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-MatExpr Mat::t() const
+Mat_ಅಭಿವ್ಯಕ್ತಿ Mat::t() ಧ್ರುವ
 {
     CV_INSTRUMENT_REGION();
 
-    checkOperandsExist(*this);
-    MatExpr e;
-    MatOp_T::makeExpr(e, *this);
-    return e;
+    checkOperandsExist(*ಏತತ್);
+    Mat_ಅಭಿವ್ಯಕ್ತಿ e;
+    MatOp_T::make_ಅಭಿವ್ಯಕ್ತಿ(e, *ಏತತ್);
+    ಪ್ರತ್ಯಾಗಮ e;
 }
 
-MatExpr Mat::inv(int method) const
+Mat_ಅಭಿವ್ಯಕ್ತಿ Mat::inv(ಪೂರ್ಣಾಙ್ಕ method) ಧ್ರುವ
 {
     CV_INSTRUMENT_REGION();
 
-    MatExpr e;
-    MatOp_Invert::makeExpr(e, method, *this);
-    return e;
+    Mat_ಅಭಿವ್ಯಕ್ತಿ e;
+    MatOp_Invert::make_ಅಭಿವ್ಯಕ್ತಿ(e, method, *ಏತತ್);
+    ಪ್ರತ್ಯಾಗಮ e;
 }
 
 
-MatExpr Mat::mul(InputArray m, double scale) const
+Mat_ಅಭಿವ್ಯಕ್ತಿ Mat::mul(ಒಳಹರಿವು_Array m, ದ್ವಿಗುಣ scale) ಧ್ರುವ
 {
     CV_INSTRUMENT_REGION();
 
@@ -1740,105 +1740,105 @@ MatExpr Mat::mul(InputArray m, double scale) const
     // a non-owning view of caller memory (e.g. a scalar bound to _InputArray(const double&),
     // a Matx or a Vec) that the returned MatExpr can outlive, so snapshot it.
     // See https://github.com/opencv/opencv/issues/23577
-    if( !m.isMat() && !m.isUMat() )
+    ಯದಿ( !m.isMat() && !m.isUMat() )
         b = b.clone();
 
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, '*', *this, b, scale);
-    return e;
+    Mat_ಅಭಿವ್ಯಕ್ತಿ e;
+    MatOp_Bin::make_ಅಭಿವ್ಯಕ್ತಿ(e, '*', *ಏತತ್, b, scale);
+    ಪ್ರತ್ಯಾಗಮ e;
 }
 
-MatExpr Mat::zeros(int rows, int cols, int type)
+Mat_ಅಭಿವ್ಯಕ್ತಿ Mat::zeros(ಪೂರ್ಣಾಙ್ಕ rows, ಪೂರ್ಣಾಙ್ಕ cols, ಪೂರ್ಣಾಙ್ಕ type)
 {
     CV_INSTRUMENT_REGION();
 
-    MatExpr e;
-    MatOp_Initializer::makeExpr(e, '0', Size(cols, rows), type);
-    return e;
+    Mat_ಅಭಿವ್ಯಕ್ತಿ e;
+    MatOp_Initializer::make_ಅಭಿವ್ಯಕ್ತಿ(e, '0', Size(cols, rows), type);
+    ಪ್ರತ್ಯಾಗಮ e;
 }
 
-MatExpr Mat::zeros(Size size, int type)
+Mat_ಅಭಿವ್ಯಕ್ತಿ Mat::zeros(Size size, ಪೂರ್ಣಾಙ್ಕ type)
 {
     CV_INSTRUMENT_REGION();
 
-    MatExpr e;
-    MatOp_Initializer::makeExpr(e, '0', size, type);
-    return e;
+    Mat_ಅಭಿವ್ಯಕ್ತಿ e;
+    MatOp_Initializer::make_ಅಭಿವ್ಯಕ್ತಿ(e, '0', size, type);
+    ಪ್ರತ್ಯಾಗಮ e;
 }
 
-MatExpr Mat::zeros(int ndims, const int* sizes, int type)
+Mat_ಅಭಿವ್ಯಕ್ತಿ Mat::zeros(ಪೂರ್ಣಾಙ್ಕ ndims, ಧ್ರುವ ಪೂರ್ಣಾಙ್ಕ* sizes, ಪೂರ್ಣಾಙ್ಕ type)
 {
     CV_INSTRUMENT_REGION();
 
-    MatExpr e;
-    MatOp_Initializer::makeExpr(e, '0', ndims, sizes, type);
-    return e;
+    Mat_ಅಭಿವ್ಯಕ್ತಿ e;
+    MatOp_Initializer::make_ಅಭಿವ್ಯಕ್ತಿ(e, '0', ndims, sizes, type);
+    ಪ್ರತ್ಯಾಗಮ e;
 }
 
-MatExpr Mat::zeros(const MatShape& shape, int type)
+Mat_ಅಭಿವ್ಯಕ್ತಿ Mat::zeros(ಧ್ರುವ MatShape& shape, ಪೂರ್ಣಾಙ್ಕ type)
 {
     CV_INSTRUMENT_REGION();
 
-    MatExpr e;
-    MatOp_Initializer::makeExpr(e, '0', shape.dims, shape.p, type);
-    return e;
+    Mat_ಅಭಿವ್ಯಕ್ತಿ e;
+    MatOp_Initializer::make_ಅಭಿವ್ಯಕ್ತಿ(e, '0', shape.dims, shape.p, type);
+    ಪ್ರತ್ಯಾಗಮ e;
 }
 
-MatExpr Mat::ones(int rows, int cols, int type)
+Mat_ಅಭಿವ್ಯಕ್ತಿ Mat::ones(ಪೂರ್ಣಾಙ್ಕ rows, ಪೂರ್ಣಾಙ್ಕ cols, ಪೂರ್ಣಾಙ್ಕ type)
 {
     CV_INSTRUMENT_REGION();
 
-    MatExpr e;
-    MatOp_Initializer::makeExpr(e, '1', Size(cols, rows), type);
-    return e;
+    Mat_ಅಭಿವ್ಯಕ್ತಿ e;
+    MatOp_Initializer::make_ಅಭಿವ್ಯಕ್ತಿ(e, '1', Size(cols, rows), type);
+    ಪ್ರತ್ಯಾಗಮ e;
 }
 
-MatExpr Mat::ones(Size size, int type)
+Mat_ಅಭಿವ್ಯಕ್ತಿ Mat::ones(Size size, ಪೂರ್ಣಾಙ್ಕ type)
 {
     CV_INSTRUMENT_REGION();
 
-    MatExpr e;
-    MatOp_Initializer::makeExpr(e, '1', size, type);
-    return e;
+    Mat_ಅಭಿವ್ಯಕ್ತಿ e;
+    MatOp_Initializer::make_ಅಭಿವ್ಯಕ್ತಿ(e, '1', size, type);
+    ಪ್ರತ್ಯಾಗಮ e;
 }
 
-MatExpr Mat::ones(int ndims, const int* sizes, int type)
+Mat_ಅಭಿವ್ಯಕ್ತಿ Mat::ones(ಪೂರ್ಣಾಙ್ಕ ndims, ಧ್ರುವ ಪೂರ್ಣಾಙ್ಕ* sizes, ಪೂರ್ಣಾಙ್ಕ type)
 {
     CV_INSTRUMENT_REGION();
 
-    MatExpr e;
-    MatOp_Initializer::makeExpr(e, '1', ndims, sizes, type);
-    return e;
+    Mat_ಅಭಿವ್ಯಕ್ತಿ e;
+    MatOp_Initializer::make_ಅಭಿವ್ಯಕ್ತಿ(e, '1', ndims, sizes, type);
+    ಪ್ರತ್ಯಾಗಮ e;
 }
 
-MatExpr Mat::ones(const MatShape& shape, int type)
+Mat_ಅಭಿವ್ಯಕ್ತಿ Mat::ones(ಧ್ರುವ MatShape& shape, ಪೂರ್ಣಾಙ್ಕ type)
 {
     CV_INSTRUMENT_REGION();
 
-    MatExpr e;
-    MatOp_Initializer::makeExpr(e, '1', shape.dims, shape.p, type);
-    return e;
+    Mat_ಅಭಿವ್ಯಕ್ತಿ e;
+    MatOp_Initializer::make_ಅಭಿವ್ಯಕ್ತಿ(e, '1', shape.dims, shape.p, type);
+    ಪ್ರತ್ಯಾಗಮ e;
 }
 
-MatExpr Mat::eye(int rows, int cols, int type)
+Mat_ಅಭಿವ್ಯಕ್ತಿ Mat::eye(ಪೂರ್ಣಾಙ್ಕ rows, ಪೂರ್ಣಾಙ್ಕ cols, ಪೂರ್ಣಾಙ್ಕ type)
 {
     CV_INSTRUMENT_REGION();
 
-    MatExpr e;
-    MatOp_Initializer::makeExpr(e, 'I', Size(cols, rows), type);
-    return e;
+    Mat_ಅಭಿವ್ಯಕ್ತಿ e;
+    MatOp_Initializer::make_ಅಭಿವ್ಯಕ್ತಿ(e, 'I', Size(cols, rows), type);
+    ಪ್ರತ್ಯಾಗಮ e;
 }
 
-MatExpr Mat::eye(Size size, int type)
+Mat_ಅಭಿವ್ಯಕ್ತಿ Mat::eye(Size size, ಪೂರ್ಣಾಙ್ಕ type)
 {
     CV_INSTRUMENT_REGION();
 
-    MatExpr e;
-    MatOp_Initializer::makeExpr(e, 'I', size, type);
-    return e;
+    Mat_ಅಭಿವ್ಯಕ್ತಿ e;
+    MatOp_Initializer::make_ಅಭಿವ್ಯಕ್ತಿ(e, 'I', size, type);
+    ಪ್ರತ್ಯಾಗಮ e;
 }
 
-void MatExpr::swap(MatExpr& other)
+ಶೂನ್ಯ Mat_ಅಭಿವ್ಯಕ್ತಿ::swap(Mat_ಅಭಿವ್ಯಕ್ತಿ& other)
 {
     using std::swap;
 
@@ -1855,16 +1855,16 @@ void MatExpr::swap(MatExpr& other)
     swap(s, other.s);
 }
 
-_InputArray::_InputArray(const MatExpr& expr)
+ಒಳಹರಿವು_Array_2::ಒಳಹರಿವು_Array_2(ಧ್ರುವ Mat_ಅಭಿವ್ಯಕ್ತಿ& ಅಭಿವ್ಯಕ್ತಿ)
 {
-    if (!isIdentity(expr))
+    ಯದಿ (!isIdentity(ಅಭಿವ್ಯಕ್ತಿ))
     {
-        Mat result = expr;  // TODO improve through refcount == 1 of expr.a (inplace operation is possible - except gemm?)
-        MatExpr result_expr(result);
-        swap(const_cast<MatExpr&>(expr), result_expr);
+        Mat result = ಅಭಿವ್ಯಕ್ತಿ;  // TODO improve through refcount == 1 of expr.a (inplace operation is possible - except gemm?)
+        Mat_ಅಭಿವ್ಯಕ್ತಿ result_ಅಭಿವ್ಯಕ್ತಿ(result);
+        swap(const_cast<Mat_ಅಭಿವ್ಯಕ್ತಿ&>(ಅಭಿವ್ಯಕ್ತಿ), result_ಅಭಿವ್ಯಕ್ತಿ);
     }
-    CV_Assert(isIdentity(expr));
-    init(FIXED_TYPE + FIXED_SIZE + MAT + ACCESS_READ, &expr.a);
+    CV_Assert(isIdentity(ಅಭಿವ್ಯಕ್ತಿ));
+    init(FIXED_TYPE + FIXED_SIZE + MAT + ACCESS_READ, &ಅಭಿವ್ಯಕ್ತಿ.a);
 }
 
 } // cv::

@@ -8,84 +8,84 @@
 // prototype's ew_op/ew_compile/ew_exec/ew_parser. Kernels are reached through the dispatchers in
 // arithm.dispatch.cpp (getElemwiseFunc/getDivFunc, declared in arithm_expr.hpp).
 
-#include "precomp.hpp"
-#include "arithm_expr.hpp"
-#include <algorithm>
-#include <climits>
-#include <cmath>
-#include <cstdlib>
-#include <cstring>
-#include <map>
-#include <ostream>
-#include <string>
+#ಅನ್ತರ್ಭಾವ "precomp.hpp"
+#ಅನ್ತರ್ಭಾವ "arithm_expr.hpp"
+#ಅನ್ತರ್ಭಾವ <algorithm>
+#ಅನ್ತರ್ಭಾವ <climits>
+#ಅನ್ತರ್ಭಾವ <cmath>
+#ಅನ್ತರ್ಭಾವ <cstdlib>
+#ಅನ್ತರ್ಭಾವ <cstring>
+#ಅನ್ತರ್ಭಾವ <map>
+#ಅನ್ತರ್ಭಾವ <ostream>
+#ಅನ್ತರ್ಭಾವ <string>
 
-namespace cv { namespace ew {
+ನಾಮಾಕಾಶ cv { ನಾಮಾಕಾಶ ew {
 
 // ============================ op metadata (was ew_op.cpp) ============================
 
-const char* opName(TOp op)
+ಧ್ರುವ ವರ್ಣ* opName(ತುದಿ op)
 {
-    switch (op)
+    ವಿಕಲ್ಪ (op)
     {
-    case OP_NOP:           return "nop";
-    case OP_NEG:           return "neg";
-    case OP_ABS:           return "abs";
-    case OP_NOT:           return "not";
-    case OP_SQRT:          return "sqrt";
-    case OP_EXP:           return "exp";
-    case OP_LOG:           return "log";
-    case OP_SIN:           return "sin";
-    case OP_COS:           return "cos";
-    case OP_TANH:          return "tanh";
-    case OP_ERF:           return "erf";
-    case OP_RELU:          return "relu";
-    case OP_CAST:          return "cast";
-    case OP_ADD:           return "add";
-    case OP_SUB:           return "sub";
-    case OP_MUL:           return "mul";
-    case OP_DIV:           return "div";
-    case OP_POW:           return "pow";
-    case OP_MIN:           return "min";
-    case OP_MAX:           return "max";
-    case OP_ABSDIFF:       return "absdiff";
-    case OP_ADDW:          return "addWeighted";
-    case OP_HYPOT:         return "hypot";
-    case OP_ATAN2:         return "atan2";
-    case OP_AND:           return "and";
-    case OP_OR:            return "or";
-    case OP_XOR:           return "xor";
-    case OP_CMP_EQ:        return "cmp_eq";
-    case OP_CMP_NE:        return "cmp_ne";
-    case OP_CMP_LT:        return "cmp_lt";
-    case OP_CMP_LE:        return "cmp_le";
-    case OP_CMP_GT:        return "cmp_gt";
-    case OP_CMP_GE:        return "cmp_ge";
-    case OP_CLAMP:         return "clamp";
-    case OP_SELECT:        return "select";
-    case OP_CONVERT_SCALE: return "convert_scale";
-    default:               return "?";
+    ಪಕ್ಷ OP_NOP:           ಪ್ರತ್ಯಾಗಮ "nop";
+    ಪಕ್ಷ OP_NEG:           ಪ್ರತ್ಯಾಗಮ "neg";
+    ಪಕ್ಷ OP_ABS:           ಪ್ರತ್ಯಾಗಮ "abs";
+    ಪಕ್ಷ OP_NOT:           ಪ್ರತ್ಯಾಗಮ "not";
+    ಪಕ್ಷ OP_SQRT:          ಪ್ರತ್ಯಾಗಮ "sqrt";
+    ಪಕ್ಷ OP_EXP:           ಪ್ರತ್ಯಾಗಮ "exp";
+    ಪಕ್ಷ OP_LOG:           ಪ್ರತ್ಯಾಗಮ "log";
+    ಪಕ್ಷ OP_SIN:           ಪ್ರತ್ಯಾಗಮ "sin";
+    ಪಕ್ಷ OP_COS:           ಪ್ರತ್ಯಾಗಮ "cos";
+    ಪಕ್ಷ OP_TANH:          ಪ್ರತ್ಯಾಗಮ "tanh";
+    ಪಕ್ಷ OP_ERF:           ಪ್ರತ್ಯಾಗಮ "erf";
+    ಪಕ್ಷ OP_RELU:          ಪ್ರತ್ಯಾಗಮ "relu";
+    ಪಕ್ಷ OP_CAST:          ಪ್ರತ್ಯಾಗಮ "cast";
+    ಪಕ್ಷ OP_ADD:           ಪ್ರತ್ಯಾಗಮ "add";
+    ಪಕ್ಷ OP_SUB:           ಪ್ರತ್ಯಾಗಮ "sub";
+    ಪಕ್ಷ OP_MUL:           ಪ್ರತ್ಯಾಗಮ "mul";
+    ಪಕ್ಷ OP_DIV:           ಪ್ರತ್ಯಾಗಮ "div";
+    ಪಕ್ಷ OP_POW:           ಪ್ರತ್ಯಾಗಮ "pow";
+    ಪಕ್ಷ OP_MIN:           ಪ್ರತ್ಯಾಗಮ "min";
+    ಪಕ್ಷ OP_MAX:           ಪ್ರತ್ಯಾಗಮ "max";
+    ಪಕ್ಷ OP_ABSDIFF:       ಪ್ರತ್ಯಾಗಮ "absdiff";
+    ಪಕ್ಷ OP_ADDW:          ಪ್ರತ್ಯಾಗಮ "addWeighted";
+    ಪಕ್ಷ OP_HYPOT:         ಪ್ರತ್ಯಾಗಮ "hypot";
+    ಪಕ್ಷ OP_ATAN2:         ಪ್ರತ್ಯಾಗಮ "atan2";
+    ಪಕ್ಷ OP_AND:           ಪ್ರತ್ಯಾಗಮ "and";
+    ಪಕ್ಷ OP_OR:            ಪ್ರತ್ಯಾಗಮ "or";
+    ಪಕ್ಷ OP_XOR:           ಪ್ರತ್ಯಾಗಮ "xor";
+    ಪಕ್ಷ OP_CMP_EQ:        ಪ್ರತ್ಯಾಗಮ "cmp_eq";
+    ಪಕ್ಷ OP_CMP_NE:        ಪ್ರತ್ಯಾಗಮ "cmp_ne";
+    ಪಕ್ಷ OP_CMP_LT:        ಪ್ರತ್ಯಾಗಮ "cmp_lt";
+    ಪಕ್ಷ OP_CMP_LE:        ಪ್ರತ್ಯಾಗಮ "cmp_le";
+    ಪಕ್ಷ OP_CMP_GT:        ಪ್ರತ್ಯಾಗಮ "cmp_gt";
+    ಪಕ್ಷ OP_CMP_GE:        ಪ್ರತ್ಯಾಗಮ "cmp_ge";
+    ಪಕ್ಷ OP_CLAMP:         ಪ್ರತ್ಯಾಗಮ "clamp";
+    ಪಕ್ಷ OP_SELECT:        ಪ್ರತ್ಯಾಗಮ "select";
+    ಪಕ್ಷ OP_CONVERT_SCALE: ಪ್ರತ್ಯಾಗಮ "convert_scale";
+    ಸ್ವಭಾವ:               ಪ್ರತ್ಯಾಗಮ "?";
     }
 }
 
 // --- op category (declared in ew_op.hpp) --------------------------------------------------
-ElemwiseCategory opCategory(TOp op)
+ElemwiseCategory opCategory(ತುದಿ op)
 {
-    switch (op)
+    ವಿಕಲ್ಪ (op)
     {
-    case OP_AND: case OP_OR: case OP_XOR: case OP_NOT:
-        return CAT_BITWISE;
-    case OP_CMP_EQ: case OP_CMP_NE: case OP_CMP_LT:
-    case OP_CMP_LE: case OP_CMP_GT: case OP_CMP_GE:
-        return CAT_COMPARE;
-    case OP_SQRT: case OP_EXP: case OP_LOG:
-    case OP_SIN: case OP_COS: case OP_TANH: case OP_ERF: case OP_ATAN2: case OP_RELU:
-        return CAT_MATH;
-    case OP_CAST: case OP_CONVERT_SCALE:
-        return CAT_CAST;
-    case OP_SELECT:
-        return CAT_SELECT;
-    default:
-        return CAT_ARITH;   // add/sub/mul/div/pow/min/max/absdiff/neg/abs/clamp
+    ಪಕ್ಷ OP_AND: ಪಕ್ಷ OP_OR: ಪಕ್ಷ OP_XOR: ಪಕ್ಷ OP_NOT:
+        ಪ್ರತ್ಯಾಗಮ CAT_BITWISE;
+    ಪಕ್ಷ OP_CMP_EQ: ಪಕ್ಷ OP_CMP_NE: ಪಕ್ಷ OP_CMP_LT:
+    ಪಕ್ಷ OP_CMP_LE: ಪಕ್ಷ OP_CMP_GT: ಪಕ್ಷ OP_CMP_GE:
+        ಪ್ರತ್ಯಾಗಮ CAT_COMPARE;
+    ಪಕ್ಷ OP_SQRT: ಪಕ್ಷ OP_EXP: ಪಕ್ಷ OP_LOG:
+    ಪಕ್ಷ OP_SIN: ಪಕ್ಷ OP_COS: ಪಕ್ಷ OP_TANH: ಪಕ್ಷ OP_ERF: ಪಕ್ಷ OP_ATAN2: ಪಕ್ಷ OP_RELU:
+        ಪ್ರತ್ಯಾಗಮ CAT_MATH;
+    ಪಕ್ಷ OP_CAST: ಪಕ್ಷ OP_CONVERT_SCALE:
+        ಪ್ರತ್ಯಾಗಮ CAT_CAST;
+    ಪಕ್ಷ OP_SELECT:
+        ಪ್ರತ್ಯಾಗಮ CAT_SELECT;
+    ಸ್ವಭಾವ:
+        ಪ್ರತ್ಯಾಗಮ CAT_ARITH;   // add/sub/mul/div/pow/min/max/absdiff/neg/abs/clamp
     }
 }
 
@@ -95,47 +95,47 @@ ElemwiseCategory opCategory(TOp op)
 // ---------------------------------------------------------------------------
 // Type inference helpers (deliberately small so they can grow later).
 // ---------------------------------------------------------------------------
-static bool isFloatDepth(int d)
+ಸ್ಥಿರ ತಾರ್ಕಿಕ isFloatDepth(ಪೂರ್ಣಾಙ್ಕ d)
 {
-    return d == CV_16F || d == CV_16BF || d == CV_32F || d == CV_64F;
+    ಪ್ರತ್ಯಾಗಮ d == CV_16F || d == CV_16BF || d == CV_32F || d == CV_64F;
 }
 
 // Can `depth` hold `v` exactly? Floats: yes (close enough for our promotion). Integers: only if v
 // is integral and in range. Used so a const operand (e.g. 2.5 in a*2.5) is NOT quantized into a
 // narrow-integer direct kernel - such an op must fall back to the float working type instead.
-static bool depthRepresents(double v, int depth)
+ಸ್ಥಿರ ತಾರ್ಕಿಕ depthRepresents(ದ್ವಿಗುಣ v, ಪೂರ್ಣಾಙ್ಕ depth)
 {
-    if (isFloatDepth(depth)) return true;
-    if (v != std::floor(v)) return false;
-    switch (depth)
+    ಯದಿ (isFloatDepth(depth)) ಪ್ರತ್ಯಾಗಮ ಸತ್ಯ;
+    ಯದಿ (v != std::floor(v)) ಪ್ರತ್ಯಾಗಮ ಅಸತ್ಯ;
+    ವಿಕಲ್ಪ (depth)
     {
-    case CV_8U:  return v >= 0            && v <= 255;
-    case CV_8S:  return v >= -128         && v <= 127;
-    case CV_16U: return v >= 0            && v <= 65535;
-    case CV_16S: return v >= -32768       && v <= 32767;
-    case CV_32U: return v >= 0            && v <= 4294967295.0;
-    case CV_32S: return v >= -2147483648.0 && v <= 2147483647.0;
-    case CV_64U: return v >= 0            && v <= 18446744073709551615.0;
-    case CV_64S: return v >= -9223372036854775808.0 && v <= 9223372036854775807.0;
-    default:     return false;
+    ಪಕ್ಷ CV_8U:  ಪ್ರತ್ಯಾಗಮ v >= 0            && v <= 255;
+    ಪಕ್ಷ CV_8S:  ಪ್ರತ್ಯಾಗಮ v >= -128         && v <= 127;
+    ಪಕ್ಷ CV_16U: ಪ್ರತ್ಯಾಗಮ v >= 0            && v <= 65535;
+    ಪಕ್ಷ CV_16S: ಪ್ರತ್ಯಾಗಮ v >= -32768       && v <= 32767;
+    ಪಕ್ಷ CV_32U: ಪ್ರತ್ಯಾಗಮ v >= 0            && v <= 4294967295.0;
+    ಪಕ್ಷ CV_32S: ಪ್ರತ್ಯಾಗಮ v >= -2147483648.0 && v <= 2147483647.0;
+    ಪಕ್ಷ CV_64U: ಪ್ರತ್ಯಾಗಮ v >= 0            && v <= 18446744073709551615.0;
+    ಪಕ್ಷ CV_64S: ಪ್ರತ್ಯಾಗಮ v >= -9223372036854775808.0 && v <= 9223372036854775807.0;
+    ಸ್ವಭಾವ:     ಪ್ರತ್ಯಾಗಮ ಅಸತ್ಯ;
     }
 }
 
 // [min, max] representable value of an integer depth, as doubles (exact for <=32-bit; the 64-bit
 // endpoints round to the nearest double). Used by the compare-with-const boundary rewrite.
-static void intRange(int depth, double& lo, double& hi)
+ಸ್ಥಿರ ಶೂನ್ಯ intRange(ಪೂರ್ಣಾಙ್ಕ depth, ದ್ವಿಗುಣ& lo, ದ್ವಿಗುಣ& hi)
 {
-    switch (depth)
+    ವಿಕಲ್ಪ (depth)
     {
-    case CV_8U:  lo = 0;                     hi = 255; break;
-    case CV_8S:  lo = -128;                  hi = 127; break;
-    case CV_16U: lo = 0;                     hi = 65535; break;
-    case CV_16S: lo = -32768;                hi = 32767; break;
-    case CV_32U: lo = 0;                     hi = 4294967295.0; break;
-    case CV_32S: lo = -2147483648.0;         hi = 2147483647.0; break;
-    case CV_64U: lo = 0;                     hi = 18446744073709551615.0; break;
-    case CV_64S: lo = -9223372036854775808.0; hi = 9223372036854775807.0; break;
-    default:     lo = 0;                     hi = 0; break;
+    ಪಕ್ಷ CV_8U:  lo = 0;                     hi = 255; ಭಙ್ಗ;
+    ಪಕ್ಷ CV_8S:  lo = -128;                  hi = 127; ಭಙ್ಗ;
+    ಪಕ್ಷ CV_16U: lo = 0;                     hi = 65535; ಭಙ್ಗ;
+    ಪಕ್ಷ CV_16S: lo = -32768;                hi = 32767; ಭಙ್ಗ;
+    ಪಕ್ಷ CV_32U: lo = 0;                     hi = 4294967295.0; ಭಙ್ಗ;
+    ಪಕ್ಷ CV_32S: lo = -2147483648.0;         hi = 2147483647.0; ಭಙ್ಗ;
+    ಪಕ್ಷ CV_64U: lo = 0;                     hi = 18446744073709551615.0; ಭಙ್ಗ;
+    ಪಕ್ಷ CV_64S: lo = -9223372036854775808.0; hi = 9223372036854775807.0; ಭಙ್ಗ;
+    ಸ್ವಭಾವ:     lo = 0;                     hi = 0; ಭಙ್ಗ;
     }
 }
 
@@ -152,28 +152,28 @@ static void intRange(int depth, double& lo, double& hi)
 //   leszlut - 3-bit size class: 8-bit -> 1, 16-bit -> 2, 32-bit -> 3, 64-bit -> 4 (NONE/Bool -> 0)
 //   signlut - 1 bit, set for signed integer depths
 //   fltlut  - 1 bit, set for float depths
-int promoteArith(int a, int b)
+ಪೂರ್ಣಾಙ್ಕ promoteArith(ಪೂರ್ಣಾಙ್ಕ a, ಪೂರ್ಣಾಙ್ಕ b)
 {
     constexpr uint64_t leszlut = 034412243322110ULL;
     constexpr unsigned signlut = 0b1001111110100u;
     constexpr unsigned fltlut  = 0b1111000000u;
 
-    if (a == b) return a;
+    ಯದಿ (a == b) ಪ್ರತ್ಯಾಗಮ a;
 
-    int wa = int((leszlut >> (a+1)*3) & 7u), wb = int((leszlut >> (b+1)*3) & 7u);
-    int fa = int((fltlut >> (a+1)) & 1u),    fb = int((fltlut >> (b+1)) & 1u);
+    ಪೂರ್ಣಾಙ್ಕ wa = ಪೂರ್ಣಾಙ್ಕ((leszlut >> (a+1)*3) & 7u), wb = ಪೂರ್ಣಾಙ್ಕ((leszlut >> (b+1)*3) & 7u);
+    ಪೂರ್ಣಾಙ್ಕ fa = ಪೂರ್ಣಾಙ್ಕ((fltlut >> (a+1)) & 1u),    fb = ಪೂರ್ಣಾಙ್ಕ((fltlut >> (b+1)) & 1u);
 
-    if (fa + fb == 0)                          // both integer
+    ಯದಿ (fa + fb == 0)                          // both integer
     {
-        int sa = int((signlut >> (a+1)) & 1u), sb = int((signlut >> (b+1)) & 1u);
-        if (sa == sb)                          // same signedness -> the wider one (keeps the sign)
-            return wa >= wb ? a : b;
+        ಪೂರ್ಣಾಙ್ಕ sa = ಪೂರ್ಣಾಙ್ಕ((signlut >> (a+1)) & 1u), sb = ಪೂರ್ಣಾಙ್ಕ((signlut >> (b+1)) & 1u);
+        ಯದಿ (sa == sb)                          // same signedness -> the wider one (keeps the sign)
+            ಪ್ರತ್ಯಾಗಮ wa >= wb ? a : b;
         // mixed sign -> a SIGNED result holding the unsigned operand: the signed width if it is already
         // wider, else one step past the unsigned width; past 64 bits there is no int -> f64.
-        int rw = std::max(wa + (1 - sa), wb + (1 - sb));
-        constexpr int ilut = (CV_64F << 5*5) | (CV_64S << 4*5) | (CV_32S << 3*5) |
+        ಪೂರ್ಣಾಙ್ಕ rw = std::max(wa + (1 - sa), wb + (1 - sb));
+        constexpr ಪೂರ್ಣಾಙ್ಕ ilut = (CV_64F << 5*5) | (CV_64S << 4*5) | (CV_32S << 3*5) |
                              (CV_16S << 2*5) | (CV_8S << 1*5) | (CV_8S << 0*5);
-        return (ilut >> rw*5) & CV_MAT_DEPTH_MASK;
+        ಪ್ರತ್ಯಾಗಮ (ilut >> rw*5) & CV_MAT_DEPTH_MASK;
     }
 
     // at least one float -> the smallest float covering both operands. Lift each integer operand to the
@@ -182,35 +182,35 @@ int promoteArith(int a, int b)
     // otherwise 32F, or 64F once the size class reaches 4.
     wa += 1 - fa;
     wb += 1 - fb;
-    int maxw = std::max(wa, wb);
-    if (maxw == 2 && fa + fb == 1)
-        return fa*a + (1 - fa)*b;
-    return CV_32F + (maxw >= 4);
+    ಪೂರ್ಣಾಙ್ಕ maxw = std::max(wa, wb);
+    ಯದಿ (maxw == 2 && fa + fb == 1)
+        ಪ್ರತ್ಯಾಗಮ fa*a + (1 - fa)*b;
+    ಪ್ರತ್ಯಾಗಮ CV_32F + (maxw >= 4);
 }
 
 // Declared in ew_op.hpp. A signed integer |a-b| reaches 2^width-1, so absdiff returns the unsigned
 // type of the same width; unsigned/float depths are unchanged.
-int absdiffResultDepth(int depth)
+ಪೂರ್ಣಾಙ್ಕ absdiffResultDepth(ಪೂರ್ಣಾಙ್ಕ depth)
 {
-    switch (depth)
+    ವಿಕಲ್ಪ (depth)
     {
-    case CV_8S:  return CV_8U;
-    case CV_16S: return CV_16U;
-    case CV_32S: return CV_32U;
-    case CV_64S: return CV_64U;
-    default:     return depth;
+    ಪಕ್ಷ CV_8S:  ಪ್ರತ್ಯಾಗಮ CV_8U;
+    ಪಕ್ಷ CV_16S: ಪ್ರತ್ಯಾಗಮ CV_16U;
+    ಪಕ್ಷ CV_32S: ಪ್ರತ್ಯಾಗಮ CV_32U;
+    ಪಕ್ಷ CV_64S: ಪ್ರತ್ಯಾಗಮ CV_64U;
+    ಸ್ವಭಾವ:     ಪ್ರತ್ಯಾಗಮ depth;
     }
 }
 
 // numpy-ish promotion of two KNOWN depths for the COMPUTE type (float dominates; the wider integer
 // otherwise, and - unlike promoteArith - two WIDE integers float-promote: promote2(16U,64S)=64F).
 // This is cv::add's "wtype": the type both operands are brought to before the op runs.
-static int promote2(int a, int b)
+ಸ್ಥಿರ ಪೂರ್ಣಾಙ್ಕ promote2(ಪೂರ್ಣಾಙ್ಕ a, ಪೂರ್ಣಾಙ್ಕ b)
 {
-    if (a == b) return a;
+    ಯದಿ (a == b) ಪ್ರತ್ಯಾಗಮ a;
 
     constexpr unsigned lbits = 3, lmask = (1u << lbits) - 1u;
-    const uint64_t typelut = (uint64_t)((0ULL << CV_8U*lbits) | (0ULL << CV_8S*lbits) |
+    ಧ್ರುವ uint64_t typelut = (uint64_t)((0ULL << CV_8U*lbits) | (0ULL << CV_8S*lbits) |
                                         (1ULL << CV_16U*lbits) | (1ULL << CV_16S*lbits) |
                                         (2ULL << CV_32U*lbits) | (2ULL << CV_32S*lbits) |
                                         (3ULL << CV_16F*lbits) | (3ULL << CV_16BF*lbits) |
@@ -220,9 +220,9 @@ static int promote2(int a, int b)
     unsigned pr_b = unsigned((typelut >> (b*lbits)) & lmask);
     unsigned max_pr = std::max(pr_a, pr_b);
     constexpr unsigned dbits = CV_CN_SHIFT, dmask = (1u << dbits) - 1u;
-    const unsigned ctypelut = ((CV_16S << 0*dbits) | (CV_32S << 1*dbits) | (CV_64S << 2*dbits) |
+    ಧ್ರುವ unsigned ctypelut = ((CV_16S << 0*dbits) | (CV_32S << 1*dbits) | (CV_64S << 2*dbits) |
                             (CV_32F << 3*dbits) | (CV_64F << 4*dbits));
-    return int((ctypelut >> (max_pr*dbits)) & dmask);
+    ಪ್ರತ್ಯಾಗಮ ಪೂರ್ಣಾಙ್ಕ((ctypelut >> (max_pr*dbits)) & dmask);
 }
 
 // Common type for a bit-pattern op (AND/OR/XOR). Unlike promoteArith there is NO numeric promotion:
@@ -230,20 +230,20 @@ static int promote2(int a, int b)
 // is reinterpreted by its bits. A flexible CONST (EW_DEPTH_NONE) yields to the concrete operand; two
 // concrete depths must share the element WIDTH (cv::bitwise requires equal types) - if they differ we
 // keep the wider one (the kernel dispatches by element size). NONE x NONE stays NONE (caller defaults).
-static int promoteBitwise(int a, int b)
+ಸ್ಥಿರ ಪೂರ್ಣಾಙ್ಕ promoteBitwise(ಪೂರ್ಣಾಙ್ಕ a, ಪೂರ್ಣಾಙ್ಕ b)
 {
-    if (a == EW_DEPTH_NONE) return b;
-    if (b == EW_DEPTH_NONE) return a;
-    if (a == b) return a;
-    return CV_ELEM_SIZE1(a) >= CV_ELEM_SIZE1(b) ? a : b;
+    ಯದಿ (a == EW_DEPTH_NONE) ಪ್ರತ್ಯಾಗಮ b;
+    ಯದಿ (b == EW_DEPTH_NONE) ಪ್ರತ್ಯಾಗಮ a;
+    ಯದಿ (a == b) ಪ್ರತ್ಯಾಗಮ a;
+    ಪ್ರತ್ಯಾಗಮ CV_ELEM_SIZE1(a) >= CV_ELEM_SIZE1(b) ? a : b;
 }
 
 // A wide type in which add(depth,depth->wide) exists and the sum is held without a premature clamp
 // (the signed-widening fallback for ADD/SUB, whose difference may go negative).
-static int safeWide(int depth)
+ಸ್ಥಿರ ಪೂರ್ಣಾಙ್ಕ safeWide(ಪೂರ್ಣಾಙ್ಕ depth)
 {
     constexpr unsigned lbits = 3, lmask = (1u << lbits) - 1u;
-    const uint64_t typelut = (uint64_t)((0ULL << CV_8U*lbits) | (0ULL << CV_8S*lbits) |
+    ಧ್ರುವ uint64_t typelut = (uint64_t)((0ULL << CV_8U*lbits) | (0ULL << CV_8S*lbits) |
                                         (1ULL << CV_16U*lbits) | (1ULL << CV_16S*lbits) |
                                         (2ULL << CV_32U*lbits) | (2ULL << CV_32S*lbits) |
                                         (3ULL << CV_16F*lbits) | (3ULL << CV_16BF*lbits) |
@@ -251,61 +251,61 @@ static int safeWide(int depth)
                                         (4ULL << CV_64S*lbits) | (4ULL << CV_64U*lbits));
     unsigned pr_depth = unsigned((typelut >> (depth*lbits)) & lmask);
     constexpr unsigned dbits = CV_CN_SHIFT, dmask = (1u << dbits) - 1u;
-    const unsigned ctypelut = ((CV_16S << 0*dbits) | (CV_32S << 1*dbits) | (CV_64S << 2*dbits) |
+    ಧ್ರುವ unsigned ctypelut = ((CV_16S << 0*dbits) | (CV_32S << 1*dbits) | (CV_64S << 2*dbits) |
                               (CV_32F << 3*dbits) | (CV_64F << 4*dbits));
-    return int((ctypelut >> (pr_depth*dbits)) & dmask);
+    ಪ್ರತ್ಯಾಗಮ ಪೂರ್ಣಾಙ್ಕ((ctypelut >> (pr_depth*dbits)) & dmask);
 }
 
 // Inline capacity for the small per-const double scratch used during type inference; larger
 // channel counts (e.g. Vec<_,16>) just spill the AutoBuffer to the heap.
-enum { MAX_LOCAL_CN = 16 };
+ಗಣನಾ { MAX_LOCAL_CN = 16 };
 
 // Append `channels` values of depth `srcdepth` (raw bytes at `data`, or zero-filled if null) to
 // constbuf, padded to a whole number of uint64_t slots. Returns the offset (in uint64_t units).
-static size_t appendConstBuf(AutoBuffer<uint64_t, 16>& constbuf, int srcdepth, const void* data, int channels)
+ಸ್ಥಿರ size_t appendConstBuf(AutoBuffer<uint64_t, 16>& constbuf, ಪೂರ್ಣಾಙ್ಕ srcdepth, ಧ್ರುವ ಶೂನ್ಯ* data, ಪೂರ್ಣಾಙ್ಕ channels)
 {
-    const int cn = std::max(1, channels);
-    const size_t nbytes = (size_t)cn * CV_ELEM_SIZE1(srcdepth);
-    const size_t nu64 = (nbytes + sizeof(uint64_t) - 1) / sizeof(uint64_t);
-    const size_t ofs = constbuf.size();
+    ಧ್ರುವ ಪೂರ್ಣಾಙ್ಕ cn = std::max(1, channels);
+    ಧ್ರುವ size_t nbytes = (size_t)cn * CV_ELEM_SIZE1(srcdepth);
+    ಧ್ರುವ size_t nu64 = (nbytes + ಪರಿಮಾಣ(uint64_t) - 1) / ಪರಿಮಾಣ(uint64_t);
+    ಧ್ರುವ size_t ofs = constbuf.size();
     constbuf.resize(ofs + nu64);
     uchar* dst = (uchar*)(constbuf.data() + ofs);
-    if (data) memcpy(dst, data, nbytes); else memset(dst, 0, nbytes);
-    return ofs;
+    ಯದಿ (data) memcpy(dst, data, nbytes); ಅನ್ಯಥಾ memset(dst, 0, nbytes);
+    ಪ್ರತ್ಯಾಗಮ ofs;
 }
 
 // Read a CONST slot's source values (constbuf, `srcdepth`) as doubles into `buf`. Returns channels.
-static int constDoubles(const TExpr& e, int s, AutoBuffer<double, MAX_LOCAL_CN>& buf)
+ಸ್ಥಿರ ಪೂರ್ಣಾಙ್ಕ constDoubles(ಧ್ರುವ TExpr& e, ಪೂರ್ಣಾಙ್ಕ s, AutoBuffer<ದ್ವಿಗುಣ, MAX_LOCAL_CN>& buf)
 {
-    const TExpr::Arg& a = e.arginfo[s];
-    const int cn = std::max(1, a.channels);
+    ಧ್ರುವ TExpr::Arg& a = e.arginfo[s];
+    ಧ್ರುವ ಪೂರ್ಣಾಙ್ಕ cn = std::max(1, a.channels);
     buf.resize(cn);
-    const uchar* src = (const uchar*)(e.constbuf.data() + a.constofs);
-    if (a.srcdepth == CV_64F)
-        memcpy(buf.data(), src, (size_t)cn * sizeof(double));   // common (Scalar / parsed literal)
-    else
+    ಧ್ರುವ uchar* src = (ಧ್ರುವ uchar*)(e.constbuf.data() + a.constofs);
+    ಯದಿ (a.srcdepth == CV_64F)
+        memcpy(buf.data(), src, (size_t)cn * ಪರಿಮಾಣ(ದ್ವಿಗುಣ));   // common (Scalar / parsed literal)
+    ಅನ್ಯಥಾ
         getConvertFunc(a.srcdepth, CV_64F)(src, 0, nullptr, 0, (uchar*)buf.data(), 0, Size(cn, 1), nullptr);
-    return cn;
+    ಪ್ರತ್ಯಾಗಮ cn;
 }
 
 // Materialize a flexible CONST `s` at depth `d`, or return `s` unchanged for a typed operand
 // (the emit* layer then casts it to the compute depth). Used by the emit* policy layers.
-static inline bool isFlexConst(const TExpr& e, int s)
+ಸ್ಥಿರ ಅನ್ತಃಸ್ಥ ತಾರ್ಕಿಕ isFlexConst(ಧ್ರುವ TExpr& e, ಪೂರ್ಣಾಙ್ಕ s)
 {
-    return e.arginfo[s].kind == TExpr::CONST && e.arginfo[s].depth == EW_DEPTH_NONE;
+    ಪ್ರತ್ಯಾಗಮ e.arginfo[s].kind == TExpr::CONST && e.arginfo[s].depth == EW_DEPTH_NONE;
 }
 
 // Read a CONST slot that carries exactly ONE value. OP_ADDW transports alpha/beta/gamma in the
 // instruction's params block - a single value applied to every channel - so a per-channel const
 // cannot ride it and must keep the expanded form.
-static bool scalarConstValue(const TExpr& e, int s, double& v)
+ಸ್ಥಿರ ತಾರ್ಕಿಕ scalar_Const_ಮೌಲ್ಯ(ಧ್ರುವ TExpr& e, ಪೂರ್ಣಾಙ್ಕ s, ದ್ವಿಗುಣ& v)
 {
-    const TExpr::Arg& a = e.arginfo[s];
-    if (a.kind != TExpr::CONST || std::max(1, a.channels) != 1) return false;
-    AutoBuffer<double, MAX_LOCAL_CN> buf;
+    ಧ್ರುವ TExpr::Arg& a = e.arginfo[s];
+    ಯದಿ (a.kind != TExpr::CONST || std::max(1, a.channels) != 1) ಪ್ರತ್ಯಾಗಮ ಅಸತ್ಯ;
+    AutoBuffer<ದ್ವಿಗುಣ, MAX_LOCAL_CN> buf;
     constDoubles(e, s, buf);
     v = buf[0];
-    return true;
+    ಪ್ರತ್ಯಾಗಮ ಸತ್ಯ;
 }
 
 // Does the run of instructions ENDING at `end` compute `array * scalar` into slot `t`?
@@ -317,50 +317,50 @@ static bool scalarConstValue(const TExpr& e, int s, double& v)
 // the tail of the program (the operand was emitted immediately before the pending add), so matching
 // backwards from `end` identifies the whole run. Fills the ORIGINAL array operand, the scalar, and
 // the index of the run's first instruction.
-static bool matchScaledChain(const TExpr& e, int end, int t,
-                             int& arrSlot, double& scale, int& startIdx)
+ಸ್ಥಿರ ತಾರ್ಕಿಕ matchScaledChain(ಧ್ರುವ TExpr& e, ಪೂರ್ಣಾಙ್ಕ end, ಪೂರ್ಣಾಙ್ಕ t,
+                             ಪೂರ್ಣಾಙ್ಕ& arrSlot, ದ್ವಿಗುಣ& scale, ಪೂರ್ಣಾಙ್ಕ& startIdx)
 {
-    if (end < 0) return false;
-    int j = end, mulResult = t;
+    ಯದಿ (end < 0) ಪ್ರತ್ಯಾಗಮ ಅಸತ್ಯ;
+    ಪೂರ್ಣಾಙ್ಕ j = end, mulResult = t;
 
     // optional trailing narrowing cast
-    if (e.prog[j].op == OP_CAST && e.prog[j].result == t)
+    ಯದಿ (e.prog[j].op == OP_CAST && e.prog[j].result == t)
     {
         mulResult = e.prog[j].arg0;
-        if (--j < 0) return false;
+        ಯದಿ (--j < 0) ಪ್ರತ್ಯಾಗಮ ಅಸತ್ಯ;
     }
 
-    const TExpr::Insn& mul = e.prog[j];
-    if (mul.op != OP_MUL || mul.result != mulResult || mul.params[0] != 1.0) return false;
+    ಧ್ರುವ TExpr::Insn& mul = e.prog[j];
+    ಯದಿ (mul.op != OP_MUL || mul.result != mulResult || mul.params[0] != 1.0) ಪ್ರತ್ಯಾಗಮ ಅಸತ್ಯ;
 
-    int arr;
-    if      (scalarConstValue(e, mul.arg1, scale)) arr = mul.arg0;
-    else if (scalarConstValue(e, mul.arg0, scale)) arr = mul.arg1;
-    else return false;                                  // array*array is not an addWeighted term
+    ಪೂರ್ಣಾಙ್ಕ arr;
+    ಯದಿ      (scalar_Const_ಮೌಲ್ಯ(e, mul.arg1, scale)) arr = mul.arg0;
+    ಅನ್ಯಥಾ ಯದಿ (scalar_Const_ಮೌಲ್ಯ(e, mul.arg0, scale)) arr = mul.arg1;
+    ಅನ್ಯಥಾ ಪ್ರತ್ಯಾಗಮ ಅಸತ್ಯ;                                  // array*array is not an addWeighted term
     startIdx = j;
 
     // optional leading widening cast feeding the multiply
-    if (j - 1 >= 0 && e.prog[j-1].op == OP_CAST && e.prog[j-1].result == arr &&
+    ಯದಿ (j - 1 >= 0 && e.prog[j-1].op == OP_CAST && e.prog[j-1].result == arr &&
         e.arginfo[arr].kind == TExpr::TEMP)
     {
         arr = e.prog[j-1].arg0;
         startIdx = j - 1;
     }
 
-    if (e.arginfo[arr].kind == TExpr::CONST) return false;   // scalar*scalar is folded elsewhere
+    ಯದಿ (e.arginfo[arr].kind == TExpr::CONST) ಪ್ರತ್ಯಾಗಮ ಅಸತ್ಯ;   // scalar*scalar is folded elsewhere
     arrSlot = arr;
-    return true;
+    ಪ್ರತ್ಯಾಗಮ ಸತ್ಯ;
 }
 
 // Can a flexible CONST `s` be represented exactly at depth `d`? (typed operands trivially "fit").
-static bool constFits(const TExpr& e, int s, int d)
+ಸ್ಥಿರ ತಾರ್ಕಿಕ constFits(ಧ್ರುವ TExpr& e, ಪೂರ್ಣಾಙ್ಕ s, ಪೂರ್ಣಾಙ್ಕ d)
 {
-    if (!isFlexConst(e, s)) return true;
-    AutoBuffer<double, MAX_LOCAL_CN> v;
-    int cn = constDoubles(e, s, v);
-    for (int ch = 0; ch < cn; ch++)
-        if (!depthRepresents(v[ch], d)) return false;
-    return true;
+    ಯದಿ (!isFlexConst(e, s)) ಪ್ರತ್ಯಾಗಮ ಸತ್ಯ;
+    AutoBuffer<ದ್ವಿಗುಣ, MAX_LOCAL_CN> v;
+    ಪೂರ್ಣಾಙ್ಕ cn = constDoubles(e, s, v);
+    ಪ್ರತಿ (ಪೂರ್ಣಾಙ್ಕ ch = 0; ch < cn; ch++)
+        ಯದಿ (!depthRepresents(v[ch], d)) ಪ್ರತ್ಯಾಗಮ ಅಸತ್ಯ;
+    ಪ್ರತ್ಯಾಗಮ ಸತ್ಯ;
 }
 
 // ---------------------------------------------------------------------------
@@ -368,39 +368,39 @@ static bool constFits(const TExpr& e, int s, int d)
 // wide fallback per op family, then cast both operands and emit (direct, else wide+narrow). Operands
 // may be typed (INPUT/TEMP) or a flexible CONST (materialized at the compute depth here).
 // ---------------------------------------------------------------------------
-int TExpr::emitBinary(TOp op, int a, int b, int rdepth, const Scalar& params)
+ಪೂರ್ಣಾಙ್ಕ TExpr::emit_ದ್ವಿಮಾನ(ತುದಿ op, ಪೂರ್ಣಾಙ್ಕ a, ಪೂರ್ಣಾಙ್ಕ b, ಪೂರ್ಣಾಙ್ಕ rdepth, ಧ್ರುವ Scalar& params)
 {
     // addWeighted a*alpha + b*beta + gamma (params = {alpha, beta, gamma}): ONE fused kernel (two v_fma).
     // Inputs are the same type T (cast to a common type if not). The kernel outputs T/f32 (small ints,
     // f16/bf16, f32) or f64 directly, at its own natural work precision; for any other requested rdepth
     // it computes at that natural precision and casts the RESULT to rdepth afterward (never the inputs
     // up before the op, that would spend an extra cast and run the op at needlessly high precision).
-    if (op == OP_ADDW)
+    ಯದಿ (op == OP_ADDW)
     {
-        int Tt = arginfo[a].depth;
-        if (arginfo[a].depth != arginfo[b].depth)
+        ಪೂರ್ಣಾಙ್ಕ Tt = arginfo[a].depth;
+        ಯದಿ (arginfo[a].depth != arginfo[b].depth)
         {
             Tt = promoteArith(arginfo[a].depth, arginfo[b].depth);
             a = maybeAddCast(a, Tt); b = maybeAddCast(b, Tt);
         }
-        if (Tt == CV_Bool)
+        ಯದಿ (Tt == CV_Bool)
             CV_Error(Error::StsNotImplemented, "addWeighted: CV_Bool inputs are not supported, cast explicitly "
                      "first, e.g. cv::texpr(\"uint8({0})*{1} + uint8({2})*{3}\", {a, alpha, b, beta})");
-        if (rdepth == EW_DEPTH_NONE) rdepth = Tt;              // default dtype = input depth
+        ಯದಿ (rdepth == EW_DEPTH_NONE) rdepth = Tt;              // default dtype = input depth
         TKernel k = getElemwiseFunc(OP_ADDW, Tt, Tt, EW_DEPTH_NONE, rdepth);
-        int outD = rdepth;
-        if (!k.fptr)                                          // no direct T->rdepth kernel: compute at T's natural work depth, cast after
+        ಪೂರ್ಣಾಙ್ಕ outD = rdepth;
+        ಯದಿ (!k.fptr)                                          // no direct T->rdepth kernel: compute at T's natural work depth, cast after
         {
             outD = (Tt==CV_32U || Tt==CV_32S || Tt==CV_64U || Tt==CV_64S || Tt==CV_64F) ? CV_64F : CV_32F;
             k = getElemwiseFunc(OP_ADDW, Tt, Tt, EW_DEPTH_NONE, outD);
             CV_Assert(k.fptr && "ew: no kernel for this op/type combination");
         }
-        const int out = addTemp(outD);
+        ಧ್ರುವ ಪೂರ್ಣಾಙ್ಕ out = addTemp(outD);
         addInsn(OP_ADDW, a, b, 0, out, k, Scalar(params[0], params[1], params[2]));
-        if (outD == rdepth) return out;
-        const int out2 = addTemp(rdepth);
+        ಯದಿ (outD == rdepth) ಪ್ರತ್ಯಾಗಮ out;
+        ಧ್ರುವ ಪೂರ್ಣಾಙ್ಕ out2 = addTemp(rdepth);
         addInsn(OP_CAST, out, 0, 0, out2);
-        return out2;
+        ಪ್ರತ್ಯಾಗಮ out2;
     }
 
     // peephole: a*alpha + b*beta [+ gamma] -> the fused OP_ADDW kernel (two v_fma). Written out,
@@ -408,20 +408,20 @@ int TExpr::emitBinary(TOp op, int a, int b, int rdepth, const Scalar& params)
     // does the whole thing in one pass with no temp. Like the abs(x - y) -> absdiff peephole in
     // emitUnary() this RETIRES the instructions it folds, so - same as there - it must leave a
     // pinned (named) slot alone: see TExpr::Arg::pinned.
-    if (op == OP_ADD)
+    ಯದಿ (op == OP_ADD)
     {
-        const int n = (int)prog.size();
+        ಧ್ರುವ ಪೂರ್ಣಾಙ್ಕ n = (ಪೂರ್ಣಾಙ್ಕ)prog.size();
 
         // (x*alpha) + (y*beta). Both multiplies are the last two instructions and their results the
         // last two temps (the operands were emitted immediately before this add), so folding them is
         // a pop of the program tail and no slot renumbering is needed.
-        int x = 0, y = 0, startA = 0, startB = 0;
-        double alpha = 0, beta = 0;
-        if (n >= 2 && a != b &&
+        ಪೂರ್ಣಾಙ್ಕ x = 0, y = 0, startA = 0, startB = 0;
+        ದ್ವಿಗುಣ alpha = 0, beta = 0;
+        ಯದಿ (n >= 2 && a != b &&
             arginfo[a].kind == TEMP && !arginfo[a].pinned &&
             arginfo[b].kind == TEMP && !arginfo[b].pinned &&
-            matchScaledChain(*this, n - 1, b, y, beta, startB) &&
-            matchScaledChain(*this, startB - 1, a, x, alpha, startA) &&
+            matchScaledChain(*ಏತತ್, n - 1, b, y, beta, startB) &&
+            matchScaledChain(*ಏತತ್, startB - 1, a, x, alpha, startA) &&
             x != a && x != b && y != a && y != b &&
             // OP_ADDW has no CV_Bool form (it would have to pick a numeric work type); leave a bool
             // operand to the plain expansion rather than turning it into an error.
@@ -430,61 +430,61 @@ int TExpr::emitBinary(TOp op, int a, int b, int rdepth, const Scalar& params)
             // The two runs together are exactly the tail [startA, n), so folding them is a truncation
             // of the program; every temp they produced was created after every surviving one, so
             // retiring them keeps the temp indices dense (0..ntemps-1) for compile()'s liveness.
-            int retired = 0, lowest = INT_MAX;
-            for (int i = startA; i < n; i++)
+            ಪೂರ್ಣಾಙ್ಕ retired = 0, lowest = INT_MAX;
+            ಪ್ರತಿ (ಪೂರ್ಣಾಙ್ಕ i = startA; i < n; i++)
             {
-                const int r = prog[i].result;
-                if (arginfo[r].kind != TEMP || arginfo[r].pinned) { retired = -1; break; }
+                ಧ್ರುವ ಪೂರ್ಣಾಙ್ಕ r = prog[i].result;
+                ಯದಿ (arginfo[r].kind != TEMP || arginfo[r].pinned) { retired = -1; ಭಙ್ಗ; }
                 lowest = std::min(lowest, arginfo[r].index);
                 retired++;
             }
-            if (retired > 0 && lowest == ntemps - retired)
+            ಯದಿ (retired > 0 && lowest == ntemps - retired)
             {
-                for (int i = startA; i < n; i++) arginfo[prog[i].result].kind = NONE;
+                ಪ್ರತಿ (ಪೂರ್ಣಾಙ್ಕ i = startA; i < n; i++) arginfo[prog[i].result].kind = NONE;
                 prog.resize(startA);
                 ntemps -= retired;
-                return emitBinary(OP_ADDW, x, y, rdepth, Scalar(alpha, beta, 0.));
+                ಪ್ರತ್ಯಾಗಮ emit_ದ್ವಿಮಾನ(OP_ADDW, x, y, rdepth, Scalar(alpha, beta, 0.));
             }
         }
 
         // (x*alpha + y*beta) + gamma: the ADDW is already emitted and its gamma still 0, so the
         // trailing scalar folds into the instruction's params instead of costing another pass.
         {
-            int acc = 0; double gamma = 0;
-            if      (scalarConstValue(*this, b, gamma)) acc = a;
-            else if (scalarConstValue(*this, a, gamma)) acc = b;
-            if (acc != 0 && n >= 1 &&
+            ಪೂರ್ಣಾಙ್ಕ acc = 0; ದ್ವಿಗುಣ gamma = 0;
+            ಯದಿ      (scalar_Const_ಮೌಲ್ಯ(*ಏತತ್, b, gamma)) acc = a;
+            ಅನ್ಯಥಾ ಯದಿ (scalar_Const_ಮೌಲ್ಯ(*ಏತತ್, a, gamma)) acc = b;
+            ಯದಿ (acc != 0 && n >= 1 &&
                 arginfo[acc].kind == TEMP && !arginfo[acc].pinned &&
                 arginfo[acc].index == ntemps - 1 &&
                 prog[n-1].op == OP_ADDW && prog[n-1].result == acc &&
                 (rdepth == EW_DEPTH_NONE || rdepth == arginfo[acc].depth))
             {
                 prog[n-1].params[2] += gamma;
-                return acc;
+                ಪ್ರತ್ಯಾಗಮ acc;
             }
         }
     }
 
-    const int nd0 = isFlexConst(*this, a) ? EW_DEPTH_NONE : arginfo[a].depth;
-    const int nd1 = isFlexConst(*this, b) ? EW_DEPTH_NONE : arginfo[b].depth;
-    const ElemwiseCategory cat = opCategory(op);
+    ಧ್ರುವ ಪೂರ್ಣಾಙ್ಕ nd0 = isFlexConst(*ಏತತ್, a) ? EW_DEPTH_NONE : arginfo[a].depth;
+    ಧ್ರುವ ಪೂರ್ಣಾಙ್ಕ nd1 = isFlexConst(*ಏತತ್, b) ? EW_DEPTH_NONE : arginfo[b].depth;
+    ಧ್ರುವ ElemwiseCategory cat = opCategory(op);
 
     // result depth (auto unless forced): compare -> mask (u8); everything else -> promoteArith.
-    int result = rdepth;
-    if (result == EW_DEPTH_NONE)
+    ಪೂರ್ಣಾಙ್ಕ result = rdepth;
+    ಯದಿ (result == EW_DEPTH_NONE)
     {
         result = (cat == CAT_COMPARE) ? CV_8U
                : (cat == CAT_BITWISE) ? promoteBitwise(nd0, nd1)   // no numeric promotion for bit ops
                : promoteArith(nd0, nd1);
-        if (result == EW_DEPTH_NONE) result = CV_32F;          // const (op) const
+        ಯದಿ (result == EW_DEPTH_NONE) result = CV_32F;          // const (op) const
     }
 
     // common type over the CONCRETE operands (a flexible const does not force it).
-    int base;
-    if (nd0 == EW_DEPTH_NONE && nd1 == EW_DEPTH_NONE) base = result;
-    else if (nd0 == EW_DEPTH_NONE) base = nd1;
-    else if (nd1 == EW_DEPTH_NONE) base = nd0;
-    else base = promote2(nd0, nd1);
+    ಪೂರ್ಣಾಙ್ಕ base;
+    ಯದಿ (nd0 == EW_DEPTH_NONE && nd1 == EW_DEPTH_NONE) base = result;
+    ಅನ್ಯಥಾ ಯದಿ (nd0 == EW_DEPTH_NONE) base = nd1;
+    ಅನ್ಯಥಾ ಯದಿ (nd1 == EW_DEPTH_NONE) base = nd0;
+    ಅನ್ಯಥಾ base = promote2(nd0, nd1);
 
     // COMPARE of an INTEGER array against a threshold that doesn't fit that type as-is (fractional,
     // out-of-range, or EQ/NE of a non-representable value): emit a SINGLE NATIVE integer compare instead
@@ -494,30 +494,30 @@ int TExpr::emitBinary(TOp op, int a, int b, int rdepth, const Scalar& params)
     // op (GE for GT/GE, LE for LT/LE, else EQ/NE) runs with a placeholder threshold on const channels;
     // the per-channel fix-up  result = (rawmask & M) | V  is FOLDED into the compare kernel via its flags
     // (M=255 real / 0 const, V=255 always-true / 0 else) - no extra pass, no separate patch kernel.
-    if (cat == CAT_COMPARE && nd0 != EW_DEPTH_NONE && !isFloatDepth(nd0) &&
-        isFlexConst(*this, b) && !constFits(*this, b, base))
+    ಯದಿ (cat == CAT_COMPARE && nd0 != EW_DEPTH_NONE && !isFloatDepth(nd0) &&
+        isFlexConst(*ಏತತ್, b) && !constFits(*ಏತತ್, b, base))
     {
-        double lo, hi; intRange(nd0, lo, hi);
-        if (hi > lo)   // hi<=lo => a depth intRange doesn't model (CV_Bool ...): leave to the f64 path
+        ದ್ವಿಗುಣ lo, hi; intRange(nd0, lo, hi);
+        ಯದಿ (hi > lo)   // hi<=lo => a depth intRange doesn't model (CV_Bool ...): leave to the f64 path
         {
-            enum { REAL, CFALSE, CTRUE };
-            AutoBuffer<double, MAX_LOCAL_CN> tv; int cn = constDoubles(*this, b, tv);
+            ಗಣನಾ { REAL, CFALSE, CTRUE };
+            AutoBuffer<ದ್ವಿಗುಣ, MAX_LOCAL_CN> tv; ಪೂರ್ಣಾಙ್ಕ cn = constDoubles(*ಏತತ್, b, tv);
             CV_Assert(cn <= 4);          // a CONST is <= 4 channels (addConst) - fixed arrays, no heap
-            int kind[4] = {}; double bound[4] = {};   // {} for -Wmaybe-uninitialized only
+            ಪೂರ್ಣಾಙ್ಕ kind[4] = {}; ದ್ವಿಗುಣ bound[4] = {};   // {} for -Wmaybe-uninitialized only
                                                       // (filled for all cn used below)
-            const TOp fam = (op == OP_CMP_GT || op == OP_CMP_GE) ? OP_CMP_GE
+            ಧ್ರುವ ತುದಿ fam = (op == OP_CMP_GT || op == OP_CMP_GE) ? OP_CMP_GE
                           : (op == OP_CMP_LT || op == OP_CMP_LE) ? OP_CMP_LE : op;   // EQ/NE unchanged
-            for (int c = 0; c < cn; c++)
+            ಪ್ರತಿ (ಪೂರ್ಣಾಙ್ಕ c = 0; c < cn; c++)
             {
-                const double t = tv[c]; int k; double B = t;
-                switch (op)
+                ಧ್ರುವ ದ್ವಿಗುಣ t = tv[c]; ಪೂರ್ಣಾಙ್ಕ k; ದ್ವಿಗುಣ B = t;
+                ವಿಕಲ್ಪ (op)
                 {
-                case OP_CMP_GT: B = std::floor(t)+1; k = B > hi ? CFALSE : B <= lo ? CTRUE : REAL; break;
-                case OP_CMP_GE: B = std::ceil(t);    k = B > hi ? CFALSE : B <= lo ? CTRUE : REAL; break;
-                case OP_CMP_LT: B = std::ceil(t)-1;  k = B < lo ? CFALSE : B >= hi ? CTRUE : REAL; break;
-                case OP_CMP_LE: B = std::floor(t);   k = B < lo ? CFALSE : B >= hi ? CTRUE : REAL; break;
-                case OP_CMP_EQ: k = depthRepresents(t, nd0) ? REAL : CFALSE; break;   // a==non-rep -> false
-                default:        k = depthRepresents(t, nd0) ? REAL : CTRUE;  break;   // NE: a!=non-rep -> true
+                ಪಕ್ಷ OP_CMP_GT: B = std::floor(t)+1; k = B > hi ? CFALSE : B <= lo ? CTRUE : REAL; ಭಙ್ಗ;
+                ಪಕ್ಷ OP_CMP_GE: B = std::ceil(t);    k = B > hi ? CFALSE : B <= lo ? CTRUE : REAL; ಭಙ್ಗ;
+                ಪಕ್ಷ OP_CMP_LT: B = std::ceil(t)-1;  k = B < lo ? CFALSE : B >= hi ? CTRUE : REAL; ಭಙ್ಗ;
+                ಪಕ್ಷ OP_CMP_LE: B = std::floor(t);   k = B < lo ? CFALSE : B >= hi ? CTRUE : REAL; ಭಙ್ಗ;
+                ಪಕ್ಷ OP_CMP_EQ: k = depthRepresents(t, nd0) ? REAL : CFALSE; ಭಙ್ಗ;   // a==non-rep -> false
+                ಸ್ವಭಾವ:        k = depthRepresents(t, nd0) ? REAL : CTRUE;  ಭಙ್ಗ;   // NE: a!=non-rep -> true
                 }
                 kind[c] = k; bound[c] = B;
             }
@@ -525,37 +525,37 @@ int TExpr::emitBinary(TOp op, int a, int b, int rdepth, const Scalar& params)
             // real+true for a GE/LE family) the compare ALONE yields the result - a plain native compare,
             // no fix-up. REAL -> fam(bound); forced-TRUE -> the family's always-true form (GE lo / LE hi);
             // forced-FALSE -> "a < lo".
-            auto ucOp  = [&](int c){ return kind[c]==REAL ? fam : kind[c]==CFALSE ? OP_CMP_LT
+            auto ucOp  = [&](ಪೂರ್ಣಾಙ್ಕ c){ ಪ್ರತ್ಯಾಗಮ kind[c]==REAL ? fam : kind[c]==CFALSE ? OP_CMP_LT
                                           : (fam == OP_CMP_LE ? OP_CMP_LE : OP_CMP_GE); };
-            auto ucThr = [&](int c){ return kind[c]==REAL ? bound[c]
+            auto ucThr = [&](ಪೂರ್ಣಾಙ್ಕ c){ ಪ್ರತ್ಯಾಗಮ kind[c]==REAL ? bound[c]
                                           : (kind[c]==CTRUE && fam==OP_CMP_LE) ? hi : lo; };
-            const TOp u0 = ucOp(0);
-            bool uniform = true;
-            for (int c = 1; c < cn && uniform; c++) uniform = (ucOp(c) == u0);
-            if (uniform)
+            ಧ್ರುವ ತುದಿ u0 = ucOp(0);
+            ತಾರ್ಕಿಕ uniform = ಸತ್ಯ;
+            ಪ್ರತಿ (ಪೂರ್ಣಾಙ್ಕ c = 1; c < cn && uniform; c++) uniform = (ucOp(c) == u0);
+            ಯದಿ (uniform)
             {
-                Scalar s; for (int c = 0; c < cn; c++) s[c] = ucThr(c);
+                Scalar s; ಪ್ರತಿ (ಪೂರ್ಣಾಙ್ಕ c = 0; c < cn; c++) s[c] = ucThr(c);
                 b = addConst(EW_DEPTH_NONE, s, cn); op = u0;   // rewrite threshold + op -> fall through
             }
-            else
+            ಅನ್ಯಥಾ
             {
                 // genuine per-channel op split (only a multi-channel scalar can cause it -> the executor
                 // lays it out as a short-row tile). One family compare with a placeholder threshold on
                 // const channels; the per-channel fix-up (rawmask & M) | V is FOLDED into the kernel via
                 // its flags (M=255 real / 0 const, V=255 always-true / 0 else) - no extra pass.
-                Scalar ts; int patchFlags = 0;
-                for (int c = 0; c < cn; c++)
+                Scalar ts; ಪೂರ್ಣಾಙ್ಕ patchFlags = 0;
+                ಪ್ರತಿ (ಪೂರ್ಣಾಙ್ಕ c = 0; c < cn; c++)
                 {
                     ts[c] = kind[c]==REAL ? bound[c] : lo;     // in-range placeholder for a const channel
-                    const int mbits = kind[c]==REAL  ? 3 : 0;  // M: real -> 255 (keep), const -> 0
-                    const int vbits = kind[c]==CTRUE ? 3 : 0;  // V: always-true -> 255, else 0
+                    ಧ್ರುವ ಪೂರ್ಣಾಙ್ಕ mbits = kind[c]==REAL  ? 3 : 0;  // M: real -> 255 (keep), const -> 0
+                    ಧ್ರುವ ಪೂರ್ಣಾಙ್ಕ vbits = kind[c]==CTRUE ? 3 : 0;  // V: always-true -> 255, else 0
                     patchFlags |= (mbits | (vbits << 2)) << (EW_CMP_PATCH_SHIFT + c*4);
                 }
                 TKernel kern = getElemwiseFunc(fam, base, base, EW_DEPTH_NONE, result);
                 kern.flags |= EW_CMP_PATCH | patchFlags;
-                const int out = addTemp(result);
+                ಧ್ರುವ ಪೂರ್ಣಾಙ್ಕ out = addTemp(result);
                 addInsn(fam, a, addConst(base, ts, cn), 0, out, kern);
-                return out;
+                ಪ್ರತ್ಯಾಗಮ out;
             }
         }
     }
@@ -567,108 +567,108 @@ int TExpr::emitBinary(TOp op, int a, int b, int rdepth, const Scalar& params)
     //   MUL/DIV                     : float work (f64 if wide)   (matches cv::multiply/divide)
     //   POW                         : float work
     //   ADD/SUB                     : common type, signed wide fallback
-    int depth, wide;
-    bool divGuard = false;
-    switch (op)
+    ಪೂರ್ಣಾಙ್ಕ depth, wide;
+    ತಾರ್ಕಿಕ divGuard = ಅಸತ್ಯ;
+    ವಿಕಲ್ಪ (op)
     {
-    case OP_MIN: case OP_MAX:
-    case OP_AND: case OP_OR: case OP_XOR:
-        depth = result; wide = result; break;
-    case OP_ABSDIFF:
+    ಪಕ್ಷ OP_MIN: ಪಕ್ಷ OP_MAX:
+    ಪಕ್ಷ OP_AND: ಪಕ್ಷ OP_OR: ಪಕ್ಷ OP_XOR:
+        depth = result; wide = result; ಭಙ್ಗ;
+    ಪಕ್ಷ OP_ABSDIFF:
     {
         // operands meet at the integer-preserving common type; |a-b| of a signed integer needs the
         // UNSIGNED type of the same width (8s->8u, ...), which is both the result and the safe type.
-        int common = (nd0 == EW_DEPTH_NONE) ? nd1
+        ಪೂರ್ಣಾಙ್ಕ common = (nd0 == EW_DEPTH_NONE) ? nd1
                    : (nd1 == EW_DEPTH_NONE) ? nd0 : promoteArith(nd0, nd1);
-        if (common == EW_DEPTH_NONE) common = result;          // both operands flexible consts
+        ಯದಿ (common == EW_DEPTH_NONE) common = result;          // both operands flexible consts
         depth = common;
         wide  = absdiffResultDepth(common);
-        if (rdepth == EW_DEPTH_NONE) result = wide;            // auto result: unsigned same width
-        break;
+        ಯದಿ (rdepth == EW_DEPTH_NONE) result = wide;            // auto result: unsigned same width
+        ಭಙ್ಗ;
     }
-    case OP_CMP_EQ: case OP_CMP_NE: case OP_CMP_LT:
-    case OP_CMP_LE: case OP_CMP_GT: case OP_CMP_GE:
+    ಪಕ್ಷ OP_CMP_EQ: ಪಕ್ಷ OP_CMP_NE: ಪಕ್ಷ OP_CMP_LT:
+    ಪಕ್ಷ OP_CMP_LE: ಪಕ್ಷ OP_CMP_GT: ಪಕ್ಷ OP_CMP_GE:
         // compare in the common operand type; if a flexible-const threshold does not FIT that type
         // (out of range, e.g. u8 > -10, or fractional, e.g. u8 > 2.5) fall back to f64 so it is NOT
         // saturated into the operand type (which would move the boundary). f64 is exact for every
         // integer array up to 32-bit; only a 64-bit-int array vs an out-of-range threshold stays
         // approximate (a pathological case). array-vs-array never has a const, so it stays integer.
-        depth = base; wide = CV_64F; break;
-    case OP_MUL: case OP_DIV:
+        depth = base; wide = CV_64F; ಭಙ್ಗ;
+    ಪಕ್ಷ OP_MUL: ಪಕ್ಷ OP_DIV:
     {
         depth = base;
-        const bool w = (depth==CV_32U || depth==CV_32S || depth==CV_64U ||
+        ಧ್ರುವ ತಾರ್ಕಿಕ w = (depth==CV_32U || depth==CV_32S || depth==CV_64U ||
                         depth==CV_64S || depth==CV_64F);
         wide = w ? CV_64F : CV_32F;
-        if (op == OP_DIV)
+        ಯದಿ (op == OP_DIV)
         {
             // guard b==0 -> 0 when BOTH operands are integer (matches cv::divide); a flexible const
             // counts as integer iff its value is integral. promote2 can float two wide ints, so this
             // must read the ORIGINAL operands, not `depth`.
-            auto intOperand = [&](int s, int nd) {
-                if (nd != EW_DEPTH_NONE) return !isFloatDepth(nd);
-                AutoBuffer<double, MAX_LOCAL_CN> v; constDoubles(*this, s, v);
-                return v[0] == std::floor(v[0]); };
+            auto intOperand = [&](ಪೂರ್ಣಾಙ್ಕ s, ಪೂರ್ಣಾಙ್ಕ nd) {
+                ಯದಿ (nd != EW_DEPTH_NONE) ಪ್ರತ್ಯಾಗಮ !isFloatDepth(nd);
+                AutoBuffer<ದ್ವಿಗುಣ, MAX_LOCAL_CN> v; constDoubles(*ಏತತ್, s, v);
+                ಪ್ರತ್ಯಾಗಮ v[0] == std::floor(v[0]); };
             divGuard = intOperand(a, nd0) && intOperand(b, nd1);
         }
-        break;
+        ಭಙ್ಗ;
     }
-    case OP_POW: case OP_HYPOT: case OP_ATAN2:
-        depth = (base == CV_64F) ? CV_64F : CV_32F; wide = depth; break;
-    default:        // OP_ADD, OP_SUB
-        depth = base; wide = safeWide(depth); break;
+    ಪಕ್ಷ OP_POW: ಪಕ್ಷ OP_HYPOT: ಪಕ್ಷ OP_ATAN2:
+        depth = (base == CV_64F) ? CV_64F : CV_32F; wide = depth; ಭಙ್ಗ;
+    ಸ್ವಭಾವ:        // OP_ADD, OP_SUB
+        depth = base; wide = safeWide(depth); ಭಙ್ಗ;
     }
 
     // a flexible const that can't be represented exactly at `depth` (e.g. 2.5 in a u8 op) forces the
     // wide working path; a NON-INTEGRAL const additionally forces a FLOAT compute (an integer wide
     // would quantize the fraction - e.g. add(u8, 1.7) must not round 1.7 to 2).
-    auto fracConst = [&](int s) {
-        if (!isFlexConst(*this, s)) return false;
-        AutoBuffer<double, MAX_LOCAL_CN> v; int n = constDoubles(*this, s, v);
-        for (int ch = 0; ch < n; ch++)
-            if (v[ch] != std::floor(v[ch])) return true;
-        return false;
+    auto fracConst = [&](ಪೂರ್ಣಾಙ್ಕ s) {
+        ಯದಿ (!isFlexConst(*ಏತತ್, s)) ಪ್ರತ್ಯಾಗಮ ಅಸತ್ಯ;
+        AutoBuffer<ದ್ವಿಗುಣ, MAX_LOCAL_CN> v; ಪೂರ್ಣಾಙ್ಕ n = constDoubles(*ಏತತ್, s, v);
+        ಪ್ರತಿ (ಪೂರ್ಣಾಙ್ಕ ch = 0; ch < n; ch++)
+            ಯದಿ (v[ch] != std::floor(v[ch])) ಪ್ರತ್ಯಾಗಮ ಸತ್ಯ;
+        ಪ್ರತ್ಯಾಗಮ ಅಸತ್ಯ;
     };
     // BITWISE never widens or floats: a bit-pattern op keeps the array's own integer type, and an
     // out-of-range/fractional scalar is just saturate/round-cast into it (matching scalarToRawData /
     // cv::bitwise's classic convertAndUnrollScalar). Skipping the widening below leaves depth == result.
-    if (cat != CAT_BITWISE && (!constFits(*this, a, depth) || !constFits(*this, b, depth)))
+    ಯದಿ (cat != CAT_BITWISE && (!constFits(*ಏತತ್, a, depth) || !constFits(*ಏತತ್, b, depth)))
     {
         depth = wide;
-        const bool frac = fracConst(a) || fracConst(b);
+        ಧ್ರುವ ತಾರ್ಕಿಕ frac = fracConst(a) || fracConst(b);
         // MIN/MAX just SELECT an operand, so a fractional scalar threshold is round-cast into the
         // array type (min(u8, 3.7) == min(u8, 4)) - matching the classic cv::min/max - instead of
         // promoting the whole op to float (add/sub/absdiff DO need the float path to keep the fraction).
-        if (frac && !isFloatDepth(depth) && op != OP_MIN && op != OP_MAX)
+        ಯದಿ (frac && !isFloatDepth(depth) && op != OP_MIN && op != OP_MAX)
             depth = wide = (result == CV_64F || base == CV_64F) ? CV_64F : CV_32F;
         // mul/div carry a scale-like float const at full f64 precision (cv::multiply/divide compute in
         // f64), so don't settle for f32 - e.g. 110 * 147.2863... must round to 16201, not 16202.
-        if (frac && (op == OP_MUL || op == OP_DIV) && depth == CV_32F)
+        ಯದಿ (frac && (op == OP_MUL || op == OP_DIV) && depth == CV_32F)
             depth = wide = CV_64F;
     }
 
-    int s0 = isFlexConst(*this, a) ? typedConstFrom(a, depth) : a;
-    int s1 = isFlexConst(*this, b) ? typedConstFrom(b, depth) : b;
-    int c0 = maybeAddCast(s0, depth), c1 = maybeAddCast(s1, depth);
+    ಪೂರ್ಣಾಙ್ಕ s0 = isFlexConst(*ಏತತ್, a) ? typedConstFrom(a, depth) : a;
+    ಪೂರ್ಣಾಙ್ಕ s1 = isFlexConst(*ಏತತ್, b) ? typedConstFrom(b, depth) : b;
+    ಪೂರ್ಣಾಙ್ಕ c0 = maybeAddCast(s0, depth), c1 = maybeAddCast(s1, depth);
 
     // emit `depth -> result` directly when a kernel exists, else compute in `wide` and cast down.
     // OP_DIV resolves via getDivFunc (carrying the /0 guard); every other op via getElemwiseFunc.
-    auto resolve = [&](int rd) {
-        return op == OP_DIV ? getDivFunc(depth, rd, divGuard)
+    auto resolve = [&](ಪೂರ್ಣಾಙ್ಕ rd) {
+        ಪ್ರತ್ಯಾಗಮ op == OP_DIV ? getDivFunc(depth, rd, divGuard)
                             : getElemwiseFunc(op, depth, depth, EW_DEPTH_NONE, rd);
     };
     TKernel k = resolve(result);
-    if (k.fptr)
+    ಯದಿ (k.fptr)
     {
-        int res = addTemp(result);
+        ಪೂರ್ಣಾಙ್ಕ res = addTemp(result);
         addInsn(op, c0, c1, 0, res, k, params);
-        return res;
+        ಪ್ರತ್ಯಾಗಮ res;
     }
     k = resolve(wide);
     CV_Assert(k.fptr && "ew: no kernel for this op/type combination");
-    int w = addTemp(wide);
+    ಪೂರ್ಣಾಙ್ಕ w = addTemp(wide);
     addInsn(op, c0, c1, 0, w, k, params);
-    return maybeAddCast(w, result);
+    ಪ್ರತ್ಯಾಗಮ maybeAddCast(w, result);
 }
 
 // ---------------------------------------------------------------------------
@@ -676,16 +676,16 @@ int TExpr::emitBinary(TOp op, int a, int b, int rdepth, const Scalar& params)
 // domain; NEG/ABS keep the operand type; NOT stays integer. (OP_CAST is not routed here - an explicit
 // cast is just maybeAddCast / a typed addConst at the call site.)
 // ---------------------------------------------------------------------------
-int TExpr::emitUnary(TOp op, int a, int rdepth, const Scalar& params)
+ಪೂರ್ಣಾಙ್ಕ TExpr::emitUnary(ತುದಿ op, ಪೂರ್ಣಾಙ್ಕ a, ಪೂರ್ಣಾಙ್ಕ rdepth, ಧ್ರುವ Scalar& params)
 {
-    const int nd = isFlexConst(*this, a) ? EW_DEPTH_NONE : arginfo[a].depth;
-    const ElemwiseCategory cat = opCategory(op);
+    ಧ್ರುವ ಪೂರ್ಣಾಙ್ಕ nd = isFlexConst(*ಏತತ್, a) ? EW_DEPTH_NONE : arginfo[a].depth;
+    ಧ್ರುವ ElemwiseCategory cat = opCategory(op);
 
     // NEG and ABS have no kernels of their own - they are compositions over the binary family
     // with a zero constant (flexible, so emitBinary types it as the operand's own type).
-    if (op == OP_NEG)
-        return emitBinary(OP_SUB, addConst(EW_DEPTH_NONE, Scalar(0.), 1), a, rdepth, params);
-    if (op == OP_ABS)
+    ಯದಿ (op == OP_NEG)
+        ಪ್ರತ್ಯಾಗಮ emit_ದ್ವಿಮಾನ(OP_SUB, addConst(EW_DEPTH_NONE, Scalar(0.), 1), a, rdepth, params);
+    ಯದಿ (op == OP_ABS)
     {
         // peephole: abs(x - y) -> absdiff(x, y), ALWAYS. Strictly speaking the two differ on
         // integers - the literal subtract saturates first (u8: max(x-y, 0); signed: clipped
@@ -694,65 +694,65 @@ int TExpr::emitUnary(TOp op, int a, int rdepth, const Scalar& params)
         // "don't notice" the difference and hand out the useful semantics. The sub is necessarily
         // the last instruction and its result the last temp (abs is emitted right after its
         // argument) - retire both, the moveToOutput manoeuvre.
-        if (!prog.empty() && arginfo[a].kind == TEMP && !arginfo[a].pinned &&
+        ಯದಿ (!prog.empty() && arginfo[a].kind == TEMP && !arginfo[a].pinned &&
             prog.back().op == OP_SUB && prog.back().result == a &&
             arginfo[a].index == ntemps - 1)
         {
-            const int x = prog.back().arg0, y = prog.back().arg1;
+            ಧ್ರುವ ಪೂರ್ಣಾಙ್ಕ x = prog.back().arg0, y = prog.back().arg1;
             prog.pop_back();
             arginfo[a].kind = NONE;
             ntemps--;
-            return emitBinary(OP_ABSDIFF, x, y, rdepth, params);
+            ಪ್ರತ್ಯಾಗಮ emit_ದ್ವಿಮಾನ(OP_ABSDIFF, x, y, rdepth, params);
         }
         // abs IS absdiff(a, 0), including the auto result type: a signed |a| lands in the
         // UNSIGNED type of the same width (|-128| = 128 fits u8 exactly; pinning the result to
         // the signed operand type would saturate it to 127). Fully uniform with the peephole.
-        return emitBinary(OP_ABSDIFF, a, addConst(EW_DEPTH_NONE, Scalar(0.), 1), rdepth, params);
+        ಪ್ರತ್ಯಾಗಮ emit_ದ್ವಿಮಾನ(OP_ABSDIFF, a, addConst(EW_DEPTH_NONE, Scalar(0.), 1), rdepth, params);
     }
 
-    int result = rdepth;
-    if (result == EW_DEPTH_NONE)
+    ಪೂರ್ಣಾಙ್ಕ result = rdepth;
+    ಯದಿ (result == EW_DEPTH_NONE)
     {
-        switch (cat)
+        ವಿಕಲ್ಪ (cat)
         {
         // math is T -> T over the float depths (f16/bf16/f32/f64 kernels exist natively);
         // an integer input computes - and lands - in the float domain
-        case CAT_MATH:    result = isFloatDepth(nd) ? nd : CV_32F; break;
-        case CAT_BITWISE: result = (nd == EW_DEPTH_NONE) ? CV_32S : nd; break;  // NOT
-        default:          result = (nd == EW_DEPTH_NONE) ? CV_32F : nd; break;  // NEG, ABS
+        ಪಕ್ಷ CAT_MATH:    result = isFloatDepth(nd) ? nd : CV_32F; ಭಙ್ಗ;
+        ಪಕ್ಷ CAT_BITWISE: result = (nd == EW_DEPTH_NONE) ? CV_32S : nd; ಭಙ್ಗ;  // NOT
+        ಸ್ವಭಾವ:          result = (nd == EW_DEPTH_NONE) ? CV_32F : nd; ಭಙ್ಗ;  // NEG, ABS
         }
     }
 
-    int depth, wide;
-    switch (cat)
+    ಪೂರ್ಣಾಙ್ಕ depth, wide;
+    ವಿಕಲ್ಪ (cat)
     {
-    case CAT_MATH:
+    ಪಕ್ಷ CAT_MATH:
         // T == result over a float depth => the native kernel (incl. the f16/bf16 in-kernel f32
         // hub - no materialized f32 temps). Everything else computes in f32/f64 and casts.
         depth = (isFloatDepth(nd) && nd == result) ? nd
               : (nd == CV_64F || result == CV_64F) ? CV_64F : CV_32F;
         wide = depth;
-        break;
-    case CAT_BITWISE: depth = result; wide = result; break;
-    default:          depth = (nd == EW_DEPTH_NONE) ? result : nd; wide = result; break;  // NEG/ABS
+        ಭಙ್ಗ;
+    ಪಕ್ಷ CAT_BITWISE: depth = result; wide = result; ಭಙ್ಗ;
+    ಸ್ವಭಾವ:          depth = (nd == EW_DEPTH_NONE) ? result : nd; wide = result; ಭಙ್ಗ;  // NEG/ABS
     }
 
-    if (!constFits(*this, a, depth)) depth = (cat == CAT_MATH) ? depth : CV_32F;
-    int s0 = isFlexConst(*this, a) ? typedConstFrom(a, depth) : a;
-    int c0 = maybeAddCast(s0, depth);
+    ಯದಿ (!constFits(*ಏತತ್, a, depth)) depth = (cat == CAT_MATH) ? depth : CV_32F;
+    ಪೂರ್ಣಾಙ್ಕ s0 = isFlexConst(*ಏತತ್, a) ? typedConstFrom(a, depth) : a;
+    ಪೂರ್ಣಾಙ್ಕ c0 = maybeAddCast(s0, depth);
 
     TKernel k = getElemwiseFunc(op, depth, EW_DEPTH_NONE, EW_DEPTH_NONE, result);
-    if (k.fptr)
+    ಯದಿ (k.fptr)
     {
-        int res = addTemp(result);
+        ಪೂರ್ಣಾಙ್ಕ res = addTemp(result);
         addInsn(op, c0, 0, 0, res, k, params);
-        return res;
+        ಪ್ರತ್ಯಾಗಮ res;
     }
     k = getElemwiseFunc(op, depth, EW_DEPTH_NONE, EW_DEPTH_NONE, wide);
     CV_Assert(k.fptr && "ew: no kernel for this op/type combination");
-    int w = addTemp(wide);
+    ಪೂರ್ಣಾಙ್ಕ w = addTemp(wide);
     addInsn(op, c0, 0, 0, w, k, params);
-    return maybeAddCast(w, result);
+    ಪ್ರತ್ಯಾಗಮ maybeAddCast(w, result);
 }
 
 // ---------------------------------------------------------------------------
@@ -760,43 +760,43 @@ int TExpr::emitUnary(TOp op, int a, int rdepth, const Scalar& params)
 // a common type and emits there; select keeps arg0 (the mask) untouched and only unifies the two
 // branches. (Both are minimal: not yet test-covered, no kernels wired up.)
 // ---------------------------------------------------------------------------
-int TExpr::emitTernary(TOp op, int a, int b, int c, int rdepth)
+ಪೂರ್ಣಾಙ್ಕ TExpr::emitTernary(ತುದಿ op, ಪೂರ್ಣಾಙ್ಕ a, ಪೂರ್ಣಾಙ್ಕ b, ಪೂರ್ಣಾಙ್ಕ c, ಪೂರ್ಣಾಙ್ಕ rdepth)
 {
-    auto dep = [&](int s) { return isFlexConst(*this, s) ? EW_DEPTH_NONE : arginfo[s].depth; };
+    auto dep = [&](ಪೂರ್ಣಾಙ್ಕ s) { ಪ್ರತ್ಯಾಗಮ isFlexConst(*ಏತತ್, s) ? EW_DEPTH_NONE : arginfo[s].depth; };
 
-    if (op == OP_SELECT)                         // select(mask=a, x=b, y=c)
+    ಯದಿ (op == OP_SELECT)                         // select(mask=a, x=b, y=c)
     {
         // the kernel consumes a 1-byte mask as-is (u8/s8/bool, mask != 0 semantics). Any other
         // mask type - a wider array or a literal - is normalized by an explicit `mask != 0`
         // compare (u8 result), NOT by a value cast (which would saturate/round the values).
-        if (isFlexConst(*this, a) || CV_ELEM_SIZE1(arginfo[a].depth) != 1)
-            a = emitBinary(OP_CMP_NE, a, addConst(EW_DEPTH_NONE, Scalar(0.), 1), CV_8U, Scalar());
-        int result = rdepth != EW_DEPTH_NONE ? rdepth : promoteArith(dep(b), dep(c));
-        if (result == EW_DEPTH_NONE) result = CV_32F;
+        ಯದಿ (isFlexConst(*ಏತತ್, a) || CV_ELEM_SIZE1(arginfo[a].depth) != 1)
+            a = emit_ದ್ವಿಮಾನ(OP_CMP_NE, a, addConst(EW_DEPTH_NONE, Scalar(0.), 1), CV_8U, Scalar());
+        ಪೂರ್ಣಾಙ್ಕ result = rdepth != EW_DEPTH_NONE ? rdepth : promoteArith(dep(b), dep(c));
+        ಯದಿ (result == EW_DEPTH_NONE) result = CV_32F;
         // a literal branch (select(m, x, 0)) is a flexible const: type it at `result` directly
         // (a value conversion in constbuf), never through an OP_CAST of a depth-less slot
-        int sb = isFlexConst(*this, b) ? typedConstFrom(b, result) : maybeAddCast(b, result);
-        int sc = isFlexConst(*this, c) ? typedConstFrom(c, result) : maybeAddCast(c, result);
-        int res = addTemp(result);
+        ಪೂರ್ಣಾಙ್ಕ sb = isFlexConst(*ಏತತ್, b) ? typedConstFrom(b, result) : maybeAddCast(b, result);
+        ಪೂರ್ಣಾಙ್ಕ sc = isFlexConst(*ಏತತ್, c) ? typedConstFrom(c, result) : maybeAddCast(c, result);
+        ಪೂರ್ಣಾಙ್ಕ res = addTemp(result);
         addInsn(OP_SELECT, a, sb, sc, res);
-        return res;
+        ಪ್ರತ್ಯಾಗಮ res;
     }
 
     // clamp(x,lo,hi): unify all three operands at `result` (compute == result, no wide fallback).
     // The x operand dominates the auto type: clamp(u8_img, 10, 200) must stay u8, and literal
     // bounds are flexible consts typed at `result` directly (never OP_CAST of a depth-less slot).
-    int result = rdepth != EW_DEPTH_NONE ? rdepth
+    ಪೂರ್ಣಾಙ್ಕ result = rdepth != EW_DEPTH_NONE ? rdepth
                                          : promoteArith(promoteArith(dep(a), dep(b)), dep(c));
-    if (result == EW_DEPTH_NONE) result = CV_32F;
-    auto typed = [&](int s) {
-        return isFlexConst(*this, s) ? typedConstFrom(s, result) : maybeAddCast(s, result);
+    ಯದಿ (result == EW_DEPTH_NONE) result = CV_32F;
+    auto typed = [&](ಪೂರ್ಣಾಙ್ಕ s) {
+        ಪ್ರತ್ಯಾಗಮ isFlexConst(*ಏತತ್, s) ? typedConstFrom(s, result) : maybeAddCast(s, result);
     };
-    int c0 = typed(a), c1 = typed(b), c2 = typed(c);
+    ಪೂರ್ಣಾಙ್ಕ c0 = typed(a), c1 = typed(b), c2 = typed(c);
     TKernel k = getElemwiseFunc(op, result, result, result, result);
     CV_Assert(k.fptr && "ew: no kernel for this op/type combination");
-    int res = addTemp(result);
+    ಪೂರ್ಣಾಙ್ಕ res = addTemp(result);
     addInsn(op, c0, c1, c2, res, k);
-    return res;
+    ಪ್ರತ್ಯಾಗಮ res;
 }
 
 // ---------------------------------------------------------------------------
@@ -804,18 +804,18 @@ int TExpr::emitTernary(TOp op, int a, int b, int c, int rdepth)
 // producer to write `out` directly (no copy), dropping `temp` when it was the last-added slot so
 // ntemps stays minimal (keeps compile()'s no-temp fast exit for single-op programs). Otherwise copy.
 // ---------------------------------------------------------------------------
-int TExpr::moveToOutput(int temp, int out)
+ಪೂರ್ಣಾಙ್ಕ TExpr::moveToOutput(ಪೂರ್ಣಾಙ್ಕ temp, ಪೂರ್ಣಾಙ್ಕ out)
 {
-    const int ninsn = (int)prog.size();
-    int producer = -1;
-    bool usedAsArg = false;
-    for (int i = 0; i < ninsn; i++)
+    ಧ್ರುವ ಪೂರ್ಣಾಙ್ಕ ninsn = (ಪೂರ್ಣಾಙ್ಕ)prog.size();
+    ಪೂರ್ಣಾಙ್ಕ producer = -1;
+    ತಾರ್ಕಿಕ usedAsArg = ಅಸತ್ಯ;
+    ಪ್ರತಿ (ಪೂರ್ಣಾಙ್ಕ i = 0; i < ninsn; i++)
     {
-        const TExpr::Insn& ins = prog[i];
-        if (ins.result == temp) producer = i;
-        if (ins.arg0 == temp || ins.arg1 == temp || ins.arg2 == temp) usedAsArg = true;
+        ಧ್ರುವ TExpr::Insn& ins = prog[i];
+        ಯದಿ (ins.result == temp) producer = i;
+        ಯದಿ (ins.arg0 == temp || ins.arg1 == temp || ins.arg2 == temp) usedAsArg = ಸತ್ಯ;
     }
-    if (arginfo[temp].kind == TEMP && producer >= 0 && !usedAsArg && !arginfo[temp].pinned &&
+    ಯದಿ (arginfo[temp].kind == TEMP && producer >= 0 && !usedAsArg && !arginfo[temp].pinned &&
         arginfo[temp].depth == arginfo[out].depth)
     {
         // MOVE semantics: redirect `temp`'s single producer to write `out` directly, then leave the
@@ -830,18 +830,18 @@ int TExpr::moveToOutput(int temp, int out)
         prog[producer].result = out;
         arginfo[temp].kind = NONE;
         ntemps--;
-        return out;
+        ಪ್ರತ್ಯಾಗಮ out;
     }
     addInsn(OP_CAST, temp, 0, 0, out);                     // same/different depth copy into `out`
-    return out;
+    ಪ್ರತ್ಯಾಗಮ out;
 }
 
 // ---------------------------------------------------------------------------
 // TExpr::output(): declare a fresh OUTPUT of `rootSlot`'s depth and moveToOutput into it.
 // ---------------------------------------------------------------------------
-int TExpr::output(int rootSlot)
+ಪೂರ್ಣಾಙ್ಕ TExpr::output(ಪೂರ್ಣಾಙ್ಕ ಬೇರು_Slot)
 {
-    return moveToOutput(rootSlot, addOutput(arginfo[rootSlot].depth));
+    ಪ್ರತ್ಯಾಗಮ moveToOutput(ಬೇರು_Slot, addOutput(arginfo[ಬೇರು_Slot].depth));
 }
 
 // ---------------------------------------------------------------------------
@@ -849,9 +849,9 @@ int TExpr::output(int rootSlot)
 // any whose pointer was pre-set, e.g. div's caller-known /0 policy) and pack the temps into a
 // minimal set of reusable physical buffers (liveness). All per-arg bookkeeping here is transient.
 // ---------------------------------------------------------------------------
-void TExpr::compile()
+ಶೂನ್ಯ TExpr::compile()
 {
-    const int ninsn = (int)prog.size();
+    ಧ್ರುವ ಪೂರ್ಣಾಙ್ಕ ninsn = (ಪೂರ್ಣಾಙ್ಕ)prog.size();
 
     // Kernels are bound eagerly by addInsn at build time, so there is no binding pass here - compile()
     // only counts consts and packs temp buffers.
@@ -862,22 +862,22 @@ void TExpr::compile()
     // emit* layers replaced them with typed copies - and are skipped. nconsts sizes exec's per-const
     // header buffer and gates the fast path. (getConvertFunc may reallocate constbuf, so snapshot the
     // source bytes first.)
-    const int nslots = (int)arginfo.size();
+    ಧ್ರುವ ಪೂರ್ಣಾಙ್ಕ nslots = (ಪೂರ್ಣಾಙ್ಕ)arginfo.size();
     nconsts = 0;
-    for (int s = 1; s < nslots; s++)
+    ಪ್ರತಿ (ಪೂರ್ಣಾಙ್ಕ s = 1; s < nslots; s++)
     {
         Arg& a = arginfo[s];
-        if (a.kind != CONST || a.depth == EW_DEPTH_NONE) continue;
-        const int cn = std::max(1, a.channels), sd = a.srcdepth, dd = a.depth;
-        const size_t sesz = CV_ELEM_SIZE1(sd), desz = CV_ELEM_SIZE1(dd);
+        ಯದಿ (a.kind != CONST || a.depth == EW_DEPTH_NONE) ಅನುವರ್ತ;
+        ಧ್ರುವ ಪೂರ್ಣಾಙ್ಕ cn = std::max(1, a.channels), sd = a.srcdepth, dd = a.depth;
+        ಧ್ರುವ size_t sesz = CV_ELEM_SIZE1(sd), desz = CV_ELEM_SIZE1(dd);
         // uint64_t element type is used for buffer alignment on worst case
-        AutoBuffer<uint64_t, sizeof(uint64_t)> srcbuf(divUp((size_t)cn * sesz, (unsigned)sizeof(uint64_t)));
+        AutoBuffer<uint64_t, ಪರಿಮಾಣ(uint64_t)> srcbuf(divUp((size_t)cn * sesz, (unsigned)ಪರಿಮಾಣ(uint64_t)));
         uchar* srcbytes = (uchar*)srcbuf.data();
-        memcpy(srcbytes, (const uchar*)(constbuf.data() + a.constofs), (size_t)cn * sesz);
-        const size_t ofs = appendConstBuf(constbuf, dd, nullptr, cn);   // reserve converted region
+        memcpy(srcbytes, (ಧ್ರುವ uchar*)(constbuf.data() + a.constofs), (size_t)cn * sesz);
+        ಧ್ರುವ size_t ofs = appendConstBuf(constbuf, dd, nullptr, cn);   // reserve converted region
         uchar* dst = (uchar*)(constbuf.data() + ofs);
-        if (sd == dd) memcpy(dst, srcbytes, (size_t)cn * desz);
-        else getConvertFunc(sd, dd)(srcbytes, 0, nullptr, 0, dst, 0, Size(cn, 1), nullptr);
+        ಯದಿ (sd == dd) memcpy(dst, srcbytes, (size_t)cn * desz);
+        ಅನ್ಯಥಾ getConvertFunc(sd, dd)(srcbytes, 0, nullptr, 0, dst, 0, Size(cn, 1), nullptr);
         a.constofs = ofs; a.srcdepth = dd;
         nconsts++;
     }
@@ -889,38 +889,38 @@ void TExpr::compile()
     nbuffers = 0;
     bufEszPrefix.resize(1); bufEszPrefix[0] = 0;
     capElems = INT_MAX;                       // no temps => exec runs each tile in one block, no scratch
-    if (ntemps == 0) return;
+    ಯದಿ (ntemps == 0) ಪ್ರತ್ಯಾಗಮ;
 
-    AutoBuffer<int, 32> tempOfSlot(nslots);
-    for (int s = 0; s < nslots; s++) tempOfSlot[s] = -1;
-    for (int s = 1; s < nslots; s++)
-        if (arginfo[s].kind == TEMP) tempOfSlot[s] = arginfo[s].index;
+    AutoBuffer<ಪೂರ್ಣಾಙ್ಕ, 32> tempOfSlot(nslots);
+    ಪ್ರತಿ (ಪೂರ್ಣಾಙ್ಕ s = 0; s < nslots; s++) tempOfSlot[s] = -1;
+    ಪ್ರತಿ (ಪೂರ್ಣಾಙ್ಕ s = 1; s < nslots; s++)
+        ಯದಿ (arginfo[s].kind == TEMP) tempOfSlot[s] = arginfo[s].index;
 
-    AutoBuffer<int, 16> lastUse(ntemps);
-    for (int t = 0; t < ntemps; t++) lastUse[t] = -1;
-    for (int i = 0; i < ninsn; i++)
+    AutoBuffer<ಪೂರ್ಣಾಙ್ಕ, 16> lastUse(ntemps);
+    ಪ್ರತಿ (ಪೂರ್ಣಾಙ್ಕ t = 0; t < ntemps; t++) lastUse[t] = -1;
+    ಪ್ರತಿ (ಪೂರ್ಣಾಙ್ಕ i = 0; i < ninsn; i++)
     {
-        const TExpr::Insn& ins = prog[i];
-        int as[3] = { ins.arg0, ins.arg1, ins.arg2 };
-        for (int k = 0; k < 3; k++)
-            if (tempOfSlot[as[k]] >= 0) lastUse[tempOfSlot[as[k]]] = i;
+        ಧ್ರುವ TExpr::Insn& ins = prog[i];
+        ಪೂರ್ಣಾಙ್ಕ as[3] = { ins.arg0, ins.arg1, ins.arg2 };
+        ಪ್ರತಿ (ಪೂರ್ಣಾಙ್ಕ k = 0; k < 3; k++)
+            ಯದಿ (tempOfSlot[as[k]] >= 0) lastUse[tempOfSlot[as[k]]] = i;
     }
 
     bufferOfTemp.resize(ntemps);
-    for (int t = 0; t < ntemps; t++) bufferOfTemp[t] = -1;
-    AutoBuffer<int, 16> freeBufs(ntemps);
-    int nfree = 0, nbuf = 0;
-    for (int i = 0; i < ninsn; i++)
+    ಪ್ರತಿ (ಪೂರ್ಣಾಙ್ಕ t = 0; t < ntemps; t++) bufferOfTemp[t] = -1;
+    AutoBuffer<ಪೂರ್ಣಾಙ್ಕ, 16> freeBufs(ntemps);
+    ಪೂರ್ಣಾಙ್ಕ nfree = 0, nbuf = 0;
+    ಪ್ರತಿ (ಪೂರ್ಣಾಙ್ಕ i = 0; i < ninsn; i++)
     {
-        const TExpr::Insn& ins = prog[i];
-        int rt = tempOfSlot[ins.result];
-        if (rt >= 0 && bufferOfTemp[rt] < 0)
+        ಧ್ರುವ TExpr::Insn& ins = prog[i];
+        ಪೂರ್ಣಾಙ್ಕ rt = tempOfSlot[ins.result];
+        ಯದಿ (rt >= 0 && bufferOfTemp[rt] < 0)
             bufferOfTemp[rt] = nfree > 0 ? freeBufs[--nfree] : nbuf++;
-        int as[3] = { ins.arg0, ins.arg1, ins.arg2 };
-        for (int k = 0; k < 3; k++)
+        ಪೂರ್ಣಾಙ್ಕ as[3] = { ins.arg0, ins.arg1, ins.arg2 };
+        ಪ್ರತಿ (ಪೂರ್ಣಾಙ್ಕ k = 0; k < 3; k++)
         {
-            int t = tempOfSlot[as[k]];
-            if (t >= 0 && lastUse[t] == i)
+            ಪೂರ್ಣಾಙ್ಕ t = tempOfSlot[as[k]];
+            ಯದಿ (t >= 0 && lastUse[t] == i)
             {
                 freeBufs[nfree++] = bufferOfTemp[t];
                 lastUse[t] = -1;   // the same temp may be several args of this insn ("d*d") -
@@ -936,18 +936,18 @@ void TExpr::compile()
     // total temp bytes/element. Precomputed here (depths are build-time) so exec()/its fast path
     // never recompute it per call, and the fast path can size its scratch in O(1).
     bufEszPrefix.resize(nbuffers + 1);
-    for (int b = 0; b <= nbuffers; b++) bufEszPrefix[b] = 0;
-    for (int s = 1; s < nslots; s++)
-        if (arginfo[s].kind == TEMP)
+    ಪ್ರತಿ (ಪೂರ್ಣಾಙ್ಕ b = 0; b <= nbuffers; b++) bufEszPrefix[b] = 0;
+    ಪ್ರತಿ (ಪೂರ್ಣಾಙ್ಕ s = 1; s < nslots; s++)
+        ಯದಿ (arginfo[s].kind == TEMP)
         {
-            int b = bufferOfTemp[arginfo[s].index], e = (int)CV_ELEM_SIZE1(arginfo[s].depth);
-            if (e > bufEszPrefix[b + 1]) bufEszPrefix[b + 1] = e;     // max elem size in buffer b
+            ಪೂರ್ಣಾಙ್ಕ b = bufferOfTemp[arginfo[s].index], e = (ಪೂರ್ಣಾಙ್ಕ)CV_ELEM_SIZE1(arginfo[s].depth);
+            ಯದಿ (e > bufEszPrefix[b + 1]) bufEszPrefix[b + 1] = e;     // max elem size in buffer b
         }
-    for (int b = 0; b < nbuffers; b++) bufEszPrefix[b + 1] += bufEszPrefix[b];   // -> prefix sums
+    ಪ್ರತಿ (ಪೂರ್ಣಾಙ್ಕ b = 0; b < nbuffers; b++) bufEszPrefix[b + 1] += bufEszPrefix[b];   // -> prefix sums
 
     // L1 fragment cap: # elements one ~4KB scratch fragment holds (exec fragments the strip so the
     // intermediates stay hot). Pure function of the temp byte layout, hence computed here once.
-    const int totalEsz = bufEszPrefix[nbuffers];
+    ಧ್ರುವ ಪೂರ್ಣಾಙ್ಕ totalEsz = bufEszPrefix[nbuffers];
     capElems = totalEsz > 0 ? std::max(64, (4 * 1024) / totalEsz) : INT_MAX;
 }
 
@@ -957,12 +957,12 @@ void TExpr::compile()
 // Logical shape of a Mat with channels as the innermost dimension; steps in elemsize1 units.
 // Used here only to infer the broadcast RESULT shape (spatial + channels) for output allocation;
 // broadcastOp does its own channel-aware layout for the traversal itself.
-static void matLogical(const Mat& m, MatShape& shp, EwSteps& step, int& esz1)
+ಸ್ಥಿರ ಶೂನ್ಯ matLogical(ಧ್ರುವ Mat& m, MatShape& shp, EwSteps& step, ಪೂರ್ಣಾಙ್ಕ& esz1)
 {
-    esz1 = (int)m.elemSize1();
-    int nd = m.dims, cn = m.channels();
+    esz1 = (ಪೂರ್ಣಾಙ್ಕ)m.elemSize1();
+    ಪೂರ್ಣಾಙ್ಕ nd = m.dims, cn = m.channels();
     shp.resize(nd + 1);
-    for (int i = 0; i < nd; i++)
+    ಪ್ರತಿ (ಪೂರ್ಣಾಙ್ಕ i = 0; i < nd; i++)
     {
         shp[i] = m.size[i];
         step[i] = m.step[i] / esz1;
@@ -972,23 +972,23 @@ static void matLogical(const Mat& m, MatShape& shp, EwSteps& step, int& esz1)
 }
 
 // numpy-style broadcast of several right-aligned shapes.
-static bool broadcastShape(const MatShape* shps, int K, MatShape& out)
+ಸ್ಥಿರ ತಾರ್ಕಿಕ broadcastShape(ಧ್ರುವ MatShape* shps, ಪೂರ್ಣಾಙ್ಕ K, MatShape& out)
 {
-    int nd = 0;
-    for (int k = 0; k < K; k++) nd = std::max(nd, shps[k].dims);
+    ಪೂರ್ಣಾಙ್ಕ nd = 0;
+    ಪ್ರತಿ (ಪೂರ್ಣಾಙ್ಕ k = 0; k < K; k++) nd = std::max(nd, shps[k].dims);
     out.assign(nd, 1);
-    for (int k = 0; k < K; k++)
+    ಪ್ರತಿ (ಪೂರ್ಣಾಙ್ಕ k = 0; k < K; k++)
     {
-        const MatShape& s = shps[k];
-        int off = nd - s.dims;
-        for (int i = 0; i < s.dims; i++)
+        ಧ್ರುವ MatShape& s = shps[k];
+        ಪೂರ್ಣಾಙ್ಕ off = nd - s.dims;
+        ಪ್ರತಿ (ಪೂರ್ಣಾಙ್ಕ i = 0; i < s.dims; i++)
         {
-            int d = s[i], &o = out[off + i];
-            if (o == 1) o = d;
-            else if (d != 1 && d != o) return false;
+            ಪೂರ್ಣಾಙ್ಕ d = s[i], &o = out[off + i];
+            ಯದಿ (o == 1) o = d;
+            ಅನ್ಯಥಾ ಯದಿ (d != 1 && d != o) ಪ್ರತ್ಯಾಗಮ ಅಸತ್ಯ;
         }
     }
-    return true;
+    ಪ್ರತ್ಯಾಗಮ ಸತ್ಯ;
 }
 
 // Rough per-element cost of an op for the parallel_for_ stripe-count hint, in units of ~1/4 cycle
@@ -996,19 +996,19 @@ static bool broadcastShape(const MatShape* shps, int K, MatShape& out)
 // run at ~1.5 cycles/element, not the ~30 a scalar-cost model would suggest - the old values
 // over-split the work into stripes too small to amortize the per-job dispatch overhead).
 // Unknown ops default to ~division. cv::expression will own this once it drives broadcastOp.
-static int opCost(TOp op)
+ಸ್ಥಿರ ಪೂರ್ಣಾಙ್ಕ opCost(ತುದಿ op)
 {
-    switch (op)
+    ವಿಕಲ್ಪ (op)
     {
-    case OP_ADD: case OP_SUB: case OP_MUL: case OP_MIN: case OP_MAX:
-    case OP_ABSDIFF: case OP_AND: case OP_OR: case OP_XOR: case OP_NOT:
-    case OP_NEG: case OP_ABS: case OP_CAST: case OP_RELU: case OP_SELECT:
-    case OP_CMP_EQ: case OP_CMP_NE: case OP_CMP_LT:
-    case OP_CMP_LE: case OP_CMP_GT: case OP_CMP_GE: return 1;
-    case OP_DIV: case OP_SQRT: case OP_HYPOT: case OP_CONVERT_SCALE: return 3;
-    case OP_SIN: case OP_COS: case OP_TANH: case OP_ERF: case OP_ATAN2:
-    case OP_EXP: case OP_LOG: case OP_POW:           return 6;
-    default:                                         return 3;
+    ಪಕ್ಷ OP_ADD: ಪಕ್ಷ OP_SUB: ಪಕ್ಷ OP_MUL: ಪಕ್ಷ OP_MIN: ಪಕ್ಷ OP_MAX:
+    ಪಕ್ಷ OP_ABSDIFF: ಪಕ್ಷ OP_AND: ಪಕ್ಷ OP_OR: ಪಕ್ಷ OP_XOR: ಪಕ್ಷ OP_NOT:
+    ಪಕ್ಷ OP_NEG: ಪಕ್ಷ OP_ABS: ಪಕ್ಷ OP_CAST: ಪಕ್ಷ OP_RELU: ಪಕ್ಷ OP_SELECT:
+    ಪಕ್ಷ OP_CMP_EQ: ಪಕ್ಷ OP_CMP_NE: ಪಕ್ಷ OP_CMP_LT:
+    ಪಕ್ಷ OP_CMP_LE: ಪಕ್ಷ OP_CMP_GT: ಪಕ್ಷ OP_CMP_GE: ಪ್ರತ್ಯಾಗಮ 1;
+    ಪಕ್ಷ OP_DIV: ಪಕ್ಷ OP_SQRT: ಪಕ್ಷ OP_HYPOT: ಪಕ್ಷ OP_CONVERT_SCALE: ಪ್ರತ್ಯಾಗಮ 3;
+    ಪಕ್ಷ OP_SIN: ಪಕ್ಷ OP_COS: ಪಕ್ಷ OP_TANH: ಪಕ್ಷ OP_ERF: ಪಕ್ಷ OP_ATAN2:
+    ಪಕ್ಷ OP_EXP: ಪಕ್ಷ OP_LOG: ಪಕ್ಷ OP_POW:           ಪ್ರತ್ಯಾಗಮ 6;
+    ಸ್ವಭಾವ:                                         ಪ್ರತ್ಯಾಗಮ 3;
     }
 }
 
@@ -1018,7 +1018,7 @@ TExpr::TExpr()
 }
 
 // Reset to an empty program: drop all instructions/slots and re-seat slot 0 = NONE.
-void TExpr::clear()
+ಶೂನ್ಯ TExpr::clear()
 {
     prog.allocate(0);
     arginfo.allocate(0);
@@ -1030,139 +1030,139 @@ void TExpr::clear()
 }
 
 // Human-readable dump of the program (slot table + instruction list). Const values are shown in f64.
-void TExpr::dump(std::ostream& os) const
+ಶೂನ್ಯ TExpr::dump(std::ostream& os) ಧ್ರುವ
 {
-    auto dn = [](int d) -> const char* {
-        switch (d) {
-        case EW_DEPTH_NONE: return "flex";
-        case CV_8U:  return "u8";  case CV_8S:  return "s8";
-        case CV_16U: return "u16"; case CV_16S: return "s16";
-        case CV_32U: return "u32"; case CV_32S: return "s32";
-        case CV_64U: return "u64"; case CV_64S: return "s64";
-        case CV_16F: return "f16"; case CV_16BF:return "bf16";
-        case CV_32F: return "f32"; case CV_64F: return "f64";
-        case CV_Bool:return "bool";
-        default:     return "?"; }
+    auto dn = [](ಪೂರ್ಣಾಙ್ಕ d) -> ಧ್ರುವ ವರ್ಣ* {
+        ವಿಕಲ್ಪ (d) {
+        ಪಕ್ಷ EW_DEPTH_NONE: ಪ್ರತ್ಯಾಗಮ "flex";
+        ಪಕ್ಷ CV_8U:  ಪ್ರತ್ಯಾಗಮ "u8";  ಪಕ್ಷ CV_8S:  ಪ್ರತ್ಯಾಗಮ "s8";
+        ಪಕ್ಷ CV_16U: ಪ್ರತ್ಯಾಗಮ "u16"; ಪಕ್ಷ CV_16S: ಪ್ರತ್ಯಾಗಮ "s16";
+        ಪಕ್ಷ CV_32U: ಪ್ರತ್ಯಾಗಮ "u32"; ಪಕ್ಷ CV_32S: ಪ್ರತ್ಯಾಗಮ "s32";
+        ಪಕ್ಷ CV_64U: ಪ್ರತ್ಯಾಗಮ "u64"; ಪಕ್ಷ CV_64S: ಪ್ರತ್ಯಾಗಮ "s64";
+        ಪಕ್ಷ CV_16F: ಪ್ರತ್ಯಾಗಮ "f16"; ಪಕ್ಷ CV_16BF:ಪ್ರತ್ಯಾಗಮ "bf16";
+        ಪಕ್ಷ CV_32F: ಪ್ರತ್ಯಾಗಮ "f32"; ಪಕ್ಷ CV_64F: ಪ್ರತ್ಯಾಗಮ "f64";
+        ಪಕ್ಷ CV_Bool:ಪ್ರತ್ಯಾಗಮ "bool";
+        ಸ್ವಭಾವ:     ಪ್ರತ್ಯಾಗಮ "?"; }
     };
-    auto kn = [](ArgKind k) -> const char* {
-        switch (k) { case NONE: return "none"; case INPUT: return "in"; case CONST: return "const";
-                     case TEMP: return "temp"; case OUTPUT: return "out"; } return "?";
+    auto kn = [](ArgKind k) -> ಧ್ರುವ ವರ್ಣ* {
+        ವಿಕಲ್ಪ (k) { ಪಕ್ಷ NONE: ಪ್ರತ್ಯಾಗಮ "none"; ಪಕ್ಷ ಒಳಹರಿವು: ಪ್ರತ್ಯಾಗಮ "in"; ಪಕ್ಷ CONST: ಪ್ರತ್ಯಾಗಮ "const";
+                     ಪಕ್ಷ TEMP: ಪ್ರತ್ಯಾಗಮ "temp"; ಪಕ್ಷ OUTPUT: ಪ್ರತ್ಯಾಗಮ "out"; } ಪ್ರತ್ಯಾಗಮ "?";
     };
     os << "TExpr: inputs=" << ninputs << " outputs=" << noutputs << " temps=" << ntemps
-       << " buffers=" << nbuffers << " consts=" << nconsts << " insns=" << (int)prog.size() << "\n";
+       << " buffers=" << nbuffers << " consts=" << nconsts << " insns=" << (ಪೂರ್ಣಾಙ್ಕ)prog.size() << "\n";
     os << "  slots:\n";
-    for (int s = 0; s < (int)arginfo.size(); s++) {
-        const Arg& a = arginfo[s];
+    ಪ್ರತಿ (ಪೂರ್ಣಾಙ್ಕ s = 0; s < (ಪೂರ್ಣಾಙ್ಕ)arginfo.size(); s++) {
+        ಧ್ರುವ Arg& a = arginfo[s];
         os << "    [" << s << "] " << kn(a.kind);
-        if (a.kind != NONE) os << " " << dn(a.depth);
-        if (a.kind == INPUT || a.kind == OUTPUT || a.kind == TEMP) os << " idx=" << a.index;
-        if (a.kind == CONST) {
-            const int cn = std::max(1, a.channels);
-            AutoBuffer<double, MAX_LOCAL_CN> v(cn);
-            const uchar* src = (const uchar*)(constbuf.data() + a.constofs);
-            if (a.srcdepth == CV_64F) memcpy(v.data(), src, (size_t)cn * sizeof(double));
-            else getConvertFunc(a.srcdepth, CV_64F)(src, 0, nullptr, 0, (uchar*)v.data(), 0, Size(cn, 1), nullptr);
+        ಯದಿ (a.kind != NONE) os << " " << dn(a.depth);
+        ಯದಿ (a.kind == ಒಳಹರಿವು || a.kind == OUTPUT || a.kind == TEMP) os << " idx=" << a.index;
+        ಯದಿ (a.kind == CONST) {
+            ಧ್ರುವ ಪೂರ್ಣಾಙ್ಕ cn = std::max(1, a.channels);
+            AutoBuffer<ದ್ವಿಗುಣ, MAX_LOCAL_CN> v(cn);
+            ಧ್ರುವ uchar* src = (ಧ್ರುವ uchar*)(constbuf.data() + a.constofs);
+            ಯದಿ (a.srcdepth == CV_64F) memcpy(v.data(), src, (size_t)cn * ಪರಿಮಾಣ(ದ್ವಿಗುಣ));
+            ಅನ್ಯಥಾ getConvertFunc(a.srcdepth, CV_64F)(src, 0, nullptr, 0, (uchar*)v.data(), 0, Size(cn, 1), nullptr);
             os << " cn=" << cn << " src=" << dn(a.srcdepth) << " {";
-            for (int c = 0; c < cn; c++) os << (c ? "," : "") << v[c];
+            ಪ್ರತಿ (ಪೂರ್ಣಾಙ್ಕ c = 0; c < cn; c++) os << (c ? "," : "") << v[c];
             os << "}";
         }
         os << "\n";
     }
     os << "  prog:\n";
-    for (int i = 0; i < (int)prog.size(); i++) {
-        const Insn& ins = prog[i];
+    ಪ್ರತಿ (ಪೂರ್ಣಾಙ್ಕ i = 0; i < (ಪೂರ್ಣಾಙ್ಕ)prog.size(); i++) {
+        ಧ್ರುವ Insn& ins = prog[i];
         os << "    " << i << ": " << opName(ins.op) << "(" << ins.arg0;
-        if (ins.arg1) os << ", " << ins.arg1;
-        if (ins.arg2) os << ", " << ins.arg2;
+        ಯದಿ (ins.arg1) os << ", " << ins.arg1;
+        ಯದಿ (ins.arg2) os << ", " << ins.arg2;
         os << ") -> " << ins.result;
-        if (ins.kernel.flags) os << " kflags=" << ins.kernel.flags;
-        if (ins.params[0] != 1.0 || ins.params[1] != 0.0)
+        ಯದಿ (ins.kernel.flags) os << " kflags=" << ins.kernel.flags;
+        ಯದಿ (ins.params[0] != 1.0 || ins.params[1] != 0.0)
             os << " params=[" << ins.params[0] << "," << ins.params[1] << "," << ins.params[2] << "]";
-        if (!ins.kernel.fptr) os << " [UNBOUND]";
+        ಯದಿ (!ins.kernel.fptr) os << " [UNBOUND]";
         os << "\n";
     }
 }
 
 // ---- program builders: append a slot / instruction, return its index ----
-int TExpr::addInput(int depth)
+ಪೂರ್ಣಾಙ್ಕ TExpr::add_ಒಳಹರಿವು(ಪೂರ್ಣಾಙ್ಕ depth)
 {
-    Arg a; a.kind = INPUT; a.depth = depth; a.index = ninputs++;
-    arginfo.push_back(a); return (int)arginfo.size() - 1;
+    Arg a; a.kind = ಒಳಹರಿವು; a.depth = depth; a.index = ninputs++;
+    arginfo.push_back(a); ಪ್ರತ್ಯಾಗಮ (ಪೂರ್ಣಾಙ್ಕ)arginfo.size() - 1;
 }
 
-int TExpr::addOutput(int depth)
+ಪೂರ್ಣಾಙ್ಕ TExpr::addOutput(ಪೂರ್ಣಾಙ್ಕ depth)
 {
     Arg a; a.kind = OUTPUT; a.depth = depth; a.index = noutputs++;
-    arginfo.push_back(a); return (int)arginfo.size() - 1;
+    arginfo.push_back(a); ಪ್ರತ್ಯಾಗಮ (ಪೂರ್ಣಾಙ್ಕ)arginfo.size() - 1;
 }
 
-int TExpr::addTemp(int depth)
+ಪೂರ್ಣಾಙ್ಕ TExpr::addTemp(ಪೂರ್ಣಾಙ್ಕ depth)
 {
     Arg a; a.kind = TEMP; a.depth = depth; a.index = ntemps++;
-    arginfo.push_back(a); return (int)arginfo.size() - 1;
+    arginfo.push_back(a); ಪ್ರತ್ಯಾಗಮ (ಪೂರ್ಣಾಙ್ಕ)arginfo.size() - 1;
 }
 
 // Source = a cv::Scalar (f64, up to 4 channels): stored as CV_64F in constbuf.
-int TExpr::addConst(int depth, const Scalar& v, int channels)
+ಪೂರ್ಣಾಙ್ಕ TExpr::addConst(ಪೂರ್ಣಾಙ್ಕ depth, ಧ್ರುವ Scalar& v, ಪೂರ್ಣಾಙ್ಕ channels)
 {
     CV_Assert(channels <= 4);
     Arg a; a.kind = CONST; a.depth = depth; a.channels = channels; a.srcdepth = CV_64F;
     a.constofs = appendConstBuf(constbuf, CV_64F, v.val, channels);
-    arginfo.push_back(a); return (int)arginfo.size() - 1;
+    arginfo.push_back(a); ಪ್ರತ್ಯಾಗಮ (ಪೂರ್ಣಾಙ್ಕ)arginfo.size() - 1;
 }
 
 // Source = native bytes of any depth/channel-count (e.g. a Vec<_,N> scalar): stored as-is.
-int TExpr::addConst(int depth, int srcdepth, const void* data, int channels)
+ಪೂರ್ಣಾಙ್ಕ TExpr::addConst(ಪೂರ್ಣಾಙ್ಕ depth, ಪೂರ್ಣಾಙ್ಕ srcdepth, ಧ್ರುವ ಶೂನ್ಯ* data, ಪೂರ್ಣಾಙ್ಕ channels)
 {
     // A CONST is a broadcast scalar - capped at 4 channels (a Scalar). Need more? Pass a 0-D Mat with
     // the desired channel count as an INPUT: broadcasting handles it, and it isn't limited to 4.
     CV_Assert(channels <= 4);
     Arg a; a.kind = CONST; a.depth = depth; a.channels = channels; a.srcdepth = srcdepth;
     a.constofs = appendConstBuf(constbuf, srcdepth, data, channels);
-    arginfo.push_back(a); return (int)arginfo.size() - 1;
+    arginfo.push_back(a); ಪ್ರತ್ಯಾಗಮ (ಪೂರ್ಣಾಙ್ಕ)arginfo.size() - 1;
 }
 
 // A typed copy of flexible CONST `srcSlot` at the resolved `depth`, sharing its (still-source)
 // values in constbuf; compile() converts each such slot's values to its `depth`.
-int TExpr::typedConstFrom(int srcSlot, int depth)
+ಪೂರ್ಣಾಙ್ಕ TExpr::typedConstFrom(ಪೂರ್ಣಾಙ್ಕ srcSlot, ಪೂರ್ಣಾಙ್ಕ depth)
 {
-    const Arg& src = arginfo[srcSlot];
+    ಧ್ರುವ Arg& src = arginfo[srcSlot];
     Arg a; a.kind = CONST; a.depth = depth; a.channels = src.channels;
     a.srcdepth = src.srcdepth; a.constofs = src.constofs;    // shares the source region
-    arginfo.push_back(a); return (int)arginfo.size() - 1;
+    arginfo.push_back(a); ಪ್ರತ್ಯಾಗಮ (ಪೂರ್ಣಾಙ್ಕ)arginfo.size() - 1;
 }
 
 // Append one instruction with a pre-resolved kernel (the caller probed getElemwiseFunc, or knows
 // the kernel - e.g. div's /0-aware kernel). No re-resolution.
-int TExpr::addInsn(TOp op, int a0, int a1, int a2, int result, const TKernel& kernel, const Scalar& params)
+ಪೂರ್ಣಾಙ್ಕ TExpr::addInsn(ತುದಿ op, ಪೂರ್ಣಾಙ್ಕ a0, ಪೂರ್ಣಾಙ್ಕ a1, ಪೂರ್ಣಾಙ್ಕ a2, ಪೂರ್ಣಾಙ್ಕ result, ಧ್ರುವ TKernel& kernel, ಧ್ರುವ Scalar& params)
 {
     TExpr::Insn ins; ins.op = op; ins.arg0 = a0; ins.arg1 = a1; ins.arg2 = a2; ins.result = result;
     ins.params = params; ins.kernel = kernel;
     prog.push_back(ins);
-    return (int)prog.size() - 1;
+    ಪ್ರತ್ಯಾಗಮ (ಪೂರ್ಣಾಙ್ಕ)prog.size() - 1;
 }
 
 // Append one instruction, resolving its kernel NOW from the operand/result depths (final at build
 // time). compile() therefore never re-resolves. A builder that needs a specific kernel (div's /0
 // policy) pushes a pre-bound Insn directly instead.
-int TExpr::addInsn(TOp op, int a0, int a1, int a2, int result, const Scalar& params)
+ಪೂರ್ಣಾಙ್ಕ TExpr::addInsn(ತುದಿ op, ಪೂರ್ಣಾಙ್ಕ a0, ಪೂರ್ಣಾಙ್ಕ a1, ಪೂರ್ಣಾಙ್ಕ a2, ಪೂರ್ಣಾಙ್ಕ result, ಧ್ರುವ Scalar& params)
 {
-    int d0 = a0 ? arginfo[a0].depth : EW_DEPTH_NONE;
-    int d1 = a1 ? arginfo[a1].depth : EW_DEPTH_NONE;
-    int d2 = a2 ? arginfo[a2].depth : EW_DEPTH_NONE;
+    ಪೂರ್ಣಾಙ್ಕ d0 = a0 ? arginfo[a0].depth : EW_DEPTH_NONE;
+    ಪೂರ್ಣಾಙ್ಕ d1 = a1 ? arginfo[a1].depth : EW_DEPTH_NONE;
+    ಪೂರ್ಣಾಙ್ಕ d2 = a2 ? arginfo[a2].depth : EW_DEPTH_NONE;
     TKernel k = getElemwiseFunc(op, d0, d1, d2, arginfo[result].depth);
     CV_Assert(k.fptr && "ew: no kernel for this op/type combination");
-    return addInsn(op, a0, a1, a2, result, k, params);
+    ಪ್ರತ್ಯಾಗಮ addInsn(op, a0, a1, a2, result, k, params);
 }
 
 // Cast `arg` to `depth` only if it is not already that depth (the sole cast-insertion helper for
 // the hand builders and the emit* layers); returns the slot holding the value at `depth`.
-int TExpr::maybeAddCast(int arg, int depth)
+ಪೂರ್ಣಾಙ್ಕ TExpr::maybeAddCast(ಪೂರ್ಣಾಙ್ಕ arg, ಪೂರ್ಣಾಙ್ಕ depth)
 {
-    if (arginfo[arg].depth == depth) return arg;
-    int t = addTemp(depth);
+    ಯದಿ (arginfo[arg].depth == depth) ಪ್ರತ್ಯಾಗಮ arg;
+    ಪೂರ್ಣಾಙ್ಕ t = addTemp(depth);
     addInsn(OP_CAST, arg, 0, 0, t);
-    return t;
+    ಪ್ರತ್ಯಾಗಮ t;
 }
 
 // Run one resolved instruction over a width x height tile. Every kernel uses ONE calling
@@ -1170,72 +1170,72 @@ int TExpr::maybeAddCast(int arg, int depth)
 // kernel.flags/kernel.userdata). OP_CAST / OP_CONVERT_SCALE bind castKernel, which forwards to a
 // core convert BinaryFunc (carried in kernel.userdata) over the distinct sub-region and then
 // expands it across any broadcast axis (see castKernel/expandKernel in ew_kernels.cpp).
-static inline void runInsn(const TExpr::Insn& ins,
-                           const void* p0, size_t y0, size_t x0,
-                           const void* p1, size_t y1, size_t x1,
-                           const void* p2, size_t y2, size_t x2,
-                           void* pr, size_t yr, int w, int h)
+ಸ್ಥಿರ ಅನ್ತಃಸ್ಥ ಶೂನ್ಯ runInsn(ಧ್ರುವ TExpr::Insn& ins,
+                           ಧ್ರುವ ಶೂನ್ಯ* p0, size_t y0, size_t x0,
+                           ಧ್ರುವ ಶೂನ್ಯ* p1, size_t y1, size_t x1,
+                           ಧ್ರುವ ಶೂನ್ಯ* p2, size_t y2, size_t x2,
+                           ಶೂನ್ಯ* pr, size_t yr, ಪೂರ್ಣಾಙ್ಕ w, ಪೂರ್ಣಾಙ್ಕ h)
 {
-    int code = ins.kernel.fptr(p0, y0, x0, p1, y1, x1, p2, y2, x2, pr, yr, w, h,
+    ಪೂರ್ಣಾಙ್ಕ code = ins.kernel.fptr(p0, y0, x0, p1, y1, x1, p2, y2, x2, pr, yr, w, h,
                                 ins.params.val, ins.kernel.flags, ins.kernel.userdata);
     CV_Assert(code >= 0);
 }
 
-struct EwBody {
-    const TExpr::Insn* prog;
+ಸಂರಚನಾ EwBody {
+    ಧ್ರುವ TExpr::Insn* prog;
     // slot -> a NON-NEGATIVE index whose meaning is given by slotKind[s]:
     //   TExpr::INPUT / TExpr::OUTPUT : index into tile.slices (the broadcast operand list; consts,
     //                                 now 0-dim broadcast operands, are relabeled INPUT and live here)
     //   TExpr::TEMP               : physical temp-buffer id
-    const int* slotMap;
-    const signed char* slotKind; // [nslots] arginfo[s].kind, for resolving slotMap[s]
-    const int* bufEszPrefix;  // [nbuffers+1] prefix sums of temp elem sizes; [nbuffers] = total
-    int ninsn, nslots, nbuffers, capElems;   // capElems: L1 fragment element cap (0 if no temps)
+    ಧ್ರುವ ಪೂರ್ಣಾಙ್ಕ* slotMap;
+    ಧ್ರುವ signed ವರ್ಣ* slotKind; // [nslots] arginfo[s].kind, for resolving slotMap[s]
+    ಧ್ರುವ ಪೂರ್ಣಾಙ್ಕ* bufEszPrefix;  // [nbuffers+1] prefix sums of temp elem sizes; [nbuffers] = total
+    ಪೂರ್ಣಾಙ್ಕ ninsn, nslots, nbuffers, capElems;   // capElems: L1 fragment element cap (0 if no temps)
 };
 
-void TExpr::outputShape(const Mat* const* inputs, MatShape& spatial, int& channels) const
+ಶೂನ್ಯ TExpr::outputShape(ಧ್ರುವ Mat* ಧ್ರುವ* inputs, MatShape& spatial, ಪೂರ್ಣಾಙ್ಕ& channels) ಧ್ರುವ
 {
     // Fast path: every real input shares one shape + channel count => the result IS inputs[0]'s
     // (consts add no dims/channels). Otherwise re-broadcast the logical (spatial + channel) shapes.
-    const int rcn0 = ninputs >= 1 ? inputs[0]->channels() : 1;
-    bool sameShape = ninputs >= 1;
-    for (int i = 1; sameShape && i < ninputs; i++)
+    ಧ್ರುವ ಪೂರ್ಣಾಙ್ಕ rcn0 = ninputs >= 1 ? inputs[0]->channels() : 1;
+    ತಾರ್ಕಿಕ sameShape = ninputs >= 1;
+    ಪ್ರತಿ (ಪೂರ್ಣಾಙ್ಕ i = 1; sameShape && i < ninputs; i++)
     {
-        const Mat& a = *inputs[i];
-        if (a.dims != inputs[0]->dims || a.channels() != rcn0) sameShape = false;
-        else for (int d = 0; d < a.dims; d++) if (a.size[d] != inputs[0]->size[d]) { sameShape = false; break; }
+        ಧ್ರುವ Mat& a = *inputs[i];
+        ಯದಿ (a.dims != inputs[0]->dims || a.channels() != rcn0) sameShape = ಅಸತ್ಯ;
+        ಅನ್ಯಥಾ ಪ್ರತಿ (ಪೂರ್ಣಾಙ್ಕ d = 0; d < a.dims; d++) ಯದಿ (a.size[d] != inputs[0]->size[d]) { sameShape = ಅಸತ್ಯ; ಭಙ್ಗ; }
     }
-    if (sameShape) { spatial = inputs[0]->size; channels = rcn0; return; }
+    ಯದಿ (sameShape) { spatial = inputs[0]->size; channels = rcn0; ಪ್ರತ್ಯಾಗಮ; }
 
     AutoBuffer<MatShape, 16> bshapes(std::max(ninputs, 1));
-    MatShape shp; EwSteps step; int esz1;
-    for (int i = 0; i < ninputs; i++) { matLogical(*inputs[i], shp, step, esz1); bshapes[i] = shp; }
+    MatShape shp; EwSteps step; ಪೂರ್ಣಾಙ್ಕ esz1;
+    ಪ್ರತಿ (ಪೂರ್ಣಾಙ್ಕ i = 0; i < ninputs; i++) { matLogical(*inputs[i], shp, step, esz1); bshapes[i] = shp; }
     MatShape full;
     CV_Assert(broadcastShape(bshapes.data(), ninputs, full) && "ew: inputs not broadcast-compatible");
-    const int ndFull = (int)full.size();
+    ಧ್ರುವ ಪೂರ್ಣಾಙ್ಕ ndFull = (ಪೂರ್ಣಾಙ್ಕ)full.size();
     channels = full[ndFull - 1];
     spatial = full; spatial.resize(ndFull - 1);
 }
 
 // Convenience overload: inputs as a contiguous Mat array -> build the pointer array + forward.
-void TExpr::outputShape(const Mat* inputs, MatShape& spatial, int& channels) const
+ಶೂನ್ಯ TExpr::outputShape(ಧ್ರುವ Mat* inputs, MatShape& spatial, ಪೂರ್ಣಾಙ್ಕ& channels) ಧ್ರುವ
 {
-    AutoBuffer<const Mat*, 16> ptrs(std::max(ninputs, 1));
-    for (int i = 0; i < ninputs; i++) ptrs[i] = &inputs[i];
+    AutoBuffer<ಧ್ರುವ Mat*, 16> ptrs(std::max(ninputs, 1));
+    ಪ್ರತಿ (ಪೂರ್ಣಾಙ್ಕ i = 0; i < ninputs; i++) ptrs[i] = &inputs[i];
     outputShape(ptrs.data(), spatial, channels);
 }
 
 // At namespace scope, NOT inside exec(): MSVC 2019 loses the constexpr-ness of function-local
 // constants used as template arguments inside a lambda (C2975).
-static constexpr int LOCAL_HDRS = 3;
-static constexpr int LOCAL_CONSTS = 4;
-static constexpr int LOCAL_OPS = 16;
+ಸ್ಥಿರ constexpr ಪೂರ್ಣಾಙ್ಕ LOCAL_HDRS = 3;
+ಸ್ಥಿರ constexpr ಪೂರ್ಣಾಙ್ಕ LOCAL_CONSTS = 4;
+ಸ್ಥಿರ constexpr ಪೂರ್ಣಾಙ್ಕ LOCAL_OPS = 16;
 
-void TExpr::exec(const Mat* const* inputs, Mat* outputs)
+ಶೂನ್ಯ TExpr::exec(ಧ್ರುವ Mat* ಧ್ರುವ* inputs, Mat* outputs)
 {
     using BrTile = BroadcastOp::Tile;
     using BrSlice = BroadcastOp::Slice;
-    const int nslots = (int)arginfo.size();
+    ಧ್ರುವ ಪೂರ್ಣಾಙ್ಕ nslots = (ಪೂರ್ಣಾಙ್ಕ)arginfo.size();
     CV_Assert(nslots >= 1 && arginfo[0].kind == TExpr::NONE);
 
     // ---- cheap fast path: a const-free program over small, same-shape, continuous arrays. Channels
@@ -1245,95 +1245,95 @@ void TExpr::exec(const Mat* const* inputs, Mat* outputs)
     //      byte layout (bufEszPrefix) is known from compile(), so we size an L1 scratch in O(1) and
     //      walk the strip in L1-sized fragments (the intermediates stay hot). nconsts/nbuffers/
     //      bufEszPrefix come from compile(); the rest is a quick check of the args. ----
-    if (nconsts == 0 && ninputs >= 1)
+    ಯದಿ (nconsts == 0 && ninputs >= 1)
     {
         constexpr size_t EW_FASTPATH_MAX = 1u << 17;   // above this the tiled/parallel path wins
-        const Mat& r = *inputs[0];
-        const int rcn = r.channels();
-        bool ok = r.isContinuous();
-        for (int i = 1; ok && i < ninputs; i++)
+        ಧ್ರುವ Mat& r = *inputs[0];
+        ಧ್ರುವ ಪೂರ್ಣಾಙ್ಕ rcn = r.channels();
+        ತಾರ್ಕಿಕ ok = r.isContinuous();
+        ಪ್ರತಿ (ಪೂರ್ಣಾಙ್ಕ i = 1; ok && i < ninputs; i++)
         {
-            const Mat& a = *inputs[i];
+            ಧ್ರುವ Mat& a = *inputs[i];
             ok = ok && a.isContinuous() && a.channels() == rcn && a.size == r.size;
         }
         // the flat strip writes the output(s) contiguously too, so it can't serve a non-contiguous
         // (cropped-ROI) destination - those fall to the general strided path below (an empty output,
         // which exec will allocate contiguous, counts as continuous here).
-        for (int s = 1; ok && s < nslots; s++)
-            if (arginfo[s].kind == OUTPUT) ok = ok && outputs[arginfo[s].index].isContinuous();
-        const size_t total = ok ? r.total() * rcn : 0;
-        if (ok && total == 0)
+        ಪ್ರತಿ (ಪೂರ್ಣಾಙ್ಕ s = 1; ok && s < nslots; s++)
+            ಯದಿ (arginfo[s].kind == OUTPUT) ok = ok && outputs[arginfo[s].index].isContinuous();
+        ಧ್ರುವ size_t total = ok ? r.total() * rcn : 0;
+        ಯದಿ (ok && total == 0)
         {
-            const MatShape rshape = r.size;
-            for (int s = 1; s < nslots; s++)
-                if (arginfo[s].kind == OUTPUT)
+            ಧ್ರುವ MatShape rshape = r.size;
+            ಪ್ರತಿ (ಪೂರ್ಣಾಙ್ಕ s = 1; s < nslots; s++)
+                ಯದಿ (arginfo[s].kind == OUTPUT)
                     outputs[arginfo[s].index].create(rshape, CV_MAKETYPE(arginfo[s].depth, rcn));
-            return;
+            ಪ್ರತ್ಯಾಗಮ;
         }
-        if (ok && total <= EW_FASTPATH_MAX)
+        ಯದಿ (ok && total <= EW_FASTPATH_MAX)
         {
-            const MatShape rshape = r.size;   // spatial dims (channels separate), as a MatShape
-            for (int s = 1; s < nslots; s++)
-                if (arginfo[s].kind == OUTPUT)
+            ಧ್ರುವ MatShape rshape = r.size;   // spatial dims (channels separate), as a MatShape
+            ಪ್ರತಿ (ಪೂರ್ಣಾಙ್ಕ s = 1; s < nslots; s++)
+                ಯದಿ (arginfo[s].kind == OUTPUT)
                     outputs[arginfo[s].index].create(rshape, CV_MAKETYPE(arginfo[s].depth, rcn));
-            const int ninsn = (int)prog.size();
+            ಧ್ರುವ ಪೂರ್ಣಾಙ್ಕ ninsn = (ಪೂರ್ಣಾಙ್ಕ)prog.size();
 
-            if (nbuffers == 0)
+            ಯದಿ (nbuffers == 0)
             {
                 // No temps (single-op add/sub/mul/...): one flat (total x 1) pass, operands point
                 // straight at the Mat data - no scratch, no fragment loop. Referenced slots are INPUT/
                 // OUTPUT (a moved-from NONE slot may exist but is never an instruction argument).
-                auto ptrOf = [&](int s) -> void* {
-                    if (s <= 0) return nullptr;
-                    const Arg& ai = arginfo[s];
-                    if (ai.kind == INPUT)  return (void*)inputs[ai.index]->data;
-                    if (ai.kind == OUTPUT) return (void*)outputs[ai.index].data;
-                    return nullptr;   // NONE
+                auto ptrOf = [&](ಪೂರ್ಣಾಙ್ಕ s) -> ಶೂನ್ಯ* {
+                    ಯದಿ (s <= 0) ಪ್ರತ್ಯಾಗಮ nullptr;
+                    ಧ್ರುವ Arg& ai = arginfo[s];
+                    ಯದಿ (ai.kind == ಒಳಹರಿವು)  ಪ್ರತ್ಯಾಗಮ (ಶೂನ್ಯ*)inputs[ai.index]->data;
+                    ಯದಿ (ai.kind == OUTPUT) ಪ್ರತ್ಯಾಗಮ (ಶೂನ್ಯ*)outputs[ai.index].data;
+                    ಪ್ರತ್ಯಾಗಮ nullptr;   // NONE
                 };
-                const int w = (int)total;
-                for (int n = 0; n < ninsn; n++)
+                ಧ್ರುವ ಪೂರ್ಣಾಙ್ಕ w = (ಪೂರ್ಣಾಙ್ಕ)total;
+                ಪ್ರತಿ (ಪೂರ್ಣಾಙ್ಕ n = 0; n < ninsn; n++)
                 {
-                    const Insn& ins = prog[n];
+                    ಧ್ರುವ Insn& ins = prog[n];
                     runInsn(ins, ptrOf(ins.arg0), 0, 1, ptrOf(ins.arg1), 0, 1,
                             ptrOf(ins.arg2), 0, 1, ptrOf(ins.result), 0, w, 1);
                 }
-                return;
+                ಪ್ರತ್ಯಾಗಮ;
             }
 
             // Temps present: walk the strip in L1-sized fragments so the intermediates stay hot.
             // Byte layout (bufEszPrefix) and the fragment cap (capElems) both come from compile();
             // scratch is totalEsz*wf0 (<= ~4KB).
-            const int totalEsz = bufEszPrefix[nbuffers];
-            const int wf0 = std::min((int)total, capElems);
+            ಧ್ರುವ ಪೂರ್ಣಾಙ್ಕ totalEsz = bufEszPrefix[nbuffers];
+            ಧ್ರುವ ಪೂರ್ಣಾಙ್ಕ wf0 = std::min((ಪೂರ್ಣಾಙ್ಕ)total, capElems);
 
-            const size_t region = alignSize((size_t)wf0, 8);
+            ಧ್ರುವ size_t region = alignSize((size_t)wf0, 8);
             // Scratch for the temp buffers. AutoBuffer no longer value-inits its tail, so a fresh per-call
             // buffer is free (we only WRITE to it); the inline 4KB covers the L1-capped size, heap backs
             // the rare larger case. uint64_t is used for memory alignment on the worst case.
-            AutoBuffer<uint64_t, (4*1024 + 256)/sizeof(uint64_t)> scratchBuf(
-                divUp((size_t)totalEsz * region, (unsigned)sizeof(uint64_t)));
+            AutoBuffer<uint64_t, (4*1024 + 256)/ಪರಿಮಾಣ(uint64_t)> scratchBuf(
+                divUp((size_t)totalEsz * region, (unsigned)ಪರಿಮಾಣ(uint64_t)));
             uchar* scratch = (uchar*)scratchBuf.data();
-            for (int x0 = 0; x0 < (int)total; x0 += wf0)
+            ಪ್ರತಿ (ಪೂರ್ಣಾಙ್ಕ x0 = 0; x0 < (ಪೂರ್ಣಾಙ್ಕ)total; x0 += wf0)
             {
-                const int wf = std::min(wf0, (int)total - x0);
-                auto ptrOf = [&](int s) -> void* {
-                    if (s <= 0) return nullptr;
-                    const Arg& ai = arginfo[s];
+                ಧ್ರುವ ಪೂರ್ಣಾಙ್ಕ wf = std::min(wf0, (ಪೂರ್ಣಾಙ್ಕ)total - x0);
+                auto ptrOf = [&](ಪೂರ್ಣಾಙ್ಕ s) -> ಶೂನ್ಯ* {
+                    ಯದಿ (s <= 0) ಪ್ರತ್ಯಾಗಮ nullptr;
+                    ಧ್ರುವ Arg& ai = arginfo[s];
                     size_t esz = CV_ELEM_SIZE1(ai.depth);
-                    if (ai.kind == INPUT)  return (uchar*)inputs[ai.index]->data  + (size_t)x0 * esz;
-                    if (ai.kind == OUTPUT) return (uchar*)outputs[ai.index].data + (size_t)x0 * esz;
-                    if (ai.kind != TEMP)   return nullptr;                                    // NONE: moved-from
-                    const int b = bufferOfTemp.empty() ? ai.index : bufferOfTemp[ai.index];  // TEMP
-                    return scratch + (size_t)bufEszPrefix[b] * region;                        // fragment-local
+                    ಯದಿ (ai.kind == ಒಳಹರಿವು)  ಪ್ರತ್ಯಾಗಮ (uchar*)inputs[ai.index]->data  + (size_t)x0 * esz;
+                    ಯದಿ (ai.kind == OUTPUT) ಪ್ರತ್ಯಾಗಮ (uchar*)outputs[ai.index].data + (size_t)x0 * esz;
+                    ಯದಿ (ai.kind != TEMP)   ಪ್ರತ್ಯಾಗಮ nullptr;                                    // NONE: moved-from
+                    ಧ್ರುವ ಪೂರ್ಣಾಙ್ಕ b = bufferOfTemp.empty() ? ai.index : bufferOfTemp[ai.index];  // TEMP
+                    ಪ್ರತ್ಯಾಗಮ scratch + (size_t)bufEszPrefix[b] * region;                        // fragment-local
                 };
-                for (int n = 0; n < ninsn; n++)
+                ಪ್ರತಿ (ಪೂರ್ಣಾಙ್ಕ n = 0; n < ninsn; n++)
                 {
-                    const Insn& ins = prog[n];
+                    ಧ್ರುವ Insn& ins = prog[n];
                     runInsn(ins, ptrOf(ins.arg0), 0, 1, ptrOf(ins.arg1), 0, 1,
                             ptrOf(ins.arg2), 0, 1, ptrOf(ins.result), 0, wf, 1);
                 }
             }
-            return;
+            ಪ್ರತ್ಯಾಗಮ;
         }
     }
 
@@ -1347,7 +1347,7 @@ void TExpr::exec(const Mat* const* inputs, Mat* outputs)
     // the matLogical + broadcastShape rebuild/re-broadcast done only to size the output. Consts are
     // irrelevant here (they don't add dims/channels), so they never break the fast path.
     MatShape spatial;
-    int rchannels;
+    ಪೂರ್ಣಾಙ್ಕ rchannels;
     outputShape(inputs, spatial, rchannels);
 
     // ---- 2. ONE pass over slots: allocate outputs, build the operand pointer list + slot map,
@@ -1360,57 +1360,57 @@ void TExpr::exec(const Mat* const* inputs, Mat* outputs)
     // In-place: an input shares its data buffer with an output. An output create() may realloc that
     // buffer while an input still needs the old contents, so we incref (header-copy) every input and
     // read through the copies. Cheap data-pointer aliasing test (nullptr data => never matches).
-    bool inplace = false;
-    for (int i = 0; i < ninputs && !inplace; i++)
-        for (int j = 0; j < noutputs; j++)
-            if (inputs[i]->data && inputs[i]->data == outputs[j].data) { inplace = true; break; }
-    int nhdrs = inplace ? ninputs : 0;
+    ತಾರ್ಕಿಕ inplace = ಅಸತ್ಯ;
+    ಪ್ರತಿ (ಪೂರ್ಣಾಙ್ಕ i = 0; i < ninputs && !inplace; i++)
+        ಪ್ರತಿ (ಪೂರ್ಣಾಙ್ಕ j = 0; j < noutputs; j++)
+            ಯದಿ (inputs[i]->data && inputs[i]->data == outputs[j].data) { inplace = ಸತ್ಯ; ಭಙ್ಗ; }
+    ಪೂರ್ಣಾಙ್ಕ nhdrs = inplace ? ninputs : 0;
 
-    AutoBuffer<const Mat*, LOCAL_OPS> arr(ninputs + noutputs + nconsts);
+    AutoBuffer<ಧ್ರುವ Mat*, LOCAL_OPS> arr(ninputs + noutputs + nconsts);
     AutoBuffer<Mat, LOCAL_HDRS> hdrs(std::max(nhdrs, 1));   // non-owning input headers (in-place incref)
-    AutoBuffer<const Mat*, LOCAL_HDRS> inptr(std::max(nhdrs, 1));  // repointed input list (in-place only)
+    AutoBuffer<ಧ್ರುವ Mat*, LOCAL_HDRS> inptr(std::max(nhdrs, 1));  // repointed input list (in-place only)
     AutoBuffer<Mat, LOCAL_CONSTS> constHdrBuf(std::max(nconsts, 1));  // 0-dim headers over constbuf
-    AutoBuffer<int, LOCAL_OPS> slotMap(nslots);
-    AutoBuffer<signed char, LOCAL_OPS> slotKind(nslots);
-    int narr = 0, nc = 0;
-    if (inplace) {
+    AutoBuffer<ಪೂರ್ಣಾಙ್ಕ, LOCAL_OPS> slotMap(nslots);
+    AutoBuffer<signed ವರ್ಣ, LOCAL_OPS> slotKind(nslots);
+    ಪೂರ್ಣಾಙ್ಕ narr = 0, nc = 0;
+    ಯದಿ (inplace) {
         // save (incref) inputs in the case of in-place operation
         // to protect them from premature deallocation
-        for (int j = 0; j < ninputs; j++) { hdrs[j] = *inputs[j]; inptr[j] = &hdrs[j]; }
+        ಪ್ರತಿ (ಪೂರ್ಣಾಙ್ಕ j = 0; j < ninputs; j++) { hdrs[j] = *inputs[j]; inptr[j] = &hdrs[j]; }
         inputs = inptr.data();
     }
-    slotKind[0] = (signed char)TExpr::NONE;
-    for (int s = 1; s < nslots; s++)
+    slotKind[0] = (signed ವರ್ಣ)TExpr::NONE;
+    ಪ್ರತಿ (ಪೂರ್ಣಾಙ್ಕ s = 1; s < nslots; s++)
     {
-        const TExpr::Arg& ai = arginfo[s];
-        slotKind[s] = (signed char)ai.kind;
-        if (ai.kind == TExpr::INPUT) {
+        ಧ್ರುವ TExpr::Arg& ai = arginfo[s];
+        slotKind[s] = (signed ವರ್ಣ)ai.kind;
+        ಯದಿ (ai.kind == TExpr::ಒಳಹರಿವು) {
             slotMap[s] = narr;
             arr[narr++] = inputs[ai.index];
         }
-        else if (ai.kind == TExpr::OUTPUT) {
+        ಅನ್ಯಥಾ ಯದಿ (ai.kind == TExpr::OUTPUT) {
             outputs[ai.index].create(spatial, CV_MAKETYPE(ai.depth, rchannels));
             slotMap[s] = narr; arr[narr++] = &outputs[ai.index];
         }
-        else if (ai.kind == TExpr::CONST && ai.depth == EW_DEPTH_NONE) {
-            slotKind[s] = (signed char)TExpr::NONE;   // dead flexible literal: never referenced
+        ಅನ್ಯಥಾ ಯದಿ (ai.kind == TExpr::CONST && ai.depth == EW_DEPTH_NONE) {
+            slotKind[s] = (signed ವರ್ಣ)TExpr::NONE;   // dead flexible literal: never referenced
             slotMap[s] = 0;
         }
-        else if (ai.kind == TExpr::CONST) {
+        ಅನ್ಯಥಾ ಯದಿ (ai.kind == TExpr::CONST) {
             // a materialized const rides the broadcast machinery as a 0-dim, per-channel operand: a
             // multichannel const forces CH_DIM (per-channel scalars); a single value broadcasts
             // everywhere. compile() already converted its values (in constbuf) to ai.depth.
-            const int c = std::max(1, ai.channels);
+            ಧ್ರುವ ಪೂರ್ಣಾಙ್ಕ c = std::max(1, ai.channels);
             constHdrBuf[nc] = Mat(MatShape::scalar(), CV_MAKETYPE(ai.depth, c),
-                                  (void*)(constbuf.data() + ai.constofs));
-            slotKind[s] = (signed char)TExpr::INPUT;   // to the body it is just an array operand
+                                  (ಶೂನ್ಯ*)(constbuf.data() + ai.constofs));
+            slotKind[s] = (signed ವರ್ಣ)TExpr::ಒಳಹರಿವು;   // to the body it is just an array operand
             slotMap[s] = narr; arr[narr++] = &constHdrBuf[nc];
             nc++;
         }
-        else if (ai.kind == TExpr::TEMP) {
+        ಅನ್ಯಥಾ ಯದಿ (ai.kind == TExpr::TEMP) {
             slotMap[s] = bufferOfTemp.empty() ? ai.index : bufferOfTemp[ai.index];  // physical buffer id
         }
-        else {  // TExpr::NONE: a moved-from temp (or dead literal) - inert, no operand, no buffer. Never
+        ಅನ್ಯಥಾ {  // TExpr::NONE: a moved-from temp (or dead literal) - inert, no operand, no buffer. Never
                 // referenced by any instruction; do NOT touch bufferOfTemp (its retired index may be >= ntemps).
             slotMap[s] = 0;
         }
@@ -1422,16 +1422,16 @@ void TExpr::exec(const Mat* const* inputs, Mat* outputs)
     // single block (no scratch).
 
     // ---- 3. ONE pass over instructions: summed per-element cost (kernels were bound at compile()). ----
-    const int ninsn = (int)prog.size();
+    ಧ್ರುವ ಪೂರ್ಣಾಙ್ಕ ninsn = (ಪೂರ್ಣಾಙ್ಕ)prog.size();
     long long costPerElem = 0;
-    for (int n = 0; n < ninsn; n++)
+    ಪ್ರತಿ (ಪೂರ್ಣಾಙ್ಕ n = 0; n < ninsn; n++)
         costPerElem += opCost(prog[n].op);
 
     // ---- 4. parallel work hint: total output scalars x summed per-element op cost / budget. ----
     long long otot = (long long)rchannels;
-    for (int d = 0; d < (int)spatial.size(); d++) otot *= spatial[d];
-    if (otot == 0)
-        return;
+    ಪ್ರತಿ (ಪೂರ್ಣಾಙ್ಕ d = 0; d < (ಪೂರ್ಣಾಙ್ಕ)spatial.size(); d++) otot *= spatial[d];
+    ಯದಿ (otot == 0)
+        ಪ್ರತ್ಯಾಗಮ;
     // One stripe per 2^16 cost units. The unit is ~1/4 cycle of the VECTORIZED kernel, but
     // element-wise work is memory-bound, so a stripe costs several times what that model says -
     // a coarser budget leaves a 32-core box running 2 stripes on DNN-sized tensors (1-4 MB).
@@ -1441,9 +1441,9 @@ void TExpr::exec(const Mat* const* inputs, Mat* outputs)
     // ~3 pieces per worker makes the slow (efficiency) cores equal-share bottlenecks, so the
     // ceiling grows as 3*nthreads instead.
     // getNumThreads() is clamped from below: some backends may report 0 (WINRT, plugins).
-    const double T = (double)std::max(getNumThreads(), 1);
-    const double nstripes = std::min(
-        (double)otot * (double)std::max<long long>(costPerElem, 1) * (1./ (double)(1 << 16)),
+    ಧ್ರುವ ದ್ವಿಗುಣ T = (ದ್ವಿಗುಣ)std::max(get_ಅಂಕೆ_Threads(), 1);
+    ಧ್ರುವ ದ್ವಿಗುಣ nstripes = std::min(
+        (ದ್ವಿಗುಣ)otot * (ದ್ವಿಗುಣ)std::max<long long>(costPerElem, 1) * (1./ (ದ್ವಿಗುಣ)(1 << 16)),
         std::min(4.*T, std::max(32., 3.*T)));
 
     EwBody body;
@@ -1466,14 +1466,14 @@ void TExpr::exec(const Mat* const* inputs, Mat* outputs)
     body.nbuffers = nbuffers;
     body.capElems = capElems;
 
-    broadcastOp(arr.data(), narr, [&](const BrTile& tile)
+    broadcastOp(arr.data(), narr, [&](ಧ್ರುವ BrTile& tile)
     {
         EwBody& bc = body;
-        const TExpr::Insn* insns = bc.prog;            // hot fields -> locals (registers/stack)
-        const int* const smap  = bc.slotMap;
-        const signed char* const skind = bc.slotKind;
-        const int nin = bc.ninsn, nsl = bc.nslots;
-        const int w = tile.width, h = tile.height;
+        ಧ್ರುವ TExpr::Insn* insns = bc.prog;            // hot fields -> locals (registers/stack)
+        ಧ್ರುವ ಪೂರ್ಣಾಙ್ಕ* ಧ್ರುವ smap  = bc.slotMap;
+        ಧ್ರುವ signed ವರ್ಣ* ಧ್ರುವ skind = bc.slotKind;
+        ಧ್ರುವ ಪೂರ್ಣಾಙ್ಕ nin = bc.ninsn, nsl = bc.nslots;
+        ಧ್ರುವ ಪೂರ್ಣಾಙ್ಕ w = tile.width, h = tile.height;
 
         // Run the program over L1-sized 2D blocks so the intermediates stay in cache. ONE rule covers
         // every tile shape: keep the strip as WIDE as fits L1 (long inner loop => good SIMD + hits the
@@ -1484,61 +1484,61 @@ void TExpr::exec(const Mat* const* inputs, Mat* outputs)
         // => bw=w, bh=h: one block over the whole tile, region temp store is empty (zero bytes), and
         // each operand slot is re-pointed once straight at its tile slice. Each temp buffer occupies
         // [bufEszPrefix[buf]*region, ...) bytes in tstore; region = bw*bh.
-        const int* const eszPrefix = bc.bufEszPrefix;
-        const int bw = std::min(w, bc.capElems);
-        const int bh = std::min(h, std::max(1, bc.capElems / std::max(1, bw)));
-        const size_t region = alignSize((size_t)bw * bh, 8);
+        ಧ್ರುವ ಪೂರ್ಣಾಙ್ಕ* ಧ್ರುವ eszPrefix = bc.bufEszPrefix;
+        ಧ್ರುವ ಪೂರ್ಣಾಙ್ಕ bw = std::min(w, bc.capElems);
+        ಧ್ರುವ ಪೂರ್ಣಾಙ್ಕ bh = std::min(h, std::max(1, bc.capElems / std::max(1, bw)));
+        ಧ್ರುವ size_t region = alignSize((size_t)bw * bh, 8);
         // uint64_t elements (see the note on scratchBuf above): keeps the block-local temp store
         // 8-byte aligned, which the 64-bit-lane kernels require on 32-bit ABIs.
-        AutoBuffer<uint64_t, (4*1024 + 256)/sizeof(uint64_t)> tstoreBuf(
-            divUp((size_t)eszPrefix[bc.nbuffers] * region, (unsigned)sizeof(uint64_t)));  // inline (<= ~4KB)
+        AutoBuffer<uint64_t, (4*1024 + 256)/ಪರಿಮಾಣ(uint64_t)> tstoreBuf(
+            divUp((size_t)eszPrefix[bc.nbuffers] * region, (unsigned)ಪರಿಮಾಣ(uint64_t)));  // inline (<= ~4KB)
         uchar* tstore = (uchar*)tstoreBuf.data();
 
         AutoBuffer<BrSlice, LOCAL_OPS> args(nsl);
-        for (int y0 = 0; y0 < h; y0 += bh)
+        ಪ್ರತಿ (ಪೂರ್ಣಾಙ್ಕ y0 = 0; y0 < h; y0 += bh)
         {
-            const int hf = std::min(bh, h - y0);
-            for (int x0 = 0; x0 < w; x0 += bw)
+            ಧ್ರುವ ಪೂರ್ಣಾಙ್ಕ hf = std::min(bh, h - y0);
+            ಪ್ರತಿ (ಪೂರ್ಣಾಙ್ಕ x0 = 0; x0 < w; x0 += bw)
             {
-                const int wf = std::min(bw, w - x0);
-                for (int s = 1; s < nsl; s++)
+                ಧ್ರುವ ಪೂರ್ಣಾಙ್ಕ wf = std::min(bw, w - x0);
+                ಪ್ರತಿ (ಪೂರ್ಣಾಙ್ಕ s = 1; s < nsl; s++)
                 {
                     BrSlice& a = args[s];
-                    const int k = skind[s];
+                    ಧ್ರುವ ಪೂರ್ಣಾಙ್ಕ k = skind[s];
                     size_t esz = CV_ELEM_SIZE1(arginfo[s].depth);
-                    if (k == TExpr::TEMP)                      // contiguous block-local buffer
+                    ಯದಿ (k == TExpr::TEMP)                      // contiguous block-local buffer
                     {
                         a.ptr = tstore + (size_t)eszPrefix[smap[s]] * region;
                         a.stepy = (size_t)wf*esz; a.stepx = 1;
                     }
-                    else                                    // array operand (incl. 0-dim consts): this
+                    ಅನ್ಯಥಾ                                    // array operand (incl. 0-dim consts): this
                                                             // block of the broadcast slice
                     {
-                        const BrSlice& sl = tile.slices[smap[s]];
+                        ಧ್ರುವ BrSlice& sl = tile.slices[smap[s]];
                         a.ptr = (uchar*)sl.ptr +
                             ((size_t)y0 * sl.stepy + (size_t)x0 * sl.stepx) * esz;
                         a.stepy = sl.stepy*esz; a.stepx = sl.stepx;
                     }
                 }
 
-                for (int n = 0; n < nin; n++)
+                ಪ್ರತಿ (ಪೂರ್ಣಾಙ್ಕ n = 0; n < nin; n++)
                 {
-                    const TExpr::Insn& ins = insns[n];
-                    const BrSlice& a0 = args[ins.arg0]; const BrSlice& a1 = args[ins.arg1];
-                    const BrSlice& a2 = args[ins.arg2]; const BrSlice& rr = args[ins.result];
+                    ಧ್ರುವ TExpr::Insn& ins = insns[n];
+                    ಧ್ರುವ BrSlice& a0 = args[ins.arg0]; ಧ್ರುವ BrSlice& a1 = args[ins.arg1];
+                    ಧ್ರುವ BrSlice& a2 = args[ins.arg2]; ಧ್ರುವ BrSlice& rr = args[ins.result];
                     runInsn(ins, a0.ptr, a0.stepy, a0.stepx, a1.ptr, a1.stepy, a1.stepx,
-                            a2.ptr, a2.stepy, a2.stepx, (void*)rr.ptr, rr.stepy, wf, hf);
+                            a2.ptr, a2.stepy, a2.stepx, (ಶೂನ್ಯ*)rr.ptr, rr.stepy, wf, hf);
                 }
             }
         }
-    }, true, nstripes);
+    }, ಸತ್ಯ, nstripes);
 }
 
 // Convenience overload: inputs as a contiguous Mat array -> build the pointer array + forward.
-void TExpr::exec(const Mat* inputs, Mat* outputs)
+ಶೂನ್ಯ TExpr::exec(ಧ್ರುವ Mat* inputs, Mat* outputs)
 {
-    AutoBuffer<const Mat*, 16> ptrs(std::max(ninputs, 1));
-    for (int i = 0; i < ninputs; i++) ptrs[i] = &inputs[i];
+    AutoBuffer<ಧ್ರುವ Mat*, 16> ptrs(std::max(ninputs, 1));
+    ಪ್ರತಿ (ಪೂರ್ಣಾಙ್ಕ i = 0; i < ninputs; i++) ptrs[i] = &inputs[i];
     exec(ptrs.data(), outputs);
 }
 
@@ -1558,30 +1558,30 @@ void TExpr::exec(const Mat* inputs, Mat* outputs)
 // select's arg2 and its result (the kernel is alias-safe). select is always the LAST instruction.
 // The mask is a single-channel 1-byte array (bool/u8/s8) the size of the output spatial shape; it
 // rides the normal broadcast machinery, so nothing special is needed in the executor.
-void makeBinaryArithProgram(TExpr& p, TOp op, int depth0, int depth1, int rdepth,
-                            int maskDepth, double scale)
+ಶೂನ್ಯ make_ದ್ವಿಮಾನ_Arith_Program(TExpr& p, ತುದಿ op, ಪೂರ್ಣಾಙ್ಕ depth0, ಪೂರ್ಣಾಙ್ಕ depth1, ಪೂರ್ಣಾಙ್ಕ rdepth,
+                            ಪೂರ್ಣಾಙ್ಕ maskDepth, ದ್ವಿಗುಣ scale)
 {
     p.clear();
-    if (rdepth < 0)                                          // rdepth == -1 => auto (like cv::'s dtype=-1)
+    ಯದಿ (rdepth < 0)                                          // rdepth == -1 => auto (like cv::'s dtype=-1)
     {
-        if (opCategory(op) == CAT_COMPARE)
+        ಯದಿ (opCategory(op) == CAT_COMPARE)
             rdepth = CV_8U;                                  // compare -> u8 mask
-        else
+        ಅನ್ಯಥಾ
         {
             rdepth = promoteArith(depth0, depth1);
-            if (op == OP_ABSDIFF) rdepth = absdiffResultDepth(rdepth);   // signed |a-b| -> unsigned same width
+            ಯದಿ (op == OP_ABSDIFF) rdepth = absdiffResultDepth(rdepth);   // signed |a-b| -> unsigned same width
         }
     }
-    const bool masked = maskDepth != EW_DEPTH_NONE;
-    int sIn0  = p.addInput(depth0);
-    int sIn1  = p.addInput(depth1);
-    int sMask = masked ? p.addInput(maskDepth) : 0;
-    int sOut  = p.addOutput(rdepth);
+    ಧ್ರುವ ತಾರ್ಕಿಕ masked = maskDepth != EW_DEPTH_NONE;
+    ಪೂರ್ಣಾಙ್ಕ sIn0  = p.add_ಒಳಹರಿವು(depth0);
+    ಪೂರ್ಣಾಙ್ಕ sIn1  = p.add_ಒಳಹರಿವು(depth1);
+    ಪೂರ್ಣಾಙ್ಕ sMask = masked ? p.add_ಒಳಹರಿವು(maskDepth) : 0;
+    ಪೂರ್ಣಾಙ್ಕ sOut  = p.addOutput(rdepth);
 
-    int r = p.emitBinary(op, sIn0, sIn1, rdepth, Scalar(scale));
-    if (masked)
+    ಪೂರ್ಣಾಙ್ಕ r = p.emit_ದ್ವಿಮಾನ(op, sIn0, sIn1, rdepth, Scalar(scale));
+    ಯದಿ (masked)
         p.addInsn(OP_SELECT, sMask, r, sOut, sOut);          // dst = mask ? r : dst
-    else
+    ಅನ್ಯಥಾ
         p.moveToOutput(r, sOut);                             // straight into the output, no dead temp
 
     p.compile();    // pack temp buffers + count consts (kernels already bound by addInsn)
@@ -1590,14 +1590,14 @@ void makeBinaryArithProgram(TExpr& p, TOp op, int depth0, int depth1, int rdepth
 // addWeighted(a, alpha, b, beta, gamma) = a*alpha + b*beta + gamma. One fused kernel (two v_fma) via
 // emitBinary(OP_ADDW); a final cast is appended only when the requested rdepth isn't a type the kernel
 // emits directly. alpha/beta/gamma travel in the instruction's params block, not as operands.
-void makeAddWeightedProgram(TExpr& p, int depth0, int depth1, int rdepth,
-                            double alpha, double beta, double gamma)
+ಶೂನ್ಯ makeAddWeightedProgram(TExpr& p, ಪೂರ್ಣಾಙ್ಕ depth0, ಪೂರ್ಣಾಙ್ಕ depth1, ಪೂರ್ಣಾಙ್ಕ rdepth,
+                            ದ್ವಿಗುಣ alpha, ದ್ವಿಗುಣ beta, ದ್ವಿಗುಣ gamma)
 {
     p.clear();
-    int sA   = p.addInput(depth0);
-    int sB   = p.addInput(depth1);
-    int sOut = p.addOutput(rdepth);
-    int r = p.emitBinary(OP_ADDW, sA, sB, rdepth, Scalar(alpha, beta, gamma));
+    ಪೂರ್ಣಾಙ್ಕ sA   = p.add_ಒಳಹರಿವು(depth0);
+    ಪೂರ್ಣಾಙ್ಕ sB   = p.add_ಒಳಹರಿವು(depth1);
+    ಪೂರ್ಣಾಙ್ಕ sOut = p.addOutput(rdepth);
+    ಪೂರ್ಣಾಙ್ಕ r = p.emit_ದ್ವಿಮಾನ(OP_ADDW, sA, sB, rdepth, Scalar(alpha, beta, gamma));
     p.moveToOutput(r, sOut);
     p.compile();    // pack temp buffers + count consts (kernels already bound by addInsn)
 }
@@ -1605,154 +1605,154 @@ void makeAddWeightedProgram(TExpr& p, int depth0, int depth1, int rdepth,
 
 // ============================ parser (was ew_parser.cpp) ============================
 
-namespace {
+ನಾಮಾಕಾಶ {
 
 // --- tokens ------------------------------------------------------------------------------
-enum TokType { T_NUM, T_INPUT, T_IDENT, T_OP, T_LPAREN, T_RPAREN, T_COMMA, T_SEMI, T_ASSIGN, T_END };
+ಗಣನಾ TokType { T_ಅಂಕೆ, T_ಒಳಹರಿವು, T_IDENT, T_OP, T_LPAREN, T_RPAREN, T_COMMA, T_SEMI, T_ASSIGN, T_END };
 
-struct Token
+ಸಂರಚನಾ Token
 {
     TokType type = T_END;
-    double num = 0;
-    int input = 0;
+    ದ್ವಿಗುಣ num = 0;
+    ಪೂರ್ಣಾಙ್ಕ ಒಳಹರಿವು_2 = 0;
     std::string text;     // identifier or operator spelling
 };
 
 // --- lexer -------------------------------------------------------------------------------
-struct Lexer
+ಸಂರಚನಾ Lexer
 {
     std::string_view s;
     size_t pos = 0;
 
     explicit Lexer(std::string_view src) : s(src) {}
 
-    static bool isIdentStart(char c) { return std::isalpha((unsigned char)c) || c == '_'; }
-    static bool isIdentChar(char c)  { return std::isalnum((unsigned char)c) || c == '_'; }
+    ಸ್ಥಿರ ತಾರ್ಕಿಕ isIdentStart(ವರ್ಣ c) { ಪ್ರತ್ಯಾಗಮ std::isalpha((unsigned ವರ್ಣ)c) || c == '_'; }
+    ಸ್ಥಿರ ತಾರ್ಕಿಕ isIdentChar(ವರ್ಣ c)  { ಪ್ರತ್ಯಾಗಮ std::isalnum((unsigned ವರ್ಣ)c) || c == '_'; }
 
     Token next()
     {
-        while (pos < s.size() && std::isspace((unsigned char)s[pos])) pos++;
+        ಯಾವತ್ (pos < s.size() && std::isspace((unsigned ವರ್ಣ)s[pos])) pos++;
         Token t;
-        if (pos >= s.size()) { t.type = T_END; return t; }
+        ಯದಿ (pos >= s.size()) { t.type = T_END; ಪ್ರತ್ಯಾಗಮ t; }
 
-        char c = s[pos];
+        ವರ್ಣ c = s[pos];
 
-        if (c == '{')                       // input placeholder {N}
+        ಯದಿ (c == '{')                       // input placeholder {N}
         {
             pos++;
             size_t start = pos;
-            while (pos < s.size() && s[pos] != '}') pos++;
+            ಯಾವತ್ (pos < s.size() && s[pos] != '}') pos++;
             CV_Assert(pos < s.size() && "ew::expression: unterminated '{'");
-            t.type = T_INPUT;
-            t.input = std::atoi(std::string(s.substr(start, pos - start)).c_str());
+            t.type = T_ಒಳಹರಿವು;
+            t.ಒಳಹರಿವು_2 = std::atoi(std::string(s.substr(start, pos - start)).c_str());
             pos++;                          // consume '}'
-            return t;
+            ಪ್ರತ್ಯಾಗಮ t;
         }
-        if (std::isdigit((unsigned char)c) || (c == '.' && pos + 1 < s.size() &&
-                                               std::isdigit((unsigned char)s[pos + 1])))
+        ಯದಿ (std::isdigit((unsigned ವರ್ಣ)c) || (c == '.' && pos + 1 < s.size() &&
+                                               std::isdigit((unsigned ವರ್ಣ)s[pos + 1])))
         {
-            char* end = nullptr;
+            ವರ್ಣ* end = nullptr;
             std::string num(s.substr(pos));
-            t.type = T_NUM;
+            t.type = T_ಅಂಕೆ;
             t.num = std::strtod(num.c_str(), &end);
             pos += (size_t)(end - num.c_str());
-            return t;
+            ಪ್ರತ್ಯಾಗಮ t;
         }
-        if (isIdentStart(c))
+        ಯದಿ (isIdentStart(c))
         {
             size_t start = pos;
-            while (pos < s.size() && isIdentChar(s[pos])) pos++;
+            ಯಾವತ್ (pos < s.size() && isIdentChar(s[pos])) pos++;
             t.type = T_IDENT;
             t.text.assign(s.substr(start, pos - start));
-            return t;
+            ಪ್ರತ್ಯಾಗಮ t;
         }
-        switch (c)
+        ವಿಕಲ್ಪ (c)
         {
-        case '(': pos++; t.type = T_LPAREN; return t;
-        case ')': pos++; t.type = T_RPAREN; return t;
-        case ',': pos++; t.type = T_COMMA;  return t;
-        case ';': pos++; t.type = T_SEMI;   return t;
+        ಪಕ್ಷ '(': pos++; t.type = T_LPAREN; ಪ್ರತ್ಯಾಗಮ t;
+        ಪಕ್ಷ ')': pos++; t.type = T_RPAREN; ಪ್ರತ್ಯಾಗಮ t;
+        ಪಕ್ಷ ',': pos++; t.type = T_COMMA;  ಪ್ರತ್ಯಾಗಮ t;
+        ಪಕ್ಷ ';': pos++; t.type = T_SEMI;   ಪ್ರತ್ಯಾಗಮ t;
         }
         // multi/!single-char operators
-        auto two = [&](const char* op) {
-            return pos + 1 < s.size() && s[pos] == op[0] && s[pos + 1] == op[1];
+        auto two = [&](ಧ್ರುವ ವರ್ಣ* op) {
+            ಪ್ರತ್ಯಾಗಮ pos + 1 < s.size() && s[pos] == op[0] && s[pos + 1] == op[1];
         };
         t.type = T_OP;
-        if (two("<=") || two(">=") || two("==") || two("!=") || two("**"))
-        { t.text.assign(s.substr(pos, 2)); pos += 2; return t; }
-        if (c == '=') { pos++; t.type = T_ASSIGN; return t; }
+        ಯದಿ (two("<=") || two(">=") || two("==") || two("!=") || two("**"))
+        { t.text.assign(s.substr(pos, 2)); pos += 2; ಪ್ರತ್ಯಾಗಮ t; }
+        ಯದಿ (c == '=') { pos++; t.type = T_ASSIGN; ಪ್ರತ್ಯಾಗಮ t; }
         CV_Assert(std::strchr("+-*/<>&|^!?:", c) && "ew::expression: unexpected character");
         t.text.assign(1, c); pos++;
-        return t;
+        ಪ್ರತ್ಯಾಗಮ t;
     }
 };
 
 // --- operator / function tables ----------------------------------------------------------
-static int binPrec(const std::string& op)
+ಸ್ಥಿರ ಪೂರ್ಣಾಙ್ಕ binPrec(ಧ್ರುವ std::string& op)
 {
-    if (op == "**") return 8;              // power binds tighter than '*'; RIGHT-associative
-    if (op == "*" || op == "/") return 7;
-    if (op == "+" || op == "-") return 6;
-    if (op == "<" || op == "<=" || op == ">" || op == ">=") return 5;
-    if (op == "==" || op == "!=") return 4;
-    if (op == "&") return 3;
-    if (op == "^") return 2;
-    if (op == "|") return 1;
-    return -1;
+    ಯದಿ (op == "**") ಪ್ರತ್ಯಾಗಮ 8;              // power binds tighter than '*'; RIGHT-associative
+    ಯದಿ (op == "*" || op == "/") ಪ್ರತ್ಯಾಗಮ 7;
+    ಯದಿ (op == "+" || op == "-") ಪ್ರತ್ಯಾಗಮ 6;
+    ಯದಿ (op == "<" || op == "<=" || op == ">" || op == ">=") ಪ್ರತ್ಯಾಗಮ 5;
+    ಯದಿ (op == "==" || op == "!=") ಪ್ರತ್ಯಾಗಮ 4;
+    ಯದಿ (op == "&") ಪ್ರತ್ಯಾಗಮ 3;
+    ಯದಿ (op == "^") ಪ್ರತ್ಯಾಗಮ 2;
+    ಯದಿ (op == "|") ಪ್ರತ್ಯಾಗಮ 1;
+    ಪ್ರತ್ಯಾಗಮ -1;
 }
 
-static TOp binOp(const std::string& op)
+ಸ್ಥಿರ ತುದಿ binOp(ಧ್ರುವ std::string& op)
 {
-    if (op == "**") return OP_POW;
-    if (op == "+")  return OP_ADD;
-    if (op == "-")  return OP_SUB;
-    if (op == "*")  return OP_MUL;
-    if (op == "/")  return OP_DIV;
-    if (op == "<")  return OP_CMP_LT;
-    if (op == "<=") return OP_CMP_LE;
-    if (op == ">")  return OP_CMP_GT;
-    if (op == ">=") return OP_CMP_GE;
-    if (op == "==") return OP_CMP_EQ;
-    if (op == "!=") return OP_CMP_NE;
-    if (op == "&")  return OP_AND;
-    if (op == "|")  return OP_OR;
-    if (op == "^")  return OP_XOR;
+    ಯದಿ (op == "**") ಪ್ರತ್ಯಾಗಮ OP_POW;
+    ಯದಿ (op == "+")  ಪ್ರತ್ಯಾಗಮ OP_ADD;
+    ಯದಿ (op == "-")  ಪ್ರತ್ಯಾಗಮ OP_SUB;
+    ಯದಿ (op == "*")  ಪ್ರತ್ಯಾಗಮ OP_MUL;
+    ಯದಿ (op == "/")  ಪ್ರತ್ಯಾಗಮ OP_DIV;
+    ಯದಿ (op == "<")  ಪ್ರತ್ಯಾಗಮ OP_CMP_LT;
+    ಯದಿ (op == "<=") ಪ್ರತ್ಯಾಗಮ OP_CMP_LE;
+    ಯದಿ (op == ">")  ಪ್ರತ್ಯಾಗಮ OP_CMP_GT;
+    ಯದಿ (op == ">=") ಪ್ರತ್ಯಾಗಮ OP_CMP_GE;
+    ಯದಿ (op == "==") ಪ್ರತ್ಯಾಗಮ OP_CMP_EQ;
+    ಯದಿ (op == "!=") ಪ್ರತ್ಯಾಗಮ OP_CMP_NE;
+    ಯದಿ (op == "&")  ಪ್ರತ್ಯಾಗಮ OP_AND;
+    ಯದಿ (op == "|")  ಪ್ರತ್ಯಾಗಮ OP_OR;
+    ಯದಿ (op == "^")  ಪ್ರತ್ಯಾಗಮ OP_XOR;
     CV_Error(Error::StsParseError, "ew::expression: bad binary operator");
 }
 
 // type-cast function name -> depth, or -1 if not a type name
-static int typeDepth(const std::string& name)
+ಸ್ಥಿರ ಪೂರ್ಣಾಙ್ಕ typeDepth(ಧ್ರುವ std::string& name)
 {
-    if (name == "float")    return CV_32F;
-    if (name == "double")   return CV_64F;
-    if (name == "half" || name == "float16") return CV_16F;
-    if (name == "bfloat16") return CV_16BF;
-    if (name == "uint8")    return CV_8U;
-    if (name == "int8")     return CV_8S;
-    if (name == "uint16")   return CV_16U;
-    if (name == "int16")    return CV_16S;
-    if (name == "uint32")   return CV_32U;
-    if (name == "int32")    return CV_32S;
-    if (name == "uint64")   return CV_64U;
-    if (name == "int64")    return CV_64S;
-    return -1;
+    ಯದಿ (name == "float")    ಪ್ರತ್ಯಾಗಮ CV_32F;
+    ಯದಿ (name == "double")   ಪ್ರತ್ಯಾಗಮ CV_64F;
+    ಯದಿ (name == "half" || name == "float16") ಪ್ರತ್ಯಾಗಮ CV_16F;
+    ಯದಿ (name == "bfloat16") ಪ್ರತ್ಯಾಗಮ CV_16BF;
+    ಯದಿ (name == "uint8")    ಪ್ರತ್ಯಾಗಮ CV_8U;
+    ಯದಿ (name == "int8")     ಪ್ರತ್ಯಾಗಮ CV_8S;
+    ಯದಿ (name == "uint16")   ಪ್ರತ್ಯಾಗಮ CV_16U;
+    ಯದಿ (name == "int16")    ಪ್ರತ್ಯಾಗಮ CV_16S;
+    ಯದಿ (name == "uint32")   ಪ್ರತ್ಯಾಗಮ CV_32U;
+    ಯದಿ (name == "int32")    ಪ್ರತ್ಯಾಗಮ CV_32S;
+    ಯದಿ (name == "uint64")   ಪ್ರತ್ಯಾಗಮ CV_64U;
+    ಯದಿ (name == "int64")    ಪ್ರತ್ಯಾಗಮ CV_64S;
+    ಪ್ರತ್ಯಾಗಮ -1;
 }
 
 // element-wise op function name -> (op, arity), or arity 0 if unknown
-static TOp fnOp(const std::string& name, int& arity)
+ಸ್ಥಿರ ತುದಿ fnOp(ಧ್ರುವ std::string& name, ಪೂರ್ಣಾಙ್ಕ& arity)
 {
-    struct E { const char* n; TOp op; };
-    static const E unary[]  = { {"abs",OP_ABS},{"sqrt",OP_SQRT},{"exp",OP_EXP},{"log",OP_LOG},
+    ಸಂರಚನಾ E { ಧ್ರುವ ವರ್ಣ* n; ತುದಿ op; };
+    ಸ್ಥಿರ ಧ್ರುವ E unary[]  = { {"abs",OP_ABS},{"sqrt",OP_SQRT},{"exp",OP_EXP},{"log",OP_LOG},
                                 {"sin",OP_SIN},{"cos",OP_COS},{"tanh",OP_TANH},{"erf",OP_ERF},
                                 {"relu",OP_RELU} };
-    static const E binary[] = { {"max",OP_MAX},{"min",OP_MIN},{"pow",OP_POW},{"absdiff",OP_ABSDIFF},
+    ಸ್ಥಿರ ಧ್ರುವ E binary[] = { {"max",OP_MAX},{"min",OP_MIN},{"pow",OP_POW},{"absdiff",OP_ABSDIFF},
                                 {"hypot",OP_HYPOT},{"mag",OP_HYPOT},     // mag = the cv::magnitude-flavored alias
                                 {"atan2",OP_ATAN2} };
-    static const E tern[]   = { {"clamp",OP_CLAMP},{"select",OP_SELECT} };
-    for (const E& e : unary)  if (name == e.n) { arity = 1; return e.op; }
-    for (const E& e : binary) if (name == e.n) { arity = 2; return e.op; }
-    for (const E& e : tern)   if (name == e.n) { arity = 3; return e.op; }
-    arity = 0; return OP_NOP;
+    ಸ್ಥಿರ ಧ್ರುವ E tern[]   = { {"clamp",OP_CLAMP},{"select",OP_SELECT} };
+    ಪ್ರತಿ (ಧ್ರುವ E& e : unary)  ಯದಿ (name == e.n) { arity = 1; ಪ್ರತ್ಯಾಗಮ e.op; }
+    ಪ್ರತಿ (ಧ್ರುವ E& e : binary) ಯದಿ (name == e.n) { arity = 2; ಪ್ರತ್ಯಾಗಮ e.op; }
+    ಪ್ರತಿ (ಧ್ರುವ E& e : tern)   ಯದಿ (name == e.n) { arity = 3; ಪ್ರತ್ಯಾಗಮ e.op; }
+    arity = 0; ಪ್ರತ್ಯಾಗಮ OP_NOP;
 }
 
 // --- parser ------------------------------------------------------------------------------
@@ -1760,147 +1760,147 @@ static TOp fnOp(const std::string& name, int& arity)
 // builders: each parse step calls e.emitUnary()/emitBinary()/addConst()/output() and returns the arg
 // SLOT holding its value. Input depths are known up front (from the input Mats), so every operand is
 // typed as it is parsed - the emit* layers infer result depths and insert casts on the spot.
-struct Parser
+ಸಂರಚನಾ Parser
 {
     Lexer lex;
     Token cur;
     TExpr& e;
-    const int* inputSlot;                 // slot id of each external input (precreated)
-    int ninputs;
-    std::map<std::string, int> env;       // named temporaries -> slot
+    ಧ್ರುವ ಪೂರ್ಣಾಙ್ಕ* ಒಳಹರಿವು_Slot;                 // slot id of each external input (precreated)
+    ಪೂರ್ಣಾಙ್ಕ ninputs;
+    std::map<std::string, ಪೂರ್ಣಾಙ್ಕ> env;       // named temporaries -> slot
 
-    Parser(std::string_view src, TExpr& expr, const int* islot, int nin)
-        : lex(src), e(expr), inputSlot(islot), ninputs(nin) { cur = lex.next(); }
+    Parser(std::string_view src, TExpr& ಅಭಿವ್ಯಕ್ತಿ, ಧ್ರುವ ಪೂರ್ಣಾಙ್ಕ* islot, ಪೂರ್ಣಾಙ್ಕ nin)
+        : lex(src), e(ಅಭಿವ್ಯಕ್ತಿ), ಒಳಹರಿವು_Slot(islot), ninputs(nin) { cur = lex.next(); }
 
-    void advance() { cur = lex.next(); }
-    bool isOp(const char* op) const { return cur.type == T_OP && cur.text == op; }
+    ಶೂನ್ಯ advance() { cur = lex.next(); }
+    ತಾರ್ಕಿಕ isOp(ಧ್ರುವ ವರ್ಣ* op) ಧ್ರುವ { ಪ್ರತ್ಯಾಗಮ cur.type == T_OP && cur.text == op; }
 
-    void expect(TokType t, const char* what)
+    ಶೂನ್ಯ expect(TokType t, ಧ್ರುವ ವರ್ಣ* what)
     {
         CV_Assert(cur.type == t && what);
         advance();
     }
 
     // A flexible CONST slot holds a literal whose depth the emit* layers pick per use.
-    bool isFlexConst(int slot) const
+    ತಾರ್ಕಿಕ isFlexConst(ಪೂರ್ಣಾಙ್ಕ slot) ಧ್ರುವ
     {
-        return e.arginfo[slot].kind == TExpr::CONST && e.arginfo[slot].depth == EW_DEPTH_NONE;
+        ಪ್ರತ್ಯಾಗಮ e.arginfo[slot].kind == TExpr::CONST && e.arginfo[slot].depth == EW_DEPTH_NONE;
     }
 
-    int parsePrimary()
+    ಪೂರ್ಣಾಙ್ಕ parsePrimary()
     {
-        if (cur.type == T_NUM)   { int s = e.addConst(EW_DEPTH_NONE, Scalar(cur.num), 1); advance(); return s; }
-        if (cur.type == T_INPUT) { int idx = cur.input; advance();
+        ಯದಿ (cur.type == T_ಅಂಕೆ)   { ಪೂರ್ಣಾಙ್ಕ s = e.addConst(EW_DEPTH_NONE, Scalar(cur.num), 1); advance(); ಪ್ರತ್ಯಾಗಮ s; }
+        ಯದಿ (cur.type == T_ಒಳಹರಿವು) { ಪೂರ್ಣಾಙ್ಕ idx = cur.ಒಳಹರಿವು_2; advance();
                                    CV_Assert(idx >= 0 && idx < ninputs && "ew::expression: input index out of range");
-                                   return inputSlot[idx]; }
-        if (cur.type == T_LPAREN){ advance(); int x = parseTernary(); expect(T_RPAREN, "expected ')'"); return x; }
-        if (cur.type == T_IDENT)
+                                   ಪ್ರತ್ಯಾಗಮ ಒಳಹರಿವು_Slot[idx]; }
+        ಯದಿ (cur.type == T_LPAREN){ advance(); ಪೂರ್ಣಾಙ್ಕ x = parseTernary(); expect(T_RPAREN, "expected ')'"); ಪ್ರತ್ಯಾಗಮ x; }
+        ಯದಿ (cur.type == T_IDENT)
         {
             std::string name = cur.text; advance();
-            if (cur.type != T_LPAREN)             // variable reference
+            ಯದಿ (cur.type != T_LPAREN)             // variable reference
             {
                 auto it = env.find(name);
                 CV_Assert(it != env.end() && "ew::expression: undefined name");
-                return it->second;
+                ಪ್ರತ್ಯಾಗಮ it->second;
             }
             advance();                            // consume '('
             // every function takes <= 3 args (clamp/select); a stack buffer avoids a std::vector
             // heap alloc. The {} is for gcc's -Wmaybe-uninitialized only.
-            std::array<int, 8> args = {}; int nargs = 0;
-            if (cur.type != T_RPAREN)
+            std::array<ಪೂರ್ಣಾಙ್ಕ, 8> args = {}; ಪೂರ್ಣಾಙ್ಕ nargs = 0;
+            ಯದಿ (cur.type != T_RPAREN)
             {
                 args[nargs++] = parseTernary();
-                while (cur.type == T_COMMA) { advance();
-                    CV_Assert(nargs < (int)args.size() && "ew::expression: too many arguments");
+                ಯಾವತ್ (cur.type == T_COMMA) { advance();
+                    CV_Assert(nargs < (ಪೂರ್ಣಾಙ್ಕ)args.size() && "ew::expression: too many arguments");
                     args[nargs++] = parseTernary(); }
             }
             expect(T_RPAREN, "expected ')'");
 
-            int td = typeDepth(name);
-            if (td >= 0)
+            ಪೂರ್ಣಾಙ್ಕ td = typeDepth(name);
+            ಯದಿ (td >= 0)
             {
                 CV_Assert(nargs == 1);                       // type cast: just convert the operand
-                int s = args[0];
-                return isFlexConst(s) ? e.typedConstFrom(s, td)
+                ಪೂರ್ಣಾಙ್ಕ s = args[0];
+                ಪ್ರತ್ಯಾಗಮ isFlexConst(s) ? e.typedConstFrom(s, td)
                                       : e.maybeAddCast(s, td);
             }
 
-            int arity = 0; TOp op = fnOp(name, arity);
+            ಪೂರ್ಣಾಙ್ಕ arity = 0; ತುದಿ op = fnOp(name, arity);
             CV_Assert(arity != 0 && "ew::expression: unknown function");
             CV_Assert(nargs == arity && "ew::expression: wrong number of arguments");
-            if (arity == 1) return e.emitUnary(op, args[0]);
-            if (arity == 2) return e.emitBinary(op, args[0], args[1]);
-            return e.emitTernary(op, args[0], args[1], args[2]);
+            ಯದಿ (arity == 1) ಪ್ರತ್ಯಾಗಮ e.emitUnary(op, args[0]);
+            ಯದಿ (arity == 2) ಪ್ರತ್ಯಾಗಮ e.emit_ದ್ವಿಮಾನ(op, args[0], args[1]);
+            ಪ್ರತ್ಯಾಗಮ e.emitTernary(op, args[0], args[1], args[2]);
         }
         CV_Error(Error::StsParseError, "ew::expression: expected a primary expression");
     }
 
-    int parseUnary()
+    ಪೂರ್ಣಾಙ್ಕ parseUnary()
     {
-        if (isOp("-") || isOp("!"))
+        ಯದಿ (isOp("-") || isOp("!"))
         {
             std::string op = cur.text; advance();
-            int operand = parseUnary();
+            ಪೂರ್ಣಾಙ್ಕ operand = parseUnary();
             // constant-fold a leading sign so that "-1.5" does not need an OP_NEG kernel
-            if (op == "-" && isFlexConst(operand))
+            ಯದಿ (op == "-" && isFlexConst(operand))
             {
-                AutoBuffer<double, MAX_LOCAL_CN> v; int cn = constDoubles(e, operand, v);
-                Scalar neg; for (int i = 0; i < cn && i < 4; i++) neg[i] = -v[i];
-                return e.addConst(EW_DEPTH_NONE, neg, std::min(cn, 4));
+                AutoBuffer<ದ್ವಿಗುಣ, MAX_LOCAL_CN> v; ಪೂರ್ಣಾಙ್ಕ cn = constDoubles(e, operand, v);
+                Scalar neg; ಪ್ರತಿ (ಪೂರ್ಣಾಙ್ಕ i = 0; i < cn && i < 4; i++) neg[i] = -v[i];
+                ಪ್ರತ್ಯಾಗಮ e.addConst(EW_DEPTH_NONE, neg, std::min(cn, 4));
             }
-            return e.emitUnary(op == "-" ? OP_NEG : OP_NOT, operand);
+            ಪ್ರತ್ಯಾಗಮ e.emitUnary(op == "-" ? OP_NEG : OP_NOT, operand);
         }
-        return parsePrimary();
+        ಪ್ರತ್ಯಾಗಮ parsePrimary();
     }
 
-    int parseExpr(int minPrec)
+    ಪೂರ್ಣಾಙ್ಕ parse_ಅಭಿವ್ಯಕ್ತಿ(ಪೂರ್ಣಾಙ್ಕ minPrec)
     {
-        int left = parseUnary();
-        while (cur.type == T_OP)
+        ಪೂರ್ಣಾಙ್ಕ ಎಡ = parseUnary();
+        ಯಾವತ್ (cur.type == T_OP)
         {
-            int p = binPrec(cur.text);
-            if (p < minPrec) break;
+            ಪೂರ್ಣಾಙ್ಕ p = binPrec(cur.text);
+            ಯದಿ (p < minPrec) ಭಙ್ಗ;
             std::string op = cur.text; advance();
             // '**' is right-associative (a ** b ** c == a ** (b ** c)): recurse at the SAME
             // precedence so the right side swallows further '**'s; everything else at p+1.
-            int right = parseExpr(op == "**" ? p : p + 1);
-            left = e.emitBinary(binOp(op), left, right);
+            ಪೂರ್ಣಾಙ್ಕ ಬಲ = parse_ಅಭಿವ್ಯಕ್ತಿ(op == "**" ? p : p + 1);
+            ಎಡ = e.emit_ದ್ವಿಮಾನ(binOp(op), ಎಡ, ಬಲ);
         }
-        return left;
+        ಪ್ರತ್ಯಾಗಮ ಎಡ;
     }
 
     // The ternary conditional  cond ? a : b  == select(cond, a, b). Lowest precedence (below all
     // arithmetic/compare/bitwise), right-associative: f1 ? a : f2 ? b : c groups as
     // f1 ? a : (f2 ? b : c). This is the general expression entry point.
-    int parseTernary()
+    ಪೂರ್ಣಾಙ್ಕ parseTernary()
     {
-        int cond = parseExpr(0);
-        if (!isOp("?")) return cond;
+        ಪೂರ್ಣಾಙ್ಕ cond = parse_ಅಭಿವ್ಯಕ್ತಿ(0);
+        ಯದಿ (!isOp("?")) ಪ್ರತ್ಯಾಗಮ cond;
         advance();
-        int thenv = parseTernary();
+        ಪೂರ್ಣಾಙ್ಕ thenv = parseTernary();
         CV_Assert(isOp(":") && "ew::expression: expected ':' in a ?: conditional");
         advance();
-        int elsev = parseTernary();               // right-associative chain
-        return e.emitTernary(OP_SELECT, cond, thenv, elsev);
+        ಪೂರ್ಣಾಙ್ಕ elsev = parseTernary();               // right-associative chain
+        ಪ್ರತ್ಯಾಗಮ e.emitTernary(OP_SELECT, cond, thenv, elsev);
     }
 
     // final result: a single expression, or a top-level tuple (e0, e1, ...).
-    void parseResult()
+    ಶೂನ್ಯ parseResult()
     {
-        if (cur.type == T_LPAREN)
+        ಯದಿ (cur.type == T_LPAREN)
         {
             // backtrack point: save the lexer AND the program length, since the trial parse below
             // emits instructions/slots that must be rolled back if this turns out NOT to be a tuple.
             Lexer save = lex; Token savedCur = cur;
-            size_t nInsn = e.prog.size(), nArg = e.arginfo.size(); int nTemp = e.ntemps;
+            size_t nInsn = e.prog.size(), nArg = e.arginfo.size(); ಪೂರ್ಣಾಙ್ಕ nTemp = e.ntemps;
             advance();
-            int e0 = parseTernary();
-            if (cur.type == T_COMMA)
+            ಪೂರ್ಣಾಙ್ಕ e0 = parseTernary();
+            ಯದಿ (cur.type == T_COMMA)
             {
                 e.output(e0);
-                while (cur.type == T_COMMA) { advance(); e.output(parseTernary()); }
+                ಯಾವತ್ (cur.type == T_COMMA) { advance(); e.output(parseTernary()); }
                 expect(T_RPAREN, "expected ')'");
-                return;
+                ಪ್ರತ್ಯಾಗಮ;
             }
             lex = save; cur = savedCur;                   // not a tuple -> undo the trial parse
             e.prog.resize(nInsn); e.arginfo.resize(nArg); e.ntemps = nTemp;
@@ -1908,31 +1908,31 @@ struct Parser
         e.output(parseTernary());
     }
 
-    void parse()
+    ಶೂನ್ಯ parse()
     {
-        while (true)
+        ಯಾವತ್ (ಸತ್ಯ)
         {
-            if (cur.type == T_IDENT)
+            ಯದಿ (cur.type == T_IDENT)
             {
                 Lexer save = lex; Token savedCur = cur;   // lexer-only backtrack (nothing emitted yet)
                 std::string name = cur.text; advance();
-                if (cur.type == T_ASSIGN)
+                ಯದಿ (cur.type == T_ASSIGN)
                 {
                     advance();
-                    const int slot = parseTernary();
+                    ಧ್ರುವ ಪೂರ್ಣಾಙ್ಕ slot = parseTernary();
                     // The name can be used any number of times below (including not at all), so the
                     // value must outlive the expression that produced it: pin the slot so the
                     // retire-the-temp optimizations skip it.
-                    e.arginfo[slot].pinned = true;
+                    e.arginfo[slot].pinned = ಸತ್ಯ;
                     env[name] = slot;
                     expect(T_SEMI, "expected ';' after assignment");
-                    continue;
+                    ಅನುವರ್ತ;
                 }
                 lex = save; cur = savedCur;               // not an assignment
             }
             parseResult();
-            if (cur.type == T_SEMI) advance();
-            break;
+            ಯದಿ (cur.type == T_SEMI) advance();
+            ಭಙ್ಗ;
         }
         CV_Assert(cur.type == T_END && "ew::expression: trailing tokens");
         CV_Assert(e.noutputs > 0 && "ew::expression: no result");
@@ -1943,35 +1943,35 @@ struct Parser
 
 }} // namespace cv::ew
 
-namespace cv {
+ನಾಮಾಕಾಶ cv {
 
 // Public entry point (declared in opencv2/core.hpp): parse a broadcasting element-wise expression,
 // compile it and run it over the inputs. This IS the engine's string front-end - there is no
 // separate cv::ew::expression indirection.
-void texpr(const std::string& expr, InputArrayOfArrays _inputs, OutputArrayOfArrays _outputs)
+ಶೂನ್ಯ texpr(ಧ್ರುವ std::string& ಅಭಿವ್ಯಕ್ತಿ, ಒಳಹರಿವು_Array_Of_Arrays _inputs, OutputArrayOfArrays _outputs)
 {
-    using namespace cv::ew;
+    using ನಾಮಾಕಾಶ cv::ew;
     CV_INSTRUMENT_REGION();
-    CV_Assert(_inputs.kind() == _InputArray::STD_VECTOR_MAT);
-    const std::vector<Mat>& inps = *(const std::vector<Mat>*)_inputs.getObj();
-    const int ninputs = (int)inps.size();
-    for (int i = 0; i < ninputs; i++)
+    CV_Assert(_inputs.kind() == ಒಳಹರಿವು_Array_2::STD_VECTOR_MAT);
+    ಧ್ರುವ std::vector<Mat>& inps = *(ಧ್ರುವ std::vector<Mat>*)_inputs.getObj();
+    ಧ್ರುವ ಪೂರ್ಣಾಙ್ಕ ninputs = (ಪೂರ್ಣಾಙ್ಕ)inps.size();
+    ಪ್ರತಿ (ಪೂರ್ಣಾಙ್ಕ i = 0; i < ninputs; i++)
         CV_Assert(!inps[i].empty());
 
     // Input depths are known now, so build a fully-typed program straight away: one INPUT slot per
     // input (slot index i carries input i's depth), then parse the expression into instructions.
     TExpr e;
-    AutoBuffer<int> islot(std::max(ninputs, 1));
-    for (int i = 0; i < ninputs; i++) islot[i] = e.addInput(inps[i].depth());
-    Parser(expr, e, islot.data(), ninputs).parse();
+    AutoBuffer<ಪೂರ್ಣಾಙ್ಕ> islot(std::max(ninputs, 1));
+    ಪ್ರತಿ (ಪೂರ್ಣಾಙ್ಕ i = 0; i < ninputs; i++) islot[i] = e.add_ಒಳಹರಿವು(inps[i].depth());
+    Parser(ಅಭಿವ್ಯಕ್ತಿ, e, islot.data(), ninputs).parse();
     e.compile();
 
     auto kind = _outputs.kind();
-    if (kind == _InputArray::STD_VECTOR_MAT) {
+    ಯದಿ (kind == ಒಳಹರಿವು_Array_2::STD_VECTOR_MAT) {
         std::vector<Mat>& outs = _outputs.getMatVecRef();
         outs.resize(e.noutputs);
         e.exec(inps.data(), outs.data());
-    } else {
+    } ಅನ್ಯಥಾ {
         CV_Error(Error::StsNotImplemented, "vector<Mat> is expected as output of texpr");
     }
 }
