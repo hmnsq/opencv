@@ -2,68 +2,68 @@
 // It is subject to the license terms in the LICENSE file found in the top-level directory
 // of this distribution and at http://opencv.org/license.html.
 
-#include "../precomp.hpp"
+#অন্তর্ভাব "../precomp.hpp"
 
-#include <vector>
+#অন্তর্ভাব <vector>
 
-#include <opencv2/core/utils/logger.defines.hpp>
+#অন্তর্ভাব <opencv2/core/utils/logger.defines.hpp>
 #undef CV_LOG_STRIP_LEVEL
 #define CV_LOG_STRIP_LEVEL CV_LOG_LEVEL_VERBOSE + 1
-#include "opencv2/core/utils/logger.hpp"
-#include "opencv2/core/utils/filesystem.hpp"
-#include "opencv2/core/utils/filesystem.private.hpp"
+#অন্তর্ভাব "opencv2/core/utils/logger.hpp"
+#অন্তর্ভাব "opencv2/core/utils/filesystem.hpp"
+#অন্তর্ভাব "opencv2/core/utils/filesystem.private.hpp"
 
-namespace cv { namespace samples {
+নামাকাশ cv { নামাকাশ samples {
 
-static cv::Ptr< std::vector<cv::String> > g_data_search_path;
-static cv::Ptr< std::vector<cv::String> > g_data_search_subdir;
+স্থির cv::Ptr< std::vector<cv::String> > g_তথ্য_অনুসন্ধান_path;
+স্থির cv::Ptr< std::vector<cv::String> > g_তথ্য_অনুসন্ধান_subdir;
 
-static std::vector<cv::String>& _getDataSearchPath()
+স্থির std::vector<cv::String>& get_তথ্য_অনুসন্ধান_Path()
 {
-    if (g_data_search_path.empty())
-        g_data_search_path.reset(new std::vector<cv::String>());
-    return *(g_data_search_path.get());
+    যদি (g_তথ্য_অনুসন্ধান_path.empty())
+        g_তথ্য_অনুসন্ধান_path.reset(নতুন std::vector<cv::String>());
+    ফেরত *(g_তথ্য_অনুসন্ধান_path.get());
 }
 
-static std::vector<cv::String>& _getDataSearchSubDirectory()
+স্থির std::vector<cv::String>& get_তথ্য_অনুসন্ধান_Sub_Directory()
 {
-    if (g_data_search_subdir.empty())
+    যদি (g_তথ্য_অনুসন্ধান_subdir.empty())
     {
-        g_data_search_subdir.reset(new std::vector<cv::String>());
-        g_data_search_subdir->push_back("samples/data");
-        g_data_search_subdir->push_back("data");
-        g_data_search_subdir->push_back("");
+        g_তথ্য_অনুসন্ধান_subdir.reset(নতুন std::vector<cv::String>());
+        g_তথ্য_অনুসন্ধান_subdir->push_back("samples/data");
+        g_তথ্য_অনুসন্ধান_subdir->push_back("data");
+        g_তথ্য_অনুসন্ধান_subdir->push_back("");
     }
-    return *(g_data_search_subdir.get());
+    ফেরত *(g_তথ্য_অনুসন্ধান_subdir.get());
 }
 
 
-CV_EXPORTS void addSamplesDataSearchPath(const cv::String& path)
+CV_EXPORTS শূন্য add_Samples_তথ্য_অনুসন্ধান_Path(ধ্রুবক cv::String& path)
 {
-    if (utils::fs::isDirectory(path))
-        _getDataSearchPath().push_back(path);
+    যদি (utils::fs::isDirectory(path))
+        get_তথ্য_অনুসন্ধান_Path().push_back(path);
 }
-CV_EXPORTS void addSamplesDataSearchSubDirectory(const cv::String& subdir)
+CV_EXPORTS শূন্য add_Samples_তথ্য_অনুসন্ধান_Sub_Directory(ধ্রুবক cv::String& subdir)
 {
-    _getDataSearchSubDirectory().push_back(subdir);
+    get_তথ্য_অনুসন্ধান_Sub_Directory().push_back(subdir);
 }
 
-cv::String findFile(const cv::String& relative_path, bool required, bool silentMode)
+cv::String findFile(ধ্রুবক cv::String& relative_path, যৌক্তিক required, যৌক্তিক silentMode)
 {
-#if OPENCV_HAVE_FILESYSTEM_SUPPORT
-    CV_LOG_DEBUG(NULL, cv::format("cv::samples::findFile('%s', %s)", relative_path.c_str(), required ? "true" : "false"));
-    cv::String result = cv::utils::findDataFile(relative_path,
+#যদি OPENCV_HAVE_FILESYSTEM_SUPPORT
+    CV_LOG_DEBUG(ফাঁকা, cv::format("cv::samples::findFile('%s', %s)", relative_path.c_str(), required ? "true" : "false"));
+    cv::String ফলাফল = cv::utils::find_তথ্য_File(relative_path,
                                                 "OPENCV_SAMPLES_DATA_PATH",
-                                                &_getDataSearchPath(),
-                                                &_getDataSearchSubDirectory());
-    if (result != relative_path && !silentMode)
+                                                &get_তথ্য_অনুসন্ধান_Path(),
+                                                &get_তথ্য_অনুসন্ধান_Sub_Directory());
+    যদি (ফলাফল != relative_path && !silentMode)
     {
-        CV_LOG_WARNING(NULL, "cv::samples::findFile('" << relative_path << "') => '" << result << "'");
+        CV_LOG_WARNING(ফাঁকা, "cv::samples::findFile('" << relative_path << "') => '" << ফলাফল << "'");
     }
-    if (result.empty() && required)
+    যদি (ফলাফল.empty() && required)
         CV_Error(cv::Error::StsError, cv::format("OpenCV samples: Can't find required data file: %s", relative_path.c_str()));
-    return result;
-#else
+    ফেরত ফলাফল;
+#অন্যথা
     CV_UNUSED(relative_path);
     CV_UNUSED(required);
     CV_UNUSED(silentMode);

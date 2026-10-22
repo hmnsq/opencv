@@ -5,12 +5,12 @@
 #ifndef PARALLEL_PLUGIN_API_HPP
 #define PARALLEL_PLUGIN_API_HPP
 
-#include <opencv2/core/cvdef.h>
-#include <opencv2/core/llapi/llapi.h>
+#অন্তর্ভাব <opencv2/core/cvdef.h>
+#অন্তর্ভাব <opencv2/core/llapi/llapi.h>
 
-#include "opencv2/core/parallel/parallel_backend.hpp"
+#অন্তর্ভাব "opencv2/core/parallel/parallel_backend.hpp"
 
-#if !defined(BUILD_PLUGIN)
+#যদি !defined(BUILD_PLUGIN)
 
 /// increased for backward-compatible changes, e.g. add new function
 /// Caller API <= Plugin API -> plugin is fully compatible
@@ -23,17 +23,17 @@
 /// Caller ABI < Plugin ABI -> plugin can't be used (plugin should provide interface with lower ABI to handle that)
 #define ABI_VERSION 0 // preview
 
-#else // !defined(BUILD_PLUGIN)
+#অন্যথা // !defined(BUILD_PLUGIN)
 
-#if !defined(ABI_VERSION) || !defined(API_VERSION)
+#যদি !defined(ABI_VERSION) || !defined(API_VERSION)
 #error "Plugin must define ABI_VERSION and API_VERSION before including parallel_plugin_api.hpp"
 #endif
 
 #endif // !defined(BUILD_PLUGIN)
 
-typedef cv::parallel::ParallelForAPI* CvPluginParallelBackendAPI;
+প্রকারলেখ cv::parallel::ParallelForAPI* CvPluginParallelBackendAPI;
 
-struct OpenCV_Core_Parallel_Plugin_API_v0_0_api_entries
+কাঠামো OpenCV_Core_Parallel_Plugin_API_v0_0_api_entries
 {
     /** @brief Get parallel backend API instance
 
@@ -41,32 +41,32 @@ struct OpenCV_Core_Parallel_Plugin_API_v0_0_api_entries
 
     @note API-CALL 1, API-Version == 0
      */
-    CvResult (CV_API_CALL *getInstance)(CV_OUT CvPluginParallelBackendAPI* handle) CV_NOEXCEPT;
+    Cv_ফলাফল (CV_API_CALL *getInstance)(CV_OUT CvPluginParallelBackendAPI* handle) CV_NOEXCEPT;
 }; // OpenCV_Core_Parallel_Plugin_API_v0_0_api_entries
 
-typedef struct OpenCV_Core_Parallel_Plugin_API_v0
+প্রকারলেখ কাঠামো OpenCV_Core_Parallel_Plugin_API_v0
 {
     OpenCV_API_Header api_header;
-    struct OpenCV_Core_Parallel_Plugin_API_v0_0_api_entries v0;
+    কাঠামো OpenCV_Core_Parallel_Plugin_API_v0_0_api_entries v0;
 } OpenCV_Core_Parallel_Plugin_API_v0;
 
-#if ABI_VERSION == 0 && API_VERSION == 0
-typedef OpenCV_Core_Parallel_Plugin_API_v0 OpenCV_Core_Parallel_Plugin_API;
-#else
+#যদি ABI_VERSION == 0 && API_VERSION == 0
+প্রকারলেখ OpenCV_Core_Parallel_Plugin_API_v0 OpenCV_Core_Parallel_Plugin_API;
+#অন্যথা
 #error "Not supported configuration: check ABI_VERSION/API_VERSION"
 #endif
 
 #ifdef BUILD_PLUGIN
-extern "C" {
+বাহ্যিক "C" {
 
 CV_PLUGIN_EXPORTS
-const OpenCV_Core_Parallel_Plugin_API* CV_API_CALL opencv_core_parallel_plugin_init_v0
-        (int requested_abi_version, int requested_api_version, void* reserved /*NULL*/) CV_NOEXCEPT;
+ধ্রুবক OpenCV_Core_Parallel_Plugin_API* CV_API_CALL opencv_core_parallel_plugin_init_v0
+        (পূর্ণসংখ্যা requested_abi_version, পূর্ণসংখ্যা requested_api_version, শূন্য* reserved /*NULL*/) CV_NOEXCEPT;
 
 }  // extern "C"
-#else  // BUILD_PLUGIN
-typedef const OpenCV_Core_Parallel_Plugin_API* (CV_API_CALL *FN_opencv_core_parallel_plugin_init_t)
-        (int requested_abi_version, int requested_api_version, void* reserved /*NULL*/);
+#অন্যথা  // BUILD_PLUGIN
+প্রকারলেখ ধ্রুবক OpenCV_Core_Parallel_Plugin_API* (CV_API_CALL *FN_opencv_core_parallel_plugin_init_t)
+        (পূর্ণসংখ্যা requested_abi_version, পূর্ণসংখ্যা requested_api_version, শূন্য* reserved /*NULL*/);
 #endif  // BUILD_PLUGIN
 
 #endif // PARALLEL_PLUGIN_API_HPP

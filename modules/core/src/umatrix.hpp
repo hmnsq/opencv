@@ -4,15 +4,15 @@
 #ifndef OPENCV_CORE_SRC_UMATRIX_HPP
 #define OPENCV_CORE_SRC_UMATRIX_HPP
 
-namespace cv {
+নামাকাশ cv {
 
-struct CV_EXPORTS UMatDataAutoLock
+কাঠামো CV_EXPORTS UMat_তথ্য_Auto_Lock
 {
-    explicit UMatDataAutoLock(UMatData* u);
-    UMatDataAutoLock(UMatData* u1, UMatData* u2);
-    ~UMatDataAutoLock();
-    UMatData* u1;
-    UMatData* u2;
+    explicit UMat_তথ্য_Auto_Lock(UMat_তথ্য* u);
+    UMat_তথ্য_Auto_Lock(UMat_তথ্য* u1, UMat_তথ্য* u2);
+    ~UMat_তথ্য_Auto_Lock();
+    UMat_তথ্য* u1;
+    UMat_তথ্য* u2;
 };
 
 }

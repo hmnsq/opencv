@@ -2,15 +2,15 @@
 // It is subject to the license terms in the LICENSE file found in the top-level directory
 // of this distribution and at http://opencv.org/license.html.
 
-#include "precomp.hpp"
-#include "arithm_expr.hpp"      // ew::mathSpanEngine - the engine fallback for exp/log
+#অন্তর্ভাব "precomp.hpp"
+#অন্তর্ভাব "arithm_expr.hpp"      // ew::mathSpanEngine - the engine fallback for exp/log
 
-#include "mathfuncs_core.simd.hpp"
-#include "mathfuncs_core.simd_declarations.hpp" // defines CV_CPU_DISPATCH_MODES_ALL=AVX2,...,BASELINE based on CMakeLists.txt content
+#অন্তর্ভাব "mathfuncs_core.simd.hpp"
+#অন্তর্ভাব "mathfuncs_core.simd_declarations.hpp" // defines CV_CPU_DISPATCH_MODES_ALL=AVX2,...,BASELINE based on CMakeLists.txt content
 
-namespace cv { namespace hal {
+নামাকাশ cv { নামাকাশ hal {
 
-void cartToPolar32f(const float* x, const float* y, float* mag, float* angle, int len, bool angleInDegrees)
+শূন্য cartToPolar32f(ধ্রুবক দশমিক* x, ধ্রুবক দশমিক* y, দশমিক* mag, দশমিক* angle, পূর্ণসংখ্যা len, যৌক্তিক angleInDegrees)
 {
     CV_INSTRUMENT_REGION();
 
@@ -20,7 +20,7 @@ void cartToPolar32f(const float* x, const float* y, float* mag, float* angle, in
         CV_CPU_DISPATCH_MODES_ALL);
 }
 
-void cartToPolar64f(const double* x, const double* y, double* mag, double* angle, int len, bool angleInDegrees)
+শূন্য cartToPolar64f(ধ্রুবক দ্বিগুণ* x, ধ্রুবক দ্বিগুণ* y, দ্বিগুণ* mag, দ্বিগুণ* angle, পূর্ণসংখ্যা len, যৌক্তিক angleInDegrees)
 {
     CV_INSTRUMENT_REGION();
 
@@ -30,7 +30,7 @@ void cartToPolar64f(const double* x, const double* y, double* mag, double* angle
         CV_CPU_DISPATCH_MODES_ALL);
 }
 
-void polarToCart32f(const float* mag, const float* angle, float* x, float* y, int len, bool angleInDegrees)
+শূন্য polarToCart32f(ধ্রুবক দশমিক* mag, ধ্রুবক দশমিক* angle, দশমিক* x, দশমিক* y, পূর্ণসংখ্যা len, যৌক্তিক angleInDegrees)
 {
     CV_INSTRUMENT_REGION();
 
@@ -40,7 +40,7 @@ void polarToCart32f(const float* mag, const float* angle, float* x, float* y, in
         CV_CPU_DISPATCH_MODES_ALL);
 }
 
-void polarToCart64f(const double* mag, const double* angle, double* x, double* y, int len, bool angleInDegrees)
+শূন্য polarToCart64f(ধ্রুবক দ্বিগুণ* mag, ধ্রুবক দ্বিগুণ* angle, দ্বিগুণ* x, দ্বিগুণ* y, পূর্ণসংখ্যা len, যৌক্তিক angleInDegrees)
 {
     CV_INSTRUMENT_REGION();
 
@@ -50,7 +50,7 @@ void polarToCart64f(const double* mag, const double* angle, double* x, double* y
         CV_CPU_DISPATCH_MODES_ALL);
 }
 
-void fastAtan32f(const float *Y, const float *X, float *angle, int len, bool angleInDegrees )
+শূন্য fastAtan32f(ধ্রুবক দশমিক *Y, ধ্রুবক দশমিক *X, দশমিক *angle, পূর্ণসংখ্যা len, যৌক্তিক angleInDegrees )
 {
     CV_INSTRUMENT_REGION();
 
@@ -60,7 +60,7 @@ void fastAtan32f(const float *Y, const float *X, float *angle, int len, bool ang
         CV_CPU_DISPATCH_MODES_ALL);
 }
 
-void fastAtan64f(const double *Y, const double *X, double *angle, int len, bool angleInDegrees)
+শূন্য fastAtan64f(ধ্রুবক দ্বিগুণ *Y, ধ্রুবক দ্বিগুণ *X, দ্বিগুণ *angle, পূর্ণসংখ্যা len, যৌক্তিক angleInDegrees)
 {
     CV_INSTRUMENT_REGION();
 
@@ -71,39 +71,39 @@ void fastAtan64f(const double *Y, const double *X, double *angle, int len, bool 
 }
 
 // deprecated
-void fastAtan2(const float *Y, const float *X, float *angle, int len, bool angleInDegrees )
+শূন্য fastAtan2(ধ্রুবক দশমিক *Y, ধ্রুবক দশমিক *X, দশমিক *angle, পূর্ণসংখ্যা len, যৌক্তিক angleInDegrees )
 {
     CV_INSTRUMENT_REGION();
 
     fastAtan32f(Y, X, angle, len, angleInDegrees);
 }
 
-void magnitude32f(const float* x, const float* y, float* mag, int len)
+শূন্য magnitude32f(ধ্রুবক দশমিক* x, ধ্রুবক দশমিক* y, দশমিক* mag, পূর্ণসংখ্যা len)
 {
     CV_INSTRUMENT_REGION();
 
     CALL_HAL(magnitude32f, cv_hal_magnitude32f, x, y, mag, len);
     // SSE42 performance issues
-    CV_IPP_RUN(IPP_VERSION_X100 > 201800 || cv::ipp::getIppTopFeatures() != ippCPUID_SSE42, CV_INSTRUMENT_FUN_IPP(ippsMagnitude_32f, x, y, mag, len) >= 0);
+    CV_IPP_RUN(IPP_VERSION_X100 > 201800 || cv::ipp::get_Ipp_শীর্ষ_Features() != ippCPUID_SSE42, CV_INSTRUMENT_FUN_IPP(ippsMagnitude_32f, x, y, mag, len) >= 0);
 
     CV_CPU_DISPATCH(magnitude32f, (x, y, mag, len),
         CV_CPU_DISPATCH_MODES_ALL);
 }
 
-void magnitude64f(const double* x, const double* y, double* mag, int len)
+শূন্য magnitude64f(ধ্রুবক দ্বিগুণ* x, ধ্রুবক দ্বিগুণ* y, দ্বিগুণ* mag, পূর্ণসংখ্যা len)
 {
     CV_INSTRUMENT_REGION();
 
     CALL_HAL(magnitude64f, cv_hal_magnitude64f, x, y, mag, len);
     // SSE42 performance issues
-    CV_IPP_RUN(IPP_VERSION_X100 > 201800 || cv::ipp::getIppTopFeatures() != ippCPUID_SSE42, CV_INSTRUMENT_FUN_IPP(ippsMagnitude_64f, x, y, mag, len) >= 0);
+    CV_IPP_RUN(IPP_VERSION_X100 > 201800 || cv::ipp::get_Ipp_শীর্ষ_Features() != ippCPUID_SSE42, CV_INSTRUMENT_FUN_IPP(ippsMagnitude_64f, x, y, mag, len) >= 0);
 
     CV_CPU_DISPATCH(magnitude64f, (x, y, mag, len),
         CV_CPU_DISPATCH_MODES_ALL);
 }
 
 
-void invSqrt32f(const float* src, float* dst, int len)
+শূন্য invSqrt32f(ধ্রুবক দশমিক* src, দশমিক* dst, পূর্ণসংখ্যা len)
 {
     CV_INSTRUMENT_REGION();
 
@@ -114,7 +114,7 @@ void invSqrt32f(const float* src, float* dst, int len)
 }
 
 
-void invSqrt64f(const double* src, double* dst, int len)
+শূন্য invSqrt64f(ধ্রুবক দ্বিগুণ* src, দ্বিগুণ* dst, পূর্ণসংখ্যা len)
 {
     CV_INSTRUMENT_REGION();
 
@@ -125,7 +125,7 @@ void invSqrt64f(const double* src, double* dst, int len)
 }
 
 
-void sqrt32f(const float* src, float* dst, int len)
+শূন্য sqrt32f(ধ্রুবক দশমিক* src, দশমিক* dst, পূর্ণসংখ্যা len)
 {
     CV_INSTRUMENT_REGION();
 
@@ -136,7 +136,7 @@ void sqrt32f(const float* src, float* dst, int len)
 }
 
 
-void sqrt64f(const double* src, double* dst, int len)
+শূন্য sqrt64f(ধ্রুবক দ্বিগুণ* src, দ্বিগুণ* dst, পূর্ণসংখ্যা len)
 {
     CV_INSTRUMENT_REGION();
 
@@ -146,7 +146,7 @@ void sqrt64f(const double* src, double* dst, int len)
         CV_CPU_DISPATCH_MODES_ALL);
 }
 
-void exp32f(const float *src, float *dst, int n)
+শূন্য exp32f(ধ্রুবক দশমিক *src, দশমিক *dst, পূর্ণসংখ্যা n)
 {
     CV_INSTRUMENT_REGION();
 
@@ -156,7 +156,7 @@ void exp32f(const float *src, float *dst, int n)
                                                        // table implementation is removed)
 }
 
-void exp64f(const double *src, double *dst, int n)
+শূন্য exp64f(ধ্রুবক দ্বিগুণ *src, দ্বিগুণ *dst, পূর্ণসংখ্যা n)
 {
     CV_INSTRUMENT_REGION();
 
@@ -166,7 +166,7 @@ void exp64f(const double *src, double *dst, int n)
                                                        // table implementation is removed)
 }
 
-void log32f(const float *src, float *dst, int n)
+শূন্য log32f(ধ্রুবক দশমিক *src, দশমিক *dst, পূর্ণসংখ্যা n)
 {
     CV_INSTRUMENT_REGION();
 
@@ -176,7 +176,7 @@ void log32f(const float *src, float *dst, int n)
                                                        // table implementation is removed)
 }
 
-void log64f(const double *src, double *dst, int n)
+শূন্য log64f(ধ্রুবক দ্বিগুণ *src, দ্বিগুণ *dst, পূর্ণসংখ্যা n)
 {
     CV_INSTRUMENT_REGION();
 
@@ -189,60 +189,60 @@ void log64f(const double *src, double *dst, int n)
 //=============================================================================
 // for compatibility with 3.0
 
-void exp(const float* src, float* dst, int n)
+শূন্য exp(ধ্রুবক দশমিক* src, দশমিক* dst, পূর্ণসংখ্যা n)
 {
     exp32f(src, dst, n);
 }
 
-void exp(const double* src, double* dst, int n)
+শূন্য exp(ধ্রুবক দ্বিগুণ* src, দ্বিগুণ* dst, পূর্ণসংখ্যা n)
 {
     exp64f(src, dst, n);
 }
 
-void log(const float* src, float* dst, int n)
+শূন্য log(ধ্রুবক দশমিক* src, দশমিক* dst, পূর্ণসংখ্যা n)
 {
     log32f(src, dst, n);
 }
 
-void log(const double* src, double* dst, int n)
+শূন্য log(ধ্রুবক দ্বিগুণ* src, দ্বিগুণ* dst, পূর্ণসংখ্যা n)
 {
     log64f(src, dst, n);
 }
 
-void magnitude(const float* x, const float* y, float* dst, int n)
+শূন্য magnitude(ধ্রুবক দশমিক* x, ধ্রুবক দশমিক* y, দশমিক* dst, পূর্ণসংখ্যা n)
 {
     magnitude32f(x, y, dst, n);
 }
 
-void magnitude(const double* x, const double* y, double* dst, int n)
+শূন্য magnitude(ধ্রুবক দ্বিগুণ* x, ধ্রুবক দ্বিগুণ* y, দ্বিগুণ* dst, পূর্ণসংখ্যা n)
 {
     magnitude64f(x, y, dst, n);
 }
 
-void sqrt(const float* src, float* dst, int len)
+শূন্য sqrt(ধ্রুবক দশমিক* src, দশমিক* dst, পূর্ণসংখ্যা len)
 {
     sqrt32f(src, dst, len);
 }
 
-void sqrt(const double* src, double* dst, int len)
+শূন্য sqrt(ধ্রুবক দ্বিগুণ* src, দ্বিগুণ* dst, পূর্ণসংখ্যা len)
 {
     sqrt64f(src, dst, len);
 }
 
-void invSqrt(const float* src, float* dst, int len)
+শূন্য invSqrt(ধ্রুবক দশমিক* src, দশমিক* dst, পূর্ণসংখ্যা len)
 {
     invSqrt32f(src, dst, len);
 }
 
-void invSqrt(const double* src, double* dst, int len)
+শূন্য invSqrt(ধ্রুবক দ্বিগুণ* src, দ্বিগুণ* dst, পূর্ণসংখ্যা len)
 {
     invSqrt64f(src, dst, len);
 }
 
 }} // namespace cv::hal::
 
-float cv::fastAtan2( float y, float x )
+দশমিক cv::fastAtan2( দশমিক y, দশমিক x )
 {
-    using namespace cv::hal;
+    using নামাকাশ cv::hal;
     CV_CPU_CALL_BASELINE(fastAtan2, (y, x));
 }

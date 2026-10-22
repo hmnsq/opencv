@@ -2,85 +2,85 @@
 // It is subject to the license terms in the LICENSE file found in the top-level directory
 // of this distribution and at http://opencv.org/license.html
 
-#include "precomp.hpp"
-#include "persistence.hpp"
-#include "persistence_impl.hpp"
-#include "persistence_base64_encoding.hpp"
-#include <unordered_map>
-#include <iterator>
+#অন্তর্ভাব "precomp.hpp"
+#অন্তর্ভাব "persistence.hpp"
+#অন্তর্ভাব "persistence_impl.hpp"
+#অন্তর্ভাব "persistence_base64_encoding.hpp"
+#অন্তর্ভাব <unordered_map>
+#অন্তর্ভাব <iterator>
 
-#include <opencv2/core/utils/logger.hpp>
+#অন্তর্ভাব <opencv2/core/utils/logger.hpp>
 
 #define CV_SEQ_ELTYPE_PTR            CV_MAKE_TYPE(CV_8U, 8 /*sizeof(void*)*/)
 
-namespace cv
+নামাকাশ cv
 {
 
-namespace fs
+নামাকাশ fs
 {
 
-int strcasecmp(const char* s1, const char* s2)
+পূর্ণসংখ্যা strcasecmp(ধ্রুবক অক্ষর* s1, ধ্রুবক অক্ষর* s2)
 {
-    const char* dummy="";
-    if(!s1) s1=dummy;
-    if(!s2) s2=dummy;
+    ধ্রুবক অক্ষর* dummy="";
+    যদি(!s1) s1=dummy;
+    যদি(!s2) s2=dummy;
 
     size_t len1 = strlen(s1);
     size_t len2 = strlen(s2);
     size_t i, len = std::min(len1, len2);
-    for( i = 0; i < len; i++ )
+    জন্য( i = 0; i < len; i++ )
     {
-        int d = tolower((int)s1[i]) - tolower((int)s2[i]);
-        if( d != 0 )
-            return d;
+        পূর্ণসংখ্যা d = tolower((পূর্ণসংখ্যা)s1[i]) - tolower((পূর্ণসংখ্যা)s2[i]);
+        যদি( d != 0 )
+            ফেরত d;
     }
-    return len1 < len2 ? -1 : len1 > len2 ? 1 : 0;
+    ফেরত len1 < len2 ? -1 : len1 > len2 ? 1 : 0;
 }
 
-char* itoa( int _val, char* buffer, int /*radix*/ )
+অক্ষর* itoa( পূর্ণসংখ্যা _val, অক্ষর* বাফার, পূর্ণসংখ্যা /*radix*/ )
 {
-    const int radix = 10;
-    char* ptr=buffer + 23 /* enough even for 64-bit integers */;
+    ধ্রুবক পূর্ণসংখ্যা radix = 10;
+    অক্ষর* ptr=বাফার + 23 /* enough even for 64-bit integers */;
     unsigned val = abs(_val);
 
     *ptr = '\0';
-    do
+    করো
     {
         unsigned r = val / radix;
-        *--ptr = (char)(val - (r*radix) + '0');
+        *--ptr = (অক্ষর)(val - (r*radix) + '0');
         val = r;
     }
-    while( val != 0 );
+    যখন( val != 0 );
 
-    if( _val < 0 )
+    যদি( _val < 0 )
         *--ptr = '-';
 
-    return ptr;
+    ফেরত ptr;
 }
 
-char* itoa( int64_t _val, char* buffer, int /*radix*/, bool _signed)
+অক্ষর* itoa( int64_t _val, অক্ষর* বাফার, পূর্ণসংখ্যা /*radix*/, যৌক্তিক _signed)
 {
-    const int radix = 10;
-    char* ptr=buffer + 23 /* enough even for 64-bit integers */;
-    int sign = _signed && _val < 0 ? -1 : 1;
+    ধ্রুবক পূর্ণসংখ্যা radix = 10;
+    অক্ষর* ptr=বাফার + 23 /* enough even for 64-bit integers */;
+    পূর্ণসংখ্যা sign = _signed && _val < 0 ? -1 : 1;
     uint64_t val = !_signed ? (uint64_t)_val : abs(_val);
 
     *ptr = '\0';
-    do
+    করো
     {
         uint64_t r = val / radix;
-        *--ptr = (char)(val - (r*radix) + '0');
+        *--ptr = (অক্ষর)(val - (r*radix) + '0');
         val = r;
     }
-    while( val != 0 );
+    যখন( val != 0 );
 
-    if( sign < 0 )
+    যদি( sign < 0 )
         *--ptr = '-';
 
-    return ptr;
+    ফেরত ptr;
 }
 
-char* doubleToString( char* buf, size_t bufSize, double value, bool explicitZero )
+অক্ষর* doubleToString( অক্ষর* buf, size_t buf_আকার, দ্বিগুণ value, যৌক্তিক explicitZero )
 {
     Cv64suf val;
     unsigned ieee754_hi;
@@ -88,324 +88,324 @@ char* doubleToString( char* buf, size_t bufSize, double value, bool explicitZero
     val.f = value;
     ieee754_hi = (unsigned)(val.u >> 32);
 
-    if( (ieee754_hi & 0x7ff00000) != 0x7ff00000 )
+    যদি( (ieee754_hi & 0x7ff00000) != 0x7ff00000 )
     {
-        int ivalue = cvRound(value);
-        if( ivalue == value )
+        পূর্ণসংখ্যা ivalue = cvRound(value);
+        যদি( ivalue == value )
         {
-            if( explicitZero )
-                snprintf( buf, bufSize, "%d.0", ivalue );
-            else
-                snprintf( buf, bufSize, "%d.", ivalue );
+            যদি( explicitZero )
+                snprintf( buf, buf_আকার, "%d.0", ivalue );
+            অন্যথা
+                snprintf( buf, buf_আকার, "%d.", ivalue );
         }
-        else
+        অন্যথা
         {
             // binary64 has 52 bit fraction with hidden bit.
             // 53 * log_10(2) is 15.955. So "%.16f" should be fine, but its test fails.
-            snprintf( buf, bufSize, "%.17g", value );
+            snprintf( buf, buf_আকার, "%.17g", value );
 
-            char* ptr = buf;
-            if( *ptr == '+' || *ptr == '-' )
+            অক্ষর* ptr = buf;
+            যদি( *ptr == '+' || *ptr == '-' )
                 ptr++;
-            for( ; cv_isdigit(*ptr); ptr++ )
+            জন্য( ; cv_isdigit(*ptr); ptr++ )
                 ;
-            if( *ptr == ',' )
+            যদি( *ptr == ',' )
                 *ptr = '.';
         }
     }
-    else
+    অন্যথা
     {
         unsigned ieee754_lo = (unsigned)val.u;
-        if( (ieee754_hi & 0x7fffffff) + (ieee754_lo != 0) > 0x7ff00000 )
+        যদি( (ieee754_hi & 0x7fffffff) + (ieee754_lo != 0) > 0x7ff00000 )
             strcpy( buf, ".Nan" );
-        else
-            strcpy( buf, (int)ieee754_hi < 0 ? "-.Inf" : ".Inf" );
+        অন্যথা
+            strcpy( buf, (পূর্ণসংখ্যা)ieee754_hi < 0 ? "-.Inf" : ".Inf" );
     }
 
-    return buf;
+    ফেরত buf;
 }
 
-char* floatToString( char* buf, size_t bufSize, float value, bool halfprecision, bool explicitZero )
+অক্ষর* floatToString( অক্ষর* buf, size_t buf_আকার, দশমিক value, যৌক্তিক halfprecision, যৌক্তিক explicitZero )
 {
     Cv32suf val;
     unsigned ieee754;
     val.f = value;
     ieee754 = val.u;
 
-    if( (ieee754 & 0x7f800000) != 0x7f800000 )
+    যদি( (ieee754 & 0x7f800000) != 0x7f800000 )
     {
-        int ivalue = cvRound(value);
-        if( ivalue == value )
+        পূর্ণসংখ্যা ivalue = cvRound(value);
+        যদি( ivalue == value )
         {
-            if( explicitZero )
-                snprintf( buf, bufSize, "%d.0", ivalue );
-            else
-                snprintf( buf, bufSize, "%d.", ivalue );
+            যদি( explicitZero )
+                snprintf( buf, buf_আকার, "%d.0", ivalue );
+            অন্যথা
+                snprintf( buf, buf_আকার, "%d.", ivalue );
         }
-        else
+        অন্যথা
         {
-            if (halfprecision)
+            যদি (halfprecision)
             {
                 // bfloat16 has 7 bit fraction with hidden bit.
                 // binary16 has 10 bit fraction with hidden bit.
                 // 11 * log_10(2) is 3.311. So "%.4f" should be fine, but its test fails.
-                snprintf(buf, bufSize, "%.5g", value);
+                snprintf(buf, buf_আকার, "%.5g", value);
             }
-            else
+            অন্যথা
             {
                 // binray32 has 23 bit fraction with hidden bit.
                 // 24 * log_10(2) is 7.225. So "%.8f" should be fine, but its test fails.
-                snprintf(buf, bufSize, "%.9g", value);
+                snprintf(buf, buf_আকার, "%.9g", value);
             }
 
-            char* ptr = buf;
-            if( *ptr == '+' || *ptr == '-' )
+            অক্ষর* ptr = buf;
+            যদি( *ptr == '+' || *ptr == '-' )
                 ptr++;
-            for( ; cv_isdigit(*ptr); ptr++ )
+            জন্য( ; cv_isdigit(*ptr); ptr++ )
                 ;
-            if( *ptr == ',' )
+            যদি( *ptr == ',' )
                 *ptr = '.';
         }
     }
-    else
+    অন্যথা
     {
-        if( (ieee754 & 0x7fffffff) != 0x7f800000 )
+        যদি( (ieee754 & 0x7fffffff) != 0x7f800000 )
             strcpy( buf, ".Nan" );
-        else
-            strcpy( buf, (int)ieee754 < 0 ? "-.Inf" : ".Inf" );
+        অন্যথা
+            strcpy( buf, (পূর্ণসংখ্যা)ieee754 < 0 ? "-.Inf" : ".Inf" );
     }
 
-    return buf;
+    ফেরত buf;
 }
 
-static const char symbols[] = "ucwsifdhHbUIneE";
+স্থির ধ্রুবক অক্ষর symbols[] = "ucwsifdhHbUIneE";
 
-static char typeSymbol(int depth)
+স্থির অক্ষর type_প্রতীক(পূর্ণসংখ্যা depth)
 {
     CV_StaticAssert(CV_64F == 6, "");
     CV_CheckDepth(depth, depth >= 0 && depth <= CV_8F_E4M3FNUZ, "");
-    return symbols[depth];
+    ফেরত symbols[depth];
 }
 
-static int symbolToType(char c)
+স্থির পূর্ণসংখ্যা প্রতীক_To_Type(অক্ষর c)
 {
-    if (c == 'r')
-        return CV_SEQ_ELTYPE_PTR;
-    const char* pos = strchr( symbols, c );
-    if( !pos )
+    যদি (c == 'r')
+        ফেরত CV_SEQ_ELTYPE_PTR;
+    ধ্রুবক অক্ষর* pos = strchr( symbols, c );
+    যদি( !pos )
         CV_Error( cv::Error::StsBadArg, "Invalid data type specification" );
-    return static_cast<int>(pos - symbols);
+    ফেরত static_cast<পূর্ণসংখ্যা>(pos - symbols);
 }
 
-char* encodeFormat(int elem_type, char* dt, size_t dt_len)
+অক্ষর* encodeFormat(পূর্ণসংখ্যা elem_type, অক্ষর* dt, size_t dt_len)
 {
-    int cn = (elem_type == CV_SEQ_ELTYPE_PTR/*CV_USRTYPE1*/) ? 1 : CV_MAT_CN(elem_type);
-    char symbol = (elem_type == CV_SEQ_ELTYPE_PTR/*CV_USRTYPE1*/) ? 'r' : typeSymbol(CV_MAT_DEPTH(elem_type));
-    snprintf(dt, dt_len, "%d%c", cn, symbol);
-    return dt + (cn == 1 ? 1 : 0);
+    পূর্ণসংখ্যা cn = (elem_type == CV_SEQ_ELTYPE_PTR/*CV_USRTYPE1*/) ? 1 : CV_MAT_CN(elem_type);
+    অক্ষর প্রতীক = (elem_type == CV_SEQ_ELTYPE_PTR/*CV_USRTYPE1*/) ? 'r' : type_প্রতীক(CV_MAT_DEPTH(elem_type));
+    snprintf(dt, dt_len, "%d%c", cn, প্রতীক);
+    ফেরত dt + (cn == 1 ? 1 : 0);
 }
 
 // Deprecated due to size of dt buffer being unknowable.
-char* encodeFormat(int elem_type, char* dt)
+অক্ষর* encodeFormat(পূর্ণসংখ্যা elem_type, অক্ষর* dt)
 {
     constexpr size_t max = 20+1+1; // UINT64_MAX + one char + nul termination.
-    return encodeFormat(elem_type, dt, max);
+    ফেরত encodeFormat(elem_type, dt, max);
 }
 
-int decodeFormat( const char* dt, int* fmt_pairs, int max_len )
+পূর্ণসংখ্যা decodeFormat( ধ্রুবক অক্ষর* dt, পূর্ণসংখ্যা* fmt_pairs, পূর্ণসংখ্যা max_len )
 {
-    int fmt_pair_count = 0;
-    int i = 0, k = 0, len = dt ? (int)strlen(dt) : 0;
+    পূর্ণসংখ্যা fmt_pair_গুনতি = 0;
+    পূর্ণসংখ্যা i = 0, k = 0, len = dt ? (পূর্ণসংখ্যা)strlen(dt) : 0;
 
-    if( !dt || !len )
-        return 0;
+    যদি( !dt || !len )
+        ফেরত 0;
 
     CV_Assert( fmt_pairs != 0 && max_len > 0 );
     fmt_pairs[0] = 0;
     max_len *= 2;
 
-    for( ; k < len; k++ )
+    জন্য( ; k < len; k++ )
     {
-        char c = dt[k];
+        অক্ষর c = dt[k];
 
-        if( cv_isdigit(c) )
+        যদি( cv_isdigit(c) )
         {
-            int count = c - '0';
-            if( cv_isdigit(dt[k+1]) )
+            পূর্ণসংখ্যা গুনতি_2 = c - '0';
+            যদি( cv_isdigit(dt[k+1]) )
             {
-                char* endptr = 0;
-                count = (int)strtol( dt+k, &endptr, 10 );
-                k = (int)(endptr - dt) - 1;
+                অক্ষর* endptr = 0;
+                গুনতি_2 = (পূর্ণসংখ্যা)strtol( dt+k, &endptr, 10 );
+                k = (পূর্ণসংখ্যা)(endptr - dt) - 1;
             }
 
-            if( count <= 0 )
+            যদি( গুনতি_2 <= 0 )
                 CV_Error( cv::Error::StsBadArg, "Invalid data type specification" );
 
-            fmt_pairs[i] = count;
+            fmt_pairs[i] = গুনতি_2;
         }
-        else
+        অন্যথা
         {
-            int depth = symbolToType(c);
-            if( fmt_pairs[i] == 0 )
+            পূর্ণসংখ্যা depth = প্রতীক_To_Type(c);
+            যদি( fmt_pairs[i] == 0 )
                 fmt_pairs[i] = 1;
             fmt_pairs[i+1] = depth;
-            if( i > 0 && fmt_pairs[i+1] == fmt_pairs[i-1] )
+            যদি( i > 0 && fmt_pairs[i+1] == fmt_pairs[i-1] )
                 fmt_pairs[i-2] += fmt_pairs[i];
-            else
+            অন্যথা
             {
                 i += 2;
-                if( i >= max_len )
+                যদি( i >= max_len )
                     CV_Error( cv::Error::StsBadArg, "Too long data type specification" );
             }
             fmt_pairs[i] = 0;
         }
     }
 
-    fmt_pair_count = i/2;
-    return fmt_pair_count;
+    fmt_pair_গুনতি = i/2;
+    ফেরত fmt_pair_গুনতি;
 }
 
-int calcElemSize( const char* dt, int initial_size )
+পূর্ণসংখ্যা calc_Elem_আকার( ধ্রুবক অক্ষর* dt, পূর্ণসংখ্যা initial_আকার )
 {
-    int size = 0;
-    int fmt_pairs[CV_FS_MAX_FMT_PAIRS*2], i, fmt_pair_count;
-    int comp_size;
+    পূর্ণসংখ্যা size = 0;
+    পূর্ণসংখ্যা fmt_pairs[CV_FS_MAX_FMT_PAIRS*2], i, fmt_pair_গুনতি;
+    পূর্ণসংখ্যা comp_আকার;
 
-    fmt_pair_count = decodeFormat( dt, fmt_pairs, CV_FS_MAX_FMT_PAIRS );
-    fmt_pair_count *= 2;
-    for( i = 0, size = initial_size; i < fmt_pair_count; i += 2 )
+    fmt_pair_গুনতি = decodeFormat( dt, fmt_pairs, CV_FS_MAX_FMT_PAIRS );
+    fmt_pair_গুনতি *= 2;
+    জন্য( i = 0, size = initial_আকার; i < fmt_pair_গুনতি; i += 2 )
     {
-        comp_size = CV_ELEM_SIZE(fmt_pairs[i+1]);
-        size = cvAlign( size, comp_size );
-        size += comp_size * fmt_pairs[i];
+        comp_আকার = CV_ELEM_আকার(fmt_pairs[i+1]);
+        size = cvAlign( size, comp_আকার );
+        size += comp_আকার * fmt_pairs[i];
     }
-    if( initial_size == 0 )
+    যদি( initial_আকার == 0 )
     {
-        comp_size = CV_ELEM_SIZE(fmt_pairs[1]);
-        size = cvAlign( size, comp_size );
+        comp_আকার = CV_ELEM_আকার(fmt_pairs[1]);
+        size = cvAlign( size, comp_আকার );
     }
-    return size;
+    ফেরত size;
 }
 
 
-int calcStructSize( const char* dt, int initial_size )
+পূর্ণসংখ্যা calc_Struct_আকার( ধ্রুবক অক্ষর* dt, পূর্ণসংখ্যা initial_আকার )
 {
-    int size = calcElemSize( dt, initial_size );
-    size_t elem_max_size = 0;
-    for ( const char * type = dt; *type != '\0'; type++ )
+    পূর্ণসংখ্যা size = calc_Elem_আকার( dt, initial_আকার );
+    size_t elem_max_আকার = 0;
+    জন্য ( ধ্রুবক অক্ষর * type = dt; *type != '\0'; type++ )
     {
-        char v = *type;
-        if (v >= '0' && v <= '9')
-            continue;  // skip vector size
-        switch (v)
+        অক্ষর v = *type;
+        যদি (v >= '0' && v <= '9')
+            চালু;  // skip vector size
+        নির্বাচন (v)
         {
-        case 'u': { elem_max_size = std::max( elem_max_size, sizeof(uchar ) ); break; }
-        case 'b': { elem_max_size = std::max( elem_max_size, sizeof(bool  ) ); break; }
-        case 'c': { elem_max_size = std::max( elem_max_size, sizeof(schar ) ); break; }
-        case 'w': { elem_max_size = std::max( elem_max_size, sizeof(ushort) ); break; }
-        case 's': { elem_max_size = std::max( elem_max_size, sizeof(short ) ); break; }
-        case 'i': { elem_max_size = std::max( elem_max_size, sizeof(int   ) ); break; }
-        case 'n': { elem_max_size = std::max( elem_max_size, sizeof(unsigned) ); break; }
-        case 'f': { elem_max_size = std::max( elem_max_size, sizeof(float ) ); break; }
-        case 'd': { elem_max_size = std::max( elem_max_size, sizeof(double) ); break; }
-        case 'h': { elem_max_size = std::max( elem_max_size, sizeof(hfloat)); break; }
-        case 'H': { elem_max_size = std::max( elem_max_size, sizeof(bfloat)); break; }
-        case 'e': { elem_max_size = std::max( elem_max_size, sizeof(fp8_t) ); break; }
-        case 'E': { elem_max_size = std::max( elem_max_size, sizeof(fp8a_t)); break; }
-        case 'I': { elem_max_size = std::max( elem_max_size, sizeof(int64_t)); break; }
-        case 'U': { elem_max_size = std::max( elem_max_size, sizeof(uint64_t)); break; }
-        default:
-            CV_Error_(Error::StsNotImplemented, ("Unknown type identifier: '%c' in '%s'", (char)(*type), dt));
+        ক্ষেত্র 'u': { elem_max_আকার = std::max( elem_max_আকার, আকার(uchar ) ); বিরতি; }
+        ক্ষেত্র 'b': { elem_max_আকার = std::max( elem_max_আকার, আকার(যৌক্তিক  ) ); বিরতি; }
+        ক্ষেত্র 'c': { elem_max_আকার = std::max( elem_max_আকার, আকার(schar ) ); বিরতি; }
+        ক্ষেত্র 'w': { elem_max_আকার = std::max( elem_max_আকার, আকার(ushort) ); বিরতি; }
+        ক্ষেত্র 's': { elem_max_আকার = std::max( elem_max_আকার, আকার(short ) ); বিরতি; }
+        ক্ষেত্র 'i': { elem_max_আকার = std::max( elem_max_আকার, আকার(পূর্ণসংখ্যা   ) ); বিরতি; }
+        ক্ষেত্র 'n': { elem_max_আকার = std::max( elem_max_আকার, আকার(unsigned) ); বিরতি; }
+        ক্ষেত্র 'f': { elem_max_আকার = std::max( elem_max_আকার, আকার(দশমিক ) ); বিরতি; }
+        ক্ষেত্র 'd': { elem_max_আকার = std::max( elem_max_আকার, আকার(দ্বিগুণ) ); বিরতি; }
+        ক্ষেত্র 'h': { elem_max_আকার = std::max( elem_max_আকার, আকার(hfloat)); বিরতি; }
+        ক্ষেত্র 'H': { elem_max_আকার = std::max( elem_max_আকার, আকার(bfloat)); বিরতি; }
+        ক্ষেত্র 'e': { elem_max_আকার = std::max( elem_max_আকার, আকার(fp8_t) ); বিরতি; }
+        ক্ষেত্র 'E': { elem_max_আকার = std::max( elem_max_আকার, আকার(fp8a_t)); বিরতি; }
+        ক্ষেত্র 'I': { elem_max_আকার = std::max( elem_max_আকার, আকার(int64_t)); বিরতি; }
+        ক্ষেত্র 'U': { elem_max_আকার = std::max( elem_max_আকার, আকার(uint64_t)); বিরতি; }
+        পূর্বনির্ধারিত:
+            CV_Error_(Error::StsNotImplemented, ("Unknown type identifier: '%c' in '%s'", (অক্ষর)(*type), dt));
         }
     }
-    size = cvAlign( size, static_cast<int>(elem_max_size) );
-    return size;
+    size = cvAlign( size, static_cast<পূর্ণসংখ্যা>(elem_max_আকার) );
+    ফেরত size;
 }
 
-int decodeSimpleFormat( const char* dt )
+পূর্ণসংখ্যা decodeSimpleFormat( ধ্রুবক অক্ষর* dt )
 {
-    int elem_type = -1;
-    int fmt_pairs[CV_FS_MAX_FMT_PAIRS*2], fmt_pair_count;
+    পূর্ণসংখ্যা elem_type = -1;
+    পূর্ণসংখ্যা fmt_pairs[CV_FS_MAX_FMT_PAIRS*2], fmt_pair_গুনতি;
 
-    fmt_pair_count = decodeFormat( dt, fmt_pairs, CV_FS_MAX_FMT_PAIRS );
-    if( fmt_pair_count != 1 || fmt_pairs[0] >= CV_CN_MAX)
+    fmt_pair_গুনতি = decodeFormat( dt, fmt_pairs, CV_FS_MAX_FMT_PAIRS );
+    যদি( fmt_pair_গুনতি != 1 || fmt_pairs[0] >= CV_CN_MAX)
         CV_Error( cv::Error::StsError, "Too complex format for the matrix" );
 
     elem_type = CV_MAKETYPE( fmt_pairs[1], fmt_pairs[0] );
 
-    return elem_type;
+    ফেরত elem_type;
 }
 
 }
 
-#if defined __i386__ || defined(_M_IX86) || defined __x86_64__ || defined(_M_X64) || \
+#যদি defined __i386__ || defined(_M_IX86) || defined __x86_64__ || defined(_M_X64) || \
     (defined (__LITTLE_ENDIAN__) && __LITTLE_ENDIAN__)
 #define CV_LITTLE_ENDIAN_MEM_ACCESS 1
-#else
+#অন্যথা
 #define CV_LITTLE_ENDIAN_MEM_ACCESS 0
 #endif
 
-static inline int readInt(const uchar* p)
+স্থির অন্তঃরেখ পূর্ণসংখ্যা readInt(ধ্রুবক uchar* p)
 {
     // On little endian CPUs, both branches produce the same result. On big endian, only the else branch does.
-#if CV_LITTLE_ENDIAN_MEM_ACCESS
-    int val;
-    memcpy(&val, p, sizeof(val));
-    return val;
-#else
-    int val = (int)(p[0] | (p[1] << 8) | (p[2] << 16) | (p[3] << 24));
-    return val;
+#যদি CV_LITTLE_ENDIAN_MEM_ACCESS
+    পূর্ণসংখ্যা val;
+    memcpy(&val, p, আকার(val));
+    ফেরত val;
+#অন্যথা
+    পূর্ণসংখ্যা val = (পূর্ণসংখ্যা)(p[0] | (p[1] << 8) | (p[2] << 16) | (p[3] << 24));
+    ফেরত val;
 #endif
 }
 
-static inline int64_t readLong(const uchar* p)
+স্থির অন্তঃরেখ int64_t readLong(ধ্রুবক uchar* p)
 {
     // On little endian CPUs, both branches produce the same result. On big endian, only the else branch does.
-#if CV_LITTLE_ENDIAN_MEM_ACCESS
+#যদি CV_LITTLE_ENDIAN_MEM_ACCESS
     int64_t val;
-    memcpy(&val, p, sizeof(val));
-    return val;
-#else
+    memcpy(&val, p, আকার(val));
+    ফেরত val;
+#অন্যথা
     unsigned val0 = (unsigned)(p[0] | (p[1] << 8) | (p[2] << 16) | (p[3] << 24));
     unsigned val1 = (unsigned)(p[4] | (p[5] << 8) | (p[6] << 16) | (p[7] << 24));
-    return val0 | ((int64_t)val1 << 32);
+    ফেরত val0 | ((int64_t)val1 << 32);
 #endif
 }
 
-static inline double readReal(const uchar* p)
+স্থির অন্তঃরেখ দ্বিগুণ readReal(ধ্রুবক uchar* p)
 {
     // On little endian CPUs, both branches produce the same result. On big endian, only the else branch does.
-#if CV_LITTLE_ENDIAN_MEM_ACCESS
-    double val;
-    memcpy(&val, p, sizeof(val));
-    return val;
-#else
+#যদি CV_LITTLE_ENDIAN_MEM_ACCESS
+    দ্বিগুণ val;
+    memcpy(&val, p, আকার(val));
+    ফেরত val;
+#অন্যথা
     unsigned val0 = (unsigned)(p[0] | (p[1] << 8) | (p[2] << 16) | (p[3] << 24));
     unsigned val1 = (unsigned)(p[4] | (p[5] << 8) | (p[6] << 16) | (p[7] << 24));
     Cv64suf val;
     val.u = val0 | ((uint64)val1 << 32);
-    return val.f;
+    ফেরত val.f;
 #endif
 }
 
 template <typename T>
-static inline void writeInt(uchar* p, T ival)
+স্থির অন্তঃরেখ শূন্য writeInt(uchar* p, T ival)
 {
     // On little endian CPUs, both branches produce the same result. On big endian, only the else branch does.
-#if CV_LITTLE_ENDIAN_MEM_ACCESS
-    memcpy(p, &ival, sizeof(ival));
-#else
-    for (size_t i = 0, j = 0; i < sizeof(ival); ++i, j += 8)
+#যদি CV_LITTLE_ENDIAN_MEM_ACCESS
+    memcpy(p, &ival, আকার(ival));
+#অন্যথা
+    জন্য (size_t i = 0, j = 0; i < আকার(ival); ++i, j += 8)
         p[i] = (uchar)(ival >> j);
 #endif
 }
 
-static inline void writeReal(uchar* p, double fval)
+স্থির অন্তঃরেখ শূন্য writeReal(uchar* p, দ্বিগুণ fval)
 {
     // On little endian CPUs, both branches produce the same result. On big endian, only the else branch does.
-#if CV_LITTLE_ENDIAN_MEM_ACCESS
-    memcpy(p, &fval, sizeof(fval));
-#else
+#যদি CV_LITTLE_ENDIAN_MEM_ACCESS
+    memcpy(p, &fval, আকার(fval));
+#অন্যথা
     Cv64suf v;
     v.f = fval;
     p[0] = (uchar)v.u;
@@ -421,43 +421,43 @@ static inline void writeReal(uchar* p, double fval)
 
 
 
-void FileStorage::Impl::init() {
+শূন্য FileStorage::Impl::init() {
     flags = 0;
-    buffer.clear();
+    বাফার.clear();
     bufofs = 0;
     state = UNDEFINED;
-    is_using_base64 = false;
+    is_using_base64 = মিথ্যা;
     state_of_writing_base64 = FileStorage_API::Base64State::Uncertain;
-    is_write_struct_delayed = false;
-    delayed_struct_key = nullptr;
+    is_write_struct_delayed = মিথ্যা;
+    delayed_struct_চাবি = nullptr;
     delayed_struct_flags = 0;
     delayed_type_name = nullptr;
     base64_writer = nullptr;
-    is_opened = false;
-    dummy_eof = false;
-    write_mode = false;
-    mem_mode = false;
+    is_opened = মিথ্যা;
+    dummy_eof = মিথ্যা;
+    write_mode = মিথ্যা;
+    mem_mode = মিথ্যা;
     space = 0;
     wrap_margin = 71;
     fmt = 0;
     file = 0;
     gzfile = 0;
-    empty_stream = true;
+    empty_stream = সত্য;
 
     strbufv.clear();
     strbuf = 0;
     strbufsize = strbufpos = 0;
     roots.clear();
 
-    fs_data.clear();
-    fs_data_ptrs.clear();
-    fs_data_blksz.clear();
+    fs_তথ্য.clear();
+    fs_তথ্য_ptrs.clear();
+    fs_তথ্য_blksz.clear();
     freeSpaceOfs = 0;
 
     str_hash.clear();
-    str_hash_data.clear();
-    str_hash_data.resize(1);
-    str_hash_data[0] = '\0';
+    str_hash_তথ্য.clear();
+    str_hash_তথ্য.resize(1);
+    str_hash_তথ্য[0] = '\0';
 
     filename.clear();
     lineno = 0;
@@ -472,21 +472,21 @@ FileStorage::Impl::~Impl() {
     release();
 }
 
-void FileStorage::Impl::release(String *out) {
-    if (is_opened) {
-        if (out)
+শূন্য FileStorage::Impl::release(String *out) {
+    যদি (is_opened) {
+        যদি (out)
             out->clear();
-        if (write_mode) {
-            while (write_stack.size() > 1) {
+        যদি (write_mode) {
+            যখন (write_স্তূপ.size() > 1) {
                 endWriteStruct();
             }
             flush();
-            if (fmt == FileStorage::FORMAT_XML)
+            যদি (fmt == FileStorage::FORMAT_XML)
                 puts("</opencv_storage>\n");
-            else if (fmt == FileStorage::FORMAT_JSON)
+            অন্যথা যদি (fmt == FileStorage::FORMAT_JSON)
                 puts("}\n");
         }
-        if (mem_mode && out) {
+        যদি (mem_mode && out) {
             *out = cv::String(outbuf.begin(), outbuf.end());
         }
     }
@@ -494,111 +494,111 @@ void FileStorage::Impl::release(String *out) {
     init();
 }
 
-void FileStorage::Impl::analyze_file_name(const std::string &file_name, std::vector<std::string> &params) {
+শূন্য FileStorage::Impl::analyze_file_name(ধ্রুবক std::string &file_name, std::vector<std::string> &params) {
     params.clear();
-    static const char not_file_name = '\n';
-    static const char parameter_begin = '?';
-    static const char parameter_separator = '&';
+    স্থির ধ্রুবক অক্ষর not_file_name = '\n';
+    স্থির ধ্রুবক অক্ষর parameter_begin = '?';
+    স্থির ধ্রুবক অক্ষর parameter_separator = '&';
 
-    if (file_name.find(not_file_name, (size_t) 0) != std::string::npos)
-        return;
+    যদি (file_name.find(not_file_name, (size_t) 0) != std::string::npos)
+        ফেরত;
 
     size_t beg = file_name.find_last_of(parameter_begin);
     params.push_back(file_name.substr((size_t) 0, beg));
 
-    if (beg != std::string::npos) {
+    যদি (beg != std::string::npos) {
         size_t end = file_name.size();
         beg++;
-        for (size_t param_beg = beg, param_end = beg;
+        জন্য (size_t param_beg = beg, param_end = beg;
              param_end < end;
              param_beg = param_end + 1) {
             param_end = file_name.find_first_of(parameter_separator, param_beg);
-            if ((param_end == std::string::npos || param_end != param_beg) && param_beg + 1 < end) {
+            যদি ((param_end == std::string::npos || param_end != param_beg) && param_beg + 1 < end) {
                 params.push_back(file_name.substr(param_beg, param_end - param_beg));
             }
         }
     }
 }
 
-bool FileStorage::Impl::open(const char *filename_or_buf, int _flags, const char *encoding) {
-    bool ok = true;
+যৌক্তিক FileStorage::Impl::open(ধ্রুবক অক্ষর *filename_or_buf, পূর্ণসংখ্যা _flags, ধ্রুবক অক্ষর *encoding) {
+    যৌক্তিক ok = সত্য;
     release();
 
-    bool append = (_flags & 3) == FileStorage::APPEND;
+    যৌক্তিক append = (_flags & 3) == FileStorage::APPEND;
     mem_mode = (_flags & FileStorage::MEMORY) != 0;
 
     write_mode = (_flags & 3) != 0;
-    bool write_base64 = (write_mode || append) && (_flags & FileStorage::BASE64) != 0;
+    যৌক্তিক write_base64 = (write_mode || append) && (_flags & FileStorage::BASE64) != 0;
 
-    bool isGZ = false;
+    যৌক্তিক isGZ = মিথ্যা;
 
     std::vector<std::string> params;
     //if ( !mem_mode )
     {
         analyze_file_name(filename_or_buf, params);
-        if (!params.empty())
+        যদি (!params.empty())
             filename = params[0];
 
-        if (!write_base64 && params.size() >= 2 &&
+        যদি (!write_base64 && params.size() >= 2 &&
             std::find(params.begin() + 1, params.end(), std::string("base64")) != params.end())
             write_base64 = (write_mode || append);
     }
 
-    if (filename.size() == 0 && !mem_mode && !write_mode)
+    যদি (filename.size() == 0 && !mem_mode && !write_mode)
         CV_Error(cv::Error::StsNullPtr, "NULL or empty filename");
 
-    if (mem_mode && append)
+    যদি (mem_mode && append)
         CV_Error(cv::Error::StsBadFlag, "FileStorage::APPEND and FileStorage::MEMORY are not currently compatible");
 
     flags = _flags;
 
-    if (!mem_mode) {
+    যদি (!mem_mode) {
         size_t dot_idx = filename.find_last_of('.');
-        char compression = '\0';
+        অক্ষর compression = '\0';
 
-        if (dot_idx != std::string::npos)
+        যদি (dot_idx != std::string::npos)
         {
             std::string ext = filename.substr(dot_idx);
 
             // Instead of `ext.starts_with(".gz")
-            if (ext.size() >= 3 && (ext[1] == 'g') && (ext[2] == 'z') )
+            যদি (ext.size() >= 3 && (ext[1] == 'g') && (ext[2] == 'z') )
             {
-                if (ext.size() == 3)
+                যদি (ext.size() == 3)
                 {
                     // ".gz"
-                    isGZ = true;
+                    isGZ = সত্য;
                 }
 
-                else if(ext.size() == 4 && cv_isdigit(ext[3]))
+                অন্যথা যদি(ext.size() == 4 && cv_isdigit(ext[3]))
                 {
                     // ".gz[0-9]"
-                    isGZ = true;
+                    isGZ = সত্য;
                     compression = ext[3];
                     filename.pop_back(); // Replace `gz[0-9]' to 'gz'.
                 }
             }
         }
 
-        if (!isGZ) {
+        যদি (!isGZ) {
             file = fopen(filename.c_str(), !write_mode ? "rt" : !append ? "wt" : "a+t");
-            if (!file)
+            যদি (!file)
             {
-                CV_LOG_ERROR(NULL, "Can't open file: '" << filename << "' in " << (!write_mode ? "read" : !append ? "write" : "append") << " mode");
-                return false;
+                CV_LOG_ERROR(ফাঁকা, "Can't open file: '" << filename << "' in " << (!write_mode ? "read" : !append ? "write" : "append") << " mode");
+                ফেরত মিথ্যা;
             }
-        } else {
-#if USE_ZLIB
-            if (append) {
+        } অন্যথা {
+#যদি USE_ZLIB
+            যদি (append) {
                 CV_Error(cv::Error::StsNotImplemented, "Appending data to compressed file is not implemented");
             }
-            char mode[] = {write_mode ? 'w' : 'r', 'b', compression ? compression : '3', '\0'};
+            অক্ষর mode[] = {write_mode ? 'w' : 'r', 'b', compression ? compression : '3', '\0'};
             gzfile = gzopen(filename.c_str(), mode);
-            if (!gzfile)
+            যদি (!gzfile)
             {
-                CV_LOG_ERROR(NULL, "Can't open archive: '" << filename << "' mode=" << mode);
-                return false;
+                CV_LOG_ERROR(ফাঁকা, "Can't open archive: '" << filename << "' mode=" << mode);
+                ফেরত মিথ্যা;
             }
-#else
+#অন্যথা
             CV_Error(cv::Error::StsNotImplemented, "There is no compressed file storage support in this configuration");
 #endif
         }
@@ -606,28 +606,28 @@ bool FileStorage::Impl::open(const char *filename_or_buf, int _flags, const char
 
     // FIXIT release() must do that, use CV_Assert() here instead
     roots.clear();
-    fs_data.clear();
+    fs_তথ্য.clear();
 
     wrap_margin = 71;
     fmt = FileStorage::FORMAT_AUTO;
 
-    if (write_mode) {
+    যদি (write_mode) {
         fmt = flags & FileStorage::FORMAT_MASK;
 
-        if (mem_mode)
+        যদি (mem_mode)
             outbuf.clear();
 
-        if (fmt == FileStorage::FORMAT_AUTO && !filename.empty()) {
-            const char *dot_pos = NULL;
-            const char *dot_pos2 = NULL;
+        যদি (fmt == FileStorage::FORMAT_AUTO && !filename.empty()) {
+            ধ্রুবক অক্ষর *dot_pos = ফাঁকা;
+            ধ্রুবক অক্ষর *dot_pos2 = ফাঁকা;
             // like strrchr() implementation, but save two last positions simultaneously
-            for (const char *pos = &filename[0]; pos[0] != 0; pos++) {
-                if (pos[0] == '.') {
+            জন্য (ধ্রুবক অক্ষর *pos = &filename[0]; pos[0] != 0; pos++) {
+                যদি (pos[0] == '.') {
                     dot_pos2 = dot_pos;
                     dot_pos = pos;
                 }
             }
-            if (fs::strcasecmp(dot_pos, ".gz") == 0 && dot_pos2 != NULL) {
+            যদি (fs::strcasecmp(dot_pos, ".gz") == 0 && dot_pos2 != ফাঁকা) {
                 dot_pos = dot_pos2;
             }
             fmt = (fs::strcasecmp(dot_pos, ".xml") == 0 || fs::strcasecmp(dot_pos, ".xml.gz") == 0)
@@ -635,68 +635,68 @@ bool FileStorage::Impl::open(const char *filename_or_buf, int _flags, const char
                   : (fs::strcasecmp(dot_pos, ".json") == 0 || fs::strcasecmp(dot_pos, ".json.gz") == 0)
                     ? FileStorage::FORMAT_JSON
                     : FileStorage::FORMAT_YAML;
-        } else if (fmt == FileStorage::FORMAT_AUTO) {
+        } অন্যথা যদি (fmt == FileStorage::FORMAT_AUTO) {
             fmt = FileStorage::FORMAT_XML;
         }
 
         // we use factor=6 for XML (the longest characters (' and ") are encoded with 6 bytes (&apos; and &quot;)
         // and factor=4 for YAML ( as we use 4 bytes for non ASCII characters (e.g. \xAB))
-        int buf_size = CV_FS_MAX_LEN * (fmt == FileStorage::FORMAT_XML ? 6 : 4) + 1024;
+        পূর্ণসংখ্যা buf_আকার_2 = CV_FS_MAX_LEN * (fmt == FileStorage::FORMAT_XML ? 6 : 4) + 1024;
 
-        if (append) {
+        যদি (append) {
             fseek(file, 0, SEEK_END);
-            if (ftell(file) == 0)
-                append = false;
+            যদি (ftell(file) == 0)
+                append = মিথ্যা;
         }
 
-        write_stack.clear();
-        empty_stream = true;
-        write_stack.push_back(FStructData("", FileNode::MAP | FileNode::EMPTY, 0));
-        buffer.reserve(buf_size + 1024);
-        buffer.resize(buf_size);
+        write_স্তূপ.clear();
+        empty_stream = সত্য;
+        write_স্তূপ.push_back(FStruct_তথ্য("", File_গ্রন্থি::MAP | File_গ্রন্থি::EMPTY, 0));
+        বাফার.reserve(buf_আকার_2 + 1024);
+        বাফার.resize(buf_আকার_2);
         bufofs = 0;
         is_using_base64 = write_base64;
         state_of_writing_base64 = FileStorage_API::Base64State::Uncertain;
 
-        if (fmt == FileStorage::FORMAT_XML) {
-            size_t file_size = file ? (size_t) ftell(file) : (size_t) 0;
-            if (!append || file_size == 0) {
-                if (encoding && *encoding != '\0') {
-                    if (fs::strcasecmp(encoding, "UTF-16") == 0) {
+        যদি (fmt == FileStorage::FORMAT_XML) {
+            size_t file_আকার_2 = file ? (size_t) ftell(file) : (size_t) 0;
+            যদি (!append || file_আকার_2 == 0) {
+                যদি (encoding && *encoding != '\0') {
+                    যদি (fs::strcasecmp(encoding, "UTF-16") == 0) {
                         release();
                         CV_Error(cv::Error::StsBadArg, "UTF-16 XML encoding is not supported! Use 8-bit encoding\n");
                     }
 
                     CV_Assert(strlen(encoding) < 1000);
-                    char buf[1100];
-                    snprintf(buf, sizeof(buf), "<?xml version=\"1.0\" encoding=\"%s\"?>\n", encoding);
+                    অক্ষর buf[1100];
+                    snprintf(buf, আকার(buf), "<?xml version=\"1.0\" encoding=\"%s\"?>\n", encoding);
                     puts(buf);
-                } else
+                } অন্যথা
                     puts("<?xml version=\"1.0\"?>\n");
                 puts("<opencv_storage>\n");
-            } else {
-                int xml_buf_size = 1 << 10;
-                char substr[] = "</opencv_storage>";
-                int last_occurrence = -1;
-                xml_buf_size = MIN(xml_buf_size, int(file_size));
-                fseek(file, -xml_buf_size, SEEK_END);
+            } অন্যথা {
+                পূর্ণসংখ্যা xml_buf_আকার = 1 << 10;
+                অক্ষর substr[] = "</opencv_storage>";
+                পূর্ণসংখ্যা last_occurrence = -1;
+                xml_buf_আকার = MIN(xml_buf_আকার, পূর্ণসংখ্যা(file_আকার_2));
+                fseek(file, -xml_buf_আকার, SEEK_END);
                 // find the last occurrence of </opencv_storage>
-                for (;;) {
-                    int line_offset = (int) ftell(file);
-                    const char *ptr0 = this->gets(xml_buf_size);
-                    const char *ptr = NULL;
-                    if (!ptr0)
-                        break;
+                জন্য (;;) {
+                    পূর্ণসংখ্যা সারি_offset = (পূর্ণসংখ্যা) ftell(file);
+                    ধ্রুবক অক্ষর *ptr0 = এই->gets(xml_buf_আকার);
+                    ধ্রুবক অক্ষর *ptr = ফাঁকা;
+                    যদি (!ptr0)
+                        বিরতি;
                     ptr = ptr0;
-                    for (;;) {
+                    জন্য (;;) {
                         ptr = strstr(ptr, substr);
-                        if (!ptr)
-                            break;
-                        last_occurrence = line_offset + (int) (ptr - ptr0);
+                        যদি (!ptr)
+                            বিরতি;
+                        last_occurrence = সারি_offset + (পূর্ণসংখ্যা) (ptr - ptr0);
                         ptr += strlen(substr);
                     }
                 }
-                if (last_occurrence < 0) {
+                যদি (last_occurrence < 0) {
                     release();
                     CV_Error(cv::Error::StsError, "Could not find </opencv_storage> in the end of file.\n");
                 }
@@ -710,838 +710,838 @@ bool FileStorage::Impl::open(const char *filename_or_buf, int _flags, const char
                 puts("\n");
             }
 
-            emitter_do_not_use_direct_dereference = createXMLEmitter(this);
-        } else if (fmt == FileStorage::FORMAT_YAML || fmt == FileStorage::FORMAT_YAML_1_0) {
-                if (!append) {
-                    if (fmt == FileStorage::FORMAT_YAML_1_0)
+            emitter_do_not_use_direct_dereference = createXMLEmitter(এই);
+        } অন্যথা যদি (fmt == FileStorage::FORMAT_YAML || fmt == FileStorage::FORMAT_YAML_1_0) {
+                যদি (!append) {
+                    যদি (fmt == FileStorage::FORMAT_YAML_1_0)
                         puts("%YAML:1.0\n---\n"); // Legacy Flag -> Legacy Header
-                    else
+                    অন্যথা
                         puts("%YAML 1.2\n---\n"); // Default -> Modern Header
                 }
-            else
+            অন্যথা
                 puts("...\n---\n");
 
-            emitter_do_not_use_direct_dereference = createYAMLEmitter(this);
-        } else {
+            emitter_do_not_use_direct_dereference = createYAMLEmitter(এই);
+        } অন্যথা {
             CV_Assert(fmt == FileStorage::FORMAT_JSON);
-            if (!append)
+            যদি (!append)
                 puts("{\n");
-            else {
-                bool valid = false;
+            অন্যথা {
+                যৌক্তিক valid = মিথ্যা;
                 long roffset = 0;
-                for (;
+                জন্য (;
                         fseek(file, roffset, SEEK_END) == 0;
                         roffset -= 1) {
-                    const char end_mark = '}';
-                    if (fgetc(file) == end_mark) {
+                    ধ্রুবক অক্ষর end_mark = '}';
+                    যদি (fgetc(file) == end_mark) {
                         fseek(file, roffset, SEEK_END);
-                        valid = true;
-                        break;
+                        valid = সত্য;
+                        বিরতি;
                     }
                 }
 
-                if (valid) {
+                যদি (valid) {
                     closeFile();
                     file = fopen(filename.c_str(), "r+t");
                     CV_Assert(file != 0);
                     fseek(file, roffset, SEEK_END);
                     fputs(",", file);
-                } else {
+                } অন্যথা {
                     CV_Error(cv::Error::StsError, "Could not find '}' in the end of file.\n");
                 }
             }
-            write_stack.back().indent = 4;
-            emitter_do_not_use_direct_dereference = createJSONEmitter(this);
+            write_স্তূপ.back().indent = 4;
+            emitter_do_not_use_direct_dereference = createJSONEmitter(এই);
         }
-        is_opened = true;
-    } else {
-        const size_t buf_size0 = 40;
-        buffer.resize(buf_size0);
-        if (mem_mode) {
-            strbuf = (char *) filename_or_buf;
+        is_opened = সত্য;
+    } অন্যথা {
+        ধ্রুবক size_t buf_size0 = 40;
+        বাফার.resize(buf_size0);
+        যদি (mem_mode) {
+            strbuf = (অক্ষর *) filename_or_buf;
             strbufsize = strlen(strbuf);
         }
 
-        const char *yaml_signature = "%YAML";
-        const char *json_signature = "{";
-        const char *xml_signature = "<?xml";
-        char *buf = this->gets(16);
+        ধ্রুবক অক্ষর *yaml_signature = "%YAML";
+        ধ্রুবক অক্ষর *json_signature = "{";
+        ধ্রুবক অক্ষর *xml_signature = "<?xml";
+        অক্ষর *buf = এই->gets(16);
         CV_Assert(buf);
-        char *bufPtr = cv_skip_BOM(buf);
+        অক্ষর *bufPtr = cv_skip_BOM(buf);
         size_t bufOffset = bufPtr - buf;
 
         // NOTE: Yaml 1.2 allows to skip header. Data without type signature is read as YAML
-        if (strncmp(bufPtr, yaml_signature, strlen(yaml_signature)) == 0)
+        যদি (strncmp(bufPtr, yaml_signature, strlen(yaml_signature)) == 0)
             fmt = FileStorage::FORMAT_YAML;
-        else if (strncmp(bufPtr, json_signature, strlen(json_signature)) == 0)
+        অন্যথা যদি (strncmp(bufPtr, json_signature, strlen(json_signature)) == 0)
             fmt = FileStorage::FORMAT_JSON;
-        else if (strncmp(bufPtr, xml_signature, strlen(xml_signature)) == 0)
+        অন্যথা যদি (strncmp(bufPtr, xml_signature, strlen(xml_signature)) == 0)
             fmt = FileStorage::FORMAT_XML;
-        else
+        অন্যথা
             fmt = FileStorage::FORMAT_YAML;
 
         rewind();
         strbufpos = bufOffset;
         bufofs = 0;
 
-        try {
-            char *ptr = bufferStart();
+        চেষ্টা {
+            অক্ষর *ptr = বাফার_Start();
             ptr[0] = ptr[1] = ptr[2] = '\0';
-            FileNode root_nodes(fs_ext, 0, 0);
+            File_গ্রন্থি মূল_nodes(fs_ext, 0, 0);
 
-            uchar *rptr = reserveNodeSpace(root_nodes, 9);
-            *rptr = FileNode::SEQ;
+            uchar *rptr = reserve_গ্রন্থি_Space(মূল_nodes, 9);
+            *rptr = File_গ্রন্থি::SEQ;
             writeInt(rptr + 1, 4);
             writeInt(rptr + 5, 0);
 
             roots.clear();
 
-            switch (fmt) {
-                case FileStorage::FORMAT_XML:
-                    parser_do_not_use_direct_dereference = createXMLParser(this);
-                    break;
-                case FileStorage::FORMAT_YAML:
-                case FileStorage::FORMAT_YAML_1_0:
-                    parser_do_not_use_direct_dereference = createYAMLParser(this);
-                    break;
-                case FileStorage::FORMAT_JSON:
-                    parser_do_not_use_direct_dereference = createJSONParser(this);
-                    break;
-                default:
+            নির্বাচন (fmt) {
+                ক্ষেত্র FileStorage::FORMAT_XML:
+                    parser_do_not_use_direct_dereference = createXMLParser(এই);
+                    বিরতি;
+                ক্ষেত্র FileStorage::FORMAT_YAML:
+                ক্ষেত্র FileStorage::FORMAT_YAML_1_0:
+                    parser_do_not_use_direct_dereference = createYAMLParser(এই);
+                    বিরতি;
+                ক্ষেত্র FileStorage::FORMAT_JSON:
+                    parser_do_not_use_direct_dereference = createJSONParser(এই);
+                    বিরতি;
+                পূর্বনির্ধারিত:
                     parser_do_not_use_direct_dereference = Ptr<FileStorageParser>();
             }
 
-            if (!parser_do_not_use_direct_dereference.empty()) {
+            যদি (!parser_do_not_use_direct_dereference.empty()) {
                 ok = getParser().parse(ptr);
-                if (ok) {
-                    finalizeCollection(root_nodes);
+                যদি (ok) {
+                    finalizeCollection(মূল_nodes);
 
-                    CV_Assert(!fs_data_ptrs.empty());
-                    FileNode roots_node(fs_ext, 0, 0);
-                    size_t i, nroots = roots_node.size();
-                    FileNodeIterator it = roots_node.begin();
+                    CV_Assert(!fs_তথ্য_ptrs.empty());
+                    File_গ্রন্থি roots_গ্রন্থি(fs_ext, 0, 0);
+                    size_t i, nroots = roots_গ্রন্থি.size();
+                    File_গ্রন্থি_Iterator it = roots_গ্রন্থি.begin();
 
-                    for (i = 0; i < nroots; i++, ++it)
+                    জন্য (i = 0; i < nroots; i++, ++it)
                         roots.push_back(*it);
                 }
             }
         }
-        catch (...)
+        ধরো (...)
         {
             // FIXIT log error message
-            is_opened = true;
+            is_opened = সত্য;
             release();
-            throw;
+            ছোড়ো;
         }
 
         // release resources that we do not need anymore
         closeFile();
-        is_opened = true;
-        std::vector<char> tmpbuf;
-        std::swap(buffer, tmpbuf);
+        is_opened = সত্য;
+        std::vector<অক্ষর> tmpbuf;
+        std::swap(বাফার, tmpbuf);
         bufofs = 0;
     }
-    return ok;
+    ফেরত ok;
 }
 
-void FileStorage::Impl::puts(const char *str) {
+শূন্য FileStorage::Impl::puts(ধ্রুবক অক্ষর *str) {
     CV_Assert(write_mode);
-    if (mem_mode)
+    যদি (mem_mode)
         std::copy(str, str + strlen(str), std::back_inserter(outbuf));
-    else if (file)
+    অন্যথা যদি (file)
         fputs(str, file);
-#if USE_ZLIB
-    else if (gzfile)
+#যদি USE_ZLIB
+    অন্যথা যদি (gzfile)
         gzputs(gzfile, str);
 #endif
-    else
+    অন্যথা
         CV_Error(cv::Error::StsError, "The storage is not opened");
 }
 
-char *FileStorage::Impl::getsFromFile(char *buf, int count) {
-    if (file)
-        return fgets(buf, count, file);
-#if USE_ZLIB
-    if (gzfile)
-        return gzgets(gzfile, buf, count);
+অক্ষর *FileStorage::Impl::getsFromFile(অক্ষর *buf, পূর্ণসংখ্যা গুনতি_2) {
+    যদি (file)
+        ফেরত fgets(buf, গুনতি_2, file);
+#যদি USE_ZLIB
+    যদি (gzfile)
+        ফেরত gzgets(gzfile, buf, গুনতি_2);
 #endif
     CV_Error(cv::Error::StsError, "The storage is not opened");
 }
 
-char *FileStorage::Impl::gets(size_t maxCount) {
-    if (strbuf) {
+অক্ষর *FileStorage::Impl::gets(size_t max_গুনতি) {
+    যদি (strbuf) {
         size_t i = strbufpos, len = strbufsize;
-        const char *instr = strbuf;
-        for (; i < len; i++) {
-            char c = instr[i];
-            if (c == '\0' || c == '\n') {
-                if (c == '\n')
+        ধ্রুবক অক্ষর *instr = strbuf;
+        জন্য (; i < len; i++) {
+            অক্ষর c = instr[i];
+            যদি (c == '\0' || c == '\n') {
+                যদি (c == '\n')
                     i++;
-                break;
+                বিরতি;
             }
         }
-        size_t count = i - strbufpos;
-        if (maxCount == 0 || maxCount > count)
-            maxCount = count;
-        buffer.resize(std::max(buffer.size(), maxCount + 8));
-        memcpy(&buffer[0], instr + strbufpos, maxCount);
-        buffer[maxCount] = '\0';
+        size_t গুনতি_2 = i - strbufpos;
+        যদি (max_গুনতি == 0 || max_গুনতি > গুনতি_2)
+            max_গুনতি = গুনতি_2;
+        বাফার.resize(std::max(বাফার.size(), max_গুনতি + 8));
+        memcpy(&বাফার[0], instr + strbufpos, max_গুনতি);
+        বাফার[max_গুনতি] = '\0';
         strbufpos = i;
-        return maxCount > 0 ? &buffer[0] : 0;
+        ফেরত max_গুনতি > 0 ? &বাফার[0] : 0;
     }
 
-    const size_t MAX_BLOCK_SIZE = INT_MAX / 2; // hopefully, that will be enough
-    if (maxCount == 0)
-        maxCount = MAX_BLOCK_SIZE;
-    else
-        CV_Assert(maxCount < MAX_BLOCK_SIZE);
+    ধ্রুবক size_t MAX_BLOCK_আকার = INT_MAX / 2; // hopefully, that will be enough
+    যদি (max_গুনতি == 0)
+        max_গুনতি = MAX_BLOCK_আকার;
+    অন্যথা
+        CV_Assert(max_গুনতি < MAX_BLOCK_আকার);
     size_t ofs = 0;
 
-    for (;;) {
-        int count = (int) std::min(buffer.size() - ofs - 16, maxCount);
-        char *ptr = getsFromFile(&buffer[ofs], count + 1);
-        if (!ptr)
-            break;
-        int delta = (int) strlen(ptr);
+    জন্য (;;) {
+        পূর্ণসংখ্যা গুনতি_2 = (পূর্ণসংখ্যা) std::min(বাফার.size() - ofs - 16, max_গুনতি);
+        অক্ষর *ptr = getsFromFile(&বাফার[ofs], গুনতি_2 + 1);
+        যদি (!ptr)
+            বিরতি;
+        পূর্ণসংখ্যা delta = (পূর্ণসংখ্যা) strlen(ptr);
         ofs += delta;
-        maxCount -= delta;
-        if (delta == 0 || ptr[delta - 1] == '\n' || maxCount == 0)
-            break;
-        if (delta == count)
-            buffer.resize((size_t) (buffer.size() * 1.5));
+        max_গুনতি -= delta;
+        যদি (delta == 0 || ptr[delta - 1] == '\n' || max_গুনতি == 0)
+            বিরতি;
+        যদি (delta == গুনতি_2)
+            বাফার.resize((size_t) (বাফার.size() * 1.5));
     }
-    return ofs > 0 ? &buffer[0] : 0;
+    ফেরত ofs > 0 ? &বাফার[0] : 0;
 }
 
-char *FileStorage::Impl::gets() {
-    char *ptr = this->gets(0);
-    if (!ptr) {
-        ptr = bufferStart();  // FIXIT Why do we need this hack? What is about other parsers JSON/YAML?
+অক্ষর *FileStorage::Impl::gets() {
+    অক্ষর *ptr = এই->gets(0);
+    যদি (!ptr) {
+        ptr = বাফার_Start();  // FIXIT Why do we need this hack? What is about other parsers JSON/YAML?
         *ptr = '\0';
         setEof();
-        return 0;
-    } else {
+        ফেরত 0;
+    } অন্যথা {
         size_t l = strlen(ptr);
-        if (l > 0 && ptr[l - 1] != '\n' && ptr[l - 1] != '\r' && !eof()) {
+        যদি (l > 0 && ptr[l - 1] != '\n' && ptr[l - 1] != '\r' && !eof()) {
             ptr[l] = '\n';
             ptr[l + 1] = '\0';
         }
     }
     lineno++;
-    return ptr;
+    ফেরত ptr;
 }
 
-bool FileStorage::Impl::eof() {
-    if (dummy_eof)
-        return true;
-    if (strbuf)
-        return strbufpos >= strbufsize;
-    if (file)
-        return feof(file) != 0;
-#if USE_ZLIB
-    if (gzfile)
-        return gzeof(gzfile) != 0;
+যৌক্তিক FileStorage::Impl::eof() {
+    যদি (dummy_eof)
+        ফেরত সত্য;
+    যদি (strbuf)
+        ফেরত strbufpos >= strbufsize;
+    যদি (file)
+        ফেরত feof(file) != 0;
+#যদি USE_ZLIB
+    যদি (gzfile)
+        ফেরত gzeof(gzfile) != 0;
 #endif
-    return false;
+    ফেরত মিথ্যা;
 }
 
-void FileStorage::Impl::setEof() {
-    dummy_eof = true;
+শূন্য FileStorage::Impl::setEof() {
+    dummy_eof = সত্য;
 }
 
-void FileStorage::Impl::closeFile() {
-    if (file)
+শূন্য FileStorage::Impl::closeFile() {
+    যদি (file)
         fclose(file);
-#if USE_ZLIB
-    else if (gzfile)
+#যদি USE_ZLIB
+    অন্যথা যদি (gzfile)
         gzclose(gzfile);
 #endif
     file = 0;
     gzfile = 0;
     strbuf = 0;
     strbufpos = 0;
-    is_opened = false;
+    is_opened = মিথ্যা;
 }
 
-void FileStorage::Impl::rewind() {
-    if (file)
+শূন্য FileStorage::Impl::rewind() {
+    যদি (file)
         ::rewind(file);
-#if USE_ZLIB
-    else if (gzfile)
+#যদি USE_ZLIB
+    অন্যথা যদি (gzfile)
         gzrewind(gzfile);
 #endif
     strbufpos = 0;
 }
 
-char *FileStorage::Impl::resizeWriteBuffer(char *ptr, int len) {
-    const char *buffer_end = &buffer[0] + buffer.size();
-    if (ptr + len < buffer_end)
-        return ptr;
+অক্ষর *FileStorage::Impl::resize_Write_বাফার(অক্ষর *ptr, পূর্ণসংখ্যা len) {
+    ধ্রুবক অক্ষর *বাফার_end = &বাফার[0] + বাফার.size();
+    যদি (ptr + len < বাফার_end)
+        ফেরত ptr;
 
-    const char *buffer_start = &buffer[0];
-    int written_len = (int) (ptr - buffer_start);
+    ধ্রুবক অক্ষর *বাফার_start = &বাফার[0];
+    পূর্ণসংখ্যা written_len = (পূর্ণসংখ্যা) (ptr - বাফার_start);
 
-    CV_Assert(written_len <= (int) buffer.size());
-    int new_size = (int) ((buffer_end - buffer_start) * 3 / 2);
-    new_size = MAX(written_len + len, new_size);
-    buffer.reserve(new_size + 256);
-    buffer.resize(new_size);
+    CV_Assert(written_len <= (পূর্ণসংখ্যা) বাফার.size());
+    পূর্ণসংখ্যা new_আকার_2 = (পূর্ণসংখ্যা) ((বাফার_end - বাফার_start) * 3 / 2);
+    new_আকার_2 = MAX(written_len + len, new_আকার_2);
+    বাফার.reserve(new_আকার_2 + 256);
+    বাফার.resize(new_আকার_2);
     bufofs = written_len;
-    return &buffer[0] + bufofs;
+    ফেরত &বাফার[0] + bufofs;
 }
 
-char *FileStorage::Impl::flush() {
-    char *buffer_start = &buffer[0];
-    char *ptr = buffer_start + bufofs;
+অক্ষর *FileStorage::Impl::flush() {
+    অক্ষর *বাফার_start = &বাফার[0];
+    অক্ষর *ptr = বাফার_start + bufofs;
 
-    if (ptr > buffer_start + space) {
+    যদি (ptr > বাফার_start + space) {
         ptr[0] = '\n';
         ptr[1] = '\0';
-        puts(buffer_start);
+        puts(বাফার_start);
         bufofs = 0;
     }
 
-    int indent = write_stack.back().indent;
+    পূর্ণসংখ্যা indent = write_স্তূপ.back().indent;
 
-    if (space != indent) {
-        memset(buffer_start, ' ', indent);
+    যদি (space != indent) {
+        memset(বাফার_start, ' ', indent);
         space = indent;
     }
     bufofs = space;
-    ptr = buffer_start + bufofs;
+    ptr = বাফার_start + bufofs;
 
-    return ptr;
+    ফেরত ptr;
 }
 
-void FileStorage::Impl::endWriteStruct() {
+শূন্য FileStorage::Impl::endWriteStruct() {
     CV_Assert(write_mode);
 
-    check_if_write_struct_is_delayed(false);
-    if (state_of_writing_base64 != FileStorage_API::Uncertain)
+    check_if_write_struct_is_delayed(মিথ্যা);
+    যদি (state_of_writing_base64 != FileStorage_API::Uncertain)
         switch_to_Base64_state(FileStorage_API::Uncertain);
 
-    CV_Assert(!write_stack.empty());
+    CV_Assert(!write_স্তূপ.empty());
 
-    FStructData &current_struct = write_stack.back();
-    if (fmt == FileStorage::FORMAT_JSON && !FileNode::isFlow(current_struct.flags) && write_stack.size() > 1)
-        current_struct.indent = write_stack[write_stack.size() - 2].indent;
+    FStruct_তথ্য &current_struct = write_স্তূপ.back();
+    যদি (fmt == FileStorage::FORMAT_JSON && !File_গ্রন্থি::isFlow(current_struct.flags) && write_স্তূপ.size() > 1)
+        current_struct.indent = write_স্তূপ[write_স্তূপ.size() - 2].indent;
 
     getEmitter().endWriteStruct(current_struct);
 
-    write_stack.pop_back();
-    if (!write_stack.empty())
-        write_stack.back().flags &= ~FileNode::EMPTY;
+    write_স্তূপ.pop_back();
+    যদি (!write_স্তূপ.empty())
+        write_স্তূপ.back().flags &= ~File_গ্রন্থি::EMPTY;
 }
 
-void FileStorage::Impl::startWriteStruct_helper(const char *key, int struct_flags,
-                                                const char *type_name) {
+শূন্য FileStorage::Impl::startWriteStruct_helper(ধ্রুবক অক্ষর *চাবি, পূর্ণসংখ্যা struct_flags,
+                                                ধ্রুবক অক্ষর *type_name) {
     CV_Assert(write_mode);
 
-    struct_flags = (struct_flags & (FileNode::TYPE_MASK | FileNode::FLOW)) | FileNode::EMPTY;
-    if (!FileNode::isCollection(struct_flags))
+    struct_flags = (struct_flags & (File_গ্রন্থি::TYPE_MASK | File_গ্রন্থি::FLOW)) | File_গ্রন্থি::EMPTY;
+    যদি (!File_গ্রন্থি::isCollection(struct_flags))
         CV_Error(cv::Error::StsBadArg,
                  "Some collection type: FileNode::SEQ or FileNode::MAP must be specified");
 
-    if (type_name && type_name[0] == '\0')
+    যদি (type_name && type_name[0] == '\0')
         type_name = 0;
 
-    FStructData s = getEmitter().startWriteStruct(write_stack.back(), key, struct_flags, type_name);
+    FStruct_তথ্য s = getEmitter().startWriteStruct(write_স্তূপ.back(), চাবি, struct_flags, type_name);
 
-    write_stack.push_back(s);
-    size_t write_stack_size = write_stack.size();
-    if (write_stack_size > 1)
-        write_stack[write_stack_size - 2].flags &= ~FileNode::EMPTY;
+    write_স্তূপ.push_back(s);
+    size_t write_স্তূপ_আকার = write_স্তূপ.size();
+    যদি (write_স্তূপ_আকার > 1)
+        write_স্তূপ[write_স্তূপ_আকার - 2].flags &= ~File_গ্রন্থি::EMPTY;
 
-    if (fmt != FileStorage::FORMAT_JSON && !FileNode::isFlow(s.flags))
+    যদি (fmt != FileStorage::FORMAT_JSON && !File_গ্রন্থি::isFlow(s.flags))
         flush();
 
-    if (fmt == FileStorage::FORMAT_JSON && type_name && type_name[0] && FileNode::isMap(struct_flags)) {
-        getEmitter().write("type_id", type_name, false);
+    যদি (fmt == FileStorage::FORMAT_JSON && type_name && type_name[0] && File_গ্রন্থি::isMap(struct_flags)) {
+        getEmitter().লিখ("type_id", type_name, মিথ্যা);
     }
 }
 
-void FileStorage::Impl::startWriteStruct(const char *key, int struct_flags,
-                                         const char *type_name) {
-    check_if_write_struct_is_delayed(false);
-    if (state_of_writing_base64 == FileStorage_API::NotUse)
+শূন্য FileStorage::Impl::startWriteStruct(ধ্রুবক অক্ষর *চাবি, পূর্ণসংখ্যা struct_flags,
+                                         ধ্রুবক অক্ষর *type_name) {
+    check_if_write_struct_is_delayed(মিথ্যা);
+    যদি (state_of_writing_base64 == FileStorage_API::NotUse)
         switch_to_Base64_state(FileStorage_API::Uncertain);
 
-    if (state_of_writing_base64 == FileStorage_API::Uncertain && FileNode::isSeq(struct_flags)
+    যদি (state_of_writing_base64 == FileStorage_API::Uncertain && File_গ্রন্থি::isSeq(struct_flags)
         && is_using_base64 && type_name == 0) {
         /* Uncertain whether output Base64 data */
-        make_write_struct_delayed(key, struct_flags, type_name);
-    } else if (type_name && memcmp(type_name, "binary", 6) == 0) {
+        make_write_struct_delayed(চাবি, struct_flags, type_name);
+    } অন্যথা যদি (type_name && memcmp(type_name, "binary", 6) == 0) {
         /* Must output Base64 data */
-        if ((FileNode::TYPE_MASK & struct_flags) != FileNode::SEQ)
+        যদি ((File_গ্রন্থি::TYPE_MASK & struct_flags) != File_গ্রন্থি::SEQ)
             CV_Error(cv::Error::StsBadArg, "must set 'struct_flags |= CV_NODE_SEQ' if using Base64.");
-        else if (state_of_writing_base64 != FileStorage_API::Uncertain)
+        অন্যথা যদি (state_of_writing_base64 != FileStorage_API::Uncertain)
             CV_Error(cv::Error::StsError, "function \'cvStartWriteStruct\' calls cannot be nested if using Base64.");
 
-        startWriteStruct_helper(key, struct_flags, "binary");
+        startWriteStruct_helper(চাবি, struct_flags, "binary");
 
-        if (state_of_writing_base64 != FileStorage_API::Uncertain)
+        যদি (state_of_writing_base64 != FileStorage_API::Uncertain)
             switch_to_Base64_state(FileStorage_API::Uncertain);
         switch_to_Base64_state(FileStorage_API::InUse);
-    } else {
+    } অন্যথা {
         /* Won't output Base64 data */
-        if (state_of_writing_base64 == FileStorage_API::InUse)
+        যদি (state_of_writing_base64 == FileStorage_API::InUse)
             CV_Error(cv::Error::StsError, "At the end of the output Base64, `cvEndWriteStruct` is needed.");
 
-        startWriteStruct_helper(key, struct_flags, type_name);
+        startWriteStruct_helper(চাবি, struct_flags, type_name);
 
-        if (state_of_writing_base64 != FileStorage_API::Uncertain)
+        যদি (state_of_writing_base64 != FileStorage_API::Uncertain)
             switch_to_Base64_state(FileStorage_API::Uncertain);
         switch_to_Base64_state(FileStorage_API::NotUse);
     }
 }
 
-void FileStorage::Impl::writeComment(const char *comment, bool eol_comment) {
+শূন্য FileStorage::Impl::writeComment(ধ্রুবক অক্ষর *comment, যৌক্তিক eol_comment) {
     CV_Assert(write_mode);
     getEmitter().writeComment(comment, eol_comment);
 }
 
-void FileStorage::Impl::startNextStream() {
+শূন্য FileStorage::Impl::start_পরবর্তী_Stream() {
     CV_Assert(write_mode);
-    if (!empty_stream) {
-        while (!write_stack.empty())
+    যদি (!empty_stream) {
+        যখন (!write_স্তূপ.empty())
             endWriteStruct();
         flush();
-        getEmitter().startNextStream();
-        empty_stream = true;
-        write_stack.push_back(FStructData("", FileNode::EMPTY, 0));
+        getEmitter().start_পরবর্তী_Stream();
+        empty_stream = সত্য;
+        write_স্তূপ.push_back(FStruct_তথ্য("", File_গ্রন্থি::EMPTY, 0));
         bufofs = 0;
     }
 }
 
-void FileStorage::Impl::write(const String &key, int value) {
+শূন্য FileStorage::Impl::লিখ(ধ্রুবক String &চাবি, পূর্ণসংখ্যা value) {
     CV_Assert(write_mode);
-    getEmitter().write(key.c_str(), value);
+    getEmitter().লিখ(চাবি.c_str(), value);
 }
 
-void FileStorage::Impl::write(const String &key, int64_t value) {
+শূন্য FileStorage::Impl::লিখ(ধ্রুবক String &চাবি, int64_t value) {
     CV_Assert(write_mode);
-    getEmitter().write(key.c_str(), value);
+    getEmitter().লিখ(চাবি.c_str(), value);
 }
 
-void FileStorage::Impl::write(const String &key, double value) {
+শূন্য FileStorage::Impl::লিখ(ধ্রুবক String &চাবি, দ্বিগুণ value) {
     CV_Assert(write_mode);
-    getEmitter().write(key.c_str(), value);
+    getEmitter().লিখ(চাবি.c_str(), value);
 }
 
-void FileStorage::Impl::write(const String &key, const String &value) {
+শূন্য FileStorage::Impl::লিখ(ধ্রুবক String &চাবি, ধ্রুবক String &value) {
     CV_Assert(write_mode);
-    getEmitter().write(key.c_str(), value.c_str(), false);
+    getEmitter().লিখ(চাবি.c_str(), value.c_str(), মিথ্যা);
 }
 
-void FileStorage::Impl::writeRawData(const std::string &dt, const void *_data, size_t len) {
+শূন্য FileStorage::Impl::write_Raw_তথ্য(ধ্রুবক std::string &dt, ধ্রুবক শূন্য *তথ্য_3, size_t len) {
     CV_Assert(write_mode);
 
-    if (is_using_base64 || state_of_writing_base64 == FileStorage_API::Base64State::InUse) {
-        writeRawDataBase64(_data, len, dt.c_str());
-        return;
-    } else if (state_of_writing_base64 == FileStorage_API::Base64State::Uncertain) {
+    যদি (is_using_base64 || state_of_writing_base64 == FileStorage_API::Base64State::InUse) {
+        write_Raw_তথ্য_Base64(তথ্য_3, len, dt.c_str());
+        ফেরত;
+    } অন্যথা যদি (state_of_writing_base64 == FileStorage_API::Base64State::Uncertain) {
         switch_to_Base64_state(FileStorage_API::Base64State::NotUse);
     }
 
-    size_t elemSize = fs::calcStructSize(dt.c_str(), 0);
-    CV_Assert(elemSize);
-    CV_Assert(len % elemSize == 0);
-    len /= elemSize;
+    size_t elem_আকার = fs::calc_Struct_আকার(dt.c_str(), 0);
+    CV_Assert(elem_আকার);
+    CV_Assert(len % elem_আকার == 0);
+    len /= elem_আকার;
 
-    bool explicitZero = fmt == FileStorage::FORMAT_JSON;
-    const uchar *data0 = (const uchar *) _data;
-    int fmt_pairs[CV_FS_MAX_FMT_PAIRS * 2], k, fmt_pair_count;
-    char buf[256] = "";
+    যৌক্তিক explicitZero = fmt == FileStorage::FORMAT_JSON;
+    ধ্রুবক uchar *data0 = (ধ্রুবক uchar *) তথ্য_3;
+    পূর্ণসংখ্যা fmt_pairs[CV_FS_MAX_FMT_PAIRS * 2], k, fmt_pair_গুনতি;
+    অক্ষর buf[256] = "";
 
-    fmt_pair_count = fs::decodeFormat(dt.c_str(), fmt_pairs, CV_FS_MAX_FMT_PAIRS);
+    fmt_pair_গুনতি = fs::decodeFormat(dt.c_str(), fmt_pairs, CV_FS_MAX_FMT_PAIRS);
 
-    if (!len)
-        return;
+    যদি (!len)
+        ফেরত;
 
-    if (!data0)
+    যদি (!data0)
         CV_Error(cv::Error::StsNullPtr, "Null data pointer");
 
-    if (fmt_pair_count == 1) {
-        fmt_pairs[0] *= (int) len;
+    যদি (fmt_pair_গুনতি == 1) {
+        fmt_pairs[0] *= (পূর্ণসংখ্যা) len;
         len = 1;
     }
 
-    for (; len--; data0 += elemSize) {
-        int offset = 0;
-        for (k = 0; k < fmt_pair_count; k++) {
-            int i, count = fmt_pairs[k * 2];
-            int elem_type = fmt_pairs[k * 2 + 1];
-            int elem_size = CV_ELEM_SIZE(elem_type);
-            const char *ptr;
+    জন্য (; len--; data0 += elem_আকার) {
+        পূর্ণসংখ্যা offset = 0;
+        জন্য (k = 0; k < fmt_pair_গুনতি; k++) {
+            পূর্ণসংখ্যা i, গুনতি_2 = fmt_pairs[k * 2];
+            পূর্ণসংখ্যা elem_type = fmt_pairs[k * 2 + 1];
+            পূর্ণসংখ্যা elem_আকার_2 = CV_ELEM_আকার(elem_type);
+            ধ্রুবক অক্ষর *ptr;
 
-            offset = cvAlign(offset, elem_size);
-            const uchar *data = data0 + offset;
+            offset = cvAlign(offset, elem_আকার_2);
+            ধ্রুবক uchar *তথ্য = data0 + offset;
 
-            for (i = 0; i < count; i++) {
-                switch (elem_type) {
-                    case CV_8U:
-                        ptr = fs::itoa(*(uchar *) data, buf, 10);
-                        data++;
-                        break;
-                    case CV_Bool:
-                        ptr = fs::itoa(*(uchar *) data != 0, buf, 10);
-                        data++;
-                        break;
-                    case CV_8S:
-                        ptr = fs::itoa(*(char *) data, buf, 10);
-                        data++;
-                        break;
-                    case CV_16U:
-                        ptr = fs::itoa(*(ushort *) data, buf, 10);
-                        data += sizeof(ushort);
-                        break;
-                    case CV_16S:
-                        ptr = fs::itoa(*(short *) data, buf, 10);
-                        data += sizeof(short);
-                        break;
-                    case CV_32U:
-                        ptr = fs::itoa((int64_t)*(unsigned*) data, buf, 10, false);
-                        data += sizeof(unsigned);
-                        break;
-                    case CV_32S:
-                        ptr = fs::itoa(*(int *) data, buf, 10);
-                        data += sizeof(int);
-                        break;
-                    case CV_64U:
-                        ptr = fs::itoa(*(uint64_t*) data, buf, 10, false);
-                        data += sizeof(uint64_t);
-                        break;
-                    case CV_64S:
-                        ptr = fs::itoa(*(int64_t*) data, buf, 10, true);
-                        data += sizeof(int64_t);
-                        break;
-                    case CV_32F:
-                        ptr = fs::floatToString(buf, sizeof(buf), *(float *) data, false, explicitZero);
-                        data += sizeof(float);
-                        break;
-                    case CV_64F:
-                        ptr = fs::doubleToString(buf, sizeof(buf), *(double *) data, explicitZero);
-                        data += sizeof(double);
-                        break;
-                    case CV_16F:
-                        ptr = fs::floatToString(buf, sizeof(buf), (float) *(hfloat *) data, true, explicitZero);
-                        data += sizeof(hfloat);
-                        break;
-                    case CV_16BF:
-                        ptr = fs::floatToString(buf, sizeof(buf), (float) *(bfloat *) data, true, explicitZero);
-                        data += sizeof(bfloat);
-                        break;
-                    case CV_8F_E4M3FN:
-                        ptr = fs::floatToString(buf, sizeof(buf), (float) *(fp8_t *) data, true, explicitZero);
-                        data += sizeof(fp8_t);
-                        break;
-                    case CV_8F_E4M3FNUZ:
-                        ptr = fs::floatToString(buf, sizeof(buf), (float) *(fp8a_t *) data, true, explicitZero);
-                        data += sizeof(fp8a_t);
-                        break;
-                    default:
+            জন্য (i = 0; i < গুনতি_2; i++) {
+                নির্বাচন (elem_type) {
+                    ক্ষেত্র CV_8U:
+                        ptr = fs::itoa(*(uchar *) তথ্য, buf, 10);
+                        তথ্য++;
+                        বিরতি;
+                    ক্ষেত্র CV_Bool:
+                        ptr = fs::itoa(*(uchar *) তথ্য != 0, buf, 10);
+                        তথ্য++;
+                        বিরতি;
+                    ক্ষেত্র CV_8S:
+                        ptr = fs::itoa(*(অক্ষর *) তথ্য, buf, 10);
+                        তথ্য++;
+                        বিরতি;
+                    ক্ষেত্র CV_16U:
+                        ptr = fs::itoa(*(ushort *) তথ্য, buf, 10);
+                        তথ্য += আকার(ushort);
+                        বিরতি;
+                    ক্ষেত্র CV_16S:
+                        ptr = fs::itoa(*(short *) তথ্য, buf, 10);
+                        তথ্য += আকার(short);
+                        বিরতি;
+                    ক্ষেত্র CV_32U:
+                        ptr = fs::itoa((int64_t)*(unsigned*) তথ্য, buf, 10, মিথ্যা);
+                        তথ্য += আকার(unsigned);
+                        বিরতি;
+                    ক্ষেত্র CV_32S:
+                        ptr = fs::itoa(*(পূর্ণসংখ্যা *) তথ্য, buf, 10);
+                        তথ্য += আকার(পূর্ণসংখ্যা);
+                        বিরতি;
+                    ক্ষেত্র CV_64U:
+                        ptr = fs::itoa(*(uint64_t*) তথ্য, buf, 10, মিথ্যা);
+                        তথ্য += আকার(uint64_t);
+                        বিরতি;
+                    ক্ষেত্র CV_64S:
+                        ptr = fs::itoa(*(int64_t*) তথ্য, buf, 10, সত্য);
+                        তথ্য += আকার(int64_t);
+                        বিরতি;
+                    ক্ষেত্র CV_32F:
+                        ptr = fs::floatToString(buf, আকার(buf), *(দশমিক *) তথ্য, মিথ্যা, explicitZero);
+                        তথ্য += আকার(দশমিক);
+                        বিরতি;
+                    ক্ষেত্র CV_64F:
+                        ptr = fs::doubleToString(buf, আকার(buf), *(দ্বিগুণ *) তথ্য, explicitZero);
+                        তথ্য += আকার(দ্বিগুণ);
+                        বিরতি;
+                    ক্ষেত্র CV_16F:
+                        ptr = fs::floatToString(buf, আকার(buf), (দশমিক) *(hfloat *) তথ্য, সত্য, explicitZero);
+                        তথ্য += আকার(hfloat);
+                        বিরতি;
+                    ক্ষেত্র CV_16BF:
+                        ptr = fs::floatToString(buf, আকার(buf), (দশমিক) *(bfloat *) তথ্য, সত্য, explicitZero);
+                        তথ্য += আকার(bfloat);
+                        বিরতি;
+                    ক্ষেত্র CV_8F_E4M3FN:
+                        ptr = fs::floatToString(buf, আকার(buf), (দশমিক) *(fp8_t *) তথ্য, সত্য, explicitZero);
+                        তথ্য += আকার(fp8_t);
+                        বিরতি;
+                    ক্ষেত্র CV_8F_E4M3FNUZ:
+                        ptr = fs::floatToString(buf, আকার(buf), (দশমিক) *(fp8a_t *) তথ্য, সত্য, explicitZero);
+                        তথ্য += আকার(fp8a_t);
+                        বিরতি;
+                    পূর্বনির্ধারিত:
                         CV_Error(cv::Error::StsUnsupportedFormat, "Unsupported type");
-                        return;
+                        ফেরত;
                 }
 
                 getEmitter().writeScalar(0, ptr);
             }
 
-            offset = (int) (data - data0);
+            offset = (পূর্ণসংখ্যা) (তথ্য - data0);
         }
     }
 }
 
-void FileStorage::Impl::workaround() {
-    check_if_write_struct_is_delayed(false);
+শূন্য FileStorage::Impl::workaround() {
+    check_if_write_struct_is_delayed(মিথ্যা);
 
-    if (state_of_writing_base64 != FileStorage_API::Base64State::Uncertain)
+    যদি (state_of_writing_base64 != FileStorage_API::Base64State::Uncertain)
         switch_to_Base64_state(FileStorage_API::Base64State::Uncertain);
 }
 
-void FileStorage::Impl::switch_to_Base64_state(FileStorage_API::Base64State new_state) {
-    const char *err_unkonwn_state = "Unexpected error, unable to determine the Base64 state.";
-    const char *err_unable_to_switch = "Unexpected error, unable to switch to this state.";
+শূন্য FileStorage::Impl::switch_to_Base64_state(FileStorage_API::Base64State new_state) {
+    ধ্রুবক অক্ষর *err_unkonwn_state = "Unexpected error, unable to determine the Base64 state.";
+    ধ্রুবক অক্ষর *err_unable_to_switch = "Unexpected error, unable to switch to this state.";
 
     /* like a finite state machine */
-    switch (state_of_writing_base64) {
-        case FileStorage_API::Base64State::Uncertain:
-            switch (new_state) {
-                case FileStorage_API::Base64State::InUse:
+    নির্বাচন (state_of_writing_base64) {
+        ক্ষেত্র FileStorage_API::Base64State::Uncertain:
+            নির্বাচন (new_state) {
+                ক্ষেত্র FileStorage_API::Base64State::InUse:
                 {
                     CV_DbgAssert(base64_writer == 0);
-                    bool can_indent = (fmt != cv::FileStorage::Mode::FORMAT_JSON);
-                    base64_writer = new base64::Base64Writer(*this, can_indent);
-                    if (!can_indent) {
-                        char *ptr = bufferPtr();
+                    যৌক্তিক can_indent = (fmt != cv::FileStorage::Mode::FORMAT_JSON);
+                    base64_writer = নতুন base64::Base64Writer(*এই, can_indent);
+                    যদি (!can_indent) {
+                        অক্ষর *ptr = বাফার_Ptr();
                         *ptr++ = '\0';
-                        puts(bufferStart());
-                        setBufferPtr(bufferStart());
-                        memset(bufferStart(), 0, static_cast<int>(space));
+                        puts(বাফার_Start());
+                        set_বাফার_Ptr(বাফার_Start());
+                        memset(বাফার_Start(), 0, static_cast<পূর্ণসংখ্যা>(space));
                         puts("\"$base64$");
                     }
-                    break;
+                    বিরতি;
                 }
-                case FileStorage_API::Base64State::Uncertain:
-                    break;
-                case FileStorage_API::Base64State::NotUse:
-                    break;
-                default:
+                ক্ষেত্র FileStorage_API::Base64State::Uncertain:
+                    বিরতি;
+                ক্ষেত্র FileStorage_API::Base64State::NotUse:
+                    বিরতি;
+                পূর্বনির্ধারিত:
                     CV_Error(cv::Error::StsError, err_unkonwn_state);
-                    break;
+                    বিরতি;
             }
-            break;
-        case FileStorage_API::Base64State::InUse:
-            switch (new_state) {
-                case FileStorage_API::Base64State::InUse:
-                case FileStorage_API::Base64State::NotUse:
+            বিরতি;
+        ক্ষেত্র FileStorage_API::Base64State::InUse:
+            নির্বাচন (new_state) {
+                ক্ষেত্র FileStorage_API::Base64State::InUse:
+                ক্ষেত্র FileStorage_API::Base64State::NotUse:
                     CV_Error(cv::Error::StsError, err_unable_to_switch);
-                    break;
-                case FileStorage_API::Base64State::Uncertain:
+                    বিরতি;
+                ক্ষেত্র FileStorage_API::Base64State::Uncertain:
                     delete base64_writer;
                     base64_writer = 0;
-                    if ( fmt == cv::FileStorage::FORMAT_JSON )
+                    যদি ( fmt == cv::FileStorage::FORMAT_JSON )
                     {
                         puts("\"");
-                        setBufferPtr(bufferStart());
+                        set_বাফার_Ptr(বাফার_Start());
                         flush();
-                        memset(bufferStart(), 0, static_cast<int>(space) );
-                        setBufferPtr(bufferStart());
+                        memset(বাফার_Start(), 0, static_cast<পূর্ণসংখ্যা>(space) );
+                        set_বাফার_Ptr(বাফার_Start());
                     }
-                    break;
-                default:
+                    বিরতি;
+                পূর্বনির্ধারিত:
                     CV_Error(cv::Error::StsError, err_unkonwn_state);
-                    break;
+                    বিরতি;
             }
-            break;
-        case FileStorage_API::Base64State::NotUse:
-            switch (new_state) {
-                case FileStorage_API::Base64State::InUse:
-                case FileStorage_API::Base64State::NotUse:
+            বিরতি;
+        ক্ষেত্র FileStorage_API::Base64State::NotUse:
+            নির্বাচন (new_state) {
+                ক্ষেত্র FileStorage_API::Base64State::InUse:
+                ক্ষেত্র FileStorage_API::Base64State::NotUse:
                     CV_Error(cv::Error::StsError, err_unable_to_switch);
-                    break;
-                case FileStorage_API::Base64State::Uncertain:
-                    break;
-                default:
+                    বিরতি;
+                ক্ষেত্র FileStorage_API::Base64State::Uncertain:
+                    বিরতি;
+                পূর্বনির্ধারিত:
                     CV_Error(cv::Error::StsError, err_unkonwn_state);
-                    break;
+                    বিরতি;
             }
-            break;
-        default:
+            বিরতি;
+        পূর্বনির্ধারিত:
             CV_Error(cv::Error::StsError, err_unkonwn_state);
-            break;
+            বিরতি;
     }
 
     state_of_writing_base64 = new_state;
 }
 
-void FileStorage::Impl::make_write_struct_delayed(const char *key, int struct_flags, const char *type_name) {
-    CV_Assert(is_write_struct_delayed == false);
-    CV_DbgAssert(delayed_struct_key == nullptr);
+শূন্য FileStorage::Impl::make_write_struct_delayed(ধ্রুবক অক্ষর *চাবি, পূর্ণসংখ্যা struct_flags, ধ্রুবক অক্ষর *type_name) {
+    CV_Assert(is_write_struct_delayed == মিথ্যা);
+    CV_DbgAssert(delayed_struct_চাবি == nullptr);
     CV_DbgAssert(delayed_struct_flags == 0);
     CV_DbgAssert(delayed_type_name == nullptr);
 
     delayed_struct_flags = struct_flags;
 
-    if (key != nullptr) {
-        delayed_struct_key = new char[strlen(key) + 1U];
-        strcpy(delayed_struct_key, key);
+    যদি (চাবি != nullptr) {
+        delayed_struct_চাবি = নতুন অক্ষর[strlen(চাবি) + 1U];
+        strcpy(delayed_struct_চাবি, চাবি);
     }
 
-    if (type_name != nullptr) {
-        delayed_type_name = new char[strlen(type_name) + 1U];
+    যদি (type_name != nullptr) {
+        delayed_type_name = নতুন অক্ষর[strlen(type_name) + 1U];
         strcpy(delayed_type_name, type_name);
     }
 
-    is_write_struct_delayed = true;
+    is_write_struct_delayed = সত্য;
 }
 
-void FileStorage::Impl::check_if_write_struct_is_delayed(bool change_type_to_base64) {
-    if (is_write_struct_delayed) {
+শূন্য FileStorage::Impl::check_if_write_struct_is_delayed(যৌক্তিক change_type_to_base64) {
+    যদি (is_write_struct_delayed) {
         /* save data to prevent recursive call errors */
-        std::string struct_key;
+        std::string struct_চাবি;
         std::string type_name;
-        int struct_flags = delayed_struct_flags;
+        পূর্ণসংখ্যা struct_flags = delayed_struct_flags;
 
-        if (delayed_struct_key != nullptr && *delayed_struct_key != '\0') {
-            struct_key.assign(delayed_struct_key);
+        যদি (delayed_struct_চাবি != nullptr && *delayed_struct_চাবি != '\0') {
+            struct_চাবি.assign(delayed_struct_চাবি);
         }
-        if (delayed_type_name != nullptr && *delayed_type_name != '\0') {
+        যদি (delayed_type_name != nullptr && *delayed_type_name != '\0') {
             type_name.assign(delayed_type_name);
         }
 
         /* reset */
-        delete[] delayed_struct_key;
+        delete[] delayed_struct_চাবি;
         delete[] delayed_type_name;
-        delayed_struct_key = nullptr;
+        delayed_struct_চাবি = nullptr;
         delayed_struct_flags = 0;
         delayed_type_name = nullptr;
 
-        is_write_struct_delayed = false;
+        is_write_struct_delayed = মিথ্যা;
 
         /* call */
-        if (change_type_to_base64) {
-            startWriteStruct_helper(struct_key.c_str(), struct_flags, "binary");
-            if (state_of_writing_base64 != FileStorage_API::Uncertain)
+        যদি (change_type_to_base64) {
+            startWriteStruct_helper(struct_চাবি.c_str(), struct_flags, "binary");
+            যদি (state_of_writing_base64 != FileStorage_API::Uncertain)
                 switch_to_Base64_state(FileStorage_API::Uncertain);
             switch_to_Base64_state(FileStorage_API::InUse);
-        } else {
-            startWriteStruct_helper(struct_key.c_str(), struct_flags, type_name.c_str());
-            if (state_of_writing_base64 != FileStorage_API::Uncertain)
+        } অন্যথা {
+            startWriteStruct_helper(struct_চাবি.c_str(), struct_flags, type_name.c_str());
+            যদি (state_of_writing_base64 != FileStorage_API::Uncertain)
                 switch_to_Base64_state(FileStorage_API::Uncertain);
             switch_to_Base64_state(FileStorage_API::NotUse);
         }
     }
 }
 
-void FileStorage::Impl::writeRawDataBase64(const void *_data, size_t len, const char *dt) {
+শূন্য FileStorage::Impl::write_Raw_তথ্য_Base64(ধ্রুবক শূন্য *তথ্য_3, size_t len, ধ্রুবক অক্ষর *dt) {
     CV_Assert(write_mode);
 
-    check_if_write_struct_is_delayed(true);
+    check_if_write_struct_is_delayed(সত্য);
 
-    if (state_of_writing_base64 == FileStorage_API::Base64State::Uncertain) {
+    যদি (state_of_writing_base64 == FileStorage_API::Base64State::Uncertain) {
         switch_to_Base64_state(FileStorage_API::Base64State::InUse);
-    } else if (state_of_writing_base64 != FileStorage_API::Base64State::InUse) {
+    } অন্যথা যদি (state_of_writing_base64 != FileStorage_API::Base64State::InUse) {
         CV_Error(cv::Error::StsError, "Base64 should not be used at present.");
     }
 
-    base64_writer->write(_data, len, dt);
+    base64_writer->লিখ(তথ্য_3, len, dt);
 }
 
-FileNode FileStorage::Impl::getFirstTopLevelNode() const {
-    return roots.empty() ? FileNode() : roots[0];
+File_গ্রন্থি FileStorage::Impl::get_First_শীর্ষ_Level_গ্রন্থি() ধ্রুবক {
+    ফেরত roots.empty() ? File_গ্রন্থি() : roots[0];
 }
 
-FileNode FileStorage::Impl::root(int streamIdx) const {
-    return streamIdx >= 0 && streamIdx < (int) roots.size() ? roots[streamIdx] : FileNode();
+File_গ্রন্থি FileStorage::Impl::মূল(পূর্ণসংখ্যা streamIdx) ধ্রুবক {
+    ফেরত streamIdx >= 0 && streamIdx < (পূর্ণসংখ্যা) roots.size() ? roots[streamIdx] : File_গ্রন্থি();
 }
 
-FileNode FileStorage::Impl::operator[](const String &nodename) const {
-    return this->operator[](nodename.c_str());
+File_গ্রন্থি FileStorage::Impl::operator[](ধ্রুবক String &nodename) ধ্রুবক {
+    ফেরত এই->operator[](nodename.c_str());
 }
 
-FileNode FileStorage::Impl::operator[](const char * /*nodename*/) const {
-    return FileNode();
+File_গ্রন্থি FileStorage::Impl::operator[](ধ্রুবক অক্ষর * /*nodename*/) ধ্রুবক {
+    ফেরত File_গ্রন্থি();
 }
 
-int FileStorage::Impl::getFormat() const { return fmt; }
+পূর্ণসংখ্যা FileStorage::Impl::getFormat() ধ্রুবক { ফেরত fmt; }
 
-char *FileStorage::Impl::bufferPtr() const { return (char *) (&buffer[0] + bufofs); }
+অক্ষর *FileStorage::Impl::বাফার_Ptr() ধ্রুবক { ফেরত (অক্ষর *) (&বাফার[0] + bufofs); }
 
-char *FileStorage::Impl::bufferStart() const { return (char *) &buffer[0]; }
+অক্ষর *FileStorage::Impl::বাফার_Start() ধ্রুবক { ফেরত (অক্ষর *) &বাফার[0]; }
 
-char *FileStorage::Impl::bufferEnd() const { return (char *) (&buffer[0] + buffer.size()); }
+অক্ষর *FileStorage::Impl::বাফার_End() ধ্রুবক { ফেরত (অক্ষর *) (&বাফার[0] + বাফার.size()); }
 
-void FileStorage::Impl::setBufferPtr(char *ptr) {
-    char *bufferstart = bufferStart();
-    CV_Assert(ptr >= bufferstart && ptr <= bufferEnd());
+শূন্য FileStorage::Impl::set_বাফার_Ptr(অক্ষর *ptr) {
+    অক্ষর *bufferstart = বাফার_Start();
+    CV_Assert(ptr >= bufferstart && ptr <= বাফার_End());
     bufofs = ptr - bufferstart;
 }
 
-int FileStorage::Impl::wrapMargin() const { return wrap_margin; }
+পূর্ণসংখ্যা FileStorage::Impl::wrapMargin() ধ্রুবক { ফেরত wrap_margin; }
 
-FStructData &FileStorage::Impl::getCurrentStruct() {
-    CV_Assert(!write_stack.empty());
-    return write_stack.back();
+FStruct_তথ্য &FileStorage::Impl::getCurrentStruct() {
+    CV_Assert(!write_স্তূপ.empty());
+    ফেরত write_স্তূপ.back();
 }
 
-void FileStorage::Impl::setNonEmpty() {
-    empty_stream = false;
+শূন্য FileStorage::Impl::setNonEmpty() {
+    empty_stream = মিথ্যা;
 }
 
-void FileStorage::Impl::processSpecialDouble(char *buf, double *value, char **endptr) {
-    FileStorage_API *fs = this;
-    char c = buf[0];
-    int inf_hi = 0x7ff00000;
+শূন্য FileStorage::Impl::processSpecialDouble(অক্ষর *buf, দ্বিগুণ *value, অক্ষর **endptr) {
+    FileStorage_API *fs = এই;
+    অক্ষর c = buf[0];
+    পূর্ণসংখ্যা inf_hi = 0x7ff00000;
 
-    if (c == '-' || c == '+') {
+    যদি (c == '-' || c == '+') {
         inf_hi = c == '-' ? 0xfff00000 : 0x7ff00000;
         c = *++buf;
     }
 
-    if (c != '.')
+    যদি (c != '.')
         CV_PARSE_ERROR_CPP("Bad format of floating-point constant");
 
     Cv64suf v;
     v.f = 0.;
-    if (toupper(buf[1]) == 'I' && toupper(buf[2]) == 'N' && toupper(buf[3]) == 'F')
+    যদি (toupper(buf[1]) == 'I' && toupper(buf[2]) == 'N' && toupper(buf[3]) == 'F')
         v.u = (uint64) inf_hi << 32;
-    else if (toupper(buf[1]) == 'N' && toupper(buf[2]) == 'A' && toupper(buf[3]) == 'N')
+    অন্যথা যদি (toupper(buf[1]) == 'N' && toupper(buf[2]) == 'A' && toupper(buf[3]) == 'N')
         v.u = (uint64) -1;
-    else
+    অন্যথা
         CV_PARSE_ERROR_CPP("Bad format of floating-point constant");
     *value = v.f;
     *endptr = buf + 4;
 }
 
-double FileStorage::Impl::strtod(char *ptr, char **endptr) {
-    double fval = ::strtod(ptr, endptr);
-    if (**endptr == '.') {
-        char *dot_pos = *endptr;
+দ্বিগুণ FileStorage::Impl::strtod(অক্ষর *ptr, অক্ষর **endptr) {
+    দ্বিগুণ fval = ::strtod(ptr, endptr);
+    যদি (**endptr == '.') {
+        অক্ষর *dot_pos = *endptr;
         *dot_pos = ',';
-        double fval2 = ::strtod(ptr, endptr);
+        দ্বিগুণ fval2 = ::strtod(ptr, endptr);
         *dot_pos = '.';
-        if (*endptr > dot_pos)
+        যদি (*endptr > dot_pos)
             fval = fval2;
-        else
+        অন্যথা
             *endptr = dot_pos;
     }
 
-    if (*endptr == ptr || cv_isalpha(**endptr))
+    যদি (*endptr == ptr || cv_isalpha(**endptr))
         processSpecialDouble(ptr, &fval, endptr);
 
-    return fval;
+    ফেরত fval;
 }
 
-void FileStorage::Impl::convertToCollection(int type, FileNode &node) {
-    CV_Assert(type == FileNode::SEQ || type == FileNode::MAP);
+শূন্য FileStorage::Impl::convertToCollection(পূর্ণসংখ্যা type, File_গ্রন্থি &গ্রন্থি) {
+    CV_Assert(type == File_গ্রন্থি::SEQ || type == File_গ্রন্থি::MAP);
 
-    int node_type = node.type();
-    if (node_type == type)
-        return;
+    পূর্ণসংখ্যা গ্রন্থি_type = গ্রন্থি.type();
+    যদি (গ্রন্থি_type == type)
+        ফেরত;
 
-    bool named = node.isNamed();
-    uchar *ptr = node.ptr() + 1 + (named ? 4 : 0);
+    যৌক্তিক named = গ্রন্থি.isNamed();
+    uchar *ptr = গ্রন্থি.ptr() + 1 + (named ? 4 : 0);
 
     int64_t ival = 0;
-    double fval = 0;
+    দ্বিগুণ fval = 0;
     std::string sval;
-    bool add_first_scalar = false;
+    যৌক্তিক add_first_scalar = মিথ্যা;
 
-    if (node_type != FileNode::NONE) {
+    যদি (গ্রন্থি_type != File_গ্রন্থি::NONE) {
         // scalar nodes can only be converted to sequences, e.g. in XML:
         // <a>5[parser_position]... => create 5 with name "a"
         // <a>5 6[parser_position]... => 5 is converted to [5] and then 6 is added to it
         //
         // otherwise we don't know where to get the element names from
-        CV_Assert(type == FileNode::SEQ);
-        if (node_type == FileNode::INT) {
+        CV_Assert(type == File_গ্রন্থি::SEQ);
+        যদি (গ্রন্থি_type == File_গ্রন্থি::INT) {
             ival = readLong(ptr);
-            add_first_scalar = true;
-        } else if (node_type == FileNode::REAL) {
+            add_first_scalar = সত্য;
+        } অন্যথা যদি (গ্রন্থি_type == File_গ্রন্থি::REAL) {
             fval = readReal(ptr);
-            add_first_scalar = true;
-        } else if (node_type == FileNode::STRING) {
-            sval = std::string(node);
-            add_first_scalar = true;
-        } else
-            CV_Error_(Error::StsError, ("The node of type %d cannot be converted to collection", node_type));
+            add_first_scalar = সত্য;
+        } অন্যথা যদি (গ্রন্থি_type == File_গ্রন্থি::STRING) {
+            sval = std::string(গ্রন্থি);
+            add_first_scalar = সত্য;
+        } অন্যথা
+            CV_Error_(Error::StsError, ("The node of type %d cannot be converted to collection", গ্রন্থি_type));
     }
 
-    ptr = reserveNodeSpace(node, 1 + (named ? 4 : 0) + 4 + 4);
-    *ptr++ = (uchar) (type | (named ? FileNode::NAMED : 0));
+    ptr = reserve_গ্রন্থি_Space(গ্রন্থি, 1 + (named ? 4 : 0) + 4 + 4);
+    *ptr++ = (uchar) (type | (named ? File_গ্রন্থি::NAMED : 0));
     // name has been copied automatically
-    if (named)
+    যদি (named)
         ptr += 4;
     // set raw_size(collection)==4, nelems(collection)==1
     writeInt(ptr, 4);
     writeInt(ptr + 4, 0);
 
-    if (add_first_scalar)
-        addNode(node, std::string(), node_type,
-                node_type == FileNode::INT ? (const void *) &ival :
-                node_type == FileNode::REAL ? (const void *) &fval :
-                node_type == FileNode::STRING ? (const void *) sval.c_str() : 0,
+    যদি (add_first_scalar)
+        add_গ্রন্থি(গ্রন্থি, std::string(), গ্রন্থি_type,
+                গ্রন্থি_type == File_গ্রন্থি::INT ? (ধ্রুবক শূন্য *) &ival :
+                গ্রন্থি_type == File_গ্রন্থি::REAL ? (ধ্রুবক শূন্য *) &fval :
+                গ্রন্থি_type == File_গ্রন্থি::STRING ? (ধ্রুবক শূন্য *) sval.c_str() : 0,
                 -1);
 }
 
@@ -1552,58 +1552,58 @@ void FileStorage::Impl::convertToCollection(int type, FileNode &node) {
 //    a new block of sufficient size is allocated and the FileNode is placed in the beginning of it.
 // The case (a) can be used to allocate the very first node by setting blockIdx == ofs == 0.
 // In the case (b) the existing tag and the name are copied automatically.
-uchar *FileStorage::Impl::reserveNodeSpace(FileNode &node, size_t sz) {
-    bool shrinkBlock = false;
-    size_t shrinkBlockIdx = 0, shrinkSize = 0;
+uchar *FileStorage::Impl::reserve_গ্রন্থি_Space(File_গ্রন্থি &গ্রন্থি, size_t sz) {
+    যৌক্তিক shrinkBlock = মিথ্যা;
+    size_t shrinkBlockIdx = 0, shrink_আকার = 0;
 
     uchar *ptr = 0, *blockEnd = 0;
 
-    if (!fs_data_ptrs.empty()) {
-        size_t blockIdx = node.blockIdx;
-        size_t ofs = node.ofs;
-        CV_Assert(blockIdx == fs_data_ptrs.size() - 1);
-        CV_Assert(ofs <= fs_data_blksz[blockIdx]);
-        CV_Assert(freeSpaceOfs <= fs_data_blksz[blockIdx]);
+    যদি (!fs_তথ্য_ptrs.empty()) {
+        size_t blockIdx = গ্রন্থি.blockIdx;
+        size_t ofs = গ্রন্থি.ofs;
+        CV_Assert(blockIdx == fs_তথ্য_ptrs.size() - 1);
+        CV_Assert(ofs <= fs_তথ্য_blksz[blockIdx]);
+        CV_Assert(freeSpaceOfs <= fs_তথ্য_blksz[blockIdx]);
         //CV_Assert( freeSpaceOfs <= ofs + sz );
 
-        ptr = fs_data_ptrs[blockIdx] + ofs;
-        blockEnd = fs_data_ptrs[blockIdx] + fs_data_blksz[blockIdx];
+        ptr = fs_তথ্য_ptrs[blockIdx] + ofs;
+        blockEnd = fs_তথ্য_ptrs[blockIdx] + fs_তথ্য_blksz[blockIdx];
 
-        CV_Assert(ptr >= fs_data_ptrs[blockIdx] && ptr <= blockEnd);
-        if (ptr + sz <= blockEnd) {
+        CV_Assert(ptr >= fs_তথ্য_ptrs[blockIdx] && ptr <= blockEnd);
+        যদি (ptr + sz <= blockEnd) {
             freeSpaceOfs = ofs + sz;
-            return ptr;
+            ফেরত ptr;
         }
 
-        if (ofs ==
+        যদি (ofs ==
             0)  // FileNode is a first component of this block. Resize current block instead of allocation of new one.
         {
-            fs_data[blockIdx]->resize(sz);
-            ptr = &fs_data[blockIdx]->at(0);
-            fs_data_ptrs[blockIdx] = ptr;
-            fs_data_blksz[blockIdx] = sz;
+            fs_তথ্য[blockIdx]->resize(sz);
+            ptr = &fs_তথ্য[blockIdx]->at(0);
+            fs_তথ্য_ptrs[blockIdx] = ptr;
+            fs_তথ্য_blksz[blockIdx] = sz;
             freeSpaceOfs = sz;
-            return ptr;
+            ফেরত ptr;
         }
 
-        shrinkBlock = true;
+        shrinkBlock = সত্য;
         shrinkBlockIdx = blockIdx;
-        shrinkSize = ofs;
+        shrink_আকার = ofs;
     }
 
-    size_t blockSize = std::max((size_t) CV_FS_MAX_LEN * 4 - 256, sz) + 256;
-    Ptr<std::vector<uchar> > pv = makePtr<std::vector<uchar> >(blockSize);
-    fs_data.push_back(pv);
+    size_t block_আকার = std::max((size_t) CV_FS_MAX_LEN * 4 - 256, sz) + 256;
+    Ptr<std::vector<uchar> > pv = makePtr<std::vector<uchar> >(block_আকার);
+    fs_তথ্য.push_back(pv);
     uchar *new_ptr = &pv->at(0);
-    fs_data_ptrs.push_back(new_ptr);
-    fs_data_blksz.push_back(blockSize);
-    node.blockIdx = fs_data_ptrs.size() - 1;
-    node.ofs = 0;
+    fs_তথ্য_ptrs.push_back(new_ptr);
+    fs_তথ্য_blksz.push_back(block_আকার);
+    গ্রন্থি.blockIdx = fs_তথ্য_ptrs.size() - 1;
+    গ্রন্থি.ofs = 0;
     freeSpaceOfs = sz;
 
-    if (ptr && ptr + 5 <= blockEnd) {
+    যদি (ptr && ptr + 5 <= blockEnd) {
         new_ptr[0] = ptr[0];
-        if (ptr[0] & FileNode::NAMED) {
+        যদি (ptr[0] & File_গ্রন্থি::NAMED) {
             new_ptr[1] = ptr[1];
             new_ptr[2] = ptr[2];
             new_ptr[3] = ptr[3];
@@ -1611,114 +1611,114 @@ uchar *FileStorage::Impl::reserveNodeSpace(FileNode &node, size_t sz) {
         }
     }
 
-    if (shrinkBlock) {
-        fs_data[shrinkBlockIdx]->resize(shrinkSize);
-        fs_data_blksz[shrinkBlockIdx] = shrinkSize;
+    যদি (shrinkBlock) {
+        fs_তথ্য[shrinkBlockIdx]->resize(shrink_আকার);
+        fs_তথ্য_blksz[shrinkBlockIdx] = shrink_আকার;
     }
 
-    return new_ptr;
+    ফেরত new_ptr;
 }
 
-unsigned FileStorage::Impl::getStringOfs(const std::string &key) const {
-    str_hash_t::const_iterator it = str_hash.find(key);
-    return it != str_hash.end() ? it->second : 0;
+unsigned FileStorage::Impl::getStringOfs(ধ্রুবক std::string &চাবি) ধ্রুবক {
+    str_hash_t::const_iterator it = str_hash.find(চাবি);
+    ফেরত it != str_hash.end() ? it->second : 0;
 }
 
-FileNode FileStorage::Impl::addNode(FileNode &collection, const std::string &key,
-                                    int elem_type, const void *value, int len) {
-    FileStorage_API *fs = this;
-    bool noname = key.empty() || (fmt == FileStorage::FORMAT_XML && strcmp(key.c_str(), "_") == 0);
-    convertToCollection(noname ? FileNode::SEQ : FileNode::MAP, collection);
+File_গ্রন্থি FileStorage::Impl::add_গ্রন্থি(File_গ্রন্থি &collection, ধ্রুবক std::string &চাবি,
+                                    পূর্ণসংখ্যা elem_type, ধ্রুবক শূন্য *value, পূর্ণসংখ্যা len) {
+    FileStorage_API *fs = এই;
+    যৌক্তিক noname = চাবি.empty() || (fmt == FileStorage::FORMAT_XML && strcmp(চাবি.c_str(), "_") == 0);
+    convertToCollection(noname ? File_গ্রন্থি::SEQ : File_গ্রন্থি::MAP, collection);
 
-    bool isseq = collection.empty() ? false : collection.isSeq();
-    if (noname != isseq)
+    যৌক্তিক isseq = collection.empty() ? মিথ্যা : collection.isSeq();
+    যদি (noname != isseq)
         CV_PARSE_ERROR_CPP(noname ? "Map element should have a name" :
                            "Sequence element should not have name (use <_></_>)");
     unsigned strofs = 0;
-    if (!noname) {
-        strofs = getStringOfs(key);
-        if (!strofs) {
-            strofs = (unsigned) str_hash_data.size();
-            size_t keysize = key.size() + 1;
-            str_hash_data.resize(strofs + keysize);
-            memcpy(&str_hash_data[0] + strofs, &key[0], keysize);
-            str_hash.insert(std::make_pair(key, strofs));
+    যদি (!noname) {
+        strofs = getStringOfs(চাবি);
+        যদি (!strofs) {
+            strofs = (unsigned) str_hash_তথ্য.size();
+            size_t keysize = চাবি.size() + 1;
+            str_hash_তথ্য.resize(strofs + keysize);
+            memcpy(&str_hash_তথ্য[0] + strofs, &চাবি[0], keysize);
+            str_hash.insert(std::make_pair(চাবি, strofs));
         }
     }
 
     uchar *cp = collection.ptr();
 
-    size_t blockIdx = fs_data_ptrs.size() - 1;
+    size_t blockIdx = fs_তথ্য_ptrs.size() - 1;
     size_t ofs = freeSpaceOfs;
-    FileNode node(fs_ext, blockIdx, ofs);
+    File_গ্রন্থি গ্রন্থি(fs_ext, blockIdx, ofs);
 
     size_t sz0 = 1 + (noname ? 0 : 4) + 8;
-    uchar *ptr = reserveNodeSpace(node, sz0);
+    uchar *ptr = reserve_গ্রন্থি_Space(গ্রন্থি, sz0);
 
-    *ptr++ = (uchar) (elem_type | (noname ? 0 : FileNode::NAMED));
-    if (elem_type == FileNode::NONE)
+    *ptr++ = (uchar) (elem_type | (noname ? 0 : File_গ্রন্থি::NAMED));
+    যদি (elem_type == File_গ্রন্থি::NONE)
         freeSpaceOfs -= 8;
 
-    if (!noname) {
-        writeInt(ptr, (int) strofs);
+    যদি (!noname) {
+        writeInt(ptr, (পূর্ণসংখ্যা) strofs);
         ptr += 4;
     }
 
-    if (elem_type == FileNode::SEQ || elem_type == FileNode::MAP) {
+    যদি (elem_type == File_গ্রন্থি::SEQ || elem_type == File_গ্রন্থি::MAP) {
         writeInt(ptr, 4);
         writeInt(ptr, 0);
     }
 
-    if (value)
-        node.setValue(elem_type, value, len);
+    যদি (value)
+        গ্রন্থি.set_মান(elem_type, value, len);
 
-    if (collection.isNamed())
+    যদি (collection.isNamed())
         cp += 4;
-    int nelems = readInt(cp + 5);
+    পূর্ণসংখ্যা nelems = readInt(cp + 5);
     writeInt(cp + 5, nelems + 1);
 
-    return node;
+    ফেরত গ্রন্থি;
 }
 
-void FileStorage::Impl::finalizeCollection(FileNode &collection) {
-    if (!collection.isSeq() && !collection.isMap())
-        return;
+শূন্য FileStorage::Impl::finalizeCollection(File_গ্রন্থি &collection) {
+    যদি (!collection.isSeq() && !collection.isMap())
+        ফেরত;
     uchar *ptr0 = collection.ptr(), *ptr = ptr0 + 1;
-    if (*ptr0 & FileNode::NAMED)
+    যদি (*ptr0 & File_গ্রন্থি::NAMED)
         ptr += 4;
     size_t blockIdx = collection.blockIdx;
     size_t ofs = collection.ofs + (size_t) (ptr + 8 - ptr0);
-    size_t rawSize = 4;
+    size_t raw_আকার = 4;
     unsigned sz = (unsigned) readInt(ptr + 4);
-    if (sz > 0) {
-        size_t lastBlockIdx = fs_data_ptrs.size() - 1;
+    যদি (sz > 0) {
+        size_t lastBlockIdx = fs_তথ্য_ptrs.size() - 1;
 
-        for (; blockIdx < lastBlockIdx; blockIdx++) {
-            rawSize += fs_data_blksz[blockIdx] - ofs;
+        জন্য (; blockIdx < lastBlockIdx; blockIdx++) {
+            raw_আকার += fs_তথ্য_blksz[blockIdx] - ofs;
             ofs = 0;
         }
     }
-    rawSize += freeSpaceOfs - ofs;
-    writeInt(ptr, (int) rawSize);
+    raw_আকার += freeSpaceOfs - ofs;
+    writeInt(ptr, (পূর্ণসংখ্যা) raw_আকার);
 }
 
-void FileStorage::Impl::normalizeNodeOfs(size_t &blockIdx, size_t &ofs) const {
-    while (ofs >= fs_data_blksz[blockIdx]) {
-        if (blockIdx == fs_data_blksz.size() - 1) {
-            CV_Assert(ofs == fs_data_blksz[blockIdx]);
-            break;
+শূন্য FileStorage::Impl::normalize_গ্রন্থি_Ofs(size_t &blockIdx, size_t &ofs) ধ্রুবক {
+    যখন (ofs >= fs_তথ্য_blksz[blockIdx]) {
+        যদি (blockIdx == fs_তথ্য_blksz.size() - 1) {
+            CV_Assert(ofs == fs_তথ্য_blksz[blockIdx]);
+            বিরতি;
         }
-        ofs -= fs_data_blksz[blockIdx];
+        ofs -= fs_তথ্য_blksz[blockIdx];
         blockIdx++;
     }
 }
 
 FileStorage::Impl::Base64State FileStorage::Impl::get_state_of_writing_base64() {
-    return state_of_writing_base64;
+    ফেরত state_of_writing_base64;
 }
 
-int FileStorage::Impl::get_space() {
-    return space;
+পূর্ণসংখ্যা FileStorage::Impl::get_space() {
+    ফেরত space;
 }
 
 
@@ -1727,10 +1727,10 @@ FileStorage::Impl::Base64Decoder::Base64Decoder() {
     ptr = 0;
     indent = 0;
     totalchars = 0;
-    eos = true;
+    eos = সত্য;
 }
 
-void FileStorage::Impl::Base64Decoder::init(const Ptr<FileStorageParser> &_parser, char *_ptr, int _indent) {
+শূন্য FileStorage::Impl::Base64Decoder::init(ধ্রুবক Ptr<FileStorageParser> &_parser, অক্ষর *_ptr, পূর্ণসংখ্যা _indent) {
     parser_do_not_use_direct_dereference = _parser;
     ptr = _ptr;
     indent = _indent;
@@ -1738,11 +1738,11 @@ void FileStorage::Impl::Base64Decoder::init(const Ptr<FileStorageParser> &_parse
     decoded.clear();
     ofs = 0;
     totalchars = 0;
-    eos = false;
+    eos = মিথ্যা;
 }
 
-bool FileStorage::Impl::Base64Decoder::readMore(int needed) {
-    static const uchar base64tab[] =
+যৌক্তিক FileStorage::Impl::Base64Decoder::readMore(পূর্ণসংখ্যা needed) {
+    স্থির ধ্রুবক uchar base64tab[] =
             {
                     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
                     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -1762,43 +1762,43 @@ bool FileStorage::Impl::Base64Decoder::readMore(int needed) {
                     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
             };
 
-    if (eos)
-        return false;
+    যদি (eos)
+        ফেরত মিথ্যা;
 
     size_t sz = decoded.size();
     CV_Assert(ofs <= sz);
     sz -= ofs;
-    for (size_t i = 0; i < sz; i++)
+    জন্য (size_t i = 0; i < sz; i++)
         decoded[i] = decoded[ofs + i];
 
     decoded.resize(sz);
     ofs = 0;
 
     CV_Assert(ptr);
-    char *beg = 0, *end = 0;
-    bool ok = getParser().getBase64Row(ptr, indent, beg, end);
+    অক্ষর *beg = 0, *end = 0;
+    যৌক্তিক ok = getParser().getBase64Row(ptr, indent, beg, end);
     ptr = end;
     std::copy(beg, end, std::back_inserter(encoded));
     totalchars += end - beg;
 
-    if (!ok || beg == end) {
+    যদি (!ok || beg == end) {
         // in the end of base64 sequence pad it with '=' characters so that
         // its total length is multiple of
-        eos = true;
+        eos = সত্য;
         size_t tc = totalchars;
-        for (; tc % 4 != 0; tc++)
+        জন্য (; tc % 4 != 0; tc++)
             encoded.push_back('=');
     }
 
-    int i = 0, j, n = (int) encoded.size();
-    if (n > 0) {
-        const uchar *tab = base64tab;
-        char *src = &encoded[0];
+    পূর্ণসংখ্যা i = 0, j, n = (পূর্ণসংখ্যা) encoded.size();
+    যদি (n > 0) {
+        ধ্রুবক uchar *tab = base64tab;
+        অক্ষর *src = &encoded[0];
 
-        for (; i <= n - 4; i += 4) {
+        জন্য (; i <= n - 4; i += 4) {
             // dddddd cccccc bbbbbb aaaaaa => ddddddcc ccccbbbb bbaaaaaa
-            uchar d = tab[(int) (uchar) src[i]], c = tab[(int) (uchar) src[i + 1]];
-            uchar b = tab[(int) (uchar) src[i + 2]], a = tab[(int) (uchar) src[i + 3]];
+            uchar d = tab[(পূর্ণসংখ্যা) (uchar) src[i]], c = tab[(পূর্ণসংখ্যা) (uchar) src[i + 1]];
+            uchar b = tab[(পূর্ণসংখ্যা) (uchar) src[i + 2]], a = tab[(পূর্ণসংখ্যা) (uchar) src[i + 3]];
 
             decoded.push_back((uchar) ((d << 2) | (c >> 4)));
             decoded.push_back((uchar) ((c << 4) | (b >> 2)));
@@ -1806,218 +1806,218 @@ bool FileStorage::Impl::Base64Decoder::readMore(int needed) {
         }
     }
 
-    if (i > 0 && encoded[i - 1] == '=') {
-        if (i > 1 && encoded[i - 2] == '=' && !decoded.empty())
+    যদি (i > 0 && encoded[i - 1] == '=') {
+        যদি (i > 1 && encoded[i - 2] == '=' && !decoded.empty())
             decoded.pop_back();
-        if (!decoded.empty())
+        যদি (!decoded.empty())
             decoded.pop_back();
     }
 
     n -= i;
-    for (j = 0; j < n; j++)
+    জন্য (j = 0; j < n; j++)
         encoded[j] = encoded[i + j];
     encoded.resize(n);
 
-    return (int) decoded.size() >= needed;
+    ফেরত (পূর্ণসংখ্যা) decoded.size() >= needed;
 }
 
 uchar FileStorage::Impl::Base64Decoder::getUInt8() {
     size_t sz = decoded.size();
-    if (ofs >= sz && !readMore(1))
-        return (uchar) 0;
-    return decoded[ofs++];
+    যদি (ofs >= sz && !readMore(1))
+        ফেরত (uchar) 0;
+    ফেরত decoded[ofs++];
 }
 
 ushort FileStorage::Impl::Base64Decoder::getUInt16() {
     size_t sz = decoded.size();
-    if (ofs + 2 > sz && !readMore(2))
-        return (ushort) 0;
+    যদি (ofs + 2 > sz && !readMore(2))
+        ফেরত (ushort) 0;
     ushort val = (decoded[ofs] + (decoded[ofs + 1] << 8));
     ofs += 2;
-    return val;
+    ফেরত val;
 }
 
-int FileStorage::Impl::Base64Decoder::getInt32() {
+পূর্ণসংখ্যা FileStorage::Impl::Base64Decoder::getInt32() {
     size_t sz = decoded.size();
-    if (ofs + 4 > sz && !readMore(4))
-        return 0;
-    int ival = readInt(&decoded[ofs]);
+    যদি (ofs + 4 > sz && !readMore(4))
+        ফেরত 0;
+    পূর্ণসংখ্যা ival = readInt(&decoded[ofs]);
     ofs += 4;
-    return ival;
+    ফেরত ival;
 }
 
 int64_t FileStorage::Impl::Base64Decoder::getInt64() {
     size_t sz = decoded.size();
-    if (ofs + 8 > sz && !readMore(8))
-        return 0;
+    যদি (ofs + 8 > sz && !readMore(8))
+        ফেরত 0;
     int64_t ival = readLong(&decoded[ofs]);
     ofs += 8;
-    return ival;
+    ফেরত ival;
 }
 
-double FileStorage::Impl::Base64Decoder::getFloat64() {
+দ্বিগুণ FileStorage::Impl::Base64Decoder::getFloat64() {
     size_t sz = decoded.size();
-    if (ofs + 8 > sz && !readMore(8))
-        return 0;
-    double fval = readReal(&decoded[ofs]);
+    যদি (ofs + 8 > sz && !readMore(8))
+        ফেরত 0;
+    দ্বিগুণ fval = readReal(&decoded[ofs]);
     ofs += 8;
-    return fval;
+    ফেরত fval;
 }
 
-bool FileStorage::Impl::Base64Decoder::endOfStream() const { return eos; }
+যৌক্তিক FileStorage::Impl::Base64Decoder::endOfStream() ধ্রুবক { ফেরত eos; }
 
-char *FileStorage::Impl::Base64Decoder::getPtr() const { return ptr; }
+অক্ষর *FileStorage::Impl::Base64Decoder::getPtr() ধ্রুবক { ফেরত ptr; }
 
 
-char *FileStorage::Impl::parseBase64(char *ptr, int indent, FileNode &collection) {
-    const int BASE64_HDR_SIZE = 24;
-    char dt[BASE64_HDR_SIZE + 1] = {0};
+অক্ষর *FileStorage::Impl::parseBase64(অক্ষর *ptr, পূর্ণসংখ্যা indent, File_গ্রন্থি &collection) {
+    ধ্রুবক পূর্ণসংখ্যা BASE64_HDR_আকার = 24;
+    অক্ষর dt[BASE64_HDR_আকার + 1] = {0};
     base64decoder.init(parser_do_not_use_direct_dereference, ptr, indent);
 
-    int i, k;
+    পূর্ণসংখ্যা i, k;
 
-    for (i = 0; i < BASE64_HDR_SIZE; i++)
-        dt[i] = (char) base64decoder.getUInt8();
-    for (i = 0; i < BASE64_HDR_SIZE; i++)
-        if (isspace(dt[i]))
-            break;
+    জন্য (i = 0; i < BASE64_HDR_আকার; i++)
+        dt[i] = (অক্ষর) base64decoder.getUInt8();
+    জন্য (i = 0; i < BASE64_HDR_আকার; i++)
+        যদি (isspace(dt[i]))
+            বিরতি;
     dt[i] = '\0';
 
     CV_Assert(!base64decoder.endOfStream());
 
-    int fmt_pairs[CV_FS_MAX_FMT_PAIRS * 2];
-    int fmt_pair_count = fs::decodeFormat(dt, fmt_pairs, CV_FS_MAX_FMT_PAIRS);
+    পূর্ণসংখ্যা fmt_pairs[CV_FS_MAX_FMT_PAIRS * 2];
+    পূর্ণসংখ্যা fmt_pair_গুনতি = fs::decodeFormat(dt, fmt_pairs, CV_FS_MAX_FMT_PAIRS);
     int64_t ival = 0;
-    double fval = 0;
+    দ্বিগুণ fval = 0;
 
-    for (;;) {
-        for (k = 0; k < fmt_pair_count; k++) {
-            int elem_type = fmt_pairs[k * 2 + 1];
-            int count = fmt_pairs[k * 2];
+    জন্য (;;) {
+        জন্য (k = 0; k < fmt_pair_গুনতি; k++) {
+            পূর্ণসংখ্যা elem_type = fmt_pairs[k * 2 + 1];
+            পূর্ণসংখ্যা গুনতি_2 = fmt_pairs[k * 2];
 
-            for (i = 0; i < count; i++) {
-                int node_type = FileNode::INT;
-                switch (elem_type) {
-                    case CV_8U:
+            জন্য (i = 0; i < গুনতি_2; i++) {
+                পূর্ণসংখ্যা গ্রন্থি_type = File_গ্রন্থি::INT;
+                নির্বাচন (elem_type) {
+                    ক্ষেত্র CV_8U:
                         ival = base64decoder.getUInt8();
-                        break;
-                    case CV_8S:
-                        ival = (char) base64decoder.getUInt8();
-                        break;
-                    case CV_Bool:
+                        বিরতি;
+                    ক্ষেত্র CV_8S:
+                        ival = (অক্ষর) base64decoder.getUInt8();
+                        বিরতি;
+                    ক্ষেত্র CV_Bool:
                         ival = base64decoder.getUInt8() != 0;
-                        break;
-                    case CV_16U:
+                        বিরতি;
+                    ক্ষেত্র CV_16U:
                         ival = base64decoder.getUInt16();
-                        break;
-                    case CV_16S:
+                        বিরতি;
+                    ক্ষেত্র CV_16S:
                         ival = (short) base64decoder.getUInt16();
-                        break;
-                    case CV_32U:
+                        বিরতি;
+                    ক্ষেত্র CV_32U:
                         ival = base64decoder.getInt32();
-                        break;
-                    case CV_32S:
+                        বিরতি;
+                    ক্ষেত্র CV_32S:
                         ival = base64decoder.getInt32();
-                        break;
-                    case CV_64U:
+                        বিরতি;
+                    ক্ষেত্র CV_64U:
                         ival = base64decoder.getInt64();
-                        break;
-                    case CV_64S:
+                        বিরতি;
+                    ক্ষেত্র CV_64S:
                         ival = base64decoder.getInt64();
-                        break;
-                    case CV_32F: {
+                        বিরতি;
+                    ক্ষেত্র CV_32F: {
                         Cv32suf v;
                         v.i = base64decoder.getInt32();
                         fval = v.f;
-                        node_type = FileNode::REAL;
+                        গ্রন্থি_type = File_গ্রন্থি::REAL;
                     }
-                        break;
-                    case CV_64F:
+                        বিরতি;
+                    ক্ষেত্র CV_64F:
                         fval = base64decoder.getFloat64();
-                        node_type = FileNode::REAL;
-                        break;
-                    case CV_16F:
-                        fval = float(hfloatFromBits(base64decoder.getUInt16()));
-                        node_type = FileNode::REAL;
-                        break;
-                    case CV_8F_E4M3FN:
+                        গ্রন্থি_type = File_গ্রন্থি::REAL;
+                        বিরতি;
+                    ক্ষেত্র CV_16F:
+                        fval = দশমিক(hfloatFromBits(base64decoder.getUInt16()));
+                        গ্রন্থি_type = File_গ্রন্থি::REAL;
+                        বিরতি;
+                    ক্ষেত্র CV_8F_E4M3FN:
                         fval = fp8_t::decodeLUT()[base64decoder.getUInt8()];
-                        node_type = FileNode::REAL;
-                        break;
-                    case CV_8F_E4M3FNUZ:
+                        গ্রন্থি_type = File_গ্রন্থি::REAL;
+                        বিরতি;
+                    ক্ষেত্র CV_8F_E4M3FNUZ:
                         fval = fp8a_t::decodeLUT()[base64decoder.getUInt8()];
-                        node_type = FileNode::REAL;
-                        break;
-                    default:
+                        গ্রন্থি_type = File_গ্রন্থি::REAL;
+                        বিরতি;
+                    পূর্বনির্ধারিত:
                         CV_Error(Error::StsUnsupportedFormat, "Unsupported type");
                 }
 
-                if (base64decoder.endOfStream())
-                    break;
-                addNode(collection, std::string(), node_type,
-                        node_type == FileNode::INT ? (void *) &ival : (void *) &fval, -1);
+                যদি (base64decoder.endOfStream())
+                    বিরতি;
+                add_গ্রন্থি(collection, std::string(), গ্রন্থি_type,
+                        গ্রন্থি_type == File_গ্রন্থি::INT ? (শূন্য *) &ival : (শূন্য *) &fval, -1);
             }
         }
-        if (base64decoder.endOfStream())
-            break;
+        যদি (base64decoder.endOfStream())
+            বিরতি;
     }
 
     finalizeCollection(collection);
-    return base64decoder.getPtr();
+    ফেরত base64decoder.getPtr();
 }
 
-void FileStorage::Impl::parseError(const char *func_name, const std::string &err_msg, const char *source_file,
-                                   int source_line) {
-    std::string msg = format("%s(%d): %s", filename.c_str(), lineno, err_msg.c_str());
-    error(Error::StsParseError, func_name, msg.c_str(), source_file, source_line);
+শূন্য FileStorage::Impl::parseError(ধ্রুবক অক্ষর *func_name, ধ্রুবক std::string &err_বার্তা, ধ্রুবক অক্ষর *source_file,
+                                   পূর্ণসংখ্যা source_সারি) {
+    std::string বার্তা = format("%s(%d): %s", filename.c_str(), lineno, err_বার্তা.c_str());
+    error(Error::StsParseError, func_name, বার্তা.c_str(), source_file, source_সারি);
 }
 
-const uchar *FileStorage::Impl::getNodePtr(size_t blockIdx, size_t ofs) const {
-    CV_Assert(blockIdx < fs_data_ptrs.size());
-    CV_Assert(ofs < fs_data_blksz[blockIdx]);
+ধ্রুবক uchar *FileStorage::Impl::get_গ্রন্থি_Ptr(size_t blockIdx, size_t ofs) ধ্রুবক {
+    CV_Assert(blockIdx < fs_তথ্য_ptrs.size());
+    CV_Assert(ofs < fs_তথ্য_blksz[blockIdx]);
 
-    return fs_data_ptrs[blockIdx] + ofs;
+    ফেরত fs_তথ্য_ptrs[blockIdx] + ofs;
 }
 
-std::string FileStorage::Impl::getName(size_t nameofs) const {
-    CV_Assert(nameofs < str_hash_data.size());
-    return std::string(&str_hash_data[nameofs]);
+std::string FileStorage::Impl::getName(size_t nameofs) ধ্রুবক {
+    CV_Assert(nameofs < str_hash_তথ্য.size());
+    ফেরত std::string(&str_hash_তথ্য[nameofs]);
 }
 
-FileStorage *FileStorage::Impl::getFS() { return fs_ext; }
+FileStorage *FileStorage::Impl::getFS() { ফেরত fs_ext; }
 
 
 FileStorage::FileStorage()
     : state(0)
 {
-    p = makePtr<FileStorage::Impl>(this);
+    p = makePtr<FileStorage::Impl>(এই);
 }
 
-FileStorage::FileStorage(const String& filename, int flags, const String& encoding)
+FileStorage::FileStorage(ধ্রুবক String& filename, পূর্ণসংখ্যা flags, ধ্রুবক String& encoding)
     : state(0)
 {
-    p = makePtr<FileStorage::Impl>(this);
-    bool ok = p->open(filename.c_str(), flags, encoding.c_str());
-    if(ok)
+    p = makePtr<FileStorage::Impl>(এই);
+    যৌক্তিক ok = p->open(filename.c_str(), flags, encoding.c_str());
+    যদি(ok)
         state = FileStorage::NAME_EXPECTED + FileStorage::INSIDE_MAP;
 }
 
-void FileStorage::startWriteStruct(const String& name, int struct_flags, const String& typeName)
+শূন্য FileStorage::startWriteStruct(ধ্রুবক String& name, পূর্ণসংখ্যা struct_flags, ধ্রুবক String& typeName)
 {
     p->startWriteStruct(name.size() ? name.c_str() : 0, struct_flags, typeName.size() ? typeName.c_str() : 0);
     elname = String();
-    if ((struct_flags & FileNode::TYPE_MASK) == FileNode::SEQ)
-        state = FileStorage::VALUE_EXPECTED;
-    else
+    যদি ((struct_flags & File_গ্রন্থি::TYPE_MASK) == File_গ্রন্থি::SEQ)
+        state = FileStorage::মান_EXPECTED;
+    অন্যথা
         state = FileStorage::NAME_EXPECTED + FileStorage::INSIDE_MAP;
 }
 
-void FileStorage::endWriteStruct()
+শূন্য FileStorage::endWriteStruct()
 {
     p->endWriteStruct();
-    state = p->write_stack.empty() || FileNode::isMap(p->write_stack.back().flags) ?
+    state = p->write_স্তূপ.empty() || File_গ্রন্থি::isMap(p->write_স্তূপ.back().flags) ?
         FileStorage::NAME_EXPECTED + FileStorage::INSIDE_MAP :
-        FileStorage::VALUE_EXPECTED;
+        FileStorage::মান_EXPECTED;
     elname = String();
 }
 
@@ -2025,955 +2025,955 @@ FileStorage::~FileStorage()
 {
 }
 
-bool FileStorage::open(const String& filename, int flags, const String& encoding)
+যৌক্তিক FileStorage::open(ধ্রুবক String& filename, পূর্ণসংখ্যা flags, ধ্রুবক String& encoding)
 {
-    try
+    চেষ্টা
     {
-        bool ok = p->open(filename.c_str(), flags, encoding.c_str());
-        if(ok)
+        যৌক্তিক ok = p->open(filename.c_str(), flags, encoding.c_str());
+        যদি(ok)
             state = FileStorage::NAME_EXPECTED + FileStorage::INSIDE_MAP;
-        return ok;
+        ফেরত ok;
     }
-    catch (...)
+    ধরো (...)
     {
         release();
-        throw;  // re-throw
+        ছোড়ো;  // re-throw
     }
 }
 
-bool FileStorage::isOpened() const { return p->is_opened; }
+যৌক্তিক FileStorage::isOpened() ধ্রুবক { ফেরত p->is_opened; }
 
-void FileStorage::release()
+শূন্য FileStorage::release()
 {
     p->release();
 }
 
-FileNode FileStorage::root(int i) const
+File_গ্রন্থি FileStorage::মূল(পূর্ণসংখ্যা i) ধ্রুবক
 {
-    if( p.empty() || p->roots.empty() || i < 0 || i >= (int)p->roots.size() )
-        return FileNode();
+    যদি( p.empty() || p->roots.empty() || i < 0 || i >= (পূর্ণসংখ্যা)p->roots.size() )
+        ফেরত File_গ্রন্থি();
 
-    return p->roots[i];
+    ফেরত p->roots[i];
 }
 
-FileNode FileStorage::getFirstTopLevelNode() const
+File_গ্রন্থি FileStorage::get_First_শীর্ষ_Level_গ্রন্থি() ধ্রুবক
 {
-    FileNode r = root();
-    FileNodeIterator it = r.begin();
-    return it != r.end() ? *it : FileNode();
+    File_গ্রন্থি r = মূল();
+    File_গ্রন্থি_Iterator it = r.begin();
+    ফেরত it != r.end() ? *it : File_গ্রন্থি();
 }
 
-std::string FileStorage::getDefaultObjectName(const std::string& _filename)
+std::string FileStorage::getDefaultObjectName(ধ্রুবক std::string& _filename)
 {
-    static const char* stubname = "unnamed";
-    const char* filename = _filename.c_str();
-    const char* ptr2 = filename + _filename.size();
-    const char* ptr = ptr2 - 1;
-    cv::AutoBuffer<char> name_buf(_filename.size()+1);
+    স্থির ধ্রুবক অক্ষর* stubname = "unnamed";
+    ধ্রুবক অক্ষর* filename = _filename.c_str();
+    ধ্রুবক অক্ষর* ptr2 = filename + _filename.size();
+    ধ্রুবক অক্ষর* ptr = ptr2 - 1;
+    cv::Auto_বাফার<অক্ষর> name_buf(_filename.size()+1);
 
-    while( ptr >= filename && *ptr != '\\' && *ptr != '/' && *ptr != ':' )
+    যখন( ptr >= filename && *ptr != '\\' && *ptr != '/' && *ptr != ':' )
     {
-        if( *ptr == '.' && (!*ptr2 || strncmp(ptr2, ".gz", 3) == 0) )
+        যদি( *ptr == '.' && (!*ptr2 || strncmp(ptr2, ".gz", 3) == 0) )
             ptr2 = ptr;
         ptr--;
     }
     ptr++;
-    if( ptr == ptr2 )
+    যদি( ptr == ptr2 )
         CV_Error( cv::Error::StsBadArg, "Invalid filename" );
 
-    char* name = name_buf.data();
+    অক্ষর* name = name_buf.তথ্য();
 
     // name must start with letter or '_'
-    if( !cv_isalpha(*ptr) && *ptr!= '_' ){
+    যদি( !cv_isalpha(*ptr) && *ptr!= '_' ){
         *name++ = '_';
     }
 
-    while( ptr < ptr2 )
+    যখন( ptr < ptr2 )
     {
-        char c = *ptr++;
-        if( !cv_isalnum(c) && c != '-' && c != '_' )
+        অক্ষর c = *ptr++;
+        যদি( !cv_isalnum(c) && c != '-' && c != '_' )
             c = '_';
         *name++ = c;
     }
     *name = '\0';
-    name = name_buf.data();
-    if( strcmp( name, "_" ) == 0 )
+    name = name_buf.তথ্য();
+    যদি( strcmp( name, "_" ) == 0 )
         strcpy( name, stubname );
-    return name;
+    ফেরত name;
 }
 
 
-int FileStorage::getFormat() const
+পূর্ণসংখ্যা FileStorage::getFormat() ধ্রুবক
 {
-    return p->fmt;
+    ফেরত p->fmt;
 }
 
-FileNode FileStorage::operator [](const char* key) const
+File_গ্রন্থি FileStorage::operator [](ধ্রুবক অক্ষর* চাবি) ধ্রুবক
 {
-    return this->operator[](std::string(key));
+    ফেরত এই->operator[](std::string(চাবি));
 }
 
-FileNode FileStorage::operator [](const std::string& key) const
+File_গ্রন্থি FileStorage::operator [](ধ্রুবক std::string& চাবি) ধ্রুবক
 {
-    FileNode res;
-    for (size_t i = 0; i < p->roots.size(); i++)
+    File_গ্রন্থি res;
+    জন্য (size_t i = 0; i < p->roots.size(); i++)
     {
-        res = p->roots[i][key];
-        if (!res.empty())
-            break;
+        res = p->roots[i][চাবি];
+        যদি (!res.empty())
+            বিরতি;
     }
-    return res;
+    ফেরত res;
 }
 
 String FileStorage::releaseAndGetString()
 {
     String buf;
     p->release(&buf);
-    return buf;
+    ফেরত buf;
 }
 
-void FileStorage::writeRaw( const String& fmt, const void* vec, size_t len )
+শূন্য FileStorage::writeRaw( ধ্রুবক String& fmt, ধ্রুবক শূন্য* vec, size_t len )
 {
-    p->writeRawData(fmt, (const uchar*)vec, len);
+    p->write_Raw_তথ্য(fmt, (ধ্রুবক uchar*)vec, len);
 }
 
-void FileStorage::writeComment( const String& comment, bool eol_comment )
+শূন্য FileStorage::writeComment( ধ্রুবক String& comment, যৌক্তিক eol_comment )
 {
     p->writeComment(comment.c_str(), eol_comment);
 }
 
-void writeScalar( FileStorage& fs, int value )
+শূন্য writeScalar( FileStorage& fs, পূর্ণসংখ্যা value )
 {
-    fs.p->write(String(), value);
+    fs.p->লিখ(String(), value);
 }
 
-void writeScalar( FileStorage& fs, int64_t value )
+শূন্য writeScalar( FileStorage& fs, int64_t value )
 {
-    fs.p->write(String(), value);
+    fs.p->লিখ(String(), value);
 }
 
-void writeScalar( FileStorage& fs, float value )
+শূন্য writeScalar( FileStorage& fs, দশমিক value )
 {
-    fs.p->write(String(), (double)value);
+    fs.p->লিখ(String(), (দ্বিগুণ)value);
 }
 
-void writeScalar( FileStorage& fs, double value )
+শূন্য writeScalar( FileStorage& fs, দ্বিগুণ value )
 {
-    fs.p->write(String(), value);
+    fs.p->লিখ(String(), value);
 }
 
-void writeScalar( FileStorage& fs, const String& value )
+শূন্য writeScalar( FileStorage& fs, ধ্রুবক String& value )
 {
-    fs.p->write(String(), value);
+    fs.p->লিখ(String(), value);
 }
 
-void write( FileStorage& fs, const String& name, int value )
+শূন্য লিখ( FileStorage& fs, ধ্রুবক String& name, পূর্ণসংখ্যা value )
 {
-    fs.p->write(name, value);
+    fs.p->লিখ(name, value);
 }
 
-void write( FileStorage& fs, const String& name, int64_t value )
+শূন্য লিখ( FileStorage& fs, ধ্রুবক String& name, int64_t value )
 {
-    fs.p->write(name, value);
+    fs.p->লিখ(name, value);
 }
 
-void write( FileStorage& fs, const String& name, float value )
+শূন্য লিখ( FileStorage& fs, ধ্রুবক String& name, দশমিক value )
 {
-    fs.p->write(name, (double)value);
+    fs.p->লিখ(name, (দ্বিগুণ)value);
 }
 
-void write( FileStorage& fs, const String& name, double value )
+শূন্য লিখ( FileStorage& fs, ধ্রুবক String& name, দ্বিগুণ value )
 {
-    fs.p->write(name, value);
+    fs.p->লিখ(name, value);
 }
 
-void write( FileStorage& fs, const String& name, const String& value )
+শূন্য লিখ( FileStorage& fs, ধ্রুবক String& name, ধ্রুবক String& value )
 {
-    fs.p->write(name, value);
+    fs.p->লিখ(name, value);
 }
 
-void write( FileStorage& fs, const String& name, bool value )
+শূন্য লিখ( FileStorage& fs, ধ্রুবক String& name, যৌক্তিক value )
 {
-    fs.p->write(name, value);
+    fs.p->লিখ(name, value);
 }
 
-void FileStorage::write(const String& name, int val) { p->write(name, val); }
-void FileStorage::write(const String& name, bool val) { p->write(name, val); }
-void FileStorage::write(const String& name, int64_t val) { p->write(name, val); }
-void FileStorage::write(const String& name, double val) { p->write(name, val); }
-void FileStorage::write(const String& name, const String& val) { p->write(name, val); }
-void FileStorage::write(const String& name, const Mat& val) { cv::write(*this, name, val); }
-void FileStorage::write(const String& name, const std::vector<String>& val) { cv::write(*this, name, val); }
+শূন্য FileStorage::লিখ(ধ্রুবক String& name, পূর্ণসংখ্যা val) { p->লিখ(name, val); }
+শূন্য FileStorage::লিখ(ধ্রুবক String& name, যৌক্তিক val) { p->লিখ(name, val); }
+শূন্য FileStorage::লিখ(ধ্রুবক String& name, int64_t val) { p->লিখ(name, val); }
+শূন্য FileStorage::লিখ(ধ্রুবক String& name, দ্বিগুণ val) { p->লিখ(name, val); }
+শূন্য FileStorage::লিখ(ধ্রুবক String& name, ধ্রুবক String& val) { p->লিখ(name, val); }
+শূন্য FileStorage::লিখ(ধ্রুবক String& name, ধ্রুবক Mat& val) { cv::লিখ(*এই, name, val); }
+শূন্য FileStorage::লিখ(ধ্রুবক String& name, ধ্রুবক std::vector<String>& val) { cv::লিখ(*এই, name, val); }
 
-FileStorage& operator << (FileStorage& fs, const String& str)
+FileStorage& operator << (FileStorage& fs, ধ্রুবক String& str)
 {
-    enum { NAME_EXPECTED = FileStorage::NAME_EXPECTED,
-        VALUE_EXPECTED = FileStorage::VALUE_EXPECTED,
+    গণনা { NAME_EXPECTED = FileStorage::NAME_EXPECTED,
+        মান_EXPECTED = FileStorage::মান_EXPECTED,
         INSIDE_MAP = FileStorage::INSIDE_MAP };
-    const char* _str = str.c_str();
-    if( !fs.isOpened() || !_str )
-        return fs;
+    ধ্রুবক অক্ষর* _str = str.c_str();
+    যদি( !fs.isOpened() || !_str )
+        ফেরত fs;
     Ptr<FileStorage::Impl>& fs_impl = fs.p;
-    char c = *_str;
+    অক্ষর c = *_str;
 
-    if( c == '}' || c == ']' )
+    যদি( c == '}' || c == ']' )
     {
-        if( fs_impl->write_stack.empty() )
+        যদি( fs_impl->write_স্তূপ.empty() )
             CV_Error_( cv::Error::StsError, ("Extra closing '%c'", *_str) );
 
         fs_impl->workaround();
 
-        int struct_flags = fs_impl->write_stack.back().flags;
-        char expected_bracket = FileNode::isMap(struct_flags) ? '}' : ']';
-        if( c != expected_bracket )
+        পূর্ণসংখ্যা struct_flags = fs_impl->write_স্তূপ.back().flags;
+        অক্ষর expected_bracket = File_গ্রন্থি::isMap(struct_flags) ? '}' : ']';
+        যদি( c != expected_bracket )
             CV_Error_( cv::Error::StsError, ("The closing '%c' does not match the opening '%c'", c, expected_bracket));
         fs_impl->endWriteStruct();
-        CV_Assert(!fs_impl->write_stack.empty());
-        struct_flags = fs_impl->write_stack.back().flags;
-        fs.state = FileNode::isMap(struct_flags) ? INSIDE_MAP + NAME_EXPECTED : VALUE_EXPECTED;
+        CV_Assert(!fs_impl->write_স্তূপ.empty());
+        struct_flags = fs_impl->write_স্তূপ.back().flags;
+        fs.state = File_গ্রন্থি::isMap(struct_flags) ? INSIDE_MAP + NAME_EXPECTED : মান_EXPECTED;
         fs.elname = String();
     }
-    else if( fs.state == NAME_EXPECTED + INSIDE_MAP )
+    অন্যথা যদি( fs.state == NAME_EXPECTED + INSIDE_MAP )
     {
-        if (!cv_isalpha(c) && c != '_')
+        যদি (!cv_isalpha(c) && c != '_')
             CV_Error_( cv::Error::StsError, ("Incorrect element name %s; should start with a letter or '_'", _str) );
         fs.elname = str;
-        fs.state = VALUE_EXPECTED + INSIDE_MAP;
+        fs.state = মান_EXPECTED + INSIDE_MAP;
     }
-    else if( (fs.state & 3) == VALUE_EXPECTED )
+    অন্যথা যদি( (fs.state & 3) == মান_EXPECTED )
     {
-        if( c == '{' || c == '[' )
+        যদি( c == '{' || c == '[' )
         {
-            int struct_flags = c == '{' ? FileNode::MAP : FileNode::SEQ;
-            fs.state = struct_flags == FileNode::MAP ? INSIDE_MAP + NAME_EXPECTED : VALUE_EXPECTED;
+            পূর্ণসংখ্যা struct_flags = c == '{' ? File_গ্রন্থি::MAP : File_গ্রন্থি::SEQ;
+            fs.state = struct_flags == File_গ্রন্থি::MAP ? INSIDE_MAP + NAME_EXPECTED : মান_EXPECTED;
             _str++;
-            if( *_str == ':' )
+            যদি( *_str == ':' )
             {
                 _str++;
-                if( !*_str )
-                    struct_flags |= FileNode::FLOW;
+                যদি( !*_str )
+                    struct_flags |= File_গ্রন্থি::FLOW;
             }
             fs_impl->startWriteStruct(!fs.elname.empty() ? fs.elname.c_str() : 0, struct_flags, *_str ? _str : 0 );
             fs.elname = String();
         }
-        else
+        অন্যথা
         {
-            write( fs, fs.elname, (c == '\\' && (_str[1] == '{' || _str[1] == '}' ||
+            লিখ( fs, fs.elname, (c == '\\' && (_str[1] == '{' || _str[1] == '}' ||
                                 _str[1] == '[' || _str[1] == ']')) ? String(_str+1) : str );
-            if( fs.state == INSIDE_MAP + VALUE_EXPECTED )
+            যদি( fs.state == INSIDE_MAP + মান_EXPECTED )
                 fs.state = INSIDE_MAP + NAME_EXPECTED;
         }
     }
-    else
+    অন্যথা
         CV_Error( cv::Error::StsError, "Invalid fs.state" );
-    return fs;
+    ফেরত fs;
 }
 
 
-FileNode::FileNode()
-    : fs(NULL)
+File_গ্রন্থি::File_গ্রন্থি()
+    : fs(ফাঁকা)
 {
     blockIdx = ofs = 0;
 }
 
-FileNode::FileNode(FileStorage::Impl* _fs, size_t _blockIdx, size_t _ofs)
+File_গ্রন্থি::File_গ্রন্থি(FileStorage::Impl* _fs, size_t _blockIdx, size_t _ofs)
     : fs(_fs)
 {
     blockIdx = _blockIdx;
     ofs = _ofs;
 }
 
-FileNode::FileNode(const FileStorage* _fs, size_t _blockIdx, size_t _ofs)
-    : FileNode(_fs->p.get(), _blockIdx, _ofs)
+File_গ্রন্থি::File_গ্রন্থি(ধ্রুবক FileStorage* _fs, size_t _blockIdx, size_t _ofs)
+    : File_গ্রন্থি(_fs->p.get(), _blockIdx, _ofs)
 {
     // nothing
 }
 
-FileNode::FileNode(const FileNode& node)
+File_গ্রন্থি::File_গ্রন্থি(ধ্রুবক File_গ্রন্থি& গ্রন্থি)
 {
-    fs = node.fs;
-    blockIdx = node.blockIdx;
-    ofs = node.ofs;
+    fs = গ্রন্থি.fs;
+    blockIdx = গ্রন্থি.blockIdx;
+    ofs = গ্রন্থি.ofs;
 }
 
-FileNode& FileNode::operator=(const FileNode& node)
+File_গ্রন্থি& File_গ্রন্থি::operator=(ধ্রুবক File_গ্রন্থি& গ্রন্থি)
 {
-    fs = node.fs;
-    blockIdx = node.blockIdx;
-    ofs = node.ofs;
-    return *this;
+    fs = গ্রন্থি.fs;
+    blockIdx = গ্রন্থি.blockIdx;
+    ofs = গ্রন্থি.ofs;
+    ফেরত *এই;
 }
 
-FileNode FileNode::operator[](const std::string& nodename) const
+File_গ্রন্থি File_গ্রন্থি::operator[](ধ্রুবক std::string& nodename) ধ্রুবক
 {
-    if(!fs)
-        return FileNode();
+    যদি(!fs)
+        ফেরত File_গ্রন্থি();
 
     CV_Assert( isMap() );
 
-    unsigned key = fs->getStringOfs(nodename);
+    unsigned চাবি = fs->getStringOfs(nodename);
     size_t i, sz = size();
-    FileNodeIterator it = begin();
+    File_গ্রন্থি_Iterator it = begin();
 
-    for( i = 0; i < sz; i++, ++it )
+    জন্য( i = 0; i < sz; i++, ++it )
     {
-        FileNode n = *it;
-        const uchar* p = n.ptr();
+        File_গ্রন্থি n = *it;
+        ধ্রুবক uchar* p = n.ptr();
         unsigned key2 = (unsigned)readInt(p + 1);
-        CV_Assert( key2 < fs->str_hash_data.size() );
-        if( key == key2 )
-            return n;
+        CV_Assert( key2 < fs->str_hash_তথ্য.size() );
+        যদি( চাবি == key2 )
+            ফেরত n;
     }
-    return FileNode();
+    ফেরত File_গ্রন্থি();
 }
 
-FileNode FileNode::operator[](const char* nodename) const
+File_গ্রন্থি File_গ্রন্থি::operator[](ধ্রুবক অক্ষর* nodename) ধ্রুবক
 {
-    return this->operator[](std::string(nodename));
+    ফেরত এই->operator[](std::string(nodename));
 }
 
-FileNode FileNode::operator[](int i) const
+File_গ্রন্থি File_গ্রন্থি::operator[](পূর্ণসংখ্যা i) ধ্রুবক
 {
-    if(!fs)
-        return FileNode();
+    যদি(!fs)
+        ফেরত File_গ্রন্থি();
 
     CV_Assert( isSeq() );
 
-    int sz = (int)size();
+    পূর্ণসংখ্যা sz = (পূর্ণসংখ্যা)size();
     CV_Assert( 0 <= i && i < sz );
 
-    FileNodeIterator it = begin();
+    File_গ্রন্থি_Iterator it = begin();
     it += i;
 
-    return *it;
+    ফেরত *it;
 }
 
-std::vector<String> FileNode::keys() const
+std::vector<String> File_গ্রন্থি::চাবিগুলি() ধ্রুবক
 {
     CV_Assert(isMap());
 
     std::vector<String> res;
     res.reserve(size());
-    for (FileNodeIterator it = begin(); it != end(); ++it)
+    জন্য (File_গ্রন্থি_Iterator it = begin(); it != end(); ++it)
     {
         res.push_back((*it).name());
     }
-    return res;
+    ফেরত res;
 }
 
-int FileNode::type() const
+পূর্ণসংখ্যা File_গ্রন্থি::type() ধ্রুবক
 {
-    const uchar* p = ptr();
-    if(!p)
-        return NONE;
-    return (*p & TYPE_MASK);
+    ধ্রুবক uchar* p = ptr();
+    যদি(!p)
+        ফেরত NONE;
+    ফেরত (*p & TYPE_MASK);
 }
 
-bool FileNode::isMap(int flags) { return (flags & TYPE_MASK) == MAP; }
-bool FileNode::isSeq(int flags) { return (flags & TYPE_MASK) == SEQ; }
-bool FileNode::isCollection(int flags) { return isMap(flags) || isSeq(flags); }
-bool FileNode::isFlow(int flags) { return (flags & FLOW) != 0; }
-bool FileNode::isEmptyCollection(int flags) { return (flags & EMPTY) != 0; }
+যৌক্তিক File_গ্রন্থি::isMap(পূর্ণসংখ্যা flags) { ফেরত (flags & TYPE_MASK) == MAP; }
+যৌক্তিক File_গ্রন্থি::isSeq(পূর্ণসংখ্যা flags) { ফেরত (flags & TYPE_MASK) == SEQ; }
+যৌক্তিক File_গ্রন্থি::isCollection(পূর্ণসংখ্যা flags) { ফেরত isMap(flags) || isSeq(flags); }
+যৌক্তিক File_গ্রন্থি::isFlow(পূর্ণসংখ্যা flags) { ফেরত (flags & FLOW) != 0; }
+যৌক্তিক File_গ্রন্থি::isEmptyCollection(পূর্ণসংখ্যা flags) { ফেরত (flags & EMPTY) != 0; }
 
-bool FileNode::empty() const   { return fs == 0; }
-bool FileNode::isNone() const  { return type() == NONE; }
-bool FileNode::isSeq() const   { return type() == SEQ; }
-bool FileNode::isMap() const   { return type() == MAP; }
-bool FileNode::isInt() const   { return type() == INT;  }
-bool FileNode::isReal() const  { return type() == REAL; }
-bool FileNode::isString() const { return type() == STRING;  }
-bool FileNode::isNamed() const
+যৌক্তিক File_গ্রন্থি::empty() ধ্রুবক   { ফেরত fs == 0; }
+যৌক্তিক File_গ্রন্থি::isNone() ধ্রুবক  { ফেরত type() == NONE; }
+যৌক্তিক File_গ্রন্থি::isSeq() ধ্রুবক   { ফেরত type() == SEQ; }
+যৌক্তিক File_গ্রন্থি::isMap() ধ্রুবক   { ফেরত type() == MAP; }
+যৌক্তিক File_গ্রন্থি::isInt() ধ্রুবক   { ফেরত type() == INT;  }
+যৌক্তিক File_গ্রন্থি::isReal() ধ্রুবক  { ফেরত type() == REAL; }
+যৌক্তিক File_গ্রন্থি::isString() ধ্রুবক { ফেরত type() == STRING;  }
+যৌক্তিক File_গ্রন্থি::isNamed() ধ্রুবক
 {
-    const uchar* p = ptr();
-    if(!p)
-        return false;
-    return (*p & NAMED) != 0;
+    ধ্রুবক uchar* p = ptr();
+    যদি(!p)
+        ফেরত মিথ্যা;
+    ফেরত (*p & NAMED) != 0;
 }
 
-std::string FileNode::name() const
+std::string File_গ্রন্থি::name() ধ্রুবক
 {
-    const uchar* p = ptr();
-    if(!p)
-        return std::string();
+    ধ্রুবক uchar* p = ptr();
+    যদি(!p)
+        ফেরত std::string();
     size_t nameofs = p[1] | (p[2]<<8) | (p[3]<<16) | (p[4]<<24);
-    return fs->getName(nameofs);
+    ফেরত fs->getName(nameofs);
 }
 
-FileNode::operator int() const
+File_গ্রন্থি::operator পূর্ণসংখ্যা() ধ্রুবক
 {
-    const uchar* p = ptr();
-    if(!p)
-        return 0;
-    int tag = *p;
-    int type = (tag & TYPE_MASK);
+    ধ্রুবক uchar* p = ptr();
+    যদি(!p)
+        ফেরত 0;
+    পূর্ণসংখ্যা tag = *p;
+    পূর্ণসংখ্যা type = (tag & TYPE_MASK);
     p += (tag & NAMED) ? 5 : 1;
 
-    if( type == INT )
+    যদি( type == INT )
     {
-        return readInt(p);
+        ফেরত readInt(p);
     }
-    else if( type == REAL )
+    অন্যথা যদি( type == REAL )
     {
-        return cvRound(readReal(p));
+        ফেরত cvRound(readReal(p));
     }
-    else
-        return 0x7fffffff;
+    অন্যথা
+        ফেরত 0x7fffffff;
 }
 
-FileNode::operator int64_t() const
+File_গ্রন্থি::operator int64_t() ধ্রুবক
 {
-    const uchar* p = ptr();
-    if(!p)
-        return 0;
-    int tag = *p;
-    int type = (tag & TYPE_MASK);
+    ধ্রুবক uchar* p = ptr();
+    যদি(!p)
+        ফেরত 0;
+    পূর্ণসংখ্যা tag = *p;
+    পূর্ণসংখ্যা type = (tag & TYPE_MASK);
     p += (tag & NAMED) ? 5 : 1;
 
-    if( type == INT )
+    যদি( type == INT )
     {
-        return readLong(p);
+        ফেরত readLong(p);
     }
-    else if( type == REAL )
+    অন্যথা যদি( type == REAL )
     {
-        return cvRound(readReal(p));
+        ফেরত cvRound(readReal(p));
     }
-    else
-        return 0x7fffffff;
+    অন্যথা
+        ফেরত 0x7fffffff;
 }
 
-FileNode::operator float() const
+File_গ্রন্থি::operator দশমিক() ধ্রুবক
 {
-    const uchar* p = ptr();
-    if(!p)
-        return 0.f;
-    int tag = *p;
-    int type = (tag & TYPE_MASK);
+    ধ্রুবক uchar* p = ptr();
+    যদি(!p)
+        ফেরত 0.f;
+    পূর্ণসংখ্যা tag = *p;
+    পূর্ণসংখ্যা type = (tag & TYPE_MASK);
     p += (tag & NAMED) ? 5 : 1;
 
-    if( type == INT )
+    যদি( type == INT )
     {
-        return (float)readLong(p);
+        ফেরত (দশমিক)readLong(p);
     }
-    else if( type == REAL )
+    অন্যথা যদি( type == REAL )
     {
-        return (float)readReal(p);
+        ফেরত (দশমিক)readReal(p);
     }
-    else
-        return FLT_MAX;
+    অন্যথা
+        ফেরত FLT_MAX;
 }
 
-FileNode::operator double() const
+File_গ্রন্থি::operator দ্বিগুণ() ধ্রুবক
 {
-    const uchar* p = ptr();
-    if(!p)
-        return 0.f;
-    int tag = *p;
-    int type = (tag & TYPE_MASK);
+    ধ্রুবক uchar* p = ptr();
+    যদি(!p)
+        ফেরত 0.f;
+    পূর্ণসংখ্যা tag = *p;
+    পূর্ণসংখ্যা type = (tag & TYPE_MASK);
     p += (tag & NAMED) ? 5 : 1;
 
-    if( type == INT )
+    যদি( type == INT )
     {
-        return (double)readLong(p);
+        ফেরত (দ্বিগুণ)readLong(p);
     }
-    else if( type == REAL )
+    অন্যথা যদি( type == REAL )
     {
-        return readReal(p);
+        ফেরত readReal(p);
     }
-    else
-        return DBL_MAX;
+    অন্যথা
+        ফেরত DBL_MAX;
 }
 
-double FileNode::real() const  { return double(*this); }
+দ্বিগুণ File_গ্রন্থি::real() ধ্রুবক  { ফেরত দ্বিগুণ(*এই); }
 
-std::string FileNode::string() const
+std::string File_গ্রন্থি::string() ধ্রুবক
 {
-    const uchar* p = ptr();
-    if( !p || (*p & TYPE_MASK) != STRING )
-        return std::string();
+    ধ্রুবক uchar* p = ptr();
+    যদি( !p || (*p & TYPE_MASK) != STRING )
+        ফেরত std::string();
     p += (*p & NAMED) ? 5 : 1;
     size_t sz = (size_t)(unsigned)readInt(p);
-    return std::string((const char*)(p + 4), sz - 1);
+    ফেরত std::string((ধ্রুবক অক্ষর*)(p + 4), sz - 1);
 }
-Mat FileNode::mat() const { Mat value; read(*this, value, Mat()); return value; }
+Mat File_গ্রন্থি::mat() ধ্রুবক { Mat value; পঠ(*এই, value, Mat()); ফেরত value; }
 
-FileNodeIterator FileNode::begin() const { return FileNodeIterator(*this, false); }
-FileNodeIterator FileNode::end() const   { return FileNodeIterator(*this, true); }
+File_গ্রন্থি_Iterator File_গ্রন্থি::begin() ধ্রুবক { ফেরত File_গ্রন্থি_Iterator(*এই, মিথ্যা); }
+File_গ্রন্থি_Iterator File_গ্রন্থি::end() ধ্রুবক   { ফেরত File_গ্রন্থি_Iterator(*এই, সত্য); }
 
-void FileNode::readRaw( const std::string& fmt, void* vec, size_t len ) const
+শূন্য File_গ্রন্থি::readRaw( ধ্রুবক std::string& fmt, শূন্য* vec, size_t len ) ধ্রুবক
 {
-    FileNodeIterator it = begin();
+    File_গ্রন্থি_Iterator it = begin();
     it.readRaw( fmt, vec, len );
 }
 
-size_t FileNode::size() const
+size_t File_গ্রন্থি::size() ধ্রুবক
 {
-    const uchar* p = ptr();
-    if( !p )
-        return 0;
-    int tag = *p;
-    int tp = tag & TYPE_MASK;
-    if( tp == MAP || tp == SEQ )
+    ধ্রুবক uchar* p = ptr();
+    যদি( !p )
+        ফেরত 0;
+    পূর্ণসংখ্যা tag = *p;
+    পূর্ণসংখ্যা tp = tag & TYPE_MASK;
+    যদি( tp == MAP || tp == SEQ )
     {
-        if( tag & NAMED )
+        যদি( tag & NAMED )
             p += 4;
-        return (size_t)(unsigned)readInt(p + 5);
+        ফেরত (size_t)(unsigned)readInt(p + 5);
     }
-    return tp != NONE;
+    ফেরত tp != NONE;
 }
 
-size_t FileNode::rawSize() const
+size_t File_গ্রন্থি::raw_আকার() ধ্রুবক
 {
-    const uchar* p0 = ptr(), *p = p0;
-    if( !p )
-        return 0;
-    int tag = *p++;
-    int tp = tag & TYPE_MASK;
-    if( tag & NAMED )
+    ধ্রুবক uchar* p0 = ptr(), *p = p0;
+    যদি( !p )
+        ফেরত 0;
+    পূর্ণসংখ্যা tag = *p++;
+    পূর্ণসংখ্যা tp = tag & TYPE_MASK;
+    যদি( tag & NAMED )
         p += 4;
     size_t sz0 = (size_t)(p - p0);
-    if( tp == INT )
-        return sz0 + 8;
-    if( tp == REAL )
-        return sz0 + 8;
-    if( tp == NONE )
-        return sz0;
+    যদি( tp == INT )
+        ফেরত sz0 + 8;
+    যদি( tp == REAL )
+        ফেরত sz0 + 8;
+    যদি( tp == NONE )
+        ফেরত sz0;
     CV_Assert( tp == STRING || tp == SEQ || tp == MAP );
-    return sz0 + 4 + readInt(p);
+    ফেরত sz0 + 4 + readInt(p);
 }
 
-uchar* FileNode::ptr()
+uchar* File_গ্রন্থি::ptr()
 {
-    return !fs ? 0 : (uchar*)fs->getNodePtr(blockIdx, ofs);
+    ফেরত !fs ? 0 : (uchar*)fs->get_গ্রন্থি_Ptr(blockIdx, ofs);
 }
 
-const uchar* FileNode::ptr() const
+ধ্রুবক uchar* File_গ্রন্থি::ptr() ধ্রুবক
 {
-    return !fs ? 0 : fs->getNodePtr(blockIdx, ofs);
+    ফেরত !fs ? 0 : fs->get_গ্রন্থি_Ptr(blockIdx, ofs);
 }
 
-void FileNode::setValue( int type, const void* value, int len )
+শূন্য File_গ্রন্থি::set_মান( পূর্ণসংখ্যা type, ধ্রুবক শূন্য* value, পূর্ণসংখ্যা len )
 {
     uchar *p = ptr();
     CV_Assert(p != 0);
 
-    int tag = *p;
-    int current_type = tag & TYPE_MASK;
+    পূর্ণসংখ্যা tag = *p;
+    পূর্ণসংখ্যা current_type = tag & TYPE_MASK;
     CV_Assert( current_type == NONE || current_type == type );
 
-    int sz = 1;
+    পূর্ণসংখ্যা sz = 1;
 
-    if( tag & NAMED )
+    যদি( tag & NAMED )
         sz += 4;
 
-    if( type == INT )
+    যদি( type == INT )
         sz += 8;
-    else if( type == REAL )
+    অন্যথা যদি( type == REAL )
         sz += 8;
-    else if( type == STRING )
+    অন্যথা যদি( type == STRING )
     {
-        if( len < 0 )
-            len = (int)strlen((const char*)value);
+        যদি( len < 0 )
+            len = (পূর্ণসংখ্যা)strlen((ধ্রুবক অক্ষর*)value);
         sz += 4 + len + 1; // besides the string content,
                            // take the size (4 bytes) and the final '\0' into account
     }
-    else
+    অন্যথা
         CV_Error(Error::StsNotImplemented, "Only scalar types can be dynamically assigned to a file node");
 
-    p = fs->reserveNodeSpace(*this, sz);
+    p = fs->reserve_গ্রন্থি_Space(*এই, sz);
     *p++ = (uchar)(type | (tag & NAMED));
-    if( tag & NAMED )
+    যদি( tag & NAMED )
         p += 4;
 
-    if( type == INT )
+    যদি( type == INT )
     {
-        int64_t ival = *(const int64_t*)value;
+        int64_t ival = *(ধ্রুবক int64_t*)value;
         writeInt(p, ival);
     }
-    else if( type == REAL )
+    অন্যথা যদি( type == REAL )
     {
-        double dbval = *(const double*)value;
+        দ্বিগুণ dbval = *(ধ্রুবক দ্বিগুণ*)value;
         writeReal(p, dbval);
     }
-    else if( type == STRING )
+    অন্যথা যদি( type == STRING )
     {
-        const char* str = (const char*)value;
+        ধ্রুবক অক্ষর* str = (ধ্রুবক অক্ষর*)value;
         writeInt(p, len + 1);
         memcpy(p + 4, str, len);
         p[4 + len] = (uchar)'\0';
     }
 }
 
-FileNodeIterator::FileNodeIterator()
+File_গ্রন্থি_Iterator::File_গ্রন্থি_Iterator()
 {
     fs = 0;
     blockIdx = 0;
     ofs = 0;
-    blockSize = 0;
-    nodeNElems = 0;
+    block_আকার = 0;
+    গ্রন্থি_NElems = 0;
     idx = 0;
 }
 
-FileNodeIterator::FileNodeIterator( const FileNode& node, bool seekEnd )
+File_গ্রন্থি_Iterator::File_গ্রন্থি_Iterator( ধ্রুবক File_গ্রন্থি& গ্রন্থি, যৌক্তিক seekEnd )
 {
-    fs = node.fs;
+    fs = গ্রন্থি.fs;
     idx = 0;
-    if( !fs )
-        blockIdx = ofs = blockSize = nodeNElems = 0;
-    else
+    যদি( !fs )
+        blockIdx = ofs = block_আকার = গ্রন্থি_NElems = 0;
+    অন্যথা
     {
-        blockIdx = node.blockIdx;
-        ofs = node.ofs;
+        blockIdx = গ্রন্থি.blockIdx;
+        ofs = গ্রন্থি.ofs;
 
-        bool collection = node.isSeq() || node.isMap();
-        if( node.isNone() )
+        যৌক্তিক collection = গ্রন্থি.isSeq() || গ্রন্থি.isMap();
+        যদি( গ্রন্থি.isNone() )
         {
-            nodeNElems = 0;
+            গ্রন্থি_NElems = 0;
         }
-        else if( !collection )
+        অন্যথা যদি( !collection )
         {
-            nodeNElems = 1;
-            if( seekEnd )
+            গ্রন্থি_NElems = 1;
+            যদি( seekEnd )
             {
                 idx = 1;
-                ofs += node.rawSize();
+                ofs += গ্রন্থি.raw_আকার();
             }
         }
-        else
+        অন্যথা
         {
-            nodeNElems = node.size();
-            const uchar* p0 = node.ptr(), *p = p0 + 1;
-            if(*p0 & FileNode::NAMED )
+            গ্রন্থি_NElems = গ্রন্থি.size();
+            ধ্রুবক uchar* p0 = গ্রন্থি.ptr(), *p = p0 + 1;
+            যদি(*p0 & File_গ্রন্থি::NAMED )
                 p += 4;
-            if( !seekEnd )
+            যদি( !seekEnd )
                 ofs += (p - p0) + 8;
-            else
+            অন্যথা
             {
                 size_t rawsz = (size_t)(unsigned)readInt(p);
                 ofs += (p - p0) + 4 + rawsz;
-                idx = nodeNElems;
+                idx = গ্রন্থি_NElems;
             }
         }
-        fs->normalizeNodeOfs(blockIdx, ofs);
-        blockSize = fs->fs_data_blksz[blockIdx];
+        fs->normalize_গ্রন্থি_Ofs(blockIdx, ofs);
+        block_আকার = fs->fs_তথ্য_blksz[blockIdx];
     }
 }
 
-FileNodeIterator::FileNodeIterator(const FileNodeIterator& it)
+File_গ্রন্থি_Iterator::File_গ্রন্থি_Iterator(ধ্রুবক File_গ্রন্থি_Iterator& it)
 {
     fs = it.fs;
     blockIdx = it.blockIdx;
     ofs = it.ofs;
-    blockSize = it.blockSize;
-    nodeNElems = it.nodeNElems;
+    block_আকার = it.block_আকার;
+    গ্রন্থি_NElems = it.গ্রন্থি_NElems;
     idx = it.idx;
 }
 
-FileNodeIterator& FileNodeIterator::operator=(const FileNodeIterator& it)
+File_গ্রন্থি_Iterator& File_গ্রন্থি_Iterator::operator=(ধ্রুবক File_গ্রন্থি_Iterator& it)
 {
     fs = it.fs;
     blockIdx = it.blockIdx;
     ofs = it.ofs;
-    blockSize = it.blockSize;
-    nodeNElems = it.nodeNElems;
+    block_আকার = it.block_আকার;
+    গ্রন্থি_NElems = it.গ্রন্থি_NElems;
     idx = it.idx;
-    return *this;
+    ফেরত *এই;
 }
 
-FileNode FileNodeIterator::operator *() const
+File_গ্রন্থি File_গ্রন্থি_Iterator::operator *() ধ্রুবক
 {
-    return FileNode(idx < nodeNElems ? fs : NULL, blockIdx, ofs);
+    ফেরত File_গ্রন্থি(idx < গ্রন্থি_NElems ? fs : ফাঁকা, blockIdx, ofs);
 }
 
-FileNodeIterator& FileNodeIterator::operator ++ ()
+File_গ্রন্থি_Iterator& File_গ্রন্থি_Iterator::operator ++ ()
 {
-    if( idx == nodeNElems || !fs )
-        return *this;
+    যদি( idx == গ্রন্থি_NElems || !fs )
+        ফেরত *এই;
     idx++;
-    FileNode n(fs, blockIdx, ofs);
-    ofs += n.rawSize();
-    if( ofs >= blockSize )
+    File_গ্রন্থি n(fs, blockIdx, ofs);
+    ofs += n.raw_আকার();
+    যদি( ofs >= block_আকার )
     {
-        fs->normalizeNodeOfs(blockIdx, ofs);
-        blockSize = fs->fs_data_blksz[blockIdx];
+        fs->normalize_গ্রন্থি_Ofs(blockIdx, ofs);
+        block_আকার = fs->fs_তথ্য_blksz[blockIdx];
     }
-    return *this;
+    ফেরত *এই;
 }
 
-FileNodeIterator FileNodeIterator::operator ++ (int)
+File_গ্রন্থি_Iterator File_গ্রন্থি_Iterator::operator ++ (পূর্ণসংখ্যা)
 {
-    FileNodeIterator it = *this;
-    ++(*this);
-    return it;
+    File_গ্রন্থি_Iterator it = *এই;
+    ++(*এই);
+    ফেরত it;
 }
 
-FileNodeIterator& FileNodeIterator::operator += (int _ofs)
+File_গ্রন্থি_Iterator& File_গ্রন্থি_Iterator::operator += (পূর্ণসংখ্যা _ofs)
 {
     CV_Assert( _ofs >= 0 );
-    for( ; _ofs > 0; _ofs-- )
-        this->operator ++();
-    return *this;
+    জন্য( ; _ofs > 0; _ofs-- )
+        এই->operator ++();
+    ফেরত *এই;
 }
 
-FileNodeIterator& FileNodeIterator::readRaw( const String& fmt, void* _data0, size_t maxsz)
+File_গ্রন্থি_Iterator& File_গ্রন্থি_Iterator::readRaw( ধ্রুবক String& fmt, শূন্য* _data0, size_t maxsz)
 {
-    if( fs && idx < nodeNElems )
+    যদি( fs && idx < গ্রন্থি_NElems )
     {
         uchar* data0 = (uchar*)_data0;
-        int fmt_pairs[CV_FS_MAX_FMT_PAIRS*2];
-        int fmt_pair_count = fs::decodeFormat( fmt.c_str(), fmt_pairs, CV_FS_MAX_FMT_PAIRS );
-        size_t esz = fs::calcStructSize( fmt.c_str(), 0 );
+        পূর্ণসংখ্যা fmt_pairs[CV_FS_MAX_FMT_PAIRS*2];
+        পূর্ণসংখ্যা fmt_pair_গুনতি = fs::decodeFormat( fmt.c_str(), fmt_pairs, CV_FS_MAX_FMT_PAIRS );
+        size_t esz = fs::calc_Struct_আকার( fmt.c_str(), 0 );
 
         CV_Assert( maxsz % esz == 0 );
         maxsz /= esz;
 
-        for( ; maxsz > 0; maxsz--, data0 += esz )
+        জন্য( ; maxsz > 0; maxsz--, data0 += esz )
         {
             size_t offset = 0;
-            for( int k = 0; k < fmt_pair_count; k++ )
+            জন্য( পূর্ণসংখ্যা k = 0; k < fmt_pair_গুনতি; k++ )
             {
-                int elem_type = fmt_pairs[k*2+1];
-                int elem_size = CV_ELEM_SIZE(elem_type);
+                পূর্ণসংখ্যা elem_type = fmt_pairs[k*2+1];
+                পূর্ণসংখ্যা elem_আকার_2 = CV_ELEM_আকার(elem_type);
 
-                int count = fmt_pairs[k*2];
-                offset = alignSize( offset, elem_size );
-                uchar* data = data0 + offset;
+                পূর্ণসংখ্যা গুনতি_2 = fmt_pairs[k*2];
+                offset = align_আকার( offset, elem_আকার_2 );
+                uchar* তথ্য = data0 + offset;
 
-                for( int i = 0; i < count; i++, ++(*this) )
+                জন্য( পূর্ণসংখ্যা i = 0; i < গুনতি_2; i++, ++(*এই) )
                 {
-                    FileNode node = *(*this);
-                    if( node.isInt() )
+                    File_গ্রন্থি গ্রন্থি = *(*এই);
+                    যদি( গ্রন্থি.isInt() )
                     {
-                        int64_t ival = static_cast<int64_t>(elem_size == 8 ? (int64_t)node : (int)node);
-                        switch( elem_type )
+                        int64_t ival = static_cast<int64_t>(elem_আকার_2 == 8 ? (int64_t)গ্রন্থি : (পূর্ণসংখ্যা)গ্রন্থি);
+                        নির্বাচন( elem_type )
                         {
-                        case CV_8U:
-                            *(uchar*)data = saturate_cast<uchar>(ival);
-                            data++;
-                            break;
-                        case CV_8S:
-                            *(char*)data = saturate_cast<schar>(ival);
-                            data++;
-                            break;
-                        case CV_Bool:
-                            *(bool*)data = ival != 0;
-                            data++;
-                            break;
-                        case CV_16U:
-                            *(ushort*)data = saturate_cast<ushort>(ival);
-                            data += sizeof(ushort);
-                            break;
-                        case CV_16S:
-                            *(short*)data = saturate_cast<short>(ival);
-                            data += sizeof(short);
-                            break;
-                        case CV_32U:
-                            *(unsigned*)data = (unsigned)std::max(ival, (int64_t)0);
-                            data += sizeof(unsigned);
-                            break;
-                        case CV_32S:
-                            *(int*)data = (int)ival;
-                            data += sizeof(int);
-                            break;
-                        case CV_32F:
-                            *(float*)data = (float)ival;
-                            data += sizeof(float);
-                            break;
-                        case CV_64U:
-                            *(uint64_t*)data = (uint64_t)ival;
-                            data += sizeof(uint64_t);
-                            break;
-                        case CV_64S:
-                            *(int64_t*)data = (int64_t)ival;
-                            data += sizeof(int64_t);
-                            break;
-                        case CV_64F:
-                            *(double*)data = (double)ival;
-                            data += sizeof(double);
-                            break;
-                        case CV_16F:
-                            *(hfloat*)data = hfloat((float)ival);
-                            data += sizeof(hfloat);
-                            break;
-                        case CV_16BF:
-                            *(bfloat*)data = bfloat((float)ival);
-                            data += sizeof(bfloat);
-                            break;
-                        case CV_8F_E4M3FN:
-                            *(fp8_t*)data = fp8_t((float)ival);
-                            data += sizeof(fp8_t);
-                            break;
-                        case CV_8F_E4M3FNUZ:
-                            *(fp8a_t*)data = fp8a_t((float)ival);
-                            data += sizeof(fp8a_t);
-                            break;
-                        default:
+                        ক্ষেত্র CV_8U:
+                            *(uchar*)তথ্য = saturate_cast<uchar>(ival);
+                            তথ্য++;
+                            বিরতি;
+                        ক্ষেত্র CV_8S:
+                            *(অক্ষর*)তথ্য = saturate_cast<schar>(ival);
+                            তথ্য++;
+                            বিরতি;
+                        ক্ষেত্র CV_Bool:
+                            *(যৌক্তিক*)তথ্য = ival != 0;
+                            তথ্য++;
+                            বিরতি;
+                        ক্ষেত্র CV_16U:
+                            *(ushort*)তথ্য = saturate_cast<ushort>(ival);
+                            তথ্য += আকার(ushort);
+                            বিরতি;
+                        ক্ষেত্র CV_16S:
+                            *(short*)তথ্য = saturate_cast<short>(ival);
+                            তথ্য += আকার(short);
+                            বিরতি;
+                        ক্ষেত্র CV_32U:
+                            *(unsigned*)তথ্য = (unsigned)std::max(ival, (int64_t)0);
+                            তথ্য += আকার(unsigned);
+                            বিরতি;
+                        ক্ষেত্র CV_32S:
+                            *(পূর্ণসংখ্যা*)তথ্য = (পূর্ণসংখ্যা)ival;
+                            তথ্য += আকার(পূর্ণসংখ্যা);
+                            বিরতি;
+                        ক্ষেত্র CV_32F:
+                            *(দশমিক*)তথ্য = (দশমিক)ival;
+                            তথ্য += আকার(দশমিক);
+                            বিরতি;
+                        ক্ষেত্র CV_64U:
+                            *(uint64_t*)তথ্য = (uint64_t)ival;
+                            তথ্য += আকার(uint64_t);
+                            বিরতি;
+                        ক্ষেত্র CV_64S:
+                            *(int64_t*)তথ্য = (int64_t)ival;
+                            তথ্য += আকার(int64_t);
+                            বিরতি;
+                        ক্ষেত্র CV_64F:
+                            *(দ্বিগুণ*)তথ্য = (দ্বিগুণ)ival;
+                            তথ্য += আকার(দ্বিগুণ);
+                            বিরতি;
+                        ক্ষেত্র CV_16F:
+                            *(hfloat*)তথ্য = hfloat((দশমিক)ival);
+                            তথ্য += আকার(hfloat);
+                            বিরতি;
+                        ক্ষেত্র CV_16BF:
+                            *(bfloat*)তথ্য = bfloat((দশমিক)ival);
+                            তথ্য += আকার(bfloat);
+                            বিরতি;
+                        ক্ষেত্র CV_8F_E4M3FN:
+                            *(fp8_t*)তথ্য = fp8_t((দশমিক)ival);
+                            তথ্য += আকার(fp8_t);
+                            বিরতি;
+                        ক্ষেত্র CV_8F_E4M3FNUZ:
+                            *(fp8a_t*)তথ্য = fp8a_t((দশমিক)ival);
+                            তথ্য += আকার(fp8a_t);
+                            বিরতি;
+                        পূর্বনির্ধারিত:
                             CV_Error( Error::StsUnsupportedFormat, "Unsupported type" );
                         }
                     }
-                    else if( node.isReal() )
+                    অন্যথা যদি( গ্রন্থি.isReal() )
                     {
-                        double fval = (double)node;
+                        দ্বিগুণ fval = (দ্বিগুণ)গ্রন্থি;
 
-                        switch( elem_type )
+                        নির্বাচন( elem_type )
                         {
-                        case CV_8U:
-                            *(uchar*)data = saturate_cast<uchar>(fval);
-                            data++;
-                            break;
-                        case CV_8S:
-                            *(char*)data = saturate_cast<schar>(fval);
-                            data++;
-                            break;
-                        case CV_16U:
-                            *(ushort*)data = saturate_cast<ushort>(fval);
-                            data += sizeof(ushort);
-                            break;
-                        case CV_16S:
-                            *(short*)data = saturate_cast<short>(fval);
-                            data += sizeof(short);
-                            break;
-                        case CV_32U:
-                            *(int*)data = saturate_cast<unsigned>(fval);
-                            data += sizeof(int);
-                            break;
-                        case CV_32S:
-                            *(int*)data = saturate_cast<int>(fval);
-                            data += sizeof(int);
-                            break;
-                        case CV_32F:
-                            *(float*)data = (float)fval;
-                            data += sizeof(float);
-                            break;
-                        case CV_64U:
-                            *(uint64_t*)data = (uint64_t)round(std::max(fval, 0.));
-                            data += sizeof(uint64_t);
-                            break;
-                        case CV_64S:
-                            *(int64_t*)data = (int64_t)round(std::max(fval, 0.));
-                            data += sizeof(int64_t);
-                            break;
-                        case CV_64F:
-                            *(double*)data = fval;
-                            data += sizeof(double);
-                            break;
-                        case CV_16F:
-                            *(hfloat*)data = hfloat((float)fval);
-                            data += sizeof(hfloat);
-                            break;
-                        case CV_16BF:
-                            *(bfloat*)data = bfloat((float)fval);
-                            data += sizeof(bfloat);
-                            break;
-                        case CV_8F_E4M3FN:
-                            *(fp8_t*)data = fp8_t((float)fval);
-                            data += sizeof(fp8_t);
-                            break;
-                        case CV_8F_E4M3FNUZ:
-                            *(fp8a_t*)data = fp8a_t((float)fval);
-                            data += sizeof(fp8a_t);
-                            break;
-                        default:
+                        ক্ষেত্র CV_8U:
+                            *(uchar*)তথ্য = saturate_cast<uchar>(fval);
+                            তথ্য++;
+                            বিরতি;
+                        ক্ষেত্র CV_8S:
+                            *(অক্ষর*)তথ্য = saturate_cast<schar>(fval);
+                            তথ্য++;
+                            বিরতি;
+                        ক্ষেত্র CV_16U:
+                            *(ushort*)তথ্য = saturate_cast<ushort>(fval);
+                            তথ্য += আকার(ushort);
+                            বিরতি;
+                        ক্ষেত্র CV_16S:
+                            *(short*)তথ্য = saturate_cast<short>(fval);
+                            তথ্য += আকার(short);
+                            বিরতি;
+                        ক্ষেত্র CV_32U:
+                            *(পূর্ণসংখ্যা*)তথ্য = saturate_cast<unsigned>(fval);
+                            তথ্য += আকার(পূর্ণসংখ্যা);
+                            বিরতি;
+                        ক্ষেত্র CV_32S:
+                            *(পূর্ণসংখ্যা*)তথ্য = saturate_cast<পূর্ণসংখ্যা>(fval);
+                            তথ্য += আকার(পূর্ণসংখ্যা);
+                            বিরতি;
+                        ক্ষেত্র CV_32F:
+                            *(দশমিক*)তথ্য = (দশমিক)fval;
+                            তথ্য += আকার(দশমিক);
+                            বিরতি;
+                        ক্ষেত্র CV_64U:
+                            *(uint64_t*)তথ্য = (uint64_t)round(std::max(fval, 0.));
+                            তথ্য += আকার(uint64_t);
+                            বিরতি;
+                        ক্ষেত্র CV_64S:
+                            *(int64_t*)তথ্য = (int64_t)round(std::max(fval, 0.));
+                            তথ্য += আকার(int64_t);
+                            বিরতি;
+                        ক্ষেত্র CV_64F:
+                            *(দ্বিগুণ*)তথ্য = fval;
+                            তথ্য += আকার(দ্বিগুণ);
+                            বিরতি;
+                        ক্ষেত্র CV_16F:
+                            *(hfloat*)তথ্য = hfloat((দশমিক)fval);
+                            তথ্য += আকার(hfloat);
+                            বিরতি;
+                        ক্ষেত্র CV_16BF:
+                            *(bfloat*)তথ্য = bfloat((দশমিক)fval);
+                            তথ্য += আকার(bfloat);
+                            বিরতি;
+                        ক্ষেত্র CV_8F_E4M3FN:
+                            *(fp8_t*)তথ্য = fp8_t((দশমিক)fval);
+                            তথ্য += আকার(fp8_t);
+                            বিরতি;
+                        ক্ষেত্র CV_8F_E4M3FNUZ:
+                            *(fp8a_t*)তথ্য = fp8a_t((দশমিক)fval);
+                            তথ্য += আকার(fp8a_t);
+                            বিরতি;
+                        পূর্বনির্ধারিত:
                             CV_Error( Error::StsUnsupportedFormat, "Unsupported type" );
                         }
                     }
-                    else
+                    অন্যথা
                         CV_Error( Error::StsError, "readRawData can only be used to read plain sequences of numbers" );
                 }
-                offset = (int)(data - data0);
+                offset = (পূর্ণসংখ্যা)(তথ্য - data0);
             }
         }
     }
 
-    return *this;
+    ফেরত *এই;
 }
 
-bool FileNodeIterator::equalTo(const FileNodeIterator& it) const
+যৌক্তিক File_গ্রন্থি_Iterator::equalTo(ধ্রুবক File_গ্রন্থি_Iterator& it) ধ্রুবক
 {
-    return fs == it.fs && blockIdx == it.blockIdx && ofs == it.ofs &&
-           idx == it.idx && nodeNElems == it.nodeNElems;
+    ফেরত fs == it.fs && blockIdx == it.blockIdx && ofs == it.ofs &&
+           idx == it.idx && গ্রন্থি_NElems == it.গ্রন্থি_NElems;
 }
 
-size_t FileNodeIterator::remaining() const
+size_t File_গ্রন্থি_Iterator::remaining() ধ্রুবক
 {
-    return nodeNElems - idx;
+    ফেরত গ্রন্থি_NElems - idx;
 }
 
-bool operator == ( const FileNodeIterator& it1, const FileNodeIterator& it2 )
+যৌক্তিক operator == ( ধ্রুবক File_গ্রন্থি_Iterator& it1, ধ্রুবক File_গ্রন্থি_Iterator& it2 )
 {
-    return it1.equalTo(it2);
+    ফেরত it1.equalTo(it2);
 }
 
-bool operator != ( const FileNodeIterator& it1, const FileNodeIterator& it2 )
+যৌক্তিক operator != ( ধ্রুবক File_গ্রন্থি_Iterator& it1, ধ্রুবক File_গ্রন্থি_Iterator& it2 )
 {
-    return !it1.equalTo(it2);
+    ফেরত !it1.equalTo(it2);
 }
 
-void read(const FileNode& node, int& val, int default_val)
+শূন্য পঠ(ধ্রুবক File_গ্রন্থি& গ্রন্থি, পূর্ণসংখ্যা& val, পূর্ণসংখ্যা default_val)
 {
     val = default_val;
-    if( !node.empty() )
+    যদি( !গ্রন্থি.empty() )
     {
-        val = (int)node;
+        val = (পূর্ণসংখ্যা)গ্রন্থি;
     }
 }
 
-void read(const FileNode& node, int64_t& val, int64_t default_val)
+শূন্য পঠ(ধ্রুবক File_গ্রন্থি& গ্রন্থি, int64_t& val, int64_t default_val)
 {
     val = default_val;
-    if( !node.empty() )
+    যদি( !গ্রন্থি.empty() )
     {
-        val = (int64_t)node;
+        val = (int64_t)গ্রন্থি;
     }
 }
 
-void read(const FileNode& node, double& val, double default_val)
+শূন্য পঠ(ধ্রুবক File_গ্রন্থি& গ্রন্থি, দ্বিগুণ& val, দ্বিগুণ default_val)
 {
     val = default_val;
-    if( !node.empty() )
+    যদি( !গ্রন্থি.empty() )
     {
-        val = (double)node;
+        val = (দ্বিগুণ)গ্রন্থি;
     }
 }
 
-void read(const FileNode& node, float& val, float default_val)
+শূন্য পঠ(ধ্রুবক File_গ্রন্থি& গ্রন্থি, দশমিক& val, দশমিক default_val)
 {
     val = default_val;
-    if( !node.empty() )
+    যদি( !গ্রন্থি.empty() )
     {
-        val = (float)node;
+        val = (দশমিক)গ্রন্থি;
     }
 }
 
-void read(const FileNode& node, std::string& val, const std::string& default_val)
+শূন্য পঠ(ধ্রুবক File_গ্রন্থি& গ্রন্থি, std::string& val, ধ্রুবক std::string& default_val)
 {
     val = default_val;
-    if( !node.empty() )
+    যদি( !গ্রন্থি.empty() )
     {
-        val = (std::string)node;
+        val = (std::string)গ্রন্থি;
     }
 }
-void FileStorage::Impl::write(const String &key, bool value)
+শূন্য FileStorage::Impl::লিখ(ধ্রুবক String &চাবি, যৌক্তিক value)
 {
     CV_Assert(write_mode);
-    if (fmt != FileStorage::FORMAT_YAML)
+    যদি (fmt != FileStorage::FORMAT_YAML)
     {
         // Legacy behavior: Write as integer 1 or 0
-        getEmitter().write(key.c_str(), (int)value);
+        getEmitter().লিখ(চাবি.c_str(), (পূর্ণসংখ্যা)value);
     }
-    else
+    অন্যথা
     {
         // Default/Modern behavior: Write as "true" or "false"
-        getEmitter().write(key.c_str(), value ? "true" : "false", false);
+        getEmitter().লিখ(চাবি.c_str(), value ? "true" : "false", মিথ্যা);
     }
 }
 
 FileStorage_API::~FileStorage_API() {}
 
-namespace internal
+নামাকাশ internal
 {
 
-WriteStructContext::WriteStructContext(FileStorage& _fs, const std::string& name,
-                                       int flags, const std::string& typeName)
+WriteStructContext::WriteStructContext(FileStorage& _fs, ধ্রুবক std::string& name,
+                                       পূর্ণসংখ্যা flags, ধ্রুবক std::string& typeName)
 {
     fs = &_fs;
     fs->startWriteStruct(name, flags, typeName);

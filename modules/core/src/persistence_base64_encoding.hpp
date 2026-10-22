@@ -5,125 +5,125 @@
 #ifndef OPENCV_CORE_BASE64_ENCODING_HPP
 #define OPENCV_CORE_BASE64_ENCODING_HPP
 
-namespace cv
+নামাকাশ cv
 {
 
-namespace base64
+নামাকাশ base64
 {
 /* A decorator for CvFileStorage
 * - no copyable
 * - not safe for now
 * - move constructor may be needed if C++11
 */
-uint8_t const base64_mapping[] =
+uint8_t ধ্রুবক base64_mapping[] =
         "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
         "abcdefghijklmnopqrstuvwxyz"
         "0123456789+/";
 
-uint8_t const base64_padding = '=';
+uint8_t ধ্রুবক base64_padding = '=';
 
-std::string make_base64_header(const char * dt);
+std::string make_base64_header(ধ্রুবক অক্ষর * dt);
 
-size_t base64_encode(uint8_t const * src, uint8_t * dst, size_t off, size_t cnt);
+size_t base64_encode(uint8_t ধ্রুবক * src, uint8_t * dst, size_t off, size_t cnt);
 
 
-int icvCalcStructSize( const char* dt, int initial_size );
+পূর্ণসংখ্যা icv_Calc_Struct_আকার( ধ্রুবক অক্ষর* dt, পূর্ণসংখ্যা initial_আকার );
 
-class Base64ContextEmitter;
-class Impl;
+শ্রেণী Base64ContextEmitter;
+শ্রেণী Impl;
 
-class Base64Writer
+শ্রেণী Base64Writer
 {
-public:
-    Base64Writer(cv::FileStorage::Impl& fs, bool can_indent);
+সর্বজনীন:
+    Base64Writer(cv::FileStorage::Impl& fs, যৌক্তিক can_indent);
     ~Base64Writer();
-    void write(const void* _data, size_t len, const char* dt);
-    template<typename _to_binary_convertor_t> void write(_to_binary_convertor_t & convertor, const char* dt);
+    শূন্য লিখ(ধ্রুবক শূন্য* তথ্য_3, size_t len, ধ্রুবক অক্ষর* dt);
+    template<typename to_দ্বিমিক_convertor_t> শূন্য লিখ(to_দ্বিমিক_convertor_t & convertor, ধ্রুবক অক্ষর* dt);
 
-private:
-    void check_dt(const char* dt);
+ব্যক্তিগত:
+    শূন্য check_dt(ধ্রুবক অক্ষর* dt);
 
-private:
+ব্যক্তিগত:
     // disable copy and assignment
-    Base64Writer(const Base64Writer &);
-    Base64Writer & operator=(const Base64Writer &);
+    Base64Writer(ধ্রুবক Base64Writer &);
+    Base64Writer & operator=(ধ্রুবক Base64Writer &);
 
-private:
+ব্যক্তিগত:
 
     Base64ContextEmitter * emitter;
-    std::string data_type_string;
+    std::string তথ্য_type_string;
 };
 
-size_t base64_encode_buffer_size(size_t cnt, bool is_end_with_zero = true);
+size_t base64_encode_বাফার_আকার(size_t cnt, যৌক্তিক is_end_with_zero = সত্য);
 
-template<typename _uint_t> inline size_t
-to_binary(_uint_t val, uchar * cur)
+template<typename _uint_t> অন্তঃরেখ size_t
+to_দ্বিমিক(_uint_t val, uchar * cur)
 {
     size_t delta = CHAR_BIT;
-    size_t cnt = sizeof(_uint_t);
-    while (cnt --> static_cast<size_t>(0U)) {
+    size_t cnt = আকার(_uint_t);
+    যখন (cnt --> static_cast<size_t>(0U)) {
         *cur++ = static_cast<uchar>(val);
         val >>= delta;
     }
-    return sizeof(_uint_t);
+    ফেরত আকার(_uint_t);
 }
 
-template<> inline size_t to_binary(bool val, uchar * cur)
+template<> অন্তঃরেখ size_t to_দ্বিমিক(যৌক্তিক val, uchar * cur)
 {
-    return to_binary(static_cast<uchar>(val), cur);
+    ফেরত to_দ্বিমিক(static_cast<uchar>(val), cur);
 }
 
-template<> inline size_t to_binary(double val, uchar * cur)
+template<> অন্তঃরেখ size_t to_দ্বিমিক(দ্বিগুণ val, uchar * cur)
 {
     Cv64suf bit64;
     bit64.f = val;
-    return to_binary(bit64.u, cur);
+    ফেরত to_দ্বিমিক(bit64.u, cur);
 }
 
-template<> inline size_t to_binary(float val, uchar * cur)
+template<> অন্তঃরেখ size_t to_দ্বিমিক(দশমিক val, uchar * cur)
 {
     Cv32suf bit32;
     bit32.f = val;
-    return to_binary(bit32.u, cur);
+    ফেরত to_দ্বিমিক(bit32.u, cur);
 }
 
-template<typename _primitive_t> inline size_t
-to_binary(uchar const * val, uchar * cur)
+template<typename _primitive_t> অন্তঃরেখ size_t
+to_দ্বিমিক(uchar ধ্রুবক * val, uchar * cur)
 {
-    return to_binary<_primitive_t>(*reinterpret_cast<_primitive_t const *>(val), cur);
+    ফেরত to_দ্বিমিক<_primitive_t>(*reinterpret_cast<_primitive_t ধ্রুবক *>(val), cur);
 }
 
 
 
-class RawDataToBinaryConvertor
+শ্রেণী Raw_তথ্য_To_দ্বিমিক_Convertor
 {
-public:
+সর্বজনীন:
     // NOTE: len is already multiplied by element size here
-    RawDataToBinaryConvertor(const void* src, int len, const std::string & dt);
+    Raw_তথ্য_To_দ্বিমিক_Convertor(ধ্রুবক শূন্য* src, পূর্ণসংখ্যা len, ধ্রুবক std::string & dt);
 
-    inline RawDataToBinaryConvertor & operator >>(uchar * & dst);
-    inline operator bool() const;
+    অন্তঃরেখ Raw_তথ্য_To_দ্বিমিক_Convertor & operator >>(uchar * & dst);
+    অন্তঃরেখ operator যৌক্তিক() ধ্রুবক;
 
-private:
-    typedef size_t(*to_binary_t)(const uchar *, uchar *);
-    struct elem_to_binary_t
+ব্যক্তিগত:
+    প্রকারলেখ size_t(*to_দ্বিমিক_t)(ধ্রুবক uchar *, uchar *);
+    কাঠামো elem_to_দ্বিমিক_t
     {
         size_t      offset;
         size_t      offset_packed;
-        to_binary_t func;
+        to_দ্বিমিক_t func;
     };
 
-private:
-    size_t make_to_binary_funcs(const std::string &dt);
+ব্যক্তিগত:
+    size_t make_to_দ্বিমিক_funcs(ধ্রুবক std::string &dt);
 
-private:
-    const uchar * beg;
-    const uchar * cur;
-    const uchar * end;
+ব্যক্তিগত:
+    ধ্রুবক uchar * beg;
+    ধ্রুবক uchar * cur;
+    ধ্রুবক uchar * end;
 
     size_t step;
     size_t step_packed;
-    std::vector<elem_to_binary_t> to_binary_funcs;
+    std::vector<elem_to_দ্বিমিক_t> to_দ্বিমিক_funcs;
 };
 
 }

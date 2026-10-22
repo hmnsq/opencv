@@ -3,108 +3,108 @@
 // of this distribution and at http://opencv.org/license.html
 
 
-#include "precomp.hpp"
-#include "opencl_kernels_core.hpp"
-#include "stat.hpp"
-#include "stat_parallel.hpp"
+#অন্তর্ভাব "precomp.hpp"
+#অন্তর্ভাব "opencl_kernels_core.hpp"
+#অন্তর্ভাব "stat.hpp"
+#অন্তর্ভাব "stat_parallel.hpp"
 
-#include "mean.simd.hpp"
-#include "mean.simd_declarations.hpp" // defines CV_CPU_DISPATCH_MODES_ALL=AVX2,...,BASELINE based on CMakeLists.txt content
+#অন্তর্ভাব "mean.simd.hpp"
+#অন্তর্ভাব "mean.simd_declarations.hpp" // defines CV_CPU_DISPATCH_MODES_ALL=AVX2,...,BASELINE based on CMakeLists.txt content
 
 
-namespace cv {
+নামাকাশ cv {
 
 // serial implementation, also used for the pieces of the parallel version
-static Scalar mean_(const Mat& src, const Mat& mask)
+স্থির Scalar mean_(ধ্রুবক Mat& src, ধ্রুবক Mat& mask)
 {
     CV_Assert( mask.empty() || ((mask.type() == CV_8U || mask.type() == CV_8S || mask.type() == CV_Bool) && src.size == mask.size) );
-    if (src.empty())
-        return Scalar::all(0.0);
+    যদি (src.empty())
+        ফেরত Scalar::all(0.0);
 
-    int k, cn = src.channels(), depth = src.depth();
+    পূর্ণসংখ্যা k, cn = src.channels(), depth = src.depth();
     Scalar s = Scalar::all(0.0);
 
     CV_Assert( cn <= 4 );
 
-    if (src.isContinuous() && mask.isContinuous())
+    যদি (src.isContinuous() && mask.isContinuous())
     {
-        CALL_HAL_RET2(meanStdDev, cv_hal_meanStdDev, s, src.data, 0, (int)src.total(), 1, src.type(),
-                      &s[0], nullptr /*stddev*/, mask.data, 0);
+        CALL_HAL_RET2(meanStdDev, cv_hal_meanStdDev, s, src.তথ্য, 0, (পূর্ণসংখ্যা)src.যোগ(), 1, src.type(),
+                      &s[0], nullptr /*stddev*/, mask.তথ্য, 0);
     }
-    else
+    অন্যথা
     {
-        if (src.dims <= 2)
+        যদি (src.dims <= 2)
         {
-            CALL_HAL_RET2(meanStdDev, cv_hal_meanStdDev, s, src.data, src.step, src.cols, src.rows, src.type(),
-                          &s[0], nullptr, mask.data, mask.step);
+            CALL_HAL_RET2(meanStdDev, cv_hal_meanStdDev, s, src.তথ্য, src.step, src.cols, src.rows, src.type(),
+                          &s[0], nullptr, mask.তথ্য, mask.step);
         }
     }
 
-    SumFunc func = getSumFunc(depth);
+    যোগ_Func func = get_যোগ_Func(depth);
 
     CV_Assert( func != 0 );
 
-    const Mat* arrays[] = {&src, &mask, 0};
+    ধ্রুবক Mat* arrays[] = {&src, &mask, 0};
     uchar* ptrs[2] = {};
     NAryMatIterator it(arrays, ptrs);
-    int total = (int)it.size, blockSize = total, partialBlockSize = 0;
-    int j, count = 0;
-    int _buf[CV_CN_MAX];
-    int* buf = (int*)&s[0];
-    bool partialSumIsInt = depth < CV_32S;
-    bool blockSum = partialSumIsInt || depth == CV_16F || depth == CV_16BF;
+    পূর্ণসংখ্যা যোগ = (পূর্ণসংখ্যা)it.size, block_আকার = যোগ, partial_Block_আকার = 0;
+    পূর্ণসংখ্যা j, গুনতি_2 = 0;
+    পূর্ণসংখ্যা _buf[CV_CN_MAX];
+    পূর্ণসংখ্যা* buf = (পূর্ণসংখ্যা*)&s[0];
+    যৌক্তিক partial_যোগ_Is_Int = depth < CV_32S;
+    যৌক্তিক block_যোগ = partial_যোগ_Is_Int || depth == CV_16F || depth == CV_16BF;
     size_t esz = 0, nz0 = 0;
 
-    if( blockSum )
+    যদি( block_যোগ )
     {
-        partialBlockSize = depth <= CV_8S ? (1 << 23) : (1 << 15);
-        blockSize = std::min(blockSize, partialBlockSize);
+        partial_Block_আকার = depth <= CV_8S ? (1 << 23) : (1 << 15);
+        block_আকার = std::min(block_আকার, partial_Block_আকার);
         buf = _buf;
-        for( k = 0; k < cn; k++ )
+        জন্য( k = 0; k < cn; k++ )
             buf[k] = 0;
-        esz = src.elemSize();
+        esz = src.elem_আকার();
     }
 
-    for( size_t i = 0; i < it.nplanes; i++, ++it )
+    জন্য( size_t i = 0; i < it.nplanes; i++, ++it )
     {
-        for( j = 0; j < total; j += blockSize )
+        জন্য( j = 0; j < যোগ; j += block_আকার )
         {
-            int bsz = std::min(total - j, blockSize);
-            int nz = func( ptrs[0], ptrs[1], (uchar*)buf, bsz, cn );
-            count += nz;
+            পূর্ণসংখ্যা bsz = std::min(যোগ - j, block_আকার);
+            পূর্ণসংখ্যা nz = func( ptrs[0], ptrs[1], (uchar*)buf, bsz, cn );
+            গুনতি_2 += nz;
             nz0 += nz;
-            if( blockSum && (count + blockSize >= partialBlockSize || (i+1 >= it.nplanes && j+bsz >= total)) )
+            যদি( block_যোগ && (গুনতি_2 + block_আকার >= partial_Block_আকার || (i+1 >= it.nplanes && j+bsz >= যোগ)) )
             {
-                if (partialSumIsInt) {
-                    for( k = 0; k < cn; k++ )
+                যদি (partial_যোগ_Is_Int) {
+                    জন্য( k = 0; k < cn; k++ )
                     {
                         s[k] += buf[k];
                         buf[k] = 0;
                     }
-                } else {
-                    for( k = 0; k < cn; k++ )
+                } অন্যথা {
+                    জন্য( k = 0; k < cn; k++ )
                     {
-                        s[k] += ((float*)buf)[k];
+                        s[k] += ((দশমিক*)buf)[k];
                         buf[k] = 0;
                     }
                 }
-                count = 0;
+                গুনতি_2 = 0;
             }
             ptrs[0] += bsz*esz;
-            if( ptrs[1] )
+            যদি( ptrs[1] )
                 ptrs[1] += bsz;
         }
     }
-    return s*(nz0 ? 1./nz0 : 0);
+    ফেরত s*(nz0 ? 1./nz0 : 0);
 }
 
 // number of elements a piece contributes to the mean
-static double statCount(const StatChunk& c)
+স্থির দ্বিগুণ stat_গুনতি(ধ্রুবক StatChunk& c)
 {
-    return c.mask.empty() ? (double)c.src.total() : (double)countNonZero(c.mask);
+    ফেরত c.mask.empty() ? (দ্বিগুণ)c.src.যোগ() : (দ্বিগুণ)গুনতি_Non_Zero(c.mask);
 }
 
-Scalar mean(InputArray _src, InputArray _mask)
+Scalar mean(প্রবেশ_Array _src, প্রবেশ_Array _mask)
 {
     CV_INSTRUMENT_REGION();
 
@@ -112,159 +112,159 @@ Scalar mean(InputArray _src, InputArray _mask)
     CV_Assert( mask.empty() || mask.type() == CV_8U || mask.type() == CV_8S || mask.type() == CV_Bool);
 
     std::vector<StatChunk> chunks;
-    if (src.channels() > 4 || !splitForParallelStat(src, mask, chunks))
-        return mean_(src, mask);
+    যদি (src.channels() > 4 || !splitForParallelStat(src, mask, chunks))
+        ফেরত mean_(src, mask);
 
-    const int n = (int)chunks.size();
+    ধ্রুবক পূর্ণসংখ্যা n = (পূর্ণসংখ্যা)chunks.size();
     std::vector<Scalar> part(n);
-    std::vector<double> cnt(n);
-    parallel_for_(Range(0, n), [&](const Range& r)
+    std::vector<দ্বিগুণ> cnt(n);
+    parallel_for_(Range(0, n), [&](ধ্রুবক Range& r)
     {
-        for (int i = r.start; i < r.end; i++)
+        জন্য (পূর্ণসংখ্যা i = r.start; i < r.end; i++)
         {
             part[i] = mean_(chunks[i].src, chunks[i].mask);
-            cnt[i] = statCount(chunks[i]);
+            cnt[i] = stat_গুনতি(chunks[i]);
         }
     });
     Scalar s = Scalar::all(0.0);
-    double total = 0;
-    for (int i = 0; i < n; i++)
+    দ্বিগুণ যোগ = 0;
+    জন্য (পূর্ণসংখ্যা i = 0; i < n; i++)
     {
         s += part[i]*cnt[i];
-        total += cnt[i];
+        যোগ += cnt[i];
     }
-    return s*(total > 0 ? 1./total : 0);
+    ফেরত s*(যোগ > 0 ? 1./যোগ : 0);
 }
 
-static SumSqrFunc getSumSqrFunc(int depth)
+স্থির যোগ_Sqr_Func get_যোগ_Sqr_Func(পূর্ণসংখ্যা depth)
 {
     CV_INSTRUMENT_REGION();
-    CV_CPU_DISPATCH(getSumSqrFunc, (depth),
+    CV_CPU_DISPATCH(get_যোগ_Sqr_Func, (depth),
         CV_CPU_DISPATCH_MODES_ALL);
 }
 
 #ifdef HAVE_OPENCL
-static bool ocl_meanStdDev( InputArray _src, OutputArray _mean, OutputArray _sdv, InputArray _mask )
+স্থির যৌক্তিক ocl_meanStdDev( প্রবেশ_Array _src, OutputArray _mean, OutputArray _sdv, প্রবেশ_Array _mask )
 {
     CV_INSTRUMENT_REGION_OPENCL();
 
-    bool haveMask = _mask.kind() != _InputArray::NONE;
-    int nz = haveMask ? -1 : (int)_src.total();
+    যৌক্তিক haveMask = _mask.kind() != প্রবেশ_Array_2::NONE;
+    পূর্ণসংখ্যা nz = haveMask ? -1 : (পূর্ণসংখ্যা)_src.যোগ();
     Scalar mean(0), stddev(0);
-    const int cn = _src.channels();
-    if (cn > 4)
-        return false;
+    ধ্রুবক পূর্ণসংখ্যা cn = _src.channels();
+    যদি (cn > 4)
+        ফেরত মিথ্যা;
 
     {
-        int type = _src.type(), depth = CV_MAT_DEPTH(type);
-        bool doubleSupport = ocl::Device::getDefault().doubleFPConfig() > 0,
+        পূর্ণসংখ্যা type = _src.type(), depth = CV_MAT_DEPTH(type);
+        যৌক্তিক doubleSupport = ocl::Device::getDefault().doubleFPConfig() > 0,
                 isContinuous = _src.isContinuous(),
                 isMaskContinuous = _mask.isContinuous();
-        const ocl::Device &defDev = ocl::Device::getDefault();
-        int groups = defDev.maxComputeUnits();
-        if (defDev.isIntel())
+        ধ্রুবক ocl::Device &defDev = ocl::Device::getDefault();
+        পূর্ণসংখ্যা groups = defDev.maxComputeUnits();
+        যদি (defDev.isIntel())
         {
-            static const int subSliceEUCount = 10;
+            স্থির ধ্রুবক পূর্ণসংখ্যা subSliceEUCount = 10;
             groups = (groups / subSliceEUCount) * 2;
         }
-        size_t wgs = defDev.maxWorkGroupSize();
+        size_t wgs = defDev.max_Work_Group_আকার();
 
-        int ddepth = std::max(CV_32S, depth), sqddepth = std::max(CV_32F, depth),
+        পূর্ণসংখ্যা ddepth = std::max(CV_32S, depth), sqddepth = std::max(CV_32F, depth),
                 dtype = CV_MAKE_TYPE(ddepth, cn),
                 sqdtype = CV_MAKETYPE(sqddepth, cn);
         CV_Assert(!haveMask || _mask.type() == CV_8U || _mask.type() == CV_8S || _mask.type() == CV_Bool);
 
-        int wgs2_aligned = 1;
-        while (wgs2_aligned < (int)wgs)
+        পূর্ণসংখ্যা wgs2_aligned = 1;
+        যখন (wgs2_aligned < (পূর্ণসংখ্যা)wgs)
             wgs2_aligned <<= 1;
         wgs2_aligned >>= 1;
 
-        if ( (!doubleSupport && depth == CV_64F) )
-            return false;
+        যদি ( (!doubleSupport && depth == CV_64F) )
+            ফেরত মিথ্যা;
 
-        char cvt[2][50];
+        অক্ষর cvt[2][50];
         String opts = format("-D srcT=%s -D srcT1=%s -D dstT=%s -D dstT1=%s -D sqddepth=%d"
                              " -D sqdstT=%s -D sqdstT1=%s -D convertToSDT=%s -D cn=%d%s%s"
                              " -D convertToDT=%s -D WGS=%d -D WGS2_ALIGNED=%d%s%s",
                              ocl::typeToStr(type), ocl::typeToStr(depth),
                              ocl::typeToStr(dtype), ocl::typeToStr(ddepth), sqddepth,
                              ocl::typeToStr(sqdtype), ocl::typeToStr(sqddepth),
-                             ocl::convertTypeStr(depth, sqddepth, cn, cvt[0], sizeof(cvt[0])),
+                             ocl::convertTypeStr(depth, sqddepth, cn, cvt[0], আকার(cvt[0])),
                              cn, isContinuous ? " -D HAVE_SRC_CONT" : "",
                              isMaskContinuous ? " -D HAVE_MASK_CONT" : "",
-                             ocl::convertTypeStr(depth, ddepth, cn, cvt[1], sizeof(cvt[1])),
-                             (int)wgs, wgs2_aligned, haveMask ? " -D HAVE_MASK" : "",
+                             ocl::convertTypeStr(depth, ddepth, cn, cvt[1], আকার(cvt[1])),
+                             (পূর্ণসংখ্যা)wgs, wgs2_aligned, haveMask ? " -D HAVE_MASK" : "",
                              doubleSupport ? " -D DOUBLE_SUPPORT" : "");
 
         ocl::Kernel k("meanStdDev", ocl::core::meanstddev_oclsrc, opts);
-        if (k.empty())
-            return false;
+        যদি (k.empty())
+            ফেরত মিথ্যা;
 
-        int dbsize = groups * ((haveMask ? CV_ELEM_SIZE1(CV_32S) : 0) +
-                               CV_ELEM_SIZE(sqdtype) + CV_ELEM_SIZE(dtype));
+        পূর্ণসংখ্যা dbsize = groups * ((haveMask ? CV_ELEM_SIZE1(CV_32S) : 0) +
+                               CV_ELEM_আকার(sqdtype) + CV_ELEM_আকার(dtype));
         UMat src = _src.getUMat(), db(1, dbsize, CV_8UC1), mask = _mask.getUMat();
 
-        ocl::KernelArg srcarg = ocl::KernelArg::ReadOnlyNoSize(src),
+        ocl::KernelArg srcarg = ocl::KernelArg::Read_Only_No_আকার(src),
                 dbarg = ocl::KernelArg::PtrWriteOnly(db),
-                maskarg = ocl::KernelArg::ReadOnlyNoSize(mask);
+                maskarg = ocl::KernelArg::Read_Only_No_আকার(mask);
 
-        if (haveMask)
-            k.args(srcarg, src.cols, (int)src.total(), groups, dbarg, maskarg);
-        else
-            k.args(srcarg, src.cols, (int)src.total(), groups, dbarg);
+        যদি (haveMask)
+            k.args(srcarg, src.cols, (পূর্ণসংখ্যা)src.যোগ(), groups, dbarg, maskarg);
+        অন্যথা
+            k.args(srcarg, src.cols, (পূর্ণসংখ্যা)src.যোগ(), groups, dbarg);
 
         size_t globalsize = groups * wgs;
 
-        if(!k.run(1, &globalsize, &wgs, false))
-            return false;
+        যদি(!k.run(1, &globalsize, &wgs, মিথ্যা))
+            ফেরত মিথ্যা;
 
-        typedef Scalar (* part_sum)(Mat m);
-        part_sum funcs[3] = { ocl_part_sum<int>, ocl_part_sum<float>, ocl_part_sum<double> };
+        প্রকারলেখ Scalar (* part_যোগ)(Mat m);
+        part_যোগ funcs[3] = { ocl_part_যোগ<পূর্ণসংখ্যা>, ocl_part_যোগ<দশমিক>, ocl_part_যোগ<দ্বিগুণ> };
         Mat dbm = db.getMat(ACCESS_READ);
 
         mean = funcs[ddepth - CV_32S](Mat(1, groups, dtype, dbm.ptr()));
-        stddev = funcs[sqddepth - CV_32S](Mat(1, groups, sqdtype, dbm.ptr() + groups * CV_ELEM_SIZE(dtype)));
+        stddev = funcs[sqddepth - CV_32S](Mat(1, groups, sqdtype, dbm.ptr() + groups * CV_ELEM_আকার(dtype)));
 
-        if (haveMask)
-            nz = saturate_cast<int>(funcs[0](Mat(1, groups, CV_32SC1, dbm.ptr() +
-                                                 groups * (CV_ELEM_SIZE(dtype) +
-                                                           CV_ELEM_SIZE(sqdtype))))[0]);
+        যদি (haveMask)
+            nz = saturate_cast<পূর্ণসংখ্যা>(funcs[0](Mat(1, groups, CV_32SC1, dbm.ptr() +
+                                                 groups * (CV_ELEM_আকার(dtype) +
+                                                           CV_ELEM_আকার(sqdtype))))[0]);
     }
 
-    double total = nz != 0 ? 1.0 / nz : 0;
-    int k, j;
-    for (int i = 0; i < cn; ++i)
+    দ্বিগুণ যোগ = nz != 0 ? 1.0 / nz : 0;
+    পূর্ণসংখ্যা k, j;
+    জন্য (পূর্ণসংখ্যা i = 0; i < cn; ++i)
     {
-        mean[i] *= total;
-        stddev[i] = std::sqrt(std::max(stddev[i] * total - mean[i] * mean[i] , 0.));
+        mean[i] *= যোগ;
+        stddev[i] = std::sqrt(std::max(stddev[i] * যোগ - mean[i] * mean[i] , 0.));
     }
 
-    for( j = 0; j < 2; j++ )
+    জন্য( j = 0; j < 2; j++ )
     {
-        const double * const sptr = j == 0 ? &mean[0] : &stddev[0];
+        ধ্রুবক দ্বিগুণ * ধ্রুবক sptr = j == 0 ? &mean[0] : &stddev[0];
         _OutputArray _dst = j == 0 ? _mean : _sdv;
-        if( !_dst.needed() )
-            continue;
+        যদি( !_dst.needed() )
+            চালু;
 
-        if( !_dst.fixedSize() )
-            _dst.create(cn, 1, CV_64F, -1, true);
+        যদি( !_dst.fixed_আকার() )
+            _dst.create(cn, 1, CV_64F, -1, সত্য);
         Mat dst = _dst.getMat();
-        int dcn = (int)dst.total();
+        পূর্ণসংখ্যা dcn = (পূর্ণসংখ্যা)dst.যোগ();
         CV_Assert( dst.type() == CV_64F && dst.isContinuous() &&
                    (dst.cols == 1 || dst.rows == 1) && dcn >= cn );
-        double* dptr = dst.ptr<double>();
-        for( k = 0; k < cn; k++ )
+        দ্বিগুণ* dptr = dst.ptr<দ্বিগুণ>();
+        জন্য( k = 0; k < cn; k++ )
             dptr[k] = sptr[k];
-        for( ; k < dcn; k++ )
+        জন্য( ; k < dcn; k++ )
             dptr[k] = 0;
     }
 
-    return true;
+    ফেরত সত্য;
 }
 #endif
 
 // serial implementation, also used for the pieces of the parallel version
-static void meanStdDev_(InputArray _src, OutputArray _mean, OutputArray _sdv, InputArray _mask)
+স্থির শূন্য meanStdDev_(প্রবেশ_Array _src, OutputArray _mean, OutputArray _sdv, প্রবেশ_Array _mask)
 {
     CV_Assert(!_src.empty());
     CV_Assert( _mask.empty() || _mask.type() == CV_8U || _mask.type() == CV_8S || _mask.type() == CV_Bool );
@@ -276,221 +276,221 @@ static void meanStdDev_(InputArray _src, OutputArray _mean, OutputArray _sdv, In
 
     CV_Assert(mask.empty() || ((mask.type() == CV_8U || mask.type() == CV_8S || mask.type() == CV_Bool) && src.size == mask.size));
 
-    int k, cn = src.channels(), depth = src.depth();
+    পূর্ণসংখ্যা k, cn = src.channels(), depth = src.depth();
     Mat mean_mat, stddev_mat;
 
-    if(_mean.needed())
+    যদি(_mean.needed())
     {
-        if( !_mean.fixedSize() )
-            _mean.create(cn, 1, CV_64F, -1, true);
+        যদি( !_mean.fixed_আকার() )
+            _mean.create(cn, 1, CV_64F, -1, সত্য);
 
         mean_mat = _mean.getMat();
-        int dcn = (int)mean_mat.total();
+        পূর্ণসংখ্যা dcn = (পূর্ণসংখ্যা)mean_mat.যোগ();
         CV_Assert( mean_mat.type() == CV_64F && mean_mat.isContinuous() &&
                    (mean_mat.cols == 1 || mean_mat.rows == 1) && dcn >= cn );
 
-        double* dptr = mean_mat.ptr<double>();
-        for(k = cn ; k < dcn; k++ )
+        দ্বিগুণ* dptr = mean_mat.ptr<দ্বিগুণ>();
+        জন্য(k = cn ; k < dcn; k++ )
             dptr[k] = 0;
     }
 
-    if (_sdv.needed())
+    যদি (_sdv.needed())
     {
-        if( !_sdv.fixedSize() )
-            _sdv.create(cn, 1, CV_64F, -1, true);
+        যদি( !_sdv.fixed_আকার() )
+            _sdv.create(cn, 1, CV_64F, -1, সত্য);
 
         stddev_mat = _sdv.getMat();
-        int dcn = (int)stddev_mat.total();
+        পূর্ণসংখ্যা dcn = (পূর্ণসংখ্যা)stddev_mat.যোগ();
         CV_Assert( stddev_mat.type() == CV_64F && stddev_mat.isContinuous() &&
                    (stddev_mat.cols == 1 || stddev_mat.rows == 1) && dcn >= cn );
 
-        double* dptr = stddev_mat.ptr<double>();
-        for(k = cn ; k < dcn; k++ )
+        দ্বিগুণ* dptr = stddev_mat.ptr<দ্বিগুণ>();
+        জন্য(k = cn ; k < dcn; k++ )
             dptr[k] = 0;
 
     }
 
-    if (src.isContinuous() && mask.isContinuous())
+    যদি (src.isContinuous() && mask.isContinuous())
     {
-        CALL_HAL(meanStdDev, cv_hal_meanStdDev, src.data, 0, (int)src.total(), 1, src.type(),
-                 _mean.needed() ? mean_mat.ptr<double>() : nullptr,
-                 _sdv.needed() ? stddev_mat.ptr<double>() : nullptr,
-                 mask.data, 0);
+        CALL_HAL(meanStdDev, cv_hal_meanStdDev, src.তথ্য, 0, (পূর্ণসংখ্যা)src.যোগ(), 1, src.type(),
+                 _mean.needed() ? mean_mat.ptr<দ্বিগুণ>() : nullptr,
+                 _sdv.needed() ? stddev_mat.ptr<দ্বিগুণ>() : nullptr,
+                 mask.তথ্য, 0);
     }
-    else
+    অন্যথা
     {
-        if (src.dims <= 2)
+        যদি (src.dims <= 2)
         {
-            CALL_HAL(meanStdDev, cv_hal_meanStdDev, src.data, src.step, src.cols, src.rows, src.type(),
-                     _mean.needed() ? mean_mat.ptr<double>() : nullptr,
-                     _sdv.needed() ? stddev_mat.ptr<double>() : nullptr,
-                     mask.data, mask.step);
+            CALL_HAL(meanStdDev, cv_hal_meanStdDev, src.তথ্য, src.step, src.cols, src.rows, src.type(),
+                     _mean.needed() ? mean_mat.ptr<দ্বিগুণ>() : nullptr,
+                     _sdv.needed() ? stddev_mat.ptr<দ্বিগুণ>() : nullptr,
+                     mask.তথ্য, mask.step);
         }
     }
 
-    SumSqrFunc func = getSumSqrFunc(depth);
+    যোগ_Sqr_Func func = get_যোগ_Sqr_Func(depth);
 
     CV_Assert( func != 0 );
 
-    const Mat* arrays[] = {&src, &mask, 0};
+    ধ্রুবক Mat* arrays[] = {&src, &mask, 0};
     uchar* ptrs[2] = {};
     NAryMatIterator it(arrays, ptrs);
-    int total = (int)it.size, blockSize = total, partialBlockSize = 0;
-    int j;
-    int64_t count = 0, nz0 = 0;
-    double _buf[CV_CN_MAX*4];
-    double *s = _buf, *sq = s + cn;
-    int *sbuf = (int*)s, *sqbuf = (int*)sq;
-    bool partialSumIsInt = depth < CV_32S;
-    bool blockSum = partialSumIsInt || depth == CV_16F || depth == CV_16BF;
-    bool blockSqSum = depth <= CV_8S;
+    পূর্ণসংখ্যা যোগ = (পূর্ণসংখ্যা)it.size, block_আকার = যোগ, partial_Block_আকার = 0;
+    পূর্ণসংখ্যা j;
+    int64_t গুনতি_2 = 0, nz0 = 0;
+    দ্বিগুণ _buf[CV_CN_MAX*4];
+    দ্বিগুণ *s = _buf, *sq = s + cn;
+    পূর্ণসংখ্যা *sbuf = (পূর্ণসংখ্যা*)s, *sqbuf = (পূর্ণসংখ্যা*)sq;
+    যৌক্তিক partial_যোগ_Is_Int = depth < CV_32S;
+    যৌক্তিক block_যোগ = partial_যোগ_Is_Int || depth == CV_16F || depth == CV_16BF;
+    যৌক্তিক block_Sq_যোগ = depth <= CV_8S;
     size_t esz = 0;
 
-    for( k = 0; k < cn; k++ )
+    জন্য( k = 0; k < cn; k++ )
         s[k] = sq[k] = 0;
 
-    if( blockSum )
+    যদি( block_যোগ )
     {
-        partialBlockSize = 1 << 15;
-        blockSize = std::min(blockSize, partialBlockSize);
-        sbuf = (int*)(sq + cn);
-        if( blockSqSum )
+        partial_Block_আকার = 1 << 15;
+        block_আকার = std::min(block_আকার, partial_Block_আকার);
+        sbuf = (পূর্ণসংখ্যা*)(sq + cn);
+        যদি( block_Sq_যোগ )
             sqbuf = sbuf + cn;
-        for( k = 0; k < cn; k++ )
+        জন্য( k = 0; k < cn; k++ )
             sbuf[k] = sqbuf[k] = 0;
-        esz = src.elemSize();
+        esz = src.elem_আকার();
     }
 
-    for( size_t i = 0; i < it.nplanes; i++, ++it )
+    জন্য( size_t i = 0; i < it.nplanes; i++, ++it )
     {
-        for( j = 0; j < total; j += blockSize )
+        জন্য( j = 0; j < যোগ; j += block_আকার )
         {
-            int bsz = std::min(total - j, blockSize);
-            int nz = func( ptrs[0], ptrs[1], (uchar*)sbuf, (uchar*)sqbuf, bsz, cn );
-            count += nz;
+            পূর্ণসংখ্যা bsz = std::min(যোগ - j, block_আকার);
+            পূর্ণসংখ্যা nz = func( ptrs[0], ptrs[1], (uchar*)sbuf, (uchar*)sqbuf, bsz, cn );
+            গুনতি_2 += nz;
             nz0 += nz;
-            if( blockSum && (count + blockSize >= partialBlockSize || (i+1 >= it.nplanes && j+bsz >= total)) )
+            যদি( block_যোগ && (গুনতি_2 + block_আকার >= partial_Block_আকার || (i+1 >= it.nplanes && j+bsz >= যোগ)) )
             {
-                if (partialSumIsInt) {
-                    for( k = 0; k < cn; k++ )
+                যদি (partial_যোগ_Is_Int) {
+                    জন্য( k = 0; k < cn; k++ )
                     {
                         s[k] += sbuf[k];
                         sbuf[k] = 0;
                     }
-                } else {
-                    for( k = 0; k < cn; k++ )
+                } অন্যথা {
+                    জন্য( k = 0; k < cn; k++ )
                     {
-                        s[k] += ((float*)sbuf)[k];
+                        s[k] += ((দশমিক*)sbuf)[k];
                         sbuf[k] = 0;
                     }
                 }
-                if( blockSqSum )
+                যদি( block_Sq_যোগ )
                 {
-                    for( k = 0; k < cn; k++ )
+                    জন্য( k = 0; k < cn; k++ )
                     {
                         sq[k] += sqbuf[k];
                         sqbuf[k] = 0;
                     }
                 }
-                count = 0;
+                গুনতি_2 = 0;
             }
             ptrs[0] += bsz*esz;
-            if( ptrs[1] )
+            যদি( ptrs[1] )
                 ptrs[1] += bsz;
         }
     }
 
-    double scale = nz0 ? 1./nz0 : 0.;
-    for( k = 0; k < cn; k++ )
+    দ্বিগুণ scale = nz0 ? 1./nz0 : 0.;
+    জন্য( k = 0; k < cn; k++ )
     {
         s[k] *= scale;
         sq[k] = std::sqrt(std::max(sq[k]*scale - s[k]*s[k], 0.));
     }
 
-    if (_mean.needed())
+    যদি (_mean.needed())
     {
-        const double* sptr = s;
-        double* dptr = mean_mat.ptr<double>();
-        for( k = 0; k < cn; k++ )
+        ধ্রুবক দ্বিগুণ* sptr = s;
+        দ্বিগুণ* dptr = mean_mat.ptr<দ্বিগুণ>();
+        জন্য( k = 0; k < cn; k++ )
             dptr[k] = sptr[k];
     }
 
-    if (_sdv.needed())
+    যদি (_sdv.needed())
     {
-        const double* sptr = sq;
-        double* dptr = stddev_mat.ptr<double>();
-        for( k = 0; k < cn; k++ )
+        ধ্রুবক দ্বিগুণ* sptr = sq;
+        দ্বিগুণ* dptr = stddev_mat.ptr<দ্বিগুণ>();
+        জন্য( k = 0; k < cn; k++ )
             dptr[k] = sptr[k];
     }
 }
 
-static void writeStatResult(OutputArray _dst, int cn, const Scalar& v)
+স্থির শূন্য write_Stat_ফলাফল(OutputArray _dst, পূর্ণসংখ্যা cn, ধ্রুবক Scalar& v)
 {
-    if (!_dst.needed())
-        return;
-    if (!_dst.fixedSize())
-        _dst.create(cn, 1, CV_64F, -1, true);
+    যদি (!_dst.needed())
+        ফেরত;
+    যদি (!_dst.fixed_আকার())
+        _dst.create(cn, 1, CV_64F, -1, সত্য);
     Mat d = _dst.getMat();
-    int dcn = (int)d.total();
+    পূর্ণসংখ্যা dcn = (পূর্ণসংখ্যা)d.যোগ();
     CV_Assert( d.type() == CV_64F && d.isContinuous() && (d.cols == 1 || d.rows == 1) && dcn >= cn );
-    double* p = d.ptr<double>();
-    for (int k = 0; k < dcn; k++)
+    দ্বিগুণ* p = d.ptr<দ্বিগুণ>();
+    জন্য (পূর্ণসংখ্যা k = 0; k < dcn; k++)
         p[k] = k < cn ? v[k] : 0;
 }
 
-void meanStdDev(InputArray _src, OutputArray _mean, OutputArray _sdv, InputArray _mask)
+শূন্য meanStdDev(প্রবেশ_Array _src, OutputArray _mean, OutputArray _sdv, প্রবেশ_Array _mask)
 {
     CV_INSTRUMENT_REGION();
 
     std::vector<StatChunk> chunks;
-    if (!_src.isUMat() && !_src.empty())
+    যদি (!_src.isUMat() && !_src.empty())
     {
         Mat src = _src.getMat(), mask = _mask.getMat();
-        const int cn = src.channels();
-        const bool maskOk = mask.empty() || ((mask.type() == CV_8U || mask.type() == CV_8S || mask.type() == CV_Bool) &&
+        ধ্রুবক পূর্ণসংখ্যা cn = src.channels();
+        ধ্রুবক যৌক্তিক maskOk = mask.empty() || ((mask.type() == CV_8U || mask.type() == CV_8S || mask.type() == CV_Bool) &&
                                              src.size == mask.size);
-        if (cn <= 4 && maskOk && splitForParallelStat(src, mask, chunks))
+        যদি (cn <= 4 && maskOk && splitForParallelStat(src, mask, chunks))
         {
-            const int n = (int)chunks.size();
+            ধ্রুবক পূর্ণসংখ্যা n = (পূর্ণসংখ্যা)chunks.size();
             std::vector<Scalar> m(n), sd(n);
-            std::vector<double> cnt(n);
-            parallel_for_(Range(0, n), [&](const Range& r)
+            std::vector<দ্বিগুণ> cnt(n);
+            parallel_for_(Range(0, n), [&](ধ্রুবক Range& r)
             {
-                for (int i = r.start; i < r.end; i++)
+                জন্য (পূর্ণসংখ্যা i = r.start; i < r.end; i++)
                 {
                     Mat mi, si;
                     meanStdDev_(chunks[i].src, mi, si, chunks[i].mask);
-                    for (int k = 0; k < cn; k++)
+                    জন্য (পূর্ণসংখ্যা k = 0; k < cn; k++)
                     {
-                        m[i][k] = mi.at<double>(k);
-                        sd[i][k] = si.at<double>(k);
+                        m[i][k] = mi.at<দ্বিগুণ>(k);
+                        sd[i][k] = si.at<দ্বিগুণ>(k);
                     }
-                    cnt[i] = statCount(chunks[i]);
+                    cnt[i] = stat_গুনতি(chunks[i]);
                 }
             });
             // combine the pieces: the variance is the mean of the piece variances plus the
             // variance of the piece means, both weighted by the piece sizes
-            double total = 0;
+            দ্বিগুণ যোগ = 0;
             Scalar M = Scalar::all(0.0), V = Scalar::all(0.0);
-            for (int i = 0; i < n; i++)
+            জন্য (পূর্ণসংখ্যা i = 0; i < n; i++)
             {
                 M += m[i]*cnt[i];
-                total += cnt[i];
+                যোগ += cnt[i];
             }
-            if (total > 0)
-                M *= 1./total;
-            for (int i = 0; i < n; i++)
-                for (int k = 0; k < cn; k++)
+            যদি (যোগ > 0)
+                M *= 1./যোগ;
+            জন্য (পূর্ণসংখ্যা i = 0; i < n; i++)
+                জন্য (পূর্ণসংখ্যা k = 0; k < cn; k++)
                 {
-                    double dm = m[i][k] - M[k];
+                    দ্বিগুণ dm = m[i][k] - M[k];
                     V[k] += cnt[i]*(sd[i][k]*sd[i][k] + dm*dm);
                 }
             Scalar SD;
-            for (int k = 0; k < cn; k++)
-                SD[k] = total > 0 ? std::sqrt(std::max(V[k]/total, 0.)) : 0;
-            writeStatResult(_mean, cn, M);
-            writeStatResult(_sdv, cn, SD);
-            return;
+            জন্য (পূর্ণসংখ্যা k = 0; k < cn; k++)
+                SD[k] = যোগ > 0 ? std::sqrt(std::max(V[k]/যোগ, 0.)) : 0;
+            write_Stat_ফলাফল(_mean, cn, M);
+            write_Stat_ফলাফল(_sdv, cn, SD);
+            ফেরত;
         }
     }
     meanStdDev_(_src, _mean, _sdv, _mask);

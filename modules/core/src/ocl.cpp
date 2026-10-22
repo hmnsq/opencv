@@ -39,39 +39,39 @@
 //
 //M*/
 
-#include "precomp.hpp"
+#অন্তর্ভাব "precomp.hpp"
 
 #ifndef HAVE_OPENCL
-#include "ocl_disabled.impl.hpp"
-#else // HAVE_OPENCL
+#অন্তর্ভাব "ocl_disabled.impl.hpp"
+#অন্যথা // HAVE_OPENCL
 
-#include <list>
-#include <map>
-#include <deque>
-#include <set>
-#include <string>
-#include <sstream>
-#include <fstream>
-#if !(defined _MSC_VER) || (defined _MSC_VER && _MSC_VER > 1700)
-#include <inttypes.h>
+#অন্তর্ভাব <list>
+#অন্তর্ভাব <map>
+#অন্তর্ভাব <deque>
+#অন্তর্ভাব <set>
+#অন্তর্ভাব <string>
+#অন্তর্ভাব <sstream>
+#অন্তর্ভাব <fstream>
+#যদি !(defined _MSC_VER) || (defined _MSC_VER && _MSC_VER > 1700)
+#অন্তর্ভাব <inttypes.h>
 #endif
 
-#include <opencv2/core/utils/configuration.private.hpp>
+#অন্তর্ভাব <opencv2/core/utils/configuration.private.hpp>
 
-#include <opencv2/core/utils/logger.defines.hpp>
+#অন্তর্ভাব <opencv2/core/utils/logger.defines.hpp>
 #undef CV_LOG_STRIP_LEVEL
 #define CV_LOG_STRIP_LEVEL CV_LOG_LEVEL_DEBUG + 1
-#include <opencv2/core/utils/logger.hpp>
+#অন্তর্ভাব <opencv2/core/utils/logger.hpp>
 
-#include "opencv2/core/ocl_genbase.hpp"
-#include "opencl_kernels_core.hpp"
+#অন্তর্ভাব "opencv2/core/ocl_genbase.hpp"
+#অন্তর্ভাব "opencl_kernels_core.hpp"
 
-#include "opencv2/core/utils/lock.private.hpp"
-#include "opencv2/core/utils/filesystem.hpp"
-#include "opencv2/core/utils/filesystem.private.hpp"
+#অন্তর্ভাব "opencv2/core/utils/lock.private.hpp"
+#অন্তর্ভাব "opencv2/core/utils/filesystem.hpp"
+#অন্তর্ভাব "opencv2/core/utils/filesystem.private.hpp"
 
-#define CV__ALLOCATOR_STATS_LOG(...) CV_LOG_VERBOSE(NULL, 0, "OpenCL allocator: " << __VA_ARGS__)
-#include "opencv2/core/utils/allocator_stats.impl.hpp"
+#define CV__ALLOCATOR_STATS_LOG(...) CV_LOG_VERBOSE(ফাঁকা, 0, "OpenCL allocator: " << __VA_ARGS__)
+#অন্তর্ভাব "opencv2/core/utils/allocator_stats.impl.hpp"
 #undef CV__ALLOCATOR_STATS_LOG
 
 #define CV_OPENCL_ALWAYS_SHOW_BUILD_LOG          0
@@ -82,817 +82,817 @@
 #define CV_OPENCL_SYNC_RUN_KERNELS               0
 #define CV_OPENCL_TRACE_CHECK                    0
 
-#define CV_OPENCL_VALIDATE_BINARY_PROGRAMS       1
+#define CV_OPENCL_VALIDATE_দ্বিমিক_PROGRAMS       1
 
 #define CV_OPENCL_SHOW_SVM_ERROR_LOG             1
 #define CV_OPENCL_SHOW_SVM_LOG                   0
 
-#include "opencv2/core/bufferpool.hpp"
-#ifndef LOG_BUFFER_POOL
-# if 0
-#   define LOG_BUFFER_POOL printf
-# else
-#   define LOG_BUFFER_POOL(...)
+#অন্তর্ভাব "opencv2/core/bufferpool.hpp"
+#ifndef LOG_বাফার_POOL
+# যদি 0
+#   define LOG_বাফার_POOL printf
+# অন্যথা
+#   define LOG_বাফার_POOL(...)
 # endif
 #endif
 
-#if CV_OPENCL_SHOW_SVM_LOG
+#যদি CV_OPENCL_SHOW_SVM_LOG
 // TODO add timestamp logging
 #define CV_OPENCL_SVM_TRACE_P printf("line %d (ocl.cpp): ", __LINE__); printf
-#else
+#অন্যথা
 #define CV_OPENCL_SVM_TRACE_P(...)
 #endif
 
-#if CV_OPENCL_SHOW_SVM_ERROR_LOG
+#যদি CV_OPENCL_SHOW_SVM_ERROR_LOG
 // TODO add timestamp logging
 #define CV_OPENCL_SVM_TRACE_ERROR_P printf("Error on line %d (ocl.cpp): ", __LINE__); printf
-#else
+#অন্যথা
 #define CV_OPENCL_SVM_TRACE_ERROR_P(...)
 #endif
 
-#include "opencv2/core/opencl/runtime/opencl_clblas.hpp"
-#include "opencv2/core/opencl/runtime/opencl_clfft.hpp"
+#অন্তর্ভাব "opencv2/core/opencl/runtime/opencl_clblas.hpp"
+#অন্তর্ভাব "opencv2/core/opencl/runtime/opencl_clfft.hpp"
 
-#include "opencv2/core/opencl/runtime/opencl_core.hpp"
+#অন্তর্ভাব "opencv2/core/opencl/runtime/opencl_core.hpp"
 
 #ifdef HAVE_OPENCL_SVM
-#include "opencv2/core/opencl/runtime/opencl_svm_20.hpp"
-#include "opencv2/core/opencl/runtime/opencl_svm_hsa_extension.hpp"
-#include "opencv2/core/opencl/opencl_svm.hpp"
+#অন্তর্ভাব "opencv2/core/opencl/runtime/opencl_svm_20.hpp"
+#অন্তর্ভাব "opencv2/core/opencl/runtime/opencl_svm_hsa_extension.hpp"
+#অন্তর্ভাব "opencv2/core/opencl/opencl_svm.hpp"
 #endif
 
-#include "umatrix.hpp"
+#অন্তর্ভাব "umatrix.hpp"
 
-namespace cv { namespace ocl {
+নামাকাশ cv { নামাকাশ ocl {
 
 #define IMPLEMENT_REFCOUNTABLE() \
-    void addref() { CV_XADD(&refcount, 1); } \
-    void release() { if( CV_XADD(&refcount, -1) == 1 && !cv::__termination) delete this; } \
-    int refcount
+    শূন্য addref() { CV_XADD(&refcount, 1); } \
+    শূন্য release() { যদি( CV_XADD(&refcount, -1) == 1 && !cv::__termination) delete এই; } \
+    পূর্ণসংখ্যা refcount
 
-static cv::utils::AllocatorStatistics opencl_allocator_stats;
+স্থির cv::utils::AllocatorStatistics opencl_allocator_stats;
 
 CV_EXPORTS cv::utils::AllocatorStatisticsInterface& getOpenCLAllocatorStatistics();
 cv::utils::AllocatorStatisticsInterface& getOpenCLAllocatorStatistics()
 {
-    return opencl_allocator_stats;
+    ফেরত opencl_allocator_stats;
 }
 
 #ifndef _DEBUG
-static bool isRaiseError()
+স্থির যৌক্তিক isRaiseError()
 {
-    static bool initialized = false;
-    static bool value = false;
-    if (!initialized)
+    স্থির যৌক্তিক initialized = মিথ্যা;
+    স্থির যৌক্তিক value = মিথ্যা;
+    যদি (!initialized)
     {
-        value = cv::utils::getConfigurationParameterBool("OPENCV_OPENCL_RAISE_ERROR", false);
-        initialized = true;
+        value = cv::utils::getConfigurationParameterBool("OPENCV_OPENCL_RAISE_ERROR", মিথ্যা);
+        initialized = সত্য;
     }
-    return value;
+    ফেরত value;
 }
 #endif
 
-static void onOpenCLKernelBuildError()
+স্থির শূন্য onOpenCLKernelBuildError()
 {
     // NB: no need to cache this value
-    bool value = cv::utils::getConfigurationParameterBool("OPENCV_OPENCL_ABORT_ON_BUILD_ERROR", false);
-    if (value)
+    যৌক্তিক value = cv::utils::getConfigurationParameterBool("OPENCV_OPENCL_ABORT_ON_BUILD_ERROR", মিথ্যা);
+    যদি (value)
     {
         fprintf(stderr, "Abort on OpenCL kernel build failure!\n");
         abort();
     }
 }
 
-#if CV_OPENCL_TRACE_CHECK
-static inline
-void traceOpenCLCheck(cl_int status, const char* message)
+#যদি CV_OPENCL_TRACE_CHECK
+স্থির অন্তঃরেখ
+শূন্য traceOpenCLCheck(cl_int status, ধ্রুবক অক্ষর* message)
 {
     std::cout << "OpenCV(OpenCL:" << status << "): " << message << std::endl << std::flush;
 }
-#define CV_OCL_TRACE_CHECK_RESULT(status, message) traceOpenCLCheck(status, message)
-#else
-#define CV_OCL_TRACE_CHECK_RESULT(status, message) /* nothing */
+#define CV_OCL_TRACE_CHECK_ফলাফল(status, message) traceOpenCLCheck(status, message)
+#অন্যথা
+#define CV_OCL_TRACE_CHECK_ফলাফল(status, message) /* nothing */
 #endif
 
-#define CV_OCL_API_ERROR_MSG(check_result, msg) \
-    cv::format("OpenCL error %s (%d) during call: %s", getOpenCLErrorString(check_result), check_result, msg)
+#define CV_OCL_API_ERROR_বার্তা(check_ফলাফল, বার্তা) \
+    cv::format("OpenCL error %s (%d) during call: %s", getOpenCLErrorString(check_ফলাফল), check_ফলাফল, বার্তা)
 
-#define CV_OCL_CHECK_RESULT(check_result, msg) \
-    do { \
-        CV_OCL_TRACE_CHECK_RESULT(check_result, msg); \
-        if (check_result != CL_SUCCESS) \
+#define CV_OCL_CHECK_ফলাফল(check_ফলাফল, বার্তা) \
+    করো { \
+        CV_OCL_TRACE_CHECK_ফলাফল(check_ফলাফল, বার্তা); \
+        যদি (check_ফলাফল != CL_SUCCESS) \
         { \
-            static_assert(std::is_convertible<decltype(msg), const char*>::value, "msg of CV_OCL_CHECK_RESULT must be const char*"); \
-            cv::String error_msg = CV_OCL_API_ERROR_MSG(check_result, msg); \
-            CV_Error(Error::OpenCLApiCallError, error_msg); \
+            static_assert(std::is_convertible<decltype(বার্তা), ধ্রুবক অক্ষর*>::value, "msg of CV_OCL_CHECK_RESULT must be const char*"); \
+            cv::String error_বার্তা = CV_OCL_API_ERROR_বার্তা(check_ফলাফল, বার্তা); \
+            CV_Error(Error::OpenCLApiCallError, error_বার্তা); \
         } \
-    } while (0)
+    } যখন (0)
 
-#define CV_OCL_CHECK_(expr, check_result) do { expr; CV_OCL_CHECK_RESULT(check_result, #expr); } while (0)
+#define CV_OCL_CHECK_(রাশিমালা, check_ফলাফল) করো { রাশিমালা; CV_OCL_CHECK_ফলাফল(check_ফলাফল, #expr); } যখন (0)
 
-#define CV_OCL_CHECK(expr) do { cl_int __cl_result = (expr); CV_OCL_CHECK_RESULT(__cl_result, #expr); } while (0)
+#define CV_OCL_CHECK(রাশিমালা) করো { cl_int __cl_result = (রাশিমালা); CV_OCL_CHECK_ফলাফল(__cl_result, #expr); } যখন (0)
 
 #ifdef _DEBUG
-#define CV_OCL_DBG_CHECK_RESULT(check_result, msg) CV_OCL_CHECK_RESULT(check_result, msg)
-#define CV_OCL_DBG_CHECK(expr) CV_OCL_CHECK(expr)
-#define CV_OCL_DBG_CHECK_(expr, check_result) CV_OCL_CHECK_(expr, check_result)
-#else
-#define CV_OCL_DBG_CHECK_RESULT(check_result, msg) \
-    do { \
-        CV_OCL_TRACE_CHECK_RESULT(check_result, msg); \
-        if (check_result != CL_SUCCESS && isRaiseError()) \
+#define CV_OCL_DBG_CHECK_ফলাফল(check_ফলাফল, বার্তা) CV_OCL_CHECK_ফলাফল(check_ফলাফল, বার্তা)
+#define CV_OCL_DBG_CHECK(রাশিমালা) CV_OCL_CHECK(রাশিমালা)
+#define CV_OCL_DBG_CHECK_(রাশিমালা, check_ফলাফল) CV_OCL_CHECK_(রাশিমালা, check_ফলাফল)
+#অন্যথা
+#define CV_OCL_DBG_CHECK_ফলাফল(check_ফলাফল, বার্তা) \
+    করো { \
+        CV_OCL_TRACE_CHECK_ফলাফল(check_ফলাফল, বার্তা); \
+        যদি (check_ফলাফল != CL_SUCCESS && isRaiseError()) \
         { \
-            static_assert(std::is_convertible<decltype(msg), const char*>::value, "msg of CV_OCL_DBG_CHECK_RESULT must be const char*"); \
-            cv::String error_msg = CV_OCL_API_ERROR_MSG(check_result, msg); \
-            CV_Error(Error::OpenCLApiCallError, error_msg); \
+            static_assert(std::is_convertible<decltype(বার্তা), ধ্রুবক অক্ষর*>::value, "msg of CV_OCL_DBG_CHECK_RESULT must be const char*"); \
+            cv::String error_বার্তা = CV_OCL_API_ERROR_বার্তা(check_ফলাফল, বার্তা); \
+            CV_Error(Error::OpenCLApiCallError, error_বার্তা); \
         } \
-    } while (0)
-#define CV_OCL_DBG_CHECK_(expr, check_result) do { expr; CV_OCL_DBG_CHECK_RESULT(check_result, #expr); } while (0)
-#define CV_OCL_DBG_CHECK(expr) do { cl_int __cl_result = (expr); CV_OCL_DBG_CHECK_RESULT(__cl_result, #expr); } while (0)
+    } যখন (0)
+#define CV_OCL_DBG_CHECK_(রাশিমালা, check_ফলাফল) করো { রাশিমালা; CV_OCL_DBG_CHECK_ফলাফল(check_ফলাফল, #expr); } যখন (0)
+#define CV_OCL_DBG_CHECK(রাশিমালা) করো { cl_int __cl_result = (রাশিমালা); CV_OCL_DBG_CHECK_ফলাফল(__cl_result, #expr); } যখন (0)
 #endif
 
 
-static const bool CV_OPENCL_CACHE_ENABLE = utils::getConfigurationParameterBool("OPENCV_OPENCL_CACHE_ENABLE", true);
-static const bool CV_OPENCL_CACHE_WRITE = utils::getConfigurationParameterBool("OPENCV_OPENCL_CACHE_WRITE", true);
-static const bool CV_OPENCL_CACHE_LOCK_ENABLE = utils::getConfigurationParameterBool("OPENCV_OPENCL_CACHE_LOCK_ENABLE", true);
-static const bool CV_OPENCL_CACHE_CLEANUP = utils::getConfigurationParameterBool("OPENCV_OPENCL_CACHE_CLEANUP", true);
+স্থির ধ্রুবক যৌক্তিক CV_OPENCL_CACHE_ENABLE = utils::getConfigurationParameterBool("OPENCV_OPENCL_CACHE_ENABLE", সত্য);
+স্থির ধ্রুবক যৌক্তিক CV_OPENCL_CACHE_WRITE = utils::getConfigurationParameterBool("OPENCV_OPENCL_CACHE_WRITE", সত্য);
+স্থির ধ্রুবক যৌক্তিক CV_OPENCL_CACHE_LOCK_ENABLE = utils::getConfigurationParameterBool("OPENCV_OPENCL_CACHE_LOCK_ENABLE", সত্য);
+স্থির ধ্রুবক যৌক্তিক CV_OPENCL_CACHE_CLEANUP = utils::getConfigurationParameterBool("OPENCV_OPENCL_CACHE_CLEANUP", সত্য);
 
-#if CV_OPENCL_VALIDATE_BINARY_PROGRAMS
-static const bool CV_OPENCL_VALIDATE_BINARY_PROGRAMS_VALUE = utils::getConfigurationParameterBool("OPENCV_OPENCL_VALIDATE_BINARY_PROGRAMS", false);
+#যদি CV_OPENCL_VALIDATE_দ্বিমিক_PROGRAMS
+স্থির ধ্রুবক যৌক্তিক CV_OPENCL_VALIDATE_দ্বিমিক_PROGRAMS_মান = utils::getConfigurationParameterBool("OPENCV_OPENCL_VALIDATE_BINARY_PROGRAMS", মিথ্যা);
 #endif
 
 // Option to disable calls clEnqueueReadBufferRect / clEnqueueWriteBufferRect / clEnqueueCopyBufferRect
-static const bool CV_OPENCL_DISABLE_BUFFER_RECT_OPERATIONS = utils::getConfigurationParameterBool("OPENCV_OPENCL_DISABLE_BUFFER_RECT_OPERATIONS",
-#if 1 //def __APPLE__
-        true
-#else
-        false
+স্থির ধ্রুবক যৌক্তিক CV_OPENCL_DISABLE_বাফার_RECT_OPERATIONS = utils::getConfigurationParameterBool("OPENCV_OPENCL_DISABLE_BUFFER_RECT_OPERATIONS",
+#যদি 1 //def __APPLE__
+        সত্য
+#অন্যথা
+        মিথ্যা
 #endif
 );
 
-static String getBuildExtraOptions()
+স্থির String getBuildExtraOptions()
 {
-    static String param_buildExtraOptions;
-    static bool initialized = false;
-    if (!initialized)
+    স্থির String param_buildExtraOptions;
+    স্থির যৌক্তিক initialized = মিথ্যা;
+    যদি (!initialized)
     {
         param_buildExtraOptions = utils::getConfigurationParameterString("OPENCV_OPENCL_BUILD_EXTRA_OPTIONS", "");
-        initialized = true;
-        if (!param_buildExtraOptions.empty())
-            CV_LOG_WARNING(NULL, "OpenCL: using extra build options: '" << param_buildExtraOptions << "'");
+        initialized = সত্য;
+        যদি (!param_buildExtraOptions.empty())
+            CV_LOG_WARNING(ফাঁকা, "OpenCL: using extra build options: '" << param_buildExtraOptions << "'");
     }
-    return param_buildExtraOptions;
+    ফেরত param_buildExtraOptions;
 }
 
-static const bool CV_OPENCL_ENABLE_MEM_USE_HOST_PTR = utils::getConfigurationParameterBool("OPENCV_OPENCL_ENABLE_MEM_USE_HOST_PTR", true);
-static const size_t CV_OPENCL_ALIGNMENT_MEM_USE_HOST_PTR = utils::getConfigurationParameterSizeT("OPENCV_OPENCL_ALIGNMENT_MEM_USE_HOST_PTR", 4);
+স্থির ধ্রুবক যৌক্তিক CV_OPENCL_ENABLE_MEM_USE_HOST_PTR = utils::getConfigurationParameterBool("OPENCV_OPENCL_ENABLE_MEM_USE_HOST_PTR", সত্য);
+স্থির ধ্রুবক size_t CV_OPENCL_ALIGNMENT_MEM_USE_HOST_PTR = utils::get_Configuration_Parameter_আকার_T("OPENCV_OPENCL_ALIGNMENT_MEM_USE_HOST_PTR", 4);
 
 
-struct UMat2D
+কাঠামো UMat2D
 {
-    UMat2D(const UMat& m)
+    UMat2D(ধ্রুবক UMat& m)
     {
-        offset = (int)m.offset;
-        step = (int)m.step;
+        offset = (পূর্ণসংখ্যা)m.offset;
+        step = (পূর্ণসংখ্যা)m.step;
         rows = m.rows;
         cols = m.cols;
     }
-    int offset;
-    int step;
-    int rows;
-    int cols;
+    পূর্ণসংখ্যা offset;
+    পূর্ণসংখ্যা step;
+    পূর্ণসংখ্যা rows;
+    পূর্ণসংখ্যা cols;
 };
 
-struct UMat3D
+কাঠামো UMat3D
 {
-    UMat3D(const UMat& m)
+    UMat3D(ধ্রুবক UMat& m)
     {
-        offset = (int)m.offset;
-        step = (int)m.step.p[1];
-        slicestep = (int)m.step.p[0];
-        slices = (int)m.size.p[0];
+        offset = (পূর্ণসংখ্যা)m.offset;
+        step = (পূর্ণসংখ্যা)m.step.p[1];
+        slicestep = (পূর্ণসংখ্যা)m.step.p[0];
+        slices = (পূর্ণসংখ্যা)m.size.p[0];
         rows = m.size.p[1];
         cols = m.size.p[2];
     }
-    int offset;
-    int slicestep;
-    int step;
-    int slices;
-    int rows;
-    int cols;
+    পূর্ণসংখ্যা offset;
+    পূর্ণসংখ্যা slicestep;
+    পূর্ণসংখ্যা step;
+    পূর্ণসংখ্যা slices;
+    পূর্ণসংখ্যা rows;
+    পূর্ণসংখ্যা cols;
 };
 
 // Computes 64-bit "cyclic redundancy check" sum, as specified in ECMA-182
-static uint64 crc64( const uchar* data, size_t size, uint64 crc0=0 )
+স্থির uint64 crc64( ধ্রুবক uchar* তথ্য, size_t size, uint64 crc0=0 )
 {
-    static uint64 table[256];
-    static bool initialized = false;
+    স্থির uint64 table[256];
+    স্থির যৌক্তিক initialized = মিথ্যা;
 
-    if( !initialized )
+    যদি( !initialized )
     {
-        for( int i = 0; i < 256; i++ )
+        জন্য( পূর্ণসংখ্যা i = 0; i < 256; i++ )
         {
             uint64 c = i;
-            for( int j = 0; j < 8; j++ )
+            জন্য( পূর্ণসংখ্যা j = 0; j < 8; j++ )
                 c = ((c & 1) ? CV_BIG_UINT(0xc96c5795d7870f42) : 0) ^ (c >> 1);
             table[i] = c;
         }
-        initialized = true;
+        initialized = সত্য;
     }
 
     uint64 crc = ~crc0;
-    for( size_t idx = 0; idx < size; idx++ )
-        crc = table[(uchar)crc ^ data[idx]] ^ (crc >> 8);
+    জন্য( size_t idx = 0; idx < size; idx++ )
+        crc = table[(uchar)crc ^ তথ্য[idx]] ^ (crc >> 8);
 
-    return ~crc;
+    ফেরত ~crc;
 }
 
-#if OPENCV_HAVE_FILESYSTEM_SUPPORT
-struct OpenCLBinaryCacheConfigurator
+#যদি OPENCV_HAVE_FILESYSTEM_SUPPORT
+কাঠামো OpenCLBinaryCacheConfigurator
 {
     cv::String cache_path_;
     cv::String cache_lock_filename_;
     cv::Ptr<utils::fs::FileLock> cache_lock_;
 
-    typedef std::map<std::string, std::string> ContextCacheType;
+    প্রকারলেখ std::map<std::string, std::string> ContextCacheType;
     ContextCacheType prepared_contexts_;
     Mutex mutex_prepared_contexts_;
 
     OpenCLBinaryCacheConfigurator()
     {
-        CV_LOG_DEBUG(NULL, "Initializing OpenCL cache configuration...");
-        if (!CV_OPENCL_CACHE_ENABLE)
+        CV_LOG_DEBUG(ফাঁকা, "Initializing OpenCL cache configuration...");
+        যদি (!CV_OPENCL_CACHE_ENABLE)
         {
-            CV_LOG_INFO(NULL, "OpenCL cache is disabled");
-            return;
+            CV_LOG_INFO(ফাঁকা, "OpenCL cache is disabled");
+            ফেরত;
         }
         cache_path_ = utils::fs::getCacheDirectory("opencl_cache", "OPENCV_OPENCL_CACHE_DIR");
-        if (cache_path_.empty())
+        যদি (cache_path_.empty())
         {
-            CV_LOG_INFO(NULL, "Specify OPENCV_OPENCL_CACHE_DIR configuration parameter to enable OpenCL cache");
+            CV_LOG_INFO(ফাঁকা, "Specify OPENCV_OPENCL_CACHE_DIR configuration parameter to enable OpenCL cache");
         }
-        do
+        করো
         {
-            try
+            চেষ্টা
             {
-                if (cache_path_.empty())
-                    break;
-                if (cache_path_ == "disabled")
-                    break;
-                if (!utils::fs::createDirectories(cache_path_))
+                যদি (cache_path_.empty())
+                    বিরতি;
+                যদি (cache_path_ == "disabled")
+                    বিরতি;
+                যদি (!utils::fs::createDirectories(cache_path_))
                 {
-                    CV_LOG_DEBUG(NULL, "Can't use OpenCL cache directory: " << cache_path_);
+                    CV_LOG_DEBUG(ফাঁকা, "Can't use OpenCL cache directory: " << cache_path_);
                     clear();
-                    break;
+                    বিরতি;
                 }
 
-                if (CV_OPENCL_CACHE_LOCK_ENABLE)
+                যদি (CV_OPENCL_CACHE_LOCK_ENABLE)
                 {
                     cache_lock_filename_ = cache_path_ + ".lock";
-                    if (!utils::fs::exists(cache_lock_filename_))
+                    যদি (!utils::fs::exists(cache_lock_filename_))
                     {
-                        CV_LOG_DEBUG(NULL, "Creating lock file... (" << cache_lock_filename_ << ")");
+                        CV_LOG_DEBUG(ফাঁকা, "Creating lock file... (" << cache_lock_filename_ << ")");
                         std::ofstream lock_filename(cache_lock_filename_.c_str(), std::ios::out);
-                        if (!lock_filename.is_open())
+                        যদি (!lock_filename.is_open())
                         {
-                            CV_LOG_WARNING(NULL, "Can't create lock file for OpenCL program cache: " << cache_lock_filename_);
-                            break;
+                            CV_LOG_WARNING(ফাঁকা, "Can't create lock file for OpenCL program cache: " << cache_lock_filename_);
+                            বিরতি;
                         }
                     }
 
-                    try
+                    চেষ্টা
                     {
                         cache_lock_ = makePtr<utils::fs::FileLock>(cache_lock_filename_.c_str());
-                        CV_LOG_VERBOSE(NULL, 0, "Checking cache lock... (" << cache_lock_filename_ << ")");
+                        CV_LOG_VERBOSE(ফাঁকা, 0, "Checking cache lock... (" << cache_lock_filename_ << ")");
                         {
                             utils::shared_lock_guard<utils::fs::FileLock> lock(*cache_lock_);
                         }
-                        CV_LOG_VERBOSE(NULL, 0, "Checking cache lock... Done!");
+                        CV_LOG_VERBOSE(ফাঁকা, 0, "Checking cache lock... Done!");
                     }
-                    catch (const cv::Exception& e)
+                    ধরো (ধ্রুবক cv::Exception& e)
                     {
-                        CV_LOG_WARNING(NULL, "Can't create OpenCL program cache lock: " << cache_lock_filename_ << std::endl << e.what());
+                        CV_LOG_WARNING(ফাঁকা, "Can't create OpenCL program cache lock: " << cache_lock_filename_ << std::endl << e.what());
                     }
-                    catch (...)
+                    ধরো (...)
                     {
-                        CV_LOG_WARNING(NULL, "Can't create OpenCL program cache lock: " << cache_lock_filename_);
+                        CV_LOG_WARNING(ফাঁকা, "Can't create OpenCL program cache lock: " << cache_lock_filename_);
                     }
                 }
-                else
+                অন্যথা
                 {
-                    if (CV_OPENCL_CACHE_WRITE)
+                    যদি (CV_OPENCL_CACHE_WRITE)
                     {
-                        CV_LOG_WARNING(NULL, "OpenCL cache lock is disabled while cache write is allowed "
+                        CV_LOG_WARNING(ফাঁকা, "OpenCL cache lock is disabled while cache write is allowed "
                                 "(not safe for multiprocess environment)");
                     }
-                    else
+                    অন্যথা
                     {
-                        CV_LOG_INFO(NULL, "OpenCL cache lock is disabled");
+                        CV_LOG_INFO(ফাঁকা, "OpenCL cache lock is disabled");
                     }
                 }
             }
-            catch (const cv::Exception& e)
+            ধরো (ধ্রুবক cv::Exception& e)
             {
-                CV_LOG_WARNING(NULL, "Can't prepare OpenCL program cache: " << cache_path_ << std::endl << e.what());
+                CV_LOG_WARNING(ফাঁকা, "Can't prepare OpenCL program cache: " << cache_path_ << std::endl << e.what());
                 clear();
             }
-        } while (0);
-        if (!cache_path_.empty())
+        } যখন (0);
+        যদি (!cache_path_.empty())
         {
-            if (cache_lock_.empty() && CV_OPENCL_CACHE_LOCK_ENABLE)
+            যদি (cache_lock_.empty() && CV_OPENCL_CACHE_LOCK_ENABLE)
             {
-                CV_LOG_WARNING(NULL, "Initialized OpenCL cache directory, but interprocess synchronization lock is not available. "
+                CV_LOG_WARNING(ফাঁকা, "Initialized OpenCL cache directory, but interprocess synchronization lock is not available. "
                         "Consider to disable OpenCL cache: OPENCV_OPENCL_CACHE_DIR=disabled");
             }
-            else
+            অন্যথা
             {
-                CV_LOG_INFO(NULL, "Successfully initialized OpenCL cache directory: " << cache_path_);
+                CV_LOG_INFO(ফাঁকা, "Successfully initialized OpenCL cache directory: " << cache_path_);
             }
         }
     }
 
-    void clear()
+    শূন্য clear()
     {
         cache_path_.clear();
         cache_lock_filename_.clear();
         cache_lock_.release();
     }
 
-    std::string prepareCacheDirectoryForContext(const std::string& ctx_prefix,
-            const std::string& cleanup_prefix)
+    std::string prepareCacheDirectoryForContext(ধ্রুবক std::string& ctx_prefix,
+            ধ্রুবক std::string& cleanup_prefix)
     {
-        if (cache_path_.empty())
-            return std::string();
+        যদি (cache_path_.empty())
+            ফেরত std::string();
 
         AutoLock lock(mutex_prepared_contexts_);
 
         ContextCacheType::iterator found_it = prepared_contexts_.find(ctx_prefix);
-        if (found_it != prepared_contexts_.end())
-            return found_it->second;
+        যদি (found_it != prepared_contexts_.end())
+            ফেরত found_it->second;
 
-        CV_LOG_INFO(NULL, "Preparing OpenCL cache configuration for context: " << ctx_prefix);
+        CV_LOG_INFO(ফাঁকা, "Preparing OpenCL cache configuration for context: " << ctx_prefix);
 
         std::string target_directory = cache_path_ + ctx_prefix + "/";
-        bool result = utils::fs::isDirectory(target_directory);
-        if (!result)
+        যৌক্তিক ফলাফল = utils::fs::isDirectory(target_directory);
+        যদি (!ফলাফল)
         {
-            try
+            চেষ্টা
             {
-                CV_LOG_VERBOSE(NULL, 0, "Creating directory: " << target_directory);
-                if (utils::fs::createDirectories(target_directory))
+                CV_LOG_VERBOSE(ফাঁকা, 0, "Creating directory: " << target_directory);
+                যদি (utils::fs::createDirectories(target_directory))
                 {
-                    result = true;
+                    ফলাফল = সত্য;
                 }
-                else
+                অন্যথা
                 {
-                    CV_LOG_WARNING(NULL, "Can't create directory: " << target_directory);
+                    CV_LOG_WARNING(ফাঁকা, "Can't create directory: " << target_directory);
                 }
             }
-            catch (const cv::Exception& e)
+            ধরো (ধ্রুবক cv::Exception& e)
             {
-                CV_LOG_ERROR(NULL, "Can't create OpenCL program cache directory for context: " << target_directory << std::endl << e.what());
+                CV_LOG_ERROR(ফাঁকা, "Can't create OpenCL program cache directory for context: " << target_directory << std::endl << e.what());
             }
         }
-        target_directory = result ? target_directory : std::string();
+        target_directory = ফলাফল ? target_directory : std::string();
         prepared_contexts_.insert(std::pair<std::string, std::string>(ctx_prefix, target_directory));
 
-        if (result && CV_OPENCL_CACHE_CLEANUP && CV_OPENCL_CACHE_WRITE && !cleanup_prefix.empty())
+        যদি (ফলাফল && CV_OPENCL_CACHE_CLEANUP && CV_OPENCL_CACHE_WRITE && !cleanup_prefix.empty())
         {
-            try
+            চেষ্টা
             {
                 std::vector<String> entries;
-                utils::fs::glob_relative(cache_path_, cleanup_prefix + "*", entries, false, true);
+                utils::fs::glob_relative(cache_path_, cleanup_prefix + "*", entries, মিথ্যা, সত্য);
                 std::vector<String> remove_entries;
-                for (size_t i = 0; i < entries.size(); i++)
+                জন্য (size_t i = 0; i < entries.size(); i++)
                 {
-                    const String& name = entries[i];
-                    if (0 == name.find(cleanup_prefix))
+                    ধ্রুবক String& name = entries[i];
+                    যদি (0 == name.find(cleanup_prefix))
                     {
-                        if (0 == name.find(ctx_prefix))
-                            continue; // skip current
+                        যদি (0 == name.find(ctx_prefix))
+                            চালু; // skip current
                         remove_entries.push_back(name);
                     }
                 }
-                if (!remove_entries.empty())
+                যদি (!remove_entries.empty())
                 {
-                    CV_LOG_WARNING(NULL, (remove_entries.size() == 1
+                    CV_LOG_WARNING(ফাঁকা, (remove_entries.size() == 1
                             ? "Detected OpenCL cache directory for other version of OpenCL device."
                             : "Detected OpenCL cache directories for other versions of OpenCL device.")
                             << " We assume that these directories are obsolete after OpenCL runtime/drivers upgrade.");
-                    CV_LOG_WARNING(NULL, "Trying to remove these directories...");
-                    for (size_t i = 0; i < remove_entries.size(); i++)
+                    CV_LOG_WARNING(ফাঁকা, "Trying to remove these directories...");
+                    জন্য (size_t i = 0; i < remove_entries.size(); i++)
                     {
-                        CV_LOG_WARNING(NULL, "- " << remove_entries[i]);
+                        CV_LOG_WARNING(ফাঁকা, "- " << remove_entries[i]);
                     }
-                    CV_LOG_WARNING(NULL, "Note: You can disable this behavior via this option: OPENCV_OPENCL_CACHE_CLEANUP=0");
+                    CV_LOG_WARNING(ফাঁকা, "Note: You can disable this behavior via this option: OPENCV_OPENCL_CACHE_CLEANUP=0");
 
-                    for (size_t i = 0; i < remove_entries.size(); i++)
+                    জন্য (size_t i = 0; i < remove_entries.size(); i++)
                     {
-                        const String& name = remove_entries[i];
+                        ধ্রুবক String& name = remove_entries[i];
                         cv::String path = utils::fs::join(cache_path_, name);
-                        try
+                        চেষ্টা
                         {
                             utils::fs::remove_all(path);
-                            CV_LOG_WARNING(NULL, "Removed: " << path);
+                            CV_LOG_WARNING(ফাঁকা, "Removed: " << path);
                         }
-                        catch (const cv::Exception& e)
+                        ধরো (ধ্রুবক cv::Exception& e)
                         {
-                            CV_LOG_ERROR(NULL, "Exception during removal of obsolete OpenCL cache directory: " << path << std::endl << e.what());
+                            CV_LOG_ERROR(ফাঁকা, "Exception during removal of obsolete OpenCL cache directory: " << path << std::endl << e.what());
                         }
                     }
                 }
             }
-            catch (...)
+            ধরো (...)
             {
-                CV_LOG_WARNING(NULL, "Can't check for obsolete OpenCL cache directories");
+                CV_LOG_WARNING(ফাঁকা, "Can't check for obsolete OpenCL cache directories");
             }
         }
 
-        CV_LOG_VERBOSE(NULL, 1, "  Result: " << (target_directory.empty() ? std::string("Failed") : target_directory));
-        return target_directory;
+        CV_LOG_VERBOSE(ফাঁকা, 1, "  Result: " << (target_directory.empty() ? std::string("Failed") : target_directory));
+        ফেরত target_directory;
     }
 
-    static OpenCLBinaryCacheConfigurator& getSingletonInstance()
+    স্থির OpenCLBinaryCacheConfigurator& getSingletonInstance()
     {
-        CV_SINGLETON_LAZY_INIT_REF(OpenCLBinaryCacheConfigurator, new OpenCLBinaryCacheConfigurator());
+        CV_SINGLETON_LAZY_INIT_REF(OpenCLBinaryCacheConfigurator, নতুন OpenCLBinaryCacheConfigurator());
     }
 };
-class BinaryProgramFile
+শ্রেণী দ্বিমিক_Program_File
 {
-    enum { MAX_ENTRIES = 64 };
+    গণনা { MAX_ENTRIES = 64 };
 
-    typedef unsigned int uint32_t;
+    প্রকারলেখ unsigned পূর্ণসংখ্যা uint32_t;
 
-    struct CV_DECL_ALIGNED(4) FileHeader
+    কাঠামো CV_DECL_ALIGNED(4) FileHeader
     {
-        uint32_t sourceSignatureSize;
+        uint32_t source_Signature_আকার;
         //char sourceSignature[];
     };
 
-    struct CV_DECL_ALIGNED(4) FileTable
+    কাঠামো CV_DECL_ALIGNED(4) FileTable
     {
-        uint32_t numberOfEntries;
+        uint32_t সংখ্যা_Of_Entries;
         //uint32_t firstEntryOffset[];
     };
 
-    struct CV_DECL_ALIGNED(4) FileEntry
+    কাঠামো CV_DECL_ALIGNED(4) FileEntry
     {
-        uint32_t nextEntryFileOffset; // 0 for the last entry in chain
-        uint32_t keySize;
-        uint32_t dataSize;
+        uint32_t পরবর্তী_Entry_File_Offset; // 0 for the last entry in chain
+        uint32_t চাবি_আকার;
+        uint32_t তথ্য_আকার;
         //char key[];
         //char data[];
     };
 
-    const std::string fileName_;
-    const char* const sourceSignature_;
-    const size_t sourceSignatureSize_;
+    ধ্রুবক std::string fileName_;
+    ধ্রুবক অক্ষর* ধ্রুবক sourceSignature_;
+    ধ্রুবক size_t source_Signature_আকার_2;
 
     std::fstream f;
 
     uint32_t entryOffsets[MAX_ENTRIES];
 
-    uint32_t getHash(const std::string& options)
+    uint32_t getHash(ধ্রুবক std::string& options)
     {
-        uint64 hash = crc64((const uchar*)options.c_str(), options.size(), 0);
-        return hash & (MAX_ENTRIES - 1);
+        uint64 hash = crc64((ধ্রুবক uchar*)options.c_str(), options.size(), 0);
+        ফেরত hash & (MAX_ENTRIES - 1);
     }
 
-    inline size_t getFileSize()
+    অন্তঃরেখ size_t get_File_আকার()
     {
         size_t pos = (size_t)f.tellg();
         f.seekg(0, std::fstream::end);
-        size_t fileSize = (size_t)f.tellg();
+        size_t file_আকার = (size_t)f.tellg();
         f.seekg(pos, std::fstream::beg);
-        return fileSize;
+        ফেরত file_আকার;
     }
-    inline uint32_t readUInt32()
+    অন্তঃরেখ uint32_t readUInt32()
     {
         uint32_t res = 0;
-        f.read((char*)&res, sizeof(uint32_t));
+        f.পঠ((অক্ষর*)&res, আকার(uint32_t));
         CV_Assert(!f.fail());
-        return res;
+        ফেরত res;
     }
-    inline void writeUInt32(const uint32_t value)
+    অন্তঃরেখ শূন্য writeUInt32(ধ্রুবক uint32_t value)
     {
         uint32_t v = value;
-        f.write((char*)&v, sizeof(uint32_t));
+        f.লিখ((অক্ষর*)&v, আকার(uint32_t));
         CV_Assert(!f.fail());
     }
 
-    inline void seekReadAbsolute(size_t pos)
+    অন্তঃরেখ শূন্য seekReadAbsolute(size_t pos)
     {
         f.seekg(pos, std::fstream::beg);
         CV_Assert(!f.fail());
     }
-    inline void seekReadRelative(size_t pos)
+    অন্তঃরেখ শূন্য seekReadRelative(size_t pos)
     {
         f.seekg(pos, std::fstream::cur);
         CV_Assert(!f.fail());
     }
 
-    inline void seekWriteAbsolute(size_t pos)
+    অন্তঃরেখ শূন্য seekWriteAbsolute(size_t pos)
     {
         f.seekp(pos, std::fstream::beg);
         CV_Assert(!f.fail());
     }
 
-    void clearFile()
+    শূন্য clearFile()
     {
         f.close();
-        if (0 != remove(fileName_.c_str()))
-            CV_LOG_ERROR(NULL, "Can't remove: " << fileName_);
-        return;
+        যদি (0 != remove(fileName_.c_str()))
+            CV_LOG_ERROR(ফাঁকা, "Can't remove: " << fileName_);
+        ফেরত;
     }
 
-public:
-    BinaryProgramFile(const std::string& fileName, const char* sourceSignature)
-        : fileName_(fileName), sourceSignature_(sourceSignature), sourceSignatureSize_(sourceSignature_ ? strlen(sourceSignature_) : 0)
+সর্বজনীন:
+    দ্বিমিক_Program_File(ধ্রুবক std::string& fileName, ধ্রুবক অক্ষর* sourceSignature)
+        : fileName_(fileName), sourceSignature_(sourceSignature), source_Signature_আকার_2(sourceSignature_ ? strlen(sourceSignature_) : 0)
     {
-        CV_StaticAssert(sizeof(uint32_t) == 4, "");
-        CV_Assert(sourceSignature_ != NULL);
-        CV_Assert(sourceSignatureSize_ > 0);
-        memset(entryOffsets, 0, sizeof(entryOffsets));
+        CV_StaticAssert(আকার(uint32_t) == 4, "");
+        CV_Assert(sourceSignature_ != ফাঁকা);
+        CV_Assert(source_Signature_আকার_2 > 0);
+        memset(entryOffsets, 0, আকার(entryOffsets));
 
         f.rdbuf()->pubsetbuf(0, 0); // disable buffering
         f.open(fileName_.c_str(), std::ios::in|std::ios::out|std::ios::binary);
-        if(f.is_open() && getFileSize() > 0)
+        যদি(f.is_open() && get_File_আকার() > 0)
         {
-            bool isValid = false;
-            try
+            যৌক্তিক isValid = মিথ্যা;
+            চেষ্টা
             {
-                uint32_t fileSourceSignatureSize = readUInt32();
-                if (fileSourceSignatureSize == sourceSignatureSize_)
+                uint32_t file_Source_Signature_আকার = readUInt32();
+                যদি (file_Source_Signature_আকার == source_Signature_আকার_2)
                 {
-                    cv::AutoBuffer<char> fileSourceSignature(fileSourceSignatureSize + 1);
-                    f.read(fileSourceSignature.data(), fileSourceSignatureSize);
-                    if (f.eof())
+                    cv::Auto_বাফার<অক্ষর> fileSourceSignature(file_Source_Signature_আকার + 1);
+                    f.পঠ(fileSourceSignature.তথ্য(), file_Source_Signature_আকার);
+                    যদি (f.eof())
                     {
-                        CV_LOG_ERROR(NULL, "Unexpected EOF");
+                        CV_LOG_ERROR(ফাঁকা, "Unexpected EOF");
                     }
-                    else if (memcmp(sourceSignature, fileSourceSignature.data(), fileSourceSignatureSize) == 0)
+                    অন্যথা যদি (memcmp(sourceSignature, fileSourceSignature.তথ্য(), file_Source_Signature_আকার) == 0)
                     {
-                        isValid = true;
+                        isValid = সত্য;
                     }
                 }
-                if (!isValid)
+                যদি (!isValid)
                 {
-                    CV_LOG_ERROR(NULL, "Source code signature/hash mismatch (program source code has been changed/updated)");
+                    CV_LOG_ERROR(ফাঁকা, "Source code signature/hash mismatch (program source code has been changed/updated)");
                 }
             }
-            catch (const cv::Exception& e)
+            ধরো (ধ্রুবক cv::Exception& e)
             {
-                CV_LOG_ERROR(NULL, "Can't open binary program file: " << fileName << " : " << e.what());
+                CV_LOG_ERROR(ফাঁকা, "Can't open binary program file: " << fileName << " : " << e.what());
             }
-            catch (...)
+            ধরো (...)
             {
-                CV_LOG_ERROR(NULL, "Can't open binary program file: " << fileName << " : Unknown error");
+                CV_LOG_ERROR(ফাঁকা, "Can't open binary program file: " << fileName << " : Unknown error");
             }
-            if (!isValid)
+            যদি (!isValid)
             {
                 clearFile();
             }
-            else
+            অন্যথা
             {
                 seekReadAbsolute(0);
             }
         }
     }
 
-    bool read(const std::string& key, std::vector<char>& buf)
+    যৌক্তিক পঠ(ধ্রুবক std::string& চাবি, std::vector<অক্ষর>& buf)
     {
-        if (!f.is_open())
-            return false;
+        যদি (!f.is_open())
+            ফেরত মিথ্যা;
 
-        size_t fileSize = getFileSize();
-        if (fileSize == 0)
+        size_t file_আকার = get_File_আকার();
+        যদি (file_আকার == 0)
         {
-            CV_LOG_ERROR(NULL, "Invalid file (empty): " << fileName_);
+            CV_LOG_ERROR(ফাঁকা, "Invalid file (empty): " << fileName_);
             clearFile();
-            return false;
+            ফেরত মিথ্যা;
         }
         seekReadAbsolute(0);
 
         // bypass FileHeader
-        uint32_t fileSourceSignatureSize = readUInt32();
-        CV_Assert(fileSourceSignatureSize > 0);
-        seekReadRelative(fileSourceSignatureSize);
+        uint32_t file_Source_Signature_আকার = readUInt32();
+        CV_Assert(file_Source_Signature_আকার > 0);
+        seekReadRelative(file_Source_Signature_আকার);
 
-        uint32_t numberOfEntries = readUInt32();
-        CV_Assert(numberOfEntries > 0);
-        if (numberOfEntries != MAX_ENTRIES)
+        uint32_t সংখ্যা_Of_Entries = readUInt32();
+        CV_Assert(সংখ্যা_Of_Entries > 0);
+        যদি (সংখ্যা_Of_Entries != MAX_ENTRIES)
         {
-            CV_LOG_ERROR(NULL, "Invalid file: " << fileName_);
+            CV_LOG_ERROR(ফাঁকা, "Invalid file: " << fileName_);
             clearFile();
-            return false;
+            ফেরত মিথ্যা;
         }
-        f.read((char*)&entryOffsets[0], sizeof(entryOffsets));
+        f.পঠ((অক্ষর*)&entryOffsets[0], আকার(entryOffsets));
         CV_Assert(!f.fail());
 
-        uint32_t entryNum = getHash(key);
+        uint32_t entry_অঙ্ক = getHash(চাবি);
 
-        uint32_t entryOffset = entryOffsets[entryNum];
+        uint32_t entryOffset = entryOffsets[entry_অঙ্ক];
         FileEntry entry;
-        while (entryOffset > 0)
+        যখন (entryOffset > 0)
         {
             seekReadAbsolute(entryOffset);
             //CV_StaticAssert(sizeof(entry) == sizeof(uint32_t) * 3, "");
-            f.read((char*)&entry, sizeof(entry));
+            f.পঠ((অক্ষর*)&entry, আকার(entry));
             CV_Assert(!f.fail());
-            cv::AutoBuffer<char> fileKey(entry.keySize + 1);
-            if (key.size() == entry.keySize)
+            cv::Auto_বাফার<অক্ষর> file_চাবি(entry.চাবি_আকার + 1);
+            যদি (চাবি.size() == entry.চাবি_আকার)
             {
-                if (entry.keySize > 0)
+                যদি (entry.চাবি_আকার > 0)
                 {
-                    f.read(fileKey.data(), entry.keySize);
+                    f.পঠ(file_চাবি.তথ্য(), entry.চাবি_আকার);
                     CV_Assert(!f.fail());
                 }
-                if (memcmp(fileKey.data(), key.c_str(), entry.keySize) == 0)
+                যদি (memcmp(file_চাবি.তথ্য(), চাবি.c_str(), entry.চাবি_আকার) == 0)
                 {
-                    buf.resize(entry.dataSize);
-                    f.read(&buf[0], entry.dataSize);
+                    buf.resize(entry.তথ্য_আকার);
+                    f.পঠ(&buf[0], entry.তথ্য_আকার);
                     CV_Assert(!f.fail());
                     seekReadAbsolute(0);
-                    CV_LOG_VERBOSE(NULL, 0, "Read...");
-                    return true;
+                    CV_LOG_VERBOSE(ফাঁকা, 0, "Read...");
+                    ফেরত সত্য;
                 }
             }
-            if (entry.nextEntryFileOffset == 0)
-                break;
-            entryOffset = entry.nextEntryFileOffset;
+            যদি (entry.পরবর্তী_Entry_File_Offset == 0)
+                বিরতি;
+            entryOffset = entry.পরবর্তী_Entry_File_Offset;
         }
-        return false;
+        ফেরত মিথ্যা;
     }
 
-    bool write(const std::string& key, std::vector<char>& buf)
+    যৌক্তিক লিখ(ধ্রুবক std::string& চাবি, std::vector<অক্ষর>& buf)
     {
-        if (!f.is_open())
+        যদি (!f.is_open())
         {
             f.open(fileName_.c_str(), std::ios::in|std::ios::out|std::ios::binary);
-            if (!f.is_open())
+            যদি (!f.is_open())
             {
                 f.open(fileName_.c_str(), std::ios::out|std::ios::binary);
-                if (!f.is_open())
+                যদি (!f.is_open())
                 {
-                    CV_LOG_ERROR(NULL, "Can't create file: " << fileName_);
-                    return false;
+                    CV_LOG_ERROR(ফাঁকা, "Can't create file: " << fileName_);
+                    ফেরত মিথ্যা;
                 }
             }
         }
 
-        size_t fileSize = getFileSize();
-        if (fileSize == 0)
+        size_t file_আকার = get_File_আকার();
+        যদি (file_আকার == 0)
         {
             // Write header
             seekWriteAbsolute(0);
-            writeUInt32((uint32_t)sourceSignatureSize_);
-            f.write(sourceSignature_, sourceSignatureSize_);
+            writeUInt32((uint32_t)source_Signature_আকার_2);
+            f.লিখ(sourceSignature_, source_Signature_আকার_2);
             CV_Assert(!f.fail());
 
             writeUInt32(MAX_ENTRIES);
-            memset(entryOffsets, 0, sizeof(entryOffsets));
-            f.write((char*)entryOffsets, sizeof(entryOffsets));
+            memset(entryOffsets, 0, আকার(entryOffsets));
+            f.লিখ((অক্ষর*)entryOffsets, আকার(entryOffsets));
             CV_Assert(!f.fail());
             f.flush();
             CV_Assert(!f.fail());
             f.close();
             f.open(fileName_.c_str(), std::ios::in|std::ios::out|std::ios::binary);
             CV_Assert(f.is_open());
-            fileSize = getFileSize();
+            file_আকার = get_File_আকার();
         }
         seekReadAbsolute(0);
 
         // bypass FileHeader
-        uint32_t fileSourceSignatureSize = readUInt32();
-        CV_Assert(fileSourceSignatureSize == sourceSignatureSize_);
-        seekReadRelative(fileSourceSignatureSize);
+        uint32_t file_Source_Signature_আকার = readUInt32();
+        CV_Assert(file_Source_Signature_আকার == source_Signature_আকার_2);
+        seekReadRelative(file_Source_Signature_আকার);
 
-        uint32_t numberOfEntries = readUInt32();
-        CV_Assert(numberOfEntries > 0);
-        if (numberOfEntries != MAX_ENTRIES)
+        uint32_t সংখ্যা_Of_Entries = readUInt32();
+        CV_Assert(সংখ্যা_Of_Entries > 0);
+        যদি (সংখ্যা_Of_Entries != MAX_ENTRIES)
         {
-            CV_LOG_ERROR(NULL, "Invalid file: " << fileName_);
+            CV_LOG_ERROR(ফাঁকা, "Invalid file: " << fileName_);
             clearFile();
-            return false;
+            ফেরত মিথ্যা;
         }
         size_t tableEntriesOffset = (size_t)f.tellg();
-        f.read((char*)&entryOffsets[0], sizeof(entryOffsets));
+        f.পঠ((অক্ষর*)&entryOffsets[0], আকার(entryOffsets));
         CV_Assert(!f.fail());
 
-        uint32_t entryNum = getHash(key);
+        uint32_t entry_অঙ্ক = getHash(চাবি);
 
-        uint32_t entryOffset = entryOffsets[entryNum];
+        uint32_t entryOffset = entryOffsets[entry_অঙ্ক];
         FileEntry entry;
-        while (entryOffset > 0)
+        যখন (entryOffset > 0)
         {
             seekReadAbsolute(entryOffset);
             //CV_StaticAssert(sizeof(entry) == sizeof(uint32_t) * 3, "");
-            f.read((char*)&entry, sizeof(entry));
+            f.পঠ((অক্ষর*)&entry, আকার(entry));
             CV_Assert(!f.fail());
-            cv::AutoBuffer<char> fileKey(entry.keySize + 1);
-            if (key.size() == entry.keySize)
+            cv::Auto_বাফার<অক্ষর> file_চাবি(entry.চাবি_আকার + 1);
+            যদি (চাবি.size() == entry.চাবি_আকার)
             {
-                if (entry.keySize > 0)
+                যদি (entry.চাবি_আকার > 0)
                 {
-                    f.read(fileKey.data(), entry.keySize);
+                    f.পঠ(file_চাবি.তথ্য(), entry.চাবি_আকার);
                     CV_Assert(!f.fail());
                 }
-                if (0 == memcmp(fileKey.data(), key.c_str(), entry.keySize))
+                যদি (0 == memcmp(file_চাবি.তথ্য(), চাবি.c_str(), entry.চাবি_আকার))
                 {
                     // duplicate
-                    CV_LOG_VERBOSE(NULL, 0, "Duplicate key ignored: " << fileName_);
-                    return false;
+                    CV_LOG_VERBOSE(ফাঁকা, 0, "Duplicate key ignored: " << fileName_);
+                    ফেরত মিথ্যা;
                 }
             }
-            if (entry.nextEntryFileOffset == 0)
-                break;
-            entryOffset = entry.nextEntryFileOffset;
+            যদি (entry.পরবর্তী_Entry_File_Offset == 0)
+                বিরতি;
+            entryOffset = entry.পরবর্তী_Entry_File_Offset;
         }
         seekReadAbsolute(0);
-        if (entryOffset > 0)
+        যদি (entryOffset > 0)
         {
             seekWriteAbsolute(entryOffset);
-            entry.nextEntryFileOffset = (uint32_t)fileSize;
-            f.write((char*)&entry, sizeof(entry));
+            entry.পরবর্তী_Entry_File_Offset = (uint32_t)file_আকার;
+            f.লিখ((অক্ষর*)&entry, আকার(entry));
             CV_Assert(!f.fail());
         }
-        else
+        অন্যথা
         {
-            entryOffsets[entryNum] = (uint32_t)fileSize;
+            entryOffsets[entry_অঙ্ক] = (uint32_t)file_আকার;
             seekWriteAbsolute(tableEntriesOffset);
-            f.write((char*)entryOffsets, sizeof(entryOffsets));
+            f.লিখ((অক্ষর*)entryOffsets, আকার(entryOffsets));
             CV_Assert(!f.fail());
         }
-        seekWriteAbsolute(fileSize);
-        entry.nextEntryFileOffset = 0;
-        entry.dataSize = (uint32_t)buf.size();
-        entry.keySize = (uint32_t)key.size();
-        f.write((char*)&entry, sizeof(entry));
+        seekWriteAbsolute(file_আকার);
+        entry.পরবর্তী_Entry_File_Offset = 0;
+        entry.তথ্য_আকার = (uint32_t)buf.size();
+        entry.চাবি_আকার = (uint32_t)চাবি.size();
+        f.লিখ((অক্ষর*)&entry, আকার(entry));
         CV_Assert(!f.fail());
-        f.write(key.c_str(), entry.keySize);
+        f.লিখ(চাবি.c_str(), entry.চাবি_আকার);
         CV_Assert(!f.fail());
-        f.write(&buf[0], entry.dataSize);
+        f.লিখ(&buf[0], entry.তথ্য_আকার);
         CV_Assert(!f.fail());
         f.flush();
         CV_Assert(!f.fail());
-        CV_LOG_VERBOSE(NULL, 0, "Write... (" << buf.size() << " bytes)");
-        return true;
+        CV_LOG_VERBOSE(ফাঁকা, 0, "Write... (" << buf.size() << " bytes)");
+        ফেরত সত্য;
     }
 };
 #endif // OPENCV_HAVE_FILESYSTEM_SUPPORT
 
 
 
-struct OpenCLExecutionContext::Impl
+কাঠামো OpenCLExecutionContext::Impl
 {
     ocl::Context context_;
-    int device_;  // device index in context
+    পূর্ণসংখ্যা device_;  // device index in context
     ocl::Queue queue_;
-    int useOpenCL_;
+    পূর্ণসংখ্যা useOpenCL_;
 
-protected:
+সুরক্ষিত:
     Impl() = delete;
 
-    void _init_device(cl_device_id deviceID)
+    শূন্য _init_device(cl_device_id deviceID)
     {
         CV_Assert(deviceID);
-        int ndevices = (int)context_.ndevices();
+        পূর্ণসংখ্যা ndevices = (পূর্ণসংখ্যা)context_.ndevices();
         CV_Assert(ndevices > 0);
-        bool found = false;
-        for (int i = 0; i < ndevices; i++)
+        যৌক্তিক found = মিথ্যা;
+        জন্য (পূর্ণসংখ্যা i = 0; i < ndevices; i++)
         {
             ocl::Device d = context_.device(i);
             cl_device_id dhandle = (cl_device_id)d.ptr();
-            if (dhandle == deviceID)
+            যদি (dhandle == deviceID)
             {
                 device_ = i;
-                found = true;
-                break;
+                found = সত্য;
+                বিরতি;
             }
         }
         CV_Assert(found && "OpenCL device can't work with passed OpenCL context");
     }
 
-    void _init_device(const ocl::Device& device)
+    শূন্য _init_device(ধ্রুবক ocl::Device& device)
     {
         CV_Assert(device.ptr());
-        int ndevices = (int)context_.ndevices();
+        পূর্ণসংখ্যা ndevices = (পূর্ণসংখ্যা)context_.ndevices();
         CV_Assert(ndevices > 0);
-        bool found = false;
-        for (int i = 0; i < ndevices; i++)
+        যৌক্তিক found = মিথ্যা;
+        জন্য (পূর্ণসংখ্যা i = 0; i < ndevices; i++)
         {
             ocl::Device d = context_.device(i);
-            if (d.getImpl() == device.getImpl())
+            যদি (d.getImpl() == device.getImpl())
             {
                 device_ = i;
-                found = true;
-                break;
+                found = সত্য;
+                বিরতি;
             }
         }
         CV_Assert(found && "OpenCL device can't work with passed OpenCL context");
     }
 
-public:
+সর্বজনীন:
     Impl(cl_platform_id platformID, cl_context context, cl_device_id deviceID)
         : device_(0), useOpenCL_(-1)
     {
@@ -905,7 +905,7 @@ public:
         queue_ = Queue(context_, context_.device(device_));
     }
 
-    Impl(const ocl::Context& context, const ocl::Device& device, const ocl::Queue& queue)
+    Impl(ধ্রুবক ocl::Context& context, ধ্রুবক ocl::Device& device, ধ্রুবক ocl::Queue& queue)
         : device_(0), useOpenCL_(-1)
     {
         CV_Assert(context.ptr());
@@ -916,7 +916,7 @@ public:
         queue_ = queue;
     }
 
-    Impl(const ocl::Context& context, const ocl::Device& device)
+    Impl(ধ্রুবক ocl::Context& context, ধ্রুবক ocl::Device& device)
         : device_(0), useOpenCL_(-1)
     {
         CV_Assert(context.ptr());
@@ -927,7 +927,7 @@ public:
         queue_ = Queue(context_, context_.device(device_));
     }
 
-    Impl(const ocl::Context& context, const int device, const ocl::Queue& queue)
+    Impl(ধ্রুবক ocl::Context& context, ধ্রুবক পূর্ণসংখ্যা device, ধ্রুবক ocl::Queue& queue)
         : context_(context)
         , device_(device)
         , queue_(queue)
@@ -935,7 +935,7 @@ public:
     {
         // nothing
     }
-    Impl(const Impl& other)
+    Impl(ধ্রুবক Impl& other)
         : context_(other.context_)
         , device_(other.device_)
         , queue_(other.queue_)
@@ -944,121 +944,121 @@ public:
         // nothing
     }
 
-    inline bool useOpenCL() const { return const_cast<Impl*>(this)->useOpenCL(); }
-    bool useOpenCL()
+    অন্তঃরেখ যৌক্তিক useOpenCL() ধ্রুবক { ফেরত const_cast<Impl*>(এই)->useOpenCL(); }
+    যৌক্তিক useOpenCL()
     {
-        if (useOpenCL_ < 0)
+        যদি (useOpenCL_ < 0)
         {
-            try
+            চেষ্টা
             {
                 useOpenCL_ = 0;
-                if (!context_.empty() && context_.ndevices() > 0)
+                যদি (!context_.empty() && context_.ndevices() > 0)
                 {
-                    const Device& d = context_.device(device_);
+                    ধ্রুবক Device& d = context_.device(device_);
                     useOpenCL_ = d.available();
                 }
             }
-            catch (const cv::Exception&)
+            ধরো (ধ্রুবক cv::Exception&)
             {
                 // nothing
             }
-            if (!useOpenCL_)
-                CV_LOG_INFO(NULL, "OpenCL: can't use OpenCL execution context");
+            যদি (!useOpenCL_)
+                CV_LOG_INFO(ফাঁকা, "OpenCL: can't use OpenCL execution context");
         }
-        return useOpenCL_ > 0;
+        ফেরত useOpenCL_ > 0;
     }
 
-    void setUseOpenCL(bool flag)
+    শূন্য setUseOpenCL(যৌক্তিক flag)
     {
-        if (!flag)
+        যদি (!flag)
             useOpenCL_ = 0;
-        else
+        অন্যথা
             useOpenCL_ = -1;
     }
 
-    static const std::shared_ptr<Impl>& getInitializedExecutionContext()
+    স্থির ধ্রুবক std::shared_ptr<Impl>& getInitializedExecutionContext()
     {
         CV_TRACE_FUNCTION();
 
-        CV_LOG_INFO(NULL, "OpenCL: initializing thread execution context");
+        CV_LOG_INFO(ফাঁকা, "OpenCL: initializing thread execution context");
 
-        static bool initialized = false;
-        static std::shared_ptr<Impl> g_primaryExecutionContext;
+        স্থির যৌক্তিক initialized = মিথ্যা;
+        স্থির std::shared_ptr<Impl> g_primaryExecutionContext;
 
-        if (!initialized)
+        যদি (!initialized)
         {
             cv::AutoLock lock(getInitializationMutex());
-            if (!initialized)
+            যদি (!initialized)
             {
-                CV_LOG_INFO(NULL, "OpenCL: creating new execution context...");
-                try
+                CV_LOG_INFO(ফাঁকা, "OpenCL: creating new execution context...");
+                চেষ্টা
                 {
                     Context c = ocl::Context::create(std::string());
-                    if (c.ndevices())
+                    যদি (c.ndevices())
                     {
-                        int deviceId = 0;
+                        পূর্ণসংখ্যা deviceId = 0;
                         auto& d = c.device(deviceId);
-                        if (d.available())
+                        যদি (d.available())
                         {
                             auto q = ocl::Queue(c, d);
-                            if (!q.ptr())
+                            যদি (!q.ptr())
                             {
-                                CV_LOG_ERROR(NULL, "OpenCL: Can't create default OpenCL queue");
+                                CV_LOG_ERROR(ফাঁকা, "OpenCL: Can't create default OpenCL queue");
                             }
-                            else
+                            অন্যথা
                             {
                                 g_primaryExecutionContext = std::make_shared<Impl>(c, deviceId, q);
-                                CV_LOG_INFO(NULL, "OpenCL: device=" << d.name());
+                                CV_LOG_INFO(ফাঁকা, "OpenCL: device=" << d.name());
                             }
                         }
-                        else
+                        অন্যথা
                         {
-                            CV_LOG_ERROR(NULL, "OpenCL: OpenCL device is not available (CL_DEVICE_AVAILABLE returns false)");
+                            CV_LOG_ERROR(ফাঁকা, "OpenCL: OpenCL device is not available (CL_DEVICE_AVAILABLE returns false)");
                         }
                     }
-                    else
+                    অন্যথা
                     {
-                        CV_LOG_INFO(NULL, "OpenCL: context is not available/disabled");
+                        CV_LOG_INFO(ফাঁকা, "OpenCL: context is not available/disabled");
                     }
                 }
-                catch (const std::exception& e)
+                ধরো (ধ্রুবক std::exception& e)
                 {
-                    CV_LOG_INFO(NULL, "OpenCL: Can't initialize OpenCL context/device/queue: " << e.what());
+                    CV_LOG_INFO(ফাঁকা, "OpenCL: Can't initialize OpenCL context/device/queue: " << e.what());
                 }
-                catch (...)
+                ধরো (...)
                 {
-                    CV_LOG_WARNING(NULL, "OpenCL: Can't initialize OpenCL context/device/queue: unknown C++ exception");
+                    CV_LOG_WARNING(ফাঁকা, "OpenCL: Can't initialize OpenCL context/device/queue: unknown C++ exception");
                 }
-                initialized = true;
+                initialized = সত্য;
             }
         }
-        return g_primaryExecutionContext;
+        ফেরত g_primaryExecutionContext;
     }
 };
 
-Context& OpenCLExecutionContext::getContext() const
+Context& OpenCLExecutionContext::getContext() ধ্রুবক
 {
     CV_Assert(p);
-    return p->context_;
+    ফেরত p->context_;
 }
-Device& OpenCLExecutionContext::getDevice() const
+Device& OpenCLExecutionContext::getDevice() ধ্রুবক
 {
     CV_Assert(p);
-    return p->context_.device(p->device_);
+    ফেরত p->context_.device(p->device_);
 }
-Queue& OpenCLExecutionContext::getQueue() const
+Queue& OpenCLExecutionContext::getQueue() ধ্রুবক
 {
     CV_Assert(p);
-    return p->queue_;
+    ফেরত p->queue_;
 }
 
-bool OpenCLExecutionContext::useOpenCL() const
+যৌক্তিক OpenCLExecutionContext::useOpenCL() ধ্রুবক
 {
-    if (p)
-        return p->useOpenCL();
-    return false;
+    যদি (p)
+        ফেরত p->useOpenCL();
+    ফেরত মিথ্যা;
 }
-void OpenCLExecutionContext::setUseOpenCL(bool flag)
+শূন্য OpenCLExecutionContext::setUseOpenCL(যৌক্তিক flag)
 {
     CV_Assert(p);
     p->setUseOpenCL(flag);
@@ -1068,60 +1068,60 @@ void OpenCLExecutionContext::setUseOpenCL(bool flag)
 OpenCLExecutionContext& OpenCLExecutionContext::getCurrent()
 {
     CV_TRACE_FUNCTION();
-    CoreTLSData& data = getCoreTlsData();
-    OpenCLExecutionContext& c = data.oclExecutionContext;
-    if (!data.oclExecutionContextInitialized)
+    CoreTLSData& তথ্য = get_Core_Tls_তথ্য();
+    OpenCLExecutionContext& c = তথ্য.oclExecutionContext;
+    যদি (!তথ্য.oclExecutionContextInitialized)
     {
-        data.oclExecutionContextInitialized = true;
-        if (c.empty() && haveOpenCL())
+        তথ্য.oclExecutionContextInitialized = সত্য;
+        যদি (c.empty() && haveOpenCL())
             c.p = Impl::getInitializedExecutionContext();
     }
-    return c;
+    ফেরত c;
 }
 
 /* static */
 OpenCLExecutionContext& OpenCLExecutionContext::getCurrentRef()
 {
     CV_TRACE_FUNCTION();
-    CoreTLSData& data = getCoreTlsData();
-    OpenCLExecutionContext& c = data.oclExecutionContext;
-    return c;
+    CoreTLSData& তথ্য = get_Core_Tls_তথ্য();
+    OpenCLExecutionContext& c = তথ্য.oclExecutionContext;
+    ফেরত c;
 }
 
-void OpenCLExecutionContext::bind() const
+শূন্য OpenCLExecutionContext::bind() ধ্রুবক
 {
     CV_TRACE_FUNCTION();
     CV_Assert(p);
-    CoreTLSData& data = getCoreTlsData();
-    data.oclExecutionContext = *this;
-    data.oclExecutionContextInitialized = true;
-    data.useOpenCL = p->useOpenCL_;  // propagate "-1", avoid call useOpenCL()
+    CoreTLSData& তথ্য = get_Core_Tls_তথ্য();
+    তথ্য.oclExecutionContext = *এই;
+    তথ্য.oclExecutionContextInitialized = সত্য;
+    তথ্য.useOpenCL = p->useOpenCL_;  // propagate "-1", avoid call useOpenCL()
 }
 
 
-OpenCLExecutionContext OpenCLExecutionContext::cloneWithNewQueue() const
+OpenCLExecutionContext OpenCLExecutionContext::cloneWithNewQueue() ধ্রুবক
 {
     CV_TRACE_FUNCTION();
     CV_Assert(p);
-    const Queue q(getContext(), getDevice());
-    return cloneWithNewQueue(q);
+    ধ্রুবক Queue q(getContext(), getDevice());
+    ফেরত cloneWithNewQueue(q);
 }
 
-OpenCLExecutionContext OpenCLExecutionContext::cloneWithNewQueue(const ocl::Queue& q) const
+OpenCLExecutionContext OpenCLExecutionContext::cloneWithNewQueue(ধ্রুবক ocl::Queue& q) ধ্রুবক
 {
     CV_TRACE_FUNCTION();
     CV_Assert(p);
-    CV_Assert(q.ptr() != NULL);
+    CV_Assert(q.ptr() != ফাঁকা);
     OpenCLExecutionContext c;
     c.p = std::make_shared<Impl>(p->context_, p->device_, q);
-    return c;
+    ফেরত c;
 }
 
 /* static */
-OpenCLExecutionContext OpenCLExecutionContext::create(const Context& context, const Device& device, const ocl::Queue& queue)
+OpenCLExecutionContext OpenCLExecutionContext::create(ধ্রুবক Context& context, ধ্রুবক Device& device, ধ্রুবক ocl::Queue& queue)
 {
     CV_TRACE_FUNCTION();
-    if (!haveOpenCL())
+    যদি (!haveOpenCL())
         CV_Error(cv::Error::OpenCLApiCallError, "OpenCL runtime is not available!");
 
     CV_Assert(!context.empty());
@@ -1130,15 +1130,15 @@ OpenCLExecutionContext OpenCLExecutionContext::create(const Context& context, co
     CV_Assert(device.ptr());
     OpenCLExecutionContext ctx;
     ctx.p = std::make_shared<OpenCLExecutionContext::Impl>(context, device, queue);
-    return ctx;
+    ফেরত ctx;
 
 }
 
 /* static */
-OpenCLExecutionContext OpenCLExecutionContext::create(const Context& context, const Device& device)
+OpenCLExecutionContext OpenCLExecutionContext::create(ধ্রুবক Context& context, ধ্রুবক Device& device)
 {
     CV_TRACE_FUNCTION();
-    if (!haveOpenCL())
+    যদি (!haveOpenCL())
         CV_Error(cv::Error::OpenCLApiCallError, "OpenCL runtime is not available!");
 
     CV_Assert(!context.empty());
@@ -1147,11 +1147,11 @@ OpenCLExecutionContext OpenCLExecutionContext::create(const Context& context, co
     CV_Assert(device.ptr());
     OpenCLExecutionContext ctx;
     ctx.p = std::make_shared<OpenCLExecutionContext::Impl>(context, device);
-    return ctx;
+    ফেরত ctx;
 
 }
 
-void OpenCLExecutionContext::release()
+শূন্য OpenCLExecutionContext::release()
 {
     CV_TRACE_FUNCTION();
     p.reset();
@@ -1160,91 +1160,91 @@ void OpenCLExecutionContext::release()
 
 
 // true if we have initialized OpenCL subsystem with available platforms
-static bool g_isOpenCLInitialized = false;
-static bool g_isOpenCLAvailable = false;
+স্থির যৌক্তিক g_isOpenCLInitialized = মিথ্যা;
+স্থির যৌক্তিক g_isOpenCLAvailable = মিথ্যা;
 
-bool haveOpenCL()
+যৌক্তিক haveOpenCL()
 {
     CV_TRACE_FUNCTION();
 
-    if (!g_isOpenCLInitialized)
+    যদি (!g_isOpenCLInitialized)
     {
         CV_TRACE_REGION("Init_OpenCL_Runtime");
         std::string envPath = utils::getConfigurationParameterString("OPENCV_OPENCL_RUNTIME");
-        if (!envPath.empty())
+        যদি (!envPath.empty())
         {
-            if (envPath == "disabled")
+            যদি (envPath == "disabled")
             {
-                g_isOpenCLAvailable = false;
-                g_isOpenCLInitialized = true;
-                return false;
+                g_isOpenCLAvailable = মিথ্যা;
+                g_isOpenCLInitialized = সত্য;
+                ফেরত মিথ্যা;
             }
         }
 
         cv::AutoLock lock(getInitializationMutex());
-        CV_LOG_INFO(NULL, "Initialize OpenCL runtime...");
-        try
+        CV_LOG_INFO(ফাঁকা, "Initialize OpenCL runtime...");
+        চেষ্টা
         {
             cl_uint n = 0;
-            g_isOpenCLAvailable = ::clGetPlatformIDs(0, NULL, &n) == CL_SUCCESS;
+            g_isOpenCLAvailable = ::clGetPlatformIDs(0, ফাঁকা, &n) == CL_SUCCESS;
             g_isOpenCLAvailable &= n > 0;
-            CV_LOG_INFO(NULL, "OpenCL: found " << n << " platforms");
+            CV_LOG_INFO(ফাঁকা, "OpenCL: found " << n << " platforms");
         }
-        catch (...)
+        ধরো (...)
         {
-            g_isOpenCLAvailable = false;
+            g_isOpenCLAvailable = মিথ্যা;
         }
-        g_isOpenCLInitialized = true;
+        g_isOpenCLInitialized = সত্য;
     }
-    return g_isOpenCLAvailable;
+    ফেরত g_isOpenCLAvailable;
 }
 
-bool useOpenCL()
+যৌক্তিক useOpenCL()
 {
-    CoreTLSData& data = getCoreTlsData();
-    if (data.useOpenCL < 0)
+    CoreTLSData& তথ্য = get_Core_Tls_তথ্য();
+    যদি (তথ্য.useOpenCL < 0)
     {
-        try
+        চেষ্টা
         {
-            data.useOpenCL = 0;
-            if (haveOpenCL())
+            তথ্য.useOpenCL = 0;
+            যদি (haveOpenCL())
             {
                 auto c = OpenCLExecutionContext::getCurrent();
-                data.useOpenCL = c.useOpenCL();
+                তথ্য.useOpenCL = c.useOpenCL();
             }
         }
-        catch (...)
+        ধরো (...)
         {
-            CV_LOG_INFO(NULL, "OpenCL: can't initialize thread OpenCL execution context");
+            CV_LOG_INFO(ফাঁকা, "OpenCL: can't initialize thread OpenCL execution context");
         }
     }
-    return data.useOpenCL > 0;
+    ফেরত তথ্য.useOpenCL > 0;
 }
 
-bool isOpenCLActivated()
+যৌক্তিক isOpenCLActivated()
 {
-    if (!g_isOpenCLAvailable)
-        return false; // prevent unnecessary OpenCL activation via useOpenCL()->haveOpenCL() calls
-    return useOpenCL();
+    যদি (!g_isOpenCLAvailable)
+        ফেরত মিথ্যা; // prevent unnecessary OpenCL activation via useOpenCL()->haveOpenCL() calls
+    ফেরত useOpenCL();
 }
 
-void setUseOpenCL(bool flag)
+শূন্য setUseOpenCL(যৌক্তিক flag)
 {
     CV_TRACE_FUNCTION();
 
-    CoreTLSData& data = getCoreTlsData();
+    CoreTLSData& তথ্য = get_Core_Tls_তথ্য();
     auto& c = OpenCLExecutionContext::getCurrentRef();
-    if (!c.empty())
+    যদি (!c.empty())
     {
         c.setUseOpenCL(flag);
-        data.useOpenCL = c.useOpenCL();
+        তথ্য.useOpenCL = c.useOpenCL();
     }
-    else
+    অন্যথা
     {
-        if (!flag)
-            data.useOpenCL = 0;
-        else
-            data.useOpenCL = -1; // enabled by default (if context is not initialized)
+        যদি (!flag)
+            তথ্য.useOpenCL = 0;
+        অন্যথা
+            তথ্য.useOpenCL = -1; // enabled by default (if context is not initialized)
     }
 }
 
@@ -1252,17 +1252,17 @@ void setUseOpenCL(bool flag)
 
 #ifdef HAVE_CLAMDBLAS
 
-class AmdBlasHelper
+শ্রেণী AmdBlasHelper
 {
-public:
-    static AmdBlasHelper & getInstance()
+সর্বজনীন:
+    স্থির AmdBlasHelper & getInstance()
     {
-        CV_SINGLETON_LAZY_INIT_REF(AmdBlasHelper, new AmdBlasHelper())
+        CV_SINGLETON_LAZY_INIT_REF(AmdBlasHelper, নতুন AmdBlasHelper())
     }
 
-    bool isAvailable() const
+    যৌক্তিক isAvailable() ধ্রুবক
     {
-        return g_isAmdBlasAvailable;
+        ফেরত g_isAmdBlasAvailable;
     }
 
     ~AmdBlasHelper()
@@ -1276,69 +1276,69 @@ public:
         catch (...) { }*/
     }
 
-protected:
+সুরক্ষিত:
     AmdBlasHelper()
     {
-        if (!g_isAmdBlasInitialized)
+        যদি (!g_isAmdBlasInitialized)
         {
             AutoLock lock(getInitializationMutex());
 
-            if (!g_isAmdBlasInitialized)
+            যদি (!g_isAmdBlasInitialized)
             {
-                if (haveOpenCL())
+                যদি (haveOpenCL())
                 {
-                    try
+                    চেষ্টা
                     {
                         g_isAmdBlasAvailable = clblasSetup() == clblasSuccess;
                     }
-                    catch (...)
+                    ধরো (...)
                     {
-                        g_isAmdBlasAvailable = false;
+                        g_isAmdBlasAvailable = মিথ্যা;
                     }
                 }
-                else
-                    g_isAmdBlasAvailable = false;
+                অন্যথা
+                    g_isAmdBlasAvailable = মিথ্যা;
 
-                g_isAmdBlasInitialized = true;
+                g_isAmdBlasInitialized = সত্য;
             }
         }
     }
 
-private:
-    static bool g_isAmdBlasInitialized;
-    static bool g_isAmdBlasAvailable;
+ব্যক্তিগত:
+    স্থির যৌক্তিক g_isAmdBlasInitialized;
+    স্থির যৌক্তিক g_isAmdBlasAvailable;
 };
 
-bool AmdBlasHelper::g_isAmdBlasAvailable = false;
-bool AmdBlasHelper::g_isAmdBlasInitialized = false;
+যৌক্তিক AmdBlasHelper::g_isAmdBlasAvailable = মিথ্যা;
+যৌক্তিক AmdBlasHelper::g_isAmdBlasInitialized = মিথ্যা;
 
-bool haveAmdBlas()
+যৌক্তিক haveAmdBlas()
 {
-    return AmdBlasHelper::getInstance().isAvailable();
+    ফেরত AmdBlasHelper::getInstance().isAvailable();
 }
 
-#else
+#অন্যথা
 
-bool haveAmdBlas()
+যৌক্তিক haveAmdBlas()
 {
-    return false;
+    ফেরত মিথ্যা;
 }
 
 #endif
 
 #ifdef HAVE_CLAMDFFT
 
-class AmdFftHelper
+শ্রেণী AmdFftHelper
 {
-public:
-    static AmdFftHelper & getInstance()
+সর্বজনীন:
+    স্থির AmdFftHelper & getInstance()
     {
-        CV_SINGLETON_LAZY_INIT_REF(AmdFftHelper, new AmdFftHelper())
+        CV_SINGLETON_LAZY_INIT_REF(AmdFftHelper, নতুন AmdFftHelper())
     }
 
-    bool isAvailable() const
+    যৌক্তিক isAvailable() ধ্রুবক
     {
-        return g_isAmdFftAvailable;
+        ফেরত g_isAmdFftAvailable;
     }
 
     ~AmdFftHelper()
@@ -1352,108 +1352,108 @@ public:
         catch (...) { }*/
     }
 
-protected:
+সুরক্ষিত:
     AmdFftHelper()
     {
-        if (!g_isAmdFftInitialized)
+        যদি (!g_isAmdFftInitialized)
         {
             AutoLock lock(getInitializationMutex());
 
-            if (!g_isAmdFftInitialized)
+            যদি (!g_isAmdFftInitialized)
             {
-                if (haveOpenCL())
+                যদি (haveOpenCL())
                 {
-                    try
+                    চেষ্টা
                     {
                         cl_uint major, minor, patch;
-                        CV_Assert(clfftInitSetupData(&setupData) == CLFFT_SUCCESS);
+                        CV_Assert(clfft_Init_Setup_তথ্য(&setup_তথ্য) == CLFFT_SUCCESS);
 
                         // it throws exception in case AmdFft binaries are not found
                         CV_Assert(clfftGetVersion(&major, &minor, &patch) == CLFFT_SUCCESS);
-                        g_isAmdFftAvailable = true;
+                        g_isAmdFftAvailable = সত্য;
                     }
-                    catch (const Exception &)
+                    ধরো (ধ্রুবক Exception &)
                     {
-                        g_isAmdFftAvailable = false;
+                        g_isAmdFftAvailable = মিথ্যা;
                     }
                 }
-                else
-                    g_isAmdFftAvailable = false;
+                অন্যথা
+                    g_isAmdFftAvailable = মিথ্যা;
 
-                g_isAmdFftInitialized = true;
+                g_isAmdFftInitialized = সত্য;
             }
         }
     }
 
-private:
-    static clfftSetupData setupData;
-    static bool g_isAmdFftInitialized;
-    static bool g_isAmdFftAvailable;
+ব্যক্তিগত:
+    স্থির clfft_Setup_তথ্য setup_তথ্য;
+    স্থির যৌক্তিক g_isAmdFftInitialized;
+    স্থির যৌক্তিক g_isAmdFftAvailable;
 };
 
-clfftSetupData AmdFftHelper::setupData;
-bool AmdFftHelper::g_isAmdFftAvailable = false;
-bool AmdFftHelper::g_isAmdFftInitialized = false;
+clfft_Setup_তথ্য AmdFftHelper::setup_তথ্য;
+যৌক্তিক AmdFftHelper::g_isAmdFftAvailable = মিথ্যা;
+যৌক্তিক AmdFftHelper::g_isAmdFftInitialized = মিথ্যা;
 
-bool haveAmdFft()
+যৌক্তিক haveAmdFft()
 {
-    return AmdFftHelper::getInstance().isAvailable();
+    ফেরত AmdFftHelper::getInstance().isAvailable();
 }
 
-#else
+#অন্যথা
 
-bool haveAmdFft()
+যৌক্তিক haveAmdFft()
 {
-    return false;
+    ফেরত মিথ্যা;
 }
 
 #endif
 
-bool haveSVM()
+যৌক্তিক haveSVM()
 {
 #ifdef HAVE_OPENCL_SVM
-    return true;
-#else
-    return false;
+    ফেরত সত্য;
+#অন্যথা
+    ফেরত মিথ্যা;
 #endif
 }
 
-void finish()
+শূন্য finish()
 {
     Queue::getDefault().finish();
 }
 
 /////////////////////////////////////////// Platform /////////////////////////////////////////////
 
-struct Platform::Impl
+কাঠামো Platform::Impl
 {
     Impl()
     {
         refcount = 1;
         handle = 0;
-        initialized = false;
+        initialized = মিথ্যা;
     }
 
     ~Impl() {}
 
-    void init()
+    শূন্য init()
     {
-        if( !initialized )
+        যদি( !initialized )
         {
             //cl_uint num_entries
             cl_uint n = 0;
-            if( clGetPlatformIDs(1, &handle, &n) != CL_SUCCESS || n == 0 )
+            যদি( clGetPlatformIDs(1, &handle, &n) != CL_SUCCESS || n == 0 )
                 handle = 0;
-            if( handle != 0 )
+            যদি( handle != 0 )
             {
-                char buf[1000];
+                অক্ষর buf[1000];
                 size_t len = 0;
-                CV_OCL_DBG_CHECK(clGetPlatformInfo(handle, CL_PLATFORM_VENDOR, sizeof(buf), buf, &len));
+                CV_OCL_DBG_CHECK(clGetPlatformInfo(handle, CL_PLATFORM_VENDOR, আকার(buf), buf, &len));
                 buf[len] = '\0';
                 vendor = String(buf);
             }
 
-            initialized = true;
+            initialized = সত্য;
         }
     }
 
@@ -1461,7 +1461,7 @@ struct Platform::Impl
 
     cl_platform_id handle;
     String vendor;
-    bool initialized;
+    যৌক্তিক initialized;
 };
 
 Platform::Platform() CV_NOEXCEPT
@@ -1471,26 +1471,26 @@ Platform::Platform() CV_NOEXCEPT
 
 Platform::~Platform()
 {
-    if(p)
+    যদি(p)
         p->release();
 }
 
-Platform::Platform(const Platform& pl)
+Platform::Platform(ধ্রুবক Platform& pl)
 {
     p = (Impl*)pl.p;
-    if(p)
+    যদি(p)
         p->addref();
 }
 
-Platform& Platform::operator = (const Platform& pl)
+Platform& Platform::operator = (ধ্রুবক Platform& pl)
 {
     Impl* newp = (Impl*)pl.p;
-    if(newp)
+    যদি(newp)
         newp->addref();
-    if(p)
+    যদি(p)
         p->release();
     p = newp;
-    return *this;
+    ফেরত *এই;
 }
 
 Platform::Platform(Platform&& pl) CV_NOEXCEPT
@@ -1501,30 +1501,30 @@ Platform::Platform(Platform&& pl) CV_NOEXCEPT
 
 Platform& Platform::operator = (Platform&& pl) CV_NOEXCEPT
 {
-    if (this != &pl) {
-        if(p)
+    যদি (এই != &pl) {
+        যদি(p)
             p->release();
         p = pl.p;
         pl.p = nullptr;
     }
-    return *this;
+    ফেরত *এই;
 }
 
-void* Platform::ptr() const
+শূন্য* Platform::ptr() ধ্রুবক
 {
-    return p ? p->handle : 0;
+    ফেরত p ? p->handle : 0;
 }
 
 Platform& Platform::getDefault()
 {
-    CV_LOG_ONCE_WARNING(NULL, "OpenCL: Platform::getDefault() is deprecated and will be removed. Use cv::ocl::getPlatfomsInfo() for enumeration of available platforms");
-    static Platform p;
-    if( !p.p )
+    CV_LOG_ONCE_WARNING(ফাঁকা, "OpenCL: Platform::getDefault() is deprecated and will be removed. Use cv::ocl::getPlatfomsInfo() for enumeration of available platforms");
+    স্থির Platform p;
+    যদি( !p.p )
     {
-        p.p = new Impl;
+        p.p = নতুন Impl;
         p.p->init();
     }
-    return p;
+    ফেরত p;
 }
 
 /////////////////////////////////////// Device ////////////////////////////////////////////
@@ -1536,67 +1536,67 @@ Platform& Platform::getDefault()
 //   http://www.khronos.org/registry/cl/sdk/1.2/docs/man/xhtml/clGetDeviceInfo.html
 //   https://www.khronos.org/registry/OpenCL/sdk/1.1/docs/man/xhtml/clGetPlatformInfo.html
 //   https://www.khronos.org/registry/OpenCL/sdk/1.2/docs/man/xhtml/clGetPlatformInfo.html
-static void parseOpenCLVersion(const String &version, int &major, int &minor)
+স্থির শূন্য parseOpenCLVersion(ধ্রুবক String &version, পূর্ণসংখ্যা &major, পূর্ণসংখ্যা &minor)
 {
     major = minor = 0;
-    if (10 >= version.length())
-        return;
-    const char *pstr = version.c_str();
-    if (0 != strncmp(pstr, "OpenCL ", 7))
-        return;
+    যদি (10 >= version.length())
+        ফেরত;
+    ধ্রুবক অক্ষর *pstr = version.c_str();
+    যদি (0 != strncmp(pstr, "OpenCL ", 7))
+        ফেরত;
     size_t ppos = version.find('.', 7);
-    if (String::npos == ppos)
-        return;
-    String temp = version.substr(7, ppos - 7);
-    major = atoi(temp.c_str());
-    temp = version.substr(ppos + 1);
-    minor = atoi(temp.c_str());
+    যদি (String::npos == ppos)
+        ফেরত;
+    String অস্থায়ী_2 = version.substr(7, ppos - 7);
+    major = atoi(অস্থায়ী_2.c_str());
+    অস্থায়ী_2 = version.substr(ppos + 1);
+    minor = atoi(অস্থায়ী_2.c_str());
 }
 
-struct Device::Impl
+কাঠামো Device::Impl
 {
-    Impl(void* d)
+    Impl(শূন্য* d)
         : refcount(1)
         , handle(0)
     {
-        try
+        চেষ্টা
         {
             cl_device_id device = (cl_device_id)d;
             _init(device);
             CV_OCL_CHECK(clRetainDevice(device));  // increment reference counter on success only
         }
-        catch (...)
+        ধরো (...)
         {
-            throw;
+            ছোড়ো;
         }
     }
 
-    void _init(cl_device_id d)
+    শূন্য _init(cl_device_id d)
     {
         handle = (cl_device_id)d;
 
         name_ = getStrProp(CL_DEVICE_NAME);
         version_ = getStrProp(CL_DEVICE_VERSION);
         extensions_ = getStrProp(CL_DEVICE_EXTENSIONS);
-        doubleFPConfig_ = getProp<cl_device_fp_config, int>(CL_DEVICE_DOUBLE_FP_CONFIG);
-        halfFPConfig_ = getProp<cl_device_fp_config, int>(CL_DEVICE_HALF_FP_CONFIG);
+        doubleFPConfig_ = getProp<cl_device_fp_config, পূর্ণসংখ্যা>(CL_DEVICE_DOUBLE_FP_CONFIG);
+        halfFPConfig_ = getProp<cl_device_fp_config, পূর্ণসংখ্যা>(CL_DEVICE_HALF_FP_CONFIG);
         hostUnifiedMemory_ = getBoolProp(CL_DEVICE_HOST_UNIFIED_MEMORY);
-        maxComputeUnits_ = getProp<cl_uint, int>(CL_DEVICE_MAX_COMPUTE_UNITS);
-        maxWorkGroupSize_ = getProp<size_t, size_t>(CL_DEVICE_MAX_WORK_GROUP_SIZE);
-        type_ = getProp<cl_device_type, int>(CL_DEVICE_TYPE);
+        maxComputeUnits_ = getProp<cl_uint, পূর্ণসংখ্যা>(CL_DEVICE_MAX_COMPUTE_UNITS);
+        max_Work_Group_আকার_2 = getProp<size_t, size_t>(CL_DEVICE_MAX_WORK_GROUP_আকার);
+        type_ = getProp<cl_device_type, পূর্ণসংখ্যা>(CL_DEVICE_TYPE);
         driverVersion_ = getStrProp(CL_DRIVER_VERSION);
-        addressBits_ = getProp<cl_uint, int>(CL_DEVICE_ADDRESS_BITS);
+        addressBits_ = getProp<cl_uint, পূর্ণসংখ্যা>(CL_DEVICE_ADDRESS_BITS);
 
         String deviceVersion_ = getStrProp(CL_DEVICE_VERSION);
         parseOpenCLVersion(deviceVersion_, deviceVersionMajor_, deviceVersionMinor_);
 
         size_t pos = 0;
-        while (pos < extensions_.size())
+        যখন (pos < extensions_.size())
         {
             size_t pos2 = extensions_.find(' ', pos);
-            if (pos2 == String::npos)
+            যদি (pos2 == String::npos)
                 pos2 = extensions_.size();
-            if (pos2 > pos)
+            যদি (pos2 > pos)
             {
                 std::string extensionName = extensions_.substr(pos, pos2 - pos);
                 extensions_set_.insert(extensionName);
@@ -1610,26 +1610,26 @@ struct Device::Impl
         intelSubgroupsSupport_ = isExtensionSupported("cl_intel_subgroups");
 
         vendorName_ = getStrProp(CL_DEVICE_VENDOR);
-        if (vendorName_ == "Advanced Micro Devices, Inc." ||
+        যদি (vendorName_ == "Advanced Micro Devices, Inc." ||
             vendorName_ == "AMD")
             vendorID_ = VENDOR_AMD;
-        else if (vendorName_ == "Intel(R) Corporation" || vendorName_ == "Intel" || vendorName_ == "Intel Inc." || strstr(name_.c_str(), "Iris") != 0)
+        অন্যথা যদি (vendorName_ == "Intel(R) Corporation" || vendorName_ == "Intel" || vendorName_ == "Intel Inc." || strstr(name_.c_str(), "Iris") != 0)
             vendorID_ = VENDOR_INTEL;
-        else if (vendorName_ == "NVIDIA Corporation")
+        অন্যথা যদি (vendorName_ == "NVIDIA Corporation")
             vendorID_ = VENDOR_NVIDIA;
-        else
+        অন্যথা
             vendorID_ = UNKNOWN_VENDOR;
 
-        const size_t CV_OPENCL_DEVICE_MAX_WORK_GROUP_SIZE = utils::getConfigurationParameterSizeT("OPENCV_OPENCL_DEVICE_MAX_WORK_GROUP_SIZE", 0);
-        if (CV_OPENCL_DEVICE_MAX_WORK_GROUP_SIZE > 0)
+        ধ্রুবক size_t CV_OPENCL_DEVICE_MAX_WORK_GROUP_আকার = utils::get_Configuration_Parameter_আকার_T("OPENCV_OPENCL_DEVICE_MAX_WORK_GROUP_SIZE", 0);
+        যদি (CV_OPENCL_DEVICE_MAX_WORK_GROUP_আকার > 0)
         {
-            const size_t new_maxWorkGroupSize = std::min(maxWorkGroupSize_, CV_OPENCL_DEVICE_MAX_WORK_GROUP_SIZE);
-            if (new_maxWorkGroupSize != maxWorkGroupSize_)
-                CV_LOG_WARNING(NULL, "OpenCL: using workgroup size: " << new_maxWorkGroupSize << " (was " << maxWorkGroupSize_ << ")");
-            maxWorkGroupSize_ = new_maxWorkGroupSize;
+            ধ্রুবক size_t new_max_Work_Group_আকার = std::min(max_Work_Group_আকার_2, CV_OPENCL_DEVICE_MAX_WORK_GROUP_আকার);
+            যদি (new_max_Work_Group_আকার != max_Work_Group_আকার_2)
+                CV_LOG_WARNING(ফাঁকা, "OpenCL: using workgroup size: " << new_max_Work_Group_আকার << " (was " << max_Work_Group_আকার_2 << ")");
+            max_Work_Group_আকার_2 = new_max_Work_Group_আকার;
         }
-#if 0
-        if (isExtensionSupported("cl_khr_spir"))
+#যদি 0
+        যদি (isExtensionSupported("cl_khr_spir"))
         {
 #ifndef CL_DEVICE_SPIR_VERSIONS
 #define CL_DEVICE_SPIR_VERSIONS                     0x40E0
@@ -1643,10 +1643,10 @@ struct Device::Impl
     ~Impl()
     {
 #ifdef _WIN32
-        if (!cv::__termination)
+        যদি (!cv::__termination)
 #endif
         {
-            if (handle)
+            যদি (handle)
             {
                 CV_OCL_CHECK(clReleaseDevice(handle));
                 handle = 0;
@@ -1655,35 +1655,35 @@ struct Device::Impl
     }
 
     template<typename _TpCL, typename _TpOut>
-    _TpOut getProp(cl_device_info prop) const
+    _TpOut getProp(cl_device_info prop) ধ্রুবক
     {
-        _TpCL temp=_TpCL();
+        _TpCL অস্থায়ী_2=_TpCL();
         size_t sz = 0;
 
-        return clGetDeviceInfo(handle, prop, sizeof(temp), &temp, &sz) == CL_SUCCESS &&
-            sz == sizeof(temp) ? _TpOut(temp) : _TpOut();
+        ফেরত clGetDeviceInfo(handle, prop, আকার(অস্থায়ী_2), &অস্থায়ী_2, &sz) == CL_SUCCESS &&
+            sz == আকার(অস্থায়ী_2) ? _TpOut(অস্থায়ী_2) : _TpOut();
     }
 
-    bool getBoolProp(cl_device_info prop) const
+    যৌক্তিক getBoolProp(cl_device_info prop) ধ্রুবক
     {
-        cl_bool temp = CL_FALSE;
+        cl_bool অস্থায়ী_2 = CL_FALSE;
         size_t sz = 0;
 
-        return clGetDeviceInfo(handle, prop, sizeof(temp), &temp, &sz) == CL_SUCCESS &&
-            sz == sizeof(temp) ? temp != 0 : false;
+        ফেরত clGetDeviceInfo(handle, prop, আকার(অস্থায়ী_2), &অস্থায়ী_2, &sz) == CL_SUCCESS &&
+            sz == আকার(অস্থায়ী_2) ? অস্থায়ী_2 != 0 : মিথ্যা;
     }
 
-    String getStrProp(cl_device_info prop) const
+    String getStrProp(cl_device_info prop) ধ্রুবক
     {
-        char buf[4096];
+        অক্ষর buf[4096];
         size_t sz=0;
-        return clGetDeviceInfo(handle, prop, sizeof(buf)-16, buf, &sz) == CL_SUCCESS &&
-            sz < sizeof(buf) ? String(buf) : String();
+        ফেরত clGetDeviceInfo(handle, prop, আকার(buf)-16, buf, &sz) == CL_SUCCESS &&
+            sz < আকার(buf) ? String(buf) : String();
     }
 
-    bool isExtensionSupported(const std::string& extensionName) const
+    যৌক্তিক isExtensionSupported(ধ্রুবক std::string& extensionName) ধ্রুবক
     {
-        return extensions_set_.count(extensionName) > 0;
+        ফেরত extensions_set_.গুনতি_2(extensionName) > 0;
     }
 
 
@@ -1694,21 +1694,21 @@ struct Device::Impl
     String name_;
     String version_;
     std::string extensions_;
-    int doubleFPConfig_;
-    bool khr_fp64_support_;
-    int halfFPConfig_;
-    bool khr_fp16_support_;
-    bool hostUnifiedMemory_;
-    int maxComputeUnits_;
-    size_t maxWorkGroupSize_;
-    int type_;
-    int addressBits_;
-    int deviceVersionMajor_;
-    int deviceVersionMinor_;
+    পূর্ণসংখ্যা doubleFPConfig_;
+    যৌক্তিক khr_fp64_support_;
+    পূর্ণসংখ্যা halfFPConfig_;
+    যৌক্তিক khr_fp16_support_;
+    যৌক্তিক hostUnifiedMemory_;
+    পূর্ণসংখ্যা maxComputeUnits_;
+    size_t max_Work_Group_আকার_2;
+    পূর্ণসংখ্যা type_;
+    পূর্ণসংখ্যা addressBits_;
+    পূর্ণসংখ্যা deviceVersionMajor_;
+    পূর্ণসংখ্যা deviceVersionMinor_;
     String driverVersion_;
     String vendorName_;
-    int vendorID_;
-    bool intelSubgroupsSupport_;
+    পূর্ণসংখ্যা vendorID_;
+    যৌক্তিক intelSubgroupsSupport_;
 
     std::set<std::string> extensions_set_;
 };
@@ -1719,28 +1719,28 @@ Device::Device() CV_NOEXCEPT
     p = 0;
 }
 
-Device::Device(void* d)
+Device::Device(শূন্য* d)
 {
     p = 0;
     set(d);
 }
 
-Device::Device(const Device& d)
+Device::Device(ধ্রুবক Device& d)
 {
     p = d.p;
-    if(p)
+    যদি(p)
         p->addref();
 }
 
-Device& Device::operator = (const Device& d)
+Device& Device::operator = (ধ্রুবক Device& d)
 {
     Impl* newp = (Impl*)d.p;
-    if(newp)
+    যদি(newp)
         newp->addref();
-    if(p)
+    যদি(p)
         p->release();
     p = newp;
-    return *this;
+    ফেরত *এই;
 }
 
 Device::Device(Device&& d) CV_NOEXCEPT
@@ -1751,341 +1751,341 @@ Device::Device(Device&& d) CV_NOEXCEPT
 
 Device& Device::operator = (Device&& d) CV_NOEXCEPT
 {
-    if (this != &d) {
-        if(p)
+    যদি (এই != &d) {
+        যদি(p)
             p->release();
         p = d.p;
         d.p = nullptr;
     }
-    return *this;
+    ফেরত *এই;
 }
 
 Device::~Device()
 {
-    if(p)
+    যদি(p)
         p->release();
 }
 
-void Device::set(void* d)
+শূন্য Device::set(শূন্য* d)
 {
-    if(p)
+    যদি(p)
         p->release();
-    p = new Impl(d);
-    if (p->handle)
+    p = নতুন Impl(d);
+    যদি (p->handle)
     {
         CV_OCL_CHECK(clReleaseDevice((cl_device_id)d));
     }
 }
 
-Device Device::fromHandle(void* d)
+Device Device::fromHandle(শূন্য* d)
 {
     Device device(d);
-    return device;
+    ফেরত device;
 }
 
-void* Device::ptr() const
+শূন্য* Device::ptr() ধ্রুবক
 {
-    return p ? p->handle : 0;
+    ফেরত p ? p->handle : 0;
 }
 
-String Device::name() const
-{ return p ? p->name_ : String(); }
+String Device::name() ধ্রুবক
+{ ফেরত p ? p->name_ : String(); }
 
-String Device::extensions() const
-{ return p ? String(p->extensions_) : String(); }
+String Device::extensions() ধ্রুবক
+{ ফেরত p ? String(p->extensions_) : String(); }
 
-bool Device::isExtensionSupported(const String& extensionName) const
-{ return p ? p->isExtensionSupported(extensionName) : false; }
+যৌক্তিক Device::isExtensionSupported(ধ্রুবক String& extensionName) ধ্রুবক
+{ ফেরত p ? p->isExtensionSupported(extensionName) : মিথ্যা; }
 
-String Device::version() const
-{ return p ? p->version_ : String(); }
+String Device::version() ধ্রুবক
+{ ফেরত p ? p->version_ : String(); }
 
-String Device::vendorName() const
-{ return p ? p->vendorName_ : String(); }
+String Device::vendorName() ধ্রুবক
+{ ফেরত p ? p->vendorName_ : String(); }
 
-int Device::vendorID() const
-{ return p ? p->vendorID_ : 0; }
+পূর্ণসংখ্যা Device::vendorID() ধ্রুবক
+{ ফেরত p ? p->vendorID_ : 0; }
 
-String Device::OpenCL_C_Version() const
-{ return p ? p->getStrProp(CL_DEVICE_OPENCL_C_VERSION) : String(); }
+String Device::OpenCL_C_Version() ধ্রুবক
+{ ফেরত p ? p->getStrProp(CL_DEVICE_OPENCL_C_VERSION) : String(); }
 
-String Device::OpenCLVersion() const
-{ return p ? p->getStrProp(CL_DEVICE_VERSION) : String(); }
+String Device::OpenCLVersion() ধ্রুবক
+{ ফেরত p ? p->getStrProp(CL_DEVICE_VERSION) : String(); }
 
-int Device::deviceVersionMajor() const
-{ return p ? p->deviceVersionMajor_ : 0; }
+পূর্ণসংখ্যা Device::deviceVersionMajor() ধ্রুবক
+{ ফেরত p ? p->deviceVersionMajor_ : 0; }
 
-int Device::deviceVersionMinor() const
-{ return p ? p->deviceVersionMinor_ : 0; }
+পূর্ণসংখ্যা Device::deviceVersionMinor() ধ্রুবক
+{ ফেরত p ? p->deviceVersionMinor_ : 0; }
 
-String Device::driverVersion() const
-{ return p ? p->driverVersion_ : String(); }
+String Device::driverVersion() ধ্রুবক
+{ ফেরত p ? p->driverVersion_ : String(); }
 
-int Device::type() const
-{ return p ? p->type_ : 0; }
+পূর্ণসংখ্যা Device::type() ধ্রুবক
+{ ফেরত p ? p->type_ : 0; }
 
-int Device::addressBits() const
-{ return p ? p->addressBits_ : 0; }
+পূর্ণসংখ্যা Device::addressBits() ধ্রুবক
+{ ফেরত p ? p->addressBits_ : 0; }
 
-bool Device::available() const
-{ return p ? p->getBoolProp(CL_DEVICE_AVAILABLE) : false; }
+যৌক্তিক Device::available() ধ্রুবক
+{ ফেরত p ? p->getBoolProp(CL_DEVICE_AVAILABLE) : মিথ্যা; }
 
-bool Device::compilerAvailable() const
-{ return p ? p->getBoolProp(CL_DEVICE_COMPILER_AVAILABLE) : false; }
+যৌক্তিক Device::compilerAvailable() ধ্রুবক
+{ ফেরত p ? p->getBoolProp(CL_DEVICE_COMPILER_AVAILABLE) : মিথ্যা; }
 
-bool Device::linkerAvailable() const
+যৌক্তিক Device::linkerAvailable() ধ্রুবক
 #ifdef CL_VERSION_1_2
-{ return p ? p->getBoolProp(CL_DEVICE_LINKER_AVAILABLE) : false; }
-#else
+{ ফেরত p ? p->getBoolProp(CL_DEVICE_LINKER_AVAILABLE) : মিথ্যা; }
+#অন্যথা
 { CV_REQUIRE_OPENCL_1_2_ERROR; }
 #endif
 
-int Device::doubleFPConfig() const
-{ return p ? p->doubleFPConfig_ : 0; }
+পূর্ণসংখ্যা Device::doubleFPConfig() ধ্রুবক
+{ ফেরত p ? p->doubleFPConfig_ : 0; }
 
-int Device::singleFPConfig() const
-{ return p ? p->getProp<cl_device_fp_config, int>(CL_DEVICE_SINGLE_FP_CONFIG) : 0; }
+পূর্ণসংখ্যা Device::singleFPConfig() ধ্রুবক
+{ ফেরত p ? p->getProp<cl_device_fp_config, পূর্ণসংখ্যা>(CL_DEVICE_SINGLE_FP_CONFIG) : 0; }
 
-int Device::halfFPConfig() const
-{ return p ? p->halfFPConfig_ : 0; }
+পূর্ণসংখ্যা Device::halfFPConfig() ধ্রুবক
+{ ফেরত p ? p->halfFPConfig_ : 0; }
 
-bool Device::hasFP64() const
-{ return p ? p->khr_fp64_support_ : false; }
-bool Device::hasFP16() const
-{ return p ? p->khr_fp16_support_ : false; }
+যৌক্তিক Device::hasFP64() ধ্রুবক
+{ ফেরত p ? p->khr_fp64_support_ : মিথ্যা; }
+যৌক্তিক Device::hasFP16() ধ্রুবক
+{ ফেরত p ? p->khr_fp16_support_ : মিথ্যা; }
 
-bool Device::endianLittle() const
-{ return p ? p->getBoolProp(CL_DEVICE_ENDIAN_LITTLE) : false; }
+যৌক্তিক Device::endianLittle() ধ্রুবক
+{ ফেরত p ? p->getBoolProp(CL_DEVICE_ENDIAN_LITTLE) : মিথ্যা; }
 
-bool Device::errorCorrectionSupport() const
-{ return p ? p->getBoolProp(CL_DEVICE_ERROR_CORRECTION_SUPPORT) : false; }
+যৌক্তিক Device::errorCorrectionSupport() ধ্রুবক
+{ ফেরত p ? p->getBoolProp(CL_DEVICE_ERROR_CORRECTION_SUPPORT) : মিথ্যা; }
 
-int Device::executionCapabilities() const
-{ return p ? p->getProp<cl_device_exec_capabilities, int>(CL_DEVICE_EXECUTION_CAPABILITIES) : 0; }
+পূর্ণসংখ্যা Device::executionCapabilities() ধ্রুবক
+{ ফেরত p ? p->getProp<cl_device_exec_capabilities, পূর্ণসংখ্যা>(CL_DEVICE_EXECUTION_CAPABILITIES) : 0; }
 
-size_t Device::globalMemCacheSize() const
-{ return p ? p->getProp<cl_ulong, size_t>(CL_DEVICE_GLOBAL_MEM_CACHE_SIZE) : 0; }
+size_t Device::global_Mem_Cache_আকার() ধ্রুবক
+{ ফেরত p ? p->getProp<cl_ulong, size_t>(CL_DEVICE_GLOBAL_MEM_CACHE_আকার) : 0; }
 
-int Device::globalMemCacheType() const
-{ return p ? p->getProp<cl_device_mem_cache_type, int>(CL_DEVICE_GLOBAL_MEM_CACHE_TYPE) : 0; }
+পূর্ণসংখ্যা Device::globalMemCacheType() ধ্রুবক
+{ ফেরত p ? p->getProp<cl_device_mem_cache_type, পূর্ণসংখ্যা>(CL_DEVICE_GLOBAL_MEM_CACHE_TYPE) : 0; }
 
-int Device::globalMemCacheLineSize() const
-{ return p ? p->getProp<cl_uint, int>(CL_DEVICE_GLOBAL_MEM_CACHELINE_SIZE) : 0; }
+পূর্ণসংখ্যা Device::global_Mem_Cache_সারি_আকার() ধ্রুবক
+{ ফেরত p ? p->getProp<cl_uint, পূর্ণসংখ্যা>(CL_DEVICE_GLOBAL_MEM_CACHELINE_আকার) : 0; }
 
-size_t Device::globalMemSize() const
-{ return p ? p->getProp<cl_ulong, size_t>(CL_DEVICE_GLOBAL_MEM_SIZE) : 0; }
+size_t Device::global_Mem_আকার() ধ্রুবক
+{ ফেরত p ? p->getProp<cl_ulong, size_t>(CL_DEVICE_GLOBAL_MEM_আকার) : 0; }
 
-size_t Device::localMemSize() const
-{ return p ? p->getProp<cl_ulong, size_t>(CL_DEVICE_LOCAL_MEM_SIZE) : 0; }
+size_t Device::local_Mem_আকার() ধ্রুবক
+{ ফেরত p ? p->getProp<cl_ulong, size_t>(CL_DEVICE_LOCAL_MEM_আকার) : 0; }
 
-int Device::localMemType() const
-{ return p ? p->getProp<cl_device_local_mem_type, int>(CL_DEVICE_LOCAL_MEM_TYPE) : 0; }
+পূর্ণসংখ্যা Device::localMemType() ধ্রুবক
+{ ফেরত p ? p->getProp<cl_device_local_mem_type, পূর্ণসংখ্যা>(CL_DEVICE_LOCAL_MEM_TYPE) : 0; }
 
-bool Device::hostUnifiedMemory() const
-{ return p ? p->hostUnifiedMemory_ : false; }
+যৌক্তিক Device::hostUnifiedMemory() ধ্রুবক
+{ ফেরত p ? p->hostUnifiedMemory_ : মিথ্যা; }
 
-bool Device::imageSupport() const
-{ return p ? p->getBoolProp(CL_DEVICE_IMAGE_SUPPORT) : false; }
+যৌক্তিক Device::imageSupport() ধ্রুবক
+{ ফেরত p ? p->getBoolProp(CL_DEVICE_IMAGE_SUPPORT) : মিথ্যা; }
 
-bool Device::imageFromBufferSupport() const
+যৌক্তিক Device::image_From_বাফার_Support() ধ্রুবক
 {
-    return p ? p->isExtensionSupported("cl_khr_image2d_from_buffer") : false;
+    ফেরত p ? p->isExtensionSupported("cl_khr_image2d_from_buffer") : মিথ্যা;
 }
 
-uint Device::imagePitchAlignment() const
+uint Device::imagePitchAlignment() ধ্রুবক
 {
 #ifdef CL_DEVICE_IMAGE_PITCH_ALIGNMENT
-    return p ? p->getProp<cl_uint, uint>(CL_DEVICE_IMAGE_PITCH_ALIGNMENT) : 0;
-#else
-    return 0;
+    ফেরত p ? p->getProp<cl_uint, uint>(CL_DEVICE_IMAGE_PITCH_ALIGNMENT) : 0;
+#অন্যথা
+    ফেরত 0;
 #endif
 }
 
-uint Device::imageBaseAddressAlignment() const
+uint Device::imageBaseAddressAlignment() ধ্রুবক
 {
 #ifdef CL_DEVICE_IMAGE_BASE_ADDRESS_ALIGNMENT
-    return p ? p->getProp<cl_uint, uint>(CL_DEVICE_IMAGE_BASE_ADDRESS_ALIGNMENT) : 0;
-#else
-    return 0;
+    ফেরত p ? p->getProp<cl_uint, uint>(CL_DEVICE_IMAGE_BASE_ADDRESS_ALIGNMENT) : 0;
+#অন্যথা
+    ফেরত 0;
 #endif
 }
 
-size_t Device::image2DMaxWidth() const
-{ return p ? p->getProp<size_t, size_t>(CL_DEVICE_IMAGE2D_MAX_WIDTH) : 0; }
+size_t Device::image2DMaxWidth() ধ্রুবক
+{ ফেরত p ? p->getProp<size_t, size_t>(CL_DEVICE_IMAGE2D_MAX_WIDTH) : 0; }
 
-size_t Device::image2DMaxHeight() const
-{ return p ? p->getProp<size_t, size_t>(CL_DEVICE_IMAGE2D_MAX_HEIGHT) : 0; }
+size_t Device::image2DMaxHeight() ধ্রুবক
+{ ফেরত p ? p->getProp<size_t, size_t>(CL_DEVICE_IMAGE2D_MAX_HEIGHT) : 0; }
 
-size_t Device::image3DMaxWidth() const
-{ return p ? p->getProp<size_t, size_t>(CL_DEVICE_IMAGE3D_MAX_WIDTH) : 0; }
+size_t Device::image3DMaxWidth() ধ্রুবক
+{ ফেরত p ? p->getProp<size_t, size_t>(CL_DEVICE_IMAGE3D_MAX_WIDTH) : 0; }
 
-size_t Device::image3DMaxHeight() const
-{ return p ? p->getProp<size_t, size_t>(CL_DEVICE_IMAGE3D_MAX_HEIGHT) : 0; }
+size_t Device::image3DMaxHeight() ধ্রুবক
+{ ফেরত p ? p->getProp<size_t, size_t>(CL_DEVICE_IMAGE3D_MAX_HEIGHT) : 0; }
 
-size_t Device::image3DMaxDepth() const
-{ return p ? p->getProp<size_t, size_t>(CL_DEVICE_IMAGE3D_MAX_DEPTH) : 0; }
+size_t Device::image3DMaxDepth() ধ্রুবক
+{ ফেরত p ? p->getProp<size_t, size_t>(CL_DEVICE_IMAGE3D_MAX_DEPTH) : 0; }
 
-size_t Device::imageMaxBufferSize() const
+size_t Device::image_Max_বাফার_আকার() ধ্রুবক
 #ifdef CL_VERSION_1_2
-{ return p ? p->getProp<size_t, size_t>(CL_DEVICE_IMAGE_MAX_BUFFER_SIZE) : 0; }
-#else
+{ ফেরত p ? p->getProp<size_t, size_t>(CL_DEVICE_IMAGE_MAX_বাফার_আকার) : 0; }
+#অন্যথা
 { CV_REQUIRE_OPENCL_1_2_ERROR; }
 #endif
 
-size_t Device::imageMaxArraySize() const
+size_t Device::image_Max_Array_আকার() ধ্রুবক
 #ifdef CL_VERSION_1_2
-{ return p ? p->getProp<size_t, size_t>(CL_DEVICE_IMAGE_MAX_ARRAY_SIZE) : 0; }
-#else
+{ ফেরত p ? p->getProp<size_t, size_t>(CL_DEVICE_IMAGE_MAX_ARRAY_আকার) : 0; }
+#অন্যথা
 { CV_REQUIRE_OPENCL_1_2_ERROR; }
 #endif
 
-bool Device::intelSubgroupsSupport() const
-{ return p ? p->intelSubgroupsSupport_ : false; }
+যৌক্তিক Device::intelSubgroupsSupport() ধ্রুবক
+{ ফেরত p ? p->intelSubgroupsSupport_ : মিথ্যা; }
 
-int Device::maxClockFrequency() const
-{ return p ? p->getProp<cl_uint, int>(CL_DEVICE_MAX_CLOCK_FREQUENCY) : 0; }
+পূর্ণসংখ্যা Device::maxClockFrequency() ধ্রুবক
+{ ফেরত p ? p->getProp<cl_uint, পূর্ণসংখ্যা>(CL_DEVICE_MAX_CLOCK_FREQUENCY) : 0; }
 
-int Device::maxComputeUnits() const
-{ return p ? p->maxComputeUnits_ : 0; }
+পূর্ণসংখ্যা Device::maxComputeUnits() ধ্রুবক
+{ ফেরত p ? p->maxComputeUnits_ : 0; }
 
-int Device::maxConstantArgs() const
-{ return p ? p->getProp<cl_uint, int>(CL_DEVICE_MAX_CONSTANT_ARGS) : 0; }
+পূর্ণসংখ্যা Device::maxConstantArgs() ধ্রুবক
+{ ফেরত p ? p->getProp<cl_uint, পূর্ণসংখ্যা>(CL_DEVICE_MAX_CONSTANT_ARGS) : 0; }
 
-size_t Device::maxConstantBufferSize() const
-{ return p ? p->getProp<cl_ulong, size_t>(CL_DEVICE_MAX_CONSTANT_BUFFER_SIZE) : 0; }
+size_t Device::max_Constant_বাফার_আকার() ধ্রুবক
+{ ফেরত p ? p->getProp<cl_ulong, size_t>(CL_DEVICE_MAX_CONSTANT_বাফার_আকার) : 0; }
 
-size_t Device::maxMemAllocSize() const
-{ return p ? p->getProp<cl_ulong, size_t>(CL_DEVICE_MAX_MEM_ALLOC_SIZE) : 0; }
+size_t Device::max_Mem_Alloc_আকার() ধ্রুবক
+{ ফেরত p ? p->getProp<cl_ulong, size_t>(CL_DEVICE_MAX_MEM_ALLOC_আকার) : 0; }
 
-size_t Device::maxParameterSize() const
-{ return p ? p->getProp<cl_ulong, size_t>(CL_DEVICE_MAX_PARAMETER_SIZE) : 0; }
+size_t Device::max_Parameter_আকার() ধ্রুবক
+{ ফেরত p ? p->getProp<cl_ulong, size_t>(CL_DEVICE_MAX_PARAMETER_আকার) : 0; }
 
-int Device::maxReadImageArgs() const
-{ return p ? p->getProp<cl_uint, int>(CL_DEVICE_MAX_READ_IMAGE_ARGS) : 0; }
+পূর্ণসংখ্যা Device::maxReadImageArgs() ধ্রুবক
+{ ফেরত p ? p->getProp<cl_uint, পূর্ণসংখ্যা>(CL_DEVICE_MAX_READ_IMAGE_ARGS) : 0; }
 
-int Device::maxWriteImageArgs() const
-{ return p ? p->getProp<cl_uint, int>(CL_DEVICE_MAX_WRITE_IMAGE_ARGS) : 0; }
+পূর্ণসংখ্যা Device::maxWriteImageArgs() ধ্রুবক
+{ ফেরত p ? p->getProp<cl_uint, পূর্ণসংখ্যা>(CL_DEVICE_MAX_WRITE_IMAGE_ARGS) : 0; }
 
-int Device::maxSamplers() const
-{ return p ? p->getProp<cl_uint, int>(CL_DEVICE_MAX_SAMPLERS) : 0; }
+পূর্ণসংখ্যা Device::maxSamplers() ধ্রুবক
+{ ফেরত p ? p->getProp<cl_uint, পূর্ণসংখ্যা>(CL_DEVICE_MAX_SAMPLERS) : 0; }
 
-size_t Device::maxWorkGroupSize() const
-{ return p ? p->maxWorkGroupSize_ : 0; }
+size_t Device::max_Work_Group_আকার() ধ্রুবক
+{ ফেরত p ? p->max_Work_Group_আকার_2 : 0; }
 
-int Device::maxWorkItemDims() const
-{ return p ? p->getProp<cl_uint, int>(CL_DEVICE_MAX_WORK_ITEM_DIMENSIONS) : 0; }
+পূর্ণসংখ্যা Device::maxWorkItemDims() ধ্রুবক
+{ ফেরত p ? p->getProp<cl_uint, পূর্ণসংখ্যা>(CL_DEVICE_MAX_WORK_ITEM_DIMENSIONS) : 0; }
 
-void Device::maxWorkItemSizes(size_t* sizes) const
+শূন্য Device::maxWorkItemSizes(size_t* sizes) ধ্রুবক
 {
-    if(p)
+    যদি(p)
     {
-        const int MAX_DIMS = 32;
+        ধ্রুবক পূর্ণসংখ্যা MAX_DIMS = 32;
         size_t retsz = 0;
         CV_OCL_DBG_CHECK(clGetDeviceInfo(p->handle, CL_DEVICE_MAX_WORK_ITEM_SIZES,
-                MAX_DIMS*sizeof(sizes[0]), &sizes[0], &retsz));
+                MAX_DIMS*আকার(sizes[0]), &sizes[0], &retsz));
     }
 }
 
-int Device::memBaseAddrAlign() const
-{ return p ? p->getProp<cl_uint, int>(CL_DEVICE_MEM_BASE_ADDR_ALIGN) : 0; }
+পূর্ণসংখ্যা Device::memBaseAddrAlign() ধ্রুবক
+{ ফেরত p ? p->getProp<cl_uint, পূর্ণসংখ্যা>(CL_DEVICE_MEM_BASE_ADDR_ALIGN) : 0; }
 
-int Device::nativeVectorWidthChar() const
-{ return p ? p->getProp<cl_uint, int>(CL_DEVICE_NATIVE_VECTOR_WIDTH_CHAR) : 0; }
+পূর্ণসংখ্যা Device::nativeVectorWidthChar() ধ্রুবক
+{ ফেরত p ? p->getProp<cl_uint, পূর্ণসংখ্যা>(CL_DEVICE_NATIVE_VECTOR_WIDTH_CHAR) : 0; }
 
-int Device::nativeVectorWidthShort() const
-{ return p ? p->getProp<cl_uint, int>(CL_DEVICE_NATIVE_VECTOR_WIDTH_SHORT) : 0; }
+পূর্ণসংখ্যা Device::nativeVectorWidthShort() ধ্রুবক
+{ ফেরত p ? p->getProp<cl_uint, পূর্ণসংখ্যা>(CL_DEVICE_NATIVE_VECTOR_WIDTH_SHORT) : 0; }
 
-int Device::nativeVectorWidthInt() const
-{ return p ? p->getProp<cl_uint, int>(CL_DEVICE_NATIVE_VECTOR_WIDTH_INT) : 0; }
+পূর্ণসংখ্যা Device::nativeVectorWidthInt() ধ্রুবক
+{ ফেরত p ? p->getProp<cl_uint, পূর্ণসংখ্যা>(CL_DEVICE_NATIVE_VECTOR_WIDTH_INT) : 0; }
 
-int Device::nativeVectorWidthLong() const
-{ return p ? p->getProp<cl_uint, int>(CL_DEVICE_NATIVE_VECTOR_WIDTH_LONG) : 0; }
+পূর্ণসংখ্যা Device::nativeVectorWidthLong() ধ্রুবক
+{ ফেরত p ? p->getProp<cl_uint, পূর্ণসংখ্যা>(CL_DEVICE_NATIVE_VECTOR_WIDTH_LONG) : 0; }
 
-int Device::nativeVectorWidthFloat() const
-{ return p ? p->getProp<cl_uint, int>(CL_DEVICE_NATIVE_VECTOR_WIDTH_FLOAT) : 0; }
+পূর্ণসংখ্যা Device::nativeVectorWidthFloat() ধ্রুবক
+{ ফেরত p ? p->getProp<cl_uint, পূর্ণসংখ্যা>(CL_DEVICE_NATIVE_VECTOR_WIDTH_FLOAT) : 0; }
 
-int Device::nativeVectorWidthDouble() const
-{ return p ? p->getProp<cl_uint, int>(CL_DEVICE_NATIVE_VECTOR_WIDTH_DOUBLE) : 0; }
+পূর্ণসংখ্যা Device::nativeVectorWidthDouble() ধ্রুবক
+{ ফেরত p ? p->getProp<cl_uint, পূর্ণসংখ্যা>(CL_DEVICE_NATIVE_VECTOR_WIDTH_DOUBLE) : 0; }
 
-int Device::nativeVectorWidthHalf() const
-{ return p ? p->getProp<cl_uint, int>(CL_DEVICE_NATIVE_VECTOR_WIDTH_HALF) : 0; }
+পূর্ণসংখ্যা Device::nativeVectorWidthHalf() ধ্রুবক
+{ ফেরত p ? p->getProp<cl_uint, পূর্ণসংখ্যা>(CL_DEVICE_NATIVE_VECTOR_WIDTH_HALF) : 0; }
 
-int Device::preferredVectorWidthChar() const
-{ return p ? p->getProp<cl_uint, int>(CL_DEVICE_PREFERRED_VECTOR_WIDTH_CHAR) : 0; }
+পূর্ণসংখ্যা Device::preferredVectorWidthChar() ধ্রুবক
+{ ফেরত p ? p->getProp<cl_uint, পূর্ণসংখ্যা>(CL_DEVICE_PREFERRED_VECTOR_WIDTH_CHAR) : 0; }
 
-int Device::preferredVectorWidthShort() const
-{ return p ? p->getProp<cl_uint, int>(CL_DEVICE_PREFERRED_VECTOR_WIDTH_SHORT) : 0; }
+পূর্ণসংখ্যা Device::preferredVectorWidthShort() ধ্রুবক
+{ ফেরত p ? p->getProp<cl_uint, পূর্ণসংখ্যা>(CL_DEVICE_PREFERRED_VECTOR_WIDTH_SHORT) : 0; }
 
-int Device::preferredVectorWidthInt() const
-{ return p ? p->getProp<cl_uint, int>(CL_DEVICE_PREFERRED_VECTOR_WIDTH_INT) : 0; }
+পূর্ণসংখ্যা Device::preferredVectorWidthInt() ধ্রুবক
+{ ফেরত p ? p->getProp<cl_uint, পূর্ণসংখ্যা>(CL_DEVICE_PREFERRED_VECTOR_WIDTH_INT) : 0; }
 
-int Device::preferredVectorWidthLong() const
-{ return p ? p->getProp<cl_uint, int>(CL_DEVICE_PREFERRED_VECTOR_WIDTH_LONG) : 0; }
+পূর্ণসংখ্যা Device::preferredVectorWidthLong() ধ্রুবক
+{ ফেরত p ? p->getProp<cl_uint, পূর্ণসংখ্যা>(CL_DEVICE_PREFERRED_VECTOR_WIDTH_LONG) : 0; }
 
-int Device::preferredVectorWidthFloat() const
-{ return p ? p->getProp<cl_uint, int>(CL_DEVICE_PREFERRED_VECTOR_WIDTH_FLOAT) : 0; }
+পূর্ণসংখ্যা Device::preferredVectorWidthFloat() ধ্রুবক
+{ ফেরত p ? p->getProp<cl_uint, পূর্ণসংখ্যা>(CL_DEVICE_PREFERRED_VECTOR_WIDTH_FLOAT) : 0; }
 
-int Device::preferredVectorWidthDouble() const
-{ return p ? p->getProp<cl_uint, int>(CL_DEVICE_PREFERRED_VECTOR_WIDTH_DOUBLE) : 0; }
+পূর্ণসংখ্যা Device::preferredVectorWidthDouble() ধ্রুবক
+{ ফেরত p ? p->getProp<cl_uint, পূর্ণসংখ্যা>(CL_DEVICE_PREFERRED_VECTOR_WIDTH_DOUBLE) : 0; }
 
-int Device::preferredVectorWidthHalf() const
-{ return p ? p->getProp<cl_uint, int>(CL_DEVICE_PREFERRED_VECTOR_WIDTH_HALF) : 0; }
+পূর্ণসংখ্যা Device::preferredVectorWidthHalf() ধ্রুবক
+{ ফেরত p ? p->getProp<cl_uint, পূর্ণসংখ্যা>(CL_DEVICE_PREFERRED_VECTOR_WIDTH_HALF) : 0; }
 
-size_t Device::printfBufferSize() const
+size_t Device::printf_বাফার_আকার() ধ্রুবক
 #ifdef CL_VERSION_1_2
-{ return p ? p->getProp<size_t, size_t>(CL_DEVICE_PRINTF_BUFFER_SIZE) : 0; }
-#else
+{ ফেরত p ? p->getProp<size_t, size_t>(CL_DEVICE_PRINTF_বাফার_আকার) : 0; }
+#অন্যথা
 { CV_REQUIRE_OPENCL_1_2_ERROR; }
 #endif
 
 
-size_t Device::profilingTimerResolution() const
-{ return p ? p->getProp<size_t, size_t>(CL_DEVICE_PROFILING_TIMER_RESOLUTION) : 0; }
+size_t Device::profilingTimerResolution() ধ্রুবক
+{ ফেরত p ? p->getProp<size_t, size_t>(CL_DEVICE_PROFILING_TIMER_RESOLUTION) : 0; }
 
-const Device& Device::getDefault()
+ধ্রুবক Device& Device::getDefault()
 {
     auto& c = OpenCLExecutionContext::getCurrent();
-    if (!c.empty())
+    যদি (!c.empty())
     {
-        return c.getDevice();
+        ফেরত c.getDevice();
     }
 
-    static Device dummy;
-    return dummy;
+    স্থির Device dummy;
+    ফেরত dummy;
 }
 
 ////////////////////////////////////// Context ///////////////////////////////////////////////////
 
 template <typename Functor, typename ObjectType>
-inline cl_int getStringInfo(Functor f, ObjectType obj, cl_uint name, std::string& param)
+অন্তঃরেখ cl_int getStringInfo(Functor f, ObjectType obj, cl_uint name, std::string& param)
 {
     ::size_t required;
-    cl_int err = f(obj, name, 0, NULL, &required);
-    if (err != CL_SUCCESS)
-        return err;
+    cl_int err = f(obj, name, 0, ফাঁকা, &required);
+    যদি (err != CL_SUCCESS)
+        ফেরত err;
 
     param.clear();
-    if (required > 0)
+    যদি (required > 0)
     {
-        AutoBuffer<char> buf(required + 1);
-        char* ptr = buf.data(); // cleanup is not needed
-        err = f(obj, name, required, ptr, NULL);
-        if (err != CL_SUCCESS)
-            return err;
+        Auto_বাফার<অক্ষর> buf(required + 1);
+        অক্ষর* ptr = buf.তথ্য(); // cleanup is not needed
+        err = f(obj, name, required, ptr, ফাঁকা);
+        যদি (err != CL_SUCCESS)
+            ফেরত err;
         param = ptr;
     }
 
-    return CL_SUCCESS;
+    ফেরত CL_SUCCESS;
 }
 
-static void split(const std::string &s, char delim, std::vector<std::string> &elems)
+স্থির শূন্য split(ধ্রুবক std::string &s, অক্ষর delim, std::vector<std::string> &elems)
 {
     elems.clear();
-    if (s.size() == 0)
-        return;
+    যদি (s.size() == 0)
+        ফেরত;
     std::istringstream ss(s);
     std::string item;
-    while (!ss.eof())
+    যখন (!ss.eof())
     {
         std::getline(ss, item, delim);
         elems.push_back(item);
@@ -2096,314 +2096,314 @@ static void split(const std::string &s, char delim, std::vector<std::string> &el
 // Sample: AMD:GPU:
 // Sample: AMD:GPU:Tahiti
 // Sample: :GPU|CPU: = '' = ':' = '::'
-static bool parseOpenCLDeviceConfiguration(const std::string& configurationStr,
+স্থির যৌক্তিক parseOpenCLDeviceConfiguration(ধ্রুবক std::string& configurationStr,
         std::string& platform, std::vector<std::string>& deviceTypes, std::string& deviceNameOrID)
 {
     std::vector<std::string> parts;
     split(configurationStr, ':', parts);
-    if (parts.size() > 3)
+    যদি (parts.size() > 3)
     {
-        CV_LOG_ERROR(NULL, "OpenCL: Invalid configuration string for OpenCL device: " << configurationStr);
-        return false;
+        CV_LOG_ERROR(ফাঁকা, "OpenCL: Invalid configuration string for OpenCL device: " << configurationStr);
+        ফেরত মিথ্যা;
     }
-    if (parts.size() > 2)
+    যদি (parts.size() > 2)
         deviceNameOrID = parts[2];
-    if (parts.size() > 1)
+    যদি (parts.size() > 1)
     {
         split(parts[1], '|', deviceTypes);
     }
-    if (parts.size() > 0)
+    যদি (parts.size() > 0)
     {
         platform = parts[0];
     }
-    return true;
+    ফেরত সত্য;
 }
 
-static cl_device_id selectOpenCLDevice(const std::string & configuration_ = std::string())
+স্থির cl_device_id selectOpenCLDevice(ধ্রুবক std::string & configuration_ = std::string())
 {
     std::string platform, deviceName;
     std::vector<std::string> deviceTypes;
 
     std::string configuration(configuration_);
-    if (configuration.empty())
+    যদি (configuration.empty())
         configuration = utils::getConfigurationParameterString("OPENCV_OPENCL_DEVICE");
 
-    if (!configuration.empty() &&
+    যদি (!configuration.empty() &&
             (configuration == "disabled" ||
              !parseOpenCLDeviceConfiguration(configuration, platform, deviceTypes, deviceName)
             ))
-        return NULL;
+        ফেরত ফাঁকা;
 
-    bool isID = false;
-    int deviceID = -1;
-    if (deviceName.length() == 1)
+    যৌক্তিক isID = মিথ্যা;
+    পূর্ণসংখ্যা deviceID = -1;
+    যদি (deviceName.length() == 1)
     // We limit ID range to 0..9, because we want to write:
     // - '2500' to mean i5-2500
     // - '8350' to mean AMD FX-8350
     // - '650' to mean GeForce 650
     // To extend ID range change condition to '> 0'
     {
-        isID = true;
-        for (size_t i = 0; i < deviceName.length(); i++)
+        isID = সত্য;
+        জন্য (size_t i = 0; i < deviceName.length(); i++)
         {
-            if (!isdigit(deviceName[i]))
+            যদি (!isdigit(deviceName[i]))
             {
-                isID = false;
-                break;
+                isID = মিথ্যা;
+                বিরতি;
             }
         }
-        if (isID)
+        যদি (isID)
         {
             deviceID = atoi(deviceName.c_str());
-            if (deviceID < 0)
-                return NULL;
+            যদি (deviceID < 0)
+                ফেরত ফাঁকা;
         }
     }
 
     std::vector<cl_platform_id> platforms;
     {
-        cl_uint numPlatforms = 0;
-        CV_OCL_DBG_CHECK(clGetPlatformIDs(0, NULL, &numPlatforms));
+        cl_uint অঙ্ক_Platforms = 0;
+        CV_OCL_DBG_CHECK(clGetPlatformIDs(0, ফাঁকা, &অঙ্ক_Platforms));
 
-        if (numPlatforms == 0)
-            return NULL;
-        platforms.resize((size_t)numPlatforms);
-        CV_OCL_DBG_CHECK(clGetPlatformIDs(numPlatforms, &platforms[0], &numPlatforms));
-        platforms.resize(numPlatforms);
+        যদি (অঙ্ক_Platforms == 0)
+            ফেরত ফাঁকা;
+        platforms.resize((size_t)অঙ্ক_Platforms);
+        CV_OCL_DBG_CHECK(clGetPlatformIDs(অঙ্ক_Platforms, &platforms[0], &অঙ্ক_Platforms));
+        platforms.resize(অঙ্ক_Platforms);
     }
 
-    if (platform.length() > 0)
+    যদি (platform.length() > 0)
     {
-        for (std::vector<cl_platform_id>::iterator currentPlatform = platforms.begin(); currentPlatform != platforms.end();)
+        জন্য (std::vector<cl_platform_id>::iterator currentPlatform = platforms.begin(); currentPlatform != platforms.end();)
         {
             std::string name;
             CV_OCL_DBG_CHECK(getStringInfo(clGetPlatformInfo, *currentPlatform, CL_PLATFORM_NAME, name));
-            if (name.find(platform) != std::string::npos)
+            যদি (name.find(platform) != std::string::npos)
             {
                 ++currentPlatform;
             }
-            else
+            অন্যথা
             {
                 currentPlatform = platforms.erase(currentPlatform);
             }
         }
-        if (platforms.size() == 0)
+        যদি (platforms.size() == 0)
         {
-            CV_LOG_ERROR(NULL, "OpenCL: Can't find OpenCL platform by name: " << platform);
-            goto not_found;
+            CV_LOG_ERROR(ফাঁকা, "OpenCL: Can't find OpenCL platform by name: " << platform);
+            যাও not_found;
         }
     }
-    if (deviceTypes.size() == 0)
+    যদি (deviceTypes.size() == 0)
     {
-        if (!isID)
+        যদি (!isID)
         {
             deviceTypes.push_back("GPU");
-            if (!configuration.empty())
+            যদি (!configuration.empty())
                 deviceTypes.push_back("CPU");
         }
-        else
+        অন্যথা
             deviceTypes.push_back("ALL");
     }
-    for (size_t t = 0; t < deviceTypes.size(); t++)
+    জন্য (size_t t = 0; t < deviceTypes.size(); t++)
     {
-        int deviceType = 0;
-        std::string tempStrDeviceType = deviceTypes[t];
-        std::transform(tempStrDeviceType.begin(), tempStrDeviceType.end(), tempStrDeviceType.begin(), details::char_tolower);
+        পূর্ণসংখ্যা deviceType = 0;
+        std::string অস্থায়ী_Str_Device_Type = deviceTypes[t];
+        std::transform(অস্থায়ী_Str_Device_Type.begin(), অস্থায়ী_Str_Device_Type.end(), অস্থায়ী_Str_Device_Type.begin(), details::char_tolower);
 
-        if (tempStrDeviceType == "gpu" || tempStrDeviceType == "dgpu" || tempStrDeviceType == "igpu")
+        যদি (অস্থায়ী_Str_Device_Type == "gpu" || অস্থায়ী_Str_Device_Type == "dgpu" || অস্থায়ী_Str_Device_Type == "igpu")
             deviceType = Device::TYPE_GPU;
-        else if (tempStrDeviceType == "cpu")
+        অন্যথা যদি (অস্থায়ী_Str_Device_Type == "cpu")
             deviceType = Device::TYPE_CPU;
-        else if (tempStrDeviceType == "accelerator")
+        অন্যথা যদি (অস্থায়ী_Str_Device_Type == "accelerator")
             deviceType = Device::TYPE_ACCELERATOR;
-        else if (tempStrDeviceType == "all")
+        অন্যথা যদি (অস্থায়ী_Str_Device_Type == "all")
             deviceType = Device::TYPE_ALL;
-        else
+        অন্যথা
         {
-            CV_LOG_ERROR(NULL, "OpenCL: Unsupported device type for OpenCL device (GPU, CPU, ACCELERATOR): " << deviceTypes[t]);
-            goto not_found;
+            CV_LOG_ERROR(ফাঁকা, "OpenCL: Unsupported device type for OpenCL device (GPU, CPU, ACCELERATOR): " << deviceTypes[t]);
+            যাও not_found;
         }
 
         std::vector<cl_device_id> devices;
-        for (std::vector<cl_platform_id>::iterator currentPlatform = platforms.begin(); currentPlatform != platforms.end(); ++currentPlatform)
+        জন্য (std::vector<cl_platform_id>::iterator currentPlatform = platforms.begin(); currentPlatform != platforms.end(); ++currentPlatform)
         {
-            cl_uint count = 0;
-            cl_int status = clGetDeviceIDs(*currentPlatform, deviceType, 0, NULL, &count);
-            if (!(status == CL_SUCCESS || status == CL_DEVICE_NOT_FOUND))
+            cl_uint গুনতি_2 = 0;
+            cl_int status = clGetDeviceIDs(*currentPlatform, deviceType, 0, ফাঁকা, &গুনতি_2);
+            যদি (!(status == CL_SUCCESS || status == CL_DEVICE_NOT_FOUND))
             {
-                CV_OCL_DBG_CHECK_RESULT(status, "clGetDeviceIDs get count");
+                CV_OCL_DBG_CHECK_ফলাফল(status, "clGetDeviceIDs get count");
             }
-            if (count == 0)
-                continue;
+            যদি (গুনতি_2 == 0)
+                চালু;
             size_t base = devices.size();
-            devices.resize(base + count);
-            status = clGetDeviceIDs(*currentPlatform, deviceType, count, &devices[base], &count);
-            if (!(status == CL_SUCCESS || status == CL_DEVICE_NOT_FOUND))
+            devices.resize(base + গুনতি_2);
+            status = clGetDeviceIDs(*currentPlatform, deviceType, গুনতি_2, &devices[base], &গুনতি_2);
+            যদি (!(status == CL_SUCCESS || status == CL_DEVICE_NOT_FOUND))
             {
-                CV_OCL_DBG_CHECK_RESULT(status, "clGetDeviceIDs get IDs");
+                CV_OCL_DBG_CHECK_ফলাফল(status, "clGetDeviceIDs get IDs");
             }
         }
 
-        for (size_t i = (isID ? deviceID : 0);
-             (isID ? (i == (size_t)deviceID) : true) && (i < devices.size());
+        জন্য (size_t i = (isID ? deviceID : 0);
+             (isID ? (i == (size_t)deviceID) : সত্য) && (i < devices.size());
              i++)
         {
             std::string name;
             CV_OCL_DBG_CHECK(getStringInfo(clGetDeviceInfo, devices[i], CL_DEVICE_NAME, name));
-            cl_bool useGPU = true;
-            if(tempStrDeviceType == "dgpu" || tempStrDeviceType == "igpu")
+            cl_bool useGPU = সত্য;
+            যদি(অস্থায়ী_Str_Device_Type == "dgpu" || অস্থায়ী_Str_Device_Type == "igpu")
             {
                 cl_bool isIGPU = CL_FALSE;
-                CV_OCL_DBG_CHECK(clGetDeviceInfo(devices[i], CL_DEVICE_HOST_UNIFIED_MEMORY, sizeof(isIGPU), &isIGPU, NULL));
-                useGPU = tempStrDeviceType == "dgpu" ? !isIGPU : isIGPU;
+                CV_OCL_DBG_CHECK(clGetDeviceInfo(devices[i], CL_DEVICE_HOST_UNIFIED_MEMORY, আকার(isIGPU), &isIGPU, ফাঁকা));
+                useGPU = অস্থায়ী_Str_Device_Type == "dgpu" ? !isIGPU : isIGPU;
             }
-            if ( (isID || name.find(deviceName) != std::string::npos) && useGPU)
+            যদি ( (isID || name.find(deviceName) != std::string::npos) && useGPU)
             {
                 // TODO check for OpenCL 1.1
-                return devices[i];
+                ফেরত devices[i];
             }
         }
     }
 
 not_found:
-    if (configuration.empty())
-        return NULL; // suppress messages on stderr
+    যদি (configuration.empty())
+        ফেরত ফাঁকা; // suppress messages on stderr
 
-    std::ostringstream msg;
-    msg << "ERROR: Requested OpenCL device not found, check configuration: '" << configuration << "'" << std::endl
+    std::ostringstream বার্তা;
+    বার্তা << "ERROR: Requested OpenCL device not found, check configuration: '" << configuration << "'" << std::endl
         << "    Platform: " << (platform.length() == 0 ? "any" : platform) << std::endl
         << "    Device types:";
-    for (size_t t = 0; t < deviceTypes.size(); t++)
-        msg << ' ' << deviceTypes[t];
+    জন্য (size_t t = 0; t < deviceTypes.size(); t++)
+        বার্তা << ' ' << deviceTypes[t];
 
-    msg << std::endl << "    Device name: " << (deviceName.length() == 0 ? "any" : deviceName);
+    বার্তা << std::endl << "    Device name: " << (deviceName.length() == 0 ? "any" : deviceName);
 
-    CV_LOG_ERROR(NULL, msg.str());
-    return NULL;
+    CV_LOG_ERROR(ফাঁকা, বার্তা.str());
+    ফেরত ফাঁকা;
 }
 
 #ifdef HAVE_OPENCL_SVM
-namespace svm {
+নামাকাশ svm {
 
-enum AllocatorFlags { // don't use first 16 bits
-        OPENCL_SVM_COARSE_GRAIN_BUFFER = 1 << 16, // clSVMAlloc + SVM map/unmap
-        OPENCL_SVM_FINE_GRAIN_BUFFER = 2 << 16, // clSVMAlloc
+গণনা AllocatorFlags { // don't use first 16 bits
+        OPENCL_SVM_COARSE_GRAIN_বাফার = 1 << 16, // clSVMAlloc + SVM map/unmap
+        OPENCL_SVM_FINE_GRAIN_বাফার = 2 << 16, // clSVMAlloc
         OPENCL_SVM_FINE_GRAIN_SYSTEM = 3 << 16, // direct access
-        OPENCL_SVM_BUFFER_MASK = 3 << 16,
-        OPENCL_SVM_BUFFER_MAP = 4 << 16
+        OPENCL_SVM_বাফার_MASK = 3 << 16,
+        OPENCL_SVM_বাফার_MAP = 4 << 16
 };
 
-static bool checkForceSVMUmatUsage()
+স্থির যৌক্তিক checkForceSVMUmatUsage()
 {
-    static bool initialized = false;
-    static bool force = false;
-    if (!initialized)
+    স্থির যৌক্তিক initialized = মিথ্যা;
+    স্থির যৌক্তিক force = মিথ্যা;
+    যদি (!initialized)
     {
-        force = utils::getConfigurationParameterBool("OPENCV_OPENCL_SVM_FORCE_UMAT_USAGE", false);
-        initialized = true;
+        force = utils::getConfigurationParameterBool("OPENCV_OPENCL_SVM_FORCE_UMAT_USAGE", মিথ্যা);
+        initialized = সত্য;
     }
-    return force;
+    ফেরত force;
 }
-static bool checkDisableSVMUMatUsage()
+স্থির যৌক্তিক checkDisableSVMUMatUsage()
 {
-    static bool initialized = false;
-    static bool force = false;
-    if (!initialized)
+    স্থির যৌক্তিক initialized = মিথ্যা;
+    স্থির যৌক্তিক force = মিথ্যা;
+    যদি (!initialized)
     {
-        force = utils::getConfigurationParameterBool("OPENCV_OPENCL_SVM_DISABLE_UMAT_USAGE", false);
-        initialized = true;
+        force = utils::getConfigurationParameterBool("OPENCV_OPENCL_SVM_DISABLE_UMAT_USAGE", মিথ্যা);
+        initialized = সত্য;
     }
-    return force;
+    ফেরত force;
 }
-static bool checkDisableSVM()
+স্থির যৌক্তিক checkDisableSVM()
 {
-    static bool initialized = false;
-    static bool force = false;
-    if (!initialized)
+    স্থির যৌক্তিক initialized = মিথ্যা;
+    স্থির যৌক্তিক force = মিথ্যা;
+    যদি (!initialized)
     {
-        force = utils::getConfigurationParameterBool("OPENCV_OPENCL_SVM_DISABLE", false);
-        initialized = true;
+        force = utils::getConfigurationParameterBool("OPENCV_OPENCL_SVM_DISABLE", মিথ্যা);
+        initialized = সত্য;
     }
-    return force;
+    ফেরত force;
 }
 // see SVMCapabilities
-static unsigned int getSVMCapabilitiesMask()
+স্থির unsigned পূর্ণসংখ্যা getSVMCapabilitiesMask()
 {
-    static bool initialized = false;
-    static unsigned int mask = 0;
-    if (!initialized)
+    স্থির যৌক্তিক initialized = মিথ্যা;
+    স্থির unsigned পূর্ণসংখ্যা mask = 0;
+    যদি (!initialized)
     {
-        const std::string envValue = utils::getConfigurationParameterString("OPENCV_OPENCL_SVM_CAPABILITIES_MASK");
-        if (envValue.empty())
+        ধ্রুবক std::string env_মান = utils::getConfigurationParameterString("OPENCV_OPENCL_SVM_CAPABILITIES_MASK");
+        যদি (env_মান.empty())
         {
-            return ~0U; // all bits 1
+            ফেরত ~0U; // all bits 1
         }
-        mask = atoi(envValue.c_str());
-        initialized = true;
+        mask = atoi(env_মান.c_str());
+        initialized = সত্য;
     }
-    return mask;
+    ফেরত mask;
 }
 } // namespace
 #endif
 
-static size_t getProgramCountLimit()
+স্থির size_t get_Program_গুনতি_Limit()
 {
-    static bool initialized = false;
-    static size_t count = 0;
-    if (!initialized)
+    স্থির যৌক্তিক initialized = মিথ্যা;
+    স্থির size_t গুনতি_2 = 0;
+    যদি (!initialized)
     {
-        count = utils::getConfigurationParameterSizeT("OPENCV_OPENCL_PROGRAM_CACHE", 0);
-        initialized = true;
+        গুনতি_2 = utils::get_Configuration_Parameter_আকার_T("OPENCV_OPENCL_PROGRAM_CACHE", 0);
+        initialized = সত্য;
     }
-    return count;
+    ফেরত গুনতি_2;
 }
 
-static int g_contextId = 0;
+স্থির পূর্ণসংখ্যা g_contextId = 0;
 
-class OpenCLBufferPoolImpl;
-class OpenCLSVMBufferPoolImpl;
+শ্রেণী OpenCLBufferPoolImpl;
+শ্রেণী OpenCLSVMBufferPoolImpl;
 
-struct Context::Impl
+কাঠামো Context::Impl
 {
-    static Context::Impl* get(Context& context) { return context.getImpl(); }
+    স্থির Context::Impl* get(Context& context) { ফেরত context.getImpl(); }
 
-    typedef std::deque<Context::Impl*> container_t;
-    static container_t& getGlobalContainer()
+    প্রকারলেখ std::deque<Context::Impl*> container_t;
+    স্থির container_t& getGlobalContainer()
     {
         // never delete this container (Impl lifetime is greater due to TLS storage)
-        static container_t* g_contexts = new container_t();
-        return *g_contexts;
+        স্থির container_t* g_contexts = নতুন container_t();
+        ফেরত *g_contexts;
     }
 
-protected:
-    Impl(const std::string& configuration_)
+সুরক্ষিত:
+    Impl(ধ্রুবক std::string& configuration_)
         : refcount(1)
         , contextId(CV_XADD(&g_contextId, 1))
         , configuration(configuration_)
         , handle(0)
 #ifdef HAVE_OPENCL_SVM
-        , svmInitialized(false)
+        , svmInitialized(মিথ্যা)
 #endif
     {
-        if (!haveOpenCL())
+        যদি (!haveOpenCL())
             CV_Error(cv::Error::OpenCLApiCallError, "OpenCL runtime is not available!");
 
         cv::AutoLock lock(cv::getInitializationMutex());
         auto& container = getGlobalContainer();
         container.resize(std::max(container.size(), (size_t)contextId + 1));
-        container[contextId] = this;
+        container[contextId] = এই;
     }
 
     ~Impl()
     {
 #ifdef _WIN32
-        if (!cv::__termination)
+        যদি (!cv::__termination)
 #endif
         {
-            if (handle)
+            যদি (handle)
             {
                 CV_OCL_DBG_CHECK(clReleaseContext(handle));
-                handle = NULL;
+                handle = ফাঁকা;
             }
             devices.clear();
         }
@@ -2414,130 +2414,130 @@ protected:
             cv::AutoLock lock(cv::getInitializationMutex());
             auto& container = getGlobalContainer();
             CV_CheckLT((size_t)contextId, container.size(), "");
-            container[contextId] = NULL;
+            container[contextId] = ফাঁকা;
         }
     }
 
-    void init_device_list()
+    শূন্য init_device_list()
     {
         CV_Assert(handle);
 
         cl_uint ndevices = 0;
-        CV_OCL_CHECK(clGetContextInfo(handle, CL_CONTEXT_NUM_DEVICES, sizeof(ndevices), &ndevices, NULL));
+        CV_OCL_CHECK(clGetContextInfo(handle, CL_CONTEXT_অঙ্ক_DEVICES, আকার(ndevices), &ndevices, ফাঁকা));
         CV_Assert(ndevices > 0);
 
-        cv::AutoBuffer<cl_device_id> cl_devices(ndevices);
-        size_t devices_ret_size = 0;
-        CV_OCL_CHECK(clGetContextInfo(handle, CL_CONTEXT_DEVICES, cl_devices.size() * sizeof(cl_device_id), &cl_devices[0], &devices_ret_size));
-        CV_CheckEQ(devices_ret_size, cl_devices.size() * sizeof(cl_device_id), "");
+        cv::Auto_বাফার<cl_device_id> cl_devices(ndevices);
+        size_t devices_ret_আকার = 0;
+        CV_OCL_CHECK(clGetContextInfo(handle, CL_CONTEXT_DEVICES, cl_devices.size() * আকার(cl_device_id), &cl_devices[0], &devices_ret_আকার));
+        CV_CheckEQ(devices_ret_আকার, cl_devices.size() * আকার(cl_device_id), "");
 
         devices.clear();
-        for (unsigned i = 0; i < ndevices; i++)
+        জন্য (unsigned i = 0; i < ndevices; i++)
         {
             devices.emplace_back(Device::fromHandle(cl_devices[i]));
         }
     }
 
-    void __init_buffer_pools();  // w/o synchronization
-    void _init_buffer_pools() const
+    শূন্য __init_buffer_pools();  // w/o synchronization
+    শূন্য init_বাফার_pools() ধ্রুবক
     {
-        if (!bufferPool_)
+        যদি (!বাফার_Pool_2)
         {
             cv::AutoLock lock(cv::getInitializationMutex());
-            if (!bufferPool_)
+            যদি (!বাফার_Pool_2)
             {
-                const_cast<Impl*>(this)->__init_buffer_pools();
+                const_cast<Impl*>(এই)->__init_buffer_pools();
             }
         }
     }
-public:
-    static Impl* findContext(const std::string& configuration)
+সর্বজনীন:
+    স্থির Impl* findContext(ধ্রুবক std::string& configuration)
     {
         CV_TRACE_FUNCTION();
         cv::AutoLock lock(cv::getInitializationMutex());
         auto& container = getGlobalContainer();
-        if (configuration.empty() && !container.empty())
-            return container[0];
-        for (auto it = container.begin(); it != container.end(); ++it)
+        যদি (configuration.empty() && !container.empty())
+            ফেরত container[0];
+        জন্য (auto it = container.begin(); it != container.end(); ++it)
         {
             Impl* i = *it;
-            if (i && i->configuration == configuration)
+            যদি (i && i->configuration == configuration)
             {
-                return i;
+                ফেরত i;
             }
         }
-        return NULL;
+        ফেরত ফাঁকা;
     }
 
-    static Impl* findOrCreateContext(const std::string& configuration_)
+    স্থির Impl* findOrCreateContext(ধ্রুবক std::string& configuration_)
     {
         CV_TRACE_FUNCTION();
         std::string configuration = configuration_;
-        if (configuration_.empty())
+        যদি (configuration_.empty())
         {
-            const std::string c = utils::getConfigurationParameterString("OPENCV_OPENCL_DEVICE");
-            if (!c.empty())
+            ধ্রুবক std::string c = utils::getConfigurationParameterString("OPENCV_OPENCL_DEVICE");
+            যদি (!c.empty())
                 configuration = c;
         }
         Impl* impl = findContext(configuration);
-        if (impl)
+        যদি (impl)
         {
-            CV_LOG_INFO(NULL, "OpenCL: reuse context@" << impl->contextId << " for configuration: " << configuration)
+            CV_LOG_INFO(ফাঁকা, "OpenCL: reuse context@" << impl->contextId << " for configuration: " << configuration)
             impl->addref();
-            return impl;
+            ফেরত impl;
         }
 
         cl_device_id d = selectOpenCLDevice(configuration);
-        if (d == NULL)
-            return NULL;
+        যদি (d == ফাঁকা)
+            ফেরত ফাঁকা;
 
-        impl = new Impl(configuration);
-        try
+        impl = নতুন Impl(configuration);
+        চেষ্টা
         {
             impl->createFromDevice(d);
-            if (impl->handle)
-                return impl;
+            যদি (impl->handle)
+                ফেরত impl;
             delete impl;
-            return NULL;
+            ফেরত ফাঁকা;
         }
-        catch (...)
+        ধরো (...)
         {
             delete impl;
-            throw;
+            ছোড়ো;
         }
     }
 
-    static Impl* findOrCreateContext(cl_context h)
+    স্থির Impl* findOrCreateContext(cl_context h)
     {
         CV_TRACE_FUNCTION();
 
         CV_Assert(h);
 
-        std::string configuration = cv::format("@ctx-%p", (void*)h);
+        std::string configuration = cv::format("@ctx-%p", (শূন্য*)h);
         Impl* impl = findContext(configuration);
-        if (impl)
+        যদি (impl)
         {
-            CV_LOG_INFO(NULL, "OpenCL: reuse context@" << impl->contextId << " for configuration: " << configuration)
+            CV_LOG_INFO(ফাঁকা, "OpenCL: reuse context@" << impl->contextId << " for configuration: " << configuration)
             impl->addref();
-            return impl;
+            ফেরত impl;
         }
 
-        impl = new Impl(configuration);
-        try
+        impl = নতুন Impl(configuration);
+        চেষ্টা
         {
             CV_OCL_CHECK(clRetainContext(h));
             impl->handle = h;
             impl->init_device_list();
-            return impl;
+            ফেরত impl;
         }
-        catch (...)
+        ধরো (...)
         {
             delete impl;
-            throw;
+            ছোড়ো;
         }
     }
 
-    static Impl* findOrCreateContext(const ocl::Device& device)
+    স্থির Impl* findOrCreateContext(ধ্রুবক ocl::Device& device)
     {
         CV_TRACE_FUNCTION();
 
@@ -2545,47 +2545,47 @@ public:
         cl_device_id d = (cl_device_id)device.ptr();
         CV_Assert(d);
 
-        std::string configuration = cv::format("@dev-%p", (void*)d);
+        std::string configuration = cv::format("@dev-%p", (শূন্য*)d);
         Impl* impl = findContext(configuration);
-        if (impl)
+        যদি (impl)
         {
-            CV_LOG_INFO(NULL, "OpenCL: reuse context@" << impl->contextId << " for configuration: " << configuration)
+            CV_LOG_INFO(ফাঁকা, "OpenCL: reuse context@" << impl->contextId << " for configuration: " << configuration)
             impl->addref();
-            return impl;
+            ফেরত impl;
         }
 
-        impl = new Impl(configuration);
-        try
+        impl = নতুন Impl(configuration);
+        চেষ্টা
         {
             impl->createFromDevice(d);
             CV_Assert(impl->handle);
-            return impl;
+            ফেরত impl;
         }
-        catch (...)
+        ধরো (...)
         {
             delete impl;
-            throw;
+            ছোড়ো;
         }
     }
 
-    void setDefault()
+    শূন্য setDefault()
     {
         CV_TRACE_FUNCTION();
         cl_device_id d = selectOpenCLDevice();
 
-        if (d == NULL)
-            return;
+        যদি (d == ফাঁকা)
+            ফেরত;
 
         createFromDevice(d);
     }
 
-    void createFromDevice(cl_device_id d)
+    শূন্য createFromDevice(cl_device_id d)
     {
         CV_TRACE_FUNCTION();
-        CV_Assert(handle == NULL);
+        CV_Assert(handle == ফাঁকা);
 
-        cl_platform_id pl = NULL;
-        CV_OCL_DBG_CHECK(clGetDeviceInfo(d, CL_DEVICE_PLATFORM, sizeof(cl_platform_id), &pl, NULL));
+        cl_platform_id pl = ফাঁকা;
+        CV_OCL_DBG_CHECK(clGetDeviceInfo(d, CL_DEVICE_PLATFORM, আকার(cl_platform_id), &pl, ফাঁকা));
 
         cl_context_properties prop[] =
         {
@@ -2598,33 +2598,33 @@ public:
         cl_int status;
 
         handle = clCreateContext(prop, nd, &d, 0, 0, &status);
-        CV_OCL_DBG_CHECK_RESULT(status, "clCreateContext");
+        CV_OCL_DBG_CHECK_ফলাফল(status, "clCreateContext");
 
-        bool ok = handle != 0 && status == CL_SUCCESS;
-        if( ok )
+        যৌক্তিক ok = handle != 0 && status == CL_SUCCESS;
+        যদি( ok )
         {
             devices.resize(nd);
             devices[0].set(d);
         }
-        else
-            handle = NULL;
+        অন্যথা
+            handle = ফাঁকা;
     }
 
-    Program getProg(const ProgramSource& src, const String& buildflags, String& errmsg);
+    Program getProg(ধ্রুবক ProgramSource& src, ধ্রুবক String& buildflags, String& errmsg);
 
-    void unloadProg(Program& prog)
+    শূন্য unloadProg(Program& prog)
     {
         cv::AutoLock lock(program_cache_mutex);
-        for (CacheList::iterator i = cacheList.begin(); i != cacheList.end(); ++i)
+        জন্য (CacheList::iterator i = cacheList.begin(); i != cacheList.end(); ++i)
         {
               phash_t::iterator it = phash.find(*i);
-              if (it != phash.end())
+              যদি (it != phash.end())
               {
-                  if (it->second.ptr() == prog.ptr())
+                  যদি (it->second.ptr() == prog.ptr())
                   {
                       phash.erase(*i);
                       cacheList.erase(i);
-                      return;
+                      ফেরত;
                   }
               }
         }
@@ -2632,61 +2632,61 @@ public:
 
     std::string& getPrefixString()
     {
-        if (prefix.empty())
+        যদি (prefix.empty())
         {
             cv::AutoLock lock(program_cache_mutex);
-            if (prefix.empty())
+            যদি (prefix.empty())
             {
                 CV_Assert(!devices.empty());
-                const Device& d = devices[0];
-                int bits = d.addressBits();
-                if (bits > 0 && bits != 64)
+                ধ্রুবক Device& d = devices[0];
+                পূর্ণসংখ্যা bits = d.addressBits();
+                যদি (bits > 0 && bits != 64)
                     prefix = cv::format("%d-bit--", bits);
                 prefix += d.vendorName() + "--" + d.name() + "--" + d.driverVersion();
                 // sanitize chars
-                for (size_t i = 0; i < prefix.size(); i++)
+                জন্য (size_t i = 0; i < prefix.size(); i++)
                 {
-                    char c = prefix[i];
-                    if (!((c >= '0' && c <= '9') || (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || c == '_' || c == '-'))
+                    অক্ষর c = prefix[i];
+                    যদি (!((c >= '0' && c <= '9') || (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || c == '_' || c == '-'))
                     {
                         prefix[i] = '_';
                     }
                 }
             }
         }
-        return prefix;
+        ফেরত prefix;
     }
 
     std::string& getPrefixBase()
     {
-        if (prefix_base.empty())
+        যদি (prefix_base.empty())
         {
             cv::AutoLock lock(program_cache_mutex);
-            if (prefix_base.empty())
+            যদি (prefix_base.empty())
             {
-                const Device& d = devices[0];
-                int bits = d.addressBits();
-                if (bits > 0 && bits != 64)
+                ধ্রুবক Device& d = devices[0];
+                পূর্ণসংখ্যা bits = d.addressBits();
+                যদি (bits > 0 && bits != 64)
                     prefix_base = cv::format("%d-bit--", bits);
                 prefix_base += d.vendorName() + "--" + d.name() + "--";
                 // sanitize chars
-                for (size_t i = 0; i < prefix_base.size(); i++)
+                জন্য (size_t i = 0; i < prefix_base.size(); i++)
                 {
-                    char c = prefix_base[i];
-                    if (!((c >= '0' && c <= '9') || (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || c == '_' || c == '-'))
+                    অক্ষর c = prefix_base[i];
+                    যদি (!((c >= '0' && c <= '9') || (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || c == '_' || c == '-'))
                     {
                         prefix_base[i] = '_';
                     }
                 }
             }
         }
-        return prefix_base;
+        ফেরত prefix_base;
     }
 
     IMPLEMENT_REFCOUNTABLE();
 
-    const int contextId;  // global unique ID
-    const std::string configuration;
+    ধ্রুবক পূর্ণসংখ্যা contextId;  // global unique ID
+    ধ্রুবক std::string configuration;
 
     cl_context handle;
     std::vector<Device> devices;
@@ -2695,118 +2695,118 @@ public:
     std::string prefix_base;
 
     cv::Mutex program_cache_mutex;
-    typedef std::map<std::string, Program> phash_t;
+    প্রকারলেখ std::map<std::string, Program> phash_t;
     phash_t phash;
-    typedef std::list<cv::String> CacheList;
+    প্রকারলেখ std::list<cv::String> CacheList;
     CacheList cacheList;
 
-    std::shared_ptr<OpenCLBufferPoolImpl> bufferPool_;
-    std::shared_ptr<OpenCLBufferPoolImpl> bufferPoolHostPtr_;
-    OpenCLBufferPoolImpl& getBufferPool() const
+    std::shared_ptr<OpenCLBufferPoolImpl> বাফার_Pool_2;
+    std::shared_ptr<OpenCLBufferPoolImpl> বাফার_Pool_Host_Ptr;
+    OpenCLBufferPoolImpl& get_বাফার_Pool() ধ্রুবক
     {
-        _init_buffer_pools();
-        CV_DbgAssert(bufferPool_);
-        return *bufferPool_.get();
+        init_বাফার_pools();
+        CV_DbgAssert(বাফার_Pool_2);
+        ফেরত *বাফার_Pool_2.get();
     }
-    OpenCLBufferPoolImpl& getBufferPoolHostPtr() const
+    OpenCLBufferPoolImpl& get_বাফার_Pool_Host_Ptr() ধ্রুবক
     {
-        _init_buffer_pools();
-        CV_DbgAssert(bufferPoolHostPtr_);
-        return *bufferPoolHostPtr_.get();
+        init_বাফার_pools();
+        CV_DbgAssert(বাফার_Pool_Host_Ptr);
+        ফেরত *বাফার_Pool_Host_Ptr.get();
     }
 
-    std::map<std::type_index, std::shared_ptr<UserContext>> userContextStorage;
+    std::map<std::type_সূচক, std::shared_ptr<UserContext>> userContextStorage;
     cv::Mutex userContextMutex;
-    void setUserContext(std::type_index typeId, const std::shared_ptr<UserContext>& userContext) {
+    শূন্য setUserContext(std::type_সূচক typeId, ধ্রুবক std::shared_ptr<UserContext>& userContext) {
         cv::AutoLock lock(userContextMutex);
         userContextStorage[typeId] = userContext;
     }
-    std::shared_ptr<UserContext> getUserContext(std::type_index typeId) {
+    std::shared_ptr<UserContext> getUserContext(std::type_সূচক typeId) {
         cv::AutoLock lock(userContextMutex);
         auto it = userContextStorage.find(typeId);
-        if (it != userContextStorage.end())
-            return it->second;
-        else
-            return nullptr;
+        যদি (it != userContextStorage.end())
+            ফেরত it->second;
+        অন্যথা
+            ফেরত nullptr;
     }
 
 #ifdef HAVE_OPENCL_SVM
-    bool svmInitialized;
-    bool svmAvailable;
-    bool svmEnabled;
+    যৌক্তিক svmInitialized;
+    যৌক্তিক svmAvailable;
+    যৌক্তিক svmEnabled;
     svm::SVMCapabilities svmCapabilities;
     svm::SVMFunctions svmFunctions;
 
-    void svmInit()
+    শূন্য svmInit()
     {
-        CV_Assert(handle != NULL);
-        const Device& device = devices[0];
+        CV_Assert(handle != ফাঁকা);
+        ধ্রুবক Device& device = devices[0];
         cl_device_svm_capabilities deviceCaps = 0;
-        CV_Assert(((void)0, CL_DEVICE_SVM_CAPABILITIES == CL_DEVICE_SVM_CAPABILITIES_AMD)); // Check assumption
-        cl_int status = clGetDeviceInfo((cl_device_id)device.ptr(), CL_DEVICE_SVM_CAPABILITIES, sizeof(deviceCaps), &deviceCaps, NULL);
-        if (status != CL_SUCCESS)
+        CV_Assert(((শূন্য)0, CL_DEVICE_SVM_CAPABILITIES == CL_DEVICE_SVM_CAPABILITIES_AMD)); // Check assumption
+        cl_int status = clGetDeviceInfo((cl_device_id)device.ptr(), CL_DEVICE_SVM_CAPABILITIES, আকার(deviceCaps), &deviceCaps, ফাঁকা);
+        যদি (status != CL_SUCCESS)
         {
             CV_OPENCL_SVM_TRACE_ERROR_P("CL_DEVICE_SVM_CAPABILITIES via clGetDeviceInfo failed: %d\n", status);
-            goto noSVM;
+            যাও noSVM;
         }
-        CV_OPENCL_SVM_TRACE_P("CL_DEVICE_SVM_CAPABILITIES returned: 0x%x\n", (int)deviceCaps);
-        CV_Assert(((void)0, CL_DEVICE_SVM_COARSE_GRAIN_BUFFER == CL_DEVICE_SVM_COARSE_GRAIN_BUFFER_AMD)); // Check assumption
-        svmCapabilities.value_ =
-                ((deviceCaps & CL_DEVICE_SVM_COARSE_GRAIN_BUFFER) ? svm::SVMCapabilities::SVM_COARSE_GRAIN_BUFFER : 0) |
-                ((deviceCaps & CL_DEVICE_SVM_FINE_GRAIN_BUFFER) ? svm::SVMCapabilities::SVM_FINE_GRAIN_BUFFER : 0) |
+        CV_OPENCL_SVM_TRACE_P("CL_DEVICE_SVM_CAPABILITIES returned: 0x%x\n", (পূর্ণসংখ্যা)deviceCaps);
+        CV_Assert(((শূন্য)0, CL_DEVICE_SVM_COARSE_GRAIN_বাফার == CL_DEVICE_SVM_COARSE_GRAIN_বাফার_AMD)); // Check assumption
+        svmCapabilities.মান_2 =
+                ((deviceCaps & CL_DEVICE_SVM_COARSE_GRAIN_বাফার) ? svm::SVMCapabilities::SVM_COARSE_GRAIN_বাফার : 0) |
+                ((deviceCaps & CL_DEVICE_SVM_FINE_GRAIN_বাফার) ? svm::SVMCapabilities::SVM_FINE_GRAIN_বাফার : 0) |
                 ((deviceCaps & CL_DEVICE_SVM_FINE_GRAIN_SYSTEM) ? svm::SVMCapabilities::SVM_FINE_GRAIN_SYSTEM : 0) |
                 ((deviceCaps & CL_DEVICE_SVM_ATOMICS) ? svm::SVMCapabilities::SVM_ATOMICS : 0);
-        svmCapabilities.value_ &= svm::getSVMCapabilitiesMask();
-        if (svmCapabilities.value_ == 0)
+        svmCapabilities.মান_2 &= svm::getSVMCapabilitiesMask();
+        যদি (svmCapabilities.মান_2 == 0)
         {
             CV_OPENCL_SVM_TRACE_ERROR_P("svmCapabilities is empty\n");
-            goto noSVM;
+            যাও noSVM;
         }
-        try
+        চেষ্টা
         {
             // Try OpenCL 2.0
             CV_OPENCL_SVM_TRACE_P("Try SVM from OpenCL 2.0 ...\n");
-            void* ptr = clSVMAlloc(handle, CL_MEM_READ_WRITE, 100, 0);
-            if (!ptr)
+            শূন্য* ptr = clSVMAlloc(handle, CL_MEM_READ_WRITE, 100, 0);
+            যদি (!ptr)
             {
                 CV_OPENCL_SVM_TRACE_ERROR_P("clSVMAlloc returned NULL...\n");
                 CV_Error(Error::StsBadArg, "clSVMAlloc returned NULL");
             }
-            try
+            চেষ্টা
             {
-                bool error = false;
+                যৌক্তিক error = মিথ্যা;
                 cl_command_queue q = (cl_command_queue)Queue::getDefault().ptr();
-                if (CL_SUCCESS != clEnqueueSVMMap(q, CL_TRUE, CL_MAP_WRITE, ptr, 100, 0, NULL, NULL))
+                যদি (CL_SUCCESS != clEnqueueSVMMap(q, CL_TRUE, CL_MAP_WRITE, ptr, 100, 0, ফাঁকা, ফাঁকা))
                 {
                     CV_OPENCL_SVM_TRACE_ERROR_P("clEnqueueSVMMap failed...\n");
                     CV_Error(Error::StsBadArg, "clEnqueueSVMMap FAILED");
                 }
                 clFinish(q);
-                try
+                চেষ্টা
                 {
-                    ((int*)ptr)[0] = 100;
+                    ((পূর্ণসংখ্যা*)ptr)[0] = 100;
                 }
-                catch (...)
+                ধরো (...)
                 {
                     CV_OPENCL_SVM_TRACE_ERROR_P("SVM buffer access test FAILED\n");
-                    error = true;
+                    error = সত্য;
                 }
-                if (CL_SUCCESS != clEnqueueSVMUnmap(q, ptr, 0, NULL, NULL))
+                যদি (CL_SUCCESS != clEnqueueSVMUnmap(q, ptr, 0, ফাঁকা, ফাঁকা))
                 {
                     CV_OPENCL_SVM_TRACE_ERROR_P("clEnqueueSVMUnmap failed...\n");
                     CV_Error(Error::StsBadArg, "clEnqueueSVMUnmap FAILED");
                 }
                 clFinish(q);
-                if (error)
+                যদি (error)
                 {
                     CV_Error(Error::StsBadArg, "OpenCL SVM buffer access test was FAILED");
                 }
             }
-            catch (...)
+            ধরো (...)
             {
                 CV_OPENCL_SVM_TRACE_ERROR_P("OpenCL SVM buffer access test was FAILED\n");
                 clSVMFree(handle, ptr);
-                throw;
+                ছোড়ো;
             }
             clSVMFree(handle, ptr);
             svmFunctions.fn_clSVMAlloc = clSVMAlloc;
@@ -2819,20 +2819,20 @@ public:
             svmFunctions.fn_clEnqueueSVMMap = clEnqueueSVMMap;
             svmFunctions.fn_clEnqueueSVMUnmap = clEnqueueSVMUnmap;
         }
-        catch (...)
+        ধরো (...)
         {
             CV_OPENCL_SVM_TRACE_P("clSVMAlloc failed, trying HSA extension...\n");
-            try
+            চেষ্টা
             {
                 // Try HSA extension
                 String extensions = device.extensions();
-                if (extensions.find("cl_amd_svm") == String::npos)
+                যদি (extensions.find("cl_amd_svm") == String::npos)
                 {
                     CV_OPENCL_SVM_TRACE_P("Device extension doesn't have cl_amd_svm: %s\n", extensions.c_str());
-                    goto noSVM;
+                    যাও noSVM;
                 }
-                cl_platform_id p = NULL;
-                CV_OCL_CHECK(status = clGetDeviceInfo((cl_device_id)device.ptr(), CL_DEVICE_PLATFORM, sizeof(cl_platform_id), &p, NULL));
+                cl_platform_id p = ফাঁকা;
+                CV_OCL_CHECK(status = clGetDeviceInfo((cl_device_id)device.ptr(), CL_DEVICE_PLATFORM, আকার(cl_platform_id), &p, ফাঁকা));
                 svmFunctions.fn_clSVMAlloc = (clSVMAllocAMD_fn)clGetExtensionFunctionAddressForPlatform(p, "clSVMAllocAMD");
                 svmFunctions.fn_clSVMFree = (clSVMFreeAMD_fn)clGetExtensionFunctionAddressForPlatform(p, "clSVMFreeAMD");
                 svmFunctions.fn_clSetKernelArgSVMPointer = (clSetKernelArgSVMPointerAMD_fn)clGetExtensionFunctionAddressForPlatform(p, "clSetKernelArgSVMPointerAMD");
@@ -2844,39 +2844,39 @@ public:
                 svmFunctions.fn_clEnqueueSVMUnmap = (clEnqueueSVMUnmapAMD_fn)clGetExtensionFunctionAddressForPlatform(p, "clEnqueueSVMUnmapAMD");
                 CV_Assert(svmFunctions.isValid());
             }
-            catch (...)
+            ধরো (...)
             {
                 CV_OPENCL_SVM_TRACE_P("Something is totally wrong\n");
-                goto noSVM;
+                যাও noSVM;
             }
         }
 
-        svmAvailable = true;
+        svmAvailable = সত্য;
         svmEnabled = !svm::checkDisableSVM();
-        svmInitialized = true;
+        svmInitialized = সত্য;
         CV_OPENCL_SVM_TRACE_P("OpenCV OpenCL SVM support initialized\n");
-        return;
+        ফেরত;
     noSVM:
         CV_OPENCL_SVM_TRACE_P("OpenCL SVM is not detected\n");
-        svmAvailable = false;
-        svmEnabled = false;
-        svmCapabilities.value_ = 0;
-        svmInitialized = true;
-        svmFunctions.fn_clSVMAlloc = NULL;
-        return;
+        svmAvailable = মিথ্যা;
+        svmEnabled = মিথ্যা;
+        svmCapabilities.মান_2 = 0;
+        svmInitialized = সত্য;
+        svmFunctions.fn_clSVMAlloc = ফাঁকা;
+        ফেরত;
     }
 
-    std::shared_ptr<OpenCLSVMBufferPoolImpl> bufferPoolSVM_;
+    std::shared_ptr<OpenCLSVMBufferPoolImpl> বাফার_Pool_SVM;
 
-    OpenCLSVMBufferPoolImpl& getBufferPoolSVM() const
+    OpenCLSVMBufferPoolImpl& get_বাফার_Pool_SVM() ধ্রুবক
     {
-        _init_buffer_pools();
-        CV_DbgAssert(bufferPoolSVM_);
-        return *bufferPoolSVM_.get();
+        init_বাফার_pools();
+        CV_DbgAssert(বাফার_Pool_SVM);
+        ফেরত *বাফার_Pool_SVM.get();
     }
 #endif
 
-    friend class Program;
+    friend শ্রেণী Program;
 };
 
 
@@ -2891,78 +2891,78 @@ Context::~Context()
 }
 
 // deprecated
-Context::Context(int dtype)
+Context::Context(পূর্ণসংখ্যা dtype)
 {
     p = 0;
     create(dtype);
 }
 
-void Context::release()
+শূন্য Context::release()
 {
-    if (p)
+    যদি (p)
     {
         p->release();
-        p = NULL;
+        p = ফাঁকা;
     }
 }
 
-bool Context::create()
+যৌক্তিক Context::create()
 {
     release();
-    if (!haveOpenCL())
-        return false;
+    যদি (!haveOpenCL())
+        ফেরত মিথ্যা;
     p = Impl::findOrCreateContext(std::string());
-    if (p && p->handle)
-        return true;
+    যদি (p && p->handle)
+        ফেরত সত্য;
     release();
-    return false;
+    ফেরত মিথ্যা;
 }
 
 // deprecated
-bool Context::create(int dtype)
+যৌক্তিক Context::create(পূর্ণসংখ্যা dtype)
 {
-    if( !haveOpenCL() )
-        return false;
+    যদি( !haveOpenCL() )
+        ফেরত মিথ্যা;
     release();
-    if (dtype == CL_DEVICE_TYPE_DEFAULT || (unsigned)dtype == (unsigned)CL_DEVICE_TYPE_ALL)
+    যদি (dtype == CL_DEVICE_TYPE_DEFAULT || (unsigned)dtype == (unsigned)CL_DEVICE_TYPE_ALL)
     {
         p = Impl::findOrCreateContext("");
     }
-    else if (dtype == CL_DEVICE_TYPE_GPU)
+    অন্যথা যদি (dtype == CL_DEVICE_TYPE_GPU)
     {
         p = Impl::findOrCreateContext(":GPU:");
     }
-    else if (dtype == CL_DEVICE_TYPE_CPU)
+    অন্যথা যদি (dtype == CL_DEVICE_TYPE_CPU)
     {
         p = Impl::findOrCreateContext(":CPU:");
     }
-    else
+    অন্যথা
     {
-        CV_LOG_ERROR(NULL, "OpenCL: Can't recognize OpenCV device type=" << dtype);
+        CV_LOG_ERROR(ফাঁকা, "OpenCL: Can't recognize OpenCV device type=" << dtype);
     }
-    if (p && !p->handle)
+    যদি (p && !p->handle)
     {
         release();
     }
-    return p != 0;
+    ফেরত p != 0;
 }
 
-Context::Context(const Context& c)
+Context::Context(ধ্রুবক Context& c)
 {
     p = (Impl*)c.p;
-    if(p)
+    যদি(p)
         p->addref();
 }
 
-Context& Context::operator = (const Context& c)
+Context& Context::operator = (ধ্রুবক Context& c)
 {
     Impl* newp = (Impl*)c.p;
-    if(newp)
+    যদি(newp)
         newp->addref();
-    if(p)
+    যদি(p)
         p->release();
     p = newp;
-    return *this;
+    ফেরত *এই;
 }
 
 Context::Context(Context&& c) CV_NOEXCEPT
@@ -2973,155 +2973,155 @@ Context::Context(Context&& c) CV_NOEXCEPT
 
 Context& Context::operator = (Context&& c) CV_NOEXCEPT
 {
-    if (this != &c) {
-        if(p)
+    যদি (এই != &c) {
+        যদি(p)
             p->release();
         p = c.p;
         c.p = nullptr;
     }
-    return *this;
+    ফেরত *এই;
 }
 
-void* Context::ptr() const
+শূন্য* Context::ptr() ধ্রুবক
 {
-    return p == NULL ? NULL : p->handle;
+    ফেরত p == ফাঁকা ? ফাঁকা : p->handle;
 }
 
-size_t Context::ndevices() const
+size_t Context::ndevices() ধ্রুবক
 {
-    return p ? p->devices.size() : 0;
+    ফেরত p ? p->devices.size() : 0;
 }
 
-Device& Context::device(size_t idx) const
+Device& Context::device(size_t idx) ধ্রুবক
 {
-    static Device dummy;
-    return !p || idx >= p->devices.size() ? dummy : p->devices[idx];
+    স্থির Device dummy;
+    ফেরত !p || idx >= p->devices.size() ? dummy : p->devices[idx];
 }
 
 Context& Context::getDefault()
 {
     auto& c = OpenCLExecutionContext::getCurrent();
-    if (!c.empty())
+    যদি (!c.empty())
     {
         auto& ctx = c.getContext();
-        return ctx;
+        ফেরত ctx;
     }
 
-    static Context dummy;
-    return dummy;
+    স্থির Context dummy;
+    ফেরত dummy;
 }
 
-Program Context::getProg(const ProgramSource& prog,
-                         const String& buildopts, String& errmsg)
+Program Context::getProg(ধ্রুবক ProgramSource& prog,
+                         ধ্রুবক String& buildopts, String& errmsg)
 {
-    return p ? p->getProg(prog, buildopts, errmsg) : Program();
+    ফেরত p ? p->getProg(prog, buildopts, errmsg) : Program();
 }
 
-void Context::unloadProg(Program& prog)
+শূন্য Context::unloadProg(Program& prog)
 {
-    if (p)
+    যদি (p)
         p->unloadProg(prog);
 }
 
 /* static */
-Context Context::fromHandle(void* context)
+Context Context::fromHandle(শূন্য* context)
 {
     Context ctx;
     ctx.p = Impl::findOrCreateContext((cl_context)context);
-    return ctx;
+    ফেরত ctx;
 }
 
 /* static */
-Context Context::fromDevice(const ocl::Device& device)
+Context Context::fromDevice(ধ্রুবক ocl::Device& device)
 {
     Context ctx;
     ctx.p = Impl::findOrCreateContext(device);
-    return ctx;
+    ফেরত ctx;
 }
 
 /* static */
-Context Context::create(const std::string& configuration)
+Context Context::create(ধ্রুবক std::string& configuration)
 {
     Context ctx;
     ctx.p = Impl::findOrCreateContext(configuration);
-    return ctx;
+    ফেরত ctx;
 }
 
-void* Context::getOpenCLContextProperty(int propertyId) const
+শূন্য* Context::getOpenCLContextProperty(পূর্ণসংখ্যা propertyId) ধ্রুবক
 {
-    if (p == NULL)
-        return nullptr;
+    যদি (p == ফাঁকা)
+        ফেরত nullptr;
     ::size_t size = 0;
-    CV_OCL_CHECK(clGetContextInfo(p->handle, CL_CONTEXT_PROPERTIES, 0, NULL, &size));
-    std::vector<cl_context_properties> prop(size / sizeof(cl_context_properties), (cl_context_properties)0);
-    CV_OCL_CHECK(clGetContextInfo(p->handle, CL_CONTEXT_PROPERTIES, size, prop.data(), NULL));
-    for (size_t i = 0; i < prop.size(); i += 2)
+    CV_OCL_CHECK(clGetContextInfo(p->handle, CL_CONTEXT_PROPERTIES, 0, ফাঁকা, &size));
+    std::vector<cl_context_properties> prop(size / আকার(cl_context_properties), (cl_context_properties)0);
+    CV_OCL_CHECK(clGetContextInfo(p->handle, CL_CONTEXT_PROPERTIES, size, prop.তথ্য(), ফাঁকা));
+    জন্য (size_t i = 0; i < prop.size(); i += 2)
     {
-        if (prop[i] == (cl_context_properties)propertyId)
+        যদি (prop[i] == (cl_context_properties)propertyId)
         {
-            CV_LOG_DEBUG(NULL, "OpenCL: found context property=" << propertyId << ") => " << (void*)prop[i + 1]);
-            return (void*)prop[i + 1];
+            CV_LOG_DEBUG(ফাঁকা, "OpenCL: found context property=" << propertyId << ") => " << (শূন্য*)prop[i + 1]);
+            ফেরত (শূন্য*)prop[i + 1];
         }
     }
-    return nullptr;
+    ফেরত nullptr;
 }
 
 #ifdef HAVE_OPENCL_SVM
-bool Context::useSVM() const
+যৌক্তিক Context::useSVM() ধ্রুবক
 {
     Context::Impl* i = p;
     CV_Assert(i);
-    if (!i->svmInitialized)
+    যদি (!i->svmInitialized)
         i->svmInit();
-    return i->svmEnabled;
+    ফেরত i->svmEnabled;
 }
-void Context::setUseSVM(bool enabled)
+শূন্য Context::setUseSVM(যৌক্তিক enabled)
 {
     Context::Impl* i = p;
     CV_Assert(i);
-    if (!i->svmInitialized)
+    যদি (!i->svmInitialized)
         i->svmInit();
-    if (enabled && !i->svmAvailable)
+    যদি (enabled && !i->svmAvailable)
     {
         CV_Error(Error::StsError, "OpenCL Shared Virtual Memory (SVM) is not supported by OpenCL device");
     }
     i->svmEnabled = enabled;
 }
-#else
-bool Context::useSVM() const { return false; }
-void Context::setUseSVM(bool enabled) { CV_Assert(!enabled); }
+#অন্যথা
+যৌক্তিক Context::useSVM() ধ্রুবক { ফেরত মিথ্যা; }
+শূন্য Context::setUseSVM(যৌক্তিক enabled) { CV_Assert(!enabled); }
 #endif
 
 #ifdef HAVE_OPENCL_SVM
-namespace svm {
+নামাকাশ svm {
 
-const SVMCapabilities getSVMCapabilitites(const ocl::Context& context)
+ধ্রুবক SVMCapabilities getSVMCapabilitites(ধ্রুবক ocl::Context& context)
 {
     Context::Impl* i = context.getImpl();
     CV_Assert(i);
-    if (!i->svmInitialized)
+    যদি (!i->svmInitialized)
         i->svmInit();
-    return i->svmCapabilities;
+    ফেরত i->svmCapabilities;
 }
 
-CV_EXPORTS const SVMFunctions* getSVMFunctions(const ocl::Context& context)
+CV_EXPORTS ধ্রুবক SVMFunctions* getSVMFunctions(ধ্রুবক ocl::Context& context)
 {
     Context::Impl* i = context.getImpl();
     CV_Assert(i);
     CV_Assert(i->svmInitialized); // getSVMCapabilitites() must be called first
-    CV_Assert(i->svmFunctions.fn_clSVMAlloc != NULL);
-    return &i->svmFunctions;
+    CV_Assert(i->svmFunctions.fn_clSVMAlloc != ফাঁকা);
+    ফেরত &i->svmFunctions;
 }
 
-CV_EXPORTS bool useSVM(UMatUsageFlags usageFlags)
+CV_EXPORTS যৌক্তিক useSVM(UMatUsageFlags usageFlags)
 {
-    if (checkForceSVMUmatUsage())
-        return true;
-    if (checkDisableSVMUMatUsage())
-        return false;
-    if ((usageFlags & USAGE_ALLOCATE_SHARED_MEMORY) != 0)
-        return true;
-    return false; // don't use SVM by default
+    যদি (checkForceSVMUmatUsage())
+        ফেরত সত্য;
+    যদি (checkDisableSVMUMatUsage())
+        ফেরত মিথ্যা;
+    যদি ((usageFlags & USAGE_ALLOCATE_SHARED_MEMORY) != 0)
+        ফেরত সত্য;
+    ফেরত মিথ্যা; // don't use SVM by default
 }
 
 } // namespace cv::ocl::svm
@@ -3131,38 +3131,38 @@ Context::UserContext::~UserContext()
 {
 }
 
-void Context::setUserContext(std::type_index typeId, const std::shared_ptr<Context::UserContext>& userContext)
+শূন্য Context::setUserContext(std::type_সূচক typeId, ধ্রুবক std::shared_ptr<Context::UserContext>& userContext)
 {
     CV_Assert(p);
     p->setUserContext(typeId, userContext);
 }
 
-std::shared_ptr<Context::UserContext> Context::getUserContext(std::type_index typeId)
+std::shared_ptr<Context::UserContext> Context::getUserContext(std::type_সূচক typeId)
 {
     CV_Assert(p);
-    return p->getUserContext(typeId);
+    ফেরত p->getUserContext(typeId);
 }
 
-static void get_platform_name(cl_platform_id id, String& name)
+স্থির শূন্য get_platform_name(cl_platform_id id, String& name)
 {
     // get platform name string length
     size_t sz = 0;
     CV_OCL_CHECK(clGetPlatformInfo(id, CL_PLATFORM_NAME, 0, 0, &sz));
 
     // get platform name string
-    AutoBuffer<char> buf(sz + 1);
-    CV_OCL_CHECK(clGetPlatformInfo(id, CL_PLATFORM_NAME, sz, buf.data(), 0));
+    Auto_বাফার<অক্ষর> buf(sz + 1);
+    CV_OCL_CHECK(clGetPlatformInfo(id, CL_PLATFORM_NAME, sz, buf.তথ্য(), 0));
 
     // just in case, ensure trailing zero for ASCIIZ string
     buf[sz] = 0;
 
-    name = buf.data();
+    name = buf.তথ্য();
 }
 
 /*
 // Attaches OpenCL context to OpenCV
 */
-void attachContext(const String& platformName, void* platformID, void* context, void* deviceID)
+শূন্য attachContext(ধ্রুবক String& platformName, শূন্য* platformID, শূন্য* context, শূন্য* deviceID)
 {
     auto ctx = OpenCLExecutionContext::create(platformName, platformID, context, deviceID);
     ctx.bind();
@@ -3170,54 +3170,54 @@ void attachContext(const String& platformName, void* platformID, void* context, 
 
 /* static */
 OpenCLExecutionContext OpenCLExecutionContext::create(
-        const std::string& platformName, void* platformID, void* context, void* deviceID
+        ধ্রুবক std::string& platformName, শূন্য* platformID, শূন্য* context, শূন্য* deviceID
 )
 {
-    if (!haveOpenCL())
+    যদি (!haveOpenCL())
         CV_Error(cv::Error::OpenCLApiCallError, "OpenCL runtime is not available!");
 
     cl_uint cnt = 0;
     CV_OCL_CHECK(clGetPlatformIDs(0, 0, &cnt));
 
-    if (cnt == 0)
+    যদি (cnt == 0)
         CV_Error(cv::Error::OpenCLApiCallError, "No OpenCL platform available!");
 
     std::vector<cl_platform_id> platforms(cnt);
 
     CV_OCL_CHECK(clGetPlatformIDs(cnt, &platforms[0], 0));
 
-    bool platformAvailable = false;
+    যৌক্তিক platformAvailable = মিথ্যা;
 
     // check if external platformName contained in list of available platforms in OpenCV
-    for (unsigned int i = 0; i < cnt; i++)
+    জন্য (unsigned পূর্ণসংখ্যা i = 0; i < cnt; i++)
     {
         String availablePlatformName;
         get_platform_name(platforms[i], availablePlatformName);
         // external platform is found in the list of available platforms
-        if (platformName == availablePlatformName)
+        যদি (platformName == availablePlatformName)
         {
-            platformAvailable = true;
-            break;
+            platformAvailable = সত্য;
+            বিরতি;
         }
     }
 
-    if (!platformAvailable)
+    যদি (!platformAvailable)
         CV_Error(cv::Error::OpenCLApiCallError, "No matched platforms available!");
 
     // check if platformID corresponds to platformName
     String actualPlatformName;
     get_platform_name((cl_platform_id)platformID, actualPlatformName);
-    if (platformName != actualPlatformName)
+    যদি (platformName != actualPlatformName)
         CV_Error(cv::Error::OpenCLApiCallError, "No matched platforms available!");
 
     OpenCLExecutionContext ctx;
     ctx.p = std::make_shared<OpenCLExecutionContext::Impl>((cl_platform_id)platformID, (cl_context)context, (cl_device_id)deviceID);
     CV_OCL_CHECK(clReleaseContext((cl_context)context));
     CV_OCL_CHECK(clReleaseDevice((cl_device_id)deviceID));
-    return ctx;
+    ফেরত ctx;
 }
 
-void initializeContextFromHandle(Context& ctx, void* _platform, void* _context, void* _device)
+শূন্য initializeContextFromHandle(Context& ctx, শূন্য* _platform, শূন্য* _context, শূন্য* _device)
 {
     // internal call, less checks
     cl_platform_id platformID = (cl_platform_id)_platform;
@@ -3233,13 +3233,13 @@ void initializeContextFromHandle(Context& ctx, void* _platform, void* _context, 
 
 /////////////////////////////////////////// Queue /////////////////////////////////////////////
 
-struct Queue::Impl
+কাঠামো Queue::Impl
 {
-    inline void __init()
+    অন্তঃরেখ শূন্য __init()
     {
         refcount = 1;
         handle = 0;
-        isProfilingQueue_ = false;
+        isProfilingQueue_ = মিথ্যা;
     }
 
     Impl(cl_command_queue q)
@@ -3248,30 +3248,30 @@ struct Queue::Impl
         handle = q;
 
         cl_command_queue_properties props = 0;
-        CV_OCL_CHECK(clGetCommandQueueInfo(handle, CL_QUEUE_PROPERTIES, sizeof(cl_command_queue_properties), &props, NULL));
+        CV_OCL_CHECK(clGetCommandQueueInfo(handle, CL_QUEUE_PROPERTIES, আকার(cl_command_queue_properties), &props, ফাঁকা));
         isProfilingQueue_ = !!(props & CL_QUEUE_PROFILING_ENABLE);
     }
 
-    Impl(cl_command_queue q, bool isProfilingQueue)
+    Impl(cl_command_queue q, যৌক্তিক isProfilingQueue)
     {
         __init();
         handle = q;
         isProfilingQueue_ = isProfilingQueue;
     }
 
-    Impl(const Context& c, const Device& d, bool withProfiling = false)
+    Impl(ধ্রুবক Context& c, ধ্রুবক Device& d, যৌক্তিক withProfiling = মিথ্যা)
     {
         __init();
 
-        const Context* pc = &c;
+        ধ্রুবক Context* pc = &c;
         cl_context ch = (cl_context)pc->ptr();
-        if( !ch )
+        যদি( !ch )
         {
             pc = &Context::getDefault();
             ch = (cl_context)pc->ptr();
         }
         cl_device_id dh = (cl_device_id)d.ptr();
-        if( !dh )
+        যদি( !dh )
             dh = (cl_device_id)pc->device(0).ptr();
         cl_int retval = 0;
         cl_command_queue_properties props = withProfiling ? CL_QUEUE_PROFILING_ENABLE : 0;
@@ -3282,48 +3282,48 @@ struct Queue::Impl
     ~Impl()
     {
 #ifdef _WIN32
-        if (!cv::__termination)
+        যদি (!cv::__termination)
 #endif
         {
-            if(handle)
+            যদি(handle)
             {
                 CV_OCL_DBG_CHECK(clFinish(handle));
                 CV_OCL_DBG_CHECK(clReleaseCommandQueue(handle));
-                handle = NULL;
+                handle = ফাঁকা;
             }
         }
     }
 
-    const cv::ocl::Queue& getProfilingQueue(const cv::ocl::Queue& self)
+    ধ্রুবক cv::ocl::Queue& getProfilingQueue(ধ্রুবক cv::ocl::Queue& self)
     {
-        if (isProfilingQueue_)
-            return self;
+        যদি (isProfilingQueue_)
+            ফেরত self;
 
-        if (profiling_queue_.ptr())
-            return profiling_queue_;
+        যদি (profiling_queue_.ptr())
+            ফেরত profiling_queue_;
 
         cl_context ctx = 0;
-        CV_OCL_CHECK(clGetCommandQueueInfo(handle, CL_QUEUE_CONTEXT, sizeof(cl_context), &ctx, NULL));
+        CV_OCL_CHECK(clGetCommandQueueInfo(handle, CL_QUEUE_CONTEXT, আকার(cl_context), &ctx, ফাঁকা));
 
         cl_device_id device = 0;
-        CV_OCL_CHECK(clGetCommandQueueInfo(handle, CL_QUEUE_DEVICE, sizeof(cl_device_id), &device, NULL));
+        CV_OCL_CHECK(clGetCommandQueueInfo(handle, CL_QUEUE_DEVICE, আকার(cl_device_id), &device, ফাঁকা));
 
-        cl_int result = CL_SUCCESS;
+        cl_int ফলাফল = CL_SUCCESS;
         cl_command_queue_properties props = CL_QUEUE_PROFILING_ENABLE;
-        cl_command_queue q = clCreateCommandQueue(ctx, device, props, &result);
-        CV_OCL_DBG_CHECK_RESULT(result, "clCreateCommandQueue(with CL_QUEUE_PROFILING_ENABLE)");
+        cl_command_queue q = clCreateCommandQueue(ctx, device, props, &ফলাফল);
+        CV_OCL_DBG_CHECK_ফলাফল(ফলাফল, "clCreateCommandQueue(with CL_QUEUE_PROFILING_ENABLE)");
 
         Queue queue;
-        queue.p = new Impl(q, true);
+        queue.p = নতুন Impl(q, সত্য);
         profiling_queue_ = queue;
 
-        return profiling_queue_;
+        ফেরত profiling_queue_;
     }
 
     IMPLEMENT_REFCOUNTABLE();
 
     cl_command_queue handle;
-    bool isProfilingQueue_;
+    যৌক্তিক isProfilingQueue_;
     cv::ocl::Queue profiling_queue_;
 };
 
@@ -3332,28 +3332,28 @@ Queue::Queue() CV_NOEXCEPT
     p = 0;
 }
 
-Queue::Queue(const Context& c, const Device& d)
+Queue::Queue(ধ্রুবক Context& c, ধ্রুবক Device& d)
 {
     p = 0;
     create(c, d);
 }
 
-Queue::Queue(const Queue& q)
+Queue::Queue(ধ্রুবক Queue& q)
 {
     p = q.p;
-    if(p)
+    যদি(p)
         p->addref();
 }
 
-Queue& Queue::operator = (const Queue& q)
+Queue& Queue::operator = (ধ্রুবক Queue& q)
 {
     Impl* newp = (Impl*)q.p;
-    if(newp)
+    যদি(newp)
         newp->addref();
-    if(p)
+    যদি(p)
         p->release();
     p = newp;
-    return *this;
+    ফেরত *এই;
 }
 
 Queue::Queue(Queue&& q) CV_NOEXCEPT
@@ -3364,66 +3364,66 @@ Queue::Queue(Queue&& q) CV_NOEXCEPT
 
 Queue& Queue::operator = (Queue&& q) CV_NOEXCEPT
 {
-    if (this != &q) {
-        if(p)
+    যদি (এই != &q) {
+        যদি(p)
             p->release();
         p = q.p;
         q.p = nullptr;
     }
-    return *this;
+    ফেরত *এই;
 }
 
 Queue::~Queue()
 {
-    if(p)
+    যদি(p)
         p->release();
 }
 
-bool Queue::create(const Context& c, const Device& d)
+যৌক্তিক Queue::create(ধ্রুবক Context& c, ধ্রুবক Device& d)
 {
-    if(p)
+    যদি(p)
         p->release();
-    p = new Impl(c, d);
-    return p->handle != 0;
+    p = নতুন Impl(c, d);
+    ফেরত p->handle != 0;
 }
 
-void Queue::finish()
+শূন্য Queue::finish()
 {
-    if(p && p->handle)
+    যদি(p && p->handle)
     {
         CV_OCL_DBG_CHECK(clFinish(p->handle));
     }
 }
 
-const Queue& Queue::getProfilingQueue() const
+ধ্রুবক Queue& Queue::getProfilingQueue() ধ্রুবক
 {
     CV_Assert(p);
-    return p->getProfilingQueue(*this);
+    ফেরত p->getProfilingQueue(*এই);
 }
 
-void* Queue::ptr() const
+শূন্য* Queue::ptr() ধ্রুবক
 {
-    return p ? p->handle : 0;
+    ফেরত p ? p->handle : 0;
 }
 
 Queue& Queue::getDefault()
 {
     auto& c = OpenCLExecutionContext::getCurrent();
-    if (!c.empty())
+    যদি (!c.empty())
     {
         auto& q = c.getQueue();
-        return q;
+        ফেরত q;
     }
-    static Queue dummy;
-    return dummy;
+    স্থির Queue dummy;
+    ফেরত dummy;
 }
 
-static cl_command_queue getQueue(const Queue& q)
+স্থির cl_command_queue getQueue(ধ্রুবক Queue& q)
 {
     cl_command_queue qq = (cl_command_queue)q.ptr();
-    if(!qq)
+    যদি(!qq)
         qq = (cl_command_queue)Queue::getDefault().ptr();
-    return qq;
+    ফেরত qq;
 }
 
 /////////////////////////////////////////// KernelArg /////////////////////////////////////////////
@@ -3433,71 +3433,71 @@ KernelArg::KernelArg() CV_NOEXCEPT
 {
 }
 
-KernelArg::KernelArg(int _flags, UMat* _m, int _wscale, int _iwscale, const void* _obj, size_t _sz)
+KernelArg::KernelArg(পূর্ণসংখ্যা _flags, UMat* _m, পূর্ণসংখ্যা _wscale, পূর্ণসংখ্যা _iwscale, ধ্রুবক শূন্য* _obj, size_t _sz)
     : flags(_flags), m(_m), obj(_obj), sz(_sz), wscale(_wscale), iwscale(_iwscale)
 {
-    CV_Assert(_flags == LOCAL || _flags == CONSTANT || _m != NULL);
+    CV_Assert(_flags == LOCAL || _flags == CONSTANT || _m != ফাঁকা);
 }
 
-KernelArg KernelArg::Constant(const Mat& m)
+KernelArg KernelArg::Constant(ধ্রুবক Mat& m)
 {
     CV_Assert(m.isContinuous());
-    return KernelArg(CONSTANT, 0, 0, 0, m.ptr(), m.total()*m.elemSize());
+    ফেরত KernelArg(CONSTANT, 0, 0, 0, m.ptr(), m.যোগ()*m.elem_আকার());
 }
 
 /////////////////////////////////////////// Kernel /////////////////////////////////////////////
 
-struct Kernel::Impl
+কাঠামো Kernel::Impl
 {
-    Impl(const char* kname, const Program& prog) :
-        refcount(1), handle(NULL), isInProgress(false), isAsyncRun(false), nu(0)
+    Impl(ধ্রুবক অক্ষর* kname, ধ্রুবক Program& prog) :
+        refcount(1), handle(ফাঁকা), isInProgress(মিথ্যা), isAsyncRun(মিথ্যা), nu(0)
     {
         cl_program ph = (cl_program)prog.ptr();
         cl_int retval = 0;
         name = kname;
-        if (ph)
+        যদি (ph)
         {
             handle = clCreateKernel(ph, kname, &retval);
-            CV_OCL_DBG_CHECK_RESULT(retval, cv::format("clCreateKernel('%s')", kname).c_str());
+            CV_OCL_DBG_CHECK_ফলাফল(retval, cv::format("clCreateKernel('%s')", kname).c_str());
         }
-        for( int i = 0; i < MAX_ARRS; i++ )
+        জন্য( পূর্ণসংখ্যা i = 0; i < MAX_ARRS; i++ )
             u[i] = 0;
-        haveTempDstUMats = false;
-        haveTempSrcUMats = false;
+        have_অস্থায়ী_Dst_UMats = মিথ্যা;
+        have_অস্থায়ী_Src_UMats = মিথ্যা;
     }
 
-    void cleanupUMats()
+    শূন্য cleanupUMats()
     {
-        bool exceptionOccurred = false;
-        for( int i = 0; i < MAX_ARRS; i++ )
+        যৌক্তিক exceptionOccurred = মিথ্যা;
+        জন্য( পূর্ণসংখ্যা i = 0; i < MAX_ARRS; i++ )
         {
-            if( u[i] )
+            যদি( u[i] )
             {
-                if( CV_XADD(&u[i]->urefcount, -1) == 1 )
+                যদি( CV_XADD(&u[i]->urefcount, -1) == 1 )
                 {
-                    u[i]->flags |= UMatData::ASYNC_CLEANUP;
-                    try
+                    u[i]->flags |= UMat_তথ্য::ASYNC_CLEANUP;
+                    চেষ্টা
                     {
                         u[i]->currAllocator->deallocate(u[i]);
                     }
-                    catch(const std::exception& exc)
+                    ধরো(ধ্রুবক std::exception& exc)
                     {
                         // limited by legacy before C++11, therefore log and
                         // remember some exception occurred to throw below
-                        CV_LOG_ERROR(NULL, "OCL: Unexpected C++ exception in OpenCL Kernel::Impl::cleanupUMats(): " << exc.what());
-                        exceptionOccurred = true;
+                        CV_LOG_ERROR(ফাঁকা, "OCL: Unexpected C++ exception in OpenCL Kernel::Impl::cleanupUMats(): " << exc.what());
+                        exceptionOccurred = সত্য;
                     }
                 }
                 u[i] = 0;
             }
         }
         nu = 0;
-        haveTempDstUMats = false;
-        haveTempSrcUMats = false;
+        have_অস্থায়ী_Dst_UMats = মিথ্যা;
+        have_অস্থায়ী_Src_UMats = মিথ্যা;
         CV_Assert(!exceptionOccurred);
     }
 
-    void addUMat(const UMat& m, bool dst)
+    শূন্য addUMat(ধ্রুবক UMat& m, যৌক্তিক dst)
     {
         // TSAN false positive: see #27638
         CV_Assert(nu < MAX_ARRS && m.u && m.u->urefcount > 0);
@@ -3505,17 +3505,17 @@ struct Kernel::Impl
         // TSAN false positive: see #27638
         CV_XADD(&m.u->urefcount, 1);
         nu++;
-        if(dst && m.u->tempUMat())
-            haveTempDstUMats = true;
-        if(m.u->originalUMatData == NULL && m.u->tempUMat())
-            haveTempSrcUMats = true;  // UMat is created on RAW memory (without proper lifetime management, even from Mat)
+        যদি(dst && m.u->অস্থায়ী_UMat())
+            have_অস্থায়ী_Dst_UMats = সত্য;
+        যদি(m.u->original_UMat_তথ্য == ফাঁকা && m.u->অস্থায়ী_UMat())
+            have_অস্থায়ী_Src_UMats = সত্য;  // UMat is created on RAW memory (without proper lifetime management, even from Mat)
     }
 
     /// Preserve image lifetime (while it is specified as Kernel argument)
-    void registerImageArgument(int arg, const Image2D& image)
+    শূন্য registerImageArgument(পূর্ণসংখ্যা arg, ধ্রুবক Image2D& image)
     {
         CV_CheckGE(arg, 0, "");
-        if (arg < (int)shadow_images.size() && shadow_images[arg].ptr() != image.ptr())  // TODO future: replace ptr => impl (more strong check)
+        যদি (arg < (পূর্ণসংখ্যা)shadow_images.size() && shadow_images[arg].ptr() != image.ptr())  // TODO future: replace ptr => impl (more strong check)
         {
             CV_Check(arg, !isInProgress, "ocl::Kernel: clearing of pending Image2D arguments is not allowed");
         }
@@ -3524,28 +3524,28 @@ struct Kernel::Impl
         shadow_images[arg] = image;
     }
 
-    void finit(cl_event e)
+    শূন্য finit(cl_event e)
     {
         CV_UNUSED(e);
-        isInProgress = false;
-        try
+        isInProgress = মিথ্যা;
+        চেষ্টা
         {
             cleanupUMats();
         }
-        catch(...)
+        ধরো(...)
         {
             release();
-            throw;
+            ছোড়ো;
         }
         release();
     }
 
-    bool run(int dims, size_t _globalsize[], size_t _localsize[],
-            bool sync, int64* timeNS, const Queue& q);
+    যৌক্তিক run(পূর্ণসংখ্যা dims, size_t _globalsize[], size_t _localsize[],
+            যৌক্তিক সমলয়, int64* timeNS, ধ্রুবক Queue& q);
 
     ~Impl()
     {
-        if(handle)
+        যদি(handle)
         {
             CV_OCL_DBG_CHECK(clReleaseKernel(handle));
         }
@@ -3555,78 +3555,78 @@ struct Kernel::Impl
 
     cv::String name;
     cl_kernel handle;
-    enum { MAX_ARRS = 16 };
-    UMatData* u[MAX_ARRS];
-    bool isInProgress;
-    bool isAsyncRun;  // true if kernel was scheduled in async mode
-    int nu;
+    গণনা { MAX_ARRS = 16 };
+    UMat_তথ্য* u[MAX_ARRS];
+    যৌক্তিক isInProgress;
+    যৌক্তিক isAsyncRun;  // true if kernel was scheduled in async mode
+    পূর্ণসংখ্যা nu;
     std::vector<Image2D> shadow_images;
-    bool haveTempDstUMats;
-    bool haveTempSrcUMats;
+    যৌক্তিক have_অস্থায়ী_Dst_UMats;
+    যৌক্তিক have_অস্থায়ী_Src_UMats;
 };
 
 }} // namespace cv::ocl
 
-extern "C" {
+বাহ্যিক "C" {
 
-static void CL_CALLBACK oclCleanupCallback(cl_event e, cl_int, void *p)
+স্থির শূন্য CL_CALLBACK oclCleanupCallback(cl_event e, cl_int, শূন্য *p)
 {
-    try
+    চেষ্টা
     {
         ((cv::ocl::Kernel::Impl*)p)->finit(e);
     }
-    catch (const cv::Exception& exc)
+    ধরো (ধ্রুবক cv::Exception& exc)
     {
-        CV_LOG_ERROR(NULL, "OCL: Unexpected OpenCV exception in OpenCL callback: " << exc.what());
+        CV_LOG_ERROR(ফাঁকা, "OCL: Unexpected OpenCV exception in OpenCL callback: " << exc.what());
     }
-    catch (const std::exception& exc)
+    ধরো (ধ্রুবক std::exception& exc)
     {
-        CV_LOG_ERROR(NULL, "OCL: Unexpected C++ exception in OpenCL callback: " << exc.what());
+        CV_LOG_ERROR(ফাঁকা, "OCL: Unexpected C++ exception in OpenCL callback: " << exc.what());
     }
-    catch (...)
+    ধরো (...)
     {
-        CV_LOG_ERROR(NULL, "OCL: Unexpected unknown C++ exception in OpenCL callback");
+        CV_LOG_ERROR(ফাঁকা, "OCL: Unexpected unknown C++ exception in OpenCL callback");
     }
 }
 
 }
 
-namespace cv { namespace ocl {
+নামাকাশ cv { নামাকাশ ocl {
 
 Kernel::Kernel() CV_NOEXCEPT
 {
     p = 0;
 }
 
-Kernel::Kernel(const char* kname, const Program& prog)
+Kernel::Kernel(ধ্রুবক অক্ষর* kname, ধ্রুবক Program& prog)
 {
     p = 0;
     create(kname, prog);
 }
 
-Kernel::Kernel(const char* kname, const ProgramSource& src,
-               const String& buildopts, String* errmsg)
+Kernel::Kernel(ধ্রুবক অক্ষর* kname, ধ্রুবক ProgramSource& src,
+               ধ্রুবক String& buildopts, String* errmsg)
 {
     p = 0;
     create(kname, src, buildopts, errmsg);
 }
 
-Kernel::Kernel(const Kernel& k)
+Kernel::Kernel(ধ্রুবক Kernel& k)
 {
     p = k.p;
-    if(p)
+    যদি(p)
         p->addref();
 }
 
-Kernel& Kernel::operator = (const Kernel& k)
+Kernel& Kernel::operator = (ধ্রুবক Kernel& k)
 {
     Impl* newp = (Impl*)k.p;
-    if(newp)
+    যদি(newp)
         newp->addref();
-    if(p)
+    যদি(p)
         p->release();
     p = newp;
-    return *this;
+    ফেরত *এই;
 }
 
 Kernel::Kernel(Kernel&& k) CV_NOEXCEPT
@@ -3637,27 +3637,27 @@ Kernel::Kernel(Kernel&& k) CV_NOEXCEPT
 
 Kernel& Kernel::operator = (Kernel&& k) CV_NOEXCEPT
 {
-    if (this != &k) {
-        if(p)
+    যদি (এই != &k) {
+        যদি(p)
             p->release();
         p = k.p;
         k.p = nullptr;
     }
-    return *this;
+    ফেরত *এই;
 }
 
 Kernel::~Kernel()
 {
-    if(p)
+    যদি(p)
         p->release();
 }
 
-bool Kernel::create(const char* kname, const Program& prog)
+যৌক্তিক Kernel::create(ধ্রুবক অক্ষর* kname, ধ্রুবক Program& prog)
 {
-    if(p)
+    যদি(p)
         p->release();
-    p = new Impl(kname, prog);
-    if(p->handle == 0)
+    p = নতুন Impl(kname, prog);
+    যদি(p->handle == 0)
     {
         p->release();
         p = 0;
@@ -3665,350 +3665,350 @@ bool Kernel::create(const char* kname, const Program& prog)
 #ifdef CV_OPENCL_RUN_ASSERT // check kernel compilation fails
     CV_Assert(p);
 #endif
-    return p != 0;
+    ফেরত p != 0;
 }
 
-bool Kernel::create(const char* kname, const ProgramSource& src,
-                    const String& buildopts, String* errmsg)
+যৌক্তিক Kernel::create(ধ্রুবক অক্ষর* kname, ধ্রুবক ProgramSource& src,
+                    ধ্রুবক String& buildopts, String* errmsg)
 {
-    if(p)
+    যদি(p)
     {
         p->release();
         p = 0;
     }
     String tempmsg;
-    if( !errmsg ) errmsg = &tempmsg;
-    const Program prog = Context::getDefault().getProg(src, buildopts, *errmsg);
-    return create(kname, prog);
+    যদি( !errmsg ) errmsg = &tempmsg;
+    ধ্রুবক Program prog = Context::getDefault().getProg(src, buildopts, *errmsg);
+    ফেরত create(kname, prog);
 }
 
-void* Kernel::ptr() const
+শূন্য* Kernel::ptr() ধ্রুবক
 {
-    return p ? p->handle : 0;
+    ফেরত p ? p->handle : 0;
 }
 
-bool Kernel::empty() const
+যৌক্তিক Kernel::empty() ধ্রুবক
 {
-    return ptr() == 0;
+    ফেরত ptr() == 0;
 }
 
-static cv::String dumpValue(size_t sz, const void* p)
+স্থির cv::String dump_মান(size_t sz, ধ্রুবক শূন্য* p)
 {
-    if (!p)
-        return "NULL";
-    if (sz == 2)
-        return cv::format("%d / %uu / 0x%04x", *(short*)p, *(unsigned short*)p, *(short*)p);
-    if (sz == 4)
-        return cv::format("%d / %uu / 0x%08x / %g", *(int*)p, *(int*)p, *(int*)p, *(float*)p);
-    if (sz == 8)
-        return cv::format("%lld / %lluu / 0x%16llx / %g", *(long long*)p, *(long long*)p, *(long long*)p, *(double*)p);
-    return cv::format("%p", p);
+    যদি (!p)
+        ফেরত "NULL";
+    যদি (sz == 2)
+        ফেরত cv::format("%d / %uu / 0x%04x", *(short*)p, *(unsigned short*)p, *(short*)p);
+    যদি (sz == 4)
+        ফেরত cv::format("%d / %uu / 0x%08x / %g", *(পূর্ণসংখ্যা*)p, *(পূর্ণসংখ্যা*)p, *(পূর্ণসংখ্যা*)p, *(দশমিক*)p);
+    যদি (sz == 8)
+        ফেরত cv::format("%lld / %lluu / 0x%16llx / %g", *(long long*)p, *(long long*)p, *(long long*)p, *(দ্বিগুণ*)p);
+    ফেরত cv::format("%p", p);
 }
 
-int Kernel::set(int i, const void* value, size_t sz)
+পূর্ণসংখ্যা Kernel::set(পূর্ণসংখ্যা i, ধ্রুবক শূন্য* value, size_t sz)
 {
-    if (!p || !p->handle)
-        return -1;
-    if (i < 0)
-        return i;
-    if( i == 0 )
+    যদি (!p || !p->handle)
+        ফেরত -1;
+    যদি (i < 0)
+        ফেরত i;
+    যদি( i == 0 )
         p->cleanupUMats();
 
     cl_int retval = clSetKernelArg(p->handle, (cl_uint)i, sz, value);
-    CV_OCL_DBG_CHECK_RESULT(retval, cv::format("clSetKernelArg('%s', arg_index=%d, size=%d, value=%s)", p->name.c_str(), (int)i, (int)sz, dumpValue(sz, value).c_str()).c_str());
-    if (retval != CL_SUCCESS)
-        return -1;
-    return i+1;
+    CV_OCL_DBG_CHECK_ফলাফল(retval, cv::format("clSetKernelArg('%s', arg_index=%d, size=%d, value=%s)", p->name.c_str(), (পূর্ণসংখ্যা)i, (পূর্ণসংখ্যা)sz, dump_মান(sz, value).c_str()).c_str());
+    যদি (retval != CL_SUCCESS)
+        ফেরত -1;
+    ফেরত i+1;
 }
 
-int Kernel::set(int i, const Image2D& image2D)
+পূর্ণসংখ্যা Kernel::set(পূর্ণসংখ্যা i, ধ্রুবক Image2D& image2D)
 {
     cl_mem h = (cl_mem)image2D.ptr();
-    int res = set(i, &h, sizeof(h));
-    if (res >= 0)
+    পূর্ণসংখ্যা res = set(i, &h, আকার(h));
+    যদি (res >= 0)
         p->registerImageArgument(i, image2D);
-    return res;
+    ফেরত res;
 }
 
-int Kernel::set(int i, const UMat& m)
+পূর্ণসংখ্যা Kernel::set(পূর্ণসংখ্যা i, ধ্রুবক UMat& m)
 {
-    return set(i, KernelArg(KernelArg::READ_WRITE, (UMat*)&m));
+    ফেরত set(i, KernelArg(KernelArg::READ_WRITE, (UMat*)&m));
 }
 
 // a CUDA-backed UMat carries a device pointer in u->handle, not a cl_mem
-static bool isCudaBacked(const UMatData* u)
+স্থির যৌক্তিক isCudaBacked(ধ্রুবক UMat_তথ্য* u)
 {
-    const MatAllocator* cudaAllocator = cv::cuda::getCudaAllocator();
-    return u && cudaAllocator && u->currAllocator == cudaAllocator;
+    ধ্রুবক MatAllocator* cudaAllocator = cv::cuda::getCudaAllocator();
+    ফেরত u && cudaAllocator && u->currAllocator == cudaAllocator;
 }
 
-int Kernel::set(int i, const KernelArg& arg)
+পূর্ণসংখ্যা Kernel::set(পূর্ণসংখ্যা i, ধ্রুবক KernelArg& arg)
 {
-    if( !p || !p->handle )
-        return -1;
-    if (i < 0)
+    যদি( !p || !p->handle )
+        ফেরত -1;
+    যদি (i < 0)
     {
-        CV_LOG_ERROR(NULL, cv::format("OpenCL: Kernel(%s)::set(arg_index=%d): negative arg_index",
-                p->name.c_str(), (int)i));
-        return i;
+        CV_LOG_ERROR(ফাঁকা, cv::format("OpenCL: Kernel(%s)::set(arg_index=%d): negative arg_index",
+                p->name.c_str(), (পূর্ণসংখ্যা)i));
+        ফেরত i;
     }
-    if( i == 0 )
+    যদি( i == 0 )
         p->cleanupUMats();
     cl_int status = 0;
-    if( arg.m )
+    যদি( arg.m )
     {
         AccessFlag accessFlags = ((arg.flags & KernelArg::READ_ONLY) ? ACCESS_READ : static_cast<AccessFlag>(0)) |
                                  ((arg.flags & KernelArg::WRITE_ONLY) ? ACCESS_WRITE : static_cast<AccessFlag>(0));
-        bool ptronly = (arg.flags & KernelArg::PTR_ONLY) != 0;
-        if (ptronly && arg.m->empty())
+        যৌক্তিক ptronly = (arg.flags & KernelArg::PTR_ONLY) != 0;
+        যদি (ptronly && arg.m->empty())
         {
-            cl_mem h_null = (cl_mem)NULL;
-            status = clSetKernelArg(p->handle, (cl_uint)i, sizeof(h_null), &h_null);
-            CV_OCL_DBG_CHECK_RESULT(status, cv::format("clSetKernelArg('%s', arg_index=%d, cl_mem=NULL)", p->name.c_str(), (int)i).c_str());
-            return i + 1;
+            cl_mem h_null = (cl_mem)ফাঁকা;
+            status = clSetKernelArg(p->handle, (cl_uint)i, আকার(h_null), &h_null);
+            CV_OCL_DBG_CHECK_ফলাফল(status, cv::format("clSetKernelArg('%s', arg_index=%d, cl_mem=NULL)", p->name.c_str(), (পূর্ণসংখ্যা)i).c_str());
+            ফেরত i + 1;
         }
         // a CUDA-backed UMat has no cl_mem; decline so the caller falls back to CPU
-        if (isCudaBacked(arg.m->u))
+        যদি (isCudaBacked(arg.m->u))
         {
-            CV_LOG_DEBUG(NULL, cv::format("OpenCL: Kernel(%s)::set(arg_index=%d): UMat is backed by the CUDA allocator, declining",
-                    p->name.c_str(), (int)i));
+            CV_LOG_DEBUG(ফাঁকা, cv::format("OpenCL: Kernel(%s)::set(arg_index=%d): UMat is backed by the CUDA allocator, declining",
+                    p->name.c_str(), (পূর্ণসংখ্যা)i));
             p->cleanupUMats();
             p->release();
             p = 0;
-            return -1;
+            ফেরত -1;
         }
         cl_mem h = (cl_mem)arg.m->handle(accessFlags);
 
-        if (!h)
+        যদি (!h)
         {
-            CV_LOG_ERROR(NULL, cv::format("OpenCL: Kernel(%s)::set(arg_index=%d, flags=%d): can't create cl_mem handle for passed UMat buffer (addr=%p)",
-                    p->name.c_str(), (int)i, (int)arg.flags, arg.m));
+            CV_LOG_ERROR(ফাঁকা, cv::format("OpenCL: Kernel(%s)::set(arg_index=%d, flags=%d): can't create cl_mem handle for passed UMat buffer (addr=%p)",
+                    p->name.c_str(), (পূর্ণসংখ্যা)i, (পূর্ণসংখ্যা)arg.flags, arg.m));
             p->release();
             p = 0;
-            return -1;
+            ফেরত -1;
         }
 
 #ifdef HAVE_OPENCL_SVM
-        if ((arg.m->u->allocatorFlags_ & svm::OPENCL_SVM_BUFFER_MASK) != 0)
+        যদি ((arg.m->u->allocatorFlags_ & svm::OPENCL_SVM_বাফার_MASK) != 0)
         {
-            const Context& ctx = Context::getDefault();
-            const svm::SVMFunctions* svmFns = svm::getSVMFunctions(ctx);
-            uchar*& svmDataPtr = (uchar*&)arg.m->u->handle;
-            CV_OPENCL_SVM_TRACE_P("clSetKernelArgSVMPointer: %p\n", svmDataPtr);
-#if 1 // TODO
-            status = svmFns->fn_clSetKernelArgSVMPointer(p->handle, (cl_uint)i, svmDataPtr);
-#else
-            status = svmFns->fn_clSetKernelArgSVMPointer(p->handle, (cl_uint)i, &svmDataPtr);
+            ধ্রুবক Context& ctx = Context::getDefault();
+            ধ্রুবক svm::SVMFunctions* svmFns = svm::getSVMFunctions(ctx);
+            uchar*& svm_তথ্য_Ptr = (uchar*&)arg.m->u->handle;
+            CV_OPENCL_SVM_TRACE_P("clSetKernelArgSVMPointer: %p\n", svm_তথ্য_Ptr);
+#যদি 1 // TODO
+            status = svmFns->fn_clSetKernelArgSVMPointer(p->handle, (cl_uint)i, svm_তথ্য_Ptr);
+#অন্যথা
+            status = svmFns->fn_clSetKernelArgSVMPointer(p->handle, (cl_uint)i, &svm_তথ্য_Ptr);
 #endif
-            CV_OCL_DBG_CHECK_RESULT(status, cv::format("clSetKernelArgSVMPointer('%s', arg_index=%d, ptr=%p)", p->name.c_str(), (int)i, (void*)svmDataPtr).c_str());
+            CV_OCL_DBG_CHECK_ফলাফল(status, cv::format("clSetKernelArgSVMPointer('%s', arg_index=%d, ptr=%p)", p->name.c_str(), (পূর্ণসংখ্যা)i, (শূন্য*)svm_তথ্য_Ptr).c_str());
         }
-        else
+        অন্যথা
 #endif
         {
-            status = clSetKernelArg(p->handle, (cl_uint)i, sizeof(h), &h);
-            CV_OCL_DBG_CHECK_RESULT(status, cv::format("clSetKernelArg('%s', arg_index=%d, cl_mem=%p)", p->name.c_str(), (int)i, (void*)h).c_str());
+            status = clSetKernelArg(p->handle, (cl_uint)i, আকার(h), &h);
+            CV_OCL_DBG_CHECK_ফলাফল(status, cv::format("clSetKernelArg('%s', arg_index=%d, cl_mem=%p)", p->name.c_str(), (পূর্ণসংখ্যা)i, (শূন্য*)h).c_str());
         }
 
-        if (ptronly)
+        যদি (ptronly)
         {
             i++;
         }
-        else if( arg.m->dims <= 2 )
+        অন্যথা যদি( arg.m->dims <= 2 )
         {
             UMat2D u2d(*arg.m);
-            status = clSetKernelArg(p->handle, (cl_uint)(i+1), sizeof(u2d.step), &u2d.step);
-            CV_OCL_DBG_CHECK_RESULT(status, cv::format("clSetKernelArg('%s', arg_index=%d, step_value=%d)", p->name.c_str(), (int)(i+1), (int)u2d.step).c_str());
-            status = clSetKernelArg(p->handle, (cl_uint)(i+2), sizeof(u2d.offset), &u2d.offset);
-            CV_OCL_DBG_CHECK_RESULT(status, cv::format("clSetKernelArg('%s', arg_index=%d, offset_value=%d)", p->name.c_str(), (int)(i+2), (int)u2d.offset).c_str());
+            status = clSetKernelArg(p->handle, (cl_uint)(i+1), আকার(u2d.step), &u2d.step);
+            CV_OCL_DBG_CHECK_ফলাফল(status, cv::format("clSetKernelArg('%s', arg_index=%d, step_value=%d)", p->name.c_str(), (পূর্ণসংখ্যা)(i+1), (পূর্ণসংখ্যা)u2d.step).c_str());
+            status = clSetKernelArg(p->handle, (cl_uint)(i+2), আকার(u2d.offset), &u2d.offset);
+            CV_OCL_DBG_CHECK_ফলাফল(status, cv::format("clSetKernelArg('%s', arg_index=%d, offset_value=%d)", p->name.c_str(), (পূর্ণসংখ্যা)(i+2), (পূর্ণসংখ্যা)u2d.offset).c_str());
             i += 3;
 
-            if( !(arg.flags & KernelArg::NO_SIZE) )
+            যদি( !(arg.flags & KernelArg::NO_আকার) )
             {
-                int cols = u2d.cols*arg.wscale/arg.iwscale;
-                status = clSetKernelArg(p->handle, (cl_uint)i, sizeof(u2d.rows), &u2d.rows);
-                CV_OCL_DBG_CHECK_RESULT(status, cv::format("clSetKernelArg('%s', arg_index=%d, rows_value=%d)", p->name.c_str(), (int)i, (int)u2d.rows).c_str());
-                status = clSetKernelArg(p->handle, (cl_uint)(i+1), sizeof(cols), &cols);
-                CV_OCL_DBG_CHECK_RESULT(status, cv::format("clSetKernelArg('%s', arg_index=%d, cols_value=%d)", p->name.c_str(), (int)(i+1), (int)cols).c_str());
+                পূর্ণসংখ্যা cols = u2d.cols*arg.wscale/arg.iwscale;
+                status = clSetKernelArg(p->handle, (cl_uint)i, আকার(u2d.rows), &u2d.rows);
+                CV_OCL_DBG_CHECK_ফলাফল(status, cv::format("clSetKernelArg('%s', arg_index=%d, rows_value=%d)", p->name.c_str(), (পূর্ণসংখ্যা)i, (পূর্ণসংখ্যা)u2d.rows).c_str());
+                status = clSetKernelArg(p->handle, (cl_uint)(i+1), আকার(cols), &cols);
+                CV_OCL_DBG_CHECK_ফলাফল(status, cv::format("clSetKernelArg('%s', arg_index=%d, cols_value=%d)", p->name.c_str(), (পূর্ণসংখ্যা)(i+1), (পূর্ণসংখ্যা)cols).c_str());
                 i += 2;
             }
         }
-        else
+        অন্যথা
         {
             UMat3D u3d(*arg.m);
-            status = clSetKernelArg(p->handle, (cl_uint)(i+1), sizeof(u3d.slicestep), &u3d.slicestep);
-            CV_OCL_DBG_CHECK_RESULT(status, cv::format("clSetKernelArg('%s', arg_index=%d, slicestep_value=%d)", p->name.c_str(), (int)(i+1), (int)u3d.slicestep).c_str());
-            status = clSetKernelArg(p->handle, (cl_uint)(i+2), sizeof(u3d.step), &u3d.step);
-            CV_OCL_DBG_CHECK_RESULT(status, cv::format("clSetKernelArg('%s', arg_index=%d, step_value=%d)", p->name.c_str(), (int)(i+2), (int)u3d.step).c_str());
-            status = clSetKernelArg(p->handle, (cl_uint)(i+3), sizeof(u3d.offset), &u3d.offset);
-            CV_OCL_DBG_CHECK_RESULT(status, cv::format("clSetKernelArg('%s', arg_index=%d, offset_value=%d)", p->name.c_str(), (int)(i+3), (int)u3d.offset).c_str());
+            status = clSetKernelArg(p->handle, (cl_uint)(i+1), আকার(u3d.slicestep), &u3d.slicestep);
+            CV_OCL_DBG_CHECK_ফলাফল(status, cv::format("clSetKernelArg('%s', arg_index=%d, slicestep_value=%d)", p->name.c_str(), (পূর্ণসংখ্যা)(i+1), (পূর্ণসংখ্যা)u3d.slicestep).c_str());
+            status = clSetKernelArg(p->handle, (cl_uint)(i+2), আকার(u3d.step), &u3d.step);
+            CV_OCL_DBG_CHECK_ফলাফল(status, cv::format("clSetKernelArg('%s', arg_index=%d, step_value=%d)", p->name.c_str(), (পূর্ণসংখ্যা)(i+2), (পূর্ণসংখ্যা)u3d.step).c_str());
+            status = clSetKernelArg(p->handle, (cl_uint)(i+3), আকার(u3d.offset), &u3d.offset);
+            CV_OCL_DBG_CHECK_ফলাফল(status, cv::format("clSetKernelArg('%s', arg_index=%d, offset_value=%d)", p->name.c_str(), (পূর্ণসংখ্যা)(i+3), (পূর্ণসংখ্যা)u3d.offset).c_str());
             i += 4;
-            if( !(arg.flags & KernelArg::NO_SIZE) )
+            যদি( !(arg.flags & KernelArg::NO_আকার) )
             {
-                int cols = u3d.cols*arg.wscale/arg.iwscale;
-                status = clSetKernelArg(p->handle, (cl_uint)i, sizeof(u3d.slices), &u3d.slices);
-                CV_OCL_DBG_CHECK_RESULT(status, cv::format("clSetKernelArg('%s', arg_index=%d, slices_value=%d)", p->name.c_str(), (int)i, (int)u3d.slices).c_str());
-                status = clSetKernelArg(p->handle, (cl_uint)(i+1), sizeof(u3d.rows), &u3d.rows);
-                CV_OCL_DBG_CHECK_RESULT(status, cv::format("clSetKernelArg('%s', arg_index=%d, rows_value=%d)", p->name.c_str(), (int)(i+1), (int)u3d.rows).c_str());
-                status = clSetKernelArg(p->handle, (cl_uint)(i+2), sizeof(u3d.cols), &cols);
-                CV_OCL_DBG_CHECK_RESULT(status, cv::format("clSetKernelArg('%s', arg_index=%d, cols_value=%d)", p->name.c_str(), (int)(i+2), (int)cols).c_str());
+                পূর্ণসংখ্যা cols = u3d.cols*arg.wscale/arg.iwscale;
+                status = clSetKernelArg(p->handle, (cl_uint)i, আকার(u3d.slices), &u3d.slices);
+                CV_OCL_DBG_CHECK_ফলাফল(status, cv::format("clSetKernelArg('%s', arg_index=%d, slices_value=%d)", p->name.c_str(), (পূর্ণসংখ্যা)i, (পূর্ণসংখ্যা)u3d.slices).c_str());
+                status = clSetKernelArg(p->handle, (cl_uint)(i+1), আকার(u3d.rows), &u3d.rows);
+                CV_OCL_DBG_CHECK_ফলাফল(status, cv::format("clSetKernelArg('%s', arg_index=%d, rows_value=%d)", p->name.c_str(), (পূর্ণসংখ্যা)(i+1), (পূর্ণসংখ্যা)u3d.rows).c_str());
+                status = clSetKernelArg(p->handle, (cl_uint)(i+2), আকার(u3d.cols), &cols);
+                CV_OCL_DBG_CHECK_ফলাফল(status, cv::format("clSetKernelArg('%s', arg_index=%d, cols_value=%d)", p->name.c_str(), (পূর্ণসংখ্যা)(i+2), (পূর্ণসংখ্যা)cols).c_str());
                 i += 3;
             }
         }
         p->addUMat(*arg.m, !!(accessFlags & ACCESS_WRITE));
-        return i;
+        ফেরত i;
     }
     status = clSetKernelArg(p->handle, (cl_uint)i, arg.sz, arg.obj);
-    CV_OCL_DBG_CHECK_RESULT(status, cv::format("clSetKernelArg('%s', arg_index=%d, size=%d, obj=%p)", p->name.c_str(), (int)i, (int)arg.sz, (void*)arg.obj).c_str());
-    return i+1;
+    CV_OCL_DBG_CHECK_ফলাফল(status, cv::format("clSetKernelArg('%s', arg_index=%d, size=%d, obj=%p)", p->name.c_str(), (পূর্ণসংখ্যা)i, (পূর্ণসংখ্যা)arg.sz, (শূন্য*)arg.obj).c_str());
+    ফেরত i+1;
 }
 
-bool Kernel::run(int dims, size_t _globalsize[], size_t _localsize[],
-                 bool sync, const Queue& q)
+যৌক্তিক Kernel::run(পূর্ণসংখ্যা dims, size_t _globalsize[], size_t _localsize[],
+                 যৌক্তিক সমলয়, ধ্রুবক Queue& q)
 {
-    if (!p)
-        return false;
+    যদি (!p)
+        ফেরত মিথ্যা;
 
     size_t globalsize[CV_MAX_DIM] = {1,1,1};
-    size_t total = 1;
-    CV_Assert(_globalsize != NULL);
-    for (int i = 0; i < dims; i++)
+    size_t যোগ = 1;
+    CV_Assert(_globalsize != ফাঁকা);
+    জন্য (পূর্ণসংখ্যা i = 0; i < dims; i++)
     {
         size_t val = _localsize ? _localsize[i] :
-            dims == 1 ? 64 : dims == 2 ? (i == 0 ? 256 : 8) : dims == 3 ? (8>>(int)(i>0)) : 1;
+            dims == 1 ? 64 : dims == 2 ? (i == 0 ? 256 : 8) : dims == 3 ? (8>>(পূর্ণসংখ্যা)(i>0)) : 1;
         CV_Assert( val > 0 );
-        total *= _globalsize[i];
-        if (_globalsize[i] == 1 && !_localsize)
+        যোগ *= _globalsize[i];
+        যদি (_globalsize[i] == 1 && !_localsize)
             val = 1;
-        globalsize[i] = divUp(_globalsize[i], (unsigned int)val) * val;
+        globalsize[i] = divUp(_globalsize[i], (unsigned পূর্ণসংখ্যা)val) * val;
     }
-    CV_Assert(total > 0);
+    CV_Assert(যোগ > 0);
 
-    return p->run(dims, globalsize, _localsize, sync, NULL, q);
+    ফেরত p->run(dims, globalsize, _localsize, সমলয়, ফাঁকা, q);
 }
 
 
-bool Kernel::run_(int dims, size_t _globalsize[], size_t _localsize[],
-                  bool sync, const Queue& q)
+যৌক্তিক Kernel::run_(পূর্ণসংখ্যা dims, size_t _globalsize[], size_t _localsize[],
+                  যৌক্তিক সমলয়, ধ্রুবক Queue& q)
 {
     CV_Assert(p);
-    return p->run(dims, _globalsize, _localsize, sync, NULL, q);
+    ফেরত p->run(dims, _globalsize, _localsize, সমলয়, ফাঁকা, q);
 }
 
 
-bool Kernel::Impl::run(int dims, size_t globalsize[], size_t localsize[],
-        bool sync, int64* timeNS, const Queue& q)
+যৌক্তিক Kernel::Impl::run(পূর্ণসংখ্যা dims, size_t globalsize[], size_t localsize[],
+        যৌক্তিক সমলয়, int64* timeNS, ধ্রুবক Queue& q)
 {
     CV_INSTRUMENT_REGION_OPENCL_RUN(name.c_str());
 
-    if (!handle)
+    যদি (!handle)
     {
-        CV_LOG_ERROR(NULL, "OpenCL kernel has zero handle: " << name);
-        return false;
+        CV_LOG_ERROR(ফাঁকা, "OpenCL kernel has zero handle: " << name);
+        ফেরত মিথ্যা;
     }
 
-    if (isAsyncRun)
+    যদি (isAsyncRun)
     {
         CV_Error_(Error::StsError, ("OpenCL kernel can't be reused in async mode: %s", name.c_str()));
     }
-    isAsyncRun = !sync;
+    isAsyncRun = !সমলয়;
 
-    if (isInProgress)
+    যদি (isInProgress)
     {
         CV_Error_(Error::StsError, ("Previous OpenCL kernel launch is not finished: %s", name.c_str()));
     }
 
-#if CV_OPENCL_SYNC_RUN_KERNELS
-    sync = true;
+#যদি CV_OPENCL_SYNC_RUN_KERNELS
+    সমলয় = সত্য;
 #endif
 
     cl_command_queue qq = getQueue(q);
-    if (haveTempDstUMats)
-        sync = true;
-    if (haveTempSrcUMats)
-        sync = true;
-    if (timeNS)
-        sync = true;
+    যদি (have_অস্থায়ী_Dst_UMats)
+        সমলয় = সত্য;
+    যদি (have_অস্থায়ী_Src_UMats)
+        সমলয় = সত্য;
+    যদি (timeNS)
+        সমলয় = সত্য;
     cl_event asyncEvent = 0;
     cl_int retval = clEnqueueNDRangeKernel(qq, handle, (cl_uint)dims,
-                                           NULL, globalsize, localsize, 0, 0,
-                                           (sync && !timeNS) ? 0 : &asyncEvent);
-#if !CV_OPENCL_SHOW_RUN_KERNELS
-    if (retval != CL_SUCCESS)
+                                           ফাঁকা, globalsize, localsize, 0, 0,
+                                           (সমলয় && !timeNS) ? 0 : &asyncEvent);
+#যদি !CV_OPENCL_SHOW_RUN_KERNELS
+    যদি (retval != CL_SUCCESS)
 #endif
     {
-        cv::String msg = cv::format("clEnqueueNDRangeKernel('%s', dims=%d, globalsize=%zux%zux%zu, localsize=%s) sync=%s", name.c_str(), (int)dims,
+        cv::String বার্তা = cv::format("clEnqueueNDRangeKernel('%s', dims=%d, globalsize=%zux%zux%zu, localsize=%s) sync=%s", name.c_str(), (পূর্ণসংখ্যা)dims,
                         globalsize[0], (dims > 1 ? globalsize[1] : 1), (dims > 2 ? globalsize[2] : 1),
                         (localsize ? cv::format("%zux%zux%zu", localsize[0], (dims > 1 ? localsize[1] : 1), (dims > 2 ? localsize[2] : 1)) : cv::String("NULL")).c_str(),
-                        sync ? "true" : "false"
+                        সমলয় ? "true" : "false"
                         );
-        if (retval != CL_SUCCESS)
+        যদি (retval != CL_SUCCESS)
         {
-            msg = CV_OCL_API_ERROR_MSG(retval, msg.c_str());
+            বার্তা = CV_OCL_API_ERROR_বার্তা(retval, বার্তা.c_str());
         }
-#if CV_OPENCL_TRACE_CHECK
-        CV_OCL_TRACE_CHECK_RESULT(retval, msg.c_str());
-#else
-        printf("%s\n", msg.c_str());
+#যদি CV_OPENCL_TRACE_CHECK
+        CV_OCL_TRACE_CHECK_ফলাফল(retval, বার্তা.c_str());
+#অন্যথা
+        printf("%s\n", বার্তা.c_str());
         fflush(stdout);
 #endif
     }
-    if (sync || retval != CL_SUCCESS)
+    যদি (সমলয় || retval != CL_SUCCESS)
     {
         CV_OCL_DBG_CHECK(clFinish(qq));
-        if (timeNS)
+        যদি (timeNS)
         {
-            if (retval == CL_SUCCESS)
+            যদি (retval == CL_SUCCESS)
             {
                 CV_OCL_DBG_CHECK(clWaitForEvents(1, &asyncEvent));
                 cl_ulong startTime, stopTime;
-                CV_OCL_CHECK(clGetEventProfilingInfo(asyncEvent, CL_PROFILING_COMMAND_START, sizeof(startTime), &startTime, NULL));
-                CV_OCL_CHECK(clGetEventProfilingInfo(asyncEvent, CL_PROFILING_COMMAND_END, sizeof(stopTime), &stopTime, NULL));
+                CV_OCL_CHECK(clGetEventProfilingInfo(asyncEvent, CL_PROFILING_COMMAND_START, আকার(startTime), &startTime, ফাঁকা));
+                CV_OCL_CHECK(clGetEventProfilingInfo(asyncEvent, CL_PROFILING_COMMAND_END, আকার(stopTime), &stopTime, ফাঁকা));
                 *timeNS = (int64)(stopTime - startTime);
             }
-            else
+            অন্যথা
             {
                 *timeNS = -1;
             }
         }
         cleanupUMats();
     }
-    else
+    অন্যথা
     {
         addref();
-        isInProgress = true;
-        CV_OCL_CHECK(clSetEventCallback(asyncEvent, CL_COMPLETE, oclCleanupCallback, this));
+        isInProgress = সত্য;
+        CV_OCL_CHECK(clSetEventCallback(asyncEvent, CL_COMPLETE, oclCleanupCallback, এই));
     }
-    if (asyncEvent)
+    যদি (asyncEvent)
         CV_OCL_DBG_CHECK(clReleaseEvent(asyncEvent));
-    return retval == CL_SUCCESS;
+    ফেরত retval == CL_SUCCESS;
 }
 
-bool Kernel::runTask(bool sync, const Queue& q)
+যৌক্তিক Kernel::runTask(যৌক্তিক সমলয়, ধ্রুবক Queue& q)
 {
-    if(!p || !p->handle || p->isInProgress)
-        return false;
+    যদি(!p || !p->handle || p->isInProgress)
+        ফেরত মিথ্যা;
 
     cl_command_queue qq = getQueue(q);
     cl_event asyncEvent = 0;
-    cl_int retval = clEnqueueTask(qq, p->handle, 0, 0, sync ? 0 : &asyncEvent);
-    CV_OCL_DBG_CHECK_RESULT(retval, cv::format("clEnqueueTask('%s') sync=%s", p->name.c_str(), sync ? "true" : "false").c_str());
-    if (sync || retval != CL_SUCCESS)
+    cl_int retval = clEnqueueTask(qq, p->handle, 0, 0, সমলয় ? 0 : &asyncEvent);
+    CV_OCL_DBG_CHECK_ফলাফল(retval, cv::format("clEnqueueTask('%s') sync=%s", p->name.c_str(), সমলয় ? "true" : "false").c_str());
+    যদি (সমলয় || retval != CL_SUCCESS)
     {
         CV_OCL_DBG_CHECK(clFinish(qq));
         p->cleanupUMats();
     }
-    else
+    অন্যথা
     {
         p->addref();
-        p->isInProgress = true;
+        p->isInProgress = সত্য;
         CV_OCL_CHECK(clSetEventCallback(asyncEvent, CL_COMPLETE, oclCleanupCallback, p));
     }
-    if (asyncEvent)
+    যদি (asyncEvent)
         CV_OCL_DBG_CHECK(clReleaseEvent(asyncEvent));
-    return retval == CL_SUCCESS;
+    ফেরত retval == CL_SUCCESS;
 }
 
-int64 Kernel::runProfiling(int dims, size_t globalsize[], size_t localsize[], const Queue& q_)
+int64 Kernel::runProfiling(পূর্ণসংখ্যা dims, size_t globalsize[], size_t localsize[], ধ্রুবক Queue& q_)
 {
     CV_Assert(p && p->handle && !p->isInProgress);
     Queue q = q_.ptr() ? q_ : Queue::getDefault();
@@ -4016,183 +4016,183 @@ int64 Kernel::runProfiling(int dims, size_t globalsize[], size_t localsize[], co
     q.finish(); // call clFinish() on base queue
     Queue profilingQueue = q.getProfilingQueue();
     int64 timeNs = -1;
-    bool res = p->run(dims, globalsize, localsize, true, &timeNs, profilingQueue);
-    return res ? timeNs : -1;
+    যৌক্তিক res = p->run(dims, globalsize, localsize, সত্য, &timeNs, profilingQueue);
+    ফেরত res ? timeNs : -1;
 }
 
-size_t Kernel::workGroupSize() const
+size_t Kernel::work_Group_আকার() ধ্রুবক
 {
-    if(!p || !p->handle)
-        return 0;
+    যদি(!p || !p->handle)
+        ফেরত 0;
     size_t val = 0, retsz = 0;
     cl_device_id dev = (cl_device_id)Device::getDefault().ptr();
-    cl_int status = clGetKernelWorkGroupInfo(p->handle, dev, CL_KERNEL_WORK_GROUP_SIZE, sizeof(val), &val, &retsz);
-    CV_OCL_CHECK_RESULT(status, "clGetKernelWorkGroupInfo(CL_KERNEL_WORK_GROUP_SIZE)");
-    return status == CL_SUCCESS ? val : 0;
+    cl_int status = clGetKernelWorkGroupInfo(p->handle, dev, CL_KERNEL_WORK_GROUP_আকার, আকার(val), &val, &retsz);
+    CV_OCL_CHECK_ফলাফল(status, "clGetKernelWorkGroupInfo(CL_KERNEL_WORK_GROUP_SIZE)");
+    ফেরত status == CL_SUCCESS ? val : 0;
 }
 
-size_t Kernel::preferedWorkGroupSizeMultiple() const
+size_t Kernel::prefered_Work_Group_আকার_Multiple() ধ্রুবক
 {
-    if(!p || !p->handle)
-        return 0;
+    যদি(!p || !p->handle)
+        ফেরত 0;
     size_t val = 0, retsz = 0;
     cl_device_id dev = (cl_device_id)Device::getDefault().ptr();
-    cl_int status = clGetKernelWorkGroupInfo(p->handle, dev, CL_KERNEL_PREFERRED_WORK_GROUP_SIZE_MULTIPLE, sizeof(val), &val, &retsz);
-    CV_OCL_CHECK_RESULT(status, "clGetKernelWorkGroupInfo(CL_KERNEL_PREFERRED_WORK_GROUP_SIZE_MULTIPLE)");
-    return status == CL_SUCCESS ? val : 0;
+    cl_int status = clGetKernelWorkGroupInfo(p->handle, dev, CL_KERNEL_PREFERRED_WORK_GROUP_আকার_MULTIPLE, আকার(val), &val, &retsz);
+    CV_OCL_CHECK_ফলাফল(status, "clGetKernelWorkGroupInfo(CL_KERNEL_PREFERRED_WORK_GROUP_SIZE_MULTIPLE)");
+    ফেরত status == CL_SUCCESS ? val : 0;
 }
 
-bool Kernel::compileWorkGroupSize(size_t wsz[]) const
+যৌক্তিক Kernel::compile_Work_Group_আকার(size_t wsz[]) ধ্রুবক
 {
-    if(!p || !p->handle || !wsz)
-        return 0;
+    যদি(!p || !p->handle || !wsz)
+        ফেরত 0;
     size_t retsz = 0;
     cl_device_id dev = (cl_device_id)Device::getDefault().ptr();
-    cl_int status = clGetKernelWorkGroupInfo(p->handle, dev, CL_KERNEL_COMPILE_WORK_GROUP_SIZE, sizeof(wsz[0])*3, wsz, &retsz);
-    CV_OCL_CHECK_RESULT(status, "clGetKernelWorkGroupInfo(CL_KERNEL_COMPILE_WORK_GROUP_SIZE)");
-    return status == CL_SUCCESS;
+    cl_int status = clGetKernelWorkGroupInfo(p->handle, dev, CL_KERNEL_COMPILE_WORK_GROUP_আকার, আকার(wsz[0])*3, wsz, &retsz);
+    CV_OCL_CHECK_ফলাফল(status, "clGetKernelWorkGroupInfo(CL_KERNEL_COMPILE_WORK_GROUP_SIZE)");
+    ফেরত status == CL_SUCCESS;
 }
 
-size_t Kernel::localMemSize() const
+size_t Kernel::local_Mem_আকার() ধ্রুবক
 {
-    if(!p || !p->handle)
-        return 0;
+    যদি(!p || !p->handle)
+        ফেরত 0;
     size_t retsz = 0;
     cl_ulong val = 0;
     cl_device_id dev = (cl_device_id)Device::getDefault().ptr();
-    cl_int status = clGetKernelWorkGroupInfo(p->handle, dev, CL_KERNEL_LOCAL_MEM_SIZE, sizeof(val), &val, &retsz);
-    CV_OCL_CHECK_RESULT(status, "clGetKernelWorkGroupInfo(CL_KERNEL_LOCAL_MEM_SIZE)");
-    return status == CL_SUCCESS ? (size_t)val : 0;
+    cl_int status = clGetKernelWorkGroupInfo(p->handle, dev, CL_KERNEL_LOCAL_MEM_আকার, আকার(val), &val, &retsz);
+    CV_OCL_CHECK_ফলাফল(status, "clGetKernelWorkGroupInfo(CL_KERNEL_LOCAL_MEM_SIZE)");
+    ফেরত status == CL_SUCCESS ? (size_t)val : 0;
 }
 
 
 
 ///////////////////////////////////////// ProgramSource ///////////////////////////////////////////////
 
-struct ProgramSource::Impl
+কাঠামো ProgramSource::Impl
 {
     IMPLEMENT_REFCOUNTABLE();
 
-    enum KIND {
+    গণনা KIND {
         PROGRAM_SOURCE_CODE = 0,
         PROGRAM_BINARIES,
         PROGRAM_SPIR,
         PROGRAM_SPIRV
     } kind_;
 
-    Impl(const String& src)
+    Impl(ধ্রুবক String& src)
     {
         init(PROGRAM_SOURCE_CODE, cv::String(), cv::String());
         initFromSource(src, cv::String());
     }
-    Impl(const String& module, const String& name, const String& codeStr, const String& codeHash)
+    Impl(ধ্রুবক String& module, ধ্রুবক String& name, ধ্রুবক String& codeStr, ধ্রুবক String& codeHash)
     {
         init(PROGRAM_SOURCE_CODE, module, name);
         initFromSource(codeStr, codeHash);
     }
 
     /// reset fields
-    void init(enum KIND kind, const String& module, const String& name)
+    শূন্য init(গণনা KIND kind, ধ্রুবক String& module, ধ্রুবক String& name)
     {
         refcount = 1;
         kind_ = kind;
         module_ = module;
         name_ = name;
 
-        sourceAddr_ = NULL;
-        sourceSize_ = 0;
-        isHashUpdated = false;
+        sourceAddr_ = ফাঁকা;
+        source_আকার = 0;
+        isHashUpdated = মিথ্যা;
     }
 
-    void initFromSource(const String& codeStr, const String& codeHash)
+    শূন্য initFromSource(ধ্রুবক String& codeStr, ধ্রুবক String& codeHash)
     {
         codeStr_ = codeStr;
         sourceHash_ = codeHash;
-        if (sourceHash_.empty())
+        যদি (sourceHash_.empty())
         {
             updateHash();
         }
-        else
+        অন্যথা
         {
-            isHashUpdated = true;
+            isHashUpdated = সত্য;
         }
     }
 
-    void updateHash(const char* hashStr = NULL)
+    শূন্য updateHash(ধ্রুবক অক্ষর* hashStr = ফাঁকা)
     {
-        if (hashStr)
+        যদি (hashStr)
         {
             sourceHash_ = cv::String(hashStr);
-            isHashUpdated = true;
-            return;
+            isHashUpdated = সত্য;
+            ফেরত;
         }
         uint64 hash = 0;
-        switch (kind_)
+        নির্বাচন (kind_)
         {
-        case PROGRAM_SOURCE_CODE:
-            if (sourceAddr_)
+        ক্ষেত্র PROGRAM_SOURCE_CODE:
+            যদি (sourceAddr_)
             {
                 CV_Assert(codeStr_.empty());
-                hash = crc64(sourceAddr_, sourceSize_); // static storage
+                hash = crc64(sourceAddr_, source_আকার); // static storage
             }
-            else
+            অন্যথা
             {
                 CV_Assert(!codeStr_.empty());
                 hash = crc64((uchar*)codeStr_.c_str(), codeStr_.size());
             }
-            break;
-        case PROGRAM_BINARIES:
-        case PROGRAM_SPIR:
-        case PROGRAM_SPIRV:
-            hash = crc64(sourceAddr_, sourceSize_);
-            break;
-        default:
+            বিরতি;
+        ক্ষেত্র PROGRAM_BINARIES:
+        ক্ষেত্র PROGRAM_SPIR:
+        ক্ষেত্র PROGRAM_SPIRV:
+            hash = crc64(sourceAddr_, source_আকার);
+            বিরতি;
+        পূর্বনির্ধারিত:
             CV_Error(Error::StsInternal, "Internal error");
         }
         sourceHash_ = cv::format("%08jx", (uintmax_t)hash);
-        isHashUpdated = true;
+        isHashUpdated = সত্য;
     }
 
-    Impl(enum KIND kind,
-            const String& module, const String& name,
-            const unsigned char* binary, const size_t size,
-            const cv::String& buildOptions = cv::String())
+    Impl(গণনা KIND kind,
+            ধ্রুবক String& module, ধ্রুবক String& name,
+            ধ্রুবক unsigned অক্ষর* binary, ধ্রুবক size_t size,
+            ধ্রুবক cv::String& buildOptions = cv::String())
     {
         init(kind, module, name);
 
         sourceAddr_ = binary;
-        sourceSize_ = size;
+        source_আকার = size;
 
         buildOptions_ = buildOptions;
     }
 
-    static ProgramSource fromSourceWithStaticLifetime(const String& module, const String& name,
-            const char* sourceCodeStaticStr, const char* hashStaticStr,
-            const cv::String& buildOptions)
+    স্থির ProgramSource fromSourceWithStaticLifetime(ধ্রুবক String& module, ধ্রুবক String& name,
+            ধ্রুবক অক্ষর* sourceCodeStaticStr, ধ্রুবক অক্ষর* hashStaticStr,
+            ধ্রুবক cv::String& buildOptions)
     {
-        ProgramSource result;
-        result.p = new Impl(PROGRAM_SOURCE_CODE, module, name,
-                (const unsigned char*)sourceCodeStaticStr, strlen(sourceCodeStaticStr), buildOptions);
-        result.p->updateHash(hashStaticStr);
-        return result;
+        ProgramSource ফলাফল;
+        ফলাফল.p = নতুন Impl(PROGRAM_SOURCE_CODE, module, name,
+                (ধ্রুবক unsigned অক্ষর*)sourceCodeStaticStr, strlen(sourceCodeStaticStr), buildOptions);
+        ফলাফল.p->updateHash(hashStaticStr);
+        ফেরত ফলাফল;
     }
 
-    static ProgramSource fromBinary(const String& module, const String& name,
-            const unsigned char* binary, const size_t size,
-            const cv::String& buildOptions)
+    স্থির ProgramSource from_দ্বিমিক(ধ্রুবক String& module, ধ্রুবক String& name,
+            ধ্রুবক unsigned অক্ষর* binary, ধ্রুবক size_t size,
+            ধ্রুবক cv::String& buildOptions)
     {
-        ProgramSource result;
-        result.p = new Impl(PROGRAM_BINARIES, module, name, binary, size, buildOptions);
-        return result;
+        ProgramSource ফলাফল;
+        ফলাফল.p = নতুন Impl(PROGRAM_BINARIES, module, name, binary, size, buildOptions);
+        ফেরত ফলাফল;
     }
 
-    static ProgramSource fromSPIR(const String& module, const String& name,
-            const unsigned char* binary, const size_t size,
-            const cv::String& buildOptions)
+    স্থির ProgramSource fromSPIR(ধ্রুবক String& module, ধ্রুবক String& name,
+            ধ্রুবক unsigned অক্ষর* binary, ধ্রুবক size_t size,
+            ধ্রুবক cv::String& buildOptions)
     {
-        ProgramSource result;
-        result.p = new Impl(PROGRAM_SPIR, module, name, binary, size, buildOptions);
-        return result;
+        ProgramSource ফলাফল;
+        ফলাফল.p = নতুন Impl(PROGRAM_SPIR, module, name, binary, size, buildOptions);
+        ফেরত ফলাফল;
     }
 
     String module_;
@@ -4201,17 +4201,17 @@ struct ProgramSource::Impl
     // TODO std::vector<ProgramSource> includes_;
     String codeStr_; // PROGRAM_SOURCE_CODE only
 
-    const unsigned char* sourceAddr_;
-    size_t sourceSize_;
+    ধ্রুবক unsigned অক্ষর* sourceAddr_;
+    size_t source_আকার;
 
     cv::String buildOptions_;
 
     String sourceHash_;
-    bool isHashUpdated;
+    যৌক্তিক isHashUpdated;
 
-    friend struct Program::Impl;
-    friend struct internal::ProgramEntry;
-    friend struct Context::Impl;
+    friend কাঠামো Program::Impl;
+    friend কাঠামো internal::ProgramEntry;
+    friend কাঠামো Context::Impl;
 };
 
 
@@ -4220,43 +4220,43 @@ ProgramSource::ProgramSource() CV_NOEXCEPT
     p = 0;
 }
 
-ProgramSource::ProgramSource(const String& module, const String& name, const String& codeStr, const String& codeHash)
+ProgramSource::ProgramSource(ধ্রুবক String& module, ধ্রুবক String& name, ধ্রুবক String& codeStr, ধ্রুবক String& codeHash)
 {
-    p = new Impl(module, name, codeStr, codeHash);
+    p = নতুন Impl(module, name, codeStr, codeHash);
 }
 
-ProgramSource::ProgramSource(const char* prog)
+ProgramSource::ProgramSource(ধ্রুবক অক্ষর* prog)
 {
-    p = new Impl(prog);
+    p = নতুন Impl(prog);
 }
 
-ProgramSource::ProgramSource(const String& prog)
+ProgramSource::ProgramSource(ধ্রুবক String& prog)
 {
-    p = new Impl(prog);
+    p = নতুন Impl(prog);
 }
 
 ProgramSource::~ProgramSource()
 {
-    if(p)
+    যদি(p)
         p->release();
 }
 
-ProgramSource::ProgramSource(const ProgramSource& prog)
+ProgramSource::ProgramSource(ধ্রুবক ProgramSource& prog)
 {
     p = prog.p;
-    if(p)
+    যদি(p)
         p->addref();
 }
 
-ProgramSource& ProgramSource::operator = (const ProgramSource& prog)
+ProgramSource& ProgramSource::operator = (ধ্রুবক ProgramSource& prog)
 {
     Impl* newp = (Impl*)prog.p;
-    if(newp)
+    যদি(newp)
         newp->addref();
-    if(p)
+    যদি(p)
         p->release();
     p = newp;
-    return *this;
+    ফেরত *এই;
 }
 
 ProgramSource::ProgramSource(ProgramSource&& prog) CV_NOEXCEPT
@@ -4267,495 +4267,495 @@ ProgramSource::ProgramSource(ProgramSource&& prog) CV_NOEXCEPT
 
 ProgramSource& ProgramSource::operator = (ProgramSource&& prog) CV_NOEXCEPT
 {
-    if (this != &prog) {
-        if(p)
+    যদি (এই != &prog) {
+        যদি(p)
             p->release();
         p = prog.p;
         prog.p = nullptr;
     }
-    return *this;
+    ফেরত *এই;
 }
 
-const String& ProgramSource::source() const
+ধ্রুবক String& ProgramSource::source() ধ্রুবক
 {
     CV_Assert(p);
     CV_Assert(p->kind_ == Impl::PROGRAM_SOURCE_CODE);
-    CV_Assert(p->sourceAddr_ == NULL); // method returns reference - can't construct temporary object
-    return p->codeStr_;
+    CV_Assert(p->sourceAddr_ == ফাঁকা); // method returns reference - can't construct temporary object
+    ফেরত p->codeStr_;
 }
 
-ProgramSource::hash_t ProgramSource::hash() const
+ProgramSource::hash_t ProgramSource::hash() ধ্রুবক
 {
     CV_Error(Error::StsNotImplemented, "Removed method: ProgramSource::hash()");
 }
 
-ProgramSource ProgramSource::fromBinary(const String& module, const String& name,
-        const unsigned char* binary, const size_t size,
-        const cv::String& buildOptions)
+ProgramSource ProgramSource::from_দ্বিমিক(ধ্রুবক String& module, ধ্রুবক String& name,
+        ধ্রুবক unsigned অক্ষর* binary, ধ্রুবক size_t size,
+        ধ্রুবক cv::String& buildOptions)
 {
     CV_Assert(binary);
     CV_Assert(size > 0);
-    return Impl::fromBinary(module, name, binary, size, buildOptions);
+    ফেরত Impl::from_দ্বিমিক(module, name, binary, size, buildOptions);
 }
 
-ProgramSource ProgramSource::fromSPIR(const String& module, const String& name,
-        const unsigned char* binary, const size_t size,
-        const cv::String& buildOptions)
+ProgramSource ProgramSource::fromSPIR(ধ্রুবক String& module, ধ্রুবক String& name,
+        ধ্রুবক unsigned অক্ষর* binary, ধ্রুবক size_t size,
+        ধ্রুবক cv::String& buildOptions)
 {
     CV_Assert(binary);
     CV_Assert(size > 0);
-    return Impl::fromBinary(module, name, binary, size, buildOptions);
+    ফেরত Impl::from_দ্বিমিক(module, name, binary, size, buildOptions);
 }
 
 
-internal::ProgramEntry::operator ProgramSource&() const
+internal::ProgramEntry::operator ProgramSource&() ধ্রুবক
 {
-    if (this->pProgramSource == NULL)
+    যদি (এই->pProgramSource == ফাঁকা)
     {
         cv::AutoLock lock(cv::getInitializationMutex());
-        if (this->pProgramSource == NULL)
+        যদি (এই->pProgramSource == ফাঁকা)
         {
-            ProgramSource ps = ProgramSource::Impl::fromSourceWithStaticLifetime(this->module, this->name, this->programCode, this->programHash, cv::String());
-            ProgramSource* ptr = new ProgramSource(ps);
-            const_cast<ProgramEntry*>(this)->pProgramSource = ptr;
+            ProgramSource ps = ProgramSource::Impl::fromSourceWithStaticLifetime(এই->module, এই->name, এই->programCode, এই->programHash, cv::String());
+            ProgramSource* ptr = নতুন ProgramSource(ps);
+            const_cast<ProgramEntry*>(এই)->pProgramSource = ptr;
         }
     }
-    return *this->pProgramSource;
+    ফেরত *এই->pProgramSource;
 }
 
 
 
 /////////////////////////////////////////// Program /////////////////////////////////////////////
 
-static
-cv::String joinBuildOptions(const cv::String& a, const cv::String& b)
+স্থির
+cv::String joinBuildOptions(ধ্রুবক cv::String& a, ধ্রুবক cv::String& b)
 {
-    if (b.empty())
-        return a;
-    if (a.empty())
-        return b;
-    if (b[0] == ' ')
-        return a + b;
-    return a + (cv::String(" ") + b);
+    যদি (b.empty())
+        ফেরত a;
+    যদি (a.empty())
+        ফেরত b;
+    যদি (b[0] == ' ')
+        ফেরত a + b;
+    ফেরত a + (cv::String(" ") + b);
 }
 
-struct Program::Impl
+কাঠামো Program::Impl
 {
     IMPLEMENT_REFCOUNTABLE();
 
-    Impl(const ProgramSource& src,
-         const String& _buildflags, String& errmsg) :
+    Impl(ধ্রুবক ProgramSource& src,
+         ধ্রুবক String& _buildflags, String& errmsg) :
          refcount(1),
-         handle(NULL),
+         handle(ফাঁকা),
          buildflags(_buildflags)
     {
-        const ProgramSource::Impl* src_ = src.getImpl();
+        ধ্রুবক ProgramSource::Impl* src_ = src.getImpl();
         CV_Assert(src_);
         sourceModule_ = src_->module_;
         sourceName_ = src_->name_;
-        const Context ctx = Context::getDefault();
+        ধ্রুবক Context ctx = Context::getDefault();
         Device device = ctx.device(0);
-        if (ctx.ptr() == NULL || device.ptr() == NULL)
-            return;
+        যদি (ctx.ptr() == ফাঁকা || device.ptr() == ফাঁকা)
+            ফেরত;
         buildflags = joinBuildOptions(buildflags, src_->buildOptions_);
-        if (src.getImpl()->kind_ == ProgramSource::Impl::PROGRAM_SOURCE_CODE)
+        যদি (src.getImpl()->kind_ == ProgramSource::Impl::PROGRAM_SOURCE_CODE)
         {
-            if (device.isAMD())
+            যদি (device.isAMD())
                 buildflags = joinBuildOptions(buildflags, " -D AMD_DEVICE");
-            else if (device.isIntel())
+            অন্যথা যদি (device.isIntel())
                 buildflags = joinBuildOptions(buildflags, " -D INTEL_DEVICE");
-            const String param_buildExtraOptions = getBuildExtraOptions();
-            if (!param_buildExtraOptions.empty())
+            ধ্রুবক String param_buildExtraOptions = getBuildExtraOptions();
+            যদি (!param_buildExtraOptions.empty())
                 buildflags = joinBuildOptions(buildflags, param_buildExtraOptions);
         }
-#if CV_OPENCL_SHOW_BUILD_OPTIONS
-        CV_LOG_INFO(NULL, "OpenCL program '" << sourceModule_ << "/" << sourceName_ << "' options:" << buildflags);
+#যদি CV_OPENCL_SHOW_BUILD_OPTIONS
+        CV_LOG_INFO(ফাঁকা, "OpenCL program '" << sourceModule_ << "/" << sourceName_ << "' options:" << buildflags);
 #endif
         compile(ctx, src_, errmsg);
-#if CV_OPENCL_SHOW_BUILD_KERNELS
-        if (handle)
+#যদি CV_OPENCL_SHOW_BUILD_KERNELS
+        যদি (handle)
         {
             size_t retsz = 0;
-            char kernels_buffer[4096] = {0};
-            cl_int result = clGetProgramInfo(handle, CL_PROGRAM_KERNEL_NAMES, sizeof(kernels_buffer), &kernels_buffer[0], &retsz);
-            CV_OCL_DBG_CHECK_RESULT(result, cv::format("clGetProgramInfo(CL_PROGRAM_KERNEL_NAMES: %s/%s)", sourceModule_.c_str(), sourceName_.c_str()).c_str());
-            if (result == CL_SUCCESS && retsz < sizeof(kernels_buffer))
+            অক্ষর kernels_বাফার[4096] = {0};
+            cl_int ফলাফল = clGetProgramInfo(handle, CL_PROGRAM_KERNEL_NAMES, আকার(kernels_বাফার), &kernels_বাফার[0], &retsz);
+            CV_OCL_DBG_CHECK_ফলাফল(ফলাফল, cv::format("clGetProgramInfo(CL_PROGRAM_KERNEL_NAMES: %s/%s)", sourceModule_.c_str(), sourceName_.c_str()).c_str());
+            যদি (ফলাফল == CL_SUCCESS && retsz < আকার(kernels_বাফার))
             {
-                kernels_buffer[retsz] = 0;
-                CV_LOG_INFO(NULL, "OpenCL program '" << sourceModule_ << "/" << sourceName_ << "' kernels: '" << kernels_buffer << "'");
+                kernels_বাফার[retsz] = 0;
+                CV_LOG_INFO(ফাঁকা, "OpenCL program '" << sourceModule_ << "/" << sourceName_ << "' kernels: '" << kernels_বাফার << "'");
             }
-            else
+            অন্যথা
             {
-                CV_LOG_ERROR(NULL, "OpenCL program '" << sourceModule_ << "/" << sourceName_ << "' can't retrieve kernel names!");
+                CV_LOG_ERROR(ফাঁকা, "OpenCL program '" << sourceModule_ << "/" << sourceName_ << "' can't retrieve kernel names!");
             }
         }
 #endif
     }
 
-    bool compile(const Context& ctx, const ProgramSource::Impl* src_, String& errmsg)
+    যৌক্তিক compile(ধ্রুবক Context& ctx, ধ্রুবক ProgramSource::Impl* src_, String& errmsg)
     {
         CV_Assert(ctx.getImpl());
         CV_Assert(src_);
 
         // We don't cache OpenCL binaries
-        if (src_->kind_ == ProgramSource::Impl::PROGRAM_BINARIES)
+        যদি (src_->kind_ == ProgramSource::Impl::PROGRAM_BINARIES)
         {
-            CV_LOG_VERBOSE(NULL, 0, "Load program binary... " << src_->module_.c_str() << "/" << src_->name_.c_str());
-            bool isLoaded = createFromBinary(ctx, src_->sourceAddr_, src_->sourceSize_, errmsg);
-            return isLoaded;
+            CV_LOG_VERBOSE(ফাঁকা, 0, "Load program binary... " << src_->module_.c_str() << "/" << src_->name_.c_str());
+            যৌক্তিক isLoaded = create_From_দ্বিমিক(ctx, src_->sourceAddr_, src_->source_আকার, errmsg);
+            ফেরত isLoaded;
         }
-        return compileWithCache(ctx, src_, errmsg);
+        ফেরত compileWithCache(ctx, src_, errmsg);
     }
 
-    bool compileWithCache(const Context& ctx, const ProgramSource::Impl* src_, String& errmsg)
+    যৌক্তিক compileWithCache(ধ্রুবক Context& ctx, ধ্রুবক ProgramSource::Impl* src_, String& errmsg)
     {
         CV_Assert(ctx.getImpl());
         CV_Assert(src_);
         CV_Assert(src_->kind_ != ProgramSource::Impl::PROGRAM_BINARIES);
 
-#if OPENCV_HAVE_FILESYSTEM_SUPPORT
+#যদি OPENCV_HAVE_FILESYSTEM_SUPPORT
         OpenCLBinaryCacheConfigurator& config = OpenCLBinaryCacheConfigurator::getSingletonInstance();
-        const std::string base_dir = config.prepareCacheDirectoryForContext(
+        ধ্রুবক std::string base_dir = config.prepareCacheDirectoryForContext(
                 ctx.getImpl()->getPrefixString(),
                 ctx.getImpl()->getPrefixBase()
         );
-        const String& hash_str = src_->sourceHash_;
+        ধ্রুবক String& hash_str = src_->sourceHash_;
         cv::String fname;
-        if (!base_dir.empty() && !src_->module_.empty() && !src_->name_.empty())
+        যদি (!base_dir.empty() && !src_->module_.empty() && !src_->name_.empty())
         {
             CV_Assert(!hash_str.empty());
             fname = src_->module_ + "--" + src_->name_ + "_" + hash_str + ".bin";
             fname = utils::fs::join(base_dir, fname);
         }
-        const cv::Ptr<utils::fs::FileLock> fileLock = config.cache_lock_; // can be empty
-        if (!fname.empty() && CV_OPENCL_CACHE_ENABLE)
+        ধ্রুবক cv::Ptr<utils::fs::FileLock> fileLock = config.cache_lock_; // can be empty
+        যদি (!fname.empty() && CV_OPENCL_CACHE_ENABLE)
         {
-            try
+            চেষ্টা
             {
-                std::vector<char> binaryBuf;
-                bool res = false;
+                std::vector<অক্ষর> দ্বিমিক_Buf;
+                যৌক্তিক res = মিথ্যা;
                 {
                     cv::utils::optional_shared_lock_guard<cv::utils::fs::FileLock> lock_fs(fileLock.get());
-                    BinaryProgramFile file(fname, hash_str.c_str());
-                    res = file.read(buildflags, binaryBuf);
+                    দ্বিমিক_Program_File file(fname, hash_str.c_str());
+                    res = file.পঠ(buildflags, দ্বিমিক_Buf);
                 }
-                if (res)
+                যদি (res)
                 {
-                    CV_Assert(!binaryBuf.empty());
-                    CV_LOG_VERBOSE(NULL, 0, "Load program binary from cache: " << src_->module_.c_str() << "/" << src_->name_.c_str());
-                    bool isLoaded = createFromBinary(ctx, binaryBuf, errmsg);
-                    if (isLoaded)
-                        return true;
+                    CV_Assert(!দ্বিমিক_Buf.empty());
+                    CV_LOG_VERBOSE(ফাঁকা, 0, "Load program binary from cache: " << src_->module_.c_str() << "/" << src_->name_.c_str());
+                    যৌক্তিক isLoaded = create_From_দ্বিমিক(ctx, দ্বিমিক_Buf, errmsg);
+                    যদি (isLoaded)
+                        ফেরত সত্য;
                 }
             }
-            catch (const cv::Exception& e)
+            ধরো (ধ্রুবক cv::Exception& e)
             {
                 CV_UNUSED(e);
-                CV_LOG_VERBOSE(NULL, 0, "Can't load OpenCL binary: " + fname << std::endl << e.what());
+                CV_LOG_VERBOSE(ফাঁকা, 0, "Can't load OpenCL binary: " + fname << std::endl << e.what());
             }
-            catch (...)
+            ধরো (...)
             {
-                CV_LOG_VERBOSE(NULL, 0, "Can't load OpenCL binary: " + fname);
+                CV_LOG_VERBOSE(ফাঁকা, 0, "Can't load OpenCL binary: " + fname);
             }
         }
 #endif // OPENCV_HAVE_FILESYSTEM_SUPPORT
-        CV_Assert(handle == NULL);
-        if (src_->kind_ == ProgramSource::Impl::PROGRAM_SOURCE_CODE)
+        CV_Assert(handle == ফাঁকা);
+        যদি (src_->kind_ == ProgramSource::Impl::PROGRAM_SOURCE_CODE)
         {
-            if (!buildFromSources(ctx, src_, errmsg))
+            যদি (!buildFromSources(ctx, src_, errmsg))
             {
-                return false;
+                ফেরত মিথ্যা;
             }
         }
-        else if (src_->kind_ == ProgramSource::Impl::PROGRAM_SPIR)
+        অন্যথা যদি (src_->kind_ == ProgramSource::Impl::PROGRAM_SPIR)
         {
             buildflags = joinBuildOptions(buildflags, " -x spir");
-            if ((cv::String(" ") + buildflags).find(" -spir-std=") == cv::String::npos)
+            যদি ((cv::String(" ") + buildflags).find(" -spir-std=") == cv::String::npos)
             {
                 buildflags = joinBuildOptions(buildflags, " -spir-std=1.2");
             }
-            CV_LOG_VERBOSE(NULL, 0, "Load program SPIR binary... " << src_->module_.c_str() << "/" << src_->name_.c_str());
-            bool isLoaded = createFromBinary(ctx, src_->sourceAddr_, src_->sourceSize_, errmsg);
-            if (!isLoaded)
-                return false;
+            CV_LOG_VERBOSE(ফাঁকা, 0, "Load program SPIR binary... " << src_->module_.c_str() << "/" << src_->name_.c_str());
+            যৌক্তিক isLoaded = create_From_দ্বিমিক(ctx, src_->sourceAddr_, src_->source_আকার, errmsg);
+            যদি (!isLoaded)
+                ফেরত মিথ্যা;
         }
-        else if (src_->kind_ == ProgramSource::Impl::PROGRAM_SPIRV)
+        অন্যথা যদি (src_->kind_ == ProgramSource::Impl::PROGRAM_SPIRV)
         {
             CV_Error(Error::StsNotImplemented, "OpenCL: SPIR-V is not supported");
         }
-        else
+        অন্যথা
         {
             CV_Error(Error::StsInternal, "Internal error");
         }
-        CV_Assert(handle != NULL);
-#if OPENCV_HAVE_FILESYSTEM_SUPPORT
-        if (!fname.empty() && CV_OPENCL_CACHE_WRITE)
+        CV_Assert(handle != ফাঁকা);
+#যদি OPENCV_HAVE_FILESYSTEM_SUPPORT
+        যদি (!fname.empty() && CV_OPENCL_CACHE_WRITE)
         {
-            try
+            চেষ্টা
             {
-                std::vector<char> binaryBuf;
-                getProgramBinary(binaryBuf);
+                std::vector<অক্ষর> দ্বিমিক_Buf;
+                get_Program_দ্বিমিক(দ্বিমিক_Buf);
                 {
                     cv::utils::optional_lock_guard<cv::utils::fs::FileLock> lock_fs(fileLock.get());
-                    BinaryProgramFile file(fname, hash_str.c_str());
-                    file.write(buildflags, binaryBuf);
+                    দ্বিমিক_Program_File file(fname, hash_str.c_str());
+                    file.লিখ(buildflags, দ্বিমিক_Buf);
                 }
             }
-            catch (const cv::Exception& e)
+            ধরো (ধ্রুবক cv::Exception& e)
             {
-                CV_LOG_WARNING(NULL, "Can't save OpenCL binary into cache: " + fname << std::endl << e.what());
+                CV_LOG_WARNING(ফাঁকা, "Can't save OpenCL binary into cache: " + fname << std::endl << e.what());
             }
-            catch (...)
+            ধরো (...)
             {
-                CV_LOG_WARNING(NULL, "Can't save OpenCL binary into cache: " + fname);
+                CV_LOG_WARNING(ফাঁকা, "Can't save OpenCL binary into cache: " + fname);
             }
         }
 #endif // OPENCV_HAVE_FILESYSTEM_SUPPORT
-#if CV_OPENCL_VALIDATE_BINARY_PROGRAMS
-        if (CV_OPENCL_VALIDATE_BINARY_PROGRAMS_VALUE)
+#যদি CV_OPENCL_VALIDATE_দ্বিমিক_PROGRAMS
+        যদি (CV_OPENCL_VALIDATE_দ্বিমিক_PROGRAMS_মান)
         {
-            std::vector<char> binaryBuf;
-            getProgramBinary(binaryBuf);
-            if (!binaryBuf.empty())
+            std::vector<অক্ষর> দ্বিমিক_Buf;
+            get_Program_দ্বিমিক(দ্বিমিক_Buf);
+            যদি (!দ্বিমিক_Buf.empty())
             {
                 CV_OCL_DBG_CHECK(clReleaseProgram(handle));
-                handle = NULL;
-                createFromBinary(ctx, binaryBuf, errmsg);
+                handle = ফাঁকা;
+                create_From_দ্বিমিক(ctx, দ্বিমিক_Buf, errmsg);
             }
         }
 #endif
-        return handle != NULL;
+        ফেরত handle != ফাঁকা;
     }
 
-    void dumpBuildLog_(cl_int result, const cl_device_id* deviceList, String& errmsg)
+    শূন্য dumpBuildLog_(cl_int ফলাফল, ধ্রুবক cl_device_id* deviceList, String& errmsg)
     {
-        AutoBuffer<char, 4096> buffer; buffer[0] = 0;
+        Auto_বাফার<অক্ষর, 4096> বাফার; বাফার[0] = 0;
 
         size_t retsz = 0;
         cl_int log_retval = clGetProgramBuildInfo(handle, deviceList[0],
                                                   CL_PROGRAM_BUILD_LOG, 0, 0, &retsz);
-        if (log_retval == CL_SUCCESS && retsz > 1)
+        যদি (log_retval == CL_SUCCESS && retsz > 1)
         {
-            buffer.resize(retsz + 16);
+            বাফার.resize(retsz + 16);
             log_retval = clGetProgramBuildInfo(handle, deviceList[0],
-                                               CL_PROGRAM_BUILD_LOG, retsz+1, buffer.data(), &retsz);
-            if (log_retval == CL_SUCCESS)
+                                               CL_PROGRAM_BUILD_LOG, retsz+1, বাফার.তথ্য(), &retsz);
+            যদি (log_retval == CL_SUCCESS)
             {
-                if (retsz < buffer.size())
-                    buffer[retsz] = 0;
-                else
-                    buffer[buffer.size() - 1] = 0;
+                যদি (retsz < বাফার.size())
+                    বাফার[retsz] = 0;
+                অন্যথা
+                    বাফার[বাফার.size() - 1] = 0;
             }
-            else
+            অন্যথা
             {
-                buffer[0] = 0;
+                বাফার[0] = 0;
             }
         }
 
-        errmsg = String(buffer.data());
+        errmsg = String(বাফার.তথ্য());
         printf("OpenCL program build log: %s/%s\nStatus %d: %s\n%s\n%s\n",
                 sourceModule_.c_str(), sourceName_.c_str(),
-                result, getOpenCLErrorString(result),
+                ফলাফল, getOpenCLErrorString(ফলাফল),
                 buildflags.c_str(), errmsg.c_str());
         fflush(stdout);
     }
 
-    bool buildFromSources(const Context& ctx, const ProgramSource::Impl* src_, String& errmsg)
+    যৌক্তিক buildFromSources(ধ্রুবক Context& ctx, ধ্রুবক ProgramSource::Impl* src_, String& errmsg)
     {
         CV_Assert(src_);
         CV_Assert(src_->kind_ == ProgramSource::Impl::PROGRAM_SOURCE_CODE);
-        CV_Assert(handle == NULL);
+        CV_Assert(handle == ফাঁকা);
         CV_INSTRUMENT_REGION_OPENCL_COMPILE(cv::format("Build OpenCL program: %s/%s %s options: %s",
                 sourceModule_.c_str(), sourceName_.c_str(),
                 src_->sourceHash_.c_str(), buildflags.c_str()).c_str());
 
-        CV_LOG_VERBOSE(NULL, 0, "Compile... " << sourceModule_.c_str() << "/" << sourceName_.c_str());
+        CV_LOG_VERBOSE(ফাঁকা, 0, "Compile... " << sourceModule_.c_str() << "/" << sourceName_.c_str());
 
-        const char* srcptr = src_->sourceAddr_ ? ((const char*)src_->sourceAddr_) : src_->codeStr_.c_str();
-        size_t srclen = src_->sourceAddr_ ? src_->sourceSize_ : src_->codeStr_.size();
-        CV_Assert(srcptr != NULL);
+        ধ্রুবক অক্ষর* srcptr = src_->sourceAddr_ ? ((ধ্রুবক অক্ষর*)src_->sourceAddr_) : src_->codeStr_.c_str();
+        size_t srclen = src_->sourceAddr_ ? src_->source_আকার : src_->codeStr_.size();
+        CV_Assert(srcptr != ফাঁকা);
         CV_Assert(srclen > 0);
 
         cl_int retval = 0;
 
         handle = clCreateProgramWithSource((cl_context)ctx.ptr(), 1, &srcptr, &srclen, &retval);
-        CV_OCL_DBG_CHECK_RESULT(retval, "clCreateProgramWithSource");
+        CV_OCL_DBG_CHECK_ফলাফল(retval, "clCreateProgramWithSource");
         CV_Assert(handle || retval != CL_SUCCESS);
-        if (handle && retval == CL_SUCCESS)
+        যদি (handle && retval == CL_SUCCESS)
         {
             size_t n = ctx.ndevices();
-            AutoBuffer<cl_device_id, 4> deviceListBuf(n + 1);
-            cl_device_id* deviceList = deviceListBuf.data();
-            for (size_t i = 0; i < n; i++)
+            Auto_বাফার<cl_device_id, 4> deviceListBuf(n + 1);
+            cl_device_id* deviceList = deviceListBuf.তথ্য();
+            জন্য (size_t i = 0; i < n; i++)
             {
                 deviceList[i] = (cl_device_id)(ctx.device(i).ptr());
             }
 
             retval = clBuildProgram(handle, (cl_uint)n, deviceList, buildflags.c_str(), 0, 0);
-            CV_OCL_TRACE_CHECK_RESULT(/*don't throw: retval*/CL_SUCCESS, cv::format("clBuildProgram(source: %s)", buildflags.c_str()).c_str());
-#if !CV_OPENCL_ALWAYS_SHOW_BUILD_LOG
-            if (retval != CL_SUCCESS)
+            CV_OCL_TRACE_CHECK_ফলাফল(/*don't throw: retval*/CL_SUCCESS, cv::format("clBuildProgram(source: %s)", buildflags.c_str()).c_str());
+#যদি !CV_OPENCL_ALWAYS_SHOW_BUILD_LOG
+            যদি (retval != CL_SUCCESS)
 #endif
             {
                 dumpBuildLog_(retval, deviceList, errmsg);
 
                 // don't remove "retval != CL_SUCCESS" condition here:
                 // it would break CV_OPENCL_ALWAYS_SHOW_BUILD_LOG mode
-                if (retval != CL_SUCCESS && handle)
+                যদি (retval != CL_SUCCESS && handle)
                 {
                     CV_OCL_DBG_CHECK(clReleaseProgram(handle));
-                    handle = NULL;
+                    handle = ফাঁকা;
                 }
-                if (retval != CL_SUCCESS &&
+                যদি (retval != CL_SUCCESS &&
                     sourceName_ != "dummy"  // used for testing of compilation flags
                 )
                 {
                     onOpenCLKernelBuildError();
                 }
             }
-#if CV_OPENCL_VALIDATE_BINARY_PROGRAMS
-            if (handle && CV_OPENCL_VALIDATE_BINARY_PROGRAMS_VALUE)
+#যদি CV_OPENCL_VALIDATE_দ্বিমিক_PROGRAMS
+            যদি (handle && CV_OPENCL_VALIDATE_দ্বিমিক_PROGRAMS_মান)
             {
-                CV_LOG_INFO(NULL, "OpenCL: query kernel names (build from sources)...");
+                CV_LOG_INFO(ফাঁকা, "OpenCL: query kernel names (build from sources)...");
                 size_t retsz = 0;
-                char kernels_buffer[4096] = {0};
-                cl_int result = clGetProgramInfo(handle, CL_PROGRAM_KERNEL_NAMES, sizeof(kernels_buffer), &kernels_buffer[0], &retsz);
-                if (retsz < sizeof(kernels_buffer))
-                    kernels_buffer[retsz] = 0;
-                else
-                    kernels_buffer[0] = 0;
-                CV_LOG_INFO(NULL, result << ": Kernels='" << kernels_buffer << "'");
+                অক্ষর kernels_বাফার[4096] = {0};
+                cl_int ফলাফল = clGetProgramInfo(handle, CL_PROGRAM_KERNEL_NAMES, আকার(kernels_বাফার), &kernels_বাফার[0], &retsz);
+                যদি (retsz < আকার(kernels_বাফার))
+                    kernels_বাফার[retsz] = 0;
+                অন্যথা
+                    kernels_বাফার[0] = 0;
+                CV_LOG_INFO(ফাঁকা, ফলাফল << ": Kernels='" << kernels_বাফার << "'");
             }
 #endif
         }
-        return handle != NULL;
+        ফেরত handle != ফাঁকা;
     }
 
-    void getProgramBinary(std::vector<char>& buf)
+    শূন্য get_Program_দ্বিমিক(std::vector<অক্ষর>& buf)
     {
         CV_Assert(handle);
         size_t sz = 0;
-        CV_OCL_CHECK(clGetProgramInfo(handle, CL_PROGRAM_BINARY_SIZES, sizeof(sz), &sz, NULL));
+        CV_OCL_CHECK(clGetProgramInfo(handle, CL_PROGRAM_দ্বিমিক_SIZES, আকার(sz), &sz, ফাঁকা));
         buf.resize(sz);
         uchar* ptr = (uchar*)&buf[0];
-        CV_OCL_CHECK(clGetProgramInfo(handle, CL_PROGRAM_BINARIES, sizeof(ptr), &ptr, NULL));
+        CV_OCL_CHECK(clGetProgramInfo(handle, CL_PROGRAM_BINARIES, আকার(ptr), &ptr, ফাঁকা));
     }
 
-    bool createFromBinary(const Context& ctx, const std::vector<char>& buf, String& errmsg)
+    যৌক্তিক create_From_দ্বিমিক(ধ্রুবক Context& ctx, ধ্রুবক std::vector<অক্ষর>& buf, String& errmsg)
     {
-        return createFromBinary(ctx, (const unsigned char*)&buf[0], buf.size(), errmsg);
+        ফেরত create_From_দ্বিমিক(ctx, (ধ্রুবক unsigned অক্ষর*)&buf[0], buf.size(), errmsg);
     }
 
-    bool createFromBinary(const Context& ctx, const unsigned char* binaryAddr, const size_t binarySize, String& errmsg)
+    যৌক্তিক create_From_দ্বিমিক(ধ্রুবক Context& ctx, ধ্রুবক unsigned অক্ষর* দ্বিমিক_Addr, ধ্রুবক size_t দ্বিমিক_আকার, String& errmsg)
     {
-        CV_Assert(handle == NULL);
+        CV_Assert(handle == ফাঁকা);
         CV_INSTRUMENT_REGION_OPENCL_COMPILE("Load OpenCL program");
-        CV_LOG_VERBOSE(NULL, 0, "Load from binary... (" << binarySize << " bytes)");
+        CV_LOG_VERBOSE(ফাঁকা, 0, "Load from binary... (" << দ্বিমিক_আকার << " bytes)");
 
-        CV_Assert(binarySize > 0);
+        CV_Assert(দ্বিমিক_আকার > 0);
 
-        size_t ndevices = (int)ctx.ndevices();
-        AutoBuffer<cl_device_id> devices_(ndevices);
-        AutoBuffer<const uchar*> binaryPtrs_(ndevices);
-        AutoBuffer<size_t> binarySizes_(ndevices);
+        size_t ndevices = (পূর্ণসংখ্যা)ctx.ndevices();
+        Auto_বাফার<cl_device_id> devices_(ndevices);
+        Auto_বাফার<ধ্রুবক uchar*> দ্বিমিক_Ptrs(ndevices);
+        Auto_বাফার<size_t> দ্বিমিক_Sizes(ndevices);
 
-        cl_device_id* devices = devices_.data();
-        const uchar** binaryPtrs = binaryPtrs_.data();
-        size_t* binarySizes = binarySizes_.data();
-        for (size_t i = 0; i < ndevices; i++)
+        cl_device_id* devices = devices_.তথ্য();
+        ধ্রুবক uchar** দ্বিমিক_Ptrs_2 = দ্বিমিক_Ptrs.তথ্য();
+        size_t* দ্বিমিক_Sizes_2 = দ্বিমিক_Sizes.তথ্য();
+        জন্য (size_t i = 0; i < ndevices; i++)
         {
             devices[i] = (cl_device_id)ctx.device(i).ptr();
-            binaryPtrs[i] = binaryAddr;
-            binarySizes[i] = binarySize;
+            দ্বিমিক_Ptrs_2[i] = দ্বিমিক_Addr;
+            দ্বিমিক_Sizes_2[i] = দ্বিমিক_আকার;
         }
 
-        cl_int result = 0;
-        handle = clCreateProgramWithBinary((cl_context)ctx.ptr(), (cl_uint)ndevices, devices_.data(),
-                                           binarySizes, binaryPtrs, NULL, &result);
-        if (result != CL_SUCCESS)
+        cl_int ফলাফল = 0;
+        handle = cl_Create_Program_With_দ্বিমিক((cl_context)ctx.ptr(), (cl_uint)ndevices, devices_.তথ্য(),
+                                           দ্বিমিক_Sizes_2, দ্বিমিক_Ptrs_2, ফাঁকা, &ফলাফল);
+        যদি (ফলাফল != CL_SUCCESS)
         {
-            CV_LOG_ERROR(NULL, CV_OCL_API_ERROR_MSG(result, "clCreateProgramWithBinary"));
-            if (handle)
+            CV_LOG_ERROR(ফাঁকা, CV_OCL_API_ERROR_বার্তা(ফলাফল, "clCreateProgramWithBinary"));
+            যদি (handle)
             {
                 CV_OCL_DBG_CHECK(clReleaseProgram(handle));
-                handle = NULL;
+                handle = ফাঁকা;
             }
         }
-        if (!handle)
+        যদি (!handle)
         {
-            return false;
+            ফেরত মিথ্যা;
         }
         // call clBuildProgram()
         {
-            result = clBuildProgram(handle, (cl_uint)ndevices, devices_.data(), buildflags.c_str(), 0, 0);
-            CV_OCL_DBG_CHECK_RESULT(result, cv::format("clBuildProgram(binary: %s/%s)", sourceModule_.c_str(), sourceName_.c_str()).c_str());
-            if (result != CL_SUCCESS)
+            ফলাফল = clBuildProgram(handle, (cl_uint)ndevices, devices_.তথ্য(), buildflags.c_str(), 0, 0);
+            CV_OCL_DBG_CHECK_ফলাফল(ফলাফল, cv::format("clBuildProgram(binary: %s/%s)", sourceModule_.c_str(), sourceName_.c_str()).c_str());
+            যদি (ফলাফল != CL_SUCCESS)
             {
-                dumpBuildLog_(result, devices, errmsg);
-                if (handle)
+                dumpBuildLog_(ফলাফল, devices, errmsg);
+                যদি (handle)
                 {
                     CV_OCL_DBG_CHECK(clReleaseProgram(handle));
-                    handle = NULL;
+                    handle = ফাঁকা;
                 }
-                return false;
+                ফেরত মিথ্যা;
             }
         }
         // check build status
         {
             cl_build_status build_status = CL_BUILD_NONE;
             size_t retsz = 0;
-            CV_OCL_DBG_CHECK(result = clGetProgramBuildInfo(handle, devices[0], CL_PROGRAM_BUILD_STATUS,
-                    sizeof(build_status), &build_status, &retsz));
-            if (result == CL_SUCCESS)
+            CV_OCL_DBG_CHECK(ফলাফল = clGetProgramBuildInfo(handle, devices[0], CL_PROGRAM_BUILD_STATUS,
+                    আকার(build_status), &build_status, &retsz));
+            যদি (ফলাফল == CL_SUCCESS)
             {
-                if (build_status == CL_BUILD_SUCCESS)
+                যদি (build_status == CL_BUILD_SUCCESS)
                 {
-                    return true;
+                    ফেরত সত্য;
                 }
-                else
+                অন্যথা
                 {
-                    CV_LOG_WARNING(NULL, "clGetProgramBuildInfo() returns " << build_status);
-                    return false;
+                    CV_LOG_WARNING(ফাঁকা, "clGetProgramBuildInfo() returns " << build_status);
+                    ফেরত মিথ্যা;
                 }
             }
-            else
+            অন্যথা
             {
-                CV_LOG_ERROR(NULL, CV_OCL_API_ERROR_MSG(result, "clGetProgramBuildInfo()"));
-                if (handle)
+                CV_LOG_ERROR(ফাঁকা, CV_OCL_API_ERROR_বার্তা(ফলাফল, "clGetProgramBuildInfo()"));
+                যদি (handle)
                 {
                     CV_OCL_DBG_CHECK(clReleaseProgram(handle));
-                    handle = NULL;
+                    handle = ফাঁকা;
                 }
             }
         }
-#if CV_OPENCL_VALIDATE_BINARY_PROGRAMS
-        if (handle && CV_OPENCL_VALIDATE_BINARY_PROGRAMS_VALUE)
+#যদি CV_OPENCL_VALIDATE_দ্বিমিক_PROGRAMS
+        যদি (handle && CV_OPENCL_VALIDATE_দ্বিমিক_PROGRAMS_মান)
         {
-            CV_LOG_INFO(NULL, "OpenCL: query kernel names (binary)...");
+            CV_LOG_INFO(ফাঁকা, "OpenCL: query kernel names (binary)...");
             size_t retsz = 0;
-            char kernels_buffer[4096] = {0};
-            result = clGetProgramInfo(handle, CL_PROGRAM_KERNEL_NAMES, sizeof(kernels_buffer), &kernels_buffer[0], &retsz);
-            if (retsz < sizeof(kernels_buffer))
-                kernels_buffer[retsz] = 0;
-            else
-                kernels_buffer[0] = 0;
-            CV_LOG_INFO(NULL, result << ": Kernels='" << kernels_buffer << "'");
+            অক্ষর kernels_বাফার[4096] = {0};
+            ফলাফল = clGetProgramInfo(handle, CL_PROGRAM_KERNEL_NAMES, আকার(kernels_বাফার), &kernels_বাফার[0], &retsz);
+            যদি (retsz < আকার(kernels_বাফার))
+                kernels_বাফার[retsz] = 0;
+            অন্যথা
+                kernels_বাফার[0] = 0;
+            CV_LOG_INFO(ফাঁকা, ফলাফল << ": Kernels='" << kernels_বাফার << "'");
         }
 #endif
-        return handle != NULL;
+        ফেরত handle != ফাঁকা;
     }
 
     ~Impl()
     {
-        if( handle )
+        যদি( handle )
         {
 #ifdef _WIN32
-            if (!cv::__termination)
+            যদি (!cv::__termination)
 #endif
             {
                 clReleaseProgram(handle);
             }
-            handle = NULL;
+            handle = ফাঁকা;
         }
     }
 
@@ -4772,29 +4772,29 @@ Program::Program() CV_NOEXCEPT
     p = 0;
 }
 
-Program::Program(const ProgramSource& src,
-        const String& buildflags, String& errmsg)
+Program::Program(ধ্রুবক ProgramSource& src,
+        ধ্রুবক String& buildflags, String& errmsg)
 {
     p = 0;
     create(src, buildflags, errmsg);
 }
 
-Program::Program(const Program& prog)
+Program::Program(ধ্রুবক Program& prog)
 {
     p = prog.p;
-    if(p)
+    যদি(p)
         p->addref();
 }
 
-Program& Program::operator = (const Program& prog)
+Program& Program::operator = (ধ্রুবক Program& prog)
 {
     Impl* newp = (Impl*)prog.p;
-    if(newp)
+    যদি(newp)
         newp->addref();
-    if(p)
+    যদি(p)
         p->release();
     p = newp;
-    return *this;
+    ফেরত *এই;
 }
 
 Program::Program(Program&& prog) CV_NOEXCEPT
@@ -4805,126 +4805,126 @@ Program::Program(Program&& prog) CV_NOEXCEPT
 
 Program& Program::operator = (Program&& prog) CV_NOEXCEPT
 {
-    if (this != &prog) {
-        if(p)
+    যদি (এই != &prog) {
+        যদি(p)
             p->release();
         p = prog.p;
         prog.p = nullptr;
     }
-    return *this;
+    ফেরত *এই;
 }
 
 Program::~Program()
 {
-    if(p)
+    যদি(p)
         p->release();
 }
 
-bool Program::create(const ProgramSource& src,
-            const String& buildflags, String& errmsg)
+যৌক্তিক Program::create(ধ্রুবক ProgramSource& src,
+            ধ্রুবক String& buildflags, String& errmsg)
 {
-    if(p)
+    যদি(p)
     {
         p->release();
-        p = NULL;
+        p = ফাঁকা;
     }
-    p = new Impl(src, buildflags, errmsg);
-    if(!p->handle)
+    p = নতুন Impl(src, buildflags, errmsg);
+    যদি(!p->handle)
     {
         p->release();
         p = 0;
     }
-    return p != 0;
+    ফেরত p != 0;
 }
 
-void* Program::ptr() const
+শূন্য* Program::ptr() ধ্রুবক
 {
-    return p ? p->handle : 0;
+    ফেরত p ? p->handle : 0;
 }
 
 #ifndef OPENCV_REMOVE_DEPRECATED_API
-const ProgramSource& Program::source() const
+ধ্রুবক ProgramSource& Program::source() ধ্রুবক
 {
     CV_Error(Error::StsNotImplemented, "Removed API");
 }
 
-bool Program::read(const String& bin, const String& buildflags)
+যৌক্তিক Program::পঠ(ধ্রুবক String& bin, ধ্রুবক String& buildflags)
 {
     CV_UNUSED(bin); CV_UNUSED(buildflags);
     CV_Error(Error::StsNotImplemented, "Removed API");
 }
 
-bool Program::write(String& bin) const
+যৌক্তিক Program::লিখ(String& bin) ধ্রুবক
 {
     CV_UNUSED(bin);
     CV_Error(Error::StsNotImplemented, "Removed API");
 }
 
-String Program::getPrefix() const
+String Program::getPrefix() ধ্রুবক
 {
-    if(!p)
-        return String();
+    যদি(!p)
+        ফেরত String();
     Context::Impl* ctx_ = Context::getDefault().getImpl();
     CV_Assert(ctx_);
-    return cv::format("opencl=%s\nbuildflags=%s", ctx_->getPrefixString().c_str(), p->buildflags.c_str());
+    ফেরত cv::format("opencl=%s\nbuildflags=%s", ctx_->getPrefixString().c_str(), p->buildflags.c_str());
 }
 
-String Program::getPrefix(const String& buildflags)
+String Program::getPrefix(ধ্রুবক String& buildflags)
 {
         Context::Impl* ctx_ = Context::getDefault().getImpl();
         CV_Assert(ctx_);
-        return cv::format("opencl=%s\nbuildflags=%s", ctx_->getPrefixString().c_str(), buildflags.c_str());
+        ফেরত cv::format("opencl=%s\nbuildflags=%s", ctx_->getPrefixString().c_str(), buildflags.c_str());
 }
 #endif // OPENCV_REMOVE_DEPRECATED_API
 
-void Program::getBinary(std::vector<char>& binary) const
+শূন্য Program::get_দ্বিমিক(std::vector<অক্ষর>& binary) ধ্রুবক
 {
     CV_Assert(p && "Empty program");
-    p->getProgramBinary(binary);
+    p->get_Program_দ্বিমিক(binary);
 }
 
-Program Context::Impl::getProg(const ProgramSource& src,
-                               const String& buildflags, String& errmsg)
+Program Context::Impl::getProg(ধ্রুবক ProgramSource& src,
+                               ধ্রুবক String& buildflags, String& errmsg)
 {
-    size_t limit = getProgramCountLimit();
-    const ProgramSource::Impl* src_ = src.getImpl();
+    size_t limit = get_Program_গুনতি_Limit();
+    ধ্রুবক ProgramSource::Impl* src_ = src.getImpl();
     CV_Assert(src_);
-    String key = cv::format("module=%s name=%s codehash=%s\nopencl=%s\nbuildflags=%s",
+    String চাবি = cv::format("module=%s name=%s codehash=%s\nopencl=%s\nbuildflags=%s",
             src_->module_.c_str(), src_->name_.c_str(), src_->sourceHash_.c_str(),
             getPrefixString().c_str(),
             buildflags.c_str());
     {
         cv::AutoLock lock(program_cache_mutex);
-        phash_t::iterator it = phash.find(key);
-        if (it != phash.end())
+        phash_t::iterator it = phash.find(চাবি);
+        যদি (it != phash.end())
         {
             // TODO LRU cache
-            CacheList::iterator i = std::find(cacheList.begin(), cacheList.end(), key);
-            if (i != cacheList.end() && i != cacheList.begin())
+            CacheList::iterator i = std::find(cacheList.begin(), cacheList.end(), চাবি);
+            যদি (i != cacheList.end() && i != cacheList.begin())
             {
                 cacheList.erase(i);
-                cacheList.push_front(key);
+                cacheList.push_front(চাবি);
             }
-            return it->second;
+            ফেরত it->second;
         }
         { // cleanup program cache
             size_t sz = phash.size();
-            if (limit > 0 && sz >= limit)
+            যদি (limit > 0 && sz >= limit)
             {
-                static bool warningFlag = false;
-                if (!warningFlag)
+                স্থির যৌক্তিক warningFlag = মিথ্যা;
+                যদি (!warningFlag)
                 {
                     printf("\nWARNING: OpenCV-OpenCL:\n"
                         "    In-memory cache for OpenCL programs is full, older programs will be unloaded.\n"
                         "    You can change cache size via OPENCV_OPENCL_PROGRAM_CACHE environment variable\n\n");
-                    warningFlag = true;
+                    warningFlag = সত্য;
                 }
-                while (!cacheList.empty())
+                যখন (!cacheList.empty())
                 {
                     size_t c = phash.erase(cacheList.back());
                     cacheList.pop_back();
-                    if (c != 0)
-                        break;
+                    যদি (c != 0)
+                        বিরতি;
                 }
             }
         }
@@ -4933,456 +4933,456 @@ Program Context::Impl::getProg(const ProgramSource& src,
     // Cache result of build failures too (to prevent unnecessary compiler invocations)
     {
         cv::AutoLock lock(program_cache_mutex);
-        phash.insert(std::pair<std::string, Program>(key, prog));
-        cacheList.push_front(key);
+        phash.insert(std::pair<std::string, Program>(চাবি, prog));
+        cacheList.push_front(চাবি);
     }
-    return prog;
+    ফেরত prog;
 }
 
 
 //////////////////////////////////////////// OpenCLAllocator //////////////////////////////////////////////////
 
 template<typename T>
-class OpenCLBufferPool
+শ্রেণী OpenCLBufferPool
 {
-protected:
+সুরক্ষিত:
     ~OpenCLBufferPool() { }
-public:
-    virtual T allocate(size_t size) = 0;
-    virtual void release(T buffer) = 0;
+সর্বজনীন:
+    আভাসী T allocate(size_t size) = 0;
+    আভাসী শূন্য release(T বাফার) = 0;
 };
 
-template <typename Derived, typename BufferEntry, typename T>
-class OpenCLBufferPoolBaseImpl : public BufferPoolController, public OpenCLBufferPool<T>
+template <typename Derived, typename বাফার_Entry, typename T>
+শ্রেণী OpenCLBufferPoolBaseImpl : সর্বজনীন বাফার_Pool_Controller, সর্বজনীন OpenCLBufferPool<T>
 {
-private:
-    inline Derived& derived() { return *static_cast<Derived*>(this); }
-protected:
+ব্যক্তিগত:
+    অন্তঃরেখ Derived& derived() { ফেরত *static_cast<Derived*>(এই); }
+সুরক্ষিত:
     Mutex mutex_;
 
-    size_t currentReservedSize;
-    size_t maxReservedSize;
+    size_t current_Reserved_আকার;
+    size_t max_Reserved_আকার;
 
-    std::list<BufferEntry> allocatedEntries_; // Allocated and used entries
-    std::list<BufferEntry> reservedEntries_; // LRU order. Allocated, but not used entries
+    std::list<বাফার_Entry> allocatedEntries_; // Allocated and used entries
+    std::list<বাফার_Entry> reservedEntries_; // LRU order. Allocated, but not used entries
 
     // synchronized
-    bool _findAndRemoveEntryFromAllocatedList(CV_OUT BufferEntry& entry, T buffer)
+    যৌক্তিক _findAndRemoveEntryFromAllocatedList(CV_OUT বাফার_Entry& entry, T বাফার)
     {
-        typename std::list<BufferEntry>::iterator i = allocatedEntries_.begin();
-        for (; i != allocatedEntries_.end(); ++i)
+        typename std::list<বাফার_Entry>::iterator i = allocatedEntries_.begin();
+        জন্য (; i != allocatedEntries_.end(); ++i)
         {
-            BufferEntry& e = *i;
-            if (e.clBuffer_ == buffer)
+            বাফার_Entry& e = *i;
+            যদি (e.cl_বাফার_2 == বাফার)
             {
                 entry = e;
                 allocatedEntries_.erase(i);
-                return true;
+                ফেরত সত্য;
             }
         }
-        return false;
+        ফেরত মিথ্যা;
     }
 
     // synchronized
-    bool _findAndRemoveEntryFromReservedList(CV_OUT BufferEntry& entry, const size_t size)
+    যৌক্তিক _findAndRemoveEntryFromReservedList(CV_OUT বাফার_Entry& entry, ধ্রুবক size_t size)
     {
-        if (reservedEntries_.empty())
-            return false;
-        typename std::list<BufferEntry>::iterator i = reservedEntries_.begin();
-        typename std::list<BufferEntry>::iterator result_pos = reservedEntries_.end();
-        BufferEntry result;
+        যদি (reservedEntries_.empty())
+            ফেরত মিথ্যা;
+        typename std::list<বাফার_Entry>::iterator i = reservedEntries_.begin();
+        typename std::list<বাফার_Entry>::iterator ফলাফল_pos = reservedEntries_.end();
+        বাফার_Entry ফলাফল;
         size_t minDiff = (size_t)(-1);
-        for (; i != reservedEntries_.end(); ++i)
+        জন্য (; i != reservedEntries_.end(); ++i)
         {
-            BufferEntry& e = *i;
-            if (e.capacity_ >= size)
+            বাফার_Entry& e = *i;
+            যদি (e.capacity_ >= size)
             {
                 size_t diff = e.capacity_ - size;
-                if (diff < std::max((size_t)4096, size / 8) && (result_pos == reservedEntries_.end() || diff < minDiff))
+                যদি (diff < std::max((size_t)4096, size / 8) && (ফলাফল_pos == reservedEntries_.end() || diff < minDiff))
                 {
                     minDiff = diff;
-                    result_pos = i;
-                    result = e;
-                    if (diff == 0)
-                        break;
+                    ফলাফল_pos = i;
+                    ফলাফল = e;
+                    যদি (diff == 0)
+                        বিরতি;
                 }
             }
         }
-        if (result_pos != reservedEntries_.end())
+        যদি (ফলাফল_pos != reservedEntries_.end())
         {
             //CV_DbgAssert(result == *result_pos);
-            reservedEntries_.erase(result_pos);
-            entry = result;
-            currentReservedSize -= entry.capacity_;
+            reservedEntries_.erase(ফলাফল_pos);
+            entry = ফলাফল;
+            current_Reserved_আকার -= entry.capacity_;
             allocatedEntries_.push_back(entry);
-            return true;
+            ফেরত সত্য;
         }
-        return false;
+        ফেরত মিথ্যা;
     }
 
     // synchronized
-    void _checkSizeOfReservedEntries()
+    শূন্য check_আকার_Of_Reserved_Entries()
     {
-        while (currentReservedSize > maxReservedSize)
+        যখন (current_Reserved_আকার > max_Reserved_আকার)
         {
             CV_DbgAssert(!reservedEntries_.empty());
-            const BufferEntry& entry = reservedEntries_.back();
-            CV_DbgAssert(currentReservedSize >= entry.capacity_);
-            currentReservedSize -= entry.capacity_;
-            derived()._releaseBufferEntry(entry);
+            ধ্রুবক বাফার_Entry& entry = reservedEntries_.back();
+            CV_DbgAssert(current_Reserved_আকার >= entry.capacity_);
+            current_Reserved_আকার -= entry.capacity_;
+            derived().release_বাফার_Entry(entry);
             reservedEntries_.pop_back();
         }
     }
 
-    inline size_t _allocationGranularity(size_t size)
+    অন্তঃরেখ size_t _allocationGranularity(size_t size)
     {
         // heuristic values
-        if (size < 1024*1024)
-            return 4096;  // don't work with buffers smaller than 4Kb (hidden allocation overhead issue)
-        else if (size < 16*1024*1024)
-            return 64*1024;
-        else
-            return 1024*1024;
+        যদি (size < 1024*1024)
+            ফেরত 4096;  // don't work with buffers smaller than 4Kb (hidden allocation overhead issue)
+        অন্যথা যদি (size < 16*1024*1024)
+            ফেরত 64*1024;
+        অন্যথা
+            ফেরত 1024*1024;
     }
 
-public:
+সর্বজনীন:
     OpenCLBufferPoolBaseImpl()
-        : currentReservedSize(0),
-          maxReservedSize(0)
+        : current_Reserved_আকার(0),
+          max_Reserved_আকার(0)
     {
         // nothing
     }
-    virtual ~OpenCLBufferPoolBaseImpl()
+    আভাসী ~OpenCLBufferPoolBaseImpl()
     {
         freeAllReservedBuffers();
         CV_Assert(reservedEntries_.empty());
     }
-public:
-    virtual T allocate(size_t size) CV_OVERRIDE
+সর্বজনীন:
+    আভাসী T allocate(size_t size) CV_OVERRIDE
     {
         AutoLock locker(mutex_);
-        BufferEntry entry;
-        if (maxReservedSize > 0 && _findAndRemoveEntryFromReservedList(entry, size))
+        বাফার_Entry entry;
+        যদি (max_Reserved_আকার > 0 && _findAndRemoveEntryFromReservedList(entry, size))
         {
             CV_DbgAssert(size <= entry.capacity_);
-            LOG_BUFFER_POOL("Reuse reserved buffer: %p\n", entry.clBuffer_);
+            LOG_বাফার_POOL("Reuse reserved buffer: %p\n", entry.cl_বাফার_2);
         }
-        else
+        অন্যথা
         {
-            derived()._allocateBufferEntry(entry, size);
+            derived().allocate_বাফার_Entry(entry, size);
         }
-        return entry.clBuffer_;
+        ফেরত entry.cl_বাফার_2;
     }
-    virtual void release(T buffer) CV_OVERRIDE
+    আভাসী শূন্য release(T বাফার) CV_OVERRIDE
     {
         AutoLock locker(mutex_);
-        BufferEntry entry;
-        CV_Assert(_findAndRemoveEntryFromAllocatedList(entry, buffer));
-        if (maxReservedSize == 0 || entry.capacity_ > maxReservedSize / 8)
+        বাফার_Entry entry;
+        CV_Assert(_findAndRemoveEntryFromAllocatedList(entry, বাফার));
+        যদি (max_Reserved_আকার == 0 || entry.capacity_ > max_Reserved_আকার / 8)
         {
-            derived()._releaseBufferEntry(entry);
+            derived().release_বাফার_Entry(entry);
         }
-        else
+        অন্যথা
         {
             reservedEntries_.push_front(entry);
-            currentReservedSize += entry.capacity_;
-            _checkSizeOfReservedEntries();
+            current_Reserved_আকার += entry.capacity_;
+            check_আকার_Of_Reserved_Entries();
         }
     }
 
-    virtual size_t getReservedSize() const CV_OVERRIDE { return currentReservedSize; }
-    virtual size_t getMaxReservedSize() const CV_OVERRIDE { return maxReservedSize; }
-    virtual void setMaxReservedSize(size_t size) CV_OVERRIDE
+    আভাসী size_t get_Reserved_আকার() ধ্রুবক CV_OVERRIDE { ফেরত current_Reserved_আকার; }
+    আভাসী size_t get_Max_Reserved_আকার() ধ্রুবক CV_OVERRIDE { ফেরত max_Reserved_আকার; }
+    আভাসী শূন্য set_Max_Reserved_আকার(size_t size) CV_OVERRIDE
     {
         AutoLock locker(mutex_);
-        size_t oldMaxReservedSize = maxReservedSize;
-        maxReservedSize = size;
-        if (maxReservedSize < oldMaxReservedSize)
+        size_t old_Max_Reserved_আকার = max_Reserved_আকার;
+        max_Reserved_আকার = size;
+        যদি (max_Reserved_আকার < old_Max_Reserved_আকার)
         {
-            typename std::list<BufferEntry>::iterator i = reservedEntries_.begin();
-            for (; i != reservedEntries_.end();)
+            typename std::list<বাফার_Entry>::iterator i = reservedEntries_.begin();
+            জন্য (; i != reservedEntries_.end();)
             {
-                const BufferEntry& entry = *i;
-                if (entry.capacity_ > maxReservedSize / 8)
+                ধ্রুবক বাফার_Entry& entry = *i;
+                যদি (entry.capacity_ > max_Reserved_আকার / 8)
                 {
-                    CV_DbgAssert(currentReservedSize >= entry.capacity_);
-                    currentReservedSize -= entry.capacity_;
-                    derived()._releaseBufferEntry(entry);
+                    CV_DbgAssert(current_Reserved_আকার >= entry.capacity_);
+                    current_Reserved_আকার -= entry.capacity_;
+                    derived().release_বাফার_Entry(entry);
                     i = reservedEntries_.erase(i);
-                    continue;
+                    চালু;
                 }
                 ++i;
             }
-            _checkSizeOfReservedEntries();
+            check_আকার_Of_Reserved_Entries();
         }
     }
-    virtual void freeAllReservedBuffers() CV_OVERRIDE
+    আভাসী শূন্য freeAllReservedBuffers() CV_OVERRIDE
     {
         AutoLock locker(mutex_);
-        typename std::list<BufferEntry>::const_iterator i = reservedEntries_.begin();
-        for (; i != reservedEntries_.end(); ++i)
+        typename std::list<বাফার_Entry>::const_iterator i = reservedEntries_.begin();
+        জন্য (; i != reservedEntries_.end(); ++i)
         {
-            const BufferEntry& entry = *i;
-            derived()._releaseBufferEntry(entry);
+            ধ্রুবক বাফার_Entry& entry = *i;
+            derived().release_বাফার_Entry(entry);
         }
         reservedEntries_.clear();
-        currentReservedSize = 0;
+        current_Reserved_আকার = 0;
     }
 };
 
-struct CLBufferEntry
+কাঠামো CLBufferEntry
 {
-    cl_mem clBuffer_;
+    cl_mem cl_বাফার_2;
     size_t capacity_;
-    CLBufferEntry() : clBuffer_((cl_mem)NULL), capacity_(0) { }
+    CLBufferEntry() : cl_বাফার_2((cl_mem)ফাঁকা), capacity_(0) { }
 };
 
-class OpenCLBufferPoolImpl CV_FINAL : public OpenCLBufferPoolBaseImpl<OpenCLBufferPoolImpl, CLBufferEntry, cl_mem>
+শ্রেণী OpenCLBufferPoolImpl CV_FINAL : সর্বজনীন OpenCLBufferPoolBaseImpl<OpenCLBufferPoolImpl, CLBufferEntry, cl_mem>
 {
-public:
-    typedef struct CLBufferEntry BufferEntry;
-protected:
-    int createFlags_;
-public:
-    OpenCLBufferPoolImpl(int createFlags = 0)
+সর্বজনীন:
+    প্রকারলেখ কাঠামো CLBufferEntry বাফার_Entry;
+সুরক্ষিত:
+    পূর্ণসংখ্যা createFlags_;
+সর্বজনীন:
+    OpenCLBufferPoolImpl(পূর্ণসংখ্যা createFlags = 0)
         : createFlags_(createFlags)
     {
     }
 
-    void _allocateBufferEntry(BufferEntry& entry, size_t size)
+    শূন্য allocate_বাফার_Entry(বাফার_Entry& entry, size_t size)
     {
-        CV_DbgAssert(entry.clBuffer_ == NULL);
-        entry.capacity_ = alignSize(size, (int)_allocationGranularity(size));
+        CV_DbgAssert(entry.cl_বাফার_2 == ফাঁকা);
+        entry.capacity_ = align_আকার(size, (পূর্ণসংখ্যা)_allocationGranularity(size));
         Context& ctx = Context::getDefault();
         cl_int retval = CL_SUCCESS;
-        entry.clBuffer_ = clCreateBuffer((cl_context)ctx.ptr(), CL_MEM_READ_WRITE|createFlags_, entry.capacity_, 0, &retval);
-        CV_OCL_CHECK_RESULT(retval, cv::format("clCreateBuffer(capacity=%lld) => %p", (long long int)entry.capacity_, (void*)entry.clBuffer_).c_str());
-        CV_Assert(entry.clBuffer_ != NULL);
-        if(retval == CL_SUCCESS)
+        entry.cl_বাফার_2 = cl_Create_বাফার((cl_context)ctx.ptr(), CL_MEM_READ_WRITE|createFlags_, entry.capacity_, 0, &retval);
+        CV_OCL_CHECK_ফলাফল(retval, cv::format("clCreateBuffer(capacity=%lld) => %p", (long long পূর্ণসংখ্যা)entry.capacity_, (শূন্য*)entry.cl_বাফার_2).c_str());
+        CV_Assert(entry.cl_বাফার_2 != ফাঁকা);
+        যদি(retval == CL_SUCCESS)
         {
             CV_IMPL_ADD(CV_IMPL_OCL);
         }
-        LOG_BUFFER_POOL("OpenCL allocate %lld (0x%llx) bytes: %p\n",
-                (long long)entry.capacity_, (long long)entry.capacity_, entry.clBuffer_);
+        LOG_বাফার_POOL("OpenCL allocate %lld (0x%llx) bytes: %p\n",
+                (long long)entry.capacity_, (long long)entry.capacity_, entry.cl_বাফার_2);
         allocatedEntries_.push_back(entry);
     }
 
-    void _releaseBufferEntry(const BufferEntry& entry)
+    শূন্য release_বাফার_Entry(ধ্রুবক বাফার_Entry& entry)
     {
         CV_Assert(entry.capacity_ != 0);
-        CV_Assert(entry.clBuffer_ != NULL);
-        LOG_BUFFER_POOL("OpenCL release buffer: %p, %lld (0x%llx) bytes\n",
-                entry.clBuffer_, (long long)entry.capacity_, (long long)entry.capacity_);
-        CV_OCL_DBG_CHECK(clReleaseMemObject(entry.clBuffer_));
+        CV_Assert(entry.cl_বাফার_2 != ফাঁকা);
+        LOG_বাফার_POOL("OpenCL release buffer: %p, %lld (0x%llx) bytes\n",
+                entry.cl_বাফার_2, (long long)entry.capacity_, (long long)entry.capacity_);
+        CV_OCL_DBG_CHECK(clReleaseMemObject(entry.cl_বাফার_2));
     }
 };
 
 #ifdef HAVE_OPENCL_SVM
-struct CLSVMBufferEntry
+কাঠামো CLSVMBufferEntry
 {
-    void* clBuffer_;
+    শূন্য* cl_বাফার_2;
     size_t capacity_;
-    CLSVMBufferEntry() : clBuffer_(NULL), capacity_(0) { }
+    CLSVMBufferEntry() : cl_বাফার_2(ফাঁকা), capacity_(0) { }
 };
-class OpenCLSVMBufferPoolImpl CV_FINAL : public OpenCLBufferPoolBaseImpl<OpenCLSVMBufferPoolImpl, CLSVMBufferEntry, void*>
+শ্রেণী OpenCLSVMBufferPoolImpl CV_FINAL : সর্বজনীন OpenCLBufferPoolBaseImpl<OpenCLSVMBufferPoolImpl, CLSVMBufferEntry, শূন্য*>
 {
-public:
-    typedef struct CLSVMBufferEntry BufferEntry;
-public:
+সর্বজনীন:
+    প্রকারলেখ কাঠামো CLSVMBufferEntry বাফার_Entry;
+সর্বজনীন:
     OpenCLSVMBufferPoolImpl()
     {
     }
 
-    void _allocateBufferEntry(BufferEntry& entry, size_t size)
+    শূন্য allocate_বাফার_Entry(বাফার_Entry& entry, size_t size)
     {
-        CV_DbgAssert(entry.clBuffer_ == NULL);
-        entry.capacity_ = alignSize(size, (int)_allocationGranularity(size));
+        CV_DbgAssert(entry.cl_বাফার_2 == ফাঁকা);
+        entry.capacity_ = align_আকার(size, (পূর্ণসংখ্যা)_allocationGranularity(size));
 
         Context& ctx = Context::getDefault();
-        const svm::SVMCapabilities svmCaps = svm::getSVMCapabilitites(ctx);
-        bool isFineGrainBuffer = svmCaps.isSupportFineGrainBuffer();
+        ধ্রুবক svm::SVMCapabilities svmCaps = svm::getSVMCapabilitites(ctx);
+        যৌক্তিক is_Fine_Grain_বাফার = svmCaps.is_Support_Fine_Grain_বাফার();
         cl_svm_mem_flags memFlags = CL_MEM_READ_WRITE |
-                (isFineGrainBuffer ? CL_MEM_SVM_FINE_GRAIN_BUFFER : 0);
+                (is_Fine_Grain_বাফার ? CL_MEM_SVM_FINE_GRAIN_বাফার : 0);
 
-        const svm::SVMFunctions* svmFns = svm::getSVMFunctions(ctx);
+        ধ্রুবক svm::SVMFunctions* svmFns = svm::getSVMFunctions(ctx);
         CV_DbgAssert(svmFns->isValid());
 
-        CV_OPENCL_SVM_TRACE_P("clSVMAlloc: %d\n", (int)entry.capacity_);
-        void *buf = svmFns->fn_clSVMAlloc((cl_context)ctx.ptr(), memFlags, entry.capacity_, 0);
+        CV_OPENCL_SVM_TRACE_P("clSVMAlloc: %d\n", (পূর্ণসংখ্যা)entry.capacity_);
+        শূন্য *buf = svmFns->fn_clSVMAlloc((cl_context)ctx.ptr(), memFlags, entry.capacity_, 0);
         CV_Assert(buf);
 
-        entry.clBuffer_ = buf;
+        entry.cl_বাফার_2 = buf;
         {
             CV_IMPL_ADD(CV_IMPL_OCL);
         }
-        LOG_BUFFER_POOL("OpenCL SVM allocate %lld (0x%llx) bytes: %p\n",
-                (long long)entry.capacity_, (long long)entry.capacity_, entry.clBuffer_);
+        LOG_বাফার_POOL("OpenCL SVM allocate %lld (0x%llx) bytes: %p\n",
+                (long long)entry.capacity_, (long long)entry.capacity_, entry.cl_বাফার_2);
         allocatedEntries_.push_back(entry);
     }
 
-    void _releaseBufferEntry(const BufferEntry& entry)
+    শূন্য release_বাফার_Entry(ধ্রুবক বাফার_Entry& entry)
     {
         CV_Assert(entry.capacity_ != 0);
-        CV_Assert(entry.clBuffer_ != NULL);
-        LOG_BUFFER_POOL("OpenCL release SVM buffer: %p, %lld (0x%llx) bytes\n",
-                entry.clBuffer_, (long long)entry.capacity_, (long long)entry.capacity_);
+        CV_Assert(entry.cl_বাফার_2 != ফাঁকা);
+        LOG_বাফার_POOL("OpenCL release SVM buffer: %p, %lld (0x%llx) bytes\n",
+                entry.cl_বাফার_2, (long long)entry.capacity_, (long long)entry.capacity_);
         Context& ctx = Context::getDefault();
-        const svm::SVMFunctions* svmFns = svm::getSVMFunctions(ctx);
+        ধ্রুবক svm::SVMFunctions* svmFns = svm::getSVMFunctions(ctx);
         CV_DbgAssert(svmFns->isValid());
-        CV_OPENCL_SVM_TRACE_P("clSVMFree: %p\n",  entry.clBuffer_);
-        svmFns->fn_clSVMFree((cl_context)ctx.ptr(), entry.clBuffer_);
+        CV_OPENCL_SVM_TRACE_P("clSVMFree: %p\n",  entry.cl_বাফার_2);
+        svmFns->fn_clSVMFree((cl_context)ctx.ptr(), entry.cl_বাফার_2);
     }
 };
 #endif
 
 
 
-template <bool readAccess, bool writeAccess>
-class AlignedDataPtr
+template <যৌক্তিক readAccess, যৌক্তিক writeAccess>
+শ্রেণী Aligned_তথ্য_Ptr
 {
-protected:
-    const size_t size_;
-    uchar* const originPtr_;
-    const size_t alignment_;
+সুরক্ষিত:
+    ধ্রুবক size_t আকার_4;
+    uchar* ধ্রুবক originPtr_;
+    ধ্রুবক size_t alignment_;
     uchar* ptr_;
     uchar* allocatedPtr_;
 
-public:
-    AlignedDataPtr(uchar* ptr, size_t size, size_t alignment)
-        : size_(size), originPtr_(ptr), alignment_(alignment), ptr_(ptr), allocatedPtr_(NULL)
+সর্বজনীন:
+    Aligned_তথ্য_Ptr(uchar* ptr, size_t size, size_t alignment)
+        : আকার_4(size), originPtr_(ptr), alignment_(alignment), ptr_(ptr), allocatedPtr_(ফাঁকা)
     {
         CV_DbgAssert((alignment & (alignment - 1)) == 0); // check for 2^n
         CV_DbgAssert(!readAccess || ptr);
-        if (((size_t)ptr_ & (alignment - 1)) != 0)
+        যদি (((size_t)ptr_ & (alignment - 1)) != 0)
         {
-            allocatedPtr_ = new uchar[size_ + alignment - 1];
+            allocatedPtr_ = নতুন uchar[আকার_4 + alignment - 1];
             ptr_ = (uchar*)(((uintptr_t)allocatedPtr_ + (alignment - 1)) & ~(alignment - 1));
-            if (readAccess)
+            যদি (readAccess)
             {
-                memcpy(ptr_, originPtr_, size_);
+                memcpy(ptr_, originPtr_, আকার_4);
             }
         }
     }
 
-    uchar* getAlignedPtr() const
+    uchar* getAlignedPtr() ধ্রুবক
     {
         CV_DbgAssert(((size_t)ptr_ & (alignment_ - 1)) == 0);
-        return ptr_;
+        ফেরত ptr_;
     }
 
-    ~AlignedDataPtr()
+    ~Aligned_তথ্য_Ptr()
     {
-        if (allocatedPtr_)
+        যদি (allocatedPtr_)
         {
-            if (writeAccess)
+            যদি (writeAccess)
             {
-                memcpy(originPtr_, ptr_, size_);
+                memcpy(originPtr_, ptr_, আকার_4);
             }
             delete[] allocatedPtr_;
-            allocatedPtr_ = NULL;
+            allocatedPtr_ = ফাঁকা;
         }
-        ptr_ = NULL;
+        ptr_ = ফাঁকা;
     }
-private:
-    AlignedDataPtr(const AlignedDataPtr&); // disabled
-    AlignedDataPtr& operator=(const AlignedDataPtr&); // disabled
+ব্যক্তিগত:
+    Aligned_তথ্য_Ptr(ধ্রুবক Aligned_তথ্য_Ptr&); // disabled
+    Aligned_তথ্য_Ptr& operator=(ধ্রুবক Aligned_তথ্য_Ptr&); // disabled
 };
 
-template <bool readAccess, bool writeAccess>
-class AlignedDataPtr2D
+template <যৌক্তিক readAccess, যৌক্তিক writeAccess>
+শ্রেণী Aligned_তথ্য_Ptr2_D
 {
-protected:
-    const size_t size_;
-    uchar* const originPtr_;
-    const size_t alignment_;
+সুরক্ষিত:
+    ধ্রুবক size_t আকার_4;
+    uchar* ধ্রুবক originPtr_;
+    ধ্রুবক size_t alignment_;
     uchar* ptr_;
     uchar* allocatedPtr_;
     size_t rows_;
     size_t cols_;
     size_t step_;
 
-public:
-    AlignedDataPtr2D(uchar* ptr, size_t rows, size_t cols, size_t step, size_t alignment, size_t extrabytes=0)
-        : size_(rows*step), originPtr_(ptr), alignment_(alignment), ptr_(ptr), allocatedPtr_(NULL), rows_(rows), cols_(cols), step_(step)
+সর্বজনীন:
+    Aligned_তথ্য_Ptr2_D(uchar* ptr, size_t rows, size_t cols, size_t step, size_t alignment, size_t extrabytes=0)
+        : আকার_4(rows*step), originPtr_(ptr), alignment_(alignment), ptr_(ptr), allocatedPtr_(ফাঁকা), rows_(rows), cols_(cols), step_(step)
     {
         CV_DbgAssert((alignment & (alignment - 1)) == 0); // check for 2^n
-        CV_DbgAssert(!readAccess || ptr != NULL);
-        if (ptr == 0 || ((size_t)ptr_ & (alignment - 1)) != 0)
+        CV_DbgAssert(!readAccess || ptr != ফাঁকা);
+        যদি (ptr == 0 || ((size_t)ptr_ & (alignment - 1)) != 0)
         {
-            allocatedPtr_ = new uchar[size_ + extrabytes + alignment - 1];
+            allocatedPtr_ = নতুন uchar[আকার_4 + extrabytes + alignment - 1];
             ptr_ = (uchar*)(((uintptr_t)allocatedPtr_ + (alignment - 1)) & ~(alignment - 1));
-            if (readAccess)
+            যদি (readAccess)
             {
-                for (size_t i = 0; i < rows_; i++)
+                জন্য (size_t i = 0; i < rows_; i++)
                     memcpy(ptr_ + i*step_, originPtr_ + i*step_, cols_);
             }
         }
     }
 
-    uchar* getAlignedPtr() const
+    uchar* getAlignedPtr() ধ্রুবক
     {
         CV_DbgAssert(((size_t)ptr_ & (alignment_ - 1)) == 0);
-        return ptr_;
+        ফেরত ptr_;
     }
 
-    ~AlignedDataPtr2D()
+    ~Aligned_তথ্য_Ptr2_D()
     {
-        if (allocatedPtr_)
+        যদি (allocatedPtr_)
         {
-            if (writeAccess)
+            যদি (writeAccess)
             {
-                for (size_t i = 0; i < rows_; i++)
+                জন্য (size_t i = 0; i < rows_; i++)
                     memcpy(originPtr_ + i*step_, ptr_ + i*step_, cols_);
             }
             delete[] allocatedPtr_;
-            allocatedPtr_ = NULL;
+            allocatedPtr_ = ফাঁকা;
         }
-        ptr_ = NULL;
+        ptr_ = ফাঁকা;
     }
-private:
-    AlignedDataPtr2D(const AlignedDataPtr2D&); // disabled
-    AlignedDataPtr2D& operator=(const AlignedDataPtr2D&); // disabled
+ব্যক্তিগত:
+    Aligned_তথ্য_Ptr2_D(ধ্রুবক Aligned_তথ্য_Ptr2_D&); // disabled
+    Aligned_তথ্য_Ptr2_D& operator=(ধ্রুবক Aligned_তথ্য_Ptr2_D&); // disabled
 };
 
-#ifndef CV_OPENCL_DATA_PTR_ALIGNMENT
-#define CV_OPENCL_DATA_PTR_ALIGNMENT 16
+#ifndef CV_OPENCL_তথ্য_PTR_ALIGNMENT
+#define CV_OPENCL_তথ্য_PTR_ALIGNMENT 16
 #endif
 
 
-void Context::Impl::__init_buffer_pools()
+শূন্য Context::Impl::__init_buffer_pools()
 {
-    bufferPool_ = std::make_shared<OpenCLBufferPoolImpl>(0);
-    OpenCLBufferPoolImpl& bufferPool = *bufferPool_.get();
-    bufferPoolHostPtr_ = std::make_shared<OpenCLBufferPoolImpl>(CL_MEM_ALLOC_HOST_PTR);
-    OpenCLBufferPoolImpl& bufferPoolHostPtr = *bufferPoolHostPtr_.get();
+    বাফার_Pool_2 = std::make_shared<OpenCLBufferPoolImpl>(0);
+    OpenCLBufferPoolImpl& বাফার_Pool_3 = *বাফার_Pool_2.get();
+    বাফার_Pool_Host_Ptr = std::make_shared<OpenCLBufferPoolImpl>(CL_MEM_ALLOC_HOST_PTR);
+    OpenCLBufferPoolImpl& বাফার_Pool_Host_Ptr_2 = *বাফার_Pool_Host_Ptr.get();
 
-    size_t defaultPoolSize = ocl::Device::getDefault().isIntel() ? 1 << 27 : 0;
-    size_t poolSize = utils::getConfigurationParameterSizeT("OPENCV_OPENCL_BUFFERPOOL_LIMIT", defaultPoolSize);
-    bufferPool.setMaxReservedSize(poolSize);
-    size_t poolSizeHostPtr = utils::getConfigurationParameterSizeT("OPENCV_OPENCL_HOST_PTR_BUFFERPOOL_LIMIT", defaultPoolSize);
-    bufferPoolHostPtr.setMaxReservedSize(poolSizeHostPtr);
+    size_t default_Pool_আকার = ocl::Device::getDefault().isIntel() ? 1 << 27 : 0;
+    size_t pool_আকার = utils::get_Configuration_Parameter_আকার_T("OPENCV_OPENCL_BUFFERPOOL_LIMIT", default_Pool_আকার);
+    বাফার_Pool_3.set_Max_Reserved_আকার(pool_আকার);
+    size_t pool_আকার_Host_Ptr = utils::get_Configuration_Parameter_আকার_T("OPENCV_OPENCL_HOST_PTR_BUFFERPOOL_LIMIT", default_Pool_আকার);
+    বাফার_Pool_Host_Ptr_2.set_Max_Reserved_আকার(pool_আকার_Host_Ptr);
 
 #ifdef HAVE_OPENCL_SVM
-    bufferPoolSVM_ = std::make_shared<OpenCLSVMBufferPoolImpl>();
-    OpenCLSVMBufferPoolImpl& bufferPoolSVM = *bufferPoolSVM_.get();
-    size_t poolSizeSVM = utils::getConfigurationParameterSizeT("OPENCV_OPENCL_SVM_BUFFERPOOL_LIMIT", defaultPoolSize);
-    bufferPoolSVM.setMaxReservedSize(poolSizeSVM);
+    বাফার_Pool_SVM = std::make_shared<OpenCLSVMBufferPoolImpl>();
+    OpenCLSVMBufferPoolImpl& বাফার_Pool_SVM_2 = *বাফার_Pool_SVM.get();
+    size_t pool_আকার_SVM = utils::get_Configuration_Parameter_আকার_T("OPENCV_OPENCL_SVM_BUFFERPOOL_LIMIT", default_Pool_আকার);
+    বাফার_Pool_SVM_2.set_Max_Reserved_আকার(pool_আকার_SVM);
 #endif
 
-    CV_LOG_INFO(NULL, "OpenCL: Initializing buffer pool for context@" << contextId << " with max capacity: poolSize=" << poolSize << " poolSizeHostPtr=" << poolSizeHostPtr);
+    CV_LOG_INFO(ফাঁকা, "OpenCL: Initializing buffer pool for context@" << contextId << " with max capacity: poolSize=" << pool_আকার << " poolSizeHostPtr=" << pool_আকার_Host_Ptr);
 }
 
-class OpenCLAllocator CV_FINAL : public MatAllocator
+শ্রেণী OpenCLAllocator CV_FINAL : সর্বজনীন MatAllocator
 {
-public:
-    enum AllocatorFlags
+সর্বজনীন:
+    গণনা AllocatorFlags
     {
-        ALLOCATOR_FLAGS_BUFFER_POOL_USED = 1 << 0,
-        ALLOCATOR_FLAGS_BUFFER_POOL_HOST_PTR_USED = 1 << 1,
+        ALLOCATOR_FLAGS_বাফার_POOL_USED = 1 << 0,
+        ALLOCATOR_FLAGS_বাফার_POOL_HOST_PTR_USED = 1 << 1,
 #ifdef HAVE_OPENCL_SVM
-        ALLOCATOR_FLAGS_BUFFER_POOL_SVM_USED = 1 << 2,
+        ALLOCATOR_FLAGS_বাফার_POOL_SVM_USED = 1 << 2,
 #endif
-        ALLOCATOR_FLAGS_EXTERNAL_BUFFER = 1 << 3  // convertFromBuffer()
+        ALLOCATOR_FLAGS_EXTERNAL_বাফার = 1 << 3  // convertFromBuffer()
     };
 
     OpenCLAllocator()
@@ -5394,32 +5394,32 @@ public:
         flushCleanupQueue();
     }
 
-    UMatData* defaultAllocate(int dims, const int* sizes, int type, void* data, size_t* step,
-            AccessFlag flags, UMatUsageFlags usageFlags) const
+    UMat_তথ্য* defaultAllocate(পূর্ণসংখ্যা dims, ধ্রুবক পূর্ণসংখ্যা* sizes, পূর্ণসংখ্যা type, শূন্য* তথ্য, size_t* step,
+            AccessFlag flags, UMatUsageFlags usageFlags) ধ্রুবক
     {
-        UMatData* u = matStdAllocator->allocate(dims, sizes, type, data, step, flags, usageFlags);
-        return u;
+        UMat_তথ্য* u = matStdAllocator->allocate(dims, sizes, type, তথ্য, step, flags, usageFlags);
+        ফেরত u;
     }
 
-    static bool isOpenCLMapForced()  // force clEnqueueMapBuffer / clEnqueueUnmapMemObject OpenCL API
+    স্থির যৌক্তিক isOpenCLMapForced()  // force clEnqueueMapBuffer / clEnqueueUnmapMemObject OpenCL API
     {
-        static bool value = cv::utils::getConfigurationParameterBool("OPENCV_OPENCL_BUFFER_FORCE_MAPPING", false);
-        return value;
+        স্থির যৌক্তিক value = cv::utils::getConfigurationParameterBool("OPENCV_OPENCL_BUFFER_FORCE_MAPPING", মিথ্যা);
+        ফেরত value;
     }
-    static bool isOpenCLCopyingForced()  // force clEnqueueReadBuffer[Rect] / clEnqueueWriteBuffer[Rect] OpenCL API
+    স্থির যৌক্তিক isOpenCLCopyingForced()  // force clEnqueueReadBuffer[Rect] / clEnqueueWriteBuffer[Rect] OpenCL API
     {
-        static bool value = cv::utils::getConfigurationParameterBool("OPENCV_OPENCL_BUFFER_FORCE_COPYING", false);
-        return value;
+        স্থির যৌক্তিক value = cv::utils::getConfigurationParameterBool("OPENCV_OPENCL_BUFFER_FORCE_COPYING", মিথ্যা);
+        ফেরত value;
     }
 
-    void getBestFlags(const Context& ctx, AccessFlag /*flags*/, UMatUsageFlags usageFlags, int& createFlags, UMatData::MemoryFlag& flags0) const
+    শূন্য getBestFlags(ধ্রুবক Context& ctx, AccessFlag /*flags*/, UMatUsageFlags usageFlags, পূর্ণসংখ্যা& createFlags, UMat_তথ্য::MemoryFlag& flags0) ধ্রুবক
     {
-        const Device& dev = ctx.device(0);
+        ধ্রুবক Device& dev = ctx.device(0);
         createFlags = 0;
-        if ((usageFlags & USAGE_ALLOCATE_HOST_MEMORY) != 0)
+        যদি ((usageFlags & USAGE_ALLOCATE_HOST_MEMORY) != 0)
             createFlags |= CL_MEM_ALLOC_HOST_PTR;
 
-        if (!isOpenCLCopyingForced() &&
+        যদি (!isOpenCLCopyingForced() &&
             (isOpenCLMapForced() ||
                 (dev.hostUnifiedMemory()
 #ifndef __APPLE__
@@ -5428,211 +5428,211 @@ public:
                 )
             )
         )
-            flags0 = static_cast<UMatData::MemoryFlag>(0);
-        else
-            flags0 = UMatData::COPY_ON_MAP;
+            flags0 = static_cast<UMat_তথ্য::MemoryFlag>(0);
+        অন্যথা
+            flags0 = UMat_তথ্য::COPY_ON_MAP;
     }
 
-    UMatData* allocate(int dims, const int* sizes, int type,
-                       void* data, size_t* step, AccessFlag flags, UMatUsageFlags usageFlags) const CV_OVERRIDE
+    UMat_তথ্য* allocate(পূর্ণসংখ্যা dims, ধ্রুবক পূর্ণসংখ্যা* sizes, পূর্ণসংখ্যা type,
+                       শূন্য* তথ্য, size_t* step, AccessFlag flags, UMatUsageFlags usageFlags) ধ্রুবক CV_OVERRIDE
     {
-        if(!useOpenCL())
-            return defaultAllocate(dims, sizes, type, data, step, flags, usageFlags);
+        যদি(!useOpenCL())
+            ফেরত defaultAllocate(dims, sizes, type, তথ্য, step, flags, usageFlags);
 
         flushCleanupQueue();
 
-        CV_Assert(data == 0);
-        size_t total = CV_ELEM_SIZE(type);
-        for( int i = dims-1; i >= 0; i-- )
+        CV_Assert(তথ্য == 0);
+        size_t যোগ = CV_ELEM_আকার(type);
+        জন্য( পূর্ণসংখ্যা i = dims-1; i >= 0; i-- )
         {
-            if( step )
-                step[i] = total;
-            total *= sizes[i];
+            যদি( step )
+                step[i] = যোগ;
+            যোগ *= sizes[i];
         }
 
         Context& ctx = Context::getDefault();
-        if (!ctx.getImpl())
-            return defaultAllocate(dims, sizes, type, data, step, flags, usageFlags);
+        যদি (!ctx.getImpl())
+            ফেরত defaultAllocate(dims, sizes, type, তথ্য, step, flags, usageFlags);
         Context::Impl& ctxImpl = *ctx.getImpl();
 
-        int createFlags = 0;
-        UMatData::MemoryFlag flags0 = static_cast<UMatData::MemoryFlag>(0);
+        পূর্ণসংখ্যা createFlags = 0;
+        UMat_তথ্য::MemoryFlag flags0 = static_cast<UMat_তথ্য::MemoryFlag>(0);
         getBestFlags(ctx, flags, usageFlags, createFlags, flags0);
 
-        void* handle = NULL;
-        int allocatorFlags = 0;
+        শূন্য* handle = ফাঁকা;
+        পূর্ণসংখ্যা allocatorFlags = 0;
 
 #ifdef HAVE_OPENCL_SVM
-        const svm::SVMCapabilities svmCaps = svm::getSVMCapabilitites(ctx);
-        if (ctx.useSVM() && svm::useSVM(usageFlags) && !svmCaps.isNoSVMSupport())
+        ধ্রুবক svm::SVMCapabilities svmCaps = svm::getSVMCapabilitites(ctx);
+        যদি (ctx.useSVM() && svm::useSVM(usageFlags) && !svmCaps.isNoSVMSupport())
         {
-            allocatorFlags = ALLOCATOR_FLAGS_BUFFER_POOL_SVM_USED;
-            handle = ctxImpl.getBufferPoolSVM().allocate(total);
+            allocatorFlags = ALLOCATOR_FLAGS_বাফার_POOL_SVM_USED;
+            handle = ctxImpl.get_বাফার_Pool_SVM().allocate(যোগ);
 
             // this property is constant, so single buffer pool can be used here
-            bool isFineGrainBuffer = svmCaps.isSupportFineGrainBuffer();
-            allocatorFlags |= isFineGrainBuffer ? svm::OPENCL_SVM_FINE_GRAIN_BUFFER : svm::OPENCL_SVM_COARSE_GRAIN_BUFFER;
+            যৌক্তিক is_Fine_Grain_বাফার = svmCaps.is_Support_Fine_Grain_বাফার();
+            allocatorFlags |= is_Fine_Grain_বাফার ? svm::OPENCL_SVM_FINE_GRAIN_বাফার : svm::OPENCL_SVM_COARSE_GRAIN_বাফার;
         }
-        else
+        অন্যথা
 #endif
-        if (createFlags == 0)
+        যদি (createFlags == 0)
         {
-            allocatorFlags = ALLOCATOR_FLAGS_BUFFER_POOL_USED;
-            handle = ctxImpl.getBufferPool().allocate(total);
+            allocatorFlags = ALLOCATOR_FLAGS_বাফার_POOL_USED;
+            handle = ctxImpl.get_বাফার_Pool().allocate(যোগ);
         }
-        else if (createFlags == CL_MEM_ALLOC_HOST_PTR)
+        অন্যথা যদি (createFlags == CL_MEM_ALLOC_HOST_PTR)
         {
-            allocatorFlags = ALLOCATOR_FLAGS_BUFFER_POOL_HOST_PTR_USED;
-            handle = ctxImpl.getBufferPoolHostPtr().allocate(total);
+            allocatorFlags = ALLOCATOR_FLAGS_বাফার_POOL_HOST_PTR_USED;
+            handle = ctxImpl.get_বাফার_Pool_Host_Ptr().allocate(যোগ);
         }
-        else
+        অন্যথা
         {
-            CV_Assert(handle != NULL); // Unsupported, throw
+            CV_Assert(handle != ফাঁকা); // Unsupported, throw
         }
 
-        if (!handle)
-            return defaultAllocate(dims, sizes, type, data, step, flags, usageFlags);
+        যদি (!handle)
+            ফেরত defaultAllocate(dims, sizes, type, তথ্য, step, flags, usageFlags);
 
-        UMatData* u = new UMatData(this);
-        u->data = 0;
-        u->size = total;
+        UMat_তথ্য* u = নতুন UMat_তথ্য(এই);
+        u->তথ্য = 0;
+        u->size = যোগ;
         u->handle = handle;
         u->flags = flags0;
         u->allocatorFlags_ = allocatorFlags;
-        u->allocatorContext = std::static_pointer_cast<void>(std::make_shared<ocl::Context>(ctx));
-        CV_DbgAssert(!u->tempUMat()); // for bufferPool.release() consistency in deallocate()
-        u->markHostCopyObsolete(true);
+        u->allocatorContext = std::static_pointer_cast<শূন্য>(std::make_shared<ocl::Context>(ctx));
+        CV_DbgAssert(!u->অস্থায়ী_UMat()); // for bufferPool.release() consistency in deallocate()
+        u->markHostCopyObsolete(সত্য);
         opencl_allocator_stats.onAllocate(u->size);
-        return u;
+        ফেরত u;
     }
 
-    bool allocate(UMatData* u, AccessFlag accessFlags, UMatUsageFlags usageFlags) const CV_OVERRIDE
+    যৌক্তিক allocate(UMat_তথ্য* u, AccessFlag accessFlags, UMatUsageFlags usageFlags) ধ্রুবক CV_OVERRIDE
     {
-        if(!u)
-            return false;
+        যদি(!u)
+            ফেরত মিথ্যা;
 
         flushCleanupQueue();
 
-        UMatDataAutoLock lock(u);
+        UMat_তথ্য_Auto_Lock lock(u);
 
-        if(u->handle == 0)
+        যদি(u->handle == 0)
         {
             CV_Assert(u->origdata != 0);
             Context& ctx = Context::getDefault();
-            int createFlags = 0;
-            UMatData::MemoryFlag flags0 = static_cast<UMatData::MemoryFlag>(0);
+            পূর্ণসংখ্যা createFlags = 0;
+            UMat_তথ্য::MemoryFlag flags0 = static_cast<UMat_তথ্য::MemoryFlag>(0);
             getBestFlags(ctx, accessFlags, usageFlags, createFlags, flags0);
 
-            bool copyOnMap = (flags0 & UMatData::COPY_ON_MAP) != 0;
+            যৌক্তিক copyOnMap = (flags0 & UMat_তথ্য::COPY_ON_MAP) != 0;
 
             cl_context ctx_handle = (cl_context)ctx.ptr();
-            int allocatorFlags = 0;
-            UMatData::MemoryFlag tempUMatFlags = static_cast<UMatData::MemoryFlag>(0);
-            void* handle = NULL;
+            পূর্ণসংখ্যা allocatorFlags = 0;
+            UMat_তথ্য::MemoryFlag অস্থায়ী_UMat_Flags = static_cast<UMat_তথ্য::MemoryFlag>(0);
+            শূন্য* handle = ফাঁকা;
             cl_int retval = CL_SUCCESS;
 
 #ifdef HAVE_OPENCL_SVM
             svm::SVMCapabilities svmCaps = svm::getSVMCapabilitites(ctx);
-            bool useSVM = ctx.useSVM() && svm::useSVM(usageFlags);
-            if (useSVM && svmCaps.isSupportFineGrainSystem())
+            যৌক্তিক useSVM = ctx.useSVM() && svm::useSVM(usageFlags);
+            যদি (useSVM && svmCaps.isSupportFineGrainSystem())
             {
                 allocatorFlags = svm::OPENCL_SVM_FINE_GRAIN_SYSTEM;
-                tempUMatFlags = UMatData::TEMP_UMAT;
+                অস্থায়ী_UMat_Flags = UMat_তথ্য::অস্থায়ী_UMAT;
                 handle = u->origdata;
-                CV_OPENCL_SVM_TRACE_P("Use fine grain system: %d (%p)\n", (int)u->size, handle);
+                CV_OPENCL_SVM_TRACE_P("Use fine grain system: %d (%p)\n", (পূর্ণসংখ্যা)u->size, handle);
             }
-            else if (useSVM && (svmCaps.isSupportFineGrainBuffer() || svmCaps.isSupportCoarseGrainBuffer()))
+            অন্যথা যদি (useSVM && (svmCaps.is_Support_Fine_Grain_বাফার() || svmCaps.is_Support_Coarse_Grain_বাফার()))
             {
-                if (!(accessFlags & ACCESS_FAST)) // memcpy used
+                যদি (!(accessFlags & ACCESS_FAST)) // memcpy used
                 {
-                    bool isFineGrainBuffer = svmCaps.isSupportFineGrainBuffer();
+                    যৌক্তিক is_Fine_Grain_বাফার = svmCaps.is_Support_Fine_Grain_বাফার();
 
                     cl_svm_mem_flags memFlags = createFlags |
-                            (isFineGrainBuffer ? CL_MEM_SVM_FINE_GRAIN_BUFFER : 0);
+                            (is_Fine_Grain_বাফার ? CL_MEM_SVM_FINE_GRAIN_বাফার : 0);
 
-                    const svm::SVMFunctions* svmFns = svm::getSVMFunctions(ctx);
+                    ধ্রুবক svm::SVMFunctions* svmFns = svm::getSVMFunctions(ctx);
                     CV_DbgAssert(svmFns->isValid());
 
-                    CV_OPENCL_SVM_TRACE_P("clSVMAlloc + copy: %d\n", (int)u->size);
+                    CV_OPENCL_SVM_TRACE_P("clSVMAlloc + copy: %d\n", (পূর্ণসংখ্যা)u->size);
                     handle = svmFns->fn_clSVMAlloc((cl_context)ctx.ptr(), memFlags, u->size, 0);
                     CV_Assert(handle);
 
-                    cl_command_queue q = NULL;
-                    if (!isFineGrainBuffer)
+                    cl_command_queue q = ফাঁকা;
+                    যদি (!is_Fine_Grain_বাফার)
                     {
                         q = (cl_command_queue)Queue::getDefault().ptr();
-                        CV_OPENCL_SVM_TRACE_P("clEnqueueSVMMap: %p (%d)\n", handle, (int)u->size);
+                        CV_OPENCL_SVM_TRACE_P("clEnqueueSVMMap: %p (%d)\n", handle, (পূর্ণসংখ্যা)u->size);
                         cl_int status = svmFns->fn_clEnqueueSVMMap(q, CL_TRUE, CL_MAP_WRITE,
                                 handle, u->size,
-                                0, NULL, NULL);
-                        CV_OCL_CHECK_RESULT(status, "clEnqueueSVMMap()");
+                                0, ফাঁকা, ফাঁকা);
+                        CV_OCL_CHECK_ফলাফল(status, "clEnqueueSVMMap()");
 
                     }
                     memcpy(handle, u->origdata, u->size);
-                    if (!isFineGrainBuffer)
+                    যদি (!is_Fine_Grain_বাফার)
                     {
                         CV_OPENCL_SVM_TRACE_P("clEnqueueSVMUnmap: %p\n", handle);
-                        cl_int status = svmFns->fn_clEnqueueSVMUnmap(q, handle, 0, NULL, NULL);
-                        CV_OCL_CHECK_RESULT(status, "clEnqueueSVMUnmap()");
+                        cl_int status = svmFns->fn_clEnqueueSVMUnmap(q, handle, 0, ফাঁকা, ফাঁকা);
+                        CV_OCL_CHECK_ফলাফল(status, "clEnqueueSVMUnmap()");
                     }
 
-                    tempUMatFlags = UMatData::TEMP_UMAT | UMatData::TEMP_COPIED_UMAT;
-                    allocatorFlags |= isFineGrainBuffer ? svm::OPENCL_SVM_FINE_GRAIN_BUFFER
-                                                : svm::OPENCL_SVM_COARSE_GRAIN_BUFFER;
+                    অস্থায়ী_UMat_Flags = UMat_তথ্য::অস্থায়ী_UMAT | UMat_তথ্য::অস্থায়ী_COPIED_UMAT;
+                    allocatorFlags |= is_Fine_Grain_বাফার ? svm::OPENCL_SVM_FINE_GRAIN_বাফার
+                                                : svm::OPENCL_SVM_COARSE_GRAIN_বাফার;
                 }
             }
-            else
+            অন্যথা
 #endif
             {
-                if( copyOnMap )
+                যদি( copyOnMap )
                     accessFlags &= ~ACCESS_FAST;
 
-                tempUMatFlags = UMatData::TEMP_UMAT;
-                if (
+                অস্থায়ী_UMat_Flags = UMat_তথ্য::অস্থায়ী_UMAT;
+                যদি (
                 #ifdef __APPLE__
                     !copyOnMap &&
                 #endif
                     CV_OPENCL_ENABLE_MEM_USE_HOST_PTR
                     // There are OpenCL runtime issues for less aligned data
                     && (CV_OPENCL_ALIGNMENT_MEM_USE_HOST_PTR != 0
-                        && u->origdata == cv::alignPtr(u->origdata, (int)CV_OPENCL_ALIGNMENT_MEM_USE_HOST_PTR))
+                        && u->origdata == cv::alignPtr(u->origdata, (পূর্ণসংখ্যা)CV_OPENCL_ALIGNMENT_MEM_USE_HOST_PTR))
                     // Avoid sharing of host memory between OpenCL buffers
-                    && !(u->originalUMatData && u->originalUMatData->handle)
+                    && !(u->original_UMat_তথ্য && u->original_UMat_তথ্য->handle)
                 )
                 {
                     // Change the host-side origdata[size] to "pinned memory" that enables fast
                     // DMA-transfers over PCIe to the device. Often used with clEnqueueMapBuffer/clEnqueueUnmapMemObject
-                    handle = clCreateBuffer(ctx_handle, CL_MEM_USE_HOST_PTR|(createFlags & ~CL_MEM_ALLOC_HOST_PTR),
+                    handle = cl_Create_বাফার(ctx_handle, CL_MEM_USE_HOST_PTR|(createFlags & ~CL_MEM_ALLOC_HOST_PTR),
                                             u->size, u->origdata, &retval);
-                    CV_OCL_DBG_CHECK_RESULT(retval, cv::format("clCreateBuffer(CL_MEM_USE_HOST_PTR|(createFlags & ~CL_MEM_ALLOC_HOST_PTR), sz=%lld, origdata=%p) => %p",
-                            (long long int)u->size, u->origdata, (void*)handle).c_str());
+                    CV_OCL_DBG_CHECK_ফলাফল(retval, cv::format("clCreateBuffer(CL_MEM_USE_HOST_PTR|(createFlags & ~CL_MEM_ALLOC_HOST_PTR), sz=%lld, origdata=%p) => %p",
+                            (long long পূর্ণসংখ্যা)u->size, u->origdata, (শূন্য*)handle).c_str());
                 }
-                if((!handle || retval < 0) && !(accessFlags & ACCESS_FAST))
+                যদি((!handle || retval < 0) && !(accessFlags & ACCESS_FAST))
                 {
                     // Allocate device-side memory and immediately copy data from the host-side pointer origdata[size].
                     // If createFlags=CL_MEM_ALLOC_HOST_PTR (aka cv::USAGE_ALLOCATE_HOST_MEMORY), then
                     // additionally allocate a host-side "pinned" duplicate of the origdata that is
                     // managed by OpenCL. This is potentially faster in unaligned/unmanaged scenarios.
-                    handle = clCreateBuffer(ctx_handle, CL_MEM_COPY_HOST_PTR|CL_MEM_READ_WRITE|createFlags,
+                    handle = cl_Create_বাফার(ctx_handle, CL_MEM_COPY_HOST_PTR|CL_MEM_READ_WRITE|createFlags,
                                                u->size, u->origdata, &retval);
-                    CV_OCL_DBG_CHECK_RESULT(retval, cv::format("clCreateBuffer(CL_MEM_COPY_HOST_PTR|CL_MEM_READ_WRITE|createFlags, sz=%lld, origdata=%p) => %p",
-                            (long long int)u->size, u->origdata, (void*)handle).c_str());
-                    tempUMatFlags |= UMatData::TEMP_COPIED_UMAT;
+                    CV_OCL_DBG_CHECK_ফলাফল(retval, cv::format("clCreateBuffer(CL_MEM_COPY_HOST_PTR|CL_MEM_READ_WRITE|createFlags, sz=%lld, origdata=%p) => %p",
+                            (long long পূর্ণসংখ্যা)u->size, u->origdata, (শূন্য*)handle).c_str());
+                    অস্থায়ী_UMat_Flags |= UMat_তথ্য::অস্থায়ী_COPIED_UMAT;
                 }
             }
-            CV_OCL_DBG_CHECK_RESULT(retval, cv::format("clCreateBuffer() => %p", (void*)handle).c_str());
-            if(!handle || retval != CL_SUCCESS)
-                return false;
+            CV_OCL_DBG_CHECK_ফলাফল(retval, cv::format("clCreateBuffer() => %p", (শূন্য*)handle).c_str());
+            যদি(!handle || retval != CL_SUCCESS)
+                ফেরত মিথ্যা;
             u->handle = handle;
-            u->prevAllocator = u->currAllocator;
-            u->currAllocator = this;
-            u->flags |= tempUMatFlags | flags0;
+            u->পূর্ব_Allocator = u->currAllocator;
+            u->currAllocator = এই;
+            u->flags |= অস্থায়ী_UMat_Flags | flags0;
             u->allocatorFlags_ = allocatorFlags;
         }
-        if (!!(accessFlags & ACCESS_WRITE))
-            u->markHostCopyObsolete(true);
+        যদি (!!(accessFlags & ACCESS_WRITE))
+            u->markHostCopyObsolete(সত্য);
         opencl_allocator_stats.onAllocate(u->size);
-        return true;
+        ফেরত সত্য;
     }
 
     /*void sync(UMatData* u) const
@@ -5665,10 +5665,10 @@ public:
         }
     }*/
 
-    void deallocate(UMatData* u) const CV_OVERRIDE
+    শূন্য deallocate(UMat_তথ্য* u) ধ্রুবক CV_OVERRIDE
     {
-        if(!u)
-            return;
+        যদি(!u)
+            ফেরত;
 
         // Next two lines: TSAN false positive: see #27638
         CV_Assert(u->urefcount == 0);
@@ -5677,398 +5677,398 @@ public:
         CV_Assert(u->handle != 0);
         CV_Assert(u->mapcount == 0);
 
-        if (!!(u->flags & UMatData::ASYNC_CLEANUP))
+        যদি (!!(u->flags & UMat_তথ্য::ASYNC_CLEANUP))
             addToCleanupQueue(u);
-        else
+        অন্যথা
             deallocate_(u);
     }
 
-    void deallocate_(UMatData* u) const
+    শূন্য deallocate_(UMat_তথ্য* u) ধ্রুবক
     {
         CV_Assert(u);
         CV_Assert(u->handle);
-        if ((u->allocatorFlags_ & ALLOCATOR_FLAGS_EXTERNAL_BUFFER) == 0)
+        যদি ((u->allocatorFlags_ & ALLOCATOR_FLAGS_EXTERNAL_বাফার) == 0)
         {
             opencl_allocator_stats.onFree(u->size);
         }
 
 #ifdef _WIN32
-        if (cv::__termination)  // process is not in consistent state (after ExitProcess call) and terminating
-            return;             // avoid any OpenCL calls
+        যদি (cv::__termination)  // process is not in consistent state (after ExitProcess call) and terminating
+            ফেরত;             // avoid any OpenCL calls
 #endif
-        if(u->tempUMat())
+        যদি(u->অস্থায়ী_UMat())
         {
             CV_Assert(u->origdata);
 //            UMatDataAutoLock lock(u);
 
-            if (u->hostCopyObsolete())
+            যদি (u->hostCopyObsolete())
             {
 #ifdef HAVE_OPENCL_SVM
-                if ((u->allocatorFlags_ & svm::OPENCL_SVM_BUFFER_MASK) != 0)
+                যদি ((u->allocatorFlags_ & svm::OPENCL_SVM_বাফার_MASK) != 0)
                 {
                     Context& ctx = Context::getDefault();
-                    const svm::SVMFunctions* svmFns = svm::getSVMFunctions(ctx);
+                    ধ্রুবক svm::SVMFunctions* svmFns = svm::getSVMFunctions(ctx);
                     CV_DbgAssert(svmFns->isValid());
 
-                    if( u->tempCopiedUMat() )
+                    যদি( u->অস্থায়ী_Copied_UMat() )
                     {
-                        CV_DbgAssert((u->allocatorFlags_ & svm::OPENCL_SVM_BUFFER_MASK) == svm::OPENCL_SVM_FINE_GRAIN_BUFFER ||
-                                (u->allocatorFlags_ & svm::OPENCL_SVM_BUFFER_MASK) == svm::OPENCL_SVM_COARSE_GRAIN_BUFFER);
-                        bool isFineGrainBuffer = (u->allocatorFlags_ & svm::OPENCL_SVM_BUFFER_MASK) == svm::OPENCL_SVM_FINE_GRAIN_BUFFER;
-                        cl_command_queue q = NULL;
-                        if (!isFineGrainBuffer)
+                        CV_DbgAssert((u->allocatorFlags_ & svm::OPENCL_SVM_বাফার_MASK) == svm::OPENCL_SVM_FINE_GRAIN_বাফার ||
+                                (u->allocatorFlags_ & svm::OPENCL_SVM_বাফার_MASK) == svm::OPENCL_SVM_COARSE_GRAIN_বাফার);
+                        যৌক্তিক is_Fine_Grain_বাফার = (u->allocatorFlags_ & svm::OPENCL_SVM_বাফার_MASK) == svm::OPENCL_SVM_FINE_GRAIN_বাফার;
+                        cl_command_queue q = ফাঁকা;
+                        যদি (!is_Fine_Grain_বাফার)
                         {
-                            CV_DbgAssert(((u->allocatorFlags_ & svm::OPENCL_SVM_BUFFER_MAP) == 0));
+                            CV_DbgAssert(((u->allocatorFlags_ & svm::OPENCL_SVM_বাফার_MAP) == 0));
                             q = (cl_command_queue)Queue::getDefault().ptr();
-                            CV_OPENCL_SVM_TRACE_P("clEnqueueSVMMap: %p (%d)\n", u->handle, (int)u->size);
+                            CV_OPENCL_SVM_TRACE_P("clEnqueueSVMMap: %p (%d)\n", u->handle, (পূর্ণসংখ্যা)u->size);
                             cl_int status = svmFns->fn_clEnqueueSVMMap(q, CL_FALSE, CL_MAP_READ,
                                     u->handle, u->size,
-                                    0, NULL, NULL);
-                            CV_OCL_CHECK_RESULT(status, "clEnqueueSVMMap()");
+                                    0, ফাঁকা, ফাঁকা);
+                            CV_OCL_CHECK_ফলাফল(status, "clEnqueueSVMMap()");
                         }
                         clFinish(q);
                         memcpy(u->origdata, u->handle, u->size);
-                        if (!isFineGrainBuffer)
+                        যদি (!is_Fine_Grain_বাফার)
                         {
                             CV_OPENCL_SVM_TRACE_P("clEnqueueSVMUnmap: %p\n", u->handle);
-                            cl_int status = svmFns->fn_clEnqueueSVMUnmap(q, u->handle, 0, NULL, NULL);
-                            CV_OCL_CHECK_RESULT(status, "clEnqueueSVMUnmap()");
+                            cl_int status = svmFns->fn_clEnqueueSVMUnmap(q, u->handle, 0, ফাঁকা, ফাঁকা);
+                            CV_OCL_CHECK_ফলাফল(status, "clEnqueueSVMUnmap()");
                         }
                     }
-                    else
+                    অন্যথা
                     {
-                        CV_DbgAssert((u->allocatorFlags_ & svm::OPENCL_SVM_BUFFER_MASK) == svm::OPENCL_SVM_FINE_GRAIN_SYSTEM);
+                        CV_DbgAssert((u->allocatorFlags_ & svm::OPENCL_SVM_বাফার_MASK) == svm::OPENCL_SVM_FINE_GRAIN_SYSTEM);
                         // nothing
                     }
                 }
-                else
+                অন্যথা
 #endif
                 {
                     cl_command_queue q = (cl_command_queue)Queue::getDefault().ptr();
-                    if( u->tempCopiedUMat() )
+                    যদি( u->অস্থায়ী_Copied_UMat() )
                     {
-                        AlignedDataPtr<false, true> alignedPtr(u->origdata, u->size, CV_OPENCL_DATA_PTR_ALIGNMENT);
-                        CV_OCL_CHECK(clEnqueueReadBuffer(q, (cl_mem)u->handle, CL_TRUE, 0,
+                        Aligned_তথ্য_Ptr<মিথ্যা, সত্য> alignedPtr(u->origdata, u->size, CV_OPENCL_তথ্য_PTR_ALIGNMENT);
+                        CV_OCL_CHECK(cl_Enqueue_Read_বাফার(q, (cl_mem)u->handle, CL_TRUE, 0,
                                             u->size, alignedPtr.getAlignedPtr(), 0, 0, 0));
                     }
-                    else
+                    অন্যথা
                     {
                         cl_int retval = 0;
-                        if (u->tempUMat())
+                        যদি (u->অস্থায়ী_UMat())
                         {
                             CV_Assert(u->mapcount == 0);
                             flushCleanupQueue(); // workaround for CL_OUT_OF_RESOURCES problem (#9960)
-                            void* data = clEnqueueMapBuffer(q, (cl_mem)u->handle, CL_TRUE,
+                            শূন্য* তথ্য = cl_Enqueue_Map_বাফার(q, (cl_mem)u->handle, CL_TRUE,
                                 (CL_MAP_READ | CL_MAP_WRITE),
                                 0, u->size, 0, 0, 0, &retval);
-                            CV_OCL_CHECK_RESULT(retval, cv::format("clEnqueueMapBuffer(handle=%p, sz=%lld) => %p", (void*)u->handle, (long long int)u->size, data).c_str());
-                            CV_Assert(u->origdata == data && "Details: https://github.com/opencv/opencv/issues/6293");
-                            if (u->originalUMatData)
+                            CV_OCL_CHECK_ফলাফল(retval, cv::format("clEnqueueMapBuffer(handle=%p, sz=%lld) => %p", (শূন্য*)u->handle, (long long পূর্ণসংখ্যা)u->size, তথ্য).c_str());
+                            CV_Assert(u->origdata == তথ্য && "Details: https://github.com/opencv/opencv/issues/6293");
+                            যদি (u->original_UMat_তথ্য)
                             {
-                                CV_Assert(u->originalUMatData->data == data);
+                                CV_Assert(u->original_UMat_তথ্য->তথ্য == তথ্য);
                             }
-                            retval = clEnqueueUnmapMemObject(q, (cl_mem)u->handle, data, 0, 0, 0);
-                            CV_OCL_CHECK_RESULT(retval, cv::format("clEnqueueUnmapMemObject(handle=%p, data=%p, [sz=%lld])", (void*)u->handle, data, (long long int)u->size).c_str());
+                            retval = clEnqueueUnmapMemObject(q, (cl_mem)u->handle, তথ্য, 0, 0, 0);
+                            CV_OCL_CHECK_ফলাফল(retval, cv::format("clEnqueueUnmapMemObject(handle=%p, data=%p, [sz=%lld])", (শূন্য*)u->handle, তথ্য, (long long পূর্ণসংখ্যা)u->size).c_str());
                             CV_OCL_DBG_CHECK(clFinish(q));
                         }
                     }
                 }
-                u->markHostCopyObsolete(false);
+                u->markHostCopyObsolete(মিথ্যা);
             }
-            else
+            অন্যথা
             {
                 // nothing
             }
 #ifdef HAVE_OPENCL_SVM
-            if ((u->allocatorFlags_ & svm::OPENCL_SVM_BUFFER_MASK) != 0)
+            যদি ((u->allocatorFlags_ & svm::OPENCL_SVM_বাফার_MASK) != 0)
             {
-                if( u->tempCopiedUMat() )
+                যদি( u->অস্থায়ী_Copied_UMat() )
                 {
                     Context& ctx = Context::getDefault();
-                    const svm::SVMFunctions* svmFns = svm::getSVMFunctions(ctx);
+                    ধ্রুবক svm::SVMFunctions* svmFns = svm::getSVMFunctions(ctx);
                     CV_DbgAssert(svmFns->isValid());
 
                     CV_OPENCL_SVM_TRACE_P("clSVMFree: %p\n", u->handle);
                     svmFns->fn_clSVMFree((cl_context)ctx.ptr(), u->handle);
                 }
             }
-            else
+            অন্যথা
 #endif
             {
                 cl_int retval = clReleaseMemObject((cl_mem)u->handle);
-                CV_OCL_DBG_CHECK_RESULT(retval, cv::format("clReleaseMemObject(ptr=%p)", (void*)u->handle).c_str());
+                CV_OCL_DBG_CHECK_ফলাফল(retval, cv::format("clReleaseMemObject(ptr=%p)", (শূন্য*)u->handle).c_str());
             }
             u->handle = 0;
-            u->markDeviceCopyObsolete(true);
-            u->currAllocator = u->prevAllocator;
-            u->prevAllocator = NULL;
-            if(u->data && u->copyOnMap() && u->data != u->origdata)
-                fastFree(u->data);
-            u->data = u->origdata;
+            u->markDeviceCopyObsolete(সত্য);
+            u->currAllocator = u->পূর্ব_Allocator;
+            u->পূর্ব_Allocator = ফাঁকা;
+            যদি(u->তথ্য && u->copyOnMap() && u->তথ্য != u->origdata)
+                fastFree(u->তথ্য);
+            u->তথ্য = u->origdata;
             u->currAllocator->deallocate(u);
-            u = NULL;
+            u = ফাঁকা;
         }
-        else
+        অন্যথা
         {
-            CV_Assert(u->origdata == NULL);
-            if(u->data && u->copyOnMap() && u->data != u->origdata)
+            CV_Assert(u->origdata == ফাঁকা);
+            যদি(u->তথ্য && u->copyOnMap() && u->তথ্য != u->origdata)
             {
-                fastFree(u->data);
-                u->data = 0;
-                u->markHostCopyObsolete(true);
+                fastFree(u->তথ্য);
+                u->তথ্য = 0;
+                u->markHostCopyObsolete(সত্য);
             }
-            if (u->allocatorFlags_ & ALLOCATOR_FLAGS_BUFFER_POOL_USED)
+            যদি (u->allocatorFlags_ & ALLOCATOR_FLAGS_বাফার_POOL_USED)
             {
                 std::shared_ptr<ocl::Context> pCtx = std::static_pointer_cast<ocl::Context>(u->allocatorContext);
                 CV_Assert(pCtx);
                 ocl::Context& ctx = *pCtx.get();
                 CV_Assert(ctx.getImpl());
-                ctx.getImpl()->getBufferPool().release((cl_mem)u->handle);
+                ctx.getImpl()->get_বাফার_Pool().release((cl_mem)u->handle);
             }
-            else if (u->allocatorFlags_ & ALLOCATOR_FLAGS_BUFFER_POOL_HOST_PTR_USED)
+            অন্যথা যদি (u->allocatorFlags_ & ALLOCATOR_FLAGS_বাফার_POOL_HOST_PTR_USED)
             {
                 std::shared_ptr<ocl::Context> pCtx = std::static_pointer_cast<ocl::Context>(u->allocatorContext);
                 CV_Assert(pCtx);
                 ocl::Context& ctx = *pCtx.get();
                 CV_Assert(ctx.getImpl());
-                ctx.getImpl()->getBufferPoolHostPtr().release((cl_mem)u->handle);
+                ctx.getImpl()->get_বাফার_Pool_Host_Ptr().release((cl_mem)u->handle);
             }
 #ifdef HAVE_OPENCL_SVM
-            else if (u->allocatorFlags_ & ALLOCATOR_FLAGS_BUFFER_POOL_SVM_USED)
+            অন্যথা যদি (u->allocatorFlags_ & ALLOCATOR_FLAGS_বাফার_POOL_SVM_USED)
             {
                 std::shared_ptr<ocl::Context> pCtx = std::static_pointer_cast<ocl::Context>(u->allocatorContext);
                 CV_Assert(pCtx);
                 ocl::Context& ctx = *pCtx.get();
-                if ((u->allocatorFlags_ & svm::OPENCL_SVM_BUFFER_MASK) == svm::OPENCL_SVM_FINE_GRAIN_SYSTEM)
+                যদি ((u->allocatorFlags_ & svm::OPENCL_SVM_বাফার_MASK) == svm::OPENCL_SVM_FINE_GRAIN_SYSTEM)
                 {
                     //nothing
                 }
-                else if ((u->allocatorFlags_ & svm::OPENCL_SVM_BUFFER_MASK) == svm::OPENCL_SVM_FINE_GRAIN_BUFFER ||
-                        (u->allocatorFlags_ & svm::OPENCL_SVM_BUFFER_MASK) == svm::OPENCL_SVM_COARSE_GRAIN_BUFFER)
+                অন্যথা যদি ((u->allocatorFlags_ & svm::OPENCL_SVM_বাফার_MASK) == svm::OPENCL_SVM_FINE_GRAIN_বাফার ||
+                        (u->allocatorFlags_ & svm::OPENCL_SVM_বাফার_MASK) == svm::OPENCL_SVM_COARSE_GRAIN_বাফার)
                 {
-                    const svm::SVMFunctions* svmFns = svm::getSVMFunctions(ctx);
+                    ধ্রুবক svm::SVMFunctions* svmFns = svm::getSVMFunctions(ctx);
                     CV_DbgAssert(svmFns->isValid());
                     cl_command_queue q = (cl_command_queue)Queue::getDefault().ptr();
 
-                    if ((u->allocatorFlags_ & svm::OPENCL_SVM_BUFFER_MAP) != 0)
+                    যদি ((u->allocatorFlags_ & svm::OPENCL_SVM_বাফার_MAP) != 0)
                     {
                         CV_OPENCL_SVM_TRACE_P("clEnqueueSVMUnmap: %p\n", u->handle);
-                        cl_int status = svmFns->fn_clEnqueueSVMUnmap(q, u->handle, 0, NULL, NULL);
-                        CV_OCL_CHECK_RESULT(status, "clEnqueueSVMUnmap()");
+                        cl_int status = svmFns->fn_clEnqueueSVMUnmap(q, u->handle, 0, ফাঁকা, ফাঁকা);
+                        CV_OCL_CHECK_ফলাফল(status, "clEnqueueSVMUnmap()");
                     }
                 }
                 CV_Assert(ctx.getImpl());
-                ctx.getImpl()->getBufferPoolSVM().release((void*)u->handle);
+                ctx.getImpl()->get_বাফার_Pool_SVM().release((শূন্য*)u->handle);
             }
 #endif
-            else
+            অন্যথা
             {
                 CV_OCL_DBG_CHECK(clReleaseMemObject((cl_mem)u->handle));
             }
             u->handle = 0;
-            u->markDeviceCopyObsolete(true);
+            u->markDeviceCopyObsolete(সত্য);
             delete u;
-            u = NULL;
+            u = ফাঁকা;
         }
-        CV_Assert(u == NULL);
+        CV_Assert(u == ফাঁকা);
     }
 
     // synchronized call (external UMatDataAutoLock, see UMat::getMat)
-    void map(UMatData* u, AccessFlag accessFlags) const CV_OVERRIDE
+    শূন্য map(UMat_তথ্য* u, AccessFlag accessFlags) ধ্রুবক CV_OVERRIDE
     {
         CV_Assert(u && u->handle);
 
-        if (!!(accessFlags & ACCESS_WRITE))
-            u->markDeviceCopyObsolete(true);
+        যদি (!!(accessFlags & ACCESS_WRITE))
+            u->markDeviceCopyObsolete(সত্য);
 
         cl_command_queue q = (cl_command_queue)Queue::getDefault().ptr();
 
         {
-            if( !u->copyOnMap() )
+            যদি( !u->copyOnMap() )
             {
                 // TODO
                 // because there can be other map requests for the same UMat with different access flags,
                 // we use the universal (read-write) access mode.
 #ifdef HAVE_OPENCL_SVM
-                if ((u->allocatorFlags_ & svm::OPENCL_SVM_BUFFER_MASK) != 0)
+                যদি ((u->allocatorFlags_ & svm::OPENCL_SVM_বাফার_MASK) != 0)
                 {
-                    if ((u->allocatorFlags_ & svm::OPENCL_SVM_BUFFER_MASK) == svm::OPENCL_SVM_COARSE_GRAIN_BUFFER)
+                    যদি ((u->allocatorFlags_ & svm::OPENCL_SVM_বাফার_MASK) == svm::OPENCL_SVM_COARSE_GRAIN_বাফার)
                     {
                         Context& ctx = Context::getDefault();
-                        const svm::SVMFunctions* svmFns = svm::getSVMFunctions(ctx);
+                        ধ্রুবক svm::SVMFunctions* svmFns = svm::getSVMFunctions(ctx);
                         CV_DbgAssert(svmFns->isValid());
 
-                        if ((u->allocatorFlags_ & svm::OPENCL_SVM_BUFFER_MAP) == 0)
+                        যদি ((u->allocatorFlags_ & svm::OPENCL_SVM_বাফার_MAP) == 0)
                         {
-                            CV_OPENCL_SVM_TRACE_P("clEnqueueSVMMap: %p (%d)\n", u->handle, (int)u->size);
+                            CV_OPENCL_SVM_TRACE_P("clEnqueueSVMMap: %p (%d)\n", u->handle, (পূর্ণসংখ্যা)u->size);
                             cl_int status = svmFns->fn_clEnqueueSVMMap(q, CL_FALSE, CL_MAP_READ | CL_MAP_WRITE,
                                     u->handle, u->size,
-                                    0, NULL, NULL);
-                            CV_OCL_CHECK_RESULT(status, "clEnqueueSVMMap()");
-                            u->allocatorFlags_ |= svm::OPENCL_SVM_BUFFER_MAP;
+                                    0, ফাঁকা, ফাঁকা);
+                            CV_OCL_CHECK_ফলাফল(status, "clEnqueueSVMMap()");
+                            u->allocatorFlags_ |= svm::OPENCL_SVM_বাফার_MAP;
                         }
                     }
                     clFinish(q);
-                    u->data = (uchar*)u->handle;
-                    u->markHostCopyObsolete(false);
-                    u->markDeviceMemMapped(true);
-                    return;
+                    u->তথ্য = (uchar*)u->handle;
+                    u->markHostCopyObsolete(মিথ্যা);
+                    u->markDeviceMemMapped(সত্য);
+                    ফেরত;
                 }
 #endif
 
                 cl_int retval = CL_SUCCESS;
-                if (!u->deviceMemMapped())
+                যদি (!u->deviceMemMapped())
                 {
                     CV_Assert(u->refcount == 1);
                     CV_Assert(u->mapcount++ == 0);
-                    u->data = (uchar*)clEnqueueMapBuffer(q, (cl_mem)u->handle, CL_TRUE,
+                    u->তথ্য = (uchar*)cl_Enqueue_Map_বাফার(q, (cl_mem)u->handle, CL_TRUE,
                                                          (CL_MAP_READ | CL_MAP_WRITE),
                                                          0, u->size, 0, 0, 0, &retval);
-                    CV_OCL_DBG_CHECK_RESULT(retval, cv::format("clEnqueueMapBuffer(handle=%p, sz=%lld) => %p", (void*)u->handle, (long long int)u->size, u->data).c_str());
+                    CV_OCL_DBG_CHECK_ফলাফল(retval, cv::format("clEnqueueMapBuffer(handle=%p, sz=%lld) => %p", (শূন্য*)u->handle, (long long পূর্ণসংখ্যা)u->size, u->তথ্য).c_str());
                 }
-                if (u->data && retval == CL_SUCCESS)
+                যদি (u->তথ্য && retval == CL_SUCCESS)
                 {
-                    u->markHostCopyObsolete(false);
-                    u->markDeviceMemMapped(true);
-                    return;
+                    u->markHostCopyObsolete(মিথ্যা);
+                    u->markDeviceMemMapped(সত্য);
+                    ফেরত;
                 }
 
                 // TODO Is it really a good idea and was it tested well?
                 // if map failed, switch to copy-on-map mode for the particular buffer
-                u->flags |= UMatData::COPY_ON_MAP;
+                u->flags |= UMat_তথ্য::COPY_ON_MAP;
             }
 
-            if(!u->data)
+            যদি(!u->তথ্য)
             {
-                u->data = (uchar*)fastMalloc(u->size);
-                u->markHostCopyObsolete(true);
+                u->তথ্য = (uchar*)fastMalloc(u->size);
+                u->markHostCopyObsolete(সত্য);
             }
         }
 
-        if (!!(accessFlags & ACCESS_READ) && u->hostCopyObsolete())
+        যদি (!!(accessFlags & ACCESS_READ) && u->hostCopyObsolete())
         {
-            AlignedDataPtr<false, true> alignedPtr(u->data, u->size, CV_OPENCL_DATA_PTR_ALIGNMENT);
+            Aligned_তথ্য_Ptr<মিথ্যা, সত্য> alignedPtr(u->তথ্য, u->size, CV_OPENCL_তথ্য_PTR_ALIGNMENT);
 #ifdef HAVE_OPENCL_SVM
-            CV_DbgAssert((u->allocatorFlags_ & svm::OPENCL_SVM_BUFFER_MASK) == 0);
+            CV_DbgAssert((u->allocatorFlags_ & svm::OPENCL_SVM_বাফার_MASK) == 0);
 #endif
-            cl_int retval = clEnqueueReadBuffer(q, (cl_mem)u->handle, CL_TRUE,
+            cl_int retval = cl_Enqueue_Read_বাফার(q, (cl_mem)u->handle, CL_TRUE,
                     0, u->size, alignedPtr.getAlignedPtr(), 0, 0, 0);
-            CV_OCL_CHECK_RESULT(retval, cv::format("clEnqueueReadBuffer(q, handle=%p, CL_TRUE, 0, sz=%lld, data=%p, 0, 0, 0)",
-                    (void*)u->handle, (long long int)u->size, alignedPtr.getAlignedPtr()).c_str());
-            u->markHostCopyObsolete(false);
+            CV_OCL_CHECK_ফলাফল(retval, cv::format("clEnqueueReadBuffer(q, handle=%p, CL_TRUE, 0, sz=%lld, data=%p, 0, 0, 0)",
+                    (শূন্য*)u->handle, (long long পূর্ণসংখ্যা)u->size, alignedPtr.getAlignedPtr()).c_str());
+            u->markHostCopyObsolete(মিথ্যা);
         }
     }
 
-    void unmap(UMatData* u) const CV_OVERRIDE
+    শূন্য unmap(UMat_তথ্য* u) ধ্রুবক CV_OVERRIDE
     {
-        if(!u)
-            return;
+        যদি(!u)
+            ফেরত;
 
 
         CV_Assert(u->handle != 0);
 
-        UMatDataAutoLock autolock(u);
+        UMat_তথ্য_Auto_Lock autolock(u);
 
         cl_command_queue q = (cl_command_queue)Queue::getDefault().ptr();
         cl_int retval = 0;
-        if( !u->copyOnMap() && u->deviceMemMapped() )
+        যদি( !u->copyOnMap() && u->deviceMemMapped() )
         {
-            CV_Assert(u->data != NULL);
+            CV_Assert(u->তথ্য != ফাঁকা);
 #ifdef HAVE_OPENCL_SVM
-            if ((u->allocatorFlags_ & svm::OPENCL_SVM_BUFFER_MASK) != 0)
+            যদি ((u->allocatorFlags_ & svm::OPENCL_SVM_বাফার_MASK) != 0)
             {
-                if ((u->allocatorFlags_ & svm::OPENCL_SVM_BUFFER_MASK) == svm::OPENCL_SVM_COARSE_GRAIN_BUFFER)
+                যদি ((u->allocatorFlags_ & svm::OPENCL_SVM_বাফার_MASK) == svm::OPENCL_SVM_COARSE_GRAIN_বাফার)
                 {
                     Context& ctx = Context::getDefault();
-                    const svm::SVMFunctions* svmFns = svm::getSVMFunctions(ctx);
+                    ধ্রুবক svm::SVMFunctions* svmFns = svm::getSVMFunctions(ctx);
                     CV_DbgAssert(svmFns->isValid());
 
-                    CV_DbgAssert((u->allocatorFlags_ & svm::OPENCL_SVM_BUFFER_MAP) != 0);
+                    CV_DbgAssert((u->allocatorFlags_ & svm::OPENCL_SVM_বাফার_MAP) != 0);
                     {
                         CV_OPENCL_SVM_TRACE_P("clEnqueueSVMUnmap: %p\n", u->handle);
                         cl_int status = svmFns->fn_clEnqueueSVMUnmap(q, u->handle,
-                                0, NULL, NULL);
-                        CV_OCL_CHECK_RESULT(status, "clEnqueueSVMUnmap()");
+                                0, ফাঁকা, ফাঁকা);
+                        CV_OCL_CHECK_ফলাফল(status, "clEnqueueSVMUnmap()");
                         clFinish(q);
-                        u->allocatorFlags_ &= ~svm::OPENCL_SVM_BUFFER_MAP;
+                        u->allocatorFlags_ &= ~svm::OPENCL_SVM_বাফার_MAP;
                     }
                 }
-                if (u->refcount == 0)
-                    u->data = 0;
-                u->markDeviceCopyObsolete(false);
-                u->markHostCopyObsolete(true);
-                return;
+                যদি (u->refcount == 0)
+                    u->তথ্য = 0;
+                u->markDeviceCopyObsolete(মিথ্যা);
+                u->markHostCopyObsolete(সত্য);
+                ফেরত;
             }
 #endif
-            if (u->refcount == 0)
+            যদি (u->refcount == 0)
             {
                 CV_Assert(u->mapcount-- == 1);
-                retval = clEnqueueUnmapMemObject(q, (cl_mem)u->handle, u->data, 0, 0, 0);
-                CV_OCL_CHECK_RESULT(retval, cv::format("clEnqueueUnmapMemObject(handle=%p, data=%p, [sz=%lld])", (void*)u->handle, u->data, (long long int)u->size).c_str());
-                if (Device::getDefault().isAMD())
+                retval = clEnqueueUnmapMemObject(q, (cl_mem)u->handle, u->তথ্য, 0, 0, 0);
+                CV_OCL_CHECK_ফলাফল(retval, cv::format("clEnqueueUnmapMemObject(handle=%p, data=%p, [sz=%lld])", (শূন্য*)u->handle, u->তথ্য, (long long পূর্ণসংখ্যা)u->size).c_str());
+                যদি (Device::getDefault().isAMD())
                 {
                     // required for multithreaded applications (see stitching test)
                     CV_OCL_DBG_CHECK(clFinish(q));
                 }
-                u->markDeviceMemMapped(false);
-                u->data = 0;
-                u->markDeviceCopyObsolete(false);
-                u->markHostCopyObsolete(true);
+                u->markDeviceMemMapped(মিথ্যা);
+                u->তথ্য = 0;
+                u->markDeviceCopyObsolete(মিথ্যা);
+                u->markHostCopyObsolete(সত্য);
             }
         }
-        else if( u->copyOnMap() && u->deviceCopyObsolete() )
+        অন্যথা যদি( u->copyOnMap() && u->deviceCopyObsolete() )
         {
-            AlignedDataPtr<true, false> alignedPtr(u->data, u->size, CV_OPENCL_DATA_PTR_ALIGNMENT);
+            Aligned_তথ্য_Ptr<সত্য, মিথ্যা> alignedPtr(u->তথ্য, u->size, CV_OPENCL_তথ্য_PTR_ALIGNMENT);
 #ifdef HAVE_OPENCL_SVM
-            CV_DbgAssert((u->allocatorFlags_ & svm::OPENCL_SVM_BUFFER_MASK) == 0);
+            CV_DbgAssert((u->allocatorFlags_ & svm::OPENCL_SVM_বাফার_MASK) == 0);
 #endif
-            retval = clEnqueueWriteBuffer(q, (cl_mem)u->handle, CL_TRUE,
+            retval = cl_Enqueue_Write_বাফার(q, (cl_mem)u->handle, CL_TRUE,
                                 0, u->size, alignedPtr.getAlignedPtr(), 0, 0, 0);
-            CV_OCL_CHECK_RESULT(retval, cv::format("clEnqueueWriteBuffer(q, handle=%p, CL_TRUE, 0, sz=%lld, data=%p, 0, 0, 0)",
-                    (void*)u->handle, (long long int)u->size, alignedPtr.getAlignedPtr()).c_str());
-            u->markDeviceCopyObsolete(false);
-            u->markHostCopyObsolete(true);
+            CV_OCL_CHECK_ফলাফল(retval, cv::format("clEnqueueWriteBuffer(q, handle=%p, CL_TRUE, 0, sz=%lld, data=%p, 0, 0, 0)",
+                    (শূন্য*)u->handle, (long long পূর্ণসংখ্যা)u->size, alignedPtr.getAlignedPtr()).c_str());
+            u->markDeviceCopyObsolete(মিথ্যা);
+            u->markHostCopyObsolete(সত্য);
         }
     }
 
-    bool checkContinuous(int dims, const size_t sz[],
-                         const size_t srcofs[], const size_t srcstep[],
-                         const size_t dstofs[], const size_t dststep[],
-                         size_t& total, size_t new_sz[],
+    যৌক্তিক checkContinuous(পূর্ণসংখ্যা dims, ধ্রুবক size_t sz[],
+                         ধ্রুবক size_t srcofs[], ধ্রুবক size_t srcstep[],
+                         ধ্রুবক size_t dstofs[], ধ্রুবক size_t dststep[],
+                         size_t& যোগ, size_t new_sz[],
                          size_t& srcrawofs, size_t new_srcofs[], size_t new_srcstep[],
-                         size_t& dstrawofs, size_t new_dstofs[], size_t new_dststep[]) const
+                         size_t& dstrawofs, size_t new_dstofs[], size_t new_dststep[]) ধ্রুবক
     {
-        bool iscontinuous = true;
+        যৌক্তিক iscontinuous = সত্য;
         srcrawofs = srcofs ? srcofs[dims-1] : 0;
         dstrawofs = dstofs ? dstofs[dims-1] : 0;
-        total = sz[dims-1];
-        for( int i = dims-2; i >= 0; i-- )
+        যোগ = sz[dims-1];
+        জন্য( পূর্ণসংখ্যা i = dims-2; i >= 0; i-- )
         {
-            if( i >= 0 && (total != srcstep[i] || total != dststep[i]) )
-                iscontinuous = false;
-            total *= sz[i];
-            if( srcofs )
+            যদি( i >= 0 && (যোগ != srcstep[i] || যোগ != dststep[i]) )
+                iscontinuous = মিথ্যা;
+            যোগ *= sz[i];
+            যদি( srcofs )
                 srcrawofs += srcofs[i]*srcstep[i];
-            if( dstofs )
+            যদি( dstofs )
                 dstrawofs += dstofs[i]*dststep[i];
         }
 
-        if( !iscontinuous )
+        যদি( !iscontinuous )
         {
             // OpenCL uses {x, y, z} order while OpenCV uses {z, y, x} order.
-            if( dims == 2 )
+            যদি( dims == 2 )
             {
                 new_sz[0] = sz[1]; new_sz[1] = sz[0]; new_sz[2] = 1;
                 // we assume that new_... arrays are initialized by caller
                 // with 0's, so there is no else branch
-                if( srcofs )
+                যদি( srcofs )
                 {
                     new_srcofs[0] = srcofs[1];
                     new_srcofs[1] = srcofs[0];
                     new_srcofs[2] = 0;
                 }
 
-                if( dstofs )
+                যদি( dstofs )
                 {
                     new_dstofs[0] = dstofs[1];
                     new_dstofs[1] = dstofs[0];
@@ -6078,20 +6078,20 @@ public:
                 new_srcstep[0] = srcstep[0]; new_srcstep[1] = 0;
                 new_dststep[0] = dststep[0]; new_dststep[1] = 0;
             }
-            else
+            অন্যথা
             {
                 // we could check for dims == 3 here,
                 // but from user perspective this one is more informative
                 CV_Assert(dims <= 3);
                 new_sz[0] = sz[2]; new_sz[1] = sz[1]; new_sz[2] = sz[0];
-                if( srcofs )
+                যদি( srcofs )
                 {
                     new_srcofs[0] = srcofs[2];
                     new_srcofs[1] = srcofs[1];
                     new_srcofs[2] = srcofs[0];
                 }
 
-                if( dstofs )
+                যদি( dstofs )
                 {
                     new_dstofs[0] = dstofs[2];
                     new_dstofs[1] = dstofs[1];
@@ -6102,124 +6102,124 @@ public:
                 new_dststep[0] = dststep[1]; new_dststep[1] = dststep[0];
             }
         }
-        return iscontinuous;
+        ফেরত iscontinuous;
     }
 
-    void download(UMatData* u, void* dstptr, int dims, const size_t sz[],
-                  const size_t srcofs[], const size_t srcstep[],
-                  const size_t dststep[]) const CV_OVERRIDE
+    শূন্য download(UMat_তথ্য* u, শূন্য* dstptr, পূর্ণসংখ্যা dims, ধ্রুবক size_t sz[],
+                  ধ্রুবক size_t srcofs[], ধ্রুবক size_t srcstep[],
+                  ধ্রুবক size_t dststep[]) ধ্রুবক CV_OVERRIDE
     {
-        if(!u)
-            return;
-        UMatDataAutoLock autolock(u);
+        যদি(!u)
+            ফেরত;
+        UMat_তথ্য_Auto_Lock autolock(u);
 
-        if( u->data && !u->hostCopyObsolete() )
+        যদি( u->তথ্য && !u->hostCopyObsolete() )
         {
             Mat::getDefaultAllocator()->download(u, dstptr, dims, sz, srcofs, srcstep, dststep);
-            return;
+            ফেরত;
         }
         CV_Assert( u->handle != 0 );
 
         cl_command_queue q = (cl_command_queue)Queue::getDefault().ptr();
 
-        size_t total = 0, new_sz[] = {0, 0, 0};
+        size_t যোগ = 0, new_sz[] = {0, 0, 0};
         size_t srcrawofs = 0, new_srcofs[] = {0, 0, 0}, new_srcstep[] = {0, 0, 0};
         size_t dstrawofs = 0, new_dstofs[] = {0, 0, 0}, new_dststep[] = {0, 0, 0};
 
-        bool iscontinuous = checkContinuous(dims, sz, srcofs, srcstep, 0, dststep,
-                                            total, new_sz,
+        যৌক্তিক iscontinuous = checkContinuous(dims, sz, srcofs, srcstep, 0, dststep,
+                                            যোগ, new_sz,
                                             srcrawofs, new_srcofs, new_srcstep,
                                             dstrawofs, new_dstofs, new_dststep);
 
 #ifdef HAVE_OPENCL_SVM
-        if ((u->allocatorFlags_ & svm::OPENCL_SVM_BUFFER_MASK) != 0)
+        যদি ((u->allocatorFlags_ & svm::OPENCL_SVM_বাফার_MASK) != 0)
         {
-            CV_DbgAssert(u->data == NULL || u->data == u->handle);
+            CV_DbgAssert(u->তথ্য == ফাঁকা || u->তথ্য == u->handle);
             Context& ctx = Context::getDefault();
-            const svm::SVMFunctions* svmFns = svm::getSVMFunctions(ctx);
+            ধ্রুবক svm::SVMFunctions* svmFns = svm::getSVMFunctions(ctx);
             CV_DbgAssert(svmFns->isValid());
 
-            CV_DbgAssert((u->allocatorFlags_ & svm::OPENCL_SVM_BUFFER_MAP) == 0);
-            if ((u->allocatorFlags_ & svm::OPENCL_SVM_BUFFER_MASK) == svm::OPENCL_SVM_COARSE_GRAIN_BUFFER)
+            CV_DbgAssert((u->allocatorFlags_ & svm::OPENCL_SVM_বাফার_MAP) == 0);
+            যদি ((u->allocatorFlags_ & svm::OPENCL_SVM_বাফার_MASK) == svm::OPENCL_SVM_COARSE_GRAIN_বাফার)
             {
-                CV_OPENCL_SVM_TRACE_P("clEnqueueSVMMap: %p (%d)\n", u->handle, (int)u->size);
+                CV_OPENCL_SVM_TRACE_P("clEnqueueSVMMap: %p (%d)\n", u->handle, (পূর্ণসংখ্যা)u->size);
                 cl_int status = svmFns->fn_clEnqueueSVMMap(q, CL_FALSE, CL_MAP_READ,
                         u->handle, u->size,
-                        0, NULL, NULL);
-                CV_OCL_CHECK_RESULT(status, "clEnqueueSVMMap()");
+                        0, ফাঁকা, ফাঁকা);
+                CV_OCL_CHECK_ফলাফল(status, "clEnqueueSVMMap()");
             }
             clFinish(q);
-            if( iscontinuous )
+            যদি( iscontinuous )
             {
-                memcpy(dstptr, (uchar*)u->handle + srcrawofs, total);
+                memcpy(dstptr, (uchar*)u->handle + srcrawofs, যোগ);
             }
-            else
+            অন্যথা
             {
                 // This code is from MatAllocator::download()
-                int isz[CV_MAX_DIM];
+                পূর্ণসংখ্যা isz[CV_MAX_DIM];
                 uchar* srcptr = (uchar*)u->handle;
-                for( int i = 0; i < dims; i++ )
+                জন্য( পূর্ণসংখ্যা i = 0; i < dims; i++ )
                 {
                     CV_Assert( sz[i] <= (size_t)INT_MAX );
-                    if( sz[i] == 0 )
-                    return;
-                    if( srcofs )
+                    যদি( sz[i] == 0 )
+                    ফেরত;
+                    যদি( srcofs )
                     srcptr += srcofs[i]*(i <= dims-2 ? srcstep[i] : 1);
-                    isz[i] = (int)sz[i];
+                    isz[i] = (পূর্ণসংখ্যা)sz[i];
                 }
 
                 Mat src(dims, isz, CV_8U, srcptr, srcstep);
                 Mat dst(dims, isz, CV_8U, dstptr, dststep);
 
-                const Mat* arrays[] = { &src, &dst };
+                ধ্রুবক Mat* arrays[] = { &src, &dst };
                 uchar* ptrs[2];
                 NAryMatIterator it(arrays, ptrs, 2);
                 size_t j, planesz = it.size;
 
-                for( j = 0; j < it.nplanes; j++, ++it )
+                জন্য( j = 0; j < it.nplanes; j++, ++it )
                     memcpy(ptrs[1], ptrs[0], planesz);
             }
-            if ((u->allocatorFlags_ & svm::OPENCL_SVM_BUFFER_MASK) == svm::OPENCL_SVM_COARSE_GRAIN_BUFFER)
+            যদি ((u->allocatorFlags_ & svm::OPENCL_SVM_বাফার_MASK) == svm::OPENCL_SVM_COARSE_GRAIN_বাফার)
             {
                 CV_OPENCL_SVM_TRACE_P("clEnqueueSVMUnmap: %p\n", u->handle);
                 cl_int status = svmFns->fn_clEnqueueSVMUnmap(q, u->handle,
-                        0, NULL, NULL);
-                CV_OCL_CHECK_RESULT(status, "clEnqueueSVMUnmap()");
+                        0, ফাঁকা, ফাঁকা);
+                CV_OCL_CHECK_ফলাফল(status, "clEnqueueSVMUnmap()");
                 clFinish(q);
             }
         }
-        else
+        অন্যথা
 #endif
         {
-            if( iscontinuous )
+            যদি( iscontinuous )
             {
-                AlignedDataPtr<false, true> alignedPtr((uchar*)dstptr, total, CV_OPENCL_DATA_PTR_ALIGNMENT);
-                CV_OCL_CHECK(clEnqueueReadBuffer(q, (cl_mem)u->handle, CL_TRUE,
-                    srcrawofs, total, alignedPtr.getAlignedPtr(), 0, 0, 0));
+                Aligned_তথ্য_Ptr<মিথ্যা, সত্য> alignedPtr((uchar*)dstptr, যোগ, CV_OPENCL_তথ্য_PTR_ALIGNMENT);
+                CV_OCL_CHECK(cl_Enqueue_Read_বাফার(q, (cl_mem)u->handle, CL_TRUE,
+                    srcrawofs, যোগ, alignedPtr.getAlignedPtr(), 0, 0, 0));
             }
-            else if (CV_OPENCL_DISABLE_BUFFER_RECT_OPERATIONS)
+            অন্যথা যদি (CV_OPENCL_DISABLE_বাফার_RECT_OPERATIONS)
             {
-                const size_t padding = CV_OPENCL_DATA_PTR_ALIGNMENT;
+                ধ্রুবক size_t padding = CV_OPENCL_তথ্য_PTR_ALIGNMENT;
                 size_t new_srcrawofs = srcrawofs & ~(padding-1);
                 size_t membuf_ofs = srcrawofs - new_srcrawofs;
-                AlignedDataPtr2D<false, false> alignedPtr(0, new_sz[1], new_srcstep[0], new_srcstep[0],
-                                                          CV_OPENCL_DATA_PTR_ALIGNMENT, padding*2);
+                Aligned_তথ্য_Ptr2_D<মিথ্যা, মিথ্যা> alignedPtr(0, new_sz[1], new_srcstep[0], new_srcstep[0],
+                                                          CV_OPENCL_তথ্য_PTR_ALIGNMENT, padding*2);
                 uchar* ptr = alignedPtr.getAlignedPtr();
 
                 CV_Assert(new_srcstep[0] >= new_sz[0]);
-                total = alignSize(new_srcstep[0]*new_sz[1] + membuf_ofs, padding);
-                total = std::min(total, u->size - new_srcrawofs);
-                CV_OCL_CHECK(clEnqueueReadBuffer(q, (cl_mem)u->handle, CL_TRUE,
-                                                 new_srcrawofs, total, ptr, 0, 0, 0));
-                for( size_t i = 0; i < new_sz[1]; i++ )
+                যোগ = align_আকার(new_srcstep[0]*new_sz[1] + membuf_ofs, padding);
+                যোগ = std::min(যোগ, u->size - new_srcrawofs);
+                CV_OCL_CHECK(cl_Enqueue_Read_বাফার(q, (cl_mem)u->handle, CL_TRUE,
+                                                 new_srcrawofs, যোগ, ptr, 0, 0, 0));
+                জন্য( size_t i = 0; i < new_sz[1]; i++ )
                     memcpy( (uchar*)dstptr + i*new_dststep[0], ptr + i*new_srcstep[0] + membuf_ofs, new_sz[0]);
             }
-            else
+            অন্যথা
             {
-                AlignedDataPtr2D<false, true> alignedPtr((uchar*)dstptr, new_sz[1], new_sz[0], new_dststep[0], CV_OPENCL_DATA_PTR_ALIGNMENT);
+                Aligned_তথ্য_Ptr2_D<মিথ্যা, সত্য> alignedPtr((uchar*)dstptr, new_sz[1], new_sz[0], new_dststep[0], CV_OPENCL_তথ্য_PTR_ALIGNMENT);
                 uchar* ptr = alignedPtr.getAlignedPtr();
 
-                CV_OCL_CHECK(clEnqueueReadBufferRect(q, (cl_mem)u->handle, CL_TRUE,
+                CV_OCL_CHECK(cl_Enqueue_Read_বাফার_Rect(q, (cl_mem)u->handle, CL_TRUE,
                     new_srcofs, new_dstofs, new_sz,
                     new_srcstep[0], 0,
                     new_dststep[0], 0,
@@ -6228,199 +6228,199 @@ public:
         }
     }
 
-    void upload(UMatData* u, const void* srcptr, int dims, const size_t sz[],
-                const size_t dstofs[], const size_t dststep[],
-                const size_t srcstep[]) const CV_OVERRIDE
+    শূন্য upload(UMat_তথ্য* u, ধ্রুবক শূন্য* srcptr, পূর্ণসংখ্যা dims, ধ্রুবক size_t sz[],
+                ধ্রুবক size_t dstofs[], ধ্রুবক size_t dststep[],
+                ধ্রুবক size_t srcstep[]) ধ্রুবক CV_OVERRIDE
     {
-        if(!u)
-            return;
+        যদি(!u)
+            ফেরত;
 
         // there should be no user-visible CPU copies of the UMat which we are going to copy to
-        CV_Assert(u->refcount == 0 || u->tempUMat());
+        CV_Assert(u->refcount == 0 || u->অস্থায়ী_UMat());
 
-        size_t total = 0, new_sz[] = {0, 0, 0};
+        size_t যোগ = 0, new_sz[] = {0, 0, 0};
         size_t srcrawofs = 0, new_srcofs[] = {0, 0, 0}, new_srcstep[] = {0, 0, 0};
         size_t dstrawofs = 0, new_dstofs[] = {0, 0, 0}, new_dststep[] = {0, 0, 0};
 
-        bool iscontinuous = checkContinuous(dims, sz, 0, srcstep, dstofs, dststep,
-                                            total, new_sz,
+        যৌক্তিক iscontinuous = checkContinuous(dims, sz, 0, srcstep, dstofs, dststep,
+                                            যোগ, new_sz,
                                             srcrawofs, new_srcofs, new_srcstep,
                                             dstrawofs, new_dstofs, new_dststep);
 
-        UMatDataAutoLock autolock(u);
+        UMat_তথ্য_Auto_Lock autolock(u);
 
         // if there is cached CPU copy of the GPU matrix,
         // we could use it as a destination.
         // we can do it in 2 cases:
         //    1. we overwrite the whole content
         //    2. we overwrite part of the matrix, but the GPU copy is out-of-date
-        if( u->data && (u->hostCopyObsolete() < u->deviceCopyObsolete() || total == u->size))
+        যদি( u->তথ্য && (u->hostCopyObsolete() < u->deviceCopyObsolete() || যোগ == u->size))
         {
             Mat::getDefaultAllocator()->upload(u, srcptr, dims, sz, dstofs, dststep, srcstep);
-            u->markHostCopyObsolete(false);
-            u->markDeviceCopyObsolete(true);
-            return;
+            u->markHostCopyObsolete(মিথ্যা);
+            u->markDeviceCopyObsolete(সত্য);
+            ফেরত;
         }
 
         CV_Assert( u->handle != 0 );
         cl_command_queue q = (cl_command_queue)Queue::getDefault().ptr();
 
 #ifdef HAVE_OPENCL_SVM
-        if ((u->allocatorFlags_ & svm::OPENCL_SVM_BUFFER_MASK) != 0)
+        যদি ((u->allocatorFlags_ & svm::OPENCL_SVM_বাফার_MASK) != 0)
         {
-            CV_DbgAssert(u->data == NULL || u->data == u->handle);
+            CV_DbgAssert(u->তথ্য == ফাঁকা || u->তথ্য == u->handle);
             Context& ctx = Context::getDefault();
-            const svm::SVMFunctions* svmFns = svm::getSVMFunctions(ctx);
+            ধ্রুবক svm::SVMFunctions* svmFns = svm::getSVMFunctions(ctx);
             CV_DbgAssert(svmFns->isValid());
 
-            CV_DbgAssert((u->allocatorFlags_ & svm::OPENCL_SVM_BUFFER_MAP) == 0);
-            if ((u->allocatorFlags_ & svm::OPENCL_SVM_BUFFER_MASK) == svm::OPENCL_SVM_COARSE_GRAIN_BUFFER)
+            CV_DbgAssert((u->allocatorFlags_ & svm::OPENCL_SVM_বাফার_MAP) == 0);
+            যদি ((u->allocatorFlags_ & svm::OPENCL_SVM_বাফার_MASK) == svm::OPENCL_SVM_COARSE_GRAIN_বাফার)
             {
-                CV_OPENCL_SVM_TRACE_P("clEnqueueSVMMap: %p (%d)\n", u->handle, (int)u->size);
+                CV_OPENCL_SVM_TRACE_P("clEnqueueSVMMap: %p (%d)\n", u->handle, (পূর্ণসংখ্যা)u->size);
                 cl_int status = svmFns->fn_clEnqueueSVMMap(q, CL_FALSE, CL_MAP_WRITE,
                         u->handle, u->size,
-                        0, NULL, NULL);
-                CV_OCL_CHECK_RESULT(status, "clEnqueueSVMMap()");
+                        0, ফাঁকা, ফাঁকা);
+                CV_OCL_CHECK_ফলাফল(status, "clEnqueueSVMMap()");
             }
             clFinish(q);
-            if( iscontinuous )
+            যদি( iscontinuous )
             {
-                memcpy((uchar*)u->handle + dstrawofs, srcptr, total);
+                memcpy((uchar*)u->handle + dstrawofs, srcptr, যোগ);
             }
-            else
+            অন্যথা
             {
                 // This code is from MatAllocator::upload()
-                int isz[CV_MAX_DIM];
+                পূর্ণসংখ্যা isz[CV_MAX_DIM];
                 uchar* dstptr = (uchar*)u->handle;
-                for( int i = 0; i < dims; i++ )
+                জন্য( পূর্ণসংখ্যা i = 0; i < dims; i++ )
                 {
                     CV_Assert( sz[i] <= (size_t)INT_MAX );
-                    if( sz[i] == 0 )
-                    return;
-                    if( dstofs )
+                    যদি( sz[i] == 0 )
+                    ফেরত;
+                    যদি( dstofs )
                     dstptr += dstofs[i]*(i <= dims-2 ? dststep[i] : 1);
-                    isz[i] = (int)sz[i];
+                    isz[i] = (পূর্ণসংখ্যা)sz[i];
                 }
 
-                Mat src(dims, isz, CV_8U, (void*)srcptr, srcstep);
+                Mat src(dims, isz, CV_8U, (শূন্য*)srcptr, srcstep);
                 Mat dst(dims, isz, CV_8U, dstptr, dststep);
 
-                const Mat* arrays[] = { &src, &dst };
+                ধ্রুবক Mat* arrays[] = { &src, &dst };
                 uchar* ptrs[2];
                 NAryMatIterator it(arrays, ptrs, 2);
                 size_t j, planesz = it.size;
 
-                for( j = 0; j < it.nplanes; j++, ++it )
+                জন্য( j = 0; j < it.nplanes; j++, ++it )
                     memcpy(ptrs[1], ptrs[0], planesz);
             }
-            if ((u->allocatorFlags_ & svm::OPENCL_SVM_BUFFER_MASK) == svm::OPENCL_SVM_COARSE_GRAIN_BUFFER)
+            যদি ((u->allocatorFlags_ & svm::OPENCL_SVM_বাফার_MASK) == svm::OPENCL_SVM_COARSE_GRAIN_বাফার)
             {
                 CV_OPENCL_SVM_TRACE_P("clEnqueueSVMUnmap: %p\n", u->handle);
                 cl_int status = svmFns->fn_clEnqueueSVMUnmap(q, u->handle,
-                        0, NULL, NULL);
-                CV_OCL_CHECK_RESULT(status, "clEnqueueSVMUnmap()");
+                        0, ফাঁকা, ফাঁকা);
+                CV_OCL_CHECK_ফলাফল(status, "clEnqueueSVMUnmap()");
                 clFinish(q);
             }
         }
-        else
+        অন্যথা
 #endif
         {
-            if( iscontinuous )
+            যদি( iscontinuous )
             {
-                AlignedDataPtr<true, false> alignedPtr((uchar*)srcptr, total, CV_OPENCL_DATA_PTR_ALIGNMENT);
-                cl_int retval = clEnqueueWriteBuffer(q, (cl_mem)u->handle, CL_TRUE,
-                    dstrawofs, total, alignedPtr.getAlignedPtr(), 0, 0, 0);
-                CV_OCL_CHECK_RESULT(retval, cv::format("clEnqueueWriteBuffer(q, handle=%p, CL_TRUE, offset=%lld, sz=%lld, data=%p, 0, 0, 0)",
-                        (void*)u->handle, (long long int)dstrawofs, (long long int)u->size, alignedPtr.getAlignedPtr()).c_str());
+                Aligned_তথ্য_Ptr<সত্য, মিথ্যা> alignedPtr((uchar*)srcptr, যোগ, CV_OPENCL_তথ্য_PTR_ALIGNMENT);
+                cl_int retval = cl_Enqueue_Write_বাফার(q, (cl_mem)u->handle, CL_TRUE,
+                    dstrawofs, যোগ, alignedPtr.getAlignedPtr(), 0, 0, 0);
+                CV_OCL_CHECK_ফলাফল(retval, cv::format("clEnqueueWriteBuffer(q, handle=%p, CL_TRUE, offset=%lld, sz=%lld, data=%p, 0, 0, 0)",
+                        (শূন্য*)u->handle, (long long পূর্ণসংখ্যা)dstrawofs, (long long পূর্ণসংখ্যা)u->size, alignedPtr.getAlignedPtr()).c_str());
             }
-            else if (CV_OPENCL_DISABLE_BUFFER_RECT_OPERATIONS)
+            অন্যথা যদি (CV_OPENCL_DISABLE_বাফার_RECT_OPERATIONS)
             {
-                const size_t padding = CV_OPENCL_DATA_PTR_ALIGNMENT;
+                ধ্রুবক size_t padding = CV_OPENCL_তথ্য_PTR_ALIGNMENT;
                 size_t new_dstrawofs = dstrawofs & ~(padding-1);
                 size_t membuf_ofs = dstrawofs - new_dstrawofs;
-                AlignedDataPtr2D<false, false> alignedPtr(0, new_sz[1], new_dststep[0], new_dststep[0],
-                                                          CV_OPENCL_DATA_PTR_ALIGNMENT, padding*2);
+                Aligned_তথ্য_Ptr2_D<মিথ্যা, মিথ্যা> alignedPtr(0, new_sz[1], new_dststep[0], new_dststep[0],
+                                                          CV_OPENCL_তথ্য_PTR_ALIGNMENT, padding*2);
                 uchar* ptr = alignedPtr.getAlignedPtr();
 
                 CV_Assert(new_dststep[0] >= new_sz[0] && new_srcstep[0] >= new_sz[0]);
-                total = alignSize(new_dststep[0]*new_sz[1] + membuf_ofs, padding);
-                total = std::min(total, u->size - new_dstrawofs);
+                যোগ = align_আকার(new_dststep[0]*new_sz[1] + membuf_ofs, padding);
+                যোগ = std::min(যোগ, u->size - new_dstrawofs);
                 /*printf("new_sz0=%d, new_sz1=%d, membuf_ofs=%d, total=%d (%08x), new_dstrawofs=%d (%08x)\n",
                        (int)new_sz[0], (int)new_sz[1], (int)membuf_ofs,
                        (int)total, (int)total, (int)new_dstrawofs, (int)new_dstrawofs);*/
-                CV_OCL_CHECK(clEnqueueReadBuffer(q, (cl_mem)u->handle, CL_TRUE,
-                                                 new_dstrawofs, total, ptr, 0, 0, 0));
-                for( size_t i = 0; i < new_sz[1]; i++ )
+                CV_OCL_CHECK(cl_Enqueue_Read_বাফার(q, (cl_mem)u->handle, CL_TRUE,
+                                                 new_dstrawofs, যোগ, ptr, 0, 0, 0));
+                জন্য( size_t i = 0; i < new_sz[1]; i++ )
                     memcpy( ptr + i*new_dststep[0] + membuf_ofs, (uchar*)srcptr + i*new_srcstep[0], new_sz[0]);
-                CV_OCL_CHECK(clEnqueueWriteBuffer(q, (cl_mem)u->handle, CL_TRUE,
-                                                 new_dstrawofs, total, ptr, 0, 0, 0));
+                CV_OCL_CHECK(cl_Enqueue_Write_বাফার(q, (cl_mem)u->handle, CL_TRUE,
+                                                 new_dstrawofs, যোগ, ptr, 0, 0, 0));
             }
-            else
+            অন্যথা
             {
-                AlignedDataPtr2D<true, false> alignedPtr((uchar*)srcptr, new_sz[1], new_sz[0], new_srcstep[0], CV_OPENCL_DATA_PTR_ALIGNMENT);
+                Aligned_তথ্য_Ptr2_D<সত্য, মিথ্যা> alignedPtr((uchar*)srcptr, new_sz[1], new_sz[0], new_srcstep[0], CV_OPENCL_তথ্য_PTR_ALIGNMENT);
                 uchar* ptr = alignedPtr.getAlignedPtr();
 
-                CV_OCL_CHECK(clEnqueueWriteBufferRect(q, (cl_mem)u->handle, CL_TRUE,
+                CV_OCL_CHECK(cl_Enqueue_Write_বাফার_Rect(q, (cl_mem)u->handle, CL_TRUE,
                     new_dstofs, new_srcofs, new_sz,
                     new_dststep[0], 0,
                     new_srcstep[0], 0,
                     ptr, 0, 0, 0));
             }
         }
-        u->markHostCopyObsolete(true);
+        u->markHostCopyObsolete(সত্য);
 #ifdef HAVE_OPENCL_SVM
-        if ((u->allocatorFlags_ & svm::OPENCL_SVM_BUFFER_MASK) == svm::OPENCL_SVM_FINE_GRAIN_BUFFER ||
-                (u->allocatorFlags_ & svm::OPENCL_SVM_BUFFER_MASK) == svm::OPENCL_SVM_FINE_GRAIN_SYSTEM)
+        যদি ((u->allocatorFlags_ & svm::OPENCL_SVM_বাফার_MASK) == svm::OPENCL_SVM_FINE_GRAIN_বাফার ||
+                (u->allocatorFlags_ & svm::OPENCL_SVM_বাফার_MASK) == svm::OPENCL_SVM_FINE_GRAIN_SYSTEM)
         {
             // nothing
         }
-        else
+        অন্যথা
 #endif
         {
-            u->markHostCopyObsolete(true);
+            u->markHostCopyObsolete(সত্য);
         }
-        u->markDeviceCopyObsolete(false);
+        u->markDeviceCopyObsolete(মিথ্যা);
     }
 
-    void copy(UMatData* src, UMatData* dst, int dims, const size_t sz[],
-              const size_t srcofs[], const size_t srcstep[],
-              const size_t dstofs[], const size_t dststep[], bool _sync) const CV_OVERRIDE
+    শূন্য copy(UMat_তথ্য* src, UMat_তথ্য* dst, পূর্ণসংখ্যা dims, ধ্রুবক size_t sz[],
+              ধ্রুবক size_t srcofs[], ধ্রুবক size_t srcstep[],
+              ধ্রুবক size_t dstofs[], ধ্রুবক size_t dststep[], যৌক্তিক _sync) ধ্রুবক CV_OVERRIDE
     {
-        if(!src || !dst)
-            return;
+        যদি(!src || !dst)
+            ফেরত;
 
-        size_t total = 0, new_sz[] = {0, 0, 0};
+        size_t যোগ = 0, new_sz[] = {0, 0, 0};
         size_t srcrawofs = 0, new_srcofs[] = {0, 0, 0}, new_srcstep[] = {0, 0, 0};
         size_t dstrawofs = 0, new_dstofs[] = {0, 0, 0}, new_dststep[] = {0, 0, 0};
 
-        bool iscontinuous = checkContinuous(dims, sz, srcofs, srcstep, dstofs, dststep,
-                                            total, new_sz,
+        যৌক্তিক iscontinuous = checkContinuous(dims, sz, srcofs, srcstep, dstofs, dststep,
+                                            যোগ, new_sz,
                                             srcrawofs, new_srcofs, new_srcstep,
                                             dstrawofs, new_dstofs, new_dststep);
 
-        UMatDataAutoLock src_autolock(src, dst);
+        UMat_তথ্য_Auto_Lock src_autolock(src, dst);
 
-        if( !src->handle || (src->data && src->hostCopyObsolete() < src->deviceCopyObsolete()) )
+        যদি( !src->handle || (src->তথ্য && src->hostCopyObsolete() < src->deviceCopyObsolete()) )
         {
-            upload(dst, src->data + srcrawofs, dims, sz, dstofs, dststep, srcstep);
-            return;
+            upload(dst, src->তথ্য + srcrawofs, dims, sz, dstofs, dststep, srcstep);
+            ফেরত;
         }
-        if( !dst->handle || (dst->data && dst->hostCopyObsolete() < dst->deviceCopyObsolete()) )
+        যদি( !dst->handle || (dst->তথ্য && dst->hostCopyObsolete() < dst->deviceCopyObsolete()) )
         {
-            download(src, dst->data + dstrawofs, dims, sz, srcofs, srcstep, dststep);
-            dst->markHostCopyObsolete(false);
+            download(src, dst->তথ্য + dstrawofs, dims, sz, srcofs, srcstep, dststep);
+            dst->markHostCopyObsolete(মিথ্যা);
 #ifdef HAVE_OPENCL_SVM
-            if ((dst->allocatorFlags_ & svm::OPENCL_SVM_BUFFER_MASK) == svm::OPENCL_SVM_FINE_GRAIN_BUFFER ||
-                    (dst->allocatorFlags_ & svm::OPENCL_SVM_BUFFER_MASK) == svm::OPENCL_SVM_FINE_GRAIN_SYSTEM)
+            যদি ((dst->allocatorFlags_ & svm::OPENCL_SVM_বাফার_MASK) == svm::OPENCL_SVM_FINE_GRAIN_বাফার ||
+                    (dst->allocatorFlags_ & svm::OPENCL_SVM_বাফার_MASK) == svm::OPENCL_SVM_FINE_GRAIN_SYSTEM)
             {
                 // nothing
             }
-            else
+            অন্যথা
 #endif
             {
-                dst->markDeviceCopyObsolete(true);
+                dst->markDeviceCopyObsolete(সত্য);
             }
-            return;
+            ফেরত;
         }
 
         // there should be no user-visible CPU copies of the UMat which we are going to copy to
@@ -6429,196 +6429,196 @@ public:
 
         cl_int retval = CL_SUCCESS;
 #ifdef HAVE_OPENCL_SVM
-        if ((src->allocatorFlags_ & svm::OPENCL_SVM_BUFFER_MASK) != 0 ||
-                (dst->allocatorFlags_ & svm::OPENCL_SVM_BUFFER_MASK) != 0)
+        যদি ((src->allocatorFlags_ & svm::OPENCL_SVM_বাফার_MASK) != 0 ||
+                (dst->allocatorFlags_ & svm::OPENCL_SVM_বাফার_MASK) != 0)
         {
-            if ((src->allocatorFlags_ & svm::OPENCL_SVM_BUFFER_MASK) != 0 &&
-                            (dst->allocatorFlags_ & svm::OPENCL_SVM_BUFFER_MASK) != 0)
+            যদি ((src->allocatorFlags_ & svm::OPENCL_SVM_বাফার_MASK) != 0 &&
+                            (dst->allocatorFlags_ & svm::OPENCL_SVM_বাফার_MASK) != 0)
             {
                 Context& ctx = Context::getDefault();
-                const svm::SVMFunctions* svmFns = svm::getSVMFunctions(ctx);
+                ধ্রুবক svm::SVMFunctions* svmFns = svm::getSVMFunctions(ctx);
                 CV_DbgAssert(svmFns->isValid());
 
-                if( iscontinuous )
+                যদি( iscontinuous )
                 {
                     CV_OPENCL_SVM_TRACE_P("clEnqueueSVMMemcpy: %p <-- %p (%d)\n",
-                            (uchar*)dst->handle + dstrawofs, (uchar*)src->handle + srcrawofs, (int)total);
+                            (uchar*)dst->handle + dstrawofs, (uchar*)src->handle + srcrawofs, (পূর্ণসংখ্যা)যোগ);
                     cl_int status = svmFns->fn_clEnqueueSVMMemcpy(q, CL_TRUE,
                             (uchar*)dst->handle + dstrawofs, (uchar*)src->handle + srcrawofs,
-                            total, 0, NULL, NULL);
-                    CV_OCL_CHECK_RESULT(status, "clEnqueueSVMMemcpy()");
+                            যোগ, 0, ফাঁকা, ফাঁকা);
+                    CV_OCL_CHECK_ফলাফল(status, "clEnqueueSVMMemcpy()");
                 }
-                else
+                অন্যথা
                 {
                     clFinish(q);
                     // This code is from MatAllocator::download()/upload()
-                    int isz[CV_MAX_DIM];
+                    পূর্ণসংখ্যা isz[CV_MAX_DIM];
                     uchar* srcptr = (uchar*)src->handle;
-                    for( int i = 0; i < dims; i++ )
+                    জন্য( পূর্ণসংখ্যা i = 0; i < dims; i++ )
                     {
                         CV_Assert( sz[i] <= (size_t)INT_MAX );
-                        if( sz[i] == 0 )
-                        return;
-                        if( srcofs )
+                        যদি( sz[i] == 0 )
+                        ফেরত;
+                        যদি( srcofs )
                         srcptr += srcofs[i]*(i <= dims-2 ? srcstep[i] : 1);
-                        isz[i] = (int)sz[i];
+                        isz[i] = (পূর্ণসংখ্যা)sz[i];
                     }
                     Mat m_src(dims, isz, CV_8U, srcptr, srcstep);
 
                     uchar* dstptr = (uchar*)dst->handle;
-                    for( int i = 0; i < dims; i++ )
+                    জন্য( পূর্ণসংখ্যা i = 0; i < dims; i++ )
                     {
-                        if( dstofs )
+                        যদি( dstofs )
                         dstptr += dstofs[i]*(i <= dims-2 ? dststep[i] : 1);
                     }
                     Mat m_dst(dims, isz, CV_8U, dstptr, dststep);
 
-                    const Mat* arrays[] = { &m_src, &m_dst };
+                    ধ্রুবক Mat* arrays[] = { &m_src, &m_dst };
                     uchar* ptrs[2];
                     NAryMatIterator it(arrays, ptrs, 2);
                     size_t j, planesz = it.size;
 
-                    for( j = 0; j < it.nplanes; j++, ++it )
+                    জন্য( j = 0; j < it.nplanes; j++, ++it )
                         memcpy(ptrs[1], ptrs[0], planesz);
                 }
             }
-            else
+            অন্যথা
             {
-                if ((src->allocatorFlags_ & svm::OPENCL_SVM_BUFFER_MASK) != 0)
+                যদি ((src->allocatorFlags_ & svm::OPENCL_SVM_বাফার_MASK) != 0)
                 {
                     map(src, ACCESS_READ);
-                    upload(dst, src->data + srcrawofs, dims, sz, dstofs, dststep, srcstep);
+                    upload(dst, src->তথ্য + srcrawofs, dims, sz, dstofs, dststep, srcstep);
                     unmap(src);
                 }
-                else
+                অন্যথা
                 {
                     map(dst, ACCESS_WRITE);
-                    download(src, dst->data + dstrawofs, dims, sz, srcofs, srcstep, dststep);
+                    download(src, dst->তথ্য + dstrawofs, dims, sz, srcofs, srcstep, dststep);
                     unmap(dst);
                 }
             }
         }
-        else
+        অন্যথা
 #endif
         {
-            if( iscontinuous )
+            যদি( iscontinuous )
             {
-                retval = clEnqueueCopyBuffer(q, (cl_mem)src->handle, (cl_mem)dst->handle,
-                                               srcrawofs, dstrawofs, total, 0, 0, 0);
-                CV_OCL_CHECK_RESULT(retval, cv::format("clEnqueueCopyBuffer(q, src=%p, dst=%p, src_offset=%lld, dst_offset=%lld, sz=%lld, 0, 0, 0)",
-                        (void*)src->handle, (void*)dst->handle, (long long int)srcrawofs, (long long int)dstrawofs, (long long int)total).c_str());
+                retval = cl_Enqueue_Copy_বাফার(q, (cl_mem)src->handle, (cl_mem)dst->handle,
+                                               srcrawofs, dstrawofs, যোগ, 0, 0, 0);
+                CV_OCL_CHECK_ফলাফল(retval, cv::format("clEnqueueCopyBuffer(q, src=%p, dst=%p, src_offset=%lld, dst_offset=%lld, sz=%lld, 0, 0, 0)",
+                        (শূন্য*)src->handle, (শূন্য*)dst->handle, (long long পূর্ণসংখ্যা)srcrawofs, (long long পূর্ণসংখ্যা)dstrawofs, (long long পূর্ণসংখ্যা)যোগ).c_str());
             }
-            else if (CV_OPENCL_DISABLE_BUFFER_RECT_OPERATIONS)
+            অন্যথা যদি (CV_OPENCL_DISABLE_বাফার_RECT_OPERATIONS)
             {
-                const size_t padding = CV_OPENCL_DATA_PTR_ALIGNMENT;
+                ধ্রুবক size_t padding = CV_OPENCL_তথ্য_PTR_ALIGNMENT;
                 size_t new_srcrawofs = srcrawofs & ~(padding-1);
                 size_t srcmembuf_ofs = srcrawofs - new_srcrawofs;
                 size_t new_dstrawofs = dstrawofs & ~(padding-1);
                 size_t dstmembuf_ofs = dstrawofs - new_dstrawofs;
 
-                AlignedDataPtr2D<false, false> srcBuf(0, new_sz[1], new_srcstep[0], new_srcstep[0],
-                                                      CV_OPENCL_DATA_PTR_ALIGNMENT, padding*2);
-                AlignedDataPtr2D<false, false> dstBuf(0, new_sz[1], new_dststep[0], new_dststep[0],
-                                                      CV_OPENCL_DATA_PTR_ALIGNMENT, padding*2);
+                Aligned_তথ্য_Ptr2_D<মিথ্যা, মিথ্যা> srcBuf(0, new_sz[1], new_srcstep[0], new_srcstep[0],
+                                                      CV_OPENCL_তথ্য_PTR_ALIGNMENT, padding*2);
+                Aligned_তথ্য_Ptr2_D<মিথ্যা, মিথ্যা> dstBuf(0, new_sz[1], new_dststep[0], new_dststep[0],
+                                                      CV_OPENCL_তথ্য_PTR_ALIGNMENT, padding*2);
                 uchar* srcptr = srcBuf.getAlignedPtr();
                 uchar* dstptr = dstBuf.getAlignedPtr();
 
                 CV_Assert(new_dststep[0] >= new_sz[0] && new_srcstep[0] >= new_sz[0]);
 
-                size_t src_total = alignSize(new_srcstep[0]*new_sz[1] + srcmembuf_ofs, padding);
-                src_total = std::min(src_total, src->size - new_srcrawofs);
-                size_t dst_total = alignSize(new_dststep[0]*new_sz[1] + dstmembuf_ofs, padding);
-                dst_total = std::min(dst_total, dst->size - new_dstrawofs);
+                size_t src_যোগ = align_আকার(new_srcstep[0]*new_sz[1] + srcmembuf_ofs, padding);
+                src_যোগ = std::min(src_যোগ, src->size - new_srcrawofs);
+                size_t dst_যোগ = align_আকার(new_dststep[0]*new_sz[1] + dstmembuf_ofs, padding);
+                dst_যোগ = std::min(dst_যোগ, dst->size - new_dstrawofs);
 
-                CV_OCL_CHECK(clEnqueueReadBuffer(q, (cl_mem)src->handle, CL_TRUE,
-                                                 new_srcrawofs, src_total, srcptr, 0, 0, 0));
-                CV_OCL_CHECK(clEnqueueReadBuffer(q, (cl_mem)dst->handle, CL_TRUE,
-                                                 new_dstrawofs, dst_total, dstptr, 0, 0, 0));
+                CV_OCL_CHECK(cl_Enqueue_Read_বাফার(q, (cl_mem)src->handle, CL_TRUE,
+                                                 new_srcrawofs, src_যোগ, srcptr, 0, 0, 0));
+                CV_OCL_CHECK(cl_Enqueue_Read_বাফার(q, (cl_mem)dst->handle, CL_TRUE,
+                                                 new_dstrawofs, dst_যোগ, dstptr, 0, 0, 0));
 
-                for( size_t i = 0; i < new_sz[1]; i++ )
+                জন্য( size_t i = 0; i < new_sz[1]; i++ )
                     memcpy( dstptr + dstmembuf_ofs + i*new_dststep[0],
                             srcptr + srcmembuf_ofs + i*new_srcstep[0], new_sz[0]);
-                CV_OCL_CHECK(clEnqueueWriteBuffer(q, (cl_mem)dst->handle, CL_TRUE,
-                                                  new_dstrawofs, dst_total, dstptr, 0, 0, 0));
+                CV_OCL_CHECK(cl_Enqueue_Write_বাফার(q, (cl_mem)dst->handle, CL_TRUE,
+                                                  new_dstrawofs, dst_যোগ, dstptr, 0, 0, 0));
             }
-            else
+            অন্যথা
             {
-                CV_OCL_CHECK(retval = clEnqueueCopyBufferRect(q, (cl_mem)src->handle, (cl_mem)dst->handle,
+                CV_OCL_CHECK(retval = cl_Enqueue_Copy_বাফার_Rect(q, (cl_mem)src->handle, (cl_mem)dst->handle,
                                                    new_srcofs, new_dstofs, new_sz,
                                                    new_srcstep[0], 0,
                                                    new_dststep[0], 0,
                                                    0, 0, 0));
             }
         }
-        if (retval == CL_SUCCESS)
+        যদি (retval == CL_SUCCESS)
         {
             CV_IMPL_ADD(CV_IMPL_OCL)
         }
 
 #ifdef HAVE_OPENCL_SVM
-        if ((dst->allocatorFlags_ & svm::OPENCL_SVM_BUFFER_MASK) == svm::OPENCL_SVM_FINE_GRAIN_BUFFER ||
-            (dst->allocatorFlags_ & svm::OPENCL_SVM_BUFFER_MASK) == svm::OPENCL_SVM_FINE_GRAIN_SYSTEM)
+        যদি ((dst->allocatorFlags_ & svm::OPENCL_SVM_বাফার_MASK) == svm::OPENCL_SVM_FINE_GRAIN_বাফার ||
+            (dst->allocatorFlags_ & svm::OPENCL_SVM_বাফার_MASK) == svm::OPENCL_SVM_FINE_GRAIN_SYSTEM)
         {
             // nothing
         }
-        else
+        অন্যথা
 #endif
         {
-            dst->markHostCopyObsolete(true);
+            dst->markHostCopyObsolete(সত্য);
         }
-        dst->markDeviceCopyObsolete(false);
+        dst->markDeviceCopyObsolete(মিথ্যা);
 
-        if( _sync )
+        যদি( _sync )
         {
             CV_OCL_DBG_CHECK(clFinish(q));
         }
     }
 
-    BufferPoolController* getBufferPoolController(const char* id) const CV_OVERRIDE
+    বাফার_Pool_Controller* get_বাফার_Pool_Controller(ধ্রুবক অক্ষর* id) ধ্রুবক CV_OVERRIDE
     {
         ocl::Context ctx = Context::getDefault();
-        if (ctx.empty())
-            return NULL;
+        যদি (ctx.empty())
+            ফেরত ফাঁকা;
 #ifdef HAVE_OPENCL_SVM
-        if ((svm::checkForceSVMUmatUsage() && (id == NULL || strcmp(id, "OCL") == 0)) || (id != NULL && strcmp(id, "SVM") == 0))
+        যদি ((svm::checkForceSVMUmatUsage() && (id == ফাঁকা || strcmp(id, "OCL") == 0)) || (id != ফাঁকা && strcmp(id, "SVM") == 0))
         {
-            return &ctx.getImpl()->getBufferPoolSVM();
+            ফেরত &ctx.getImpl()->get_বাফার_Pool_SVM();
         }
 #endif
-        if (id != NULL && strcmp(id, "HOST_ALLOC") == 0)
+        যদি (id != ফাঁকা && strcmp(id, "HOST_ALLOC") == 0)
         {
-            return &ctx.getImpl()->getBufferPoolHostPtr();
+            ফেরত &ctx.getImpl()->get_বাফার_Pool_Host_Ptr();
         }
-        if (id != NULL && strcmp(id, "OCL") != 0)
+        যদি (id != ফাঁকা && strcmp(id, "OCL") != 0)
         {
             CV_Error(cv::Error::StsBadArg, "getBufferPoolController(): unknown BufferPool ID\n");
         }
-        return &ctx.getImpl()->getBufferPool();
+        ফেরত &ctx.getImpl()->get_বাফার_Pool();
     }
 
     MatAllocator* matStdAllocator;
 
     mutable cv::Mutex cleanupQueueMutex;
-    mutable std::deque<UMatData*> cleanupQueue;
+    mutable std::deque<UMat_তথ্য*> cleanupQueue;
 
-    void flushCleanupQueue() const
+    শূন্য flushCleanupQueue() ধ্রুবক
     {
         // TSAN false positive: see #27638
-        if (!cleanupQueue.empty())
+        যদি (!cleanupQueue.empty())
         {
-            std::deque<UMatData*> q;
+            std::deque<UMat_তথ্য*> q;
             {
                 cv::AutoLock lock(cleanupQueueMutex);
                 // TSAN false positive: see #27638
                 q.swap(cleanupQueue);
             }
-            for (std::deque<UMatData*>::const_iterator i = q.begin(); i != q.end(); ++i)
+            জন্য (std::deque<UMat_তথ্য*>::const_iterator i = q.begin(); i != q.end(); ++i)
             {
                 deallocate_(*i);
             }
         }
     }
-    void addToCleanupQueue(UMatData* u) const
+    শূন্য addToCleanupQueue(UMat_তথ্য* u) ধ্রুবক
     {
         //TODO: Validation check: CV_Assert(!u->tempUMat());
         {
@@ -6628,10 +6628,10 @@ public:
     }
 };
 
-static OpenCLAllocator* getOpenCLAllocator_() // call once guarantee
+স্থির OpenCLAllocator* getOpenCLAllocator_() // call once guarantee
 {
-    static OpenCLAllocator* g_allocator = new OpenCLAllocator(); // avoid destructor call (using of this object is too wide)
-    return g_allocator;
+    স্থির OpenCLAllocator* g_allocator = নতুন OpenCLAllocator(); // avoid destructor call (using of this object is too wide)
+    ফেরত g_allocator;
 }
 MatAllocator* getOpenCLAllocator()
 {
@@ -6641,25 +6641,25 @@ MatAllocator* getOpenCLAllocator()
 }} // namespace cv::ocl
 
 
-namespace cv {
+নামাকাশ cv {
 
 // three funcs below are implemented in umatrix.cpp
-void setSize( UMat& m, int _dims, const int* _sz, const size_t* _steps,
-              bool autoSteps = false );
-void finalizeHdr(UMat& m);
+শূন্য set_আকার( UMat& m, পূর্ণসংখ্যা _dims, ধ্রুবক পূর্ণসংখ্যা* _sz, ধ্রুবক size_t* _steps,
+              যৌক্তিক autoSteps = মিথ্যা );
+শূন্য finalizeHdr(UMat& m);
 
 } // namespace cv
 
 
-namespace cv { namespace ocl {
+নামাকাশ cv { নামাকাশ ocl {
 
 /*
 // Convert OpenCL buffer memory to UMat
 */
-void convertFromBuffer(void* cl_mem_buffer, size_t step, int rows, int cols, int type, UMat& dst)
+শূন্য convert_From_বাফার(শূন্য* cl_mem_বাফার, size_t step, পূর্ণসংখ্যা rows, পূর্ণসংখ্যা cols, পূর্ণসংখ্যা type, UMat& dst)
 {
-    int d = 2;
-    int sizes[] = { rows, cols };
+    পূর্ণসংখ্যা d = 2;
+    পূর্ণসংখ্যা sizes[] = { rows, cols };
 
     CV_Assert(0 <= d && d <= CV_MAX_DIM);
 
@@ -6668,109 +6668,109 @@ void convertFromBuffer(void* cl_mem_buffer, size_t step, int rows, int cols, int
     dst.flags      = (type & Mat::TYPE_MASK) | Mat::MAGIC_VAL;
     dst.usageFlags = USAGE_DEFAULT;
 
-    setSize(dst, d, sizes, 0, true);
+    set_আকার(dst, d, sizes, 0, সত্য);
     dst.offset = 0;
 
-    cl_mem             memobj = (cl_mem)cl_mem_buffer;
+    cl_mem             memobj = (cl_mem)cl_mem_বাফার;
     cl_mem_object_type mem_type = 0;
 
-    CV_OCL_CHECK(clGetMemObjectInfo(memobj, CL_MEM_TYPE, sizeof(cl_mem_object_type), &mem_type, 0));
+    CV_OCL_CHECK(clGetMemObjectInfo(memobj, CL_MEM_TYPE, আকার(cl_mem_object_type), &mem_type, 0));
 
-    CV_Assert(CL_MEM_OBJECT_BUFFER == mem_type);
+    CV_Assert(CL_MEM_OBJECT_বাফার == mem_type);
 
-    size_t total = 0;
-    CV_OCL_CHECK(clGetMemObjectInfo(memobj, CL_MEM_SIZE, sizeof(size_t), &total, 0));
+    size_t যোগ = 0;
+    CV_OCL_CHECK(clGetMemObjectInfo(memobj, CL_MEM_আকার, আকার(size_t), &যোগ, 0));
 
     CV_OCL_CHECK(clRetainMemObject(memobj));
 
-    CV_Assert((int)step >= cols * CV_ELEM_SIZE(type));
-    CV_Assert(total >= rows * step);
+    CV_Assert((পূর্ণসংখ্যা)step >= cols * CV_ELEM_আকার(type));
+    CV_Assert(যোগ >= rows * step);
 
     // attach clBuffer to UMatData
-    dst.u = new UMatData(getOpenCLAllocator());
-    dst.u->data            = 0;
-    dst.u->allocatorFlags_ = OpenCLAllocator::ALLOCATOR_FLAGS_EXTERNAL_BUFFER;  // not allocated from any OpenCV buffer pool
-    dst.u->flags           = static_cast<UMatData::MemoryFlag>(0);
-    dst.u->handle          = cl_mem_buffer;
+    dst.u = নতুন UMat_তথ্য(getOpenCLAllocator());
+    dst.u->তথ্য            = 0;
+    dst.u->allocatorFlags_ = OpenCLAllocator::ALLOCATOR_FLAGS_EXTERNAL_বাফার;  // not allocated from any OpenCV buffer pool
+    dst.u->flags           = static_cast<UMat_তথ্য::MemoryFlag>(0);
+    dst.u->handle          = cl_mem_বাফার;
     dst.u->origdata        = 0;
-    dst.u->prevAllocator   = 0;
-    dst.u->size            = total;
+    dst.u->পূর্ব_Allocator   = 0;
+    dst.u->size            = যোগ;
 
     finalizeHdr(dst);
     dst.addref();
 
-    return;
+    ফেরত;
 } // convertFromBuffer()
 
 
 /*
 // Convert OpenCL image2d_t memory to UMat
 */
-void convertFromImage(void* cl_mem_image, UMat& dst)
+শূন্য convertFromImage(শূন্য* cl_mem_image, UMat& dst)
 {
     cl_mem             clImage = (cl_mem)cl_mem_image;
     cl_mem_object_type mem_type = 0;
 
-    CV_OCL_CHECK(clGetMemObjectInfo(clImage, CL_MEM_TYPE, sizeof(cl_mem_object_type), &mem_type, 0));
+    CV_OCL_CHECK(clGetMemObjectInfo(clImage, CL_MEM_TYPE, আকার(cl_mem_object_type), &mem_type, 0));
 
     CV_Assert(CL_MEM_OBJECT_IMAGE2D == mem_type);
 
     cl_image_format fmt = { 0, 0 };
-    CV_OCL_CHECK(clGetImageInfo(clImage, CL_IMAGE_FORMAT, sizeof(cl_image_format), &fmt, 0));
+    CV_OCL_CHECK(clGetImageInfo(clImage, CL_IMAGE_FORMAT, আকার(cl_image_format), &fmt, 0));
 
-    int depth = CV_8U;
-    switch (fmt.image_channel_data_type)
+    পূর্ণসংখ্যা depth = CV_8U;
+    নির্বাচন (fmt.image_channel_তথ্য_type)
     {
-    case CL_UNORM_INT8:
-    case CL_UNSIGNED_INT8:
+    ক্ষেত্র CL_UNORM_INT8:
+    ক্ষেত্র CL_UNSIGNED_INT8:
         depth = CV_8U;
-        break;
+        বিরতি;
 
-    case CL_SNORM_INT8:
-    case CL_SIGNED_INT8:
+    ক্ষেত্র CL_SNORM_INT8:
+    ক্ষেত্র CL_SIGNED_INT8:
         depth = CV_8S;
-        break;
+        বিরতি;
 
-    case CL_UNORM_INT16:
-    case CL_UNSIGNED_INT16:
+    ক্ষেত্র CL_UNORM_INT16:
+    ক্ষেত্র CL_UNSIGNED_INT16:
         depth = CV_16U;
-        break;
+        বিরতি;
 
-    case CL_SNORM_INT16:
-    case CL_SIGNED_INT16:
+    ক্ষেত্র CL_SNORM_INT16:
+    ক্ষেত্র CL_SIGNED_INT16:
         depth = CV_16S;
-        break;
+        বিরতি;
 
-    case CL_SIGNED_INT32:
+    ক্ষেত্র CL_SIGNED_INT32:
         depth = CV_32S;
-        break;
+        বিরতি;
 
-    case CL_FLOAT:
+    ক্ষেত্র CL_FLOAT:
         depth = CV_32F;
-        break;
+        বিরতি;
 
-    case CL_HALF_FLOAT:
+    ক্ষেত্র CL_HALF_FLOAT:
         depth = CV_16F;
-        break;
+        বিরতি;
 
-    default:
+    পূর্বনির্ধারিত:
         CV_Error(cv::Error::OpenCLApiCallError, "Not supported image_channel_data_type");
     }
 
-    int type = CV_8UC1;
-    switch (fmt.image_channel_order)
+    পূর্ণসংখ্যা type = CV_8UC1;
+    নির্বাচন (fmt.image_channel_order)
     {
-    case CL_R:
-    case CL_A:
-    case CL_INTENSITY:
-    case CL_LUMINANCE:
+    ক্ষেত্র CL_R:
+    ক্ষেত্র CL_A:
+    ক্ষেত্র CL_INTENSITY:
+    ক্ষেত্র CL_LUMINANCE:
         type = CV_MAKE_TYPE(depth, 1);
-        break;
+        বিরতি;
 
-    case CL_RG:
-    case CL_RA:
+    ক্ষেত্র CL_RG:
+    ক্ষেত্র CL_RA:
         type = CV_MAKE_TYPE(depth, 2);
-        break;
+        বিরতি;
 
     // CL_RGB has no mappings to OpenCV types because CL_RGB can only be used with
     // CL_UNORM_SHORT_565, CL_UNORM_SHORT_555, or CL_UNORM_INT_101010.
@@ -6778,68 +6778,68 @@ void convertFromImage(void* cl_mem_image, UMat& dst)
         type = CV_MAKE_TYPE(depth, 3);
         break;*/
 
-    case CL_RGBA:
-    case CL_BGRA:
-    case CL_ARGB:
+    ক্ষেত্র CL_RGBA:
+    ক্ষেত্র CL_BGRA:
+    ক্ষেত্র CL_ARGB:
         type = CV_MAKE_TYPE(depth, 4);
-        break;
+        বিরতি;
 
-    default:
+    পূর্বনির্ধারিত:
         CV_Error(cv::Error::OpenCLApiCallError, "Not supported image_channel_order");
-        break;
+        বিরতি;
     }
 
     size_t step = 0;
-    CV_OCL_CHECK(clGetImageInfo(clImage, CL_IMAGE_ROW_PITCH, sizeof(size_t), &step, 0));
+    CV_OCL_CHECK(clGetImageInfo(clImage, CL_IMAGE_ROW_PITCH, আকার(size_t), &step, 0));
 
     size_t w = 0;
-    CV_OCL_CHECK(clGetImageInfo(clImage, CL_IMAGE_WIDTH, sizeof(size_t), &w, 0));
+    CV_OCL_CHECK(clGetImageInfo(clImage, CL_IMAGE_WIDTH, আকার(size_t), &w, 0));
 
     size_t h = 0;
-    CV_OCL_CHECK(clGetImageInfo(clImage, CL_IMAGE_HEIGHT, sizeof(size_t), &h, 0));
+    CV_OCL_CHECK(clGetImageInfo(clImage, CL_IMAGE_HEIGHT, আকার(size_t), &h, 0));
 
-    dst.create((int)h, (int)w, type);
+    dst.create((পূর্ণসংখ্যা)h, (পূর্ণসংখ্যা)w, type);
 
-    cl_mem clBuffer = (cl_mem)dst.handle(ACCESS_READ);
+    cl_mem cl_বাফার = (cl_mem)dst.handle(ACCESS_READ);
 
     cl_command_queue q = (cl_command_queue)Queue::getDefault().ptr();
 
     size_t offset = 0;
     size_t src_origin[3] = { 0, 0, 0 };
     size_t region[3] = { w, h, 1 };
-    CV_OCL_CHECK(clEnqueueCopyImageToBuffer(q, clImage, clBuffer, src_origin, region, offset, 0, NULL, NULL));
+    CV_OCL_CHECK(cl_Enqueue_Copy_Image_To_বাফার(q, clImage, cl_বাফার, src_origin, region, offset, 0, ফাঁকা, ফাঁকা));
 
     CV_OCL_CHECK(clFinish(q));
 
-    return;
+    ফেরত;
 } // convertFromImage()
 
 
 ///////////////////////////////////////////// Utility functions /////////////////////////////////////////////////
 
-static void getDevices(std::vector<cl_device_id>& devices, cl_platform_id platform)
+স্থির শূন্য getDevices(std::vector<cl_device_id>& devices, cl_platform_id platform)
 {
-    cl_uint numDevices = 0;
-    cl_int status = clGetDeviceIDs(platform, (cl_device_type)Device::TYPE_ALL, 0, NULL, &numDevices);
-    if (status != CL_DEVICE_NOT_FOUND) // Not an error if platform has no devices
+    cl_uint অঙ্ক_Devices = 0;
+    cl_int status = clGetDeviceIDs(platform, (cl_device_type)Device::TYPE_ALL, 0, ফাঁকা, &অঙ্ক_Devices);
+    যদি (status != CL_DEVICE_NOT_FOUND) // Not an error if platform has no devices
     {
-        CV_OCL_DBG_CHECK_RESULT(status,
-            cv::format("clGetDeviceIDs(platform, Device::TYPE_ALL, num_entries=0, devices=NULL, numDevices=%p)", &numDevices).c_str());
+        CV_OCL_DBG_CHECK_ফলাফল(status,
+            cv::format("clGetDeviceIDs(platform, Device::TYPE_ALL, num_entries=0, devices=NULL, numDevices=%p)", &অঙ্ক_Devices).c_str());
     }
 
-    if (numDevices == 0)
+    যদি (অঙ্ক_Devices == 0)
     {
         devices.clear();
-        return;
+        ফেরত;
     }
 
-    devices.resize((size_t)numDevices);
-    CV_OCL_DBG_CHECK(clGetDeviceIDs(platform, (cl_device_type)Device::TYPE_ALL, numDevices, &devices[0], &numDevices));
+    devices.resize((size_t)অঙ্ক_Devices);
+    CV_OCL_DBG_CHECK(clGetDeviceIDs(platform, (cl_device_type)Device::TYPE_ALL, অঙ্ক_Devices, &devices[0], &অঙ্ক_Devices));
 }
 
-struct PlatformInfo::Impl
+কাঠামো PlatformInfo::Impl
 {
-    Impl(void* id)
+    Impl(শূন্য* id)
     {
         refcount = 1;
         handle = *(cl_platform_id*)id;
@@ -6849,12 +6849,12 @@ struct PlatformInfo::Impl
         parseOpenCLVersion(version_, versionMajor_, versionMinor_);
     }
 
-    String getStrProp(cl_platform_info prop) const
+    String getStrProp(cl_platform_info prop) ধ্রুবক
     {
-        char buf[1024];
+        অক্ষর buf[1024];
         size_t sz=0;
-        return clGetPlatformInfo(handle, prop, sizeof(buf)-16, buf, &sz) == CL_SUCCESS &&
-            sz < sizeof(buf) ? String(buf) : String();
+        ফেরত clGetPlatformInfo(handle, prop, আকার(buf)-16, buf, &sz) == CL_SUCCESS &&
+            sz < আকার(buf) ? String(buf) : String();
     }
 
     IMPLEMENT_REFCOUNTABLE();
@@ -6862,8 +6862,8 @@ struct PlatformInfo::Impl
     cl_platform_id handle;
 
     String version_;
-    int versionMajor_;
-    int versionMinor_;
+    পূর্ণসংখ্যা versionMajor_;
+    পূর্ণসংখ্যা versionMinor_;
 };
 
 PlatformInfo::PlatformInfo() CV_NOEXCEPT
@@ -6871,35 +6871,35 @@ PlatformInfo::PlatformInfo() CV_NOEXCEPT
     p = 0;
 }
 
-PlatformInfo::PlatformInfo(void* platform_id)
+PlatformInfo::PlatformInfo(শূন্য* platform_id)
 {
-    p = new Impl(platform_id);
+    p = নতুন Impl(platform_id);
 }
 
 PlatformInfo::~PlatformInfo()
 {
-    if(p)
+    যদি(p)
         p->release();
 }
 
-PlatformInfo::PlatformInfo(const PlatformInfo& i)
+PlatformInfo::PlatformInfo(ধ্রুবক PlatformInfo& i)
 {
-    if (i.p)
+    যদি (i.p)
         i.p->addref();
     p = i.p;
 }
 
-PlatformInfo& PlatformInfo::operator =(const PlatformInfo& i)
+PlatformInfo& PlatformInfo::operator =(ধ্রুবক PlatformInfo& i)
 {
-    if (i.p != p)
+    যদি (i.p != p)
     {
-        if (i.p)
+        যদি (i.p)
             i.p->addref();
-        if (p)
+        যদি (p)
             p->release();
         p = i.p;
     }
-    return *this;
+    ফেরত *এই;
 }
 
 PlatformInfo::PlatformInfo(PlatformInfo&& i) CV_NOEXCEPT
@@ -6910,81 +6910,81 @@ PlatformInfo::PlatformInfo(PlatformInfo&& i) CV_NOEXCEPT
 
 PlatformInfo& PlatformInfo::operator = (PlatformInfo&& i) CV_NOEXCEPT
 {
-    if (this != &i) {
-        if(p)
+    যদি (এই != &i) {
+        যদি(p)
             p->release();
         p = i.p;
         i.p = nullptr;
     }
-    return *this;
+    ফেরত *এই;
 }
 
-int PlatformInfo::deviceNumber() const
+পূর্ণসংখ্যা PlatformInfo::device_সংখ্যা() ধ্রুবক
 {
-    return p ? (int)p->devices.size() : 0;
+    ফেরত p ? (পূর্ণসংখ্যা)p->devices.size() : 0;
 }
 
-void PlatformInfo::getDevice(Device& device, int d) const
+শূন্য PlatformInfo::getDevice(Device& device, পূর্ণসংখ্যা d) ধ্রুবক
 {
-    CV_Assert(p && d < (int)p->devices.size() );
-    if(p)
+    CV_Assert(p && d < (পূর্ণসংখ্যা)p->devices.size() );
+    যদি(p)
         device.set(p->devices[d]);
 }
 
-String PlatformInfo::name() const
+String PlatformInfo::name() ধ্রুবক
 {
-    return p ? p->getStrProp(CL_PLATFORM_NAME) : String();
+    ফেরত p ? p->getStrProp(CL_PLATFORM_NAME) : String();
 }
 
-String PlatformInfo::vendor() const
+String PlatformInfo::vendor() ধ্রুবক
 {
-    return p ? p->getStrProp(CL_PLATFORM_VENDOR) : String();
+    ফেরত p ? p->getStrProp(CL_PLATFORM_VENDOR) : String();
 }
 
-String PlatformInfo::version() const
+String PlatformInfo::version() ধ্রুবক
 {
-    return p ? p->version_ : String();
+    ফেরত p ? p->version_ : String();
 }
 
-int PlatformInfo::versionMajor() const
+পূর্ণসংখ্যা PlatformInfo::versionMajor() ধ্রুবক
 {
     CV_Assert(p);
-    return p->versionMajor_;
+    ফেরত p->versionMajor_;
 }
 
-int PlatformInfo::versionMinor() const
+পূর্ণসংখ্যা PlatformInfo::versionMinor() ধ্রুবক
 {
     CV_Assert(p);
-    return p->versionMinor_;
+    ফেরত p->versionMinor_;
 }
 
-static void getPlatforms(std::vector<cl_platform_id>& platforms)
+স্থির শূন্য getPlatforms(std::vector<cl_platform_id>& platforms)
 {
-    cl_uint numPlatforms = 0;
-    CV_OCL_DBG_CHECK(clGetPlatformIDs(0, NULL, &numPlatforms));
+    cl_uint অঙ্ক_Platforms = 0;
+    CV_OCL_DBG_CHECK(clGetPlatformIDs(0, ফাঁকা, &অঙ্ক_Platforms));
 
-    if (numPlatforms == 0)
+    যদি (অঙ্ক_Platforms == 0)
     {
         platforms.clear();
-        return;
+        ফেরত;
     }
 
-    platforms.resize((size_t)numPlatforms);
-    CV_OCL_DBG_CHECK(clGetPlatformIDs(numPlatforms, &platforms[0], &numPlatforms));
+    platforms.resize((size_t)অঙ্ক_Platforms);
+    CV_OCL_DBG_CHECK(clGetPlatformIDs(অঙ্ক_Platforms, &platforms[0], &অঙ্ক_Platforms));
 }
 
-void getPlatfomsInfo(std::vector<PlatformInfo>& platformsInfo)
+শূন্য getPlatfomsInfo(std::vector<PlatformInfo>& platformsInfo)
 {
     std::vector<cl_platform_id> platforms;
     getPlatforms(platforms);
 
-    for (size_t i = 0; i < platforms.size(); i++)
-        platformsInfo.push_back( PlatformInfo((void*)&platforms[i]) );
+    জন্য (size_t i = 0; i < platforms.size(); i++)
+        platformsInfo.push_back( PlatformInfo((শূন্য*)&platforms[i]) );
 }
 
-const char* typeToStr(int type)
+ধ্রুবক অক্ষর* typeToStr(পূর্ণসংখ্যা type)
 {
-    static const char* tab[CV_DEPTH_MAX*16]=
+    স্থির ধ্রুবক অক্ষর* tab[CV_DEPTH_MAX*16]=
     {
         "uchar", "uchar2", "uchar3", "uchar4", 0, 0, 0, "uchar8", 0, 0, 0, 0, 0, 0, 0, "uchar16",
         "char", "char2", "char3", "char4", 0, 0, 0, "char8", 0, 0, 0, 0, 0, 0, 0, "char16",
@@ -7000,15 +7000,15 @@ const char* typeToStr(int type)
         "long", "long2", "long3", "long4", 0, 0, 0, "long8", 0, 0, 0, 0, 0, 0, 0, "long16",
         "uint", "uint2", "uint3", "uint4", 0, 0, 0, "uint8", 0, 0, 0, 0, 0, 0, 0, "uint16"
     };
-    int cn = CV_MAT_CN(type), depth = CV_MAT_DEPTH(type);
-    const char* result = cn > 16 ? nullptr : tab[depth*16 + cn-1];
-    CV_Assert(result);
-    return result;
+    পূর্ণসংখ্যা cn = CV_MAT_CN(type), depth = CV_MAT_DEPTH(type);
+    ধ্রুবক অক্ষর* ফলাফল = cn > 16 ? nullptr : tab[depth*16 + cn-1];
+    CV_Assert(ফলাফল);
+    ফেরত ফলাফল;
 }
 
-const char* memopTypeToStr(int type)
+ধ্রুবক অক্ষর* memopTypeToStr(পূর্ণসংখ্যা type)
 {
-    static const char* tab[CV_DEPTH_MAX*16] =
+    স্থির ধ্রুবক অক্ষর* tab[CV_DEPTH_MAX*16] =
     {
         "uchar", "uchar2", "uchar3", "uchar4", 0, 0, 0, "uchar8", 0, 0, 0, 0, 0, 0, 0, "uchar16",
         "char", "char2", "char3", "char4", 0, 0, 0, "char8", 0, 0, 0, 0, 0, 0, 0, "char16",
@@ -7024,15 +7024,15 @@ const char* memopTypeToStr(int type)
         "long", "long2", "long3", "long4", 0, 0, 0, "long8", 0, 0, 0, 0, 0, 0, 0, "long16",
         "uint", "uint2", "uint3", "uint4", 0, 0, 0, "uint8", 0, 0, 0, 0, 0, 0, 0, "uint16"
     };
-    int cn = CV_MAT_CN(type), depth = CV_MAT_DEPTH(type);
-    const char* result = cn > 16 ? nullptr : tab[depth*16 + cn-1];
-    CV_Assert(result);
-    return result;
+    পূর্ণসংখ্যা cn = CV_MAT_CN(type), depth = CV_MAT_DEPTH(type);
+    ধ্রুবক অক্ষর* ফলাফল = cn > 16 ? nullptr : tab[depth*16 + cn-1];
+    CV_Assert(ফলাফল);
+    ফেরত ফলাফল;
 }
 
-const char* vecopTypeToStr(int type)
+ধ্রুবক অক্ষর* vecopTypeToStr(পূর্ণসংখ্যা type)
 {
-    static const char* tab[CV_DEPTH_MAX*16] =
+    স্থির ধ্রুবক অক্ষর* tab[CV_DEPTH_MAX*16] =
     {
         "uchar", "short", "uchar3", "int", 0, 0, 0, "int2", 0, 0, 0, 0, 0, 0, 0, "int4",
         "char", "short", "char3", "int", 0, 0, 0, "int2", 0, 0, 0, 0, 0, 0, 0, "int4",
@@ -7048,46 +7048,46 @@ const char* vecopTypeToStr(int type)
         "long", "long2", "long3", "long4", 0, 0, 0, "long8", 0, 0, 0, 0, 0, 0, 0, "long16",
         "uint", "uint2", "uint3", "uint4", 0, 0, 0, "uint8", 0, 0, 0, 0, 0, 0, 0, "uint16"
     };
-    int cn = CV_MAT_CN(type), depth = CV_MAT_DEPTH(type);
-    const char* result = cn > 16 ? 0 : tab[depth*16 + cn-1];
-    CV_Assert(result);
-    return result;
+    পূর্ণসংখ্যা cn = CV_MAT_CN(type), depth = CV_MAT_DEPTH(type);
+    ধ্রুবক অক্ষর* ফলাফল = cn > 16 ? 0 : tab[depth*16 + cn-1];
+    CV_Assert(ফলাফল);
+    ফেরত ফলাফল;
 }
 
 // Deprecated due to size of buf buffer being unknowable.
-const char* convertTypeStr(int sdepth, int ddepth, int cn, char* buf)
+ধ্রুবক অক্ষর* convertTypeStr(পূর্ণসংখ্যা sdepth, পূর্ণসংখ্যা ddepth, পূর্ণসংখ্যা cn, অক্ষর* buf)
 {
     // Since the size of buf is not given, we assume 50 because that's what all callers use.
     constexpr size_t buf_max = 50;
 
-    return convertTypeStr(sdepth, ddepth, cn, buf, buf_max);
+    ফেরত convertTypeStr(sdepth, ddepth, cn, buf, buf_max);
 }
 
-const char* convertTypeStr(int sdepth, int ddepth, int cn, char* buf, size_t buf_size)
+ধ্রুবক অক্ষর* convertTypeStr(পূর্ণসংখ্যা sdepth, পূর্ণসংখ্যা ddepth, পূর্ণসংখ্যা cn, অক্ষর* buf, size_t buf_আকার_2)
 {
-    if( sdepth == ddepth )
-        return "noconvert";
-    const char *typestr = typeToStr(CV_MAKETYPE(ddepth, cn));
-    if( CV_IS_FLOAT_TYPE(ddepth) ||
+    যদি( sdepth == ddepth )
+        ফেরত "noconvert";
+    ধ্রুবক অক্ষর *typestr = typeToStr(CV_MAKETYPE(ddepth, cn));
+    যদি( CV_IS_FLOAT_TYPE(ddepth) ||
         (ddepth == CV_32S && sdepth < CV_32S) ||
         (ddepth == CV_16S && sdepth <= CV_8S) ||
         (ddepth == CV_16U && sdepth == CV_8U))
     {
-        snprintf(buf, buf_size, "convert_%s", typestr);
+        snprintf(buf, buf_আকার_2, "convert_%s", typestr);
     }
-    else if( CV_IS_FLOAT_TYPE(sdepth) )
-        snprintf(buf, buf_size, "convert_%s_sat_rte", typestr);
-    else
-        snprintf(buf, buf_size, "convert_%s_sat", typestr);
+    অন্যথা যদি( CV_IS_FLOAT_TYPE(sdepth) )
+        snprintf(buf, buf_আকার_2, "convert_%s_sat_rte", typestr);
+    অন্যথা
+        snprintf(buf, buf_আকার_2, "convert_%s_sat", typestr);
 
-    return buf;
+    ফেরত buf;
 }
 
-const char* getOpenCLErrorString(int errorCode)
+ধ্রুবক অক্ষর* getOpenCLErrorString(পূর্ণসংখ্যা errorCode)
 {
-#define CV_OCL_CODE(id) case id: return #id
-#define CV_OCL_CODE_(id, name) case id: return #name
-    switch (errorCode)
+#define CV_OCL_CODE(id) ক্ষেত্র id: ফেরত #id
+#define CV_OCL_CODE_(id, name) ক্ষেত্র id: ফেরত #name
+    নির্বাচন (errorCode)
     {
     CV_OCL_CODE(CL_SUCCESS);
     CV_OCL_CODE(CL_DEVICE_NOT_FOUND);
@@ -7102,14 +7102,14 @@ const char* getOpenCLErrorString(int errorCode)
     CV_OCL_CODE(CL_IMAGE_FORMAT_NOT_SUPPORTED);
     CV_OCL_CODE(CL_BUILD_PROGRAM_FAILURE);
     CV_OCL_CODE(CL_MAP_FAILURE);
-    CV_OCL_CODE(CL_MISALIGNED_SUB_BUFFER_OFFSET);
+    CV_OCL_CODE(CL_MISALIGNED_SUB_বাফার_OFFSET);
     CV_OCL_CODE(CL_EXEC_STATUS_ERROR_FOR_EVENTS_IN_WAIT_LIST);
     CV_OCL_CODE(CL_COMPILE_PROGRAM_FAILURE);
     CV_OCL_CODE(CL_LINKER_NOT_AVAILABLE);
     CV_OCL_CODE(CL_LINK_PROGRAM_FAILURE);
     CV_OCL_CODE(CL_DEVICE_PARTITION_FAILED);
     CV_OCL_CODE(CL_KERNEL_ARG_INFO_NOT_AVAILABLE);
-    CV_OCL_CODE(CL_INVALID_VALUE);
+    CV_OCL_CODE(CL_INVALID_মান);
     CV_OCL_CODE(CL_INVALID_DEVICE_TYPE);
     CV_OCL_CODE(CL_INVALID_PLATFORM);
     CV_OCL_CODE(CL_INVALID_DEVICE);
@@ -7119,39 +7119,39 @@ const char* getOpenCLErrorString(int errorCode)
     CV_OCL_CODE(CL_INVALID_HOST_PTR);
     CV_OCL_CODE(CL_INVALID_MEM_OBJECT);
     CV_OCL_CODE(CL_INVALID_IMAGE_FORMAT_DESCRIPTOR);
-    CV_OCL_CODE(CL_INVALID_IMAGE_SIZE);
+    CV_OCL_CODE(CL_INVALID_IMAGE_আকার);
     CV_OCL_CODE(CL_INVALID_SAMPLER);
-    CV_OCL_CODE(CL_INVALID_BINARY);
+    CV_OCL_CODE(CL_INVALID_দ্বিমিক);
     CV_OCL_CODE(CL_INVALID_BUILD_OPTIONS);
     CV_OCL_CODE(CL_INVALID_PROGRAM);
     CV_OCL_CODE(CL_INVALID_PROGRAM_EXECUTABLE);
     CV_OCL_CODE(CL_INVALID_KERNEL_NAME);
     CV_OCL_CODE(CL_INVALID_KERNEL_DEFINITION);
     CV_OCL_CODE(CL_INVALID_KERNEL);
-    CV_OCL_CODE(CL_INVALID_ARG_INDEX);
-    CV_OCL_CODE(CL_INVALID_ARG_VALUE);
-    CV_OCL_CODE(CL_INVALID_ARG_SIZE);
+    CV_OCL_CODE(CL_INVALID_ARG_সূচক);
+    CV_OCL_CODE(CL_INVALID_ARG_মান);
+    CV_OCL_CODE(CL_INVALID_ARG_আকার);
     CV_OCL_CODE(CL_INVALID_KERNEL_ARGS);
     CV_OCL_CODE(CL_INVALID_WORK_DIMENSION);
-    CV_OCL_CODE(CL_INVALID_WORK_GROUP_SIZE);
-    CV_OCL_CODE(CL_INVALID_WORK_ITEM_SIZE);
+    CV_OCL_CODE(CL_INVALID_WORK_GROUP_আকার);
+    CV_OCL_CODE(CL_INVALID_WORK_ITEM_আকার);
     CV_OCL_CODE(CL_INVALID_GLOBAL_OFFSET);
     CV_OCL_CODE(CL_INVALID_EVENT_WAIT_LIST);
     CV_OCL_CODE(CL_INVALID_EVENT);
     CV_OCL_CODE(CL_INVALID_OPERATION);
     CV_OCL_CODE(CL_INVALID_GL_OBJECT);
-    CV_OCL_CODE(CL_INVALID_BUFFER_SIZE);
+    CV_OCL_CODE(CL_INVALID_বাফার_আকার);
     CV_OCL_CODE(CL_INVALID_MIP_LEVEL);
-    CV_OCL_CODE(CL_INVALID_GLOBAL_WORK_SIZE);
+    CV_OCL_CODE(CL_INVALID_GLOBAL_WORK_আকার);
     // OpenCL 1.1
     CV_OCL_CODE(CL_INVALID_PROPERTY);
     // OpenCL 1.2
     CV_OCL_CODE(CL_INVALID_IMAGE_DESCRIPTOR);
     CV_OCL_CODE(CL_INVALID_COMPILER_OPTIONS);
     CV_OCL_CODE(CL_INVALID_LINKER_OPTIONS);
-    CV_OCL_CODE(CL_INVALID_DEVICE_PARTITION_COUNT);
+    CV_OCL_CODE(CL_INVALID_DEVICE_PARTITION_গুনতি);
     // OpenCL 2.0
-    CV_OCL_CODE_(-69, CL_INVALID_PIPE_SIZE);
+    CV_OCL_CODE_(-69, CL_INVALID_PIPE_আকার);
     CV_OCL_CODE_(-70, CL_INVALID_DEVICE_QUEUE);
     // Extensions
     CV_OCL_CODE_(-1000, CL_INVALID_GL_SHAREGROUP_REFERENCE_KHR);
@@ -7160,107 +7160,107 @@ const char* getOpenCLErrorString(int errorCode)
     CV_OCL_CODE_(-1003, CL_INVALID_D3D10_RESOURCE_KHR);
     CV_OCL_CODE_(-1004, CL_D3D10_RESOURCE_ALREADY_ACQUIRED_KHR);
     CV_OCL_CODE_(-1005, CL_D3D10_RESOURCE_NOT_ACQUIRED_KHR);
-    default: return "Unknown OpenCL error";
+    পূর্বনির্ধারিত: ফেরত "Unknown OpenCL error";
     }
 #undef CV_OCL_CODE
 #undef CV_OCL_CODE_
 }
 
 template <typename T>
-static std::string kerToStr(const Mat & k)
+স্থির std::string kerToStr(ধ্রুবক Mat & k)
 {
-    int width = k.cols - 1, depth = k.depth();
-    const T * const data = k.ptr<T>();
+    পূর্ণসংখ্যা width = k.cols - 1, depth = k.depth();
+    ধ্রুবক T * ধ্রুবক তথ্য = k.ptr<T>();
 
     std::ostringstream stream;
     stream.precision(10);
 
-    if (depth <= CV_8S)
+    যদি (depth <= CV_8S)
     {
-        for (int i = 0; i < width; ++i)
-            stream << "DIG(" << (int)data[i] << ")";
-        stream << "DIG(" << (int)data[width] << ")";
+        জন্য (পূর্ণসংখ্যা i = 0; i < width; ++i)
+            stream << "DIG(" << (পূর্ণসংখ্যা)তথ্য[i] << ")";
+        stream << "DIG(" << (পূর্ণসংখ্যা)তথ্য[width] << ")";
     }
-    else if (depth == CV_32F)
+    অন্যথা যদি (depth == CV_32F)
     {
         stream.setf(std::ios_base::showpoint);
-        for (int i = 0; i < width; ++i)
-            stream << "DIG(" << data[i] << "f)";
-        stream << "DIG(" << data[width] << "f)";
+        জন্য (পূর্ণসংখ্যা i = 0; i < width; ++i)
+            stream << "DIG(" << তথ্য[i] << "f)";
+        stream << "DIG(" << তথ্য[width] << "f)";
     }
-    else if (depth == CV_16F)
+    অন্যথা যদি (depth == CV_16F)
     {
         stream.setf(std::ios_base::showpoint);
-        for (int i = 0; i < width; ++i)
-            stream << "DIG(" << (float)data[i] << "h)";
-        stream << "DIG(" << (float)data[width] << "h)";
+        জন্য (পূর্ণসংখ্যা i = 0; i < width; ++i)
+            stream << "DIG(" << (দশমিক)তথ্য[i] << "h)";
+        stream << "DIG(" << (দশমিক)তথ্য[width] << "h)";
     }
-    else
+    অন্যথা
     {
-        for (int i = 0; i < width; ++i)
-            stream << "DIG(" << data[i] << ")";
-        stream << "DIG(" << data[width] << ")";
+        জন্য (পূর্ণসংখ্যা i = 0; i < width; ++i)
+            stream << "DIG(" << তথ্য[i] << ")";
+        stream << "DIG(" << তথ্য[width] << ")";
     }
 
-    return stream.str();
+    ফেরত stream.str();
 }
 
-String kernelToStr(InputArray _kernel, int ddepth, const char * name)
+String kernelToStr(প্রবেশ_Array _kernel, পূর্ণসংখ্যা ddepth, ধ্রুবক অক্ষর * name)
 {
     Mat kernel = _kernel.getMat().reshape(1, 1);
 
-    int depth = kernel.depth();
-    if (ddepth < 0)
+    পূর্ণসংখ্যা depth = kernel.depth();
+    যদি (ddepth < 0)
         ddepth = depth;
 
     // bf16 and fp8 constants have no OpenCL literal form, output them as regular float
-    if (ddepth == CV_16BF || ddepth == CV_8F_E4M3FN || ddepth == CV_8F_E4M3FNUZ)
+    যদি (ddepth == CV_16BF || ddepth == CV_8F_E4M3FN || ddepth == CV_8F_E4M3FNUZ)
         ddepth = CV_32F;
 
-    if (ddepth != depth)
+    যদি (ddepth != depth)
         kernel.convertTo(kernel, ddepth);
 
-    typedef std::string (* func_t)(const Mat &);
-    static const func_t funcs[CV_DEPTH_MAX] = { kerToStr<uchar>, kerToStr<char>, kerToStr<ushort>, kerToStr<short>,
-                                                kerToStr<int>, kerToStr<float>, kerToStr<double>, kerToStr<hfloat>,
-                                                0, kerToStr<bool>, kerToStr<uint64_t>, kerToStr<int64_t>, kerToStr<unsigned> };
-    const func_t func = funcs[ddepth];
+    প্রকারলেখ std::string (* func_t)(ধ্রুবক Mat &);
+    স্থির ধ্রুবক func_t funcs[CV_DEPTH_MAX] = { kerToStr<uchar>, kerToStr<অক্ষর>, kerToStr<ushort>, kerToStr<short>,
+                                                kerToStr<পূর্ণসংখ্যা>, kerToStr<দশমিক>, kerToStr<দ্বিগুণ>, kerToStr<hfloat>,
+                                                0, kerToStr<যৌক্তিক>, kerToStr<uint64_t>, kerToStr<int64_t>, kerToStr<unsigned> };
+    ধ্রুবক func_t func = funcs[ddepth];
     CV_Assert(func != 0);
 
-    return cv::format(" -D %s=%s", name ? name : "COEFF", func(kernel).c_str());
+    ফেরত cv::format(" -D %s=%s", name ? name : "COEFF", func(kernel).c_str());
 }
 
 #define PROCESS_SRC(src) \
-    do \
+    করো \
     { \
-        if (!src.empty()) \
+        যদি (!src.empty()) \
         { \
             CV_Assert(src.isMat() || src.isUMat()); \
-            Size csize = src.size(); \
-            int ctype = src.type(), ccn = CV_MAT_CN(ctype), cdepth = CV_MAT_DEPTH(ctype), \
+            আকার_2 csize = src.size(); \
+            পূর্ণসংখ্যা ctype = src.type(), ccn = CV_MAT_CN(ctype), cdepth = CV_MAT_DEPTH(ctype), \
                 ckercn = vectorWidths[cdepth], cwidth = ccn * csize.width; \
-            if (cwidth < ckercn || ckercn <= 0) \
-                return 1; \
+            যদি (cwidth < ckercn || ckercn <= 0) \
+                ফেরত 1; \
             cols.push_back(cwidth); \
-            if (strat == OCL_VECTOR_OWN && ctype != ref_type) \
-                return 1; \
+            যদি (strat == OCL_VECTOR_OWN && ctype != ref_type) \
+                ফেরত 1; \
             offsets.push_back(src.offset()); \
             steps.push_back(src.step()); \
             dividers.push_back(ckercn * CV_ELEM_SIZE1(ctype)); \
             kercns.push_back(ckercn); \
         } \
     } \
-    while ((void)0, 0)
+    যখন ((শূন্য)0, 0)
 
-int predictOptimalVectorWidth(InputArray src1, InputArray src2, InputArray src3,
-                              InputArray src4, InputArray src5, InputArray src6,
-                              InputArray src7, InputArray src8, InputArray src9,
+পূর্ণসংখ্যা predictOptimalVectorWidth(প্রবেশ_Array src1, প্রবেশ_Array src2, প্রবেশ_Array src3,
+                              প্রবেশ_Array src4, প্রবেশ_Array src5, প্রবেশ_Array src6,
+                              প্রবেশ_Array src7, প্রবেশ_Array src8, প্রবেশ_Array src9,
                               OclVectorStrategy strat)
 {
-    const ocl::Device & d = ocl::Device::getDefault();
+    ধ্রুবক ocl::Device & d = ocl::Device::getDefault();
 
     // Indexed by depth: must span CV_DEPTH_MAX. bf16 has no OpenCL vector type.
-    int vectorWidths[CV_DEPTH_MAX] = {
+    পূর্ণসংখ্যা vectorWidths[CV_DEPTH_MAX] = {
         d.preferredVectorWidthChar(), d.preferredVectorWidthChar(),   // CV_8U,  CV_8S
         d.preferredVectorWidthShort(), d.preferredVectorWidthShort(), // CV_16U, CV_16S
         d.preferredVectorWidthInt(), d.preferredVectorWidthFloat(),   // CV_32S, CV_32F
@@ -7272,7 +7272,7 @@ int predictOptimalVectorWidth(InputArray src1, InputArray src2, InputArray src3,
     };
 
     // if the device says don't use vectors
-    if (vectorWidths[0] == 1)
+    যদি (vectorWidths[0] == 1)
     {
         // it's heuristic
         vectorWidths[CV_8U] = vectorWidths[CV_8S] = 4;
@@ -7280,30 +7280,30 @@ int predictOptimalVectorWidth(InputArray src1, InputArray src2, InputArray src3,
         vectorWidths[CV_32S] = vectorWidths[CV_32F] = vectorWidths[CV_64F] = 1;
     }
 
-    return checkOptimalVectorWidth(vectorWidths, src1, src2, src3, src4, src5, src6, src7, src8, src9, strat);
+    ফেরত checkOptimalVectorWidth(vectorWidths, src1, src2, src3, src4, src5, src6, src7, src8, src9, strat);
 }
 
-int checkOptimalVectorWidth([[maybe_unused]] const int *vectorWidths,
-                            [[maybe_unused]] InputArray src1,
-                            [[maybe_unused]] InputArray src2,
-                            [[maybe_unused]] InputArray src3,
-                            [[maybe_unused]] InputArray src4,
-                            [[maybe_unused]] InputArray src5,
-                            [[maybe_unused]] InputArray src6,
-                            [[maybe_unused]] InputArray src7,
-                            [[maybe_unused]] InputArray src8,
-                            [[maybe_unused]] InputArray src9,
+পূর্ণসংখ্যা checkOptimalVectorWidth([[maybe_unused]] ধ্রুবক পূর্ণসংখ্যা *vectorWidths,
+                            [[maybe_unused]] প্রবেশ_Array src1,
+                            [[maybe_unused]] প্রবেশ_Array src2,
+                            [[maybe_unused]] প্রবেশ_Array src3,
+                            [[maybe_unused]] প্রবেশ_Array src4,
+                            [[maybe_unused]] প্রবেশ_Array src5,
+                            [[maybe_unused]] প্রবেশ_Array src6,
+                            [[maybe_unused]] প্রবেশ_Array src7,
+                            [[maybe_unused]] প্রবেশ_Array src8,
+                            [[maybe_unused]] প্রবেশ_Array src9,
                             [[maybe_unused]] OclVectorStrategy strat)
 {
 #ifdef __APPLE__
-    return 1;
-#else
+    ফেরত 1;
+#অন্যথা
     CV_Assert(vectorWidths);
 
-    int ref_type = src1.type();
+    পূর্ণসংখ্যা ref_type = src1.type();
 
     std::vector<size_t> offsets, steps, cols;
-    std::vector<int> dividers, kercns;
+    std::vector<পূর্ণসংখ্যা> dividers, kercns;
     PROCESS_SRC(src1);
     PROCESS_SRC(src2);
     PROCESS_SRC(src3);
@@ -7316,48 +7316,48 @@ int checkOptimalVectorWidth([[maybe_unused]] const int *vectorWidths,
 
     size_t size = offsets.size();
 
-    for (size_t i = 0; i < size; ++i)
-        while (offsets[i] % dividers[i] != 0 || steps[i] % dividers[i] != 0 || cols[i] % kercns[i] != 0)
+    জন্য (size_t i = 0; i < size; ++i)
+        যখন (offsets[i] % dividers[i] != 0 || steps[i] % dividers[i] != 0 || cols[i] % kercns[i] != 0)
             dividers[i] >>= 1, kercns[i] >>= 1;
 
     // default strategy
-    int kercn = *std::min_element(kercns.begin(), kercns.end());
+    পূর্ণসংখ্যা kercn = *std::min_element(kercns.begin(), kercns.end());
 
-    return kercn;
+    ফেরত kercn;
 #endif
 }
 
-int predictOptimalVectorWidthMax(InputArray src1, InputArray src2, InputArray src3,
-                                 InputArray src4, InputArray src5, InputArray src6,
-                                 InputArray src7, InputArray src8, InputArray src9)
+পূর্ণসংখ্যা predictOptimalVectorWidthMax(প্রবেশ_Array src1, প্রবেশ_Array src2, প্রবেশ_Array src3,
+                                 প্রবেশ_Array src4, প্রবেশ_Array src5, প্রবেশ_Array src6,
+                                 প্রবেশ_Array src7, প্রবেশ_Array src8, প্রবেশ_Array src9)
 {
-    return predictOptimalVectorWidth(src1, src2, src3, src4, src5, src6, src7, src8, src9, OCL_VECTOR_MAX);
+    ফেরত predictOptimalVectorWidth(src1, src2, src3, src4, src5, src6, src7, src8, src9, OCL_VECTOR_MAX);
 }
 
 #undef PROCESS_SRC
 
 
 // TODO Make this as a method of OpenCL "BuildOptions" class
-void buildOptionsAddMatrixDescription(String& buildOptions, const String& name, InputArray _m)
+শূন্য buildOptionsAddMatrixDescription(String& buildOptions, ধ্রুবক String& name, প্রবেশ_Array _m)
 {
-    if (!buildOptions.empty())
+    যদি (!buildOptions.empty())
         buildOptions += " ";
-    int type = _m.type(), depth = CV_MAT_DEPTH(type);
+    পূর্ণসংখ্যা type = _m.type(), depth = CV_MAT_DEPTH(type);
     buildOptions += format(
             "-D %s_T=%s -D %s_T1=%s -D %s_CN=%d -D %s_TSIZE=%d -D %s_T1SIZE=%d -D %s_DEPTH=%d",
             name.c_str(), ocl::typeToStr(type),
             name.c_str(), ocl::typeToStr(CV_MAKE_TYPE(depth, 1)),
-            name.c_str(), (int)CV_MAT_CN(type),
-            name.c_str(), (int)CV_ELEM_SIZE(type),
-            name.c_str(), (int)CV_ELEM_SIZE1(type),
-            name.c_str(), (int)depth
+            name.c_str(), (পূর্ণসংখ্যা)CV_MAT_CN(type),
+            name.c_str(), (পূর্ণসংখ্যা)CV_ELEM_আকার(type),
+            name.c_str(), (পূর্ণসংখ্যা)CV_ELEM_SIZE1(type),
+            name.c_str(), (পূর্ণসংখ্যা)depth
             );
 }
 
 
-struct Image2D::Impl
+কাঠামো Image2D::Impl
 {
-    Impl(const UMat &src, bool norm, bool alias)
+    Impl(ধ্রুবক UMat &src, যৌক্তিক norm, যৌক্তিক alias)
     {
         handle = 0;
         refcount = 1;
@@ -7366,77 +7366,77 @@ struct Image2D::Impl
 
     ~Impl()
     {
-        if (handle)
+        যদি (handle)
             clReleaseMemObject(handle);
     }
 
-    static cl_image_format getImageFormat(int depth, int cn, bool norm)
+    স্থির cl_image_format getImageFormat(পূর্ণসংখ্যা depth, পূর্ণসংখ্যা cn, যৌক্তিক norm)
     {
         cl_image_format format;
-        static const int channelTypes[] = { CL_UNSIGNED_INT8, CL_SIGNED_INT8, CL_UNSIGNED_INT16,
+        স্থির ধ্রুবক পূর্ণসংখ্যা channelTypes[] = { CL_UNSIGNED_INT8, CL_SIGNED_INT8, CL_UNSIGNED_INT16,
                                        CL_SIGNED_INT16, CL_SIGNED_INT32, CL_FLOAT, -1, CL_HALF_FLOAT };
-        static const int channelTypesNorm[] = { CL_UNORM_INT8, CL_SNORM_INT8, CL_UNORM_INT16,
+        স্থির ধ্রুবক পূর্ণসংখ্যা channelTypesNorm[] = { CL_UNORM_INT8, CL_SNORM_INT8, CL_UNORM_INT16,
                                                 CL_SNORM_INT16, -1, -1, -1, -1 };
         // CL_RGB has no mappings to OpenCV types because CL_RGB can only be used with
         // CL_UNORM_SHORT_565, CL_UNORM_SHORT_555, or CL_UNORM_INT_101010.
-        static const int channelOrders[] = { -1, CL_R, CL_RG, /*CL_RGB*/ -1, CL_RGBA };
+        স্থির ধ্রুবক পূর্ণসংখ্যা channelOrders[] = { -1, CL_R, CL_RG, /*CL_RGB*/ -1, CL_RGBA };
 
-        int channelType = norm ? channelTypesNorm[depth] : channelTypes[depth];
-        int channelOrder = channelOrders[cn];
-        format.image_channel_data_type = (cl_channel_type)channelType;
+        পূর্ণসংখ্যা channelType = norm ? channelTypesNorm[depth] : channelTypes[depth];
+        পূর্ণসংখ্যা channelOrder = channelOrders[cn];
+        format.image_channel_তথ্য_type = (cl_channel_type)channelType;
         format.image_channel_order = (cl_channel_order)channelOrder;
-        return format;
+        ফেরত format;
     }
 
-    static bool isFormatSupported(cl_image_format format)
+    স্থির যৌক্তিক isFormatSupported(cl_image_format format)
     {
-        if (!haveOpenCL())
+        যদি (!haveOpenCL())
             CV_Error(Error::OpenCLApiCallError, "OpenCL runtime not found!");
 
         cl_context context = (cl_context)Context::getDefault().ptr();
-        if (!context)
-            return false;
+        যদি (!context)
+            ফেরত মিথ্যা;
 
         // Figure out how many formats are supported by this context.
-        cl_uint numFormats = 0;
+        cl_uint অঙ্ক_Formats = 0;
         cl_int err = clGetSupportedImageFormats(context, CL_MEM_READ_WRITE,
-                                                CL_MEM_OBJECT_IMAGE2D, numFormats,
-                                                NULL, &numFormats);
-        CV_OCL_DBG_CHECK_RESULT(err, "clGetSupportedImageFormats(CL_MEM_OBJECT_IMAGE2D, NULL)");
-        if (numFormats > 0)
+                                                CL_MEM_OBJECT_IMAGE2D, অঙ্ক_Formats,
+                                                ফাঁকা, &অঙ্ক_Formats);
+        CV_OCL_DBG_CHECK_ফলাফল(err, "clGetSupportedImageFormats(CL_MEM_OBJECT_IMAGE2D, NULL)");
+        যদি (অঙ্ক_Formats > 0)
         {
-            AutoBuffer<cl_image_format> formats(numFormats);
+            Auto_বাফার<cl_image_format> formats(অঙ্ক_Formats);
             err = clGetSupportedImageFormats(context, CL_MEM_READ_WRITE,
-                                             CL_MEM_OBJECT_IMAGE2D, numFormats,
-                                             formats.data(), NULL);
-            CV_OCL_DBG_CHECK_RESULT(err, "clGetSupportedImageFormats(CL_MEM_OBJECT_IMAGE2D, formats)");
-            for (cl_uint i = 0; i < numFormats; ++i)
+                                             CL_MEM_OBJECT_IMAGE2D, অঙ্ক_Formats,
+                                             formats.তথ্য(), ফাঁকা);
+            CV_OCL_DBG_CHECK_ফলাফল(err, "clGetSupportedImageFormats(CL_MEM_OBJECT_IMAGE2D, formats)");
+            জন্য (cl_uint i = 0; i < অঙ্ক_Formats; ++i)
             {
-                if (!memcmp(&formats[i], &format, sizeof(format)))
+                যদি (!memcmp(&formats[i], &format, আকার(format)))
                 {
-                    return true;
+                    ফেরত সত্য;
                 }
             }
         }
-        return false;
+        ফেরত মিথ্যা;
     }
 
-    void init(const UMat &src, bool norm, bool alias)
+    শূন্য init(ধ্রুবক UMat &src, যৌক্তিক norm, যৌক্তিক alias)
     {
-        if (!haveOpenCL())
+        যদি (!haveOpenCL())
             CV_Error(Error::OpenCLApiCallError, "OpenCL runtime not found!");
 
         CV_Assert(!src.empty());
         CV_Assert(ocl::Device::getDefault().imageSupport());
 
-        int err, depth = src.depth(), cn = src.channels();
+        পূর্ণসংখ্যা err, depth = src.depth(), cn = src.channels();
         CV_Assert(cn <= 4);
         cl_image_format format = getImageFormat(depth, cn, norm);
 
-        if (!isFormatSupported(format))
+        যদি (!isFormatSupported(format))
             CV_Error(Error::OpenCLApiCallError, "Image format is not supported");
 
-        if (alias && !src.handle(ACCESS_RW))
+        যদি (alias && !src.handle(ACCESS_RW))
             CV_Error(Error::OpenCLApiCallError, "Incorrect UMat, handle is null");
 
         cl_context context = (cl_context)Context::getDefault().ptr();
@@ -7445,63 +7445,63 @@ struct Image2D::Impl
 #ifdef CL_VERSION_1_2
         // this enables backwards portability to
         // run on OpenCL 1.1 platform if library binaries are compiled with OpenCL 1.2 support
-        const Device & d = ocl::Device::getDefault();
-        int minor = d.deviceVersionMinor(), major = d.deviceVersionMajor();
+        ধ্রুবক Device & d = ocl::Device::getDefault();
+        পূর্ণসংখ্যা minor = d.deviceVersionMinor(), major = d.deviceVersionMajor();
         CV_Assert(!alias || canCreateAlias(src));
-        if (1 < major || (1 == major && 2 <= minor))
+        যদি (1 < major || (1 == major && 2 <= minor))
         {
             cl_image_desc desc;
             desc.image_type       = CL_MEM_OBJECT_IMAGE2D;
             desc.image_width      = src.cols;
             desc.image_height     = src.rows;
             desc.image_depth      = 0;
-            desc.image_array_size = 1;
+            desc.image_array_আকার = 1;
             desc.image_row_pitch  = alias ? src.step[0] : 0;
             desc.image_slice_pitch = 0;
-            desc.buffer           = alias ? (cl_mem)src.handle(ACCESS_RW) : 0;
-            desc.num_mip_levels   = 0;
-            desc.num_samples      = 0;
-            handle = clCreateImage(context, CL_MEM_READ_WRITE, &format, &desc, NULL, &err);
+            desc.বাফার           = alias ? (cl_mem)src.handle(ACCESS_RW) : 0;
+            desc.অঙ্ক_mip_levels   = 0;
+            desc.অঙ্ক_samples      = 0;
+            handle = clCreateImage(context, CL_MEM_READ_WRITE, &format, &desc, ফাঁকা, &err);
         }
-        else
+        অন্যথা
 #endif
         {
             CV_SUPPRESS_DEPRECATED_START
             CV_Assert(!alias);  // This is an OpenCL 1.2 extension
-            handle = clCreateImage2D(context, CL_MEM_READ_WRITE, &format, src.cols, src.rows, 0, NULL, &err);
+            handle = clCreateImage2D(context, CL_MEM_READ_WRITE, &format, src.cols, src.rows, 0, ফাঁকা, &err);
             CV_SUPPRESS_DEPRECATED_END
         }
-        CV_OCL_DBG_CHECK_RESULT(err, "clCreateImage()");
+        CV_OCL_DBG_CHECK_ফলাফল(err, "clCreateImage()");
 
         size_t origin[] = { 0, 0, 0 };
         size_t region[] = { static_cast<size_t>(src.cols), static_cast<size_t>(src.rows), 1 };
 
-        cl_mem devData;
-        if (!alias && !src.isContinuous())
+        cl_mem dev_তথ্য;
+        যদি (!alias && !src.isContinuous())
         {
-            devData = clCreateBuffer(context, CL_MEM_READ_ONLY, src.cols * src.rows * src.elemSize(), NULL, &err);
-            CV_OCL_CHECK_RESULT(err, cv::format("clCreateBuffer(CL_MEM_READ_ONLY, sz=%lld) => %p",
-                    (long long int)(src.cols * src.rows * src.elemSize()), (void*)devData
+            dev_তথ্য = cl_Create_বাফার(context, CL_MEM_READ_ONLY, src.cols * src.rows * src.elem_আকার(), ফাঁকা, &err);
+            CV_OCL_CHECK_ফলাফল(err, cv::format("clCreateBuffer(CL_MEM_READ_ONLY, sz=%lld) => %p",
+                    (long long পূর্ণসংখ্যা)(src.cols * src.rows * src.elem_আকার()), (শূন্য*)dev_তথ্য
                 ).c_str());
 
-            const size_t roi[3] = {static_cast<size_t>(src.cols) * src.elemSize(), static_cast<size_t>(src.rows), 1};
-            CV_OCL_CHECK(clEnqueueCopyBufferRect(queue, (cl_mem)src.handle(ACCESS_READ), devData, origin, origin,
-                roi, src.step, 0, src.cols * src.elemSize(), 0, 0, NULL, NULL));
+            ধ্রুবক size_t roi[3] = {static_cast<size_t>(src.cols) * src.elem_আকার(), static_cast<size_t>(src.rows), 1};
+            CV_OCL_CHECK(cl_Enqueue_Copy_বাফার_Rect(queue, (cl_mem)src.handle(ACCESS_READ), dev_তথ্য, origin, origin,
+                roi, src.step, 0, src.cols * src.elem_আকার(), 0, 0, ফাঁকা, ফাঁকা));
             CV_OCL_DBG_CHECK(clFlush(queue));
         }
-        else
+        অন্যথা
         {
-            devData = (cl_mem)src.handle(ACCESS_READ);
+            dev_তথ্য = (cl_mem)src.handle(ACCESS_READ);
         }
-        CV_Assert(devData != NULL);
+        CV_Assert(dev_তথ্য != ফাঁকা);
 
-        if (!alias)
+        যদি (!alias)
         {
-            CV_OCL_CHECK(clEnqueueCopyBufferToImage(queue, devData, handle, 0, origin, region, 0, NULL, 0));
-            if (!src.isContinuous())
+            CV_OCL_CHECK(cl_Enqueue_Copy_বাফার_To_Image(queue, dev_তথ্য, handle, 0, origin, region, 0, ফাঁকা, 0));
+            যদি (!src.isContinuous())
             {
                 CV_OCL_DBG_CHECK(clFlush(queue));
-                CV_OCL_DBG_CHECK(clReleaseMemObject(devData));
+                CV_OCL_DBG_CHECK(clReleaseMemObject(dev_তথ্য));
             }
         }
     }
@@ -7513,60 +7513,60 @@ struct Image2D::Impl
 
 Image2D::Image2D() CV_NOEXCEPT
 {
-    p = NULL;
+    p = ফাঁকা;
 }
 
-Image2D::Image2D(const UMat &src, bool norm, bool alias)
+Image2D::Image2D(ধ্রুবক UMat &src, যৌক্তিক norm, যৌক্তিক alias)
 {
-    p = new Impl(src, norm, alias);
+    p = নতুন Impl(src, norm, alias);
 }
 
-bool Image2D::canCreateAlias(const UMat &m)
+যৌক্তিক Image2D::canCreateAlias(ধ্রুবক UMat &m)
 {
-    bool ret = false;
-    const Device & d = ocl::Device::getDefault();
-    if (d.imageFromBufferSupport() && !m.empty())
+    যৌক্তিক ret = মিথ্যা;
+    ধ্রুবক Device & d = ocl::Device::getDefault();
+    যদি (d.image_From_বাফার_Support() && !m.empty())
     {
         // This is the required pitch alignment in pixels
         uint pitchAlign = d.imagePitchAlignment();
-        if (pitchAlign && !(m.step % (pitchAlign * m.elemSize())))
+        যদি (pitchAlign && !(m.step % (pitchAlign * m.elem_আকার())))
         {
             // We don't currently handle the case where the buffer was created
             // with CL_MEM_USE_HOST_PTR
-            if (!m.u->tempUMat())
+            যদি (!m.u->অস্থায়ী_UMat())
             {
-                ret = true;
+                ret = সত্য;
             }
         }
     }
-    return ret;
+    ফেরত ret;
 }
 
-bool Image2D::isFormatSupported(int depth, int cn, bool norm)
+যৌক্তিক Image2D::isFormatSupported(পূর্ণসংখ্যা depth, পূর্ণসংখ্যা cn, যৌক্তিক norm)
 {
     cl_image_format format = Impl::getImageFormat(depth, cn, norm);
 
-    return Impl::isFormatSupported(format);
+    ফেরত Impl::isFormatSupported(format);
 }
 
-Image2D::Image2D(const Image2D & i)
+Image2D::Image2D(ধ্রুবক Image2D & i)
 {
     p = i.p;
-    if (p)
+    যদি (p)
         p->addref();
 }
 
-Image2D & Image2D::operator = (const Image2D & i)
+Image2D & Image2D::operator = (ধ্রুবক Image2D & i)
 {
-    if (i.p != p)
+    যদি (i.p != p)
     {
-        if (i.p)
+        যদি (i.p)
             i.p->addref();
-        if (p)
+        যদি (p)
             p->release();
         p = i.p;
     }
-    return *this;
+    ফেরত *এই;
 }
 
 Image2D::Image2D(Image2D&& i) CV_NOEXCEPT
@@ -7577,120 +7577,120 @@ Image2D::Image2D(Image2D&& i) CV_NOEXCEPT
 
 Image2D& Image2D::operator = (Image2D&& i) CV_NOEXCEPT
 {
-    if (this != &i) {
-        if (p)
+    যদি (এই != &i) {
+        যদি (p)
             p->release();
         p = i.p;
         i.p = nullptr;
     }
-    return *this;
+    ফেরত *এই;
 }
 
 Image2D::~Image2D()
 {
-    if (p)
+    যদি (p)
         p->release();
 }
 
-void* Image2D::ptr() const
+শূন্য* Image2D::ptr() ধ্রুবক
 {
-    return p ? p->handle : 0;
+    ফেরত p ? p->handle : 0;
 }
 
-bool internal::isOpenCLForced()
+যৌক্তিক internal::isOpenCLForced()
 {
-    static bool initialized = false;
-    static bool value = false;
-    if (!initialized)
+    স্থির যৌক্তিক initialized = মিথ্যা;
+    স্থির যৌক্তিক value = মিথ্যা;
+    যদি (!initialized)
     {
-        value = utils::getConfigurationParameterBool("OPENCV_OPENCL_FORCE", false);
-        initialized = true;
+        value = utils::getConfigurationParameterBool("OPENCV_OPENCL_FORCE", মিথ্যা);
+        initialized = সত্য;
     }
-    return value;
+    ফেরত value;
 }
 
-bool internal::isPerformanceCheckBypassed()
+যৌক্তিক internal::isPerformanceCheckBypassed()
 {
-    static bool initialized = false;
-    static bool value = false;
-    if (!initialized)
+    স্থির যৌক্তিক initialized = মিথ্যা;
+    স্থির যৌক্তিক value = মিথ্যা;
+    যদি (!initialized)
     {
-        value = utils::getConfigurationParameterBool("OPENCV_OPENCL_PERF_CHECK_BYPASS", false);
-        initialized = true;
+        value = utils::getConfigurationParameterBool("OPENCV_OPENCL_PERF_CHECK_BYPASS", মিথ্যা);
+        initialized = সত্য;
     }
-    return value;
+    ফেরত value;
 }
 
-bool internal::isCLBuffer(UMat& u)
+যৌক্তিক internal::isCLBuffer(UMat& u)
 {
-    if (isCudaBacked(u.u))
-        return false;
-    void* h = u.handle(ACCESS_RW);
-    if (!h)
-        return true;
+    যদি (isCudaBacked(u.u))
+        ফেরত মিথ্যা;
+    শূন্য* h = u.handle(ACCESS_RW);
+    যদি (!h)
+        ফেরত সত্য;
     CV_DbgAssert(u.u->currAllocator == getOpenCLAllocator());
-#if 1
-    if ((u.u->allocatorFlags_ & 0xffff0000) != 0) // OpenCL SVM flags are stored here
-        return false;
-#else
+#যদি 1
+    যদি ((u.u->allocatorFlags_ & 0xffff0000) != 0) // OpenCL SVM flags are stored here
+        ফেরত মিথ্যা;
+#অন্যথা
     cl_mem_object_type type = 0;
-    cl_int ret = clGetMemObjectInfo((cl_mem)h, CL_MEM_TYPE, sizeof(type), &type, NULL);
-    if (ret != CL_SUCCESS || type != CL_MEM_OBJECT_BUFFER)
-        return false;
+    cl_int ret = clGetMemObjectInfo((cl_mem)h, CL_MEM_TYPE, আকার(type), &type, ফাঁকা);
+    যদি (ret != CL_SUCCESS || type != CL_MEM_OBJECT_বাফার)
+        ফেরত মিথ্যা;
 #endif
-    return true;
+    ফেরত সত্য;
 }
 
-struct Timer::Impl
+কাঠামো Timer::Impl
 {
-    const Queue queue;
+    ধ্রুবক Queue queue;
 
-    Impl(const Queue& q)
+    Impl(ধ্রুবক Queue& q)
         : queue(q)
     {
     }
 
     ~Impl(){}
 
-    void start()
+    শূন্য start()
     {
         CV_OCL_DBG_CHECK(clFinish((cl_command_queue)queue.ptr()));
         timer.start();
     }
 
-    void stop()
+    শূন্য stop()
     {
         CV_OCL_DBG_CHECK(clFinish((cl_command_queue)queue.ptr()));
         timer.stop();
     }
 
-    uint64 durationNS() const
+    uint64 durationNS() ধ্রুবক
     {
-        return (uint64)(timer.getTimeSec() * 1e9);
+        ফেরত (uint64)(timer.getTimeSec() * 1e9);
     }
 
     TickMeter timer;
 };
 
-Timer::Timer(const Queue& q) : p(new Impl(q)) { }
+Timer::Timer(ধ্রুবক Queue& q) : p(নতুন Impl(q)) { }
 Timer::~Timer() { delete p; }
 
-void Timer::start()
+শূন্য Timer::start()
 {
     CV_Assert(p);
     p->start();
 }
 
-void Timer::stop()
+শূন্য Timer::stop()
 {
     CV_Assert(p);
     p->stop();
 }
 
-uint64 Timer::durationNS() const
+uint64 Timer::durationNS() ধ্রুবক
 {
     CV_Assert(p);
-    return p->durationNS();
+    ফেরত p->durationNS();
 }
 
 }} // namespace

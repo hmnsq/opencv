@@ -2,365 +2,365 @@
 // It is subject to the license terms in the LICENSE file found in the top-level directory
 // of this distribution and at http://opencv.org/license.html.
 
-#include "precomp.hpp"
-#include "opencv2/core/async.hpp"
-#include "opencv2/core/detail/async_promise.hpp"
+#অন্তর্ভাব "precomp.hpp"
+#অন্তর্ভাব "opencv2/core/async.hpp"
+#অন্তর্ভাব "opencv2/core/detail/async_promise.hpp"
 
-#include "opencv2/core/cvstd.hpp"
+#অন্তর্ভাব "opencv2/core/cvstd.hpp"
 
-#include <opencv2/core/utils/logger.defines.hpp>
+#অন্তর্ভাব <opencv2/core/utils/logger.defines.hpp>
 #undef CV_LOG_STRIP_LEVEL
 #define CV_LOG_STRIP_LEVEL CV_LOG_LEVEL_DEBUG + 1
-#include <opencv2/core/utils/logger.hpp>
+#অন্তর্ভাব <opencv2/core/utils/logger.hpp>
 
 #ifndef OPENCV_DISABLE_THREAD_SUPPORT
 
-#include <mutex>
-#include <condition_variable>
-#include <chrono>
+#অন্তর্ভাব <mutex>
+#অন্তর্ভাব <condition_variable>
+#অন্তর্ভাব <chrono>
 
-namespace cv {
+নামাকাশ cv {
 
 /**
 Manages shared state of asynchronous result
 */
-struct AsyncArray::Impl
+কাঠামো AsyncArray::Impl
 {
-    int refcount;
-    void addrefFuture() CV_NOEXCEPT { CV_XADD(&refcount_future, 1); CV_XADD(&refcount, 1); } \
-    void releaseFuture() CV_NOEXCEPT { CV_XADD(&refcount_future, -1); if(1 == CV_XADD(&refcount, -1)) delete this; } \
-    int refcount_future;
-    void addrefPromise() CV_NOEXCEPT { CV_XADD(&refcount_promise, 1); CV_XADD(&refcount, 1); } \
-    void releasePromise() CV_NOEXCEPT { CV_XADD(&refcount_promise, -1); if(1 == CV_XADD(&refcount, -1)) delete this; } \
-    int refcount_promise;
+    পূর্ণসংখ্যা refcount;
+    শূন্য addrefFuture() CV_NOEXCEPT { CV_XADD(&refcount_future, 1); CV_XADD(&refcount, 1); } \
+    শূন্য releaseFuture() CV_NOEXCEPT { CV_XADD(&refcount_future, -1); যদি(1 == CV_XADD(&refcount, -1)) delete এই; } \
+    পূর্ণসংখ্যা refcount_future;
+    শূন্য addrefPromise() CV_NOEXCEPT { CV_XADD(&refcount_promise, 1); CV_XADD(&refcount, 1); } \
+    শূন্য releasePromise() CV_NOEXCEPT { CV_XADD(&refcount_promise, -1); যদি(1 == CV_XADD(&refcount, -1)) delete এই; } \
+    পূর্ণসংখ্যা refcount_promise;
 
     mutable std::mutex mtx;
     mutable std::condition_variable cond_var;
 
-    mutable bool has_result; // Mat, UMat or exception
+    mutable যৌক্তিক has_ফলাফল; // Mat, UMat or exception
 
-    mutable cv::Ptr<Mat> result_mat;
-    mutable cv::Ptr<UMat> result_umat;
+    mutable cv::Ptr<Mat> ফলাফল_mat;
+    mutable cv::Ptr<UMat> ফলাফল_umat;
 
 
-    bool has_exception;
-#if CV__EXCEPTION_PTR
+    যৌক্তিক has_exception;
+#যদি CV__EXCEPTION_PTR
     std::exception_ptr exception;
 #endif
     cv::Exception cv_exception;
 
-    mutable bool result_is_fetched;
+    mutable যৌক্তিক ফলাফল_is_fetched;
 
-    bool future_is_returned;
+    যৌক্তিক future_is_returned;
 
     Impl()
         : refcount(1), refcount_future(0), refcount_promise(1)
-        , has_result(false)
-        , has_exception(false)
-        , result_is_fetched(false)
-        , future_is_returned(false)
+        , has_ফলাফল(মিথ্যা)
+        , has_exception(মিথ্যা)
+        , ফলাফল_is_fetched(মিথ্যা)
+        , future_is_returned(মিথ্যা)
     {
         // nothing
     }
 
     ~Impl()
     {
-        if (has_result && !result_is_fetched)
+        যদি (has_ফলাফল && !ফলাফল_is_fetched)
         {
-            CV_LOG_INFO(NULL, "Asynchronous result has not been fetched");
+            CV_LOG_INFO(ফাঁকা, "Asynchronous result has not been fetched");
         }
     }
 
-    bool get(OutputArray dst, int64 timeoutNs) const
+    যৌক্তিক get(OutputArray dst, int64 timeoutNs) ধ্রুবক
     {
-        CV_Assert(!result_is_fetched);
-        if (!has_result)
+        CV_Assert(!ফলাফল_is_fetched);
+        যদি (!has_ফলাফল)
         {
-            if(refcount_promise == 0)
+            যদি(refcount_promise == 0)
                 CV_Error(Error::StsInternal, "Asynchronous result producer has been destroyed");
-            if (!wait_for(timeoutNs))
-                return false;
+            যদি (!wait_for(timeoutNs))
+                ফেরত মিথ্যা;
         }
         std::unique_lock<std::mutex> lock(mtx);
-        if (has_result)
+        যদি (has_ফলাফল)
         {
-            if (!result_mat.empty())
+            যদি (!ফলাফল_mat.empty())
             {
-                dst.move(*result_mat.get());
-                result_mat.release();
-                result_is_fetched = true;
-                return true;
+                dst.move(*ফলাফল_mat.get());
+                ফলাফল_mat.release();
+                ফলাফল_is_fetched = সত্য;
+                ফেরত সত্য;
             }
-            if (!result_umat.empty())
+            যদি (!ফলাফল_umat.empty())
             {
-                dst.move(*result_umat.get());
-                result_umat.release();
-                result_is_fetched = true;
-                return true;
+                dst.move(*ফলাফল_umat.get());
+                ফলাফল_umat.release();
+                ফলাফল_is_fetched = সত্য;
+                ফেরত সত্য;
             }
-#if CV__EXCEPTION_PTR
-            if (has_exception && exception)
+#যদি CV__EXCEPTION_PTR
+            যদি (has_exception && exception)
             {
-                result_is_fetched = true;
+                ফলাফল_is_fetched = সত্য;
                 std::rethrow_exception(exception);
             }
 #endif
-            if (has_exception)
+            যদি (has_exception)
             {
-                result_is_fetched = true;
-                throw cv_exception;
+                ফলাফল_is_fetched = সত্য;
+                ছোড়ো cv_exception;
             }
             CV_Error(Error::StsInternal, "AsyncArray: invalid state of 'has_result = true'");
         }
-        CV_Assert(!has_result);
+        CV_Assert(!has_ফলাফল);
         CV_Assert(timeoutNs < 0);
-        return false;
+        ফেরত মিথ্যা;
     }
 
-    bool valid() const CV_NOEXCEPT
+    যৌক্তিক valid() ধ্রুবক CV_NOEXCEPT
     {
-        if (result_is_fetched)
-            return false;
-        if (refcount_promise == 0 && !has_result)
-            return false;
-        return true;
+        যদি (ফলাফল_is_fetched)
+            ফেরত মিথ্যা;
+        যদি (refcount_promise == 0 && !has_ফলাফল)
+            ফেরত মিথ্যা;
+        ফেরত সত্য;
     }
 
-    bool wait_for(int64 timeoutNs) const
+    যৌক্তিক wait_for(int64 timeoutNs) ধ্রুবক
     {
         CV_Assert(valid());
-        if (has_result)
-            return has_result;
-        if (timeoutNs == 0)
-            return has_result;
-        CV_LOG_INFO(NULL, "Waiting for async result ...");
+        যদি (has_ফলাফল)
+            ফেরত has_ফলাফল;
+        যদি (timeoutNs == 0)
+            ফেরত has_ফলাফল;
+        CV_LOG_INFO(ফাঁকা, "Waiting for async result ...");
         std::unique_lock<std::mutex> lock(mtx);
-        const auto cond_pred = [&]{ return has_result == true; };
-        if (timeoutNs > 0)
-            return cond_var.wait_for(lock, std::chrono::nanoseconds(timeoutNs), cond_pred);
-        else
+        ধ্রুবক auto cond_pred = [&]{ ফেরত has_ফলাফল == সত্য; };
+        যদি (timeoutNs > 0)
+            ফেরত cond_var.wait_for(lock, std::chrono::nanoseconds(timeoutNs), cond_pred);
+        অন্যথা
         {
             cond_var.wait(lock, cond_pred);
-            CV_Assert(has_result);
-            return true;
+            CV_Assert(has_ফলাফল);
+            ফেরত সত্য;
         }
     }
 
-    AsyncArray getArrayResult()
+    AsyncArray get_Array_ফলাফল()
     {
         CV_Assert(refcount_future == 0);
-        AsyncArray result;
+        AsyncArray ফলাফল;
         addrefFuture();
-        result.p = this;
-        future_is_returned = true;
-        return result;
+        ফলাফল.p = এই;
+        future_is_returned = সত্য;
+        ফেরত ফলাফল;
     }
 
-    void setValue(InputArray value)
+    শূন্য set_মান(প্রবেশ_Array value)
     {
-        if (future_is_returned && refcount_future == 0)
+        যদি (future_is_returned && refcount_future == 0)
             CV_Error(Error::StsError, "Associated AsyncArray has been destroyed");
         std::unique_lock<std::mutex> lock(mtx);
-        CV_Assert(!has_result);
-        int k = value.kind();
-        if (k == _InputArray::UMAT)
+        CV_Assert(!has_ফলাফল);
+        পূর্ণসংখ্যা k = value.kind();
+        যদি (k == প্রবেশ_Array_2::UMAT)
         {
-            result_umat = makePtr<UMat>();
-            value.copyTo(*result_umat.get());
+            ফলাফল_umat = makePtr<UMat>();
+            value.copyTo(*ফলাফল_umat.get());
         }
-        else
+        অন্যথা
         {
-            result_mat = makePtr<Mat>();
-            value.copyTo(*result_mat.get());
+            ফলাফল_mat = makePtr<Mat>();
+            value.copyTo(*ফলাফল_mat.get());
         }
-        has_result = true;
+        has_ফলাফল = সত্য;
         cond_var.notify_all();
     }
 
-#if CV__EXCEPTION_PTR
-    void setException(std::exception_ptr e)
+#যদি CV__EXCEPTION_PTR
+    শূন্য setException(std::exception_ptr e)
     {
-        if (future_is_returned && refcount_future == 0)
+        যদি (future_is_returned && refcount_future == 0)
             CV_Error(Error::StsError, "Associated AsyncArray has been destroyed");
         std::unique_lock<std::mutex> lock(mtx);
-        CV_Assert(!has_result);
-        has_exception = true;
+        CV_Assert(!has_ফলাফল);
+        has_exception = সত্য;
         exception = e;
-        has_result = true;
+        has_ফলাফল = সত্য;
         cond_var.notify_all();
     }
 #endif
 
-    void setException(const cv::Exception e)
+    শূন্য setException(ধ্রুবক cv::Exception e)
     {
-        if (future_is_returned && refcount_future == 0)
+        যদি (future_is_returned && refcount_future == 0)
             CV_Error(Error::StsError, "Associated AsyncArray has been destroyed");
         std::unique_lock<std::mutex> lock(mtx);
-        CV_Assert(!has_result);
-        has_exception = true;
+        CV_Assert(!has_ফলাফল);
+        has_exception = সত্য;
         cv_exception = e;
-        has_result = true;
+        has_ফলাফল = সত্য;
         cond_var.notify_all();
     }
 };
 
 }  // namespace
 
-#else  // OPENCV_DISABLE_THREAD_SUPPORT
+#অন্যথা  // OPENCV_DISABLE_THREAD_SUPPORT
 
-namespace cv {
+নামাকাশ cv {
 
 // no threading
-struct AsyncArray::Impl
+কাঠামো AsyncArray::Impl
 {
-    int refcount;
-    void addrefFuture() CV_NOEXCEPT { refcount_future++; refcount++; }
-    void releaseFuture() CV_NOEXCEPT { refcount_future--; if (0 == --refcount) delete this; }
-    int refcount_future;
-    void addrefPromise() CV_NOEXCEPT { refcount_promise++; refcount++; } \
-    void releasePromise() CV_NOEXCEPT { refcount_promise--; if (0 == --refcount) delete this; }
-    int refcount_promise;
+    পূর্ণসংখ্যা refcount;
+    শূন্য addrefFuture() CV_NOEXCEPT { refcount_future++; refcount++; }
+    শূন্য releaseFuture() CV_NOEXCEPT { refcount_future--; যদি (0 == --refcount) delete এই; }
+    পূর্ণসংখ্যা refcount_future;
+    শূন্য addrefPromise() CV_NOEXCEPT { refcount_promise++; refcount++; } \
+    শূন্য releasePromise() CV_NOEXCEPT { refcount_promise--; যদি (0 == --refcount) delete এই; }
+    পূর্ণসংখ্যা refcount_promise;
 
-    mutable bool has_result; // Mat, UMat or exception
+    mutable যৌক্তিক has_ফলাফল; // Mat, UMat or exception
 
-    mutable cv::Ptr<Mat> result_mat;
-    mutable cv::Ptr<UMat> result_umat;
+    mutable cv::Ptr<Mat> ফলাফল_mat;
+    mutable cv::Ptr<UMat> ফলাফল_umat;
 
 
-    bool has_exception;
-#if CV__EXCEPTION_PTR
+    যৌক্তিক has_exception;
+#যদি CV__EXCEPTION_PTR
     std::exception_ptr exception;
 #endif
     cv::Exception cv_exception;
 
-    mutable bool result_is_fetched;
+    mutable যৌক্তিক ফলাফল_is_fetched;
 
-    bool future_is_returned;
+    যৌক্তিক future_is_returned;
 
     Impl()
         : refcount(1), refcount_future(0), refcount_promise(1)
-        , has_result(false)
-        , has_exception(false)
-        , result_is_fetched(false)
-        , future_is_returned(false)
+        , has_ফলাফল(মিথ্যা)
+        , has_exception(মিথ্যা)
+        , ফলাফল_is_fetched(মিথ্যা)
+        , future_is_returned(মিথ্যা)
     {
         // nothing
     }
 
     ~Impl()
     {
-        if (has_result && !result_is_fetched)
+        যদি (has_ফলাফল && !ফলাফল_is_fetched)
         {
-            CV_LOG_INFO(NULL, "Asynchronous result has not been fetched");
+            CV_LOG_INFO(ফাঁকা, "Asynchronous result has not been fetched");
         }
     }
 
-    bool get(OutputArray dst, int64 timeoutNs) const
+    যৌক্তিক get(OutputArray dst, int64 timeoutNs) ধ্রুবক
     {
-        CV_Assert(!result_is_fetched);
-        if (!has_result)
+        CV_Assert(!ফলাফল_is_fetched);
+        যদি (!has_ফলাফল)
         {
             CV_UNUSED(timeoutNs);
             CV_Error(Error::StsError, "Result is not produced (unable to wait for result in OPENCV_DISABLE_THREAD_SUPPORT mode)");
         }
-        if (!result_mat.empty())
+        যদি (!ফলাফল_mat.empty())
         {
-            dst.move(*result_mat.get());
-            result_mat.release();
-            result_is_fetched = true;
-            return true;
+            dst.move(*ফলাফল_mat.get());
+            ফলাফল_mat.release();
+            ফলাফল_is_fetched = সত্য;
+            ফেরত সত্য;
         }
-        if (!result_umat.empty())
+        যদি (!ফলাফল_umat.empty())
         {
-            dst.move(*result_umat.get());
-            result_umat.release();
-            result_is_fetched = true;
-            return true;
+            dst.move(*ফলাফল_umat.get());
+            ফলাফল_umat.release();
+            ফলাফল_is_fetched = সত্য;
+            ফেরত সত্য;
         }
-#if CV__EXCEPTION_PTR
-        if (has_exception && exception)
+#যদি CV__EXCEPTION_PTR
+        যদি (has_exception && exception)
         {
-            result_is_fetched = true;
+            ফলাফল_is_fetched = সত্য;
             std::rethrow_exception(exception);
         }
 #endif
-        if (has_exception)
+        যদি (has_exception)
         {
-            result_is_fetched = true;
-            throw cv_exception;
+            ফলাফল_is_fetched = সত্য;
+            ছোড়ো cv_exception;
         }
         CV_Error(Error::StsInternal, "AsyncArray: invalid state of 'has_result = true'");
-        return false;
+        ফেরত মিথ্যা;
     }
 
-    bool valid() const CV_NOEXCEPT
+    যৌক্তিক valid() ধ্রুবক CV_NOEXCEPT
     {
-        if (result_is_fetched)
-            return false;
-        if (refcount_promise == 0 && !has_result)
-            return false;
-        return true;
+        যদি (ফলাফল_is_fetched)
+            ফেরত মিথ্যা;
+        যদি (refcount_promise == 0 && !has_ফলাফল)
+            ফেরত মিথ্যা;
+        ফেরত সত্য;
     }
 
-    bool wait_for(int64 timeoutNs) const
+    যৌক্তিক wait_for(int64 timeoutNs) ধ্রুবক
     {
         CV_Assert(valid());
-        if (has_result)
-            return has_result;
-        if (timeoutNs == 0)
-            return has_result;
+        যদি (has_ফলাফল)
+            ফেরত has_ফলাফল;
+        যদি (timeoutNs == 0)
+            ফেরত has_ফলাফল;
         CV_Error(Error::StsError, "Unable to wait in OPENCV_DISABLE_THREAD_SUPPORT mode");
     }
 
-    AsyncArray getArrayResult()
+    AsyncArray get_Array_ফলাফল()
     {
         CV_Assert(refcount_future == 0);
-        AsyncArray result;
+        AsyncArray ফলাফল;
         addrefFuture();
-        result.p = this;
-        future_is_returned = true;
-        return result;
+        ফলাফল.p = এই;
+        future_is_returned = সত্য;
+        ফেরত ফলাফল;
     }
 
-    void setValue(InputArray value)
+    শূন্য set_মান(প্রবেশ_Array value)
     {
-        if (future_is_returned && refcount_future == 0)
+        যদি (future_is_returned && refcount_future == 0)
             CV_Error(Error::StsError, "Associated AsyncArray has been destroyed");
-        CV_Assert(!has_result);
-        int k = value.kind();
-        if (k == _InputArray::UMAT)
+        CV_Assert(!has_ফলাফল);
+        পূর্ণসংখ্যা k = value.kind();
+        যদি (k == প্রবেশ_Array_2::UMAT)
         {
-            result_umat = makePtr<UMat>();
-            value.copyTo(*result_umat.get());
+            ফলাফল_umat = makePtr<UMat>();
+            value.copyTo(*ফলাফল_umat.get());
         }
-        else
+        অন্যথা
         {
-            result_mat = makePtr<Mat>();
-            value.copyTo(*result_mat.get());
+            ফলাফল_mat = makePtr<Mat>();
+            value.copyTo(*ফলাফল_mat.get());
         }
-        has_result = true;
+        has_ফলাফল = সত্য;
     }
 
-#if CV__EXCEPTION_PTR
-    void setException(std::exception_ptr e)
+#যদি CV__EXCEPTION_PTR
+    শূন্য setException(std::exception_ptr e)
     {
-        if (future_is_returned && refcount_future == 0)
+        যদি (future_is_returned && refcount_future == 0)
             CV_Error(Error::StsError, "Associated AsyncArray has been destroyed");
-        CV_Assert(!has_result);
-        has_exception = true;
+        CV_Assert(!has_ফলাফল);
+        has_exception = সত্য;
         exception = e;
-        has_result = true;
+        has_ফলাফল = সত্য;
     }
 #endif
 
-    void setException(const cv::Exception e)
+    শূন্য setException(ধ্রুবক cv::Exception e)
     {
-        if (future_is_returned && refcount_future == 0)
+        যদি (future_is_returned && refcount_future == 0)
             CV_Error(Error::StsError, "Associated AsyncArray has been destroyed");
-        CV_Assert(!has_result);
-        has_exception = true;
+        CV_Assert(!has_ফলাফল);
+        has_exception = সত্য;
         cv_exception = e;
-        has_result = true;
+        has_ফলাফল = সত্য;
     }
 };
 
@@ -368,10 +368,10 @@ struct AsyncArray::Impl
 
 #endif  // OPENCV_DISABLE_THREAD_SUPPORT
 
-namespace cv {
+নামাকাশ cv {
 
 AsyncArray::AsyncArray() CV_NOEXCEPT
-    : p(NULL)
+    : p(ফাঁকা)
 {
 }
 
@@ -380,54 +380,54 @@ AsyncArray::~AsyncArray() CV_NOEXCEPT
     release();
 }
 
-AsyncArray::AsyncArray(const AsyncArray& o) CV_NOEXCEPT
+AsyncArray::AsyncArray(ধ্রুবক AsyncArray& o) CV_NOEXCEPT
     : p(o.p)
 {
-    if (p)
+    যদি (p)
         p->addrefFuture();
 }
 
-AsyncArray& AsyncArray::operator=(const AsyncArray& o) CV_NOEXCEPT
+AsyncArray& AsyncArray::operator=(ধ্রুবক AsyncArray& o) CV_NOEXCEPT
 {
     Impl* newp = o.p;
-    if (newp)
+    যদি (newp)
         newp->addrefFuture();
     release();
     p = newp;
-    return *this;
+    ফেরত *এই;
 }
 
-void AsyncArray::release() CV_NOEXCEPT
+শূন্য AsyncArray::release() CV_NOEXCEPT
 {
     Impl* impl = p;
-    p = NULL;
-    if (impl)
+    p = ফাঁকা;
+    যদি (impl)
         impl->releaseFuture();
 }
 
-bool AsyncArray::get(OutputArray dst, int64 timeoutNs) const
+যৌক্তিক AsyncArray::get(OutputArray dst, int64 timeoutNs) ধ্রুবক
 {
     CV_Assert(p);
-    return p->get(dst, timeoutNs);
+    ফেরত p->get(dst, timeoutNs);
 }
 
-void AsyncArray::get(OutputArray dst) const
+শূন্য AsyncArray::get(OutputArray dst) ধ্রুবক
 {
     CV_Assert(p);
-    bool res = p->get(dst, -1);
+    যৌক্তিক res = p->get(dst, -1);
     CV_Assert(res);
 }
 
-bool AsyncArray::wait_for(int64 timeoutNs) const
+যৌক্তিক AsyncArray::wait_for(int64 timeoutNs) ধ্রুবক
 {
     CV_Assert(p);
-    return p->wait_for(timeoutNs);
+    ফেরত p->wait_for(timeoutNs);
 }
 
-bool AsyncArray::valid() const CV_NOEXCEPT
+যৌক্তিক AsyncArray::valid() ধ্রুবক CV_NOEXCEPT
 {
-    if (!p) return false;
-    return p->valid();
+    যদি (!p) ফেরত মিথ্যা;
+    ফেরত p->valid();
 }
 
 
@@ -436,7 +436,7 @@ bool AsyncArray::valid() const CV_NOEXCEPT
 //
 
 AsyncPromise::AsyncPromise() CV_NOEXCEPT
-    : p(new AsyncArray::Impl())
+    : p(নতুন AsyncArray::Impl())
 {
 }
 
@@ -445,54 +445,54 @@ AsyncPromise::~AsyncPromise() CV_NOEXCEPT
     release();
 }
 
-AsyncPromise::AsyncPromise(const AsyncPromise& o) CV_NOEXCEPT
+AsyncPromise::AsyncPromise(ধ্রুবক AsyncPromise& o) CV_NOEXCEPT
     : p(o.p)
 {
-    if (p)
+    যদি (p)
         p->addrefPromise();
 }
 
-AsyncPromise& AsyncPromise::operator=(const AsyncPromise& o) CV_NOEXCEPT
+AsyncPromise& AsyncPromise::operator=(ধ্রুবক AsyncPromise& o) CV_NOEXCEPT
 {
     Impl* newp = o.p;
-    if (newp)
+    যদি (newp)
         newp->addrefPromise();
     release();
     p = newp;
-    return *this;
+    ফেরত *এই;
 }
 
-void AsyncPromise::release() CV_NOEXCEPT
+শূন্য AsyncPromise::release() CV_NOEXCEPT
 {
     Impl* impl = p;
-    p = NULL;
-    if (impl)
+    p = ফাঁকা;
+    যদি (impl)
         impl->releasePromise();
 }
 
-AsyncArray AsyncPromise::getArrayResult()
+AsyncArray AsyncPromise::get_Array_ফলাফল()
 {
     CV_Assert(p);
-    return p->getArrayResult();
+    ফেরত p->get_Array_ফলাফল();
 }
 
-void AsyncPromise::setValue(InputArray value)
+শূন্য AsyncPromise::set_মান(প্রবেশ_Array value)
 {
     CV_Assert(p);
-    return p->setValue(value);
+    ফেরত p->set_মান(value);
 }
 
-void AsyncPromise::setException(const cv::Exception& exception)
+শূন্য AsyncPromise::setException(ধ্রুবক cv::Exception& exception)
 {
     CV_Assert(p);
-    return p->setException(exception);
+    ফেরত p->setException(exception);
 }
 
-#if CV__EXCEPTION_PTR
-void AsyncPromise::setException(std::exception_ptr exception)
+#যদি CV__EXCEPTION_PTR
+শূন্য AsyncPromise::setException(std::exception_ptr exception)
 {
     CV_Assert(p);
-    return p->setException(exception);
+    ফেরত p->setException(exception);
 }
 #endif
 

@@ -2,9 +2,9 @@
 // It is subject to the license terms in the LICENSE file found in the top-level directory
 // of this distribution and at http://opencv.org/license.html
 
-#include "precomp.hpp"
-#include "opencv2/core/mat.hpp"
-#include "opencl_kernels_core.hpp"
+#অন্তর্ভাব "precomp.hpp"
+#অন্তর্ভাব "opencv2/core/mat.hpp"
+#অন্তর্ভাব "opencl_kernels_core.hpp"
 
 #define IPP_DISABLE_REDUCE 1
 #define IPP_DISABLE_SORT   0
@@ -13,13 +13,13 @@
                                         Matrix Operations
 \*************************************************************************************************/
 
-void cv::swap( Mat& a, Mat& b )
+শূন্য cv::swap( Mat& a, Mat& b )
 {
     std::swap(a.flags, b.flags);
     std::swap(a.dims, b.dims);
     std::swap(a.rows, b.rows);
     std::swap(a.cols, b.cols);
-    std::swap(a.data, b.data);
+    std::swap(a.তথ্য, b.তথ্য);
     std::swap(a.datastart, b.datastart);
     std::swap(a.dataend, b.dataend);
     std::swap(a.datalimit, b.datalimit);
@@ -31,27 +31,27 @@ void cv::swap( Mat& a, Mat& b )
 }
 
 
-void cv::hconcat(const Mat* src, size_t nsrc, OutputArray _dst)
+শূন্য cv::hconcat(ধ্রুবক Mat* src, size_t nsrc, OutputArray _dst)
 {
     CV_INSTRUMENT_REGION();
 
-    if( nsrc == 0 || !src )
+    যদি( nsrc == 0 || !src )
     {
         _dst.release();
-        return;
+        ফেরত;
     }
 
-    int totalCols = 0, cols = 0;
-    for( size_t i = 0; i < nsrc; i++ )
+    পূর্ণসংখ্যা যোগ_Cols = 0, cols = 0;
+    জন্য( size_t i = 0; i < nsrc; i++ )
     {
         CV_Assert( src[i].dims <= 2 &&
                    src[i].rows == src[0].rows &&
                    src[i].type() == src[0].type());
-        totalCols += src[i].cols;
+        যোগ_Cols += src[i].cols;
     }
-    _dst.create( src[0].rows, totalCols, src[0].type());
+    _dst.create( src[0].rows, যোগ_Cols, src[0].type());
     Mat dst = _dst.getMat();
-    for( size_t i = 0; i < nsrc; i++ )
+    জন্য( size_t i = 0; i < nsrc; i++ )
     {
         Mat dpart = dst(Rect(cols, 0, src[i].cols, src[i].rows));
         src[i].copyTo(dpart);
@@ -59,7 +59,7 @@ void cv::hconcat(const Mat* src, size_t nsrc, OutputArray _dst)
     }
 }
 
-void cv::hconcat(InputArray src1, InputArray src2, OutputArray dst)
+শূন্য cv::hconcat(প্রবেশ_Array src1, প্রবেশ_Array src2, OutputArray dst)
 {
     CV_INSTRUMENT_REGION();
 
@@ -67,7 +67,7 @@ void cv::hconcat(InputArray src1, InputArray src2, OutputArray dst)
     hconcat(src, 2, dst);
 }
 
-void cv::hconcat(InputArray _src, OutputArray dst)
+শূন্য cv::hconcat(প্রবেশ_Array _src, OutputArray dst)
 {
     CV_INSTRUMENT_REGION();
 
@@ -76,27 +76,27 @@ void cv::hconcat(InputArray _src, OutputArray dst)
     hconcat(!src.empty() ? &src[0] : nullptr, src.size(), dst);
 }
 
-void cv::vconcat(const Mat* src, size_t nsrc, OutputArray _dst)
+শূন্য cv::vconcat(ধ্রুবক Mat* src, size_t nsrc, OutputArray _dst)
 {
     CV_TRACE_FUNCTION_SKIP_NESTED()
 
-    if( nsrc == 0 || !src )
+    যদি( nsrc == 0 || !src )
     {
         _dst.release();
-        return;
+        ফেরত;
     }
 
-    int totalRows = 0, rows = 0;
-    for( size_t i = 0; i < nsrc; i++ )
+    পূর্ণসংখ্যা যোগ_Rows = 0, rows = 0;
+    জন্য( size_t i = 0; i < nsrc; i++ )
     {
         CV_Assert(src[i].dims <= 2 &&
                   src[i].cols == src[0].cols &&
                   src[i].type() == src[0].type());
-        totalRows += src[i].rows;
+        যোগ_Rows += src[i].rows;
     }
-    _dst.create( totalRows, src[0].cols, src[0].type());
+    _dst.create( যোগ_Rows, src[0].cols, src[0].type());
     Mat dst = _dst.getMat();
-    for( size_t i = 0; i < nsrc; i++ )
+    জন্য( size_t i = 0; i < nsrc; i++ )
     {
         Mat dpart(dst, Rect(0, rows, src[i].cols, src[i].rows));
         src[i].copyTo(dpart);
@@ -104,7 +104,7 @@ void cv::vconcat(const Mat* src, size_t nsrc, OutputArray _dst)
     }
 }
 
-void cv::vconcat(InputArray src1, InputArray src2, OutputArray dst)
+শূন্য cv::vconcat(প্রবেশ_Array src1, প্রবেশ_Array src2, OutputArray dst)
 {
     CV_INSTRUMENT_REGION();
 
@@ -112,7 +112,7 @@ void cv::vconcat(InputArray src1, InputArray src2, OutputArray dst)
     vconcat(src, 2, dst);
 }
 
-void cv::vconcat(InputArray _src, OutputArray dst)
+শূন্য cv::vconcat(প্রবেশ_Array _src, OutputArray dst)
 {
     CV_INSTRUMENT_REGION();
 
@@ -125,19 +125,19 @@ void cv::vconcat(InputArray _src, OutputArray dst)
 
 #ifdef HAVE_OPENCL
 
-namespace cv {
+নামাকাশ cv {
 
-static bool ocl_setIdentity( InputOutputArray _m, const Scalar& s )
+স্থির যৌক্তিক ocl_setIdentity( প্রবেশ_Output_Array _m, ধ্রুবক Scalar& s )
 {
-    int type = _m.type(), depth = CV_MAT_DEPTH(type), cn = CV_MAT_CN(type), kercn = cn, rowsPerWI = 1;
-    int sctype = CV_MAKE_TYPE(depth, cn == 3 ? 4 : cn);
-    if (ocl::Device::getDefault().isIntel())
+    পূর্ণসংখ্যা type = _m.type(), depth = CV_MAT_DEPTH(type), cn = CV_MAT_CN(type), kercn = cn, rowsPerWI = 1;
+    পূর্ণসংখ্যা sctype = CV_MAKE_TYPE(depth, cn == 3 ? 4 : cn);
+    যদি (ocl::Device::getDefault().isIntel())
     {
         rowsPerWI = 4;
-        if (cn == 1)
+        যদি (cn == 1)
         {
             kercn = std::min(ocl::predictOptimalVectorWidth(_m), 4);
-            if (kercn != 4)
+            যদি (kercn != 4)
                 kercn = 1;
         }
     }
@@ -148,22 +148,22 @@ static bool ocl_setIdentity( InputOutputArray _m, const Scalar& s )
                          ocl::memopTypeToStr(depth), cn,
                          ocl::memopTypeToStr(sctype),
                          kercn, rowsPerWI));
-    if (k.empty())
-        return false;
+    যদি (k.empty())
+        ফেরত মিথ্যা;
 
     UMat m = _m.getUMat();
     k.args(ocl::KernelArg::WriteOnly(m, cn, kercn),
            ocl::KernelArg::Constant(Mat(1, 1, sctype, s)));
 
     size_t globalsize[2] = { (size_t)m.cols * cn / kercn, ((size_t)m.rows + rowsPerWI - 1) / rowsPerWI };
-    return k.run(2, globalsize, nullptr, false);
+    ফেরত k.run(2, globalsize, nullptr, মিথ্যা);
 }
 
 }
 
 #endif
 
-void cv::setIdentity( InputOutputArray _m, const Scalar& s )
+শূন্য cv::setIdentity( প্রবেশ_Output_Array _m, ধ্রুবক Scalar& s )
 {
     CV_INSTRUMENT_REGION();
 
@@ -173,36 +173,36 @@ void cv::setIdentity( InputOutputArray _m, const Scalar& s )
                ocl_setIdentity(_m, s))
 
     Mat m = _m.getMat();
-    int rows = m.rows, cols = m.cols, type = m.type();
+    পূর্ণসংখ্যা rows = m.rows, cols = m.cols, type = m.type();
 
-    if( type == CV_32FC1 )
+    যদি( type == CV_32FC1 )
     {
-        float* data = m.ptr<float>();
-        float val = (float)s[0];
-        size_t step = m.step/sizeof(data[0]);
+        দশমিক* তথ্য = m.ptr<দশমিক>();
+        দশমিক val = (দশমিক)s[0];
+        size_t step = m.step/আকার(তথ্য[0]);
 
-        for( int i = 0; i < rows; i++, data += step )
+        জন্য( পূর্ণসংখ্যা i = 0; i < rows; i++, তথ্য += step )
         {
-            for( int j = 0; j < cols; j++ )
-                data[j] = 0;
-            if( i < cols )
-                data[i] = val;
+            জন্য( পূর্ণসংখ্যা j = 0; j < cols; j++ )
+                তথ্য[j] = 0;
+            যদি( i < cols )
+                তথ্য[i] = val;
         }
     }
-    else if( type == CV_64FC1 )
+    অন্যথা যদি( type == CV_64FC1 )
     {
-        double* data = m.ptr<double>();
-        double val = s[0];
-        size_t step = m.step/sizeof(data[0]);
+        দ্বিগুণ* তথ্য = m.ptr<দ্বিগুণ>();
+        দ্বিগুণ val = s[0];
+        size_t step = m.step/আকার(তথ্য[0]);
 
-        for( int i = 0; i < rows; i++, data += step )
+        জন্য( পূর্ণসংখ্যা i = 0; i < rows; i++, তথ্য += step )
         {
-            std::fill(data, data + cols, 0.0);
-            if (i < cols)
-                data[i] = val;
+            std::fill(তথ্য, তথ্য + cols, 0.0);
+            যদি (i < cols)
+                তথ্য[i] = val;
         }
     }
-    else
+    অন্যথা
     {
         m = Scalar(0);
         m.diag() = s;
@@ -210,162 +210,162 @@ void cv::setIdentity( InputOutputArray _m, const Scalar& s )
 }
 
 
-namespace cv {
+নামাকাশ cv {
 
-UMat UMat::eye(int rows, int cols, int type, UMatUsageFlags usageFlags)
+UMat UMat::eye(পূর্ণসংখ্যা rows, পূর্ণসংখ্যা cols, পূর্ণসংখ্যা type, UMatUsageFlags usageFlags)
 {
-    return UMat::eye(Size(cols, rows), type, usageFlags);
+    ফেরত UMat::eye(আকার_2(cols, rows), type, usageFlags);
 }
 
-UMat UMat::eye(Size size, int type, UMatUsageFlags usageFlags)
+UMat UMat::eye(আকার_2 size, পূর্ণসংখ্যা type, UMatUsageFlags usageFlags)
 {
     UMat m(size, type, usageFlags);
     setIdentity(m);
-    return m;
+    ফেরত m;
 }
 
 }  // namespace
 
 //////////////////////////////////////////// trace ///////////////////////////////////////////
 
-cv::Scalar cv::trace( InputArray _m )
+cv::Scalar cv::trace( প্রবেশ_Array _m )
 {
     CV_INSTRUMENT_REGION();
 
     Mat m = _m.getMat();
     CV_Assert( m.dims <= 2 );
-    int type = m.type();
-    int nm = std::min(m.rows, m.cols);
+    পূর্ণসংখ্যা type = m.type();
+    পূর্ণসংখ্যা nm = std::min(m.rows, m.cols);
 
-    if( type == CV_32FC1 )
+    যদি( type == CV_32FC1 )
     {
-        const float* ptr = m.ptr<float>();
-        size_t step = m.step/sizeof(ptr[0]) + 1;
-        double _s = 0;
-        for( int i = 0; i < nm; i++ )
+        ধ্রুবক দশমিক* ptr = m.ptr<দশমিক>();
+        size_t step = m.step/আকার(ptr[0]) + 1;
+        দ্বিগুণ _s = 0;
+        জন্য( পূর্ণসংখ্যা i = 0; i < nm; i++ )
             _s += ptr[i*step];
-        return _s;
+        ফেরত _s;
     }
 
-    if( type == CV_64FC1 )
+    যদি( type == CV_64FC1 )
     {
-        const double* ptr = m.ptr<double>();
-        size_t step = m.step/sizeof(ptr[0]) + 1;
-        double _s = 0;
-        for( int i = 0; i < nm; i++ )
+        ধ্রুবক দ্বিগুণ* ptr = m.ptr<দ্বিগুণ>();
+        size_t step = m.step/আকার(ptr[0]) + 1;
+        দ্বিগুণ _s = 0;
+        জন্য( পূর্ণসংখ্যা i = 0; i < nm; i++ )
             _s += ptr[i*step];
-        return _s;
+        ফেরত _s;
     }
 
-    return cv::sum(m.diag());
+    ফেরত cv::যোগ_2(m.diag());
 }
 
 
 ////////////////////////////////////// completeSymm /////////////////////////////////////////
 
-void cv::completeSymm( InputOutputArray _m, bool LtoR )
+শূন্য cv::completeSymm( প্রবেশ_Output_Array _m, যৌক্তিক LtoR )
 {
     CV_INSTRUMENT_REGION();
 
     Mat m = _m.getMat();
-    size_t step = m.step, esz = m.elemSize();
+    size_t step = m.step, esz = m.elem_আকার();
     CV_Assert( m.dims <= 2 && m.rows == m.cols );
 
-    int rows = m.rows;
-    int j0 = 0, j1 = rows;
+    পূর্ণসংখ্যা rows = m.rows;
+    পূর্ণসংখ্যা j0 = 0, j1 = rows;
 
-    uchar* data = m.ptr();
-    for( int i = 0; i < rows; i++ )
+    uchar* তথ্য = m.ptr();
+    জন্য( পূর্ণসংখ্যা i = 0; i < rows; i++ )
     {
-        if( !LtoR ) j1 = i; else j0 = i+1;
-        for( int j = j0; j < j1; j++ )
-            memcpy(data + (i*step + j*esz), data + (j*step + i*esz), esz);
+        যদি( !LtoR ) j1 = i; অন্যথা j0 = i+1;
+        জন্য( পূর্ণসংখ্যা j = j0; j < j1; j++ )
+            memcpy(তথ্য + (i*step + j*esz), তথ্য + (j*step + i*esz), esz);
     }
 }
 
 
-cv::Mat cv::Mat::cross(InputArray _m) const
+cv::Mat cv::Mat::cross(প্রবেশ_Array _m) ধ্রুবক
 {
     Mat m = _m.getMat();
-    int tp = type(), d = CV_MAT_DEPTH(tp);
+    পূর্ণসংখ্যা tp = type(), d = CV_MAT_DEPTH(tp);
     CV_Assert( dims <= 2 && m.dims <= 2 && size() == m.size() && tp == m.type() &&
         ((rows == 3 && cols == 1) || (cols*channels() == 3 && rows == 1)));
-    Mat result(rows, cols, tp);
+    Mat ফলাফল(rows, cols, tp);
 
-    if( d == CV_32F )
+    যদি( d == CV_32F )
     {
-        const float *a = (const float*)data, *b = (const float*)m.data;
-        float* c = (float*)result.data;
-        size_t lda = rows > 1 ? step/sizeof(a[0]) : 1;
-        size_t ldb = rows > 1 ? m.step/sizeof(b[0]) : 1;
+        ধ্রুবক দশমিক *a = (ধ্রুবক দশমিক*)তথ্য, *b = (ধ্রুবক দশমিক*)m.তথ্য;
+        দশমিক* c = (দশমিক*)ফলাফল.তথ্য;
+        size_t lda = rows > 1 ? step/আকার(a[0]) : 1;
+        size_t ldb = rows > 1 ? m.step/আকার(b[0]) : 1;
 
         c[0] = a[lda] * b[ldb*2] - a[lda*2] * b[ldb];
         c[1] = a[lda*2] * b[0] - a[0] * b[ldb*2];
         c[2] = a[0] * b[ldb] - a[lda] * b[0];
     }
-    else if( d == CV_64F )
+    অন্যথা যদি( d == CV_64F )
     {
-        const double *a = (const double*)data, *b = (const double*)m.data;
-        double* c = (double*)result.data;
-        size_t lda = rows > 1 ? step/sizeof(a[0]) : 1;
-        size_t ldb = rows > 1 ? m.step/sizeof(b[0]) : 1;
+        ধ্রুবক দ্বিগুণ *a = (ধ্রুবক দ্বিগুণ*)তথ্য, *b = (ধ্রুবক দ্বিগুণ*)m.তথ্য;
+        দ্বিগুণ* c = (দ্বিগুণ*)ফলাফল.তথ্য;
+        size_t lda = rows > 1 ? step/আকার(a[0]) : 1;
+        size_t ldb = rows > 1 ? m.step/আকার(b[0]) : 1;
 
         c[0] = a[lda] * b[ldb*2] - a[lda*2] * b[ldb];
         c[1] = a[lda*2] * b[0] - a[0] * b[ldb*2];
         c[2] = a[0] * b[ldb] - a[lda] * b[0];
     }
 
-    return result;
+    ফেরত ফলাফল;
 }
 
 
 ////////////////////////////////////////// reduce ////////////////////////////////////////////
 
-namespace cv
+নামাকাশ cv
 {
 
-typedef void (*ReduceSumFunc)(const Mat& src, Mat& dst);
-ReduceSumFunc getReduceCSumFunc(int sdepth, int ddepth);
-ReduceSumFunc getReduceRSumFunc(int sdepth, int ddepth);
-ReduceSumFunc getReduceRSum2Func(int sdepth, int ddepth);
+প্রকারলেখ শূন্য (*Reduce_যোগ_Func)(ধ্রুবক Mat& src, Mat& dst);
+Reduce_যোগ_Func getReduceCSumFunc(পূর্ণসংখ্যা sdepth, পূর্ণসংখ্যা ddepth);
+Reduce_যোগ_Func getReduceRSumFunc(পূর্ণসংখ্যা sdepth, পূর্ণসংখ্যা ddepth);
+Reduce_যোগ_Func getReduceRSum2Func(পূর্ণসংখ্যা sdepth, পূর্ণসংখ্যা ddepth);
 
 template <typename T, typename WT, typename Op>
-struct ReduceR_SIMD
+কাঠামো ReduceR_SIMD
 {
-    int operator()(const T*, int start, int, WT*, const Op&) const
+    পূর্ণসংখ্যা operator()(ধ্রুবক T*, পূর্ণসংখ্যা start, পূর্ণসংখ্যা, WT*, ধ্রুবক Op&) ধ্রুবক
     {
-        return start;
+        ফেরত start;
     }
 };
 
 
-template<typename T, typename ST, typename WT, class Op, class OpInit>
-class ReduceR_Invoker : public ParallelLoopBody
+template<typename T, typename ST, typename WT, শ্রেণী Op, শ্রেণী OpInit>
+শ্রেণী ReduceR_Invoker : সর্বজনীন ParallelLoopBody
 {
-public:
-  ReduceR_Invoker(const Mat& aSrcmat, Mat& aDstmat, Op& aOp, OpInit& aOpInit)
-                 :srcmat(aSrcmat),dstmat(aDstmat),op(aOp),opInit(aOpInit),buffer(srcmat.size().width*srcmat.channels())
+সর্বজনীন:
+  ReduceR_Invoker(ধ্রুবক Mat& aSrcmat, Mat& aDstmat, Op& aOp, OpInit& aOpInit)
+                 :srcmat(aSrcmat),dstmat(aDstmat),op(aOp),opInit(aOpInit),বাফার(srcmat.size().width*srcmat.channels())
   {
   }
-  void operator()(const Range& range) const CV_OVERRIDE
+  শূন্য operator()(ধ্রুবক Range& range) ধ্রুবক CV_OVERRIDE
   {
-    const T* src = srcmat.ptr<T>();
-    const size_t srcstep = srcmat.step/sizeof(src[0]);
-    WT* buf = buffer.data();
+    ধ্রুবক T* src = srcmat.ptr<T>();
+    ধ্রুবক size_t srcstep = srcmat.step/আকার(src[0]);
+    WT* buf = বাফার.তথ্য();
     ST* dst = dstmat.ptr<ST>();
-    int i = 0;
+    পূর্ণসংখ্যা i = 0;
 
-    for( i = range.start ; i < range.end; i++ )
+    জন্য( i = range.start ; i < range.end; i++ )
         buf[i] = opInit(src[i]);
 
-    int height = srcmat.size().height;
-    for( ; --height; )
+    পূর্ণসংখ্যা height = srcmat.size().height;
+    জন্য( ; --height; )
     {
         src += srcstep;
         ReduceR_SIMD<T, WT, Op> simd_op;
         i = simd_op(src, range.start, range.end, buf, op);
-        #if CV_ENABLE_UNROLLED
-        for(; i <= range.end - 4; i += 4 )
+        #যদি CV_ENABLE_UNROLLED
+        জন্য(; i <= range.end - 4; i += 4 )
         {
             WT s0, s1;
             s0 = op(buf[i], (WT)src[i]);
@@ -377,80 +377,80 @@ public:
             buf[i+2] = s0; buf[i+3] = s1;
         }
         #endif
-        for( ; i < range.end; i++ )
+        জন্য( ; i < range.end; i++ )
             buf[i] = op(buf[i], (WT)src[i]);
     }
 
-    for( i = range.start ; i < range.end; i++ )
+    জন্য( i = range.start ; i < range.end; i++ )
         dst[i] = (ST)buf[i];
   }
-private:
-  const Mat& srcmat;
+ব্যক্তিগত:
+  ধ্রুবক Mat& srcmat;
   Mat& dstmat;
   Op& op;
   OpInit& opInit;
-  mutable AutoBuffer<WT> buffer;
+  mutable Auto_বাফার<WT> বাফার;
 };
 
-template<typename T, typename ST, class Op, class OpInit = OpNop<ST> > static void
-reduceR_( const Mat& srcmat, Mat& dstmat)
+template<typename T, typename ST, শ্রেণী Op, শ্রেণী OpInit = OpNop<ST> > স্থির শূন্য
+reduceR_( ধ্রুবক Mat& srcmat, Mat& dstmat)
 {
-    typedef typename Op::rtype WT;
+    প্রকারলেখ typename Op::rtype WT;
     Op op;
     OpInit opInit;
 
     ReduceR_Invoker<T, ST, WT, Op, OpInit> body(srcmat, dstmat, op, opInit);
     //group columns by 64 bytes for data locality
-    parallel_for_(Range(0, srcmat.size().width*srcmat.channels()), body, srcmat.size().width*CV_ELEM_SIZE(srcmat.depth())/64);
+    parallel_for_(Range(0, srcmat.size().width*srcmat.channels()), body, srcmat.size().width*CV_ELEM_আকার(srcmat.depth())/64);
 }
 
-template<typename T, typename ST, typename WT, class Op, class OpInit>
-class ReduceC_Invoker : public ParallelLoopBody
+template<typename T, typename ST, typename WT, শ্রেণী Op, শ্রেণী OpInit>
+শ্রেণী ReduceC_Invoker : সর্বজনীন ParallelLoopBody
 {
-public:
-  ReduceC_Invoker(const Mat& aSrcmat, Mat& aDstmat, Op& aOp, OpInit& aOpInit)
+সর্বজনীন:
+  ReduceC_Invoker(ধ্রুবক Mat& aSrcmat, Mat& aDstmat, Op& aOp, OpInit& aOpInit)
                  :srcmat(aSrcmat),dstmat(aDstmat),op(aOp),opInit(aOpInit)
   {
   }
-  void operator()(const Range& range) const CV_OVERRIDE
+  শূন্য operator()(ধ্রুবক Range& range) ধ্রুবক CV_OVERRIDE
   {
-    const int cn = srcmat.channels();
-    const int width = srcmat.size().width*cn;
-    AutoBuffer<WT> cumul(cn);
-    for( int y = range.start; y < range.end; y++ )
+    ধ্রুবক পূর্ণসংখ্যা cn = srcmat.channels();
+    ধ্রুবক পূর্ণসংখ্যা width = srcmat.size().width*cn;
+    Auto_বাফার<WT> cumul(cn);
+    জন্য( পূর্ণসংখ্যা y = range.start; y < range.end; y++ )
     {
-        const T* src = srcmat.ptr<T>(y);
+        ধ্রুবক T* src = srcmat.ptr<T>(y);
         ST* dst = dstmat.ptr<ST>(y);
-        if( width == cn )
+        যদি( width == cn )
         {
-          for( int k = 0; k < cn; k++ )
+          জন্য( পূর্ণসংখ্যা k = 0; k < cn; k++ )
               dst[k] = (ST)opInit(src[k]);
         }
-        else
+        অন্যথা
         {
-            for(int k = 0; k < cn ; ++k )
+            জন্য(পূর্ণসংখ্যা k = 0; k < cn ; ++k )
               cumul[k] = opInit(src[k]);
-            for(int k = cn ; k < width ; k += cn )
+            জন্য(পূর্ণসংখ্যা k = cn ; k < width ; k += cn )
             {
-                for (int c = 0 ; c < cn ; ++c)
+                জন্য (পূর্ণসংখ্যা c = 0 ; c < cn ; ++c)
                   cumul[c] = op(cumul[c], src[k+c]);
             }
-            for(int k = 0 ; k < cn ; ++k )
+            জন্য(পূর্ণসংখ্যা k = 0 ; k < cn ; ++k )
               dst[k] = (ST)cumul[k];
         }
     }
   }
-private:
-  const Mat& srcmat;
+ব্যক্তিগত:
+  ধ্রুবক Mat& srcmat;
   Mat& dstmat;
   Op& op;
   OpInit& opInit;
 };
 
-template<typename T, typename ST, class Op, class OpInit = OpNop<ST> > static void
-reduceC_( const Mat& srcmat, Mat& dstmat)
+template<typename T, typename ST, শ্রেণী Op, শ্রেণী OpInit = OpNop<ST> > স্থির শূন্য
+reduceC_( ধ্রুবক Mat& srcmat, Mat& dstmat)
 {
-    typedef typename Op::rtype WT;
+    প্রকারলেখ typename Op::rtype WT;
     Op op;
     OpInit opInit;
 
@@ -458,111 +458,111 @@ reduceC_( const Mat& srcmat, Mat& dstmat)
     parallel_for_(Range(0, srcmat.size().height), body);
 }
 
-typedef void (*ReduceFunc)( const Mat& src, Mat& dst );
+প্রকারলেখ শূন্য (*ReduceFunc)( ধ্রুবক Mat& src, Mat& dst );
 
 }
 
-#define reduceSumR8u32s  reduceR_<uchar, int,   OpAdd<int>, OpNop<int> >
-#define reduceSumR8u32f  reduceR_<uchar, float, OpAdd<int>, OpNop<int> >
-#define reduceSumR8u64f  reduceR_<uchar, double,OpAdd<int>, OpNop<int> >
-#define reduceSumR16u32f reduceR_<ushort,float, OpAdd<float> >
-#define reduceSumR16u64f reduceR_<ushort,double,OpAdd<double> >
-#define reduceSumR16s32f reduceR_<short, float, OpAdd<float> >
-#define reduceSumR16s64f reduceR_<short, double,OpAdd<double> >
-#define reduceSumR32f32f reduceR_<float, float, OpAdd<float> >
-#define reduceSumR32f64f reduceR_<float, double,OpAdd<double> >
-#define reduceSumR64f64f reduceR_<double,double,OpAdd<double> >
+#define reduce_যোগ_R8u32s  reduceR_<uchar, পূর্ণসংখ্যা,   OpAdd<পূর্ণসংখ্যা>, OpNop<পূর্ণসংখ্যা> >
+#define reduce_যোগ_R8u32f  reduceR_<uchar, দশমিক, OpAdd<পূর্ণসংখ্যা>, OpNop<পূর্ণসংখ্যা> >
+#define reduce_যোগ_R8u64f  reduceR_<uchar, দ্বিগুণ,OpAdd<পূর্ণসংখ্যা>, OpNop<পূর্ণসংখ্যা> >
+#define reduce_যোগ_R16u32f reduceR_<ushort,দশমিক, OpAdd<দশমিক> >
+#define reduce_যোগ_R16u64f reduceR_<ushort,দ্বিগুণ,OpAdd<দ্বিগুণ> >
+#define reduce_যোগ_R16s32f reduceR_<short, দশমিক, OpAdd<দশমিক> >
+#define reduce_যোগ_R16s64f reduceR_<short, দ্বিগুণ,OpAdd<দ্বিগুণ> >
+#define reduce_যোগ_R32f32f reduceR_<দশমিক, দশমিক, OpAdd<দশমিক> >
+#define reduce_যোগ_R32f64f reduceR_<দশমিক, দ্বিগুণ,OpAdd<দ্বিগুণ> >
+#define reduce_যোগ_R64f64f reduceR_<দ্বিগুণ,দ্বিগুণ,OpAdd<দ্বিগুণ> >
 
-#define reduceSum2R8u32s  reduceR_<uchar, int,   OpAddSqr<int>,   OpSqr<int> >
-#define reduceSum2R8u32f  reduceR_<uchar, float, OpAddSqr<int>,   OpSqr<int> >
-#define reduceSum2R8u64f  reduceR_<uchar, double,OpAddSqr<int>,   OpSqr<int> >
-#define reduceSum2R16u32f reduceR_<ushort,float, OpAddSqr<float>, OpSqr<float> >
-#define reduceSum2R16u64f reduceR_<ushort,double,OpAddSqr<double>,OpSqr<double> >
-#define reduceSum2R16s32f reduceR_<short, float, OpAddSqr<float>, OpSqr<float> >
-#define reduceSum2R16s64f reduceR_<short, double,OpAddSqr<double>,OpSqr<double> >
-#define reduceSum2R32f32f reduceR_<float, float, OpAddSqr<float>, OpSqr<float> >
-#define reduceSum2R32f64f reduceR_<float, double,OpAddSqr<double>,OpSqr<double> >
-#define reduceSum2R64f64f reduceR_<double,double,OpAddSqr<double>,OpSqr<double> >
+#define reduceSum2R8u32s  reduceR_<uchar, পূর্ণসংখ্যা,   OpAddSqr<পূর্ণসংখ্যা>,   OpSqr<পূর্ণসংখ্যা> >
+#define reduceSum2R8u32f  reduceR_<uchar, দশমিক, OpAddSqr<পূর্ণসংখ্যা>,   OpSqr<পূর্ণসংখ্যা> >
+#define reduceSum2R8u64f  reduceR_<uchar, দ্বিগুণ,OpAddSqr<পূর্ণসংখ্যা>,   OpSqr<পূর্ণসংখ্যা> >
+#define reduceSum2R16u32f reduceR_<ushort,দশমিক, OpAddSqr<দশমিক>, OpSqr<দশমিক> >
+#define reduceSum2R16u64f reduceR_<ushort,দ্বিগুণ,OpAddSqr<দ্বিগুণ>,OpSqr<দ্বিগুণ> >
+#define reduceSum2R16s32f reduceR_<short, দশমিক, OpAddSqr<দশমিক>, OpSqr<দশমিক> >
+#define reduceSum2R16s64f reduceR_<short, দ্বিগুণ,OpAddSqr<দ্বিগুণ>,OpSqr<দ্বিগুণ> >
+#define reduceSum2R32f32f reduceR_<দশমিক, দশমিক, OpAddSqr<দশমিক>, OpSqr<দশমিক> >
+#define reduceSum2R32f64f reduceR_<দশমিক, দ্বিগুণ,OpAddSqr<দ্বিগুণ>,OpSqr<দ্বিগুণ> >
+#define reduceSum2R64f64f reduceR_<দ্বিগুণ,দ্বিগুণ,OpAddSqr<দ্বিগুণ>,OpSqr<দ্বিগুণ> >
 
 #define reduceMaxR8u  reduceR_<uchar, uchar, OpMax<uchar> >
 #define reduceMaxR16u reduceR_<ushort,ushort,OpMax<ushort> >
 #define reduceMaxR16s reduceR_<short, short, OpMax<short> >
-#define reduceMaxR32f reduceR_<float, float, OpMax<float> >
-#define reduceMaxR64f reduceR_<double,double,OpMax<double> >
+#define reduceMaxR32f reduceR_<দশমিক, দশমিক, OpMax<দশমিক> >
+#define reduceMaxR64f reduceR_<দ্বিগুণ,দ্বিগুণ,OpMax<দ্বিগুণ> >
 
 #define reduceMinR8u  reduceR_<uchar, uchar, OpMin<uchar> >
 #define reduceMinR16u reduceR_<ushort,ushort,OpMin<ushort> >
 #define reduceMinR16s reduceR_<short, short, OpMin<short> >
-#define reduceMinR32f reduceR_<float, float, OpMin<float> >
-#define reduceMinR64f reduceR_<double,double,OpMin<double> >
+#define reduceMinR32f reduceR_<দশমিক, দশমিক, OpMin<দশমিক> >
+#define reduceMinR64f reduceR_<দ্বিগুণ,দ্বিগুণ,OpMin<দ্বিগুণ> >
 
-#if defined(HAVE_IPP) && !IPP_DISABLE_REDUCE
-static inline bool ipp_reduceSumC_8u16u16s32f_64f(const cv::Mat& srcmat, cv::Mat& dstmat)
+#যদি defined(HAVE_IPP) && !IPP_DISABLE_REDUCE
+স্থির অন্তঃরেখ যৌক্তিক ipp_reduce_যোগ_C_8u16u16s32f_64f(ধ্রুবক cv::Mat& srcmat, cv::Mat& dstmat)
 {
-    int sstep = (int)srcmat.step, stype = srcmat.type(),
+    পূর্ণসংখ্যা sstep = (পূর্ণসংখ্যা)srcmat.step, stype = srcmat.type(),
             ddepth = dstmat.depth();
 
-    IppiSize roisize = { srcmat.size().width, 1 };
+    Ippi_আকার roisize = { srcmat.size().width, 1 };
 
-    typedef IppStatus (CV_STDCALL * IppiSum)(const void * pSrc, int srcStep, IppiSize roiSize, Ipp64f* pSum);
-    typedef IppStatus (CV_STDCALL * IppiSumHint)(const void * pSrc, int srcStep, IppiSize roiSize, Ipp64f* pSum, IppHintAlgorithm hint);
-    IppiSum ippiSum = 0;
-    IppiSumHint ippiSumHint = 0;
+    প্রকারলেখ IppStatus (CV_STDCALL * Ippi_যোগ)(ধ্রুবক শূন্য * pSrc, পূর্ণসংখ্যা srcStep, Ippi_আকার roi_আকার, Ipp64f* p_যোগ);
+    প্রকারলেখ IppStatus (CV_STDCALL * Ippi_যোগ_Hint)(ধ্রুবক শূন্য * pSrc, পূর্ণসংখ্যা srcStep, Ippi_আকার roi_আকার, Ipp64f* p_যোগ, IppHintAlgorithm hint);
+    Ippi_যোগ ippi_যোগ = 0;
+    Ippi_যোগ_Hint ippi_যোগ_Hint = 0;
 
-    if(ddepth == CV_64F)
+    যদি(ddepth == CV_64F)
     {
-        ippiSum =
-            stype == CV_8UC1 ? (IppiSum)ippiSum_8u_C1R :
-            stype == CV_8UC3 ? (IppiSum)ippiSum_8u_C3R :
-            stype == CV_8UC4 ? (IppiSum)ippiSum_8u_C4R :
-            stype == CV_16UC1 ? (IppiSum)ippiSum_16u_C1R :
-            stype == CV_16UC3 ? (IppiSum)ippiSum_16u_C3R :
-            stype == CV_16UC4 ? (IppiSum)ippiSum_16u_C4R :
-            stype == CV_16SC1 ? (IppiSum)ippiSum_16s_C1R :
-            stype == CV_16SC3 ? (IppiSum)ippiSum_16s_C3R :
-            stype == CV_16SC4 ? (IppiSum)ippiSum_16s_C4R : 0;
-        ippiSumHint =
-            stype == CV_32FC1 ? (IppiSumHint)ippiSum_32f_C1R :
-            stype == CV_32FC3 ? (IppiSumHint)ippiSum_32f_C3R :
-            stype == CV_32FC4 ? (IppiSumHint)ippiSum_32f_C4R : 0;
+        ippi_যোগ =
+            stype == CV_8UC1 ? (Ippi_যোগ)ippi_যোগ_8u_C1_R :
+            stype == CV_8UC3 ? (Ippi_যোগ)ippi_যোগ_8u_C3_R :
+            stype == CV_8UC4 ? (Ippi_যোগ)ippi_যোগ_8u_C4_R :
+            stype == CV_16UC1 ? (Ippi_যোগ)ippi_যোগ_16u_C1_R :
+            stype == CV_16UC3 ? (Ippi_যোগ)ippi_যোগ_16u_C3_R :
+            stype == CV_16UC4 ? (Ippi_যোগ)ippi_যোগ_16u_C4_R :
+            stype == CV_16SC1 ? (Ippi_যোগ)ippi_যোগ_16s_C1_R :
+            stype == CV_16SC3 ? (Ippi_যোগ)ippi_যোগ_16s_C3_R :
+            stype == CV_16SC4 ? (Ippi_যোগ)ippi_যোগ_16s_C4_R : 0;
+        ippi_যোগ_Hint =
+            stype == CV_32FC1 ? (Ippi_যোগ_Hint)ippi_যোগ_32f_C1_R :
+            stype == CV_32FC3 ? (Ippi_যোগ_Hint)ippi_যোগ_32f_C3_R :
+            stype == CV_32FC4 ? (Ippi_যোগ_Hint)ippi_যোগ_32f_C4_R : 0;
     }
 
-    if(ippiSum)
+    যদি(ippi_যোগ)
     {
-        for(int y = 0; y < srcmat.size().height; y++)
+        জন্য(পূর্ণসংখ্যা y = 0; y < srcmat.size().height; y++)
         {
-            if(CV_INSTRUMENT_FUN_IPP(ippiSum, srcmat.ptr(y), sstep, roisize, dstmat.ptr<Ipp64f>(y)) < 0)
-                return false;
+            যদি(CV_INSTRUMENT_FUN_IPP(ippi_যোগ, srcmat.ptr(y), sstep, roisize, dstmat.ptr<Ipp64f>(y)) < 0)
+                ফেরত মিথ্যা;
         }
-        return true;
+        ফেরত সত্য;
     }
-    else if(ippiSumHint)
+    অন্যথা যদি(ippi_যোগ_Hint)
     {
-        for(int y = 0; y < srcmat.size().height; y++)
+        জন্য(পূর্ণসংখ্যা y = 0; y < srcmat.size().height; y++)
         {
-            if(CV_INSTRUMENT_FUN_IPP(ippiSumHint, srcmat.ptr(y), sstep, roisize, dstmat.ptr<Ipp64f>(y), ippAlgHintAccurate) < 0)
-                return false;
+            যদি(CV_INSTRUMENT_FUN_IPP(ippi_যোগ_Hint, srcmat.ptr(y), sstep, roisize, dstmat.ptr<Ipp64f>(y), ippAlgHintAccurate) < 0)
+                ফেরত মিথ্যা;
         }
-        return true;
+        ফেরত সত্য;
     }
 
-    return false;
+    ফেরত মিথ্যা;
 }
 
-static inline void reduceSumC_8u16u16s32f_64f(const cv::Mat& srcmat, cv::Mat& dstmat)
+স্থির অন্তঃরেখ শূন্য reduce_যোগ_C_8u16u16s32f_64f(ধ্রুবক cv::Mat& srcmat, cv::Mat& dstmat)
 {
-    CV_IPP_RUN_FAST(ipp_reduceSumC_8u16u16s32f_64f(srcmat, dstmat));
+    CV_IPP_RUN_FAST(ipp_reduce_যোগ_C_8u16u16s32f_64f(srcmat, dstmat));
 
     cv::ReduceFunc func = 0;
 
-    if(dstmat.depth() == CV_64F)
+    যদি(dstmat.depth() == CV_64F)
     {
-        int sdepth = CV_MAT_DEPTH(srcmat.type());
+        পূর্ণসংখ্যা sdepth = CV_MAT_DEPTH(srcmat.type());
         func =
-            sdepth == CV_8U ? (cv::ReduceFunc)cv::reduceC_<uchar, double,   cv::OpAdd<double> > :
-            sdepth == CV_16U ? (cv::ReduceFunc)cv::reduceC_<ushort, double,   cv::OpAdd<double> > :
-            sdepth == CV_16S ? (cv::ReduceFunc)cv::reduceC_<short, double,   cv::OpAdd<double> > :
-            sdepth == CV_32F ? (cv::ReduceFunc)cv::reduceC_<float, double,   cv::OpAdd<double> > : 0;
+            sdepth == CV_8U ? (cv::ReduceFunc)cv::reduceC_<uchar, দ্বিগুণ,   cv::OpAdd<দ্বিগুণ> > :
+            sdepth == CV_16U ? (cv::ReduceFunc)cv::reduceC_<ushort, দ্বিগুণ,   cv::OpAdd<দ্বিগুণ> > :
+            sdepth == CV_16S ? (cv::ReduceFunc)cv::reduceC_<short, দ্বিগুণ,   cv::OpAdd<দ্বিগুণ> > :
+            sdepth == CV_32F ? (cv::ReduceFunc)cv::reduceC_<দশমিক, দ্বিগুণ,   cv::OpAdd<দ্বিগুণ> > : 0;
     }
     CV_Assert(func);
 
@@ -571,126 +571,126 @@ static inline void reduceSumC_8u16u16s32f_64f(const cv::Mat& srcmat, cv::Mat& ds
 
 #endif
 
-#define reduceSumC8u32s  reduceC_<uchar, int,   OpAdd<int>, OpNop<int> >
-#define reduceSumC8u32f  reduceC_<uchar, float, OpAdd<int>, OpNop<int> >
-#define reduceSumC16u32f reduceC_<ushort,float, OpAdd<float> >
-#define reduceSumC16s32f reduceC_<short, float, OpAdd<float> >
-#define reduceSumC32f32f reduceC_<float, float, OpAdd<float> >
-#define reduceSumC64f64f reduceC_<double,double,OpAdd<double> >
+#define reduce_যোগ_C8u32s  reduceC_<uchar, পূর্ণসংখ্যা,   OpAdd<পূর্ণসংখ্যা>, OpNop<পূর্ণসংখ্যা> >
+#define reduce_যোগ_C8u32f  reduceC_<uchar, দশমিক, OpAdd<পূর্ণসংখ্যা>, OpNop<পূর্ণসংখ্যা> >
+#define reduce_যোগ_C16u32f reduceC_<ushort,দশমিক, OpAdd<দশমিক> >
+#define reduce_যোগ_C16s32f reduceC_<short, দশমিক, OpAdd<দশমিক> >
+#define reduce_যোগ_C32f32f reduceC_<দশমিক, দশমিক, OpAdd<দশমিক> >
+#define reduce_যোগ_C64f64f reduceC_<দ্বিগুণ,দ্বিগুণ,OpAdd<দ্বিগুণ> >
 
-#define reduceSum2C8u32s  reduceC_<uchar, int,   OpAddSqr<int>,   OpSqr<int> >
-#define reduceSum2C8u32f  reduceC_<uchar, float, OpAddSqr<int>,   OpSqr<int> >
-#define reduceSum2C16u32f reduceC_<ushort,float, OpAddSqr<float>, OpSqr<float> >
-#define reduceSum2C16s32f reduceC_<short, float, OpAddSqr<float>, OpSqr<float> >
-#define reduceSum2C32f32f reduceC_<float, float, OpAddSqr<float>, OpSqr<float> >
-#define reduceSum2C64f64f reduceC_<double,double,OpAddSqr<double>,OpSqr<double> >
+#define reduceSum2C8u32s  reduceC_<uchar, পূর্ণসংখ্যা,   OpAddSqr<পূর্ণসংখ্যা>,   OpSqr<পূর্ণসংখ্যা> >
+#define reduceSum2C8u32f  reduceC_<uchar, দশমিক, OpAddSqr<পূর্ণসংখ্যা>,   OpSqr<পূর্ণসংখ্যা> >
+#define reduceSum2C16u32f reduceC_<ushort,দশমিক, OpAddSqr<দশমিক>, OpSqr<দশমিক> >
+#define reduceSum2C16s32f reduceC_<short, দশমিক, OpAddSqr<দশমিক>, OpSqr<দশমিক> >
+#define reduceSum2C32f32f reduceC_<দশমিক, দশমিক, OpAddSqr<দশমিক>, OpSqr<দশমিক> >
+#define reduceSum2C64f64f reduceC_<দ্বিগুণ,দ্বিগুণ,OpAddSqr<দ্বিগুণ>,OpSqr<দ্বিগুণ> >
 
-#if defined(HAVE_IPP) && !IPP_DISABLE_REDUCE
-#define reduceSumC8u64f  reduceSumC_8u16u16s32f_64f
-#define reduceSumC16u64f reduceSumC_8u16u16s32f_64f
-#define reduceSumC16s64f reduceSumC_8u16u16s32f_64f
-#define reduceSumC32f64f reduceSumC_8u16u16s32f_64f
-#else
-#define reduceSumC8u64f  reduceC_<uchar, double,OpAdd<int>, OpNop<int> >
-#define reduceSumC16u64f reduceC_<ushort,double,OpAdd<double> >
-#define reduceSumC16s64f reduceC_<short, double,OpAdd<double> >
-#define reduceSumC32f64f reduceC_<float, double,OpAdd<double> >
+#যদি defined(HAVE_IPP) && !IPP_DISABLE_REDUCE
+#define reduce_যোগ_C8u64f  reduce_যোগ_C_8u16u16s32f_64f
+#define reduce_যোগ_C16u64f reduce_যোগ_C_8u16u16s32f_64f
+#define reduce_যোগ_C16s64f reduce_যোগ_C_8u16u16s32f_64f
+#define reduce_যোগ_C32f64f reduce_যোগ_C_8u16u16s32f_64f
+#অন্যথা
+#define reduce_যোগ_C8u64f  reduceC_<uchar, দ্বিগুণ,OpAdd<পূর্ণসংখ্যা>, OpNop<পূর্ণসংখ্যা> >
+#define reduce_যোগ_C16u64f reduceC_<ushort,দ্বিগুণ,OpAdd<দ্বিগুণ> >
+#define reduce_যোগ_C16s64f reduceC_<short, দ্বিগুণ,OpAdd<দ্বিগুণ> >
+#define reduce_যোগ_C32f64f reduceC_<দশমিক, দ্বিগুণ,OpAdd<দ্বিগুণ> >
 #endif
 
-#define reduceSum2C8u64f  reduceC_<uchar, double,OpAddSqr<int>,   OpSqr<int> >
-#define reduceSum2C16u64f reduceC_<ushort,double,OpAddSqr<double>,OpSqr<double> >
-#define reduceSum2C16s64f reduceC_<short, double,OpAddSqr<double>,OpSqr<double> >
-#define reduceSum2C32f64f reduceC_<float, double,OpAddSqr<double>,OpSqr<double> >
+#define reduceSum2C8u64f  reduceC_<uchar, দ্বিগুণ,OpAddSqr<পূর্ণসংখ্যা>,   OpSqr<পূর্ণসংখ্যা> >
+#define reduceSum2C16u64f reduceC_<ushort,দ্বিগুণ,OpAddSqr<দ্বিগুণ>,OpSqr<দ্বিগুণ> >
+#define reduceSum2C16s64f reduceC_<short, দ্বিগুণ,OpAddSqr<দ্বিগুণ>,OpSqr<দ্বিগুণ> >
+#define reduceSum2C32f64f reduceC_<দশমিক, দ্বিগুণ,OpAddSqr<দ্বিগুণ>,OpSqr<দ্বিগুণ> >
 
-#if defined(HAVE_IPP) && !IPP_DISABLE_REDUCE
+#যদি defined(HAVE_IPP) && !IPP_DISABLE_REDUCE
 #define REDUCE_OP(favor, optype, type1, type2) \
-static inline bool ipp_reduce##optype##C##favor(const cv::Mat& srcmat, cv::Mat& dstmat) \
+স্থির অন্তঃরেখ যৌক্তিক ipp_reduce##optype##C##favor(ধ্রুবক cv::Mat& srcmat, cv::Mat& dstmat) \
 { \
-    if((srcmat.channels() == 1)) \
+    যদি((srcmat.channels() == 1)) \
     { \
-        int sstep = (int)srcmat.step; \
-        typedef Ipp##favor IppType; \
-        IppiSize roisize = ippiSize(srcmat.size().width, 1);\
-        for(int y = 0; y < srcmat.size().height; y++)\
+        পূর্ণসংখ্যা sstep = (পূর্ণসংখ্যা)srcmat.step; \
+        প্রকারলেখ Ipp##favor IppType; \
+        Ippi_আকার roisize = ippi_আকার(srcmat.size().width, 1);\
+        জন্য(পূর্ণসংখ্যা y = 0; y < srcmat.size().height; y++)\
         {\
-            if(CV_INSTRUMENT_FUN_IPP(ippi##optype##_##favor##_C1R, srcmat.ptr<IppType>(y), sstep, roisize, dstmat.ptr<IppType>(y)) < 0)\
-                return false;\
+            যদি(CV_INSTRUMENT_FUN_IPP(ippi##optype##_##favor##_C1R, srcmat.ptr<IppType>(y), sstep, roisize, dstmat.ptr<IppType>(y)) < 0)\
+                ফেরত মিথ্যা;\
         }\
-        return true;\
+        ফেরত সত্য;\
     }\
-    return false; \
+    ফেরত মিথ্যা; \
 } \
-static inline void reduce##optype##C##favor(const cv::Mat& srcmat, cv::Mat& dstmat) \
+স্থির অন্তঃরেখ শূন্য reduce##optype##C##favor(ধ্রুবক cv::Mat& srcmat, cv::Mat& dstmat) \
 { \
     CV_IPP_RUN_FAST(ipp_reduce##optype##C##favor(srcmat, dstmat)); \
     cv::reduceC_ < type1, type2, cv::Op##optype < type2 > >(srcmat, dstmat); \
 }
 #endif
 
-#if defined(HAVE_IPP) && !IPP_DISABLE_REDUCE
+#যদি defined(HAVE_IPP) && !IPP_DISABLE_REDUCE
 REDUCE_OP(8u, Max, uchar, uchar)
 REDUCE_OP(16u, Max, ushort, ushort)
 REDUCE_OP(16s, Max, short, short)
-REDUCE_OP(32f, Max, float, float)
-#else
+REDUCE_OP(32f, Max, দশমিক, দশমিক)
+#অন্যথা
 #define reduceMaxC8u  reduceC_<uchar, uchar, OpMax<uchar> >
 #define reduceMaxC16u reduceC_<ushort,ushort,OpMax<ushort> >
 #define reduceMaxC16s reduceC_<short, short, OpMax<short> >
-#define reduceMaxC32f reduceC_<float, float, OpMax<float> >
+#define reduceMaxC32f reduceC_<দশমিক, দশমিক, OpMax<দশমিক> >
 #endif
-#define reduceMaxC64f reduceC_<double,double,OpMax<double> >
+#define reduceMaxC64f reduceC_<দ্বিগুণ,দ্বিগুণ,OpMax<দ্বিগুণ> >
 
-#if defined(HAVE_IPP) && !IPP_DISABLE_REDUCE
+#যদি defined(HAVE_IPP) && !IPP_DISABLE_REDUCE
 REDUCE_OP(8u, Min, uchar, uchar)
 REDUCE_OP(16u, Min, ushort, ushort)
 REDUCE_OP(16s, Min, short, short)
-REDUCE_OP(32f, Min, float, float)
-#else
+REDUCE_OP(32f, Min, দশমিক, দশমিক)
+#অন্যথা
 #define reduceMinC8u  reduceC_<uchar, uchar, OpMin<uchar> >
 #define reduceMinC16u reduceC_<ushort,ushort,OpMin<ushort> >
 #define reduceMinC16s reduceC_<short, short, OpMin<short> >
-#define reduceMinC32f reduceC_<float, float, OpMin<float> >
+#define reduceMinC32f reduceC_<দশমিক, দশমিক, OpMin<দশমিক> >
 #endif
-#define reduceMinC64f reduceC_<double,double,OpMin<double> >
+#define reduceMinC64f reduceC_<দ্বিগুণ,দ্বিগুণ,OpMin<দ্বিগুণ> >
 
 #ifdef HAVE_OPENCL
 
-namespace cv {
+নামাকাশ cv {
 
-static bool ocl_reduce(InputArray _src, OutputArray _dst,
-                       int dim, int op, int op0, int stype, int dtype)
+স্থির যৌক্তিক ocl_reduce(প্রবেশ_Array _src, OutputArray _dst,
+                       পূর্ণসংখ্যা dim, পূর্ণসংখ্যা op, পূর্ণসংখ্যা op0, পূর্ণসংখ্যা stype, পূর্ণসংখ্যা dtype)
 {
-    const int min_opt_cols = 128, buf_cols = 32;
-    int sdepth = CV_MAT_DEPTH(stype), cn = CV_MAT_CN(stype),
+    ধ্রুবক পূর্ণসংখ্যা min_opt_cols = 128, buf_cols = 32;
+    পূর্ণসংখ্যা sdepth = CV_MAT_DEPTH(stype), cn = CV_MAT_CN(stype),
             ddepth = CV_MAT_DEPTH(dtype), ddepth0 = ddepth;
-    const ocl::Device &defDev = ocl::Device::getDefault();
-    bool doubleSupport = defDev.doubleFPConfig() > 0;
+    ধ্রুবক ocl::Device &defDev = ocl::Device::getDefault();
+    যৌক্তিক doubleSupport = defDev.doubleFPConfig() > 0;
 
-    size_t wgs = defDev.maxWorkGroupSize();
-    bool useOptimized = 1 == dim && _src.cols() > min_opt_cols && (wgs >= buf_cols);
+    size_t wgs = defDev.max_Work_Group_আকার();
+    যৌক্তিক useOptimized = 1 == dim && _src.cols() > min_opt_cols && (wgs >= buf_cols);
 
-    if (!doubleSupport && (sdepth == CV_64F || ddepth == CV_64F))
-        return false;
+    যদি (!doubleSupport && (sdepth == CV_64F || ddepth == CV_64F))
+        ফেরত মিথ্যা;
 
-    if (op == REDUCE_AVG)
+    যদি (op == REDUCE_AVG)
     {
-        if (sdepth < CV_32S && ddepth < CV_32S)
+        যদি (sdepth < CV_32S && ddepth < CV_32S)
             ddepth = CV_32S;
     }
 
-    const char * const ops[5] = { "OCL_CV_REDUCE_SUM", "OCL_CV_REDUCE_AVG",
+    ধ্রুবক অক্ষর * ধ্রুবক ops[5] = { "OCL_CV_REDUCE_SUM", "OCL_CV_REDUCE_AVG",
                                   "OCL_CV_REDUCE_MAX", "OCL_CV_REDUCE_MIN",
                                   "OCL_CV_REDUCE_SUM2"};
-    int wdepth = std::max(ddepth, CV_32F);
-    if (useOptimized)
+    পূর্ণসংখ্যা wdepth = std::max(ddepth, CV_32F);
+    যদি (useOptimized)
     {
         size_t tileHeight = (size_t)(wgs / buf_cols);
-        if (defDev.isIntel())
+        যদি (defDev.isIntel())
         {
-            static const size_t maxItemInGroupCount = 16;
-            tileHeight = min(tileHeight, defDev.localMemSize() / buf_cols / CV_ELEM_SIZE(CV_MAKETYPE(wdepth, cn)) / maxItemInGroupCount);
+            স্থির ধ্রুবক size_t max_Item_In_Group_গুনতি = 16;
+            tileHeight = min(tileHeight, defDev.local_Mem_আকার() / buf_cols / CV_ELEM_আকার(CV_MAKETYPE(wdepth, cn)) / max_Item_In_Group_গুনতি);
         }
-        char cvt[3][50];
+        অক্ষর cvt[3][50];
         cv::String build_opt = format("-D OP_REDUCE_PRE -D BUF_COLS=%d -D TILE_HEIGHT=%zu -D %s -D dim=1"
                                             " -D cn=%d -D ddepth=%d"
                                             " -D srcT=%s -D bufT=%s -D dstT=%s"
@@ -699,61 +699,61 @@ static bool ocl_reduce(InputArray _src, OutputArray _dst,
                                             ocl::typeToStr(sdepth),
                                             ocl::typeToStr(ddepth),
                                             ocl::typeToStr(ddepth0),
-                                            ocl::convertTypeStr(ddepth, wdepth, 1, cvt[0], sizeof(cvt[0])),
-                                            ocl::convertTypeStr(sdepth, ddepth, 1, cvt[1], sizeof(cvt[1])),
-                                            ocl::convertTypeStr(wdepth, ddepth0, 1, cvt[2], sizeof(cvt[2])),
+                                            ocl::convertTypeStr(ddepth, wdepth, 1, cvt[0], আকার(cvt[0])),
+                                            ocl::convertTypeStr(sdepth, ddepth, 1, cvt[1], আকার(cvt[1])),
+                                            ocl::convertTypeStr(wdepth, ddepth0, 1, cvt[2], আকার(cvt[2])),
                                             doubleSupport ? " -D DOUBLE_SUPPORT" : "");
         ocl::Kernel k("reduce_horz_opt", ocl::core::reduce2_oclsrc, build_opt);
-        if (k.empty())
-            return false;
+        যদি (k.empty())
+            ফেরত মিথ্যা;
         UMat src = _src.getUMat();
-        Size dsize(1, src.rows);
+        আকার_2 dsize(1, src.rows);
         _dst.create(dsize, dtype);
         UMat dst = _dst.getUMat();
 
-        if (op0 == REDUCE_AVG)
+        যদি (op0 == REDUCE_AVG)
             k.args(ocl::KernelArg::ReadOnly(src),
-                      ocl::KernelArg::WriteOnlyNoSize(dst), 1.0f / src.cols);
-        else
+                      ocl::KernelArg::Write_Only_No_আকার(dst), 1.0f / src.cols);
+        অন্যথা
             k.args(ocl::KernelArg::ReadOnly(src),
-                      ocl::KernelArg::WriteOnlyNoSize(dst));
+                      ocl::KernelArg::Write_Only_No_আকার(dst));
 
-        size_t localSize[2] = { (size_t)buf_cols, (size_t)tileHeight};
-        size_t globalSize[2] = { (size_t)buf_cols, (size_t)src.rows };
-        return k.run(2, globalSize, localSize, false);
+        size_t local_আকার[2] = { (size_t)buf_cols, (size_t)tileHeight};
+        size_t global_আকার[2] = { (size_t)buf_cols, (size_t)src.rows };
+        ফেরত k.run(2, global_আকার, local_আকার, মিথ্যা);
     }
-    else
+    অন্যথা
     {
-        char cvt[2][50];
+        অক্ষর cvt[2][50];
         cv::String build_opt = format("-D %s -D dim=%d -D cn=%d -D ddepth=%d"
                                       " -D srcT=%s -D dstT=%s -D dstT0=%s -D convertToWT=%s"
                                       " -D convertToDT=%s -D convertToDT0=%s%s",
                                       ops[op], dim, cn, ddepth, ocl::typeToStr(useOptimized ? ddepth : sdepth),
                                       ocl::typeToStr(ddepth), ocl::typeToStr(ddepth0),
-                                      ocl::convertTypeStr(ddepth, wdepth, 1, cvt[0], sizeof(cvt[0])),
-                                      ocl::convertTypeStr(sdepth, ddepth, 1, cvt[0], sizeof(cvt[0])),
-                                      ocl::convertTypeStr(wdepth, ddepth0, 1, cvt[1], sizeof(cvt[1])),
+                                      ocl::convertTypeStr(ddepth, wdepth, 1, cvt[0], আকার(cvt[0])),
+                                      ocl::convertTypeStr(sdepth, ddepth, 1, cvt[0], আকার(cvt[0])),
+                                      ocl::convertTypeStr(wdepth, ddepth0, 1, cvt[1], আকার(cvt[1])),
                                       doubleSupport ? " -D DOUBLE_SUPPORT" : "");
 
         ocl::Kernel k("reduce", ocl::core::reduce2_oclsrc, build_opt);
-        if (k.empty())
-            return false;
+        যদি (k.empty())
+            ফেরত মিথ্যা;
 
         UMat src = _src.getUMat();
-        Size dsize(dim == 0 ? src.cols : 1, dim == 0 ? 1 : src.rows);
+        আকার_2 dsize(dim == 0 ? src.cols : 1, dim == 0 ? 1 : src.rows);
         _dst.create(dsize, dtype);
         UMat dst = _dst.getUMat();
 
         ocl::KernelArg srcarg = ocl::KernelArg::ReadOnly(src),
-                temparg = ocl::KernelArg::WriteOnlyNoSize(dst);
+                temparg = ocl::KernelArg::Write_Only_No_আকার(dst);
 
-        if (op0 == REDUCE_AVG)
+        যদি (op0 == REDUCE_AVG)
             k.args(srcarg, temparg, 1.0f / (dim == 0 ? src.rows : src.cols));
-        else
+        অন্যথা
             k.args(srcarg, temparg);
 
         size_t globalsize = std::max(dsize.width, dsize.height);
-        return k.run(1, &globalsize, NULL, false);
+        ফেরত k.run(1, &globalsize, ফাঁকা, মিথ্যা);
     }
 }
 
@@ -761,26 +761,26 @@ static bool ocl_reduce(InputArray _src, OutputArray _dst,
 
 #endif
 
-void cv::reduce(InputArray _src, OutputArray _dst, int dim, int op, int dtype)
+শূন্য cv::reduce(প্রবেশ_Array _src, OutputArray _dst, পূর্ণসংখ্যা dim, পূর্ণসংখ্যা op, পূর্ণসংখ্যা dtype)
 {
     CV_INSTRUMENT_REGION();
 
-    if (_src.dims() > 2 || op > REDUCE_SUM2)
+    যদি (_src.dims() > 2 || op > REDUCE_SUM2)
     {
         CV_CheckGE(dim, -_src.dims(), "reduce: dim is out of range");
         CV_CheckLT(dim, _src.dims(), "reduce: dim is out of range");
-        cv::reduce(_src, _dst, cv::ReduceParams(op, {dim}, true, dtype < 0 && _dst.fixedType() ? _dst.depth() : dtype));
-        return;
+        cv::reduce(_src, _dst, cv::ReduceParams(op, {dim}, সত্য, dtype < 0 && _dst.fixedType() ? _dst.depth() : dtype));
+        ফেরত;
     }
-    int op0 = op;
-    int stype = _src.type(), sdepth = CV_MAT_DEPTH(stype), cn = CV_MAT_CN(stype);
-    if( dtype < 0 )
+    পূর্ণসংখ্যা op0 = op;
+    পূর্ণসংখ্যা stype = _src.type(), sdepth = CV_MAT_DEPTH(stype), cn = CV_MAT_CN(stype);
+    যদি( dtype < 0 )
         dtype = _dst.fixedType() ? _dst.type() : stype;
     dtype = CV_MAKETYPE(dtype >= 0 ? dtype : stype, cn);
-    int ddepth = CV_MAT_DEPTH(dtype);
+    পূর্ণসংখ্যা ddepth = CV_MAT_DEPTH(dtype);
 
     CV_Assert( cn == CV_MAT_CN(dtype) );
-    CV_Assert( op == REDUCE_SUM || op == REDUCE_MAX ||
+    CV_Assert( op == REDUCE_যোগ || op == REDUCE_MAX ||
                op == REDUCE_MIN || op == REDUCE_AVG ||
                op == REDUCE_SUM2);
 
@@ -789,282 +789,282 @@ void cv::reduce(InputArray _src, OutputArray _dst, int dim, int op, int dtype)
 
     // Fake reference to source. Resolves issue 8693 in case of src == dst.
     UMat srcUMat;
-    if (_src.isUMat())
+    যদি (_src.isUMat())
         srcUMat = _src.getUMat();
 
     Mat src = _src.getMat();
-    if (src.empty()) {
+    যদি (src.empty()) {
         src.convertTo(_dst, dtype);
-        return;
+        ফেরত;
     }
-    if (src.dims <= 1) {
+    যদি (src.dims <= 1) {
         CV_Assert(dim == 0);
         dim = 1;
     }
 
     _dst.create(dim == 0 ? 1 : src.rows, dim == 0 ? src.cols : 1, dtype);
-    Mat dst = _dst.getMat(), temp = dst;
+    Mat dst = _dst.getMat(), অস্থায়ী_2 = dst;
 
-    if( op == REDUCE_AVG )
+    যদি( op == REDUCE_AVG )
     {
-        op = REDUCE_SUM;
-        if( sdepth < CV_32S && ddepth < CV_32S )
+        op = REDUCE_যোগ;
+        যদি( sdepth < CV_32S && ddepth < CV_32S )
         {
-            temp.create(dst.rows, dst.cols, CV_32SC(cn));
+            অস্থায়ী_2.create(dst.rows, dst.cols, CV_32SC(cn));
             ddepth = CV_32S;
         }
     }
 
     ReduceFunc func = 0;
-    if( dim == 0 )
+    যদি( dim == 0 )
     {
-        if( op == REDUCE_SUM )
+        যদি( op == REDUCE_যোগ )
         {
-            ReduceSumFunc simd_func = getReduceRSumFunc(sdepth, ddepth);
-            if(simd_func)
+            Reduce_যোগ_Func simd_func = getReduceRSumFunc(sdepth, ddepth);
+            যদি(simd_func)
                 func = (ReduceFunc)simd_func;
-            else if(sdepth == CV_8U && ddepth == CV_32S)
-                func = reduceSumR8u32s;
-            else if(sdepth == CV_8U && ddepth == CV_32F)
-                func = reduceSumR8u32f;
-            else if(sdepth == CV_8U && ddepth == CV_64F)
-                func = reduceSumR8u64f;
-            else if(sdepth == CV_16U && ddepth == CV_32F)
-                func = reduceSumR16u32f;
-            else if(sdepth == CV_16U && ddepth == CV_64F)
-                func = reduceSumR16u64f;
-            else if(sdepth == CV_16S && ddepth == CV_32F)
-                func = reduceSumR16s32f;
-            else if(sdepth == CV_16S && ddepth == CV_64F)
-                func = reduceSumR16s64f;
-            else if(sdepth == CV_32F && ddepth == CV_32F)
-                func = reduceSumR32f32f;
-            else if(sdepth == CV_32F && ddepth == CV_64F)
-                func = reduceSumR32f64f;
-            else if(sdepth == CV_64F && ddepth == CV_64F)
-                func = reduceSumR64f64f;
+            অন্যথা যদি(sdepth == CV_8U && ddepth == CV_32S)
+                func = reduce_যোগ_R8u32s;
+            অন্যথা যদি(sdepth == CV_8U && ddepth == CV_32F)
+                func = reduce_যোগ_R8u32f;
+            অন্যথা যদি(sdepth == CV_8U && ddepth == CV_64F)
+                func = reduce_যোগ_R8u64f;
+            অন্যথা যদি(sdepth == CV_16U && ddepth == CV_32F)
+                func = reduce_যোগ_R16u32f;
+            অন্যথা যদি(sdepth == CV_16U && ddepth == CV_64F)
+                func = reduce_যোগ_R16u64f;
+            অন্যথা যদি(sdepth == CV_16S && ddepth == CV_32F)
+                func = reduce_যোগ_R16s32f;
+            অন্যথা যদি(sdepth == CV_16S && ddepth == CV_64F)
+                func = reduce_যোগ_R16s64f;
+            অন্যথা যদি(sdepth == CV_32F && ddepth == CV_32F)
+                func = reduce_যোগ_R32f32f;
+            অন্যথা যদি(sdepth == CV_32F && ddepth == CV_64F)
+                func = reduce_যোগ_R32f64f;
+            অন্যথা যদি(sdepth == CV_64F && ddepth == CV_64F)
+                func = reduce_যোগ_R64f64f;
         }
-        else if(op == REDUCE_MAX)
+        অন্যথা যদি(op == REDUCE_MAX)
         {
-            if(sdepth == CV_8U && ddepth == CV_8U)
+            যদি(sdepth == CV_8U && ddepth == CV_8U)
                 func = reduceMaxR8u;
-            else if(sdepth == CV_16U && ddepth == CV_16U)
+            অন্যথা যদি(sdepth == CV_16U && ddepth == CV_16U)
                 func = reduceMaxR16u;
-            else if(sdepth == CV_16S && ddepth == CV_16S)
+            অন্যথা যদি(sdepth == CV_16S && ddepth == CV_16S)
                 func = reduceMaxR16s;
-            else if(sdepth == CV_32F && ddepth == CV_32F)
+            অন্যথা যদি(sdepth == CV_32F && ddepth == CV_32F)
                 func = reduceMaxR32f;
-            else if(sdepth == CV_64F && ddepth == CV_64F)
+            অন্যথা যদি(sdepth == CV_64F && ddepth == CV_64F)
                 func = reduceMaxR64f;
         }
-        else if(op == REDUCE_MIN)
+        অন্যথা যদি(op == REDUCE_MIN)
         {
-            if(sdepth == CV_8U && ddepth == CV_8U)
+            যদি(sdepth == CV_8U && ddepth == CV_8U)
                 func = reduceMinR8u;
-            else if(sdepth == CV_16U && ddepth == CV_16U)
+            অন্যথা যদি(sdepth == CV_16U && ddepth == CV_16U)
                 func = reduceMinR16u;
-            else if(sdepth == CV_16S && ddepth == CV_16S)
+            অন্যথা যদি(sdepth == CV_16S && ddepth == CV_16S)
                 func = reduceMinR16s;
-            else if(sdepth == CV_32F && ddepth == CV_32F)
+            অন্যথা যদি(sdepth == CV_32F && ddepth == CV_32F)
                 func = reduceMinR32f;
-            else if(sdepth == CV_64F && ddepth == CV_64F)
+            অন্যথা যদি(sdepth == CV_64F && ddepth == CV_64F)
                 func = reduceMinR64f;
         }
-        else if( op == REDUCE_SUM2 )
+        অন্যথা যদি( op == REDUCE_SUM2 )
         {
-            ReduceSumFunc simd_func = getReduceRSum2Func(sdepth, ddepth);
-            if(simd_func)
+            Reduce_যোগ_Func simd_func = getReduceRSum2Func(sdepth, ddepth);
+            যদি(simd_func)
                 func = simd_func;
-            else if(sdepth == CV_8U && ddepth == CV_32S)
+            অন্যথা যদি(sdepth == CV_8U && ddepth == CV_32S)
                 func = reduceSum2R8u32s;
-            else if(sdepth == CV_8U && ddepth == CV_32F)
+            অন্যথা যদি(sdepth == CV_8U && ddepth == CV_32F)
                 func = reduceSum2R8u32f;
-            else if(sdepth == CV_8U && ddepth == CV_64F)
+            অন্যথা যদি(sdepth == CV_8U && ddepth == CV_64F)
                 func = reduceSum2R8u64f;
-            else if(sdepth == CV_16U && ddepth == CV_32F)
+            অন্যথা যদি(sdepth == CV_16U && ddepth == CV_32F)
                 func = reduceSum2R16u32f;
-            else if(sdepth == CV_16U && ddepth == CV_64F)
+            অন্যথা যদি(sdepth == CV_16U && ddepth == CV_64F)
                 func = reduceSum2R16u64f;
-            else if(sdepth == CV_16S && ddepth == CV_32F)
+            অন্যথা যদি(sdepth == CV_16S && ddepth == CV_32F)
                 func = reduceSum2R16s32f;
-            else if(sdepth == CV_16S && ddepth == CV_64F)
+            অন্যথা যদি(sdepth == CV_16S && ddepth == CV_64F)
                 func = reduceSum2R16s64f;
-            else if(sdepth == CV_32F && ddepth == CV_32F)
+            অন্যথা যদি(sdepth == CV_32F && ddepth == CV_32F)
                 func = reduceSum2R32f32f;
-            else if(sdepth == CV_32F && ddepth == CV_64F)
+            অন্যথা যদি(sdepth == CV_32F && ddepth == CV_64F)
                 func = reduceSum2R32f64f;
-            else if(sdepth == CV_64F && ddepth == CV_64F)
+            অন্যথা যদি(sdepth == CV_64F && ddepth == CV_64F)
                 func = reduceSum2R64f64f;
         }
     }
-    else
+    অন্যথা
     {
-        if(op == REDUCE_SUM)
+        যদি(op == REDUCE_যোগ)
         {
-            ReduceSumFunc simd_func = getReduceCSumFunc(sdepth, ddepth);
-            if(simd_func)
+            Reduce_যোগ_Func simd_func = getReduceCSumFunc(sdepth, ddepth);
+            যদি(simd_func)
                 func = (ReduceFunc)simd_func;
-            else if(sdepth == CV_8U && ddepth == CV_32S)
-                func = reduceSumC8u32s;
-            else if(sdepth == CV_8U && ddepth == CV_32F)
-                func = reduceSumC8u32f;
-            else if(sdepth == CV_8U && ddepth == CV_64F)
-                func = reduceSumC8u64f;
-            else if(sdepth == CV_16U && ddepth == CV_32F)
-                func = reduceSumC16u32f;
-            else if(sdepth == CV_16U && ddepth == CV_64F)
-                func = reduceSumC16u64f;
-            else if(sdepth == CV_16S && ddepth == CV_32F)
-                func = reduceSumC16s32f;
-            else if(sdepth == CV_16S && ddepth == CV_64F)
-                func = reduceSumC16s64f;
-            else if(sdepth == CV_32F && ddepth == CV_32F)
-                func = reduceSumC32f32f;
-            else if(sdepth == CV_32F && ddepth == CV_64F)
-                func = reduceSumC32f64f;
-            else if(sdepth == CV_64F && ddepth == CV_64F)
-                func = reduceSumC64f64f;
+            অন্যথা যদি(sdepth == CV_8U && ddepth == CV_32S)
+                func = reduce_যোগ_C8u32s;
+            অন্যথা যদি(sdepth == CV_8U && ddepth == CV_32F)
+                func = reduce_যোগ_C8u32f;
+            অন্যথা যদি(sdepth == CV_8U && ddepth == CV_64F)
+                func = reduce_যোগ_C8u64f;
+            অন্যথা যদি(sdepth == CV_16U && ddepth == CV_32F)
+                func = reduce_যোগ_C16u32f;
+            অন্যথা যদি(sdepth == CV_16U && ddepth == CV_64F)
+                func = reduce_যোগ_C16u64f;
+            অন্যথা যদি(sdepth == CV_16S && ddepth == CV_32F)
+                func = reduce_যোগ_C16s32f;
+            অন্যথা যদি(sdepth == CV_16S && ddepth == CV_64F)
+                func = reduce_যোগ_C16s64f;
+            অন্যথা যদি(sdepth == CV_32F && ddepth == CV_32F)
+                func = reduce_যোগ_C32f32f;
+            অন্যথা যদি(sdepth == CV_32F && ddepth == CV_64F)
+                func = reduce_যোগ_C32f64f;
+            অন্যথা যদি(sdepth == CV_64F && ddepth == CV_64F)
+                func = reduce_যোগ_C64f64f;
         }
-        else if(op == REDUCE_MAX)
+        অন্যথা যদি(op == REDUCE_MAX)
         {
-            if(sdepth == CV_8U && ddepth == CV_8U)
+            যদি(sdepth == CV_8U && ddepth == CV_8U)
                 func = reduceMaxC8u;
-            else if(sdepth == CV_16U && ddepth == CV_16U)
+            অন্যথা যদি(sdepth == CV_16U && ddepth == CV_16U)
                 func = reduceMaxC16u;
-            else if(sdepth == CV_16S && ddepth == CV_16S)
+            অন্যথা যদি(sdepth == CV_16S && ddepth == CV_16S)
                 func = reduceMaxC16s;
-            else if(sdepth == CV_32F && ddepth == CV_32F)
+            অন্যথা যদি(sdepth == CV_32F && ddepth == CV_32F)
                 func = reduceMaxC32f;
-            else if(sdepth == CV_64F && ddepth == CV_64F)
+            অন্যথা যদি(sdepth == CV_64F && ddepth == CV_64F)
                 func = reduceMaxC64f;
         }
-        else if(op == REDUCE_MIN)
+        অন্যথা যদি(op == REDUCE_MIN)
         {
-            if(sdepth == CV_8U && ddepth == CV_8U)
+            যদি(sdepth == CV_8U && ddepth == CV_8U)
                 func = reduceMinC8u;
-            else if(sdepth == CV_16U && ddepth == CV_16U)
+            অন্যথা যদি(sdepth == CV_16U && ddepth == CV_16U)
                 func = reduceMinC16u;
-            else if(sdepth == CV_16S && ddepth == CV_16S)
+            অন্যথা যদি(sdepth == CV_16S && ddepth == CV_16S)
                 func = reduceMinC16s;
-            else if(sdepth == CV_32F && ddepth == CV_32F)
+            অন্যথা যদি(sdepth == CV_32F && ddepth == CV_32F)
                 func = reduceMinC32f;
-            else if(sdepth == CV_64F && ddepth == CV_64F)
+            অন্যথা যদি(sdepth == CV_64F && ddepth == CV_64F)
                 func = reduceMinC64f;
         }
-        else if(op == REDUCE_SUM2)
+        অন্যথা যদি(op == REDUCE_SUM2)
         {
-            if(sdepth == CV_8U && ddepth == CV_32S)
+            যদি(sdepth == CV_8U && ddepth == CV_32S)
                 func = reduceSum2C8u32s;
-            else if(sdepth == CV_8U && ddepth == CV_32F)
+            অন্যথা যদি(sdepth == CV_8U && ddepth == CV_32F)
                 func = reduceSum2C8u32f;
-            else if(sdepth == CV_8U && ddepth == CV_64F)
+            অন্যথা যদি(sdepth == CV_8U && ddepth == CV_64F)
                 func = reduceSum2C8u64f;
-            else if(sdepth == CV_16U && ddepth == CV_32F)
+            অন্যথা যদি(sdepth == CV_16U && ddepth == CV_32F)
                 func = reduceSum2C16u32f;
-            else if(sdepth == CV_16U && ddepth == CV_64F)
+            অন্যথা যদি(sdepth == CV_16U && ddepth == CV_64F)
                 func = reduceSum2C16u64f;
-            else if(sdepth == CV_16S && ddepth == CV_32F)
+            অন্যথা যদি(sdepth == CV_16S && ddepth == CV_32F)
                 func = reduceSum2C16s32f;
-            else if(sdepth == CV_16S && ddepth == CV_64F)
+            অন্যথা যদি(sdepth == CV_16S && ddepth == CV_64F)
                 func = reduceSum2C16s64f;
-            else if(sdepth == CV_32F && ddepth == CV_32F)
+            অন্যথা যদি(sdepth == CV_32F && ddepth == CV_32F)
                 func = reduceSum2C32f32f;
-            else if(sdepth == CV_32F && ddepth == CV_64F)
+            অন্যথা যদি(sdepth == CV_32F && ddepth == CV_64F)
                 func = reduceSum2C32f64f;
-            else if(sdepth == CV_64F && ddepth == CV_64F)
+            অন্যথা যদি(sdepth == CV_64F && ddepth == CV_64F)
                 func = reduceSum2C64f64f;
         }
     }
 
-    if( !func )
+    যদি( !func )
         CV_Error( cv::Error::StsUnsupportedFormat,
                   "Unsupported combination of input and output array formats" );
 
-    func( src, temp );
+    func( src, অস্থায়ী_2 );
 
-    if( op0 == REDUCE_AVG )
-        temp.convertTo(dst, dst.type(), 1./(dim == 0 ? src.rows : src.cols));
+    যদি( op0 == REDUCE_AVG )
+        অস্থায়ী_2.convertTo(dst, dst.type(), 1./(dim == 0 ? src.rows : src.cols));
 }
 
 
 //////////////////////////////////////// sort ///////////////////////////////////////////
 
-namespace cv
+নামাকাশ cv
 {
 
-template<typename T> static void sort_( const Mat& src, Mat& dst, int flags )
+template<typename T> স্থির শূন্য sort_( ধ্রুবক Mat& src, Mat& dst, পূর্ণসংখ্যা flags )
 {
-    int n, len;
-    bool sortRows = (flags & 1) == SORT_EVERY_ROW;
-    bool inplace = src.data == dst.data;
-    bool sortDescending = (flags & SORT_DESCENDING) != 0;
+    পূর্ণসংখ্যা n, len;
+    যৌক্তিক sortRows = (flags & 1) == SORT_EVERY_ROW;
+    যৌক্তিক inplace = src.তথ্য == dst.তথ্য;
+    যৌক্তিক sortDescending = (flags & SORT_DESCENDING) != 0;
 
-    if( sortRows )
+    যদি( sortRows )
         n = src.rows, len = src.cols;
-    else
+    অন্যথা
         n = src.cols, len = src.rows;
-    parallel_for_(Range(0, n), [&](const Range& range)
+    parallel_for_(Range(0, n), [&](ধ্রুবক Range& range)
     {
-        AutoBuffer<T> buf;
-        if( !sortRows )
+        Auto_বাফার<T> buf;
+        যদি( !sortRows )
             buf.allocate(len);
-        T* bptr = buf.data();
+        T* bptr = buf.তথ্য();
 
-        for( int i = range.start; i < range.end; i++ )
+        জন্য( পূর্ণসংখ্যা i = range.start; i < range.end; i++ )
         {
             T* ptr = bptr;
-            if( sortRows )
+            যদি( sortRows )
             {
                 T* dptr = dst.ptr<T>(i);
-                if( !inplace )
+                যদি( !inplace )
                 {
-                    const T* sptr = src.ptr<T>(i);
-                    memcpy(dptr, sptr, sizeof(T) * len);
+                    ধ্রুবক T* sptr = src.ptr<T>(i);
+                    memcpy(dptr, sptr, আকার(T) * len);
                 }
                 ptr = dptr;
             }
-            else
+            অন্যথা
             {
-                for( int j = 0; j < len; j++ )
+                জন্য( পূর্ণসংখ্যা j = 0; j < len; j++ )
                     ptr[j] = src.ptr<T>(j)[i];
             }
 
             std::sort( ptr, ptr + len );
-            if( sortDescending )
+            যদি( sortDescending )
             {
-                for( int j = 0; j < len/2; j++ )
+                জন্য( পূর্ণসংখ্যা j = 0; j < len/2; j++ )
                     std::swap(ptr[j], ptr[len-1-j]);
             }
 
-            if( !sortRows )
-                for( int j = 0; j < len; j++ )
+            যদি( !sortRows )
+                জন্য( পূর্ণসংখ্যা j = 0; j < len; j++ )
                     dst.ptr<T>(j)[i] = ptr[j];
         }
     });
 }
 
 
-#if defined(HAVE_IPP) && !IPP_DISABLE_SORT
-typedef IppStatus (CV_STDCALL *IppSortFunc)(void  *pSrcDst, int    len, Ipp8u *pBuffer);
+#যদি defined(HAVE_IPP) && !IPP_DISABLE_SORT
+প্রকারলেখ IppStatus (CV_STDCALL *IppSortFunc)(শূন্য  *pSrcDst, পূর্ণসংখ্যা    len, Ipp8u *p_বাফার);
 
-template<typename T, IppStatus (CV_STDCALL *fn)(T*, int, Ipp8u*)>
-static IppStatus CV_STDCALL ippSortWrap(void* pSrcDst, int len, Ipp8u* pBuffer)
+template<typename T, IppStatus (CV_STDCALL *fn)(T*, পূর্ণসংখ্যা, Ipp8u*)>
+স্থির IppStatus CV_STDCALL ippSortWrap(শূন্য* pSrcDst, পূর্ণসংখ্যা len, Ipp8u* p_বাফার)
 {
-    return fn((T*)pSrcDst, len, pBuffer);
+    ফেরত fn((T*)pSrcDst, len, p_বাফার);
 }
 
-static IppSortFunc getSortFunc(int depth, bool sortDescending)
+স্থির IppSortFunc getSortFunc(পূর্ণসংখ্যা depth, যৌক্তিক sortDescending)
 {
-    if (!sortDescending)
-        return depth == CV_8U ? ippSortWrap<Ipp8u, ippsSortRadixAscend_8u_I> :
+    যদি (!sortDescending)
+        ফেরত depth == CV_8U ? ippSortWrap<Ipp8u, ippsSortRadixAscend_8u_I> :
             depth == CV_16U ? ippSortWrap<Ipp16u, ippsSortRadixAscend_16u_I> :
             depth == CV_16S ? ippSortWrap<Ipp16s, ippsSortRadixAscend_16s_I> :
             depth == CV_32S ? ippSortWrap<Ipp32s, ippsSortRadixAscend_32s_I> :
             depth == CV_32F ? ippSortWrap<Ipp32f, ippsSortRadixAscend_32f_I> :
             depth == CV_64F ? ippSortWrap<Ipp64f, ippsSortRadixAscend_64f_I> :
             0;
-    else
-        return depth == CV_8U ? ippSortWrap<Ipp8u, ippsSortRadixDescend_8u_I> :
+    অন্যথা
+        ফেরত depth == CV_8U ? ippSortWrap<Ipp8u, ippsSortRadixDescend_8u_I> :
             depth == CV_16U ? ippSortWrap<Ipp16u, ippsSortRadixDescend_16u_I> :
             depth == CV_16S ? ippSortWrap<Ipp16s, ippsSortRadixDescend_16s_I> :
             depth == CV_32S ? ippSortWrap<Ipp32s, ippsSortRadixDescend_32s_I> :
@@ -1073,68 +1073,68 @@ static IppSortFunc getSortFunc(int depth, bool sortDescending)
             0;
 }
 
-static bool ipp_sort(const Mat& src, Mat& dst, int flags)
+স্থির যৌক্তিক ipp_sort(ধ্রুবক Mat& src, Mat& dst, পূর্ণসংখ্যা flags)
 {
     CV_INSTRUMENT_REGION_IPP();
 
-    bool        sortRows        = (flags & 1) == SORT_EVERY_ROW;
-    bool        sortDescending  = (flags & SORT_DESCENDING) != 0;
-    bool        inplace         = (src.data == dst.data);
-    int         depth           = src.depth();
-    IppDataType type            = ippiGetDataType(depth);
+    যৌক্তিক        sortRows        = (flags & 1) == SORT_EVERY_ROW;
+    যৌক্তিক        sortDescending  = (flags & SORT_DESCENDING) != 0;
+    যৌক্তিক        inplace         = (src.তথ্য == dst.তথ্য);
+    পূর্ণসংখ্যা         depth           = src.depth();
+    Ipp_তথ্য_Type type            = ippi_Get_তথ্য_Type(depth);
 
     IppSortFunc ippsSortRadix_I = getSortFunc(depth, sortDescending);
-    if(!ippsSortRadix_I)
-        return false;
+    যদি(!ippsSortRadix_I)
+        ফেরত মিথ্যা;
 
-    int n, len;
-    if( sortRows )
+    পূর্ণসংখ্যা n, len;
+    যদি( sortRows )
         n = src.rows, len = src.cols;
-    else
+    অন্যথা
         n = src.cols, len = src.rows;
 
-    int bufferSize;
-    if(ippsSortRadixGetBufferSize(len, type, &bufferSize) < 0)
-        return false;
+    পূর্ণসংখ্যা বাফার_আকার;
+    যদি(ipps_Sort_Radix_Get_বাফার_আকার(len, type, &বাফার_আকার) < 0)
+        ফেরত মিথ্যা;
 
     // Each row/column sorts independently, so parallelize over n like sort_ does.
     // IPP scratch (buffer) and per-column temporaries are thread-local; a shared flag
     // records IPP failures since the lambda cannot return from ipp_sort.
-    volatile bool ok = true;
-    parallel_for_(Range(0, n), [&](const Range& range)
+    অস্থির যৌক্তিক ok = সত্য;
+    parallel_for_(Range(0, n), [&](ধ্রুবক Range& range)
     {
-        AutoBuffer<Ipp8u> buffer(bufferSize);
+        Auto_বাফার<Ipp8u> বাফার(বাফার_আকার);
         Mat  row;
         Rect subRect(0,0,1,src.rows);
-        if( !sortRows )
+        যদি( !sortRows )
             row.create(1, src.rows, src.type());
 
-        for( int i = range.start; i < range.end; i++ )
+        জন্য( পূর্ণসংখ্যা i = range.start; i < range.end; i++ )
         {
-            if( !ok )
-                break;
-            void* ptr;
-            if( sortRows )
+            যদি( !ok )
+                বিরতি;
+            শূন্য* ptr;
+            যদি( sortRows )
             {
                 uchar* dptr = dst.ptr(i);
-                if( !inplace )
-                    memcpy(dptr, src.ptr(i), src.cols * src.elemSize());
+                যদি( !inplace )
+                    memcpy(dptr, src.ptr(i), src.cols * src.elem_আকার());
                 ptr = dptr;
             }
-            else
+            অন্যথা
             {
                 subRect.x = i;
                 Mat(src, subRect).copyTo(row);
                 ptr = row.ptr();
             }
 
-            if( CV_INSTRUMENT_FUN_IPP(ippsSortRadix_I, ptr, len, buffer.data()) < 0 )
+            যদি( CV_INSTRUMENT_FUN_IPP(ippsSortRadix_I, ptr, len, বাফার.তথ্য()) < 0 )
             {
-                ok = false;
-                break;
+                ok = মিথ্যা;
+                বিরতি;
             }
 
-            if( !sortRows )
+            যদি( !sortRows )
             {
                 Mat dstSub(dst, subRect);
                 row = row.reshape(1, dstSub.rows);
@@ -1144,175 +1144,175 @@ static bool ipp_sort(const Mat& src, Mat& dst, int flags)
         }
     });
 
-    return ok;
+    ফেরত ok;
 }
 #endif
 
-template<typename _Tp> class LessThanIdx
+template<typename _Tp> শ্রেণী LessThanIdx
 {
-public:
-    LessThanIdx( const _Tp* _arr ) : arr(_arr) {}
-    bool operator()(int a, int b) const { return arr[a] < arr[b]; }
-    const _Tp* arr;
+সর্বজনীন:
+    LessThanIdx( ধ্রুবক _Tp* _arr ) : arr(_arr) {}
+    যৌক্তিক operator()(পূর্ণসংখ্যা a, পূর্ণসংখ্যা b) ধ্রুবক { ফেরত arr[a] < arr[b]; }
+    ধ্রুবক _Tp* arr;
 };
 
-template<typename T> static void sortIdx_( const Mat& src, Mat& dst, int flags )
+template<typename T> স্থির শূন্য sortIdx_( ধ্রুবক Mat& src, Mat& dst, পূর্ণসংখ্যা flags )
 {
-    AutoBuffer<T> buf;
-    AutoBuffer<int> ibuf;
-    bool sortRows = (flags & 1) == SORT_EVERY_ROW;
-    bool sortDescending = (flags & SORT_DESCENDING) != 0;
+    Auto_বাফার<T> buf;
+    Auto_বাফার<পূর্ণসংখ্যা> ibuf;
+    যৌক্তিক sortRows = (flags & 1) == SORT_EVERY_ROW;
+    যৌক্তিক sortDescending = (flags & SORT_DESCENDING) != 0;
 
-    CV_Assert( src.data != dst.data );
+    CV_Assert( src.তথ্য != dst.তথ্য );
 
-    int n, len;
-    if( sortRows )
+    পূর্ণসংখ্যা n, len;
+    যদি( sortRows )
         n = src.rows, len = src.cols;
-    else
+    অন্যথা
     {
         n = src.cols, len = src.rows;
         buf.allocate(len);
         ibuf.allocate(len);
     }
-    T* bptr = buf.data();
-    int* _iptr = ibuf.data();
+    T* bptr = buf.তথ্য();
+    পূর্ণসংখ্যা* _iptr = ibuf.তথ্য();
 
-    for( int i = 0; i < n; i++ )
+    জন্য( পূর্ণসংখ্যা i = 0; i < n; i++ )
     {
         T* ptr = bptr;
-        int* iptr = _iptr;
+        পূর্ণসংখ্যা* iptr = _iptr;
 
-        if( sortRows )
+        যদি( sortRows )
         {
-            ptr = (T*)(src.data + src.step*i);
-            iptr = dst.ptr<int>(i);
+            ptr = (T*)(src.তথ্য + src.step*i);
+            iptr = dst.ptr<পূর্ণসংখ্যা>(i);
         }
-        else
+        অন্যথা
         {
-            for( int j = 0; j < len; j++ )
+            জন্য( পূর্ণসংখ্যা j = 0; j < len; j++ )
                 ptr[j] = src.ptr<T>(j)[i];
         }
-        for( int j = 0; j < len; j++ )
+        জন্য( পূর্ণসংখ্যা j = 0; j < len; j++ )
             iptr[j] = j;
 
         std::sort( iptr, iptr + len, LessThanIdx<T>(ptr) );
-        if( sortDescending )
+        যদি( sortDescending )
         {
-            for( int j = 0; j < len/2; j++ )
+            জন্য( পূর্ণসংখ্যা j = 0; j < len/2; j++ )
                 std::swap(iptr[j], iptr[len-1-j]);
         }
 
-        if( !sortRows )
-            for( int j = 0; j < len; j++ )
-                dst.ptr<int>(j)[i] = iptr[j];
+        যদি( !sortRows )
+            জন্য( পূর্ণসংখ্যা j = 0; j < len; j++ )
+                dst.ptr<পূর্ণসংখ্যা>(j)[i] = iptr[j];
     }
 }
 
-#if defined(HAVE_IPP) && !IPP_DISABLE_SORT
-typedef IppStatus (CV_STDCALL *IppSortIndexFunc)(const void*  pSrc, Ipp32s srcStrideBytes, Ipp32s *pDstIndx, int len, Ipp8u *pBuffer);
+#যদি defined(HAVE_IPP) && !IPP_DISABLE_SORT
+প্রকারলেখ IppStatus (CV_STDCALL *Ipp_Sort_সূচক_Func)(ধ্রুবক শূন্য*  pSrc, Ipp32s srcStrideBytes, Ipp32s *pDstIndx, পূর্ণসংখ্যা len, Ipp8u *p_বাফার);
 
-template<typename T, IppStatus (CV_STDCALL *fn)(const T*, Ipp32s, Ipp32s*, int, Ipp8u*)>
-static IppStatus CV_STDCALL ippSortIndexWrap(const void* pSrc, Ipp32s srcStrideBytes, Ipp32s *pDstIndx, int len, Ipp8u *pBuffer)
+template<typename T, IppStatus (CV_STDCALL *fn)(ধ্রুবক T*, Ipp32s, Ipp32s*, পূর্ণসংখ্যা, Ipp8u*)>
+স্থির IppStatus CV_STDCALL ipp_Sort_সূচক_Wrap(ধ্রুবক শূন্য* pSrc, Ipp32s srcStrideBytes, Ipp32s *pDstIndx, পূর্ণসংখ্যা len, Ipp8u *p_বাফার)
 {
-    return fn((const T*)pSrc, srcStrideBytes, pDstIndx, len, pBuffer);
+    ফেরত fn((ধ্রুবক T*)pSrc, srcStrideBytes, pDstIndx, len, p_বাফার);
 }
 
-static IppSortIndexFunc getSortIndexFunc(int depth, bool sortDescending)
+স্থির Ipp_Sort_সূচক_Func get_Sort_সূচক_Func(পূর্ণসংখ্যা depth, যৌক্তিক sortDescending)
 {
-    if (!sortDescending)
-        return depth == CV_8U ? ippSortIndexWrap<Ipp8u, ippsSortRadixIndexAscend_8u> :
-            depth == CV_16U ? ippSortIndexWrap<Ipp16u, ippsSortRadixIndexAscend_16u> :
-            depth == CV_16S ? ippSortIndexWrap<Ipp16s, ippsSortRadixIndexAscend_16s> :
-            depth == CV_32S ? ippSortIndexWrap<Ipp32s, ippsSortRadixIndexAscend_32s> :
-            depth == CV_32F ? ippSortIndexWrap<Ipp32f, ippsSortRadixIndexAscend_32f> :
+    যদি (!sortDescending)
+        ফেরত depth == CV_8U ? ipp_Sort_সূচক_Wrap<Ipp8u, ipps_Sort_Radix_সূচক_Ascend_8u> :
+            depth == CV_16U ? ipp_Sort_সূচক_Wrap<Ipp16u, ipps_Sort_Radix_সূচক_Ascend_16u> :
+            depth == CV_16S ? ipp_Sort_সূচক_Wrap<Ipp16s, ipps_Sort_Radix_সূচক_Ascend_16s> :
+            depth == CV_32S ? ipp_Sort_সূচক_Wrap<Ipp32s, ipps_Sort_Radix_সূচক_Ascend_32s> :
+            depth == CV_32F ? ipp_Sort_সূচক_Wrap<Ipp32f, ipps_Sort_Radix_সূচক_Ascend_32f> :
             0;
-    else
-        return depth == CV_8U ? ippSortIndexWrap<Ipp8u, ippsSortRadixIndexDescend_8u> :
-            depth == CV_16U ? ippSortIndexWrap<Ipp16u, ippsSortRadixIndexDescend_16u> :
-            depth == CV_16S ? ippSortIndexWrap<Ipp16s, ippsSortRadixIndexDescend_16s> :
-            depth == CV_32S ? ippSortIndexWrap<Ipp32s, ippsSortRadixIndexDescend_32s> :
-            depth == CV_32F ? ippSortIndexWrap<Ipp32f, ippsSortRadixIndexDescend_32f> :
+    অন্যথা
+        ফেরত depth == CV_8U ? ipp_Sort_সূচক_Wrap<Ipp8u, ipps_Sort_Radix_সূচক_Descend_8u> :
+            depth == CV_16U ? ipp_Sort_সূচক_Wrap<Ipp16u, ipps_Sort_Radix_সূচক_Descend_16u> :
+            depth == CV_16S ? ipp_Sort_সূচক_Wrap<Ipp16s, ipps_Sort_Radix_সূচক_Descend_16s> :
+            depth == CV_32S ? ipp_Sort_সূচক_Wrap<Ipp32s, ipps_Sort_Radix_সূচক_Descend_32s> :
+            depth == CV_32F ? ipp_Sort_সূচক_Wrap<Ipp32f, ipps_Sort_Radix_সূচক_Descend_32f> :
             0;
 }
 
-static bool ipp_sortIdx( const Mat& src, Mat& dst, int flags )
+স্থির যৌক্তিক ipp_sortIdx( ধ্রুবক Mat& src, Mat& dst, পূর্ণসংখ্যা flags )
 {
     CV_INSTRUMENT_REGION_IPP();
 
-    bool        sortRows        = (flags & 1) == SORT_EVERY_ROW;
-    bool        sortDescending  = (flags & SORT_DESCENDING) != 0;
-    int         depth           = src.depth();
-    IppDataType type            = ippiGetDataType(depth);
+    যৌক্তিক        sortRows        = (flags & 1) == SORT_EVERY_ROW;
+    যৌক্তিক        sortDescending  = (flags & SORT_DESCENDING) != 0;
+    পূর্ণসংখ্যা         depth           = src.depth();
+    Ipp_তথ্য_Type type            = ippi_Get_তথ্য_Type(depth);
 
-    IppSortIndexFunc ippsSortRadixIndex = getSortIndexFunc(depth, sortDescending);
-    if(!ippsSortRadixIndex)
-        return false;
+    Ipp_Sort_সূচক_Func ipps_Sort_Radix_সূচক = get_Sort_সূচক_Func(depth, sortDescending);
+    যদি(!ipps_Sort_Radix_সূচক)
+        ফেরত মিথ্যা;
 
-    if(sortRows)
+    যদি(sortRows)
     {
-        AutoBuffer<Ipp8u> buffer;
-        int               bufferSize;
-        if(ippsSortRadixIndexGetBufferSize(src.cols, type, &bufferSize) < 0)
-            return false;
+        Auto_বাফার<Ipp8u> বাফার;
+        পূর্ণসংখ্যা               বাফার_আকার;
+        যদি(ipps_Sort_Radix_সূচক_Get_বাফার_আকার(src.cols, type, &বাফার_আকার) < 0)
+            ফেরত মিথ্যা;
 
-        buffer.allocate(bufferSize);
+        বাফার.allocate(বাফার_আকার);
 
-        for(int i = 0; i < src.rows; i++)
+        জন্য(পূর্ণসংখ্যা i = 0; i < src.rows; i++)
         {
-            if(CV_INSTRUMENT_FUN_IPP(ippsSortRadixIndex, (const void*)src.ptr(i), (Ipp32s)src.step[1], (Ipp32s*)dst.ptr(i), src.cols, buffer.data()) < 0)
-                return false;
+            যদি(CV_INSTRUMENT_FUN_IPP(ipps_Sort_Radix_সূচক, (ধ্রুবক শূন্য*)src.ptr(i), (Ipp32s)src.step[1], (Ipp32s*)dst.ptr(i), src.cols, বাফার.তথ্য()) < 0)
+                ফেরত মিথ্যা;
         }
     }
-    else
+    অন্যথা
     {
         Mat  dstRow(1, dst.rows, dst.type());
         Mat  dstSub;
         Rect subRect(0,0,1,src.rows);
 
-        AutoBuffer<Ipp8u> buffer;
-        int               bufferSize;
-        if(ippsSortRadixIndexGetBufferSize(src.rows, type, &bufferSize) < 0)
-            return false;
+        Auto_বাফার<Ipp8u> বাফার;
+        পূর্ণসংখ্যা               বাফার_আকার;
+        যদি(ipps_Sort_Radix_সূচক_Get_বাফার_আকার(src.rows, type, &বাফার_আকার) < 0)
+            ফেরত মিথ্যা;
 
-        buffer.allocate(bufferSize);
+        বাফার.allocate(বাফার_আকার);
 
         Ipp32s srcStep = (Ipp32s)src.step[0];
-        for(int i = 0; i < src.cols; i++)
+        জন্য(পূর্ণসংখ্যা i = 0; i < src.cols; i++)
         {
             subRect.x = i;
             dstSub = Mat(dst, subRect);
 
-            if(CV_INSTRUMENT_FUN_IPP(ippsSortRadixIndex, (const void*)src.ptr(0, i), srcStep, (Ipp32s*)dstRow.ptr(), src.rows, buffer.data()) < 0)
-                return false;
+            যদি(CV_INSTRUMENT_FUN_IPP(ipps_Sort_Radix_সূচক, (ধ্রুবক শূন্য*)src.ptr(0, i), srcStep, (Ipp32s*)dstRow.ptr(), src.rows, বাফার.তথ্য()) < 0)
+                ফেরত মিথ্যা;
 
             dstRow = dstRow.reshape(1, dstSub.rows);
             dstRow.copyTo(dstSub);
         }
     }
 
-    return true;
+    ফেরত সত্য;
 }
 #endif
 
-typedef void (*SortFunc)(const Mat& src, Mat& dst, int flags);
+প্রকারলেখ শূন্য (*SortFunc)(ধ্রুবক Mat& src, Mat& dst, পূর্ণসংখ্যা flags);
 }
 
-void cv::sort( InputArray _src, OutputArray _dst, int flags )
+শূন্য cv::sort( প্রবেশ_Array _src, OutputArray _dst, পূর্ণসংখ্যা flags )
 {
     CV_INSTRUMENT_REGION();
 
     Mat src = _src.getMat();
     CV_Assert( src.dims <= 2 && src.channels() == 1 );
-    _dst.createSameSize( src, src.type() );
+    _dst.create_Same_আকার( src, src.type() );
     Mat dst = _dst.getMat();
-#if !IPP_DISABLE_SORT
+#যদি !IPP_DISABLE_SORT
     CV_IPP_RUN_FAST(ipp_sort(src, dst, flags));
 #endif
 
-    static SortFunc tab[CV_DEPTH_MAX] =
+    স্থির SortFunc tab[CV_DEPTH_MAX] =
     {
         sort_<uchar>, sort_<schar>, sort_<ushort>, sort_<short>,
-        sort_<int>, sort_<float>, sort_<double>, 0
+        sort_<পূর্ণসংখ্যা>, sort_<দশমিক>, sort_<দ্বিগুণ>, 0
     };
     SortFunc func = tab[src.depth()];
     CV_Assert( func != 0 );
@@ -1320,26 +1320,26 @@ void cv::sort( InputArray _src, OutputArray _dst, int flags )
     func( src, dst, flags );
 }
 
-void cv::sortIdx( InputArray _src, OutputArray _dst, int flags )
+শূন্য cv::sortIdx( প্রবেশ_Array _src, OutputArray _dst, পূর্ণসংখ্যা flags )
 {
     CV_INSTRUMENT_REGION();
 
     Mat src = _src.getMat();
     CV_Assert( src.dims <= 2 && src.channels() == 1 );
     Mat dst = _dst.getMat();
-    if( dst.data == src.data )
+    যদি( dst.তথ্য == src.তথ্য )
         _dst.release();
-    _dst.createSameSize( src, CV_32S );
+    _dst.create_Same_আকার( src, CV_32S );
     dst = _dst.getMat();
 
-#if !IPP_DISABLE_SORT
+#যদি !IPP_DISABLE_SORT
     CV_IPP_RUN_FAST(ipp_sortIdx(src, dst, flags));
 #endif
 
-    static SortFunc tab[CV_DEPTH_MAX] =
+    স্থির SortFunc tab[CV_DEPTH_MAX] =
     {
         sortIdx_<uchar>, sortIdx_<schar>, sortIdx_<ushort>, sortIdx_<short>,
-        sortIdx_<int>, sortIdx_<float>, sortIdx_<double>, 0
+        sortIdx_<পূর্ণসংখ্যা>, sortIdx_<দশমিক>, sortIdx_<দ্বিগুণ>, 0
     };
     SortFunc func = tab[src.depth()];
     CV_Assert( func != 0 );

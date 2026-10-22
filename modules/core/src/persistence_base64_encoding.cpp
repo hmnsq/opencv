@@ -2,32 +2,32 @@
 // It is subject to the license terms in the LICENSE file found in the top-level directory
 // of this distribution and at http://opencv.org/license.html
 
-#include "precomp.hpp"
-#include "persistence_impl.hpp"
-#include "persistence_base64_encoding.hpp"
+#অন্তর্ভাব "precomp.hpp"
+#অন্তর্ভাব "persistence_impl.hpp"
+#অন্তর্ভাব "persistence_base64_encoding.hpp"
 
-namespace cv
+নামাকাশ cv
 {
 
-class base64::Base64ContextEmitter
+শ্রেণী base64::Base64ContextEmitter
 {
-public:
-    explicit Base64ContextEmitter(cv::FileStorage::Impl& fs, bool needs_indent_)
+সর্বজনীন:
+    explicit Base64ContextEmitter(cv::FileStorage::Impl& fs, যৌক্তিক needs_indent_)
             : file_storage(fs)
             , needs_indent(needs_indent_)
-            , binary_buffer(BUFFER_LEN)
-            , base64_buffer(base64_encode_buffer_size(BUFFER_LEN))
+            , দ্বিমিক_বাফার(বাফার_LEN)
+            , base64_বাফার(base64_encode_বাফার_আকার(বাফার_LEN))
             , src_beg(0)
             , src_cur(0)
             , src_end(0)
     {
-        src_beg = binary_buffer.data();
-        src_end = src_beg + BUFFER_LEN;
+        src_beg = দ্বিমিক_বাফার.তথ্য();
+        src_end = src_beg + বাফার_LEN;
         src_cur = src_beg;
 
         CV_Assert(fs.write_mode);
 
-        if (needs_indent)
+        যদি (needs_indent)
         {
             file_storage.flush();
         }
@@ -36,30 +36,30 @@ public:
     ~Base64ContextEmitter()
     {
         /* cleaning */
-        if (src_cur != src_beg)
+        যদি (src_cur != src_beg)
             flush();    /* encode the rest binary data to base64 buffer */
     }
 
-    Base64ContextEmitter & write(const uchar * beg, const uchar * end)
+    Base64ContextEmitter & লিখ(ধ্রুবক uchar * beg, ধ্রুবক uchar * end)
     {
-        if (beg >= end)
-            return *this;
+        যদি (beg >= end)
+            ফেরত *এই;
 
-        while (beg < end) {
+        যখন (beg < end) {
             /* collect binary data and copy to binary buffer */
             size_t len = std::min(end - beg, src_end - src_cur);
             std::memcpy(src_cur, beg, len);
             beg     += len;
             src_cur += len;
 
-            if (src_cur >= src_end) {
+            যদি (src_cur >= src_end) {
                 /* binary buffer is full. */
                 /* encode it to base64 and send result to fs */
                 flush();
             }
         }
 
-        return *this;
+        ফেরত *এই;
     }
 
     /*
@@ -67,97 +67,97 @@ public:
      * - `operator >> (uchar * & dst)` for writing current binary data to `dst` and moving to next data.
      * - `operator bool` for checking if current location is valid and not the end.
      */
-    template<typename _to_binary_convertor_t> inline
-    Base64ContextEmitter & write(_to_binary_convertor_t & convertor)
+    template<typename to_দ্বিমিক_convertor_t> অন্তঃরেখ
+    Base64ContextEmitter & লিখ(to_দ্বিমিক_convertor_t & convertor)
     {
-        constexpr size_t BUFFER_MAX_LEN = 1024U;
+        constexpr size_t বাফার_MAX_LEN = 1024U;
 
-        uchar buffer[BUFFER_MAX_LEN];
-        uchar * beg = buffer;
+        uchar বাফার[বাফার_MAX_LEN];
+        uchar * beg = বাফার;
         uchar * end = beg;
 
-        while (convertor) {
+        যখন (convertor) {
             convertor >> end;
-            write(beg, end);
+            লিখ(beg, end);
             end = beg;
         }
 
-        return *this;
+        ফেরত *এই;
     }
 
-    bool flush()
+    যৌক্তিক flush()
     {
         /* control line width, so on. */
-        size_t len = base64_encode(src_beg, base64_buffer.data(), 0U, src_cur - src_beg);
-        if (len == 0U)
-            return false;
+        size_t len = base64_encode(src_beg, base64_বাফার.তথ্য(), 0U, src_cur - src_beg);
+        যদি (len == 0U)
+            ফেরত মিথ্যা;
 
         src_cur = src_beg;
 
-        if ( !needs_indent)
+        যদি ( !needs_indent)
         {
-            file_storage.puts((const char*)base64_buffer.data());
+            file_storage.puts((ধ্রুবক অক্ষর*)base64_বাফার.তথ্য());
         }
-        else
+        অন্যথা
         {
-            const char newline[] = "\n";
-            char space[80];
-            int ident = file_storage.write_stack.back().indent;
-            memset(space, ' ', static_cast<int>(ident));
+            ধ্রুবক অক্ষর newline[] = "\n";
+            অক্ষর space[80];
+            পূর্ণসংখ্যা ident = file_storage.write_স্তূপ.back().indent;
+            memset(space, ' ', static_cast<পূর্ণসংখ্যা>(ident));
             space[ident] = '\0';
 
             file_storage.puts(space);
-            file_storage.puts((const char*)base64_buffer.data());
+            file_storage.puts((ধ্রুবক অক্ষর*)base64_বাফার.তথ্য());
             file_storage.puts(newline);
             file_storage.flush();
         }
 
-        return true;
+        ফেরত সত্য;
     }
 
-private:
+ব্যক্তিগত:
     /* because of Base64, we must keep its length a multiple of 3 */
-    static const size_t BUFFER_LEN = 48U;
+    স্থির ধ্রুবক size_t বাফার_LEN = 48U;
     // static_assert(BUFFER_LEN % 3 == 0, "BUFFER_LEN is invalid");
 
-private:
+ব্যক্তিগত:
     cv::FileStorage::Impl& file_storage;
-    bool needs_indent;
+    যৌক্তিক needs_indent;
 
-    std::vector<uchar> binary_buffer;
-    std::vector<uchar> base64_buffer;
+    std::vector<uchar> দ্বিমিক_বাফার;
+    std::vector<uchar> base64_বাফার;
     uchar * src_beg;
     uchar * src_cur;
     uchar * src_end;
 };
 
-std::string base64::make_base64_header(const char *dt) {
+std::string base64::make_base64_header(ধ্রুবক অক্ষর *dt) {
     std::ostringstream oss;
     oss << dt   << ' ';
-    std::string buffer(oss.str());
-    CV_Assert(buffer.size() < ::base64::HEADER_SIZE);
+    std::string বাফার(oss.str());
+    CV_Assert(বাফার.size() < ::base64::HEADER_আকার);
 
-    buffer.reserve(::base64::HEADER_SIZE);
-    while (buffer.size() < ::base64::HEADER_SIZE)
-        buffer += ' ';
+    বাফার.reserve(::base64::HEADER_আকার);
+    যখন (বাফার.size() < ::base64::HEADER_আকার)
+        বাফার += ' ';
 
-    return buffer;
+    ফেরত বাফার;
 }
 
-size_t base64::base64_encode(const uint8_t *src, uint8_t *dst, size_t off, size_t cnt) {
-    if (!src || !dst || !cnt)
-        return 0;
+size_t base64::base64_encode(ধ্রুবক uint8_t *src, uint8_t *dst, size_t off, size_t cnt) {
+    যদি (!src || !dst || !cnt)
+        ফেরত 0;
 
     /* initialize beginning and end */
     uint8_t       * dst_beg = dst;
     uint8_t       * dst_cur = dst_beg;
 
-    uint8_t const * src_beg = src + off;
-    uint8_t const * src_cur = src_beg;
-    uint8_t const * src_end = src_cur + cnt / 3U * 3U;
+    uint8_t ধ্রুবক * src_beg = src + off;
+    uint8_t ধ্রুবক * src_cur = src_beg;
+    uint8_t ধ্রুবক * src_end = src_cur + cnt / 3U * 3U;
 
     /* integer multiples part */
-    while (src_cur < src_end) {
+    যখন (src_cur < src_end) {
         uint8_t _2 = *src_cur++;
         uint8_t _1 = *src_cur++;
         uint8_t _0 = *src_cur++;
@@ -169,11 +169,11 @@ size_t base64::base64_encode(const uint8_t *src, uint8_t *dst, size_t off, size_
 
     /* remainder part */
     size_t rst = src_beg + cnt - src_cur;
-    if (rst == 1U) {
+    যদি (rst == 1U) {
         uint8_t _2 = *src_cur++;
         *dst_cur++ = base64_mapping[ _2          >> 2U];
         *dst_cur++ = base64_mapping[(_2 & 0x03U) << 4U];
-    } else if (rst == 2U) {
+    } অন্যথা যদি (rst == 2U) {
         uint8_t _2 = *src_cur++;
         uint8_t _1 = *src_cur++;
         *dst_cur++ = base64_mapping[ _2          >> 2U];
@@ -182,69 +182,69 @@ size_t base64::base64_encode(const uint8_t *src, uint8_t *dst, size_t off, size_
     }
 
     /* padding */
-    switch (rst)
+    নির্বাচন (rst)
     {
-        case 1U: *dst_cur++ = base64_padding;
+        ক্ষেত্র 1U: *dst_cur++ = base64_padding;
             [[fallthrough]];
-        case 2U: *dst_cur++ = base64_padding;
+        ক্ষেত্র 2U: *dst_cur++ = base64_padding;
             [[fallthrough]];
-        default: *dst_cur   = 0;
-            break;
+        পূর্বনির্ধারিত: *dst_cur   = 0;
+            বিরতি;
     }
 
-    return static_cast<size_t>(dst_cur - dst_beg);
+    ফেরত static_cast<size_t>(dst_cur - dst_beg);
 }
 
-int base64::icvCalcStructSize(const char *dt, int initial_size) {
-    int size = cv::fs::calcElemSize( dt, initial_size );
-    size_t elem_max_size = 0;
-    for ( const char * type = dt; *type != '\0'; type++ ) {
-        switch ( *type )
+পূর্ণসংখ্যা base64::icv_Calc_Struct_আকার(ধ্রুবক অক্ষর *dt, পূর্ণসংখ্যা initial_আকার) {
+    পূর্ণসংখ্যা size = cv::fs::calc_Elem_আকার( dt, initial_আকার );
+    size_t elem_max_আকার = 0;
+    জন্য ( ধ্রুবক অক্ষর * type = dt; *type != '\0'; type++ ) {
+        নির্বাচন ( *type )
         {
-            case 'u': { elem_max_size = std::max( elem_max_size, sizeof(uchar ) ); break; }
-            case 'b': { elem_max_size = std::max( elem_max_size, sizeof(uchar ) ); break; }
-            case 'c': { elem_max_size = std::max( elem_max_size, sizeof(schar ) ); break; }
-            case 'w': { elem_max_size = std::max( elem_max_size, sizeof(ushort) ); break; }
-            case 's': { elem_max_size = std::max( elem_max_size, sizeof(short ) ); break; }
-            case 'i': { elem_max_size = std::max( elem_max_size, sizeof(int   ) ); break; }
-            case 'n': { elem_max_size = std::max( elem_max_size, sizeof(unsigned) ); break; }
-            case 'f': { elem_max_size = std::max( elem_max_size, sizeof(float ) ); break; }
-            case 'd': { elem_max_size = std::max( elem_max_size, sizeof(double) ); break; }
-            case 'I': { elem_max_size = std::max( elem_max_size, sizeof(int64_t)); break; }
-            case 'U': { elem_max_size = std::max( elem_max_size, sizeof(uint64_t)); break; }
-            case 'e': { elem_max_size = std::max( elem_max_size, sizeof(uchar) ); break; }
-            case 'E': { elem_max_size = std::max( elem_max_size, sizeof(uchar) ); break; }
-            default: break;
+            ক্ষেত্র 'u': { elem_max_আকার = std::max( elem_max_আকার, আকার(uchar ) ); বিরতি; }
+            ক্ষেত্র 'b': { elem_max_আকার = std::max( elem_max_আকার, আকার(uchar ) ); বিরতি; }
+            ক্ষেত্র 'c': { elem_max_আকার = std::max( elem_max_আকার, আকার(schar ) ); বিরতি; }
+            ক্ষেত্র 'w': { elem_max_আকার = std::max( elem_max_আকার, আকার(ushort) ); বিরতি; }
+            ক্ষেত্র 's': { elem_max_আকার = std::max( elem_max_আকার, আকার(short ) ); বিরতি; }
+            ক্ষেত্র 'i': { elem_max_আকার = std::max( elem_max_আকার, আকার(পূর্ণসংখ্যা   ) ); বিরতি; }
+            ক্ষেত্র 'n': { elem_max_আকার = std::max( elem_max_আকার, আকার(unsigned) ); বিরতি; }
+            ক্ষেত্র 'f': { elem_max_আকার = std::max( elem_max_আকার, আকার(দশমিক ) ); বিরতি; }
+            ক্ষেত্র 'd': { elem_max_আকার = std::max( elem_max_আকার, আকার(দ্বিগুণ) ); বিরতি; }
+            ক্ষেত্র 'I': { elem_max_আকার = std::max( elem_max_আকার, আকার(int64_t)); বিরতি; }
+            ক্ষেত্র 'U': { elem_max_আকার = std::max( elem_max_আকার, আকার(uint64_t)); বিরতি; }
+            ক্ষেত্র 'e': { elem_max_আকার = std::max( elem_max_আকার, আকার(uchar) ); বিরতি; }
+            ক্ষেত্র 'E': { elem_max_আকার = std::max( elem_max_আকার, আকার(uchar) ); বিরতি; }
+            পূর্বনির্ধারিত: বিরতি;
         }
     }
-    size = cvAlign( size, static_cast<int>(elem_max_size) );
-    return size;
+    size = cvAlign( size, static_cast<পূর্ণসংখ্যা>(elem_max_আকার) );
+    ফেরত size;
 }
 
-size_t base64::base64_encode_buffer_size(size_t cnt, bool is_end_with_zero) {
-    size_t additional = static_cast<size_t>(is_end_with_zero == true);
-    return (cnt + 2U) / 3U * 4U + additional;
+size_t base64::base64_encode_বাফার_আকার(size_t cnt, যৌক্তিক is_end_with_zero) {
+    size_t additional = static_cast<size_t>(is_end_with_zero == সত্য);
+    ফেরত (cnt + 2U) / 3U * 4U + additional;
 }
 
-base64::Base64Writer::Base64Writer(cv::FileStorage::Impl& fs, bool can_indent)
-        : emitter(new Base64ContextEmitter(fs, can_indent))
-        , data_type_string()
+base64::Base64Writer::Base64Writer(cv::FileStorage::Impl& fs, যৌক্তিক can_indent)
+        : emitter(নতুন Base64ContextEmitter(fs, can_indent))
+        , তথ্য_type_string()
 {
     CV_Assert(fs.write_mode);
 }
 
-void base64::Base64Writer::write(const void* _data, size_t len, const char* dt)
+শূন্য base64::Base64Writer::লিখ(ধ্রুবক শূন্য* তথ্য_3, size_t len, ধ্রুবক অক্ষর* dt)
 {
     check_dt(dt);
-    RawDataToBinaryConvertor convertor(_data, static_cast<int>(len), data_type_string);
-    emitter->write(convertor);
+    Raw_তথ্য_To_দ্বিমিক_Convertor convertor(তথ্য_3, static_cast<পূর্ণসংখ্যা>(len), তথ্য_type_string);
+    emitter->লিখ(convertor);
 }
 
-template<typename _to_binary_convertor_t> inline
-void base64::Base64Writer::write(_to_binary_convertor_t & convertor, const char* dt)
+template<typename to_দ্বিমিক_convertor_t> অন্তঃরেখ
+শূন্য base64::Base64Writer::লিখ(to_দ্বিমিক_convertor_t & convertor, ধ্রুবক অক্ষর* dt)
 {
     check_dt(dt);
-    emitter->write(convertor);
+    emitter->লিখ(convertor);
 }
 
 base64::Base64Writer::~Base64Writer()
@@ -252,25 +252,25 @@ base64::Base64Writer::~Base64Writer()
     delete emitter;
 }
 
-void base64::Base64Writer::check_dt(const char* dt)
+শূন্য base64::Base64Writer::check_dt(ধ্রুবক অক্ষর* dt)
 {
-    if ( dt == 0 )
+    যদি ( dt == 0 )
         CV_Error( cv::Error::StsBadArg, "Invalid \'dt\'." );
-    else if (data_type_string.empty()) {
-        data_type_string = dt;
+    অন্যথা যদি (তথ্য_type_string.empty()) {
+        তথ্য_type_string = dt;
 
         /* output header */
-        std::string buffer = make_base64_header(dt);
-        const uchar * beg = reinterpret_cast<const uchar *>(buffer.data());
-        const uchar * end = beg + buffer.size();
+        std::string বাফার = make_base64_header(dt);
+        ধ্রুবক uchar * beg = reinterpret_cast<ধ্রুবক uchar *>(বাফার.তথ্য());
+        ধ্রুবক uchar * end = beg + বাফার.size();
 
-        emitter->write(beg, end);
-    } else if ( data_type_string != dt )
+        emitter->লিখ(beg, end);
+    } অন্যথা যদি ( তথ্য_type_string != dt )
         CV_Error( cv::Error::StsBadArg, "\'dt\' does not match." );
 }
 
-base64::RawDataToBinaryConvertor::RawDataToBinaryConvertor(const void* src, int len, const std::string & dt)
-        : beg(reinterpret_cast<const uchar *>(src))
+base64::Raw_তথ্য_To_দ্বিমিক_Convertor::Raw_তথ্য_To_দ্বিমিক_Convertor(ধ্রুবক শূন্য* src, পূর্ণসংখ্যা len, ধ্রুবক std::string & dt)
+        : beg(reinterpret_cast<ধ্রুবক uchar *>(src))
         , cur(0)
         , end(0)
 {
@@ -279,113 +279,113 @@ base64::RawDataToBinaryConvertor::RawDataToBinaryConvertor(const void* src, int 
     CV_Assert(len > 0);
 
     /* calc step and to_binary_funcs */
-    step_packed = make_to_binary_funcs(dt);
+    step_packed = make_to_দ্বিমিক_funcs(dt);
 
     end = beg;
     cur = beg;
 
-    step = icvCalcStructSize(dt.c_str(), 0);
+    step = icv_Calc_Struct_আকার(dt.c_str(), 0);
     end = beg + static_cast<size_t>(len);
 }
 
-inline  base64::RawDataToBinaryConvertor&  base64::RawDataToBinaryConvertor::operator >>(uchar * & dst)
+অন্তঃরেখ  base64::Raw_তথ্য_To_দ্বিমিক_Convertor&  base64::Raw_তথ্য_To_দ্বিমিক_Convertor::operator >>(uchar * & dst)
 {
-    CV_DbgAssert(*this);
+    CV_DbgAssert(*এই);
 
-    for (size_t i = 0U, n = to_binary_funcs.size(); i < n; i++) {
-        elem_to_binary_t & pack = to_binary_funcs[i];
+    জন্য (size_t i = 0U, n = to_দ্বিমিক_funcs.size(); i < n; i++) {
+        elem_to_দ্বিমিক_t & pack = to_দ্বিমিক_funcs[i];
         pack.func(cur + pack.offset, dst + pack.offset_packed);
     }
     cur += step;
     dst += step_packed;
 
-    return *this;
+    ফেরত *এই;
 }
 
-inline  base64::RawDataToBinaryConvertor::operator bool() const
+অন্তঃরেখ  base64::Raw_তথ্য_To_দ্বিমিক_Convertor::operator যৌক্তিক() ধ্রুবক
 {
-    return cur < end;
+    ফেরত cur < end;
 }
 
-size_t base64::RawDataToBinaryConvertor::make_to_binary_funcs(const std::string &dt)
+size_t base64::Raw_তথ্য_To_দ্বিমিক_Convertor::make_to_দ্বিমিক_funcs(ধ্রুবক std::string &dt)
 {
     size_t cnt = 0;
     size_t offset = 0;
     size_t offset_packed = 0;
-    char type = '\0';
+    অক্ষর type = '\0';
 
     std::istringstream iss(dt);
-    while (!iss.eof()) {
-        if (!(iss >> cnt)) {
+    যখন (!iss.eof()) {
+        যদি (!(iss >> cnt)) {
             iss.clear();
             cnt = 1;
         }
         CV_Assert(cnt > 0U);
-        if (!(iss >> type))
-            break;
+        যদি (!(iss >> type))
+            বিরতি;
 
-        while (cnt-- > 0)
+        যখন (cnt-- > 0)
         {
-            elem_to_binary_t pack;
+            elem_to_দ্বিমিক_t pack;
 
             size_t size = 0;
-            switch (type)
+            নির্বাচন (type)
             {
-                case 'u':
-                case 'c':
-                    size = sizeof(uchar);
-                    pack.func = to_binary<uchar>;
-                    break;
-                case 'b':
-                    size = sizeof(uchar);
-                    pack.func = to_binary<bool>;
-                    break;
-                case 'w':
-                case 's':
-                    size = sizeof(ushort);
-                    pack.func = to_binary<ushort>;
-                    break;
-                case 'n':
-                case 'i':
-                    size = sizeof(uint);
-                    pack.func = to_binary<uint>;
-                    break;
-                case 'f':
-                    size = sizeof(float);
-                    pack.func = to_binary<float>;
-                    break;
-                case 'd':
-                    size = sizeof(double);
-                    pack.func = to_binary<double>;
-                    break;
-                case 'I':
-                case 'U':
-                    size = sizeof(uint64_t);
-                    pack.func = to_binary<uint64_t>;
-                    break;
-                case 'e':
-                case 'E':
-                    size = sizeof(uchar);
-                    pack.func = to_binary<uchar>;
-                    break;
-                case 'r':
-                default:
+                ক্ষেত্র 'u':
+                ক্ষেত্র 'c':
+                    size = আকার(uchar);
+                    pack.func = to_দ্বিমিক<uchar>;
+                    বিরতি;
+                ক্ষেত্র 'b':
+                    size = আকার(uchar);
+                    pack.func = to_দ্বিমিক<যৌক্তিক>;
+                    বিরতি;
+                ক্ষেত্র 'w':
+                ক্ষেত্র 's':
+                    size = আকার(ushort);
+                    pack.func = to_দ্বিমিক<ushort>;
+                    বিরতি;
+                ক্ষেত্র 'n':
+                ক্ষেত্র 'i':
+                    size = আকার(uint);
+                    pack.func = to_দ্বিমিক<uint>;
+                    বিরতি;
+                ক্ষেত্র 'f':
+                    size = আকার(দশমিক);
+                    pack.func = to_দ্বিমিক<দশমিক>;
+                    বিরতি;
+                ক্ষেত্র 'd':
+                    size = আকার(দ্বিগুণ);
+                    pack.func = to_দ্বিমিক<দ্বিগুণ>;
+                    বিরতি;
+                ক্ষেত্র 'I':
+                ক্ষেত্র 'U':
+                    size = আকার(uint64_t);
+                    pack.func = to_দ্বিমিক<uint64_t>;
+                    বিরতি;
+                ক্ষেত্র 'e':
+                ক্ষেত্র 'E':
+                    size = আকার(uchar);
+                    pack.func = to_দ্বিমিক<uchar>;
+                    বিরতি;
+                ক্ষেত্র 'r':
+                পূর্বনির্ধারিত:
                     CV_Error(cv::Error::StsError, "type is not supported");
             };
 
-            offset = static_cast<size_t>(cvAlign(static_cast<int>(offset), static_cast<int>(size)));
+            offset = static_cast<size_t>(cvAlign(static_cast<পূর্ণসংখ্যা>(offset), static_cast<পূর্ণসংখ্যা>(size)));
             pack.offset = offset;
             offset += size;
 
             pack.offset_packed = offset_packed;
             offset_packed += size;
 
-            to_binary_funcs.push_back(pack);
+            to_দ্বিমিক_funcs.push_back(pack);
         }
     }
 
     CV_Assert(iss.eof());
-    return offset_packed;
+    ফেরত offset_packed;
 }
 
 }

@@ -5,117 +5,117 @@
 #ifndef OPENCV_CORE_PERSISTENCE_IMPL_HPP
 #define OPENCV_CORE_PERSISTENCE_IMPL_HPP
 
-#include "persistence.hpp"
-#include "persistence_base64_encoding.hpp"
-#include <unordered_map>
-#include <iterator>
+#অন্তর্ভাব "persistence.hpp"
+#অন্তর্ভাব "persistence_base64_encoding.hpp"
+#অন্তর্ভাব <unordered_map>
+#অন্তর্ভাব <iterator>
 
 
-namespace cv
+নামাকাশ cv
 {
 
-enum Base64State{
+গণনা Base64State{
     Uncertain,
     NotUse,
     InUse,
 };
 
-class cv::FileStorage::Impl : public FileStorage_API
+শ্রেণী cv::FileStorage::Impl : সর্বজনীন FileStorage_API
 {
-public:
-    void init();
+সর্বজনীন:
+    শূন্য init();
 
     Impl(FileStorage* _fs);
 
-    virtual ~Impl();
+    আভাসী ~Impl();
 
-    void release(String* out=0);
+    শূন্য release(String* out=0);
 
-    void analyze_file_name( const std::string& file_name, std::vector<std::string>& params );
+    শূন্য analyze_file_name( ধ্রুবক std::string& file_name, std::vector<std::string>& params );
 
-    bool open( const char* filename_or_buf, int _flags, const char* encoding );
+    যৌক্তিক open( ধ্রুবক অক্ষর* filename_or_buf, পূর্ণসংখ্যা _flags, ধ্রুবক অক্ষর* encoding );
 
-    void puts( const char* str );
+    শূন্য puts( ধ্রুবক অক্ষর* str );
 
-    char* getsFromFile( char* buf, int count );
+    অক্ষর* getsFromFile( অক্ষর* buf, পূর্ণসংখ্যা গুনতি_2 );
 
-    char* gets( size_t maxCount );
+    অক্ষর* gets( size_t max_গুনতি );
 
-    char* gets();
+    অক্ষর* gets();
 
-    bool eof();
+    যৌক্তিক eof();
 
-    void setEof();
+    শূন্য setEof();
 
-    void closeFile();
+    শূন্য closeFile();
 
-    void rewind();
+    শূন্য rewind();
 
-    char* resizeWriteBuffer( char* ptr, int len );
+    অক্ষর* resize_Write_বাফার( অক্ষর* ptr, পূর্ণসংখ্যা len );
 
-    char* flush();
+    অক্ষর* flush();
 
-    void endWriteStruct();
+    শূন্য endWriteStruct();
 
-    void startWriteStruct_helper( const char* key, int struct_flags,
-                                  const char* type_name );
+    শূন্য startWriteStruct_helper( ধ্রুবক অক্ষর* চাবি, পূর্ণসংখ্যা struct_flags,
+                                  ধ্রুবক অক্ষর* type_name );
 
-    void startWriteStruct( const char* key, int struct_flags,
-                           const char* type_name );
+    শূন্য startWriteStruct( ধ্রুবক অক্ষর* চাবি, পূর্ণসংখ্যা struct_flags,
+                           ধ্রুবক অক্ষর* type_name );
 
-    void writeComment( const char* comment, bool eol_comment );
+    শূন্য writeComment( ধ্রুবক অক্ষর* comment, যৌক্তিক eol_comment );
 
-    void startNextStream();
+    শূন্য start_পরবর্তী_Stream();
 
-    void write( const String& key, int value );
+    শূন্য লিখ( ধ্রুবক String& চাবি, পূর্ণসংখ্যা value );
 
-    void write( const String& key, bool value );
+    শূন্য লিখ( ধ্রুবক String& চাবি, যৌক্তিক value );
 
-    void write( const String& key, int64_t value );
+    শূন্য লিখ( ধ্রুবক String& চাবি, int64_t value );
 
-    void write( const String& key, double value );
+    শূন্য লিখ( ধ্রুবক String& চাবি, দ্বিগুণ value );
 
-    void write( const String& key, const String& value );
+    শূন্য লিখ( ধ্রুবক String& চাবি, ধ্রুবক String& value );
 
-    void writeRawData( const std::string& dt, const void* _data, size_t len );
+    শূন্য write_Raw_তথ্য( ধ্রুবক std::string& dt, ধ্রুবক শূন্য* তথ্য_3, size_t len );
 
-    void workaround();
+    শূন্য workaround();
 
-    void switch_to_Base64_state( FileStorage_API::Base64State new_state);
+    শূন্য switch_to_Base64_state( FileStorage_API::Base64State new_state);
 
-    void make_write_struct_delayed( const char* key, int struct_flags, const char* type_name );
+    শূন্য make_write_struct_delayed( ধ্রুবক অক্ষর* চাবি, পূর্ণসংখ্যা struct_flags, ধ্রুবক অক্ষর* type_name );
 
-    void check_if_write_struct_is_delayed( bool change_type_to_base64 );
+    শূন্য check_if_write_struct_is_delayed( যৌক্তিক change_type_to_base64 );
 
-    void writeRawDataBase64(const void* _data, size_t len, const char* dt );
+    শূন্য write_Raw_তথ্য_Base64(ধ্রুবক শূন্য* তথ্য_3, size_t len, ধ্রুবক অক্ষর* dt );
 
     String releaseAndGetString();
 
-    FileNode getFirstTopLevelNode() const;
+    File_গ্রন্থি get_First_শীর্ষ_Level_গ্রন্থি() ধ্রুবক;
 
-    FileNode root(int streamIdx=0) const;
+    File_গ্রন্থি মূল(পূর্ণসংখ্যা streamIdx=0) ধ্রুবক;
 
-    FileNode operator[](const String& nodename) const;
+    File_গ্রন্থি operator[](ধ্রুবক String& nodename) ধ্রুবক;
 
-    FileNode operator[](const char* /*nodename*/) const;
+    File_গ্রন্থি operator[](ধ্রুবক অক্ষর* /*nodename*/) ধ্রুবক;
 
-    virtual int getFormat() const CV_OVERRIDE;
+    আভাসী পূর্ণসংখ্যা getFormat() ধ্রুবক CV_OVERRIDE;
 
-    char* bufferPtr() const;
-    char* bufferStart() const;
-    char* bufferEnd() const;
-    void setBufferPtr(char* ptr);
-    int wrapMargin() const;
+    অক্ষর* বাফার_Ptr() ধ্রুবক;
+    অক্ষর* বাফার_Start() ধ্রুবক;
+    অক্ষর* বাফার_End() ধ্রুবক;
+    শূন্য set_বাফার_Ptr(অক্ষর* ptr);
+    পূর্ণসংখ্যা wrapMargin() ধ্রুবক;
 
-    FStructData& getCurrentStruct();
+    FStruct_তথ্য& getCurrentStruct();
 
-    void setNonEmpty();
+    শূন্য setNonEmpty();
 
-    void processSpecialDouble( char* buf, double* value, char** endptr );
+    শূন্য processSpecialDouble( অক্ষর* buf, দ্বিগুণ* value, অক্ষর** endptr );
 
-    double strtod( char* ptr, char** endptr );
+    দ্বিগুণ strtod( অক্ষর* ptr, অক্ষর** endptr );
 
-    void convertToCollection(int type, FileNode& node);
+    শূন্য convertToCollection(পূর্ণসংখ্যা type, File_গ্রন্থি& গ্রন্থি);
 
     // a) allocates new FileNode (for that just set blockIdx to the last block and ofs to freeSpaceOfs) or
     // b) reallocates just created new node (blockIdx and ofs must be taken from FileNode).
@@ -124,130 +124,130 @@ public:
     //    a new block of sufficient size is allocated and the FileNode is placed in the beginning of it.
     // The case (a) can be used to allocate the very first node by setting blockIdx == ofs == 0.
     // In the case (b) the existing tag and the name are copied automatically.
-    uchar* reserveNodeSpace(FileNode& node, size_t sz);
+    uchar* reserve_গ্রন্থি_Space(File_গ্রন্থি& গ্রন্থি, size_t sz);
 
-    unsigned getStringOfs( const std::string& key ) const;
+    unsigned getStringOfs( ধ্রুবক std::string& চাবি ) ধ্রুবক;
 
-    FileNode addNode( FileNode& collection, const std::string& key,
-                      int elem_type, const void* value, int len );
+    File_গ্রন্থি add_গ্রন্থি( File_গ্রন্থি& collection, ধ্রুবক std::string& চাবি,
+                      পূর্ণসংখ্যা elem_type, ধ্রুবক শূন্য* value, পূর্ণসংখ্যা len );
 
-    void finalizeCollection( FileNode& collection );
+    শূন্য finalizeCollection( File_গ্রন্থি& collection );
 
-    void normalizeNodeOfs(size_t& blockIdx, size_t& ofs) const;
+    শূন্য normalize_গ্রন্থি_Ofs(size_t& blockIdx, size_t& ofs) ধ্রুবক;
 
     Base64State get_state_of_writing_base64();
 
-    int get_space();
+    পূর্ণসংখ্যা get_space();
 
-    class Base64Decoder
+    শ্রেণী Base64Decoder
     {
-    public:
+    সর্বজনীন:
         Base64Decoder();
-        void init(const Ptr<FileStorageParser>& _parser, char* _ptr, int _indent);
+        শূন্য init(ধ্রুবক Ptr<FileStorageParser>& _parser, অক্ষর* _ptr, পূর্ণসংখ্যা _indent);
 
-        bool readMore(int needed);
+        যৌক্তিক readMore(পূর্ণসংখ্যা needed);
 
         uchar getUInt8();
 
         ushort getUInt16();
 
-        int getInt32();
+        পূর্ণসংখ্যা getInt32();
 
         int64_t getInt64();
 
-        double getFloat64();
+        দ্বিগুণ getFloat64();
 
-        bool endOfStream() const;
-        char* getPtr() const;
-    protected:
+        যৌক্তিক endOfStream() ধ্রুবক;
+        অক্ষর* getPtr() ধ্রুবক;
+    সুরক্ষিত:
 
         Ptr<FileStorageParser> parser_do_not_use_direct_dereference;
-        FileStorageParser& getParser() const
+        FileStorageParser& getParser() ধ্রুবক
         {
-            if (!parser_do_not_use_direct_dereference)
+            যদি (!parser_do_not_use_direct_dereference)
                 CV_Error(Error::StsNullPtr, "Parser is not available");
-            return *parser_do_not_use_direct_dereference;
+            ফেরত *parser_do_not_use_direct_dereference;
         }
-        char* ptr;
-        int indent;
-        std::vector<char> encoded;
+        অক্ষর* ptr;
+        পূর্ণসংখ্যা indent;
+        std::vector<অক্ষর> encoded;
         std::vector<uchar> decoded;
         size_t ofs;
         size_t totalchars;
-        bool eos;
+        যৌক্তিক eos;
     };
 
-    char* parseBase64(char* ptr, int indent, FileNode& collection);
+    অক্ষর* parseBase64(অক্ষর* ptr, পূর্ণসংখ্যা indent, File_গ্রন্থি& collection);
 
-    void parseError( const char* func_name, const std::string& err_msg, const char* source_file, int source_line );
+    শূন্য parseError( ধ্রুবক অক্ষর* func_name, ধ্রুবক std::string& err_বার্তা, ধ্রুবক অক্ষর* source_file, পূর্ণসংখ্যা source_সারি );
 
-    const uchar* getNodePtr(size_t blockIdx, size_t ofs) const;
+    ধ্রুবক uchar* get_গ্রন্থি_Ptr(size_t blockIdx, size_t ofs) ধ্রুবক;
 
-    std::string getName( size_t nameofs ) const;
+    std::string getName( size_t nameofs ) ধ্রুবক;
 
     FileStorage* getFS();
 
     FileStorage* fs_ext;
 
     std::string filename;
-    int flags;
-    bool empty_stream;
+    পূর্ণসংখ্যা flags;
+    যৌক্তিক empty_stream;
 
     FILE* file;
     gzFile gzfile;
 
-    bool is_opened;
-    bool dummy_eof;
-    bool write_mode;
-    bool mem_mode;
-    int fmt;
+    যৌক্তিক is_opened;
+    যৌক্তিক dummy_eof;
+    যৌক্তিক write_mode;
+    যৌক্তিক mem_mode;
+    পূর্ণসংখ্যা fmt;
 
     State state; //!< current state of the FileStorage (used only for writing)
-    bool is_using_base64;
-    bool is_write_struct_delayed;
-    char* delayed_struct_key;
-    int   delayed_struct_flags;
-    char* delayed_type_name;
+    যৌক্তিক is_using_base64;
+    যৌক্তিক is_write_struct_delayed;
+    অক্ষর* delayed_struct_চাবি;
+    পূর্ণসংখ্যা   delayed_struct_flags;
+    অক্ষর* delayed_type_name;
     FileStorage_API::Base64State state_of_writing_base64;
 
-    int space, wrap_margin;
-    std::deque<FStructData> write_stack;
-    std::vector<char> buffer;
+    পূর্ণসংখ্যা space, wrap_margin;
+    std::deque<FStruct_তথ্য> write_স্তূপ;
+    std::vector<অক্ষর> বাফার;
     size_t bufofs;
 
-    std::deque<char> outbuf;
+    std::deque<অক্ষর> outbuf;
 
     Ptr<FileStorageEmitter> emitter_do_not_use_direct_dereference;
     FileStorageEmitter& getEmitter()
     {
-        if (!emitter_do_not_use_direct_dereference)
+        যদি (!emitter_do_not_use_direct_dereference)
             CV_Error(Error::StsNullPtr, "Emitter is not available");
-        return *emitter_do_not_use_direct_dereference;
+        ফেরত *emitter_do_not_use_direct_dereference;
     }
     Ptr<FileStorageParser> parser_do_not_use_direct_dereference;
-    FileStorageParser& getParser() const
+    FileStorageParser& getParser() ধ্রুবক
     {
-        if (!parser_do_not_use_direct_dereference)
+        যদি (!parser_do_not_use_direct_dereference)
             CV_Error(Error::StsNullPtr, "Parser is not available");
-        return *parser_do_not_use_direct_dereference;
+        ফেরত *parser_do_not_use_direct_dereference;
     }
     Base64Decoder base64decoder;
     base64::Base64Writer* base64_writer;
 
-    std::vector<FileNode> roots;
-    std::vector<Ptr<std::vector<uchar> > > fs_data;
-    std::vector<uchar*> fs_data_ptrs;
-    std::vector<size_t> fs_data_blksz;
+    std::vector<File_গ্রন্থি> roots;
+    std::vector<Ptr<std::vector<uchar> > > fs_তথ্য;
+    std::vector<uchar*> fs_তথ্য_ptrs;
+    std::vector<size_t> fs_তথ্য_blksz;
     size_t freeSpaceOfs;
-    typedef std::unordered_map<std::string, unsigned> str_hash_t;
+    প্রকারলেখ std::unordered_map<std::string, unsigned> str_hash_t;
     str_hash_t str_hash;
-    std::vector<char> str_hash_data;
+    std::vector<অক্ষর> str_hash_তথ্য;
 
-    std::vector<char> strbufv;
-    char* strbuf;
+    std::vector<অক্ষর> strbufv;
+    অক্ষর* strbuf;
     size_t strbufsize;
     size_t strbufpos;
-    int lineno;
+    পূর্ণসংখ্যা lineno;
 };
 
 }

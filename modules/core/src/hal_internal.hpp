@@ -47,26 +47,26 @@
 
 #ifdef HAVE_LAPACK
 
-int lapack_LU32f(float* a, size_t a_step, int m, float* b, size_t b_step, int n, int* info);
-int lapack_LU64f(double* a, size_t a_step, int m, double* b, size_t b_step, int n, int* info);
-int lapack_Cholesky32f(float* a, size_t a_step, int m, float* b, size_t b_step, int n, bool* info);
-int lapack_Cholesky64f(double* a, size_t a_step, int m, double* b, size_t b_step, int n, bool* info);
-int lapack_SVD32f(float* a, size_t a_step, float* w, float* u, size_t u_step, float* vt, size_t v_step, int m, int n, int flags);
-int lapack_SVD64f(double* a, size_t a_step, double* w, double* u, size_t u_step, double* vt, size_t v_step, int m, int n, int flags);
-int lapack_QR32f(float* src1, size_t src1_step, int m, int n, int k, float* src2, size_t src2_step, float* dst, int* info);
-int lapack_QR64f(double* src1, size_t src1_step, int m, int n, int k, double* src2, size_t src2_step, double* dst, int* info);
-int lapack_gemm32f(const float* src1, size_t src1_step, const float* src2, size_t src2_step,
-                   float alpha, const float* src3, size_t src3_step, float beta, float* dst, size_t dst_step,
-                   int m, int n, int k, int flags);
-int lapack_gemm64f(const double* src1, size_t src1_step, const double* src2, size_t src2_step,
-                   double alpha, const double* src3, size_t src3_step, double beta, double* dst, size_t dst_step,
-                   int m, int n, int k, int flags);
-int lapack_gemm32fc(const float* src1, size_t src1_step, const float* src2, size_t src2_step,
-                   float alpha, const float* src3, size_t src3_step, float beta, float* dst, size_t dst_step,
-                   int m, int n, int k, int flags);
-int lapack_gemm64fc(const double* src1, size_t src1_step, const double* src2, size_t src2_step,
-                   double alpha, const double* src3, size_t src3_step, double beta, double* dst, size_t dst_step,
-                   int m, int n, int k, int flags);
+পূর্ণসংখ্যা lapack_LU32f(দশমিক* a, size_t a_step, পূর্ণসংখ্যা m, দশমিক* b, size_t b_step, পূর্ণসংখ্যা n, পূর্ণসংখ্যা* info);
+পূর্ণসংখ্যা lapack_LU64f(দ্বিগুণ* a, size_t a_step, পূর্ণসংখ্যা m, দ্বিগুণ* b, size_t b_step, পূর্ণসংখ্যা n, পূর্ণসংখ্যা* info);
+পূর্ণসংখ্যা lapack_Cholesky32f(দশমিক* a, size_t a_step, পূর্ণসংখ্যা m, দশমিক* b, size_t b_step, পূর্ণসংখ্যা n, যৌক্তিক* info);
+পূর্ণসংখ্যা lapack_Cholesky64f(দ্বিগুণ* a, size_t a_step, পূর্ণসংখ্যা m, দ্বিগুণ* b, size_t b_step, পূর্ণসংখ্যা n, যৌক্তিক* info);
+পূর্ণসংখ্যা lapack_SVD32f(দশমিক* a, size_t a_step, দশমিক* w, দশমিক* u, size_t u_step, দশমিক* vt, size_t v_step, পূর্ণসংখ্যা m, পূর্ণসংখ্যা n, পূর্ণসংখ্যা flags);
+পূর্ণসংখ্যা lapack_SVD64f(দ্বিগুণ* a, size_t a_step, দ্বিগুণ* w, দ্বিগুণ* u, size_t u_step, দ্বিগুণ* vt, size_t v_step, পূর্ণসংখ্যা m, পূর্ণসংখ্যা n, পূর্ণসংখ্যা flags);
+পূর্ণসংখ্যা lapack_QR32f(দশমিক* src1, size_t src1_step, পূর্ণসংখ্যা m, পূর্ণসংখ্যা n, পূর্ণসংখ্যা k, দশমিক* src2, size_t src2_step, দশমিক* dst, পূর্ণসংখ্যা* info);
+পূর্ণসংখ্যা lapack_QR64f(দ্বিগুণ* src1, size_t src1_step, পূর্ণসংখ্যা m, পূর্ণসংখ্যা n, পূর্ণসংখ্যা k, দ্বিগুণ* src2, size_t src2_step, দ্বিগুণ* dst, পূর্ণসংখ্যা* info);
+পূর্ণসংখ্যা lapack_gemm32f(ধ্রুবক দশমিক* src1, size_t src1_step, ধ্রুবক দশমিক* src2, size_t src2_step,
+                   দশমিক alpha, ধ্রুবক দশমিক* src3, size_t src3_step, দশমিক beta, দশমিক* dst, size_t dst_step,
+                   পূর্ণসংখ্যা m, পূর্ণসংখ্যা n, পূর্ণসংখ্যা k, পূর্ণসংখ্যা flags);
+পূর্ণসংখ্যা lapack_gemm64f(ধ্রুবক দ্বিগুণ* src1, size_t src1_step, ধ্রুবক দ্বিগুণ* src2, size_t src2_step,
+                   দ্বিগুণ alpha, ধ্রুবক দ্বিগুণ* src3, size_t src3_step, দ্বিগুণ beta, দ্বিগুণ* dst, size_t dst_step,
+                   পূর্ণসংখ্যা m, পূর্ণসংখ্যা n, পূর্ণসংখ্যা k, পূর্ণসংখ্যা flags);
+পূর্ণসংখ্যা lapack_gemm32fc(ধ্রুবক দশমিক* src1, size_t src1_step, ধ্রুবক দশমিক* src2, size_t src2_step,
+                   দশমিক alpha, ধ্রুবক দশমিক* src3, size_t src3_step, দশমিক beta, দশমিক* dst, size_t dst_step,
+                   পূর্ণসংখ্যা m, পূর্ণসংখ্যা n, পূর্ণসংখ্যা k, পূর্ণসংখ্যা flags);
+পূর্ণসংখ্যা lapack_gemm64fc(ধ্রুবক দ্বিগুণ* src1, size_t src1_step, ধ্রুবক দ্বিগুণ* src2, size_t src2_step,
+                   দ্বিগুণ alpha, ধ্রুবক দ্বিগুণ* src3, size_t src3_step, দ্বিগুণ beta, দ্বিগুণ* dst, size_t dst_step,
+                   পূর্ণসংখ্যা m, পূর্ণসংখ্যা n, পূর্ণসংখ্যা k, পূর্ণসংখ্যা flags);
 
 #undef cv_hal_LU32f
 #define cv_hal_LU32f lapack_LU32f

@@ -9,209 +9,209 @@
 //
 // */
 
-#include "precomp.hpp"
-#include <opencv2/core/utils/logger.hpp>
+#অন্তর্ভাব "precomp.hpp"
+#অন্তর্ভাব <opencv2/core/utils/logger.hpp>
 
-namespace cv
+নামাকাশ cv
 {
 
 //This and its overload below are used in various MatExpr operator overloads
 //implemented to check that Matrix operands exist.
-static void checkOperandsExist(const Mat& a)
+স্থির শূন্য checkOperandsExist(ধ্রুবক Mat& a)
 {
-    if (a.empty())
+    যদি (a.empty())
     {
         CV_Error(cv::Error::StsBadArg, "Matrix operand is an empty matrix.");
     }
 }
 
-static void checkOperandsExist(const Mat& a, const Mat& b)
+স্থির শূন্য checkOperandsExist(ধ্রুবক Mat& a, ধ্রুবক Mat& b)
 {
-    if (a.empty() || b.empty())
+    যদি (a.empty() || b.empty())
     {
         CV_Error(cv::Error::StsBadArg, "One or more matrix operands are empty.");
     }
 }
 
 
-class MatOp_Identity CV_FINAL : public MatOp
+শ্রেণী MatOp_Identity CV_FINAL : সর্বজনীন MatOp
 {
-public:
+সর্বজনীন:
     MatOp_Identity() {}
-    virtual ~MatOp_Identity() {}
+    আভাসী ~MatOp_Identity() {}
 
-    bool elementWise(const MatExpr& /*expr*/) const CV_OVERRIDE { return true; }
-    void assign(const MatExpr& expr, Mat& m, int type=-1) const CV_OVERRIDE;
+    যৌক্তিক elementWise(ধ্রুবক Mat_রাশিমালা& /*রাশিমালা*/) ধ্রুবক CV_OVERRIDE { ফেরত সত্য; }
+    শূন্য assign(ধ্রুবক Mat_রাশিমালা& রাশিমালা, Mat& m, পূর্ণসংখ্যা type=-1) ধ্রুবক CV_OVERRIDE;
 
-    static void makeExpr(MatExpr& res, const Mat& m);
+    স্থির শূন্য make_রাশিমালা(Mat_রাশিমালা& res, ধ্রুবক Mat& m);
 };
 
-static MatOp_Identity g_MatOp_Identity;
+স্থির MatOp_Identity g_MatOp_Identity;
 
-class MatOp_AddEx CV_FINAL : public MatOp
+শ্রেণী MatOp_AddEx CV_FINAL : সর্বজনীন MatOp
 {
-public:
+সর্বজনীন:
     MatOp_AddEx() {}
-    virtual ~MatOp_AddEx() {}
+    আভাসী ~MatOp_AddEx() {}
 
-    bool elementWise(const MatExpr& /*expr*/) const CV_OVERRIDE { return true; }
-    void assign(const MatExpr& expr, Mat& m, int type=-1) const CV_OVERRIDE;
+    যৌক্তিক elementWise(ধ্রুবক Mat_রাশিমালা& /*রাশিমালা*/) ধ্রুবক CV_OVERRIDE { ফেরত সত্য; }
+    শূন্য assign(ধ্রুবক Mat_রাশিমালা& রাশিমালা, Mat& m, পূর্ণসংখ্যা type=-1) ধ্রুবক CV_OVERRIDE;
 
-    void add(const MatExpr& e1, const Scalar& s, MatExpr& res) const CV_OVERRIDE;
-    void subtract(const Scalar& s, const MatExpr& expr, MatExpr& res) const CV_OVERRIDE;
-    void multiply(const MatExpr& e1, double s, MatExpr& res) const CV_OVERRIDE;
-    void divide(double s, const MatExpr& e, MatExpr& res) const CV_OVERRIDE;
+    শূন্য add(ধ্রুবক Mat_রাশিমালা& e1, ধ্রুবক Scalar& s, Mat_রাশিমালা& res) ধ্রুবক CV_OVERRIDE;
+    শূন্য subtract(ধ্রুবক Scalar& s, ধ্রুবক Mat_রাশিমালা& রাশিমালা, Mat_রাশিমালা& res) ধ্রুবক CV_OVERRIDE;
+    শূন্য multiply(ধ্রুবক Mat_রাশিমালা& e1, দ্বিগুণ s, Mat_রাশিমালা& res) ধ্রুবক CV_OVERRIDE;
+    শূন্য divide(দ্বিগুণ s, ধ্রুবক Mat_রাশিমালা& e, Mat_রাশিমালা& res) ধ্রুবক CV_OVERRIDE;
 
-    void transpose(const MatExpr& e1, MatExpr& res) const CV_OVERRIDE;
-    void abs(const MatExpr& expr, MatExpr& res) const CV_OVERRIDE;
+    শূন্য transpose(ধ্রুবক Mat_রাশিমালা& e1, Mat_রাশিমালা& res) ধ্রুবক CV_OVERRIDE;
+    শূন্য abs(ধ্রুবক Mat_রাশিমালা& রাশিমালা, Mat_রাশিমালা& res) ধ্রুবক CV_OVERRIDE;
 
-    static void makeExpr(MatExpr& res, const Mat& a, const Mat& b, double alpha, double beta, const Scalar& s=Scalar());
+    স্থির শূন্য make_রাশিমালা(Mat_রাশিমালা& res, ধ্রুবক Mat& a, ধ্রুবক Mat& b, দ্বিগুণ alpha, দ্বিগুণ beta, ধ্রুবক Scalar& s=Scalar());
 };
 
-static MatOp_AddEx g_MatOp_AddEx;
+স্থির MatOp_AddEx g_MatOp_AddEx;
 
-class MatOp_Bin CV_FINAL : public MatOp
+শ্রেণী MatOp_Bin CV_FINAL : সর্বজনীন MatOp
 {
-public:
+সর্বজনীন:
     MatOp_Bin() {}
-    virtual ~MatOp_Bin() {}
+    আভাসী ~MatOp_Bin() {}
 
-    bool elementWise(const MatExpr& /*expr*/) const CV_OVERRIDE { return true; }
-    void assign(const MatExpr& expr, Mat& m, int type=-1) const CV_OVERRIDE;
+    যৌক্তিক elementWise(ধ্রুবক Mat_রাশিমালা& /*রাশিমালা*/) ধ্রুবক CV_OVERRIDE { ফেরত সত্য; }
+    শূন্য assign(ধ্রুবক Mat_রাশিমালা& রাশিমালা, Mat& m, পূর্ণসংখ্যা type=-1) ধ্রুবক CV_OVERRIDE;
 
-    void multiply(const MatExpr& e1, double s, MatExpr& res) const CV_OVERRIDE;
-    void divide(double s, const MatExpr& e, MatExpr& res) const CV_OVERRIDE;
+    শূন্য multiply(ধ্রুবক Mat_রাশিমালা& e1, দ্বিগুণ s, Mat_রাশিমালা& res) ধ্রুবক CV_OVERRIDE;
+    শূন্য divide(দ্বিগুণ s, ধ্রুবক Mat_রাশিমালা& e, Mat_রাশিমালা& res) ধ্রুবক CV_OVERRIDE;
 
-    static void makeExpr(MatExpr& res, char op, const Mat& a, const Mat& b, double scale=1);
-    static void makeExpr(MatExpr& res, char op, const Mat& a, const Scalar& s);
+    স্থির শূন্য make_রাশিমালা(Mat_রাশিমালা& res, অক্ষর op, ধ্রুবক Mat& a, ধ্রুবক Mat& b, দ্বিগুণ scale=1);
+    স্থির শূন্য make_রাশিমালা(Mat_রাশিমালা& res, অক্ষর op, ধ্রুবক Mat& a, ধ্রুবক Scalar& s);
 };
 
-static MatOp_Bin g_MatOp_Bin;
+স্থির MatOp_Bin g_MatOp_Bin;
 
-class MatOp_Cmp CV_FINAL : public MatOp
+শ্রেণী MatOp_Cmp CV_FINAL : সর্বজনীন MatOp
 {
-public:
+সর্বজনীন:
     MatOp_Cmp() {}
-    virtual ~MatOp_Cmp() {}
+    আভাসী ~MatOp_Cmp() {}
 
-    bool elementWise(const MatExpr& /*expr*/) const CV_OVERRIDE { return true; }
-    void assign(const MatExpr& expr, Mat& m, int type=-1) const CV_OVERRIDE;
+    যৌক্তিক elementWise(ধ্রুবক Mat_রাশিমালা& /*রাশিমালা*/) ধ্রুবক CV_OVERRIDE { ফেরত সত্য; }
+    শূন্য assign(ধ্রুবক Mat_রাশিমালা& রাশিমালা, Mat& m, পূর্ণসংখ্যা type=-1) ধ্রুবক CV_OVERRIDE;
 
-    static void makeExpr(MatExpr& res, int cmpop, const Mat& a, const Mat& b);
-    static void makeExpr(MatExpr& res, int cmpop, const Mat& a, double alpha);
+    স্থির শূন্য make_রাশিমালা(Mat_রাশিমালা& res, পূর্ণসংখ্যা cmpop, ধ্রুবক Mat& a, ধ্রুবক Mat& b);
+    স্থির শূন্য make_রাশিমালা(Mat_রাশিমালা& res, পূর্ণসংখ্যা cmpop, ধ্রুবক Mat& a, দ্বিগুণ alpha);
 };
 
-static MatOp_Cmp g_MatOp_Cmp;
+স্থির MatOp_Cmp g_MatOp_Cmp;
 
-class MatOp_GEMM CV_FINAL : public MatOp
+শ্রেণী MatOp_GEMM CV_FINAL : সর্বজনীন MatOp
 {
-public:
+সর্বজনীন:
     MatOp_GEMM() {}
-    virtual ~MatOp_GEMM() {}
+    আভাসী ~MatOp_GEMM() {}
 
-    bool elementWise(const MatExpr& /*expr*/) const CV_OVERRIDE { return false; }
-    void assign(const MatExpr& expr, Mat& m, int type=-1) const CV_OVERRIDE;
+    যৌক্তিক elementWise(ধ্রুবক Mat_রাশিমালা& /*রাশিমালা*/) ধ্রুবক CV_OVERRIDE { ফেরত মিথ্যা; }
+    শূন্য assign(ধ্রুবক Mat_রাশিমালা& রাশিমালা, Mat& m, পূর্ণসংখ্যা type=-1) ধ্রুবক CV_OVERRIDE;
 
-    void add(const MatExpr& e1, const MatExpr& e2, MatExpr& res) const CV_OVERRIDE;
-    void subtract(const MatExpr& e1, const MatExpr& e2, MatExpr& res) const CV_OVERRIDE;
-    void multiply(const MatExpr& e, double s, MatExpr& res) const CV_OVERRIDE;
+    শূন্য add(ধ্রুবক Mat_রাশিমালা& e1, ধ্রুবক Mat_রাশিমালা& e2, Mat_রাশিমালা& res) ধ্রুবক CV_OVERRIDE;
+    শূন্য subtract(ধ্রুবক Mat_রাশিমালা& e1, ধ্রুবক Mat_রাশিমালা& e2, Mat_রাশিমালা& res) ধ্রুবক CV_OVERRIDE;
+    শূন্য multiply(ধ্রুবক Mat_রাশিমালা& e, দ্বিগুণ s, Mat_রাশিমালা& res) ধ্রুবক CV_OVERRIDE;
 
-    void transpose(const MatExpr& expr, MatExpr& res) const CV_OVERRIDE;
+    শূন্য transpose(ধ্রুবক Mat_রাশিমালা& রাশিমালা, Mat_রাশিমালা& res) ধ্রুবক CV_OVERRIDE;
 
-    Size size(const MatExpr& expr) const CV_OVERRIDE
+    আকার_2 size(ধ্রুবক Mat_রাশিমালা& রাশিমালা) ধ্রুবক CV_OVERRIDE
     {
-        return Size(
-            (expr.flags & GEMM_2_T) ? expr.b.rows : expr.b.cols,
-            (expr.flags & GEMM_1_T) ? expr.a.cols : expr.a.rows
+        ফেরত আকার_2(
+            (রাশিমালা.flags & GEMM_2_T) ? রাশিমালা.b.rows : রাশিমালা.b.cols,
+            (রাশিমালা.flags & GEMM_1_T) ? রাশিমালা.a.cols : রাশিমালা.a.rows
         );
     }
 
-    static void makeExpr(MatExpr& res, int flags, const Mat& a, const Mat& b,
-                         double alpha=1, const Mat& c=Mat(), double beta=1);
+    স্থির শূন্য make_রাশিমালা(Mat_রাশিমালা& res, পূর্ণসংখ্যা flags, ধ্রুবক Mat& a, ধ্রুবক Mat& b,
+                         দ্বিগুণ alpha=1, ধ্রুবক Mat& c=Mat(), দ্বিগুণ beta=1);
 
 };
 
-static MatOp_GEMM g_MatOp_GEMM;
+স্থির MatOp_GEMM g_MatOp_GEMM;
 
-class MatOp_Invert CV_FINAL : public MatOp
+শ্রেণী MatOp_Invert CV_FINAL : সর্বজনীন MatOp
 {
-public:
+সর্বজনীন:
     MatOp_Invert() {}
-    virtual ~MatOp_Invert() {}
+    আভাসী ~MatOp_Invert() {}
 
-    bool elementWise(const MatExpr& /*expr*/) const CV_OVERRIDE { return false; }
-    void assign(const MatExpr& expr, Mat& m, int type=-1) const CV_OVERRIDE;
+    যৌক্তিক elementWise(ধ্রুবক Mat_রাশিমালা& /*রাশিমালা*/) ধ্রুবক CV_OVERRIDE { ফেরত মিথ্যা; }
+    শূন্য assign(ধ্রুবক Mat_রাশিমালা& রাশিমালা, Mat& m, পূর্ণসংখ্যা type=-1) ধ্রুবক CV_OVERRIDE;
 
-    void matmul(const MatExpr& expr1, const MatExpr& expr2, MatExpr& res) const CV_OVERRIDE;
+    শূন্য matmul(ধ্রুবক Mat_রাশিমালা& expr1, ধ্রুবক Mat_রাশিমালা& expr2, Mat_রাশিমালা& res) ধ্রুবক CV_OVERRIDE;
 
-    static void makeExpr(MatExpr& res, int method, const Mat& m);
+    স্থির শূন্য make_রাশিমালা(Mat_রাশিমালা& res, পূর্ণসংখ্যা method, ধ্রুবক Mat& m);
 };
 
-static MatOp_Invert g_MatOp_Invert;
+স্থির MatOp_Invert g_MatOp_Invert;
 
-class MatOp_T CV_FINAL : public MatOp
+শ্রেণী MatOp_T CV_FINAL : সর্বজনীন MatOp
 {
-public:
+সর্বজনীন:
     MatOp_T() {}
-    virtual ~MatOp_T() {}
+    আভাসী ~MatOp_T() {}
 
-    bool elementWise(const MatExpr& /*expr*/) const CV_OVERRIDE { return false; }
-    void assign(const MatExpr& expr, Mat& m, int type=-1) const CV_OVERRIDE;
+    যৌক্তিক elementWise(ধ্রুবক Mat_রাশিমালা& /*রাশিমালা*/) ধ্রুবক CV_OVERRIDE { ফেরত মিথ্যা; }
+    শূন্য assign(ধ্রুবক Mat_রাশিমালা& রাশিমালা, Mat& m, পূর্ণসংখ্যা type=-1) ধ্রুবক CV_OVERRIDE;
 
-    void multiply(const MatExpr& e1, double s, MatExpr& res) const CV_OVERRIDE;
-    void transpose(const MatExpr& expr, MatExpr& res) const CV_OVERRIDE;
+    শূন্য multiply(ধ্রুবক Mat_রাশিমালা& e1, দ্বিগুণ s, Mat_রাশিমালা& res) ধ্রুবক CV_OVERRIDE;
+    শূন্য transpose(ধ্রুবক Mat_রাশিমালা& রাশিমালা, Mat_রাশিমালা& res) ধ্রুবক CV_OVERRIDE;
 
-    static void makeExpr(MatExpr& res, const Mat& a, double alpha=1);
+    স্থির শূন্য make_রাশিমালা(Mat_রাশিমালা& res, ধ্রুবক Mat& a, দ্বিগুণ alpha=1);
 };
 
-static MatOp_T g_MatOp_T;
+স্থির MatOp_T g_MatOp_T;
 
-class MatOp_Solve CV_FINAL : public MatOp
+শ্রেণী MatOp_Solve CV_FINAL : সর্বজনীন MatOp
 {
-public:
+সর্বজনীন:
     MatOp_Solve() {}
-    virtual ~MatOp_Solve() {}
+    আভাসী ~MatOp_Solve() {}
 
-    bool elementWise(const MatExpr& /*expr*/) const CV_OVERRIDE { return false; }
-    void assign(const MatExpr& expr, Mat& m, int type=-1) const CV_OVERRIDE;
+    যৌক্তিক elementWise(ধ্রুবক Mat_রাশিমালা& /*রাশিমালা*/) ধ্রুবক CV_OVERRIDE { ফেরত মিথ্যা; }
+    শূন্য assign(ধ্রুবক Mat_রাশিমালা& রাশিমালা, Mat& m, পূর্ণসংখ্যা type=-1) ধ্রুবক CV_OVERRIDE;
 
-    static void makeExpr(MatExpr& res, int method, const Mat& a, const Mat& b);
+    স্থির শূন্য make_রাশিমালা(Mat_রাশিমালা& res, পূর্ণসংখ্যা method, ধ্রুবক Mat& a, ধ্রুবক Mat& b);
 };
 
-static MatOp_Solve g_MatOp_Solve;
+স্থির MatOp_Solve g_MatOp_Solve;
 
-class MatOp_Initializer CV_FINAL : public MatOp
+শ্রেণী MatOp_Initializer CV_FINAL : সর্বজনীন MatOp
 {
-public:
+সর্বজনীন:
     MatOp_Initializer() {}
-    virtual ~MatOp_Initializer() {}
+    আভাসী ~MatOp_Initializer() {}
 
-    bool elementWise(const MatExpr& /*expr*/) const CV_OVERRIDE { return false; }
-    void assign(const MatExpr& expr, Mat& m, int type=-1) const CV_OVERRIDE;
+    যৌক্তিক elementWise(ধ্রুবক Mat_রাশিমালা& /*রাশিমালা*/) ধ্রুবক CV_OVERRIDE { ফেরত মিথ্যা; }
+    শূন্য assign(ধ্রুবক Mat_রাশিমালা& রাশিমালা, Mat& m, পূর্ণসংখ্যা type=-1) ধ্রুবক CV_OVERRIDE;
 
-    void multiply(const MatExpr& e, double s, MatExpr& res) const CV_OVERRIDE;
+    শূন্য multiply(ধ্রুবক Mat_রাশিমালা& e, দ্বিগুণ s, Mat_রাশিমালা& res) ধ্রুবক CV_OVERRIDE;
 
-    static void makeExpr(MatExpr& res, int method, Size sz, int type, double alpha=1);
-    static void makeExpr(MatExpr& res, int method, int ndims, const int* sizes, int type, double alpha=1);
+    স্থির শূন্য make_রাশিমালা(Mat_রাশিমালা& res, পূর্ণসংখ্যা method, আকার_2 sz, পূর্ণসংখ্যা type, দ্বিগুণ alpha=1);
+    স্থির শূন্য make_রাশিমালা(Mat_রাশিমালা& res, পূর্ণসংখ্যা method, পূর্ণসংখ্যা ndims, ধ্রুবক পূর্ণসংখ্যা* sizes, পূর্ণসংখ্যা type, দ্বিগুণ alpha=1);
 };
 
-static MatOp_Initializer* getGlobalMatOpInitializer()
+স্থির MatOp_Initializer* getGlobalMatOpInitializer()
 {
-    CV_SINGLETON_LAZY_INIT(MatOp_Initializer, new MatOp_Initializer())
+    CV_SINGLETON_LAZY_INIT(MatOp_Initializer, নতুন MatOp_Initializer())
 }
 
-static inline bool isIdentity(const MatExpr& e) { return e.op == &g_MatOp_Identity; }
-static inline bool isAddEx(const MatExpr& e) { return e.op == &g_MatOp_AddEx; }
-static inline bool isScaled(const MatExpr& e) { return isAddEx(e) && (!e.b.data || e.beta == 0) && e.s == Scalar(); }
-static inline bool isBin(const MatExpr& e, char c) { return e.op == &g_MatOp_Bin && e.flags == c; }
-static inline bool isCmp(const MatExpr& e) { return e.op == &g_MatOp_Cmp; }
-static inline bool isReciprocal(const MatExpr& e) { return isBin(e,'/') && (!e.b.data || e.beta == 0); }
-static inline bool isT(const MatExpr& e) { return e.op == &g_MatOp_T; }
-static inline bool isInv(const MatExpr& e) { return e.op == &g_MatOp_Invert; }
-static inline bool isSolve(const MatExpr& e) { return e.op == &g_MatOp_Solve; }
+স্থির অন্তঃরেখ যৌক্তিক isIdentity(ধ্রুবক Mat_রাশিমালা& e) { ফেরত e.op == &g_MatOp_Identity; }
+স্থির অন্তঃরেখ যৌক্তিক isAddEx(ধ্রুবক Mat_রাশিমালা& e) { ফেরত e.op == &g_MatOp_AddEx; }
+স্থির অন্তঃরেখ যৌক্তিক isScaled(ধ্রুবক Mat_রাশিমালা& e) { ফেরত isAddEx(e) && (!e.b.তথ্য || e.beta == 0) && e.s == Scalar(); }
+স্থির অন্তঃরেখ যৌক্তিক isBin(ধ্রুবক Mat_রাশিমালা& e, অক্ষর c) { ফেরত e.op == &g_MatOp_Bin && e.flags == c; }
+স্থির অন্তঃরেখ যৌক্তিক isCmp(ধ্রুবক Mat_রাশিমালা& e) { ফেরত e.op == &g_MatOp_Cmp; }
+স্থির অন্তঃরেখ যৌক্তিক isReciprocal(ধ্রুবক Mat_রাশিমালা& e) { ফেরত isBin(e,'/') && (!e.b.তথ্য || e.beta == 0); }
+স্থির অন্তঃরেখ যৌক্তিক isT(ধ্রুবক Mat_রাশিমালা& e) { ফেরত e.op == &g_MatOp_T; }
+স্থির অন্তঃরেখ যৌক্তিক isInv(ধ্রুবক Mat_রাশিমালা& e) { ফেরত e.op == &g_MatOp_Invert; }
+স্থির অন্তঃরেখ যৌক্তিক isSolve(ধ্রুবক Mat_রাশিমালা& e) { ফেরত e.op == &g_MatOp_Solve; }
 //static inline bool isGEMM(const MatExpr& e) { return e.op == &g_MatOp_GEMM; }
-static inline bool isMatProd(const MatExpr& e) { return e.op == &g_MatOp_GEMM && (!e.c.data || e.beta == 0); }
-static inline bool isInitializer(const MatExpr& e) { return e.op == getGlobalMatOpInitializer(); }
+স্থির অন্তঃরেখ যৌক্তিক isMatProd(ধ্রুবক Mat_রাশিমালা& e) { ফেরত e.op == &g_MatOp_GEMM && (!e.c.তথ্য || e.beta == 0); }
+স্থির অন্তঃরেখ যৌক্তিক isInitializer(ধ্রুবক Mat_রাশিমালা& e) { ফেরত e.op == getGlobalMatOpInitializer(); }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -219,1138 +219,1138 @@ MatOp::MatOp() {}
 MatOp::~MatOp() {}
 
 
-bool MatOp::elementWise(const MatExpr& /*expr*/) const
+যৌক্তিক MatOp::elementWise(ধ্রুবক Mat_রাশিমালা& /*রাশিমালা*/) ধ্রুবক
 {
-    return false;
+    ফেরত মিথ্যা;
 }
 
-void MatOp::roi(const MatExpr& expr, const Range& rowRange, const Range& colRange, MatExpr& e) const
+শূন্য MatOp::roi(ধ্রুবক Mat_রাশিমালা& রাশিমালা, ধ্রুবক Range& rowRange, ধ্রুবক Range& colRange, Mat_রাশিমালা& e) ধ্রুবক
 {
-    if( elementWise(expr) )
+    যদি( elementWise(রাশিমালা) )
     {
-        e = MatExpr(expr.op, expr.flags, Mat(), Mat(), Mat(),
-                    expr.alpha, expr.beta, expr.s);
-        if(expr.a.data)
-            e.a = expr.a(rowRange, colRange);
-        if(expr.b.data)
-            e.b = expr.b(rowRange, colRange);
-        if(expr.c.data)
-            e.c = expr.c(rowRange, colRange);
+        e = Mat_রাশিমালা(রাশিমালা.op, রাশিমালা.flags, Mat(), Mat(), Mat(),
+                    রাশিমালা.alpha, রাশিমালা.beta, রাশিমালা.s);
+        যদি(রাশিমালা.a.তথ্য)
+            e.a = রাশিমালা.a(rowRange, colRange);
+        যদি(রাশিমালা.b.তথ্য)
+            e.b = রাশিমালা.b(rowRange, colRange);
+        যদি(রাশিমালা.c.তথ্য)
+            e.c = রাশিমালা.c(rowRange, colRange);
     }
-    else
-    {
-        Mat m;
-        expr.op->assign(expr, m);
-        e = MatExpr(&g_MatOp_Identity, 0, m(rowRange, colRange), Mat(), Mat());
-    }
-}
-
-void MatOp::diag(const MatExpr& expr, int d, MatExpr& e) const
-{
-    if( elementWise(expr) )
-    {
-        e = MatExpr(expr.op, expr.flags, Mat(), Mat(), Mat(),
-                    expr.alpha, expr.beta, expr.s);
-        if(expr.a.data)
-            e.a = expr.a.diag(d);
-        if(expr.b.data)
-            e.b = expr.b.diag(d);
-        if(expr.c.data)
-            e.c = expr.c.diag(d);
-    }
-    else
+    অন্যথা
     {
         Mat m;
-        expr.op->assign(expr, m);
-        e = MatExpr(&g_MatOp_Identity, 0, m.diag(d), Mat(), Mat());
+        রাশিমালা.op->assign(রাশিমালা, m);
+        e = Mat_রাশিমালা(&g_MatOp_Identity, 0, m(rowRange, colRange), Mat(), Mat());
+    }
+}
+
+শূন্য MatOp::diag(ধ্রুবক Mat_রাশিমালা& রাশিমালা, পূর্ণসংখ্যা d, Mat_রাশিমালা& e) ধ্রুবক
+{
+    যদি( elementWise(রাশিমালা) )
+    {
+        e = Mat_রাশিমালা(রাশিমালা.op, রাশিমালা.flags, Mat(), Mat(), Mat(),
+                    রাশিমালা.alpha, রাশিমালা.beta, রাশিমালা.s);
+        যদি(রাশিমালা.a.তথ্য)
+            e.a = রাশিমালা.a.diag(d);
+        যদি(রাশিমালা.b.তথ্য)
+            e.b = রাশিমালা.b.diag(d);
+        যদি(রাশিমালা.c.তথ্য)
+            e.c = রাশিমালা.c.diag(d);
+    }
+    অন্যথা
+    {
+        Mat m;
+        রাশিমালা.op->assign(রাশিমালা, m);
+        e = Mat_রাশিমালা(&g_MatOp_Identity, 0, m.diag(d), Mat(), Mat());
     }
 }
 
 
-void MatOp::augAssignAdd(const MatExpr& expr, Mat& m) const
+শূন্য MatOp::augAssignAdd(ধ্রুবক Mat_রাশিমালা& রাশিমালা, Mat& m) ধ্রুবক
 {
-    Mat temp;
-    expr.op->assign(expr, temp);
-    m += temp;
+    Mat অস্থায়ী_2;
+    রাশিমালা.op->assign(রাশিমালা, অস্থায়ী_2);
+    m += অস্থায়ী_2;
 }
 
 
-void MatOp::augAssignSubtract(const MatExpr& expr, Mat& m) const
+শূন্য MatOp::augAssignSubtract(ধ্রুবক Mat_রাশিমালা& রাশিমালা, Mat& m) ধ্রুবক
 {
-    Mat temp;
-    expr.op->assign(expr, temp);
-    m -= temp;
+    Mat অস্থায়ী_2;
+    রাশিমালা.op->assign(রাশিমালা, অস্থায়ী_2);
+    m -= অস্থায়ী_2;
 }
 
 
-void MatOp::augAssignMultiply(const MatExpr& expr, Mat& m) const
+শূন্য MatOp::augAssignMultiply(ধ্রুবক Mat_রাশিমালা& রাশিমালা, Mat& m) ধ্রুবক
 {
-    Mat temp;
-    expr.op->assign(expr, temp);
-    m *= temp;
+    Mat অস্থায়ী_2;
+    রাশিমালা.op->assign(রাশিমালা, অস্থায়ী_2);
+    m *= অস্থায়ী_2;
 }
 
 
-void MatOp::augAssignDivide(const MatExpr& expr, Mat& m) const
+শূন্য MatOp::augAssignDivide(ধ্রুবক Mat_রাশিমালা& রাশিমালা, Mat& m) ধ্রুবক
 {
-    Mat temp;
-    expr.op->assign(expr, temp);
-    m /= temp;
+    Mat অস্থায়ী_2;
+    রাশিমালা.op->assign(রাশিমালা, অস্থায়ী_2);
+    m /= অস্থায়ী_2;
 }
 
 
-void MatOp::augAssignAnd(const MatExpr& expr, Mat& m) const
+শূন্য MatOp::augAssignAnd(ধ্রুবক Mat_রাশিমালা& রাশিমালা, Mat& m) ধ্রুবক
 {
-    Mat temp;
-    expr.op->assign(expr, temp);
-    m &= temp;
+    Mat অস্থায়ী_2;
+    রাশিমালা.op->assign(রাশিমালা, অস্থায়ী_2);
+    m &= অস্থায়ী_2;
 }
 
 
-void MatOp::augAssignOr(const MatExpr& expr, Mat& m) const
+শূন্য MatOp::augAssignOr(ধ্রুবক Mat_রাশিমালা& রাশিমালা, Mat& m) ধ্রুবক
 {
-    Mat temp;
-    expr.op->assign(expr, temp);
-    m |= temp;
+    Mat অস্থায়ী_2;
+    রাশিমালা.op->assign(রাশিমালা, অস্থায়ী_2);
+    m |= অস্থায়ী_2;
 }
 
 
-void MatOp::augAssignXor(const MatExpr& expr, Mat& m) const
+শূন্য MatOp::augAssignXor(ধ্রুবক Mat_রাশিমালা& রাশিমালা, Mat& m) ধ্রুবক
 {
-    Mat temp;
-    expr.op->assign(expr, temp);
-    m ^= temp;
+    Mat অস্থায়ী_2;
+    রাশিমালা.op->assign(রাশিমালা, অস্থায়ী_2);
+    m ^= অস্থায়ী_2;
 }
 
 
-void MatOp::add(const MatExpr& e1, const MatExpr& e2, MatExpr& res) const
+শূন্য MatOp::add(ধ্রুবক Mat_রাশিমালা& e1, ধ্রুবক Mat_রাশিমালা& e2, Mat_রাশিমালা& res) ধ্রুবক
 {
     CV_INSTRUMENT_REGION();
 
-    if( this == e2.op )
+    যদি( এই == e2.op )
     {
-        double alpha = 1, beta = 1;
+        দ্বিগুণ alpha = 1, beta = 1;
         Scalar s;
         Mat m1, m2;
-        if( isAddEx(e1) && (!e1.b.data || e1.beta == 0) )
+        যদি( isAddEx(e1) && (!e1.b.তথ্য || e1.beta == 0) )
         {
             m1 = e1.a;
             alpha = e1.alpha;
             s = e1.s;
         }
-        else
+        অন্যথা
             e1.op->assign(e1, m1);
 
-        if( isAddEx(e2) && (!e2.b.data || e2.beta == 0) )
+        যদি( isAddEx(e2) && (!e2.b.তথ্য || e2.beta == 0) )
         {
             m2 = e2.a;
             beta = e2.alpha;
             s += e2.s;
         }
-        else
+        অন্যথা
             e2.op->assign(e2, m2);
-        MatOp_AddEx::makeExpr(res, m1, m2, alpha, beta, s);
+        MatOp_AddEx::make_রাশিমালা(res, m1, m2, alpha, beta, s);
     }
-    else
+    অন্যথা
         e2.op->add(e1, e2, res);
 }
 
 
-void MatOp::add(const MatExpr& expr1, const Scalar& s, MatExpr& res) const
+শূন্য MatOp::add(ধ্রুবক Mat_রাশিমালা& expr1, ধ্রুবক Scalar& s, Mat_রাশিমালা& res) ধ্রুবক
 {
     CV_INSTRUMENT_REGION();
 
     Mat m1;
     expr1.op->assign(expr1, m1);
-    MatOp_AddEx::makeExpr(res, m1, Mat(), 1, 0, s);
+    MatOp_AddEx::make_রাশিমালা(res, m1, Mat(), 1, 0, s);
 }
 
 
-void MatOp::subtract(const MatExpr& e1, const MatExpr& e2, MatExpr& res) const
+শূন্য MatOp::subtract(ধ্রুবক Mat_রাশিমালা& e1, ধ্রুবক Mat_রাশিমালা& e2, Mat_রাশিমালা& res) ধ্রুবক
 {
     CV_INSTRUMENT_REGION();
 
-    if( this == e2.op )
+    যদি( এই == e2.op )
     {
-        double alpha = 1, beta = -1;
+        দ্বিগুণ alpha = 1, beta = -1;
         Scalar s;
         Mat m1, m2;
-        if( isAddEx(e1) && (!e1.b.data || e1.beta == 0) )
+        যদি( isAddEx(e1) && (!e1.b.তথ্য || e1.beta == 0) )
         {
             m1 = e1.a;
             alpha = e1.alpha;
             s = e1.s;
         }
-        else
+        অন্যথা
             e1.op->assign(e1, m1);
 
-        if( isAddEx(e2) && (!e2.b.data || e2.beta == 0) )
+        যদি( isAddEx(e2) && (!e2.b.তথ্য || e2.beta == 0) )
         {
             m2 = e2.a;
             beta = -e2.alpha;
             s -= e2.s;
         }
-        else
+        অন্যথা
             e2.op->assign(e2, m2);
-        MatOp_AddEx::makeExpr(res, m1, m2, alpha, beta, s);
+        MatOp_AddEx::make_রাশিমালা(res, m1, m2, alpha, beta, s);
     }
-    else
+    অন্যথা
         e2.op->subtract(e1, e2, res);
 }
 
 
-void MatOp::subtract(const Scalar& s, const MatExpr& expr, MatExpr& res) const
+শূন্য MatOp::subtract(ধ্রুবক Scalar& s, ধ্রুবক Mat_রাশিমালা& রাশিমালা, Mat_রাশিমালা& res) ধ্রুবক
 {
     CV_INSTRUMENT_REGION();
 
     Mat m;
-    expr.op->assign(expr, m);
-    MatOp_AddEx::makeExpr(res, m, Mat(), -1, 0, s);
+    রাশিমালা.op->assign(রাশিমালা, m);
+    MatOp_AddEx::make_রাশিমালা(res, m, Mat(), -1, 0, s);
 }
 
 
-void MatOp::multiply(const MatExpr& e1, const MatExpr& e2, MatExpr& res, double scale) const
+শূন্য MatOp::multiply(ধ্রুবক Mat_রাশিমালা& e1, ধ্রুবক Mat_রাশিমালা& e2, Mat_রাশিমালা& res, দ্বিগুণ scale) ধ্রুবক
 {
     CV_INSTRUMENT_REGION();
 
-    if( this == e2.op )
+    যদি( এই == e2.op )
     {
         Mat m1, m2;
 
-        if( isReciprocal(e1) )
+        যদি( isReciprocal(e1) )
         {
-            if( isScaled(e2) )
+            যদি( isScaled(e2) )
             {
                 scale *= e2.alpha;
                 m2 = e2.a;
             }
-            else
+            অন্যথা
                 e2.op->assign(e2, m2);
 
-            MatOp_Bin::makeExpr(res, '/', m2, e1.a, scale/e1.alpha);
+            MatOp_Bin::make_রাশিমালা(res, '/', m2, e1.a, scale/e1.alpha);
         }
-        else
+        অন্যথা
         {
-            char op = '*';
-            if( isScaled(e1) )
+            অক্ষর op = '*';
+            যদি( isScaled(e1) )
             {
                 m1 = e1.a;
                 scale *= e1.alpha;
             }
-            else
+            অন্যথা
                 e1.op->assign(e1, m1);
 
-            if( isScaled(e2) )
+            যদি( isScaled(e2) )
             {
                 m2 = e2.a;
                 scale *= e2.alpha;
             }
-            else if( isReciprocal(e2) )
+            অন্যথা যদি( isReciprocal(e2) )
             {
                 op = '/';
                 m2 = e2.a;
                 scale *= e2.alpha;
             }
-            else
+            অন্যথা
                 e2.op->assign(e2, m2);
 
-            MatOp_Bin::makeExpr(res, op, m1, m2, scale);
+            MatOp_Bin::make_রাশিমালা(res, op, m1, m2, scale);
         }
     }
-    else
+    অন্যথা
         e2.op->multiply(e1, e2, res, scale);
 }
 
 
-void MatOp::multiply(const MatExpr& expr, double s, MatExpr& res) const
+শূন্য MatOp::multiply(ধ্রুবক Mat_রাশিমালা& রাশিমালা, দ্বিগুণ s, Mat_রাশিমালা& res) ধ্রুবক
 {
     CV_INSTRUMENT_REGION();
 
     Mat m;
-    expr.op->assign(expr, m);
-    MatOp_AddEx::makeExpr(res, m, Mat(), s, 0);
+    রাশিমালা.op->assign(রাশিমালা, m);
+    MatOp_AddEx::make_রাশিমালা(res, m, Mat(), s, 0);
 }
 
 
-void MatOp::divide(const MatExpr& e1, const MatExpr& e2, MatExpr& res, double scale) const
+শূন্য MatOp::divide(ধ্রুবক Mat_রাশিমালা& e1, ধ্রুবক Mat_রাশিমালা& e2, Mat_রাশিমালা& res, দ্বিগুণ scale) ধ্রুবক
 {
     CV_INSTRUMENT_REGION();
 
-    if( this == e2.op )
+    যদি( এই == e2.op )
     {
-        if( isReciprocal(e1) && isReciprocal(e2) )
-            MatOp_Bin::makeExpr(res, '/', e2.a, e1.a, e1.alpha/e2.alpha);
-        else
+        যদি( isReciprocal(e1) && isReciprocal(e2) )
+            MatOp_Bin::make_রাশিমালা(res, '/', e2.a, e1.a, e1.alpha/e2.alpha);
+        অন্যথা
         {
             Mat m1, m2;
-            char op = '/';
+            অক্ষর op = '/';
 
-            if( isScaled(e1) )
+            যদি( isScaled(e1) )
             {
                 m1 = e1.a;
                 scale *= e1.alpha;
             }
-            else
+            অন্যথা
                 e1.op->assign(e1, m1);
 
-            if( isScaled(e2) )
+            যদি( isScaled(e2) )
             {
                 m2 = e2.a;
                 scale /= e2.alpha;
             }
-            else if( isReciprocal(e2) )
+            অন্যথা যদি( isReciprocal(e2) )
             {
                 m2 = e2.a;
                 scale /= e2.alpha;
                 op = '*';
             }
-            else
+            অন্যথা
                 e2.op->assign(e2, m2);
-            MatOp_Bin::makeExpr(res, op, m1, m2, scale);
+            MatOp_Bin::make_রাশিমালা(res, op, m1, m2, scale);
         }
     }
-    else
+    অন্যথা
         e2.op->divide(e1, e2, res, scale);
 }
 
 
-void MatOp::divide(double s, const MatExpr& expr, MatExpr& res) const
+শূন্য MatOp::divide(দ্বিগুণ s, ধ্রুবক Mat_রাশিমালা& রাশিমালা, Mat_রাশিমালা& res) ধ্রুবক
 {
     CV_INSTRUMENT_REGION();
 
     Mat m;
-    expr.op->assign(expr, m);
-    MatOp_Bin::makeExpr(res, '/', m, Mat(), s);
+    রাশিমালা.op->assign(রাশিমালা, m);
+    MatOp_Bin::make_রাশিমালা(res, '/', m, Mat(), s);
 }
 
 
-void MatOp::abs(const MatExpr& expr, MatExpr& res) const
+শূন্য MatOp::abs(ধ্রুবক Mat_রাশিমালা& রাশিমালা, Mat_রাশিমালা& res) ধ্রুবক
 {
     CV_INSTRUMENT_REGION();
 
     Mat m;
-    expr.op->assign(expr, m);
-    MatOp_Bin::makeExpr(res, 'a', m, Mat());
+    রাশিমালা.op->assign(রাশিমালা, m);
+    MatOp_Bin::make_রাশিমালা(res, 'a', m, Mat());
 }
 
 
-void MatOp::transpose(const MatExpr& expr, MatExpr& res) const
+শূন্য MatOp::transpose(ধ্রুবক Mat_রাশিমালা& রাশিমালা, Mat_রাশিমালা& res) ধ্রুবক
 {
     CV_INSTRUMENT_REGION();
 
     Mat m;
-    expr.op->assign(expr, m);
-    MatOp_T::makeExpr(res, m, 1);
+    রাশিমালা.op->assign(রাশিমালা, m);
+    MatOp_T::make_রাশিমালা(res, m, 1);
 }
 
 
-void MatOp::matmul(const MatExpr& e1, const MatExpr& e2, MatExpr& res) const
+শূন্য MatOp::matmul(ধ্রুবক Mat_রাশিমালা& e1, ধ্রুবক Mat_রাশিমালা& e2, Mat_রাশিমালা& res) ধ্রুবক
 {
-    if( this == e2.op )
+    যদি( এই == e2.op )
     {
-        double scale = 1;
-        int flags = 0;
+        দ্বিগুণ scale = 1;
+        পূর্ণসংখ্যা flags = 0;
         Mat m1, m2;
 
-        if( isT(e1) )
+        যদি( isT(e1) )
         {
             flags = cv::GEMM_1_T;
             scale = e1.alpha;
             m1 = e1.a;
         }
-        else if( isScaled(e1) )
+        অন্যথা যদি( isScaled(e1) )
         {
             scale = e1.alpha;
             m1 = e1.a;
         }
-        else
+        অন্যথা
             e1.op->assign(e1, m1);
 
-        if( isT(e2) )
+        যদি( isT(e2) )
         {
             flags |= cv::GEMM_2_T;
             scale *= e2.alpha;
             m2 = e2.a;
         }
-        else if( isScaled(e2) )
+        অন্যথা যদি( isScaled(e2) )
         {
             scale *= e2.alpha;
             m2 = e2.a;
         }
-        else
+        অন্যথা
             e2.op->assign(e2, m2);
 
-        MatOp_GEMM::makeExpr(res, flags, m1, m2, scale);
+        MatOp_GEMM::make_রাশিমালা(res, flags, m1, m2, scale);
     }
-    else
+    অন্যথা
         e2.op->matmul(e1, e2, res);
 }
 
 
-void MatOp::invert(const MatExpr& expr, int method, MatExpr& res) const
+শূন্য MatOp::invert(ধ্রুবক Mat_রাশিমালা& রাশিমালা, পূর্ণসংখ্যা method, Mat_রাশিমালা& res) ধ্রুবক
 {
     Mat m;
-    expr.op->assign(expr, m);
-    MatOp_Invert::makeExpr(res, method, m);
+    রাশিমালা.op->assign(রাশিমালা, m);
+    MatOp_Invert::make_রাশিমালা(res, method, m);
 }
 
 
-Size MatOp::size(const MatExpr& expr) const
+আকার_2 MatOp::size(ধ্রুবক Mat_রাশিমালা& রাশিমালা) ধ্রুবক
 {
-    return !expr.a.empty() ? expr.a.size() : expr.b.empty() ? expr.b.size() : expr.c.size();
+    ফেরত !রাশিমালা.a.empty() ? রাশিমালা.a.size() : রাশিমালা.b.empty() ? রাশিমালা.b.size() : রাশিমালা.c.size();
 }
 
-int MatOp::type(const MatExpr& expr) const
+পূর্ণসংখ্যা MatOp::type(ধ্রুবক Mat_রাশিমালা& রাশিমালা) ধ্রুবক
 {
     CV_INSTRUMENT_REGION();
 
-    return !expr.a.empty() ? expr.a.type() : expr.b.empty() ? expr.b.type() : expr.c.type();
+    ফেরত !রাশিমালা.a.empty() ? রাশিমালা.a.type() : রাশিমালা.b.empty() ? রাশিমালা.b.type() : রাশিমালা.c.type();
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////
 
-MatExpr::MatExpr(const Mat& m) : op(&g_MatOp_Identity), flags(0), a(m), b(Mat()), c(Mat()), alpha(1), beta(0), s(Scalar())
+Mat_রাশিমালা::Mat_রাশিমালা(ধ্রুবক Mat& m) : op(&g_MatOp_Identity), flags(0), a(m), b(Mat()), c(Mat()), alpha(1), beta(0), s(Scalar())
 {
 }
 
-MatExpr MatExpr::row(int y) const
+Mat_রাশিমালা Mat_রাশিমালা::row(পূর্ণসংখ্যা y) ধ্রুবক
 {
-    MatExpr e;
-    op->roi(*this, Range(y, y+1), Range::all(), e);
-    return e;
+    Mat_রাশিমালা e;
+    op->roi(*এই, Range(y, y+1), Range::all(), e);
+    ফেরত e;
 }
 
-MatExpr MatExpr::col(int x) const
+Mat_রাশিমালা Mat_রাশিমালা::col(পূর্ণসংখ্যা x) ধ্রুবক
 {
-    MatExpr e;
-    op->roi(*this, Range::all(), Range(x, x+1), e);
-    return e;
+    Mat_রাশিমালা e;
+    op->roi(*এই, Range::all(), Range(x, x+1), e);
+    ফেরত e;
 }
 
-MatExpr MatExpr::diag(int d) const
+Mat_রাশিমালা Mat_রাশিমালা::diag(পূর্ণসংখ্যা d) ধ্রুবক
 {
-    MatExpr e;
-    op->diag(*this, d, e);
-    return e;
+    Mat_রাশিমালা e;
+    op->diag(*এই, d, e);
+    ফেরত e;
 }
 
-MatExpr MatExpr::operator()( const Range& rowRange, const Range& colRange ) const
+Mat_রাশিমালা Mat_রাশিমালা::operator()( ধ্রুবক Range& rowRange, ধ্রুবক Range& colRange ) ধ্রুবক
 {
-    MatExpr e;
-    op->roi(*this, rowRange, colRange, e);
-    return e;
+    Mat_রাশিমালা e;
+    op->roi(*এই, rowRange, colRange, e);
+    ফেরত e;
 }
 
-MatExpr MatExpr::operator()( const Rect& roi ) const
+Mat_রাশিমালা Mat_রাশিমালা::operator()( ধ্রুবক Rect& roi ) ধ্রুবক
 {
-    MatExpr e;
-    op->roi(*this, Range(roi.y, roi.y + roi.height), Range(roi.x, roi.x + roi.width), e);
-    return e;
+    Mat_রাশিমালা e;
+    op->roi(*এই, Range(roi.y, roi.y + roi.height), Range(roi.x, roi.x + roi.width), e);
+    ফেরত e;
 }
 
-Mat MatExpr::cross(const Mat& m) const
+Mat Mat_রাশিমালা::cross(ধ্রুবক Mat& m) ধ্রুবক
 {
-    return ((Mat)*this).cross(m);
+    ফেরত ((Mat)*এই).cross(m);
 }
 
-double MatExpr::dot(const Mat& m) const
+দ্বিগুণ Mat_রাশিমালা::dot(ধ্রুবক Mat& m) ধ্রুবক
 {
-    return ((Mat)*this).dot(m);
+    ফেরত ((Mat)*এই).dot(m);
 }
 
-MatExpr MatExpr::t() const
+Mat_রাশিমালা Mat_রাশিমালা::t() ধ্রুবক
 {
-    MatExpr e;
-    op->transpose(*this, e);
-    return e;
+    Mat_রাশিমালা e;
+    op->transpose(*এই, e);
+    ফেরত e;
 }
 
-MatExpr MatExpr::inv(int method) const
+Mat_রাশিমালা Mat_রাশিমালা::inv(পূর্ণসংখ্যা method) ধ্রুবক
 {
-    MatExpr e;
-    op->invert(*this, method, e);
-    return e;
+    Mat_রাশিমালা e;
+    op->invert(*এই, method, e);
+    ফেরত e;
 }
 
-MatExpr MatExpr::mul(const MatExpr& e, double scale) const
+Mat_রাশিমালা Mat_রাশিমালা::mul(ধ্রুবক Mat_রাশিমালা& e, দ্বিগুণ scale) ধ্রুবক
 {
-    MatExpr en;
-    op->multiply(*this, e, en, scale);
-    return en;
+    Mat_রাশিমালা en;
+    op->multiply(*এই, e, en, scale);
+    ফেরত en;
 }
 
-MatExpr MatExpr::mul(const Mat& m, double scale) const
+Mat_রাশিমালা Mat_রাশিমালা::mul(ধ্রুবক Mat& m, দ্বিগুণ scale) ধ্রুবক
 {
-    MatExpr e;
-    op->multiply(*this, MatExpr(m), e, scale);
-    return e;
+    Mat_রাশিমালা e;
+    op->multiply(*এই, Mat_রাশিমালা(m), e, scale);
+    ফেরত e;
 }
 
-MatExpr operator + (const Mat& a, const Mat& b)
+Mat_রাশিমালা operator + (ধ্রুবক Mat& a, ধ্রুবক Mat& b)
 {
     checkOperandsExist(a, b);
-    MatExpr e;
-    MatOp_AddEx::makeExpr(e, a, b, 1, 1);
-    return e;
+    Mat_রাশিমালা e;
+    MatOp_AddEx::make_রাশিমালা(e, a, b, 1, 1);
+    ফেরত e;
 }
 
-MatExpr operator + (const Mat& a, const Scalar& s)
+Mat_রাশিমালা operator + (ধ্রুবক Mat& a, ধ্রুবক Scalar& s)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_AddEx::makeExpr(e, a, Mat(), 1, 0, s);
-    return e;
+    Mat_রাশিমালা e;
+    MatOp_AddEx::make_রাশিমালা(e, a, Mat(), 1, 0, s);
+    ফেরত e;
 }
 
-MatExpr operator + (const Scalar& s, const Mat& a)
+Mat_রাশিমালা operator + (ধ্রুবক Scalar& s, ধ্রুবক Mat& a)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_AddEx::makeExpr(e, a, Mat(), 1, 0, s);
-    return e;
+    Mat_রাশিমালা e;
+    MatOp_AddEx::make_রাশিমালা(e, a, Mat(), 1, 0, s);
+    ফেরত e;
 }
 
-MatExpr operator + (const MatExpr& e, const Mat& m)
+Mat_রাশিমালা operator + (ধ্রুবক Mat_রাশিমালা& e, ধ্রুবক Mat& m)
 {
-    MatExpr en;
-    e.op->add(e, MatExpr(m), en);
-    return en;
+    Mat_রাশিমালা en;
+    e.op->add(e, Mat_রাশিমালা(m), en);
+    ফেরত en;
 }
 
-MatExpr operator + (const Mat& m, const MatExpr& e)
+Mat_রাশিমালা operator + (ধ্রুবক Mat& m, ধ্রুবক Mat_রাশিমালা& e)
 {
     checkOperandsExist(m);
-    MatExpr en;
-    e.op->add(e, MatExpr(m), en);
-    return en;
+    Mat_রাশিমালা en;
+    e.op->add(e, Mat_রাশিমালা(m), en);
+    ফেরত en;
 }
 
-MatExpr operator + (const MatExpr& e, const Scalar& s)
+Mat_রাশিমালা operator + (ধ্রুবক Mat_রাশিমালা& e, ধ্রুবক Scalar& s)
 {
-    MatExpr en;
+    Mat_রাশিমালা en;
     e.op->add(e, s, en);
-    return en;
+    ফেরত en;
 }
 
-MatExpr operator + (const Scalar& s, const MatExpr& e)
+Mat_রাশিমালা operator + (ধ্রুবক Scalar& s, ধ্রুবক Mat_রাশিমালা& e)
 {
-    MatExpr en;
+    Mat_রাশিমালা en;
     e.op->add(e, s, en);
-    return en;
+    ফেরত en;
 }
 
-MatExpr operator + (const MatExpr& e1, const MatExpr& e2)
+Mat_রাশিমালা operator + (ধ্রুবক Mat_রাশিমালা& e1, ধ্রুবক Mat_রাশিমালা& e2)
 {
-    MatExpr en;
+    Mat_রাশিমালা en;
     e1.op->add(e1, e2, en);
-    return en;
+    ফেরত en;
 }
 
-MatExpr operator - (const Mat& a, const Mat& b)
+Mat_রাশিমালা operator - (ধ্রুবক Mat& a, ধ্রুবক Mat& b)
 {
     checkOperandsExist(a, b);
-    MatExpr e;
-    MatOp_AddEx::makeExpr(e, a, b, 1, -1);
-    return e;
+    Mat_রাশিমালা e;
+    MatOp_AddEx::make_রাশিমালা(e, a, b, 1, -1);
+    ফেরত e;
 }
 
-MatExpr operator - (const Mat& a, const Scalar& s)
+Mat_রাশিমালা operator - (ধ্রুবক Mat& a, ধ্রুবক Scalar& s)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_AddEx::makeExpr(e, a, Mat(), 1, 0, -s);
-    return e;
+    Mat_রাশিমালা e;
+    MatOp_AddEx::make_রাশিমালা(e, a, Mat(), 1, 0, -s);
+    ফেরত e;
 }
 
-MatExpr operator - (const Scalar& s, const Mat& a)
+Mat_রাশিমালা operator - (ধ্রুবক Scalar& s, ধ্রুবক Mat& a)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_AddEx::makeExpr(e, a, Mat(), -1, 0, s);
-    return e;
+    Mat_রাশিমালা e;
+    MatOp_AddEx::make_রাশিমালা(e, a, Mat(), -1, 0, s);
+    ফেরত e;
 }
 
-MatExpr operator - (const MatExpr& e, const Mat& m)
+Mat_রাশিমালা operator - (ধ্রুবক Mat_রাশিমালা& e, ধ্রুবক Mat& m)
 {
     checkOperandsExist(m);
-    MatExpr en;
-    e.op->subtract(e, MatExpr(m), en);
-    return en;
+    Mat_রাশিমালা en;
+    e.op->subtract(e, Mat_রাশিমালা(m), en);
+    ফেরত en;
 }
 
-MatExpr operator - (const Mat& m, const MatExpr& e)
+Mat_রাশিমালা operator - (ধ্রুবক Mat& m, ধ্রুবক Mat_রাশিমালা& e)
 {
     checkOperandsExist(m);
-    MatExpr en;
-    e.op->subtract(MatExpr(m), e, en);
-    return en;
+    Mat_রাশিমালা en;
+    e.op->subtract(Mat_রাশিমালা(m), e, en);
+    ফেরত en;
 }
 
-MatExpr operator - (const MatExpr& e, const Scalar& s)
+Mat_রাশিমালা operator - (ধ্রুবক Mat_রাশিমালা& e, ধ্রুবক Scalar& s)
 {
-    MatExpr en;
+    Mat_রাশিমালা en;
     e.op->add(e, -s, en);
-    return en;
+    ফেরত en;
 }
 
-MatExpr operator - (const Scalar& s, const MatExpr& e)
+Mat_রাশিমালা operator - (ধ্রুবক Scalar& s, ধ্রুবক Mat_রাশিমালা& e)
 {
-    MatExpr en;
+    Mat_রাশিমালা en;
     e.op->subtract(s, e, en);
-    return en;
+    ফেরত en;
 }
 
-MatExpr operator - (const MatExpr& e1, const MatExpr& e2)
+Mat_রাশিমালা operator - (ধ্রুবক Mat_রাশিমালা& e1, ধ্রুবক Mat_রাশিমালা& e2)
 {
-    MatExpr en;
+    Mat_রাশিমালা en;
     e1.op->subtract(e1, e2, en);
-    return en;
+    ফেরত en;
 }
 
-MatExpr operator - (const Mat& m)
+Mat_রাশিমালা operator - (ধ্রুবক Mat& m)
 {
     checkOperandsExist(m);
-    MatExpr e;
-    MatOp_AddEx::makeExpr(e, m, Mat(), -1, 0);
-    return e;
+    Mat_রাশিমালা e;
+    MatOp_AddEx::make_রাশিমালা(e, m, Mat(), -1, 0);
+    ফেরত e;
 }
 
-MatExpr operator - (const MatExpr& e)
+Mat_রাশিমালা operator - (ধ্রুবক Mat_রাশিমালা& e)
 {
-    MatExpr en;
+    Mat_রাশিমালা en;
     e.op->subtract(Scalar(0), e, en);
-    return en;
+    ফেরত en;
 }
 
-MatExpr operator * (const Mat& a, const Mat& b)
+Mat_রাশিমালা operator * (ধ্রুবক Mat& a, ধ্রুবক Mat& b)
 {
     checkOperandsExist(a, b);
-    MatExpr e;
-    MatOp_GEMM::makeExpr(e, 0, a, b);
-    return e;
+    Mat_রাশিমালা e;
+    MatOp_GEMM::make_রাশিমালা(e, 0, a, b);
+    ফেরত e;
 }
 
-MatExpr operator * (const Mat& a, double s)
+Mat_রাশিমালা operator * (ধ্রুবক Mat& a, দ্বিগুণ s)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_AddEx::makeExpr(e, a, Mat(), s, 0);
-    return e;
+    Mat_রাশিমালা e;
+    MatOp_AddEx::make_রাশিমালা(e, a, Mat(), s, 0);
+    ফেরত e;
 }
 
-MatExpr operator * (double s, const Mat& a)
+Mat_রাশিমালা operator * (দ্বিগুণ s, ধ্রুবক Mat& a)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_AddEx::makeExpr(e, a, Mat(), s, 0);
-    return e;
+    Mat_রাশিমালা e;
+    MatOp_AddEx::make_রাশিমালা(e, a, Mat(), s, 0);
+    ফেরত e;
 }
 
-MatExpr operator * (const MatExpr& e, const Mat& m)
+Mat_রাশিমালা operator * (ধ্রুবক Mat_রাশিমালা& e, ধ্রুবক Mat& m)
 {
-    MatExpr en;
-    e.op->matmul(e, MatExpr(m), en);
-    return en;
+    Mat_রাশিমালা en;
+    e.op->matmul(e, Mat_রাশিমালা(m), en);
+    ফেরত en;
 }
 
-MatExpr operator * (const Mat& m, const MatExpr& e)
+Mat_রাশিমালা operator * (ধ্রুবক Mat& m, ধ্রুবক Mat_রাশিমালা& e)
 {
     checkOperandsExist(m);
-    MatExpr en;
-    e.op->matmul(MatExpr(m), e, en);
-    return en;
+    Mat_রাশিমালা en;
+    e.op->matmul(Mat_রাশিমালা(m), e, en);
+    ফেরত en;
 }
 
-MatExpr operator * (const MatExpr& e, double s)
+Mat_রাশিমালা operator * (ধ্রুবক Mat_রাশিমালা& e, দ্বিগুণ s)
 {
-    MatExpr en;
+    Mat_রাশিমালা en;
     e.op->multiply(e, s, en);
-    return en;
+    ফেরত en;
 }
 
-MatExpr operator * (double s, const MatExpr& e)
+Mat_রাশিমালা operator * (দ্বিগুণ s, ধ্রুবক Mat_রাশিমালা& e)
 {
-    MatExpr en;
+    Mat_রাশিমালা en;
     e.op->multiply(e, s, en);
-    return en;
+    ফেরত en;
 }
 
-MatExpr operator * (const MatExpr& e1, const MatExpr& e2)
+Mat_রাশিমালা operator * (ধ্রুবক Mat_রাশিমালা& e1, ধ্রুবক Mat_রাশিমালা& e2)
 {
-    MatExpr en;
+    Mat_রাশিমালা en;
     e1.op->matmul(e1, e2, en);
-    return en;
+    ফেরত en;
 }
 
-MatExpr operator / (const Mat& a, const Mat& b)
+Mat_রাশিমালা operator / (ধ্রুবক Mat& a, ধ্রুবক Mat& b)
 {
     checkOperandsExist(a, b);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, '/', a, b);
-    return e;
+    Mat_রাশিমালা e;
+    MatOp_Bin::make_রাশিমালা(e, '/', a, b);
+    ফেরত e;
 }
 
-MatExpr operator / (const Mat& a, double s)
+Mat_রাশিমালা operator / (ধ্রুবক Mat& a, দ্বিগুণ s)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_AddEx::makeExpr(e, a, Mat(), 1./s, 0);
-    return e;
+    Mat_রাশিমালা e;
+    MatOp_AddEx::make_রাশিমালা(e, a, Mat(), 1./s, 0);
+    ফেরত e;
 }
 
-MatExpr operator / (double s, const Mat& a)
+Mat_রাশিমালা operator / (দ্বিগুণ s, ধ্রুবক Mat& a)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, '/', a, Mat(), s);
-    return e;
+    Mat_রাশিমালা e;
+    MatOp_Bin::make_রাশিমালা(e, '/', a, Mat(), s);
+    ফেরত e;
 }
 
-MatExpr operator / (const MatExpr& e, const Mat& m)
+Mat_রাশিমালা operator / (ধ্রুবক Mat_রাশিমালা& e, ধ্রুবক Mat& m)
 {
-    MatExpr en;
-    e.op->divide(e, MatExpr(m), en);
-    return en;
+    Mat_রাশিমালা en;
+    e.op->divide(e, Mat_রাশিমালা(m), en);
+    ফেরত en;
 }
 
-MatExpr operator / (const Mat& m, const MatExpr& e)
+Mat_রাশিমালা operator / (ধ্রুবক Mat& m, ধ্রুবক Mat_রাশিমালা& e)
 {
     checkOperandsExist(m);
-    MatExpr en;
-    e.op->divide(MatExpr(m), e, en);
-    return en;
+    Mat_রাশিমালা en;
+    e.op->divide(Mat_রাশিমালা(m), e, en);
+    ফেরত en;
 }
 
-MatExpr operator / (const MatExpr& e, double s)
+Mat_রাশিমালা operator / (ধ্রুবক Mat_রাশিমালা& e, দ্বিগুণ s)
 {
-    MatExpr en;
+    Mat_রাশিমালা en;
     e.op->multiply(e, 1./s, en);
-    return en;
+    ফেরত en;
 }
 
-MatExpr operator / (double s, const MatExpr& e)
+Mat_রাশিমালা operator / (দ্বিগুণ s, ধ্রুবক Mat_রাশিমালা& e)
 {
-    MatExpr en;
+    Mat_রাশিমালা en;
     e.op->divide(s, e, en);
-    return en;
+    ফেরত en;
 }
 
-MatExpr operator / (const MatExpr& e1, const MatExpr& e2)
+Mat_রাশিমালা operator / (ধ্রুবক Mat_রাশিমালা& e1, ধ্রুবক Mat_রাশিমালা& e2)
 {
-    MatExpr en;
+    Mat_রাশিমালা en;
     e1.op->divide(e1, e2, en);
-    return en;
+    ফেরত en;
 }
 
-MatExpr operator < (const Mat& a, const Mat& b)
+Mat_রাশিমালা operator < (ধ্রুবক Mat& a, ধ্রুবক Mat& b)
 {
     checkOperandsExist(a, b);
-    MatExpr e;
-    MatOp_Cmp::makeExpr(e, cv::CMP_LT, a, b);
-    return e;
+    Mat_রাশিমালা e;
+    MatOp_Cmp::make_রাশিমালা(e, cv::CMP_LT, a, b);
+    ফেরত e;
 }
 
-MatExpr operator < (const Mat& a, double s)
+Mat_রাশিমালা operator < (ধ্রুবক Mat& a, দ্বিগুণ s)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Cmp::makeExpr(e, cv::CMP_LT, a, s);
-    return e;
+    Mat_রাশিমালা e;
+    MatOp_Cmp::make_রাশিমালা(e, cv::CMP_LT, a, s);
+    ফেরত e;
 }
 
-MatExpr operator < (double s, const Mat& a)
+Mat_রাশিমালা operator < (দ্বিগুণ s, ধ্রুবক Mat& a)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Cmp::makeExpr(e, cv::CMP_GT, a, s);
-    return e;
+    Mat_রাশিমালা e;
+    MatOp_Cmp::make_রাশিমালা(e, cv::CMP_GT, a, s);
+    ফেরত e;
 }
 
-MatExpr operator <= (const Mat& a, const Mat& b)
+Mat_রাশিমালা operator <= (ধ্রুবক Mat& a, ধ্রুবক Mat& b)
 {
     checkOperandsExist(a, b);
-    MatExpr e;
-    MatOp_Cmp::makeExpr(e, cv::CMP_LE, a, b);
-    return e;
+    Mat_রাশিমালা e;
+    MatOp_Cmp::make_রাশিমালা(e, cv::CMP_LE, a, b);
+    ফেরত e;
 }
 
-MatExpr operator <= (const Mat& a, double s)
+Mat_রাশিমালা operator <= (ধ্রুবক Mat& a, দ্বিগুণ s)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Cmp::makeExpr(e, cv::CMP_LE, a, s);
-    return e;
+    Mat_রাশিমালা e;
+    MatOp_Cmp::make_রাশিমালা(e, cv::CMP_LE, a, s);
+    ফেরত e;
 }
 
-MatExpr operator <= (double s, const Mat& a)
+Mat_রাশিমালা operator <= (দ্বিগুণ s, ধ্রুবক Mat& a)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Cmp::makeExpr(e, cv::CMP_GE, a, s);
-    return e;
+    Mat_রাশিমালা e;
+    MatOp_Cmp::make_রাশিমালা(e, cv::CMP_GE, a, s);
+    ফেরত e;
 }
 
-MatExpr operator == (const Mat& a, const Mat& b)
+Mat_রাশিমালা operator == (ধ্রুবক Mat& a, ধ্রুবক Mat& b)
 {
     checkOperandsExist(a, b);
-    MatExpr e;
-    MatOp_Cmp::makeExpr(e, cv::CMP_EQ, a, b);
-    return e;
+    Mat_রাশিমালা e;
+    MatOp_Cmp::make_রাশিমালা(e, cv::CMP_EQ, a, b);
+    ফেরত e;
 }
 
-MatExpr operator == (const Mat& a, double s)
+Mat_রাশিমালা operator == (ধ্রুবক Mat& a, দ্বিগুণ s)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Cmp::makeExpr(e, cv::CMP_EQ, a, s);
-    return e;
+    Mat_রাশিমালা e;
+    MatOp_Cmp::make_রাশিমালা(e, cv::CMP_EQ, a, s);
+    ফেরত e;
 }
 
-MatExpr operator == (double s, const Mat& a)
+Mat_রাশিমালা operator == (দ্বিগুণ s, ধ্রুবক Mat& a)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Cmp::makeExpr(e, cv::CMP_EQ, a, s);
-    return e;
+    Mat_রাশিমালা e;
+    MatOp_Cmp::make_রাশিমালা(e, cv::CMP_EQ, a, s);
+    ফেরত e;
 }
 
-MatExpr operator != (const Mat& a, const Mat& b)
+Mat_রাশিমালা operator != (ধ্রুবক Mat& a, ধ্রুবক Mat& b)
 {
     checkOperandsExist(a, b);
-    MatExpr e;
-    MatOp_Cmp::makeExpr(e, cv::CMP_NE, a, b);
-    return e;
+    Mat_রাশিমালা e;
+    MatOp_Cmp::make_রাশিমালা(e, cv::CMP_NE, a, b);
+    ফেরত e;
 }
 
-MatExpr operator != (const Mat& a, double s)
+Mat_রাশিমালা operator != (ধ্রুবক Mat& a, দ্বিগুণ s)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Cmp::makeExpr(e, cv::CMP_NE, a, s);
-    return e;
+    Mat_রাশিমালা e;
+    MatOp_Cmp::make_রাশিমালা(e, cv::CMP_NE, a, s);
+    ফেরত e;
 }
 
-MatExpr operator != (double s, const Mat& a)
+Mat_রাশিমালা operator != (দ্বিগুণ s, ধ্রুবক Mat& a)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Cmp::makeExpr(e, cv::CMP_NE, a, s);
-    return e;
+    Mat_রাশিমালা e;
+    MatOp_Cmp::make_রাশিমালা(e, cv::CMP_NE, a, s);
+    ফেরত e;
 }
 
-MatExpr operator >= (const Mat& a, const Mat& b)
+Mat_রাশিমালা operator >= (ধ্রুবক Mat& a, ধ্রুবক Mat& b)
 {
     checkOperandsExist(a, b);
-    MatExpr e;
-    MatOp_Cmp::makeExpr(e, cv::CMP_GE, a, b);
-    return e;
+    Mat_রাশিমালা e;
+    MatOp_Cmp::make_রাশিমালা(e, cv::CMP_GE, a, b);
+    ফেরত e;
 }
 
-MatExpr operator >= (const Mat& a, double s)
+Mat_রাশিমালা operator >= (ধ্রুবক Mat& a, দ্বিগুণ s)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Cmp::makeExpr(e, cv::CMP_GE, a, s);
-    return e;
+    Mat_রাশিমালা e;
+    MatOp_Cmp::make_রাশিমালা(e, cv::CMP_GE, a, s);
+    ফেরত e;
 }
 
-MatExpr operator >= (double s, const Mat& a)
+Mat_রাশিমালা operator >= (দ্বিগুণ s, ধ্রুবক Mat& a)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Cmp::makeExpr(e, cv::CMP_LE, a, s);
-    return e;
+    Mat_রাশিমালা e;
+    MatOp_Cmp::make_রাশিমালা(e, cv::CMP_LE, a, s);
+    ফেরত e;
 }
 
-MatExpr operator > (const Mat& a, const Mat& b)
+Mat_রাশিমালা operator > (ধ্রুবক Mat& a, ধ্রুবক Mat& b)
 {
     checkOperandsExist(a, b);
-    MatExpr e;
-    MatOp_Cmp::makeExpr(e, cv::CMP_GT, a, b);
-    return e;
+    Mat_রাশিমালা e;
+    MatOp_Cmp::make_রাশিমালা(e, cv::CMP_GT, a, b);
+    ফেরত e;
 }
 
-MatExpr operator > (const Mat& a, double s)
+Mat_রাশিমালা operator > (ধ্রুবক Mat& a, দ্বিগুণ s)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Cmp::makeExpr(e, cv::CMP_GT, a, s);
-    return e;
+    Mat_রাশিমালা e;
+    MatOp_Cmp::make_রাশিমালা(e, cv::CMP_GT, a, s);
+    ফেরত e;
 }
 
-MatExpr operator > (double s, const Mat& a)
+Mat_রাশিমালা operator > (দ্বিগুণ s, ধ্রুবক Mat& a)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Cmp::makeExpr(e, cv::CMP_LT, a, s);
-    return e;
+    Mat_রাশিমালা e;
+    MatOp_Cmp::make_রাশিমালা(e, cv::CMP_LT, a, s);
+    ফেরত e;
 }
 
-MatExpr min(const Mat& a, const Mat& b)
+Mat_রাশিমালা min(ধ্রুবক Mat& a, ধ্রুবক Mat& b)
 {
     CV_INSTRUMENT_REGION();
 
     checkOperandsExist(a, b);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, 'm', a, b);
-    return e;
+    Mat_রাশিমালা e;
+    MatOp_Bin::make_রাশিমালা(e, 'm', a, b);
+    ফেরত e;
 }
 
-MatExpr min(const Mat& a, double s)
+Mat_রাশিমালা min(ধ্রুবক Mat& a, দ্বিগুণ s)
 {
     CV_INSTRUMENT_REGION();
 
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, 'n', a, s);
-    return e;
+    Mat_রাশিমালা e;
+    MatOp_Bin::make_রাশিমালা(e, 'n', a, s);
+    ফেরত e;
 }
 
-MatExpr min(double s, const Mat& a)
+Mat_রাশিমালা min(দ্বিগুণ s, ধ্রুবক Mat& a)
 {
     CV_INSTRUMENT_REGION();
 
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, 'n', a, s);
-    return e;
+    Mat_রাশিমালা e;
+    MatOp_Bin::make_রাশিমালা(e, 'n', a, s);
+    ফেরত e;
 }
 
-MatExpr max(const Mat& a, const Mat& b)
+Mat_রাশিমালা max(ধ্রুবক Mat& a, ধ্রুবক Mat& b)
 {
     CV_INSTRUMENT_REGION();
 
     checkOperandsExist(a, b);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, 'M', a, b);
-    return e;
+    Mat_রাশিমালা e;
+    MatOp_Bin::make_রাশিমালা(e, 'M', a, b);
+    ফেরত e;
 }
 
-MatExpr max(const Mat& a, double s)
+Mat_রাশিমালা max(ধ্রুবক Mat& a, দ্বিগুণ s)
 {
     CV_INSTRUMENT_REGION();
 
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, 'N', a, s);
-    return e;
+    Mat_রাশিমালা e;
+    MatOp_Bin::make_রাশিমালা(e, 'N', a, s);
+    ফেরত e;
 }
 
-MatExpr max(double s, const Mat& a)
+Mat_রাশিমালা max(দ্বিগুণ s, ধ্রুবক Mat& a)
 {
     CV_INSTRUMENT_REGION();
 
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, 'N', a, s);
-    return e;
+    Mat_রাশিমালা e;
+    MatOp_Bin::make_রাশিমালা(e, 'N', a, s);
+    ফেরত e;
 }
 
-MatExpr operator & (const Mat& a, const Mat& b)
+Mat_রাশিমালা operator & (ধ্রুবক Mat& a, ধ্রুবক Mat& b)
 {
     checkOperandsExist(a, b);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, '&', a, b);
-    return e;
+    Mat_রাশিমালা e;
+    MatOp_Bin::make_রাশিমালা(e, '&', a, b);
+    ফেরত e;
 }
 
-MatExpr operator & (const Mat& a, const Scalar& s)
+Mat_রাশিমালা operator & (ধ্রুবক Mat& a, ধ্রুবক Scalar& s)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, '&', a, s);
-    return e;
+    Mat_রাশিমালা e;
+    MatOp_Bin::make_রাশিমালা(e, '&', a, s);
+    ফেরত e;
 }
 
-MatExpr operator & (const Scalar& s, const Mat& a)
+Mat_রাশিমালা operator & (ধ্রুবক Scalar& s, ধ্রুবক Mat& a)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, '&', a, s);
-    return e;
+    Mat_রাশিমালা e;
+    MatOp_Bin::make_রাশিমালা(e, '&', a, s);
+    ফেরত e;
 }
 
-MatExpr operator | (const Mat& a, const Mat& b)
+Mat_রাশিমালা operator | (ধ্রুবক Mat& a, ধ্রুবক Mat& b)
 {
     checkOperandsExist(a, b);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, '|', a, b);
-    return e;
+    Mat_রাশিমালা e;
+    MatOp_Bin::make_রাশিমালা(e, '|', a, b);
+    ফেরত e;
 }
 
-MatExpr operator | (const Mat& a, const Scalar& s)
+Mat_রাশিমালা operator | (ধ্রুবক Mat& a, ধ্রুবক Scalar& s)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, '|', a, s);
-    return e;
+    Mat_রাশিমালা e;
+    MatOp_Bin::make_রাশিমালা(e, '|', a, s);
+    ফেরত e;
 }
 
-MatExpr operator | (const Scalar& s, const Mat& a)
+Mat_রাশিমালা operator | (ধ্রুবক Scalar& s, ধ্রুবক Mat& a)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, '|', a, s);
-    return e;
+    Mat_রাশিমালা e;
+    MatOp_Bin::make_রাশিমালা(e, '|', a, s);
+    ফেরত e;
 }
 
-MatExpr operator ^ (const Mat& a, const Mat& b)
+Mat_রাশিমালা operator ^ (ধ্রুবক Mat& a, ধ্রুবক Mat& b)
 {
     checkOperandsExist(a, b);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, '^', a, b);
-    return e;
+    Mat_রাশিমালা e;
+    MatOp_Bin::make_রাশিমালা(e, '^', a, b);
+    ফেরত e;
 }
 
-MatExpr operator ^ (const Mat& a, const Scalar& s)
+Mat_রাশিমালা operator ^ (ধ্রুবক Mat& a, ধ্রুবক Scalar& s)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, '^', a, s);
-    return e;
+    Mat_রাশিমালা e;
+    MatOp_Bin::make_রাশিমালা(e, '^', a, s);
+    ফেরত e;
 }
 
-MatExpr operator ^ (const Scalar& s, const Mat& a)
+Mat_রাশিমালা operator ^ (ধ্রুবক Scalar& s, ধ্রুবক Mat& a)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, '^', a, s);
-    return e;
+    Mat_রাশিমালা e;
+    MatOp_Bin::make_রাশিমালা(e, '^', a, s);
+    ফেরত e;
 }
 
-MatExpr operator ~(const Mat& a)
+Mat_রাশিমালা operator ~(ধ্রুবক Mat& a)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, '~', a, Scalar());
-    return e;
+    Mat_রাশিমালা e;
+    MatOp_Bin::make_রাশিমালা(e, '~', a, Scalar());
+    ফেরত e;
 }
 
-MatExpr abs(const Mat& a)
+Mat_রাশিমালা abs(ধ্রুবক Mat& a)
 {
     CV_INSTRUMENT_REGION();
 
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, 'a', a, Scalar());
-    return e;
+    Mat_রাশিমালা e;
+    MatOp_Bin::make_রাশিমালা(e, 'a', a, Scalar());
+    ফেরত e;
 }
 
-MatExpr abs(const MatExpr& e)
+Mat_রাশিমালা abs(ধ্রুবক Mat_রাশিমালা& e)
 {
     CV_INSTRUMENT_REGION();
 
-    MatExpr en;
+    Mat_রাশিমালা en;
     e.op->abs(e, en);
-    return en;
+    ফেরত en;
 }
 
 
-Size MatExpr::size() const
+আকার_2 Mat_রাশিমালা::size() ধ্রুবক
 {
-    if( isT(*this) || isInv(*this) )
-        return Size(a.rows, a.cols);
-    if( isSolve(*this) )
-        return Size(b.cols, a.cols);
-    if( isInitializer(*this) )
-        return a.size();
-    return op ? op->size(*this) : Size();
+    যদি( isT(*এই) || isInv(*এই) )
+        ফেরত আকার_2(a.rows, a.cols);
+    যদি( isSolve(*এই) )
+        ফেরত আকার_2(b.cols, a.cols);
+    যদি( isInitializer(*এই) )
+        ফেরত a.size();
+    ফেরত op ? op->size(*এই) : আকার_2();
 }
 
 
-int MatExpr::type() const
+পূর্ণসংখ্যা Mat_রাশিমালা::type() ধ্রুবক
 {
     CV_INSTRUMENT_REGION();
 
-    if( isInitializer(*this) )
-        return a.type();
-    if( isCmp(*this) )
-        return CV_MAKETYPE(CV_8U, a.channels());
-    return op ? op->type(*this) : -1;
+    যদি( isInitializer(*এই) )
+        ফেরত a.type();
+    যদি( isCmp(*এই) )
+        ফেরত CV_MAKETYPE(CV_8U, a.channels());
+    ফেরত op ? op->type(*এই) : -1;
 }
 
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void MatOp_Identity::assign(const MatExpr& e, Mat& m, int _type) const
+শূন্য MatOp_Identity::assign(ধ্রুবক Mat_রাশিমালা& e, Mat& m, পূর্ণসংখ্যা _type) ধ্রুবক
 {
-    if( _type == -1 || _type == e.a.type() )
+    যদি( _type == -1 || _type == e.a.type() )
         m = e.a;
-    else
+    অন্যথা
     {
         CV_Assert( CV_MAT_CN(_type) == e.a.channels() );
         e.a.convertTo(m, _type);
     }
 }
 
-inline void MatOp_Identity::makeExpr(MatExpr& res, const Mat& m)
+অন্তঃরেখ শূন্য MatOp_Identity::make_রাশিমালা(Mat_রাশিমালা& res, ধ্রুবক Mat& m)
 {
-    res = MatExpr(&g_MatOp_Identity, 0, m, Mat(), Mat(), 1, 0);
+    res = Mat_রাশিমালা(&g_MatOp_Identity, 0, m, Mat(), Mat(), 1, 0);
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void MatOp_AddEx::assign(const MatExpr& e, Mat& m, int _type) const
+শূন্য MatOp_AddEx::assign(ধ্রুবক Mat_রাশিমালা& e, Mat& m, পূর্ণসংখ্যা _type) ধ্রুবক
 {
-    Mat temp, &dst = _type == -1 || e.a.type() == _type ? m : temp;
-    if( e.b.data )
+    Mat অস্থায়ী_2, &dst = _type == -1 || e.a.type() == _type ? m : অস্থায়ী_2;
+    যদি( e.b.তথ্য )
     {
-        if( e.s == Scalar() || !e.s.isReal() )
+        যদি( e.s == Scalar() || !e.s.isReal() )
         {
-            if( e.alpha == 1 )
+            যদি( e.alpha == 1 )
             {
-                if( e.beta == 1 )
+                যদি( e.beta == 1 )
                     cv::add(e.a, e.b, dst);
-                else if( e.beta == -1 )
+                অন্যথা যদি( e.beta == -1 )
                     cv::subtract(e.a, e.b, dst);
-                else
+                অন্যথা
                     cv::scaleAdd(e.b, e.beta, e.a, dst);
             }
-            else if( e.beta == 1 )
+            অন্যথা যদি( e.beta == 1 )
             {
-                if( e.alpha == -1 )
+                যদি( e.alpha == -1 )
                     cv::subtract(e.b, e.a, dst);
-                else
+                অন্যথা
                     cv::scaleAdd(e.a, e.alpha, e.b, dst);
             }
-            else
+            অন্যথা
                 cv::addWeighted(e.a, e.alpha, e.b, e.beta, 0, dst);
 
-            if( !e.s.isReal() )
+            যদি( !e.s.isReal() )
                 cv::add(dst, e.s, dst);
         }
-        else
+        অন্যথা
         {
-            if (e.a.channels() > 1)
-                CV_LOG_ONCE_WARNING(NULL, "OpenCV/MatExpr: processing of multi-channel arrays might be changed in the future: "
+            যদি (e.a.channels() > 1)
+                CV_LOG_ONCE_WARNING(ফাঁকা, "OpenCV/MatExpr: processing of multi-channel arrays might be changed in the future: "
                                           "https://github.com/opencv/opencv/issues/16739");
             cv::addWeighted(e.a, e.alpha, e.b, e.beta, e.s[0], dst);
         }
     }
-    else if( e.s.isReal() && (dst.data != m.data || fabs(e.alpha) != 1))
+    অন্যথা যদি( e.s.isReal() && (dst.তথ্য != m.তথ্য || fabs(e.alpha) != 1))
     {
-        if (e.a.channels() > 1 && e.s[0] != 0.0)
-            CV_LOG_ONCE_WARNING(NULL, "OpenCV/MatExpr: processing of multi-channel arrays might be changed in the future: "
+        যদি (e.a.channels() > 1 && e.s[0] != 0.0)
+            CV_LOG_ONCE_WARNING(ফাঁকা, "OpenCV/MatExpr: processing of multi-channel arrays might be changed in the future: "
                                       "https://github.com/opencv/opencv/issues/16739");
         e.a.convertTo(m, _type, e.alpha, e.s[0]);
-        return;
+        ফেরত;
     }
-    else if( e.alpha == 1 )
+    অন্যথা যদি( e.alpha == 1 )
         cv::add(e.a, e.s, dst);
-    else if( e.alpha == -1 )
+    অন্যথা যদি( e.alpha == -1 )
         cv::subtract(e.s, e.a, dst);
-    else
+    অন্যথা
     {
         e.a.convertTo(dst, e.a.type(), e.alpha);
         cv::add(dst, e.s, dst);
     }
 
-    if( dst.data != m.data )
+    যদি( dst.তথ্য != m.তথ্য )
         dst.convertTo(m, m.type());
 }
 
 
-void MatOp_AddEx::add(const MatExpr& e, const Scalar& s, MatExpr& res) const
+শূন্য MatOp_AddEx::add(ধ্রুবক Mat_রাশিমালা& e, ধ্রুবক Scalar& s, Mat_রাশিমালা& res) ধ্রুবক
 {
     CV_INSTRUMENT_REGION();
 
@@ -1359,7 +1359,7 @@ void MatOp_AddEx::add(const MatExpr& e, const Scalar& s, MatExpr& res) const
 }
 
 
-void MatOp_AddEx::subtract(const Scalar& s, const MatExpr& e, MatExpr& res) const
+শূন্য MatOp_AddEx::subtract(ধ্রুবক Scalar& s, ধ্রুবক Mat_রাশিমালা& e, Mat_রাশিমালা& res) ধ্রুবক
 {
     CV_INSTRUMENT_REGION();
 
@@ -1369,7 +1369,7 @@ void MatOp_AddEx::subtract(const Scalar& s, const MatExpr& e, MatExpr& res) cons
     res.s = s - res.s;
 }
 
-void MatOp_AddEx::multiply(const MatExpr& e, double s, MatExpr& res) const
+শূন্য MatOp_AddEx::multiply(ধ্রুবক Mat_রাশিমালা& e, দ্বিগুণ s, Mat_রাশিমালা& res) ধ্রুবক
 {
     CV_INSTRUMENT_REGION();
 
@@ -1379,160 +1379,160 @@ void MatOp_AddEx::multiply(const MatExpr& e, double s, MatExpr& res) const
     res.s *= s;
 }
 
-void MatOp_AddEx::divide(double s, const MatExpr& e, MatExpr& res) const
+শূন্য MatOp_AddEx::divide(দ্বিগুণ s, ধ্রুবক Mat_রাশিমালা& e, Mat_রাশিমালা& res) ধ্রুবক
 {
     CV_INSTRUMENT_REGION();
 
-    if( isScaled(e) )
-        MatOp_Bin::makeExpr(res, '/', e.a, Mat(), s/e.alpha);
-    else
+    যদি( isScaled(e) )
+        MatOp_Bin::make_রাশিমালা(res, '/', e.a, Mat(), s/e.alpha);
+    অন্যথা
         MatOp::divide(s, e, res);
 }
 
 
-void MatOp_AddEx::transpose(const MatExpr& e, MatExpr& res) const
+শূন্য MatOp_AddEx::transpose(ধ্রুবক Mat_রাশিমালা& e, Mat_রাশিমালা& res) ধ্রুবক
 {
     CV_INSTRUMENT_REGION();
 
-    if( isScaled(e) )
-        MatOp_T::makeExpr(res, e.a, e.alpha);
-    else
+    যদি( isScaled(e) )
+        MatOp_T::make_রাশিমালা(res, e.a, e.alpha);
+    অন্যথা
         MatOp::transpose(e, res);
 }
 
-void MatOp_AddEx::abs(const MatExpr& e, MatExpr& res) const
+শূন্য MatOp_AddEx::abs(ধ্রুবক Mat_রাশিমালা& e, Mat_রাশিমালা& res) ধ্রুবক
 {
     CV_INSTRUMENT_REGION();
 
-    if( (!e.b.data || e.beta == 0) && fabs(e.alpha) == 1 )
-        MatOp_Bin::makeExpr(res, 'a', e.a, -e.s*e.alpha);
-    else if( e.b.data && e.alpha + e.beta == 0 && e.alpha*e.beta == -1 )
-        MatOp_Bin::makeExpr(res, 'a', e.a, e.b);
-    else
+    যদি( (!e.b.তথ্য || e.beta == 0) && fabs(e.alpha) == 1 )
+        MatOp_Bin::make_রাশিমালা(res, 'a', e.a, -e.s*e.alpha);
+    অন্যথা যদি( e.b.তথ্য && e.alpha + e.beta == 0 && e.alpha*e.beta == -1 )
+        MatOp_Bin::make_রাশিমালা(res, 'a', e.a, e.b);
+    অন্যথা
         MatOp::abs(e, res);
 }
 
-inline void MatOp_AddEx::makeExpr(MatExpr& res, const Mat& a, const Mat& b, double alpha, double beta, const Scalar& s)
+অন্তঃরেখ শূন্য MatOp_AddEx::make_রাশিমালা(Mat_রাশিমালা& res, ধ্রুবক Mat& a, ধ্রুবক Mat& b, দ্বিগুণ alpha, দ্বিগুণ beta, ধ্রুবক Scalar& s)
 {
-    res = MatExpr(&g_MatOp_AddEx, 0, a, b, Mat(), alpha, beta, s);
+    res = Mat_রাশিমালা(&g_MatOp_AddEx, 0, a, b, Mat(), alpha, beta, s);
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void MatOp_Bin::assign(const MatExpr& e, Mat& m, int _type) const
+শূন্য MatOp_Bin::assign(ধ্রুবক Mat_রাশিমালা& e, Mat& m, পূর্ণসংখ্যা _type) ধ্রুবক
 {
-    Mat temp, &dst = _type == -1 || e.a.type() == _type ? m : temp;
+    Mat অস্থায়ী_2, &dst = _type == -1 || e.a.type() == _type ? m : অস্থায়ী_2;
 
-    if( e.flags == '*' )
+    যদি( e.flags == '*' )
         cv::multiply(e.a, e.b, dst, e.alpha);
-    else if( e.flags == '/' && e.b.data )
+    অন্যথা যদি( e.flags == '/' && e.b.তথ্য )
         cv::divide(e.a, e.b, dst, e.alpha);
-    else if( e.flags == '/' && !e.b.data )
+    অন্যথা যদি( e.flags == '/' && !e.b.তথ্য )
         cv::divide(e.alpha, e.a, dst );
-    else if( e.flags == '&' && e.b.data )
+    অন্যথা যদি( e.flags == '&' && e.b.তথ্য )
         bitwise_and(e.a, e.b, dst);
-    else if( e.flags == '&' && !e.b.data )
+    অন্যথা যদি( e.flags == '&' && !e.b.তথ্য )
         bitwise_and(e.a, e.s, dst);
-    else if( e.flags == '|' && e.b.data )
+    অন্যথা যদি( e.flags == '|' && e.b.তথ্য )
         bitwise_or(e.a, e.b, dst);
-    else if( e.flags == '|' && !e.b.data )
+    অন্যথা যদি( e.flags == '|' && !e.b.তথ্য )
         bitwise_or(e.a, e.s, dst);
-    else if( e.flags == '^' && e.b.data )
+    অন্যথা যদি( e.flags == '^' && e.b.তথ্য )
         bitwise_xor(e.a, e.b, dst);
-    else if( e.flags == '^' && !e.b.data )
+    অন্যথা যদি( e.flags == '^' && !e.b.তথ্য )
         bitwise_xor(e.a, e.s, dst);
-    else if( e.flags == '~' && !e.b.data )
+    অন্যথা যদি( e.flags == '~' && !e.b.তথ্য )
         bitwise_not(e.a, dst);
-    else if( e.flags == 'm' )
+    অন্যথা যদি( e.flags == 'm' )
         cv::min(e.a, e.b, dst);
-    else if( e.flags == 'n' )
+    অন্যথা যদি( e.flags == 'n' )
         cv::min(e.a, e.s[0], dst);
-    else if( e.flags == 'M' )
+    অন্যথা যদি( e.flags == 'M' )
         cv::max(e.a, e.b, dst);
-    else if( e.flags == 'N' )
+    অন্যথা যদি( e.flags == 'N' )
         cv::max(e.a, e.s[0], dst);
-    else if( e.flags == 'a' && e.b.data )
+    অন্যথা যদি( e.flags == 'a' && e.b.তথ্য )
         cv::absdiff(e.a, e.b, dst);
-    else if( e.flags == 'a' && !e.b.data )
+    অন্যথা যদি( e.flags == 'a' && !e.b.তথ্য )
         cv::absdiff(e.a, e.s, dst);
-    else
+    অন্যথা
         CV_Error(cv::Error::StsError, "Unknown operation");
 
-    if( dst.data != m.data )
+    যদি( dst.তথ্য != m.তথ্য )
         dst.convertTo(m, _type);
 }
 
-void MatOp_Bin::multiply(const MatExpr& e, double s, MatExpr& res) const
+শূন্য MatOp_Bin::multiply(ধ্রুবক Mat_রাশিমালা& e, দ্বিগুণ s, Mat_রাশিমালা& res) ধ্রুবক
 {
     CV_INSTRUMENT_REGION();
 
-    if( e.flags == '*' || e.flags == '/' )
+    যদি( e.flags == '*' || e.flags == '/' )
     {
         res = e;
         res.alpha *= s;
     }
-    else
+    অন্যথা
         MatOp::multiply(e, s, res);
 }
 
-void MatOp_Bin::divide(double s, const MatExpr& e, MatExpr& res) const
+শূন্য MatOp_Bin::divide(দ্বিগুণ s, ধ্রুবক Mat_রাশিমালা& e, Mat_রাশিমালা& res) ধ্রুবক
 {
     CV_INSTRUMENT_REGION();
 
-    if( e.flags == '/' && (!e.b.data || e.beta == 0) )
-        MatOp_AddEx::makeExpr(res, e.a, Mat(), s/e.alpha, 0);
-    else
+    যদি( e.flags == '/' && (!e.b.তথ্য || e.beta == 0) )
+        MatOp_AddEx::make_রাশিমালা(res, e.a, Mat(), s/e.alpha, 0);
+    অন্যথা
         MatOp::divide(s, e, res);
 }
 
-inline void MatOp_Bin::makeExpr(MatExpr& res, char op, const Mat& a, const Mat& b, double scale)
+অন্তঃরেখ শূন্য MatOp_Bin::make_রাশিমালা(Mat_রাশিমালা& res, অক্ষর op, ধ্রুবক Mat& a, ধ্রুবক Mat& b, দ্বিগুণ scale)
 {
-    res = MatExpr(&g_MatOp_Bin, op, a, b, Mat(), scale, b.data ? 1 : 0);
+    res = Mat_রাশিমালা(&g_MatOp_Bin, op, a, b, Mat(), scale, b.তথ্য ? 1 : 0);
 }
 
-inline void MatOp_Bin::makeExpr(MatExpr& res, char op, const Mat& a, const Scalar& s)
+অন্তঃরেখ শূন্য MatOp_Bin::make_রাশিমালা(Mat_রাশিমালা& res, অক্ষর op, ধ্রুবক Mat& a, ধ্রুবক Scalar& s)
 {
-    res = MatExpr(&g_MatOp_Bin, op, a, Mat(), Mat(), 1, 0, s);
+    res = Mat_রাশিমালা(&g_MatOp_Bin, op, a, Mat(), Mat(), 1, 0, s);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void MatOp_Cmp::assign(const MatExpr& e, Mat& m, int _type) const
+শূন্য MatOp_Cmp::assign(ধ্রুবক Mat_রাশিমালা& e, Mat& m, পূর্ণসংখ্যা _type) ধ্রুবক
 {
-    Mat temp, &dst = _type == -1 || _type == CV_8U ? m : temp;
+    Mat অস্থায়ী_2, &dst = _type == -1 || _type == CV_8U ? m : অস্থায়ী_2;
 
-    if( e.b.data )
+    যদি( e.b.তথ্য )
         cv::compare(e.a, e.b, dst, e.flags);
-    else
+    অন্যথা
         cv::compare(e.a, e.alpha, dst, e.flags);
 
-    if( dst.data != m.data )
+    যদি( dst.তথ্য != m.তথ্য )
         dst.convertTo(m, _type);
 }
 
-inline void MatOp_Cmp::makeExpr(MatExpr& res, int cmpop, const Mat& a, const Mat& b)
+অন্তঃরেখ শূন্য MatOp_Cmp::make_রাশিমালা(Mat_রাশিমালা& res, পূর্ণসংখ্যা cmpop, ধ্রুবক Mat& a, ধ্রুবক Mat& b)
 {
-    res = MatExpr(&g_MatOp_Cmp, cmpop, a, b, Mat(), 1, 1);
+    res = Mat_রাশিমালা(&g_MatOp_Cmp, cmpop, a, b, Mat(), 1, 1);
 }
 
-inline void MatOp_Cmp::makeExpr(MatExpr& res, int cmpop, const Mat& a, double alpha)
+অন্তঃরেখ শূন্য MatOp_Cmp::make_রাশিমালা(Mat_রাশিমালা& res, পূর্ণসংখ্যা cmpop, ধ্রুবক Mat& a, দ্বিগুণ alpha)
 {
-    res = MatExpr(&g_MatOp_Cmp, cmpop, a, Mat(), Mat(), alpha, 1);
+    res = Mat_রাশিমালা(&g_MatOp_Cmp, cmpop, a, Mat(), Mat(), alpha, 1);
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void MatOp_T::assign(const MatExpr& e, Mat& m, int _type) const
+শূন্য MatOp_T::assign(ধ্রুবক Mat_রাশিমালা& e, Mat& m, পূর্ণসংখ্যা _type) ধ্রুবক
 {
-    Mat temp, &dst = _type == -1 || _type == e.a.type() ? m : temp;
+    Mat অস্থায়ী_2, &dst = _type == -1 || _type == e.a.type() ? m : অস্থায়ী_2;
 
     cv::transpose(e.a, dst);
 
-    if( dst.data != m.data || e.alpha != 1 )
+    যদি( dst.তথ্য != m.তথ্য || e.alpha != 1 )
         dst.convertTo(m, _type, e.alpha);
 }
 
-void MatOp_T::multiply(const MatExpr& e, double s, MatExpr& res) const
+শূন্য MatOp_T::multiply(ধ্রুবক Mat_রাশিমালা& e, দ্বিগুণ s, Mat_রাশিমালা& res) ধ্রুবক
 {
     CV_INSTRUMENT_REGION();
 
@@ -1540,71 +1540,71 @@ void MatOp_T::multiply(const MatExpr& e, double s, MatExpr& res) const
     res.alpha *= s;
 }
 
-void MatOp_T::transpose(const MatExpr& e, MatExpr& res) const
+শূন্য MatOp_T::transpose(ধ্রুবক Mat_রাশিমালা& e, Mat_রাশিমালা& res) ধ্রুবক
 {
     CV_INSTRUMENT_REGION();
 
-    if( e.alpha == 1 )
-        MatOp_Identity::makeExpr(res, e.a);
-    else
-        MatOp_AddEx::makeExpr(res, e.a, Mat(), e.alpha, 0);
+    যদি( e.alpha == 1 )
+        MatOp_Identity::make_রাশিমালা(res, e.a);
+    অন্যথা
+        MatOp_AddEx::make_রাশিমালা(res, e.a, Mat(), e.alpha, 0);
 }
 
-inline void MatOp_T::makeExpr(MatExpr& res, const Mat& a, double alpha)
+অন্তঃরেখ শূন্য MatOp_T::make_রাশিমালা(Mat_রাশিমালা& res, ধ্রুবক Mat& a, দ্বিগুণ alpha)
 {
-    res = MatExpr(&g_MatOp_T, 0, a, Mat(), Mat(), alpha, 0);
+    res = Mat_রাশিমালা(&g_MatOp_T, 0, a, Mat(), Mat(), alpha, 0);
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void MatOp_GEMM::assign(const MatExpr& e, Mat& m, int _type) const
+শূন্য MatOp_GEMM::assign(ধ্রুবক Mat_রাশিমালা& e, Mat& m, পূর্ণসংখ্যা _type) ধ্রুবক
 {
-    Mat temp, &dst = _type == -1 || _type == e.a.type() ? m : temp;
+    Mat অস্থায়ী_2, &dst = _type == -1 || _type == e.a.type() ? m : অস্থায়ী_2;
 
     cv::gemm(e.a, e.b, e.alpha, e.c, e.beta, dst, e.flags);
-    if( dst.data != m.data )
+    যদি( dst.তথ্য != m.তথ্য )
         dst.convertTo(m, _type);
 }
 
-void MatOp_GEMM::add(const MatExpr& e1, const MatExpr& e2, MatExpr& res) const
+শূন্য MatOp_GEMM::add(ধ্রুবক Mat_রাশিমালা& e1, ধ্রুবক Mat_রাশিমালা& e2, Mat_রাশিমালা& res) ধ্রুবক
 {
     CV_INSTRUMENT_REGION();
 
-    bool i1 = isIdentity(e1), i2 = isIdentity(e2);
-    double alpha1 = i1 ? 1 : e1.alpha, alpha2 = i2 ? 1 : e2.alpha;
+    যৌক্তিক i1 = isIdentity(e1), i2 = isIdentity(e2);
+    দ্বিগুণ alpha1 = i1 ? 1 : e1.alpha, alpha2 = i2 ? 1 : e2.alpha;
 
-    if( isMatProd(e1) && (i2 || isScaled(e2) || isT(e2)) )
-        MatOp_GEMM::makeExpr(res, (e1.flags & ~cv::GEMM_3_T)|(isT(e2) ? cv::GEMM_3_T : 0),
+    যদি( isMatProd(e1) && (i2 || isScaled(e2) || isT(e2)) )
+        MatOp_GEMM::make_রাশিমালা(res, (e1.flags & ~cv::GEMM_3_T)|(isT(e2) ? cv::GEMM_3_T : 0),
                              e1.a, e1.b, alpha1, e2.a, alpha2);
-    else if( isMatProd(e2) && (i1 || isScaled(e1) || isT(e1)) )
-        MatOp_GEMM::makeExpr(res, (e2.flags & ~cv::GEMM_3_T)|(isT(e1) ? cv::GEMM_3_T : 0),
+    অন্যথা যদি( isMatProd(e2) && (i1 || isScaled(e1) || isT(e1)) )
+        MatOp_GEMM::make_রাশিমালা(res, (e2.flags & ~cv::GEMM_3_T)|(isT(e1) ? cv::GEMM_3_T : 0),
                              e2.a, e2.b, alpha2, e1.a, alpha1);
-    else if( this == e2.op )
+    অন্যথা যদি( এই == e2.op )
         MatOp::add(e1, e2, res);
-    else
+    অন্যথা
         e2.op->add(e1, e2, res);
 }
 
-void MatOp_GEMM::subtract(const MatExpr& e1, const MatExpr& e2, MatExpr& res) const
+শূন্য MatOp_GEMM::subtract(ধ্রুবক Mat_রাশিমালা& e1, ধ্রুবক Mat_রাশিমালা& e2, Mat_রাশিমালা& res) ধ্রুবক
 {
     CV_INSTRUMENT_REGION();
 
-    bool i1 = isIdentity(e1), i2 = isIdentity(e2);
-    double alpha1 = i1 ? 1 : e1.alpha, alpha2 = i2 ? 1 : e2.alpha;
+    যৌক্তিক i1 = isIdentity(e1), i2 = isIdentity(e2);
+    দ্বিগুণ alpha1 = i1 ? 1 : e1.alpha, alpha2 = i2 ? 1 : e2.alpha;
 
-    if( isMatProd(e1) && (i2 || isScaled(e2) || isT(e2)) )
-        MatOp_GEMM::makeExpr(res, (e1.flags & ~cv::GEMM_3_T)|(isT(e2) ? cv::GEMM_3_T : 0),
+    যদি( isMatProd(e1) && (i2 || isScaled(e2) || isT(e2)) )
+        MatOp_GEMM::make_রাশিমালা(res, (e1.flags & ~cv::GEMM_3_T)|(isT(e2) ? cv::GEMM_3_T : 0),
                              e1.a, e1.b, alpha1, e2.a, -alpha2);
-    else if( isMatProd(e2) && (i1 || isScaled(e1) || isT(e1)) )
-        MatOp_GEMM::makeExpr(res, (e2.flags & ~cv::GEMM_3_T)|(isT(e1) ? cv::GEMM_3_T : 0),
+    অন্যথা যদি( isMatProd(e2) && (i1 || isScaled(e1) || isT(e1)) )
+        MatOp_GEMM::make_রাশিমালা(res, (e2.flags & ~cv::GEMM_3_T)|(isT(e1) ? cv::GEMM_3_T : 0),
                             e2.a, e2.b, -alpha2, e1.a, alpha1);
-    else if( this == e2.op )
+    অন্যথা যদি( এই == e2.op )
         MatOp::subtract(e1, e2, res);
-    else
+    অন্যথা
         e2.op->subtract(e1, e2, res);
 }
 
-void MatOp_GEMM::multiply(const MatExpr& e, double s, MatExpr& res) const
+শূন্য MatOp_GEMM::multiply(ধ্রুবক Mat_রাশিমালা& e, দ্বিগুণ s, Mat_রাশিমালা& res) ধ্রুবক
 {
     CV_INSTRUMENT_REGION();
 
@@ -1613,7 +1613,7 @@ void MatOp_GEMM::multiply(const MatExpr& e, double s, MatExpr& res) const
     res.beta *= s;
 }
 
-void MatOp_GEMM::transpose(const MatExpr& e, MatExpr& res) const
+শূন্য MatOp_GEMM::transpose(ধ্রুবক Mat_রাশিমালা& e, Mat_রাশিমালা& res) ধ্রুবক
 {
     CV_INSTRUMENT_REGION();
 
@@ -1624,74 +1624,74 @@ void MatOp_GEMM::transpose(const MatExpr& e, MatExpr& res) const
     swap(res.a, res.b);
 }
 
-inline void MatOp_GEMM::makeExpr(MatExpr& res, int flags, const Mat& a, const Mat& b,
-                                 double alpha, const Mat& c, double beta)
+অন্তঃরেখ শূন্য MatOp_GEMM::make_রাশিমালা(Mat_রাশিমালা& res, পূর্ণসংখ্যা flags, ধ্রুবক Mat& a, ধ্রুবক Mat& b,
+                                 দ্বিগুণ alpha, ধ্রুবক Mat& c, দ্বিগুণ beta)
 {
-    res = MatExpr(&g_MatOp_GEMM, flags, a, b, c, alpha, beta);
+    res = Mat_রাশিমালা(&g_MatOp_GEMM, flags, a, b, c, alpha, beta);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void MatOp_Invert::assign(const MatExpr& e, Mat& m, int _type) const
+শূন্য MatOp_Invert::assign(ধ্রুবক Mat_রাশিমালা& e, Mat& m, পূর্ণসংখ্যা _type) ধ্রুবক
 {
-    Mat temp, &dst = _type == -1 || _type == e.a.type() ? m : temp;
+    Mat অস্থায়ী_2, &dst = _type == -1 || _type == e.a.type() ? m : অস্থায়ী_2;
 
     cv::invert(e.a, dst, e.flags);
-    if( dst.data != m.data )
+    যদি( dst.তথ্য != m.তথ্য )
         dst.convertTo(m, _type);
 }
 
-void MatOp_Invert::matmul(const MatExpr& e1, const MatExpr& e2, MatExpr& res) const
+শূন্য MatOp_Invert::matmul(ধ্রুবক Mat_রাশিমালা& e1, ধ্রুবক Mat_রাশিমালা& e2, Mat_রাশিমালা& res) ধ্রুবক
 {
-    if( isInv(e1) && isIdentity(e2) )
-        MatOp_Solve::makeExpr(res, e1.flags, e1.a, e2.a);
-    else if( this == e2.op )
+    যদি( isInv(e1) && isIdentity(e2) )
+        MatOp_Solve::make_রাশিমালা(res, e1.flags, e1.a, e2.a);
+    অন্যথা যদি( এই == e2.op )
         MatOp::matmul(e1, e2, res);
-    else
+    অন্যথা
         e2.op->matmul(e1, e2, res);
 }
 
-inline void MatOp_Invert::makeExpr(MatExpr& res, int method, const Mat& m)
+অন্তঃরেখ শূন্য MatOp_Invert::make_রাশিমালা(Mat_রাশিমালা& res, পূর্ণসংখ্যা method, ধ্রুবক Mat& m)
 {
-    res = MatExpr(&g_MatOp_Invert, method, m, Mat(), Mat(), 1, 0);
+    res = Mat_রাশিমালা(&g_MatOp_Invert, method, m, Mat(), Mat(), 1, 0);
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void MatOp_Solve::assign(const MatExpr& e, Mat& m, int _type) const
+শূন্য MatOp_Solve::assign(ধ্রুবক Mat_রাশিমালা& e, Mat& m, পূর্ণসংখ্যা _type) ধ্রুবক
 {
-    Mat temp, &dst = _type == -1 || _type == e.a.type() ? m : temp;
+    Mat অস্থায়ী_2, &dst = _type == -1 || _type == e.a.type() ? m : অস্থায়ী_2;
 
     cv::solve(e.a, e.b, dst, e.flags);
-    if( dst.data != m.data )
+    যদি( dst.তথ্য != m.তথ্য )
         dst.convertTo(m, _type);
 }
 
-inline void MatOp_Solve::makeExpr(MatExpr& res, int method, const Mat& a, const Mat& b)
+অন্তঃরেখ শূন্য MatOp_Solve::make_রাশিমালা(Mat_রাশিমালা& res, পূর্ণসংখ্যা method, ধ্রুবক Mat& a, ধ্রুবক Mat& b)
 {
-    res = MatExpr(&g_MatOp_Solve, method, a, b, Mat(), 1, 1);
+    res = Mat_রাশিমালা(&g_MatOp_Solve, method, a, b, Mat(), 1, 1);
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void MatOp_Initializer::assign(const MatExpr& e, Mat& m, int _type) const
+শূন্য MatOp_Initializer::assign(ধ্রুবক Mat_রাশিমালা& e, Mat& m, পূর্ণসংখ্যা _type) ধ্রুবক
 {
-    if( _type == -1 )
+    যদি( _type == -1 )
         _type = e.a.type();
 
     m.create(e.a.size, _type);
 
-    if( e.flags == 'I' && e.a.dims <= 2 )
+    যদি( e.flags == 'I' && e.a.dims <= 2 )
         setIdentity(m, Scalar(e.alpha));
-    else if( e.flags == '0' )
+    অন্যথা যদি( e.flags == '0' )
         m = Scalar();
-    else if( e.flags == '1' )
+    অন্যথা যদি( e.flags == '1' )
         m = Scalar(e.alpha);
-    else
+    অন্যথা
         CV_Error(cv::Error::StsError, "Invalid matrix initializer type");
 }
 
-void MatOp_Initializer::multiply(const MatExpr& e, double s, MatExpr& res) const
+শূন্য MatOp_Initializer::multiply(ধ্রুবক Mat_রাশিমালা& e, দ্বিগুণ s, Mat_রাশিমালা& res) ধ্রুবক
 {
     CV_INSTRUMENT_REGION();
 
@@ -1699,39 +1699,39 @@ void MatOp_Initializer::multiply(const MatExpr& e, double s, MatExpr& res) const
     res.alpha *= s;
 }
 
-inline void MatOp_Initializer::makeExpr(MatExpr& res, int method, Size sz, int type, double alpha)
+অন্তঃরেখ শূন্য MatOp_Initializer::make_রাশিমালা(Mat_রাশিমালা& res, পূর্ণসংখ্যা method, আকার_2 sz, পূর্ণসংখ্যা type, দ্বিগুণ alpha)
 {
-    res = MatExpr(getGlobalMatOpInitializer(), method, Mat(sz, type, (void*)(size_t)0xEEEEEEEE), Mat(), Mat(), alpha, 0);
+    res = Mat_রাশিমালা(getGlobalMatOpInitializer(), method, Mat(sz, type, (শূন্য*)(size_t)0xEEEEEEEE), Mat(), Mat(), alpha, 0);
 }
 
-inline void MatOp_Initializer::makeExpr(MatExpr& res, int method, int ndims, const int* sizes, int type, double alpha)
+অন্তঃরেখ শূন্য MatOp_Initializer::make_রাশিমালা(Mat_রাশিমালা& res, পূর্ণসংখ্যা method, পূর্ণসংখ্যা ndims, ধ্রুবক পূর্ণসংখ্যা* sizes, পূর্ণসংখ্যা type, দ্বিগুণ alpha)
 {
-    res = MatExpr(getGlobalMatOpInitializer(), method, Mat(ndims, sizes, type, (void*)(size_t)0xEEEEEEEE), Mat(), Mat(), alpha, 0);
+    res = Mat_রাশিমালা(getGlobalMatOpInitializer(), method, Mat(ndims, sizes, type, (শূন্য*)(size_t)0xEEEEEEEE), Mat(), Mat(), alpha, 0);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-MatExpr Mat::t() const
+Mat_রাশিমালা Mat::t() ধ্রুবক
 {
     CV_INSTRUMENT_REGION();
 
-    checkOperandsExist(*this);
-    MatExpr e;
-    MatOp_T::makeExpr(e, *this);
-    return e;
+    checkOperandsExist(*এই);
+    Mat_রাশিমালা e;
+    MatOp_T::make_রাশিমালা(e, *এই);
+    ফেরত e;
 }
 
-MatExpr Mat::inv(int method) const
+Mat_রাশিমালা Mat::inv(পূর্ণসংখ্যা method) ধ্রুবক
 {
     CV_INSTRUMENT_REGION();
 
-    MatExpr e;
-    MatOp_Invert::makeExpr(e, method, *this);
-    return e;
+    Mat_রাশিমালা e;
+    MatOp_Invert::make_রাশিমালা(e, method, *এই);
+    ফেরত e;
 }
 
 
-MatExpr Mat::mul(InputArray m, double scale) const
+Mat_রাশিমালা Mat::mul(প্রবেশ_Array m, দ্বিগুণ scale) ধ্রুবক
 {
     CV_INSTRUMENT_REGION();
 
@@ -1740,105 +1740,105 @@ MatExpr Mat::mul(InputArray m, double scale) const
     // a non-owning view of caller memory (e.g. a scalar bound to _InputArray(const double&),
     // a Matx or a Vec) that the returned MatExpr can outlive, so snapshot it.
     // See https://github.com/opencv/opencv/issues/23577
-    if( !m.isMat() && !m.isUMat() )
+    যদি( !m.isMat() && !m.isUMat() )
         b = b.clone();
 
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, '*', *this, b, scale);
-    return e;
+    Mat_রাশিমালা e;
+    MatOp_Bin::make_রাশিমালা(e, '*', *এই, b, scale);
+    ফেরত e;
 }
 
-MatExpr Mat::zeros(int rows, int cols, int type)
+Mat_রাশিমালা Mat::zeros(পূর্ণসংখ্যা rows, পূর্ণসংখ্যা cols, পূর্ণসংখ্যা type)
 {
     CV_INSTRUMENT_REGION();
 
-    MatExpr e;
-    MatOp_Initializer::makeExpr(e, '0', Size(cols, rows), type);
-    return e;
+    Mat_রাশিমালা e;
+    MatOp_Initializer::make_রাশিমালা(e, '0', আকার_2(cols, rows), type);
+    ফেরত e;
 }
 
-MatExpr Mat::zeros(Size size, int type)
+Mat_রাশিমালা Mat::zeros(আকার_2 size, পূর্ণসংখ্যা type)
 {
     CV_INSTRUMENT_REGION();
 
-    MatExpr e;
-    MatOp_Initializer::makeExpr(e, '0', size, type);
-    return e;
+    Mat_রাশিমালা e;
+    MatOp_Initializer::make_রাশিমালা(e, '0', size, type);
+    ফেরত e;
 }
 
-MatExpr Mat::zeros(int ndims, const int* sizes, int type)
+Mat_রাশিমালা Mat::zeros(পূর্ণসংখ্যা ndims, ধ্রুবক পূর্ণসংখ্যা* sizes, পূর্ণসংখ্যা type)
 {
     CV_INSTRUMENT_REGION();
 
-    MatExpr e;
-    MatOp_Initializer::makeExpr(e, '0', ndims, sizes, type);
-    return e;
+    Mat_রাশিমালা e;
+    MatOp_Initializer::make_রাশিমালা(e, '0', ndims, sizes, type);
+    ফেরত e;
 }
 
-MatExpr Mat::zeros(const MatShape& shape, int type)
+Mat_রাশিমালা Mat::zeros(ধ্রুবক MatShape& shape, পূর্ণসংখ্যা type)
 {
     CV_INSTRUMENT_REGION();
 
-    MatExpr e;
-    MatOp_Initializer::makeExpr(e, '0', shape.dims, shape.p, type);
-    return e;
+    Mat_রাশিমালা e;
+    MatOp_Initializer::make_রাশিমালা(e, '0', shape.dims, shape.p, type);
+    ফেরত e;
 }
 
-MatExpr Mat::ones(int rows, int cols, int type)
+Mat_রাশিমালা Mat::ones(পূর্ণসংখ্যা rows, পূর্ণসংখ্যা cols, পূর্ণসংখ্যা type)
 {
     CV_INSTRUMENT_REGION();
 
-    MatExpr e;
-    MatOp_Initializer::makeExpr(e, '1', Size(cols, rows), type);
-    return e;
+    Mat_রাশিমালা e;
+    MatOp_Initializer::make_রাশিমালা(e, '1', আকার_2(cols, rows), type);
+    ফেরত e;
 }
 
-MatExpr Mat::ones(Size size, int type)
+Mat_রাশিমালা Mat::ones(আকার_2 size, পূর্ণসংখ্যা type)
 {
     CV_INSTRUMENT_REGION();
 
-    MatExpr e;
-    MatOp_Initializer::makeExpr(e, '1', size, type);
-    return e;
+    Mat_রাশিমালা e;
+    MatOp_Initializer::make_রাশিমালা(e, '1', size, type);
+    ফেরত e;
 }
 
-MatExpr Mat::ones(int ndims, const int* sizes, int type)
+Mat_রাশিমালা Mat::ones(পূর্ণসংখ্যা ndims, ধ্রুবক পূর্ণসংখ্যা* sizes, পূর্ণসংখ্যা type)
 {
     CV_INSTRUMENT_REGION();
 
-    MatExpr e;
-    MatOp_Initializer::makeExpr(e, '1', ndims, sizes, type);
-    return e;
+    Mat_রাশিমালা e;
+    MatOp_Initializer::make_রাশিমালা(e, '1', ndims, sizes, type);
+    ফেরত e;
 }
 
-MatExpr Mat::ones(const MatShape& shape, int type)
+Mat_রাশিমালা Mat::ones(ধ্রুবক MatShape& shape, পূর্ণসংখ্যা type)
 {
     CV_INSTRUMENT_REGION();
 
-    MatExpr e;
-    MatOp_Initializer::makeExpr(e, '1', shape.dims, shape.p, type);
-    return e;
+    Mat_রাশিমালা e;
+    MatOp_Initializer::make_রাশিমালা(e, '1', shape.dims, shape.p, type);
+    ফেরত e;
 }
 
-MatExpr Mat::eye(int rows, int cols, int type)
+Mat_রাশিমালা Mat::eye(পূর্ণসংখ্যা rows, পূর্ণসংখ্যা cols, পূর্ণসংখ্যা type)
 {
     CV_INSTRUMENT_REGION();
 
-    MatExpr e;
-    MatOp_Initializer::makeExpr(e, 'I', Size(cols, rows), type);
-    return e;
+    Mat_রাশিমালা e;
+    MatOp_Initializer::make_রাশিমালা(e, 'I', আকার_2(cols, rows), type);
+    ফেরত e;
 }
 
-MatExpr Mat::eye(Size size, int type)
+Mat_রাশিমালা Mat::eye(আকার_2 size, পূর্ণসংখ্যা type)
 {
     CV_INSTRUMENT_REGION();
 
-    MatExpr e;
-    MatOp_Initializer::makeExpr(e, 'I', size, type);
-    return e;
+    Mat_রাশিমালা e;
+    MatOp_Initializer::make_রাশিমালা(e, 'I', size, type);
+    ফেরত e;
 }
 
-void MatExpr::swap(MatExpr& other)
+শূন্য Mat_রাশিমালা::swap(Mat_রাশিমালা& other)
 {
     using std::swap;
 
@@ -1855,16 +1855,16 @@ void MatExpr::swap(MatExpr& other)
     swap(s, other.s);
 }
 
-_InputArray::_InputArray(const MatExpr& expr)
+প্রবেশ_Array_2::প্রবেশ_Array_2(ধ্রুবক Mat_রাশিমালা& রাশিমালা)
 {
-    if (!isIdentity(expr))
+    যদি (!isIdentity(রাশিমালা))
     {
-        Mat result = expr;  // TODO improve through refcount == 1 of expr.a (inplace operation is possible - except gemm?)
-        MatExpr result_expr(result);
-        swap(const_cast<MatExpr&>(expr), result_expr);
+        Mat ফলাফল = রাশিমালা;  // TODO improve through refcount == 1 of expr.a (inplace operation is possible - except gemm?)
+        Mat_রাশিমালা ফলাফল_রাশিমালা(ফলাফল);
+        swap(const_cast<Mat_রাশিমালা&>(রাশিমালা), ফলাফল_রাশিমালা);
     }
-    CV_Assert(isIdentity(expr));
-    init(FIXED_TYPE + FIXED_SIZE + MAT + ACCESS_READ, &expr.a);
+    CV_Assert(isIdentity(রাশিমালা));
+    init(FIXED_TYPE + FIXED_আকার + MAT + ACCESS_READ, &রাশিমালা.a);
 }
 
 } // cv::

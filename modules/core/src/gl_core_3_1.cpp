@@ -40,426 +40,426 @@
 //
 //M*/
 
-#include "precomp.hpp"
-#include "gl_core_3_1.hpp"
+#অন্তর্ভাব "precomp.hpp"
+#অন্তর্ভাব "gl_core_3_1.hpp"
 
 #ifdef HAVE_OPENGL
 
     #ifdef __APPLE__
-        #include <dlfcn.h>
+        #অন্তর্ভাব <dlfcn.h>
 
-        static void* AppleGLGetProcAddress (const char* name)
+        স্থির শূন্য* AppleGLGetProcAddress (ধ্রুবক অক্ষর* name)
         {
-            static bool initialized = false;
-            static void * handle = NULL;
-            if (!handle)
+            স্থির যৌক্তিক initialized = মিথ্যা;
+            স্থির শূন্য * handle = ফাঁকা;
+            যদি (!handle)
             {
-                if (!initialized)
+                যদি (!initialized)
                 {
-                    initialized = true;
-                    const char * const path = "/System/Library/Frameworks/OpenGL.framework/Versions/Current/OpenGL";
+                    initialized = সত্য;
+                    ধ্রুবক অক্ষর * ধ্রুবক path = "/System/Library/Frameworks/OpenGL.framework/Versions/Current/OpenGL";
 
                     handle = dlopen(path, RTLD_LAZY | RTLD_GLOBAL);
                 }
-                if (!handle)
-                    return NULL;
+                যদি (!handle)
+                    ফেরত ফাঁকা;
             }
-            return dlsym(handle, name);
+            ফেরত dlsym(handle, name);
         }
     #endif // __APPLE__
 
-    #if defined(__sgi) || defined (__sun)
-        #include <dlfcn.h>
-        #include <stdio.h>
+    #যদি defined(__sgi) || defined (__sun)
+        #অন্তর্ভাব <dlfcn.h>
+        #অন্তর্ভাব <stdio.h>
 
-        static void* SunGetProcAddress (const char* name)
+        স্থির শূন্য* SunGetProcAddress (ধ্রুবক অক্ষর* name)
         {
-            typedef void* (func_t*)(const GLubyte*);
+            প্রকারলেখ শূন্য* (func_t*)(ধ্রুবক GLubyte*);
 
-            static void* h = 0;
-            static func_t gpa = 0;
+            স্থির শূন্য* h = 0;
+            স্থির func_t gpa = 0;
 
-            if (!h)
+            যদি (!h)
             {
-                h = dlopen(NULL, RTLD_LAZY | RTLD_LOCAL);
-                if (!h)
-                    return 0;
+                h = dlopen(ফাঁকা, RTLD_LAZY | RTLD_LOCAL);
+                যদি (!h)
+                    ফেরত 0;
                 gpa = (func_t) dlsym(h, "glXGetProcAddress");
             }
 
-            return gpa ? gpa((const GLubyte*) name) : dlsym(h, name);
+            ফেরত gpa ? gpa((ধ্রুবক GLubyte*) name) : dlsym(h, name);
         }
     #endif // __sgi || __sun
 
-    #if defined(_WIN32)
+    #যদি defined(_WIN32)
         #ifdef _MSC_VER
             #pragma warning(disable: 4055)
             #pragma warning(disable: 4054)
         #endif
 
-        static int TestPointer(const PROC pTest)
+        স্থির পূর্ণসংখ্যা TestPointer(ধ্রুবক PROC pTest)
         {
-            if(!pTest)
-                return 0;
+            যদি(!pTest)
+                ফেরত 0;
 
             ptrdiff_t iTest = (ptrdiff_t) pTest;
 
-            if (iTest == 1 || iTest == 2 || iTest == 3 || iTest == -1)
-                return 0;
+            যদি (iTest == 1 || iTest == 2 || iTest == 3 || iTest == -1)
+                ফেরত 0;
 
-            return 1;
+            ফেরত 1;
         }
 
-        static PROC WinGetProcAddress(const char* name)
+        স্থির PROC WinGetProcAddress(ধ্রুবক অক্ষর* name)
         {
             PROC pFunc = wglGetProcAddress((LPCSTR) name);
-            if (TestPointer(pFunc))
-                return pFunc;
+            যদি (TestPointer(pFunc))
+                ফেরত pFunc;
 
             HMODULE glMod = GetModuleHandleA("OpenGL32.dll");
-            return (PROC) GetProcAddress(glMod, (LPCSTR) name);
+            ফেরত (PROC) GetProcAddress(glMod, (LPCSTR) name);
         }
     #endif // _WIN32
 
-    #if defined(_WIN32)
+    #যদি defined(_WIN32)
         #define CV_GL_GET_PROC_ADDRESS(name) WinGetProcAddress(name)
-    #elif defined(__APPLE__)
+    #নতুবা_যদি defined(__APPLE__)
         #define CV_GL_GET_PROC_ADDRESS(name) AppleGLGetProcAddress(name)
-    #elif defined(__sgi) || defined(__sun)
+    #নতুবা_যদি defined(__sgi) || defined(__sun)
         #define CV_GL_GET_PROC_ADDRESS(name) SunGetProcAddress(name)
-    #else // GLX
-        #include <GL/glx.h>
+    #অন্যথা // GLX
+        #অন্তর্ভাব <GL/glx.h>
 
-        #define CV_GL_GET_PROC_ADDRESS(name) glXGetProcAddressARB((const GLubyte*) name)
+        #define CV_GL_GET_PROC_ADDRESS(name) glXGetProcAddressARB((ধ্রুবক GLubyte*) name)
     #endif
 
-    static void* IntGetProcAddress(const char* name)
+    স্থির শূন্য* IntGetProcAddress(ধ্রুবক অক্ষর* name)
     {
-        void* func =  (void*) CV_GL_GET_PROC_ADDRESS(name);
-        if (!func)
+        শূন্য* func =  (শূন্য*) CV_GL_GET_PROC_ADDRESS(name);
+        যদি (!func)
         {
             CV_Error(cv::Error::OpenGlApiCallError, cv::format("Can't load OpenGL extension [%s]", name) );
         }
-        return func;
+        ফেরত func;
     }
-#else
-#if defined(_MSC_VER)
+#অন্যথা
+#যদি defined(_MSC_VER)
     #pragma warning(disable : 4702)  // unreachable code
 #endif
-    static void* IntGetProcAddress(const char*)
+    স্থির শূন্য* IntGetProcAddress(ধ্রুবক অক্ষর*)
     {
         CV_Error(cv::Error::OpenGlNotSupported, "The library is compiled without OpenGL support");
     }
 #endif
 
-namespace gl
+নামাকাশ gl
 {
     //////////////////////////////////////////////
     // Function pointer types
 
     // Extension: 1.1
-    typedef void (CODEGEN_FUNCPTR *PFNCULLFACEPROC)(GLenum );
-    typedef void (CODEGEN_FUNCPTR *PFNFRONTFACEPROC)(GLenum );
-    typedef void (CODEGEN_FUNCPTR *PFNHINTPROC)(GLenum , GLenum );
-    typedef void (CODEGEN_FUNCPTR *PFNLINEWIDTHPROC)(GLfloat );
-    typedef void (CODEGEN_FUNCPTR *PFNPOINTSIZEPROC)(GLfloat );
-    typedef void (CODEGEN_FUNCPTR *PFNPOLYGONMODEPROC)(GLenum , GLenum );
-    typedef void (CODEGEN_FUNCPTR *PFNSCISSORPROC)(GLint , GLint , GLsizei , GLsizei );
-    typedef void (CODEGEN_FUNCPTR *PFNTEXPARAMETERFPROC)(GLenum , GLenum , GLfloat );
-    typedef void (CODEGEN_FUNCPTR *PFNTEXPARAMETERFVPROC)(GLenum , GLenum , const GLfloat *);
-    typedef void (CODEGEN_FUNCPTR *PFNTEXPARAMETERIPROC)(GLenum , GLenum , GLint );
-    typedef void (CODEGEN_FUNCPTR *PFNTEXPARAMETERIVPROC)(GLenum , GLenum , const GLint *);
-    typedef void (CODEGEN_FUNCPTR *PFNTEXIMAGE1DPROC)(GLenum , GLint , GLint , GLsizei , GLint , GLenum , GLenum , const GLvoid *);
-    typedef void (CODEGEN_FUNCPTR *PFNTEXIMAGE2DPROC)(GLenum , GLint , GLint , GLsizei , GLsizei , GLint , GLenum , GLenum , const GLvoid *);
-    typedef void (CODEGEN_FUNCPTR *PFNDRAWBUFFERPROC)(GLenum );
-    typedef void (CODEGEN_FUNCPTR *PFNCLEARPROC)(GLbitfield );
-    typedef void (CODEGEN_FUNCPTR *PFNCLEARCOLORPROC)(GLfloat , GLfloat , GLfloat , GLfloat );
-    typedef void (CODEGEN_FUNCPTR *PFNCLEARSTENCILPROC)(GLint );
-    typedef void (CODEGEN_FUNCPTR *PFNCLEARDEPTHPROC)(GLdouble );
-    typedef void (CODEGEN_FUNCPTR *PFNSTENCILMASKPROC)(GLuint );
-    typedef void (CODEGEN_FUNCPTR *PFNCOLORMASKPROC)(GLboolean , GLboolean , GLboolean , GLboolean );
-    typedef void (CODEGEN_FUNCPTR *PFNDEPTHMASKPROC)(GLboolean );
-    typedef void (CODEGEN_FUNCPTR *PFNDISABLEPROC)(GLenum );
-    typedef void (CODEGEN_FUNCPTR *PFNENABLEPROC)(GLenum );
-    typedef void (CODEGEN_FUNCPTR *PFNFINISHPROC)();
-    typedef void (CODEGEN_FUNCPTR *PFNFLUSHPROC)();
-    typedef void (CODEGEN_FUNCPTR *PFNBLENDFUNCPROC)(GLenum , GLenum );
-    typedef void (CODEGEN_FUNCPTR *PFNLOGICOPPROC)(GLenum );
-    typedef void (CODEGEN_FUNCPTR *PFNSTENCILFUNCPROC)(GLenum , GLint , GLuint );
-    typedef void (CODEGEN_FUNCPTR *PFNSTENCILOPPROC)(GLenum , GLenum , GLenum );
-    typedef void (CODEGEN_FUNCPTR *PFNDEPTHFUNCPROC)(GLenum );
-    typedef void (CODEGEN_FUNCPTR *PFNPIXELSTOREFPROC)(GLenum , GLfloat );
-    typedef void (CODEGEN_FUNCPTR *PFNPIXELSTOREIPROC)(GLenum , GLint );
-    typedef void (CODEGEN_FUNCPTR *PFNREADBUFFERPROC)(GLenum );
-    typedef void (CODEGEN_FUNCPTR *PFNREADPIXELSPROC)(GLint , GLint , GLsizei , GLsizei , GLenum , GLenum , GLvoid *);
-    typedef void (CODEGEN_FUNCPTR *PFNGETBOOLEANVPROC)(GLenum , GLboolean *);
-    typedef void (CODEGEN_FUNCPTR *PFNGETDOUBLEVPROC)(GLenum , GLdouble *);
-    typedef GLenum (CODEGEN_FUNCPTR *PFNGETERRORPROC)();
-    typedef void (CODEGEN_FUNCPTR *PFNGETFLOATVPROC)(GLenum , GLfloat *);
-    typedef void (CODEGEN_FUNCPTR *PFNGETINTEGERVPROC)(GLenum , GLint *);
-    typedef const GLubyte * (CODEGEN_FUNCPTR *PFNGETSTRINGPROC)(GLenum );
-    typedef void (CODEGEN_FUNCPTR *PFNGETTEXIMAGEPROC)(GLenum , GLint , GLenum , GLenum , GLvoid *);
-    typedef void (CODEGEN_FUNCPTR *PFNGETTEXPARAMETERFVPROC)(GLenum , GLenum , GLfloat *);
-    typedef void (CODEGEN_FUNCPTR *PFNGETTEXPARAMETERIVPROC)(GLenum , GLenum , GLint *);
-    typedef void (CODEGEN_FUNCPTR *PFNGETTEXLEVELPARAMETERFVPROC)(GLenum , GLint , GLenum , GLfloat *);
-    typedef void (CODEGEN_FUNCPTR *PFNGETTEXLEVELPARAMETERIVPROC)(GLenum , GLint , GLenum , GLint *);
-    typedef GLboolean (CODEGEN_FUNCPTR *PFNISENABLEDPROC)(GLenum );
-    typedef void (CODEGEN_FUNCPTR *PFNDEPTHRANGEPROC)(GLdouble , GLdouble );
-    typedef void (CODEGEN_FUNCPTR *PFNVIEWPORTPROC)(GLint , GLint , GLsizei , GLsizei );
-    typedef void (CODEGEN_FUNCPTR *PFNDRAWARRAYSPROC)(GLenum , GLint , GLsizei );
-    typedef void (CODEGEN_FUNCPTR *PFNDRAWELEMENTSPROC)(GLenum , GLsizei , GLenum , const GLvoid *);
-    typedef void (CODEGEN_FUNCPTR *PFNGETPOINTERVPROC)(GLenum , GLvoid* *);
-    typedef void (CODEGEN_FUNCPTR *PFNPOLYGONOFFSETPROC)(GLfloat , GLfloat );
-    typedef void (CODEGEN_FUNCPTR *PFNCOPYTEXIMAGE1DPROC)(GLenum , GLint , GLenum , GLint , GLint , GLsizei , GLint );
-    typedef void (CODEGEN_FUNCPTR *PFNCOPYTEXIMAGE2DPROC)(GLenum , GLint , GLenum , GLint , GLint , GLsizei , GLsizei , GLint );
-    typedef void (CODEGEN_FUNCPTR *PFNCOPYTEXSUBIMAGE1DPROC)(GLenum , GLint , GLint , GLint , GLint , GLsizei );
-    typedef void (CODEGEN_FUNCPTR *PFNCOPYTEXSUBIMAGE2DPROC)(GLenum , GLint , GLint , GLint , GLint , GLint , GLsizei , GLsizei );
-    typedef void (CODEGEN_FUNCPTR *PFNTEXSUBIMAGE1DPROC)(GLenum , GLint , GLint , GLsizei , GLenum , GLenum , const GLvoid *);
-    typedef void (CODEGEN_FUNCPTR *PFNTEXSUBIMAGE2DPROC)(GLenum , GLint , GLint , GLint , GLsizei , GLsizei , GLenum , GLenum , const GLvoid *);
-    typedef void (CODEGEN_FUNCPTR *PFNBINDTEXTUREPROC)(GLenum , GLuint );
-    typedef void (CODEGEN_FUNCPTR *PFNDELETETEXTURESPROC)(GLsizei , const GLuint *);
-    typedef void (CODEGEN_FUNCPTR *PFNGENTEXTURESPROC)(GLsizei , GLuint *);
-    typedef GLboolean (CODEGEN_FUNCPTR *PFNISTEXTUREPROC)(GLuint );
-    typedef void (CODEGEN_FUNCPTR *PFNINDEXUBPROC)(GLubyte );
-    typedef void (CODEGEN_FUNCPTR *PFNINDEXUBVPROC)(const GLubyte *);
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNCULLFACEPROC)(GLenum );
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNFRONTFACEPROC)(GLenum );
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNHINTPROC)(GLenum , GLenum );
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNLINEWIDTHPROC)(GLfloat );
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNPOINTSIZEPROC)(GLfloat );
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNPOLYGONMODEPROC)(GLenum , GLenum );
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNSCISSORPROC)(GLint , GLint , GLsizei , GLsizei );
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNTEXPARAMETERFPROC)(GLenum , GLenum , GLfloat );
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNTEXPARAMETERFVPROC)(GLenum , GLenum , ধ্রুবক GLfloat *);
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNTEXPARAMETERIPROC)(GLenum , GLenum , GLint );
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNTEXPARAMETERIVPROC)(GLenum , GLenum , ধ্রুবক GLint *);
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNTEXIMAGE1DPROC)(GLenum , GLint , GLint , GLsizei , GLint , GLenum , GLenum , ধ্রুবক GLvoid *);
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNTEXIMAGE2DPROC)(GLenum , GLint , GLint , GLsizei , GLsizei , GLint , GLenum , GLenum , ধ্রুবক GLvoid *);
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNDRAWBUFFERPROC)(GLenum );
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNCLEARPROC)(GLbitfield );
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNCLEARCOLORPROC)(GLfloat , GLfloat , GLfloat , GLfloat );
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNCLEARSTENCILPROC)(GLint );
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNCLEARDEPTHPROC)(GLdouble );
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNSTENCILMASKPROC)(GLuint );
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNCOLORMASKPROC)(GLboolean , GLboolean , GLboolean , GLboolean );
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNDEPTHMASKPROC)(GLboolean );
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNDISABLEPROC)(GLenum );
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNENABLEPROC)(GLenum );
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNFINISHPROC)();
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNFLUSHPROC)();
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNBLENDFUNCPROC)(GLenum , GLenum );
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNLOGICOPPROC)(GLenum );
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNSTENCILFUNCPROC)(GLenum , GLint , GLuint );
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNSTENCILOPPROC)(GLenum , GLenum , GLenum );
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNDEPTHFUNCPROC)(GLenum );
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNPIXELSTOREFPROC)(GLenum , GLfloat );
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNPIXELSTOREIPROC)(GLenum , GLint );
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNREADBUFFERPROC)(GLenum );
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNREADPIXELSPROC)(GLint , GLint , GLsizei , GLsizei , GLenum , GLenum , GLvoid *);
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNGETBOOLEANVPROC)(GLenum , GLboolean *);
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNGETDOUBLEVPROC)(GLenum , GLdouble *);
+    প্রকারলেখ GLenum (CODEGEN_FUNCPTR *PFNGETERRORPROC)();
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNGETFLOATVPROC)(GLenum , GLfloat *);
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNGETINTEGERVPROC)(GLenum , GLint *);
+    প্রকারলেখ ধ্রুবক GLubyte * (CODEGEN_FUNCPTR *PFNGETSTRINGPROC)(GLenum );
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNGETTEXIMAGEPROC)(GLenum , GLint , GLenum , GLenum , GLvoid *);
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNGETTEXPARAMETERFVPROC)(GLenum , GLenum , GLfloat *);
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNGETTEXPARAMETERIVPROC)(GLenum , GLenum , GLint *);
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNGETTEXLEVELPARAMETERFVPROC)(GLenum , GLint , GLenum , GLfloat *);
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNGETTEXLEVELPARAMETERIVPROC)(GLenum , GLint , GLenum , GLint *);
+    প্রকারলেখ GLboolean (CODEGEN_FUNCPTR *PFNISENABLEDPROC)(GLenum );
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNDEPTHRANGEPROC)(GLdouble , GLdouble );
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNVIEWPORTPROC)(GLint , GLint , GLsizei , GLsizei );
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNDRAWARRAYSPROC)(GLenum , GLint , GLsizei );
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNDRAWELEMENTSPROC)(GLenum , GLsizei , GLenum , ধ্রুবক GLvoid *);
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNGETPOINTERVPROC)(GLenum , GLvoid* *);
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNPOLYGONOFFSETPROC)(GLfloat , GLfloat );
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNCOPYTEXIMAGE1DPROC)(GLenum , GLint , GLenum , GLint , GLint , GLsizei , GLint );
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNCOPYTEXIMAGE2DPROC)(GLenum , GLint , GLenum , GLint , GLint , GLsizei , GLsizei , GLint );
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNCOPYTEXSUBIMAGE1DPROC)(GLenum , GLint , GLint , GLint , GLint , GLsizei );
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNCOPYTEXSUBIMAGE2DPROC)(GLenum , GLint , GLint , GLint , GLint , GLint , GLsizei , GLsizei );
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNTEXSUBIMAGE1DPROC)(GLenum , GLint , GLint , GLsizei , GLenum , GLenum , ধ্রুবক GLvoid *);
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNTEXSUBIMAGE2DPROC)(GLenum , GLint , GLint , GLint , GLsizei , GLsizei , GLenum , GLenum , ধ্রুবক GLvoid *);
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNBINDTEXTUREPROC)(GLenum , GLuint );
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNDELETETEXTURESPROC)(GLsizei , ধ্রুবক GLuint *);
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNGENTEXTURESPROC)(GLsizei , GLuint *);
+    প্রকারলেখ GLboolean (CODEGEN_FUNCPTR *PFNISTEXTUREPROC)(GLuint );
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNINDEXUBPROC)(GLubyte );
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNINDEXUBVPROC)(ধ্রুবক GLubyte *);
 
     // Extension: 1.2
-    typedef void (CODEGEN_FUNCPTR *PFNBLENDCOLORPROC)(GLfloat , GLfloat , GLfloat , GLfloat );
-    typedef void (CODEGEN_FUNCPTR *PFNBLENDEQUATIONPROC)(GLenum );
-    typedef void (CODEGEN_FUNCPTR *PFNDRAWRANGEELEMENTSPROC)(GLenum , GLuint , GLuint , GLsizei , GLenum , const GLvoid *);
-    typedef void (CODEGEN_FUNCPTR *PFNTEXSUBIMAGE3DPROC)(GLenum , GLint , GLint , GLint , GLint , GLsizei , GLsizei , GLsizei , GLenum , GLenum , const GLvoid *);
-    typedef void (CODEGEN_FUNCPTR *PFNCOPYTEXSUBIMAGE3DPROC)(GLenum , GLint , GLint , GLint , GLint , GLint , GLint , GLsizei , GLsizei );
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNBLENDCOLORPROC)(GLfloat , GLfloat , GLfloat , GLfloat );
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNBLENDEQUATIONPROC)(GLenum );
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNDRAWRANGEELEMENTSPROC)(GLenum , GLuint , GLuint , GLsizei , GLenum , ধ্রুবক GLvoid *);
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNTEXSUBIMAGE3DPROC)(GLenum , GLint , GLint , GLint , GLint , GLsizei , GLsizei , GLsizei , GLenum , GLenum , ধ্রুবক GLvoid *);
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNCOPYTEXSUBIMAGE3DPROC)(GLenum , GLint , GLint , GLint , GLint , GLint , GLint , GLsizei , GLsizei );
 
     // Extension: 1.3
-    typedef void (CODEGEN_FUNCPTR *PFNACTIVETEXTUREPROC)(GLenum );
-    typedef void (CODEGEN_FUNCPTR *PFNSAMPLECOVERAGEPROC)(GLfloat , GLboolean );
-    typedef void (CODEGEN_FUNCPTR *PFNCOMPRESSEDTEXIMAGE3DPROC)(GLenum , GLint , GLenum , GLsizei , GLsizei , GLsizei , GLint , GLsizei , const GLvoid *);
-    typedef void (CODEGEN_FUNCPTR *PFNCOMPRESSEDTEXIMAGE2DPROC)(GLenum , GLint , GLenum , GLsizei , GLsizei , GLint , GLsizei , const GLvoid *);
-    typedef void (CODEGEN_FUNCPTR *PFNCOMPRESSEDTEXIMAGE1DPROC)(GLenum , GLint , GLenum , GLsizei , GLint , GLsizei , const GLvoid *);
-    typedef void (CODEGEN_FUNCPTR *PFNCOMPRESSEDTEXSUBIMAGE3DPROC)(GLenum , GLint , GLint , GLint , GLint , GLsizei , GLsizei , GLsizei , GLenum , GLsizei , const GLvoid *);
-    typedef void (CODEGEN_FUNCPTR *PFNCOMPRESSEDTEXSUBIMAGE2DPROC)(GLenum , GLint , GLint , GLint , GLsizei , GLsizei , GLenum , GLsizei , const GLvoid *);
-    typedef void (CODEGEN_FUNCPTR *PFNCOMPRESSEDTEXSUBIMAGE1DPROC)(GLenum , GLint , GLint , GLsizei , GLenum , GLsizei , const GLvoid *);
-    typedef void (CODEGEN_FUNCPTR *PFNGETCOMPRESSEDTEXIMAGEPROC)(GLenum , GLint , GLvoid *);
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNACTIVETEXTUREPROC)(GLenum );
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNSAMPLECOVERAGEPROC)(GLfloat , GLboolean );
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNCOMPRESSEDTEXIMAGE3DPROC)(GLenum , GLint , GLenum , GLsizei , GLsizei , GLsizei , GLint , GLsizei , ধ্রুবক GLvoid *);
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNCOMPRESSEDTEXIMAGE2DPROC)(GLenum , GLint , GLenum , GLsizei , GLsizei , GLint , GLsizei , ধ্রুবক GLvoid *);
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNCOMPRESSEDTEXIMAGE1DPROC)(GLenum , GLint , GLenum , GLsizei , GLint , GLsizei , ধ্রুবক GLvoid *);
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNCOMPRESSEDTEXSUBIMAGE3DPROC)(GLenum , GLint , GLint , GLint , GLint , GLsizei , GLsizei , GLsizei , GLenum , GLsizei , ধ্রুবক GLvoid *);
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNCOMPRESSEDTEXSUBIMAGE2DPROC)(GLenum , GLint , GLint , GLint , GLsizei , GLsizei , GLenum , GLsizei , ধ্রুবক GLvoid *);
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNCOMPRESSEDTEXSUBIMAGE1DPROC)(GLenum , GLint , GLint , GLsizei , GLenum , GLsizei , ধ্রুবক GLvoid *);
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNGETCOMPRESSEDTEXIMAGEPROC)(GLenum , GLint , GLvoid *);
 
     // Extension: 1.4
-    typedef void (CODEGEN_FUNCPTR *PFNBLENDFUNCSEPARATEPROC)(GLenum , GLenum , GLenum , GLenum );
-    typedef void (CODEGEN_FUNCPTR *PFNMULTIDRAWARRAYSPROC)(GLenum , const GLint *, const GLsizei *, GLsizei );
-    typedef void (CODEGEN_FUNCPTR *PFNMULTIDRAWELEMENTSPROC)(GLenum , const GLsizei *, GLenum , const GLvoid* const *, GLsizei );
-    typedef void (CODEGEN_FUNCPTR *PFNPOINTPARAMETERFPROC)(GLenum , GLfloat );
-    typedef void (CODEGEN_FUNCPTR *PFNPOINTPARAMETERFVPROC)(GLenum , const GLfloat *);
-    typedef void (CODEGEN_FUNCPTR *PFNPOINTPARAMETERIPROC)(GLenum , GLint );
-    typedef void (CODEGEN_FUNCPTR *PFNPOINTPARAMETERIVPROC)(GLenum , const GLint *);
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNBLENDFUNCSEPARATEPROC)(GLenum , GLenum , GLenum , GLenum );
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNMULTIDRAWARRAYSPROC)(GLenum , ধ্রুবক GLint *, ধ্রুবক GLsizei *, GLsizei );
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNMULTIDRAWELEMENTSPROC)(GLenum , ধ্রুবক GLsizei *, GLenum , ধ্রুবক GLvoid* ধ্রুবক *, GLsizei );
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNPOINTPARAMETERFPROC)(GLenum , GLfloat );
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNPOINTPARAMETERFVPROC)(GLenum , ধ্রুবক GLfloat *);
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNPOINTPARAMETERIPROC)(GLenum , GLint );
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNPOINTPARAMETERIVPROC)(GLenum , ধ্রুবক GLint *);
 
     // Extension: 1.5
-    typedef void (CODEGEN_FUNCPTR *PFNGENQUERIESPROC)(GLsizei , GLuint *);
-    typedef void (CODEGEN_FUNCPTR *PFNDELETEQUERIESPROC)(GLsizei , const GLuint *);
-    typedef GLboolean (CODEGEN_FUNCPTR *PFNISQUERYPROC)(GLuint );
-    typedef void (CODEGEN_FUNCPTR *PFNBEGINQUERYPROC)(GLenum , GLuint );
-    typedef void (CODEGEN_FUNCPTR *PFNENDQUERYPROC)(GLenum );
-    typedef void (CODEGEN_FUNCPTR *PFNGETQUERYIVPROC)(GLenum , GLenum , GLint *);
-    typedef void (CODEGEN_FUNCPTR *PFNGETQUERYOBJECTIVPROC)(GLuint , GLenum , GLint *);
-    typedef void (CODEGEN_FUNCPTR *PFNGETQUERYOBJECTUIVPROC)(GLuint , GLenum , GLuint *);
-    typedef void (CODEGEN_FUNCPTR *PFNBINDBUFFERPROC)(GLenum , GLuint );
-    typedef void (CODEGEN_FUNCPTR *PFNDELETEBUFFERSPROC)(GLsizei , const GLuint *);
-    typedef void (CODEGEN_FUNCPTR *PFNGENBUFFERSPROC)(GLsizei , GLuint *);
-    typedef GLboolean (CODEGEN_FUNCPTR *PFNISBUFFERPROC)(GLuint );
-    typedef void (CODEGEN_FUNCPTR *PFNBUFFERDATAPROC)(GLenum , GLsizeiptr , const GLvoid *, GLenum );
-    typedef void (CODEGEN_FUNCPTR *PFNBUFFERSUBDATAPROC)(GLenum , GLintptr , GLsizeiptr , const GLvoid *);
-    typedef void (CODEGEN_FUNCPTR *PFNGETBUFFERSUBDATAPROC)(GLenum , GLintptr , GLsizeiptr , GLvoid *);
-    typedef GLvoid* (CODEGEN_FUNCPTR *PFNMAPBUFFERPROC)(GLenum , GLenum );
-    typedef GLboolean (CODEGEN_FUNCPTR *PFNUNMAPBUFFERPROC)(GLenum );
-    typedef void (CODEGEN_FUNCPTR *PFNGETBUFFERPARAMETERIVPROC)(GLenum , GLenum , GLint *);
-    typedef void (CODEGEN_FUNCPTR *PFNGETBUFFERPOINTERVPROC)(GLenum , GLenum , GLvoid* *);
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNGENQUERIESPROC)(GLsizei , GLuint *);
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNDELETEQUERIESPROC)(GLsizei , ধ্রুবক GLuint *);
+    প্রকারলেখ GLboolean (CODEGEN_FUNCPTR *PFNISQUERYPROC)(GLuint );
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNBEGINQUERYPROC)(GLenum , GLuint );
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNENDQUERYPROC)(GLenum );
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNGETQUERYIVPROC)(GLenum , GLenum , GLint *);
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNGETQUERYOBJECTIVPROC)(GLuint , GLenum , GLint *);
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNGETQUERYOBJECTUIVPROC)(GLuint , GLenum , GLuint *);
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNBINDBUFFERPROC)(GLenum , GLuint );
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNDELETEBUFFERSPROC)(GLsizei , ধ্রুবক GLuint *);
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNGENBUFFERSPROC)(GLsizei , GLuint *);
+    প্রকারলেখ GLboolean (CODEGEN_FUNCPTR *PFNISBUFFERPROC)(GLuint );
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNBUFFERDATAPROC)(GLenum , GLsizeiptr , ধ্রুবক GLvoid *, GLenum );
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNBUFFERSUBDATAPROC)(GLenum , GLintptr , GLsizeiptr , ধ্রুবক GLvoid *);
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNGETBUFFERSUBDATAPROC)(GLenum , GLintptr , GLsizeiptr , GLvoid *);
+    প্রকারলেখ GLvoid* (CODEGEN_FUNCPTR *PFNMAPBUFFERPROC)(GLenum , GLenum );
+    প্রকারলেখ GLboolean (CODEGEN_FUNCPTR *PFNUNMAPBUFFERPROC)(GLenum );
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNGETBUFFERPARAMETERIVPROC)(GLenum , GLenum , GLint *);
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNGETBUFFERPOINTERVPROC)(GLenum , GLenum , GLvoid* *);
 
     // Extension: 2.0
-    typedef void (CODEGEN_FUNCPTR *PFNBLENDEQUATIONSEPARATEPROC)(GLenum , GLenum );
-    typedef void (CODEGEN_FUNCPTR *PFNDRAWBUFFERSPROC)(GLsizei , const GLenum *);
-    typedef void (CODEGEN_FUNCPTR *PFNSTENCILOPSEPARATEPROC)(GLenum , GLenum , GLenum , GLenum );
-    typedef void (CODEGEN_FUNCPTR *PFNSTENCILFUNCSEPARATEPROC)(GLenum , GLenum , GLint , GLuint );
-    typedef void (CODEGEN_FUNCPTR *PFNSTENCILMASKSEPARATEPROC)(GLenum , GLuint );
-    typedef void (CODEGEN_FUNCPTR *PFNATTACHSHADERPROC)(GLuint , GLuint );
-    typedef void (CODEGEN_FUNCPTR *PFNBINDATTRIBLOCATIONPROC)(GLuint , GLuint , const GLchar *);
-    typedef void (CODEGEN_FUNCPTR *PFNCOMPILESHADERPROC)(GLuint );
-    typedef GLuint (CODEGEN_FUNCPTR *PFNCREATEPROGRAMPROC)();
-    typedef GLuint (CODEGEN_FUNCPTR *PFNCREATESHADERPROC)(GLenum );
-    typedef void (CODEGEN_FUNCPTR *PFNDELETEPROGRAMPROC)(GLuint );
-    typedef void (CODEGEN_FUNCPTR *PFNDELETESHADERPROC)(GLuint );
-    typedef void (CODEGEN_FUNCPTR *PFNDETACHSHADERPROC)(GLuint , GLuint );
-    typedef void (CODEGEN_FUNCPTR *PFNDISABLEVERTEXATTRIBARRAYPROC)(GLuint );
-    typedef void (CODEGEN_FUNCPTR *PFNENABLEVERTEXATTRIBARRAYPROC)(GLuint );
-    typedef void (CODEGEN_FUNCPTR *PFNGETACTIVEATTRIBPROC)(GLuint , GLuint , GLsizei , GLsizei *, GLint *, GLenum *, GLchar *);
-    typedef void (CODEGEN_FUNCPTR *PFNGETACTIVEUNIFORMPROC)(GLuint , GLuint , GLsizei , GLsizei *, GLint *, GLenum *, GLchar *);
-    typedef void (CODEGEN_FUNCPTR *PFNGETATTACHEDSHADERSPROC)(GLuint , GLsizei , GLsizei *, GLuint *);
-    typedef GLint (CODEGEN_FUNCPTR *PFNGETATTRIBLOCATIONPROC)(GLuint , const GLchar *);
-    typedef void (CODEGEN_FUNCPTR *PFNGETPROGRAMIVPROC)(GLuint , GLenum , GLint *);
-    typedef void (CODEGEN_FUNCPTR *PFNGETPROGRAMINFOLOGPROC)(GLuint , GLsizei , GLsizei *, GLchar *);
-    typedef void (CODEGEN_FUNCPTR *PFNGETSHADERIVPROC)(GLuint , GLenum , GLint *);
-    typedef void (CODEGEN_FUNCPTR *PFNGETSHADERINFOLOGPROC)(GLuint , GLsizei , GLsizei *, GLchar *);
-    typedef void (CODEGEN_FUNCPTR *PFNGETSHADERSOURCEPROC)(GLuint , GLsizei , GLsizei *, GLchar *);
-    typedef GLint (CODEGEN_FUNCPTR *PFNGETUNIFORMLOCATIONPROC)(GLuint , const GLchar *);
-    typedef void (CODEGEN_FUNCPTR *PFNGETUNIFORMFVPROC)(GLuint , GLint , GLfloat *);
-    typedef void (CODEGEN_FUNCPTR *PFNGETUNIFORMIVPROC)(GLuint , GLint , GLint *);
-    typedef void (CODEGEN_FUNCPTR *PFNGETVERTEXATTRIBDVPROC)(GLuint , GLenum , GLdouble *);
-    typedef void (CODEGEN_FUNCPTR *PFNGETVERTEXATTRIBFVPROC)(GLuint , GLenum , GLfloat *);
-    typedef void (CODEGEN_FUNCPTR *PFNGETVERTEXATTRIBIVPROC)(GLuint , GLenum , GLint *);
-    typedef void (CODEGEN_FUNCPTR *PFNGETVERTEXATTRIBPOINTERVPROC)(GLuint , GLenum , GLvoid* *);
-    typedef GLboolean (CODEGEN_FUNCPTR *PFNISPROGRAMPROC)(GLuint );
-    typedef GLboolean (CODEGEN_FUNCPTR *PFNISSHADERPROC)(GLuint );
-    typedef void (CODEGEN_FUNCPTR *PFNLINKPROGRAMPROC)(GLuint );
-    typedef void (CODEGEN_FUNCPTR *PFNSHADERSOURCEPROC)(GLuint , GLsizei , const GLchar* const *, const GLint *);
-    typedef void (CODEGEN_FUNCPTR *PFNUSEPROGRAMPROC)(GLuint );
-    typedef void (CODEGEN_FUNCPTR *PFNUNIFORM1FPROC)(GLint , GLfloat );
-    typedef void (CODEGEN_FUNCPTR *PFNUNIFORM2FPROC)(GLint , GLfloat , GLfloat );
-    typedef void (CODEGEN_FUNCPTR *PFNUNIFORM3FPROC)(GLint , GLfloat , GLfloat , GLfloat );
-    typedef void (CODEGEN_FUNCPTR *PFNUNIFORM4FPROC)(GLint , GLfloat , GLfloat , GLfloat , GLfloat );
-    typedef void (CODEGEN_FUNCPTR *PFNUNIFORM1IPROC)(GLint , GLint );
-    typedef void (CODEGEN_FUNCPTR *PFNUNIFORM2IPROC)(GLint , GLint , GLint );
-    typedef void (CODEGEN_FUNCPTR *PFNUNIFORM3IPROC)(GLint , GLint , GLint , GLint );
-    typedef void (CODEGEN_FUNCPTR *PFNUNIFORM4IPROC)(GLint , GLint , GLint , GLint , GLint );
-    typedef void (CODEGEN_FUNCPTR *PFNUNIFORM1FVPROC)(GLint , GLsizei , const GLfloat *);
-    typedef void (CODEGEN_FUNCPTR *PFNUNIFORM2FVPROC)(GLint , GLsizei , const GLfloat *);
-    typedef void (CODEGEN_FUNCPTR *PFNUNIFORM3FVPROC)(GLint , GLsizei , const GLfloat *);
-    typedef void (CODEGEN_FUNCPTR *PFNUNIFORM4FVPROC)(GLint , GLsizei , const GLfloat *);
-    typedef void (CODEGEN_FUNCPTR *PFNUNIFORM1IVPROC)(GLint , GLsizei , const GLint *);
-    typedef void (CODEGEN_FUNCPTR *PFNUNIFORM2IVPROC)(GLint , GLsizei , const GLint *);
-    typedef void (CODEGEN_FUNCPTR *PFNUNIFORM3IVPROC)(GLint , GLsizei , const GLint *);
-    typedef void (CODEGEN_FUNCPTR *PFNUNIFORM4IVPROC)(GLint , GLsizei , const GLint *);
-    typedef void (CODEGEN_FUNCPTR *PFNUNIFORMMATRIX2FVPROC)(GLint , GLsizei , GLboolean , const GLfloat *);
-    typedef void (CODEGEN_FUNCPTR *PFNUNIFORMMATRIX3FVPROC)(GLint , GLsizei , GLboolean , const GLfloat *);
-    typedef void (CODEGEN_FUNCPTR *PFNUNIFORMMATRIX4FVPROC)(GLint , GLsizei , GLboolean , const GLfloat *);
-    typedef void (CODEGEN_FUNCPTR *PFNVALIDATEPROGRAMPROC)(GLuint );
-    typedef void (CODEGEN_FUNCPTR *PFNVERTEXATTRIBPOINTERPROC)(GLuint , GLint , GLenum , GLboolean , GLsizei , const GLvoid *);
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNBLENDEQUATIONSEPARATEPROC)(GLenum , GLenum );
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNDRAWBUFFERSPROC)(GLsizei , ধ্রুবক GLenum *);
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNSTENCILOPSEPARATEPROC)(GLenum , GLenum , GLenum , GLenum );
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNSTENCILFUNCSEPARATEPROC)(GLenum , GLenum , GLint , GLuint );
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNSTENCILMASKSEPARATEPROC)(GLenum , GLuint );
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNATTACHSHADERPROC)(GLuint , GLuint );
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNBINDATTRIBLOCATIONPROC)(GLuint , GLuint , ধ্রুবক GLchar *);
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNCOMPILESHADERPROC)(GLuint );
+    প্রকারলেখ GLuint (CODEGEN_FUNCPTR *PFNCREATEPROGRAMPROC)();
+    প্রকারলেখ GLuint (CODEGEN_FUNCPTR *PFNCREATESHADERPROC)(GLenum );
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNDELETEPROGRAMPROC)(GLuint );
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNDELETESHADERPROC)(GLuint );
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNDETACHSHADERPROC)(GLuint , GLuint );
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNDISABLEVERTEXATTRIBARRAYPROC)(GLuint );
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNENABLEVERTEXATTRIBARRAYPROC)(GLuint );
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNGETACTIVEATTRIBPROC)(GLuint , GLuint , GLsizei , GLsizei *, GLint *, GLenum *, GLchar *);
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNGETACTIVEUNIFORMPROC)(GLuint , GLuint , GLsizei , GLsizei *, GLint *, GLenum *, GLchar *);
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNGETATTACHEDSHADERSPROC)(GLuint , GLsizei , GLsizei *, GLuint *);
+    প্রকারলেখ GLint (CODEGEN_FUNCPTR *PFNGETATTRIBLOCATIONPROC)(GLuint , ধ্রুবক GLchar *);
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNGETPROGRAMIVPROC)(GLuint , GLenum , GLint *);
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNGETPROGRAMINFOLOGPROC)(GLuint , GLsizei , GLsizei *, GLchar *);
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNGETSHADERIVPROC)(GLuint , GLenum , GLint *);
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNGETSHADERINFOLOGPROC)(GLuint , GLsizei , GLsizei *, GLchar *);
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNGETSHADERSOURCEPROC)(GLuint , GLsizei , GLsizei *, GLchar *);
+    প্রকারলেখ GLint (CODEGEN_FUNCPTR *PFNGETUNIFORMLOCATIONPROC)(GLuint , ধ্রুবক GLchar *);
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNGETUNIFORMFVPROC)(GLuint , GLint , GLfloat *);
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNGETUNIFORMIVPROC)(GLuint , GLint , GLint *);
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNGETVERTEXATTRIBDVPROC)(GLuint , GLenum , GLdouble *);
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNGETVERTEXATTRIBFVPROC)(GLuint , GLenum , GLfloat *);
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNGETVERTEXATTRIBIVPROC)(GLuint , GLenum , GLint *);
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNGETVERTEXATTRIBPOINTERVPROC)(GLuint , GLenum , GLvoid* *);
+    প্রকারলেখ GLboolean (CODEGEN_FUNCPTR *PFNISPROGRAMPROC)(GLuint );
+    প্রকারলেখ GLboolean (CODEGEN_FUNCPTR *PFNISSHADERPROC)(GLuint );
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNLINKPROGRAMPROC)(GLuint );
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNSHADERSOURCEPROC)(GLuint , GLsizei , ধ্রুবক GLchar* ধ্রুবক *, ধ্রুবক GLint *);
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNUSEPROGRAMPROC)(GLuint );
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNUNIFORM1FPROC)(GLint , GLfloat );
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNUNIFORM2FPROC)(GLint , GLfloat , GLfloat );
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNUNIFORM3FPROC)(GLint , GLfloat , GLfloat , GLfloat );
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNUNIFORM4FPROC)(GLint , GLfloat , GLfloat , GLfloat , GLfloat );
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNUNIFORM1IPROC)(GLint , GLint );
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNUNIFORM2IPROC)(GLint , GLint , GLint );
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNUNIFORM3IPROC)(GLint , GLint , GLint , GLint );
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNUNIFORM4IPROC)(GLint , GLint , GLint , GLint , GLint );
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNUNIFORM1FVPROC)(GLint , GLsizei , ধ্রুবক GLfloat *);
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNUNIFORM2FVPROC)(GLint , GLsizei , ধ্রুবক GLfloat *);
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNUNIFORM3FVPROC)(GLint , GLsizei , ধ্রুবক GLfloat *);
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNUNIFORM4FVPROC)(GLint , GLsizei , ধ্রুবক GLfloat *);
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNUNIFORM1IVPROC)(GLint , GLsizei , ধ্রুবক GLint *);
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNUNIFORM2IVPROC)(GLint , GLsizei , ধ্রুবক GLint *);
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNUNIFORM3IVPROC)(GLint , GLsizei , ধ্রুবক GLint *);
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNUNIFORM4IVPROC)(GLint , GLsizei , ধ্রুবক GLint *);
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNUNIFORMMATRIX2FVPROC)(GLint , GLsizei , GLboolean , ধ্রুবক GLfloat *);
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNUNIFORMMATRIX3FVPROC)(GLint , GLsizei , GLboolean , ধ্রুবক GLfloat *);
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNUNIFORMMATRIX4FVPROC)(GLint , GLsizei , GLboolean , ধ্রুবক GLfloat *);
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNVALIDATEPROGRAMPROC)(GLuint );
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNVERTEXATTRIBPOINTERPROC)(GLuint , GLint , GLenum , GLboolean , GLsizei , ধ্রুবক GLvoid *);
 
     // Extension: 2.1
-    typedef void (CODEGEN_FUNCPTR *PFNUNIFORMMATRIX2X3FVPROC)(GLint , GLsizei , GLboolean , const GLfloat *);
-    typedef void (CODEGEN_FUNCPTR *PFNUNIFORMMATRIX3X2FVPROC)(GLint , GLsizei , GLboolean , const GLfloat *);
-    typedef void (CODEGEN_FUNCPTR *PFNUNIFORMMATRIX2X4FVPROC)(GLint , GLsizei , GLboolean , const GLfloat *);
-    typedef void (CODEGEN_FUNCPTR *PFNUNIFORMMATRIX4X2FVPROC)(GLint , GLsizei , GLboolean , const GLfloat *);
-    typedef void (CODEGEN_FUNCPTR *PFNUNIFORMMATRIX3X4FVPROC)(GLint , GLsizei , GLboolean , const GLfloat *);
-    typedef void (CODEGEN_FUNCPTR *PFNUNIFORMMATRIX4X3FVPROC)(GLint , GLsizei , GLboolean , const GLfloat *);
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNUNIFORMMATRIX2X3FVPROC)(GLint , GLsizei , GLboolean , ধ্রুবক GLfloat *);
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNUNIFORMMATRIX3X2FVPROC)(GLint , GLsizei , GLboolean , ধ্রুবক GLfloat *);
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNUNIFORMMATRIX2X4FVPROC)(GLint , GLsizei , GLboolean , ধ্রুবক GLfloat *);
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNUNIFORMMATRIX4X2FVPROC)(GLint , GLsizei , GLboolean , ধ্রুবক GLfloat *);
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNUNIFORMMATRIX3X4FVPROC)(GLint , GLsizei , GLboolean , ধ্রুবক GLfloat *);
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNUNIFORMMATRIX4X3FVPROC)(GLint , GLsizei , GLboolean , ধ্রুবক GLfloat *);
 
     // Extension: ARB_vertex_array_object
-    typedef void (CODEGEN_FUNCPTR *PFNBINDVERTEXARRAYPROC)(GLuint );
-    typedef void (CODEGEN_FUNCPTR *PFNDELETEVERTEXARRAYSPROC)(GLsizei , const GLuint *);
-    typedef void (CODEGEN_FUNCPTR *PFNGENVERTEXARRAYSPROC)(GLsizei , GLuint *);
-    typedef GLboolean (CODEGEN_FUNCPTR *PFNISVERTEXARRAYPROC)(GLuint );
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNBINDVERTEXARRAYPROC)(GLuint );
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNDELETEVERTEXARRAYSPROC)(GLsizei , ধ্রুবক GLuint *);
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNGENVERTEXARRAYSPROC)(GLsizei , GLuint *);
+    প্রকারলেখ GLboolean (CODEGEN_FUNCPTR *PFNISVERTEXARRAYPROC)(GLuint );
 
     // Extension: ARB_map_buffer_range
-    typedef GLvoid* (CODEGEN_FUNCPTR *PFNMAPBUFFERRANGEPROC)(GLenum , GLintptr , GLsizeiptr , GLbitfield );
-    typedef void (CODEGEN_FUNCPTR *PFNFLUSHMAPPEDBUFFERRANGEPROC)(GLenum , GLintptr , GLsizeiptr );
+    প্রকারলেখ GLvoid* (CODEGEN_FUNCPTR *PFNMAPBUFFERRANGEPROC)(GLenum , GLintptr , GLsizeiptr , GLbitfield );
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNFLUSHMAPPEDBUFFERRANGEPROC)(GLenum , GLintptr , GLsizeiptr );
 
     // Extension: ARB_framebuffer_object
-    typedef GLboolean (CODEGEN_FUNCPTR *PFNISRENDERBUFFERPROC)(GLuint );
-    typedef void (CODEGEN_FUNCPTR *PFNBINDRENDERBUFFERPROC)(GLenum , GLuint );
-    typedef void (CODEGEN_FUNCPTR *PFNDELETERENDERBUFFERSPROC)(GLsizei , const GLuint *);
-    typedef void (CODEGEN_FUNCPTR *PFNGENRENDERBUFFERSPROC)(GLsizei , GLuint *);
-    typedef void (CODEGEN_FUNCPTR *PFNRENDERBUFFERSTORAGEPROC)(GLenum , GLenum , GLsizei , GLsizei );
-    typedef void (CODEGEN_FUNCPTR *PFNGETRENDERBUFFERPARAMETERIVPROC)(GLenum , GLenum , GLint *);
-    typedef GLboolean (CODEGEN_FUNCPTR *PFNISFRAMEBUFFERPROC)(GLuint );
-    typedef void (CODEGEN_FUNCPTR *PFNBINDFRAMEBUFFERPROC)(GLenum , GLuint );
-    typedef void (CODEGEN_FUNCPTR *PFNDELETEFRAMEBUFFERSPROC)(GLsizei , const GLuint *);
-    typedef void (CODEGEN_FUNCPTR *PFNGENFRAMEBUFFERSPROC)(GLsizei , GLuint *);
-    typedef GLenum (CODEGEN_FUNCPTR *PFNCHECKFRAMEBUFFERSTATUSPROC)(GLenum );
-    typedef void (CODEGEN_FUNCPTR *PFNFRAMEBUFFERTEXTURE1DPROC)(GLenum , GLenum , GLenum , GLuint , GLint );
-    typedef void (CODEGEN_FUNCPTR *PFNFRAMEBUFFERTEXTURE2DPROC)(GLenum , GLenum , GLenum , GLuint , GLint );
-    typedef void (CODEGEN_FUNCPTR *PFNFRAMEBUFFERTEXTURE3DPROC)(GLenum , GLenum , GLenum , GLuint , GLint , GLint );
-    typedef void (CODEGEN_FUNCPTR *PFNFRAMEBUFFERRENDERBUFFERPROC)(GLenum , GLenum , GLenum , GLuint );
-    typedef void (CODEGEN_FUNCPTR *PFNGETFRAMEBUFFERATTACHMENTPARAMETERIVPROC)(GLenum , GLenum , GLenum , GLint *);
-    typedef void (CODEGEN_FUNCPTR *PFNGENERATEMIPMAPPROC)(GLenum );
-    typedef void (CODEGEN_FUNCPTR *PFNBLITFRAMEBUFFERPROC)(GLint , GLint , GLint , GLint , GLint , GLint , GLint , GLint , GLbitfield , GLenum );
-    typedef void (CODEGEN_FUNCPTR *PFNRENDERBUFFERSTORAGEMULTISAMPLEPROC)(GLenum , GLsizei , GLenum , GLsizei , GLsizei );
-    typedef void (CODEGEN_FUNCPTR *PFNFRAMEBUFFERTEXTURELAYERPROC)(GLenum , GLenum , GLuint , GLint , GLint );
+    প্রকারলেখ GLboolean (CODEGEN_FUNCPTR *PFNISRENDERBUFFERPROC)(GLuint );
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNBINDRENDERBUFFERPROC)(GLenum , GLuint );
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNDELETERENDERBUFFERSPROC)(GLsizei , ধ্রুবক GLuint *);
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNGENRENDERBUFFERSPROC)(GLsizei , GLuint *);
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNRENDERBUFFERSTORAGEPROC)(GLenum , GLenum , GLsizei , GLsizei );
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNGETRENDERBUFFERPARAMETERIVPROC)(GLenum , GLenum , GLint *);
+    প্রকারলেখ GLboolean (CODEGEN_FUNCPTR *PFNISFRAMEBUFFERPROC)(GLuint );
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNBINDFRAMEBUFFERPROC)(GLenum , GLuint );
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNDELETEFRAMEBUFFERSPROC)(GLsizei , ধ্রুবক GLuint *);
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNGENFRAMEBUFFERSPROC)(GLsizei , GLuint *);
+    প্রকারলেখ GLenum (CODEGEN_FUNCPTR *PFNCHECKFRAMEBUFFERSTATUSPROC)(GLenum );
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNFRAMEBUFFERTEXTURE1DPROC)(GLenum , GLenum , GLenum , GLuint , GLint );
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNFRAMEBUFFERTEXTURE2DPROC)(GLenum , GLenum , GLenum , GLuint , GLint );
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNFRAMEBUFFERTEXTURE3DPROC)(GLenum , GLenum , GLenum , GLuint , GLint , GLint );
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNFRAMEBUFFERRENDERBUFFERPROC)(GLenum , GLenum , GLenum , GLuint );
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNGETFRAMEBUFFERATTACHMENTPARAMETERIVPROC)(GLenum , GLenum , GLenum , GLint *);
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNGENERATEMIPMAPPROC)(GLenum );
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNBLITFRAMEBUFFERPROC)(GLint , GLint , GLint , GLint , GLint , GLint , GLint , GLint , GLbitfield , GLenum );
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNRENDERBUFFERSTORAGEMULTISAMPLEPROC)(GLenum , GLsizei , GLenum , GLsizei , GLsizei );
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNFRAMEBUFFERTEXTURELAYERPROC)(GLenum , GLenum , GLuint , GLint , GLint );
 
     // Extension: 3.0
-    typedef void (CODEGEN_FUNCPTR *PFNCOLORMASKIPROC)(GLuint , GLboolean , GLboolean , GLboolean , GLboolean );
-    typedef void (CODEGEN_FUNCPTR *PFNGETBOOLEANI_VPROC)(GLenum , GLuint , GLboolean *);
-    typedef void (CODEGEN_FUNCPTR *PFNGETINTEGERI_VPROC)(GLenum , GLuint , GLint *);
-    typedef void (CODEGEN_FUNCPTR *PFNENABLEIPROC)(GLenum , GLuint );
-    typedef void (CODEGEN_FUNCPTR *PFNDISABLEIPROC)(GLenum , GLuint );
-    typedef GLboolean (CODEGEN_FUNCPTR *PFNISENABLEDIPROC)(GLenum , GLuint );
-    typedef void (CODEGEN_FUNCPTR *PFNBEGINTRANSFORMFEEDBACKPROC)(GLenum );
-    typedef void (CODEGEN_FUNCPTR *PFNENDTRANSFORMFEEDBACKPROC)();
-    typedef void (CODEGEN_FUNCPTR *PFNBINDBUFFERRANGEPROC)(GLenum , GLuint , GLuint , GLintptr , GLsizeiptr );
-    typedef void (CODEGEN_FUNCPTR *PFNBINDBUFFERBASEPROC)(GLenum , GLuint , GLuint );
-    typedef void (CODEGEN_FUNCPTR *PFNTRANSFORMFEEDBACKVARYINGSPROC)(GLuint , GLsizei , const GLchar* const *, GLenum );
-    typedef void (CODEGEN_FUNCPTR *PFNGETTRANSFORMFEEDBACKVARYINGPROC)(GLuint , GLuint , GLsizei , GLsizei *, GLsizei *, GLenum *, GLchar *);
-    typedef void (CODEGEN_FUNCPTR *PFNCLAMPCOLORPROC)(GLenum , GLenum );
-    typedef void (CODEGEN_FUNCPTR *PFNBEGINCONDITIONALRENDERPROC)(GLuint , GLenum );
-    typedef void (CODEGEN_FUNCPTR *PFNENDCONDITIONALRENDERPROC)();
-    typedef void (CODEGEN_FUNCPTR *PFNVERTEXATTRIBIPOINTERPROC)(GLuint , GLint , GLenum , GLsizei , const GLvoid *);
-    typedef void (CODEGEN_FUNCPTR *PFNGETVERTEXATTRIBIIVPROC)(GLuint , GLenum , GLint *);
-    typedef void (CODEGEN_FUNCPTR *PFNGETVERTEXATTRIBIUIVPROC)(GLuint , GLenum , GLuint *);
-    typedef void (CODEGEN_FUNCPTR *PFNVERTEXATTRIBI1IPROC)(GLuint , GLint );
-    typedef void (CODEGEN_FUNCPTR *PFNVERTEXATTRIBI2IPROC)(GLuint , GLint , GLint );
-    typedef void (CODEGEN_FUNCPTR *PFNVERTEXATTRIBI3IPROC)(GLuint , GLint , GLint , GLint );
-    typedef void (CODEGEN_FUNCPTR *PFNVERTEXATTRIBI4IPROC)(GLuint , GLint , GLint , GLint , GLint );
-    typedef void (CODEGEN_FUNCPTR *PFNVERTEXATTRIBI1UIPROC)(GLuint , GLuint );
-    typedef void (CODEGEN_FUNCPTR *PFNVERTEXATTRIBI2UIPROC)(GLuint , GLuint , GLuint );
-    typedef void (CODEGEN_FUNCPTR *PFNVERTEXATTRIBI3UIPROC)(GLuint , GLuint , GLuint , GLuint );
-    typedef void (CODEGEN_FUNCPTR *PFNVERTEXATTRIBI4UIPROC)(GLuint , GLuint , GLuint , GLuint , GLuint );
-    typedef void (CODEGEN_FUNCPTR *PFNVERTEXATTRIBI1IVPROC)(GLuint , const GLint *);
-    typedef void (CODEGEN_FUNCPTR *PFNVERTEXATTRIBI2IVPROC)(GLuint , const GLint *);
-    typedef void (CODEGEN_FUNCPTR *PFNVERTEXATTRIBI3IVPROC)(GLuint , const GLint *);
-    typedef void (CODEGEN_FUNCPTR *PFNVERTEXATTRIBI4IVPROC)(GLuint , const GLint *);
-    typedef void (CODEGEN_FUNCPTR *PFNVERTEXATTRIBI1UIVPROC)(GLuint , const GLuint *);
-    typedef void (CODEGEN_FUNCPTR *PFNVERTEXATTRIBI2UIVPROC)(GLuint , const GLuint *);
-    typedef void (CODEGEN_FUNCPTR *PFNVERTEXATTRIBI3UIVPROC)(GLuint , const GLuint *);
-    typedef void (CODEGEN_FUNCPTR *PFNVERTEXATTRIBI4UIVPROC)(GLuint , const GLuint *);
-    typedef void (CODEGEN_FUNCPTR *PFNVERTEXATTRIBI4BVPROC)(GLuint , const GLbyte *);
-    typedef void (CODEGEN_FUNCPTR *PFNVERTEXATTRIBI4SVPROC)(GLuint , const GLshort *);
-    typedef void (CODEGEN_FUNCPTR *PFNVERTEXATTRIBI4UBVPROC)(GLuint , const GLubyte *);
-    typedef void (CODEGEN_FUNCPTR *PFNVERTEXATTRIBI4USVPROC)(GLuint , const GLushort *);
-    typedef void (CODEGEN_FUNCPTR *PFNGETUNIFORMUIVPROC)(GLuint , GLint , GLuint *);
-    typedef void (CODEGEN_FUNCPTR *PFNBINDFRAGDATALOCATIONPROC)(GLuint , GLuint , const GLchar *);
-    typedef GLint (CODEGEN_FUNCPTR *PFNGETFRAGDATALOCATIONPROC)(GLuint , const GLchar *);
-    typedef void (CODEGEN_FUNCPTR *PFNUNIFORM1UIPROC)(GLint , GLuint );
-    typedef void (CODEGEN_FUNCPTR *PFNUNIFORM2UIPROC)(GLint , GLuint , GLuint );
-    typedef void (CODEGEN_FUNCPTR *PFNUNIFORM3UIPROC)(GLint , GLuint , GLuint , GLuint );
-    typedef void (CODEGEN_FUNCPTR *PFNUNIFORM4UIPROC)(GLint , GLuint , GLuint , GLuint , GLuint );
-    typedef void (CODEGEN_FUNCPTR *PFNUNIFORM1UIVPROC)(GLint , GLsizei , const GLuint *);
-    typedef void (CODEGEN_FUNCPTR *PFNUNIFORM2UIVPROC)(GLint , GLsizei , const GLuint *);
-    typedef void (CODEGEN_FUNCPTR *PFNUNIFORM3UIVPROC)(GLint , GLsizei , const GLuint *);
-    typedef void (CODEGEN_FUNCPTR *PFNUNIFORM4UIVPROC)(GLint , GLsizei , const GLuint *);
-    typedef void (CODEGEN_FUNCPTR *PFNTEXPARAMETERIIVPROC)(GLenum , GLenum , const GLint *);
-    typedef void (CODEGEN_FUNCPTR *PFNTEXPARAMETERIUIVPROC)(GLenum , GLenum , const GLuint *);
-    typedef void (CODEGEN_FUNCPTR *PFNGETTEXPARAMETERIIVPROC)(GLenum , GLenum , GLint *);
-    typedef void (CODEGEN_FUNCPTR *PFNGETTEXPARAMETERIUIVPROC)(GLenum , GLenum , GLuint *);
-    typedef void (CODEGEN_FUNCPTR *PFNCLEARBUFFERIVPROC)(GLenum , GLint , const GLint *);
-    typedef void (CODEGEN_FUNCPTR *PFNCLEARBUFFERUIVPROC)(GLenum , GLint , const GLuint *);
-    typedef void (CODEGEN_FUNCPTR *PFNCLEARBUFFERFVPROC)(GLenum , GLint , const GLfloat *);
-    typedef void (CODEGEN_FUNCPTR *PFNCLEARBUFFERFIPROC)(GLenum , GLint , GLfloat , GLint );
-    typedef const GLubyte * (CODEGEN_FUNCPTR *PFNGETSTRINGIPROC)(GLenum , GLuint );
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNCOLORMASKIPROC)(GLuint , GLboolean , GLboolean , GLboolean , GLboolean );
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNGETBOOLEANI_VPROC)(GLenum , GLuint , GLboolean *);
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNGETINTEGERI_VPROC)(GLenum , GLuint , GLint *);
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNENABLEIPROC)(GLenum , GLuint );
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNDISABLEIPROC)(GLenum , GLuint );
+    প্রকারলেখ GLboolean (CODEGEN_FUNCPTR *PFNISENABLEDIPROC)(GLenum , GLuint );
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNBEGINTRANSFORMFEEDBACKPROC)(GLenum );
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNENDTRANSFORMFEEDBACKPROC)();
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNBINDBUFFERRANGEPROC)(GLenum , GLuint , GLuint , GLintptr , GLsizeiptr );
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNBINDBUFFERBASEPROC)(GLenum , GLuint , GLuint );
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNTRANSFORMFEEDBACKVARYINGSPROC)(GLuint , GLsizei , ধ্রুবক GLchar* ধ্রুবক *, GLenum );
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNGETTRANSFORMFEEDBACKVARYINGPROC)(GLuint , GLuint , GLsizei , GLsizei *, GLsizei *, GLenum *, GLchar *);
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNCLAMPCOLORPROC)(GLenum , GLenum );
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNBEGINCONDITIONALRENDERPROC)(GLuint , GLenum );
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNENDCONDITIONALRENDERPROC)();
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNVERTEXATTRIBIPOINTERPROC)(GLuint , GLint , GLenum , GLsizei , ধ্রুবক GLvoid *);
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNGETVERTEXATTRIBIIVPROC)(GLuint , GLenum , GLint *);
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNGETVERTEXATTRIBIUIVPROC)(GLuint , GLenum , GLuint *);
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNVERTEXATTRIBI1IPROC)(GLuint , GLint );
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNVERTEXATTRIBI2IPROC)(GLuint , GLint , GLint );
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNVERTEXATTRIBI3IPROC)(GLuint , GLint , GLint , GLint );
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNVERTEXATTRIBI4IPROC)(GLuint , GLint , GLint , GLint , GLint );
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNVERTEXATTRIBI1UIPROC)(GLuint , GLuint );
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNVERTEXATTRIBI2UIPROC)(GLuint , GLuint , GLuint );
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNVERTEXATTRIBI3UIPROC)(GLuint , GLuint , GLuint , GLuint );
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNVERTEXATTRIBI4UIPROC)(GLuint , GLuint , GLuint , GLuint , GLuint );
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNVERTEXATTRIBI1IVPROC)(GLuint , ধ্রুবক GLint *);
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNVERTEXATTRIBI2IVPROC)(GLuint , ধ্রুবক GLint *);
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNVERTEXATTRIBI3IVPROC)(GLuint , ধ্রুবক GLint *);
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNVERTEXATTRIBI4IVPROC)(GLuint , ধ্রুবক GLint *);
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNVERTEXATTRIBI1UIVPROC)(GLuint , ধ্রুবক GLuint *);
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNVERTEXATTRIBI2UIVPROC)(GLuint , ধ্রুবক GLuint *);
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNVERTEXATTRIBI3UIVPROC)(GLuint , ধ্রুবক GLuint *);
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNVERTEXATTRIBI4UIVPROC)(GLuint , ধ্রুবক GLuint *);
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNVERTEXATTRIBI4BVPROC)(GLuint , ধ্রুবক GLbyte *);
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNVERTEXATTRIBI4SVPROC)(GLuint , ধ্রুবক GLshort *);
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNVERTEXATTRIBI4UBVPROC)(GLuint , ধ্রুবক GLubyte *);
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNVERTEXATTRIBI4USVPROC)(GLuint , ধ্রুবক GLushort *);
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNGETUNIFORMUIVPROC)(GLuint , GLint , GLuint *);
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNBINDFRAGDATALOCATIONPROC)(GLuint , GLuint , ধ্রুবক GLchar *);
+    প্রকারলেখ GLint (CODEGEN_FUNCPTR *PFNGETFRAGDATALOCATIONPROC)(GLuint , ধ্রুবক GLchar *);
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNUNIFORM1UIPROC)(GLint , GLuint );
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNUNIFORM2UIPROC)(GLint , GLuint , GLuint );
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNUNIFORM3UIPROC)(GLint , GLuint , GLuint , GLuint );
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNUNIFORM4UIPROC)(GLint , GLuint , GLuint , GLuint , GLuint );
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNUNIFORM1UIVPROC)(GLint , GLsizei , ধ্রুবক GLuint *);
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNUNIFORM2UIVPROC)(GLint , GLsizei , ধ্রুবক GLuint *);
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNUNIFORM3UIVPROC)(GLint , GLsizei , ধ্রুবক GLuint *);
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNUNIFORM4UIVPROC)(GLint , GLsizei , ধ্রুবক GLuint *);
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNTEXPARAMETERIIVPROC)(GLenum , GLenum , ধ্রুবক GLint *);
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNTEXPARAMETERIUIVPROC)(GLenum , GLenum , ধ্রুবক GLuint *);
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNGETTEXPARAMETERIIVPROC)(GLenum , GLenum , GLint *);
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNGETTEXPARAMETERIUIVPROC)(GLenum , GLenum , GLuint *);
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNCLEARBUFFERIVPROC)(GLenum , GLint , ধ্রুবক GLint *);
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNCLEARBUFFERUIVPROC)(GLenum , GLint , ধ্রুবক GLuint *);
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNCLEARBUFFERFVPROC)(GLenum , GLint , ধ্রুবক GLfloat *);
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNCLEARBUFFERFIPROC)(GLenum , GLint , GLfloat , GLint );
+    প্রকারলেখ ধ্রুবক GLubyte * (CODEGEN_FUNCPTR *PFNGETSTRINGIPROC)(GLenum , GLuint );
 
     // Extension: ARB_uniform_buffer_object
-    typedef void (CODEGEN_FUNCPTR *PFNGETUNIFORMINDICESPROC)(GLuint , GLsizei , const GLchar* const *, GLuint *);
-    typedef void (CODEGEN_FUNCPTR *PFNGETACTIVEUNIFORMSIVPROC)(GLuint , GLsizei , const GLuint *, GLenum , GLint *);
-    typedef void (CODEGEN_FUNCPTR *PFNGETACTIVEUNIFORMNAMEPROC)(GLuint , GLuint , GLsizei , GLsizei *, GLchar *);
-    typedef GLuint (CODEGEN_FUNCPTR *PFNGETUNIFORMBLOCKINDEXPROC)(GLuint , const GLchar *);
-    typedef void (CODEGEN_FUNCPTR *PFNGETACTIVEUNIFORMBLOCKIVPROC)(GLuint , GLuint , GLenum , GLint *);
-    typedef void (CODEGEN_FUNCPTR *PFNGETACTIVEUNIFORMBLOCKNAMEPROC)(GLuint , GLuint , GLsizei , GLsizei *, GLchar *);
-    typedef void (CODEGEN_FUNCPTR *PFNUNIFORMBLOCKBINDINGPROC)(GLuint , GLuint , GLuint );
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNGETUNIFORMINDICESPROC)(GLuint , GLsizei , ধ্রুবক GLchar* ধ্রুবক *, GLuint *);
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNGETACTIVEUNIFORMSIVPROC)(GLuint , GLsizei , ধ্রুবক GLuint *, GLenum , GLint *);
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNGETACTIVEUNIFORMNAMEPROC)(GLuint , GLuint , GLsizei , GLsizei *, GLchar *);
+    প্রকারলেখ GLuint (CODEGEN_FUNCPTR *PFNGETUNIFORMBLOCKINDEXPROC)(GLuint , ধ্রুবক GLchar *);
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNGETACTIVEUNIFORMBLOCKIVPROC)(GLuint , GLuint , GLenum , GLint *);
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNGETACTIVEUNIFORMBLOCKNAMEPROC)(GLuint , GLuint , GLsizei , GLsizei *, GLchar *);
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNUNIFORMBLOCKBINDINGPROC)(GLuint , GLuint , GLuint );
 
     // Extension: ARB_copy_buffer
-    typedef void (CODEGEN_FUNCPTR *PFNCOPYBUFFERSUBDATAPROC)(GLenum , GLenum , GLintptr , GLintptr , GLsizeiptr );
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNCOPYBUFFERSUBDATAPROC)(GLenum , GLenum , GLintptr , GLintptr , GLsizeiptr );
 
     // Extension: 3.1
-    typedef void (CODEGEN_FUNCPTR *PFNDRAWARRAYSINSTANCEDPROC)(GLenum , GLint , GLsizei , GLsizei );
-    typedef void (CODEGEN_FUNCPTR *PFNDRAWELEMENTSINSTANCEDPROC)(GLenum , GLsizei , GLenum , const GLvoid *, GLsizei );
-    typedef void (CODEGEN_FUNCPTR *PFNTEXBUFFERPROC)(GLenum , GLenum , GLuint );
-    typedef void (CODEGEN_FUNCPTR *PFNPRIMITIVERESTARTINDEXPROC)(GLuint );
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNDRAWARRAYSINSTANCEDPROC)(GLenum , GLint , GLsizei , GLsizei );
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNDRAWELEMENTSINSTANCEDPROC)(GLenum , GLsizei , GLenum , ধ্রুবক GLvoid *, GLsizei );
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNTEXBUFFERPROC)(GLenum , GLenum , GLuint );
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNPRIMITIVERESTARTINDEXPROC)(GLuint );
 
     // Legacy
-    typedef void (CODEGEN_FUNCPTR *PFNENABLECLIENTSTATEPROC)(GLenum );
-    typedef void (CODEGEN_FUNCPTR *PFNDISABLECLIENTSTATEPROC)(GLenum );
-    typedef void (CODEGEN_FUNCPTR *PFNVERTEXPOINTERPROC)(GLint , GLenum , GLsizei , const GLvoid *);
-    typedef void (CODEGEN_FUNCPTR *PFNNORMALPOINTERPROC)(GLenum , GLsizei , const GLvoid *);
-    typedef void (CODEGEN_FUNCPTR *PFNCOLORPOINTERPROC)(GLint , GLenum , GLsizei , const GLvoid *);
-    typedef void (CODEGEN_FUNCPTR *PFNTEXCOORDPOINTERPROC)(GLint , GLenum , GLsizei , const GLvoid *);
-    typedef void (CODEGEN_FUNCPTR *PFNTEXENVIPROC)(GLenum , GLenum , GLint );
-    typedef void (CODEGEN_FUNCPTR *PFNMATRIXMODEPROC)(GLenum );
-    typedef void (CODEGEN_FUNCPTR *PFNLOADIDENTITYPROC)(void);
-    typedef void (CODEGEN_FUNCPTR *PFNORTHOPROC)(GLdouble , GLdouble , GLdouble , GLdouble , GLdouble , GLdouble );
-    typedef void (CODEGEN_FUNCPTR *PFNCOLOR3DPROC)(GLdouble , GLdouble , GLdouble );
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNENABLECLIENTSTATEPROC)(GLenum );
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNDISABLECLIENTSTATEPROC)(GLenum );
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNVERTEXPOINTERPROC)(GLint , GLenum , GLsizei , ধ্রুবক GLvoid *);
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNNORMALPOINTERPROC)(GLenum , GLsizei , ধ্রুবক GLvoid *);
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNCOLORPOINTERPROC)(GLint , GLenum , GLsizei , ধ্রুবক GLvoid *);
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNTEXCOORDPOINTERPROC)(GLint , GLenum , GLsizei , ধ্রুবক GLvoid *);
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNTEXENVIPROC)(GLenum , GLenum , GLint );
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNMATRIXMODEPROC)(GLenum );
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNLOADIDENTITYPROC)(শূন্য);
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNORTHOPROC)(GLdouble , GLdouble , GLdouble , GLdouble , GLdouble , GLdouble );
+    প্রকারলেখ শূন্য (CODEGEN_FUNCPTR *PFNCOLOR3DPROC)(GLdouble , GLdouble , GLdouble );
 
     //////////////////////////////////////////////
     // Function pointers
@@ -468,8 +468,8 @@ namespace gl
     PFNCULLFACEPROC CullFace;
     PFNFRONTFACEPROC FrontFace;
     PFNHINTPROC Hint;
-    PFNLINEWIDTHPROC LineWidth;
-    PFNPOINTSIZEPROC PointSize;
+    PFNLINEWIDTHPROC সারি_Width;
+    PFNPOINTSIZEPROC Point_আকার;
     PFNPOLYGONMODEPROC PolygonMode;
     PFNSCISSORPROC Scissor;
     PFNTEXPARAMETERFPROC TexParameterf;
@@ -478,7 +478,7 @@ namespace gl
     PFNTEXPARAMETERIVPROC TexParameteriv;
     PFNTEXIMAGE1DPROC TexImage1D;
     PFNTEXIMAGE2DPROC TexImage2D;
-    PFNDRAWBUFFERPROC DrawBuffer;
+    PFNDRAWBUFFERPROC Draw_বাফার;
     PFNCLEARPROC Clear;
     PFNCLEARCOLORPROC ClearColor;
     PFNCLEARSTENCILPROC ClearStencil;
@@ -497,7 +497,7 @@ namespace gl
     PFNDEPTHFUNCPROC DepthFunc;
     PFNPIXELSTOREFPROC PixelStoref;
     PFNPIXELSTOREIPROC PixelStorei;
-    PFNREADBUFFERPROC ReadBuffer;
+    PFNREADBUFFERPROC Read_বাফার;
     PFNREADPIXELSPROC ReadPixels;
     PFNGETBOOLEANVPROC GetBooleanv;
     PFNGETDOUBLEVPROC GetDoublev;
@@ -566,17 +566,17 @@ namespace gl
     PFNGETQUERYIVPROC GetQueryiv;
     PFNGETQUERYOBJECTIVPROC GetQueryObjectiv;
     PFNGETQUERYOBJECTUIVPROC GetQueryObjectuiv;
-    PFNBINDBUFFERPROC BindBuffer;
+    PFNBINDBUFFERPROC Bind_বাফার;
     PFNDELETEBUFFERSPROC DeleteBuffers;
     PFNGENBUFFERSPROC GenBuffers;
-    PFNISBUFFERPROC IsBuffer;
-    PFNBUFFERDATAPROC BufferData;
-    PFNBUFFERSUBDATAPROC BufferSubData;
-    PFNGETBUFFERSUBDATAPROC GetBufferSubData;
-    PFNMAPBUFFERPROC MapBuffer;
-    PFNUNMAPBUFFERPROC UnmapBuffer;
-    PFNGETBUFFERPARAMETERIVPROC GetBufferParameteriv;
-    PFNGETBUFFERPOINTERVPROC GetBufferPointerv;
+    PFNISBUFFERPROC Is_বাফার;
+    PFNBUFFERDATAPROC বাফার_তথ্য;
+    PFNBUFFERSUBDATAPROC বাফার_Sub_তথ্য;
+    PFNGETBUFFERSUBDATAPROC Get_বাফার_Sub_তথ্য;
+    PFNMAPBUFFERPROC Map_বাফার;
+    PFNUNMAPBUFFERPROC Unmap_বাফার;
+    PFNGETBUFFERPARAMETERIVPROC Get_বাফার_Parameteriv;
+    PFNGETBUFFERPOINTERVPROC Get_বাফার_Pointerv;
 
     // Extension: 2.0
     PFNBLENDEQUATIONSEPARATEPROC BlendEquationSeparate;
@@ -652,8 +652,8 @@ namespace gl
     PFNISVERTEXARRAYPROC IsVertexArray;
 
     // Extension: ARB_map_buffer_range
-    PFNMAPBUFFERRANGEPROC MapBufferRange;
-    PFNFLUSHMAPPEDBUFFERRANGEPROC FlushMappedBufferRange;
+    PFNMAPBUFFERRANGEPROC Map_বাফার_Range;
+    PFNFLUSHMAPPEDBUFFERRANGEPROC Flush_Mapped_বাফার_Range;
 
     // Extension: ARB_framebuffer_object
     PFNISRENDERBUFFERPROC IsRenderbuffer;
@@ -686,8 +686,8 @@ namespace gl
     PFNISENABLEDIPROC IsEnabledi;
     PFNBEGINTRANSFORMFEEDBACKPROC BeginTransformFeedback;
     PFNENDTRANSFORMFEEDBACKPROC EndTransformFeedback;
-    PFNBINDBUFFERRANGEPROC BindBufferRange;
-    PFNBINDBUFFERBASEPROC BindBufferBase;
+    PFNBINDBUFFERRANGEPROC Bind_বাফার_Range;
+    PFNBINDBUFFERBASEPROC Bind_বাফার_Base;
     PFNTRANSFORMFEEDBACKVARYINGSPROC TransformFeedbackVaryings;
     PFNGETTRANSFORMFEEDBACKVARYINGPROC GetTransformFeedbackVarying;
     PFNCLAMPCOLORPROC ClampColor;
@@ -717,8 +717,8 @@ namespace gl
     PFNVERTEXATTRIBI4UBVPROC VertexAttribI4ubv;
     PFNVERTEXATTRIBI4USVPROC VertexAttribI4usv;
     PFNGETUNIFORMUIVPROC GetUniformuiv;
-    PFNBINDFRAGDATALOCATIONPROC BindFragDataLocation;
-    PFNGETFRAGDATALOCATIONPROC GetFragDataLocation;
+    PFNBINDFRAGDATALOCATIONPROC Bind_Frag_তথ্য_Location;
+    PFNGETFRAGDATALOCATIONPROC Get_Frag_তথ্য_Location;
     PFNUNIFORM1UIPROC Uniform1ui;
     PFNUNIFORM2UIPROC Uniform2ui;
     PFNUNIFORM3UIPROC Uniform3ui;
@@ -741,19 +741,19 @@ namespace gl
     PFNGETUNIFORMINDICESPROC GetUniformIndices;
     PFNGETACTIVEUNIFORMSIVPROC GetActiveUniformsiv;
     PFNGETACTIVEUNIFORMNAMEPROC GetActiveUniformName;
-    PFNGETUNIFORMBLOCKINDEXPROC GetUniformBlockIndex;
+    PFNGETUNIFORMBLOCKINDEXPROC Get_Uniform_Block_সূচক;
     PFNGETACTIVEUNIFORMBLOCKIVPROC GetActiveUniformBlockiv;
     PFNGETACTIVEUNIFORMBLOCKNAMEPROC GetActiveUniformBlockName;
     PFNUNIFORMBLOCKBINDINGPROC UniformBlockBinding;
 
     // Extension: ARB_copy_buffer
-    PFNCOPYBUFFERSUBDATAPROC CopyBufferSubData;
+    PFNCOPYBUFFERSUBDATAPROC Copy_বাফার_Sub_তথ্য;
 
     // Extension: 3.1
     PFNDRAWARRAYSINSTANCEDPROC DrawArraysInstanced;
     PFNDRAWELEMENTSINSTANCEDPROC DrawElementsInstanced;
-    PFNTEXBUFFERPROC TexBuffer;
-    PFNPRIMITIVERESTARTINDEXPROC PrimitiveRestartIndex;
+    PFNTEXBUFFERPROC Tex_বাফার;
+    PFNPRIMITIVERESTARTINDEXPROC Primitive_Restart_সূচক;
 
     // Legacy
     PFNENABLECLIENTSTATEPROC EnableClientState;
@@ -776,385 +776,385 @@ namespace gl
 
     // Extension: 1.1
 
-    static void CODEGEN_FUNCPTR Switch_CullFace(GLenum mode)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_CullFace(GLenum mode)
     {
         CullFace = (PFNCULLFACEPROC)IntGetProcAddress("glCullFace");
         CullFace(mode);
     }
 
-    static void CODEGEN_FUNCPTR Switch_FrontFace(GLenum mode)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_FrontFace(GLenum mode)
     {
         FrontFace = (PFNFRONTFACEPROC)IntGetProcAddress("glFrontFace");
         FrontFace(mode);
     }
 
-    static void CODEGEN_FUNCPTR Switch_Hint(GLenum target, GLenum mode)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_Hint(GLenum target, GLenum mode)
     {
         Hint = (PFNHINTPROC)IntGetProcAddress("glHint");
         Hint(target, mode);
     }
 
-    static void CODEGEN_FUNCPTR Switch_LineWidth(GLfloat width)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_সারি_Width(GLfloat width)
     {
-        LineWidth = (PFNLINEWIDTHPROC)IntGetProcAddress("glLineWidth");
-        LineWidth(width);
+        সারি_Width = (PFNLINEWIDTHPROC)IntGetProcAddress("glLineWidth");
+        সারি_Width(width);
     }
 
-    static void CODEGEN_FUNCPTR Switch_PointSize(GLfloat size)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_Point_আকার(GLfloat size)
     {
-        PointSize = (PFNPOINTSIZEPROC)IntGetProcAddress("glPointSize");
-        PointSize(size);
+        Point_আকার = (PFNPOINTSIZEPROC)IntGetProcAddress("glPointSize");
+        Point_আকার(size);
     }
 
-    static void CODEGEN_FUNCPTR Switch_PolygonMode(GLenum face, GLenum mode)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_PolygonMode(GLenum face, GLenum mode)
     {
         PolygonMode = (PFNPOLYGONMODEPROC)IntGetProcAddress("glPolygonMode");
         PolygonMode(face, mode);
     }
 
-    static void CODEGEN_FUNCPTR Switch_Scissor(GLint x, GLint y, GLsizei width, GLsizei height)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_Scissor(GLint x, GLint y, GLsizei width, GLsizei height)
     {
         Scissor = (PFNSCISSORPROC)IntGetProcAddress("glScissor");
         Scissor(x, y, width, height);
     }
 
-    static void CODEGEN_FUNCPTR Switch_TexParameterf(GLenum target, GLenum pname, GLfloat param)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_TexParameterf(GLenum target, GLenum pname, GLfloat param)
     {
         TexParameterf = (PFNTEXPARAMETERFPROC)IntGetProcAddress("glTexParameterf");
         TexParameterf(target, pname, param);
     }
 
-    static void CODEGEN_FUNCPTR Switch_TexParameterfv(GLenum target, GLenum pname, const GLfloat *params)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_TexParameterfv(GLenum target, GLenum pname, ধ্রুবক GLfloat *params)
     {
         TexParameterfv = (PFNTEXPARAMETERFVPROC)IntGetProcAddress("glTexParameterfv");
         TexParameterfv(target, pname, params);
     }
 
-    static void CODEGEN_FUNCPTR Switch_TexParameteri(GLenum target, GLenum pname, GLint param)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_TexParameteri(GLenum target, GLenum pname, GLint param)
     {
         TexParameteri = (PFNTEXPARAMETERIPROC)IntGetProcAddress("glTexParameteri");
         TexParameteri(target, pname, param);
     }
 
-    static void CODEGEN_FUNCPTR Switch_TexParameteriv(GLenum target, GLenum pname, const GLint *params)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_TexParameteriv(GLenum target, GLenum pname, ধ্রুবক GLint *params)
     {
         TexParameteriv = (PFNTEXPARAMETERIVPROC)IntGetProcAddress("glTexParameteriv");
         TexParameteriv(target, pname, params);
     }
 
-    static void CODEGEN_FUNCPTR Switch_TexImage1D(GLenum target, GLint level, GLint internalformat, GLsizei width, GLint border, GLenum format, GLenum type, const GLvoid *pixels)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_TexImage1D(GLenum target, GLint level, GLint internalformat, GLsizei width, GLint border, GLenum format, GLenum type, ধ্রুবক GLvoid *pixels)
     {
         TexImage1D = (PFNTEXIMAGE1DPROC)IntGetProcAddress("glTexImage1D");
         TexImage1D(target, level, internalformat, width, border, format, type, pixels);
     }
 
-    static void CODEGEN_FUNCPTR Switch_TexImage2D(GLenum target, GLint level, GLint internalformat, GLsizei width, GLsizei height, GLint border, GLenum format, GLenum type, const GLvoid *pixels)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_TexImage2D(GLenum target, GLint level, GLint internalformat, GLsizei width, GLsizei height, GLint border, GLenum format, GLenum type, ধ্রুবক GLvoid *pixels)
     {
         TexImage2D = (PFNTEXIMAGE2DPROC)IntGetProcAddress("glTexImage2D");
         TexImage2D(target, level, internalformat, width, height, border, format, type, pixels);
     }
 
-    static void CODEGEN_FUNCPTR Switch_DrawBuffer(GLenum mode)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_Draw_বাফার(GLenum mode)
     {
-        DrawBuffer = (PFNDRAWBUFFERPROC)IntGetProcAddress("glDrawBuffer");
-        DrawBuffer(mode);
+        Draw_বাফার = (PFNDRAWBUFFERPROC)IntGetProcAddress("glDrawBuffer");
+        Draw_বাফার(mode);
     }
 
-    static void CODEGEN_FUNCPTR Switch_Clear(GLbitfield mask)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_Clear(GLbitfield mask)
     {
         Clear = (PFNCLEARPROC)IntGetProcAddress("glClear");
         Clear(mask);
     }
 
-    static void CODEGEN_FUNCPTR Switch_ClearColor(GLfloat red, GLfloat green, GLfloat blue, GLfloat alpha)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_ClearColor(GLfloat red, GLfloat green, GLfloat blue, GLfloat alpha)
     {
         ClearColor = (PFNCLEARCOLORPROC)IntGetProcAddress("glClearColor");
         ClearColor(red, green, blue, alpha);
     }
 
-    static void CODEGEN_FUNCPTR Switch_ClearStencil(GLint s)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_ClearStencil(GLint s)
     {
         ClearStencil = (PFNCLEARSTENCILPROC)IntGetProcAddress("glClearStencil");
         ClearStencil(s);
     }
 
-    static void CODEGEN_FUNCPTR Switch_ClearDepth(GLdouble depth)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_ClearDepth(GLdouble depth)
     {
         ClearDepth = (PFNCLEARDEPTHPROC)IntGetProcAddress("glClearDepth");
         ClearDepth(depth);
     }
 
-    static void CODEGEN_FUNCPTR Switch_StencilMask(GLuint mask)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_StencilMask(GLuint mask)
     {
         StencilMask = (PFNSTENCILMASKPROC)IntGetProcAddress("glStencilMask");
         StencilMask(mask);
     }
 
-    static void CODEGEN_FUNCPTR Switch_ColorMask(GLboolean red, GLboolean green, GLboolean blue, GLboolean alpha)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_ColorMask(GLboolean red, GLboolean green, GLboolean blue, GLboolean alpha)
     {
         ColorMask = (PFNCOLORMASKPROC)IntGetProcAddress("glColorMask");
         ColorMask(red, green, blue, alpha);
     }
 
-    static void CODEGEN_FUNCPTR Switch_DepthMask(GLboolean flag)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_DepthMask(GLboolean flag)
     {
         DepthMask = (PFNDEPTHMASKPROC)IntGetProcAddress("glDepthMask");
         DepthMask(flag);
     }
 
-    static void CODEGEN_FUNCPTR Switch_Disable(GLenum cap)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_Disable(GLenum cap)
     {
         Disable = (PFNDISABLEPROC)IntGetProcAddress("glDisable");
         Disable(cap);
     }
 
-    static void CODEGEN_FUNCPTR Switch_Enable(GLenum cap)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_Enable(GLenum cap)
     {
         Enable = (PFNENABLEPROC)IntGetProcAddress("glEnable");
         Enable(cap);
     }
 
-    static void CODEGEN_FUNCPTR Switch_Finish()
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_Finish()
     {
         Finish = (PFNFINISHPROC)IntGetProcAddress("glFinish");
         Finish();
     }
 
-    static void CODEGEN_FUNCPTR Switch_Flush()
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_Flush()
     {
         Flush = (PFNFLUSHPROC)IntGetProcAddress("glFlush");
         Flush();
     }
 
-    static void CODEGEN_FUNCPTR Switch_BlendFunc(GLenum sfactor, GLenum dfactor)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_BlendFunc(GLenum sfactor, GLenum dfactor)
     {
         BlendFunc = (PFNBLENDFUNCPROC)IntGetProcAddress("glBlendFunc");
         BlendFunc(sfactor, dfactor);
     }
 
-    static void CODEGEN_FUNCPTR Switch_LogicOp(GLenum opcode)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_LogicOp(GLenum opcode)
     {
         LogicOp = (PFNLOGICOPPROC)IntGetProcAddress("glLogicOp");
         LogicOp(opcode);
     }
 
-    static void CODEGEN_FUNCPTR Switch_StencilFunc(GLenum func, GLint ref, GLuint mask)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_StencilFunc(GLenum func, GLint ref, GLuint mask)
     {
         StencilFunc = (PFNSTENCILFUNCPROC)IntGetProcAddress("glStencilFunc");
         StencilFunc(func, ref, mask);
     }
 
-    static void CODEGEN_FUNCPTR Switch_StencilOp(GLenum fail, GLenum zfail, GLenum zpass)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_StencilOp(GLenum fail, GLenum zfail, GLenum zpass)
     {
         StencilOp = (PFNSTENCILOPPROC)IntGetProcAddress("glStencilOp");
         StencilOp(fail, zfail, zpass);
     }
 
-    static void CODEGEN_FUNCPTR Switch_DepthFunc(GLenum func)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_DepthFunc(GLenum func)
     {
         DepthFunc = (PFNDEPTHFUNCPROC)IntGetProcAddress("glDepthFunc");
         DepthFunc(func);
     }
 
-    static void CODEGEN_FUNCPTR Switch_PixelStoref(GLenum pname, GLfloat param)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_PixelStoref(GLenum pname, GLfloat param)
     {
         PixelStoref = (PFNPIXELSTOREFPROC)IntGetProcAddress("glPixelStoref");
         PixelStoref(pname, param);
     }
 
-    static void CODEGEN_FUNCPTR Switch_PixelStorei(GLenum pname, GLint param)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_PixelStorei(GLenum pname, GLint param)
     {
         PixelStorei = (PFNPIXELSTOREIPROC)IntGetProcAddress("glPixelStorei");
         PixelStorei(pname, param);
     }
 
-    static void CODEGEN_FUNCPTR Switch_ReadBuffer(GLenum mode)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_Read_বাফার(GLenum mode)
     {
-        ReadBuffer = (PFNREADBUFFERPROC)IntGetProcAddress("glReadBuffer");
-        ReadBuffer(mode);
+        Read_বাফার = (PFNREADBUFFERPROC)IntGetProcAddress("glReadBuffer");
+        Read_বাফার(mode);
     }
 
-    static void CODEGEN_FUNCPTR Switch_ReadPixels(GLint x, GLint y, GLsizei width, GLsizei height, GLenum format, GLenum type, GLvoid *pixels)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_ReadPixels(GLint x, GLint y, GLsizei width, GLsizei height, GLenum format, GLenum type, GLvoid *pixels)
     {
         ReadPixels = (PFNREADPIXELSPROC)IntGetProcAddress("glReadPixels");
         ReadPixels(x, y, width, height, format, type, pixels);
     }
 
-    static void CODEGEN_FUNCPTR Switch_GetBooleanv(GLenum pname, GLboolean *params)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_GetBooleanv(GLenum pname, GLboolean *params)
     {
         GetBooleanv = (PFNGETBOOLEANVPROC)IntGetProcAddress("glGetBooleanv");
         GetBooleanv(pname, params);
     }
 
-    static void CODEGEN_FUNCPTR Switch_GetDoublev(GLenum pname, GLdouble *params)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_GetDoublev(GLenum pname, GLdouble *params)
     {
         GetDoublev = (PFNGETDOUBLEVPROC)IntGetProcAddress("glGetDoublev");
         GetDoublev(pname, params);
     }
 
-    static GLenum CODEGEN_FUNCPTR Switch_GetError()
+    স্থির GLenum CODEGEN_FUNCPTR Switch_GetError()
     {
         GetError = (PFNGETERRORPROC)IntGetProcAddress("glGetError");
-        return GetError();
+        ফেরত GetError();
     }
 
-    static void CODEGEN_FUNCPTR Switch_GetFloatv(GLenum pname, GLfloat *params)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_GetFloatv(GLenum pname, GLfloat *params)
     {
         GetFloatv = (PFNGETFLOATVPROC)IntGetProcAddress("glGetFloatv");
         GetFloatv(pname, params);
     }
 
-    static void CODEGEN_FUNCPTR Switch_GetIntegerv(GLenum pname, GLint *params)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_GetIntegerv(GLenum pname, GLint *params)
     {
         GetIntegerv = (PFNGETINTEGERVPROC)IntGetProcAddress("glGetIntegerv");
         GetIntegerv(pname, params);
     }
 
-    static const GLubyte * CODEGEN_FUNCPTR Switch_GetString(GLenum name)
+    স্থির ধ্রুবক GLubyte * CODEGEN_FUNCPTR Switch_GetString(GLenum name)
     {
         GetString = (PFNGETSTRINGPROC)IntGetProcAddress("glGetString");
-        return GetString(name);
+        ফেরত GetString(name);
     }
 
-    static void CODEGEN_FUNCPTR Switch_GetTexImage(GLenum target, GLint level, GLenum format, GLenum type, GLvoid *pixels)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_GetTexImage(GLenum target, GLint level, GLenum format, GLenum type, GLvoid *pixels)
     {
         GetTexImage = (PFNGETTEXIMAGEPROC)IntGetProcAddress("glGetTexImage");
         GetTexImage(target, level, format, type, pixels);
     }
 
-    static void CODEGEN_FUNCPTR Switch_GetTexParameterfv(GLenum target, GLenum pname, GLfloat *params)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_GetTexParameterfv(GLenum target, GLenum pname, GLfloat *params)
     {
         GetTexParameterfv = (PFNGETTEXPARAMETERFVPROC)IntGetProcAddress("glGetTexParameterfv");
         GetTexParameterfv(target, pname, params);
     }
 
-    static void CODEGEN_FUNCPTR Switch_GetTexParameteriv(GLenum target, GLenum pname, GLint *params)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_GetTexParameteriv(GLenum target, GLenum pname, GLint *params)
     {
         GetTexParameteriv = (PFNGETTEXPARAMETERIVPROC)IntGetProcAddress("glGetTexParameteriv");
         GetTexParameteriv(target, pname, params);
     }
 
-    static void CODEGEN_FUNCPTR Switch_GetTexLevelParameterfv(GLenum target, GLint level, GLenum pname, GLfloat *params)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_GetTexLevelParameterfv(GLenum target, GLint level, GLenum pname, GLfloat *params)
     {
         GetTexLevelParameterfv = (PFNGETTEXLEVELPARAMETERFVPROC)IntGetProcAddress("glGetTexLevelParameterfv");
         GetTexLevelParameterfv(target, level, pname, params);
     }
 
-    static void CODEGEN_FUNCPTR Switch_GetTexLevelParameteriv(GLenum target, GLint level, GLenum pname, GLint *params)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_GetTexLevelParameteriv(GLenum target, GLint level, GLenum pname, GLint *params)
     {
         GetTexLevelParameteriv = (PFNGETTEXLEVELPARAMETERIVPROC)IntGetProcAddress("glGetTexLevelParameteriv");
         GetTexLevelParameteriv(target, level, pname, params);
     }
 
-    static GLboolean CODEGEN_FUNCPTR Switch_IsEnabled(GLenum cap)
+    স্থির GLboolean CODEGEN_FUNCPTR Switch_IsEnabled(GLenum cap)
     {
         IsEnabled = (PFNISENABLEDPROC)IntGetProcAddress("glIsEnabled");
-        return IsEnabled(cap);
+        ফেরত IsEnabled(cap);
     }
 
-    static void CODEGEN_FUNCPTR Switch_DepthRange(GLdouble ren_near, GLdouble ren_far)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_DepthRange(GLdouble ren_near, GLdouble ren_far)
     {
         DepthRange = (PFNDEPTHRANGEPROC)IntGetProcAddress("glDepthRange");
         DepthRange(ren_near, ren_far);
     }
 
-    static void CODEGEN_FUNCPTR Switch_Viewport(GLint x, GLint y, GLsizei width, GLsizei height)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_Viewport(GLint x, GLint y, GLsizei width, GLsizei height)
     {
         Viewport = (PFNVIEWPORTPROC)IntGetProcAddress("glViewport");
         Viewport(x, y, width, height);
     }
 
-    static void CODEGEN_FUNCPTR Switch_DrawArrays(GLenum mode, GLint first, GLsizei count)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_DrawArrays(GLenum mode, GLint first, GLsizei গুনতি_2)
     {
         DrawArrays = (PFNDRAWARRAYSPROC)IntGetProcAddress("glDrawArrays");
-        DrawArrays(mode, first, count);
+        DrawArrays(mode, first, গুনতি_2);
     }
 
-    static void CODEGEN_FUNCPTR Switch_DrawElements(GLenum mode, GLsizei count, GLenum type, const GLvoid *indices)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_DrawElements(GLenum mode, GLsizei গুনতি_2, GLenum type, ধ্রুবক GLvoid *indices)
     {
         DrawElements = (PFNDRAWELEMENTSPROC)IntGetProcAddress("glDrawElements");
-        DrawElements(mode, count, type, indices);
+        DrawElements(mode, গুনতি_2, type, indices);
     }
 
-    static void CODEGEN_FUNCPTR Switch_GetPointerv(GLenum pname, GLvoid* *params)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_GetPointerv(GLenum pname, GLvoid* *params)
     {
         GetPointerv = (PFNGETPOINTERVPROC)IntGetProcAddress("glGetPointerv");
         GetPointerv(pname, params);
     }
 
-    static void CODEGEN_FUNCPTR Switch_PolygonOffset(GLfloat factor, GLfloat units)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_PolygonOffset(GLfloat factor, GLfloat units)
     {
         PolygonOffset = (PFNPOLYGONOFFSETPROC)IntGetProcAddress("glPolygonOffset");
         PolygonOffset(factor, units);
     }
 
-    static void CODEGEN_FUNCPTR Switch_CopyTexImage1D(GLenum target, GLint level, GLenum internalformat, GLint x, GLint y, GLsizei width, GLint border)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_CopyTexImage1D(GLenum target, GLint level, GLenum internalformat, GLint x, GLint y, GLsizei width, GLint border)
     {
         CopyTexImage1D = (PFNCOPYTEXIMAGE1DPROC)IntGetProcAddress("glCopyTexImage1D");
         CopyTexImage1D(target, level, internalformat, x, y, width, border);
     }
 
-    static void CODEGEN_FUNCPTR Switch_CopyTexImage2D(GLenum target, GLint level, GLenum internalformat, GLint x, GLint y, GLsizei width, GLsizei height, GLint border)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_CopyTexImage2D(GLenum target, GLint level, GLenum internalformat, GLint x, GLint y, GLsizei width, GLsizei height, GLint border)
     {
         CopyTexImage2D = (PFNCOPYTEXIMAGE2DPROC)IntGetProcAddress("glCopyTexImage2D");
         CopyTexImage2D(target, level, internalformat, x, y, width, height, border);
     }
 
-    static void CODEGEN_FUNCPTR Switch_CopyTexSubImage1D(GLenum target, GLint level, GLint xoffset, GLint x, GLint y, GLsizei width)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_CopyTexSubImage1D(GLenum target, GLint level, GLint xoffset, GLint x, GLint y, GLsizei width)
     {
         CopyTexSubImage1D = (PFNCOPYTEXSUBIMAGE1DPROC)IntGetProcAddress("glCopyTexSubImage1D");
         CopyTexSubImage1D(target, level, xoffset, x, y, width);
     }
 
-    static void CODEGEN_FUNCPTR Switch_CopyTexSubImage2D(GLenum target, GLint level, GLint xoffset, GLint yoffset, GLint x, GLint y, GLsizei width, GLsizei height)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_CopyTexSubImage2D(GLenum target, GLint level, GLint xoffset, GLint yoffset, GLint x, GLint y, GLsizei width, GLsizei height)
     {
         CopyTexSubImage2D = (PFNCOPYTEXSUBIMAGE2DPROC)IntGetProcAddress("glCopyTexSubImage2D");
         CopyTexSubImage2D(target, level, xoffset, yoffset, x, y, width, height);
     }
 
-    static void CODEGEN_FUNCPTR Switch_TexSubImage1D(GLenum target, GLint level, GLint xoffset, GLsizei width, GLenum format, GLenum type, const GLvoid *pixels)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_TexSubImage1D(GLenum target, GLint level, GLint xoffset, GLsizei width, GLenum format, GLenum type, ধ্রুবক GLvoid *pixels)
     {
         TexSubImage1D = (PFNTEXSUBIMAGE1DPROC)IntGetProcAddress("glTexSubImage1D");
         TexSubImage1D(target, level, xoffset, width, format, type, pixels);
     }
 
-    static void CODEGEN_FUNCPTR Switch_TexSubImage2D(GLenum target, GLint level, GLint xoffset, GLint yoffset, GLsizei width, GLsizei height, GLenum format, GLenum type, const GLvoid *pixels)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_TexSubImage2D(GLenum target, GLint level, GLint xoffset, GLint yoffset, GLsizei width, GLsizei height, GLenum format, GLenum type, ধ্রুবক GLvoid *pixels)
     {
         TexSubImage2D = (PFNTEXSUBIMAGE2DPROC)IntGetProcAddress("glTexSubImage2D");
         TexSubImage2D(target, level, xoffset, yoffset, width, height, format, type, pixels);
     }
 
-    static void CODEGEN_FUNCPTR Switch_BindTexture(GLenum target, GLuint texture)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_BindTexture(GLenum target, GLuint texture)
     {
         BindTexture = (PFNBINDTEXTUREPROC)IntGetProcAddress("glBindTexture");
         BindTexture(target, texture);
     }
 
-    static void CODEGEN_FUNCPTR Switch_DeleteTextures(GLsizei n, const GLuint *textures)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_DeleteTextures(GLsizei n, ধ্রুবক GLuint *textures)
     {
         DeleteTextures = (PFNDELETETEXTURESPROC)IntGetProcAddress("glDeleteTextures");
         DeleteTextures(n, textures);
     }
 
-    static void CODEGEN_FUNCPTR Switch_GenTextures(GLsizei n, GLuint *textures)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_GenTextures(GLsizei n, GLuint *textures)
     {
         GenTextures = (PFNGENTEXTURESPROC)IntGetProcAddress("glGenTextures");
         GenTextures(n, textures);
     }
 
-    static GLboolean CODEGEN_FUNCPTR Switch_IsTexture(GLuint texture)
+    স্থির GLboolean CODEGEN_FUNCPTR Switch_IsTexture(GLuint texture)
     {
         IsTexture = (PFNISTEXTUREPROC)IntGetProcAddress("glIsTexture");
-        return IsTexture(texture);
+        ফেরত IsTexture(texture);
     }
 
-    static void CODEGEN_FUNCPTR Switch_Indexub(GLubyte c)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_Indexub(GLubyte c)
     {
         Indexub = (PFNINDEXUBPROC)IntGetProcAddress("glIndexub");
         Indexub(c);
     }
 
-    static void CODEGEN_FUNCPTR Switch_Indexubv(const GLubyte *c)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_Indexubv(ধ্রুবক GLubyte *c)
     {
         Indexubv = (PFNINDEXUBVPROC)IntGetProcAddress("glIndexubv");
         Indexubv(c);
@@ -1162,31 +1162,31 @@ namespace gl
 
     // Extension: 1.2
 
-    static void CODEGEN_FUNCPTR Switch_BlendColor(GLfloat red, GLfloat green, GLfloat blue, GLfloat alpha)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_BlendColor(GLfloat red, GLfloat green, GLfloat blue, GLfloat alpha)
     {
         BlendColor = (PFNBLENDCOLORPROC)IntGetProcAddress("glBlendColor");
         BlendColor(red, green, blue, alpha);
     }
 
-    static void CODEGEN_FUNCPTR Switch_BlendEquation(GLenum mode)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_BlendEquation(GLenum mode)
     {
         BlendEquation = (PFNBLENDEQUATIONPROC)IntGetProcAddress("glBlendEquation");
         BlendEquation(mode);
     }
 
-    static void CODEGEN_FUNCPTR Switch_DrawRangeElements(GLenum mode, GLuint start, GLuint end, GLsizei count, GLenum type, const GLvoid *indices)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_DrawRangeElements(GLenum mode, GLuint start, GLuint end, GLsizei গুনতি_2, GLenum type, ধ্রুবক GLvoid *indices)
     {
         DrawRangeElements = (PFNDRAWRANGEELEMENTSPROC)IntGetProcAddress("glDrawRangeElements");
-        DrawRangeElements(mode, start, end, count, type, indices);
+        DrawRangeElements(mode, start, end, গুনতি_2, type, indices);
     }
 
-    static void CODEGEN_FUNCPTR Switch_TexSubImage3D(GLenum target, GLint level, GLint xoffset, GLint yoffset, GLint zoffset, GLsizei width, GLsizei height, GLsizei depth, GLenum format, GLenum type, const GLvoid *pixels)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_TexSubImage3D(GLenum target, GLint level, GLint xoffset, GLint yoffset, GLint zoffset, GLsizei width, GLsizei height, GLsizei depth, GLenum format, GLenum type, ধ্রুবক GLvoid *pixels)
     {
         TexSubImage3D = (PFNTEXSUBIMAGE3DPROC)IntGetProcAddress("glTexSubImage3D");
         TexSubImage3D(target, level, xoffset, yoffset, zoffset, width, height, depth, format, type, pixels);
     }
 
-    static void CODEGEN_FUNCPTR Switch_CopyTexSubImage3D(GLenum target, GLint level, GLint xoffset, GLint yoffset, GLint zoffset, GLint x, GLint y, GLsizei width, GLsizei height)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_CopyTexSubImage3D(GLenum target, GLint level, GLint xoffset, GLint yoffset, GLint zoffset, GLint x, GLint y, GLsizei width, GLsizei height)
     {
         CopyTexSubImage3D = (PFNCOPYTEXSUBIMAGE3DPROC)IntGetProcAddress("glCopyTexSubImage3D");
         CopyTexSubImage3D(target, level, xoffset, yoffset, zoffset, x, y, width, height);
@@ -1194,55 +1194,55 @@ namespace gl
 
     // Extension: 1.3
 
-    static void CODEGEN_FUNCPTR Switch_ActiveTexture(GLenum texture)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_ActiveTexture(GLenum texture)
     {
         ActiveTexture = (PFNACTIVETEXTUREPROC)IntGetProcAddress("glActiveTexture");
         ActiveTexture(texture);
     }
 
-    static void CODEGEN_FUNCPTR Switch_SampleCoverage(GLfloat value, GLboolean invert)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_SampleCoverage(GLfloat value, GLboolean invert)
     {
         SampleCoverage = (PFNSAMPLECOVERAGEPROC)IntGetProcAddress("glSampleCoverage");
         SampleCoverage(value, invert);
     }
 
-    static void CODEGEN_FUNCPTR Switch_CompressedTexImage3D(GLenum target, GLint level, GLenum internalformat, GLsizei width, GLsizei height, GLsizei depth, GLint border, GLsizei imageSize, const GLvoid *data)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_CompressedTexImage3D(GLenum target, GLint level, GLenum internalformat, GLsizei width, GLsizei height, GLsizei depth, GLint border, GLsizei image_আকার, ধ্রুবক GLvoid *তথ্য)
     {
         CompressedTexImage3D = (PFNCOMPRESSEDTEXIMAGE3DPROC)IntGetProcAddress("glCompressedTexImage3D");
-        CompressedTexImage3D(target, level, internalformat, width, height, depth, border, imageSize, data);
+        CompressedTexImage3D(target, level, internalformat, width, height, depth, border, image_আকার, তথ্য);
     }
 
-    static void CODEGEN_FUNCPTR Switch_CompressedTexImage2D(GLenum target, GLint level, GLenum internalformat, GLsizei width, GLsizei height, GLint border, GLsizei imageSize, const GLvoid *data)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_CompressedTexImage2D(GLenum target, GLint level, GLenum internalformat, GLsizei width, GLsizei height, GLint border, GLsizei image_আকার, ধ্রুবক GLvoid *তথ্য)
     {
         CompressedTexImage2D = (PFNCOMPRESSEDTEXIMAGE2DPROC)IntGetProcAddress("glCompressedTexImage2D");
-        CompressedTexImage2D(target, level, internalformat, width, height, border, imageSize, data);
+        CompressedTexImage2D(target, level, internalformat, width, height, border, image_আকার, তথ্য);
     }
 
-    static void CODEGEN_FUNCPTR Switch_CompressedTexImage1D(GLenum target, GLint level, GLenum internalformat, GLsizei width, GLint border, GLsizei imageSize, const GLvoid *data)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_CompressedTexImage1D(GLenum target, GLint level, GLenum internalformat, GLsizei width, GLint border, GLsizei image_আকার, ধ্রুবক GLvoid *তথ্য)
     {
         CompressedTexImage1D = (PFNCOMPRESSEDTEXIMAGE1DPROC)IntGetProcAddress("glCompressedTexImage1D");
-        CompressedTexImage1D(target, level, internalformat, width, border, imageSize, data);
+        CompressedTexImage1D(target, level, internalformat, width, border, image_আকার, তথ্য);
     }
 
-    static void CODEGEN_FUNCPTR Switch_CompressedTexSubImage3D(GLenum target, GLint level, GLint xoffset, GLint yoffset, GLint zoffset, GLsizei width, GLsizei height, GLsizei depth, GLenum format, GLsizei imageSize, const GLvoid *data)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_CompressedTexSubImage3D(GLenum target, GLint level, GLint xoffset, GLint yoffset, GLint zoffset, GLsizei width, GLsizei height, GLsizei depth, GLenum format, GLsizei image_আকার, ধ্রুবক GLvoid *তথ্য)
     {
         CompressedTexSubImage3D = (PFNCOMPRESSEDTEXSUBIMAGE3DPROC)IntGetProcAddress("glCompressedTexSubImage3D");
-        CompressedTexSubImage3D(target, level, xoffset, yoffset, zoffset, width, height, depth, format, imageSize, data);
+        CompressedTexSubImage3D(target, level, xoffset, yoffset, zoffset, width, height, depth, format, image_আকার, তথ্য);
     }
 
-    static void CODEGEN_FUNCPTR Switch_CompressedTexSubImage2D(GLenum target, GLint level, GLint xoffset, GLint yoffset, GLsizei width, GLsizei height, GLenum format, GLsizei imageSize, const GLvoid *data)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_CompressedTexSubImage2D(GLenum target, GLint level, GLint xoffset, GLint yoffset, GLsizei width, GLsizei height, GLenum format, GLsizei image_আকার, ধ্রুবক GLvoid *তথ্য)
     {
         CompressedTexSubImage2D = (PFNCOMPRESSEDTEXSUBIMAGE2DPROC)IntGetProcAddress("glCompressedTexSubImage2D");
-        CompressedTexSubImage2D(target, level, xoffset, yoffset, width, height, format, imageSize, data);
+        CompressedTexSubImage2D(target, level, xoffset, yoffset, width, height, format, image_আকার, তথ্য);
     }
 
-    static void CODEGEN_FUNCPTR Switch_CompressedTexSubImage1D(GLenum target, GLint level, GLint xoffset, GLsizei width, GLenum format, GLsizei imageSize, const GLvoid *data)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_CompressedTexSubImage1D(GLenum target, GLint level, GLint xoffset, GLsizei width, GLenum format, GLsizei image_আকার, ধ্রুবক GLvoid *তথ্য)
     {
         CompressedTexSubImage1D = (PFNCOMPRESSEDTEXSUBIMAGE1DPROC)IntGetProcAddress("glCompressedTexSubImage1D");
-        CompressedTexSubImage1D(target, level, xoffset, width, format, imageSize, data);
+        CompressedTexSubImage1D(target, level, xoffset, width, format, image_আকার, তথ্য);
     }
 
-    static void CODEGEN_FUNCPTR Switch_GetCompressedTexImage(GLenum target, GLint level, GLvoid *img)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_GetCompressedTexImage(GLenum target, GLint level, GLvoid *img)
     {
         GetCompressedTexImage = (PFNGETCOMPRESSEDTEXIMAGEPROC)IntGetProcAddress("glGetCompressedTexImage");
         GetCompressedTexImage(target, level, img);
@@ -1250,43 +1250,43 @@ namespace gl
 
     // Extension: 1.4
 
-    static void CODEGEN_FUNCPTR Switch_BlendFuncSeparate(GLenum sfactorRGB, GLenum dfactorRGB, GLenum sfactorAlpha, GLenum dfactorAlpha)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_BlendFuncSeparate(GLenum sfactorRGB, GLenum dfactorRGB, GLenum sfactorAlpha, GLenum dfactorAlpha)
     {
         BlendFuncSeparate = (PFNBLENDFUNCSEPARATEPROC)IntGetProcAddress("glBlendFuncSeparate");
         BlendFuncSeparate(sfactorRGB, dfactorRGB, sfactorAlpha, dfactorAlpha);
     }
 
-    static void CODEGEN_FUNCPTR Switch_MultiDrawArrays(GLenum mode, const GLint *first, const GLsizei *count, GLsizei drawcount)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_MultiDrawArrays(GLenum mode, ধ্রুবক GLint *first, ধ্রুবক GLsizei *গুনতি_2, GLsizei drawcount)
     {
         MultiDrawArrays = (PFNMULTIDRAWARRAYSPROC)IntGetProcAddress("glMultiDrawArrays");
-        MultiDrawArrays(mode, first, count, drawcount);
+        MultiDrawArrays(mode, first, গুনতি_2, drawcount);
     }
 
-    static void CODEGEN_FUNCPTR Switch_MultiDrawElements(GLenum mode, const GLsizei *count, GLenum type, const GLvoid* const *indices, GLsizei drawcount)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_MultiDrawElements(GLenum mode, ধ্রুবক GLsizei *গুনতি_2, GLenum type, ধ্রুবক GLvoid* ধ্রুবক *indices, GLsizei drawcount)
     {
         MultiDrawElements = (PFNMULTIDRAWELEMENTSPROC)IntGetProcAddress("glMultiDrawElements");
-        MultiDrawElements(mode, count, type, indices, drawcount);
+        MultiDrawElements(mode, গুনতি_2, type, indices, drawcount);
     }
 
-    static void CODEGEN_FUNCPTR Switch_PointParameterf(GLenum pname, GLfloat param)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_PointParameterf(GLenum pname, GLfloat param)
     {
         PointParameterf = (PFNPOINTPARAMETERFPROC)IntGetProcAddress("glPointParameterf");
         PointParameterf(pname, param);
     }
 
-    static void CODEGEN_FUNCPTR Switch_PointParameterfv(GLenum pname, const GLfloat *params)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_PointParameterfv(GLenum pname, ধ্রুবক GLfloat *params)
     {
         PointParameterfv = (PFNPOINTPARAMETERFVPROC)IntGetProcAddress("glPointParameterfv");
         PointParameterfv(pname, params);
     }
 
-    static void CODEGEN_FUNCPTR Switch_PointParameteri(GLenum pname, GLint param)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_PointParameteri(GLenum pname, GLint param)
     {
         PointParameteri = (PFNPOINTPARAMETERIPROC)IntGetProcAddress("glPointParameteri");
         PointParameteri(pname, param);
     }
 
-    static void CODEGEN_FUNCPTR Switch_PointParameteriv(GLenum pname, const GLint *params)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_PointParameteriv(GLenum pname, ধ্রুবক GLint *params)
     {
         PointParameteriv = (PFNPOINTPARAMETERIVPROC)IntGetProcAddress("glPointParameteriv");
         PointParameteriv(pname, params);
@@ -1294,659 +1294,659 @@ namespace gl
 
     // Extension: 1.5
 
-    static void CODEGEN_FUNCPTR Switch_GenQueries(GLsizei n, GLuint *ids)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_GenQueries(GLsizei n, GLuint *ids)
     {
         GenQueries = (PFNGENQUERIESPROC)IntGetProcAddress("glGenQueries");
         GenQueries(n, ids);
     }
 
-    static void CODEGEN_FUNCPTR Switch_DeleteQueries(GLsizei n, const GLuint *ids)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_DeleteQueries(GLsizei n, ধ্রুবক GLuint *ids)
     {
         DeleteQueries = (PFNDELETEQUERIESPROC)IntGetProcAddress("glDeleteQueries");
         DeleteQueries(n, ids);
     }
 
-    static GLboolean CODEGEN_FUNCPTR Switch_IsQuery(GLuint id)
+    স্থির GLboolean CODEGEN_FUNCPTR Switch_IsQuery(GLuint id)
     {
         IsQuery = (PFNISQUERYPROC)IntGetProcAddress("glIsQuery");
-        return IsQuery(id);
+        ফেরত IsQuery(id);
     }
 
-    static void CODEGEN_FUNCPTR Switch_BeginQuery(GLenum target, GLuint id)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_BeginQuery(GLenum target, GLuint id)
     {
         BeginQuery = (PFNBEGINQUERYPROC)IntGetProcAddress("glBeginQuery");
         BeginQuery(target, id);
     }
 
-    static void CODEGEN_FUNCPTR Switch_EndQuery(GLenum target)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_EndQuery(GLenum target)
     {
         EndQuery = (PFNENDQUERYPROC)IntGetProcAddress("glEndQuery");
         EndQuery(target);
     }
 
-    static void CODEGEN_FUNCPTR Switch_GetQueryiv(GLenum target, GLenum pname, GLint *params)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_GetQueryiv(GLenum target, GLenum pname, GLint *params)
     {
         GetQueryiv = (PFNGETQUERYIVPROC)IntGetProcAddress("glGetQueryiv");
         GetQueryiv(target, pname, params);
     }
 
-    static void CODEGEN_FUNCPTR Switch_GetQueryObjectiv(GLuint id, GLenum pname, GLint *params)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_GetQueryObjectiv(GLuint id, GLenum pname, GLint *params)
     {
         GetQueryObjectiv = (PFNGETQUERYOBJECTIVPROC)IntGetProcAddress("glGetQueryObjectiv");
         GetQueryObjectiv(id, pname, params);
     }
 
-    static void CODEGEN_FUNCPTR Switch_GetQueryObjectuiv(GLuint id, GLenum pname, GLuint *params)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_GetQueryObjectuiv(GLuint id, GLenum pname, GLuint *params)
     {
         GetQueryObjectuiv = (PFNGETQUERYOBJECTUIVPROC)IntGetProcAddress("glGetQueryObjectuiv");
         GetQueryObjectuiv(id, pname, params);
     }
 
-    static void CODEGEN_FUNCPTR Switch_BindBuffer(GLenum target, GLuint buffer)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_Bind_বাফার(GLenum target, GLuint বাফার)
     {
-        BindBuffer = (PFNBINDBUFFERPROC)IntGetProcAddress("glBindBuffer");
-        BindBuffer(target, buffer);
+        Bind_বাফার = (PFNBINDBUFFERPROC)IntGetProcAddress("glBindBuffer");
+        Bind_বাফার(target, বাফার);
     }
 
-    static void CODEGEN_FUNCPTR Switch_DeleteBuffers(GLsizei n, const GLuint *buffers)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_DeleteBuffers(GLsizei n, ধ্রুবক GLuint *buffers)
     {
         DeleteBuffers = (PFNDELETEBUFFERSPROC)IntGetProcAddress("glDeleteBuffers");
         DeleteBuffers(n, buffers);
     }
 
-    static void CODEGEN_FUNCPTR Switch_GenBuffers(GLsizei n, GLuint *buffers)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_GenBuffers(GLsizei n, GLuint *buffers)
     {
         GenBuffers = (PFNGENBUFFERSPROC)IntGetProcAddress("glGenBuffers");
         GenBuffers(n, buffers);
     }
 
-    static GLboolean CODEGEN_FUNCPTR Switch_IsBuffer(GLuint buffer)
+    স্থির GLboolean CODEGEN_FUNCPTR Switch_Is_বাফার(GLuint বাফার)
     {
-        IsBuffer = (PFNISBUFFERPROC)IntGetProcAddress("glIsBuffer");
-        return IsBuffer(buffer);
+        Is_বাফার = (PFNISBUFFERPROC)IntGetProcAddress("glIsBuffer");
+        ফেরত Is_বাফার(বাফার);
     }
 
-    static void CODEGEN_FUNCPTR Switch_BufferData(GLenum target, GLsizeiptr size, const GLvoid *data, GLenum usage)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_বাফার_তথ্য(GLenum target, GLsizeiptr size, ধ্রুবক GLvoid *তথ্য, GLenum usage)
     {
-        BufferData = (PFNBUFFERDATAPROC)IntGetProcAddress("glBufferData");
-        BufferData(target, size, data, usage);
+        বাফার_তথ্য = (PFNBUFFERDATAPROC)IntGetProcAddress("glBufferData");
+        বাফার_তথ্য(target, size, তথ্য, usage);
     }
 
-    static void CODEGEN_FUNCPTR Switch_BufferSubData(GLenum target, GLintptr offset, GLsizeiptr size, const GLvoid *data)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_বাফার_Sub_তথ্য(GLenum target, GLintptr offset, GLsizeiptr size, ধ্রুবক GLvoid *তথ্য)
     {
-        BufferSubData = (PFNBUFFERSUBDATAPROC)IntGetProcAddress("glBufferSubData");
-        BufferSubData(target, offset, size, data);
+        বাফার_Sub_তথ্য = (PFNBUFFERSUBDATAPROC)IntGetProcAddress("glBufferSubData");
+        বাফার_Sub_তথ্য(target, offset, size, তথ্য);
     }
 
-    static void CODEGEN_FUNCPTR Switch_GetBufferSubData(GLenum target, GLintptr offset, GLsizeiptr size, GLvoid *data)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_Get_বাফার_Sub_তথ্য(GLenum target, GLintptr offset, GLsizeiptr size, GLvoid *তথ্য)
     {
-        GetBufferSubData = (PFNGETBUFFERSUBDATAPROC)IntGetProcAddress("glGetBufferSubData");
-        GetBufferSubData(target, offset, size, data);
+        Get_বাফার_Sub_তথ্য = (PFNGETBUFFERSUBDATAPROC)IntGetProcAddress("glGetBufferSubData");
+        Get_বাফার_Sub_তথ্য(target, offset, size, তথ্য);
     }
 
-    static GLvoid* CODEGEN_FUNCPTR Switch_MapBuffer(GLenum target, GLenum access)
+    স্থির GLvoid* CODEGEN_FUNCPTR Switch_Map_বাফার(GLenum target, GLenum access)
     {
-        MapBuffer = (PFNMAPBUFFERPROC)IntGetProcAddress("glMapBuffer");
-        return MapBuffer(target, access);
+        Map_বাফার = (PFNMAPBUFFERPROC)IntGetProcAddress("glMapBuffer");
+        ফেরত Map_বাফার(target, access);
     }
 
-    static GLboolean CODEGEN_FUNCPTR Switch_UnmapBuffer(GLenum target)
+    স্থির GLboolean CODEGEN_FUNCPTR Switch_Unmap_বাফার(GLenum target)
     {
-        UnmapBuffer = (PFNUNMAPBUFFERPROC)IntGetProcAddress("glUnmapBuffer");
-        return UnmapBuffer(target);
+        Unmap_বাফার = (PFNUNMAPBUFFERPROC)IntGetProcAddress("glUnmapBuffer");
+        ফেরত Unmap_বাফার(target);
     }
 
-    static void CODEGEN_FUNCPTR Switch_GetBufferParameteriv(GLenum target, GLenum pname, GLint *params)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_Get_বাফার_Parameteriv(GLenum target, GLenum pname, GLint *params)
     {
-        GetBufferParameteriv = (PFNGETBUFFERPARAMETERIVPROC)IntGetProcAddress("glGetBufferParameteriv");
-        GetBufferParameteriv(target, pname, params);
+        Get_বাফার_Parameteriv = (PFNGETBUFFERPARAMETERIVPROC)IntGetProcAddress("glGetBufferParameteriv");
+        Get_বাফার_Parameteriv(target, pname, params);
     }
 
-    static void CODEGEN_FUNCPTR Switch_GetBufferPointerv(GLenum target, GLenum pname, GLvoid* *params)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_Get_বাফার_Pointerv(GLenum target, GLenum pname, GLvoid* *params)
     {
-        GetBufferPointerv = (PFNGETBUFFERPOINTERVPROC)IntGetProcAddress("glGetBufferPointerv");
-        GetBufferPointerv(target, pname, params);
+        Get_বাফার_Pointerv = (PFNGETBUFFERPOINTERVPROC)IntGetProcAddress("glGetBufferPointerv");
+        Get_বাফার_Pointerv(target, pname, params);
     }
 
     // Extension: 2.0
 
-    static void CODEGEN_FUNCPTR Switch_BlendEquationSeparate(GLenum modeRGB, GLenum modeAlpha)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_BlendEquationSeparate(GLenum modeRGB, GLenum modeAlpha)
     {
         BlendEquationSeparate = (PFNBLENDEQUATIONSEPARATEPROC)IntGetProcAddress("glBlendEquationSeparate");
         BlendEquationSeparate(modeRGB, modeAlpha);
     }
 
-    static void CODEGEN_FUNCPTR Switch_DrawBuffers(GLsizei n, const GLenum *bufs)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_DrawBuffers(GLsizei n, ধ্রুবক GLenum *bufs)
     {
         DrawBuffers = (PFNDRAWBUFFERSPROC)IntGetProcAddress("glDrawBuffers");
         DrawBuffers(n, bufs);
     }
 
-    static void CODEGEN_FUNCPTR Switch_StencilOpSeparate(GLenum face, GLenum sfail, GLenum dpfail, GLenum dppass)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_StencilOpSeparate(GLenum face, GLenum sfail, GLenum dpfail, GLenum dppass)
     {
         StencilOpSeparate = (PFNSTENCILOPSEPARATEPROC)IntGetProcAddress("glStencilOpSeparate");
         StencilOpSeparate(face, sfail, dpfail, dppass);
     }
 
-    static void CODEGEN_FUNCPTR Switch_StencilFuncSeparate(GLenum face, GLenum func, GLint ref, GLuint mask)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_StencilFuncSeparate(GLenum face, GLenum func, GLint ref, GLuint mask)
     {
         StencilFuncSeparate = (PFNSTENCILFUNCSEPARATEPROC)IntGetProcAddress("glStencilFuncSeparate");
         StencilFuncSeparate(face, func, ref, mask);
     }
 
-    static void CODEGEN_FUNCPTR Switch_StencilMaskSeparate(GLenum face, GLuint mask)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_StencilMaskSeparate(GLenum face, GLuint mask)
     {
         StencilMaskSeparate = (PFNSTENCILMASKSEPARATEPROC)IntGetProcAddress("glStencilMaskSeparate");
         StencilMaskSeparate(face, mask);
     }
 
-    static void CODEGEN_FUNCPTR Switch_AttachShader(GLuint program, GLuint shader)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_AttachShader(GLuint program, GLuint shader)
     {
         AttachShader = (PFNATTACHSHADERPROC)IntGetProcAddress("glAttachShader");
         AttachShader(program, shader);
     }
 
-    static void CODEGEN_FUNCPTR Switch_BindAttribLocation(GLuint program, GLuint index, const GLchar *name)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_BindAttribLocation(GLuint program, GLuint সূচক, ধ্রুবক GLchar *name)
     {
         BindAttribLocation = (PFNBINDATTRIBLOCATIONPROC)IntGetProcAddress("glBindAttribLocation");
-        BindAttribLocation(program, index, name);
+        BindAttribLocation(program, সূচক, name);
     }
 
-    static void CODEGEN_FUNCPTR Switch_CompileShader(GLuint shader)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_CompileShader(GLuint shader)
     {
         CompileShader = (PFNCOMPILESHADERPROC)IntGetProcAddress("glCompileShader");
         CompileShader(shader);
     }
 
-    static GLuint CODEGEN_FUNCPTR Switch_CreateProgram()
+    স্থির GLuint CODEGEN_FUNCPTR Switch_CreateProgram()
     {
         CreateProgram = (PFNCREATEPROGRAMPROC)IntGetProcAddress("glCreateProgram");
-        return CreateProgram();
+        ফেরত CreateProgram();
     }
 
-    static GLuint CODEGEN_FUNCPTR Switch_CreateShader(GLenum type)
+    স্থির GLuint CODEGEN_FUNCPTR Switch_CreateShader(GLenum type)
     {
         CreateShader = (PFNCREATESHADERPROC)IntGetProcAddress("glCreateShader");
-        return CreateShader(type);
+        ফেরত CreateShader(type);
     }
 
-    static void CODEGEN_FUNCPTR Switch_DeleteProgram(GLuint program)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_DeleteProgram(GLuint program)
     {
         DeleteProgram = (PFNDELETEPROGRAMPROC)IntGetProcAddress("glDeleteProgram");
         DeleteProgram(program);
     }
 
-    static void CODEGEN_FUNCPTR Switch_DeleteShader(GLuint shader)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_DeleteShader(GLuint shader)
     {
         DeleteShader = (PFNDELETESHADERPROC)IntGetProcAddress("glDeleteShader");
         DeleteShader(shader);
     }
 
-    static void CODEGEN_FUNCPTR Switch_DetachShader(GLuint program, GLuint shader)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_DetachShader(GLuint program, GLuint shader)
     {
         DetachShader = (PFNDETACHSHADERPROC)IntGetProcAddress("glDetachShader");
         DetachShader(program, shader);
     }
 
-    static void CODEGEN_FUNCPTR Switch_DisableVertexAttribArray(GLuint index)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_DisableVertexAttribArray(GLuint সূচক)
     {
         DisableVertexAttribArray = (PFNDISABLEVERTEXATTRIBARRAYPROC)IntGetProcAddress("glDisableVertexAttribArray");
-        DisableVertexAttribArray(index);
+        DisableVertexAttribArray(সূচক);
     }
 
-    static void CODEGEN_FUNCPTR Switch_EnableVertexAttribArray(GLuint index)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_EnableVertexAttribArray(GLuint সূচক)
     {
         EnableVertexAttribArray = (PFNENABLEVERTEXATTRIBARRAYPROC)IntGetProcAddress("glEnableVertexAttribArray");
-        EnableVertexAttribArray(index);
+        EnableVertexAttribArray(সূচক);
     }
 
-    static void CODEGEN_FUNCPTR Switch_GetActiveAttrib(GLuint program, GLuint index, GLsizei bufSize, GLsizei *length, GLint *size, GLenum *type, GLchar *name)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_GetActiveAttrib(GLuint program, GLuint সূচক, GLsizei buf_আকার, GLsizei *length, GLint *size, GLenum *type, GLchar *name)
     {
         GetActiveAttrib = (PFNGETACTIVEATTRIBPROC)IntGetProcAddress("glGetActiveAttrib");
-        GetActiveAttrib(program, index, bufSize, length, size, type, name);
+        GetActiveAttrib(program, সূচক, buf_আকার, length, size, type, name);
     }
 
-    static void CODEGEN_FUNCPTR Switch_GetActiveUniform(GLuint program, GLuint index, GLsizei bufSize, GLsizei *length, GLint *size, GLenum *type, GLchar *name)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_GetActiveUniform(GLuint program, GLuint সূচক, GLsizei buf_আকার, GLsizei *length, GLint *size, GLenum *type, GLchar *name)
     {
         GetActiveUniform = (PFNGETACTIVEUNIFORMPROC)IntGetProcAddress("glGetActiveUniform");
-        GetActiveUniform(program, index, bufSize, length, size, type, name);
+        GetActiveUniform(program, সূচক, buf_আকার, length, size, type, name);
     }
 
-    static void CODEGEN_FUNCPTR Switch_GetAttachedShaders(GLuint program, GLsizei maxCount, GLsizei *count, GLuint *obj)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_GetAttachedShaders(GLuint program, GLsizei max_গুনতি, GLsizei *গুনতি_2, GLuint *obj)
     {
         GetAttachedShaders = (PFNGETATTACHEDSHADERSPROC)IntGetProcAddress("glGetAttachedShaders");
-        GetAttachedShaders(program, maxCount, count, obj);
+        GetAttachedShaders(program, max_গুনতি, গুনতি_2, obj);
     }
 
-    static GLint CODEGEN_FUNCPTR Switch_GetAttribLocation(GLuint program, const GLchar *name)
+    স্থির GLint CODEGEN_FUNCPTR Switch_GetAttribLocation(GLuint program, ধ্রুবক GLchar *name)
     {
         GetAttribLocation = (PFNGETATTRIBLOCATIONPROC)IntGetProcAddress("glGetAttribLocation");
-        return GetAttribLocation(program, name);
+        ফেরত GetAttribLocation(program, name);
     }
 
-    static void CODEGEN_FUNCPTR Switch_GetProgramiv(GLuint program, GLenum pname, GLint *params)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_GetProgramiv(GLuint program, GLenum pname, GLint *params)
     {
         GetProgramiv = (PFNGETPROGRAMIVPROC)IntGetProcAddress("glGetProgramiv");
         GetProgramiv(program, pname, params);
     }
 
-    static void CODEGEN_FUNCPTR Switch_GetProgramInfoLog(GLuint program, GLsizei bufSize, GLsizei *length, GLchar *infoLog)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_GetProgramInfoLog(GLuint program, GLsizei buf_আকার, GLsizei *length, GLchar *infoLog)
     {
         GetProgramInfoLog = (PFNGETPROGRAMINFOLOGPROC)IntGetProcAddress("glGetProgramInfoLog");
-        GetProgramInfoLog(program, bufSize, length, infoLog);
+        GetProgramInfoLog(program, buf_আকার, length, infoLog);
     }
 
-    static void CODEGEN_FUNCPTR Switch_GetShaderiv(GLuint shader, GLenum pname, GLint *params)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_GetShaderiv(GLuint shader, GLenum pname, GLint *params)
     {
         GetShaderiv = (PFNGETSHADERIVPROC)IntGetProcAddress("glGetShaderiv");
         GetShaderiv(shader, pname, params);
     }
 
-    static void CODEGEN_FUNCPTR Switch_GetShaderInfoLog(GLuint shader, GLsizei bufSize, GLsizei *length, GLchar *infoLog)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_GetShaderInfoLog(GLuint shader, GLsizei buf_আকার, GLsizei *length, GLchar *infoLog)
     {
         GetShaderInfoLog = (PFNGETSHADERINFOLOGPROC)IntGetProcAddress("glGetShaderInfoLog");
-        GetShaderInfoLog(shader, bufSize, length, infoLog);
+        GetShaderInfoLog(shader, buf_আকার, length, infoLog);
     }
 
-    static void CODEGEN_FUNCPTR Switch_GetShaderSource(GLuint shader, GLsizei bufSize, GLsizei *length, GLchar *source)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_GetShaderSource(GLuint shader, GLsizei buf_আকার, GLsizei *length, GLchar *source)
     {
         GetShaderSource = (PFNGETSHADERSOURCEPROC)IntGetProcAddress("glGetShaderSource");
-        GetShaderSource(shader, bufSize, length, source);
+        GetShaderSource(shader, buf_আকার, length, source);
     }
 
-    static GLint CODEGEN_FUNCPTR Switch_GetUniformLocation(GLuint program, const GLchar *name)
+    স্থির GLint CODEGEN_FUNCPTR Switch_GetUniformLocation(GLuint program, ধ্রুবক GLchar *name)
     {
         GetUniformLocation = (PFNGETUNIFORMLOCATIONPROC)IntGetProcAddress("glGetUniformLocation");
-        return GetUniformLocation(program, name);
+        ফেরত GetUniformLocation(program, name);
     }
 
-    static void CODEGEN_FUNCPTR Switch_GetUniformfv(GLuint program, GLint location, GLfloat *params)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_GetUniformfv(GLuint program, GLint location, GLfloat *params)
     {
         GetUniformfv = (PFNGETUNIFORMFVPROC)IntGetProcAddress("glGetUniformfv");
         GetUniformfv(program, location, params);
     }
 
-    static void CODEGEN_FUNCPTR Switch_GetUniformiv(GLuint program, GLint location, GLint *params)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_GetUniformiv(GLuint program, GLint location, GLint *params)
     {
         GetUniformiv = (PFNGETUNIFORMIVPROC)IntGetProcAddress("glGetUniformiv");
         GetUniformiv(program, location, params);
     }
 
-    static void CODEGEN_FUNCPTR Switch_GetVertexAttribdv(GLuint index, GLenum pname, GLdouble *params)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_GetVertexAttribdv(GLuint সূচক, GLenum pname, GLdouble *params)
     {
         GetVertexAttribdv = (PFNGETVERTEXATTRIBDVPROC)IntGetProcAddress("glGetVertexAttribdv");
-        GetVertexAttribdv(index, pname, params);
+        GetVertexAttribdv(সূচক, pname, params);
     }
 
-    static void CODEGEN_FUNCPTR Switch_GetVertexAttribfv(GLuint index, GLenum pname, GLfloat *params)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_GetVertexAttribfv(GLuint সূচক, GLenum pname, GLfloat *params)
     {
         GetVertexAttribfv = (PFNGETVERTEXATTRIBFVPROC)IntGetProcAddress("glGetVertexAttribfv");
-        GetVertexAttribfv(index, pname, params);
+        GetVertexAttribfv(সূচক, pname, params);
     }
 
-    static void CODEGEN_FUNCPTR Switch_GetVertexAttribiv(GLuint index, GLenum pname, GLint *params)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_GetVertexAttribiv(GLuint সূচক, GLenum pname, GLint *params)
     {
         GetVertexAttribiv = (PFNGETVERTEXATTRIBIVPROC)IntGetProcAddress("glGetVertexAttribiv");
-        GetVertexAttribiv(index, pname, params);
+        GetVertexAttribiv(সূচক, pname, params);
     }
 
-    static void CODEGEN_FUNCPTR Switch_GetVertexAttribPointerv(GLuint index, GLenum pname, GLvoid* *pointer)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_GetVertexAttribPointerv(GLuint সূচক, GLenum pname, GLvoid* *pointer)
     {
         GetVertexAttribPointerv = (PFNGETVERTEXATTRIBPOINTERVPROC)IntGetProcAddress("glGetVertexAttribPointerv");
-        GetVertexAttribPointerv(index, pname, pointer);
+        GetVertexAttribPointerv(সূচক, pname, pointer);
     }
 
-    static GLboolean CODEGEN_FUNCPTR Switch_IsProgram(GLuint program)
+    স্থির GLboolean CODEGEN_FUNCPTR Switch_IsProgram(GLuint program)
     {
         IsProgram = (PFNISPROGRAMPROC)IntGetProcAddress("glIsProgram");
-        return IsProgram(program);
+        ফেরত IsProgram(program);
     }
 
-    static GLboolean CODEGEN_FUNCPTR Switch_IsShader(GLuint shader)
+    স্থির GLboolean CODEGEN_FUNCPTR Switch_IsShader(GLuint shader)
     {
         IsShader = (PFNISSHADERPROC)IntGetProcAddress("glIsShader");
-        return IsShader(shader);
+        ফেরত IsShader(shader);
     }
 
-    static void CODEGEN_FUNCPTR Switch_LinkProgram(GLuint program)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_LinkProgram(GLuint program)
     {
         LinkProgram = (PFNLINKPROGRAMPROC)IntGetProcAddress("glLinkProgram");
         LinkProgram(program);
     }
 
-    static void CODEGEN_FUNCPTR Switch_ShaderSource(GLuint shader, GLsizei count, const GLchar* const *string, const GLint *length)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_ShaderSource(GLuint shader, GLsizei গুনতি_2, ধ্রুবক GLchar* ধ্রুবক *string, ধ্রুবক GLint *length)
     {
         ShaderSource = (PFNSHADERSOURCEPROC)IntGetProcAddress("glShaderSource");
-        ShaderSource(shader, count, string, length);
+        ShaderSource(shader, গুনতি_2, string, length);
     }
 
-    static void CODEGEN_FUNCPTR Switch_UseProgram(GLuint program)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_UseProgram(GLuint program)
     {
         UseProgram = (PFNUSEPROGRAMPROC)IntGetProcAddress("glUseProgram");
         UseProgram(program);
     }
 
-    static void CODEGEN_FUNCPTR Switch_Uniform1f(GLint location, GLfloat v0)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_Uniform1f(GLint location, GLfloat v0)
     {
         Uniform1f = (PFNUNIFORM1FPROC)IntGetProcAddress("glUniform1f");
         Uniform1f(location, v0);
     }
 
-    static void CODEGEN_FUNCPTR Switch_Uniform2f(GLint location, GLfloat v0, GLfloat v1)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_Uniform2f(GLint location, GLfloat v0, GLfloat v1)
     {
         Uniform2f = (PFNUNIFORM2FPROC)IntGetProcAddress("glUniform2f");
         Uniform2f(location, v0, v1);
     }
 
-    static void CODEGEN_FUNCPTR Switch_Uniform3f(GLint location, GLfloat v0, GLfloat v1, GLfloat v2)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_Uniform3f(GLint location, GLfloat v0, GLfloat v1, GLfloat v2)
     {
         Uniform3f = (PFNUNIFORM3FPROC)IntGetProcAddress("glUniform3f");
         Uniform3f(location, v0, v1, v2);
     }
 
-    static void CODEGEN_FUNCPTR Switch_Uniform4f(GLint location, GLfloat v0, GLfloat v1, GLfloat v2, GLfloat v3)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_Uniform4f(GLint location, GLfloat v0, GLfloat v1, GLfloat v2, GLfloat v3)
     {
         Uniform4f = (PFNUNIFORM4FPROC)IntGetProcAddress("glUniform4f");
         Uniform4f(location, v0, v1, v2, v3);
     }
 
-    static void CODEGEN_FUNCPTR Switch_Uniform1i(GLint location, GLint v0)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_Uniform1i(GLint location, GLint v0)
     {
         Uniform1i = (PFNUNIFORM1IPROC)IntGetProcAddress("glUniform1i");
         Uniform1i(location, v0);
     }
 
-    static void CODEGEN_FUNCPTR Switch_Uniform2i(GLint location, GLint v0, GLint v1)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_Uniform2i(GLint location, GLint v0, GLint v1)
     {
         Uniform2i = (PFNUNIFORM2IPROC)IntGetProcAddress("glUniform2i");
         Uniform2i(location, v0, v1);
     }
 
-    static void CODEGEN_FUNCPTR Switch_Uniform3i(GLint location, GLint v0, GLint v1, GLint v2)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_Uniform3i(GLint location, GLint v0, GLint v1, GLint v2)
     {
         Uniform3i = (PFNUNIFORM3IPROC)IntGetProcAddress("glUniform3i");
         Uniform3i(location, v0, v1, v2);
     }
 
-    static void CODEGEN_FUNCPTR Switch_Uniform4i(GLint location, GLint v0, GLint v1, GLint v2, GLint v3)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_Uniform4i(GLint location, GLint v0, GLint v1, GLint v2, GLint v3)
     {
         Uniform4i = (PFNUNIFORM4IPROC)IntGetProcAddress("glUniform4i");
         Uniform4i(location, v0, v1, v2, v3);
     }
 
-    static void CODEGEN_FUNCPTR Switch_Uniform1fv(GLint location, GLsizei count, const GLfloat *value)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_Uniform1fv(GLint location, GLsizei গুনতি_2, ধ্রুবক GLfloat *value)
     {
         Uniform1fv = (PFNUNIFORM1FVPROC)IntGetProcAddress("glUniform1fv");
-        Uniform1fv(location, count, value);
+        Uniform1fv(location, গুনতি_2, value);
     }
 
-    static void CODEGEN_FUNCPTR Switch_Uniform2fv(GLint location, GLsizei count, const GLfloat *value)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_Uniform2fv(GLint location, GLsizei গুনতি_2, ধ্রুবক GLfloat *value)
     {
         Uniform2fv = (PFNUNIFORM2FVPROC)IntGetProcAddress("glUniform2fv");
-        Uniform2fv(location, count, value);
+        Uniform2fv(location, গুনতি_2, value);
     }
 
-    static void CODEGEN_FUNCPTR Switch_Uniform3fv(GLint location, GLsizei count, const GLfloat *value)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_Uniform3fv(GLint location, GLsizei গুনতি_2, ধ্রুবক GLfloat *value)
     {
         Uniform3fv = (PFNUNIFORM3FVPROC)IntGetProcAddress("glUniform3fv");
-        Uniform3fv(location, count, value);
+        Uniform3fv(location, গুনতি_2, value);
     }
 
-    static void CODEGEN_FUNCPTR Switch_Uniform4fv(GLint location, GLsizei count, const GLfloat *value)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_Uniform4fv(GLint location, GLsizei গুনতি_2, ধ্রুবক GLfloat *value)
     {
         Uniform4fv = (PFNUNIFORM4FVPROC)IntGetProcAddress("glUniform4fv");
-        Uniform4fv(location, count, value);
+        Uniform4fv(location, গুনতি_2, value);
     }
 
-    static void CODEGEN_FUNCPTR Switch_Uniform1iv(GLint location, GLsizei count, const GLint *value)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_Uniform1iv(GLint location, GLsizei গুনতি_2, ধ্রুবক GLint *value)
     {
         Uniform1iv = (PFNUNIFORM1IVPROC)IntGetProcAddress("glUniform1iv");
-        Uniform1iv(location, count, value);
+        Uniform1iv(location, গুনতি_2, value);
     }
 
-    static void CODEGEN_FUNCPTR Switch_Uniform2iv(GLint location, GLsizei count, const GLint *value)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_Uniform2iv(GLint location, GLsizei গুনতি_2, ধ্রুবক GLint *value)
     {
         Uniform2iv = (PFNUNIFORM2IVPROC)IntGetProcAddress("glUniform2iv");
-        Uniform2iv(location, count, value);
+        Uniform2iv(location, গুনতি_2, value);
     }
 
-    static void CODEGEN_FUNCPTR Switch_Uniform3iv(GLint location, GLsizei count, const GLint *value)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_Uniform3iv(GLint location, GLsizei গুনতি_2, ধ্রুবক GLint *value)
     {
         Uniform3iv = (PFNUNIFORM3IVPROC)IntGetProcAddress("glUniform3iv");
-        Uniform3iv(location, count, value);
+        Uniform3iv(location, গুনতি_2, value);
     }
 
-    static void CODEGEN_FUNCPTR Switch_Uniform4iv(GLint location, GLsizei count, const GLint *value)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_Uniform4iv(GLint location, GLsizei গুনতি_2, ধ্রুবক GLint *value)
     {
         Uniform4iv = (PFNUNIFORM4IVPROC)IntGetProcAddress("glUniform4iv");
-        Uniform4iv(location, count, value);
+        Uniform4iv(location, গুনতি_2, value);
     }
 
-    static void CODEGEN_FUNCPTR Switch_UniformMatrix2fv(GLint location, GLsizei count, GLboolean transpose, const GLfloat *value)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_UniformMatrix2fv(GLint location, GLsizei গুনতি_2, GLboolean transpose, ধ্রুবক GLfloat *value)
     {
         UniformMatrix2fv = (PFNUNIFORMMATRIX2FVPROC)IntGetProcAddress("glUniformMatrix2fv");
-        UniformMatrix2fv(location, count, transpose, value);
+        UniformMatrix2fv(location, গুনতি_2, transpose, value);
     }
 
-    static void CODEGEN_FUNCPTR Switch_UniformMatrix3fv(GLint location, GLsizei count, GLboolean transpose, const GLfloat *value)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_UniformMatrix3fv(GLint location, GLsizei গুনতি_2, GLboolean transpose, ধ্রুবক GLfloat *value)
     {
         UniformMatrix3fv = (PFNUNIFORMMATRIX3FVPROC)IntGetProcAddress("glUniformMatrix3fv");
-        UniformMatrix3fv(location, count, transpose, value);
+        UniformMatrix3fv(location, গুনতি_2, transpose, value);
     }
 
-    static void CODEGEN_FUNCPTR Switch_UniformMatrix4fv(GLint location, GLsizei count, GLboolean transpose, const GLfloat *value)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_UniformMatrix4fv(GLint location, GLsizei গুনতি_2, GLboolean transpose, ধ্রুবক GLfloat *value)
     {
         UniformMatrix4fv = (PFNUNIFORMMATRIX4FVPROC)IntGetProcAddress("glUniformMatrix4fv");
-        UniformMatrix4fv(location, count, transpose, value);
+        UniformMatrix4fv(location, গুনতি_2, transpose, value);
     }
 
-    static void CODEGEN_FUNCPTR Switch_ValidateProgram(GLuint program)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_ValidateProgram(GLuint program)
     {
         ValidateProgram = (PFNVALIDATEPROGRAMPROC)IntGetProcAddress("glValidateProgram");
         ValidateProgram(program);
     }
 
-    static void CODEGEN_FUNCPTR Switch_VertexAttribPointer(GLuint index, GLint size, GLenum type, GLboolean normalized, GLsizei stride, const GLvoid *pointer)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_VertexAttribPointer(GLuint সূচক, GLint size, GLenum type, GLboolean normalized, GLsizei stride, ধ্রুবক GLvoid *pointer)
     {
         VertexAttribPointer = (PFNVERTEXATTRIBPOINTERPROC)IntGetProcAddress("glVertexAttribPointer");
-        VertexAttribPointer(index, size, type, normalized, stride, pointer);
+        VertexAttribPointer(সূচক, size, type, normalized, stride, pointer);
     }
 
     // Extension: 2.1
 
-    static void CODEGEN_FUNCPTR Switch_UniformMatrix2x3fv(GLint location, GLsizei count, GLboolean transpose, const GLfloat *value)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_UniformMatrix2x3fv(GLint location, GLsizei গুনতি_2, GLboolean transpose, ধ্রুবক GLfloat *value)
     {
         UniformMatrix2x3fv = (PFNUNIFORMMATRIX2X3FVPROC)IntGetProcAddress("glUniformMatrix2x3fv");
-        UniformMatrix2x3fv(location, count, transpose, value);
+        UniformMatrix2x3fv(location, গুনতি_2, transpose, value);
     }
 
-    static void CODEGEN_FUNCPTR Switch_UniformMatrix3x2fv(GLint location, GLsizei count, GLboolean transpose, const GLfloat *value)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_UniformMatrix3x2fv(GLint location, GLsizei গুনতি_2, GLboolean transpose, ধ্রুবক GLfloat *value)
     {
         UniformMatrix3x2fv = (PFNUNIFORMMATRIX3X2FVPROC)IntGetProcAddress("glUniformMatrix3x2fv");
-        UniformMatrix3x2fv(location, count, transpose, value);
+        UniformMatrix3x2fv(location, গুনতি_2, transpose, value);
     }
 
-    static void CODEGEN_FUNCPTR Switch_UniformMatrix2x4fv(GLint location, GLsizei count, GLboolean transpose, const GLfloat *value)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_UniformMatrix2x4fv(GLint location, GLsizei গুনতি_2, GLboolean transpose, ধ্রুবক GLfloat *value)
     {
         UniformMatrix2x4fv = (PFNUNIFORMMATRIX2X4FVPROC)IntGetProcAddress("glUniformMatrix2x4fv");
-        UniformMatrix2x4fv(location, count, transpose, value);
+        UniformMatrix2x4fv(location, গুনতি_2, transpose, value);
     }
 
-    static void CODEGEN_FUNCPTR Switch_UniformMatrix4x2fv(GLint location, GLsizei count, GLboolean transpose, const GLfloat *value)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_UniformMatrix4x2fv(GLint location, GLsizei গুনতি_2, GLboolean transpose, ধ্রুবক GLfloat *value)
     {
         UniformMatrix4x2fv = (PFNUNIFORMMATRIX4X2FVPROC)IntGetProcAddress("glUniformMatrix4x2fv");
-        UniformMatrix4x2fv(location, count, transpose, value);
+        UniformMatrix4x2fv(location, গুনতি_2, transpose, value);
     }
 
-    static void CODEGEN_FUNCPTR Switch_UniformMatrix3x4fv(GLint location, GLsizei count, GLboolean transpose, const GLfloat *value)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_UniformMatrix3x4fv(GLint location, GLsizei গুনতি_2, GLboolean transpose, ধ্রুবক GLfloat *value)
     {
         UniformMatrix3x4fv = (PFNUNIFORMMATRIX3X4FVPROC)IntGetProcAddress("glUniformMatrix3x4fv");
-        UniformMatrix3x4fv(location, count, transpose, value);
+        UniformMatrix3x4fv(location, গুনতি_2, transpose, value);
     }
 
-    static void CODEGEN_FUNCPTR Switch_UniformMatrix4x3fv(GLint location, GLsizei count, GLboolean transpose, const GLfloat *value)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_UniformMatrix4x3fv(GLint location, GLsizei গুনতি_2, GLboolean transpose, ধ্রুবক GLfloat *value)
     {
         UniformMatrix4x3fv = (PFNUNIFORMMATRIX4X3FVPROC)IntGetProcAddress("glUniformMatrix4x3fv");
-        UniformMatrix4x3fv(location, count, transpose, value);
+        UniformMatrix4x3fv(location, গুনতি_2, transpose, value);
     }
 
     // Extension: ARB_vertex_array_object
 
-    static void CODEGEN_FUNCPTR Switch_BindVertexArray(GLuint ren_array)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_BindVertexArray(GLuint ren_array)
     {
         BindVertexArray = (PFNBINDVERTEXARRAYPROC)IntGetProcAddress("glBindVertexArray");
         BindVertexArray(ren_array);
     }
 
-    static void CODEGEN_FUNCPTR Switch_DeleteVertexArrays(GLsizei n, const GLuint *arrays)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_DeleteVertexArrays(GLsizei n, ধ্রুবক GLuint *arrays)
     {
         DeleteVertexArrays = (PFNDELETEVERTEXARRAYSPROC)IntGetProcAddress("glDeleteVertexArrays");
         DeleteVertexArrays(n, arrays);
     }
 
-    static void CODEGEN_FUNCPTR Switch_GenVertexArrays(GLsizei n, GLuint *arrays)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_GenVertexArrays(GLsizei n, GLuint *arrays)
     {
         GenVertexArrays = (PFNGENVERTEXARRAYSPROC)IntGetProcAddress("glGenVertexArrays");
         GenVertexArrays(n, arrays);
     }
 
-    static GLboolean CODEGEN_FUNCPTR Switch_IsVertexArray(GLuint ren_array)
+    স্থির GLboolean CODEGEN_FUNCPTR Switch_IsVertexArray(GLuint ren_array)
     {
         IsVertexArray = (PFNISVERTEXARRAYPROC)IntGetProcAddress("glIsVertexArray");
-        return IsVertexArray(ren_array);
+        ফেরত IsVertexArray(ren_array);
     }
 
     // Extension: ARB_map_buffer_range
 
-    static GLvoid* CODEGEN_FUNCPTR Switch_MapBufferRange(GLenum target, GLintptr offset, GLsizeiptr length, GLbitfield access)
+    স্থির GLvoid* CODEGEN_FUNCPTR Switch_Map_বাফার_Range(GLenum target, GLintptr offset, GLsizeiptr length, GLbitfield access)
     {
-        MapBufferRange = (PFNMAPBUFFERRANGEPROC)IntGetProcAddress("glMapBufferRange");
-        return MapBufferRange(target, offset, length, access);
+        Map_বাফার_Range = (PFNMAPBUFFERRANGEPROC)IntGetProcAddress("glMapBufferRange");
+        ফেরত Map_বাফার_Range(target, offset, length, access);
     }
 
-    static void CODEGEN_FUNCPTR Switch_FlushMappedBufferRange(GLenum target, GLintptr offset, GLsizeiptr length)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_Flush_Mapped_বাফার_Range(GLenum target, GLintptr offset, GLsizeiptr length)
     {
-        FlushMappedBufferRange = (PFNFLUSHMAPPEDBUFFERRANGEPROC)IntGetProcAddress("glFlushMappedBufferRange");
-        FlushMappedBufferRange(target, offset, length);
+        Flush_Mapped_বাফার_Range = (PFNFLUSHMAPPEDBUFFERRANGEPROC)IntGetProcAddress("glFlushMappedBufferRange");
+        Flush_Mapped_বাফার_Range(target, offset, length);
     }
 
     // Extension: ARB_framebuffer_object
 
-    static GLboolean CODEGEN_FUNCPTR Switch_IsRenderbuffer(GLuint renderbuffer)
+    স্থির GLboolean CODEGEN_FUNCPTR Switch_IsRenderbuffer(GLuint renderbuffer)
     {
         IsRenderbuffer = (PFNISRENDERBUFFERPROC)IntGetProcAddress("glIsRenderbuffer");
-        return IsRenderbuffer(renderbuffer);
+        ফেরত IsRenderbuffer(renderbuffer);
     }
 
-    static void CODEGEN_FUNCPTR Switch_BindRenderbuffer(GLenum target, GLuint renderbuffer)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_BindRenderbuffer(GLenum target, GLuint renderbuffer)
     {
         BindRenderbuffer = (PFNBINDRENDERBUFFERPROC)IntGetProcAddress("glBindRenderbuffer");
         BindRenderbuffer(target, renderbuffer);
     }
 
-    static void CODEGEN_FUNCPTR Switch_DeleteRenderbuffers(GLsizei n, const GLuint *renderbuffers)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_DeleteRenderbuffers(GLsizei n, ধ্রুবক GLuint *renderbuffers)
     {
         DeleteRenderbuffers = (PFNDELETERENDERBUFFERSPROC)IntGetProcAddress("glDeleteRenderbuffers");
         DeleteRenderbuffers(n, renderbuffers);
     }
 
-    static void CODEGEN_FUNCPTR Switch_GenRenderbuffers(GLsizei n, GLuint *renderbuffers)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_GenRenderbuffers(GLsizei n, GLuint *renderbuffers)
     {
         GenRenderbuffers = (PFNGENRENDERBUFFERSPROC)IntGetProcAddress("glGenRenderbuffers");
         GenRenderbuffers(n, renderbuffers);
     }
 
-    static void CODEGEN_FUNCPTR Switch_RenderbufferStorage(GLenum target, GLenum internalformat, GLsizei width, GLsizei height)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_RenderbufferStorage(GLenum target, GLenum internalformat, GLsizei width, GLsizei height)
     {
         RenderbufferStorage = (PFNRENDERBUFFERSTORAGEPROC)IntGetProcAddress("glRenderbufferStorage");
         RenderbufferStorage(target, internalformat, width, height);
     }
 
-    static void CODEGEN_FUNCPTR Switch_GetRenderbufferParameteriv(GLenum target, GLenum pname, GLint *params)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_GetRenderbufferParameteriv(GLenum target, GLenum pname, GLint *params)
     {
         GetRenderbufferParameteriv = (PFNGETRENDERBUFFERPARAMETERIVPROC)IntGetProcAddress("glGetRenderbufferParameteriv");
         GetRenderbufferParameteriv(target, pname, params);
     }
 
-    static GLboolean CODEGEN_FUNCPTR Switch_IsFramebuffer(GLuint framebuffer)
+    স্থির GLboolean CODEGEN_FUNCPTR Switch_IsFramebuffer(GLuint framebuffer)
     {
         IsFramebuffer = (PFNISFRAMEBUFFERPROC)IntGetProcAddress("glIsFramebuffer");
-        return IsFramebuffer(framebuffer);
+        ফেরত IsFramebuffer(framebuffer);
     }
 
-    static void CODEGEN_FUNCPTR Switch_BindFramebuffer(GLenum target, GLuint framebuffer)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_BindFramebuffer(GLenum target, GLuint framebuffer)
     {
         BindFramebuffer = (PFNBINDFRAMEBUFFERPROC)IntGetProcAddress("glBindFramebuffer");
         BindFramebuffer(target, framebuffer);
     }
 
-    static void CODEGEN_FUNCPTR Switch_DeleteFramebuffers(GLsizei n, const GLuint *framebuffers)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_DeleteFramebuffers(GLsizei n, ধ্রুবক GLuint *framebuffers)
     {
         DeleteFramebuffers = (PFNDELETEFRAMEBUFFERSPROC)IntGetProcAddress("glDeleteFramebuffers");
         DeleteFramebuffers(n, framebuffers);
     }
 
-    static void CODEGEN_FUNCPTR Switch_GenFramebuffers(GLsizei n, GLuint *framebuffers)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_GenFramebuffers(GLsizei n, GLuint *framebuffers)
     {
         GenFramebuffers = (PFNGENFRAMEBUFFERSPROC)IntGetProcAddress("glGenFramebuffers");
         GenFramebuffers(n, framebuffers);
     }
 
-    static GLenum CODEGEN_FUNCPTR Switch_CheckFramebufferStatus(GLenum target)
+    স্থির GLenum CODEGEN_FUNCPTR Switch_CheckFramebufferStatus(GLenum target)
     {
         CheckFramebufferStatus = (PFNCHECKFRAMEBUFFERSTATUSPROC)IntGetProcAddress("glCheckFramebufferStatus");
-        return CheckFramebufferStatus(target);
+        ফেরত CheckFramebufferStatus(target);
     }
 
-    static void CODEGEN_FUNCPTR Switch_FramebufferTexture1D(GLenum target, GLenum attachment, GLenum textarget, GLuint texture, GLint level)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_FramebufferTexture1D(GLenum target, GLenum attachment, GLenum textarget, GLuint texture, GLint level)
     {
         FramebufferTexture1D = (PFNFRAMEBUFFERTEXTURE1DPROC)IntGetProcAddress("glFramebufferTexture1D");
         FramebufferTexture1D(target, attachment, textarget, texture, level);
     }
 
-    static void CODEGEN_FUNCPTR Switch_FramebufferTexture2D(GLenum target, GLenum attachment, GLenum textarget, GLuint texture, GLint level)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_FramebufferTexture2D(GLenum target, GLenum attachment, GLenum textarget, GLuint texture, GLint level)
     {
         FramebufferTexture2D = (PFNFRAMEBUFFERTEXTURE2DPROC)IntGetProcAddress("glFramebufferTexture2D");
         FramebufferTexture2D(target, attachment, textarget, texture, level);
     }
 
-    static void CODEGEN_FUNCPTR Switch_FramebufferTexture3D(GLenum target, GLenum attachment, GLenum textarget, GLuint texture, GLint level, GLint zoffset)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_FramebufferTexture3D(GLenum target, GLenum attachment, GLenum textarget, GLuint texture, GLint level, GLint zoffset)
     {
         FramebufferTexture3D = (PFNFRAMEBUFFERTEXTURE3DPROC)IntGetProcAddress("glFramebufferTexture3D");
         FramebufferTexture3D(target, attachment, textarget, texture, level, zoffset);
     }
 
-    static void CODEGEN_FUNCPTR Switch_FramebufferRenderbuffer(GLenum target, GLenum attachment, GLenum renderbuffertarget, GLuint renderbuffer)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_FramebufferRenderbuffer(GLenum target, GLenum attachment, GLenum renderbuffertarget, GLuint renderbuffer)
     {
         FramebufferRenderbuffer = (PFNFRAMEBUFFERRENDERBUFFERPROC)IntGetProcAddress("glFramebufferRenderbuffer");
         FramebufferRenderbuffer(target, attachment, renderbuffertarget, renderbuffer);
     }
 
-    static void CODEGEN_FUNCPTR Switch_GetFramebufferAttachmentParameteriv(GLenum target, GLenum attachment, GLenum pname, GLint *params)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_GetFramebufferAttachmentParameteriv(GLenum target, GLenum attachment, GLenum pname, GLint *params)
     {
         GetFramebufferAttachmentParameteriv = (PFNGETFRAMEBUFFERATTACHMENTPARAMETERIVPROC)IntGetProcAddress("glGetFramebufferAttachmentParameteriv");
         GetFramebufferAttachmentParameteriv(target, attachment, pname, params);
     }
 
-    static void CODEGEN_FUNCPTR Switch_GenerateMipmap(GLenum target)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_GenerateMipmap(GLenum target)
     {
         GenerateMipmap = (PFNGENERATEMIPMAPPROC)IntGetProcAddress("glGenerateMipmap");
         GenerateMipmap(target);
     }
 
-    static void CODEGEN_FUNCPTR Switch_BlitFramebuffer(GLint srcX0, GLint srcY0, GLint srcX1, GLint srcY1, GLint dstX0, GLint dstY0, GLint dstX1, GLint dstY1, GLbitfield mask, GLenum filter)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_BlitFramebuffer(GLint srcX0, GLint srcY0, GLint srcX1, GLint srcY1, GLint dstX0, GLint dstY0, GLint dstX1, GLint dstY1, GLbitfield mask, GLenum filter)
     {
         BlitFramebuffer = (PFNBLITFRAMEBUFFERPROC)IntGetProcAddress("glBlitFramebuffer");
         BlitFramebuffer(srcX0, srcY0, srcX1, srcY1, dstX0, dstY0, dstX1, dstY1, mask, filter);
     }
 
-    static void CODEGEN_FUNCPTR Switch_RenderbufferStorageMultisample(GLenum target, GLsizei samples, GLenum internalformat, GLsizei width, GLsizei height)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_RenderbufferStorageMultisample(GLenum target, GLsizei samples, GLenum internalformat, GLsizei width, GLsizei height)
     {
         RenderbufferStorageMultisample = (PFNRENDERBUFFERSTORAGEMULTISAMPLEPROC)IntGetProcAddress("glRenderbufferStorageMultisample");
         RenderbufferStorageMultisample(target, samples, internalformat, width, height);
     }
 
-    static void CODEGEN_FUNCPTR Switch_FramebufferTextureLayer(GLenum target, GLenum attachment, GLuint texture, GLint level, GLint layer)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_FramebufferTextureLayer(GLenum target, GLenum attachment, GLuint texture, GLint level, GLint layer)
     {
         FramebufferTextureLayer = (PFNFRAMEBUFFERTEXTURELAYERPROC)IntGetProcAddress("glFramebufferTextureLayer");
         FramebufferTextureLayer(target, attachment, texture, level, layer);
@@ -1954,501 +1954,501 @@ namespace gl
 
     // Extension: 3.0
 
-    static void CODEGEN_FUNCPTR Switch_ColorMaski(GLuint index, GLboolean r, GLboolean g, GLboolean b, GLboolean a)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_ColorMaski(GLuint সূচক, GLboolean r, GLboolean g, GLboolean b, GLboolean a)
     {
         ColorMaski = (PFNCOLORMASKIPROC)IntGetProcAddress("glColorMaski");
-        ColorMaski(index, r, g, b, a);
+        ColorMaski(সূচক, r, g, b, a);
     }
 
-    static void CODEGEN_FUNCPTR Switch_GetBooleani_v(GLenum target, GLuint index, GLboolean *data)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_GetBooleani_v(GLenum target, GLuint সূচক, GLboolean *তথ্য)
     {
         GetBooleani_v = (PFNGETBOOLEANI_VPROC)IntGetProcAddress("glGetBooleani_v");
-        GetBooleani_v(target, index, data);
+        GetBooleani_v(target, সূচক, তথ্য);
     }
 
-    static void CODEGEN_FUNCPTR Switch_GetIntegeri_v(GLenum target, GLuint index, GLint *data)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_GetIntegeri_v(GLenum target, GLuint সূচক, GLint *তথ্য)
     {
         GetIntegeri_v = (PFNGETINTEGERI_VPROC)IntGetProcAddress("glGetIntegeri_v");
-        GetIntegeri_v(target, index, data);
+        GetIntegeri_v(target, সূচক, তথ্য);
     }
 
-    static void CODEGEN_FUNCPTR Switch_Enablei(GLenum target, GLuint index)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_Enablei(GLenum target, GLuint সূচক)
     {
         Enablei = (PFNENABLEIPROC)IntGetProcAddress("glEnablei");
-        Enablei(target, index);
+        Enablei(target, সূচক);
     }
 
-    static void CODEGEN_FUNCPTR Switch_Disablei(GLenum target, GLuint index)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_Disablei(GLenum target, GLuint সূচক)
     {
         Disablei = (PFNDISABLEIPROC)IntGetProcAddress("glDisablei");
-        Disablei(target, index);
+        Disablei(target, সূচক);
     }
 
-    static GLboolean CODEGEN_FUNCPTR Switch_IsEnabledi(GLenum target, GLuint index)
+    স্থির GLboolean CODEGEN_FUNCPTR Switch_IsEnabledi(GLenum target, GLuint সূচক)
     {
         IsEnabledi = (PFNISENABLEDIPROC)IntGetProcAddress("glIsEnabledi");
-        return IsEnabledi(target, index);
+        ফেরত IsEnabledi(target, সূচক);
     }
 
-    static void CODEGEN_FUNCPTR Switch_BeginTransformFeedback(GLenum primitiveMode)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_BeginTransformFeedback(GLenum primitiveMode)
     {
         BeginTransformFeedback = (PFNBEGINTRANSFORMFEEDBACKPROC)IntGetProcAddress("glBeginTransformFeedback");
         BeginTransformFeedback(primitiveMode);
     }
 
-    static void CODEGEN_FUNCPTR Switch_EndTransformFeedback()
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_EndTransformFeedback()
     {
         EndTransformFeedback = (PFNENDTRANSFORMFEEDBACKPROC)IntGetProcAddress("glEndTransformFeedback");
         EndTransformFeedback();
     }
 
-    static void CODEGEN_FUNCPTR Switch_BindBufferRange(GLenum target, GLuint index, GLuint buffer, GLintptr offset, GLsizeiptr size)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_Bind_বাফার_Range(GLenum target, GLuint সূচক, GLuint বাফার, GLintptr offset, GLsizeiptr size)
     {
-        BindBufferRange = (PFNBINDBUFFERRANGEPROC)IntGetProcAddress("glBindBufferRange");
-        BindBufferRange(target, index, buffer, offset, size);
+        Bind_বাফার_Range = (PFNBINDBUFFERRANGEPROC)IntGetProcAddress("glBindBufferRange");
+        Bind_বাফার_Range(target, সূচক, বাফার, offset, size);
     }
 
-    static void CODEGEN_FUNCPTR Switch_BindBufferBase(GLenum target, GLuint index, GLuint buffer)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_Bind_বাফার_Base(GLenum target, GLuint সূচক, GLuint বাফার)
     {
-        BindBufferBase = (PFNBINDBUFFERBASEPROC)IntGetProcAddress("glBindBufferBase");
-        BindBufferBase(target, index, buffer);
+        Bind_বাফার_Base = (PFNBINDBUFFERBASEPROC)IntGetProcAddress("glBindBufferBase");
+        Bind_বাফার_Base(target, সূচক, বাফার);
     }
 
-    static void CODEGEN_FUNCPTR Switch_TransformFeedbackVaryings(GLuint program, GLsizei count, const GLchar* const *varyings, GLenum bufferMode)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_TransformFeedbackVaryings(GLuint program, GLsizei গুনতি_2, ধ্রুবক GLchar* ধ্রুবক *varyings, GLenum বাফার_Mode)
     {
         TransformFeedbackVaryings = (PFNTRANSFORMFEEDBACKVARYINGSPROC)IntGetProcAddress("glTransformFeedbackVaryings");
-        TransformFeedbackVaryings(program, count, varyings, bufferMode);
+        TransformFeedbackVaryings(program, গুনতি_2, varyings, বাফার_Mode);
     }
 
-    static void CODEGEN_FUNCPTR Switch_GetTransformFeedbackVarying(GLuint program, GLuint index, GLsizei bufSize, GLsizei *length, GLsizei *size, GLenum *type, GLchar *name)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_GetTransformFeedbackVarying(GLuint program, GLuint সূচক, GLsizei buf_আকার, GLsizei *length, GLsizei *size, GLenum *type, GLchar *name)
     {
         GetTransformFeedbackVarying = (PFNGETTRANSFORMFEEDBACKVARYINGPROC)IntGetProcAddress("glGetTransformFeedbackVarying");
-        GetTransformFeedbackVarying(program, index, bufSize, length, size, type, name);
+        GetTransformFeedbackVarying(program, সূচক, buf_আকার, length, size, type, name);
     }
 
-    static void CODEGEN_FUNCPTR Switch_ClampColor(GLenum target, GLenum clamp)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_ClampColor(GLenum target, GLenum clamp)
     {
         ClampColor = (PFNCLAMPCOLORPROC)IntGetProcAddress("glClampColor");
         ClampColor(target, clamp);
     }
 
-    static void CODEGEN_FUNCPTR Switch_BeginConditionalRender(GLuint id, GLenum mode)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_BeginConditionalRender(GLuint id, GLenum mode)
     {
         BeginConditionalRender = (PFNBEGINCONDITIONALRENDERPROC)IntGetProcAddress("glBeginConditionalRender");
         BeginConditionalRender(id, mode);
     }
 
-    static void CODEGEN_FUNCPTR Switch_EndConditionalRender()
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_EndConditionalRender()
     {
         EndConditionalRender = (PFNENDCONDITIONALRENDERPROC)IntGetProcAddress("glEndConditionalRender");
         EndConditionalRender();
     }
 
-    static void CODEGEN_FUNCPTR Switch_VertexAttribIPointer(GLuint index, GLint size, GLenum type, GLsizei stride, const GLvoid *pointer)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_VertexAttribIPointer(GLuint সূচক, GLint size, GLenum type, GLsizei stride, ধ্রুবক GLvoid *pointer)
     {
         VertexAttribIPointer = (PFNVERTEXATTRIBIPOINTERPROC)IntGetProcAddress("glVertexAttribIPointer");
-        VertexAttribIPointer(index, size, type, stride, pointer);
+        VertexAttribIPointer(সূচক, size, type, stride, pointer);
     }
 
-    static void CODEGEN_FUNCPTR Switch_GetVertexAttribIiv(GLuint index, GLenum pname, GLint *params)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_GetVertexAttribIiv(GLuint সূচক, GLenum pname, GLint *params)
     {
         GetVertexAttribIiv = (PFNGETVERTEXATTRIBIIVPROC)IntGetProcAddress("glGetVertexAttribIiv");
-        GetVertexAttribIiv(index, pname, params);
+        GetVertexAttribIiv(সূচক, pname, params);
     }
 
-    static void CODEGEN_FUNCPTR Switch_GetVertexAttribIuiv(GLuint index, GLenum pname, GLuint *params)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_GetVertexAttribIuiv(GLuint সূচক, GLenum pname, GLuint *params)
     {
         GetVertexAttribIuiv = (PFNGETVERTEXATTRIBIUIVPROC)IntGetProcAddress("glGetVertexAttribIuiv");
-        GetVertexAttribIuiv(index, pname, params);
+        GetVertexAttribIuiv(সূচক, pname, params);
     }
 
-    static void CODEGEN_FUNCPTR Switch_VertexAttribI1i(GLuint index, GLint x)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_VertexAttribI1i(GLuint সূচক, GLint x)
     {
         VertexAttribI1i = (PFNVERTEXATTRIBI1IPROC)IntGetProcAddress("glVertexAttribI1i");
-        VertexAttribI1i(index, x);
+        VertexAttribI1i(সূচক, x);
     }
 
-    static void CODEGEN_FUNCPTR Switch_VertexAttribI2i(GLuint index, GLint x, GLint y)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_VertexAttribI2i(GLuint সূচক, GLint x, GLint y)
     {
         VertexAttribI2i = (PFNVERTEXATTRIBI2IPROC)IntGetProcAddress("glVertexAttribI2i");
-        VertexAttribI2i(index, x, y);
+        VertexAttribI2i(সূচক, x, y);
     }
 
-    static void CODEGEN_FUNCPTR Switch_VertexAttribI3i(GLuint index, GLint x, GLint y, GLint z)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_VertexAttribI3i(GLuint সূচক, GLint x, GLint y, GLint z)
     {
         VertexAttribI3i = (PFNVERTEXATTRIBI3IPROC)IntGetProcAddress("glVertexAttribI3i");
-        VertexAttribI3i(index, x, y, z);
+        VertexAttribI3i(সূচক, x, y, z);
     }
 
-    static void CODEGEN_FUNCPTR Switch_VertexAttribI4i(GLuint index, GLint x, GLint y, GLint z, GLint w)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_VertexAttribI4i(GLuint সূচক, GLint x, GLint y, GLint z, GLint w)
     {
         VertexAttribI4i = (PFNVERTEXATTRIBI4IPROC)IntGetProcAddress("glVertexAttribI4i");
-        VertexAttribI4i(index, x, y, z, w);
+        VertexAttribI4i(সূচক, x, y, z, w);
     }
 
-    static void CODEGEN_FUNCPTR Switch_VertexAttribI1ui(GLuint index, GLuint x)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_VertexAttribI1ui(GLuint সূচক, GLuint x)
     {
         VertexAttribI1ui = (PFNVERTEXATTRIBI1UIPROC)IntGetProcAddress("glVertexAttribI1ui");
-        VertexAttribI1ui(index, x);
+        VertexAttribI1ui(সূচক, x);
     }
 
-    static void CODEGEN_FUNCPTR Switch_VertexAttribI2ui(GLuint index, GLuint x, GLuint y)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_VertexAttribI2ui(GLuint সূচক, GLuint x, GLuint y)
     {
         VertexAttribI2ui = (PFNVERTEXATTRIBI2UIPROC)IntGetProcAddress("glVertexAttribI2ui");
-        VertexAttribI2ui(index, x, y);
+        VertexAttribI2ui(সূচক, x, y);
     }
 
-    static void CODEGEN_FUNCPTR Switch_VertexAttribI3ui(GLuint index, GLuint x, GLuint y, GLuint z)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_VertexAttribI3ui(GLuint সূচক, GLuint x, GLuint y, GLuint z)
     {
         VertexAttribI3ui = (PFNVERTEXATTRIBI3UIPROC)IntGetProcAddress("glVertexAttribI3ui");
-        VertexAttribI3ui(index, x, y, z);
+        VertexAttribI3ui(সূচক, x, y, z);
     }
 
-    static void CODEGEN_FUNCPTR Switch_VertexAttribI4ui(GLuint index, GLuint x, GLuint y, GLuint z, GLuint w)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_VertexAttribI4ui(GLuint সূচক, GLuint x, GLuint y, GLuint z, GLuint w)
     {
         VertexAttribI4ui = (PFNVERTEXATTRIBI4UIPROC)IntGetProcAddress("glVertexAttribI4ui");
-        VertexAttribI4ui(index, x, y, z, w);
+        VertexAttribI4ui(সূচক, x, y, z, w);
     }
 
-    static void CODEGEN_FUNCPTR Switch_VertexAttribI1iv(GLuint index, const GLint *v)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_VertexAttribI1iv(GLuint সূচক, ধ্রুবক GLint *v)
     {
         VertexAttribI1iv = (PFNVERTEXATTRIBI1IVPROC)IntGetProcAddress("glVertexAttribI1iv");
-        VertexAttribI1iv(index, v);
+        VertexAttribI1iv(সূচক, v);
     }
 
-    static void CODEGEN_FUNCPTR Switch_VertexAttribI2iv(GLuint index, const GLint *v)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_VertexAttribI2iv(GLuint সূচক, ধ্রুবক GLint *v)
     {
         VertexAttribI2iv = (PFNVERTEXATTRIBI2IVPROC)IntGetProcAddress("glVertexAttribI2iv");
-        VertexAttribI2iv(index, v);
+        VertexAttribI2iv(সূচক, v);
     }
 
-    static void CODEGEN_FUNCPTR Switch_VertexAttribI3iv(GLuint index, const GLint *v)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_VertexAttribI3iv(GLuint সূচক, ধ্রুবক GLint *v)
     {
         VertexAttribI3iv = (PFNVERTEXATTRIBI3IVPROC)IntGetProcAddress("glVertexAttribI3iv");
-        VertexAttribI3iv(index, v);
+        VertexAttribI3iv(সূচক, v);
     }
 
-    static void CODEGEN_FUNCPTR Switch_VertexAttribI4iv(GLuint index, const GLint *v)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_VertexAttribI4iv(GLuint সূচক, ধ্রুবক GLint *v)
     {
         VertexAttribI4iv = (PFNVERTEXATTRIBI4IVPROC)IntGetProcAddress("glVertexAttribI4iv");
-        VertexAttribI4iv(index, v);
+        VertexAttribI4iv(সূচক, v);
     }
 
-    static void CODEGEN_FUNCPTR Switch_VertexAttribI1uiv(GLuint index, const GLuint *v)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_VertexAttribI1uiv(GLuint সূচক, ধ্রুবক GLuint *v)
     {
         VertexAttribI1uiv = (PFNVERTEXATTRIBI1UIVPROC)IntGetProcAddress("glVertexAttribI1uiv");
-        VertexAttribI1uiv(index, v);
+        VertexAttribI1uiv(সূচক, v);
     }
 
-    static void CODEGEN_FUNCPTR Switch_VertexAttribI2uiv(GLuint index, const GLuint *v)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_VertexAttribI2uiv(GLuint সূচক, ধ্রুবক GLuint *v)
     {
         VertexAttribI2uiv = (PFNVERTEXATTRIBI2UIVPROC)IntGetProcAddress("glVertexAttribI2uiv");
-        VertexAttribI2uiv(index, v);
+        VertexAttribI2uiv(সূচক, v);
     }
 
-    static void CODEGEN_FUNCPTR Switch_VertexAttribI3uiv(GLuint index, const GLuint *v)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_VertexAttribI3uiv(GLuint সূচক, ধ্রুবক GLuint *v)
     {
         VertexAttribI3uiv = (PFNVERTEXATTRIBI3UIVPROC)IntGetProcAddress("glVertexAttribI3uiv");
-        VertexAttribI3uiv(index, v);
+        VertexAttribI3uiv(সূচক, v);
     }
 
-    static void CODEGEN_FUNCPTR Switch_VertexAttribI4uiv(GLuint index, const GLuint *v)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_VertexAttribI4uiv(GLuint সূচক, ধ্রুবক GLuint *v)
     {
         VertexAttribI4uiv = (PFNVERTEXATTRIBI4UIVPROC)IntGetProcAddress("glVertexAttribI4uiv");
-        VertexAttribI4uiv(index, v);
+        VertexAttribI4uiv(সূচক, v);
     }
 
-    static void CODEGEN_FUNCPTR Switch_VertexAttribI4bv(GLuint index, const GLbyte *v)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_VertexAttribI4bv(GLuint সূচক, ধ্রুবক GLbyte *v)
     {
         VertexAttribI4bv = (PFNVERTEXATTRIBI4BVPROC)IntGetProcAddress("glVertexAttribI4bv");
-        VertexAttribI4bv(index, v);
+        VertexAttribI4bv(সূচক, v);
     }
 
-    static void CODEGEN_FUNCPTR Switch_VertexAttribI4sv(GLuint index, const GLshort *v)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_VertexAttribI4sv(GLuint সূচক, ধ্রুবক GLshort *v)
     {
         VertexAttribI4sv = (PFNVERTEXATTRIBI4SVPROC)IntGetProcAddress("glVertexAttribI4sv");
-        VertexAttribI4sv(index, v);
+        VertexAttribI4sv(সূচক, v);
     }
 
-    static void CODEGEN_FUNCPTR Switch_VertexAttribI4ubv(GLuint index, const GLubyte *v)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_VertexAttribI4ubv(GLuint সূচক, ধ্রুবক GLubyte *v)
     {
         VertexAttribI4ubv = (PFNVERTEXATTRIBI4UBVPROC)IntGetProcAddress("glVertexAttribI4ubv");
-        VertexAttribI4ubv(index, v);
+        VertexAttribI4ubv(সূচক, v);
     }
 
-    static void CODEGEN_FUNCPTR Switch_VertexAttribI4usv(GLuint index, const GLushort *v)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_VertexAttribI4usv(GLuint সূচক, ধ্রুবক GLushort *v)
     {
         VertexAttribI4usv = (PFNVERTEXATTRIBI4USVPROC)IntGetProcAddress("glVertexAttribI4usv");
-        VertexAttribI4usv(index, v);
+        VertexAttribI4usv(সূচক, v);
     }
 
-    static void CODEGEN_FUNCPTR Switch_GetUniformuiv(GLuint program, GLint location, GLuint *params)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_GetUniformuiv(GLuint program, GLint location, GLuint *params)
     {
         GetUniformuiv = (PFNGETUNIFORMUIVPROC)IntGetProcAddress("glGetUniformuiv");
         GetUniformuiv(program, location, params);
     }
 
-    static void CODEGEN_FUNCPTR Switch_BindFragDataLocation(GLuint program, GLuint color, const GLchar *name)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_Bind_Frag_তথ্য_Location(GLuint program, GLuint color, ধ্রুবক GLchar *name)
     {
-        BindFragDataLocation = (PFNBINDFRAGDATALOCATIONPROC)IntGetProcAddress("glBindFragDataLocation");
-        BindFragDataLocation(program, color, name);
+        Bind_Frag_তথ্য_Location = (PFNBINDFRAGDATALOCATIONPROC)IntGetProcAddress("glBindFragDataLocation");
+        Bind_Frag_তথ্য_Location(program, color, name);
     }
 
-    static GLint CODEGEN_FUNCPTR Switch_GetFragDataLocation(GLuint program, const GLchar *name)
+    স্থির GLint CODEGEN_FUNCPTR Switch_Get_Frag_তথ্য_Location(GLuint program, ধ্রুবক GLchar *name)
     {
-        GetFragDataLocation = (PFNGETFRAGDATALOCATIONPROC)IntGetProcAddress("glGetFragDataLocation");
-        return GetFragDataLocation(program, name);
+        Get_Frag_তথ্য_Location = (PFNGETFRAGDATALOCATIONPROC)IntGetProcAddress("glGetFragDataLocation");
+        ফেরত Get_Frag_তথ্য_Location(program, name);
     }
 
-    static void CODEGEN_FUNCPTR Switch_Uniform1ui(GLint location, GLuint v0)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_Uniform1ui(GLint location, GLuint v0)
     {
         Uniform1ui = (PFNUNIFORM1UIPROC)IntGetProcAddress("glUniform1ui");
         Uniform1ui(location, v0);
     }
 
-    static void CODEGEN_FUNCPTR Switch_Uniform2ui(GLint location, GLuint v0, GLuint v1)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_Uniform2ui(GLint location, GLuint v0, GLuint v1)
     {
         Uniform2ui = (PFNUNIFORM2UIPROC)IntGetProcAddress("glUniform2ui");
         Uniform2ui(location, v0, v1);
     }
 
-    static void CODEGEN_FUNCPTR Switch_Uniform3ui(GLint location, GLuint v0, GLuint v1, GLuint v2)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_Uniform3ui(GLint location, GLuint v0, GLuint v1, GLuint v2)
     {
         Uniform3ui = (PFNUNIFORM3UIPROC)IntGetProcAddress("glUniform3ui");
         Uniform3ui(location, v0, v1, v2);
     }
 
-    static void CODEGEN_FUNCPTR Switch_Uniform4ui(GLint location, GLuint v0, GLuint v1, GLuint v2, GLuint v3)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_Uniform4ui(GLint location, GLuint v0, GLuint v1, GLuint v2, GLuint v3)
     {
         Uniform4ui = (PFNUNIFORM4UIPROC)IntGetProcAddress("glUniform4ui");
         Uniform4ui(location, v0, v1, v2, v3);
     }
 
-    static void CODEGEN_FUNCPTR Switch_Uniform1uiv(GLint location, GLsizei count, const GLuint *value)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_Uniform1uiv(GLint location, GLsizei গুনতি_2, ধ্রুবক GLuint *value)
     {
         Uniform1uiv = (PFNUNIFORM1UIVPROC)IntGetProcAddress("glUniform1uiv");
-        Uniform1uiv(location, count, value);
+        Uniform1uiv(location, গুনতি_2, value);
     }
 
-    static void CODEGEN_FUNCPTR Switch_Uniform2uiv(GLint location, GLsizei count, const GLuint *value)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_Uniform2uiv(GLint location, GLsizei গুনতি_2, ধ্রুবক GLuint *value)
     {
         Uniform2uiv = (PFNUNIFORM2UIVPROC)IntGetProcAddress("glUniform2uiv");
-        Uniform2uiv(location, count, value);
+        Uniform2uiv(location, গুনতি_2, value);
     }
 
-    static void CODEGEN_FUNCPTR Switch_Uniform3uiv(GLint location, GLsizei count, const GLuint *value)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_Uniform3uiv(GLint location, GLsizei গুনতি_2, ধ্রুবক GLuint *value)
     {
         Uniform3uiv = (PFNUNIFORM3UIVPROC)IntGetProcAddress("glUniform3uiv");
-        Uniform3uiv(location, count, value);
+        Uniform3uiv(location, গুনতি_2, value);
     }
 
-    static void CODEGEN_FUNCPTR Switch_Uniform4uiv(GLint location, GLsizei count, const GLuint *value)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_Uniform4uiv(GLint location, GLsizei গুনতি_2, ধ্রুবক GLuint *value)
     {
         Uniform4uiv = (PFNUNIFORM4UIVPROC)IntGetProcAddress("glUniform4uiv");
-        Uniform4uiv(location, count, value);
+        Uniform4uiv(location, গুনতি_2, value);
     }
 
-    static void CODEGEN_FUNCPTR Switch_TexParameterIiv(GLenum target, GLenum pname, const GLint *params)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_TexParameterIiv(GLenum target, GLenum pname, ধ্রুবক GLint *params)
     {
         TexParameterIiv = (PFNTEXPARAMETERIIVPROC)IntGetProcAddress("glTexParameterIiv");
         TexParameterIiv(target, pname, params);
     }
 
-    static void CODEGEN_FUNCPTR Switch_TexParameterIuiv(GLenum target, GLenum pname, const GLuint *params)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_TexParameterIuiv(GLenum target, GLenum pname, ধ্রুবক GLuint *params)
     {
         TexParameterIuiv = (PFNTEXPARAMETERIUIVPROC)IntGetProcAddress("glTexParameterIuiv");
         TexParameterIuiv(target, pname, params);
     }
 
-    static void CODEGEN_FUNCPTR Switch_GetTexParameterIiv(GLenum target, GLenum pname, GLint *params)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_GetTexParameterIiv(GLenum target, GLenum pname, GLint *params)
     {
         GetTexParameterIiv = (PFNGETTEXPARAMETERIIVPROC)IntGetProcAddress("glGetTexParameterIiv");
         GetTexParameterIiv(target, pname, params);
     }
 
-    static void CODEGEN_FUNCPTR Switch_GetTexParameterIuiv(GLenum target, GLenum pname, GLuint *params)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_GetTexParameterIuiv(GLenum target, GLenum pname, GLuint *params)
     {
         GetTexParameterIuiv = (PFNGETTEXPARAMETERIUIVPROC)IntGetProcAddress("glGetTexParameterIuiv");
         GetTexParameterIuiv(target, pname, params);
     }
 
-    static void CODEGEN_FUNCPTR Switch_ClearBufferiv(GLenum buffer, GLint drawbuffer, const GLint *value)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_ClearBufferiv(GLenum বাফার, GLint drawbuffer, ধ্রুবক GLint *value)
     {
         ClearBufferiv = (PFNCLEARBUFFERIVPROC)IntGetProcAddress("glClearBufferiv");
-        ClearBufferiv(buffer, drawbuffer, value);
+        ClearBufferiv(বাফার, drawbuffer, value);
     }
 
-    static void CODEGEN_FUNCPTR Switch_ClearBufferuiv(GLenum buffer, GLint drawbuffer, const GLuint *value)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_ClearBufferuiv(GLenum বাফার, GLint drawbuffer, ধ্রুবক GLuint *value)
     {
         ClearBufferuiv = (PFNCLEARBUFFERUIVPROC)IntGetProcAddress("glClearBufferuiv");
-        ClearBufferuiv(buffer, drawbuffer, value);
+        ClearBufferuiv(বাফার, drawbuffer, value);
     }
 
-    static void CODEGEN_FUNCPTR Switch_ClearBufferfv(GLenum buffer, GLint drawbuffer, const GLfloat *value)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_ClearBufferfv(GLenum বাফার, GLint drawbuffer, ধ্রুবক GLfloat *value)
     {
         ClearBufferfv = (PFNCLEARBUFFERFVPROC)IntGetProcAddress("glClearBufferfv");
-        ClearBufferfv(buffer, drawbuffer, value);
+        ClearBufferfv(বাফার, drawbuffer, value);
     }
 
-    static void CODEGEN_FUNCPTR Switch_ClearBufferfi(GLenum buffer, GLint drawbuffer, GLfloat depth, GLint stencil)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_ClearBufferfi(GLenum বাফার, GLint drawbuffer, GLfloat depth, GLint stencil)
     {
         ClearBufferfi = (PFNCLEARBUFFERFIPROC)IntGetProcAddress("glClearBufferfi");
-        ClearBufferfi(buffer, drawbuffer, depth, stencil);
+        ClearBufferfi(বাফার, drawbuffer, depth, stencil);
     }
 
-    static const GLubyte * CODEGEN_FUNCPTR Switch_GetStringi(GLenum name, GLuint index)
+    স্থির ধ্রুবক GLubyte * CODEGEN_FUNCPTR Switch_GetStringi(GLenum name, GLuint সূচক)
     {
         GetStringi = (PFNGETSTRINGIPROC)IntGetProcAddress("glGetStringi");
-        return GetStringi(name, index);
+        ফেরত GetStringi(name, সূচক);
     }
 
     // Extension: ARB_uniform_buffer_object
 
-    static void CODEGEN_FUNCPTR Switch_GetUniformIndices(GLuint program, GLsizei uniformCount, const GLchar* const *uniformNames, GLuint *uniformIndices)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_GetUniformIndices(GLuint program, GLsizei uniform_গুনতি, ধ্রুবক GLchar* ধ্রুবক *uniformNames, GLuint *uniformIndices)
     {
         GetUniformIndices = (PFNGETUNIFORMINDICESPROC)IntGetProcAddress("glGetUniformIndices");
-        GetUniformIndices(program, uniformCount, uniformNames, uniformIndices);
+        GetUniformIndices(program, uniform_গুনতি, uniformNames, uniformIndices);
     }
 
-    static void CODEGEN_FUNCPTR Switch_GetActiveUniformsiv(GLuint program, GLsizei uniformCount, const GLuint *uniformIndices, GLenum pname, GLint *params)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_GetActiveUniformsiv(GLuint program, GLsizei uniform_গুনতি, ধ্রুবক GLuint *uniformIndices, GLenum pname, GLint *params)
     {
         GetActiveUniformsiv = (PFNGETACTIVEUNIFORMSIVPROC)IntGetProcAddress("glGetActiveUniformsiv");
-        GetActiveUniformsiv(program, uniformCount, uniformIndices, pname, params);
+        GetActiveUniformsiv(program, uniform_গুনতি, uniformIndices, pname, params);
     }
 
-    static void CODEGEN_FUNCPTR Switch_GetActiveUniformName(GLuint program, GLuint uniformIndex, GLsizei bufSize, GLsizei *length, GLchar *uniformName)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_GetActiveUniformName(GLuint program, GLuint uniform_সূচক, GLsizei buf_আকার, GLsizei *length, GLchar *uniformName)
     {
         GetActiveUniformName = (PFNGETACTIVEUNIFORMNAMEPROC)IntGetProcAddress("glGetActiveUniformName");
-        GetActiveUniformName(program, uniformIndex, bufSize, length, uniformName);
+        GetActiveUniformName(program, uniform_সূচক, buf_আকার, length, uniformName);
     }
 
-    static GLuint CODEGEN_FUNCPTR Switch_GetUniformBlockIndex(GLuint program, const GLchar *uniformBlockName)
+    স্থির GLuint CODEGEN_FUNCPTR Switch_Get_Uniform_Block_সূচক(GLuint program, ধ্রুবক GLchar *uniformBlockName)
     {
-        GetUniformBlockIndex = (PFNGETUNIFORMBLOCKINDEXPROC)IntGetProcAddress("glGetUniformBlockIndex");
-        return GetUniformBlockIndex(program, uniformBlockName);
+        Get_Uniform_Block_সূচক = (PFNGETUNIFORMBLOCKINDEXPROC)IntGetProcAddress("glGetUniformBlockIndex");
+        ফেরত Get_Uniform_Block_সূচক(program, uniformBlockName);
     }
 
-    static void CODEGEN_FUNCPTR Switch_GetActiveUniformBlockiv(GLuint program, GLuint uniformBlockIndex, GLenum pname, GLint *params)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_GetActiveUniformBlockiv(GLuint program, GLuint uniform_Block_সূচক, GLenum pname, GLint *params)
     {
         GetActiveUniformBlockiv = (PFNGETACTIVEUNIFORMBLOCKIVPROC)IntGetProcAddress("glGetActiveUniformBlockiv");
-        GetActiveUniformBlockiv(program, uniformBlockIndex, pname, params);
+        GetActiveUniformBlockiv(program, uniform_Block_সূচক, pname, params);
     }
 
-    static void CODEGEN_FUNCPTR Switch_GetActiveUniformBlockName(GLuint program, GLuint uniformBlockIndex, GLsizei bufSize, GLsizei *length, GLchar *uniformBlockName)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_GetActiveUniformBlockName(GLuint program, GLuint uniform_Block_সূচক, GLsizei buf_আকার, GLsizei *length, GLchar *uniformBlockName)
     {
         GetActiveUniformBlockName = (PFNGETACTIVEUNIFORMBLOCKNAMEPROC)IntGetProcAddress("glGetActiveUniformBlockName");
-        GetActiveUniformBlockName(program, uniformBlockIndex, bufSize, length, uniformBlockName);
+        GetActiveUniformBlockName(program, uniform_Block_সূচক, buf_আকার, length, uniformBlockName);
     }
 
-    static void CODEGEN_FUNCPTR Switch_UniformBlockBinding(GLuint program, GLuint uniformBlockIndex, GLuint uniformBlockBinding)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_UniformBlockBinding(GLuint program, GLuint uniform_Block_সূচক, GLuint uniformBlockBinding)
     {
         UniformBlockBinding = (PFNUNIFORMBLOCKBINDINGPROC)IntGetProcAddress("glUniformBlockBinding");
-        UniformBlockBinding(program, uniformBlockIndex, uniformBlockBinding);
+        UniformBlockBinding(program, uniform_Block_সূচক, uniformBlockBinding);
     }
 
     // Extension: ARB_copy_buffer
 
-    static void CODEGEN_FUNCPTR Switch_CopyBufferSubData(GLenum readTarget, GLenum writeTarget, GLintptr readOffset, GLintptr writeOffset, GLsizeiptr size)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_Copy_বাফার_Sub_তথ্য(GLenum readTarget, GLenum writeTarget, GLintptr readOffset, GLintptr writeOffset, GLsizeiptr size)
     {
-        CopyBufferSubData = (PFNCOPYBUFFERSUBDATAPROC)IntGetProcAddress("glCopyBufferSubData");
-        CopyBufferSubData(readTarget, writeTarget, readOffset, writeOffset, size);
+        Copy_বাফার_Sub_তথ্য = (PFNCOPYBUFFERSUBDATAPROC)IntGetProcAddress("glCopyBufferSubData");
+        Copy_বাফার_Sub_তথ্য(readTarget, writeTarget, readOffset, writeOffset, size);
     }
 
     // Extension: 3.1
 
-    static void CODEGEN_FUNCPTR Switch_DrawArraysInstanced(GLenum mode, GLint first, GLsizei count, GLsizei instancecount)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_DrawArraysInstanced(GLenum mode, GLint first, GLsizei গুনতি_2, GLsizei instancecount)
     {
         DrawArraysInstanced = (PFNDRAWARRAYSINSTANCEDPROC)IntGetProcAddress("glDrawArraysInstanced");
-        DrawArraysInstanced(mode, first, count, instancecount);
+        DrawArraysInstanced(mode, first, গুনতি_2, instancecount);
     }
 
-    static void CODEGEN_FUNCPTR Switch_DrawElementsInstanced(GLenum mode, GLsizei count, GLenum type, const GLvoid *indices, GLsizei instancecount)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_DrawElementsInstanced(GLenum mode, GLsizei গুনতি_2, GLenum type, ধ্রুবক GLvoid *indices, GLsizei instancecount)
     {
         DrawElementsInstanced = (PFNDRAWELEMENTSINSTANCEDPROC)IntGetProcAddress("glDrawElementsInstanced");
-        DrawElementsInstanced(mode, count, type, indices, instancecount);
+        DrawElementsInstanced(mode, গুনতি_2, type, indices, instancecount);
     }
 
-    static void CODEGEN_FUNCPTR Switch_TexBuffer(GLenum target, GLenum internalformat, GLuint buffer)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_Tex_বাফার(GLenum target, GLenum internalformat, GLuint বাফার)
     {
-        TexBuffer = (PFNTEXBUFFERPROC)IntGetProcAddress("glTexBuffer");
-        TexBuffer(target, internalformat, buffer);
+        Tex_বাফার = (PFNTEXBUFFERPROC)IntGetProcAddress("glTexBuffer");
+        Tex_বাফার(target, internalformat, বাফার);
     }
 
-    static void CODEGEN_FUNCPTR Switch_PrimitiveRestartIndex(GLuint index)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_Primitive_Restart_সূচক(GLuint সূচক)
     {
-        PrimitiveRestartIndex = (PFNPRIMITIVERESTARTINDEXPROC)IntGetProcAddress("glPrimitiveRestartIndex");
-        PrimitiveRestartIndex(index);
+        Primitive_Restart_সূচক = (PFNPRIMITIVERESTARTINDEXPROC)IntGetProcAddress("glPrimitiveRestartIndex");
+        Primitive_Restart_সূচক(সূচক);
     }
 
     // Legacy
 
-    static void CODEGEN_FUNCPTR Switch_EnableClientState(GLenum cap)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_EnableClientState(GLenum cap)
     {
         EnableClientState = (PFNENABLECLIENTSTATEPROC)IntGetProcAddress("glEnableClientState");
         EnableClientState(cap);
     }
 
-    static void CODEGEN_FUNCPTR Switch_DisableClientState(GLenum cap)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_DisableClientState(GLenum cap)
     {
         DisableClientState = (PFNDISABLECLIENTSTATEPROC)IntGetProcAddress("glDisableClientState");
         DisableClientState(cap);
     }
 
-    static void CODEGEN_FUNCPTR Switch_VertexPointer(GLint size, GLenum type, GLsizei stride, const GLvoid *ptr)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_VertexPointer(GLint size, GLenum type, GLsizei stride, ধ্রুবক GLvoid *ptr)
     {
         VertexPointer = (PFNVERTEXPOINTERPROC)IntGetProcAddress("glVertexPointer");
         VertexPointer(size, type, stride, ptr);
     }
 
-    static void CODEGEN_FUNCPTR Switch_NormalPointer(GLenum type, GLsizei stride, const GLvoid *ptr)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_NormalPointer(GLenum type, GLsizei stride, ধ্রুবক GLvoid *ptr)
     {
         NormalPointer = (PFNNORMALPOINTERPROC)IntGetProcAddress("glNormalPointer");
         NormalPointer(type, stride, ptr);
     }
 
-    static void CODEGEN_FUNCPTR Switch_ColorPointer(GLint size, GLenum type, GLsizei stride, const GLvoid *ptr)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_ColorPointer(GLint size, GLenum type, GLsizei stride, ধ্রুবক GLvoid *ptr)
     {
         ColorPointer = (PFNCOLORPOINTERPROC)IntGetProcAddress("glColorPointer");
         ColorPointer(size, type, stride, ptr);
     }
 
-    static void CODEGEN_FUNCPTR Switch_TexCoordPointer(GLint size, GLenum type, GLsizei stride, const GLvoid *ptr)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_TexCoordPointer(GLint size, GLenum type, GLsizei stride, ধ্রুবক GLvoid *ptr)
     {
         TexCoordPointer = (PFNTEXCOORDPOINTERPROC)IntGetProcAddress("glTexCoordPointer");
         TexCoordPointer(size, type, stride, ptr);
     }
 
-    static void CODEGEN_FUNCPTR Switch_TexEnvi(GLenum target, GLenum pname, GLint param)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_TexEnvi(GLenum target, GLenum pname, GLint param)
     {
         TexEnvi = (PFNTEXENVIPROC)IntGetProcAddress("glTexEnvi");
         TexEnvi(target, pname, param);
     }
 
-    static void CODEGEN_FUNCPTR Switch_MatrixMode(GLenum mode)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_MatrixMode(GLenum mode)
     {
         MatrixMode = (PFNMATRIXMODEPROC)IntGetProcAddress("glMatrixMode");
         MatrixMode(mode);
     }
 
-    static void CODEGEN_FUNCPTR Switch_LoadIdentity(void)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_LoadIdentity(শূন্য)
     {
         LoadIdentity = (PFNLOADIDENTITYPROC)IntGetProcAddress("glLoadIdentity");
         LoadIdentity();
     }
 
-    static void CODEGEN_FUNCPTR Switch_Ortho(GLdouble left, GLdouble right, GLdouble bottom, GLdouble top, GLdouble near_val, GLdouble far_val)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_Ortho(GLdouble বাম, GLdouble ডান, GLdouble bottom, GLdouble শীর্ষ_2, GLdouble near_val, GLdouble far_val)
     {
         Ortho = (PFNORTHOPROC)IntGetProcAddress("glOrtho");
-        Ortho(left, right, bottom, top, near_val, far_val);
+        Ortho(বাম, ডান, bottom, শীর্ষ_2, near_val, far_val);
     }
 
-    static void CODEGEN_FUNCPTR Switch_Color3d(GLdouble red, GLdouble green, GLdouble blue)
+    স্থির শূন্য CODEGEN_FUNCPTR Switch_Color3d(GLdouble red, GLdouble green, GLdouble blue)
     {
         Color3d = (PFNCOLOR3DPROC)IntGetProcAddress("glColor3d");
         Color3d(red, green, blue);
     }
 
-    struct InitializeVariables
+    কাঠামো InitializeVariables
     {
         InitializeVariables()
         {
@@ -2456,8 +2456,8 @@ namespace gl
             CullFace = Switch_CullFace;
             FrontFace = Switch_FrontFace;
             Hint = Switch_Hint;
-            LineWidth = Switch_LineWidth;
-            PointSize = Switch_PointSize;
+            সারি_Width = Switch_সারি_Width;
+            Point_আকার = Switch_Point_আকার;
             PolygonMode = Switch_PolygonMode;
             Scissor = Switch_Scissor;
             TexParameterf = Switch_TexParameterf;
@@ -2466,7 +2466,7 @@ namespace gl
             TexParameteriv = Switch_TexParameteriv;
             TexImage1D = Switch_TexImage1D;
             TexImage2D = Switch_TexImage2D;
-            DrawBuffer = Switch_DrawBuffer;
+            Draw_বাফার = Switch_Draw_বাফার;
             Clear = Switch_Clear;
             ClearColor = Switch_ClearColor;
             ClearStencil = Switch_ClearStencil;
@@ -2485,7 +2485,7 @@ namespace gl
             DepthFunc = Switch_DepthFunc;
             PixelStoref = Switch_PixelStoref;
             PixelStorei = Switch_PixelStorei;
-            ReadBuffer = Switch_ReadBuffer;
+            Read_বাফার = Switch_Read_বাফার;
             ReadPixels = Switch_ReadPixels;
             GetBooleanv = Switch_GetBooleanv;
             GetDoublev = Switch_GetDoublev;
@@ -2554,17 +2554,17 @@ namespace gl
             GetQueryiv = Switch_GetQueryiv;
             GetQueryObjectiv = Switch_GetQueryObjectiv;
             GetQueryObjectuiv = Switch_GetQueryObjectuiv;
-            BindBuffer = Switch_BindBuffer;
+            Bind_বাফার = Switch_Bind_বাফার;
             DeleteBuffers = Switch_DeleteBuffers;
             GenBuffers = Switch_GenBuffers;
-            IsBuffer = Switch_IsBuffer;
-            BufferData = Switch_BufferData;
-            BufferSubData = Switch_BufferSubData;
-            GetBufferSubData = Switch_GetBufferSubData;
-            MapBuffer = Switch_MapBuffer;
-            UnmapBuffer = Switch_UnmapBuffer;
-            GetBufferParameteriv = Switch_GetBufferParameteriv;
-            GetBufferPointerv = Switch_GetBufferPointerv;
+            Is_বাফার = Switch_Is_বাফার;
+            বাফার_তথ্য = Switch_বাফার_তথ্য;
+            বাফার_Sub_তথ্য = Switch_বাফার_Sub_তথ্য;
+            Get_বাফার_Sub_তথ্য = Switch_Get_বাফার_Sub_তথ্য;
+            Map_বাফার = Switch_Map_বাফার;
+            Unmap_বাফার = Switch_Unmap_বাফার;
+            Get_বাফার_Parameteriv = Switch_Get_বাফার_Parameteriv;
+            Get_বাফার_Pointerv = Switch_Get_বাফার_Pointerv;
 
             // Extension: 2.0
             BlendEquationSeparate = Switch_BlendEquationSeparate;
@@ -2640,8 +2640,8 @@ namespace gl
             IsVertexArray = Switch_IsVertexArray;
 
             // Extension: ARB_map_buffer_range
-            MapBufferRange = Switch_MapBufferRange;
-            FlushMappedBufferRange = Switch_FlushMappedBufferRange;
+            Map_বাফার_Range = Switch_Map_বাফার_Range;
+            Flush_Mapped_বাফার_Range = Switch_Flush_Mapped_বাফার_Range;
 
             // Extension: ARB_framebuffer_object
             IsRenderbuffer = Switch_IsRenderbuffer;
@@ -2674,8 +2674,8 @@ namespace gl
             IsEnabledi = Switch_IsEnabledi;
             BeginTransformFeedback = Switch_BeginTransformFeedback;
             EndTransformFeedback = Switch_EndTransformFeedback;
-            BindBufferRange = Switch_BindBufferRange;
-            BindBufferBase = Switch_BindBufferBase;
+            Bind_বাফার_Range = Switch_Bind_বাফার_Range;
+            Bind_বাফার_Base = Switch_Bind_বাফার_Base;
             TransformFeedbackVaryings = Switch_TransformFeedbackVaryings;
             GetTransformFeedbackVarying = Switch_GetTransformFeedbackVarying;
             ClampColor = Switch_ClampColor;
@@ -2705,8 +2705,8 @@ namespace gl
             VertexAttribI4ubv = Switch_VertexAttribI4ubv;
             VertexAttribI4usv = Switch_VertexAttribI4usv;
             GetUniformuiv = Switch_GetUniformuiv;
-            BindFragDataLocation = Switch_BindFragDataLocation;
-            GetFragDataLocation = Switch_GetFragDataLocation;
+            Bind_Frag_তথ্য_Location = Switch_Bind_Frag_তথ্য_Location;
+            Get_Frag_তথ্য_Location = Switch_Get_Frag_তথ্য_Location;
             Uniform1ui = Switch_Uniform1ui;
             Uniform2ui = Switch_Uniform2ui;
             Uniform3ui = Switch_Uniform3ui;
@@ -2729,19 +2729,19 @@ namespace gl
             GetUniformIndices = Switch_GetUniformIndices;
             GetActiveUniformsiv = Switch_GetActiveUniformsiv;
             GetActiveUniformName = Switch_GetActiveUniformName;
-            GetUniformBlockIndex = Switch_GetUniformBlockIndex;
+            Get_Uniform_Block_সূচক = Switch_Get_Uniform_Block_সূচক;
             GetActiveUniformBlockiv = Switch_GetActiveUniformBlockiv;
             GetActiveUniformBlockName = Switch_GetActiveUniformBlockName;
             UniformBlockBinding = Switch_UniformBlockBinding;
 
             // Extension: ARB_copy_buffer
-            CopyBufferSubData = Switch_CopyBufferSubData;
+            Copy_বাফার_Sub_তথ্য = Switch_Copy_বাফার_Sub_তথ্য;
 
             // Extension: 3.1
             DrawArraysInstanced = Switch_DrawArraysInstanced;
             DrawElementsInstanced = Switch_DrawElementsInstanced;
-            TexBuffer = Switch_TexBuffer;
-            PrimitiveRestartIndex = Switch_PrimitiveRestartIndex;
+            Tex_বাফার = Switch_Tex_বাফার;
+            Primitive_Restart_সূচক = Switch_Primitive_Restart_সূচক;
 
             // Legacy
             EnableClientState = Switch_EnableClientState;

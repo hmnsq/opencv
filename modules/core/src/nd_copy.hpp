@@ -11,37 +11,37 @@
 #ifndef OPENCV_CORE_ND_COPY_HPP
 #define OPENCV_CORE_ND_COPY_HPP
 
-namespace cv { namespace nd {
+নামাকাশ cv { নামাকাশ nd {
 
-enum { MAX_VIEW_DIMS = CV_MAX_DIM };
+গণনা { MAX_VIEW_DIMS = CV_MAX_DIM };
 
-struct View
+কাঠামো View
 {
-    uchar* data = nullptr;
-    int dims = 0;
+    uchar* তথ্য = nullptr;
+    পূর্ণসংখ্যা dims = 0;
     size_t esz = 0;                    // element size in bytes, channels included
-    int size[MAX_VIEW_DIMS];
+    পূর্ণসংখ্যা size[MAX_VIEW_DIMS];
     ptrdiff_t step[MAX_VIEW_DIMS];     // in bytes; 0 = broadcast, negative = reversed
 };
 
-View viewOf(const Mat& m);
+View viewOf(ধ্রুবক Mat& m);
 
 // The i-th axis of the result is the order[i]-th axis of v.
-View permute(const View& v, const int* order);
+View permute(ধ্রুবক View& v, ধ্রুবক পূর্ণসংখ্যা* order);
 
-void flip(View& v, int axis);
+শূন্য flip(View& v, পূর্ণসংখ্যা axis);
 
 // Keep `count` elements along the axis, starting at `start`; `step` may be negative.
-void slice(View& v, int axis, int start, int step, int count);
+শূন্য slice(View& v, পূর্ণসংখ্যা axis, পূর্ণসংখ্যা start, পূর্ণসংখ্যা step, পূর্ণসংখ্যা গুনতি_2);
 
 // The views must have the same dims, sizes and esz. Overlapping views are allowed.
-void copy(const View& src, const View& dst);
+শূন্য copy(ধ্রুবক View& src, ধ্রুবক View& dst);
 
 // n independent copies executed in one parallel pass.
-void copyBatch(const View* src, const View* dst, int n);
+শূন্য copyBatch(ধ্রুবক View* src, ধ্রুবক View* dst, পূর্ণসংখ্যা n);
 
 // cv::transpose kernel for the element size, or nullptr; defined in matrix_transform.cpp.
-typedef void (*TransposeFunc)(const uchar* src, size_t sstep, uchar* dst, size_t dstep, Size sz);
+প্রকারলেখ শূন্য (*TransposeFunc)(ধ্রুবক uchar* src, size_t sstep, uchar* dst, size_t dstep, আকার_2 sz);
 TransposeFunc getTransposeFunc(size_t esz);
 
 }} // namespace cv::nd

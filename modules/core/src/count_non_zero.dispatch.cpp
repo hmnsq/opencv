@@ -3,36 +3,36 @@
 // of this distribution and at http://opencv.org/license.html
 
 
-#include "precomp.hpp"
-#include "opencl_kernels_core.hpp"
-#include "stat.hpp"
+#অন্তর্ভাব "precomp.hpp"
+#অন্তর্ভাব "opencl_kernels_core.hpp"
+#অন্তর্ভাব "stat.hpp"
 
-#include "count_non_zero.simd.hpp"
-#include "count_non_zero.simd_declarations.hpp" // defines CV_CPU_DISPATCH_MODES_ALL=AVX2,...,BASELINE based on CMakeLists.txt content
+#অন্তর্ভাব "count_non_zero.simd.hpp"
+#অন্তর্ভাব "count_non_zero.simd_declarations.hpp" // defines CV_CPU_DISPATCH_MODES_ALL=AVX2,...,BASELINE based on CMakeLists.txt content
 
-namespace cv {
+নামাকাশ cv {
 
-static CountNonZeroFunc getCountNonZeroTab(int depth)
+স্থির গুনতি_Non_Zero_Func get_গুনতি_Non_Zero_Tab(পূর্ণসংখ্যা depth)
 {
     CV_INSTRUMENT_REGION();
-    CV_CPU_DISPATCH(getCountNonZeroTab, (depth),
+    CV_CPU_DISPATCH(get_গুনতি_Non_Zero_Tab, (depth),
         CV_CPU_DISPATCH_MODES_ALL);
 }
 
 #ifdef HAVE_OPENCL
-static bool ocl_countNonZero( InputArray _src, int & res )
+স্থির যৌক্তিক ocl_গুনতি_Non_Zero( প্রবেশ_Array _src, পূর্ণসংখ্যা & res )
 {
-    int type = _src.type(), depth = CV_MAT_DEPTH(type), kercn = ocl::predictOptimalVectorWidth(_src);
-    bool doubleSupport = ocl::Device::getDefault().doubleFPConfig() > 0;
+    পূর্ণসংখ্যা type = _src.type(), depth = CV_MAT_DEPTH(type), kercn = ocl::predictOptimalVectorWidth(_src);
+    যৌক্তিক doubleSupport = ocl::Device::getDefault().doubleFPConfig() > 0;
 
-    if (depth == CV_64F && !doubleSupport)
-        return false;
+    যদি (depth == CV_64F && !doubleSupport)
+        ফেরত মিথ্যা;
 
-    int dbsize = ocl::Device::getDefault().maxComputeUnits();
-    size_t wgs = ocl::Device::getDefault().maxWorkGroupSize();
+    পূর্ণসংখ্যা dbsize = ocl::Device::getDefault().maxComputeUnits();
+    size_t wgs = ocl::Device::getDefault().max_Work_Group_আকার();
 
-    int wgs2_aligned = 1;
-    while (wgs2_aligned < (int)wgs)
+    পূর্ণসংখ্যা wgs2_aligned = 1;
+    যখন (wgs2_aligned < (পূর্ণসংখ্যা)wgs)
         wgs2_aligned <<= 1;
     wgs2_aligned >>= 1;
 
@@ -40,207 +40,207 @@ static bool ocl_countNonZero( InputArray _src, int & res )
                   format("-D srcT=%s -D srcT1=%s -D cn=1 -D OP_COUNT_NON_ZERO"
                          " -D WGS=%d -D kercn=%d -D WGS2_ALIGNED=%d%s%s",
                          ocl::typeToStr(CV_MAKE_TYPE(depth, kercn)),
-                         ocl::typeToStr(depth), (int)wgs, kercn,
+                         ocl::typeToStr(depth), (পূর্ণসংখ্যা)wgs, kercn,
                          wgs2_aligned, doubleSupport ? " -D DOUBLE_SUPPORT" : "",
                          _src.isContinuous() ? " -D HAVE_SRC_CONT" : ""));
-    if (k.empty())
-        return false;
+    যদি (k.empty())
+        ফেরত মিথ্যা;
 
     UMat src = _src.getUMat(), db(1, dbsize, CV_32SC1);
-    k.args(ocl::KernelArg::ReadOnlyNoSize(src), src.cols, (int)src.total(),
+    k.args(ocl::KernelArg::Read_Only_No_আকার(src), src.cols, (পূর্ণসংখ্যা)src.যোগ(),
            dbsize, ocl::KernelArg::PtrWriteOnly(db));
 
     size_t globalsize = dbsize * wgs;
-    if (k.run(1, &globalsize, &wgs, true))
-        return res = saturate_cast<int>(cv::sum(db.getMat(ACCESS_READ))[0]), true;
-    return false;
+    যদি (k.run(1, &globalsize, &wgs, সত্য))
+        ফেরত res = saturate_cast<পূর্ণসংখ্যা>(cv::যোগ_2(db.getMat(ACCESS_READ))[0]), সত্য;
+    ফেরত মিথ্যা;
 }
 #endif
 
-#if defined HAVE_IPP
-static bool ipp_countNonZero( Mat &src, int &res )
+#যদি defined HAVE_IPP
+স্থির যৌক্তিক ipp_গুনতি_Non_Zero( Mat &src, পূর্ণসংখ্যা &res )
 {
     CV_INSTRUMENT_REGION_IPP();
 
-#if IPP_VERSION_X100 < 201801
+#যদি IPP_VERSION_X100 < 201801
     // Poor performance of SSE42
-    if(cv::ipp::getIppTopFeatures() == ippCPUID_SSE42)
-        return false;
+    যদি(cv::ipp::get_Ipp_শীর্ষ_Features() == ippCPUID_SSE42)
+        ফেরত মিথ্যা;
 #endif
 
-    Ipp32s  count = 0;
-    int     depth = src.depth();
+    Ipp32s  গুনতি_2 = 0;
+    পূর্ণসংখ্যা     depth = src.depth();
 
-    if(src.dims <= 2)
+    যদি(src.dims <= 2)
     {
         IppStatus status;
-        IppiSize  size = {src.cols*src.channels(), src.rows};
+        Ippi_আকার  size = {src.cols*src.channels(), src.rows};
 
-        if(depth == CV_8U)
-            status = CV_INSTRUMENT_FUN_IPP(ippiCountInRange_8u_C1R, (const Ipp8u *)src.ptr(), (int)src.step, size, &count, 0, 0);
-        else if(depth == CV_32F)
-            status = CV_INSTRUMENT_FUN_IPP(ippiCountInRange_32f_C1R, (const Ipp32f *)src.ptr(), (int)src.step, size, &count, 0, 0);
-        else
-            return false;
+        যদি(depth == CV_8U)
+            status = CV_INSTRUMENT_FUN_IPP(ippi_গুনতি_In_Range_8u_C1_R, (ধ্রুবক Ipp8u *)src.ptr(), (পূর্ণসংখ্যা)src.step, size, &গুনতি_2, 0, 0);
+        অন্যথা যদি(depth == CV_32F)
+            status = CV_INSTRUMENT_FUN_IPP(ippi_গুনতি_In_Range_32f_C1_R, (ধ্রুবক Ipp32f *)src.ptr(), (পূর্ণসংখ্যা)src.step, size, &গুনতি_2, 0, 0);
+        অন্যথা
+            ফেরত মিথ্যা;
 
-        if(status < 0)
-            return false;
+        যদি(status < 0)
+            ফেরত মিথ্যা;
 
-        res = size.width*size.height - count;
+        res = size.width*size.height - গুনতি_2;
     }
-    else
+    অন্যথা
     {
         IppStatus       status;
-        const Mat      *arrays[] = {&src, NULL};
+        ধ্রুবক Mat      *arrays[] = {&src, ফাঁকা};
         Mat            planes[1];
         NAryMatIterator it(arrays, planes, 1);
-        IppiSize        size  = {(int)it.size*src.channels(), 1};
+        Ippi_আকার        size  = {(পূর্ণসংখ্যা)it.size*src.channels(), 1};
         res = 0;
-        for (size_t i = 0; i < it.nplanes; i++, ++it)
+        জন্য (size_t i = 0; i < it.nplanes; i++, ++it)
         {
-            if(depth == CV_8U)
-                status = CV_INSTRUMENT_FUN_IPP(ippiCountInRange_8u_C1R, it.planes->ptr<Ipp8u>(), (int)it.planes->step, size, &count, 0, 0);
-            else if(depth == CV_32F)
-                status = CV_INSTRUMENT_FUN_IPP(ippiCountInRange_32f_C1R, it.planes->ptr<Ipp32f>(), (int)it.planes->step, size, &count, 0, 0);
-            else
-                return false;
+            যদি(depth == CV_8U)
+                status = CV_INSTRUMENT_FUN_IPP(ippi_গুনতি_In_Range_8u_C1_R, it.planes->ptr<Ipp8u>(), (পূর্ণসংখ্যা)it.planes->step, size, &গুনতি_2, 0, 0);
+            অন্যথা যদি(depth == CV_32F)
+                status = CV_INSTRUMENT_FUN_IPP(ippi_গুনতি_In_Range_32f_C1_R, it.planes->ptr<Ipp32f>(), (পূর্ণসংখ্যা)it.planes->step, size, &গুনতি_2, 0, 0);
+            অন্যথা
+                ফেরত মিথ্যা;
 
-            if(status < 0 || (int)it.planes->total()*src.channels() < count)
-                return false;
+            যদি(status < 0 || (পূর্ণসংখ্যা)it.planes->যোগ()*src.channels() < গুনতি_2)
+                ফেরত মিথ্যা;
 
-            res += (int)it.planes->total()*src.channels() - count;
+            res += (পূর্ণসংখ্যা)it.planes->যোগ()*src.channels() - গুনতি_2;
         }
     }
 
-    return true;
+    ফেরত সত্য;
 }
 #endif
 
-int countNonZero(InputArray _src)
+পূর্ণসংখ্যা গুনতি_Non_Zero(প্রবেশ_Array _src)
 {
     CV_INSTRUMENT_REGION();
 
-    int type = _src.type(), cn = CV_MAT_CN(type);
+    পূর্ণসংখ্যা type = _src.type(), cn = CV_MAT_CN(type);
     CV_Assert( cn == 1 );
 
-#if defined HAVE_OPENCL || defined HAVE_IPP
-    int res = -1;
+#যদি defined HAVE_OPENCL || defined HAVE_IPP
+    পূর্ণসংখ্যা res = -1;
 #endif
 
 #ifdef HAVE_OPENCL
     CV_OCL_RUN_(OCL_PERFORMANCE_CHECK(_src.isUMat()) && _src.dims() <= 2,
-                ocl_countNonZero(_src, res),
+                ocl_গুনতি_Non_Zero(_src, res),
                 res)
 #endif
 
     Mat src = _src.getMat();
-    CV_IPP_RUN_FAST(ipp_countNonZero(src, res), res);
+    CV_IPP_RUN_FAST(ipp_গুনতি_Non_Zero(src, res), res);
 
-    CountNonZeroFunc func = getCountNonZeroTab(src.depth());
+    গুনতি_Non_Zero_Func func = get_গুনতি_Non_Zero_Tab(src.depth());
     CV_Assert( func != 0 );
 
-    const Mat* arrays[] = {&src, 0};
+    ধ্রুবক Mat* arrays[] = {&src, 0};
     uchar* ptrs[1] = {};
     NAryMatIterator it(arrays, ptrs);
-    int total = (int)it.size, nz = 0;
+    পূর্ণসংখ্যা যোগ = (পূর্ণসংখ্যা)it.size, nz = 0;
 
-    for( size_t i = 0; i < it.nplanes; i++, ++it )
-        nz += func( ptrs[0], total );
+    জন্য( size_t i = 0; i < it.nplanes; i++, ++it )
+        nz += func( ptrs[0], যোগ );
 
-    return nz;
+    ফেরত nz;
 }
 
-void findNonZero(InputArray _src, OutputArray _idx)
+শূন্য findNonZero(প্রবেশ_Array _src, OutputArray _idx)
 {
     Mat src = _src.getMat();
     CV_Assert( src.channels() == 1 && src.dims == 2 );
 
-    int depth = src.depth();
+    পূর্ণসংখ্যা depth = src.depth();
     std::vector<Point> idxvec;
-    int rows = src.rows, cols = src.cols;
-    AutoBuffer<int> buf_(cols + 1);
-    int* buf = buf_.data();
+    পূর্ণসংখ্যা rows = src.rows, cols = src.cols;
+    Auto_বাফার<পূর্ণসংখ্যা> buf_(cols + 1);
+    পূর্ণসংখ্যা* buf = buf_.তথ্য();
 
-    for( int i = 0; i < rows; i++ )
+    জন্য( পূর্ণসংখ্যা i = 0; i < rows; i++ )
     {
-        int j, k = 0;
-        const uchar* ptr8 = src.ptr(i);
-        if( depth == CV_8U || depth == CV_8S || depth == CV_Bool || depth == CV_8F_E4M3FNUZ )
+        পূর্ণসংখ্যা j, k = 0;
+        ধ্রুবক uchar* ptr8 = src.ptr(i);
+        যদি( depth == CV_8U || depth == CV_8S || depth == CV_Bool || depth == CV_8F_E4M3FNUZ )
         {
             j = 0;
-#if (CV_SIMD || CV_SIMD_SCALABLE)
+#যদি (CV_SIMD || CV_SIMD_SCALABLE)
             // skip whole SIMD blocks of zeros; only scan blocks that contain a non-zero byte
-            const int vlanes = VTraits<v_uint8>::vlanes();
-            const v_uint8 vzero = vx_setzero_u8();
-            for( ; j <= cols - vlanes; j += vlanes )
+            ধ্রুবক পূর্ণসংখ্যা vlanes = VTraits<v_uint8>::vlanes();
+            ধ্রুবক v_uint8 vzero = vx_setzero_u8();
+            জন্য( ; j <= cols - vlanes; j += vlanes )
             {
-                if( !v_check_any(v_ne(vx_load(ptr8 + j), vzero)) )
-                    continue;
-                for( int t = j; t < j + vlanes; t++ )
-                    if( ptr8[t] != 0 ) buf[k++] = t;
+                যদি( !v_check_any(v_ne(vx_load(ptr8 + j), vzero)) )
+                    চালু;
+                জন্য( পূর্ণসংখ্যা t = j; t < j + vlanes; t++ )
+                    যদি( ptr8[t] != 0 ) buf[k++] = t;
             }
 #endif
-            for( ; j < cols; j++ )
-                if( ptr8[j] != 0 ) buf[k++] = j;
+            জন্য( ; j < cols; j++ )
+                যদি( ptr8[j] != 0 ) buf[k++] = j;
         }
-        else if( depth == CV_16U || depth == CV_16S )
+        অন্যথা যদি( depth == CV_16U || depth == CV_16S )
         {
-            const ushort* ptr16 = (const ushort*)ptr8;
-            for( j = 0; j < cols; j++ )
-                if( ptr16[j] != 0 ) buf[k++] = j;
+            ধ্রুবক ushort* ptr16 = (ধ্রুবক ushort*)ptr8;
+            জন্য( j = 0; j < cols; j++ )
+                যদি( ptr16[j] != 0 ) buf[k++] = j;
         }
-        else if( depth == CV_32S || depth == CV_32U )
+        অন্যথা যদি( depth == CV_32S || depth == CV_32U )
         {
-            const int* ptr32s = (const int*)ptr8;
-            for( j = 0; j < cols; j++ )
-                if( ptr32s[j] != 0 ) buf[k++] = j;
+            ধ্রুবক পূর্ণসংখ্যা* ptr32s = (ধ্রুবক পূর্ণসংখ্যা*)ptr8;
+            জন্য( j = 0; j < cols; j++ )
+                যদি( ptr32s[j] != 0 ) buf[k++] = j;
         }
-        else if( depth == CV_64S || depth == CV_64U )
+        অন্যথা যদি( depth == CV_64S || depth == CV_64U )
         {
-            const int64* ptr64s = (const int64*)ptr8;
-            for( j = 0; j < cols; j++ )
-                if( ptr64s[j] != 0 ) buf[k++] = j;
+            ধ্রুবক int64* ptr64s = (ধ্রুবক int64*)ptr8;
+            জন্য( j = 0; j < cols; j++ )
+                যদি( ptr64s[j] != 0 ) buf[k++] = j;
         }
-        else if( depth == CV_32F )
+        অন্যথা যদি( depth == CV_32F )
         {
-            const int* ptr32s = (const int*)ptr8;
-            for( j = 0; j < cols; j++ )
-                if( (ptr32s[j]<<1) != 0 ) buf[k++] = j;
+            ধ্রুবক পূর্ণসংখ্যা* ptr32s = (ধ্রুবক পূর্ণসংখ্যা*)ptr8;
+            জন্য( j = 0; j < cols; j++ )
+                যদি( (ptr32s[j]<<1) != 0 ) buf[k++] = j;
         }
-        else if( depth == CV_16F || depth == CV_16BF )
+        অন্যথা যদি( depth == CV_16F || depth == CV_16BF )
         {
-            const ushort* ptr16 = (const ushort*)ptr8;
-            for( j = 0; j < cols; j++ )
+            ধ্রুবক ushort* ptr16 = (ধ্রুবক ushort*)ptr8;
+            জন্য( j = 0; j < cols; j++ )
                 // mask sign bit so -0 (0x8000) is treated as zero; cannot use <<1 here
                 // because ushort is promoted to int and the sign bit would not be discarded
-                if( (ptr16[j] & 0x7fff) != 0 ) buf[k++] = j;
+                যদি( (ptr16[j] & 0x7fff) != 0 ) buf[k++] = j;
         }
-        else if( depth == CV_8F_E4M3FN )
+        অন্যথা যদি( depth == CV_8F_E4M3FN )
         {
-            for( j = 0; j < cols; j++ )
+            জন্য( j = 0; j < cols; j++ )
                 // mask sign bit so -0 (0x80) is treated as zero
-                if( (ptr8[j] & 0x7f) != 0 ) buf[k++] = j;
+                যদি( (ptr8[j] & 0x7f) != 0 ) buf[k++] = j;
         }
-        else
+        অন্যথা
         {
-            const int64* ptr64s = (const int64*)ptr8;
-            for( j = 0; j < cols; j++ )
-                if( (ptr64s[j]<<1) != 0 ) buf[k++] = j;
+            ধ্রুবক int64* ptr64s = (ধ্রুবক int64*)ptr8;
+            জন্য( j = 0; j < cols; j++ )
+                যদি( (ptr64s[j]<<1) != 0 ) buf[k++] = j;
         }
 
-        if( k > 0 )
+        যদি( k > 0 )
         {
             size_t sz = idxvec.size();
             idxvec.resize(sz + k);
-            for( j = 0; j < k; j++ )
+            জন্য( j = 0; j < k; j++ )
                 idxvec[sz + j] = Point(buf[j], i);
         }
     }
 
-    if( idxvec.empty() || (_idx.kind() == _InputArray::MAT && !_idx.getMatRef().isContinuous()) )
+    যদি( idxvec.empty() || (_idx.kind() == প্রবেশ_Array_2::MAT && !_idx.getMatRef().isContinuous()) )
         _idx.release();
 
-    if( !idxvec.empty() )
+    যদি( !idxvec.empty() )
         Mat(idxvec).copyTo(_idx);
 }
 

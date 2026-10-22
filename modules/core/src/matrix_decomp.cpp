@@ -3,128 +3,128 @@
 // of this distribution and at http://opencv.org/license.html
 
 
-#include "precomp.hpp"
+#অন্তর্ভাব "precomp.hpp"
 
-namespace cv { namespace hal {
+নামাকাশ cv { নামাকাশ hal {
 
 /****************************************************************************************\
 *                     LU & Cholesky implementation for small matrices                    *
 \****************************************************************************************/
 
-template<typename _Tp> static inline int
-LUImpl(_Tp* A, size_t astep, int m, _Tp* b, size_t bstep, int n, _Tp eps)
+template<typename _Tp> স্থির অন্তঃরেখ পূর্ণসংখ্যা
+LUImpl(_Tp* A, size_t astep, পূর্ণসংখ্যা m, _Tp* b, size_t bstep, পূর্ণসংখ্যা n, _Tp eps)
 {
-    int i, j, k, p = 1;
-    astep /= sizeof(A[0]);
-    bstep /= sizeof(b[0]);
+    পূর্ণসংখ্যা i, j, k, p = 1;
+    astep /= আকার(A[0]);
+    bstep /= আকার(b[0]);
 
-    for( i = 0; i < m; i++ )
+    জন্য( i = 0; i < m; i++ )
     {
         k = i;
 
-        for( j = i+1; j < m; j++ )
-            if( std::abs(A[j*astep + i]) > std::abs(A[k*astep + i]) )
+        জন্য( j = i+1; j < m; j++ )
+            যদি( std::abs(A[j*astep + i]) > std::abs(A[k*astep + i]) )
                 k = j;
 
-        if( std::abs(A[k*astep + i]) < eps )
-            return 0;
+        যদি( std::abs(A[k*astep + i]) < eps )
+            ফেরত 0;
 
-        if( k != i )
+        যদি( k != i )
         {
-            for( j = i; j < m; j++ )
+            জন্য( j = i; j < m; j++ )
                 std::swap(A[i*astep + j], A[k*astep + j]);
-            if( b )
-                for( j = 0; j < n; j++ )
+            যদি( b )
+                জন্য( j = 0; j < n; j++ )
                     std::swap(b[i*bstep + j], b[k*bstep + j]);
             p = -p;
         }
 
         _Tp d = -1/A[i*astep + i];
 
-        for( j = i+1; j < m; j++ )
+        জন্য( j = i+1; j < m; j++ )
         {
             _Tp alpha = A[j*astep + i]*d;
 
-            for( k = i+1; k < m; k++ )
+            জন্য( k = i+1; k < m; k++ )
                 A[j*astep + k] += alpha*A[i*astep + k];
 
-            if( b )
-                for( k = 0; k < n; k++ )
+            যদি( b )
+                জন্য( k = 0; k < n; k++ )
                     b[j*bstep + k] += alpha*b[i*bstep + k];
         }
     }
 
-    if( b )
+    যদি( b )
     {
-        for( i = m-1; i >= 0; i-- )
-            for( j = 0; j < n; j++ )
+        জন্য( i = m-1; i >= 0; i-- )
+            জন্য( j = 0; j < n; j++ )
             {
                 _Tp s = b[i*bstep + j];
-                for( k = i+1; k < m; k++ )
+                জন্য( k = i+1; k < m; k++ )
                     s -= A[i*astep + k]*b[k*bstep + j];
                 b[i*bstep + j] = s/A[i*astep + i];
             }
     }
 
-    return p;
+    ফেরত p;
 }
 
 
-int LU32f(float* A, size_t astep, int m, float* b, size_t bstep, int n)
+পূর্ণসংখ্যা LU32f(দশমিক* A, size_t astep, পূর্ণসংখ্যা m, দশমিক* b, size_t bstep, পূর্ণসংখ্যা n)
 {
     CV_INSTRUMENT_REGION();
 
-    int output;
+    পূর্ণসংখ্যা output;
     CALL_HAL_RET(LU32f, cv_hal_LU32f, output, A, astep, m, b, bstep, n)
     output = LUImpl(A, astep, m, b, bstep, n, FLT_EPSILON*10);
-    return output;
+    ফেরত output;
 }
 
 
-int LU64f(double* A, size_t astep, int m, double* b, size_t bstep, int n)
+পূর্ণসংখ্যা LU64f(দ্বিগুণ* A, size_t astep, পূর্ণসংখ্যা m, দ্বিগুণ* b, size_t bstep, পূর্ণসংখ্যা n)
 {
     CV_INSTRUMENT_REGION();
 
-    int output;
+    পূর্ণসংখ্যা output;
     CALL_HAL_RET(LU64f, cv_hal_LU64f, output, A, astep, m, b, bstep, n)
     output = LUImpl(A, astep, m, b, bstep, n, DBL_EPSILON*100);
-    return output;
+    ফেরত output;
 }
 
-template<typename _Tp> static inline bool
-CholImpl(_Tp* A, size_t astep, int m, _Tp* b, size_t bstep, int n)
+template<typename _Tp> স্থির অন্তঃরেখ যৌক্তিক
+CholImpl(_Tp* A, size_t astep, পূর্ণসংখ্যা m, _Tp* b, size_t bstep, পূর্ণসংখ্যা n)
 {
     _Tp* L = A;
-    int i, j, k;
-    double s;
-    astep /= sizeof(A[0]);
-    bstep /= sizeof(b[0]);
+    পূর্ণসংখ্যা i, j, k;
+    দ্বিগুণ s;
+    astep /= আকার(A[0]);
+    bstep /= আকার(b[0]);
 
-    for( i = 0; i < m; i++ )
+    জন্য( i = 0; i < m; i++ )
     {
-        for( j = 0; j < i; j++ )
+        জন্য( j = 0; j < i; j++ )
         {
             s = A[i*astep + j];
-            for( k = 0; k < j; k++ )
+            জন্য( k = 0; k < j; k++ )
                 s -= L[i*astep + k]*L[j*astep + k];
             L[i*astep + j] = (_Tp)(s*L[j*astep + j]);
         }
         s = A[i*astep + i];
-        for( k = 0; k < j; k++ )
+        জন্য( k = 0; k < j; k++ )
         {
-            double t = L[i*astep + k];
+            দ্বিগুণ t = L[i*astep + k];
             s -= t*t;
         }
-        if( s < std::numeric_limits<_Tp>::epsilon() )
-            return false;
+        যদি( s < std::numeric_limits<_Tp>::epsilon() )
+            ফেরত মিথ্যা;
         L[i*astep + i] = (_Tp)(1./std::sqrt(s));
     }
 
-    if (!b)
+    যদি (!b)
     {
-        for( i = 0; i < m; i++ )
+        জন্য( i = 0; i < m; i++ )
              L[i*astep + i]=1/L[i*astep + i];
-        return true;
+        ফেরত সত্য;
    }
 
     // LLt x = b
@@ -143,79 +143,79 @@ CholImpl(_Tp* A, size_t astep, int m, _Tp* b, size_t bstep, int n)
      [             L33 ]  x3   y3
      */
 
-    for( i = 0; i < m; i++ )
+    জন্য( i = 0; i < m; i++ )
     {
-        for( j = 0; j < n; j++ )
+        জন্য( j = 0; j < n; j++ )
         {
             s = b[i*bstep + j];
-            for( k = 0; k < i; k++ )
+            জন্য( k = 0; k < i; k++ )
                 s -= L[i*astep + k]*b[k*bstep + j];
             b[i*bstep + j] = (_Tp)(s*L[i*astep + i]);
         }
     }
 
-    for( i = m-1; i >= 0; i-- )
+    জন্য( i = m-1; i >= 0; i-- )
     {
-        for( j = 0; j < n; j++ )
+        জন্য( j = 0; j < n; j++ )
         {
             s = b[i*bstep + j];
-            for( k = m-1; k > i; k-- )
+            জন্য( k = m-1; k > i; k-- )
                 s -= L[k*astep + i]*b[k*bstep + j];
             b[i*bstep + j] = (_Tp)(s*L[i*astep + i]);
         }
     }
-    for( i = 0; i < m; i++ )
+    জন্য( i = 0; i < m; i++ )
             L[i*astep + i]=1/L[i*astep + i];
 
-    return true;
+    ফেরত সত্য;
 }
 
-bool Cholesky32f(float* A, size_t astep, int m, float* b, size_t bstep, int n)
+যৌক্তিক Cholesky32f(দশমিক* A, size_t astep, পূর্ণসংখ্যা m, দশমিক* b, size_t bstep, পূর্ণসংখ্যা n)
 {
     CV_INSTRUMENT_REGION();
 
-    bool output;
+    যৌক্তিক output;
     CALL_HAL_RET(Cholesky32f, cv_hal_Cholesky32f, output, A, astep, m, b, bstep, n)
-    return CholImpl(A, astep, m, b, bstep, n);
+    ফেরত CholImpl(A, astep, m, b, bstep, n);
 }
 
-bool Cholesky64f(double* A, size_t astep, int m, double* b, size_t bstep, int n)
+যৌক্তিক Cholesky64f(দ্বিগুণ* A, size_t astep, পূর্ণসংখ্যা m, দ্বিগুণ* b, size_t bstep, পূর্ণসংখ্যা n)
 {
     CV_INSTRUMENT_REGION();
 
-    bool output;
+    যৌক্তিক output;
     CALL_HAL_RET(Cholesky64f, cv_hal_Cholesky64f, output, A, astep, m, b, bstep, n)
-    return CholImpl(A, astep, m, b, bstep, n);
+    ফেরত CholImpl(A, astep, m, b, bstep, n);
 }
 
-template<typename _Tp> inline static int
+template<typename _Tp> অন্তঃরেখ স্থির পূর্ণসংখ্যা
 sign(_Tp x)
 {
-    if (x >= (_Tp)0)
-        return 1;
-    else
-        return -1;
+    যদি (x >= (_Tp)0)
+        ফেরত 1;
+    অন্যথা
+        ফেরত -1;
 }
 
-template<typename _Tp> static inline int
-QRImpl(_Tp* A, size_t astep, int m, int n, int k, _Tp* b, size_t bstep, _Tp* hFactors, _Tp eps)
+template<typename _Tp> স্থির অন্তঃরেখ পূর্ণসংখ্যা
+QRImpl(_Tp* A, size_t astep, পূর্ণসংখ্যা m, পূর্ণসংখ্যা n, পূর্ণসংখ্যা k, _Tp* b, size_t bstep, _Tp* hFactors, _Tp eps)
 {
-    astep /= sizeof(_Tp);
-    bstep /= sizeof(_Tp);
+    astep /= আকার(_Tp);
+    bstep /= আকার(_Tp);
 
-    cv::AutoBuffer<_Tp> buffer;
-    size_t buf_size = m ? m + n : hFactors != NULL;
-    buffer.allocate(buf_size);
-    _Tp* vl = buffer.data();
-    if (hFactors == NULL)
+    cv::Auto_বাফার<_Tp> বাফার;
+    size_t buf_আকার_2 = m ? m + n : hFactors != ফাঁকা;
+    বাফার.allocate(buf_আকার_2);
+    _Tp* vl = বাফার.তথ্য();
+    যদি (hFactors == ফাঁকা)
         hFactors = vl + m;
 
-    for (int l = 0; l < n; l++)
+    জন্য (পূর্ণসংখ্যা l = 0; l < n; l++)
     {
         //generate vl
-        int vlSize = m - l;
+        পূর্ণসংখ্যা vl_আকার = m - l;
         _Tp vlNorm = (_Tp)0;
-        for (int i = 0; i < vlSize; i++)
+        জন্য (পূর্ণসংখ্যা i = 0; i < vl_আকার; i++)
         {
             vl[i] = A[(l + i)*astep + l];
             vlNorm += vl[i] * vl[i];
@@ -223,20 +223,20 @@ QRImpl(_Tp* A, size_t astep, int m, int n, int k, _Tp* b, size_t bstep, _Tp* hFa
         _Tp tmpV = vl[0];
         vl[0] = vl[0] + sign(vl[0])*std::sqrt(vlNorm);
         vlNorm = std::sqrt(vlNorm + vl[0] * vl[0] - tmpV*tmpV);
-        for (int i = 0; i < vlSize; i++)
+        জন্য (পূর্ণসংখ্যা i = 0; i < vl_আকার; i++)
         {
             vl[i] /= vlNorm;
         }
         //multiply A_l*vl
-        for (int j = l; j < n; j++)
+        জন্য (পূর্ণসংখ্যা j = l; j < n; j++)
         {
             _Tp v_lA = (_Tp)0;
-            for (int i = l; i < m; i++)
+            জন্য (পূর্ণসংখ্যা i = l; i < m; i++)
             {
                 v_lA += vl[i - l] * A[i*astep + j];
             }
 
-            for (int i = l; i < m; i++)
+            জন্য (পূর্ণসংখ্যা i = l; i < m; i++)
             {
                 A[i*astep + j] -= 2 * vl[i - l] * v_lA;
             }
@@ -244,94 +244,94 @@ QRImpl(_Tp* A, size_t astep, int m, int n, int k, _Tp* b, size_t bstep, _Tp* hFa
 
         //save vl and factors
         hFactors[l] = vl[0] * vl[0];
-        for (int i = 1; i < vlSize; i++)
+        জন্য (পূর্ণসংখ্যা i = 1; i < vl_আকার; i++)
         {
             A[(l + i)*astep + l] = vl[i] / vl[0];
         }
     }
 
-    if (b)
+    যদি (b)
     {
         //generate new rhs
-        for (int l = 0; l < n; l++)
+        জন্য (পূর্ণসংখ্যা l = 0; l < n; l++)
         {
             //unpack vl
             vl[0] = (_Tp)1;
-            for (int j = 1; j < m - l; j++)
+            জন্য (পূর্ণসংখ্যা j = 1; j < m - l; j++)
             {
               vl[j] = A[(j + l)*astep + l];
             }
 
             //h_l*x
-            for (int j = 0; j < k; j++)
+            জন্য (পূর্ণসংখ্যা j = 0; j < k; j++)
             {
                 _Tp v_lB = (_Tp)0;
-                for (int i = l; i < m; i++)
+                জন্য (পূর্ণসংখ্যা i = l; i < m; i++)
                   v_lB += vl[i - l] * b[i*bstep + j];
 
-                for (int i = l; i < m; i++)
+                জন্য (পূর্ণসংখ্যা i = l; i < m; i++)
                     b[i*bstep + j] -= 2 * vl[i - l] * v_lB * hFactors[l];
             }
         }
         //do back substitution
-        for (int i = n - 1; i >= 0; i--)
+        জন্য (পূর্ণসংখ্যা i = n - 1; i >= 0; i--)
         {
-            for (int j = n - 1; j > i; j--)
+            জন্য (পূর্ণসংখ্যা j = n - 1; j > i; j--)
             {
-                for (int p = 0; p < k; p++)
+                জন্য (পূর্ণসংখ্যা p = 0; p < k; p++)
                     b[i*bstep + p] -= b[j*bstep + p] * A[i*astep + j];
             }
-            if (std::abs(A[i*astep + i]) < eps)
-                return 0;
-            for (int p = 0; p < k; p++)
+            যদি (std::abs(A[i*astep + i]) < eps)
+                ফেরত 0;
+            জন্য (পূর্ণসংখ্যা p = 0; p < k; p++)
                 b[i*bstep + p] /= A[i*astep + i];
         }
     }
 
-    return 1;
+    ফেরত 1;
 }
 
-int QR32f(float* A, size_t astep, int m, int n, int k, float* b, size_t bstep, float* hFactors)
+পূর্ণসংখ্যা QR32f(দশমিক* A, size_t astep, পূর্ণসংখ্যা m, পূর্ণসংখ্যা n, পূর্ণসংখ্যা k, দশমিক* b, size_t bstep, দশমিক* hFactors)
 {
     CV_INSTRUMENT_REGION();
 
-    int output;
+    পূর্ণসংখ্যা output;
     CALL_HAL_RET(QR32f, cv_hal_QR32f, output, A, astep, m, n, k, b, bstep, hFactors);
     output = QRImpl(A, astep, m, n, k, b, bstep, hFactors, FLT_EPSILON * 10);
-    return output;
+    ফেরত output;
 }
 
-int QR64f(double* A, size_t astep, int m, int n, int k, double* b, size_t bstep, double* hFactors)
+পূর্ণসংখ্যা QR64f(দ্বিগুণ* A, size_t astep, পূর্ণসংখ্যা m, পূর্ণসংখ্যা n, পূর্ণসংখ্যা k, দ্বিগুণ* b, size_t bstep, দ্বিগুণ* hFactors)
 {
     CV_INSTRUMENT_REGION();
 
-    int output;
+    পূর্ণসংখ্যা output;
     CALL_HAL_RET(QR64f, cv_hal_QR64f, output, A, astep, m, n, k, b, bstep, hFactors)
     output = QRImpl(A, astep, m, n, k, b, bstep, hFactors, DBL_EPSILON * 100);
-    return output;
+    ফেরত output;
 }
 
 //=============================================================================
 // for compatibility with 3.0
 
-int LU(float* A, size_t astep, int m, float* b, size_t bstep, int n)
+পূর্ণসংখ্যা LU(দশমিক* A, size_t astep, পূর্ণসংখ্যা m, দশমিক* b, size_t bstep, পূর্ণসংখ্যা n)
 {
-    return LUImpl(A, astep, m, b, bstep, n, FLT_EPSILON*10);
+    ফেরত LUImpl(A, astep, m, b, bstep, n, FLT_EPSILON*10);
 }
 
-int LU(double* A, size_t astep, int m, double* b, size_t bstep, int n)
+পূর্ণসংখ্যা LU(দ্বিগুণ* A, size_t astep, পূর্ণসংখ্যা m, দ্বিগুণ* b, size_t bstep, পূর্ণসংখ্যা n)
 {
-    return LUImpl(A, astep, m, b, bstep, n, DBL_EPSILON*100);
+    ফেরত LUImpl(A, astep, m, b, bstep, n, DBL_EPSILON*100);
 }
 
-bool Cholesky(float* A, size_t astep, int m, float* b, size_t bstep, int n)
+যৌক্তিক Cholesky(দশমিক* A, size_t astep, পূর্ণসংখ্যা m, দশমিক* b, size_t bstep, পূর্ণসংখ্যা n)
 {
-    return CholImpl(A, astep, m, b, bstep, n);
+    ফেরত CholImpl(A, astep, m, b, bstep, n);
 }
 
-bool Cholesky(double* A, size_t astep, int m, double* b, size_t bstep, int n)
+যৌক্তিক Cholesky(দ্বিগুণ* A, size_t astep, পূর্ণসংখ্যা m, দ্বিগুণ* b, size_t bstep, পূর্ণসংখ্যা n)
 {
-    return CholImpl(A, astep, m, b, bstep, n);
+    ফেরত CholImpl(A, astep, m, b, bstep, n);
 }
 
 }} // cv::hal::

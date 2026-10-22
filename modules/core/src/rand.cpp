@@ -40,9 +40,9 @@
 //
 //M*/
 
-#include "precomp.hpp"
+#অন্তর্ভাব "precomp.hpp"
 
-namespace cv
+নামাকাশ cv
 {
 
 ///////////////////////////// Functions Declaration //////////////////////////////////////
@@ -56,11 +56,11 @@ namespace cv
    carry = floor (temp / (2^32))
 */
 
-#define  RNG_NEXT(x)    ((uint64)(unsigned)(x)*CV_RNG_COEFF + ((x) >> 32))
+#define  RNG_পরবর্তী(x)    ((uint64)(unsigned)(x)*CV_RNG_COEFF + ((x) >> 32))
 // make it jump-less
-#define  CN_NEXT(k)     (((k) + 1) & (((k) >= cn) - 1))
+#define  CN_পরবর্তী(k)     (((k) + 1) & (((k) >= cn) - 1))
 
-enum
+গণনা
 {
     RNG_FLAG_SMALL = 0x40000000,
     RNG_FLAG_STDMTX = 0x80000000
@@ -70,230 +70,230 @@ enum
 *                           Pseudo-Random Number Generators (PRNGs)                     *
 \***************************************************************************************/
 
-template<typename T> static void
-randBits_( T* arr, int len, int cn, uint64* state, const Vec2l* p, int flags )
+template<typename T> স্থির শূন্য
+randBits_( T* arr, পূর্ণসংখ্যা len, পূর্ণসংখ্যা cn, uint64* state, ধ্রুবক Vec2l* p, পূর্ণসংখ্যা flags )
 {
-    bool small_flag = (flags & RNG_FLAG_SMALL) != 0;
-    uint64 temp = *state;
-    int i, k = 0;
+    যৌক্তিক small_flag = (flags & RNG_FLAG_SMALL) != 0;
+    uint64 অস্থায়ী_2 = *state;
+    পূর্ণসংখ্যা i, k = 0;
     len *= cn;
     --cn;
 
-    if( !small_flag )
+    যদি( !small_flag )
     {
-        for( i = 0; i <= len - 4; i += 4 )
+        জন্য( i = 0; i <= len - 4; i += 4 )
         {
             int64_t t0, t1;
 
-            temp = RNG_NEXT(temp);
-            t0 = ((int64_t)temp & p[k][0]) + p[k][1];
-            k = CN_NEXT(k);
-            temp = RNG_NEXT(temp);
-            t1 = ((int64_t)temp & p[k][0]) + p[k][1];
-            k = CN_NEXT(k);
+            অস্থায়ী_2 = RNG_পরবর্তী(অস্থায়ী_2);
+            t0 = ((int64_t)অস্থায়ী_2 & p[k][0]) + p[k][1];
+            k = CN_পরবর্তী(k);
+            অস্থায়ী_2 = RNG_পরবর্তী(অস্থায়ী_2);
+            t1 = ((int64_t)অস্থায়ী_2 & p[k][0]) + p[k][1];
+            k = CN_পরবর্তী(k);
             arr[i] = saturate_cast<T>(t0);
             arr[i+1] = saturate_cast<T>(t1);
 
-            temp = RNG_NEXT(temp);
-            t0 = ((int64_t)temp & p[k][0]) + p[k][1];
-            k = CN_NEXT(k);
-            temp = RNG_NEXT(temp);
-            t1 = ((int64_t)temp & p[k][0]) + p[k][1];
-            k = CN_NEXT(k);
+            অস্থায়ী_2 = RNG_পরবর্তী(অস্থায়ী_2);
+            t0 = ((int64_t)অস্থায়ী_2 & p[k][0]) + p[k][1];
+            k = CN_পরবর্তী(k);
+            অস্থায়ী_2 = RNG_পরবর্তী(অস্থায়ী_2);
+            t1 = ((int64_t)অস্থায়ী_2 & p[k][0]) + p[k][1];
+            k = CN_পরবর্তী(k);
             arr[i+2] = saturate_cast<T>(t0);
             arr[i+3] = saturate_cast<T>(t1);
         }
     }
-    else
+    অন্যথা
     {
-        for( i = 0; i <= len - 4; i += 4 )
+        জন্য( i = 0; i <= len - 4; i += 4 )
         {
             int64_t t0, t1, t;
-            temp = RNG_NEXT(temp);
-            t = temp;
+            অস্থায়ী_2 = RNG_পরবর্তী(অস্থায়ী_2);
+            t = অস্থায়ী_2;
             // p[i+...][0] is within 0..255 in this branch (small_flag==true),
             // so we don't need to do (t>>...)&255,
             // the upper bits will be cleaned with ... & p[i+...][0].
             t0 = (t & p[k][0]) + p[k][1];
-            k = CN_NEXT(k);
+            k = CN_পরবর্তী(k);
             t1 = ((t >> 8) & p[k][0]) + p[k][1];
-            k = CN_NEXT(k);
+            k = CN_পরবর্তী(k);
             arr[i] = saturate_cast<T>(t0);
             arr[i+1] = saturate_cast<T>(t1);
 
             t0 = ((t >> 16) & p[k][0]) + p[k][1];
-            k = CN_NEXT(k);
+            k = CN_পরবর্তী(k);
             t1 = ((t >> 24) & p[k][0]) + p[k][1];
-            k = CN_NEXT(k);
+            k = CN_পরবর্তী(k);
             arr[i+2] = saturate_cast<T>(t0);
             arr[i+3] = saturate_cast<T>(t1);
         }
     }
 
-    for( ; i < len; i++ )
+    জন্য( ; i < len; i++ )
     {
         int64_t t0;
-        temp = RNG_NEXT(temp);
+        অস্থায়ী_2 = RNG_পরবর্তী(অস্থায়ী_2);
 
-        t0 = ((int64_t)temp & p[k][0]) + p[k][1];
-        k = CN_NEXT(k);
+        t0 = ((int64_t)অস্থায়ী_2 & p[k][0]) + p[k][1];
+        k = CN_পরবর্তী(k);
         arr[i] = saturate_cast<T>(t0);
     }
 
-    *state = temp;
+    *state = অস্থায়ী_2;
 }
 
-struct DivStruct
+কাঠামো DivStruct
 {
     unsigned d;
     unsigned M;
-    int sh1, sh2;
+    পূর্ণসংখ্যা sh1, sh2;
     int64_t delta;
     uint64_t diff;
 };
 
-template<typename T> static void
-randi_( T* arr, int len, int cn, uint64* state, const DivStruct* p )
+template<typename T> স্থির শূন্য
+randi_( T* arr, পূর্ণসংখ্যা len, পূর্ণসংখ্যা cn, uint64* state, ধ্রুবক DivStruct* p )
 {
-    uint64 temp = *state;
-    int k = 0;
+    uint64 অস্থায়ী_2 = *state;
+    পূর্ণসংখ্যা k = 0;
     len *= cn;
     cn--;
-    for( int i = 0; i < len; i++ )
+    জন্য( পূর্ণসংখ্যা i = 0; i < len; i++ )
     {
-        temp = RNG_NEXT(temp);
-        unsigned t = (unsigned)temp;
+        অস্থায়ী_2 = RNG_পরবর্তী(অস্থায়ী_2);
+        unsigned t = (unsigned)অস্থায়ী_2;
         unsigned v = (unsigned)(((uint64)t * p[k].M) >> 32);
         v = (v + ((t - v) >> p[k].sh1)) >> p[k].sh2;
         int64_t res = (int64_t)(t - v*p[k].d) + p[k].delta;
-        k = CN_NEXT(k);
+        k = CN_পরবর্তী(k);
         arr[i] = saturate_cast<T>(res);
     }
-    *state = temp;
+    *state = অস্থায়ী_2;
 }
 
-static void
-randi_( int64_t* arr, int len, int cn, uint64* state, const DivStruct* p )
+স্থির শূন্য
+randi_( int64_t* arr, পূর্ণসংখ্যা len, পূর্ণসংখ্যা cn, uint64* state, ধ্রুবক DivStruct* p )
 {
-    uint64 temp = *state;
-    int k = 0;
+    uint64 অস্থায়ী_2 = *state;
+    পূর্ণসংখ্যা k = 0;
     len *= cn;
     cn--;
-    for( int i = 0; i < len; i++ )
+    জন্য( পূর্ণসংখ্যা i = 0; i < len; i++ )
     {
-        temp = RNG_NEXT(temp);
-        unsigned t0 = (unsigned)temp;
-        temp = RNG_NEXT(temp);
-        unsigned t1 = (unsigned)temp;
+        অস্থায়ী_2 = RNG_পরবর্তী(অস্থায়ী_2);
+        unsigned t0 = (unsigned)অস্থায়ী_2;
+        অস্থায়ী_2 = RNG_পরবর্তী(অস্থায়ী_2);
+        unsigned t1 = (unsigned)অস্থায়ী_2;
         int64_t t = (int64_t)((((uint64_t)t0 << 32) | t1) % p[k].diff) + p[k].delta;
-        k = CN_NEXT(k);
+        k = CN_পরবর্তী(k);
         arr[i] = t;
     }
-    *state = temp;
+    *state = অস্থায়ী_2;
 }
 
-static void
-randi_( uint64_t* arr, int len, int cn, uint64* state, const DivStruct* p )
+স্থির শূন্য
+randi_( uint64_t* arr, পূর্ণসংখ্যা len, পূর্ণসংখ্যা cn, uint64* state, ধ্রুবক DivStruct* p )
 {
-    uint64 temp = *state;
-    int k = 0;
+    uint64 অস্থায়ী_2 = *state;
+    পূর্ণসংখ্যা k = 0;
     len *= cn;
     cn--;
-    for( int i = 0; i < len; i++ )
+    জন্য( পূর্ণসংখ্যা i = 0; i < len; i++ )
     {
-        temp = RNG_NEXT(temp);
-        unsigned t0 = (unsigned)temp;
-        temp = RNG_NEXT(temp);
-        unsigned t1 = (unsigned)temp;
+        অস্থায়ী_2 = RNG_পরবর্তী(অস্থায়ী_2);
+        unsigned t0 = (unsigned)অস্থায়ী_2;
+        অস্থায়ী_2 = RNG_পরবর্তী(অস্থায়ী_2);
+        unsigned t1 = (unsigned)অস্থায়ী_2;
         uint64_t t = (((uint64_t)t0 << 32) | t1) % p[k].diff;
         int64_t delta = p[k].delta;
-        k = CN_NEXT(k);
+        k = CN_পরবর্তী(k);
         arr[i] = delta >= 0 || t >= (uint64_t)-delta ? t + (uint64_t)delta : 0;
     }
-    *state = temp;
+    *state = অস্থায়ী_2;
 }
 
 template<typename T>
-static void randBitsWrap(void* arr, int len, int cn, uint64* state, const void* p, void*, int flags)
+স্থির শূন্য randBitsWrap(শূন্য* arr, পূর্ণসংখ্যা len, পূর্ণসংখ্যা cn, uint64* state, ধ্রুবক শূন্য* p, শূন্য*, পূর্ণসংখ্যা flags)
 {
-    randBits_((T*)arr, len, cn, state, (const Vec2l*)p, flags);
+    randBits_((T*)arr, len, cn, state, (ধ্রুবক Vec2l*)p, flags);
 }
 
 template<typename T>
-static void randiWrap(void* arr, int len, int cn, uint64* state, const void* p, void*, int)
+স্থির শূন্য randiWrap(শূন্য* arr, পূর্ণসংখ্যা len, পূর্ণসংখ্যা cn, uint64* state, ধ্রুবক শূন্য* p, শূন্য*, পূর্ণসংখ্যা)
 {
-    randi_((T*)arr, len, cn, state, (const DivStruct*)p);
+    randi_((T*)arr, len, cn, state, (ধ্রুবক DivStruct*)p);
 }
 
 // Narrow an f32 buffer into one of the 1-byte FP8 destinations.
-static inline void cvt32fToFP8(const float* src, void* dst, int len, int depth)
+স্থির অন্তঃরেখ শূন্য cvt32fToFP8(ধ্রুবক দশমিক* src, শূন্য* dst, পূর্ণসংখ্যা len, পূর্ণসংখ্যা depth)
 {
-    if (depth == CV_8F_E4M3FN)        { fp8_t*   d = (fp8_t*)dst;   for (int i = 0; i < len; i++) d[i] = fp8_t(src[i]); }
-    else                              { fp8a_t* d = (fp8a_t*)dst; for (int i = 0; i < len; i++) d[i] = fp8a_t(src[i]); }
+    যদি (depth == CV_8F_E4M3FN)        { fp8_t*   d = (fp8_t*)dst;   জন্য (পূর্ণসংখ্যা i = 0; i < len; i++) d[i] = fp8_t(src[i]); }
+    অন্যথা                              { fp8a_t* d = (fp8a_t*)dst; জন্য (পূর্ণসংখ্যা i = 0; i < len; i++) d[i] = fp8a_t(src[i]); }
 }
-static inline bool isFP8Depth(int d) { return d >= CV_8F_E4M3FN && d <= CV_8F_E4M3FNUZ; }
+স্থির অন্তঃরেখ যৌক্তিক isFP8Depth(পূর্ণসংখ্যা d) { ফেরত d >= CV_8F_E4M3FN && d <= CV_8F_E4M3FNUZ; }
 
-static void randf_16_or_32f( void* dst, int len_, int cn, uint64* state, const void* _p, void* _fbuf, int flags )
+স্থির শূন্য randf_16_or_32f( শূন্য* dst, পূর্ণসংখ্যা len_, পূর্ণসংখ্যা cn, uint64* state, ধ্রুবক শূন্য* _p, শূন্য* _fbuf, পূর্ণসংখ্যা flags )
 {
-    const Vec2f* p = (const Vec2f*)_p;
-    float* fbuf = (float*)_fbuf;
-    int depth = CV_MAT_DEPTH(flags);
-    uint64 temp = *state;
-    int k = 0, len = len_*cn;
-    float* arr = depth == CV_16F || depth == CV_16BF || isFP8Depth(depth) ? fbuf : (float*)dst;
+    ধ্রুবক Vec2f* p = (ধ্রুবক Vec2f*)_p;
+    দশমিক* fbuf = (দশমিক*)_fbuf;
+    পূর্ণসংখ্যা depth = CV_MAT_DEPTH(flags);
+    uint64 অস্থায়ী_2 = *state;
+    পূর্ণসংখ্যা k = 0, len = len_*cn;
+    দশমিক* arr = depth == CV_16F || depth == CV_16BF || isFP8Depth(depth) ? fbuf : (দশমিক*)dst;
     cn--;
-    for( int i = 0; i < len; i++ )
+    জন্য( পূর্ণসংখ্যা i = 0; i < len; i++ )
     {
-        int t = (int)(temp = RNG_NEXT(temp));
-        arr[i] = (float)(t*p[k][0]);
-        k = CN_NEXT(k);
+        পূর্ণসংখ্যা t = (পূর্ণসংখ্যা)(অস্থায়ী_2 = RNG_পরবর্তী(অস্থায়ী_2));
+        arr[i] = (দশমিক)(t*p[k][0]);
+        k = CN_পরবর্তী(k);
     }
-    *state = temp;
+    *state = অস্থায়ী_2;
     hal::addRNGBias32f(arr, &p[0][0], len_, cn+1);
-    if (depth == CV_16F)
+    যদি (depth == CV_16F)
         hal::cvt32f16f(fbuf, (hfloat*)dst, len);
-    else if (depth == CV_16BF)
+    অন্যথা যদি (depth == CV_16BF)
         hal::cvt32f16bf(fbuf, (bfloat*)dst, len);
-    else if (isFP8Depth(depth))
+    অন্যথা যদি (isFP8Depth(depth))
         cvt32fToFP8(fbuf, dst, len, depth);
 }
 
-static void
-randf_64f( void* _arr, int len_, int cn, uint64* state, const void* _p, void*, int )
+স্থির শূন্য
+randf_64f( শূন্য* _arr, পূর্ণসংখ্যা len_, পূর্ণসংখ্যা cn, uint64* state, ধ্রুবক শূন্য* _p, শূন্য*, পূর্ণসংখ্যা )
 {
-    double* arr = (double*)_arr;
-    const Vec2d* p = (const Vec2d*)_p;
-    uint64 temp = *state;
-    int k = 0, len = len_*cn;
+    দ্বিগুণ* arr = (দ্বিগুণ*)_arr;
+    ধ্রুবক Vec2d* p = (ধ্রুবক Vec2d*)_p;
+    uint64 অস্থায়ী_2 = *state;
+    পূর্ণসংখ্যা k = 0, len = len_*cn;
     cn--;
-    for( int i = 0; i < len; i++ )
+    জন্য( পূর্ণসংখ্যা i = 0; i < len; i++ )
     {
-        temp = RNG_NEXT(temp);
-        int64_t v = (int64_t)((temp >> 32) | (temp << 32));
+        অস্থায়ী_2 = RNG_পরবর্তী(অস্থায়ী_2);
+        int64_t v = (int64_t)((অস্থায়ী_2 >> 32) | (অস্থায়ী_2 << 32));
         arr[i] = v*p[k][0];
-        k = CN_NEXT(k);
+        k = CN_পরবর্তী(k);
     }
-    *state = temp;
+    *state = অস্থায়ী_2;
     hal::addRNGBias64f(arr, &p[0][0], len_, cn+1);
 }
 
-typedef void (*RandFunc)(void* arr, int len, int cn, uint64* state,
-                         const void* p, void* tempbuf, int flags);
+প্রকারলেখ শূন্য (*RandFunc)(শূন্য* arr, পূর্ণসংখ্যা len, পূর্ণসংখ্যা cn, uint64* state,
+                         ধ্রুবক শূন্য* p, শূন্য* tempbuf, পূর্ণসংখ্যা flags);
 
-static RandFunc randTab[CV_DEPTH_MAX][CV_DEPTH_MAX] =
+স্থির RandFunc randTab[CV_DEPTH_MAX][CV_DEPTH_MAX] =
 {
     {
         randiWrap<uchar>, randiWrap<schar>, randiWrap<ushort>,
-        randiWrap<short>, randiWrap<int>, randf_16_or_32f,
+        randiWrap<short>, randiWrap<পূর্ণসংখ্যা>, randf_16_or_32f,
         randf_64f, randf_16_or_32f, randf_16_or_32f,
-        randiWrap<bool>, randiWrap<uint64_t>, randiWrap<int64_t>,
+        randiWrap<যৌক্তিক>, randiWrap<uint64_t>, randiWrap<int64_t>,
         randiWrap<unsigned>,
         randf_16_or_32f, randf_16_or_32f    // CV_8F_E4M3FN, E4M3FNUZ
     },
     {
         randBitsWrap<uchar>, randBitsWrap<schar>, randBitsWrap<ushort>,
-        randBitsWrap<short>, randBitsWrap<int>, 0, 0, 0, 0,
-        randBitsWrap<bool>, randBitsWrap<uint64_t>, randBitsWrap<int64_t>,
+        randBitsWrap<short>, randBitsWrap<পূর্ণসংখ্যা>, 0, 0, 0, 0,
+        randBitsWrap<যৌক্তিক>, randBitsWrap<uint64_t>, randBitsWrap<int64_t>,
         randBitsWrap<unsigned>, 0, 0, 0
     }
 };
@@ -303,331 +303,331 @@ static RandFunc randTab[CV_DEPTH_MAX][CV_DEPTH_MAX] =
    "The Ziggurat Method for Generating Random Variables"
    by George Marsaglia and Wai Wan Tsang, Journal of Statistical Software, 2007.
 */
-static void
-randn_0_1_32f( float* arr, int len, uint64* state )
+স্থির শূন্য
+randn_0_1_32f( দশমিক* arr, পূর্ণসংখ্যা len, uint64* state )
 {
-    const float r = 3.442620f; // The start of the right tail
-    const float rng_flt = 2.3283064365386962890625e-10f; // 2^-32
-    static unsigned kn[128];
-    static float wn[128], fn[128];
-    uint64 temp = *state;
-    static bool initialized=false;
-    int i;
+    ধ্রুবক দশমিক r = 3.442620f; // The start of the right tail
+    ধ্রুবক দশমিক rng_flt = 2.3283064365386962890625e-10f; // 2^-32
+    স্থির unsigned kn[128];
+    স্থির দশমিক wn[128], fn[128];
+    uint64 অস্থায়ী_2 = *state;
+    স্থির যৌক্তিক initialized=মিথ্যা;
+    পূর্ণসংখ্যা i;
 
-    if( !initialized )
+    যদি( !initialized )
     {
-        const double m1 = 2147483648.0;
-        double dn = 3.442619855899, tn = dn, vn = 9.91256303526217e-3;
+        ধ্রুবক দ্বিগুণ m1 = 2147483648.0;
+        দ্বিগুণ dn = 3.442619855899, tn = dn, vn = 9.91256303526217e-3;
 
         // Set up the tables
-        double q = vn/std::exp(-.5*dn*dn);
+        দ্বিগুণ q = vn/std::exp(-.5*dn*dn);
         kn[0] = (unsigned)((dn/q)*m1);
         kn[1] = 0;
 
-        wn[0] = (float)(q/m1);
-        wn[127] = (float)(dn/m1);
+        wn[0] = (দশমিক)(q/m1);
+        wn[127] = (দশমিক)(dn/m1);
 
         fn[0] = 1.f;
-        fn[127] = (float)std::exp(-.5*dn*dn);
+        fn[127] = (দশমিক)std::exp(-.5*dn*dn);
 
-        for(i=126;i>=1;i--)
+        জন্য(i=126;i>=1;i--)
         {
             dn = std::sqrt(-2.*std::log(vn/dn+std::exp(-.5*dn*dn)));
             kn[i+1] = (unsigned)((dn/tn)*m1);
             tn = dn;
-            fn[i] = (float)std::exp(-.5*dn*dn);
-            wn[i] = (float)(dn/m1);
+            fn[i] = (দশমিক)std::exp(-.5*dn*dn);
+            wn[i] = (দশমিক)(dn/m1);
         }
-        initialized = true;
+        initialized = সত্য;
     }
 
-    for( i = 0; i < len; i++ )
+    জন্য( i = 0; i < len; i++ )
     {
-        float x, y;
-        for(;;)
+        দশমিক x, y;
+        জন্য(;;)
         {
-            int hz = (int)temp;
-            temp = RNG_NEXT(temp);
-            int iz = hz & 127;
+            পূর্ণসংখ্যা hz = (পূর্ণসংখ্যা)অস্থায়ী_2;
+            অস্থায়ী_2 = RNG_পরবর্তী(অস্থায়ী_2);
+            পূর্ণসংখ্যা iz = hz & 127;
             x = hz*wn[iz];
-            if( (unsigned)std::abs(hz) < kn[iz] )
-                break;
-            if( iz == 0) // iz==0, handles the base strip
+            যদি( (unsigned)std::abs(hz) < kn[iz] )
+                বিরতি;
+            যদি( iz == 0) // iz==0, handles the base strip
             {
-                do
+                করো
                 {
-                    x = (unsigned)temp*rng_flt;
-                    temp = RNG_NEXT(temp);
-                    y = (unsigned)temp*rng_flt;
-                    temp = RNG_NEXT(temp);
-                    x = (float)(-std::log(x+FLT_MIN)*0.2904764);
-                    y = (float)-std::log(y+FLT_MIN);
+                    x = (unsigned)অস্থায়ী_2*rng_flt;
+                    অস্থায়ী_2 = RNG_পরবর্তী(অস্থায়ী_2);
+                    y = (unsigned)অস্থায়ী_2*rng_flt;
+                    অস্থায়ী_2 = RNG_পরবর্তী(অস্থায়ী_2);
+                    x = (দশমিক)(-std::log(x+FLT_MIN)*0.2904764);
+                    y = (দশমিক)-std::log(y+FLT_MIN);
                 }	// .2904764 is 1/r
-                while( y + y < x*x );
+                যখন( y + y < x*x );
                 x = hz > 0 ? r + x : -r - x;
-                break;
+                বিরতি;
             }
             // iz > 0, handle the wedges of other strips
-            y = (unsigned)temp*rng_flt;
-            temp = RNG_NEXT(temp);
-            if( fn[iz] + y*(fn[iz - 1] - fn[iz]) < std::exp(-.5*x*x) )
-                break;
+            y = (unsigned)অস্থায়ী_2*rng_flt;
+            অস্থায়ী_2 = RNG_পরবর্তী(অস্থায়ী_2);
+            যদি( fn[iz] + y*(fn[iz - 1] - fn[iz]) < std::exp(-.5*x*x) )
+                বিরতি;
         }
         arr[i] = x;
     }
-    *state = temp;
+    *state = অস্থায়ী_2;
 }
 
 
-double RNG::gaussian(double sigma)
+দ্বিগুণ RNG::gaussian(দ্বিগুণ sigma)
 {
-    float temp;
-    randn_0_1_32f( &temp, 1, &state );
-    return temp*sigma;
+    দশমিক অস্থায়ী_2;
+    randn_0_1_32f( &অস্থায়ী_2, 1, &state );
+    ফেরত অস্থায়ী_2*sigma;
 }
 
-template<typename T, typename PT> static void
-randnScale_(float* src, void* _dst, int len, int cn,
-            const void* _mean, const void* _stddev, int flags )
+template<typename T, typename PT> স্থির শূন্য
+randnScale_(দশমিক* src, শূন্য* _dst, পূর্ণসংখ্যা len, পূর্ণসংখ্যা cn,
+            ধ্রুবক শূন্য* _mean, ধ্রুবক শূন্য* _stddev, পূর্ণসংখ্যা flags )
 {
     T* dst = (T*)_dst;
-    const PT* mean = (const PT*)_mean;
-    const PT* stddev = (const PT*)_stddev;
-    bool stdmtx = (flags & RNG_FLAG_STDMTX) != 0;
-    int i, j, k;
-    if( !stdmtx || cn == 1 )
+    ধ্রুবক PT* mean = (ধ্রুবক PT*)_mean;
+    ধ্রুবক PT* stddev = (ধ্রুবক PT*)_stddev;
+    যৌক্তিক stdmtx = (flags & RNG_FLAG_STDMTX) != 0;
+    পূর্ণসংখ্যা i, j, k;
+    যদি( !stdmtx || cn == 1 )
     {
-        if( cn == 1 )
+        যদি( cn == 1 )
         {
             PT a = stddev[0], b = mean[0];
-            for( i = 0; i < len; i++ )
+            জন্য( i = 0; i < len; i++ )
                 dst[i] = saturate_cast<T>(src[i]*a + b);
         }
-        else
+        অন্যথা
         {
             len *= cn;
             cn--;
-            for( i = k = 0; i < len; i++ ) {
+            জন্য( i = k = 0; i < len; i++ ) {
                 dst[i] = saturate_cast<T>(src[i]*stddev[k] + mean[k]);
-                k = CN_NEXT(k);
+                k = CN_পরবর্তী(k);
             }
         }
     }
-    else
+    অন্যথা
     {
         len *= cn;
         cn--;
-        for( i = j = 0; i < len; i++ )
+        জন্য( i = j = 0; i < len; i++ )
         {
             PT s = mean[j];
-            int i0 = i - j;
-            for( k = 0; k <= cn; k++ )
+            পূর্ণসংখ্যা i0 = i - j;
+            জন্য( k = 0; k <= cn; k++ )
                 s += src[i0 + k]*stddev[j*(cn+1) + k];
             dst[i] = saturate_cast<T>(s);
-            j = CN_NEXT(j);
+            j = CN_পরবর্তী(j);
         }
     }
 }
 
 // special version for 16f, 16bf and 32f
-static void
-randnScale_16_or_32f(float* fbuf, void* _dst, int len, int cn,
-                     const void* _mean, const void* _stddev, int flags)
+স্থির শূন্য
+randnScale_16_or_32f(দশমিক* fbuf, শূন্য* _dst, পূর্ণসংখ্যা len, পূর্ণসংখ্যা cn,
+                     ধ্রুবক শূন্য* _mean, ধ্রুবক শূন্য* _stddev, পূর্ণসংখ্যা flags)
 {
-    float* dst = (float*)_dst;
-    const float* mean = (const float*)_mean;
-    const float* stddev = (const float*)_stddev;
-    bool stdmtx = (flags & RNG_FLAG_STDMTX) != 0;
-    int depth = CV_MAT_DEPTH(flags);
-    float* arr = depth == CV_16F || depth == CV_16BF || isFP8Depth(depth) ? fbuf : dst;
-    int i, j, k;
+    দশমিক* dst = (দশমিক*)_dst;
+    ধ্রুবক দশমিক* mean = (ধ্রুবক দশমিক*)_mean;
+    ধ্রুবক দশমিক* stddev = (ধ্রুবক দশমিক*)_stddev;
+    যৌক্তিক stdmtx = (flags & RNG_FLAG_STDMTX) != 0;
+    পূর্ণসংখ্যা depth = CV_MAT_DEPTH(flags);
+    দশমিক* arr = depth == CV_16F || depth == CV_16BF || isFP8Depth(depth) ? fbuf : dst;
+    পূর্ণসংখ্যা i, j, k;
 
-    if( !stdmtx || cn == 1 )
+    যদি( !stdmtx || cn == 1 )
     {
-        if( cn == 1 )
+        যদি( cn == 1 )
         {
-            float a = stddev[0], b = mean[0];
-            for( i = 0; i < len; i++ )
+            দশমিক a = stddev[0], b = mean[0];
+            জন্য( i = 0; i < len; i++ )
                 arr[i] = fbuf[i]*a + b;
         }
-        else
+        অন্যথা
         {
             len *= cn;
             cn--;
-            for( i = k = 0; i < len; i++ ) {
+            জন্য( i = k = 0; i < len; i++ ) {
                 arr[i] = fbuf[i]*stddev[k] + mean[k];
-                k = CN_NEXT(k);
+                k = CN_পরবর্তী(k);
             }
         }
     }
-    else if( depth == CV_32F )
+    অন্যথা যদি( depth == CV_32F )
     {
         len *= cn;
         cn--;
-        for( i = j = 0; i < len; i++ )
+        জন্য( i = j = 0; i < len; i++ )
         {
-            float s = mean[j];
-            int i0 = i - j;
-            for( k = 0; k <= cn; k++ )
+            দশমিক s = mean[j];
+            পূর্ণসংখ্যা i0 = i - j;
+            জন্য( k = 0; k <= cn; k++ )
                 s += fbuf[i0 + k]*stddev[j*(cn+1) + k];
             dst[i] = s;
-            j = CN_NEXT(j);
+            j = CN_পরবর্তী(j);
         }
     }
-    else
+    অন্যথা
     {
-        float elembuf[CV_CN_MAX];
+        দশমিক elembuf[CV_CN_MAX];
         len *= cn;
-        for( i = 0; i < len; i += cn )
+        জন্য( i = 0; i < len; i += cn )
         {
             // since we process fbuf in-place,
             // we need to copy each cn-channel element
             // prior to matrix multiplication
-            for (j = 0; j < cn; j++)
+            জন্য (j = 0; j < cn; j++)
                 elembuf[j] = fbuf[i + j];
-            for (j = 0; j < cn; j++) {
-                float s = mean[j];
-                for( k = 0; k < cn; k++ )
+            জন্য (j = 0; j < cn; j++) {
+                দশমিক s = mean[j];
+                জন্য( k = 0; k < cn; k++ )
                     s += elembuf[k]*stddev[j*cn + k];
                 fbuf[i + j] = s;
             }
         }
     }
-    if (depth == CV_16F)
+    যদি (depth == CV_16F)
         hal::cvt32f16f(fbuf, (hfloat*)dst, len);
-    else if (depth == CV_16BF)
+    অন্যথা যদি (depth == CV_16BF)
         hal::cvt32f16bf(fbuf, (bfloat*)dst, len);
-    else if (isFP8Depth(depth))
+    অন্যথা যদি (isFP8Depth(depth))
         cvt32fToFP8(fbuf, dst, len, depth);
 }
 
-typedef void (*RandnScaleFunc)(float* src, void* dst, int len, int cn,
-                               const void* mean, const void* stddev, int flags);
+প্রকারলেখ শূন্য (*RandnScaleFunc)(দশমিক* src, শূন্য* dst, পূর্ণসংখ্যা len, পূর্ণসংখ্যা cn,
+                               ধ্রুবক শূন্য* mean, ধ্রুবক শূন্য* stddev, পূর্ণসংখ্যা flags);
 
-static RandnScaleFunc randnScaleTab[CV_DEPTH_MAX] =
+স্থির RandnScaleFunc randnScaleTab[CV_DEPTH_MAX] =
 {
-    randnScale_<uchar, float>, randnScale_<schar, float>, randnScale_<ushort, float>,
-    randnScale_<short, float>, randnScale_<int, float>, randnScale_16_or_32f,
-    randnScale_<double, double>, randnScale_16_or_32f, randnScale_16_or_32f,
-    randnScale_<bool, float>, randnScale_<uint64_t, double>, randnScale_<int64_t, double>,
-    randnScale_<unsigned, float>,
+    randnScale_<uchar, দশমিক>, randnScale_<schar, দশমিক>, randnScale_<ushort, দশমিক>,
+    randnScale_<short, দশমিক>, randnScale_<পূর্ণসংখ্যা, দশমিক>, randnScale_16_or_32f,
+    randnScale_<দ্বিগুণ, দ্বিগুণ>, randnScale_16_or_32f, randnScale_16_or_32f,
+    randnScale_<যৌক্তিক, দশমিক>, randnScale_<uint64_t, দ্বিগুণ>, randnScale_<int64_t, দ্বিগুণ>,
+    randnScale_<unsigned, দশমিক>,
     randnScale_16_or_32f, randnScale_16_or_32f   // CV_8F_E4M3FN, E4M3FNUZ
 };
 
-void RNG::fill( InputOutputArray _mat, int disttype,
-                InputArray _param1arg, InputArray _param2arg,
-                bool saturateRange )
+শূন্য RNG::fill( প্রবেশ_Output_Array _mat, পূর্ণসংখ্যা disttype,
+                প্রবেশ_Array _param1arg, প্রবেশ_Array _param2arg,
+                যৌক্তিক saturateRange )
 {
     CV_Assert(!_mat.empty());
 
     Mat mat = _mat.getMat(), _param1 = _param1arg.getMat(), _param2 = _param2arg.getMat();
-    int j, depth = mat.depth(), cn = mat.channels();
-    int esz1 = CV_ELEM_SIZE(depth);
-    AutoBuffer<double> _parambuf;
-    bool fast_int_mode = false;
-    bool small_flag = false;
+    পূর্ণসংখ্যা j, depth = mat.depth(), cn = mat.channels();
+    পূর্ণসংখ্যা esz1 = CV_ELEM_আকার(depth);
+    Auto_বাফার<দ্বিগুণ> _parambuf;
+    যৌক্তিক fast_int_mode = মিথ্যা;
+    যৌক্তিক small_flag = মিথ্যা;
     RandFunc func = 0;
     RandnScaleFunc scaleFunc = 0;
 
     CV_Assert(_param1.channels() == 1 && (_param1.rows == 1 || _param1.cols == 1) &&
               (_param1.rows + _param1.cols - 1 == cn || _param1.rows + _param1.cols - 1 == 1 ||
-               (_param1.size() == Size(1, 4) && _param1.type() == CV_64F && cn <= 4)));
+               (_param1.size() == আকার_2(1, 4) && _param1.type() == CV_64F && cn <= 4)));
     CV_Assert( _param2.channels() == 1 &&
                (((_param2.rows == 1 || _param2.cols == 1) &&
                 (_param2.rows + _param2.cols - 1 == cn || _param2.rows + _param2.cols - 1 == 1 ||
-                (_param1.size() == Size(1, 4) && _param1.type() == CV_64F && cn <= 4))) ||
+                (_param1.size() == আকার_2(1, 4) && _param1.type() == CV_64F && cn <= 4))) ||
                 (_param2.rows == cn && _param2.cols == cn && disttype == NORMAL)));
 
-    const void* uni_param = 0;
+    ধ্রুবক শূন্য* uni_param = 0;
     uchar* mean = 0;
     uchar* stddev = 0;
-    bool stdmtx = false;
-    int n1 = (int)_param1.total();
-    int n2 = (int)_param2.total();
+    যৌক্তিক stdmtx = মিথ্যা;
+    পূর্ণসংখ্যা n1 = (পূর্ণসংখ্যা)_param1.যোগ();
+    পূর্ণসংখ্যা n2 = (পূর্ণসংখ্যা)_param2.যোগ();
 
-    if( disttype == UNIFORM )
+    যদি( disttype == UNIFORM )
     {
-        _parambuf.allocate(cn*(sizeof(DivStruct)+sizeof(double)-1)/sizeof(double) + cn*4);
-        double* parambuf = _parambuf.data();
-        double* p1 = _param1.ptr<double>();
-        double* p2 = _param2.ptr<double>();
+        _parambuf.allocate(cn*(আকার(DivStruct)+আকার(দ্বিগুণ)-1)/আকার(দ্বিগুণ) + cn*4);
+        দ্বিগুণ* parambuf = _parambuf.তথ্য();
+        দ্বিগুণ* p1 = _param1.ptr<দ্বিগুণ>();
+        দ্বিগুণ* p2 = _param2.ptr<দ্বিগুণ>();
 
-        if( !_param1.isContinuous() || _param1.type() != CV_64F || n1 != cn )
+        যদি( !_param1.isContinuous() || _param1.type() != CV_64F || n1 != cn )
         {
             p1 = parambuf;
             Mat tmp(_param1.size(), CV_64F, p1);
             _param1.convertTo(tmp, CV_64F);
-            for( j = n1; j < cn; j++ )
+            জন্য( j = n1; j < cn; j++ )
                 p1[j] = p1[j-n1];
         }
 
-        if( !_param2.isContinuous() || _param2.type() != CV_64F || n2 != cn )
+        যদি( !_param2.isContinuous() || _param2.type() != CV_64F || n2 != cn )
         {
             p2 = parambuf + cn;
             Mat tmp(_param2.size(), CV_64F, p2);
             _param2.convertTo(tmp, CV_64F);
-            for( j = n2; j < cn; j++ )
+            জন্য( j = n2; j < cn; j++ )
                 p2[j] = p2[j-n2];
         }
 
-        if( CV_IS_INT_TYPE(depth) )
+        যদি( CV_IS_INT_TYPE(depth) )
         {
             Vec2l* ip = (Vec2l*)(parambuf + cn*2);
             CV_DbgCheckLT((size_t)(cn*4 - 1), _parambuf.size(), "");
-            for( j = 0, fast_int_mode = true; j < cn; j++ )
+            জন্য( j = 0, fast_int_mode = সত্য; j < cn; j++ )
             {
-                double a = std::min(p1[j], p2[j]);
-                double b = std::max(p1[j], p2[j]);
-                if( saturateRange )
+                দ্বিগুণ a = std::min(p1[j], p2[j]);
+                দ্বিগুণ b = std::max(p1[j], p2[j]);
+                যদি( saturateRange )
                 {
                     a = std::max(a, depth == CV_8U || depth == CV_16U || depth == CV_32U ||
                                  depth == CV_64U || depth == CV_Bool ? 0. :
                                  depth == CV_8S ? -128. : depth == CV_16S ? -32768. :
-                                 depth == CV_32S ? (double)INT_MIN : (double)INT64_MIN);
+                                 depth == CV_32S ? (দ্বিগুণ)INT_MIN : (দ্বিগুণ)INT64_MIN);
                     b = std::min(b, depth == CV_8U ? 256. : depth == CV_Bool ? 2. : depth == CV_16U ? 65536. :
-                                 depth == CV_8S ? 128. : depth == CV_16S ? 32768. : depth == CV_32U ? (double)UINT_MAX :
-                                 depth == CV_32S ? (double)INT_MAX : (double)INT64_MAX);
+                                 depth == CV_8S ? 128. : depth == CV_16S ? 32768. : depth == CV_32U ? (দ্বিগুণ)UINT_MAX :
+                                 depth == CV_32S ? (দ্বিগুণ)INT_MAX : (দ্বিগুণ)INT64_MAX);
                 }
                 ip[j][1] = (int64_t)ceil(a);
                 int64_t idiff = ip[j][0] = (int64_t)floor(b) - ip[j][1] - 1;
-                if (idiff < 0)
+                যদি (idiff < 0)
                 {
                     idiff = 0;
                     ip[j][0] = 0;
                 }
-                double diff = b - a;
+                দ্বিগুণ diff = b - a;
 
                 fast_int_mode = fast_int_mode && diff <= 4294967296. && (idiff & (idiff+1)) == 0;
-                if( fast_int_mode )
+                যদি( fast_int_mode )
                     small_flag = idiff <= 255;
-                else
+                অন্যথা
                 {
                     int64_t minval = INT32_MIN/2, maxval = INT32_MAX;
-                    if (depth == CV_64S || depth == CV_64U)
+                    যদি (depth == CV_64S || depth == CV_64U)
                     {
                         minval = INT64_MIN/2;
                         maxval = INT64_MAX;
                     }
-                    if( diff > (double)maxval )
+                    যদি( diff > (দ্বিগুণ)maxval )
                         ip[j][0] = maxval;
-                    if( a < (double)minval )
+                    যদি( a < (দ্বিগুণ)minval )
                         ip[j][1] = minval;
                 }
             }
 
             uni_param = ip;
-            if( !fast_int_mode )
+            যদি( !fast_int_mode )
             {
                 DivStruct* ds = (DivStruct*)(ip + cn);
-                CV_DbgCheckLE((void*)(ds + cn), (void*)(parambuf + _parambuf.size()), "Last byte check");
-                for( j = 0; j < cn; j++ )
+                CV_DbgCheckLE((শূন্য*)(ds + cn), (শূন্য*)(parambuf + _parambuf.size()), "Last byte check");
+                জন্য( j = 0; j < cn; j++ )
                 {
                     ds[j].delta = ip[j][1];
                     ds[j].diff = ip[j][0];
-                    if (depth != CV_64U && depth != CV_64S) {
+                    যদি (depth != CV_64U && depth != CV_64S) {
                         unsigned d = ds[j].d = (unsigned)(ip[j][0]+1);
-                        int l = 0;
-                        while(((uint64)1 << l) < d)
+                        পূর্ণসংখ্যা l = 0;
+                        যখন(((uint64)1 << l) < d)
                             l++;
                         ds[j].M = (unsigned)(((uint64)1 << 32)*(((uint64)1 << l) - d)/d) + 1;
                         ds[j].sh1 = std::min(l, 1);
@@ -639,32 +639,32 @@ void RNG::fill( InputOutputArray _mat, int disttype,
 
             func = randTab[fast_int_mode ? 1 : 0][depth];
         }
-        else
+        অন্যথা
         {
-            double scale = depth == CV_64F ?
+            দ্বিগুণ scale = depth == CV_64F ?
                 5.4210108624275221700372640043497e-20 : // 2**-64
                 2.3283064365386962890625e-10;           // 2**-32
-            double maxdiff = saturateRange ? (double)FLT_MAX : DBL_MAX;
+            দ্বিগুণ maxdiff = saturateRange ? (দ্বিগুণ)FLT_MAX : DBL_MAX;
 
             // for each channel i compute such dparam[0][i] & dparam[1][i],
             // so that a signed 32/64-bit integer X is transformed to
             // the range [param1.val[i], param2.val[i]) using
             // dparam[0][i]*X + dparam[1][i]
             CV_DbgCheckLT((size_t)(cn*4 - 1), _parambuf.size(), "");
-            if( depth != CV_64F )
+            যদি( depth != CV_64F )
             {
                 Vec2f* fp = (Vec2f*)(parambuf + cn*2);
-                for( j = 0; j < cn; j++ )
+                জন্য( j = 0; j < cn; j++ )
                 {
-                    fp[j][0] = (float)(std::min(maxdiff, p2[j] - p1[j])*scale);
-                    fp[j][1] = (float)((p2[j] + p1[j])*0.5);
+                    fp[j][0] = (দশমিক)(std::min(maxdiff, p2[j] - p1[j])*scale);
+                    fp[j][1] = (দশমিক)((p2[j] + p1[j])*0.5);
                 }
                 uni_param = fp;
             }
-            else
+            অন্যথা
             {
                 Vec2d* dp = (Vec2d*)(parambuf + cn*2);
-                for( j = 0; j < cn; j++ )
+                জন্য( j = 0; j < cn; j++ )
                 {
                     dp[j][0] = std::min(DBL_MAX, p2[j] - p1[j])*scale;
                     dp[j][1] = ((p2[j] + p1[j])*0.5);
@@ -676,69 +676,69 @@ void RNG::fill( InputOutputArray _mat, int disttype,
         }
         CV_Assert( func != 0 );
     }
-    else if( disttype == RNG::NORMAL )
+    অন্যথা যদি( disttype == RNG::NORMAL )
     {
         _parambuf.allocate(MAX(n1, cn) + MAX(n2, cn));
-        double* parambuf = _parambuf.data();
+        দ্বিগুণ* parambuf = _parambuf.তথ্য();
 
-        int ptype = esz1 == 8 ? CV_64F : CV_32F;
+        পূর্ণসংখ্যা ptype = esz1 == 8 ? CV_64F : CV_32F;
 
-        if( _param1.isContinuous() && _param1.type() == ptype && n1 >= cn)
+        যদি( _param1.isContinuous() && _param1.type() == ptype && n1 >= cn)
             mean = _param1.ptr();
-        else
+        অন্যথা
         {
             Mat tmp(_param1.size(), ptype, parambuf);
             _param1.convertTo(tmp, ptype);
             mean = (uchar*)parambuf;
         }
 
-        if( n1 < cn )
-            for( j = n1*esz1; j < cn*esz1; j++ )
+        যদি( n1 < cn )
+            জন্য( j = n1*esz1; j < cn*esz1; j++ )
                 mean[j] = mean[j - n1*esz1];
 
-        if( _param2.isContinuous() && _param2.type() == ptype && n2 >= cn)
+        যদি( _param2.isContinuous() && _param2.type() == ptype && n2 >= cn)
             stddev = _param2.ptr();
-        else
+        অন্যথা
         {
             Mat tmp(_param2.size(), ptype, parambuf + MAX(n1, cn));
             _param2.convertTo(tmp, ptype);
             stddev = (uchar*)(parambuf + MAX(n1, cn));
         }
 
-        if( n2 < cn )
-            for( j = n2*esz1; j < cn*esz1; j++ )
+        যদি( n2 < cn )
+            জন্য( j = n2*esz1; j < cn*esz1; j++ )
                 stddev[j] = stddev[j - n2*esz1];
 
         stdmtx = _param2.rows == cn && _param2.cols == cn;
         scaleFunc = randnScaleTab[depth];
         CV_Assert( scaleFunc != 0 );
     }
-    else
+    অন্যথা
         CV_Error( cv::Error::StsBadArg, "Unknown distribution type" );
 
-    const Mat* arrays[] = {&mat, 0};
+    ধ্রুবক Mat* arrays[] = {&mat, 0};
     uchar* ptr = 0;
     NAryMatIterator it(arrays, &ptr, 1);
-    float fbuf[BLOCK_SIZE + CV_CN_MAX];
-    int total = (int)it.size;
-    int blockSize = std::min((BLOCK_SIZE + cn - 1)/cn, total);
+    দশমিক fbuf[BLOCK_আকার + CV_CN_MAX];
+    পূর্ণসংখ্যা যোগ = (পূর্ণসংখ্যা)it.size;
+    পূর্ণসংখ্যা block_আকার = std::min((BLOCK_আকার + cn - 1)/cn, যোগ);
     size_t esz = (size_t)esz1*cn;
-    int flags = mat.type();
+    পূর্ণসংখ্যা flags = mat.type();
 
-    if( disttype == UNIFORM )
-        flags |= (small_flag ? (int)RNG_FLAG_SMALL : 0);
-    else
-        flags |= (stdmtx ? (int)RNG_FLAG_STDMTX : 0);
+    যদি( disttype == UNIFORM )
+        flags |= (small_flag ? (পূর্ণসংখ্যা)RNG_FLAG_SMALL : 0);
+    অন্যথা
+        flags |= (stdmtx ? (পূর্ণসংখ্যা)RNG_FLAG_STDMTX : 0);
 
-    for( size_t i = 0; i < it.nplanes; i++, ++it )
+    জন্য( size_t i = 0; i < it.nplanes; i++, ++it )
     {
-        for( j = 0; j < total; j += blockSize )
+        জন্য( j = 0; j < যোগ; j += block_আকার )
         {
-            int len = std::min(total - j, blockSize);
+            পূর্ণসংখ্যা len = std::min(যোগ - j, block_আকার);
 
-            if( disttype == UNIFORM )
+            যদি( disttype == UNIFORM )
                 func(ptr + j*esz, len, cn, &state, uni_param, fbuf, flags);
-            else
+            অন্যথা
             {
                 randn_0_1_32f(fbuf, len*cn, &state);
                 scaleFunc(fbuf, ptr + j*esz, len, cn, mean, stddev, flags);
@@ -751,71 +751,71 @@ void RNG::fill( InputOutputArray _mat, int disttype,
 
 cv::RNG& cv::theRNG()
 {
-    return getCoreTlsData().rng;
+    ফেরত get_Core_Tls_তথ্য().rng;
 }
 
-void cv::setRNGSeed(int seed)
+শূন্য cv::setRNGSeed(পূর্ণসংখ্যা seed)
 {
     theRNG() = RNG(static_cast<uint64>(seed));
 }
 
 
-void cv::randu(InputOutputArray dst, InputArray low, InputArray high)
+শূন্য cv::randu(প্রবেশ_Output_Array dst, প্রবেশ_Array নিচের, প্রবেশ_Array উপরের)
 {
     CV_INSTRUMENT_REGION();
 
-    theRNG().fill(dst, RNG::UNIFORM, low, high);
+    theRNG().fill(dst, RNG::UNIFORM, নিচের, উপরের);
 }
 
-void cv::randn(InputOutputArray dst, InputArray mean, InputArray stddev)
+শূন্য cv::randn(প্রবেশ_Output_Array dst, প্রবেশ_Array mean, প্রবেশ_Array stddev)
 {
     CV_INSTRUMENT_REGION();
 
     theRNG().fill(dst, RNG::NORMAL, mean, stddev);
 }
 
-namespace cv
+নামাকাশ cv
 {
 
-template<typename T> static void
-randShuffle_( Mat& _arr, RNG& rng, double )
+template<typename T> স্থির শূন্য
+randShuffle_( Mat& _arr, RNG& rng, দ্বিগুণ )
 {
-    unsigned sz = (unsigned)_arr.total();
-    if( _arr.isContinuous() )
+    unsigned sz = (unsigned)_arr.যোগ();
+    যদি( _arr.isContinuous() )
     {
         T* arr = _arr.ptr<T>();
-        for( unsigned i = 0; i < sz; i++ )
+        জন্য( unsigned i = 0; i < sz; i++ )
         {
             unsigned j = (unsigned)rng % sz;
             std::swap( arr[j], arr[i] );
         }
     }
-    else
+    অন্যথা
     {
         CV_Assert( _arr.dims <= 2 );
-        uchar* data = _arr.ptr();
+        uchar* তথ্য = _arr.ptr();
         size_t step = _arr.step;
-        int rows = _arr.rows;
-        int cols = _arr.cols;
-        for( int i0 = 0; i0 < rows; i0++ )
+        পূর্ণসংখ্যা rows = _arr.rows;
+        পূর্ণসংখ্যা cols = _arr.cols;
+        জন্য( পূর্ণসংখ্যা i0 = 0; i0 < rows; i0++ )
         {
             T* p = _arr.ptr<T>(i0);
-            for( int j0 = 0; j0 < cols; j0++ )
+            জন্য( পূর্ণসংখ্যা j0 = 0; j0 < cols; j0++ )
             {
                 unsigned k1 = (unsigned)rng % sz;
-                int i1 = (int)(k1 / cols);
-                int j1 = (int)(k1 - (unsigned)i1*(unsigned)cols);
-                std::swap( p[j0], ((T*)(data + step*i1))[j1] );
+                পূর্ণসংখ্যা i1 = (পূর্ণসংখ্যা)(k1 / cols);
+                পূর্ণসংখ্যা j1 = (পূর্ণসংখ্যা)(k1 - (unsigned)i1*(unsigned)cols);
+                std::swap( p[j0], ((T*)(তথ্য + step*i1))[j1] );
             }
         }
     }
 }
 
-typedef void (*RandShuffleFunc)( Mat& dst, RNG& rng, double iterFactor );
+প্রকারলেখ শূন্য (*RandShuffleFunc)( Mat& dst, RNG& rng, দ্বিগুণ iterFactor );
 
 }
 
-void cv::randShuffle( InputOutputArray _dst, double iterFactor, RNG* _rng )
+শূন্য cv::randShuffle( প্রবেশ_Output_Array _dst, দ্বিগুণ iterFactor, RNG* _rng )
 {
     CV_INSTRUMENT_REGION();
 
@@ -825,25 +825,25 @@ void cv::randShuffle( InputOutputArray _dst, double iterFactor, RNG* _rng )
         randShuffle_<uchar>, // 1
         randShuffle_<ushort>, // 2
         randShuffle_<Vec<uchar,3> >, // 3
-        randShuffle_<int>, // 4
+        randShuffle_<পূর্ণসংখ্যা>, // 4
         0,
         randShuffle_<Vec<ushort,3> >, // 6
         0,
-        randShuffle_<Vec<int,2> >, // 8
+        randShuffle_<Vec<পূর্ণসংখ্যা,2> >, // 8
         0, 0, 0,
-        randShuffle_<Vec<int,3> >, // 12
+        randShuffle_<Vec<পূর্ণসংখ্যা,3> >, // 12
         0, 0, 0,
-        randShuffle_<Vec<int,4> >, // 16
+        randShuffle_<Vec<পূর্ণসংখ্যা,4> >, // 16
         0, 0, 0, 0, 0, 0, 0,
-        randShuffle_<Vec<int,6> >, // 24
+        randShuffle_<Vec<পূর্ণসংখ্যা,6> >, // 24
         0, 0, 0, 0, 0, 0, 0,
-        randShuffle_<Vec<int,8> > // 32
+        randShuffle_<Vec<পূর্ণসংখ্যা,8> > // 32
     };
 
     Mat dst = _dst.getMat();
     RNG& rng = _rng ? *_rng : theRNG();
-    CV_Assert( dst.elemSize() <= 32 );
-    RandShuffleFunc func = tab[dst.elemSize()];
+    CV_Assert( dst.elem_আকার() <= 32 );
+    RandShuffleFunc func = tab[dst.elem_আকার()];
     CV_Assert( func != 0 );
     func( dst, rng, iterFactor );
 }
@@ -899,10 +899,10 @@ cv::RNG_MT19937::RNG_MT19937(unsigned s) { seed(s); }
 
 cv::RNG_MT19937::RNG_MT19937() { seed(5489U); }
 
-void cv::RNG_MT19937::seed(unsigned s)
+শূন্য cv::RNG_MT19937::seed(unsigned s)
 {
     state[0]= s;
-    for (mti = 1; mti < N; mti++)
+    জন্য (mti = 1; mti < N; mti++)
     {
         /* See Knuth TAOCP Vol2. 3rd Ed. P.106 for multiplier. */
         state[mti] = (1812433253U * (state[mti - 1] ^ (state[mti - 1] >> 30)) + mti);
@@ -912,23 +912,23 @@ void cv::RNG_MT19937::seed(unsigned s)
 unsigned cv::RNG_MT19937::next()
 {
     /* mag01[x] = x * MATRIX_A  for x=0,1 */
-    static unsigned mag01[2] = { 0x0U, /*MATRIX_A*/ 0x9908b0dfU};
+    স্থির unsigned mag01[2] = { 0x0U, /*MATRIX_A*/ 0x9908b0dfU};
 
-    const unsigned UPPER_MASK = 0x80000000U;
-    const unsigned LOWER_MASK = 0x7fffffffU;
+    ধ্রুবক unsigned UPPER_MASK = 0x80000000U;
+    ধ্রুবক unsigned LOWER_MASK = 0x7fffffffU;
 
     /* generate N words at one time */
-    if (mti >= N)
+    যদি (mti >= N)
     {
-        int kk = 0;
+        পূর্ণসংখ্যা kk = 0;
 
-        for (; kk < N - M; ++kk)
+        জন্য (; kk < N - M; ++kk)
         {
             unsigned y = (state[kk] & UPPER_MASK) | (state[kk + 1] & LOWER_MASK);
             state[kk] = state[kk + M] ^ (y >> 1) ^ mag01[y & 0x1U];
         }
 
-        for (; kk < N - 1; ++kk)
+        জন্য (; kk < N - 1; ++kk)
         {
             unsigned y = (state[kk] & UPPER_MASK) | (state[kk + 1] & LOWER_MASK);
             state[kk] = state[kk + (M - N)] ^ (y >> 1) ^ mag01[y & 0x1U];
@@ -948,30 +948,30 @@ unsigned cv::RNG_MT19937::next()
     y ^= (y << 15) & 0xefc60000U;
     y ^= (y >> 18);
 
-    return y;
+    ফেরত y;
 }
 
-cv::RNG_MT19937::operator unsigned() { return next(); }
+cv::RNG_MT19937::operator unsigned() { ফেরত next(); }
 
-cv::RNG_MT19937::operator int() { return (int)next();}
+cv::RNG_MT19937::operator পূর্ণসংখ্যা() { ফেরত (পূর্ণসংখ্যা)next();}
 
-cv::RNG_MT19937::operator float() { return next() * (1.f / 4294967296.f); }
+cv::RNG_MT19937::operator দশমিক() { ফেরত next() * (1.f / 4294967296.f); }
 
-cv::RNG_MT19937::operator double()
+cv::RNG_MT19937::operator দ্বিগুণ()
 {
     unsigned a = next() >> 5;
     unsigned b = next() >> 6;
-    return (a * 67108864.0 + b) * (1.0 / 9007199254740992.0);
+    ফেরত (a * 67108864.0 + b) * (1.0 / 9007199254740992.0);
 }
 
-int cv::RNG_MT19937::uniform(int a, int b) { return (int)(next() % (b - a) + a); }
+পূর্ণসংখ্যা cv::RNG_MT19937::uniform(পূর্ণসংখ্যা a, পূর্ণসংখ্যা b) { ফেরত (পূর্ণসংখ্যা)(next() % (b - a) + a); }
 
-float cv::RNG_MT19937::uniform(float a, float b) { return ((float)*this)*(b - a) + a; }
+দশমিক cv::RNG_MT19937::uniform(দশমিক a, দশমিক b) { ফেরত ((দশমিক)*এই)*(b - a) + a; }
 
-double cv::RNG_MT19937::uniform(double a, double b) { return ((double)*this)*(b - a) + a; }
+দ্বিগুণ cv::RNG_MT19937::uniform(দ্বিগুণ a, দ্বিগুণ b) { ফেরত ((দ্বিগুণ)*এই)*(b - a) + a; }
 
-unsigned cv::RNG_MT19937::operator ()(unsigned b) { return next() % b; }
+unsigned cv::RNG_MT19937::operator ()(unsigned b) { ফেরত next() % b; }
 
-unsigned cv::RNG_MT19937::operator ()() { return next(); }
+unsigned cv::RNG_MT19937::operator ()() { ফেরত next(); }
 
 /* End of file. */

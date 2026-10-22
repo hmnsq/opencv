@@ -3,19 +3,19 @@
 // of this distribution and at http://opencv.org/license.html
 
 
-#include "precomp.hpp"
-#include "opencl_kernels_core.hpp"
-#include "stat.hpp"
-#include "stat_parallel.hpp"
-#include "opencv2/core/detail/dispatch_helper.impl.hpp"
-#include <algorithm>
+#অন্তর্ভাব "precomp.hpp"
+#অন্তর্ভাব "opencl_kernels_core.hpp"
+#অন্তর্ভাব "stat.hpp"
+#অন্তর্ভাব "stat_parallel.hpp"
+#অন্তর্ভাব "opencv2/core/detail/dispatch_helper.impl.hpp"
+#অন্তর্ভাব <algorithm>
 
-#include "minmax.simd.hpp"
-#include "minmax.simd_declarations.hpp" // defines CV_CPU_DISPATCH_MODES_ALL=AVX2,...,BASELINE based on CMakeLists.txt content
+#অন্তর্ভাব "minmax.simd.hpp"
+#অন্তর্ভাব "minmax.simd_declarations.hpp" // defines CV_CPU_DISPATCH_MODES_ALL=AVX2,...,BASELINE based on CMakeLists.txt content
 
-namespace cv {
+নামাকাশ cv {
 
-static MinMaxIdxFunc getMinMaxIdxFunc(int depth)
+স্থির MinMaxIdxFunc getMinMaxIdxFunc(পূর্ণসংখ্যা depth)
 {
     CV_INSTRUMENT_REGION();
     CV_CPU_DISPATCH(getMinMaxIdxFunc, (depth),
@@ -24,22 +24,22 @@ static MinMaxIdxFunc getMinMaxIdxFunc(int depth)
 
 // The function expects 1-based indexing for ofs
 // Zero is treated as invalid offset (not found)
-static void ofs2idx(const Mat& a, size_t ofs, int* idx)
+স্থির শূন্য ofs2idx(ধ্রুবক Mat& a, size_t ofs, পূর্ণসংখ্যা* idx)
 {
-    int i, d = a.dims;
-    if( ofs > 0 )
+    পূর্ণসংখ্যা i, d = a.dims;
+    যদি( ofs > 0 )
     {
         ofs--;
-        for( i = d-1; i >= 0; i-- )
+        জন্য( i = d-1; i >= 0; i-- )
         {
-            int sz = a.size[i];
-            idx[i] = (int)(ofs % sz);
+            পূর্ণসংখ্যা sz = a.size[i];
+            idx[i] = (পূর্ণসংখ্যা)(ofs % sz);
             ofs /= sz;
         }
     }
-    else
+    অন্যথা
     {
-        for( i = d-1; i >= 0; i-- )
+        জন্য( i = d-1; i >= 0; i-- )
             idx[i] = -1;
     }
 }
@@ -49,173 +49,173 @@ static void ofs2idx(const Mat& a, size_t ofs, int* idx)
 #define MINMAX_STRUCT_ALIGNMENT 8 // sizeof double
 
 template <typename T>
-void getMinMaxRes(const Mat & db, double * minVal, double * maxVal,
-                  int* minLoc, int* maxLoc,
-                  int groupnum, int cols, double * maxVal2)
+শূন্য getMinMaxRes(ধ্রুবক Mat & db, দ্বিগুণ * minVal, দ্বিগুণ * maxVal,
+                  পূর্ণসংখ্যা* minLoc, পূর্ণসংখ্যা* maxLoc,
+                  পূর্ণসংখ্যা groupnum, পূর্ণসংখ্যা cols, দ্বিগুণ * maxVal2)
 {
-    uint index_max = std::numeric_limits<uint>::max();
+    uint সূচক_max = std::numeric_limits<uint>::max();
     T minval = std::numeric_limits<T>::max();
     T maxval = std::numeric_limits<T>::min() > 0 ? (T)-std::numeric_limits<T>::max() : std::numeric_limits<T>::min(), maxval2 = maxval;
-    uint minloc = index_max, maxloc = index_max;
+    uint minloc = সূচক_max, maxloc = সূচক_max;
 
-    size_t index = 0;
-    const T * minptr = NULL, * maxptr = NULL, * maxptr2 = NULL;
-    const uint * minlocptr = NULL, * maxlocptr = NULL;
-    if (minVal || minLoc)
+    size_t সূচক = 0;
+    ধ্রুবক T * minptr = ফাঁকা, * maxptr = ফাঁকা, * maxptr2 = ফাঁকা;
+    ধ্রুবক uint * minlocptr = ফাঁকা, * maxlocptr = ফাঁকা;
+    যদি (minVal || minLoc)
     {
         minptr = db.ptr<T>();
-        index += sizeof(T) * groupnum;
-        index = alignSize(index, MINMAX_STRUCT_ALIGNMENT);
+        সূচক += আকার(T) * groupnum;
+        সূচক = align_আকার(সূচক, MINMAX_STRUCT_ALIGNMENT);
     }
-    if (maxVal || maxLoc)
+    যদি (maxVal || maxLoc)
     {
-        maxptr = (const T *)(db.ptr() + index);
-        index += sizeof(T) * groupnum;
-        index = alignSize(index, MINMAX_STRUCT_ALIGNMENT);
+        maxptr = (ধ্রুবক T *)(db.ptr() + সূচক);
+        সূচক += আকার(T) * groupnum;
+        সূচক = align_আকার(সূচক, MINMAX_STRUCT_ALIGNMENT);
     }
-    if (minLoc)
+    যদি (minLoc)
     {
-        minlocptr = (const uint *)(db.ptr() + index);
-        index += sizeof(uint) * groupnum;
-        index = alignSize(index, MINMAX_STRUCT_ALIGNMENT);
+        minlocptr = (ধ্রুবক uint *)(db.ptr() + সূচক);
+        সূচক += আকার(uint) * groupnum;
+        সূচক = align_আকার(সূচক, MINMAX_STRUCT_ALIGNMENT);
     }
-    if (maxLoc)
+    যদি (maxLoc)
     {
-        maxlocptr = (const uint *)(db.ptr() + index);
-        index += sizeof(uint) * groupnum;
-        index = alignSize(index, MINMAX_STRUCT_ALIGNMENT);
+        maxlocptr = (ধ্রুবক uint *)(db.ptr() + সূচক);
+        সূচক += আকার(uint) * groupnum;
+        সূচক = align_আকার(সূচক, MINMAX_STRUCT_ALIGNMENT);
     }
-    if (maxVal2)
-        maxptr2 = (const T *)(db.ptr() + index);
+    যদি (maxVal2)
+        maxptr2 = (ধ্রুবক T *)(db.ptr() + সূচক);
 
-    for (int i = 0; i < groupnum; i++)
+    জন্য (পূর্ণসংখ্যা i = 0; i < groupnum; i++)
     {
-        if (minptr && minptr[i] <= minval)
+        যদি (minptr && minptr[i] <= minval)
         {
-            if (minptr[i] == minval)
+            যদি (minptr[i] == minval)
             {
-                if (minlocptr)
+                যদি (minlocptr)
                     minloc = std::min(minlocptr[i], minloc);
             }
-            else
+            অন্যথা
             {
-                if (minlocptr)
+                যদি (minlocptr)
                     minloc = minlocptr[i];
                 minval = minptr[i];
             }
         }
-        if (maxptr && maxptr[i] >= maxval)
+        যদি (maxptr && maxptr[i] >= maxval)
         {
-            if (maxptr[i] == maxval)
+            যদি (maxptr[i] == maxval)
             {
-                if (maxlocptr)
+                যদি (maxlocptr)
                     maxloc = std::min(maxlocptr[i], maxloc);
             }
-            else
+            অন্যথা
             {
-                if (maxlocptr)
+                যদি (maxlocptr)
                     maxloc = maxlocptr[i];
                 maxval = maxptr[i];
             }
         }
-        if (maxptr2 && maxptr2[i] > maxval2)
+        যদি (maxptr2 && maxptr2[i] > maxval2)
             maxval2 = maxptr2[i];
     }
-    bool zero_mask = (minLoc && minloc == index_max) ||
-    (maxLoc && maxloc == index_max);
+    যৌক্তিক zero_mask = (minLoc && minloc == সূচক_max) ||
+    (maxLoc && maxloc == সূচক_max);
 
-    if (minVal)
-        *minVal = zero_mask ? 0 : (double)minval;
-    if (maxVal)
-        *maxVal = zero_mask ? 0 : (double)maxval;
-    if (maxVal2)
-        *maxVal2 = zero_mask ? 0 : (double)maxval2;
+    যদি (minVal)
+        *minVal = zero_mask ? 0 : (দ্বিগুণ)minval;
+    যদি (maxVal)
+        *maxVal = zero_mask ? 0 : (দ্বিগুণ)maxval;
+    যদি (maxVal2)
+        *maxVal2 = zero_mask ? 0 : (দ্বিগুণ)maxval2;
 
-    if (minLoc)
+    যদি (minLoc)
     {
         minLoc[0] = zero_mask ? -1 : minloc / cols;
         minLoc[1] = zero_mask ? -1 : minloc % cols;
     }
-    if (maxLoc)
+    যদি (maxLoc)
     {
         maxLoc[0] = zero_mask ? -1 : maxloc / cols;
         maxLoc[1] = zero_mask ? -1 : maxloc % cols;
     }
 }
 
-typedef void (*getMinMaxResFunc)(const Mat & db, double * minVal, double * maxVal,
-                                 int * minLoc, int *maxLoc, int gropunum, int cols, double * maxVal2);
+প্রকারলেখ শূন্য (*getMinMaxResFunc)(ধ্রুবক Mat & db, দ্বিগুণ * minVal, দ্বিগুণ * maxVal,
+                                 পূর্ণসংখ্যা * minLoc, পূর্ণসংখ্যা *maxLoc, পূর্ণসংখ্যা gropunum, পূর্ণসংখ্যা cols, দ্বিগুণ * maxVal2);
 
-bool ocl_minMaxIdx( InputArray _src, double* minVal, double* maxVal, int* minLoc, int* maxLoc, InputArray _mask,
-                   int ddepth, bool absValues, InputArray _src2, double * maxVal2)
+যৌক্তিক ocl_minMaxIdx( প্রবেশ_Array _src, দ্বিগুণ* minVal, দ্বিগুণ* maxVal, পূর্ণসংখ্যা* minLoc, পূর্ণসংখ্যা* maxLoc, প্রবেশ_Array _mask,
+                   পূর্ণসংখ্যা ddepth, যৌক্তিক abs_মানসমূহ, প্রবেশ_Array _src2, দ্বিগুণ * maxVal2)
 {
-    const ocl::Device & dev = ocl::Device::getDefault();
+    ধ্রুবক ocl::Device & dev = ocl::Device::getDefault();
 
 #ifdef __ANDROID__
-    if (dev.isNVidia())
-        return false;
+    যদি (dev.isNVidia())
+        ফেরত মিথ্যা;
 #endif
 
-    if (dev.deviceVersionMajor() == 1 && dev.deviceVersionMinor() < 2)
+    যদি (dev.deviceVersionMajor() == 1 && dev.deviceVersionMinor() < 2)
     {
         // 'static' storage class specifier used by "minmaxloc" is available from OpenCL 1.2+ only
-        return false;
+        ফেরত মিথ্যা;
     }
 
-    bool doubleSupport = dev.doubleFPConfig() > 0, haveMask = !_mask.empty(),
-    haveSrc2 = _src2.kind() != _InputArray::NONE;
-    int type = _src.type(), depth = CV_MAT_DEPTH(type), cn = CV_MAT_CN(type),
+    যৌক্তিক doubleSupport = dev.doubleFPConfig() > 0, haveMask = !_mask.empty(),
+    haveSrc2 = _src2.kind() != প্রবেশ_Array_2::NONE;
+    পূর্ণসংখ্যা type = _src.type(), depth = CV_MAT_DEPTH(type), cn = CV_MAT_CN(type),
     kercn = haveMask ? cn : std::min(4, ocl::predictOptimalVectorWidth(_src, _src2));
 
-    if (depth >= CV_16F)
-        return false;
+    যদি (depth >= CV_16F)
+        ফেরত মিথ্যা;
 
     // disabled following modes since it occasionally fails on AMD devices (e.g. A10-6800K, sep. 2014)
-    if ((haveMask || type == CV_32FC1) && dev.isAMD())
-        return false;
+    যদি ((haveMask || type == CV_32FC1) && dev.isAMD())
+        ফেরত মিথ্যা;
 
     CV_Assert( (cn == 1 && (!haveMask || _mask.type() == CV_8U || _mask.type() == CV_8S || _mask.type() == CV_Bool)) ||
               (cn >= 1 && !minLoc && !maxLoc) );
 
-    if (ddepth < 0)
+    যদি (ddepth < 0)
         ddepth = depth;
 
     CV_Assert(!haveSrc2 || _src2.type() == type);
 
-    if (depth == CV_32S || depth == CV_8S || depth == CV_32U || depth == CV_64U ||
+    যদি (depth == CV_32S || depth == CV_8S || depth == CV_32U || depth == CV_64U ||
         depth == CV_64S || depth == CV_16F || depth == CV_16BF)
-        return false;
+        ফেরত মিথ্যা;
 
-    if ((depth == CV_64F || ddepth == CV_64F) && !doubleSupport)
-        return false;
+    যদি ((depth == CV_64F || ddepth == CV_64F) && !doubleSupport)
+        ফেরত মিথ্যা;
 
-    int groupnum = dev.maxComputeUnits();
-    size_t wgs = dev.maxWorkGroupSize();
+    পূর্ণসংখ্যা groupnum = dev.maxComputeUnits();
+    size_t wgs = dev.max_Work_Group_আকার();
 
-    int wgs2_aligned = 1;
-    while (wgs2_aligned < (int)wgs)
+    পূর্ণসংখ্যা wgs2_aligned = 1;
+    যখন (wgs2_aligned < (পূর্ণসংখ্যা)wgs)
         wgs2_aligned <<= 1;
     wgs2_aligned >>= 1;
 
-    bool needMinVal = minVal || minLoc, needMinLoc = minLoc != NULL,
-    needMaxVal = maxVal || maxLoc, needMaxLoc = maxLoc != NULL;
+    যৌক্তিক needMinVal = minVal || minLoc, needMinLoc = minLoc != ফাঁকা,
+    needMaxVal = maxVal || maxLoc, needMaxLoc = maxLoc != ফাঁকা;
 
     // in case of mask we must know whether mask is filled with zeros or not
     // so let's calculate min or max location, if it's undefined, so mask is zeros
-    if (!(needMaxLoc || needMinLoc) && haveMask)
+    যদি (!(needMaxLoc || needMinLoc) && haveMask)
     {
-        if (needMinVal)
-            needMinLoc = true;
-        else
-            needMaxLoc = true;
+        যদি (needMinVal)
+            needMinLoc = সত্য;
+        অন্যথা
+            needMaxLoc = সত্য;
     }
 
-    char cvt[2][50];
+    অক্ষর cvt[2][50];
     String opts = format("-D DEPTH_%d -D srcT1=%s%s -D WGS=%d -D srcT=%s"
                          " -D WGS2_ALIGNED=%d%s%s%s -D kercn=%d%s%s%s%s"
                          " -D dstT1=%s -D dstT=%s -D convertToDT=%s%s%s%s%s -D wdepth=%d -D convertFromU=%s"
                          " -D MINMAX_STRUCT_ALIGNMENT=%d",
-                         depth, ocl::typeToStr(depth), haveMask ? " -D HAVE_MASK" : "", (int)wgs,
+                         depth, ocl::typeToStr(depth), haveMask ? " -D HAVE_MASK" : "", (পূর্ণসংখ্যা)wgs,
                          ocl::typeToStr(CV_MAKE_TYPE(depth, kercn)), wgs2_aligned,
                          doubleSupport ? " -D DOUBLE_SUPPORT" : "",
                          _src.isContinuous() ? " -D HAVE_SRC_CONT" : "",
@@ -223,75 +223,75 @@ bool ocl_minMaxIdx( InputArray _src, double* minVal, double* maxVal, int* minLoc
                          needMinVal ? " -D NEED_MINVAL" : "", needMaxVal ? " -D NEED_MAXVAL" : "",
                          needMinLoc ? " -D NEED_MINLOC" : "", needMaxLoc ? " -D NEED_MAXLOC" : "",
                          ocl::typeToStr(ddepth), ocl::typeToStr(CV_MAKE_TYPE(ddepth, kercn)),
-                         ocl::convertTypeStr(depth, ddepth, kercn, cvt[0], sizeof(cvt[0])),
-                         absValues ? " -D OP_ABS" : "",
+                         ocl::convertTypeStr(depth, ddepth, kercn, cvt[0], আকার(cvt[0])),
+                         abs_মানসমূহ ? " -D OP_ABS" : "",
                          haveSrc2 ? " -D HAVE_SRC2" : "", maxVal2 ? " -D OP_CALC2" : "",
                          haveSrc2 && _src2.isContinuous() ? " -D HAVE_SRC2_CONT" : "", ddepth,
-                         depth <= CV_32S && ddepth == CV_32S ? ocl::convertTypeStr(CV_8U, ddepth, kercn, cvt[1], sizeof(cvt[1])) : "noconvert",
+                         depth <= CV_32S && ddepth == CV_32S ? ocl::convertTypeStr(CV_8U, ddepth, kercn, cvt[1], আকার(cvt[1])) : "noconvert",
                          MINMAX_STRUCT_ALIGNMENT);
 
     ocl::Kernel k("minmaxloc", ocl::core::minmaxloc_oclsrc, opts);
-    if (k.empty())
-        return false;
+    যদি (k.empty())
+        ফেরত মিথ্যা;
 
-    int esz = CV_ELEM_SIZE(ddepth), esz32s = CV_ELEM_SIZE1(CV_32S),
+    পূর্ণসংখ্যা esz = CV_ELEM_আকার(ddepth), esz32s = CV_ELEM_SIZE1(CV_32S),
     dbsize = groupnum * ((needMinVal ? esz : 0) + (needMaxVal ? esz : 0) +
                          (needMinLoc ? esz32s : 0) + (needMaxLoc ? esz32s : 0) +
                          (maxVal2 ? esz : 0))
     + 5 * MINMAX_STRUCT_ALIGNMENT;
     UMat src = _src.getUMat(), src2 = _src2.getUMat(), db(1, dbsize, CV_8UC1), mask = _mask.getUMat();
 
-    if (cn > 1 && !haveMask)
+    যদি (cn > 1 && !haveMask)
     {
         src = src.reshape(1);
         src2 = src2.reshape(1);
     }
 
-    if (haveSrc2)
+    যদি (haveSrc2)
     {
-        if (!haveMask)
-            k.args(ocl::KernelArg::ReadOnlyNoSize(src), src.cols, (int)src.total(),
-                   groupnum, ocl::KernelArg::PtrWriteOnly(db), ocl::KernelArg::ReadOnlyNoSize(src2));
-        else
-            k.args(ocl::KernelArg::ReadOnlyNoSize(src), src.cols, (int)src.total(),
-                   groupnum, ocl::KernelArg::PtrWriteOnly(db), ocl::KernelArg::ReadOnlyNoSize(mask),
-                   ocl::KernelArg::ReadOnlyNoSize(src2));
+        যদি (!haveMask)
+            k.args(ocl::KernelArg::Read_Only_No_আকার(src), src.cols, (পূর্ণসংখ্যা)src.যোগ(),
+                   groupnum, ocl::KernelArg::PtrWriteOnly(db), ocl::KernelArg::Read_Only_No_আকার(src2));
+        অন্যথা
+            k.args(ocl::KernelArg::Read_Only_No_আকার(src), src.cols, (পূর্ণসংখ্যা)src.যোগ(),
+                   groupnum, ocl::KernelArg::PtrWriteOnly(db), ocl::KernelArg::Read_Only_No_আকার(mask),
+                   ocl::KernelArg::Read_Only_No_আকার(src2));
     }
-    else
+    অন্যথা
     {
-        if (!haveMask)
-            k.args(ocl::KernelArg::ReadOnlyNoSize(src), src.cols, (int)src.total(),
+        যদি (!haveMask)
+            k.args(ocl::KernelArg::Read_Only_No_আকার(src), src.cols, (পূর্ণসংখ্যা)src.যোগ(),
                    groupnum, ocl::KernelArg::PtrWriteOnly(db));
-        else
-            k.args(ocl::KernelArg::ReadOnlyNoSize(src), src.cols, (int)src.total(),
-                   groupnum, ocl::KernelArg::PtrWriteOnly(db), ocl::KernelArg::ReadOnlyNoSize(mask));
+        অন্যথা
+            k.args(ocl::KernelArg::Read_Only_No_আকার(src), src.cols, (পূর্ণসংখ্যা)src.যোগ(),
+                   groupnum, ocl::KernelArg::PtrWriteOnly(db), ocl::KernelArg::Read_Only_No_আকার(mask));
     }
 
     size_t globalsize = groupnum * wgs;
-    if (!k.run(1, &globalsize, &wgs, true))
-        return false;
+    যদি (!k.run(1, &globalsize, &wgs, সত্য))
+        ফেরত মিথ্যা;
 
-    static const getMinMaxResFunc functab[7] =
+    স্থির ধ্রুবক getMinMaxResFunc functab[7] =
     {
         getMinMaxRes<uchar>,
-        getMinMaxRes<char>,
+        getMinMaxRes<অক্ষর>,
         getMinMaxRes<ushort>,
         getMinMaxRes<short>,
-        getMinMaxRes<int>,
-        getMinMaxRes<float>,
-        getMinMaxRes<double>
+        getMinMaxRes<পূর্ণসংখ্যা>,
+        getMinMaxRes<দশমিক>,
+        getMinMaxRes<দ্বিগুণ>
     };
 
     CV_Assert(ddepth <= CV_64F);
     getMinMaxResFunc func = functab[ddepth];
 
-    int locTemp[2];
+    পূর্ণসংখ্যা loc_অস্থায়ী[2];
     func(db.getMat(ACCESS_READ), minVal, maxVal,
-         needMinLoc ? minLoc ? minLoc : locTemp : minLoc,
-         needMaxLoc ? maxLoc ? maxLoc : locTemp : maxLoc,
+         needMinLoc ? minLoc ? minLoc : loc_অস্থায়ী : minLoc,
+         needMaxLoc ? maxLoc ? maxLoc : loc_অস্থায়ী : maxLoc,
          groupnum, src.cols, maxVal2);
 
-    return true;
+    ফেরত সত্য;
 }
 
 #endif
@@ -299,12 +299,12 @@ bool ocl_minMaxIdx( InputArray _src, double* minVal, double* maxVal, int* minLoc
 }
 
 // serial implementation, also used for the pieces of the parallel version
-static void minMaxIdx_(cv::InputArray _src, double* minVal,
-                       double* maxVal, int* minIdx, int* maxIdx,
-                       cv::InputArray _mask)
+স্থির শূন্য minMaxIdx_(cv::প্রবেশ_Array _src, দ্বিগুণ* minVal,
+                       দ্বিগুণ* maxVal, পূর্ণসংখ্যা* minIdx, পূর্ণসংখ্যা* maxIdx,
+                       cv::প্রবেশ_Array _mask)
 {
-    using namespace cv;
-    int type = _src.type(), depth = CV_MAT_DEPTH(type), cn = CV_MAT_CN(type);
+    using নামাকাশ cv;
+    পূর্ণসংখ্যা type = _src.type(), depth = CV_MAT_DEPTH(type), cn = CV_MAT_CN(type);
     CV_Assert( (cn == 1 && (_mask.empty() || _mask.type() == CV_8U || _mask.type() == CV_8S || _mask.type() == CV_Bool)) ||
                (cn > 1 && _mask.empty() && !minIdx && !maxIdx) );
 
@@ -313,31 +313,31 @@ static void minMaxIdx_(cv::InputArray _src, double* minVal,
 
     Mat src = _src.getMat(), mask = _mask.getMat();
 
-    if (src.dims <= 2)
+    যদি (src.dims <= 2)
     {
-        if ((size_t)src.step == (size_t)mask.step || mask.empty())
+        যদি ((size_t)src.step == (size_t)mask.step || mask.empty())
         {
-            CALL_HAL(minMaxIdx, cv_hal_minMaxIdx, src.data, src.step, src.cols*cn, src.rows,
-                     src.depth(), minVal, maxVal, minIdx, maxIdx, mask.data);
+            CALL_HAL(minMaxIdx, cv_hal_minMaxIdx, src.তথ্য, src.step, src.cols*cn, src.rows,
+                     src.depth(), minVal, maxVal, minIdx, maxIdx, mask.তথ্য);
         }
-        CALL_HAL(minMaxIdxMaskStep, cv_hal_minMaxIdxMaskStep, src.data, src.step, src.cols*cn, src.rows,
-                 src.depth(), minVal, maxVal, minIdx, maxIdx, mask.data, mask.step);
+        CALL_HAL(minMaxIdxMaskStep, cv_hal_minMaxIdxMaskStep, src.তথ্য, src.step, src.cols*cn, src.rows,
+                 src.depth(), minVal, maxVal, minIdx, maxIdx, mask.তথ্য, mask.step);
     }
-    else if (src.isContinuous() && (mask.isContinuous() || mask.empty()))
+    অন্যথা যদি (src.isContinuous() && (mask.isContinuous() || mask.empty()))
     {
-        int res = cv_hal_minMaxIdx(src.data, 0, (int)src.total()*cn, 1, src.depth(),
-                                   minVal, maxVal, minIdx, maxIdx, mask.data);
+        পূর্ণসংখ্যা res = cv_hal_minMaxIdx(src.তথ্য, 0, (পূর্ণসংখ্যা)src.যোগ()*cn, 1, src.depth(),
+                                   minVal, maxVal, minIdx, maxIdx, mask.তথ্য);
 
-        if (res == CV_HAL_ERROR_OK)
+        যদি (res == CV_HAL_ERROR_OK)
         {
             // minIdx[0] and minIdx[0] are always 0 for "flatten" version
-            if (minIdx)
+            যদি (minIdx)
                 ofs2idx(src, minIdx[1]+1, minIdx);
-            if (maxIdx)
+            যদি (maxIdx)
                 ofs2idx(src, maxIdx[1]+1, maxIdx);
-            return;
+            ফেরত;
         }
-        else if (res != CV_HAL_ERROR_NOT_IMPLEMENTED)
+        অন্যথা যদি (res != CV_HAL_ERROR_NOT_IMPLEMENTED)
         {
             CV_Error_(cv::Error::StsInternal,
             ("HAL implementation minMaxIdx ==> " CVAUX_STR(cv_hal_minMaxIdx) " returned %d (0x%08x)", res, res));
@@ -347,131 +347,131 @@ static void minMaxIdx_(cv::InputArray _src, double* minVal,
     MinMaxIdxFunc func = getMinMaxIdxFunc(depth);
     CV_Assert( func != 0 );
 
-    const Mat* arrays[] = {&src, &mask, 0};
+    ধ্রুবক Mat* arrays[] = {&src, &mask, 0};
     uchar* ptrs[2] = {};
     NAryMatIterator it(arrays, ptrs);
 
     size_t minidx = 0, maxidx = 0;
     size_t startidx = 1;
-    union {
-        int i;
-        float f;
-        double d;
+    সংঘ {
+        পূর্ণসংখ্যা i;
+        দশমিক f;
+        দ্বিগুণ d;
         int64 L;
         uint64 UL;
     } minval, maxval;
-    int planeSize = (int)it.size*cn;
+    পূর্ণসংখ্যা plane_আকার = (পূর্ণসংখ্যা)it.size*cn;
     minval.L = maxval.L = 0;
 
-    for( size_t i = 0; i < it.nplanes; i++, ++it, startidx += planeSize )
-        func( ptrs[0], ptrs[1], &minval.L, &maxval.L, &minidx, &maxidx, planeSize, startidx );
+    জন্য( size_t i = 0; i < it.nplanes; i++, ++it, startidx += plane_আকার )
+        func( ptrs[0], ptrs[1], &minval.L, &maxval.L, &minidx, &maxidx, plane_আকার, startidx );
 
-    double dminval, dmaxval;
-    if( depth <= CV_32S || depth == CV_Bool )
+    দ্বিগুণ dminval, dmaxval;
+    যদি( depth <= CV_32S || depth == CV_Bool )
         dminval = minval.i, dmaxval = maxval.i;
-    else if( depth == CV_32F || depth == CV_16F || depth == CV_16BF )
+    অন্যথা যদি( depth == CV_32F || depth == CV_16F || depth == CV_16BF )
         dminval = minval.f, dmaxval = maxval.f;
-    else if( depth == CV_64F )
+    অন্যথা যদি( depth == CV_64F )
         dminval = minval.d, dmaxval = maxval.d;
-    else if( depth == CV_64S || depth == CV_32U )
-        dminval = (double)minval.L, dmaxval = (double)maxval.L;
-    else {
+    অন্যথা যদি( depth == CV_64S || depth == CV_32U )
+        dminval = (দ্বিগুণ)minval.L, dmaxval = (দ্বিগুণ)maxval.L;
+    অন্যথা {
         CV_Assert(depth == CV_64U);
-        dminval = (double)minval.UL, dmaxval = (double)maxval.UL;
+        dminval = (দ্বিগুণ)minval.UL, dmaxval = (দ্বিগুণ)maxval.UL;
     }
 
-    if( minVal )
+    যদি( minVal )
         *minVal = dminval;
-    if( maxVal )
+    যদি( maxVal )
         *maxVal = dmaxval;
 
-    if( minIdx )
+    যদি( minIdx )
         ofs2idx(src, minidx, minIdx);
-    if( maxIdx )
+    যদি( maxIdx )
         ofs2idx(src, maxidx, maxIdx);
 }
 
-void cv::minMaxIdx(InputArray _src, double* minVal,
-                   double* maxVal, int* minIdx, int* maxIdx,
-                   InputArray _mask)
+শূন্য cv::minMaxIdx(প্রবেশ_Array _src, দ্বিগুণ* minVal,
+                   দ্বিগুণ* maxVal, পূর্ণসংখ্যা* minIdx, পূর্ণসংখ্যা* maxIdx,
+                   প্রবেশ_Array _mask)
 {
     CV_INSTRUMENT_REGION();
 
     std::vector<StatChunk> chunks;
-    if (!_src.isUMat())
+    যদি (!_src.isUMat())
     {
         Mat src = _src.getMat(), mask = _mask.getMat();
-        const int cn = src.channels();
-        const bool argsOk = (cn == 1 && (mask.empty() || ((mask.type() == CV_8U || mask.type() == CV_8S ||
+        ধ্রুবক পূর্ণসংখ্যা cn = src.channels();
+        ধ্রুবক যৌক্তিক argsOk = (cn == 1 && (mask.empty() || ((mask.type() == CV_8U || mask.type() == CV_8S ||
                              mask.type() == CV_Bool) && src.size == mask.size))) ||
                             (cn > 1 && mask.empty() && !minIdx && !maxIdx);
-        if (argsOk && splitForParallelStat(src, mask, chunks))
+        যদি (argsOk && splitForParallelStat(src, mask, chunks))
         {
-            const int n = (int)chunks.size();
-            std::vector<double> mn(n), mx(n);
+            ধ্রুবক পূর্ণসংখ্যা n = (পূর্ণসংখ্যা)chunks.size();
+            std::vector<দ্বিগুণ> mn(n), mx(n);
             std::vector<size_t> imn(n, 0), imx(n, 0);   // 1-based row-major indices, 0 = no element
-            parallel_for_(Range(0, n), [&](const Range& r)
+            parallel_for_(Range(0, n), [&](ধ্রুবক Range& r)
             {
-                for (int i = r.start; i < r.end; i++)
+                জন্য (পূর্ণসংখ্যা i = r.start; i < r.end; i++)
                 {
-                    int a[2] = {-1, -1}, b[2] = {-1, -1};
+                    পূর্ণসংখ্যা a[2] = {-1, -1}, b[2] = {-1, -1};
                     minMaxIdx_(chunks[i].src, &mn[i], &mx[i], cn == 1 ? a : nullptr, cn == 1 ? b : nullptr,
                                chunks[i].mask);
-                    if (cn > 1)
+                    যদি (cn > 1)
                         imn[i] = imx[i] = 1;
-                    else if (a[0] >= 0)
+                    অন্যথা যদি (a[0] >= 0)
                     {
-                        imn[i] = chunkIndexToElem(chunks[i], a) + 1;
-                        imx[i] = chunkIndexToElem(chunks[i], b) + 1;
+                        imn[i] = chunk_সূচক_To_Elem(chunks[i], a) + 1;
+                        imx[i] = chunk_সূচক_To_Elem(chunks[i], b) + 1;
                     }
                 }
             });
             // pieces are in memory order, so taking the first strict improvement keeps the
             // first occurrence, as in the serial version
-            int bmin = -1, bmax = -1;
-            for (int i = 0; i < n; i++)
+            পূর্ণসংখ্যা bmin = -1, bmax = -1;
+            জন্য (পূর্ণসংখ্যা i = 0; i < n; i++)
             {
-                if (imn[i] == 0)
-                    continue;
-                if (bmin < 0 || mn[i] < mn[bmin]) bmin = i;
-                if (bmax < 0 || mx[i] > mx[bmax]) bmax = i;
+                যদি (imn[i] == 0)
+                    চালু;
+                যদি (bmin < 0 || mn[i] < mn[bmin]) bmin = i;
+                যদি (bmax < 0 || mx[i] > mx[bmax]) bmax = i;
             }
-            if (minVal) *minVal = bmin >= 0 ? mn[bmin] : 0;
-            if (maxVal) *maxVal = bmax >= 0 ? mx[bmax] : 0;
-            if (minIdx) ofs2idx(src, bmin >= 0 ? imn[bmin] : 0, minIdx);
-            if (maxIdx) ofs2idx(src, bmax >= 0 ? imx[bmax] : 0, maxIdx);
-            return;
+            যদি (minVal) *minVal = bmin >= 0 ? mn[bmin] : 0;
+            যদি (maxVal) *maxVal = bmax >= 0 ? mx[bmax] : 0;
+            যদি (minIdx) ofs2idx(src, bmin >= 0 ? imn[bmin] : 0, minIdx);
+            যদি (maxIdx) ofs2idx(src, bmax >= 0 ? imx[bmax] : 0, maxIdx);
+            ফেরত;
         }
     }
     minMaxIdx_(_src, minVal, maxVal, minIdx, maxIdx, _mask);
 }
 
-void cv::minMaxLoc( InputArray _img, double* minVal, double* maxVal,
-                    Point* minLoc, Point* maxLoc, InputArray mask )
+শূন্য cv::minMaxLoc( প্রবেশ_Array _img, দ্বিগুণ* minVal, দ্বিগুণ* maxVal,
+                    Point* minLoc, Point* maxLoc, প্রবেশ_Array mask )
 {
     CV_INSTRUMENT_REGION();
 
-    int dims = _img.dims();
+    পূর্ণসংখ্যা dims = _img.dims();
     CV_CheckLE(dims, 2, "");
 
-    minMaxIdx(_img, minVal, maxVal, (int*)minLoc, (int*)maxLoc, mask);
-    if( minLoc) {
-        if (dims == 2)
+    minMaxIdx(_img, minVal, maxVal, (পূর্ণসংখ্যা*)minLoc, (পূর্ণসংখ্যা*)maxLoc, mask);
+    যদি( minLoc) {
+        যদি (dims == 2)
             std::swap(minLoc->x, minLoc->y);
-        else {
+        অন্যথা {
             minLoc->y = 0;
         }
     }
-    if( maxLoc) {
-        if (dims == 2)
+    যদি( maxLoc) {
+        যদি (dims == 2)
             std::swap(maxLoc->x, maxLoc->y);
-        else {
+        অন্যথা {
             maxLoc->y = 0;
         }
     }
 }
 
-enum class ReduceMode
+গণনা শ্রেণী ReduceMode
 {
     FIRST_MIN = 0, //!< get index of first min occurrence
     LAST_MIN  = 1, //!< get index of last min occurrence
@@ -480,60 +480,60 @@ enum class ReduceMode
 };
 
 template <typename T>
-struct reduceMinMaxImpl
+কাঠামো reduceMinMaxImpl
 {
-    void operator()(const cv::Mat& src, cv::Mat& dst, ReduceMode mode, const int axis) const
+    শূন্য operator()(ধ্রুবক cv::Mat& src, cv::Mat& dst, ReduceMode mode, ধ্রুবক পূর্ণসংখ্যা axis) ধ্রুবক
     {
-        switch(mode)
+        নির্বাচন(mode)
         {
-        case ReduceMode::FIRST_MIN:
+        ক্ষেত্র ReduceMode::FIRST_MIN:
             reduceMinMaxApply<std::less>(src, dst, axis);
-            break;
-        case ReduceMode::LAST_MIN:
+            বিরতি;
+        ক্ষেত্র ReduceMode::LAST_MIN:
             reduceMinMaxApply<std::less_equal>(src, dst, axis);
-            break;
-        case ReduceMode::FIRST_MAX:
+            বিরতি;
+        ক্ষেত্র ReduceMode::FIRST_MAX:
             reduceMinMaxApply<std::greater>(src, dst, axis);
-            break;
-        case ReduceMode::LAST_MAX:
+            বিরতি;
+        ক্ষেত্র ReduceMode::LAST_MAX:
             reduceMinMaxApply<std::greater_equal>(src, dst, axis);
-            break;
+            বিরতি;
         }
     }
 
-    template <template<class> class Cmp>
-    static void reduceMinMaxApply(const cv::Mat& src, cv::Mat& dst, const int axis)
+    template <template<শ্রেণী> শ্রেণী Cmp>
+    স্থির শূন্য reduceMinMaxApply(ধ্রুবক cv::Mat& src, cv::Mat& dst, ধ্রুবক পূর্ণসংখ্যা axis)
     {
         Cmp<T> cmp;
 
-        const auto *src_ptr = src.ptr<T>();
+        ধ্রুবক auto *src_ptr = src.ptr<T>();
         auto *dst_ptr = dst.ptr<int32_t>();
 
-        const size_t outer_size = src.total(0, axis);
-        const auto mid_size = static_cast<size_t>(src.size[axis]);
+        ধ্রুবক size_t outer_আকার = src.যোগ(0, axis);
+        ধ্রুবক auto mid_আকার = static_cast<size_t>(src.size[axis]);
 
-        const size_t outer_step = src.total(axis);
-        const size_t dst_step = dst.total(axis);
+        ধ্রুবক size_t outer_step = src.যোগ(axis);
+        ধ্রুবক size_t dst_step = dst.যোগ(axis);
 
-        const size_t mid_step = src.total(axis + 1);
+        ধ্রুবক size_t mid_step = src.যোগ(axis + 1);
 
-        for (size_t outer = 0; outer < outer_size; ++outer)
+        জন্য (size_t outer = 0; outer < outer_আকার; ++outer)
         {
-            const size_t outer_offset = outer * outer_step;
-            const size_t dst_offset = outer * dst_step;
-            for (size_t mid = 0; mid != mid_size; ++mid)
+            ধ্রুবক size_t outer_offset = outer * outer_step;
+            ধ্রুবক size_t dst_offset = outer * dst_step;
+            জন্য (size_t mid = 0; mid != mid_আকার; ++mid)
             {
-                const size_t src_offset = outer_offset + mid * mid_step;
-                for (size_t inner = 0; inner < mid_step; inner++)
+                ধ্রুবক size_t src_offset = outer_offset + mid * mid_step;
+                জন্য (size_t inner = 0; inner < mid_step; inner++)
                 {
-                    int32_t& index = dst_ptr[dst_offset + inner];
+                    int32_t& সূচক = dst_ptr[dst_offset + inner];
 
-                    const size_t prev = outer_offset + index * mid_step + inner;
-                    const size_t curr = src_offset + inner;
+                    ধ্রুবক size_t পূর্ব = outer_offset + সূচক * mid_step + inner;
+                    ধ্রুবক size_t curr = src_offset + inner;
 
-                    if (cmp(src_ptr[curr], src_ptr[prev]))
+                    যদি (cmp(src_ptr[curr], src_ptr[পূর্ব]))
                     {
-                        index = static_cast<int32_t>(mid);
+                        সূচক = static_cast<int32_t>(mid);
                     }
                 }
             }
@@ -541,49 +541,49 @@ struct reduceMinMaxImpl
     }
 };
 
-static void reduceMinMax(cv::InputArray src, cv::OutputArray dst, ReduceMode mode, int axis)
+স্থির শূন্য reduceMinMax(cv::প্রবেশ_Array src, cv::OutputArray dst, ReduceMode mode, পূর্ণসংখ্যা axis)
 {
     CV_INSTRUMENT_REGION();
 
     cv::Mat srcMat = src.getMat();
-    int dims = std::max(1, srcMat.dims);
+    পূর্ণসংখ্যা dims = std::max(1, srcMat.dims);
     axis = (axis + dims) % dims;
     CV_Assert(srcMat.channels() == 1 && axis >= 0 && axis <= srcMat.dims);
 
-    std::vector<int> sizes(srcMat.dims);
+    std::vector<পূর্ণসংখ্যা> sizes(srcMat.dims);
     std::copy(srcMat.size.p, srcMat.size.p + srcMat.dims, sizes.begin());
-    if(!sizes.empty())
+    যদি(!sizes.empty())
         sizes[axis] = 1;
 
-    dst.create(srcMat.dims, sizes.data(), CV_32SC1); // indices
+    dst.create(srcMat.dims, sizes.তথ্য(), CV_32SC1); // indices
     cv::Mat dstMat = dst.getMat();
     dstMat.setTo(cv::Scalar::all(0));
 
-    if (!srcMat.isContinuous())
+    যদি (!srcMat.isContinuous())
     {
         srcMat = srcMat.clone();
     }
 
-    bool needs_copy = !dstMat.isContinuous();
-    if (needs_copy)
+    যৌক্তিক needs_copy = !dstMat.isContinuous();
+    যদি (needs_copy)
     {
         dstMat = dstMat.clone();
     }
 
     cv::detail::depthDispatch<reduceMinMaxImpl>(srcMat.depth(), srcMat, dstMat, mode, axis);
 
-    if (needs_copy)
+    যদি (needs_copy)
     {
         dstMat.copyTo(dst);
     }
 }
 
-void cv::reduceArgMin(InputArray src, OutputArray dst, int axis, bool lastIndex)
+শূন্য cv::reduceArgMin(প্রবেশ_Array src, OutputArray dst, পূর্ণসংখ্যা axis, যৌক্তিক last_সূচক)
 {
-    reduceMinMax(src, dst, lastIndex ? ReduceMode::LAST_MIN : ReduceMode::FIRST_MIN, axis);
+    reduceMinMax(src, dst, last_সূচক ? ReduceMode::LAST_MIN : ReduceMode::FIRST_MIN, axis);
 }
 
-void cv::reduceArgMax(InputArray src, OutputArray dst, int axis, bool lastIndex)
+শূন্য cv::reduceArgMax(প্রবেশ_Array src, OutputArray dst, পূর্ণসংখ্যা axis, যৌক্তিক last_সূচক)
 {
-    reduceMinMax(src, dst, lastIndex ? ReduceMode::LAST_MAX : ReduceMode::FIRST_MAX, axis);
+    reduceMinMax(src, dst, last_সূচক ? ReduceMode::LAST_MAX : ReduceMode::FIRST_MAX, axis);
 }
