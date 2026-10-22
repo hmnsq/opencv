@@ -2,328 +2,328 @@
 // It is subject to the license terms in the LICENSE file found in the top-level directory
 // of this distribution and at http://opencv.org/license.html
 
-#include "precomp.hpp"
-#include "persistence.hpp"
+#अन्तर्भाव "precomp.hpp"
+#अन्तर्भाव "persistence.hpp"
 
-namespace cv
+नामाकाश cv
 {
 
-void write( FileStorage& fs, const String& name, const Mat& m )
+शून्य लिख( FileStorage& fs, ध्रुव String& name, ध्रुव Mat& m )
 {
-    char dt[22];
+    वर्ण dt[22];
 
-    if( m.dims == 2 || m.empty() )
+    यदि( m.dims == 2 || m.empty() )
     {
-        fs.startWriteStruct(name, FileNode::MAP, String("opencv-matrix"));
+        fs.startWriteStruct(name, File_गाँठ::MAP, String("opencv-matrix"));
         fs << "rows" << m.rows;
         fs << "cols" << m.cols;
-        fs << "dt" << fs::encodeFormat( m.type(), dt, sizeof(dt) );
+        fs << "dt" << fs::encodeFormat( m.type(), dt, परिमाण(dt) );
         fs << "data" << "[:";
-        for( int i = 0; i < m.rows; i++ )
+        प्रति( पूर्णाङ्क i = 0; i < m.rows; i++ )
             fs.writeRaw(dt, m.ptr(i), m.cols*m.elemSize());
         fs << "]";
         fs.endWriteStruct();
     }
-    else
+    अन्यथा
     {
-        fs.startWriteStruct(name, FileNode::MAP, String("opencv-nd-matrix"));
+        fs.startWriteStruct(name, File_गाँठ::MAP, String("opencv-nd-matrix"));
         fs << "sizes" << "[:";
-        fs.writeRaw( "i", m.size.p, m.dims*sizeof(int) );
+        fs.writeRaw( "i", m.size.p, m.dims*परिमाण(पूर्णाङ्क) );
         fs << "]";
-        fs << "dt" << fs::encodeFormat( m.type(), dt, sizeof(dt) );
+        fs << "dt" << fs::encodeFormat( m.type(), dt, परिमाण(dt) );
         fs << "data" << "[:";
-        const Mat* arrays[] = {&m, 0};
+        ध्रुव Mat* arrays[] = {&m, 0};
         uchar* ptrs[1] = {};
         NAryMatIterator it(arrays, ptrs);
-        size_t total = it.size*m.elemSize();
+        माप_प्रकार total = it.size*m.elemSize();
 
-        for( size_t i = 0; i < it.nplanes; i++, ++it )
+        प्रति( माप_प्रकार i = 0; i < it.nplanes; i++, ++it )
             fs.writeRaw( dt, ptrs[0], total );
         fs << "]";
         fs.endWriteStruct();
     }
 }
 
-struct SparseNodeCmp
+संरचना Sparse_गाँठ_Cmp
 {
-    SparseNodeCmp(int _dims) : dims(_dims) {}
-    bool operator()(const SparseMat::Node* a, const SparseMat::Node* b)
+    Sparse_गाँठ_Cmp(पूर्णाङ्क _dims) : dims(_dims) {}
+    तार्किक चालक()(ध्रुव SparseMat::Node* a, ध्रुव SparseMat::Node* b)
     {
-        for( int i = 0; i < dims; i++ )
+        प्रति( पूर्णाङ्क i = 0; i < dims; i++ )
         {
-            int d = a->idx[i] - b->idx[i];
-            if(d)
-                return d < 0;
+            पूर्णाङ्क d = a->idx[i] - b->idx[i];
+            यदि(d)
+                प्रत्यागम d < 0;
         }
-        return false;
+        प्रत्यागम असत्य;
     }
 
-    int dims;
+    पूर्णाङ्क dims;
 };
 
-void write( FileStorage& fs, const String& name, const SparseMat& m )
+शून्य लिख( FileStorage& fs, ध्रुव String& name, ध्रुव SparseMat& m )
 {
-    char dt[22];
+    वर्ण dt[22];
 
-    fs.startWriteStruct(name, FileNode::MAP, String("opencv-sparse-matrix"));
+    fs.startWriteStruct(name, File_गाँठ::MAP, String("opencv-sparse-matrix"));
     fs << "sizes" << "[:";
-    int dims = m.dims();
-    if( dims > 0 )
-        fs.writeRaw("i", m.hdr->size, dims*sizeof(int) );
+    पूर्णाङ्क dims = m.dims();
+    यदि( dims > 0 )
+        fs.writeRaw("i", m.hdr->size, dims*परिमाण(पूर्णाङ्क) );
     fs << "]";
-    fs << "dt" << fs::encodeFormat( m.type(), dt, sizeof(dt) );
+    fs << "dt" << fs::encodeFormat( m.type(), dt, परिमाण(dt) );
     fs << "data" << "[:";
 
-    size_t i = 0, n = m.nzcount();
-    AutoBuffer<const SparseMat::Node*> elems(n);
+    माप_प्रकार i = 0, n = m.nzcount();
+    AutoBuffer<ध्रुव SparseMat::Node*> elems(n);
     SparseMatConstIterator it = m.begin(), it_end = m.end();
 
-    for( ; it != it_end; ++it )
+    प्रति( ; it != it_end; ++it )
     {
-        CV_Assert(it.node() != 0);
-        elems[i++] = it.node();
+        CV_Assert(it.गाँठ() != 0);
+        elems[i++] = it.गाँठ();
     }
 
-    std::sort(elems.begin(), elems.end(), SparseNodeCmp(dims));
-    const SparseMat::Node* prev_node = 0;
-    size_t esz = m.elemSize();
+    std::sort(elems.begin(), elems.end(), Sparse_गाँठ_Cmp(dims));
+    ध्रुव SparseMat::Node* prev_गाँठ = 0;
+    माप_प्रकार esz = m.elemSize();
 
-    for( i = 0; i < n; i++ )
+    प्रति( i = 0; i < n; i++ )
     {
-        const SparseMat::Node* node = elems[i];
-        int k = 0;
+        ध्रुव SparseMat::Node* गाँठ = elems[i];
+        पूर्णाङ्क k = 0;
 
-        if( prev_node )
+        यदि( prev_गाँठ )
         {
-            for( ; k < dims; k++ )
-                if( node->idx[k] != prev_node->idx[k] )
-                    break;
+            प्रति( ; k < dims; k++ )
+                यदि( गाँठ->idx[k] != prev_गाँठ->idx[k] )
+                    भङ्ग;
             CV_Assert( k < dims );
-            if( k < dims - 1 )
+            यदि( k < dims - 1 )
                 writeScalar( fs, k - dims + 1 );
         }
-        for( ; k < dims; k++ )
-            writeScalar( fs, node->idx[k] );
-        prev_node = node;
+        प्रति( ; k < dims; k++ )
+            writeScalar( fs, गाँठ->idx[k] );
+        prev_गाँठ = गाँठ;
 
-        const uchar* value = &m.value<uchar>(node);
+        ध्रुव uchar* value = &m.value<uchar>(गाँठ);
         fs.writeRaw(dt, value, esz);
     }
 
     fs << "]" << "}";
 }
 
-void read(const FileNode& node, Mat& m, const Mat& default_mat)
+शून्य पठ(ध्रुव File_गाँठ& गाँठ, Mat& m, ध्रुव Mat& default_mat)
 {
-    if( node.empty() )
+    यदि( गाँठ.empty() )
     {
         default_mat.copyTo(m);
-        return;
+        प्रत्यागम;
     }
 
     std::string dt;
-    int rows, cols, elem_type;
+    पूर्णाङ्क rows, cols, elem_type;
 
-    read(node["dt"], dt, std::string());
+    पठ(गाँठ["dt"], dt, std::string());
     CV_Assert( !dt.empty() );
 
     elem_type = fs::decodeSimpleFormat( dt.c_str() );
 
-    read(node["rows"], rows, -1);
-    if( rows >= 0 )
+    पठ(गाँठ["rows"], rows, -1);
+    यदि( rows >= 0 )
     {
-        read(node["cols"], cols, -1);
+        पठ(गाँठ["cols"], cols, -1);
         m.create(rows, cols, elem_type);
     }
-    else
+    अन्यथा
     {
-        int sizes[CV_MAX_DIM] = {0}, dims;
-        FileNode sizes_node = node["sizes"];
-        CV_Assert( !sizes_node.empty() );
+        पूर्णाङ्क sizes[CV_MAX_DIM] = {0}, dims;
+        File_गाँठ sizes_गाँठ = गाँठ["sizes"];
+        CV_Assert( !sizes_गाँठ.empty() );
 
-        dims = (int)sizes_node.size();
+        dims = (पूर्णाङ्क)sizes_गाँठ.size();
         CV_Assert( dims >= 0 && dims <= CV_MAX_DIM );
-        sizes_node.readRaw("i", sizes, dims*sizeof(sizes[0]));
+        sizes_गाँठ.readRaw("i", sizes, dims*परिमाण(sizes[0]));
 
         m.create(dims, sizes, elem_type);
     }
 
-    FileNode data_node = node["data"];
-    CV_Assert(!data_node.empty());
+    File_गाँठ data_गाँठ = गाँठ["data"];
+    CV_Assert(!data_गाँठ.empty());
 
-    size_t nelems = data_node.size();
-    if (nelems == 0)
+    माप_प्रकार nelems = data_गाँठ.size();
+    यदि (nelems == 0)
     {
         m = Mat();
-        return;
+        प्रत्यागम;
     }
     CV_Assert(nelems == m.total()*m.channels());
 
-    data_node.readRaw(dt, (uchar*)m.ptr(), m.total()*m.elemSize());
+    data_गाँठ.readRaw(dt, (uchar*)m.ptr(), m.total()*m.elemSize());
 }
 
-void read( const FileNode& node, SparseMat& m, const SparseMat& default_mat )
+शून्य पठ( ध्रुव File_गाँठ& गाँठ, SparseMat& m, ध्रुव SparseMat& default_mat )
 {
-    if( node.empty() )
+    यदि( गाँठ.empty() )
     {
         default_mat.copyTo(m);
-        return;
+        प्रत्यागम;
     }
 
     std::string dt;
-    read(node["dt"], dt, std::string());
+    पठ(गाँठ["dt"], dt, std::string());
     CV_Assert( !dt.empty() );
 
-    int elem_type = fs::decodeSimpleFormat( dt.c_str() );
+    पूर्णाङ्क elem_type = fs::decodeSimpleFormat( dt.c_str() );
 
-    int sizes[CV_MAX_DIM] = {0};
-    FileNode sizes_node = node["sizes"];
-    CV_Assert( !sizes_node.empty() );
+    पूर्णाङ्क sizes[CV_MAX_DIM] = {0};
+    File_गाँठ sizes_गाँठ = गाँठ["sizes"];
+    CV_Assert( !sizes_गाँठ.empty() );
 
-    int dims = (int)sizes_node.size();
+    पूर्णाङ्क dims = (पूर्णाङ्क)sizes_गाँठ.size();
     CV_Assert( dims > 0 && dims <= CV_MAX_DIM );
-    sizes_node.readRaw("i", sizes, dims*sizeof(sizes[0]));
+    sizes_गाँठ.readRaw("i", sizes, dims*परिमाण(sizes[0]));
 
     m.create(dims, sizes, elem_type);
 
-    FileNode data = node["data"];
+    File_गाँठ data = गाँठ["data"];
     CV_Assert( data.isSeq() );
 
-    int cn = CV_MAT_CN(elem_type);
-    int idx[CV_MAX_DIM] = {0};
-    size_t i, sz = data.size();
-    size_t esz = m.elemSize();
-    FileNodeIterator it = data.begin();
+    पूर्णाङ्क cn = CV_MAT_CN(elem_type);
+    पूर्णाङ्क idx[CV_MAX_DIM] = {0};
+    माप_प्रकार i, sz = data.size();
+    माप_प्रकार esz = m.elemSize();
+    File_गाँठ_Iterator it = data.begin();
 
-    for( i = 0; i < sz; )
+    प्रति( i = 0; i < sz; )
     {
-        FileNode n = *it;
-        int k = (int)n;
-        if( i > 0 && k >= 0 )
+        File_गाँठ n = *it;
+        पूर्णाङ्क k = (पूर्णाङ्क)n;
+        यदि( i > 0 && k >= 0 )
         {
             CV_Assert( k < sizes[dims-1] );
             idx[dims-1] = k;
         }
-        else
+        अन्यथा
         {
-            if( i > 0 )
+            यदि( i > 0 )
             {
                 // write() stores the first changed dimension as k - dims + 1
                 k = dims + k - 1;
                 CV_Assert( k >= 0 );
             }
-            else
+            अन्यथा
             {
                 CV_Assert( k >= 0 && k < sizes[0] );
                 idx[0] = k, k = 1;
             }
-            for( ; k < dims; k++ )
+            प्रति( ; k < dims; k++ )
             {
                 ++it;
                 i++;
                 n = *it;
                 CV_Assert( n.isInt() );
-                int idx_k = (int)n;
+                पूर्णाङ्क idx_k = (पूर्णाङ्क)n;
                 CV_Assert( idx_k >= 0 && idx_k < sizes[k] );
                 idx[k] = idx_k;
             }
         }
         ++it;
         i++;
-        uchar* valptr = m.ptr(idx, true);
+        uchar* valptr = m.ptr(idx, सत्य);
         it.readRaw(dt, valptr, esz);
         i += cn;
     }
 }
 
-void read(const FileNode& node, KeyPoint& value, const KeyPoint& default_value)
+शून्य पठ(ध्रुव File_गाँठ& गाँठ, कुंजी_Point& value, ध्रुव कुंजी_Point& default_मूल्य)
 {
-    if( node.empty() )
+    यदि( गाँठ.empty() )
     {
-        value = default_value;
-        return;
+        value = default_मूल्य;
+        प्रत्यागम;
     }
-    node >> value;
+    गाँठ >> value;
 }
 
-void read(const FileNode& node, DMatch& value, const DMatch& default_value)
+शून्य पठ(ध्रुव File_गाँठ& गाँठ, DMatch& value, ध्रुव DMatch& default_मूल्य)
 {
-    if( node.empty() )
+    यदि( गाँठ.empty() )
     {
-        value = default_value;
-        return;
+        value = default_मूल्य;
+        प्रत्यागम;
     }
-    node >> value;
+    गाँठ >> value;
 }
 
 #ifdef CV__LEGACY_PERSISTENCE
-void write( FileStorage& fs, const std::string& name, const std::vector<KeyPoint>& vec)
+शून्य लिख( FileStorage& fs, ध्रुव std::string& name, ध्रुव std::vector<कुंजी_Point>& vec)
 {
     // from template implementation
-    cv::internal::WriteStructContext ws(fs, name, FileNode::SEQ);
-    write(fs, vec);
+    cv::internal::WriteStructContext ws(fs, name, File_गाँठ::SEQ);
+    लिख(fs, vec);
 }
 
-void read(const FileNode& node, std::vector<KeyPoint>& keypoints)
+शून्य पठ(ध्रुव File_गाँठ& गाँठ, std::vector<कुंजी_Point>& keypoints)
 {
-    FileNode first_node = *(node.begin());
-    if (first_node.isSeq())
+    File_गाँठ first_गाँठ = *(गाँठ.begin());
+    यदि (first_गाँठ.isSeq())
     {
         // modern scheme
 #ifdef OPENCV_TRAITS_ENABLE_DEPRECATED
-        FileNodeIterator it = node.begin();
-        size_t total = (size_t)it.remaining;
+        File_गाँठ_Iterator it = गाँठ.begin();
+        माप_प्रकार total = (माप_प्रकार)it.remaining;
         keypoints.resize(total);
-        for (size_t i = 0; i < total; ++i, ++it)
+        प्रति (माप_प्रकार i = 0; i < total; ++i, ++it)
         {
             (*it) >> keypoints[i];
         }
-#else
-        FileNodeIterator it = node.begin();
+#अन्यथा
+        File_गाँठ_Iterator it = गाँठ.begin();
         it >> keypoints;
 #endif
-        return;
+        प्रत्यागम;
     }
     keypoints.clear();
-    FileNodeIterator it = node.begin(), it_end = node.end();
-    for( ; it != it_end; )
+    File_गाँठ_Iterator it = गाँठ.begin(), it_end = गाँठ.end();
+    प्रति( ; it != it_end; )
     {
-        KeyPoint kpt;
+        कुंजी_Point kpt;
         it >> kpt.pt.x >> kpt.pt.y >> kpt.size >> kpt.angle >> kpt.response >> kpt.octave >> kpt.class_id;
         keypoints.push_back(kpt);
     }
 }
 
-void write( FileStorage& fs, const std::string& name, const std::vector<DMatch>& vec)
+शून्य लिख( FileStorage& fs, ध्रुव std::string& name, ध्रुव std::vector<DMatch>& vec)
 {
     // from template implementation
-    cv::internal::WriteStructContext ws(fs, name, FileNode::SEQ);
-    write(fs, vec);
+    cv::internal::WriteStructContext ws(fs, name, File_गाँठ::SEQ);
+    लिख(fs, vec);
 }
 
-void read(const FileNode& node, std::vector<DMatch>& matches)
+शून्य पठ(ध्रुव File_गाँठ& गाँठ, std::vector<DMatch>& matches)
 {
-    FileNode first_node = *(node.begin());
-    if (first_node.isSeq())
+    File_गाँठ first_गाँठ = *(गाँठ.begin());
+    यदि (first_गाँठ.isSeq())
     {
         // modern scheme
 #ifdef OPENCV_TRAITS_ENABLE_DEPRECATED
-        FileNodeIterator it = node.begin();
-        size_t total = (size_t)it.remaining;
+        File_गाँठ_Iterator it = गाँठ.begin();
+        माप_प्रकार total = (माप_प्रकार)it.remaining;
         matches.resize(total);
-        for (size_t i = 0; i < total; ++i, ++it)
+        प्रति (माप_प्रकार i = 0; i < total; ++i, ++it)
         {
             (*it) >> matches[i];
         }
-#else
-        FileNodeIterator it = node.begin();
+#अन्यथा
+        File_गाँठ_Iterator it = गाँठ.begin();
         it >> matches;
 #endif
-        return;
+        प्रत्यागम;
     }
     matches.clear();
-    FileNodeIterator it = node.begin(), it_end = node.end();
-    for( ; it != it_end; )
+    File_गाँठ_Iterator it = गाँठ.begin(), it_end = गाँठ.end();
+    प्रति( ; it != it_end; )
     {
         DMatch m;
         it >> m.queryIdx >> m.trainIdx >> m.imgIdx >> m.distance;

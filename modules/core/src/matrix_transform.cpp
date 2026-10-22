@@ -2,30 +2,30 @@
 // It is subject to the license terms in the LICENSE file found in the top-level directory
 // of this distribution and at http://opencv.org/license.html
 // Copyright (C) 2026, Advanced Micro Devices, Inc., all rights reserved.
-#include "precomp.hpp"
-#include "opencl_kernels_core.hpp"
-#include "hal_replacement.hpp"
-#include "opencv2/core/detail/dispatch_helper.impl.hpp"
+#अन्तर्भाव "precomp.hpp"
+#अन्तर्भाव "opencl_kernels_core.hpp"
+#अन्तर्भाव "hal_replacement.hpp"
+#अन्तर्भाव "opencv2/core/detail/dispatch_helper.impl.hpp"
 
-#include "transpose.simd.hpp"
-#include "transpose.simd_declarations.hpp"
-#include "nd_copy.hpp"
+#अन्तर्भाव "transpose.simd.hpp"
+#अन्तर्भाव "transpose.simd_declarations.hpp"
+#अन्तर्भाव "nd_copy.hpp"
 
-#include <algorithm> // std::swap_ranges
-#include <numeric> // std::accumulate
+#अन्तर्भाव <algorithm> // std::swap_ranges
+#अन्तर्भाव <numeric> // std::accumulate
 
-namespace cv {
+नामाकाश cv {
 
 ////////////////////////////////////// transpose /////////////////////////////////////////
-#if CV_SIMD128
-static void transpose_8bit_simd(const uchar* src, size_t sstep, uchar* dst, size_t dstep, Size sz)
+#यदि CV_SIMD128
+स्थिर शून्य transpose_8bit_simd(ध्रुव uchar* src, माप_प्रकार sstep, uchar* dst, माप_प्रकार dstep, Size sz)
 {
-    const int m = sz.width, n = sz.height;
-    int i = 0;
-    for (; i <= m - 16; i += 16)
+    ध्रुव पूर्णाङ्क m = sz.width, n = sz.height;
+    पूर्णाङ्क i = 0;
+    प्रति (; i <= m - 16; i += 16)
     {
-        int j = 0;
-        for (; j <= n - 16; j += 16)
+        पूर्णाङ्क j = 0;
+        प्रति (; j <= n - 16; j += 16)
         {
             v_uint8x16 r0  = v_load(src + i + sstep*(j+ 0));
             v_uint8x16 r1  = v_load(src + i + sstep*(j+ 1));
@@ -79,22 +79,22 @@ static void transpose_8bit_simd(const uchar* src, size_t sstep, uchar* dst, size
             v_zip(v_reinterpret_as_u32(s10), v_reinterpret_as_u32(s14), u12, u13);
             v_zip(v_reinterpret_as_u32(s11), v_reinterpret_as_u32(s15), u14, u15);
 
-            v_uint32x4 v0  = v_combine_low (u0,  u8);
-            v_uint32x4 v1  = v_combine_high(u0,  u8);
-            v_uint32x4 v2  = v_combine_low (u1,  u9);
-            v_uint32x4 v3  = v_combine_high(u1,  u9);
-            v_uint32x4 v4  = v_combine_low (u2,  u10);
-            v_uint32x4 v5  = v_combine_high(u2,  u10);
-            v_uint32x4 v6  = v_combine_low (u3,  u11);
-            v_uint32x4 v7  = v_combine_high(u3,  u11);
-            v_uint32x4 v8  = v_combine_low (u4,  u12);
-            v_uint32x4 v9  = v_combine_high(u4,  u12);
-            v_uint32x4 v10 = v_combine_low (u5,  u13);
-            v_uint32x4 v11 = v_combine_high(u5,  u13);
-            v_uint32x4 v12 = v_combine_low (u6,  u14);
-            v_uint32x4 v13 = v_combine_high(u6,  u14);
-            v_uint32x4 v14 = v_combine_low (u7,  u15);
-            v_uint32x4 v15 = v_combine_high(u7,  u15);
+            v_uint32x4 v0  = v_combine_निचला (u0,  u8);
+            v_uint32x4 v1  = v_combine_ऊपरी(u0,  u8);
+            v_uint32x4 v2  = v_combine_निचला (u1,  u9);
+            v_uint32x4 v3  = v_combine_ऊपरी(u1,  u9);
+            v_uint32x4 v4  = v_combine_निचला (u2,  u10);
+            v_uint32x4 v5  = v_combine_ऊपरी(u2,  u10);
+            v_uint32x4 v6  = v_combine_निचला (u3,  u11);
+            v_uint32x4 v7  = v_combine_ऊपरी(u3,  u11);
+            v_uint32x4 v8  = v_combine_निचला (u4,  u12);
+            v_uint32x4 v9  = v_combine_ऊपरी(u4,  u12);
+            v_uint32x4 v10 = v_combine_निचला (u5,  u13);
+            v_uint32x4 v11 = v_combine_ऊपरी(u5,  u13);
+            v_uint32x4 v12 = v_combine_निचला (u6,  u14);
+            v_uint32x4 v13 = v_combine_ऊपरी(u6,  u14);
+            v_uint32x4 v14 = v_combine_निचला (u7,  u15);
+            v_uint32x4 v15 = v_combine_ऊपरी(u7,  u15);
 
             v_store(dst + dstep*(i+ 0) + j, v_reinterpret_as_u8(v0));
             v_store(dst + dstep*(i+ 1) + j, v_reinterpret_as_u8(v1));
@@ -113,30 +113,30 @@ static void transpose_8bit_simd(const uchar* src, size_t sstep, uchar* dst, size
             v_store(dst + dstep*(i+14) + j, v_reinterpret_as_u8(v14));
             v_store(dst + dstep*(i+15) + j, v_reinterpret_as_u8(v15));
         }
-        for (; j < n; j++)
-            for (int k = 0; k < 16; k++)
+        प्रति (; j < n; j++)
+            प्रति (पूर्णाङ्क k = 0; k < 16; k++)
                 dst[dstep*(i+k) + j] = src[i + sstep*j + k];
     }
-    for (; i < m; i++)
-        for (int j = 0; j < n; j++)
+    प्रति (; i < m; i++)
+        प्रति (पूर्णाङ्क j = 0; j < n; j++)
             dst[dstep*i + j] = src[i + sstep*j];
 }
 
-static void transpose_16bit_simd(const uchar* src, size_t sstep, uchar* dst, size_t dstep, Size sz)
+स्थिर शून्य transpose_16bit_simd(ध्रुव uchar* src, माप_प्रकार sstep, uchar* dst, माप_प्रकार dstep, Size sz)
 {
-    const ushort* src16 = reinterpret_cast<const ushort*>(src);
+    ध्रुव ushort* src16 = reinterpret_cast<ध्रुव ushort*>(src);
     ushort* dst16 = reinterpret_cast<ushort*>(dst);
 
-    const size_t sstep_e = sstep / sizeof(ushort);
-    const size_t dstep_e = dstep / sizeof(ushort);
+    ध्रुव माप_प्रकार sstep_e = sstep / परिमाण(ushort);
+    ध्रुव माप_प्रकार dstep_e = dstep / परिमाण(ushort);
 
-    const int m = sz.width, n = sz.height;
-    int i = 0;
+    ध्रुव पूर्णाङ्क m = sz.width, n = sz.height;
+    पूर्णाङ्क i = 0;
 
-    for (; i <= m - 8; i += 8)
+    प्रति (; i <= m - 8; i += 8)
     {
-        int j = 0;
-        for (; j <= n - 8; j += 8)
+        पूर्णाङ्क j = 0;
+        प्रति (; j <= n - 8; j += 8)
         {
             v_uint16x8 r0 = v_load(src16 + i + sstep_e*(j+0));
             v_uint16x8 r1 = v_load(src16 + i + sstep_e*(j+1));
@@ -172,16 +172,16 @@ static void transpose_16bit_simd(const uchar* src, size_t sstep, uchar* dst, siz
             v_store(dst16 + dstep_e*(i+6) + j, v_reinterpret_as_u16(v6));
             v_store(dst16 + dstep_e*(i+7) + j, v_reinterpret_as_u16(v7));
         }
-        for (; j < n; j++)
-            for (int k = 0; k < 8; k++)
+        प्रति (; j < n; j++)
+            प्रति (पूर्णाङ्क k = 0; k < 8; k++)
                 dst16[dstep_e*(i+k) + j] = src16[i + sstep_e*j + k];
     }
-    for (; i < m; i++)
-        for (int j = 0; j < n; j++)
+    प्रति (; i < m; i++)
+        प्रति (पूर्णाङ्क j = 0; j < n; j++)
             dst16[dstep_e*i + j] = src16[i + sstep_e*j];
 }
 
-static void transpose_32bit_simd(const uchar* src, size_t sstep, uchar* dst, size_t dstep, Size sz)
+स्थिर शून्य transpose_32bit_simd(ध्रुव uchar* src, माप_प्रकार sstep, uchar* dst, माप_प्रकार dstep, Size sz)
 {
     // Cache-blocked + AVX2-aware path lives in transpose.simd.hpp; pick the
     // best variant available at runtime.
@@ -189,21 +189,21 @@ static void transpose_32bit_simd(const uchar* src, size_t sstep, uchar* dst, siz
                     CV_CPU_DISPATCH_MODES_ALL);
 }
 
-static void transpose_48bit_simd(const uchar* src, size_t sstep, uchar* dst, size_t dstep, Size sz)
+स्थिर शून्य transpose_48bit_simd(ध्रुव uchar* src, माप_प्रकार sstep, uchar* dst, माप_प्रकार dstep, Size sz)
 {
-    const short* src16 = reinterpret_cast<const short*>(src);
-    short* dst16 = reinterpret_cast<short*>(dst);
+    ध्रुव लघु* src16 = reinterpret_cast<ध्रुव लघु*>(src);
+    लघु* dst16 = reinterpret_cast<लघु*>(dst);
 
-    const size_t sstep_e = sstep / sizeof(short);
-    const size_t dstep_e = dstep / sizeof(short);
+    ध्रुव माप_प्रकार sstep_e = sstep / परिमाण(लघु);
+    ध्रुव माप_प्रकार dstep_e = dstep / परिमाण(लघु);
 
-    const int m = sz.width, n = sz.height;
-    int i = 0;
+    ध्रुव पूर्णाङ्क m = sz.width, n = sz.height;
+    पूर्णाङ्क i = 0;
 
-    for (; i <= m - 8; i += 8)
+    प्रति (; i <= m - 8; i += 8)
     {
-        int j = 0;
-        for (; j <= n - 8; j += 8)
+        पूर्णाङ्क j = 0;
+        प्रति (; j <= n - 8; j += 8)
         {
             v_int16x8 C0_0, C1_0, C2_0;
             v_int16x8 C0_1, C1_1, C2_1;
@@ -280,16 +280,16 @@ static void transpose_48bit_simd(const uchar* src, size_t sstep, uchar* dst, siz
             v_store_interleave(dst16 + dstep_e*(i+6) + j*3, r0_6, r1_6, r2_6);
             v_store_interleave(dst16 + dstep_e*(i+7) + j*3, r0_7, r1_7, r2_7);
         }
-        for (; j < n; j++)
-            for (int k = 0; k < 8; k++)
+        प्रति (; j < n; j++)
+            प्रति (पूर्णाङ्क k = 0; k < 8; k++)
             {
                 dst16[dstep_e*(i+k) + j*3 + 0] = src16[sstep_e*j + (i+k)*3 + 0];
                 dst16[dstep_e*(i+k) + j*3 + 1] = src16[sstep_e*j + (i+k)*3 + 1];
                 dst16[dstep_e*(i+k) + j*3 + 2] = src16[sstep_e*j + (i+k)*3 + 2];
             }
     }
-    for (; i < m; i++)
-        for (int j = 0; j < n; j++)
+    प्रति (; i < m; i++)
+        प्रति (पूर्णाङ्क j = 0; j < n; j++)
         {
             dst16[dstep_e*i + j*3 + 0] = src16[sstep_e*j + i*3 + 0];
             dst16[dstep_e*i + j*3 + 1] = src16[sstep_e*j + i*3 + 1];
@@ -298,36 +298,36 @@ static void transpose_48bit_simd(const uchar* src, size_t sstep, uchar* dst, siz
 }
 #endif
 
-template<typename T> static void
-transpose_( const uchar* src, size_t sstep, uchar* dst, size_t dstep, Size sz )
+ढाँचा<typename T> स्थिर शून्य
+transpose_( ध्रुव uchar* src, माप_प्रकार sstep, uchar* dst, माप_प्रकार dstep, Size sz )
 {
-#if CV_SIMD128
-    switch (sizeof(T))
+#यदि CV_SIMD128
+    विकल्प (परिमाण(T))
     {
-        case 1: transpose_8bit_simd(src, sstep, dst, dstep, sz);  return;
-        case 2: transpose_16bit_simd(src, sstep, dst, dstep, sz); return;
-        case 4: transpose_32bit_simd(src, sstep, dst, dstep, sz); return;
-        case 6: transpose_48bit_simd(src, sstep, dst, dstep, sz); return;
-        default: break;
+        पक्ष 1: transpose_8bit_simd(src, sstep, dst, dstep, sz);  प्रत्यागम;
+        पक्ष 2: transpose_16bit_simd(src, sstep, dst, dstep, sz); प्रत्यागम;
+        पक्ष 4: transpose_32bit_simd(src, sstep, dst, dstep, sz); प्रत्यागम;
+        पक्ष 6: transpose_48bit_simd(src, sstep, dst, dstep, sz); प्रत्यागम;
+        स्वभाव: भङ्ग;
     }
 #endif
 
-    int i = 0, j, m = sz.width, n = sz.height;
+    पूर्णाङ्क i = 0, j, m = sz.width, n = sz.height;
 
-    #if CV_ENABLE_UNROLLED
-    for(; i <= m - 4; i += 4 )
+    #यदि CV_ENABLE_UNROLLED
+    प्रति(; i <= m - 4; i += 4 )
     {
         T* d0 = (T*)(dst + dstep*i);
         T* d1 = (T*)(dst + dstep*(i+1));
         T* d2 = (T*)(dst + dstep*(i+2));
         T* d3 = (T*)(dst + dstep*(i+3));
 
-        for( j = 0; j <= n - 4; j += 4 )
+        प्रति( j = 0; j <= n - 4; j += 4 )
         {
-            const T* s0 = (const T*)(src + i*sizeof(T) + sstep*j);
-            const T* s1 = (const T*)(src + i*sizeof(T) + sstep*(j+1));
-            const T* s2 = (const T*)(src + i*sizeof(T) + sstep*(j+2));
-            const T* s3 = (const T*)(src + i*sizeof(T) + sstep*(j+3));
+            ध्रुव T* s0 = (ध्रुव T*)(src + i*परिमाण(T) + sstep*j);
+            ध्रुव T* s1 = (ध्रुव T*)(src + i*परिमाण(T) + sstep*(j+1));
+            ध्रुव T* s2 = (ध्रुव T*)(src + i*परिमाण(T) + sstep*(j+2));
+            ध्रुव T* s3 = (ध्रुव T*)(src + i*परिमाण(T) + sstep*(j+3));
 
             d0[j] = s0[0]; d0[j+1] = s1[0]; d0[j+2] = s2[0]; d0[j+3] = s3[0];
             d1[j] = s0[1]; d1[j+1] = s1[1]; d1[j+2] = s2[1]; d1[j+3] = s3[1];
@@ -335,62 +335,62 @@ transpose_( const uchar* src, size_t sstep, uchar* dst, size_t dstep, Size sz )
             d3[j] = s0[3]; d3[j+1] = s1[3]; d3[j+2] = s2[3]; d3[j+3] = s3[3];
         }
 
-        for( ; j < n; j++ )
+        प्रति( ; j < n; j++ )
         {
-            const T* s0 = (const T*)(src + i*sizeof(T) + j*sstep);
+            ध्रुव T* s0 = (ध्रुव T*)(src + i*परिमाण(T) + j*sstep);
             d0[j] = s0[0]; d1[j] = s0[1]; d2[j] = s0[2]; d3[j] = s0[3];
         }
     }
     #endif
-    for( ; i < m; i++ )
+    प्रति( ; i < m; i++ )
     {
         T* d0 = (T*)(dst + dstep*i);
         j = 0;
-        #if CV_ENABLE_UNROLLED
-        for(; j <= n - 4; j += 4 )
+        #यदि CV_ENABLE_UNROLLED
+        प्रति(; j <= n - 4; j += 4 )
         {
-            const T* s0 = (const T*)(src + i*sizeof(T) + sstep*j);
-            const T* s1 = (const T*)(src + i*sizeof(T) + sstep*(j+1));
-            const T* s2 = (const T*)(src + i*sizeof(T) + sstep*(j+2));
-            const T* s3 = (const T*)(src + i*sizeof(T) + sstep*(j+3));
+            ध्रुव T* s0 = (ध्रुव T*)(src + i*परिमाण(T) + sstep*j);
+            ध्रुव T* s1 = (ध्रुव T*)(src + i*परिमाण(T) + sstep*(j+1));
+            ध्रुव T* s2 = (ध्रुव T*)(src + i*परिमाण(T) + sstep*(j+2));
+            ध्रुव T* s3 = (ध्रुव T*)(src + i*परिमाण(T) + sstep*(j+3));
 
             d0[j] = s0[0]; d0[j+1] = s1[0]; d0[j+2] = s2[0]; d0[j+3] = s3[0];
         }
         #endif
-        for( ; j < n; j++ )
+        प्रति( ; j < n; j++ )
         {
-            const T* s0 = (const T*)(src + i*sizeof(T) + j*sstep);
+            ध्रुव T* s0 = (ध्रुव T*)(src + i*परिमाण(T) + j*sstep);
             d0[j] = s0[0];
         }
     }
 }
 
-template<typename T> static void
-transposeI_( uchar* data, size_t step, int n )
+ढाँचा<typename T> स्थिर शून्य
+transposeI_( uchar* data, माप_प्रकार step, पूर्णाङ्क n )
 {
-    for( int i = 0; i < n; i++ )
+    प्रति( पूर्णाङ्क i = 0; i < n; i++ )
     {
         T* row = (T*)(data + step*i);
-        uchar* data1 = data + i*sizeof(T);
-        for( int j = i+1; j < n; j++ )
+        uchar* data1 = data + i*परिमाण(T);
+        प्रति( पूर्णाङ्क j = i+1; j < n; j++ )
             std::swap( row[j], *(T*)(data1 + step*j) );
     }
 }
 
-typedef void (*TransposeFunc)( const uchar* src, size_t sstep, uchar* dst, size_t dstep, Size sz );
-typedef void (*TransposeInplaceFunc)( uchar* data, size_t step, int n );
+प्रकारनिर्देश शून्य (*TransposeFunc)( ध्रुव uchar* src, माप_प्रकार sstep, uchar* dst, माप_प्रकार dstep, Size sz );
+प्रकारनिर्देश शून्य (*TransposeInplaceFunc)( uchar* data, माप_प्रकार step, पूर्णाङ्क n );
 
 #define DEF_TRANSPOSE_FUNC(suffix, type) \
-static void transpose_##suffix( const uchar* src, size_t sstep, uchar* dst, size_t dstep, Size sz ) \
+स्थिर शून्य transpose_##suffix( ध्रुव uchar* src, माप_प्रकार sstep, uchar* dst, माप_प्रकार dstep, Size sz ) \
 { transpose_<type>(src, sstep, dst, dstep, sz); } \
 \
-static void transposeI_##suffix( uchar* data, size_t step, int n ) \
+स्थिर शून्य transposeI_##suffix( uchar* data, माप_प्रकार step, पूर्णाङ्क n ) \
 { transposeI_<type>(data, step, n); }
 
 DEF_TRANSPOSE_FUNC(8u, uchar)
 DEF_TRANSPOSE_FUNC(16u, ushort)
 DEF_TRANSPOSE_FUNC(8uC3, Vec3b)
-DEF_TRANSPOSE_FUNC(32s, int)
+DEF_TRANSPOSE_FUNC(32s, पूर्णाङ्क)
 DEF_TRANSPOSE_FUNC(16uC3, Vec3s)
 DEF_TRANSPOSE_FUNC(32sC2, Vec2i)
 DEF_TRANSPOSE_FUNC(32sC3, Vec3i)
@@ -398,19 +398,19 @@ DEF_TRANSPOSE_FUNC(32sC4, Vec4i)
 DEF_TRANSPOSE_FUNC(32sC6, Vec6i)
 DEF_TRANSPOSE_FUNC(32sC8, Vec8i)
 
-static TransposeFunc transposeTab[] =
+स्थिर TransposeFunc transposeTab[] =
 {
     0, transpose_8u, transpose_16u, transpose_8uC3, transpose_32s, 0, transpose_16uC3, 0,
     transpose_32sC2, 0, 0, 0, transpose_32sC3, 0, 0, 0, transpose_32sC4,
     0, 0, 0, 0, 0, 0, 0, transpose_32sC6, 0, 0, 0, 0, 0, 0, 0, transpose_32sC8
 };
 
-nd::TransposeFunc nd::getTransposeFunc(size_t esz)
+nd::TransposeFunc nd::getTransposeFunc(माप_प्रकार esz)
 {
-    return esz < sizeof(transposeTab)/sizeof(transposeTab[0]) ? transposeTab[esz] : nullptr;
+    प्रत्यागम esz < परिमाण(transposeTab)/परिमाण(transposeTab[0]) ? transposeTab[esz] : nullptr;
 }
 
-static TransposeInplaceFunc transposeInplaceTab[] =
+स्थिर TransposeInplaceFunc transposeInplaceTab[] =
 {
     0, transposeI_8u, transposeI_16u, transposeI_8uC3, transposeI_32s, 0, transposeI_16uC3, 0,
     transposeI_32sC2, 0, 0, 0, transposeI_32sC3, 0, 0, 0, transposeI_32sC4,
@@ -419,11 +419,11 @@ static TransposeInplaceFunc transposeInplaceTab[] =
 
 #ifdef HAVE_OPENCL
 
-static bool ocl_transpose( InputArray _src, OutputArray _dst )
+स्थिर तार्किक ocl_transpose( निवेश_Array _src, OutputArray _dst )
 {
-    const ocl::Device & dev = ocl::Device::getDefault();
-    const int TILE_DIM = 32, BLOCK_ROWS = 8;
-    int type = _src.type(), cn = CV_MAT_CN(type), depth = CV_MAT_DEPTH(type),
+    ध्रुव ocl::Device & dev = ocl::Device::getDefault();
+    ध्रुव पूर्णाङ्क TILE_DIM = 32, BLOCK_ROWS = 8;
+    पूर्णाङ्क type = _src.type(), cn = CV_MAT_CN(type), depth = CV_MAT_DEPTH(type),
         rowsPerWI = dev.isIntel() ? 4 : 1;
 
     UMat src = _src.getUMat();
@@ -431,92 +431,92 @@ static bool ocl_transpose( InputArray _src, OutputArray _dst )
     UMat dst = _dst.getUMat();
 
     String kernelName("transpose");
-    bool inplace = dst.u == src.u;
+    तार्किक inplace = dst.u == src.u;
 
-    if (inplace)
+    यदि (inplace)
     {
         CV_Assert(dst.cols == dst.rows);
         kernelName += "_inplace";
     }
-    else
+    अन्यथा
     {
         // check required local memory size
-        size_t required_local_memory = (size_t) TILE_DIM*(TILE_DIM+1)*CV_ELEM_SIZE(type);
-        if (required_local_memory > ocl::Device::getDefault().localMemSize())
-            return false;
+        माप_प्रकार required_local_memory = (माप_प्रकार) TILE_DIM*(TILE_DIM+1)*CV_ELEM_SIZE(type);
+        यदि (required_local_memory > ocl::Device::getDefault().localMemSize())
+            प्रत्यागम असत्य;
     }
 
     String deviceMacro;
-    if (dev.isIntel())
+    यदि (dev.isIntel())
         deviceMacro = " -D INTEL_GPU";
-    else
+    अन्यथा
         deviceMacro = "";
 
     ocl::Kernel k(kernelName.c_str(), ocl::core::transpose_oclsrc,
                   format("-D T=%s -D T1=%s -D cn=%d -D TILE_DIM=%d -D BLOCK_ROWS=%d -D rowsPerWI=%d%s%s",
                          ocl::memopTypeToStr(type), ocl::memopTypeToStr(depth),
                          cn, TILE_DIM, BLOCK_ROWS, rowsPerWI, inplace ? " -D INPLACE" : "", deviceMacro.c_str()));
-    if (k.empty())
-        return false;
+    यदि (k.empty())
+        प्रत्यागम असत्य;
 
-    if (inplace)
+    यदि (inplace)
         k.args(ocl::KernelArg::ReadWriteNoSize(dst), dst.rows);
-    else
+    अन्यथा
         k.args(ocl::KernelArg::ReadOnly(src),
                ocl::KernelArg::WriteOnlyNoSize(dst));
 
-    size_t localsize[2]  = { TILE_DIM, BLOCK_ROWS };
-    size_t globalsize[2] = { (size_t)src.cols, inplace ? ((size_t)src.rows + rowsPerWI - 1) / rowsPerWI : (divUp((size_t)src.rows, TILE_DIM) * BLOCK_ROWS) };
+    माप_प्रकार localsize[2]  = { TILE_DIM, BLOCK_ROWS };
+    माप_प्रकार globalsize[2] = { (माप_प्रकार)src.cols, inplace ? ((माप_प्रकार)src.rows + rowsPerWI - 1) / rowsPerWI : (divUp((माप_प्रकार)src.rows, TILE_DIM) * BLOCK_ROWS) };
 
-    if (inplace && dev.isIntel())
+    यदि (inplace && dev.isIntel())
     {
         localsize[0] = 16;
         localsize[1] = dev.maxWorkGroupSize() / localsize[0];
     }
 
-    return k.run(2, globalsize, localsize, false);
+    प्रत्यागम k.run(2, globalsize, localsize, असत्य);
 }
 
 #endif
 
-void transpose( InputArray _src, OutputArray _dst )
+शून्य transpose( निवेश_Array _src, OutputArray _dst )
 {
     CV_INSTRUMENT_REGION();
 
-    int type = _src.type(), esz = CV_ELEM_SIZE(type);
+    पूर्णाङ्क type = _src.type(), esz = CV_ELEM_SIZE(type);
     CV_Assert( _src.dims() <= 2 && esz <= 32 );
 
     CV_OCL_RUN(_dst.isUMat(),
                ocl_transpose(_src, _dst))
 
     Mat src = _src.getMat();
-    if( src.empty() )
+    यदि( src.empty() )
     {
         _dst.release();
-        return;
+        प्रत्यागम;
     }
 
     _dst.create(src.cols, src.rows, src.type());
     Mat dst = _dst.getMat();
 
     // handle the case of single-column/single-row matrices, stored in STL vectors.
-    if( src.rows != dst.cols || src.cols != dst.rows )
+    यदि( src.rows != dst.cols || src.cols != dst.rows )
     {
         CV_Assert( src.size() == dst.size() && (src.cols == 1 || src.rows == 1) );
         src.copyTo(dst);
-        return;
+        प्रत्यागम;
     }
 
     CALL_HAL(transpose2d, cv_hal_transpose2d, src.data, src.step, dst.data, dst.step, src.cols, src.rows, esz);
 
-    if( dst.data == src.data )
+    यदि( dst.data == src.data )
     {
         TransposeInplaceFunc func = transposeInplaceTab[esz];
         CV_Assert( func != 0 );
         CV_Assert( dst.cols == dst.rows );
         func( dst.ptr(), dst.step, dst.rows );
     }
-    else
+    अन्यथा
     {
         TransposeFunc func = transposeTab[esz];
         CV_Assert( func != 0 );
@@ -525,61 +525,61 @@ void transpose( InputArray _src, OutputArray _dst )
 }
 
 
-void transpose(InputArray src_, const std::vector<int>& order, OutputArray dst_)
+शून्य transpose(निवेश_Array src_, ध्रुव std::vector<पूर्णाङ्क>& order, OutputArray dst_)
 {
     CV_INSTRUMENT_REGION();
 
     Mat inp = src_.getMat();
-    const int ndims = inp.dims;
+    ध्रुव पूर्णाङ्क ndims = inp.dims;
     CV_Assert(!(ndims == 0 && inp.empty()));
-    CV_CheckEQ(order.size(), static_cast<size_t>(ndims), "Number of dimensions shouldn't change");
+    CV_CheckEQ(order.size(), static_cast<माप_प्रकार>(ndims), "Number of dimensions shouldn't change");
 
-    bool used[CV_MAX_DIM] = {false};
-    int newShape[CV_MAX_DIM];
-    for (int i = 0; i < ndims; i++)
+    तार्किक used[CV_MAX_DIM] = {असत्य};
+    पूर्णाङ्क newShape[CV_MAX_DIM];
+    प्रति (पूर्णाङ्क i = 0; i < ndims; i++)
     {
-        int j = order[i];
+        पूर्णाङ्क j = order[i];
         CV_Check(j, 0 <= j && j < ndims && !used[j], "New order should be a valid permutation of the old one");
-        used[j] = true;
+        used[j] = सत्य;
         newShape[i] = inp.size[j];
     }
 
     // plain 2D transpose keeps using cv::transpose (HAL, in-place square case);
     // not for an empty input, which cv::transpose would answer by releasing dst
-    if (ndims == 2 && order[0] == 1 && !inp.empty() && nd::getTransposeFunc(inp.elemSize()))
+    यदि (ndims == 2 && order[0] == 1 && !inp.empty() && nd::getTransposeFunc(inp.elemSize()))
     {
         transpose(inp, dst_);
-        return;
+        प्रत्यागम;
     }
 
     dst_.create(ndims, newShape, inp.type());
     Mat out = dst_.getMat();
-    if (out.total() == 0)
-        return;
+    यदि (out.total() == 0)
+        प्रत्यागम;
     nd::copy(nd::permute(nd::viewOf(inp), order.data()), nd::viewOf(out));
 }
 
-void transposeND(InputArray src, const std::vector<int>& order, OutputArray dst)
+शून्य transposeND(निवेश_Array src, ध्रुव std::vector<पूर्णाङ्क>& order, OutputArray dst)
 {
     transpose(src, order, dst);
 }
 
 
 // Generic scalar fallback
-CV_ALWAYS_INLINE void flipHoriz_generic( const uchar* src, size_t sstep, uchar* dst, size_t dstep, Size size, size_t esz )
+CV_ALWAYS_INLINE शून्य flipHoriz_generic( ध्रुव uchar* src, माप_प्रकार sstep, uchar* dst, माप_प्रकार dstep, Size size, माप_प्रकार esz )
 {
-    int i, j, limit = (int)(((size.width + 1)/2)*esz);
-    int height = size.height;
-    AutoBuffer<int> _tab(size.width*esz);
-    int* tab = _tab.data();
+    पूर्णाङ्क i, j, limit = (पूर्णाङ्क)(((size.width + 1)/2)*esz);
+    पूर्णाङ्क height = size.height;
+    AutoBuffer<पूर्णाङ्क> _tab(size.width*esz);
+    पूर्णाङ्क* tab = _tab.data();
 
-    for( i = 0; i < size.width; i++ )
-        for( size_t k = 0; k < esz; k++ )
-            tab[i*esz + k] = (int)((size.width - i - 1)*esz + k);
+    प्रति( i = 0; i < size.width; i++ )
+        प्रति( माप_प्रकार k = 0; k < esz; k++ )
+            tab[i*esz + k] = (पूर्णाङ्क)((size.width - i - 1)*esz + k);
 
-    for( ; height--; src += sstep, dst += dstep )
+    प्रति( ; height--; src += sstep, dst += dstep )
     {
-        for( i = 0; i < limit; i++ )
+        प्रति( i = 0; i < limit; i++ )
         {
             j = tab[i];
             uchar t0 = src[i], t1 = src[j];
@@ -588,25 +588,25 @@ CV_ALWAYS_INLINE void flipHoriz_generic( const uchar* src, size_t sstep, uchar* 
     }
 }
 
-#if CV_SIMD || CV_SIMD_SCALABLE
-template<typename V> CV_ALWAYS_INLINE void flipHoriz_single( const uchar* src, size_t sstep, uchar* dst, size_t dstep, Size size )
+#यदि CV_SIMD || CV_SIMD_SCALABLE
+ढाँचा<typename V> CV_ALWAYS_INLINE शून्य flipHoriz_single( ध्रुव uchar* src, माप_प्रकार sstep, uchar* dst, माप_प्रकार dstep, Size size )
 {
-    typedef typename VTraits<V>::lane_type T;
-    const int vlanes = VTraits<v_uint8>::vlanes();
-    int end = (int)(size.width * sizeof(T));
-    int width = (end + 1) / 2;
-    int width_simd = width & -vlanes;
-    int height = size.height;
+    प्रकारनिर्देश typename VTraits<V>::lane_type T;
+    ध्रुव पूर्णाङ्क vlanes = VTraits<v_uint8>::vlanes();
+    पूर्णाङ्क end = (पूर्णाङ्क)(size.width * परिमाण(T));
+    पूर्णाङ्क width = (end + 1) / 2;
+    पूर्णाङ्क width_simd = width & -vlanes;
+    पूर्णाङ्क height = size.height;
 
-    CV_DbgAssert(!CV_STRONG_ALIGNMENT || isAligned<sizeof(T)>(src, dst));
+    CV_DbgAssert(!CV_STRONG_ALIGNMENT || isAligned<परिमाण(T)>(src, dst));
 
-    for( ; height--; src += sstep, dst += dstep )
+    प्रति( ; height--; src += sstep, dst += dstep )
     {
-        int i = 0, j = end;
-        for( ; i < width_simd; i += vlanes, j -= vlanes )
+        पूर्णाङ्क i = 0, j = end;
+        प्रति( ; i < width_simd; i += vlanes, j -= vlanes )
         {
-            V t0 = vx_load((const T*)(src + i));
-            V t1 = vx_load((const T*)(src + j - vlanes));
+            V t0 = vx_load((ध्रुव T*)(src + i));
+            V t1 = vx_load((ध्रुव T*)(src + j - vlanes));
             t0 = v_reverse(t0);
             t1 = v_reverse(t1);
             v_store((T*)(dst + j - vlanes), t0);
@@ -614,25 +614,25 @@ template<typename V> CV_ALWAYS_INLINE void flipHoriz_single( const uchar* src, s
         }
 
         // Scalar tail loop
-        if (isAligned<sizeof(T)>(src, dst))
+        यदि (isAligned<परिमाण(T)>(src, dst))
         {
-            for ( ; i < width; i += sizeof(T), j -= sizeof(T) )
+            प्रति ( ; i < width; i += परिमाण(T), j -= परिमाण(T) )
             {
-                T t0 = *((const T*)(src + i));
-                T t1 = *((const T*)(src + j - sizeof(T)));
-                *((T*)(dst + j - sizeof(T))) = t0;
+                T t0 = *((ध्रुव T*)(src + i));
+                T t1 = *((ध्रुव T*)(src + j - परिमाण(T)));
+                *((T*)(dst + j - परिमाण(T))) = t0;
                 *((T*)(dst + i)) = t1;
             }
         }
-        else
+        अन्यथा
         {
-            for ( ; i < width; i += sizeof(T), j -= sizeof(T) )
+            प्रति ( ; i < width; i += परिमाण(T), j -= परिमाण(T) )
             {
-                for (int k = 0; k < (int)sizeof(T); k++)
+                प्रति (पूर्णाङ्क k = 0; k < (पूर्णाङ्क)परिमाण(T); k++)
                 {
                     uchar t0 = src[i + k];
-                    uchar t1 = src[j + k - sizeof(T)];
-                    dst[j + k - sizeof(T)] = t0;
+                    uchar t1 = src[j + k - परिमाण(T)];
+                    dst[j + k - परिमाण(T)] = t0;
                     dst[i + k] = t1;
                 }
             }
@@ -641,26 +641,26 @@ template<typename V> CV_ALWAYS_INLINE void flipHoriz_single( const uchar* src, s
 }
 
 // SIMD for C3
-template<typename V>
-CV_ALWAYS_INLINE void flipHoriz_c3( const uchar* src, size_t sstep, uchar* dst, size_t dstep, Size size )
+ढाँचा<typename V>
+CV_ALWAYS_INLINE शून्य flipHoriz_c3( ध्रुव uchar* src, माप_प्रकार sstep, uchar* dst, माप_प्रकार dstep, Size size )
 {
-    typedef typename VTraits<V>::lane_type T;
-    const int vlanes = VTraits<V>::vlanes();
-    const int stride = 3 * sizeof(T);
-    int width = size.width;
-    int centre = (width + 1) / 2;
-    int width_simd = (centre / vlanes) * vlanes;
-    int height = size.height;
+    प्रकारनिर्देश typename VTraits<V>::lane_type T;
+    ध्रुव पूर्णाङ्क vlanes = VTraits<V>::vlanes();
+    ध्रुव पूर्णाङ्क stride = 3 * परिमाण(T);
+    पूर्णाङ्क width = size.width;
+    पूर्णाङ्क centre = (width + 1) / 2;
+    पूर्णाङ्क width_simd = (centre / vlanes) * vlanes;
+    पूर्णाङ्क height = size.height;
 
-    for( ; height--; src += sstep, dst += dstep )
+    प्रति( ; height--; src += sstep, dst += dstep )
     {
-        int i = 0;
-        for( ; i < width_simd; i += vlanes )
+        पूर्णाङ्क i = 0;
+        प्रति( ; i < width_simd; i += vlanes )
         {
             V r0, g0, b0;
-            v_load_deinterleave((const T*)(src + i * stride), r0, g0, b0);
+            v_load_deinterleave((ध्रुव T*)(src + i * stride), r0, g0, b0);
             V r1, g1, b1;
-            v_load_deinterleave((const T*)(src + (width - i - vlanes) * stride), r1, g1, b1);
+            v_load_deinterleave((ध्रुव T*)(src + (width - i - vlanes) * stride), r1, g1, b1);
             r0 = v_reverse(r0);
             g0 = v_reverse(g0);
             b0 = v_reverse(b0);
@@ -671,15 +671,15 @@ CV_ALWAYS_INLINE void flipHoriz_c3( const uchar* src, size_t sstep, uchar* dst, 
             v_store_interleave((T*)(dst + i * stride), r1, g1, b1);
         }
         // Scalar tail loop for remaining pixels
-        for( ; i < centre; i++ )
+        प्रति( ; i < centre; i++ )
         {
-            int j = width - i - 1;
-            T c0 = ((const T*)(src + i * stride))[0];
-            T c1 = ((const T*)(src + i * stride))[1];
-            T c2 = ((const T*)(src + i * stride))[2];
-            T c3 = ((const T*)(src + j * stride))[0];
-            T c4 = ((const T*)(src + j * stride))[1];
-            T c5 = ((const T*)(src + j * stride))[2];
+            पूर्णाङ्क j = width - i - 1;
+            T c0 = ((ध्रुव T*)(src + i * stride))[0];
+            T c1 = ((ध्रुव T*)(src + i * stride))[1];
+            T c2 = ((ध्रुव T*)(src + i * stride))[2];
+            T c3 = ((ध्रुव T*)(src + j * stride))[0];
+            T c4 = ((ध्रुव T*)(src + j * stride))[1];
+            T c5 = ((ध्रुव T*)(src + j * stride))[2];
             ((T*)(dst + j * stride))[0] = c0;
             ((T*)(dst + j * stride))[1] = c1;
             ((T*)(dst + j * stride))[2] = c2;
@@ -691,19 +691,19 @@ CV_ALWAYS_INLINE void flipHoriz_c3( const uchar* src, size_t sstep, uchar* dst, 
 }
 
 // SIMD flip when ESZ multiple of vlanes
-template<size_t ESZ>
-CV_ALWAYS_INLINE void flipHoriz_vlanes_match( const uchar* src, size_t sstep, uchar* dst, size_t dstep, Size size)
+ढाँचा<माप_प्रकार ESZ>
+CV_ALWAYS_INLINE शून्य flipHoriz_vlanes_match( ध्रुव uchar* src, माप_प्रकार sstep, uchar* dst, माप_प्रकार dstep, Size size)
 {
-    const int vlanes = VTraits<v_uint8>::vlanes();
-    int end = (int)(size.width * ESZ);
-    int width = end / 2;
-    int height = size.height;
-    int eSize = (int)ESZ;
-    for( ; height--; src += sstep, dst += dstep )
+    ध्रुव पूर्णाङ्क vlanes = VTraits<v_uint8>::vlanes();
+    पूर्णाङ्क end = (पूर्णाङ्क)(size.width * ESZ);
+    पूर्णाङ्क width = end / 2;
+    पूर्णाङ्क height = size.height;
+    पूर्णाङ्क eSize = (पूर्णाङ्क)ESZ;
+    प्रति( ; height--; src += sstep, dst += dstep )
     {
-        for( int i = 0, j = end - eSize; i < width; i += eSize, j -= eSize )
+        प्रति( पूर्णाङ्क i = 0, j = end - eSize; i < width; i += eSize, j -= eSize )
         {
-            for( int k = 0; k < eSize; k += vlanes )
+            प्रति( पूर्णाङ्क k = 0; k < eSize; k += vlanes )
             {
                 v_uint8 t0 = vx_load(src + i + k);
                 v_uint8 t1 = vx_load(src + j + k);
@@ -714,18 +714,18 @@ CV_ALWAYS_INLINE void flipHoriz_vlanes_match( const uchar* src, size_t sstep, uc
     }
 }
 
-#if CV_SIMD128
+#यदि CV_SIMD128
 // SIMD flip when ESZ=16 (128-bit)
-template<size_t ESZ>
-CV_ALWAYS_INLINE void flipHoriz_vlanes_match_128( const uchar* src, size_t sstep, uchar* dst, size_t dstep, Size size)
+ढाँचा<माप_प्रकार ESZ>
+CV_ALWAYS_INLINE शून्य flipHoriz_vlanes_match_128( ध्रुव uchar* src, माप_प्रकार sstep, uchar* dst, माप_प्रकार dstep, Size size)
 {
-    const int vlanes16 = VTraits<v_uint8x16>::vlanes();
-    int end = (int)(size.width * ESZ);
-    int width = end / 2;
-    int height = size.height;
-    for( ; height--; src += sstep, dst += dstep )
+    ध्रुव पूर्णाङ्क vlanes16 = VTraits<v_uint8x16>::vlanes();
+    पूर्णाङ्क end = (पूर्णाङ्क)(size.width * ESZ);
+    पूर्णाङ्क width = end / 2;
+    पूर्णाङ्क height = size.height;
+    प्रति( ; height--; src += sstep, dst += dstep )
     {
-        for( int i = 0, j = end - vlanes16; i < width; i += vlanes16, j -= vlanes16 )
+        प्रति( पूर्णाङ्क i = 0, j = end - vlanes16; i < width; i += vlanes16, j -= vlanes16 )
         {
             v_uint8x16 t0 = v_load(src + i);
             v_uint8x16 t1 = v_load(src + j);
@@ -737,46 +737,46 @@ CV_ALWAYS_INLINE void flipHoriz_vlanes_match_128( const uchar* src, size_t sstep
 #endif // CV_SIMD128
 
 // SIMD flip for ESZ=16,32
-template<size_t ESZ>
-CV_ALWAYS_INLINE void flipHoriz_vlanes_dispatch( const uchar* src, size_t sstep, uchar* dst, size_t dstep, Size size )
+ढाँचा<माप_प्रकार ESZ>
+CV_ALWAYS_INLINE शून्य flipHoriz_vlanes_dispatch( ध्रुव uchar* src, माप_प्रकार sstep, uchar* dst, माप_प्रकार dstep, Size size )
 {
-    const int vlanes = VTraits<v_uint8>::vlanes();
-#if CV_SIMD128
-    const int vlanes16 = VTraits<v_uint8x16>::vlanes();
+    ध्रुव पूर्णाङ्क vlanes = VTraits<v_uint8>::vlanes();
+#यदि CV_SIMD128
+    ध्रुव पूर्णाङ्क vlanes16 = VTraits<v_uint8x16>::vlanes();
 #endif
-    if ( (ESZ == (size_t)vlanes) || (ESZ == 2 * (size_t)vlanes))
+    यदि ( (ESZ == (माप_प्रकार)vlanes) || (ESZ == 2 * (माप_प्रकार)vlanes))
     {
         flipHoriz_vlanes_match<ESZ>(src, sstep, dst, dstep, size);
-        return;
+        प्रत्यागम;
     }
-#if CV_SIMD128
-    else if (ESZ == vlanes16)
+#यदि CV_SIMD128
+    अन्यथा यदि (ESZ == vlanes16)
     {
         flipHoriz_vlanes_match_128<ESZ>(src, sstep, dst, dstep, size);
-        return;
+        प्रत्यागम;
     }
 #endif
     flipHoriz_generic(src, sstep, dst, dstep, size, ESZ);
 }
 
-#if CV_SIMD128
+#यदि CV_SIMD128
 // SIMD flip for ESZ=24 (CV_64FC3)
-CV_ALWAYS_INLINE void flipHoriz_24( const uchar* src, size_t sstep, uchar* dst, size_t dstep, Size size )
+CV_ALWAYS_INLINE शून्य flipHoriz_24( ध्रुव uchar* src, माप_प्रकार sstep, uchar* dst, माप_प्रकार dstep, Size size )
 {
-    CV_DbgAssert(!CV_STRONG_ALIGNMENT || isAligned<8>(((size_t)src)|((size_t)dst)|sstep|dstep));
+    CV_DbgAssert(!CV_STRONG_ALIGNMENT || isAligned<8>(((माप_प्रकार)src)|((माप_प्रकार)dst)|sstep|dstep));
 
-    const int lanes16 = 16;
-    int end = (int)(size.width * 24);
-    int width = (end + 1) / 2;
-    int height = size.height;
-    for( ; height--; src += sstep, dst += dstep )
+    ध्रुव पूर्णाङ्क lanes16 = 16;
+    पूर्णाङ्क end = (पूर्णाङ्क)(size.width * 24);
+    पूर्णाङ्क width = (end + 1) / 2;
+    पूर्णाङ्क height = size.height;
+    प्रति( ; height--; src += sstep, dst += dstep )
     {
-        for ( int i = 0, j = end; i < width; i += lanes16 + 8, j -= lanes16 + 8 )
+        प्रति ( पूर्णाङ्क i = 0, j = end; i < width; i += lanes16 + 8, j -= lanes16 + 8 )
         {
             v_uint8x16 t0 = v_load(src + i);
-            uint64_t t2 = *reinterpret_cast<const uint64_t*>(src + i + lanes16);
+            uint64_t t2 = *reinterpret_cast<ध्रुव uint64_t*>(src + i + lanes16);
             v_uint8x16 t1 = v_load(src + j - lanes16 - 8);
-            uint64_t t3 = *reinterpret_cast<const uint64_t*>(src + j - 8);
+            uint64_t t3 = *reinterpret_cast<ध्रुव uint64_t*>(src + j - 8);
             v_store(dst + j - lanes16 - 8, t0);
             *reinterpret_cast<uint64_t*>(dst + j - 8) = t2;
             v_store(dst + i, t1);
@@ -787,71 +787,71 @@ CV_ALWAYS_INLINE void flipHoriz_24( const uchar* src, size_t sstep, uchar* dst, 
 #endif // CV_SIMD128
 #endif // CV_SIMD || CV_SIMD_SCALABLE
 
-static void flipHoriz( const uchar* src, size_t sstep, uchar* dst, size_t dstep, Size size, size_t esz )
+स्थिर शून्य flipHoriz( ध्रुव uchar* src, माप_प्रकार sstep, uchar* dst, माप_प्रकार dstep, Size size, माप_प्रकार esz )
 {
-#if CV_SIMD || CV_SIMD_SCALABLE
-#if CV_STRONG_ALIGNMENT
-    const size_t alignMark = ((size_t)src)|((size_t)dst)|sstep|dstep;
-#else
-    const size_t alignMark = 0; // unaligned access is allowed: all the checks below fold to true
+#यदि CV_SIMD || CV_SIMD_SCALABLE
+#यदि CV_STRONG_ALIGNMENT
+    ध्रुव माप_प्रकार alignMark = ((माप_प्रकार)src)|((माप_प्रकार)dst)|sstep|dstep;
+#अन्यथा
+    ध्रुव माप_प्रकार alignMark = 0; // unaligned access is allowed: all the checks below fold to true
 #endif
 
     // SIMD-optimized dispatch
-    switch(esz)
+    विकल्प(esz)
     {
-        case 1:                                                                               // CV_8UC1: 8-bit, 1 channel
-            flipHoriz_single<v_uint8>(src, sstep, dst, dstep, size); return;
-        case 2:                                                                               // CV_8UC2, CV_16UC1: 8-bit 2-channel or 16-bit 1-channel
-            if (isAligned<2>(alignMark)) { flipHoriz_single<v_uint16>(src, sstep, dst, dstep, size); return; }
-            break;
-        case 3:                                                                               // CV_8UC3: 8-bit, 3 channels
-            flipHoriz_c3<v_uint8>(src, sstep, dst, dstep, size); return;
-        case 4:                                                                               // CV_8UC4, CV_16UC2, CV_32SC1, CV_32FC1: 8-bit 4-channel, 16-bit 2-channel, or 32-bit 1-channel
-            if (isAligned<4>(alignMark)) { flipHoriz_single<v_uint32>(src, sstep, dst, dstep, size); return; }
-            break;
-        case 6:                                                                               // CV_16UC3, CV_16SC3: 16-bit, 3 channels
-            if (isAligned<2>(alignMark)) { flipHoriz_c3<v_uint16>(src, sstep, dst, dstep, size); return; }
-            break;
-        case 8:                                                                               // CV_16UC4, CV_32SC2, CV_32FC2, CV_64FC1: 16-bit 4-channel, 32-bit 2-channel, or 64-bit 1-channel
-            if (isAligned<8>(alignMark)) { flipHoriz_single<v_uint64>(src, sstep, dst, dstep, size); return; }
-            break;
-        case 12:                                                                              // CV_32SC3, CV_32FC3: 32-bit, 3 channels
-            if (isAligned<4>(alignMark)) { flipHoriz_c3<v_uint32>(src, sstep, dst, dstep, size); return; }
-            break;
-        case 16:                                                                              // CV_32SC4, CV_32FC4, CV_64FC2: 32-bit 4-channel or 64-bit 2-channel
-            flipHoriz_vlanes_dispatch<16>(src, sstep, dst, dstep, size); return;               // byte-wise access only
-#if CV_SIMD128
-        case 24:                                                                              // CV_64FC3: 64-bit, 3 channels
-            if (isAligned<8>(alignMark)) { flipHoriz_24(src, sstep, dst, dstep, size); return; }
-            break;
+        पक्ष 1:                                                                               // CV_8UC1: 8-bit, 1 channel
+            flipHoriz_single<v_uint8>(src, sstep, dst, dstep, size); प्रत्यागम;
+        पक्ष 2:                                                                               // CV_8UC2, CV_16UC1: 8-bit 2-channel or 16-bit 1-channel
+            यदि (isAligned<2>(alignMark)) { flipHoriz_single<v_uint16>(src, sstep, dst, dstep, size); प्रत्यागम; }
+            भङ्ग;
+        पक्ष 3:                                                                               // CV_8UC3: 8-bit, 3 channels
+            flipHoriz_c3<v_uint8>(src, sstep, dst, dstep, size); प्रत्यागम;
+        पक्ष 4:                                                                               // CV_8UC4, CV_16UC2, CV_32SC1, CV_32FC1: 8-bit 4-channel, 16-bit 2-channel, or 32-bit 1-channel
+            यदि (isAligned<4>(alignMark)) { flipHoriz_single<v_uint32>(src, sstep, dst, dstep, size); प्रत्यागम; }
+            भङ्ग;
+        पक्ष 6:                                                                               // CV_16UC3, CV_16SC3: 16-bit, 3 channels
+            यदि (isAligned<2>(alignMark)) { flipHoriz_c3<v_uint16>(src, sstep, dst, dstep, size); प्रत्यागम; }
+            भङ्ग;
+        पक्ष 8:                                                                               // CV_16UC4, CV_32SC2, CV_32FC2, CV_64FC1: 16-bit 4-channel, 32-bit 2-channel, or 64-bit 1-channel
+            यदि (isAligned<8>(alignMark)) { flipHoriz_single<v_uint64>(src, sstep, dst, dstep, size); प्रत्यागम; }
+            भङ्ग;
+        पक्ष 12:                                                                              // CV_32SC3, CV_32FC3: 32-bit, 3 channels
+            यदि (isAligned<4>(alignMark)) { flipHoriz_c3<v_uint32>(src, sstep, dst, dstep, size); प्रत्यागम; }
+            भङ्ग;
+        पक्ष 16:                                                                              // CV_32SC4, CV_32FC4, CV_64FC2: 32-bit 4-channel or 64-bit 2-channel
+            flipHoriz_vlanes_dispatch<16>(src, sstep, dst, dstep, size); प्रत्यागम;               // byte-wise access only
+#यदि CV_SIMD128
+        पक्ष 24:                                                                              // CV_64FC3: 64-bit, 3 channels
+            यदि (isAligned<8>(alignMark)) { flipHoriz_24(src, sstep, dst, dstep, size); प्रत्यागम; }
+            भङ्ग;
 #endif
-        case 32:                                                                              // CV_64FC4: 64-bit, 4 channels
-            flipHoriz_vlanes_dispatch<32>(src, sstep, dst, dstep, size); return;               // byte-wise access only
-        default:
-            break; // Fall through to generic implementation
+        पक्ष 32:                                                                              // CV_64FC4: 64-bit, 4 channels
+            flipHoriz_vlanes_dispatch<32>(src, sstep, dst, dstep, size); प्रत्यागम;               // byte-wise access only
+        स्वभाव:
+            भङ्ग; // Fall through to generic implementation
     }
 #endif
     // Fallback: generic scalar
     flipHoriz_generic(src, sstep, dst, dstep, size, esz);
 }
 
-static void
-flipVert( const uchar* src0, size_t sstep, uchar* dst0, size_t dstep, Size size, size_t esz )
+स्थिर शून्य
+flipVert( ध्रुव uchar* src0, माप_प्रकार sstep, uchar* dst0, माप_प्रकार dstep, Size size, माप_प्रकार esz )
 {
-    const uchar* src1 = src0 + (size.height - 1)*sstep;
+    ध्रुव uchar* src1 = src0 + (size.height - 1)*sstep;
     uchar* dst1 = dst0 + (size.height - 1)*dstep;
-    size.width *= (int)esz;
+    size.width *= (पूर्णाङ्क)esz;
 
-    for( int y = 0; y < (size.height + 1)/2; y++, src0 += sstep, src1 -= sstep,
+    प्रति( पूर्णाङ्क y = 0; y < (size.height + 1)/2; y++, src0 += sstep, src1 -= sstep,
                                                   dst0 += dstep, dst1 -= dstep )
     {
-        int i = 0;
-#if (CV_SIMD || CV_SIMD_SCALABLE)
-#if CV_STRONG_ALIGNMENT
-        if (isAligned<sizeof(int)>(src0, src1, dst0, dst1))
+        पूर्णाङ्क i = 0;
+#यदि (CV_SIMD || CV_SIMD_SCALABLE)
+#यदि CV_STRONG_ALIGNMENT
+        यदि (isAligned<परिमाण(पूर्णाङ्क)>(src0, src1, dst0, dst1))
 #endif
         {
-            for (; i <= size.width - VTraits<v_uint8>::vlanes(); i += VTraits<v_uint8>::vlanes())
+            प्रति (; i <= size.width - VTraits<v_uint8>::vlanes(); i += VTraits<v_uint8>::vlanes())
             {
                 v_int32 t0 = v_reinterpret_as_s32(vx_load(src0 + i));
                 v_int32 t1 = v_reinterpret_as_s32(vx_load(src1 + i));
@@ -859,10 +859,10 @@ flipVert( const uchar* src0, size_t sstep, uchar* dst0, size_t dstep, Size size,
                 v_store(dst1 + i, v_reinterpret_as_u8(t0));
             }
         }
-#if CV_STRONG_ALIGNMENT
-        else
+#यदि CV_STRONG_ALIGNMENT
+        अन्यथा
         {
-            for (; i <= size.width - VTraits<v_uint8>::vlanes(); i += VTraits<v_uint8>::vlanes())
+            प्रति (; i <= size.width - VTraits<v_uint8>::vlanes(); i += VTraits<v_uint8>::vlanes())
             {
                 v_uint8 t0 = vx_load(src0 + i);
                 v_uint8 t1 = vx_load(src1 + i);
@@ -873,46 +873,46 @@ flipVert( const uchar* src0, size_t sstep, uchar* dst0, size_t dstep, Size size,
 #endif
 #endif
 
-        if (isAligned<sizeof(int)>(src0, src1, dst0, dst1))
+        यदि (isAligned<परिमाण(पूर्णाङ्क)>(src0, src1, dst0, dst1))
         {
-            for( ; i <= size.width - 16; i += 16 )
+            प्रति( ; i <= size.width - 16; i += 16 )
             {
-                int t0 = ((int*)(src0 + i))[0];
-                int t1 = ((int*)(src1 + i))[0];
+                पूर्णाङ्क t0 = ((पूर्णाङ्क*)(src0 + i))[0];
+                पूर्णाङ्क t1 = ((पूर्णाङ्क*)(src1 + i))[0];
 
-                ((int*)(dst0 + i))[0] = t1;
-                ((int*)(dst1 + i))[0] = t0;
+                ((पूर्णाङ्क*)(dst0 + i))[0] = t1;
+                ((पूर्णाङ्क*)(dst1 + i))[0] = t0;
 
-                t0 = ((int*)(src0 + i))[1];
-                t1 = ((int*)(src1 + i))[1];
+                t0 = ((पूर्णाङ्क*)(src0 + i))[1];
+                t1 = ((पूर्णाङ्क*)(src1 + i))[1];
 
-                ((int*)(dst0 + i))[1] = t1;
-                ((int*)(dst1 + i))[1] = t0;
+                ((पूर्णाङ्क*)(dst0 + i))[1] = t1;
+                ((पूर्णाङ्क*)(dst1 + i))[1] = t0;
 
-                t0 = ((int*)(src0 + i))[2];
-                t1 = ((int*)(src1 + i))[2];
+                t0 = ((पूर्णाङ्क*)(src0 + i))[2];
+                t1 = ((पूर्णाङ्क*)(src1 + i))[2];
 
-                ((int*)(dst0 + i))[2] = t1;
-                ((int*)(dst1 + i))[2] = t0;
+                ((पूर्णाङ्क*)(dst0 + i))[2] = t1;
+                ((पूर्णाङ्क*)(dst1 + i))[2] = t0;
 
-                t0 = ((int*)(src0 + i))[3];
-                t1 = ((int*)(src1 + i))[3];
+                t0 = ((पूर्णाङ्क*)(src0 + i))[3];
+                t1 = ((पूर्णाङ्क*)(src1 + i))[3];
 
-                ((int*)(dst0 + i))[3] = t1;
-                ((int*)(dst1 + i))[3] = t0;
+                ((पूर्णाङ्क*)(dst0 + i))[3] = t1;
+                ((पूर्णाङ्क*)(dst1 + i))[3] = t0;
             }
 
-            for( ; i <= size.width - 4; i += 4 )
+            प्रति( ; i <= size.width - 4; i += 4 )
             {
-                int t0 = ((int*)(src0 + i))[0];
-                int t1 = ((int*)(src1 + i))[0];
+                पूर्णाङ्क t0 = ((पूर्णाङ्क*)(src0 + i))[0];
+                पूर्णाङ्क t1 = ((पूर्णाङ्क*)(src1 + i))[0];
 
-                ((int*)(dst0 + i))[0] = t1;
-                ((int*)(dst1 + i))[0] = t0;
+                ((पूर्णाङ्क*)(dst0 + i))[0] = t1;
+                ((पूर्णाङ्क*)(dst1 + i))[0] = t0;
             }
         }
 
-        for( ; i < size.width; i++ )
+        प्रति( ; i < size.width; i++ )
         {
             uchar t0 = src0[i];
             uchar t1 = src1[i];
@@ -925,173 +925,173 @@ flipVert( const uchar* src0, size_t sstep, uchar* dst0, size_t dstep, Size size,
 
 #ifdef HAVE_OPENCL
 
-enum { FLIP_COLS = 1 << 0, FLIP_ROWS = 1 << 1, FLIP_BOTH = FLIP_ROWS | FLIP_COLS };
+गणना { FLIP_COLS = 1 << 0, FLIP_ROWS = 1 << 1, FLIP_BOTH = FLIP_ROWS | FLIP_COLS };
 
-static bool ocl_flip(InputArray _src, OutputArray _dst, int flipCode )
+स्थिर तार्किक ocl_flip(निवेश_Array _src, OutputArray _dst, पूर्णाङ्क flipCode )
 {
     CV_Assert(flipCode >= -1 && flipCode <= 1);
 
-    const ocl::Device & dev = ocl::Device::getDefault();
-    int type = _src.type(), depth = CV_MAT_DEPTH(type), cn = CV_MAT_CN(type),
+    ध्रुव ocl::Device & dev = ocl::Device::getDefault();
+    पूर्णाङ्क type = _src.type(), depth = CV_MAT_DEPTH(type), cn = CV_MAT_CN(type),
             flipType, kercn = std::min(ocl::predictOptimalVectorWidth(_src, _dst), 4);
 
-    bool doubleSupport = dev.doubleFPConfig() > 0;
-    if (!doubleSupport && depth == CV_64F)
+    तार्किक doubleSupport = dev.doubleFPConfig() > 0;
+    यदि (!doubleSupport && depth == CV_64F)
         kercn = cn;
 
-    if (cn > 4)
-        return false;
+    यदि (cn > 4)
+        प्रत्यागम असत्य;
 
     Size size = _src.size();
     _dst.create(size, type);
     UMat src = _src.getUMat(), dst = _dst.getUMat();
-    bool inplace = (dst.u == src.u);
+    तार्किक inplace = (dst.u == src.u);
 
     String kernelName;
-    if (flipCode == 0)
+    यदि (flipCode == 0)
         kernelName = "arithm_flip_rows", flipType = FLIP_ROWS;
-    else if (flipCode > 0)
+    अन्यथा यदि (flipCode > 0)
         kernelName = "arithm_flip_cols", flipType = FLIP_COLS;
-    else
+    अन्यथा
         kernelName = "arithm_flip_rows_cols", flipType = FLIP_BOTH;
 
-    if(inplace)
+    यदि(inplace)
         kernelName += "_inplace";
 
-    int pxPerWIy = (dev.isIntel() && (dev.type() & ocl::Device::TYPE_GPU)) ? 4 : 1;
+    पूर्णाङ्क pxPerWIy = (dev.isIntel() && (dev.type() & ocl::Device::TYPE_GPU)) ? 4 : 1;
     kercn = (cn!=3 || flipType == FLIP_ROWS) ? std::max(kercn, cn) : cn;
-    const int TILE_SIZE = 32, BLOCK_ROWS = 8;
+    ध्रुव पूर्णाङ्क TILE_SIZE = 32, BLOCK_ROWS = 8;
 
     ocl::Kernel k(kernelName.c_str(), ocl::core::flip_oclsrc,
                 format( "-D T=%s -D T1=%s -D DEPTH=%d -D cn=%d -D PIX_PER_WI_Y=%d -D kercn=%d -D TILE_SIZE=%d -D BLOCK_ROWS=%d%s",
                 kercn != cn ? ocl::typeToStr(CV_MAKE_TYPE(depth, kercn)) : ocl::vecopTypeToStr(CV_MAKE_TYPE(depth, kercn)),
                 kercn != cn ? ocl::typeToStr(depth) : ocl::vecopTypeToStr(depth), depth, cn, pxPerWIy, kercn, TILE_SIZE, BLOCK_ROWS,
                 inplace ? " -D INPLACE" : ""));
-    if (k.empty())
-        return false;
+    यदि (k.empty())
+        प्रत्यागम असत्य;
 
-    int cols = size.width * cn / kercn, rows = size.height;
-    int work_cols = flipType == FLIP_COLS ? (cols + 1) >> 1 : cols;
-    int work_rows = flipType & FLIP_ROWS ? (rows + 1) >> 1 : rows;
+    पूर्णाङ्क cols = size.width * cn / kercn, rows = size.height;
+    पूर्णाङ्क work_cols = flipType == FLIP_COLS ? (cols + 1) >> 1 : cols;
+    पूर्णाङ्क work_rows = flipType & FLIP_ROWS ? (rows + 1) >> 1 : rows;
 
-    if (inplace)
+    यदि (inplace)
     {
         k.args(ocl::KernelArg::ReadWriteNoSize(dst), rows, cols);
 
-        int gs_cols, gs_rows;
-        if (flipType == FLIP_COLS)
+        पूर्णाङ्क gs_cols, gs_rows;
+        यदि (flipType == FLIP_COLS)
         {
             gs_cols = work_cols;
             gs_rows = rows;
         }
-        else if (flipType == FLIP_ROWS)
+        अन्यथा यदि (flipType == FLIP_ROWS)
         {
             gs_cols = cols;
             gs_rows = work_rows;
         }
-        else // FLIP_BOTH
+        अन्यथा // FLIP_BOTH
         {
             gs_cols = cols;
             gs_rows = rows;
         }
 
-        size_t globalsize[2] = {
-            (size_t)divUp(gs_cols, TILE_SIZE) * TILE_SIZE,
-            (size_t)divUp(gs_rows, TILE_SIZE) * BLOCK_ROWS
+        माप_प्रकार globalsize[2] = {
+            (माप_प्रकार)divUp(gs_cols, TILE_SIZE) * TILE_SIZE,
+            (माप_प्रकार)divUp(gs_rows, TILE_SIZE) * BLOCK_ROWS
         };
-        size_t localsize[2] = { TILE_SIZE, BLOCK_ROWS };
-        return k.run(2, globalsize, localsize, false);
+        माप_प्रकार localsize[2] = { TILE_SIZE, BLOCK_ROWS };
+        प्रत्यागम k.run(2, globalsize, localsize, असत्य);
     }
-    else
+    अन्यथा
     {
         k.args(ocl::KernelArg::ReadOnlyNoSize(src),
            ocl::KernelArg::WriteOnly(dst, cn, kercn), work_rows, work_cols);
 
-        size_t maxWorkGroupSize = dev.maxWorkGroupSize();
+        माप_प्रकार maxWorkGroupSize = dev.maxWorkGroupSize();
         CV_Assert(maxWorkGroupSize % 4 == 0);
 
-        size_t globalsize[2] = { (size_t)work_cols, ((size_t)work_rows + pxPerWIy - 1) / pxPerWIy };
-        size_t localsize[2]  = { maxWorkGroupSize / 4, 4 };
-        return k.run(2, globalsize, (flipType == FLIP_COLS) && !dev.isIntel() ? localsize : NULL, false);
+        माप_प्रकार globalsize[2] = { (माप_प्रकार)work_cols, ((माप_प्रकार)work_rows + pxPerWIy - 1) / pxPerWIy };
+        माप_प्रकार localsize[2]  = { maxWorkGroupSize / 4, 4 };
+        प्रत्यागम k.run(2, globalsize, (flipType == FLIP_COLS) && !dev.isIntel() ? localsize : रिक्त, असत्य);
     }
 }
 
 #endif
 
-void flip( InputArray _src, OutputArray _dst, int flip_mode )
+शून्य flip( निवेश_Array _src, OutputArray _dst, पूर्णाङ्क flip_mode )
 {
     CV_INSTRUMENT_REGION();
 
     CV_Assert( _src.dims() <= 2 );
     Size size = _src.size();
 
-    if (flip_mode < 0)
+    यदि (flip_mode < 0)
     {
-        if (size.width == 1)
+        यदि (size.width == 1)
             flip_mode = 0;
-        if (size.height == 1)
+        यदि (size.height == 1)
             flip_mode = 1;
     }
 
-    if ((size.width == 1 && flip_mode > 0) ||
+    यदि ((size.width == 1 && flip_mode > 0) ||
         (size.height == 1 && flip_mode == 0))
     {
-        return _src.copyTo(_dst);
+        प्रत्यागम _src.copyTo(_dst);
     }
 
     CV_OCL_RUN( _dst.isUMat(), ocl_flip(_src, _dst, flip_mode))
 
     Mat src = _src.getMat();
-    int type = src.type();
+    पूर्णाङ्क type = src.type();
     _dst.create( size, type );
     Mat dst = _dst.getMat();
 
     CALL_HAL(flip, cv_hal_flip, type, src.ptr(), src.step, src.cols, src.rows,
              dst.ptr(), dst.step, flip_mode);
 
-    size_t esz = CV_ELEM_SIZE(type);
+    माप_प्रकार esz = CV_ELEM_SIZE(type);
 
-    if( flip_mode <= 0 )
+    यदि( flip_mode <= 0 )
         flipVert( src.ptr(), src.step, dst.ptr(), dst.step, src.size(), esz );
-    else
+    अन्यथा
         flipHoriz( src.ptr(), src.step, dst.ptr(), dst.step, src.size(), esz );
 
-    if( flip_mode < 0 )
+    यदि( flip_mode < 0 )
         flipHoriz( dst.ptr(), dst.step, dst.ptr(), dst.step, dst.size(), esz );
 }
 
 // In-place flip of a continuous array: swap the slices along the axis, no temporary copy.
-static void flipNDInplace(Mat& m, int axis)
+स्थिर शून्य flipNDInplace(Mat& m, पूर्णाङ्क axis)
 {
-    size_t nouter = 1;
-    for (int i = 0; i < axis; i++)
-        nouter *= (size_t)m.size[i];
-    const int n = m.size[axis];
-    const size_t step = m.step[axis];
+    माप_प्रकार nouter = 1;
+    प्रति (पूर्णाङ्क i = 0; i < axis; i++)
+        nouter *= (माप_प्रकार)m.size[i];
+    ध्रुव पूर्णाङ्क n = m.size[axis];
+    ध्रुव माप_प्रकार step = m.step[axis];
     uchar* data = m.ptr();
-    for (size_t i = 0; i < nouter; i++, data += n*step)
-        for (int j = 0, k = n - 1; j < k; j++, k--)
+    प्रति (माप_प्रकार i = 0; i < nouter; i++, data += n*step)
+        प्रति (पूर्णाङ्क j = 0, k = n - 1; j < k; j++, k--)
             std::swap_ranges(data + j*step, data + (j + 1)*step, data + k*step);
 }
 
-void flipND(InputArray _src, OutputArray _dst, int _axis)
+शून्य flipND(निवेश_Array _src, OutputArray _dst, पूर्णाङ्क _axis)
 {
     CV_INSTRUMENT_REGION();
 
     Mat src = _src.getMat();
 
     // verify axis
-    int ndim = src.dims;
+    पूर्णाङ्क ndim = src.dims;
     CV_CheckLT(_axis, ndim, "flipND: given axis is out of range");
     CV_CheckGE(_axis, -ndim, "flipND: given axis is out of range");
-    int axis = (_axis + ndim) % ndim;
+    पूर्णाङ्क axis = (_axis + ndim) % ndim;
 
     _dst.create(ndim, src.size.p, src.type());
     Mat dst = _dst.getMat();
-    if (dst.data == src.data && src.isContinuous() && dst.isContinuous())
+    यदि (dst.data == src.data && src.isContinuous() && dst.isContinuous())
     {
         flipNDInplace(dst, axis);
-        return;
+        प्रत्यागम;
     }
 
     nd::View v = nd::viewOf(src);
@@ -1099,7 +1099,7 @@ void flipND(InputArray _src, OutputArray _dst, int _axis)
     nd::copy(v, nd::viewOf(dst));
 }
 
-void concat(InputArrayOfArrays _src, int axis, OutputArray _dst)
+शून्य concat(निवेश_Array_Of_Arrays _src, पूर्णाङ्क axis, OutputArray _dst)
 {
     CV_INSTRUMENT_REGION();
 
@@ -1107,40 +1107,40 @@ void concat(InputArrayOfArrays _src, int axis, OutputArray _dst)
     _src.getMatVector(src);
     CV_Assert(!src.empty());
 
-    const Mat& src0 = src[0];
-    const int ndims = src0.dims, type = src0.type(), ninputs = (int)src.size();
+    ध्रुव Mat& src0 = src[0];
+    ध्रुव पूर्णाङ्क ndims = src0.dims, type = src0.type(), ninputs = (पूर्णाङ्क)src.size();
     CV_CheckGE(ndims, 1, "concat: 0-dimensional arrays are not supported");
     CV_CheckGE(axis, -ndims, "concat: axis is out of range");
     CV_CheckLT(axis, ndims, "concat: axis is out of range");
-    if (axis < 0)
+    यदि (axis < 0)
         axis += ndims;
 
-    int outShape[CV_MAX_DIM];
-    for (int i = 0; i < ndims; i++)
+    पूर्णाङ्क outShape[CV_MAX_DIM];
+    प्रति (पूर्णाङ्क i = 0; i < ndims; i++)
         outShape[i] = src0.size[i];
     int64 axisSize = 0;
-    for (int k = 0; k < ninputs; k++)
+    प्रति (पूर्णाङ्क k = 0; k < ninputs; k++)
     {
-        const Mat& m = src[k];
+        ध्रुव Mat& m = src[k];
         CV_CheckEQ(m.type(), type, "concat: all the input arrays must have the same type");
         CV_CheckEQ(m.dims, ndims, "concat: all the input arrays must have the same number of dimensions");
-        for (int i = 0; i < ndims; i++)
-            if (i != axis)
+        प्रति (पूर्णाङ्क i = 0; i < ndims; i++)
+            यदि (i != axis)
                 CV_CheckEQ(m.size[i], outShape[i], "concat: the input shapes must match except along the axis");
         axisSize += m.size[axis];
     }
-    CV_CheckLE((size_t)axisSize, (size_t)INT_MAX, "concat: the output is too big");
-    outShape[axis] = (int)axisSize;
+    CV_CheckLE((माप_प्रकार)axisSize, (माप_प्रकार)पूर्णांक_उच्च, "concat: the output is too big");
+    outShape[axis] = (पूर्णाङ्क)axisSize;
 
     _dst.create(ndims, outShape, type);
     Mat dst = _dst.getMat();
 
     AutoBuffer<nd::View, 4> sv(ninputs), dv(ninputs);
-    const nd::View dst0 = nd::viewOf(dst);
-    int ofs = 0;
-    for (int k = 0; k < ninputs; k++)
+    ध्रुव nd::View dst0 = nd::viewOf(dst);
+    पूर्णाङ्क ofs = 0;
+    प्रति (पूर्णाङ्क k = 0; k < ninputs; k++)
     {
-        const int sz = src[k].size[axis];
+        ध्रुव पूर्णाङ्क sz = src[k].size[axis];
         sv[k] = nd::viewOf(src[k]);
         dv[k] = dst0;
         nd::slice(dv[k], axis, ofs, 1, sz);
@@ -1149,37 +1149,37 @@ void concat(InputArrayOfArrays _src, int axis, OutputArray _dst)
     nd::copyBatch(sv.data(), dv.data(), ninputs);
 }
 
-void split(InputArray _src, int axis, const std::vector<int>& sizes, OutputArrayOfArrays _dst)
+शून्य split(निवेश_Array _src, पूर्णाङ्क axis, ध्रुव std::vector<पूर्णाङ्क>& sizes, OutputArrayOfArrays _dst)
 {
     CV_INSTRUMENT_REGION();
 
     Mat src = _src.getMat();
-    const int ndims = src.dims, type = src.type(), noutputs = (int)sizes.size();
+    ध्रुव पूर्णाङ्क ndims = src.dims, type = src.type(), noutputs = (पूर्णाङ्क)sizes.size();
     CV_CheckGE(ndims, 1, "split: 0-dimensional arrays are not supported");
     CV_CheckGE(axis, -ndims, "split: axis is out of range");
     CV_CheckLT(axis, ndims, "split: axis is out of range");
-    if (axis < 0)
+    यदि (axis < 0)
         axis += ndims;
     CV_Assert(noutputs > 0);
 
     int64 axisSize = 0;
-    for (int k = 0; k < noutputs; k++)
+    प्रति (पूर्णाङ्क k = 0; k < noutputs; k++)
     {
         CV_CheckGE(sizes[k], 0, "split: the sizes must be non-negative");
         axisSize += sizes[k];
     }
-    CV_CheckEQ((size_t)axisSize, (size_t)src.size[axis], "split: the sizes must sum up to the size of the axis");
+    CV_CheckEQ((माप_प्रकार)axisSize, (माप_प्रकार)src.size[axis], "split: the sizes must sum up to the size of the axis");
 
-    int outShape[CV_MAX_DIM];
-    for (int i = 0; i < ndims; i++)
+    पूर्णाङ्क outShape[CV_MAX_DIM];
+    प्रति (पूर्णाङ्क i = 0; i < ndims; i++)
         outShape[i] = src.size[i];
 
-    _dst.create(noutputs, 1, type, -1, true);
+    _dst.create(noutputs, 1, type, -1, सत्य);
     AutoBuffer<nd::View, 4> sv(noutputs), dv(noutputs);
     std::vector<Mat> dst(noutputs);
-    const nd::View src0 = nd::viewOf(src);
-    int ofs = 0;
-    for (int k = 0; k < noutputs; k++)
+    ध्रुव nd::View src0 = nd::viewOf(src);
+    पूर्णाङ्क ofs = 0;
+    प्रति (पूर्णाङ्क k = 0; k < noutputs; k++)
     {
         outShape[axis] = sizes[k];
         _dst.create(ndims, outShape, type, k);
@@ -1192,28 +1192,28 @@ void split(InputArray _src, int axis, const std::vector<int>& sizes, OutputArray
     nd::copyBatch(sv.data(), dv.data(), noutputs);
 }
 
-void repeat(InputArray _src, const std::vector<int>& repeats, OutputArray _dst)
+शून्य repeat(निवेश_Array _src, ध्रुव std::vector<पूर्णाङ्क>& repeats, OutputArray _dst)
 {
     CV_INSTRUMENT_REGION();
 
     Mat src = _src.getMat();
-    const int ndims = src.dims;
+    ध्रुव पूर्णाङ्क ndims = src.dims;
     CV_Assert(!(ndims == 0 && src.empty()));
-    CV_CheckEQ(repeats.size(), (size_t)ndims, "repeat: the number of repeats must match the number of dimensions");
+    CV_CheckEQ(repeats.size(), (माप_प्रकार)ndims, "repeat: the number of repeats must match the number of dimensions");
 
-    int outShape[CV_MAX_DIM];
-    for (int i = 0; i < ndims; i++)
+    पूर्णाङ्क outShape[CV_MAX_DIM];
+    प्रति (पूर्णाङ्क i = 0; i < ndims; i++)
     {
         CV_CheckGE(repeats[i], 0, "repeat: the repeats must be non-negative");
         int64 sz = (int64)src.size[i]*repeats[i];
-        CV_CheckLE((size_t)sz, (size_t)INT_MAX, "repeat: the output is too big");
-        outShape[i] = (int)sz;
+        CV_CheckLE((माप_प्रकार)sz, (माप_प्रकार)पूर्णांक_उच्च, "repeat: the output is too big");
+        outShape[i] = (पूर्णाङ्क)sz;
     }
 
     _dst.create(ndims, outShape, src.type());
     Mat dst = _dst.getMat();
-    if (dst.total() == 0 || src.empty())
-        return;
+    यदि (dst.total() == 0 || src.empty())
+        प्रत्यागम;
 
     // Each repeated output axis is split into (repeat index, position), the former
     // with source step 0, so the whole tile is one broadcasting copy.
@@ -1221,24 +1221,24 @@ void repeat(InputArray _src, const std::vector<int>& repeats, OutputArray _dst)
     sv.data = src.data;
     dv.data = dst.data;
     sv.esz = dv.esz = src.elemSize();
-    int n = 0;
-    for (int i = 0; i < ndims; i++)
+    पूर्णाङ्क n = 0;
+    प्रति (पूर्णाङ्क i = 0; i < ndims; i++)
     {
-        const int sz = src.size[i], r = repeats[i];
-        if (r != 1)
+        ध्रुव पूर्णाङ्क sz = src.size[i], r = repeats[i];
+        यदि (r != 1)
         {
-            CV_CheckLT(n, (int)nd::MAX_VIEW_DIMS, "repeat: too many dimensions");
+            CV_CheckLT(n, (पूर्णाङ्क)nd::MAX_VIEW_DIMS, "repeat: too many dimensions");
             sv.size[n] = dv.size[n] = r;
             sv.step[n] = 0;
-            dv.step[n] = (ptrdiff_t)dst.step[i]*sz;
+            dv.step[n] = (सूचक_भेद_प्रकार)dst.step[i]*sz;
             n++;
         }
-        if (sz != 1 || r == 1)
+        यदि (sz != 1 || r == 1)
         {
-            CV_CheckLT(n, (int)nd::MAX_VIEW_DIMS, "repeat: too many dimensions");
+            CV_CheckLT(n, (पूर्णाङ्क)nd::MAX_VIEW_DIMS, "repeat: too many dimensions");
             sv.size[n] = dv.size[n] = sz;
-            sv.step[n] = (ptrdiff_t)src.step[i];
-            dv.step[n] = (ptrdiff_t)dst.step[i];
+            sv.step[n] = (सूचक_भेद_प्रकार)src.step[i];
+            dv.step[n] = (सूचक_भेद_प्रकार)dst.step[i];
             n++;
         }
     }
@@ -1246,13 +1246,13 @@ void repeat(InputArray _src, const std::vector<int>& repeats, OutputArray _dst)
     nd::copy(sv, dv);
 }
 
-void slice(InputArray _src, const std::vector<int>& starts, const std::vector<int>& ends,
-             const std::vector<int>& steps, OutputArray _dst)
+शून्य slice(निवेश_Array _src, ध्रुव std::vector<पूर्णाङ्क>& starts, ध्रुव std::vector<पूर्णाङ्क>& ends,
+             ध्रुव std::vector<पूर्णाङ्क>& steps, OutputArray _dst)
 {
     CV_INSTRUMENT_REGION();
 
     Mat src = _src.getMat();
-    const int ndims = src.dims, nslices = (int)starts.size();
+    ध्रुव पूर्णाङ्क ndims = src.dims, nslices = (पूर्णाङ्क)starts.size();
     CV_Assert(!(ndims == 0 && src.empty()));
     CV_CheckLE(nslices, ndims, "slice: too many starts");
     CV_CheckEQ(ends.size(), starts.size(), "slice: starts and ends must have the same size");
@@ -1260,58 +1260,58 @@ void slice(InputArray _src, const std::vector<int>& starts, const std::vector<in
              "slice: steps must be empty or have the same size as starts");
 
     nd::View sv = nd::viewOf(src);
-    int outShape[CV_MAX_DIM];
-    for (int i = 0; i < ndims; i++)
+    पूर्णाङ्क outShape[CV_MAX_DIM];
+    प्रति (पूर्णाङ्क i = 0; i < ndims; i++)
         outShape[i] = src.size[i];
 
-    for (int i = 0; i < nslices; i++)
+    प्रति (पूर्णाङ्क i = 0; i < nslices; i++)
     {
-        const int n = src.size[i], start = starts[i], end = ends[i];
-        const int step = steps.empty() ? 1 : steps[i];
+        ध्रुव पूर्णाङ्क n = src.size[i], start = starts[i], end = ends[i];
+        ध्रुव पूर्णाङ्क step = steps.empty() ? 1 : steps[i];
         CV_CheckNE(step, 0, "slice: step must not be zero");
-        int count;
-        if (step > 0)
+        पूर्णाङ्क गिनती_2;
+        यदि (step > 0)
         {
             CV_Check(start, 0 <= start && start <= n, "slice: start is out of range");
             CV_Check(end, 0 <= end && end <= n, "slice: end is out of range");
-            count = end > start ? (int)(((int64)end - start + step - 1)/step) : 0;
+            गिनती_2 = end > start ? (पूर्णाङ्क)(((int64)end - start + step - 1)/step) : 0;
         }
-        else
+        अन्यथा
         {
             CV_Check(start, -1 <= start && start < n, "slice: start is out of range");
             CV_Check(end, -1 <= end && end < n, "slice: end is out of range");
-            count = start > end ? (int)(((int64)start - end - step - 1)/(-step)) : 0;
+            गिनती_2 = start > end ? (पूर्णाङ्क)(((int64)start - end - step - 1)/(-step)) : 0;
         }
-        nd::slice(sv, i, start, step, count);
-        outShape[i] = count;
+        nd::slice(sv, i, start, step, गिनती_2);
+        outShape[i] = गिनती_2;
     }
 
     _dst.create(ndims, outShape, src.type());
     Mat dst = _dst.getMat();
-    if (dst.total() == 0 || src.empty())
-        return;
+    यदि (dst.total() == 0 || src.empty())
+        प्रत्यागम;
     nd::copy(sv, nd::viewOf(dst));
 }
 
 /*
     This function first prepends 1 to each tensor shape to have a common max_ndims dimension, then flatten non-broadcast dimensions.
 */
-static bool _flatten_for_broadcast(int narrays, int max_ndims, const int* ndims, const int** orig_shape,
-                                   int** flatten_shape, size_t** flatten_step) {
-    int i, j, k;
+स्थिर तार्किक _flatten_for_broadcast(पूर्णाङ्क narrays, पूर्णाङ्क max_ndims, ध्रुव पूर्णाङ्क* ndims, ध्रुव पूर्णाङ्क** orig_shape,
+                                   पूर्णाङ्क** flatten_shape, माप_प्रकार** flatten_step) {
+    पूर्णाङ्क i, j, k;
 
     // step 1.
     // * make all inputs and the output max_ndims-dimensional.
     // * compute proper step's
-    for (i = max_ndims - 1; i >= 0; i-- ) {
-        for (k = 0; k < narrays; k++) {
+    प्रति (i = max_ndims - 1; i >= 0; i-- ) {
+        प्रति (k = 0; k < narrays; k++) {
             j = ndims[k] - (max_ndims - i);
-            int sz_i = j >= 0 ? orig_shape[k][j] : 1;
-            size_t st_i = i == max_ndims - 1 ? 1 : flatten_step[k][i+1] * flatten_shape[k][i+1];
+            पूर्णाङ्क sz_i = j >= 0 ? orig_shape[k][j] : 1;
+            माप_प्रकार st_i = i == max_ndims - 1 ? 1 : flatten_step[k][i+1] * flatten_shape[k][i+1];
             flatten_shape[k][i] = sz_i;
             flatten_step[k][i] = st_i;
-            if (flatten_shape[k][i] == 0)
-                return false;
+            यदि (flatten_shape[k][i] == 0)
+                प्रत्यागम असत्य;
         }
     }
 
@@ -1320,23 +1320,23 @@ static bool _flatten_for_broadcast(int narrays, int max_ndims, const int* ndims,
     // this loop is probably the most tricky part
     // in the whole implementation of broadcasting.
     j = max_ndims-1;
-    for (i = j - 1; i >= 0; i--) {
-        bool all_contiguous = true, all_scalars = true, all_consistent = true;
-        for(k = 0; k < narrays; k++) {
-            size_t st = flatten_step[k][j] * flatten_shape[k][j];
-            bool prev_scalar = flatten_shape[k][j] == 1;
-            bool scalar = flatten_shape[k][i] == 1;
+    प्रति (i = j - 1; i >= 0; i--) {
+        तार्किक all_contiguous = सत्य, all_scalars = सत्य, all_consistent = सत्य;
+        प्रति(k = 0; k < narrays; k++) {
+            माप_प्रकार st = flatten_step[k][j] * flatten_shape[k][j];
+            तार्किक prev_scalar = flatten_shape[k][j] == 1;
+            तार्किक scalar = flatten_shape[k][i] == 1;
             all_contiguous = all_contiguous && (st == flatten_step[k][i]);
             all_scalars = all_scalars && scalar;
             all_consistent = all_consistent && (scalar == prev_scalar);
         }
-        if (all_contiguous && (all_consistent || all_scalars)) {
-            for(k = 0; k < narrays; k++)
+        यदि (all_contiguous && (all_consistent || all_scalars)) {
+            प्रति(k = 0; k < narrays; k++)
                 flatten_shape[k][j] *= flatten_shape[k][i];
-        } else {
+        } अन्यथा {
             j--;
-            if (i < j) {
-                for(k = 0; k < narrays; k++) {
+            यदि (i < j) {
+                प्रति(k = 0; k < narrays; k++) {
                     flatten_shape[k][j] = flatten_shape[k][i];
                     flatten_step[k][j] = flatten_step[k][i];
                 }
@@ -1345,20 +1345,20 @@ static bool _flatten_for_broadcast(int narrays, int max_ndims, const int* ndims,
     }
 
     // step 3. Set some step's to 0's.
-    for (i = max_ndims-1; i >= j; i--) {
-        for (k = 0; k < narrays; k++)
+    प्रति (i = max_ndims-1; i >= j; i--) {
+        प्रति (k = 0; k < narrays; k++)
             flatten_step[k][i] = flatten_shape[k][i] == 1 ? 0 : flatten_step[k][i];
     }
-    for (; i >= 0; i--) {
-        for (k = 0; k < narrays; k++) {
+    प्रति (; i >= 0; i--) {
+        प्रति (k = 0; k < narrays; k++) {
             flatten_step[k][i] = 0;
             flatten_shape[k][i] = 1;
         }
     }
-    return true;
+    प्रत्यागम सत्य;
 }
 
-void broadcast(InputArray _src, InputArray _shape, OutputArray _dst) {
+शून्य broadcast(निवेश_Array _src, निवेश_Array _shape, OutputArray _dst) {
     CV_INSTRUMENT_REGION();
 
     Mat src = _src.getMat();
@@ -1367,153 +1367,153 @@ void broadcast(InputArray _src, InputArray _shape, OutputArray _dst) {
 
     Mat shape = _shape.getMat();
     CV_CheckTypeEQ(shape.type(), CV_32S, "broadcast: target shape must be of type int32");
-    const auto dims_shape = static_cast<int>(shape.total());
-    const auto *ptr_shape = shape.ptr<int>();
+    ध्रुव स्वतः dims_shape = static_cast<पूर्णाङ्क>(shape.total());
+    ध्रुव स्वतः *ptr_shape = shape.ptr<पूर्णाङ्क>();
 
     // check valid shape, 1D/0D Mat would fail in the following checks
-    const auto dims_src = src.dims;
+    ध्रुव स्वतः dims_src = src.dims;
     CV_CheckLE(dims_src, dims_shape,
                "broadcast: dimension of input array must be less than or equal to dimension of target shape");
-    std::vector<int> shape_src{src.size.p, src.size.p + dims_src};
-    if (shape_src.size() < static_cast<size_t>(dims_shape)) {
+    std::vector<पूर्णाङ्क> shape_src{src.size.p, src.size.p + dims_src};
+    यदि (shape_src.size() < static_cast<माप_प्रकार>(dims_shape)) {
         shape_src.insert(shape_src.begin(), dims_shape - shape_src.size(), 1);
     }
-    for (int i = 0; i < static_cast<int>(shape_src.size()); ++i) {
-        const auto *shape_target = ptr_shape;
-        if (shape_src[i] != 1) {
+    प्रति (पूर्णाङ्क i = 0; i < static_cast<पूर्णाङ्क>(shape_src.size()); ++i) {
+        ध्रुव स्वतः *shape_target = ptr_shape;
+        यदि (shape_src[i] != 1) {
             CV_CheckEQ(shape_src[i], shape_target[i], "target shape must be equal to input shape or 1");
         }
     }
 
     // impl
-    _dst.create(dims_shape, shape.ptr<int>(), src.type());
+    _dst.create(dims_shape, shape.ptr<पूर्णाङ्क>(), src.type());
     Mat dst = _dst.getMat();
-    if (dst.total() == 0)
-        return;
-    cv::AutoBuffer<int> is_same_shape(dims_shape, 0);
-    for (int i = 0; i < static_cast<int>(shape_src.size()); ++i) {
-        if (shape_src[i] == ptr_shape[i]) {
+    यदि (dst.total() == 0)
+        प्रत्यागम;
+    cv::AutoBuffer<पूर्णाङ्क> is_same_shape(dims_shape, 0);
+    प्रति (पूर्णाङ्क i = 0; i < static_cast<पूर्णाङ्क>(shape_src.size()); ++i) {
+        यदि (shape_src[i] == ptr_shape[i]) {
             is_same_shape[i] = 1;
         }
     }
     // copy if same shape
-    if (std::accumulate(is_same_shape.begin(), is_same_shape.end(), 1, std::multiplies<int>()) != 0) {
-        const auto *p_src = src.ptr<const char>();
-        auto *p_dst = dst.ptr<char>();
-        std::memcpy(p_dst, p_src, dst.total() * dst.elemSize());
-        return;
+    यदि (std::accumulate(is_same_shape.begin(), is_same_shape.end(), 1, std::multiplies<पूर्णाङ्क>()) != 0) {
+        ध्रुव स्वतः *p_src = src.ptr<ध्रुव वर्ण>();
+        स्वतः *p_dst = dst.ptr<वर्ण>();
+        std::स_नकल(p_dst, p_src, dst.total() * dst.elemSize());
+        प्रत्यागम;
     }
     // other cases
-    int max_ndims = std::max(dims_src, dims_shape);
-    if (max_ndims < 2 && src.total() == 1) {
-        const char* p_src = src.ptr<const char>();
-        char* p_dst = dst.ptr<char>();
-        size_t esz = src.elemSize();
-        for (size_t j = 0; j < dst.total(); j++)
-            std::memcpy(p_dst + j * esz, p_src, esz);
-        return;
+    पूर्णाङ्क max_ndims = std::max(dims_src, dims_shape);
+    यदि (max_ndims < 2 && src.total() == 1) {
+        ध्रुव वर्ण* p_src = src.ptr<ध्रुव वर्ण>();
+        वर्ण* p_dst = dst.ptr<वर्ण>();
+        माप_प्रकार esz = src.elemSize();
+        प्रति (माप_प्रकार j = 0; j < dst.total(); j++)
+            std::स_नकल(p_dst + j * esz, p_src, esz);
+        प्रत्यागम;
     }
-    const int all_ndims[2] = {src.dims, dst.dims};
-    const int* orig_shapes[2] = {src.size.p, dst.size.p};
-    cv::AutoBuffer<size_t> buff(max_ndims * 4);
-    int* flatten_shapes[2] = {(int*)buff.data(), (int*)(buff.data() + max_ndims)};
-    size_t* flatten_steps[2] = {(size_t*)(buff.data() + 2 * max_ndims), (size_t*)(buff.data() + 3 * max_ndims)};
-    if (_flatten_for_broadcast(2, max_ndims, all_ndims, orig_shapes, flatten_shapes, flatten_steps)) {
-        size_t src_dp = flatten_steps[0][max_ndims - 1];
-        size_t dst_dp = flatten_steps[1][max_ndims - 1];
+    ध्रुव पूर्णाङ्क all_ndims[2] = {src.dims, dst.dims};
+    ध्रुव पूर्णाङ्क* orig_shapes[2] = {src.size.p, dst.size.p};
+    cv::AutoBuffer<माप_प्रकार> buff(max_ndims * 4);
+    पूर्णाङ्क* flatten_shapes[2] = {(पूर्णाङ्क*)buff.data(), (पूर्णाङ्क*)(buff.data() + max_ndims)};
+    माप_प्रकार* flatten_steps[2] = {(माप_प्रकार*)(buff.data() + 2 * max_ndims), (माप_प्रकार*)(buff.data() + 3 * max_ndims)};
+    यदि (_flatten_for_broadcast(2, max_ndims, all_ndims, orig_shapes, flatten_shapes, flatten_steps)) {
+        माप_प्रकार src_dp = flatten_steps[0][max_ndims - 1];
+        माप_प्रकार dst_dp = flatten_steps[1][max_ndims - 1];
         CV_Assert(dst_dp == 1 || dst_dp == 0);
         CV_Assert(max_ndims >= 2); // >= 3?
-        size_t rowstep_src = flatten_steps[0][max_ndims - 2];
-        size_t rowstep_dst = flatten_steps[1][max_ndims - 2];
-        const char* ptr_src = src.ptr<const char>();
-        char* ptr_dst = dst.ptr<char>();
-        size_t esz = src.elemSize();
-        int nrows = flatten_shapes[1][max_ndims - 2];
-        int ncols = flatten_shapes[1][max_ndims - 1];
-        int nplanes = 1;
+        माप_प्रकार rowstep_src = flatten_steps[0][max_ndims - 2];
+        माप_प्रकार rowstep_dst = flatten_steps[1][max_ndims - 2];
+        ध्रुव वर्ण* ptr_src = src.ptr<ध्रुव वर्ण>();
+        वर्ण* ptr_dst = dst.ptr<वर्ण>();
+        माप_प्रकार esz = src.elemSize();
+        पूर्णाङ्क nrows = flatten_shapes[1][max_ndims - 2];
+        पूर्णाङ्क ncols = flatten_shapes[1][max_ndims - 1];
+        पूर्णाङ्क nplanes = 1;
         CV_Check(esz, esz == 1 || esz == 2 || esz == 4 || esz == 8, "broadcast: not supported data type");
 
-        for (int k = 0; k < max_ndims - 2; k++) {
+        प्रति (पूर्णाङ्क k = 0; k < max_ndims - 2; k++) {
             nplanes *= flatten_shapes[1][k];
         }
-        for (int plane_idx = 0; plane_idx < nplanes; plane_idx++) {
-            size_t offset_src = 0, offset_dst = 0;
-            size_t idx = (size_t)plane_idx;
-            for (int k = max_ndims - 3; k >= 0; k--) {
-                size_t prev_idx = idx / flatten_shapes[1][k];
-                size_t i_k = (int)(idx - prev_idx * flatten_shapes[1][k]);
+        प्रति (पूर्णाङ्क plane_idx = 0; plane_idx < nplanes; plane_idx++) {
+            माप_प्रकार offset_src = 0, offset_dst = 0;
+            माप_प्रकार idx = (माप_प्रकार)plane_idx;
+            प्रति (पूर्णाङ्क k = max_ndims - 3; k >= 0; k--) {
+                माप_प्रकार prev_idx = idx / flatten_shapes[1][k];
+                माप_प्रकार i_k = (पूर्णाङ्क)(idx - prev_idx * flatten_shapes[1][k]);
                 offset_src += i_k * flatten_steps[0][k];
                 offset_dst += i_k * flatten_steps[1][k];
                 idx = prev_idx;
             }
 
             #define OPENCV_CORE_BROADCAST_LOOP(_Tp) \
-                for (int i = 0; i < nrows; i++) {   \
-                    const _Tp *ptr_src_ = (const _Tp*)ptr_src + offset_src + rowstep_src * i; \
+                प्रति (पूर्णाङ्क i = 0; i < nrows; i++) {   \
+                    ध्रुव _Tp *ptr_src_ = (ध्रुव _Tp*)ptr_src + offset_src + rowstep_src * i; \
                     _Tp *ptr_dst_ = (_Tp*)ptr_dst + offset_dst + rowstep_dst * i; \
-                    if (src_dp == 1) { \
-                        for (int j = 0; j < ncols; j++) { \
+                    यदि (src_dp == 1) { \
+                        प्रति (पूर्णाङ्क j = 0; j < ncols; j++) { \
                             ptr_dst_[j] = ptr_src_[j]; \
                         } \
-                    } else { \
+                    } अन्यथा { \
                         _Tp x = *ptr_src_; \
-                        for (int j = 0; j < ncols; j++) { \
+                        प्रति (पूर्णाङ्क j = 0; j < ncols; j++) { \
                             ptr_dst_[j] = x; \
                         } \
                     } \
                 }
 
-            if (esz == 1) {
+            यदि (esz == 1) {
                 OPENCV_CORE_BROADCAST_LOOP(int8_t);
-            } else if (esz == 2) {
+            } अन्यथा यदि (esz == 2) {
                 OPENCV_CORE_BROADCAST_LOOP(int16_t);
-            } else if (esz == 4) {
+            } अन्यथा यदि (esz == 4) {
                 OPENCV_CORE_BROADCAST_LOOP(int32_t);
-            } else if (esz == 8) {
+            } अन्यथा यदि (esz == 8) {
                 OPENCV_CORE_BROADCAST_LOOP(int64_t);
-            } else {
+            } अन्यथा {
                 CV_Error(cv::Error::StsNotImplemented, "");
             }
             #undef OPENCV_CORE_BROADCAST_LOOP
         }
-    } else {
-        if (dst.total() == 0)
-            return;
+    } अन्यथा {
+        यदि (dst.total() == 0)
+            प्रत्यागम;
         // initial copy (src to dst)
-        std::vector<size_t> step_src{src.step.p, src.step.p + dims_src};
-        if (step_src.size() < static_cast<size_t>(dims_shape)) {
+        std::vector<माप_प्रकार> step_src{src.step.p, src.step.p + dims_src};
+        यदि (step_src.size() < static_cast<माप_प्रकार>(dims_shape)) {
             step_src.insert(step_src.begin(), dims_shape - step_src.size(), step_src[0]);
         }
-        for (size_t i = 0; i < src.total(); ++i) {
-            size_t t = i;
-            size_t src_offset = 0, dst_offset = 0;
-            for (int j = static_cast<int>(shape_src.size() - 1); j >= 0; --j) {
-                size_t idx = t / shape_src[j];
-                size_t offset = static_cast<size_t>(t - idx * shape_src[j]);
+        प्रति (माप_प्रकार i = 0; i < src.total(); ++i) {
+            माप_प्रकार t = i;
+            माप_प्रकार src_offset = 0, dst_offset = 0;
+            प्रति (पूर्णाङ्क j = static_cast<पूर्णाङ्क>(shape_src.size() - 1); j >= 0; --j) {
+                माप_प्रकार idx = t / shape_src[j];
+                माप_प्रकार offset = static_cast<माप_प्रकार>(t - idx * shape_src[j]);
                 src_offset += offset * step_src[j];
                 dst_offset += offset * dst.step[j];
                 t = idx;
             }
-            const auto *p_src = src.ptr<const char>();
-            auto *p_dst = dst.ptr<char>();
-            std::memcpy(p_dst + dst_offset, p_src + src_offset, dst.elemSize());
+            ध्रुव स्वतः *p_src = src.ptr<ध्रुव वर्ण>();
+            स्वतः *p_dst = dst.ptr<वर्ण>();
+            std::स_नकल(p_dst + dst_offset, p_src + src_offset, dst.elemSize());
         }
         // broadcast copy (dst inplace)
-        AutoBuffer<int> cumulative_shape(dims_shape, 1);
-        int total = static_cast<int>(dst.total());
-        for (int i = dims_shape - 1; i >= 0; --i) {
-            cumulative_shape[i] = static_cast<int>(total / ptr_shape[i]);
+        AutoBuffer<पूर्णाङ्क> cumulative_shape(dims_shape, 1);
+        पूर्णाङ्क total = static_cast<पूर्णाङ्क>(dst.total());
+        प्रति (पूर्णाङ्क i = dims_shape - 1; i >= 0; --i) {
+            cumulative_shape[i] = static_cast<पूर्णाङ्क>(total / ptr_shape[i]);
             total = cumulative_shape[i];
         }
-        for (int i = dims_shape - 1; i >= 0; --i) {
-            if (is_same_shape[i] == 1) {
-                continue;
+        प्रति (पूर्णाङ्क i = dims_shape - 1; i >= 0; --i) {
+            यदि (is_same_shape[i] == 1) {
+                अनुवर्त;
             }
-            auto step = dst.step[i];
-            auto *p_dst = dst.ptr<char>();
-            for (int j = 0; j < cumulative_shape[i]; j++) {
-                for (int k = 0; k < ptr_shape[i] - 1; k++) {
-                    std::memcpy(p_dst + step, p_dst, step);
+            स्वतः step = dst.step[i];
+            स्वतः *p_dst = dst.ptr<वर्ण>();
+            प्रति (पूर्णाङ्क j = 0; j < cumulative_shape[i]; j++) {
+                प्रति (पूर्णाङ्क k = 0; k < ptr_shape[i] - 1; k++) {
+                    std::स_नकल(p_dst + step, p_dst, step);
                     p_dst += step;
                 }
                 p_dst += step;
@@ -1522,73 +1522,73 @@ void broadcast(InputArray _src, InputArray _shape, OutputArray _dst) {
     }
 }
 
-void broadcast(InputArray _src, const MatShape& _shape, OutputArray _dst)
+शून्य broadcast(निवेश_Array _src, ध्रुव MatShape& _shape, OutputArray _dst)
 {
-    if (_shape.dims < 0) {
+    यदि (_shape.dims < 0) {
         _dst.release();
-    } else {
-        Mat shape(1, _shape.dims, CV_32S, (int*)_shape.p);
+    } अन्यथा {
+        Mat shape(1, _shape.dims, CV_32S, (पूर्णाङ्क*)_shape.p);
         broadcast(_src, shape, _dst);
     }
 }
 
-static void rotateImpl(InputArray _src, OutputArray _dst, int rotateMode)
+स्थिर शून्य rotateImpl(निवेश_Array _src, OutputArray _dst, पूर्णाङ्क rotateMode)
 {
-    switch (rotateMode)
+    विकल्प (rotateMode)
     {
-    case ROTATE_90_CLOCKWISE:
+    पक्ष ROTATE_90_CLOCKWISE:
         transpose(_src, _dst);
         flip(_dst, _dst, 1);
-        break;
-    case ROTATE_180:
+        भङ्ग;
+    पक्ष ROTATE_180:
         flip(_src, _dst, -1);
-        break;
-    case ROTATE_90_COUNTERCLOCKWISE:
+        भङ्ग;
+    पक्ष ROTATE_90_COUNTERCLOCKWISE:
         transpose(_src, _dst);
         flip(_dst, _dst, 0);
-        break;
-    default:
-        break;
+        भङ्ग;
+    स्वभाव:
+        भङ्ग;
     }
 }
 
-void rotate(InputArray _src, OutputArray _dst, int rotateMode)
+शून्य rotate(निवेश_Array _src, OutputArray _dst, पूर्णाङ्क rotateMode)
 {
     CV_Assert(_src.dims() <= 2);
-    int angle;
+    पूर्णाङ्क angle;
 
-    if (_dst.isUMat())
+    यदि (_dst.isUMat())
     {
         rotateImpl(_src, _dst, rotateMode);
-        return;
+        प्रत्यागम;
     }
 
     Mat src = _src.getMat();
-    int type = src.type();
-    if( src.empty() )
+    पूर्णाङ्क type = src.type();
+    यदि( src.empty() )
     {
         _dst.release();
-        return;
+        प्रत्यागम;
     }
 
-    switch (rotateMode)
+    विकल्प (rotateMode)
     {
-    case ROTATE_90_CLOCKWISE:
+    पक्ष ROTATE_90_CLOCKWISE:
         _dst.create(src.cols, src.rows, type);
         angle = 90;
-        break;
-    case ROTATE_180:
+        भङ्ग;
+    पक्ष ROTATE_180:
         _dst.create(src.rows, src.cols, type);
         angle = 180;
-        break;
-    case ROTATE_90_COUNTERCLOCKWISE:
+        भङ्ग;
+    पक्ष ROTATE_90_COUNTERCLOCKWISE:
         _dst.create(src.cols, src.rows, type);
         angle = 270;
-        break;
-    default:
+        भङ्ग;
+    स्वभाव:
         _dst.create(src.rows, src.cols, type);
         angle = 0;
-        break;
+        भङ्ग;
     }
 
     Mat dst = _dst.getMat();
