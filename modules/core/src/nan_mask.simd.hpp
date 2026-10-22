@@ -13,7 +13,7 @@ typedef void (*FiniteMaskFunc)(const uchar *src, uchar *dst, size_t total);
 CV_CPU_OPTIMIZATION_NAMESPACE_BEGIN
 
 PatchNanFunc getPatchNanFunc(bool isDouble);
-FiniteMaskFunc getFiniteMaskFunc(bool isDouble, int cn);
+FiniteMaskFunc getFiniteMaskFunc(bool isDouble, цео cn);
 
 #ifndef CV_CPU_OPTIMIZATION_DECLARATIONS_ONLY
 
@@ -25,15 +25,15 @@ static void patchNaNs_32f(uchar* ptr, size_t ulen, double newVal)
     Cv32suf val;
     val.f = (float)newVal;
 
-    int j = 0;
-    int len = (int)ulen;
+    цео j = 0;
+    цео len = (цео)ulen;
 
-#if (CV_SIMD || CV_SIMD_SCALABLE)
+#ако (CV_SIMD || CV_SIMD_SCALABLE)
     v_int32 v_pos_mask = vx_setall_s32(0x7fffffff), v_exp_mask = vx_setall_s32(0x7f800000);
     v_int32 v_val = vx_setall_s32(val.i);
 
-    int cWidth = VTraits<v_int32>::vlanes();
-    for (; j < len - cWidth*2 + 1; j += cWidth*2)
+    цео cWidth = VTraits<v_int32>::vlanes();
+    за (; j < len - cWidth*2 + 1; j += cWidth*2)
     {
         v_int32 v_src0 = vx_load(tptr + j);
         v_int32 v_src1 = vx_load(tptr + j + cWidth);
@@ -41,7 +41,7 @@ static void patchNaNs_32f(uchar* ptr, size_t ulen, double newVal)
         v_int32 v_cmp_mask0 = v_lt(v_exp_mask, v_and(v_src0, v_pos_mask));
         v_int32 v_cmp_mask1 = v_lt(v_exp_mask, v_and(v_src1, v_pos_mask));
 
-        if (v_check_any(v_or(v_cmp_mask0, v_cmp_mask1)))
+        ако (v_check_any(v_or(v_cmp_mask0, v_cmp_mask1)))
         {
             v_int32 v_dst0 = v_select(v_cmp_mask0, v_val, v_src0);
             v_int32 v_dst1 = v_select(v_cmp_mask1, v_val, v_src1);
@@ -52,9 +52,9 @@ static void patchNaNs_32f(uchar* ptr, size_t ulen, double newVal)
     }
 #endif
 
-    for (; j < len; j++)
+    за (; j < len; j++)
     {
-        if ((tptr[j] & 0x7fffffff) > 0x7f800000)
+        ако ((tptr[j] & 0x7fffffff) > 0x7f800000)
         {
             tptr[j] = val.i;
         }
@@ -70,16 +70,16 @@ static void patchNaNs_64f(uchar* ptr, size_t ulen, double newVal)
     Cv64suf val;
     val.f = newVal;
 
-    int j = 0;
-    int len = (int)ulen;
+    цео j = 0;
+    цео len = (цео)ulen;
 
-#if (CV_SIMD || CV_SIMD_SCALABLE)
+#ако (CV_SIMD || CV_SIMD_SCALABLE)
     v_int64 v_exp_mask = vx_setall_s64(0x7FF0000000000000);
     v_int64 v_pos_mask = vx_setall_s64(0x7FFFFFFFFFFFFFFF);
     v_int64 v_val = vx_setall_s64(val.i);
 
-    int cWidth = VTraits<v_int64>::vlanes();
-    for (; j < len - cWidth * 2 + 1; j += cWidth*2)
+    цео cWidth = VTraits<v_int64>::vlanes();
+    за (; j < len - cWidth * 2 + 1; j += cWidth*2)
     {
         v_int64 v_src0 = vx_load(tptr + j);
         v_int64 v_src1 = vx_load(tptr + j + cWidth);
@@ -87,7 +87,7 @@ static void patchNaNs_64f(uchar* ptr, size_t ulen, double newVal)
         v_int64 v_cmp_mask0 = v_lt(v_exp_mask, v_and(v_src0, v_pos_mask));
         v_int64 v_cmp_mask1 = v_lt(v_exp_mask, v_and(v_src1, v_pos_mask));
 
-        if (v_check_any(v_cmp_mask0) || v_check_any(v_cmp_mask1))
+        ако (v_check_any(v_cmp_mask0) || v_check_any(v_cmp_mask1))
         {
             // v_select is not available for v_int64, emulating it
             v_int32 val32 = v_reinterpret_as_s32(v_val);
@@ -100,34 +100,34 @@ static void patchNaNs_64f(uchar* ptr, size_t ulen, double newVal)
     }
 #endif
 
-    for (; j < len; j++)
-        if ((tptr[j] & 0x7FFFFFFFFFFFFFFF) > 0x7FF0000000000000)
+    за (; j < len; j++)
+        ако ((tptr[j] & 0x7FFFFFFFFFFFFFFF) > 0x7FF0000000000000)
             tptr[j] = val.i;
 }
 
 PatchNanFunc getPatchNanFunc(bool isDouble)
 {
-    return isDouble ? patchNaNs_64f
+    врати isDouble ? patchNaNs_64f
                     : patchNaNs_32f;
 }
 
 ////// finiteMask //////
 
-#if (CV_SIMD || CV_SIMD_SCALABLE)
+#ако (CV_SIMD || CV_SIMD_SCALABLE)
 
-template <typename _Tp, int cn>
-int finiteMaskSIMD_(const _Tp *src, uchar *dst, size_t total);
+template <typename _Tp, цео cn>
+цео finiteMaskSIMD_(const _Tp *src, uchar *dst, size_t total);
 
 template <>
-int finiteMaskSIMD_<float, 1>(const float *fsrc, uchar *dst, size_t utotal)
+цео finiteMaskSIMD_<float, 1>(const float *fsrc, uchar *dst, size_t utotal)
 {
     const uint32_t* src = (const uint32_t*)fsrc;
-    const int osize = VTraits<v_uint8>::vlanes();
+    const цео osize = VTraits<v_uint8>::vlanes();
     v_uint32 vmaskExp = vx_setall_u32(0x7f800000);
 
-    int i = 0;
-    int total = (int)utotal;
-    for(; i < total - osize + 1; i += osize )
+    цео i = 0;
+    цео total = (цео)utotal;
+    за(; i < total - osize + 1; i += osize )
     {
         v_uint32 vv0, vv1, vv2, vv3;
         vv0 = v_ne(v_and(vx_load(src + i              ), vmaskExp), vmaskExp);
@@ -138,21 +138,21 @@ int finiteMaskSIMD_<float, 1>(const float *fsrc, uchar *dst, size_t utotal)
         v_store(dst + i, v_pack_b(vv0, vv1, vv2, vv3));
     }
 
-    return i;
+    врати i;
 }
 
 
 template <>
-int finiteMaskSIMD_<float, 2>(const float *fsrc, uchar *dst, size_t utotal)
+цео finiteMaskSIMD_<float, 2>(const float *fsrc, uchar *dst, size_t utotal)
 {
     const uint32_t* src = (const uint32_t*)fsrc;
-    const int size8 = VTraits<v_uint8>::vlanes();
+    const цео size8 = VTraits<v_uint8>::vlanes();
     v_uint32 vmaskExp = vx_setall_u32(0x7f800000);
     v_uint16 vmaskBoth = vx_setall_u16(0xffff);
 
-    int i = 0;
-    int total = (int)utotal;
-    for(; i < total - (size8 / 2) + 1; i += (size8 / 2) )
+    цео i = 0;
+    цео total = (цео)utotal;
+    за(; i < total - (size8 / 2) + 1; i += (size8 / 2) )
     {
         v_uint32 vv0, vv1, vv2, vv3;
         vv0 = v_ne(v_and(vx_load(src + i*2                ), vmaskExp), vmaskExp);
@@ -166,21 +166,21 @@ int finiteMaskSIMD_<float, 2>(const float *fsrc, uchar *dst, size_t utotal)
         v_store_low(dst + i, v_pack(vfinite, vfinite));
     }
 
-    return i;
+    врати i;
 }
 
 
 template <>
-int finiteMaskSIMD_<float, 3>(const float *fsrc, uchar *dst, size_t utotal)
+цео finiteMaskSIMD_<float, 3>(const float *fsrc, uchar *dst, size_t utotal)
 {
     const uint32_t* src = (const uint32_t*)fsrc;
-    const int npixels = VTraits<v_float32>::vlanes();
+    const цео npixels = VTraits<v_float32>::vlanes();
     v_uint32 vmaskExp = vx_setall_u32(0x7f800000);
     v_uint32 z = vx_setzero_u32();
 
-    int i = 0;
-    int total = (int)utotal;
-    for (; i < total - npixels + 1; i += npixels)
+    цео i = 0;
+    цео total = (цео)utotal;
+    за (; i < total - npixels + 1; i += npixels)
     {
         v_uint32 vv0, vv1, vv2;
         vv0 = v_ne(v_and(vx_load(src + i*3            ), vmaskExp), vmaskExp);
@@ -194,7 +194,7 @@ int finiteMaskSIMD_<float, 3>(const float *fsrc, uchar *dst, size_t utotal)
         v_uint8 vsh2 = v_extract<2>(velems, velems);
 
         v_uint8 vres3 = v_and(v_and(velems, vsh1), vsh2);
-        for (int j = 0; j < npixels; j++)
+        за (цео j = 0; j < npixels; j++)
         {
             dst[i + j] = v_get0(vres3);
             // 2nd arg is useless
@@ -202,22 +202,22 @@ int finiteMaskSIMD_<float, 3>(const float *fsrc, uchar *dst, size_t utotal)
         }
     }
 
-    return i;
+    врати i;
 }
 
 
 template <>
-int finiteMaskSIMD_<float, 4>(const float *fsrc, uchar *dst, size_t utotal)
+цео finiteMaskSIMD_<float, 4>(const float *fsrc, uchar *dst, size_t utotal)
 {
     const uint32_t* src = (const uint32_t*)fsrc;
-    const int npixels = VTraits<v_uint8>::vlanes() / 2;
-    const int nfloats = VTraits<v_uint32>::vlanes();
+    const цео npixels = VTraits<v_uint8>::vlanes() / 2;
+    const цео nfloats = VTraits<v_uint32>::vlanes();
     const v_uint32 vMaskExp = vx_setall_u32(0x7f800000);
     v_uint32 vmaskAll4 = vx_setall_u32(0xFFFFFFFF);
 
-    int i = 0;
-    int total = (int)utotal;
-    for(; i < total - npixels + 1; i += npixels )
+    цео i = 0;
+    цео total = (цео)utotal;
+    за(; i < total - npixels + 1; i += npixels )
     {
         v_uint32 v0 = vx_load(src + i * 4 + 0*nfloats);
         v_uint32 v1 = vx_load(src + i * 4 + 1*nfloats);
@@ -249,22 +249,22 @@ int finiteMaskSIMD_<float, 4>(const float *fsrc, uchar *dst, size_t utotal)
         v_store_low(dst + i, vres);
     }
 
-    return i;
+    врати i;
 }
 
 
 template <>
-int finiteMaskSIMD_<double, 1>(const double *dsrc, uchar *dst, size_t utotal)
+цео finiteMaskSIMD_<double, 1>(const double *dsrc, uchar *dst, size_t utotal)
 {
     const uint64_t* src = (const uint64_t*)dsrc;
-    const int size8 = VTraits<v_uint8>::vlanes();
-    int i = 0;
-    int total = (int)utotal;
+    const цео size8 = VTraits<v_uint8>::vlanes();
+    цео i = 0;
+    цео total = (цео)utotal;
 
     v_uint64 vmaskExp = vx_setall_u64(0x7ff0000000000000);
     v_uint64 z = vx_setzero_u64();
 
-    for(; i < total - (size8 / 2) + 1; i += (size8 / 2) )
+    за(; i < total - (size8 / 2) + 1; i += (size8 / 2) )
     {
         v_uint64 vv0, vv1, vv2, vv3;
         vv0 = v_ne(v_and(vx_load(src + i                ), vmaskExp), vmaskExp);
@@ -277,21 +277,21 @@ int finiteMaskSIMD_<double, 1>(const double *dsrc, uchar *dst, size_t utotal)
         v_store_low(dst + i, v);
     }
 
-    return i;
+    врати i;
 }
 
 template <>
-int finiteMaskSIMD_<double, 2>(const double *dsrc, uchar *dst, size_t utotal)
+цео finiteMaskSIMD_<double, 2>(const double *dsrc, uchar *dst, size_t utotal)
 {
     const uint64_t* src = (const uint64_t*)dsrc;
-    const int npixels = VTraits<v_uint8>::vlanes() / 2;
-    const int ndoubles = VTraits<v_uint64>::vlanes();
+    const цео npixels = VTraits<v_uint8>::vlanes() / 2;
+    const цео ndoubles = VTraits<v_uint64>::vlanes();
     v_uint64 vmaskExp = vx_setall_u64(0x7ff0000000000000);
     v_uint16 vmaskBoth = vx_setall_u16(0xffff);
 
-    int i = 0;
-    int total = (int)utotal;
-    for(; i < total - npixels + 1; i += npixels )
+    цео i = 0;
+    цео total = (цео)utotal;
+    за(; i < total - npixels + 1; i += npixels )
     {
         v_uint64 vv0 = v_ne(v_and(vx_load(src + i*2 + 0*ndoubles), vmaskExp), vmaskExp);
         v_uint64 vv1 = v_ne(v_and(vx_load(src + i*2 + 1*ndoubles), vmaskExp), vmaskExp);
@@ -311,24 +311,24 @@ int finiteMaskSIMD_<double, 2>(const double *dsrc, uchar *dst, size_t utotal)
         v_store_low(dst + i, vres);
     }
 
-    return i;
+    врати i;
 }
 
 
 template <>
-int finiteMaskSIMD_<double, 3>(const double *dsrc, uchar *dst, size_t utotal)
+цео finiteMaskSIMD_<double, 3>(const double *dsrc, uchar *dst, size_t utotal)
 {
     //TODO: vectorize it properly
 
     const uint64_t* src = (const uint64_t*)dsrc;
-    const int npixels = VTraits<v_uint8>::vlanes() / 2;
+    const цео npixels = VTraits<v_uint8>::vlanes() / 2;
     uint64_t maskExp = 0x7ff0000000000000;
 
-    int i = 0;
-    int total = (int)utotal;
-    for(; i < total - npixels + 1; i += npixels )
+    цео i = 0;
+    цео total = (цео)utotal;
+    за(; i < total - npixels + 1; i += npixels )
     {
-        for (int j = 0; j < npixels; j++)
+        за (цео j = 0; j < npixels; j++)
         {
             uint64_t val0 = src[i * 3 + j * 3 + 0];
             uint64_t val1 = src[i * 3 + j * 3 + 1];
@@ -342,23 +342,23 @@ int finiteMaskSIMD_<double, 3>(const double *dsrc, uchar *dst, size_t utotal)
         }
     }
 
-    return i;
+    врати i;
 }
 
 template <>
-int finiteMaskSIMD_<double, 4>(const double *dsrc, uchar *dst, size_t utotal)
+цео finiteMaskSIMD_<double, 4>(const double *dsrc, uchar *dst, size_t utotal)
 {
     //TODO: vectorize it properly
 
     uint64_t* src = (uint64_t*)dsrc;
-    const int npixels = VTraits<v_uint8>::vlanes() / 2;
-    const int ndoubles = VTraits<v_uint64>::vlanes();
+    const цео npixels = VTraits<v_uint8>::vlanes() / 2;
+    const цео ndoubles = VTraits<v_uint64>::vlanes();
     v_uint16 vmaskExp16 = vx_setall_u16(0x7ff0);
     v_uint32 z = vx_setzero_u32();
 
-    int i = 0;
-    int total = (int)utotal;
-    for(; i < total - npixels + 1; i += npixels )
+    цео i = 0;
+    цео total = (цео)utotal;
+    за(; i < total - npixels + 1; i += npixels )
     {
         v_uint16 vexpb0, vexpb1, vexpb2, vexpb3;
         v_uint16 dummy;
@@ -388,27 +388,27 @@ int finiteMaskSIMD_<double, 4>(const double *dsrc, uchar *dst, size_t utotal)
         dst += npixels;
     }
 
-    return i;
+    врати i;
 }
 
 #endif
 
 
-template <typename _Tp, int cn>
+template <typename _Tp, цео cn>
 void finiteMask_(const uchar *src, uchar *dst, size_t total)
 {
     CV_INSTRUMENT_REGION();
     size_t i = 0;
     const _Tp* tsrc = (const _Tp*) src;
 
-#if (CV_SIMD || CV_SIMD_SCALABLE)
+#ако (CV_SIMD || CV_SIMD_SCALABLE)
     i = finiteMaskSIMD_<_Tp, cn>(tsrc, dst, total);
 #endif
 
-    for(; i < total; i++ )
+    за(; i < total; i++ )
     {
         bool finite = true;
-        for (int c = 0; c < cn; c++)
+        за (цео c = 0; c < cn; c++)
         {
             _Tp val = tsrc[i * cn + c];
             finite = finite && !cvIsNaN(val) && !cvIsInf(val);
@@ -417,7 +417,7 @@ void finiteMask_(const uchar *src, uchar *dst, size_t total)
     }
 }
 
-FiniteMaskFunc getFiniteMaskFunc(bool isDouble, int cn)
+FiniteMaskFunc getFiniteMaskFunc(bool isDouble, цео cn)
 {
     static FiniteMaskFunc tab[CV_DEPTH_MAX] =
     {
@@ -431,8 +431,8 @@ FiniteMaskFunc getFiniteMaskFunc(bool isDouble, int cn)
         finiteMask_<double, 4>,
     };
 
-    int idx = (isDouble ? 4 : 0) + cn - 1;
-    return tab[idx];
+    цео idx = (isDouble ? 4 : 0) + cn - 1;
+    врати tab[idx];
 }
 
 #endif

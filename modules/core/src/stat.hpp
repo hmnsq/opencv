@@ -13,30 +13,30 @@ namespace cv {
 #ifdef HAVE_OPENCL
 
 enum { OCL_OP_SUM = 0, OCL_OP_SUM_ABS =  1, OCL_OP_SUM_SQR = 2 };
-bool ocl_sum( InputArray _src, Scalar & res, int sum_op, InputArray _mask = noArray(),
+bool ocl_sum( InputArray _src, Scalar & res, цео sum_op, InputArray _mask = noArray(),
                      InputArray _src2 = noArray(), bool calc2 = false, const Scalar & res2 = Scalar() );
-bool ocl_minMaxIdx( InputArray _src, double* minVal, double* maxVal, int* minLoc, int* maxLoc, InputArray _mask,
-                           int ddepth = -1, bool absValues = false, InputArray _src2 = noArray(), double * maxVal2 = NULL);
+bool ocl_minMaxIdx( InputArray _src, double* minVal, double* maxVal, цео* minLoc, цео* maxLoc, InputArray _mask,
+                           цео ddepth = -1, bool absValues = false, InputArray _src2 = noArray(), double * maxVal2 = NULL);
 
 template <typename T> Scalar ocl_part_sum(Mat m)
 {
     CV_Assert(m.rows == 1);
 
     Scalar s = Scalar::all(0);
-    int cn = m.channels();
+    цео cn = m.channels();
     const T * const ptr = m.ptr<T>(0);
 
-    for (int x = 0, w = m.cols * cn; x < w; )
-        for (int c = 0; c < cn; ++c, ++x)
+    за (цео x = 0, w = m.cols * cn; x < w; )
+        за (цео c = 0; c < cn; ++c, ++x)
             s[c] += ptr[x];
 
-    return s;
+    врати s;
 }
 
 #endif
 
-typedef int (*SumFunc)(const uchar*, const uchar* mask, uchar*, int, int);
-SumFunc getSumFunc(int depth);
+typedef цео (*SumFunc)(const uchar*, const uchar* mask, uchar*, цео, цео);
+SumFunc getSumFunc(цео depth);
 
 }
 

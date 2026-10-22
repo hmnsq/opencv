@@ -23,41 +23,41 @@ public:
     virtual ~YAMLEmitter() {}
 
     FStructData startWriteStruct(const FStructData& parent, const char* key,
-                                 int struct_flags, const char* type_name=0)
+                                 цео struct_flags, const char* type_name=0)
     {
         char buf[CV_FS_MAX_LEN + 1024];
         const char* data = 0;
 
-        if ( type_name && *type_name == '\0' )
+        ако ( type_name && *type_name == '\0' )
             type_name = 0;
 
         struct_flags = (struct_flags & (FileNode::TYPE_MASK|FileNode::FLOW)) | FileNode::EMPTY;
-        if( !FileNode::isCollection(struct_flags))
+        ако( !FileNode::isCollection(struct_flags))
             CV_Error( cv::Error::StsBadArg,
                      "Some collection type - FileNode::SEQ or FileNode::MAP, must be specified" );
 
-        if (type_name && memcmp(type_name, "binary", 6) == 0)
+        ако (type_name && memcmp(type_name, "binary", 6) == 0)
         {
             /* reset struct flag. in order not to print ']' */
             struct_flags = FileNode::SEQ;
             snprintf(buf, sizeof(buf), "!!binary |");
             data = buf;
         }
-        else if( FileNode::isFlow(struct_flags))
+        инако ако( FileNode::isFlow(struct_flags))
         {
             char c = FileNode::isMap(struct_flags) ? '{' : '[';
             struct_flags |= FileNode::FLOW;
 
-            if( type_name )
+            ако( type_name )
                 snprintf( buf, sizeof(buf), "!!%s %c", type_name, c );
-            else
+            инако
             {
                 buf[0] = c;
                 buf[1] = '\0';
             }
             data = buf;
         }
-        else if( type_name )
+        инако ако( type_name )
         {
             snprintf( buf, sizeof(buf), "!!%s", type_name );
             data = buf;
@@ -69,27 +69,27 @@ public:
         fsd.indent = parent.indent;
         fsd.flags = struct_flags;
 
-        if( !FileNode::isFlow(parent.flags) )
+        ако( !FileNode::isFlow(parent.flags) )
             fsd.indent += CV_YML_INDENT + FileNode::isFlow(struct_flags);
 
-        return fsd;
+        врати fsd;
     }
 
     void endWriteStruct(const FStructData& current_struct)
     {
         char* ptr;
 
-        int struct_flags = current_struct.flags;
+        цео struct_flags = current_struct.flags;
 
-        if( FileNode::isFlow(struct_flags) )
+        ако( FileNode::isFlow(struct_flags) )
         {
             ptr = fs->bufferPtr();
-            if( ptr > fs->bufferStart() + current_struct.indent && !FileNode::isEmptyCollection(struct_flags) )
+            ако( ptr > fs->bufferStart() + current_struct.indent && !FileNode::isEmptyCollection(struct_flags) )
                 *ptr++ = ' ';
             *ptr++ = FileNode::isMap(struct_flags) ? '}' : ']';
             fs->setBufferPtr(ptr);
         }
-        else if( FileNode::isEmptyCollection(struct_flags) )
+        инако ако( FileNode::isEmptyCollection(struct_flags) )
         {
             ptr = fs->flush();
             memcpy( ptr, FileNode::isMap(struct_flags) ? "{}" : "[]", 2 );
@@ -101,7 +101,7 @@ public:
         CV_Assert( fs->struct_indent >= 0 );*/
     }
 
-    void write(const char* key, int value)
+    void write(const char* key, цео value)
     {
         char buf[128];
         writeScalar( key, fs::itoa( value, buf, 10 ));
@@ -123,53 +123,53 @@ public:
     {
         char buf[CV_FS_MAX_LEN*4+16];
         char* data = (char*)str;
-        int i, len;
+        цео i, len;
 
-        if( !str )
+        ако( !str )
             CV_Error( cv::Error::StsNullPtr, "Null string pointer" );
 
-        len = (int)strlen(str);
-        if( len > CV_FS_MAX_LEN )
+        len = (цео)strlen(str);
+        ако( len > CV_FS_MAX_LEN )
             CV_Error( cv::Error::StsBadArg, "The written string is too long" );
 
-        if( quote || len == 0 || str[0] != str[len-1] || (str[0] != '\"' && str[0] != '\'') )
+        ако( quote || len == 0 || str[0] != str[len-1] || (str[0] != '\"' && str[0] != '\'') )
         {
-            int need_quote = quote || len == 0 || str[0] == ' ';
+            цео need_quote = quote || len == 0 || str[0] == ' ';
             data = buf;
             *data++ = '\"';
-            for( i = 0; i < len; i++ )
+            за( i = 0; i < len; i++ )
             {
                 char c = str[i];
 
-                if( !need_quote && !cv_isalnum(c) && c != '_' && c != ' ' && c != '-' &&
+                ако( !need_quote && !cv_isalnum(c) && c != '_' && c != ' ' && c != '-' &&
                    c != '(' && c != ')' && c != '/' && c != '+' && c != ';' )
                     need_quote = 1;
 
-                if( !cv_isalnum(c) && (!cv_isprint(c) || c == '\\' || c == '\'' || c == '\"') )
+                ако( !cv_isalnum(c) && (!cv_isprint(c) || c == '\\' || c == '\'' || c == '\"') )
                 {
                     *data++ = '\\';
-                    if( cv_isprint(c) )
+                    ако( cv_isprint(c) )
                         *data++ = c;
-                    else if( c == '\n' )
+                    инако ако( c == '\n' )
                         *data++ = 'n';
-                    else if( c == '\r' )
+                    инако ако( c == '\r' )
                         *data++ = 'r';
-                    else if( c == '\t' )
+                    инако ако( c == '\t' )
                         *data++ = 't';
-                    else
+                    инако
                     {
                         snprintf( data, sizeof(buf) - (data - buf), "x%02x", c );
                         data += 3;
                     }
                 }
-                else
+                инако
                     *data++ = c;
             }
-            if( !need_quote && (cv_isdigit(str[0]) ||
+            ако( !need_quote && (cv_isdigit(str[0]) ||
                                 str[0] == '+' || str[0] == '-' || str[0] == '.' ))
                 need_quote = 1;
 
-            if( need_quote )
+            ако( need_quote )
                 *data++ = '\"';
             *data++ = '\0';
             data = buf + !need_quote;
@@ -181,99 +181,99 @@ public:
     void writeScalar(const char* key, const char* data)
     {
         fs->check_if_write_struct_is_delayed(false);
-        if ( fs->get_state_of_writing_base64() == FileStorage_API::Uncertain )
+        ако ( fs->get_state_of_writing_base64() == FileStorage_API::Uncertain )
         {
             fs->switch_to_Base64_state( FileStorage_API::NotUse );
         }
-        else if ( fs->get_state_of_writing_base64() == FileStorage_API::InUse )
+        инако ако ( fs->get_state_of_writing_base64() == FileStorage_API::InUse )
         {
             CV_Error( cv::Error::StsError, "At present, output Base64 data only." );
         }
 
-        int i, keylen = 0;
-        int datalen = 0;
+        цео i, keylen = 0;
+        цео datalen = 0;
         char* ptr;
 
         FStructData& current_struct = fs->getCurrentStruct();
 
-        int struct_flags = current_struct.flags;
+        цео struct_flags = current_struct.flags;
 
-        if( key && key[0] == '\0' )
+        ако( key && key[0] == '\0' )
             key = 0;
 
-        if( FileNode::isCollection(struct_flags) )
+        ако( FileNode::isCollection(struct_flags) )
         {
-            if( (FileNode::isMap(struct_flags) ^ (key != 0)) )
+            ако( (FileNode::isMap(struct_flags) ^ (key != 0)) )
                 CV_Error( cv::Error::StsBadArg, "An attempt to add element without a key to a map, "
                          "or add element with key to sequence" );
         }
-        else
+        инако
         {
             fs->setNonEmpty();
             struct_flags = FileNode::EMPTY | (key ? FileNode::MAP : FileNode::SEQ);
         }
 
-        if( key )
+        ако( key )
         {
-            keylen = (int)strlen(key);
-            if( keylen == 0 )
+            keylen = (цео)strlen(key);
+            ако( keylen == 0 )
                 CV_Error( cv::Error::StsBadArg, "The key is an empty" );
 
-            if( keylen > CV_FS_MAX_LEN )
+            ако( keylen > CV_FS_MAX_LEN )
                 CV_Error( cv::Error::StsBadArg, "The key is too long" );
         }
 
-        if( data )
-            datalen = (int)strlen(data);
+        ако( data )
+            datalen = (цео)strlen(data);
 
-        if( FileNode::isFlow(struct_flags) )
+        ако( FileNode::isFlow(struct_flags) )
         {
             ptr = fs->bufferPtr();
-            if( !FileNode::isEmptyCollection(struct_flags) )
+            ако( !FileNode::isEmptyCollection(struct_flags) )
                 *ptr++ = ',';
-            int new_offset = (int)(ptr - fs->bufferStart()) + keylen + datalen;
-            if( new_offset > fs->wrapMargin() && new_offset - current_struct.indent > 10 )
+            цео new_offset = (цео)(ptr - fs->bufferStart()) + keylen + datalen;
+            ако( new_offset > fs->wrapMargin() && new_offset - current_struct.indent > 10 )
             {
                 fs->setBufferPtr(ptr);
                 ptr = fs->flush();
             }
-            else
+            инако
                 *ptr++ = ' ';
         }
-        else
+        инако
         {
             ptr = fs->flush();
-            if( !FileNode::isMap(struct_flags) )
+            ако( !FileNode::isMap(struct_flags) )
             {
                 *ptr++ = '-';
-                if( data )
+                ако( data )
                     *ptr++ = ' ';
             }
         }
 
-        if( key )
+        ако( key )
         {
-            if( !cv_isalpha(key[0]) && key[0] != '_' )
+            ако( !cv_isalpha(key[0]) && key[0] != '_' )
                 CV_Error( cv::Error::StsBadArg, "Key must start with a letter or _" );
 
             ptr = fs->resizeWriteBuffer( ptr, keylen );
 
-            for( i = 0; i < keylen; i++ )
+            за( i = 0; i < keylen; i++ )
             {
                 char c = key[i];
 
                 ptr[i] = c;
-                if( !cv_isalnum(c) && c != '-' && c != '_' && c != ' ' )
+                ако( !cv_isalnum(c) && c != '-' && c != '_' && c != ' ' )
                     CV_Error( cv::Error::StsBadArg, "Key names may only contain alphanumeric characters [a-zA-Z0-9], '-', '_' and ' '" );
             }
 
             ptr += keylen;
             *ptr++ = ':';
-            if( !FileNode::isFlow(struct_flags) && data )
+            ако( !FileNode::isFlow(struct_flags) && data )
                 *ptr++ = ' ';
         }
 
-        if( data )
+        ако( data )
         {
             ptr = fs->resizeWriteBuffer( ptr, datalen );
             memcpy( ptr, data, datalen );
@@ -286,35 +286,35 @@ public:
 
     void writeComment(const char* comment, bool eol_comment)
     {
-        if( !comment )
+        ако( !comment )
             CV_Error( cv::Error::StsNullPtr, "Null comment" );
 
-        int len = (int)strlen(comment);
+        цео len = (цео)strlen(comment);
         const char* eol = strchr(comment, '\n');
         bool multiline = eol != 0;
         char* ptr = fs->bufferPtr();
 
-        if( !eol_comment || multiline ||
+        ако( !eol_comment || multiline ||
             fs->bufferEnd() - ptr < len || ptr == fs->bufferStart() )
             ptr = fs->flush();
-        else
+        инако
             *ptr++ = ' ';
 
-        while( comment )
+        док( comment )
         {
             *ptr++ = '#';
             *ptr++ = ' ';
-            if( eol )
+            ако( eol )
             {
-                ptr = fs->resizeWriteBuffer( ptr, (int)(eol - comment) + 1 );
+                ptr = fs->resizeWriteBuffer( ptr, (цео)(eol - comment) + 1 );
                 memcpy( ptr, comment, eol - comment + 1 );
                 fs->setBufferPtr(ptr + (eol - comment));
                 comment = eol + 1;
                 eol = strchr( comment, '\n' );
             }
-            else
+            инако
             {
-                len = (int)strlen(comment);
+                len = (цео)strlen(comment);
                 ptr = fs->resizeWriteBuffer( ptr, len );
                 memcpy( ptr, comment, len );
                 fs->setBufferPtr(ptr + len);
@@ -344,31 +344,31 @@ public:
 
     virtual ~YAMLParser() {}
 
-    char* skipSpaces( char* ptr, int min_indent, int max_comment_indent )
+    char* skipSpaces( char* ptr, цео min_indent, цео max_comment_indent )
     {
-        if (!ptr)
+        ако (!ptr)
             CV_PARSE_ERROR_CPP("Invalid input");
 
-        for(;;)
+        за(;;)
         {
-            while( *ptr == ' ' )
+            док( *ptr == ' ' )
                 ptr++;
-            if( *ptr == '#' )
+            ако( *ptr == '#' )
             {
-                if( ptr - fs->bufferStart() > max_comment_indent )
-                    return ptr;
+                ако( ptr - fs->bufferStart() > max_comment_indent )
+                    врати ptr;
                 *ptr = '\0';
             }
-            else if( cv_isprint(*ptr) )
+            инако ако( cv_isprint(*ptr) )
             {
-                if( ptr - fs->bufferStart() < min_indent )
+                ако( ptr - fs->bufferStart() < min_indent )
                     CV_PARSE_ERROR_CPP( "Incorrect indentation" );
                 break;
             }
-            else if( *ptr == '\0' || *ptr == '\n' || *ptr == '\r' )
+            инако ако( *ptr == '\0' || *ptr == '\n' || *ptr == '\r' )
             {
                 ptr = fs->gets();
-                if( !ptr )
+                ако( !ptr )
                 {
                     // emulate end of stream
                     ptr = fs->bufferStart();
@@ -377,99 +377,99 @@ public:
                     fs->setEof();
                     break;
                 }
-                else
+                инако
                 {
-                    int l = (int)strlen(ptr);
-                    if( ptr[l-1] != '\n' && ptr[l-1] != '\r' && !fs->eof() )
+                    цео l = (цео)strlen(ptr);
+                    ако( ptr[l-1] != '\n' && ptr[l-1] != '\r' && !fs->eof() )
                         CV_PARSE_ERROR_CPP( "Too long string or a last string w/o newline" );
                 }
             }
-            else
+            инако
                 CV_PARSE_ERROR_CPP( *ptr == '\t' ? "Tabs are prohibited in YAML!" : "Invalid character" );
         }
 
-        return ptr;
+        врати ptr;
     }
 
-    bool getBase64Row(char* ptr, int indent, char* &beg, char* &end)
+    bool getBase64Row(char* ptr, цео indent, char* &beg, char* &end)
     {
-        if (!ptr)
+        ако (!ptr)
             CV_PARSE_ERROR_CPP("Invalid input");
 
         beg = end = ptr = skipSpaces(ptr, 0, INT_MAX);
-        if (!ptr || !*ptr)
-            return false; // end of file
+        ако (!ptr || !*ptr)
+            врати false; // end of file
 
-        if (ptr - fs->bufferStart() != indent)
-            return false; // end of base64 data
+        ако (ptr - fs->bufferStart() != indent)
+            врати false; // end of base64 data
 
         /* find end */
-        while(cv_isprint(*ptr)) /* no check for base64 string */
+        док(cv_isprint(*ptr)) /* no check for base64 string */
             ++ptr;
-        if (*ptr == '\0')
+        ако (*ptr == '\0')
             CV_PARSE_ERROR_CPP("Unexpected end of line");
 
         end = ptr;
-        return true;
+        врати true;
     }
 
 
     char* parseKey( char* ptr, FileNode& map_node, FileNode& value_placeholder )
     {
-        if (!ptr)
+        ако (!ptr)
             CV_PARSE_ERROR_CPP("Invalid input");
 
         char c;
         char *endptr = ptr - 1, *saveptr;
 
-        if( *ptr == '-' )
+        ако( *ptr == '-' )
             CV_PARSE_ERROR_CPP( "Key may not start with \'-\'" );
 
         do c = *++endptr;
-        while( cv_isprint(c) && c != ':' );
+        док( cv_isprint(c) && c != ':' );
 
-        if( c != ':' )
+        ако( c != ':' )
             CV_PARSE_ERROR_CPP( "Missing \':\'" );
 
         saveptr = endptr + 1;
-        if( endptr == ptr )
+        ако( endptr == ptr )
             CV_PARSE_ERROR_CPP( "An empty key" );
 
         do c = *--endptr;
-        while( c == ' ' );
+        док( c == ' ' );
 
         ++endptr;
 
         value_placeholder = fs->addNode(map_node, std::string(ptr, endptr - ptr), FileNode::NONE);
         ptr = saveptr;
 
-        return ptr;
+        врати ptr;
     }
 
-    char* parseValue( char* ptr, FileNode& node, int min_indent, bool is_parent_flow, int depth = 0 )
+    char* parseValue( char* ptr, FileNode& node, цео min_indent, bool is_parent_flow, цео depth = 0 )
     {
-        if (!ptr)
+        ако (!ptr)
             CV_PARSE_ERROR_CPP("Invalid input");
 
-        if( depth > CV_PERSISTENCE_MAX_DEPTH )
+        ако( depth > CV_PERSISTENCE_MAX_DEPTH )
             CV_PARSE_ERROR_CPP("Too many nested collections");
 
         char* endptr = 0;
         char c = ptr[0], d = ptr[1];
-        int value_type = FileNode::NONE;
-        int len;
+        цео value_type = FileNode::NONE;
+        цео len;
         bool is_binary_string = false;
         bool is_user = false;
 
-        if( c == '!' ) // handle explicit type specification
+        ако( c == '!' ) // handle explicit type specification
         {
-            if( d == '!' || d == '^' )
+            ако( d == '!' || d == '^' )
             {
                 ptr++;
                 is_user = true;
                 //value_type |= FileNode::USER;
             }
-            if ( d == '<') //support of full type heading from YAML 1.2
+            ако ( d == '<') //support of full type heading from YAML 1.2
             {
                 const char* yamlTypeHeading = "<tag:yaml.org,2002:";
                 const size_t headingLength = strlen(yamlTypeHeading);
@@ -477,11 +477,11 @@ public:
                 char* typeEndPtr = ++ptr;
 
                 do d = *++typeEndPtr;
-                while( cv_isprint(d) && d != ' ' && d != '>' );
+                док( cv_isprint(d) && d != ' ' && d != '>' );
 
-                if ( d == '>' && (size_t)(typeEndPtr - ptr) > headingLength )
+                ако ( d == '>' && (size_t)(typeEndPtr - ptr) > headingLength )
                 {
-                    if ( memcmp(ptr, yamlTypeHeading, headingLength) == 0 )
+                    ако ( memcmp(ptr, yamlTypeHeading, headingLength) == 0 )
                     {
                         *typeEndPtr = ' ';
                         ptr += headingLength - 1;
@@ -493,32 +493,32 @@ public:
 
             endptr = ptr++;
             do d = *++endptr;
-            while( cv_isprint(d) && d != ' ' );
-            len = (int)(endptr - ptr);
-            if( len == 0 )
+            док( cv_isprint(d) && d != ' ' );
+            len = (цео)(endptr - ptr);
+            ако( len == 0 )
                 CV_PARSE_ERROR_CPP( "Empty type name" );
             d = *endptr;
             *endptr = '\0';
 
-            if( len == 3 && !is_user )
+            ако( len == 3 && !is_user )
             {
-                if( memcmp( ptr, "str", 3 ) == 0 )
+                ако( memcmp( ptr, "str", 3 ) == 0 )
                     value_type = FileNode::STRING;
-                else if( memcmp( ptr, "int", 3 ) == 0 )
+                инако ако( memcmp( ptr, "int", 3 ) == 0 )
                     value_type = FileNode::INT;
-                else if( memcmp( ptr, "seq", 3 ) == 0 )
+                инако ако( memcmp( ptr, "seq", 3 ) == 0 )
                     value_type = FileNode::SEQ;
-                else if( memcmp( ptr, "map", 3 ) == 0 )
+                инако ако( memcmp( ptr, "map", 3 ) == 0 )
                     value_type = FileNode::MAP;
             }
-            else if( len == 5 && !is_user )
+            инако ако( len == 5 && !is_user )
             {
-                if( memcmp( ptr, "float", 5 ) == 0 )
+                ако( memcmp( ptr, "float", 5 ) == 0 )
                     value_type = FileNode::REAL;
             }
-            else if (len == 6 && is_user)
+            инако ако (len == 6 && is_user)
             {
-                if( memcmp( ptr, "binary", 6 ) == 0 ) {
+                ако( memcmp( ptr, "binary", 6 ) == 0 ) {
                     value_type = FileNode::SEQ;
                     is_binary_string = true;
 
@@ -529,9 +529,9 @@ public:
 
                     do {
                         d = *++endptr;
-                        if (d == '|')
+                        ако (d == '|')
                             break;
-                    } while (d == ' ');
+                    } док (d == ' ');
 
                     d = *++endptr;
                     *endptr = '\0';
@@ -540,161 +540,161 @@ public:
 
             *endptr = d;
             ptr = skipSpaces( endptr, min_indent, INT_MAX );
-            if (!ptr)
+            ако (!ptr)
                 CV_PARSE_ERROR_CPP("Invalid input");
 
             c = *ptr;
 
-            if( !is_user )
+            ако( !is_user )
             {
-                if (value_type == FileNode::STRING && c != '\'' && c != '\"')
+                ако (value_type == FileNode::STRING && c != '\'' && c != '\"')
                     goto force_string;
-                if( value_type == FileNode::INT )
+                ако( value_type == FileNode::INT )
                     goto force_int;
-                if( value_type == FileNode::REAL )
+                ако( value_type == FileNode::REAL )
                     goto force_real;
             }
         }
 
-        if (is_binary_string)
+        ако (is_binary_string)
         {
-            int indent = static_cast<int>(ptr - fs->bufferStart());
+            цео indent = static_cast<цео>(ptr - fs->bufferStart());
             ptr = fs->parseBase64(ptr, indent, node);
         }
-        else if( cv_isdigit(c) ||
+        инако ако( cv_isdigit(c) ||
                 ((c == '-' || c == '+') && (cv_isdigit(d) || d == '.')) ||
                 (c == '.' && cv_isalnum(d))) // a number
         {
             endptr = ptr + (c == '-' || c == '+');
-            while( cv_isdigit(*endptr) )
+            док( cv_isdigit(*endptr) )
                 endptr++;
-            if( *endptr == '.' || *endptr == 'e' )
+            ако( *endptr == '.' || *endptr == 'e' )
             {
             force_real:
                 double fval = fs->strtod( ptr, &endptr );
                 node.setValue(FileNode::REAL, &fval);
             }
-            else
+            инако
             {
             force_int:
                 int64_t ival = strtoll( ptr, &endptr, 0 );
                 node.setValue(FileNode::INT, &ival);
             }
 
-            if( !endptr || endptr == ptr )
+            ако( !endptr || endptr == ptr )
                 CV_PARSE_ERROR_CPP( "Invalid numeric value (inconsistent explicit type specification?)" );
 
             ptr = endptr;
             CV_PERSISTENCE_CHECK_END_OF_BUFFER_BUG_CPP();
         }
-        else if( c == '\'' || c == '\"' ) // an explicit string
+        инако ако( c == '\'' || c == '\"' ) // an explicit string
         {
-            if( c == '\'' )
-                for( len = 0; len < CV_FS_MAX_LEN; )
+            ако( c == '\'' )
+                за( len = 0; len < CV_FS_MAX_LEN; )
                 {
                     c = *++ptr;
-                    if( cv_isalnum(c) || (c != '\'' && cv_isprint(c)))
+                    ако( cv_isalnum(c) || (c != '\'' && cv_isprint(c)))
                         buf[len++] = c;
-                    else if( c == '\'' )
+                    инако ако( c == '\'' )
                     {
                         c = *++ptr;
-                        if( c != '\'' )
+                        ако( c != '\'' )
                             break;
                         buf[len++] = c;
                     }
-                    else
+                    инако
                         CV_PARSE_ERROR_CPP( "Invalid character" );
                 }
-            else
-                for( len = 0; len < CV_FS_MAX_LEN; )
+            инако
+                за( len = 0; len < CV_FS_MAX_LEN; )
                 {
                     c = *++ptr;
-                    if( cv_isalnum(c) || (c != '\\' && c != '\"' && cv_isprint(c)))
+                    ако( cv_isalnum(c) || (c != '\\' && c != '\"' && cv_isprint(c)))
                         buf[len++] = c;
-                    else if( c == '\"' )
+                    инако ако( c == '\"' )
                     {
                         ++ptr;
                         break;
                     }
-                    else if( c == '\\' )
+                    инако ако( c == '\\' )
                     {
                         d = *++ptr;
-                        if( d == '\'' )
+                        ако( d == '\'' )
                             buf[len++] = d;
-                        else if( d == '\"' || d == '\\' || d == '\'' )
+                        инако ако( d == '\"' || d == '\\' || d == '\'' )
                             buf[len++] = d;
-                        else if( d == 'n' )
+                        инако ако( d == 'n' )
                             buf[len++] = '\n';
-                        else if( d == 'r' )
+                        инако ако( d == 'r' )
                             buf[len++] = '\r';
-                        else if( d == 't' )
+                        инако ако( d == 't' )
                             buf[len++] = '\t';
-                        else if( d == 'x' || (cv_isdigit(d) && d < '8') )
+                        инако ако( d == 'x' || (cv_isdigit(d) && d < '8') )
                         {
-                            int val, is_hex = d == 'x';
+                            цео val, is_hex = d == 'x';
                             c = ptr[3];
                             ptr[3] = '\0';
-                            val = (int)strtol( ptr + is_hex, &endptr, is_hex ? 8 : 16 );
+                            val = (цео)strtol( ptr + is_hex, &endptr, is_hex ? 8 : 16 );
                             ptr[3] = c;
-                            if( endptr == ptr + is_hex )
+                            ако( endptr == ptr + is_hex )
                                 buf[len++] = 'x';
-                            else
+                            инако
                             {
                                 buf[len++] = (char)val;
                                 ptr = endptr;
                             }
                         }
                     }
-                    else
+                    инако
                         CV_PARSE_ERROR_CPP( "Invalid character" );
                 }
 
-            if( len >= CV_FS_MAX_LEN )
+            ако( len >= CV_FS_MAX_LEN )
                 CV_PARSE_ERROR_CPP( "Too long string literal" );
 
             node.setValue(FileNode::STRING, buf, len);
         }
-        else if( c == '[' || c == '{' ) // collection as a flow
+        инако ако( c == '[' || c == '{' ) // collection as a flow
         {
-            int new_min_indent = min_indent + !is_parent_flow;
-            int struct_type = c == '{' ? FileNode::MAP : FileNode::SEQ;
-            int nelems = 0;
+            цео new_min_indent = min_indent + !is_parent_flow;
+            цео struct_type = c == '{' ? FileNode::MAP : FileNode::SEQ;
+            цео nelems = 0;
 
             fs->convertToCollection(struct_type, node);
             d = c == '[' ? ']' : '}';
 
-            for( ++ptr ;; nelems++ )
+            за( ++ptr ;; nelems++ )
             {
                 FileNode elem;
 
                 ptr = skipSpaces( ptr, new_min_indent, INT_MAX );
-                if (!ptr)
+                ако (!ptr)
                     CV_PARSE_ERROR_CPP("Invalid input");
-                if( *ptr == '}' || *ptr == ']' )
+                ако( *ptr == '}' || *ptr == ']' )
                 {
-                    if( *ptr != d )
+                    ако( *ptr != d )
                         CV_PARSE_ERROR_CPP( "The wrong closing bracket" );
                     ptr++;
                     break;
                 }
 
-                if( nelems != 0 )
+                ако( nelems != 0 )
                 {
-                    if( *ptr != ',' )
+                    ако( *ptr != ',' )
                         CV_PARSE_ERROR_CPP( "Missing , between the elements" );
                     ptr = skipSpaces( ptr + 1, new_min_indent, INT_MAX );
-                    if (!ptr)
+                    ако (!ptr)
                         CV_PARSE_ERROR_CPP("Invalid input");
                 }
 
-                if( struct_type == FileNode::MAP )
+                ако( struct_type == FileNode::MAP )
                 {
                     ptr = parseKey( ptr, node, elem );
                     ptr = skipSpaces( ptr, new_min_indent, INT_MAX );
                 }
-                else
+                инако
                 {
-                    if( *ptr == ']' )
+                    ако( *ptr == ']' )
                         break;
                     elem = fs->addNode(node, std::string(), FileNode::NONE);
                 }
@@ -702,18 +702,18 @@ public:
             }
             fs->finalizeCollection(node);
         }
-        else
+        инако
         {
-            int indent, struct_type;
+            цео indent, struct_type;
 
-            if( is_parent_flow || c != '-' )
+            ако( is_parent_flow || c != '-' )
             {
                 // implicit (one-line) string or nested block-style collection
-                if( !is_parent_flow )
+                ако( !is_parent_flow )
                 {
-                    if( c == '?' )
+                    ако( c == '?' )
                         CV_PARSE_ERROR_CPP( "Complex keys are not supported" );
-                    if( c == '|' || c == '>' )
+                    ако( c == '|' || c == '>' )
                         CV_PARSE_ERROR_CPP( "Multi-line text literals are not supported" );
                 }
 
@@ -721,64 +721,64 @@ public:
                 endptr = ptr - 1;
 
                 do c = *++endptr;
-                while( cv_isprint(c) &&
+                док( cv_isprint(c) &&
                       (!is_parent_flow || (c != ',' && c != '}' && c != ']')) &&
                       (is_parent_flow || c != ':' || value_type == FileNode::STRING));
 
-                if( endptr == ptr )
+                ако( endptr == ptr )
                     CV_PARSE_ERROR_CPP( "Invalid character" );
 
-                if( is_parent_flow || c != ':' )
+                ако( is_parent_flow || c != ':' )
                 {
                     char* str_end = endptr;
                     do c = *--str_end;
-                    while( str_end > ptr && c == ' ' );
+                    док( str_end > ptr && c == ' ' );
                     str_end++;
-                    if ((fs->getFormat() & FileStorage::FORMAT_MASK) != FileStorage::FORMAT_YAML_1_0)
+                    ако ((fs->getFormat() & FileStorage::FORMAT_MASK) != FileStorage::FORMAT_YAML_1_0)
                     {
                         size_t llen = str_end - ptr;
-                        if (llen == 4 && memcmp(ptr, "true", 4) == 0) {
+                        ако (llen == 4 && memcmp(ptr, "true", 4) == 0) {
                             int64_t ival = 1;
                             node.setValue(FileNode::INT, &ival);
                             ptr = endptr;
-                            return ptr;
+                            врати ptr;
                         }
-                        else if (llen == 5 && memcmp(ptr, "false", 5) == 0) {
+                        инако ако (llen == 5 && memcmp(ptr, "false", 5) == 0) {
                             int64_t ival = 0;
                             node.setValue(FileNode::INT, &ival);
                             ptr = endptr;
-                            return ptr;
+                            врати ptr;
                         }
-                        else if (llen == 4 && memcmp(ptr, "null", 4) == 0) {
+                        инако ако (llen == 4 && memcmp(ptr, "null", 4) == 0) {
                             ptr = endptr;
-                            return ptr;
+                            врати ptr;
                         }
                     }
 
-                    node.setValue(FileNode::STRING, ptr, (int)(str_end - ptr));
+                    node.setValue(FileNode::STRING, ptr, (цео)(str_end - ptr));
                     ptr = endptr;
-                    return ptr;
+                    врати ptr;
                 }
                 struct_type = FileNode::MAP;
             }
-            else
+            инако
                 struct_type = FileNode::SEQ;
 
             fs->convertToCollection( struct_type, node );
-            indent = (int)(ptr - fs->bufferStart());
+            indent = (цео)(ptr - fs->bufferStart());
 
-            for(;;)
+            за(;;)
             {
                 FileNode elem;
 
-                if( struct_type == FileNode::MAP )
+                ако( struct_type == FileNode::MAP )
                 {
                     ptr = parseKey( ptr, node, elem );
                 }
-                else
+                инако
                 {
                     c = *ptr++;
-                    if( c != '-' )
+                    ако( c != '-' )
                         CV_PARSE_ERROR_CPP( "Block sequence elements must be preceded with \'-\'" );
 
                     elem = fs->addNode(node, std::string(), FileNode::NONE);
@@ -786,103 +786,103 @@ public:
                 ptr = skipSpaces( ptr, indent + 1, INT_MAX );
                 ptr = parseValue( ptr, elem, indent + 1, false, depth + 1 );
                 ptr = skipSpaces( ptr, 0, INT_MAX );
-                if( ptr - fs->bufferStart() != indent )
+                ако( ptr - fs->bufferStart() != indent )
                 {
-                    if( ptr - fs->bufferStart() < indent )
+                    ако( ptr - fs->bufferStart() < indent )
                         break;
-                    else
+                    инако
                         CV_PARSE_ERROR_CPP( "Incorrect indentation" );
                 }
-                if( memcmp( ptr, "...", 3 ) == 0 )
+                ако( memcmp( ptr, "...", 3 ) == 0 )
                     break;
             }
             fs->finalizeCollection(node);
         }
 
-        return ptr;
+        врати ptr;
     }
 
     bool parse( char* ptr )
     {
-        if (!ptr)
+        ако (!ptr)
             CV_PARSE_ERROR_CPP("Invalid input");
 
         bool first = true;
         bool ok = true;
         FileNode root_collection(fs->getFS(), 0, 0);
 
-        for(;;)
+        за(;;)
         {
             // 0. skip leading comments and directives  and ...
             // 1. reach the first item
-            for(;;)
+            за(;;)
             {
                 ptr = skipSpaces( ptr, 0, INT_MAX );
-                if( !ptr || *ptr == '\0' )
+                ако( !ptr || *ptr == '\0' )
                 {
                     ok = !first;
                     break;
                 }
 
-                if( *ptr == '%' )
+                ако( *ptr == '%' )
                 {
-                    if( memcmp( ptr, "%YAML", 5 ) == 0 &&
+                    ако( memcmp( ptr, "%YAML", 5 ) == 0 &&
                         memcmp( ptr, "%YAML:1.", 8 ) != 0 &&
                         memcmp( ptr, "%YAML 1.", 8 ) != 0)
                     {
-                        if ((fs->getFormat() & FileStorage::FORMAT_MASK) == FileStorage::FORMAT_YAML_1_0)
+                        ако ((fs->getFormat() & FileStorage::FORMAT_MASK) == FileStorage::FORMAT_YAML_1_0)
                             CV_PARSE_ERROR_CPP( "Unsupported YAML version (it must be 1.x)" );
                     }
                     *ptr = '\0';
                 }
-                else if( *ptr == '-' )
+                инако ако( *ptr == '-' )
                 {
-                    if( memcmp(ptr, "---", 3) == 0 )
+                    ако( memcmp(ptr, "---", 3) == 0 )
                     {
                         ptr += 3;
                         break;
                     }
-                    else if( first )
+                    инако ако( first )
                         break;
                 }
-                else if( cv_isalnum(*ptr) || *ptr=='_')
+                инако ако( cv_isalnum(*ptr) || *ptr=='_')
                 {
-                    if( !first )
+                    ако( !first )
                         CV_PARSE_ERROR_CPP( "The YAML streams must start with '---', except the first one" );
                     break;
                 }
-                else if( fs->eof() )
+                инако ако( fs->eof() )
                     break;
-                else
+                инако
                     CV_PARSE_ERROR_CPP( "Invalid or unsupported syntax" );
             }
 
-            if( ptr )
+            ако( ptr )
                 ptr = skipSpaces( ptr, 0, INT_MAX );
-            if( !ptr || !ptr[0] )
+            ако( !ptr || !ptr[0] )
                 break;
-            if( memcmp( ptr, "...", 3 ) != 0 )
+            ако( memcmp( ptr, "...", 3 ) != 0 )
             {
                 // 2. parse the collection
                 FileNode root_node = fs->addNode(root_collection, std::string(), FileNode::NONE);
 
                 ptr = parseValue( ptr, root_node, 0, false );
-                if( !root_node.isMap() && !root_node.isSeq() )
+                ако( !root_node.isMap() && !root_node.isSeq() )
                     CV_PARSE_ERROR_CPP( "Only collections as YAML streams are supported by this parser" );
 
                 // 3. parse until the end of file or next collection
                 ptr = skipSpaces( ptr, 0, INT_MAX );
-                if( !ptr )
+                ако( !ptr )
                     break;
             }
 
-            if( fs->eof() )
+            ако( fs->eof() )
                 break;
             ptr += 3;
             first = false;
         }
 
-        return ok;
+        врати ok;
     }
 
     FileStorage_API* fs;
@@ -891,12 +891,12 @@ public:
 
 Ptr<FileStorageEmitter> createYAMLEmitter(FileStorage_API* fs)
 {
-    return makePtr<YAMLEmitter>(fs);
+    врати makePtr<YAMLEmitter>(fs);
 }
 
 Ptr<FileStorageParser> createYAMLParser(FileStorage_API* fs)
 {
-    return makePtr<YAMLParser>(fs);
+    врати makePtr<YAMLParser>(fs);
 }
 
 }

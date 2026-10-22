@@ -48,7 +48,7 @@
 #include "opencv2/core/parallel/parallel_backend.hpp"
 #include "parallel/parallel.hpp"
 
-#if defined _WIN32 || defined WINCE
+#ако defined _WIN32 || defined WINCE
     #include <windows.h>
     #undef small
     #undef min
@@ -56,14 +56,14 @@
     #undef abs
 #endif
 
-#if defined __unix__ || defined __APPLE__ || defined __GLIBC__ \
+#ако defined __unix__ || defined __APPLE__ || defined __GLIBC__ \
     || defined __HAIKU__ || defined __EMSCRIPTEN__ \
     || defined __FreeBSD__ || defined __NetBSD__ || defined __OpenBSD__
     #include <unistd.h>
     #include <stdio.h>
     #include <sys/types.h>
     #include <fstream>
-    #if defined __ANDROID__
+    #ако defined __ANDROID__
         #include <sys/sysconf.h>
         #include <sys/syscall.h>
         #include <sched.h>
@@ -72,7 +72,7 @@
     #endif
 #endif
 
-#if defined (__QNX__)
+#ако defined (__QNX__)
     #include <sys/syspage.h>
 #endif
 
@@ -88,7 +88,7 @@
     #define HAVE_GCD
 #endif
 
-#if defined _MSC_VER
+#ако defined _MSC_VER
     #define HAVE_CONCURRENCY
 #endif
 
@@ -102,13 +102,13 @@
    - HAVE_PTHREADS_PF - pthreads if available
 */
 
-#if defined HAVE_TBB
+#ако defined HAVE_TBB
     #ifndef TBB_SUPPRESS_DEPRECATED_MESSAGES  // supress warning
     #define TBB_SUPPRESS_DEPRECATED_MESSAGES 1
     #endif
     #include "tbb/tbb.h"
     #include "tbb/task.h"
-    #if TBB_INTERFACE_VERSION >= 8000
+    #ако TBB_INTERFACE_VERSION >= 8000
         #include "tbb/task_arena.h"
     #endif
     #undef min
@@ -135,7 +135,7 @@
 #endif
 
 
-#if defined HAVE_TBB
+#ако defined HAVE_TBB
 #  define CV_PARALLEL_FRAMEWORK "tbb"
 #elif defined HAVE_HPX
 #  define CV_PARALLEL_FRAMEWORK "hpx"
@@ -177,10 +177,10 @@ namespace {
         pNode->m_payload.m_tls.gather(data);
 
         uint64 ticksMax = 0;
-        int    threads  = 0;
-        for(size_t i = 0; i < data.size(); i++)
+        цео    threads  = 0;
+        за(size_t i = 0; i < data.size(); i++)
         {
-            if(data[i] && data[i]->m_ticksTotal)
+            ако(data[i] && data[i]->m_ticksTotal)
             {
                 ticksMax = MAX(ticksMax, data[i]->m_ticksTotal);
                 pNode->m_payload.m_ticksTotal -= data[i]->m_ticksTotal;
@@ -191,7 +191,7 @@ namespace {
         pNode->m_payload.m_ticksTotal += ticksMax;
         pNode->m_payload.m_threads = MAX(pNode->m_payload.m_threads, threads);
 
-        for(size_t i = 0; i < pNode->m_childs.size(); i++)
+        за(size_t i = 0; i < pNode->m_childs.size(); i++)
             SyncNodes(pNode->m_childs[i]);
     }
 #endif
@@ -210,7 +210,7 @@ namespace {
 
             // propagate main thread state
             rng = cv::theRNG();
-#if OPENCV_SUPPORTS_FP_DENORMALS_HINT && OPENCV_IMPL_FP_HINTS
+#ако OPENCV_SUPPORTS_FP_DENORMALS_HINT && OPENCV_IMPL_FP_HINTS
             details::saveFPDenormalsState(fp_denormals_base_state);
 #endif
 
@@ -226,10 +226,10 @@ namespace {
         void finalize()
         {
 #ifdef ENABLE_INSTRUMENTATION
-            for(size_t i = 0; i < pThreadRoot->m_childs.size(); i++)
+            за(size_t i = 0; i < pThreadRoot->m_childs.size(); i++)
                 SyncNodes(pThreadRoot->m_childs[i]);
 #endif
-            if (is_rng_used)
+            ако (is_rng_used)
             {
                 // Some parallel backends execute nested jobs in the main thread,
                 // so we need to restore initial RNG state here.
@@ -240,15 +240,15 @@ namespace {
                 cv::theRNG().next();
             }
 #ifdef OPENCV_TRACE
-            if (traceRootRegion)
+            ако (traceRootRegion)
                 CV_TRACE_NS::details::parallelForFinalize(*traceRootRegion);
 #endif
 
-            if (hasException)
+            ако (hasException)
             {
-#if CV__EXCEPTION_PTR
+#ако CV__EXCEPTION_PTR
                 std::rethrow_exception(pException);
-#else
+#инако
                 CV_Error(Error::StsError, "Exception in parallel_for() body: " + exception_message);
 #endif
             }
@@ -257,7 +257,7 @@ namespace {
 
         const cv::ParallelLoopBody* body;
         cv::Range wholeRange;
-        int nstripes;
+        цео nstripes;
         cv::RNG rng;
         mutable bool is_rng_used;
 #ifdef OPENCV_TRACE
@@ -268,35 +268,35 @@ namespace {
         cv::instr::InstrNode *pThreadRoot;
 #endif
         bool hasException;
-#if CV__EXCEPTION_PTR
+#ако CV__EXCEPTION_PTR
         std::exception_ptr pException;
-#else
+#инако
         cv::String exception_message;
 #endif
-#if CV__EXCEPTION_PTR
+#ако CV__EXCEPTION_PTR
         void recordException()
-#else
+#инако
         void recordException(const cv::String& msg)
 #endif
         {
 #ifndef CV_THREAD_SANITIZER
-            if (!hasException)
+            ако (!hasException)
 #endif
             {
                 cv::AutoLock lock(cv::getInitializationMutex());
-                if (!hasException)
+                ако (!hasException)
                 {
                     hasException = true;
-#if CV__EXCEPTION_PTR
+#ако CV__EXCEPTION_PTR
                     pException = std::current_exception();
-#else
+#инако
                     exception_message = msg;
 #endif
                 }
             }
         }
 
-#if OPENCV_SUPPORTS_FP_DENORMALS_HINT && OPENCV_IMPL_FP_HINTS
+#ако OPENCV_SUPPORTS_FP_DENORMALS_HINT && OPENCV_IMPL_FP_HINTS
         details::FPDenormalsModeState fp_denormals_base_state;
 #endif
 
@@ -319,10 +319,10 @@ namespace {
         {
 #ifdef OPENCV_TRACE
             // TODO CV_TRACE_NS::details::setCurrentRegion(rootRegion);
-            if (ctx.traceRootRegion && ctx.traceRootContext)
+            ако (ctx.traceRootRegion && ctx.traceRootContext)
                 CV_TRACE_NS::details::parallelForSetRootRegion(*ctx.traceRootRegion, *ctx.traceRootContext);
             CV__TRACE_OPENCV_FUNCTION_NAME("parallel_for_body");
-            if (ctx.traceRootRegion)
+            ако (ctx.traceRootRegion)
                 CV_TRACE_NS::details::parallelForAttachNestedRegion(*ctx.traceRootRegion);
 #endif
 
@@ -336,16 +336,16 @@ namespace {
 
             // propagate main thread state
             cv::theRNG() = ctx.rng;
-#if OPENCV_SUPPORTS_FP_DENORMALS_HINT && OPENCV_IMPL_FP_HINTS
+#ако OPENCV_SUPPORTS_FP_DENORMALS_HINT && OPENCV_IMPL_FP_HINTS
             FPDenormalsIgnoreHintScope fp_denormals_scope(ctx.fp_denormals_base_state);
 #endif
 
             cv::Range r;
             cv::Range wholeRange = ctx.wholeRange;
-            int nstripes = ctx.nstripes;
-            r.start = (int)(wholeRange.start +
+            цео nstripes = ctx.nstripes;
+            r.start = (цео)(wholeRange.start +
                             ((uint64)sr.start*(wholeRange.end - wholeRange.start) + nstripes/2)/nstripes);
-            r.end = sr.end >= nstripes ? wholeRange.end : (int)(wholeRange.start +
+            r.end = sr.end >= nstripes ? wholeRange.end : (цео)(wholeRange.start +
                             ((uint64)sr.end*(wholeRange.end - wholeRange.start) + nstripes/2)/nstripes);
 
 #ifdef OPENCV_TRACE
@@ -357,12 +357,12 @@ namespace {
             {
                 (*ctx.body)(r);
             }
-#if CV__EXCEPTION_PTR
+#ако CV__EXCEPTION_PTR
             catch (...)
             {
                 ctx.recordException();
             }
-#else
+#инако
             catch (const cv::Exception& e)
             {
                 ctx.recordException(e.what());
@@ -377,16 +377,16 @@ namespace {
             }
 #endif
 
-            if (!ctx.is_rng_used && !(cv::theRNG() == ctx.rng))
+            ако (!ctx.is_rng_used && !(cv::theRNG() == ctx.rng))
                 ctx.is_rng_used = true;
         }
-        cv::Range stripeRange() const { return cv::Range(0, ctx.nstripes); }
+        cv::Range stripeRange() const { врати cv::Range(0, ctx.nstripes); }
 
     protected:
         ParallelLoopBodyWrapperContext& ctx;
     };
 
-#if defined HAVE_TBB
+#ако defined HAVE_TBB
     class ProxyLoopBody : public ParallelLoopBodyWrapper
     {
     public:
@@ -394,7 +394,7 @@ namespace {
         : ParallelLoopBodyWrapper(ctx_)
         {}
 
-        void operator ()(const tbb::blocked_range<int>& range) const
+        void operator ()(const tbb::blocked_range<цео>& range) const
         {
             this->ParallelLoopBodyWrapper::operator()(cv::Range(range.begin(), range.end()));
         }
@@ -402,7 +402,7 @@ namespace {
         void operator ()() const  // run parallel job
         {
             cv::Range range = this->stripeRange();
-            tbb::parallel_for(tbb::blocked_range<int>(range.start, range.end), *this);
+            tbb::parallel_for(tbb::blocked_range<цео>(range.start, range.end), *this);
         }
     };
 #elif defined HAVE_HPX
@@ -419,7 +419,7 @@ namespace {
             hpx::parallel::for_loop(
                     hpx::parallel::execution::par,
                     stripeRange.start, stripeRange.end,
-                    [&](const int &i) { ;
+                    [&](const цео &i) { ;
                         this->ParallelLoopBodyWrapper::operator()(
                                 cv::Range(i, i + 1));
                     });
@@ -432,7 +432,7 @@ namespace {
     static void block_function(void* context, size_t index)
     {
         ProxyLoopBody* ptr_body = static_cast<ProxyLoopBody*>(context);
-        (*ptr_body)(cv::Range((int)index, (int)index + 1));
+        (*ptr_body)(cv::Range((цео)index, (цео)index + 1));
     }
 #elif defined WINRT || defined HAVE_CONCURRENCY
     class ProxyLoopBody : public ParallelLoopBodyWrapper
@@ -442,7 +442,7 @@ namespace {
         : ParallelLoopBodyWrapper(ctx)
         {}
 
-        void operator ()(int i) const
+        void operator ()(цео i) const
         {
             this->ParallelLoopBodyWrapper::operator()(cv::Range(i, i + 1));
         }
@@ -451,33 +451,33 @@ namespace {
     // PPL's default auto_partitioner silently skips whole chunks of the range on
     // ARM64 (unfixed MSVC bug, developercommunity.visualstudio.com/t/1027444).
     template <typename Body>
-    static inline void pplParallelFor(int first, int last, const Body& body)
+    static inline void pplParallelFor(цео first, цео last, const Body& body)
     {
-#if defined(_M_ARM64) || defined(_M_ARM64EC)
+#ако defined(_M_ARM64) || defined(_M_ARM64EC)
         Concurrency::parallel_for(first, last, body, Concurrency::static_partitioner());
-#else
+#инако
         Concurrency::parallel_for(first, last, body);
 #endif
     }
-#else
+#инако
     typedef ParallelLoopBodyWrapper ProxyLoopBody;
 #endif
 
-#if defined HAVE_TBB
-    #if TBB_INTERFACE_VERSION >= 8000
+#ако defined HAVE_TBB
+    #ако TBB_INTERFACE_VERSION >= 8000
         static tbb::task_arena tbbArena(tbb::task_arena::automatic);
-    #else
+    #инако
         static tbb::task_scheduler_init tbbScheduler(tbb::task_scheduler_init::deferred);
     #endif
 #elif defined HAVE_HPX
 // nothing for HPX
 #elif defined HAVE_OPENMP
-static inline int _initMaxThreads()
+static inline цео _initMaxThreads()
 {
-    int maxThreads = omp_get_max_threads();
-    return maxThreads;
+    цео maxThreads = omp_get_max_threads();
+    врати maxThreads;
 }
-static int numThreadsMax = _initMaxThreads();
+static цео numThreadsMax = _initMaxThreads();
 #elif defined HAVE_GCD
 // nothing for GCD
 #elif defined WINRT
@@ -488,12 +488,12 @@ class SchedPtr
 {
     Concurrency::Scheduler* sched_;
 public:
-    Concurrency::Scheduler* operator->() { return sched_; }
-    operator Concurrency::Scheduler*() { return sched_; }
+    Concurrency::Scheduler* operator->() { врати sched_; }
+    operator Concurrency::Scheduler*() { врати sched_; }
 
     void operator=(Concurrency::Scheduler* sched)
     {
-        if (sched_) sched_->Release();
+        ако (sched_) sched_->Release();
         sched_ = sched;
     }
 
@@ -520,14 +520,14 @@ void parallel_for_(const cv::Range& range, const cv::ParallelLoopBody& body, dou
 #endif
 
     CV_INSTRUMENT_REGION_MT_FORK();
-    if (range.empty())
-        return;
+    ако (range.empty())
+        врати;
 
     static std::atomic<bool> flagNestedParallelFor(false);
     bool isNotNestedRegion = !flagNestedParallelFor.load();
-    if (isNotNestedRegion)
+    ако (isNotNestedRegion)
       isNotNestedRegion = !flagNestedParallelFor.exchange(true);
-    if (isNotNestedRegion)
+    ако (isNotNestedRegion)
     {
         try
         {
@@ -540,7 +540,7 @@ void parallel_for_(const cv::Range& range, const cv::ParallelLoopBody& body, dou
             throw;
         }
     }
-    else // nested parallel_for_() calls are not parallelized
+    инако // nested parallel_for_() calls are not parallelized
     {
         CV_UNUSED(nstripes);
         body(range);
@@ -548,7 +548,7 @@ void parallel_for_(const cv::Range& range, const cv::ParallelLoopBody& body, dou
 }
 
 static
-void parallel_for_cb(int start, int end, void* data)
+void parallel_for_cb(цео start, цео end, void* data)
 {
     CV_DbgAssert(data);
     const cv::ParallelLoopBody& body = *(const cv::ParallelLoopBody*)data;
@@ -558,32 +558,32 @@ void parallel_for_cb(int start, int end, void* data)
 static void parallel_for_impl(const cv::Range& range, const cv::ParallelLoopBody& body, double nstripes)
 {
     using namespace cv::parallel;
-    if ((numThreads < 0 || numThreads > 1) && range.end - range.start > 1)
+    ако ((numThreads < 0 || numThreads > 1) && range.end - range.start > 1)
     {
         ParallelLoopBodyWrapperContext ctx(body, range, nstripes);
         ProxyLoopBody pbody(ctx);
         cv::Range stripeRange = pbody.stripeRange();
-        if( stripeRange.end - stripeRange.start == 1 )
+        ако( stripeRange.end - stripeRange.start == 1 )
         {
             body(range);
-            return;
+            врати;
         }
 
         std::shared_ptr<ParallelForAPI>& api = getCurrentParallelForAPI();
-        if (api)
+        ако (api)
         {
             CV_CheckEQ(stripeRange.start, 0, "");
             api->parallel_for(stripeRange.end, parallel_for_cb, (void*)&pbody);
             ctx.finalize();  // propagate exceptions if exists
-            return;
+            врати;
         }
 
 #ifdef CV_PARALLEL_FRAMEWORK
-#if defined HAVE_TBB
+#ако defined HAVE_TBB
 
-#if TBB_INTERFACE_VERSION >= 8000
+#ако TBB_INTERFACE_VERSION >= 8000
         tbbArena.execute(pbody);
-#else
+#инако
         pbody();
 #endif
 
@@ -592,8 +592,8 @@ static void parallel_for_impl(const cv::Range& range, const cv::ParallelLoopBody
 
 #elif defined HAVE_OPENMP
 
-        #pragma omp parallel for schedule(dynamic) num_threads(numThreads > 0 ? numThreads : numThreadsMax)
-        for (int i = stripeRange.start; i < stripeRange.end; ++i)
+        #pragma omp parallel за schedule(dynamic) num_threads(numThreads > 0 ? numThreads : numThreadsMax)
+        за (цео i = stripeRange.start; i < stripeRange.end; ++i)
             pbody(Range(i, i + 1));
 
 #elif defined HAVE_GCD
@@ -607,11 +607,11 @@ static void parallel_for_impl(const cv::Range& range, const cv::ParallelLoopBody
 
 #elif defined HAVE_CONCURRENCY
 
-        if(!pplScheduler || pplScheduler->Id() == Concurrency::CurrentScheduler::Id())
+        ако(!pplScheduler || pplScheduler->Id() == Concurrency::CurrentScheduler::Id())
         {
             pplParallelFor(stripeRange.start, stripeRange.end, pbody);
         }
-        else
+        инако
         {
             pplScheduler->Attach();
             pplParallelFor(stripeRange.start, stripeRange.end, pbody);
@@ -622,14 +622,14 @@ static void parallel_for_impl(const cv::Range& range, const cv::ParallelLoopBody
 
         parallel_for_pthreads(pbody.stripeRange(), pbody, pbody.stripeRange().size());
 
-#else
+#инако
 
 #error You have hacked and compiling with unsupported parallel framework
 
 #endif
 
         ctx.finalize();  // propagate exceptions if exists
-        return;
+        врати;
 #endif // CV_PARALLEL_FRAMEWORK
     }
 
@@ -637,62 +637,62 @@ static void parallel_for_impl(const cv::Range& range, const cv::ParallelLoopBody
 }
 
 
-int getNumThreads(void)
+цео getNumThreads(void)
 {
     std::shared_ptr<ParallelForAPI>& api = getCurrentParallelForAPI();
-    if (api)
+    ако (api)
     {
-        return api->getNumThreads();
+        врати api->getNumThreads();
     }
 
-    if (numThreads == 0)
-        return 1;
+    ако (numThreads == 0)
+        врати 1;
 
-#if defined HAVE_TBB
+#ако defined HAVE_TBB
 
-#if TBB_INTERFACE_VERSION >= 9100
-    return tbbArena.max_concurrency();
+#ако TBB_INTERFACE_VERSION >= 9100
+    врати tbbArena.max_concurrency();
 #elif TBB_INTERFACE_VERSION >= 8000
-    return numThreads > 0
+    врати numThreads > 0
         ? numThreads
         : tbb::task_scheduler_init::default_num_threads();
-#else
-    return tbbScheduler.is_active()
+#инако
+    врати tbbScheduler.is_active()
            ? numThreads
            : tbb::task_scheduler_init::default_num_threads();
 #endif
 
 #elif defined HAVE_HPX
-    return numThreads;
+    врати numThreads;
 
 #elif defined HAVE_OPENMP
 
-    return numThreads > 0
+    врати numThreads > 0
            ? numThreads
            : numThreadsMax;
 
 
 #elif defined HAVE_GCD
 
-    return cv::getNumberOfCPUs(); // the GCD thread pool limit
+    врати cv::getNumberOfCPUs(); // the GCD thread pool limit
 
 #elif defined WINRT
 
-    return 0;
+    врати 0;
 
 #elif defined HAVE_CONCURRENCY
 
-    return (pplScheduler == 0)
+    врати (pplScheduler == 0)
         ? Concurrency::CurrentScheduler::Get()->GetNumberOfVirtualProcessors()
         : (1 + pplScheduler->GetNumberOfVirtualProcessors());
 
 #elif defined HAVE_PTHREADS_PF
 
-        return parallel_pthreads_get_threads_num();
+        врати parallel_pthreads_get_threads_num();
 
-#else
+#инако
 
-    return 1;
+    врати 1;
 
 #endif
 }
@@ -702,52 +702,52 @@ unsigned defaultNumberOfThreads()
 #ifdef __ANDROID__
     // many modern phones/tables have 4-core CPUs. Let's use no more
     // than 2 threads by default not to overheat the devices
-    const unsigned int default_number_of_threads = 2;
-#else
-    const unsigned int default_number_of_threads = (unsigned int)std::max(1, cv::getNumberOfCPUs());
+    const unsigned цео default_number_of_threads = 2;
+#инако
+    const unsigned цео default_number_of_threads = (unsigned цео)std::max(1, cv::getNumberOfCPUs());
 #endif
 
     unsigned result = default_number_of_threads;
 
-    static int config_num_threads = (int)utils::getConfigurationParameterSizeT("OPENCV_FOR_THREADS_NUM", 0);
+    static цео config_num_threads = (цео)utils::getConfigurationParameterSizeT("OPENCV_FOR_THREADS_NUM", 0);
 
-    if (config_num_threads)
+    ако (config_num_threads)
     {
         result = (unsigned)std::max(1, config_num_threads);
         //do we need upper limit of threads number?
     }
-    return result;
+    врати result;
 }
 
-void setNumThreads( int threads_ )
+void setNumThreads( цео threads_ )
 {
     CV_UNUSED(threads_);
 
-    int threads = (threads_ < 0) ? defaultNumberOfThreads() : (unsigned)threads_;
+    цео threads = (threads_ < 0) ? defaultNumberOfThreads() : (unsigned)threads_;
     numThreads = threads;
 
     std::shared_ptr<ParallelForAPI>& api = getCurrentParallelForAPI();
-    if (api)
+    ако (api)
     {
         api->setNumThreads(numThreads);
     }
 
 #ifdef HAVE_TBB
 
-#if TBB_INTERFACE_VERSION >= 8000
-    if(tbbArena.is_active()) tbbArena.terminate();
-    if(threads > 0) tbbArena.initialize(threads);
-#else
-    if(tbbScheduler.is_active()) tbbScheduler.terminate();
-    if(threads > 0) tbbScheduler.initialize(threads);
+#ако TBB_INTERFACE_VERSION >= 8000
+    ако(tbbArena.is_active()) tbbArena.terminate();
+    ако(threads > 0) tbbArena.initialize(threads);
+#инако
+    ако(tbbScheduler.is_active()) tbbScheduler.terminate();
+    ако(threads > 0) tbbScheduler.initialize(threads);
 #endif
 
 #elif defined HAVE_HPX
-    return; // nothing needed as numThreads is used
+    врати; // nothing needed as numThreads is used
 
 #elif defined HAVE_OPENMP
 
-    return; // nothing needed as num_threads clause is used in #pragma omp parallel for
+    врати; // nothing needed as num_threads clause is used in #pragma omp parallel for
 
 #elif defined HAVE_GCD
 
@@ -756,20 +756,20 @@ void setNumThreads( int threads_ )
 
 #elif defined WINRT
 
-    return;
+    врати;
 
 #elif defined HAVE_CONCURRENCY
 
-    if (threads <= 0)
+    ако (threads <= 0)
     {
         pplScheduler = 0;
     }
-    else if (threads == 1)
+    инако ако (threads == 1)
     {
         // Concurrency always uses >=2 threads, so we just disable it if 1 thread is requested
         numThreads = 0;
     }
-    else if (pplScheduler == 0 || 1 + pplScheduler->GetNumberOfVirtualProcessors() != (unsigned int)threads)
+    инако ако (pplScheduler == 0 || 1 + pplScheduler->GetNumberOfVirtualProcessors() != (unsigned цео)threads)
     {
         pplScheduler = Concurrency::Scheduler::Create(Concurrency::SchedulerPolicy(2,
                        Concurrency::MinConcurrency, threads-1,
@@ -784,152 +784,152 @@ void setNumThreads( int threads_ )
 }
 
 
-int getThreadNum()
+цео getThreadNum()
 {
     std::shared_ptr<ParallelForAPI>& api = getCurrentParallelForAPI();
-    if (api)
+    ако (api)
     {
-        return api->getThreadNum();
+        врати api->getThreadNum();
     }
 
-#if defined HAVE_TBB
-    #if TBB_INTERFACE_VERSION >= 9100
-        return tbb::this_task_arena::current_thread_index();
+#ако defined HAVE_TBB
+    #ако TBB_INTERFACE_VERSION >= 9100
+        врати tbb::this_task_arena::current_thread_index();
     #elif TBB_INTERFACE_VERSION >= 8000
-        return tbb::task_arena::current_thread_index();
-    #else
-        return 0;
+        врати tbb::task_arena::current_thread_index();
+    #инако
+        врати 0;
     #endif
 #elif defined HAVE_HPX
-    return (int)(hpx::get_num_worker_threads());
+    врати (цео)(hpx::get_num_worker_threads());
 #elif defined HAVE_OPENMP
-    return omp_get_thread_num();
+    врати omp_get_thread_num();
 #elif defined HAVE_GCD
-    return (int)(size_t)(void*)pthread_self(); // no zero-based indexing
+    врати (цео)(size_t)(void*)pthread_self(); // no zero-based indexing
 #elif defined WINRT
-    return 0;
+    врати 0;
 #elif defined HAVE_CONCURRENCY
-    return std::max(0, (int)Concurrency::Context::VirtualProcessorId()); // zero for master thread, unique number for others but not necessary 1,2,3,...
+    врати std::max(0, (цео)Concurrency::Context::VirtualProcessorId()); // zero for master thread, unique number for others but not necessary 1,2,3,...
 #elif defined HAVE_PTHREADS_PF
-    return (int)(size_t)(void*)pthread_self(); // no zero-based indexing
-#else
-    return 0;
+    врати (цео)(size_t)(void*)pthread_self(); // no zero-based indexing
+#инако
+    врати 0;
 #endif
 }
 
 
-#if defined __linux__ || defined __GLIBC__ || defined __HAIKU__ || defined __ANDROID__
+#ако defined __linux__ || defined __GLIBC__ || defined __HAIKU__ || defined __ANDROID__
   #define CV_CPU_GROUPS_1
 #endif
 
-#if defined __linux__ || defined __ANDROID__
+#ако defined __linux__ || defined __ANDROID__
   #define CV_HAVE_CGROUPS 1
 #endif
 
-#if defined CV_CPU_GROUPS_1
+#ако defined CV_CPU_GROUPS_1
 static inline
 std::string getFileContents(const char *filename)
 {
     std::ifstream ifs(filename);
-    if (!ifs.is_open())
-        return std::string();
+    ако (!ifs.is_open())
+        врати std::string();
 
     std::string content( (std::istreambuf_iterator<char>(ifs) ),
                          (std::istreambuf_iterator<char>()    ) );
 
-    if (ifs.fail())
-        return std::string();
+    ако (ifs.fail())
+        врати std::string();
 
-    return content;
+    врати content;
 }
 
 static inline
-int getNumberOfCPUsImpl(const char *filename)
+цео getNumberOfCPUsImpl(const char *filename)
 {
    std::string file_contents = getFileContents(filename);
-   if(file_contents.empty())
-       return 0;
+   ако(file_contents.empty())
+       врати 0;
 
    char *pbuf = const_cast<char*>(file_contents.c_str());
    //parse string of form "0-1,3,5-7,10,13-15"
-   int cpusAvailable = 0;
+   цео cpusAvailable = 0;
 
-   while(*pbuf)
+   док(*pbuf)
    {
       const char* pos = pbuf;
       bool range = false;
-      while(*pbuf && *pbuf != ',')
+      док(*pbuf && *pbuf != ',')
       {
-          if(*pbuf == '-') range = true;
+          ако(*pbuf == '-') range = true;
           ++pbuf;
       }
-      if(*pbuf) *pbuf++ = 0;
-      if(!range)
+      ако(*pbuf) *pbuf++ = 0;
+      ако(!range)
         ++cpusAvailable;
-      else
+      инако
       {
-          int rstart = 0, rend = 0;
+          цео rstart = 0, rend = 0;
           sscanf(pos, "%d-%d", &rstart, &rend);
           cpusAvailable += rend - rstart + 1;
       }
 
    }
-   return cpusAvailable;
+   врати cpusAvailable;
 }
 #endif
 
-#if defined CV_HAVE_CGROUPS
+#ако defined CV_HAVE_CGROUPS
 static inline
 unsigned getNumberOfCPUsCFSv2()
 {
-    int cfs_quota = 0;
-    int cfs_period = 0;
+    цео cfs_quota = 0;
+    цео cfs_period = 0;
 
     std::ifstream ss_cpu_max("/sys/fs/cgroup/cpu.max", std::ios::in | std::ios::binary);
     ss_cpu_max >> cfs_quota >> cfs_period;
 
-    if (ss_cpu_max.fail() || cfs_quota < 1 || cfs_period < 1) /* values must not be 0 or negative */
-        return 0;
+    ако (ss_cpu_max.fail() || cfs_quota < 1 || cfs_period < 1) /* values must not be 0 or negative */
+        врати 0;
 
-    return (unsigned)max(1, cfs_quota/cfs_period);
+    врати (unsigned)max(1, cfs_quota/cfs_period);
 }
 
 static inline
 unsigned getNumberOfCPUsCFSv1()
 {
-    int cfs_quota = 0;
+    цео cfs_quota = 0;
     {
         std::ifstream ss_period("/sys/fs/cgroup/cpu/cpu.cfs_quota_us", std::ios::in | std::ios::binary);
         ss_period >> cfs_quota;
 
-        if (ss_period.fail() || cfs_quota < 1) /* cfs_quota must not be 0 or negative */
-            return 0;
+        ако (ss_period.fail() || cfs_quota < 1) /* cfs_quota must not be 0 or negative */
+            врати 0;
     }
 
-    int cfs_period = 0;
+    цео cfs_period = 0;
     {
         std::ifstream ss_quota("/sys/fs/cgroup/cpu/cpu.cfs_period_us", std::ios::in | std::ios::binary);
         ss_quota >> cfs_period;
 
-        if (ss_quota.fail() || cfs_period < 1)
-            return 0;
+        ако (ss_quota.fail() || cfs_period < 1)
+            врати 0;
     }
 
-    return (unsigned)max(1, cfs_quota/cfs_period);
+    врати (unsigned)max(1, cfs_quota/cfs_period);
 }
 #endif
 
 template <typename T> static inline
 T minNonZero(const T& val_1, const T& val_2)
 {
-    if ((val_1 != 0) && (val_2 != 0))
-        return std::min(val_1, val_2);
-    return (val_1 != 0) ? val_1 : val_2;
+    ако ((val_1 != 0) && (val_2 != 0))
+        врати std::min(val_1, val_2);
+    врати (val_1 != 0) ? val_1 : val_2;
 }
 
 #ifndef OPENCV_DISABLE_THREAD_SUPPORT
 static
-int getNumberOfCPUs_()
+цео getNumberOfCPUs_()
 {
 #ifndef OPENCV_SEMIHOSTING
     /*
@@ -937,7 +937,7 @@ int getNumberOfCPUs_()
      * the minimum most value as it has high probablity of being right and safe.
      * Return 1 if we get 0 or not found on all methods.
     */
-#if !defined(__MINGW32__) /* not implemented (2020-03) */
+#ако !defined(__MINGW32__) /* not implemented (2020-03) */
 
     /*
      * Check for this standard C++11 way, we do not return directly because
@@ -946,16 +946,16 @@ int getNumberOfCPUs_()
      * must be "considered only a hint".
     */
     unsigned ncpus = std::thread::hardware_concurrency(); /* If the value is not well defined or not computable, returns 0 */
-#else
+#инако
     unsigned ncpus = 0; /* 0 means we have to find out some other way */
 #endif
 
-#if defined _WIN32
+#ако defined _WIN32
 
     SYSTEM_INFO sysinfo = {};
-#if (defined(_M_ARM) || defined(_M_ARM64) || defined(_M_ARM64EC) || defined(_M_X64) || defined(WINRT)) && _WIN32_WINNT >= 0x501
+#ако (defined(_M_ARM) || defined(_M_ARM64) || defined(_M_ARM64EC) || defined(_M_X64) || defined(WINRT)) && _WIN32_WINNT >= 0x501
     GetNativeSystemInfo( &sysinfo );
-#else
+#инако
     GetSystemInfo( &sysinfo );
 #endif
     unsigned ncpus_sysinfo = sysinfo.dwNumberOfProcessors;
@@ -963,8 +963,8 @@ int getNumberOfCPUs_()
 
 #elif defined __APPLE__
 
-    int numCPU=0;
-    int mib[4];
+    цео numCPU=0;
+    цео mib[4];
     size_t len = sizeof(numCPU);
 
     /* set the mib for hw.ncpu */
@@ -974,12 +974,12 @@ int getNumberOfCPUs_()
     /* get the number of CPUs from the system */
     sysctl(mib, 2, &numCPU, &len, NULL, 0);
 
-    if( numCPU < 1 )
+    ако( numCPU < 1 )
     {
         mib[1] = HW_NCPU;
         sysctl( mib, 2, &numCPU, &len, NULL, 0 );
 
-        if( numCPU < 1 )
+        ако( numCPU < 1 )
             numCPU = 1;
     }
 
@@ -987,7 +987,7 @@ int getNumberOfCPUs_()
 
 #elif defined CV_CPU_GROUPS_1
 
-#if defined CV_HAVE_CGROUPS
+#ако defined CV_HAVE_CGROUPS
     static unsigned ncpus_impl_cpuset = (unsigned)getNumberOfCPUsImpl("/sys/fs/cgroup/cpuset/cpuset.cpus");
     ncpus = minNonZero(ncpus, ncpus_impl_cpuset);
 
@@ -1003,13 +1003,13 @@ int getNumberOfCPUs_()
 
 #endif
 
-#if defined _GNU_SOURCE \
+#ако defined _GNU_SOURCE \
     && !defined(__MINGW32__) /* not implemented (2020-03) */ \
     && !defined(__EMSCRIPTEN__) \
     && !defined(__ANDROID__)  // TODO: add check for modern Android NDK
 
     cpu_set_t cpu_set;
-    if (0 == sched_getaffinity(0, sizeof(cpu_set), &cpu_set))
+    ако (0 == sched_getaffinity(0, sizeof(cpu_set), &cpu_set))
     {
         unsigned cpu_count_cpu_set = CPU_COUNT(&cpu_set);
         ncpus = minNonZero(ncpus, cpu_count_cpu_set);
@@ -1017,7 +1017,7 @@ int getNumberOfCPUs_()
 
 #endif
 
-#if !defined(_WIN32) && !defined(__APPLE__) && defined(_SC_NPROCESSORS_ONLN)
+#ако !defined(_WIN32) && !defined(__APPLE__) && defined(_SC_NPROCESSORS_ONLN)
 
     static unsigned cpu_count_sysconf = (unsigned)sysconf( _SC_NPROCESSORS_ONLN );
     ncpus = minNonZero(ncpus, cpu_count_sysconf);
@@ -1026,36 +1026,36 @@ int getNumberOfCPUs_()
     ncpus = minNonZero(ncpus, cpu_count_sysconf);
 #endif
 
-    return ncpus != 0 ? ncpus : 1;
-#else //  OPENCV_SEMIHOSTING
-    return 1;
+    врати ncpus != 0 ? ncpus : 1;
+#инако //  OPENCV_SEMIHOSTING
+    врати 1;
 #endif //OPENCV_SEMIHOSTING
 }
 
-int getNumberOfCPUs()
+цео getNumberOfCPUs()
 {
-    static int nCPUs = getNumberOfCPUs_();
-    return nCPUs;  // cached value
+    static цео nCPUs = getNumberOfCPUs_();
+    врати nCPUs;  // cached value
 }
 
-#else  // OPENCV_DISABLE_THREAD_SUPPORT
-int getNumberOfCPUs()
+#инако  // OPENCV_DISABLE_THREAD_SUPPORT
+цео getNumberOfCPUs()
 {
-    return 1;
+    врати 1;
 }
 #endif  // OPENCV_DISABLE_THREAD_SUPPORT
 
 const char* currentParallelFramework()
 {
     std::shared_ptr<ParallelForAPI>& api = getCurrentParallelForAPI();
-    if (api)
+    ако (api)
     {
-        return api->getName();
+        врати api->getName();
     }
 #ifdef CV_PARALLEL_FRAMEWORK
-    return CV_PARALLEL_FRAMEWORK;
-#else
-    return NULL;
+    врати CV_PARALLEL_FRAMEWORK;
+#инако
+    врати NULL;
 #endif
 }
 

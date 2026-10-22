@@ -157,117 +157,117 @@ namespace {
 #define openclamdblas_fn0(ID, _R, decl_args) \
     typedef _R (*ID##FN)decl_args; \
     static _R ID##_switch_fn decl_args \
-    { return ((ID##FN)openclamdblas_check_fn(ID))(); } \
+    { врати ((ID##FN)openclamdblas_check_fn(ID))(); } \
 
 #define openclamdblas_fn1(ID, _R, decl_args) \
     typedef _R (*ID##FN)decl_args; \
     static _R ID##_switch_fn decl_args \
-    { return ((ID##FN)openclamdblas_check_fn(ID))(p1); } \
+    { врати ((ID##FN)openclamdblas_check_fn(ID))(p1); } \
 
 #define openclamdblas_fn2(ID, _R, decl_args) \
     typedef _R (*ID##FN)decl_args; \
     static _R ID##_switch_fn decl_args \
-    { return ((ID##FN)openclamdblas_check_fn(ID))(p1, p2); } \
+    { врати ((ID##FN)openclamdblas_check_fn(ID))(p1, p2); } \
 
 #define openclamdblas_fn3(ID, _R, decl_args) \
     typedef _R (*ID##FN)decl_args; \
     static _R ID##_switch_fn decl_args \
-    { return ((ID##FN)openclamdblas_check_fn(ID))(p1, p2, p3); } \
+    { врати ((ID##FN)openclamdblas_check_fn(ID))(p1, p2, p3); } \
 
 #define openclamdblas_fn4(ID, _R, decl_args) \
     typedef _R (*ID##FN)decl_args; \
     static _R ID##_switch_fn decl_args \
-    { return ((ID##FN)openclamdblas_check_fn(ID))(p1, p2, p3, p4); } \
+    { врати ((ID##FN)openclamdblas_check_fn(ID))(p1, p2, p3, p4); } \
 
 #define openclamdblas_fn5(ID, _R, decl_args) \
     typedef _R (*ID##FN)decl_args; \
     static _R ID##_switch_fn decl_args \
-    { return ((ID##FN)openclamdblas_check_fn(ID))(p1, p2, p3, p4, p5); } \
+    { врати ((ID##FN)openclamdblas_check_fn(ID))(p1, p2, p3, p4, p5); } \
 
 #define openclamdblas_fn6(ID, _R, decl_args) \
     typedef _R (*ID##FN)decl_args; \
     static _R ID##_switch_fn decl_args \
-    { return ((ID##FN)openclamdblas_check_fn(ID))(p1, p2, p3, p4, p5, p6); } \
+    { врати ((ID##FN)openclamdblas_check_fn(ID))(p1, p2, p3, p4, p5, p6); } \
 
 #define openclamdblas_fn7(ID, _R, decl_args) \
     typedef _R (*ID##FN)decl_args; \
     static _R ID##_switch_fn decl_args \
-    { return ((ID##FN)openclamdblas_check_fn(ID))(p1, p2, p3, p4, p5, p6, p7); } \
+    { врати ((ID##FN)openclamdblas_check_fn(ID))(p1, p2, p3, p4, p5, p6, p7); } \
 
 #define openclamdblas_fn8(ID, _R, decl_args) \
     typedef _R (*ID##FN)decl_args; \
     static _R ID##_switch_fn decl_args \
-    { return ((ID##FN)openclamdblas_check_fn(ID))(p1, p2, p3, p4, p5, p6, p7, p8); } \
+    { врати ((ID##FN)openclamdblas_check_fn(ID))(p1, p2, p3, p4, p5, p6, p7, p8); } \
 
 #define openclamdblas_fn9(ID, _R, decl_args) \
     typedef _R (*ID##FN)decl_args; \
     static _R ID##_switch_fn decl_args \
-    { return ((ID##FN)openclamdblas_check_fn(ID))(p1, p2, p3, p4, p5, p6, p7, p8, p9); } \
+    { врати ((ID##FN)openclamdblas_check_fn(ID))(p1, p2, p3, p4, p5, p6, p7, p8, p9); } \
 
 #define openclamdblas_fn10(ID, _R, decl_args) \
     typedef _R (*ID##FN)decl_args; \
     static _R ID##_switch_fn decl_args \
-    { return ((ID##FN)openclamdblas_check_fn(ID))(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10); } \
+    { врати ((ID##FN)openclamdblas_check_fn(ID))(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10); } \
 
 #define openclamdblas_fn11(ID, _R, decl_args) \
     typedef _R (*ID##FN)decl_args; \
     static _R ID##_switch_fn decl_args \
-    { return ((ID##FN)openclamdblas_check_fn(ID))(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11); } \
+    { врати ((ID##FN)openclamdblas_check_fn(ID))(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11); } \
 
 #define openclamdblas_fn12(ID, _R, decl_args) \
     typedef _R (*ID##FN)decl_args; \
     static _R ID##_switch_fn decl_args \
-    { return ((ID##FN)openclamdblas_check_fn(ID))(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12); } \
+    { врати ((ID##FN)openclamdblas_check_fn(ID))(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12); } \
 
 #define openclamdblas_fn13(ID, _R, decl_args) \
     typedef _R (*ID##FN)decl_args; \
     static _R ID##_switch_fn decl_args \
-    { return ((ID##FN)openclamdblas_check_fn(ID))(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13); } \
+    { врати ((ID##FN)openclamdblas_check_fn(ID))(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13); } \
 
 #define openclamdblas_fn14(ID, _R, decl_args) \
     typedef _R (*ID##FN)decl_args; \
     static _R ID##_switch_fn decl_args \
-    { return ((ID##FN)openclamdblas_check_fn(ID))(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14); } \
+    { врати ((ID##FN)openclamdblas_check_fn(ID))(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14); } \
 
 #define openclamdblas_fn15(ID, _R, decl_args) \
     typedef _R (*ID##FN)decl_args; \
     static _R ID##_switch_fn decl_args \
-    { return ((ID##FN)openclamdblas_check_fn(ID))(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p15); } \
+    { врати ((ID##FN)openclamdblas_check_fn(ID))(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p15); } \
 
 #define openclamdblas_fn16(ID, _R, decl_args) \
     typedef _R (*ID##FN)decl_args; \
     static _R ID##_switch_fn decl_args \
-    { return ((ID##FN)openclamdblas_check_fn(ID))(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p15, p16); } \
+    { врати ((ID##FN)openclamdblas_check_fn(ID))(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p15, p16); } \
 
 #define openclamdblas_fn17(ID, _R, decl_args) \
     typedef _R (*ID##FN)decl_args; \
     static _R ID##_switch_fn decl_args \
-    { return ((ID##FN)openclamdblas_check_fn(ID))(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p15, p16, p17); } \
+    { врати ((ID##FN)openclamdblas_check_fn(ID))(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p15, p16, p17); } \
 
 #define openclamdblas_fn18(ID, _R, decl_args) \
     typedef _R (*ID##FN)decl_args; \
     static _R ID##_switch_fn decl_args \
-    { return ((ID##FN)openclamdblas_check_fn(ID))(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p15, p16, p17, p18); } \
+    { врати ((ID##FN)openclamdblas_check_fn(ID))(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p15, p16, p17, p18); } \
 
 #define openclamdblas_fn19(ID, _R, decl_args) \
     typedef _R (*ID##FN)decl_args; \
     static _R ID##_switch_fn decl_args \
-    { return ((ID##FN)openclamdblas_check_fn(ID))(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p15, p16, p17, p18, p19); } \
+    { врати ((ID##FN)openclamdblas_check_fn(ID))(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p15, p16, p17, p18, p19); } \
 
 #define openclamdblas_fn20(ID, _R, decl_args) \
     typedef _R (*ID##FN)decl_args; \
     static _R ID##_switch_fn decl_args \
-    { return ((ID##FN)openclamdblas_check_fn(ID))(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p15, p16, p17, p18, p19, p20); } \
+    { врати ((ID##FN)openclamdblas_check_fn(ID))(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p15, p16, p17, p18, p19, p20); } \
 
 #define openclamdblas_fn21(ID, _R, decl_args) \
     typedef _R (*ID##FN)decl_args; \
     static _R ID##_switch_fn decl_args \
-    { return ((ID##FN)openclamdblas_check_fn(ID))(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p15, p16, p17, p18, p19, p20, p21); } \
+    { врати ((ID##FN)openclamdblas_check_fn(ID))(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p15, p16, p17, p18, p19, p20, p21); } \
 
 #define openclamdblas_fn22(ID, _R, decl_args) \
     typedef _R (*ID##FN)decl_args; \
     static _R ID##_switch_fn decl_args \
-    { return ((ID##FN)openclamdblas_check_fn(ID))(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p15, p16, p17, p18, p19, p20, p21, p22); } \
+    { врати ((ID##FN)openclamdblas_check_fn(ID))(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p15, p16, p17, p18, p19, p20, p21, p22); } \
 
 }
 

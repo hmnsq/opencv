@@ -11,31 +11,31 @@
 namespace cv {
 
 namespace hal {
-void cvt16f32f(const hfloat* src, float* dst, int len)
+void cvt16f32f(const hfloat* src, float* dst, цео len)
 {
     CV_INSTRUMENT_REGION();
     CV_CPU_DISPATCH(cvt16f32f, (src, dst, len),
         CV_CPU_DISPATCH_MODES_ALL);
 }
-void cvt32f16f(const float* src, hfloat* dst, int len)
+void cvt32f16f(const float* src, hfloat* dst, цео len)
 {
     CV_INSTRUMENT_REGION();
     CV_CPU_DISPATCH(cvt32f16f, (src, dst, len),
         CV_CPU_DISPATCH_MODES_ALL);
 }
-void cvt32f16bf(const float* src, bfloat* dst, int len)
+void cvt32f16bf(const float* src, bfloat* dst, цео len)
 {
     CV_INSTRUMENT_REGION();
     CV_CPU_DISPATCH(cvt32f16bf, (src, dst, len),
         CV_CPU_DISPATCH_MODES_ALL);
 }
-void addRNGBias32f(float* arr, const float* scaleBiasPairs, int len, int cn)
+void addRNGBias32f(float* arr, const float* scaleBiasPairs, цео len, цео cn)
 {
     CV_INSTRUMENT_REGION();
     CV_CPU_DISPATCH(addRNGBias32f, (arr, scaleBiasPairs, len, cn),
         CV_CPU_DISPATCH_MODES_ALL);
 }
-void addRNGBias64f(double* arr, const double* scaleBiasPairs, int len, int cn)
+void addRNGBias64f(double* arr, const double* scaleBiasPairs, цео len, цео cn)
 {
     CV_INSTRUMENT_REGION();
     CV_CPU_DISPATCH(addRNGBias64f, (arr, scaleBiasPairs, len, cn),
@@ -45,7 +45,7 @@ void addRNGBias64f(double* arr, const double* scaleBiasPairs, int len, int cn)
 } // namespace
 
 
-BinaryFunc getConvertFunc(int sdepth, int ddepth)
+BinaryFunc getConvertFunc(цео sdepth, цео ddepth)
 {
     CV_INSTRUMENT_REGION();
     CV_CPU_DISPATCH(getConvertFunc, (sdepth, ddepth),
@@ -53,44 +53,44 @@ BinaryFunc getConvertFunc(int sdepth, int ddepth)
 }
 
 #ifdef HAVE_OPENCL
-static bool ocl_convertTo(InputArray src_, OutputArray dst_, int ddepth, bool noScale, double alpha, double beta)
+static bool ocl_convertTo(InputArray src_, OutputArray dst_, цео ddepth, bool noScale, double alpha, double beta)
 {
     CV_INSTRUMENT_REGION();
 
     CV_Assert(ddepth >= 0);
 
-    int stype = src_.type();
-    int sdepth = CV_MAT_DEPTH(stype);
-    int cn = CV_MAT_CN(stype);
+    цео stype = src_.type();
+    цео sdepth = CV_MAT_DEPTH(stype);
+    цео cn = CV_MAT_CN(stype);
 
     // FP8 types are not supported by the OpenCL kernels yet; fall back to CPU.
-    if ((sdepth >= CV_8F_E4M3FN && sdepth <= CV_8F_E4M3FNUZ) ||
+    ако ((sdepth >= CV_8F_E4M3FN && sdepth <= CV_8F_E4M3FNUZ) ||
         (ddepth >= CV_8F_E4M3FN && ddepth <= CV_8F_E4M3FNUZ))
-        return false;
+        врати false;
 
-    int dtype = CV_MAKETYPE(ddepth, cn);
+    цео dtype = CV_MAKETYPE(ddepth, cn);
 
-    int wdepth = (sdepth == CV_64F) ? CV_64F : CV_32F;
+    цео wdepth = (sdepth == CV_64F) ? CV_64F : CV_32F;
 
     bool needDouble = sdepth == CV_64F || ddepth == CV_64F;
     bool doubleCheck = true;
-    if (needDouble)
+    ако (needDouble)
     {
         doubleCheck = ocl::Device::getDefault().hasFP64();
     }
     bool halfCheck = true;
     bool needHalf = sdepth == CV_16F || ddepth == CV_16F;
-    if (needHalf)
+    ако (needHalf)
     {
         halfCheck = ocl::Device::getDefault().hasFP16();
     }
 
-    if (!doubleCheck)
-        return false;
-    if (!halfCheck)
-        return false;
+    ако (!doubleCheck)
+        врати false;
+    ако (!halfCheck)
+        врати false;
 
-    const int rowsPerWI = 4;
+    const цео rowsPerWI = 4;
 
     char cvt[2][50];
     ocl::Kernel k("convertTo", ocl::core::convert_oclsrc,
@@ -105,8 +105,8 @@ static bool ocl_convertTo(InputArray src_, OutputArray dst_, int ddepth, bool no
                   )
     );
 
-    if (k.empty())
-        return false;
+    ако (k.empty())
+        врати false;
 
     UMat src = src_.getUMat();
     dst_.createSameSize(src_, dtype);
@@ -114,65 +114,65 @@ static bool ocl_convertTo(InputArray src_, OutputArray dst_, int ddepth, bool no
 
     float alphaf = (float)alpha, betaf = (float)beta;
 
-    if (noScale)
+    ако (noScale)
         k.args(ocl::KernelArg::ReadOnlyNoSize(src), ocl::KernelArg::WriteOnly(dst, cn));
-    else if (wdepth == CV_32F)
+    инако ако (wdepth == CV_32F)
         k.args(ocl::KernelArg::ReadOnlyNoSize(src), ocl::KernelArg::WriteOnly(dst, cn), alphaf, betaf);
-    else
+    инако
         k.args(ocl::KernelArg::ReadOnlyNoSize(src), ocl::KernelArg::WriteOnly(dst, cn), alpha, beta);
 
     size_t globalsize[2] = {
         (size_t)dst.cols * cn,
         divUp((size_t)dst.rows, rowsPerWI)
     };
-    if (!k.run(2, globalsize, NULL, false))
-        return false;
+    ако (!k.run(2, globalsize, NULL, false))
+        врати false;
 
     CV_IMPL_ADD(CV_IMPL_OCL);
-    return true;
+    врати true;
 }
 #endif
 
-void Mat::convertTo(OutputArray dst, int type_, double alpha, double beta) const
+void Mat::convertTo(OutputArray dst, цео type_, double alpha, double beta) const
 {
     CV_INSTRUMENT_REGION();
 
-    if (empty())
+    ако (empty())
     {
-        int ddepth = CV_MAT_DEPTH(type_);
-        if (ddepth < 0)
+        цео ddepth = CV_MAT_DEPTH(type_);
+        ако (ddepth < 0)
             ddepth = dst.fixedType() ? dst.depth() : depth();
-        const int dtype = CV_MAKETYPE(ddepth, channels());
+        const цео dtype = CV_MAKETYPE(ddepth, channels());
 
         dst.release();
         bool allowTransposed = dims == 1 ||
             dst.kind() == _InputArray::STD_VECTOR ||
             (dst.fixedSize() && dst.dims() == 1);
         dst.create(size, dtype, -1, allowTransposed);
-        return;
+        врати;
     }
 
-    int stype = type();
-    int sdepth = CV_MAT_DEPTH(stype);
+    цео stype = type();
+    цео sdepth = CV_MAT_DEPTH(stype);
 
-    int ddepth = sdepth;
-    if (type_ >= 0)
+    цео ddepth = sdepth;
+    ако (type_ >= 0)
         ddepth = CV_MAT_DEPTH(type_);
-    else
+    инако
         ddepth = dst.fixedType() ? dst.depth() : sdepth;
 
     bool noScale = std::fabs(alpha - 1) < DBL_EPSILON && std::fabs(beta) < DBL_EPSILON;
-    if (sdepth == ddepth && noScale)
+    ако (sdepth == ddepth && noScale)
     {
         copyTo(dst);
-        return;
+        врати;
     }
 
     CV_OCL_RUN(dims <= 2 && dst.isUMat(),
                ocl_convertTo(*this, dst, ddepth, noScale, alpha, beta))
 
-    int cn = channels();
-    int dtype = CV_MAKETYPE(ddepth, cn);
+    цео cn = channels();
+    цео dtype = CV_MAKETYPE(ddepth, cn);
 
     Mat src = *this;
     bool allowTransposed = dims == 1 ||
@@ -181,62 +181,62 @@ void Mat::convertTo(OutputArray dst, int type_, double alpha, double beta) const
     dst.create( size, dtype, -1, allowTransposed );
     Mat dstMat = dst.getMat();
 
-    if( dims <= 2 )
+    ако( dims <= 2 )
     {
         CALL_HAL(convertScale, cv_hal_convertScale, src.data, src.step, dstMat.data, dstMat.step, src.cols * cn, src.rows, sdepth, ddepth, alpha, beta);
     }
-    else if( src.isContinuous() && dstMat.isContinuous() )
+    инако ако( src.isContinuous() && dstMat.isContinuous() )
     {
-        CALL_HAL(convertScale, cv_hal_convertScale, src.data, 0, dstMat.data, 0, (int)src.total() * cn, 1, sdepth, ddepth, alpha, beta);
+        CALL_HAL(convertScale, cv_hal_convertScale, src.data, 0, dstMat.data, 0, (цео)src.total() * cn, 1, sdepth, ddepth, alpha, beta);
     }
 
     BinaryFunc func = noScale ? getConvertFunc(sdepth, ddepth) : getConvertScaleFunc(sdepth, ddepth);
     double scale[] = {alpha, beta};
     CV_Assert( func != 0 );
 
-    if( dims <= 2 )
+    ако( dims <= 2 )
     {
         Size sz = getContinuousSize2D(src, dstMat, cn);
         func(src.data, src.step, 0, 0, dstMat.data, dstMat.step, sz, scale);
     }
-    else
+    инако
     {
         const Mat* arrays[] = {&src, &dstMat, 0};
         uchar* ptrs[2] = {};
         NAryMatIterator it(arrays, ptrs);
-        Size sz((int)(it.size*cn), 1);
+        Size sz((цео)(it.size*cn), 1);
 
-        for( size_t i = 0; i < it.nplanes; i++, ++it )
+        за( size_t i = 0; i < it.nplanes; i++, ++it )
             func(ptrs[0], 1, 0, 0, ptrs[1], 1, sz, scale);
     }
 }
 
-void UMat::convertTo(OutputArray dst, int type_, double alpha, double beta) const
+void UMat::convertTo(OutputArray dst, цео type_, double alpha, double beta) const
 {
     CV_INSTRUMENT_REGION();
 
-    if (empty())
+    ако (empty())
     {
         dst.release();
         dst.create(size(), type_ >= 0 ? type_ : type());
-        return;
+        врати;
     }
 
 #ifdef HAVE_OPENCL
-    int stype = type();
-    int sdepth = CV_MAT_DEPTH(stype);
+    цео stype = type();
+    цео sdepth = CV_MAT_DEPTH(stype);
 
-    int ddepth = sdepth;
-    if (type_ >= 0)
+    цео ddepth = sdepth;
+    ако (type_ >= 0)
         ddepth = CV_MAT_DEPTH(type_);
-    else
+    инако
         ddepth = dst.fixedType() ? dst.depth() : sdepth;
 
     bool noScale = std::fabs(alpha - 1) < DBL_EPSILON && std::fabs(beta) < DBL_EPSILON;
-    if (sdepth == ddepth && noScale)
+    ако (sdepth == ddepth && noScale)
     {
         copyTo(dst);
-        return;
+        врати;
     }
 
     CV_OCL_RUN(dims <= 2,
