@@ -2,222 +2,222 @@
 // It is subject to the license terms in the LICENSE file found in the top-level directory
 // of this distribution and at http://opencv.org/license.html.
 
-#include "precomp.hpp"
+#ਅਨ੍ਤਰ੍ਭਾਵ "precomp.hpp"
 
-using namespace cv;
-using namespace cv::cuda;
+ਵਰਤੋਂ ਨਾਮਾਕਾਸ਼ cv;
+ਵਰਤੋਂ ਨਾਮਾਕਾਸ਼ cv::cuda;
 
-GpuMatND::~GpuMatND() = default;
+GpuMatND::~GpuMatND() = ਮੂਲ;
 
-GpuMatND::GpuMatND(const MatShape& _shape, int _type, void* _data, StepArray _step) :
-    flags(0), dims(0), data(static_cast<uchar*>(_data)), offset(0)
+GpuMatND::GpuMatND(ਅਚਲ MatShape& _shape, ਪੂਰਨ _type, ਖਾਲੀ* ਅੰਕੜੇ_3, ਕਦਮ_Array ਕਦਮ_3) :
+    flags(0), dims(0), ਅੰਕੜੇ(static_cast<uchar*>(ਅੰਕੜੇ_3)), offset(0)
 {
-    CV_Assert(_step.empty() || _shape.size() == _step.size() + 1 ||
-              (_shape.size() == _step.size() && _step.back() == (size_t)CV_ELEM_SIZE(_type)));
+    CV_Assert(ਕਦਮ_3.empty() || _shape.size() == ਕਦਮ_3.size() + 1 ||
+              (_shape.size() == ਕਦਮ_3.size() && ਕਦਮ_3.back() == (size_t)CV_ELEM_ਮਾਪ(_type)));
 
-    setFields(_shape, _type, std::move(_step));
+    ਸੈੱਟ_Fields(_shape, _type, std::move(ਕਦਮ_3));
 }
 
-GpuMatND GpuMatND::operator()(const std::vector<Range>& ranges) const
+GpuMatND GpuMatND::ਸੰਚਾਲਕ()(ਅਚਲ std::vector<Range>& ranges) ਅਚਲ
 {
-    CV_Assert(dims == (int)ranges.size());
+    CV_Assert(dims == (ਪੂਰਨ)ranges.size());
 
-    for (int i = 0; i < dims; ++i)
+    ਲਈ (ਪੂਰਨ i = 0; i < dims; ++i)
     {
         Range r = ranges[i];
-        CV_Assert(r == Range::all() || (0 <= r.start && r.start < r.end && r.end <= size[i]));
+        CV_Assert(r == Range::all() || (0 <= r.ਸ਼ੁਰੂ && r.ਸ਼ੁਰੂ < r.end && r.end <= size[i]));
     }
 
-    GpuMatND ret = *this;
+    GpuMatND ret = *ਇਹ;
 
-    for (int i = 0; i < dims; ++i)
+    ਲਈ (ਪੂਰਨ i = 0; i < dims; ++i)
     {
         Range r = ranges[i];
-        if (r != Range::all() && r != Range(0, ret.size[i]))
+        ਜੇ (r != Range::all() && r != Range(0, ret.size[i]))
         {
-            ret.offset += r.start * ret.step[i];
+            ret.offset += r.ਸ਼ੁਰੂ * ret.ਕਦਮ[i];
             ret.size[i] = r.size();
             ret.flags |= Mat::SUBMATRIX_FLAG;
         }
     }
 
-    ret.flags = cv::updateContinuityFlag(ret.flags, dims, ret.size.data(), ret.step.data());
+    ret.flags = cv::updateContinuityFlag(ret.flags, dims, ret.size.ਅੰਕੜੇ(), ret.ਕਦਮ.ਅੰਕੜੇ());
 
-    return ret;
+    ਵਾਪਸ ret;
 }
 
-GpuMat GpuMatND::createGpuMatHeader(IndexArray idx, Range rowRange, Range colRange) const
+GpuMat GpuMatND::create_Gpu_Mat_ਸਿਰਲੇਖ(ਸੂਚਕਾਂਕ_Array idx, Range ਪੰਕਤੀ_Range_2, Range ਖਾਨਾ_Range_2) ਅਚਲ
 {
-    CV_Assert((int)idx.size() == dims - 2);
+    CV_Assert((ਪੂਰਨ)idx.size() == dims - 2);
 
     std::vector<Range> ranges;
-    for (int i : idx)
+    ਲਈ (ਪੂਰਨ i : idx)
         ranges.emplace_back(i, i+1);
-    ranges.push_back(rowRange);
-    ranges.push_back(colRange);
+    ranges.push_back(ਪੰਕਤੀ_Range_2);
+    ranges.push_back(ਖਾਨਾ_Range_2);
 
-    return (*this)(ranges).createGpuMatHeader();
+    ਵਾਪਸ (*ਇਹ)(ranges).create_Gpu_Mat_ਸਿਰਲੇਖ();
 }
 
-GpuMat GpuMatND::createGpuMatHeader() const
+GpuMat GpuMatND::create_Gpu_Mat_ਸਿਰਲੇਖ() ਅਚਲ
 {
-    auto Effectively2D = [](GpuMatND m)
+    ਸਵੈਚਾਲਿਤ Effectively2D = [](GpuMatND m)
     {
-        for (int i = 0; i < m.dims - 2; ++i)
-            if (m.size[i] > 1)
-                return false;
-        return true;
+        ਲਈ (ਪੂਰਨ i = 0; i < m.dims - 2; ++i)
+            ਜੇ (m.size[i] > 1)
+                ਵਾਪਸ ਝੂਠ;
+        ਵਾਪਸ ਸੱਚ;
     };
-    CV_Assert(Effectively2D(*this));
-    int rows_, cols_ = dims >= 1 ? size[dims - 1] : 1;
-    size_t step_;
-    if (dims >= 2)
+    CV_Assert(Effectively2D(*ਇਹ));
+    ਪੂਰਨ ਪੰਕਤੀਆਂ_2, ਖਾਨੇ_ਗਿਣਤੀ_2 = dims >= 1 ? size[dims - 1] : 1;
+    size_t ਕਦਮ_2;
+    ਜੇ (dims >= 2)
     {
-        rows_ = size[dims - 2];
-        step_ = step[dims - 2];
+        ਪੰਕਤੀਆਂ_2 = size[dims - 2];
+        ਕਦਮ_2 = ਕਦਮ[dims - 2];
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
-        rows_ = 1;
-        step_ = cols_ * elemSize();
+        ਪੰਕਤੀਆਂ_2 = 1;
+        ਕਦਮ_2 = ਖਾਨੇ_ਗਿਣਤੀ_2 * elem_ਮਾਪ();
     }
 
-    return GpuMat(rows_, cols_, type(), getDevicePtr(), step_);
+    ਵਾਪਸ GpuMat(ਪੰਕਤੀਆਂ_2, ਖਾਨੇ_ਗਿਣਤੀ_2, type(), getDevicePtr(), ਕਦਮ_2);
 }
 
-GpuMat GpuMatND::operator()(IndexArray idx, Range rowRange, Range colRange) const
+GpuMat GpuMatND::ਸੰਚਾਲਕ()(ਸੂਚਕਾਂਕ_Array idx, Range ਪੰਕਤੀ_Range_2, Range ਖਾਨਾ_Range_2) ਅਚਲ
 {
-    return createGpuMatHeader(idx, rowRange, colRange).clone();
+    ਵਾਪਸ create_Gpu_Mat_ਸਿਰਲੇਖ(idx, ਪੰਕਤੀ_Range_2, ਖਾਨਾ_Range_2).clone();
 }
 
-GpuMatND::operator GpuMat() const
+GpuMatND::ਸੰਚਾਲਕ GpuMat() ਅਚਲ
 {
-    return createGpuMatHeader().clone();
+    ਵਾਪਸ create_Gpu_Mat_ਸਿਰਲੇਖ().clone();
 }
 
-void GpuMatND::setFields(MatShape _size, int _type, StepArray _step)
+ਖਾਲੀ GpuMatND::ਸੈੱਟ_Fields(MatShape ਮਾਪ_4, ਪੂਰਨ _type, ਕਦਮ_Array ਕਦਮ_3)
 {
-    _type &= Mat::TYPE_MASK;
+    _type &= Mat::TYPE_ਨਕਾਬ;
 
     flags = Mat::MAGIC_VAL + _type;
-    dims = static_cast<int>(_size.size());
-    size = std::move(_size);
+    dims = static_cast<ਪੂਰਨ>(ਮਾਪ_4.size());
+    size = std::move(ਮਾਪ_4);
 
-    if (_step.empty())
+    ਜੇ (ਕਦਮ_3.empty())
     {
-        step = StepArray(dims);
+        ਕਦਮ = ਕਦਮ_Array(dims);
 
-        step.back() = elemSize();
-        for (int _i = dims - 2; _i >= 0; --_i)
+        ਕਦਮ.back() = elem_ਮਾਪ();
+        ਲਈ (ਪੂਰਨ _i = dims - 2; _i >= 0; --_i)
         {
-            const size_t i = _i;
-            step[i] = step[i+1] * size[i+1];
+            ਅਚਲ size_t i = _i;
+            ਕਦਮ[i] = ਕਦਮ[i+1] * size[i+1];
         }
 
         flags |= Mat::CONTINUOUS_FLAG;
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
-        step = std::move(_step);
-        if (step.size() < size.size())
-          step.push_back(elemSize());
+        ਕਦਮ = std::move(ਕਦਮ_3);
+        ਜੇ (ਕਦਮ.size() < size.size())
+          ਕਦਮ.push_back(elem_ਮਾਪ());
 
-        flags = cv::updateContinuityFlag(flags, dims, size.data(), step.data());
+        flags = cv::updateContinuityFlag(flags, dims, size.ਅੰਕੜੇ(), ਕਦਮ.ਅੰਕੜੇ());
     }
 
-    CV_Assert(size.size() == step.size());
-    CV_Assert(step.back() == elemSize());
+    CV_Assert(size.size() == ਕਦਮ.size());
+    CV_Assert(ਕਦਮ.back() == elem_ਮਾਪ());
 }
 
-#ifndef HAVE_CUDA
+#ਜੇ_ਅਪਰਿਭਾਸ਼ਿਤ HAVE_CUDA
 
-GpuData::GpuData(const size_t _size)
-    : data(nullptr), size(0)
+Gpu_ਅੰਕੜੇ::Gpu_ਅੰਕੜੇ(ਅਚਲ size_t ਮਾਪ_4)
+    : ਅੰਕੜੇ(ਖਾਲੀ_ਸੂਚਕ), size(0)
 {
-    CV_UNUSED(_size);
+    CV_ਅਣਵਰਤਿਆ(ਮਾਪ_4);
     throw_no_cuda();
 }
 
-GpuData::~GpuData()
+Gpu_ਅੰਕੜੇ::~Gpu_ਅੰਕੜੇ()
 {
 }
 
-void GpuMatND::create(const MatShape& _shape, int _type)
+ਖਾਲੀ GpuMatND::create(ਅਚਲ MatShape& _shape, ਪੂਰਨ _type)
 {
-    CV_UNUSED(_shape);
-    CV_UNUSED(_type);
+    CV_ਅਣਵਰਤਿਆ(_shape);
+    CV_ਅਣਵਰਤਿਆ(_type);
     throw_no_cuda();
 }
 
-void GpuMatND::release()
-{
-    throw_no_cuda();
-}
-
-GpuMatND GpuMatND::clone() const
+ਖਾਲੀ GpuMatND::release()
 {
     throw_no_cuda();
 }
 
-GpuMatND GpuMatND::clone(Stream& stream) const
+GpuMatND GpuMatND::clone() ਅਚਲ
 {
-    CV_UNUSED(stream);
     throw_no_cuda();
 }
 
-void GpuMatND::upload(InputArray src)
+GpuMatND GpuMatND::clone(ਧਾਰਾ& stream) ਅਚਲ
 {
-    CV_UNUSED(src);
+    CV_ਅਣਵਰਤਿਆ(stream);
     throw_no_cuda();
 }
 
-void GpuMatND::upload(InputArray src, Stream& stream)
+ਖਾਲੀ GpuMatND::upload(ਨਿਵੇਸ਼_Array src)
 {
-    CV_UNUSED(src);
-    CV_UNUSED(stream);
+    CV_ਅਣਵਰਤਿਆ(src);
     throw_no_cuda();
 }
 
-void GpuMatND::download(OutputArray dst) const
+ਖਾਲੀ GpuMatND::upload(ਨਿਵੇਸ਼_Array src, ਧਾਰਾ& stream)
 {
-    CV_UNUSED(dst);
+    CV_ਅਣਵਰਤਿਆ(src);
+    CV_ਅਣਵਰਤਿਆ(stream);
     throw_no_cuda();
 }
 
-void GpuMatND::download(OutputArray dst, Stream& stream) const
+ਖਾਲੀ GpuMatND::download(OutputArray dst) ਅਚਲ
 {
-    CV_UNUSED(dst);
-    CV_UNUSED(stream);
+    CV_ਅਣਵਰਤਿਆ(dst);
     throw_no_cuda();
 }
 
-void GpuMatND::fit(const MatShape& _shape, int _type)
+ਖਾਲੀ GpuMatND::download(OutputArray dst, ਧਾਰਾ& stream) ਅਚਲ
 {
-    auto elements_nonzero = [](const MatShape& v)
+    CV_ਅਣਵਰਤਿਆ(dst);
+    CV_ਅਣਵਰਤਿਆ(stream);
+    throw_no_cuda();
+}
+
+ਖਾਲੀ GpuMatND::fit(ਅਚਲ MatShape& _shape, ਪੂਰਨ _type)
+{
+    ਸਵੈਚਾਲਿਤ elements_nonzero = [](ਅਚਲ MatShape& v)
     {
-        return std::all_of(v.begin(), v.end(), [](int u){ return u > 0; });
+        ਵਾਪਸ std::all_of(v.begin(), v.end(), [](ਪੂਰਨ u){ ਵਾਪਸ u > 0; });
     };
     CV_Assert(!_shape.empty());
     CV_Assert(elements_nonzero(_shape));
 
-    _type &= Mat::TYPE_MASK;
+    _type &= Mat::TYPE_ਨਕਾਬ;
 
-    const size_t esz = (size_t)CV_ELEM_SIZE(_type);
+    ਅਚਲ size_t esz = (size_t)CV_ELEM_ਮਾਪ(_type);
     size_t step0 = esz;
-    for (int i = (int)_shape.size() - 2; i >= 0; --i)
+    ਲਈ (ਪੂਰਨ i = (ਪੂਰਨ)_shape.size() - 2; i >= 0; --i)
         step0 *= (size_t)_shape[(size_t)i + 1];
-    const size_t requiredBytes = (size_t)_shape[0] * step0;
+    ਅਚਲ size_t required_ਬਾਈਟਾਂ = (size_t)_shape[0] * step0;
 
-    const bool canReuse = !empty() && !external() && isContinuous() && !isSubmatrix() && offset == 0;
-    const size_t oldCapacity = canReuse ? totalMemSize() : 0;
+    ਅਚਲ ਤਾਰਕਿਕ canReuse = !empty() && !external() && isContinuous() && !isSubmatrix() && offset == 0;
+    ਅਚਲ size_t old_ਸਮਰੱਥਾ = canReuse ? ਕੁੱਲ_Mem_ਮਾਪ() : 0;
 
-    if (!canReuse || requiredBytes > oldCapacity)
+    ਜੇ (!canReuse || required_ਬਾਈਟਾਂ > old_ਸਮਰੱਥਾ)
     {
         create(_shape, _type);
-        return;
+        ਵਾਪਸ;
     }
 
-    setFields(_shape, _type);
+    ਸੈੱਟ_Fields(_shape, _type);
 }
 
-#endif
+#ਜੇ_ਅੰਤ

@@ -3,245 +3,245 @@
 // of this distribution and at http://opencv.org/license.html
 
 
-#include "precomp.hpp"
-#include "opencl_kernels_core.hpp"
-#include "stat.hpp"
+#ਅਨ੍ਤਰ੍ਭਾਵ "precomp.hpp"
+#ਅਨ੍ਤਰ੍ਭਾਵ "opencl_kernels_core.hpp"
+#ਅਨ੍ਤਰ੍ਭਾਵ "stat.hpp"
 
-#include "count_non_zero.simd.hpp"
-#include "count_non_zero.simd_declarations.hpp" // defines CV_CPU_DISPATCH_MODES_ALL=AVX2,...,BASELINE based on CMakeLists.txt content
+#ਅਨ੍ਤਰ੍ਭਾਵ "count_non_zero.simd.hpp"
+#ਅਨ੍ਤਰ੍ਭਾਵ "count_non_zero.simd_declarations.hpp" // defines CV_CPU_DISPATCH_MODES_ALL=AVX2,...,BASELINE based on CMakeLists.txt content
 
-namespace cv {
+ਨਾਮਾਕਾਸ਼ cv {
 
-static CountNonZeroFunc getCountNonZeroTab(int depth)
+ਸਥਿਰ ਗਿਣਤੀ_Non_Zero_Func get_ਗਿਣਤੀ_Non_Zero_Tab(ਪੂਰਨ ਡੂੰਘਾਈ)
 {
     CV_INSTRUMENT_REGION();
-    CV_CPU_DISPATCH(getCountNonZeroTab, (depth),
+    CV_CPU_DISPATCH(get_ਗਿਣਤੀ_Non_Zero_Tab, (ਡੂੰਘਾਈ),
         CV_CPU_DISPATCH_MODES_ALL);
 }
 
-#ifdef HAVE_OPENCL
-static bool ocl_countNonZero( InputArray _src, int & res )
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ HAVE_OPENCL
+ਸਥਿਰ ਤਾਰਕਿਕ ocl_ਗਿਣਤੀ_Non_Zero( ਨਿਵੇਸ਼_Array _src, ਪੂਰਨ & res )
 {
-    int type = _src.type(), depth = CV_MAT_DEPTH(type), kercn = ocl::predictOptimalVectorWidth(_src);
-    bool doubleSupport = ocl::Device::getDefault().doubleFPConfig() > 0;
+    ਪੂਰਨ type = _src.type(), ਡੂੰਘਾਈ = CV_MAT_ਡੂੰਘਾਈ(type), kercn = ocl::predict_Optimal_ਸਦਿਸ਼_ਚੌੜਾਈ(_src);
+    ਤਾਰਕਿਕ doubleSupport = ocl::Device::getDefault().doubleFPConfig() > 0;
 
-    if (depth == CV_64F && !doubleSupport)
-        return false;
+    ਜੇ (ਡੂੰਘਾਈ == CV_64F && !doubleSupport)
+        ਵਾਪਸ ਝੂਠ;
 
-    int dbsize = ocl::Device::getDefault().maxComputeUnits();
-    size_t wgs = ocl::Device::getDefault().maxWorkGroupSize();
+    ਪੂਰਨ dbsize = ocl::Device::getDefault().maxComputeUnits();
+    size_t wgs = ocl::Device::getDefault().max_Work_ਸਮੂਹ_ਮਾਪ();
 
-    int wgs2_aligned = 1;
-    while (wgs2_aligned < (int)wgs)
+    ਪੂਰਨ wgs2_aligned = 1;
+    ਜਦੋਂ (wgs2_aligned < (ਪੂਰਨ)wgs)
         wgs2_aligned <<= 1;
     wgs2_aligned >>= 1;
 
     ocl::Kernel k("reduce", ocl::core::reduce_oclsrc,
                   format("-D srcT=%s -D srcT1=%s -D cn=1 -D OP_COUNT_NON_ZERO"
                          " -D WGS=%d -D kercn=%d -D WGS2_ALIGNED=%d%s%s",
-                         ocl::typeToStr(CV_MAKE_TYPE(depth, kercn)),
-                         ocl::typeToStr(depth), (int)wgs, kercn,
+                         ocl::type_ਮੰਜ਼ਿਲ_Str(CV_MAKE_TYPE(ਡੂੰਘਾਈ, kercn)),
+                         ocl::type_ਮੰਜ਼ਿਲ_Str(ਡੂੰਘਾਈ), (ਪੂਰਨ)wgs, kercn,
                          wgs2_aligned, doubleSupport ? " -D DOUBLE_SUPPORT" : "",
                          _src.isContinuous() ? " -D HAVE_SRC_CONT" : ""));
-    if (k.empty())
-        return false;
+    ਜੇ (k.empty())
+        ਵਾਪਸ ਝੂਠ;
 
     UMat src = _src.getUMat(), db(1, dbsize, CV_32SC1);
-    k.args(ocl::KernelArg::ReadOnlyNoSize(src), src.cols, (int)src.total(),
+    k.ਦਲੀਲਾਂ(ocl::KernelArg::Read_Only_No_ਮਾਪ(src), src.ਖਾਨੇ_ਗਿਣਤੀ, (ਪੂਰਨ)src.ਕੁੱਲ(),
            dbsize, ocl::KernelArg::PtrWriteOnly(db));
 
     size_t globalsize = dbsize * wgs;
-    if (k.run(1, &globalsize, &wgs, true))
-        return res = saturate_cast<int>(cv::sum(db.getMat(ACCESS_READ))[0]), true;
-    return false;
+    ਜੇ (k.ਲੜੀਵਾਰ(1, &globalsize, &wgs, ਸੱਚ))
+        ਵਾਪਸ res = saturate_cast<ਪੂਰਨ>(cv::ਜੋੜ(db.getMat(ACCESS_READ))[0]), ਸੱਚ;
+    ਵਾਪਸ ਝੂਠ;
 }
-#endif
+#ਜੇ_ਅੰਤ
 
-#if defined HAVE_IPP
-static bool ipp_countNonZero( Mat &src, int &res )
+#ਜੇ defined HAVE_IPP
+ਸਥਿਰ ਤਾਰਕਿਕ ipp_ਗਿਣਤੀ_Non_Zero( Mat &src, ਪੂਰਨ &res )
 {
     CV_INSTRUMENT_REGION_IPP();
 
-#if IPP_VERSION_X100 < 201801
+#ਜੇ IPP_ਸੰਸਕਰਣ_X100 < 201801
     // Poor performance of SSE42
-    if(cv::ipp::getIppTopFeatures() == ippCPUID_SSE42)
-        return false;
-#endif
+    ਜੇ(cv::ipp::get_Ipp_ਸਿਖਰ_Features() == ippCPUID_SSE42)
+        ਵਾਪਸ ਝੂਠ;
+#ਜੇ_ਅੰਤ
 
-    Ipp32s  count = 0;
-    int     depth = src.depth();
+    Ipp32s  ਗਿਣਤੀ_3 = 0;
+    ਪੂਰਨ     ਡੂੰਘਾਈ = src.ਡੂੰਘਾਈ();
 
-    if(src.dims <= 2)
+    ਜੇ(src.dims <= 2)
     {
-        IppStatus status;
-        IppiSize  size = {src.cols*src.channels(), src.rows};
+        Ipp_ਸਥਿਤੀ ਸਥਿਤੀ;
+        Ippi_ਮਾਪ  size = {src.ਖਾਨੇ_ਗਿਣਤੀ*src.channels(), src.ਪੰਕਤੀਆਂ};
 
-        if(depth == CV_8U)
-            status = CV_INSTRUMENT_FUN_IPP(ippiCountInRange_8u_C1R, (const Ipp8u *)src.ptr(), (int)src.step, size, &count, 0, 0);
-        else if(depth == CV_32F)
-            status = CV_INSTRUMENT_FUN_IPP(ippiCountInRange_32f_C1R, (const Ipp32f *)src.ptr(), (int)src.step, size, &count, 0, 0);
-        else
-            return false;
+        ਜੇ(ਡੂੰਘਾਈ == CV_8U)
+            ਸਥਿਤੀ = CV_INSTRUMENT_FUN_IPP(ippi_ਗਿਣਤੀ_ਵਿੱਚ_Range_8u_C1_R, (ਅਚਲ Ipp8u *)src.ptr(), (ਪੂਰਨ)src.ਕਦਮ, size, &ਗਿਣਤੀ_3, 0, 0);
+        ਨਹੀਂਤਾਂ ਜੇ(ਡੂੰਘਾਈ == CV_32F)
+            ਸਥਿਤੀ = CV_INSTRUMENT_FUN_IPP(ippi_ਗਿਣਤੀ_ਵਿੱਚ_Range_32f_C1_R, (ਅਚਲ Ipp32f *)src.ptr(), (ਪੂਰਨ)src.ਕਦਮ, size, &ਗਿਣਤੀ_3, 0, 0);
+        ਨਹੀਂਤਾਂ
+            ਵਾਪਸ ਝੂਠ;
 
-        if(status < 0)
-            return false;
+        ਜੇ(ਸਥਿਤੀ < 0)
+            ਵਾਪਸ ਝੂਠ;
 
-        res = size.width*size.height - count;
+        res = size.ਚੌੜਾਈ*size.ਉਚਾਈ - ਗਿਣਤੀ_3;
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
-        IppStatus       status;
-        const Mat      *arrays[] = {&src, NULL};
+        Ipp_ਸਥਿਤੀ       ਸਥਿਤੀ;
+        ਅਚਲ Mat      *arrays[] = {&src, ਨਿਰਾ};
         Mat            planes[1];
         NAryMatIterator it(arrays, planes, 1);
-        IppiSize        size  = {(int)it.size*src.channels(), 1};
+        Ippi_ਮਾਪ        size  = {(ਪੂਰਨ)it.size*src.channels(), 1};
         res = 0;
-        for (size_t i = 0; i < it.nplanes; i++, ++it)
+        ਲਈ (size_t i = 0; i < it.nplanes; i++, ++it)
         {
-            if(depth == CV_8U)
-                status = CV_INSTRUMENT_FUN_IPP(ippiCountInRange_8u_C1R, it.planes->ptr<Ipp8u>(), (int)it.planes->step, size, &count, 0, 0);
-            else if(depth == CV_32F)
-                status = CV_INSTRUMENT_FUN_IPP(ippiCountInRange_32f_C1R, it.planes->ptr<Ipp32f>(), (int)it.planes->step, size, &count, 0, 0);
-            else
-                return false;
+            ਜੇ(ਡੂੰਘਾਈ == CV_8U)
+                ਸਥਿਤੀ = CV_INSTRUMENT_FUN_IPP(ippi_ਗਿਣਤੀ_ਵਿੱਚ_Range_8u_C1_R, it.planes->ptr<Ipp8u>(), (ਪੂਰਨ)it.planes->ਕਦਮ, size, &ਗਿਣਤੀ_3, 0, 0);
+            ਨਹੀਂਤਾਂ ਜੇ(ਡੂੰਘਾਈ == CV_32F)
+                ਸਥਿਤੀ = CV_INSTRUMENT_FUN_IPP(ippi_ਗਿਣਤੀ_ਵਿੱਚ_Range_32f_C1_R, it.planes->ptr<Ipp32f>(), (ਪੂਰਨ)it.planes->ਕਦਮ, size, &ਗਿਣਤੀ_3, 0, 0);
+            ਨਹੀਂਤਾਂ
+                ਵਾਪਸ ਝੂਠ;
 
-            if(status < 0 || (int)it.planes->total()*src.channels() < count)
-                return false;
+            ਜੇ(ਸਥਿਤੀ < 0 || (ਪੂਰਨ)it.planes->ਕੁੱਲ()*src.channels() < ਗਿਣਤੀ_3)
+                ਵਾਪਸ ਝੂਠ;
 
-            res += (int)it.planes->total()*src.channels() - count;
+            res += (ਪੂਰਨ)it.planes->ਕੁੱਲ()*src.channels() - ਗਿਣਤੀ_3;
         }
     }
 
-    return true;
+    ਵਾਪਸ ਸੱਚ;
 }
-#endif
+#ਜੇ_ਅੰਤ
 
-int countNonZero(InputArray _src)
+ਪੂਰਨ ਗਿਣਤੀ_Non_Zero(ਨਿਵੇਸ਼_Array _src)
 {
     CV_INSTRUMENT_REGION();
 
-    int type = _src.type(), cn = CV_MAT_CN(type);
+    ਪੂਰਨ type = _src.type(), cn = CV_MAT_CN(type);
     CV_Assert( cn == 1 );
 
-#if defined HAVE_OPENCL || defined HAVE_IPP
-    int res = -1;
-#endif
+#ਜੇ defined HAVE_OPENCL || defined HAVE_IPP
+    ਪੂਰਨ res = -1;
+#ਜੇ_ਅੰਤ
 
-#ifdef HAVE_OPENCL
-    CV_OCL_RUN_(OCL_PERFORMANCE_CHECK(_src.isUMat()) && _src.dims() <= 2,
-                ocl_countNonZero(_src, res),
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ HAVE_OPENCL
+    CV_OCL_ਲੜੀਵਾਰ_2(OCL_PERFORMANCE_CHECK(_src.isUMat()) && _src.dims() <= 2,
+                ocl_ਗਿਣਤੀ_Non_Zero(_src, res),
                 res)
-#endif
+#ਜੇ_ਅੰਤ
 
     Mat src = _src.getMat();
-    CV_IPP_RUN_FAST(ipp_countNonZero(src, res), res);
+    CV_IPP_ਲੜੀਵਾਰ_FAST(ipp_ਗਿਣਤੀ_Non_Zero(src, res), res);
 
-    CountNonZeroFunc func = getCountNonZeroTab(src.depth());
+    ਗਿਣਤੀ_Non_Zero_Func func = get_ਗਿਣਤੀ_Non_Zero_Tab(src.ਡੂੰਘਾਈ());
     CV_Assert( func != 0 );
 
-    const Mat* arrays[] = {&src, 0};
+    ਅਚਲ Mat* arrays[] = {&src, 0};
     uchar* ptrs[1] = {};
     NAryMatIterator it(arrays, ptrs);
-    int total = (int)it.size, nz = 0;
+    ਪੂਰਨ ਕੁੱਲ = (ਪੂਰਨ)it.size, nz = 0;
 
-    for( size_t i = 0; i < it.nplanes; i++, ++it )
-        nz += func( ptrs[0], total );
+    ਲਈ( size_t i = 0; i < it.nplanes; i++, ++it )
+        nz += func( ptrs[0], ਕੁੱਲ );
 
-    return nz;
+    ਵਾਪਸ nz;
 }
 
-void findNonZero(InputArray _src, OutputArray _idx)
+ਖਾਲੀ ਲੱਭੋ_Non_Zero(ਨਿਵੇਸ਼_Array _src, OutputArray _idx)
 {
     Mat src = _src.getMat();
     CV_Assert( src.channels() == 1 && src.dims == 2 );
 
-    int depth = src.depth();
-    std::vector<Point> idxvec;
-    int rows = src.rows, cols = src.cols;
-    AutoBuffer<int> buf_(cols + 1);
-    int* buf = buf_.data();
+    ਪੂਰਨ ਡੂੰਘਾਈ = src.ਡੂੰਘਾਈ();
+    std::vector<ਬਿੰਦੂ> idxvec;
+    ਪੂਰਨ ਪੰਕਤੀਆਂ = src.ਪੰਕਤੀਆਂ, ਖਾਨੇ_ਗਿਣਤੀ = src.ਖਾਨੇ_ਗਿਣਤੀ;
+    Auto_ਬਫਰ<ਪੂਰਨ> buf_(ਖਾਨੇ_ਗਿਣਤੀ + 1);
+    ਪੂਰਨ* buf = buf_.ਅੰਕੜੇ();
 
-    for( int i = 0; i < rows; i++ )
+    ਲਈ( ਪੂਰਨ i = 0; i < ਪੰਕਤੀਆਂ; i++ )
     {
-        int j, k = 0;
-        const uchar* ptr8 = src.ptr(i);
-        if( depth == CV_8U || depth == CV_8S || depth == CV_Bool || depth == CV_8F_E4M3FNUZ )
+        ਪੂਰਨ j, k = 0;
+        ਅਚਲ uchar* ptr8 = src.ptr(i);
+        ਜੇ( ਡੂੰਘਾਈ == CV_8U || ਡੂੰਘਾਈ == CV_8S || ਡੂੰਘਾਈ == CV_Bool || ਡੂੰਘਾਈ == CV_8F_E4M3FNUZ )
         {
             j = 0;
-#if (CV_SIMD || CV_SIMD_SCALABLE)
+#ਜੇ (CV_SIMD || CV_SIMD_SCALABLE)
             // skip whole SIMD blocks of zeros; only scan blocks that contain a non-zero byte
-            const int vlanes = VTraits<v_uint8>::vlanes();
-            const v_uint8 vzero = vx_setzero_u8();
-            for( ; j <= cols - vlanes; j += vlanes )
+            ਅਚਲ ਪੂਰਨ vlanes = VTraits<v_uint8>::vlanes();
+            ਅਚਲ v_uint8 vzero = vx_setzero_u8();
+            ਲਈ( ; j <= ਖਾਨੇ_ਗਿਣਤੀ - vlanes; j += vlanes )
             {
-                if( !v_check_any(v_ne(vx_load(ptr8 + j), vzero)) )
-                    continue;
-                for( int t = j; t < j + vlanes; t++ )
-                    if( ptr8[t] != 0 ) buf[k++] = t;
+                ਜੇ( !v_check_any(v_ne(vx_ਲੱਦੋ(ptr8 + j), vzero)) )
+                    ਜਾਰੀ;
+                ਲਈ( ਪੂਰਨ t = j; t < j + vlanes; t++ )
+                    ਜੇ( ptr8[t] != 0 ) buf[k++] = t;
             }
-#endif
-            for( ; j < cols; j++ )
-                if( ptr8[j] != 0 ) buf[k++] = j;
+#ਜੇ_ਅੰਤ
+            ਲਈ( ; j < ਖਾਨੇ_ਗਿਣਤੀ; j++ )
+                ਜੇ( ptr8[j] != 0 ) buf[k++] = j;
         }
-        else if( depth == CV_16U || depth == CV_16S )
+        ਨਹੀਂਤਾਂ ਜੇ( ਡੂੰਘਾਈ == CV_16U || ਡੂੰਘਾਈ == CV_16S )
         {
-            const ushort* ptr16 = (const ushort*)ptr8;
-            for( j = 0; j < cols; j++ )
-                if( ptr16[j] != 0 ) buf[k++] = j;
+            ਅਚਲ ushort* ptr16 = (ਅਚਲ ushort*)ptr8;
+            ਲਈ( j = 0; j < ਖਾਨੇ_ਗਿਣਤੀ; j++ )
+                ਜੇ( ptr16[j] != 0 ) buf[k++] = j;
         }
-        else if( depth == CV_32S || depth == CV_32U )
+        ਨਹੀਂਤਾਂ ਜੇ( ਡੂੰਘਾਈ == CV_32S || ਡੂੰਘਾਈ == CV_32U )
         {
-            const int* ptr32s = (const int*)ptr8;
-            for( j = 0; j < cols; j++ )
-                if( ptr32s[j] != 0 ) buf[k++] = j;
+            ਅਚਲ ਪੂਰਨ* ptr32s = (ਅਚਲ ਪੂਰਨ*)ptr8;
+            ਲਈ( j = 0; j < ਖਾਨੇ_ਗਿਣਤੀ; j++ )
+                ਜੇ( ptr32s[j] != 0 ) buf[k++] = j;
         }
-        else if( depth == CV_64S || depth == CV_64U )
+        ਨਹੀਂਤਾਂ ਜੇ( ਡੂੰਘਾਈ == CV_64S || ਡੂੰਘਾਈ == CV_64U )
         {
-            const int64* ptr64s = (const int64*)ptr8;
-            for( j = 0; j < cols; j++ )
-                if( ptr64s[j] != 0 ) buf[k++] = j;
+            ਅਚਲ int64* ptr64s = (ਅਚਲ int64*)ptr8;
+            ਲਈ( j = 0; j < ਖਾਨੇ_ਗਿਣਤੀ; j++ )
+                ਜੇ( ptr64s[j] != 0 ) buf[k++] = j;
         }
-        else if( depth == CV_32F )
+        ਨਹੀਂਤਾਂ ਜੇ( ਡੂੰਘਾਈ == CV_32F )
         {
-            const int* ptr32s = (const int*)ptr8;
-            for( j = 0; j < cols; j++ )
-                if( (ptr32s[j]<<1) != 0 ) buf[k++] = j;
+            ਅਚਲ ਪੂਰਨ* ptr32s = (ਅਚਲ ਪੂਰਨ*)ptr8;
+            ਲਈ( j = 0; j < ਖਾਨੇ_ਗਿਣਤੀ; j++ )
+                ਜੇ( (ptr32s[j]<<1) != 0 ) buf[k++] = j;
         }
-        else if( depth == CV_16F || depth == CV_16BF )
+        ਨਹੀਂਤਾਂ ਜੇ( ਡੂੰਘਾਈ == CV_16F || ਡੂੰਘਾਈ == CV_16BF )
         {
-            const ushort* ptr16 = (const ushort*)ptr8;
-            for( j = 0; j < cols; j++ )
+            ਅਚਲ ushort* ptr16 = (ਅਚਲ ushort*)ptr8;
+            ਲਈ( j = 0; j < ਖਾਨੇ_ਗਿਣਤੀ; j++ )
                 // mask sign bit so -0 (0x8000) is treated as zero; cannot use <<1 here
                 // because ushort is promoted to int and the sign bit would not be discarded
-                if( (ptr16[j] & 0x7fff) != 0 ) buf[k++] = j;
+                ਜੇ( (ptr16[j] & 0x7fff) != 0 ) buf[k++] = j;
         }
-        else if( depth == CV_8F_E4M3FN )
+        ਨਹੀਂਤਾਂ ਜੇ( ਡੂੰਘਾਈ == CV_8F_E4M3FN )
         {
-            for( j = 0; j < cols; j++ )
+            ਲਈ( j = 0; j < ਖਾਨੇ_ਗਿਣਤੀ; j++ )
                 // mask sign bit so -0 (0x80) is treated as zero
-                if( (ptr8[j] & 0x7f) != 0 ) buf[k++] = j;
+                ਜੇ( (ptr8[j] & 0x7f) != 0 ) buf[k++] = j;
         }
-        else
+        ਨਹੀਂਤਾਂ
         {
-            const int64* ptr64s = (const int64*)ptr8;
-            for( j = 0; j < cols; j++ )
-                if( (ptr64s[j]<<1) != 0 ) buf[k++] = j;
+            ਅਚਲ int64* ptr64s = (ਅਚਲ int64*)ptr8;
+            ਲਈ( j = 0; j < ਖਾਨੇ_ਗਿਣਤੀ; j++ )
+                ਜੇ( (ptr64s[j]<<1) != 0 ) buf[k++] = j;
         }
 
-        if( k > 0 )
+        ਜੇ( k > 0 )
         {
             size_t sz = idxvec.size();
             idxvec.resize(sz + k);
-            for( j = 0; j < k; j++ )
-                idxvec[sz + j] = Point(buf[j], i);
+            ਲਈ( j = 0; j < k; j++ )
+                idxvec[sz + j] = ਬਿੰਦੂ(buf[j], i);
         }
     }
 
-    if( idxvec.empty() || (_idx.kind() == _InputArray::MAT && !_idx.getMatRef().isContinuous()) )
+    ਜੇ( idxvec.empty() || (_idx.ਕਿਸਮ() == ਨਿਵੇਸ਼_Array_2::MAT && !_idx.getMatRef().isContinuous()) )
         _idx.release();
 
-    if( !idxvec.empty() )
-        Mat(idxvec).copyTo(_idx);
+    ਜੇ( !idxvec.empty() )
+        Mat(idxvec).copy_ਮੰਜ਼ਿਲ(_idx);
 }
 
 } // namespace

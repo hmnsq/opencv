@@ -41,515 +41,515 @@
 //
 //M*/
 
-#include "precomp.hpp"
+#ਅਨ੍ਤਰ੍ਭਾਵ "precomp.hpp"
 
-using namespace cv;
-using namespace cv::cuda;
+ਵਰਤੋਂ ਨਾਮਾਕਾਸ਼ cv;
+ਵਰਤੋਂ ਨਾਮਾਕਾਸ਼ cv::cuda;
 
-void cv::cuda::GpuMat::updateContinuityFlag()
+ਖਾਲੀ cv::cuda::GpuMat::updateContinuityFlag()
 {
-    int sz[] = { rows, cols };
-    size_t steps[] = { step, elemSize() };
-    flags = cv::updateContinuityFlag(flags, 2, sz, steps);
+    ਪੂਰਨ sz[] = { ਪੰਕਤੀਆਂ, ਖਾਨੇ_ਗਿਣਤੀ };
+    size_t ਕਦਮਾਂ[] = { ਕਦਮ, elem_ਮਾਪ() };
+    flags = cv::updateContinuityFlag(flags, 2, sz, ਕਦਮਾਂ);
 }
 
-cv::cuda::GpuMat::GpuMat(int rows_, int cols_, int type_, void* data_, size_t step_) :
-    flags(Mat::MAGIC_VAL + (type_ & Mat::TYPE_MASK)), rows(rows_), cols(cols_),
-    step(step_), data((uchar*)data_), refcount(0),
-    datastart((uchar*)data_), dataend((const uchar*)data_),
+cv::cuda::GpuMat::GpuMat(ਪੂਰਨ ਪੰਕਤੀਆਂ_2, ਪੂਰਨ ਖਾਨੇ_ਗਿਣਤੀ_2, ਪੂਰਨ type_, ਖਾਲੀ* ਅੰਕੜੇ_2, size_t ਕਦਮ_2) :
+    flags(Mat::MAGIC_VAL + (type_ & Mat::TYPE_ਨਕਾਬ)), ਪੰਕਤੀਆਂ(ਪੰਕਤੀਆਂ_2), ਖਾਨੇ_ਗਿਣਤੀ(ਖਾਨੇ_ਗਿਣਤੀ_2),
+    ਕਦਮ(ਕਦਮ_2), ਅੰਕੜੇ((uchar*)ਅੰਕੜੇ_2), refcount(0),
+    datastart((uchar*)ਅੰਕੜੇ_2), dataend((ਅਚਲ uchar*)ਅੰਕੜੇ_2),
     allocator(defaultAllocator())
 {
-    size_t minstep = cols * elemSize();
+    size_t minstep = ਖਾਨੇ_ਗਿਣਤੀ * elem_ਮਾਪ();
 
-    if (step == Mat::AUTO_STEP)
+    ਜੇ (ਕਦਮ == Mat::AUTO_ਕਦਮ)
     {
-        step = minstep;
+        ਕਦਮ = minstep;
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
-        if (rows == 1)
-            step = minstep;
+        ਜੇ (ਪੰਕਤੀਆਂ == 1)
+            ਕਦਮ = minstep;
 
-        CV_DbgAssert( step >= minstep );
+        CV_DbgAssert( ਕਦਮ >= minstep );
     }
 
-    dataend += step * (rows - 1) + minstep;
+    dataend += ਕਦਮ * (ਪੰਕਤੀਆਂ - 1) + minstep;
     updateContinuityFlag();
 }
 
-cv::cuda::GpuMat::GpuMat(Size size_, int type_, void* data_, size_t step_) :
-    flags(Mat::MAGIC_VAL + (type_ & Mat::TYPE_MASK)), rows(size_.height), cols(size_.width),
-    step(step_), data((uchar*)data_), refcount(0),
-    datastart((uchar*)data_), dataend((const uchar*)data_),
+cv::cuda::GpuMat::GpuMat(ਮਾਪ ਮਾਪ_3, ਪੂਰਨ type_, ਖਾਲੀ* ਅੰਕੜੇ_2, size_t ਕਦਮ_2) :
+    flags(Mat::MAGIC_VAL + (type_ & Mat::TYPE_ਨਕਾਬ)), ਪੰਕਤੀਆਂ(ਮਾਪ_3.ਉਚਾਈ), ਖਾਨੇ_ਗਿਣਤੀ(ਮਾਪ_3.ਚੌੜਾਈ),
+    ਕਦਮ(ਕਦਮ_2), ਅੰਕੜੇ((uchar*)ਅੰਕੜੇ_2), refcount(0),
+    datastart((uchar*)ਅੰਕੜੇ_2), dataend((ਅਚਲ uchar*)ਅੰਕੜੇ_2),
     allocator(defaultAllocator())
 {
-    size_t minstep = cols * elemSize();
+    size_t minstep = ਖਾਨੇ_ਗਿਣਤੀ * elem_ਮਾਪ();
 
-    if (step == Mat::AUTO_STEP)
+    ਜੇ (ਕਦਮ == Mat::AUTO_ਕਦਮ)
     {
-        step = minstep;
+        ਕਦਮ = minstep;
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
-        if (rows == 1)
-            step = minstep;
+        ਜੇ (ਪੰਕਤੀਆਂ == 1)
+            ਕਦਮ = minstep;
 
-        CV_DbgAssert( step >= minstep );
+        CV_DbgAssert( ਕਦਮ >= minstep );
     }
 
-    dataend += step * (rows - 1) + minstep;
+    dataend += ਕਦਮ * (ਪੰਕਤੀਆਂ - 1) + minstep;
     updateContinuityFlag();
 }
 
-cv::cuda::GpuMat::GpuMat(const GpuMat& m, Range rowRange_, Range colRange_)
+cv::cuda::GpuMat::GpuMat(ਅਚਲ GpuMat& m, Range ਪੰਕਤੀ_Range, Range ਖਾਨਾ_Range)
 {
     flags = m.flags;
-    step = m.step; refcount = m.refcount;
-    data = m.data; datastart = m.datastart; dataend = m.dataend;
+    ਕਦਮ = m.ਕਦਮ; refcount = m.refcount;
+    ਅੰਕੜੇ = m.ਅੰਕੜੇ; datastart = m.datastart; dataend = m.dataend;
     allocator = m.allocator;
 
-    if (rowRange_ == Range::all())
+    ਜੇ (ਪੰਕਤੀ_Range == Range::all())
     {
-        rows = m.rows;
+        ਪੰਕਤੀਆਂ = m.ਪੰਕਤੀਆਂ;
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
-        CV_Assert( 0 <= rowRange_.start && rowRange_.start <= rowRange_.end && rowRange_.end <= m.rows );
+        CV_Assert( 0 <= ਪੰਕਤੀ_Range.ਸ਼ੁਰੂ && ਪੰਕਤੀ_Range.ਸ਼ੁਰੂ <= ਪੰਕਤੀ_Range.end && ਪੰਕਤੀ_Range.end <= m.ਪੰਕਤੀਆਂ );
 
-        rows = rowRange_.size();
-        data += step*rowRange_.start;
-    }
-
-    if (colRange_ == Range::all())
-    {
-        cols = m.cols;
-    }
-    else
-    {
-        CV_Assert( 0 <= colRange_.start && colRange_.start <= colRange_.end && colRange_.end <= m.cols );
-
-        cols = colRange_.size();
-        data += colRange_.start*elemSize();
+        ਪੰਕਤੀਆਂ = ਪੰਕਤੀ_Range.size();
+        ਅੰਕੜੇ += ਕਦਮ*ਪੰਕਤੀ_Range.ਸ਼ੁਰੂ;
     }
 
-    if (refcount)
+    ਜੇ (ਖਾਨਾ_Range == Range::all())
+    {
+        ਖਾਨੇ_ਗਿਣਤੀ = m.ਖਾਨੇ_ਗਿਣਤੀ;
+    }
+    ਨਹੀਂਤਾਂ
+    {
+        CV_Assert( 0 <= ਖਾਨਾ_Range.ਸ਼ੁਰੂ && ਖਾਨਾ_Range.ਸ਼ੁਰੂ <= ਖਾਨਾ_Range.end && ਖਾਨਾ_Range.end <= m.ਖਾਨੇ_ਗਿਣਤੀ );
+
+        ਖਾਨੇ_ਗਿਣਤੀ = ਖਾਨਾ_Range.size();
+        ਅੰਕੜੇ += ਖਾਨਾ_Range.ਸ਼ੁਰੂ*elem_ਮਾਪ();
+    }
+
+    ਜੇ (refcount)
         CV_XADD(refcount, 1);
 
-    if (rows <= 0 || cols <= 0)
-        rows = cols = 0;
+    ਜੇ (ਪੰਕਤੀਆਂ <= 0 || ਖਾਨੇ_ਗਿਣਤੀ <= 0)
+        ਪੰਕਤੀਆਂ = ਖਾਨੇ_ਗਿਣਤੀ = 0;
 
     updateContinuityFlag();
 }
 
-cv::cuda::GpuMat::GpuMat(const GpuMat& m, Rect roi) :
-    flags(m.flags), rows(roi.height), cols(roi.width),
-    step(m.step), data(m.data + roi.y*step), refcount(m.refcount),
+cv::cuda::GpuMat::GpuMat(ਅਚਲ GpuMat& m, Rect roi) :
+    flags(m.flags), ਪੰਕਤੀਆਂ(roi.ਉਚਾਈ), ਖਾਨੇ_ਗਿਣਤੀ(roi.ਚੌੜਾਈ),
+    ਕਦਮ(m.ਕਦਮ), ਅੰਕੜੇ(m.ਅੰਕੜੇ + roi.y*ਕਦਮ), refcount(m.refcount),
     datastart(m.datastart), dataend(m.dataend),
     allocator(m.allocator)
 {
-    data += roi.x * elemSize();
+    ਅੰਕੜੇ += roi.x * elem_ਮਾਪ();
 
-    CV_Assert( 0 <= roi.x && 0 <= roi.width &&
-               roi.x + roi.width <= m.cols &&
-               0 <= roi.y && 0 <= roi.height &&
-               roi.y + roi.height <= m.rows );
+    CV_Assert( 0 <= roi.x && 0 <= roi.ਚੌੜਾਈ &&
+               roi.x + roi.ਚੌੜਾਈ <= m.ਖਾਨੇ_ਗਿਣਤੀ &&
+               0 <= roi.y && 0 <= roi.ਉਚਾਈ &&
+               roi.y + roi.ਉਚਾਈ <= m.ਪੰਕਤੀਆਂ );
 
-    if (refcount)
+    ਜੇ (refcount)
         CV_XADD(refcount, 1);
 
-    if (rows <= 0 || cols <= 0)
-        rows = cols = 0;
+    ਜੇ (ਪੰਕਤੀਆਂ <= 0 || ਖਾਨੇ_ਗਿਣਤੀ <= 0)
+        ਪੰਕਤੀਆਂ = ਖਾਨੇ_ਗਿਣਤੀ = 0;
     updateContinuityFlag();
 }
 
-GpuMat cv::cuda::GpuMat::reshape(int new_cn, int new_rows) const
+GpuMat cv::cuda::GpuMat::reshape(ਪੂਰਨ new_cn, ਪੂਰਨ new_ਪੰਕਤੀਆਂ) ਅਚਲ
 {
-    GpuMat hdr = *this;
+    GpuMat hdr = *ਇਹ;
 
-    int cn = channels();
-    if (new_cn == 0)
+    ਪੂਰਨ cn = channels();
+    ਜੇ (new_cn == 0)
         new_cn = cn;
 
-    int total_width = cols * cn;
+    ਪੂਰਨ ਕੁੱਲ_ਚੌੜਾਈ = ਖਾਨੇ_ਗਿਣਤੀ * cn;
 
-    if ((new_cn > total_width || total_width % new_cn != 0) && new_rows == 0)
-        new_rows = rows * total_width / new_cn;
+    ਜੇ ((new_cn > ਕੁੱਲ_ਚੌੜਾਈ || ਕੁੱਲ_ਚੌੜਾਈ % new_cn != 0) && new_ਪੰਕਤੀਆਂ == 0)
+        new_ਪੰਕਤੀਆਂ = ਪੰਕਤੀਆਂ * ਕੁੱਲ_ਚੌੜਾਈ / new_cn;
 
-    if (new_rows != 0 && new_rows != rows)
+    ਜੇ (new_ਪੰਕਤੀਆਂ != 0 && new_ਪੰਕਤੀਆਂ != ਪੰਕਤੀਆਂ)
     {
-        int total_size = total_width * rows;
+        ਪੂਰਨ ਕੁੱਲ_ਮਾਪ_2 = ਕੁੱਲ_ਚੌੜਾਈ * ਪੰਕਤੀਆਂ;
 
-        if (!isContinuous())
-            CV_Error(cv::Error::BadStep, "The matrix is not continuous, thus its number of rows can not be changed");
+        ਜੇ (!isContinuous())
+            CV_Error(cv::Error::Bad_ਕਦਮ, "The matrix is not continuous, thus its number of rows can not be changed");
 
-        if ((unsigned)new_rows > (unsigned)total_size)
-            CV_Error(cv::Error::StsOutOfRange, "Bad new number of rows");
+        ਜੇ ((ਬਿਨਾਨਿਸ਼ਾਨੀ)new_ਪੰਕਤੀਆਂ > (ਬਿਨਾਨਿਸ਼ਾਨੀ)ਕੁੱਲ_ਮਾਪ_2)
+            CV_Error(cv::Error::Sts_ਬਾਹਰਲਾ_ਦਾ_Range, "Bad new number of rows");
 
-        total_width = total_size / new_rows;
+        ਕੁੱਲ_ਚੌੜਾਈ = ਕੁੱਲ_ਮਾਪ_2 / new_ਪੰਕਤੀਆਂ;
 
-        if (total_width * new_rows != total_size)
+        ਜੇ (ਕੁੱਲ_ਚੌੜਾਈ * new_ਪੰਕਤੀਆਂ != ਕੁੱਲ_ਮਾਪ_2)
             CV_Error(cv::Error::StsBadArg, "The total number of matrix elements is not divisible by the new number of rows");
 
-        hdr.rows = new_rows;
-        hdr.step = total_width * elemSize1();
+        hdr.ਪੰਕਤੀਆਂ = new_ਪੰਕਤੀਆਂ;
+        hdr.ਕਦਮ = ਕੁੱਲ_ਚੌੜਾਈ * elemSize1();
     }
 
-    int new_width = total_width / new_cn;
+    ਪੂਰਨ new_ਚੌੜਾਈ = ਕੁੱਲ_ਚੌੜਾਈ / new_cn;
 
-    if (new_width * new_cn != total_width)
-        CV_Error(cv::Error::BadNumChannels, "The total width is not divisible by the new number of channels");
+    ਜੇ (new_ਚੌੜਾਈ * new_cn != ਕੁੱਲ_ਚੌੜਾਈ)
+        CV_Error(cv::Error::Bad_ਅੰਕ_Channels, "The total width is not divisible by the new number of channels");
 
-    hdr.cols = new_width;
-    hdr.flags = (hdr.flags & ~CV_MAT_CN_MASK) | ((new_cn - 1) << CV_CN_SHIFT);
+    hdr.ਖਾਨੇ_ਗਿਣਤੀ = new_ਚੌੜਾਈ;
+    hdr.flags = (hdr.flags & ~CV_MAT_CN_ਨਕਾਬ) | ((new_cn - 1) << CV_CN_ਖਿਸਕਾਓ);
 
-    return hdr;
+    ਵਾਪਸ hdr;
 }
 
-void cv::cuda::GpuMat::locateROI(Size& wholeSize, Point& ofs) const
+ਖਾਲੀ cv::cuda::GpuMat::locateROI(ਮਾਪ& ਸਾਰਾ_ਮਾਪ, ਬਿੰਦੂ& ofs) ਅਚਲ
 {
-    CV_DbgAssert( step > 0 );
+    CV_DbgAssert( ਕਦਮ > 0 );
 
-    size_t esz = elemSize();
-    ptrdiff_t delta1 = data - datastart;
+    size_t esz = elem_ਮਾਪ();
+    ptrdiff_t delta1 = ਅੰਕੜੇ - datastart;
     ptrdiff_t delta2 = dataend - datastart;
 
-    if (delta1 == 0)
+    ਜੇ (delta1 == 0)
     {
         ofs.x = ofs.y = 0;
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
-        ofs.y = static_cast<int>(delta1 / step);
-        ofs.x = static_cast<int>((delta1 - step * ofs.y) / esz);
+        ofs.y = static_cast<ਪੂਰਨ>(delta1 / ਕਦਮ);
+        ofs.x = static_cast<ਪੂਰਨ>((delta1 - ਕਦਮ * ofs.y) / esz);
 
-        CV_DbgAssert( data == datastart + ofs.y * step + ofs.x * esz );
+        CV_DbgAssert( ਅੰਕੜੇ == datastart + ofs.y * ਕਦਮ + ofs.x * esz );
     }
 
-    size_t minstep = (ofs.x + cols) * esz;
+    size_t minstep = (ofs.x + ਖਾਨੇ_ਗਿਣਤੀ) * esz;
 
-    wholeSize.height = std::max(static_cast<int>((delta2 - minstep) / step + 1), ofs.y + rows);
-    wholeSize.width = std::max(static_cast<int>((delta2 - step * (wholeSize.height - 1)) / esz), ofs.x + cols);
+    ਸਾਰਾ_ਮਾਪ.ਉਚਾਈ = std::max(static_cast<ਪੂਰਨ>((delta2 - minstep) / ਕਦਮ + 1), ofs.y + ਪੰਕਤੀਆਂ);
+    ਸਾਰਾ_ਮਾਪ.ਚੌੜਾਈ = std::max(static_cast<ਪੂਰਨ>((delta2 - ਕਦਮ * (ਸਾਰਾ_ਮਾਪ.ਉਚਾਈ - 1)) / esz), ofs.x + ਖਾਨੇ_ਗਿਣਤੀ);
 }
 
-GpuMat& cv::cuda::GpuMat::adjustROI(int dtop, int dbottom, int dleft, int dright)
+GpuMat& cv::cuda::GpuMat::adjustROI(ਪੂਰਨ dtop, ਪੂਰਨ dbottom, ਪੂਰਨ dleft, ਪੂਰਨ dright)
 {
-    Size wholeSize;
-    Point ofs;
-    locateROI(wholeSize, ofs);
+    ਮਾਪ ਸਾਰਾ_ਮਾਪ;
+    ਬਿੰਦੂ ofs;
+    locateROI(ਸਾਰਾ_ਮਾਪ, ofs);
 
-    size_t esz = elemSize();
+    size_t esz = elem_ਮਾਪ();
 
-    int row1 = std::max(ofs.y - dtop, 0);
-    int row2 = std::min(ofs.y + rows + dbottom, wholeSize.height);
+    ਪੂਰਨ row1 = std::max(ofs.y - dtop, 0);
+    ਪੂਰਨ row2 = std::min(ofs.y + ਪੰਕਤੀਆਂ + dbottom, ਸਾਰਾ_ਮਾਪ.ਉਚਾਈ);
 
-    int col1 = std::max(ofs.x - dleft, 0);
-    int col2 = std::min(ofs.x + cols + dright, wholeSize.width);
+    ਪੂਰਨ col1 = std::max(ofs.x - dleft, 0);
+    ਪੂਰਨ col2 = std::min(ofs.x + ਖਾਨੇ_ਗਿਣਤੀ + dright, ਸਾਰਾ_ਮਾਪ.ਚੌੜਾਈ);
 
-    data += (row1 - ofs.y) * step + (col1 - ofs.x) * esz;
-    rows = row2 - row1;
-    cols = col2 - col1;
+    ਅੰਕੜੇ += (row1 - ofs.y) * ਕਦਮ + (col1 - ofs.x) * esz;
+    ਪੰਕਤੀਆਂ = row2 - row1;
+    ਖਾਨੇ_ਗਿਣਤੀ = col2 - col1;
 
     updateContinuityFlag();
-    return *this;
+    ਵਾਪਸ *ਇਹ;
 }
 
-namespace
+ਨਾਮਾਕਾਸ਼
 {
-    template <class ObjType>
-    void createContinuousImpl(int rows, int cols, int type, ObjType& obj)
+    ਸਾਂਚਾ <ਵਰਗ ObjType>
+    ਖਾਲੀ createContinuousImpl(ਪੂਰਨ ਪੰਕਤੀਆਂ, ਪੂਰਨ ਖਾਨੇ_ਗਿਣਤੀ, ਪੂਰਨ type, ObjType& obj)
     {
-        const int area = rows * cols;
+        ਅਚਲ ਪੂਰਨ area = ਪੰਕਤੀਆਂ * ਖਾਨੇ_ਗਿਣਤੀ;
 
-        if (obj.empty() || obj.type() != type || !obj.isContinuous() || obj.size().area() != area)
+        ਜੇ (obj.empty() || obj.type() != type || !obj.isContinuous() || obj.size().area() != area)
             obj.create(1, area, type);
 
-        obj = obj.reshape(obj.channels(), rows);
+        obj = obj.reshape(obj.channels(), ਪੰਕਤੀਆਂ);
     }
 }
 
-void cv::cuda::createContinuous(int rows, int cols, int type, OutputArray arr)
+ਖਾਲੀ cv::cuda::createContinuous(ਪੂਰਨ ਪੰਕਤੀਆਂ, ਪੂਰਨ ਖਾਨੇ_ਗਿਣਤੀ, ਪੂਰਨ type, OutputArray arr)
 {
-    switch (arr.kind())
+    ਚੋਣ (arr.ਕਿਸਮ())
     {
-    case _InputArray::MAT:
-        ::createContinuousImpl(rows, cols, type, arr.getMatRef());
-        break;
+    ਹਾਲਤ ਨਿਵੇਸ਼_Array_2::MAT:
+        ::createContinuousImpl(ਪੰਕਤੀਆਂ, ਖਾਨੇ_ਗਿਣਤੀ, type, arr.getMatRef());
+        ਰੋਕੋ;
 
-    case _InputArray::CUDA_GPU_MAT:
-        ::createContinuousImpl(rows, cols, type, arr.getGpuMatRef());
-        break;
+    ਹਾਲਤ ਨਿਵੇਸ਼_Array_2::CUDA_GPU_MAT:
+        ::createContinuousImpl(ਪੰਕਤੀਆਂ, ਖਾਨੇ_ਗਿਣਤੀ, type, arr.getGpuMatRef());
+        ਰੋਕੋ;
 
-    case _InputArray::CUDA_HOST_MEM:
-        ::createContinuousImpl(rows, cols, type, arr.getHostMemRef());
-        break;
+    ਹਾਲਤ ਨਿਵੇਸ਼_Array_2::CUDA_HOST_MEM:
+        ::createContinuousImpl(ਪੰਕਤੀਆਂ, ਖਾਨੇ_ਗਿਣਤੀ, type, arr.getHostMemRef());
+        ਰੋਕੋ;
 
-    default:
-        arr.create(rows, cols, type);
+    ਮੂਲ:
+        arr.create(ਪੰਕਤੀਆਂ, ਖਾਨੇ_ਗਿਣਤੀ, type);
     }
 }
 
-namespace
+ਨਾਮਾਕਾਸ਼
 {
-    template <class ObjType>
-    void ensureSizeIsEnoughImpl(int rows, int cols, int type, ObjType& obj)
+    ਸਾਂਚਾ <ਵਰਗ ObjType>
+    ਖਾਲੀ ensure_ਮਾਪ_Is_Enough_Impl(ਪੂਰਨ ਪੰਕਤੀਆਂ, ਪੂਰਨ ਖਾਨੇ_ਗਿਣਤੀ, ਪੂਰਨ type, ObjType& obj)
     {
-        if (obj.empty() || obj.type() != type || obj.data != obj.datastart)
+        ਜੇ (obj.empty() || obj.type() != type || obj.ਅੰਕੜੇ != obj.datastart)
         {
-            obj.create(rows, cols, type);
+            obj.create(ਪੰਕਤੀਆਂ, ਖਾਨੇ_ਗਿਣਤੀ, type);
         }
-        else
+        ਨਹੀਂਤਾਂ
         {
-            const size_t esz = obj.elemSize();
-            const ptrdiff_t delta2 = obj.dataend - obj.datastart;
+            ਅਚਲ size_t esz = obj.elem_ਮਾਪ();
+            ਅਚਲ ptrdiff_t delta2 = obj.dataend - obj.datastart;
 
-            const size_t minstep = obj.cols * esz;
+            ਅਚਲ size_t minstep = obj.ਖਾਨੇ_ਗਿਣਤੀ * esz;
 
-            Size wholeSize;
-            wholeSize.height = std::max(static_cast<int>((delta2 - minstep) / static_cast<size_t>(obj.step) + 1), obj.rows);
-            wholeSize.width = std::max(static_cast<int>((delta2 - static_cast<size_t>(obj.step) * (wholeSize.height - 1)) / esz), obj.cols);
+            ਮਾਪ ਸਾਰਾ_ਮਾਪ;
+            ਸਾਰਾ_ਮਾਪ.ਉਚਾਈ = std::max(static_cast<ਪੂਰਨ>((delta2 - minstep) / static_cast<size_t>(obj.ਕਦਮ) + 1), obj.ਪੰਕਤੀਆਂ);
+            ਸਾਰਾ_ਮਾਪ.ਚੌੜਾਈ = std::max(static_cast<ਪੂਰਨ>((delta2 - static_cast<size_t>(obj.ਕਦਮ) * (ਸਾਰਾ_ਮਾਪ.ਉਚਾਈ - 1)) / esz), obj.ਖਾਨੇ_ਗਿਣਤੀ);
 
-            if (wholeSize.height < rows || wholeSize.width < cols)
+            ਜੇ (ਸਾਰਾ_ਮਾਪ.ਉਚਾਈ < ਪੰਕਤੀਆਂ || ਸਾਰਾ_ਮਾਪ.ਚੌੜਾਈ < ਖਾਨੇ_ਗਿਣਤੀ)
             {
-                obj.create(rows, cols, type);
+                obj.create(ਪੰਕਤੀਆਂ, ਖਾਨੇ_ਗਿਣਤੀ, type);
             }
-            else
+            ਨਹੀਂਤਾਂ
             {
-                obj.cols = cols;
-                obj.rows = rows;
+                obj.ਖਾਨੇ_ਗਿਣਤੀ = ਖਾਨੇ_ਗਿਣਤੀ;
+                obj.ਪੰਕਤੀਆਂ = ਪੰਕਤੀਆਂ;
             }
         }
     }
 }
 
-void cv::cuda::ensureSizeIsEnough(int rows, int cols, int type, OutputArray arr)
+ਖਾਲੀ cv::cuda::ensure_ਮਾਪ_Is_Enough(ਪੂਰਨ ਪੰਕਤੀਆਂ, ਪੂਰਨ ਖਾਨੇ_ਗਿਣਤੀ, ਪੂਰਨ type, OutputArray arr)
 {
-    switch (arr.kind())
+    ਚੋਣ (arr.ਕਿਸਮ())
     {
-    case _InputArray::MAT:
-        ::ensureSizeIsEnoughImpl(rows, cols, type, arr.getMatRef());
-        break;
+    ਹਾਲਤ ਨਿਵੇਸ਼_Array_2::MAT:
+        ::ensure_ਮਾਪ_Is_Enough_Impl(ਪੰਕਤੀਆਂ, ਖਾਨੇ_ਗਿਣਤੀ, type, arr.getMatRef());
+        ਰੋਕੋ;
 
-    case _InputArray::CUDA_GPU_MAT:
-        ::ensureSizeIsEnoughImpl(rows, cols, type, arr.getGpuMatRef());
-        break;
+    ਹਾਲਤ ਨਿਵੇਸ਼_Array_2::CUDA_GPU_MAT:
+        ::ensure_ਮਾਪ_Is_Enough_Impl(ਪੰਕਤੀਆਂ, ਖਾਨੇ_ਗਿਣਤੀ, type, arr.getGpuMatRef());
+        ਰੋਕੋ;
 
-    case _InputArray::CUDA_HOST_MEM:
-        ::ensureSizeIsEnoughImpl(rows, cols, type, arr.getHostMemRef());
-        break;
+    ਹਾਲਤ ਨਿਵੇਸ਼_Array_2::CUDA_HOST_MEM:
+        ::ensure_ਮਾਪ_Is_Enough_Impl(ਪੰਕਤੀਆਂ, ਖਾਨੇ_ਗਿਣਤੀ, type, arr.getHostMemRef());
+        ਰੋਕੋ;
 
-    default:
-        arr.create(rows, cols, type);
+    ਮੂਲ:
+        arr.create(ਪੰਕਤੀਆਂ, ਖਾਨੇ_ਗਿਣਤੀ, type);
     }
 }
 
-GpuMat cv::cuda::getInputMat(InputArray _src, Stream& stream)
+GpuMat cv::cuda::get_ਨਿਵੇਸ਼_Mat(ਨਿਵੇਸ਼_Array _src, ਧਾਰਾ& stream)
 {
-#ifndef HAVE_CUDA
-    CV_UNUSED(_src);
-    CV_UNUSED(stream);
+#ਜੇ_ਅਪਰਿਭਾਸ਼ਿਤ HAVE_CUDA
+    CV_ਅਣਵਰਤਿਆ(_src);
+    CV_ਅਣਵਰਤਿਆ(stream);
     throw_no_cuda();
-#else
+#ਨਹੀਂਤਾਂ
     GpuMat src;
-    if (_src.kind() == _InputArray::CUDA_GPU_MAT)
+    ਜੇ (_src.ਕਿਸਮ() == ਨਿਵੇਸ਼_Array_2::CUDA_GPU_MAT)
     {
         src = _src.getGpuMat();
     }
-    else if (!_src.empty())
+    ਨਹੀਂਤਾਂ ਜੇ (!_src.empty())
     {
-        BufferPool pool(stream);
-        src = pool.getBuffer(_src.size(), _src.type());
+        ਬਫਰ_Pool pool(stream);
+        src = pool.get_ਬਫਰ(_src.size(), _src.type());
         src.upload(_src, stream);
     }
-    return src;
-#endif
+    ਵਾਪਸ src;
+#ਜੇ_ਅੰਤ
 }
 
-GpuMat cv::cuda::getOutputMat(OutputArray _dst, int rows, int cols, int type, Stream& stream)
+GpuMat cv::cuda::getOutputMat(OutputArray _dst, ਪੂਰਨ ਪੰਕਤੀਆਂ, ਪੂਰਨ ਖਾਨੇ_ਗਿਣਤੀ, ਪੂਰਨ type, ਧਾਰਾ& stream)
 {
-#ifndef HAVE_CUDA
-    CV_UNUSED(_dst);
-    CV_UNUSED(rows);
-    CV_UNUSED(cols);
-    CV_UNUSED(type);
-    CV_UNUSED(stream);
+#ਜੇ_ਅਪਰਿਭਾਸ਼ਿਤ HAVE_CUDA
+    CV_ਅਣਵਰਤਿਆ(_dst);
+    CV_ਅਣਵਰਤਿਆ(ਪੰਕਤੀਆਂ);
+    CV_ਅਣਵਰਤਿਆ(ਖਾਨੇ_ਗਿਣਤੀ);
+    CV_ਅਣਵਰਤਿਆ(type);
+    CV_ਅਣਵਰਤਿਆ(stream);
     throw_no_cuda();
-#else
+#ਨਹੀਂਤਾਂ
     GpuMat dst;
-    if (_dst.kind() == _InputArray::CUDA_GPU_MAT)
+    ਜੇ (_dst.ਕਿਸਮ() == ਨਿਵੇਸ਼_Array_2::CUDA_GPU_MAT)
     {
-        _dst.create(rows, cols, type);
+        _dst.create(ਪੰਕਤੀਆਂ, ਖਾਨੇ_ਗਿਣਤੀ, type);
         dst = _dst.getGpuMat();
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
-        BufferPool pool(stream);
-        dst = pool.getBuffer(rows, cols, type);
+        ਬਫਰ_Pool pool(stream);
+        dst = pool.get_ਬਫਰ(ਪੰਕਤੀਆਂ, ਖਾਨੇ_ਗਿਣਤੀ, type);
     }
-    return dst;
-#endif
+    ਵਾਪਸ dst;
+#ਜੇ_ਅੰਤ
 }
 
-void cv::cuda::syncOutput(const GpuMat& dst, OutputArray _dst, Stream& stream)
+ਖਾਲੀ cv::cuda::syncOutput(ਅਚਲ GpuMat& dst, OutputArray _dst, ਧਾਰਾ& stream)
 {
-#ifndef HAVE_CUDA
-    CV_UNUSED(dst);
-    CV_UNUSED(_dst);
-    CV_UNUSED(stream);
+#ਜੇ_ਅਪਰਿਭਾਸ਼ਿਤ HAVE_CUDA
+    CV_ਅਣਵਰਤਿਆ(dst);
+    CV_ਅਣਵਰਤਿਆ(_dst);
+    CV_ਅਣਵਰਤਿਆ(stream);
     throw_no_cuda();
-#else
-    if (_dst.kind() != _InputArray::CUDA_GPU_MAT)
+#ਨਹੀਂਤਾਂ
+    ਜੇ (_dst.ਕਿਸਮ() != ਨਿਵੇਸ਼_Array_2::CUDA_GPU_MAT)
     {
-        if (stream)
+        ਜੇ (stream)
             dst.download(_dst, stream);
-        else
+        ਨਹੀਂਤਾਂ
             dst.download(_dst);
     }
-#endif
+#ਜੇ_ਅੰਤ
 }
 
-#ifndef HAVE_CUDA
+#ਜੇ_ਅਪਰਿਭਾਸ਼ਿਤ HAVE_CUDA
 
 GpuMat::Allocator* cv::cuda::GpuMat::defaultAllocator()
 {
-    return 0;
+    ਵਾਪਸ 0;
 }
 
-void cv::cuda::GpuMat::setDefaultAllocator(Allocator* allocator)
+ਖਾਲੀ cv::cuda::GpuMat::ਸੈੱਟ_Default_Allocator(Allocator* allocator)
 {
-    CV_UNUSED(allocator);
+    CV_ਅਣਵਰਤਿਆ(allocator);
     throw_no_cuda();
 }
 
 GpuMat::Allocator* cv::cuda::GpuMat::getStdAllocator()
 {
-    return 0;
+    ਵਾਪਸ 0;
 }
 
-void cv::cuda::GpuMat::create(int _rows, int _cols, int _type)
+ਖਾਲੀ cv::cuda::GpuMat::create(ਪੂਰਨ ਪੰਕਤੀਆਂ_3, ਪੂਰਨ ਖਾਨੇ_ਗਿਣਤੀ_3, ਪੂਰਨ _type)
 {
-    CV_UNUSED(_rows);
-    CV_UNUSED(_cols);
-    CV_UNUSED(_type);
+    CV_ਅਣਵਰਤਿਆ(ਪੰਕਤੀਆਂ_3);
+    CV_ਅਣਵਰਤਿਆ(ਖਾਨੇ_ਗਿਣਤੀ_3);
+    CV_ਅਣਵਰਤਿਆ(_type);
     throw_no_cuda();
 }
 
-void cv::cuda::GpuMat::release()
+ਖਾਲੀ cv::cuda::GpuMat::release()
 {
-    if( refcount && CV_XADD(refcount, -1) == 1 )
-        defaultAllocator()->free(this);
-    dataend = datastart = data = 0;
-    step = 0;
+    ਜੇ( refcount && CV_XADD(refcount, -1) == 1 )
+        defaultAllocator()->ਮੁਕਤ(ਇਹ);
+    dataend = datastart = ਅੰਕੜੇ = 0;
+    ਕਦਮ = 0;
     refcount = 0;
-    flags &= ~Mat::MAGIC_MASK;
+    flags &= ~Mat::MAGIC_ਨਕਾਬ;
 }
 
-void cv::cuda::GpuMat::fit(int _rows, int _cols, int _type)
+ਖਾਲੀ cv::cuda::GpuMat::fit(ਪੂਰਨ ਪੰਕਤੀਆਂ_3, ਪੂਰਨ ਖਾਨੇ_ਗਿਣਤੀ_3, ਪੂਰਨ _type)
 {
     // Emulate Mat::fit semantics for GPU: avoid reallocation when possible
-    size_t oldTotalBytes = (datastart && dataend) ? (size_t)(dataend - datastart) : 0;
-    size_t esz = CV_ELEM_SIZE(_type);
-    size_t newTotalBytes = (size_t)_rows * (size_t)_cols * esz;
+    size_t old_ਕੁੱਲ_ਬਾਈਟਾਂ = (datastart && dataend) ? (size_t)(dataend - datastart) : 0;
+    size_t esz = CV_ELEM_ਮਾਪ(_type);
+    size_t new_ਕੁੱਲ_ਬਾਈਟਾਂ = (size_t)ਪੰਕਤੀਆਂ_3 * (size_t)ਖਾਨੇ_ਗਿਣਤੀ_3 * esz;
 
     // Reallocate if:
     // - need non-contiguous layout (GPU pitch) or ROI, or
     // - requested bytes exceed current capacity, or
     // - data pointer is not at the start (ROI)
-    if (newTotalBytes > 0 && (!isContinuous() || newTotalBytes > oldTotalBytes || data != datastart))
+    ਜੇ (new_ਕੁੱਲ_ਬਾਈਟਾਂ > 0 && (!isContinuous() || new_ਕੁੱਲ_ਬਾਈਟਾਂ > old_ਕੁੱਲ_ਬਾਈਟਾਂ || ਅੰਕੜੇ != datastart))
     {
-        create(_rows, _cols, _type);
-        return;
+        create(ਪੰਕਤੀਆਂ_3, ਖਾਨੇ_ਗਿਣਤੀ_3, _type);
+        ਵਾਪਸ;
     }
 
     // Reuse existing allocation, just adjust header/type
-    flags = (flags & ~Mat::TYPE_MASK) | CV_MAKETYPE(CV_MAT_DEPTH(_type), CV_MAT_CN(_type));
-    rows = _rows;
-    cols = _cols;
-    step = (size_t)cols * esz;
+    flags = (flags & ~Mat::TYPE_ਨਕਾਬ) | CV_MAKETYPE(CV_MAT_ਡੂੰਘਾਈ(_type), CV_MAT_CN(_type));
+    ਪੰਕਤੀਆਂ = ਪੰਕਤੀਆਂ_3;
+    ਖਾਨੇ_ਗਿਣਤੀ = ਖਾਨੇ_ਗਿਣਤੀ_3;
+    ਕਦਮ = (size_t)ਖਾਨੇ_ਗਿਣਤੀ * esz;
 }
 
-void cv::cuda::GpuMat::fit(Size _sz, int _type)
+ਖਾਲੀ cv::cuda::GpuMat::fit(ਮਾਪ _sz, ਪੂਰਨ _type)
 {
-    fit(_sz.height, _sz.width, _type);
+    fit(_sz.ਉਚਾਈ, _sz.ਚੌੜਾਈ, _type);
 }
 
-void cv::cuda::GpuMat::upload(InputArray arr)
+ਖਾਲੀ cv::cuda::GpuMat::upload(ਨਿਵੇਸ਼_Array arr)
 {
-    CV_UNUSED(arr);
+    CV_ਅਣਵਰਤਿਆ(arr);
     throw_no_cuda();
 }
 
-void cv::cuda::GpuMat::upload(InputArray arr, Stream& _stream)
+ਖਾਲੀ cv::cuda::GpuMat::upload(ਨਿਵੇਸ਼_Array arr, ਧਾਰਾ& ਧਾਰਾ_2)
 {
-    CV_UNUSED(arr);
-    CV_UNUSED(_stream);
+    CV_ਅਣਵਰਤਿਆ(arr);
+    CV_ਅਣਵਰਤਿਆ(ਧਾਰਾ_2);
     throw_no_cuda();
 }
 
-void cv::cuda::GpuMat::download(OutputArray _dst) const
+ਖਾਲੀ cv::cuda::GpuMat::download(OutputArray _dst) ਅਚਲ
 {
-    CV_UNUSED(_dst);
+    CV_ਅਣਵਰਤਿਆ(_dst);
     throw_no_cuda();
 }
 
-void cv::cuda::GpuMat::download(OutputArray _dst, Stream& _stream) const
+ਖਾਲੀ cv::cuda::GpuMat::download(OutputArray _dst, ਧਾਰਾ& ਧਾਰਾ_2) ਅਚਲ
 {
-    CV_UNUSED(_dst);
-    CV_UNUSED(_stream);
+    CV_ਅਣਵਰਤਿਆ(_dst);
+    CV_ਅਣਵਰਤਿਆ(ਧਾਰਾ_2);
     throw_no_cuda();
 }
 
-void cv::cuda::GpuMat::copyTo(OutputArray _dst) const
+ਖਾਲੀ cv::cuda::GpuMat::copy_ਮੰਜ਼ਿਲ(OutputArray _dst) ਅਚਲ
 {
-    CV_UNUSED(_dst);
+    CV_ਅਣਵਰਤਿਆ(_dst);
     throw_no_cuda();
 }
 
-void cv::cuda::GpuMat::copyTo(OutputArray _dst, Stream& _stream) const
+ਖਾਲੀ cv::cuda::GpuMat::copy_ਮੰਜ਼ਿਲ(OutputArray _dst, ਧਾਰਾ& ਧਾਰਾ_2) ਅਚਲ
 {
-    CV_UNUSED(_dst);
-    CV_UNUSED(_stream);
+    CV_ਅਣਵਰਤਿਆ(_dst);
+    CV_ਅਣਵਰਤਿਆ(ਧਾਰਾ_2);
     throw_no_cuda();
 }
 
-void cv::cuda::GpuMat::copyTo(OutputArray _dst, InputArray _mask, Stream& _stream) const
+ਖਾਲੀ cv::cuda::GpuMat::copy_ਮੰਜ਼ਿਲ(OutputArray _dst, ਨਿਵੇਸ਼_Array ਨਕਾਬ_2, ਧਾਰਾ& ਧਾਰਾ_2) ਅਚਲ
 {
-    CV_UNUSED(_dst);
-    CV_UNUSED(_mask);
-    CV_UNUSED(_stream);
+    CV_ਅਣਵਰਤਿਆ(_dst);
+    CV_ਅਣਵਰਤਿਆ(ਨਕਾਬ_2);
+    CV_ਅਣਵਰਤਿਆ(ਧਾਰਾ_2);
     throw_no_cuda();
 }
 
-GpuMat& cv::cuda::GpuMat::setTo(Scalar s, Stream& _stream)
+GpuMat& cv::cuda::GpuMat::ਸੈੱਟ_ਮੰਜ਼ਿਲ(Scalar s, ਧਾਰਾ& ਧਾਰਾ_2)
 {
-    CV_UNUSED(s);
-    CV_UNUSED(_stream);
+    CV_ਅਣਵਰਤਿਆ(s);
+    CV_ਅਣਵਰਤਿਆ(ਧਾਰਾ_2);
     throw_no_cuda();
 }
 
-GpuMat& cv::cuda::GpuMat::setTo(Scalar s, InputArray _mask, Stream& _stream)
+GpuMat& cv::cuda::GpuMat::ਸੈੱਟ_ਮੰਜ਼ਿਲ(Scalar s, ਨਿਵੇਸ਼_Array ਨਕਾਬ_2, ਧਾਰਾ& ਧਾਰਾ_2)
 {
-    CV_UNUSED(s);
-    CV_UNUSED(_mask);
-    CV_UNUSED(_stream);
+    CV_ਅਣਵਰਤਿਆ(s);
+    CV_ਅਣਵਰਤਿਆ(ਨਕਾਬ_2);
+    CV_ਅਣਵਰਤਿਆ(ਧਾਰਾ_2);
     throw_no_cuda();
 }
 
-void cv::cuda::GpuMat::convertTo(OutputArray _dst, int rtype, Stream& _stream) const
+ਖਾਲੀ cv::cuda::GpuMat::convert_ਮੰਜ਼ਿਲ(OutputArray _dst, ਪੂਰਨ rtype, ਧਾਰਾ& ਧਾਰਾ_2) ਅਚਲ
 {
-    CV_UNUSED(_dst);
-    CV_UNUSED(rtype);
-    CV_UNUSED(_stream);
+    CV_ਅਣਵਰਤਿਆ(_dst);
+    CV_ਅਣਵਰਤਿਆ(rtype);
+    CV_ਅਣਵਰਤਿਆ(ਧਾਰਾ_2);
     throw_no_cuda();
 }
 
-void cv::cuda::GpuMat::convertTo(OutputArray _dst, int rtype, double alpha, double beta, Stream& _stream) const
+ਖਾਲੀ cv::cuda::GpuMat::convert_ਮੰਜ਼ਿਲ(OutputArray _dst, ਪੂਰਨ rtype, ਦੁੱਗਣਾ alpha, ਦੁੱਗਣਾ beta, ਧਾਰਾ& ਧਾਰਾ_2) ਅਚਲ
 {
-    CV_UNUSED(_dst);
-    CV_UNUSED(rtype);
-    CV_UNUSED(alpha);
-    CV_UNUSED(beta);
-    CV_UNUSED(_stream);
+    CV_ਅਣਵਰਤਿਆ(_dst);
+    CV_ਅਣਵਰਤਿਆ(rtype);
+    CV_ਅਣਵਰਤਿਆ(alpha);
+    CV_ਅਣਵਰਤਿਆ(beta);
+    CV_ਅਣਵਰਤਿਆ(ਧਾਰਾ_2);
     throw_no_cuda();
 }
 
-#endif
+#ਜੇ_ਅੰਤ

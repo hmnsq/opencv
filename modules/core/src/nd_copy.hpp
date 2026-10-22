@@ -8,42 +8,42 @@
 // and slice.
 // Each of them only describes a source and a destination view; channels stay inside the element.
 
-#ifndef OPENCV_CORE_ND_COPY_HPP
-#define OPENCV_CORE_ND_COPY_HPP
+#ਜੇ_ਅਪਰਿਭਾਸ਼ਿਤ OPENCV_CORE_ND_COPY_HPP
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ OPENCV_CORE_ND_COPY_HPP
 
-namespace cv { namespace nd {
+ਨਾਮਾਕਾਸ਼ cv { ਨਾਮਾਕਾਸ਼ nd {
 
-enum { MAX_VIEW_DIMS = CV_MAX_DIM };
+ਗਿਣਤੀ { MAX_VIEW_DIMS = CV_MAX_DIM };
 
-struct View
+ਬਣਤਰ View
 {
-    uchar* data = nullptr;
-    int dims = 0;
+    uchar* ਅੰਕੜੇ = ਖਾਲੀ_ਸੂਚਕ;
+    ਪੂਰਨ dims = 0;
     size_t esz = 0;                    // element size in bytes, channels included
-    int size[MAX_VIEW_DIMS];
-    ptrdiff_t step[MAX_VIEW_DIMS];     // in bytes; 0 = broadcast, negative = reversed
+    ਪੂਰਨ size[MAX_VIEW_DIMS];
+    ptrdiff_t ਕਦਮ[MAX_VIEW_DIMS];     // in bytes; 0 = broadcast, negative = reversed
 };
 
-View viewOf(const Mat& m);
+View view_ਦਾ(ਅਚਲ Mat& m);
 
 // The i-th axis of the result is the order[i]-th axis of v.
-View permute(const View& v, const int* order);
+View ਕ੍ਰਮ_ਬਦਲੋ(ਅਚਲ View& v, ਅਚਲ ਪੂਰਨ* ਕ੍ਰਮ);
 
-void flip(View& v, int axis);
+ਖਾਲੀ flip(View& v, ਪੂਰਨ axis);
 
 // Keep `count` elements along the axis, starting at `start`; `step` may be negative.
-void slice(View& v, int axis, int start, int step, int count);
+ਖਾਲੀ ਟੁਕੜਾ_2(View& v, ਪੂਰਨ axis, ਪੂਰਨ ਸ਼ੁਰੂ, ਪੂਰਨ ਕਦਮ, ਪੂਰਨ ਗਿਣਤੀ_3);
 
 // The views must have the same dims, sizes and esz. Overlapping views are allowed.
-void copy(const View& src, const View& dst);
+ਖਾਲੀ copy(ਅਚਲ View& src, ਅਚਲ View& dst);
 
 // n independent copies executed in one parallel pass.
-void copyBatch(const View* src, const View* dst, int n);
+ਖਾਲੀ copyBatch(ਅਚਲ View* src, ਅਚਲ View* dst, ਪੂਰਨ n);
 
 // cv::transpose kernel for the element size, or nullptr; defined in matrix_transform.cpp.
-typedef void (*TransposeFunc)(const uchar* src, size_t sstep, uchar* dst, size_t dstep, Size sz);
+ਕਿਸਮਪਰਿਭਾਸ਼ਾ ਖਾਲੀ (*TransposeFunc)(ਅਚਲ uchar* src, size_t sstep, uchar* dst, size_t dstep, ਮਾਪ sz);
 TransposeFunc getTransposeFunc(size_t esz);
 
 }} // namespace cv::nd
 
-#endif
+#ਜੇ_ਅੰਤ

@@ -2,238 +2,238 @@
 // It is subject to the license terms in the LICENSE file found in the top-level directory
 // of this distribution and at http://opencv.org/license.html.
 
-#include "opencv2/core/ocl_genbase.hpp"
+#ਅਨ੍ਤਰ੍ਭਾਵ "opencv2/core/ocl_genbase.hpp"
 
-#if defined(_MSC_VER)
-    #pragma warning(push)
-    #pragma warning(disable : 4100)
-    #pragma warning(disable : 4702)
-#elif defined(__clang__)
-    #pragma clang diagnostic push
-    #pragma clang diagnostic ignored "-Wunused-parameter"
-#elif defined(__GNUC__)
-    #pragma GCC diagnostic push
-    #pragma GCC diagnostic ignored "-Wunused-parameter"
-#endif
+#ਜੇ defined(_MSC_VER)
+    #ਹਦਾਇਤ warning(push)
+    #ਹਦਾਇਤ warning(disable : 4100)
+    #ਹਦਾਇਤ warning(disable : 4702)
+#ਜਾਂਜੇ defined(__clang__)
+    #ਹਦਾਇਤ clang diagnostic push
+    #ਹਦਾਇਤ clang diagnostic ignored "-Wunused-parameter"
+#ਜਾਂਜੇ defined(__GNUC__)
+    #ਹਦਾਇਤ GCC diagnostic push
+    #ਹਦਾਇਤ GCC diagnostic ignored "-Wunused-parameter"
+#ਜੇ_ਅੰਤ
 
-namespace cv { namespace ocl {
+ਨਾਮਾਕਾਸ਼ cv { ਨਾਮਾਕਾਸ਼ ocl {
 
-static
-CV_NORETURN void throw_no_ocl()
+ਸਥਿਰ
+CV_NORETURN ਖਾਲੀ throw_no_ocl()
 {
     CV_Error(Error::OpenCLApiCallError, "OpenCV build without OpenCL support");
 }
-#define OCL_NOT_AVAILABLE() throw_no_ocl();
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ OCL_NOT_ਉਪਲਬਧ() throw_no_ocl();
 
-CV_EXPORTS_W bool haveOpenCL() { return false; }
-CV_EXPORTS_W bool useOpenCL() { return false; }
-CV_EXPORTS_W bool haveAmdBlas() { return false; }
-CV_EXPORTS_W bool haveAmdFft() { return false; }
-CV_EXPORTS_W void setUseOpenCL(bool flag) { /* nothing */ }
-CV_EXPORTS_W void finish() { /* nothing */ }
+CV_EXPORTS_W ਤਾਰਕਿਕ haveOpenCL() { ਵਾਪਸ ਝੂਠ; }
+CV_EXPORTS_W ਤਾਰਕਿਕ useOpenCL() { ਵਾਪਸ ਝੂਠ; }
+CV_EXPORTS_W ਤਾਰਕਿਕ haveAmdBlas() { ਵਾਪਸ ਝੂਠ; }
+CV_EXPORTS_W ਤਾਰਕਿਕ haveAmdFft() { ਵਾਪਸ ਝੂਠ; }
+CV_EXPORTS_W ਖਾਲੀ ਸੈੱਟ_Use_Open_CL(ਤਾਰਕਿਕ flag) { /* nothing */ }
+CV_EXPORTS_W ਖਾਲੀ ਅੰਤ_2() { /* nothing */ }
 
-CV_EXPORTS bool haveSVM() { return false; }
+CV_EXPORTS ਤਾਰਕਿਕ haveSVM() { ਵਾਪਸ ਝੂਠ; }
 
-Device::Device() CV_NOEXCEPT : p(NULL) { }
-Device::Device(void* d) : p(NULL) { OCL_NOT_AVAILABLE(); }
-Device::Device(const Device& d) : p(NULL) { }
-Device& Device::operator=(const Device& d) { return *this; }
-Device::Device(Device&&) CV_NOEXCEPT : p(NULL) { }
-Device& Device::operator=(Device&&) CV_NOEXCEPT { return *this; }
+Device::Device() CV_NOEXCEPT : p(ਨਿਰਾ) { }
+Device::Device(ਖਾਲੀ* d) : p(ਨਿਰਾ) { OCL_NOT_ਉਪਲਬਧ(); }
+Device::Device(ਅਚਲ Device& d) : p(ਨਿਰਾ) { }
+Device& Device::ਸੰਚਾਲਕ=(ਅਚਲ Device& d) { ਵਾਪਸ *ਇਹ; }
+Device::Device(Device&&) CV_NOEXCEPT : p(ਨਿਰਾ) { }
+Device& Device::ਸੰਚਾਲਕ=(Device&&) CV_NOEXCEPT { ਵਾਪਸ *ਇਹ; }
 Device::~Device() { }
 
-void Device::set(void* d) { OCL_NOT_AVAILABLE(); }
+ਖਾਲੀ Device::ਸੈੱਟ(ਖਾਲੀ* d) { OCL_NOT_ਉਪਲਬਧ(); }
 
-String Device::name() const { OCL_NOT_AVAILABLE(); }
-String Device::extensions() const { OCL_NOT_AVAILABLE(); }
-bool Device::isExtensionSupported(const String& extensionName) const { OCL_NOT_AVAILABLE(); }
-String Device::version() const { OCL_NOT_AVAILABLE(); }
-String Device::vendorName() const { OCL_NOT_AVAILABLE(); }
-String Device::OpenCL_C_Version() const { OCL_NOT_AVAILABLE(); }
-String Device::OpenCLVersion() const { OCL_NOT_AVAILABLE(); }
-int Device::deviceVersionMajor() const { OCL_NOT_AVAILABLE(); }
-int Device::deviceVersionMinor() const { OCL_NOT_AVAILABLE(); }
-String Device::driverVersion() const { OCL_NOT_AVAILABLE(); }
-void* Device::ptr() const { /*OCL_NOT_AVAILABLE();*/ return NULL; }
+String Device::name() ਅਚਲ { OCL_NOT_ਉਪਲਬਧ(); }
+String Device::extensions() ਅਚਲ { OCL_NOT_ਉਪਲਬਧ(); }
+ਤਾਰਕਿਕ Device::isExtensionSupported(ਅਚਲ String& extensionName) ਅਚਲ { OCL_NOT_ਉਪਲਬਧ(); }
+String Device::ਸੰਸਕਰਣ() ਅਚਲ { OCL_NOT_ਉਪਲਬਧ(); }
+String Device::vendorName() ਅਚਲ { OCL_NOT_ਉਪਲਬਧ(); }
+String Device::Open_CL_C_ਸੰਸਕਰਣ() ਅਚਲ { OCL_NOT_ਉਪਲਬਧ(); }
+String Device::OpenCLVersion() ਅਚਲ { OCL_NOT_ਉਪਲਬਧ(); }
+ਪੂਰਨ Device::device_ਸੰਸਕਰਣ_Major() ਅਚਲ { OCL_NOT_ਉਪਲਬਧ(); }
+ਪੂਰਨ Device::device_ਸੰਸਕਰਣ_Minor() ਅਚਲ { OCL_NOT_ਉਪਲਬਧ(); }
+String Device::driver_ਸੰਸਕਰਣ() ਅਚਲ { OCL_NOT_ਉਪਲਬਧ(); }
+ਖਾਲੀ* Device::ptr() ਅਚਲ { /*OCL_NOT_AVAILABLE();*/ ਵਾਪਸ ਨਿਰਾ; }
 
-int Device::type() const { OCL_NOT_AVAILABLE(); }
+ਪੂਰਨ Device::type() ਅਚਲ { OCL_NOT_ਉਪਲਬਧ(); }
 
-int Device::addressBits() const { OCL_NOT_AVAILABLE(); }
-bool Device::available() const { OCL_NOT_AVAILABLE(); }
-bool Device::compilerAvailable() const { OCL_NOT_AVAILABLE(); }
-bool Device::linkerAvailable() const { OCL_NOT_AVAILABLE(); }
+ਪੂਰਨ Device::ਪਤਾ_ਬਿੱਟ() ਅਚਲ { OCL_NOT_ਉਪਲਬਧ(); }
+ਤਾਰਕਿਕ Device::ਉਪਲਬਧ() ਅਚਲ { OCL_NOT_ਉਪਲਬਧ(); }
+ਤਾਰਕਿਕ Device::compiler_ਉਪਲਬਧ() ਅਚਲ { OCL_NOT_ਉਪਲਬਧ(); }
+ਤਾਰਕਿਕ Device::linker_ਉਪਲਬਧ() ਅਚਲ { OCL_NOT_ਉਪਲਬਧ(); }
 
-int Device::doubleFPConfig() const { OCL_NOT_AVAILABLE(); }
-int Device::singleFPConfig() const { OCL_NOT_AVAILABLE(); }
-int Device::halfFPConfig() const { OCL_NOT_AVAILABLE(); }
+ਪੂਰਨ Device::doubleFPConfig() ਅਚਲ { OCL_NOT_ਉਪਲਬਧ(); }
+ਪੂਰਨ Device::singleFPConfig() ਅਚਲ { OCL_NOT_ਉਪਲਬਧ(); }
+ਪੂਰਨ Device::halfFPConfig() ਅਚਲ { OCL_NOT_ਉਪਲਬਧ(); }
 
-bool Device::hasFP64() const { OCL_NOT_AVAILABLE(); }
-bool Device::hasFP16() const { OCL_NOT_AVAILABLE(); }
+ਤਾਰਕਿਕ Device::hasFP64() ਅਚਲ { OCL_NOT_ਉਪਲਬਧ(); }
+ਤਾਰਕਿਕ Device::hasFP16() ਅਚਲ { OCL_NOT_ਉਪਲਬਧ(); }
 
-bool Device::endianLittle() const { OCL_NOT_AVAILABLE(); }
-bool Device::errorCorrectionSupport() const { OCL_NOT_AVAILABLE(); }
+ਤਾਰਕਿਕ Device::endianLittle() ਅਚਲ { OCL_NOT_ਉਪਲਬਧ(); }
+ਤਾਰਕਿਕ Device::errorCorrectionSupport() ਅਚਲ { OCL_NOT_ਉਪਲਬਧ(); }
 
-int Device::executionCapabilities() const { OCL_NOT_AVAILABLE(); }
+ਪੂਰਨ Device::executionCapabilities() ਅਚਲ { OCL_NOT_ਉਪਲਬਧ(); }
 
-size_t Device::globalMemCacheSize() const { OCL_NOT_AVAILABLE(); }
+size_t Device::global_Mem_Cache_ਮਾਪ() ਅਚਲ { OCL_NOT_ਉਪਲਬਧ(); }
 
-int Device::globalMemCacheType() const { OCL_NOT_AVAILABLE(); }
-int Device::globalMemCacheLineSize() const { OCL_NOT_AVAILABLE(); }
-size_t Device::globalMemSize() const { OCL_NOT_AVAILABLE(); }
+ਪੂਰਨ Device::globalMemCacheType() ਅਚਲ { OCL_NOT_ਉਪਲਬਧ(); }
+ਪੂਰਨ Device::global_Mem_Cache_ਸਤਰ_ਮਾਪ() ਅਚਲ { OCL_NOT_ਉਪਲਬਧ(); }
+size_t Device::global_Mem_ਮਾਪ() ਅਚਲ { OCL_NOT_ਉਪਲਬਧ(); }
 
-size_t Device::localMemSize() const { OCL_NOT_AVAILABLE(); }
-int Device::localMemType() const { return NO_LOCAL_MEM; }
-bool Device::hostUnifiedMemory() const { OCL_NOT_AVAILABLE(); }
+size_t Device::local_Mem_ਮਾਪ() ਅਚਲ { OCL_NOT_ਉਪਲਬਧ(); }
+ਪੂਰਨ Device::localMemType() ਅਚਲ { ਵਾਪਸ NO_LOCAL_MEM; }
+ਤਾਰਕਿਕ Device::host_Unified_ਸਮ੍ਰਿਤੀ_2() ਅਚਲ { OCL_NOT_ਉਪਲਬਧ(); }
 
-bool Device::imageSupport() const { OCL_NOT_AVAILABLE(); }
+ਤਾਰਕਿਕ Device::imageSupport() ਅਚਲ { OCL_NOT_ਉਪਲਬਧ(); }
 
-bool Device::imageFromBufferSupport() const { OCL_NOT_AVAILABLE(); }
-uint Device::imagePitchAlignment() const { OCL_NOT_AVAILABLE(); }
-uint Device::imageBaseAddressAlignment() const { OCL_NOT_AVAILABLE(); }
+ਤਾਰਕਿਕ Device::image_From_ਬਫਰ_Support() ਅਚਲ { OCL_NOT_ਉਪਲਬਧ(); }
+uint Device::imagePitchAlignment() ਅਚਲ { OCL_NOT_ਉਪਲਬਧ(); }
+uint Device::image_ਅਧਾਰ_ਪਤਾ_Alignment() ਅਚਲ { OCL_NOT_ਉਪਲਬਧ(); }
 
-bool Device::intelSubgroupsSupport() const { OCL_NOT_AVAILABLE(); }
+ਤਾਰਕਿਕ Device::intelSubgroupsSupport() ਅਚਲ { OCL_NOT_ਉਪਲਬਧ(); }
 
-size_t Device::image2DMaxWidth() const { OCL_NOT_AVAILABLE(); }
-size_t Device::image2DMaxHeight() const { OCL_NOT_AVAILABLE(); }
+size_t Device::image2_DMax_ਚੌੜਾਈ() ਅਚਲ { OCL_NOT_ਉਪਲਬਧ(); }
+size_t Device::image2_DMax_ਉਚਾਈ() ਅਚਲ { OCL_NOT_ਉਪਲਬਧ(); }
 
-size_t Device::image3DMaxWidth() const { OCL_NOT_AVAILABLE(); }
-size_t Device::image3DMaxHeight() const { OCL_NOT_AVAILABLE(); }
-size_t Device::image3DMaxDepth() const { OCL_NOT_AVAILABLE(); }
+size_t Device::image3_DMax_ਚੌੜਾਈ() ਅਚਲ { OCL_NOT_ਉਪਲਬਧ(); }
+size_t Device::image3_DMax_ਉਚਾਈ() ਅਚਲ { OCL_NOT_ਉਪਲਬਧ(); }
+size_t Device::image3_DMax_ਡੂੰਘਾਈ() ਅਚਲ { OCL_NOT_ਉਪਲਬਧ(); }
 
-size_t Device::imageMaxBufferSize() const { OCL_NOT_AVAILABLE(); }
-size_t Device::imageMaxArraySize() const { OCL_NOT_AVAILABLE(); }
+size_t Device::image_Max_ਬਫਰ_ਮਾਪ() ਅਚਲ { OCL_NOT_ਉਪਲਬਧ(); }
+size_t Device::image_Max_Array_ਮਾਪ() ਅਚਲ { OCL_NOT_ਉਪਲਬਧ(); }
 
-int Device::vendorID() const { OCL_NOT_AVAILABLE(); }
+ਪੂਰਨ Device::vendorID() ਅਚਲ { OCL_NOT_ਉਪਲਬਧ(); }
 
-int Device::maxClockFrequency() const { OCL_NOT_AVAILABLE(); }
-int Device::maxComputeUnits() const { OCL_NOT_AVAILABLE(); }
-int Device::maxConstantArgs() const { OCL_NOT_AVAILABLE(); }
-size_t Device::maxConstantBufferSize() const { OCL_NOT_AVAILABLE(); }
+ਪੂਰਨ Device::maxClockFrequency() ਅਚਲ { OCL_NOT_ਉਪਲਬਧ(); }
+ਪੂਰਨ Device::maxComputeUnits() ਅਚਲ { OCL_NOT_ਉਪਲਬਧ(); }
+ਪੂਰਨ Device::max_Constant_ਦਲੀਲਾਂ() ਅਚਲ { OCL_NOT_ਉਪਲਬਧ(); }
+size_t Device::max_Constant_ਬਫਰ_ਮਾਪ() ਅਚਲ { OCL_NOT_ਉਪਲਬਧ(); }
 
-size_t Device::maxMemAllocSize() const { OCL_NOT_AVAILABLE(); }
-size_t Device::maxParameterSize() const { OCL_NOT_AVAILABLE(); }
+size_t Device::max_Mem_Alloc_ਮਾਪ() ਅਚਲ { OCL_NOT_ਉਪਲਬਧ(); }
+size_t Device::max_Parameter_ਮਾਪ() ਅਚਲ { OCL_NOT_ਉਪਲਬਧ(); }
 
-int Device::maxReadImageArgs() const { OCL_NOT_AVAILABLE(); }
-int Device::maxWriteImageArgs() const { OCL_NOT_AVAILABLE(); }
-int Device::maxSamplers() const { OCL_NOT_AVAILABLE(); }
+ਪੂਰਨ Device::max_Read_Image_ਦਲੀਲਾਂ() ਅਚਲ { OCL_NOT_ਉਪਲਬਧ(); }
+ਪੂਰਨ Device::max_Write_Image_ਦਲੀਲਾਂ() ਅਚਲ { OCL_NOT_ਉਪਲਬਧ(); }
+ਪੂਰਨ Device::maxSamplers() ਅਚਲ { OCL_NOT_ਉਪਲਬਧ(); }
 
-size_t Device::maxWorkGroupSize() const { OCL_NOT_AVAILABLE(); }
-int Device::maxWorkItemDims() const { OCL_NOT_AVAILABLE(); }
-void Device::maxWorkItemSizes(size_t*) const { OCL_NOT_AVAILABLE(); }
+size_t Device::max_Work_ਸਮੂਹ_ਮਾਪ() ਅਚਲ { OCL_NOT_ਉਪਲਬਧ(); }
+ਪੂਰਨ Device::max_Work_ਵਸਤੂ_Dims() ਅਚਲ { OCL_NOT_ਉਪਲਬਧ(); }
+ਖਾਲੀ Device::max_Work_ਵਸਤੂ_Sizes(size_t*) ਅਚਲ { OCL_NOT_ਉਪਲਬਧ(); }
 
-int Device::memBaseAddrAlign() const { OCL_NOT_AVAILABLE(); }
+ਪੂਰਨ Device::mem_ਅਧਾਰ_Addr_Align() ਅਚਲ { OCL_NOT_ਉਪਲਬਧ(); }
 
-int Device::nativeVectorWidthChar() const { OCL_NOT_AVAILABLE(); }
-int Device::nativeVectorWidthShort() const { OCL_NOT_AVAILABLE(); }
-int Device::nativeVectorWidthInt() const { OCL_NOT_AVAILABLE(); }
-int Device::nativeVectorWidthLong() const { OCL_NOT_AVAILABLE(); }
-int Device::nativeVectorWidthFloat() const { OCL_NOT_AVAILABLE(); }
-int Device::nativeVectorWidthDouble() const { OCL_NOT_AVAILABLE(); }
-int Device::nativeVectorWidthHalf() const { OCL_NOT_AVAILABLE(); }
+ਪੂਰਨ Device::native_ਸਦਿਸ਼_ਚੌੜਾਈ_Char() ਅਚਲ { OCL_NOT_ਉਪਲਬਧ(); }
+ਪੂਰਨ Device::native_ਸਦਿਸ਼_ਚੌੜਾਈ_Short() ਅਚਲ { OCL_NOT_ਉਪਲਬਧ(); }
+ਪੂਰਨ Device::native_ਸਦਿਸ਼_ਚੌੜਾਈ_Int() ਅਚਲ { OCL_NOT_ਉਪਲਬਧ(); }
+ਪੂਰਨ Device::native_ਸਦਿਸ਼_ਚੌੜਾਈ_Long() ਅਚਲ { OCL_NOT_ਉਪਲਬਧ(); }
+ਪੂਰਨ Device::native_ਸਦਿਸ਼_ਚੌੜਾਈ_Float() ਅਚਲ { OCL_NOT_ਉਪਲਬਧ(); }
+ਪੂਰਨ Device::native_ਸਦਿਸ਼_ਚੌੜਾਈ_Double() ਅਚਲ { OCL_NOT_ਉਪਲਬਧ(); }
+ਪੂਰਨ Device::native_ਸਦਿਸ਼_ਚੌੜਾਈ_Half() ਅਚਲ { OCL_NOT_ਉਪਲਬਧ(); }
 
-int Device::preferredVectorWidthChar() const { OCL_NOT_AVAILABLE(); }
-int Device::preferredVectorWidthShort() const { OCL_NOT_AVAILABLE(); }
-int Device::preferredVectorWidthInt() const { OCL_NOT_AVAILABLE(); }
-int Device::preferredVectorWidthLong() const { OCL_NOT_AVAILABLE(); }
-int Device::preferredVectorWidthFloat() const { OCL_NOT_AVAILABLE(); }
-int Device::preferredVectorWidthDouble() const { OCL_NOT_AVAILABLE(); }
-int Device::preferredVectorWidthHalf() const { OCL_NOT_AVAILABLE(); }
+ਪੂਰਨ Device::preferred_ਸਦਿਸ਼_ਚੌੜਾਈ_Char() ਅਚਲ { OCL_NOT_ਉਪਲਬਧ(); }
+ਪੂਰਨ Device::preferred_ਸਦਿਸ਼_ਚੌੜਾਈ_Short() ਅਚਲ { OCL_NOT_ਉਪਲਬਧ(); }
+ਪੂਰਨ Device::preferred_ਸਦਿਸ਼_ਚੌੜਾਈ_Int() ਅਚਲ { OCL_NOT_ਉਪਲਬਧ(); }
+ਪੂਰਨ Device::preferred_ਸਦਿਸ਼_ਚੌੜਾਈ_Long() ਅਚਲ { OCL_NOT_ਉਪਲਬਧ(); }
+ਪੂਰਨ Device::preferred_ਸਦਿਸ਼_ਚੌੜਾਈ_Float() ਅਚਲ { OCL_NOT_ਉਪਲਬਧ(); }
+ਪੂਰਨ Device::preferred_ਸਦਿਸ਼_ਚੌੜਾਈ_Double() ਅਚਲ { OCL_NOT_ਉਪਲਬਧ(); }
+ਪੂਰਨ Device::preferred_ਸਦਿਸ਼_ਚੌੜਾਈ_Half() ਅਚਲ { OCL_NOT_ਉਪਲਬਧ(); }
 
-size_t Device::printfBufferSize() const { OCL_NOT_AVAILABLE(); }
-size_t Device::profilingTimerResolution() const { OCL_NOT_AVAILABLE(); }
+size_t Device::printf_ਬਫਰ_ਮਾਪ() ਅਚਲ { OCL_NOT_ਉਪਲਬਧ(); }
+size_t Device::profilingTimerResolution() ਅਚਲ { OCL_NOT_ਉਪਲਬਧ(); }
 
 /* static */
-const Device& Device::getDefault()
+ਅਚਲ Device& Device::getDefault()
 {
-    static Device dummy;
-    return dummy;
+    ਸਥਿਰ Device dummy;
+    ਵਾਪਸ dummy;
 }
 
-/* static */ Device Device::fromHandle(void* d) { OCL_NOT_AVAILABLE(); }
+/* static */ Device Device::fromHandle(ਖਾਲੀ* d) { OCL_NOT_ਉਪਲਬਧ(); }
 
 
-Context::Context() CV_NOEXCEPT : p(NULL) { }
-Context::Context(int dtype) : p(NULL) { }
+Context::Context() CV_NOEXCEPT : p(ਨਿਰਾ) { }
+Context::Context(ਪੂਰਨ dtype) : p(ਨਿਰਾ) { }
 Context::~Context() { }
-Context::Context(const Context& c) : p(NULL) { }
-Context& Context::operator=(const Context& c) { return *this; }
-Context::Context(Context&&) CV_NOEXCEPT : p(NULL) { }
-Context& Context::operator=(Context&&) CV_NOEXCEPT { return *this; }
+Context::Context(ਅਚਲ Context& c) : p(ਨਿਰਾ) { }
+Context& Context::ਸੰਚਾਲਕ=(ਅਚਲ Context& c) { ਵਾਪਸ *ਇਹ; }
+Context::Context(Context&&) CV_NOEXCEPT : p(ਨਿਰਾ) { }
+Context& Context::ਸੰਚਾਲਕ=(Context&&) CV_NOEXCEPT { ਵਾਪਸ *ਇਹ; }
 
-bool Context::create() { return false; }
-bool Context::create(int dtype) { return false; }
-size_t Context::ndevices() const { return 0; }
-Device& Context::device(size_t idx) const { OCL_NOT_AVAILABLE(); }
-Program Context::getProg(const ProgramSource& prog, const String& buildopt, String& errmsg) { OCL_NOT_AVAILABLE(); }
-void Context::unloadProg(Program& prog) { }
+ਤਾਰਕਿਕ Context::create() { ਵਾਪਸ ਝੂਠ; }
+ਤਾਰਕਿਕ Context::create(ਪੂਰਨ dtype) { ਵਾਪਸ ਝੂਠ; }
+size_t Context::ndevices() ਅਚਲ { ਵਾਪਸ 0; }
+Device& Context::device(size_t idx) ਅਚਲ { OCL_NOT_ਉਪਲਬਧ(); }
+ਪ੍ਰੋਗਰਾਮ_2 Context::getProg(ਅਚਲ ਪ੍ਰੋਗਰਾਮ_ਸਰੋਤ& prog, ਅਚਲ String& buildopt, String& errmsg) { OCL_NOT_ਉਪਲਬਧ(); }
+ਖਾਲੀ Context::unloadProg(ਪ੍ਰੋਗਰਾਮ_2& prog) { }
 
 /* static */
 Context& Context::getDefault()
 {
-    static Context dummy;
-    return dummy;
+    ਸਥਿਰ Context dummy;
+    ਵਾਪਸ dummy;
 }
-void* Context::ptr() const { return NULL; }
+ਖਾਲੀ* Context::ptr() ਅਚਲ { ਵਾਪਸ ਨਿਰਾ; }
 
-void* Context::getOpenCLContextProperty(int /*propertyId*/) const { OCL_NOT_AVAILABLE(); }
+ਖਾਲੀ* Context::getOpenCLContextProperty(ਪੂਰਨ /*propertyId*/) ਅਚਲ { OCL_NOT_ਉਪਲਬਧ(); }
 
-bool Context::useSVM() const { return false; }
-void Context::setUseSVM(bool enabled) { }
+ਤਾਰਕਿਕ Context::useSVM() ਅਚਲ { ਵਾਪਸ ਝੂਠ; }
+ਖਾਲੀ Context::ਸੈੱਟ_Use_SVM(ਤਾਰਕਿਕ enabled) { }
 
 Context::UserContext::~UserContext() { }
 
-void Context::setUserContext(std::type_index /*typeId*/, const std::shared_ptr<Context::UserContext>& /*userContext*/) { OCL_NOT_AVAILABLE(); }
-std::shared_ptr<Context::UserContext> Context::getUserContext(std::type_index /*typeId*/) { OCL_NOT_AVAILABLE(); }
+ਖਾਲੀ Context::ਸੈੱਟ_User_Context(std::type_ਸੂਚਕਾਂਕ /*typeId*/, ਅਚਲ std::shared_ptr<Context::UserContext>& /*userContext*/) { OCL_NOT_ਉਪਲਬਧ(); }
+std::shared_ptr<Context::UserContext> Context::getUserContext(std::type_ਸੂਚਕਾਂਕ /*typeId*/) { OCL_NOT_ਉਪਲਬਧ(); }
 
-/* static */ Context Context::fromHandle(void* context) { OCL_NOT_AVAILABLE(); }
-/* static */ Context Context::fromDevice(const ocl::Device& device) { OCL_NOT_AVAILABLE(); }
-/* static */ Context Context::create(const std::string& configuration) { OCL_NOT_AVAILABLE(); }
+/* static */ Context Context::fromHandle(ਖਾਲੀ* context) { OCL_NOT_ਉਪਲਬਧ(); }
+/* static */ Context Context::fromDevice(ਅਚਲ ocl::Device& device) { OCL_NOT_ਉਪਲਬਧ(); }
+/* static */ Context Context::create(ਅਚਲ std::string& configuration) { OCL_NOT_ਉਪਲਬਧ(); }
 
-void Context::release() { }
+ਖਾਲੀ Context::release() { }
 
 
-Platform::Platform() CV_NOEXCEPT : p(NULL) { }
+Platform::Platform() CV_NOEXCEPT : p(ਨਿਰਾ) { }
 Platform::~Platform() { }
-Platform::Platform(const Platform&) : p(NULL) { }
-Platform& Platform::operator=(const Platform&) { return *this; }
-Platform::Platform(Platform&&) CV_NOEXCEPT : p(NULL) { }
-Platform& Platform::operator=(Platform&&) CV_NOEXCEPT { return *this; }
+Platform::Platform(ਅਚਲ Platform&) : p(ਨਿਰਾ) { }
+Platform& Platform::ਸੰਚਾਲਕ=(ਅਚਲ Platform&) { ਵਾਪਸ *ਇਹ; }
+Platform::Platform(Platform&&) CV_NOEXCEPT : p(ਨਿਰਾ) { }
+Platform& Platform::ਸੰਚਾਲਕ=(Platform&&) CV_NOEXCEPT { ਵਾਪਸ *ਇਹ; }
 
-void* Platform::ptr() const { return NULL; }
+ਖਾਲੀ* Platform::ptr() ਅਚਲ { ਵਾਪਸ ਨਿਰਾ; }
 
 /* static */
 Platform& Platform::getDefault()
 {
-    static Platform dummy;
-    return dummy;
+    ਸਥਿਰ Platform dummy;
+    ਵਾਪਸ dummy;
 }
 
-void attachContext(const String& platformName, void* platformID, void* context, void* deviceID) { OCL_NOT_AVAILABLE(); }
-void convertFromBuffer(void* cl_mem_buffer, size_t step, int rows, int cols, int type, UMat& dst) { OCL_NOT_AVAILABLE(); }
-void convertFromImage(void* cl_mem_image, UMat& dst) { OCL_NOT_AVAILABLE(); }
+ਖਾਲੀ attachContext(ਅਚਲ String& platformName, ਖਾਲੀ* platformID, ਖਾਲੀ* context, ਖਾਲੀ* deviceID) { OCL_NOT_ਉਪਲਬਧ(); }
+ਖਾਲੀ convert_From_ਬਫਰ(ਖਾਲੀ* cl_mem_ਬਫਰ, size_t ਕਦਮ, ਪੂਰਨ ਪੰਕਤੀਆਂ, ਪੂਰਨ ਖਾਨੇ_ਗਿਣਤੀ, ਪੂਰਨ type, UMat& dst) { OCL_NOT_ਉਪਲਬਧ(); }
+ਖਾਲੀ convertFromImage(ਖਾਲੀ* cl_mem_image, UMat& dst) { OCL_NOT_ਉਪਲਬਧ(); }
 
-void initializeContextFromHandle(Context& ctx, void* platform, void* context, void* device) { OCL_NOT_AVAILABLE(); }
+ਖਾਲੀ initializeContextFromHandle(Context& ctx, ਖਾਲੀ* platform, ਖਾਲੀ* context, ਖਾਲੀ* device) { OCL_NOT_ਉਪਲਬਧ(); }
 
-Queue::Queue() CV_NOEXCEPT : p(NULL) { }
-Queue::Queue(const Context& c, const Device& d) : p(NULL) { OCL_NOT_AVAILABLE(); }
-Queue::~Queue() { }
-Queue::Queue(const Queue& q) {}
-Queue& Queue::operator=(const Queue& q) { return *this; }
-Queue::Queue(Queue&&) CV_NOEXCEPT : p(NULL) { }
-Queue& Queue::operator=(Queue&&) CV_NOEXCEPT { return *this; }
+ਕਤਾਰ::ਕਤਾਰ() CV_NOEXCEPT : p(ਨਿਰਾ) { }
+ਕਤਾਰ::ਕਤਾਰ(ਅਚਲ Context& c, ਅਚਲ Device& d) : p(ਨਿਰਾ) { OCL_NOT_ਉਪਲਬਧ(); }
+ਕਤਾਰ::~ਕਤਾਰ() { }
+ਕਤਾਰ::ਕਤਾਰ(ਅਚਲ ਕਤਾਰ& q) {}
+ਕਤਾਰ& ਕਤਾਰ::ਸੰਚਾਲਕ=(ਅਚਲ ਕਤਾਰ& q) { ਵਾਪਸ *ਇਹ; }
+ਕਤਾਰ::ਕਤਾਰ(ਕਤਾਰ&&) CV_NOEXCEPT : p(ਨਿਰਾ) { }
+ਕਤਾਰ& ਕਤਾਰ::ਸੰਚਾਲਕ=(ਕਤਾਰ&&) CV_NOEXCEPT { ਵਾਪਸ *ਇਹ; }
 
-bool Queue::create(const Context& c, const Device& d) { OCL_NOT_AVAILABLE(); }
-void Queue::finish() {}
-void* Queue::ptr() const { return NULL; }
+ਤਾਰਕਿਕ ਕਤਾਰ::create(ਅਚਲ Context& c, ਅਚਲ Device& d) { OCL_NOT_ਉਪਲਬਧ(); }
+ਖਾਲੀ ਕਤਾਰ::ਅੰਤ_2() {}
+ਖਾਲੀ* ਕਤਾਰ::ptr() ਅਚਲ { ਵਾਪਸ ਨਿਰਾ; }
 /* static */
-Queue& Queue::getDefault()
+ਕਤਾਰ& ਕਤਾਰ::getDefault()
 {
-    static Queue dummy;
-    return dummy;
+    ਸਥਿਰ ਕਤਾਰ dummy;
+    ਵਾਪਸ dummy;
 }
 
 /// @brief Returns OpenCL command queue with enable profiling mode support
-const Queue& Queue::getProfilingQueue() const { OCL_NOT_AVAILABLE(); }
+ਅਚਲ ਕਤਾਰ& ਕਤਾਰ::get_Profiling_ਕਤਾਰ() ਅਚਲ { OCL_NOT_ਉਪਲਬਧ(); }
 
 
 KernelArg::KernelArg() CV_NOEXCEPT
@@ -241,200 +241,200 @@ KernelArg::KernelArg() CV_NOEXCEPT
 {
 }
 
-KernelArg::KernelArg(int _flags, UMat* _m, int _wscale, int _iwscale, const void* _obj, size_t _sz)
+KernelArg::KernelArg(ਪੂਰਨ _flags, UMat* _m, ਪੂਰਨ _wscale, ਪੂਰਨ _iwscale, ਅਚਲ ਖਾਲੀ* _obj, size_t _sz)
     : flags(_flags), m(_m), obj(_obj), sz(_sz), wscale(_wscale), iwscale(_iwscale)
 {
-    OCL_NOT_AVAILABLE();
+    OCL_NOT_ਉਪਲਬਧ();
 }
 
-KernelArg KernelArg::Constant(const Mat& m)
+KernelArg KernelArg::Constant(ਅਚਲ Mat& m)
 {
-    OCL_NOT_AVAILABLE();
+    OCL_NOT_ਉਪਲਬਧ();
 }
 
 
-Kernel::Kernel() CV_NOEXCEPT : p(NULL) { }
-Kernel::Kernel(const char* kname, const Program& prog) : p(NULL) { OCL_NOT_AVAILABLE(); }
-Kernel::Kernel(const char* kname, const ProgramSource& prog, const String& buildopts, String* errmsg) : p(NULL) { OCL_NOT_AVAILABLE(); }
+Kernel::Kernel() CV_NOEXCEPT : p(ਨਿਰਾ) { }
+Kernel::Kernel(ਅਚਲ ਅੱਖਰ* kname, ਅਚਲ ਪ੍ਰੋਗਰਾਮ_2& prog) : p(ਨਿਰਾ) { OCL_NOT_ਉਪਲਬਧ(); }
+Kernel::Kernel(ਅਚਲ ਅੱਖਰ* kname, ਅਚਲ ਪ੍ਰੋਗਰਾਮ_ਸਰੋਤ& prog, ਅਚਲ String& buildopts, String* errmsg) : p(ਨਿਰਾ) { OCL_NOT_ਉਪਲਬਧ(); }
 Kernel::~Kernel() { }
-Kernel::Kernel(const Kernel& k) : p(NULL) { }
-Kernel& Kernel::operator=(const Kernel& k) { return *this; }
-Kernel::Kernel(Kernel&&) CV_NOEXCEPT : p(NULL) { }
-Kernel& Kernel::operator=(Kernel&&) CV_NOEXCEPT { return *this; }
+Kernel::Kernel(ਅਚਲ Kernel& k) : p(ਨਿਰਾ) { }
+Kernel& Kernel::ਸੰਚਾਲਕ=(ਅਚਲ Kernel& k) { ਵਾਪਸ *ਇਹ; }
+Kernel::Kernel(Kernel&&) CV_NOEXCEPT : p(ਨਿਰਾ) { }
+Kernel& Kernel::ਸੰਚਾਲਕ=(Kernel&&) CV_NOEXCEPT { ਵਾਪਸ *ਇਹ; }
 
-bool Kernel::empty() const { return true; }
-bool Kernel::create(const char* kname, const Program& prog) { OCL_NOT_AVAILABLE(); }
-bool Kernel::create(const char* kname, const ProgramSource& prog, const String& buildopts, String* errmsg) { OCL_NOT_AVAILABLE(); }
+ਤਾਰਕਿਕ Kernel::empty() ਅਚਲ { ਵਾਪਸ ਸੱਚ; }
+ਤਾਰਕਿਕ Kernel::create(ਅਚਲ ਅੱਖਰ* kname, ਅਚਲ ਪ੍ਰੋਗਰਾਮ_2& prog) { OCL_NOT_ਉਪਲਬਧ(); }
+ਤਾਰਕਿਕ Kernel::create(ਅਚਲ ਅੱਖਰ* kname, ਅਚਲ ਪ੍ਰੋਗਰਾਮ_ਸਰੋਤ& prog, ਅਚਲ String& buildopts, String* errmsg) { OCL_NOT_ਉਪਲਬਧ(); }
 
-int Kernel::set(int i, const void* value, size_t sz) { OCL_NOT_AVAILABLE(); }
-int Kernel::set(int i, const Image2D& image2D) { OCL_NOT_AVAILABLE(); }
-int Kernel::set(int i, const UMat& m) { OCL_NOT_AVAILABLE(); }
-int Kernel::set(int i, const KernelArg& arg) { OCL_NOT_AVAILABLE(); }
+ਪੂਰਨ Kernel::ਸੈੱਟ(ਪੂਰਨ i, ਅਚਲ ਖਾਲੀ* value, size_t sz) { OCL_NOT_ਉਪਲਬਧ(); }
+ਪੂਰਨ Kernel::ਸੈੱਟ(ਪੂਰਨ i, ਅਚਲ Image2D& image2D) { OCL_NOT_ਉਪਲਬਧ(); }
+ਪੂਰਨ Kernel::ਸੈੱਟ(ਪੂਰਨ i, ਅਚਲ UMat& m) { OCL_NOT_ਉਪਲਬਧ(); }
+ਪੂਰਨ Kernel::ਸੈੱਟ(ਪੂਰਨ i, ਅਚਲ KernelArg& arg) { OCL_NOT_ਉਪਲਬਧ(); }
 
-bool Kernel::run(int dims, size_t globalsize[], size_t localsize[], bool sync, const Queue& q) { OCL_NOT_AVAILABLE(); }
-bool Kernel::runTask(bool sync, const Queue& q) { OCL_NOT_AVAILABLE(); }
+ਤਾਰਕਿਕ Kernel::ਲੜੀਵਾਰ(ਪੂਰਨ dims, size_t globalsize[], size_t localsize[], ਤਾਰਕਿਕ ਸਮਕਾਲੀ, ਅਚਲ ਕਤਾਰ& q) { OCL_NOT_ਉਪਲਬਧ(); }
+ਤਾਰਕਿਕ Kernel::ਲੜੀਵਾਰ_Task(ਤਾਰਕਿਕ ਸਮਕਾਲੀ, ਅਚਲ ਕਤਾਰ& q) { OCL_NOT_ਉਪਲਬਧ(); }
 
-int64 Kernel::runProfiling(int dims, size_t globalsize[], size_t localsize[], const Queue& q) { OCL_NOT_AVAILABLE(); }
+int64 Kernel::ਲੜੀਵਾਰ_Profiling(ਪੂਰਨ dims, size_t globalsize[], size_t localsize[], ਅਚਲ ਕਤਾਰ& q) { OCL_NOT_ਉਪਲਬਧ(); }
 
-size_t Kernel::workGroupSize() const { OCL_NOT_AVAILABLE(); }
-size_t Kernel::preferedWorkGroupSizeMultiple() const { OCL_NOT_AVAILABLE(); }
-bool Kernel::compileWorkGroupSize(size_t wsz[]) const { OCL_NOT_AVAILABLE(); }
-size_t Kernel::localMemSize() const { OCL_NOT_AVAILABLE(); }
+size_t Kernel::work_ਸਮੂਹ_ਮਾਪ() ਅਚਲ { OCL_NOT_ਉਪਲਬਧ(); }
+size_t Kernel::prefered_Work_ਸਮੂਹ_ਮਾਪ_ਗੁਣਜ() ਅਚਲ { OCL_NOT_ਉਪਲਬਧ(); }
+ਤਾਰਕਿਕ Kernel::compile_Work_ਸਮੂਹ_ਮਾਪ(size_t wsz[]) ਅਚਲ { OCL_NOT_ਉਪਲਬਧ(); }
+size_t Kernel::local_Mem_ਮਾਪ() ਅਚਲ { OCL_NOT_ਉਪਲਬਧ(); }
 
-void* Kernel::ptr() const { return NULL; }
-
-
-Program::Program() CV_NOEXCEPT : p(NULL) { }
-Program::Program(const ProgramSource& src, const String& buildflags, String& errmsg) : p(NULL) { OCL_NOT_AVAILABLE(); }
-Program::Program(const Program& prog) : p(NULL) { }
-Program& Program::operator=(const Program& prog) { return *this; }
-Program::Program(Program&&) CV_NOEXCEPT : p(NULL) { }
-Program& Program::operator=(Program&&) CV_NOEXCEPT { return *this; }
-Program::~Program() { }
-
-bool Program::create(const ProgramSource& src, const String& buildflags, String& errmsg) { OCL_NOT_AVAILABLE(); }
-
-void* Program::ptr() const { return NULL; }
-
-void Program::getBinary(std::vector<char>& binary) const { OCL_NOT_AVAILABLE(); }
-
-bool Program::read(const String& buf, const String& buildflags) { OCL_NOT_AVAILABLE(); }
-bool Program::write(String& buf) const { OCL_NOT_AVAILABLE(); }
-const ProgramSource& Program::source() const { OCL_NOT_AVAILABLE(); }
-String Program::getPrefix() const { OCL_NOT_AVAILABLE(); }
-/* static */ String Program::getPrefix(const String& buildflags) { OCL_NOT_AVAILABLE(); }
+ਖਾਲੀ* Kernel::ptr() ਅਚਲ { ਵਾਪਸ ਨਿਰਾ; }
 
 
-ProgramSource::ProgramSource() CV_NOEXCEPT : p(NULL) { }
-ProgramSource::ProgramSource(const String& module, const String& name, const String& codeStr, const String& codeHash) : p(NULL) { }
-ProgramSource::ProgramSource(const String& prog) : p(NULL) { }
-ProgramSource::ProgramSource(const char* prog) : p(NULL) { }
-ProgramSource::~ProgramSource() { }
-ProgramSource::ProgramSource(const ProgramSource& prog) : p(NULL) { }
-ProgramSource& ProgramSource::operator=(const ProgramSource& prog) { return *this; }
-ProgramSource::ProgramSource(ProgramSource&&) CV_NOEXCEPT : p(NULL) { }
-ProgramSource& ProgramSource::operator=(ProgramSource&&) CV_NOEXCEPT { return *this; }
+ਪ੍ਰੋਗਰਾਮ_2::ਪ੍ਰੋਗਰਾਮ_2() CV_NOEXCEPT : p(ਨਿਰਾ) { }
+ਪ੍ਰੋਗਰਾਮ_2::ਪ੍ਰੋਗਰਾਮ_2(ਅਚਲ ਪ੍ਰੋਗਰਾਮ_ਸਰੋਤ& src, ਅਚਲ String& buildflags, String& errmsg) : p(ਨਿਰਾ) { OCL_NOT_ਉਪਲਬਧ(); }
+ਪ੍ਰੋਗਰਾਮ_2::ਪ੍ਰੋਗਰਾਮ_2(ਅਚਲ ਪ੍ਰੋਗਰਾਮ_2& prog) : p(ਨਿਰਾ) { }
+ਪ੍ਰੋਗਰਾਮ_2& ਪ੍ਰੋਗਰਾਮ_2::ਸੰਚਾਲਕ=(ਅਚਲ ਪ੍ਰੋਗਰਾਮ_2& prog) { ਵਾਪਸ *ਇਹ; }
+ਪ੍ਰੋਗਰਾਮ_2::ਪ੍ਰੋਗਰਾਮ_2(ਪ੍ਰੋਗਰਾਮ_2&&) CV_NOEXCEPT : p(ਨਿਰਾ) { }
+ਪ੍ਰੋਗਰਾਮ_2& ਪ੍ਰੋਗਰਾਮ_2::ਸੰਚਾਲਕ=(ਪ੍ਰੋਗਰਾਮ_2&&) CV_NOEXCEPT { ਵਾਪਸ *ਇਹ; }
+ਪ੍ਰੋਗਰਾਮ_2::~ਪ੍ਰੋਗਰਾਮ_2() { }
 
-const String& ProgramSource::source() const { OCL_NOT_AVAILABLE(); }
-ProgramSource::hash_t ProgramSource::hash() const { OCL_NOT_AVAILABLE(); }
+ਤਾਰਕਿਕ ਪ੍ਰੋਗਰਾਮ_2::create(ਅਚਲ ਪ੍ਰੋਗਰਾਮ_ਸਰੋਤ& src, ਅਚਲ String& buildflags, String& errmsg) { OCL_NOT_ਉਪਲਬਧ(); }
 
-/* static */ ProgramSource ProgramSource::fromBinary(const String& module, const String& name, const unsigned char* binary, const size_t size, const cv::String& buildOptions) { OCL_NOT_AVAILABLE(); }
-/* static */ ProgramSource ProgramSource::fromSPIR(const String& module, const String& name, const unsigned char* binary, const size_t size, const cv::String& buildOptions) { OCL_NOT_AVAILABLE(); }
+ਖਾਲੀ* ਪ੍ਰੋਗਰਾਮ_2::ptr() ਅਚਲ { ਵਾਪਸ ਨਿਰਾ; }
+
+ਖਾਲੀ ਪ੍ਰੋਗਰਾਮ_2::get_ਦੁਆਧਾਰੀ(std::vector<ਅੱਖਰ>& binary) ਅਚਲ { OCL_NOT_ਉਪਲਬਧ(); }
+
+ਤਾਰਕਿਕ ਪ੍ਰੋਗਰਾਮ_2::ਪਠ(ਅਚਲ String& buf, ਅਚਲ String& buildflags) { OCL_NOT_ਉਪਲਬਧ(); }
+ਤਾਰਕਿਕ ਪ੍ਰੋਗਰਾਮ_2::ਲਿਖ(String& buf) ਅਚਲ { OCL_NOT_ਉਪਲਬਧ(); }
+ਅਚਲ ਪ੍ਰੋਗਰਾਮ_ਸਰੋਤ& ਪ੍ਰੋਗਰਾਮ_2::ਸਰੋਤ() ਅਚਲ { OCL_NOT_ਉਪਲਬਧ(); }
+String ਪ੍ਰੋਗਰਾਮ_2::get_ਅਗੇਤਰ() ਅਚਲ { OCL_NOT_ਉਪਲਬਧ(); }
+/* static */ String ਪ੍ਰੋਗਰਾਮ_2::get_ਅਗੇਤਰ(ਅਚਲ String& buildflags) { OCL_NOT_ਉਪਲਬਧ(); }
 
 
-PlatformInfo::PlatformInfo() CV_NOEXCEPT : p(NULL) { }
-PlatformInfo::PlatformInfo(void* id) : p(NULL) { OCL_NOT_AVAILABLE(); }
+ਪ੍ਰੋਗਰਾਮ_ਸਰੋਤ::ਪ੍ਰੋਗਰਾਮ_ਸਰੋਤ() CV_NOEXCEPT : p(ਨਿਰਾ) { }
+ਪ੍ਰੋਗਰਾਮ_ਸਰੋਤ::ਪ੍ਰੋਗਰਾਮ_ਸਰੋਤ(ਅਚਲ String& module, ਅਚਲ String& name, ਅਚਲ String& ਕੋਡ_Str, ਅਚਲ String& ਕੋਡ_Hash) : p(ਨਿਰਾ) { }
+ਪ੍ਰੋਗਰਾਮ_ਸਰੋਤ::ਪ੍ਰੋਗਰਾਮ_ਸਰੋਤ(ਅਚਲ String& prog) : p(ਨਿਰਾ) { }
+ਪ੍ਰੋਗਰਾਮ_ਸਰੋਤ::ਪ੍ਰੋਗਰਾਮ_ਸਰੋਤ(ਅਚਲ ਅੱਖਰ* prog) : p(ਨਿਰਾ) { }
+ਪ੍ਰੋਗਰਾਮ_ਸਰੋਤ::~ਪ੍ਰੋਗਰਾਮ_ਸਰੋਤ() { }
+ਪ੍ਰੋਗਰਾਮ_ਸਰੋਤ::ਪ੍ਰੋਗਰਾਮ_ਸਰੋਤ(ਅਚਲ ਪ੍ਰੋਗਰਾਮ_ਸਰੋਤ& prog) : p(ਨਿਰਾ) { }
+ਪ੍ਰੋਗਰਾਮ_ਸਰੋਤ& ਪ੍ਰੋਗਰਾਮ_ਸਰੋਤ::ਸੰਚਾਲਕ=(ਅਚਲ ਪ੍ਰੋਗਰਾਮ_ਸਰੋਤ& prog) { ਵਾਪਸ *ਇਹ; }
+ਪ੍ਰੋਗਰਾਮ_ਸਰੋਤ::ਪ੍ਰੋਗਰਾਮ_ਸਰੋਤ(ਪ੍ਰੋਗਰਾਮ_ਸਰੋਤ&&) CV_NOEXCEPT : p(ਨਿਰਾ) { }
+ਪ੍ਰੋਗਰਾਮ_ਸਰੋਤ& ਪ੍ਰੋਗਰਾਮ_ਸਰੋਤ::ਸੰਚਾਲਕ=(ਪ੍ਰੋਗਰਾਮ_ਸਰੋਤ&&) CV_NOEXCEPT { ਵਾਪਸ *ਇਹ; }
+
+ਅਚਲ String& ਪ੍ਰੋਗਰਾਮ_ਸਰੋਤ::ਸਰੋਤ() ਅਚਲ { OCL_NOT_ਉਪਲਬਧ(); }
+ਪ੍ਰੋਗਰਾਮ_ਸਰੋਤ::hash_t ਪ੍ਰੋਗਰਾਮ_ਸਰੋਤ::hash() ਅਚਲ { OCL_NOT_ਉਪਲਬਧ(); }
+
+/* static */ ਪ੍ਰੋਗਰਾਮ_ਸਰੋਤ ਪ੍ਰੋਗਰਾਮ_ਸਰੋਤ::from_ਦੁਆਧਾਰੀ(ਅਚਲ String& module, ਅਚਲ String& name, ਅਚਲ ਬਿਨਾਨਿਸ਼ਾਨੀ ਅੱਖਰ* binary, ਅਚਲ size_t size, ਅਚਲ cv::String& buildOptions) { OCL_NOT_ਉਪਲਬਧ(); }
+/* static */ ਪ੍ਰੋਗਰਾਮ_ਸਰੋਤ ਪ੍ਰੋਗਰਾਮ_ਸਰੋਤ::fromSPIR(ਅਚਲ String& module, ਅਚਲ String& name, ਅਚਲ ਬਿਨਾਨਿਸ਼ਾਨੀ ਅੱਖਰ* binary, ਅਚਲ size_t size, ਅਚਲ cv::String& buildOptions) { OCL_NOT_ਉਪਲਬਧ(); }
+
+
+PlatformInfo::PlatformInfo() CV_NOEXCEPT : p(ਨਿਰਾ) { }
+PlatformInfo::PlatformInfo(ਖਾਲੀ* id) : p(ਨਿਰਾ) { OCL_NOT_ਉਪਲਬਧ(); }
 PlatformInfo::~PlatformInfo() { }
 
-PlatformInfo::PlatformInfo(const PlatformInfo& i) : p(NULL) { }
-PlatformInfo& PlatformInfo::operator=(const PlatformInfo& i) { return *this; }
-PlatformInfo::PlatformInfo(PlatformInfo&&) CV_NOEXCEPT : p(NULL) { }
-PlatformInfo& PlatformInfo::operator=(PlatformInfo&&) CV_NOEXCEPT { return *this; }
+PlatformInfo::PlatformInfo(ਅਚਲ PlatformInfo& i) : p(ਨਿਰਾ) { }
+PlatformInfo& PlatformInfo::ਸੰਚਾਲਕ=(ਅਚਲ PlatformInfo& i) { ਵਾਪਸ *ਇਹ; }
+PlatformInfo::PlatformInfo(PlatformInfo&&) CV_NOEXCEPT : p(ਨਿਰਾ) { }
+PlatformInfo& PlatformInfo::ਸੰਚਾਲਕ=(PlatformInfo&&) CV_NOEXCEPT { ਵਾਪਸ *ਇਹ; }
 
-String PlatformInfo::name() const { OCL_NOT_AVAILABLE(); }
-String PlatformInfo::vendor() const { OCL_NOT_AVAILABLE(); }
-String PlatformInfo::version() const { OCL_NOT_AVAILABLE(); }
-int PlatformInfo::deviceNumber() const { OCL_NOT_AVAILABLE(); }
-void PlatformInfo::getDevice(Device& device, int d) const { OCL_NOT_AVAILABLE(); }
+String PlatformInfo::name() ਅਚਲ { OCL_NOT_ਉਪਲਬਧ(); }
+String PlatformInfo::vendor() ਅਚਲ { OCL_NOT_ਉਪਲਬਧ(); }
+String PlatformInfo::ਸੰਸਕਰਣ() ਅਚਲ { OCL_NOT_ਉਪਲਬਧ(); }
+ਪੂਰਨ PlatformInfo::device_ਸੰਖਿਆ() ਅਚਲ { OCL_NOT_ਉਪਲਬਧ(); }
+ਖਾਲੀ PlatformInfo::getDevice(Device& device, ਪੂਰਨ d) ਅਚਲ { OCL_NOT_ਉਪਲਬਧ(); }
 
-const char* convertTypeStr(int sdepth, int ddepth, int cn, char* buf) { OCL_NOT_AVAILABLE(); }
-const char* typeToStr(int t) { OCL_NOT_AVAILABLE(); }
-const char* memopTypeToStr(int t) { OCL_NOT_AVAILABLE(); }
-const char* vecopTypeToStr(int t) { OCL_NOT_AVAILABLE(); }
-const char* getOpenCLErrorString(int errorCode) { OCL_NOT_AVAILABLE(); }
-String kernelToStr(InputArray _kernel, int ddepth, const char* name) { OCL_NOT_AVAILABLE(); }
-void getPlatfomsInfo(std::vector<PlatformInfo>& platform_info) { OCL_NOT_AVAILABLE(); }
-
-
-int predictOptimalVectorWidth(InputArray src1, InputArray src2, InputArray src3,
-        InputArray src4, InputArray src5, InputArray src6,
-        InputArray src7, InputArray src8, InputArray src9,
-        OclVectorStrategy strat)
-{ OCL_NOT_AVAILABLE(); }
-
-int checkOptimalVectorWidth(const int *vectorWidths,
-        InputArray src1, InputArray src2, InputArray src3,
-        InputArray src4, InputArray src5, InputArray src6,
-        InputArray src7, InputArray src8, InputArray src9,
-        OclVectorStrategy strat)
-{ OCL_NOT_AVAILABLE(); }
-
-int predictOptimalVectorWidthMax(InputArray src1, InputArray src2, InputArray src3,
-        InputArray src4, InputArray src5, InputArray src6,
-        InputArray src7, InputArray src8, InputArray src9)
-{ OCL_NOT_AVAILABLE(); }
-
-void buildOptionsAddMatrixDescription(String& buildOptions, const String& name, InputArray _m) { OCL_NOT_AVAILABLE(); }
+ਅਚਲ ਅੱਖਰ* convertTypeStr(ਪੂਰਨ sdepth, ਪੂਰਨ ddepth, ਪੂਰਨ cn, ਅੱਖਰ* buf) { OCL_NOT_ਉਪਲਬਧ(); }
+ਅਚਲ ਅੱਖਰ* type_ਮੰਜ਼ਿਲ_Str(ਪੂਰਨ t) { OCL_NOT_ਉਪਲਬਧ(); }
+ਅਚਲ ਅੱਖਰ* memop_Type_ਮੰਜ਼ਿਲ_Str(ਪੂਰਨ t) { OCL_NOT_ਉਪਲਬਧ(); }
+ਅਚਲ ਅੱਖਰ* vecop_Type_ਮੰਜ਼ਿਲ_Str(ਪੂਰਨ t) { OCL_NOT_ਉਪਲਬਧ(); }
+ਅਚਲ ਅੱਖਰ* getOpenCLErrorString(ਪੂਰਨ error_ਕੋਡ) { OCL_NOT_ਉਪਲਬਧ(); }
+String kernel_ਮੰਜ਼ਿਲ_Str(ਨਿਵੇਸ਼_Array _kernel, ਪੂਰਨ ddepth, ਅਚਲ ਅੱਖਰ* name) { OCL_NOT_ਉਪਲਬਧ(); }
+ਖਾਲੀ getPlatfomsInfo(std::vector<PlatformInfo>& platform_info) { OCL_NOT_ਉਪਲਬਧ(); }
 
 
-Image2D::Image2D() CV_NOEXCEPT : p(NULL) { }
-Image2D::Image2D(const UMat &src, bool norm, bool alias) { OCL_NOT_AVAILABLE(); }
-Image2D::Image2D(const Image2D & i) : p(NULL) { OCL_NOT_AVAILABLE(); }
+ਪੂਰਨ predict_Optimal_ਸਦਿਸ਼_ਚੌੜਾਈ(ਨਿਵੇਸ਼_Array src1, ਨਿਵੇਸ਼_Array src2, ਨਿਵੇਸ਼_Array src3,
+        ਨਿਵੇਸ਼_Array src4, ਨਿਵੇਸ਼_Array src5, ਨਿਵੇਸ਼_Array src6,
+        ਨਿਵੇਸ਼_Array src7, ਨਿਵੇਸ਼_Array src8, ਨਿਵੇਸ਼_Array src9,
+        Ocl_ਸਦਿਸ਼_Strategy strat)
+{ OCL_NOT_ਉਪਲਬਧ(); }
+
+ਪੂਰਨ check_Optimal_ਸਦਿਸ਼_ਚੌੜਾਈ(ਅਚਲ ਪੂਰਨ *ਸਦਿਸ਼_Widths,
+        ਨਿਵੇਸ਼_Array src1, ਨਿਵੇਸ਼_Array src2, ਨਿਵੇਸ਼_Array src3,
+        ਨਿਵੇਸ਼_Array src4, ਨਿਵੇਸ਼_Array src5, ਨਿਵੇਸ਼_Array src6,
+        ਨਿਵੇਸ਼_Array src7, ਨਿਵੇਸ਼_Array src8, ਨਿਵੇਸ਼_Array src9,
+        Ocl_ਸਦਿਸ਼_Strategy strat)
+{ OCL_NOT_ਉਪਲਬਧ(); }
+
+ਪੂਰਨ predict_Optimal_ਸਦਿਸ਼_ਚੌੜਾਈ_Max(ਨਿਵੇਸ਼_Array src1, ਨਿਵੇਸ਼_Array src2, ਨਿਵੇਸ਼_Array src3,
+        ਨਿਵੇਸ਼_Array src4, ਨਿਵੇਸ਼_Array src5, ਨਿਵੇਸ਼_Array src6,
+        ਨਿਵੇਸ਼_Array src7, ਨਿਵੇਸ਼_Array src8, ਨਿਵੇਸ਼_Array src9)
+{ OCL_NOT_ਉਪਲਬਧ(); }
+
+ਖਾਲੀ build_Options_ਜੋੜੋ_ਮੈਟ੍ਰਿਕਸ_Description(String& buildOptions, ਅਚਲ String& name, ਨਿਵੇਸ਼_Array _m) { OCL_NOT_ਉਪਲਬਧ(); }
+
+
+Image2D::Image2D() CV_NOEXCEPT : p(ਨਿਰਾ) { }
+Image2D::Image2D(ਅਚਲ UMat &src, ਤਾਰਕਿਕ norm, ਤਾਰਕਿਕ alias) { OCL_NOT_ਉਪਲਬਧ(); }
+Image2D::Image2D(ਅਚਲ Image2D & i) : p(ਨਿਰਾ) { OCL_NOT_ਉਪਲਬਧ(); }
 Image2D::~Image2D() { }
-Image2D& Image2D::operator=(const Image2D & i) { return *this; }
-Image2D::Image2D(Image2D&&) CV_NOEXCEPT : p(NULL) { }
-Image2D& Image2D::operator=(Image2D&&) CV_NOEXCEPT { return *this; }
+Image2D& Image2D::ਸੰਚਾਲਕ=(ਅਚਲ Image2D & i) { ਵਾਪਸ *ਇਹ; }
+Image2D::Image2D(Image2D&&) CV_NOEXCEPT : p(ਨਿਰਾ) { }
+Image2D& Image2D::ਸੰਚਾਲਕ=(Image2D&&) CV_NOEXCEPT { ਵਾਪਸ *ਇਹ; }
 
-/* static */ bool Image2D::canCreateAlias(const UMat &u) { OCL_NOT_AVAILABLE(); }
-/* static */ bool Image2D::isFormatSupported(int depth, int cn, bool norm) { OCL_NOT_AVAILABLE(); }
+/* static */ ਤਾਰਕਿਕ Image2D::canCreateAlias(ਅਚਲ UMat &u) { OCL_NOT_ਉਪਲਬਧ(); }
+/* static */ ਤਾਰਕਿਕ Image2D::isFormatSupported(ਪੂਰਨ ਡੂੰਘਾਈ, ਪੂਰਨ cn, ਤਾਰਕਿਕ norm) { OCL_NOT_ਉਪਲਬਧ(); }
 
-void* Image2D::ptr() const { return NULL; }
+ਖਾਲੀ* Image2D::ptr() ਅਚਲ { ਵਾਪਸ ਨਿਰਾ; }
 
 
-Timer::Timer(const Queue& q) : p(NULL) {}
+Timer::Timer(ਅਚਲ ਕਤਾਰ& q) : p(ਨਿਰਾ) {}
 Timer::~Timer() {}
-void Timer::start() { OCL_NOT_AVAILABLE(); }
-void Timer::stop() { OCL_NOT_AVAILABLE();}
+ਖਾਲੀ Timer::ਸ਼ੁਰੂ() { OCL_NOT_ਉਪਲਬਧ(); }
+ਖਾਲੀ Timer::stop() { OCL_NOT_ਉਪਲਬਧ();}
 
-uint64 Timer::durationNS() const { OCL_NOT_AVAILABLE(); }
+uint64 Timer::durationNS() ਅਚਲ { OCL_NOT_ਉਪਲਬਧ(); }
 
-MatAllocator* getOpenCLAllocator() { return NULL; }
+MatAllocator* getOpenCLAllocator() { ਵਾਪਸ ਨਿਰਾ; }
 
-internal::ProgramEntry::operator ProgramSource&() const { OCL_NOT_AVAILABLE(); }
+internal::ਪ੍ਰੋਗਰਾਮ_ਇੰਦਰਾਜ::ਸੰਚਾਲਕ ਪ੍ਰੋਗਰਾਮ_ਸਰੋਤ&() ਅਚਲ { OCL_NOT_ਉਪਲਬਧ(); }
 
 
-struct OpenCLExecutionContext::Impl
+ਬਣਤਰ OpenCLExecutionContext::Impl
 {
-    Impl() = default;
+    Impl() = ਮੂਲ;
 };
 
-Context& OpenCLExecutionContext::getContext() const { OCL_NOT_AVAILABLE(); }
-Device& OpenCLExecutionContext::getDevice() const { OCL_NOT_AVAILABLE(); }
-Queue& OpenCLExecutionContext::getQueue() const { OCL_NOT_AVAILABLE(); }
+Context& OpenCLExecutionContext::getContext() ਅਚਲ { OCL_NOT_ਉਪਲਬਧ(); }
+Device& OpenCLExecutionContext::getDevice() ਅਚਲ { OCL_NOT_ਉਪਲਬਧ(); }
+ਕਤਾਰ& OpenCLExecutionContext::get_ਕਤਾਰ() ਅਚਲ { OCL_NOT_ਉਪਲਬਧ(); }
 
-bool OpenCLExecutionContext::useOpenCL() const { return false; }
-void OpenCLExecutionContext::setUseOpenCL(bool flag) { }
+ਤਾਰਕਿਕ OpenCLExecutionContext::useOpenCL() ਅਚਲ { ਵਾਪਸ ਝੂਠ; }
+ਖਾਲੀ OpenCLExecutionContext::ਸੈੱਟ_Use_Open_CL(ਤਾਰਕਿਕ flag) { }
 
-static
+ਸਥਿਰ
 OpenCLExecutionContext& getDummyOpenCLExecutionContext()
 {
-    static OpenCLExecutionContext dummy;
-    return dummy;
+    ਸਥਿਰ OpenCLExecutionContext dummy;
+    ਵਾਪਸ dummy;
 }
 
 /* static */
-OpenCLExecutionContext& OpenCLExecutionContext::getCurrent() { return getDummyOpenCLExecutionContext(); }
+OpenCLExecutionContext& OpenCLExecutionContext::getCurrent() { ਵਾਪਸ getDummyOpenCLExecutionContext(); }
 
 /* static */
-OpenCLExecutionContext& OpenCLExecutionContext::getCurrentRef() { return getDummyOpenCLExecutionContext(); }
+OpenCLExecutionContext& OpenCLExecutionContext::getCurrentRef() { ਵਾਪਸ getDummyOpenCLExecutionContext(); }
 
-void OpenCLExecutionContext::bind() const { OCL_NOT_AVAILABLE(); }
+ਖਾਲੀ OpenCLExecutionContext::bind() ਅਚਲ { OCL_NOT_ਉਪਲਬਧ(); }
 
-OpenCLExecutionContext OpenCLExecutionContext::cloneWithNewQueue(const ocl::Queue& q) const { OCL_NOT_AVAILABLE(); }
-OpenCLExecutionContext OpenCLExecutionContext::cloneWithNewQueue() const { OCL_NOT_AVAILABLE(); }
+OpenCLExecutionContext OpenCLExecutionContext::clone_With_New_ਕਤਾਰ(ਅਚਲ ocl::ਕਤਾਰ& q) ਅਚਲ { OCL_NOT_ਉਪਲਬਧ(); }
+OpenCLExecutionContext OpenCLExecutionContext::clone_With_New_ਕਤਾਰ() ਅਚਲ { OCL_NOT_ਉਪਲਬਧ(); }
 
-/* static */ OpenCLExecutionContext OpenCLExecutionContext::create(const std::string& platformName, void* platformID, void* context, void* deviceID) { OCL_NOT_AVAILABLE(); }
-/* static */ OpenCLExecutionContext OpenCLExecutionContext::create(const Context& context, const Device& device, const ocl::Queue& queue) { OCL_NOT_AVAILABLE(); }
-/* static */ OpenCLExecutionContext OpenCLExecutionContext::create(const Context& context, const Device& device) { OCL_NOT_AVAILABLE(); }
+/* static */ OpenCLExecutionContext OpenCLExecutionContext::create(ਅਚਲ std::string& platformName, ਖਾਲੀ* platformID, ਖਾਲੀ* context, ਖਾਲੀ* deviceID) { OCL_NOT_ਉਪਲਬਧ(); }
+/* static */ OpenCLExecutionContext OpenCLExecutionContext::create(ਅਚਲ Context& context, ਅਚਲ Device& device, ਅਚਲ ocl::ਕਤਾਰ& ਕਤਾਰ_2) { OCL_NOT_ਉਪਲਬਧ(); }
+/* static */ OpenCLExecutionContext OpenCLExecutionContext::create(ਅਚਲ Context& context, ਅਚਲ Device& device) { OCL_NOT_ਉਪਲਬਧ(); }
 
-void OpenCLExecutionContext::release() { }
+ਖਾਲੀ OpenCLExecutionContext::release() { }
 
 }}
 
-#if defined(_MSC_VER)
-    #pragma warning(pop)
-#elif defined(__clang__)
-    #pragma clang diagnostic pop
-#elif defined(__GNUC__)
-    #pragma GCC diagnostic pop
-#endif
+#ਜੇ defined(_MSC_VER)
+    #ਹਦਾਇਤ warning(pop)
+#ਜਾਂਜੇ defined(__clang__)
+    #ਹਦਾਇਤ clang diagnostic pop
+#ਜਾਂਜੇ defined(__GNUC__)
+    #ਹਦਾਇਤ GCC diagnostic pop
+#ਜੇ_ਅੰਤ

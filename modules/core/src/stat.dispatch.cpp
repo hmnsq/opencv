@@ -4,33 +4,33 @@
 //
 // Copyright (C) 2026, Advanced Micro Devices, Inc., all rights reserved.
 
-#include "precomp.hpp"
+#ਅਨ੍ਤਰ੍ਭਾਵ "precomp.hpp"
 
-#include "stat.simd.hpp"
-#include "stat.simd_declarations.hpp" // defines CV_CPU_DISPATCH_MODES_ALL=AVX2,...,BASELINE based on CMakeLists.txt content
+#ਅਨ੍ਤਰ੍ਭਾਵ "stat.simd.hpp"
+#ਅਨ੍ਤਰ੍ਭਾਵ "stat.simd_declarations.hpp" // defines CV_CPU_DISPATCH_MODES_ALL=AVX2,...,BASELINE based on CMakeLists.txt content
 
-namespace cv { namespace hal {
+ਨਾਮਾਕਾਸ਼ cv { ਨਾਮਾਕਾਸ਼ hal {
 
 // Resolve the SIMD implementation ONCE via a cached function pointer. normHamming
 // is called per-descriptor in hot matcher loops on short (32/64-byte) descriptors,
 // where a per-call dispatch chain + CV_INSTRUMENT_REGION dominate the cost.
-static NormHammingFunc getNormHammingFunc() {
+ਸਥਿਰ NormHammingFunc getNormHammingFunc() {
     CV_CPU_DISPATCH(getNormHammingFunc, (), CV_CPU_DISPATCH_MODES_ALL);
 }
-static NormHammingDiffFunc getNormHammingDiffFunc() {
+ਸਥਿਰ NormHammingDiffFunc getNormHammingDiffFunc() {
     CV_CPU_DISPATCH(getNormHammingDiffFunc, (), CV_CPU_DISPATCH_MODES_ALL);
 }
 
-int normHamming(const uchar* a, int n)
+ਪੂਰਨ normHamming(ਅਚਲ uchar* a, ਪੂਰਨ n)
 {
-    static const NormHammingFunc fn = getNormHammingFunc();
-    return fn(a, n);
+    ਸਥਿਰ ਅਚਲ NormHammingFunc fn = getNormHammingFunc();
+    ਵਾਪਸ fn(a, n);
 }
 
-int normHamming(const uchar* a, const uchar* b, int n)
+ਪੂਰਨ normHamming(ਅਚਲ uchar* a, ਅਚਲ uchar* b, ਪੂਰਨ n)
 {
-    static const NormHammingDiffFunc fn = getNormHammingDiffFunc();
-    return fn(a, b, n);
+    ਸਥਿਰ ਅਚਲ NormHammingDiffFunc fn = getNormHammingDiffFunc();
+    ਵਾਪਸ fn(a, b, n);
 }
 
 }} //cv::hal

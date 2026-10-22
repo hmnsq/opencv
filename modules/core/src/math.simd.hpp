@@ -21,196 +21,196 @@
 // works on every baseline. Integer inputs never reach these kernels: emitUnary computes integer
 // math in the float domain and casts.
 
-#include "opencv2/core/hal/intrin.hpp"
-#include "convert.hpp"          // typed vx_load_pair_as / v_store_pair_as helpers (cv::)
-#include "arithm_expr.hpp"      // the kernel contract: TOp / TKernel / KernelFunc
-#include <cmath>
+#ਅਨ੍ਤਰ੍ਭਾਵ "opencv2/core/hal/intrin.hpp"
+#ਅਨ੍ਤਰ੍ਭਾਵ "convert.hpp"          // typed vx_load_pair_as / v_store_pair_as helpers (cv::)
+#ਅਨ੍ਤਰ੍ਭਾਵ "arithm_expr.hpp"      // the kernel contract: TOp / TKernel / KernelFunc
+#ਅਨ੍ਤਰ੍ਭਾਵ <cmath>
 
-namespace cv {
+ਨਾਮਾਕਾਸ਼ cv {
 
 // Everything outside cv::ew::CV_CPU_OPTIMIZATION_NAMESPACE must be skipped in the
 // declarations-only re-includes (one per dispatched mode), or it gets redefined.
-#ifndef CV_CPU_OPTIMIZATION_DECLARATIONS_ONLY
-#if (CV_SIMD || CV_SIMD_SCALABLE)
+#ਜੇ_ਅਪਰਿਭਾਸ਼ਿਤ CV_CPU_OPTIMIZATION_DECLARATIONS_ONLY
+#ਜੇ (CV_SIMD || CV_SIMD_SCALABLE)
 
 // f32-pair -> f16/bf16 stores for the half-float hub (convert.hpp covers the other pairs)
-static inline void v_store_pair_as(hfloat* p, const v_float32& a, const v_float32& b)
+ਸਥਿਰ ਸਤਰਅੰਦਰ ਖਾਲੀ v_store_pair_as(hfloat* p, ਅਚਲ v_float32& a, ਅਚਲ v_float32& b)
 {
     v_pack_store(p, a);
     v_pack_store(p + VTraits<v_float32>::vlanes(), b);
 }
-static inline void v_store_pair_as(bfloat* p, const v_float32& a, const v_float32& b)
+ਸਥਿਰ ਸਤਰਅੰਦਰ ਖਾਲੀ v_store_pair_as(bfloat* p, ਅਚਲ v_float32& a, ਅਚਲ v_float32& b)
 {
     v_pack_store(p, a);
     v_pack_store(p + VTraits<v_float32>::vlanes(), b);
 }
 
-#endif
-#endif // CV_CPU_OPTIMIZATION_DECLARATIONS_ONLY
+#ਜੇ_ਅੰਤ
+#ਜੇ_ਅੰਤ // CV_CPU_OPTIMIZATION_DECLARATIONS_ONLY
 
-namespace ew {
+ਨਾਮਾਕਾਸ਼ ew {
 CV_CPU_OPTIMIZATION_NAMESPACE_BEGIN
 
 // ---- per-op kernel entry points for THIS baseline (the regular dispatchers in
 //      math.dispatch.cpp reach them through CV_CPU_DISPATCH). ----
-TKernel getMathFunc_(TOp op, int T);                 // unary math, T -> T, T in {f16, bf16, f32, f64}
-TKernel getPowFunc_(int T, int R);                   // OP_POW, T x T -> T (R must equal T)
+TKernel getMathFunc_(ਸਿਖਰ op, ਪੂਰਨ T);                 // unary math, T -> T, T in {f16, bf16, f32, f64}
+TKernel getPowFunc_(ਪੂਰਨ T, ਪੂਰਨ R);                   // OP_POW, T x T -> T (R must equal T)
 
-#ifndef CV_CPU_OPTIMIZATION_DECLARATIONS_ONLY
+#ਜੇ_ਅਪਰਿਭਾਸ਼ਿਤ CV_CPU_OPTIMIZATION_DECLARATIONS_ONLY
 
 // ===========================================================================
 // Op functors: vec(Wvec) over the work vector (f32 or f64), scl(WT) for the scalar path/tail.
 // New unary math ops slot in here.
 // ===========================================================================
-struct MSqrt {
-    template<typename V> static V vec(const V& x) { return v_sqrt(x); }
-    template<typename W> static W scl(W x) { return std::sqrt(x); }
+ਬਣਤਰ MSqrt {
+    ਸਾਂਚਾ<ਕਿਸਮ_ਨਾਂ V> ਸਥਿਰ V vec(ਅਚਲ V& x) { ਵਾਪਸ v_sqrt(x); }
+    ਸਾਂਚਾ<ਕਿਸਮ_ਨਾਂ W> ਸਥਿਰ W scl(W x) { ਵਾਪਸ std::ਵਰਗਮੂਲ(x); }
 };
-struct MExp {
-    template<typename V> static V vec(const V& x) { return v_exp(x); }
-    template<typename W> static W scl(W x) { return std::exp(x); }
+ਬਣਤਰ MExp {
+    ਸਾਂਚਾ<ਕਿਸਮ_ਨਾਂ V> ਸਥਿਰ V vec(ਅਚਲ V& x) { ਵਾਪਸ v_exp(x); }
+    ਸਾਂਚਾ<ਕਿਸਮ_ਨਾਂ W> ਸਥਿਰ W scl(W x) { ਵਾਪਸ std::ਘਾਤਾਂਕ(x); }
 };
-struct MLog {
-    template<typename V> static V vec(const V& x) { return v_log(x); }
-    template<typename W> static W scl(W x) { return std::log(x); }
+ਬਣਤਰ MLog {
+    ਸਾਂਚਾ<ਕਿਸਮ_ਨਾਂ V> ਸਥਿਰ V vec(ਅਚਲ V& x) { ਵਾਪਸ v_log(x); }
+    ਸਾਂਚਾ<ਕਿਸਮ_ਨਾਂ W> ਸਥਿਰ W scl(W x) { ਵਾਪਸ std::ਲਘੂਗਣਕ(x); }
 };
-struct MSin {
-    template<typename V> static V vec(const V& x) { return v_sin(x); }
-    template<typename W> static W scl(W x) { return std::sin(x); }
+ਬਣਤਰ MSin {
+    ਸਾਂਚਾ<ਕਿਸਮ_ਨਾਂ V> ਸਥਿਰ V vec(ਅਚਲ V& x) { ਵਾਪਸ v_sin(x); }
+    ਸਾਂਚਾ<ਕਿਸਮ_ਨਾਂ W> ਸਥਿਰ W scl(W x) { ਵਾਪਸ std::ਜੀਵਾ(x); }
 };
-struct MCos {
-    template<typename V> static V vec(const V& x) { return v_cos(x); }
-    template<typename W> static W scl(W x) { return std::cos(x); }
+ਬਣਤਰ MCos {
+    ਸਾਂਚਾ<ਕਿਸਮ_ਨਾਂ V> ਸਥਿਰ V vec(ਅਚਲ V& x) { ਵਾਪਸ v_cos(x); }
+    ਸਾਂਚਾ<ਕਿਸਮ_ਨਾਂ W> ਸਥਿਰ W scl(W x) { ਵਾਪਸ std::ਕੋਜੀਵਾ(x); }
 };
 // tanh(x) = (e^2x - 1) / (e^2x + 1), on top of v_exp (no v_tanh intrinsic). The input is clamped
 // first: tanh saturates to +/-1 well inside |x| <= 10 (f32) / 20 (f64), while an unclamped large x
 // would push e^2x to inf and the ratio to inf/inf = NaN. (A NaN input may map to a saturated value
 // on some ISAs instead of NaN - the polynomial v_exp has relaxed NaN semantics anyway.)
-struct MTanh {
-    static v_float32 vec(const v_float32& x)
+ਬਣਤਰ MTanh {
+    ਸਥਿਰ v_float32 vec(ਅਚਲ v_float32& x)
     {
-        const v_float32 one = vx_setall_f32(1.f), lim = vx_setall_f32(10.f);
+        ਅਚਲ v_float32 one = vx_setall_f32(1.f), lim = vx_setall_f32(10.f);
         v_float32 cx = v_min(v_max(x, v_sub(vx_setzero_f32(), lim)), lim);
-        v_float32 e = v_exp(v_add(cx, cx));
-        return v_div(v_sub(e, one), v_add(e, one));
+        v_float32 e = v_exp(v_ਜੋੜੋ(cx, cx));
+        ਵਾਪਸ v_div(v_sub(e, one), v_ਜੋੜੋ(e, one));
     }
-#if CV_SIMD_64F || CV_SIMD_SCALABLE_64F
-    static v_float64 vec(const v_float64& x)
+#ਜੇ CV_SIMD_64F || CV_SIMD_SCALABLE_64F
+    ਸਥਿਰ v_float64 vec(ਅਚਲ v_float64& x)
     {
-        const v_float64 one = vx_setall_f64(1.), lim = vx_setall_f64(20.);
+        ਅਚਲ v_float64 one = vx_setall_f64(1.), lim = vx_setall_f64(20.);
         v_float64 cx = v_min(v_max(x, v_sub(vx_setzero_f64(), lim)), lim);
-        v_float64 e = v_exp(v_add(cx, cx));
-        return v_div(v_sub(e, one), v_add(e, one));
+        v_float64 e = v_exp(v_ਜੋੜੋ(cx, cx));
+        ਵਾਪਸ v_div(v_sub(e, one), v_ਜੋੜੋ(e, one));
     }
-#endif
-    template<typename W> static W scl(W x) { return std::tanh(x); }
+#ਜੇ_ਅੰਤ
+    ਸਾਂਚਾ<ਕਿਸਮ_ਨਾਂ W> ਸਥਿਰ W scl(W x) { ਵਾਪਸ std::tanh(x); }
 };
-struct MErf {
-    static v_float32 vec(const v_float32& x) { return v_erf(x); }
-#if CV_SIMD_64F || CV_SIMD_SCALABLE_64F
+ਬਣਤਰ MErf {
+    ਸਥਿਰ v_float32 vec(ਅਚਲ v_float32& x) { ਵਾਪਸ v_erf(x); }
+#ਜੇ CV_SIMD_64F || CV_SIMD_SCALABLE_64F
     // no f64 SIMD erf primitive: apply std::erf per lane (keeps the one kernel shape; the
     // store/load round-trip is noise next to libm erf itself)
-    static v_float64 vec(const v_float64& x)
+    ਸਥਿਰ v_float64 vec(ਅਚਲ v_float64& x)
     {
-        double buf[VTraits<v_float64>::max_nlanes];
+        ਦੁੱਗਣਾ buf[VTraits<v_float64>::max_nlanes];
         v_store(buf, x);
-        for (int i = 0; i < VTraits<v_float64>::vlanes(); i++) buf[i] = std::erf(buf[i]);
-        return vx_load(buf);
+        ਲਈ (ਪੂਰਨ i = 0; i < VTraits<v_float64>::vlanes(); i++) buf[i] = std::erf(buf[i]);
+        ਵਾਪਸ vx_ਲੱਦੋ(buf);
     }
-#endif
-    template<typename W> static W scl(W x) { return std::erf(x); }
+#ਜੇ_ਅੰਤ
+    ਸਾਂਚਾ<ਕਿਸਮ_ਨਾਂ W> ਸਥਿਰ W scl(W x) { ਵਾਪਸ std::erf(x); }
 };
-struct MRelu {
-    template<typename V> static V vec(const V& x) { return v_max(x, v_setzero_<V>()); }
-    template<typename W> static W scl(W x) { return x > W(0) ? x : W(0); }
+ਬਣਤਰ MRelu {
+    ਸਾਂਚਾ<ਕਿਸਮ_ਨਾਂ V> ਸਥਿਰ V vec(ਅਚਲ V& x) { ਵਾਪਸ v_max(x, v_setzero_<V>()); }
+    ਸਾਂਚਾ<ਕਿਸਮ_ਨਾਂ W> ਸਥਿਰ W scl(W x) { ਵਾਪਸ x > W(0) ? x : W(0); }
 };
 
 // ===========================================================================
 // The unary kernel: dst = Op(src), T -> T. Wvec picks the work vector: v_float32 / v_float64 for
 // the native depths, v_float32 for the f16/bf16 hub (vx_load_pair_as does the widening).
 // ===========================================================================
-template<typename T, typename Wvec, class Op>
-static int vecUnaryKernel(const void* src0_, size_t s0y, size_t s0x,
-                          const void*, size_t, size_t, const void*, size_t, size_t,
-                          void* dst_, size_t dsty, int width, int height,
-                          const double*, int, void*)
+ਸਾਂਚਾ<ਕਿਸਮ_ਨਾਂ T, ਕਿਸਮ_ਨਾਂ Wvec, ਵਰਗ Op>
+ਸਥਿਰ ਪੂਰਨ vecUnaryKernel(ਅਚਲ ਖਾਲੀ* src0_, size_t s0y, size_t s0x,
+                          ਅਚਲ ਖਾਲੀ*, size_t, size_t, ਅਚਲ ਖਾਲੀ*, size_t, size_t,
+                          ਖਾਲੀ* dst_, size_t dsty, ਪੂਰਨ ਚੌੜਾਈ, ਪੂਰਨ ਉਚਾਈ,
+                          ਅਚਲ ਦੁੱਗਣਾ*, ਪੂਰਨ, ਖਾਲੀ*)
 {
-    s0y /= sizeof(T);
-    dsty /= sizeof(T);
+    s0y /= ਆਕਾਰ(T);
+    dsty /= ਆਕਾਰ(T);
     CV_Assert(s0x <= 1u);
 
-    const T* src0 = (const T*)src0_;
+    ਅਚਲ T* src0 = (ਅਚਲ T*)src0_;
     T* dst = (T*)dst_;
-    using WT = typename VTraits<Wvec>::lane_type;
+    ਵਰਤੋਂ WT = ਕਿਸਮ_ਨਾਂ VTraits<Wvec>::lane_type;
 
-    if (height > 1 && dsty == (size_t)width && s0y == s0x*(size_t)width) { width *= height; height = 1; }
+    ਜੇ (ਉਚਾਈ > 1 && dsty == (size_t)ਚੌੜਾਈ && s0y == s0x*(size_t)ਚੌੜਾਈ) { ਚੌੜਾਈ *= ਉਚਾਈ; ਉਚਾਈ = 1; }
 
     // vertical broadcast (a row expanded into a matrix, s0y == 0): every output row is identical -
     // compute the first one, memcpy the rest (transcendentals cost far more than a row copy)
-    const int urows = (s0y == 0 && height > 1) ? 1 : height;
+    ਅਚਲ ਪੂਰਨ urows = (s0y == 0 && ਉਚਾਈ > 1) ? 1 : ਉਚਾਈ;
 
-    for (int y = 0; y < urows; y++, src0 += s0y, dst += dsty)
+    ਲਈ (ਪੂਰਨ y = 0; y < urows; y++, src0 += s0y, dst += dsty)
     {
-        if (s0x == 0)                     // broadcast-scalar source: one value covers the row
+        ਜੇ (s0x == 0)                     // broadcast-scalar source: one value covers the row
         {
             T v = saturate_cast<T>(Op::scl((WT)src0[0]));
-            for (int x = 0; x < width; x++) dst[x] = v;
-            continue;
+            ਲਈ (ਪੂਰਨ x = 0; x < ਚੌੜਾਈ; x++) dst[x] = v;
+            ਜਾਰੀ;
         }
-        int x = 0;
-#if (CV_SIMD || CV_SIMD_SCALABLE)
-        const int VECSZ = VTraits<Wvec>::vlanes();
+        ਪੂਰਨ x = 0;
+#ਜੇ (CV_SIMD || CV_SIMD_SCALABLE)
+        ਅਚਲ ਪੂਰਨ VECSZ = VTraits<Wvec>::vlanes();
         // in-place (dst == src) forbids the right-edge backoff: it would re-read already-written
         // values and apply Op twice. Those rows finish in the scalar tail instead.
-        const bool use_tail_trick = width >= VECSZ*4 && src0_ != dst_;
-        for (; x < width; x += VECSZ*2)
+        ਅਚਲ ਤਾਰਕਿਕ use_ਪੂਛ_trick = ਚੌੜਾਈ >= VECSZ*4 && src0_ != dst_;
+        ਲਈ (; x < ਚੌੜਾਈ; x += VECSZ*2)
         {
-            if (x + VECSZ*2 > width) { if (!use_tail_trick || x == 0) break; x = width - VECSZ*2; }
+            ਜੇ (x + VECSZ*2 > ਚੌੜਾਈ) { ਜੇ (!use_ਪੂਛ_trick || x == 0) ਰੋਕੋ; x = ਚੌੜਾਈ - VECSZ*2; }
             Wvec a0, a1;
-            vx_load_pair_as(src0 + x, a0, a1);
+            vx_ਲੱਦੋ_pair_as(src0 + x, a0, a1);
             a0 = Op::vec(a0); a1 = Op::vec(a1);
             v_store_pair_as(dst + x, a0, a1);
         }
-#endif
-        for (; x < width; x++)
+#ਜੇ_ਅੰਤ
+        ਲਈ (; x < ਚੌੜਾਈ; x++)
             dst[x] = saturate_cast<T>(Op::scl((WT)src0[x]));
     }
     dst = (T*)dst_;
-    for (int y = urows; y < height; y++)
-        memcpy(dst + (size_t)y*dsty, dst, (size_t)width*sizeof(T));
-    return 0;
+    ਲਈ (ਪੂਰਨ y = urows; y < ਉਚਾਈ; y++)
+        ਸਮ੍ਰਿਤੀ_ਨਕਲ(dst + (size_t)y*dsty, dst, (size_t)ਚੌੜਾਈ*ਆਕਾਰ(T));
+    ਵਾਪਸ 0;
 }
 
 // Scalar-only variant for (op, depth) pairs with no SIMD primitive (erf on f64; every op's f64
 // when the baseline has no 64-bit float SIMD).
-template<typename T, typename WT, class Op>
-static int scalarUnaryKernel(const void* src0_, size_t s0y, size_t s0x,
-                             const void*, size_t, size_t, const void*, size_t, size_t,
-                             void* dst_, size_t dsty, int width, int height,
-                             const double*, int, void*)
+ਸਾਂਚਾ<ਕਿਸਮ_ਨਾਂ T, ਕਿਸਮ_ਨਾਂ WT, ਵਰਗ Op>
+ਸਥਿਰ ਪੂਰਨ scalarUnaryKernel(ਅਚਲ ਖਾਲੀ* src0_, size_t s0y, size_t s0x,
+                             ਅਚਲ ਖਾਲੀ*, size_t, size_t, ਅਚਲ ਖਾਲੀ*, size_t, size_t,
+                             ਖਾਲੀ* dst_, size_t dsty, ਪੂਰਨ ਚੌੜਾਈ, ਪੂਰਨ ਉਚਾਈ,
+                             ਅਚਲ ਦੁੱਗਣਾ*, ਪੂਰਨ, ਖਾਲੀ*)
 {
-    s0y /= sizeof(T);
-    dsty /= sizeof(T);
+    s0y /= ਆਕਾਰ(T);
+    dsty /= ਆਕਾਰ(T);
     CV_Assert(s0x <= 1u);
-    const T* src0 = (const T*)src0_;
+    ਅਚਲ T* src0 = (ਅਚਲ T*)src0_;
     T* dst = (T*)dst_;
-    if (height > 1 && dsty == (size_t)width && s0y == s0x*(size_t)width) { width *= height; height = 1; }
-    const int urows = (s0y == 0 && height > 1) ? 1 : height;   // vertical broadcast: 1 row + copies
-    for (int y = 0; y < urows; y++, src0 += s0y, dst += dsty)
+    ਜੇ (ਉਚਾਈ > 1 && dsty == (size_t)ਚੌੜਾਈ && s0y == s0x*(size_t)ਚੌੜਾਈ) { ਚੌੜਾਈ *= ਉਚਾਈ; ਉਚਾਈ = 1; }
+    ਅਚਲ ਪੂਰਨ urows = (s0y == 0 && ਉਚਾਈ > 1) ? 1 : ਉਚਾਈ;   // vertical broadcast: 1 row + copies
+    ਲਈ (ਪੂਰਨ y = 0; y < urows; y++, src0 += s0y, dst += dsty)
     {
-        if (s0x == 0)
+        ਜੇ (s0x == 0)
         {
             T v = saturate_cast<T>(Op::scl((WT)src0[0]));
-            for (int x = 0; x < width; x++) dst[x] = v;
-            continue;
+            ਲਈ (ਪੂਰਨ x = 0; x < ਚੌੜਾਈ; x++) dst[x] = v;
+            ਜਾਰੀ;
         }
-        for (int x = 0; x < width; x++)
+        ਲਈ (ਪੂਰਨ x = 0; x < ਚੌੜਾਈ; x++)
             dst[x] = saturate_cast<T>(Op::scl((WT)src0[x]));
     }
     dst = (T*)dst_;
-    for (int y = urows; y < height; y++)
-        memcpy(dst + (size_t)y*dsty, dst, (size_t)width*sizeof(T));
-    return 0;
+    ਲਈ (ਪੂਰਨ y = urows; y < ਉਚਾਈ; y++)
+        ਸਮ੍ਰਿਤੀ_ਨਕਲ(dst + (size_t)y*dsty, dst, (size_t)ਚੌੜਾਈ*ਆਕਾਰ(T));
+    ਵਾਪਸ 0;
 }
 
 // ===========================================================================
@@ -230,153 +230,153 @@ static int scalarUnaryKernel(const void* src0_, size_t s0y, size_t s0x,
 // input: pow is not idempotent, so an in-place backoff would re-read already-written values (the
 // overlap region is otherwise just recomputed from the untouched source). Suppressed rows finish
 // in the scalar tail.
-#if (CV_SIMD || CV_SIMD_SCALABLE)
-static inline v_float32 vxSetallW(float v,  const v_float32&) { return vx_setall_f32(v); }
-#if CV_SIMD_64F || CV_SIMD_SCALABLE_64F
-static inline v_float64 vxSetallW(double v, const v_float64&) { return vx_setall_f64(v); }
-#endif
-#endif
+#ਜੇ (CV_SIMD || CV_SIMD_SCALABLE)
+ਸਥਿਰ ਸਤਰਅੰਦਰ v_float32 vxSetallW(ਦਸ਼ਮਲਵ v,  ਅਚਲ v_float32&) { ਵਾਪਸ vx_setall_f32(v); }
+#ਜੇ CV_SIMD_64F || CV_SIMD_SCALABLE_64F
+ਸਥਿਰ ਸਤਰਅੰਦਰ v_float64 vxSetallW(ਦੁੱਗਣਾ v, ਅਚਲ v_float64&) { ਵਾਪਸ vx_setall_f64(v); }
+#ਜੇ_ਅੰਤ
+#ਜੇ_ਅੰਤ
 
 // Plain scalar pow for baselines without the needed SIMD float width (f64 without 64-bit SIMD).
-template<typename T, typename WT>
-static int scalarPowKernel(const void* src0_, size_t s0y, size_t s0x,
-                           const void* src1_, size_t s1y, size_t s1x,
-                           const void*, size_t, size_t,
-                           void* dst_, size_t dsty, int width, int height,
-                           const double*, int, void*)
+ਸਾਂਚਾ<ਕਿਸਮ_ਨਾਂ T, ਕਿਸਮ_ਨਾਂ WT>
+ਸਥਿਰ ਪੂਰਨ scalarPowKernel(ਅਚਲ ਖਾਲੀ* src0_, size_t s0y, size_t s0x,
+                           ਅਚਲ ਖਾਲੀ* src1_, size_t s1y, size_t s1x,
+                           ਅਚਲ ਖਾਲੀ*, size_t, size_t,
+                           ਖਾਲੀ* dst_, size_t dsty, ਪੂਰਨ ਚੌੜਾਈ, ਪੂਰਨ ਉਚਾਈ,
+                           ਅਚਲ ਦੁੱਗਣਾ*, ਪੂਰਨ, ਖਾਲੀ*)
 {
-    s0y /= sizeof(T); s1y /= sizeof(T); dsty /= sizeof(T);
+    s0y /= ਆਕਾਰ(T); s1y /= ਆਕਾਰ(T); dsty /= ਆਕਾਰ(T);
     CV_Assert(s0x <= 1u && s1x <= 1u);
-    const T* src0 = (const T*)src0_;
-    const T* src1 = (const T*)src1_;
+    ਅਚਲ T* src0 = (ਅਚਲ T*)src0_;
+    ਅਚਲ T* src1 = (ਅਚਲ T*)src1_;
     T* dst = (T*)dst_;
-    if (height > 1 && dsty == (size_t)width && s0y == s0x*(size_t)width && s1y == s1x*(size_t)width)
-    { width *= height; height = 1; }
-    for (int y = 0; y < height; y++, src0 += s0y, src1 += s1y, dst += dsty)
-        for (int x = 0; x < width; x++)
-            dst[x] = saturate_cast<T>(std::pow((WT)src0[x*s0x], (WT)src1[x*s1x]));
-    return 0;
+    ਜੇ (ਉਚਾਈ > 1 && dsty == (size_t)ਚੌੜਾਈ && s0y == s0x*(size_t)ਚੌੜਾਈ && s1y == s1x*(size_t)ਚੌੜਾਈ)
+    { ਚੌੜਾਈ *= ਉਚਾਈ; ਉਚਾਈ = 1; }
+    ਲਈ (ਪੂਰਨ y = 0; y < ਉਚਾਈ; y++, src0 += s0y, src1 += s1y, dst += dsty)
+        ਲਈ (ਪੂਰਨ x = 0; x < ਚੌੜਾਈ; x++)
+            dst[x] = saturate_cast<T>(std::ਘਾਤ((WT)src0[x*s0x], (WT)src1[x*s1x]));
+    ਵਾਪਸ 0;
 }
 
-template<typename T, typename Wvec>
-static int powKernel(const void* src0_, size_t s0y, size_t s0x,
-                     const void* src1_, size_t s1y, size_t s1x,
-                     const void*, size_t, size_t,
-                     void* dst_, size_t dsty, int width, int height,
-                     const double*, int, void*)
+ਸਾਂਚਾ<ਕਿਸਮ_ਨਾਂ T, ਕਿਸਮ_ਨਾਂ Wvec>
+ਸਥਿਰ ਪੂਰਨ powKernel(ਅਚਲ ਖਾਲੀ* src0_, size_t s0y, size_t s0x,
+                     ਅਚਲ ਖਾਲੀ* src1_, size_t s1y, size_t s1x,
+                     ਅਚਲ ਖਾਲੀ*, size_t, size_t,
+                     ਖਾਲੀ* dst_, size_t dsty, ਪੂਰਨ ਚੌੜਾਈ, ਪੂਰਨ ਉਚਾਈ,
+                     ਅਚਲ ਦੁੱਗਣਾ*, ਪੂਰਨ, ਖਾਲੀ*)
 {
-    s0y /= sizeof(T);
-    s1y /= sizeof(T);
-    dsty /= sizeof(T);
+    s0y /= ਆਕਾਰ(T);
+    s1y /= ਆਕਾਰ(T);
+    dsty /= ਆਕਾਰ(T);
     CV_Assert(s0x <= 1u && s1x <= 1u);
 
-    const T* src0 = (const T*)src0_;
-    const T* src1 = (const T*)src1_;
+    ਅਚਲ T* src0 = (ਅਚਲ T*)src0_;
+    ਅਚਲ T* src1 = (ਅਚਲ T*)src1_;
     T* dst = (T*)dst_;
-    using WT = typename VTraits<Wvec>::lane_type;
+    ਵਰਤੋਂ WT = ਕਿਸਮ_ਨਾਂ VTraits<Wvec>::lane_type;
 
-    if (height > 1 && dsty == (size_t)width && s0y == s0x*(size_t)width && s1y == s1x*(size_t)width)
-    { width *= height; height = 1; }
+    ਜੇ (ਉਚਾਈ > 1 && dsty == (size_t)ਚੌੜਾਈ && s0y == s0x*(size_t)ਚੌੜਾਈ && s1y == s1x*(size_t)ਚੌੜਾਈ)
+    { ਚੌੜਾਈ *= ਉਚਾਈ; ਉਚਾਈ = 1; }
 
-    [[maybe_unused]] const bool tail_trick = src0_ != dst_ && src1_ != dst_;
+    [[maybe_unused]] ਅਚਲ ਤਾਰਕਿਕ ਪੂਛ_trick = src0_ != dst_ && src1_ != dst_;
 
     // both operands vertically broadcast: every output row is identical - compute one, copy
-    const int urows = (s0y == 0 && s1y == 0 && height > 1) ? 1 : height;
+    ਅਚਲ ਪੂਰਨ urows = (s0y == 0 && s1y == 0 && ਉਚਾਈ > 1) ? 1 : ਉਚਾਈ;
 
-    for (int y = 0; y < urows; y++, src0 += s0y, src1 += s1y, dst += dsty)
+    ਲਈ (ਪੂਰਨ y = 0; y < urows; y++, src0 += s0y, src1 += s1y, dst += dsty)
     {
-        int x = 0;
-        if (s1x == 0)                                   // scalar exponent for this row
+        ਪੂਰਨ x = 0;
+        ਜੇ (s1x == 0)                                   // scalar exponent for this row
         {
-            const WT p = (WT)src1[0];
-#if (CV_SIMD || CV_SIMD_SCALABLE)
-            const int VECSZ = VTraits<Wvec>::vlanes();
-            if (s0x == 1)
+            ਅਚਲ WT p = (WT)src1[0];
+#ਜੇ (CV_SIMD || CV_SIMD_SCALABLE)
+            ਅਚਲ ਪੂਰਨ VECSZ = VTraits<Wvec>::vlanes();
+            ਜੇ (s0x == 1)
             {
-                if (p == WT(2) || p == WT(3))
+                ਜੇ (p == WT(2) || p == WT(3))
                 {
-                    for (; x < width; x += VECSZ*2)
+                    ਲਈ (; x < ਚੌੜਾਈ; x += VECSZ*2)
                     {
-                        if (x + VECSZ*2 > width) { if (!tail_trick || x == 0) break; x = width - VECSZ*2; }
+                        ਜੇ (x + VECSZ*2 > ਚੌੜਾਈ) { ਜੇ (!ਪੂਛ_trick || x == 0) ਰੋਕੋ; x = ਚੌੜਾਈ - VECSZ*2; }
                         Wvec a0, a1;
-                        vx_load_pair_as(src0 + x, a0, a1);
+                        vx_ਲੱਦੋ_pair_as(src0 + x, a0, a1);
                         Wvec r0 = v_mul(a0, a0), r1 = v_mul(a1, a1);
-                        if (p == WT(3)) { r0 = v_mul(r0, a0); r1 = v_mul(r1, a1); }
+                        ਜੇ (p == WT(3)) { r0 = v_mul(r0, a0); r1 = v_mul(r1, a1); }
                         v_store_pair_as(dst + x, r0, r1);
                     }
                 }
-                else if (p == WT(0.5))
+                ਨਹੀਂਤਾਂ ਜੇ (p == WT(0.5))
                 {
-                    for (; x < width; x += VECSZ*2)
+                    ਲਈ (; x < ਚੌੜਾਈ; x += VECSZ*2)
                     {
-                        if (x + VECSZ*2 > width) { if (!tail_trick || x == 0) break; x = width - VECSZ*2; }
+                        ਜੇ (x + VECSZ*2 > ਚੌੜਾਈ) { ਜੇ (!ਪੂਛ_trick || x == 0) ਰੋਕੋ; x = ਚੌੜਾਈ - VECSZ*2; }
                         Wvec a0, a1;
-                        vx_load_pair_as(src0 + x, a0, a1);
+                        vx_ਲੱਦੋ_pair_as(src0 + x, a0, a1);
                         a0 = v_sqrt(a0); a1 = v_sqrt(a1);
                         v_store_pair_as(dst + x, a0, a1);
                     }
                 }
-                else if (p == WT(1))
+                ਨਹੀਂਤਾਂ ਜੇ (p == WT(1))
                 {
-                    if ((const void*)src0 != (const void*)dst)
-                        for (; x < width; x++) dst[x] = src0[x];
-                    x = width;
+                    ਜੇ ((ਅਚਲ ਖਾਲੀ*)src0 != (ਅਚਲ ਖਾਲੀ*)dst)
+                        ਲਈ (; x < ਚੌੜਾਈ; x++) dst[x] = src0[x];
+                    x = ਚੌੜਾਈ;
                 }
-                else if (p == WT(0))
+                ਨਹੀਂਤਾਂ ਜੇ (p == WT(0))
                 {
-                    const T one = saturate_cast<T>(1);
-                    for (; x < width; x++) dst[x] = one;
+                    ਅਚਲ T one = saturate_cast<T>(1);
+                    ਲਈ (; x < ਚੌੜਾਈ; x++) dst[x] = one;
                 }
-                else if (p == WT(-0.5))
+                ਨਹੀਂਤਾਂ ਜੇ (p == WT(-0.5))
                 {
-                    const Wvec one = vxSetallW(WT(1), Wvec());
-                    for (; x < width; x += VECSZ*2)
+                    ਅਚਲ Wvec one = vxSetallW(WT(1), Wvec());
+                    ਲਈ (; x < ਚੌੜਾਈ; x += VECSZ*2)
                     {
-                        if (x + VECSZ*2 > width) { if (!tail_trick || x == 0) break; x = width - VECSZ*2; }
+                        ਜੇ (x + VECSZ*2 > ਚੌੜਾਈ) { ਜੇ (!ਪੂਛ_trick || x == 0) ਰੋਕੋ; x = ਚੌੜਾਈ - VECSZ*2; }
                         Wvec a0, a1;
-                        vx_load_pair_as(src0 + x, a0, a1);
+                        vx_ਲੱਦੋ_pair_as(src0 + x, a0, a1);
                         a0 = v_div(one, v_sqrt(a0)); a1 = v_div(one, v_sqrt(a1));
                         v_store_pair_as(dst + x, a0, a1);
                     }
                 }
-                else if (p == std::rint(p) && std::abs(p) <= WT(65536))
+                ਨਹੀਂਤਾਂ ਜੇ (p == std::rint(p) && std::ਨਿਰਪੇਖ(p) <= WT(65536))
                 {
                     // any other INTEGER exponent: LSB-first binary exponentiation - the same
                     // multiply chain (and order) as the classic iPow, fully vectorized. Also more
                     // accurate than exp(p*log x) (a few ulp vs ~2e-7 rel) and semantically exact
                     // on non-positive bases: the sign falls out of the multiplies, 0^negative
                     // divides to inf - no scalar patching needed.
-                    const int ip = (int)p, ap = ip < 0 ? -ip : ip;   // ap >= 1 (0..3 handled above)
-                    const Wvec one = vxSetallW(WT(1), Wvec());
-                    for (; x < width; x += VECSZ*2)
+                    ਅਚਲ ਪੂਰਨ ip = (ਪੂਰਨ)p, ap = ip < 0 ? -ip : ip;   // ap >= 1 (0..3 handled above)
+                    ਅਚਲ Wvec one = vxSetallW(WT(1), Wvec());
+                    ਲਈ (; x < ਚੌੜਾਈ; x += VECSZ*2)
                     {
-                        if (x + VECSZ*2 > width) { if (!tail_trick || x == 0) break; x = width - VECSZ*2; }
+                        ਜੇ (x + VECSZ*2 > ਚੌੜਾਈ) { ਜੇ (!ਪੂਛ_trick || x == 0) ਰੋਕੋ; x = ਚੌੜਾਈ - VECSZ*2; }
                         Wvec b0, b1;
-                        vx_load_pair_as(src0 + x, b0, b1);
+                        vx_ਲੱਦੋ_pair_as(src0 + x, b0, b1);
                         Wvec a0 = one, a1 = one;
-                        for (int q = ap; q > 1; q >>= 1)
+                        ਲਈ (ਪੂਰਨ q = ap; q > 1; q >>= 1)
                         {
-                            if (q & 1) { a0 = v_mul(a0, b0); a1 = v_mul(a1, b1); }
+                            ਜੇ (q & 1) { a0 = v_mul(a0, b0); a1 = v_mul(a1, b1); }
                             b0 = v_mul(b0, b0); b1 = v_mul(b1, b1);
                         }
                         a0 = v_mul(a0, b0); a1 = v_mul(a1, b1);
-                        if (ip < 0) { a0 = v_div(one, a0); a1 = v_div(one, a1); }
+                        ਜੇ (ip < 0) { a0 = v_div(one, a0); a1 = v_div(one, a1); }
                         v_store_pair_as(dst + x, a0, a1);
                     }
                 }
-                else                                    // general scalar exponent: exp(p * log(x))
+                ਨਹੀਂਤਾਂ                                    // general scalar exponent: exp(p * log(x))
                 {
-                    const Wvec vp = vxSetallW(p, Wvec()), z = v_setzero_<Wvec>();
-                    for (; x < width; x += VECSZ*2)
+                    ਅਚਲ Wvec vp = vxSetallW(p, Wvec()), z = v_setzero_<Wvec>();
+                    ਲਈ (; x < ਚੌੜਾਈ; x += VECSZ*2)
                     {
-                        if (x + VECSZ*2 > width) { if (!tail_trick || x == 0) break; x = width - VECSZ*2; }
+                        ਜੇ (x + VECSZ*2 > ਚੌੜਾਈ) { ਜੇ (!ਪੂਛ_trick || x == 0) ਰੋਕੋ; x = ਚੌੜਾਈ - VECSZ*2; }
                         Wvec a0, a1;
-                        vx_load_pair_as(src0 + x, a0, a1);
-                        if (v_check_any(v_or(v_le(a0, z), v_le(a1, z))))
+                        vx_ਲੱਦੋ_pair_as(src0 + x, a0, a1);
+                        ਜੇ (v_check_any(v_or(v_le(a0, z), v_le(a1, z))))
                         {                               // exact std::pow for x <= 0 lanes
-                            for (int i = 0; i < VECSZ*2; i++)
-                                dst[x + i] = saturate_cast<T>(std::pow((WT)src0[x + i], p));
-                            continue;
+                            ਲਈ (ਪੂਰਨ i = 0; i < VECSZ*2; i++)
+                                dst[x + i] = saturate_cast<T>(std::ਘਾਤ((WT)src0[x + i], p));
+                            ਜਾਰੀ;
                         }
                         a0 = v_log(a0);
                         a1 = v_log(a1);
@@ -388,28 +388,28 @@ static int powKernel(const void* src0_, size_t s0y, size_t s0x,
                     }
                 }
             }
-#endif
-            for (; x < width; x++)
-                dst[x] = saturate_cast<T>(std::pow((WT)src0[x*s0x], p));
-            continue;
+#ਜੇ_ਅੰਤ
+            ਲਈ (; x < ਚੌੜਾਈ; x++)
+                dst[x] = saturate_cast<T>(std::ਘਾਤ((WT)src0[x*s0x], p));
+            ਜਾਰੀ;
         }
         // per-element exponent
-#if (CV_SIMD || CV_SIMD_SCALABLE)
-        if (s0x == 1)
+#ਜੇ (CV_SIMD || CV_SIMD_SCALABLE)
+        ਜੇ (s0x == 1)
         {
-            const int VECSZ = VTraits<Wvec>::vlanes();
-            const Wvec z = v_setzero_<Wvec>();
-            for (; x < width; x += VECSZ*2)
+            ਅਚਲ ਪੂਰਨ VECSZ = VTraits<Wvec>::vlanes();
+            ਅਚਲ Wvec z = v_setzero_<Wvec>();
+            ਲਈ (; x < ਚੌੜਾਈ; x += VECSZ*2)
             {
-                if (x + VECSZ*2 > width) { if (!tail_trick || x == 0) break; x = width - VECSZ*2; }
+                ਜੇ (x + VECSZ*2 > ਚੌੜਾਈ) { ਜੇ (!ਪੂਛ_trick || x == 0) ਰੋਕੋ; x = ਚੌੜਾਈ - VECSZ*2; }
                 Wvec a0, a1, b0, b1;
-                vx_load_pair_as(src0 + x, a0, a1);
-                vx_load_pair_as(src1 + x, b0, b1);
-                if (v_check_any(v_or(v_le(a0, z), v_le(a1, z))))
+                vx_ਲੱਦੋ_pair_as(src0 + x, a0, a1);
+                vx_ਲੱਦੋ_pair_as(src1 + x, b0, b1);
+                ਜੇ (v_check_any(v_or(v_le(a0, z), v_le(a1, z))))
                 {
-                    for (int i = 0; i < VECSZ*2; i++)
-                        dst[x + i] = saturate_cast<T>(std::pow((WT)src0[x + i], (WT)src1[x + i]));
-                    continue;
+                    ਲਈ (ਪੂਰਨ i = 0; i < VECSZ*2; i++)
+                        dst[x + i] = saturate_cast<T>(std::ਘਾਤ((WT)src0[x + i], (WT)src1[x + i]));
+                    ਜਾਰੀ;
                 }
                 a0 = v_log(a0);
                 a1 = v_log(a1);
@@ -420,76 +420,76 @@ static int powKernel(const void* src0_, size_t s0y, size_t s0x,
                 v_store_pair_as(dst + x, a0, a1);
             }
         }
-#endif
-        for (; x < width; x++)
-            dst[x] = saturate_cast<T>(std::pow((WT)src0[x*s0x], (WT)src1[x]));
+#ਜੇ_ਅੰਤ
+        ਲਈ (; x < ਚੌੜਾਈ; x++)
+            dst[x] = saturate_cast<T>(std::ਘਾਤ((WT)src0[x*s0x], (WT)src1[x]));
     }
     dst = (T*)dst_;
-    for (int y = urows; y < height; y++)
-        memcpy(dst + (size_t)y*dsty, dst, (size_t)width*sizeof(T));
-    return 0;
+    ਲਈ (ਪੂਰਨ y = urows; y < ਉਚਾਈ; y++)
+        ਸਮ੍ਰਿਤੀ_ਨਕਲ(dst + (size_t)y*dsty, dst, (size_t)ਚੌੜਾਈ*ਆਕਾਰ(T));
+    ਵਾਪਸ 0;
 }
 
-TKernel getPowFunc_(int T, int R)
+TKernel getPowFunc_(ਪੂਰਨ T, ਪੂਰਨ R)
 {
-    if (R != T)
-        return {};
-    KernelFunc fptr = nullptr;
-    switch (T)
+    ਜੇ (R != T)
+        ਵਾਪਸ {};
+    KernelFunc fptr = ਖਾਲੀ_ਸੂਚਕ;
+    ਚੋਣ (T)
     {
-    case CV_16F:  fptr = powKernel<hfloat, v_float32>; break;
-    case CV_16BF: fptr = powKernel<bfloat, v_float32>; break;
-    case CV_32F:  fptr = powKernel<float,  v_float32>; break;
-#if CV_SIMD_64F || CV_SIMD_SCALABLE_64F
-    case CV_64F:  fptr = powKernel<double, v_float64>; break;
-#else
-    case CV_64F:  fptr = scalarPowKernel<double, double>; break;
-#endif
-    default: ;
+    ਹਾਲਤ CV_16F:  fptr = powKernel<hfloat, v_float32>; ਰੋਕੋ;
+    ਹਾਲਤ CV_16BF: fptr = powKernel<bfloat, v_float32>; ਰੋਕੋ;
+    ਹਾਲਤ CV_32F:  fptr = powKernel<ਦਸ਼ਮਲਵ,  v_float32>; ਰੋਕੋ;
+#ਜੇ CV_SIMD_64F || CV_SIMD_SCALABLE_64F
+    ਹਾਲਤ CV_64F:  fptr = powKernel<ਦੁੱਗਣਾ, v_float64>; ਰੋਕੋ;
+#ਨਹੀਂਤਾਂ
+    ਹਾਲਤ CV_64F:  fptr = scalarPowKernel<ਦੁੱਗਣਾ, ਦੁੱਗਣਾ>; ਰੋਕੋ;
+#ਜੇ_ਅੰਤ
+    ਮੂਲ: ;
     }
-    return {fptr, nullptr, 0};
+    ਵਾਪਸ {fptr, ਖਾਲੀ_ਸੂਚਕ, 0};
 }
 
 // ===========================================================================
 // getters for THIS baseline
 // ===========================================================================
-template<class Op>
-static KernelFunc mathByDepth(int T)
+ਸਾਂਚਾ<ਵਰਗ Op>
+ਸਥਿਰ KernelFunc math_By_ਡੂੰਘਾਈ(ਪੂਰਨ T)
 {
-    switch (T)
+    ਚੋਣ (T)
     {
-    case CV_16F:  return vecUnaryKernel<hfloat, v_float32, Op>;
-    case CV_16BF: return vecUnaryKernel<bfloat, v_float32, Op>;
-    case CV_32F:  return vecUnaryKernel<float,  v_float32, Op>;
-#if CV_SIMD_64F || CV_SIMD_SCALABLE_64F
-    case CV_64F:  return vecUnaryKernel<double, v_float64, Op>;
-#else
-    case CV_64F:  return scalarUnaryKernel<double, double, Op>;
-#endif
-    default:      return nullptr;
+    ਹਾਲਤ CV_16F:  ਵਾਪਸ vecUnaryKernel<hfloat, v_float32, Op>;
+    ਹਾਲਤ CV_16BF: ਵਾਪਸ vecUnaryKernel<bfloat, v_float32, Op>;
+    ਹਾਲਤ CV_32F:  ਵਾਪਸ vecUnaryKernel<ਦਸ਼ਮਲਵ,  v_float32, Op>;
+#ਜੇ CV_SIMD_64F || CV_SIMD_SCALABLE_64F
+    ਹਾਲਤ CV_64F:  ਵਾਪਸ vecUnaryKernel<ਦੁੱਗਣਾ, v_float64, Op>;
+#ਨਹੀਂਤਾਂ
+    ਹਾਲਤ CV_64F:  ਵਾਪਸ scalarUnaryKernel<ਦੁੱਗਣਾ, ਦੁੱਗਣਾ, Op>;
+#ਜੇ_ਅੰਤ
+    ਮੂਲ:      ਵਾਪਸ ਖਾਲੀ_ਸੂਚਕ;
     }
 }
 
-TKernel getMathFunc_(TOp op, int T)
+TKernel getMathFunc_(ਸਿਖਰ op, ਪੂਰਨ T)
 {
-    KernelFunc f = nullptr;
-    switch (op)
+    KernelFunc f = ਖਾਲੀ_ਸੂਚਕ;
+    ਚੋਣ (op)
     {
-    case OP_SQRT: f = mathByDepth<MSqrt>(T); break;
-    case OP_EXP:  f = mathByDepth<MExp >(T); break;
-    case OP_LOG:  f = mathByDepth<MLog >(T); break;
-    case OP_SIN:  f = mathByDepth<MSin >(T); break;
-    case OP_COS:  f = mathByDepth<MCos >(T); break;
-    case OP_TANH: f = mathByDepth<MTanh>(T); break;
-    case OP_RELU: f = mathByDepth<MRelu>(T); break;
-    case OP_ERF:  f = mathByDepth<MErf >(T); break;
-    default: ;
+    ਹਾਲਤ OP_SQRT: f = math_By_ਡੂੰਘਾਈ<MSqrt>(T); ਰੋਕੋ;
+    ਹਾਲਤ OP_EXP:  f = math_By_ਡੂੰਘਾਈ<MExp >(T); ਰੋਕੋ;
+    ਹਾਲਤ OP_LOG:  f = math_By_ਡੂੰਘਾਈ<MLog >(T); ਰੋਕੋ;
+    ਹਾਲਤ OP_SIN:  f = math_By_ਡੂੰਘਾਈ<MSin >(T); ਰੋਕੋ;
+    ਹਾਲਤ OP_COS:  f = math_By_ਡੂੰਘਾਈ<MCos >(T); ਰੋਕੋ;
+    ਹਾਲਤ OP_TANH: f = math_By_ਡੂੰਘਾਈ<MTanh>(T); ਰੋਕੋ;
+    ਹਾਲਤ OP_RELU: f = math_By_ਡੂੰਘਾਈ<MRelu>(T); ਰੋਕੋ;
+    ਹਾਲਤ OP_ERF:  f = math_By_ਡੂੰਘਾਈ<MErf >(T); ਰੋਕੋ;
+    ਮੂਲ: ;
     }
-    return {f, nullptr, 0};
+    ਵਾਪਸ {f, ਖਾਲੀ_ਸੂਚਕ, 0};
 }
 
 
-#endif // CV_CPU_OPTIMIZATION_DECLARATIONS_ONLY
+#ਜੇ_ਅੰਤ // CV_CPU_OPTIMIZATION_DECLARATIONS_ONLY
 
-CV_CPU_OPTIMIZATION_NAMESPACE_END
+CV_CPU_OPTIMIZATION_NAMESPACE_ਸਿਰਾ
 }} // namespace cv::ew

@@ -3,224 +3,224 @@
 // of this distribution and at http://opencv.org/license.html
 
 
-#include "precomp.hpp"
-#include "opencl_kernels_core.hpp"
-#include "stat.hpp"
+#ਅਨ੍ਤਰ੍ਭਾਵ "precomp.hpp"
+#ਅਨ੍ਤਰ੍ਭਾਵ "opencl_kernels_core.hpp"
+#ਅਨ੍ਤਰ੍ਭਾਵ "stat.hpp"
 
-#include "stat_parallel.hpp"
-#include "sum.simd.hpp"
-#include "sum.simd_declarations.hpp" // defines CV_CPU_DISPATCH_MODES_ALL=AVX2,...,BASELINE based on CMakeLists.txt content
+#ਅਨ੍ਤਰ੍ਭਾਵ "stat_parallel.hpp"
+#ਅਨ੍ਤਰ੍ਭਾਵ "sum.simd.hpp"
+#ਅਨ੍ਤਰ੍ਭਾਵ "sum.simd_declarations.hpp" // defines CV_CPU_DISPATCH_MODES_ALL=AVX2,...,BASELINE based on CMakeLists.txt content
 
-namespace cv
+ਨਾਮਾਕਾਸ਼ cv
 {
 
-SumFunc getSumFunc(int depth)
+ਜੋੜ_Func get_ਜੋੜ_Func(ਪੂਰਨ ਡੂੰਘਾਈ)
 {
     CV_INSTRUMENT_REGION();
-    CV_CPU_DISPATCH(getSumFunc, (depth),
+    CV_CPU_DISPATCH(get_ਜੋੜ_Func, (ਡੂੰਘਾਈ),
         CV_CPU_DISPATCH_MODES_ALL);
 }
 
-#ifdef HAVE_OPENCL
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ HAVE_OPENCL
 
-bool ocl_sum( InputArray _src, Scalar & res, int sum_op, InputArray _mask,
-                     InputArray _src2, bool calc2, const Scalar & res2 )
+ਤਾਰਕਿਕ ocl_ਜੋੜ( ਨਿਵੇਸ਼_Array _src, Scalar & res, ਪੂਰਨ ਜੋੜ_op, ਨਿਵੇਸ਼_Array ਨਕਾਬ_2,
+                     ਨਿਵੇਸ਼_Array _src2, ਤਾਰਕਿਕ calc2, ਅਚਲ Scalar & res2 )
 {
-    CV_Assert(sum_op == OCL_OP_SUM || sum_op == OCL_OP_SUM_ABS || sum_op == OCL_OP_SUM_SQR);
+    CV_Assert(ਜੋੜ_op == OCL_OP_ਜੋੜ || ਜੋੜ_op == OCL_OP_ਜੋੜ_ABS || ਜੋੜ_op == OCL_OP_ਜੋੜ_SQR);
 
-    const ocl::Device & dev = ocl::Device::getDefault();
-    bool doubleSupport = dev.doubleFPConfig() > 0,
-        haveMask = _mask.kind() != _InputArray::NONE,
-        haveSrc2 = _src2.kind() != _InputArray::NONE;
-    int type = _src.type(), depth = CV_MAT_DEPTH(type), cn = CV_MAT_CN(type),
-            kercn = cn == 1 && !haveMask ? ocl::predictOptimalVectorWidth(_src, _src2) : 1,
+    ਅਚਲ ocl::Device & dev = ocl::Device::getDefault();
+    ਤਾਰਕਿਕ doubleSupport = dev.doubleFPConfig() > 0,
+        have_ਨਕਾਬ = ਨਕਾਬ_2.ਕਿਸਮ() != ਨਿਵੇਸ਼_Array_2::NONE,
+        haveSrc2 = _src2.ਕਿਸਮ() != ਨਿਵੇਸ਼_Array_2::NONE;
+    ਪੂਰਨ type = _src.type(), ਡੂੰਘਾਈ = CV_MAT_ਡੂੰਘਾਈ(type), cn = CV_MAT_CN(type),
+            kercn = cn == 1 && !have_ਨਕਾਬ ? ocl::predict_Optimal_ਸਦਿਸ਼_ਚੌੜਾਈ(_src, _src2) : 1,
             mcn = std::max(cn, kercn);
     CV_Assert(!haveSrc2 || _src2.type() == type);
-    int convert_cn = haveSrc2 ? mcn : cn;
+    ਪੂਰਨ convert_cn = haveSrc2 ? mcn : cn;
 
-    if ( (!doubleSupport && depth == CV_64F) || cn > 4 )
-        return false;
+    ਜੇ ( (!doubleSupport && ਡੂੰਘਾਈ == CV_64F) || cn > 4 )
+        ਵਾਪਸ ਝੂਠ;
 
-    if (depth >= CV_16F)
-        return false;
+    ਜੇ (ਡੂੰਘਾਈ >= CV_16F)
+        ਵਾਪਸ ਝੂਠ;
 
-    int ngroups = dev.maxComputeUnits(), dbsize = ngroups * (calc2 ? 2 : 1);
-    size_t wgs = dev.maxWorkGroupSize();
+    ਪੂਰਨ ngroups = dev.maxComputeUnits(), dbsize = ngroups * (calc2 ? 2 : 1);
+    size_t wgs = dev.max_Work_ਸਮੂਹ_ਮਾਪ();
 
-    int ddepth = std::max(sum_op == OCL_OP_SUM_SQR ? CV_32F : CV_32S, depth),
+    ਪੂਰਨ ddepth = std::max(ਜੋੜ_op == OCL_OP_ਜੋੜ_SQR ? CV_32F : CV_32S, ਡੂੰਘਾਈ),
             dtype = CV_MAKE_TYPE(ddepth, cn);
-    CV_Assert(!haveMask || _mask.type() == CV_8U || _mask.type() == CV_8S || _mask.type() == CV_Bool);
+    CV_Assert(!have_ਨਕਾਬ || ਨਕਾਬ_2.type() == CV_8U || ਨਕਾਬ_2.type() == CV_8S || ਨਕਾਬ_2.type() == CV_Bool);
 
-    int wgs2_aligned = 1;
-    while (wgs2_aligned < (int)wgs)
+    ਪੂਰਨ wgs2_aligned = 1;
+    ਜਦੋਂ (wgs2_aligned < (ਪੂਰਨ)wgs)
         wgs2_aligned <<= 1;
     wgs2_aligned >>= 1;
 
-    static const char * const opMap[3] = { "OP_SUM", "OP_SUM_ABS", "OP_SUM_SQR" };
-    char cvt[2][50];
+    ਸਥਿਰ ਅਚਲ ਅੱਖਰ * ਅਚਲ opMap[3] = { "OP_SUM", "OP_SUM_ABS", "OP_SUM_SQR" };
+    ਅੱਖਰ cvt[2][50];
     String opts = format("-D srcT=%s -D srcT1=%s -D dstT=%s -D dstTK=%s -D dstT1=%s -D ddepth=%d -D cn=%d"
                          " -D convertToDT=%s -D %s -D WGS=%d -D WGS2_ALIGNED=%d%s%s%s%s -D kercn=%d%s%s%s -D convertFromU=%s",
-                         ocl::typeToStr(CV_MAKE_TYPE(depth, mcn)), ocl::typeToStr(depth),
-                         ocl::typeToStr(dtype), ocl::typeToStr(CV_MAKE_TYPE(ddepth, mcn)),
-                         ocl::typeToStr(ddepth), ddepth, cn,
-                         ocl::convertTypeStr(depth, ddepth, mcn, cvt[0], sizeof(cvt[0])),
-                         opMap[sum_op], (int)wgs, wgs2_aligned,
+                         ocl::type_ਮੰਜ਼ਿਲ_Str(CV_MAKE_TYPE(ਡੂੰਘਾਈ, mcn)), ocl::type_ਮੰਜ਼ਿਲ_Str(ਡੂੰਘਾਈ),
+                         ocl::type_ਮੰਜ਼ਿਲ_Str(dtype), ocl::type_ਮੰਜ਼ਿਲ_Str(CV_MAKE_TYPE(ddepth, mcn)),
+                         ocl::type_ਮੰਜ਼ਿਲ_Str(ddepth), ddepth, cn,
+                         ocl::convertTypeStr(ਡੂੰਘਾਈ, ddepth, mcn, cvt[0], ਆਕਾਰ(cvt[0])),
+                         opMap[ਜੋੜ_op], (ਪੂਰਨ)wgs, wgs2_aligned,
                          doubleSupport ? " -D DOUBLE_SUPPORT" : "",
-                         haveMask ? " -D HAVE_MASK" : "",
+                         have_ਨਕਾਬ ? " -D HAVE_MASK" : "",
                          _src.isContinuous() ? " -D HAVE_SRC_CONT" : "",
-                         haveMask && _mask.isContinuous() ? " -D HAVE_MASK_CONT" : "", kercn,
+                         have_ਨਕਾਬ && ਨਕਾਬ_2.isContinuous() ? " -D HAVE_MASK_CONT" : "", kercn,
                          haveSrc2 ? " -D HAVE_SRC2" : "", calc2 ? " -D OP_CALC2" : "",
                          haveSrc2 && _src2.isContinuous() ? " -D HAVE_SRC2_CONT" : "",
-                         depth <= CV_32S && ddepth == CV_32S ? ocl::convertTypeStr(CV_8U, ddepth, convert_cn, cvt[1], sizeof(cvt[1])) : "noconvert");
+                         ਡੂੰਘਾਈ <= CV_32S && ddepth == CV_32S ? ocl::convertTypeStr(CV_8U, ddepth, convert_cn, cvt[1], ਆਕਾਰ(cvt[1])) : "noconvert");
 
     ocl::Kernel k("reduce", ocl::core::reduce_oclsrc, opts);
-    if (k.empty())
-        return false;
+    ਜੇ (k.empty())
+        ਵਾਪਸ ਝੂਠ;
 
     UMat src = _src.getUMat(), src2 = _src2.getUMat(),
-        db(1, dbsize, dtype), mask = _mask.getUMat();
+        db(1, dbsize, dtype), ਨਕਾਬ = ਨਕਾਬ_2.getUMat();
 
-    ocl::KernelArg srcarg = ocl::KernelArg::ReadOnlyNoSize(src),
+    ocl::KernelArg srcarg = ocl::KernelArg::Read_Only_No_ਮਾਪ(src),
             dbarg = ocl::KernelArg::PtrWriteOnly(db),
-            maskarg = ocl::KernelArg::ReadOnlyNoSize(mask),
-            src2arg = ocl::KernelArg::ReadOnlyNoSize(src2);
+            maskarg = ocl::KernelArg::Read_Only_No_ਮਾਪ(ਨਕਾਬ),
+            src2arg = ocl::KernelArg::Read_Only_No_ਮਾਪ(src2);
 
-    if (haveMask)
+    ਜੇ (have_ਨਕਾਬ)
     {
-        if (haveSrc2)
-            k.args(srcarg, src.cols, (int)src.total(), ngroups, dbarg, maskarg, src2arg);
-        else
-            k.args(srcarg, src.cols, (int)src.total(), ngroups, dbarg, maskarg);
+        ਜੇ (haveSrc2)
+            k.ਦਲੀਲਾਂ(srcarg, src.ਖਾਨੇ_ਗਿਣਤੀ, (ਪੂਰਨ)src.ਕੁੱਲ(), ngroups, dbarg, maskarg, src2arg);
+        ਨਹੀਂਤਾਂ
+            k.ਦਲੀਲਾਂ(srcarg, src.ਖਾਨੇ_ਗਿਣਤੀ, (ਪੂਰਨ)src.ਕੁੱਲ(), ngroups, dbarg, maskarg);
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
-        if (haveSrc2)
-            k.args(srcarg, src.cols, (int)src.total(), ngroups, dbarg, src2arg);
-        else
-            k.args(srcarg, src.cols, (int)src.total(), ngroups, dbarg);
+        ਜੇ (haveSrc2)
+            k.ਦਲੀਲਾਂ(srcarg, src.ਖਾਨੇ_ਗਿਣਤੀ, (ਪੂਰਨ)src.ਕੁੱਲ(), ngroups, dbarg, src2arg);
+        ਨਹੀਂਤਾਂ
+            k.ਦਲੀਲਾਂ(srcarg, src.ਖਾਨੇ_ਗਿਣਤੀ, (ਪੂਰਨ)src.ਕੁੱਲ(), ngroups, dbarg);
     }
 
     size_t globalsize = ngroups * wgs;
-    if (k.run(1, &globalsize, &wgs, true))
+    ਜੇ (k.ਲੜੀਵਾਰ(1, &globalsize, &wgs, ਸੱਚ))
     {
-        typedef Scalar (*part_sum)(Mat m);
-        part_sum funcs[3] = { ocl_part_sum<int>, ocl_part_sum<float>, ocl_part_sum<double> },
+        ਕਿਸਮਪਰਿਭਾਸ਼ਾ Scalar (*part_ਜੋੜ)(Mat m);
+        part_ਜੋੜ funcs[3] = { ocl_part_ਜੋੜ<ਪੂਰਨ>, ocl_part_ਜੋੜ<ਦਸ਼ਮਲਵ>, ocl_part_ਜੋੜ<ਦੁੱਗਣਾ> },
                 func = funcs[ddepth - CV_32S];
 
         Mat mres = db.getMat(ACCESS_READ);
-        if (calc2)
-            const_cast<Scalar &>(res2) = func(mres.colRange(ngroups, dbsize));
+        ਜੇ (calc2)
+            const_cast<Scalar &>(res2) = func(mres.ਖਾਨਾ_Range_2(ngroups, dbsize));
 
-        res = func(mres.colRange(0, ngroups));
-        return true;
+        res = func(mres.ਖਾਨਾ_Range_2(0, ngroups));
+        ਵਾਪਸ ਸੱਚ;
     }
-    return false;
+    ਵਾਪਸ ਝੂਠ;
 }
 
-#endif
+#ਜੇ_ਅੰਤ
 
 // serial implementation, also used for the pieces of the parallel version
-static Scalar sum_(const Mat& src)
+ਸਥਿਰ Scalar ਜੋੜ_2(ਅਚਲ Mat& src)
 {
     Scalar _res;
-    int cn = src.channels();
+    ਪੂਰਨ cn = src.channels();
 
-    if (src.dims <= 2)
+    ਜੇ (src.dims <= 2)
     {
-        CALL_HAL_RET2(sum, cv_hal_sum, _res, src.data, src.step, src.type(), src.cols, src.rows, &_res[0]);
+        CALL_HAL_RET2(ਜੋੜ, cv_hal_ਜੋੜ, _res, src.ਅੰਕੜੇ, src.ਕਦਮ, src.type(), src.ਖਾਨੇ_ਗਿਣਤੀ, src.ਪੰਕਤੀਆਂ, &_res[0]);
     }
-    else if (src.isContinuous())
+    ਨਹੀਂਤਾਂ ਜੇ (src.isContinuous())
     {
-        CALL_HAL_RET2(sum, cv_hal_sum, _res, src.data, 0, src.type(), (int)src.total(), 1, &_res[0]);
+        CALL_HAL_RET2(ਜੋੜ, cv_hal_ਜੋੜ, _res, src.ਅੰਕੜੇ, 0, src.type(), (ਪੂਰਨ)src.ਕੁੱਲ(), 1, &_res[0]);
     }
 
-    int k, depth = src.depth();
-    SumFunc func = getSumFunc(depth);
-    if (func == nullptr) {
-        if (depth == CV_Bool && cn == 1)
-            return Scalar((double)countNonZero(src));
+    ਪੂਰਨ k, ਡੂੰਘਾਈ = src.ਡੂੰਘਾਈ();
+    ਜੋੜ_Func func = get_ਜੋੜ_Func(ਡੂੰਘਾਈ);
+    ਜੇ (func == ਖਾਲੀ_ਸੂਚਕ) {
+        ਜੇ (ਡੂੰਘਾਈ == CV_Bool && cn == 1)
+            ਵਾਪਸ Scalar((ਦੁੱਗਣਾ)ਗਿਣਤੀ_Non_Zero(src));
         CV_Error_(Error::StsNotImplemented, ("sum: %s input is not supported, convert the input to another type (e.g. CV_32F) first",
-                                            typeToString(src.type()).c_str()));
+                                            type_ਮੰਜ਼ਿਲ_String(src.type()).c_str()));
     }
 
-    const Mat* arrays[] = {&src, 0};
+    ਅਚਲ Mat* arrays[] = {&src, 0};
     uchar* ptrs[1] = {};
     NAryMatIterator it(arrays, ptrs);
-    int total = (int)it.size, blockSize = total, partialBlockSize = 0;
-    int j, count = 0;
-    int _buf[CV_CN_MAX];
-    int* buf = (int*)&_res[0];
+    ਪੂਰਨ ਕੁੱਲ = (ਪੂਰਨ)it.size, ਖੰਡ_ਮਾਪ_2 = ਕੁੱਲ, partial_ਖੰਡ_ਮਾਪ = 0;
+    ਪੂਰਨ j, ਗਿਣਤੀ_3 = 0;
+    ਪੂਰਨ _buf[CV_CN_MAX];
+    ਪੂਰਨ* buf = (ਪੂਰਨ*)&_res[0];
     size_t esz = 0;
-    bool partialSumIsInt = depth < CV_32S;
-    bool blockSum = partialSumIsInt || depth == CV_16F || depth == CV_16BF;
+    ਤਾਰਕਿਕ partial_ਜੋੜ_Is_Int = ਡੂੰਘਾਈ < CV_32S;
+    ਤਾਰਕਿਕ ਖੰਡ_ਜੋੜ = partial_ਜੋੜ_Is_Int || ਡੂੰਘਾਈ == CV_16F || ਡੂੰਘਾਈ == CV_16BF;
 
-    if( blockSum )
+    ਜੇ( ਖੰਡ_ਜੋੜ )
     {
-        partialBlockSize = depth <= CV_8S ? (1 << 23) : (1 << 15);
-        blockSize = std::min(blockSize, partialBlockSize);
+        partial_ਖੰਡ_ਮਾਪ = ਡੂੰਘਾਈ <= CV_8S ? (1 << 23) : (1 << 15);
+        ਖੰਡ_ਮਾਪ_2 = std::min(ਖੰਡ_ਮਾਪ_2, partial_ਖੰਡ_ਮਾਪ);
         buf = _buf;
-        for( k = 0; k < cn; k++ )
+        ਲਈ( k = 0; k < cn; k++ )
             buf[k] = 0;
-        esz = src.elemSize();
+        esz = src.elem_ਮਾਪ();
     }
 
-    for( size_t i = 0; i < it.nplanes; i++, ++it )
+    ਲਈ( size_t i = 0; i < it.nplanes; i++, ++it )
     {
-        for( j = 0; j < total; j += blockSize )
+        ਲਈ( j = 0; j < ਕੁੱਲ; j += ਖੰਡ_ਮਾਪ_2 )
         {
-            int bsz = std::min(total - j, blockSize);
+            ਪੂਰਨ bsz = std::min(ਕੁੱਲ - j, ਖੰਡ_ਮਾਪ_2);
             func( ptrs[0], 0, (uchar*)buf, bsz, cn );
-            count += bsz;
-            if( blockSum && (count + blockSize >= partialBlockSize || (i+1 >= it.nplanes && j+bsz >= total)) )
+            ਗਿਣਤੀ_3 += bsz;
+            ਜੇ( ਖੰਡ_ਜੋੜ && (ਗਿਣਤੀ_3 + ਖੰਡ_ਮਾਪ_2 >= partial_ਖੰਡ_ਮਾਪ || (i+1 >= it.nplanes && j+bsz >= ਕੁੱਲ)) )
             {
-                if (partialSumIsInt) {
-                    for( k = 0; k < cn; k++ )
+                ਜੇ (partial_ਜੋੜ_Is_Int) {
+                    ਲਈ( k = 0; k < cn; k++ )
                     {
                         _res[k] += buf[k];
                         buf[k] = 0;
                     }
-                } else {
-                    for( k = 0; k < cn; k++ )
+                } ਨਹੀਂਤਾਂ {
+                    ਲਈ( k = 0; k < cn; k++ )
                     {
-                        _res[k] += ((float*)buf)[k];
+                        _res[k] += ((ਦਸ਼ਮਲਵ*)buf)[k];
                         buf[k] = 0;
                     }
                 }
-                count = 0;
+                ਗਿਣਤੀ_3 = 0;
             }
             ptrs[0] += bsz*esz;
         }
     }
-    return _res;
+    ਵਾਪਸ _res;
 }
 
-Scalar sum(InputArray _src)
+Scalar ਜੋੜ(ਨਿਵੇਸ਼_Array _src)
 {
     CV_INSTRUMENT_REGION();
 
     Scalar _res;
-#ifdef HAVE_OPENCL
-    CV_OCL_RUN_(OCL_PERFORMANCE_CHECK(_src.isUMat()) && _src.dims() <= 2,
-                ocl_sum(_src, _res, OCL_OP_SUM),
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ HAVE_OPENCL
+    CV_OCL_ਲੜੀਵਾਰ_2(OCL_PERFORMANCE_CHECK(_src.isUMat()) && _src.dims() <= 2,
+                ocl_ਜੋੜ(_src, _res, OCL_OP_ਜੋੜ),
                 _res);
-#endif
+#ਜੇ_ਅੰਤ
 
     Mat src = _src.getMat();
     CV_CheckLE( src.channels(), 4, "cv::sum does not support more than 4 channels" );
 
     std::vector<StatChunk> chunks;
-    if (!splitForParallelStat(src, Mat(), chunks))
-        return sum_(src);
+    ਜੇ (!ਵੰਡੋ_For_Parallel_Stat(src, Mat(), chunks))
+        ਵਾਪਸ ਜੋੜ_2(src);
 
     std::vector<Scalar> part(chunks.size());
-    parallel_for_(Range(0, (int)chunks.size()), [&](const Range& r)
+    parallel_for_(Range(0, (ਪੂਰਨ)chunks.size()), [&](ਅਚਲ Range& r)
     {
-        for (int i = r.start; i < r.end; i++)
-            part[i] = sum_(chunks[i].src);
+        ਲਈ (ਪੂਰਨ i = r.ਸ਼ੁਰੂ; i < r.end; i++)
+            part[i] = ਜੋੜ_2(chunks[i].src);
     });
-    for (const Scalar& v : part)
+    ਲਈ (ਅਚਲ Scalar& v : part)
         _res += v;
-    return _res;
+    ਵਾਪਸ _res;
 }
 
 } // namespace

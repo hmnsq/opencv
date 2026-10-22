@@ -3,537 +3,537 @@
 // of this distribution and at http://opencv.org/license.html
 
 
-#include "precomp.hpp"
-#include "opencl_kernels_core.hpp"
-#include "stat.hpp"
-#include "stat_parallel.hpp"
-#include "opencv2/core/detail/dispatch_helper.impl.hpp"
-#include <algorithm>
+#ਅਨ੍ਤਰ੍ਭਾਵ "precomp.hpp"
+#ਅਨ੍ਤਰ੍ਭਾਵ "opencl_kernels_core.hpp"
+#ਅਨ੍ਤਰ੍ਭਾਵ "stat.hpp"
+#ਅਨ੍ਤਰ੍ਭਾਵ "stat_parallel.hpp"
+#ਅਨ੍ਤਰ੍ਭਾਵ "opencv2/core/detail/dispatch_helper.impl.hpp"
+#ਅਨ੍ਤਰ੍ਭਾਵ <algorithm>
 
-#include "minmax.simd.hpp"
-#include "minmax.simd_declarations.hpp" // defines CV_CPU_DISPATCH_MODES_ALL=AVX2,...,BASELINE based on CMakeLists.txt content
+#ਅਨ੍ਤਰ੍ਭਾਵ "minmax.simd.hpp"
+#ਅਨ੍ਤਰ੍ਭਾਵ "minmax.simd_declarations.hpp" // defines CV_CPU_DISPATCH_MODES_ALL=AVX2,...,BASELINE based on CMakeLists.txt content
 
-namespace cv {
+ਨਾਮਾਕਾਸ਼ cv {
 
-static MinMaxIdxFunc getMinMaxIdxFunc(int depth)
+ਸਥਿਰ MinMaxIdxFunc getMinMaxIdxFunc(ਪੂਰਨ ਡੂੰਘਾਈ)
 {
     CV_INSTRUMENT_REGION();
-    CV_CPU_DISPATCH(getMinMaxIdxFunc, (depth),
+    CV_CPU_DISPATCH(getMinMaxIdxFunc, (ਡੂੰਘਾਈ),
                     CV_CPU_DISPATCH_MODES_ALL);
 }
 
 // The function expects 1-based indexing for ofs
 // Zero is treated as invalid offset (not found)
-static void ofs2idx(const Mat& a, size_t ofs, int* idx)
+ਸਥਿਰ ਖਾਲੀ ofs2idx(ਅਚਲ Mat& a, size_t ofs, ਪੂਰਨ* idx)
 {
-    int i, d = a.dims;
-    if( ofs > 0 )
+    ਪੂਰਨ i, d = a.dims;
+    ਜੇ( ofs > 0 )
     {
         ofs--;
-        for( i = d-1; i >= 0; i-- )
+        ਲਈ( i = d-1; i >= 0; i-- )
         {
-            int sz = a.size[i];
-            idx[i] = (int)(ofs % sz);
+            ਪੂਰਨ sz = a.size[i];
+            idx[i] = (ਪੂਰਨ)(ofs % sz);
             ofs /= sz;
         }
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
-        for( i = d-1; i >= 0; i-- )
+        ਲਈ( i = d-1; i >= 0; i-- )
             idx[i] = -1;
     }
 }
 
-#ifdef HAVE_OPENCL
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ HAVE_OPENCL
 
-#define MINMAX_STRUCT_ALIGNMENT 8 // sizeof double
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ MINMAX_STRUCT_ALIGNMENT 8 // sizeof double
 
-template <typename T>
-void getMinMaxRes(const Mat & db, double * minVal, double * maxVal,
-                  int* minLoc, int* maxLoc,
-                  int groupnum, int cols, double * maxVal2)
+ਸਾਂਚਾ <ਕਿਸਮ_ਨਾਂ T>
+ਖਾਲੀ getMinMaxRes(ਅਚਲ Mat & db, ਦੁੱਗਣਾ * minVal, ਦੁੱਗਣਾ * maxVal,
+                  ਪੂਰਨ* minLoc, ਪੂਰਨ* maxLoc,
+                  ਪੂਰਨ groupnum, ਪੂਰਨ ਖਾਨੇ_ਗਿਣਤੀ, ਦੁੱਗਣਾ * maxVal2)
 {
-    uint index_max = std::numeric_limits<uint>::max();
+    uint ਸੂਚਕਾਂਕ_max = std::numeric_limits<uint>::max();
     T minval = std::numeric_limits<T>::max();
     T maxval = std::numeric_limits<T>::min() > 0 ? (T)-std::numeric_limits<T>::max() : std::numeric_limits<T>::min(), maxval2 = maxval;
-    uint minloc = index_max, maxloc = index_max;
+    uint minloc = ਸੂਚਕਾਂਕ_max, maxloc = ਸੂਚਕਾਂਕ_max;
 
-    size_t index = 0;
-    const T * minptr = NULL, * maxptr = NULL, * maxptr2 = NULL;
-    const uint * minlocptr = NULL, * maxlocptr = NULL;
-    if (minVal || minLoc)
+    size_t ਸੂਚਕਾਂਕ = 0;
+    ਅਚਲ T * minptr = ਨਿਰਾ, * maxptr = ਨਿਰਾ, * maxptr2 = ਨਿਰਾ;
+    ਅਚਲ uint * minlocptr = ਨਿਰਾ, * maxlocptr = ਨਿਰਾ;
+    ਜੇ (minVal || minLoc)
     {
         minptr = db.ptr<T>();
-        index += sizeof(T) * groupnum;
-        index = alignSize(index, MINMAX_STRUCT_ALIGNMENT);
+        ਸੂਚਕਾਂਕ += ਆਕਾਰ(T) * groupnum;
+        ਸੂਚਕਾਂਕ = align_ਮਾਪ(ਸੂਚਕਾਂਕ, MINMAX_STRUCT_ALIGNMENT);
     }
-    if (maxVal || maxLoc)
+    ਜੇ (maxVal || maxLoc)
     {
-        maxptr = (const T *)(db.ptr() + index);
-        index += sizeof(T) * groupnum;
-        index = alignSize(index, MINMAX_STRUCT_ALIGNMENT);
+        maxptr = (ਅਚਲ T *)(db.ptr() + ਸੂਚਕਾਂਕ);
+        ਸੂਚਕਾਂਕ += ਆਕਾਰ(T) * groupnum;
+        ਸੂਚਕਾਂਕ = align_ਮਾਪ(ਸੂਚਕਾਂਕ, MINMAX_STRUCT_ALIGNMENT);
     }
-    if (minLoc)
+    ਜੇ (minLoc)
     {
-        minlocptr = (const uint *)(db.ptr() + index);
-        index += sizeof(uint) * groupnum;
-        index = alignSize(index, MINMAX_STRUCT_ALIGNMENT);
+        minlocptr = (ਅਚਲ uint *)(db.ptr() + ਸੂਚਕਾਂਕ);
+        ਸੂਚਕਾਂਕ += ਆਕਾਰ(uint) * groupnum;
+        ਸੂਚਕਾਂਕ = align_ਮਾਪ(ਸੂਚਕਾਂਕ, MINMAX_STRUCT_ALIGNMENT);
     }
-    if (maxLoc)
+    ਜੇ (maxLoc)
     {
-        maxlocptr = (const uint *)(db.ptr() + index);
-        index += sizeof(uint) * groupnum;
-        index = alignSize(index, MINMAX_STRUCT_ALIGNMENT);
+        maxlocptr = (ਅਚਲ uint *)(db.ptr() + ਸੂਚਕਾਂਕ);
+        ਸੂਚਕਾਂਕ += ਆਕਾਰ(uint) * groupnum;
+        ਸੂਚਕਾਂਕ = align_ਮਾਪ(ਸੂਚਕਾਂਕ, MINMAX_STRUCT_ALIGNMENT);
     }
-    if (maxVal2)
-        maxptr2 = (const T *)(db.ptr() + index);
+    ਜੇ (maxVal2)
+        maxptr2 = (ਅਚਲ T *)(db.ptr() + ਸੂਚਕਾਂਕ);
 
-    for (int i = 0; i < groupnum; i++)
+    ਲਈ (ਪੂਰਨ i = 0; i < groupnum; i++)
     {
-        if (minptr && minptr[i] <= minval)
+        ਜੇ (minptr && minptr[i] <= minval)
         {
-            if (minptr[i] == minval)
+            ਜੇ (minptr[i] == minval)
             {
-                if (minlocptr)
+                ਜੇ (minlocptr)
                     minloc = std::min(minlocptr[i], minloc);
             }
-            else
+            ਨਹੀਂਤਾਂ
             {
-                if (minlocptr)
+                ਜੇ (minlocptr)
                     minloc = minlocptr[i];
                 minval = minptr[i];
             }
         }
-        if (maxptr && maxptr[i] >= maxval)
+        ਜੇ (maxptr && maxptr[i] >= maxval)
         {
-            if (maxptr[i] == maxval)
+            ਜੇ (maxptr[i] == maxval)
             {
-                if (maxlocptr)
+                ਜੇ (maxlocptr)
                     maxloc = std::min(maxlocptr[i], maxloc);
             }
-            else
+            ਨਹੀਂਤਾਂ
             {
-                if (maxlocptr)
+                ਜੇ (maxlocptr)
                     maxloc = maxlocptr[i];
                 maxval = maxptr[i];
             }
         }
-        if (maxptr2 && maxptr2[i] > maxval2)
+        ਜੇ (maxptr2 && maxptr2[i] > maxval2)
             maxval2 = maxptr2[i];
     }
-    bool zero_mask = (minLoc && minloc == index_max) ||
-    (maxLoc && maxloc == index_max);
+    ਤਾਰਕਿਕ zero_ਨਕਾਬ = (minLoc && minloc == ਸੂਚਕਾਂਕ_max) ||
+    (maxLoc && maxloc == ਸੂਚਕਾਂਕ_max);
 
-    if (minVal)
-        *minVal = zero_mask ? 0 : (double)minval;
-    if (maxVal)
-        *maxVal = zero_mask ? 0 : (double)maxval;
-    if (maxVal2)
-        *maxVal2 = zero_mask ? 0 : (double)maxval2;
+    ਜੇ (minVal)
+        *minVal = zero_ਨਕਾਬ ? 0 : (ਦੁੱਗਣਾ)minval;
+    ਜੇ (maxVal)
+        *maxVal = zero_ਨਕਾਬ ? 0 : (ਦੁੱਗਣਾ)maxval;
+    ਜੇ (maxVal2)
+        *maxVal2 = zero_ਨਕਾਬ ? 0 : (ਦੁੱਗਣਾ)maxval2;
 
-    if (minLoc)
+    ਜੇ (minLoc)
     {
-        minLoc[0] = zero_mask ? -1 : minloc / cols;
-        minLoc[1] = zero_mask ? -1 : minloc % cols;
+        minLoc[0] = zero_ਨਕਾਬ ? -1 : minloc / ਖਾਨੇ_ਗਿਣਤੀ;
+        minLoc[1] = zero_ਨਕਾਬ ? -1 : minloc % ਖਾਨੇ_ਗਿਣਤੀ;
     }
-    if (maxLoc)
+    ਜੇ (maxLoc)
     {
-        maxLoc[0] = zero_mask ? -1 : maxloc / cols;
-        maxLoc[1] = zero_mask ? -1 : maxloc % cols;
+        maxLoc[0] = zero_ਨਕਾਬ ? -1 : maxloc / ਖਾਨੇ_ਗਿਣਤੀ;
+        maxLoc[1] = zero_ਨਕਾਬ ? -1 : maxloc % ਖਾਨੇ_ਗਿਣਤੀ;
     }
 }
 
-typedef void (*getMinMaxResFunc)(const Mat & db, double * minVal, double * maxVal,
-                                 int * minLoc, int *maxLoc, int gropunum, int cols, double * maxVal2);
+ਕਿਸਮਪਰਿਭਾਸ਼ਾ ਖਾਲੀ (*getMinMaxResFunc)(ਅਚਲ Mat & db, ਦੁੱਗਣਾ * minVal, ਦੁੱਗਣਾ * maxVal,
+                                 ਪੂਰਨ * minLoc, ਪੂਰਨ *maxLoc, ਪੂਰਨ gropunum, ਪੂਰਨ ਖਾਨੇ_ਗਿਣਤੀ, ਦੁੱਗਣਾ * maxVal2);
 
-bool ocl_minMaxIdx( InputArray _src, double* minVal, double* maxVal, int* minLoc, int* maxLoc, InputArray _mask,
-                   int ddepth, bool absValues, InputArray _src2, double * maxVal2)
+ਤਾਰਕਿਕ ocl_minMaxIdx( ਨਿਵੇਸ਼_Array _src, ਦੁੱਗਣਾ* minVal, ਦੁੱਗਣਾ* maxVal, ਪੂਰਨ* minLoc, ਪੂਰਨ* maxLoc, ਨਿਵੇਸ਼_Array ਨਕਾਬ_2,
+                   ਪੂਰਨ ddepth, ਤਾਰਕਿਕ abs_ਮੁੱਲਾਂ, ਨਿਵੇਸ਼_Array _src2, ਦੁੱਗਣਾ * maxVal2)
 {
-    const ocl::Device & dev = ocl::Device::getDefault();
+    ਅਚਲ ocl::Device & dev = ocl::Device::getDefault();
 
-#ifdef __ANDROID__
-    if (dev.isNVidia())
-        return false;
-#endif
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ __ANDROID__
+    ਜੇ (dev.isNVidia())
+        ਵਾਪਸ ਝੂਠ;
+#ਜੇ_ਅੰਤ
 
-    if (dev.deviceVersionMajor() == 1 && dev.deviceVersionMinor() < 2)
+    ਜੇ (dev.device_ਸੰਸਕਰਣ_Major() == 1 && dev.device_ਸੰਸਕਰਣ_Minor() < 2)
     {
         // 'static' storage class specifier used by "minmaxloc" is available from OpenCL 1.2+ only
-        return false;
+        ਵਾਪਸ ਝੂਠ;
     }
 
-    bool doubleSupport = dev.doubleFPConfig() > 0, haveMask = !_mask.empty(),
-    haveSrc2 = _src2.kind() != _InputArray::NONE;
-    int type = _src.type(), depth = CV_MAT_DEPTH(type), cn = CV_MAT_CN(type),
-    kercn = haveMask ? cn : std::min(4, ocl::predictOptimalVectorWidth(_src, _src2));
+    ਤਾਰਕਿਕ doubleSupport = dev.doubleFPConfig() > 0, have_ਨਕਾਬ = !ਨਕਾਬ_2.empty(),
+    haveSrc2 = _src2.ਕਿਸਮ() != ਨਿਵੇਸ਼_Array_2::NONE;
+    ਪੂਰਨ type = _src.type(), ਡੂੰਘਾਈ = CV_MAT_ਡੂੰਘਾਈ(type), cn = CV_MAT_CN(type),
+    kercn = have_ਨਕਾਬ ? cn : std::min(4, ocl::predict_Optimal_ਸਦਿਸ਼_ਚੌੜਾਈ(_src, _src2));
 
-    if (depth >= CV_16F)
-        return false;
+    ਜੇ (ਡੂੰਘਾਈ >= CV_16F)
+        ਵਾਪਸ ਝੂਠ;
 
     // disabled following modes since it occasionally fails on AMD devices (e.g. A10-6800K, sep. 2014)
-    if ((haveMask || type == CV_32FC1) && dev.isAMD())
-        return false;
+    ਜੇ ((have_ਨਕਾਬ || type == CV_32FC1) && dev.isAMD())
+        ਵਾਪਸ ਝੂਠ;
 
-    CV_Assert( (cn == 1 && (!haveMask || _mask.type() == CV_8U || _mask.type() == CV_8S || _mask.type() == CV_Bool)) ||
+    CV_Assert( (cn == 1 && (!have_ਨਕਾਬ || ਨਕਾਬ_2.type() == CV_8U || ਨਕਾਬ_2.type() == CV_8S || ਨਕਾਬ_2.type() == CV_Bool)) ||
               (cn >= 1 && !minLoc && !maxLoc) );
 
-    if (ddepth < 0)
-        ddepth = depth;
+    ਜੇ (ddepth < 0)
+        ddepth = ਡੂੰਘਾਈ;
 
     CV_Assert(!haveSrc2 || _src2.type() == type);
 
-    if (depth == CV_32S || depth == CV_8S || depth == CV_32U || depth == CV_64U ||
-        depth == CV_64S || depth == CV_16F || depth == CV_16BF)
-        return false;
+    ਜੇ (ਡੂੰਘਾਈ == CV_32S || ਡੂੰਘਾਈ == CV_8S || ਡੂੰਘਾਈ == CV_32U || ਡੂੰਘਾਈ == CV_64U ||
+        ਡੂੰਘਾਈ == CV_64S || ਡੂੰਘਾਈ == CV_16F || ਡੂੰਘਾਈ == CV_16BF)
+        ਵਾਪਸ ਝੂਠ;
 
-    if ((depth == CV_64F || ddepth == CV_64F) && !doubleSupport)
-        return false;
+    ਜੇ ((ਡੂੰਘਾਈ == CV_64F || ddepth == CV_64F) && !doubleSupport)
+        ਵਾਪਸ ਝੂਠ;
 
-    int groupnum = dev.maxComputeUnits();
-    size_t wgs = dev.maxWorkGroupSize();
+    ਪੂਰਨ groupnum = dev.maxComputeUnits();
+    size_t wgs = dev.max_Work_ਸਮੂਹ_ਮਾਪ();
 
-    int wgs2_aligned = 1;
-    while (wgs2_aligned < (int)wgs)
+    ਪੂਰਨ wgs2_aligned = 1;
+    ਜਦੋਂ (wgs2_aligned < (ਪੂਰਨ)wgs)
         wgs2_aligned <<= 1;
     wgs2_aligned >>= 1;
 
-    bool needMinVal = minVal || minLoc, needMinLoc = minLoc != NULL,
-    needMaxVal = maxVal || maxLoc, needMaxLoc = maxLoc != NULL;
+    ਤਾਰਕਿਕ needMinVal = minVal || minLoc, needMinLoc = minLoc != ਨਿਰਾ,
+    needMaxVal = maxVal || maxLoc, needMaxLoc = maxLoc != ਨਿਰਾ;
 
     // in case of mask we must know whether mask is filled with zeros or not
     // so let's calculate min or max location, if it's undefined, so mask is zeros
-    if (!(needMaxLoc || needMinLoc) && haveMask)
+    ਜੇ (!(needMaxLoc || needMinLoc) && have_ਨਕਾਬ)
     {
-        if (needMinVal)
-            needMinLoc = true;
-        else
-            needMaxLoc = true;
+        ਜੇ (needMinVal)
+            needMinLoc = ਸੱਚ;
+        ਨਹੀਂਤਾਂ
+            needMaxLoc = ਸੱਚ;
     }
 
-    char cvt[2][50];
+    ਅੱਖਰ cvt[2][50];
     String opts = format("-D DEPTH_%d -D srcT1=%s%s -D WGS=%d -D srcT=%s"
                          " -D WGS2_ALIGNED=%d%s%s%s -D kercn=%d%s%s%s%s"
                          " -D dstT1=%s -D dstT=%s -D convertToDT=%s%s%s%s%s -D wdepth=%d -D convertFromU=%s"
                          " -D MINMAX_STRUCT_ALIGNMENT=%d",
-                         depth, ocl::typeToStr(depth), haveMask ? " -D HAVE_MASK" : "", (int)wgs,
-                         ocl::typeToStr(CV_MAKE_TYPE(depth, kercn)), wgs2_aligned,
+                         ਡੂੰਘਾਈ, ocl::type_ਮੰਜ਼ਿਲ_Str(ਡੂੰਘਾਈ), have_ਨਕਾਬ ? " -D HAVE_MASK" : "", (ਪੂਰਨ)wgs,
+                         ocl::type_ਮੰਜ਼ਿਲ_Str(CV_MAKE_TYPE(ਡੂੰਘਾਈ, kercn)), wgs2_aligned,
                          doubleSupport ? " -D DOUBLE_SUPPORT" : "",
                          _src.isContinuous() ? " -D HAVE_SRC_CONT" : "",
-                         _mask.isContinuous() ? " -D HAVE_MASK_CONT" : "", kercn,
+                         ਨਕਾਬ_2.isContinuous() ? " -D HAVE_MASK_CONT" : "", kercn,
                          needMinVal ? " -D NEED_MINVAL" : "", needMaxVal ? " -D NEED_MAXVAL" : "",
                          needMinLoc ? " -D NEED_MINLOC" : "", needMaxLoc ? " -D NEED_MAXLOC" : "",
-                         ocl::typeToStr(ddepth), ocl::typeToStr(CV_MAKE_TYPE(ddepth, kercn)),
-                         ocl::convertTypeStr(depth, ddepth, kercn, cvt[0], sizeof(cvt[0])),
-                         absValues ? " -D OP_ABS" : "",
+                         ocl::type_ਮੰਜ਼ਿਲ_Str(ddepth), ocl::type_ਮੰਜ਼ਿਲ_Str(CV_MAKE_TYPE(ddepth, kercn)),
+                         ocl::convertTypeStr(ਡੂੰਘਾਈ, ddepth, kercn, cvt[0], ਆਕਾਰ(cvt[0])),
+                         abs_ਮੁੱਲਾਂ ? " -D OP_ABS" : "",
                          haveSrc2 ? " -D HAVE_SRC2" : "", maxVal2 ? " -D OP_CALC2" : "",
                          haveSrc2 && _src2.isContinuous() ? " -D HAVE_SRC2_CONT" : "", ddepth,
-                         depth <= CV_32S && ddepth == CV_32S ? ocl::convertTypeStr(CV_8U, ddepth, kercn, cvt[1], sizeof(cvt[1])) : "noconvert",
+                         ਡੂੰਘਾਈ <= CV_32S && ddepth == CV_32S ? ocl::convertTypeStr(CV_8U, ddepth, kercn, cvt[1], ਆਕਾਰ(cvt[1])) : "noconvert",
                          MINMAX_STRUCT_ALIGNMENT);
 
     ocl::Kernel k("minmaxloc", ocl::core::minmaxloc_oclsrc, opts);
-    if (k.empty())
-        return false;
+    ਜੇ (k.empty())
+        ਵਾਪਸ ਝੂਠ;
 
-    int esz = CV_ELEM_SIZE(ddepth), esz32s = CV_ELEM_SIZE1(CV_32S),
+    ਪੂਰਨ esz = CV_ELEM_ਮਾਪ(ddepth), esz32s = CV_ELEM_SIZE1(CV_32S),
     dbsize = groupnum * ((needMinVal ? esz : 0) + (needMaxVal ? esz : 0) +
                          (needMinLoc ? esz32s : 0) + (needMaxLoc ? esz32s : 0) +
                          (maxVal2 ? esz : 0))
     + 5 * MINMAX_STRUCT_ALIGNMENT;
-    UMat src = _src.getUMat(), src2 = _src2.getUMat(), db(1, dbsize, CV_8UC1), mask = _mask.getUMat();
+    UMat src = _src.getUMat(), src2 = _src2.getUMat(), db(1, dbsize, CV_8UC1), ਨਕਾਬ = ਨਕਾਬ_2.getUMat();
 
-    if (cn > 1 && !haveMask)
+    ਜੇ (cn > 1 && !have_ਨਕਾਬ)
     {
         src = src.reshape(1);
         src2 = src2.reshape(1);
     }
 
-    if (haveSrc2)
+    ਜੇ (haveSrc2)
     {
-        if (!haveMask)
-            k.args(ocl::KernelArg::ReadOnlyNoSize(src), src.cols, (int)src.total(),
-                   groupnum, ocl::KernelArg::PtrWriteOnly(db), ocl::KernelArg::ReadOnlyNoSize(src2));
-        else
-            k.args(ocl::KernelArg::ReadOnlyNoSize(src), src.cols, (int)src.total(),
-                   groupnum, ocl::KernelArg::PtrWriteOnly(db), ocl::KernelArg::ReadOnlyNoSize(mask),
-                   ocl::KernelArg::ReadOnlyNoSize(src2));
+        ਜੇ (!have_ਨਕਾਬ)
+            k.ਦਲੀਲਾਂ(ocl::KernelArg::Read_Only_No_ਮਾਪ(src), src.ਖਾਨੇ_ਗਿਣਤੀ, (ਪੂਰਨ)src.ਕੁੱਲ(),
+                   groupnum, ocl::KernelArg::PtrWriteOnly(db), ocl::KernelArg::Read_Only_No_ਮਾਪ(src2));
+        ਨਹੀਂਤਾਂ
+            k.ਦਲੀਲਾਂ(ocl::KernelArg::Read_Only_No_ਮਾਪ(src), src.ਖਾਨੇ_ਗਿਣਤੀ, (ਪੂਰਨ)src.ਕੁੱਲ(),
+                   groupnum, ocl::KernelArg::PtrWriteOnly(db), ocl::KernelArg::Read_Only_No_ਮਾਪ(ਨਕਾਬ),
+                   ocl::KernelArg::Read_Only_No_ਮਾਪ(src2));
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
-        if (!haveMask)
-            k.args(ocl::KernelArg::ReadOnlyNoSize(src), src.cols, (int)src.total(),
+        ਜੇ (!have_ਨਕਾਬ)
+            k.ਦਲੀਲਾਂ(ocl::KernelArg::Read_Only_No_ਮਾਪ(src), src.ਖਾਨੇ_ਗਿਣਤੀ, (ਪੂਰਨ)src.ਕੁੱਲ(),
                    groupnum, ocl::KernelArg::PtrWriteOnly(db));
-        else
-            k.args(ocl::KernelArg::ReadOnlyNoSize(src), src.cols, (int)src.total(),
-                   groupnum, ocl::KernelArg::PtrWriteOnly(db), ocl::KernelArg::ReadOnlyNoSize(mask));
+        ਨਹੀਂਤਾਂ
+            k.ਦਲੀਲਾਂ(ocl::KernelArg::Read_Only_No_ਮਾਪ(src), src.ਖਾਨੇ_ਗਿਣਤੀ, (ਪੂਰਨ)src.ਕੁੱਲ(),
+                   groupnum, ocl::KernelArg::PtrWriteOnly(db), ocl::KernelArg::Read_Only_No_ਮਾਪ(ਨਕਾਬ));
     }
 
     size_t globalsize = groupnum * wgs;
-    if (!k.run(1, &globalsize, &wgs, true))
-        return false;
+    ਜੇ (!k.ਲੜੀਵਾਰ(1, &globalsize, &wgs, ਸੱਚ))
+        ਵਾਪਸ ਝੂਠ;
 
-    static const getMinMaxResFunc functab[7] =
+    ਸਥਿਰ ਅਚਲ getMinMaxResFunc functab[7] =
     {
         getMinMaxRes<uchar>,
-        getMinMaxRes<char>,
+        getMinMaxRes<ਅੱਖਰ>,
         getMinMaxRes<ushort>,
-        getMinMaxRes<short>,
-        getMinMaxRes<int>,
-        getMinMaxRes<float>,
-        getMinMaxRes<double>
+        getMinMaxRes<ਛੋਟਾ>,
+        getMinMaxRes<ਪੂਰਨ>,
+        getMinMaxRes<ਦਸ਼ਮਲਵ>,
+        getMinMaxRes<ਦੁੱਗਣਾ>
     };
 
     CV_Assert(ddepth <= CV_64F);
     getMinMaxResFunc func = functab[ddepth];
 
-    int locTemp[2];
+    ਪੂਰਨ loc_ਆਰਜ਼ੀ[2];
     func(db.getMat(ACCESS_READ), minVal, maxVal,
-         needMinLoc ? minLoc ? minLoc : locTemp : minLoc,
-         needMaxLoc ? maxLoc ? maxLoc : locTemp : maxLoc,
-         groupnum, src.cols, maxVal2);
+         needMinLoc ? minLoc ? minLoc : loc_ਆਰਜ਼ੀ : minLoc,
+         needMaxLoc ? maxLoc ? maxLoc : loc_ਆਰਜ਼ੀ : maxLoc,
+         groupnum, src.ਖਾਨੇ_ਗਿਣਤੀ, maxVal2);
 
-    return true;
+    ਵਾਪਸ ਸੱਚ;
 }
 
-#endif
+#ਜੇ_ਅੰਤ
 
 }
 
 // serial implementation, also used for the pieces of the parallel version
-static void minMaxIdx_(cv::InputArray _src, double* minVal,
-                       double* maxVal, int* minIdx, int* maxIdx,
-                       cv::InputArray _mask)
+ਸਥਿਰ ਖਾਲੀ minMaxIdx_(cv::ਨਿਵੇਸ਼_Array _src, ਦੁੱਗਣਾ* minVal,
+                       ਦੁੱਗਣਾ* maxVal, ਪੂਰਨ* minIdx, ਪੂਰਨ* maxIdx,
+                       cv::ਨਿਵੇਸ਼_Array ਨਕਾਬ_2)
 {
-    using namespace cv;
-    int type = _src.type(), depth = CV_MAT_DEPTH(type), cn = CV_MAT_CN(type);
-    CV_Assert( (cn == 1 && (_mask.empty() || _mask.type() == CV_8U || _mask.type() == CV_8S || _mask.type() == CV_Bool)) ||
-               (cn > 1 && _mask.empty() && !minIdx && !maxIdx) );
+    ਵਰਤੋਂ ਨਾਮਾਕਾਸ਼ cv;
+    ਪੂਰਨ type = _src.type(), ਡੂੰਘਾਈ = CV_MAT_ਡੂੰਘਾਈ(type), cn = CV_MAT_CN(type);
+    CV_Assert( (cn == 1 && (ਨਕਾਬ_2.empty() || ਨਕਾਬ_2.type() == CV_8U || ਨਕਾਬ_2.type() == CV_8S || ਨਕਾਬ_2.type() == CV_Bool)) ||
+               (cn > 1 && ਨਕਾਬ_2.empty() && !minIdx && !maxIdx) );
 
-    CV_OCL_RUN(OCL_PERFORMANCE_CHECK(_src.isUMat()) && _src.dims() <= 2  && (_mask.empty() || _src.size() == _mask.size()),
-               ocl_minMaxIdx(_src, minVal, maxVal, minIdx, maxIdx, _mask))
+    CV_OCL_ਲੜੀਵਾਰ(OCL_PERFORMANCE_CHECK(_src.isUMat()) && _src.dims() <= 2  && (ਨਕਾਬ_2.empty() || _src.size() == ਨਕਾਬ_2.size()),
+               ocl_minMaxIdx(_src, minVal, maxVal, minIdx, maxIdx, ਨਕਾਬ_2))
 
-    Mat src = _src.getMat(), mask = _mask.getMat();
+    Mat src = _src.getMat(), ਨਕਾਬ = ਨਕਾਬ_2.getMat();
 
-    if (src.dims <= 2)
+    ਜੇ (src.dims <= 2)
     {
-        if ((size_t)src.step == (size_t)mask.step || mask.empty())
+        ਜੇ ((size_t)src.ਕਦਮ == (size_t)ਨਕਾਬ.ਕਦਮ || ਨਕਾਬ.empty())
         {
-            CALL_HAL(minMaxIdx, cv_hal_minMaxIdx, src.data, src.step, src.cols*cn, src.rows,
-                     src.depth(), minVal, maxVal, minIdx, maxIdx, mask.data);
+            CALL_HAL(minMaxIdx, cv_hal_minMaxIdx, src.ਅੰਕੜੇ, src.ਕਦਮ, src.ਖਾਨੇ_ਗਿਣਤੀ*cn, src.ਪੰਕਤੀਆਂ,
+                     src.ਡੂੰਘਾਈ(), minVal, maxVal, minIdx, maxIdx, ਨਕਾਬ.ਅੰਕੜੇ);
         }
-        CALL_HAL(minMaxIdxMaskStep, cv_hal_minMaxIdxMaskStep, src.data, src.step, src.cols*cn, src.rows,
-                 src.depth(), minVal, maxVal, minIdx, maxIdx, mask.data, mask.step);
+        CALL_HAL(min_Max_Idx_ਨਕਾਬ_ਕਦਮ, cv_hal_min_Max_Idx_ਨਕਾਬ_ਕਦਮ, src.ਅੰਕੜੇ, src.ਕਦਮ, src.ਖਾਨੇ_ਗਿਣਤੀ*cn, src.ਪੰਕਤੀਆਂ,
+                 src.ਡੂੰਘਾਈ(), minVal, maxVal, minIdx, maxIdx, ਨਕਾਬ.ਅੰਕੜੇ, ਨਕਾਬ.ਕਦਮ);
     }
-    else if (src.isContinuous() && (mask.isContinuous() || mask.empty()))
+    ਨਹੀਂਤਾਂ ਜੇ (src.isContinuous() && (ਨਕਾਬ.isContinuous() || ਨਕਾਬ.empty()))
     {
-        int res = cv_hal_minMaxIdx(src.data, 0, (int)src.total()*cn, 1, src.depth(),
-                                   minVal, maxVal, minIdx, maxIdx, mask.data);
+        ਪੂਰਨ res = cv_hal_minMaxIdx(src.ਅੰਕੜੇ, 0, (ਪੂਰਨ)src.ਕੁੱਲ()*cn, 1, src.ਡੂੰਘਾਈ(),
+                                   minVal, maxVal, minIdx, maxIdx, ਨਕਾਬ.ਅੰਕੜੇ);
 
-        if (res == CV_HAL_ERROR_OK)
+        ਜੇ (res == CV_HAL_ERROR_OK)
         {
             // minIdx[0] and minIdx[0] are always 0 for "flatten" version
-            if (minIdx)
+            ਜੇ (minIdx)
                 ofs2idx(src, minIdx[1]+1, minIdx);
-            if (maxIdx)
+            ਜੇ (maxIdx)
                 ofs2idx(src, maxIdx[1]+1, maxIdx);
-            return;
+            ਵਾਪਸ;
         }
-        else if (res != CV_HAL_ERROR_NOT_IMPLEMENTED)
+        ਨਹੀਂਤਾਂ ਜੇ (res != CV_HAL_ERROR_NOT_IMPLEMENTED)
         {
-            CV_Error_(cv::Error::StsInternal,
+            CV_Error_(cv::Error::Sts_ਅੰਦਰੂਨੀ,
             ("HAL implementation minMaxIdx ==> " CVAUX_STR(cv_hal_minMaxIdx) " returned %d (0x%08x)", res, res));
         }
     }
 
-    MinMaxIdxFunc func = getMinMaxIdxFunc(depth);
+    MinMaxIdxFunc func = getMinMaxIdxFunc(ਡੂੰਘਾਈ);
     CV_Assert( func != 0 );
 
-    const Mat* arrays[] = {&src, &mask, 0};
+    ਅਚਲ Mat* arrays[] = {&src, &ਨਕਾਬ, 0};
     uchar* ptrs[2] = {};
     NAryMatIterator it(arrays, ptrs);
 
     size_t minidx = 0, maxidx = 0;
     size_t startidx = 1;
-    union {
-        int i;
-        float f;
-        double d;
+    ਸੰਘ {
+        ਪੂਰਨ i;
+        ਦਸ਼ਮਲਵ f;
+        ਦੁੱਗਣਾ d;
         int64 L;
         uint64 UL;
     } minval, maxval;
-    int planeSize = (int)it.size*cn;
+    ਪੂਰਨ plane_ਮਾਪ = (ਪੂਰਨ)it.size*cn;
     minval.L = maxval.L = 0;
 
-    for( size_t i = 0; i < it.nplanes; i++, ++it, startidx += planeSize )
-        func( ptrs[0], ptrs[1], &minval.L, &maxval.L, &minidx, &maxidx, planeSize, startidx );
+    ਲਈ( size_t i = 0; i < it.nplanes; i++, ++it, startidx += plane_ਮਾਪ )
+        func( ptrs[0], ptrs[1], &minval.L, &maxval.L, &minidx, &maxidx, plane_ਮਾਪ, startidx );
 
-    double dminval, dmaxval;
-    if( depth <= CV_32S || depth == CV_Bool )
+    ਦੁੱਗਣਾ dminval, dmaxval;
+    ਜੇ( ਡੂੰਘਾਈ <= CV_32S || ਡੂੰਘਾਈ == CV_Bool )
         dminval = minval.i, dmaxval = maxval.i;
-    else if( depth == CV_32F || depth == CV_16F || depth == CV_16BF )
+    ਨਹੀਂਤਾਂ ਜੇ( ਡੂੰਘਾਈ == CV_32F || ਡੂੰਘਾਈ == CV_16F || ਡੂੰਘਾਈ == CV_16BF )
         dminval = minval.f, dmaxval = maxval.f;
-    else if( depth == CV_64F )
+    ਨਹੀਂਤਾਂ ਜੇ( ਡੂੰਘਾਈ == CV_64F )
         dminval = minval.d, dmaxval = maxval.d;
-    else if( depth == CV_64S || depth == CV_32U )
-        dminval = (double)minval.L, dmaxval = (double)maxval.L;
-    else {
-        CV_Assert(depth == CV_64U);
-        dminval = (double)minval.UL, dmaxval = (double)maxval.UL;
+    ਨਹੀਂਤਾਂ ਜੇ( ਡੂੰਘਾਈ == CV_64S || ਡੂੰਘਾਈ == CV_32U )
+        dminval = (ਦੁੱਗਣਾ)minval.L, dmaxval = (ਦੁੱਗਣਾ)maxval.L;
+    ਨਹੀਂਤਾਂ {
+        CV_Assert(ਡੂੰਘਾਈ == CV_64U);
+        dminval = (ਦੁੱਗਣਾ)minval.UL, dmaxval = (ਦੁੱਗਣਾ)maxval.UL;
     }
 
-    if( minVal )
+    ਜੇ( minVal )
         *minVal = dminval;
-    if( maxVal )
+    ਜੇ( maxVal )
         *maxVal = dmaxval;
 
-    if( minIdx )
+    ਜੇ( minIdx )
         ofs2idx(src, minidx, minIdx);
-    if( maxIdx )
+    ਜੇ( maxIdx )
         ofs2idx(src, maxidx, maxIdx);
 }
 
-void cv::minMaxIdx(InputArray _src, double* minVal,
-                   double* maxVal, int* minIdx, int* maxIdx,
-                   InputArray _mask)
+ਖਾਲੀ cv::minMaxIdx(ਨਿਵੇਸ਼_Array _src, ਦੁੱਗਣਾ* minVal,
+                   ਦੁੱਗਣਾ* maxVal, ਪੂਰਨ* minIdx, ਪੂਰਨ* maxIdx,
+                   ਨਿਵੇਸ਼_Array ਨਕਾਬ_2)
 {
     CV_INSTRUMENT_REGION();
 
     std::vector<StatChunk> chunks;
-    if (!_src.isUMat())
+    ਜੇ (!_src.isUMat())
     {
-        Mat src = _src.getMat(), mask = _mask.getMat();
-        const int cn = src.channels();
-        const bool argsOk = (cn == 1 && (mask.empty() || ((mask.type() == CV_8U || mask.type() == CV_8S ||
-                             mask.type() == CV_Bool) && src.size == mask.size))) ||
-                            (cn > 1 && mask.empty() && !minIdx && !maxIdx);
-        if (argsOk && splitForParallelStat(src, mask, chunks))
+        Mat src = _src.getMat(), ਨਕਾਬ = ਨਕਾਬ_2.getMat();
+        ਅਚਲ ਪੂਰਨ cn = src.channels();
+        ਅਚਲ ਤਾਰਕਿਕ ਦਲੀਲਾਂ_Ok = (cn == 1 && (ਨਕਾਬ.empty() || ((ਨਕਾਬ.type() == CV_8U || ਨਕਾਬ.type() == CV_8S ||
+                             ਨਕਾਬ.type() == CV_Bool) && src.size == ਨਕਾਬ.size))) ||
+                            (cn > 1 && ਨਕਾਬ.empty() && !minIdx && !maxIdx);
+        ਜੇ (ਦਲੀਲਾਂ_Ok && ਵੰਡੋ_For_Parallel_Stat(src, ਨਕਾਬ, chunks))
         {
-            const int n = (int)chunks.size();
-            std::vector<double> mn(n), mx(n);
+            ਅਚਲ ਪੂਰਨ n = (ਪੂਰਨ)chunks.size();
+            std::vector<ਦੁੱਗਣਾ> mn(n), mx(n);
             std::vector<size_t> imn(n, 0), imx(n, 0);   // 1-based row-major indices, 0 = no element
-            parallel_for_(Range(0, n), [&](const Range& r)
+            parallel_for_(Range(0, n), [&](ਅਚਲ Range& r)
             {
-                for (int i = r.start; i < r.end; i++)
+                ਲਈ (ਪੂਰਨ i = r.ਸ਼ੁਰੂ; i < r.end; i++)
                 {
-                    int a[2] = {-1, -1}, b[2] = {-1, -1};
-                    minMaxIdx_(chunks[i].src, &mn[i], &mx[i], cn == 1 ? a : nullptr, cn == 1 ? b : nullptr,
-                               chunks[i].mask);
-                    if (cn > 1)
+                    ਪੂਰਨ a[2] = {-1, -1}, b[2] = {-1, -1};
+                    minMaxIdx_(chunks[i].src, &mn[i], &mx[i], cn == 1 ? a : ਖਾਲੀ_ਸੂਚਕ, cn == 1 ? b : ਖਾਲੀ_ਸੂਚਕ,
+                               chunks[i].ਨਕਾਬ);
+                    ਜੇ (cn > 1)
                         imn[i] = imx[i] = 1;
-                    else if (a[0] >= 0)
+                    ਨਹੀਂਤਾਂ ਜੇ (a[0] >= 0)
                     {
-                        imn[i] = chunkIndexToElem(chunks[i], a) + 1;
-                        imx[i] = chunkIndexToElem(chunks[i], b) + 1;
+                        imn[i] = chunk_ਸੂਚਕਾਂਕ_ਮੰਜ਼ਿਲ_Elem(chunks[i], a) + 1;
+                        imx[i] = chunk_ਸੂਚਕਾਂਕ_ਮੰਜ਼ਿਲ_Elem(chunks[i], b) + 1;
                     }
                 }
             });
             // pieces are in memory order, so taking the first strict improvement keeps the
             // first occurrence, as in the serial version
-            int bmin = -1, bmax = -1;
-            for (int i = 0; i < n; i++)
+            ਪੂਰਨ bmin = -1, bmax = -1;
+            ਲਈ (ਪੂਰਨ i = 0; i < n; i++)
             {
-                if (imn[i] == 0)
-                    continue;
-                if (bmin < 0 || mn[i] < mn[bmin]) bmin = i;
-                if (bmax < 0 || mx[i] > mx[bmax]) bmax = i;
+                ਜੇ (imn[i] == 0)
+                    ਜਾਰੀ;
+                ਜੇ (bmin < 0 || mn[i] < mn[bmin]) bmin = i;
+                ਜੇ (bmax < 0 || mx[i] > mx[bmax]) bmax = i;
             }
-            if (minVal) *minVal = bmin >= 0 ? mn[bmin] : 0;
-            if (maxVal) *maxVal = bmax >= 0 ? mx[bmax] : 0;
-            if (minIdx) ofs2idx(src, bmin >= 0 ? imn[bmin] : 0, minIdx);
-            if (maxIdx) ofs2idx(src, bmax >= 0 ? imx[bmax] : 0, maxIdx);
-            return;
+            ਜੇ (minVal) *minVal = bmin >= 0 ? mn[bmin] : 0;
+            ਜੇ (maxVal) *maxVal = bmax >= 0 ? mx[bmax] : 0;
+            ਜੇ (minIdx) ofs2idx(src, bmin >= 0 ? imn[bmin] : 0, minIdx);
+            ਜੇ (maxIdx) ofs2idx(src, bmax >= 0 ? imx[bmax] : 0, maxIdx);
+            ਵਾਪਸ;
         }
     }
-    minMaxIdx_(_src, minVal, maxVal, minIdx, maxIdx, _mask);
+    minMaxIdx_(_src, minVal, maxVal, minIdx, maxIdx, ਨਕਾਬ_2);
 }
 
-void cv::minMaxLoc( InputArray _img, double* minVal, double* maxVal,
-                    Point* minLoc, Point* maxLoc, InputArray mask )
+ਖਾਲੀ cv::minMaxLoc( ਨਿਵੇਸ਼_Array _img, ਦੁੱਗਣਾ* minVal, ਦੁੱਗਣਾ* maxVal,
+                    ਬਿੰਦੂ* minLoc, ਬਿੰਦੂ* maxLoc, ਨਿਵੇਸ਼_Array ਨਕਾਬ )
 {
     CV_INSTRUMENT_REGION();
 
-    int dims = _img.dims();
+    ਪੂਰਨ dims = _img.dims();
     CV_CheckLE(dims, 2, "");
 
-    minMaxIdx(_img, minVal, maxVal, (int*)minLoc, (int*)maxLoc, mask);
-    if( minLoc) {
-        if (dims == 2)
+    minMaxIdx(_img, minVal, maxVal, (ਪੂਰਨ*)minLoc, (ਪੂਰਨ*)maxLoc, ਨਕਾਬ);
+    ਜੇ( minLoc) {
+        ਜੇ (dims == 2)
             std::swap(minLoc->x, minLoc->y);
-        else {
+        ਨਹੀਂਤਾਂ {
             minLoc->y = 0;
         }
     }
-    if( maxLoc) {
-        if (dims == 2)
+    ਜੇ( maxLoc) {
+        ਜੇ (dims == 2)
             std::swap(maxLoc->x, maxLoc->y);
-        else {
+        ਨਹੀਂਤਾਂ {
             maxLoc->y = 0;
         }
     }
 }
 
-enum class ReduceMode
+ਗਿਣਤੀ ਵਰਗ Reduce_ਬਹੁਲਕ
 {
-    FIRST_MIN = 0, //!< get index of first min occurrence
-    LAST_MIN  = 1, //!< get index of last min occurrence
-    FIRST_MAX = 2, //!< get index of first max occurrence
-    LAST_MAX  = 3, //!< get index of last max occurrence
+    ਪਹਿਲਾ_MIN = 0, //!< get index of first min occurrence
+    ਆਖਰੀ_MIN  = 1, //!< get index of last min occurrence
+    ਪਹਿਲਾ_MAX = 2, //!< get index of first max occurrence
+    ਆਖਰੀ_MAX  = 3, //!< get index of last max occurrence
 };
 
-template <typename T>
-struct reduceMinMaxImpl
+ਸਾਂਚਾ <ਕਿਸਮ_ਨਾਂ T>
+ਬਣਤਰ reduceMinMaxImpl
 {
-    void operator()(const cv::Mat& src, cv::Mat& dst, ReduceMode mode, const int axis) const
+    ਖਾਲੀ ਸੰਚਾਲਕ()(ਅਚਲ cv::Mat& src, cv::Mat& dst, Reduce_ਬਹੁਲਕ ਬਹੁਲਕ, ਅਚਲ ਪੂਰਨ axis) ਅਚਲ
     {
-        switch(mode)
+        ਚੋਣ(ਬਹੁਲਕ)
         {
-        case ReduceMode::FIRST_MIN:
+        ਹਾਲਤ Reduce_ਬਹੁਲਕ::ਪਹਿਲਾ_MIN:
             reduceMinMaxApply<std::less>(src, dst, axis);
-            break;
-        case ReduceMode::LAST_MIN:
+            ਰੋਕੋ;
+        ਹਾਲਤ Reduce_ਬਹੁਲਕ::ਆਖਰੀ_MIN:
             reduceMinMaxApply<std::less_equal>(src, dst, axis);
-            break;
-        case ReduceMode::FIRST_MAX:
+            ਰੋਕੋ;
+        ਹਾਲਤ Reduce_ਬਹੁਲਕ::ਪਹਿਲਾ_MAX:
             reduceMinMaxApply<std::greater>(src, dst, axis);
-            break;
-        case ReduceMode::LAST_MAX:
+            ਰੋਕੋ;
+        ਹਾਲਤ Reduce_ਬਹੁਲਕ::ਆਖਰੀ_MAX:
             reduceMinMaxApply<std::greater_equal>(src, dst, axis);
-            break;
+            ਰੋਕੋ;
         }
     }
 
-    template <template<class> class Cmp>
-    static void reduceMinMaxApply(const cv::Mat& src, cv::Mat& dst, const int axis)
+    ਸਾਂਚਾ <ਸਾਂਚਾ<ਵਰਗ> ਵਰਗ Cmp>
+    ਸਥਿਰ ਖਾਲੀ reduceMinMaxApply(ਅਚਲ cv::Mat& src, cv::Mat& dst, ਅਚਲ ਪੂਰਨ axis)
     {
         Cmp<T> cmp;
 
-        const auto *src_ptr = src.ptr<T>();
-        auto *dst_ptr = dst.ptr<int32_t>();
+        ਅਚਲ ਸਵੈਚਾਲਿਤ *src_ptr = src.ptr<T>();
+        ਸਵੈਚਾਲਿਤ *dst_ptr = dst.ptr<int32_t>();
 
-        const size_t outer_size = src.total(0, axis);
-        const auto mid_size = static_cast<size_t>(src.size[axis]);
+        ਅਚਲ size_t outer_ਮਾਪ = src.ਕੁੱਲ(0, axis);
+        ਅਚਲ ਸਵੈਚਾਲਿਤ mid_ਮਾਪ = static_cast<size_t>(src.size[axis]);
 
-        const size_t outer_step = src.total(axis);
-        const size_t dst_step = dst.total(axis);
+        ਅਚਲ size_t outer_ਕਦਮ = src.ਕੁੱਲ(axis);
+        ਅਚਲ size_t dst_ਕਦਮ = dst.ਕੁੱਲ(axis);
 
-        const size_t mid_step = src.total(axis + 1);
+        ਅਚਲ size_t mid_ਕਦਮ = src.ਕੁੱਲ(axis + 1);
 
-        for (size_t outer = 0; outer < outer_size; ++outer)
+        ਲਈ (size_t outer = 0; outer < outer_ਮਾਪ; ++outer)
         {
-            const size_t outer_offset = outer * outer_step;
-            const size_t dst_offset = outer * dst_step;
-            for (size_t mid = 0; mid != mid_size; ++mid)
+            ਅਚਲ size_t outer_ਵਿੱਥ = outer * outer_ਕਦਮ;
+            ਅਚਲ size_t dst_ਵਿੱਥ = outer * dst_ਕਦਮ;
+            ਲਈ (size_t mid = 0; mid != mid_ਮਾਪ; ++mid)
             {
-                const size_t src_offset = outer_offset + mid * mid_step;
-                for (size_t inner = 0; inner < mid_step; inner++)
+                ਅਚਲ size_t src_ਵਿੱਥ = outer_ਵਿੱਥ + mid * mid_ਕਦਮ;
+                ਲਈ (size_t inner = 0; inner < mid_ਕਦਮ; inner++)
                 {
-                    int32_t& index = dst_ptr[dst_offset + inner];
+                    int32_t& ਸੂਚਕਾਂਕ = dst_ptr[dst_ਵਿੱਥ + inner];
 
-                    const size_t prev = outer_offset + index * mid_step + inner;
-                    const size_t curr = src_offset + inner;
+                    ਅਚਲ size_t prev = outer_ਵਿੱਥ + ਸੂਚਕਾਂਕ * mid_ਕਦਮ + inner;
+                    ਅਚਲ size_t curr = src_ਵਿੱਥ + inner;
 
-                    if (cmp(src_ptr[curr], src_ptr[prev]))
+                    ਜੇ (cmp(src_ptr[curr], src_ptr[prev]))
                     {
-                        index = static_cast<int32_t>(mid);
+                        ਸੂਚਕਾਂਕ = static_cast<int32_t>(mid);
                     }
                 }
             }
@@ -541,49 +541,49 @@ struct reduceMinMaxImpl
     }
 };
 
-static void reduceMinMax(cv::InputArray src, cv::OutputArray dst, ReduceMode mode, int axis)
+ਸਥਿਰ ਖਾਲੀ reduceMinMax(cv::ਨਿਵੇਸ਼_Array src, cv::OutputArray dst, Reduce_ਬਹੁਲਕ ਬਹੁਲਕ, ਪੂਰਨ axis)
 {
     CV_INSTRUMENT_REGION();
 
     cv::Mat srcMat = src.getMat();
-    int dims = std::max(1, srcMat.dims);
+    ਪੂਰਨ dims = std::max(1, srcMat.dims);
     axis = (axis + dims) % dims;
     CV_Assert(srcMat.channels() == 1 && axis >= 0 && axis <= srcMat.dims);
 
-    std::vector<int> sizes(srcMat.dims);
+    std::vector<ਪੂਰਨ> sizes(srcMat.dims);
     std::copy(srcMat.size.p, srcMat.size.p + srcMat.dims, sizes.begin());
-    if(!sizes.empty())
+    ਜੇ(!sizes.empty())
         sizes[axis] = 1;
 
-    dst.create(srcMat.dims, sizes.data(), CV_32SC1); // indices
+    dst.create(srcMat.dims, sizes.ਅੰਕੜੇ(), CV_32SC1); // indices
     cv::Mat dstMat = dst.getMat();
-    dstMat.setTo(cv::Scalar::all(0));
+    dstMat.ਸੈੱਟ_ਮੰਜ਼ਿਲ(cv::Scalar::all(0));
 
-    if (!srcMat.isContinuous())
+    ਜੇ (!srcMat.isContinuous())
     {
         srcMat = srcMat.clone();
     }
 
-    bool needs_copy = !dstMat.isContinuous();
-    if (needs_copy)
+    ਤਾਰਕਿਕ needs_copy = !dstMat.isContinuous();
+    ਜੇ (needs_copy)
     {
         dstMat = dstMat.clone();
     }
 
-    cv::detail::depthDispatch<reduceMinMaxImpl>(srcMat.depth(), srcMat, dstMat, mode, axis);
+    cv::detail::ਡੂੰਘਾਈ_Dispatch<reduceMinMaxImpl>(srcMat.ਡੂੰਘਾਈ(), srcMat, dstMat, ਬਹੁਲਕ, axis);
 
-    if (needs_copy)
+    ਜੇ (needs_copy)
     {
-        dstMat.copyTo(dst);
+        dstMat.copy_ਮੰਜ਼ਿਲ(dst);
     }
 }
 
-void cv::reduceArgMin(InputArray src, OutputArray dst, int axis, bool lastIndex)
+ਖਾਲੀ cv::reduceArgMin(ਨਿਵੇਸ਼_Array src, OutputArray dst, ਪੂਰਨ axis, ਤਾਰਕਿਕ ਆਖਰੀ_ਸੂਚਕਾਂਕ)
 {
-    reduceMinMax(src, dst, lastIndex ? ReduceMode::LAST_MIN : ReduceMode::FIRST_MIN, axis);
+    reduceMinMax(src, dst, ਆਖਰੀ_ਸੂਚਕਾਂਕ ? Reduce_ਬਹੁਲਕ::ਆਖਰੀ_MIN : Reduce_ਬਹੁਲਕ::ਪਹਿਲਾ_MIN, axis);
 }
 
-void cv::reduceArgMax(InputArray src, OutputArray dst, int axis, bool lastIndex)
+ਖਾਲੀ cv::reduceArgMax(ਨਿਵੇਸ਼_Array src, OutputArray dst, ਪੂਰਨ axis, ਤਾਰਕਿਕ ਆਖਰੀ_ਸੂਚਕਾਂਕ)
 {
-    reduceMinMax(src, dst, lastIndex ? ReduceMode::LAST_MAX : ReduceMode::FIRST_MAX, axis);
+    reduceMinMax(src, dst, ਆਖਰੀ_ਸੂਚਕਾਂਕ ? Reduce_ਬਹੁਲਕ::ਆਖਰੀ_MAX : Reduce_ਬਹੁਲਕ::ਪਹਿਲਾ_MAX, axis);
 }

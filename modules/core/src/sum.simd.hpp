@@ -3,261 +3,261 @@
 // of this distribution and at http://opencv.org/license.html
 
 
-#include "precomp.hpp"
-#include "stat.hpp"
+#ਅਨ੍ਤਰ੍ਭਾਵ "precomp.hpp"
+#ਅਨ੍ਤਰ੍ਭਾਵ "stat.hpp"
 
-namespace cv {
+ਨਾਮਾਕਾਸ਼ cv {
 CV_CPU_OPTIMIZATION_NAMESPACE_BEGIN
 
-template<typename T, typename ST, int (*fn)(const T*, const uchar*, ST*, int, int)>
-static int sumWrap(const uchar* src, const uchar* mask, uchar* sum, int len, int cn)
+ਸਾਂਚਾ<ਕਿਸਮ_ਨਾਂ T, ਕਿਸਮ_ਨਾਂ ST, ਪੂਰਨ (*fn)(ਅਚਲ T*, ਅਚਲ uchar*, ST*, ਪੂਰਨ, ਪੂਰਨ)>
+ਸਥਿਰ ਪੂਰਨ ਜੋੜ_Wrap(ਅਚਲ uchar* src, ਅਚਲ uchar* ਨਕਾਬ, uchar* ਜੋੜ, ਪੂਰਨ len, ਪੂਰਨ cn)
 {
-    return fn((const T*)src, mask, (ST*)sum, len, cn);
+    ਵਾਪਸ fn((ਅਚਲ T*)src, ਨਕਾਬ, (ST*)ਜੋੜ, len, cn);
 }
 
-SumFunc getSumFunc(int depth);
+ਜੋੜ_Func get_ਜੋੜ_Func(ਪੂਰਨ ਡੂੰਘਾਈ);
 
-#ifndef CV_CPU_OPTIMIZATION_DECLARATIONS_ONLY
+#ਜੇ_ਅਪਰਿਭਾਸ਼ਿਤ CV_CPU_OPTIMIZATION_DECLARATIONS_ONLY
 
-template <typename T, typename ST>
-struct Sum_SIMD
+ਸਾਂਚਾ <ਕਿਸਮ_ਨਾਂ T, ਕਿਸਮ_ਨਾਂ ST>
+ਬਣਤਰ ਜੋੜ_SIMD
 {
-    Sum_SIMD(int) {}
-    int operator () (const T*, const uchar*, ST*, int, int) const
+    ਜੋੜ_SIMD(ਪੂਰਨ) {}
+    ਪੂਰਨ ਸੰਚਾਲਕ () (ਅਚਲ T*, ਅਚਲ uchar*, ST*, ਪੂਰਨ, ਪੂਰਨ) ਅਚਲ
     {
-        return 0;
+        ਵਾਪਸ 0;
     }
 };
 
-#if (CV_SIMD || CV_SIMD_SCALABLE)
+#ਜੇ (CV_SIMD || CV_SIMD_SCALABLE)
 
-#undef REDUCE_PARTIAL_SUMS
-#define REDUCE_PARTIAL_SUMS() \
-    if (cn == 1) \
-        dst[0] += v_reduce_sum(v_add(v_add(s0, s1), s2)); \
-    else if (cn == 2) { \
-        s0 = v_add(v_add(s0, s1), s2); \
-        dst[0] += v_reduce_sum(v_and(s0, m0)); \
-        dst[1] += v_reduce_sum(v_and(s0, m1)); \
-    } else if (cn == 3) { \
-        dst[0] += v_reduce_sum(v_add(v_add(v_and(s0, m0), v_and(s1, m1)), v_and(s2, m2))); \
-        dst[1] += v_reduce_sum(v_add(v_add(v_and(s0, m3), v_and(s1, m4)), v_and(s2, m5))); \
-        dst[2] += v_reduce_sum(v_add(v_add(v_and(s0, m6), v_and(s1, m7)), v_and(s2, m8))); \
-    } else if (cn == 4) { \
-        s0 = v_add(v_add(s0, s1), s2); \
-        dst[0] += v_reduce_sum(v_and(s0, m0)); \
-        dst[1] += v_reduce_sum(v_and(s0, m1)); \
-        dst[2] += v_reduce_sum(v_and(s0, m2)); \
-        dst[3] += v_reduce_sum(v_and(s0, m3)); \
+#ਪਰਿਭਾਸ਼ਾ_ਰੱਦ REDUCE_PARTIAL_SUMS
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ REDUCE_PARTIAL_SUMS() \
+    ਜੇ (cn == 1) \
+        dst[0] += v_reduce_ਜੋੜ(v_ਜੋੜੋ(v_ਜੋੜੋ(s0, s1), s2)); \
+    ਨਹੀਂਤਾਂ ਜੇ (cn == 2) { \
+        s0 = v_ਜੋੜੋ(v_ਜੋੜੋ(s0, s1), s2); \
+        dst[0] += v_reduce_ਜੋੜ(v_and(s0, m0)); \
+        dst[1] += v_reduce_ਜੋੜ(v_and(s0, m1)); \
+    } ਨਹੀਂਤਾਂ ਜੇ (cn == 3) { \
+        dst[0] += v_reduce_ਜੋੜ(v_ਜੋੜੋ(v_ਜੋੜੋ(v_and(s0, m0), v_and(s1, m1)), v_and(s2, m2))); \
+        dst[1] += v_reduce_ਜੋੜ(v_ਜੋੜੋ(v_ਜੋੜੋ(v_and(s0, m3), v_and(s1, m4)), v_and(s2, m5))); \
+        dst[2] += v_reduce_ਜੋੜ(v_ਜੋੜੋ(v_ਜੋੜੋ(v_and(s0, m6), v_and(s1, m7)), v_and(s2, m8))); \
+    } ਨਹੀਂਤਾਂ ਜੇ (cn == 4) { \
+        s0 = v_ਜੋੜੋ(v_ਜੋੜੋ(s0, s1), s2); \
+        dst[0] += v_reduce_ਜੋੜ(v_and(s0, m0)); \
+        dst[1] += v_reduce_ਜੋੜ(v_and(s0, m1)); \
+        dst[2] += v_reduce_ਜੋੜ(v_and(s0, m2)); \
+        dst[3] += v_reduce_ਜੋੜ(v_and(s0, m3)); \
     }
 
-template<typename ST>
-static void init_maskbuf(ST* maskbuf, int cn, int simd_width)
+ਸਾਂਚਾ<ਕਿਸਮ_ਨਾਂ ST>
+ਸਥਿਰ ਖਾਲੀ init_maskbuf(ST* maskbuf, ਪੂਰਨ cn, ਪੂਰਨ simd_ਚੌੜਾਈ)
 {
-    memset(maskbuf, 0, simd_width*9*sizeof(maskbuf[0]));
-    if (cn == 1)
+    memset(maskbuf, 0, simd_ਚੌੜਾਈ*9*ਆਕਾਰ(maskbuf[0]));
+    ਜੇ (cn == 1)
         ;
-    else if (cn == 2)
-        for (int i = 0; i < simd_width; i += 2) {
+    ਨਹੀਂਤਾਂ ਜੇ (cn == 2)
+        ਲਈ (ਪੂਰਨ i = 0; i < simd_ਚੌੜਾਈ; i += 2) {
             maskbuf[i] = (ST)-1;
-            maskbuf[i+1+simd_width] = (ST)-1;
+            maskbuf[i+1+simd_ਚੌੜਾਈ] = (ST)-1;
         }
-    else if (cn == 3)
-        for (int i = 0; i < simd_width*3; i += 3) {
+    ਨਹੀਂਤਾਂ ਜੇ (cn == 3)
+        ਲਈ (ਪੂਰਨ i = 0; i < simd_ਚੌੜਾਈ*3; i += 3) {
             maskbuf[i] = (ST)-1;
-            maskbuf[i+1+simd_width*3] = (ST)-1;
-            maskbuf[i+2+simd_width*6] = (ST)-1;
+            maskbuf[i+1+simd_ਚੌੜਾਈ*3] = (ST)-1;
+            maskbuf[i+2+simd_ਚੌੜਾਈ*6] = (ST)-1;
         }
-    else if (cn == 4 && simd_width >= 4) {
-        for (int i = 0; i < simd_width; i += 4) {
+    ਨਹੀਂਤਾਂ ਜੇ (cn == 4 && simd_ਚੌੜਾਈ >= 4) {
+        ਲਈ (ਪੂਰਨ i = 0; i < simd_ਚੌੜਾਈ; i += 4) {
             maskbuf[i] = (ST)-1;
-            maskbuf[i+1+simd_width] = (ST)-1;
-            maskbuf[i+2+simd_width*2] = (ST)-1;
-            maskbuf[i+3+simd_width*3] = (ST)-1;
+            maskbuf[i+1+simd_ਚੌੜਾਈ] = (ST)-1;
+            maskbuf[i+2+simd_ਚੌੜਾਈ*2] = (ST)-1;
+            maskbuf[i+3+simd_ਚੌੜਾਈ*3] = (ST)-1;
         }
     }
 }
 
-#undef DEFINE_SUM_SIMD_8
-#define DEFINE_SUM_SIMD_8(T, ST, iST, VecT, load_op) \
-template<> struct Sum_SIMD<T, ST> \
+#ਪਰਿਭਾਸ਼ਾ_ਰੱਦ DEFINE_ਜੋੜ_SIMD_8
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ DEFINE_ਜੋੜ_SIMD_8(T, ST, iST, VecT, ਲੱਦੋ_op) \
+ਸਾਂਚਾ<> ਬਣਤਰ ਜੋੜ_SIMD<T, ST> \
 { \
-    Sum_SIMD(int cn) \
+    ਜੋੜ_SIMD(ਪੂਰਨ cn) \
     { \
         init_maskbuf((iST*)maskbuf, cn, VTraits<VecT>::vlanes()); \
     } \
-    int operator ()(const T* src, const uchar* mask, ST* dst, int len, int cn) const \
+    ਪੂਰਨ ਸੰਚਾਲਕ ()(ਅਚਲ T* src, ਅਚਲ uchar* ਨਕਾਬ, ST* dst, ਪੂਰਨ len, ਪੂਰਨ cn) ਅਚਲ \
     { \
-        if (mask || (cn < 1 || cn > 4)) \
-            return 0; \
+        ਜੇ (ਨਕਾਬ || (cn < 1 || cn > 4)) \
+            ਵਾਪਸ 0; \
         len *= cn; \
-        int x = 0, simd_width = VTraits<VecT>::vlanes(); \
-        VecT m0 = vx_load(maskbuf), m1, m2, m3, m4, m5, m6, m7, m8; \
-        if (cn == 1) { \
+        ਪੂਰਨ x = 0, simd_ਚੌੜਾਈ = VTraits<VecT>::vlanes(); \
+        VecT m0 = vx_ਲੱਦੋ(maskbuf), m1, m2, m3, m4, m5, m6, m7, m8; \
+        ਜੇ (cn == 1) { \
             m1 = m2 = m3 = m4 = m5 = m6 = m7 = m8 = m0; \
-        } else { \
-            m1 = vx_load(maskbuf + simd_width); \
-            m2 = vx_load(maskbuf + simd_width*2); \
-            m3 = vx_load(maskbuf + simd_width*3); \
-            m4 = vx_load(maskbuf + simd_width*4); \
-            m5 = vx_load(maskbuf + simd_width*5); \
-            m6 = vx_load(maskbuf + simd_width*6); \
-            m7 = vx_load(maskbuf + simd_width*7); \
-            m8 = vx_load(maskbuf + simd_width*8); \
+        } ਨਹੀਂਤਾਂ { \
+            m1 = vx_ਲੱਦੋ(maskbuf + simd_ਚੌੜਾਈ); \
+            m2 = vx_ਲੱਦੋ(maskbuf + simd_ਚੌੜਾਈ*2); \
+            m3 = vx_ਲੱਦੋ(maskbuf + simd_ਚੌੜਾਈ*3); \
+            m4 = vx_ਲੱਦੋ(maskbuf + simd_ਚੌੜਾਈ*4); \
+            m5 = vx_ਲੱਦੋ(maskbuf + simd_ਚੌੜਾਈ*5); \
+            m6 = vx_ਲੱਦੋ(maskbuf + simd_ਚੌੜਾਈ*6); \
+            m7 = vx_ਲੱਦੋ(maskbuf + simd_ਚੌੜਾਈ*7); \
+            m8 = vx_ਲੱਦੋ(maskbuf + simd_ਚੌੜਾਈ*8); \
         } \
         VecT s0 = v_xor(m0, m0), s1 = s0, s2 = s0; \
-        for (; x <= len - simd_width*6; x += simd_width*6) { \
-            auto v0 = load_op(src + x); \
-            auto v1 = load_op(src + x + simd_width*2); \
-            auto v2 = load_op(src + x + simd_width*4); \
-            s0 = v_add(s0, v_expand_low(v0)); \
-            s1 = v_add(s1, v_expand_high(v0)); \
-            s2 = v_add(s2, v_expand_low(v1)); \
-            s0 = v_add(s0, v_expand_high(v1)); \
-            s1 = v_add(s1, v_expand_low(v2)); \
-            s2 = v_add(s2, v_expand_high(v2)); \
+        ਲਈ (; x <= len - simd_ਚੌੜਾਈ*6; x += simd_ਚੌੜਾਈ*6) { \
+            ਸਵੈਚਾਲਿਤ v0 = ਲੱਦੋ_op(src + x); \
+            ਸਵੈਚਾਲਿਤ v1 = ਲੱਦੋ_op(src + x + simd_ਚੌੜਾਈ*2); \
+            ਸਵੈਚਾਲਿਤ v2 = ਲੱਦੋ_op(src + x + simd_ਚੌੜਾਈ*4); \
+            s0 = v_ਜੋੜੋ(s0, v_expand_ਨੀਵਾਂ(v0)); \
+            s1 = v_ਜੋੜੋ(s1, v_expand_ਉੱਚਾ(v0)); \
+            s2 = v_ਜੋੜੋ(s2, v_expand_ਨੀਵਾਂ(v1)); \
+            s0 = v_ਜੋੜੋ(s0, v_expand_ਉੱਚਾ(v1)); \
+            s1 = v_ਜੋੜੋ(s1, v_expand_ਨੀਵਾਂ(v2)); \
+            s2 = v_ਜੋੜੋ(s2, v_expand_ਉੱਚਾ(v2)); \
         } \
         REDUCE_PARTIAL_SUMS(); \
         vx_cleanup(); \
-        return x / cn; \
+        ਵਾਪਸ x / cn; \
     } \
     ST maskbuf[VTraits<VecT>::max_nlanes*9]; \
 };
 
-#undef DEFINE_SUM_SIMD_16
-#define DEFINE_SUM_SIMD_16(T, ST, iST, VecT, load_op) \
-template<> struct Sum_SIMD<T, ST> \
+#ਪਰਿਭਾਸ਼ਾ_ਰੱਦ DEFINE_ਜੋੜ_SIMD_16
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ DEFINE_ਜੋੜ_SIMD_16(T, ST, iST, VecT, ਲੱਦੋ_op) \
+ਸਾਂਚਾ<> ਬਣਤਰ ਜੋੜ_SIMD<T, ST> \
 { \
-    Sum_SIMD(int cn) \
+    ਜੋੜ_SIMD(ਪੂਰਨ cn) \
     { \
         init_maskbuf((iST*)maskbuf, cn, VTraits<VecT>::vlanes()); \
     } \
-    int operator ()(const T* src, const uchar* mask, ST* dst, int len, int cn) const \
+    ਪੂਰਨ ਸੰਚਾਲਕ ()(ਅਚਲ T* src, ਅਚਲ uchar* ਨਕਾਬ, ST* dst, ਪੂਰਨ len, ਪੂਰਨ cn) ਅਚਲ \
     { \
-        if (mask || (cn < 1 || cn > 4)) \
-            return 0; \
+        ਜੇ (ਨਕਾਬ || (cn < 1 || cn > 4)) \
+            ਵਾਪਸ 0; \
         len *= cn; \
-        int x = 0, simd_width = VTraits<VecT>::vlanes(); \
-        VecT m0 = vx_load(maskbuf), m1, m2, m3, m4, m5, m6, m7, m8; \
-        if (cn == 1) { \
+        ਪੂਰਨ x = 0, simd_ਚੌੜਾਈ = VTraits<VecT>::vlanes(); \
+        VecT m0 = vx_ਲੱਦੋ(maskbuf), m1, m2, m3, m4, m5, m6, m7, m8; \
+        ਜੇ (cn == 1) { \
             m1 = m2 = m3 = m4 = m5 = m6 = m7 = m8 = m0; \
-        } else { \
-            m1 = vx_load(maskbuf + simd_width); \
-            m2 = vx_load(maskbuf + simd_width*2); \
-            m3 = vx_load(maskbuf + simd_width*3); \
-            m4 = vx_load(maskbuf + simd_width*4); \
-            m5 = vx_load(maskbuf + simd_width*5); \
-            m6 = vx_load(maskbuf + simd_width*6); \
-            m7 = vx_load(maskbuf + simd_width*7); \
-            m8 = vx_load(maskbuf + simd_width*8); \
+        } ਨਹੀਂਤਾਂ { \
+            m1 = vx_ਲੱਦੋ(maskbuf + simd_ਚੌੜਾਈ); \
+            m2 = vx_ਲੱਦੋ(maskbuf + simd_ਚੌੜਾਈ*2); \
+            m3 = vx_ਲੱਦੋ(maskbuf + simd_ਚੌੜਾਈ*3); \
+            m4 = vx_ਲੱਦੋ(maskbuf + simd_ਚੌੜਾਈ*4); \
+            m5 = vx_ਲੱਦੋ(maskbuf + simd_ਚੌੜਾਈ*5); \
+            m6 = vx_ਲੱਦੋ(maskbuf + simd_ਚੌੜਾਈ*6); \
+            m7 = vx_ਲੱਦੋ(maskbuf + simd_ਚੌੜਾਈ*7); \
+            m8 = vx_ਲੱਦੋ(maskbuf + simd_ਚੌੜਾਈ*8); \
         } \
         VecT s0 = v_xor(m0, m0), s1 = s0, s2 = s0; \
-        for (; x <= len - simd_width*3; x += simd_width*3) { \
-            auto v0 = load_op(src + x); \
-            auto v1 = load_op(src + x + simd_width); \
-            auto v2 = load_op(src + x + simd_width*2); \
-            s0 = v_add(s0, v0); \
-            s1 = v_add(s1, v1); \
-            s2 = v_add(s2, v2); \
+        ਲਈ (; x <= len - simd_ਚੌੜਾਈ*3; x += simd_ਚੌੜਾਈ*3) { \
+            ਸਵੈਚਾਲਿਤ v0 = ਲੱਦੋ_op(src + x); \
+            ਸਵੈਚਾਲਿਤ v1 = ਲੱਦੋ_op(src + x + simd_ਚੌੜਾਈ); \
+            ਸਵੈਚਾਲਿਤ v2 = ਲੱਦੋ_op(src + x + simd_ਚੌੜਾਈ*2); \
+            s0 = v_ਜੋੜੋ(s0, v0); \
+            s1 = v_ਜੋੜੋ(s1, v1); \
+            s2 = v_ਜੋੜੋ(s2, v2); \
         } \
         REDUCE_PARTIAL_SUMS(); \
         vx_cleanup(); \
-        return x / cn; \
+        ਵਾਪਸ x / cn; \
     } \
     ST maskbuf[VTraits<VecT>::max_nlanes*9]; \
 };
 
-#undef load_u8_as_s16
-#undef load_u16_as_s32
-#define load_u8_as_s16(addr) v_reinterpret_as_s16(vx_load_expand(addr))
-#define load_u16_as_s32(addr) v_reinterpret_as_s32(vx_load_expand(addr))
+#ਪਰਿਭਾਸ਼ਾ_ਰੱਦ ਲੱਦੋ_u8_as_s16
+#ਪਰਿਭਾਸ਼ਾ_ਰੱਦ ਲੱਦੋ_u16_as_s32
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ ਲੱਦੋ_u8_as_s16(addr) v_reinterpret_as_s16(vx_ਲੱਦੋ_expand(addr))
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ ਲੱਦੋ_u16_as_s32(addr) v_reinterpret_as_s32(vx_ਲੱਦੋ_expand(addr))
 
-DEFINE_SUM_SIMD_8(uchar, int, int, v_int32, load_u8_as_s16)
-DEFINE_SUM_SIMD_8(schar, int, int, v_int32, vx_load_expand)
-DEFINE_SUM_SIMD_16(ushort, int, int, v_int32, load_u16_as_s32)
-DEFINE_SUM_SIMD_16(short, int, int, v_int32, vx_load_expand)
-DEFINE_SUM_SIMD_16(hfloat, float, int, v_float32, vx_load_expand)
-DEFINE_SUM_SIMD_16(bfloat, float, int, v_float32, vx_load_expand)
+DEFINE_ਜੋੜ_SIMD_8(uchar, ਪੂਰਨ, ਪੂਰਨ, v_int32, ਲੱਦੋ_u8_as_s16)
+DEFINE_ਜੋੜ_SIMD_8(schar, ਪੂਰਨ, ਪੂਰਨ, v_int32, vx_ਲੱਦੋ_expand)
+DEFINE_ਜੋੜ_SIMD_16(ushort, ਪੂਰਨ, ਪੂਰਨ, v_int32, ਲੱਦੋ_u16_as_s32)
+DEFINE_ਜੋੜ_SIMD_16(ਛੋਟਾ, ਪੂਰਨ, ਪੂਰਨ, v_int32, vx_ਲੱਦੋ_expand)
+DEFINE_ਜੋੜ_SIMD_16(hfloat, ਦਸ਼ਮਲਵ, ਪੂਰਨ, v_float32, vx_ਲੱਦੋ_expand)
+DEFINE_ਜੋੜ_SIMD_16(bfloat, ਦਸ਼ਮਲਵ, ਪੂਰਨ, v_float32, vx_ਲੱਦੋ_expand)
 
-#if (CV_SIMD_64F || CV_SIMD_SCALABLE_64F)
+#ਜੇ (CV_SIMD_64F || CV_SIMD_SCALABLE_64F)
 
-#undef DEFINE_SUM_SIMD_32
-#define DEFINE_SUM_SIMD_32(T, ST, iST, VecT) \
-template<> struct Sum_SIMD<T, ST> \
+#ਪਰਿਭਾਸ਼ਾ_ਰੱਦ DEFINE_ਜੋੜ_SIMD_32
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ DEFINE_ਜੋੜ_SIMD_32(T, ST, iST, VecT) \
+ਸਾਂਚਾ<> ਬਣਤਰ ਜੋੜ_SIMD<T, ST> \
 { \
-    Sum_SIMD(int cn) \
+    ਜੋੜ_SIMD(ਪੂਰਨ cn) \
     { \
         init_maskbuf((iST*)maskbuf, cn, VTraits<VecT>::vlanes()); \
     } \
-    int operator ()(const T* src, const uchar* mask, ST* dst, int len, int cn) const \
+    ਪੂਰਨ ਸੰਚਾਲਕ ()(ਅਚਲ T* src, ਅਚਲ uchar* ਨਕਾਬ, ST* dst, ਪੂਰਨ len, ਪੂਰਨ cn) ਅਚਲ \
     { \
-        int x = 0, simd_width = VTraits<VecT>::vlanes(); \
-        if (mask || (cn < 1 || cn > 3+(simd_width>=4))) \
-            return 0; \
+        ਪੂਰਨ x = 0, simd_ਚੌੜਾਈ = VTraits<VecT>::vlanes(); \
+        ਜੇ (ਨਕਾਬ || (cn < 1 || cn > 3+(simd_ਚੌੜਾਈ>=4))) \
+            ਵਾਪਸ 0; \
         len *= cn; \
-        VecT m0 = vx_load(maskbuf), m1, m2, m3, m4, m5, m6, m7, m8; \
-        if (cn == 1) { \
+        VecT m0 = vx_ਲੱਦੋ(maskbuf), m1, m2, m3, m4, m5, m6, m7, m8; \
+        ਜੇ (cn == 1) { \
             m1 = m2 = m3 = m4 = m5 = m6 = m7 = m8 = m0; \
-        } else { \
-            m1 = vx_load(maskbuf + simd_width); \
-            m2 = vx_load(maskbuf + simd_width*2); \
-            m3 = vx_load(maskbuf + simd_width*3); \
-            m4 = vx_load(maskbuf + simd_width*4); \
-            m5 = vx_load(maskbuf + simd_width*5); \
-            m6 = vx_load(maskbuf + simd_width*6); \
-            m7 = vx_load(maskbuf + simd_width*7); \
-            m8 = vx_load(maskbuf + simd_width*8); \
+        } ਨਹੀਂਤਾਂ { \
+            m1 = vx_ਲੱਦੋ(maskbuf + simd_ਚੌੜਾਈ); \
+            m2 = vx_ਲੱਦੋ(maskbuf + simd_ਚੌੜਾਈ*2); \
+            m3 = vx_ਲੱਦੋ(maskbuf + simd_ਚੌੜਾਈ*3); \
+            m4 = vx_ਲੱਦੋ(maskbuf + simd_ਚੌੜਾਈ*4); \
+            m5 = vx_ਲੱਦੋ(maskbuf + simd_ਚੌੜਾਈ*5); \
+            m6 = vx_ਲੱਦੋ(maskbuf + simd_ਚੌੜਾਈ*6); \
+            m7 = vx_ਲੱਦੋ(maskbuf + simd_ਚੌੜਾਈ*7); \
+            m8 = vx_ਲੱਦੋ(maskbuf + simd_ਚੌੜਾਈ*8); \
         } \
         VecT s0 = v_xor(m0, m0), s1 = s0, s2 = s0; \
-        for (; x <= len - simd_width*6; x += simd_width*6) { \
-            auto v0 = vx_load(src + x); \
-            auto v1 = vx_load(src + x + simd_width*2); \
-            auto v2 = vx_load(src + x + simd_width*4); \
-            s0 = v_add(s0, v_cvt_f64(v0)); \
-            s1 = v_add(s1, v_cvt_f64_high(v0)); \
-            s2 = v_add(s2, v_cvt_f64(v1)); \
-            s0 = v_add(s0, v_cvt_f64_high(v1)); \
-            s1 = v_add(s1, v_cvt_f64(v2)); \
-            s2 = v_add(s2, v_cvt_f64_high(v2)); \
+        ਲਈ (; x <= len - simd_ਚੌੜਾਈ*6; x += simd_ਚੌੜਾਈ*6) { \
+            ਸਵੈਚਾਲਿਤ v0 = vx_ਲੱਦੋ(src + x); \
+            ਸਵੈਚਾਲਿਤ v1 = vx_ਲੱਦੋ(src + x + simd_ਚੌੜਾਈ*2); \
+            ਸਵੈਚਾਲਿਤ v2 = vx_ਲੱਦੋ(src + x + simd_ਚੌੜਾਈ*4); \
+            s0 = v_ਜੋੜੋ(s0, v_cvt_f64(v0)); \
+            s1 = v_ਜੋੜੋ(s1, v_cvt_f64_ਉੱਚਾ(v0)); \
+            s2 = v_ਜੋੜੋ(s2, v_cvt_f64(v1)); \
+            s0 = v_ਜੋੜੋ(s0, v_cvt_f64_ਉੱਚਾ(v1)); \
+            s1 = v_ਜੋੜੋ(s1, v_cvt_f64(v2)); \
+            s2 = v_ਜੋੜੋ(s2, v_cvt_f64_ਉੱਚਾ(v2)); \
         } \
         REDUCE_PARTIAL_SUMS(); \
         vx_cleanup(); \
-        return x / cn; \
+        ਵਾਪਸ x / cn; \
     } \
     ST maskbuf[VTraits<VecT>::max_nlanes*9]; \
 };
 
-DEFINE_SUM_SIMD_32(int, double, int64, v_float64)
-DEFINE_SUM_SIMD_32(float, double, int64, v_float64)
-#endif
-#endif
+DEFINE_ਜੋੜ_SIMD_32(ਪੂਰਨ, ਦੁੱਗਣਾ, int64, v_float64)
+DEFINE_ਜੋੜ_SIMD_32(ਦਸ਼ਮਲਵ, ਦੁੱਗਣਾ, int64, v_float64)
+#ਜੇ_ਅੰਤ
+#ਜੇ_ਅੰਤ
 
-template<typename T, typename ST, typename WT=T>
-static int sum_(const T* src0, const uchar* mask, ST* dst, int len, int cn )
+ਸਾਂਚਾ<ਕਿਸਮ_ਨਾਂ T, ਕਿਸਮ_ਨਾਂ ST, ਕਿਸਮ_ਨਾਂ WT=T>
+ਸਥਿਰ ਪੂਰਨ ਜੋੜ_2(ਅਚਲ T* src0, ਅਚਲ uchar* ਨਕਾਬ, ST* dst, ਪੂਰਨ len, ਪੂਰਨ cn )
 {
-    const T* src = src0;
-    if( !mask )
+    ਅਚਲ T* src = src0;
+    ਜੇ( !ਨਕਾਬ )
     {
-        Sum_SIMD<T, ST> vop(cn);
-        int i0 = vop(src0, mask, dst, len, cn), i = i0, k = cn % 4;
+        ਜੋੜ_SIMD<T, ST> vop(cn);
+        ਪੂਰਨ i0 = vop(src0, ਨਕਾਬ, dst, len, cn), i = i0, k = cn % 4;
         src += i0 * cn;
 
-        if( k == 1 )
+        ਜੇ( k == 1 )
         {
             ST s0 = dst[0];
 
-            #if CV_ENABLE_UNROLLED
-            for(; i <= len - 4; i += 4, src += cn*4 )
+            #ਜੇ CV_ENABLE_UNROLLED
+            ਲਈ(; i <= len - 4; i += 4, src += cn*4 )
                 s0 += (WT)src[0] + (WT)src[cn] + (WT)src[cn*2] + (WT)src[cn*3];
-            #endif
-            for( ; i < len; i++, src += cn )
+            #ਜੇ_ਅੰਤ
+            ਲਈ( ; i < len; i++, src += cn )
                 s0 += (WT)src[0];
             dst[0] = s0;
         }
-        else if( k == 2 )
+        ਨਹੀਂਤਾਂ ਜੇ( k == 2 )
         {
             ST s0 = dst[0], s1 = dst[1];
-            for( ; i < len; i++, src += cn )
+            ਲਈ( ; i < len; i++, src += cn )
             {
                 s0 += (WT)src[0];
                 s1 += (WT)src[1];
@@ -265,10 +265,10 @@ static int sum_(const T* src0, const uchar* mask, ST* dst, int len, int cn )
             dst[0] = s0;
             dst[1] = s1;
         }
-        else if( k == 3 )
+        ਨਹੀਂਤਾਂ ਜੇ( k == 3 )
         {
             ST s0 = dst[0], s1 = dst[1], s2 = dst[2];
-            for( ; i < len; i++, src += cn )
+            ਲਈ( ; i < len; i++, src += cn )
             {
                 s0 += (WT)src[0];
                 s1 += (WT)src[1];
@@ -279,11 +279,11 @@ static int sum_(const T* src0, const uchar* mask, ST* dst, int len, int cn )
             dst[2] = s2;
         }
 
-        for( ; k < cn; k += 4 )
+        ਲਈ( ; k < cn; k += 4 )
         {
             src = src0 + i0*cn + k;
             ST s0 = dst[k], s1 = dst[k+1], s2 = dst[k+2], s3 = dst[k+3];
-            for( i = i0; i < len; i++, src += cn )
+            ਲਈ( i = i0; i < len; i++, src += cn )
             {
                 s0 += (WT)src[0]; s1 += (WT)src[1];
                 s2 += (WT)src[2]; s3 += (WT)src[3];
@@ -293,26 +293,26 @@ static int sum_(const T* src0, const uchar* mask, ST* dst, int len, int cn )
             dst[k+2] = s2;
             dst[k+3] = s3;
         }
-        return len;
+        ਵਾਪਸ len;
     }
 
-    int i, nzm = 0;
-    if( cn == 1 )
+    ਪੂਰਨ i, nzm = 0;
+    ਜੇ( cn == 1 )
     {
         ST s = dst[0];
-        for( i = 0; i < len; i++ )
-            if( mask[i] )
+        ਲਈ( i = 0; i < len; i++ )
+            ਜੇ( ਨਕਾਬ[i] )
             {
                 s += (WT)src[i];
                 nzm++;
             }
         dst[0] = s;
     }
-    else if( cn == 3 )
+    ਨਹੀਂਤਾਂ ਜੇ( cn == 3 )
     {
         ST s0 = dst[0], s1 = dst[1], s2 = dst[2];
-        for( i = 0; i < len; i++, src += 3 )
-            if( mask[i] )
+        ਲਈ( i = 0; i < len; i++, src += 3 )
+            ਜੇ( ਨਕਾਬ[i] )
             {
                 s0 += (WT)src[0];
                 s1 += (WT)src[1];
@@ -323,14 +323,14 @@ static int sum_(const T* src0, const uchar* mask, ST* dst, int len, int cn )
         dst[1] = s1;
         dst[2] = s2;
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
-        for( i = 0; i < len; i++, src += cn )
-            if( mask[i] )
+        ਲਈ( i = 0; i < len; i++, src += cn )
+            ਜੇ( ਨਕਾਬ[i] )
             {
-                int k = 0;
-                #if CV_ENABLE_UNROLLED
-                for( ; k <= cn - 4; k += 4 )
+                ਪੂਰਨ k = 0;
+                #ਜੇ CV_ENABLE_UNROLLED
+                ਲਈ( ; k <= cn - 4; k += 4 )
                 {
                     ST s0, s1;
                     s0 = dst[k] + (WT)src[k];
@@ -340,76 +340,76 @@ static int sum_(const T* src0, const uchar* mask, ST* dst, int len, int cn )
                     s1 = dst[k+3] + (WT)src[k+3];
                     dst[k+2] = s0; dst[k+3] = s1;
                 }
-                #endif
-                for( ; k < cn; k++ )
+                #ਜੇ_ਅੰਤ
+                ਲਈ( ; k < cn; k++ )
                     dst[k] += (WT)src[k];
                 nzm++;
             }
     }
-    return nzm;
+    ਵਾਪਸ nzm;
 }
 
 
-static int sum8u( const uchar* src, const uchar* mask, int* dst, int len, int cn )
-{ CV_INSTRUMENT_REGION(); return sum_(src, mask, dst, len, cn); }
+ਸਥਿਰ ਪੂਰਨ sum8u( ਅਚਲ uchar* src, ਅਚਲ uchar* ਨਕਾਬ, ਪੂਰਨ* dst, ਪੂਰਨ len, ਪੂਰਨ cn )
+{ CV_INSTRUMENT_REGION(); ਵਾਪਸ ਜੋੜ_2(src, ਨਕਾਬ, dst, len, cn); }
 
-static int sum8s( const schar* src, const uchar* mask, int* dst, int len, int cn )
-{ CV_INSTRUMENT_REGION(); return sum_(src, mask, dst, len, cn); }
+ਸਥਿਰ ਪੂਰਨ sum8s( ਅਚਲ schar* src, ਅਚਲ uchar* ਨਕਾਬ, ਪੂਰਨ* dst, ਪੂਰਨ len, ਪੂਰਨ cn )
+{ CV_INSTRUMENT_REGION(); ਵਾਪਸ ਜੋੜ_2(src, ਨਕਾਬ, dst, len, cn); }
 
-static int sum16u( const ushort* src, const uchar* mask, int* dst, int len, int cn )
-{ CV_INSTRUMENT_REGION(); return sum_(src, mask, dst, len, cn); }
+ਸਥਿਰ ਪੂਰਨ sum16u( ਅਚਲ ushort* src, ਅਚਲ uchar* ਨਕਾਬ, ਪੂਰਨ* dst, ਪੂਰਨ len, ਪੂਰਨ cn )
+{ CV_INSTRUMENT_REGION(); ਵਾਪਸ ਜੋੜ_2(src, ਨਕਾਬ, dst, len, cn); }
 
-static int sum16s( const short* src, const uchar* mask, int* dst, int len, int cn )
-{ CV_INSTRUMENT_REGION(); return sum_(src, mask, dst, len, cn); }
+ਸਥਿਰ ਪੂਰਨ sum16s( ਅਚਲ ਛੋਟਾ* src, ਅਚਲ uchar* ਨਕਾਬ, ਪੂਰਨ* dst, ਪੂਰਨ len, ਪੂਰਨ cn )
+{ CV_INSTRUMENT_REGION(); ਵਾਪਸ ਜੋੜ_2(src, ਨਕਾਬ, dst, len, cn); }
 
-static int sum32u( const unsigned* src, const uchar* mask, double* dst, int len, int cn )
-{ CV_INSTRUMENT_REGION(); return sum_<unsigned, double, uint64>(src, mask, dst, len, cn); }
+ਸਥਿਰ ਪੂਰਨ sum32u( ਅਚਲ ਬਿਨਾਨਿਸ਼ਾਨੀ* src, ਅਚਲ uchar* ਨਕਾਬ, ਦੁੱਗਣਾ* dst, ਪੂਰਨ len, ਪੂਰਨ cn )
+{ CV_INSTRUMENT_REGION(); ਵਾਪਸ ਜੋੜ_2<ਬਿਨਾਨਿਸ਼ਾਨੀ, ਦੁੱਗਣਾ, uint64>(src, ਨਕਾਬ, dst, len, cn); }
 
-static int sum32s( const int* src, const uchar* mask, double* dst, int len, int cn )
-{ CV_INSTRUMENT_REGION(); return sum_<int, double, int64>(src, mask, dst, len, cn); }
+ਸਥਿਰ ਪੂਰਨ sum32s( ਅਚਲ ਪੂਰਨ* src, ਅਚਲ uchar* ਨਕਾਬ, ਦੁੱਗਣਾ* dst, ਪੂਰਨ len, ਪੂਰਨ cn )
+{ CV_INSTRUMENT_REGION(); ਵਾਪਸ ਜੋੜ_2<ਪੂਰਨ, ਦੁੱਗਣਾ, int64>(src, ਨਕਾਬ, dst, len, cn); }
 
-static int sum64u( const uint64* src, const uchar* mask, double* dst, int len, int cn )
-{ CV_INSTRUMENT_REGION(); return sum_(src, mask, dst, len, cn); }
+ਸਥਿਰ ਪੂਰਨ sum64u( ਅਚਲ uint64* src, ਅਚਲ uchar* ਨਕਾਬ, ਦੁੱਗਣਾ* dst, ਪੂਰਨ len, ਪੂਰਨ cn )
+{ CV_INSTRUMENT_REGION(); ਵਾਪਸ ਜੋੜ_2(src, ਨਕਾਬ, dst, len, cn); }
 
-static int sum64s( const int64* src, const uchar* mask, double* dst, int len, int cn )
-{ CV_INSTRUMENT_REGION(); return sum_(src, mask, dst, len, cn); }
+ਸਥਿਰ ਪੂਰਨ sum64s( ਅਚਲ int64* src, ਅਚਲ uchar* ਨਕਾਬ, ਦੁੱਗਣਾ* dst, ਪੂਰਨ len, ਪੂਰਨ cn )
+{ CV_INSTRUMENT_REGION(); ਵਾਪਸ ਜੋੜ_2(src, ਨਕਾਬ, dst, len, cn); }
 
-static int sum32f( const float* src, const uchar* mask, double* dst, int len, int cn )
-{ CV_INSTRUMENT_REGION(); return sum_(src, mask, dst, len, cn); }
+ਸਥਿਰ ਪੂਰਨ sum32f( ਅਚਲ ਦਸ਼ਮਲਵ* src, ਅਚਲ uchar* ਨਕਾਬ, ਦੁੱਗਣਾ* dst, ਪੂਰਨ len, ਪੂਰਨ cn )
+{ CV_INSTRUMENT_REGION(); ਵਾਪਸ ਜੋੜ_2(src, ਨਕਾਬ, dst, len, cn); }
 
-static int sum64f( const double* src, const uchar* mask, double* dst, int len, int cn )
-{ CV_INSTRUMENT_REGION(); return sum_(src, mask, dst, len, cn); }
+ਸਥਿਰ ਪੂਰਨ sum64f( ਅਚਲ ਦੁੱਗਣਾ* src, ਅਚਲ uchar* ਨਕਾਬ, ਦੁੱਗਣਾ* dst, ਪੂਰਨ len, ਪੂਰਨ cn )
+{ CV_INSTRUMENT_REGION(); ਵਾਪਸ ਜੋੜ_2(src, ਨਕਾਬ, dst, len, cn); }
 
-static int sum16f( const hfloat* src, const uchar* mask, float* dst, int len, int cn )
-{ CV_INSTRUMENT_REGION(); return sum_<hfloat, float, float>(src, mask, dst, len, cn); }
+ਸਥਿਰ ਪੂਰਨ sum16f( ਅਚਲ hfloat* src, ਅਚਲ uchar* ਨਕਾਬ, ਦਸ਼ਮਲਵ* dst, ਪੂਰਨ len, ਪੂਰਨ cn )
+{ CV_INSTRUMENT_REGION(); ਵਾਪਸ ਜੋੜ_2<hfloat, ਦਸ਼ਮਲਵ, ਦਸ਼ਮਲਵ>(src, ਨਕਾਬ, dst, len, cn); }
 
-static int sum16bf( const bfloat* src, const uchar* mask, float* dst, int len, int cn )
-{ CV_INSTRUMENT_REGION(); return sum_<bfloat, float, float>(src, mask, dst, len, cn); }
+ਸਥਿਰ ਪੂਰਨ sum16bf( ਅਚਲ bfloat* src, ਅਚਲ uchar* ਨਕਾਬ, ਦਸ਼ਮਲਵ* dst, ਪੂਰਨ len, ਪੂਰਨ cn )
+{ CV_INSTRUMENT_REGION(); ਵਾਪਸ ਜੋੜ_2<bfloat, ਦਸ਼ਮਲਵ, ਦਸ਼ਮਲਵ>(src, ਨਕਾਬ, dst, len, cn); }
 
-SumFunc getSumFunc(int depth)
+ਜੋੜ_Func get_ਜੋੜ_Func(ਪੂਰਨ ਡੂੰਘਾਈ)
 {
-    static SumFunc sumTab[CV_DEPTH_MAX] =
+    ਸਥਿਰ ਜੋੜ_Func ਜੋੜ_Tab[CV_ਡੂੰਘਾਈ_MAX] =
     {
-        sumWrap<uchar, int, sum8u>,
-        sumWrap<schar, int, sum8s>,
-        sumWrap<ushort, int, sum16u>,
-        sumWrap<short, int, sum16s>,
-        sumWrap<int, double, sum32s>,
-        sumWrap<float, double, sum32f>,
-        sumWrap<double, double, sum64f>,
-        sumWrap<hfloat, float, sum16f>,
-        sumWrap<bfloat, float, sum16bf>,
+        ਜੋੜ_Wrap<uchar, ਪੂਰਨ, sum8u>,
+        ਜੋੜ_Wrap<schar, ਪੂਰਨ, sum8s>,
+        ਜੋੜ_Wrap<ushort, ਪੂਰਨ, sum16u>,
+        ਜੋੜ_Wrap<ਛੋਟਾ, ਪੂਰਨ, sum16s>,
+        ਜੋੜ_Wrap<ਪੂਰਨ, ਦੁੱਗਣਾ, sum32s>,
+        ਜੋੜ_Wrap<ਦਸ਼ਮਲਵ, ਦੁੱਗਣਾ, sum32f>,
+        ਜੋੜ_Wrap<ਦੁੱਗਣਾ, ਦੁੱਗਣਾ, sum64f>,
+        ਜੋੜ_Wrap<hfloat, ਦਸ਼ਮਲਵ, sum16f>,
+        ਜੋੜ_Wrap<bfloat, ਦਸ਼ਮਲਵ, sum16bf>,
         0,
-        sumWrap<uint64, double, sum64u>,
-        sumWrap<int64, double, sum64s>,
-        sumWrap<unsigned, double, sum32u>,
+        ਜੋੜ_Wrap<uint64, ਦੁੱਗਣਾ, sum64u>,
+        ਜੋੜ_Wrap<int64, ਦੁੱਗਣਾ, sum64s>,
+        ਜੋੜ_Wrap<ਬਿਨਾਨਿਸ਼ਾਨੀ, ਦੁੱਗਣਾ, sum32u>,
         0
     };
 
-    return sumTab[depth];
+    ਵਾਪਸ ਜੋੜ_Tab[ਡੂੰਘਾਈ];
 }
 
-#endif
+#ਜੇ_ਅੰਤ
 
-CV_CPU_OPTIMIZATION_NAMESPACE_END
+CV_CPU_OPTIMIZATION_NAMESPACE_ਸਿਰਾ
 } // namespace

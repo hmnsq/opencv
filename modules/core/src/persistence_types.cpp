@@ -2,335 +2,335 @@
 // It is subject to the license terms in the LICENSE file found in the top-level directory
 // of this distribution and at http://opencv.org/license.html
 
-#include "precomp.hpp"
-#include "persistence.hpp"
+#ਅਨ੍ਤਰ੍ਭਾਵ "precomp.hpp"
+#ਅਨ੍ਤਰ੍ਭਾਵ "persistence.hpp"
 
-namespace cv
+ਨਾਮਾਕਾਸ਼ cv
 {
 
-void write( FileStorage& fs, const String& name, const Mat& m )
+ਖਾਲੀ ਲਿਖ( FileStorage& fs, ਅਚਲ String& name, ਅਚਲ Mat& m )
 {
-    char dt[22];
+    ਅੱਖਰ dt[22];
 
-    if( m.dims == 2 || m.empty() )
+    ਜੇ( m.dims == 2 || m.empty() )
     {
-        fs.startWriteStruct(name, FileNode::MAP, String("opencv-matrix"));
-        fs << "rows" << m.rows;
-        fs << "cols" << m.cols;
-        fs << "dt" << fs::encodeFormat( m.type(), dt, sizeof(dt) );
+        fs.ਸ਼ੁਰੂ_Write_Struct(name, File_ਗੰਢ::MAP, String("opencv-matrix"));
+        fs << "rows" << m.ਪੰਕਤੀਆਂ;
+        fs << "cols" << m.ਖਾਨੇ_ਗਿਣਤੀ;
+        fs << "dt" << fs::encodeFormat( m.type(), dt, ਆਕਾਰ(dt) );
         fs << "data" << "[:";
-        for( int i = 0; i < m.rows; i++ )
-            fs.writeRaw(dt, m.ptr(i), m.cols*m.elemSize());
+        ਲਈ( ਪੂਰਨ i = 0; i < m.ਪੰਕਤੀਆਂ; i++ )
+            fs.writeRaw(dt, m.ptr(i), m.ਖਾਨੇ_ਗਿਣਤੀ*m.elem_ਮਾਪ());
         fs << "]";
-        fs.endWriteStruct();
+        fs.ਸਿਰਾ_Write_Struct();
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
-        fs.startWriteStruct(name, FileNode::MAP, String("opencv-nd-matrix"));
+        fs.ਸ਼ੁਰੂ_Write_Struct(name, File_ਗੰਢ::MAP, String("opencv-nd-matrix"));
         fs << "sizes" << "[:";
-        fs.writeRaw( "i", m.size.p, m.dims*sizeof(int) );
+        fs.writeRaw( "i", m.size.p, m.dims*ਆਕਾਰ(ਪੂਰਨ) );
         fs << "]";
-        fs << "dt" << fs::encodeFormat( m.type(), dt, sizeof(dt) );
+        fs << "dt" << fs::encodeFormat( m.type(), dt, ਆਕਾਰ(dt) );
         fs << "data" << "[:";
-        const Mat* arrays[] = {&m, 0};
+        ਅਚਲ Mat* arrays[] = {&m, 0};
         uchar* ptrs[1] = {};
         NAryMatIterator it(arrays, ptrs);
-        size_t total = it.size*m.elemSize();
+        size_t ਕੁੱਲ = it.size*m.elem_ਮਾਪ();
 
-        for( size_t i = 0; i < it.nplanes; i++, ++it )
-            fs.writeRaw( dt, ptrs[0], total );
+        ਲਈ( size_t i = 0; i < it.nplanes; i++, ++it )
+            fs.writeRaw( dt, ptrs[0], ਕੁੱਲ );
         fs << "]";
-        fs.endWriteStruct();
+        fs.ਸਿਰਾ_Write_Struct();
     }
 }
 
-struct SparseNodeCmp
+ਬਣਤਰ Sparse_ਗੰਢ_Cmp
 {
-    SparseNodeCmp(int _dims) : dims(_dims) {}
-    bool operator()(const SparseMat::Node* a, const SparseMat::Node* b)
+    Sparse_ਗੰਢ_Cmp(ਪੂਰਨ _dims) : dims(_dims) {}
+    ਤਾਰਕਿਕ ਸੰਚਾਲਕ()(ਅਚਲ SparseMat::Node* a, ਅਚਲ SparseMat::Node* b)
     {
-        for( int i = 0; i < dims; i++ )
+        ਲਈ( ਪੂਰਨ i = 0; i < dims; i++ )
         {
-            int d = a->idx[i] - b->idx[i];
-            if(d)
-                return d < 0;
+            ਪੂਰਨ d = a->idx[i] - b->idx[i];
+            ਜੇ(d)
+                ਵਾਪਸ d < 0;
         }
-        return false;
+        ਵਾਪਸ ਝੂਠ;
     }
 
-    int dims;
+    ਪੂਰਨ dims;
 };
 
-void write( FileStorage& fs, const String& name, const SparseMat& m )
+ਖਾਲੀ ਲਿਖ( FileStorage& fs, ਅਚਲ String& name, ਅਚਲ SparseMat& m )
 {
-    char dt[22];
+    ਅੱਖਰ dt[22];
 
-    fs.startWriteStruct(name, FileNode::MAP, String("opencv-sparse-matrix"));
+    fs.ਸ਼ੁਰੂ_Write_Struct(name, File_ਗੰਢ::MAP, String("opencv-sparse-matrix"));
     fs << "sizes" << "[:";
-    int dims = m.dims();
-    if( dims > 0 )
-        fs.writeRaw("i", m.hdr->size, dims*sizeof(int) );
+    ਪੂਰਨ dims = m.dims();
+    ਜੇ( dims > 0 )
+        fs.writeRaw("i", m.hdr->size, dims*ਆਕਾਰ(ਪੂਰਨ) );
     fs << "]";
-    fs << "dt" << fs::encodeFormat( m.type(), dt, sizeof(dt) );
+    fs << "dt" << fs::encodeFormat( m.type(), dt, ਆਕਾਰ(dt) );
     fs << "data" << "[:";
 
     size_t i = 0, n = m.nzcount();
-    AutoBuffer<const SparseMat::Node*> elems(n);
-    SparseMatConstIterator it = m.begin(), it_end = m.end();
+    Auto_ਬਫਰ<ਅਚਲ SparseMat::Node*> elems(n);
+    SparseMatConstIterator it = m.begin(), it_ਸਿਰਾ = m.end();
 
-    for( ; it != it_end; ++it )
+    ਲਈ( ; it != it_ਸਿਰਾ; ++it )
     {
-        CV_Assert(it.node() != 0);
-        elems[i++] = it.node();
+        CV_Assert(it.ਗੰਢ() != 0);
+        elems[i++] = it.ਗੰਢ();
     }
 
-    std::sort(elems.begin(), elems.end(), SparseNodeCmp(dims));
-    const SparseMat::Node* prev_node = 0;
-    size_t esz = m.elemSize();
+    std::sort(elems.begin(), elems.end(), Sparse_ਗੰਢ_Cmp(dims));
+    ਅਚਲ SparseMat::Node* prev_ਗੰਢ = 0;
+    size_t esz = m.elem_ਮਾਪ();
 
-    for( i = 0; i < n; i++ )
+    ਲਈ( i = 0; i < n; i++ )
     {
-        const SparseMat::Node* node = elems[i];
-        int k = 0;
+        ਅਚਲ SparseMat::Node* ਗੰਢ = elems[i];
+        ਪੂਰਨ k = 0;
 
-        if( prev_node )
+        ਜੇ( prev_ਗੰਢ )
         {
-            for( ; k < dims; k++ )
-                if( node->idx[k] != prev_node->idx[k] )
-                    break;
+            ਲਈ( ; k < dims; k++ )
+                ਜੇ( ਗੰਢ->idx[k] != prev_ਗੰਢ->idx[k] )
+                    ਰੋਕੋ;
             CV_Assert( k < dims );
-            if( k < dims - 1 )
+            ਜੇ( k < dims - 1 )
                 writeScalar( fs, k - dims + 1 );
         }
-        for( ; k < dims; k++ )
-            writeScalar( fs, node->idx[k] );
-        prev_node = node;
+        ਲਈ( ; k < dims; k++ )
+            writeScalar( fs, ਗੰਢ->idx[k] );
+        prev_ਗੰਢ = ਗੰਢ;
 
-        const uchar* value = &m.value<uchar>(node);
+        ਅਚਲ uchar* value = &m.value<uchar>(ਗੰਢ);
         fs.writeRaw(dt, value, esz);
     }
 
     fs << "]" << "}";
 }
 
-void read(const FileNode& node, Mat& m, const Mat& default_mat)
+ਖਾਲੀ ਪਠ(ਅਚਲ File_ਗੰਢ& ਗੰਢ, Mat& m, ਅਚਲ Mat& default_mat)
 {
-    if( node.empty() )
+    ਜੇ( ਗੰਢ.empty() )
     {
-        default_mat.copyTo(m);
-        return;
+        default_mat.copy_ਮੰਜ਼ਿਲ(m);
+        ਵਾਪਸ;
     }
 
     std::string dt;
-    int rows, cols, elem_type;
+    ਪੂਰਨ ਪੰਕਤੀਆਂ, ਖਾਨੇ_ਗਿਣਤੀ, elem_type;
 
-    read(node["dt"], dt, std::string());
+    ਪਠ(ਗੰਢ["dt"], dt, std::string());
     CV_Assert( !dt.empty() );
 
     elem_type = fs::decodeSimpleFormat( dt.c_str() );
 
-    read(node["rows"], rows, -1);
-    if( rows >= 0 )
+    ਪਠ(ਗੰਢ["rows"], ਪੰਕਤੀਆਂ, -1);
+    ਜੇ( ਪੰਕਤੀਆਂ >= 0 )
     {
-        read(node["cols"], cols, -1);
-        m.create(rows, cols, elem_type);
+        ਪਠ(ਗੰਢ["cols"], ਖਾਨੇ_ਗਿਣਤੀ, -1);
+        m.create(ਪੰਕਤੀਆਂ, ਖਾਨੇ_ਗਿਣਤੀ, elem_type);
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
-        int sizes[CV_MAX_DIM] = {0}, dims;
-        FileNode sizes_node = node["sizes"];
-        CV_Assert( !sizes_node.empty() );
+        ਪੂਰਨ sizes[CV_MAX_DIM] = {0}, dims;
+        File_ਗੰਢ sizes_ਗੰਢ = ਗੰਢ["sizes"];
+        CV_Assert( !sizes_ਗੰਢ.empty() );
 
-        dims = (int)sizes_node.size();
+        dims = (ਪੂਰਨ)sizes_ਗੰਢ.size();
         CV_Assert( dims >= 0 && dims <= CV_MAX_DIM );
-        sizes_node.readRaw("i", sizes, dims*sizeof(sizes[0]));
+        sizes_ਗੰਢ.readRaw("i", sizes, dims*ਆਕਾਰ(sizes[0]));
 
         m.create(dims, sizes, elem_type);
     }
 
-    FileNode data_node = node["data"];
-    CV_Assert(!data_node.empty());
+    File_ਗੰਢ ਅੰਕੜੇ_ਗੰਢ = ਗੰਢ["data"];
+    CV_Assert(!ਅੰਕੜੇ_ਗੰਢ.empty());
 
-    size_t nelems = data_node.size();
-    if (nelems == 0)
+    size_t nelems = ਅੰਕੜੇ_ਗੰਢ.size();
+    ਜੇ (nelems == 0)
     {
         m = Mat();
-        return;
+        ਵਾਪਸ;
     }
-    CV_Assert(nelems == m.total()*m.channels());
+    CV_Assert(nelems == m.ਕੁੱਲ()*m.channels());
 
-    data_node.readRaw(dt, (uchar*)m.ptr(), m.total()*m.elemSize());
+    ਅੰਕੜੇ_ਗੰਢ.readRaw(dt, (uchar*)m.ptr(), m.ਕੁੱਲ()*m.elem_ਮਾਪ());
 }
 
-void read( const FileNode& node, SparseMat& m, const SparseMat& default_mat )
+ਖਾਲੀ ਪਠ( ਅਚਲ File_ਗੰਢ& ਗੰਢ, SparseMat& m, ਅਚਲ SparseMat& default_mat )
 {
-    if( node.empty() )
+    ਜੇ( ਗੰਢ.empty() )
     {
-        default_mat.copyTo(m);
-        return;
+        default_mat.copy_ਮੰਜ਼ਿਲ(m);
+        ਵਾਪਸ;
     }
 
     std::string dt;
-    read(node["dt"], dt, std::string());
+    ਪਠ(ਗੰਢ["dt"], dt, std::string());
     CV_Assert( !dt.empty() );
 
-    int elem_type = fs::decodeSimpleFormat( dt.c_str() );
+    ਪੂਰਨ elem_type = fs::decodeSimpleFormat( dt.c_str() );
 
-    int sizes[CV_MAX_DIM] = {0};
-    FileNode sizes_node = node["sizes"];
-    CV_Assert( !sizes_node.empty() );
+    ਪੂਰਨ sizes[CV_MAX_DIM] = {0};
+    File_ਗੰਢ sizes_ਗੰਢ = ਗੰਢ["sizes"];
+    CV_Assert( !sizes_ਗੰਢ.empty() );
 
-    int dims = (int)sizes_node.size();
+    ਪੂਰਨ dims = (ਪੂਰਨ)sizes_ਗੰਢ.size();
     CV_Assert( dims > 0 && dims <= CV_MAX_DIM );
-    sizes_node.readRaw("i", sizes, dims*sizeof(sizes[0]));
+    sizes_ਗੰਢ.readRaw("i", sizes, dims*ਆਕਾਰ(sizes[0]));
 
     m.create(dims, sizes, elem_type);
 
-    FileNode data = node["data"];
-    CV_Assert( data.isSeq() );
+    File_ਗੰਢ ਅੰਕੜੇ = ਗੰਢ["data"];
+    CV_Assert( ਅੰਕੜੇ.isSeq() );
 
-    int cn = CV_MAT_CN(elem_type);
-    int idx[CV_MAX_DIM] = {0};
-    size_t i, sz = data.size();
-    size_t esz = m.elemSize();
-    FileNodeIterator it = data.begin();
+    ਪੂਰਨ cn = CV_MAT_CN(elem_type);
+    ਪੂਰਨ idx[CV_MAX_DIM] = {0};
+    size_t i, sz = ਅੰਕੜੇ.size();
+    size_t esz = m.elem_ਮਾਪ();
+    File_ਗੰਢ_Iterator it = ਅੰਕੜੇ.begin();
 
-    for( i = 0; i < sz; )
+    ਲਈ( i = 0; i < sz; )
     {
-        FileNode n = *it;
-        int k = (int)n;
-        if( i > 0 && k >= 0 )
+        File_ਗੰਢ n = *it;
+        ਪੂਰਨ k = (ਪੂਰਨ)n;
+        ਜੇ( i > 0 && k >= 0 )
         {
             CV_Assert( k < sizes[dims-1] );
             idx[dims-1] = k;
         }
-        else
+        ਨਹੀਂਤਾਂ
         {
-            if( i > 0 )
+            ਜੇ( i > 0 )
             {
                 // write() stores the first changed dimension as k - dims + 1
                 k = dims + k - 1;
                 CV_Assert( k >= 0 );
             }
-            else
+            ਨਹੀਂਤਾਂ
             {
                 CV_Assert( k >= 0 && k < sizes[0] );
                 idx[0] = k, k = 1;
             }
-            for( ; k < dims; k++ )
+            ਲਈ( ; k < dims; k++ )
             {
                 ++it;
                 i++;
                 n = *it;
                 CV_Assert( n.isInt() );
-                int idx_k = (int)n;
+                ਪੂਰਨ idx_k = (ਪੂਰਨ)n;
                 CV_Assert( idx_k >= 0 && idx_k < sizes[k] );
                 idx[k] = idx_k;
             }
         }
         ++it;
         i++;
-        uchar* valptr = m.ptr(idx, true);
+        uchar* valptr = m.ptr(idx, ਸੱਚ);
         it.readRaw(dt, valptr, esz);
         i += cn;
     }
 }
 
-void read(const FileNode& node, KeyPoint& value, const KeyPoint& default_value)
+ਖਾਲੀ ਪਠ(ਅਚਲ File_ਗੰਢ& ਗੰਢ, ਕੁੰਜੀ_ਬਿੰਦੂ& value, ਅਚਲ ਕੁੰਜੀ_ਬਿੰਦੂ& default_ਮੁੱਲ)
 {
-    if( node.empty() )
+    ਜੇ( ਗੰਢ.empty() )
     {
-        value = default_value;
-        return;
+        value = default_ਮੁੱਲ;
+        ਵਾਪਸ;
     }
-    node >> value;
+    ਗੰਢ >> value;
 }
 
-void read(const FileNode& node, DMatch& value, const DMatch& default_value)
+ਖਾਲੀ ਪਠ(ਅਚਲ File_ਗੰਢ& ਗੰਢ, DMatch& value, ਅਚਲ DMatch& default_ਮੁੱਲ)
 {
-    if( node.empty() )
+    ਜੇ( ਗੰਢ.empty() )
     {
-        value = default_value;
-        return;
+        value = default_ਮੁੱਲ;
+        ਵਾਪਸ;
     }
-    node >> value;
+    ਗੰਢ >> value;
 }
 
-#ifdef CV__LEGACY_PERSISTENCE
-void write( FileStorage& fs, const std::string& name, const std::vector<KeyPoint>& vec)
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ CV__LEGACY_PERSISTENCE
+ਖਾਲੀ ਲਿਖ( FileStorage& fs, ਅਚਲ std::string& name, ਅਚਲ std::vector<ਕੁੰਜੀ_ਬਿੰਦੂ>& vec)
 {
     // from template implementation
-    cv::internal::WriteStructContext ws(fs, name, FileNode::SEQ);
-    write(fs, vec);
+    cv::internal::WriteStructContext ws(fs, name, File_ਗੰਢ::SEQ);
+    ਲਿਖ(fs, vec);
 }
 
-void read(const FileNode& node, std::vector<KeyPoint>& keypoints)
+ਖਾਲੀ ਪਠ(ਅਚਲ File_ਗੰਢ& ਗੰਢ, std::vector<ਕੁੰਜੀ_ਬਿੰਦੂ>& keypoints)
 {
-    FileNode first_node = *(node.begin());
-    if (first_node.isSeq())
+    File_ਗੰਢ ਪਹਿਲਾ_ਗੰਢ = *(ਗੰਢ.begin());
+    ਜੇ (ਪਹਿਲਾ_ਗੰਢ.isSeq())
     {
         // modern scheme
-#ifdef OPENCV_TRAITS_ENABLE_DEPRECATED
-        FileNodeIterator it = node.begin();
-        size_t total = (size_t)it.remaining;
-        keypoints.resize(total);
-        for (size_t i = 0; i < total; ++i, ++it)
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ OPENCV_TRAITS_ENABLE_DEPRECATED
+        File_ਗੰਢ_Iterator it = ਗੰਢ.begin();
+        size_t ਕੁੱਲ = (size_t)it.ਬਚਿਆ;
+        keypoints.resize(ਕੁੱਲ);
+        ਲਈ (size_t i = 0; i < ਕੁੱਲ; ++i, ++it)
         {
             (*it) >> keypoints[i];
         }
-#else
-        FileNodeIterator it = node.begin();
+#ਨਹੀਂਤਾਂ
+        File_ਗੰਢ_Iterator it = ਗੰਢ.begin();
         it >> keypoints;
-#endif
-        return;
+#ਜੇ_ਅੰਤ
+        ਵਾਪਸ;
     }
     keypoints.clear();
-    FileNodeIterator it = node.begin(), it_end = node.end();
-    for( ; it != it_end; )
+    File_ਗੰਢ_Iterator it = ਗੰਢ.begin(), it_ਸਿਰਾ = ਗੰਢ.end();
+    ਲਈ( ; it != it_ਸਿਰਾ; )
     {
-        KeyPoint kpt;
+        ਕੁੰਜੀ_ਬਿੰਦੂ kpt;
         it >> kpt.pt.x >> kpt.pt.y >> kpt.size >> kpt.angle >> kpt.response >> kpt.octave >> kpt.class_id;
         keypoints.push_back(kpt);
     }
 }
 
-void write( FileStorage& fs, const std::string& name, const std::vector<DMatch>& vec)
+ਖਾਲੀ ਲਿਖ( FileStorage& fs, ਅਚਲ std::string& name, ਅਚਲ std::vector<DMatch>& vec)
 {
     // from template implementation
-    cv::internal::WriteStructContext ws(fs, name, FileNode::SEQ);
-    write(fs, vec);
+    cv::internal::WriteStructContext ws(fs, name, File_ਗੰਢ::SEQ);
+    ਲਿਖ(fs, vec);
 }
 
-void read(const FileNode& node, std::vector<DMatch>& matches)
+ਖਾਲੀ ਪਠ(ਅਚਲ File_ਗੰਢ& ਗੰਢ, std::vector<DMatch>& matches)
 {
-    FileNode first_node = *(node.begin());
-    if (first_node.isSeq())
+    File_ਗੰਢ ਪਹਿਲਾ_ਗੰਢ = *(ਗੰਢ.begin());
+    ਜੇ (ਪਹਿਲਾ_ਗੰਢ.isSeq())
     {
         // modern scheme
-#ifdef OPENCV_TRAITS_ENABLE_DEPRECATED
-        FileNodeIterator it = node.begin();
-        size_t total = (size_t)it.remaining;
-        matches.resize(total);
-        for (size_t i = 0; i < total; ++i, ++it)
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ OPENCV_TRAITS_ENABLE_DEPRECATED
+        File_ਗੰਢ_Iterator it = ਗੰਢ.begin();
+        size_t ਕੁੱਲ = (size_t)it.ਬਚਿਆ;
+        matches.resize(ਕੁੱਲ);
+        ਲਈ (size_t i = 0; i < ਕੁੱਲ; ++i, ++it)
         {
             (*it) >> matches[i];
         }
-#else
-        FileNodeIterator it = node.begin();
+#ਨਹੀਂਤਾਂ
+        File_ਗੰਢ_Iterator it = ਗੰਢ.begin();
         it >> matches;
-#endif
-        return;
+#ਜੇ_ਅੰਤ
+        ਵਾਪਸ;
     }
     matches.clear();
-    FileNodeIterator it = node.begin(), it_end = node.end();
-    for( ; it != it_end; )
+    File_ਗੰਢ_Iterator it = ਗੰਢ.begin(), it_ਸਿਰਾ = ਗੰਢ.end();
+    ਲਈ( ; it != it_ਸਿਰਾ; )
     {
         DMatch m;
         it >> m.queryIdx >> m.trainIdx >> m.imgIdx >> m.distance;
         matches.push_back(m);
     }
 }
-#endif
+#ਜੇ_ਅੰਤ
 
 
 }

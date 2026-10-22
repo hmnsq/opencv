@@ -2,252 +2,252 @@
 // It is subject to the license terms in the LICENSE file found in the top-level directory
 // of this distribution and at http://opencv.org/license.html
 
-#include "precomp.hpp"
-#include "opencl_kernels_core.hpp"
+#ਅਨ੍ਤਰ੍ਭਾਵ "precomp.hpp"
+#ਅਨ੍ਤਰ੍ਭਾਵ "opencl_kernels_core.hpp"
 
-#include "convert.simd.hpp"
-#include "convert.simd_declarations.hpp" // defines CV_CPU_DISPATCH_MODES_ALL=AVX2,...,BASELINE based on CMakeLists.txt content
+#ਅਨ੍ਤਰ੍ਭਾਵ "convert.simd.hpp"
+#ਅਨ੍ਤਰ੍ਭਾਵ "convert.simd_declarations.hpp" // defines CV_CPU_DISPATCH_MODES_ALL=AVX2,...,BASELINE based on CMakeLists.txt content
 
-namespace cv {
+ਨਾਮਾਕਾਸ਼ cv {
 
-namespace hal {
-void cvt16f32f(const hfloat* src, float* dst, int len)
+ਨਾਮਾਕਾਸ਼ hal {
+ਖਾਲੀ cvt16f32f(ਅਚਲ hfloat* src, ਦਸ਼ਮਲਵ* dst, ਪੂਰਨ len)
 {
     CV_INSTRUMENT_REGION();
     CV_CPU_DISPATCH(cvt16f32f, (src, dst, len),
         CV_CPU_DISPATCH_MODES_ALL);
 }
-void cvt32f16f(const float* src, hfloat* dst, int len)
+ਖਾਲੀ cvt32f16f(ਅਚਲ ਦਸ਼ਮਲਵ* src, hfloat* dst, ਪੂਰਨ len)
 {
     CV_INSTRUMENT_REGION();
     CV_CPU_DISPATCH(cvt32f16f, (src, dst, len),
         CV_CPU_DISPATCH_MODES_ALL);
 }
-void cvt32f16bf(const float* src, bfloat* dst, int len)
+ਖਾਲੀ cvt32f16bf(ਅਚਲ ਦਸ਼ਮਲਵ* src, bfloat* dst, ਪੂਰਨ len)
 {
     CV_INSTRUMENT_REGION();
     CV_CPU_DISPATCH(cvt32f16bf, (src, dst, len),
         CV_CPU_DISPATCH_MODES_ALL);
 }
-void addRNGBias32f(float* arr, const float* scaleBiasPairs, int len, int cn)
+ਖਾਲੀ ਜੋੜੋ_RNGBias32f(ਦਸ਼ਮਲਵ* arr, ਅਚਲ ਦਸ਼ਮਲਵ* scale_Bias_ਜੋੜੇ, ਪੂਰਨ len, ਪੂਰਨ cn)
 {
     CV_INSTRUMENT_REGION();
-    CV_CPU_DISPATCH(addRNGBias32f, (arr, scaleBiasPairs, len, cn),
+    CV_CPU_DISPATCH(ਜੋੜੋ_RNGBias32f, (arr, scale_Bias_ਜੋੜੇ, len, cn),
         CV_CPU_DISPATCH_MODES_ALL);
 }
-void addRNGBias64f(double* arr, const double* scaleBiasPairs, int len, int cn)
+ਖਾਲੀ ਜੋੜੋ_RNGBias64f(ਦੁੱਗਣਾ* arr, ਅਚਲ ਦੁੱਗਣਾ* scale_Bias_ਜੋੜੇ, ਪੂਰਨ len, ਪੂਰਨ cn)
 {
     CV_INSTRUMENT_REGION();
-    CV_CPU_DISPATCH(addRNGBias64f, (arr, scaleBiasPairs, len, cn),
+    CV_CPU_DISPATCH(ਜੋੜੋ_RNGBias64f, (arr, scale_Bias_ਜੋੜੇ, len, cn),
         CV_CPU_DISPATCH_MODES_ALL);
 }
 
 } // namespace
 
 
-BinaryFunc getConvertFunc(int sdepth, int ddepth)
+ਦੁਆਧਾਰੀ_Func getConvertFunc(ਪੂਰਨ sdepth, ਪੂਰਨ ddepth)
 {
     CV_INSTRUMENT_REGION();
     CV_CPU_DISPATCH(getConvertFunc, (sdepth, ddepth),
         CV_CPU_DISPATCH_MODES_ALL);
 }
 
-#ifdef HAVE_OPENCL
-static bool ocl_convertTo(InputArray src_, OutputArray dst_, int ddepth, bool noScale, double alpha, double beta)
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ HAVE_OPENCL
+ਸਥਿਰ ਤਾਰਕਿਕ ocl_convert_ਮੰਜ਼ਿਲ(ਨਿਵੇਸ਼_Array src_, OutputArray dst_, ਪੂਰਨ ddepth, ਤਾਰਕਿਕ noScale, ਦੁੱਗਣਾ alpha, ਦੁੱਗਣਾ beta)
 {
     CV_INSTRUMENT_REGION();
 
     CV_Assert(ddepth >= 0);
 
-    int stype = src_.type();
-    int sdepth = CV_MAT_DEPTH(stype);
-    int cn = CV_MAT_CN(stype);
+    ਪੂਰਨ stype = src_.type();
+    ਪੂਰਨ sdepth = CV_MAT_ਡੂੰਘਾਈ(stype);
+    ਪੂਰਨ cn = CV_MAT_CN(stype);
 
     // FP8 types are not supported by the OpenCL kernels yet; fall back to CPU.
-    if ((sdepth >= CV_8F_E4M3FN && sdepth <= CV_8F_E4M3FNUZ) ||
+    ਜੇ ((sdepth >= CV_8F_E4M3FN && sdepth <= CV_8F_E4M3FNUZ) ||
         (ddepth >= CV_8F_E4M3FN && ddepth <= CV_8F_E4M3FNUZ))
-        return false;
+        ਵਾਪਸ ਝੂਠ;
 
-    int dtype = CV_MAKETYPE(ddepth, cn);
+    ਪੂਰਨ dtype = CV_MAKETYPE(ddepth, cn);
 
-    int wdepth = (sdepth == CV_64F) ? CV_64F : CV_32F;
+    ਪੂਰਨ wdepth = (sdepth == CV_64F) ? CV_64F : CV_32F;
 
-    bool needDouble = sdepth == CV_64F || ddepth == CV_64F;
-    bool doubleCheck = true;
-    if (needDouble)
+    ਤਾਰਕਿਕ needDouble = sdepth == CV_64F || ddepth == CV_64F;
+    ਤਾਰਕਿਕ doubleCheck = ਸੱਚ;
+    ਜੇ (needDouble)
     {
         doubleCheck = ocl::Device::getDefault().hasFP64();
     }
-    bool halfCheck = true;
-    bool needHalf = sdepth == CV_16F || ddepth == CV_16F;
-    if (needHalf)
+    ਤਾਰਕਿਕ halfCheck = ਸੱਚ;
+    ਤਾਰਕਿਕ needHalf = sdepth == CV_16F || ddepth == CV_16F;
+    ਜੇ (needHalf)
     {
         halfCheck = ocl::Device::getDefault().hasFP16();
     }
 
-    if (!doubleCheck)
-        return false;
-    if (!halfCheck)
-        return false;
+    ਜੇ (!doubleCheck)
+        ਵਾਪਸ ਝੂਠ;
+    ਜੇ (!halfCheck)
+        ਵਾਪਸ ਝੂਠ;
 
-    const int rowsPerWI = 4;
+    ਅਚਲ ਪੂਰਨ ਪੰਕਤੀਆਂ_ਪ੍ਰਤੀ_WI = 4;
 
-    char cvt[2][50];
+    ਅੱਖਰ cvt[2][50];
     ocl::Kernel k("convertTo", ocl::core::convert_oclsrc,
                   format("-D srcT=%s -D WT=%s -D dstT=%s -D convertToWT=%s -D convertToDT=%s -D rowsPerWI=%d%s%s%s",
-                         ocl::typeToStr(sdepth), ocl::typeToStr(wdepth), ocl::typeToStr(ddepth),
-                         ocl::convertTypeStr(sdepth, wdepth, 1, cvt[0], sizeof(cvt[0])),
-                         ocl::convertTypeStr(wdepth, ddepth, 1, cvt[1], sizeof(cvt[1])),
-                         rowsPerWI,
+                         ocl::type_ਮੰਜ਼ਿਲ_Str(sdepth), ocl::type_ਮੰਜ਼ਿਲ_Str(wdepth), ocl::type_ਮੰਜ਼ਿਲ_Str(ddepth),
+                         ocl::convertTypeStr(sdepth, wdepth, 1, cvt[0], ਆਕਾਰ(cvt[0])),
+                         ocl::convertTypeStr(wdepth, ddepth, 1, cvt[1], ਆਕਾਰ(cvt[1])),
+                         ਪੰਕਤੀਆਂ_ਪ੍ਰਤੀ_WI,
                          needDouble ? " -D DOUBLE_SUPPORT" : "",
                          needHalf ? " -D HALF_SUPPORT" : "",
                          noScale ? " -D NO_SCALE" : ""
                   )
     );
 
-    if (k.empty())
-        return false;
+    ਜੇ (k.empty())
+        ਵਾਪਸ ਝੂਠ;
 
     UMat src = src_.getUMat();
-    dst_.createSameSize(src_, dtype);
+    dst_.create_Same_ਮਾਪ(src_, dtype);
     UMat dst = dst_.getUMat();
 
-    float alphaf = (float)alpha, betaf = (float)beta;
+    ਦਸ਼ਮਲਵ alphaf = (ਦਸ਼ਮਲਵ)alpha, betaf = (ਦਸ਼ਮਲਵ)beta;
 
-    if (noScale)
-        k.args(ocl::KernelArg::ReadOnlyNoSize(src), ocl::KernelArg::WriteOnly(dst, cn));
-    else if (wdepth == CV_32F)
-        k.args(ocl::KernelArg::ReadOnlyNoSize(src), ocl::KernelArg::WriteOnly(dst, cn), alphaf, betaf);
-    else
-        k.args(ocl::KernelArg::ReadOnlyNoSize(src), ocl::KernelArg::WriteOnly(dst, cn), alpha, beta);
+    ਜੇ (noScale)
+        k.ਦਲੀਲਾਂ(ocl::KernelArg::Read_Only_No_ਮਾਪ(src), ocl::KernelArg::WriteOnly(dst, cn));
+    ਨਹੀਂਤਾਂ ਜੇ (wdepth == CV_32F)
+        k.ਦਲੀਲਾਂ(ocl::KernelArg::Read_Only_No_ਮਾਪ(src), ocl::KernelArg::WriteOnly(dst, cn), alphaf, betaf);
+    ਨਹੀਂਤਾਂ
+        k.ਦਲੀਲਾਂ(ocl::KernelArg::Read_Only_No_ਮਾਪ(src), ocl::KernelArg::WriteOnly(dst, cn), alpha, beta);
 
     size_t globalsize[2] = {
-        (size_t)dst.cols * cn,
-        divUp((size_t)dst.rows, rowsPerWI)
+        (size_t)dst.ਖਾਨੇ_ਗਿਣਤੀ * cn,
+        div_ਉੱਪਰ((size_t)dst.ਪੰਕਤੀਆਂ, ਪੰਕਤੀਆਂ_ਪ੍ਰਤੀ_WI)
     };
-    if (!k.run(2, globalsize, NULL, false))
-        return false;
+    ਜੇ (!k.ਲੜੀਵਾਰ(2, globalsize, ਨਿਰਾ, ਝੂਠ))
+        ਵਾਪਸ ਝੂਠ;
 
-    CV_IMPL_ADD(CV_IMPL_OCL);
-    return true;
+    CV_IMPL_ਜੋੜੋ(CV_IMPL_OCL);
+    ਵਾਪਸ ਸੱਚ;
 }
-#endif
+#ਜੇ_ਅੰਤ
 
-void Mat::convertTo(OutputArray dst, int type_, double alpha, double beta) const
+ਖਾਲੀ Mat::convert_ਮੰਜ਼ਿਲ(OutputArray dst, ਪੂਰਨ type_, ਦੁੱਗਣਾ alpha, ਦੁੱਗਣਾ beta) ਅਚਲ
 {
     CV_INSTRUMENT_REGION();
 
-    if (empty())
+    ਜੇ (empty())
     {
-        int ddepth = CV_MAT_DEPTH(type_);
-        if (ddepth < 0)
-            ddepth = dst.fixedType() ? dst.depth() : depth();
-        const int dtype = CV_MAKETYPE(ddepth, channels());
+        ਪੂਰਨ ddepth = CV_MAT_ਡੂੰਘਾਈ(type_);
+        ਜੇ (ddepth < 0)
+            ddepth = dst.fixedType() ? dst.ਡੂੰਘਾਈ() : ਡੂੰਘਾਈ();
+        ਅਚਲ ਪੂਰਨ dtype = CV_MAKETYPE(ddepth, channels());
 
         dst.release();
-        bool allowTransposed = dims == 1 ||
-            dst.kind() == _InputArray::STD_VECTOR ||
-            (dst.fixedSize() && dst.dims() == 1);
+        ਤਾਰਕਿਕ allowTransposed = dims == 1 ||
+            dst.ਕਿਸਮ() == ਨਿਵੇਸ਼_Array_2::STD_ਸਦਿਸ਼ ||
+            (dst.fixed_ਮਾਪ() && dst.dims() == 1);
         dst.create(size, dtype, -1, allowTransposed);
-        return;
+        ਵਾਪਸ;
     }
 
-    int stype = type();
-    int sdepth = CV_MAT_DEPTH(stype);
+    ਪੂਰਨ stype = type();
+    ਪੂਰਨ sdepth = CV_MAT_ਡੂੰਘਾਈ(stype);
 
-    int ddepth = sdepth;
-    if (type_ >= 0)
-        ddepth = CV_MAT_DEPTH(type_);
-    else
-        ddepth = dst.fixedType() ? dst.depth() : sdepth;
+    ਪੂਰਨ ddepth = sdepth;
+    ਜੇ (type_ >= 0)
+        ddepth = CV_MAT_ਡੂੰਘਾਈ(type_);
+    ਨਹੀਂਤਾਂ
+        ddepth = dst.fixedType() ? dst.ਡੂੰਘਾਈ() : sdepth;
 
-    bool noScale = std::fabs(alpha - 1) < DBL_EPSILON && std::fabs(beta) < DBL_EPSILON;
-    if (sdepth == ddepth && noScale)
+    ਤਾਰਕਿਕ noScale = std::fabs(alpha - 1) < DBL_EPSILON && std::fabs(beta) < DBL_EPSILON;
+    ਜੇ (sdepth == ddepth && noScale)
     {
-        copyTo(dst);
-        return;
+        copy_ਮੰਜ਼ਿਲ(dst);
+        ਵਾਪਸ;
     }
 
-    CV_OCL_RUN(dims <= 2 && dst.isUMat(),
-               ocl_convertTo(*this, dst, ddepth, noScale, alpha, beta))
+    CV_OCL_ਲੜੀਵਾਰ(dims <= 2 && dst.isUMat(),
+               ocl_convert_ਮੰਜ਼ਿਲ(*ਇਹ, dst, ddepth, noScale, alpha, beta))
 
-    int cn = channels();
-    int dtype = CV_MAKETYPE(ddepth, cn);
+    ਪੂਰਨ cn = channels();
+    ਪੂਰਨ dtype = CV_MAKETYPE(ddepth, cn);
 
-    Mat src = *this;
-    bool allowTransposed = dims == 1 ||
-        dst.kind() == _InputArray::STD_VECTOR ||
-        (dst.fixedSize() && dst.dims() == 1);
+    Mat src = *ਇਹ;
+    ਤਾਰਕਿਕ allowTransposed = dims == 1 ||
+        dst.ਕਿਸਮ() == ਨਿਵੇਸ਼_Array_2::STD_ਸਦਿਸ਼ ||
+        (dst.fixed_ਮਾਪ() && dst.dims() == 1);
     dst.create( size, dtype, -1, allowTransposed );
     Mat dstMat = dst.getMat();
 
-    if( dims <= 2 )
+    ਜੇ( dims <= 2 )
     {
-        CALL_HAL(convertScale, cv_hal_convertScale, src.data, src.step, dstMat.data, dstMat.step, src.cols * cn, src.rows, sdepth, ddepth, alpha, beta);
+        CALL_HAL(convertScale, cv_hal_convertScale, src.ਅੰਕੜੇ, src.ਕਦਮ, dstMat.ਅੰਕੜੇ, dstMat.ਕਦਮ, src.ਖਾਨੇ_ਗਿਣਤੀ * cn, src.ਪੰਕਤੀਆਂ, sdepth, ddepth, alpha, beta);
     }
-    else if( src.isContinuous() && dstMat.isContinuous() )
+    ਨਹੀਂਤਾਂ ਜੇ( src.isContinuous() && dstMat.isContinuous() )
     {
-        CALL_HAL(convertScale, cv_hal_convertScale, src.data, 0, dstMat.data, 0, (int)src.total() * cn, 1, sdepth, ddepth, alpha, beta);
+        CALL_HAL(convertScale, cv_hal_convertScale, src.ਅੰਕੜੇ, 0, dstMat.ਅੰਕੜੇ, 0, (ਪੂਰਨ)src.ਕੁੱਲ() * cn, 1, sdepth, ddepth, alpha, beta);
     }
 
-    BinaryFunc func = noScale ? getConvertFunc(sdepth, ddepth) : getConvertScaleFunc(sdepth, ddepth);
-    double scale[] = {alpha, beta};
+    ਦੁਆਧਾਰੀ_Func func = noScale ? getConvertFunc(sdepth, ddepth) : getConvertScaleFunc(sdepth, ddepth);
+    ਦੁੱਗਣਾ scale[] = {alpha, beta};
     CV_Assert( func != 0 );
 
-    if( dims <= 2 )
+    ਜੇ( dims <= 2 )
     {
-        Size sz = getContinuousSize2D(src, dstMat, cn);
-        func(src.data, src.step, 0, 0, dstMat.data, dstMat.step, sz, scale);
+        ਮਾਪ sz = getContinuousSize2D(src, dstMat, cn);
+        func(src.ਅੰਕੜੇ, src.ਕਦਮ, 0, 0, dstMat.ਅੰਕੜੇ, dstMat.ਕਦਮ, sz, scale);
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
-        const Mat* arrays[] = {&src, &dstMat, 0};
+        ਅਚਲ Mat* arrays[] = {&src, &dstMat, 0};
         uchar* ptrs[2] = {};
         NAryMatIterator it(arrays, ptrs);
-        Size sz((int)(it.size*cn), 1);
+        ਮਾਪ sz((ਪੂਰਨ)(it.size*cn), 1);
 
-        for( size_t i = 0; i < it.nplanes; i++, ++it )
+        ਲਈ( size_t i = 0; i < it.nplanes; i++, ++it )
             func(ptrs[0], 1, 0, 0, ptrs[1], 1, sz, scale);
     }
 }
 
-void UMat::convertTo(OutputArray dst, int type_, double alpha, double beta) const
+ਖਾਲੀ UMat::convert_ਮੰਜ਼ਿਲ(OutputArray dst, ਪੂਰਨ type_, ਦੁੱਗਣਾ alpha, ਦੁੱਗਣਾ beta) ਅਚਲ
 {
     CV_INSTRUMENT_REGION();
 
-    if (empty())
+    ਜੇ (empty())
     {
         dst.release();
         dst.create(size(), type_ >= 0 ? type_ : type());
-        return;
+        ਵਾਪਸ;
     }
 
-#ifdef HAVE_OPENCL
-    int stype = type();
-    int sdepth = CV_MAT_DEPTH(stype);
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ HAVE_OPENCL
+    ਪੂਰਨ stype = type();
+    ਪੂਰਨ sdepth = CV_MAT_ਡੂੰਘਾਈ(stype);
 
-    int ddepth = sdepth;
-    if (type_ >= 0)
-        ddepth = CV_MAT_DEPTH(type_);
-    else
-        ddepth = dst.fixedType() ? dst.depth() : sdepth;
+    ਪੂਰਨ ddepth = sdepth;
+    ਜੇ (type_ >= 0)
+        ddepth = CV_MAT_ਡੂੰਘਾਈ(type_);
+    ਨਹੀਂਤਾਂ
+        ddepth = dst.fixedType() ? dst.ਡੂੰਘਾਈ() : sdepth;
 
-    bool noScale = std::fabs(alpha - 1) < DBL_EPSILON && std::fabs(beta) < DBL_EPSILON;
-    if (sdepth == ddepth && noScale)
+    ਤਾਰਕਿਕ noScale = std::fabs(alpha - 1) < DBL_EPSILON && std::fabs(beta) < DBL_EPSILON;
+    ਜੇ (sdepth == ddepth && noScale)
     {
-        copyTo(dst);
-        return;
+        copy_ਮੰਜ਼ਿਲ(dst);
+        ਵਾਪਸ;
     }
 
-    CV_OCL_RUN(dims <= 2,
-               ocl_convertTo(*this, dst, ddepth, noScale, alpha, beta))
-#endif // HAVE_OPENCL
+    CV_OCL_ਲੜੀਵਾਰ(dims <= 2,
+               ocl_convert_ਮੰਜ਼ਿਲ(*ਇਹ, dst, ddepth, noScale, alpha, beta))
+#ਜੇ_ਅੰਤ // HAVE_OPENCL
 
-    UMat src = *this;  // Fake reference to itself.
+    UMat src = *ਇਹ;  // Fake reference to itself.
                        // Resolves issue 8693 in case of src == dst.
     Mat m = getMat(ACCESS_READ);
-    m.convertTo(dst, type_, alpha, beta);
-    (void)src;
+    m.convert_ਮੰਜ਼ਿਲ(dst, type_, alpha, beta);
+    (ਖਾਲੀ)src;
 }
 
 } // namespace cv

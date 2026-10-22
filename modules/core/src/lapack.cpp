@@ -40,11 +40,11 @@
 //
 //M*/
 
-#include "precomp.hpp"
-#include <limits>
+#ਅਨ੍ਤਰ੍ਭਾਵ "precomp.hpp"
+#ਅਨ੍ਤਰ੍ਭਾਵ <limits>
 
-#ifdef HAVE_EIGEN
-#  if defined(_MSC_VER)
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ HAVE_EIGEN
+#  ਜੇ defined(_MSC_VER)
 #    pragma warning(push)
 #    pragma warning(disable:4701)  // potentially uninitialized local variable
 #    pragma warning(disable:4702)  // unreachable code
@@ -52,136 +52,136 @@
 #  endif
 #  include <Eigen/Core>
 #  include <Eigen/Eigenvalues>
-#  if defined(_MSC_VER)
+#  ਜੇ defined(_MSC_VER)
 #    pragma warning(pop)
 #  endif
 #  include "opencv2/core/eigen.hpp"
-#endif
+#ਜੇ_ਅੰਤ
 
-namespace cv
+ਨਾਮਾਕਾਸ਼ cv
 {
 
-int LU(float* A, size_t astep, int m, float* b, size_t bstep, int n)
-{
-    CV_INSTRUMENT_REGION();
-
-    return hal::LU32f(A, astep, m, b, bstep, n);
-}
-
-int LU(double* A, size_t astep, int m, double* b, size_t bstep, int n)
+ਪੂਰਨ LU(ਦਸ਼ਮਲਵ* A, size_t astep, ਪੂਰਨ m, ਦਸ਼ਮਲਵ* b, size_t bstep, ਪੂਰਨ n)
 {
     CV_INSTRUMENT_REGION();
 
-    return hal::LU64f(A, astep, m, b, bstep, n);
+    ਵਾਪਸ hal::LU32f(A, astep, m, b, bstep, n);
 }
 
-bool Cholesky(float* A, size_t astep, int m, float* b, size_t bstep, int n)
+ਪੂਰਨ LU(ਦੁੱਗਣਾ* A, size_t astep, ਪੂਰਨ m, ਦੁੱਗਣਾ* b, size_t bstep, ਪੂਰਨ n)
 {
     CV_INSTRUMENT_REGION();
 
-    return hal::Cholesky32f(A, astep, m, b, bstep, n);
+    ਵਾਪਸ hal::LU64f(A, astep, m, b, bstep, n);
 }
 
-bool Cholesky(double* A, size_t astep, int m, double* b, size_t bstep, int n)
+ਤਾਰਕਿਕ Cholesky(ਦਸ਼ਮਲਵ* A, size_t astep, ਪੂਰਨ m, ਦਸ਼ਮਲਵ* b, size_t bstep, ਪੂਰਨ n)
 {
     CV_INSTRUMENT_REGION();
 
-    return hal::Cholesky64f(A, astep, m, b, bstep, n);
+    ਵਾਪਸ hal::Cholesky32f(A, astep, m, b, bstep, n);
 }
 
-template<typename _Tp> static inline _Tp hypot(_Tp a, _Tp b)
+ਤਾਰਕਿਕ Cholesky(ਦੁੱਗਣਾ* A, size_t astep, ਪੂਰਨ m, ਦੁੱਗਣਾ* b, size_t bstep, ਪੂਰਨ n)
 {
-    a = std::abs(a);
-    b = std::abs(b);
-    if( a > b )
+    CV_INSTRUMENT_REGION();
+
+    ਵਾਪਸ hal::Cholesky64f(A, astep, m, b, bstep, n);
+}
+
+ਸਾਂਚਾ<ਕਿਸਮ_ਨਾਂ _Tp> ਸਥਿਰ ਸਤਰਅੰਦਰ _Tp hypot(_Tp a, _Tp b)
+{
+    a = std::ਨਿਰਪੇਖ(a);
+    b = std::ਨਿਰਪੇਖ(b);
+    ਜੇ( a > b )
     {
         b /= a;
-        return a*std::sqrt(1 + b*b);
+        ਵਾਪਸ a*std::ਵਰਗਮੂਲ(1 + b*b);
     }
-    if( b > 0 )
+    ਜੇ( b > 0 )
     {
         a /= b;
-        return b*std::sqrt(1 + a*a);
+        ਵਾਪਸ b*std::ਵਰਗਮੂਲ(1 + a*a);
     }
-    return 0;
+    ਵਾਪਸ 0;
 }
 
 
-template<typename _Tp> bool
-JacobiImpl_( _Tp* A, size_t astep, _Tp* W, _Tp* V, size_t vstep, int n, uchar* buf )
+ਸਾਂਚਾ<ਕਿਸਮ_ਨਾਂ _Tp> ਤਾਰਕਿਕ
+JacobiImpl_( _Tp* A, size_t astep, _Tp* W, _Tp* V, size_t vstep, ਪੂਰਨ n, uchar* buf )
 {
-    const _Tp eps = std::numeric_limits<_Tp>::epsilon();
-    int i, j, k, m;
+    ਅਚਲ _Tp eps = std::numeric_limits<_Tp>::epsilon();
+    ਪੂਰਨ i, j, k, m;
 
-    astep /= sizeof(A[0]);
-    if( V )
+    astep /= ਆਕਾਰ(A[0]);
+    ਜੇ( V )
     {
-        vstep /= sizeof(V[0]);
-        for( i = 0; i < n; i++ )
+        vstep /= ਆਕਾਰ(V[0]);
+        ਲਈ( i = 0; i < n; i++ )
         {
-            for( j = 0; j < n; j++ )
+            ਲਈ( j = 0; j < n; j++ )
                 V[i*vstep + j] = (_Tp)0;
             V[i*vstep + i] = (_Tp)1;
         }
     }
 
-    int iters, maxIters = n*n*30;
+    ਪੂਰਨ iters, maxIters = n*n*30;
 
-    int* indR = (int*)alignPtr(buf, sizeof(int));
-    int* indC = indR + n;
+    ਪੂਰਨ* indR = (ਪੂਰਨ*)alignPtr(buf, ਆਕਾਰ(ਪੂਰਨ));
+    ਪੂਰਨ* indC = indR + n;
     _Tp mv = (_Tp)0;
 
-    for( k = 0; k < n; k++ )
+    ਲਈ( k = 0; k < n; k++ )
     {
         W[k] = A[(astep + 1)*k];
-        if( k < n - 1 )
+        ਜੇ( k < n - 1 )
         {
-            for( m = k+1, mv = std::abs(A[astep*k + m]), i = k+2; i < n; i++ )
+            ਲਈ( m = k+1, mv = std::ਨਿਰਪੇਖ(A[astep*k + m]), i = k+2; i < n; i++ )
             {
-                _Tp val = std::abs(A[astep*k+i]);
-                if( mv < val )
+                _Tp val = std::ਨਿਰਪੇਖ(A[astep*k+i]);
+                ਜੇ( mv < val )
                     mv = val, m = i;
             }
             indR[k] = m;
         }
-        if( k > 0 )
+        ਜੇ( k > 0 )
         {
-            for( m = 0, mv = std::abs(A[k]), i = 1; i < k; i++ )
+            ਲਈ( m = 0, mv = std::ਨਿਰਪੇਖ(A[k]), i = 1; i < k; i++ )
             {
-                _Tp val = std::abs(A[astep*i+k]);
-                if( mv < val )
+                _Tp val = std::ਨਿਰਪੇਖ(A[astep*i+k]);
+                ਜੇ( mv < val )
                     mv = val, m = i;
             }
             indC[k] = m;
         }
     }
 
-    if( n > 1 ) for( iters = 0; iters < maxIters; iters++ )
+    ਜੇ( n > 1 ) ਲਈ( iters = 0; iters < maxIters; iters++ )
     {
         // find index (k,l) of pivot p
-        for( k = 0, mv = std::abs(A[indR[0]]), i = 1; i < n-1; i++ )
+        ਲਈ( k = 0, mv = std::ਨਿਰਪੇਖ(A[indR[0]]), i = 1; i < n-1; i++ )
         {
-            _Tp val = std::abs(A[astep*i + indR[i]]);
-            if( mv < val )
+            _Tp val = std::ਨਿਰਪੇਖ(A[astep*i + indR[i]]);
+            ਜੇ( mv < val )
                 mv = val, k = i;
         }
-        int l = indR[k];
-        for( i = 1; i < n; i++ )
+        ਪੂਰਨ l = indR[k];
+        ਲਈ( i = 1; i < n; i++ )
         {
-            _Tp val = std::abs(A[astep*indC[i] + i]);
-            if( mv < val )
+            _Tp val = std::ਨਿਰਪੇਖ(A[astep*indC[i] + i]);
+            ਜੇ( mv < val )
                 mv = val, k = indC[i], l = i;
         }
 
         _Tp p = A[astep*k + l];
-        if( std::abs(p) <= eps )
-            break;
+        ਜੇ( std::ਨਿਰਪੇਖ(p) <= eps )
+            ਰੋਕੋ;
         _Tp y = (_Tp)((W[l] - W[k])*0.5);
-        _Tp t = std::abs(y) + hypot(p, y);
+        _Tp t = std::ਨਿਰਪੇਖ(y) + hypot(p, y);
         _Tp s = hypot(p, t);
         _Tp c = t/s;
         s = p/s; t = (p/t)*p;
-        if( y < 0 )
+        ਜੇ( y < 0 )
             s = -s, t = -t;
         A[astep*k + l] = 0;
 
@@ -190,43 +190,43 @@ JacobiImpl_( _Tp* A, size_t astep, _Tp* W, _Tp* V, size_t vstep, int n, uchar* b
 
         _Tp a0, b0;
 
-#undef rotate
-#define rotate(v0, v1) a0 = v0, b0 = v1, v0 = a0*c - b0*s, v1 = a0*s + b0*c
+#ਪਰਿਭਾਸ਼ਾ_ਰੱਦ rotate
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ rotate(v0, v1) a0 = v0, b0 = v1, v0 = a0*c - b0*s, v1 = a0*s + b0*c
 
         // rotate rows and columns k and l
-        for( i = 0; i < k; i++ )
+        ਲਈ( i = 0; i < k; i++ )
             rotate(A[astep*i+k], A[astep*i+l]);
-        for( i = k+1; i < l; i++ )
+        ਲਈ( i = k+1; i < l; i++ )
             rotate(A[astep*k+i], A[astep*i+l]);
-        for( i = l+1; i < n; i++ )
+        ਲਈ( i = l+1; i < n; i++ )
             rotate(A[astep*k+i], A[astep*l+i]);
 
         // rotate eigenvectors
-        if( V )
-            for( i = 0; i < n; i++ )
+        ਜੇ( V )
+            ਲਈ( i = 0; i < n; i++ )
                 rotate(V[vstep*k+i], V[vstep*l+i]);
 
-#undef rotate
+#ਪਰਿਭਾਸ਼ਾ_ਰੱਦ rotate
 
-        for( j = 0; j < 2; j++ )
+        ਲਈ( j = 0; j < 2; j++ )
         {
-            int idx = j == 0 ? k : l;
-            if( idx < n - 1 )
+            ਪੂਰਨ idx = j == 0 ? k : l;
+            ਜੇ( idx < n - 1 )
             {
-                for( m = idx+1, mv = std::abs(A[astep*idx + m]), i = idx+2; i < n; i++ )
+                ਲਈ( m = idx+1, mv = std::ਨਿਰਪੇਖ(A[astep*idx + m]), i = idx+2; i < n; i++ )
                 {
-                    _Tp val = std::abs(A[astep*idx+i]);
-                    if( mv < val )
+                    _Tp val = std::ਨਿਰਪੇਖ(A[astep*idx+i]);
+                    ਜੇ( mv < val )
                         mv = val, m = i;
                 }
                 indR[idx] = m;
             }
-            if( idx > 0 )
+            ਜੇ( idx > 0 )
             {
-                for( m = 0, mv = std::abs(A[idx]), i = 1; i < idx; i++ )
+                ਲਈ( m = 0, mv = std::ਨਿਰਪੇਖ(A[idx]), i = 1; i < idx; i++ )
                 {
-                    _Tp val = std::abs(A[astep*i+idx]);
-                    if( mv < val )
+                    _Tp val = std::ਨਿਰਪੇਖ(A[astep*i+idx]);
+                    ਜੇ( mv < val )
                         mv = val, m = i;
                 }
                 indC[idx] = m;
@@ -235,205 +235,205 @@ JacobiImpl_( _Tp* A, size_t astep, _Tp* W, _Tp* V, size_t vstep, int n, uchar* b
     }
 
     // sort eigenvalues & eigenvectors
-    for( k = 0; k < n-1; k++ )
+    ਲਈ( k = 0; k < n-1; k++ )
     {
         m = k;
-        for( i = k+1; i < n; i++ )
+        ਲਈ( i = k+1; i < n; i++ )
         {
-            if( W[m] < W[i] )
+            ਜੇ( W[m] < W[i] )
                 m = i;
         }
-        if( k != m )
+        ਜੇ( k != m )
         {
             std::swap(W[m], W[k]);
-            if( V )
-                for( i = 0; i < n; i++ )
+            ਜੇ( V )
+                ਲਈ( i = 0; i < n; i++ )
                     std::swap(V[vstep*m + i], V[vstep*k + i]);
         }
     }
 
-    return true;
+    ਵਾਪਸ ਸੱਚ;
 }
 
-static bool Jacobi( float* S, size_t sstep, float* e, float* E, size_t estep, int n, uchar* buf )
+ਸਥਿਰ ਤਾਰਕਿਕ Jacobi( ਦਸ਼ਮਲਵ* S, size_t sstep, ਦਸ਼ਮਲਵ* e, ਦਸ਼ਮਲਵ* E, size_t estep, ਪੂਰਨ n, uchar* buf )
 {
-    return JacobiImpl_(S, sstep, e, E, estep, n, buf);
+    ਵਾਪਸ JacobiImpl_(S, sstep, e, E, estep, n, buf);
 }
 
-static bool Jacobi( double* S, size_t sstep, double* e, double* E, size_t estep, int n, uchar* buf )
+ਸਥਿਰ ਤਾਰਕਿਕ Jacobi( ਦੁੱਗਣਾ* S, size_t sstep, ਦੁੱਗਣਾ* e, ਦੁੱਗਣਾ* E, size_t estep, ਪੂਰਨ n, uchar* buf )
 {
-    return JacobiImpl_(S, sstep, e, E, estep, n, buf);
+    ਵਾਪਸ JacobiImpl_(S, sstep, e, E, estep, n, buf);
 }
 
 
-template<typename T> struct VBLAS
+ਸਾਂਚਾ<ਕਿਸਮ_ਨਾਂ T> ਬਣਤਰ VBLAS
 {
-    int dot(const T*, const T*, int, T*) const { return 0; }
-    int givens(T*, T*, int, T, T) const { return 0; }
+    ਪੂਰਨ dot(ਅਚਲ T*, ਅਚਲ T*, ਪੂਰਨ, T*) ਅਚਲ { ਵਾਪਸ 0; }
+    ਪੂਰਨ givens(T*, T*, ਪੂਰਨ, T, T) ਅਚਲ { ਵਾਪਸ 0; }
 };
 
-#if (CV_SIMD || CV_SIMD_SCALABLE)
-template<> inline int VBLAS<float>::dot(const float* a, const float* b, int n, float* result) const
+#ਜੇ (CV_SIMD || CV_SIMD_SCALABLE)
+ਸਾਂਚਾ<> ਸਤਰਅੰਦਰ ਪੂਰਨ VBLAS<ਦਸ਼ਮਲਵ>::dot(ਅਚਲ ਦਸ਼ਮਲਵ* a, ਅਚਲ ਦਸ਼ਮਲਵ* b, ਪੂਰਨ n, ਦਸ਼ਮਲਵ* ਨਤੀਜਾ) ਅਚਲ
 {
-    if( n < 2*VTraits<v_float32>::vlanes() )
-        return 0;
-    int k = 0;
+    ਜੇ( n < 2*VTraits<v_float32>::vlanes() )
+        ਵਾਪਸ 0;
+    ਪੂਰਨ k = 0;
     v_float32 s0 = vx_setzero_f32();
-    for( ; k <= n - VTraits<v_float32>::vlanes(); k += VTraits<v_float32>::vlanes() )
+    ਲਈ( ; k <= n - VTraits<v_float32>::vlanes(); k += VTraits<v_float32>::vlanes() )
     {
-        v_float32 a0 = vx_load(a + k);
-        v_float32 b0 = vx_load(b + k);
+        v_float32 a0 = vx_ਲੱਦੋ(a + k);
+        v_float32 b0 = vx_ਲੱਦੋ(b + k);
 
-        s0 = v_add(s0, v_mul(a0, b0));
+        s0 = v_ਜੋੜੋ(s0, v_mul(a0, b0));
     }
-    *result = v_reduce_sum(s0);
+    *ਨਤੀਜਾ = v_reduce_ਜੋੜ(s0);
     vx_cleanup();
-    return k;
+    ਵਾਪਸ k;
 }
 
 
-template<> inline int VBLAS<float>::givens(float* a, float* b, int n, float c, float s) const
+ਸਾਂਚਾ<> ਸਤਰਅੰਦਰ ਪੂਰਨ VBLAS<ਦਸ਼ਮਲਵ>::givens(ਦਸ਼ਮਲਵ* a, ਦਸ਼ਮਲਵ* b, ਪੂਰਨ n, ਦਸ਼ਮਲਵ c, ਦਸ਼ਮਲਵ s) ਅਚਲ
 {
-    if( n < VTraits<v_float32>::vlanes())
-        return 0;
-    int k = 0;
+    ਜੇ( n < VTraits<v_float32>::vlanes())
+        ਵਾਪਸ 0;
+    ਪੂਰਨ k = 0;
     v_float32 c4 = vx_setall_f32(c), s4 = vx_setall_f32(s);
     v_float32 ns4 = vx_setall_f32(-s);
-    for( ; k <= n - VTraits<v_float32>::vlanes(); k += VTraits<v_float32>::vlanes() )
+    ਲਈ( ; k <= n - VTraits<v_float32>::vlanes(); k += VTraits<v_float32>::vlanes() )
     {
-        v_float32 a0 = vx_load(a + k);
-        v_float32 b0 = vx_load(b + k);
+        v_float32 a0 = vx_ਲੱਦੋ(a + k);
+        v_float32 b0 = vx_ਲੱਦੋ(b + k);
         v_float32 t0 = v_fma(a0, c4, v_mul(b0, s4));
         v_float32 t1 = v_fma(a0, ns4, v_mul(b0, c4));
         v_store(a + k, t0);
         v_store(b + k, t1);
     }
     vx_cleanup();
-    return k;
+    ਵਾਪਸ k;
 }
 
 
-#if (CV_SIMD_64F || CV_SIMD_SCALABLE_64F)
-template<> inline int VBLAS<double>::dot(const double* a, const double* b, int n, double* result) const
+#ਜੇ (CV_SIMD_64F || CV_SIMD_SCALABLE_64F)
+ਸਾਂਚਾ<> ਸਤਰਅੰਦਰ ਪੂਰਨ VBLAS<ਦੁੱਗਣਾ>::dot(ਅਚਲ ਦੁੱਗਣਾ* a, ਅਚਲ ਦੁੱਗਣਾ* b, ਪੂਰਨ n, ਦੁੱਗਣਾ* ਨਤੀਜਾ) ਅਚਲ
 {
-    if( n < 2*VTraits<v_float64>::vlanes() )
-        return 0;
-    int k = 0;
+    ਜੇ( n < 2*VTraits<v_float64>::vlanes() )
+        ਵਾਪਸ 0;
+    ਪੂਰਨ k = 0;
     v_float64 s0 = vx_setzero_f64();
-    for( ; k <= n - VTraits<v_float64>::vlanes(); k += VTraits<v_float64>::vlanes() )
+    ਲਈ( ; k <= n - VTraits<v_float64>::vlanes(); k += VTraits<v_float64>::vlanes() )
     {
-        v_float64 a0 = vx_load(a + k);
-        v_float64 b0 = vx_load(b + k);
+        v_float64 a0 = vx_ਲੱਦੋ(a + k);
+        v_float64 b0 = vx_ਲੱਦੋ(b + k);
 
-        s0 = v_add(s0, v_mul(a0, b0));
+        s0 = v_ਜੋੜੋ(s0, v_mul(a0, b0));
     }
-    *result = v_reduce_sum(s0);
+    *ਨਤੀਜਾ = v_reduce_ਜੋੜ(s0);
     vx_cleanup();
-    return k;
+    ਵਾਪਸ k;
 }
 
 
-template<> inline int VBLAS<double>::givens(double* a, double* b, int n, double c, double s) const
+ਸਾਂਚਾ<> ਸਤਰਅੰਦਰ ਪੂਰਨ VBLAS<ਦੁੱਗਣਾ>::givens(ਦੁੱਗਣਾ* a, ਦੁੱਗਣਾ* b, ਪੂਰਨ n, ਦੁੱਗਣਾ c, ਦੁੱਗਣਾ s) ਅਚਲ
 {
-    int k = 0;
+    ਪੂਰਨ k = 0;
     v_float64 c2 = vx_setall_f64(c), s2 = vx_setall_f64(s);
     v_float64 ns2 = vx_setall_f64(-s);
-    for( ; k <= n - VTraits<v_float64>::vlanes(); k += VTraits<v_float64>::vlanes() )
+    ਲਈ( ; k <= n - VTraits<v_float64>::vlanes(); k += VTraits<v_float64>::vlanes() )
     {
-        v_float64 a0 = vx_load(a + k);
-        v_float64 b0 = vx_load(b + k);
+        v_float64 a0 = vx_ਲੱਦੋ(a + k);
+        v_float64 b0 = vx_ਲੱਦੋ(b + k);
         v_float64 t0 = v_fma(a0, c2, v_mul(b0, s2));
         v_float64 t1 = v_fma(a0, ns2, v_mul(b0, c2));
         v_store(a + k, t0);
         v_store(b + k, t1);
     }
     vx_cleanup();
-    return k;
+    ਵਾਪਸ k;
 }
 
 
-#endif // (CV_SIMD_64F || CV_SIMD_SCALABLE_64F)
-#endif // (CV_SIMD || CV_SIMD_SCALABLE)
+#ਜੇ_ਅੰਤ // (CV_SIMD_64F || CV_SIMD_SCALABLE_64F)
+#ਜੇ_ਅੰਤ // (CV_SIMD || CV_SIMD_SCALABLE)
 
-template<typename _Tp> void
+ਸਾਂਚਾ<ਕਿਸਮ_ਨਾਂ _Tp> ਖਾਲੀ
 JacobiSVDImpl_(_Tp* At, size_t astep, _Tp* _W, _Tp* Vt, size_t vstep,
-               int m, int n, int n1, double minval, _Tp eps)
+               ਪੂਰਨ m, ਪੂਰਨ n, ਪੂਰਨ n1, ਦੁੱਗਣਾ minval, _Tp eps)
 {
     VBLAS<_Tp> vblas;
-    AutoBuffer<double> Wbuf(n);
-    double* W = Wbuf.data();
-    int i, j, k, iter, max_iter = std::max(m, 30);
+    Auto_ਬਫਰ<ਦੁੱਗਣਾ> Wbuf(n);
+    ਦੁੱਗਣਾ* W = Wbuf.ਅੰਕੜੇ();
+    ਪੂਰਨ i, j, k, iter, max_iter = std::max(m, 30);
     _Tp c, s;
-    double sd;
-    astep /= sizeof(At[0]);
-    vstep /= sizeof(Vt[0]);
+    ਦੁੱਗਣਾ sd;
+    astep /= ਆਕਾਰ(At[0]);
+    vstep /= ਆਕਾਰ(Vt[0]);
 
-    for( i = 0; i < n; i++ )
+    ਲਈ( i = 0; i < n; i++ )
     {
-        for( k = 0, sd = 0; k < m; k++ )
+        ਲਈ( k = 0, sd = 0; k < m; k++ )
         {
             _Tp t = At[i*astep + k];
-            sd += (double)t*t;
+            sd += (ਦੁੱਗਣਾ)t*t;
         }
         W[i] = sd;
 
-        if( Vt )
+        ਜੇ( Vt )
         {
-            for( k = 0; k < n; k++ )
+            ਲਈ( k = 0; k < n; k++ )
                 Vt[i*vstep + k] = 0;
             Vt[i*vstep + i] = 1;
         }
     }
 
-    for( iter = 0; iter < max_iter; iter++ )
+    ਲਈ( iter = 0; iter < max_iter; iter++ )
     {
-        bool changed = false;
+        ਤਾਰਕਿਕ ਬਦਲਿਆ = ਝੂਠ;
 
-        for( i = 0; i < n-1; i++ )
-            for( j = i+1; j < n; j++ )
+        ਲਈ( i = 0; i < n-1; i++ )
+            ਲਈ( j = i+1; j < n; j++ )
             {
                 _Tp *Ai = At + i*astep, *Aj = At + j*astep;
-                double a = W[i], p = 0, b = W[j];
+                ਦੁੱਗਣਾ a = W[i], p = 0, b = W[j];
 
-                for( k = 0; k < m; k++ )
-                    p += (double)Ai[k]*Aj[k];
+                ਲਈ( k = 0; k < m; k++ )
+                    p += (ਦੁੱਗਣਾ)Ai[k]*Aj[k];
 
-                if( std::abs(p) <= eps*std::sqrt((double)a*b) )
-                    continue;
+                ਜੇ( std::ਨਿਰਪੇਖ(p) <= eps*std::ਵਰਗਮੂਲ((ਦੁੱਗਣਾ)a*b) )
+                    ਜਾਰੀ;
 
                 p *= 2;
-                double beta = a - b, gamma = hypot((double)p, beta);
-                if( beta < 0 )
+                ਦੁੱਗਣਾ beta = a - b, gamma = hypot((ਦੁੱਗਣਾ)p, beta);
+                ਜੇ( beta < 0 )
                 {
-                    double delta = (gamma - beta)*0.5;
-                    s = (_Tp)std::sqrt(delta/gamma);
+                    ਦੁੱਗਣਾ delta = (gamma - beta)*0.5;
+                    s = (_Tp)std::ਵਰਗਮੂਲ(delta/gamma);
                     c = (_Tp)(p/(gamma*s*2));
                 }
-                else
+                ਨਹੀਂਤਾਂ
                 {
-                    c = (_Tp)std::sqrt((gamma + beta)/(gamma*2));
+                    c = (_Tp)std::ਵਰਗਮੂਲ((gamma + beta)/(gamma*2));
                     s = (_Tp)(p/(gamma*c*2));
                 }
 
                 a = b = 0;
-                for( k = 0; k < m; k++ )
+                ਲਈ( k = 0; k < m; k++ )
                 {
                     _Tp t0 = c*Ai[k] + s*Aj[k];
                     _Tp t1 = -s*Ai[k] + c*Aj[k];
                     Ai[k] = t0; Aj[k] = t1;
 
-                    a += (double)t0*t0; b += (double)t1*t1;
+                    a += (ਦੁੱਗਣਾ)t0*t0; b += (ਦੁੱਗਣਾ)t1*t1;
                 }
                 W[i] = a; W[j] = b;
 
-                changed = true;
+                ਬਦਲਿਆ = ਸੱਚ;
 
-                if( Vt )
+                ਜੇ( Vt )
                 {
                     _Tp *Vi = Vt + i*vstep, *Vj = Vt + j*vstep;
                     k = vblas.givens(Vi, Vj, n, c, s);
 
-                    for( ; k < n; k++ )
+                    ਲਈ( ; k < n; k++ )
                     {
                         _Tp t0 = c*Vi[k] + s*Vj[k];
                         _Tp t1 = -s*Vi[k] + c*Vj[k];
@@ -441,154 +441,154 @@ JacobiSVDImpl_(_Tp* At, size_t astep, _Tp* _W, _Tp* Vt, size_t vstep,
                     }
                 }
             }
-        if( !changed )
-            break;
+        ਜੇ( !ਬਦਲਿਆ )
+            ਰੋਕੋ;
     }
 
-    for( i = 0; i < n; i++ )
+    ਲਈ( i = 0; i < n; i++ )
     {
-        for( k = 0, sd = 0; k < m; k++ )
+        ਲਈ( k = 0, sd = 0; k < m; k++ )
         {
             _Tp t = At[i*astep + k];
-            sd += (double)t*t;
+            sd += (ਦੁੱਗਣਾ)t*t;
         }
-        W[i] = std::sqrt(sd);
+        W[i] = std::ਵਰਗਮੂਲ(sd);
     }
 
-    for( i = 0; i < n-1; i++ )
+    ਲਈ( i = 0; i < n-1; i++ )
     {
         j = i;
-        for( k = i+1; k < n; k++ )
+        ਲਈ( k = i+1; k < n; k++ )
         {
-            if( W[j] < W[k] )
+            ਜੇ( W[j] < W[k] )
                 j = k;
         }
-        if( i != j )
+        ਜੇ( i != j )
         {
             std::swap(W[i], W[j]);
-            if( Vt )
+            ਜੇ( Vt )
             {
-                for( k = 0; k < m; k++ )
+                ਲਈ( k = 0; k < m; k++ )
                     std::swap(At[i*astep + k], At[j*astep + k]);
 
-                for( k = 0; k < n; k++ )
+                ਲਈ( k = 0; k < n; k++ )
                     std::swap(Vt[i*vstep + k], Vt[j*vstep + k]);
             }
         }
     }
 
-    for( i = 0; i < n; i++ )
+    ਲਈ( i = 0; i < n; i++ )
         _W[i] = (_Tp)W[i];
 
-    if( !Vt )
-        return;
+    ਜੇ( !Vt )
+        ਵਾਪਸ;
 
     RNG rng(0x12345678);
-    for( i = 0; i < n1; i++ )
+    ਲਈ( i = 0; i < n1; i++ )
     {
         sd = i < n ? W[i] : 0;
 
-        for( int ii = 0; ii < 100 && sd <= minval; ii++ )
+        ਲਈ( ਪੂਰਨ ii = 0; ii < 100 && sd <= minval; ii++ )
         {
             // if we got a zero singular value, then in order to get the corresponding left singular vector
             // we generate a random vector, project it to the previously computed left singular vectors,
             // subtract the projection and normalize the difference.
-            const _Tp val0 = (_Tp)(1./m);
-            for( k = 0; k < m; k++ )
+            ਅਚਲ _Tp val0 = (_Tp)(1./m);
+            ਲਈ( k = 0; k < m; k++ )
             {
                 _Tp val = (rng.next() & 256) != 0 ? val0 : -val0;
                 At[i*astep + k] = val;
             }
-            for( iter = 0; iter < 2; iter++ )
+            ਲਈ( iter = 0; iter < 2; iter++ )
             {
-                for( j = 0; j < i; j++ )
+                ਲਈ( j = 0; j < i; j++ )
                 {
                     sd = 0;
-                    for( k = 0; k < m; k++ )
+                    ਲਈ( k = 0; k < m; k++ )
                         sd += At[i*astep + k]*At[j*astep + k];
                     _Tp asum = 0;
-                    for( k = 0; k < m; k++ )
+                    ਲਈ( k = 0; k < m; k++ )
                     {
                         _Tp t = (_Tp)(At[i*astep + k] - sd*At[j*astep + k]);
                         At[i*astep + k] = t;
-                        asum += std::abs(t);
+                        asum += std::ਨਿਰਪੇਖ(t);
                     }
                     asum = asum > eps*100 ? 1/asum : 0;
-                    for( k = 0; k < m; k++ )
+                    ਲਈ( k = 0; k < m; k++ )
                         At[i*astep + k] *= asum;
                 }
             }
             sd = 0;
-            for( k = 0; k < m; k++ )
+            ਲਈ( k = 0; k < m; k++ )
             {
                 _Tp t = At[i*astep + k];
-                sd += (double)t*t;
+                sd += (ਦੁੱਗਣਾ)t*t;
             }
-            sd = std::sqrt(sd);
+            sd = std::ਵਰਗਮੂਲ(sd);
         }
 
         s = (_Tp)(sd > minval ? 1/sd : 0.);
-        for( k = 0; k < m; k++ )
+        ਲਈ( k = 0; k < m; k++ )
             At[i*astep + k] *= s;
     }
 }
 
 
-static void JacobiSVD(float* At, size_t astep, float* W, float* Vt, size_t vstep, int m, int n, int n1=-1)
+ਸਥਿਰ ਖਾਲੀ JacobiSVD(ਦਸ਼ਮਲਵ* At, size_t astep, ਦਸ਼ਮਲਵ* W, ਦਸ਼ਮਲਵ* Vt, size_t vstep, ਪੂਰਨ m, ਪੂਰਨ n, ਪੂਰਨ n1=-1)
 {
-    hal::SVD32f(At, astep, W, NULL, astep, Vt, vstep, m, n, n1);
+    hal::SVD32f(At, astep, W, ਨਿਰਾ, astep, Vt, vstep, m, n, n1);
 }
 
-static void JacobiSVD(double* At, size_t astep, double* W, double* Vt, size_t vstep, int m, int n, int n1=-1)
+ਸਥਿਰ ਖਾਲੀ JacobiSVD(ਦੁੱਗਣਾ* At, size_t astep, ਦੁੱਗਣਾ* W, ਦੁੱਗਣਾ* Vt, size_t vstep, ਪੂਰਨ m, ਪੂਰਨ n, ਪੂਰਨ n1=-1)
 {
-    hal::SVD64f(At, astep, W, NULL, astep, Vt, vstep, m, n, n1);
+    hal::SVD64f(At, astep, W, ਨਿਰਾ, astep, Vt, vstep, m, n, n1);
 }
 
-template <typename fptype> static inline int
-decodeSVDParameters(const fptype* U, const fptype* Vt, int m, int n, int n1)
+ਸਾਂਚਾ <ਕਿਸਮ_ਨਾਂ fptype> ਸਥਿਰ ਸਤਰਅੰਦਰ ਪੂਰਨ
+decodeSVDParameters(ਅਚਲ fptype* U, ਅਚਲ fptype* Vt, ਪੂਰਨ m, ਪੂਰਨ n, ਪੂਰਨ n1)
 {
-    int halSVDFlag = 0;
-    if(Vt == NULL)
+    ਪੂਰਨ halSVDFlag = 0;
+    ਜੇ(Vt == ਨਿਰਾ)
         halSVDFlag = CV_HAL_SVD_NO_UV;
-    else if(n1 <= 0 || n1 == n)
+    ਨਹੀਂਤਾਂ ਜੇ(n1 <= 0 || n1 == n)
     {
         halSVDFlag = CV_HAL_SVD_SHORT_UV;
-        if(U == NULL)
+        ਜੇ(U == ਨਿਰਾ)
             halSVDFlag |= CV_HAL_SVD_MODIFY_A;
     }
-    else if(n1 == m)
+    ਨਹੀਂਤਾਂ ਜੇ(n1 == m)
     {
-        halSVDFlag = CV_HAL_SVD_FULL_UV;
-        if(U == NULL)
+        halSVDFlag = CV_HAL_SVD_ਭਰਿਆ_UV;
+        ਜੇ(U == ਨਿਰਾ)
             halSVDFlag |= CV_HAL_SVD_MODIFY_A;
     }
-    return halSVDFlag;
+    ਵਾਪਸ halSVDFlag;
 }
 
-void hal::SVD32f(float* At, size_t astep, float* W, float* U, size_t ustep, float* Vt, size_t vstep, int m, int n, int n1)
+ਖਾਲੀ hal::SVD32f(ਦਸ਼ਮਲਵ* At, size_t astep, ਦਸ਼ਮਲਵ* W, ਦਸ਼ਮਲਵ* U, size_t ustep, ਦਸ਼ਮਲਵ* Vt, size_t vstep, ਪੂਰਨ m, ਪੂਰਨ n, ਪੂਰਨ n1)
 {
     CALL_HAL(SVD32f, cv_hal_SVD32f, At, astep, W, U, ustep, Vt, vstep, m, n, decodeSVDParameters(U, Vt, m, n, n1))
     JacobiSVDImpl_(At, astep, W, Vt, vstep, m, n, !Vt ? 0 : n1 < 0 ? n : n1, FLT_MIN, FLT_EPSILON*2);
 }
 
-void hal::SVD64f(double* At, size_t astep, double* W, double* U, size_t ustep, double* Vt, size_t vstep, int m, int n, int n1)
+ਖਾਲੀ hal::SVD64f(ਦੁੱਗਣਾ* At, size_t astep, ਦੁੱਗਣਾ* W, ਦੁੱਗਣਾ* U, size_t ustep, ਦੁੱਗਣਾ* Vt, size_t vstep, ਪੂਰਨ m, ਪੂਰਨ n, ਪੂਰਨ n1)
 {
     CALL_HAL(SVD64f, cv_hal_SVD64f, At, astep, W, U, ustep, Vt, vstep, m, n, decodeSVDParameters(U, Vt, m, n, n1))
     JacobiSVDImpl_(At, astep, W, Vt, vstep, m, n, !Vt ? 0 : n1 < 0 ? n : n1, DBL_MIN, DBL_EPSILON*10);
 }
 
 /* y[0:m,0:n] += diag(a[0:1,0:m]) * x[0:m,0:n] */
-template<typename T1, typename T2, typename T3> static void
-MatrAXPY( int m, int n, const T1* x, int dx,
-         const T2* a, int inca, T3* y, int dy )
+ਸਾਂਚਾ<ਕਿਸਮ_ਨਾਂ T1, ਕਿਸਮ_ਨਾਂ T2, ਕਿਸਮ_ਨਾਂ T3> ਸਥਿਰ ਖਾਲੀ
+MatrAXPY( ਪੂਰਨ m, ਪੂਰਨ n, ਅਚਲ T1* x, ਪੂਰਨ dx,
+         ਅਚਲ T2* a, ਪੂਰਨ inca, T3* y, ਪੂਰਨ dy )
 {
-    int i;
-    for( i = 0; i < m; i++, x += dx, y += dy )
+    ਪੂਰਨ i;
+    ਲਈ( i = 0; i < m; i++, x += dx, y += dy )
     {
         T2 s = a[i*inca];
-        int j = 0;
-         #if CV_ENABLE_UNROLLED
-        for(; j <= n - 4; j += 4 )
+        ਪੂਰਨ j = 0;
+         #ਜੇ CV_ENABLE_UNROLLED
+        ਲਈ(; j <= n - 4; j += 4 )
         {
             T3 t0 = (T3)(y[j]   + s*x[j]);
             T3 t1 = (T3)(y[j+1] + s*x[j+1]);
@@ -599,303 +599,303 @@ MatrAXPY( int m, int n, const T1* x, int dx,
             y[j+2] = t0;
             y[j+3] = t1;
         }
-        #endif
-        for( ; j < n; j++ )
+        #ਜੇ_ਅੰਤ
+        ਲਈ( ; j < n; j++ )
             y[j] = (T3)(y[j] + s*x[j]);
     }
 }
 
-template<typename T> static void
-SVBkSbImpl_( int m, int n, const T* w, int incw,
-       const T* u, int ldu, bool uT,
-       const T* v, int ldv, bool vT,
-       const T* b, int ldb, int nb,
-       T* x, int ldx, double* buffer, T eps )
+ਸਾਂਚਾ<ਕਿਸਮ_ਨਾਂ T> ਸਥਿਰ ਖਾਲੀ
+SVBkSbImpl_( ਪੂਰਨ m, ਪੂਰਨ n, ਅਚਲ T* w, ਪੂਰਨ incw,
+       ਅਚਲ T* u, ਪੂਰਨ ldu, ਤਾਰਕਿਕ uT,
+       ਅਚਲ T* v, ਪੂਰਨ ldv, ਤਾਰਕਿਕ vT,
+       ਅਚਲ T* b, ਪੂਰਨ ldb, ਪੂਰਨ nb,
+       T* x, ਪੂਰਨ ldx, ਦੁੱਗਣਾ* ਬਫਰ, T eps )
 {
-    double threshold = 0;
-    int udelta0 = uT ? ldu : 1, udelta1 = uT ? 1 : ldu;
-    int vdelta0 = vT ? ldv : 1, vdelta1 = vT ? 1 : ldv;
-    int i, j, nm = std::min(m, n);
+    ਦੁੱਗਣਾ ਹੱਦ = 0;
+    ਪੂਰਨ udelta0 = uT ? ldu : 1, udelta1 = uT ? 1 : ldu;
+    ਪੂਰਨ vdelta0 = vT ? ldv : 1, vdelta1 = vT ? 1 : ldv;
+    ਪੂਰਨ i, j, nm = std::min(m, n);
 
-    if( !b )
+    ਜੇ( !b )
         nb = m;
 
-    for( i = 0; i < n; i++ )
-        for( j = 0; j < nb; j++ )
+    ਲਈ( i = 0; i < n; i++ )
+        ਲਈ( j = 0; j < nb; j++ )
             x[i*ldx + j] = 0;
 
-    for( i = 0; i < nm; i++ )
-        threshold += w[i*incw];
-    threshold *= eps;
+    ਲਈ( i = 0; i < nm; i++ )
+        ਹੱਦ += w[i*incw];
+    ਹੱਦ *= eps;
 
     // v * inv(w) * uT * b
-    for( i = 0; i < nm; i++, u += udelta0, v += vdelta0 )
+    ਲਈ( i = 0; i < nm; i++, u += udelta0, v += vdelta0 )
     {
-        double wi = w[i*incw];
-        if( (double)std::abs(wi) <= threshold )
-            continue;
+        ਦੁੱਗਣਾ wi = w[i*incw];
+        ਜੇ( (ਦੁੱਗਣਾ)std::ਨਿਰਪੇਖ(wi) <= ਹੱਦ )
+            ਜਾਰੀ;
         wi = 1/wi;
 
-        if( nb == 1 )
+        ਜੇ( nb == 1 )
         {
-            double s = 0;
-            if( b )
-                for( j = 0; j < m; j++ )
+            ਦੁੱਗਣਾ s = 0;
+            ਜੇ( b )
+                ਲਈ( j = 0; j < m; j++ )
                     s += u[j*udelta1]*b[j*ldb];
-            else
+            ਨਹੀਂਤਾਂ
                 s = u[0];
             s *= wi;
 
-            for( j = 0; j < n; j++ )
+            ਲਈ( j = 0; j < n; j++ )
                 x[j*ldx] = (T)(x[j*ldx] + s*v[j*vdelta1]);
         }
-        else
+        ਨਹੀਂਤਾਂ
         {
-            if( b )
+            ਜੇ( b )
             {
-                for( j = 0; j < nb; j++ )
-                    buffer[j] = 0;
-                MatrAXPY( m, nb, b, ldb, u, udelta1, buffer, 0 );
-                for( j = 0; j < nb; j++ )
-                    buffer[j] *= wi;
+                ਲਈ( j = 0; j < nb; j++ )
+                    ਬਫਰ[j] = 0;
+                MatrAXPY( m, nb, b, ldb, u, udelta1, ਬਫਰ, 0 );
+                ਲਈ( j = 0; j < nb; j++ )
+                    ਬਫਰ[j] *= wi;
             }
-            else
+            ਨਹੀਂਤਾਂ
             {
-                for( j = 0; j < nb; j++ )
-                    buffer[j] = u[j*udelta1]*wi;
+                ਲਈ( j = 0; j < nb; j++ )
+                    ਬਫਰ[j] = u[j*udelta1]*wi;
             }
-            MatrAXPY( n, nb, buffer, 0, v, vdelta1, x, ldx );
+            MatrAXPY( n, nb, ਬਫਰ, 0, v, vdelta1, x, ldx );
         }
     }
 }
 
-static void
-SVBkSb( int m, int n, const float* w, size_t wstep,
-        const float* u, size_t ustep, bool uT,
-        const float* v, size_t vstep, bool vT,
-        const float* b, size_t bstep, int nb,
-        float* x, size_t xstep, uchar* buffer )
+ਸਥਿਰ ਖਾਲੀ
+SVBkSb( ਪੂਰਨ m, ਪੂਰਨ n, ਅਚਲ ਦਸ਼ਮਲਵ* w, size_t wstep,
+        ਅਚਲ ਦਸ਼ਮਲਵ* u, size_t ustep, ਤਾਰਕਿਕ uT,
+        ਅਚਲ ਦਸ਼ਮਲਵ* v, size_t vstep, ਤਾਰਕਿਕ vT,
+        ਅਚਲ ਦਸ਼ਮਲਵ* b, size_t bstep, ਪੂਰਨ nb,
+        ਦਸ਼ਮਲਵ* x, size_t xstep, uchar* ਬਫਰ )
 {
-    SVBkSbImpl_(m, n, w, wstep ? (int)(wstep/sizeof(w[0])) : 1,
-                u, (int)(ustep/sizeof(u[0])), uT,
-                v, (int)(vstep/sizeof(v[0])), vT,
-                b, (int)(bstep/sizeof(b[0])), nb,
-                x, (int)(xstep/sizeof(x[0])),
-                (double*)alignPtr(buffer, sizeof(double)), (float)(DBL_EPSILON*2) );
+    SVBkSbImpl_(m, n, w, wstep ? (ਪੂਰਨ)(wstep/ਆਕਾਰ(w[0])) : 1,
+                u, (ਪੂਰਨ)(ustep/ਆਕਾਰ(u[0])), uT,
+                v, (ਪੂਰਨ)(vstep/ਆਕਾਰ(v[0])), vT,
+                b, (ਪੂਰਨ)(bstep/ਆਕਾਰ(b[0])), nb,
+                x, (ਪੂਰਨ)(xstep/ਆਕਾਰ(x[0])),
+                (ਦੁੱਗਣਾ*)alignPtr(ਬਫਰ, ਆਕਾਰ(ਦੁੱਗਣਾ)), (ਦਸ਼ਮਲਵ)(DBL_EPSILON*2) );
 }
 
-static void
-SVBkSb( int m, int n, const double* w, size_t wstep,
-       const double* u, size_t ustep, bool uT,
-       const double* v, size_t vstep, bool vT,
-       const double* b, size_t bstep, int nb,
-       double* x, size_t xstep, uchar* buffer )
+ਸਥਿਰ ਖਾਲੀ
+SVBkSb( ਪੂਰਨ m, ਪੂਰਨ n, ਅਚਲ ਦੁੱਗਣਾ* w, size_t wstep,
+       ਅਚਲ ਦੁੱਗਣਾ* u, size_t ustep, ਤਾਰਕਿਕ uT,
+       ਅਚਲ ਦੁੱਗਣਾ* v, size_t vstep, ਤਾਰਕਿਕ vT,
+       ਅਚਲ ਦੁੱਗਣਾ* b, size_t bstep, ਪੂਰਨ nb,
+       ਦੁੱਗਣਾ* x, size_t xstep, uchar* ਬਫਰ )
 {
-    SVBkSbImpl_(m, n, w, wstep ? (int)(wstep/sizeof(w[0])) : 1,
-                u, (int)(ustep/sizeof(u[0])), uT,
-                v, (int)(vstep/sizeof(v[0])), vT,
-                b, (int)(bstep/sizeof(b[0])), nb,
-                x, (int)(xstep/sizeof(x[0])),
-                (double*)alignPtr(buffer, sizeof(double)), DBL_EPSILON*2 );
+    SVBkSbImpl_(m, n, w, wstep ? (ਪੂਰਨ)(wstep/ਆਕਾਰ(w[0])) : 1,
+                u, (ਪੂਰਨ)(ustep/ਆਕਾਰ(u[0])), uT,
+                v, (ਪੂਰਨ)(vstep/ਆਕਾਰ(v[0])), vT,
+                b, (ਪੂਰਨ)(bstep/ਆਕਾਰ(b[0])), nb,
+                x, (ਪੂਰਨ)(xstep/ਆਕਾਰ(x[0])),
+                (ਦੁੱਗਣਾ*)alignPtr(ਬਫਰ, ਆਕਾਰ(ਦੁੱਗਣਾ)), DBL_EPSILON*2 );
 }
 
 /****************************************************************************************\
 *                                 Determinant of the matrix                              *
 \****************************************************************************************/
 
-#define det2(m)   ((double)m(0,0)*m(1,1) - (double)m(0,1)*m(1,0))
-#define det3(m)   (m(0,0)*((double)m(1,1)*m(2,2) - (double)m(1,2)*m(2,1)) -  \
-                   m(0,1)*((double)m(1,0)*m(2,2) - (double)m(1,2)*m(2,0)) +  \
-                   m(0,2)*((double)m(1,0)*m(2,1) - (double)m(1,1)*m(2,0)))
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ det2(m)   ((ਦੁੱਗਣਾ)m(0,0)*m(1,1) - (ਦੁੱਗਣਾ)m(0,1)*m(1,0))
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ det3(m)   (m(0,0)*((ਦੁੱਗਣਾ)m(1,1)*m(2,2) - (ਦੁੱਗਣਾ)m(1,2)*m(2,1)) -  \
+                   m(0,1)*((ਦੁੱਗਣਾ)m(1,0)*m(2,2) - (ਦੁੱਗਣਾ)m(1,2)*m(2,0)) +  \
+                   m(0,2)*((ਦੁੱਗਣਾ)m(1,0)*m(2,1) - (ਦੁੱਗਣਾ)m(1,1)*m(2,0)))
 
-double determinant( InputArray _mat )
+ਦੁੱਗਣਾ ਨਿਰਧਾਰਕ( ਨਿਵੇਸ਼_Array _mat )
 {
     CV_INSTRUMENT_REGION();
 
     Mat mat = _mat.getMat();
-    double result = 0;
-    int type = mat.type(), rows = mat.rows;
-    size_t step = mat.step;
-    const uchar* m = mat.ptr();
+    ਦੁੱਗਣਾ ਨਤੀਜਾ = 0;
+    ਪੂਰਨ type = mat.type(), ਪੰਕਤੀਆਂ = mat.ਪੰਕਤੀਆਂ;
+    size_t ਕਦਮ = mat.ਕਦਮ;
+    ਅਚਲ uchar* m = mat.ptr();
 
     CV_Assert( !mat.empty() );
-    CV_Assert( mat.rows == mat.cols && (type == CV_32F || type == CV_64F));
+    CV_Assert( mat.ਪੰਕਤੀਆਂ == mat.ਖਾਨੇ_ਗਿਣਤੀ && (type == CV_32F || type == CV_64F));
 
-    #define Mf(y, x) ((float*)(m + y*step))[x]
-    #define Md(y, x) ((double*)(m + y*step))[x]
+    #ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ Mf(y, x) ((ਦਸ਼ਮਲਵ*)(m + y*ਕਦਮ))[x]
+    #ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ Md(y, x) ((ਦੁੱਗਣਾ*)(m + y*ਕਦਮ))[x]
 
-    if( type == CV_32F )
+    ਜੇ( type == CV_32F )
     {
-        if( rows == 2 )
-            result = det2(Mf);
-        else if( rows == 3 )
-            result = det3(Mf);
-        else if( rows == 1 )
-            result = Mf(0,0);
-        else
+        ਜੇ( ਪੰਕਤੀਆਂ == 2 )
+            ਨਤੀਜਾ = det2(Mf);
+        ਨਹੀਂਤਾਂ ਜੇ( ਪੰਕਤੀਆਂ == 3 )
+            ਨਤੀਜਾ = det3(Mf);
+        ਨਹੀਂਤਾਂ ਜੇ( ਪੰਕਤੀਆਂ == 1 )
+            ਨਤੀਜਾ = Mf(0,0);
+        ਨਹੀਂਤਾਂ
         {
-            size_t bufSize = rows*rows*sizeof(float);
-            AutoBuffer<uchar> buffer(bufSize);
-            Mat a(rows, rows, CV_32F, buffer.data());
-            mat.copyTo(a);
+            size_t buf_ਮਾਪ = ਪੰਕਤੀਆਂ*ਪੰਕਤੀਆਂ*ਆਕਾਰ(ਦਸ਼ਮਲਵ);
+            Auto_ਬਫਰ<uchar> ਬਫਰ(buf_ਮਾਪ);
+            Mat a(ਪੰਕਤੀਆਂ, ਪੰਕਤੀਆਂ, CV_32F, ਬਫਰ.ਅੰਕੜੇ());
+            mat.copy_ਮੰਜ਼ਿਲ(a);
 
-            result = hal::LU32f(a.ptr<float>(), a.step, rows, 0, 0, 0);
-            if( result )
+            ਨਤੀਜਾ = hal::LU32f(a.ptr<ਦਸ਼ਮਲਵ>(), a.ਕਦਮ, ਪੰਕਤੀਆਂ, 0, 0, 0);
+            ਜੇ( ਨਤੀਜਾ )
             {
-                for( int i = 0; i < rows; i++ )
-                    result *= a.at<float>(i,i);
+                ਲਈ( ਪੂਰਨ i = 0; i < ਪੰਕਤੀਆਂ; i++ )
+                    ਨਤੀਜਾ *= a.at<ਦਸ਼ਮਲਵ>(i,i);
             }
         }
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
-        if( rows == 2 )
-            result = det2(Md);
-        else if( rows == 3 )
-            result = det3(Md);
-        else if( rows == 1 )
-            result = Md(0,0);
-        else
+        ਜੇ( ਪੰਕਤੀਆਂ == 2 )
+            ਨਤੀਜਾ = det2(Md);
+        ਨਹੀਂਤਾਂ ਜੇ( ਪੰਕਤੀਆਂ == 3 )
+            ਨਤੀਜਾ = det3(Md);
+        ਨਹੀਂਤਾਂ ਜੇ( ਪੰਕਤੀਆਂ == 1 )
+            ਨਤੀਜਾ = Md(0,0);
+        ਨਹੀਂਤਾਂ
         {
-            size_t bufSize = rows*rows*sizeof(double);
-            AutoBuffer<uchar> buffer(bufSize);
-            Mat a(rows, rows, CV_64F, buffer.data());
-            mat.copyTo(a);
+            size_t buf_ਮਾਪ = ਪੰਕਤੀਆਂ*ਪੰਕਤੀਆਂ*ਆਕਾਰ(ਦੁੱਗਣਾ);
+            Auto_ਬਫਰ<uchar> ਬਫਰ(buf_ਮਾਪ);
+            Mat a(ਪੰਕਤੀਆਂ, ਪੰਕਤੀਆਂ, CV_64F, ਬਫਰ.ਅੰਕੜੇ());
+            mat.copy_ਮੰਜ਼ਿਲ(a);
 
-            result = hal::LU64f(a.ptr<double>(), a.step, rows, 0, 0, 0);
-            if( result )
+            ਨਤੀਜਾ = hal::LU64f(a.ptr<ਦੁੱਗਣਾ>(), a.ਕਦਮ, ਪੰਕਤੀਆਂ, 0, 0, 0);
+            ਜੇ( ਨਤੀਜਾ )
             {
-                for( int i = 0; i < rows; i++ )
-                    result *= a.at<double>(i,i);
+                ਲਈ( ਪੂਰਨ i = 0; i < ਪੰਕਤੀਆਂ; i++ )
+                    ਨਤੀਜਾ *= a.at<ਦੁੱਗਣਾ>(i,i);
             }
         }
     }
 
-    #undef Mf
-    #undef Md
+    #ਪਰਿਭਾਸ਼ਾ_ਰੱਦ Mf
+    #ਪਰਿਭਾਸ਼ਾ_ਰੱਦ Md
 
-    return result;
+    ਵਾਪਸ ਨਤੀਜਾ;
 }
 
 /****************************************************************************************\
 *                          Inverse (or pseudo-inverse) of a matrix                       *
 \****************************************************************************************/
 
-#define Sf( y, x ) ((float*)(srcdata + y*srcstep))[x]
-#define Sd( y, x ) ((double*)(srcdata + y*srcstep))[x]
-#define Df( y, x ) ((float*)(dstdata + y*dststep))[x]
-#define Dd( y, x ) ((double*)(dstdata + y*dststep))[x]
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ Sf( y, x ) ((ਦਸ਼ਮਲਵ*)(srcdata + y*srcstep))[x]
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ Sd( y, x ) ((ਦੁੱਗਣਾ*)(srcdata + y*srcstep))[x]
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ Df( y, x ) ((ਦਸ਼ਮਲਵ*)(dstdata + y*dststep))[x]
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ Dd( y, x ) ((ਦੁੱਗਣਾ*)(dstdata + y*dststep))[x]
 
-double invert( InputArray _src, OutputArray _dst, int method )
+ਦੁੱਗਣਾ invert( ਨਿਵੇਸ਼_Array _src, OutputArray _dst, ਪੂਰਨ ਵਿਧੀ )
 {
     CV_INSTRUMENT_REGION();
 
-    bool result = false;
+    ਤਾਰਕਿਕ ਨਤੀਜਾ = ਝੂਠ;
     Mat src = _src.getMat();
-    int type = src.type();
+    ਪੂਰਨ type = src.type();
 
     CV_Assert(type == CV_32F || type == CV_64F);
 
-    size_t esz = CV_ELEM_SIZE(type);
-    int m = src.rows, n = src.cols;
+    size_t esz = CV_ELEM_ਮਾਪ(type);
+    ਪੂਰਨ m = src.ਪੰਕਤੀਆਂ, n = src.ਖਾਨੇ_ਗਿਣਤੀ;
 
-    if( method == DECOMP_SVD )
+    ਜੇ( ਵਿਧੀ == DECOMP_SVD )
     {
-        int nm = std::min(m, n);
+        ਪੂਰਨ nm = std::min(m, n);
 
-        AutoBuffer<uchar> _buf((m*nm + nm + nm*n)*esz + sizeof(double));
-        uchar* buf = alignPtr((uchar*)_buf.data(), (int)esz);
+        Auto_ਬਫਰ<uchar> _buf((m*nm + nm + nm*n)*esz + ਆਕਾਰ(ਦੁੱਗਣਾ));
+        uchar* buf = alignPtr((uchar*)_buf.ਅੰਕੜੇ(), (ਪੂਰਨ)esz);
         Mat u(m, nm, type, buf);
         Mat w(nm, 1, type, u.ptr() + m*nm*esz);
         Mat vt(nm, n, type, w.ptr() + nm*esz);
 
         SVD::compute(src, w, u, vt);
-        SVD::backSubst(w, u, vt, Mat(), _dst);
-        return type == CV_32F ?
-            (w.ptr<float>()[0] >= FLT_EPSILON ?
-             w.ptr<float>()[n-1]/w.ptr<float>()[0] : 0) :
-            (w.ptr<double>()[0] >= DBL_EPSILON ?
-             w.ptr<double>()[n-1]/w.ptr<double>()[0] : 0);
+        SVD::ਪਿੱਠ_Subst(w, u, vt, Mat(), _dst);
+        ਵਾਪਸ type == CV_32F ?
+            (w.ptr<ਦਸ਼ਮਲਵ>()[0] >= FLT_EPSILON ?
+             w.ptr<ਦਸ਼ਮਲਵ>()[n-1]/w.ptr<ਦਸ਼ਮਲਵ>()[0] : 0) :
+            (w.ptr<ਦੁੱਗਣਾ>()[0] >= DBL_EPSILON ?
+             w.ptr<ਦੁੱਗਣਾ>()[n-1]/w.ptr<ਦੁੱਗਣਾ>()[0] : 0);
     }
 
     CV_Assert( m == n );
 
-    if( method == DECOMP_EIG )
+    ਜੇ( ਵਿਧੀ == DECOMP_EIG )
     {
-        AutoBuffer<uchar> _buf((n*n*2 + n)*esz + sizeof(double));
-        uchar* buf = alignPtr((uchar*)_buf.data(), (int)esz);
+        Auto_ਬਫਰ<uchar> _buf((n*n*2 + n)*esz + ਆਕਾਰ(ਦੁੱਗਣਾ));
+        uchar* buf = alignPtr((uchar*)_buf.ਅੰਕੜੇ(), (ਪੂਰਨ)esz);
         Mat u(n, n, type, buf);
         Mat w(n, 1, type, u.ptr() + n*n*esz);
         Mat vt(n, n, type, w.ptr() + n*esz);
 
         eigen(src, w, vt);
         transpose(vt, u);
-        SVD::backSubst(w, u, vt, Mat(), _dst);
-        return type == CV_32F ?
-        (w.ptr<float>()[0] >= FLT_EPSILON ?
-         w.ptr<float>()[n-1]/w.ptr<float>()[0] : 0) :
-        (w.ptr<double>()[0] >= DBL_EPSILON ?
-         w.ptr<double>()[n-1]/w.ptr<double>()[0] : 0);
+        SVD::ਪਿੱਠ_Subst(w, u, vt, Mat(), _dst);
+        ਵਾਪਸ type == CV_32F ?
+        (w.ptr<ਦਸ਼ਮਲਵ>()[0] >= FLT_EPSILON ?
+         w.ptr<ਦਸ਼ਮਲਵ>()[n-1]/w.ptr<ਦਸ਼ਮਲਵ>()[0] : 0) :
+        (w.ptr<ਦੁੱਗਣਾ>()[0] >= DBL_EPSILON ?
+         w.ptr<ਦੁੱਗਣਾ>()[n-1]/w.ptr<ਦੁੱਗਣਾ>()[0] : 0);
     }
 
-    CV_Assert( method == DECOMP_LU || method == DECOMP_CHOLESKY );
+    CV_Assert( ਵਿਧੀ == DECOMP_LU || ਵਿਧੀ == DECOMP_CHOLESKY );
 
     _dst.create( n, n, type );
     Mat dst = _dst.getMat();
 
-    if( n <= 3 )
+    ਜੇ( n <= 3 )
     {
-        const uchar* srcdata = src.ptr();
+        ਅਚਲ uchar* srcdata = src.ptr();
         uchar* dstdata = dst.ptr();
-        size_t srcstep = src.step;
-        size_t dststep = dst.step;
+        size_t srcstep = src.ਕਦਮ;
+        size_t dststep = dst.ਕਦਮ;
 
-        if( n == 2 )
+        ਜੇ( n == 2 )
         {
-            if( type == CV_32FC1 )
+            ਜੇ( type == CV_32FC1 )
             {
-                double d = det2(Sf);
-                if( d != 0. )
+                ਦੁੱਗਣਾ d = det2(Sf);
+                ਜੇ( d != 0. )
                 {
-                    result = true;
+                    ਨਤੀਜਾ = ਸੱਚ;
                     d = 1./d;
-                #if CV_SIMD128
-                    const float d_32f = (float)d;
-                    const v_float32x4 d_vec(d_32f, -d_32f, -d_32f, d_32f);
-                    v_float32x4 s0 = v_mul(v_load_halves((const float *)srcdata, (const float *)(srcdata + srcstep)), d_vec);//0123//3120
-                    s0 = v_extract<3>(s0, v_combine_low(v_rotate_right<1>(s0), s0));
-                    v_store_low((float*)dstdata, s0);
-                    v_store_high((float*)(dstdata + dststep), s0);
-                #else
-                    double t0, t1;
+                #ਜੇ CV_SIMD128
+                    ਅਚਲ ਦਸ਼ਮਲਵ d_32f = (ਦਸ਼ਮਲਵ)d;
+                    ਅਚਲ v_float32x4 d_vec(d_32f, -d_32f, -d_32f, d_32f);
+                    v_float32x4 s0 = v_mul(v_ਲੱਦੋ_halves((ਅਚਲ ਦਸ਼ਮਲਵ *)srcdata, (ਅਚਲ ਦਸ਼ਮਲਵ *)(srcdata + srcstep)), d_vec);//0123//3120
+                    s0 = v_ਕੱਢੋ<3>(s0, v_combine_ਨੀਵਾਂ(v_rotate_ਸੱਜਾ<1>(s0), s0));
+                    v_store_ਨੀਵਾਂ((ਦਸ਼ਮਲਵ*)dstdata, s0);
+                    v_store_ਉੱਚਾ((ਦਸ਼ਮਲਵ*)(dstdata + dststep), s0);
+                #ਨਹੀਂਤਾਂ
+                    ਦੁੱਗਣਾ t0, t1;
                     t0 = Sf(0,0)*d;
                     t1 = Sf(1,1)*d;
-                    Df(1,1) = (float)t0;
-                    Df(0,0) = (float)t1;
+                    Df(1,1) = (ਦਸ਼ਮਲਵ)t0;
+                    Df(0,0) = (ਦਸ਼ਮਲਵ)t1;
                     t0 = -Sf(0,1)*d;
                     t1 = -Sf(1,0)*d;
-                    Df(0,1) = (float)t0;
-                    Df(1,0) = (float)t1;
-                #endif
+                    Df(0,1) = (ਦਸ਼ਮਲਵ)t0;
+                    Df(1,0) = (ਦਸ਼ਮਲਵ)t1;
+                #ਜੇ_ਅੰਤ
                 }
             }
-            else
+            ਨਹੀਂਤਾਂ
             {
-                double d = det2(Sd);
-                if( d != 0. )
+                ਦੁੱਗਣਾ d = det2(Sd);
+                ਜੇ( d != 0. )
                 {
-                    result = true;
+                    ਨਤੀਜਾ = ਸੱਚ;
                     d = 1./d;
-                #if CV_SIMD128_64F
+                #ਜੇ CV_SIMD128_64F
                     v_float64x2 det = v_setall_f64(d);
-                    v_float64x2 s0 = v_mul(v_load((const double *)srcdata), det);
-                    v_float64x2 s1 = v_mul(v_load((const double *)(srcdata + srcstep)), det);
-                    v_float64x2 sm = v_extract<1>(s1, s0);//30
-                    v_float64x2 ss = v_sub(v_setall<double>(0), v_extract<1>(s0, s1));//12
-                    v_store((double*)dstdata, v_combine_low(sm, ss));//31
-                    v_store((double*)(dstdata + dststep), v_combine_high(ss, sm));//20
-                #else
-                    double t0, t1;
+                    v_float64x2 s0 = v_mul(v_ਲੱਦੋ((ਅਚਲ ਦੁੱਗਣਾ *)srcdata), det);
+                    v_float64x2 s1 = v_mul(v_ਲੱਦੋ((ਅਚਲ ਦੁੱਗਣਾ *)(srcdata + srcstep)), det);
+                    v_float64x2 sm = v_ਕੱਢੋ<1>(s1, s0);//30
+                    v_float64x2 ss = v_sub(v_setall<ਦੁੱਗਣਾ>(0), v_ਕੱਢੋ<1>(s0, s1));//12
+                    v_store((ਦੁੱਗਣਾ*)dstdata, v_combine_ਨੀਵਾਂ(sm, ss));//31
+                    v_store((ਦੁੱਗਣਾ*)(dstdata + dststep), v_combine_ਉੱਚਾ(ss, sm));//20
+                #ਨਹੀਂਤਾਂ
+                    ਦੁੱਗਣਾ t0, t1;
                     t0 = Sd(0,0)*d;
                     t1 = Sd(1,1)*d;
                     Dd(1,1) = t0;
@@ -904,47 +904,47 @@ double invert( InputArray _src, OutputArray _dst, int method )
                     t1 = -Sd(1,0)*d;
                     Dd(0,1) = t0;
                     Dd(1,0) = t1;
-                #endif
+                #ਜੇ_ਅੰਤ
                 }
             }
         }
-        else if( n == 3 )
+        ਨਹੀਂਤਾਂ ਜੇ( n == 3 )
         {
-            if( type == CV_32FC1 )
+            ਜੇ( type == CV_32FC1 )
             {
-                double d = det3(Sf);
+                ਦੁੱਗਣਾ d = det3(Sf);
 
-                if( d != 0. )
+                ਜੇ( d != 0. )
                 {
-                    double t[12];
+                    ਦੁੱਗਣਾ t[12];
 
-                    result = true;
+                    ਨਤੀਜਾ = ਸੱਚ;
                     d = 1./d;
-                    t[0] = (((double)Sf(1,1) * Sf(2,2) - (double)Sf(1,2) * Sf(2,1)) * d);
-                    t[1] = (((double)Sf(0,2) * Sf(2,1) - (double)Sf(0,1) * Sf(2,2)) * d);
-                    t[2] = (((double)Sf(0,1) * Sf(1,2) - (double)Sf(0,2) * Sf(1,1)) * d);
+                    t[0] = (((ਦੁੱਗਣਾ)Sf(1,1) * Sf(2,2) - (ਦੁੱਗਣਾ)Sf(1,2) * Sf(2,1)) * d);
+                    t[1] = (((ਦੁੱਗਣਾ)Sf(0,2) * Sf(2,1) - (ਦੁੱਗਣਾ)Sf(0,1) * Sf(2,2)) * d);
+                    t[2] = (((ਦੁੱਗਣਾ)Sf(0,1) * Sf(1,2) - (ਦੁੱਗਣਾ)Sf(0,2) * Sf(1,1)) * d);
 
-                    t[3] = (((double)Sf(1,2) * Sf(2,0) - (double)Sf(1,0) * Sf(2,2)) * d);
-                    t[4] = (((double)Sf(0,0) * Sf(2,2) - (double)Sf(0,2) * Sf(2,0)) * d);
-                    t[5] = (((double)Sf(0,2) * Sf(1,0) - (double)Sf(0,0) * Sf(1,2)) * d);
+                    t[3] = (((ਦੁੱਗਣਾ)Sf(1,2) * Sf(2,0) - (ਦੁੱਗਣਾ)Sf(1,0) * Sf(2,2)) * d);
+                    t[4] = (((ਦੁੱਗਣਾ)Sf(0,0) * Sf(2,2) - (ਦੁੱਗਣਾ)Sf(0,2) * Sf(2,0)) * d);
+                    t[5] = (((ਦੁੱਗਣਾ)Sf(0,2) * Sf(1,0) - (ਦੁੱਗਣਾ)Sf(0,0) * Sf(1,2)) * d);
 
-                    t[6] = (((double)Sf(1,0) * Sf(2,1) - (double)Sf(1,1) * Sf(2,0)) * d);
-                    t[7] = (((double)Sf(0,1) * Sf(2,0) - (double)Sf(0,0) * Sf(2,1)) * d);
-                    t[8] = (((double)Sf(0,0) * Sf(1,1) - (double)Sf(0,1) * Sf(1,0)) * d);
+                    t[6] = (((ਦੁੱਗਣਾ)Sf(1,0) * Sf(2,1) - (ਦੁੱਗਣਾ)Sf(1,1) * Sf(2,0)) * d);
+                    t[7] = (((ਦੁੱਗਣਾ)Sf(0,1) * Sf(2,0) - (ਦੁੱਗਣਾ)Sf(0,0) * Sf(2,1)) * d);
+                    t[8] = (((ਦੁੱਗਣਾ)Sf(0,0) * Sf(1,1) - (ਦੁੱਗਣਾ)Sf(0,1) * Sf(1,0)) * d);
 
-                    Df(0,0) = (float)t[0]; Df(0,1) = (float)t[1]; Df(0,2) = (float)t[2];
-                    Df(1,0) = (float)t[3]; Df(1,1) = (float)t[4]; Df(1,2) = (float)t[5];
-                    Df(2,0) = (float)t[6]; Df(2,1) = (float)t[7]; Df(2,2) = (float)t[8];
+                    Df(0,0) = (ਦਸ਼ਮਲਵ)t[0]; Df(0,1) = (ਦਸ਼ਮਲਵ)t[1]; Df(0,2) = (ਦਸ਼ਮਲਵ)t[2];
+                    Df(1,0) = (ਦਸ਼ਮਲਵ)t[3]; Df(1,1) = (ਦਸ਼ਮਲਵ)t[4]; Df(1,2) = (ਦਸ਼ਮਲਵ)t[5];
+                    Df(2,0) = (ਦਸ਼ਮਲਵ)t[6]; Df(2,1) = (ਦਸ਼ਮਲਵ)t[7]; Df(2,2) = (ਦਸ਼ਮਲਵ)t[8];
                 }
             }
-            else
+            ਨਹੀਂਤਾਂ
             {
-                double d = det3(Sd);
-                if( d != 0. )
+                ਦੁੱਗਣਾ d = det3(Sd);
+                ਜੇ( d != 0. )
                 {
-                    result = true;
+                    ਨਤੀਜਾ = ਸੱਚ;
                     d = 1./d;
-                    double t[9];
+                    ਦੁੱਗਣਾ t[9];
 
                     t[0] = (Sd(1,1) * Sd(2,2) - Sd(1,2) * Sd(2,1)) * d;
                     t[1] = (Sd(0,2) * Sd(2,1) - Sd(0,1) * Sd(2,2)) * d;
@@ -964,60 +964,60 @@ double invert( InputArray _src, OutputArray _dst, int method )
                 }
             }
         }
-        else
+        ਨਹੀਂਤਾਂ
         {
             CV_Assert( n == 1 );
 
-            if( type == CV_32FC1 )
+            ਜੇ( type == CV_32FC1 )
             {
-                double d = Sf(0,0);
-                if( d != 0. )
+                ਦੁੱਗਣਾ d = Sf(0,0);
+                ਜੇ( d != 0. )
                 {
-                    result = true;
-                    Df(0,0) = (float)(1./d);
+                    ਨਤੀਜਾ = ਸੱਚ;
+                    Df(0,0) = (ਦਸ਼ਮਲਵ)(1./d);
                 }
             }
-            else
+            ਨਹੀਂਤਾਂ
             {
-                double d = Sd(0,0);
-                if( d != 0. )
+                ਦੁੱਗਣਾ d = Sd(0,0);
+                ਜੇ( d != 0. )
                 {
-                    result = true;
+                    ਨਤੀਜਾ = ਸੱਚ;
                     Dd(0,0) = 1./d;
                 }
             }
         }
-        if( !result )
+        ਜੇ( !ਨਤੀਜਾ )
             dst = Scalar(0);
-        return result;
+        ਵਾਪਸ ਨਤੀਜਾ;
     }
 
-   int elem_size = CV_ELEM_SIZE(type);
-    AutoBuffer<uchar> buf(n*n*elem_size);
-    Mat src1(n, n, type, buf.data());
-    src.copyTo(src1);
-    setIdentity(dst);
+   ਪੂਰਨ elem_ਮਾਪ_2 = CV_ELEM_ਮਾਪ(type);
+    Auto_ਬਫਰ<uchar> buf(n*n*elem_ਮਾਪ_2);
+    Mat src1(n, n, type, buf.ਅੰਕੜੇ());
+    src.copy_ਮੰਜ਼ਿਲ(src1);
+    ਸੈੱਟ_ਪਛਾਣ_ਤੱਤ(dst);
 
-    if( method == DECOMP_LU && type == CV_32F )
-        result = hal::LU32f(src1.ptr<float>(), src1.step, n, dst.ptr<float>(), dst.step, n) != 0;
-    else if( method == DECOMP_LU && type == CV_64F )
-        result = hal::LU64f(src1.ptr<double>(), src1.step, n, dst.ptr<double>(), dst.step, n) != 0;
-    else if( method == DECOMP_CHOLESKY && type == CV_32F )
-        result = hal::Cholesky32f(src1.ptr<float>(), src1.step, n, dst.ptr<float>(), dst.step, n);
-    else
-        result = hal::Cholesky64f(src1.ptr<double>(), src1.step, n, dst.ptr<double>(), dst.step, n);
+    ਜੇ( ਵਿਧੀ == DECOMP_LU && type == CV_32F )
+        ਨਤੀਜਾ = hal::LU32f(src1.ptr<ਦਸ਼ਮਲਵ>(), src1.ਕਦਮ, n, dst.ptr<ਦਸ਼ਮਲਵ>(), dst.ਕਦਮ, n) != 0;
+    ਨਹੀਂਤਾਂ ਜੇ( ਵਿਧੀ == DECOMP_LU && type == CV_64F )
+        ਨਤੀਜਾ = hal::LU64f(src1.ptr<ਦੁੱਗਣਾ>(), src1.ਕਦਮ, n, dst.ptr<ਦੁੱਗਣਾ>(), dst.ਕਦਮ, n) != 0;
+    ਨਹੀਂਤਾਂ ਜੇ( ਵਿਧੀ == DECOMP_CHOLESKY && type == CV_32F )
+        ਨਤੀਜਾ = hal::Cholesky32f(src1.ptr<ਦਸ਼ਮਲਵ>(), src1.ਕਦਮ, n, dst.ptr<ਦਸ਼ਮਲਵ>(), dst.ਕਦਮ, n);
+    ਨਹੀਂਤਾਂ
+        ਨਤੀਜਾ = hal::Cholesky64f(src1.ptr<ਦੁੱਗਣਾ>(), src1.ਕਦਮ, n, dst.ptr<ਦੁੱਗਣਾ>(), dst.ਕਦਮ, n);
 
-    if( !result )
+    ਜੇ( !ਨਤੀਜਾ )
         dst = Scalar(0);
 
-    return result;
+    ਵਾਪਸ ਨਤੀਜਾ;
 }
 
-UMat UMat::inv(int method) const
+UMat UMat::inv(ਪੂਰਨ ਵਿਧੀ) ਅਚਲ
 {
     UMat m;
-    invert(*this, m, method);
-    return m;
+    invert(*ਇਹ, m, ਵਿਧੀ);
+    ਵਾਪਸ m;
 }
 
 
@@ -1025,110 +1025,110 @@ UMat UMat::inv(int method) const
 *                              Solving a linear system                                   *
 \****************************************************************************************/
 
-bool solve( InputArray _src, InputArray _src2arg, OutputArray _dst, int method )
+ਤਾਰਕਿਕ solve( ਨਿਵੇਸ਼_Array _src, ਨਿਵੇਸ਼_Array _src2arg, OutputArray _dst, ਪੂਰਨ ਵਿਧੀ )
 {
     CV_INSTRUMENT_REGION();
 
-    bool result = true;
+    ਤਾਰਕਿਕ ਨਤੀਜਾ = ਸੱਚ;
     Mat src = _src.getMat(), _src2 = _src2arg.getMat();
-    int type = src.type();
-    bool is_normal = (method & DECOMP_NORMAL) != 0;
+    ਪੂਰਨ type = src.type();
+    ਤਾਰਕਿਕ is_ਸਾਧਾਰਨ = (ਵਿਧੀ & DECOMP_ਸਾਧਾਰਨ) != 0;
 
     CV_Assert( type == _src2.type() && (type == CV_32F || type == CV_64F) );
 
-    method &= ~DECOMP_NORMAL;
-    CV_Check(method, method == DECOMP_LU || method == DECOMP_SVD || method == DECOMP_EIG ||
-                     method == DECOMP_CHOLESKY || method == DECOMP_QR,
+    ਵਿਧੀ &= ~DECOMP_ਸਾਧਾਰਨ;
+    CV_Check(ਵਿਧੀ, ਵਿਧੀ == DECOMP_LU || ਵਿਧੀ == DECOMP_SVD || ਵਿਧੀ == DECOMP_EIG ||
+                     ਵਿਧੀ == DECOMP_CHOLESKY || ਵਿਧੀ == DECOMP_QR,
              "Unsupported method, see #DecompTypes");
-    CV_Assert( (method != DECOMP_LU && method != DECOMP_CHOLESKY) ||
-        is_normal || src.rows == src.cols );
+    CV_Assert( (ਵਿਧੀ != DECOMP_LU && ਵਿਧੀ != DECOMP_CHOLESKY) ||
+        is_ਸਾਧਾਰਨ || src.ਪੰਕਤੀਆਂ == src.ਖਾਨੇ_ਗਿਣਤੀ );
 
     // check case of a single equation and small matrix
-    if( (method == DECOMP_LU || method == DECOMP_CHOLESKY) && !is_normal &&
-        src.rows <= 3 && src.rows == src.cols && _src2.cols == 1 )
+    ਜੇ( (ਵਿਧੀ == DECOMP_LU || ਵਿਧੀ == DECOMP_CHOLESKY) && !is_ਸਾਧਾਰਨ &&
+        src.ਪੰਕਤੀਆਂ <= 3 && src.ਪੰਕਤੀਆਂ == src.ਖਾਨੇ_ਗਿਣਤੀ && _src2.ਖਾਨੇ_ਗਿਣਤੀ == 1 )
     {
-        _dst.create( src.cols, _src2.cols, src.type() );
+        _dst.create( src.ਖਾਨੇ_ਗਿਣਤੀ, _src2.ਖਾਨੇ_ਗਿਣਤੀ, src.type() );
         Mat dst = _dst.getMat();
 
-        #define bf(y) ((float*)(bdata + y*src2step))[0]
-        #define bd(y) ((double*)(bdata + y*src2step))[0]
+        #ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ bf(y) ((ਦਸ਼ਮਲਵ*)(bdata + y*src2step))[0]
+        #ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ bd(y) ((ਦੁੱਗਣਾ*)(bdata + y*src2step))[0]
 
-        const uchar* srcdata = src.ptr();
-        const uchar* bdata = _src2.ptr();
+        ਅਚਲ uchar* srcdata = src.ptr();
+        ਅਚਲ uchar* bdata = _src2.ptr();
         uchar* dstdata = dst.ptr();
-        size_t srcstep = src.step;
-        size_t src2step = _src2.step;
-        size_t dststep = dst.step;
+        size_t srcstep = src.ਕਦਮ;
+        size_t src2step = _src2.ਕਦਮ;
+        size_t dststep = dst.ਕਦਮ;
 
-        if( src.rows == 2 )
+        ਜੇ( src.ਪੰਕਤੀਆਂ == 2 )
         {
-            if( type == CV_32FC1 )
+            ਜੇ( type == CV_32FC1 )
             {
-                double d = det2(Sf);
-                if( d != 0. )
+                ਦੁੱਗਣਾ d = det2(Sf);
+                ਜੇ( d != 0. )
                 {
-                    double t;
+                    ਦੁੱਗਣਾ t;
                     d = 1./d;
-                    t = (float)(((double)bf(0)*Sf(1,1) - (double)bf(1)*Sf(0,1))*d);
-                    Df(1,0) = (float)(((double)bf(1)*Sf(0,0) - (double)bf(0)*Sf(1,0))*d);
-                    Df(0,0) = (float)t;
+                    t = (ਦਸ਼ਮਲਵ)(((ਦੁੱਗਣਾ)bf(0)*Sf(1,1) - (ਦੁੱਗਣਾ)bf(1)*Sf(0,1))*d);
+                    Df(1,0) = (ਦਸ਼ਮਲਵ)(((ਦੁੱਗਣਾ)bf(1)*Sf(0,0) - (ਦੁੱਗਣਾ)bf(0)*Sf(1,0))*d);
+                    Df(0,0) = (ਦਸ਼ਮਲਵ)t;
                 }
-                else
-                    result = false;
+                ਨਹੀਂਤਾਂ
+                    ਨਤੀਜਾ = ਝੂਠ;
             }
-            else
+            ਨਹੀਂਤਾਂ
             {
-                double d = det2(Sd);
-                if( d != 0. )
+                ਦੁੱਗਣਾ d = det2(Sd);
+                ਜੇ( d != 0. )
                 {
-                    double t;
+                    ਦੁੱਗਣਾ t;
                     d = 1./d;
                     t = (bd(0)*Sd(1,1) - bd(1)*Sd(0,1))*d;
                     Dd(1,0) = (bd(1)*Sd(0,0) - bd(0)*Sd(1,0))*d;
                     Dd(0,0) = t;
                 }
-                else
-                    result = false;
+                ਨਹੀਂਤਾਂ
+                    ਨਤੀਜਾ = ਝੂਠ;
             }
         }
-        else if( src.rows == 3 )
+        ਨਹੀਂਤਾਂ ਜੇ( src.ਪੰਕਤੀਆਂ == 3 )
         {
-            if( type == CV_32FC1 )
+            ਜੇ( type == CV_32FC1 )
             {
-                double d = det3(Sf);
-                if( d != 0. )
+                ਦੁੱਗਣਾ d = det3(Sf);
+                ਜੇ( d != 0. )
                 {
-                    float t[3];
+                    ਦਸ਼ਮਲਵ t[3];
                     d = 1./d;
 
-                    t[0] = (float)(d*
-                           (bf(0)*((double)Sf(1,1)*Sf(2,2) - (double)Sf(1,2)*Sf(2,1)) -
-                            Sf(0,1)*((double)bf(1)*Sf(2,2) - (double)Sf(1,2)*bf(2)) +
-                            Sf(0,2)*((double)bf(1)*Sf(2,1) - (double)Sf(1,1)*bf(2))));
+                    t[0] = (ਦਸ਼ਮਲਵ)(d*
+                           (bf(0)*((ਦੁੱਗਣਾ)Sf(1,1)*Sf(2,2) - (ਦੁੱਗਣਾ)Sf(1,2)*Sf(2,1)) -
+                            Sf(0,1)*((ਦੁੱਗਣਾ)bf(1)*Sf(2,2) - (ਦੁੱਗਣਾ)Sf(1,2)*bf(2)) +
+                            Sf(0,2)*((ਦੁੱਗਣਾ)bf(1)*Sf(2,1) - (ਦੁੱਗਣਾ)Sf(1,1)*bf(2))));
 
-                    t[1] = (float)(d*
-                           (Sf(0,0)*(double)(bf(1)*Sf(2,2) - (double)Sf(1,2)*bf(2)) -
-                            bf(0)*((double)Sf(1,0)*Sf(2,2) - (double)Sf(1,2)*Sf(2,0)) +
-                            Sf(0,2)*((double)Sf(1,0)*bf(2) - (double)bf(1)*Sf(2,0))));
+                    t[1] = (ਦਸ਼ਮਲਵ)(d*
+                           (Sf(0,0)*(ਦੁੱਗਣਾ)(bf(1)*Sf(2,2) - (ਦੁੱਗਣਾ)Sf(1,2)*bf(2)) -
+                            bf(0)*((ਦੁੱਗਣਾ)Sf(1,0)*Sf(2,2) - (ਦੁੱਗਣਾ)Sf(1,2)*Sf(2,0)) +
+                            Sf(0,2)*((ਦੁੱਗਣਾ)Sf(1,0)*bf(2) - (ਦੁੱਗਣਾ)bf(1)*Sf(2,0))));
 
-                    t[2] = (float)(d*
-                           (Sf(0,0)*((double)Sf(1,1)*bf(2) - (double)bf(1)*Sf(2,1)) -
-                            Sf(0,1)*((double)Sf(1,0)*bf(2) - (double)bf(1)*Sf(2,0)) +
-                            bf(0)*((double)Sf(1,0)*Sf(2,1) - (double)Sf(1,1)*Sf(2,0))));
+                    t[2] = (ਦਸ਼ਮਲਵ)(d*
+                           (Sf(0,0)*((ਦੁੱਗਣਾ)Sf(1,1)*bf(2) - (ਦੁੱਗਣਾ)bf(1)*Sf(2,1)) -
+                            Sf(0,1)*((ਦੁੱਗਣਾ)Sf(1,0)*bf(2) - (ਦੁੱਗਣਾ)bf(1)*Sf(2,0)) +
+                            bf(0)*((ਦੁੱਗਣਾ)Sf(1,0)*Sf(2,1) - (ਦੁੱਗਣਾ)Sf(1,1)*Sf(2,0))));
 
                     Df(0,0) = t[0];
                     Df(1,0) = t[1];
                     Df(2,0) = t[2];
                 }
-                else
-                    result = false;
+                ਨਹੀਂਤਾਂ
+                    ਨਤੀਜਾ = ਝੂਠ;
             }
-            else
+            ਨਹੀਂਤਾਂ
             {
-                double d = det3(Sd);
-                if( d != 0. )
+                ਦੁੱਗਣਾ d = det3(Sd);
+                ਜੇ( d != 0. )
                 {
-                    double t[9];
+                    ਦੁੱਗਣਾ t[9];
 
                     d = 1./d;
 
@@ -1148,92 +1148,92 @@ bool solve( InputArray _src, InputArray _src2arg, OutputArray _dst, int method )
                     Dd(1,0) = t[1];
                     Dd(2,0) = t[2];
                 }
-                else
-                    result = false;
+                ਨਹੀਂਤਾਂ
+                    ਨਤੀਜਾ = ਝੂਠ;
             }
         }
-        else
+        ਨਹੀਂਤਾਂ
         {
-            CV_Assert( src.rows == 1 );
+            CV_Assert( src.ਪੰਕਤੀਆਂ == 1 );
 
-            if( type == CV_32FC1 )
+            ਜੇ( type == CV_32FC1 )
             {
-                double d = Sf(0,0);
-                if( d != 0. )
-                    Df(0,0) = (float)(bf(0)/d);
-                else
-                    result = false;
+                ਦੁੱਗਣਾ d = Sf(0,0);
+                ਜੇ( d != 0. )
+                    Df(0,0) = (ਦਸ਼ਮਲਵ)(bf(0)/d);
+                ਨਹੀਂਤਾਂ
+                    ਨਤੀਜਾ = ਝੂਠ;
             }
-            else
+            ਨਹੀਂਤਾਂ
             {
-                double d = Sd(0,0);
-                if( d != 0. )
+                ਦੁੱਗਣਾ d = Sd(0,0);
+                ਜੇ( d != 0. )
                     Dd(0,0) = (bd(0)/d);
-                else
-                    result = false;
+                ਨਹੀਂਤਾਂ
+                    ਨਤੀਜਾ = ਝੂਠ;
             }
         }
-        return result;
+        ਵਾਪਸ ਨਤੀਜਾ;
     }
 
-    int m = src.rows, m_ = m, n = src.cols, nb = _src2.cols;
-    size_t esz = CV_ELEM_SIZE(type), bufsize = 0;
-    size_t vstep = alignSize(n*esz, 16);
-    size_t astep = method == DECOMP_SVD && !is_normal ? alignSize(m*esz, 16) : vstep;
-    AutoBuffer<uchar> buffer;
+    ਪੂਰਨ m = src.ਪੰਕਤੀਆਂ, m_ = m, n = src.ਖਾਨੇ_ਗਿਣਤੀ, nb = _src2.ਖਾਨੇ_ਗਿਣਤੀ;
+    size_t esz = CV_ELEM_ਮਾਪ(type), bufsize = 0;
+    size_t vstep = align_ਮਾਪ(n*esz, 16);
+    size_t astep = ਵਿਧੀ == DECOMP_SVD && !is_ਸਾਧਾਰਨ ? align_ਮਾਪ(m*esz, 16) : vstep;
+    Auto_ਬਫਰ<uchar> ਬਫਰ;
 
     Mat src2 = _src2;
-    _dst.create( src.cols, src2.cols, src.type() );
+    _dst.create( src.ਖਾਨੇ_ਗਿਣਤੀ, src2.ਖਾਨੇ_ਗਿਣਤੀ, src.type() );
     Mat dst = _dst.getMat();
 
-    if( m < n )
+    ਜੇ( m < n )
         CV_Error(cv::Error::StsBadArg, "The function can not solve under-determined linear systems" );
 
-    if( m == n )
-        is_normal = false;
-    else if( is_normal )
+    ਜੇ( m == n )
+        is_ਸਾਧਾਰਨ = ਝੂਠ;
+    ਨਹੀਂਤਾਂ ਜੇ( is_ਸਾਧਾਰਨ )
     {
         m_ = n;
-        if( method == DECOMP_SVD )
-            method = DECOMP_EIG;
+        ਜੇ( ਵਿਧੀ == DECOMP_SVD )
+            ਵਿਧੀ = DECOMP_EIG;
     }
 
-    CV_Assert(m == src2.rows);
-    size_t asize = astep*(method == DECOMP_SVD || is_normal ? n : m);
+    CV_Assert(m == src2.ਪੰਕਤੀਆਂ);
+    size_t asize = astep*(ਵਿਧੀ == DECOMP_SVD || is_ਸਾਧਾਰਨ ? n : m);
     bufsize += asize + 32;
 
-    if( is_normal )
+    ਜੇ( is_ਸਾਧਾਰਨ )
         bufsize += n*nb*esz;
-    if( method == DECOMP_SVD || method == DECOMP_EIG )
-        bufsize += n*5*esz + n*vstep + nb*sizeof(double) + 32;
+    ਜੇ( ਵਿਧੀ == DECOMP_SVD || ਵਿਧੀ == DECOMP_EIG )
+        bufsize += n*5*esz + n*vstep + nb*ਆਕਾਰ(ਦੁੱਗਣਾ) + 32;
 
-    buffer.allocate(bufsize);
-    uchar* ptr = alignPtr(buffer.data(), 16);
+    ਬਫਰ.allocate(bufsize);
+    uchar* ptr = alignPtr(ਬਫਰ.ਅੰਕੜੇ(), 16);
 
     Mat a(m_, n, type, ptr, astep);
 
-    if( is_normal )
-        mulTransposed(src, a, true);
-    else if( method != DECOMP_SVD )
-        src.copyTo(a);
-    else
+    ਜੇ( is_ਸਾਧਾਰਨ )
+        mulTransposed(src, a, ਸੱਚ);
+    ਨਹੀਂਤਾਂ ਜੇ( ਵਿਧੀ != DECOMP_SVD )
+        src.copy_ਮੰਜ਼ਿਲ(a);
+    ਨਹੀਂਤਾਂ
     {
         a = Mat(n, m_, type, ptr, astep);
         transpose(src, a);
     }
     ptr += asize;
 
-    if( !is_normal )
+    ਜੇ( !is_ਸਾਧਾਰਨ )
     {
-        if( method == DECOMP_LU || method == DECOMP_CHOLESKY )
-            src2.copyTo(dst);
+        ਜੇ( ਵਿਧੀ == DECOMP_LU || ਵਿਧੀ == DECOMP_CHOLESKY )
+            src2.copy_ਮੰਜ਼ਿਲ(dst);
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
         // a'*b
-        if( method == DECOMP_LU || method == DECOMP_CHOLESKY )
+        ਜੇ( ਵਿਧੀ == DECOMP_LU || ਵਿਧੀ == DECOMP_CHOLESKY )
             gemm( src, src2, 1, Mat(), 0, dst, GEMM_1_T );
-        else
+        ਨਹੀਂਤਾਂ
         {
             Mat tmp(n, nb, type, ptr);
             ptr += n*nb*esz;
@@ -1242,305 +1242,305 @@ bool solve( InputArray _src, InputArray _src2arg, OutputArray _dst, int method )
         }
     }
 
-    if( method == DECOMP_LU )
+    ਜੇ( ਵਿਧੀ == DECOMP_LU )
     {
-        if( type == CV_32F )
-            result = hal::LU32f(a.ptr<float>(), a.step, n, dst.ptr<float>(), dst.step, nb) != 0;
-        else
-            result = hal::LU64f(a.ptr<double>(), a.step, n, dst.ptr<double>(), dst.step, nb) != 0;
+        ਜੇ( type == CV_32F )
+            ਨਤੀਜਾ = hal::LU32f(a.ptr<ਦਸ਼ਮਲਵ>(), a.ਕਦਮ, n, dst.ptr<ਦਸ਼ਮਲਵ>(), dst.ਕਦਮ, nb) != 0;
+        ਨਹੀਂਤਾਂ
+            ਨਤੀਜਾ = hal::LU64f(a.ptr<ਦੁੱਗਣਾ>(), a.ਕਦਮ, n, dst.ptr<ਦੁੱਗਣਾ>(), dst.ਕਦਮ, nb) != 0;
     }
-    else if( method == DECOMP_CHOLESKY )
+    ਨਹੀਂਤਾਂ ਜੇ( ਵਿਧੀ == DECOMP_CHOLESKY )
     {
-        if( type == CV_32F )
-            result = hal::Cholesky32f(a.ptr<float>(), a.step, n, dst.ptr<float>(), dst.step, nb);
-        else
-            result = hal::Cholesky64f(a.ptr<double>(), a.step, n, dst.ptr<double>(), dst.step, nb);
+        ਜੇ( type == CV_32F )
+            ਨਤੀਜਾ = hal::Cholesky32f(a.ptr<ਦਸ਼ਮਲਵ>(), a.ਕਦਮ, n, dst.ptr<ਦਸ਼ਮਲਵ>(), dst.ਕਦਮ, nb);
+        ਨਹੀਂਤਾਂ
+            ਨਤੀਜਾ = hal::Cholesky64f(a.ptr<ਦੁੱਗਣਾ>(), a.ਕਦਮ, n, dst.ptr<ਦੁੱਗਣਾ>(), dst.ਕਦਮ, nb);
     }
-    else if( method == DECOMP_QR )
+    ਨਹੀਂਤਾਂ ਜੇ( ਵਿਧੀ == DECOMP_QR )
     {
         Mat rhsMat;
-        if( is_normal || m == n )
+        ਜੇ( is_ਸਾਧਾਰਨ || m == n )
         {
-            src2.copyTo(dst);
+            src2.copy_ਮੰਜ਼ਿਲ(dst);
             rhsMat = dst;
         }
-        else
+        ਨਹੀਂਤਾਂ
         {
             rhsMat = Mat(m, nb, type);
-            src2.copyTo(rhsMat);
+            src2.copy_ਮੰਜ਼ਿਲ(rhsMat);
         }
 
-        if( type == CV_32F )
-            result = hal::QR32f(a.ptr<float>(), a.step, a.rows, a.cols, rhsMat.cols, rhsMat.ptr<float>(), rhsMat.step, NULL) != 0;
-        else
-            result = hal::QR64f(a.ptr<double>(), a.step, a.rows, a.cols, rhsMat.cols, rhsMat.ptr<double>(), rhsMat.step, NULL) != 0;
+        ਜੇ( type == CV_32F )
+            ਨਤੀਜਾ = hal::QR32f(a.ptr<ਦਸ਼ਮਲਵ>(), a.ਕਦਮ, a.ਪੰਕਤੀਆਂ, a.ਖਾਨੇ_ਗਿਣਤੀ, rhsMat.ਖਾਨੇ_ਗਿਣਤੀ, rhsMat.ptr<ਦਸ਼ਮਲਵ>(), rhsMat.ਕਦਮ, ਨਿਰਾ) != 0;
+        ਨਹੀਂਤਾਂ
+            ਨਤੀਜਾ = hal::QR64f(a.ptr<ਦੁੱਗਣਾ>(), a.ਕਦਮ, a.ਪੰਕਤੀਆਂ, a.ਖਾਨੇ_ਗਿਣਤੀ, rhsMat.ਖਾਨੇ_ਗਿਣਤੀ, rhsMat.ptr<ਦੁੱਗਣਾ>(), rhsMat.ਕਦਮ, ਨਿਰਾ) != 0;
 
-        if (rhsMat.rows != dst.rows)
-            rhsMat.rowRange(0, dst.rows).copyTo(dst);
+        ਜੇ (rhsMat.ਪੰਕਤੀਆਂ != dst.ਪੰਕਤੀਆਂ)
+            rhsMat.ਪੰਕਤੀ_Range_2(0, dst.ਪੰਕਤੀਆਂ).copy_ਮੰਜ਼ਿਲ(dst);
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
         ptr = alignPtr(ptr, 16);
         Mat v(n, n, type, ptr, vstep), w(n, 1, type, ptr + vstep*n), u;
         ptr += n*(vstep + esz);
 
-        if( method == DECOMP_EIG )
+        ਜੇ( ਵਿਧੀ == DECOMP_EIG )
         {
-            if( type == CV_32F )
-                Jacobi(a.ptr<float>(), a.step, w.ptr<float>(), v.ptr<float>(), v.step, n, ptr);
-            else
-                Jacobi(a.ptr<double>(), a.step, w.ptr<double>(), v.ptr<double>(), v.step, n, ptr);
+            ਜੇ( type == CV_32F )
+                Jacobi(a.ptr<ਦਸ਼ਮਲਵ>(), a.ਕਦਮ, w.ptr<ਦਸ਼ਮਲਵ>(), v.ptr<ਦਸ਼ਮਲਵ>(), v.ਕਦਮ, n, ptr);
+            ਨਹੀਂਤਾਂ
+                Jacobi(a.ptr<ਦੁੱਗਣਾ>(), a.ਕਦਮ, w.ptr<ਦੁੱਗਣਾ>(), v.ptr<ਦੁੱਗਣਾ>(), v.ਕਦਮ, n, ptr);
             u = v;
         }
-        else
+        ਨਹੀਂਤਾਂ
         {
-            if( type == CV_32F )
-                JacobiSVD(a.ptr<float>(), a.step, w.ptr<float>(), v.ptr<float>(), v.step, m_, n);
-            else
-                JacobiSVD(a.ptr<double>(), a.step, w.ptr<double>(), v.ptr<double>(), v.step, m_, n);
+            ਜੇ( type == CV_32F )
+                JacobiSVD(a.ptr<ਦਸ਼ਮਲਵ>(), a.ਕਦਮ, w.ptr<ਦਸ਼ਮਲਵ>(), v.ptr<ਦਸ਼ਮਲਵ>(), v.ਕਦਮ, m_, n);
+            ਨਹੀਂਤਾਂ
+                JacobiSVD(a.ptr<ਦੁੱਗਣਾ>(), a.ਕਦਮ, w.ptr<ਦੁੱਗਣਾ>(), v.ptr<ਦੁੱਗਣਾ>(), v.ਕਦਮ, m_, n);
             u = a;
         }
 
-        if( type == CV_32F )
+        ਜੇ( type == CV_32F )
         {
-            SVBkSb(m_, n, w.ptr<float>(), 0, u.ptr<float>(), u.step, true,
-                   v.ptr<float>(), v.step, true, src2.ptr<float>(),
-                   src2.step, nb, dst.ptr<float>(), dst.step, ptr);
+            SVBkSb(m_, n, w.ptr<ਦਸ਼ਮਲਵ>(), 0, u.ptr<ਦਸ਼ਮਲਵ>(), u.ਕਦਮ, ਸੱਚ,
+                   v.ptr<ਦਸ਼ਮਲਵ>(), v.ਕਦਮ, ਸੱਚ, src2.ptr<ਦਸ਼ਮਲਵ>(),
+                   src2.ਕਦਮ, nb, dst.ptr<ਦਸ਼ਮਲਵ>(), dst.ਕਦਮ, ptr);
         }
-        else
+        ਨਹੀਂਤਾਂ
         {
-            SVBkSb(m_, n, w.ptr<double>(), 0, u.ptr<double>(), u.step, true,
-                   v.ptr<double>(), v.step, true, src2.ptr<double>(),
-                   src2.step, nb, dst.ptr<double>(), dst.step, ptr);
+            SVBkSb(m_, n, w.ptr<ਦੁੱਗਣਾ>(), 0, u.ptr<ਦੁੱਗਣਾ>(), u.ਕਦਮ, ਸੱਚ,
+                   v.ptr<ਦੁੱਗਣਾ>(), v.ਕਦਮ, ਸੱਚ, src2.ptr<ਦੁੱਗਣਾ>(),
+                   src2.ਕਦਮ, nb, dst.ptr<ਦੁੱਗਣਾ>(), dst.ਕਦਮ, ptr);
         }
-        result = true;
+        ਨਤੀਜਾ = ਸੱਚ;
     }
 
-    if( !result )
+    ਜੇ( !ਨਤੀਜਾ )
         dst = Scalar(0);
 
-    return result;
+    ਵਾਪਸ ਨਤੀਜਾ;
 }
 
 
 /////////////////// finding eigenvalues and eigenvectors of a symmetric matrix ///////////////
 
-bool eigen( InputArray _src, OutputArray _evals, OutputArray _evects )
+ਤਾਰਕਿਕ eigen( ਨਿਵੇਸ਼_Array _src, OutputArray _evals, OutputArray _evects )
 {
     CV_INSTRUMENT_REGION();
 
     Mat src = _src.getMat();
-    int type = src.type();
-    int n = src.rows;
+    ਪੂਰਨ type = src.type();
+    ਪੂਰਨ n = src.ਪੰਕਤੀਆਂ;
 
-    CV_Assert( src.rows == src.cols );
+    CV_Assert( src.ਪੰਕਤੀਆਂ == src.ਖਾਨੇ_ਗਿਣਤੀ );
     CV_Assert (type == CV_32F || type == CV_64F);
 
     Mat v;
-    if( _evects.needed() )
+    ਜੇ( _evects.needed() )
     {
         _evects.create(n, n, type);
         v = _evects.getMat();
     }
 
-#ifdef HAVE_EIGEN
-    const bool evecNeeded = _evects.needed();
-    const int esOptions = evecNeeded ? Eigen::ComputeEigenvectors : Eigen::EigenvaluesOnly;
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ HAVE_EIGEN
+    ਅਚਲ ਤਾਰਕਿਕ evecNeeded = _evects.needed();
+    ਅਚਲ ਪੂਰਨ esOptions = evecNeeded ? Eigen::ComputeEigenvectors : Eigen::EigenvaluesOnly;
     _evals.create(n, 1, type);
     Mat evals = _evals.getMat();
-    if ( type == CV_64F )
+    ਜੇ ( type == CV_64F )
     {
-        Eigen::MatrixXd src_eig, zeros_eig;
+        Eigen::ਮੈਟ੍ਰਿਕਸ_Xd src_eig, zeros_eig;
         cv::cv2eigen(src, src_eig);
 
-        Eigen::SelfAdjointEigenSolver<Eigen::MatrixXd> es;
+        Eigen::SelfAdjointEigenSolver<Eigen::ਮੈਟ੍ਰਿਕਸ_Xd> es;
         es.compute(src_eig, esOptions);
-        if ( es.info() == Eigen::Success )
+        ਜੇ ( es.info() == Eigen::Success )
         {
             cv::eigen2cv(es.eigenvalues().reverse().eval(), evals);
-            if ( evecNeeded )
+            ਜੇ ( evecNeeded )
             {
                 cv::Mat evects = _evects.getMat();
                 cv::eigen2cv(es.eigenvectors().rowwise().reverse().transpose().eval(), v);
             }
-            return true;
+            ਵਾਪਸ ਸੱਚ;
         }
-    } else { // CV_32F
-        Eigen::MatrixXf src_eig, zeros_eig;
+    } ਨਹੀਂਤਾਂ { // CV_32F
+        Eigen::ਮੈਟ੍ਰਿਕਸ_Xf src_eig, zeros_eig;
         cv::cv2eigen(src, src_eig);
 
-        Eigen::SelfAdjointEigenSolver<Eigen::MatrixXf> es;
+        Eigen::SelfAdjointEigenSolver<Eigen::ਮੈਟ੍ਰਿਕਸ_Xf> es;
         es.compute(src_eig, esOptions);
-        if ( es.info() == Eigen::Success )
+        ਜੇ ( es.info() == Eigen::Success )
         {
             cv::eigen2cv(es.eigenvalues().reverse().eval(), evals);
-            if ( evecNeeded )
+            ਜੇ ( evecNeeded )
             {
                 cv::eigen2cv(es.eigenvectors().rowwise().reverse().transpose().eval(), v);
             }
-            return true;
+            ਵਾਪਸ ਸੱਚ;
         }
     }
-    return false;
-#else
+    ਵਾਪਸ ਝੂਠ;
+#ਨਹੀਂਤਾਂ
 
-    size_t elemSize = src.elemSize(), astep = alignSize(n*elemSize, 16);
-    AutoBuffer<uchar> buf(n*astep + n*5*elemSize + 32);
-    uchar* ptr = alignPtr(buf.data(), 16);
+    size_t elem_ਮਾਪ = src.elem_ਮਾਪ(), astep = align_ਮਾਪ(n*elem_ਮਾਪ, 16);
+    Auto_ਬਫਰ<uchar> buf(n*astep + n*5*elem_ਮਾਪ + 32);
+    uchar* ptr = alignPtr(buf.ਅੰਕੜੇ(), 16);
     Mat a(n, n, type, ptr, astep), w(n, 1, type, ptr + astep*n);
-    ptr += astep*n + elemSize*n;
-    src.copyTo(a);
-    bool ok = type == CV_32F ?
-        Jacobi(a.ptr<float>(), a.step, w.ptr<float>(), v.ptr<float>(), v.step, n, ptr) :
-        Jacobi(a.ptr<double>(), a.step, w.ptr<double>(), v.ptr<double>(), v.step, n, ptr);
+    ptr += astep*n + elem_ਮਾਪ*n;
+    src.copy_ਮੰਜ਼ਿਲ(a);
+    ਤਾਰਕਿਕ ok = type == CV_32F ?
+        Jacobi(a.ptr<ਦਸ਼ਮਲਵ>(), a.ਕਦਮ, w.ptr<ਦਸ਼ਮਲਵ>(), v.ptr<ਦਸ਼ਮਲਵ>(), v.ਕਦਮ, n, ptr) :
+        Jacobi(a.ptr<ਦੁੱਗਣਾ>(), a.ਕਦਮ, w.ptr<ਦੁੱਗਣਾ>(), v.ptr<ਦੁੱਗਣਾ>(), v.ਕਦਮ, n, ptr);
 
-    w.copyTo(_evals);
-    return ok;
-#endif
+    w.copy_ਮੰਜ਼ਿਲ(_evals);
+    ਵਾਪਸ ok;
+#ਜੇ_ਅੰਤ
 }
 
-static void _SVDcompute( InputArray _aarr, OutputArray _w,
-                         OutputArray _u, OutputArray _vt, int flags )
+ਸਥਿਰ ਖਾਲੀ _SVDcompute( ਨਿਵੇਸ਼_Array _aarr, OutputArray _w,
+                         OutputArray _u, OutputArray _vt, ਪੂਰਨ flags )
 {
     Mat src = _aarr.getMat();
-    int m = src.rows, n = src.cols;
-    int type = src.type();
-    bool compute_uv = _u.needed() || _vt.needed();
-    bool full_uv = (flags & SVD::FULL_UV) != 0;
+    ਪੂਰਨ m = src.ਪੰਕਤੀਆਂ, n = src.ਖਾਨੇ_ਗਿਣਤੀ;
+    ਪੂਰਨ type = src.type();
+    ਤਾਰਕਿਕ compute_uv = _u.needed() || _vt.needed();
+    ਤਾਰਕਿਕ ਭਰਿਆ_uv = (flags & SVD::ਭਰਿਆ_UV) != 0;
 
     CV_Assert( type == CV_32F || type == CV_64F );
 
-    if( flags & SVD::NO_UV )
+    ਜੇ( flags & SVD::NO_UV )
     {
         _u.release();
         _vt.release();
-        compute_uv = full_uv = false;
+        compute_uv = ਭਰਿਆ_uv = ਝੂਠ;
     }
 
-    bool at = false;
-    if( m < n )
+    ਤਾਰਕਿਕ at = ਝੂਠ;
+    ਜੇ( m < n )
     {
         std::swap(m, n);
-        at = true;
+        at = ਸੱਚ;
     }
 
-    int urows = full_uv ? m : n;
-    size_t esz = src.elemSize(), astep = alignSize(m*esz, 16), vstep = alignSize(n*esz, 16);
-    AutoBuffer<uchar> _buf(urows*astep + n*vstep + n*esz + 32);
-    uchar* buf = alignPtr(_buf.data(), 16);
-    Mat temp_a(n, m, type, buf, astep);
-    Mat temp_w(n, 1, type, buf + urows*astep);
-    Mat temp_u(urows, m, type, buf, astep), temp_v;
+    ਪੂਰਨ urows = ਭਰਿਆ_uv ? m : n;
+    size_t esz = src.elem_ਮਾਪ(), astep = align_ਮਾਪ(m*esz, 16), vstep = align_ਮਾਪ(n*esz, 16);
+    Auto_ਬਫਰ<uchar> _buf(urows*astep + n*vstep + n*esz + 32);
+    uchar* buf = alignPtr(_buf.ਅੰਕੜੇ(), 16);
+    Mat ਆਰਜ਼ੀ_a(n, m, type, buf, astep);
+    Mat ਆਰਜ਼ੀ_w(n, 1, type, buf + urows*astep);
+    Mat ਆਰਜ਼ੀ_u(urows, m, type, buf, astep), ਆਰਜ਼ੀ_v;
 
-    if( compute_uv )
-        temp_v = Mat(n, n, type, alignPtr(buf + urows*astep + n*esz, 16), vstep);
+    ਜੇ( compute_uv )
+        ਆਰਜ਼ੀ_v = Mat(n, n, type, alignPtr(buf + urows*astep + n*esz, 16), vstep);
 
-    if( urows > n )
-        temp_u = Scalar::all(0);
+    ਜੇ( urows > n )
+        ਆਰਜ਼ੀ_u = Scalar::all(0);
 
-    if( !at )
-        transpose(src, temp_a);
-    else
-        src.copyTo(temp_a);
+    ਜੇ( !at )
+        transpose(src, ਆਰਜ਼ੀ_a);
+    ਨਹੀਂਤਾਂ
+        src.copy_ਮੰਜ਼ਿਲ(ਆਰਜ਼ੀ_a);
 
-    if( type == CV_32F )
+    ਜੇ( type == CV_32F )
     {
-        JacobiSVD(temp_a.ptr<float>(), temp_u.step, temp_w.ptr<float>(),
-              temp_v.ptr<float>(), temp_v.step, m, n, compute_uv ? urows : 0);
+        JacobiSVD(ਆਰਜ਼ੀ_a.ptr<ਦਸ਼ਮਲਵ>(), ਆਰਜ਼ੀ_u.ਕਦਮ, ਆਰਜ਼ੀ_w.ptr<ਦਸ਼ਮਲਵ>(),
+              ਆਰਜ਼ੀ_v.ptr<ਦਸ਼ਮਲਵ>(), ਆਰਜ਼ੀ_v.ਕਦਮ, m, n, compute_uv ? urows : 0);
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
-        JacobiSVD(temp_a.ptr<double>(), temp_u.step, temp_w.ptr<double>(),
-              temp_v.ptr<double>(), temp_v.step, m, n, compute_uv ? urows : 0);
+        JacobiSVD(ਆਰਜ਼ੀ_a.ptr<ਦੁੱਗਣਾ>(), ਆਰਜ਼ੀ_u.ਕਦਮ, ਆਰਜ਼ੀ_w.ptr<ਦੁੱਗਣਾ>(),
+              ਆਰਜ਼ੀ_v.ptr<ਦੁੱਗਣਾ>(), ਆਰਜ਼ੀ_v.ਕਦਮ, m, n, compute_uv ? urows : 0);
     }
-    temp_w.copyTo(_w);
-    if( compute_uv )
+    ਆਰਜ਼ੀ_w.copy_ਮੰਜ਼ਿਲ(_w);
+    ਜੇ( compute_uv )
     {
-        if( !at )
+        ਜੇ( !at )
         {
-            if( _u.needed() )
-                transpose(temp_u, _u);
-            if( _vt.needed() )
-                temp_v.copyTo(_vt);
+            ਜੇ( _u.needed() )
+                transpose(ਆਰਜ਼ੀ_u, _u);
+            ਜੇ( _vt.needed() )
+                ਆਰਜ਼ੀ_v.copy_ਮੰਜ਼ਿਲ(_vt);
         }
-        else
+        ਨਹੀਂਤਾਂ
         {
-            if( _u.needed() )
-                transpose(temp_v, _u);
-            if( _vt.needed() )
-                temp_u.copyTo(_vt);
+            ਜੇ( _u.needed() )
+                transpose(ਆਰਜ਼ੀ_v, _u);
+            ਜੇ( _vt.needed() )
+                ਆਰਜ਼ੀ_u.copy_ਮੰਜ਼ਿਲ(_vt);
         }
     }
 }
 
 
-void SVD::compute( InputArray a, OutputArray w, OutputArray u, OutputArray vt, int flags )
+ਖਾਲੀ SVD::compute( ਨਿਵੇਸ਼_Array a, OutputArray w, OutputArray u, OutputArray vt, ਪੂਰਨ flags )
 {
     CV_INSTRUMENT_REGION();
 
     _SVDcompute(a, w, u, vt, flags);
 }
 
-void SVD::compute( InputArray a, OutputArray w, int flags )
+ਖਾਲੀ SVD::compute( ਨਿਵੇਸ਼_Array a, OutputArray w, ਪੂਰਨ flags )
 {
     CV_INSTRUMENT_REGION();
 
     _SVDcompute(a, w, noArray(), noArray(), flags);
 }
 
-void SVD::backSubst( InputArray _w, InputArray _u, InputArray _vt,
-                     InputArray _rhs, OutputArray _dst )
+ਖਾਲੀ SVD::ਪਿੱਠ_Subst( ਨਿਵੇਸ਼_Array _w, ਨਿਵੇਸ਼_Array _u, ਨਿਵੇਸ਼_Array _vt,
+                     ਨਿਵੇਸ਼_Array _rhs, OutputArray _dst )
 {
     Mat w = _w.getMat(), u = _u.getMat(), vt = _vt.getMat(), rhs = _rhs.getMat();
-    int type = w.type(), esz = (int)w.elemSize();
-    int m = u.rows, n = vt.cols, nb = rhs.data ? rhs.cols : m, nm = std::min(m, n);
-    size_t wstep = w.rows == 1 ? (size_t)esz : w.cols == 1 ? (size_t)w.step : (size_t)w.step + esz;
-    AutoBuffer<uchar> buffer(nb*sizeof(double) + 16);
-    CV_Assert( w.type() == u.type() && u.type() == vt.type() && u.data && vt.data && w.data );
-    CV_Assert( u.cols >= nm && vt.rows >= nm &&
-              (w.size() == Size(nm, 1) || w.size() == Size(1, nm) || w.size() == Size(vt.rows, u.cols)) );
-    CV_Assert( rhs.data == 0 || (rhs.type() == type && rhs.rows == m) );
+    ਪੂਰਨ type = w.type(), esz = (ਪੂਰਨ)w.elem_ਮਾਪ();
+    ਪੂਰਨ m = u.ਪੰਕਤੀਆਂ, n = vt.ਖਾਨੇ_ਗਿਣਤੀ, nb = rhs.ਅੰਕੜੇ ? rhs.ਖਾਨੇ_ਗਿਣਤੀ : m, nm = std::min(m, n);
+    size_t wstep = w.ਪੰਕਤੀਆਂ == 1 ? (size_t)esz : w.ਖਾਨੇ_ਗਿਣਤੀ == 1 ? (size_t)w.ਕਦਮ : (size_t)w.ਕਦਮ + esz;
+    Auto_ਬਫਰ<uchar> ਬਫਰ(nb*ਆਕਾਰ(ਦੁੱਗਣਾ) + 16);
+    CV_Assert( w.type() == u.type() && u.type() == vt.type() && u.ਅੰਕੜੇ && vt.ਅੰਕੜੇ && w.ਅੰਕੜੇ );
+    CV_Assert( u.ਖਾਨੇ_ਗਿਣਤੀ >= nm && vt.ਪੰਕਤੀਆਂ >= nm &&
+              (w.size() == ਮਾਪ(nm, 1) || w.size() == ਮਾਪ(1, nm) || w.size() == ਮਾਪ(vt.ਪੰਕਤੀਆਂ, u.ਖਾਨੇ_ਗਿਣਤੀ)) );
+    CV_Assert( rhs.ਅੰਕੜੇ == 0 || (rhs.type() == type && rhs.ਪੰਕਤੀਆਂ == m) );
 
     _dst.create( n, nb, type );
     Mat dst = _dst.getMat();
-    if( type == CV_32F )
-        SVBkSb(m, n, w.ptr<float>(), wstep, u.ptr<float>(), u.step, false,
-               vt.ptr<float>(), vt.step, true, rhs.ptr<float>(), rhs.step, nb,
-               dst.ptr<float>(), dst.step, buffer.data());
-    else if( type == CV_64F )
-        SVBkSb(m, n, w.ptr<double>(), wstep, u.ptr<double>(), u.step, false,
-               vt.ptr<double>(), vt.step, true, rhs.ptr<double>(), rhs.step, nb,
-               dst.ptr<double>(), dst.step, buffer.data());
-    else
+    ਜੇ( type == CV_32F )
+        SVBkSb(m, n, w.ptr<ਦਸ਼ਮਲਵ>(), wstep, u.ptr<ਦਸ਼ਮਲਵ>(), u.ਕਦਮ, ਝੂਠ,
+               vt.ptr<ਦਸ਼ਮਲਵ>(), vt.ਕਦਮ, ਸੱਚ, rhs.ptr<ਦਸ਼ਮਲਵ>(), rhs.ਕਦਮ, nb,
+               dst.ptr<ਦਸ਼ਮਲਵ>(), dst.ਕਦਮ, ਬਫਰ.ਅੰਕੜੇ());
+    ਨਹੀਂਤਾਂ ਜੇ( type == CV_64F )
+        SVBkSb(m, n, w.ptr<ਦੁੱਗਣਾ>(), wstep, u.ptr<ਦੁੱਗਣਾ>(), u.ਕਦਮ, ਝੂਠ,
+               vt.ptr<ਦੁੱਗਣਾ>(), vt.ਕਦਮ, ਸੱਚ, rhs.ptr<ਦੁੱਗਣਾ>(), rhs.ਕਦਮ, nb,
+               dst.ptr<ਦੁੱਗਣਾ>(), dst.ਕਦਮ, ਬਫਰ.ਅੰਕੜੇ());
+    ਨਹੀਂਤਾਂ
         CV_Error( cv::Error::StsUnsupportedFormat, "" );
 }
 
 
-SVD& SVD::operator ()(InputArray a, int flags)
+SVD& SVD::ਸੰਚਾਲਕ ()(ਨਿਵੇਸ਼_Array a, ਪੂਰਨ flags)
 {
     _SVDcompute(a, w, u, vt, flags);
-    return *this;
+    ਵਾਪਸ *ਇਹ;
 }
 
 
-void SVD::backSubst( InputArray rhs, OutputArray dst ) const
+ਖਾਲੀ SVD::ਪਿੱਠ_Subst( ਨਿਵੇਸ਼_Array rhs, OutputArray dst ) ਅਚਲ
 {
-    backSubst( w, u, vt, rhs, dst );
+    ਪਿੱਠ_Subst( w, u, vt, rhs, dst );
 }
 
 }
 
 
-void cv::SVDecomp(InputArray src, OutputArray w, OutputArray u, OutputArray vt, int flags)
+ਖਾਲੀ cv::SVDecomp(ਨਿਵੇਸ਼_Array src, OutputArray w, OutputArray u, OutputArray vt, ਪੂਰਨ flags)
 {
     CV_INSTRUMENT_REGION();
 
     SVD::compute(src, w, u, vt, flags);
 }
 
-void cv::SVBackSubst(InputArray w, InputArray u, InputArray vt, InputArray rhs, OutputArray dst)
+ਖਾਲੀ cv::SVBackSubst(ਨਿਵੇਸ਼_Array w, ਨਿਵੇਸ਼_Array u, ਨਿਵੇਸ਼_Array vt, ਨਿਵੇਸ਼_Array rhs, OutputArray dst)
 {
     CV_INSTRUMENT_REGION();
 
-    SVD::backSubst(w, u, vt, rhs, dst);
+    SVD::ਪਿੱਠ_Subst(w, u, vt, rhs, dst);
 }

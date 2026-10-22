@@ -2,44 +2,44 @@
 // It is subject to the license terms in the LICENSE file found in the top-level directory
 // of this distribution and at http://opencv.org/license.html
 
-#include "precomp.hpp"
+#ਅਨ੍ਤਰ੍ਭਾਵ "precomp.hpp"
 
-namespace cv {
+ਨਾਮਾਕਾਸ਼ cv {
 
-typedef bool (*HasNonZeroFunc)(const void*, size_t);
+ਕਿਸਮਪਰਿਭਾਸ਼ਾ ਤਾਰਕਿਕ (*HasNonZeroFunc)(ਅਚਲ ਖਾਲੀ*, size_t);
 
 CV_CPU_OPTIMIZATION_NAMESPACE_BEGIN
 
-HasNonZeroFunc getHasNonZeroFunc(int depth);
+HasNonZeroFunc getHasNonZeroFunc(ਪੂਰਨ ਡੂੰਘਾਈ);
 
-#ifndef CV_CPU_OPTIMIZATION_DECLARATIONS_ONLY
+#ਜੇ_ਅਪਰਿਭਾਸ਼ਿਤ CV_CPU_OPTIMIZATION_DECLARATIONS_ONLY
 
-#undef SIMD_ONLY
-#if (CV_SIMD || CV_SIMD_SCALABLE)
-#define SIMD_ONLY(expr) expr
-#else
-#define SIMD_ONLY(expr)
-#endif
+#ਪਰਿਭਾਸ਼ਾ_ਰੱਦ SIMD_ONLY
+#ਜੇ (CV_SIMD || CV_SIMD_SCALABLE)
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ SIMD_ONLY(ਵਿਅੰਜਕ) ਵਿਅੰਜਕ
+#ਨਹੀਂਤਾਂ
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ SIMD_ONLY(ਵਿਅੰਜਕ)
+#ਜੇ_ਅੰਤ
 
-#undef DEFINE_HASNONZERO_FUNC
-#define DEFINE_HASNONZERO_FUNC(funcname, suffix, T, VT, cmp_op, scalar_nz_op) \
-static bool funcname( const void* _src, size_t len ) \
+#ਪਰਿਭਾਸ਼ਾ_ਰੱਦ DEFINE_HASNONZERO_FUNC
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ DEFINE_HASNONZERO_FUNC(funcname, suffix, T, VT, cmp_op, scalar_nz_op) \
+ਸਥਿਰ ਤਾਰਕਿਕ funcname( ਅਚਲ ਖਾਲੀ* _src, size_t len ) \
 { \
-    const T* src = (const T*)_src; \
+    ਅਚਲ T* src = (ਅਚਲ T*)_src; \
     size_t i = 0; \
     SIMD_ONLY( \
-    const int vlanes = VTraits<VT>::vlanes(); \
+    ਅਚਲ ਪੂਰਨ vlanes = VTraits<VT>::vlanes(); \
     VT v_zero = vx_setzero_##suffix(); \
-    for (i = 0; i + vlanes*8 <= len; i += vlanes*8) \
+    ਲਈ (i = 0; i + vlanes*8 <= len; i += vlanes*8) \
     { \
-        VT x0 = vx_load(src + i); \
-        VT x1 = vx_load(src + i + vlanes); \
-        VT x2 = vx_load(src + i + vlanes*2); \
-        VT x3 = vx_load(src + i + vlanes*3); \
-        VT x4 = vx_load(src + i + vlanes*4); \
-        VT x5 = vx_load(src + i + vlanes*5); \
-        VT x6 = vx_load(src + i + vlanes*6); \
-        VT x7 = vx_load(src + i + vlanes*7); \
+        VT x0 = vx_ਲੱਦੋ(src + i); \
+        VT x1 = vx_ਲੱਦੋ(src + i + vlanes); \
+        VT x2 = vx_ਲੱਦੋ(src + i + vlanes*2); \
+        VT x3 = vx_ਲੱਦੋ(src + i + vlanes*3); \
+        VT x4 = vx_ਲੱਦੋ(src + i + vlanes*4); \
+        VT x5 = vx_ਲੱਦੋ(src + i + vlanes*5); \
+        VT x6 = vx_ਲੱਦੋ(src + i + vlanes*6); \
+        VT x7 = vx_ਲੱਦੋ(src + i + vlanes*7); \
         x0 = v_or(x0, x1); \
         x2 = v_or(x2, x3); \
         x4 = v_or(x4, x5); \
@@ -48,54 +48,54 @@ static bool funcname( const void* _src, size_t len ) \
         x4 = v_or(x4, x6); \
         x0 = v_or(x0, x4); \
         x0 = cmp_op(x0, v_zero); \
-        if (v_check_any(x0)) \
-            return true; \
+        ਜੇ (v_check_any(x0)) \
+            ਵਾਪਸ ਸੱਚ; \
     } \
-    for (; i < len; i += vlanes) \
+    ਲਈ (; i < len; i += vlanes) \
     { \
-        if (i + vlanes > len) { \
-            if (i == 0) \
-                break; \
+        ਜੇ (i + vlanes > len) { \
+            ਜੇ (i == 0) \
+                ਰੋਕੋ; \
             i = len - vlanes; \
         } \
-        VT x0 = vx_load(src + i); \
+        VT x0 = vx_ਲੱਦੋ(src + i); \
         x0 = cmp_op(x0, v_zero); \
-        if (v_check_any(x0)) \
-            return true; \
+        ਜੇ (v_check_any(x0)) \
+            ਵਾਪਸ ਸੱਚ; \
     } \
     v_cleanup();) \
-    for( ; i < len; i++ ) \
+    ਲਈ( ; i < len; i++ ) \
     { \
         T x = src[i]; \
-        if (scalar_nz_op(x) != 0) \
-            return true; \
+        ਜੇ (scalar_nz_op(x) != 0) \
+            ਵਾਪਸ ਸੱਚ; \
     } \
-    return false; \
+    ਵਾਪਸ ਝੂਠ; \
 }
 
-#undef CHECK_NZ_INT
-#define CHECK_NZ_INT(x) ((x) != 0)
-#undef CHECK_NZ_FP
-#define CHECK_NZ_FP(x) (((x)<<1) != 0)
-#undef CHECK_NZ_FP16
-#define CHECK_NZ_FP16(x) (((x)&0x7fff) != 0)
-#undef VEC_CMP_EQ_Z_FP16
-#define VEC_CMP_EQ_Z_FP16(x, z) v_ne(v_add_wrap(x, x), z)
-#undef VEC_CMP_EQ_Z_FP
-#define VEC_CMP_EQ_Z_FP(x, z) v_ne(v_add(x, x), z)
+#ਪਰਿਭਾਸ਼ਾ_ਰੱਦ CHECK_NZ_INT
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ CHECK_NZ_INT(x) ((x) != 0)
+#ਪਰਿਭਾਸ਼ਾ_ਰੱਦ CHECK_NZ_FP
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ CHECK_NZ_FP(x) (((x)<<1) != 0)
+#ਪਰਿਭਾਸ਼ਾ_ਰੱਦ CHECK_NZ_FP16
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ CHECK_NZ_FP16(x) (((x)&0x7fff) != 0)
+#ਪਰਿਭਾਸ਼ਾ_ਰੱਦ VEC_CMP_EQ_Z_FP16
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ VEC_CMP_EQ_Z_FP16(x, z) v_ne(v_ਜੋੜੋ_wrap(x, x), z)
+#ਪਰਿਭਾਸ਼ਾ_ਰੱਦ VEC_CMP_EQ_Z_FP
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ VEC_CMP_EQ_Z_FP(x, z) v_ne(v_ਜੋੜੋ(x, x), z)
 
 DEFINE_HASNONZERO_FUNC(hasNonZero8u, u8, uchar, v_uint8, v_ne, CHECK_NZ_INT)
 DEFINE_HASNONZERO_FUNC(hasNonZero16u, u16, ushort, v_uint16, v_ne, CHECK_NZ_INT)
-DEFINE_HASNONZERO_FUNC(hasNonZero32s, s32, int, v_int32, v_ne, CHECK_NZ_INT)
+DEFINE_HASNONZERO_FUNC(hasNonZero32s, s32, ਪੂਰਨ, v_int32, v_ne, CHECK_NZ_INT)
 DEFINE_HASNONZERO_FUNC(hasNonZero64s, s64, int64, v_int64, v_ne, CHECK_NZ_INT)
 
-DEFINE_HASNONZERO_FUNC(hasNonZero32f, s32, int, v_int32, VEC_CMP_EQ_Z_FP, CHECK_NZ_FP)
+DEFINE_HASNONZERO_FUNC(hasNonZero32f, s32, ਪੂਰਨ, v_int32, VEC_CMP_EQ_Z_FP, CHECK_NZ_FP)
 DEFINE_HASNONZERO_FUNC(hasNonZero64f, s64, int64, v_int64, VEC_CMP_EQ_Z_FP, CHECK_NZ_FP)
 DEFINE_HASNONZERO_FUNC(hasNonZero16f, u16, ushort, v_uint16, VEC_CMP_EQ_Z_FP16, CHECK_NZ_FP16)
 
-HasNonZeroFunc getHasNonZeroFunc(int depth)
+HasNonZeroFunc getHasNonZeroFunc(ਪੂਰਨ ਡੂੰਘਾਈ)
 {
-    static HasNonZeroFunc hasNonZeroTab[CV_DEPTH_MAX] =
+    ਸਥਿਰ HasNonZeroFunc hasNonZeroTab[CV_ਡੂੰਘਾਈ_MAX] =
     {
         hasNonZero8u,
         hasNonZero8u,
@@ -113,10 +113,10 @@ HasNonZeroFunc getHasNonZeroFunc(int depth)
         0
     };
 
-    return hasNonZeroTab[depth];
+    ਵਾਪਸ hasNonZeroTab[ਡੂੰਘਾਈ];
 }
 
-#endif
+#ਜੇ_ਅੰਤ
 
-CV_CPU_OPTIMIZATION_NAMESPACE_END
+CV_CPU_OPTIMIZATION_NAMESPACE_ਸਿਰਾ
 } // namespace

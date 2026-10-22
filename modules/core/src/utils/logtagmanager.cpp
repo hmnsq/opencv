@@ -2,40 +2,40 @@
 // It is subject to the license terms in the LICENSE file found in the top-level directory
 // of this distribution and at http://opencv.org/license.html.
 
-#include "../precomp.hpp"
-#include "logtagmanager.hpp"
-#include "logtagconfigparser.hpp"
+#ਅਨ੍ਤਰ੍ਭਾਵ "../precomp.hpp"
+#ਅਨ੍ਤਰ੍ਭਾਵ "logtagmanager.hpp"
+#ਅਨ੍ਤਰ੍ਭਾਵ "logtagconfigparser.hpp"
 
-namespace cv {
-namespace utils {
-namespace logging {
-
-
-const char* LogTagManager::m_globalName = "global";
+ਨਾਮਾਕਾਸ਼ cv {
+ਨਾਮਾਕਾਸ਼ utils {
+ਨਾਮਾਕਾਸ਼ logging {
 
 
-LogTagManager::LogTagManager(LogLevel defaultUnconfiguredGlobalLevel)
+ਅਚਲ ਅੱਖਰ* Log_ਟੈਗ_Manager::m_globalName = "global";
+
+
+Log_ਟੈਗ_Manager::Log_ਟੈਗ_Manager(LogLevel defaultUnconfiguredGlobalLevel)
     : m_mutex()
-    , m_globalLogTag(new LogTag(m_globalName, defaultUnconfiguredGlobalLevel))
-    , m_config(std::make_shared<LogTagConfigParser>(defaultUnconfiguredGlobalLevel))
+    , m_global_Log_ਟੈਗ(ਨਵਾਂ Log_ਟੈਗ(m_globalName, defaultUnconfiguredGlobalLevel))
+    , m_config(std::make_shared<Log_ਟੈਗ_Config_Parser>(defaultUnconfiguredGlobalLevel))
 {
-    assign(m_globalName, m_globalLogTag.get());
+    assign(m_globalName, m_global_Log_ਟੈਗ.get());
 }
 
-LogTagManager::~LogTagManager()
+Log_ਟੈਗ_Manager::~Log_ਟੈਗ_Manager()
 {
 }
 
-void LogTagManager::setConfigString(const std::string& configString, bool apply /*true*/)
+ਖਾਲੀ Log_ਟੈਗ_Manager::ਸੈੱਟ_Config_String(ਅਚਲ std::string& configString, ਤਾਰਕਿਕ apply /*true*/)
 {
     m_config->parse(configString);
-    if (m_config->hasMalformed())
+    ਜੇ (m_config->hasMalformed())
     {
-        return;
+        ਵਾਪਸ;
     }
-    if (!apply)
+    ਜੇ (!apply)
     {
-        return;
+        ਵਾਪਸ;
     }
     // The following code is arranged with "priority by overwriting",
     // where when the same log tag has multiple matches, the last code
@@ -46,383 +46,383 @@ void LogTagManager::setConfigString(const std::string& configString, bool apply 
     // Matching by any name part has moderate priority.
     // Matching by first name part (prefix) has lowest priority.
     //
-    const auto& globalConfig = m_config->getGlobalConfig();
-    m_globalLogTag->level = globalConfig.level;
-    for (const auto& config : m_config->getFirstPartConfigs())
+    ਅਚਲ ਸਵੈਚਾਲਿਤ& globalConfig = m_config->getGlobalConfig();
+    m_global_Log_ਟੈਗ->level = globalConfig.level;
+    ਲਈ (ਅਚਲ ਸਵੈਚਾਲਿਤ& config : m_config->get_ਪਹਿਲਾ_Part_Configs())
     {
-        setLevelByFirstPart(config.namePart, config.level);
+        ਸੈੱਟ_Level_By_ਪਹਿਲਾ_Part(config.namePart, config.level);
     }
-    for (const auto& config : m_config->getAnyPartConfigs())
+    ਲਈ (ਅਚਲ ਸਵੈਚਾਲਿਤ& config : m_config->getAnyPartConfigs())
     {
-        setLevelByAnyPart(config.namePart, config.level);
+        ਸੈੱਟ_Level_By_Any_Part(config.namePart, config.level);
     }
-    for (const auto& config : m_config->getFullNameConfigs())
+    ਲਈ (ਅਚਲ ਸਵੈਚਾਲਿਤ& config : m_config->get_ਭਰਿਆ_Name_Configs())
     {
-        setLevelByFullName(config.namePart, config.level);
+        ਸੈੱਟ_Level_By_ਭਰਿਆ_Name(config.namePart, config.level);
     }
 }
 
-LogTagConfigParser& LogTagManager::getConfigParser() const
+Log_ਟੈਗ_Config_Parser& Log_ਟੈਗ_Manager::getConfigParser() ਅਚਲ
 {
-    return *m_config;
+    ਵਾਪਸ *m_config;
 }
 
-void LogTagManager::assign(const std::string& fullName, LogTag* ptr)
+ਖਾਲੀ Log_ਟੈਗ_Manager::assign(ਅਚਲ std::string& ਭਰਿਆ_Name, Log_ਟੈਗ* ptr)
 {
     CV_TRACE_FUNCTION();
-    LockType lock(m_mutex);
-    FullNameLookupResult result(fullName);
-    result.m_findCrossReferences = true;
-    m_nameTable.addOrLookupFullName(result);
-    FullNameInfo& fullNameInfo = *result.m_fullNameInfoPtr;
-    const bool isPtrChanged = (fullNameInfo.logTagPtr != ptr);
-    if (!isPtrChanged)
+    ਤਾਲਾ_Type lock(m_mutex);
+    ਭਰਿਆ_Name_Lookup_ਨਤੀਜਾ ਨਤੀਜਾ(ਭਰਿਆ_Name);
+    ਨਤੀਜਾ.m_ਲੱਭੋ_Cross_References = ਸੱਚ;
+    m_name_ਸਾਰਣੀ.ਜੋੜੋ_Or_Lookup_ਭਰਿਆ_Name(ਨਤੀਜਾ);
+    ਭਰਿਆ_Name_Info& ਭਰਿਆ_Name_Info_2 = *ਨਤੀਜਾ.m_ਭਰਿਆ_Name_Info_Ptr;
+    ਅਚਲ ਤਾਰਕਿਕ is_Ptr_ਬਦਲਿਆ = (ਭਰਿਆ_Name_Info_2.log_ਟੈਗ_Ptr != ptr);
+    ਜੇ (!is_Ptr_ਬਦਲਿਆ)
     {
-        return;
+        ਵਾਪਸ;
     }
-    fullNameInfo.logTagPtr = ptr;
-    if (!ptr)
+    ਭਰਿਆ_Name_Info_2.log_ਟੈਗ_Ptr = ptr;
+    ਜੇ (!ptr)
     {
-        return;
+        ਵਾਪਸ;
     }
-    const bool hasAppliedFullNameConfig = internal_applyFullNameConfigToTag(fullNameInfo);
-    if (hasAppliedFullNameConfig)
+    ਅਚਲ ਤਾਰਕਿਕ has_Applied_ਭਰਿਆ_Name_Config = ਅੰਦਰੂਨੀ_apply_ਭਰਿਆ_Name_Config_ਮੰਜ਼ਿਲ_ਟੈਗ(ਭਰਿਆ_Name_Info_2);
+    ਜੇ (has_Applied_ਭਰਿਆ_Name_Config)
     {
-        return;
+        ਵਾਪਸ;
     }
-    internal_applyNamePartConfigToSpecificTag(result);
+    ਅੰਦਰੂਨੀ_apply_Name_Part_Config_ਮੰਜ਼ਿਲ_Specific_ਟੈਗ(ਨਤੀਜਾ);
 }
 
-void LogTagManager::unassign(const std::string& fullName)
+ਖਾਲੀ Log_ਟੈਗ_Manager::unassign(ਅਚਲ std::string& ਭਰਿਆ_Name)
 {
     // Lock is inside assign() method.
-    assign(fullName, nullptr);
+    assign(ਭਰਿਆ_Name, ਖਾਲੀ_ਸੂਚਕ);
 }
 
-LogTag* LogTagManager::get(const std::string& fullName)
+Log_ਟੈਗ* Log_ਟੈਗ_Manager::get(ਅਚਲ std::string& ਭਰਿਆ_Name)
 {
     CV_TRACE_FUNCTION();
-    LockType lock(m_mutex);
-    FullNameInfo* fullNameInfoPtr = m_nameTable.getFullNameInfo(fullName);
-    if (fullNameInfoPtr && fullNameInfoPtr->logTagPtr)
+    ਤਾਲਾ_Type lock(m_mutex);
+    ਭਰਿਆ_Name_Info* ਭਰਿਆ_Name_Info_Ptr = m_name_ਸਾਰਣੀ.get_ਭਰਿਆ_Name_Info(ਭਰਿਆ_Name);
+    ਜੇ (ਭਰਿਆ_Name_Info_Ptr && ਭਰਿਆ_Name_Info_Ptr->log_ਟੈਗ_Ptr)
     {
-        return fullNameInfoPtr->logTagPtr;
+        ਵਾਪਸ ਭਰਿਆ_Name_Info_Ptr->log_ਟੈਗ_Ptr;
     }
-    return nullptr;
+    ਵਾਪਸ ਖਾਲੀ_ਸੂਚਕ;
 }
 
-void LogTagManager::setLevelByFullName(const std::string& fullName, LogLevel level)
+ਖਾਲੀ Log_ਟੈਗ_Manager::ਸੈੱਟ_Level_By_ਭਰਿਆ_Name(ਅਚਲ std::string& ਭਰਿਆ_Name, LogLevel level)
 {
     CV_TRACE_FUNCTION();
-    LockType lock(m_mutex);
-    FullNameLookupResult result(fullName);
-    result.m_findCrossReferences = false;
-    m_nameTable.addOrLookupFullName(result);
-    FullNameInfo& fullNameInfo = *result.m_fullNameInfoPtr;
-    if (fullNameInfo.parsedLevel.scope == MatchingScope::Full &&
-        fullNameInfo.parsedLevel.level == level)
+    ਤਾਲਾ_Type lock(m_mutex);
+    ਭਰਿਆ_Name_Lookup_ਨਤੀਜਾ ਨਤੀਜਾ(ਭਰਿਆ_Name);
+    ਨਤੀਜਾ.m_ਲੱਭੋ_Cross_References = ਝੂਠ;
+    m_name_ਸਾਰਣੀ.ਜੋੜੋ_Or_Lookup_ਭਰਿਆ_Name(ਨਤੀਜਾ);
+    ਭਰਿਆ_Name_Info& ਭਰਿਆ_Name_Info_2 = *ਨਤੀਜਾ.m_ਭਰਿਆ_Name_Info_Ptr;
+    ਜੇ (ਭਰਿਆ_Name_Info_2.parsedLevel.scope == MatchingScope::ਭਰਿਆ_2 &&
+        ਭਰਿਆ_Name_Info_2.parsedLevel.level == level)
     {
         // skip additional processing if nothing changes.
-        return;
+        ਵਾਪਸ;
     }
     // update the cached configured value.
-    fullNameInfo.parsedLevel.scope = MatchingScope::Full;
-    fullNameInfo.parsedLevel.level = level;
+    ਭਰਿਆ_Name_Info_2.parsedLevel.scope = MatchingScope::ਭਰਿਆ_2;
+    ਭਰਿਆ_Name_Info_2.parsedLevel.level = level;
     // update the actual tag, if already registered.
-    LogTag* logTagPtr = fullNameInfo.logTagPtr;
-    if (logTagPtr)
+    Log_ਟੈਗ* log_ਟੈਗ_Ptr = ਭਰਿਆ_Name_Info_2.log_ਟੈਗ_Ptr;
+    ਜੇ (log_ਟੈਗ_Ptr)
     {
-        logTagPtr->level = level;
+        log_ਟੈਗ_Ptr->level = level;
     }
 }
 
-void LogTagManager::setLevelByFirstPart(const std::string& firstPart, LogLevel level)
+ਖਾਲੀ Log_ਟੈਗ_Manager::ਸੈੱਟ_Level_By_ਪਹਿਲਾ_Part(ਅਚਲ std::string& ਪਹਿਲਾ_Part, LogLevel level)
 {
     // Lock is inside setLevelByNamePart() method.
-    setLevelByNamePart(firstPart, level, MatchingScope::FirstNamePart);
+    ਸੈੱਟ_Level_By_Name_Part(ਪਹਿਲਾ_Part, level, MatchingScope::ਪਹਿਲਾ_Name_Part);
 }
 
-void LogTagManager::setLevelByAnyPart(const std::string& anyPart, LogLevel level)
+ਖਾਲੀ Log_ਟੈਗ_Manager::ਸੈੱਟ_Level_By_Any_Part(ਅਚਲ std::string& anyPart, LogLevel level)
 {
     // Lock is inside setLevelByNamePart() method.
-    setLevelByNamePart(anyPart, level, MatchingScope::AnyNamePart);
+    ਸੈੱਟ_Level_By_Name_Part(anyPart, level, MatchingScope::AnyNamePart);
 }
 
-void LogTagManager::setLevelByNamePart(const std::string& namePart, LogLevel level, MatchingScope scope)
+ਖਾਲੀ Log_ਟੈਗ_Manager::ਸੈੱਟ_Level_By_Name_Part(ਅਚਲ std::string& namePart, LogLevel level, MatchingScope scope)
 {
     CV_TRACE_FUNCTION();
-    LockType lock(m_mutex);
-    NamePartLookupResult result(namePart);
-    result.m_findCrossReferences = true;
-    m_nameTable.addOrLookupNamePart(result);
-    NamePartInfo& namePartInfo = *result.m_namePartInfoPtr;
-    if (namePartInfo.parsedLevel.scope == scope &&
+    ਤਾਲਾ_Type lock(m_mutex);
+    Name_Part_Lookup_ਨਤੀਜਾ ਨਤੀਜਾ(namePart);
+    ਨਤੀਜਾ.m_ਲੱਭੋ_Cross_References = ਸੱਚ;
+    m_name_ਸਾਰਣੀ.ਜੋੜੋ_Or_Lookup_Name_Part(ਨਤੀਜਾ);
+    NamePartInfo& namePartInfo = *ਨਤੀਜਾ.m_namePartInfoPtr;
+    ਜੇ (namePartInfo.parsedLevel.scope == scope &&
         namePartInfo.parsedLevel.level == level)
     {
         // skip additional processing if nothing changes.
-        return;
+        ਵਾਪਸ;
     }
     namePartInfo.parsedLevel.scope = scope;
     namePartInfo.parsedLevel.level = level;
-    internal_applyNamePartConfigToMatchingTags(result);
+    ਅੰਦਰੂਨੀ_apply_Name_Part_Config_ਮੰਜ਼ਿਲ_Matching_ਟੈਗ_ਸੂਚੀ(ਨਤੀਜਾ);
 }
 
-std::vector<std::string> LogTagManager::splitNameParts(const std::string& fullName)
+std::vector<std::string> Log_ਟੈਗ_Manager::ਵੰਡੋ_Name_Parts(ਅਚਲ std::string& ਭਰਿਆ_Name)
 {
-    const size_t npos = std::string::npos;
-    const size_t len = fullName.length();
+    ਅਚਲ size_t npos = std::string::npos;
+    ਅਚਲ size_t len = ਭਰਿਆ_Name.length();
     std::vector<std::string> nameParts;
-    size_t start = 0u;
-    while (start < len)
+    size_t ਸ਼ੁਰੂ = 0u;
+    ਜਦੋਂ (ਸ਼ੁਰੂ < len)
     {
-        size_t nextPeriod = fullName.find('.', start);
-        if (nextPeriod == npos)
+        size_t ਅਗਲਾ_Period = ਭਰਿਆ_Name.find('.', ਸ਼ੁਰੂ);
+        ਜੇ (ਅਗਲਾ_Period == npos)
         {
-            nextPeriod = len;
+            ਅਗਲਾ_Period = len;
         }
-        if (nextPeriod >= start + 1u)
+        ਜੇ (ਅਗਲਾ_Period >= ਸ਼ੁਰੂ + 1u)
         {
-            nameParts.emplace_back(fullName.substr(start, nextPeriod - start));
+            nameParts.emplace_back(ਭਰਿਆ_Name.substr(ਸ਼ੁਰੂ, ਅਗਲਾ_Period - ਸ਼ੁਰੂ));
         }
-        start = nextPeriod + 1u;
+        ਸ਼ੁਰੂ = ਅਗਲਾ_Period + 1u;
     }
-    return nameParts;
+    ਵਾਪਸ nameParts;
 }
 
-bool LogTagManager::internal_isNamePartMatch(MatchingScope scope, size_t matchingPos)
+ਤਾਰਕਿਕ Log_ਟੈਗ_Manager::ਅੰਦਰੂਨੀ_is_Name_Part_ਮੇਲ(MatchingScope scope, size_t matchingPos)
 {
-    switch (scope)
+    ਚੋਣ (scope)
     {
-    case MatchingScope::FirstNamePart:
-        return (matchingPos == 0u);
-    case MatchingScope::AnyNamePart:
-        return true;
-    case MatchingScope::None:
-    case MatchingScope::Full:
-    default:
-        return false;
+    ਹਾਲਤ MatchingScope::ਪਹਿਲਾ_Name_Part:
+        ਵਾਪਸ (matchingPos == 0u);
+    ਹਾਲਤ MatchingScope::AnyNamePart:
+        ਵਾਪਸ ਸੱਚ;
+    ਹਾਲਤ MatchingScope::None:
+    ਹਾਲਤ MatchingScope::ਭਰਿਆ_2:
+    ਮੂਲ:
+        ਵਾਪਸ ਝੂਠ;
     }
 }
 
-bool LogTagManager::internal_applyFullNameConfigToTag(FullNameInfo& fullNameInfo)
+ਤਾਰਕਿਕ Log_ਟੈਗ_Manager::ਅੰਦਰੂਨੀ_apply_ਭਰਿਆ_Name_Config_ਮੰਜ਼ਿਲ_ਟੈਗ(ਭਰਿਆ_Name_Info& ਭਰਿਆ_Name_Info_2)
 {
-    if (!fullNameInfo.logTagPtr)
+    ਜੇ (!ਭਰਿਆ_Name_Info_2.log_ਟੈਗ_Ptr)
     {
-        return false;
+        ਵਾਪਸ ਝੂਠ;
     }
-    if (fullNameInfo.parsedLevel.scope == MatchingScope::Full)
+    ਜੇ (ਭਰਿਆ_Name_Info_2.parsedLevel.scope == MatchingScope::ਭਰਿਆ_2)
     {
-        fullNameInfo.logTagPtr->level = fullNameInfo.parsedLevel.level;
-        return true;
+        ਭਰਿਆ_Name_Info_2.log_ਟੈਗ_Ptr->level = ਭਰਿਆ_Name_Info_2.parsedLevel.level;
+        ਵਾਪਸ ਸੱਚ;
     }
-    return false;
+    ਵਾਪਸ ਝੂਠ;
 }
 
-bool LogTagManager::internal_applyNamePartConfigToSpecificTag(FullNameLookupResult& fullNameResult)
+ਤਾਰਕਿਕ Log_ਟੈਗ_Manager::ਅੰਦਰੂਨੀ_apply_Name_Part_Config_ਮੰਜ਼ਿਲ_Specific_ਟੈਗ(ਭਰਿਆ_Name_Lookup_ਨਤੀਜਾ& ਭਰਿਆ_Name_ਨਤੀਜਾ)
 {
-    const FullNameInfo& fullNameInfo = *fullNameResult.m_fullNameInfoPtr;
-    LogTag* const logTag = fullNameInfo.logTagPtr;
-    if (!logTag)
+    ਅਚਲ ਭਰਿਆ_Name_Info& ਭਰਿਆ_Name_Info_2 = *ਭਰਿਆ_Name_ਨਤੀਜਾ.m_ਭਰਿਆ_Name_Info_Ptr;
+    Log_ਟੈਗ* ਅਚਲ log_ਟੈਗ = ਭਰਿਆ_Name_Info_2.log_ਟੈਗ_Ptr;
+    ਜੇ (!log_ਟੈਗ)
     {
-        return false;
+        ਵਾਪਸ ਝੂਠ;
     }
-    CV_Assert(fullNameResult.m_findCrossReferences);
-    const auto& crossReferences = fullNameResult.m_crossReferences;
-    const size_t matchingNamePartCount = crossReferences.size();
-    for (size_t k = 0u; k < matchingNamePartCount; ++k)
+    CV_Assert(ਭਰਿਆ_Name_ਨਤੀਜਾ.m_ਲੱਭੋ_Cross_References);
+    ਅਚਲ ਸਵੈਚਾਲਿਤ& crossReferences = ਭਰਿਆ_Name_ਨਤੀਜਾ.m_crossReferences;
+    ਅਚਲ size_t matching_Name_Part_ਗਿਣਤੀ = crossReferences.size();
+    ਲਈ (size_t k = 0u; k < matching_Name_Part_ਗਿਣਤੀ; ++k)
     {
-        const auto& match = crossReferences.at(k);
-        const auto& namePartInfo = *match.m_namePartInfo;
-        const auto& parsedLevel = namePartInfo.parsedLevel;
-        const auto scope = parsedLevel.scope;
-        const LogLevel level = parsedLevel.level;
-        const size_t matchingPos = match.m_matchingPos;
-        const bool isMatch = internal_isNamePartMatch(scope, matchingPos);
-        if (isMatch)
+        ਅਚਲ ਸਵੈਚਾਲਿਤ& ਮੇਲ = crossReferences.at(k);
+        ਅਚਲ ਸਵੈਚਾਲਿਤ& namePartInfo = *ਮੇਲ.m_namePartInfo;
+        ਅਚਲ ਸਵੈਚਾਲਿਤ& parsedLevel = namePartInfo.parsedLevel;
+        ਅਚਲ ਸਵੈਚਾਲਿਤ scope = parsedLevel.scope;
+        ਅਚਲ LogLevel level = parsedLevel.level;
+        ਅਚਲ size_t matchingPos = ਮੇਲ.m_matchingPos;
+        ਅਚਲ ਤਾਰਕਿਕ is_ਮੇਲ = ਅੰਦਰੂਨੀ_is_Name_Part_ਮੇਲ(scope, matchingPos);
+        ਜੇ (is_ਮੇਲ)
         {
-            logTag->level = level;
-            return true;
+            log_ਟੈਗ->level = level;
+            ਵਾਪਸ ਸੱਚ;
         }
     }
-    return false;
+    ਵਾਪਸ ਝੂਠ;
 }
 
-void LogTagManager::internal_applyNamePartConfigToMatchingTags(NamePartLookupResult& namePartResult)
+ਖਾਲੀ Log_ਟੈਗ_Manager::ਅੰਦਰੂਨੀ_apply_Name_Part_Config_ਮੰਜ਼ਿਲ_Matching_ਟੈਗ_ਸੂਚੀ(Name_Part_Lookup_ਨਤੀਜਾ& name_Part_ਨਤੀਜਾ)
 {
-    CV_Assert(namePartResult.m_findCrossReferences);
-    const auto& crossReferences = namePartResult.m_crossReferences;
-    const size_t matchingFullNameCount = crossReferences.size();
-    NamePartInfo& namePartInfo = *namePartResult.m_namePartInfoPtr;
-    const MatchingScope scope = namePartInfo.parsedLevel.scope;
-    CV_Assert(scope != MatchingScope::Full);
-    if (scope == MatchingScope::None)
+    CV_Assert(name_Part_ਨਤੀਜਾ.m_ਲੱਭੋ_Cross_References);
+    ਅਚਲ ਸਵੈਚਾਲਿਤ& crossReferences = name_Part_ਨਤੀਜਾ.m_crossReferences;
+    ਅਚਲ size_t matching_ਭਰਿਆ_Name_ਗਿਣਤੀ = crossReferences.size();
+    NamePartInfo& namePartInfo = *name_Part_ਨਤੀਜਾ.m_namePartInfoPtr;
+    ਅਚਲ MatchingScope scope = namePartInfo.parsedLevel.scope;
+    CV_Assert(scope != MatchingScope::ਭਰਿਆ_2);
+    ਜੇ (scope == MatchingScope::None)
     {
-        return;
+        ਵਾਪਸ;
     }
-    const LogLevel level = namePartInfo.parsedLevel.level;
-    for (size_t k = 0u; k < matchingFullNameCount; ++k)
+    ਅਚਲ LogLevel level = namePartInfo.parsedLevel.level;
+    ਲਈ (size_t k = 0u; k < matching_ਭਰਿਆ_Name_ਗਿਣਤੀ; ++k)
     {
-        const auto& match = crossReferences.at(k);
-        FullNameInfo& fullNameInfo = *match.m_fullNameInfo;
-        LogTag* logTagPtr = fullNameInfo.logTagPtr;
-        if (!logTagPtr)
+        ਅਚਲ ਸਵੈਚਾਲਿਤ& ਮੇਲ = crossReferences.at(k);
+        ਭਰਿਆ_Name_Info& ਭਰਿਆ_Name_Info_2 = *ਮੇਲ.m_ਭਰਿਆ_Name_Info;
+        Log_ਟੈਗ* log_ਟੈਗ_Ptr = ਭਰਿਆ_Name_Info_2.log_ਟੈਗ_Ptr;
+        ਜੇ (!log_ਟੈਗ_Ptr)
         {
-            continue;
+            ਜਾਰੀ;
         }
-        if (fullNameInfo.parsedLevel.scope == MatchingScope::Full)
+        ਜੇ (ਭਰਿਆ_Name_Info_2.parsedLevel.scope == MatchingScope::ਭਰਿਆ_2)
         {
             // If the full name already has valid config, that full name config
             // has precedence over name part config.
-            continue;
+            ਜਾਰੀ;
         }
-        const size_t matchingPos = match.m_matchingPos;
-        const bool isMatch = internal_isNamePartMatch(scope, matchingPos);
-        if (!isMatch)
+        ਅਚਲ size_t matchingPos = ਮੇਲ.m_matchingPos;
+        ਅਚਲ ਤਾਰਕਿਕ is_ਮੇਲ = ਅੰਦਰੂਨੀ_is_Name_Part_ਮੇਲ(scope, matchingPos);
+        ਜੇ (!is_ਮੇਲ)
         {
-            continue;
+            ਜਾਰੀ;
         }
-        logTagPtr->level = level;
+        log_ਟੈਗ_Ptr->level = level;
     }
 }
 
-void LogTagManager::NameTable::addOrLookupFullName(FullNameLookupResult& result)
+ਖਾਲੀ Log_ਟੈਗ_Manager::Name_ਸਾਰਣੀ::ਜੋੜੋ_Or_Lookup_ਭਰਿਆ_Name(ਭਰਿਆ_Name_Lookup_ਨਤੀਜਾ& ਨਤੀਜਾ)
 {
-    const auto fullNameIdAndFlag = internal_addOrLookupFullName(result.m_fullName);
-    result.m_fullNameId = fullNameIdAndFlag.first;
-    result.m_nameParts = LogTagManager::splitNameParts(result.m_fullName);
-    internal_addOrLookupNameParts(result.m_nameParts, result.m_namePartIds);
-    const bool isNew = fullNameIdAndFlag.second;
-    if (isNew)
+    ਅਚਲ ਸਵੈਚਾਲਿਤ ਭਰਿਆ_Name_Id_And_Flag = ਅੰਦਰੂਨੀ_ਜੋੜੋ_Or_Lookup_ਭਰਿਆ_Name(ਨਤੀਜਾ.m_ਭਰਿਆ_Name);
+    ਨਤੀਜਾ.m_ਭਰਿਆ_Name_Id = ਭਰਿਆ_Name_Id_And_Flag.first;
+    ਨਤੀਜਾ.m_nameParts = Log_ਟੈਗ_Manager::ਵੰਡੋ_Name_Parts(ਨਤੀਜਾ.m_ਭਰਿਆ_Name);
+    ਅੰਦਰੂਨੀ_ਜੋੜੋ_Or_Lookup_Name_Parts(ਨਤੀਜਾ.m_nameParts, ਨਤੀਜਾ.m_namePartIds);
+    ਅਚਲ ਤਾਰਕਿਕ isNew = ਭਰਿਆ_Name_Id_And_Flag.second;
+    ਜੇ (isNew)
     {
-        internal_addCrossReference(result.m_fullNameId, result.m_namePartIds);
+        ਅੰਦਰੂਨੀ_ਜੋੜੋ_Cross_Reference(ਨਤੀਜਾ.m_ਭਰਿਆ_Name_Id, ਨਤੀਜਾ.m_namePartIds);
     }
     // ====== IMPORTANT ====== Critical order-of-operation ======
     // The gathering of the pointers of FullNameInfo and NamePartInfo are performed
     // as the last step of the operation, so that these pointer are not invalidated
     // by the vector append operations earlier in this function.
     // ======
-    result.m_fullNameInfoPtr = internal_getFullNameInfo(result.m_fullNameId);
-    if (result.m_findCrossReferences)
+    ਨਤੀਜਾ.m_ਭਰਿਆ_Name_Info_Ptr = ਅੰਦਰੂਨੀ_get_ਭਰਿਆ_Name_Info(ਨਤੀਜਾ.m_ਭਰਿਆ_Name_Id);
+    ਜੇ (ਨਤੀਜਾ.m_ਲੱਭੋ_Cross_References)
     {
-        internal_findMatchingNamePartsForFullName(result);
+        ਅੰਦਰੂਨੀ_ਲੱਭੋ_Matching_Name_Parts_For_ਭਰਿਆ_Name(ਨਤੀਜਾ);
     }
 }
 
-void LogTagManager::NameTable::addOrLookupNamePart(NamePartLookupResult& result)
+ਖਾਲੀ Log_ਟੈਗ_Manager::Name_ਸਾਰਣੀ::ਜੋੜੋ_Or_Lookup_Name_Part(Name_Part_Lookup_ਨਤੀਜਾ& ਨਤੀਜਾ)
 {
-    result.m_namePartId = internal_addOrLookupNamePart(result.m_namePart);
-    result.m_namePartInfoPtr = internal_getNamePartInfo(result.m_namePartId);
-    if (result.m_findCrossReferences)
+    ਨਤੀਜਾ.m_namePartId = ਅੰਦਰੂਨੀ_ਜੋੜੋ_Or_Lookup_Name_Part(ਨਤੀਜਾ.m_namePart);
+    ਨਤੀਜਾ.m_namePartInfoPtr = ਅੰਦਰੂਨੀ_get_Name_Part_Info(ਨਤੀਜਾ.m_namePartId);
+    ਜੇ (ਨਤੀਜਾ.m_ਲੱਭੋ_Cross_References)
     {
-        internal_findMatchingFullNamesForNamePart(result);
+        ਅੰਦਰੂਨੀ_ਲੱਭੋ_Matching_ਭਰਿਆ_ਨਾਂ_For_Name_Part(ਨਤੀਜਾ);
     }
 }
 
-std::pair<size_t, bool> LogTagManager::NameTable::internal_addOrLookupFullName(const std::string& fullName)
+std::pair<size_t, ਤਾਰਕਿਕ> Log_ਟੈਗ_Manager::Name_ਸਾਰਣੀ::ਅੰਦਰੂਨੀ_ਜੋੜੋ_Or_Lookup_ਭਰਿਆ_Name(ਅਚਲ std::string& ਭਰਿਆ_Name)
 {
-    const auto fullNameIdIter = m_fullNameIds.find(fullName);
-    if (fullNameIdIter != m_fullNameIds.end())
+    ਅਚਲ ਸਵੈਚਾਲਿਤ ਭਰਿਆ_Name_Id_Iter = m_ਭਰਿਆ_Name_Ids.find(ਭਰਿਆ_Name);
+    ਜੇ (ਭਰਿਆ_Name_Id_Iter != m_ਭਰਿਆ_Name_Ids.end())
     {
-        return std::make_pair(fullNameIdIter->second, false);
+        ਵਾਪਸ std::make_pair(ਭਰਿਆ_Name_Id_Iter->second, ਝੂਠ);
     }
-    const size_t fullNameId = m_fullNameInfos.size();
-    m_fullNameInfos.emplace_back(FullNameInfo{});
-    m_fullNameIds.emplace(fullName, fullNameId);
-    return std::make_pair(fullNameId, true);
+    ਅਚਲ size_t ਭਰਿਆ_Name_Id = m_ਭਰਿਆ_Name_Infos.size();
+    m_ਭਰਿਆ_Name_Infos.emplace_back(ਭਰਿਆ_Name_Info{});
+    m_ਭਰਿਆ_Name_Ids.emplace(ਭਰਿਆ_Name, ਭਰਿਆ_Name_Id);
+    ਵਾਪਸ std::make_pair(ਭਰਿਆ_Name_Id, ਸੱਚ);
 }
 
-void LogTagManager::NameTable::internal_addOrLookupNameParts(const std::vector<std::string>& nameParts,
+ਖਾਲੀ Log_ਟੈਗ_Manager::Name_ਸਾਰਣੀ::ਅੰਦਰੂਨੀ_ਜੋੜੋ_Or_Lookup_Name_Parts(ਅਚਲ std::vector<std::string>& nameParts,
     std::vector<size_t>& namePartIds)
 {
-    const size_t namePartCount = nameParts.size();
-    namePartIds.resize(namePartCount, ~(size_t)0u);
-    for (size_t namePartIndex = 0u; namePartIndex < namePartCount; ++namePartIndex)
+    ਅਚਲ size_t name_Part_ਗਿਣਤੀ = nameParts.size();
+    namePartIds.resize(name_Part_ਗਿਣਤੀ, ~(size_t)0u);
+    ਲਈ (size_t name_Part_ਸੂਚਕਾਂਕ = 0u; name_Part_ਸੂਚਕਾਂਕ < name_Part_ਗਿਣਤੀ; ++name_Part_ਸੂਚਕਾਂਕ)
     {
-        const std::string& namePart = nameParts.at(namePartIndex);
-        const size_t namePartId = internal_addOrLookupNamePart(namePart);
-        namePartIds.at(namePartIndex) = namePartId;
+        ਅਚਲ std::string& namePart = nameParts.at(name_Part_ਸੂਚਕਾਂਕ);
+        ਅਚਲ size_t namePartId = ਅੰਦਰੂਨੀ_ਜੋੜੋ_Or_Lookup_Name_Part(namePart);
+        namePartIds.at(name_Part_ਸੂਚਕਾਂਕ) = namePartId;
     }
 }
 
-size_t LogTagManager::NameTable::internal_addOrLookupNamePart(const std::string& namePart)
+size_t Log_ਟੈਗ_Manager::Name_ਸਾਰਣੀ::ਅੰਦਰੂਨੀ_ਜੋੜੋ_Or_Lookup_Name_Part(ਅਚਲ std::string& namePart)
 {
-    const auto namePartIter = m_namePartIds.find(namePart);
-    if (namePartIter != m_namePartIds.end())
+    ਅਚਲ ਸਵੈਚਾਲਿਤ namePartIter = m_namePartIds.find(namePart);
+    ਜੇ (namePartIter != m_namePartIds.end())
     {
-        return namePartIter->second;
+        ਵਾਪਸ namePartIter->second;
     }
-    const size_t namePartId = m_namePartInfos.size();
+    ਅਚਲ size_t namePartId = m_namePartInfos.size();
     m_namePartInfos.emplace_back(NamePartInfo{});
     m_namePartIds.emplace(namePart, namePartId);
-    return namePartId;
+    ਵਾਪਸ namePartId;
 }
 
-void LogTagManager::NameTable::internal_addCrossReference(size_t fullNameId, const std::vector<size_t>& namePartIds)
+ਖਾਲੀ Log_ਟੈਗ_Manager::Name_ਸਾਰਣੀ::ਅੰਦਰੂਨੀ_ਜੋੜੋ_Cross_Reference(size_t ਭਰਿਆ_Name_Id, ਅਚਲ std::vector<size_t>& namePartIds)
 {
-    const size_t namePartCount = namePartIds.size();
-    for (size_t namePartPos = 0u; namePartPos < namePartCount; ++namePartPos)
+    ਅਚਲ size_t name_Part_ਗਿਣਤੀ = namePartIds.size();
+    ਲਈ (size_t namePartPos = 0u; namePartPos < name_Part_ਗਿਣਤੀ; ++namePartPos)
     {
-        const size_t namePartId = namePartIds.at(namePartPos);
-        m_fullNameToNamePartIds.emplace(fullNameId, std::make_pair(namePartId, namePartPos));
-        m_namePartToFullNameIds.emplace(namePartId, std::make_pair(fullNameId, namePartPos));
+        ਅਚਲ size_t namePartId = namePartIds.at(namePartPos);
+        m_ਭਰਿਆ_Name_ਮੰਜ਼ਿਲ_Name_Part_Ids.emplace(ਭਰਿਆ_Name_Id, std::make_pair(namePartId, namePartPos));
+        m_name_Part_ਮੰਜ਼ਿਲ_ਭਰਿਆ_Name_Ids.emplace(namePartId, std::make_pair(ਭਰਿਆ_Name_Id, namePartPos));
     }
 }
 
-LogTagManager::FullNameInfo* LogTagManager::NameTable::getFullNameInfo(const std::string& fullName)
+Log_ਟੈਗ_Manager::ਭਰਿਆ_Name_Info* Log_ਟੈਗ_Manager::Name_ਸਾਰਣੀ::get_ਭਰਿਆ_Name_Info(ਅਚਲ std::string& ਭਰਿਆ_Name)
 {
-    const auto fullNameIdIter = m_fullNameIds.find(fullName);
-    if (fullNameIdIter == m_fullNameIds.end())
+    ਅਚਲ ਸਵੈਚਾਲਿਤ ਭਰਿਆ_Name_Id_Iter = m_ਭਰਿਆ_Name_Ids.find(ਭਰਿਆ_Name);
+    ਜੇ (ਭਰਿਆ_Name_Id_Iter == m_ਭਰਿਆ_Name_Ids.end())
     {
-        return nullptr;
+        ਵਾਪਸ ਖਾਲੀ_ਸੂਚਕ;
     }
-    const size_t fullNameId = fullNameIdIter->second;
-    return internal_getFullNameInfo(fullNameId);
+    ਅਚਲ size_t ਭਰਿਆ_Name_Id = ਭਰਿਆ_Name_Id_Iter->second;
+    ਵਾਪਸ ਅੰਦਰੂਨੀ_get_ਭਰਿਆ_Name_Info(ਭਰਿਆ_Name_Id);
 }
 
-LogTagManager::FullNameInfo* LogTagManager::NameTable::internal_getFullNameInfo(size_t fullNameId)
+Log_ਟੈਗ_Manager::ਭਰਿਆ_Name_Info* Log_ਟੈਗ_Manager::Name_ਸਾਰਣੀ::ਅੰਦਰੂਨੀ_get_ਭਰਿਆ_Name_Info(size_t ਭਰਿਆ_Name_Id)
 {
-    return std::addressof(m_fullNameInfos.at(fullNameId));
+    ਵਾਪਸ std::addressof(m_ਭਰਿਆ_Name_Infos.at(ਭਰਿਆ_Name_Id));
 }
 
-LogTagManager::NamePartInfo* LogTagManager::NameTable::internal_getNamePartInfo(size_t namePartId)
+Log_ਟੈਗ_Manager::NamePartInfo* Log_ਟੈਗ_Manager::Name_ਸਾਰਣੀ::ਅੰਦਰੂਨੀ_get_Name_Part_Info(size_t namePartId)
 {
-    return std::addressof(m_namePartInfos.at(namePartId));
+    ਵਾਪਸ std::addressof(m_namePartInfos.at(namePartId));
 }
 
-void LogTagManager::NameTable::internal_findMatchingNamePartsForFullName(FullNameLookupResult& fullNameResult)
+ਖਾਲੀ Log_ਟੈਗ_Manager::Name_ਸਾਰਣੀ::ਅੰਦਰੂਨੀ_ਲੱਭੋ_Matching_Name_Parts_For_ਭਰਿਆ_Name(ਭਰਿਆ_Name_Lookup_ਨਤੀਜਾ& ਭਰਿਆ_Name_ਨਤੀਜਾ)
 {
-    const size_t fullNameId = fullNameResult.m_fullNameId;
-    FullNameInfo* fullNameInfo = fullNameResult.m_fullNameInfoPtr;
-    const auto& namePartIds = fullNameResult.m_namePartIds;
-    const size_t namePartCount = namePartIds.size();
-    auto& crossReferences = fullNameResult.m_crossReferences;
+    ਅਚਲ size_t ਭਰਿਆ_Name_Id = ਭਰਿਆ_Name_ਨਤੀਜਾ.m_ਭਰਿਆ_Name_Id;
+    ਭਰਿਆ_Name_Info* ਭਰਿਆ_Name_Info_2 = ਭਰਿਆ_Name_ਨਤੀਜਾ.m_ਭਰਿਆ_Name_Info_Ptr;
+    ਅਚਲ ਸਵੈਚਾਲਿਤ& namePartIds = ਭਰਿਆ_Name_ਨਤੀਜਾ.m_namePartIds;
+    ਅਚਲ size_t name_Part_ਗਿਣਤੀ = namePartIds.size();
+    ਸਵੈਚਾਲਿਤ& crossReferences = ਭਰਿਆ_Name_ਨਤੀਜਾ.m_crossReferences;
     crossReferences.clear();
-    crossReferences.reserve(namePartCount);
-    for (size_t matchingPos = 0u; matchingPos < namePartCount; ++matchingPos)
+    crossReferences.reserve(name_Part_ਗਿਣਤੀ);
+    ਲਈ (size_t matchingPos = 0u; matchingPos < name_Part_ਗਿਣਤੀ; ++matchingPos)
     {
-        const size_t namePartId = namePartIds.at(matchingPos);
-        NamePartInfo* namePartInfo = internal_getNamePartInfo(namePartId);
-        crossReferences.emplace_back(CrossReference(fullNameId, namePartId, matchingPos, fullNameInfo, namePartInfo));
+        ਅਚਲ size_t namePartId = namePartIds.at(matchingPos);
+        NamePartInfo* namePartInfo = ਅੰਦਰੂਨੀ_get_Name_Part_Info(namePartId);
+        crossReferences.emplace_back(CrossReference(ਭਰਿਆ_Name_Id, namePartId, matchingPos, ਭਰਿਆ_Name_Info_2, namePartInfo));
     }
 }
 
-void LogTagManager::NameTable::internal_findMatchingFullNamesForNamePart(NamePartLookupResult& result)
+ਖਾਲੀ Log_ਟੈਗ_Manager::Name_ਸਾਰਣੀ::ਅੰਦਰੂਨੀ_ਲੱਭੋ_Matching_ਭਰਿਆ_ਨਾਂ_For_Name_Part(Name_Part_Lookup_ਨਤੀਜਾ& ਨਤੀਜਾ)
 {
-    const size_t namePartId = result.m_namePartId;
-    NamePartInfo* namePartInfo = result.m_namePartInfoPtr;
-    const size_t matchingFullNameCount = m_namePartToFullNameIds.count(namePartId);
-    std::vector<CrossReference>& crossReferences = result.m_crossReferences;
+    ਅਚਲ size_t namePartId = ਨਤੀਜਾ.m_namePartId;
+    NamePartInfo* namePartInfo = ਨਤੀਜਾ.m_namePartInfoPtr;
+    ਅਚਲ size_t matching_ਭਰਿਆ_Name_ਗਿਣਤੀ = m_name_Part_ਮੰਜ਼ਿਲ_ਭਰਿਆ_Name_Ids.ਗਿਣਤੀ_3(namePartId);
+    std::vector<CrossReference>& crossReferences = ਨਤੀਜਾ.m_crossReferences;
     crossReferences.clear();
-    crossReferences.reserve(matchingFullNameCount);
-    const auto namePartToFullNameIterPair = m_namePartToFullNameIds.equal_range(result.m_namePartId);
-    const auto iterBegin = namePartToFullNameIterPair.first;
-    const auto iterEnd = namePartToFullNameIterPair.second;
-    for (auto iter = iterBegin; iter != iterEnd; ++iter)
+    crossReferences.reserve(matching_ਭਰਿਆ_Name_ਗਿਣਤੀ);
+    ਅਚਲ ਸਵੈਚਾਲਿਤ name_Part_ਮੰਜ਼ਿਲ_ਭਰਿਆ_Name_Iter_Pair = m_name_Part_ਮੰਜ਼ਿਲ_ਭਰਿਆ_Name_Ids.equal_range(ਨਤੀਜਾ.m_namePartId);
+    ਅਚਲ ਸਵੈਚਾਲਿਤ iterBegin = name_Part_ਮੰਜ਼ਿਲ_ਭਰਿਆ_Name_Iter_Pair.first;
+    ਅਚਲ ਸਵੈਚਾਲਿਤ iter_ਸਿਰਾ = name_Part_ਮੰਜ਼ਿਲ_ਭਰਿਆ_Name_Iter_Pair.second;
+    ਲਈ (ਸਵੈਚਾਲਿਤ iter = iterBegin; iter != iter_ਸਿਰਾ; ++iter)
     {
-        const size_t fullNameId = iter->second.first;
-        const size_t matchingPos = iter->second.second;
-        FullNameInfo* fullNameInfo = internal_getFullNameInfo(fullNameId);
-        crossReferences.emplace_back(CrossReference(fullNameId, namePartId, matchingPos, fullNameInfo, namePartInfo));
+        ਅਚਲ size_t ਭਰਿਆ_Name_Id = iter->second.first;
+        ਅਚਲ size_t matchingPos = iter->second.second;
+        ਭਰਿਆ_Name_Info* ਭਰਿਆ_Name_Info_2 = ਅੰਦਰੂਨੀ_get_ਭਰਿਆ_Name_Info(ਭਰਿਆ_Name_Id);
+        crossReferences.emplace_back(CrossReference(ਭਰਿਆ_Name_Id, namePartId, matchingPos, ਭਰਿਆ_Name_Info_2, namePartInfo));
     }
 }
 

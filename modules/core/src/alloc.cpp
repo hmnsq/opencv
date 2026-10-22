@@ -40,190 +40,190 @@
 //
 //M*/
 
-#include "precomp.hpp"
+#ਅਨ੍ਤਰ੍ਭਾਵ "precomp.hpp"
 
-#include <opencv2/core/utils/logger.defines.hpp>
-#undef CV_LOG_STRIP_LEVEL
-#define CV_LOG_STRIP_LEVEL CV_LOG_LEVEL_VERBOSE + 1
-#include <opencv2/core/utils/logger.hpp>
-#include <opencv2/core/utils/configuration.private.hpp>
+#ਅਨ੍ਤਰ੍ਭਾਵ <opencv2/core/utils/logger.defines.hpp>
+#ਪਰਿਭਾਸ਼ਾ_ਰੱਦ CV_LOG_STRIP_LEVEL
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ CV_LOG_STRIP_LEVEL CV_LOG_LEVEL_VERBOSE + 1
+#ਅਨ੍ਤਰ੍ਭਾਵ <opencv2/core/utils/logger.hpp>
+#ਅਨ੍ਤਰ੍ਭਾਵ <opencv2/core/utils/configuration.private.hpp>
 
-#define CV__ALLOCATOR_STATS_LOG(...) CV_LOG_VERBOSE(NULL, 0, "alloc.cpp: " << __VA_ARGS__)
-#include "opencv2/core/utils/allocator_stats.impl.hpp"
-#undef CV__ALLOCATOR_STATS_LOG
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ CV__ALLOCATOR_STATS_LOG(...) CV_LOG_VERBOSE(ਨਿਰਾ, 0, "alloc.cpp: " << __VA_ARGS__)
+#ਅਨ੍ਤਰ੍ਭਾਵ "opencv2/core/utils/allocator_stats.impl.hpp"
+#ਪਰਿਭਾਸ਼ਾ_ਰੱਦ CV__ALLOCATOR_STATS_LOG
 
 //#define OPENCV_ALLOC_ENABLE_STATISTICS
 
 
-#ifdef HAVE_POSIX_MEMALIGN
-#include <stdlib.h>
-#elif defined HAVE_MALLOC_H
-#include <malloc.h>
-#endif
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ HAVE_POSIX_MEMALIGN
+#ਅਨ੍ਤਰ੍ਭਾਵ <stdlib.h>
+#ਜਾਂਜੇ defined HAVE_MALLOC_H
+#ਅਨ੍ਤਰ੍ਭਾਵ <malloc.h>
+#ਜੇ_ਅੰਤ
 
-#ifdef OPENCV_ALLOC_ENABLE_STATISTICS
-#define OPENCV_ALLOC_STATISTICS_LIMIT 4096  // don't track buffers less than N bytes
-#include <map>
-#endif
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ OPENCV_ALLOC_ENABLE_STATISTICS
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ OPENCV_ALLOC_STATISTICS_ਹੱਦਬੰਦੀ 4096  // don't track buffers less than N bytes
+#ਅਨ੍ਤਰ੍ਭਾਵ <map>
+#ਜੇ_ਅੰਤ
 
-namespace cv {
+ਨਾਮਾਕਾਸ਼ cv {
 
-static void* OutOfMemoryError(size_t size)
+ਸਥਿਰ ਖਾਲੀ* ਬਾਹਰਲਾ_ਦਾ_ਸਮ੍ਰਿਤੀ_Error(size_t size)
 {
-    CV_Error_(cv::Error::StsNoMem, ("Failed to allocate %llu bytes", (unsigned long long)size));
+    CV_Error_(cv::Error::StsNoMem, ("Failed to allocate %llu bytes", (ਬਿਨਾਨਿਸ਼ਾਨੀ ਲੰਮਾ ਲੰਮਾ)size));
 }
 
 CV_EXPORTS cv::utils::AllocatorStatisticsInterface& getAllocatorStatistics();
 
-static cv::utils::AllocatorStatistics allocator_stats;
+ਸਥਿਰ cv::utils::AllocatorStatistics allocator_stats;
 
 cv::utils::AllocatorStatisticsInterface& getAllocatorStatistics()
 {
-    return allocator_stats;
+    ਵਾਪਸ allocator_stats;
 }
 
-#if defined HAVE_POSIX_MEMALIGN || defined HAVE_MEMALIGN || defined HAVE_WIN32_ALIGNED_MALLOC
-static bool readMemoryAlignmentParameter()
+#ਜੇ defined HAVE_POSIX_MEMALIGN || defined HAVE_MEMALIGN || defined HAVE_WIN32_ALIGNED_MALLOC
+ਸਥਿਰ ਤਾਰਕਿਕ read_ਸਮ੍ਰਿਤੀ_Alignment_Parameter()
 {
-    bool value = true;
-#if defined(__GLIBC__) && defined(__linux__) \
+    ਤਾਰਕਿਕ value = ਸੱਚ;
+#ਜੇ defined(__GLIBC__) && defined(__linux__) \
     && !defined(CV_STATIC_ANALYSIS) \
-    && !defined(OPENCV_ENABLE_MEMORY_SANITIZER) \
-    && !defined(FUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION)  /* oss-fuzz */ \
+    && !defined(OPENCV_ENABLE_ਸਮ੍ਰਿਤੀ_SANITIZER) \
+    && !defined(FUZZING_BUILD_ਬਹੁਲਕ_UNSAFE_FOR_PRODUCTION)  /* oss-fuzz */ \
     && !defined(_WIN32)  /* MinGW? */
     {
         // https://github.com/opencv/opencv/issues/15526
-        value = false;
+        value = ਝੂਠ;
     }
-#endif
+#ਜੇ_ਅੰਤ
     value = cv::utils::getConfigurationParameterBool("OPENCV_ENABLE_MEMALIGN", value);  // should not call fastMalloc() internally
     // TODO add checks for valgrind, ASAN if value == false
-    return value;
+    ਵਾਪਸ value;
 }
 
-#if defined _MSC_VER
-#pragma warning(suppress:4714)  // preventive: const marked as __forceinline not inlined
-static __forceinline
-#else
-static inline
-#endif
-bool isAlignedAllocationEnabled()
+#ਜੇ defined _MSC_VER
+#ਹਦਾਇਤ warning(suppress:4714)  // preventive: const marked as __forceinline not inlined
+ਸਥਿਰ __forceinline
+#ਨਹੀਂਤਾਂ
+ਸਥਿਰ ਸਤਰਅੰਦਰ
+#ਜੇ_ਅੰਤ
+ਤਾਰਕਿਕ is_Aligned_ਵੰਡ_Enabled()
 {
     // use construct on first use idiom https://isocpp.org/wiki/faq/ctors#static-init-order-on-first-use
     // details: https://github.com/opencv/opencv/issues/15691
-    static bool useMemalign = readMemoryAlignmentParameter();
-    return useMemalign;
+    ਸਥਿਰ ਤਾਰਕਿਕ useMemalign = read_ਸਮ੍ਰਿਤੀ_Alignment_Parameter();
+    ਵਾਪਸ useMemalign;
 }
 
 // need for this static const is disputed; retaining as it doesn't cause harm
-static const bool g_force_initialization_memalign_flag
-#if defined __GNUC__
-    __attribute__((unused))
-#endif
-    = isAlignedAllocationEnabled();
-#endif
+ਸਥਿਰ ਅਚਲ ਤਾਰਕਿਕ g_force_initialization_memalign_flag
+#ਜੇ defined __GNUC__
+    __attribute__((ਅਣਵਰਤਿਆ))
+#ਜੇ_ਅੰਤ
+    = is_Aligned_ਵੰਡ_Enabled();
+#ਜੇ_ਅੰਤ
 
-#ifdef OPENCV_ALLOC_ENABLE_STATISTICS
-static inline
-void* fastMalloc_(size_t size)
-#else
-void* fastMalloc(size_t size)
-#endif
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ OPENCV_ALLOC_ENABLE_STATISTICS
+ਸਥਿਰ ਸਤਰਅੰਦਰ
+ਖਾਲੀ* fastMalloc_(size_t size)
+#ਨਹੀਂਤਾਂ
+ਖਾਲੀ* fastMalloc(size_t size)
+#ਜੇ_ਅੰਤ
 {
-#ifdef HAVE_POSIX_MEMALIGN
-    if (isAlignedAllocationEnabled())
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ HAVE_POSIX_MEMALIGN
+    ਜੇ (is_Aligned_ਵੰਡ_Enabled())
     {
-        void* ptr = NULL;
-        if(posix_memalign(&ptr, CV_MALLOC_ALIGN, size))
-            ptr = NULL;
-        if(!ptr)
-            return OutOfMemoryError(size);
-        return ptr;
+        ਖਾਲੀ* ptr = ਨਿਰਾ;
+        ਜੇ(posix_memalign(&ptr, CV_MALLOC_ALIGN, size))
+            ptr = ਨਿਰਾ;
+        ਜੇ(!ptr)
+            ਵਾਪਸ ਬਾਹਰਲਾ_ਦਾ_ਸਮ੍ਰਿਤੀ_Error(size);
+        ਵਾਪਸ ptr;
     }
-#elif defined HAVE_MEMALIGN
-    if (isAlignedAllocationEnabled())
+#ਜਾਂਜੇ defined HAVE_MEMALIGN
+    ਜੇ (is_Aligned_ਵੰਡ_Enabled())
     {
-        void* ptr = memalign(CV_MALLOC_ALIGN, size);
-        if(!ptr)
-            return OutOfMemoryError(size);
-        return ptr;
+        ਖਾਲੀ* ptr = memalign(CV_MALLOC_ALIGN, size);
+        ਜੇ(!ptr)
+            ਵਾਪਸ ਬਾਹਰਲਾ_ਦਾ_ਸਮ੍ਰਿਤੀ_Error(size);
+        ਵਾਪਸ ptr;
     }
-#elif defined HAVE_WIN32_ALIGNED_MALLOC
-    if (isAlignedAllocationEnabled())
+#ਜਾਂਜੇ defined HAVE_WIN32_ALIGNED_MALLOC
+    ਜੇ (is_Aligned_ਵੰਡ_Enabled())
     {
-        void* ptr = _aligned_malloc(size, CV_MALLOC_ALIGN);
-        if(!ptr)
-            return OutOfMemoryError(size);
-        return ptr;
+        ਖਾਲੀ* ptr = _aligned_malloc(size, CV_MALLOC_ALIGN);
+        ਜੇ(!ptr)
+            ਵਾਪਸ ਬਾਹਰਲਾ_ਦਾ_ਸਮ੍ਰਿਤੀ_Error(size);
+        ਵਾਪਸ ptr;
     }
-#endif
-    uchar* udata = (uchar*)malloc(size + sizeof(void*) + CV_MALLOC_ALIGN);
-    if(!udata)
-        return OutOfMemoryError(size);
+#ਜੇ_ਅੰਤ
+    uchar* udata = (uchar*)ਸਮ੍ਰਿਤੀ_ਦਿਓ(size + ਆਕਾਰ(ਖਾਲੀ*) + CV_MALLOC_ALIGN);
+    ਜੇ(!udata)
+        ਵਾਪਸ ਬਾਹਰਲਾ_ਦਾ_ਸਮ੍ਰਿਤੀ_Error(size);
     uchar** adata = alignPtr((uchar**)udata + 1, CV_MALLOC_ALIGN);
     adata[-1] = udata;
-    return adata;
+    ਵਾਪਸ adata;
 }
 
-#ifdef OPENCV_ALLOC_ENABLE_STATISTICS
-static inline
-void fastFree_(void* ptr)
-#else
-void fastFree(void* ptr)
-#endif
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ OPENCV_ALLOC_ENABLE_STATISTICS
+ਸਥਿਰ ਸਤਰਅੰਦਰ
+ਖਾਲੀ fastFree_(ਖਾਲੀ* ptr)
+#ਨਹੀਂਤਾਂ
+ਖਾਲੀ fastFree(ਖਾਲੀ* ptr)
+#ਜੇ_ਅੰਤ
 {
-#if defined HAVE_POSIX_MEMALIGN || defined HAVE_MEMALIGN
-    if (isAlignedAllocationEnabled())
+#ਜੇ defined HAVE_POSIX_MEMALIGN || defined HAVE_MEMALIGN
+    ਜੇ (is_Aligned_ਵੰਡ_Enabled())
     {
-        free(ptr);
-        return;
+        ਮੁਕਤ(ptr);
+        ਵਾਪਸ;
     }
-#elif defined HAVE_WIN32_ALIGNED_MALLOC
-    if (isAlignedAllocationEnabled())
+#ਜਾਂਜੇ defined HAVE_WIN32_ALIGNED_MALLOC
+    ਜੇ (is_Aligned_ਵੰਡ_Enabled())
     {
         _aligned_free(ptr);
-        return;
+        ਵਾਪਸ;
     }
-#endif
-    if(ptr)
+#ਜੇ_ਅੰਤ
+    ਜੇ(ptr)
     {
         uchar* udata = ((uchar**)ptr)[-1];
         CV_DbgAssert(udata < (uchar*)ptr &&
-               ((uchar*)ptr - udata) <= (ptrdiff_t)(sizeof(void*)+CV_MALLOC_ALIGN));
-        free(udata);
+               ((uchar*)ptr - udata) <= (ptrdiff_t)(ਆਕਾਰ(ਖਾਲੀ*)+CV_MALLOC_ALIGN));
+        ਮੁਕਤ(udata);
     }
 }
 
-#ifdef OPENCV_ALLOC_ENABLE_STATISTICS
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ OPENCV_ALLOC_ENABLE_STATISTICS
 
-static
-Mutex& getAllocationStatisticsMutex()
+ਸਥਿਰ
+Mutex& get_ਵੰਡ_Statistics_Mutex()
 {
-    static Mutex* p_alloc_mutex = allocSingletonNew<Mutex>();
+    ਸਥਿਰ Mutex* p_alloc_mutex = allocSingletonNew<Mutex>();
     CV_Assert(p_alloc_mutex);
-    return *p_alloc_mutex;
+    ਵਾਪਸ *p_alloc_mutex;
 }
 
-static std::map<void*, size_t> allocated_buffers;  // guarded by getAllocationStatisticsMutex()
+ਸਥਿਰ std::map<ਖਾਲੀ*, size_t> allocated_buffers;  // guarded by getAllocationStatisticsMutex()
 
-void* fastMalloc(size_t size)
+ਖਾਲੀ* fastMalloc(size_t size)
 {
-    void* res = fastMalloc_(size);
-    if (res && size >= OPENCV_ALLOC_STATISTICS_LIMIT)
+    ਖਾਲੀ* res = fastMalloc_(size);
+    ਜੇ (res && size >= OPENCV_ALLOC_STATISTICS_ਹੱਦਬੰਦੀ)
     {
-        cv::AutoLock lock(getAllocationStatisticsMutex());
+        cv::Auto_ਤਾਲਾ lock(get_ਵੰਡ_Statistics_Mutex());
         allocated_buffers.insert(std::make_pair(res, size));
         allocator_stats.onAllocate(size);
     }
-    return res;
+    ਵਾਪਸ res;
 }
 
-void fastFree(void* ptr)
+ਖਾਲੀ fastFree(ਖਾਲੀ* ptr)
 {
     {
-        cv::AutoLock lock(getAllocationStatisticsMutex());
-        std::map<void*, size_t>::iterator i = allocated_buffers.find(ptr);
-        if (i != allocated_buffers.end())
+        cv::Auto_ਤਾਲਾ lock(get_ਵੰਡ_Statistics_Mutex());
+        std::map<ਖਾਲੀ*, size_t>::iterator i = allocated_buffers.find(ptr);
+        ਜੇ (i != allocated_buffers.end())
         {
             size_t size = i->second;
             allocator_stats.onFree(size);
@@ -233,7 +233,7 @@ void fastFree(void* ptr)
     fastFree_(ptr);
 }
 
-#endif // OPENCV_ALLOC_ENABLE_STATISTICS
+#ਜੇ_ਅੰਤ // OPENCV_ALLOC_ENABLE_STATISTICS
 
 } // namespace
 /* End of file. */

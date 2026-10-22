@@ -3,15 +3,15 @@
 // of this distribution and at http://opencv.org/license.html
 
 
-#include "precomp.hpp"
-#include "opencl_kernels_core.hpp"
+#ਅਨ੍ਤਰ੍ਭਾਵ "precomp.hpp"
+#ਅਨ੍ਤਰ੍ਭਾਵ "opencl_kernels_core.hpp"
 
-#include "merge.simd.hpp"
-#include "merge.simd_declarations.hpp" // defines CV_CPU_DISPATCH_MODES_ALL=AVX2,...,BASELINE based on CMakeLists.txt content
+#ਅਨ੍ਤਰ੍ਭਾਵ "merge.simd.hpp"
+#ਅਨ੍ਤਰ੍ਭਾਵ "merge.simd_declarations.hpp" // defines CV_CPU_DISPATCH_MODES_ALL=AVX2,...,BASELINE based on CMakeLists.txt content
 
-namespace cv { namespace hal {
+ਨਾਮਾਕਾਸ਼ cv { ਨਾਮਾਕਾਸ਼ hal {
 
-void merge8u(const uchar** src, uchar* dst, int len, int cn )
+ਖਾਲੀ merge8u(ਅਚਲ uchar** src, uchar* dst, ਪੂਰਨ len, ਪੂਰਨ cn )
 {
     CV_INSTRUMENT_REGION();
     CALL_HAL(merge8u, cv_hal_merge8u, src, dst, len, cn)
@@ -19,7 +19,7 @@ void merge8u(const uchar** src, uchar* dst, int len, int cn )
         CV_CPU_DISPATCH_MODES_ALL);
 }
 
-void merge16u(const ushort** src, ushort* dst, int len, int cn )
+ਖਾਲੀ merge16u(ਅਚਲ ushort** src, ushort* dst, ਪੂਰਨ len, ਪੂਰਨ cn )
 {
     CV_INSTRUMENT_REGION();
     CALL_HAL(merge16u, cv_hal_merge16u, src, dst, len, cn)
@@ -27,7 +27,7 @@ void merge16u(const ushort** src, ushort* dst, int len, int cn )
         CV_CPU_DISPATCH_MODES_ALL);
 }
 
-void merge32s(const int** src, int* dst, int len, int cn )
+ਖਾਲੀ merge32s(ਅਚਲ ਪੂਰਨ** src, ਪੂਰਨ* dst, ਪੂਰਨ len, ਪੂਰਨ cn )
 {
     CV_INSTRUMENT_REGION();
     CALL_HAL(merge32s, cv_hal_merge32s, src, dst, len, cn)
@@ -35,7 +35,7 @@ void merge32s(const int** src, int* dst, int len, int cn )
         CV_CPU_DISPATCH_MODES_ALL);
 }
 
-void merge64s(const int64** src, int64* dst, int len, int cn )
+ਖਾਲੀ merge64s(ਅਚਲ int64** src, int64* dst, ਪੂਰਨ len, ਪੂਰਨ cn )
 {
     CV_INSTRUMENT_REGION();
     CALL_HAL(merge64s, cv_hal_merge64s, src, dst, len, cn)
@@ -46,198 +46,198 @@ void merge64s(const int64** src, int64* dst, int len, int cn )
 } // namespace cv::hal::
 
 
-typedef void (*MergeFunc)(const void** src, void* dst, int len, int cn);
+ਕਿਸਮਪਰਿਭਾਸ਼ਾ ਖਾਲੀ (*ਮਿਲਾਓ_Func)(ਅਚਲ ਖਾਲੀ** src, ਖਾਲੀ* dst, ਪੂਰਨ len, ਪੂਰਨ cn);
 
-template<typename T, void (*fn)(const T**, T*, int, int)>
-static void mergeWrap(const void** src, void* dst, int len, int cn)
+ਸਾਂਚਾ<ਕਿਸਮ_ਨਾਂ T, ਖਾਲੀ (*fn)(ਅਚਲ T**, T*, ਪੂਰਨ, ਪੂਰਨ)>
+ਸਥਿਰ ਖਾਲੀ ਮਿਲਾਓ_Wrap(ਅਚਲ ਖਾਲੀ** src, ਖਾਲੀ* dst, ਪੂਰਨ len, ਪੂਰਨ cn)
 {
-    fn((const T**)src, (T*)dst, len, cn);
+    fn((ਅਚਲ T**)src, (T*)dst, len, cn);
 }
 
-static MergeFunc getMergeFunc(int depth)
+ਸਥਿਰ ਮਿਲਾਓ_Func get_ਮਿਲਾਓ_Func(ਪੂਰਨ ਡੂੰਘਾਈ)
 {
-    static MergeFunc mergeTab[CV_DEPTH_MAX] =
+    ਸਥਿਰ ਮਿਲਾਓ_Func ਮਿਲਾਓ_Tab[CV_ਡੂੰਘਾਈ_MAX] =
     {
-        mergeWrap<uchar, cv::hal::merge8u>, mergeWrap<uchar, cv::hal::merge8u>,
-        mergeWrap<ushort, cv::hal::merge16u>, mergeWrap<ushort, cv::hal::merge16u>,
-        mergeWrap<int, cv::hal::merge32s>, mergeWrap<int, cv::hal::merge32s>,
-        mergeWrap<int64_t, cv::hal::merge64s>, mergeWrap<ushort, cv::hal::merge16u>,
-        mergeWrap<ushort, cv::hal::merge16u>, mergeWrap<uchar, cv::hal::merge8u>,
-        mergeWrap<int64_t, cv::hal::merge64s>, mergeWrap<int64_t, cv::hal::merge64s>,
-        mergeWrap<int, cv::hal::merge32s>, mergeWrap<uchar, cv::hal::merge8u>,
-        mergeWrap<uchar, cv::hal::merge8u>, 0,
+        ਮਿਲਾਓ_Wrap<uchar, cv::hal::merge8u>, ਮਿਲਾਓ_Wrap<uchar, cv::hal::merge8u>,
+        ਮਿਲਾਓ_Wrap<ushort, cv::hal::merge16u>, ਮਿਲਾਓ_Wrap<ushort, cv::hal::merge16u>,
+        ਮਿਲਾਓ_Wrap<ਪੂਰਨ, cv::hal::merge32s>, ਮਿਲਾਓ_Wrap<ਪੂਰਨ, cv::hal::merge32s>,
+        ਮਿਲਾਓ_Wrap<int64_t, cv::hal::merge64s>, ਮਿਲਾਓ_Wrap<ushort, cv::hal::merge16u>,
+        ਮਿਲਾਓ_Wrap<ushort, cv::hal::merge16u>, ਮਿਲਾਓ_Wrap<uchar, cv::hal::merge8u>,
+        ਮਿਲਾਓ_Wrap<int64_t, cv::hal::merge64s>, ਮਿਲਾਓ_Wrap<int64_t, cv::hal::merge64s>,
+        ਮਿਲਾਓ_Wrap<ਪੂਰਨ, cv::hal::merge32s>, ਮਿਲਾਓ_Wrap<uchar, cv::hal::merge8u>,
+        ਮਿਲਾਓ_Wrap<uchar, cv::hal::merge8u>, 0,
     };
 
-    return mergeTab[depth];
+    ਵਾਪਸ ਮਿਲਾਓ_Tab[ਡੂੰਘਾਈ];
 }
 
-#ifdef HAVE_IPP
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ HAVE_IPP
 
-static bool ipp_merge(const Mat* mv, Mat& dst, int channels)
+ਸਥਿਰ ਤਾਰਕਿਕ ipp_ਮਿਲਾਓ(ਅਚਲ Mat* mv, Mat& dst, ਪੂਰਨ channels)
 {
-#ifdef HAVE_IPP_IW_LL
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ HAVE_IPP_IW_LL
     CV_INSTRUMENT_REGION_IPP();
 
-    if(channels != 3 && channels != 4)
-        return false;
+    ਜੇ(channels != 3 && channels != 4)
+        ਵਾਪਸ ਝੂਠ;
 
-    if(mv[0].dims <= 2)
+    ਜੇ(mv[0].dims <= 2)
     {
-        IppiSize    size       = ippiSize(mv[0].size());
-        const void *srcPtrs[4] = {NULL};
-        size_t      srcStep    = mv[0].step;
-        for(int i = 0; i < channels; i++)
+        Ippi_ਮਾਪ    size       = ippi_ਮਾਪ(mv[0].size());
+        ਅਚਲ ਖਾਲੀ *srcPtrs[4] = {ਨਿਰਾ};
+        size_t      src_ਕਦਮ_3    = mv[0].ਕਦਮ;
+        ਲਈ(ਪੂਰਨ i = 0; i < channels; i++)
         {
             srcPtrs[i] = mv[i].ptr();
-            if(srcStep != mv[i].step)
-                return false;
+            ਜੇ(src_ਕਦਮ_3 != mv[i].ਕਦਮ)
+                ਵਾਪਸ ਝੂਠ;
         }
 
-        return CV_INSTRUMENT_FUN_IPP(llwiCopyMerge, srcPtrs, (int)srcStep, dst.ptr(), (int)dst.step, size, (int)mv[0].elemSize1(), channels, 0) >= 0;
+        ਵਾਪਸ CV_INSTRUMENT_FUN_IPP(llwi_Copy_ਮਿਲਾਓ, srcPtrs, (ਪੂਰਨ)src_ਕਦਮ_3, dst.ptr(), (ਪੂਰਨ)dst.ਕਦਮ, size, (ਪੂਰਨ)mv[0].elemSize1(), channels, 0) >= 0;
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
-        const Mat *arrays[5] = {NULL};
-        uchar     *ptrs[5]   = {NULL};
+        ਅਚਲ Mat *arrays[5] = {ਨਿਰਾ};
+        uchar     *ptrs[5]   = {ਨਿਰਾ};
         arrays[0] = &dst;
 
-        for(int i = 1; i < channels; i++)
+        ਲਈ(ਪੂਰਨ i = 1; i < channels; i++)
         {
             arrays[i] = &mv[i-1];
         }
 
         NAryMatIterator it(arrays, ptrs);
-        IppiSize size = { (int)it.size, 1 };
+        Ippi_ਮਾਪ size = { (ਪੂਰਨ)it.size, 1 };
 
-        for( size_t i = 0; i < it.nplanes; i++, ++it )
+        ਲਈ( size_t i = 0; i < it.nplanes; i++, ++it )
         {
-            if(CV_INSTRUMENT_FUN_IPP(llwiCopyMerge, (const void**)&ptrs[1], 0, ptrs[0], 0, size, (int)mv[0].elemSize1(), channels, 0) < 0)
-                return false;
+            ਜੇ(CV_INSTRUMENT_FUN_IPP(llwi_Copy_ਮਿਲਾਓ, (ਅਚਲ ਖਾਲੀ**)&ptrs[1], 0, ptrs[0], 0, size, (ਪੂਰਨ)mv[0].elemSize1(), channels, 0) < 0)
+                ਵਾਪਸ ਝੂਠ;
         }
-        return true;
+        ਵਾਪਸ ਸੱਚ;
     }
-#else
-    CV_UNUSED(dst); CV_UNUSED(mv); CV_UNUSED(channels);
-    return false;
-#endif
+#ਨਹੀਂਤਾਂ
+    CV_ਅਣਵਰਤਿਆ(dst); CV_ਅਣਵਰਤਿਆ(mv); CV_ਅਣਵਰਤਿਆ(channels);
+    ਵਾਪਸ ਝੂਠ;
+#ਜੇ_ਅੰਤ
 }
-#endif
+#ਜੇ_ਅੰਤ
 
-void merge(const Mat* mv, size_t n, OutputArray _dst)
+ਖਾਲੀ ਮਿਲਾਓ(ਅਚਲ Mat* mv, size_t n, OutputArray _dst)
 {
     CV_INSTRUMENT_REGION();
 
     CV_Assert( mv && n > 0 );
     CV_Assert(!mv[0].empty());
 
-    int depth = mv[0].depth();
-    bool allch1 = true;
-    int k, cn = 0;
+    ਪੂਰਨ ਡੂੰਘਾਈ = mv[0].ਡੂੰਘਾਈ();
+    ਤਾਰਕਿਕ allch1 = ਸੱਚ;
+    ਪੂਰਨ k, cn = 0;
     size_t i;
 
-    for( i = 0; i < n; i++ )
+    ਲਈ( i = 0; i < n; i++ )
     {
-        CV_Assert(mv[i].size == mv[0].size && mv[i].depth() == depth);
+        CV_Assert(mv[i].size == mv[0].size && mv[i].ਡੂੰਘਾਈ() == ਡੂੰਘਾਈ);
         allch1 = allch1 && mv[i].channels() == 1;
         cn += mv[i].channels();
     }
 
     CV_Assert( 0 < cn && cn <= CV_CN_MAX );
-    _dst.create(mv[0].size, CV_MAKETYPE(depth, cn));
+    _dst.create(mv[0].size, CV_MAKETYPE(ਡੂੰਘਾਈ, cn));
     Mat dst = _dst.getMat();
 
-    if( n == 1 )
+    ਜੇ( n == 1 )
     {
-        mv[0].copyTo(dst);
-        return;
+        mv[0].copy_ਮੰਜ਼ਿਲ(dst);
+        ਵਾਪਸ;
     }
 
-    CV_IPP_RUN(allch1, ipp_merge(mv, dst, (int)n));
+    CV_IPP_ਲੜੀਵਾਰ(allch1, ipp_ਮਿਲਾਓ(mv, dst, (ਪੂਰਨ)n));
 
-    if( !allch1 )
+    ਜੇ( !allch1 )
     {
-        AutoBuffer<int> pairs(cn*2);
-        int j, ni=0;
+        Auto_ਬਫਰ<ਪੂਰਨ> ਜੋੜੇ(cn*2);
+        ਪੂਰਨ j, ni=0;
 
-        for( i = 0, j = 0; i < n; i++, j += ni )
+        ਲਈ( i = 0, j = 0; i < n; i++, j += ni )
         {
             ni = mv[i].channels();
-            for( k = 0; k < ni; k++ )
+            ਲਈ( k = 0; k < ni; k++ )
             {
-                pairs[(j+k)*2] = j + k;
-                pairs[(j+k)*2+1] = j + k;
+                ਜੋੜੇ[(j+k)*2] = j + k;
+                ਜੋੜੇ[(j+k)*2+1] = j + k;
             }
         }
-        mixChannels( mv, n, &dst, 1, &pairs[0], cn );
-        return;
+        mixChannels( mv, n, &dst, 1, &ਜੋੜੇ[0], cn );
+        ਵਾਪਸ;
     }
 
-    MergeFunc func = getMergeFunc(depth);
+    ਮਿਲਾਓ_Func func = get_ਮਿਲਾਓ_Func(ਡੂੰਘਾਈ);
     CV_Assert( func != 0 );
 
-    size_t esz = dst.elemSize(), esz1 = dst.elemSize1();
-    size_t blocksize0 = (int)((BLOCK_SIZE + esz-1)/esz);
-    AutoBuffer<uchar> _buf((cn+1)*(sizeof(Mat*) + sizeof(uchar*)) + 16);
-    const Mat** arrays = (const Mat**)_buf.data();
+    size_t esz = dst.elem_ਮਾਪ(), esz1 = dst.elemSize1();
+    size_t blocksize0 = (ਪੂਰਨ)((ਖੰਡ_ਮਾਪ + esz-1)/esz);
+    Auto_ਬਫਰ<uchar> _buf((cn+1)*(ਆਕਾਰ(Mat*) + ਆਕਾਰ(uchar*)) + 16);
+    ਅਚਲ Mat** arrays = (ਅਚਲ Mat**)_buf.ਅੰਕੜੇ();
     uchar** ptrs = (uchar**)alignPtr(arrays + cn + 1, 16);
 
     arrays[0] = &dst;
-    for( k = 0; k < cn; k++ )
+    ਲਈ( k = 0; k < cn; k++ )
         arrays[k+1] = &mv[k];
 
     NAryMatIterator it(arrays, ptrs, cn+1);
-    size_t total = (int)it.size;
-    size_t blocksize = std::min((size_t)CV_SPLIT_MERGE_MAX_BLOCK_SIZE(cn), cn <= 4 ? total : std::min(total, blocksize0));
+    size_t ਕੁੱਲ = (ਪੂਰਨ)it.size;
+    size_t blocksize = std::min((size_t)CV_ਵੰਡੋ_ਮਿਲਾਓ_MAX_ਖੰਡ_ਮਾਪ(cn), cn <= 4 ? ਕੁੱਲ : std::min(ਕੁੱਲ, blocksize0));
 
-    for( i = 0; i < it.nplanes; i++, ++it )
+    ਲਈ( i = 0; i < it.nplanes; i++, ++it )
     {
-        for( size_t j = 0; j < total; j += blocksize )
+        ਲਈ( size_t j = 0; j < ਕੁੱਲ; j += blocksize )
         {
-            size_t bsz = std::min(total - j, blocksize);
-            func( (const void**)&ptrs[1], ptrs[0], (int)bsz, cn );
+            size_t bsz = std::min(ਕੁੱਲ - j, blocksize);
+            func( (ਅਚਲ ਖਾਲੀ**)&ptrs[1], ptrs[0], (ਪੂਰਨ)bsz, cn );
 
-            if( j + blocksize < total )
+            ਜੇ( j + blocksize < ਕੁੱਲ )
             {
                 ptrs[0] += bsz*esz;
-                for( int t = 0; t < cn; t++ )
+                ਲਈ( ਪੂਰਨ t = 0; t < cn; t++ )
                     ptrs[t+1] += bsz*esz1;
             }
         }
     }
 }
 
-#ifdef HAVE_OPENCL
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ HAVE_OPENCL
 
-static bool ocl_merge( InputArrayOfArrays _mv, OutputArray _dst )
+ਸਥਿਰ ਤਾਰਕਿਕ ocl_ਮਿਲਾਓ( ਨਿਵੇਸ਼_Array_ਦਾ_Arrays _mv, OutputArray _dst )
 {
     std::vector<UMat> src, ksrc;
-    _mv.getUMatVector(src);
+    _mv.get_UMat_ਸਦਿਸ਼(src);
     CV_Assert(!src.empty());
 
-    int type = src[0].type(), depth = CV_MAT_DEPTH(type),
-            rowsPerWI = ocl::Device::getDefault().isIntel() ? 4 : 1;
-    Size size = src[0].size();
+    ਪੂਰਨ type = src[0].type(), ਡੂੰਘਾਈ = CV_MAT_ਡੂੰਘਾਈ(type),
+            ਪੰਕਤੀਆਂ_ਪ੍ਰਤੀ_WI = ocl::Device::getDefault().isIntel() ? 4 : 1;
+    ਮਾਪ size = src[0].size();
 
-    for (size_t i = 0, srcsize = src.size(); i < srcsize; ++i)
+    ਲਈ (size_t i = 0, srcsize = src.size(); i < srcsize; ++i)
     {
-        int itype = src[i].type(), icn = CV_MAT_CN(itype), idepth = CV_MAT_DEPTH(itype),
+        ਪੂਰਨ itype = src[i].type(), icn = CV_MAT_CN(itype), idepth = CV_MAT_ਡੂੰਘਾਈ(itype),
                 esz1 = CV_ELEM_SIZE1(idepth);
-        if (src[i].dims > 2)
-            return false;
+        ਜੇ (src[i].dims > 2)
+            ਵਾਪਸ ਝੂਠ;
 
-        CV_Assert(size == src[i].size() && depth == idepth);
+        CV_Assert(size == src[i].size() && ਡੂੰਘਾਈ == idepth);
 
-        for (int cn = 0; cn < icn; ++cn)
+        ਲਈ (ਪੂਰਨ cn = 0; cn < icn; ++cn)
         {
             UMat tsrc = src[i];
             tsrc.offset += cn * esz1;
             ksrc.push_back(tsrc);
         }
     }
-    int dcn = (int)ksrc.size();
+    ਪੂਰਨ dcn = (ਪੂਰਨ)ksrc.size();
 
     String srcargs, processelem, cndecl, indexdecl;
-    for (int i = 0; i < dcn; ++i)
+    ਲਈ (ਪੂਰਨ i = 0; i < dcn; ++i)
     {
         srcargs += format("DECLARE_SRC_PARAM(%d)", i);
         processelem += format("PROCESS_ELEM(%d)", i);
@@ -245,39 +245,39 @@ static bool ocl_merge( InputArrayOfArrays _mv, OutputArray _dst )
         cndecl += format(" -D scn%d=%d", i, ksrc[i].channels());
     }
 
-    ocl::Kernel k("merge", ocl::core::split_merge_oclsrc,
+    ocl::Kernel k("merge", ocl::core::ਵੰਡੋ_ਮਿਲਾਓ_oclsrc,
                   format("-D OP_MERGE -D cn=%d -D T=%s -D DECLARE_SRC_PARAMS_N=%s"
                          " -D DECLARE_INDEX_N=%s -D PROCESS_ELEMS_N=%s%s",
-                         dcn, ocl::memopTypeToStr(depth), srcargs.c_str(),
+                         dcn, ocl::memop_Type_ਮੰਜ਼ਿਲ_Str(ਡੂੰਘਾਈ), srcargs.c_str(),
                          indexdecl.c_str(), processelem.c_str(), cndecl.c_str()));
-    if (k.empty())
-        return false;
+    ਜੇ (k.empty())
+        ਵਾਪਸ ਝੂਠ;
 
-    _dst.create(size, CV_MAKE_TYPE(depth, dcn));
+    _dst.create(size, CV_MAKE_TYPE(ਡੂੰਘਾਈ, dcn));
     UMat dst = _dst.getUMat();
 
-    int argidx = 0;
-    for (int i = 0; i < dcn; ++i)
-        argidx = k.set(argidx, ocl::KernelArg::ReadOnlyNoSize(ksrc[i]));
-    argidx = k.set(argidx, ocl::KernelArg::WriteOnly(dst));
-    k.set(argidx, rowsPerWI);
+    ਪੂਰਨ argidx = 0;
+    ਲਈ (ਪੂਰਨ i = 0; i < dcn; ++i)
+        argidx = k.ਸੈੱਟ(argidx, ocl::KernelArg::Read_Only_No_ਮਾਪ(ksrc[i]));
+    argidx = k.ਸੈੱਟ(argidx, ocl::KernelArg::WriteOnly(dst));
+    k.ਸੈੱਟ(argidx, ਪੰਕਤੀਆਂ_ਪ੍ਰਤੀ_WI);
 
-    size_t globalsize[2] = { (size_t)dst.cols, ((size_t)dst.rows + rowsPerWI - 1) / rowsPerWI };
-    return k.run(2, globalsize, NULL, false);
+    size_t globalsize[2] = { (size_t)dst.ਖਾਨੇ_ਗਿਣਤੀ, ((size_t)dst.ਪੰਕਤੀਆਂ + ਪੰਕਤੀਆਂ_ਪ੍ਰਤੀ_WI - 1) / ਪੰਕਤੀਆਂ_ਪ੍ਰਤੀ_WI };
+    ਵਾਪਸ k.ਲੜੀਵਾਰ(2, globalsize, ਨਿਰਾ, ਝੂਠ);
 }
 
-#endif
+#ਜੇ_ਅੰਤ
 
-void merge(InputArrayOfArrays _mv, OutputArray _dst)
+ਖਾਲੀ ਮਿਲਾਓ(ਨਿਵੇਸ਼_Array_ਦਾ_Arrays _mv, OutputArray _dst)
 {
     CV_INSTRUMENT_REGION();
 
-    CV_OCL_RUN(_mv.isUMatVector() && _dst.isUMat(),
-               ocl_merge(_mv, _dst))
+    CV_OCL_ਲੜੀਵਾਰ(_mv.is_UMat_ਸਦਿਸ਼() && _dst.isUMat(),
+               ocl_ਮਿਲਾਓ(_mv, _dst))
 
     std::vector<Mat> mv;
-    _mv.getMatVector(mv);
-    merge(!mv.empty() ? &mv[0] : 0, mv.size(), _dst);
+    _mv.get_Mat_ਸਦਿਸ਼(mv);
+    ਮਿਲਾਓ(!mv.empty() ? &mv[0] : 0, mv.size(), _dst);
 }
 
 } // namespace

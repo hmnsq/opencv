@@ -39,79 +39,79 @@
 //
 //M*/
 
-#include "precomp.hpp"
-#include "opencl_kernels_core.hpp"
-#include "umatrix.hpp"
+#ਅਨ੍ਤਰ੍ਭਾਵ "precomp.hpp"
+#ਅਨ੍ਤਰ੍ਭਾਵ "opencl_kernels_core.hpp"
+#ਅਨ੍ਤਰ੍ਭਾਵ "umatrix.hpp"
 
-#include <opencv2/core/utils/tls.hpp>
+#ਅਨ੍ਤਰ੍ਭਾਵ <opencv2/core/utils/tls.hpp>
 
 ///////////////////////////////// UMat implementation ///////////////////////////////
 
-namespace cv {
+ਨਾਮਾਕਾਸ਼ cv {
 
 // forward decls, implementation is below in this file
-void setSize(UMat& m, int _dims, const int* _sz, const size_t* _steps,
-             bool autoSteps = false);
+ਖਾਲੀ ਸੈੱਟ_ਮਾਪ(UMat& m, ਪੂਰਨ _dims, ਅਚਲ ਪੂਰਨ* _sz, ਅਚਲ size_t* ਕਦਮਾਂ_2,
+             ਤਾਰਕਿਕ auto_ਕਦਮਾਂ = ਝੂਠ);
 
-void updateContinuityFlag(UMat& m);
-void finalizeHdr(UMat& m);
+ਖਾਲੀ updateContinuityFlag(UMat& m);
+ਖਾਲੀ finalizeHdr(UMat& m);
 
-UMatData::UMatData(const MatAllocator* allocator)
+UMat_ਅੰਕੜੇ::UMat_ਅੰਕੜੇ(ਅਚਲ MatAllocator* allocator)
 {
     prevAllocator = currAllocator = allocator;
     urefcount = refcount = mapcount = 0;
-    data = origdata = 0;
+    ਅੰਕੜੇ = origdata = 0;
     size = 0;
-    flags = static_cast<UMatData::MemoryFlag>(0);
+    flags = static_cast<UMat_ਅੰਕੜੇ::ਸਮ੍ਰਿਤੀ_Flag>(0);
     handle = 0;
     userdata = 0;
     allocatorFlags_ = 0;
-    originalUMatData = NULL;
+    original_UMat_ਅੰਕੜੇ = ਨਿਰਾ;
 }
 
-UMatData::~UMatData()
+UMat_ਅੰਕੜੇ::~UMat_ਅੰਕੜੇ()
 {
     prevAllocator = currAllocator = 0;
     urefcount = refcount = 0;
     CV_Assert(mapcount == 0);
-    data = origdata = 0;
+    ਅੰਕੜੇ = origdata = 0;
     size = 0;
-    bool isAsyncCleanup = !!(flags & UMatData::ASYNC_CLEANUP);
-    flags = static_cast<UMatData::MemoryFlag>(0);
+    ਤਾਰਕਿਕ isAsyncCleanup = !!(flags & UMat_ਅੰਕੜੇ::ASYNC_CLEANUP);
+    flags = static_cast<UMat_ਅੰਕੜੇ::ਸਮ੍ਰਿਤੀ_Flag>(0);
     handle = 0;
     userdata = 0;
     allocatorFlags_ = 0;
-    if (originalUMatData)
+    ਜੇ (original_UMat_ਅੰਕੜੇ)
     {
-        bool showWarn = false;
-        UMatData* u = originalUMatData;
-        bool zero_Ref = CV_XADD(&(u->refcount), -1) == 1;
-        if (zero_Ref)
+        ਤਾਰਕਿਕ showWarn = ਝੂਠ;
+        UMat_ਅੰਕੜੇ* u = original_UMat_ਅੰਕੜੇ;
+        ਤਾਰਕਿਕ zero_Ref = CV_XADD(&(u->refcount), -1) == 1;
+        ਜੇ (zero_Ref)
         {
             // simulate Mat::deallocate
-            if (u->mapcount != 0)
+            ਜੇ (u->mapcount != 0)
             {
                 (u->currAllocator ? u->currAllocator : /* TODO allocator ? allocator :*/ Mat::getDefaultAllocator())->unmap(u);
             }
-            else
+            ਨਹੀਂਤਾਂ
             {
                 // we don't do "map", so we can't do "unmap"
             }
         }
-        bool zero_URef = CV_XADD(&(u->urefcount), -1) == 1;
-        if (zero_Ref && !zero_URef)
-            showWarn = true;
-        if (zero_Ref && zero_URef) // oops, we need to free resources
+        ਤਾਰਕਿਕ zero_URef = CV_XADD(&(u->urefcount), -1) == 1;
+        ਜੇ (zero_Ref && !zero_URef)
+            showWarn = ਸੱਚ;
+        ਜੇ (zero_Ref && zero_URef) // oops, we need to free resources
         {
             showWarn = !isAsyncCleanup;
             // simulate UMat::deallocate
             u->currAllocator->deallocate(u);
         }
-#ifndef NDEBUG
-        if (showWarn)
+#ਜੇ_ਅਪਰਿਭਾਸ਼ਿਤ NDEBUG
+        ਜੇ (showWarn)
         {
-            static int warn_message_showed = 0;
-            if (warn_message_showed++ < 100)
+            ਸਥਿਰ ਪੂਰਨ warn_ਸੁਨੇਹਾ_showed = 0;
+            ਜੇ (warn_ਸੁਨੇਹਾ_showed++ < 100)
             {
                 fflush(stdout);
                 fprintf(stderr, "\n! OPENCV warning: getUMat()/getMat() call chain possible problem."
@@ -120,489 +120,489 @@ UMatData::~UMatData()
                 fflush(stderr);
             }
         }
-#else
-        CV_UNUSED(showWarn);
-#endif
-        originalUMatData = NULL;
+#ਨਹੀਂਤਾਂ
+        CV_ਅਣਵਰਤਿਆ(showWarn);
+#ਜੇ_ਅੰਤ
+        original_UMat_ਅੰਕੜੇ = ਨਿਰਾ;
     }
 }
 
-#ifndef OPENCV_DISABLE_THREAD_SUPPORT
+#ਜੇ_ਅਪਰਿਭਾਸ਼ਿਤ OPENCV_DISABLE_THREAD_SUPPORT
 
 // it should be a prime number for the best hash function
-enum { UMAT_NLOCKS = 31 };
-static Mutex umatLocks[UMAT_NLOCKS];
+ਗਿਣਤੀ { UMAT_NLOCKS = 31 };
+ਸਥਿਰ Mutex umatLocks[UMAT_NLOCKS];
 
-static size_t getUMatDataLockIndex(const UMatData* u)
+ਸਥਿਰ size_t get_UMat_ਅੰਕੜੇ_ਤਾਲਾ_ਸੂਚਕਾਂਕ(ਅਚਲ UMat_ਅੰਕੜੇ* u)
 {
-    size_t idx = ((size_t)(void*)u) % UMAT_NLOCKS;
-    return idx;
+    size_t idx = ((size_t)(ਖਾਲੀ*)u) % UMAT_NLOCKS;
+    ਵਾਪਸ idx;
 }
 
-void UMatData::lock()
+ਖਾਲੀ UMat_ਅੰਕੜੇ::lock()
 {
-    size_t idx = getUMatDataLockIndex(this);
+    size_t idx = get_UMat_ਅੰਕੜੇ_ਤਾਲਾ_ਸੂਚਕਾਂਕ(ਇਹ);
     //printf("%d lock(%d)\n", cv::utils::getThreadID(), (int)idx);
     umatLocks[idx].lock();
 }
 
-void UMatData::unlock()
+ਖਾਲੀ UMat_ਅੰਕੜੇ::unlock()
 {
-    size_t idx = getUMatDataLockIndex(this);
+    size_t idx = get_UMat_ਅੰਕੜੇ_ਤਾਲਾ_ਸੂਚਕਾਂਕ(ਇਹ);
     //printf("%d unlock(%d)\n", cv::utils::getThreadID(), (int)idx);
     umatLocks[idx].unlock();
 }
 
 
 // Do not allow several lock() calls with different UMatData objects.
-struct UMatDataAutoLocker
+ਬਣਤਰ UMat_ਅੰਕੜੇ_Auto_Locker
 {
-    int usage_count;
-    UMatData* locked_objects[2];
-    UMatDataAutoLocker() : usage_count(0) { locked_objects[0] = NULL; locked_objects[1] = NULL; }
+    ਪੂਰਨ usage_ਗਿਣਤੀ;
+    UMat_ਅੰਕੜੇ* locked_objects[2];
+    UMat_ਅੰਕੜੇ_Auto_Locker() : usage_ਗਿਣਤੀ(0) { locked_objects[0] = ਨਿਰਾ; locked_objects[1] = ਨਿਰਾ; }
 
-    void lock(UMatData*& u1)
+    ਖਾਲੀ lock(UMat_ਅੰਕੜੇ*& u1)
     {
-        bool locked_1 = (u1 == locked_objects[0] || u1 == locked_objects[1]);
-        if (locked_1)
+        ਤਾਰਕਿਕ locked_1 = (u1 == locked_objects[0] || u1 == locked_objects[1]);
+        ਜੇ (locked_1)
         {
-            u1 = NULL;
-            return;
+            u1 = ਨਿਰਾ;
+            ਵਾਪਸ;
         }
-        CV_Assert(usage_count == 0);  // UMatDataAutoLock can't be used multiple times from the same thread
-        usage_count = 1;
+        CV_Assert(usage_ਗਿਣਤੀ == 0);  // UMatDataAutoLock can't be used multiple times from the same thread
+        usage_ਗਿਣਤੀ = 1;
         locked_objects[0] = u1;
         u1->lock();
     }
-    void lock(UMatData*& u1, UMatData*& u2)
+    ਖਾਲੀ lock(UMat_ਅੰਕੜੇ*& u1, UMat_ਅੰਕੜੇ*& u2)
     {
-        bool locked_1 = (u1 == locked_objects[0] || u1 == locked_objects[1]);
-        bool locked_2 = (u2 == locked_objects[0] || u2 == locked_objects[1]);
-        if (locked_1)
-            u1 = NULL;
-        if (locked_2)
-            u2 = NULL;
-        if (locked_1 && locked_2)
-            return;
-        CV_Assert(usage_count == 0);  // UMatDataAutoLock can't be used multiple times from the same thread
-        usage_count = 1;
+        ਤਾਰਕਿਕ locked_1 = (u1 == locked_objects[0] || u1 == locked_objects[1]);
+        ਤਾਰਕਿਕ locked_2 = (u2 == locked_objects[0] || u2 == locked_objects[1]);
+        ਜੇ (locked_1)
+            u1 = ਨਿਰਾ;
+        ਜੇ (locked_2)
+            u2 = ਨਿਰਾ;
+        ਜੇ (locked_1 && locked_2)
+            ਵਾਪਸ;
+        CV_Assert(usage_ਗਿਣਤੀ == 0);  // UMatDataAutoLock can't be used multiple times from the same thread
+        usage_ਗਿਣਤੀ = 1;
         locked_objects[0] = u1;
         locked_objects[1] = u2;
-        if (u1)
+        ਜੇ (u1)
             u1->lock();
-        if (u2)
+        ਜੇ (u2)
             u2->lock();
     }
-    void release(UMatData* u1, UMatData* u2)
+    ਖਾਲੀ release(UMat_ਅੰਕੜੇ* u1, UMat_ਅੰਕੜੇ* u2)
     {
-        if (u1 == NULL && u2 == NULL)
-            return;
-        CV_Assert(usage_count == 1);
-        usage_count = 0;
-        if (u1)
+        ਜੇ (u1 == ਨਿਰਾ && u2 == ਨਿਰਾ)
+            ਵਾਪਸ;
+        CV_Assert(usage_ਗਿਣਤੀ == 1);
+        usage_ਗਿਣਤੀ = 0;
+        ਜੇ (u1)
             u1->unlock();
-        if (u2)
+        ਜੇ (u2)
             u2->unlock();
-        locked_objects[0] = NULL; locked_objects[1] = NULL;
+        locked_objects[0] = ਨਿਰਾ; locked_objects[1] = ਨਿਰਾ;
     }
 };
-static TLSData<UMatDataAutoLocker>& getUMatDataAutoLockerTLS()
+ਸਥਿਰ TLSData<UMat_ਅੰਕੜੇ_Auto_Locker>& get_UMat_ਅੰਕੜੇ_Auto_Locker_TLS()
 {
-    CV_SINGLETON_LAZY_INIT_REF(TLSData<UMatDataAutoLocker>, new TLSData<UMatDataAutoLocker>());
+    CV_SINGLETON_LAZY_INIT_REF(TLSData<UMat_ਅੰਕੜੇ_Auto_Locker>, ਨਵਾਂ TLSData<UMat_ਅੰਕੜੇ_Auto_Locker>());
 }
-static UMatDataAutoLocker& getUMatDataAutoLocker() { return getUMatDataAutoLockerTLS().getRef(); }
+ਸਥਿਰ UMat_ਅੰਕੜੇ_Auto_Locker& get_UMat_ਅੰਕੜੇ_Auto_Locker() { ਵਾਪਸ get_UMat_ਅੰਕੜੇ_Auto_Locker_TLS().getRef(); }
 
 
-UMatDataAutoLock::UMatDataAutoLock(UMatData* u) : u1(u), u2(NULL)
+UMat_ਅੰਕੜੇ_Auto_ਤਾਲਾ::UMat_ਅੰਕੜੇ_Auto_ਤਾਲਾ(UMat_ਅੰਕੜੇ* u) : u1(u), u2(ਨਿਰਾ)
 {
-    getUMatDataAutoLocker().lock(u1);
+    get_UMat_ਅੰਕੜੇ_Auto_Locker().lock(u1);
 }
-UMatDataAutoLock::UMatDataAutoLock(UMatData* u1_, UMatData* u2_) : u1(u1_), u2(u2_)
+UMat_ਅੰਕੜੇ_Auto_ਤਾਲਾ::UMat_ਅੰਕੜੇ_Auto_ਤਾਲਾ(UMat_ਅੰਕੜੇ* u1_, UMat_ਅੰਕੜੇ* u2_) : u1(u1_), u2(u2_)
 {
-    if (getUMatDataLockIndex(u1) > getUMatDataLockIndex(u2))
+    ਜੇ (get_UMat_ਅੰਕੜੇ_ਤਾਲਾ_ਸੂਚਕਾਂਕ(u1) > get_UMat_ਅੰਕੜੇ_ਤਾਲਾ_ਸੂਚਕਾਂਕ(u2))
     {
         std::swap(u1, u2);
     }
-    getUMatDataAutoLocker().lock(u1, u2);
+    get_UMat_ਅੰਕੜੇ_Auto_Locker().lock(u1, u2);
 }
-UMatDataAutoLock::~UMatDataAutoLock()
+UMat_ਅੰਕੜੇ_Auto_ਤਾਲਾ::~UMat_ਅੰਕੜੇ_Auto_ਤਾਲਾ()
 {
-    getUMatDataAutoLocker().release(u1, u2);
+    get_UMat_ਅੰਕੜੇ_Auto_Locker().release(u1, u2);
 }
 
-#else
+#ਨਹੀਂਤਾਂ
 
-void UMatData::lock()
+ਖਾਲੀ UMat_ਅੰਕੜੇ::lock()
 {
     // nothing in OPENCV_DISABLE_THREAD_SUPPORT mode
 }
 
-void UMatData::unlock()
+ਖਾਲੀ UMat_ਅੰਕੜੇ::unlock()
 {
     // nothing in OPENCV_DISABLE_THREAD_SUPPORT mode
 }
 
-UMatDataAutoLock::UMatDataAutoLock(UMatData* u) : u1(u), u2(NULL)
+UMat_ਅੰਕੜੇ_Auto_ਤਾਲਾ::UMat_ਅੰਕੜੇ_Auto_ਤਾਲਾ(UMat_ਅੰਕੜੇ* u) : u1(u), u2(ਨਿਰਾ)
 {
     // nothing in OPENCV_DISABLE_THREAD_SUPPORT mode
 }
-UMatDataAutoLock::UMatDataAutoLock(UMatData* u1_, UMatData* u2_) : u1(u1_), u2(u2_)
+UMat_ਅੰਕੜੇ_Auto_ਤਾਲਾ::UMat_ਅੰਕੜੇ_Auto_ਤਾਲਾ(UMat_ਅੰਕੜੇ* u1_, UMat_ਅੰਕੜੇ* u2_) : u1(u1_), u2(u2_)
 {
     // nothing in OPENCV_DISABLE_THREAD_SUPPORT mode
 }
-UMatDataAutoLock::~UMatDataAutoLock()
+UMat_ਅੰਕੜੇ_Auto_ਤਾਲਾ::~UMat_ਅੰਕੜੇ_Auto_ਤਾਲਾ()
 {
     // nothing in OPENCV_DISABLE_THREAD_SUPPORT mode
 }
 
-#endif  // OPENCV_DISABLE_THREAD_SUPPORT
+#ਜੇ_ਅੰਤ  // OPENCV_DISABLE_THREAD_SUPPORT
 
 //////////////////////////////// UMat ////////////////////////////////
 
 UMat::UMat(UMatUsageFlags _usageFlags) CV_NOEXCEPT
-: flags(MAGIC_VAL), dims(0), rows(0), cols(0), allocator(0), usageFlags(_usageFlags), u(0), offset(0)
+: flags(MAGIC_VAL), dims(0), ਪੰਕਤੀਆਂ(0), ਖਾਨੇ_ਗਿਣਤੀ(0), allocator(0), usageFlags(_usageFlags), u(0), offset(0)
 {}
 
-UMat::UMat(int _rows, int _cols, int _type, UMatUsageFlags _usageFlags)
-: flags(MAGIC_VAL), dims(0), rows(0), cols(0), allocator(0), usageFlags(_usageFlags), u(0), offset(0)
+UMat::UMat(ਪੂਰਨ ਪੰਕਤੀਆਂ_3, ਪੂਰਨ ਖਾਨੇ_ਗਿਣਤੀ_3, ਪੂਰਨ _type, UMatUsageFlags _usageFlags)
+: flags(MAGIC_VAL), dims(0), ਪੰਕਤੀਆਂ(0), ਖਾਨੇ_ਗਿਣਤੀ(0), allocator(0), usageFlags(_usageFlags), u(0), offset(0)
 {
-    create(_rows, _cols, _type);
+    create(ਪੰਕਤੀਆਂ_3, ਖਾਨੇ_ਗਿਣਤੀ_3, _type);
 }
 
-UMat::UMat(int _rows, int _cols, int _type, const Scalar& _s, UMatUsageFlags _usageFlags)
-: flags(MAGIC_VAL), dims(0), rows(0), cols(0), allocator(0), usageFlags(_usageFlags), u(0), offset(0)
+UMat::UMat(ਪੂਰਨ ਪੰਕਤੀਆਂ_3, ਪੂਰਨ ਖਾਨੇ_ਗਿਣਤੀ_3, ਪੂਰਨ _type, ਅਚਲ Scalar& _s, UMatUsageFlags _usageFlags)
+: flags(MAGIC_VAL), dims(0), ਪੰਕਤੀਆਂ(0), ਖਾਨੇ_ਗਿਣਤੀ(0), allocator(0), usageFlags(_usageFlags), u(0), offset(0)
 {
-    create(_rows, _cols, _type);
-    *this = _s;
+    create(ਪੰਕਤੀਆਂ_3, ਖਾਨੇ_ਗਿਣਤੀ_3, _type);
+    *ਇਹ = _s;
 }
 
-UMat::UMat(Size _sz, int _type, UMatUsageFlags _usageFlags)
-: flags(MAGIC_VAL), dims(0), rows(0), cols(0), allocator(0), usageFlags(_usageFlags), u(0), offset(0)
+UMat::UMat(ਮਾਪ _sz, ਪੂਰਨ _type, UMatUsageFlags _usageFlags)
+: flags(MAGIC_VAL), dims(0), ਪੰਕਤੀਆਂ(0), ਖਾਨੇ_ਗਿਣਤੀ(0), allocator(0), usageFlags(_usageFlags), u(0), offset(0)
 {
-    create( _sz.height, _sz.width, _type );
+    create( _sz.ਉਚਾਈ, _sz.ਚੌੜਾਈ, _type );
 }
 
-UMat::UMat(Size _sz, int _type, const Scalar& _s, UMatUsageFlags _usageFlags)
-: flags(MAGIC_VAL), dims(0), rows(0), cols(0), allocator(0), usageFlags(_usageFlags), u(0), offset(0)
+UMat::UMat(ਮਾਪ _sz, ਪੂਰਨ _type, ਅਚਲ Scalar& _s, UMatUsageFlags _usageFlags)
+: flags(MAGIC_VAL), dims(0), ਪੰਕਤੀਆਂ(0), ਖਾਨੇ_ਗਿਣਤੀ(0), allocator(0), usageFlags(_usageFlags), u(0), offset(0)
 {
-    create(_sz.height, _sz.width, _type);
-    *this = _s;
+    create(_sz.ਉਚਾਈ, _sz.ਚੌੜਾਈ, _type);
+    *ਇਹ = _s;
 }
 
-UMat::UMat(int _dims, const int* _sz, int _type, UMatUsageFlags _usageFlags)
-: flags(MAGIC_VAL), dims(0), rows(0), cols(0), allocator(0), usageFlags(_usageFlags), u(0), offset(0)
-{
-    create(_dims, _sz, _type);
-}
-
-UMat::UMat(int _dims, const int* _sz, int _type, const Scalar& _s, UMatUsageFlags _usageFlags)
-: flags(MAGIC_VAL), dims(0), rows(0), cols(0), allocator(0), usageFlags(_usageFlags), u(0), offset(0)
+UMat::UMat(ਪੂਰਨ _dims, ਅਚਲ ਪੂਰਨ* _sz, ਪੂਰਨ _type, UMatUsageFlags _usageFlags)
+: flags(MAGIC_VAL), dims(0), ਪੰਕਤੀਆਂ(0), ਖਾਨੇ_ਗਿਣਤੀ(0), allocator(0), usageFlags(_usageFlags), u(0), offset(0)
 {
     create(_dims, _sz, _type);
-    *this = _s;
 }
 
-UMat::UMat(const MatShape& _shape, int _type, UMatUsageFlags _usageFlags)
-: flags(MAGIC_VAL), dims(0), rows(0), cols(0), allocator(0), usageFlags(_usageFlags), u(0), offset(0)
+UMat::UMat(ਪੂਰਨ _dims, ਅਚਲ ਪੂਰਨ* _sz, ਪੂਰਨ _type, ਅਚਲ Scalar& _s, UMatUsageFlags _usageFlags)
+: flags(MAGIC_VAL), dims(0), ਪੰਕਤੀਆਂ(0), ਖਾਨੇ_ਗਿਣਤੀ(0), allocator(0), usageFlags(_usageFlags), u(0), offset(0)
+{
+    create(_dims, _sz, _type);
+    *ਇਹ = _s;
+}
+
+UMat::UMat(ਅਚਲ MatShape& _shape, ਪੂਰਨ _type, UMatUsageFlags _usageFlags)
+: flags(MAGIC_VAL), dims(0), ਪੰਕਤੀਆਂ(0), ਖਾਨੇ_ਗਿਣਤੀ(0), allocator(0), usageFlags(_usageFlags), u(0), offset(0)
 {
     create(_shape.dims, _shape.p, _type);
 }
 
-UMat::UMat(const MatShape& _shape, int _type, const Scalar& _s, UMatUsageFlags _usageFlags)
-: flags(MAGIC_VAL), dims(0), rows(0), cols(0), allocator(0), usageFlags(_usageFlags), u(0), offset(0)
+UMat::UMat(ਅਚਲ MatShape& _shape, ਪੂਰਨ _type, ਅਚਲ Scalar& _s, UMatUsageFlags _usageFlags)
+: flags(MAGIC_VAL), dims(0), ਪੰਕਤੀਆਂ(0), ਖਾਨੇ_ਗਿਣਤੀ(0), allocator(0), usageFlags(_usageFlags), u(0), offset(0)
 {
     create(_shape.dims, _shape.p, _type);
-    *this = _s;
+    *ਇਹ = _s;
 }
 
-UMat::UMat(const UMat& m)
-: flags(m.flags), dims(m.dims), rows(m.rows), cols(m.cols), allocator(m.allocator),
-  usageFlags(m.usageFlags), u(m.u), offset(m.offset), size(m.size), step(m.step)
+UMat::UMat(ਅਚਲ UMat& m)
+: flags(m.flags), dims(m.dims), ਪੰਕਤੀਆਂ(m.ਪੰਕਤੀਆਂ), ਖਾਨੇ_ਗਿਣਤੀ(m.ਖਾਨੇ_ਗਿਣਤੀ), allocator(m.allocator),
+  usageFlags(m.usageFlags), u(m.u), offset(m.offset), size(m.size), ਕਦਮ(m.ਕਦਮ)
 {
     addref();
 }
 
-UMat& UMat::operator=(const UMat& m)
+UMat& UMat::ਸੰਚਾਲਕ=(ਅਚਲ UMat& m)
 {
-    if( this != &m )
+    ਜੇ( ਇਹ != &m )
     {
         const_cast<UMat&>(m).addref();
         release();
         flags = m.flags;
         dims = m.dims;
-        rows = m.rows;
-        cols = m.cols;
+        ਪੰਕਤੀਆਂ = m.ਪੰਕਤੀਆਂ;
+        ਖਾਨੇ_ਗਿਣਤੀ = m.ਖਾਨੇ_ਗਿਣਤੀ;
         size = m.size;
-        step = m.step;
+        ਕਦਮ = m.ਕਦਮ;
         allocator = m.allocator;
         usageFlags = m.usageFlags;
         u = m.u;
         offset = m.offset;
     }
-    return *this;
+    ਵਾਪਸ *ਇਹ;
 }
 
-UMat UMat::clone() const
+UMat UMat::clone() ਅਚਲ
 {
     UMat m;
-    copyTo(m);
-    return m;
+    copy_ਮੰਜ਼ਿਲ(m);
+    ਵਾਪਸ m;
 }
 
-void UMat::assignTo(UMat& m, int _type) const
+ਖਾਲੀ UMat::ਸੌਂਪੋ_ਮੰਜ਼ਿਲ(UMat& m, ਪੂਰਨ _type) ਅਚਲ
 {
-    if( _type < 0 )
-        m = *this;
-    else
-        convertTo(m, _type);
+    ਜੇ( _type < 0 )
+        m = *ਇਹ;
+    ਨਹੀਂਤਾਂ
+        convert_ਮੰਜ਼ਿਲ(m, _type);
 }
 
-void UMat::create(int _rows, int _cols, int _type, UMatUsageFlags _usageFlags)
+ਖਾਲੀ UMat::create(ਪੂਰਨ ਪੰਕਤੀਆਂ_3, ਪੂਰਨ ਖਾਨੇ_ਗਿਣਤੀ_3, ਪੂਰਨ _type, UMatUsageFlags _usageFlags)
 {
-    int sz[] = {_rows, _cols};
+    ਪੂਰਨ sz[] = {ਪੰਕਤੀਆਂ_3, ਖਾਨੇ_ਗਿਣਤੀ_3};
     create(2, sz, _type, _usageFlags);
 }
 
-void UMat::create(Size _sz, int _type, UMatUsageFlags _usageFlags)
+ਖਾਲੀ UMat::create(ਮਾਪ _sz, ਪੂਰਨ _type, UMatUsageFlags _usageFlags)
 {
-    create(_sz.height, _sz.width, _type, _usageFlags);
+    create(_sz.ਉਚਾਈ, _sz.ਚੌੜਾਈ, _type, _usageFlags);
 }
 
-void UMat::createSameSize(InputArray arr, int _type, UMatUsageFlags _usageFlags)
+ਖਾਲੀ UMat::create_Same_ਮਾਪ(ਨਿਵੇਸ਼_Array arr, ਪੂਰਨ _type, UMatUsageFlags _usageFlags)
 {
     create(arr.shape(), _type, _usageFlags);
 }
 
-void UMat::addref()
+ਖਾਲੀ UMat::addref()
 {
-    if( u )
+    ਜੇ( u )
         CV_XADD(&(u->urefcount), 1);
 }
 
-void UMat::release()
+ਖਾਲੀ UMat::release()
 {
-    if( u && CV_XADD(&(u->urefcount), -1) == 1 )
+    ਜੇ( u && CV_XADD(&(u->urefcount), -1) == 1 )
         deallocate();
     u = 0;
     size.clear();
-    dims = cols = rows = 0;
+    dims = ਖਾਨੇ_ਗਿਣਤੀ = ਪੰਕਤੀਆਂ = 0;
 }
 
-bool UMat::empty() const
+ਤਾਰਕਿਕ UMat::empty() ਅਚਲ
 {
-    return u == 0 || total() == 0;
+    ਵਾਪਸ u == 0 || ਕੁੱਲ() == 0;
 }
 
-size_t UMat::total() const
+size_t UMat::ਕੁੱਲ() ਅਚਲ
 {
-    if( dims <= 2 )
-        return (size_t)rows * cols;
+    ਜੇ( dims <= 2 )
+        ਵਾਪਸ (size_t)ਪੰਕਤੀਆਂ * ਖਾਨੇ_ਗਿਣਤੀ;
     size_t p = 1;
-    for( int i = 0; i < dims; i++ )
+    ਲਈ( ਪੂਰਨ i = 0; i < dims; i++ )
         p *= size[i];
-    return p;
+    ਵਾਪਸ p;
 }
 
-MatShape UMat::shape() const
+MatShape UMat::shape() ਅਚਲ
 {
-    return size;
+    ਵਾਪਸ size;
 }
 
 UMat::UMat(UMat&& m)
-: flags(m.flags), dims(m.dims), rows(m.rows), cols(m.cols), allocator(m.allocator),
+: flags(m.flags), dims(m.dims), ਪੰਕਤੀਆਂ(m.ਪੰਕਤੀਆਂ), ਖਾਨੇ_ਗਿਣਤੀ(m.ਖਾਨੇ_ਗਿਣਤੀ), allocator(m.allocator),
   usageFlags(m.usageFlags), u(m.u), offset(m.offset)
 {
     size = m.size;
-    step = m.step;
+    ਕਦਮ = m.ਕਦਮ;
     m.flags = MAGIC_VAL;
     m.usageFlags = USAGE_DEFAULT;
-    m.dims = m.rows = m.cols = 0;
+    m.dims = m.ਪੰਕਤੀਆਂ = m.ਖਾਨੇ_ਗਿਣਤੀ = 0;
     m.size.clear();
-    m.allocator = NULL;
-    m.u = NULL;
+    m.allocator = ਨਿਰਾ;
+    m.u = ਨਿਰਾ;
     m.offset = 0;
 }
 
-UMat& UMat::operator=(UMat&& m)
+UMat& UMat::ਸੰਚਾਲਕ=(UMat&& m)
 {
-    if (this == &m)
-      return *this;
+    ਜੇ (ਇਹ == &m)
+      ਵਾਪਸ *ਇਹ;
     release();
-    flags = m.flags; dims = m.dims; rows = m.rows; cols = m.cols;
+    flags = m.flags; dims = m.dims; ਪੰਕਤੀਆਂ = m.ਪੰਕਤੀਆਂ; ਖਾਨੇ_ਗਿਣਤੀ = m.ਖਾਨੇ_ਗਿਣਤੀ;
     allocator = m.allocator; usageFlags = m.usageFlags;
     u = m.u;
     offset = m.offset;
     size = m.size;
-    step = m.step;
+    ਕਦਮ = m.ਕਦਮ;
     m.flags = MAGIC_VAL;
     m.usageFlags = USAGE_DEFAULT;
-    m.dims = m.rows = m.cols = 0;
-    m.allocator = NULL;
-    m.u = NULL;
+    m.dims = m.ਪੰਕਤੀਆਂ = m.ਖਾਨੇ_ਗਿਣਤੀ = 0;
+    m.allocator = ਨਿਰਾ;
+    m.u = ਨਿਰਾ;
     m.offset = 0;
-    return *this;
+    ਵਾਪਸ *ਇਹ;
 }
 
 
 MatAllocator* UMat::getStdAllocator()
 {
-#ifdef HAVE_OPENCL
-    if (ocl::useOpenCL())
-        return ocl::getOpenCLAllocator();
-#endif
-    return Mat::getDefaultAllocator();
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ HAVE_OPENCL
+    ਜੇ (ocl::useOpenCL())
+        ਵਾਪਸ ocl::getOpenCLAllocator();
+#ਜੇ_ਅੰਤ
+    ਵਾਪਸ Mat::getDefaultAllocator();
 }
 
-void swap( UMat& a, UMat& b )
+ਖਾਲੀ swap( UMat& a, UMat& b )
 {
     std::swap(a.flags, b.flags);
     std::swap(a.dims, b.dims);
-    std::swap(a.rows, b.rows);
-    std::swap(a.cols, b.cols);
+    std::swap(a.ਪੰਕਤੀਆਂ, b.ਪੰਕਤੀਆਂ);
+    std::swap(a.ਖਾਨੇ_ਗਿਣਤੀ, b.ਖਾਨੇ_ਗਿਣਤੀ);
     std::swap(a.allocator, b.allocator);
     std::swap(a.u, b.u);
     std::swap(a.offset, b.offset);
 
     std::swap(a.size, b.size);
-    std::swap(a.step, b.step);
+    std::swap(a.ਕਦਮ, b.ਕਦਮ);
 }
 
 
-void setSize( UMat& m, int _dims, const int* _sz,
-              const size_t* _steps, bool autoSteps )
+ਖਾਲੀ ਸੈੱਟ_ਮਾਪ( UMat& m, ਪੂਰਨ _dims, ਅਚਲ ਪੂਰਨ* _sz,
+              ਅਚਲ size_t* ਕਦਮਾਂ_2, ਤਾਰਕਿਕ auto_ਕਦਮਾਂ )
 {
     CV_Assert( 0 <= _dims && _dims <= CV_MAX_DIM && _dims <= MatShape::MAX_DIMS);
 
     m.dims = _dims;
     m.size = MatShape(_dims, _sz);
-    m.step[std::max(_dims-1, 0)] = CV_ELEM_SIZE(m.flags);
-    for (int i = _dims-2; i >= 0; i--) {
-        size_t autostep = m.size[i+1]*m.step[i+1];
-        if (_steps) {
-            m.step[i] = _steps[i];
+    m.ਕਦਮ[std::max(_dims-1, 0)] = CV_ELEM_ਮਾਪ(m.flags);
+    ਲਈ (ਪੂਰਨ i = _dims-2; i >= 0; i--) {
+        size_t autostep = m.size[i+1]*m.ਕਦਮ[i+1];
+        ਜੇ (ਕਦਮਾਂ_2) {
+            m.ਕਦਮ[i] = ਕਦਮਾਂ_2[i];
             //CV_Assert(m.step[i] >= autostep);
-        } else if (autoSteps) {
-            m.step[i] = autostep;
-        } else {
-            m.step[i] = 0;
+        } ਨਹੀਂਤਾਂ ਜੇ (auto_ਕਦਮਾਂ) {
+            m.ਕਦਮ[i] = autostep;
+        } ਨਹੀਂਤਾਂ {
+            m.ਕਦਮ[i] = 0;
         }
     }
 
-    if( _dims <= 2 )
+    ਜੇ( _dims <= 2 )
     {
-        m.cols = _dims == 0 ? 1 : _sz ? _sz[_dims > 1] : 0;
-        m.rows = _dims < 2 ? 1 : _sz ? _sz[0] : 0;
-    } else {
-        m.cols = m.rows = -1;
+        m.ਖਾਨੇ_ਗਿਣਤੀ = _dims == 0 ? 1 : _sz ? _sz[_dims > 1] : 0;
+        m.ਪੰਕਤੀਆਂ = _dims < 2 ? 1 : _sz ? _sz[0] : 0;
+    } ਨਹੀਂਤਾਂ {
+        m.ਖਾਨੇ_ਗਿਣਤੀ = m.ਪੰਕਤੀਆਂ = -1;
     }
 }
 
 
-void UMat::updateContinuityFlag()
+ਖਾਲੀ UMat::updateContinuityFlag()
 {
-    flags = cv::updateContinuityFlag(flags, dims, size.p, step.p);
+    flags = cv::updateContinuityFlag(flags, dims, size.p, ਕਦਮ.p);
 }
 
 
-void finalizeHdr(UMat& m)
+ਖਾਲੀ finalizeHdr(UMat& m)
 {
     m.updateContinuityFlag();
-    int d = m.dims;
-    if( d > 2 )
-        m.rows = m.cols = -1;
+    ਪੂਰਨ d = m.dims;
+    ਜੇ( d > 2 )
+        m.ਪੰਕਤੀਆਂ = m.ਖਾਨੇ_ਗਿਣਤੀ = -1;
 }
 
 
-UMat Mat::getUMat(AccessFlag accessFlags, UMatUsageFlags usageFlags) const
+UMat Mat::getUMat(AccessFlag accessFlags, UMatUsageFlags usageFlags) ਅਚਲ
 {
     UMat hdr;
-    if(!data)
-        return hdr;
-    if (data != datastart)
+    ਜੇ(!ਅੰਕੜੇ)
+        ਵਾਪਸ hdr;
+    ਜੇ (ਅੰਕੜੇ != datastart)
     {
-        Size wholeSize;
-        Point ofs;
-        locateROI(wholeSize, ofs);
-        Size sz(cols, rows);
-        if (ofs.x != 0 || ofs.y != 0)
+        ਮਾਪ ਸਾਰਾ_ਮਾਪ;
+        ਬਿੰਦੂ ofs;
+        locateROI(ਸਾਰਾ_ਮਾਪ, ofs);
+        ਮਾਪ sz(ਖਾਨੇ_ਗਿਣਤੀ, ਪੰਕਤੀਆਂ);
+        ਜੇ (ofs.x != 0 || ofs.y != 0)
         {
-            Mat src = *this;
-            int dtop = ofs.y;
-            int dbottom = wholeSize.height - src.rows - ofs.y;
-            int dleft = ofs.x;
-            int dright = wholeSize.width - src.cols - ofs.x;
+            Mat src = *ਇਹ;
+            ਪੂਰਨ dtop = ofs.y;
+            ਪੂਰਨ dbottom = ਸਾਰਾ_ਮਾਪ.ਉਚਾਈ - src.ਪੰਕਤੀਆਂ - ofs.y;
+            ਪੂਰਨ dleft = ofs.x;
+            ਪੂਰਨ dright = ਸਾਰਾ_ਮਾਪ.ਚੌੜਾਈ - src.ਖਾਨੇ_ਗਿਣਤੀ - ofs.x;
             src.adjustROI(dtop, dbottom, dleft, dright);
-            return src.getUMat(accessFlags, usageFlags)(cv::Rect(ofs.x, ofs.y, sz.width, sz.height));
+            ਵਾਪਸ src.getUMat(accessFlags, usageFlags)(cv::Rect(ofs.x, ofs.y, sz.ਚੌੜਾਈ, sz.ਉਚਾਈ));
         }
     }
-    CV_Assert(data == datastart);
+    CV_Assert(ਅੰਕੜੇ == datastart);
 
     accessFlags |= ACCESS_RW;
-    UMatData* new_u = NULL;
-    MatStep new_step = step;
+    UMat_ਅੰਕੜੇ* new_u = ਨਿਰਾ;
+    Mat_ਕਦਮ new_ਕਦਮ = ਕਦਮ;
     {
         MatAllocator *a = allocator, *a0 = getDefaultAllocator();
-        if(!a)
+        ਜੇ(!a)
             a = a0;
-        new_u = a->allocate(dims, size.p, type(), data, new_step.p, accessFlags, usageFlags);
-        new_u->originalUMatData = u;
+        new_u = a->allocate(dims, size.p, type(), ਅੰਕੜੇ, new_ਕਦਮ.p, accessFlags, usageFlags);
+        new_u->original_UMat_ਅੰਕੜੇ = u;
     }
-    bool allocated = false;
-    try
+    ਤਾਰਕਿਕ allocated = ਝੂਠ;
+    ਕੋਸ਼ਿਸ਼
     {
         allocated = UMat::getStdAllocator()->allocate(new_u, accessFlags, usageFlags);
     }
-    catch (const cv::Exception& e)
+    ਫੜੋ (ਅਚਲ cv::Exception& e)
     {
         fprintf(stderr, "Exception: %s\n", e.what());
     }
-    if (!allocated)
+    ਜੇ (!allocated)
     {
         allocated = getDefaultAllocator()->allocate(new_u, accessFlags, usageFlags);
         CV_Assert(allocated);
     }
-    if (u != NULL)
+    ਜੇ (u != ਨਿਰਾ)
     {
-#ifdef HAVE_OPENCL
-        if (ocl::useOpenCL() && new_u->currAllocator == ocl::getOpenCLAllocator())
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ HAVE_OPENCL
+        ਜੇ (ocl::useOpenCL() && new_u->currAllocator == ocl::getOpenCLAllocator())
         {
-            CV_Assert(new_u->tempUMat());
+            CV_Assert(new_u->ਆਰਜ਼ੀ_UMat());
         }
-#endif
+#ਜੇ_ਅੰਤ
         CV_XADD(&(u->refcount), 1);
         CV_XADD(&(u->urefcount), 1);
     }
-    try
+    ਕੋਸ਼ਿਸ਼
     {
         hdr.flags = flags;
         hdr.usageFlags = usageFlags;
-        setSize(hdr, dims, size.p, new_step.p);
+        ਸੈੱਟ_ਮਾਪ(hdr, dims, size.p, new_ਕਦਮ.p);
         finalizeHdr(hdr);
         hdr.u = new_u;
         hdr.offset = 0; //data - datastart;
         hdr.addref();
-        return hdr;
+        ਵਾਪਸ hdr;
     }
-    catch(...)
+    ਫੜੋ(...)
     {
-        if (u != NULL)
+        ਜੇ (u != ਨਿਰਾ)
         {
             CV_XADD(&(u->refcount), -1);
             CV_XADD(&(u->urefcount), -1);
         }
         new_u->currAllocator->deallocate(new_u);
-        throw;
+        ਸੁੱਟੋ;
     }
 
 }
 
-void UMat::create(int d0, const int* _sizes, int _type, UMatUsageFlags _usageFlags)
+ਖਾਲੀ UMat::create(ਪੂਰਨ d0, ਅਚਲ ਪੂਰਨ* _sizes, ਪੂਰਨ _type, UMatUsageFlags _usageFlags)
 {
-    int sz1 = 1, d = d0;
-    int i;
-    if (d == 0) {
+    ਪੂਰਨ sz1 = 1, d = d0;
+    ਪੂਰਨ i;
+    ਜੇ (d == 0) {
         d = 1;
-        _sizes = (const int*)&sz1;
+        _sizes = (ਅਚਲ ਪੂਰਨ*)&sz1;
     }
     CV_Assert(0 <= d && d <= CV_MAX_DIM && _sizes);
     _type = CV_MAT_TYPE(_type);
@@ -611,138 +611,138 @@ void UMat::create(int d0, const int* _sizes, int _type, UMatUsageFlags _usageFla
     // ...then don't change the existing usageFlags
     // it is not possible to change usage from non-default to USAGE_DEFAULT through create()
     // ...instead must construct UMat()
-    if (_usageFlags == cv::USAGE_DEFAULT)
+    ਜੇ (_usageFlags == cv::USAGE_DEFAULT)
     {
         _usageFlags = usageFlags;
     }
 
-    if( u && d == dims && _type == type() && _usageFlags == usageFlags )
+    ਜੇ( u && d == dims && _type == type() && _usageFlags == usageFlags )
     {
-        for( i = 0; i < d; i++ )
-            if( size[i] != _sizes[i] )
-                break;
-        if( i == d )
-            return;
+        ਲਈ( i = 0; i < d; i++ )
+            ਜੇ( size[i] != _sizes[i] )
+                ਰੋਕੋ;
+        ਜੇ( i == d )
+            ਵਾਪਸ;
     }
 
-    int _sizes_backup[CV_MAX_DIM]; // #5991
-    if (_sizes == (this->size.p))
+    ਪੂਰਨ _sizes_backup[CV_MAX_DIM]; // #5991
+    ਜੇ (_sizes == (ਇਹ->size.p))
     {
-        for(i = 0; i < d; i++ )
+        ਲਈ(i = 0; i < d; i++ )
             _sizes_backup[i] = _sizes[i];
         _sizes = _sizes_backup;
     }
 
     release();
     usageFlags = _usageFlags;
-    if( d == 0 )
-        return;
-    flags = (_type & CV_MAT_TYPE_MASK) | MAGIC_VAL;
-    setSize(*this, d, _sizes, 0, true);
+    ਜੇ( d == 0 )
+        ਵਾਪਸ;
+    flags = (_type & CV_MAT_TYPE_ਨਕਾਬ) | MAGIC_VAL;
+    ਸੈੱਟ_ਮਾਪ(*ਇਹ, d, _sizes, 0, ਸੱਚ);
     offset = 0;
 
-    if( total() > 0 )
+    ਜੇ( ਕੁੱਲ() > 0 )
     {
         MatAllocator *a = allocator, *a0 = getStdAllocator();
-        if (!a)
+        ਜੇ (!a)
         {
             a = a0;
             a0 = Mat::getDefaultAllocator();
         }
-        try
+        ਕੋਸ਼ਿਸ਼
         {
-            u = a->allocate(dims, size.p, _type, 0, step.p, ACCESS_RW /* ignored */, usageFlags);
+            u = a->allocate(dims, size.p, _type, 0, ਕਦਮ.p, ACCESS_RW /* ignored */, usageFlags);
             CV_Assert(u != 0);
         }
-        catch(...)
+        ਫੜੋ(...)
         {
-            if(a != a0)
-                u = a0->allocate(dims, size.p, _type, 0, step.p, ACCESS_RW /* ignored */, usageFlags);
+            ਜੇ(a != a0)
+                u = a0->allocate(dims, size.p, _type, 0, ਕਦਮ.p, ACCESS_RW /* ignored */, usageFlags);
             CV_Assert(u != 0);
         }
-        CV_Assert( step[dims-1] == (size_t)CV_ELEM_SIZE(flags) );
+        CV_Assert( ਕਦਮ[dims-1] == (size_t)CV_ELEM_ਮਾਪ(flags) );
     }
 
-    finalizeHdr(*this);
+    finalizeHdr(*ਇਹ);
     addref();
     size.dims = dims = d0;
 }
 
-void UMat::create(const std::vector<int>& _sizes, int _type, UMatUsageFlags _usageFlags)
+ਖਾਲੀ UMat::create(ਅਚਲ std::vector<ਪੂਰਨ>& _sizes, ਪੂਰਨ _type, UMatUsageFlags _usageFlags)
 {
-    create((int)_sizes.size(), _sizes.data(), _type, _usageFlags);
+    create((ਪੂਰਨ)_sizes.size(), _sizes.ਅੰਕੜੇ(), _type, _usageFlags);
 }
 
-void UMat::create(const MatShape& _shape, int _type, UMatUsageFlags _usageFlags)
+ਖਾਲੀ UMat::create(ਅਚਲ MatShape& _shape, ਪੂਰਨ _type, UMatUsageFlags _usageFlags)
 {
-    if (_shape.dims < 0) {
+    ਜੇ (_shape.dims < 0) {
         release();
-    } else {
+    } ਨਹੀਂਤਾਂ {
         create(_shape.dims, _shape.p, _type, _usageFlags);
         size.layout = _shape.layout;
         size.C = _shape.C;
     }
 }
 
-void UMat::fit(int _dims, const int* _sizes, int _type, UMatUsageFlags _usageFlags)
+ਖਾਲੀ UMat::fit(ਪੂਰਨ _dims, ਅਚਲ ਪੂਰਨ* _sizes, ਪੂਰਨ _type, UMatUsageFlags _usageFlags)
 {
-    if (_usageFlags == cv::USAGE_DEFAULT)
+    ਜੇ (_usageFlags == cv::USAGE_DEFAULT)
         _usageFlags = usageFlags;
-    size_t oldTotalBytes = u ? u->size : 0;
-    size_t esz = CV_ELEM_SIZE(_type), newTotal = _dims >= 0;
-    for (int i = 0; i < _dims; i++)
-        newTotal *= _sizes[i];
-    size_t newTotalBytes = newTotal*esz;
-    if (newTotalBytes > 0 &&
+    size_t old_ਕੁੱਲ_ਬਾਈਟਾਂ = u ? u->size : 0;
+    size_t esz = CV_ELEM_ਮਾਪ(_type), new_ਕੁੱਲ = _dims >= 0;
+    ਲਈ (ਪੂਰਨ i = 0; i < _dims; i++)
+        new_ਕੁੱਲ *= _sizes[i];
+    size_t new_ਕੁੱਲ_ਬਾਈਟਾਂ = new_ਕੁੱਲ*esz;
+    ਜੇ (new_ਕੁੱਲ_ਬਾਈਟਾਂ > 0 &&
         (!isContinuous() ||
-         newTotalBytes > oldTotalBytes ||
+         new_ਕੁੱਲ_ਬਾਈਟਾਂ > old_ਕੁੱਲ_ਬਾਈਟਾਂ ||
          offset != 0 ||
          _usageFlags != usageFlags)) {
         create(_dims, _sizes, _type, _usageFlags);
-    } else {
-        flags = (flags & ~Mat::TYPE_MASK) | CV_MAT_TYPE(_type);
-        int _dummy_size = 0;
-        setSize(*this, (_dims >= 0 ? _dims : 1), (_dims >= 0 ? _sizes : &_dummy_size), nullptr, true);
-        finalizeHdr(*this);
+    } ਨਹੀਂਤਾਂ {
+        flags = (flags & ~Mat::TYPE_ਨਕਾਬ) | CV_MAT_TYPE(_type);
+        ਪੂਰਨ dummy_ਮਾਪ = 0;
+        ਸੈੱਟ_ਮਾਪ(*ਇਹ, (_dims >= 0 ? _dims : 1), (_dims >= 0 ? _sizes : &dummy_ਮਾਪ), ਖਾਲੀ_ਸੂਚਕ, ਸੱਚ);
+        finalizeHdr(*ਇਹ);
     }
 }
 
-void UMat::fit(const std::vector<int>& _shape, int _type, UMatUsageFlags _usageFlags)
+ਖਾਲੀ UMat::fit(ਅਚਲ std::vector<ਪੂਰਨ>& _shape, ਪੂਰਨ _type, UMatUsageFlags _usageFlags)
 {
-    fit((int)_shape.size(), _shape.data(), _type, _usageFlags);
+    fit((ਪੂਰਨ)_shape.size(), _shape.ਅੰਕੜੇ(), _type, _usageFlags);
 }
 
-void UMat::fit(const MatShape& _shape, int _type, UMatUsageFlags _usageFlags)
+ਖਾਲੀ UMat::fit(ਅਚਲ MatShape& _shape, ਪੂਰਨ _type, UMatUsageFlags _usageFlags)
 {
     fit(_shape.dims, _shape.p, _type, _usageFlags);
     size.layout = _shape.layout;
     size.C = _shape.C;
 }
 
-void UMat::fit(int _rows, int _cols, int _type, UMatUsageFlags _usageFlags)
+ਖਾਲੀ UMat::fit(ਪੂਰਨ ਪੰਕਤੀਆਂ_3, ਪੂਰਨ ਖਾਨੇ_ਗਿਣਤੀ_3, ਪੂਰਨ _type, UMatUsageFlags _usageFlags)
 {
-    _type &= TYPE_MASK;
-    int sz[] = {_rows, _cols};
+    _type &= TYPE_ਨਕਾਬ;
+    ਪੂਰਨ sz[] = {ਪੰਕਤੀਆਂ_3, ਖਾਨੇ_ਗਿਣਤੀ_3};
     fit(2, sz, _type, _usageFlags);
 }
 
-void UMat::fit(Size _sz, int _type, UMatUsageFlags _usageFlags)
+ਖਾਲੀ UMat::fit(ਮਾਪ _sz, ਪੂਰਨ _type, UMatUsageFlags _usageFlags)
 {
-    fit(_sz.height, _sz.width, _type, _usageFlags);
+    fit(_sz.ਉਚਾਈ, _sz.ਚੌੜਾਈ, _type, _usageFlags);
 }
 
-void UMat::fitSameSize(InputArray m, int _type, UMatUsageFlags _usageFlags)
+ਖਾਲੀ UMat::fit_Same_ਮਾਪ(ਨਿਵੇਸ਼_Array m, ਪੂਰਨ _type, UMatUsageFlags _usageFlags)
 {
     fit(m.shape(), _type, _usageFlags);
 }
 
-void UMat::copySize(const UMat& m)
+ਖਾਲੀ UMat::copy_ਮਾਪ(ਅਚਲ UMat& m)
 {
     dims = m.dims;
-    cols = m.cols;
-    rows = m.rows;
+    ਖਾਨੇ_ਗਿਣਤੀ = m.ਖਾਨੇ_ਗਿਣਤੀ;
+    ਪੰਕਤੀਆਂ = m.ਪੰਕਤੀਆਂ;
     size = m.size;
-    step = m.step;
+    ਕਦਮ = m.ਕਦਮ;
 }
 
 UMat::~UMat()
@@ -750,612 +750,612 @@ UMat::~UMat()
     release();
 }
 
-void UMat::deallocate()
+ਖਾਲੀ UMat::deallocate()
 {
-    UMatData* u_ = u;
-    u = NULL;
+    UMat_ਅੰਕੜੇ* u_ = u;
+    u = ਨਿਰਾ;
     u_->currAllocator->deallocate(u_);
 }
 
 
-UMat::UMat(const UMat& m, const Range& _rowRange, const Range& _colRange)
-    : flags(MAGIC_VAL), dims(0), rows(0), cols(0), allocator(0), usageFlags(USAGE_DEFAULT), u(0), offset(0)
+UMat::UMat(ਅਚਲ UMat& m, ਅਚਲ Range& ਪੰਕਤੀ_Range_3, ਅਚਲ Range& ਖਾਨਾ_Range_3)
+    : flags(MAGIC_VAL), dims(0), ਪੰਕਤੀਆਂ(0), ਖਾਨੇ_ਗਿਣਤੀ(0), allocator(0), usageFlags(USAGE_DEFAULT), u(0), offset(0)
 {
     CV_Assert( m.dims >= 2 && m.dims <= MatShape::MAX_DIMS );
-    if( m.dims > 2 )
+    ਜੇ( m.dims > 2 )
     {
         Range rs[MatShape::MAX_DIMS];
-        rs[0] = _rowRange;
-        rs[1] = _colRange;
-        for( int i = 2; i < m.dims; i++ )
+        rs[0] = ਪੰਕਤੀ_Range_3;
+        rs[1] = ਖਾਨਾ_Range_3;
+        ਲਈ( ਪੂਰਨ i = 2; i < m.dims; i++ )
             rs[i] = Range::all();
-        *this = m(rs);
-        return;
+        *ਇਹ = m(rs);
+        ਵਾਪਸ;
     }
 
-    *this = m;
-    if( _rowRange != Range::all() && _rowRange != Range(0,rows) )
+    *ਇਹ = m;
+    ਜੇ( ਪੰਕਤੀ_Range_3 != Range::all() && ਪੰਕਤੀ_Range_3 != Range(0,ਪੰਕਤੀਆਂ) )
     {
-        CV_Assert( 0 <= _rowRange.start &&
-                  _rowRange.start <= _rowRange.end &&
-                  _rowRange.end <= m.rows );
-        size[0] = rows = _rowRange.size();
-        offset += step*_rowRange.start;
+        CV_Assert( 0 <= ਪੰਕਤੀ_Range_3.ਸ਼ੁਰੂ &&
+                  ਪੰਕਤੀ_Range_3.ਸ਼ੁਰੂ <= ਪੰਕਤੀ_Range_3.end &&
+                  ਪੰਕਤੀ_Range_3.end <= m.ਪੰਕਤੀਆਂ );
+        size[0] = ਪੰਕਤੀਆਂ = ਪੰਕਤੀ_Range_3.size();
+        offset += ਕਦਮ*ਪੰਕਤੀ_Range_3.ਸ਼ੁਰੂ;
         flags |= SUBMATRIX_FLAG;
     }
 
-    if( _colRange != Range::all() && _colRange != Range(0,cols) )
+    ਜੇ( ਖਾਨਾ_Range_3 != Range::all() && ਖਾਨਾ_Range_3 != Range(0,ਖਾਨੇ_ਗਿਣਤੀ) )
     {
-        CV_Assert( 0 <= _colRange.start &&
-                  _colRange.start <= _colRange.end &&
-                  _colRange.end <= m.cols );
-        size[1] = cols = _colRange.size();
-        offset += _colRange.start*elemSize();
+        CV_Assert( 0 <= ਖਾਨਾ_Range_3.ਸ਼ੁਰੂ &&
+                  ਖਾਨਾ_Range_3.ਸ਼ੁਰੂ <= ਖਾਨਾ_Range_3.end &&
+                  ਖਾਨਾ_Range_3.end <= m.ਖਾਨੇ_ਗਿਣਤੀ );
+        size[1] = ਖਾਨੇ_ਗਿਣਤੀ = ਖਾਨਾ_Range_3.size();
+        offset += ਖਾਨਾ_Range_3.ਸ਼ੁਰੂ*elem_ਮਾਪ();
         flags |= SUBMATRIX_FLAG;
     }
 
     updateContinuityFlag();
 
-    if( rows <= 0 || cols <= 0 )
+    ਜੇ( ਪੰਕਤੀਆਂ <= 0 || ਖਾਨੇ_ਗਿਣਤੀ <= 0 )
     {
         release();
-        rows = cols = 0;
+        ਪੰਕਤੀਆਂ = ਖਾਨੇ_ਗਿਣਤੀ = 0;
     }
 }
 
 
-UMat::UMat(const UMat& m, const Rect& roi)
-    : flags(m.flags), dims(2), rows(roi.height), cols(roi.width),
+UMat::UMat(ਅਚਲ UMat& m, ਅਚਲ Rect& roi)
+    : flags(m.flags), dims(2), ਪੰਕਤੀਆਂ(roi.ਉਚਾਈ), ਖਾਨੇ_ਗਿਣਤੀ(roi.ਚੌੜਾਈ),
     allocator(m.allocator), usageFlags(m.usageFlags), u(m.u),
-    offset(m.offset + roi.y*m.step[0]), size(2)
+    offset(m.offset + roi.y*m.ਕਦਮ[0]), size(2)
 {
     CV_Assert( m.dims <= 2 );
 
-    size_t esz = CV_ELEM_SIZE(flags);
+    size_t esz = CV_ELEM_ਮਾਪ(flags);
     offset += roi.x*esz;
-    CV_Assert( 0 <= roi.x && 0 <= roi.width && roi.x + roi.width <= m.cols &&
-              0 <= roi.y && 0 <= roi.height && roi.y + roi.height <= m.rows );
-    if( roi.width < m.cols || roi.height < m.rows )
+    CV_Assert( 0 <= roi.x && 0 <= roi.ਚੌੜਾਈ && roi.x + roi.ਚੌੜਾਈ <= m.ਖਾਨੇ_ਗਿਣਤੀ &&
+              0 <= roi.y && 0 <= roi.ਉਚਾਈ && roi.y + roi.ਉਚਾਈ <= m.ਪੰਕਤੀਆਂ );
+    ਜੇ( roi.ਚੌੜਾਈ < m.ਖਾਨੇ_ਗਿਣਤੀ || roi.ਉਚਾਈ < m.ਪੰਕਤੀਆਂ )
         flags |= SUBMATRIX_FLAG;
 
-    size[0] = rows;
-    size[1] = cols;
-    step[0] = m.dims == 2 ? m.step[0] : cols*esz;
-    step[1] = esz;
+    size[0] = ਪੰਕਤੀਆਂ;
+    size[1] = ਖਾਨੇ_ਗਿਣਤੀ;
+    ਕਦਮ[0] = m.dims == 2 ? m.ਕਦਮ[0] : ਖਾਨੇ_ਗਿਣਤੀ*esz;
+    ਕਦਮ[1] = esz;
 
     updateContinuityFlag();
 
     addref();
-    if( rows <= 0 || cols <= 0 )
+    ਜੇ( ਪੰਕਤੀਆਂ <= 0 || ਖਾਨੇ_ਗਿਣਤੀ <= 0 )
     {
-        rows = cols = 0;
+        ਪੰਕਤੀਆਂ = ਖਾਨੇ_ਗਿਣਤੀ = 0;
         release();
     }
 }
 
 
-UMat::UMat(const UMat& m, const Range* ranges)
-    : flags(MAGIC_VAL), dims(0), rows(0), cols(0), allocator(0), usageFlags(USAGE_DEFAULT), u(0), offset(0)
+UMat::UMat(ਅਚਲ UMat& m, ਅਚਲ Range* ranges)
+    : flags(MAGIC_VAL), dims(0), ਪੰਕਤੀਆਂ(0), ਖਾਨੇ_ਗਿਣਤੀ(0), allocator(0), usageFlags(USAGE_DEFAULT), u(0), offset(0)
 {
-    int i, d = m.dims;
+    ਪੂਰਨ i, d = m.dims;
 
     CV_Assert(ranges);
-    for( i = 0; i < d; i++ )
+    ਲਈ( i = 0; i < d; i++ )
     {
         Range r = ranges[i];
-        CV_Assert( r == Range::all() || (0 <= r.start && r.start < r.end && r.end <= m.size[i]) );
+        CV_Assert( r == Range::all() || (0 <= r.ਸ਼ੁਰੂ && r.ਸ਼ੁਰੂ < r.end && r.end <= m.size[i]) );
     }
-    *this = m;
-    for( i = 0; i < d; i++ )
+    *ਇਹ = m;
+    ਲਈ( i = 0; i < d; i++ )
     {
         Range r = ranges[i];
-        if( r != Range::all() && r != Range(0, size.p[i]))
+        ਜੇ( r != Range::all() && r != Range(0, size.p[i]))
         {
-            size.p[i] = r.end - r.start;
-            offset += r.start*step.p[i];
+            size.p[i] = r.end - r.ਸ਼ੁਰੂ;
+            offset += r.ਸ਼ੁਰੂ*ਕਦਮ.p[i];
             flags |= SUBMATRIX_FLAG;
         }
     }
 
-    if (d <= 2) {
-        rows = d == 2 ? size[0] : 1;
-        cols = d <= 0 ? (d >= 0) : size[d > 1];
+    ਜੇ (d <= 2) {
+        ਪੰਕਤੀਆਂ = d == 2 ? size[0] : 1;
+        ਖਾਨੇ_ਗਿਣਤੀ = d <= 0 ? (d >= 0) : size[d > 1];
     }
     updateContinuityFlag();
 }
 
-UMat::UMat(const UMat& m, const std::vector<Range>& ranges)
-    : flags(MAGIC_VAL), dims(0), rows(0), cols(0), allocator(0), usageFlags(USAGE_DEFAULT), u(0), offset(0)
+UMat::UMat(ਅਚਲ UMat& m, ਅਚਲ std::vector<Range>& ranges)
+    : flags(MAGIC_VAL), dims(0), ਪੰਕਤੀਆਂ(0), ਖਾਨੇ_ਗਿਣਤੀ(0), allocator(0), usageFlags(USAGE_DEFAULT), u(0), offset(0)
 {
-    int i, d = m.dims;
+    ਪੂਰਨ i, d = m.dims;
 
-    CV_Assert((int)ranges.size() == d);
-    for (i = 0; i < d; i++)
+    CV_Assert((ਪੂਰਨ)ranges.size() == d);
+    ਲਈ (i = 0; i < d; i++)
     {
         Range r = ranges[i];
-        CV_Assert(r == Range::all() || (0 <= r.start && r.start < r.end && r.end <= m.size[i]));
+        CV_Assert(r == Range::all() || (0 <= r.ਸ਼ੁਰੂ && r.ਸ਼ੁਰੂ < r.end && r.end <= m.size[i]));
     }
-    *this = m;
-    for (i = 0; i < d; i++)
+    *ਇਹ = m;
+    ਲਈ (i = 0; i < d; i++)
     {
         Range r = ranges[i];
-        if (r != Range::all() && r != Range(0, size.p[i]))
+        ਜੇ (r != Range::all() && r != Range(0, size.p[i]))
         {
-            size.p[i] = r.end - r.start;
-            offset += r.start*step.p[i];
+            size.p[i] = r.end - r.ਸ਼ੁਰੂ;
+            offset += r.ਸ਼ੁਰੂ*ਕਦਮ.p[i];
             flags |= SUBMATRIX_FLAG;
         }
     }
 
-    if (d <= 2) {
-        rows = d == 2 ? size[0] : 1;
-        cols = d <= 0 ? (d >= 0) : size[d > 1];
+    ਜੇ (d <= 2) {
+        ਪੰਕਤੀਆਂ = d == 2 ? size[0] : 1;
+        ਖਾਨੇ_ਗਿਣਤੀ = d <= 0 ? (d >= 0) : size[d > 1];
     }
     updateContinuityFlag();
 }
 
-UMat UMat::diag(int d) const
+UMat UMat::diag(ਪੂਰਨ d) ਅਚਲ
 {
     CV_Assert( dims <= 2 );
-    UMat m = *this;
-    size_t esz = elemSize();
-    int len;
+    UMat m = *ਇਹ;
+    size_t esz = elem_ਮਾਪ();
+    ਪੂਰਨ len;
 
-    if( d >= 0 )
+    ਜੇ( d >= 0 )
     {
-        len = std::min(cols - d, rows);
+        len = std::min(ਖਾਨੇ_ਗਿਣਤੀ - d, ਪੰਕਤੀਆਂ);
         m.offset += esz*d;
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
-        len = std::min(rows + d, cols);
-        m.offset -= step[0]*d;
+        len = std::min(ਪੰਕਤੀਆਂ + d, ਖਾਨੇ_ਗਿਣਤੀ);
+        m.offset -= ਕਦਮ[0]*d;
     }
     CV_DbgAssert( len > 0 );
 
-    m.size[0] = m.rows = len;
-    m.size[1] = m.cols = 1;
-    m.step[0] += (len > 1 ? esz : 0);
+    m.size[0] = m.ਪੰਕਤੀਆਂ = len;
+    m.size[1] = m.ਖਾਨੇ_ਗਿਣਤੀ = 1;
+    m.ਕਦਮ[0] += (len > 1 ? esz : 0);
 
     m.updateContinuityFlag();
 
-    if( size() != Size(1,1) )
+    ਜੇ( size() != ਮਾਪ(1,1) )
         m.flags |= SUBMATRIX_FLAG;
 
-    return m;
+    ਵਾਪਸ m;
 }
 
-void UMat::locateROI( Size& wholeSize, Point& ofs ) const
+ਖਾਲੀ UMat::locateROI( ਮਾਪ& ਸਾਰਾ_ਮਾਪ, ਬਿੰਦੂ& ofs ) ਅਚਲ
 {
-    CV_Assert( dims <= 2 && step[0] > 0 );
-    size_t esz = elemSize(), minstep;
+    CV_Assert( dims <= 2 && ਕਦਮ[0] > 0 );
+    size_t esz = elem_ਮਾਪ(), minstep;
     ptrdiff_t delta1 = (ptrdiff_t)offset, delta2 = (ptrdiff_t)u->size;
 
-    if( delta1 == 0 )
+    ਜੇ( delta1 == 0 )
         ofs.x = ofs.y = 0;
-    else
+    ਨਹੀਂਤਾਂ
     {
-        ofs.y = (int)(delta1/step[0]);
-        ofs.x = (int)((delta1 - step[0]*ofs.y)/esz);
-        CV_DbgAssert( offset == (size_t)(ofs.y*step[0] + ofs.x*esz) );
+        ofs.y = (ਪੂਰਨ)(delta1/ਕਦਮ[0]);
+        ofs.x = (ਪੂਰਨ)((delta1 - ਕਦਮ[0]*ofs.y)/esz);
+        CV_DbgAssert( offset == (size_t)(ofs.y*ਕਦਮ[0] + ofs.x*esz) );
     }
-    minstep = (ofs.x + cols)*esz;
-    wholeSize.height = (int)((delta2 - minstep)/step[0] + 1);
-    wholeSize.height = std::max(wholeSize.height, ofs.y + rows);
-    wholeSize.width = (int)((delta2 - step*(wholeSize.height-1))/esz);
-    wholeSize.width = std::max(wholeSize.width, ofs.x + cols);
+    minstep = (ofs.x + ਖਾਨੇ_ਗਿਣਤੀ)*esz;
+    ਸਾਰਾ_ਮਾਪ.ਉਚਾਈ = (ਪੂਰਨ)((delta2 - minstep)/ਕਦਮ[0] + 1);
+    ਸਾਰਾ_ਮਾਪ.ਉਚਾਈ = std::max(ਸਾਰਾ_ਮਾਪ.ਉਚਾਈ, ofs.y + ਪੰਕਤੀਆਂ);
+    ਸਾਰਾ_ਮਾਪ.ਚੌੜਾਈ = (ਪੂਰਨ)((delta2 - ਕਦਮ*(ਸਾਰਾ_ਮਾਪ.ਉਚਾਈ-1))/esz);
+    ਸਾਰਾ_ਮਾਪ.ਚੌੜਾਈ = std::max(ਸਾਰਾ_ਮਾਪ.ਚੌੜਾਈ, ofs.x + ਖਾਨੇ_ਗਿਣਤੀ);
 }
 
 
-UMat& UMat::adjustROI( int dtop, int dbottom, int dleft, int dright )
+UMat& UMat::adjustROI( ਪੂਰਨ dtop, ਪੂਰਨ dbottom, ਪੂਰਨ dleft, ਪੂਰਨ dright )
 {
-    CV_Assert( dims == 2 && step[0] > 0 );
-    Size wholeSize; Point ofs;
-    size_t esz = elemSize();
-    locateROI( wholeSize, ofs );
-    int row1 = std::min(std::max(ofs.y - dtop, 0), wholeSize.height), row2 = std::max(0, std::min(ofs.y + rows + dbottom, wholeSize.height));
-    int col1 = std::min(std::max(ofs.x - dleft, 0), wholeSize.width), col2 = std::max(0, std::min(ofs.x + cols + dright, wholeSize.width));
-    if(row1 > row2)
+    CV_Assert( dims == 2 && ਕਦਮ[0] > 0 );
+    ਮਾਪ ਸਾਰਾ_ਮਾਪ; ਬਿੰਦੂ ofs;
+    size_t esz = elem_ਮਾਪ();
+    locateROI( ਸਾਰਾ_ਮਾਪ, ofs );
+    ਪੂਰਨ row1 = std::min(std::max(ofs.y - dtop, 0), ਸਾਰਾ_ਮਾਪ.ਉਚਾਈ), row2 = std::max(0, std::min(ofs.y + ਪੰਕਤੀਆਂ + dbottom, ਸਾਰਾ_ਮਾਪ.ਉਚਾਈ));
+    ਪੂਰਨ col1 = std::min(std::max(ofs.x - dleft, 0), ਸਾਰਾ_ਮਾਪ.ਚੌੜਾਈ), col2 = std::max(0, std::min(ofs.x + ਖਾਨੇ_ਗਿਣਤੀ + dright, ਸਾਰਾ_ਮਾਪ.ਚੌੜਾਈ));
+    ਜੇ(row1 > row2)
         std::swap(row1, row2);
-    if(col1 > col2)
+    ਜੇ(col1 > col2)
         std::swap(col1, col2);
 
-    offset += (row1 - ofs.y)*step + (col1 - ofs.x)*esz;
-    rows = row2 - row1; cols = col2 - col1;
-    size.p[0] = rows; size.p[1] = cols;
+    offset += (row1 - ofs.y)*ਕਦਮ + (col1 - ofs.x)*esz;
+    ਪੰਕਤੀਆਂ = row2 - row1; ਖਾਨੇ_ਗਿਣਤੀ = col2 - col1;
+    size.p[0] = ਪੰਕਤੀਆਂ; size.p[1] = ਖਾਨੇ_ਗਿਣਤੀ;
     updateContinuityFlag();
-    return *this;
+    ਵਾਪਸ *ਇਹ;
 }
 
 
-UMat UMat::reshape(int new_cn, int new_rows) const
+UMat UMat::reshape(ਪੂਰਨ new_cn, ਪੂਰਨ new_ਪੰਕਤੀਆਂ) ਅਚਲ
 {
-    int cn = channels();
-    UMat hdr = *this;
+    ਪੂਰਨ cn = channels();
+    UMat hdr = *ਇਹ;
 
-    if( dims > 2 && new_rows == 0 && new_cn != 0 && size[dims-1]*cn % new_cn == 0 )
+    ਜੇ( dims > 2 && new_ਪੰਕਤੀਆਂ == 0 && new_cn != 0 && size[dims-1]*cn % new_cn == 0 )
     {
-        hdr.flags = (hdr.flags & ~CV_MAT_CN_MASK) | ((new_cn-1) << CV_CN_SHIFT);
-        hdr.step[dims-1] = CV_ELEM_SIZE(hdr.flags);
+        hdr.flags = (hdr.flags & ~CV_MAT_CN_ਨਕਾਬ) | ((new_cn-1) << CV_CN_ਖਿਸਕਾਓ);
+        hdr.ਕਦਮ[dims-1] = CV_ELEM_ਮਾਪ(hdr.flags);
         hdr.size[dims-1] = hdr.size[dims-1]*cn / new_cn;
-        return hdr;
+        ਵਾਪਸ hdr;
     }
 
     CV_Assert( dims <= 2 );
 
-    if( new_cn == 0 )
+    ਜੇ( new_cn == 0 )
         new_cn = cn;
 
-    int total_width = cols * cn;
+    ਪੂਰਨ ਕੁੱਲ_ਚੌੜਾਈ = ਖਾਨੇ_ਗਿਣਤੀ * cn;
 
-    if( (new_cn > total_width || total_width % new_cn != 0) && new_rows == 0 )
-        new_rows = rows * total_width / new_cn;
+    ਜੇ( (new_cn > ਕੁੱਲ_ਚੌੜਾਈ || ਕੁੱਲ_ਚੌੜਾਈ % new_cn != 0) && new_ਪੰਕਤੀਆਂ == 0 )
+        new_ਪੰਕਤੀਆਂ = ਪੰਕਤੀਆਂ * ਕੁੱਲ_ਚੌੜਾਈ / new_cn;
 
-    if( new_rows != 0 && new_rows != rows )
+    ਜੇ( new_ਪੰਕਤੀਆਂ != 0 && new_ਪੰਕਤੀਆਂ != ਪੰਕਤੀਆਂ )
     {
-        int total_size = total_width * rows;
-        if( !isContinuous() )
-            CV_Error( cv::Error::BadStep,
+        ਪੂਰਨ ਕੁੱਲ_ਮਾਪ_2 = ਕੁੱਲ_ਚੌੜਾਈ * ਪੰਕਤੀਆਂ;
+        ਜੇ( !isContinuous() )
+            CV_Error( cv::Error::Bad_ਕਦਮ,
             "The matrix is not continuous, thus its number of rows can not be changed" );
 
-        total_width = total_size / new_rows;
+        ਕੁੱਲ_ਚੌੜਾਈ = ਕੁੱਲ_ਮਾਪ_2 / new_ਪੰਕਤੀਆਂ;
 
-        if( total_width * new_rows != total_size )
+        ਜੇ( ਕੁੱਲ_ਚੌੜਾਈ * new_ਪੰਕਤੀਆਂ != ਕੁੱਲ_ਮਾਪ_2 )
             CV_Error( cv::Error::StsBadArg, "The total number of matrix elements "
                                     "is not divisible by the new number of rows" );
 
-        hdr.size[0] = hdr.rows = new_rows;
-        hdr.step[0] = total_width * elemSize1();
-    } else {
-        hdr.size[0] = hdr.rows = rows;
-        if (dims <= 1)
-            hdr.step[0] = cols * CV_ELEM_SIZE(flags);
+        hdr.size[0] = hdr.ਪੰਕਤੀਆਂ = new_ਪੰਕਤੀਆਂ;
+        hdr.ਕਦਮ[0] = ਕੁੱਲ_ਚੌੜਾਈ * elemSize1();
+    } ਨਹੀਂਤਾਂ {
+        hdr.size[0] = hdr.ਪੰਕਤੀਆਂ = ਪੰਕਤੀਆਂ;
+        ਜੇ (dims <= 1)
+            hdr.ਕਦਮ[0] = ਖਾਨੇ_ਗਿਣਤੀ * CV_ELEM_ਮਾਪ(flags);
     }
 
-    int new_width = total_width / new_cn;
+    ਪੂਰਨ new_ਚੌੜਾਈ = ਕੁੱਲ_ਚੌੜਾਈ / new_cn;
 
-    if( new_width * new_cn != total_width )
-        CV_Error( cv::Error::BadNumChannels,
+    ਜੇ( new_ਚੌੜਾਈ * new_cn != ਕੁੱਲ_ਚੌੜਾਈ )
+        CV_Error( cv::Error::Bad_ਅੰਕ_Channels,
         "The total width is not divisible by the new number of channels" );
 
     hdr.size.dims = hdr.dims = 2;
-    hdr.size[1] = hdr.cols = new_width;
-    hdr.flags = (hdr.flags & ~CV_MAT_CN_MASK) | ((new_cn-1) << CV_CN_SHIFT);
-    hdr.step[1] = CV_ELEM_SIZE(hdr.flags);
-    return hdr;
+    hdr.size[1] = hdr.ਖਾਨੇ_ਗਿਣਤੀ = new_ਚੌੜਾਈ;
+    hdr.flags = (hdr.flags & ~CV_MAT_CN_ਨਕਾਬ) | ((new_cn-1) << CV_CN_ਖਿਸਕਾਓ);
+    hdr.ਕਦਮ[1] = CV_ELEM_ਮਾਪ(hdr.flags);
+    ਵਾਪਸ hdr;
 }
 
-#ifdef HAVE_OPENCL
-namespace {
-static bool ocl_setDiag(const UMat& d, UMat& m, int len)
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ HAVE_OPENCL
+ਨਾਮਾਕਾਸ਼ {
+ਸਥਿਰ ਤਾਰਕਿਕ ocl_ਸੈੱਟ_Diag(ਅਚਲ UMat& d, UMat& m, ਪੂਰਨ len)
 {
-    int cn = d.channels();
-    int depth = d.depth();
+    ਪੂਰਨ cn = d.channels();
+    ਪੂਰਨ ਡੂੰਘਾਈ = d.ਡੂੰਘਾਈ();
 
-    if (depth == CV_64F && !ocl::Device::getDefault().doubleFPConfig())
-        return false;
+    ਜੇ (ਡੂੰਘਾਈ == CV_64F && !ocl::Device::getDefault().doubleFPConfig())
+        ਵਾਪਸ ਝੂਠ;
 
     String opts = format("-D SET_DIAG -D T1=%s -D cn=%d -D IS_ROW_VECTOR=%d",
-                         ocl::memopTypeToStr(depth),
+                         ocl::memop_Type_ਮੰਜ਼ਿਲ_Str(ਡੂੰਘਾਈ),
                          cn,
-                         (d.rows == 1) ? 1 : 0);
+                         (d.ਪੰਕਤੀਆਂ == 1) ? 1 : 0);
 
     ocl::Kernel k("setDiag", ocl::core::copyset_oclsrc, opts);
-    if (k.empty())
-        return false;
+    ਜੇ (k.empty())
+        ਵਾਪਸ ਝੂਠ;
 
-    k.args(ocl::KernelArg::WriteOnly(m),
-           ocl::KernelArg::ReadOnlyNoSize(d),
+    k.ਦਲੀਲਾਂ(ocl::KernelArg::WriteOnly(m),
+           ocl::KernelArg::Read_Only_No_ਮਾਪ(d),
            len);
 
     size_t globalsize[2] = { (size_t)len, (size_t)len };
-    return k.run(2, globalsize, NULL, false);
+    ਵਾਪਸ k.ਲੜੀਵਾਰ(2, globalsize, ਨਿਰਾ, ਝੂਠ);
 }
 }
-#endif
+#ਜੇ_ਅੰਤ
 
-UMat UMat::diag(const UMat& d, UMatUsageFlags usageFlags)
+UMat UMat::diag(ਅਚਲ UMat& d, UMatUsageFlags usageFlags)
 {
     CV_INSTRUMENT_REGION();
 
-    CV_Assert(d.cols == 1 || d.rows == 1);
-    int len = d.rows + d.cols - 1;
+    CV_Assert(d.ਖਾਨੇ_ਗਿਣਤੀ == 1 || d.ਪੰਕਤੀਆਂ == 1);
+    ਪੂਰਨ len = d.ਪੰਕਤੀਆਂ + d.ਖਾਨੇ_ਗਿਣਤੀ - 1;
 
-#ifdef HAVE_OPENCL
-    if (ocl::useOpenCL())
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ HAVE_OPENCL
+    ਜੇ (ocl::useOpenCL())
     {
         UMat m(len, len, d.type(), usageFlags);
-        if (ocl_setDiag(d, m, len))
+        ਜੇ (ocl_ਸੈੱਟ_Diag(d, m, len))
         {
-            CV_IMPL_ADD(CV_IMPL_OCL);
-            return m;
+            CV_IMPL_ਜੋੜੋ(CV_IMPL_OCL);
+            ਵਾਪਸ m;
         }
     }
-#endif
+#ਜੇ_ਅੰਤ
 
     UMat m(len, len, d.type(), Scalar(0), usageFlags);
     UMat md = m.diag();
-    if( d.cols == 1 )
-        d.copyTo(md);
-    else
+    ਜੇ( d.ਖਾਨੇ_ਗਿਣਤੀ == 1 )
+        d.copy_ਮੰਜ਼ਿਲ(md);
+    ਨਹੀਂਤਾਂ
         transpose(d, md);
-    return m;
+    ਵਾਪਸ m;
 }
 
-int UMat::checkVector(int _elemChannels, int _depth, bool _requireContinuous) const
+ਪੂਰਨ UMat::check_ਸਦਿਸ਼(ਪੂਰਨ _elemChannels, ਪੂਰਨ ਡੂੰਘਾਈ_2, ਤਾਰਕਿਕ _requireContinuous) ਅਚਲ
 {
-    return (depth() == _depth || _depth <= 0) &&
+    ਵਾਪਸ (ਡੂੰਘਾਈ() == ਡੂੰਘਾਈ_2 || ਡੂੰਘਾਈ_2 <= 0) &&
         (isContinuous() || !_requireContinuous) &&
-        ((dims <= 2 && (((rows == 1 || cols == 1) && channels() == _elemChannels) ||
-                        (cols == _elemChannels && channels() == 1))) ||
+        ((dims <= 2 && (((ਪੰਕਤੀਆਂ == 1 || ਖਾਨੇ_ਗਿਣਤੀ == 1) && channels() == _elemChannels) ||
+                        (ਖਾਨੇ_ਗਿਣਤੀ == _elemChannels && channels() == 1))) ||
         (dims == 3 && channels() == 1 && size.p[2] == _elemChannels && (size.p[0] == 1 || size.p[1] == 1) &&
-         (isContinuous() || step.p[1] == step.p[2]*size.p[2])))
-    ? (int)(total()*channels()/_elemChannels) : -1;
+         (isContinuous() || ਕਦਮ.p[1] == ਕਦਮ.p[2]*size.p[2])))
+    ? (ਪੂਰਨ)(ਕੁੱਲ()*channels()/_elemChannels) : -1;
 }
 
-UMat UMat::reshape(int _cn, int _newndims, const int* _newsz) const
+UMat UMat::reshape(ਪੂਰਨ _cn, ਪੂਰਨ _newndims, ਅਚਲ ਪੂਰਨ* _newsz) ਅਚਲ
 {
-    if(_newndims == dims)
+    ਜੇ(_newndims == dims)
     {
-        if(_newsz == 0)
-            return reshape(_cn);
-        if(_newndims == 2)
-            return reshape(_cn, _newsz[0]);
+        ਜੇ(_newsz == 0)
+            ਵਾਪਸ reshape(_cn);
+        ਜੇ(_newndims == 2)
+            ਵਾਪਸ reshape(_cn, _newsz[0]);
     }
 
-    if (isContinuous())
+    ਜੇ (isContinuous())
     {
         CV_Assert(_cn >= 0 && _newndims >= 0 && _newndims <= CV_MAX_DIM && (_newndims == 0 || _newsz != 0));
 
-        if (_cn == 0)
-            _cn = this->channels();
-        else
+        ਜੇ (_cn == 0)
+            _cn = ਇਹ->channels();
+        ਨਹੀਂਤਾਂ
             CV_Assert(_cn <= CV_CN_MAX);
 
-        size_t total_elem1_ref = this->total() * this->channels();
-        size_t total_elem1 = _cn;
+        size_t ਕੁੱਲ_elem1_ref = ਇਹ->ਕੁੱਲ() * ਇਹ->channels();
+        size_t ਕੁੱਲ_elem1 = _cn;
 
-        AutoBuffer<int, 4> newsz_buf( (size_t)std::max(_newndims, 1) );
+        Auto_ਬਫਰ<ਪੂਰਨ, 4> newsz_buf( (size_t)std::max(_newndims, 1) );
 
-        int m1_idx = -1;
+        ਪੂਰਨ m1_idx = -1;
 
-        for (int i = 0; i < _newndims; i++)
+        ਲਈ (ਪੂਰਨ i = 0; i < _newndims; i++)
         {
-            if (_newsz[i] >= 0) {
-                if (_newsz[i] == 0 && i < dims)
+            ਜੇ (_newsz[i] >= 0) {
+                ਜੇ (_newsz[i] == 0 && i < dims)
                     newsz_buf[i] = size.p[i];
-                else
+                ਨਹੀਂਤਾਂ
                     newsz_buf[i] = _newsz[i];
-                total_elem1 *= (size_t)newsz_buf[i];
-            } else {
-                if (m1_idx >= 0)
-                    CV_Error(cv::Error::StsBadSize, "More than one '-1' occured in the new shape");
+                ਕੁੱਲ_elem1 *= (size_t)newsz_buf[i];
+            } ਨਹੀਂਤਾਂ {
+                ਜੇ (m1_idx >= 0)
+                    CV_Error(cv::Error::Sts_Bad_ਮਾਪ, "More than one '-1' occured in the new shape");
                 m1_idx = i;
             }
         }
 
-        if (m1_idx >= 0) {
-            if (total_elem1 == 0) {
-                CV_Assert(total_elem1_ref == 0);
-                total_elem1 = 1;
+        ਜੇ (m1_idx >= 0) {
+            ਜੇ (ਕੁੱਲ_elem1 == 0) {
+                CV_Assert(ਕੁੱਲ_elem1_ref == 0);
+                ਕੁੱਲ_elem1 = 1;
             }
-            CV_Assert(total_elem1_ref % total_elem1 == 0);
-            newsz_buf[m1_idx] = (int)(total_elem1_ref / total_elem1);
-        } else if (total_elem1 != total_elem1_ref) {
+            CV_Assert(ਕੁੱਲ_elem1_ref % ਕੁੱਲ_elem1 == 0);
+            newsz_buf[m1_idx] = (ਪੂਰਨ)(ਕੁੱਲ_elem1_ref / ਕੁੱਲ_elem1);
+        } ਨਹੀਂਤਾਂ ਜੇ (ਕੁੱਲ_elem1 != ਕੁੱਲ_elem1_ref) {
             CV_Error(cv::Error::StsUnmatchedSizes, "Requested and source matrices have different count of elements");
         }
 
-        UMat hdr = *this;
-        hdr.flags = (hdr.flags & ~CV_MAT_CN_MASK) | ((_cn-1) << CV_CN_SHIFT);
-        setSize(hdr, _newndims, newsz_buf.data(), NULL, true);
+        UMat hdr = *ਇਹ;
+        hdr.flags = (hdr.flags & ~CV_MAT_CN_ਨਕਾਬ) | ((_cn-1) << CV_CN_ਖਿਸਕਾਓ);
+        ਸੈੱਟ_ਮਾਪ(hdr, _newndims, newsz_buf.ਅੰਕੜੇ(), ਨਿਰਾ, ਸੱਚ);
 
-        return hdr;
+        ਵਾਪਸ hdr;
     }
 
     CV_Error(cv::Error::StsNotImplemented, "Reshaping of n-dimensional non-continuous matrices is not supported yet");
 }
 
-UMat UMat::reshape(int _cn, const MatShape& _newshape) const
+UMat UMat::reshape(ਪੂਰਨ _cn, ਅਚਲ MatShape& _newshape) ਅਚਲ
 {
-    if (_newshape.dims < 0) {
-        int newshape[] = {0};
-        return reshape(_cn, 1, newshape);
+    ਜੇ (_newshape.dims < 0) {
+        ਪੂਰਨ newshape[] = {0};
+        ਵਾਪਸ reshape(_cn, 1, newshape);
     }
-    return reshape(_cn, _newshape.dims, _newshape.p);
+    ਵਾਪਸ reshape(_cn, _newshape.dims, _newshape.p);
 }
 
-Mat UMat::getMat(AccessFlag accessFlags) const
+Mat UMat::getMat(AccessFlag accessFlags) ਅਚਲ
 {
-    if(!u)
-        return Mat();
+    ਜੇ(!u)
+        ਵਾਪਸ Mat();
     // TODO Support ACCESS_READ (ACCESS_WRITE) without unnecessary data transfers
     accessFlags |= ACCESS_RW;
-    UMatDataAutoLock autolock(u);
-    try
+    UMat_ਅੰਕੜੇ_Auto_ਤਾਲਾ autolock(u);
+    ਕੋਸ਼ਿਸ਼
     {
-        if(CV_XADD(&u->refcount, 1) == 0)
+        ਜੇ(CV_XADD(&u->refcount, 1) == 0)
             u->currAllocator->map(u, accessFlags);
-        if (u->data != 0)
+        ਜੇ (u->ਅੰਕੜੇ != 0)
         {
-            Mat hdr(dims, size.p, type(), u->data + offset, step.p);
+            Mat hdr(dims, size.p, type(), u->ਅੰਕੜੇ + offset, ਕਦਮ.p);
             hdr.flags = flags;
             hdr.u = u;
-            hdr.datastart = u->data;
-            hdr.data = u->data + offset;
-            hdr.datalimit = hdr.dataend = u->data + u->size;
-            return hdr;
+            hdr.datastart = u->ਅੰਕੜੇ;
+            hdr.ਅੰਕੜੇ = u->ਅੰਕੜੇ + offset;
+            hdr.datalimit = hdr.dataend = u->ਅੰਕੜੇ + u->size;
+            ਵਾਪਸ hdr;
         }
     }
-    catch(...)
+    ਫੜੋ(...)
     {
         CV_XADD(&u->refcount, -1);
-        throw;
+        ਸੁੱਟੋ;
     }
     CV_XADD(&u->refcount, -1);
-    CV_Assert(u->data != 0 && "Error mapping of UMat to host memory.");
-    return Mat();
+    CV_Assert(u->ਅੰਕੜੇ != 0 && "Error mapping of UMat to host memory.");
+    ਵਾਪਸ Mat();
 }
 
-void* UMat::handle(AccessFlag accessFlags) const
+ਖਾਲੀ* UMat::handle(AccessFlag accessFlags) ਅਚਲ
 {
-    if( !u )
-        return 0;
+    ਜੇ( !u )
+        ਵਾਪਸ 0;
 
     CV_Assert(u->refcount == 0);
     CV_Assert(!u->deviceCopyObsolete() || u->copyOnMap());
-    if (u->deviceCopyObsolete())
+    ਜੇ (u->deviceCopyObsolete())
     {
         u->currAllocator->unmap(u);
     }
 
-    if (!!(accessFlags & ACCESS_WRITE))
-        u->markHostCopyObsolete(true);
+    ਜੇ (!!(accessFlags & ACCESS_WRITE))
+        u->markHostCopyObsolete(ਸੱਚ);
 
-    return u->handle;
+    ਵਾਪਸ u->handle;
 }
 
-void UMat::ndoffset(size_t* ofs) const
+ਖਾਲੀ UMat::ndoffset(size_t* ofs) ਅਚਲ
 {
     // offset = step[0]*ofs[0] + step[1]*ofs[1] + step[2]*ofs[2] + ...;
     size_t val = offset;
-    for( int i = 0; i < dims; i++ )
+    ਲਈ( ਪੂਰਨ i = 0; i < dims; i++ )
     {
-        size_t s = step.p[i];
+        size_t s = ਕਦਮ.p[i];
         ofs[i] = val / s;
         val -= ofs[i]*s;
     }
 }
 
-void UMat::copyTo(OutputArray _dst) const
+ਖਾਲੀ UMat::copy_ਮੰਜ਼ਿਲ(OutputArray _dst) ਅਚਲ
 {
     CV_INSTRUMENT_REGION();
 
-#ifdef HAVE_CUDA
-    if (_dst.isGpuMat())
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ HAVE_CUDA
+    ਜੇ (_dst.isGpuMat())
     {
-        _dst.getGpuMat().upload(*this);
-        return;
+        _dst.getGpuMat().upload(*ਇਹ);
+        ਵਾਪਸ;
     }
-#endif
+#ਜੇ_ਅੰਤ
 
-    int stype = type();
-    int dtype = _dst.type();
-    if( _dst.fixedType() && dtype != stype )
+    ਪੂਰਨ stype = type();
+    ਪੂਰਨ dtype = _dst.type();
+    ਜੇ( _dst.fixedType() && dtype != stype )
     {
         CV_Assert( CV_MAT_CN(stype) == CV_MAT_CN(dtype) );
-        convertTo( _dst, dtype );
-        return;
+        convert_ਮੰਜ਼ਿਲ( _dst, dtype );
+        ਵਾਪਸ;
     }
 
-    if( dims == 0 && empty() )
+    ਜੇ( dims == 0 && empty() )
     {
         _dst.release();
-        void* obj = _dst.getObj();
-        if (_dst.isMat())
+        ਖਾਲੀ* obj = _dst.getObj();
+        ਜੇ (_dst.isMat())
             reinterpret_cast<Mat*>(obj)->flags = Mat::MAGIC_VAL | Mat::CONTINUOUS_FLAG | stype;
-        else if (_dst.isUMat())
+        ਨਹੀਂਤਾਂ ਜੇ (_dst.isUMat())
             reinterpret_cast<UMat*>(obj)->flags = UMat::MAGIC_VAL | UMat::CONTINUOUS_FLAG | stype;
-        else if (_dst.isGpuMat())
+        ਨਹੀਂਤਾਂ ਜੇ (_dst.isGpuMat())
             reinterpret_cast<cuda::GpuMat*>(obj)->flags = stype;
-        return;
+        ਵਾਪਸ;
     }
 
     _dst.create( dims, size.p, stype );
-    if (empty())
-        return;
+    ਜੇ (empty())
+        ਵਾਪਸ;
 
     size_t sz[CV_MAX_DIM] = {1}, srcofs[CV_MAX_DIM]={0}, dstofs[CV_MAX_DIM]={0};
-    size_t esz = CV_ELEM_SIZE(stype);
-    int i, d = std::max(dims, 1);
-    for( i = 0; i < d; i++ )
+    size_t esz = CV_ELEM_ਮਾਪ(stype);
+    ਪੂਰਨ i, d = std::max(dims, 1);
+    ਲਈ( i = 0; i < d; i++ )
         sz[i] = size.p[i];
     sz[d-1] *= esz;
     ndoffset(srcofs);
     srcofs[d-1] *= esz;
 
-    if( _dst.isUMat() )
+    ਜੇ( _dst.isUMat() )
     {
         UMat dst = _dst.getUMat();
         CV_Assert(dst.u);
-        if( u == dst.u && dst.offset == offset )
-            return;
+        ਜੇ( u == dst.u && dst.offset == offset )
+            ਵਾਪਸ;
 
-        if (u->currAllocator == dst.u->currAllocator)
+        ਜੇ (u->currAllocator == dst.u->currAllocator)
         {
             dst.ndoffset(dstofs);
             dstofs[dims-1] *= esz;
-            u->currAllocator->copy(u, dst.u, d, sz, srcofs, step.p, dstofs, dst.step.p, false);
-            return;
+            u->currAllocator->copy(u, dst.u, d, sz, srcofs, ਕਦਮ.p, dstofs, dst.ਕਦਮ.p, ਝੂਠ);
+            ਵਾਪਸ;
         }
 
         // different allocators: never map a device destination, upload into it instead
         // (through a host Mat when both sides are device memory)
         MatAllocator* hostAllocator = Mat::getDefaultAllocator();
-        if (dst.u->currAllocator != hostAllocator)
+        ਜੇ (dst.u->currAllocator != hostAllocator)
         {
-            if (u->currAllocator == hostAllocator)
-                getMat(ACCESS_READ).copyTo(_dst);
-            else
+            ਜੇ (u->currAllocator == hostAllocator)
+                getMat(ACCESS_READ).copy_ਮੰਜ਼ਿਲ(_dst);
+            ਨਹੀਂਤਾਂ
             {
                 Mat tmp;
-                copyTo(tmp);
-                tmp.copyTo(_dst);
+                copy_ਮੰਜ਼ਿਲ(tmp);
+                tmp.copy_ਮੰਜ਼ਿਲ(_dst);
             }
-            return;
+            ਵਾਪਸ;
         }
     }
 
     Mat dst = _dst.getMat();
-    u->currAllocator->download(u, dst.ptr(), d, sz, srcofs, step.p, dst.step.p);
+    u->currAllocator->download(u, dst.ptr(), d, sz, srcofs, ਕਦਮ.p, dst.ਕਦਮ.p);
 }
 
-void UMat::copyTo(OutputArray _dst, InputArray _mask) const
+ਖਾਲੀ UMat::copy_ਮੰਜ਼ਿਲ(OutputArray _dst, ਨਿਵੇਸ਼_Array ਨਕਾਬ_2) ਅਚਲ
 {
     CV_INSTRUMENT_REGION();
 
-    if( _mask.empty() )
+    ਜੇ( ਨਕਾਬ_2.empty() )
     {
-        copyTo(_dst);
-        return;
+        copy_ਮੰਜ਼ਿਲ(_dst);
+        ਵਾਪਸ;
     }
-#ifdef HAVE_OPENCL
-    int cn = channels(), mtype = _mask.type(), mdepth = CV_MAT_DEPTH(mtype), mcn = CV_MAT_CN(mtype);
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ HAVE_OPENCL
+    ਪੂਰਨ cn = channels(), mtype = ਨਕਾਬ_2.type(), mdepth = CV_MAT_ਡੂੰਘਾਈ(mtype), mcn = CV_MAT_CN(mtype);
     CV_Assert( (mdepth == CV_8U || mdepth == CV_8S || mdepth == CV_Bool) && (mcn == 1 || mcn == cn) );
 
-    if (ocl::useOpenCL() && _dst.isUMat() && dims <= 2)
+    ਜੇ (ocl::useOpenCL() && _dst.isUMat() && dims <= 2)
     {
-        UMatData * prevu = _dst.getUMat().u;
+        UMat_ਅੰਕੜੇ * prevu = _dst.getUMat().u;
         _dst.create( size, type() );
 
         UMat dst = _dst.getUMat();
 
-        bool haveDstUninit = false;
-        if( prevu != dst.u ) // do not leave dst uninitialized
-            haveDstUninit = true;
+        ਤਾਰਕਿਕ haveDstUninit = ਝੂਠ;
+        ਜੇ( prevu != dst.u ) // do not leave dst uninitialized
+            haveDstUninit = ਸੱਚ;
 
         String opts = format("-D COPY_TO_MASK -D T1=%s -D scn=%d -D mcn=%d%s",
-                             ocl::memopTypeToStr(depth()), cn, mcn,
+                             ocl::memop_Type_ਮੰਜ਼ਿਲ_Str(ਡੂੰਘਾਈ()), cn, mcn,
                              haveDstUninit ? " -D HAVE_DST_UNINIT" : "");
 
         ocl::Kernel k("copyToMask", ocl::core::copyset_oclsrc, opts);
-        if (!k.empty())
+        ਜੇ (!k.empty())
         {
-            k.args(ocl::KernelArg::ReadOnlyNoSize(*this),
-                   ocl::KernelArg::ReadOnlyNoSize(_mask.getUMat()),
+            k.ਦਲੀਲਾਂ(ocl::KernelArg::Read_Only_No_ਮਾਪ(*ਇਹ),
+                   ocl::KernelArg::Read_Only_No_ਮਾਪ(ਨਕਾਬ_2.getUMat()),
                    haveDstUninit ? ocl::KernelArg::WriteOnly(dst) :
                                    ocl::KernelArg::ReadWrite(dst));
 
-            size_t globalsize[2] = { (size_t)cols, (size_t)rows };
-            if (k.run(2, globalsize, NULL, false))
+            size_t globalsize[2] = { (size_t)ਖਾਨੇ_ਗਿਣਤੀ, (size_t)ਪੰਕਤੀਆਂ };
+            ਜੇ (k.ਲੜੀਵਾਰ(2, globalsize, ਨਿਰਾ, ਝੂਠ))
             {
-                CV_IMPL_ADD(CV_IMPL_OCL);
-                return;
+                CV_IMPL_ਜੋੜੋ(CV_IMPL_OCL);
+                ਵਾਪਸ;
             }
         }
     }
-#endif
+#ਜੇ_ਅੰਤ
     Mat src = getMat(ACCESS_READ);
-    src.copyTo(_dst, _mask);
+    src.copy_ਮੰਜ਼ਿਲ(_dst, ਨਕਾਬ_2);
 }
 
 
@@ -1363,116 +1363,116 @@ void UMat::copyTo(OutputArray _dst, InputArray _mask) const
 // void UMat::convertTo moved to convert.dispatch.cpp
 //
 
-UMat& UMat::setTo(InputArray _value, InputArray _mask)
+UMat& UMat::ਸੈੱਟ_ਮੰਜ਼ਿਲ(ਨਿਵੇਸ਼_Array ਮੁੱਲ, ਨਿਵੇਸ਼_Array ਨਕਾਬ_2)
 {
     CV_INSTRUMENT_REGION();
 
-    bool haveMask = !_mask.empty();
-#ifdef HAVE_OPENCL
-    int tp = type(), cn = CV_MAT_CN(tp), d = CV_MAT_DEPTH(tp);
+    ਤਾਰਕਿਕ have_ਨਕਾਬ = !ਨਕਾਬ_2.empty();
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ HAVE_OPENCL
+    ਪੂਰਨ tp = type(), cn = CV_MAT_CN(tp), d = CV_MAT_ਡੂੰਘਾਈ(tp);
 
-    if( dims <= 2 && cn <= 4 && CV_MAT_DEPTH(tp) < CV_64F && ocl::useOpenCL() )
+    ਜੇ( dims <= 2 && cn <= 4 && CV_MAT_ਡੂੰਘਾਈ(tp) < CV_64F && ocl::useOpenCL() )
     {
-        Mat value = _value.getMat();
-        CV_Assert( checkScalar(value, type(), _value.kind(), _InputArray::UMAT) );
-        int kercn = haveMask || cn == 3 ? cn : std::max(cn, ocl::predictOptimalVectorWidth(*this)),
+        Mat value = ਮੁੱਲ.getMat();
+        CV_Assert( checkScalar(value, type(), ਮੁੱਲ.ਕਿਸਮ(), ਨਿਵੇਸ਼_Array_2::UMAT) );
+        ਪੂਰਨ kercn = have_ਨਕਾਬ || cn == 3 ? cn : std::max(cn, ocl::predict_Optimal_ਸਦਿਸ਼_ਚੌੜਾਈ(*ਇਹ)),
                 kertp = CV_MAKE_TYPE(d, kercn);
 
-        double buf[16] = { 0, 0, 0, 0, 0, 0, 0, 0,
+        ਦੁੱਗਣਾ buf[16] = { 0, 0, 0, 0, 0, 0, 0, 0,
                            0, 0, 0, 0, 0, 0, 0, 0 };
         convertAndUnrollScalar(value, tp, (uchar *)buf, kercn / cn);
 
-        int scalarcn = kercn == 3 ? 4 : kercn, rowsPerWI = ocl::Device::getDefault().isIntel() ? 4 : 1;
+        ਪੂਰਨ scalarcn = kercn == 3 ? 4 : kercn, ਪੰਕਤੀਆਂ_ਪ੍ਰਤੀ_WI = ocl::Device::getDefault().isIntel() ? 4 : 1;
         String opts = format("-D dstT=%s -D rowsPerWI=%d -D dstST=%s -D dstT1=%s -D cn=%d",
-                             ocl::memopTypeToStr(kertp), rowsPerWI,
-                             ocl::memopTypeToStr(CV_MAKETYPE(d, scalarcn)),
-                             ocl::memopTypeToStr(d), kercn);
+                             ocl::memop_Type_ਮੰਜ਼ਿਲ_Str(kertp), ਪੰਕਤੀਆਂ_ਪ੍ਰਤੀ_WI,
+                             ocl::memop_Type_ਮੰਜ਼ਿਲ_Str(CV_MAKETYPE(d, scalarcn)),
+                             ocl::memop_Type_ਮੰਜ਼ਿਲ_Str(d), kercn);
 
-        ocl::Kernel setK(haveMask ? "setMask" : "set", ocl::core::copyset_oclsrc, opts);
-        if( !setK.empty() )
+        ocl::Kernel ਸੈੱਟ_K(have_ਨਕਾਬ ? "setMask" : "set", ocl::core::copyset_oclsrc, opts);
+        ਜੇ( !ਸੈੱਟ_K.empty() )
         {
-            ocl::KernelArg scalararg(ocl::KernelArg::CONSTANT, 0, 0, 0, buf, CV_ELEM_SIZE(d) * scalarcn);
-            UMat mask;
+            ocl::KernelArg scalararg(ocl::KernelArg::CONSTANT, 0, 0, 0, buf, CV_ELEM_ਮਾਪ(d) * scalarcn);
+            UMat ਨਕਾਬ;
 
-            if( haveMask )
+            ਜੇ( have_ਨਕਾਬ )
             {
-                mask = _mask.getUMat();
-                CV_Assert( mask.size() == size() && (mask.type() == CV_8U || mask.type() == CV_8S || mask.type() == CV_Bool) );
-                ocl::KernelArg maskarg = ocl::KernelArg::ReadOnlyNoSize(mask),
-                        dstarg = ocl::KernelArg::ReadWrite(*this);
-                setK.args(maskarg, dstarg, scalararg);
+                ਨਕਾਬ = ਨਕਾਬ_2.getUMat();
+                CV_Assert( ਨਕਾਬ.size() == size() && (ਨਕਾਬ.type() == CV_8U || ਨਕਾਬ.type() == CV_8S || ਨਕਾਬ.type() == CV_Bool) );
+                ocl::KernelArg maskarg = ocl::KernelArg::Read_Only_No_ਮਾਪ(ਨਕਾਬ),
+                        dstarg = ocl::KernelArg::ReadWrite(*ਇਹ);
+                ਸੈੱਟ_K.ਦਲੀਲਾਂ(maskarg, dstarg, scalararg);
             }
-            else
+            ਨਹੀਂਤਾਂ
             {
-                ocl::KernelArg dstarg = ocl::KernelArg::WriteOnly(*this, cn, kercn);
-                setK.args(dstarg, scalararg);
+                ocl::KernelArg dstarg = ocl::KernelArg::WriteOnly(*ਇਹ, cn, kercn);
+                ਸੈੱਟ_K.ਦਲੀਲਾਂ(dstarg, scalararg);
             }
 
-            size_t globalsize[] = { (size_t)cols * cn / kercn, ((size_t)rows + rowsPerWI - 1) / rowsPerWI };
-            if( setK.run(2, globalsize, NULL, false) )
+            size_t globalsize[] = { (size_t)ਖਾਨੇ_ਗਿਣਤੀ * cn / kercn, ((size_t)ਪੰਕਤੀਆਂ + ਪੰਕਤੀਆਂ_ਪ੍ਰਤੀ_WI - 1) / ਪੰਕਤੀਆਂ_ਪ੍ਰਤੀ_WI };
+            ਜੇ( ਸੈੱਟ_K.ਲੜੀਵਾਰ(2, globalsize, ਨਿਰਾ, ਝੂਠ) )
             {
-                CV_IMPL_ADD(CV_IMPL_OCL);
-                return *this;
+                CV_IMPL_ਜੋੜੋ(CV_IMPL_OCL);
+                ਵਾਪਸ *ਇਹ;
             }
         }
     }
-#endif
-    Mat m = getMat(haveMask ? ACCESS_RW : ACCESS_WRITE);
-    m.setTo(_value, _mask);
-    return *this;
+#ਜੇ_ਅੰਤ
+    Mat m = getMat(have_ਨਕਾਬ ? ACCESS_RW : ACCESS_WRITE);
+    m.ਸੈੱਟ_ਮੰਜ਼ਿਲ(ਮੁੱਲ, ਨਕਾਬ_2);
+    ਵਾਪਸ *ਇਹ;
 }
 
-UMat& UMat::operator = (const Scalar& s)
+UMat& UMat::ਸੰਚਾਲਕ = (ਅਚਲ Scalar& s)
 {
-    setTo(s);
-    return *this;
+    ਸੈੱਟ_ਮੰਜ਼ਿਲ(s);
+    ਵਾਪਸ *ਇਹ;
 }
 
-UMat UMat::t() const
+UMat UMat::t() ਅਚਲ
 {
     UMat m;
-    transpose(*this, m);
-    return m;
+    transpose(*ਇਹ, m);
+    ਵਾਪਸ m;
 }
 
-UMat UMat::zeros(int rows, int cols, int type, UMatUsageFlags usageFlags)
+UMat UMat::zeros(ਪੂਰਨ ਪੰਕਤੀਆਂ, ਪੂਰਨ ਖਾਨੇ_ਗਿਣਤੀ, ਪੂਰਨ type, UMatUsageFlags usageFlags)
 {
-    return UMat(rows, cols, type, Scalar::all(0), usageFlags);
+    ਵਾਪਸ UMat(ਪੰਕਤੀਆਂ, ਖਾਨੇ_ਗਿਣਤੀ, type, Scalar::all(0), usageFlags);
 }
 
-UMat UMat::zeros(Size size, int type, UMatUsageFlags usageFlags)
+UMat UMat::zeros(ਮਾਪ size, ਪੂਰਨ type, UMatUsageFlags usageFlags)
 {
-    return UMat(size, type, Scalar::all(0), usageFlags);
+    ਵਾਪਸ UMat(size, type, Scalar::all(0), usageFlags);
 }
 
-UMat UMat::zeros(int ndims, const int* sz, int type, UMatUsageFlags usageFlags)
+UMat UMat::zeros(ਪੂਰਨ ndims, ਅਚਲ ਪੂਰਨ* sz, ਪੂਰਨ type, UMatUsageFlags usageFlags)
 {
-    return UMat(ndims, sz, type, Scalar::all(0), usageFlags);
+    ਵਾਪਸ UMat(ndims, sz, type, Scalar::all(0), usageFlags);
 }
 
-UMat UMat::zeros(const MatShape& shape, int type, UMatUsageFlags usageFlags)
+UMat UMat::zeros(ਅਚਲ MatShape& shape, ਪੂਰਨ type, UMatUsageFlags usageFlags)
 {
-    return UMat(shape.dims, shape.p, type, Scalar::all(0), usageFlags);
+    ਵਾਪਸ UMat(shape.dims, shape.p, type, Scalar::all(0), usageFlags);
 }
 
-UMat UMat::ones(int rows, int cols, int type, UMatUsageFlags usageFlags)
+UMat UMat::ones(ਪੂਰਨ ਪੰਕਤੀਆਂ, ਪੂਰਨ ਖਾਨੇ_ਗਿਣਤੀ, ਪੂਰਨ type, UMatUsageFlags usageFlags)
 {
-    return UMat(rows, cols, type, Scalar(1), usageFlags);
+    ਵਾਪਸ UMat(ਪੰਕਤੀਆਂ, ਖਾਨੇ_ਗਿਣਤੀ, type, Scalar(1), usageFlags);
 }
 
-UMat UMat::ones(Size size, int type, UMatUsageFlags usageFlags)
+UMat UMat::ones(ਮਾਪ size, ਪੂਰਨ type, UMatUsageFlags usageFlags)
 {
-    return UMat(size, type, Scalar(1), usageFlags);
+    ਵਾਪਸ UMat(size, type, Scalar(1), usageFlags);
 }
 
-UMat UMat::ones(int ndims, const int* sz, int type, UMatUsageFlags usageFlags)
+UMat UMat::ones(ਪੂਰਨ ndims, ਅਚਲ ਪੂਰਨ* sz, ਪੂਰਨ type, UMatUsageFlags usageFlags)
 {
-    return UMat(ndims, sz, type, Scalar(1), usageFlags);
+    ਵਾਪਸ UMat(ndims, sz, type, Scalar(1), usageFlags);
 }
 
-UMat UMat::ones(const MatShape& shape, int type, UMatUsageFlags usageFlags)
+UMat UMat::ones(ਅਚਲ MatShape& shape, ਪੂਰਨ type, UMatUsageFlags usageFlags)
 {
-    return UMat(shape.dims, shape.p, type, Scalar(1), usageFlags);
+    ਵਾਪਸ UMat(shape.dims, shape.p, type, Scalar(1), usageFlags);
 }
 
 }

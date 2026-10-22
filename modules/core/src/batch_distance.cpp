@@ -3,177 +3,177 @@
 // of this distribution and at http://opencv.org/license.html
 
 
-#include "precomp.hpp"
-#include "stat.hpp"
-#include <opencv2/core/hal/hal.hpp>
+#ਅਨ੍ਤਰ੍ਭਾਵ "precomp.hpp"
+#ਅਨ੍ਤਰ੍ਭਾਵ "stat.hpp"
+#ਅਨ੍ਤਰ੍ਭਾਵ <opencv2/core/hal/hal.hpp>
 
-namespace cv
+ਨਾਮਾਕਾਸ਼ cv
 {
 
-template<typename _Tp, typename _Rt>
-static void batchDistL1_(const void* _src1, const void* _src2, size_t step2,
-                         int nvecs, int len, void* _dist, const uchar* mask)
+ਸਾਂਚਾ<ਕਿਸਮ_ਨਾਂ _Tp, ਕਿਸਮ_ਨਾਂ _Rt>
+ਸਥਿਰ ਖਾਲੀ batchDistL1_(ਅਚਲ ਖਾਲੀ* _src1, ਅਚਲ ਖਾਲੀ* _src2, size_t step2,
+                         ਪੂਰਨ nvecs, ਪੂਰਨ len, ਖਾਲੀ* _dist, ਅਚਲ uchar* ਨਕਾਬ)
 {
-    const _Tp* src1 = (const _Tp*)_src1;
-    const _Tp* src2 = (const _Tp*)_src2;
+    ਅਚਲ _Tp* src1 = (ਅਚਲ _Tp*)_src1;
+    ਅਚਲ _Tp* src2 = (ਅਚਲ _Tp*)_src2;
     _Rt* dist = (_Rt*)_dist;
-    step2 /= sizeof(src2[0]);
-    if( !mask )
+    step2 /= ਆਕਾਰ(src2[0]);
+    ਜੇ( !ਨਕਾਬ )
     {
-        for( int i = 0; i < nvecs; i++ )
+        ਲਈ( ਪੂਰਨ i = 0; i < nvecs; i++ )
             dist[i] = normL1<_Tp, _Rt>(src1, src2 + step2*i, len);
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
         _Rt val0 = std::numeric_limits<_Rt>::max();
-        for( int i = 0; i < nvecs; i++ )
-            dist[i] = mask[i] ? normL1<_Tp, _Rt>(src1, src2 + step2*i, len) : val0;
+        ਲਈ( ਪੂਰਨ i = 0; i < nvecs; i++ )
+            dist[i] = ਨਕਾਬ[i] ? normL1<_Tp, _Rt>(src1, src2 + step2*i, len) : val0;
     }
 }
 
-template<typename _Tp, typename _Rt>
-static void batchDistL2Sqr_(const void* _src1, const void* _src2, size_t step2,
-                            int nvecs, int len, void* _dist, const uchar* mask)
+ਸਾਂਚਾ<ਕਿਸਮ_ਨਾਂ _Tp, ਕਿਸਮ_ਨਾਂ _Rt>
+ਸਥਿਰ ਖਾਲੀ batchDistL2Sqr_(ਅਚਲ ਖਾਲੀ* _src1, ਅਚਲ ਖਾਲੀ* _src2, size_t step2,
+                            ਪੂਰਨ nvecs, ਪੂਰਨ len, ਖਾਲੀ* _dist, ਅਚਲ uchar* ਨਕਾਬ)
 {
-    const _Tp* src1 = (const _Tp*)_src1;
-    const _Tp* src2 = (const _Tp*)_src2;
+    ਅਚਲ _Tp* src1 = (ਅਚਲ _Tp*)_src1;
+    ਅਚਲ _Tp* src2 = (ਅਚਲ _Tp*)_src2;
     _Rt* dist = (_Rt*)_dist;
-    step2 /= sizeof(src2[0]);
-    if( !mask )
+    step2 /= ਆਕਾਰ(src2[0]);
+    ਜੇ( !ਨਕਾਬ )
     {
-        for( int i = 0; i < nvecs; i++ )
+        ਲਈ( ਪੂਰਨ i = 0; i < nvecs; i++ )
             dist[i] = normL2Sqr<_Tp, _Rt>(src1, src2 + step2*i, len);
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
         _Rt val0 = std::numeric_limits<_Rt>::max();
-        for( int i = 0; i < nvecs; i++ )
-            dist[i] = mask[i] ? normL2Sqr<_Tp, _Rt>(src1, src2 + step2*i, len) : val0;
+        ਲਈ( ਪੂਰਨ i = 0; i < nvecs; i++ )
+            dist[i] = ਨਕਾਬ[i] ? normL2Sqr<_Tp, _Rt>(src1, src2 + step2*i, len) : val0;
     }
 }
 
-template<>
-void batchDistL2Sqr_<float, float>(const void* _src1, const void* _src2, size_t step2,
-                                   int nvecs, int len, void* _dist, const uchar* mask)
+ਸਾਂਚਾ<>
+ਖਾਲੀ batchDistL2Sqr_<ਦਸ਼ਮਲਵ, ਦਸ਼ਮਲਵ>(ਅਚਲ ਖਾਲੀ* _src1, ਅਚਲ ਖਾਲੀ* _src2, size_t step2,
+                                   ਪੂਰਨ nvecs, ਪੂਰਨ len, ਖਾਲੀ* _dist, ਅਚਲ uchar* ਨਕਾਬ)
 {
-    const float* src1 = (const float*)_src1;
-    const float* src2 = (const float*)_src2;
-    float* dist = (float*)_dist;
-    step2 /= sizeof(src2[0]);
-    if( !mask )
+    ਅਚਲ ਦਸ਼ਮਲਵ* src1 = (ਅਚਲ ਦਸ਼ਮਲਵ*)_src1;
+    ਅਚਲ ਦਸ਼ਮਲਵ* src2 = (ਅਚਲ ਦਸ਼ਮਲਵ*)_src2;
+    ਦਸ਼ਮਲਵ* dist = (ਦਸ਼ਮਲਵ*)_dist;
+    step2 /= ਆਕਾਰ(src2[0]);
+    ਜੇ( !ਨਕਾਬ )
     {
-        for( int i = 0; i < nvecs; i++ )
+        ਲਈ( ਪੂਰਨ i = 0; i < nvecs; i++ )
             dist[i] = hal::normL2Sqr_(src1, src2 + step2*i, len);
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
-        float val0 = std::numeric_limits<float>::max();
-        for( int i = 0; i < nvecs; i++ )
-            dist[i] = mask[i] ? hal::normL2Sqr_(src1, src2 + step2*i, len) : val0;
+        ਦਸ਼ਮਲਵ val0 = std::numeric_limits<ਦਸ਼ਮਲਵ>::max();
+        ਲਈ( ਪੂਰਨ i = 0; i < nvecs; i++ )
+            dist[i] = ਨਕਾਬ[i] ? hal::normL2Sqr_(src1, src2 + step2*i, len) : val0;
     }
 }
 
-template<typename _Tp, typename _Rt>
-static void batchDistL2_(const void* _src1, const void* _src2, size_t step2,
-                         int nvecs, int len, void* _dist, const uchar* mask)
+ਸਾਂਚਾ<ਕਿਸਮ_ਨਾਂ _Tp, ਕਿਸਮ_ਨਾਂ _Rt>
+ਸਥਿਰ ਖਾਲੀ batchDistL2_(ਅਚਲ ਖਾਲੀ* _src1, ਅਚਲ ਖਾਲੀ* _src2, size_t step2,
+                         ਪੂਰਨ nvecs, ਪੂਰਨ len, ਖਾਲੀ* _dist, ਅਚਲ uchar* ਨਕਾਬ)
 {
-    const _Tp* src1 = (const _Tp*)_src1;
-    const _Tp* src2 = (const _Tp*)_src2;
+    ਅਚਲ _Tp* src1 = (ਅਚਲ _Tp*)_src1;
+    ਅਚਲ _Tp* src2 = (ਅਚਲ _Tp*)_src2;
     _Rt* dist = (_Rt*)_dist;
-    step2 /= sizeof(src2[0]);
-    if( !mask )
+    step2 /= ਆਕਾਰ(src2[0]);
+    ਜੇ( !ਨਕਾਬ )
     {
-        for( int i = 0; i < nvecs; i++ )
-            dist[i] = std::sqrt(normL2Sqr<_Tp, _Rt>(src1, src2 + step2*i, len));
+        ਲਈ( ਪੂਰਨ i = 0; i < nvecs; i++ )
+            dist[i] = std::ਵਰਗਮੂਲ(normL2Sqr<_Tp, _Rt>(src1, src2 + step2*i, len));
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
         _Rt val0 = std::numeric_limits<_Rt>::max();
-        for( int i = 0; i < nvecs; i++ )
-            dist[i] = mask[i] ? std::sqrt(normL2Sqr<_Tp, _Rt>(src1, src2 + step2*i, len)) : val0;
+        ਲਈ( ਪੂਰਨ i = 0; i < nvecs; i++ )
+            dist[i] = ਨਕਾਬ[i] ? std::ਵਰਗਮੂਲ(normL2Sqr<_Tp, _Rt>(src1, src2 + step2*i, len)) : val0;
     }
 }
 
-template<>
-void batchDistL2_<float, float>(const void* _src1, const void* _src2, size_t step2,
-                                int nvecs, int len, void* _dist, const uchar* mask)
+ਸਾਂਚਾ<>
+ਖਾਲੀ batchDistL2_<ਦਸ਼ਮਲਵ, ਦਸ਼ਮਲਵ>(ਅਚਲ ਖਾਲੀ* _src1, ਅਚਲ ਖਾਲੀ* _src2, size_t step2,
+                                ਪੂਰਨ nvecs, ਪੂਰਨ len, ਖਾਲੀ* _dist, ਅਚਲ uchar* ਨਕਾਬ)
 {
-    const float* src1 = (const float*)_src1;
-    const float* src2 = (const float*)_src2;
-    float* dist = (float*)_dist;
-    step2 /= sizeof(src2[0]);
-    if( !mask )
+    ਅਚਲ ਦਸ਼ਮਲਵ* src1 = (ਅਚਲ ਦਸ਼ਮਲਵ*)_src1;
+    ਅਚਲ ਦਸ਼ਮਲਵ* src2 = (ਅਚਲ ਦਸ਼ਮਲਵ*)_src2;
+    ਦਸ਼ਮਲਵ* dist = (ਦਸ਼ਮਲਵ*)_dist;
+    step2 /= ਆਕਾਰ(src2[0]);
+    ਜੇ( !ਨਕਾਬ )
     {
-        for( int i = 0; i < nvecs; i++ )
-            dist[i] = std::sqrt(hal::normL2Sqr_(src1, src2 + step2*i, len));
+        ਲਈ( ਪੂਰਨ i = 0; i < nvecs; i++ )
+            dist[i] = std::ਵਰਗਮੂਲ(hal::normL2Sqr_(src1, src2 + step2*i, len));
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
-        float val0 = std::numeric_limits<float>::max();
-        for( int i = 0; i < nvecs; i++ )
-            dist[i] = mask[i] ? std::sqrt(hal::normL2Sqr_(src1, src2 + step2*i, len)) : val0;
+        ਦਸ਼ਮਲਵ val0 = std::numeric_limits<ਦਸ਼ਮਲਵ>::max();
+        ਲਈ( ਪੂਰਨ i = 0; i < nvecs; i++ )
+            dist[i] = ਨਕਾਬ[i] ? std::ਵਰਗਮੂਲ(hal::normL2Sqr_(src1, src2 + step2*i, len)) : val0;
     }
 }
 
-static void batchDistHamming(const void* _src1, const void* _src2, size_t step2,
-                             int nvecs, int len, void* _dist, const uchar* mask)
+ਸਥਿਰ ਖਾਲੀ batchDistHamming(ਅਚਲ ਖਾਲੀ* _src1, ਅਚਲ ਖਾਲੀ* _src2, size_t step2,
+                             ਪੂਰਨ nvecs, ਪੂਰਨ len, ਖਾਲੀ* _dist, ਅਚਲ uchar* ਨਕਾਬ)
 {
-    const uchar* src1 = (const uchar*)_src1;
-    const uchar* src2 = (const uchar*)_src2;
-    int* dist = (int*)_dist;
-    step2 /= sizeof(src2[0]);
-    if( !mask )
+    ਅਚਲ uchar* src1 = (ਅਚਲ uchar*)_src1;
+    ਅਚਲ uchar* src2 = (ਅਚਲ uchar*)_src2;
+    ਪੂਰਨ* dist = (ਪੂਰਨ*)_dist;
+    step2 /= ਆਕਾਰ(src2[0]);
+    ਜੇ( !ਨਕਾਬ )
     {
-        for( int i = 0; i < nvecs; i++ )
+        ਲਈ( ਪੂਰਨ i = 0; i < nvecs; i++ )
              dist[i] = hal::normHamming(src1, src2 + step2*i, len);
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
-        int val0 = INT_MAX;
-        for( int i = 0; i < nvecs; i++ )
+        ਪੂਰਨ val0 = ਵੱਧ_ਤੋਂ_ਵੱਧ_ਅੰਕ;
+        ਲਈ( ਪੂਰਨ i = 0; i < nvecs; i++ )
         {
-            if (mask[i])
+            ਜੇ (ਨਕਾਬ[i])
                 dist[i] = hal::normHamming(src1, src2 + step2*i, len);
-            else
+            ਨਹੀਂਤਾਂ
                 dist[i] = val0;
         }
     }
 }
 
-static void batchDistHamming2(const void* _src1, const void* _src2, size_t step2,
-                              int nvecs, int len, void* _dist, const uchar* mask)
+ਸਥਿਰ ਖਾਲੀ batchDistHamming2(ਅਚਲ ਖਾਲੀ* _src1, ਅਚਲ ਖਾਲੀ* _src2, size_t step2,
+                              ਪੂਰਨ nvecs, ਪੂਰਨ len, ਖਾਲੀ* _dist, ਅਚਲ uchar* ਨਕਾਬ)
 {
-    const uchar* src1 = (const uchar*)_src1;
-    const uchar* src2 = (const uchar*)_src2;
-    int* dist = (int*)_dist;
-    step2 /= sizeof(src2[0]);
-    if( !mask )
+    ਅਚਲ uchar* src1 = (ਅਚਲ uchar*)_src1;
+    ਅਚਲ uchar* src2 = (ਅਚਲ uchar*)_src2;
+    ਪੂਰਨ* dist = (ਪੂਰਨ*)_dist;
+    step2 /= ਆਕਾਰ(src2[0]);
+    ਜੇ( !ਨਕਾਬ )
     {
-        for( int i = 0; i < nvecs; i++ )
+        ਲਈ( ਪੂਰਨ i = 0; i < nvecs; i++ )
             dist[i] = hal::normHamming(src1, src2 + step2*i, len, 2);
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
-        int val0 = INT_MAX;
-        for( int i = 0; i < nvecs; i++ )
+        ਪੂਰਨ val0 = ਵੱਧ_ਤੋਂ_ਵੱਧ_ਅੰਕ;
+        ਲਈ( ਪੂਰਨ i = 0; i < nvecs; i++ )
         {
-            if (mask[i])
+            ਜੇ (ਨਕਾਬ[i])
                 dist[i] = hal::normHamming(src1, src2 + step2*i, len, 2);
-            else
+            ਨਹੀਂਤਾਂ
                 dist[i] = val0;
         }
     }
 }
 
-typedef void (*BatchDistFunc)(const void* src1, const void* src2, size_t step2,
-                              int nvecs, int len, void* dist, const uchar* mask);
+ਕਿਸਮਪਰਿਭਾਸ਼ਾ ਖਾਲੀ (*BatchDistFunc)(ਅਚਲ ਖਾਲੀ* src1, ਅਚਲ ਖਾਲੀ* src2, size_t step2,
+                              ਪੂਰਨ nvecs, ਪੂਰਨ len, ਖਾਲੀ* dist, ਅਚਲ uchar* ਨਕਾਬ);
 
 
-struct BatchDistInvoker : public ParallelLoopBody
+ਬਣਤਰ BatchDistInvoker : ਜਨਤਕ ParallelLoopBody
 {
-    BatchDistInvoker( const Mat& _src1, const Mat& _src2,
-                      Mat& _dist, Mat& _nidx, int _K,
-                      const Mat& _mask, int _update,
+    BatchDistInvoker( ਅਚਲ Mat& _src1, ਅਚਲ Mat& _src2,
+                      Mat& _dist, Mat& _nidx, ਪੂਰਨ _K,
+                      ਅਚਲ Mat& ਨਕਾਬ_2, ਪੂਰਨ _update,
                       BatchDistFunc _func)
     {
         src1 = &_src1;
@@ -181,36 +181,36 @@ struct BatchDistInvoker : public ParallelLoopBody
         dist = &_dist;
         nidx = &_nidx;
         K = _K;
-        mask = &_mask;
+        ਨਕਾਬ = &ਨਕਾਬ_2;
         update = _update;
         func = _func;
     }
 
-    void operator()(const Range& range) const CV_OVERRIDE
+    ਖਾਲੀ ਸੰਚਾਲਕ()(ਅਚਲ Range& range) ਅਚਲ CV_OVERRIDE
     {
-        AutoBuffer<int> buf(src2->rows);
-        int* bufptr = buf.data();
+        Auto_ਬਫਰ<ਪੂਰਨ> buf(src2->ਪੰਕਤੀਆਂ);
+        ਪੂਰਨ* bufptr = buf.ਅੰਕੜੇ();
 
-        for( int i = range.start; i < range.end; i++ )
+        ਲਈ( ਪੂਰਨ i = range.ਸ਼ੁਰੂ; i < range.end; i++ )
         {
-            func(src1->ptr(i), src2->ptr(), src2->step, src2->rows, src2->cols,
-                 K > 0 ? (uchar*)bufptr : dist->ptr(i), mask->data ? mask->ptr(i) : 0);
+            func(src1->ptr(i), src2->ptr(), src2->ਕਦਮ, src2->ਪੰਕਤੀਆਂ, src2->ਖਾਨੇ_ਗਿਣਤੀ,
+                 K > 0 ? (uchar*)bufptr : dist->ptr(i), ਨਕਾਬ->ਅੰਕੜੇ ? ਨਕਾਬ->ptr(i) : 0);
 
-            if( K > 0 )
+            ਜੇ( K > 0 )
             {
-                int* nidxptr = nidx->ptr<int>(i);
+                ਪੂਰਨ* nidxptr = nidx->ptr<ਪੂਰਨ>(i);
                 // since positive float's can be compared just like int's,
                 // we handle both CV_32S and CV_32F cases with a single branch
-                int* distptr = (int*)dist->ptr(i);
+                ਪੂਰਨ* distptr = (ਪੂਰਨ*)dist->ptr(i);
 
-                int j, k;
+                ਪੂਰਨ j, k;
 
-                for( j = 0; j < src2->rows; j++ )
+                ਲਈ( j = 0; j < src2->ਪੰਕਤੀਆਂ; j++ )
                 {
-                    int d = bufptr[j];
-                    if( d < distptr[K-1] )
+                    ਪੂਰਨ d = bufptr[j];
+                    ਜੇ( d < distptr[K-1] )
                     {
-                        for( k = K-2; k >= 0 && distptr[k] > d; k-- )
+                        ਲਈ( k = K-2; k >= 0 && distptr[k] > d; k-- )
                         {
                             nidxptr[k+1] = nidxptr[k];
                             distptr[k+1] = distptr[k];
@@ -223,61 +223,61 @@ struct BatchDistInvoker : public ParallelLoopBody
         }
     }
 
-    const Mat *src1;
-    const Mat *src2;
+    ਅਚਲ Mat *src1;
+    ਅਚਲ Mat *src2;
     Mat *dist;
     Mat *nidx;
-    const Mat *mask;
-    int K;
-    int update;
+    ਅਚਲ Mat *ਨਕਾਬ;
+    ਪੂਰਨ K;
+    ਪੂਰਨ update;
     BatchDistFunc func;
 };
 
 }
 
-void cv::batchDistance( InputArray _src1, InputArray _src2,
-                        OutputArray _dist, int dtype, OutputArray _nidx,
-                        int normType, int K, InputArray _mask,
-                        int update, bool crosscheck )
+ਖਾਲੀ cv::batch_ਦੂਰੀ( ਨਿਵੇਸ਼_Array _src1, ਨਿਵੇਸ਼_Array _src2,
+                        OutputArray _dist, ਪੂਰਨ dtype, OutputArray _nidx,
+                        ਪੂਰਨ normType, ਪੂਰਨ K, ਨਿਵੇਸ਼_Array ਨਕਾਬ_2,
+                        ਪੂਰਨ update, ਤਾਰਕਿਕ crosscheck )
 {
     CV_INSTRUMENT_REGION();
 
-    Mat src1 = _src1.getMat(), src2 = _src2.getMat(), mask = _mask.getMat();
-    int type = src1.type();
-    CV_Assert( type == src2.type() && src1.cols == src2.cols &&
+    Mat src1 = _src1.getMat(), src2 = _src2.getMat(), ਨਕਾਬ = ਨਕਾਬ_2.getMat();
+    ਪੂਰਨ type = src1.type();
+    CV_Assert( type == src2.type() && src1.ਖਾਨੇ_ਗਿਣਤੀ == src2.ਖਾਨੇ_ਗਿਣਤੀ &&
                (type == CV_32F || type == CV_8U));
     CV_Assert( _nidx.needed() == (K > 0) );
 
-    if( dtype == -1 )
+    ਜੇ( dtype == -1 )
     {
         dtype = normType == NORM_HAMMING || normType == NORM_HAMMING2 ? CV_32S : CV_32F;
     }
     CV_Assert( (type == CV_8U && dtype == CV_32S) || dtype == CV_32F);
 
-    K = std::min(K, src2.rows);
+    K = std::min(K, src2.ਪੰਕਤੀਆਂ);
 
-    _dist.create(src1.rows, (K > 0 ? K : src2.rows), dtype);
+    _dist.create(src1.ਪੰਕਤੀਆਂ, (K > 0 ? K : src2.ਪੰਕਤੀਆਂ), dtype);
     Mat dist = _dist.getMat(), nidx;
-    if( _nidx.needed() )
+    ਜੇ( _nidx.needed() )
     {
         _nidx.create(dist.size(), CV_32S);
         nidx = _nidx.getMat();
     }
 
-    if( update == 0 && K > 0 )
+    ਜੇ( update == 0 && K > 0 )
     {
-        dist = Scalar::all(dtype == CV_32S ? (double)INT_MAX : (double)FLT_MAX);
+        dist = Scalar::all(dtype == CV_32S ? (ਦੁੱਗਣਾ)ਵੱਧ_ਤੋਂ_ਵੱਧ_ਅੰਕ : (ਦੁੱਗਣਾ)FLT_MAX);
         nidx = Scalar::all(-1);
     }
 
 
-    if( crosscheck )
+    ਜੇ( crosscheck )
     {
-        CV_Assert( K == 1 && update == 0 && mask.empty() );
+        CV_Assert( K == 1 && update == 0 && ਨਕਾਬ.empty() );
         CV_Assert(!nidx.empty());
         Mat tdist, tidx, sdist, sidx;
-        batchDistance(src2, src1, tdist, dtype, tidx, normType, K, mask, 0, false);
-        batchDistance(src1, src2, sdist, dtype, sidx, normType, K, mask, 0, false);
+        batch_ਦੂਰੀ(src2, src1, tdist, dtype, tidx, normType, K, ਨਕਾਬ, 0, ਝੂਠ);
+        batch_ਦੂਰੀ(src1, src2, sdist, dtype, sidx, normType, K, ਨਕਾਬ, 0, ਝੂਠ);
 
         // if an idx-th element from src1 appeared to be the nearest to i-th element of src2,
         // we update the minimum mutual distance between idx-th element of src1 and the whole src2 set.
@@ -285,75 +285,75 @@ void cv::batchDistance( InputArray _src1, InputArray _src2,
         // to i*-th element of src2 and i*-th element of src2 is the closest to idx-th element of src1.
         // If nidx[idx] = -1, it means that there is no such ideal couple for it in src2.
         // This O(2N) procedure is called cross-check and it helps to eliminate some false matches.
-        if( dtype == CV_32S )
+        ਜੇ( dtype == CV_32S )
         {
-            for( int i = 0; i < tdist.rows; i++ )
+            ਲਈ( ਪੂਰਨ i = 0; i < tdist.ਪੰਕਤੀਆਂ; i++ )
             {
-                int idx = tidx.at<int>(i);
-                int d = tdist.at<int>(i), d0 = dist.at<int>(idx);
-                if( d < d0 )
+                ਪੂਰਨ idx = tidx.at<ਪੂਰਨ>(i);
+                ਪੂਰਨ d = tdist.at<ਪੂਰਨ>(i), d0 = dist.at<ਪੂਰਨ>(idx);
+                ਜੇ( d < d0 )
                 {
-                    dist.at<int>(idx) = d;
-                    nidx.at<int>(idx) = i + update;
+                    dist.at<ਪੂਰਨ>(idx) = d;
+                    nidx.at<ਪੂਰਨ>(idx) = i + update;
                 }
             }
         }
-        else
+        ਨਹੀਂਤਾਂ
         {
-            for( int i = 0; i < tdist.rows; i++ )
+            ਲਈ( ਪੂਰਨ i = 0; i < tdist.ਪੰਕਤੀਆਂ; i++ )
             {
-                int idx = tidx.at<int>(i);
-                float d = tdist.at<float>(i), d0 = dist.at<float>(idx);
-                if( d < d0 )
+                ਪੂਰਨ idx = tidx.at<ਪੂਰਨ>(i);
+                ਦਸ਼ਮਲਵ d = tdist.at<ਦਸ਼ਮਲਵ>(i), d0 = dist.at<ਦਸ਼ਮਲਵ>(idx);
+                ਜੇ( d < d0 )
                 {
-                    dist.at<float>(idx) = d;
-                    nidx.at<int>(idx) = i + update;
+                    dist.at<ਦਸ਼ਮਲਵ>(idx) = d;
+                    nidx.at<ਪੂਰਨ>(idx) = i + update;
                 }
             }
         }
-        for( int i = 0; i < sdist.rows; i++ )
+        ਲਈ( ਪੂਰਨ i = 0; i < sdist.ਪੰਕਤੀਆਂ; i++ )
         {
-            if( tidx.at<int>(sidx.at<int>(i)) != i )
+            ਜੇ( tidx.at<ਪੂਰਨ>(sidx.at<ਪੂਰਨ>(i)) != i )
             {
-                nidx.at<int>(i) = -1;
+                nidx.at<ਪੂਰਨ>(i) = -1;
             }
         }
-        return;
+        ਵਾਪਸ;
     }
 
     BatchDistFunc func = 0;
-    if( type == CV_8U )
+    ਜੇ( type == CV_8U )
     {
-        if( normType == NORM_L1 && dtype == CV_32S )
-            func = batchDistL1_<uchar, int>;
-        else if( normType == NORM_L1 && dtype == CV_32F )
-            func = batchDistL1_<uchar, float>;
-        else if( normType == NORM_L2SQR && dtype == CV_32S )
-            func = batchDistL2Sqr_<uchar, int>;
-        else if( normType == NORM_L2SQR && dtype == CV_32F )
-            func = batchDistL2Sqr_<uchar, float>;
-        else if( normType == NORM_L2 && dtype == CV_32F )
-            func = batchDistL2_<uchar, float>;
-        else if( normType == NORM_HAMMING && dtype == CV_32S )
+        ਜੇ( normType == NORM_L1 && dtype == CV_32S )
+            func = batchDistL1_<uchar, ਪੂਰਨ>;
+        ਨਹੀਂਤਾਂ ਜੇ( normType == NORM_L1 && dtype == CV_32F )
+            func = batchDistL1_<uchar, ਦਸ਼ਮਲਵ>;
+        ਨਹੀਂਤਾਂ ਜੇ( normType == NORM_L2SQR && dtype == CV_32S )
+            func = batchDistL2Sqr_<uchar, ਪੂਰਨ>;
+        ਨਹੀਂਤਾਂ ਜੇ( normType == NORM_L2SQR && dtype == CV_32F )
+            func = batchDistL2Sqr_<uchar, ਦਸ਼ਮਲਵ>;
+        ਨਹੀਂਤਾਂ ਜੇ( normType == NORM_L2 && dtype == CV_32F )
+            func = batchDistL2_<uchar, ਦਸ਼ਮਲਵ>;
+        ਨਹੀਂਤਾਂ ਜੇ( normType == NORM_HAMMING && dtype == CV_32S )
             func = batchDistHamming;
-        else if( normType == NORM_HAMMING2 && dtype == CV_32S )
+        ਨਹੀਂਤਾਂ ਜੇ( normType == NORM_HAMMING2 && dtype == CV_32S )
             func = batchDistHamming2;
     }
-    else if( type == CV_32F && dtype == CV_32F )
+    ਨਹੀਂਤਾਂ ਜੇ( type == CV_32F && dtype == CV_32F )
     {
-        if( normType == NORM_L1 )
-            func = batchDistL1_<float, float>;
-        else if( normType == NORM_L2SQR )
-            func = batchDistL2Sqr_<float, float>;
-        else if( normType == NORM_L2 )
-            func = batchDistL2_<float, float>;
+        ਜੇ( normType == NORM_L1 )
+            func = batchDistL1_<ਦਸ਼ਮਲਵ, ਦਸ਼ਮਲਵ>;
+        ਨਹੀਂਤਾਂ ਜੇ( normType == NORM_L2SQR )
+            func = batchDistL2Sqr_<ਦਸ਼ਮਲਵ, ਦਸ਼ਮਲਵ>;
+        ਨਹੀਂਤਾਂ ਜੇ( normType == NORM_L2 )
+            func = batchDistL2_<ਦਸ਼ਮਲਵ, ਦਸ਼ਮਲਵ>;
     }
 
-    if( func == 0 )
+    ਜੇ( func == 0 )
         CV_Error_(cv::Error::StsUnsupportedFormat,
                   ("The combination of type=%d, dtype=%d and normType=%d is not supported",
                    type, dtype, normType));
 
-    parallel_for_(Range(0, src1.rows),
-                  BatchDistInvoker(src1, src2, dist, nidx, K, mask, update, func));
+    parallel_for_(Range(0, src1.ਪੰਕਤੀਆਂ),
+                  BatchDistInvoker(src1, src2, dist, nidx, K, ਨਕਾਬ, update, func));
 }

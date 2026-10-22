@@ -3,41 +3,41 @@
 // of this distribution and at http://opencv.org/license.html
 
 
-#ifndef SRC_STAT_HPP
-#define SRC_STAT_HPP
+#ਜੇ_ਅਪਰਿਭਾਸ਼ਿਤ SRC_STAT_HPP
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ SRC_STAT_HPP
 
-#include "opencv2/core/mat.hpp"
+#ਅਨ੍ਤਰ੍ਭਾਵ "opencv2/core/mat.hpp"
 
-namespace cv {
+ਨਾਮਾਕਾਸ਼ cv {
 
-#ifdef HAVE_OPENCL
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ HAVE_OPENCL
 
-enum { OCL_OP_SUM = 0, OCL_OP_SUM_ABS =  1, OCL_OP_SUM_SQR = 2 };
-bool ocl_sum( InputArray _src, Scalar & res, int sum_op, InputArray _mask = noArray(),
-                     InputArray _src2 = noArray(), bool calc2 = false, const Scalar & res2 = Scalar() );
-bool ocl_minMaxIdx( InputArray _src, double* minVal, double* maxVal, int* minLoc, int* maxLoc, InputArray _mask,
-                           int ddepth = -1, bool absValues = false, InputArray _src2 = noArray(), double * maxVal2 = NULL);
+ਗਿਣਤੀ { OCL_OP_ਜੋੜ = 0, OCL_OP_ਜੋੜ_ABS =  1, OCL_OP_ਜੋੜ_SQR = 2 };
+ਤਾਰਕਿਕ ocl_ਜੋੜ( ਨਿਵੇਸ਼_Array _src, Scalar & res, ਪੂਰਨ ਜੋੜ_op, ਨਿਵੇਸ਼_Array ਨਕਾਬ_2 = noArray(),
+                     ਨਿਵੇਸ਼_Array _src2 = noArray(), ਤਾਰਕਿਕ calc2 = ਝੂਠ, ਅਚਲ Scalar & res2 = Scalar() );
+ਤਾਰਕਿਕ ocl_minMaxIdx( ਨਿਵੇਸ਼_Array _src, ਦੁੱਗਣਾ* minVal, ਦੁੱਗਣਾ* maxVal, ਪੂਰਨ* minLoc, ਪੂਰਨ* maxLoc, ਨਿਵੇਸ਼_Array ਨਕਾਬ_2,
+                           ਪੂਰਨ ddepth = -1, ਤਾਰਕਿਕ abs_ਮੁੱਲਾਂ = ਝੂਠ, ਨਿਵੇਸ਼_Array _src2 = noArray(), ਦੁੱਗਣਾ * maxVal2 = ਨਿਰਾ);
 
-template <typename T> Scalar ocl_part_sum(Mat m)
+ਸਾਂਚਾ <ਕਿਸਮ_ਨਾਂ T> Scalar ocl_part_ਜੋੜ(Mat m)
 {
-    CV_Assert(m.rows == 1);
+    CV_Assert(m.ਪੰਕਤੀਆਂ == 1);
 
     Scalar s = Scalar::all(0);
-    int cn = m.channels();
-    const T * const ptr = m.ptr<T>(0);
+    ਪੂਰਨ cn = m.channels();
+    ਅਚਲ T * ਅਚਲ ptr = m.ptr<T>(0);
 
-    for (int x = 0, w = m.cols * cn; x < w; )
-        for (int c = 0; c < cn; ++c, ++x)
+    ਲਈ (ਪੂਰਨ x = 0, w = m.ਖਾਨੇ_ਗਿਣਤੀ * cn; x < w; )
+        ਲਈ (ਪੂਰਨ c = 0; c < cn; ++c, ++x)
             s[c] += ptr[x];
 
-    return s;
+    ਵਾਪਸ s;
 }
 
-#endif
+#ਜੇ_ਅੰਤ
 
-typedef int (*SumFunc)(const uchar*, const uchar* mask, uchar*, int, int);
-SumFunc getSumFunc(int depth);
+ਕਿਸਮਪਰਿਭਾਸ਼ਾ ਪੂਰਨ (*ਜੋੜ_Func)(ਅਚਲ uchar*, ਅਚਲ uchar* ਨਕਾਬ, uchar*, ਪੂਰਨ, ਪੂਰਨ);
+ਜੋੜ_Func get_ਜੋੜ_Func(ਪੂਰਨ ਡੂੰਘਾਈ);
 
 }
 
-#endif // SRC_STAT_HPP
+#ਜੇ_ਅੰਤ // SRC_STAT_HPP

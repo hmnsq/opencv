@@ -2,50 +2,50 @@
 // It is subject to the license terms in the LICENSE file found in the top-level directory
 // of this distribution and at http://opencv.org/license.html.
 
-#ifndef OPENCV_CORE_LOGTAGCONFIG_HPP
-#define OPENCV_CORE_LOGTAGCONFIG_HPP
+#ਜੇ_ਅਪਰਿਭਾਸ਼ਿਤ OPENCV_CORE_LOGTAGCONFIG_HPP
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ OPENCV_CORE_LOGTAGCONFIG_HPP
 
-#if 1 // if not already in precompiled headers
-#include <opencv2/core/utils/logger.defines.hpp>
-#include <string>
-#endif
+#ਜੇ 1 // if not already in precompiled headers
+#ਅਨ੍ਤਰ੍ਭਾਵ <opencv2/core/utils/logger.defines.hpp>
+#ਅਨ੍ਤਰ੍ਭਾਵ <string>
+#ਜੇ_ਅੰਤ
 
-namespace cv {
-namespace utils {
-namespace logging {
+ਨਾਮਾਕਾਸ਼ cv {
+ਨਾਮਾਕਾਸ਼ utils {
+ਨਾਮਾਕਾਸ਼ logging {
 
-struct LogTagConfig
+ਬਣਤਰ Log_ਟੈਗ_Config
 {
     std::string namePart;
     LogLevel level;
-    bool isGlobal;
-    bool hasPrefixWildcard;
-    bool hasSuffixWildcard;
+    ਤਾਰਕਿਕ isGlobal;
+    ਤਾਰਕਿਕ has_ਅਗੇਤਰ_Wildcard;
+    ਤਾਰਕਿਕ hasSuffixWildcard;
 
-    LogTagConfig()
+    Log_ਟੈਗ_Config()
         : namePart()
         , level()
         , isGlobal()
-        , hasPrefixWildcard()
+        , has_ਅਗੇਤਰ_Wildcard()
         , hasSuffixWildcard()
     {
     }
 
-    LogTagConfig(const std::string& _namePart, LogLevel _level, bool _isGlobal = false,
-        bool _hasPrefixWildcard = false, bool _hasSuffixWildcard = false)
+    Log_ਟੈਗ_Config(ਅਚਲ std::string& _namePart, LogLevel _level, ਤਾਰਕਿਕ _isGlobal = ਝੂਠ,
+        ਤਾਰਕਿਕ has_ਅਗੇਤਰ_Wildcard_2 = ਝੂਠ, ਤਾਰਕਿਕ _hasSuffixWildcard = ਝੂਠ)
         : namePart(_namePart)
         , level(_level)
         , isGlobal(_isGlobal)
-        , hasPrefixWildcard(_hasPrefixWildcard)
+        , has_ਅਗੇਤਰ_Wildcard(has_ਅਗੇਤਰ_Wildcard_2)
         , hasSuffixWildcard(_hasSuffixWildcard)
     {
     }
 
-    LogTagConfig(const LogTagConfig&) = default;
-    LogTagConfig(LogTagConfig&&) = default;
-    ~LogTagConfig() = default;
+    Log_ਟੈਗ_Config(ਅਚਲ Log_ਟੈਗ_Config&) = ਮੂਲ;
+    Log_ਟੈਗ_Config(Log_ਟੈਗ_Config&&) = ਮੂਲ;
+    ~Log_ਟੈਗ_Config() = ਮੂਲ;
 };
 
 }}}
 
-#endif
+#ਜੇ_ਅੰਤ

@@ -3,105 +3,105 @@
 // of this distribution and at http://opencv.org/license.html
 
 
-#include "precomp.hpp"
-#include "opencl_kernels_core.hpp"
-#include "stat.hpp"
+#ਅਨ੍ਤਰ੍ਭਾਵ "precomp.hpp"
+#ਅਨ੍ਤਰ੍ਭਾਵ "opencl_kernels_core.hpp"
+#ਅਨ੍ਤਰ੍ਭਾਵ "stat.hpp"
 
-#include "has_non_zero.simd.hpp"
-#include "has_non_zero.simd_declarations.hpp" // defines CV_CPU_DISPATCH_MODES_ALL=AVX2,...,BASELINE based on CMakeLists.txt content
+#ਅਨ੍ਤਰ੍ਭਾਵ "has_non_zero.simd.hpp"
+#ਅਨ੍ਤਰ੍ਭਾਵ "has_non_zero.simd_declarations.hpp" // defines CV_CPU_DISPATCH_MODES_ALL=AVX2,...,BASELINE based on CMakeLists.txt content
 
-namespace cv {
+ਨਾਮਾਕਾਸ਼ cv {
 
-static HasNonZeroFunc getHasNonZeroFunc(int depth)
+ਸਥਿਰ HasNonZeroFunc getHasNonZeroFunc(ਪੂਰਨ ਡੂੰਘਾਈ)
 {
     CV_INSTRUMENT_REGION();
-    CV_CPU_DISPATCH(getHasNonZeroFunc, (depth),
+    CV_CPU_DISPATCH(getHasNonZeroFunc, (ਡੂੰਘਾਈ),
         CV_CPU_DISPATCH_MODES_ALL);
 }
 
-#ifdef HAVE_OPENCL
-static bool ocl_hasNonZero( InputArray _src, bool & res )
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ HAVE_OPENCL
+ਸਥਿਰ ਤਾਰਕਿਕ ocl_hasNonZero( ਨਿਵੇਸ਼_Array _src, ਤਾਰਕਿਕ & res )
 {
-    int type = _src.type(), depth = CV_MAT_DEPTH(type), kercn = ocl::predictOptimalVectorWidth(_src);
-    bool doubleSupport = ocl::Device::getDefault().doubleFPConfig() > 0;
+    ਪੂਰਨ type = _src.type(), ਡੂੰਘਾਈ = CV_MAT_ਡੂੰਘਾਈ(type), kercn = ocl::predict_Optimal_ਸਦਿਸ਼_ਚੌੜਾਈ(_src);
+    ਤਾਰਕਿਕ doubleSupport = ocl::Device::getDefault().doubleFPConfig() > 0;
 
-    if (depth == CV_64F && !doubleSupport)
-        return false;
+    ਜੇ (ਡੂੰਘਾਈ == CV_64F && !doubleSupport)
+        ਵਾਪਸ ਝੂਠ;
 
-    int dbsize = ocl::Device::getDefault().maxComputeUnits();
-    size_t wgs = ocl::Device::getDefault().maxWorkGroupSize();
+    ਪੂਰਨ dbsize = ocl::Device::getDefault().maxComputeUnits();
+    size_t wgs = ocl::Device::getDefault().max_Work_ਸਮੂਹ_ਮਾਪ();
 
-    int wgs2_aligned = 1;
-    while (wgs2_aligned < (int)wgs)
+    ਪੂਰਨ wgs2_aligned = 1;
+    ਜਦੋਂ (wgs2_aligned < (ਪੂਰਨ)wgs)
         wgs2_aligned <<= 1;
     wgs2_aligned >>= 1;
 
     ocl::Kernel k("reduce", ocl::core::reduce_oclsrc,
                   format("-D srcT=%s -D srcT1=%s -D cn=1 -D OP_COUNT_NON_ZERO"
                          " -D WGS=%d -D kercn=%d -D WGS2_ALIGNED=%d%s%s",
-                         ocl::typeToStr(CV_MAKE_TYPE(depth, kercn)),
-                         ocl::typeToStr(depth), (int)wgs, kercn,
+                         ocl::type_ਮੰਜ਼ਿਲ_Str(CV_MAKE_TYPE(ਡੂੰਘਾਈ, kercn)),
+                         ocl::type_ਮੰਜ਼ਿਲ_Str(ਡੂੰਘਾਈ), (ਪੂਰਨ)wgs, kercn,
                          wgs2_aligned, doubleSupport ? " -D DOUBLE_SUPPORT" : "",
                          _src.isContinuous() ? " -D HAVE_SRC_CONT" : ""));
-    if (k.empty())
-        return false;
+    ਜੇ (k.empty())
+        ਵਾਪਸ ਝੂਠ;
 
     UMat src = _src.getUMat(), db(1, dbsize, CV_32SC1);
-    k.args(ocl::KernelArg::ReadOnlyNoSize(src), src.cols, (int)src.total(),
+    k.ਦਲੀਲਾਂ(ocl::KernelArg::Read_Only_No_ਮਾਪ(src), src.ਖਾਨੇ_ਗਿਣਤੀ, (ਪੂਰਨ)src.ਕੁੱਲ(),
            dbsize, ocl::KernelArg::PtrWriteOnly(db));
 
     size_t globalsize = dbsize * wgs;
-    if (k.run(1, &globalsize, &wgs, true))
-        return res = (saturate_cast<int>(cv::sum(db.getMat(ACCESS_READ))[0])>0), true;
-    return false;
+    ਜੇ (k.ਲੜੀਵਾਰ(1, &globalsize, &wgs, ਸੱਚ))
+        ਵਾਪਸ res = (saturate_cast<ਪੂਰਨ>(cv::ਜੋੜ(db.getMat(ACCESS_READ))[0])>0), ਸੱਚ;
+    ਵਾਪਸ ਝੂਠ;
 }
-#endif
+#ਜੇ_ਅੰਤ
 
-bool hasNonZero(InputArray _src)
+ਤਾਰਕਿਕ hasNonZero(ਨਿਵੇਸ਼_Array _src)
 {
     CV_INSTRUMENT_REGION();
 
-    int type = _src.type(), cn = CV_MAT_CN(type);
+    ਪੂਰਨ type = _src.type(), cn = CV_MAT_CN(type);
     CV_Assert( cn == 1 );
 
-    bool res = false;
+    ਤਾਰਕਿਕ res = ਝੂਠ;
 
-#ifdef HAVE_OPENCL
-    CV_OCL_RUN_(OCL_PERFORMANCE_CHECK(_src.isUMat()) && _src.dims() <= 2,
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ HAVE_OPENCL
+    CV_OCL_ਲੜੀਵਾਰ_2(OCL_PERFORMANCE_CHECK(_src.isUMat()) && _src.dims() <= 2,
                 ocl_hasNonZero(_src, res),
                 res)
-#endif
+#ਜੇ_ਅੰਤ
 
     Mat src = _src.getMat();
 
-    HasNonZeroFunc func = getHasNonZeroFunc(src.depth());
+    HasNonZeroFunc func = getHasNonZeroFunc(src.ਡੂੰਘਾਈ());
     CV_Assert( func != 0 );
 
-    if (src.dims == 2)//fast path to avoid creating planes of single rows
+    ਜੇ (src.dims == 2)//fast path to avoid creating planes of single rows
     {
-        if (src.isContinuous())
-            res |= func(src.ptr<uchar>(0), src.total());
-        else
-            for(int row = 0, rowsCount = src.rows ; !res && (row<rowsCount) ; ++row)
-                res |= func(src.ptr<uchar>(row), src.cols);
+        ਜੇ (src.isContinuous())
+            res |= func(src.ptr<uchar>(0), src.ਕੁੱਲ());
+        ਨਹੀਂਤਾਂ
+            ਲਈ(ਪੂਰਨ ਪੰਕਤੀ = 0, ਪੰਕਤੀਆਂ_ਗਿਣਤੀ = src.ਪੰਕਤੀਆਂ ; !res && (ਪੰਕਤੀ<ਪੰਕਤੀਆਂ_ਗਿਣਤੀ) ; ++ਪੰਕਤੀ)
+                res |= func(src.ptr<uchar>(ਪੰਕਤੀ), src.ਖਾਨੇ_ਗਿਣਤੀ);
     }
-    else//if (src.dims != 2)
+    ਨਹੀਂਤਾਂ//if (src.dims != 2)
     {
-        const Mat* arrays[] = {&src, nullptr};
+        ਅਚਲ Mat* arrays[] = {&src, ਖਾਲੀ_ਸੂਚਕ};
         Mat planes[1];
         NAryMatIterator itNAry(arrays, planes, 1);
-        for(size_t p = 0 ; !res && (p<itNAry.nplanes) ; ++p, ++itNAry)
+        ਲਈ(size_t p = 0 ; !res && (p<itNAry.nplanes) ; ++p, ++itNAry)
         {
-            const Mat& plane = itNAry.planes[0];
-            if (plane.isContinuous())
-                res |= func(plane.ptr<uchar>(0), plane.total());
-            else
-              for(int row = 0, rowsCount = plane.rows ; !res && (row<rowsCount) ; ++row)
-                  res |= func(plane.ptr<uchar>(row), plane.cols);
+            ਅਚਲ Mat& plane = itNAry.planes[0];
+            ਜੇ (plane.isContinuous())
+                res |= func(plane.ptr<uchar>(0), plane.ਕੁੱਲ());
+            ਨਹੀਂਤਾਂ
+              ਲਈ(ਪੂਰਨ ਪੰਕਤੀ = 0, ਪੰਕਤੀਆਂ_ਗਿਣਤੀ = plane.ਪੰਕਤੀਆਂ ; !res && (ਪੰਕਤੀ<ਪੰਕਤੀਆਂ_ਗਿਣਤੀ) ; ++ਪੰਕਤੀ)
+                  res |= func(plane.ptr<uchar>(ਪੰਕਤੀ), plane.ਖਾਨੇ_ਗਿਣਤੀ);
         }
     }
 
-    return res;
+    ਵਾਪਸ res;
 }
 
 } // namespace

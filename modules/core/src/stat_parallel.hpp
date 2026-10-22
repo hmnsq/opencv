@@ -8,68 +8,68 @@
 // Each piece is reduced by the existing serial code (including the HAL), and the results are
 // combined in piece order.
 
-#ifndef OPENCV_CORE_STAT_PARALLEL_HPP
-#define OPENCV_CORE_STAT_PARALLEL_HPP
+#ਜੇ_ਅਪਰਿਭਾਸ਼ਿਤ OPENCV_CORE_STAT_PARALLEL_HPP
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ OPENCV_CORE_STAT_PARALLEL_HPP
 
-namespace cv {
+ਨਾਮਾਕਾਸ਼ cv {
 
-struct StatChunk
+ਬਣਤਰ StatChunk
 {
-    Mat src, mask;
-    size_t firstElem;   // row-major index of the first element of the piece in the whole array
+    Mat src, ਨਕਾਬ;
+    size_t ਪਹਿਲਾ_Elem;   // row-major index of the first element of the piece in the whole array
 };
 
 // Returns false when the array is too small to be worth splitting, or cannot be split.
-static inline bool splitForParallelStat(const Mat& src, const Mat& mask, std::vector<StatChunk>& chunks)
+ਸਥਿਰ ਸਤਰਅੰਦਰ ਤਾਰਕਿਕ ਵੰਡੋ_For_Parallel_Stat(ਅਚਲ Mat& src, ਅਚਲ Mat& ਨਕਾਬ, std::vector<StatChunk>& chunks)
 {
-    const size_t total = src.total(), work = total*src.channels();
-    if (work < ((size_t)1 << 18))
-        return false;
-    const int nthreads = getNumThreads();
-    if (nthreads <= 1)
-        return false;
-    const int n = (int)std::min((size_t)nthreads*2, work >> 16);
-    if (n < 2)
-        return false;
+    ਅਚਲ size_t ਕੁੱਲ = src.ਕੁੱਲ(), work = ਕੁੱਲ*src.channels();
+    ਜੇ (work < ((size_t)1 << 18))
+        ਵਾਪਸ ਝੂਠ;
+    ਅਚਲ ਪੂਰਨ nthreads = get_ਅੰਕ_ਧਾਗੇ();
+    ਜੇ (nthreads <= 1)
+        ਵਾਪਸ ਝੂਠ;
+    ਅਚਲ ਪੂਰਨ n = (ਪੂਰਨ)std::min((size_t)nthreads*2, work >> 16);
+    ਜੇ (n < 2)
+        ਵਾਪਸ ਝੂਠ;
 
     chunks.clear();
-    if (src.dims <= 2 && src.rows >= n)
+    ਜੇ (src.dims <= 2 && src.ਪੰਕਤੀਆਂ >= n)
     {
-        for (int i = 0; i < n; i++)
+        ਲਈ (ਪੂਰਨ i = 0; i < n; i++)
         {
-            int r0 = (int)((int64)src.rows*i/n), r1 = (int)((int64)src.rows*(i + 1)/n);
+            ਪੂਰਨ r0 = (ਪੂਰਨ)((int64)src.ਪੰਕਤੀਆਂ*i/n), r1 = (ਪੂਰਨ)((int64)src.ਪੰਕਤੀਆਂ*(i + 1)/n);
             StatChunk c;
-            c.src = src.rowRange(r0, r1);
-            if (!mask.empty())
-                c.mask = mask.rowRange(r0, r1);
-            c.firstElem = (size_t)r0*src.cols;
+            c.src = src.ਪੰਕਤੀ_Range_2(r0, r1);
+            ਜੇ (!ਨਕਾਬ.empty())
+                c.ਨਕਾਬ = ਨਕਾਬ.ਪੰਕਤੀ_Range_2(r0, r1);
+            c.ਪਹਿਲਾ_Elem = (size_t)r0*src.ਖਾਨੇ_ਗਿਣਤੀ;
             chunks.push_back(c);
         }
-        return true;
+        ਵਾਪਸ ਸੱਚ;
     }
-    if (src.isContinuous() && (mask.empty() || mask.isContinuous()) && total <= (size_t)INT_MAX)
+    ਜੇ (src.isContinuous() && (ਨਕਾਬ.empty() || ਨਕਾਬ.isContinuous()) && ਕੁੱਲ <= (size_t)ਵੱਧ_ਤੋਂ_ਵੱਧ_ਅੰਕ)
     {
-        for (int i = 0; i < n; i++)
+        ਲਈ (ਪੂਰਨ i = 0; i < n; i++)
         {
-            size_t e0 = total*i/n, e1 = total*(i + 1)/n;
+            size_t e0 = ਕੁੱਲ*i/n, e1 = ਕੁੱਲ*(i + 1)/n;
             StatChunk c;
-            c.src = Mat(1, (int)(e1 - e0), src.type(), (void*)(src.data + e0*src.elemSize()));
-            if (!mask.empty())
-                c.mask = Mat(1, (int)(e1 - e0), mask.type(), (void*)(mask.data + e0*mask.elemSize()));
-            c.firstElem = e0;
+            c.src = Mat(1, (ਪੂਰਨ)(e1 - e0), src.type(), (ਖਾਲੀ*)(src.ਅੰਕੜੇ + e0*src.elem_ਮਾਪ()));
+            ਜੇ (!ਨਕਾਬ.empty())
+                c.ਨਕਾਬ = Mat(1, (ਪੂਰਨ)(e1 - e0), ਨਕਾਬ.type(), (ਖਾਲੀ*)(ਨਕਾਬ.ਅੰਕੜੇ + e0*ਨਕਾਬ.elem_ਮਾਪ()));
+            c.ਪਹਿਲਾ_Elem = e0;
             chunks.push_back(c);
         }
-        return true;
+        ਵਾਪਸ ਸੱਚ;
     }
-    return false;
+    ਵਾਪਸ ਝੂਠ;
 }
 
 // row-major index of an element given by the per-dimension indices of a 2D piece
-static inline size_t chunkIndexToElem(const StatChunk& c, const int* idx)
+ਸਥਿਰ ਸਤਰਅੰਦਰ size_t chunk_ਸੂਚਕਾਂਕ_ਮੰਜ਼ਿਲ_Elem(ਅਚਲ StatChunk& c, ਅਚਲ ਪੂਰਨ* idx)
 {
-    return c.firstElem + (size_t)idx[0]*c.src.cols + idx[1];
+    ਵਾਪਸ c.ਪਹਿਲਾ_Elem + (size_t)idx[0]*c.src.ਖਾਨੇ_ਗਿਣਤੀ + idx[1];
 }
 
 } // namespace cv
 
-#endif
+#ਜੇ_ਅੰਤ

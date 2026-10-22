@@ -41,77 +41,77 @@
 //
 //M*/
 
-#include "precomp.hpp"
-#include "opencl_kernels_core.hpp"
-#include <atomic>
-#include <limits>
-#include <iostream>
-#include <algorithm>
-#include <cmath>
-#include "mathfuncs.hpp"
-#include "arithm_expr.hpp"      // the element-wise engine: getMathFunc + TExpr for cv::exp/log/sqrt
+#ਅਨ੍ਤਰ੍ਭਾਵ "precomp.hpp"
+#ਅਨ੍ਤਰ੍ਭਾਵ "opencl_kernels_core.hpp"
+#ਅਨ੍ਤਰ੍ਭਾਵ <atomic>
+#ਅਨ੍ਤਰ੍ਭਾਵ <limits>
+#ਅਨ੍ਤਰ੍ਭਾਵ <iostream>
+#ਅਨ੍ਤਰ੍ਭਾਵ <algorithm>
+#ਅਨ੍ਤਰ੍ਭਾਵ <cmath>
+#ਅਨ੍ਤਰ੍ਭਾਵ "mathfuncs.hpp"
+#ਅਨ੍ਤਰ੍ਭਾਵ "arithm_expr.hpp"      // the element-wise engine: getMathFunc + TExpr for cv::exp/log/sqrt
 
-namespace cv
+ਨਾਮਾਕਾਸ਼ cv
 {
 
-typedef void (*MathFunc)(const void* src, void* dst, int len);
+ਕਿਸਮਪਰਿਭਾਸ਼ਾ ਖਾਲੀ (*MathFunc)(ਅਚਲ ਖਾਲੀ* src, ਖਾਲੀ* dst, ਪੂਰਨ len);
 
-#ifdef HAVE_OPENCL
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ HAVE_OPENCL
 
-enum { OCL_OP_LOG=0, OCL_OP_EXP=1, OCL_OP_MAG=2, OCL_OP_PHASE_DEGREES=3, OCL_OP_PHASE_RADIANS=4 };
+ਗਿਣਤੀ { OCL_OP_LOG=0, OCL_OP_EXP=1, OCL_OP_MAG=2, OCL_OP_PHASE_DEGREES=3, OCL_OP_PHASE_RADIANS=4 };
 
-static const char* oclop2str[] = { "OP_LOG", "OP_EXP", "OP_MAG", "OP_PHASE_DEGREES", "OP_PHASE_RADIANS", 0 };
+ਸਥਿਰ ਅਚਲ ਅੱਖਰ* oclop2str[] = { "OP_LOG", "OP_EXP", "OP_MAG", "OP_PHASE_DEGREES", "OP_PHASE_RADIANS", 0 };
 
-static bool ocl_math_op(InputArray _src1, InputArray _src2, OutputArray _dst, int oclop)
+ਸਥਿਰ ਤਾਰਕਿਕ ocl_math_op(ਨਿਵੇਸ਼_Array _src1, ਨਿਵੇਸ਼_Array _src2, OutputArray _dst, ਪੂਰਨ oclop)
 {
-    int type = _src1.type(), depth = CV_MAT_DEPTH(type), cn = CV_MAT_CN(type);
-    int kercn = oclop == OCL_OP_PHASE_DEGREES ||
-            oclop == OCL_OP_PHASE_RADIANS ? 1 : ocl::predictOptimalVectorWidth(_src1, _src2, _dst);
+    ਪੂਰਨ type = _src1.type(), ਡੂੰਘਾਈ = CV_MAT_ਡੂੰਘਾਈ(type), cn = CV_MAT_CN(type);
+    ਪੂਰਨ kercn = oclop == OCL_OP_PHASE_DEGREES ||
+            oclop == OCL_OP_PHASE_RADIANS ? 1 : ocl::predict_Optimal_ਸਦਿਸ਼_ਚੌੜਾਈ(_src1, _src2, _dst);
 
-    const ocl::Device d = ocl::Device::getDefault();
-    bool double_support = d.doubleFPConfig() > 0;
-    if (!double_support && depth == CV_64F)
-        return false;
-    int rowsPerWI = d.isIntel() ? 4 : 1;
+    ਅਚਲ ocl::Device d = ocl::Device::getDefault();
+    ਤਾਰਕਿਕ double_support = d.doubleFPConfig() > 0;
+    ਜੇ (!double_support && ਡੂੰਘਾਈ == CV_64F)
+        ਵਾਪਸ ਝੂਠ;
+    ਪੂਰਨ ਪੰਕਤੀਆਂ_ਪ੍ਰਤੀ_WI = d.isIntel() ? 4 : 1;
 
     ocl::Kernel k("KF", ocl::core::arithm_oclsrc,
                   format("-D %s -D %s -D dstT=%s -D DEPTH_dst=%d -D rowsPerWI=%d%s", _src2.empty() ? "UNARY_OP" : "BINARY_OP",
-                         oclop2str[oclop], ocl::typeToStr(CV_MAKE_TYPE(depth, kercn)), depth, rowsPerWI,
+                         oclop2str[oclop], ocl::type_ਮੰਜ਼ਿਲ_Str(CV_MAKE_TYPE(ਡੂੰਘਾਈ, kercn)), ਡੂੰਘਾਈ, ਪੰਕਤੀਆਂ_ਪ੍ਰਤੀ_WI,
                          double_support ? " -D DOUBLE_SUPPORT" : ""));
-    if (k.empty())
-        return false;
+    ਜੇ (k.empty())
+        ਵਾਪਸ ਝੂਠ;
 
     UMat src1 = _src1.getUMat(), src2 = _src2.getUMat();
-    _dst.createSameSize(src1, type);
+    _dst.create_Same_ਮਾਪ(src1, type);
     UMat dst = _dst.getUMat();
 
-    ocl::KernelArg src1arg = ocl::KernelArg::ReadOnlyNoSize(src1),
-            src2arg = ocl::KernelArg::ReadOnlyNoSize(src2),
+    ocl::KernelArg src1arg = ocl::KernelArg::Read_Only_No_ਮਾਪ(src1),
+            src2arg = ocl::KernelArg::Read_Only_No_ਮਾਪ(src2),
             dstarg = ocl::KernelArg::WriteOnly(dst, cn, kercn);
 
-    if (src2.empty())
-        k.args(src1arg, dstarg);
-    else
-        k.args(src1arg, src2arg, dstarg);
+    ਜੇ (src2.empty())
+        k.ਦਲੀਲਾਂ(src1arg, dstarg);
+    ਨਹੀਂਤਾਂ
+        k.ਦਲੀਲਾਂ(src1arg, src2arg, dstarg);
 
-    size_t globalsize[] = { (size_t)src1.cols * cn / kercn, ((size_t)src1.rows + rowsPerWI - 1) / rowsPerWI };
-    return k.run(2, globalsize, 0, false);
+    size_t globalsize[] = { (size_t)src1.ਖਾਨੇ_ਗਿਣਤੀ * cn / kercn, ((size_t)src1.ਪੰਕਤੀਆਂ + ਪੰਕਤੀਆਂ_ਪ੍ਰਤੀ_WI - 1) / ਪੰਕਤੀਆਂ_ਪ੍ਰਤੀ_WI };
+    ਵਾਪਸ k.ਲੜੀਵਾਰ(2, globalsize, 0, ਝੂਠ);
 }
 
-#endif
+#ਜੇ_ਅੰਤ
 
 /* ************************************************************************** *\
    Fast cube root by Ken Turkowski
    (http://www.worldserver.com/turk/computergraphics/papers.html)
 \* ************************************************************************** */
-CV_DISABLE_UBSAN float cubeRoot( float value )
+CV_DISABLE_UBSAN ਦਸ਼ਮਲਵ cube_ਜੜ੍ਹ( ਦਸ਼ਮਲਵ value )
 {
     CV_INSTRUMENT_REGION();
 
-    float fr;
+    ਦਸ਼ਮਲਵ fr;
     Cv32suf v, m;
-    int ix, s;
-    int ex, shx;
+    ਪੂਰਨ ix, s;
+    ਪੂਰਨ ex, shx;
 
     v.f = value;
     ix = v.i & 0x7fffffff;
@@ -125,7 +125,7 @@ CV_DISABLE_UBSAN float cubeRoot( float value )
 
     /* 0.125 <= fr < 1.0 */
     /* Use quartic rational polynomial with error < 2^(-24) */
-    fr = (float)(((((45.2548339756803022511987494 * fr +
+    fr = (ਦਸ਼ਮਲਵ)(((((45.2548339756803022511987494 * fr +
     192.2798368355061050458134625) * fr +
     119.1654824285581628956914143) * fr +
     13.43250139086239872172837314) * fr +
@@ -140,84 +140,84 @@ CV_DISABLE_UBSAN float cubeRoot( float value )
     m.f = value;
     v.f = fr;
     v.i = (v.i + (ex << 23) + s) & (m.i*2 != 0 ? -1 : 0);
-    return v.f;
+    ਵਾਪਸ v.f;
 }
 
 /****************************************************************************************\
 *                                  Cartezian -> Polar                                    *
 \****************************************************************************************/
 
-void magnitude( InputArray src1, InputArray src2, OutputArray dst )
+ਖਾਲੀ magnitude( ਨਿਵੇਸ਼_Array src1, ਨਿਵੇਸ਼_Array src2, OutputArray dst )
 {
     CV_INSTRUMENT_REGION();
 
-    int type = src1.type(), depth = src1.depth(), cn = src1.channels();
-    CV_Assert( src1.size() == src2.size() && type == src2.type() && (depth == CV_32F || depth == CV_64F));
+    ਪੂਰਨ type = src1.type(), ਡੂੰਘਾਈ = src1.ਡੂੰਘਾਈ(), cn = src1.channels();
+    CV_Assert( src1.size() == src2.size() && type == src2.type() && (ਡੂੰਘਾਈ == CV_32F || ਡੂੰਘਾਈ == CV_64F));
 
-    CV_OCL_RUN(dst.isUMat() && src1.dims() <= 2 && src2.dims() <= 2,
+    CV_OCL_ਲੜੀਵਾਰ(dst.isUMat() && src1.dims() <= 2 && src2.dims() <= 2,
                ocl_math_op(src1, src2, dst, OCL_OP_MAG))
 
     Mat X = src1.getMat(), Y = src2.getMat();
     dst.create(X.size, X.type());
     Mat Mag = dst.getMat();
 
-    const Mat* arrays[] = {&X, &Y, &Mag, 0};
+    ਅਚਲ Mat* arrays[] = {&X, &Y, &Mag, 0};
     uchar* ptrs[3] = {};
     NAryMatIterator it(arrays, ptrs);
-    int len = (int)it.size*cn;
+    ਪੂਰਨ len = (ਪੂਰਨ)it.size*cn;
 
-    for( size_t i = 0; i < it.nplanes; i++, ++it )
+    ਲਈ( size_t i = 0; i < it.nplanes; i++, ++it )
     {
-        if( depth == CV_32F )
+        ਜੇ( ਡੂੰਘਾਈ == CV_32F )
         {
-            const float *x = (const float*)ptrs[0], *y = (const float*)ptrs[1];
-            float *mag = (float*)ptrs[2];
+            ਅਚਲ ਦਸ਼ਮਲਵ *x = (ਅਚਲ ਦਸ਼ਮਲਵ*)ptrs[0], *y = (ਅਚਲ ਦਸ਼ਮਲਵ*)ptrs[1];
+            ਦਸ਼ਮਲਵ *mag = (ਦਸ਼ਮਲਵ*)ptrs[2];
             hal::magnitude32f( x, y, mag, len );
         }
-        else
+        ਨਹੀਂਤਾਂ
         {
-            const double *x = (const double*)ptrs[0], *y = (const double*)ptrs[1];
-            double *mag = (double*)ptrs[2];
+            ਅਚਲ ਦੁੱਗਣਾ *x = (ਅਚਲ ਦੁੱਗਣਾ*)ptrs[0], *y = (ਅਚਲ ਦੁੱਗਣਾ*)ptrs[1];
+            ਦੁੱਗਣਾ *mag = (ਦੁੱਗਣਾ*)ptrs[2];
             hal::magnitude64f( x, y, mag, len );
         }
     }
 }
 
-void phase( InputArray src1, InputArray src2, OutputArray dst, bool angleInDegrees )
+ਖਾਲੀ phase( ਨਿਵੇਸ਼_Array src1, ਨਿਵੇਸ਼_Array src2, OutputArray dst, ਤਾਰਕਿਕ angle_ਵਿੱਚ_Degrees )
 {
     CV_INSTRUMENT_REGION();
 
-    int type = src1.type(), depth = src1.depth(), cn = src1.channels();
-    CV_Assert( src1.size() == src2.size() && type == src2.type() && (depth == CV_32F || depth == CV_64F));
+    ਪੂਰਨ type = src1.type(), ਡੂੰਘਾਈ = src1.ਡੂੰਘਾਈ(), cn = src1.channels();
+    CV_Assert( src1.size() == src2.size() && type == src2.type() && (ਡੂੰਘਾਈ == CV_32F || ਡੂੰਘਾਈ == CV_64F));
 
-    CV_OCL_RUN(dst.isUMat() && src1.dims() <= 2 && src2.dims() <= 2,
-               ocl_math_op(src1, src2, dst, angleInDegrees ? OCL_OP_PHASE_DEGREES : OCL_OP_PHASE_RADIANS))
+    CV_OCL_ਲੜੀਵਾਰ(dst.isUMat() && src1.dims() <= 2 && src2.dims() <= 2,
+               ocl_math_op(src1, src2, dst, angle_ਵਿੱਚ_Degrees ? OCL_OP_PHASE_DEGREES : OCL_OP_PHASE_RADIANS))
 
     Mat X = src1.getMat(), Y = src2.getMat();
     dst.create( X.size, type );
     Mat Angle = dst.getMat();
 
-    const Mat* arrays[] = {&X, &Y, &Angle, 0};
+    ਅਚਲ Mat* arrays[] = {&X, &Y, &Angle, 0};
     uchar* ptrs[3] = {};
     NAryMatIterator it(arrays, ptrs);
-    int j, total = (int)(it.size*cn), blockSize = total;
+    ਪੂਰਨ j, ਕੁੱਲ = (ਪੂਰਨ)(it.size*cn), ਖੰਡ_ਮਾਪ_2 = ਕੁੱਲ;
     size_t esz1 = X.elemSize1();
-    for( size_t i = 0; i < it.nplanes; i++, ++it )
+    ਲਈ( size_t i = 0; i < it.nplanes; i++, ++it )
     {
-        for( j = 0; j < total; j += blockSize )
+        ਲਈ( j = 0; j < ਕੁੱਲ; j += ਖੰਡ_ਮਾਪ_2 )
         {
-            int len = std::min(total - j, blockSize);
-            if( depth == CV_32F )
+            ਪੂਰਨ len = std::min(ਕੁੱਲ - j, ਖੰਡ_ਮਾਪ_2);
+            ਜੇ( ਡੂੰਘਾਈ == CV_32F )
             {
-                const float *x = (const float*)ptrs[0], *y = (const float*)ptrs[1];
-                float *angle = (float*)ptrs[2];
-                hal::fastAtan32f( y, x, angle, len, angleInDegrees );
+                ਅਚਲ ਦਸ਼ਮਲਵ *x = (ਅਚਲ ਦਸ਼ਮਲਵ*)ptrs[0], *y = (ਅਚਲ ਦਸ਼ਮਲਵ*)ptrs[1];
+                ਦਸ਼ਮਲਵ *angle = (ਦਸ਼ਮਲਵ*)ptrs[2];
+                hal::fastAtan32f( y, x, angle, len, angle_ਵਿੱਚ_Degrees );
             }
-            else
+            ਨਹੀਂਤਾਂ
             {
-                const double *x = (const double*)ptrs[0], *y = (const double*)ptrs[1];
-                double *angle = (double*)ptrs[2];
-                hal::fastAtan64f(y, x, angle, len, angleInDegrees);
+                ਅਚਲ ਦੁੱਗਣਾ *x = (ਅਚਲ ਦੁੱਗਣਾ*)ptrs[0], *y = (ਅਚਲ ਦੁੱਗਣਾ*)ptrs[1];
+                ਦੁੱਗਣਾ *angle = (ਦੁੱਗਣਾ*)ptrs[2];
+                hal::fastAtan64f(y, x, angle, len, angle_ਵਿੱਚ_Degrees);
             }
             ptrs[0] += len*esz1;
             ptrs[1] += len*esz1;
@@ -226,97 +226,97 @@ void phase( InputArray src1, InputArray src2, OutputArray dst, bool angleInDegre
     }
 }
 
-#ifdef HAVE_OPENCL
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ HAVE_OPENCL
 
-static bool ocl_cartToPolar( InputArray _src1, InputArray _src2,
-                             OutputArray _dst1, OutputArray _dst2, bool angleInDegrees )
+ਸਥਿਰ ਤਾਰਕਿਕ ocl_cart_ਮੰਜ਼ਿਲ_Polar( ਨਿਵੇਸ਼_Array _src1, ਨਿਵੇਸ਼_Array _src2,
+                             OutputArray _dst1, OutputArray _dst2, ਤਾਰਕਿਕ angle_ਵਿੱਚ_Degrees )
 {
-    const ocl::Device & d = ocl::Device::getDefault();
-    int type = _src1.type(), depth = CV_MAT_DEPTH(type), cn = CV_MAT_CN(type),
-            rowsPerWI = d.isIntel() ? 4 : 1;
-    bool doubleSupport = d.doubleFPConfig() > 0;
+    ਅਚਲ ocl::Device & d = ocl::Device::getDefault();
+    ਪੂਰਨ type = _src1.type(), ਡੂੰਘਾਈ = CV_MAT_ਡੂੰਘਾਈ(type), cn = CV_MAT_CN(type),
+            ਪੰਕਤੀਆਂ_ਪ੍ਰਤੀ_WI = d.isIntel() ? 4 : 1;
+    ਤਾਰਕਿਕ doubleSupport = d.doubleFPConfig() > 0;
 
-    const bool _src1IsDstMag = (_src1.getObj() == _dst1.getObj());
-    const bool _src1IsDstAngle = (_src1.getObj() == _dst2.getObj());
-    const bool _src2IsDstMag = (_src2.getObj() == _dst1.getObj());
-    const bool _src2IsDstAngle = (_src2.getObj() == _dst2.getObj());
+    ਅਚਲ ਤਾਰਕਿਕ _src1IsDstMag = (_src1.getObj() == _dst1.getObj());
+    ਅਚਲ ਤਾਰਕਿਕ _src1IsDstAngle = (_src1.getObj() == _dst2.getObj());
+    ਅਚਲ ਤਾਰਕਿਕ _src2IsDstMag = (_src2.getObj() == _dst1.getObj());
+    ਅਚਲ ਤਾਰਕਿਕ _src2IsDstAngle = (_src2.getObj() == _dst2.getObj());
 
-    if ( !(_src1.dims() <= 2 && _src2.dims() <= 2 &&
-           (depth == CV_32F || depth == CV_64F) && type == _src2.type()) ||
-         (depth == CV_64F && !doubleSupport) )
-        return false;
+    ਜੇ ( !(_src1.dims() <= 2 && _src2.dims() <= 2 &&
+           (ਡੂੰਘਾਈ == CV_32F || ਡੂੰਘਾਈ == CV_64F) && type == _src2.type()) ||
+         (ਡੂੰਘਾਈ == CV_64F && !doubleSupport) )
+        ਵਾਪਸ ਝੂਠ;
 
     ocl::Kernel k("KF", ocl::core::arithm_oclsrc,
                   format("-D BINARY_OP -D dstT=%s -D DEPTH_dst=%d -D rowsPerWI=%d -D OP_CTP_%s%s%s%s%s%s",
-                         ocl::typeToStr(CV_MAKE_TYPE(depth, 1)), depth,
-                         rowsPerWI, angleInDegrees ? "AD" : "AR",
+                         ocl::type_ਮੰਜ਼ਿਲ_Str(CV_MAKE_TYPE(ਡੂੰਘਾਈ, 1)), ਡੂੰਘਾਈ,
+                         ਪੰਕਤੀਆਂ_ਪ੍ਰਤੀ_WI, angle_ਵਿੱਚ_Degrees ? "AD" : "AR",
                          doubleSupport ? " -D DOUBLE_SUPPORT" : "",
                          _src1IsDstMag   ? " -D SRC1_IS_DST_MAG" : "",
                          _src1IsDstAngle ? " -D SRC1_IS_DST_ANGLE" : "",
                          _src2IsDstMag   ? " -D SRC2_IS_DST_MAG" : "",
                          _src2IsDstAngle ? " -D SRC2_IS_DST_ANGLE" : ""
                          ));
-    if (k.empty())
-        return false;
+    ਜੇ (k.empty())
+        ਵਾਪਸ ਝੂਠ;
 
     UMat src1 = _src1.getUMat(), src2 = _src2.getUMat();
-    Size size = src1.size();
+    ਮਾਪ size = src1.size();
     CV_Assert( size == src2.size() );
 
     _dst1.create(size, type);
     _dst2.create(size, type);
     UMat dst1 = _dst1.getUMat(), dst2 = _dst2.getUMat();
 
-    k.args(_src1IsDstMag || _src1IsDstAngle ? ocl::KernelArg::ReadWriteNoSize(src1) : ocl::KernelArg::ReadOnlyNoSize(src1),
-           _src2IsDstMag || _src2IsDstAngle ? ocl::KernelArg::ReadWriteNoSize(src2) : ocl::KernelArg::ReadOnlyNoSize(src2),
+    k.ਦਲੀਲਾਂ(_src1IsDstMag || _src1IsDstAngle ? ocl::KernelArg::Read_Write_No_ਮਾਪ(src1) : ocl::KernelArg::Read_Only_No_ਮਾਪ(src1),
+           _src2IsDstMag || _src2IsDstAngle ? ocl::KernelArg::Read_Write_No_ਮਾਪ(src2) : ocl::KernelArg::Read_Only_No_ਮਾਪ(src2),
            ocl::KernelArg::WriteOnly(dst1, cn),
-           ocl::KernelArg::WriteOnlyNoSize(dst2));
+           ocl::KernelArg::Write_Only_No_ਮਾਪ(dst2));
 
-    size_t globalsize[2] = { (size_t)dst1.cols * cn, ((size_t)dst1.rows + rowsPerWI - 1) / rowsPerWI };
-    return k.run(2, globalsize, NULL, false);
+    size_t globalsize[2] = { (size_t)dst1.ਖਾਨੇ_ਗਿਣਤੀ * cn, ((size_t)dst1.ਪੰਕਤੀਆਂ + ਪੰਕਤੀਆਂ_ਪ੍ਰਤੀ_WI - 1) / ਪੰਕਤੀਆਂ_ਪ੍ਰਤੀ_WI };
+    ਵਾਪਸ k.ਲੜੀਵਾਰ(2, globalsize, ਨਿਰਾ, ਝੂਠ);
 }
 
-#endif
+#ਜੇ_ਅੰਤ
 
-void cartToPolar( InputArray src1, InputArray src2,
-                  OutputArray dst1, OutputArray dst2, bool angleInDegrees )
+ਖਾਲੀ cart_ਮੰਜ਼ਿਲ_Polar( ਨਿਵੇਸ਼_Array src1, ਨਿਵੇਸ਼_Array src2,
+                  OutputArray dst1, OutputArray dst2, ਤਾਰਕਿਕ angle_ਵਿੱਚ_Degrees )
 {
     CV_INSTRUMENT_REGION();
 
     CV_Assert(dst1.getObj() != dst2.getObj());
 
-    CV_OCL_RUN(dst1.isUMat() && dst2.isUMat(),
-            ocl_cartToPolar(src1, src2, dst1, dst2, angleInDegrees))
+    CV_OCL_ਲੜੀਵਾਰ(dst1.isUMat() && dst2.isUMat(),
+            ocl_cart_ਮੰਜ਼ਿਲ_Polar(src1, src2, dst1, dst2, angle_ਵਿੱਚ_Degrees))
 
     Mat X = src1.getMat(), Y = src2.getMat();
-    int type = X.type(), depth = X.depth(), cn = X.channels();
-    CV_Assert( X.size == Y.size && type == Y.type() && (depth == CV_32F || depth == CV_64F));
+    ਪੂਰਨ type = X.type(), ਡੂੰਘਾਈ = X.ਡੂੰਘਾਈ(), cn = X.channels();
+    CV_Assert( X.size == Y.size && type == Y.type() && (ਡੂੰਘਾਈ == CV_32F || ਡੂੰਘਾਈ == CV_64F));
     dst1.create( X.size, type );
     dst2.create( X.size, type );
     Mat Mag = dst1.getMat(), Angle = dst2.getMat();
 
-    const Mat* arrays[] = {&X, &Y, &Mag, &Angle, 0};
+    ਅਚਲ Mat* arrays[] = {&X, &Y, &Mag, &Angle, 0};
     uchar* ptrs[4] = {};
     NAryMatIterator it(arrays, ptrs);
-    int j, total = (int)(it.size*cn), blockSize = std::min(total, ((BLOCK_SIZE+cn-1)/cn)*cn);
+    ਪੂਰਨ j, ਕੁੱਲ = (ਪੂਰਨ)(it.size*cn), ਖੰਡ_ਮਾਪ_2 = std::min(ਕੁੱਲ, ((ਖੰਡ_ਮਾਪ+cn-1)/cn)*cn);
     size_t esz1 = X.elemSize1();
 
-    for( size_t i = 0; i < it.nplanes; i++, ++it )
+    ਲਈ( size_t i = 0; i < it.nplanes; i++, ++it )
     {
-        for( j = 0; j < total; j += blockSize )
+        ਲਈ( j = 0; j < ਕੁੱਲ; j += ਖੰਡ_ਮਾਪ_2 )
         {
-            int len = std::min(total - j, blockSize);
-            if( depth == CV_32F )
+            ਪੂਰਨ len = std::min(ਕੁੱਲ - j, ਖੰਡ_ਮਾਪ_2);
+            ਜੇ( ਡੂੰਘਾਈ == CV_32F )
             {
-                const float *x = (const float*)ptrs[0], *y = (const float*)ptrs[1];
-                float *mag = (float*)ptrs[2], *angle = (float*)ptrs[3];
-                hal::cartToPolar32f( x, y, mag, angle, len, angleInDegrees );
+                ਅਚਲ ਦਸ਼ਮਲਵ *x = (ਅਚਲ ਦਸ਼ਮਲਵ*)ptrs[0], *y = (ਅਚਲ ਦਸ਼ਮਲਵ*)ptrs[1];
+                ਦਸ਼ਮਲਵ *mag = (ਦਸ਼ਮਲਵ*)ptrs[2], *angle = (ਦਸ਼ਮਲਵ*)ptrs[3];
+                hal::cart_ਮੰਜ਼ਿਲ_Polar32f( x, y, mag, angle, len, angle_ਵਿੱਚ_Degrees );
             }
-            else
+            ਨਹੀਂਤਾਂ
             {
-                const double *x = (const double*)ptrs[0], *y = (const double*)ptrs[1];
-                double *mag = (double*)ptrs[2], *angle = (double*)ptrs[3];
-                hal::cartToPolar64f(x, y, mag, angle, len, angleInDegrees);
+                ਅਚਲ ਦੁੱਗਣਾ *x = (ਅਚਲ ਦੁੱਗਣਾ*)ptrs[0], *y = (ਅਚਲ ਦੁੱਗਣਾ*)ptrs[1];
+                ਦੁੱਗਣਾ *mag = (ਦੁੱਗਣਾ*)ptrs[2], *angle = (ਦੁੱਗਣਾ*)ptrs[3];
+                hal::cart_ਮੰਜ਼ਿਲ_Polar64f(x, y, mag, angle, len, angle_ਵਿੱਚ_Degrees);
             }
             ptrs[0] += len*esz1;
             ptrs[1] += len*esz1;
@@ -331,68 +331,68 @@ void cartToPolar( InputArray src1, InputArray src2,
 *                                  Polar -> Cartezian                                    *
 \****************************************************************************************/
 
-#ifdef HAVE_OPENCL
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ HAVE_OPENCL
 
-static bool ocl_polarToCart( InputArray _mag, InputArray _angle,
-                             OutputArray _dst1, OutputArray _dst2, bool angleInDegrees )
+ਸਥਿਰ ਤਾਰਕਿਕ ocl_polar_ਮੰਜ਼ਿਲ_Cart( ਨਿਵੇਸ਼_Array _mag, ਨਿਵੇਸ਼_Array _angle,
+                             OutputArray _dst1, OutputArray _dst2, ਤਾਰਕਿਕ angle_ਵਿੱਚ_Degrees )
 {
-    const ocl::Device & d = ocl::Device::getDefault();
-    int type = _angle.type(), depth = CV_MAT_DEPTH(type), cn = CV_MAT_CN(type),
-            rowsPerWI = d.isIntel() ? 4 : 1;
-    bool doubleSupport = d.doubleFPConfig() > 0;
+    ਅਚਲ ocl::Device & d = ocl::Device::getDefault();
+    ਪੂਰਨ type = _angle.type(), ਡੂੰਘਾਈ = CV_MAT_ਡੂੰਘਾਈ(type), cn = CV_MAT_CN(type),
+            ਪੰਕਤੀਆਂ_ਪ੍ਰਤੀ_WI = d.isIntel() ? 4 : 1;
+    ਤਾਰਕਿਕ doubleSupport = d.doubleFPConfig() > 0;
 
-    const bool _src1IsDstX = (_mag.getObj() == _dst1.getObj());
-    const bool _src1IsDstY = (_mag.getObj() == _dst2.getObj());
-    const bool _src2IsDstX = (_angle.getObj() == _dst1.getObj());
-    const bool _src2IsDstY = (_angle.getObj() == _dst2.getObj());
+    ਅਚਲ ਤਾਰਕਿਕ _src1IsDstX = (_mag.getObj() == _dst1.getObj());
+    ਅਚਲ ਤਾਰਕਿਕ _src1IsDstY = (_mag.getObj() == _dst2.getObj());
+    ਅਚਲ ਤਾਰਕਿਕ _src2IsDstX = (_angle.getObj() == _dst1.getObj());
+    ਅਚਲ ਤਾਰਕਿਕ _src2IsDstY = (_angle.getObj() == _dst2.getObj());
 
-    if ( !doubleSupport && depth == CV_64F )
-        return false;
+    ਜੇ ( !doubleSupport && ਡੂੰਘਾਈ == CV_64F )
+        ਵਾਪਸ ਝੂਠ;
 
     ocl::Kernel k("KF", ocl::core::arithm_oclsrc,
                   format("-D dstT=%s -D DEPTH_dst=%d -D rowsPerWI=%d -D BINARY_OP -D OP_PTC_%s%s%s%s%s%s",
-                         ocl::typeToStr(CV_MAKE_TYPE(depth, 1)), depth,
-                         rowsPerWI,
-                         angleInDegrees ? "AD" : "AR",
+                         ocl::type_ਮੰਜ਼ਿਲ_Str(CV_MAKE_TYPE(ਡੂੰਘਾਈ, 1)), ਡੂੰਘਾਈ,
+                         ਪੰਕਤੀਆਂ_ਪ੍ਰਤੀ_WI,
+                         angle_ਵਿੱਚ_Degrees ? "AD" : "AR",
                          doubleSupport ? " -D DOUBLE_SUPPORT" : "",
                          _src1IsDstX   ? " -D SRC1_IS_DST_X" : "",
                          _src1IsDstY ? " -D SRC1_IS_DST_Y" : "",
                          _src2IsDstX   ? " -D SRC2_IS_DST_X" : "",
                          _src2IsDstY ? " -D SRC2_IS_DST_Y" : ""));
-    if (k.empty())
-        return false;
+    ਜੇ (k.empty())
+        ਵਾਪਸ ਝੂਠ;
 
     UMat mag = _mag.getUMat(), angle = _angle.getUMat();
-    Size size = angle.size();
+    ਮਾਪ size = angle.size();
     CV_Assert(mag.size() == size);
 
     _dst1.create(size, type);
     _dst2.create(size, type);
     UMat dst1 = _dst1.getUMat(), dst2 = _dst2.getUMat();
 
-    k.args(_src1IsDstX || _src1IsDstY ? ocl::KernelArg::ReadWriteNoSize(mag) : ocl::KernelArg::ReadOnlyNoSize(mag),
-           _src2IsDstX || _src2IsDstY  ? ocl::KernelArg::ReadWriteNoSize(angle) : ocl::KernelArg::ReadOnlyNoSize(angle),
+    k.ਦਲੀਲਾਂ(_src1IsDstX || _src1IsDstY ? ocl::KernelArg::Read_Write_No_ਮਾਪ(mag) : ocl::KernelArg::Read_Only_No_ਮਾਪ(mag),
+           _src2IsDstX || _src2IsDstY  ? ocl::KernelArg::Read_Write_No_ਮਾਪ(angle) : ocl::KernelArg::Read_Only_No_ਮਾਪ(angle),
            ocl::KernelArg::WriteOnly(dst1, cn),
-           ocl::KernelArg::WriteOnlyNoSize(dst2));
+           ocl::KernelArg::Write_Only_No_ਮਾਪ(dst2));
 
-    size_t globalsize[2] = { (size_t)dst1.cols * cn, ((size_t)dst1.rows + rowsPerWI - 1) / rowsPerWI };
-    return k.run(2, globalsize, NULL, false);
+    size_t globalsize[2] = { (size_t)dst1.ਖਾਨੇ_ਗਿਣਤੀ * cn, ((size_t)dst1.ਪੰਕਤੀਆਂ + ਪੰਕਤੀਆਂ_ਪ੍ਰਤੀ_WI - 1) / ਪੰਕਤੀਆਂ_ਪ੍ਰਤੀ_WI };
+    ਵਾਪਸ k.ਲੜੀਵਾਰ(2, globalsize, ਨਿਰਾ, ਝੂਠ);
 }
 
-#endif
+#ਜੇ_ਅੰਤ
 
-void polarToCart( InputArray src1, InputArray src2,
-                  OutputArray dst1, OutputArray dst2, bool angleInDegrees )
+ਖਾਲੀ polar_ਮੰਜ਼ਿਲ_Cart( ਨਿਵੇਸ਼_Array src1, ਨਿਵੇਸ਼_Array src2,
+                  OutputArray dst1, OutputArray dst2, ਤਾਰਕਿਕ angle_ਵਿੱਚ_Degrees )
 {
     CV_INSTRUMENT_REGION();
 
     CV_Assert(dst1.getObj() != dst2.getObj());
 
-    int type = src2.type(), depth = CV_MAT_DEPTH(type), cn = CV_MAT_CN(type);
-    CV_Assert((depth == CV_32F || depth == CV_64F) && (src1.empty() || src1.type() == type));
+    ਪੂਰਨ type = src2.type(), ਡੂੰਘਾਈ = CV_MAT_ਡੂੰਘਾਈ(type), cn = CV_MAT_CN(type);
+    CV_Assert((ਡੂੰਘਾਈ == CV_32F || ਡੂੰਘਾਈ == CV_64F) && (src1.empty() || src1.type() == type));
 
-    CV_OCL_RUN(!src1.empty() && src2.dims() <= 2 && dst1.isUMat() && dst2.isUMat(),
-               ocl_polarToCart(src1, src2, dst1, dst2, angleInDegrees))
+    CV_OCL_ਲੜੀਵਾਰ(!src1.empty() && src2.dims() <= 2 && dst1.isUMat() && dst2.isUMat(),
+               ocl_polar_ਮੰਜ਼ਿਲ_Cart(src1, src2, dst1, dst2, angle_ਵਿੱਚ_Degrees))
 
     Mat Mag = src1.getMat(), Angle = src2.getMat();
     CV_Assert( Mag.empty() || Angle.size == Mag.size);
@@ -400,31 +400,31 @@ void polarToCart( InputArray src1, InputArray src2,
     dst2.create( Angle.size, type );
     Mat X = dst1.getMat(), Y = dst2.getMat();
 
-    const Mat* arrays[] = {&Mag, &Angle, &X, &Y, 0};
+    ਅਚਲ Mat* arrays[] = {&Mag, &Angle, &X, &Y, 0};
     uchar* ptrs[4] = {};
     NAryMatIterator it(arrays, ptrs);
-    int j, total = (int)(it.size*cn), blockSize = std::min(total, ((BLOCK_SIZE+cn-1)/cn)*cn);
+    ਪੂਰਨ j, ਕੁੱਲ = (ਪੂਰਨ)(it.size*cn), ਖੰਡ_ਮਾਪ_2 = std::min(ਕੁੱਲ, ((ਖੰਡ_ਮਾਪ+cn-1)/cn)*cn);
     size_t esz1 = Angle.elemSize1();
 
-    for( size_t i = 0; i < it.nplanes; i++, ++it )
+    ਲਈ( size_t i = 0; i < it.nplanes; i++, ++it )
     {
-        for( j = 0; j < total; j += blockSize )
+        ਲਈ( j = 0; j < ਕੁੱਲ; j += ਖੰਡ_ਮਾਪ_2 )
         {
-            int len = std::min(total - j, blockSize);
-            if ( depth == CV_32F )
+            ਪੂਰਨ len = std::min(ਕੁੱਲ - j, ਖੰਡ_ਮਾਪ_2);
+            ਜੇ ( ਡੂੰਘਾਈ == CV_32F )
             {
-                const float *mag = (const float*)ptrs[0], *angle = (const float*)ptrs[1];
-                float *x = (float*)ptrs[2], *y = (float*)ptrs[3];
-                hal::polarToCart32f( mag, angle, x, y, len, angleInDegrees );
+                ਅਚਲ ਦਸ਼ਮਲਵ *mag = (ਅਚਲ ਦਸ਼ਮਲਵ*)ptrs[0], *angle = (ਅਚਲ ਦਸ਼ਮਲਵ*)ptrs[1];
+                ਦਸ਼ਮਲਵ *x = (ਦਸ਼ਮਲਵ*)ptrs[2], *y = (ਦਸ਼ਮਲਵ*)ptrs[3];
+                hal::polar_ਮੰਜ਼ਿਲ_Cart32f( mag, angle, x, y, len, angle_ਵਿੱਚ_Degrees );
             }
-            else
+            ਨਹੀਂਤਾਂ
             {
-                const double *mag = (const double*)ptrs[0], *angle = (const double*)ptrs[1];
-                double *x = (double*)ptrs[2], *y = (double*)ptrs[3];
-                hal::polarToCart64f( mag, angle, x, y, len, angleInDegrees );
+                ਅਚਲ ਦੁੱਗਣਾ *mag = (ਅਚਲ ਦੁੱਗਣਾ*)ptrs[0], *angle = (ਅਚਲ ਦੁੱਗਣਾ*)ptrs[1];
+                ਦੁੱਗਣਾ *x = (ਦੁੱਗਣਾ*)ptrs[2], *y = (ਦੁੱਗਣਾ*)ptrs[3];
+                hal::polar_ਮੰਜ਼ਿਲ_Cart64f( mag, angle, x, y, len, angle_ਵਿੱਚ_Degrees );
             }
 
-            if( ptrs[0] )
+            ਜੇ( ptrs[0] )
                 ptrs[0] += len*esz1;
             ptrs[1] += len*esz1;
             ptrs[2] += len*esz1;
@@ -445,46 +445,46 @@ void polarToCart( InputArray src1, InputArray src2,
 //    parallel_for machinery - their setup dominates at these sizes.
 //  - everything else (large arrays - worth parallelizing; ROIs - need real steps): the usual
 //    1-instruction program via compile()/exec().
-enum { MATH_OP_SMALL = 100000 };     // elements; tune with a benchmark if the crossover moves
+ਗਿਣਤੀ { MATH_OP_SMALL = 100000 };     // elements; tune with a benchmark if the crossover moves
 
-static void math_op(ew::TOp op, InputArray _src, OutputArray _dst)
+ਸਥਿਰ ਖਾਲੀ math_op(ew::ਸਿਖਰ op, ਨਿਵੇਸ਼_Array _src, OutputArray _dst)
 {
-    int type = _src.type(), depth = CV_MAT_DEPTH(type);
-    CV_Assert(depth == CV_16F || depth == CV_16BF || depth == CV_32F || depth == CV_64F);
+    ਪੂਰਨ type = _src.type(), ਡੂੰਘਾਈ = CV_MAT_ਡੂੰਘਾਈ(type);
+    CV_Assert(ਡੂੰਘਾਈ == CV_16F || ਡੂੰਘਾਈ == CV_16BF || ਡੂੰਘਾਈ == CV_32F || ਡੂੰਘਾਈ == CV_64F);
 
     Mat src = _src.getMat();
-    _dst.createSameSize(_src, type);   // whole-shape transfer (layout & future metadata included)
+    _dst.create_Same_ਮਾਪ(_src, type);   // whole-shape transfer (layout & future metadata included)
     Mat dst = _dst.getMat();
-    if (src.empty())
-        return;
+    ਜੇ (src.empty())
+        ਵਾਪਸ;
 
-    const size_t total = src.total() * src.channels();
-    if (src.isContinuous() && dst.isContinuous() && total <= (size_t)MATH_OP_SMALL)
+    ਅਚਲ size_t ਕੁੱਲ = src.ਕੁੱਲ() * src.channels();
+    ਜੇ (src.isContinuous() && dst.isContinuous() && ਕੁੱਲ <= (size_t)MATH_OP_SMALL)
     {
-        ew::TKernel k = ew::getMathFunc(op, depth);
+        ew::TKernel k = ew::getMathFunc(op, ਡੂੰਘਾਈ);
         CV_Assert(k.fptr);
-        static const double noparams[4] = {};
-        k.fptr(src.data, 0, 1, nullptr, 0, 0, nullptr, 0, 0,
-               dst.data, 0, (int)total, 1, noparams, k.flags, k.userdata);
-        return;
+        ਸਥਿਰ ਅਚਲ ਦੁੱਗਣਾ noparams[4] = {};
+        k.fptr(src.ਅੰਕੜੇ, 0, 1, ਖਾਲੀ_ਸੂਚਕ, 0, 0, ਖਾਲੀ_ਸੂਚਕ, 0, 0,
+               dst.ਅੰਕੜੇ, 0, (ਪੂਰਨ)ਕੁੱਲ, 1, noparams, k.flags, k.userdata);
+        ਵਾਪਸ;
     }
 
     ew::TExpr p;
-    const int a = p.addInput(depth);
-    const int out = p.addOutput(depth);
-    p.moveToOutput(p.emitUnary(op, a, depth), out);
+    ਅਚਲ ਪੂਰਨ a = p.ਜੋੜੋ_ਨਿਵੇਸ਼(ਡੂੰਘਾਈ);
+    ਅਚਲ ਪੂਰਨ out = p.ਜੋੜੋ_Output(ਡੂੰਘਾਈ);
+    p.move_ਮੰਜ਼ਿਲ_Output(p.emitUnary(op, a, ਡੂੰਘਾਈ), out);
     p.compile();
-    const Mat* inputs[] = { &src };
+    ਅਚਲ Mat* inputs[] = { &src };
     p.exec(inputs, &dst);
 }
 
-void exp( InputArray _src, OutputArray _dst )
+ਖਾਲੀ ਘਾਤਾਂਕ( ਨਿਵੇਸ਼_Array _src, OutputArray _dst )
 {
     CV_INSTRUMENT_REGION();
 
-    [[maybe_unused]] int depth = _src.depth();   // consumed by CV_OCL_RUN only
+    [[maybe_unused]] ਪੂਰਨ ਡੂੰਘਾਈ = _src.ਡੂੰਘਾਈ();   // consumed by CV_OCL_RUN only
 
-    CV_OCL_RUN(_dst.isUMat() && _src.dims() <= 2 && (depth == CV_32F || depth == CV_64F),
+    CV_OCL_ਲੜੀਵਾਰ(_dst.isUMat() && _src.dims() <= 2 && (ਡੂੰਘਾਈ == CV_32F || ਡੂੰਘਾਈ == CV_64F),
                ocl_math_op(_src, noArray(), _dst, OCL_OP_EXP))
 
     math_op(ew::OP_EXP, _src, _dst);
@@ -495,13 +495,13 @@ void exp( InputArray _src, OutputArray _dst )
 *                                          L O G                                         *
 \****************************************************************************************/
 
-void log( InputArray _src, OutputArray _dst )
+ਖਾਲੀ ਲਘੂਗਣਕ( ਨਿਵੇਸ਼_Array _src, OutputArray _dst )
 {
     CV_INSTRUMENT_REGION();
 
-    [[maybe_unused]] int depth = _src.depth();   // consumed by CV_OCL_RUN only
+    [[maybe_unused]] ਪੂਰਨ ਡੂੰਘਾਈ = _src.ਡੂੰਘਾਈ();   // consumed by CV_OCL_RUN only
 
-    CV_OCL_RUN( _dst.isUMat() && _src.dims() <= 2 && (depth == CV_32F || depth == CV_64F),
+    CV_OCL_ਲੜੀਵਾਰ( _dst.isUMat() && _src.dims() <= 2 && (ਡੂੰਘਾਈ == CV_32F || ਡੂੰਘਾਈ == CV_64F),
                 ocl_math_op(_src, noArray(), _dst, OCL_OP_LOG))
 
     math_op(ew::OP_LOG, _src, _dst);
@@ -511,36 +511,36 @@ void log( InputArray _src, OutputArray _dst )
 *                                    P O W E R                                           *
 \****************************************************************************************/
 
-template <typename T, typename WT>
-struct iPow_SIMD
+ਸਾਂਚਾ <ਕਿਸਮ_ਨਾਂ T, ਕਿਸਮ_ਨਾਂ WT>
+ਬਣਤਰ iPow_SIMD
 {
-    int operator() ( const T *, T *, int, int)
+    ਪੂਰਨ ਸੰਚਾਲਕ() ( ਅਚਲ T *, T *, ਪੂਰਨ, ਪੂਰਨ)
     {
-        return 0;
+        ਵਾਪਸ 0;
     }
 };
 
-#if (CV_SIMD || CV_SIMD_SCALABLE)
+#ਜੇ (CV_SIMD || CV_SIMD_SCALABLE)
 
-template <>
-struct iPow_SIMD<uchar, unsigned>
+ਸਾਂਚਾ <>
+ਬਣਤਰ iPow_SIMD<uchar, ਬਿਨਾਨਿਸ਼ਾਨੀ>
 {
-    int operator() ( const uchar * src, uchar * dst, int len, int power )
+    ਪੂਰਨ ਸੰਚਾਲਕ() ( ਅਚਲ uchar * src, uchar * dst, ਪੂਰਨ len, ਪੂਰਨ power )
     {
-        int i = 0;
+        ਪੂਰਨ i = 0;
         v_uint32 v_1 = vx_setall_u32(1u);
 
-        for ( ; i <= len - VTraits<v_uint16>::vlanes(); i += VTraits<v_uint16>::vlanes())
+        ਲਈ ( ; i <= len - VTraits<v_uint16>::vlanes(); i += VTraits<v_uint16>::vlanes())
         {
             v_uint32 v_a1 = v_1, v_a2 = v_1;
-            v_uint16 v = vx_load_expand(src + i);
+            v_uint16 v = vx_ਲੱਦੋ_expand(src + i);
             v_uint32 v_b1, v_b2;
             v_expand(v, v_b1, v_b2);
-            int p = power;
+            ਪੂਰਨ p = power;
 
-            while( p > 1 )
+            ਜਦੋਂ( p > 1 )
             {
-                if (p & 1)
+                ਜੇ (p & 1)
                 {
                     v_a1 = v_mul(v_a1, v_b1);
                     v_a2 = v_mul(v_a2, v_b2);
@@ -558,29 +558,29 @@ struct iPow_SIMD<uchar, unsigned>
         }
         vx_cleanup();
 
-        return i;
+        ਵਾਪਸ i;
     }
 };
 
-template <>
-struct iPow_SIMD<schar, int>
+ਸਾਂਚਾ <>
+ਬਣਤਰ iPow_SIMD<schar, ਪੂਰਨ>
 {
-    int operator() ( const schar * src, schar * dst, int len, int power)
+    ਪੂਰਨ ਸੰਚਾਲਕ() ( ਅਚਲ schar * src, schar * dst, ਪੂਰਨ len, ਪੂਰਨ power)
     {
-        int i = 0;
+        ਪੂਰਨ i = 0;
         v_int32 v_1 = vx_setall_s32(1);
 
-        for ( ; i <= len - VTraits<v_int16>::vlanes(); i += VTraits<v_int16>::vlanes())
+        ਲਈ ( ; i <= len - VTraits<v_int16>::vlanes(); i += VTraits<v_int16>::vlanes())
         {
             v_int32 v_a1 = v_1, v_a2 = v_1;
-            v_int16 v = vx_load_expand(src + i);
+            v_int16 v = vx_ਲੱਦੋ_expand(src + i);
             v_int32 v_b1, v_b2;
             v_expand(v, v_b1, v_b2);
-            int p = power;
+            ਪੂਰਨ p = power;
 
-            while( p > 1 )
+            ਜਦੋਂ( p > 1 )
             {
-                if (p & 1)
+                ਜੇ (p & 1)
                 {
                     v_a1 = v_mul(v_a1, v_b1);
                     v_a2 = v_mul(v_a2, v_b2);
@@ -598,29 +598,29 @@ struct iPow_SIMD<schar, int>
         }
         vx_cleanup();
 
-        return i;
+        ਵਾਪਸ i;
     }
 };
 
-template <>
-struct iPow_SIMD<ushort, unsigned>
+ਸਾਂਚਾ <>
+ਬਣਤਰ iPow_SIMD<ushort, ਬਿਨਾਨਿਸ਼ਾਨੀ>
 {
-    int operator() ( const ushort * src, ushort * dst, int len, int power)
+    ਪੂਰਨ ਸੰਚਾਲਕ() ( ਅਚਲ ushort * src, ushort * dst, ਪੂਰਨ len, ਪੂਰਨ power)
     {
-        int i = 0;
+        ਪੂਰਨ i = 0;
         v_uint32 v_1 = vx_setall_u32(1u);
 
-        for ( ; i <= len - VTraits<v_uint16>::vlanes(); i += VTraits<v_uint16>::vlanes())
+        ਲਈ ( ; i <= len - VTraits<v_uint16>::vlanes(); i += VTraits<v_uint16>::vlanes())
         {
             v_uint32 v_a1 = v_1, v_a2 = v_1;
-            v_uint16 v = vx_load(src + i);
+            v_uint16 v = vx_ਲੱਦੋ(src + i);
             v_uint32 v_b1, v_b2;
             v_expand(v, v_b1, v_b2);
-            int p = power;
+            ਪੂਰਨ p = power;
 
-            while( p > 1 )
+            ਜਦੋਂ( p > 1 )
             {
-                if (p & 1)
+                ਜੇ (p & 1)
                 {
                     v_a1 = v_mul(v_a1, v_b1);
                     v_a2 = v_mul(v_a2, v_b2);
@@ -638,29 +638,29 @@ struct iPow_SIMD<ushort, unsigned>
         }
         vx_cleanup();
 
-        return i;
+        ਵਾਪਸ i;
     }
 };
 
-template <>
-struct iPow_SIMD<short, int>
+ਸਾਂਚਾ <>
+ਬਣਤਰ iPow_SIMD<ਛੋਟਾ, ਪੂਰਨ>
 {
-    int operator() ( const short * src, short * dst, int len, int power)
+    ਪੂਰਨ ਸੰਚਾਲਕ() ( ਅਚਲ ਛੋਟਾ * src, ਛੋਟਾ * dst, ਪੂਰਨ len, ਪੂਰਨ power)
     {
-        int i = 0;
+        ਪੂਰਨ i = 0;
         v_int32 v_1 = vx_setall_s32(1);
 
-        for ( ; i <= len - VTraits<v_int16>::vlanes(); i += VTraits<v_int16>::vlanes())
+        ਲਈ ( ; i <= len - VTraits<v_int16>::vlanes(); i += VTraits<v_int16>::vlanes())
         {
             v_int32 v_a1 = v_1, v_a2 = v_1;
-            v_int16 v = vx_load(src + i);
+            v_int16 v = vx_ਲੱਦੋ(src + i);
             v_int32 v_b1, v_b2;
             v_expand(v, v_b1, v_b2);
-            int p = power;
+            ਪੂਰਨ p = power;
 
-            while( p > 1 )
+            ਜਦੋਂ( p > 1 )
             {
-                if (p & 1)
+                ਜੇ (p & 1)
                 {
                     v_a1 = v_mul(v_a1, v_b1);
                     v_a2 = v_mul(v_a2, v_b2);
@@ -678,27 +678,27 @@ struct iPow_SIMD<short, int>
         }
         vx_cleanup();
 
-        return i;
+        ਵਾਪਸ i;
     }
 };
 
-template <>
-struct iPow_SIMD<int, int>
+ਸਾਂਚਾ <>
+ਬਣਤਰ iPow_SIMD<ਪੂਰਨ, ਪੂਰਨ>
 {
-    int operator() ( const int * src, int * dst, int len, int power)
+    ਪੂਰਨ ਸੰਚਾਲਕ() ( ਅਚਲ ਪੂਰਨ * src, ਪੂਰਨ * dst, ਪੂਰਨ len, ਪੂਰਨ power)
     {
-        int i = 0;
+        ਪੂਰਨ i = 0;
         v_int32 v_1 = vx_setall_s32(1);
 
-        for ( ; i <= len - VTraits<v_int32>::vlanes()*2; i += VTraits<v_int32>::vlanes()*2)
+        ਲਈ ( ; i <= len - VTraits<v_int32>::vlanes()*2; i += VTraits<v_int32>::vlanes()*2)
         {
             v_int32 v_a1 = v_1, v_a2 = v_1;
-            v_int32 v_b1 = vx_load(src + i), v_b2 = vx_load(src + i + VTraits<v_int32>::vlanes());
-            int p = power;
+            v_int32 v_b1 = vx_ਲੱਦੋ(src + i), v_b2 = vx_ਲੱਦੋ(src + i + VTraits<v_int32>::vlanes());
+            ਪੂਰਨ p = power;
 
-            while( p > 1 )
+            ਜਦੋਂ( p > 1 )
             {
-                if (p & 1)
+                ਜੇ (p & 1)
                 {
                     v_a1 = v_mul(v_a1, v_b1);
                     v_a2 = v_mul(v_a2, v_b2);
@@ -716,32 +716,32 @@ struct iPow_SIMD<int, int>
         }
         vx_cleanup();
 
-        return i;
+        ਵਾਪਸ i;
     }
 };
 
-template <>
-struct iPow_SIMD<float, float>
+ਸਾਂਚਾ <>
+ਬਣਤਰ iPow_SIMD<ਦਸ਼ਮਲਵ, ਦਸ਼ਮਲਵ>
 {
-    int operator() ( const float * src, float * dst, int len, int power)
+    ਪੂਰਨ ਸੰਚਾਲਕ() ( ਅਚਲ ਦਸ਼ਮਲਵ * src, ਦਸ਼ਮਲਵ * dst, ਪੂਰਨ len, ਪੂਰਨ power)
     {
-        int i = 0;
+        ਪੂਰਨ i = 0;
         v_float32 v_1 = vx_setall_f32(1.f);
 
-        for ( ; i <= len - VTraits<v_float32>::vlanes()*2; i += VTraits<v_float32>::vlanes()*2)
+        ਲਈ ( ; i <= len - VTraits<v_float32>::vlanes()*2; i += VTraits<v_float32>::vlanes()*2)
         {
             v_float32 v_a1 = v_1, v_a2 = v_1;
-            v_float32 v_b1 = vx_load(src + i), v_b2 = vx_load(src + i + VTraits<v_float32>::vlanes());
-            int p = std::abs(power);
-            if( power < 0 )
+            v_float32 v_b1 = vx_ਲੱਦੋ(src + i), v_b2 = vx_ਲੱਦੋ(src + i + VTraits<v_float32>::vlanes());
+            ਪੂਰਨ p = std::ਨਿਰਪੇਖ(power);
+            ਜੇ( power < 0 )
             {
                 v_b1 = v_div(v_1, v_b1);
                 v_b2 = v_div(v_1, v_b2);
             }
 
-            while( p > 1 )
+            ਜਦੋਂ( p > 1 )
             {
-                if (p & 1)
+                ਜੇ (p & 1)
                 {
                     v_a1 = v_mul(v_a1, v_b1);
                     v_a2 = v_mul(v_a2, v_b2);
@@ -759,33 +759,33 @@ struct iPow_SIMD<float, float>
         }
         vx_cleanup();
 
-        return i;
+        ਵਾਪਸ i;
     }
 };
 
-#if (CV_SIMD_64F || CV_SIMD_SCALABLE_64F)
-template <>
-struct iPow_SIMD<double, double>
+#ਜੇ (CV_SIMD_64F || CV_SIMD_SCALABLE_64F)
+ਸਾਂਚਾ <>
+ਬਣਤਰ iPow_SIMD<ਦੁੱਗਣਾ, ਦੁੱਗਣਾ>
 {
-    int operator() ( const double * src, double * dst, int len, int power)
+    ਪੂਰਨ ਸੰਚਾਲਕ() ( ਅਚਲ ਦੁੱਗਣਾ * src, ਦੁੱਗਣਾ * dst, ਪੂਰਨ len, ਪੂਰਨ power)
     {
-        int i = 0;
+        ਪੂਰਨ i = 0;
         v_float64 v_1 = vx_setall_f64(1.);
 
-        for ( ; i <= len - VTraits<v_float64>::vlanes()*2; i += VTraits<v_float64>::vlanes()*2)
+        ਲਈ ( ; i <= len - VTraits<v_float64>::vlanes()*2; i += VTraits<v_float64>::vlanes()*2)
         {
             v_float64 v_a1 = v_1, v_a2 = v_1;
-            v_float64 v_b1 = vx_load(src + i), v_b2 = vx_load(src + i + VTraits<v_float64>::vlanes());
-            int p = std::abs(power);
-            if( power < 0 )
+            v_float64 v_b1 = vx_ਲੱਦੋ(src + i), v_b2 = vx_ਲੱਦੋ(src + i + VTraits<v_float64>::vlanes());
+            ਪੂਰਨ p = std::ਨਿਰਪੇਖ(power);
+            ਜੇ( power < 0 )
             {
                 v_b1 = v_div(v_1, v_b1);
                 v_b2 = v_div(v_1, v_b2);
             }
 
-            while( p > 1 )
+            ਜਦੋਂ( p > 1 )
             {
-                if (p & 1)
+                ਜੇ (p & 1)
                 {
                     v_a1 = v_mul(v_a1, v_b1);
                     v_a2 = v_mul(v_a2, v_b2);
@@ -803,44 +803,44 @@ struct iPow_SIMD<double, double>
         }
         vx_cleanup();
 
-        return i;
+        ਵਾਪਸ i;
     }
 };
-#endif
+#ਜੇ_ਅੰਤ
 
-#endif
+#ਜੇ_ਅੰਤ
 
-template<typename T, typename WT>
-static void
-iPow_i( const void* _src, void* _dst, int len, int power )
+ਸਾਂਚਾ<ਕਿਸਮ_ਨਾਂ T, ਕਿਸਮ_ਨਾਂ WT>
+ਸਥਿਰ ਖਾਲੀ
+iPow_i( ਅਚਲ ਖਾਲੀ* _src, ਖਾਲੀ* _dst, ਪੂਰਨ len, ਪੂਰਨ power )
 {
-    const T* src = (const T*)_src;
+    ਅਚਲ T* src = (ਅਚਲ T*)_src;
     T* dst = (T*)_dst;
-    if( power < 0 )
+    ਜੇ( power < 0 )
     {
         T tab[5] =
         {
             saturate_cast<T>(power == -1 ? -1 : 0), saturate_cast<T>((power & 1) ? -1 : 1),
             std::numeric_limits<T>::max(), 1, saturate_cast<T>(power == -1 ? 1 : 0)
         };
-        for( int i = 0; i < len; i++ )
+        ਲਈ( ਪੂਰਨ i = 0; i < len; i++ )
         {
             T val = src[i];
             dst[i] = cv_abs(val) <= 2 ? tab[val + 2] : (T)0;
         }
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
         iPow_SIMD<T, WT> vop;
-        int i = vop(src, dst, len, power);
+        ਪੂਰਨ i = vop(src, dst, len, power);
 
-        for( ; i < len; i++ )
+        ਲਈ( ; i < len; i++ )
         {
             WT a = 1, b = src[i];
-            int p = power;
-            while( p > 1 )
+            ਪੂਰਨ p = power;
+            ਜਦੋਂ( p > 1 )
             {
-                if( p & 1 )
+                ਜੇ( p & 1 )
                     a *= b;
                 b *= b;
                 p >>= 1;
@@ -852,26 +852,26 @@ iPow_i( const void* _src, void* _dst, int len, int power )
     }
 }
 
-template<typename T>
-static void
-iPow_f( const void* _src, void* _dst, int len, int power0 )
+ਸਾਂਚਾ<ਕਿਸਮ_ਨਾਂ T>
+ਸਥਿਰ ਖਾਲੀ
+iPow_f( ਅਚਲ ਖਾਲੀ* _src, ਖਾਲੀ* _dst, ਪੂਰਨ len, ਪੂਰਨ power0 )
 {
-    const T* src = (const T*)_src;
+    ਅਚਲ T* src = (ਅਚਲ T*)_src;
     T* dst = (T*)_dst;
     iPow_SIMD<T, T> vop;
-    int i = vop(src, dst, len, power0);
-    int power = std::abs(power0);
+    ਪੂਰਨ i = vop(src, dst, len, power0);
+    ਪੂਰਨ power = std::ਨਿਰਪੇਖ(power0);
 
-    for( ; i < len; i++ )
+    ਲਈ( ; i < len; i++ )
     {
         T a = 1, b = src[i];
-        int p = power;
-        if( power0 < 0 )
+        ਪੂਰਨ p = power;
+        ਜੇ( power0 < 0 )
             b = 1/b;
 
-        while( p > 1 )
+        ਜਦੋਂ( p > 1 )
         {
-            if( p & 1 )
+            ਜੇ( p & 1 )
                 a *= b;
             b *= b;
             p >>= 1;
@@ -882,282 +882,282 @@ iPow_f( const void* _src, void* _dst, int len, int power0 )
     }
 }
 
-typedef void (*IPowFunc)( const void* src, void* dst, int len, int power );
+ਕਿਸਮਪਰਿਭਾਸ਼ਾ ਖਾਲੀ (*IPowFunc)( ਅਚਲ ਖਾਲੀ* src, ਖਾਲੀ* dst, ਪੂਰਨ len, ਪੂਰਨ power );
 
-static IPowFunc ipowTab[CV_DEPTH_MAX] =
+ਸਥਿਰ IPowFunc ipowTab[CV_ਡੂੰਘਾਈ_MAX] =
 {
-    iPow_i<uchar, unsigned>, iPow_i<schar, int>, iPow_i<ushort, unsigned>, iPow_i<short, int>,
-    iPow_i<int, int>, iPow_f<float>, iPow_f<double>, 0
+    iPow_i<uchar, ਬਿਨਾਨਿਸ਼ਾਨੀ>, iPow_i<schar, ਪੂਰਨ>, iPow_i<ushort, ਬਿਨਾਨਿਸ਼ਾਨੀ>, iPow_i<ਛੋਟਾ, ਪੂਰਨ>,
+    iPow_i<ਪੂਰਨ, ਪੂਰਨ>, iPow_f<ਦਸ਼ਮਲਵ>, iPow_f<ਦੁੱਗਣਾ>, 0
 };
 
-#ifdef HAVE_OPENCL
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ HAVE_OPENCL
 
-static bool ocl_pow(InputArray _src, double power, OutputArray _dst,
-                    bool is_ipower, int ipower)
+ਸਥਿਰ ਤਾਰਕਿਕ ocl_pow(ਨਿਵੇਸ਼_Array _src, ਦੁੱਗਣਾ power, OutputArray _dst,
+                    ਤਾਰਕਿਕ is_ipower, ਪੂਰਨ ipower)
 {
-    const ocl::Device & d = ocl::Device::getDefault();
-    int type = _src.type(), depth = CV_MAT_DEPTH(type), cn = CV_MAT_CN(type),
-            rowsPerWI = d.isIntel() ? 4 : 1;
-    bool doubleSupport = d.doubleFPConfig() > 0;
+    ਅਚਲ ocl::Device & d = ocl::Device::getDefault();
+    ਪੂਰਨ type = _src.type(), ਡੂੰਘਾਈ = CV_MAT_ਡੂੰਘਾਈ(type), cn = CV_MAT_CN(type),
+            ਪੰਕਤੀਆਂ_ਪ੍ਰਤੀ_WI = d.isIntel() ? 4 : 1;
+    ਤਾਰਕਿਕ doubleSupport = d.doubleFPConfig() > 0;
 
-    _dst.createSameSize(_src, type);
-    if (is_ipower)
+    _dst.create_Same_ਮਾਪ(_src, type);
+    ਜੇ (is_ipower)
     {
-        if( ipower < 0 )
+        ਜੇ( ipower < 0 )
         {
-            if( depth == CV_32F || depth == CV_64F )
-                is_ipower = false;
-            else
-                return false;
+            ਜੇ( ਡੂੰਘਾਈ == CV_32F || ਡੂੰਘਾਈ == CV_64F )
+                is_ipower = ਝੂਠ;
+            ਨਹੀਂਤਾਂ
+                ਵਾਪਸ ਝੂਠ;
         }
     }
 
-    if (depth == CV_64F && !doubleSupport)
-        return false;
+    ਜੇ (ਡੂੰਘਾਈ == CV_64F && !doubleSupport)
+        ਵਾਪਸ ਝੂਠ;
 
-    bool issqrt = std::abs(power - 0.5) < DBL_EPSILON;
-    const char * const op = issqrt ? "OP_SQRT" : is_ipower ? "OP_POWN" : "OP_POW";
+    ਤਾਰਕਿਕ issqrt = std::ਨਿਰਪੇਖ(power - 0.5) < DBL_EPSILON;
+    ਅਚਲ ਅੱਖਰ * ਅਚਲ op = issqrt ? "OP_SQRT" : is_ipower ? "OP_POWN" : "OP_POW";
 
     // Note: channels are unrolled
 
     std::string extra_opts ="";
-    if (is_ipower)
+    ਜੇ (is_ipower)
     {
-        int wdepth = CV_32F;
-        if (depth == CV_64F)
+        ਪੂਰਨ wdepth = CV_32F;
+        ਜੇ (ਡੂੰਘਾਈ == CV_64F)
             wdepth = CV_64F;
-        else if (depth == CV_16F)
+        ਨਹੀਂਤਾਂ ਜੇ (ਡੂੰਘਾਈ == CV_16F)
             wdepth = CV_16F;
 
-        char cvt[2][50];
+        ਅੱਖਰ cvt[2][50];
         extra_opts = format(
             " -D srcT1=%s -DsrcT1_C1=%s"
             " -D srcT2=int -D workST=int"
             " -D workT=%s -D wdepth=%d -D convertToWT1=%s"
             " -D convertToDT=%s"
             " -D workT1=%s",
-            ocl::typeToStr(CV_MAKE_TYPE(depth, 1)),
-            ocl::typeToStr(CV_MAKE_TYPE(depth, 1)),
-            ocl::typeToStr(CV_MAKE_TYPE(wdepth, 1)),
+            ocl::type_ਮੰਜ਼ਿਲ_Str(CV_MAKE_TYPE(ਡੂੰਘਾਈ, 1)),
+            ocl::type_ਮੰਜ਼ਿਲ_Str(CV_MAKE_TYPE(ਡੂੰਘਾਈ, 1)),
+            ocl::type_ਮੰਜ਼ਿਲ_Str(CV_MAKE_TYPE(wdepth, 1)),
             wdepth,
-            ocl::convertTypeStr(depth, wdepth, 1, cvt[0], sizeof(cvt[0])),
-            ocl::convertTypeStr(wdepth, depth, 1, cvt[1], sizeof(cvt[1])),
-            ocl::typeToStr(wdepth)
+            ocl::convertTypeStr(ਡੂੰਘਾਈ, wdepth, 1, cvt[0], ਆਕਾਰ(cvt[0])),
+            ocl::convertTypeStr(wdepth, ਡੂੰਘਾਈ, 1, cvt[1], ਆਕਾਰ(cvt[1])),
+            ocl::type_ਮੰਜ਼ਿਲ_Str(wdepth)
         );
     }
 
     ocl::Kernel k("KF", ocl::core::arithm_oclsrc,
                   format("-D cn=%d -D dstT=%s -D dstT_C1=%s -D DEPTH_dst=%d -D rowsPerWI=%d -D %s%s%s%s",
                          1,
-                         ocl::typeToStr(depth), ocl::typeToStr(depth), depth, rowsPerWI, op,
+                         ocl::type_ਮੰਜ਼ਿਲ_Str(ਡੂੰਘਾਈ), ocl::type_ਮੰਜ਼ਿਲ_Str(ਡੂੰਘਾਈ), ਡੂੰਘਾਈ, ਪੰਕਤੀਆਂ_ਪ੍ਰਤੀ_WI, op,
                          " -D UNARY_OP=1",
                          extra_opts.empty() ? "" : extra_opts.c_str(),
                          doubleSupport ? " -D DOUBLE_SUPPORT" : ""));
-    if (k.empty())
-        return false;
+    ਜੇ (k.empty())
+        ਵਾਪਸ ਝੂਠ;
 
     UMat src = _src.getUMat();
-    _dst.createSameSize(src, type);
+    _dst.create_Same_ਮਾਪ(src, type);
     UMat dst = _dst.getUMat();
 
-    ocl::KernelArg srcarg = ocl::KernelArg::ReadOnlyNoSize(src),
+    ocl::KernelArg srcarg = ocl::KernelArg::Read_Only_No_ਮਾਪ(src),
             dstarg = ocl::KernelArg::WriteOnly(dst, cn);
 
-    if (issqrt)
-        k.args(srcarg, dstarg);
-    else if (is_ipower)
-        k.args(srcarg, dstarg, ipower);
-    else
+    ਜੇ (issqrt)
+        k.ਦਲੀਲਾਂ(srcarg, dstarg);
+    ਨਹੀਂਤਾਂ ਜੇ (is_ipower)
+        k.ਦਲੀਲਾਂ(srcarg, dstarg, ipower);
+    ਨਹੀਂਤਾਂ
     {
-        if (depth == CV_32F)
-            k.args(srcarg, dstarg, (float)power);
-        else
-            k.args(srcarg, dstarg, power);
+        ਜੇ (ਡੂੰਘਾਈ == CV_32F)
+            k.ਦਲੀਲਾਂ(srcarg, dstarg, (ਦਸ਼ਮਲਵ)power);
+        ਨਹੀਂਤਾਂ
+            k.ਦਲੀਲਾਂ(srcarg, dstarg, power);
     }
 
-    size_t globalsize[2] = { (size_t)dst.cols *  cn, ((size_t)dst.rows + rowsPerWI - 1) / rowsPerWI };
-    return k.run(2, globalsize, NULL, false);
+    size_t globalsize[2] = { (size_t)dst.ਖਾਨੇ_ਗਿਣਤੀ *  cn, ((size_t)dst.ਪੰਕਤੀਆਂ + ਪੰਕਤੀਆਂ_ਪ੍ਰਤੀ_WI - 1) / ਪੰਕਤੀਆਂ_ਪ੍ਰਤੀ_WI };
+    ਵਾਪਸ k.ਲੜੀਵਾਰ(2, globalsize, ਨਿਰਾ, ਝੂਠ);
 }
 
-#endif
+#ਜੇ_ਅੰਤ
 
-void pow( InputArray _src, double power, OutputArray _dst )
+ਖਾਲੀ ਘਾਤ( ਨਿਵੇਸ਼_Array _src, ਦੁੱਗਣਾ power, OutputArray _dst )
 {
     CV_INSTRUMENT_REGION();
 
-    int type = _src.type(), depth = CV_MAT_DEPTH(type),
-            cn = CV_MAT_CN(type), ipower = cvRound(power);
-    bool is_ipower = fabs(ipower - power) < DBL_EPSILON;
-#ifdef HAVE_OPENCL
-    bool useOpenCL = _dst.isUMat() && _src.dims() <= 2;
-#endif
+    ਪੂਰਨ type = _src.type(), ਡੂੰਘਾਈ = CV_MAT_ਡੂੰਘਾਈ(type),
+            cn = CV_MAT_CN(type), ipower = cv_ਗੇੜਾ(power);
+    ਤਾਰਕਿਕ is_ipower = fabs(ipower - power) < DBL_EPSILON;
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ HAVE_OPENCL
+    ਤਾਰਕਿਕ useOpenCL = _dst.isUMat() && _src.dims() <= 2;
+#ਜੇ_ਅੰਤ
 
-    if (is_ipower)
+    ਜੇ (is_ipower)
     {
-        switch( ipower )
+        ਚੋਣ( ipower )
         {
-        case 0:
-            _dst.createSameSize(_src, type);
-            _dst.setTo(Scalar::all(1));
-            return;
-        case 1:
-            _src.copyTo(_dst);
-            return;
-        case 2:
+        ਹਾਲਤ 0:
+            _dst.create_Same_ਮਾਪ(_src, type);
+            _dst.ਸੈੱਟ_ਮੰਜ਼ਿਲ(Scalar::all(1));
+            ਵਾਪਸ;
+        ਹਾਲਤ 1:
+            _src.copy_ਮੰਜ਼ਿਲ(_dst);
+            ਵਾਪਸ;
+        ਹਾਲਤ 2:
             multiply(_src, _src, _dst);
-            return;
+            ਵਾਪਸ;
         }
     }
 
-    CV_OCL_RUN(useOpenCL, ocl_pow(_src, power, _dst, is_ipower, ipower))
+    CV_OCL_ਲੜੀਵਾਰ(useOpenCL, ocl_pow(_src, power, _dst, is_ipower, ipower))
 
-    const bool floatDepth = depth == CV_16F || depth == CV_16BF || depth == CV_32F || depth == CV_64F;
+    ਅਚਲ ਤਾਰਕਿਕ float_ਡੂੰਘਾਈ = ਡੂੰਘਾਈ == CV_16F || ਡੂੰਘਾਈ == CV_16BF || ਡੂੰਘਾਈ == CV_32F || ਡੂੰਘਾਈ == CV_64F;
 
     // INTEGER array ** INTEGER power: keep the classic iPow kernels (an exact multiply chain with
     // the classic wrap-around semantics) - full bit-exact compatibility for whoever relies on it.
     // Everything else - any power on a float array, a fractional power on an integer one (computed
     // in the float domain and saturated back), plus the 32U/64-bit depths iPow never supported -
     // goes through the engine below.
-    if( is_ipower && !floatDepth && ipowTab[depth] )
+    ਜੇ( is_ipower && !float_ਡੂੰਘਾਈ && ipowTab[ਡੂੰਘਾਈ] )
     {
         Mat src = _src.getMat();
-        _dst.createSameSize(_src, type);
+        _dst.create_Same_ਮਾਪ(_src, type);
         Mat dst = _dst.getMat();
 
-        const Mat* arrays[] = {&src, &dst, 0};
+        ਅਚਲ Mat* arrays[] = {&src, &dst, 0};
         uchar* ptrs[2] = {};
         NAryMatIterator it(arrays, ptrs);
-        int len = (int)(it.size*cn);
-        IPowFunc func = ipowTab[depth];
+        ਪੂਰਨ len = (ਪੂਰਨ)(it.size*cn);
+        IPowFunc func = ipowTab[ਡੂੰਘਾਈ];
 
-        for( size_t i = 0; i < it.nplanes; i++, ++it )
+        ਲਈ( size_t i = 0; i < it.nplanes; i++, ++it )
             func( ptrs[0], ptrs[1], len, ipower );
-        return;
+        ਵਾਪਸ;
     }
 
     // The engine path, two tiers like math_op: the pow kernel special-cases the exponents
     // 3/0.5 (2/1/0 never reach here) per row and vectorizes the general exp(p*log x) with an exact
     // std::pow patch for non-positive bases (0^negative -> inf, negative^fractional -> NaN).
     Mat src = _src.getMat();
-    _dst.createSameSize(_src, type);
+    _dst.create_Same_ਮਾਪ(_src, type);
     Mat dst = _dst.getMat();
-    if (src.empty())
-        return;
+    ਜੇ (src.empty())
+        ਵਾਪਸ;
 
-    const size_t total = src.total() * cn;
-    if (floatDepth && src.isContinuous() && dst.isContinuous() && total <= (size_t)MATH_OP_SMALL)
+    ਅਚਲ size_t ਕੁੱਲ = src.ਕੁੱਲ() * cn;
+    ਜੇ (float_ਡੂੰਘਾਈ && src.isContinuous() && dst.isContinuous() && ਕੁੱਲ <= (size_t)MATH_OP_SMALL)
     {
-        ew::TKernel k = ew::getPowFunc(depth, depth);
-        if (k.fptr)
+        ew::TKernel k = ew::getPowFunc(ਡੂੰਘਾਈ, ਡੂੰਘਾਈ);
+        ਜੇ (k.fptr)
         {
-            double pvstore;                    // the broadcast exponent, stored as T
-            void* pv = &pvstore;
-            switch (depth)
+            ਦੁੱਗਣਾ pvstore;                    // the broadcast exponent, stored as T
+            ਖਾਲੀ* pv = &pvstore;
+            ਚੋਣ (ਡੂੰਘਾਈ)
             {
-            case CV_16F:  *(hfloat*)pv = saturate_cast<hfloat>(power); break;
-            case CV_16BF: *(bfloat*)pv = saturate_cast<bfloat>(power); break;
-            case CV_32F:  *(float*)pv = (float)power; break;
-            default:      pvstore = power; break;
+            ਹਾਲਤ CV_16F:  *(hfloat*)pv = saturate_cast<hfloat>(power); ਰੋਕੋ;
+            ਹਾਲਤ CV_16BF: *(bfloat*)pv = saturate_cast<bfloat>(power); ਰੋਕੋ;
+            ਹਾਲਤ CV_32F:  *(ਦਸ਼ਮਲਵ*)pv = (ਦਸ਼ਮਲਵ)power; ਰੋਕੋ;
+            ਮੂਲ:      pvstore = power; ਰੋਕੋ;
             }
-            static const double noparams[4] = {};
-            k.fptr(src.data, 0, 1, pv, 0, 0, nullptr, 0, 0,
-                   dst.data, 0, (int)total, 1, noparams, k.flags, k.userdata);
-            return;
+            ਸਥਿਰ ਅਚਲ ਦੁੱਗਣਾ noparams[4] = {};
+            k.fptr(src.ਅੰਕੜੇ, 0, 1, pv, 0, 0, ਖਾਲੀ_ਸੂਚਕ, 0, 0,
+                   dst.ਅੰਕੜੇ, 0, (ਪੂਰਨ)ਕੁੱਲ, 1, noparams, k.flags, k.userdata);
+            ਵਾਪਸ;
         }
     }
 
     ew::TExpr prog;
-    const int a = prog.addInput(depth);
-    const int c = prog.addConst(ew::EW_DEPTH_NONE, Scalar(power), 1);
-    const int out = prog.addOutput(depth);
-    prog.moveToOutput(prog.emitBinary(ew::OP_POW, a, c, depth), out);
+    ਅਚਲ ਪੂਰਨ a = prog.ਜੋੜੋ_ਨਿਵੇਸ਼(ਡੂੰਘਾਈ);
+    ਅਚਲ ਪੂਰਨ c = prog.ਜੋੜੋ_Const(ew::EW_ਡੂੰਘਾਈ_NONE, Scalar(power), 1);
+    ਅਚਲ ਪੂਰਨ out = prog.ਜੋੜੋ_Output(ਡੂੰਘਾਈ);
+    prog.move_ਮੰਜ਼ਿਲ_Output(prog.emit_ਦੁਆਧਾਰੀ(ew::OP_POW, a, c, ਡੂੰਘਾਈ), out);
     prog.compile();
-    const Mat* inputs[] = { &src };
+    ਅਚਲ Mat* inputs[] = { &src };
     prog.exec(inputs, &dst);
 }
 
-void sqrt(InputArray a, OutputArray b)
+ਖਾਲੀ ਵਰਗਮੂਲ(ਨਿਵੇਸ਼_Array a, OutputArray b)
 {
     CV_INSTRUMENT_REGION();
 
-    if (b.isUMat() && a.dims() <= 2)     // the OpenCL route (via ocl_pow) is unchanged
+    ਜੇ (b.isUMat() && a.dims() <= 2)     // the OpenCL route (via ocl_pow) is unchanged
     {
-        cv::pow(a, 0.5, b);
-        return;
+        cv::ਘਾਤ(a, 0.5, b);
+        ਵਾਪਸ;
     }
     math_op(ew::OP_SQRT, a, b);
 }
 
 /************************** CheckArray for NaN's, Inf's *********************************/
 
-template<int cv_mat_type> struct mat_type_assotiations{};
+ਸਾਂਚਾ<ਪੂਰਨ cv_mat_type> ਬਣਤਰ mat_type_assotiations{};
 
-template<> struct mat_type_assotiations<CV_8U>
+ਸਾਂਚਾ<> ਬਣਤਰ mat_type_assotiations<CV_8U>
 {
-    typedef unsigned char type;
-    static const type min_allowable = 0x0;
-    static const type max_allowable = 0xFF;
+    ਕਿਸਮਪਰਿਭਾਸ਼ਾ ਬਿਨਾਨਿਸ਼ਾਨੀ ਅੱਖਰ type;
+    ਸਥਿਰ ਅਚਲ type min_allowable = 0x0;
+    ਸਥਿਰ ਅਚਲ type max_allowable = 0xFF;
 };
 
-template<> struct mat_type_assotiations<CV_8S>
+ਸਾਂਚਾ<> ਬਣਤਰ mat_type_assotiations<CV_8S>
 {
-    typedef signed char type;
-    static const type min_allowable = SCHAR_MIN;
-    static const type max_allowable = SCHAR_MAX;
+    ਕਿਸਮਪਰਿਭਾਸ਼ਾ ਨਿਸ਼ਾਨੀਵਾਲਾ ਅੱਖਰ type;
+    ਸਥਿਰ ਅਚਲ type min_allowable = SCHAR_MIN;
+    ਸਥਿਰ ਅਚਲ type max_allowable = SCHAR_MAX;
 };
 
-template<> struct mat_type_assotiations<CV_16U>
+ਸਾਂਚਾ<> ਬਣਤਰ mat_type_assotiations<CV_16U>
 {
-    typedef unsigned short type;
-    static const type min_allowable = 0x0;
-    static const type max_allowable = USHRT_MAX;
+    ਕਿਸਮਪਰਿਭਾਸ਼ਾ ਬਿਨਾਨਿਸ਼ਾਨੀ ਛੋਟਾ type;
+    ਸਥਿਰ ਅਚਲ type min_allowable = 0x0;
+    ਸਥਿਰ ਅਚਲ type max_allowable = USHRT_MAX;
 };
-template<> struct mat_type_assotiations<CV_16S>
+ਸਾਂਚਾ<> ਬਣਤਰ mat_type_assotiations<CV_16S>
 {
-    typedef signed short type;
-    static const type min_allowable = SHRT_MIN;
-    static const type max_allowable = SHRT_MAX;
-};
-
-template<> struct mat_type_assotiations<CV_32S>
-{
-    typedef int type;
-    static const type min_allowable = (-INT_MAX - 1);
-    static const type max_allowable = INT_MAX;
+    ਕਿਸਮਪਰਿਭਾਸ਼ਾ ਨਿਸ਼ਾਨੀਵਾਲਾ ਛੋਟਾ type;
+    ਸਥਿਰ ਅਚਲ type min_allowable = SHRT_MIN;
+    ਸਥਿਰ ਅਚਲ type max_allowable = SHRT_MAX;
 };
 
-template<int depth>
-static bool checkIntegerRange(cv::Mat src, Point& bad_pt, int minVal, int maxVal)
+ਸਾਂਚਾ<> ਬਣਤਰ mat_type_assotiations<CV_32S>
 {
-    typedef mat_type_assotiations<depth> type_ass;
+    ਕਿਸਮਪਰਿਭਾਸ਼ਾ ਪੂਰਨ type;
+    ਸਥਿਰ ਅਚਲ type min_allowable = (-ਵੱਧ_ਤੋਂ_ਵੱਧ_ਅੰਕ - 1);
+    ਸਥਿਰ ਅਚਲ type max_allowable = ਵੱਧ_ਤੋਂ_ਵੱਧ_ਅੰਕ;
+};
 
-    if (minVal < type_ass::min_allowable && maxVal > type_ass::max_allowable)
+ਸਾਂਚਾ<ਪੂਰਨ ਡੂੰਘਾਈ>
+ਸਥਿਰ ਤਾਰਕਿਕ checkIntegerRange(cv::Mat src, ਬਿੰਦੂ& bad_pt, ਪੂਰਨ minVal, ਪੂਰਨ maxVal)
+{
+    ਕਿਸਮਪਰਿਭਾਸ਼ਾ mat_type_assotiations<ਡੂੰਘਾਈ> type_ass;
+
+    ਜੇ (minVal < type_ass::min_allowable && maxVal > type_ass::max_allowable)
     {
-        return true;
+        ਵਾਪਸ ਸੱਚ;
     }
-    else if (minVal > type_ass::max_allowable || maxVal < type_ass::min_allowable || maxVal < minVal)
+    ਨਹੀਂਤਾਂ ਜੇ (minVal > type_ass::max_allowable || maxVal < type_ass::min_allowable || maxVal < minVal)
     {
-        bad_pt = cv::Point(0,0);
-        return false;
+        bad_pt = cv::ਬਿੰਦੂ(0,0);
+        ਵਾਪਸ ਝੂਠ;
     }
     cv::Mat as_one_channel = src.reshape(1,0);
 
-    for (int j = 0; j < as_one_channel.rows; ++j)
-        for (int i = 0; i < as_one_channel.cols; ++i)
+    ਲਈ (ਪੂਰਨ j = 0; j < as_one_channel.ਪੰਕਤੀਆਂ; ++j)
+        ਲਈ (ਪੂਰਨ i = 0; i < as_one_channel.ਖਾਨੇ_ਗਿਣਤੀ; ++i)
         {
-            typename type_ass::type v = as_one_channel.at<typename type_ass::type>(j ,i);
-            if (v < minVal || v > maxVal)
+            ਕਿਸਮ_ਨਾਂ type_ass::type v = as_one_channel.at<ਕਿਸਮ_ਨਾਂ type_ass::type>(j ,i);
+            ਜੇ (v < minVal || v > maxVal)
             {
                 bad_pt.y = j;
                 bad_pt.x = i / src.channels();
-                return false;
+                ਵਾਪਸ ਝੂਠ;
             }
         }
 
-    return true;
+    ਵਾਪਸ ਸੱਚ;
 }
 
-typedef bool (*check_range_function)(cv::Mat src, Point& bad_pt, int minVal, int maxVal);
+ਕਿਸਮਪਰਿਭਾਸ਼ਾ ਤਾਰਕਿਕ (*check_range_function)(cv::Mat src, ਬਿੰਦੂ& bad_pt, ਪੂਰਨ minVal, ਪੂਰਨ maxVal);
 
 check_range_function check_range_functions[] =
 {
@@ -1168,113 +1168,113 @@ check_range_function check_range_functions[] =
     &checkIntegerRange<CV_32S>
 };
 
-template<typename T>
-static void checkTypedRange(Mat& src, Point& badPt, double minVal, double maxVal)
+ਸਾਂਚਾ<ਕਿਸਮ_ਨਾਂ T>
+ਸਥਿਰ ਖਾਲੀ checkTypedRange(Mat& src, ਬਿੰਦੂ& badPt, ਦੁੱਗਣਾ minVal, ਦੁੱਗਣਾ maxVal)
 {
-    int loc = 0;
-    int cn = src.channels();
-    Size size = getContinuousSize2D(src, cn);
-    const T* isrc = src.ptr<T>();
-    size_t step = src.step / sizeof(isrc[0]);
+    ਪੂਰਨ loc = 0;
+    ਪੂਰਨ cn = src.channels();
+    ਮਾਪ size = getContinuousSize2D(src, cn);
+    ਅਚਲ T* isrc = src.ptr<T>();
+    size_t ਕਦਮ = src.ਕਦਮ / ਆਕਾਰ(isrc[0]);
 
-    for( ; badPt.x < 0 && size.height--; loc += size.width, isrc += step )
+    ਲਈ( ; badPt.x < 0 && size.ਉਚਾਈ--; loc += size.ਚੌੜਾਈ, isrc += ਕਦਮ )
     {
-        for( int i = 0; i < size.width; i++ )
+        ਲਈ( ਪੂਰਨ i = 0; i < size.ਚੌੜਾਈ; i++ )
         {
-            double val = (double)isrc[i];
-            if( !(val >= minVal && val < maxVal) )
+            ਦੁੱਗਣਾ val = (ਦੁੱਗਣਾ)isrc[i];
+            ਜੇ( !(val >= minVal && val < maxVal) )
             {
-                int pixelId = (loc + i) / cn;
-                badPt = Point(pixelId % src.cols, pixelId / src.cols);
-                break;
+                ਪੂਰਨ pixelId = (loc + i) / cn;
+                badPt = ਬਿੰਦੂ(pixelId % src.ਖਾਨੇ_ਗਿਣਤੀ, pixelId / src.ਖਾਨੇ_ਗਿਣਤੀ);
+                ਰੋਕੋ;
             }
         }
     }
 }
 
-bool checkRange(InputArray _src, bool quiet, Point* pt, double minVal, double maxVal)
+ਤਾਰਕਿਕ checkRange(ਨਿਵੇਸ਼_Array _src, ਤਾਰਕਿਕ quiet, ਬਿੰਦੂ* pt, ਦੁੱਗਣਾ minVal, ਦੁੱਗਣਾ maxVal)
 {
     CV_INSTRUMENT_REGION();
 
     Mat src = _src.getMat();
 
-    if ( src.dims > 2 )
+    ਜੇ ( src.dims > 2 )
     {
-        CV_Assert(pt == NULL); // no way to provide location info
+        CV_Assert(pt == ਨਿਰਾ); // no way to provide location info
 
-        const Mat* arrays[] = {&src, 0};
+        ਅਚਲ Mat* arrays[] = {&src, 0};
         Mat planes[1];
         NAryMatIterator it(arrays, planes);
 
-        for ( size_t i = 0; i < it.nplanes; i++, ++it )
+        ਲਈ ( size_t i = 0; i < it.nplanes; i++, ++it )
         {
-            if (!checkRange( it.planes[0], quiet, NULL, minVal, maxVal ))
+            ਜੇ (!checkRange( it.planes[0], quiet, ਨਿਰਾ, minVal, maxVal ))
             {
-                return false;
+                ਵਾਪਸ ਝੂਠ;
             }
         }
-        return true;
+        ਵਾਪਸ ਸੱਚ;
     }
 
-    int depth = src.depth();
-    Point badPt(-1, -1);
+    ਪੂਰਨ ਡੂੰਘਾਈ = src.ਡੂੰਘਾਈ();
+    ਬਿੰਦੂ badPt(-1, -1);
 
-    if (depth < CV_32F)
+    ਜੇ (ਡੂੰਘਾਈ < CV_32F)
     {
-        int minVali = minVal <= INT_MIN ? INT_MIN : cvFloor(minVal);
-        int maxVali = maxVal > INT_MAX ? INT_MAX : cvCeil(maxVal) - 1;
+        ਪੂਰਨ minVali = minVal <= INT_MIN ? INT_MIN : cvFloor(minVal);
+        ਪੂਰਨ maxVali = maxVal > ਵੱਧ_ਤੋਂ_ਵੱਧ_ਅੰਕ ? ਵੱਧ_ਤੋਂ_ਵੱਧ_ਅੰਕ : cvCeil(maxVal) - 1;
 
-        (check_range_functions[depth])(src, badPt, minVali, maxVali);
+        (check_range_functions[ਡੂੰਘਾਈ])(src, badPt, minVali, maxVali);
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
-        int i, loc = 0;
-        int cn = src.channels();
-        Size size = getContinuousSize2D(src, cn);
+        ਪੂਰਨ i, loc = 0;
+        ਪੂਰਨ cn = src.channels();
+        ਮਾਪ size = getContinuousSize2D(src, cn);
 
-        if( depth == CV_16F )
+        ਜੇ( ਡੂੰਘਾਈ == CV_16F )
         {
             checkTypedRange<hfloat>(src, badPt, minVal, maxVal);
         }
-        else if( depth == CV_16BF )
+        ਨਹੀਂਤਾਂ ਜੇ( ਡੂੰਘਾਈ == CV_16BF )
         {
             checkTypedRange<bfloat>(src, badPt, minVal, maxVal);
         }
-        else if( depth == CV_32F )
+        ਨਹੀਂਤਾਂ ਜੇ( ਡੂੰਘਾਈ == CV_32F )
         {
             Cv32suf a, b;
-            int ia, ib;
-            const int* isrc = src.ptr<int>();
-            size_t step = src.step/sizeof(isrc[0]);
+            ਪੂਰਨ ia, ib;
+            ਅਚਲ ਪੂਰਨ* isrc = src.ptr<ਪੂਰਨ>();
+            size_t ਕਦਮ = src.ਕਦਮ/ਆਕਾਰ(isrc[0]);
 
-            a.f = (float)std::max(minVal, (double)-FLT_MAX);
-            b.f = (float)std::min(maxVal, (double)FLT_MAX);
+            a.f = (ਦਸ਼ਮਲਵ)std::max(minVal, (ਦੁੱਗਣਾ)-FLT_MAX);
+            b.f = (ਦਸ਼ਮਲਵ)std::min(maxVal, (ਦੁੱਗਣਾ)FLT_MAX);
 
             ia = CV_TOGGLE_FLT(a.i);
             ib = CV_TOGGLE_FLT(b.i);
 
-            for( ; badPt.x < 0 && size.height--; loc += size.width, isrc += step )
+            ਲਈ( ; badPt.x < 0 && size.ਉਚਾਈ--; loc += size.ਚੌੜਾਈ, isrc += ਕਦਮ )
             {
-                for( i = 0; i < size.width; i++ )
+                ਲਈ( i = 0; i < size.ਚੌੜਾਈ; i++ )
                 {
-                    int val = isrc[i];
+                    ਪੂਰਨ val = isrc[i];
                     val = CV_TOGGLE_FLT(val);
 
-                    if( val < ia || val >= ib )
+                    ਜੇ( val < ia || val >= ib )
                     {
-                        int pixelId = (loc + i) / cn;
-                        badPt = Point(pixelId % src.cols, pixelId / src.cols);
-                        break;
+                        ਪੂਰਨ pixelId = (loc + i) / cn;
+                        badPt = ਬਿੰਦੂ(pixelId % src.ਖਾਨੇ_ਗਿਣਤੀ, pixelId / src.ਖਾਨੇ_ਗਿਣਤੀ);
+                        ਰੋਕੋ;
                     }
                 }
             }
         }
-        else if( depth == CV_64F )
+        ਨਹੀਂਤਾਂ ਜੇ( ਡੂੰਘਾਈ == CV_64F )
         {
             Cv64suf a, b;
             int64 ia, ib;
-            const int64* isrc = src.ptr<int64>();
-            size_t step = src.step/sizeof(isrc[0]);
+            ਅਚਲ int64* isrc = src.ptr<int64>();
+            size_t ਕਦਮ = src.ਕਦਮ/ਆਕਾਰ(isrc[0]);
 
             a.f = minVal;
             b.f = maxVal;
@@ -1282,58 +1282,58 @@ bool checkRange(InputArray _src, bool quiet, Point* pt, double minVal, double ma
             ia = CV_TOGGLE_DBL(a.i);
             ib = CV_TOGGLE_DBL(b.i);
 
-            for( ; badPt.x < 0 && size.height--; loc += size.width, isrc += step )
+            ਲਈ( ; badPt.x < 0 && size.ਉਚਾਈ--; loc += size.ਚੌੜਾਈ, isrc += ਕਦਮ )
             {
-                for( i = 0; i < size.width; i++ )
+                ਲਈ( i = 0; i < size.ਚੌੜਾਈ; i++ )
                 {
                     int64 val = isrc[i];
                     val = CV_TOGGLE_DBL(val);
 
-                    if( val < ia || val >= ib )
+                    ਜੇ( val < ia || val >= ib )
                     {
-                        int pixelId = (loc + i) / cn;
-                        badPt = Point(pixelId % src.cols, pixelId / src.cols);
-                        break;
+                        ਪੂਰਨ pixelId = (loc + i) / cn;
+                        badPt = ਬਿੰਦੂ(pixelId % src.ਖਾਨੇ_ਗਿਣਤੀ, pixelId / src.ਖਾਨੇ_ਗਿਣਤੀ);
+                        ਰੋਕੋ;
                     }
                 }
             }
         }
-        else if( depth == CV_Bool )
+        ਨਹੀਂਤਾਂ ਜੇ( ਡੂੰਘਾਈ == CV_Bool )
         {
             checkTypedRange<uchar>(src, badPt, minVal, maxVal);
         }
-        else if( depth == CV_32U )
+        ਨਹੀਂਤਾਂ ਜੇ( ਡੂੰਘਾਈ == CV_32U )
         {
             checkTypedRange<uint32_t>(src, badPt, minVal, maxVal);
         }
-        else if( depth == CV_64U )
+        ਨਹੀਂਤਾਂ ਜੇ( ਡੂੰਘਾਈ == CV_64U )
         {
             checkTypedRange<uint64_t>(src, badPt, minVal, maxVal);
         }
-        else if( depth == CV_64S )
+        ਨਹੀਂਤਾਂ ਜੇ( ਡੂੰਘਾਈ == CV_64S )
         {
             checkTypedRange<int64_t>(src, badPt, minVal, maxVal);
         }
-        else
+        ਨਹੀਂਤਾਂ
         {
             CV_Error(Error::StsUnsupportedFormat, "Unsupported matrix depth in checkRange");
         }
     }
 
-    if( badPt.x >= 0 )
+    ਜੇ( badPt.x >= 0 )
     {
-        if( pt )
+        ਜੇ( pt )
             *pt = badPt;
-        if( !quiet )
+        ਜੇ( !quiet )
         {
-            cv::String value_str;
-            value_str << src(cv::Range(badPt.y, badPt.y + 1), cv::Range(badPt.x, badPt.x + 1));
-            CV_Error_( cv::Error::StsOutOfRange,
-            ("the value at (%d, %d)=%s is out of range [%f, %f)", badPt.x, badPt.y, value_str.c_str(), minVal, maxVal));
+            cv::String ਮੁੱਲ_str;
+            ਮੁੱਲ_str << src(cv::Range(badPt.y, badPt.y + 1), cv::Range(badPt.x, badPt.x + 1));
+            CV_Error_( cv::Error::Sts_ਬਾਹਰਲਾ_ਦਾ_Range,
+            ("the value at (%d, %d)=%s is out of range [%f, %f)", badPt.x, badPt.y, ਮੁੱਲ_str.c_str(), minVal, maxVal));
         }
-        return false;
+        ਵਾਪਸ ਝੂਠ;
     }
-    return true;
+    ਵਾਪਸ ਸੱਚ;
 }
 
 } // namespace cv
@@ -1362,84 +1362,84 @@ bool checkRange(InputArray _src, bool quiet, Point* pt, double minVal, double ma
   -----------------------------------------------------------------------
 */
 
-int cv::solveCubic( InputArray _coeffs, OutputArray _roots )
+ਪੂਰਨ cv::solveCubic( ਨਿਵੇਸ਼_Array _coeffs, OutputArray _roots )
 {
     CV_INSTRUMENT_REGION();
 
-    const int n0 = 3;
+    ਅਚਲ ਪੂਰਨ n0 = 3;
     Mat coeffs = _coeffs.getMat();
-    int ctype = coeffs.type();
+    ਪੂਰਨ ctype = coeffs.type();
 
     CV_Assert( ctype == CV_32F || ctype == CV_64F );
-    CV_Assert( (coeffs.size() == Size(n0, 1) ||
-                coeffs.size() == Size(n0+1, 1) ||
-                coeffs.size() == Size(1, n0) ||
-                coeffs.size() == Size(1, n0+1)) );
+    CV_Assert( (coeffs.size() == ਮਾਪ(n0, 1) ||
+                coeffs.size() == ਮਾਪ(n0+1, 1) ||
+                coeffs.size() == ਮਾਪ(1, n0) ||
+                coeffs.size() == ਮਾਪ(1, n0+1)) );
 
-    _roots.create(n0, 1, ctype, -1, true, _OutputArray::DEPTH_MASK_FLT);
+    _roots.create(n0, 1, ctype, -1, ਸੱਚ, _OutputArray::ਡੂੰਘਾਈ_ਨਕਾਬ_FLT);
     Mat roots = _roots.getMat();
 
-    int i = -1, n = 0;
-    double a0 = 1., a1, a2, a3;
-    double x0 = 0., x1 = 0., x2 = 0.;
-    int ncoeffs = coeffs.rows + coeffs.cols - 1;
+    ਪੂਰਨ i = -1, n = 0;
+    ਦੁੱਗਣਾ a0 = 1., a1, a2, a3;
+    ਦੁੱਗਣਾ x0 = 0., x1 = 0., x2 = 0.;
+    ਪੂਰਨ ncoeffs = coeffs.ਪੰਕਤੀਆਂ + coeffs.ਖਾਨੇ_ਗਿਣਤੀ - 1;
 
-    if( ctype == CV_32FC1 )
+    ਜੇ( ctype == CV_32FC1 )
     {
-        if( ncoeffs == 4 )
-            a0 = coeffs.at<float>(++i);
+        ਜੇ( ncoeffs == 4 )
+            a0 = coeffs.at<ਦਸ਼ਮਲਵ>(++i);
 
-        a1 = coeffs.at<float>(i+1);
-        a2 = coeffs.at<float>(i+2);
-        a3 = coeffs.at<float>(i+3);
+        a1 = coeffs.at<ਦਸ਼ਮਲਵ>(i+1);
+        a2 = coeffs.at<ਦਸ਼ਮਲਵ>(i+2);
+        a3 = coeffs.at<ਦਸ਼ਮਲਵ>(i+3);
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
-        if( ncoeffs == 4 )
-            a0 = coeffs.at<double>(++i);
+        ਜੇ( ncoeffs == 4 )
+            a0 = coeffs.at<ਦੁੱਗਣਾ>(++i);
 
-        a1 = coeffs.at<double>(i+1);
-        a2 = coeffs.at<double>(i+2);
-        a3 = coeffs.at<double>(i+3);
+        a1 = coeffs.at<ਦੁੱਗਣਾ>(i+1);
+        a2 = coeffs.at<ਦੁੱਗਣਾ>(i+2);
+        a3 = coeffs.at<ਦੁੱਗਣਾ>(i+3);
     }
 
     // Fix for Issue #27748: Normalize coefficients to avoid overflow/underflow
     // and correctly detect negligible cubic terms.
-    double max_coeff = std::max({std::abs(a0), std::abs(a1), std::abs(a2), std::abs(a3)});
+    ਦੁੱਗਣਾ max_coeff = std::max({std::ਨਿਰਪੇਖ(a0), std::ਨਿਰਪੇਖ(a1), std::ਨਿਰਪੇਖ(a2), std::ਨਿਰਪੇਖ(a3)});
 
     // If max_coeff is effectively zero, the equation is 0=0
-    if (max_coeff < std::numeric_limits<double>::epsilon())
-        return -1;
+    ਜੇ (max_coeff < std::numeric_limits<ਦੁੱਗਣਾ>::epsilon())
+        ਵਾਪਸ -1;
 
     // Check if the cubic term is negligible relative to the largest coefficient
-    if( std::abs(a0) < std::numeric_limits<double>::epsilon() * max_coeff )
+    ਜੇ( std::ਨਿਰਪੇਖ(a0) < std::numeric_limits<ਦੁੱਗਣਾ>::epsilon() * max_coeff )
     {
-        if( std::abs(a1) < std::numeric_limits<double>::epsilon() * max_coeff )
+        ਜੇ( std::ਨਿਰਪੇਖ(a1) < std::numeric_limits<ਦੁੱਗਣਾ>::epsilon() * max_coeff )
         {
-            if( std::abs(a2) < std::numeric_limits<double>::epsilon() * max_coeff )
-                n = std::abs(a3) < std::numeric_limits<double>::epsilon() * max_coeff ? -1 : 0;
-            else
+            ਜੇ( std::ਨਿਰਪੇਖ(a2) < std::numeric_limits<ਦੁੱਗਣਾ>::epsilon() * max_coeff )
+                n = std::ਨਿਰਪੇਖ(a3) < std::numeric_limits<ਦੁੱਗਣਾ>::epsilon() * max_coeff ? -1 : 0;
+            ਨਹੀਂਤਾਂ
             {
                 // linear equation
                 x0 = -a3/a2;
                 n = 1;
             }
         }
-        else
+        ਨਹੀਂਤਾਂ
         {
             // quadratic equation
-            double d = a2*a2 - 4*a1*a3;
-            if( d >= 0 )
+            ਦੁੱਗਣਾ d = a2*a2 - 4*a1*a3;
+            ਜੇ( d >= 0 )
             {
-                d = std::sqrt(d);
-                double q1 = (-a2 + d) * 0.5;
-                double q2 = (a2 + d) * -0.5;
-                if( std::abs(q1) > std::abs(q2) )
+                d = std::ਵਰਗਮੂਲ(d);
+                ਦੁੱਗਣਾ q1 = (-a2 + d) * 0.5;
+                ਦੁੱਗਣਾ q2 = (a2 + d) * -0.5;
+                ਜੇ( std::ਨਿਰਪੇਖ(q1) > std::ਨਿਰਪੇਖ(q2) )
                 {
                     x0 = q1 / a1;
                     x1 = a3 / q1;
                 }
-                else
+                ਨਹੀਂਤਾਂ
                 {
                     x0 = q2 / a1;
                     x1 = a3 / q2;
@@ -1448,11 +1448,11 @@ int cv::solveCubic( InputArray _coeffs, OutputArray _roots )
             }
         }
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
         // cubic equation
         // Normalize coefficients in-place to prevent overflow/instability
-        double scale = 1.0 / max_coeff;
+        ਦੁੱਗਣਾ scale = 1.0 / max_coeff;
         a0 *= scale;
         a1 *= scale;
         a2 *= scale;
@@ -1463,9 +1463,9 @@ int cv::solveCubic( InputArray _coeffs, OutputArray _roots )
         a2 *= a0;
         a3 *= a0;
 
-        double Q = (a1 * a1 - 3 * a2) * (1./9);
-        double R = (a1 * (2 * a1 * a1 - 9 * a2) + 27 * a3) * (1./54);
-        double Qcubed = Q * Q * Q;
+        ਦੁੱਗਣਾ Q = (a1 * a1 - 3 * a2) * (1./9);
+        ਦੁੱਗਣਾ R = (a1 * (2 * a1 * a1 - 9 * a2) + 27 * a3) * (1./54);
+        ਦੁੱਗਣਾ Qcubed = Q * Q * Q;
 
         /*
           Here we expand expression `Qcubed - R * R` for `d` variable
@@ -1474,21 +1474,21 @@ int cv::solveCubic( InputArray _coeffs, OutputArray _roots )
 
           And then we additionally group terms to further reduce rounding error.
         */
-        double d = (a1 * a1 * (a2 * a2 - 4 * a1 * a3) + 2 * a2 * (9 * a1 * a3 - 2 * a2 * a2) - 27 * a3 * a3) * (1./108);
+        ਦੁੱਗਣਾ d = (a1 * a1 * (a2 * a2 - 4 * a1 * a3) + 2 * a2 * (9 * a1 * a3 - 2 * a2 * a2) - 27 * a3 * a3) * (1./108);
 
-        if( d > 0 )
+        ਜੇ( d > 0 )
         {
-            double theta = acos(R / sqrt(Qcubed));
-            double sqrtQ = sqrt(Q);
-            double t0 = -2 * sqrtQ;
-            double t1 = theta * (1./3);
-            double t2 = a1 * (1./3);
-            x0 = t0 * cos(t1) - t2;
-            x1 = t0 * cos(t1 + (2.*CV_PI/3)) - t2;
-            x2 = t0 * cos(t1 + (4.*CV_PI/3)) - t2;
+            ਦੁੱਗਣਾ theta = acos(R / ਵਰਗਮੂਲ(Qcubed));
+            ਦੁੱਗਣਾ sqrtQ = ਵਰਗਮੂਲ(Q);
+            ਦੁੱਗਣਾ t0 = -2 * sqrtQ;
+            ਦੁੱਗਣਾ t1 = theta * (1./3);
+            ਦੁੱਗਣਾ t2 = a1 * (1./3);
+            x0 = t0 * ਕੋਜੀਵਾ(t1) - t2;
+            x1 = t0 * ਕੋਜੀਵਾ(t1 + (2.*CV_PI/3)) - t2;
+            x2 = t0 * ਕੋਜੀਵਾ(t1 + (4.*CV_PI/3)) - t2;
             n = 3;
         }
-        else if( d == 0 )
+        ਨਹੀਂਤਾਂ ਜੇ( d == 0 )
         {
             x0 = -2*std::cbrt(R) - a1/3;
             x1 = std::cbrt(R) - a1/3;
@@ -1496,189 +1496,189 @@ int cv::solveCubic( InputArray _coeffs, OutputArray _roots )
             n = x0 == x1 ? 1 : 2;
             x1 = x0 == x1 ? 0 : x1;
         }
-        else
+        ਨਹੀਂਤਾਂ
         {
-            double e;
-            d = sqrt(-d);
+            ਦੁੱਗਣਾ e;
+            d = ਵਰਗਮੂਲ(-d);
             e = std::cbrt(d + fabs(R));
-            if( R > 0 )
+            ਜੇ( R > 0 )
                 e = -e;
             x0 = (e + Q / e) - a1 * (1./3);
             n = 1;
         }
     }
 
-    if( roots.type() == CV_32FC1 )
+    ਜੇ( roots.type() == CV_32FC1 )
     {
-        roots.at<float>(0) = (float)x0;
-        roots.at<float>(1) = (float)x1;
-        roots.at<float>(2) = (float)x2;
+        roots.at<ਦਸ਼ਮਲਵ>(0) = (ਦਸ਼ਮਲਵ)x0;
+        roots.at<ਦਸ਼ਮਲਵ>(1) = (ਦਸ਼ਮਲਵ)x1;
+        roots.at<ਦਸ਼ਮਲਵ>(2) = (ਦਸ਼ਮਲਵ)x2;
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
-        roots.at<double>(0) = x0;
-        roots.at<double>(1) = x1;
-        roots.at<double>(2) = x2;
+        roots.at<ਦੁੱਗਣਾ>(0) = x0;
+        roots.at<ਦੁੱਗਣਾ>(1) = x1;
+        roots.at<ਦੁੱਗਣਾ>(2) = x2;
     }
 
-    return n;
+    ਵਾਪਸ n;
 }
 
 /* finds complex roots of a polynomial using Durand-Kerner method:
    http://en.wikipedia.org/wiki/Durand%E2%80%93Kerner_method */
-double cv::solvePoly( InputArray _coeffs0, OutputArray _roots0, int maxIters )
+ਦੁੱਗਣਾ cv::solvePoly( ਨਿਵੇਸ਼_Array _coeffs0, OutputArray _roots0, ਪੂਰਨ maxIters )
 {
     CV_INSTRUMENT_REGION();
 
-    typedef Complex<double> C;
+    ਕਿਸਮਪਰਿਭਾਸ਼ਾ Complex<ਦੁੱਗਣਾ> C;
 
-    double maxDiff = 0;
-    int iter, i, j;
+    ਦੁੱਗਣਾ maxDiff = 0;
+    ਪੂਰਨ iter, i, j;
     Mat coeffs0 = _coeffs0.getMat();
-    int ctype = _coeffs0.type();
-    int cdepth = CV_MAT_DEPTH(ctype);
+    ਪੂਰਨ ctype = _coeffs0.type();
+    ਪੂਰਨ cdepth = CV_MAT_ਡੂੰਘਾਈ(ctype);
 
-    CV_Assert( CV_MAT_DEPTH(ctype) >= CV_32F && CV_MAT_CN(ctype) <= 2 );
-    CV_Assert( (coeffs0.rows == 1 || coeffs0.cols == 1) && coeffs0.total() >= 2 );
+    CV_Assert( CV_MAT_ਡੂੰਘਾਈ(ctype) >= CV_32F && CV_MAT_CN(ctype) <= 2 );
+    CV_Assert( (coeffs0.ਪੰਕਤੀਆਂ == 1 || coeffs0.ਖਾਨੇ_ਗਿਣਤੀ == 1) && coeffs0.ਕੁੱਲ() >= 2 );
 
-    int n0 = coeffs0.cols + coeffs0.rows - 2, n = n0;
+    ਪੂਰਨ n0 = coeffs0.ਖਾਨੇ_ਗਿਣਤੀ + coeffs0.ਪੰਕਤੀਆਂ - 2, n = n0;
 
-    _roots0.create(n, 1, CV_MAKETYPE(cdepth, 2), -1, true, _OutputArray::DEPTH_MASK_FLT);
+    _roots0.create(n, 1, CV_MAKETYPE(cdepth, 2), -1, ਸੱਚ, _OutputArray::ਡੂੰਘਾਈ_ਨਕਾਬ_FLT);
     Mat roots0 = _roots0.getMat();
 
-    AutoBuffer<C> buf(n*2+2);
-    C *coeffs = buf.data(), *roots = coeffs + n + 1;
+    Auto_ਬਫਰ<C> buf(n*2+2);
+    C *coeffs = buf.ਅੰਕੜੇ(), *roots = coeffs + n + 1;
     Mat coeffs1(coeffs0.size(), CV_MAKETYPE(CV_64F, coeffs0.channels()), coeffs0.channels() == 2 ? coeffs : roots);
-    coeffs0.convertTo(coeffs1, coeffs1.type());
-    if( coeffs0.channels() == 1 )
+    coeffs0.convert_ਮੰਜ਼ਿਲ(coeffs1, coeffs1.type());
+    ਜੇ( coeffs0.channels() == 1 )
     {
-        const double* rcoeffs = (const double*)roots;
-        for( i = 0; i <= n; i++ )
+        ਅਚਲ ਦੁੱਗਣਾ* rcoeffs = (ਅਚਲ ਦੁੱਗਣਾ*)roots;
+        ਲਈ( i = 0; i <= n; i++ )
             coeffs[i] = C(rcoeffs[i], 0);
     }
 
-    for( ; n > 1; n-- )
+    ਲਈ( ; n > 1; n-- )
     {
-        if( std::abs(coeffs[n].re) + std::abs(coeffs[n].im) > DBL_EPSILON )
-            break;
+        ਜੇ( std::ਨਿਰਪੇਖ(coeffs[n].re) + std::ਨਿਰਪੇਖ(coeffs[n].im) > DBL_EPSILON )
+            ਰੋਕੋ;
     }
-    CV_Assert( std::abs(coeffs[n].re) + std::abs(coeffs[n].im) > DBL_EPSILON );
+    CV_Assert( std::ਨਿਰਪੇਖ(coeffs[n].re) + std::ਨਿਰਪੇਖ(coeffs[n].im) > DBL_EPSILON );
 
     // Related issue: https://github.com/opencv/opencv/issues/23644,
     // This the initialization scheme of "Initial approximations in Durand-Kerner's root finding method" by Guggenheimer.
     // https://link.springer.com/article/10.1007/BF01935059
     // We put the initial points equidistantly on a circle on the complex plane. This code computes the circle radius as in the paper.
     Mat absCoeffs(n + 1, 1, CV_64F);
-    for( i = 0; i <= n; i++ )
-        absCoeffs.at<double>(i) = abs(coeffs[i]);
+    ਲਈ( i = 0; i <= n; i++ )
+        absCoeffs.at<ਦੁੱਗਣਾ>(i) = ਨਿਰਪੇਖ(coeffs[i]);
 
-    int nonZeroCoeffs = 0;
+    ਪੂਰਨ nonZeroCoeffs = 0;
     Mat u(n, 1, CV_64F, Scalar(0)), v(n, 1, CV_64F, Scalar(0));
-    for( i = 0; i <= n; i++ )
+    ਲਈ( i = 0; i <= n; i++ )
     {
-        double coeff = absCoeffs.at<double>(i);
-        if( coeff > DBL_EPSILON )
+        ਦੁੱਗਣਾ coeff = absCoeffs.at<ਦੁੱਗਣਾ>(i);
+        ਜੇ( coeff > DBL_EPSILON )
         {
-            if( i != n )
-                u.at<double>(i) = 2.0 * pow(coeff / absCoeffs.at<double>(n), 1.0 / (n - i));
-            if( i != 0 )
-                v.at<double>(i - 1) = 0.5 * pow(absCoeffs.at<double>(0) / coeff, 1.0 / i);
+            ਜੇ( i != n )
+                u.at<ਦੁੱਗਣਾ>(i) = 2.0 * ਘਾਤ(coeff / absCoeffs.at<ਦੁੱਗਣਾ>(n), 1.0 / (n - i));
+            ਜੇ( i != 0 )
+                v.at<ਦੁੱਗਣਾ>(i - 1) = 0.5 * ਘਾਤ(absCoeffs.at<ਦੁੱਗਣਾ>(0) / coeff, 1.0 / i);
             nonZeroCoeffs++;
         }
     }
-    double scale = 1;
-    if( nonZeroCoeffs > 2 )
+    ਦੁੱਗਣਾ scale = 1;
+    ਜੇ( nonZeroCoeffs > 2 )
     {
-        Point maxU, minV;
-        minMaxLoc(u, nullptr, nullptr, nullptr, &maxU);
-        minMaxLoc(v, nullptr, nullptr, &minV);
-        u.at<double>(maxU) = 0;
-        v.at<double>(minV) = 0;
-        scale = (sum(u).val[0] + sum(v).val[0]) / (2 * nonZeroCoeffs - 2);
+        ਬਿੰਦੂ maxU, minV;
+        minMaxLoc(u, ਖਾਲੀ_ਸੂਚਕ, ਖਾਲੀ_ਸੂਚਕ, ਖਾਲੀ_ਸੂਚਕ, &maxU);
+        minMaxLoc(v, ਖਾਲੀ_ਸੂਚਕ, ਖਾਲੀ_ਸੂਚਕ, &minV);
+        u.at<ਦੁੱਗਣਾ>(maxU) = 0;
+        v.at<ਦੁੱਗਣਾ>(minV) = 0;
+        scale = (ਜੋੜ(u).val[0] + ਜੋੜ(v).val[0]) / (2 * nonZeroCoeffs - 2);
     }
 
-    C p(scale, 0), r(cos(CV_2PI / n), sin(CV_2PI / n));
+    C p(scale, 0), r(ਕੋਜੀਵਾ(CV_2PI / n), ਜੀਵਾ(CV_2PI / n));
 
-    for( i = 0; i < n; i++ )
+    ਲਈ( i = 0; i < n; i++ )
     {
         roots[i] = p;
         p = p * r;
     }
 
     maxIters = maxIters <= 0 ? 1000 : maxIters;
-    for( iter = 0; iter < maxIters; iter++ )
+    ਲਈ( iter = 0; iter < maxIters; iter++ )
     {
         maxDiff = 0;
-        for( i = 0; i < n; i++ )
+        ਲਈ( i = 0; i < n; i++ )
         {
             p = roots[i];
             C num = coeffs[n], denom = coeffs[n];
-            int num_same_root = 1;
-            for( j = 0; j < n; j++ )
+            ਪੂਰਨ ਅੰਕ_same_ਜੜ੍ਹ = 1;
+            ਲਈ( j = 0; j < n; j++ )
             {
                 num = num*p + coeffs[n-j-1];
-                if( j != i )
+                ਜੇ( j != i )
                 {
-                    if ( (p - roots[j]).re != 0 || (p - roots[j]).im != 0 )
+                    ਜੇ ( (p - roots[j]).re != 0 || (p - roots[j]).im != 0 )
                         denom = denom * (p - roots[j]);
-                    else
-                        num_same_root++;
+                    ਨਹੀਂਤਾਂ
+                        ਅੰਕ_same_ਜੜ੍ਹ++;
                 }
             }
             num /= denom;
-            if( num_same_root > 1)
+            ਜੇ( ਅੰਕ_same_ਜੜ੍ਹ > 1)
             {
-                double old_num_re = num.re;
-                double old_num_im = num.im;
-                int square_root_times = num_same_root % 2 == 0 ? num_same_root / 2 : num_same_root / 2 - 1;
+                ਦੁੱਗਣਾ old_ਅੰਕ_re = num.re;
+                ਦੁੱਗਣਾ old_ਅੰਕ_im = num.im;
+                ਪੂਰਨ ਵਰਗਫਲ_ਜੜ੍ਹ_times = ਅੰਕ_same_ਜੜ੍ਹ % 2 == 0 ? ਅੰਕ_same_ਜੜ੍ਹ / 2 : ਅੰਕ_same_ਜੜ੍ਹ / 2 - 1;
 
-                for( j = 0; j < square_root_times; j++)
+                ਲਈ( j = 0; j < ਵਰਗਫਲ_ਜੜ੍ਹ_times; j++)
                 {
-                    num.re = old_num_re*old_num_re + old_num_im*old_num_im;
-                    num.re = sqrt(num.re);
-                    num.re += old_num_re;
-                    num.im = num.re - old_num_re;
+                    num.re = old_ਅੰਕ_re*old_ਅੰਕ_re + old_ਅੰਕ_im*old_ਅੰਕ_im;
+                    num.re = ਵਰਗਮੂਲ(num.re);
+                    num.re += old_ਅੰਕ_re;
+                    num.im = num.re - old_ਅੰਕ_re;
                     num.re /= 2;
-                    num.re = sqrt(num.re);
+                    num.re = ਵਰਗਮੂਲ(num.re);
 
                     num.im /= 2;
-                    num.im = sqrt(num.im);
-                    if( old_num_re < 0 ) num.im = -num.im;
+                    num.im = ਵਰਗਮੂਲ(num.im);
+                    ਜੇ( old_ਅੰਕ_re < 0 ) num.im = -num.im;
                 }
 
-                if( num_same_root % 2 != 0){
+                ਜੇ( ਅੰਕ_same_ਜੜ੍ਹ % 2 != 0){
                     Mat cube_coefs(4, 1, CV_64FC1);
                     Mat cube_roots(3, 1, CV_64FC2);
-                    cube_coefs.at<double>(3) = -(std::pow(old_num_re, 3));
-                    cube_coefs.at<double>(2) = -(15*std::pow(old_num_re, 2) + 27*std::pow(old_num_im, 2));
-                    cube_coefs.at<double>(1) = -48*old_num_re;
-                    cube_coefs.at<double>(0) = 64;
+                    cube_coefs.at<ਦੁੱਗਣਾ>(3) = -(std::ਘਾਤ(old_ਅੰਕ_re, 3));
+                    cube_coefs.at<ਦੁੱਗਣਾ>(2) = -(15*std::ਘਾਤ(old_ਅੰਕ_re, 2) + 27*std::ਘਾਤ(old_ਅੰਕ_im, 2));
+                    cube_coefs.at<ਦੁੱਗਣਾ>(1) = -48*old_ਅੰਕ_re;
+                    cube_coefs.at<ਦੁੱਗਣਾ>(0) = 64;
                     solveCubic(cube_coefs, cube_roots);
 
-                    num.re = std::cbrt(cube_roots.at<double>(0));
-                    num.im = sqrt(std::pow(num.re, 2) / 3 - old_num_re / (3*num.re));
+                    num.re = std::cbrt(cube_roots.at<ਦੁੱਗਣਾ>(0));
+                    num.im = ਵਰਗਮੂਲ(std::ਘਾਤ(num.re, 2) / 3 - old_ਅੰਕ_re / (3*num.re));
                 }
             }
             roots[i] = p - num;
-            maxDiff = std::max(maxDiff, cv::abs(num));
+            maxDiff = std::max(maxDiff, cv::ਨਿਰਪੇਖ(num));
         }
-        if( maxDiff <= 0 )
-            break;
+        ਜੇ( maxDiff <= 0 )
+            ਰੋਕੋ;
     }
 
-    if( coeffs0.channels() == 1 )
+    ਜੇ( coeffs0.channels() == 1 )
     {
-        const double verySmallEps = 1e-100;
-        for( i = 0; i < n; i++ )
-            if( fabs(roots[i].im) < verySmallEps )
+        ਅਚਲ ਦੁੱਗਣਾ verySmallEps = 1e-100;
+        ਲਈ( i = 0; i < n; i++ )
+            ਜੇ( fabs(roots[i].im) < verySmallEps )
                 roots[i].im = 0;
     }
 
-    for( ; n < n0; n++ )
+    ਲਈ( ; n < n0; n++ )
         roots[n+1] = roots[n];
 
-    Mat(roots0.size(), CV_64FC2, roots).convertTo(roots0, roots0.type());
-    return maxDiff;
+    Mat(roots0.size(), CV_64FC2, roots).convert_ਮੰਜ਼ਿਲ(roots0, roots0.type());
+    ਵਾਪਸ maxDiff;
 }
 
 

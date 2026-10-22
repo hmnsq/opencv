@@ -40,194 +40,194 @@
 //
 //M*/
 
-#ifndef OPENGL_NOLOAD_STYLE_HPP
-#define OPENGL_NOLOAD_STYLE_HPP
+#ਜੇ_ਅਪਰਿਭਾਸ਼ਿਤ OPENGL_NOLOAD_STYLE_HPP
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ OPENGL_NOLOAD_STYLE_HPP
 
-#if defined(__gl_h_) || defined(__GL_H__)
-#error Attempt to include auto-generated header after including gl.h
-#endif
-#if defined(__glext_h_) || defined(__GLEXT_H_)
-#error Attempt to include auto-generated header after including glext.h
-#endif
-#if defined(__gl_ATI_h_)
-#error Attempt to include auto-generated header after including glATI.h
-#endif
+#ਜੇ defined(__gl_h_) || defined(__GL_H__)
+#ਗਲਤੀ Attempt ਮੰਜ਼ਿਲ include ਸਵੈਚਾਲਿਤ-generated ਸਿਰਲੇਖ after including gl.h
+#ਜੇ_ਅੰਤ
+#ਜੇ defined(__glext_h_) || defined(__GLEXT_H_)
+#ਗਲਤੀ Attempt ਮੰਜ਼ਿਲ include ਸਵੈਚਾਲਿਤ-generated ਸਿਰਲੇਖ after including glext.h
+#ਜੇ_ਅੰਤ
+#ਜੇ defined(__gl_ATI_h_)
+#ਗਲਤੀ Attempt ਮੰਜ਼ਿਲ include ਸਵੈਚਾਲਿਤ-generated ਸਿਰਲੇਖ after including glATI.h
+#ਜੇ_ਅੰਤ
 
-#define __gl_h_
-#define __GL_H__
-#define __glext_h_
-#define __GLEXT_H_
-#define __gl_ATI_h_
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ __gl_h_
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ __GL_H__
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ __glext_h_
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ __GLEXT_H_
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ __gl_ATI_h_
 
-#ifndef APIENTRY
-    #if defined(__MINGW32__)
-        #ifndef WIN32_LEAN_AND_MEAN
-            #define WIN32_LEAN_AND_MEAN 1
-        #endif
-        #ifndef NOMINMAX
-            #define NOMINMAX
-        #endif
-        #include <windows.h>
-    #elif (defined(_MSC_VER) && _MSC_VER >= 800) || defined(_STDCALL_SUPPORTED) || defined(__BORLANDC__)
-        #ifndef WIN32_LEAN_AND_MEAN
-            #define WIN32_LEAN_AND_MEAN 1
-        #endif
-        #ifndef NOMINMAX
-            #define NOMINMAX
-        #endif
-        #include <windows.h>
-    #else
-        #define APIENTRY
-    #endif
-#endif // APIENTRY
+#ਜੇ_ਅਪਰਿਭਾਸ਼ਿਤ APIENTRY
+    #ਜੇ defined(__MINGW32__)
+        #ਜੇ_ਅਪਰਿਭਾਸ਼ਿਤ WIN32_LEAN_AND_ਔਸਤ
+            #ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ WIN32_LEAN_AND_ਔਸਤ 1
+        #ਜੇ_ਅੰਤ
+        #ਜੇ_ਅਪਰਿਭਾਸ਼ਿਤ NOMINMAX
+            #ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ NOMINMAX
+        #ਜੇ_ਅੰਤ
+        #ਅਨ੍ਤਰ੍ਭਾਵ <windows.h>
+    #ਜਾਂਜੇ (defined(_MSC_VER) && _MSC_VER >= 800) || defined(_STDCALL_SUPPORTED) || defined(__BORLANDC__)
+        #ਜੇ_ਅਪਰਿਭਾਸ਼ਿਤ WIN32_LEAN_AND_ਔਸਤ
+            #ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ WIN32_LEAN_AND_ਔਸਤ 1
+        #ਜੇ_ਅੰਤ
+        #ਜੇ_ਅਪਰਿਭਾਸ਼ਿਤ NOMINMAX
+            #ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ NOMINMAX
+        #ਜੇ_ਅੰਤ
+        #ਅਨ੍ਤਰ੍ਭਾਵ <windows.h>
+    #ਨਹੀਂਤਾਂ
+        #ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ APIENTRY
+    #ਜੇ_ਅੰਤ
+#ਜੇ_ਅੰਤ // APIENTRY
 
-#ifndef CODEGEN_FUNCPTR
-    #define CODEGEN_REMOVE_FUNCPTR
-    #if defined(_WIN32)
-        #define CODEGEN_FUNCPTR APIENTRY
-    #else
-        #define CODEGEN_FUNCPTR
-    #endif
-#endif // CODEGEN_FUNCPTR
+#ਜੇ_ਅਪਰਿਭਾਸ਼ਿਤ CODEGEN_FUNCPTR
+    #ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ CODEGEN_REMOVE_FUNCPTR
+    #ਜੇ defined(_WIN32)
+        #ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ CODEGEN_FUNCPTR APIENTRY
+    #ਨਹੀਂਤਾਂ
+        #ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ CODEGEN_FUNCPTR
+    #ਜੇ_ਅੰਤ
+#ਜੇ_ਅੰਤ // CODEGEN_FUNCPTR
 
-#ifndef GL_LOAD_GEN_BASIC_OPENGL_TYPEDEFS
-#define GL_LOAD_GEN_BASIC_OPENGL_TYPEDEFS
-    typedef unsigned int GLenum;
-    typedef unsigned char GLboolean;
-    typedef unsigned int GLbitfield;
-    typedef signed char GLbyte;
-    typedef short GLshort;
-    typedef int GLint;
-    typedef int GLsizei;
-    typedef unsigned char GLubyte;
-    typedef unsigned short GLushort;
-    typedef unsigned int GLuint;
-    typedef float GLfloat;
-    typedef float GLclampf;
-    typedef double GLdouble;
-    typedef double GLclampd;
-    #define GLvoid void
-#endif // GL_LOAD_GEN_BASIC_OPENGL_TYPEDEFS
+#ਜੇ_ਅਪਰਿਭਾਸ਼ਿਤ GL_ਲੱਦੋ_GEN_BASIC_OPENGL_TYPEDEFS
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ GL_ਲੱਦੋ_GEN_BASIC_OPENGL_TYPEDEFS
+    ਕਿਸਮਪਰਿਭਾਸ਼ਾ ਬਿਨਾਨਿਸ਼ਾਨੀ ਪੂਰਨ GLenum;
+    ਕਿਸਮਪਰਿਭਾਸ਼ਾ ਬਿਨਾਨਿਸ਼ਾਨੀ ਅੱਖਰ GLboolean;
+    ਕਿਸਮਪਰਿਭਾਸ਼ਾ ਬਿਨਾਨਿਸ਼ਾਨੀ ਪੂਰਨ GLbitfield;
+    ਕਿਸਮਪਰਿਭਾਸ਼ਾ ਨਿਸ਼ਾਨੀਵਾਲਾ ਅੱਖਰ GLbyte;
+    ਕਿਸਮਪਰਿਭਾਸ਼ਾ ਛੋਟਾ GLshort;
+    ਕਿਸਮਪਰਿਭਾਸ਼ਾ ਪੂਰਨ GLint;
+    ਕਿਸਮਪਰਿਭਾਸ਼ਾ ਪੂਰਨ GLsizei;
+    ਕਿਸਮਪਰਿਭਾਸ਼ਾ ਬਿਨਾਨਿਸ਼ਾਨੀ ਅੱਖਰ GLubyte;
+    ਕਿਸਮਪਰਿਭਾਸ਼ਾ ਬਿਨਾਨਿਸ਼ਾਨੀ ਛੋਟਾ GLushort;
+    ਕਿਸਮਪਰਿਭਾਸ਼ਾ ਬਿਨਾਨਿਸ਼ਾਨੀ ਪੂਰਨ GLuint;
+    ਕਿਸਮਪਰਿਭਾਸ਼ਾ ਦਸ਼ਮਲਵ GLfloat;
+    ਕਿਸਮਪਰਿਭਾਸ਼ਾ ਦਸ਼ਮਲਵ GLclampf;
+    ਕਿਸਮਪਰਿਭਾਸ਼ਾ ਦੁੱਗਣਾ GLdouble;
+    ਕਿਸਮਪਰਿਭਾਸ਼ਾ ਦੁੱਗਣਾ GLclampd;
+    #ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ GLvoid ਖਾਲੀ
+#ਜੇ_ਅੰਤ // GL_LOAD_GEN_BASIC_OPENGL_TYPEDEFS
 
-#include <stddef.h>
+#ਅਨ੍ਤਰ੍ਭਾਵ <stddef.h>
 
-#ifndef GL_VERSION_2_0
+#ਜੇ_ਅਪਰਿਭਾਸ਼ਿਤ GL_ਸੰਸਕਰਣ_2_0
     // GL type for program/shader text
-    typedef char GLchar;
-#endif
+    ਕਿਸਮਪਰਿਭਾਸ਼ਾ ਅੱਖਰ GLchar;
+#ਜੇ_ਅੰਤ
 
-#ifndef GL_VERSION_1_5
+#ਜੇ_ਅਪਰਿਭਾਸ਼ਿਤ GL_ਸੰਸਕਰਣ_1_5
     // GL types for handling large vertex buffer objects
-    typedef ptrdiff_t GLintptr;
-    typedef ptrdiff_t GLsizeiptr;
-#endif
+    ਕਿਸਮਪਰਿਭਾਸ਼ਾ ptrdiff_t GLintptr;
+    ਕਿਸਮਪਰਿਭਾਸ਼ਾ ptrdiff_t GLsizeiptr;
+#ਜੇ_ਅੰਤ
 
-#ifndef GL_ARB_vertex_buffer_object
+#ਜੇ_ਅਪਰਿਭਾਸ਼ਿਤ GL_ARB_ਸ਼ੀਰਸ਼_ਬਫਰ_object
     // GL types for handling large vertex buffer objects
-    typedef ptrdiff_t GLintptrARB;
-    typedef ptrdiff_t GLsizeiptrARB;
-#endif
+    ਕਿਸਮਪਰਿਭਾਸ਼ਾ ptrdiff_t GLintptrARB;
+    ਕਿਸਮਪਰਿਭਾਸ਼ਾ ptrdiff_t GLsizeiptrARB;
+#ਜੇ_ਅੰਤ
 
-#ifndef GL_ARB_shader_objects
+#ਜੇ_ਅਪਰਿਭਾਸ਼ਿਤ GL_ARB_shader_objects
     // GL types for program/shader text and shader object handles
-    typedef char GLcharARB;
-    typedef unsigned int GLhandleARB;
-#endif
+    ਕਿਸਮਪਰਿਭਾਸ਼ਾ ਅੱਖਰ GLcharARB;
+    ਕਿਸਮਪਰਿਭਾਸ਼ਾ ਬਿਨਾਨਿਸ਼ਾਨੀ ਪੂਰਨ GLhandleARB;
+#ਜੇ_ਅੰਤ
 
 // GL type for "half" precision (s10e5) float data in host memory
-#ifndef GL_ARB_half_float_pixel
-    typedef unsigned short GLhalfARB;
-#endif
-#ifndef GL_NV_half_float
-    typedef unsigned short GLhalfNV;
-#endif
+#ਜੇ_ਅਪਰਿਭਾਸ਼ਿਤ GL_ARB_half_float_pixel
+    ਕਿਸਮਪਰਿਭਾਸ਼ਾ ਬਿਨਾਨਿਸ਼ਾਨੀ ਛੋਟਾ GLhalfARB;
+#ਜੇ_ਅੰਤ
+#ਜੇ_ਅਪਰਿਭਾਸ਼ਿਤ GL_NV_half_float
+    ਕਿਸਮਪਰਿਭਾਸ਼ਾ ਬਿਨਾਨਿਸ਼ਾਨੀ ਛੋਟਾ GLhalfNV;
+#ਜੇ_ਅੰਤ
 
-#ifndef GLEXT_64_TYPES_DEFINED
+#ਜੇ_ਅਪਰਿਭਾਸ਼ਿਤ GLEXT_64_TYPES_DEFINED
     // This code block is duplicated in glxext.h, so must be protected
-    #define GLEXT_64_TYPES_DEFINED
+    #ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ GLEXT_64_TYPES_DEFINED
 
     // Define int32_t, int64_t, and uint64_t types for UST/MSC
     // (as used in the GL_EXT_timer_query extension)
-    #if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L
-        #include <inttypes.h>
-    #elif defined(__sun__) || defined(__digital__)
-        #include <inttypes.h>
-        #if defined(__STDC__)
-            #if defined(__arch64__) || defined(_LP64)
-                typedef long int int64_t;
-                typedef unsigned long int uint64_t;
-            #else
-                typedef long long int int64_t;
-                typedef unsigned long long int uint64_t;
-            #endif // __arch64__
-        #endif // __STDC__
-    #elif defined( __VMS ) || defined(__sgi)
-        #include <inttypes.h>
-    #elif defined(__SCO__) || defined(__USLC__)
-        #include <stdint.h>
-    #elif defined(__UNIXOS2__) || defined(__SOL64__)
-        typedef long int int32_t;
-        typedef long long int int64_t;
-        typedef unsigned long long int uint64_t;
-    #elif defined(_WIN32) && defined(__GNUC__)
-        #include <stdint.h>
-    #elif defined(_WIN32)
-        typedef __int32 int32_t;
-        typedef __int64 int64_t;
-        typedef unsigned __int64 uint64_t;
-    #else
+    #ਜੇ defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L
+        #ਅਨ੍ਤਰ੍ਭਾਵ <inttypes.h>
+    #ਜਾਂਜੇ defined(__sun__) || defined(__digital__)
+        #ਅਨ੍ਤਰ੍ਭਾਵ <inttypes.h>
+        #ਜੇ defined(__STDC__)
+            #ਜੇ defined(__arch64__) || defined(_LP64)
+                ਕਿਸਮਪਰਿਭਾਸ਼ਾ ਲੰਮਾ ਪੂਰਨ int64_t;
+                ਕਿਸਮਪਰਿਭਾਸ਼ਾ ਬਿਨਾਨਿਸ਼ਾਨੀ ਲੰਮਾ ਪੂਰਨ uint64_t;
+            #ਨਹੀਂਤਾਂ
+                ਕਿਸਮਪਰਿਭਾਸ਼ਾ ਲੰਮਾ ਲੰਮਾ ਪੂਰਨ int64_t;
+                ਕਿਸਮਪਰਿਭਾਸ਼ਾ ਬਿਨਾਨਿਸ਼ਾਨੀ ਲੰਮਾ ਲੰਮਾ ਪੂਰਨ uint64_t;
+            #ਜੇ_ਅੰਤ // __arch64__
+        #ਜੇ_ਅੰਤ // __STDC__
+    #ਜਾਂਜੇ defined( __VMS ) || defined(__sgi)
+        #ਅਨ੍ਤਰ੍ਭਾਵ <inttypes.h>
+    #ਜਾਂਜੇ defined(__SCO__) || defined(__USLC__)
+        #ਅਨ੍ਤਰ੍ਭਾਵ <stdint.h>
+    #ਜਾਂਜੇ defined(__UNIXOS2__) || defined(__SOL64__)
+        ਕਿਸਮਪਰਿਭਾਸ਼ਾ ਲੰਮਾ ਪੂਰਨ int32_t;
+        ਕਿਸਮਪਰਿਭਾਸ਼ਾ ਲੰਮਾ ਲੰਮਾ ਪੂਰਨ int64_t;
+        ਕਿਸਮਪਰਿਭਾਸ਼ਾ ਬਿਨਾਨਿਸ਼ਾਨੀ ਲੰਮਾ ਲੰਮਾ ਪੂਰਨ uint64_t;
+    #ਜਾਂਜੇ defined(_WIN32) && defined(__GNUC__)
+        #ਅਨ੍ਤਰ੍ਭਾਵ <stdint.h>
+    #ਜਾਂਜੇ defined(_WIN32)
+        ਕਿਸਮਪਰਿਭਾਸ਼ਾ __int32 int32_t;
+        ਕਿਸਮਪਰਿਭਾਸ਼ਾ __int64 int64_t;
+        ਕਿਸਮਪਰਿਭਾਸ਼ਾ ਬਿਨਾਨਿਸ਼ਾਨੀ __int64 uint64_t;
+    #ਨਹੀਂਤਾਂ
         // Fallback if nothing above works
-        #include <inttypes.h>
-    #endif
-#endif
+        #ਅਨ੍ਤਰ੍ਭਾਵ <inttypes.h>
+    #ਜੇ_ਅੰਤ
+#ਜੇ_ਅੰਤ
 
-#ifndef GL_EXT_timer_query
-    typedef int64_t GLint64EXT;
-    typedef uint64_t GLuint64EXT;
-#endif
+#ਜੇ_ਅਪਰਿਭਾਸ਼ਿਤ GL_EXT_timer_query
+    ਕਿਸਮਪਰਿਭਾਸ਼ਾ int64_t GLint64EXT;
+    ਕਿਸਮਪਰਿਭਾਸ਼ਾ uint64_t GLuint64EXT;
+#ਜੇ_ਅੰਤ
 
-#ifndef GL_ARB_sync
-    typedef int64_t GLint64;
-    typedef uint64_t GLuint64;
-    typedef struct __GLsync *GLsync;
-#endif
+#ਜੇ_ਅਪਰਿਭਾਸ਼ਿਤ GL_ARB_sync
+    ਕਿਸਮਪਰਿਭਾਸ਼ਾ int64_t GLint64;
+    ਕਿਸਮਪਰਿਭਾਸ਼ਾ uint64_t GLuint64;
+    ਕਿਸਮਪਰਿਭਾਸ਼ਾ ਬਣਤਰ __GLsync *GLsync;
+#ਜੇ_ਅੰਤ
 
-#ifndef GL_ARB_cl_event
+#ਜੇ_ਅਪਰਿਭਾਸ਼ਿਤ GL_ARB_cl_event
     // These incomplete types let us declare types compatible with OpenCL's cl_context and cl_event
-    struct _cl_context;
-    struct _cl_event;
-#endif
+    ਬਣਤਰ _cl_context;
+    ਬਣਤਰ _cl_event;
+#ਜੇ_ਅੰਤ
 
-#ifndef GL_ARB_debug_output
-    typedef void (APIENTRY *GLDEBUGPROCARB)(GLenum source,GLenum type,GLuint id,GLenum severity,GLsizei length,const GLchar *message,GLvoid *userParam);
-#endif
+#ਜੇ_ਅਪਰਿਭਾਸ਼ਿਤ GL_ARB_debug_output
+    ਕਿਸਮਪਰਿਭਾਸ਼ਾ ਖਾਲੀ (APIENTRY *GLDEBUGPROCARB)(GLenum ਸਰੋਤ,GLenum type,GLuint id,GLenum severity,GLsizei length,ਅਚਲ GLchar *message,GLvoid *userParam);
+#ਜੇ_ਅੰਤ
 
-#ifndef GL_AMD_debug_output
-    typedef void (APIENTRY *GLDEBUGPROCAMD)(GLuint id,GLenum category,GLenum severity,GLsizei length,const GLchar *message,GLvoid *userParam);
-#endif
+#ਜੇ_ਅਪਰਿਭਾਸ਼ਿਤ GL_AMD_debug_output
+    ਕਿਸਮਪਰਿਭਾਸ਼ਾ ਖਾਲੀ (APIENTRY *GLDEBUGPROCAMD)(GLuint id,GLenum category,GLenum severity,GLsizei length,ਅਚਲ GLchar *message,GLvoid *userParam);
+#ਜੇ_ਅੰਤ
 
-#ifndef GL_KHR_debug
-    typedef void (APIENTRY *GLDEBUGPROC)(GLenum source,GLenum type,GLuint id,GLenum severity,GLsizei length,const GLchar *message,GLvoid *userParam);
-#endif
+#ਜੇ_ਅਪਰਿਭਾਸ਼ਿਤ GL_KHR_debug
+    ਕਿਸਮਪਰਿਭਾਸ਼ਾ ਖਾਲੀ (APIENTRY *GLDEBUGPROC)(GLenum ਸਰੋਤ,GLenum type,GLuint id,GLenum severity,GLsizei length,ਅਚਲ GLchar *message,GLvoid *userParam);
+#ਜੇ_ਅੰਤ
 
-#ifndef GL_NV_vdpau_interop
-    typedef GLintptr GLvdpauSurfaceNV;
-#endif
+#ਜੇ_ਅਪਰਿਭਾਸ਼ਿਤ GL_NV_vdpau_interop
+    ਕਿਸਮਪਰਿਭਾਸ਼ਾ GLintptr GLvdpauSurfaceNV;
+#ਜੇ_ਅੰਤ
 
-namespace gl
+ਨਾਮਾਕਾਸ਼ gl
 {
-    enum
+    ਗਿਣਤੀ
     {
         // Version: 1.1
-        DEPTH_BUFFER_BIT                 = 0x00000100,
-        STENCIL_BUFFER_BIT               = 0x00000400,
-        COLOR_BUFFER_BIT                 = 0x00004000,
+        ਡੂੰਘਾਈ_ਬਫਰ_ਦੋਆਧਾਰੀ_ਅੰਕ                 = 0x00000100,
+        STENCIL_ਬਫਰ_ਦੋਆਧਾਰੀ_ਅੰਕ               = 0x00000400,
+        COLOR_ਬਫਰ_ਦੋਆਧਾਰੀ_ਅੰਕ                 = 0x00004000,
         FALSE_                           = 0,
         TRUE_                            = 1,
         POINTS                           = 0x0000,
-        LINES                            = 0x0001,
-        LINE_LOOP                        = 0x0002,
-        LINE_STRIP                       = 0x0003,
+        ਸਤਰਾਂ                            = 0x0001,
+        ਸਤਰ_LOOP                        = 0x0002,
+        ਸਤਰ_STRIP                       = 0x0003,
         TRIANGLES                        = 0x0004,
         TRIANGLE_STRIP                   = 0x0005,
         TRIANGLE_FAN                     = 0x0006,
@@ -252,46 +252,46 @@ namespace gl
         ONE_MINUS_DST_COLOR              = 0x0307,
         SRC_ALPHA_SATURATE               = 0x0308,
         NONE                             = 0,
-        FRONT_LEFT                       = 0x0400,
-        FRONT_RIGHT                      = 0x0401,
-        BACK_LEFT                        = 0x0402,
-        BACK_RIGHT                       = 0x0403,
+        FRONT_ਖੱਬਾ                       = 0x0400,
+        FRONT_ਸੱਜਾ                      = 0x0401,
+        ਪਿੱਠ_ਖੱਬਾ                        = 0x0402,
+        ਪਿੱਠ_ਸੱਜਾ                       = 0x0403,
         FRONT                            = 0x0404,
-        BACK                             = 0x0405,
-        LEFT                             = 0x0406,
-        RIGHT                            = 0x0407,
-        FRONT_AND_BACK                   = 0x0408,
+        ਪਿੱਠ                             = 0x0405,
+        ਖੱਬਾ                             = 0x0406,
+        ਸੱਜਾ                            = 0x0407,
+        FRONT_AND_ਪਿੱਠ                   = 0x0408,
         NO_ERROR_                        = 0,
         INVALID_ENUM                     = 0x0500,
-        INVALID_VALUE                    = 0x0501,
+        INVALID_ਮੁੱਲ                    = 0x0501,
         INVALID_OPERATION                = 0x0502,
-        OUT_OF_MEMORY                    = 0x0505,
+        ਬਾਹਰਲਾ_ਦਾ_ਸਮ੍ਰਿਤੀ                    = 0x0505,
         CW                               = 0x0900,
         CCW                              = 0x0901,
-        POINT_SIZE                       = 0x0B11,
-        POINT_SIZE_RANGE                 = 0x0B12,
-        POINT_SIZE_GRANULARITY           = 0x0B13,
-        LINE_SMOOTH                      = 0x0B20,
-        LINE_WIDTH                       = 0x0B21,
-        LINE_WIDTH_RANGE                 = 0x0B22,
-        LINE_WIDTH_GRANULARITY           = 0x0B23,
-        POLYGON_MODE                     = 0x0B40,
+        ਬਿੰਦੂ_ਮਾਪ_2                       = 0x0B11,
+        ਬਿੰਦੂ_ਮਾਪ_RANGE                 = 0x0B12,
+        ਬਿੰਦੂ_ਮਾਪ_GRANULARITY           = 0x0B13,
+        ਸਤਰ_SMOOTH                      = 0x0B20,
+        ਸਤਰ_ਚੌੜਾਈ_2                       = 0x0B21,
+        ਸਤਰ_ਚੌੜਾਈ_RANGE                 = 0x0B22,
+        ਸਤਰ_ਚੌੜਾਈ_GRANULARITY           = 0x0B23,
+        POLYGON_ਬਹੁਲਕ                     = 0x0B40,
         POLYGON_SMOOTH                   = 0x0B41,
         CULL_FACE                        = 0x0B44,
-        CULL_FACE_MODE                   = 0x0B45,
+        CULL_FACE_ਬਹੁਲਕ                   = 0x0B45,
         FRONT_FACE                       = 0x0B46,
-        DEPTH_RANGE                      = 0x0B70,
-        DEPTH_TEST                       = 0x0B71,
-        DEPTH_WRITEMASK                  = 0x0B72,
-        DEPTH_CLEAR_VALUE                = 0x0B73,
-        DEPTH_FUNC                       = 0x0B74,
+        ਡੂੰਘਾਈ_RANGE                      = 0x0B70,
+        ਡੂੰਘਾਈ_TEST                       = 0x0B71,
+        ਡੂੰਘਾਈ_WRITEMASK                  = 0x0B72,
+        ਡੂੰਘਾਈ_CLEAR_ਮੁੱਲ                = 0x0B73,
+        ਡੂੰਘਾਈ_FUNC                       = 0x0B74,
         STENCIL_TEST                     = 0x0B90,
-        STENCIL_CLEAR_VALUE              = 0x0B91,
+        STENCIL_CLEAR_ਮੁੱਲ              = 0x0B91,
         STENCIL_FUNC                     = 0x0B92,
-        STENCIL_VALUE_MASK               = 0x0B93,
+        STENCIL_ਮੁੱਲ_ਨਕਾਬ               = 0x0B93,
         STENCIL_FAIL                     = 0x0B94,
-        STENCIL_PASS_DEPTH_FAIL          = 0x0B95,
-        STENCIL_PASS_DEPTH_PASS          = 0x0B96,
+        STENCIL_PASS_ਡੂੰਘਾਈ_FAIL          = 0x0B95,
+        STENCIL_PASS_ਡੂੰਘਾਈ_PASS          = 0x0B96,
         STENCIL_REF                      = 0x0B97,
         STENCIL_WRITEMASK                = 0x0B98,
         VIEWPORT                         = 0x0BA2,
@@ -299,50 +299,50 @@ namespace gl
         BLEND_DST                        = 0x0BE0,
         BLEND_SRC                        = 0x0BE1,
         BLEND                            = 0x0BE2,
-        LOGIC_OP_MODE                    = 0x0BF0,
+        LOGIC_OP_ਬਹੁਲਕ                    = 0x0BF0,
         COLOR_LOGIC_OP                   = 0x0BF2,
-        DRAW_BUFFER                      = 0x0C01,
-        READ_BUFFER                      = 0x0C02,
+        DRAW_ਬਫਰ                      = 0x0C01,
+        READ_ਬਫਰ                      = 0x0C02,
         SCISSOR_BOX                      = 0x0C10,
         SCISSOR_TEST                     = 0x0C11,
-        COLOR_CLEAR_VALUE                = 0x0C22,
+        COLOR_CLEAR_ਮੁੱਲ                = 0x0C22,
         COLOR_WRITEMASK                  = 0x0C23,
         DOUBLEBUFFER                     = 0x0C32,
         STEREO                           = 0x0C33,
-        LINE_SMOOTH_HINT                 = 0x0C52,
+        ਸਤਰ_SMOOTH_HINT                 = 0x0C52,
         POLYGON_SMOOTH_HINT              = 0x0C53,
-        UNPACK_SWAP_BYTES                = 0x0CF0,
-        UNPACK_LSB_FIRST                 = 0x0CF1,
-        UNPACK_ROW_LENGTH                = 0x0CF2,
-        UNPACK_SKIP_ROWS                 = 0x0CF3,
+        UNPACK_ਅਦਲਾ_ਬਦਲੀ_ਬਾਈਟਾਂ                = 0x0CF0,
+        UNPACK_LSB_ਪਹਿਲਾ                 = 0x0CF1,
+        UNPACK_ਪੰਕਤੀ_ਲੰਮਾਈ                = 0x0CF2,
+        UNPACK_SKIP_ਪੰਕਤੀਆਂ                 = 0x0CF3,
         UNPACK_SKIP_PIXELS               = 0x0CF4,
         UNPACK_ALIGNMENT                 = 0x0CF5,
-        PACK_SWAP_BYTES                  = 0x0D00,
-        PACK_LSB_FIRST                   = 0x0D01,
-        PACK_ROW_LENGTH                  = 0x0D02,
-        PACK_SKIP_ROWS                   = 0x0D03,
+        PACK_ਅਦਲਾ_ਬਦਲੀ_ਬਾਈਟਾਂ                  = 0x0D00,
+        PACK_LSB_ਪਹਿਲਾ                   = 0x0D01,
+        PACK_ਪੰਕਤੀ_ਲੰਮਾਈ                  = 0x0D02,
+        PACK_SKIP_ਪੰਕਤੀਆਂ                   = 0x0D03,
         PACK_SKIP_PIXELS                 = 0x0D04,
         PACK_ALIGNMENT                   = 0x0D05,
-        MAX_TEXTURE_SIZE                 = 0x0D33,
+        MAX_TEXTURE_ਮਾਪ                 = 0x0D33,
         MAX_VIEWPORT_DIMS                = 0x0D3A,
-        SUBPIXEL_BITS                    = 0x0D50,
+        SUBPIXEL_ਬਿੱਟ                    = 0x0D50,
         TEXTURE_1D                       = 0x0DE0,
         TEXTURE_2D                       = 0x0DE1,
-        POLYGON_OFFSET_UNITS             = 0x2A00,
-        POLYGON_OFFSET_POINT             = 0x2A01,
-        POLYGON_OFFSET_LINE              = 0x2A02,
-        POLYGON_OFFSET_FILL              = 0x8037,
-        POLYGON_OFFSET_FACTOR            = 0x8038,
+        POLYGON_ਵਿੱਥ_UNITS             = 0x2A00,
+        POLYGON_ਵਿੱਥ_ਬਿੰਦੂ             = 0x2A01,
+        POLYGON_ਵਿੱਥ_ਸਤਰ              = 0x2A02,
+        POLYGON_ਵਿੱਥ_FILL              = 0x8037,
+        POLYGON_ਵਿੱਥ_ਗੁਣਕ            = 0x8038,
         TEXTURE_BINDING_1D               = 0x8068,
         TEXTURE_BINDING_2D               = 0x8069,
-        TEXTURE_WIDTH                    = 0x1000,
-        TEXTURE_HEIGHT                   = 0x1001,
-        TEXTURE_INTERNAL_FORMAT          = 0x1003,
+        TEXTURE_ਚੌੜਾਈ                    = 0x1000,
+        TEXTURE_ਉਚਾਈ                   = 0x1001,
+        TEXTURE_ਅੰਦਰੂਨੀ_FORMAT          = 0x1003,
         TEXTURE_BORDER_COLOR             = 0x1004,
-        TEXTURE_RED_SIZE                 = 0x805C,
-        TEXTURE_GREEN_SIZE               = 0x805D,
-        TEXTURE_BLUE_SIZE                = 0x805E,
-        TEXTURE_ALPHA_SIZE               = 0x805F,
+        TEXTURE_RED_ਮਾਪ                 = 0x805C,
+        TEXTURE_GREEN_ਮਾਪ               = 0x805D,
+        TEXTURE_BLUE_ਮਾਪ                = 0x805E,
+        TEXTURE_ALPHA_ਮਾਪ               = 0x805F,
         DONT_CARE                        = 0x1100,
         FASTEST                          = 0x1101,
         NICEST                           = 0x1102,
@@ -356,7 +356,7 @@ namespace gl
         DOUBLE                           = 0x140A,
         CLEAR                            = 0x1500,
         AND                              = 0x1501,
-        AND_REVERSE                      = 0x1502,
+        AND_ਉਲਟ                      = 0x1502,
         COPY                             = 0x1503,
         AND_INVERTED                     = 0x1504,
         NOOP                             = 0x1505,
@@ -365,25 +365,25 @@ namespace gl
         NOR                              = 0x1508,
         EQUIV                            = 0x1509,
         INVERT                           = 0x150A,
-        OR_REVERSE                       = 0x150B,
+        OR_ਉਲਟ                       = 0x150B,
         COPY_INVERTED                    = 0x150C,
         OR_INVERTED                      = 0x150D,
         NAND                             = 0x150E,
-        SET                              = 0x150F,
+        ਸੈੱਟ_2                              = 0x150F,
         TEXTURE                          = 0x1702,
         COLOR                            = 0x1800,
-        DEPTH                            = 0x1801,
+        ਡੂੰਘਾਈ_3                            = 0x1801,
         STENCIL                          = 0x1802,
-        STENCIL_INDEX                    = 0x1901,
-        DEPTH_COMPONENT                  = 0x1902,
+        STENCIL_ਸੂਚਕਾਂਕ                    = 0x1901,
+        ਡੂੰਘਾਈ_COMPONENT                  = 0x1902,
         RED                              = 0x1903,
         GREEN                            = 0x1904,
         BLUE                             = 0x1905,
         ALPHA                            = 0x1906,
         RGB                              = 0x1907,
         RGBA                             = 0x1908,
-        POINT                            = 0x1B00,
-        LINE                             = 0x1B01,
+        ਬਿੰਦੂ_2                            = 0x1B00,
+        ਸਤਰ_2                             = 0x1B01,
         FILL                             = 0x1B02,
         KEEP                             = 0x1E00,
         REPLACE                          = 0x1E01,
@@ -391,14 +391,14 @@ namespace gl
         DECR                             = 0x1E03,
         VENDOR                           = 0x1F00,
         RENDERER                         = 0x1F01,
-        VERSION_                         = 0x1F02,
+        ਸੰਸਕਰਣ_2                         = 0x1F02,
         EXTENSIONS                       = 0x1F03,
-        NEAREST                          = 0x2600,
-        LINEAR                           = 0x2601,
-        NEAREST_MIPMAP_NEAREST           = 0x2700,
-        LINEAR_MIPMAP_NEAREST            = 0x2701,
-        NEAREST_MIPMAP_LINEAR            = 0x2702,
-        LINEAR_MIPMAP_LINEAR             = 0x2703,
+        ਸਭ_ਤੋਂ_ਨੇੜੇ                          = 0x2600,
+        ਰੇਖਿਕ                           = 0x2601,
+        ਸਭ_ਤੋਂ_ਨੇੜੇ_MIPMAP_ਸਭ_ਤੋਂ_ਨੇੜੇ           = 0x2700,
+        ਰੇਖਿਕ_MIPMAP_ਸਭ_ਤੋਂ_ਨੇੜੇ            = 0x2701,
+        ਸਭ_ਤੋਂ_ਨੇੜੇ_MIPMAP_ਰੇਖਿਕ            = 0x2702,
+        ਰੇਖਿਕ_MIPMAP_ਰੇਖਿਕ             = 0x2703,
         TEXTURE_MAG_FILTER               = 0x2800,
         TEXTURE_MIN_FILTER               = 0x2801,
         TEXTURE_WRAP_S                   = 0x2802,
@@ -427,24 +427,24 @@ namespace gl
         CONSTANT_ALPHA                   = 0x8003,
         ONE_MINUS_CONSTANT_ALPHA         = 0x8004,
         BLEND_COLOR                      = 0x8005,
-        FUNC_ADD                         = 0x8006,
+        FUNC_ਜੋੜੋ                         = 0x8006,
         MIN                              = 0x8007,
         MAX                              = 0x8008,
         BLEND_EQUATION                   = 0x8009,
-        FUNC_SUBTRACT                    = 0x800A,
-        FUNC_REVERSE_SUBTRACT            = 0x800B,
+        FUNC_ਘਟਾਓ                    = 0x800A,
+        FUNC_ਉਲਟ_ਘਟਾਓ            = 0x800B,
         CONVOLUTION_1D                   = 0x8010,
         CONVOLUTION_2D                   = 0x8011,
         SEPARABLE_2D                     = 0x8012,
-        CONVOLUTION_BORDER_MODE          = 0x8013,
+        CONVOLUTION_BORDER_ਬਹੁਲਕ          = 0x8013,
         CONVOLUTION_FILTER_SCALE         = 0x8014,
         CONVOLUTION_FILTER_BIAS          = 0x8015,
         REDUCE                           = 0x8016,
         CONVOLUTION_FORMAT               = 0x8017,
-        CONVOLUTION_WIDTH                = 0x8018,
-        CONVOLUTION_HEIGHT               = 0x8019,
-        MAX_CONVOLUTION_WIDTH            = 0x801A,
-        MAX_CONVOLUTION_HEIGHT           = 0x801B,
+        CONVOLUTION_ਚੌੜਾਈ                = 0x8018,
+        CONVOLUTION_ਉਚਾਈ               = 0x8019,
+        MAX_CONVOLUTION_ਚੌੜਾਈ            = 0x801A,
+        MAX_CONVOLUTION_ਉਚਾਈ           = 0x801B,
         POST_CONVOLUTION_RED_SCALE       = 0x801C,
         POST_CONVOLUTION_GREEN_SCALE     = 0x801D,
         POST_CONVOLUTION_BLUE_SCALE      = 0x801E,
@@ -455,45 +455,45 @@ namespace gl
         POST_CONVOLUTION_ALPHA_BIAS      = 0x8023,
         HISTOGRAM                        = 0x8024,
         PROXY_HISTOGRAM                  = 0x8025,
-        HISTOGRAM_WIDTH                  = 0x8026,
+        HISTOGRAM_ਚੌੜਾਈ                  = 0x8026,
         HISTOGRAM_FORMAT                 = 0x8027,
-        HISTOGRAM_RED_SIZE               = 0x8028,
-        HISTOGRAM_GREEN_SIZE             = 0x8029,
-        HISTOGRAM_BLUE_SIZE              = 0x802A,
-        HISTOGRAM_ALPHA_SIZE             = 0x802B,
-        HISTOGRAM_LUMINANCE_SIZE         = 0x802C,
+        HISTOGRAM_RED_ਮਾਪ               = 0x8028,
+        HISTOGRAM_GREEN_ਮਾਪ             = 0x8029,
+        HISTOGRAM_BLUE_ਮਾਪ              = 0x802A,
+        HISTOGRAM_ALPHA_ਮਾਪ             = 0x802B,
+        HISTOGRAM_LUMINANCE_ਮਾਪ         = 0x802C,
         HISTOGRAM_SINK                   = 0x802D,
         MINMAX                           = 0x802E,
         MINMAX_FORMAT                    = 0x802F,
         MINMAX_SINK                      = 0x8030,
-        TABLE_TOO_LARGE                  = 0x8031,
-        COLOR_MATRIX                     = 0x80B1,
-        COLOR_MATRIX_STACK_DEPTH         = 0x80B2,
-        MAX_COLOR_MATRIX_STACK_DEPTH     = 0x80B3,
-        POST_COLOR_MATRIX_RED_SCALE      = 0x80B4,
-        POST_COLOR_MATRIX_GREEN_SCALE    = 0x80B5,
-        POST_COLOR_MATRIX_BLUE_SCALE     = 0x80B6,
-        POST_COLOR_MATRIX_ALPHA_SCALE    = 0x80B7,
-        POST_COLOR_MATRIX_RED_BIAS       = 0x80B8,
-        POST_COLOR_MATRIX_GREEN_BIAS     = 0x80B9,
-        POST_COLOR_MATRIX_BLUE_BIAS      = 0x80BA,
-        POST_COLOR_MATRIX_ALPHA_BIAS     = 0x80BB,
-        COLOR_TABLE                      = 0x80D0,
-        POST_CONVOLUTION_COLOR_TABLE     = 0x80D1,
-        POST_COLOR_MATRIX_COLOR_TABLE    = 0x80D2,
-        PROXY_COLOR_TABLE                = 0x80D3,
-        PROXY_POST_CONVOLUTION_COLOR_TABLE = 0x80D4,
-        PROXY_POST_COLOR_MATRIX_COLOR_TABLE = 0x80D5,
-        COLOR_TABLE_SCALE                = 0x80D6,
-        COLOR_TABLE_BIAS                 = 0x80D7,
-        COLOR_TABLE_FORMAT               = 0x80D8,
-        COLOR_TABLE_WIDTH                = 0x80D9,
-        COLOR_TABLE_RED_SIZE             = 0x80DA,
-        COLOR_TABLE_GREEN_SIZE           = 0x80DB,
-        COLOR_TABLE_BLUE_SIZE            = 0x80DC,
-        COLOR_TABLE_ALPHA_SIZE           = 0x80DD,
-        COLOR_TABLE_LUMINANCE_SIZE       = 0x80DE,
-        COLOR_TABLE_INTENSITY_SIZE       = 0x80DF,
+        ਸਾਰਣੀ_TOO_LARGE                  = 0x8031,
+        COLOR_ਮੈਟ੍ਰਿਕਸ                     = 0x80B1,
+        COLOR_ਮੈਟ੍ਰਿਕਸ_ਢੇਰ_ਡੂੰਘਾਈ         = 0x80B2,
+        MAX_COLOR_ਮੈਟ੍ਰਿਕਸ_ਢੇਰ_ਡੂੰਘਾਈ     = 0x80B3,
+        POST_COLOR_ਮੈਟ੍ਰਿਕਸ_RED_SCALE      = 0x80B4,
+        POST_COLOR_ਮੈਟ੍ਰਿਕਸ_GREEN_SCALE    = 0x80B5,
+        POST_COLOR_ਮੈਟ੍ਰਿਕਸ_BLUE_SCALE     = 0x80B6,
+        POST_COLOR_ਮੈਟ੍ਰਿਕਸ_ALPHA_SCALE    = 0x80B7,
+        POST_COLOR_ਮੈਟ੍ਰਿਕਸ_RED_BIAS       = 0x80B8,
+        POST_COLOR_ਮੈਟ੍ਰਿਕਸ_GREEN_BIAS     = 0x80B9,
+        POST_COLOR_ਮੈਟ੍ਰਿਕਸ_BLUE_BIAS      = 0x80BA,
+        POST_COLOR_ਮੈਟ੍ਰਿਕਸ_ALPHA_BIAS     = 0x80BB,
+        COLOR_ਸਾਰਣੀ                      = 0x80D0,
+        POST_CONVOLUTION_COLOR_ਸਾਰਣੀ     = 0x80D1,
+        POST_COLOR_ਮੈਟ੍ਰਿਕਸ_COLOR_ਸਾਰਣੀ    = 0x80D2,
+        PROXY_COLOR_ਸਾਰਣੀ                = 0x80D3,
+        PROXY_POST_CONVOLUTION_COLOR_ਸਾਰਣੀ = 0x80D4,
+        PROXY_POST_COLOR_ਮੈਟ੍ਰਿਕਸ_COLOR_ਸਾਰਣੀ = 0x80D5,
+        COLOR_ਸਾਰਣੀ_SCALE                = 0x80D6,
+        COLOR_ਸਾਰਣੀ_BIAS                 = 0x80D7,
+        COLOR_ਸਾਰਣੀ_FORMAT               = 0x80D8,
+        COLOR_ਸਾਰਣੀ_ਚੌੜਾਈ                = 0x80D9,
+        COLOR_ਸਾਰਣੀ_RED_ਮਾਪ             = 0x80DA,
+        COLOR_ਸਾਰਣੀ_GREEN_ਮਾਪ           = 0x80DB,
+        COLOR_ਸਾਰਣੀ_BLUE_ਮਾਪ            = 0x80DC,
+        COLOR_ਸਾਰਣੀ_ALPHA_ਮਾਪ           = 0x80DD,
+        COLOR_ਸਾਰਣੀ_LUMINANCE_ਮਾਪ       = 0x80DE,
+        COLOR_ਸਾਰਣੀ_INTENSITY_ਮਾਪ       = 0x80DF,
         CONSTANT_BORDER                  = 0x8151,
         REPLICATE_BORDER                 = 0x8153,
         CONVOLUTION_BORDER_COLOR         = 0x8154,
@@ -506,14 +506,14 @@ namespace gl
         UNSIGNED_INT_10_10_10_2          = 0x8036,
         TEXTURE_BINDING_3D               = 0x806A,
         PACK_SKIP_IMAGES                 = 0x806B,
-        PACK_IMAGE_HEIGHT                = 0x806C,
+        PACK_IMAGE_ਉਚਾਈ                = 0x806C,
         UNPACK_SKIP_IMAGES               = 0x806D,
-        UNPACK_IMAGE_HEIGHT              = 0x806E,
+        UNPACK_IMAGE_ਉਚਾਈ              = 0x806E,
         TEXTURE_3D                       = 0x806F,
         PROXY_TEXTURE_3D                 = 0x8070,
-        TEXTURE_DEPTH                    = 0x8071,
+        TEXTURE_ਡੂੰਘਾਈ                    = 0x8071,
         TEXTURE_WRAP_R                   = 0x8072,
-        MAX_3D_TEXTURE_SIZE              = 0x8073,
+        MAX_3_D_TEXTURE_ਮਾਪ              = 0x8073,
         UNSIGNED_BYTE_2_3_3_REV          = 0x8362,
         UNSIGNED_SHORT_5_6_5             = 0x8363,
         UNSIGNED_SHORT_5_6_5_REV         = 0x8364,
@@ -525,16 +525,16 @@ namespace gl
         BGRA                             = 0x80E1,
         MAX_ELEMENTS_VERTICES            = 0x80E8,
         MAX_ELEMENTS_INDICES             = 0x80E9,
-        CLAMP_TO_EDGE                    = 0x812F,
+        CLAMP_ਮੰਜ਼ਿਲ_ਕਿਨਾਰਾ                    = 0x812F,
         TEXTURE_MIN_LOD                  = 0x813A,
         TEXTURE_MAX_LOD                  = 0x813B,
-        TEXTURE_BASE_LEVEL               = 0x813C,
+        TEXTURE_ਅਧਾਰ_LEVEL               = 0x813C,
         TEXTURE_MAX_LEVEL                = 0x813D,
-        SMOOTH_POINT_SIZE_RANGE          = 0x0B12,
-        SMOOTH_POINT_SIZE_GRANULARITY    = 0x0B13,
-        SMOOTH_LINE_WIDTH_RANGE          = 0x0B22,
-        SMOOTH_LINE_WIDTH_GRANULARITY    = 0x0B23,
-        ALIASED_LINE_WIDTH_RANGE         = 0x846E,
+        SMOOTH_ਬਿੰਦੂ_ਮਾਪ_RANGE          = 0x0B12,
+        SMOOTH_ਬਿੰਦੂ_ਮਾਪ_GRANULARITY    = 0x0B13,
+        SMOOTH_ਸਤਰ_ਚੌੜਾਈ_RANGE          = 0x0B22,
+        SMOOTH_ਸਤਰ_ਚੌੜਾਈ_GRANULARITY    = 0x0B23,
+        ALIASED_ਸਤਰ_ਚੌੜਾਈ_RANGE         = 0x846E,
 
         // Version: 1.3
         TEXTURE0                         = 0x84C0,
@@ -569,73 +569,73 @@ namespace gl
         TEXTURE29                        = 0x84DD,
         TEXTURE30                        = 0x84DE,
         TEXTURE31                        = 0x84DF,
-        ACTIVE_TEXTURE                   = 0x84E0,
+        ਸਰਗਰਮ_TEXTURE                   = 0x84E0,
         MULTISAMPLE                      = 0x809D,
-        SAMPLE_ALPHA_TO_COVERAGE         = 0x809E,
-        SAMPLE_ALPHA_TO_ONE              = 0x809F,
+        SAMPLE_ALPHA_ਮੰਜ਼ਿਲ_COVERAGE         = 0x809E,
+        SAMPLE_ALPHA_ਮੰਜ਼ਿਲ_ONE              = 0x809F,
         SAMPLE_COVERAGE                  = 0x80A0,
         SAMPLE_BUFFERS                   = 0x80A8,
         SAMPLES                          = 0x80A9,
-        SAMPLE_COVERAGE_VALUE            = 0x80AA,
+        SAMPLE_COVERAGE_ਮੁੱਲ            = 0x80AA,
         SAMPLE_COVERAGE_INVERT           = 0x80AB,
         TEXTURE_CUBE_MAP                 = 0x8513,
         TEXTURE_BINDING_CUBE_MAP         = 0x8514,
-        TEXTURE_CUBE_MAP_POSITIVE_X      = 0x8515,
+        TEXTURE_CUBE_MAP_ਸਕਾਰਾਤਮਕ_X      = 0x8515,
         TEXTURE_CUBE_MAP_NEGATIVE_X      = 0x8516,
-        TEXTURE_CUBE_MAP_POSITIVE_Y      = 0x8517,
+        TEXTURE_CUBE_MAP_ਸਕਾਰਾਤਮਕ_Y      = 0x8517,
         TEXTURE_CUBE_MAP_NEGATIVE_Y      = 0x8518,
-        TEXTURE_CUBE_MAP_POSITIVE_Z      = 0x8519,
+        TEXTURE_CUBE_MAP_ਸਕਾਰਾਤਮਕ_Z      = 0x8519,
         TEXTURE_CUBE_MAP_NEGATIVE_Z      = 0x851A,
         PROXY_TEXTURE_CUBE_MAP           = 0x851B,
-        MAX_CUBE_MAP_TEXTURE_SIZE        = 0x851C,
+        MAX_CUBE_MAP_TEXTURE_ਮਾਪ        = 0x851C,
         COMPRESSED_RGB                   = 0x84ED,
         COMPRESSED_RGBA                  = 0x84EE,
         TEXTURE_COMPRESSION_HINT         = 0x84EF,
-        TEXTURE_COMPRESSED_IMAGE_SIZE    = 0x86A0,
+        TEXTURE_COMPRESSED_IMAGE_ਮਾਪ    = 0x86A0,
         TEXTURE_COMPRESSED               = 0x86A1,
-        NUM_COMPRESSED_TEXTURE_FORMATS   = 0x86A2,
+        ਅੰਕ_COMPRESSED_TEXTURE_FORMATS   = 0x86A2,
         COMPRESSED_TEXTURE_FORMATS       = 0x86A3,
-        CLAMP_TO_BORDER                  = 0x812D,
+        CLAMP_ਮੰਜ਼ਿਲ_BORDER                  = 0x812D,
 
         // Version: 1.4
         BLEND_DST_RGB                    = 0x80C8,
         BLEND_SRC_RGB                    = 0x80C9,
         BLEND_DST_ALPHA                  = 0x80CA,
         BLEND_SRC_ALPHA                  = 0x80CB,
-        POINT_FADE_THRESHOLD_SIZE        = 0x8128,
-        DEPTH_COMPONENT16                = 0x81A5,
-        DEPTH_COMPONENT24                = 0x81A6,
-        DEPTH_COMPONENT32                = 0x81A7,
+        ਬਿੰਦੂ_FADE_ਹੱਦ_ਮਾਪ        = 0x8128,
+        ਡੂੰਘਾਈ_COMPONENT16                = 0x81A5,
+        ਡੂੰਘਾਈ_COMPONENT24                = 0x81A6,
+        ਡੂੰਘਾਈ_COMPONENT32                = 0x81A7,
         MIRRORED_REPEAT                  = 0x8370,
         MAX_TEXTURE_LOD_BIAS             = 0x84FD,
         TEXTURE_LOD_BIAS                 = 0x8501,
         INCR_WRAP                        = 0x8507,
         DECR_WRAP                        = 0x8508,
-        TEXTURE_DEPTH_SIZE               = 0x884A,
-        TEXTURE_COMPARE_MODE             = 0x884C,
+        TEXTURE_ਡੂੰਘਾਈ_ਮਾਪ               = 0x884A,
+        TEXTURE_COMPARE_ਬਹੁਲਕ             = 0x884C,
         TEXTURE_COMPARE_FUNC             = 0x884D,
 
         // Version: 1.5
-        BUFFER_SIZE                      = 0x8764,
-        BUFFER_USAGE                     = 0x8765,
-        QUERY_COUNTER_BITS               = 0x8864,
+        ਬਫਰ_ਮਾਪ_2                      = 0x8764,
+        ਬਫਰ_USAGE                     = 0x8765,
+        QUERY_COUNTER_ਬਿੱਟ               = 0x8864,
         CURRENT_QUERY                    = 0x8865,
-        QUERY_RESULT                     = 0x8866,
-        QUERY_RESULT_AVAILABLE           = 0x8867,
-        ARRAY_BUFFER                     = 0x8892,
-        ELEMENT_ARRAY_BUFFER             = 0x8893,
-        ARRAY_BUFFER_BINDING             = 0x8894,
-        ELEMENT_ARRAY_BUFFER_BINDING     = 0x8895,
-        VERTEX_ATTRIB_ARRAY_BUFFER_BINDING = 0x889F,
+        QUERY_ਨਤੀਜਾ                     = 0x8866,
+        QUERY_ਨਤੀਜਾ_ਉਪਲਬਧ           = 0x8867,
+        ARRAY_ਬਫਰ                     = 0x8892,
+        ELEMENT_ARRAY_ਬਫਰ             = 0x8893,
+        ARRAY_ਬਫਰ_BINDING             = 0x8894,
+        ELEMENT_ARRAY_ਬਫਰ_BINDING     = 0x8895,
+        ਸ਼ੀਰਸ਼_ATTRIB_ARRAY_ਬਫਰ_BINDING = 0x889F,
         READ_ONLY                        = 0x88B8,
         WRITE_ONLY                       = 0x88B9,
         READ_WRITE                       = 0x88BA,
-        BUFFER_ACCESS                    = 0x88BB,
-        BUFFER_MAPPED                    = 0x88BC,
-        BUFFER_MAP_POINTER               = 0x88BD,
-        STREAM_DRAW                      = 0x88E0,
-        STREAM_READ                      = 0x88E1,
-        STREAM_COPY                      = 0x88E2,
+        ਬਫਰ_ACCESS                    = 0x88BB,
+        ਬਫਰ_MAPPED                    = 0x88BC,
+        ਬਫਰ_MAP_ਸੂਚਕ               = 0x88BD,
+        ਧਾਰਾ_DRAW                      = 0x88E0,
+        ਧਾਰਾ_READ                      = 0x88E1,
+        ਧਾਰਾ_COPY                      = 0x88E2,
         STATIC_DRAW                      = 0x88E4,
         STATIC_READ                      = 0x88E5,
         STATIC_COPY                      = 0x88E6,
@@ -647,17 +647,17 @@ namespace gl
 
         // Version: 2.0
         BLEND_EQUATION_RGB               = 0x8009,
-        VERTEX_ATTRIB_ARRAY_ENABLED      = 0x8622,
-        VERTEX_ATTRIB_ARRAY_SIZE         = 0x8623,
-        VERTEX_ATTRIB_ARRAY_STRIDE       = 0x8624,
-        VERTEX_ATTRIB_ARRAY_TYPE         = 0x8625,
-        CURRENT_VERTEX_ATTRIB            = 0x8626,
-        VERTEX_PROGRAM_POINT_SIZE        = 0x8642,
-        VERTEX_ATTRIB_ARRAY_POINTER      = 0x8645,
-        STENCIL_BACK_FUNC                = 0x8800,
-        STENCIL_BACK_FAIL                = 0x8801,
-        STENCIL_BACK_PASS_DEPTH_FAIL     = 0x8802,
-        STENCIL_BACK_PASS_DEPTH_PASS     = 0x8803,
+        ਸ਼ੀਰਸ਼_ATTRIB_ARRAY_ENABLED      = 0x8622,
+        ਸ਼ੀਰਸ਼_ATTRIB_ARRAY_ਮਾਪ         = 0x8623,
+        ਸ਼ੀਰਸ਼_ATTRIB_ARRAY_STRIDE       = 0x8624,
+        ਸ਼ੀਰਸ਼_ATTRIB_ARRAY_TYPE         = 0x8625,
+        CURRENT_ਸ਼ੀਰਸ਼_ATTRIB            = 0x8626,
+        ਸ਼ੀਰਸ਼_ਪ੍ਰੋਗਰਾਮ_ਬਿੰਦੂ_ਮਾਪ        = 0x8642,
+        ਸ਼ੀਰਸ਼_ATTRIB_ARRAY_ਸੂਚਕ      = 0x8645,
+        STENCIL_ਪਿੱਠ_FUNC                = 0x8800,
+        STENCIL_ਪਿੱਠ_FAIL                = 0x8801,
+        STENCIL_ਪਿੱਠ_PASS_ਡੂੰਘਾਈ_FAIL     = 0x8802,
+        STENCIL_ਪਿੱਠ_PASS_ਡੂੰਘਾਈ_PASS     = 0x8803,
         MAX_DRAW_BUFFERS                 = 0x8824,
         DRAW_BUFFER0                     = 0x8825,
         DRAW_BUFFER1                     = 0x8826,
@@ -676,15 +676,15 @@ namespace gl
         DRAW_BUFFER14                    = 0x8833,
         DRAW_BUFFER15                    = 0x8834,
         BLEND_EQUATION_ALPHA             = 0x883D,
-        MAX_VERTEX_ATTRIBS               = 0x8869,
-        VERTEX_ATTRIB_ARRAY_NORMALIZED   = 0x886A,
+        MAX_ਸ਼ੀਰਸ਼_ATTRIBS               = 0x8869,
+        ਸ਼ੀਰਸ਼_ATTRIB_ARRAY_NORMALIZED   = 0x886A,
         MAX_TEXTURE_IMAGE_UNITS          = 0x8872,
         FRAGMENT_SHADER                  = 0x8B30,
-        VERTEX_SHADER                    = 0x8B31,
-        MAX_FRAGMENT_UNIFORM_COMPONENTS  = 0x8B49,
-        MAX_VERTEX_UNIFORM_COMPONENTS    = 0x8B4A,
+        ਸ਼ੀਰਸ਼_SHADER                    = 0x8B31,
+        MAX_FRAGMENT_ਇਕਸਾਰ_COMPONENTS  = 0x8B49,
+        MAX_ਸ਼ੀਰਸ਼_ਇਕਸਾਰ_COMPONENTS    = 0x8B4A,
         MAX_VARYING_FLOATS               = 0x8B4B,
-        MAX_VERTEX_TEXTURE_IMAGE_UNITS   = 0x8B4C,
+        MAX_ਸ਼ੀਰਸ਼_TEXTURE_IMAGE_UNITS   = 0x8B4C,
         MAX_COMBINED_TEXTURE_IMAGE_UNITS = 0x8B4D,
         SHADER_TYPE                      = 0x8B4F,
         FLOAT_VEC2                       = 0x8B50,
@@ -706,32 +706,32 @@ namespace gl
         SAMPLER_CUBE                     = 0x8B60,
         SAMPLER_1D_SHADOW                = 0x8B61,
         SAMPLER_2D_SHADOW                = 0x8B62,
-        DELETE_STATUS                    = 0x8B80,
-        COMPILE_STATUS                   = 0x8B81,
-        LINK_STATUS                      = 0x8B82,
-        VALIDATE_STATUS                  = 0x8B83,
-        INFO_LOG_LENGTH                  = 0x8B84,
+        DELETE_ਸਥਿਤੀ                    = 0x8B80,
+        COMPILE_ਸਥਿਤੀ                   = 0x8B81,
+        LINK_ਸਥਿਤੀ                      = 0x8B82,
+        VALIDATE_ਸਥਿਤੀ                  = 0x8B83,
+        INFO_LOG_ਲੰਮਾਈ                  = 0x8B84,
         ATTACHED_SHADERS                 = 0x8B85,
-        ACTIVE_UNIFORMS                  = 0x8B86,
-        ACTIVE_UNIFORM_MAX_LENGTH        = 0x8B87,
-        SHADER_SOURCE_LENGTH             = 0x8B88,
-        ACTIVE_ATTRIBUTES                = 0x8B89,
-        ACTIVE_ATTRIBUTE_MAX_LENGTH      = 0x8B8A,
+        ਸਰਗਰਮ_UNIFORMS                  = 0x8B86,
+        ਸਰਗਰਮ_ਇਕਸਾਰ_MAX_ਲੰਮਾਈ        = 0x8B87,
+        SHADER_ਸਰੋਤ_ਲੰਮਾਈ             = 0x8B88,
+        ਸਰਗਰਮ_ਗੁਣ                = 0x8B89,
+        ਸਰਗਰਮ_ATTRIBUTE_MAX_ਲੰਮਾਈ      = 0x8B8A,
         FRAGMENT_SHADER_DERIVATIVE_HINT  = 0x8B8B,
-        SHADING_LANGUAGE_VERSION         = 0x8B8C,
-        CURRENT_PROGRAM                  = 0x8B8D,
-        POINT_SPRITE_COORD_ORIGIN        = 0x8CA0,
-        LOWER_LEFT                       = 0x8CA1,
-        UPPER_LEFT                       = 0x8CA2,
-        STENCIL_BACK_REF                 = 0x8CA3,
-        STENCIL_BACK_VALUE_MASK          = 0x8CA4,
-        STENCIL_BACK_WRITEMASK           = 0x8CA5,
+        SHADING_LANGUAGE_ਸੰਸਕਰਣ         = 0x8B8C,
+        CURRENT_ਪ੍ਰੋਗਰਾਮ                  = 0x8B8D,
+        ਬਿੰਦੂ_SPRITE_COORD_ORIGIN        = 0x8CA0,
+        ਹੇਠਲਾ_ਖੱਬਾ                       = 0x8CA1,
+        ਉੱਤਲਾ_ਖੱਬਾ                       = 0x8CA2,
+        STENCIL_ਪਿੱਠ_REF                 = 0x8CA3,
+        STENCIL_ਪਿੱਠ_ਮੁੱਲ_ਨਕਾਬ          = 0x8CA4,
+        STENCIL_ਪਿੱਠ_WRITEMASK           = 0x8CA5,
 
         // Version: 2.1
-        PIXEL_PACK_BUFFER                = 0x88EB,
-        PIXEL_UNPACK_BUFFER              = 0x88EC,
-        PIXEL_PACK_BUFFER_BINDING        = 0x88ED,
-        PIXEL_UNPACK_BUFFER_BINDING      = 0x88EF,
+        PIXEL_PACK_ਬਫਰ                = 0x88EB,
+        PIXEL_UNPACK_ਬਫਰ              = 0x88EC,
+        PIXEL_PACK_ਬਫਰ_BINDING        = 0x88ED,
+        PIXEL_UNPACK_ਬਫਰ_BINDING      = 0x88EF,
         FLOAT_MAT2x3                     = 0x8B65,
         FLOAT_MAT2x4                     = 0x8B66,
         FLOAT_MAT3x2                     = 0x8B67,
@@ -746,7 +746,7 @@ namespace gl
         COMPRESSED_SRGB_ALPHA            = 0x8C49,
 
         // Core Extension: ARB_vertex_array_object
-        VERTEX_ARRAY_BINDING             = 0x85B5,
+        ਸ਼ੀਰਸ਼_ARRAY_BINDING             = 0x85B5,
 
         // Core Extension: ARB_texture_rg
         RG                               = 0x8227,
@@ -779,12 +779,12 @@ namespace gl
         COMPRESSED_SIGNED_RG_RGTC2       = 0x8DBE,
 
         // Core Extension: ARB_map_buffer_range
-        MAP_READ_BIT                     = 0x0001,
-        MAP_WRITE_BIT                    = 0x0002,
-        MAP_INVALIDATE_RANGE_BIT         = 0x0004,
-        MAP_INVALIDATE_BUFFER_BIT        = 0x0008,
-        MAP_FLUSH_EXPLICIT_BIT           = 0x0010,
-        MAP_UNSYNCHRONIZED_BIT           = 0x0020,
+        MAP_READ_ਦੋਆਧਾਰੀ_ਅੰਕ                     = 0x0001,
+        MAP_WRITE_ਦੋਆਧਾਰੀ_ਅੰਕ                    = 0x0002,
+        MAP_INVALIDATE_RANGE_ਦੋਆਧਾਰੀ_ਅੰਕ         = 0x0004,
+        MAP_INVALIDATE_ਬਫਰ_ਦੋਆਧਾਰੀ_ਅੰਕ        = 0x0008,
+        MAP_FLUSH_EXPLICIT_ਦੋਆਧਾਰੀ_ਅੰਕ           = 0x0010,
+        MAP_UNSYNCHRONIZED_ਦੋਆਧਾਰੀ_ਅੰਕ           = 0x0020,
 
         // Core Extension: ARB_half_float_vertex
         HALF_FLOAT                       = 0x140B,
@@ -796,26 +796,26 @@ namespace gl
         INVALID_FRAMEBUFFER_OPERATION    = 0x0506,
         FRAMEBUFFER_ATTACHMENT_COLOR_ENCODING = 0x8210,
         FRAMEBUFFER_ATTACHMENT_COMPONENT_TYPE = 0x8211,
-        FRAMEBUFFER_ATTACHMENT_RED_SIZE  = 0x8212,
-        FRAMEBUFFER_ATTACHMENT_GREEN_SIZE = 0x8213,
-        FRAMEBUFFER_ATTACHMENT_BLUE_SIZE = 0x8214,
-        FRAMEBUFFER_ATTACHMENT_ALPHA_SIZE = 0x8215,
-        FRAMEBUFFER_ATTACHMENT_DEPTH_SIZE = 0x8216,
-        FRAMEBUFFER_ATTACHMENT_STENCIL_SIZE = 0x8217,
+        FRAMEBUFFER_ATTACHMENT_RED_ਮਾਪ  = 0x8212,
+        FRAMEBUFFER_ATTACHMENT_GREEN_ਮਾਪ = 0x8213,
+        FRAMEBUFFER_ATTACHMENT_BLUE_ਮਾਪ = 0x8214,
+        FRAMEBUFFER_ATTACHMENT_ALPHA_ਮਾਪ = 0x8215,
+        FRAMEBUFFER_ATTACHMENT_ਡੂੰਘਾਈ_ਮਾਪ = 0x8216,
+        FRAMEBUFFER_ATTACHMENT_STENCIL_ਮਾਪ = 0x8217,
         FRAMEBUFFER_DEFAULT              = 0x8218,
         FRAMEBUFFER_UNDEFINED            = 0x8219,
-        DEPTH_STENCIL_ATTACHMENT         = 0x821A,
-        INDEX                            = 0x8222,
-        MAX_RENDERBUFFER_SIZE            = 0x84E8,
-        DEPTH_STENCIL                    = 0x84F9,
+        ਡੂੰਘਾਈ_STENCIL_ATTACHMENT         = 0x821A,
+        ਸੂਚਕਾਂਕ_2                            = 0x8222,
+        MAX_RENDERBUFFER_ਮਾਪ            = 0x84E8,
+        ਡੂੰਘਾਈ_STENCIL                    = 0x84F9,
         UNSIGNED_INT_24_8                = 0x84FA,
         DEPTH24_STENCIL8                 = 0x88F0,
-        TEXTURE_STENCIL_SIZE             = 0x88F1,
+        TEXTURE_STENCIL_ਮਾਪ             = 0x88F1,
         TEXTURE_RED_TYPE                 = 0x8C10,
         TEXTURE_GREEN_TYPE               = 0x8C11,
         TEXTURE_BLUE_TYPE                = 0x8C12,
         TEXTURE_ALPHA_TYPE               = 0x8C13,
-        TEXTURE_DEPTH_TYPE               = 0x8C16,
+        TEXTURE_ਡੂੰਘਾਈ_TYPE               = 0x8C16,
         UNSIGNED_NORMALIZED              = 0x8C17,
         FRAMEBUFFER_BINDING              = 0x8CA6,
         DRAW_FRAMEBUFFER_BINDING         = 0x8CA6,
@@ -832,8 +832,8 @@ namespace gl
         FRAMEBUFFER_COMPLETE             = 0x8CD5,
         FRAMEBUFFER_INCOMPLETE_ATTACHMENT = 0x8CD6,
         FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT = 0x8CD7,
-        FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER = 0x8CDB,
-        FRAMEBUFFER_INCOMPLETE_READ_BUFFER = 0x8CDC,
+        FRAMEBUFFER_INCOMPLETE_DRAW_ਬਫਰ = 0x8CDB,
+        FRAMEBUFFER_INCOMPLETE_READ_ਬਫਰ = 0x8CDC,
         FRAMEBUFFER_UNSUPPORTED          = 0x8CDD,
         MAX_COLOR_ATTACHMENTS            = 0x8CDF,
         COLOR_ATTACHMENT0                = 0x8CE0,
@@ -852,35 +852,35 @@ namespace gl
         COLOR_ATTACHMENT13               = 0x8CED,
         COLOR_ATTACHMENT14               = 0x8CEE,
         COLOR_ATTACHMENT15               = 0x8CEF,
-        DEPTH_ATTACHMENT                 = 0x8D00,
+        ਡੂੰਘਾਈ_ATTACHMENT                 = 0x8D00,
         STENCIL_ATTACHMENT               = 0x8D20,
         FRAMEBUFFER                      = 0x8D40,
         RENDERBUFFER                     = 0x8D41,
-        RENDERBUFFER_WIDTH               = 0x8D42,
-        RENDERBUFFER_HEIGHT              = 0x8D43,
-        RENDERBUFFER_INTERNAL_FORMAT     = 0x8D44,
+        RENDERBUFFER_ਚੌੜਾਈ               = 0x8D42,
+        RENDERBUFFER_ਉਚਾਈ              = 0x8D43,
+        RENDERBUFFER_ਅੰਦਰੂਨੀ_FORMAT     = 0x8D44,
         STENCIL_INDEX1                   = 0x8D46,
         STENCIL_INDEX4                   = 0x8D47,
         STENCIL_INDEX8                   = 0x8D48,
         STENCIL_INDEX16                  = 0x8D49,
-        RENDERBUFFER_RED_SIZE            = 0x8D50,
-        RENDERBUFFER_GREEN_SIZE          = 0x8D51,
-        RENDERBUFFER_BLUE_SIZE           = 0x8D52,
-        RENDERBUFFER_ALPHA_SIZE          = 0x8D53,
-        RENDERBUFFER_DEPTH_SIZE          = 0x8D54,
-        RENDERBUFFER_STENCIL_SIZE        = 0x8D55,
+        RENDERBUFFER_RED_ਮਾਪ            = 0x8D50,
+        RENDERBUFFER_GREEN_ਮਾਪ          = 0x8D51,
+        RENDERBUFFER_BLUE_ਮਾਪ           = 0x8D52,
+        RENDERBUFFER_ALPHA_ਮਾਪ          = 0x8D53,
+        RENDERBUFFER_ਡੂੰਘਾਈ_ਮਾਪ          = 0x8D54,
+        RENDERBUFFER_STENCIL_ਮਾਪ        = 0x8D55,
         FRAMEBUFFER_INCOMPLETE_MULTISAMPLE = 0x8D56,
         MAX_SAMPLES                      = 0x8D57,
         TEXTURE_LUMINANCE_TYPE           = 0x8C14,
         TEXTURE_INTENSITY_TYPE           = 0x8C15,
 
         // Core Extension: ARB_depth_buffer_float
-        DEPTH_COMPONENT32F               = 0x8CAC,
+        ਡੂੰਘਾਈ_COMPONENT32_F               = 0x8CAC,
         DEPTH32F_STENCIL8                = 0x8CAD,
         FLOAT_32_UNSIGNED_INT_24_8_REV   = 0x8DAD,
 
         // Version: 3.0
-        COMPARE_REF_TO_TEXTURE           = 0x884E,
+        COMPARE_REF_ਮੰਜ਼ਿਲ_TEXTURE           = 0x884E,
         CLIP_DISTANCE0                   = 0x3000,
         CLIP_DISTANCE1                   = 0x3001,
         CLIP_DISTANCE2                   = 0x3002,
@@ -890,21 +890,21 @@ namespace gl
         CLIP_DISTANCE6                   = 0x3006,
         CLIP_DISTANCE7                   = 0x3007,
         MAX_CLIP_DISTANCES               = 0x0D32,
-        MAJOR_VERSION                    = 0x821B,
-        MINOR_VERSION                    = 0x821C,
-        NUM_EXTENSIONS                   = 0x821D,
+        MAJOR_ਸੰਸਕਰਣ                    = 0x821B,
+        MINOR_ਸੰਸਕਰਣ                    = 0x821C,
+        ਅੰਕ_EXTENSIONS                   = 0x821D,
         CONTEXT_FLAGS                    = 0x821E,
         COMPRESSED_RED                   = 0x8225,
         COMPRESSED_RG                    = 0x8226,
-        CONTEXT_FLAG_FORWARD_COMPATIBLE_BIT = 0x0001,
+        CONTEXT_FLAG_FORWARD_COMPATIBLE_ਦੋਆਧਾਰੀ_ਅੰਕ = 0x0001,
         RGBA32F                          = 0x8814,
         RGB32F                           = 0x8815,
         RGBA16F                          = 0x881A,
         RGB16F                           = 0x881B,
-        VERTEX_ATTRIB_ARRAY_INTEGER      = 0x88FD,
+        ਸ਼ੀਰਸ਼_ATTRIB_ARRAY_INTEGER      = 0x88FD,
         MAX_ARRAY_TEXTURE_LAYERS         = 0x88FF,
-        MIN_PROGRAM_TEXEL_OFFSET         = 0x8904,
-        MAX_PROGRAM_TEXEL_OFFSET         = 0x8905,
+        MIN_ਪ੍ਰੋਗਰਾਮ_TEXEL_ਵਿੱਥ         = 0x8904,
+        MAX_ਪ੍ਰੋਗਰਾਮ_TEXEL_ਵਿੱਥ         = 0x8905,
         CLAMP_READ_COLOR                 = 0x891C,
         FIXED_ONLY                       = 0x891D,
         TEXTURE_1D_ARRAY                 = 0x8C18,
@@ -917,13 +917,13 @@ namespace gl
         UNSIGNED_INT_10F_11F_11F_REV     = 0x8C3B,
         RGB9_E5                          = 0x8C3D,
         UNSIGNED_INT_5_9_9_9_REV         = 0x8C3E,
-        TEXTURE_SHARED_SIZE              = 0x8C3F,
-        TRANSFORM_FEEDBACK_VARYING_MAX_LENGTH = 0x8C76,
-        TRANSFORM_FEEDBACK_BUFFER_MODE   = 0x8C7F,
+        TEXTURE_SHARED_ਮਾਪ              = 0x8C3F,
+        TRANSFORM_FEEDBACK_VARYING_MAX_ਲੰਮਾਈ = 0x8C76,
+        TRANSFORM_FEEDBACK_ਬਫਰ_ਬਹੁਲਕ   = 0x8C7F,
         MAX_TRANSFORM_FEEDBACK_SEPARATE_COMPONENTS = 0x8C80,
         TRANSFORM_FEEDBACK_VARYINGS      = 0x8C83,
-        TRANSFORM_FEEDBACK_BUFFER_START  = 0x8C84,
-        TRANSFORM_FEEDBACK_BUFFER_SIZE   = 0x8C85,
+        TRANSFORM_FEEDBACK_ਬਫਰ_ਸ਼ੁਰੂ  = 0x8C84,
+        TRANSFORM_FEEDBACK_ਬਫਰ_ਮਾਪ   = 0x8C85,
         PRIMITIVES_GENERATED             = 0x8C87,
         TRANSFORM_FEEDBACK_PRIMITIVES_WRITTEN = 0x8C88,
         RASTERIZER_DISCARD               = 0x8C89,
@@ -931,8 +931,8 @@ namespace gl
         MAX_TRANSFORM_FEEDBACK_SEPARATE_ATTRIBS = 0x8C8B,
         INTERLEAVED_ATTRIBS              = 0x8C8C,
         SEPARATE_ATTRIBS                 = 0x8C8D,
-        TRANSFORM_FEEDBACK_BUFFER        = 0x8C8E,
-        TRANSFORM_FEEDBACK_BUFFER_BINDING = 0x8C8F,
+        TRANSFORM_FEEDBACK_ਬਫਰ        = 0x8C8E,
+        TRANSFORM_FEEDBACK_ਬਫਰ_BINDING = 0x8C8F,
         RGBA32UI                         = 0x8D70,
         RGB32UI                          = 0x8D71,
         RGBA16UI                         = 0x8D76,
@@ -976,67 +976,67 @@ namespace gl
         QUERY_NO_WAIT                    = 0x8E14,
         QUERY_BY_REGION_WAIT             = 0x8E15,
         QUERY_BY_REGION_NO_WAIT          = 0x8E16,
-        BUFFER_ACCESS_FLAGS              = 0x911F,
-        BUFFER_MAP_LENGTH                = 0x9120,
-        BUFFER_MAP_OFFSET                = 0x9121,
+        ਬਫਰ_ACCESS_FLAGS              = 0x911F,
+        ਬਫਰ_MAP_ਲੰਮਾਈ                = 0x9120,
+        ਬਫਰ_MAP_ਵਿੱਥ                = 0x9121,
 
         // Core Extension: ARB_uniform_buffer_object
-        UNIFORM_BUFFER                   = 0x8A11,
-        UNIFORM_BUFFER_BINDING           = 0x8A28,
-        UNIFORM_BUFFER_START             = 0x8A29,
-        UNIFORM_BUFFER_SIZE              = 0x8A2A,
-        MAX_VERTEX_UNIFORM_BLOCKS        = 0x8A2B,
-        MAX_FRAGMENT_UNIFORM_BLOCKS      = 0x8A2D,
-        MAX_COMBINED_UNIFORM_BLOCKS      = 0x8A2E,
-        MAX_UNIFORM_BUFFER_BINDINGS      = 0x8A2F,
-        MAX_UNIFORM_BLOCK_SIZE           = 0x8A30,
-        MAX_COMBINED_VERTEX_UNIFORM_COMPONENTS = 0x8A31,
-        MAX_COMBINED_FRAGMENT_UNIFORM_COMPONENTS = 0x8A33,
-        UNIFORM_BUFFER_OFFSET_ALIGNMENT  = 0x8A34,
-        ACTIVE_UNIFORM_BLOCK_MAX_NAME_LENGTH = 0x8A35,
-        ACTIVE_UNIFORM_BLOCKS            = 0x8A36,
-        UNIFORM_TYPE                     = 0x8A37,
-        UNIFORM_SIZE                     = 0x8A38,
-        UNIFORM_NAME_LENGTH              = 0x8A39,
-        UNIFORM_BLOCK_INDEX              = 0x8A3A,
-        UNIFORM_OFFSET                   = 0x8A3B,
-        UNIFORM_ARRAY_STRIDE             = 0x8A3C,
-        UNIFORM_MATRIX_STRIDE            = 0x8A3D,
-        UNIFORM_IS_ROW_MAJOR             = 0x8A3E,
-        UNIFORM_BLOCK_BINDING            = 0x8A3F,
-        UNIFORM_BLOCK_DATA_SIZE          = 0x8A40,
-        UNIFORM_BLOCK_NAME_LENGTH        = 0x8A41,
-        UNIFORM_BLOCK_ACTIVE_UNIFORMS    = 0x8A42,
-        UNIFORM_BLOCK_ACTIVE_UNIFORM_INDICES = 0x8A43,
-        UNIFORM_BLOCK_REFERENCED_BY_VERTEX_SHADER = 0x8A44,
-        UNIFORM_BLOCK_REFERENCED_BY_FRAGMENT_SHADER = 0x8A46,
-        INVALID_INDEX                    = 0xFFFFFFFF,
-        MAX_GEOMETRY_UNIFORM_BLOCKS      = 0x8A2C,
-        MAX_COMBINED_GEOMETRY_UNIFORM_COMPONENTS = 0x8A32,
-        UNIFORM_BLOCK_REFERENCED_BY_GEOMETRY_SHADER = 0x8A45,
+        ਇਕਸਾਰ_ਬਫਰ                   = 0x8A11,
+        ਇਕਸਾਰ_ਬਫਰ_BINDING           = 0x8A28,
+        ਇਕਸਾਰ_ਬਫਰ_ਸ਼ੁਰੂ             = 0x8A29,
+        ਇਕਸਾਰ_ਬਫਰ_ਮਾਪ              = 0x8A2A,
+        MAX_ਸ਼ੀਰਸ਼_ਇਕਸਾਰ_ਖੰਡਾਂ        = 0x8A2B,
+        MAX_FRAGMENT_ਇਕਸਾਰ_ਖੰਡਾਂ      = 0x8A2D,
+        MAX_COMBINED_ਇਕਸਾਰ_ਖੰਡਾਂ      = 0x8A2E,
+        MAX_ਇਕਸਾਰ_ਬਫਰ_BINDINGS      = 0x8A2F,
+        MAX_ਇਕਸਾਰ_ਖੰਡ_ਮਾਪ           = 0x8A30,
+        MAX_COMBINED_ਸ਼ੀਰਸ਼_ਇਕਸਾਰ_COMPONENTS = 0x8A31,
+        MAX_COMBINED_FRAGMENT_ਇਕਸਾਰ_COMPONENTS = 0x8A33,
+        ਇਕਸਾਰ_ਬਫਰ_ਵਿੱਥ_ALIGNMENT  = 0x8A34,
+        ਸਰਗਰਮ_ਇਕਸਾਰ_ਖੰਡ_MAX_NAME_ਲੰਮਾਈ = 0x8A35,
+        ਸਰਗਰਮ_ਇਕਸਾਰ_ਖੰਡਾਂ            = 0x8A36,
+        ਇਕਸਾਰ_TYPE                     = 0x8A37,
+        ਇਕਸਾਰ_ਮਾਪ                     = 0x8A38,
+        ਇਕਸਾਰ_NAME_ਲੰਮਾਈ              = 0x8A39,
+        ਇਕਸਾਰ_ਖੰਡ_ਸੂਚਕਾਂਕ_2              = 0x8A3A,
+        ਇਕਸਾਰ_ਵਿੱਥ                   = 0x8A3B,
+        ਇਕਸਾਰ_ARRAY_STRIDE             = 0x8A3C,
+        ਇਕਸਾਰ_ਮੈਟ੍ਰਿਕਸ_STRIDE            = 0x8A3D,
+        ਇਕਸਾਰ_IS_ਪੰਕਤੀ_MAJOR             = 0x8A3E,
+        ਇਕਸਾਰ_ਖੰਡ_BINDING            = 0x8A3F,
+        ਇਕਸਾਰ_ਖੰਡ_ਅੰਕੜੇ_ਮਾਪ          = 0x8A40,
+        ਇਕਸਾਰ_ਖੰਡ_NAME_ਲੰਮਾਈ        = 0x8A41,
+        ਇਕਸਾਰ_ਖੰਡ_ਸਰਗਰਮ_UNIFORMS    = 0x8A42,
+        ਇਕਸਾਰ_ਖੰਡ_ਸਰਗਰਮ_ਇਕਸਾਰ_INDICES = 0x8A43,
+        ਇਕਸਾਰ_ਖੰਡ_REFERENCED_BY_ਸ਼ੀਰਸ਼_SHADER = 0x8A44,
+        ਇਕਸਾਰ_ਖੰਡ_REFERENCED_BY_FRAGMENT_SHADER = 0x8A46,
+        INVALID_ਸੂਚਕਾਂਕ                    = 0xFFFFFFFF,
+        MAX_GEOMETRY_ਇਕਸਾਰ_ਖੰਡਾਂ      = 0x8A2C,
+        MAX_COMBINED_GEOMETRY_ਇਕਸਾਰ_COMPONENTS = 0x8A32,
+        ਇਕਸਾਰ_ਖੰਡ_REFERENCED_BY_GEOMETRY_SHADER = 0x8A45,
 
         // Core Extension: ARB_copy_buffer
-        COPY_READ_BUFFER                 = 0x8F36,
-        COPY_WRITE_BUFFER                = 0x8F37,
-        COPY_READ_BUFFER_BINDING         = 0x8F36,
-        COPY_WRITE_BUFFER_BINDING        = 0x8F37,
+        COPY_READ_ਬਫਰ                 = 0x8F36,
+        COPY_WRITE_ਬਫਰ                = 0x8F37,
+        COPY_READ_ਬਫਰ_BINDING         = 0x8F36,
+        COPY_WRITE_ਬਫਰ_BINDING        = 0x8F37,
 
         // Version: 3.1
         SAMPLER_2D_RECT                  = 0x8B63,
         SAMPLER_2D_RECT_SHADOW           = 0x8B64,
-        SAMPLER_BUFFER                   = 0x8DC2,
+        SAMPLER_ਬਫਰ                   = 0x8DC2,
         INT_SAMPLER_2D_RECT              = 0x8DCD,
-        INT_SAMPLER_BUFFER               = 0x8DD0,
+        INT_SAMPLER_ਬਫਰ               = 0x8DD0,
         UNSIGNED_INT_SAMPLER_2D_RECT     = 0x8DD5,
-        UNSIGNED_INT_SAMPLER_BUFFER      = 0x8DD8,
-        TEXTURE_BUFFER                   = 0x8C2A,
-        MAX_TEXTURE_BUFFER_SIZE          = 0x8C2B,
-        TEXTURE_BINDING_BUFFER           = 0x8C2C,
-        TEXTURE_BUFFER_DATA_STORE_BINDING = 0x8C2D,
+        UNSIGNED_INT_SAMPLER_ਬਫਰ      = 0x8DD8,
+        TEXTURE_ਬਫਰ                   = 0x8C2A,
+        MAX_TEXTURE_ਬਫਰ_ਮਾਪ          = 0x8C2B,
+        TEXTURE_BINDING_ਬਫਰ           = 0x8C2C,
+        TEXTURE_ਬਫਰ_ਅੰਕੜੇ_STORE_BINDING = 0x8C2D,
         TEXTURE_RECTANGLE                = 0x84F5,
         TEXTURE_BINDING_RECTANGLE        = 0x84F6,
         PROXY_TEXTURE_RECTANGLE          = 0x84F7,
-        MAX_RECTANGLE_TEXTURE_SIZE       = 0x84F8,
+        MAX_RECTANGLE_TEXTURE_ਮਾਪ       = 0x84F8,
         RED_SNORM                        = 0x8F90,
         RG_SNORM                         = 0x8F91,
         RGB_SNORM                        = 0x8F92,
@@ -1051,323 +1051,323 @@ namespace gl
         RGBA16_SNORM                     = 0x8F9B,
         SIGNED_NORMALIZED                = 0x8F9C,
         PRIMITIVE_RESTART                = 0x8F9D,
-        PRIMITIVE_RESTART_INDEX          = 0x8F9E,
+        PRIMITIVE_RESTART_ਸੂਚਕਾਂਕ          = 0x8F9E,
 
         // Legacy
-        VERTEX_ARRAY = 0x8074,
-        NORMAL_ARRAY = 0x8075,
+        ਸ਼ੀਰਸ਼_ARRAY = 0x8074,
+        ਸਾਧਾਰਨ_ARRAY = 0x8075,
         COLOR_ARRAY = 0x8076,
         TEXTURE_COORD_ARRAY = 0x8078,
         TEXTURE_ENV = 0x2300,
-        TEXTURE_ENV_MODE = 0x2200,
+        TEXTURE_ENV_ਬਹੁਲਕ = 0x2200,
         MODELVIEW = 0x1700,
         PROJECTION = 0x1701,
         LIGHTING = 0x0B50
     };
 
     // Extension: 1.1
-    extern void (CODEGEN_FUNCPTR *CullFace)(GLenum mode);
-    extern void (CODEGEN_FUNCPTR *FrontFace)(GLenum mode);
-    extern void (CODEGEN_FUNCPTR *Hint)(GLenum target, GLenum mode);
-    extern void (CODEGEN_FUNCPTR *LineWidth)(GLfloat width);
-    extern void (CODEGEN_FUNCPTR *PointSize)(GLfloat size);
-    extern void (CODEGEN_FUNCPTR *PolygonMode)(GLenum face, GLenum mode);
-    extern void (CODEGEN_FUNCPTR *Scissor)(GLint x, GLint y, GLsizei width, GLsizei height);
-    extern void (CODEGEN_FUNCPTR *TexParameterf)(GLenum target, GLenum pname, GLfloat param);
-    extern void (CODEGEN_FUNCPTR *TexParameterfv)(GLenum target, GLenum pname, const GLfloat *params);
-    extern void (CODEGEN_FUNCPTR *TexParameteri)(GLenum target, GLenum pname, GLint param);
-    extern void (CODEGEN_FUNCPTR *TexParameteriv)(GLenum target, GLenum pname, const GLint *params);
-    extern void (CODEGEN_FUNCPTR *TexImage1D)(GLenum target, GLint level, GLint internalformat, GLsizei width, GLint border, GLenum format, GLenum type, const GLvoid *pixels);
-    extern void (CODEGEN_FUNCPTR *TexImage2D)(GLenum target, GLint level, GLint internalformat, GLsizei width, GLsizei height, GLint border, GLenum format, GLenum type, const GLvoid *pixels);
-    extern void (CODEGEN_FUNCPTR *DrawBuffer)(GLenum mode);
-    extern void (CODEGEN_FUNCPTR *Clear)(GLbitfield mask);
-    extern void (CODEGEN_FUNCPTR *ClearColor)(GLfloat red, GLfloat green, GLfloat blue, GLfloat alpha);
-    extern void (CODEGEN_FUNCPTR *ClearStencil)(GLint s);
-    extern void (CODEGEN_FUNCPTR *ClearDepth)(GLdouble depth);
-    extern void (CODEGEN_FUNCPTR *StencilMask)(GLuint mask);
-    extern void (CODEGEN_FUNCPTR *ColorMask)(GLboolean red, GLboolean green, GLboolean blue, GLboolean alpha);
-    extern void (CODEGEN_FUNCPTR *DepthMask)(GLboolean flag);
-    extern void (CODEGEN_FUNCPTR *Disable)(GLenum cap);
-    extern void (CODEGEN_FUNCPTR *Enable)(GLenum cap);
-    extern void (CODEGEN_FUNCPTR *Finish)();
-    extern void (CODEGEN_FUNCPTR *Flush)();
-    extern void (CODEGEN_FUNCPTR *BlendFunc)(GLenum sfactor, GLenum dfactor);
-    extern void (CODEGEN_FUNCPTR *LogicOp)(GLenum opcode);
-    extern void (CODEGEN_FUNCPTR *StencilFunc)(GLenum func, GLint ref, GLuint mask);
-    extern void (CODEGEN_FUNCPTR *StencilOp)(GLenum fail, GLenum zfail, GLenum zpass);
-    extern void (CODEGEN_FUNCPTR *DepthFunc)(GLenum func);
-    extern void (CODEGEN_FUNCPTR *PixelStoref)(GLenum pname, GLfloat param);
-    extern void (CODEGEN_FUNCPTR *PixelStorei)(GLenum pname, GLint param);
-    extern void (CODEGEN_FUNCPTR *ReadBuffer)(GLenum mode);
-    extern void (CODEGEN_FUNCPTR *ReadPixels)(GLint x, GLint y, GLsizei width, GLsizei height, GLenum format, GLenum type, GLvoid *pixels);
-    extern void (CODEGEN_FUNCPTR *GetBooleanv)(GLenum pname, GLboolean *params);
-    extern void (CODEGEN_FUNCPTR *GetDoublev)(GLenum pname, GLdouble *params);
-    extern GLenum (CODEGEN_FUNCPTR *GetError)();
-    extern void (CODEGEN_FUNCPTR *GetFloatv)(GLenum pname, GLfloat *params);
-    extern void (CODEGEN_FUNCPTR *GetIntegerv)(GLenum pname, GLint *params);
-    extern const GLubyte * (CODEGEN_FUNCPTR *GetString)(GLenum name);
-    extern void (CODEGEN_FUNCPTR *GetTexImage)(GLenum target, GLint level, GLenum format, GLenum type, GLvoid *pixels);
-    extern void (CODEGEN_FUNCPTR *GetTexParameterfv)(GLenum target, GLenum pname, GLfloat *params);
-    extern void (CODEGEN_FUNCPTR *GetTexParameteriv)(GLenum target, GLenum pname, GLint *params);
-    extern void (CODEGEN_FUNCPTR *GetTexLevelParameterfv)(GLenum target, GLint level, GLenum pname, GLfloat *params);
-    extern void (CODEGEN_FUNCPTR *GetTexLevelParameteriv)(GLenum target, GLint level, GLenum pname, GLint *params);
-    extern GLboolean (CODEGEN_FUNCPTR *IsEnabled)(GLenum cap);
-    extern void (CODEGEN_FUNCPTR *DepthRange)(GLdouble ren_near, GLdouble ren_far);
-    extern void (CODEGEN_FUNCPTR *Viewport)(GLint x, GLint y, GLsizei width, GLsizei height);
-    extern void (CODEGEN_FUNCPTR *DrawArrays)(GLenum mode, GLint first, GLsizei count);
-    extern void (CODEGEN_FUNCPTR *DrawElements)(GLenum mode, GLsizei count, GLenum type, const GLvoid *indices);
-    extern void (CODEGEN_FUNCPTR *GetPointerv)(GLenum pname, GLvoid* *params);
-    extern void (CODEGEN_FUNCPTR *PolygonOffset)(GLfloat factor, GLfloat units);
-    extern void (CODEGEN_FUNCPTR *CopyTexImage1D)(GLenum target, GLint level, GLenum internalformat, GLint x, GLint y, GLsizei width, GLint border);
-    extern void (CODEGEN_FUNCPTR *CopyTexImage2D)(GLenum target, GLint level, GLenum internalformat, GLint x, GLint y, GLsizei width, GLsizei height, GLint border);
-    extern void (CODEGEN_FUNCPTR *CopyTexSubImage1D)(GLenum target, GLint level, GLint xoffset, GLint x, GLint y, GLsizei width);
-    extern void (CODEGEN_FUNCPTR *CopyTexSubImage2D)(GLenum target, GLint level, GLint xoffset, GLint yoffset, GLint x, GLint y, GLsizei width, GLsizei height);
-    extern void (CODEGEN_FUNCPTR *TexSubImage1D)(GLenum target, GLint level, GLint xoffset, GLsizei width, GLenum format, GLenum type, const GLvoid *pixels);
-    extern void (CODEGEN_FUNCPTR *TexSubImage2D)(GLenum target, GLint level, GLint xoffset, GLint yoffset, GLsizei width, GLsizei height, GLenum format, GLenum type, const GLvoid *pixels);
-    extern void (CODEGEN_FUNCPTR *BindTexture)(GLenum target, GLuint texture);
-    extern void (CODEGEN_FUNCPTR *DeleteTextures)(GLsizei n, const GLuint *textures);
-    extern void (CODEGEN_FUNCPTR *GenTextures)(GLsizei n, GLuint *textures);
-    extern GLboolean (CODEGEN_FUNCPTR *IsTexture)(GLuint texture);
-    extern void (CODEGEN_FUNCPTR *Indexub)(GLubyte c);
-    extern void (CODEGEN_FUNCPTR *Indexubv)(const GLubyte *c);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *CullFace)(GLenum ਬਹੁਲਕ);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *FrontFace)(GLenum ਬਹੁਲਕ);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *Hint)(GLenum target, GLenum ਬਹੁਲਕ);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *ਸਤਰ_ਚੌੜਾਈ)(GLfloat ਚੌੜਾਈ);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *ਬਿੰਦੂ_ਮਾਪ)(GLfloat size);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *Polygon_ਬਹੁਲਕ)(GLenum face, GLenum ਬਹੁਲਕ);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *Scissor)(GLint x, GLint y, GLsizei ਚੌੜਾਈ, GLsizei ਉਚਾਈ);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *TexParameterf)(GLenum target, GLenum pname, GLfloat param);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *TexParameterfv)(GLenum target, GLenum pname, ਅਚਲ GLfloat *params);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *TexParameteri)(GLenum target, GLenum pname, GLint param);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *TexParameteriv)(GLenum target, GLenum pname, ਅਚਲ GLint *params);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *TexImage1D)(GLenum target, GLint level, GLint internalformat, GLsizei ਚੌੜਾਈ, GLint border, GLenum format, GLenum type, ਅਚਲ GLvoid *pixels);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *TexImage2D)(GLenum target, GLint level, GLint internalformat, GLsizei ਚੌੜਾਈ, GLsizei ਉਚਾਈ, GLint border, GLenum format, GLenum type, ਅਚਲ GLvoid *pixels);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *Draw_ਬਫਰ)(GLenum ਬਹੁਲਕ);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *Clear)(GLbitfield ਨਕਾਬ);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *ClearColor)(GLfloat red, GLfloat green, GLfloat blue, GLfloat alpha);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *ClearStencil)(GLint s);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *Clear_ਡੂੰਘਾਈ)(GLdouble ਡੂੰਘਾਈ);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *Stencil_ਨਕਾਬ)(GLuint ਨਕਾਬ);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *Color_ਨਕਾਬ)(GLboolean red, GLboolean green, GLboolean blue, GLboolean alpha);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *ਡੂੰਘਾਈ_ਨਕਾਬ)(GLboolean flag);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *Disable)(GLenum cap);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *Enable)(GLenum cap);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *ਅੰਤ)();
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *Flush)();
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *BlendFunc)(GLenum sfactor, GLenum dfactor);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *LogicOp)(GLenum opcode);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *StencilFunc)(GLenum func, GLint ref, GLuint ਨਕਾਬ);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *StencilOp)(GLenum fail, GLenum zfail, GLenum zpass);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *ਡੂੰਘਾਈ_Func)(GLenum func);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *PixelStoref)(GLenum pname, GLfloat param);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *PixelStorei)(GLenum pname, GLint param);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *Read_ਬਫਰ)(GLenum ਬਹੁਲਕ);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *ReadPixels)(GLint x, GLint y, GLsizei ਚੌੜਾਈ, GLsizei ਉਚਾਈ, GLenum format, GLenum type, GLvoid *pixels);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *GetBooleanv)(GLenum pname, GLboolean *params);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *GetDoublev)(GLenum pname, GLdouble *params);
+    ਬਾਹਰੀ GLenum (CODEGEN_FUNCPTR *GetError)();
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *GetFloatv)(GLenum pname, GLfloat *params);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *GetIntegerv)(GLenum pname, GLint *params);
+    ਬਾਹਰੀ ਅਚਲ GLubyte * (CODEGEN_FUNCPTR *GetString)(GLenum name);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *GetTexImage)(GLenum target, GLint level, GLenum format, GLenum type, GLvoid *pixels);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *GetTexParameterfv)(GLenum target, GLenum pname, GLfloat *params);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *GetTexParameteriv)(GLenum target, GLenum pname, GLint *params);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *GetTexLevelParameterfv)(GLenum target, GLint level, GLenum pname, GLfloat *params);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *GetTexLevelParameteriv)(GLenum target, GLint level, GLenum pname, GLint *params);
+    ਬਾਹਰੀ GLboolean (CODEGEN_FUNCPTR *IsEnabled)(GLenum cap);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *ਡੂੰਘਾਈ_Range)(GLdouble ren_near, GLdouble ren_far);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *Viewport)(GLint x, GLint y, GLsizei ਚੌੜਾਈ, GLsizei ਉਚਾਈ);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *DrawArrays)(GLenum ਬਹੁਲਕ, GLint first, GLsizei ਗਿਣਤੀ_3);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *DrawElements)(GLenum ਬਹੁਲਕ, GLsizei ਗਿਣਤੀ_3, GLenum type, ਅਚਲ GLvoid *indices);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *GetPointerv)(GLenum pname, GLvoid* *params);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *Polygon_ਵਿੱਥ)(GLfloat ਗੁਣਕ, GLfloat units);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *CopyTexImage1D)(GLenum target, GLint level, GLenum internalformat, GLint x, GLint y, GLsizei ਚੌੜਾਈ, GLint border);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *CopyTexImage2D)(GLenum target, GLint level, GLenum internalformat, GLint x, GLint y, GLsizei ਚੌੜਾਈ, GLsizei ਉਚਾਈ, GLint border);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *CopyTexSubImage1D)(GLenum target, GLint level, GLint xoffset, GLint x, GLint y, GLsizei ਚੌੜਾਈ);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *CopyTexSubImage2D)(GLenum target, GLint level, GLint xoffset, GLint yoffset, GLint x, GLint y, GLsizei ਚੌੜਾਈ, GLsizei ਉਚਾਈ);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *TexSubImage1D)(GLenum target, GLint level, GLint xoffset, GLsizei ਚੌੜਾਈ, GLenum format, GLenum type, ਅਚਲ GLvoid *pixels);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *TexSubImage2D)(GLenum target, GLint level, GLint xoffset, GLint yoffset, GLsizei ਚੌੜਾਈ, GLsizei ਉਚਾਈ, GLenum format, GLenum type, ਅਚਲ GLvoid *pixels);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *BindTexture)(GLenum target, GLuint texture);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *DeleteTextures)(GLsizei n, ਅਚਲ GLuint *textures);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *GenTextures)(GLsizei n, GLuint *textures);
+    ਬਾਹਰੀ GLboolean (CODEGEN_FUNCPTR *IsTexture)(GLuint texture);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *Indexub)(GLubyte c);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *Indexubv)(ਅਚਲ GLubyte *c);
 
     // Extension: 1.2
-    extern void (CODEGEN_FUNCPTR *BlendColor)(GLfloat red, GLfloat green, GLfloat blue, GLfloat alpha);
-    extern void (CODEGEN_FUNCPTR *BlendEquation)(GLenum mode);
-    extern void (CODEGEN_FUNCPTR *DrawRangeElements)(GLenum mode, GLuint start, GLuint end, GLsizei count, GLenum type, const GLvoid *indices);
-    extern void (CODEGEN_FUNCPTR *TexSubImage3D)(GLenum target, GLint level, GLint xoffset, GLint yoffset, GLint zoffset, GLsizei width, GLsizei height, GLsizei depth, GLenum format, GLenum type, const GLvoid *pixels);
-    extern void (CODEGEN_FUNCPTR *CopyTexSubImage3D)(GLenum target, GLint level, GLint xoffset, GLint yoffset, GLint zoffset, GLint x, GLint y, GLsizei width, GLsizei height);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *BlendColor)(GLfloat red, GLfloat green, GLfloat blue, GLfloat alpha);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *BlendEquation)(GLenum ਬਹੁਲਕ);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *DrawRangeElements)(GLenum ਬਹੁਲਕ, GLuint ਸ਼ੁਰੂ, GLuint end, GLsizei ਗਿਣਤੀ_3, GLenum type, ਅਚਲ GLvoid *indices);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *TexSubImage3D)(GLenum target, GLint level, GLint xoffset, GLint yoffset, GLint zoffset, GLsizei ਚੌੜਾਈ, GLsizei ਉਚਾਈ, GLsizei ਡੂੰਘਾਈ, GLenum format, GLenum type, ਅਚਲ GLvoid *pixels);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *CopyTexSubImage3D)(GLenum target, GLint level, GLint xoffset, GLint yoffset, GLint zoffset, GLint x, GLint y, GLsizei ਚੌੜਾਈ, GLsizei ਉਚਾਈ);
 
     // Extension: 1.3
-    extern void (CODEGEN_FUNCPTR *ActiveTexture)(GLenum texture);
-    extern void (CODEGEN_FUNCPTR *SampleCoverage)(GLfloat value, GLboolean invert);
-    extern void (CODEGEN_FUNCPTR *CompressedTexImage3D)(GLenum target, GLint level, GLenum internalformat, GLsizei width, GLsizei height, GLsizei depth, GLint border, GLsizei imageSize, const GLvoid *data);
-    extern void (CODEGEN_FUNCPTR *CompressedTexImage2D)(GLenum target, GLint level, GLenum internalformat, GLsizei width, GLsizei height, GLint border, GLsizei imageSize, const GLvoid *data);
-    extern void (CODEGEN_FUNCPTR *CompressedTexImage1D)(GLenum target, GLint level, GLenum internalformat, GLsizei width, GLint border, GLsizei imageSize, const GLvoid *data);
-    extern void (CODEGEN_FUNCPTR *CompressedTexSubImage3D)(GLenum target, GLint level, GLint xoffset, GLint yoffset, GLint zoffset, GLsizei width, GLsizei height, GLsizei depth, GLenum format, GLsizei imageSize, const GLvoid *data);
-    extern void (CODEGEN_FUNCPTR *CompressedTexSubImage2D)(GLenum target, GLint level, GLint xoffset, GLint yoffset, GLsizei width, GLsizei height, GLenum format, GLsizei imageSize, const GLvoid *data);
-    extern void (CODEGEN_FUNCPTR *CompressedTexSubImage1D)(GLenum target, GLint level, GLint xoffset, GLsizei width, GLenum format, GLsizei imageSize, const GLvoid *data);
-    extern void (CODEGEN_FUNCPTR *GetCompressedTexImage)(GLenum target, GLint level, GLvoid *img);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *ਸਰਗਰਮ_Texture)(GLenum texture);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *SampleCoverage)(GLfloat value, GLboolean invert);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *CompressedTexImage3D)(GLenum target, GLint level, GLenum internalformat, GLsizei ਚੌੜਾਈ, GLsizei ਉਚਾਈ, GLsizei ਡੂੰਘਾਈ, GLint border, GLsizei image_ਮਾਪ, ਅਚਲ GLvoid *ਅੰਕੜੇ);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *CompressedTexImage2D)(GLenum target, GLint level, GLenum internalformat, GLsizei ਚੌੜਾਈ, GLsizei ਉਚਾਈ, GLint border, GLsizei image_ਮਾਪ, ਅਚਲ GLvoid *ਅੰਕੜੇ);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *CompressedTexImage1D)(GLenum target, GLint level, GLenum internalformat, GLsizei ਚੌੜਾਈ, GLint border, GLsizei image_ਮਾਪ, ਅਚਲ GLvoid *ਅੰਕੜੇ);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *CompressedTexSubImage3D)(GLenum target, GLint level, GLint xoffset, GLint yoffset, GLint zoffset, GLsizei ਚੌੜਾਈ, GLsizei ਉਚਾਈ, GLsizei ਡੂੰਘਾਈ, GLenum format, GLsizei image_ਮਾਪ, ਅਚਲ GLvoid *ਅੰਕੜੇ);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *CompressedTexSubImage2D)(GLenum target, GLint level, GLint xoffset, GLint yoffset, GLsizei ਚੌੜਾਈ, GLsizei ਉਚਾਈ, GLenum format, GLsizei image_ਮਾਪ, ਅਚਲ GLvoid *ਅੰਕੜੇ);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *CompressedTexSubImage1D)(GLenum target, GLint level, GLint xoffset, GLsizei ਚੌੜਾਈ, GLenum format, GLsizei image_ਮਾਪ, ਅਚਲ GLvoid *ਅੰਕੜੇ);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *GetCompressedTexImage)(GLenum target, GLint level, GLvoid *img);
 
     // Extension: 1.4
-    extern void (CODEGEN_FUNCPTR *BlendFuncSeparate)(GLenum sfactorRGB, GLenum dfactorRGB, GLenum sfactorAlpha, GLenum dfactorAlpha);
-    extern void (CODEGEN_FUNCPTR *MultiDrawArrays)(GLenum mode, const GLint *first, const GLsizei *count, GLsizei drawcount);
-    extern void (CODEGEN_FUNCPTR *MultiDrawElements)(GLenum mode, const GLsizei *count, GLenum type, const GLvoid* const *indices, GLsizei drawcount);
-    extern void (CODEGEN_FUNCPTR *PointParameterf)(GLenum pname, GLfloat param);
-    extern void (CODEGEN_FUNCPTR *PointParameterfv)(GLenum pname, const GLfloat *params);
-    extern void (CODEGEN_FUNCPTR *PointParameteri)(GLenum pname, GLint param);
-    extern void (CODEGEN_FUNCPTR *PointParameteriv)(GLenum pname, const GLint *params);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *BlendFuncSeparate)(GLenum sfactorRGB, GLenum dfactorRGB, GLenum sfactorAlpha, GLenum dfactorAlpha);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *MultiDrawArrays)(GLenum ਬਹੁਲਕ, ਅਚਲ GLint *first, ਅਚਲ GLsizei *ਗਿਣਤੀ_3, GLsizei drawcount);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *MultiDrawElements)(GLenum ਬਹੁਲਕ, ਅਚਲ GLsizei *ਗਿਣਤੀ_3, GLenum type, ਅਚਲ GLvoid* ਅਚਲ *indices, GLsizei drawcount);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *ਬਿੰਦੂ_Parameterf)(GLenum pname, GLfloat param);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *ਬਿੰਦੂ_Parameterfv)(GLenum pname, ਅਚਲ GLfloat *params);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *ਬਿੰਦੂ_Parameteri)(GLenum pname, GLint param);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *ਬਿੰਦੂ_Parameteriv)(GLenum pname, ਅਚਲ GLint *params);
 
     // Extension: 1.5
-    extern void (CODEGEN_FUNCPTR *GenQueries)(GLsizei n, GLuint *ids);
-    extern void (CODEGEN_FUNCPTR *DeleteQueries)(GLsizei n, const GLuint *ids);
-    extern GLboolean (CODEGEN_FUNCPTR *IsQuery)(GLuint id);
-    extern void (CODEGEN_FUNCPTR *BeginQuery)(GLenum target, GLuint id);
-    extern void (CODEGEN_FUNCPTR *EndQuery)(GLenum target);
-    extern void (CODEGEN_FUNCPTR *GetQueryiv)(GLenum target, GLenum pname, GLint *params);
-    extern void (CODEGEN_FUNCPTR *GetQueryObjectiv)(GLuint id, GLenum pname, GLint *params);
-    extern void (CODEGEN_FUNCPTR *GetQueryObjectuiv)(GLuint id, GLenum pname, GLuint *params);
-    extern void (CODEGEN_FUNCPTR *BindBuffer)(GLenum target, GLuint buffer);
-    extern void (CODEGEN_FUNCPTR *DeleteBuffers)(GLsizei n, const GLuint *buffers);
-    extern void (CODEGEN_FUNCPTR *GenBuffers)(GLsizei n, GLuint *buffers);
-    extern GLboolean (CODEGEN_FUNCPTR *IsBuffer)(GLuint buffer);
-    extern void (CODEGEN_FUNCPTR *BufferData)(GLenum target, GLsizeiptr size, const GLvoid *data, GLenum usage);
-    extern void (CODEGEN_FUNCPTR *BufferSubData)(GLenum target, GLintptr offset, GLsizeiptr size, const GLvoid *data);
-    extern void (CODEGEN_FUNCPTR *GetBufferSubData)(GLenum target, GLintptr offset, GLsizeiptr size, GLvoid *data);
-    extern GLvoid* (CODEGEN_FUNCPTR *MapBuffer)(GLenum target, GLenum access);
-    extern GLboolean (CODEGEN_FUNCPTR *UnmapBuffer)(GLenum target);
-    extern void (CODEGEN_FUNCPTR *GetBufferParameteriv)(GLenum target, GLenum pname, GLint *params);
-    extern void (CODEGEN_FUNCPTR *GetBufferPointerv)(GLenum target, GLenum pname, GLvoid* *params);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *GenQueries)(GLsizei n, GLuint *ids);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *DeleteQueries)(GLsizei n, ਅਚਲ GLuint *ids);
+    ਬਾਹਰੀ GLboolean (CODEGEN_FUNCPTR *IsQuery)(GLuint id);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *BeginQuery)(GLenum target, GLuint id);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *ਸਿਰਾ_Query)(GLenum target);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *GetQueryiv)(GLenum target, GLenum pname, GLint *params);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *GetQueryObjectiv)(GLuint id, GLenum pname, GLint *params);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *GetQueryObjectuiv)(GLuint id, GLenum pname, GLuint *params);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *Bind_ਬਫਰ)(GLenum target, GLuint ਬਫਰ);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *DeleteBuffers)(GLsizei n, ਅਚਲ GLuint *buffers);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *GenBuffers)(GLsizei n, GLuint *buffers);
+    ਬਾਹਰੀ GLboolean (CODEGEN_FUNCPTR *Is_ਬਫਰ)(GLuint ਬਫਰ);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *ਬਫਰ_ਅੰਕੜੇ)(GLenum target, GLsizeiptr size, ਅਚਲ GLvoid *ਅੰਕੜੇ, GLenum usage);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *ਬਫਰ_Sub_ਅੰਕੜੇ)(GLenum target, GLintptr offset, GLsizeiptr size, ਅਚਲ GLvoid *ਅੰਕੜੇ);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *Get_ਬਫਰ_Sub_ਅੰਕੜੇ)(GLenum target, GLintptr offset, GLsizeiptr size, GLvoid *ਅੰਕੜੇ);
+    ਬਾਹਰੀ GLvoid* (CODEGEN_FUNCPTR *Map_ਬਫਰ)(GLenum target, GLenum access);
+    ਬਾਹਰੀ GLboolean (CODEGEN_FUNCPTR *Unmap_ਬਫਰ)(GLenum target);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *Get_ਬਫਰ_Parameteriv)(GLenum target, GLenum pname, GLint *params);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *Get_ਬਫਰ_Pointerv)(GLenum target, GLenum pname, GLvoid* *params);
 
     // Extension: 2.0
-    extern void (CODEGEN_FUNCPTR *BlendEquationSeparate)(GLenum modeRGB, GLenum modeAlpha);
-    extern void (CODEGEN_FUNCPTR *DrawBuffers)(GLsizei n, const GLenum *bufs);
-    extern void (CODEGEN_FUNCPTR *StencilOpSeparate)(GLenum face, GLenum sfail, GLenum dpfail, GLenum dppass);
-    extern void (CODEGEN_FUNCPTR *StencilFuncSeparate)(GLenum face, GLenum func, GLint ref, GLuint mask);
-    extern void (CODEGEN_FUNCPTR *StencilMaskSeparate)(GLenum face, GLuint mask);
-    extern void (CODEGEN_FUNCPTR *AttachShader)(GLuint program, GLuint shader);
-    extern void (CODEGEN_FUNCPTR *BindAttribLocation)(GLuint program, GLuint index, const GLchar *name);
-    extern void (CODEGEN_FUNCPTR *CompileShader)(GLuint shader);
-    extern GLuint (CODEGEN_FUNCPTR *CreateProgram)();
-    extern GLuint (CODEGEN_FUNCPTR *CreateShader)(GLenum type);
-    extern void (CODEGEN_FUNCPTR *DeleteProgram)(GLuint program);
-    extern void (CODEGEN_FUNCPTR *DeleteShader)(GLuint shader);
-    extern void (CODEGEN_FUNCPTR *DetachShader)(GLuint program, GLuint shader);
-    extern void (CODEGEN_FUNCPTR *DisableVertexAttribArray)(GLuint index);
-    extern void (CODEGEN_FUNCPTR *EnableVertexAttribArray)(GLuint index);
-    extern void (CODEGEN_FUNCPTR *GetActiveAttrib)(GLuint program, GLuint index, GLsizei bufSize, GLsizei *length, GLint *size, GLenum *type, GLchar *name);
-    extern void (CODEGEN_FUNCPTR *GetActiveUniform)(GLuint program, GLuint index, GLsizei bufSize, GLsizei *length, GLint *size, GLenum *type, GLchar *name);
-    extern void (CODEGEN_FUNCPTR *GetAttachedShaders)(GLuint program, GLsizei maxCount, GLsizei *count, GLuint *obj);
-    extern GLint (CODEGEN_FUNCPTR *GetAttribLocation)(GLuint program, const GLchar *name);
-    extern void (CODEGEN_FUNCPTR *GetProgramiv)(GLuint program, GLenum pname, GLint *params);
-    extern void (CODEGEN_FUNCPTR *GetProgramInfoLog)(GLuint program, GLsizei bufSize, GLsizei *length, GLchar *infoLog);
-    extern void (CODEGEN_FUNCPTR *GetShaderiv)(GLuint shader, GLenum pname, GLint *params);
-    extern void (CODEGEN_FUNCPTR *GetShaderInfoLog)(GLuint shader, GLsizei bufSize, GLsizei *length, GLchar *infoLog);
-    extern void (CODEGEN_FUNCPTR *GetShaderSource)(GLuint shader, GLsizei bufSize, GLsizei *length, GLchar *source);
-    extern GLint (CODEGEN_FUNCPTR *GetUniformLocation)(GLuint program, const GLchar *name);
-    extern void (CODEGEN_FUNCPTR *GetUniformfv)(GLuint program, GLint location, GLfloat *params);
-    extern void (CODEGEN_FUNCPTR *GetUniformiv)(GLuint program, GLint location, GLint *params);
-    extern void (CODEGEN_FUNCPTR *GetVertexAttribdv)(GLuint index, GLenum pname, GLdouble *params);
-    extern void (CODEGEN_FUNCPTR *GetVertexAttribfv)(GLuint index, GLenum pname, GLfloat *params);
-    extern void (CODEGEN_FUNCPTR *GetVertexAttribiv)(GLuint index, GLenum pname, GLint *params);
-    extern void (CODEGEN_FUNCPTR *GetVertexAttribPointerv)(GLuint index, GLenum pname, GLvoid* *pointer);
-    extern GLboolean (CODEGEN_FUNCPTR *IsProgram)(GLuint program);
-    extern GLboolean (CODEGEN_FUNCPTR *IsShader)(GLuint shader);
-    extern void (CODEGEN_FUNCPTR *LinkProgram)(GLuint program);
-    extern void (CODEGEN_FUNCPTR *ShaderSource)(GLuint shader, GLsizei count, const GLchar* const *string, const GLint *length);
-    extern void (CODEGEN_FUNCPTR *UseProgram)(GLuint program);
-    extern void (CODEGEN_FUNCPTR *Uniform1f)(GLint location, GLfloat v0);
-    extern void (CODEGEN_FUNCPTR *Uniform2f)(GLint location, GLfloat v0, GLfloat v1);
-    extern void (CODEGEN_FUNCPTR *Uniform3f)(GLint location, GLfloat v0, GLfloat v1, GLfloat v2);
-    extern void (CODEGEN_FUNCPTR *Uniform4f)(GLint location, GLfloat v0, GLfloat v1, GLfloat v2, GLfloat v3);
-    extern void (CODEGEN_FUNCPTR *Uniform1i)(GLint location, GLint v0);
-    extern void (CODEGEN_FUNCPTR *Uniform2i)(GLint location, GLint v0, GLint v1);
-    extern void (CODEGEN_FUNCPTR *Uniform3i)(GLint location, GLint v0, GLint v1, GLint v2);
-    extern void (CODEGEN_FUNCPTR *Uniform4i)(GLint location, GLint v0, GLint v1, GLint v2, GLint v3);
-    extern void (CODEGEN_FUNCPTR *Uniform1fv)(GLint location, GLsizei count, const GLfloat *value);
-    extern void (CODEGEN_FUNCPTR *Uniform2fv)(GLint location, GLsizei count, const GLfloat *value);
-    extern void (CODEGEN_FUNCPTR *Uniform3fv)(GLint location, GLsizei count, const GLfloat *value);
-    extern void (CODEGEN_FUNCPTR *Uniform4fv)(GLint location, GLsizei count, const GLfloat *value);
-    extern void (CODEGEN_FUNCPTR *Uniform1iv)(GLint location, GLsizei count, const GLint *value);
-    extern void (CODEGEN_FUNCPTR *Uniform2iv)(GLint location, GLsizei count, const GLint *value);
-    extern void (CODEGEN_FUNCPTR *Uniform3iv)(GLint location, GLsizei count, const GLint *value);
-    extern void (CODEGEN_FUNCPTR *Uniform4iv)(GLint location, GLsizei count, const GLint *value);
-    extern void (CODEGEN_FUNCPTR *UniformMatrix2fv)(GLint location, GLsizei count, GLboolean transpose, const GLfloat *value);
-    extern void (CODEGEN_FUNCPTR *UniformMatrix3fv)(GLint location, GLsizei count, GLboolean transpose, const GLfloat *value);
-    extern void (CODEGEN_FUNCPTR *UniformMatrix4fv)(GLint location, GLsizei count, GLboolean transpose, const GLfloat *value);
-    extern void (CODEGEN_FUNCPTR *ValidateProgram)(GLuint program);
-    extern void (CODEGEN_FUNCPTR *VertexAttribPointer)(GLuint index, GLint size, GLenum type, GLboolean normalized, GLsizei stride, const GLvoid *pointer);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *BlendEquationSeparate)(GLenum ਬਹੁਲਕ_RGB, GLenum ਬਹੁਲਕ_Alpha);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *DrawBuffers)(GLsizei n, ਅਚਲ GLenum *bufs);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *StencilOpSeparate)(GLenum face, GLenum sfail, GLenum dpfail, GLenum dppass);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *StencilFuncSeparate)(GLenum face, GLenum func, GLint ref, GLuint ਨਕਾਬ);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *Stencil_ਨਕਾਬ_Separate)(GLenum face, GLuint ਨਕਾਬ);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *AttachShader)(GLuint ਪ੍ਰੋਗਰਾਮ, GLuint shader);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *BindAttribLocation)(GLuint ਪ੍ਰੋਗਰਾਮ, GLuint ਸੂਚਕਾਂਕ, ਅਚਲ GLchar *name);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *CompileShader)(GLuint shader);
+    ਬਾਹਰੀ GLuint (CODEGEN_FUNCPTR *Create_ਪ੍ਰੋਗਰਾਮ)();
+    ਬਾਹਰੀ GLuint (CODEGEN_FUNCPTR *CreateShader)(GLenum type);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *Delete_ਪ੍ਰੋਗਰਾਮ)(GLuint ਪ੍ਰੋਗਰਾਮ);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *DeleteShader)(GLuint shader);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *DetachShader)(GLuint ਪ੍ਰੋਗਰਾਮ, GLuint shader);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *Disable_ਸ਼ੀਰਸ਼_Attrib_Array)(GLuint ਸੂਚਕਾਂਕ);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *Enable_ਸ਼ੀਰਸ਼_Attrib_Array)(GLuint ਸੂਚਕਾਂਕ);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *Get_ਸਰਗਰਮ_Attrib)(GLuint ਪ੍ਰੋਗਰਾਮ, GLuint ਸੂਚਕਾਂਕ, GLsizei buf_ਮਾਪ, GLsizei *length, GLint *size, GLenum *type, GLchar *name);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *Get_ਸਰਗਰਮ_ਇਕਸਾਰ)(GLuint ਪ੍ਰੋਗਰਾਮ, GLuint ਸੂਚਕਾਂਕ, GLsizei buf_ਮਾਪ, GLsizei *length, GLint *size, GLenum *type, GLchar *name);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *GetAttachedShaders)(GLuint ਪ੍ਰੋਗਰਾਮ, GLsizei max_ਗਿਣਤੀ, GLsizei *ਗਿਣਤੀ_3, GLuint *obj);
+    ਬਾਹਰੀ GLint (CODEGEN_FUNCPTR *GetAttribLocation)(GLuint ਪ੍ਰੋਗਰਾਮ, ਅਚਲ GLchar *name);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *GetProgramiv)(GLuint ਪ੍ਰੋਗਰਾਮ, GLenum pname, GLint *params);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *Get_ਪ੍ਰੋਗਰਾਮ_Info_Log)(GLuint ਪ੍ਰੋਗਰਾਮ, GLsizei buf_ਮਾਪ, GLsizei *length, GLchar *infoLog);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *GetShaderiv)(GLuint shader, GLenum pname, GLint *params);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *GetShaderInfoLog)(GLuint shader, GLsizei buf_ਮਾਪ, GLsizei *length, GLchar *infoLog);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *Get_Shader_ਸਰੋਤ)(GLuint shader, GLsizei buf_ਮਾਪ, GLsizei *length, GLchar *ਸਰੋਤ);
+    ਬਾਹਰੀ GLint (CODEGEN_FUNCPTR *Get_ਇਕਸਾਰ_Location)(GLuint ਪ੍ਰੋਗਰਾਮ, ਅਚਲ GLchar *name);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *GetUniformfv)(GLuint ਪ੍ਰੋਗਰਾਮ, GLint location, GLfloat *params);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *GetUniformiv)(GLuint ਪ੍ਰੋਗਰਾਮ, GLint location, GLint *params);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *Get_ਸ਼ੀਰਸ਼_Attribdv)(GLuint ਸੂਚਕਾਂਕ, GLenum pname, GLdouble *params);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *Get_ਸ਼ੀਰਸ਼_Attribfv)(GLuint ਸੂਚਕਾਂਕ, GLenum pname, GLfloat *params);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *Get_ਸ਼ੀਰਸ਼_Attribiv)(GLuint ਸੂਚਕਾਂਕ, GLenum pname, GLint *params);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *Get_ਸ਼ੀਰਸ਼_Attrib_Pointerv)(GLuint ਸੂਚਕਾਂਕ, GLenum pname, GLvoid* *pointer);
+    ਬਾਹਰੀ GLboolean (CODEGEN_FUNCPTR *Is_ਪ੍ਰੋਗਰਾਮ)(GLuint ਪ੍ਰੋਗਰਾਮ);
+    ਬਾਹਰੀ GLboolean (CODEGEN_FUNCPTR *IsShader)(GLuint shader);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *Link_ਪ੍ਰੋਗਰਾਮ)(GLuint ਪ੍ਰੋਗਰਾਮ);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *Shader_ਸਰੋਤ)(GLuint shader, GLsizei ਗਿਣਤੀ_3, ਅਚਲ GLchar* ਅਚਲ *string, ਅਚਲ GLint *length);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *Use_ਪ੍ਰੋਗਰਾਮ)(GLuint ਪ੍ਰੋਗਰਾਮ);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *Uniform1f)(GLint location, GLfloat v0);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *Uniform2f)(GLint location, GLfloat v0, GLfloat v1);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *Uniform3f)(GLint location, GLfloat v0, GLfloat v1, GLfloat v2);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *Uniform4f)(GLint location, GLfloat v0, GLfloat v1, GLfloat v2, GLfloat v3);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *Uniform1i)(GLint location, GLint v0);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *Uniform2i)(GLint location, GLint v0, GLint v1);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *Uniform3i)(GLint location, GLint v0, GLint v1, GLint v2);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *Uniform4i)(GLint location, GLint v0, GLint v1, GLint v2, GLint v3);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *Uniform1fv)(GLint location, GLsizei ਗਿਣਤੀ_3, ਅਚਲ GLfloat *value);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *Uniform2fv)(GLint location, GLsizei ਗਿਣਤੀ_3, ਅਚਲ GLfloat *value);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *Uniform3fv)(GLint location, GLsizei ਗਿਣਤੀ_3, ਅਚਲ GLfloat *value);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *Uniform4fv)(GLint location, GLsizei ਗਿਣਤੀ_3, ਅਚਲ GLfloat *value);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *Uniform1iv)(GLint location, GLsizei ਗਿਣਤੀ_3, ਅਚਲ GLint *value);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *Uniform2iv)(GLint location, GLsizei ਗਿਣਤੀ_3, ਅਚਲ GLint *value);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *Uniform3iv)(GLint location, GLsizei ਗਿਣਤੀ_3, ਅਚਲ GLint *value);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *Uniform4iv)(GLint location, GLsizei ਗਿਣਤੀ_3, ਅਚਲ GLint *value);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *ਇਕਸਾਰ_Matrix2fv)(GLint location, GLsizei ਗਿਣਤੀ_3, GLboolean transpose, ਅਚਲ GLfloat *value);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *ਇਕਸਾਰ_Matrix3fv)(GLint location, GLsizei ਗਿਣਤੀ_3, GLboolean transpose, ਅਚਲ GLfloat *value);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *ਇਕਸਾਰ_Matrix4fv)(GLint location, GLsizei ਗਿਣਤੀ_3, GLboolean transpose, ਅਚਲ GLfloat *value);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *Validate_ਪ੍ਰੋਗਰਾਮ)(GLuint ਪ੍ਰੋਗਰਾਮ);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *ਸ਼ੀਰਸ਼_Attrib_ਸੂਚਕ)(GLuint ਸੂਚਕਾਂਕ, GLint size, GLenum type, GLboolean normalized, GLsizei stride, ਅਚਲ GLvoid *pointer);
 
     // Extension: 2.1
-    extern void (CODEGEN_FUNCPTR *UniformMatrix2x3fv)(GLint location, GLsizei count, GLboolean transpose, const GLfloat *value);
-    extern void (CODEGEN_FUNCPTR *UniformMatrix3x2fv)(GLint location, GLsizei count, GLboolean transpose, const GLfloat *value);
-    extern void (CODEGEN_FUNCPTR *UniformMatrix2x4fv)(GLint location, GLsizei count, GLboolean transpose, const GLfloat *value);
-    extern void (CODEGEN_FUNCPTR *UniformMatrix4x2fv)(GLint location, GLsizei count, GLboolean transpose, const GLfloat *value);
-    extern void (CODEGEN_FUNCPTR *UniformMatrix3x4fv)(GLint location, GLsizei count, GLboolean transpose, const GLfloat *value);
-    extern void (CODEGEN_FUNCPTR *UniformMatrix4x3fv)(GLint location, GLsizei count, GLboolean transpose, const GLfloat *value);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *ਇਕਸਾਰ_Matrix2x3fv)(GLint location, GLsizei ਗਿਣਤੀ_3, GLboolean transpose, ਅਚਲ GLfloat *value);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *ਇਕਸਾਰ_Matrix3x2fv)(GLint location, GLsizei ਗਿਣਤੀ_3, GLboolean transpose, ਅਚਲ GLfloat *value);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *ਇਕਸਾਰ_Matrix2x4fv)(GLint location, GLsizei ਗਿਣਤੀ_3, GLboolean transpose, ਅਚਲ GLfloat *value);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *ਇਕਸਾਰ_Matrix4x2fv)(GLint location, GLsizei ਗਿਣਤੀ_3, GLboolean transpose, ਅਚਲ GLfloat *value);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *ਇਕਸਾਰ_Matrix3x4fv)(GLint location, GLsizei ਗਿਣਤੀ_3, GLboolean transpose, ਅਚਲ GLfloat *value);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *ਇਕਸਾਰ_Matrix4x3fv)(GLint location, GLsizei ਗਿਣਤੀ_3, GLboolean transpose, ਅਚਲ GLfloat *value);
 
     // Extension: ARB_vertex_array_object
-    extern void (CODEGEN_FUNCPTR *BindVertexArray)(GLuint ren_array);
-    extern void (CODEGEN_FUNCPTR *DeleteVertexArrays)(GLsizei n, const GLuint *arrays);
-    extern void (CODEGEN_FUNCPTR *GenVertexArrays)(GLsizei n, GLuint *arrays);
-    extern GLboolean (CODEGEN_FUNCPTR *IsVertexArray)(GLuint ren_array);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *Bind_ਸ਼ੀਰਸ਼_Array)(GLuint ren_array);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *Delete_ਸ਼ੀਰਸ਼_Arrays)(GLsizei n, ਅਚਲ GLuint *arrays);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *Gen_ਸ਼ੀਰਸ਼_Arrays)(GLsizei n, GLuint *arrays);
+    ਬਾਹਰੀ GLboolean (CODEGEN_FUNCPTR *Is_ਸ਼ੀਰਸ਼_Array)(GLuint ren_array);
 
     // Extension: ARB_map_buffer_range
-    extern GLvoid* (CODEGEN_FUNCPTR *MapBufferRange)(GLenum target, GLintptr offset, GLsizeiptr length, GLbitfield access);
-    extern void (CODEGEN_FUNCPTR *FlushMappedBufferRange)(GLenum target, GLintptr offset, GLsizeiptr length);
+    ਬਾਹਰੀ GLvoid* (CODEGEN_FUNCPTR *Map_ਬਫਰ_Range)(GLenum target, GLintptr offset, GLsizeiptr length, GLbitfield access);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *Flush_Mapped_ਬਫਰ_Range)(GLenum target, GLintptr offset, GLsizeiptr length);
 
     // Extension: ARB_framebuffer_object
-    extern GLboolean (CODEGEN_FUNCPTR *IsRenderbuffer)(GLuint renderbuffer);
-    extern void (CODEGEN_FUNCPTR *BindRenderbuffer)(GLenum target, GLuint renderbuffer);
-    extern void (CODEGEN_FUNCPTR *DeleteRenderbuffers)(GLsizei n, const GLuint *renderbuffers);
-    extern void (CODEGEN_FUNCPTR *GenRenderbuffers)(GLsizei n, GLuint *renderbuffers);
-    extern void (CODEGEN_FUNCPTR *RenderbufferStorage)(GLenum target, GLenum internalformat, GLsizei width, GLsizei height);
-    extern void (CODEGEN_FUNCPTR *GetRenderbufferParameteriv)(GLenum target, GLenum pname, GLint *params);
-    extern GLboolean (CODEGEN_FUNCPTR *IsFramebuffer)(GLuint framebuffer);
-    extern void (CODEGEN_FUNCPTR *BindFramebuffer)(GLenum target, GLuint framebuffer);
-    extern void (CODEGEN_FUNCPTR *DeleteFramebuffers)(GLsizei n, const GLuint *framebuffers);
-    extern void (CODEGEN_FUNCPTR *GenFramebuffers)(GLsizei n, GLuint *framebuffers);
-    extern GLenum (CODEGEN_FUNCPTR *CheckFramebufferStatus)(GLenum target);
-    extern void (CODEGEN_FUNCPTR *FramebufferTexture1D)(GLenum target, GLenum attachment, GLenum textarget, GLuint texture, GLint level);
-    extern void (CODEGEN_FUNCPTR *FramebufferTexture2D)(GLenum target, GLenum attachment, GLenum textarget, GLuint texture, GLint level);
-    extern void (CODEGEN_FUNCPTR *FramebufferTexture3D)(GLenum target, GLenum attachment, GLenum textarget, GLuint texture, GLint level, GLint zoffset);
-    extern void (CODEGEN_FUNCPTR *FramebufferRenderbuffer)(GLenum target, GLenum attachment, GLenum renderbuffertarget, GLuint renderbuffer);
-    extern void (CODEGEN_FUNCPTR *GetFramebufferAttachmentParameteriv)(GLenum target, GLenum attachment, GLenum pname, GLint *params);
-    extern void (CODEGEN_FUNCPTR *GenerateMipmap)(GLenum target);
-    extern void (CODEGEN_FUNCPTR *BlitFramebuffer)(GLint srcX0, GLint srcY0, GLint srcX1, GLint srcY1, GLint dstX0, GLint dstY0, GLint dstX1, GLint dstY1, GLbitfield mask, GLenum filter);
-    extern void (CODEGEN_FUNCPTR *RenderbufferStorageMultisample)(GLenum target, GLsizei samples, GLenum internalformat, GLsizei width, GLsizei height);
-    extern void (CODEGEN_FUNCPTR *FramebufferTextureLayer)(GLenum target, GLenum attachment, GLuint texture, GLint level, GLint layer);
+    ਬਾਹਰੀ GLboolean (CODEGEN_FUNCPTR *IsRenderbuffer)(GLuint renderbuffer);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *BindRenderbuffer)(GLenum target, GLuint renderbuffer);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *DeleteRenderbuffers)(GLsizei n, ਅਚਲ GLuint *renderbuffers);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *GenRenderbuffers)(GLsizei n, GLuint *renderbuffers);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *RenderbufferStorage)(GLenum target, GLenum internalformat, GLsizei ਚੌੜਾਈ, GLsizei ਉਚਾਈ);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *GetRenderbufferParameteriv)(GLenum target, GLenum pname, GLint *params);
+    ਬਾਹਰੀ GLboolean (CODEGEN_FUNCPTR *IsFramebuffer)(GLuint framebuffer);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *BindFramebuffer)(GLenum target, GLuint framebuffer);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *DeleteFramebuffers)(GLsizei n, ਅਚਲ GLuint *framebuffers);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *GenFramebuffers)(GLsizei n, GLuint *framebuffers);
+    ਬਾਹਰੀ GLenum (CODEGEN_FUNCPTR *Check_Framebuffer_ਸਥਿਤੀ)(GLenum target);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *FramebufferTexture1D)(GLenum target, GLenum attachment, GLenum textarget, GLuint texture, GLint level);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *FramebufferTexture2D)(GLenum target, GLenum attachment, GLenum textarget, GLuint texture, GLint level);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *FramebufferTexture3D)(GLenum target, GLenum attachment, GLenum textarget, GLuint texture, GLint level, GLint zoffset);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *FramebufferRenderbuffer)(GLenum target, GLenum attachment, GLenum renderbuffertarget, GLuint renderbuffer);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *GetFramebufferAttachmentParameteriv)(GLenum target, GLenum attachment, GLenum pname, GLint *params);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *GenerateMipmap)(GLenum target);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *BlitFramebuffer)(GLint srcX0, GLint srcY0, GLint srcX1, GLint srcY1, GLint dstX0, GLint dstY0, GLint dstX1, GLint dstY1, GLbitfield ਨਕਾਬ, GLenum filter);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *RenderbufferStorageMultisample)(GLenum target, GLsizei samples, GLenum internalformat, GLsizei ਚੌੜਾਈ, GLsizei ਉਚਾਈ);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *FramebufferTextureLayer)(GLenum target, GLenum attachment, GLuint texture, GLint level, GLint layer);
 
     // Extension: 3.0
-    extern void (CODEGEN_FUNCPTR *ColorMaski)(GLuint index, GLboolean r, GLboolean g, GLboolean b, GLboolean a);
-    extern void (CODEGEN_FUNCPTR *GetBooleani_v)(GLenum target, GLuint index, GLboolean *data);
-    extern void (CODEGEN_FUNCPTR *GetIntegeri_v)(GLenum target, GLuint index, GLint *data);
-    extern void (CODEGEN_FUNCPTR *Enablei)(GLenum target, GLuint index);
-    extern void (CODEGEN_FUNCPTR *Disablei)(GLenum target, GLuint index);
-    extern GLboolean (CODEGEN_FUNCPTR *IsEnabledi)(GLenum target, GLuint index);
-    extern void (CODEGEN_FUNCPTR *BeginTransformFeedback)(GLenum primitiveMode);
-    extern void (CODEGEN_FUNCPTR *EndTransformFeedback)();
-    extern void (CODEGEN_FUNCPTR *BindBufferRange)(GLenum target, GLuint index, GLuint buffer, GLintptr offset, GLsizeiptr size);
-    extern void (CODEGEN_FUNCPTR *BindBufferBase)(GLenum target, GLuint index, GLuint buffer);
-    extern void (CODEGEN_FUNCPTR *TransformFeedbackVaryings)(GLuint program, GLsizei count, const GLchar* const *varyings, GLenum bufferMode);
-    extern void (CODEGEN_FUNCPTR *GetTransformFeedbackVarying)(GLuint program, GLuint index, GLsizei bufSize, GLsizei *length, GLsizei *size, GLenum *type, GLchar *name);
-    extern void (CODEGEN_FUNCPTR *ClampColor)(GLenum target, GLenum clamp);
-    extern void (CODEGEN_FUNCPTR *BeginConditionalRender)(GLuint id, GLenum mode);
-    extern void (CODEGEN_FUNCPTR *EndConditionalRender)();
-    extern void (CODEGEN_FUNCPTR *VertexAttribIPointer)(GLuint index, GLint size, GLenum type, GLsizei stride, const GLvoid *pointer);
-    extern void (CODEGEN_FUNCPTR *GetVertexAttribIiv)(GLuint index, GLenum pname, GLint *params);
-    extern void (CODEGEN_FUNCPTR *GetVertexAttribIuiv)(GLuint index, GLenum pname, GLuint *params);
-    extern void (CODEGEN_FUNCPTR *VertexAttribI1i)(GLuint index, GLint x);
-    extern void (CODEGEN_FUNCPTR *VertexAttribI2i)(GLuint index, GLint x, GLint y);
-    extern void (CODEGEN_FUNCPTR *VertexAttribI3i)(GLuint index, GLint x, GLint y, GLint z);
-    extern void (CODEGEN_FUNCPTR *VertexAttribI4i)(GLuint index, GLint x, GLint y, GLint z, GLint w);
-    extern void (CODEGEN_FUNCPTR *VertexAttribI1ui)(GLuint index, GLuint x);
-    extern void (CODEGEN_FUNCPTR *VertexAttribI2ui)(GLuint index, GLuint x, GLuint y);
-    extern void (CODEGEN_FUNCPTR *VertexAttribI3ui)(GLuint index, GLuint x, GLuint y, GLuint z);
-    extern void (CODEGEN_FUNCPTR *VertexAttribI4ui)(GLuint index, GLuint x, GLuint y, GLuint z, GLuint w);
-    extern void (CODEGEN_FUNCPTR *VertexAttribI1iv)(GLuint index, const GLint *v);
-    extern void (CODEGEN_FUNCPTR *VertexAttribI2iv)(GLuint index, const GLint *v);
-    extern void (CODEGEN_FUNCPTR *VertexAttribI3iv)(GLuint index, const GLint *v);
-    extern void (CODEGEN_FUNCPTR *VertexAttribI4iv)(GLuint index, const GLint *v);
-    extern void (CODEGEN_FUNCPTR *VertexAttribI1uiv)(GLuint index, const GLuint *v);
-    extern void (CODEGEN_FUNCPTR *VertexAttribI2uiv)(GLuint index, const GLuint *v);
-    extern void (CODEGEN_FUNCPTR *VertexAttribI3uiv)(GLuint index, const GLuint *v);
-    extern void (CODEGEN_FUNCPTR *VertexAttribI4uiv)(GLuint index, const GLuint *v);
-    extern void (CODEGEN_FUNCPTR *VertexAttribI4bv)(GLuint index, const GLbyte *v);
-    extern void (CODEGEN_FUNCPTR *VertexAttribI4sv)(GLuint index, const GLshort *v);
-    extern void (CODEGEN_FUNCPTR *VertexAttribI4ubv)(GLuint index, const GLubyte *v);
-    extern void (CODEGEN_FUNCPTR *VertexAttribI4usv)(GLuint index, const GLushort *v);
-    extern void (CODEGEN_FUNCPTR *GetUniformuiv)(GLuint program, GLint location, GLuint *params);
-    extern void (CODEGEN_FUNCPTR *BindFragDataLocation)(GLuint program, GLuint color, const GLchar *name);
-    extern GLint (CODEGEN_FUNCPTR *GetFragDataLocation)(GLuint program, const GLchar *name);
-    extern void (CODEGEN_FUNCPTR *Uniform1ui)(GLint location, GLuint v0);
-    extern void (CODEGEN_FUNCPTR *Uniform2ui)(GLint location, GLuint v0, GLuint v1);
-    extern void (CODEGEN_FUNCPTR *Uniform3ui)(GLint location, GLuint v0, GLuint v1, GLuint v2);
-    extern void (CODEGEN_FUNCPTR *Uniform4ui)(GLint location, GLuint v0, GLuint v1, GLuint v2, GLuint v3);
-    extern void (CODEGEN_FUNCPTR *Uniform1uiv)(GLint location, GLsizei count, const GLuint *value);
-    extern void (CODEGEN_FUNCPTR *Uniform2uiv)(GLint location, GLsizei count, const GLuint *value);
-    extern void (CODEGEN_FUNCPTR *Uniform3uiv)(GLint location, GLsizei count, const GLuint *value);
-    extern void (CODEGEN_FUNCPTR *Uniform4uiv)(GLint location, GLsizei count, const GLuint *value);
-    extern void (CODEGEN_FUNCPTR *TexParameterIiv)(GLenum target, GLenum pname, const GLint *params);
-    extern void (CODEGEN_FUNCPTR *TexParameterIuiv)(GLenum target, GLenum pname, const GLuint *params);
-    extern void (CODEGEN_FUNCPTR *GetTexParameterIiv)(GLenum target, GLenum pname, GLint *params);
-    extern void (CODEGEN_FUNCPTR *GetTexParameterIuiv)(GLenum target, GLenum pname, GLuint *params);
-    extern void (CODEGEN_FUNCPTR *ClearBufferiv)(GLenum buffer, GLint drawbuffer, const GLint *value);
-    extern void (CODEGEN_FUNCPTR *ClearBufferuiv)(GLenum buffer, GLint drawbuffer, const GLuint *value);
-    extern void (CODEGEN_FUNCPTR *ClearBufferfv)(GLenum buffer, GLint drawbuffer, const GLfloat *value);
-    extern void (CODEGEN_FUNCPTR *ClearBufferfi)(GLenum buffer, GLint drawbuffer, GLfloat depth, GLint stencil);
-    extern const GLubyte * (CODEGEN_FUNCPTR *GetStringi)(GLenum name, GLuint index);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *ColorMaski)(GLuint ਸੂਚਕਾਂਕ, GLboolean r, GLboolean g, GLboolean b, GLboolean a);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *GetBooleani_v)(GLenum target, GLuint ਸੂਚਕਾਂਕ, GLboolean *ਅੰਕੜੇ);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *GetIntegeri_v)(GLenum target, GLuint ਸੂਚਕਾਂਕ, GLint *ਅੰਕੜੇ);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *Enablei)(GLenum target, GLuint ਸੂਚਕਾਂਕ);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *Disablei)(GLenum target, GLuint ਸੂਚਕਾਂਕ);
+    ਬਾਹਰੀ GLboolean (CODEGEN_FUNCPTR *IsEnabledi)(GLenum target, GLuint ਸੂਚਕਾਂਕ);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *BeginTransformFeedback)(GLenum primitive_ਬਹੁਲਕ);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *ਸਿਰਾ_Transform_Feedback)();
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *Bind_ਬਫਰ_Range)(GLenum target, GLuint ਸੂਚਕਾਂਕ, GLuint ਬਫਰ, GLintptr offset, GLsizeiptr size);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *Bind_ਬਫਰ_ਅਧਾਰ)(GLenum target, GLuint ਸੂਚਕਾਂਕ, GLuint ਬਫਰ);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *TransformFeedbackVaryings)(GLuint ਪ੍ਰੋਗਰਾਮ, GLsizei ਗਿਣਤੀ_3, ਅਚਲ GLchar* ਅਚਲ *varyings, GLenum ਬਫਰ_ਬਹੁਲਕ);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *GetTransformFeedbackVarying)(GLuint ਪ੍ਰੋਗਰਾਮ, GLuint ਸੂਚਕਾਂਕ, GLsizei buf_ਮਾਪ, GLsizei *length, GLsizei *size, GLenum *type, GLchar *name);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *ClampColor)(GLenum target, GLenum clamp);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *BeginConditionalRender)(GLuint id, GLenum ਬਹੁਲਕ);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *ਸਿਰਾ_Conditional_Render)();
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *ਸ਼ੀਰਸ਼_Attrib_IPointer)(GLuint ਸੂਚਕਾਂਕ, GLint size, GLenum type, GLsizei stride, ਅਚਲ GLvoid *pointer);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *Get_ਸ਼ੀਰਸ਼_Attrib_Iiv)(GLuint ਸੂਚਕਾਂਕ, GLenum pname, GLint *params);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *Get_ਸ਼ੀਰਸ਼_Attrib_Iuiv)(GLuint ਸੂਚਕਾਂਕ, GLenum pname, GLuint *params);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *ਸ਼ੀਰਸ਼_Attrib_I1i)(GLuint ਸੂਚਕਾਂਕ, GLint x);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *ਸ਼ੀਰਸ਼_Attrib_I2i)(GLuint ਸੂਚਕਾਂਕ, GLint x, GLint y);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *ਸ਼ੀਰਸ਼_Attrib_I3i)(GLuint ਸੂਚਕਾਂਕ, GLint x, GLint y, GLint z);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *ਸ਼ੀਰਸ਼_Attrib_I4i)(GLuint ਸੂਚਕਾਂਕ, GLint x, GLint y, GLint z, GLint w);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *ਸ਼ੀਰਸ਼_Attrib_I1ui)(GLuint ਸੂਚਕਾਂਕ, GLuint x);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *ਸ਼ੀਰਸ਼_Attrib_I2ui)(GLuint ਸੂਚਕਾਂਕ, GLuint x, GLuint y);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *ਸ਼ੀਰਸ਼_Attrib_I3ui)(GLuint ਸੂਚਕਾਂਕ, GLuint x, GLuint y, GLuint z);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *ਸ਼ੀਰਸ਼_Attrib_I4ui)(GLuint ਸੂਚਕਾਂਕ, GLuint x, GLuint y, GLuint z, GLuint w);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *ਸ਼ੀਰਸ਼_Attrib_I1iv)(GLuint ਸੂਚਕਾਂਕ, ਅਚਲ GLint *v);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *ਸ਼ੀਰਸ਼_Attrib_I2iv)(GLuint ਸੂਚਕਾਂਕ, ਅਚਲ GLint *v);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *ਸ਼ੀਰਸ਼_Attrib_I3iv)(GLuint ਸੂਚਕਾਂਕ, ਅਚਲ GLint *v);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *ਸ਼ੀਰਸ਼_Attrib_I4iv)(GLuint ਸੂਚਕਾਂਕ, ਅਚਲ GLint *v);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *ਸ਼ੀਰਸ਼_Attrib_I1uiv)(GLuint ਸੂਚਕਾਂਕ, ਅਚਲ GLuint *v);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *ਸ਼ੀਰਸ਼_Attrib_I2uiv)(GLuint ਸੂਚਕਾਂਕ, ਅਚਲ GLuint *v);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *ਸ਼ੀਰਸ਼_Attrib_I3uiv)(GLuint ਸੂਚਕਾਂਕ, ਅਚਲ GLuint *v);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *ਸ਼ੀਰਸ਼_Attrib_I4uiv)(GLuint ਸੂਚਕਾਂਕ, ਅਚਲ GLuint *v);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *ਸ਼ੀਰਸ਼_Attrib_I4bv)(GLuint ਸੂਚਕਾਂਕ, ਅਚਲ GLbyte *v);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *ਸ਼ੀਰਸ਼_Attrib_I4sv)(GLuint ਸੂਚਕਾਂਕ, ਅਚਲ GLshort *v);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *ਸ਼ੀਰਸ਼_Attrib_I4ubv)(GLuint ਸੂਚਕਾਂਕ, ਅਚਲ GLubyte *v);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *ਸ਼ੀਰਸ਼_Attrib_I4usv)(GLuint ਸੂਚਕਾਂਕ, ਅਚਲ GLushort *v);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *GetUniformuiv)(GLuint ਪ੍ਰੋਗਰਾਮ, GLint location, GLuint *params);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *Bind_Frag_ਅੰਕੜੇ_Location)(GLuint ਪ੍ਰੋਗਰਾਮ, GLuint color, ਅਚਲ GLchar *name);
+    ਬਾਹਰੀ GLint (CODEGEN_FUNCPTR *Get_Frag_ਅੰਕੜੇ_Location)(GLuint ਪ੍ਰੋਗਰਾਮ, ਅਚਲ GLchar *name);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *Uniform1ui)(GLint location, GLuint v0);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *Uniform2ui)(GLint location, GLuint v0, GLuint v1);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *Uniform3ui)(GLint location, GLuint v0, GLuint v1, GLuint v2);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *Uniform4ui)(GLint location, GLuint v0, GLuint v1, GLuint v2, GLuint v3);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *Uniform1uiv)(GLint location, GLsizei ਗਿਣਤੀ_3, ਅਚਲ GLuint *value);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *Uniform2uiv)(GLint location, GLsizei ਗਿਣਤੀ_3, ਅਚਲ GLuint *value);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *Uniform3uiv)(GLint location, GLsizei ਗਿਣਤੀ_3, ਅਚਲ GLuint *value);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *Uniform4uiv)(GLint location, GLsizei ਗਿਣਤੀ_3, ਅਚਲ GLuint *value);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *TexParameterIiv)(GLenum target, GLenum pname, ਅਚਲ GLint *params);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *TexParameterIuiv)(GLenum target, GLenum pname, ਅਚਲ GLuint *params);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *GetTexParameterIiv)(GLenum target, GLenum pname, GLint *params);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *GetTexParameterIuiv)(GLenum target, GLenum pname, GLuint *params);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *ClearBufferiv)(GLenum ਬਫਰ, GLint drawbuffer, ਅਚਲ GLint *value);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *ClearBufferuiv)(GLenum ਬਫਰ, GLint drawbuffer, ਅਚਲ GLuint *value);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *ClearBufferfv)(GLenum ਬਫਰ, GLint drawbuffer, ਅਚਲ GLfloat *value);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *ClearBufferfi)(GLenum ਬਫਰ, GLint drawbuffer, GLfloat ਡੂੰਘਾਈ, GLint stencil);
+    ਬਾਹਰੀ ਅਚਲ GLubyte * (CODEGEN_FUNCPTR *GetStringi)(GLenum name, GLuint ਸੂਚਕਾਂਕ);
 
     // Extension: ARB_uniform_buffer_object
-    extern void (CODEGEN_FUNCPTR *GetUniformIndices)(GLuint program, GLsizei uniformCount, const GLchar* const *uniformNames, GLuint *uniformIndices);
-    extern void (CODEGEN_FUNCPTR *GetActiveUniformsiv)(GLuint program, GLsizei uniformCount, const GLuint *uniformIndices, GLenum pname, GLint *params);
-    extern void (CODEGEN_FUNCPTR *GetActiveUniformName)(GLuint program, GLuint uniformIndex, GLsizei bufSize, GLsizei *length, GLchar *uniformName);
-    extern GLuint (CODEGEN_FUNCPTR *GetUniformBlockIndex)(GLuint program, const GLchar *uniformBlockName);
-    extern void (CODEGEN_FUNCPTR *GetActiveUniformBlockiv)(GLuint program, GLuint uniformBlockIndex, GLenum pname, GLint *params);
-    extern void (CODEGEN_FUNCPTR *GetActiveUniformBlockName)(GLuint program, GLuint uniformBlockIndex, GLsizei bufSize, GLsizei *length, GLchar *uniformBlockName);
-    extern void (CODEGEN_FUNCPTR *UniformBlockBinding)(GLuint program, GLuint uniformBlockIndex, GLuint uniformBlockBinding);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *Get_ਇਕਸਾਰ_Indices)(GLuint ਪ੍ਰੋਗਰਾਮ, GLsizei ਇਕਸਾਰ_ਗਿਣਤੀ, ਅਚਲ GLchar* ਅਚਲ *ਇਕਸਾਰ_ਨਾਂ, GLuint *ਇਕਸਾਰ_Indices);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *Get_ਸਰਗਰਮ_Uniformsiv)(GLuint ਪ੍ਰੋਗਰਾਮ, GLsizei ਇਕਸਾਰ_ਗਿਣਤੀ, ਅਚਲ GLuint *ਇਕਸਾਰ_Indices, GLenum pname, GLint *params);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *Get_ਸਰਗਰਮ_ਇਕਸਾਰ_Name)(GLuint ਪ੍ਰੋਗਰਾਮ, GLuint ਇਕਸਾਰ_ਸੂਚਕਾਂਕ, GLsizei buf_ਮਾਪ, GLsizei *length, GLchar *ਇਕਸਾਰ_Name);
+    ਬਾਹਰੀ GLuint (CODEGEN_FUNCPTR *Get_ਇਕਸਾਰ_ਖੰਡ_ਸੂਚਕਾਂਕ)(GLuint ਪ੍ਰੋਗਰਾਮ, ਅਚਲ GLchar *ਇਕਸਾਰ_ਖੰਡ_Name);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *Get_ਸਰਗਰਮ_ਇਕਸਾਰ_Blockiv)(GLuint ਪ੍ਰੋਗਰਾਮ, GLuint ਇਕਸਾਰ_ਖੰਡ_ਸੂਚਕਾਂਕ, GLenum pname, GLint *params);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *Get_ਸਰਗਰਮ_ਇਕਸਾਰ_ਖੰਡ_Name)(GLuint ਪ੍ਰੋਗਰਾਮ, GLuint ਇਕਸਾਰ_ਖੰਡ_ਸੂਚਕਾਂਕ, GLsizei buf_ਮਾਪ, GLsizei *length, GLchar *ਇਕਸਾਰ_ਖੰਡ_Name);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *ਇਕਸਾਰ_ਖੰਡ_Binding)(GLuint ਪ੍ਰੋਗਰਾਮ, GLuint ਇਕਸਾਰ_ਖੰਡ_ਸੂਚਕਾਂਕ, GLuint ਇਕਸਾਰ_ਖੰਡ_Binding_2);
 
     // Extension: ARB_copy_buffer
-    extern void (CODEGEN_FUNCPTR *CopyBufferSubData)(GLenum readTarget, GLenum writeTarget, GLintptr readOffset, GLintptr writeOffset, GLsizeiptr size);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *Copy_ਬਫਰ_Sub_ਅੰਕੜੇ)(GLenum read_ਨਿਸ਼ਾਨਾ, GLenum write_ਨਿਸ਼ਾਨਾ, GLintptr read_ਵਿੱਥ, GLintptr write_ਵਿੱਥ, GLsizeiptr size);
 
     // Extension: 3.1
-    extern void (CODEGEN_FUNCPTR *DrawArraysInstanced)(GLenum mode, GLint first, GLsizei count, GLsizei instancecount);
-    extern void (CODEGEN_FUNCPTR *DrawElementsInstanced)(GLenum mode, GLsizei count, GLenum type, const GLvoid *indices, GLsizei instancecount);
-    extern void (CODEGEN_FUNCPTR *TexBuffer)(GLenum target, GLenum internalformat, GLuint buffer);
-    extern void (CODEGEN_FUNCPTR *PrimitiveRestartIndex)(GLuint index);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *DrawArraysInstanced)(GLenum ਬਹੁਲਕ, GLint first, GLsizei ਗਿਣਤੀ_3, GLsizei instancecount);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *DrawElementsInstanced)(GLenum ਬਹੁਲਕ, GLsizei ਗਿਣਤੀ_3, GLenum type, ਅਚਲ GLvoid *indices, GLsizei instancecount);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *Tex_ਬਫਰ)(GLenum target, GLenum internalformat, GLuint ਬਫਰ);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *Primitive_Restart_ਸੂਚਕਾਂਕ)(GLuint ਸੂਚਕਾਂਕ);
 
     // Legacy
-    extern void (CODEGEN_FUNCPTR *EnableClientState)(GLenum cap);
-    extern void (CODEGEN_FUNCPTR *DisableClientState)(GLenum cap);
-    extern void (CODEGEN_FUNCPTR *VertexPointer)(GLint size, GLenum type, GLsizei stride, const GLvoid *ptr);
-    extern void (CODEGEN_FUNCPTR *NormalPointer)(GLenum type, GLsizei stride, const GLvoid *ptr);
-    extern void (CODEGEN_FUNCPTR *ColorPointer)(GLint size, GLenum type, GLsizei stride, const GLvoid *ptr);
-    extern void (CODEGEN_FUNCPTR *TexCoordPointer)(GLint size, GLenum type, GLsizei stride, const GLvoid *ptr);
-    extern void (CODEGEN_FUNCPTR *TexEnvi)(GLenum target, GLenum pname, GLint param);
-    extern void (CODEGEN_FUNCPTR *MatrixMode)(GLenum mode);
-    extern void (CODEGEN_FUNCPTR *LoadIdentity)(void);
-    extern void (CODEGEN_FUNCPTR *Ortho)(GLdouble left, GLdouble right, GLdouble bottom, GLdouble top, GLdouble near_val, GLdouble far_val);
-    extern void (CODEGEN_FUNCPTR *Color3d)(GLdouble red, GLdouble green, GLdouble blue);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *EnableClientState)(GLenum cap);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *DisableClientState)(GLenum cap);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *ਸ਼ੀਰਸ਼_ਸੂਚਕ)(GLint size, GLenum type, GLsizei stride, ਅਚਲ GLvoid *ptr);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *ਸਾਧਾਰਨ_ਸੂਚਕ)(GLenum type, GLsizei stride, ਅਚਲ GLvoid *ptr);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *Color_ਸੂਚਕ)(GLint size, GLenum type, GLsizei stride, ਅਚਲ GLvoid *ptr);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *Tex_Coord_ਸੂਚਕ)(GLint size, GLenum type, GLsizei stride, ਅਚਲ GLvoid *ptr);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *TexEnvi)(GLenum target, GLenum pname, GLint param);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *ਮੈਟ੍ਰਿਕਸ_ਬਹੁਲਕ)(GLenum ਬਹੁਲਕ);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *ਲੱਦੋ_ਪਛਾਣ_ਤੱਤ)(ਖਾਲੀ);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *Ortho)(GLdouble ਖੱਬੇ, GLdouble ਸੱਜੇ, GLdouble bottom, GLdouble ਸਿਖਰ_2, GLdouble near_val, GLdouble far_val);
+    ਬਾਹਰੀ ਖਾਲੀ (CODEGEN_FUNCPTR *Color3d)(GLdouble red, GLdouble green, GLdouble blue);
 }
 
-#endif // OPENGL_NOLOAD_STYLE_HPP
+#ਜੇ_ਅੰਤ // OPENGL_NOLOAD_STYLE_HPP

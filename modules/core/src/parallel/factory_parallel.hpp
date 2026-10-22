@@ -2,28 +2,28 @@
 // It is subject to the license terms in the LICENSE file found in the top-level directory
 // of this distribution and at http://opencv.org/license.html.
 
-#ifndef OPENCV_CORE_PARALLEL_FACTORY_HPP
-#define OPENCV_CORE_PARALLEL_FACTORY_HPP
+#ਜੇ_ਅਪਰਿਭਾਸ਼ਿਤ OPENCV_CORE_PARALLEL_FACTORY_HPP
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ OPENCV_CORE_PARALLEL_FACTORY_HPP
 
-#include "opencv2/core/parallel/parallel_backend.hpp"
+#ਅਨ੍ਤਰ੍ਭਾਵ "opencv2/core/parallel/parallel_backend.hpp"
 
-namespace cv { namespace parallel {
+ਨਾਮਾਕਾਸ਼ cv { ਨਾਮਾਕਾਸ਼ parallel {
 
-class IParallelBackendFactory
+ਵਰਗ IParallelBackendFactory
 {
-public:
-    virtual ~IParallelBackendFactory() {}
-    virtual std::shared_ptr<cv::parallel::ParallelForAPI> create() const = 0;
+ਜਨਤਕ:
+    ਆਭਾਸੀ ~IParallelBackendFactory() {}
+    ਆਭਾਸੀ std::shared_ptr<cv::parallel::ParallelForAPI> create() ਅਚਲ = 0;
 };
 
 
-class StaticBackendFactory CV_FINAL: public IParallelBackendFactory
+ਵਰਗ StaticBackendFactory CV_FINAL: ਜਨਤਕ IParallelBackendFactory
 {
-protected:
-    std::function<std::shared_ptr<cv::parallel::ParallelForAPI>(void)> create_fn_;
+ਸੁਰੱਖਿਅਤ:
+    std::function<std::shared_ptr<cv::parallel::ParallelForAPI>(ਖਾਲੀ)> create_fn_;
 
-public:
-    StaticBackendFactory(std::function<std::shared_ptr<cv::parallel::ParallelForAPI>(void)>&& create_fn)
+ਜਨਤਕ:
+    StaticBackendFactory(std::function<std::shared_ptr<cv::parallel::ParallelForAPI>(ਖਾਲੀ)>&& create_fn)
         : create_fn_(create_fn)
     {
         // nothing
@@ -31,9 +31,9 @@ public:
 
     ~StaticBackendFactory() CV_OVERRIDE {}
 
-    std::shared_ptr<cv::parallel::ParallelForAPI> create() const CV_OVERRIDE
+    std::shared_ptr<cv::parallel::ParallelForAPI> create() ਅਚਲ CV_OVERRIDE
     {
-        return create_fn_();
+        ਵਾਪਸ create_fn_();
     }
 };
 
@@ -41,8 +41,8 @@ public:
 // PluginBackendFactory is implemented in plugin_wrapper.cpp
 //
 
-std::shared_ptr<IParallelBackendFactory> createPluginParallelBackendFactory(const std::string& baseName);
+std::shared_ptr<IParallelBackendFactory> createPluginParallelBackendFactory(ਅਚਲ std::string& ਅਧਾਰ_Name);
 
 }}  // namespace
 
-#endif  // OPENCV_CORE_PARALLEL_FACTORY_HPP
+#ਜੇ_ਅੰਤ  // OPENCV_CORE_PARALLEL_FACTORY_HPP

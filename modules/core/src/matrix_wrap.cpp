@@ -2,53 +2,53 @@
 // It is subject to the license terms in the LICENSE file found in the top-level directory
 // of this distribution and at http://opencv.org/license.html
 
-#include "precomp.hpp"
-#include "opencv2/core/mat.hpp"
+#ਅਨ੍ਤਰ੍ਭਾਵ "precomp.hpp"
+#ਅਨ੍ਤਰ੍ਭਾਵ "opencv2/core/mat.hpp"
 
-namespace cv {
+ਨਾਮਾਕਾਸ਼ cv {
 
-typedef Vec<int, 5> Vec5i;
-typedef Vec<int, 7> Vec7i;
-typedef Vec<int, 9> Vec9i;
-typedef Vec<int, 10> Vec10i;
-typedef Vec<int, 11> Vec11i;
-typedef Vec<int, 12> Vec12i;
-typedef Vec<int, 13> Vec13i;
-typedef Vec<int, 14> Vec14i;
-typedef Vec<int, 15> Vec15i;
-typedef Vec<int, 16> Vec16i;
-typedef Vec<int, 32> Vec32i;
-typedef Vec<int, 64> Vec64i;
-typedef Vec<int, 128> Vec128i;
+ਕਿਸਮਪਰਿਭਾਸ਼ਾ Vec<ਪੂਰਨ, 5> Vec5i;
+ਕਿਸਮਪਰਿਭਾਸ਼ਾ Vec<ਪੂਰਨ, 7> Vec7i;
+ਕਿਸਮਪਰਿਭਾਸ਼ਾ Vec<ਪੂਰਨ, 9> Vec9i;
+ਕਿਸਮਪਰਿਭਾਸ਼ਾ Vec<ਪੂਰਨ, 10> Vec10i;
+ਕਿਸਮਪਰਿਭਾਸ਼ਾ Vec<ਪੂਰਨ, 11> Vec11i;
+ਕਿਸਮਪਰਿਭਾਸ਼ਾ Vec<ਪੂਰਨ, 12> Vec12i;
+ਕਿਸਮਪਰਿਭਾਸ਼ਾ Vec<ਪੂਰਨ, 13> Vec13i;
+ਕਿਸਮਪਰਿਭਾਸ਼ਾ Vec<ਪੂਰਨ, 14> Vec14i;
+ਕਿਸਮਪਰਿਭਾਸ਼ਾ Vec<ਪੂਰਨ, 15> Vec15i;
+ਕਿਸਮਪਰਿਭਾਸ਼ਾ Vec<ਪੂਰਨ, 16> Vec16i;
+ਕਿਸਮਪਰਿਭਾਸ਼ਾ Vec<ਪੂਰਨ, 32> Vec32i;
+ਕਿਸਮਪਰਿਭਾਸ਼ਾ Vec<ਪੂਰਨ, 64> Vec64i;
+ਕਿਸਮਪਰਿਭਾਸ਼ਾ Vec<ਪੂਰਨ, 128> Vec128i;
 
-#undef STD_VECTOR_SWITCH
-#define STD_VECTOR_SWITCH(esz, func) \
-    switch( esz ) \
+#ਪਰਿਭਾਸ਼ਾ_ਰੱਦ STD_ਸਦਿਸ਼_SWITCH
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ STD_ਸਦਿਸ਼_SWITCH(esz, func) \
+    ਚੋਣ( esz ) \
     { \
-    case 1: func(uchar); \
-    case 2: func(Vec2b); \
-    case 3: func(Vec3b); \
-    case 4: func(int); \
-    case 6: func(Vec3s); \
-    case 8: func(Vec2i); \
-    case 12: func(Vec3i); \
-    case 16: func(Vec4i); \
-    case 20: func(Vec5i); \
-    case 24: func(Vec6i); \
-    case 28: func(Vec7i); \
-    case 32: func(Vec8i); \
-    case 36: func(Vec9i); \
-    case 40: func(Vec10i); \
-    case 44: func(Vec11i); \
-    case 48: func(Vec12i); \
-    case 52: func(Vec13i); \
-    case 56: func(Vec14i); \
-    case 60: func(Vec15i); \
-    case 64: func(Vec16i); \
-    case 128: func(Vec32i); \
-    case 256: func(Vec64i); \
-    case 512: func(Vec128i); \
-    default: \
+    ਹਾਲਤ 1: func(uchar); \
+    ਹਾਲਤ 2: func(Vec2b); \
+    ਹਾਲਤ 3: func(Vec3b); \
+    ਹਾਲਤ 4: func(ਪੂਰਨ); \
+    ਹਾਲਤ 6: func(Vec3s); \
+    ਹਾਲਤ 8: func(Vec2i); \
+    ਹਾਲਤ 12: func(Vec3i); \
+    ਹਾਲਤ 16: func(Vec4i); \
+    ਹਾਲਤ 20: func(Vec5i); \
+    ਹਾਲਤ 24: func(Vec6i); \
+    ਹਾਲਤ 28: func(Vec7i); \
+    ਹਾਲਤ 32: func(Vec8i); \
+    ਹਾਲਤ 36: func(Vec9i); \
+    ਹਾਲਤ 40: func(Vec10i); \
+    ਹਾਲਤ 44: func(Vec11i); \
+    ਹਾਲਤ 48: func(Vec12i); \
+    ਹਾਲਤ 52: func(Vec13i); \
+    ਹਾਲਤ 56: func(Vec14i); \
+    ਹਾਲਤ 60: func(Vec15i); \
+    ਹਾਲਤ 64: func(Vec16i); \
+    ਹਾਲਤ 128: func(Vec32i); \
+    ਹਾਲਤ 256: func(Vec64i); \
+    ਹਾਲਤ 512: func(Vec128i); \
+    ਮੂਲ: \
         CV_Error_(cv::Error::StsBadArg, ("Vectors of vectors with element size %d are not supported. Please, modify STD_VECTOR_SWITCH() macro\n", esz)); \
     }
 
@@ -56,2457 +56,2457 @@ typedef Vec<int, 128> Vec128i;
                                         Input/Output Array
 \*************************************************************************************************/
 
-Mat _InputArray::getMat_(int i) const
+Mat ਨਿਵੇਸ਼_Array_2::getMat_(ਪੂਰਨ i) ਅਚਲ
 {
-    _InputArray::KindFlag k = kind();
-    AccessFlag accessFlags = flags & ACCESS_MASK;
+    ਨਿਵੇਸ਼_Array_2::ਕਿਸਮ_Flag k = ਕਿਸਮ();
+    AccessFlag accessFlags = flags & ACCESS_ਨਕਾਬ;
 
-    if( k == MAT )
+    ਜੇ( k == MAT )
     {
-        const Mat* m = (const Mat*)obj;
-        if( i < 0 )
-            return *m;
-        return m->row(i);
+        ਅਚਲ Mat* m = (ਅਚਲ Mat*)obj;
+        ਜੇ( i < 0 )
+            ਵਾਪਸ *m;
+        ਵਾਪਸ m->ਪੰਕਤੀ(i);
     }
 
-    if( k == UMAT )
+    ਜੇ( k == UMAT )
     {
-        const UMat* m = (const UMat*)obj;
-        if( i < 0 )
-            return m->getMat(accessFlags);
-        return m->getMat(accessFlags).row(i);
+        ਅਚਲ UMat* m = (ਅਚਲ UMat*)obj;
+        ਜੇ( i < 0 )
+            ਵਾਪਸ m->getMat(accessFlags);
+        ਵਾਪਸ m->getMat(accessFlags).ਪੰਕਤੀ(i);
     }
 
-    if (k == MATX)
+    ਜੇ (k == MATX)
     {
         CV_Assert( i < 0 );
-        return Mat(sz, flags, obj);
+        ਵਾਪਸ Mat(sz, flags, obj);
     }
 
-    if( k == STD_BOOL_VECTOR )
+    ਜੇ( k == STD_BOOL_ਸਦਿਸ਼ )
     {
         CV_Assert( i < 0 );
-        int t = CV_8U;
-        const std::vector<bool>& v = *(const std::vector<bool>*)obj;
-        int j, n = (int)v.size();
-        if( n == 0 )
-            return Mat();
+        ਪੂਰਨ t = CV_8U;
+        ਅਚਲ std::vector<ਤਾਰਕਿਕ>& v = *(ਅਚਲ std::vector<ਤਾਰਕਿਕ>*)obj;
+        ਪੂਰਨ j, n = (ਪੂਰਨ)v.size();
+        ਜੇ( n == 0 )
+            ਵਾਪਸ Mat();
         Mat m(1, &n, t);
-        uchar* dst = m.data;
-        for( j = 0; j < n; j++ )
+        uchar* dst = m.ਅੰਕੜੇ;
+        ਲਈ( j = 0; j < n; j++ )
             dst[j] = (uchar)v[j];
-        return m;
+        ਵਾਪਸ m;
     }
 
-    if( k == NONE )
-        return Mat();
+    ਜੇ( k == NONE )
+        ਵਾਪਸ Mat();
 
-    if( k == STD_VECTOR || k == STD_VECTOR_VECTOR )
+    ਜੇ( k == STD_ਸਦਿਸ਼ || k == STD_ਸਦਿਸ਼_ਸਦਿਸ਼ )
     {
-        int t = CV_MAT_TYPE(flags);
-        int esz = CV_ELEM_SIZE(t);
+        ਪੂਰਨ t = CV_MAT_TYPE(flags);
+        ਪੂਰਨ esz = CV_ELEM_ਮਾਪ(t);
 
-    #undef GET_MAT
-    #define GET_MAT(T) \
+    #ਪਰਿਭਾਸ਼ਾ_ਰੱਦ GET_MAT
+    #ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ GET_MAT(T) \
         { \
             std::vector<T>* v; \
-            if (k == STD_VECTOR_VECTOR) { \
+            ਜੇ (k == STD_ਸਦਿਸ਼_ਸਦਿਸ਼) { \
                 std::vector<std::vector<T> >* vv = \
                     reinterpret_cast<std::vector<std::vector<T> >*>(obj); \
                 CV_Assert(size_t(i) < vv->size()); \
                 v = &vv->at(i); \
-            } else { \
+            } ਨਹੀਂਤਾਂ { \
                 v = reinterpret_cast<std::vector<T>*>(obj); \
             } \
-            int v_sz = int(v->size()); \
-            return v->empty() ? Mat() : Mat(1, &v_sz, t, v->data()); \
+            ਪੂਰਨ v_sz = ਪੂਰਨ(v->size()); \
+            ਵਾਪਸ v->empty() ? Mat() : Mat(1, &v_sz, t, v->ਅੰਕੜੇ()); \
         }
 
-        STD_VECTOR_SWITCH(esz, GET_MAT)
+        STD_ਸਦਿਸ਼_SWITCH(esz, GET_MAT)
     }
 
-    if( k == STD_VECTOR_MAT )
+    ਜੇ( k == STD_ਸਦਿਸ਼_MAT )
     {
-        const std::vector<Mat>& v = *(const std::vector<Mat>*)obj;
-        CV_Assert( 0 <= i && i < (int)v.size() );
+        ਅਚਲ std::vector<Mat>& v = *(ਅਚਲ std::vector<Mat>*)obj;
+        CV_Assert( 0 <= i && i < (ਪੂਰਨ)v.size() );
 
-        return v[i];
+        ਵਾਪਸ v[i];
     }
 
-    if( k == STD_ARRAY_MAT )
+    ਜੇ( k == STD_ARRAY_MAT )
     {
-        const Mat* v = (const Mat*)obj;
-        CV_Assert( 0 <= i && i < sz.height );
+        ਅਚਲ Mat* v = (ਅਚਲ Mat*)obj;
+        CV_Assert( 0 <= i && i < sz.ਉਚਾਈ );
 
-        return v[i];
+        ਵਾਪਸ v[i];
     }
 
-    if( k == STD_VECTOR_UMAT )
+    ਜੇ( k == STD_ਸਦਿਸ਼_UMAT )
     {
-        const std::vector<UMat>& v = *(const std::vector<UMat>*)obj;
-        CV_Assert( 0 <= i && i < (int)v.size() );
+        ਅਚਲ std::vector<UMat>& v = *(ਅਚਲ std::vector<UMat>*)obj;
+        CV_Assert( 0 <= i && i < (ਪੂਰਨ)v.size() );
 
-        return v[i].getMat(accessFlags);
+        ਵਾਪਸ v[i].getMat(accessFlags);
     }
 
-    if( k == OPENGL_BUFFER )
+    ਜੇ( k == OPENGL_ਬਫਰ )
     {
         CV_Assert( i < 0 );
         CV_Error(cv::Error::StsNotImplemented, "You should explicitly call mapHost/unmapHost methods for ogl::Buffer object");
     }
 
-    if( k == CUDA_GPU_MAT )
+    ਜੇ( k == CUDA_GPU_MAT )
     {
         CV_Assert( i < 0 );
         CV_Error(cv::Error::StsNotImplemented, "You should explicitly call download method for cuda::GpuMat object");
     }
 
-    if( k == CUDA_GPU_MATND )
+    ਜੇ( k == CUDA_GPU_MATND )
     {
         CV_Assert( i < 0 );
         CV_Error(cv::Error::StsNotImplemented, "You should explicitly call download method for cuda::GpuMatND object");
     }
 
-    if( k == CUDA_HOST_MEM )
+    ਜੇ( k == CUDA_HOST_MEM )
     {
         CV_Assert( i < 0 );
 
-        const cuda::HostMem* cuda_mem = (const cuda::HostMem*)obj;
+        ਅਚਲ cuda::HostMem* cuda_mem = (ਅਚਲ cuda::HostMem*)obj;
 
-        return cuda_mem->createMatHeader();
+        ਵਾਪਸ cuda_mem->create_Mat_ਸਿਰਲੇਖ();
     }
 
     CV_Error(Error::StsNotImplemented, "Unknown/unsupported array type");
 }
 
-UMat _InputArray::getUMat(int i) const
+UMat ਨਿਵੇਸ਼_Array_2::getUMat(ਪੂਰਨ i) ਅਚਲ
 {
-    _InputArray::KindFlag k = kind();
-    AccessFlag accessFlags = flags & ACCESS_MASK;
+    ਨਿਵੇਸ਼_Array_2::ਕਿਸਮ_Flag k = ਕਿਸਮ();
+    AccessFlag accessFlags = flags & ACCESS_ਨਕਾਬ;
 
-    if( k == UMAT )
+    ਜੇ( k == UMAT )
     {
-        const UMat* m = (const UMat*)obj;
-        if( i < 0 )
-            return *m;
-        return m->row(i);
+        ਅਚਲ UMat* m = (ਅਚਲ UMat*)obj;
+        ਜੇ( i < 0 )
+            ਵਾਪਸ *m;
+        ਵਾਪਸ m->ਪੰਕਤੀ(i);
     }
 
-    if( k == STD_VECTOR_UMAT )
+    ਜੇ( k == STD_ਸਦਿਸ਼_UMAT )
     {
-        const std::vector<UMat>& v = *(const std::vector<UMat>*)obj;
-        CV_Assert( 0 <= i && i < (int)v.size() );
+        ਅਚਲ std::vector<UMat>& v = *(ਅਚਲ std::vector<UMat>*)obj;
+        CV_Assert( 0 <= i && i < (ਪੂਰਨ)v.size() );
 
-        return v[i];
+        ਵਾਪਸ v[i];
     }
 
-    if( k == MAT )
+    ਜੇ( k == MAT )
     {
-        const Mat* m = (const Mat*)obj;
-        if( i < 0 )
-            return m->getUMat(accessFlags);
-        return m->row(i).getUMat(accessFlags);
+        ਅਚਲ Mat* m = (ਅਚਲ Mat*)obj;
+        ਜੇ( i < 0 )
+            ਵਾਪਸ m->getUMat(accessFlags);
+        ਵਾਪਸ m->ਪੰਕਤੀ(i).getUMat(accessFlags);
     }
 
-    return getMat(i).getUMat(accessFlags);
+    ਵਾਪਸ getMat(i).getUMat(accessFlags);
 }
 
-void _InputArray::getMatVector(std::vector<Mat>& mv) const
+ਖਾਲੀ ਨਿਵੇਸ਼_Array_2::get_Mat_ਸਦਿਸ਼(std::vector<Mat>& mv) ਅਚਲ
 {
-    _InputArray::KindFlag k = kind();
-    AccessFlag accessFlags = flags & ACCESS_MASK;
+    ਨਿਵੇਸ਼_Array_2::ਕਿਸਮ_Flag k = ਕਿਸਮ();
+    AccessFlag accessFlags = flags & ACCESS_ਨਕਾਬ;
 
-    if( k == MAT )
+    ਜੇ( k == MAT )
     {
-        const Mat& m = *(const Mat*)obj;
-        int n = (int)m.size[0];
+        ਅਚਲ Mat& m = *(ਅਚਲ Mat*)obj;
+        ਪੂਰਨ n = (ਪੂਰਨ)m.size[0];
         mv.resize(n);
         CV_Assert(m.dims >= 2);
 
-        for( int i = 0; i < n; i++ )
-            mv[i] = m.dims <= 2 ? Mat(1, m.cols, m.type(), (void*)m.ptr(i)) :
-                Mat(m.dims-1, &m.size[1], m.type(), (void*)m.ptr(i), &m.step[1]);
-        return;
+        ਲਈ( ਪੂਰਨ i = 0; i < n; i++ )
+            mv[i] = m.dims <= 2 ? Mat(1, m.ਖਾਨੇ_ਗਿਣਤੀ, m.type(), (ਖਾਲੀ*)m.ptr(i)) :
+                Mat(m.dims-1, &m.size[1], m.type(), (ਖਾਲੀ*)m.ptr(i), &m.ਕਦਮ[1]);
+        ਵਾਪਸ;
     }
 
-    if (k == MATX)
+    ਜੇ (k == MATX)
     {
-        size_t n = sz.height, esz = CV_ELEM_SIZE(flags);
+        size_t n = sz.ਉਚਾਈ, esz = CV_ELEM_ਮਾਪ(flags);
         mv.resize(n);
 
-        for( size_t i = 0; i < n; i++ )
-            mv[i] = Mat(1, sz.width, CV_MAT_TYPE(flags), (uchar*)obj + esz*sz.width*i);
-        return;
+        ਲਈ( size_t i = 0; i < n; i++ )
+            mv[i] = Mat(1, sz.ਚੌੜਾਈ, CV_MAT_TYPE(flags), (uchar*)obj + esz*sz.ਚੌੜਾਈ*i);
+        ਵਾਪਸ;
     }
 
-    if( k == STD_VECTOR )
+    ਜੇ( k == STD_ਸਦਿਸ਼ )
     {
-        const std::vector<uchar>& v = *(const std::vector<uchar>*)obj;
+        ਅਚਲ std::vector<uchar>& v = *(ਅਚਲ std::vector<uchar>*)obj;
 
-        size_t n = total(), esz = CV_ELEM_SIZE(flags);
-        int t = CV_MAT_DEPTH(flags), cn = CV_MAT_CN(flags);
+        size_t n = ਕੁੱਲ(), esz = CV_ELEM_ਮਾਪ(flags);
+        ਪੂਰਨ t = CV_MAT_ਡੂੰਘਾਈ(flags), cn = CV_MAT_CN(flags);
         mv.resize(n);
 
-        for( size_t i = 0; i < n; i++ )
-            mv[i] = Mat(1, cn, t, (void*)(v.data() + esz*i));
-        return;
+        ਲਈ( size_t i = 0; i < n; i++ )
+            mv[i] = Mat(1, cn, t, (ਖਾਲੀ*)(v.ਅੰਕੜੇ() + esz*i));
+        ਵਾਪਸ;
     }
 
-    if( k == NONE )
+    ਜੇ( k == NONE )
     {
         mv.clear();
-        return;
+        ਵਾਪਸ;
     }
 
-    if( k == STD_VECTOR_VECTOR )
+    ਜੇ( k == STD_ਸਦਿਸ਼_ਸਦਿਸ਼ )
     {
-        int typ = CV_MAT_TYPE(flags);
-        int esz = CV_ELEM_SIZE(typ);
+        ਪੂਰਨ typ = CV_MAT_TYPE(flags);
+        ਪੂਰਨ esz = CV_ELEM_ਮਾਪ(typ);
 
-        #undef GET_VEC_VEC_MAT_VEC
-        #define GET_VEC_VEC_MAT_VEC(T) \
+        #ਪਰਿਭਾਸ਼ਾ_ਰੱਦ GET_VEC_VEC_MAT_VEC
+        #ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ GET_VEC_VEC_MAT_VEC(T) \
         { \
-            const std::vector<std::vector<T > >* vv = (const std::vector<std::vector<T > >*)obj; \
+            ਅਚਲ std::vector<std::vector<T > >* vv = (ਅਚਲ std::vector<std::vector<T > >*)obj; \
             size_t n = vv->size(); \
             mv.resize(n); \
-            for (size_t i = 0; i < n; i++) { \
-                const std::vector<T >& vi = vv->at(i); \
-                CV_Assert(vi.size() <= (size_t)INT_MAX); \
-                int ni = (int)vi.size(); \
-                mv[i] = ni > 0 ? Mat(1, &ni, typ, (void*)vi.data()) : Mat(); \
+            ਲਈ (size_t i = 0; i < n; i++) { \
+                ਅਚਲ std::vector<T >& vi = vv->at(i); \
+                CV_Assert(vi.size() <= (size_t)ਵੱਧ_ਤੋਂ_ਵੱਧ_ਅੰਕ); \
+                ਪੂਰਨ ni = (ਪੂਰਨ)vi.size(); \
+                mv[i] = ni > 0 ? Mat(1, &ni, typ, (ਖਾਲੀ*)vi.ਅੰਕੜੇ()) : Mat(); \
             } \
         } \
-        break
+        ਰੋਕੋ
 
-        STD_VECTOR_SWITCH(esz, GET_VEC_VEC_MAT_VEC)
-        return;
+        STD_ਸਦਿਸ਼_SWITCH(esz, GET_VEC_VEC_MAT_VEC)
+        ਵਾਪਸ;
     }
 
-    if( k == STD_VECTOR_MAT )
+    ਜੇ( k == STD_ਸਦਿਸ਼_MAT )
     {
-        const std::vector<Mat>& v = *(const std::vector<Mat>*)obj;
+        ਅਚਲ std::vector<Mat>& v = *(ਅਚਲ std::vector<Mat>*)obj;
         size_t n = v.size();
         mv.resize(n);
 
-        for( size_t i = 0; i < n; i++ )
+        ਲਈ( size_t i = 0; i < n; i++ )
             mv[i] = v[i];
-        return;
+        ਵਾਪਸ;
     }
 
-    if( k == STD_ARRAY_MAT )
+    ਜੇ( k == STD_ARRAY_MAT )
     {
-        const Mat* v = (const Mat*)obj;
-        size_t n = sz.height;
+        ਅਚਲ Mat* v = (ਅਚਲ Mat*)obj;
+        size_t n = sz.ਉਚਾਈ;
         mv.resize(n);
 
-        for( size_t i = 0; i < n; i++ )
+        ਲਈ( size_t i = 0; i < n; i++ )
             mv[i] = v[i];
-        return;
+        ਵਾਪਸ;
     }
 
-    if( k == STD_VECTOR_UMAT )
+    ਜੇ( k == STD_ਸਦਿਸ਼_UMAT )
     {
-        const std::vector<UMat>& v = *(const std::vector<UMat>*)obj;
+        ਅਚਲ std::vector<UMat>& v = *(ਅਚਲ std::vector<UMat>*)obj;
         size_t n = v.size();
         mv.resize(n);
 
-        for( size_t i = 0; i < n; i++ )
+        ਲਈ( size_t i = 0; i < n; i++ )
             mv[i] = v[i].getMat(accessFlags);
-        return;
+        ਵਾਪਸ;
     }
 
     CV_Error(Error::StsNotImplemented, "Unknown/unsupported array type");
 }
 
-void _InputArray::getUMatVector(std::vector<UMat>& umv) const
+ਖਾਲੀ ਨਿਵੇਸ਼_Array_2::get_UMat_ਸਦਿਸ਼(std::vector<UMat>& umv) ਅਚਲ
 {
-    _InputArray::KindFlag k = kind();
-    AccessFlag accessFlags = flags & ACCESS_MASK;
+    ਨਿਵੇਸ਼_Array_2::ਕਿਸਮ_Flag k = ਕਿਸਮ();
+    AccessFlag accessFlags = flags & ACCESS_ਨਕਾਬ;
 
-    if( k == NONE )
+    ਜੇ( k == NONE )
     {
         umv.clear();
-        return;
+        ਵਾਪਸ;
     }
 
-    if( k == STD_VECTOR_MAT )
+    ਜੇ( k == STD_ਸਦਿਸ਼_MAT )
     {
-        const std::vector<Mat>& v = *(const std::vector<Mat>*)obj;
+        ਅਚਲ std::vector<Mat>& v = *(ਅਚਲ std::vector<Mat>*)obj;
         size_t n = v.size();
         umv.resize(n);
 
-        for( size_t i = 0; i < n; i++ )
+        ਲਈ( size_t i = 0; i < n; i++ )
             umv[i] = v[i].getUMat(accessFlags);
-        return;
+        ਵਾਪਸ;
     }
 
-    if( k == STD_ARRAY_MAT )
+    ਜੇ( k == STD_ARRAY_MAT )
     {
-        const Mat* v = (const Mat*)obj;
-        size_t n = sz.height;
+        ਅਚਲ Mat* v = (ਅਚਲ Mat*)obj;
+        size_t n = sz.ਉਚਾਈ;
         umv.resize(n);
 
-        for( size_t i = 0; i < n; i++ )
+        ਲਈ( size_t i = 0; i < n; i++ )
             umv[i] = v[i].getUMat(accessFlags);
-        return;
+        ਵਾਪਸ;
     }
 
-    if( k == STD_VECTOR_UMAT )
+    ਜੇ( k == STD_ਸਦਿਸ਼_UMAT )
     {
-        const std::vector<UMat>& v = *(const std::vector<UMat>*)obj;
+        ਅਚਲ std::vector<UMat>& v = *(ਅਚਲ std::vector<UMat>*)obj;
         size_t n = v.size();
         umv.resize(n);
 
-        for( size_t i = 0; i < n; i++ )
+        ਲਈ( size_t i = 0; i < n; i++ )
             umv[i] = v[i];
-        return;
+        ਵਾਪਸ;
     }
 
-    if( k == UMAT )
+    ਜੇ( k == UMAT )
     {
         UMat& v = *(UMat*)obj;
         umv.resize(1);
         umv[0] = v;
-        return;
+        ਵਾਪਸ;
     }
-    if( k == MAT )
+    ਜੇ( k == MAT )
     {
         Mat& v = *(Mat*)obj;
         umv.resize(1);
         umv[0] = v.getUMat(accessFlags);
-        return;
+        ਵਾਪਸ;
     }
 
     CV_Error(Error::StsNotImplemented, "Unknown/unsupported array type");
 }
 
-cuda::GpuMat _InputArray::getGpuMat() const
+cuda::GpuMat ਨਿਵੇਸ਼_Array_2::getGpuMat() ਅਚਲ
 {
-#ifdef HAVE_CUDA
-    _InputArray::KindFlag k = kind();
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ HAVE_CUDA
+    ਨਿਵੇਸ਼_Array_2::ਕਿਸਮ_Flag k = ਕਿਸਮ();
 
-    if (k == CUDA_GPU_MAT)
+    ਜੇ (k == CUDA_GPU_MAT)
     {
-        const cuda::GpuMat* d_mat = (const cuda::GpuMat*)obj;
-        return *d_mat;
+        ਅਚਲ cuda::GpuMat* d_mat = (ਅਚਲ cuda::GpuMat*)obj;
+        ਵਾਪਸ *d_mat;
     }
 
-    if (k == CUDA_HOST_MEM)
+    ਜੇ (k == CUDA_HOST_MEM)
     {
-        const cuda::HostMem* cuda_mem = (const cuda::HostMem*)obj;
-        return cuda_mem->createGpuMatHeader();
+        ਅਚਲ cuda::HostMem* cuda_mem = (ਅਚਲ cuda::HostMem*)obj;
+        ਵਾਪਸ cuda_mem->create_Gpu_Mat_ਸਿਰਲੇਖ();
     }
 
-    if (k == OPENGL_BUFFER)
+    ਜੇ (k == OPENGL_ਬਫਰ)
     {
         CV_Error(cv::Error::StsNotImplemented, "You should explicitly call mapDevice/unmapDevice methods for ogl::Buffer object");
     }
 
-    if (k == NONE)
-        return cuda::GpuMat();
+    ਜੇ (k == NONE)
+        ਵਾਪਸ cuda::GpuMat();
 
     CV_Error(cv::Error::StsNotImplemented, "getGpuMat is available only for cuda::GpuMat and cuda::HostMem");
-#else
+#ਨਹੀਂਤਾਂ
     CV_Error(Error::StsNotImplemented, "CUDA support is not enabled in this OpenCV build (missing HAVE_CUDA)");
-#endif
+#ਜੇ_ਅੰਤ
 }
-void _InputArray::getGpuMatVector(std::vector<cuda::GpuMat>& gpumv) const
+ਖਾਲੀ ਨਿਵੇਸ਼_Array_2::get_Gpu_Mat_ਸਦਿਸ਼(std::vector<cuda::GpuMat>& gpumv) ਅਚਲ
 {
-#ifdef HAVE_CUDA
-    _InputArray::KindFlag k = kind();
-    if (k == STD_VECTOR_CUDA_GPU_MAT)
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ HAVE_CUDA
+    ਨਿਵੇਸ਼_Array_2::ਕਿਸਮ_Flag k = ਕਿਸਮ();
+    ਜੇ (k == STD_ਸਦਿਸ਼_CUDA_GPU_MAT)
     {
         gpumv = *(std::vector<cuda::GpuMat>*)obj;
     }
-#else
-    CV_UNUSED(gpumv);
+#ਨਹੀਂਤਾਂ
+    CV_ਅਣਵਰਤਿਆ(gpumv);
     CV_Error(Error::StsNotImplemented, "CUDA support is not enabled in this OpenCV build (missing HAVE_CUDA)");
-#endif
+#ਜੇ_ਅੰਤ
 }
-void _InputArray::getGpuMatNDVector(std::vector<cuda::GpuMatND>& gpumv) const
+ਖਾਲੀ ਨਿਵੇਸ਼_Array_2::getGpuMatNDVector(std::vector<cuda::GpuMatND>& gpumv) ਅਚਲ
 {
-#ifdef HAVE_CUDA
-    _InputArray::KindFlag k = kind();
-    if (k == STD_VECTOR_CUDA_GPU_MAT_ND)
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ HAVE_CUDA
+    ਨਿਵੇਸ਼_Array_2::ਕਿਸਮ_Flag k = ਕਿਸਮ();
+    ਜੇ (k == STD_ਸਦਿਸ਼_CUDA_GPU_MAT_ND)
     {
         gpumv = *(std::vector<cuda::GpuMatND>*)obj;
     }
-#else
-    CV_UNUSED(gpumv);
+#ਨਹੀਂਤਾਂ
+    CV_ਅਣਵਰਤਿਆ(gpumv);
     CV_Error(Error::StsNotImplemented, "CUDA support is not enabled in this OpenCV build (missing HAVE_CUDA)");
-#endif
+#ਜੇ_ਅੰਤ
 }
-cuda::GpuMatND _InputArray::getGpuMatND() const
+cuda::GpuMatND ਨਿਵੇਸ਼_Array_2::getGpuMatND() ਅਚਲ
 {
-#ifdef HAVE_CUDA
-    _InputArray::KindFlag k = kind();
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ HAVE_CUDA
+    ਨਿਵੇਸ਼_Array_2::ਕਿਸਮ_Flag k = ਕਿਸਮ();
 
-    if (k == CUDA_GPU_MATND)
+    ਜੇ (k == CUDA_GPU_MATND)
     {
-        const cuda::GpuMatND* d_mat = (const cuda::GpuMatND*)obj;
-        return *d_mat;
+        ਅਚਲ cuda::GpuMatND* d_mat = (ਅਚਲ cuda::GpuMatND*)obj;
+        ਵਾਪਸ *d_mat;
     }
 
     CV_Error(cv::Error::StsNotImplemented, "getGpuMatND is available only for cuda::GpuMatND");
-#else
+#ਨਹੀਂਤਾਂ
     CV_Error(Error::StsNotImplemented, "CUDA support is not enabled in this OpenCV build (missing HAVE_CUDA)");
-#endif
+#ਜੇ_ਅੰਤ
 }
-ogl::Buffer _InputArray::getOGlBuffer() const
+ogl::ਬਫਰ_2 ਨਿਵੇਸ਼_Array_2::get_OGl_ਬਫਰ() ਅਚਲ
 {
-    _InputArray::KindFlag k = kind();
+    ਨਿਵੇਸ਼_Array_2::ਕਿਸਮ_Flag k = ਕਿਸਮ();
 
-    CV_Assert(k == OPENGL_BUFFER);
+    CV_Assert(k == OPENGL_ਬਫਰ);
 
-    const ogl::Buffer* gl_buf = (const ogl::Buffer*)obj;
-    return *gl_buf;
+    ਅਚਲ ogl::ਬਫਰ_2* gl_buf = (ਅਚਲ ogl::ਬਫਰ_2*)obj;
+    ਵਾਪਸ *gl_buf;
 }
 
-int _InputArray::rows_(int i) const
+ਪੂਰਨ ਨਿਵੇਸ਼_Array_2::ਪੰਕਤੀਆਂ_2(ਪੂਰਨ i) ਅਚਲ
 {
-#ifdef HAVE_CUDA
-    _InputArray::KindFlag k = kind();
-    if (k == CUDA_GPU_MATND)
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ HAVE_CUDA
+    ਨਿਵੇਸ਼_Array_2::ਕਿਸਮ_Flag k = ਕਿਸਮ();
+    ਜੇ (k == CUDA_GPU_MATND)
     {
-        const cuda::GpuMatND& _gpuMatND = *(const cuda::GpuMatND*)obj;
-        return (_gpuMatND.dims < 1) ? 0 : _gpuMatND.size[0];
+        ਅਚਲ cuda::GpuMatND& _gpuMatND = *(ਅਚਲ cuda::GpuMatND*)obj;
+        ਵਾਪਸ (_gpuMatND.dims < 1) ? 0 : _gpuMatND.size[0];
     }
-#endif
+#ਜੇ_ਅੰਤ
 
-    return size_(i).height;
+    ਵਾਪਸ ਮਾਪ_3(i).ਉਚਾਈ;
 }
 
-int _InputArray::cols_(int i) const
+ਪੂਰਨ ਨਿਵੇਸ਼_Array_2::ਖਾਨੇ_ਗਿਣਤੀ_2(ਪੂਰਨ i) ਅਚਲ
 {
-#ifdef HAVE_CUDA
-    _InputArray::KindFlag k = kind();
-    if (k == CUDA_GPU_MATND)
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ HAVE_CUDA
+    ਨਿਵੇਸ਼_Array_2::ਕਿਸਮ_Flag k = ਕਿਸਮ();
+    ਜੇ (k == CUDA_GPU_MATND)
     {
-        const cuda::GpuMatND& _gpuMatND = *(const cuda::GpuMatND*)obj;
-        return (_gpuMatND.dims < 2) ? 0 : _gpuMatND.size[1];
+        ਅਚਲ cuda::GpuMatND& _gpuMatND = *(ਅਚਲ cuda::GpuMatND*)obj;
+        ਵਾਪਸ (_gpuMatND.dims < 2) ? 0 : _gpuMatND.size[1];
     }
-#endif
+#ਜੇ_ਅੰਤ
 
-    return size_(i).width;
+    ਵਾਪਸ ਮਾਪ_3(i).ਚੌੜਾਈ;
 }
 
-Size _InputArray::size_(int i) const
+ਮਾਪ ਨਿਵੇਸ਼_Array_2::ਮਾਪ_3(ਪੂਰਨ i) ਅਚਲ
 {
-    _InputArray::KindFlag k = kind();
+    ਨਿਵੇਸ਼_Array_2::ਕਿਸਮ_Flag k = ਕਿਸਮ();
 
-    if( k == MAT )
+    ਜੇ( k == MAT )
     {
         CV_Assert( i < 0 );
-        const Mat* m = (const Mat*)obj;
+        ਅਚਲ Mat* m = (ਅਚਲ Mat*)obj;
         CV_Assert(m->dims <= 2);
-        return Size(m->cols, m->rows);
+        ਵਾਪਸ ਮਾਪ(m->ਖਾਨੇ_ਗਿਣਤੀ, m->ਪੰਕਤੀਆਂ);
     }
 
-    if( k == UMAT )
+    ਜੇ( k == UMAT )
     {
         CV_Assert( i < 0 );
-        const UMat* m = (const UMat*)obj;
+        ਅਚਲ UMat* m = (ਅਚਲ UMat*)obj;
         CV_Assert(m->dims <= 2);
-        return Size(m->cols, m->rows);
+        ਵਾਪਸ ਮਾਪ(m->ਖਾਨੇ_ਗਿਣਤੀ, m->ਪੰਕਤੀਆਂ);
     }
 
-    if (k == MATX)
+    ਜੇ (k == MATX)
     {
         CV_Assert( i < 0 );
-        return sz;
+        ਵਾਪਸ sz;
     }
 
-    if( k == NONE )
-        return Size();
+    ਜੇ( k == NONE )
+        ਵਾਪਸ ਮਾਪ();
 
-    if( k == STD_VECTOR || k == STD_VECTOR_VECTOR || k == STD_BOOL_VECTOR )
+    ਜੇ( k == STD_ਸਦਿਸ਼ || k == STD_ਸਦਿਸ਼_ਸਦਿਸ਼ || k == STD_BOOL_ਸਦਿਸ਼ )
     {
-        size_t n = total(i);
-        CV_Assert(n <= (size_t)INT_MAX);
-        return Size((int)n, 1);
+        size_t n = ਕੁੱਲ(i);
+        CV_Assert(n <= (size_t)ਵੱਧ_ਤੋਂ_ਵੱਧ_ਅੰਕ);
+        ਵਾਪਸ ਮਾਪ((ਪੂਰਨ)n, 1);
     }
 
-    if( k == STD_VECTOR_MAT )
+    ਜੇ( k == STD_ਸਦਿਸ਼_MAT )
     {
-        const std::vector<Mat>& vv = *(const std::vector<Mat>*)obj;
-        if( i < 0 )
-            return vv.empty() ? Size() : Size((int)vv.size(), 1);
-        CV_Assert( i < (int)vv.size() );
+        ਅਚਲ std::vector<Mat>& vv = *(ਅਚਲ std::vector<Mat>*)obj;
+        ਜੇ( i < 0 )
+            ਵਾਪਸ vv.empty() ? ਮਾਪ() : ਮਾਪ((ਪੂਰਨ)vv.size(), 1);
+        CV_Assert( i < (ਪੂਰਨ)vv.size() );
 
-        return vv[i].size();
+        ਵਾਪਸ vv[i].size();
     }
 
-    if( k == STD_ARRAY_MAT )
+    ਜੇ( k == STD_ARRAY_MAT )
     {
-        const Mat* vv = (const Mat*)obj;
-        if( i < 0 )
-            return sz.height==0 ? Size() : Size(sz.height, 1);
-        CV_Assert( i < sz.height );
+        ਅਚਲ Mat* vv = (ਅਚਲ Mat*)obj;
+        ਜੇ( i < 0 )
+            ਵਾਪਸ sz.ਉਚਾਈ==0 ? ਮਾਪ() : ਮਾਪ(sz.ਉਚਾਈ, 1);
+        CV_Assert( i < sz.ਉਚਾਈ );
 
-        return vv[i].size();
+        ਵਾਪਸ vv[i].size();
     }
 
-    if (k == STD_VECTOR_CUDA_GPU_MAT)
+    ਜੇ (k == STD_ਸਦਿਸ਼_CUDA_GPU_MAT)
     {
-#ifdef HAVE_CUDA
-        const std::vector<cuda::GpuMat>& vv = *(const std::vector<cuda::GpuMat>*)obj;
-        if (i < 0)
-            return vv.empty() ? Size() : Size((int)vv.size(), 1);
-        CV_Assert(i < (int)vv.size());
-        return vv[i].size();
-#else
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ HAVE_CUDA
+        ਅਚਲ std::vector<cuda::GpuMat>& vv = *(ਅਚਲ std::vector<cuda::GpuMat>*)obj;
+        ਜੇ (i < 0)
+            ਵਾਪਸ vv.empty() ? ਮਾਪ() : ਮਾਪ((ਪੂਰਨ)vv.size(), 1);
+        CV_Assert(i < (ਪੂਰਨ)vv.size());
+        ਵਾਪਸ vv[i].size();
+#ਨਹੀਂਤਾਂ
         CV_Error(Error::StsNotImplemented, "CUDA support is not enabled in this OpenCV build (missing HAVE_CUDA)");
-#endif
+#ਜੇ_ਅੰਤ
     }
 
-    if (k == STD_VECTOR_CUDA_GPU_MAT_ND)
+    ਜੇ (k == STD_ਸਦਿਸ਼_CUDA_GPU_MAT_ND)
     {
-#ifdef HAVE_CUDA
-        const std::vector<cuda::GpuMatND>& vv = *(const std::vector<cuda::GpuMatND>*)obj;
-        if (i < 0)
-            return vv.empty() ? Size() : Size((int)vv.size(), 1);
-        CV_Assert(i < (int)vv.size());
-        const cuda::GpuMatND& m = vv[i];
-        if (m.dims == 0)
-            return Size();
-        if (m.dims == 1)
-            return Size(1, m.size[0]);
-        return Size(m.size[1], m.size[0]);
-#else
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ HAVE_CUDA
+        ਅਚਲ std::vector<cuda::GpuMatND>& vv = *(ਅਚਲ std::vector<cuda::GpuMatND>*)obj;
+        ਜੇ (i < 0)
+            ਵਾਪਸ vv.empty() ? ਮਾਪ() : ਮਾਪ((ਪੂਰਨ)vv.size(), 1);
+        CV_Assert(i < (ਪੂਰਨ)vv.size());
+        ਅਚਲ cuda::GpuMatND& m = vv[i];
+        ਜੇ (m.dims == 0)
+            ਵਾਪਸ ਮਾਪ();
+        ਜੇ (m.dims == 1)
+            ਵਾਪਸ ਮਾਪ(1, m.size[0]);
+        ਵਾਪਸ ਮਾਪ(m.size[1], m.size[0]);
+#ਨਹੀਂਤਾਂ
         CV_Error(Error::StsNotImplemented, "CUDA support is not enabled in this OpenCV build (missing HAVE_CUDA)");
-#endif
+#ਜੇ_ਅੰਤ
     }
 
-    if( k == STD_VECTOR_UMAT )
+    ਜੇ( k == STD_ਸਦਿਸ਼_UMAT )
     {
-        const std::vector<UMat>& vv = *(const std::vector<UMat>*)obj;
-        if( i < 0 )
-            return vv.empty() ? Size() : Size((int)vv.size(), 1);
-        CV_Assert( i < (int)vv.size() );
+        ਅਚਲ std::vector<UMat>& vv = *(ਅਚਲ std::vector<UMat>*)obj;
+        ਜੇ( i < 0 )
+            ਵਾਪਸ vv.empty() ? ਮਾਪ() : ਮਾਪ((ਪੂਰਨ)vv.size(), 1);
+        CV_Assert( i < (ਪੂਰਨ)vv.size() );
 
-        return vv[i].size();
+        ਵਾਪਸ vv[i].size();
     }
 
-    if (k == STD_VECTOR_CUDA_GPU_MAT_ND)
+    ਜੇ (k == STD_ਸਦਿਸ਼_CUDA_GPU_MAT_ND)
     {
-#ifdef HAVE_CUDA
-        const std::vector<cuda::GpuMatND>& vv = *(const std::vector<cuda::GpuMatND>*)obj;
-        if (i < 0)
-            return vv.empty() ? Size() : Size((int)vv.size(), 1);
-        CV_Assert(i < (int)vv.size());
-        const cuda::GpuMatND& m = vv[i];
-        if (m.dims == 0)
-            return Size();
-        if (m.dims == 1)
-            return Size(1, m.size[0]);
-        return Size(m.size[1], m.size[0]);
-#else
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ HAVE_CUDA
+        ਅਚਲ std::vector<cuda::GpuMatND>& vv = *(ਅਚਲ std::vector<cuda::GpuMatND>*)obj;
+        ਜੇ (i < 0)
+            ਵਾਪਸ vv.empty() ? ਮਾਪ() : ਮਾਪ((ਪੂਰਨ)vv.size(), 1);
+        CV_Assert(i < (ਪੂਰਨ)vv.size());
+        ਅਚਲ cuda::GpuMatND& m = vv[i];
+        ਜੇ (m.dims == 0)
+            ਵਾਪਸ ਮਾਪ();
+        ਜੇ (m.dims == 1)
+            ਵਾਪਸ ਮਾਪ(1, m.size[0]);
+        ਵਾਪਸ ਮਾਪ(m.size[1], m.size[0]);
+#ਨਹੀਂਤਾਂ
         CV_Error(Error::StsNotImplemented, "CUDA support is not enabled in this OpenCV build (missing HAVE_CUDA)");
-#endif
+#ਜੇ_ਅੰਤ
     }
 
-    if( k == OPENGL_BUFFER )
+    ਜੇ( k == OPENGL_ਬਫਰ )
     {
         CV_Assert( i < 0 );
-        const ogl::Buffer* buf = (const ogl::Buffer*)obj;
-        return buf->size();
+        ਅਚਲ ogl::ਬਫਰ_2* buf = (ਅਚਲ ogl::ਬਫਰ_2*)obj;
+        ਵਾਪਸ buf->size();
     }
 
-    if( k == CUDA_GPU_MAT )
+    ਜੇ( k == CUDA_GPU_MAT )
     {
         CV_Assert( i < 0 );
-        const cuda::GpuMat* d_mat = (const cuda::GpuMat*)obj;
-        return d_mat->size();
+        ਅਚਲ cuda::GpuMat* d_mat = (ਅਚਲ cuda::GpuMat*)obj;
+        ਵਾਪਸ d_mat->size();
     }
 
-    if( k == CUDA_HOST_MEM )
+    ਜੇ( k == CUDA_HOST_MEM )
     {
         CV_Assert( i < 0 );
-        const cuda::HostMem* cuda_mem = (const cuda::HostMem*)obj;
-        return cuda_mem->size();
+        ਅਚਲ cuda::HostMem* cuda_mem = (ਅਚਲ cuda::HostMem*)obj;
+        ਵਾਪਸ cuda_mem->size();
     }
 
     CV_Error(Error::StsNotImplemented, "Unknown/unsupported array type");
 }
 
-int _InputArray::sizend(int* arrsz, int i) const
+ਪੂਰਨ ਨਿਵੇਸ਼_Array_2::sizend(ਪੂਰਨ* arrsz, ਪੂਰਨ i) ਅਚਲ
 {
-    int j, d = 0;
-    _InputArray::KindFlag k = kind();
+    ਪੂਰਨ j, d = 0;
+    ਨਿਵੇਸ਼_Array_2::ਕਿਸਮ_Flag k = ਕਿਸਮ();
 
-    if( k == NONE )
+    ਜੇ( k == NONE )
         ;
-    else if( k == MAT )
+    ਨਹੀਂਤਾਂ ਜੇ( k == MAT )
     {
         CV_Assert( i < 0 );
-        const Mat& m = *(const Mat*)obj;
+        ਅਚਲ Mat& m = *(ਅਚਲ Mat*)obj;
         d = m.dims;
-        if(arrsz)
-            for(j = 0; j < d; j++)
+        ਜੇ(arrsz)
+            ਲਈ(j = 0; j < d; j++)
                 arrsz[j] = m.size.p[j];
     }
-    else if( k == UMAT )
+    ਨਹੀਂਤਾਂ ਜੇ( k == UMAT )
     {
         CV_Assert( i < 0 );
-        const UMat& m = *(const UMat*)obj;
+        ਅਚਲ UMat& m = *(ਅਚਲ UMat*)obj;
         d = m.dims;
-        if(arrsz)
-            for(j = 0; j < d; j++)
+        ਜੇ(arrsz)
+            ਲਈ(j = 0; j < d; j++)
                 arrsz[j] = m.size.p[j];
     }
-    else if( k == STD_VECTOR_MAT && i >= 0 )
+    ਨਹੀਂਤਾਂ ਜੇ( k == STD_ਸਦਿਸ਼_MAT && i >= 0 )
     {
-        const std::vector<Mat>& vv = *(const std::vector<Mat>*)obj;
-        CV_Assert( i < (int)vv.size() );
-        const Mat& m = vv[i];
+        ਅਚਲ std::vector<Mat>& vv = *(ਅਚਲ std::vector<Mat>*)obj;
+        CV_Assert( i < (ਪੂਰਨ)vv.size() );
+        ਅਚਲ Mat& m = vv[i];
         d = m.dims;
-        if(arrsz)
-            for(j = 0; j < d; j++)
+        ਜੇ(arrsz)
+            ਲਈ(j = 0; j < d; j++)
                 arrsz[j] = m.size.p[j];
     }
-    else if( k == STD_ARRAY_MAT && i >= 0 )
+    ਨਹੀਂਤਾਂ ਜੇ( k == STD_ARRAY_MAT && i >= 0 )
     {
-        const Mat* vv = (const Mat*)obj;
-        CV_Assert( i < sz.height );
-        const Mat& m = vv[i];
+        ਅਚਲ Mat* vv = (ਅਚਲ Mat*)obj;
+        CV_Assert( i < sz.ਉਚਾਈ );
+        ਅਚਲ Mat& m = vv[i];
         d = m.dims;
-        if(arrsz)
-            for(j = 0; j < d; j++)
+        ਜੇ(arrsz)
+            ਲਈ(j = 0; j < d; j++)
                 arrsz[j] = m.size.p[j];
     }
-    else if( k == STD_VECTOR_UMAT && i >= 0 )
+    ਨਹੀਂਤਾਂ ਜੇ( k == STD_ਸਦਿਸ਼_UMAT && i >= 0 )
     {
-        const std::vector<UMat>& vv = *(const std::vector<UMat>*)obj;
-        CV_Assert( i < (int)vv.size() );
-        const UMat& m = vv[i];
+        ਅਚਲ std::vector<UMat>& vv = *(ਅਚਲ std::vector<UMat>*)obj;
+        CV_Assert( i < (ਪੂਰਨ)vv.size() );
+        ਅਚਲ UMat& m = vv[i];
         d = m.dims;
-        if(arrsz)
-            for(j = 0; j < d; j++)
+        ਜੇ(arrsz)
+            ਲਈ(j = 0; j < d; j++)
                 arrsz[j] = m.size.p[j];
     }
-    else if (((k == STD_VECTOR || k == STD_BOOL_VECTOR || k == STD_VECTOR_VECTOR) && i < 0) ||
-             (k == STD_VECTOR_VECTOR && i >= 0))
+    ਨਹੀਂਤਾਂ ਜੇ (((k == STD_ਸਦਿਸ਼ || k == STD_BOOL_ਸਦਿਸ਼ || k == STD_ਸਦਿਸ਼_ਸਦਿਸ਼) && i < 0) ||
+             (k == STD_ਸਦਿਸ਼_ਸਦਿਸ਼ && i >= 0))
     {
-        size_t n = total(i);
+        size_t n = ਕੁੱਲ(i);
         d = 1;
-        if(arrsz)
+        ਜੇ(arrsz)
         {
-            arrsz[0] = int(n);
+            arrsz[0] = ਪੂਰਨ(n);
         }
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
         CV_CheckLE(dims(i), 2, "Not supported");
-        Size sz2d = size(i);
+        ਮਾਪ sz2d = size(i);
         d = 2;
-        if(arrsz)
+        ਜੇ(arrsz)
         {
-            arrsz[0] = sz2d.height;
-            arrsz[1] = sz2d.width;
+            arrsz[0] = sz2d.ਉਚਾਈ;
+            arrsz[1] = sz2d.ਚੌੜਾਈ;
         }
     }
 
-    return d;
+    ਵਾਪਸ d;
 }
 
-bool _InputArray::empty(int i) const
+ਤਾਰਕਿਕ ਨਿਵੇਸ਼_Array_2::empty(ਪੂਰਨ i) ਅਚਲ
 {
-    _InputArray::KindFlag k = kind();
-    if (i >= 0) {
-        if (k == STD_VECTOR_MAT) {
-            auto mv = reinterpret_cast<const std::vector<Mat>*>(obj);
+    ਨਿਵੇਸ਼_Array_2::ਕਿਸਮ_Flag k = ਕਿਸਮ();
+    ਜੇ (i >= 0) {
+        ਜੇ (k == STD_ਸਦਿਸ਼_MAT) {
+            ਸਵੈਚਾਲਿਤ mv = reinterpret_cast<ਅਚਲ std::vector<Mat>*>(obj);
             CV_Assert((size_t)i < mv->size());
-            return mv->at(i).empty();
+            ਵਾਪਸ mv->at(i).empty();
         }
-        else if (k == STD_VECTOR_UMAT) {
-            auto umv = reinterpret_cast<const std::vector<UMat>*>(obj);
+        ਨਹੀਂਤਾਂ ਜੇ (k == STD_ਸਦਿਸ਼_UMAT) {
+            ਸਵੈਚਾਲਿਤ umv = reinterpret_cast<ਅਚਲ std::vector<UMat>*>(obj);
             CV_Assert((size_t)i < umv->size());
-            return umv->at(i).empty();
+            ਵਾਪਸ umv->at(i).empty();
         }
-        else if (k == STD_VECTOR || k == STD_BOOL_VECTOR || k == STD_VECTOR_VECTOR) {
-            size_t n = total(i);
-            return n == 0;
-        } else {
+        ਨਹੀਂਤਾਂ ਜੇ (k == STD_ਸਦਿਸ਼ || k == STD_BOOL_ਸਦਿਸ਼ || k == STD_ਸਦਿਸ਼_ਸਦਿਸ਼) {
+            size_t n = ਕੁੱਲ(i);
+            ਵਾਪਸ n == 0;
+        } ਨਹੀਂਤਾਂ {
             CV_Error(Error::StsNotImplemented, "");
         }
     }
-    return empty();
+    ਵਾਪਸ empty();
 }
 
-MatShape _InputArray::shape(int i) const
+MatShape ਨਿਵੇਸ਼_Array_2::shape(ਪੂਰਨ i) ਅਚਲ
 {
-    _InputArray::KindFlag k = kind();
+    ਨਿਵੇਸ਼_Array_2::ਕਿਸਮ_Flag k = ਕਿਸਮ();
     MatShape shape;
 
-    if( k == NONE )
+    ਜੇ( k == NONE )
         ;
-    else if( k == MAT )
+    ਨਹੀਂਤਾਂ ਜੇ( k == MAT )
     {
         CV_Assert( i < 0 );
-        const Mat& m = *(const Mat*)obj;
+        ਅਚਲ Mat& m = *(ਅਚਲ Mat*)obj;
         shape = m.size;
     }
-    else if( k == UMAT )
+    ਨਹੀਂਤਾਂ ਜੇ( k == UMAT )
     {
         CV_Assert( i < 0 );
-        const UMat& m = *(const UMat*)obj;
+        ਅਚਲ UMat& m = *(ਅਚਲ UMat*)obj;
         shape = m.size;
     }
-    else if( k == STD_VECTOR_MAT && i >= 0 )
+    ਨਹੀਂਤਾਂ ਜੇ( k == STD_ਸਦਿਸ਼_MAT && i >= 0 )
     {
-        const std::vector<Mat>& vv = *(const std::vector<Mat>*)obj;
+        ਅਚਲ std::vector<Mat>& vv = *(ਅਚਲ std::vector<Mat>*)obj;
         CV_Assert( (size_t)i < vv.size() );
-        const Mat& m = vv[i];
+        ਅਚਲ Mat& m = vv[i];
         shape = m.size;
     }
-    else if( k == STD_ARRAY_MAT && i >= 0 )
+    ਨਹੀਂਤਾਂ ਜੇ( k == STD_ARRAY_MAT && i >= 0 )
     {
-        const Mat* vv = (const Mat*)obj;
-        CV_Assert( i < sz.height );
-        const Mat& m = vv[i];
+        ਅਚਲ Mat* vv = (ਅਚਲ Mat*)obj;
+        CV_Assert( i < sz.ਉਚਾਈ );
+        ਅਚਲ Mat& m = vv[i];
         shape = m.size;
     }
-    else if( k == STD_VECTOR_UMAT && i >= 0 )
+    ਨਹੀਂਤਾਂ ਜੇ( k == STD_ਸਦਿਸ਼_UMAT && i >= 0 )
     {
-        const std::vector<UMat>& vv = *(const std::vector<UMat>*)obj;
+        ਅਚਲ std::vector<UMat>& vv = *(ਅਚਲ std::vector<UMat>*)obj;
         CV_Assert( (size_t)i < vv.size() );
-        const UMat& m = vv[i];
+        ਅਚਲ UMat& m = vv[i];
         shape = m.size;
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
-        int sizes[CV_MAX_DIM];
-        int dims = sizend(sizes, i);
+        ਪੂਰਨ sizes[CV_MAX_DIM];
+        ਪੂਰਨ dims = sizend(sizes, i);
         shape = MatShape(dims, sizes);
     }
 
-    return shape;
+    ਵਾਪਸ shape;
 }
 
-bool _InputArray::sameSize(const _InputArray& arr) const
+ਤਾਰਕਿਕ ਨਿਵੇਸ਼_Array_2::same_ਮਾਪ(ਅਚਲ ਨਿਵੇਸ਼_Array_2& arr) ਅਚਲ
 {
-    _InputArray::KindFlag k1 = kind(), k2 = arr.kind();
-    Size sz1;
+    ਨਿਵੇਸ਼_Array_2::ਕਿਸਮ_Flag k1 = ਕਿਸਮ(), k2 = arr.ਕਿਸਮ();
+    ਮਾਪ sz1;
 
-    if( k1 == MAT )
+    ਜੇ( k1 == MAT )
     {
-        const Mat* m = ((const Mat*)obj);
-        if( k2 == MAT )
-            return m->size == ((const Mat*)arr.obj)->size;
-        if( k2 == UMAT )
-            return m->size == ((const UMat*)arr.obj)->size;
-        if( m->dims > 2 )
-            return false;
+        ਅਚਲ Mat* m = ((ਅਚਲ Mat*)obj);
+        ਜੇ( k2 == MAT )
+            ਵਾਪਸ m->size == ((ਅਚਲ Mat*)arr.obj)->size;
+        ਜੇ( k2 == UMAT )
+            ਵਾਪਸ m->size == ((ਅਚਲ UMat*)arr.obj)->size;
+        ਜੇ( m->dims > 2 )
+            ਵਾਪਸ ਝੂਠ;
         sz1 = m->size();
     }
-    else if( k1 == UMAT )
+    ਨਹੀਂਤਾਂ ਜੇ( k1 == UMAT )
     {
-        const UMat* m = ((const UMat*)obj);
-        if( k2 == MAT )
-            return m->size == ((const Mat*)arr.obj)->size;
-        if( k2 == UMAT )
-            return m->size == ((const UMat*)arr.obj)->size;
-        if( m->dims > 2 )
-            return false;
+        ਅਚਲ UMat* m = ((ਅਚਲ UMat*)obj);
+        ਜੇ( k2 == MAT )
+            ਵਾਪਸ m->size == ((ਅਚਲ Mat*)arr.obj)->size;
+        ਜੇ( k2 == UMAT )
+            ਵਾਪਸ m->size == ((ਅਚਲ UMat*)arr.obj)->size;
+        ਜੇ( m->dims > 2 )
+            ਵਾਪਸ ਝੂਠ;
         sz1 = m->size();
     }
-    else if ( (k1 == CUDA_GPU_MATND) && (k2 == CUDA_GPU_MATND))
+    ਨਹੀਂਤਾਂ ਜੇ ( (k1 == CUDA_GPU_MATND) && (k2 == CUDA_GPU_MATND))
     {
-        return ((const cuda::GpuMatND*)obj)->size == ((const cuda::GpuMatND*)arr.obj)->size;
+        ਵਾਪਸ ((ਅਚਲ cuda::GpuMatND*)obj)->size == ((ਅਚਲ cuda::GpuMatND*)arr.obj)->size;
     }
-    else
+    ਨਹੀਂਤਾਂ
         sz1 = size();
 
-    if( arr.dims() > 2 )
-        return false;
-    return sz1 == arr.size();
+    ਜੇ( arr.dims() > 2 )
+        ਵਾਪਸ ਝੂਠ;
+    ਵਾਪਸ sz1 == arr.size();
 }
 
-int _InputArray::dims_(int i) const
+ਪੂਰਨ ਨਿਵੇਸ਼_Array_2::dims_(ਪੂਰਨ i) ਅਚਲ
 {
-    _InputArray::KindFlag k = kind();
+    ਨਿਵੇਸ਼_Array_2::ਕਿਸਮ_Flag k = ਕਿਸਮ();
 
-    if( k == MAT )
+    ਜੇ( k == MAT )
     {
         CV_Assert( i < 0 );
-        return ((const Mat*)obj)->dims;
+        ਵਾਪਸ ((ਅਚਲ Mat*)obj)->dims;
     }
 
-    if( k == UMAT )
+    ਜੇ( k == UMAT )
     {
         CV_Assert( i < 0 );
-        return ((const UMat*)obj)->dims;
+        ਵਾਪਸ ((ਅਚਲ UMat*)obj)->dims;
     }
 
-    if (k == MATX)
+    ਜੇ (k == MATX)
     {
         CV_Assert( i < 0 );
-        return 2;
+        ਵਾਪਸ 2;
     }
 
-    if( k == STD_VECTOR || k == STD_BOOL_VECTOR )
+    ਜੇ( k == STD_ਸਦਿਸ਼ || k == STD_BOOL_ਸਦਿਸ਼ )
     {
         CV_Assert( i < 0 );
-        return 1;
+        ਵਾਪਸ 1;
     }
 
-    if( k == NONE )
-        return 0;
+    ਜੇ( k == NONE )
+        ਵਾਪਸ 0;
 
-    if( k == STD_VECTOR_VECTOR )
+    ਜੇ( k == STD_ਸਦਿਸ਼_ਸਦਿਸ਼ )
     {
-        if( i < 0 )
-            return 1;
-        CV_Assert( size_t(i) < total() );
-        return 1;
+        ਜੇ( i < 0 )
+            ਵਾਪਸ 1;
+        CV_Assert( size_t(i) < ਕੁੱਲ() );
+        ਵਾਪਸ 1;
     }
 
-    if( k == STD_VECTOR_MAT )
+    ਜੇ( k == STD_ਸਦਿਸ਼_MAT )
     {
-        const std::vector<Mat>& vv = *(const std::vector<Mat>*)obj;
-        if( i < 0 )
-            return 1;
-        CV_Assert( i < (int)vv.size() );
+        ਅਚਲ std::vector<Mat>& vv = *(ਅਚਲ std::vector<Mat>*)obj;
+        ਜੇ( i < 0 )
+            ਵਾਪਸ 1;
+        CV_Assert( i < (ਪੂਰਨ)vv.size() );
 
-        return vv[i].dims;
+        ਵਾਪਸ vv[i].dims;
     }
 
-    if( k == STD_ARRAY_MAT )
+    ਜੇ( k == STD_ARRAY_MAT )
     {
-        const Mat* vv = (const Mat*)obj;
-        if( i < 0 )
-            return 1;
-        CV_Assert( i < sz.height );
+        ਅਚਲ Mat* vv = (ਅਚਲ Mat*)obj;
+        ਜੇ( i < 0 )
+            ਵਾਪਸ 1;
+        CV_Assert( i < sz.ਉਚਾਈ );
 
-        return vv[i].dims;
+        ਵਾਪਸ vv[i].dims;
     }
 
-    if( k == STD_VECTOR_UMAT )
+    ਜੇ( k == STD_ਸਦਿਸ਼_UMAT )
     {
-        const std::vector<UMat>& vv = *(const std::vector<UMat>*)obj;
-        if( i < 0 )
-            return 1;
-        CV_Assert( i < (int)vv.size() );
+        ਅਚਲ std::vector<UMat>& vv = *(ਅਚਲ std::vector<UMat>*)obj;
+        ਜੇ( i < 0 )
+            ਵਾਪਸ 1;
+        CV_Assert( i < (ਪੂਰਨ)vv.size() );
 
-        return vv[i].dims;
+        ਵਾਪਸ vv[i].dims;
     }
 
-    if( k == OPENGL_BUFFER )
-    {
-        CV_Assert( i < 0 );
-        return 2;
-    }
-
-    if( k == CUDA_GPU_MAT )
+    ਜੇ( k == OPENGL_ਬਫਰ )
     {
         CV_Assert( i < 0 );
-        return 2;
+        ਵਾਪਸ 2;
     }
 
-    if( k == CUDA_GPU_MATND )
+    ਜੇ( k == CUDA_GPU_MAT )
     {
         CV_Assert( i < 0 );
-        return ((const cuda::GpuMatND*)obj)->dims;
+        ਵਾਪਸ 2;
     }
 
-    if( k == CUDA_HOST_MEM )
+    ਜੇ( k == CUDA_GPU_MATND )
     {
         CV_Assert( i < 0 );
-        return 2;
+        ਵਾਪਸ ((ਅਚਲ cuda::GpuMatND*)obj)->dims;
+    }
+
+    ਜੇ( k == CUDA_HOST_MEM )
+    {
+        CV_Assert( i < 0 );
+        ਵਾਪਸ 2;
     }
 
     CV_Error(Error::StsNotImplemented, "Unknown/unsupported array type");
 }
 
-size_t _InputArray::total(int i) const
+size_t ਨਿਵੇਸ਼_Array_2::ਕੁੱਲ(ਪੂਰਨ i) ਅਚਲ
 {
-    _InputArray::KindFlag k = kind();
+    ਨਿਵੇਸ਼_Array_2::ਕਿਸਮ_Flag k = ਕਿਸਮ();
 
-    if( k == MAT )
+    ਜੇ( k == MAT )
     {
         CV_Assert( i < 0 );
-        return ((const Mat*)obj)->total();
+        ਵਾਪਸ ((ਅਚਲ Mat*)obj)->ਕੁੱਲ();
     }
 
-    if( k == UMAT )
+    ਜੇ( k == UMAT )
     {
         CV_Assert( i < 0 );
-        return ((const UMat*)obj)->total();
+        ਵਾਪਸ ((ਅਚਲ UMat*)obj)->ਕੁੱਲ();
     }
 
-    if( k == STD_VECTOR_MAT )
+    ਜੇ( k == STD_ਸਦਿਸ਼_MAT )
     {
-        const std::vector<Mat>& vv = *(const std::vector<Mat>*)obj;
-        if( i < 0 )
-            return vv.size();
+        ਅਚਲ std::vector<Mat>& vv = *(ਅਚਲ std::vector<Mat>*)obj;
+        ਜੇ( i < 0 )
+            ਵਾਪਸ vv.size();
 
-        CV_Assert( i < (int)vv.size() );
-        return vv[i].total();
+        CV_Assert( i < (ਪੂਰਨ)vv.size() );
+        ਵਾਪਸ vv[i].ਕੁੱਲ();
     }
 
-    if( k == STD_ARRAY_MAT )
+    ਜੇ( k == STD_ARRAY_MAT )
     {
-        const Mat* vv = (const Mat*)obj;
-        if( i < 0 )
-            return sz.height;
+        ਅਚਲ Mat* vv = (ਅਚਲ Mat*)obj;
+        ਜੇ( i < 0 )
+            ਵਾਪਸ sz.ਉਚਾਈ;
 
-        CV_Assert( i < sz.height );
-        return vv[i].total();
+        CV_Assert( i < sz.ਉਚਾਈ );
+        ਵਾਪਸ vv[i].ਕੁੱਲ();
     }
 
-    if( k == STD_VECTOR_UMAT )
+    ਜੇ( k == STD_ਸਦਿਸ਼_UMAT )
     {
-        const std::vector<UMat>& vv = *(const std::vector<UMat>*)obj;
-        if( i < 0 )
-            return vv.size();
+        ਅਚਲ std::vector<UMat>& vv = *(ਅਚਲ std::vector<UMat>*)obj;
+        ਜੇ( i < 0 )
+            ਵਾਪਸ vv.size();
 
-        CV_Assert( i < (int)vv.size() );
-        return vv[i].total();
+        CV_Assert( i < (ਪੂਰਨ)vv.size() );
+        ਵਾਪਸ vv[i].ਕੁੱਲ();
     }
 
-    if( k == CUDA_GPU_MATND )
+    ਜੇ( k == CUDA_GPU_MATND )
     {
         CV_Assert( i < 0 );
         size_t res = 0;
-        const cuda::GpuMatND& _gpuMatND = *((const cuda::GpuMatND*)obj);
-        if (_gpuMatND.dims > 0)
+        ਅਚਲ cuda::GpuMatND& _gpuMatND = *((ਅਚਲ cuda::GpuMatND*)obj);
+        ਜੇ (_gpuMatND.dims > 0)
         {
             res = 1;
-            for(int d = 0 ; d<_gpuMatND.dims ; ++d)
+            ਲਈ(ਪੂਰਨ d = 0 ; d<_gpuMatND.dims ; ++d)
                 res *= _gpuMatND.size[d];
-            return res;
+            ਵਾਪਸ res;
         }
     }
 
-    if (k == STD_VECTOR || k == STD_VECTOR_VECTOR)
+    ਜੇ (k == STD_ਸਦਿਸ਼ || k == STD_ਸਦਿਸ਼_ਸਦਿਸ਼)
     {
-        CV_Assert(i < 0 || k == STD_VECTOR_VECTOR);
-        int esz = CV_ELEM_SIZE(flags);
+        CV_Assert(i < 0 || k == STD_ਸਦਿਸ਼_ਸਦਿਸ਼);
+        ਪੂਰਨ esz = CV_ELEM_ਮਾਪ(flags);
 
-        #undef GET_VEC_SIZE
-        #define GET_VEC_SIZE(T) \
-            if (k == STD_VECTOR_VECTOR) { \
-                const std::vector<std::vector<T > >* vv = (const std::vector<std::vector<T > >*)obj; \
+        #ਪਰਿਭਾਸ਼ਾ_ਰੱਦ GET_VEC_ਮਾਪ
+        #ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ GET_VEC_ਮਾਪ(T) \
+            ਜੇ (k == STD_ਸਦਿਸ਼_ਸਦਿਸ਼) { \
+                ਅਚਲ std::vector<std::vector<T > >* vv = (ਅਚਲ std::vector<std::vector<T > >*)obj; \
                 size_t n = vv->size(); \
-                if (i < 0) \
-                    return n; \
+                ਜੇ (i < 0) \
+                    ਵਾਪਸ n; \
                 CV_Assert((size_t)i < n); \
-                return vv->at(i).size(); \
-            } else \
-                return ((const std::vector<T >*)obj)->size()
+                ਵਾਪਸ vv->at(i).size(); \
+            } ਨਹੀਂਤਾਂ \
+                ਵਾਪਸ ((ਅਚਲ std::vector<T >*)obj)->size()
 
-        STD_VECTOR_SWITCH(esz, GET_VEC_SIZE)
+        STD_ਸਦਿਸ਼_SWITCH(esz, GET_VEC_ਮਾਪ)
     }
 
-    return size(i).area();
+    ਵਾਪਸ size(i).area();
 }
 
-int _InputArray::type_(int i) const
+ਪੂਰਨ ਨਿਵੇਸ਼_Array_2::type_(ਪੂਰਨ i) ਅਚਲ
 {
-    _InputArray::KindFlag k = kind();
+    ਨਿਵੇਸ਼_Array_2::ਕਿਸਮ_Flag k = ਕਿਸਮ();
 
-    if( k == MAT )
-        return ((const Mat*)obj)->type();
+    ਜੇ( k == MAT )
+        ਵਾਪਸ ((ਅਚਲ Mat*)obj)->type();
 
-    if( k == UMAT )
-        return ((const UMat*)obj)->type();
+    ਜੇ( k == UMAT )
+        ਵਾਪਸ ((ਅਚਲ UMat*)obj)->type();
 
-    if( k == MATX || k == STD_VECTOR || k == STD_VECTOR_VECTOR || k == STD_BOOL_VECTOR )
-        return CV_MAT_TYPE(flags);
+    ਜੇ( k == MATX || k == STD_ਸਦਿਸ਼ || k == STD_ਸਦਿਸ਼_ਸਦਿਸ਼ || k == STD_BOOL_ਸਦਿਸ਼ )
+        ਵਾਪਸ CV_MAT_TYPE(flags);
 
-    if( k == NONE )
-        return -1;
+    ਜੇ( k == NONE )
+        ਵਾਪਸ -1;
 
-    if( k == STD_VECTOR_UMAT )
+    ਜੇ( k == STD_ਸਦਿਸ਼_UMAT )
     {
-        const std::vector<UMat>& vv = *(const std::vector<UMat>*)obj;
-        if( vv.empty() )
+        ਅਚਲ std::vector<UMat>& vv = *(ਅਚਲ std::vector<UMat>*)obj;
+        ਜੇ( vv.empty() )
         {
             CV_Assert((flags & FIXED_TYPE) != 0);
-            return CV_MAT_TYPE(flags);
+            ਵਾਪਸ CV_MAT_TYPE(flags);
         }
-        CV_Assert( i < (int)vv.size() );
-        return vv[i >= 0 ? i : 0].type();
+        CV_Assert( i < (ਪੂਰਨ)vv.size() );
+        ਵਾਪਸ vv[i >= 0 ? i : 0].type();
     }
 
-    if( k == STD_VECTOR_MAT )
+    ਜੇ( k == STD_ਸਦਿਸ਼_MAT )
     {
-        const std::vector<Mat>& vv = *(const std::vector<Mat>*)obj;
-        if( vv.empty() )
+        ਅਚਲ std::vector<Mat>& vv = *(ਅਚਲ std::vector<Mat>*)obj;
+        ਜੇ( vv.empty() )
         {
             CV_Assert((flags & FIXED_TYPE) != 0);
-            return CV_MAT_TYPE(flags);
+            ਵਾਪਸ CV_MAT_TYPE(flags);
         }
-        CV_Assert( i < (int)vv.size() );
-        return vv[i >= 0 ? i : 0].type();
+        CV_Assert( i < (ਪੂਰਨ)vv.size() );
+        ਵਾਪਸ vv[i >= 0 ? i : 0].type();
     }
 
-    if( k == STD_ARRAY_MAT )
+    ਜੇ( k == STD_ARRAY_MAT )
     {
-        const Mat* vv = (const Mat*)obj;
-        if( sz.height == 0 )
+        ਅਚਲ Mat* vv = (ਅਚਲ Mat*)obj;
+        ਜੇ( sz.ਉਚਾਈ == 0 )
         {
             CV_Assert((flags & FIXED_TYPE) != 0);
-            return CV_MAT_TYPE(flags);
+            ਵਾਪਸ CV_MAT_TYPE(flags);
         }
-        CV_Assert( i < sz.height );
-        return vv[i >= 0 ? i : 0].type();
+        CV_Assert( i < sz.ਉਚਾਈ );
+        ਵਾਪਸ vv[i >= 0 ? i : 0].type();
     }
 
-    if (k == STD_VECTOR_CUDA_GPU_MAT)
+    ਜੇ (k == STD_ਸਦਿਸ਼_CUDA_GPU_MAT)
     {
-#ifdef HAVE_CUDA
-        const std::vector<cuda::GpuMat>& vv = *(const std::vector<cuda::GpuMat>*)obj;
-        if (vv.empty())
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ HAVE_CUDA
+        ਅਚਲ std::vector<cuda::GpuMat>& vv = *(ਅਚਲ std::vector<cuda::GpuMat>*)obj;
+        ਜੇ (vv.empty())
         {
             CV_Assert((flags & FIXED_TYPE) != 0);
-            return CV_MAT_TYPE(flags);
+            ਵਾਪਸ CV_MAT_TYPE(flags);
         }
-        CV_Assert(i < (int)vv.size());
-        return vv[i >= 0 ? i : 0].type();
-#else
+        CV_Assert(i < (ਪੂਰਨ)vv.size());
+        ਵਾਪਸ vv[i >= 0 ? i : 0].type();
+#ਨਹੀਂਤਾਂ
         CV_Error(Error::StsNotImplemented, "CUDA support is not enabled in this OpenCV build (missing HAVE_CUDA)");
-#endif
+#ਜੇ_ਅੰਤ
     }
 
-    if (k == STD_VECTOR_CUDA_GPU_MAT_ND)
+    ਜੇ (k == STD_ਸਦਿਸ਼_CUDA_GPU_MAT_ND)
     {
-#ifdef HAVE_CUDA
-        const std::vector<cuda::GpuMatND>& vv = *(const std::vector<cuda::GpuMatND>*)obj;
-        if (vv.empty())
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ HAVE_CUDA
+        ਅਚਲ std::vector<cuda::GpuMatND>& vv = *(ਅਚਲ std::vector<cuda::GpuMatND>*)obj;
+        ਜੇ (vv.empty())
         {
             CV_Assert((flags & FIXED_TYPE) != 0);
-            return CV_MAT_TYPE(flags);
+            ਵਾਪਸ CV_MAT_TYPE(flags);
         }
-        CV_Assert(i < (int)vv.size());
-        return vv[i >= 0 ? i : 0].type();
-#else
+        CV_Assert(i < (ਪੂਰਨ)vv.size());
+        ਵਾਪਸ vv[i >= 0 ? i : 0].type();
+#ਨਹੀਂਤਾਂ
         CV_Error(Error::StsNotImplemented, "CUDA support is not enabled in this OpenCV build (missing HAVE_CUDA)");
-#endif
+#ਜੇ_ਅੰਤ
     }
 
-    if( k == OPENGL_BUFFER )
-        return ((const ogl::Buffer*)obj)->type();
+    ਜੇ( k == OPENGL_ਬਫਰ )
+        ਵਾਪਸ ((ਅਚਲ ogl::ਬਫਰ_2*)obj)->type();
 
-    if( k == CUDA_GPU_MAT )
-        return ((const cuda::GpuMat*)obj)->type();
+    ਜੇ( k == CUDA_GPU_MAT )
+        ਵਾਪਸ ((ਅਚਲ cuda::GpuMat*)obj)->type();
 
-    if( k == CUDA_GPU_MATND )
-        return ((const cuda::GpuMatND*)obj)->type();
+    ਜੇ( k == CUDA_GPU_MATND )
+        ਵਾਪਸ ((ਅਚਲ cuda::GpuMatND*)obj)->type();
 
-    if( k == CUDA_HOST_MEM )
-        return ((const cuda::HostMem*)obj)->type();
+    ਜੇ( k == CUDA_HOST_MEM )
+        ਵਾਪਸ ((ਅਚਲ cuda::HostMem*)obj)->type();
 
     CV_Error(Error::StsNotImplemented, "Unknown/unsupported array type");
 }
 
-int _InputArray::depth_(int i) const
+ਪੂਰਨ ਨਿਵੇਸ਼_Array_2::ਡੂੰਘਾਈ_4(ਪੂਰਨ i) ਅਚਲ
 {
-    return CV_MAT_DEPTH(type(i));
+    ਵਾਪਸ CV_MAT_ਡੂੰਘਾਈ(type(i));
 }
 
-bool _InputArray::empty_() const
+ਤਾਰਕਿਕ ਨਿਵੇਸ਼_Array_2::ਖਾਲੀ_ਥਾਵਾਂ() ਅਚਲ
 {
-    _InputArray::KindFlag k = kind();
+    ਨਿਵੇਸ਼_Array_2::ਕਿਸਮ_Flag k = ਕਿਸਮ();
 
-    if( k == MAT )
-        return ((const Mat*)obj)->empty();
+    ਜੇ( k == MAT )
+        ਵਾਪਸ ((ਅਚਲ Mat*)obj)->empty();
 
-    if( k == UMAT )
-        return ((const UMat*)obj)->empty();
+    ਜੇ( k == UMAT )
+        ਵਾਪਸ ((ਅਚਲ UMat*)obj)->empty();
 
-    if (k == MATX)
-        return false;
+    ਜੇ (k == MATX)
+        ਵਾਪਸ ਝੂਠ;
 
-    if( k == STD_VECTOR || k == STD_BOOL_VECTOR || k == STD_VECTOR_VECTOR )
+    ਜੇ( k == STD_ਸਦਿਸ਼ || k == STD_BOOL_ਸਦਿਸ਼ || k == STD_ਸਦਿਸ਼_ਸਦਿਸ਼ )
     {
-        size_t n = total(-1);
-        return n == 0;
+        size_t n = ਕੁੱਲ(-1);
+        ਵਾਪਸ n == 0;
     }
 
-    if( k == NONE )
-        return true;
+    ਜੇ( k == NONE )
+        ਵਾਪਸ ਸੱਚ;
 
-    if( k == STD_VECTOR_MAT )
+    ਜੇ( k == STD_ਸਦਿਸ਼_MAT )
     {
-        const std::vector<Mat>& vv = *(const std::vector<Mat>*)obj;
-        return vv.empty();
+        ਅਚਲ std::vector<Mat>& vv = *(ਅਚਲ std::vector<Mat>*)obj;
+        ਵਾਪਸ vv.empty();
     }
 
-    if( k == STD_ARRAY_MAT )
+    ਜੇ( k == STD_ARRAY_MAT )
     {
-        return sz.height == 0;
+        ਵਾਪਸ sz.ਉਚਾਈ == 0;
     }
 
-    if( k == STD_VECTOR_UMAT )
+    ਜੇ( k == STD_ਸਦਿਸ਼_UMAT )
     {
-        const std::vector<UMat>& vv = *(const std::vector<UMat>*)obj;
-        return vv.empty();
+        ਅਚਲ std::vector<UMat>& vv = *(ਅਚਲ std::vector<UMat>*)obj;
+        ਵਾਪਸ vv.empty();
     }
 
-    if( k == OPENGL_BUFFER )
-        return ((const ogl::Buffer*)obj)->empty();
+    ਜੇ( k == OPENGL_ਬਫਰ )
+        ਵਾਪਸ ((ਅਚਲ ogl::ਬਫਰ_2*)obj)->empty();
 
-    if( k == CUDA_GPU_MAT )
-        return ((const cuda::GpuMat*)obj)->empty();
+    ਜੇ( k == CUDA_GPU_MAT )
+        ਵਾਪਸ ((ਅਚਲ cuda::GpuMat*)obj)->empty();
 
-    if (k == STD_VECTOR_CUDA_GPU_MAT)
+    ਜੇ (k == STD_ਸਦਿਸ਼_CUDA_GPU_MAT)
     {
-        const std::vector<cuda::GpuMat>& vv = *(const std::vector<cuda::GpuMat>*)obj;
-        return vv.empty();
+        ਅਚਲ std::vector<cuda::GpuMat>& vv = *(ਅਚਲ std::vector<cuda::GpuMat>*)obj;
+        ਵਾਪਸ vv.empty();
     }
 
-    if( k == CUDA_GPU_MATND )
-        return ((const cuda::GpuMatND*)obj)->empty();
+    ਜੇ( k == CUDA_GPU_MATND )
+        ਵਾਪਸ ((ਅਚਲ cuda::GpuMatND*)obj)->empty();
 
-    if (k == STD_VECTOR_CUDA_GPU_MAT_ND)
+    ਜੇ (k == STD_ਸਦਿਸ਼_CUDA_GPU_MAT_ND)
     {
-        const std::vector<cuda::GpuMatND>& vv = *(const std::vector<cuda::GpuMatND>*)obj;
-        return vv.empty();
+        ਅਚਲ std::vector<cuda::GpuMatND>& vv = *(ਅਚਲ std::vector<cuda::GpuMatND>*)obj;
+        ਵਾਪਸ vv.empty();
     }
 
-    if( k == CUDA_HOST_MEM )
-        return ((const cuda::HostMem*)obj)->empty();
+    ਜੇ( k == CUDA_HOST_MEM )
+        ਵਾਪਸ ((ਅਚਲ cuda::HostMem*)obj)->empty();
 
     CV_Error(Error::StsNotImplemented, "Unknown/unsupported array type");
 }
 
-bool _InputArray::isContinuous(int i) const
+ਤਾਰਕਿਕ ਨਿਵੇਸ਼_Array_2::isContinuous(ਪੂਰਨ i) ਅਚਲ
 {
-    _InputArray::KindFlag k = kind();
+    ਨਿਵੇਸ਼_Array_2::ਕਿਸਮ_Flag k = ਕਿਸਮ();
 
-    if( k == MAT )
-        return i < 0 ? ((const Mat*)obj)->isContinuous() : true;
+    ਜੇ( k == MAT )
+        ਵਾਪਸ i < 0 ? ((ਅਚਲ Mat*)obj)->isContinuous() : ਸੱਚ;
 
-    if( k == UMAT )
-        return i < 0 ? ((const UMat*)obj)->isContinuous() : true;
+    ਜੇ( k == UMAT )
+        ਵਾਪਸ i < 0 ? ((ਅਚਲ UMat*)obj)->isContinuous() : ਸੱਚ;
 
-    if( k == MATX || k == STD_VECTOR ||
-        k == NONE || k == STD_VECTOR_VECTOR || k == STD_BOOL_VECTOR )
-        return true;
+    ਜੇ( k == MATX || k == STD_ਸਦਿਸ਼ ||
+        k == NONE || k == STD_ਸਦਿਸ਼_ਸਦਿਸ਼ || k == STD_BOOL_ਸਦਿਸ਼ )
+        ਵਾਪਸ ਸੱਚ;
 
-    if( k == STD_VECTOR_MAT )
+    ਜੇ( k == STD_ਸਦਿਸ਼_MAT )
     {
-        const std::vector<Mat>& vv = *(const std::vector<Mat>*)obj;
+        ਅਚਲ std::vector<Mat>& vv = *(ਅਚਲ std::vector<Mat>*)obj;
         CV_Assert(i >= 0 && (size_t)i < vv.size());
-        return vv[i].isContinuous();
+        ਵਾਪਸ vv[i].isContinuous();
     }
 
-    if( k == STD_ARRAY_MAT )
+    ਜੇ( k == STD_ARRAY_MAT )
     {
-        const Mat* vv = (const Mat*)obj;
-        CV_Assert(i >= 0 && i < sz.height);
-        return vv[i].isContinuous();
+        ਅਚਲ Mat* vv = (ਅਚਲ Mat*)obj;
+        CV_Assert(i >= 0 && i < sz.ਉਚਾਈ);
+        ਵਾਪਸ vv[i].isContinuous();
     }
 
-    if( k == STD_VECTOR_UMAT )
+    ਜੇ( k == STD_ਸਦਿਸ਼_UMAT )
     {
-        const std::vector<UMat>& vv = *(const std::vector<UMat>*)obj;
+        ਅਚਲ std::vector<UMat>& vv = *(ਅਚਲ std::vector<UMat>*)obj;
         CV_Assert(i >= 0 && (size_t)i < vv.size());
-        return vv[i].isContinuous();
+        ਵਾਪਸ vv[i].isContinuous();
     }
 
-    if( k == CUDA_GPU_MAT )
-      return i < 0 ? ((const cuda::GpuMat*)obj)->isContinuous() : true;
+    ਜੇ( k == CUDA_GPU_MAT )
+      ਵਾਪਸ i < 0 ? ((ਅਚਲ cuda::GpuMat*)obj)->isContinuous() : ਸੱਚ;
 
-    if( k == CUDA_GPU_MATND )
-        return i < 0 ? ((const cuda::GpuMatND*)obj)->isContinuous() : true;
+    ਜੇ( k == CUDA_GPU_MATND )
+        ਵਾਪਸ i < 0 ? ((ਅਚਲ cuda::GpuMatND*)obj)->isContinuous() : ਸੱਚ;
 
     CV_Error(cv::Error::StsNotImplemented, "Unknown/unsupported array type");
 }
 
-bool _InputArray::isSubmatrix(int i) const
+ਤਾਰਕਿਕ ਨਿਵੇਸ਼_Array_2::isSubmatrix(ਪੂਰਨ i) ਅਚਲ
 {
-    _InputArray::KindFlag k = kind();
+    ਨਿਵੇਸ਼_Array_2::ਕਿਸਮ_Flag k = ਕਿਸਮ();
 
-    if( k == MAT )
-        return i < 0 ? ((const Mat*)obj)->isSubmatrix() : false;
+    ਜੇ( k == MAT )
+        ਵਾਪਸ i < 0 ? ((ਅਚਲ Mat*)obj)->isSubmatrix() : ਝੂਠ;
 
-    if( k == UMAT )
-        return i < 0 ? ((const UMat*)obj)->isSubmatrix() : false;
+    ਜੇ( k == UMAT )
+        ਵਾਪਸ i < 0 ? ((ਅਚਲ UMat*)obj)->isSubmatrix() : ਝੂਠ;
 
-    if( k == MATX || k == STD_VECTOR ||
-        k == NONE || k == STD_VECTOR_VECTOR || k == STD_BOOL_VECTOR )
-        return false;
+    ਜੇ( k == MATX || k == STD_ਸਦਿਸ਼ ||
+        k == NONE || k == STD_ਸਦਿਸ਼_ਸਦਿਸ਼ || k == STD_BOOL_ਸਦਿਸ਼ )
+        ਵਾਪਸ ਝੂਠ;
 
-    if( k == STD_VECTOR_MAT )
+    ਜੇ( k == STD_ਸਦਿਸ਼_MAT )
     {
-        const std::vector<Mat>& vv = *(const std::vector<Mat>*)obj;
+        ਅਚਲ std::vector<Mat>& vv = *(ਅਚਲ std::vector<Mat>*)obj;
         CV_Assert(i >= 0 && (size_t)i < vv.size());
-        return vv[i].isSubmatrix();
+        ਵਾਪਸ vv[i].isSubmatrix();
     }
 
-    if( k == STD_ARRAY_MAT )
+    ਜੇ( k == STD_ARRAY_MAT )
     {
-        const Mat* vv = (const Mat*)obj;
-        CV_Assert(i >= 0 && i < sz.height);
-        return vv[i].isSubmatrix();
+        ਅਚਲ Mat* vv = (ਅਚਲ Mat*)obj;
+        CV_Assert(i >= 0 && i < sz.ਉਚਾਈ);
+        ਵਾਪਸ vv[i].isSubmatrix();
     }
 
-    if( k == STD_VECTOR_UMAT )
+    ਜੇ( k == STD_ਸਦਿਸ਼_UMAT )
     {
-        const std::vector<UMat>& vv = *(const std::vector<UMat>*)obj;
+        ਅਚਲ std::vector<UMat>& vv = *(ਅਚਲ std::vector<UMat>*)obj;
         CV_Assert(i >= 0 && (size_t)i < vv.size());
-        return vv[i].isSubmatrix();
+        ਵਾਪਸ vv[i].isSubmatrix();
     }
 
-    if( k == CUDA_GPU_MATND )
+    ਜੇ( k == CUDA_GPU_MATND )
     {
-        return ((const cuda::GpuMatND*)obj)->isSubmatrix();
+        ਵਾਪਸ ((ਅਚਲ cuda::GpuMatND*)obj)->isSubmatrix();
     }
 
-    if (k == STD_VECTOR_CUDA_GPU_MAT_ND)
+    ਜੇ (k == STD_ਸਦਿਸ਼_CUDA_GPU_MAT_ND)
     {
-        const std::vector<cuda::GpuMatND>& vv = *(const std::vector<cuda::GpuMatND>*)obj;
+        ਅਚਲ std::vector<cuda::GpuMatND>& vv = *(ਅਚਲ std::vector<cuda::GpuMatND>*)obj;
         CV_Assert(i >= 0 && (size_t)i < vv.size());
-        return vv[i].isSubmatrix();
+        ਵਾਪਸ vv[i].isSubmatrix();
     }
 
     CV_Error(cv::Error::StsNotImplemented, "");
 }
 
-size_t _InputArray::offset(int i) const
+size_t ਨਿਵੇਸ਼_Array_2::offset(ਪੂਰਨ i) ਅਚਲ
 {
-    _InputArray::KindFlag k = kind();
+    ਨਿਵੇਸ਼_Array_2::ਕਿਸਮ_Flag k = ਕਿਸਮ();
 
-    if( k == MAT )
+    ਜੇ( k == MAT )
     {
         CV_Assert( i < 0 );
-        const Mat * const m = ((const Mat*)obj);
-        return (size_t)(m->ptr() - m->datastart);
+        ਅਚਲ Mat * ਅਚਲ m = ((ਅਚਲ Mat*)obj);
+        ਵਾਪਸ (size_t)(m->ptr() - m->datastart);
     }
 
-    if( k == UMAT )
+    ਜੇ( k == UMAT )
     {
         CV_Assert( i < 0 );
-        return ((const UMat*)obj)->offset;
+        ਵਾਪਸ ((ਅਚਲ UMat*)obj)->offset;
     }
 
-    if( k == MATX || k == STD_VECTOR ||
-        k == NONE || k == STD_VECTOR_VECTOR || k == STD_BOOL_VECTOR )
-        return 0;
+    ਜੇ( k == MATX || k == STD_ਸਦਿਸ਼ ||
+        k == NONE || k == STD_ਸਦਿਸ਼_ਸਦਿਸ਼ || k == STD_BOOL_ਸਦਿਸ਼ )
+        ਵਾਪਸ 0;
 
-    if( k == STD_VECTOR_MAT )
+    ਜੇ( k == STD_ਸਦਿਸ਼_MAT )
     {
-        const std::vector<Mat>& vv = *(const std::vector<Mat>*)obj;
-        CV_Assert( i >= 0 && i < (int)vv.size() );
+        ਅਚਲ std::vector<Mat>& vv = *(ਅਚਲ std::vector<Mat>*)obj;
+        CV_Assert( i >= 0 && i < (ਪੂਰਨ)vv.size() );
 
-        return (size_t)(vv[i].ptr() - vv[i].datastart);
+        ਵਾਪਸ (size_t)(vv[i].ptr() - vv[i].datastart);
     }
 
-    if( k == STD_ARRAY_MAT )
+    ਜੇ( k == STD_ARRAY_MAT )
     {
-        const Mat* vv = (const Mat*)obj;
-        CV_Assert( i >= 0 && i < sz.height );
-        return (size_t)(vv[i].ptr() - vv[i].datastart);
+        ਅਚਲ Mat* vv = (ਅਚਲ Mat*)obj;
+        CV_Assert( i >= 0 && i < sz.ਉਚਾਈ );
+        ਵਾਪਸ (size_t)(vv[i].ptr() - vv[i].datastart);
     }
 
-    if( k == STD_VECTOR_UMAT )
+    ਜੇ( k == STD_ਸਦਿਸ਼_UMAT )
     {
-        const std::vector<UMat>& vv = *(const std::vector<UMat>*)obj;
+        ਅਚਲ std::vector<UMat>& vv = *(ਅਚਲ std::vector<UMat>*)obj;
         CV_Assert(i >= 0 && (size_t)i < vv.size());
-        return vv[i].offset;
+        ਵਾਪਸ vv[i].offset;
     }
 
-    if( k == CUDA_GPU_MAT )
+    ਜੇ( k == CUDA_GPU_MAT )
     {
         CV_Assert( i < 0 );
-        const cuda::GpuMat * const m = ((const cuda::GpuMat*)obj);
-        return (size_t)(m->data - m->datastart);
+        ਅਚਲ cuda::GpuMat * ਅਚਲ m = ((ਅਚਲ cuda::GpuMat*)obj);
+        ਵਾਪਸ (size_t)(m->ਅੰਕੜੇ - m->datastart);
     }
 
-    if (k == STD_VECTOR_CUDA_GPU_MAT)
+    ਜੇ (k == STD_ਸਦਿਸ਼_CUDA_GPU_MAT)
     {
-        const std::vector<cuda::GpuMat>& vv = *(const std::vector<cuda::GpuMat>*)obj;
+        ਅਚਲ std::vector<cuda::GpuMat>& vv = *(ਅਚਲ std::vector<cuda::GpuMat>*)obj;
         CV_Assert(i >= 0 && (size_t)i < vv.size());
-        return (size_t)(vv[i].data - vv[i].datastart);
+        ਵਾਪਸ (size_t)(vv[i].ਅੰਕੜੇ - vv[i].datastart);
     }
 
     CV_Error(Error::StsNotImplemented, "");
 }
 
-size_t _InputArray::step(int i) const
+size_t ਨਿਵੇਸ਼_Array_2::ਕਦਮ(ਪੂਰਨ i) ਅਚਲ
 {
-    _InputArray::KindFlag k = kind();
+    ਨਿਵੇਸ਼_Array_2::ਕਿਸਮ_Flag k = ਕਿਸਮ();
 
-    if( k == MAT )
+    ਜੇ( k == MAT )
     {
         CV_Assert( i < 0 );
-        return ((const Mat*)obj)->step;
+        ਵਾਪਸ ((ਅਚਲ Mat*)obj)->ਕਦਮ;
     }
 
-    if( k == UMAT )
+    ਜੇ( k == UMAT )
     {
         CV_Assert( i < 0 );
-        return ((const UMat*)obj)->step;
+        ਵਾਪਸ ((ਅਚਲ UMat*)obj)->ਕਦਮ;
     }
 
-    if( k == MATX || k == STD_VECTOR ||
-        k == NONE || k == STD_VECTOR_VECTOR || k == STD_BOOL_VECTOR )
-        return 0;
+    ਜੇ( k == MATX || k == STD_ਸਦਿਸ਼ ||
+        k == NONE || k == STD_ਸਦਿਸ਼_ਸਦਿਸ਼ || k == STD_BOOL_ਸਦਿਸ਼ )
+        ਵਾਪਸ 0;
 
-    if( k == STD_VECTOR_MAT )
+    ਜੇ( k == STD_ਸਦਿਸ਼_MAT )
     {
-        const std::vector<Mat>& vv = *(const std::vector<Mat>*)obj;
-        CV_Assert( i >= 0 && i < (int)vv.size() );
-        return vv[i].step;
+        ਅਚਲ std::vector<Mat>& vv = *(ਅਚਲ std::vector<Mat>*)obj;
+        CV_Assert( i >= 0 && i < (ਪੂਰਨ)vv.size() );
+        ਵਾਪਸ vv[i].ਕਦਮ;
     }
 
-    if( k == STD_ARRAY_MAT )
+    ਜੇ( k == STD_ARRAY_MAT )
     {
-        const Mat* vv = (const Mat*)obj;
-        CV_Assert( i >= 0 && i < sz.height );
-        return vv[i].step;
+        ਅਚਲ Mat* vv = (ਅਚਲ Mat*)obj;
+        CV_Assert( i >= 0 && i < sz.ਉਚਾਈ );
+        ਵਾਪਸ vv[i].ਕਦਮ;
     }
 
-    if( k == STD_VECTOR_UMAT )
+    ਜੇ( k == STD_ਸਦਿਸ਼_UMAT )
     {
-        const std::vector<UMat>& vv = *(const std::vector<UMat>*)obj;
+        ਅਚਲ std::vector<UMat>& vv = *(ਅਚਲ std::vector<UMat>*)obj;
         CV_Assert(i >= 0 && (size_t)i < vv.size());
-        return vv[i].step;
+        ਵਾਪਸ vv[i].ਕਦਮ;
     }
 
-    if( k == CUDA_GPU_MAT )
+    ਜੇ( k == CUDA_GPU_MAT )
     {
         CV_Assert( i < 0 );
-        return ((const cuda::GpuMat*)obj)->step;
+        ਵਾਪਸ ((ਅਚਲ cuda::GpuMat*)obj)->ਕਦਮ;
     }
-    if (k == STD_VECTOR_CUDA_GPU_MAT)
+    ਜੇ (k == STD_ਸਦਿਸ਼_CUDA_GPU_MAT)
     {
-        const std::vector<cuda::GpuMat>& vv = *(const std::vector<cuda::GpuMat>*)obj;
+        ਅਚਲ std::vector<cuda::GpuMat>& vv = *(ਅਚਲ std::vector<cuda::GpuMat>*)obj;
         CV_Assert(i >= 0 && (size_t)i < vv.size());
-        return vv[i].step;
+        ਵਾਪਸ vv[i].ਕਦਮ;
     }
-    if( k == CUDA_GPU_MATND )
+    ਜੇ( k == CUDA_GPU_MATND )
     {
-        const cuda::GpuMatND& _gpuMatND = *(const cuda::GpuMatND*)obj;
+        ਅਚਲ cuda::GpuMatND& _gpuMatND = *(ਅਚਲ cuda::GpuMatND*)obj;
         CV_Assert( i >= 0 && i < _gpuMatND.dims );
-        return _gpuMatND.step[i];
+        ਵਾਪਸ _gpuMatND.ਕਦਮ[i];
     }
 
-    if (k == STD_VECTOR_CUDA_GPU_MAT_ND)
+    ਜੇ (k == STD_ਸਦਿਸ਼_CUDA_GPU_MAT_ND)
     {
-        const std::vector<cuda::GpuMatND>& vv = *(const std::vector<cuda::GpuMatND>*)obj;
+        ਅਚਲ std::vector<cuda::GpuMatND>& vv = *(ਅਚਲ std::vector<cuda::GpuMatND>*)obj;
         CV_Assert(i >= 0 && (size_t)i < vv.size());
-        const cuda::GpuMatND& _gpuMatND = vv[i];
+        ਅਚਲ cuda::GpuMatND& _gpuMatND = vv[i];
         CV_Assert( _gpuMatND.dims > 0 );
-        return _gpuMatND.step[0];
+        ਵਾਪਸ _gpuMatND.ਕਦਮ[0];
     }
 
     CV_Error(Error::StsNotImplemented, "");
 }
 
-void _InputArray::copyTo(const _OutputArray& arr) const
+ਖਾਲੀ ਨਿਵੇਸ਼_Array_2::copy_ਮੰਜ਼ਿਲ(ਅਚਲ _OutputArray& arr) ਅਚਲ
 {
-    _InputArray::KindFlag k = kind();
+    ਨਿਵੇਸ਼_Array_2::ਕਿਸਮ_Flag k = ਕਿਸਮ();
 
-    if( k == NONE )
+    ਜੇ( k == NONE )
         arr.release();
-    else if( k == MAT || k == MATX || k == STD_VECTOR || k == STD_BOOL_VECTOR )
+    ਨਹੀਂਤਾਂ ਜੇ( k == MAT || k == MATX || k == STD_ਸਦਿਸ਼ || k == STD_BOOL_ਸਦਿਸ਼ )
     {
         Mat m = getMat();
-        m.copyTo(arr);
+        m.copy_ਮੰਜ਼ਿਲ(arr);
     }
-    else if( k == UMAT )
-        ((UMat*)obj)->copyTo(arr);
-#ifdef HAVE_CUDA
-    else if (k == CUDA_GPU_MAT)
-        ((cuda::GpuMat*)obj)->copyTo(arr);
-#endif
-    else
+    ਨਹੀਂਤਾਂ ਜੇ( k == UMAT )
+        ((UMat*)obj)->copy_ਮੰਜ਼ਿਲ(arr);
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ HAVE_CUDA
+    ਨਹੀਂਤਾਂ ਜੇ (k == CUDA_GPU_MAT)
+        ((cuda::GpuMat*)obj)->copy_ਮੰਜ਼ਿਲ(arr);
+#ਜੇ_ਅੰਤ
+    ਨਹੀਂਤਾਂ
         CV_Error(Error::StsNotImplemented, "");
 }
 
-void _InputArray::copyTo(const _OutputArray& arr, const _InputArray & mask) const
+ਖਾਲੀ ਨਿਵੇਸ਼_Array_2::copy_ਮੰਜ਼ਿਲ(ਅਚਲ _OutputArray& arr, ਅਚਲ ਨਿਵੇਸ਼_Array_2 & ਨਕਾਬ) ਅਚਲ
 {
-    _InputArray::KindFlag k = kind();
+    ਨਿਵੇਸ਼_Array_2::ਕਿਸਮ_Flag k = ਕਿਸਮ();
 
-    if( k == NONE )
+    ਜੇ( k == NONE )
         arr.release();
-    else if( k == MAT || k == MATX || k == STD_VECTOR || k == STD_BOOL_VECTOR )
+    ਨਹੀਂਤਾਂ ਜੇ( k == MAT || k == MATX || k == STD_ਸਦਿਸ਼ || k == STD_BOOL_ਸਦਿਸ਼ )
     {
         Mat m = getMat();
-        m.copyTo(arr, mask);
+        m.copy_ਮੰਜ਼ਿਲ(arr, ਨਕਾਬ);
     }
-    else if( k == UMAT )
-        ((UMat*)obj)->copyTo(arr, mask);
-#ifdef HAVE_CUDA
-    else if (k == CUDA_GPU_MAT)
-        ((cuda::GpuMat*)obj)->copyTo(arr, mask);
-#endif
-    else
+    ਨਹੀਂਤਾਂ ਜੇ( k == UMAT )
+        ((UMat*)obj)->copy_ਮੰਜ਼ਿਲ(arr, ਨਕਾਬ);
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ HAVE_CUDA
+    ਨਹੀਂਤਾਂ ਜੇ (k == CUDA_GPU_MAT)
+        ((cuda::GpuMat*)obj)->copy_ਮੰਜ਼ਿਲ(arr, ਨਕਾਬ);
+#ਜੇ_ਅੰਤ
+    ਨਹੀਂਤਾਂ
         CV_Error(Error::StsNotImplemented, "");
 }
 
-bool _OutputArray::fixedSize() const
+ਤਾਰਕਿਕ _OutputArray::fixed_ਮਾਪ() ਅਚਲ
 {
-    return (flags & FIXED_SIZE) == FIXED_SIZE;
+    ਵਾਪਸ (flags & FIXED_ਮਾਪ) == FIXED_ਮਾਪ;
 }
 
-bool _OutputArray::fixedType() const
+ਤਾਰਕਿਕ _OutputArray::fixedType() ਅਚਲ
 {
-    return (flags & FIXED_TYPE) == FIXED_TYPE;
+    ਵਾਪਸ (flags & FIXED_TYPE) == FIXED_TYPE;
 }
 
-void _OutputArray::create_(Size _sz, int mtype, int i, bool allowTransposed, _OutputArray::DepthMask fixedDepthMask) const
+ਖਾਲੀ _OutputArray::create_(ਮਾਪ _sz, ਪੂਰਨ mtype, ਪੂਰਨ i, ਤਾਰਕਿਕ allowTransposed, _OutputArray::ਡੂੰਘਾਈ_ਨਕਾਬ fixed_ਡੂੰਘਾਈ_ਨਕਾਬ) ਅਚਲ
 {
-    _InputArray::KindFlag k = kind();
-    if( k == MAT && i < 0 && !allowTransposed && fixedDepthMask == 0 )
+    ਨਿਵੇਸ਼_Array_2::ਕਿਸਮ_Flag k = ਕਿਸਮ();
+    ਜੇ( k == MAT && i < 0 && !allowTransposed && fixed_ਡੂੰਘਾਈ_ਨਕਾਬ == 0 )
     {
-        CV_Assert(!fixedSize() || ((Mat*)obj)->size.operator()() == _sz);
+        CV_Assert(!fixed_ਮਾਪ() || ((Mat*)obj)->size.ਸੰਚਾਲਕ()() == _sz);
         CV_Assert(!fixedType() || ((Mat*)obj)->type() == mtype);
         ((Mat*)obj)->create(_sz, mtype);
-        return;
+        ਵਾਪਸ;
     }
-    if( k == UMAT && i < 0 && !allowTransposed && fixedDepthMask == 0 )
+    ਜੇ( k == UMAT && i < 0 && !allowTransposed && fixed_ਡੂੰਘਾਈ_ਨਕਾਬ == 0 )
     {
-        CV_Assert(!fixedSize() || ((UMat*)obj)->size.operator()() == _sz);
+        CV_Assert(!fixed_ਮਾਪ() || ((UMat*)obj)->size.ਸੰਚਾਲਕ()() == _sz);
         CV_Assert(!fixedType() || ((UMat*)obj)->type() == mtype);
         ((UMat*)obj)->create(_sz, mtype);
-        return;
+        ਵਾਪਸ;
     }
-    if( k == CUDA_GPU_MAT && i < 0 && !allowTransposed && fixedDepthMask == 0 )
+    ਜੇ( k == CUDA_GPU_MAT && i < 0 && !allowTransposed && fixed_ਡੂੰਘਾਈ_ਨਕਾਬ == 0 )
     {
-        CV_Assert(!fixedSize() || ((cuda::GpuMat*)obj)->size() == _sz);
+        CV_Assert(!fixed_ਮਾਪ() || ((cuda::GpuMat*)obj)->size() == _sz);
         CV_Assert(!fixedType() || ((cuda::GpuMat*)obj)->type() == mtype);
-#ifdef HAVE_CUDA
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ HAVE_CUDA
         ((cuda::GpuMat*)obj)->create(_sz, mtype);
-        return;
-#else
+        ਵਾਪਸ;
+#ਨਹੀਂਤਾਂ
         CV_Error(Error::StsNotImplemented, "CUDA support is not enabled in this OpenCV build (missing HAVE_CUDA)");
-#endif
+#ਜੇ_ਅੰਤ
     }
-    if( k == CUDA_GPU_MATND && i < 0 && !allowTransposed && fixedDepthMask == 0 )
+    ਜੇ( k == CUDA_GPU_MATND && i < 0 && !allowTransposed && fixed_ਡੂੰਘਾਈ_ਨਕਾਬ == 0 )
     {
-        CV_Assert(!fixedSize() || ((((cuda::GpuMatND*)obj)->dims == 2) && (((cuda::GpuMatND*)obj)->size[0] == _sz.height) && (((cuda::GpuMatND*)obj)->size[1] == _sz.width)));
+        CV_Assert(!fixed_ਮਾਪ() || ((((cuda::GpuMatND*)obj)->dims == 2) && (((cuda::GpuMatND*)obj)->size[0] == _sz.ਉਚਾਈ) && (((cuda::GpuMatND*)obj)->size[1] == _sz.ਚੌੜਾਈ)));
         CV_Assert(!fixedType() || ((cuda::GpuMatND*)obj)->type() == mtype);
-#ifdef HAVE_CUDA
-        cuda::GpuMatND::SizeArray sizes({_sz.height, _sz.width});
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ HAVE_CUDA
+        cuda::GpuMatND::ਮਾਪ_Array sizes({_sz.ਉਚਾਈ, _sz.ਚੌੜਾਈ});
         ((cuda::GpuMatND*)obj)->create(sizes, mtype);
-        return;
-#else
+        ਵਾਪਸ;
+#ਨਹੀਂਤਾਂ
         CV_Error(Error::StsNotImplemented, "CUDA support is not enabled in this OpenCV build (missing HAVE_CUDA)");
-#endif
+#ਜੇ_ਅੰਤ
     }
-    if( k == OPENGL_BUFFER && i < 0 && !allowTransposed && fixedDepthMask == 0 )
+    ਜੇ( k == OPENGL_ਬਫਰ && i < 0 && !allowTransposed && fixed_ਡੂੰਘਾਈ_ਨਕਾਬ == 0 )
     {
-        CV_Assert(!fixedSize() || ((ogl::Buffer*)obj)->size() == _sz);
-        CV_Assert(!fixedType() || ((ogl::Buffer*)obj)->type() == mtype);
-#ifdef HAVE_OPENGL
-        ((ogl::Buffer*)obj)->create(_sz, mtype);
-        return;
-#else
+        CV_Assert(!fixed_ਮਾਪ() || ((ogl::ਬਫਰ_2*)obj)->size() == _sz);
+        CV_Assert(!fixedType() || ((ogl::ਬਫਰ_2*)obj)->type() == mtype);
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ HAVE_OPENGL
+        ((ogl::ਬਫਰ_2*)obj)->create(_sz, mtype);
+        ਵਾਪਸ;
+#ਨਹੀਂਤਾਂ
         CV_Error(Error::StsNotImplemented, "OpenGL support is not enabled in this OpenCV build (missing HAVE_OPENGL)");
-#endif
+#ਜੇ_ਅੰਤ
     }
-    if( k == CUDA_HOST_MEM && i < 0 && !allowTransposed && fixedDepthMask == 0 )
+    ਜੇ( k == CUDA_HOST_MEM && i < 0 && !allowTransposed && fixed_ਡੂੰਘਾਈ_ਨਕਾਬ == 0 )
     {
-        CV_Assert(!fixedSize() || ((cuda::HostMem*)obj)->size() == _sz);
+        CV_Assert(!fixed_ਮਾਪ() || ((cuda::HostMem*)obj)->size() == _sz);
         CV_Assert(!fixedType() || ((cuda::HostMem*)obj)->type() == mtype);
-#ifdef HAVE_CUDA
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ HAVE_CUDA
         ((cuda::HostMem*)obj)->create(_sz, mtype);
-        return;
-#else
+        ਵਾਪਸ;
+#ਨਹੀਂਤਾਂ
         CV_Error(Error::StsNotImplemented, "CUDA support is not enabled in this OpenCV build (missing HAVE_CUDA)");
-#endif
+#ਜੇ_ਅੰਤ
     }
-    int sizes[] = {_sz.height, _sz.width};
-    create(2, sizes, mtype, i, allowTransposed, fixedDepthMask);
+    ਪੂਰਨ sizes[] = {_sz.ਉਚਾਈ, _sz.ਚੌੜਾਈ};
+    create(2, sizes, mtype, i, allowTransposed, fixed_ਡੂੰਘਾਈ_ਨਕਾਬ);
 }
 
-void _OutputArray::create_(int _rows, int _cols, int mtype, int i, bool allowTransposed, _OutputArray::DepthMask fixedDepthMask) const
+ਖਾਲੀ _OutputArray::create_(ਪੂਰਨ ਪੰਕਤੀਆਂ_3, ਪੂਰਨ ਖਾਨੇ_ਗਿਣਤੀ_3, ਪੂਰਨ mtype, ਪੂਰਨ i, ਤਾਰਕਿਕ allowTransposed, _OutputArray::ਡੂੰਘਾਈ_ਨਕਾਬ fixed_ਡੂੰਘਾਈ_ਨਕਾਬ) ਅਚਲ
 {
-    _InputArray::KindFlag k = kind();
-    if( k == MAT && i < 0 && !allowTransposed && fixedDepthMask == 0 )
+    ਨਿਵੇਸ਼_Array_2::ਕਿਸਮ_Flag k = ਕਿਸਮ();
+    ਜੇ( k == MAT && i < 0 && !allowTransposed && fixed_ਡੂੰਘਾਈ_ਨਕਾਬ == 0 )
     {
-        CV_Assert(!fixedSize() || ((Mat*)obj)->size.operator()() == Size(_cols, _rows));
+        CV_Assert(!fixed_ਮਾਪ() || ((Mat*)obj)->size.ਸੰਚਾਲਕ()() == ਮਾਪ(ਖਾਨੇ_ਗਿਣਤੀ_3, ਪੰਕਤੀਆਂ_3));
         CV_Assert(!fixedType() || ((Mat*)obj)->type() == mtype);
-        ((Mat*)obj)->create(_rows, _cols, mtype);
-        return;
+        ((Mat*)obj)->create(ਪੰਕਤੀਆਂ_3, ਖਾਨੇ_ਗਿਣਤੀ_3, mtype);
+        ਵਾਪਸ;
     }
-    if( k == UMAT && i < 0 && !allowTransposed && fixedDepthMask == 0 )
+    ਜੇ( k == UMAT && i < 0 && !allowTransposed && fixed_ਡੂੰਘਾਈ_ਨਕਾਬ == 0 )
     {
-        CV_Assert(!fixedSize() || ((UMat*)obj)->size.operator()() == Size(_cols, _rows));
+        CV_Assert(!fixed_ਮਾਪ() || ((UMat*)obj)->size.ਸੰਚਾਲਕ()() == ਮਾਪ(ਖਾਨੇ_ਗਿਣਤੀ_3, ਪੰਕਤੀਆਂ_3));
         CV_Assert(!fixedType() || ((UMat*)obj)->type() == mtype);
-        ((UMat*)obj)->create(_rows, _cols, mtype);
-        return;
+        ((UMat*)obj)->create(ਪੰਕਤੀਆਂ_3, ਖਾਨੇ_ਗਿਣਤੀ_3, mtype);
+        ਵਾਪਸ;
     }
-    if( k == CUDA_GPU_MAT && i < 0 && !allowTransposed && fixedDepthMask == 0 )
+    ਜੇ( k == CUDA_GPU_MAT && i < 0 && !allowTransposed && fixed_ਡੂੰਘਾਈ_ਨਕਾਬ == 0 )
     {
-        CV_Assert(!fixedSize() || ((cuda::GpuMat*)obj)->size() == Size(_cols, _rows));
+        CV_Assert(!fixed_ਮਾਪ() || ((cuda::GpuMat*)obj)->size() == ਮਾਪ(ਖਾਨੇ_ਗਿਣਤੀ_3, ਪੰਕਤੀਆਂ_3));
         CV_Assert(!fixedType() || ((cuda::GpuMat*)obj)->type() == mtype);
-#ifdef HAVE_CUDA
-        ((cuda::GpuMat*)obj)->create(_rows, _cols, mtype);
-        return;
-#else
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ HAVE_CUDA
+        ((cuda::GpuMat*)obj)->create(ਪੰਕਤੀਆਂ_3, ਖਾਨੇ_ਗਿਣਤੀ_3, mtype);
+        ਵਾਪਸ;
+#ਨਹੀਂਤਾਂ
         CV_Error(Error::StsNotImplemented, "CUDA support is not enabled in this OpenCV build (missing HAVE_CUDA)");
-#endif
+#ਜੇ_ਅੰਤ
     }
-    if( k == CUDA_GPU_MATND && i < 0 && !allowTransposed && fixedDepthMask == 0 )
+    ਜੇ( k == CUDA_GPU_MATND && i < 0 && !allowTransposed && fixed_ਡੂੰਘਾਈ_ਨਕਾਬ == 0 )
     {
-        CV_Assert(!fixedSize() || ((((cuda::GpuMatND*)obj)->dims == 2) && (((cuda::GpuMatND*)obj)->size[0] == _rows) && (((cuda::GpuMatND*)obj)->size[1] == _cols)));
+        CV_Assert(!fixed_ਮਾਪ() || ((((cuda::GpuMatND*)obj)->dims == 2) && (((cuda::GpuMatND*)obj)->size[0] == ਪੰਕਤੀਆਂ_3) && (((cuda::GpuMatND*)obj)->size[1] == ਖਾਨੇ_ਗਿਣਤੀ_3)));
         CV_Assert(!fixedType() || ((cuda::GpuMatND*)obj)->type() == mtype);
-#ifdef HAVE_CUDA
-        cuda::GpuMatND::SizeArray sizes({_rows, _cols});
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ HAVE_CUDA
+        cuda::GpuMatND::ਮਾਪ_Array sizes({ਪੰਕਤੀਆਂ_3, ਖਾਨੇ_ਗਿਣਤੀ_3});
         ((cuda::GpuMatND*)obj)->create(sizes, mtype);
-        return;
-#else
+        ਵਾਪਸ;
+#ਨਹੀਂਤਾਂ
         CV_Error(Error::StsNotImplemented, "CUDA support is not enabled in this OpenCV build (missing HAVE_CUDA)");
-#endif
+#ਜੇ_ਅੰਤ
     }
-    if( k == OPENGL_BUFFER && i < 0 && !allowTransposed && fixedDepthMask == 0 )
+    ਜੇ( k == OPENGL_ਬਫਰ && i < 0 && !allowTransposed && fixed_ਡੂੰਘਾਈ_ਨਕਾਬ == 0 )
     {
-        CV_Assert(!fixedSize() || ((ogl::Buffer*)obj)->size() == Size(_cols, _rows));
-        CV_Assert(!fixedType() || ((ogl::Buffer*)obj)->type() == mtype);
-#ifdef HAVE_OPENGL
-        ((ogl::Buffer*)obj)->create(_rows, _cols, mtype);
-        return;
-#else
+        CV_Assert(!fixed_ਮਾਪ() || ((ogl::ਬਫਰ_2*)obj)->size() == ਮਾਪ(ਖਾਨੇ_ਗਿਣਤੀ_3, ਪੰਕਤੀਆਂ_3));
+        CV_Assert(!fixedType() || ((ogl::ਬਫਰ_2*)obj)->type() == mtype);
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ HAVE_OPENGL
+        ((ogl::ਬਫਰ_2*)obj)->create(ਪੰਕਤੀਆਂ_3, ਖਾਨੇ_ਗਿਣਤੀ_3, mtype);
+        ਵਾਪਸ;
+#ਨਹੀਂਤਾਂ
         CV_Error(Error::StsNotImplemented, "OpenGL support is not enabled in this OpenCV build (missing HAVE_OPENGL)");
-#endif
+#ਜੇ_ਅੰਤ
     }
-    if( k == CUDA_HOST_MEM && i < 0 && !allowTransposed && fixedDepthMask == 0 )
+    ਜੇ( k == CUDA_HOST_MEM && i < 0 && !allowTransposed && fixed_ਡੂੰਘਾਈ_ਨਕਾਬ == 0 )
     {
-        CV_Assert(!fixedSize() || ((cuda::HostMem*)obj)->size() == Size(_cols, _rows));
+        CV_Assert(!fixed_ਮਾਪ() || ((cuda::HostMem*)obj)->size() == ਮਾਪ(ਖਾਨੇ_ਗਿਣਤੀ_3, ਪੰਕਤੀਆਂ_3));
         CV_Assert(!fixedType() || ((cuda::HostMem*)obj)->type() == mtype);
-#ifdef HAVE_CUDA
-        ((cuda::HostMem*)obj)->create(_rows, _cols, mtype);
-        return;
-#else
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ HAVE_CUDA
+        ((cuda::HostMem*)obj)->create(ਪੰਕਤੀਆਂ_3, ਖਾਨੇ_ਗਿਣਤੀ_3, mtype);
+        ਵਾਪਸ;
+#ਨਹੀਂਤਾਂ
         CV_Error(Error::StsNotImplemented, "CUDA support is not enabled in this OpenCV build (missing HAVE_CUDA)");
-#endif
+#ਜੇ_ਅੰਤ
     }
-    int sizes[] = {_rows, _cols};
-    create(2, sizes, mtype, i, allowTransposed, fixedDepthMask);
+    ਪੂਰਨ sizes[] = {ਪੰਕਤੀਆਂ_3, ਖਾਨੇ_ਗਿਣਤੀ_3};
+    create(2, sizes, mtype, i, allowTransposed, fixed_ਡੂੰਘਾਈ_ਨਕਾਬ);
 }
 
-void _OutputArray::create(int d, const int* sizes, int mtype, int i,
-                          bool allowTransposed, _OutputArray::DepthMask fixedDepthMask) const
+ਖਾਲੀ _OutputArray::create(ਪੂਰਨ d, ਅਚਲ ਪੂਰਨ* sizes, ਪੂਰਨ mtype, ਪੂਰਨ i,
+                          ਤਾਰਕਿਕ allowTransposed, _OutputArray::ਡੂੰਘਾਈ_ਨਕਾਬ fixed_ਡੂੰਘਾਈ_ਨਕਾਬ) ਅਚਲ
 {
-    int size0 = d > 0 ? sizes[0] : 1, size1 = d > 1 ? sizes[1] : 1;
-    _InputArray::KindFlag k = kind();
+    ਪੂਰਨ size0 = d > 0 ? sizes[0] : 1, size1 = d > 1 ? sizes[1] : 1;
+    ਨਿਵੇਸ਼_Array_2::ਕਿਸਮ_Flag k = ਕਿਸਮ();
     mtype = CV_MAT_TYPE(mtype);
 
-    if( k == MAT )
+    ਜੇ( k == MAT )
     {
         CV_Assert( i < 0 );
         Mat& m = *(Mat*)obj;
-        CV_Assert(!(m.empty() && fixedType() && fixedSize()) && "Can't reallocate empty Mat with locked layout (probably due to misused 'const' modifier)");
-        if (!m.empty() && d <= 2 && m.dims <= 2 &&
+        CV_Assert(!(m.empty() && fixedType() && fixed_ਮਾਪ()) && "Can't reallocate empty Mat with locked layout (probably due to misused 'const' modifier)");
+        ਜੇ (!m.empty() && d <= 2 && m.dims <= 2 &&
             m.type() == mtype &&
-            ((m.rows == size0 && m.cols == size1) ||
-            (allowTransposed && m.rows == size1 && m.cols == size0 && m.isContinuous())))
+            ((m.ਪੰਕਤੀਆਂ == size0 && m.ਖਾਨੇ_ਗਿਣਤੀ == size1) ||
+            (allowTransposed && m.ਪੰਕਤੀਆਂ == size1 && m.ਖਾਨੇ_ਗਿਣਤੀ == size0 && m.isContinuous())))
         {
-            return;
+            ਵਾਪਸ;
         }
 
-        if(fixedType())
+        ਜੇ(fixedType())
         {
-            if(CV_MAT_CN(mtype) == m.channels() && ((1 << CV_MAT_DEPTH(flags)) & fixedDepthMask) != 0 )
+            ਜੇ(CV_MAT_CN(mtype) == m.channels() && ((1 << CV_MAT_ਡੂੰਘਾਈ(flags)) & fixed_ਡੂੰਘਾਈ_ਨਕਾਬ) != 0 )
                 mtype = m.type();
-            else
+            ਨਹੀਂਤਾਂ
                 CV_CheckTypeEQ(m.type(), CV_MAT_TYPE(mtype), "Can't reallocate Mat with locked type (probably due to misused 'const' modifier)");
         }
-        if(fixedSize())
+        ਜੇ(fixed_ਮਾਪ())
         {
             CV_CheckEQ(m.dims, d, "Can't reallocate Mat with locked size (probably due to misused 'const' modifier)");
-            for(int j = 0; j < d; ++j)
+            ਲਈ(ਪੂਰਨ j = 0; j < d; ++j)
                 CV_CheckEQ(m.size[j], sizes[j], "Can't reallocate Mat with locked size (probably due to misused 'const' modifier)");
         }
         m.create(d, sizes, mtype);
-        return;
+        ਵਾਪਸ;
     }
 
-    if( k == UMAT )
+    ਜੇ( k == UMAT )
     {
         CV_Assert( i < 0 );
         UMat& m = *(UMat*)obj;
-        CV_Assert(!(m.empty() && fixedType() && fixedSize()) && "Can't reallocate empty UMat with locked layout (probably due to misused 'const' modifier)");
-        if (!m.empty() && d <= 2 && m.dims <= 2 &&
+        CV_Assert(!(m.empty() && fixedType() && fixed_ਮਾਪ()) && "Can't reallocate empty UMat with locked layout (probably due to misused 'const' modifier)");
+        ਜੇ (!m.empty() && d <= 2 && m.dims <= 2 &&
             m.type() == mtype &&
-            ((m.rows == size0 && m.cols == size1) ||
-            (allowTransposed && m.rows == size1 && m.cols == size0 && m.isContinuous())))
+            ((m.ਪੰਕਤੀਆਂ == size0 && m.ਖਾਨੇ_ਗਿਣਤੀ == size1) ||
+            (allowTransposed && m.ਪੰਕਤੀਆਂ == size1 && m.ਖਾਨੇ_ਗਿਣਤੀ == size0 && m.isContinuous())))
         {
-            return;
+            ਵਾਪਸ;
         }
 
-        if(fixedType())
+        ਜੇ(fixedType())
         {
-            if(CV_MAT_CN(mtype) == m.channels() && ((1 << CV_MAT_TYPE(flags)) & fixedDepthMask) != 0 )
+            ਜੇ(CV_MAT_CN(mtype) == m.channels() && ((1 << CV_MAT_TYPE(flags)) & fixed_ਡੂੰਘਾਈ_ਨਕਾਬ) != 0 )
                 mtype = m.type();
-            else
+            ਨਹੀਂਤਾਂ
                 CV_CheckTypeEQ(m.type(), CV_MAT_TYPE(mtype), "Can't reallocate UMat with locked type (probably due to misused 'const' modifier)");
         }
-        if(fixedSize())
+        ਜੇ(fixed_ਮਾਪ())
         {
             CV_CheckEQ(m.dims, d, "Can't reallocate UMat with locked size (probably due to misused 'const' modifier)");
-            for(int j = 0; j < d; ++j)
+            ਲਈ(ਪੂਰਨ j = 0; j < d; ++j)
                 CV_CheckEQ(m.size[j], sizes[j], "Can't reallocate UMat with locked size (probably due to misused 'const' modifier)");
         }
         m.create(d, sizes, mtype);
-        return;
+        ਵਾਪਸ;
     }
 
-    if( k == MATX )
+    ਜੇ( k == MATX )
     {
         CV_Assert( i < 0 );
-        int type0 = CV_MAT_TYPE(flags);
-        CV_Assert( mtype == type0 || (CV_MAT_CN(mtype) == 1 && ((1 << type0) & fixedDepthMask) != 0) );
+        ਪੂਰਨ type0 = CV_MAT_TYPE(flags);
+        CV_Assert( mtype == type0 || (CV_MAT_CN(mtype) == 1 && ((1 << type0) & fixed_ਡੂੰਘਾਈ_ਨਕਾਬ) != 0) );
         CV_CheckLE(d, 2, "");
-        Size requested_size(d == 2 ? sizes[1] : 1, d >= 1 ? sizes[0] : 1);
-        if (sz.width == 1 || sz.height == 1)
+        ਮਾਪ requested_size(d == 2 ? sizes[1] : 1, d >= 1 ? sizes[0] : 1);
+        ਜੇ (sz.ਚੌੜਾਈ == 1 || sz.ਉਚਾਈ == 1)
         {
             // NB: 1D arrays assume allowTransposed=true (see #4159)
-            int total_1d = std::max(sz.width, sz.height);
-            CV_Check(requested_size, std::max(requested_size.width, requested_size.height) == total_1d, "");
+            ਪੂਰਨ ਕੁੱਲ_1d = std::max(sz.ਚੌੜਾਈ, sz.ਉਚਾਈ);
+            CV_Check(requested_size, std::max(requested_size.ਚੌੜਾਈ, requested_size.ਉਚਾਈ) == ਕੁੱਲ_1d, "");
         }
-        else
+        ਨਹੀਂਤਾਂ
         {
-            if (!allowTransposed)
+            ਜੇ (!allowTransposed)
             {
                 CV_CheckEQ(requested_size, sz, "");
             }
-            else
+            ਨਹੀਂਤਾਂ
             {
                 CV_Check(requested_size,
-                        (requested_size == sz || (requested_size.height == sz.width && requested_size.width == sz.height)),
+                        (requested_size == sz || (requested_size.ਉਚਾਈ == sz.ਚੌੜਾਈ && requested_size.ਚੌੜਾਈ == sz.ਉਚਾਈ)),
                         "");
             }
         }
-        return;
+        ਵਾਪਸ;
     }
 
-    if( k == STD_VECTOR || k == STD_VECTOR_VECTOR )
+    ਜੇ( k == STD_ਸਦਿਸ਼ || k == STD_ਸਦਿਸ਼_ਸਦਿਸ਼ )
     {
-        CV_Assert(!fixedSize());
-        CV_Assert(k == STD_VECTOR_VECTOR || i < 0);
+        CV_Assert(!fixed_ਮਾਪ());
+        CV_Assert(k == STD_ਸਦਿਸ਼_ਸਦਿਸ਼ || i < 0);
         CV_Assert( d <= 2 && (size0 == 1 || size1 == 1 || size0*size1 == 0) );
         size_t len = size0*size1 > 0 ? size0 + size1 - 1 : 0;
-        int esz = CV_ELEM_SIZE(flags);
+        ਪੂਰਨ esz = CV_ELEM_ਮਾਪ(flags);
 
-        if( k == STD_VECTOR || (k == STD_VECTOR_VECTOR && i >= 0) )
+        ਜੇ( k == STD_ਸਦਿਸ਼ || (k == STD_ਸਦਿਸ਼_ਸਦਿਸ਼ && i >= 0) )
         {
-            int type0 = CV_MAT_TYPE(flags);
-            CV_Assert( mtype == type0 || (CV_MAT_CN(mtype) == CV_MAT_CN(type0) && ((1 << type0) & fixedDepthMask) != 0) );
+            ਪੂਰਨ type0 = CV_MAT_TYPE(flags);
+            CV_Assert( mtype == type0 || (CV_MAT_CN(mtype) == CV_MAT_CN(type0) && ((1 << type0) & fixed_ਡੂੰਘਾਈ_ਨਕਾਬ) != 0) );
         }
 
-    #undef RESIZE_VEC
-    #define RESIZE_VEC(T) \
+    #ਪਰਿਭਾਸ਼ਾ_ਰੱਦ RESIZE_VEC
+    #ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ RESIZE_VEC(T) \
         { \
             std::vector<T>* v; \
-            if (k == STD_VECTOR_VECTOR) { \
+            ਜੇ (k == STD_ਸਦਿਸ਼_ਸਦਿਸ਼) { \
                 std::vector<std::vector<T> >* vv = reinterpret_cast<std::vector<std::vector<T> >*>(obj); \
-                if (i < 0) { \
-                    CV_Assert(!fixedSize() || len == vv->size()); \
+                ਜੇ (i < 0) { \
+                    CV_Assert(!fixed_ਮਾਪ() || len == vv->size()); \
                     vv->resize(len); \
-                    return; \
+                    ਵਾਪਸ; \
                 } \
                 CV_Assert(size_t(i) < vv->size()); \
                 v = &vv->at(i); \
-            } else { \
+            } ਨਹੀਂਤਾਂ { \
                 v = reinterpret_cast<std::vector<T>*>(obj); \
             } \
-            CV_Assert(!fixedSize() || len == v->size()); \
+            CV_Assert(!fixed_ਮਾਪ() || len == v->size()); \
             v->resize(len); \
         } \
-        break
+        ਰੋਕੋ
 
-        STD_VECTOR_SWITCH(esz, RESIZE_VEC)
-        return;
+        STD_ਸਦਿਸ਼_SWITCH(esz, RESIZE_VEC)
+        ਵਾਪਸ;
     }
 
-    if( k == NONE )
+    ਜੇ( k == NONE )
     {
         CV_Error(cv::Error::StsNullPtr, "create() called for the missing output array" );
     }
 
-    if( k == STD_VECTOR_MAT )
+    ਜੇ( k == STD_ਸਦਿਸ਼_MAT )
     {
         std::vector<Mat>& v = *(std::vector<Mat>*)obj;
 
-        if( i < 0 )
+        ਜੇ( i < 0 )
         {
             CV_Assert( d == 2 && (sizes[0] == 1 || sizes[1] == 1 || sizes[0]*sizes[1] == 0) );
             size_t len = sizes[0]*sizes[1] > 0 ? sizes[0] + sizes[1] - 1 : 0, len0 = v.size();
 
-            CV_Assert(!fixedSize() || len == len0);
+            CV_Assert(!fixed_ਮਾਪ() || len == len0);
             v.resize(len);
-            if( fixedType() )
+            ਜੇ( fixedType() )
             {
-                int _type = CV_MAT_TYPE(flags);
-                for( size_t j = len0; j < len; j++ )
+                ਪੂਰਨ _type = CV_MAT_TYPE(flags);
+                ਲਈ( size_t j = len0; j < len; j++ )
                 {
-                    if( v[j].type() == _type )
-                        continue;
+                    ਜੇ( v[j].type() == _type )
+                        ਜਾਰੀ;
                     CV_Assert( v[j].empty() );
-                    v[j].flags = (v[j].flags & ~CV_MAT_TYPE_MASK) | _type;
+                    v[j].flags = (v[j].flags & ~CV_MAT_TYPE_ਨਕਾਬ) | _type;
                 }
             }
-            return;
+            ਵਾਪਸ;
         }
 
-        CV_Assert( i < (int)v.size() );
+        CV_Assert( i < (ਪੂਰਨ)v.size() );
         Mat& m = v[i];
 
-        if( allowTransposed )
+        ਜੇ( allowTransposed )
         {
-            if( !m.isContinuous() )
+            ਜੇ( !m.isContinuous() )
             {
-                CV_Assert(!fixedType() && !fixedSize());
+                CV_Assert(!fixedType() && !fixed_ਮਾਪ());
                 m.release();
             }
 
-            if( d == 2 && m.dims == 2 && m.data &&
-                m.type() == mtype && m.rows == sizes[1] && m.cols == sizes[0] )
-                return;
+            ਜੇ( d == 2 && m.dims == 2 && m.ਅੰਕੜੇ &&
+                m.type() == mtype && m.ਪੰਕਤੀਆਂ == sizes[1] && m.ਖਾਨੇ_ਗਿਣਤੀ == sizes[0] )
+                ਵਾਪਸ;
         }
 
-        if(fixedType())
+        ਜੇ(fixedType())
         {
-            if(CV_MAT_CN(mtype) == m.channels() && ((1 << CV_MAT_TYPE(flags)) & fixedDepthMask) != 0 )
+            ਜੇ(CV_MAT_CN(mtype) == m.channels() && ((1 << CV_MAT_TYPE(flags)) & fixed_ਡੂੰਘਾਈ_ਨਕਾਬ) != 0 )
                 mtype = m.type();
-            else
+            ਨਹੀਂਤਾਂ
                 CV_Assert(CV_MAT_TYPE(mtype) == m.type());
         }
-        if(fixedSize())
+        ਜੇ(fixed_ਮਾਪ())
         {
             CV_Assert(m.dims == d);
-            for(int j = 0; j < d; ++j)
+            ਲਈ(ਪੂਰਨ j = 0; j < d; ++j)
                 CV_Assert(m.size[j] == sizes[j]);
         }
 
         m.create(d, sizes, mtype);
-        return;
+        ਵਾਪਸ;
     }
 
-    if( k == STD_ARRAY_MAT )
+    ਜੇ( k == STD_ARRAY_MAT )
     {
         Mat* v = (Mat*)obj;
 
-        if( i < 0 )
+        ਜੇ( i < 0 )
         {
             CV_Assert( d == 2 && (sizes[0] == 1 || sizes[1] == 1 || sizes[0]*sizes[1] == 0) );
-            size_t len = sizes[0]*sizes[1] > 0 ? sizes[0] + sizes[1] - 1 : 0, len0 = sz.height;
+            size_t len = sizes[0]*sizes[1] > 0 ? sizes[0] + sizes[1] - 1 : 0, len0 = sz.ਉਚਾਈ;
 
             CV_Assert(len == len0);
-            if( fixedType() )
+            ਜੇ( fixedType() )
             {
-                int _type = CV_MAT_TYPE(flags);
-                for( size_t j = len0; j < len; j++ )
+                ਪੂਰਨ _type = CV_MAT_TYPE(flags);
+                ਲਈ( size_t j = len0; j < len; j++ )
                 {
-                    if( v[j].type() == _type )
-                        continue;
+                    ਜੇ( v[j].type() == _type )
+                        ਜਾਰੀ;
                     CV_Assert( v[j].empty() );
-                    v[j].flags = (v[j].flags & ~CV_MAT_TYPE_MASK) | _type;
+                    v[j].flags = (v[j].flags & ~CV_MAT_TYPE_ਨਕਾਬ) | _type;
                 }
             }
-            return;
+            ਵਾਪਸ;
         }
 
-        CV_Assert( i < sz.height );
+        CV_Assert( i < sz.ਉਚਾਈ );
         Mat& m = v[i];
 
-        if( allowTransposed )
+        ਜੇ( allowTransposed )
         {
-            if( !m.isContinuous() )
+            ਜੇ( !m.isContinuous() )
             {
-                CV_Assert(!fixedType() && !fixedSize());
+                CV_Assert(!fixedType() && !fixed_ਮਾਪ());
                 m.release();
             }
 
-            if( d == 2 && m.dims == 2 && m.data &&
-                m.type() == mtype && m.rows == sizes[1] && m.cols == sizes[0] )
-                return;
+            ਜੇ( d == 2 && m.dims == 2 && m.ਅੰਕੜੇ &&
+                m.type() == mtype && m.ਪੰਕਤੀਆਂ == sizes[1] && m.ਖਾਨੇ_ਗਿਣਤੀ == sizes[0] )
+                ਵਾਪਸ;
         }
 
-        if(fixedType())
+        ਜੇ(fixedType())
         {
-            if(CV_MAT_CN(mtype) == m.channels() && ((1 << CV_MAT_TYPE(flags)) & fixedDepthMask) != 0 )
+            ਜੇ(CV_MAT_CN(mtype) == m.channels() && ((1 << CV_MAT_TYPE(flags)) & fixed_ਡੂੰਘਾਈ_ਨਕਾਬ) != 0 )
                 mtype = m.type();
-            else
+            ਨਹੀਂਤਾਂ
                 CV_Assert(CV_MAT_TYPE(mtype) == m.type());
         }
 
-        if(fixedSize())
+        ਜੇ(fixed_ਮਾਪ())
         {
             CV_Assert(m.dims == d);
-            for(int j = 0; j < d; ++j)
+            ਲਈ(ਪੂਰਨ j = 0; j < d; ++j)
                 CV_Assert(m.size[j] == sizes[j]);
         }
 
         m.create(d, sizes, mtype);
-        return;
+        ਵਾਪਸ;
     }
 
-    if( k == STD_VECTOR_UMAT )
+    ਜੇ( k == STD_ਸਦਿਸ਼_UMAT )
     {
         std::vector<UMat>& v = *(std::vector<UMat>*)obj;
 
-        if( i < 0 )
+        ਜੇ( i < 0 )
         {
             CV_Assert( d == 2 && (sizes[0] == 1 || sizes[1] == 1 || sizes[0]*sizes[1] == 0) );
             size_t len = sizes[0]*sizes[1] > 0 ? sizes[0] + sizes[1] - 1 : 0, len0 = v.size();
 
-            CV_Assert(!fixedSize() || len == len0);
+            CV_Assert(!fixed_ਮਾਪ() || len == len0);
             v.resize(len);
-            if( fixedType() )
+            ਜੇ( fixedType() )
             {
-                int _type = CV_MAT_TYPE(flags);
-                for( size_t j = len0; j < len; j++ )
+                ਪੂਰਨ _type = CV_MAT_TYPE(flags);
+                ਲਈ( size_t j = len0; j < len; j++ )
                 {
-                    if( v[j].type() == _type )
-                        continue;
+                    ਜੇ( v[j].type() == _type )
+                        ਜਾਰੀ;
                     CV_Assert( v[j].empty() );
-                    v[j].flags = (v[j].flags & ~CV_MAT_TYPE_MASK) | _type;
+                    v[j].flags = (v[j].flags & ~CV_MAT_TYPE_ਨਕਾਬ) | _type;
                 }
             }
-            return;
+            ਵਾਪਸ;
         }
 
-        CV_Assert( i < (int)v.size() );
+        CV_Assert( i < (ਪੂਰਨ)v.size() );
         UMat& m = v[i];
 
-        if( allowTransposed )
+        ਜੇ( allowTransposed )
         {
-            if( !m.isContinuous() )
+            ਜੇ( !m.isContinuous() )
             {
-                CV_Assert(!fixedType() && !fixedSize());
+                CV_Assert(!fixedType() && !fixed_ਮਾਪ());
                 m.release();
             }
 
-            if( d == 2 && m.dims == 2 && m.u &&
-                m.type() == mtype && m.rows == sizes[1] && m.cols == sizes[0] )
-                return;
+            ਜੇ( d == 2 && m.dims == 2 && m.u &&
+                m.type() == mtype && m.ਪੰਕਤੀਆਂ == sizes[1] && m.ਖਾਨੇ_ਗਿਣਤੀ == sizes[0] )
+                ਵਾਪਸ;
         }
 
-        if(fixedType())
+        ਜੇ(fixedType())
         {
-            if(CV_MAT_CN(mtype) == m.channels() && ((1 << CV_MAT_TYPE(flags)) & fixedDepthMask) != 0 )
+            ਜੇ(CV_MAT_CN(mtype) == m.channels() && ((1 << CV_MAT_TYPE(flags)) & fixed_ਡੂੰਘਾਈ_ਨਕਾਬ) != 0 )
                 mtype = m.type();
-            else
+            ਨਹੀਂਤਾਂ
                 CV_Assert(CV_MAT_TYPE(mtype) == m.type());
         }
-        if(fixedSize())
+        ਜੇ(fixed_ਮਾਪ())
         {
             CV_Assert(m.dims == d);
-            for(int j = 0; j < d; ++j)
+            ਲਈ(ਪੂਰਨ j = 0; j < d; ++j)
                 CV_Assert(m.size[j] == sizes[j]);
         }
 
         m.create(d, sizes, mtype);
-        return;
+        ਵਾਪਸ;
     }
 
-    if ((k == CUDA_GPU_MAT || k == CUDA_HOST_MEM) && d <= 2 &&
-        i < 0 && !allowTransposed && fixedDepthMask == 0)
+    ਜੇ ((k == CUDA_GPU_MAT || k == CUDA_HOST_MEM) && d <= 2 &&
+        i < 0 && !allowTransposed && fixed_ਡੂੰਘਾਈ_ਨਕਾਬ == 0)
     {
         create((d < 2 ? 1 : sizes[0]), (d < 1 ? 1 : sizes[d > 1]),
-                mtype, i, allowTransposed, fixedDepthMask);
-        return;
+                mtype, i, allowTransposed, fixed_ਡੂੰਘਾਈ_ਨਕਾਬ);
+        ਵਾਪਸ;
     }
 
-    if( k == CUDA_GPU_MATND && d > 0 && i < 0 && !allowTransposed && fixedDepthMask == 0 )
+    ਜੇ( k == CUDA_GPU_MATND && d > 0 && i < 0 && !allowTransposed && fixed_ਡੂੰਘਾਈ_ਨਕਾਬ == 0 )
     {
-#ifdef HAVE_CUDA
-        cuda::GpuMatND::SizeArray sizeArray = cuda::GpuMatND::SizeArray(sizes, sizes+d);
-        ((cuda::GpuMatND*)obj)->create(sizeArray, mtype);
-        return;
-#else
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ HAVE_CUDA
+        cuda::GpuMatND::ਮਾਪ_Array ਮਾਪ_Array_2 = cuda::GpuMatND::ਮਾਪ_Array(sizes, sizes+d);
+        ((cuda::GpuMatND*)obj)->create(ਮਾਪ_Array_2, mtype);
+        ਵਾਪਸ;
+#ਨਹੀਂਤਾਂ
         CV_Error(Error::StsNotImplemented, "CUDA support is not enabled in this OpenCV build (missing HAVE_CUDA)");
-#endif
+#ਜੇ_ਅੰਤ
     }
 
 
     CV_Error(Error::StsNotImplemented, "Unknown/unsupported array type");
 }
 
-void _OutputArray::create(const MatShape& shape, int mtype, int i,
-                          bool allowTransposed, _OutputArray::DepthMask fixedDepthMask) const
+ਖਾਲੀ _OutputArray::create(ਅਚਲ MatShape& shape, ਪੂਰਨ mtype, ਪੂਰਨ i,
+                          ਤਾਰਕਿਕ allowTransposed, _OutputArray::ਡੂੰਘਾਈ_ਨਕਾਬ fixed_ਡੂੰਘਾਈ_ਨਕਾਬ) ਅਚਲ
 {
-    if (shape.dims < 0) {
+    ਜੇ (shape.dims < 0) {
         release();
-    } else {
-        create(shape.dims, shape.p, mtype, i, allowTransposed, fixedDepthMask);
+    } ਨਹੀਂਤਾਂ {
+        create(shape.dims, shape.p, mtype, i, allowTransposed, fixed_ਡੂੰਘਾਈ_ਨਕਾਬ);
     }
 }
 
-Mat _OutputArray::reinterpret(int mtype) const
+Mat _OutputArray::reinterpret(ਪੂਰਨ mtype) ਅਚਲ
 {
     mtype = CV_MAT_TYPE(mtype);
-    return getMat().reinterpret(mtype);
+    ਵਾਪਸ getMat().reinterpret(mtype);
 }
 
-void _OutputArray::createSameSize(const _InputArray& arr, int mtype) const
+ਖਾਲੀ _OutputArray::create_Same_ਮਾਪ(ਅਚਲ ਨਿਵੇਸ਼_Array_2& arr, ਪੂਰਨ mtype) ਅਚਲ
 {
     create(arr.shape(), mtype);
 }
 
-void _OutputArray::fit(Size _sz, int mtype, int i,
-                       bool allowTransposed, _OutputArray::DepthMask fixedDepthMask) const
+ਖਾਲੀ _OutputArray::fit(ਮਾਪ _sz, ਪੂਰਨ mtype, ਪੂਰਨ i,
+                       ਤਾਰਕਿਕ allowTransposed, _OutputArray::ਡੂੰਘਾਈ_ਨਕਾਬ fixed_ਡੂੰਘਾਈ_ਨਕਾਬ) ਅਚਲ
 {
-    int sizes[] = {_sz.height, _sz.width};
-    fit(2, sizes, mtype, i, allowTransposed, fixedDepthMask);
+    ਪੂਰਨ sizes[] = {_sz.ਉਚਾਈ, _sz.ਚੌੜਾਈ};
+    fit(2, sizes, mtype, i, allowTransposed, fixed_ਡੂੰਘਾਈ_ਨਕਾਬ);
 }
 
-void _OutputArray::fit(int rows, int cols, int mtype, int i,
-                       bool allowTransposed, _OutputArray::DepthMask fixedDepthMask) const
+ਖਾਲੀ _OutputArray::fit(ਪੂਰਨ ਪੰਕਤੀਆਂ, ਪੂਰਨ ਖਾਨੇ_ਗਿਣਤੀ, ਪੂਰਨ mtype, ਪੂਰਨ i,
+                       ਤਾਰਕਿਕ allowTransposed, _OutputArray::ਡੂੰਘਾਈ_ਨਕਾਬ fixed_ਡੂੰਘਾਈ_ਨਕਾਬ) ਅਚਲ
 {
-    int sizes[] = {rows, cols};
-    fit(2, sizes, mtype, i, allowTransposed, fixedDepthMask);
+    ਪੂਰਨ sizes[] = {ਪੰਕਤੀਆਂ, ਖਾਨੇ_ਗਿਣਤੀ};
+    fit(2, sizes, mtype, i, allowTransposed, fixed_ਡੂੰਘਾਈ_ਨਕਾਬ);
 }
 
-void _OutputArray::fit(const MatShape& shape, int mtype, int i,
-                       bool allowTransposed, _OutputArray::DepthMask fixedDepthMask) const
+ਖਾਲੀ _OutputArray::fit(ਅਚਲ MatShape& shape, ਪੂਰਨ mtype, ਪੂਰਨ i,
+                       ਤਾਰਕਿਕ allowTransposed, _OutputArray::ਡੂੰਘਾਈ_ਨਕਾਬ fixed_ਡੂੰਘਾਈ_ਨਕਾਬ) ਅਚਲ
 {
-    if (shape.dims < 0) {
+    ਜੇ (shape.dims < 0) {
         release();
-        return;
+        ਵਾਪਸ;
     }
-    fit(shape.dims, shape.p, mtype, i, allowTransposed, fixedDepthMask);
+    fit(shape.dims, shape.p, mtype, i, allowTransposed, fixed_ਡੂੰਘਾਈ_ਨਕਾਬ);
 
     // fit(dims, sizes) resets the layout, so carry it over the same way Mat::fit(const MatShape&) does
-    _InputArray::KindFlag k = kind();
-    if ((k == MAT && i < 0) || (k == STD_VECTOR_MAT && i >= 0)) {
-        MatSize& msize = getMatRef(i).size;
+    ਨਿਵੇਸ਼_Array_2::ਕਿਸਮ_Flag k = ਕਿਸਮ();
+    ਜੇ ((k == MAT && i < 0) || (k == STD_ਸਦਿਸ਼_MAT && i >= 0)) {
+        Mat_ਮਾਪ& msize = getMatRef(i).size;
         msize.layout = shape.layout;
         msize.C = shape.C;
-    } else if ((k == UMAT && i < 0) || (k == STD_VECTOR_UMAT && i >= 0)) {
-        MatSize& msize = getUMatRef(i).size;
+    } ਨਹੀਂਤਾਂ ਜੇ ((k == UMAT && i < 0) || (k == STD_ਸਦਿਸ਼_UMAT && i >= 0)) {
+        Mat_ਮਾਪ& msize = getUMatRef(i).size;
         msize.layout = shape.layout;
         msize.C = shape.C;
     }
 }
 
-void _OutputArray::fitSameSize(const _InputArray& arr, int mtype) const
+ਖਾਲੀ _OutputArray::fit_Same_ਮਾਪ(ਅਚਲ ਨਿਵੇਸ਼_Array_2& arr, ਪੂਰਨ mtype) ਅਚਲ
 {
     fit(arr.shape(), mtype);
 }
 
-void _OutputArray::fit(int d, const int* sizes, int mtype, int i,
-                       bool allowTransposed, _OutputArray::DepthMask fixedDepthMask) const
+ਖਾਲੀ _OutputArray::fit(ਪੂਰਨ d, ਅਚਲ ਪੂਰਨ* sizes, ਪੂਰਨ mtype, ਪੂਰਨ i,
+                       ਤਾਰਕਿਕ allowTransposed, _OutputArray::ਡੂੰਘਾਈ_ਨਕਾਬ fixed_ਡੂੰਘਾਈ_ਨਕਾਬ) ਅਚਲ
 {
-    int size0 = d > 0 ? sizes[0] : 1, size1 = d > 1 ? sizes[1] : 1;
-    _InputArray::KindFlag k = kind();
+    ਪੂਰਨ size0 = d > 0 ? sizes[0] : 1, size1 = d > 1 ? sizes[1] : 1;
+    ਨਿਵੇਸ਼_Array_2::ਕਿਸਮ_Flag k = ਕਿਸਮ();
     mtype = CV_MAT_TYPE(mtype);
 
-    if( (k == MAT && i < 0) || (k == STD_VECTOR_MAT && i >= 0) )
+    ਜੇ( (k == MAT && i < 0) || (k == STD_ਸਦਿਸ਼_MAT && i >= 0) )
     {
         Mat* m;
-        if (k == MAT)
+        ਜੇ (k == MAT)
             m = (Mat*)obj;
-        else {
+        ਨਹੀਂਤਾਂ {
             std::vector<Mat>& v = *(std::vector<Mat>*)obj;
             CV_Assert((size_t)i < v.size());
             m = &v[i];
         }
-        CV_Assert(!(m->empty() && fixedType() && fixedSize()) && "Can't reallocate empty Mat with locked layout (probably due to misused 'const' modifier)");
-        if (!m->empty() && d <= 2 && m->dims <= 2 &&
+        CV_Assert(!(m->empty() && fixedType() && fixed_ਮਾਪ()) && "Can't reallocate empty Mat with locked layout (probably due to misused 'const' modifier)");
+        ਜੇ (!m->empty() && d <= 2 && m->dims <= 2 &&
             m->type() == mtype &&
-            ((m->rows == size0 && m->cols == size1) ||
-             (allowTransposed && m->rows == size1 && m->cols == size0 && m->isContinuous())))
+            ((m->ਪੰਕਤੀਆਂ == size0 && m->ਖਾਨੇ_ਗਿਣਤੀ == size1) ||
+             (allowTransposed && m->ਪੰਕਤੀਆਂ == size1 && m->ਖਾਨੇ_ਗਿਣਤੀ == size0 && m->isContinuous())))
         {
-            return;
+            ਵਾਪਸ;
         }
 
-        if(fixedType())
+        ਜੇ(fixedType())
         {
-            if(CV_MAT_CN(mtype) == m->channels() && ((1 << CV_MAT_DEPTH(flags)) & fixedDepthMask) != 0 )
+            ਜੇ(CV_MAT_CN(mtype) == m->channels() && ((1 << CV_MAT_ਡੂੰਘਾਈ(flags)) & fixed_ਡੂੰਘਾਈ_ਨਕਾਬ) != 0 )
                 mtype = m->type();
-            else
+            ਨਹੀਂਤਾਂ
                 CV_CheckTypeEQ(m->type(), CV_MAT_TYPE(mtype), "Can't reallocate Mat with locked type (probably due to misused 'const' modifier)");
         }
-        if(fixedSize())
+        ਜੇ(fixed_ਮਾਪ())
         {
             CV_CheckEQ(m->dims, d, "Can't reallocate Mat with locked size (probably due to misused 'const' modifier)");
-            for(int j = 0; j < d; ++j)
+            ਲਈ(ਪੂਰਨ j = 0; j < d; ++j)
                 CV_CheckEQ(m->size[j], sizes[j], "Can't reallocate Mat with locked size (probably due to misused 'const' modifier)");
         }
         m->fit(d, sizes, mtype);
-        return;
+        ਵਾਪਸ;
     }
 
-    if( (k == UMAT && i < 0) || (k == STD_VECTOR_UMAT && i >= 0) )
+    ਜੇ( (k == UMAT && i < 0) || (k == STD_ਸਦਿਸ਼_UMAT && i >= 0) )
     {
         UMat* m;
-        if (k == UMAT)
+        ਜੇ (k == UMAT)
             m = (UMat*)obj;
-        else {
+        ਨਹੀਂਤਾਂ {
             std::vector<UMat>& v = *(std::vector<UMat>*)obj;
             CV_Assert((size_t)i < v.size());
             m = &v[i];
         }
-        CV_Assert(!(m->empty() && fixedType() && fixedSize()) && "Can't reallocate empty Mat with locked layout (probably due to misused 'const' modifier)");
-        if (!m->empty() && d <= 2 && m->dims <= 2 &&
+        CV_Assert(!(m->empty() && fixedType() && fixed_ਮਾਪ()) && "Can't reallocate empty Mat with locked layout (probably due to misused 'const' modifier)");
+        ਜੇ (!m->empty() && d <= 2 && m->dims <= 2 &&
             m->type() == mtype &&
-            ((m->rows == size0 && m->cols == size1) ||
-             (allowTransposed && m->rows == size1 && m->cols == size0 && m->isContinuous())))
+            ((m->ਪੰਕਤੀਆਂ == size0 && m->ਖਾਨੇ_ਗਿਣਤੀ == size1) ||
+             (allowTransposed && m->ਪੰਕਤੀਆਂ == size1 && m->ਖਾਨੇ_ਗਿਣਤੀ == size0 && m->isContinuous())))
         {
-            return;
+            ਵਾਪਸ;
         }
 
-        if(fixedType())
+        ਜੇ(fixedType())
         {
-            if(CV_MAT_CN(mtype) == m->channels() && ((1 << CV_MAT_DEPTH(flags)) & fixedDepthMask) != 0 )
+            ਜੇ(CV_MAT_CN(mtype) == m->channels() && ((1 << CV_MAT_ਡੂੰਘਾਈ(flags)) & fixed_ਡੂੰਘਾਈ_ਨਕਾਬ) != 0 )
                 mtype = m->type();
-            else
+            ਨਹੀਂਤਾਂ
                 CV_CheckTypeEQ(m->type(), CV_MAT_TYPE(mtype), "Can't reallocate Mat with locked type (probably due to misused 'const' modifier)");
         }
-        if(fixedSize())
+        ਜੇ(fixed_ਮਾਪ())
         {
             CV_CheckEQ(m->dims, d, "Can't reallocate Mat with locked size (probably due to misused 'const' modifier)");
-            for(int j = 0; j < d; ++j)
+            ਲਈ(ਪੂਰਨ j = 0; j < d; ++j)
                 CV_CheckEQ(m->size[j], sizes[j], "Can't reallocate Mat with locked size (probably due to misused 'const' modifier)");
         }
         m->fit(d, sizes, mtype);
-        return;
+        ਵਾਪਸ;
     }
 
-    create(d, sizes, mtype, i, allowTransposed, fixedDepthMask);
+    create(d, sizes, mtype, i, allowTransposed, fixed_ਡੂੰਘਾਈ_ਨਕਾਬ);
 }
 
-void _OutputArray::release() const
+ਖਾਲੀ _OutputArray::release() ਅਚਲ
 {
-    CV_Assert(!fixedSize());
+    CV_Assert(!fixed_ਮਾਪ());
 
-    _InputArray::KindFlag k = kind();
+    ਨਿਵੇਸ਼_Array_2::ਕਿਸਮ_Flag k = ਕਿਸਮ();
 
-    if( k == MAT )
+    ਜੇ( k == MAT )
     {
         ((Mat*)obj)->release();
-        return;
+        ਵਾਪਸ;
     }
 
-    if( k == UMAT )
+    ਜੇ( k == UMAT )
     {
         ((UMat*)obj)->release();
-        return;
+        ਵਾਪਸ;
     }
 
-    if( k == CUDA_GPU_MAT )
+    ਜੇ( k == CUDA_GPU_MAT )
     {
-#ifdef HAVE_CUDA
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ HAVE_CUDA
         ((cuda::GpuMat*)obj)->release();
-        return;
-#else
+        ਵਾਪਸ;
+#ਨਹੀਂਤਾਂ
         CV_Error(Error::StsNotImplemented, "CUDA support is not enabled in this OpenCV build (missing HAVE_CUDA)");
-#endif
+#ਜੇ_ਅੰਤ
     }
 
-    if( k == CUDA_GPU_MATND )
+    ਜੇ( k == CUDA_GPU_MATND )
     {
-#ifdef HAVE_CUDA
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ HAVE_CUDA
         ((cuda::GpuMatND*)obj)->release();
-        return;
-#else
+        ਵਾਪਸ;
+#ਨਹੀਂਤਾਂ
         CV_Error(Error::StsNotImplemented, "CUDA support is not enabled in this OpenCV build (missing HAVE_CUDA)");
-#endif
+#ਜੇ_ਅੰਤ
     }
 
-    if( k == CUDA_HOST_MEM )
+    ਜੇ( k == CUDA_HOST_MEM )
     {
-#ifdef HAVE_CUDA
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ HAVE_CUDA
         ((cuda::HostMem*)obj)->release();
-        return;
-#else
+        ਵਾਪਸ;
+#ਨਹੀਂਤਾਂ
         CV_Error(Error::StsNotImplemented, "CUDA support is not enabled in this OpenCV build (missing HAVE_CUDA)");
-#endif
+#ਜੇ_ਅੰਤ
     }
 
-    if( k == OPENGL_BUFFER )
+    ਜੇ( k == OPENGL_ਬਫਰ )
     {
-#ifdef HAVE_OPENGL
-        ((ogl::Buffer*)obj)->release();
-        return;
-#else
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ HAVE_OPENGL
+        ((ogl::ਬਫਰ_2*)obj)->release();
+        ਵਾਪਸ;
+#ਨਹੀਂਤਾਂ
         CV_Error(Error::StsNotImplemented, "OpenGL support is not enabled in this OpenCV build (missing HAVE_OPENGL)");
-#endif
+#ਜੇ_ਅੰਤ
     }
 
-    if( k == NONE )
-        return;
+    ਜੇ( k == NONE )
+        ਵਾਪਸ;
 
-    if( k == STD_VECTOR || k == STD_VECTOR_VECTOR )
+    ਜੇ( k == STD_ਸਦਿਸ਼ || k == STD_ਸਦਿਸ਼_ਸਦਿਸ਼ )
     {
-    #undef CLEAR_VEC
-    #define CLEAR_VEC(T) \
-        if (k == STD_VECTOR_VECTOR) { \
+    #ਪਰਿਭਾਸ਼ਾ_ਰੱਦ CLEAR_VEC
+    #ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ CLEAR_VEC(T) \
+        ਜੇ (k == STD_ਸਦਿਸ਼_ਸਦਿਸ਼) { \
             std::vector<std::vector<T> >* vv = \
                 reinterpret_cast<std::vector<std::vector<T> >*>(obj); \
             vv->clear(); \
-        } else { \
+        } ਨਹੀਂਤਾਂ { \
             std::vector<T>* v = reinterpret_cast<std::vector<T>*>(obj); \
             v->clear(); \
         } \
-        break
+        ਰੋਕੋ
 
-        int esz = CV_ELEM_SIZE(flags);
-        STD_VECTOR_SWITCH(esz, CLEAR_VEC);
-        return;
+        ਪੂਰਨ esz = CV_ELEM_ਮਾਪ(flags);
+        STD_ਸਦਿਸ਼_SWITCH(esz, CLEAR_VEC);
+        ਵਾਪਸ;
     }
 
-    if( k == STD_VECTOR_MAT )
+    ਜੇ( k == STD_ਸਦਿਸ਼_MAT )
     {
         ((std::vector<Mat>*)obj)->clear();
-        return;
+        ਵਾਪਸ;
     }
 
-    if( k == STD_ARRAY_MAT )
+    ਜੇ( k == STD_ARRAY_MAT )
     {
         Mat* v = (Mat*)obj;
-        for( int i = 0; i < sz.height; i++ )
+        ਲਈ( ਪੂਰਨ i = 0; i < sz.ਉਚਾਈ; i++ )
             v[i].release();
-        return;
+        ਵਾਪਸ;
     }
 
-    if( k == STD_BOOL_VECTOR )
+    ਜੇ( k == STD_BOOL_ਸਦਿਸ਼ )
     {
-        ((std::vector<bool>*)obj)->clear();
-        return;
+        ((std::vector<ਤਾਰਕਿਕ>*)obj)->clear();
+        ਵਾਪਸ;
     }
 
-    if( k == STD_VECTOR_UMAT )
+    ਜੇ( k == STD_ਸਦਿਸ਼_UMAT )
     {
         ((std::vector<UMat>*)obj)->clear();
-        return;
+        ਵਾਪਸ;
     }
-    if (k == STD_VECTOR_CUDA_GPU_MAT)
+    ਜੇ (k == STD_ਸਦਿਸ਼_CUDA_GPU_MAT)
     {
-#ifdef HAVE_CUDA
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ HAVE_CUDA
         ((std::vector<cuda::GpuMat>*)obj)->clear();
-        return;
-#else
+        ਵਾਪਸ;
+#ਨਹੀਂਤਾਂ
         CV_Error(Error::StsNotImplemented, "CUDA support is not enabled in this OpenCV build (missing HAVE_CUDA)");
-#endif
+#ਜੇ_ਅੰਤ
     }
     CV_Error(Error::StsNotImplemented, "Unknown/unsupported array type");
 }
 
-void _OutputArray::clear() const
+ਖਾਲੀ _OutputArray::clear() ਅਚਲ
 {
-    _InputArray::KindFlag k = kind();
+    ਨਿਵੇਸ਼_Array_2::ਕਿਸਮ_Flag k = ਕਿਸਮ();
 
-    if( k == MAT )
+    ਜੇ( k == MAT )
     {
-        CV_Assert(!fixedSize());
+        CV_Assert(!fixed_ਮਾਪ());
         ((Mat*)obj)->resize(0);
-        return;
+        ਵਾਪਸ;
     }
 
     release();
 }
 
-bool _OutputArray::needed() const
+ਤਾਰਕਿਕ _OutputArray::needed() ਅਚਲ
 {
-    return kind() != NONE;
+    ਵਾਪਸ ਕਿਸਮ() != NONE;
 }
 
-Mat& _OutputArray::getMatRef(int i) const
+Mat& _OutputArray::getMatRef(ਪੂਰਨ i) ਅਚਲ
 {
-    _InputArray::KindFlag k = kind();
-    if( i < 0 )
+    ਨਿਵੇਸ਼_Array_2::ਕਿਸਮ_Flag k = ਕਿਸਮ();
+    ਜੇ( i < 0 )
     {
         CV_Assert( k == MAT );
-        return *(Mat*)obj;
+        ਵਾਪਸ *(Mat*)obj;
     }
 
-    CV_Assert( k == STD_VECTOR_MAT || k == STD_ARRAY_MAT );
+    CV_Assert( k == STD_ਸਦਿਸ਼_MAT || k == STD_ARRAY_MAT );
 
-    if( k == STD_VECTOR_MAT )
+    ਜੇ( k == STD_ਸਦਿਸ਼_MAT )
     {
         std::vector<Mat>& v = *(std::vector<Mat>*)obj;
-        CV_Assert( i < (int)v.size() );
-        return v[i];
+        CV_Assert( i < (ਪੂਰਨ)v.size() );
+        ਵਾਪਸ v[i];
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
         Mat* v = (Mat*)obj;
-        CV_Assert( 0 <= i && i < sz.height );
-        return v[i];
+        CV_Assert( 0 <= i && i < sz.ਉਚਾਈ );
+        ਵਾਪਸ v[i];
     }
 }
 
-UMat& _OutputArray::getUMatRef(int i) const
+UMat& _OutputArray::getUMatRef(ਪੂਰਨ i) ਅਚਲ
 {
-    _InputArray::KindFlag k = kind();
-    if( i < 0 )
+    ਨਿਵੇਸ਼_Array_2::ਕਿਸਮ_Flag k = ਕਿਸਮ();
+    ਜੇ( i < 0 )
     {
         CV_Assert( k == UMAT );
-        return *(UMat*)obj;
+        ਵਾਪਸ *(UMat*)obj;
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
-        CV_Assert( k == STD_VECTOR_UMAT );
+        CV_Assert( k == STD_ਸਦਿਸ਼_UMAT );
         std::vector<UMat>& v = *(std::vector<UMat>*)obj;
-        CV_Assert( i < (int)v.size() );
-        return v[i];
+        CV_Assert( i < (ਪੂਰਨ)v.size() );
+        ਵਾਪਸ v[i];
     }
 }
 
-cuda::GpuMat& _OutputArray::getGpuMatRef() const
+cuda::GpuMat& _OutputArray::getGpuMatRef() ਅਚਲ
 {
-    _InputArray::KindFlag k = kind();
+    ਨਿਵੇਸ਼_Array_2::ਕਿਸਮ_Flag k = ਕਿਸਮ();
     CV_Assert( k == CUDA_GPU_MAT );
-    return *(cuda::GpuMat*)obj;
+    ਵਾਪਸ *(cuda::GpuMat*)obj;
 }
-std::vector<cuda::GpuMat>& _OutputArray::getGpuMatVecRef() const
+std::vector<cuda::GpuMat>& _OutputArray::getGpuMatVecRef() ਅਚਲ
 {
-    _InputArray::KindFlag k = kind();
-    CV_Assert(k == STD_VECTOR_CUDA_GPU_MAT);
-    return *(std::vector<cuda::GpuMat>*)obj;
+    ਨਿਵੇਸ਼_Array_2::ਕਿਸਮ_Flag k = ਕਿਸਮ();
+    CV_Assert(k == STD_ਸਦਿਸ਼_CUDA_GPU_MAT);
+    ਵਾਪਸ *(std::vector<cuda::GpuMat>*)obj;
 }
-cuda::GpuMatND& _OutputArray::getGpuMatNDRef() const
+cuda::GpuMatND& _OutputArray::getGpuMatNDRef() ਅਚਲ
 {
-    _InputArray::KindFlag k = kind();
+    ਨਿਵੇਸ਼_Array_2::ਕਿਸਮ_Flag k = ਕਿਸਮ();
     CV_Assert( k == CUDA_GPU_MATND );
-    return *(cuda::GpuMatND*)obj;
+    ਵਾਪਸ *(cuda::GpuMatND*)obj;
 }
 
-std::vector<cuda::GpuMatND>& _OutputArray::getGpuMatNDVecRef() const
+std::vector<cuda::GpuMatND>& _OutputArray::getGpuMatNDVecRef() ਅਚਲ
 {
-    _InputArray::KindFlag k = kind();
-    CV_Assert(k == STD_VECTOR_CUDA_GPU_MAT_ND);
-    return *(std::vector<cuda::GpuMatND>*)obj;
+    ਨਿਵੇਸ਼_Array_2::ਕਿਸਮ_Flag k = ਕਿਸਮ();
+    CV_Assert(k == STD_ਸਦਿਸ਼_CUDA_GPU_MAT_ND);
+    ਵਾਪਸ *(std::vector<cuda::GpuMatND>*)obj;
 }
 
-ogl::Buffer& _OutputArray::getOGlBufferRef() const
+ogl::ਬਫਰ_2& _OutputArray::get_OGl_ਬਫਰ_Ref() ਅਚਲ
 {
-    _InputArray::KindFlag k = kind();
-    CV_Assert( k == OPENGL_BUFFER );
-    return *(ogl::Buffer*)obj;
+    ਨਿਵੇਸ਼_Array_2::ਕਿਸਮ_Flag k = ਕਿਸਮ();
+    CV_Assert( k == OPENGL_ਬਫਰ );
+    ਵਾਪਸ *(ogl::ਬਫਰ_2*)obj;
 }
 
-cuda::HostMem& _OutputArray::getHostMemRef() const
+cuda::HostMem& _OutputArray::getHostMemRef() ਅਚਲ
 {
-    _InputArray::KindFlag k = kind();
+    ਨਿਵੇਸ਼_Array_2::ਕਿਸਮ_Flag k = ਕਿਸਮ();
     CV_Assert( k == CUDA_HOST_MEM );
-    return *(cuda::HostMem*)obj;
+    ਵਾਪਸ *(cuda::HostMem*)obj;
 }
 
-void _OutputArray::setTo(const _InputArray& arr, const _InputArray & mask) const
+ਖਾਲੀ _OutputArray::ਸੈੱਟ_ਮੰਜ਼ਿਲ(ਅਚਲ ਨਿਵੇਸ਼_Array_2& arr, ਅਚਲ ਨਿਵੇਸ਼_Array_2 & ਨਕਾਬ) ਅਚਲ
 {
-    _InputArray::KindFlag k = kind();
+    ਨਿਵੇਸ਼_Array_2::ਕਿਸਮ_Flag k = ਕਿਸਮ();
 
-    if( k == NONE )
+    ਜੇ( k == NONE )
         ;
-    else if (k == MAT || k == MATX || k == STD_VECTOR)
+    ਨਹੀਂਤਾਂ ਜੇ (k == MAT || k == MATX || k == STD_ਸਦਿਸ਼)
     {
         Mat m = getMat();
-        m.setTo(arr, mask);
+        m.ਸੈੱਟ_ਮੰਜ਼ਿਲ(arr, ਨਕਾਬ);
     }
-    else if( k == UMAT )
-        ((UMat*)obj)->setTo(arr, mask);
-    else if( k == CUDA_GPU_MAT )
+    ਨਹੀਂਤਾਂ ਜੇ( k == UMAT )
+        ((UMat*)obj)->ਸੈੱਟ_ਮੰਜ਼ਿਲ(arr, ਨਕਾਬ);
+    ਨਹੀਂਤਾਂ ਜੇ( k == CUDA_GPU_MAT )
     {
-#ifdef HAVE_CUDA
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ HAVE_CUDA
         Mat value = arr.getMat();
-        CV_Assert( checkScalar(value, type(), arr.kind(), _InputArray::CUDA_GPU_MAT) );
-        ((cuda::GpuMat*)obj)->setTo(Scalar(Vec<double, 4>(value.ptr<double>())), mask);
-#else
+        CV_Assert( checkScalar(value, type(), arr.ਕਿਸਮ(), ਨਿਵੇਸ਼_Array_2::CUDA_GPU_MAT) );
+        ((cuda::GpuMat*)obj)->ਸੈੱਟ_ਮੰਜ਼ਿਲ(Scalar(Vec<ਦੁੱਗਣਾ, 4>(value.ptr<ਦੁੱਗਣਾ>())), ਨਕਾਬ);
+#ਨਹੀਂਤਾਂ
         CV_Error(Error::StsNotImplemented, "CUDA support is not enabled in this OpenCV build (missing HAVE_CUDA)");
-#endif
+#ਜੇ_ਅੰਤ
     }
-    else
+    ਨਹੀਂਤਾਂ
         CV_Error(Error::StsNotImplemented, "");
 }
 
-void _OutputArray::setZero() const
+ਖਾਲੀ _OutputArray::ਸੈੱਟ_Zero() ਅਚਲ
 {
-    _InputArray::KindFlag k = kind();
+    ਨਿਵੇਸ਼_Array_2::ਕਿਸਮ_Flag k = ਕਿਸਮ();
 
-    if( k == NONE )
+    ਜੇ( k == NONE )
         ;
-    else if (k == MAT || k == MATX || k == STD_VECTOR)
+    ਨਹੀਂਤਾਂ ਜੇ (k == MAT || k == MATX || k == STD_ਸਦਿਸ਼)
     {
         Mat m = getMat();
-        m.setZero();
+        m.ਸੈੱਟ_Zero();
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
-        setTo(Scalar::all(0), noArray());
+        ਸੈੱਟ_ਮੰਜ਼ਿਲ(Scalar::all(0), noArray());
     }
 }
 
-void _OutputArray::assign(const UMat& u) const
+ਖਾਲੀ _OutputArray::assign(ਅਚਲ UMat& u) ਅਚਲ
 {
-    _InputArray::KindFlag k = kind();
-    if (k == UMAT)
+    ਨਿਵੇਸ਼_Array_2::ਕਿਸਮ_Flag k = ਕਿਸਮ();
+    ਜੇ (k == UMAT)
     {
         *(UMat*)obj = u;
     }
-    else if (k == MAT)
+    ਨਹੀਂਤਾਂ ਜੇ (k == MAT)
     {
-        u.copyTo(*(Mat*)obj); // TODO check u.getMat()
+        u.copy_ਮੰਜ਼ਿਲ(*(Mat*)obj); // TODO check u.getMat()
     }
-    else if (k == MATX)
+    ਨਹੀਂਤਾਂ ਜੇ (k == MATX)
     {
-        u.copyTo(getMat()); // TODO check u.getMat()
+        u.copy_ਮੰਜ਼ਿਲ(getMat()); // TODO check u.getMat()
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
         CV_Error(Error::StsNotImplemented, "");
     }
 }
 
 
-void _OutputArray::assign(const Mat& m) const
+ਖਾਲੀ _OutputArray::assign(ਅਚਲ Mat& m) ਅਚਲ
 {
-    _InputArray::KindFlag k = kind();
-    if (k == UMAT)
+    ਨਿਵੇਸ਼_Array_2::ਕਿਸਮ_Flag k = ਕਿਸਮ();
+    ਜੇ (k == UMAT)
     {
-        m.copyTo(*(UMat*)obj); // TODO check m.getUMat()
+        m.copy_ਮੰਜ਼ਿਲ(*(UMat*)obj); // TODO check m.getUMat()
     }
-    else if (k == MAT)
+    ਨਹੀਂਤਾਂ ਜੇ (k == MAT)
     {
         *(Mat*)obj = m;
     }
-    else if (k == MATX)
+    ਨਹੀਂਤਾਂ ਜੇ (k == MATX)
     {
-        m.copyTo(getMat());
+        m.copy_ਮੰਜ਼ਿਲ(getMat());
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
         CV_Error(Error::StsNotImplemented, "");
     }
 }
 
 
-void _OutputArray::move(UMat& u) const
+ਖਾਲੀ _OutputArray::move(UMat& u) ਅਚਲ
 {
-    if (fixedSize())
+    ਜੇ (fixed_ਮਾਪ())
     {
         // TODO Performance warning
         assign(u);
-        return;
+        ਵਾਪਸ;
     }
-    int k = kind();
-    if (k == UMAT)
+    ਪੂਰਨ k = ਕਿਸਮ();
+    ਜੇ (k == UMAT)
     {
         *(UMat*)obj = std::move(u);
     }
-    else if (k == MAT)
+    ਨਹੀਂਤਾਂ ਜੇ (k == MAT)
     {
-        u.copyTo(*(Mat*)obj); // TODO check u.getMat()
+        u.copy_ਮੰਜ਼ਿਲ(*(Mat*)obj); // TODO check u.getMat()
         u.release();
     }
-    else if (k == MATX)
+    ਨਹੀਂਤਾਂ ਜੇ (k == MATX)
     {
-        u.copyTo(getMat()); // TODO check u.getMat()
+        u.copy_ਮੰਜ਼ਿਲ(getMat()); // TODO check u.getMat()
         u.release();
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
         CV_Error(Error::StsNotImplemented, "");
     }
 }
 
 
-void _OutputArray::move(Mat& m) const
+ਖਾਲੀ _OutputArray::move(Mat& m) ਅਚਲ
 {
-    if (fixedSize())
+    ਜੇ (fixed_ਮਾਪ())
     {
         // TODO Performance warning
         assign(m);
-        return;
+        ਵਾਪਸ;
     }
-    int k = kind();
-    if (k == UMAT)
+    ਪੂਰਨ k = ਕਿਸਮ();
+    ਜੇ (k == UMAT)
     {
-        m.copyTo(*(UMat*)obj); // TODO check m.getUMat()
+        m.copy_ਮੰਜ਼ਿਲ(*(UMat*)obj); // TODO check m.getUMat()
         m.release();
     }
-    else if (k == MAT)
+    ਨਹੀਂਤਾਂ ਜੇ (k == MAT)
     {
         *(Mat*)obj = std::move(m);
     }
-    else if (k == MATX)
+    ਨਹੀਂਤਾਂ ਜੇ (k == MATX)
     {
-        m.copyTo(getMat());
+        m.copy_ਮੰਜ਼ਿਲ(getMat());
         m.release();
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
         CV_Error(Error::StsNotImplemented, "");
     }
 }
 
 
-void _OutputArray::assign(const std::vector<UMat>& v) const
+ਖਾਲੀ _OutputArray::assign(ਅਚਲ std::vector<UMat>& v) ਅਚਲ
 {
-    _InputArray::KindFlag k = kind();
-    if (k == STD_VECTOR_UMAT)
+    ਨਿਵੇਸ਼_Array_2::ਕਿਸਮ_Flag k = ਕਿਸਮ();
+    ਜੇ (k == STD_ਸਦਿਸ਼_UMAT)
     {
         std::vector<UMat>& this_v = *(std::vector<UMat>*)obj;
         CV_Assert(this_v.size() == v.size());
 
-        for (size_t i = 0; i < v.size(); i++)
+        ਲਈ (size_t i = 0; i < v.size(); i++)
         {
-            const UMat& m = v[i];
+            ਅਚਲ UMat& m = v[i];
             UMat& this_m = this_v[i];
-            if (this_m.u != NULL && this_m.u == m.u)
-                continue; // same object (see dnn::Layer::forward_fallback)
-            m.copyTo(this_m);
+            ਜੇ (this_m.u != ਨਿਰਾ && this_m.u == m.u)
+                ਜਾਰੀ; // same object (see dnn::Layer::forward_fallback)
+            m.copy_ਮੰਜ਼ਿਲ(this_m);
         }
     }
-    else if (k == STD_VECTOR_MAT)
+    ਨਹੀਂਤਾਂ ਜੇ (k == STD_ਸਦਿਸ਼_MAT)
     {
         std::vector<Mat>& this_v = *(std::vector<Mat>*)obj;
         CV_Assert(this_v.size() == v.size());
 
-        for (size_t i = 0; i < v.size(); i++)
+        ਲਈ (size_t i = 0; i < v.size(); i++)
         {
-            const UMat& m = v[i];
+            ਅਚਲ UMat& m = v[i];
             Mat& this_m = this_v[i];
-            if (this_m.u != NULL && this_m.u == m.u)
-                continue; // same object (see dnn::Layer::forward_fallback)
-            m.copyTo(this_m);
+            ਜੇ (this_m.u != ਨਿਰਾ && this_m.u == m.u)
+                ਜਾਰੀ; // same object (see dnn::Layer::forward_fallback)
+            m.copy_ਮੰਜ਼ਿਲ(this_m);
         }
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
         CV_Error(Error::StsNotImplemented, "");
     }
 }
 
 
-void _OutputArray::assign(const std::vector<Mat>& v) const
+ਖਾਲੀ _OutputArray::assign(ਅਚਲ std::vector<Mat>& v) ਅਚਲ
 {
-    _InputArray::KindFlag k = kind();
-    if (k == STD_VECTOR_UMAT)
+    ਨਿਵੇਸ਼_Array_2::ਕਿਸਮ_Flag k = ਕਿਸਮ();
+    ਜੇ (k == STD_ਸਦਿਸ਼_UMAT)
     {
         std::vector<UMat>& this_v = *(std::vector<UMat>*)obj;
         CV_Assert(this_v.size() == v.size());
 
-        for (size_t i = 0; i < v.size(); i++)
+        ਲਈ (size_t i = 0; i < v.size(); i++)
         {
-            const Mat& m = v[i];
+            ਅਚਲ Mat& m = v[i];
             UMat& this_m = this_v[i];
-            if (this_m.u != NULL && this_m.u == m.u)
-                continue; // same object (see dnn::Layer::forward_fallback)
-            m.copyTo(this_m);
+            ਜੇ (this_m.u != ਨਿਰਾ && this_m.u == m.u)
+                ਜਾਰੀ; // same object (see dnn::Layer::forward_fallback)
+            m.copy_ਮੰਜ਼ਿਲ(this_m);
         }
     }
-    else if (k == STD_VECTOR_MAT)
+    ਨਹੀਂਤਾਂ ਜੇ (k == STD_ਸਦਿਸ਼_MAT)
     {
         std::vector<Mat>& this_v = *(std::vector<Mat>*)obj;
         CV_Assert(this_v.size() == v.size());
 
-        for (size_t i = 0; i < v.size(); i++)
+        ਲਈ (size_t i = 0; i < v.size(); i++)
         {
-            const Mat& m = v[i];
+            ਅਚਲ Mat& m = v[i];
             Mat& this_m = this_v[i];
-            if (this_m.u != NULL && this_m.u == m.u)
-                continue; // same object (see dnn::Layer::forward_fallback)
-            m.copyTo(this_m);
+            ਜੇ (this_m.u != ਨਿਰਾ && this_m.u == m.u)
+                ਜਾਰੀ; // same object (see dnn::Layer::forward_fallback)
+            m.copy_ਮੰਜ਼ਿਲ(this_m);
         }
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
         CV_Error(Error::StsNotImplemented, "");
     }
 }
 
 
-static _InputOutputArray _none;
-InputOutputArray noArray() { return _none; }
+ਸਥਿਰ ਨਿਵੇਸ਼_Output_Array_2 _none;
+ਨਿਵੇਸ਼_Output_Array noArray() { ਵਾਪਸ _none; }
 
 } // cv::

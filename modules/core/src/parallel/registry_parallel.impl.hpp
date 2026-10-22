@@ -6,168 +6,168 @@
 // Not a standalone header, part of parallel.cpp
 //
 
-#include "opencv2/core/utils/filesystem.private.hpp"  // OPENCV_HAVE_FILESYSTEM_SUPPORT
+#ਅਨ੍ਤਰ੍ਭਾਵ "opencv2/core/utils/filesystem.private.hpp"  // OPENCV_HAVE_FILESYSTEM_SUPPORT
 
-namespace cv { namespace parallel {
+ਨਾਮਾਕਾਸ਼ cv { ਨਾਮਾਕਾਸ਼ parallel {
 
-#if OPENCV_HAVE_FILESYSTEM_SUPPORT && defined(PARALLEL_ENABLE_PLUGINS)
-#define DECLARE_DYNAMIC_BACKEND(name) \
+#ਜੇ OPENCV_HAVE_FILESYSTEM_SUPPORT && defined(PARALLEL_ENABLE_PLUGINS)
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ DECLARE_DYNAMIC_BACKEND(name) \
 ParallelBackendInfo { \
     1000, name, createPluginParallelBackendFactory(name) \
 },
-#else
-#define DECLARE_DYNAMIC_BACKEND(name) /* nothing */
-#endif
+#ਨਹੀਂਤਾਂ
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ DECLARE_DYNAMIC_BACKEND(name) /* nothing */
+#ਜੇ_ਅੰਤ
 
-#define DECLARE_STATIC_BACKEND(name, createBackendAPI) \
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ DECLARE_STATIC_BACKEND(name, createBackendAPI) \
 ParallelBackendInfo { \
-    1000, name, std::make_shared<cv::parallel::StaticBackendFactory>([=] () -> std::shared_ptr<cv::parallel::ParallelForAPI> { return createBackendAPI(); }) \
+    1000, name, std::make_shared<cv::parallel::StaticBackendFactory>([=] () -> std::shared_ptr<cv::parallel::ParallelForAPI> { ਵਾਪਸ createBackendAPI(); }) \
 },
 
-static
+ਸਥਿਰ
 std::vector<ParallelBackendInfo>& getBuiltinParallelBackendsInfo()
 {
-    static std::vector<ParallelBackendInfo> g_backends
+    ਸਥਿਰ std::vector<ParallelBackendInfo> g_backends
     {
-#ifdef HAVE_TBB
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ HAVE_TBB
         DECLARE_STATIC_BACKEND("TBB", createParallelBackendTBB)
-#elif defined(PARALLEL_ENABLE_PLUGINS)
+#ਜਾਂਜੇ defined(PARALLEL_ENABLE_PLUGINS)
         DECLARE_DYNAMIC_BACKEND("ONETBB")   // dedicated oneTBB plugin (interface >= 12000, binary incompatibe with TBB 2017-2020)
         DECLARE_DYNAMIC_BACKEND("TBB")      // generic TBB plugins
-#endif
+#ਜੇ_ਅੰਤ
 
-#ifdef HAVE_OPENMP
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ HAVE_OPENMP
         DECLARE_STATIC_BACKEND("OPENMP", createParallelBackendOpenMP)
-#elif defined(PARALLEL_ENABLE_PLUGINS)
+#ਜਾਂਜੇ defined(PARALLEL_ENABLE_PLUGINS)
         DECLARE_DYNAMIC_BACKEND("OPENMP")  // TODO Intel OpenMP?
-#endif
+#ਜੇ_ਅੰਤ
     };
-    return g_backends;
+    ਵਾਪਸ g_backends;
 }
 
-static
-bool sortByPriority(const ParallelBackendInfo &lhs, const ParallelBackendInfo &rhs)
+ਸਥਿਰ
+ਤਾਰਕਿਕ ਛਾਂਟੋ_By_ਤਰਜੀਹ(ਅਚਲ ParallelBackendInfo &lhs, ਅਚਲ ParallelBackendInfo &rhs)
 {
-    return lhs.priority > rhs.priority;
+    ਵਾਪਸ lhs.ਤਰਜੀਹ > rhs.ਤਰਜੀਹ;
 }
 
 /** @brief Manages list of enabled backends
  */
-class ParallelBackendRegistry
+ਵਰਗ ParallelBackendRegistry
 {
-protected:
+ਸੁਰੱਖਿਅਤ:
     std::vector<ParallelBackendInfo> enabledBackends;
     ParallelBackendRegistry()
     {
         enabledBackends = getBuiltinParallelBackendsInfo();
-        int N = (int)enabledBackends.size();
-        for (int i = 0; i < N; i++)
+        ਪੂਰਨ N = (ਪੂਰਨ)enabledBackends.size();
+        ਲਈ (ਪੂਰਨ i = 0; i < N; i++)
         {
             ParallelBackendInfo& info = enabledBackends[i];
-            info.priority = 1000 - i * 10;
+            info.ਤਰਜੀਹ = 1000 - i * 10;
         }
-        CV_LOG_DEBUG(NULL, "core(parallel): Builtin backends(" << N << "): " << dumpBackends());
-        if (readPrioritySettings())
+        CV_LOG_DEBUG(ਨਿਰਾ, "core(parallel): Builtin backends(" << N << "): " << dumpBackends());
+        ਜੇ (read_ਤਰਜੀਹ_Settings())
         {
-            CV_LOG_INFO(NULL, "core(parallel): Updated backends priorities: " << dumpBackends());
-            N = (int)enabledBackends.size();
+            CV_LOG_INFO(ਨਿਰਾ, "core(parallel): Updated backends priorities: " << dumpBackends());
+            N = (ਪੂਰਨ)enabledBackends.size();
         }
-        int enabled = 0;
-        for (int i = 0; i < N; i++)
+        ਪੂਰਨ enabled = 0;
+        ਲਈ (ਪੂਰਨ i = 0; i < N; i++)
         {
             ParallelBackendInfo& info = enabledBackends[enabled];
-            if (enabled != i)
+            ਜੇ (enabled != i)
                 info = enabledBackends[i];
-            size_t param_priority = utils::getConfigurationParameterSizeT(cv::format("OPENCV_PARALLEL_PRIORITY_%s", info.name.c_str()).c_str(), (size_t)info.priority);
-            CV_Assert(param_priority == (size_t)(int)param_priority); // overflow check
-            if (param_priority > 0)
+            size_t param_ਤਰਜੀਹ = utils::get_Configuration_Parameter_ਮਾਪ_T(cv::format("OPENCV_PARALLEL_PRIORITY_%s", info.name.c_str()).c_str(), (size_t)info.ਤਰਜੀਹ);
+            CV_Assert(param_ਤਰਜੀਹ == (size_t)(ਪੂਰਨ)param_ਤਰਜੀਹ); // overflow check
+            ਜੇ (param_ਤਰਜੀਹ > 0)
             {
-                info.priority = (int)param_priority;
+                info.ਤਰਜੀਹ = (ਪੂਰਨ)param_ਤਰਜੀਹ;
                 enabled++;
             }
-            else
+            ਨਹੀਂਤਾਂ
             {
-                CV_LOG_INFO(NULL, "core(parallel): Disable backend: " << info.name);
+                CV_LOG_INFO(ਨਿਰਾ, "core(parallel): Disable backend: " << info.name);
             }
         }
         enabledBackends.resize(enabled);
-        CV_LOG_DEBUG(NULL, "core(parallel): Available backends(" << enabled << "): " << dumpBackends());
-        std::sort(enabledBackends.begin(), enabledBackends.end(), sortByPriority);
-        CV_LOG_INFO(NULL, "core(parallel): Enabled backends(" << enabled << ", sorted by priority): " << (enabledBackends.empty() ? std::string("N/A") : dumpBackends()));
+        CV_LOG_DEBUG(ਨਿਰਾ, "core(parallel): Available backends(" << enabled << "): " << dumpBackends());
+        std::sort(enabledBackends.begin(), enabledBackends.end(), ਛਾਂਟੋ_By_ਤਰਜੀਹ);
+        CV_LOG_INFO(ਨਿਰਾ, "core(parallel): Enabled backends(" << enabled << ", sorted by priority): " << (enabledBackends.empty() ? std::string("N/A") : dumpBackends()));
     }
 
-    static std::vector<std::string> tokenize_string(const std::string& input, char token)
+    ਸਥਿਰ std::vector<std::string> tokenize_string(ਅਚਲ std::string& ਨਿਵੇਸ਼_2, ਅੱਖਰ token)
     {
-        std::vector<std::string> result;
+        std::vector<std::string> ਨਤੀਜਾ;
         std::string::size_type prev_pos = 0, pos = 0;
-        while((pos = input.find(token, pos)) != std::string::npos)
+        ਜਦੋਂ((pos = ਨਿਵੇਸ਼_2.find(token, pos)) != std::string::npos)
         {
-            result.push_back(input.substr(prev_pos, pos-prev_pos));
+            ਨਤੀਜਾ.push_back(ਨਿਵੇਸ਼_2.substr(prev_pos, pos-prev_pos));
             prev_pos = ++pos;
         }
-        result.push_back(input.substr(prev_pos));
-        return result;
+        ਨਤੀਜਾ.push_back(ਨਿਵੇਸ਼_2.substr(prev_pos));
+        ਵਾਪਸ ਨਤੀਜਾ;
     }
-    bool readPrioritySettings()
+    ਤਾਰਕਿਕ read_ਤਰਜੀਹ_Settings()
     {
-        bool hasChanges = false;
+        ਤਾਰਕਿਕ hasChanges = ਝੂਠ;
         cv::String prioritized_backends = utils::getConfigurationParameterString("OPENCV_PARALLEL_PRIORITY_LIST");
-        if (prioritized_backends.empty())
-            return hasChanges;
-        CV_LOG_INFO(NULL, "core(parallel): Configured priority list (OPENCV_PARALLEL_PRIORITY_LIST): " << prioritized_backends);
-        const std::vector<std::string> names = tokenize_string(prioritized_backends, ',');
-        for (size_t i = 0; i < names.size(); i++)
+        ਜੇ (prioritized_backends.empty())
+            ਵਾਪਸ hasChanges;
+        CV_LOG_INFO(ਨਿਰਾ, "core(parallel): Configured priority list (OPENCV_PARALLEL_PRIORITY_LIST): " << prioritized_backends);
+        ਅਚਲ std::vector<std::string> ਨਾਂ_2 = tokenize_string(prioritized_backends, ',');
+        ਲਈ (size_t i = 0; i < ਨਾਂ_2.size(); i++)
         {
-            const std::string& name = names[i];
-            int priority = (int)(100000 + (names.size() - i) * 1000);
-            bool found = false;
-            for (size_t k = 0; k < enabledBackends.size(); k++)
+            ਅਚਲ std::string& name = ਨਾਂ_2[i];
+            ਪੂਰਨ ਤਰਜੀਹ = (ਪੂਰਨ)(100000 + (ਨਾਂ_2.size() - i) * 1000);
+            ਤਾਰਕਿਕ ਮਿਲਿਆ = ਝੂਠ;
+            ਲਈ (size_t k = 0; k < enabledBackends.size(); k++)
             {
                 ParallelBackendInfo& info = enabledBackends[k];
-                if (name == info.name)
+                ਜੇ (name == info.name)
                 {
-                    info.priority = priority;
-                    CV_LOG_DEBUG(NULL, "core(parallel): New backend priority: '" << name << "' => " << info.priority);
-                    found = true;
-                    hasChanges = true;
-                    break;
+                    info.ਤਰਜੀਹ = ਤਰਜੀਹ;
+                    CV_LOG_DEBUG(ਨਿਰਾ, "core(parallel): New backend priority: '" << name << "' => " << info.ਤਰਜੀਹ);
+                    ਮਿਲਿਆ = ਸੱਚ;
+                    hasChanges = ਸੱਚ;
+                    ਰੋਕੋ;
                 }
             }
-            if (!found)
+            ਜੇ (!ਮਿਲਿਆ)
             {
-                CV_LOG_INFO(NULL, "core(parallel): Adding parallel backend (plugin): '" << name << "'");
-                enabledBackends.push_back(ParallelBackendInfo{priority, name, createPluginParallelBackendFactory(name)});
-                hasChanges = true;
+                CV_LOG_INFO(ਨਿਰਾ, "core(parallel): Adding parallel backend (plugin): '" << name << "'");
+                enabledBackends.push_back(ParallelBackendInfo{ਤਰਜੀਹ, name, createPluginParallelBackendFactory(name)});
+                hasChanges = ਸੱਚ;
             }
         }
-        return hasChanges;
+        ਵਾਪਸ hasChanges;
     }
-public:
-    std::string dumpBackends() const
+ਜਨਤਕ:
+    std::string dumpBackends() ਅਚਲ
     {
         std::ostringstream os;
-        for (size_t i = 0; i < enabledBackends.size(); i++)
+        ਲਈ (size_t i = 0; i < enabledBackends.size(); i++)
         {
-            if (i > 0) os << "; ";
-            const ParallelBackendInfo& info = enabledBackends[i];
-            os << info.name << '(' << info.priority << ')';
+            ਜੇ (i > 0) os << "; ";
+            ਅਚਲ ParallelBackendInfo& info = enabledBackends[i];
+            os << info.name << '(' << info.ਤਰਜੀਹ << ')';
         }
-        return os.str();
+        ਵਾਪਸ os.str();
     }
 
-    static ParallelBackendRegistry& getInstance()
+    ਸਥਿਰ ParallelBackendRegistry& getInstance()
     {
-        static ParallelBackendRegistry g_instance;
-        return g_instance;
+        ਸਥਿਰ ParallelBackendRegistry g_instance;
+        ਵਾਪਸ g_instance;
     }
 
-    inline const std::vector<ParallelBackendInfo>& getEnabledBackends() const { return enabledBackends; }
+    ਸਤਰਅੰਦਰ ਅਚਲ std::vector<ParallelBackendInfo>& getEnabledBackends() ਅਚਲ { ਵਾਪਸ enabledBackends; }
 };
 
 
-const std::vector<ParallelBackendInfo>& getParallelBackendsInfo()
+ਅਚਲ std::vector<ParallelBackendInfo>& getParallelBackendsInfo()
 {
-    return cv::parallel::ParallelBackendRegistry::getInstance().getEnabledBackends();
+    ਵਾਪਸ cv::parallel::ParallelBackendRegistry::getInstance().getEnabledBackends();
 }
 
 }} // namespace

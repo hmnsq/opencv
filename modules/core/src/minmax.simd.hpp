@@ -2,88 +2,88 @@
 // It is subject to the license terms in the LICENSE file found in the top-level directory
 // of this distribution and at http://opencv.org/license.html
 
-#include "precomp.hpp"
+#ਅਨ੍ਤਰ੍ਭਾਵ "precomp.hpp"
 
-namespace cv {
+ਨਾਮਾਕਾਸ਼ cv {
 
-typedef void (*MinMaxIdxFunc)(const uchar* data, const uchar* mask,
-                              void* minval, void* maxval,
+ਕਿਸਮਪਰਿਭਾਸ਼ਾ ਖਾਲੀ (*MinMaxIdxFunc)(ਅਚਲ uchar* ਅੰਕੜੇ, ਅਚਲ uchar* ਨਕਾਬ,
+                              ਖਾਲੀ* minval, ਖਾਲੀ* maxval,
                               size_t* minidx, size_t* maxidx,
-                              int len, size_t startidx);
+                              ਪੂਰਨ len, size_t startidx);
 
 CV_CPU_OPTIMIZATION_NAMESPACE_BEGIN
 
-template<typename T, typename WT, void (*fn)(const T*, const uchar*, WT*, WT*, size_t*, size_t*, int, size_t)>
-static void minMaxIdxWrap(const uchar* data, const uchar* mask,
-                          void* minval, void* maxval,
+ਸਾਂਚਾ<ਕਿਸਮ_ਨਾਂ T, ਕਿਸਮ_ਨਾਂ WT, ਖਾਲੀ (*fn)(ਅਚਲ T*, ਅਚਲ uchar*, WT*, WT*, size_t*, size_t*, ਪੂਰਨ, size_t)>
+ਸਥਿਰ ਖਾਲੀ minMaxIdxWrap(ਅਚਲ uchar* ਅੰਕੜੇ, ਅਚਲ uchar* ਨਕਾਬ,
+                          ਖਾਲੀ* minval, ਖਾਲੀ* maxval,
                           size_t* minidx, size_t* maxidx,
-                          int len, size_t startidx)
+                          ਪੂਰਨ len, size_t startidx)
 {
-    fn((const T*)data, mask, (WT*)minval, (WT*)maxval, minidx, maxidx, len, startidx);
+    fn((ਅਚਲ T*)ਅੰਕੜੇ, ਨਕਾਬ, (WT*)minval, (WT*)maxval, minidx, maxidx, len, startidx);
 }
 
-MinMaxIdxFunc getMinMaxIdxFunc(int depth);
+MinMaxIdxFunc getMinMaxIdxFunc(ਪੂਰਨ ਡੂੰਘਾਈ);
 
-#ifndef CV_CPU_OPTIMIZATION_DECLARATIONS_ONLY
+#ਜੇ_ਅਪਰਿਭਾਸ਼ਿਤ CV_CPU_OPTIMIZATION_DECLARATIONS_ONLY
 
-template<typename T, typename WT> static void
-minMaxIdx_( const T* src, const uchar* mask, WT* _minVal, WT* _maxVal,
-            size_t* _minIdx, size_t* _maxIdx, int len, size_t startIdx )
+ਸਾਂਚਾ<ਕਿਸਮ_ਨਾਂ T, ਕਿਸਮ_ਨਾਂ WT> ਸਥਿਰ ਖਾਲੀ
+minMaxIdx_( ਅਚਲ T* src, ਅਚਲ uchar* ਨਕਾਬ, WT* _minVal, WT* _maxVal,
+            size_t* _minIdx, size_t* _maxIdx, ਪੂਰਨ len, size_t ਸ਼ੁਰੂ_Idx )
 {
     WT minVal = *_minVal, maxVal = *_maxVal;
     size_t minIdx = *_minIdx, maxIdx = *_maxIdx;
-    int i = 0;
+    ਪੂਰਨ i = 0;
 
-    if (minIdx == 0 || maxIdx == 0) {
-        if (mask) {
-            for (; i < len; i++) {
-                if (mask[i]) {
+    ਜੇ (minIdx == 0 || maxIdx == 0) {
+        ਜੇ (ਨਕਾਬ) {
+            ਲਈ (; i < len; i++) {
+                ਜੇ (ਨਕਾਬ[i]) {
                     minVal = maxVal = (WT)src[i];
-                    minIdx = maxIdx = startIdx + i;
+                    minIdx = maxIdx = ਸ਼ੁਰੂ_Idx + i;
                     i++;
-                    break;
+                    ਰੋਕੋ;
                 }
             }
         }
-        else if (len > 0) {
+        ਨਹੀਂਤਾਂ ਜੇ (len > 0) {
             minVal = maxVal = (WT)src[0];
-            minIdx = maxIdx = startIdx;
+            minIdx = maxIdx = ਸ਼ੁਰੂ_Idx;
             i++;
         }
     }
 
-    if( !mask )
+    ਜੇ( !ਨਕਾਬ )
     {
-        for( ; i < len; i++ )
+        ਲਈ( ; i < len; i++ )
         {
             WT val = (WT)src[i];
-            if( val < minVal )
+            ਜੇ( val < minVal )
             {
                 minVal = val;
-                minIdx = startIdx + i;
+                minIdx = ਸ਼ੁਰੂ_Idx + i;
             }
-            if( val > maxVal )
+            ਜੇ( val > maxVal )
             {
                 maxVal = val;
-                maxIdx = startIdx + i;
+                maxIdx = ਸ਼ੁਰੂ_Idx + i;
             }
         }
     }
-    else
+    ਨਹੀਂਤਾਂ
     {
-        for( ; i < len; i++ )
+        ਲਈ( ; i < len; i++ )
         {
             WT val = (WT)src[i];
-            uchar m = mask[i];
-            if( m && val < minVal )
+            uchar m = ਨਕਾਬ[i];
+            ਜੇ( m && val < minVal )
             {
                 minVal = val;
-                minIdx = startIdx + i;
+                minIdx = ਸ਼ੁਰੂ_Idx + i;
             }
-            if( m && val > maxVal )
+            ਜੇ( m && val > maxVal )
             {
                 maxVal = val;
-                maxIdx = startIdx + i;
+                maxIdx = ਸ਼ੁਰੂ_Idx + i;
             }
         }
     }
@@ -94,70 +94,70 @@ minMaxIdx_( const T* src, const uchar* mask, WT* _minVal, WT* _maxVal,
     *_maxVal = maxVal;
 }
 
-#undef SIMD_ONLY
-#if (CV_SIMD || CV_SIMD_SCALABLE)
-#define SIMD_ONLY(expr) expr
-#else
-#define SIMD_ONLY(expr)
-#endif
+#ਪਰਿਭਾਸ਼ਾ_ਰੱਦ SIMD_ONLY
+#ਜੇ (CV_SIMD || CV_SIMD_SCALABLE)
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ SIMD_ONLY(ਵਿਅੰਜਕ) ਵਿਅੰਜਕ
+#ਨਹੀਂਤਾਂ
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ SIMD_ONLY(ਵਿਅੰਜਕ)
+#ਜੇ_ਅੰਤ
 
-static int minMaxInit(const uchar* mask, int len)
+ਸਥਿਰ ਪੂਰਨ minMaxInit(ਅਚਲ uchar* ਨਕਾਬ, ਪੂਰਨ len)
 {
-    int i = 0;
+    ਪੂਰਨ i = 0;
     SIMD_ONLY(
-    int vlanes = VTraits<v_uint8>::vlanes();
+    ਪੂਰਨ vlanes = VTraits<v_uint8>::vlanes();
     v_uint8 v_zero = vx_setzero_u8();
-    for (; i < len; i += vlanes) {
-        if (i + vlanes > len) {
-            if (i == 0)
-                break;
+    ਲਈ (; i < len; i += vlanes) {
+        ਜੇ (i + vlanes > len) {
+            ਜੇ (i == 0)
+                ਰੋਕੋ;
             i = len - vlanes;
         }
-        v_uint8 mask_i = v_ne(vx_load(mask + i), v_zero);
-        if (v_check_any(mask_i))
-            return i + v_scan_forward(mask_i);
+        v_uint8 ਨਕਾਬ_i = v_ne(vx_ਲੱਦੋ(ਨਕਾਬ + i), v_zero);
+        ਜੇ (v_check_any(ਨਕਾਬ_i))
+            ਵਾਪਸ i + v_ਜਾਂਚ_forward(ਨਕਾਬ_i);
     })
-    for (; i < len; i++) {
-        if (mask[i] != 0)
-            return i;
+    ਲਈ (; i < len; i++) {
+        ਜੇ (ਨਕਾਬ[i] != 0)
+            ਵਾਪਸ i;
     }
-    return -1;
+    ਵਾਪਸ -1;
 }
 
 // vectorized implementation for u8, s8, u16 and s16
 // uses blocks to decrease the lane size necessary to store indices
-#undef DEFINE_MINMAXIDX_SMALLINT_FUNC
-#define DEFINE_MINMAXIDX_SMALLINT_FUNC(funcname, suffix, usuffix, T, UT, VT, UVT, WT, BLOCK_SIZE, load_mask) \
-static void funcname(const T* src, const uchar* mask, WT* _minVal, WT* _maxVal, \
-                     size_t* _minIdx, size_t* _maxIdx, int len, size_t startIdx) \
+#ਪਰਿਭਾਸ਼ਾ_ਰੱਦ DEFINE_MINMAXIDX_SMALLINT_FUNC
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ DEFINE_MINMAXIDX_SMALLINT_FUNC(funcname, suffix, usuffix, T, UT, VT, UVT, WT, ਖੰਡ_ਮਾਪ, ਲੱਦੋ_ਨਕਾਬ) \
+ਸਥਿਰ ਖਾਲੀ funcname(ਅਚਲ T* src, ਅਚਲ uchar* ਨਕਾਬ, WT* _minVal, WT* _maxVal, \
+                     size_t* _minIdx, size_t* _maxIdx, ਪੂਰਨ len, size_t ਸ਼ੁਰੂ_Idx) \
 { \
     T minVal = T(*_minVal), maxVal = T(*_maxVal); \
     size_t minIdx = *_minIdx, maxIdx = *_maxIdx; \
-    int i = 0; \
+    ਪੂਰਨ i = 0; \
     /* initialize minVal/maxVal/minIdx/maxIdx to the proper values in the beginning */ \
-    if (minIdx == 0) { \
-        if (mask) { \
-            i = minMaxInit(mask, len); \
-            if (i < 0) \
-                return; \
+    ਜੇ (minIdx == 0) { \
+        ਜੇ (ਨਕਾਬ) { \
+            i = minMaxInit(ਨਕਾਬ, len); \
+            ਜੇ (i < 0) \
+                ਵਾਪਸ; \
         } \
         minVal = maxVal = src[i]; \
-        minIdx = maxIdx = startIdx + i; \
+        minIdx = maxIdx = ਸ਼ੁਰੂ_Idx + i; \
         i++; \
     } \
     SIMD_ONLY( \
-    const int vlanes = VTraits<VT>::vlanes(); \
-    const int block_size0 = BLOCK_SIZE - vlanes; \
-    if (len-i >= vlanes && block_size0 > 0 && block_size0 % vlanes == 0) { \
+    ਅਚਲ ਪੂਰਨ vlanes = VTraits<VT>::vlanes(); \
+    ਅਚਲ ਪੂਰਨ ਖੰਡ_size0 = ਖੰਡ_ਮਾਪ - vlanes; \
+    ਜੇ (len-i >= vlanes && ਖੰਡ_size0 > 0 && ਖੰਡ_size0 % vlanes == 0) { \
         UT idxbuf[VTraits<UVT>::max_nlanes]; \
-        for (int j = 0; j < vlanes; j++) \
+        ਲਈ (ਪੂਰਨ j = 0; j < vlanes; j++) \
             idxbuf[j] = (UT)j; \
-        UVT v_idx0 = vx_load(idxbuf); \
+        UVT v_idx0 = vx_ਲੱਦੋ(idxbuf); \
         UVT v_idx_delta = vx_setall_##usuffix((UT)vlanes); \
         UVT v_invalid_idx = vx_setall_##usuffix((UT)-1); \
         VT v_minval = vx_setall_##suffix(minVal); \
         VT v_maxval = vx_setall_##suffix(maxVal); \
-        int block_size = block_size0; \
+        ਪੂਰਨ ਖੰਡ_ਮਾਪ_3 = ਖੰਡ_size0; \
         /* process data by blocks: */ \
         /* - for u8/s8 data each block contains up to 256-vlanes elements */ \
         /* - for u16/s16 data each block contains up to 65536-vlanes elements */ \
@@ -167,38 +167,38 @@ static void funcname(const T* src, const uchar* mask, WT* _minVal, WT* _maxVal, 
         /* 0b111...111 is "invalid index", meaning that this */ \
         /* particular lane has not been updated. */ \
         /* after each block we update minVal, maxVal, minIdx and maxIdx */ \
-        for (; i <= len - vlanes; i += block_size) { \
-            block_size = std::min(block_size, (len - i) & -vlanes); \
+        ਲਈ (; i <= len - vlanes; i += ਖੰਡ_ਮਾਪ_3) { \
+            ਖੰਡ_ਮਾਪ_3 = std::min(ਖੰਡ_ਮਾਪ_3, (len - i) & -vlanes); \
             UVT v_locidx = v_idx0; \
             UVT v_minidx = v_invalid_idx; \
             UVT v_maxidx = v_invalid_idx; \
-            if (!mask) { \
-                for (int j = 0; j < block_size; j += vlanes) { \
-                    VT data = vx_load(src + i + j); \
-                    UVT lt_min = v_reinterpret_as_##usuffix(v_lt(data, v_minval)); \
-                    UVT gt_max = v_reinterpret_as_##usuffix(v_gt(data, v_maxval)); \
+            ਜੇ (!ਨਕਾਬ) { \
+                ਲਈ (ਪੂਰਨ j = 0; j < ਖੰਡ_ਮਾਪ_3; j += vlanes) { \
+                    VT ਅੰਕੜੇ = vx_ਲੱਦੋ(src + i + j); \
+                    UVT lt_min = v_reinterpret_as_##usuffix(v_lt(ਅੰਕੜੇ, v_minval)); \
+                    UVT gt_max = v_reinterpret_as_##usuffix(v_gt(ਅੰਕੜੇ, v_maxval)); \
                     v_minidx = v_select(lt_min, v_locidx, v_minidx); \
                     v_maxidx = v_select(gt_max, v_locidx, v_maxidx); \
-                    v_minval = v_min(v_minval, data); \
-                    v_maxval = v_max(v_maxval, data); \
-                    v_locidx = v_add(v_locidx, v_idx_delta); \
+                    v_minval = v_min(v_minval, ਅੰਕੜੇ); \
+                    v_maxval = v_max(v_maxval, ਅੰਕੜੇ); \
+                    v_locidx = v_ਜੋੜੋ(v_locidx, v_idx_delta); \
                 } \
-            } else { \
+            } ਨਹੀਂਤਾਂ { \
                 UVT v_zero = vx_setzero_##usuffix(); \
-                for (int j = 0; j < block_size; j += vlanes) { \
-                    VT data = vx_load(src + i + j); \
-                    UVT msk = v_ne(load_mask(mask + i + j), v_zero); \
-                    UVT lt_min = v_reinterpret_as_##usuffix(v_lt(data, v_minval)); \
-                    UVT gt_max = v_reinterpret_as_##usuffix(v_gt(data, v_maxval)); \
+                ਲਈ (ਪੂਰਨ j = 0; j < ਖੰਡ_ਮਾਪ_3; j += vlanes) { \
+                    VT ਅੰਕੜੇ = vx_ਲੱਦੋ(src + i + j); \
+                    UVT msk = v_ne(ਲੱਦੋ_ਨਕਾਬ(ਨਕਾਬ + i + j), v_zero); \
+                    UVT lt_min = v_reinterpret_as_##usuffix(v_lt(ਅੰਕੜੇ, v_minval)); \
+                    UVT gt_max = v_reinterpret_as_##usuffix(v_gt(ਅੰਕੜੇ, v_maxval)); \
                     lt_min = v_and(lt_min, msk); \
                     gt_max = v_and(gt_max, msk); \
                     v_minidx = v_select(lt_min, v_locidx, v_minidx); \
                     v_maxidx = v_select(gt_max, v_locidx, v_maxidx); \
-                    VT lt_min_data = v_reinterpret_as_##suffix(lt_min); \
-                    VT gt_max_data = v_reinterpret_as_##suffix(gt_max); \
-                    v_minval = v_select(lt_min_data, data, v_minval); \
-                    v_maxval = v_select(gt_max_data, data, v_maxval); \
-                    v_locidx = v_add(v_locidx, v_idx_delta); \
+                    VT lt_min_ਅੰਕੜੇ = v_reinterpret_as_##suffix(lt_min); \
+                    VT gt_max_ਅੰਕੜੇ = v_reinterpret_as_##suffix(gt_max); \
+                    v_minval = v_select(lt_min_ਅੰਕੜੇ, ਅੰਕੜੇ, v_minval); \
+                    v_maxval = v_select(gt_max_ਅੰਕੜੇ, ਅੰਕੜੇ, v_maxval); \
+                    v_locidx = v_ਜੋੜੋ(v_locidx, v_idx_delta); \
                 } \
             } \
             /* for both minimum and maximum we check whether global extremum */ \
@@ -206,19 +206,19 @@ static void funcname(const T* src, const uchar* mask, WT* _minVal, WT* _maxVal, 
             /* the smallest index within the block where the new global */ \
             /* extremum value occurs */ \
             UVT idxmask = v_ne(v_minidx, v_invalid_idx); \
-            if (v_check_any(idxmask)) { \
+            ਜੇ (v_check_any(idxmask)) { \
                 minVal = (T)v_reduce_min(v_minval); \
                 VT invmask = v_ne(v_minval, vx_setall_##suffix(minVal)); \
                 v_minidx = v_or(v_minidx, v_reinterpret_as_##usuffix(invmask)); \
-                minIdx = startIdx + i + v_reduce_min(v_minidx); \
+                minIdx = ਸ਼ੁਰੂ_Idx + i + v_reduce_min(v_minidx); \
                 v_minval = vx_setall_##suffix(minVal); \
             } \
             idxmask = v_ne(v_maxidx, v_invalid_idx); \
-            if (v_check_any(idxmask)) { \
+            ਜੇ (v_check_any(idxmask)) { \
                 maxVal = (T)v_reduce_max(v_maxval); \
                 VT invmask = v_ne(v_maxval, vx_setall_##suffix(maxVal)); \
                 v_maxidx = v_or(v_maxidx, v_reinterpret_as_##usuffix(invmask)); \
-                maxIdx = startIdx + i + v_reduce_min(v_maxidx); \
+                maxIdx = ਸ਼ੁਰੂ_Idx + i + v_reduce_min(v_maxidx); \
                 v_maxval = vx_setall_##suffix(maxVal); \
             } \
         } \
@@ -230,43 +230,43 @@ static void funcname(const T* src, const uchar* mask, WT* _minVal, WT* _maxVal, 
     /* [TODO]: unlike sum, countNonZero and other reduce operations, */ \
     /* in the case of minMaxIdx we can process the tail using */ \
     /* vector overlapping technique (as in arithmetic operations) */ \
-    if (i < len) { \
+    ਜੇ (i < len) { \
         src += i; \
-        if (mask) mask += i; \
-        startIdx += i; \
+        ਜੇ (ਨਕਾਬ) ਨਕਾਬ += i; \
+        ਸ਼ੁਰੂ_Idx += i; \
         len -= i; \
-        minMaxIdx_(src, mask, _minVal, _maxVal, _minIdx, _maxIdx, len, startIdx); \
+        minMaxIdx_(src, ਨਕਾਬ, _minVal, _maxVal, _minIdx, _maxIdx, len, ਸ਼ੁਰੂ_Idx); \
     } \
 }
 
 // vectorized implementation for s32, f32, f16 and bf16
 // (potentially can be extended for u32)
 // no need to use blocks here
-#undef DEFINE_MINMAXIDX_FUNC
-#define DEFINE_MINMAXIDX_FUNC(funcname, suffix, usuffix, T, UT, VT, UVT, WT, load_op) \
-static void funcname(const T* src, const uchar* mask, WT* _minVal, WT* _maxVal, \
-                     size_t* _minIdx, size_t* _maxIdx, int len, size_t startIdx) \
+#ਪਰਿਭਾਸ਼ਾ_ਰੱਦ DEFINE_MINMAXIDX_FUNC
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ DEFINE_MINMAXIDX_FUNC(funcname, suffix, usuffix, T, UT, VT, UVT, WT, ਲੱਦੋ_op) \
+ਸਥਿਰ ਖਾਲੀ funcname(ਅਚਲ T* src, ਅਚਲ uchar* ਨਕਾਬ, WT* _minVal, WT* _maxVal, \
+                     size_t* _minIdx, size_t* _maxIdx, ਪੂਰਨ len, size_t ਸ਼ੁਰੂ_Idx) \
 { \
     WT minVal = *_minVal, maxVal = *_maxVal; \
     size_t minIdx = *_minIdx, maxIdx = *_maxIdx; \
-    int i = 0; \
+    ਪੂਰਨ i = 0; \
     /* initialize minVal/maxVal/minIdx/maxIdx to the proper values in the beginning */ \
-    if (minIdx == 0) { \
-        if (mask) { \
-            i = minMaxInit(mask, len); \
-            if (i < 0) \
-                return; \
+    ਜੇ (minIdx == 0) { \
+        ਜੇ (ਨਕਾਬ) { \
+            i = minMaxInit(ਨਕਾਬ, len); \
+            ਜੇ (i < 0) \
+                ਵਾਪਸ; \
         } \
         minVal = maxVal = src[i]; \
-        minIdx = maxIdx = startIdx + i; \
+        minIdx = maxIdx = ਸ਼ੁਰੂ_Idx + i; \
         i++; \
     } \
     SIMD_ONLY( \
-    const int vlanes = VTraits<VT>::vlanes(); \
+    ਅਚਲ ਪੂਰਨ vlanes = VTraits<VT>::vlanes(); \
     UT idxbuf[VTraits<UVT>::max_nlanes]; \
-    for (int j = 0; j < vlanes; j++) \
+    ਲਈ (ਪੂਰਨ j = 0; j < vlanes; j++) \
         idxbuf[j] = (UT)(i+j); \
-    UVT v_locidx = vx_load(idxbuf); \
+    UVT v_locidx = vx_ਲੱਦੋ(idxbuf); \
     UVT v_idx_delta = vx_setall_##usuffix((UT)vlanes); \
     UVT v_invalid_idx = vx_setall_##usuffix((UT)-1); \
     VT v_minval = vx_setall_##suffix(minVal); \
@@ -282,33 +282,33 @@ static void funcname(const T* src, const uchar* mask, WT* _minVal, WT* _maxVal, 
     /* 0b111...111 is "invalid index", meaning that this */ \
     /* particular lane has not been updated. */ \
     /* after each block we update minVal, maxVal, minIdx and maxIdx */ \
-    if (!mask) { \
-        for (; i <= len - vlanes; i += vlanes) { \
-            VT data = load_op(src + i); \
-            UVT lt_min = v_reinterpret_as_##usuffix(v_lt(data, v_minval)); \
-            UVT gt_max = v_reinterpret_as_##usuffix(v_gt(data, v_maxval)); \
+    ਜੇ (!ਨਕਾਬ) { \
+        ਲਈ (; i <= len - vlanes; i += vlanes) { \
+            VT ਅੰਕੜੇ = ਲੱਦੋ_op(src + i); \
+            UVT lt_min = v_reinterpret_as_##usuffix(v_lt(ਅੰਕੜੇ, v_minval)); \
+            UVT gt_max = v_reinterpret_as_##usuffix(v_gt(ਅੰਕੜੇ, v_maxval)); \
             v_minidx = v_select(lt_min, v_locidx, v_minidx); \
             v_maxidx = v_select(gt_max, v_locidx, v_maxidx); \
-            v_minval = v_min(v_minval, data); \
-            v_maxval = v_max(v_maxval, data); \
-            v_locidx = v_add(v_locidx, v_idx_delta); \
+            v_minval = v_min(v_minval, ਅੰਕੜੇ); \
+            v_maxval = v_max(v_maxval, ਅੰਕੜੇ); \
+            v_locidx = v_ਜੋੜੋ(v_locidx, v_idx_delta); \
         } \
-    } else { \
+    } ਨਹੀਂਤਾਂ { \
         UVT v_zero = vx_setzero_##usuffix(); \
-        for (; i <= len - vlanes; i += vlanes) { \
-            VT data = load_op(src + i); \
-            UVT msk = v_ne(vx_load_expand_q(mask + i), v_zero); \
-            UVT lt_min = v_reinterpret_as_##usuffix(v_lt(data, v_minval)); \
-            UVT gt_max = v_reinterpret_as_##usuffix(v_gt(data, v_maxval)); \
+        ਲਈ (; i <= len - vlanes; i += vlanes) { \
+            VT ਅੰਕੜੇ = ਲੱਦੋ_op(src + i); \
+            UVT msk = v_ne(vx_ਲੱਦੋ_expand_q(ਨਕਾਬ + i), v_zero); \
+            UVT lt_min = v_reinterpret_as_##usuffix(v_lt(ਅੰਕੜੇ, v_minval)); \
+            UVT gt_max = v_reinterpret_as_##usuffix(v_gt(ਅੰਕੜੇ, v_maxval)); \
             lt_min = v_and(lt_min, msk); \
             gt_max = v_and(gt_max, msk); \
             v_minidx = v_select(lt_min, v_locidx, v_minidx); \
             v_maxidx = v_select(gt_max, v_locidx, v_maxidx); \
-            VT lt_min_data = v_reinterpret_as_##suffix(lt_min); \
-            VT gt_max_data = v_reinterpret_as_##suffix(gt_max); \
-            v_minval = v_select(lt_min_data, data, v_minval); \
-            v_maxval = v_select(gt_max_data, data, v_maxval); \
-            v_locidx = v_add(v_locidx, v_idx_delta); \
+            VT lt_min_ਅੰਕੜੇ = v_reinterpret_as_##suffix(lt_min); \
+            VT gt_max_ਅੰਕੜੇ = v_reinterpret_as_##suffix(gt_max); \
+            v_minval = v_select(lt_min_ਅੰਕੜੇ, ਅੰਕੜੇ, v_minval); \
+            v_maxval = v_select(gt_max_ਅੰਕੜੇ, ਅੰਕੜੇ, v_maxval); \
+            v_locidx = v_ਜੋੜੋ(v_locidx, v_idx_delta); \
         } \
     } \
     /* for both minimum and maximum we check whether global extremum */ \
@@ -316,19 +316,19 @@ static void funcname(const T* src, const uchar* mask, WT* _minVal, WT* _maxVal, 
     /* the smallest index within the block where the new global */ \
     /* extremum value occurs */ \
     UVT idxmask = v_ne(v_minidx, v_invalid_idx); \
-    if (v_check_any(idxmask)) { \
+    ਜੇ (v_check_any(idxmask)) { \
         minVal = v_reduce_min(v_minval); \
         VT invmask = v_ne(v_minval, vx_setall_##suffix(minVal)); \
         v_minidx = v_or(v_minidx, v_reinterpret_as_##usuffix(invmask)); \
-        minIdx = startIdx + v_reduce_min(v_minidx); \
+        minIdx = ਸ਼ੁਰੂ_Idx + v_reduce_min(v_minidx); \
         v_minval = vx_setall_##suffix(minVal); \
     } \
     idxmask = v_ne(v_maxidx, v_invalid_idx); \
-    if (v_check_any(idxmask)) { \
+    ਜੇ (v_check_any(idxmask)) { \
         maxVal = v_reduce_max(v_maxval); \
         VT invmask = v_ne(v_maxval, vx_setall_##suffix(maxVal)); \
         v_maxidx = v_or(v_maxidx, v_reinterpret_as_##usuffix(invmask)); \
-        maxIdx = startIdx + v_reduce_min(v_maxidx); \
+        maxIdx = ਸ਼ੁਰੂ_Idx + v_reduce_min(v_maxidx); \
         v_maxval = vx_setall_##suffix(maxVal); \
     }) \
     *_minVal = minVal; \
@@ -338,66 +338,66 @@ static void funcname(const T* src, const uchar* mask, WT* _minVal, WT* _maxVal, 
     /* [TODO]: unlike sum, countNonZero and other reduce operations, */ \
     /* in the case of minMaxIdx we can process the tail using */ \
     /* vector overlapping technique (as in arithmetic operations) */ \
-    if (i < len) { \
+    ਜੇ (i < len) { \
         src += i; \
-        if (mask) mask += i; \
-        startIdx += i; \
+        ਜੇ (ਨਕਾਬ) ਨਕਾਬ += i; \
+        ਸ਼ੁਰੂ_Idx += i; \
         len -= i; \
-        minMaxIdx_(src, mask, _minVal, _maxVal, _minIdx, _maxIdx, len, startIdx); \
+        minMaxIdx_(src, ਨਕਾਬ, _minVal, _maxVal, _minIdx, _maxIdx, len, ਸ਼ੁਰੂ_Idx); \
     } \
 }
 
-#undef DEFINE_MINMAXIDX_FUNC_NOSIMD
-#define DEFINE_MINMAXIDX_FUNC_NOSIMD(funcname, T, WT) \
-static void funcname(const T* src, const uchar* mask, WT* _minVal, WT* _maxVal, \
-                     size_t* _minIdx, size_t* _maxIdx, int len, size_t startIdx) \
+#ਪਰਿਭਾਸ਼ਾ_ਰੱਦ DEFINE_MINMAXIDX_FUNC_NOSIMD
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ DEFINE_MINMAXIDX_FUNC_NOSIMD(funcname, T, WT) \
+ਸਥਿਰ ਖਾਲੀ funcname(ਅਚਲ T* src, ਅਚਲ uchar* ਨਕਾਬ, WT* _minVal, WT* _maxVal, \
+                     size_t* _minIdx, size_t* _maxIdx, ਪੂਰਨ len, size_t ਸ਼ੁਰੂ_Idx) \
 { \
-    minMaxIdx_(src, mask, _minVal, _maxVal, _minIdx, _maxIdx, len, startIdx); \
+    minMaxIdx_(src, ਨਕਾਬ, _minVal, _maxVal, _minIdx, _maxIdx, len, ਸ਼ੁਰੂ_Idx); \
 }
 
-DEFINE_MINMAXIDX_SMALLINT_FUNC(minMaxIdx8u, u8, u8, uchar, uchar, v_uint8, v_uint8, int, 256, vx_load)
-DEFINE_MINMAXIDX_SMALLINT_FUNC(minMaxIdx8s, s8, u8, schar, uchar, v_int8, v_uint8, int, 256, vx_load)
-DEFINE_MINMAXIDX_SMALLINT_FUNC(minMaxIdx16u, u16, u16, ushort, ushort, v_uint16, v_uint16, int, 65536, vx_load_expand)
-DEFINE_MINMAXIDX_SMALLINT_FUNC(minMaxIdx16s, s16, u16, short, ushort, v_int16, v_uint16, int, 65536, vx_load_expand)
+DEFINE_MINMAXIDX_SMALLINT_FUNC(minMaxIdx8u, u8, u8, uchar, uchar, v_uint8, v_uint8, ਪੂਰਨ, 256, vx_ਲੱਦੋ)
+DEFINE_MINMAXIDX_SMALLINT_FUNC(minMaxIdx8s, s8, u8, schar, uchar, v_int8, v_uint8, ਪੂਰਨ, 256, vx_ਲੱਦੋ)
+DEFINE_MINMAXIDX_SMALLINT_FUNC(minMaxIdx16u, u16, u16, ushort, ushort, v_uint16, v_uint16, ਪੂਰਨ, 65536, vx_ਲੱਦੋ_expand)
+DEFINE_MINMAXIDX_SMALLINT_FUNC(minMaxIdx16s, s16, u16, ਛੋਟਾ, ushort, v_int16, v_uint16, ਪੂਰਨ, 65536, vx_ਲੱਦੋ_expand)
 
-DEFINE_MINMAXIDX_FUNC(minMaxIdx32s, s32, u32, int, unsigned, v_int32, v_uint32, int, vx_load)
-DEFINE_MINMAXIDX_FUNC(minMaxIdx32f, f32, u32, float, unsigned, v_float32, v_uint32, float, vx_load)
-DEFINE_MINMAXIDX_FUNC(minMaxIdx16f, f32, u32, hfloat, unsigned, v_float32, v_uint32, float, vx_load_expand)
-DEFINE_MINMAXIDX_FUNC(minMaxIdx16bf, f32, u32, bfloat, unsigned, v_float32, v_uint32, float, vx_load_expand)
+DEFINE_MINMAXIDX_FUNC(minMaxIdx32s, s32, u32, ਪੂਰਨ, ਬਿਨਾਨਿਸ਼ਾਨੀ, v_int32, v_uint32, ਪੂਰਨ, vx_ਲੱਦੋ)
+DEFINE_MINMAXIDX_FUNC(minMaxIdx32f, f32, u32, ਦਸ਼ਮਲਵ, ਬਿਨਾਨਿਸ਼ਾਨੀ, v_float32, v_uint32, ਦਸ਼ਮਲਵ, vx_ਲੱਦੋ)
+DEFINE_MINMAXIDX_FUNC(minMaxIdx16f, f32, u32, hfloat, ਬਿਨਾਨਿਸ਼ਾਨੀ, v_float32, v_uint32, ਦਸ਼ਮਲਵ, vx_ਲੱਦੋ_expand)
+DEFINE_MINMAXIDX_FUNC(minMaxIdx16bf, f32, u32, bfloat, ਬਿਨਾਨਿਸ਼ਾਨੀ, v_float32, v_uint32, ਦਸ਼ਮਲਵ, vx_ਲੱਦੋ_expand)
 
 //DEFINE_MINMAXIDX_FUNC_NOSIMD(minMaxIdx32s, int, int)
 //DEFINE_MINMAXIDX_FUNC_NOSIMD(minMaxIdx32f, float, float)
-DEFINE_MINMAXIDX_FUNC_NOSIMD(minMaxIdx64f, double, double)
+DEFINE_MINMAXIDX_FUNC_NOSIMD(minMaxIdx64f, ਦੁੱਗਣਾ, ਦੁੱਗਣਾ)
 //DEFINE_MINMAXIDX_FUNC_NOSIMD(minMaxIdx16f, hfloat, float)
 //DEFINE_MINMAXIDX_FUNC_NOSIMD(minMaxIdx16bf, bfloat, float)
 DEFINE_MINMAXIDX_FUNC_NOSIMD(minMaxIdx64u, uint64, uint64)
 DEFINE_MINMAXIDX_FUNC_NOSIMD(minMaxIdx64s, int64, int64)
-DEFINE_MINMAXIDX_FUNC_NOSIMD(minMaxIdx32u, unsigned, int64)
+DEFINE_MINMAXIDX_FUNC_NOSIMD(minMaxIdx32u, ਬਿਨਾਨਿਸ਼ਾਨੀ, int64)
 
-MinMaxIdxFunc getMinMaxIdxFunc(int depth)
+MinMaxIdxFunc getMinMaxIdxFunc(ਪੂਰਨ ਡੂੰਘਾਈ)
 {
-    static MinMaxIdxFunc minMaxIdxTab[CV_DEPTH_MAX] =
+    ਸਥਿਰ MinMaxIdxFunc minMaxIdxTab[CV_ਡੂੰਘਾਈ_MAX] =
     {
-        minMaxIdxWrap<uchar, int, minMaxIdx8u>,
-        minMaxIdxWrap<schar, int, minMaxIdx8s>,
-        minMaxIdxWrap<ushort, int, minMaxIdx16u>,
-        minMaxIdxWrap<short, int, minMaxIdx16s>,
-        minMaxIdxWrap<int, int, minMaxIdx32s>,
-        minMaxIdxWrap<float, float, minMaxIdx32f>,
-        minMaxIdxWrap<double, double, minMaxIdx64f>,
-        minMaxIdxWrap<hfloat, float, minMaxIdx16f>,
-        minMaxIdxWrap<bfloat, float, minMaxIdx16bf>,
-        minMaxIdxWrap<uchar, int, minMaxIdx8u>,
+        minMaxIdxWrap<uchar, ਪੂਰਨ, minMaxIdx8u>,
+        minMaxIdxWrap<schar, ਪੂਰਨ, minMaxIdx8s>,
+        minMaxIdxWrap<ushort, ਪੂਰਨ, minMaxIdx16u>,
+        minMaxIdxWrap<ਛੋਟਾ, ਪੂਰਨ, minMaxIdx16s>,
+        minMaxIdxWrap<ਪੂਰਨ, ਪੂਰਨ, minMaxIdx32s>,
+        minMaxIdxWrap<ਦਸ਼ਮਲਵ, ਦਸ਼ਮਲਵ, minMaxIdx32f>,
+        minMaxIdxWrap<ਦੁੱਗਣਾ, ਦੁੱਗਣਾ, minMaxIdx64f>,
+        minMaxIdxWrap<hfloat, ਦਸ਼ਮਲਵ, minMaxIdx16f>,
+        minMaxIdxWrap<bfloat, ਦਸ਼ਮਲਵ, minMaxIdx16bf>,
+        minMaxIdxWrap<uchar, ਪੂਰਨ, minMaxIdx8u>,
         minMaxIdxWrap<uint64, uint64, minMaxIdx64u>,
         minMaxIdxWrap<int64, int64, minMaxIdx64s>,
-        minMaxIdxWrap<unsigned, int64, minMaxIdx32u>,
+        minMaxIdxWrap<ਬਿਨਾਨਿਸ਼ਾਨੀ, int64, minMaxIdx32u>,
         0
     };
 
-    return minMaxIdxTab[depth];
+    ਵਾਪਸ minMaxIdxTab[ਡੂੰਘਾਈ];
 }
 
-#endif
+#ਜੇ_ਅੰਤ
 
-CV_CPU_OPTIMIZATION_NAMESPACE_END
+CV_CPU_OPTIMIZATION_NAMESPACE_ਸਿਰਾ
 } // namespace

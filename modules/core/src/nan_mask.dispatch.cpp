@@ -2,151 +2,151 @@
 // It is subject to the license terms in the LICENSE file found in the top-level directory
 // of this distribution and at http://opencv.org/license.html.
 
-#include "precomp.hpp"
-#include "opencl_kernels_core.hpp"
+#ਅਨ੍ਤਰ੍ਭਾਵ "precomp.hpp"
+#ਅਨ੍ਤਰ੍ਭਾਵ "opencl_kernels_core.hpp"
 
-#include "nan_mask.simd.hpp"
-#include "nan_mask.simd_declarations.hpp" // defines CV_CPU_DISPATCH_MODES_ALL=AVX2,...,BASELINE based on CMakeLists.txt content
+#ਅਨ੍ਤਰ੍ਭਾਵ "nan_mask.simd.hpp"
+#ਅਨ੍ਤਰ੍ਭਾਵ "nan_mask.simd_declarations.hpp" // defines CV_CPU_DISPATCH_MODES_ALL=AVX2,...,BASELINE based on CMakeLists.txt content
 
-namespace cv {
+ਨਾਮਾਕਾਸ਼ cv {
 
-#ifdef HAVE_OPENCL
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ HAVE_OPENCL
 
-static bool ocl_patchNaNs( InputOutputArray _a, double value )
+ਸਥਿਰ ਤਾਰਕਿਕ ocl_patchNaNs( ਨਿਵੇਸ਼_Output_Array _a, ਦੁੱਗਣਾ value )
 {
-    int ftype = _a.depth();
+    ਪੂਰਨ ftype = _a.ਡੂੰਘਾਈ();
 
-    const ocl::Device d = ocl::Device::getDefault();
-    bool doubleSupport = d.doubleFPConfig() > 0;
-    if (!doubleSupport && ftype == CV_64F)
+    ਅਚਲ ocl::Device d = ocl::Device::getDefault();
+    ਤਾਰਕਿਕ doubleSupport = d.doubleFPConfig() > 0;
+    ਜੇ (!doubleSupport && ftype == CV_64F)
     {
-        return false;
+        ਵਾਪਸ ਝੂਠ;
     }
 
-    int rowsPerWI = ocl::Device::getDefault().isIntel() ? 4 : 1;
+    ਪੂਰਨ ਪੰਕਤੀਆਂ_ਪ੍ਰਤੀ_WI = ocl::Device::getDefault().isIntel() ? 4 : 1;
     ocl::Kernel k("KF", ocl::core::arithm_oclsrc,
                      format("-D UNARY_OP -D OP_PATCH_NANS -D dstT=%s -D DEPTH_dst=%d -D rowsPerWI=%d %s",
-                            ftype == CV_64F ? "double" : "float", ftype, rowsPerWI,
+                            ftype == CV_64F ? "double" : "float", ftype, ਪੰਕਤੀਆਂ_ਪ੍ਰਤੀ_WI,
                             doubleSupport ? "-D DOUBLE_SUPPORT" : ""));
-    if (k.empty())
-        return false;
+    ਜੇ (k.empty())
+        ਵਾਪਸ ਝੂਠ;
 
     UMat a = _a.getUMat();
-    int cn = a.channels();
+    ਪੂਰਨ cn = a.channels();
 
     // to pass float or double to args
-    if (ftype == CV_32F)
+    ਜੇ (ftype == CV_32F)
     {
-        k.args(ocl::KernelArg::ReadOnlyNoSize(a), ocl::KernelArg::WriteOnly(a, cn), (float)value);
+        k.ਦਲੀਲਾਂ(ocl::KernelArg::Read_Only_No_ਮਾਪ(a), ocl::KernelArg::WriteOnly(a, cn), (ਦਸ਼ਮਲਵ)value);
     }
-    else // CV_64F
+    ਨਹੀਂਤਾਂ // CV_64F
     {
-        k.args(ocl::KernelArg::ReadOnlyNoSize(a), ocl::KernelArg::WriteOnly(a, cn), value);
+        k.ਦਲੀਲਾਂ(ocl::KernelArg::Read_Only_No_ਮਾਪ(a), ocl::KernelArg::WriteOnly(a, cn), value);
     }
 
-    size_t globalsize[2] = { (size_t)a.cols * cn, ((size_t)a.rows + rowsPerWI - 1) / rowsPerWI };
-    return k.run(2, globalsize, NULL, false);
+    size_t globalsize[2] = { (size_t)a.ਖਾਨੇ_ਗਿਣਤੀ * cn, ((size_t)a.ਪੰਕਤੀਆਂ + ਪੰਕਤੀਆਂ_ਪ੍ਰਤੀ_WI - 1) / ਪੰਕਤੀਆਂ_ਪ੍ਰਤੀ_WI };
+    ਵਾਪਸ k.ਲੜੀਵਾਰ(2, globalsize, ਨਿਰਾ, ਝੂਠ);
 }
 
-#endif
+#ਜੇ_ਅੰਤ
 
-static PatchNanFunc getPatchNanFunc(bool isDouble)
+ਸਥਿਰ PatchNanFunc getPatchNanFunc(ਤਾਰਕਿਕ isDouble)
 {
     CV_INSTRUMENT_REGION();
     CV_CPU_DISPATCH(getPatchNanFunc, (isDouble), CV_CPU_DISPATCH_MODES_ALL);
 }
 
-void patchNaNs( InputOutputArray _a, double _val )
+ਖਾਲੀ patchNaNs( ਨਿਵੇਸ਼_Output_Array _a, ਦੁੱਗਣਾ _val )
 {
     CV_INSTRUMENT_REGION();
-    CV_Assert( _a.depth() == CV_32F || _a.depth() == CV_64F);
+    CV_Assert( _a.ਡੂੰਘਾਈ() == CV_32F || _a.ਡੂੰਘਾਈ() == CV_64F);
 
-    CV_OCL_RUN(_a.isUMat() && _a.dims() <= 2,
+    CV_OCL_ਲੜੀਵਾਰ(_a.isUMat() && _a.dims() <= 2,
                ocl_patchNaNs(_a, _val))
 
     Mat a = _a.getMat();
-    const Mat* arrays[] = {&a, 0};
+    ਅਚਲ Mat* arrays[] = {&a, 0};
     uchar* ptrs[1] = {};
     NAryMatIterator it(arrays, ptrs);
     size_t len = it.size*a.channels();
 
-    PatchNanFunc func = getPatchNanFunc(_a.depth() == CV_64F);
+    PatchNanFunc func = getPatchNanFunc(_a.ਡੂੰਘਾਈ() == CV_64F);
 
-    for (size_t i = 0; i < it.nplanes; i++, ++it)
+    ਲਈ (size_t i = 0; i < it.nplanes; i++, ++it)
     {
         func(ptrs[0], len, _val);
     }
 }
 
 
-#ifdef HAVE_OPENCL
+#ਜੇ_ਪਰਿਭਾਸ਼ਿਤ HAVE_OPENCL
 
-static bool ocl_finiteMask(const UMat img, UMat mask)
+ਸਥਿਰ ਤਾਰਕਿਕ ocl_finite_ਨਕਾਬ(ਅਚਲ UMat img, UMat ਨਕਾਬ)
 {
-    int channels = img.channels();
-    int depth = img.depth();
+    ਪੂਰਨ channels = img.channels();
+    ਪੂਰਨ ਡੂੰਘਾਈ = img.ਡੂੰਘਾਈ();
 
-    const ocl::Device d = ocl::Device::getDefault();
-    bool doubleSupport = d.doubleFPConfig() > 0;
-    if (!doubleSupport && depth == CV_64F)
+    ਅਚਲ ocl::Device d = ocl::Device::getDefault();
+    ਤਾਰਕਿਕ doubleSupport = d.doubleFPConfig() > 0;
+    ਜੇ (!doubleSupport && ਡੂੰਘਾਈ == CV_64F)
     {
-        return false;
+        ਵਾਪਸ ਝੂਠ;
     }
 
-    int rowsPerWI = ocl::Device::getDefault().isIntel() ? 4 : 1;
+    ਪੂਰਨ ਪੰਕਤੀਆਂ_ਪ੍ਰਤੀ_WI = ocl::Device::getDefault().isIntel() ? 4 : 1;
     ocl::Kernel k("finiteMask", ocl::core::finitemask_oclsrc,
                   format("-D srcT=%s -D cn=%d -D rowsPerWI=%d %s",
-                         depth == CV_32F ? "float" : "double", channels, rowsPerWI,
+                         ਡੂੰਘਾਈ == CV_32F ? "float" : "double", channels, ਪੰਕਤੀਆਂ_ਪ੍ਰਤੀ_WI,
                          doubleSupport ? "-D DOUBLE_SUPPORT" : ""));
-    if (k.empty())
-        return false;
+    ਜੇ (k.empty())
+        ਵਾਪਸ ਝੂਠ;
 
-    k.args(ocl::KernelArg::ReadOnlyNoSize(img), ocl::KernelArg::WriteOnly(mask));
+    k.ਦਲੀਲਾਂ(ocl::KernelArg::Read_Only_No_ਮਾਪ(img), ocl::KernelArg::WriteOnly(ਨਕਾਬ));
 
-    size_t globalsize[2] = { (size_t)img.cols, ((size_t)img.rows + rowsPerWI - 1) / rowsPerWI };
-    return k.run(2, globalsize, NULL, false);
+    size_t globalsize[2] = { (size_t)img.ਖਾਨੇ_ਗਿਣਤੀ, ((size_t)img.ਪੰਕਤੀਆਂ + ਪੰਕਤੀਆਂ_ਪ੍ਰਤੀ_WI - 1) / ਪੰਕਤੀਆਂ_ਪ੍ਰਤੀ_WI };
+    ਵਾਪਸ k.ਲੜੀਵਾਰ(2, globalsize, ਨਿਰਾ, ਝੂਠ);
 }
 
-#endif
+#ਜੇ_ਅੰਤ
 
-static FiniteMaskFunc getFiniteMaskFunc(bool isDouble, int cn)
+ਸਥਿਰ Finite_ਨਕਾਬ_Func get_Finite_ਨਕਾਬ_Func(ਤਾਰਕਿਕ isDouble, ਪੂਰਨ cn)
 {
     CV_INSTRUMENT_REGION();
-    CV_CPU_DISPATCH(getFiniteMaskFunc, (isDouble, cn), CV_CPU_DISPATCH_MODES_ALL);
+    CV_CPU_DISPATCH(get_Finite_ਨਕਾਬ_Func, (isDouble, cn), CV_CPU_DISPATCH_MODES_ALL);
 }
 
-void finiteMask(InputArray _src, OutputArray _mask)
+ਖਾਲੀ finite_ਨਕਾਬ(ਨਿਵੇਸ਼_Array _src, OutputArray ਨਕਾਬ_2)
 {
     CV_INSTRUMENT_REGION();
 
-    int channels = _src.channels();
-    int depth = _src.depth();
+    ਪੂਰਨ channels = _src.channels();
+    ਪੂਰਨ ਡੂੰਘਾਈ = _src.ਡੂੰਘਾਈ();
     CV_Assert( channels > 0 && channels <= 4);
-    CV_Assert( depth == CV_32F || depth == CV_64F );
-    std::vector<int> vsz(_src.dims());
-    _src.sizend(vsz.data());
-    _mask.create(_src.dims(), vsz.data(), CV_8UC1);
+    CV_Assert( ਡੂੰਘਾਈ == CV_32F || ਡੂੰਘਾਈ == CV_64F );
+    std::vector<ਪੂਰਨ> vsz(_src.dims());
+    _src.sizend(vsz.ਅੰਕੜੇ());
+    ਨਕਾਬ_2.create(_src.dims(), vsz.ਅੰਕੜੇ(), CV_8UC1);
 
-    CV_OCL_RUN(_src.isUMat() && _mask.isUMat() && _src.dims() <= 2,
-               ocl_finiteMask(_src.getUMat(), _mask.getUMat()));
+    CV_OCL_ਲੜੀਵਾਰ(_src.isUMat() && ਨਕਾਬ_2.isUMat() && _src.dims() <= 2,
+               ocl_finite_ਨਕਾਬ(_src.getUMat(), ਨਕਾਬ_2.getUMat()));
 
     Mat src = _src.getMat();
-    Mat mask = _mask.getMat();
+    Mat ਨਕਾਬ = ਨਕਾਬ_2.getMat();
 
-    const Mat *arrays[]={&src, &mask, 0};
+    ਅਚਲ Mat *arrays[]={&src, &ਨਕਾਬ, 0};
     Mat planes[2];
     NAryMatIterator it(arrays, planes);
-    size_t total = planes[0].total();
+    size_t ਕੁੱਲ = planes[0].ਕੁੱਲ();
     size_t i, nplanes = it.nplanes;
 
-    FiniteMaskFunc func = getFiniteMaskFunc((depth == CV_64F), channels);
+    Finite_ਨਕਾਬ_Func func = get_Finite_ਨਕਾਬ_Func((ਡੂੰਘਾਈ == CV_64F), channels);
 
-    for( i = 0; i < nplanes; i++, ++it )
+    ਲਈ( i = 0; i < nplanes; i++, ++it )
     {
-        const uchar* sptr = planes[0].ptr();
+        ਅਚਲ uchar* sptr = planes[0].ptr();
         uchar* dptr = planes[1].ptr();
 
-        func(sptr, dptr, total);
+        func(sptr, dptr, ਕੁੱਲ);
     }
 }
 } //namespace cv

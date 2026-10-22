@@ -6,100 +6,100 @@
 // Not a standalone header, part of va_intel.cpp
 //
 
-#include "opencv2/core/utils/plugin_loader.private.hpp"  // DynamicLib
-#include "opencv2/core/utils/configuration.private.hpp"
+#ਅਨ੍ਤਰ੍ਭਾਵ "opencv2/core/utils/plugin_loader.private.hpp"  // DynamicLib
+#ਅਨ੍ਤਰ੍ਭਾਵ "opencv2/core/utils/configuration.private.hpp"
 
-namespace cv { namespace detail {
+ਨਾਮਾਕਾਸ਼ cv { ਨਾਮਾਕਾਸ਼ detail {
 
-typedef VAStatus (*FN_vaDeriveImage)(VADisplay dpy, VASurfaceID surface, VAImage *image);
-typedef VAStatus (*FN_vaDestroyImage)(VADisplay dpy, VAImageID image);
-typedef VAStatus (*FN_vaMapBuffer)(VADisplay dpy, VABufferID buf_id, void **pbuf);
-typedef VAStatus (*FN_vaSyncSurface)(VADisplay dpy, VASurfaceID render_target);
-typedef VAStatus (*FN_vaUnmapBuffer)(VADisplay dpy, VABufferID buf_id);
-typedef int (*FN_vaMaxNumImageFormats)(VADisplay dpy);
-typedef VAStatus (*FN_vaQueryImageFormats)(VADisplay dpy, VAImageFormat *format_list, int *num_formats);
-typedef VAStatus (*FN_vaCreateImage)(VADisplay dpy, VAImageFormat *format, int width, int height, VAImage *image);
-typedef VAStatus (*FN_vaPutImage)(VADisplay dpy, VASurfaceID surface, VAImageID image, int src_x, int src_y, unsigned int src_width, unsigned int src_height, int dest_x, int dest_y, unsigned int dest_width, unsigned int dest_height);
-typedef VAStatus (*FN_vaGetImage)(VADisplay dpy, VASurfaceID surface, int x, int y, unsigned int width, unsigned int height, VAImageID image);
+ਕਿਸਮਪਰਿਭਾਸ਼ਾ VAStatus (*FN_vaDeriveImage)(VADisplay dpy, VASurfaceID surface, VAImage *image);
+ਕਿਸਮਪਰਿਭਾਸ਼ਾ VAStatus (*FN_vaDestroyImage)(VADisplay dpy, VAImageID image);
+ਕਿਸਮਪਰਿਭਾਸ਼ਾ VAStatus (*FN_va_Map_ਬਫਰ)(VADisplay dpy, VABufferID buf_id, ਖਾਲੀ **pbuf);
+ਕਿਸਮਪਰਿਭਾਸ਼ਾ VAStatus (*FN_vaSyncSurface)(VADisplay dpy, VASurfaceID render_ਨਿਸ਼ਾਨਾ);
+ਕਿਸਮਪਰਿਭਾਸ਼ਾ VAStatus (*FN_va_Unmap_ਬਫਰ)(VADisplay dpy, VABufferID buf_id);
+ਕਿਸਮਪਰਿਭਾਸ਼ਾ ਪੂਰਨ (*FN_va_Max_ਅੰਕ_Image_Formats)(VADisplay dpy);
+ਕਿਸਮਪਰਿਭਾਸ਼ਾ VAStatus (*FN_vaQueryImageFormats)(VADisplay dpy, VAImageFormat *format_list, ਪੂਰਨ *ਅੰਕ_formats);
+ਕਿਸਮਪਰਿਭਾਸ਼ਾ VAStatus (*FN_vaCreateImage)(VADisplay dpy, VAImageFormat *format, ਪੂਰਨ ਚੌੜਾਈ, ਪੂਰਨ ਉਚਾਈ, VAImage *image);
+ਕਿਸਮਪਰਿਭਾਸ਼ਾ VAStatus (*FN_vaPutImage)(VADisplay dpy, VASurfaceID surface, VAImageID image, ਪੂਰਨ src_x, ਪੂਰਨ src_y, ਬਿਨਾਨਿਸ਼ਾਨੀ ਪੂਰਨ src_ਚੌੜਾਈ, ਬਿਨਾਨਿਸ਼ਾਨੀ ਪੂਰਨ src_ਉਚਾਈ, ਪੂਰਨ dest_x, ਪੂਰਨ dest_y, ਬਿਨਾਨਿਸ਼ਾਨੀ ਪੂਰਨ dest_ਚੌੜਾਈ, ਬਿਨਾਨਿਸ਼ਾਨੀ ਪੂਰਨ dest_ਉਚਾਈ);
+ਕਿਸਮਪਰਿਭਾਸ਼ਾ VAStatus (*FN_vaGetImage)(VADisplay dpy, VASurfaceID surface, ਪੂਰਨ x, ਪੂਰਨ y, ਬਿਨਾਨਿਸ਼ਾਨੀ ਪੂਰਨ ਚੌੜਾਈ, ਬਿਨਾਨਿਸ਼ਾਨੀ ਪੂਰਨ ਉਚਾਈ, VAImageID image);
 
-static FN_vaDeriveImage fn_vaDeriveImage = NULL;
-static FN_vaDestroyImage fn_vaDestroyImage = NULL;
-static FN_vaMapBuffer fn_vaMapBuffer = NULL;
-static FN_vaSyncSurface fn_vaSyncSurface = NULL;
-static FN_vaUnmapBuffer fn_vaUnmapBuffer = NULL;
-static FN_vaMaxNumImageFormats fn_vaMaxNumImageFormats = NULL;
-static FN_vaQueryImageFormats fn_vaQueryImageFormats = NULL;
-static FN_vaCreateImage fn_vaCreateImage = NULL;
-static FN_vaPutImage fn_vaPutImage = NULL;
-static FN_vaGetImage fn_vaGetImage = NULL;
+ਸਥਿਰ FN_vaDeriveImage fn_vaDeriveImage = ਨਿਰਾ;
+ਸਥਿਰ FN_vaDestroyImage fn_vaDestroyImage = ਨਿਰਾ;
+ਸਥਿਰ FN_va_Map_ਬਫਰ fn_va_Map_ਬਫਰ = ਨਿਰਾ;
+ਸਥਿਰ FN_vaSyncSurface fn_vaSyncSurface = ਨਿਰਾ;
+ਸਥਿਰ FN_va_Unmap_ਬਫਰ fn_va_Unmap_ਬਫਰ = ਨਿਰਾ;
+ਸਥਿਰ FN_va_Max_ਅੰਕ_Image_Formats fn_va_Max_ਅੰਕ_Image_Formats = ਨਿਰਾ;
+ਸਥਿਰ FN_vaQueryImageFormats fn_vaQueryImageFormats = ਨਿਰਾ;
+ਸਥਿਰ FN_vaCreateImage fn_vaCreateImage = ਨਿਰਾ;
+ਸਥਿਰ FN_vaPutImage fn_vaPutImage = ਨਿਰਾ;
+ਸਥਿਰ FN_vaGetImage fn_vaGetImage = ਨਿਰਾ;
 
-#define vaDeriveImage fn_vaDeriveImage
-#define vaDestroyImage fn_vaDestroyImage
-#define vaMapBuffer fn_vaMapBuffer
-#define vaSyncSurface fn_vaSyncSurface
-#define vaUnmapBuffer fn_vaUnmapBuffer
-#define vaMaxNumImageFormats fn_vaMaxNumImageFormats
-#define vaQueryImageFormats fn_vaQueryImageFormats
-#define vaCreateImage fn_vaCreateImage
-#define vaPutImage fn_vaPutImage
-#define vaGetImage fn_vaGetImage
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ vaDeriveImage fn_vaDeriveImage
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ vaDestroyImage fn_vaDestroyImage
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ va_Map_ਬਫਰ fn_va_Map_ਬਫਰ
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ vaSyncSurface fn_vaSyncSurface
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ va_Unmap_ਬਫਰ fn_va_Unmap_ਬਫਰ
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ va_Max_ਅੰਕ_Image_Formats fn_va_Max_ਅੰਕ_Image_Formats
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ vaQueryImageFormats fn_vaQueryImageFormats
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ vaCreateImage fn_vaCreateImage
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ vaPutImage fn_vaPutImage
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ vaGetImage fn_vaGetImage
 
 
-static std::shared_ptr<cv::plugin::impl::DynamicLib> loadLibVA()
+ਸਥਿਰ std::shared_ptr<cv::plugin::impl::DynamicLib> ਲੱਦੋ_Lib_VA()
 {
     std::shared_ptr<cv::plugin::impl::DynamicLib> lib;
-    const std::string envPath = utils::getConfigurationParameterString("OPENCV_LIBVA_RUNTIME");
-    if (!envPath.empty())
+    ਅਚਲ std::string env_ਰਸਤਾ = utils::getConfigurationParameterString("OPENCV_LIBVA_RUNTIME");
+    ਜੇ (!env_ਰਸਤਾ.empty())
     {
-        lib = std::make_shared<cv::plugin::impl::DynamicLib>(envPath);
-        return lib;
+        lib = std::make_shared<cv::plugin::impl::DynamicLib>(env_ਰਸਤਾ);
+        ਵਾਪਸ lib;
     }
-    static const char* const candidates[] = {
+    ਸਥਿਰ ਅਚਲ ਅੱਖਰ* ਅਚਲ candidates[] = {
         "libva.so",
         "libva.so.2",
         "libva.so.1",
     };
-    for (int i = 0; i < 3; ++i)
+    ਲਈ (ਪੂਰਨ i = 0; i < 3; ++i)
     {
         lib = std::make_shared<cv::plugin::impl::DynamicLib>(candidates[i]);
-        if (lib->isLoaded())
-            break;
+        ਜੇ (lib->isLoaded())
+            ਰੋਕੋ;
     }
-    return lib;
+    ਵਾਪਸ lib;
 }
-static void init_libva()
+ਸਥਿਰ ਖਾਲੀ init_libva()
 {
-    static bool initialized = false;
-    static auto library = loadLibVA();
-    if (!initialized)
+    ਸਥਿਰ ਤਾਰਕਿਕ initialized = ਝੂਠ;
+    ਸਥਿਰ ਸਵੈਚਾਲਿਤ library = ਲੱਦੋ_Lib_VA();
+    ਜੇ (!initialized)
     {
-        if (!library || !library->isLoaded())
+        ਜੇ (!library || !library->isLoaded())
         {
             library.reset();
             CV_Error(cv::Error::StsBadFunc, "OpenCV can't load VA library (libva)");
         }
-        auto& lib = *library.get();
-#define VA_LOAD_SYMBOL(name) fn_ ## name = reinterpret_cast<FN_ ## name>(lib.getSymbol(#name)); \
-        if (!fn_ ## name) \
+        ਸਵੈਚਾਲਿਤ& lib = *library.get();
+#ਪਰਿਭਾਸ਼ਿਤ_ਕਰੋ VA_ਲੱਦੋ_ਚਿੰਨ੍ਹ(name) fn_ ## name = reinterpret_cast<FN_ ## name>(lib.get_ਚਿੰਨ੍ਹ(#name)); \
+        ਜੇ (!fn_ ## name) \
         { \
             library.reset(); \
-            initialized = true; \
+            initialized = ਸੱਚ; \
             CV_Error_(cv::Error::StsBadFunc, ("OpenCV can't load VA library (libva), missing symbol: %s", #name)); \
         }
 
-        VA_LOAD_SYMBOL(vaDeriveImage);
-        VA_LOAD_SYMBOL(vaDestroyImage);
-        VA_LOAD_SYMBOL(vaMapBuffer);
-        VA_LOAD_SYMBOL(vaSyncSurface);
-        VA_LOAD_SYMBOL(vaUnmapBuffer);
-        VA_LOAD_SYMBOL(vaMaxNumImageFormats);
-        VA_LOAD_SYMBOL(vaQueryImageFormats);
-        VA_LOAD_SYMBOL(vaCreateImage);
-        VA_LOAD_SYMBOL(vaPutImage);
-        VA_LOAD_SYMBOL(vaGetImage);
-        initialized = true;
+        VA_ਲੱਦੋ_ਚਿੰਨ੍ਹ(vaDeriveImage);
+        VA_ਲੱਦੋ_ਚਿੰਨ੍ਹ(vaDestroyImage);
+        VA_ਲੱਦੋ_ਚਿੰਨ੍ਹ(va_Map_ਬਫਰ);
+        VA_ਲੱਦੋ_ਚਿੰਨ੍ਹ(vaSyncSurface);
+        VA_ਲੱਦੋ_ਚਿੰਨ੍ਹ(va_Unmap_ਬਫਰ);
+        VA_ਲੱਦੋ_ਚਿੰਨ੍ਹ(va_Max_ਅੰਕ_Image_Formats);
+        VA_ਲੱਦੋ_ਚਿੰਨ੍ਹ(vaQueryImageFormats);
+        VA_ਲੱਦੋ_ਚਿੰਨ੍ਹ(vaCreateImage);
+        VA_ਲੱਦੋ_ਚਿੰਨ੍ਹ(vaPutImage);
+        VA_ਲੱਦੋ_ਚਿੰਨ੍ਹ(vaGetImage);
+        initialized = ਸੱਚ;
     }
-    if (!library)
+    ਜੇ (!library)
         CV_Error(cv::Error::StsBadFunc, "OpenCV can't load/initialize VA library (libva)");
 }
 
