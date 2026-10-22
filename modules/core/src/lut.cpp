@@ -4,217 +4,217 @@
 // Copyright (C) 2026, Advanced Micro Devices, Inc., all rights reserved.
 
 
-#include "precomp.hpp"
-#include "opencl_kernels_core.hpp"
-#include "convert.hpp"
-#include <sys/types.h>
+#شامل "precomp.hpp"
+#شامل "opencl_kernels_core.hpp"
+#شامل "convert.hpp"
+#شامل <sys/types.h>
 
-namespace cv {
-void LUT8u_dispatch( const uchar* src, const uchar* lut, uchar* dst, int len, int cn, int lutcn );
-void LUT16u_dispatch( const uchar* src, const ushort* lut, ushort* dst, int len, int cn, int lutcn );
+نامخلا cv {
+خالی LUT8u_dispatch( ثابت uchar* src, ثابت uchar* lut, uchar* dst, صحیح len, صحیح cn, صحیح lutcn );
+خالی LUT16u_dispatch( ثابت uchar* src, ثابت ushort* lut, ushort* dst, صحیح len, صحیح cn, صحیح lutcn );
 } // namespace cv
 
 /****************************************************************************************\
 *                                    LUT Transform                                       *
 \****************************************************************************************/
 
-namespace cv
+نامخلا cv
 {
 
-template<typename Ti, typename T> static void
-LUT_( const void* _src, const void* _lut, void* _dst, int len, int cn, int lutcn )
+سانچہ<قسم_نام Ti, قسم_نام T> ساکن خالی
+LUT_( ثابت خالی* _src, ثابت خالی* _lut, خالی* _dst, صحیح len, صحیح cn, صحیح lutcn )
 {
-    const Ti* src = (const Ti*)_src;
-    const T* lut = (const T*)_lut;
+    ثابت Ti* src = (ثابت Ti*)_src;
+    ثابت T* lut = (ثابت T*)_lut;
     T* dst = (T*)_dst;
-    if( lutcn == 1 )
+    اگر( lutcn == 1 )
     {
-        for( int i = 0; i < len*cn; i++ )
+        برائے( صحیح i = 0; i < len*cn; i++ )
             dst[i] = lut[src[i]];
     }
-    else
+    ورنہ
     {
-        for( int i = 0; i < len*cn; i += cn )
-            for( int k = 0; k < cn; k++ )
+        برائے( صحیح i = 0; i < len*cn; i += cn )
+            برائے( صحیح k = 0; k < cn; k++ )
                 dst[i+k] = lut[src[i+k]*cn+k];
     }
 }
 
-template<typename T, void (*fn)(const uchar*, const T*, T*, int, int, int)>
-static void lutDispatchWrap( const void* src, const void* lut, void* dst, int len, int cn, int lutcn )
+سانچہ<قسم_نام T, خالی (*fn)(ثابت uchar*, ثابت T*, T*, صحیح, صحیح, صحیح)>
+ساکن خالی lutDispatchWrap( ثابت خالی* src, ثابت خالی* lut, خالی* dst, صحیح len, صحیح cn, صحیح lutcn )
 {
-    fn((const uchar*)src, (const T*)lut, (T*)dst, len, cn, lutcn);
+    fn((ثابت uchar*)src, (ثابت T*)lut, (T*)dst, len, cn, lutcn);
 }
 
-typedef void (*LUTFunc)( const void* src, const void* lut, void* dst, int len, int cn, int lutcn );
+قسمتعریف خالی (*LUTFunc)( ثابت خالی* src, ثابت خالی* lut, خالی* dst, صحیح len, صحیح cn, صحیح lutcn );
 
-static LUTFunc getLUTFunc(const int srcDepth, const int dstDepth)
+ساکن LUTFunc getLUTFunc(ثابت صحیح src_گہرائی, ثابت صحیح dst_گہرائی)
 {
-    LUTFunc ret = nullptr;
-    if((srcDepth == CV_8U) || (srcDepth == CV_8S))
+    LUTFunc ret = خالی_اشاریہ;
+    اگر((src_گہرائی == CV_8U) || (src_گہرائی == CV_8S))
     {
-        switch(dstDepth)
+        انتخاب(dst_گہرائی)
         {
-            case CV_8U:   ret = lutDispatchWrap<uchar, LUT8u_dispatch>;   break;
-            case CV_8S:   ret = LUT_<uint8_t, int8_t>;    break;
-            case CV_16U:  ret = lutDispatchWrap<ushort, LUT16u_dispatch>; break;
-            case CV_16S:  ret = LUT_<uint8_t, int16_t>;   break;
-            case CV_32S:  ret = LUT_<uint8_t, int32_t>;   break;
-            case CV_32F:  ret = LUT_<uint8_t, int32_t>;   break; // float
-            case CV_64F:  ret = LUT_<uint8_t, int64_t>;   break; // double
-            case CV_16F:  ret = LUT_<uint8_t, int16_t>;   break; // hfloat
-            case CV_16BF: ret = LUT_<uint8_t, int16_t>;   break; // bfloat
-            case CV_Bool: ret = LUT_<uint8_t, uint8_t>;   break; // bool
-            case CV_64U:  ret = LUT_<uint8_t, uint64_t>;  break;
-            case CV_64S:  ret = LUT_<uint8_t, int64_t>;   break;
-            case CV_32U:  ret = LUT_<uint8_t, uint32_t>;  break;
-            default:      ret = nullptr;                  break;
+            حالت CV_8U:   ret = lutDispatchWrap<uchar, LUT8u_dispatch>;   توڑو;
+            حالت CV_8S:   ret = LUT_<uint8_t, int8_t>;    توڑو;
+            حالت CV_16U:  ret = lutDispatchWrap<ushort, LUT16u_dispatch>; توڑو;
+            حالت CV_16S:  ret = LUT_<uint8_t, int16_t>;   توڑو;
+            حالت CV_32S:  ret = LUT_<uint8_t, int32_t>;   توڑو;
+            حالت CV_32F:  ret = LUT_<uint8_t, int32_t>;   توڑو; // float
+            حالت CV_64F:  ret = LUT_<uint8_t, int64_t>;   توڑو; // double
+            حالت CV_16F:  ret = LUT_<uint8_t, int16_t>;   توڑو; // hfloat
+            حالت CV_16BF: ret = LUT_<uint8_t, int16_t>;   توڑو; // bfloat
+            حالت CV_Bool: ret = LUT_<uint8_t, uint8_t>;   توڑو; // bool
+            حالت CV_64U:  ret = LUT_<uint8_t, uint64_t>;  توڑو;
+            حالت CV_64S:  ret = LUT_<uint8_t, int64_t>;   توڑو;
+            حالت CV_32U:  ret = LUT_<uint8_t, uint32_t>;  توڑو;
+            طےشدہ:      ret = خالی_اشاریہ;                  توڑو;
         }
     }
-    else if((srcDepth == CV_16U) || (srcDepth == CV_16S))
+    ورنہ اگر((src_گہرائی == CV_16U) || (src_گہرائی == CV_16S))
     {
-        switch(dstDepth)
+        انتخاب(dst_گہرائی)
         {
-            case CV_8U:   ret = LUT_<uint16_t, uint8_t>;  break;
-            case CV_8S:   ret = LUT_<uint16_t, int8_t>;   break;
-            case CV_16U:  ret = LUT_<uint16_t, uint16_t>; break;
-            case CV_16S:  ret = LUT_<uint16_t, int16_t>;  break;
-            case CV_32S:  ret = LUT_<uint16_t, int32_t>;  break;
-            case CV_32F:  ret = LUT_<uint16_t, int32_t>;  break; // float
-            case CV_64F:  ret = LUT_<uint16_t, int64_t>;  break; // double
-            case CV_16F:  ret = LUT_<uint16_t, int16_t>;  break; // hfloat
-            case CV_16BF: ret = LUT_<uint16_t, int16_t>;  break; // bfloat
-            case CV_Bool: ret = LUT_<uint16_t, uint8_t>;  break; // bool
-            case CV_64U:  ret = LUT_<uint16_t, uint64_t>; break;
-            case CV_64S:  ret = LUT_<uint16_t, int64_t>;  break;
-            case CV_32U:  ret = LUT_<uint16_t, uint32_t>; break;
-            default:      ret = nullptr;                  break;
+            حالت CV_8U:   ret = LUT_<uint16_t, uint8_t>;  توڑو;
+            حالت CV_8S:   ret = LUT_<uint16_t, int8_t>;   توڑو;
+            حالت CV_16U:  ret = LUT_<uint16_t, uint16_t>; توڑو;
+            حالت CV_16S:  ret = LUT_<uint16_t, int16_t>;  توڑو;
+            حالت CV_32S:  ret = LUT_<uint16_t, int32_t>;  توڑو;
+            حالت CV_32F:  ret = LUT_<uint16_t, int32_t>;  توڑو; // float
+            حالت CV_64F:  ret = LUT_<uint16_t, int64_t>;  توڑو; // double
+            حالت CV_16F:  ret = LUT_<uint16_t, int16_t>;  توڑو; // hfloat
+            حالت CV_16BF: ret = LUT_<uint16_t, int16_t>;  توڑو; // bfloat
+            حالت CV_Bool: ret = LUT_<uint16_t, uint8_t>;  توڑو; // bool
+            حالت CV_64U:  ret = LUT_<uint16_t, uint64_t>; توڑو;
+            حالت CV_64S:  ret = LUT_<uint16_t, int64_t>;  توڑو;
+            حالت CV_32U:  ret = LUT_<uint16_t, uint32_t>; توڑو;
+            طےشدہ:      ret = خالی_اشاریہ;                  توڑو;
         }
     }
 
-    CV_CheckTrue(ret != nullptr, "An unexpected type combination was specified.");
-    return ret;
+    CV_CheckTrue(ret != خالی_اشاریہ, "An unexpected type combination was specified.");
+    واپس ret;
 }
 
-#ifdef HAVE_OPENCL
+#اگر_تعریف_شدہ HAVE_OPENCL
 
-static bool ocl_LUT(InputArray _src, InputArray _lut, OutputArray _dst)
+ساکن منطقی ocl_LUT(داخلہ_Array _src, داخلہ_Array _lut, OutputArray _dst)
 {
-    int lcn = _lut.channels(), dcn = _src.channels(), ddepth = _lut.depth();
+    صحیح lcn = _lut.channels(), dcn = _src.channels(), ddepth = _lut.گہرائی();
 
     UMat src = _src.getUMat(), lut = _lut.getUMat();
-    _dst.createSameSize(src, CV_MAKETYPE(ddepth, dcn));
+    _dst.create_Same_سائز(src, CV_MAKETYPE(ddepth, dcn));
     UMat dst = _dst.getUMat();
-    int kercn = lcn == 1 ? std::min(4, ocl::predictOptimalVectorWidth(_src, _dst)) : dcn;
+    صحیح kercn = lcn == 1 ? std::min(4, ocl::predict_Optimal_سمتیہ_چوڑائی(_src, _dst)) : dcn;
 
     ocl::Kernel k("LUT", ocl::core::lut_oclsrc,
                   format("-D dcn=%d -D lcn=%d -D srcT=%s -D dstT=%s", kercn, lcn,
-                         ocl::typeToStr(src.depth()), ocl::memopTypeToStr(ddepth)));
-    if (k.empty())
-        return false;
+                         ocl::type_مقصد_Str(src.گہرائی()), ocl::memop_Type_مقصد_Str(ddepth)));
+    اگر (k.empty())
+        واپس جھوٹ;
 
-    k.args(ocl::KernelArg::ReadOnlyNoSize(src), ocl::KernelArg::ReadOnlyNoSize(lut),
+    k.دلائل(ocl::KernelArg::Read_Only_No_سائز(src), ocl::KernelArg::Read_Only_No_سائز(lut),
         ocl::KernelArg::WriteOnly(dst, dcn, kercn));
 
-    size_t globalSize[2] = { (size_t)dst.cols * dcn / kercn, ((size_t)dst.rows + 3) / 4 };
-    return k.run(2, globalSize, NULL, false);
+    size_t global_سائز[2] = { (size_t)dst.ستون_تعداد * dcn / kercn, ((size_t)dst.صفیں + 3) / 4 };
+    واپس k.تسلسل(2, global_سائز, تہی, جھوٹ);
 }
 
-#endif
+#اگر_ختم
 
-class LUTParallelBody : public ParallelLoopBody
+جماعت LUTParallelBody : عوامی ParallelLoopBody
 {
-public:
-    const Mat& src_;
-    const Mat& lut_;
+عوامی:
+    ثابت Mat& src_;
+    ثابت Mat& lut_;
     Mat& dst_;
 
     LUTFunc func_;
 
-    LUTParallelBody(const Mat& src, const Mat& lut, Mat& dst, LUTFunc func)
+    LUTParallelBody(ثابت Mat& src, ثابت Mat& lut, Mat& dst, LUTFunc func)
         : src_(src), lut_(lut), dst_(dst), func_(func)
     {
     }
 
-    void operator()( const cv::Range& range ) const CV_OVERRIDE
+    خالی عامل()( ثابت cv::Range& range ) ثابت CV_OVERRIDE
     {
-        const int row0 = range.start;
-        const int row1 = range.end;
+        ثابت صحیح row0 = range.آغاز;
+        ثابت صحیح row1 = range.end;
 
-        Mat src = src_.rowRange(row0, row1);
-        Mat dst = dst_.rowRange(row0, row1);
+        Mat src = src_.صف_Range_2(row0, row1);
+        Mat dst = dst_.صف_Range_2(row0, row1);
 
-        int cn = src.channels();
-        int lutcn = lut_.channels();
+        صحیح cn = src.channels();
+        صحیح lutcn = lut_.channels();
 
-        const Mat* arrays[] = {&src, &dst, 0};
+        ثابت Mat* arrays[] = {&src, &dst, 0};
         uchar* ptrs[2] = {};
         NAryMatIterator it(arrays, ptrs);
-        int len = (int)it.size;
+        صحیح len = (صحیح)it.size;
 
-        for( size_t i = 0; i < it.nplanes; i++, ++it )
+        برائے( size_t i = 0; i < it.nplanes; i++, ++it )
             func_(ptrs[0], lut_.ptr(), ptrs[1], len, cn, lutcn);
     }
-private:
-    LUTParallelBody(const LUTParallelBody&);
-    LUTParallelBody& operator=(const LUTParallelBody&);
+نجی:
+    LUTParallelBody(ثابت LUTParallelBody&);
+    LUTParallelBody& عامل=(ثابت LUTParallelBody&);
 };
 
 } // cv::
 
-void cv::LUT( InputArray _src, InputArray _lut, OutputArray _dst )
+خالی cv::LUT( داخلہ_Array _src, داخلہ_Array _lut, OutputArray _dst )
 {
     CV_INSTRUMENT_REGION();
 
-    int cn = _src.channels(), depth = _src.depth();
-    int lutcn = _lut.channels();
-    const size_t lut_size = _lut.total();
+    صحیح cn = _src.channels(), گہرائی = _src.گہرائی();
+    صحیح lutcn = _lut.channels();
+    ثابت size_t lut_سائز = _lut.کل();
 
     CV_Assert( (lutcn == cn || lutcn == 1) && _lut.isContinuous() &&
         (
-            ((lut_size == 256) && ((depth == CV_8U)||(depth == CV_8S))) ||
-            ((lut_size == 65536) && ((depth == CV_16U)||(depth == CV_16S)))
+            ((lut_سائز == 256) && ((گہرائی == CV_8U)||(گہرائی == CV_8S))) ||
+            ((lut_سائز == 65536) && ((گہرائی == CV_16U)||(گہرائی == CV_16S)))
         )
     );
 
-    CV_OCL_RUN(_dst.isUMat() && _src.dims() <= 2 && (lut_size == 256),
+    CV_OCL_تسلسل(_dst.isUMat() && _src.dims() <= 2 && (lut_سائز == 256),
                ocl_LUT(_src, _lut, _dst))
 
     Mat src = _src.getMat(), lut = _lut.getMat();
-    _dst.createSameSize(_src, CV_MAKETYPE(_lut.depth(), cn));
+    _dst.create_Same_سائز(_src, CV_MAKETYPE(_lut.گہرائی(), cn));
     Mat dst = _dst.getMat();
 
-    if(lut_size == 256)
+    اگر(lut_سائز == 256)
     {
-        CALL_HAL(LUT, cv_hal_lut, src.data, src.step, src.type(), lut.data,
-                 lut.elemSize1(), lutcn, dst.data, dst.step, src.cols, src.rows);
+        CALL_HAL(LUT, cv_hal_lut, src.ڈیٹا, src.قدم, src.type(), lut.ڈیٹا,
+                 lut.elemSize1(), lutcn, dst.ڈیٹا, dst.قدم, src.ستون_تعداد, src.صفیں);
     }
-    else
+    ورنہ
     {
-        CALL_HAL(LUT16, cv_hal_lut16, src.ptr<ushort>(), src.step, src.type(), lut.data,
-                 lut.elemSize1(), lutcn, dst.data, dst.step, src.cols, src.rows);
+        CALL_HAL(LUT16, cv_hal_lut16, src.ptr<ushort>(), src.قدم, src.type(), lut.ڈیٹا,
+                 lut.elemSize1(), lutcn, dst.ڈیٹا, dst.قدم, src.ستون_تعداد, src.صفیں);
     }
 
-    const LUTFunc func = getLUTFunc(src.depth(), dst.depth());
-    CV_Assert( func != nullptr );
+    ثابت LUTFunc func = getLUTFunc(src.گہرائی(), dst.گہرائی());
+    CV_Assert( func != خالی_اشاریہ );
 
-    if (_src.dims() <= 2)
+    اگر (_src.dims() <= 2)
     {
         LUTParallelBody body(src, lut, dst, func);
-        Range all(0, dst.rows);
-        if (dst.total() >= (size_t)(1<<18))
-            parallel_for_(all, body, (double)std::max((size_t)1, dst.total()>>16));
-        else
+        Range all(0, dst.صفیں);
+        اگر (dst.کل() >= (size_t)(1<<18))
+            parallel_for_(all, body, (دوہرا)std::max((size_t)1, dst.کل()>>16));
+        ورنہ
             body(all);
 
-        return;
+        واپس;
     }
 
-    const Mat* arrays[] = {&src, &dst, 0};
+    ثابت Mat* arrays[] = {&src, &dst, 0};
     uchar* ptrs[2] = {};
     NAryMatIterator it(arrays, ptrs);
-    int len = (int)it.size;
+    صحیح len = (صحیح)it.size;
 
-    for( size_t i = 0; i < it.nplanes; i++, ++it )
+    برائے( size_t i = 0; i < it.nplanes; i++, ++it )
         func(ptrs[0], lut.ptr(), ptrs[1], len, cn, lutcn);
 }

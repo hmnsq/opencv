@@ -3,224 +3,224 @@
 // of this distribution and at http://opencv.org/license.html
 
 
-#include "precomp.hpp"
-#include "opencl_kernels_core.hpp"
-#include "stat.hpp"
+#شامل "precomp.hpp"
+#شامل "opencl_kernels_core.hpp"
+#شامل "stat.hpp"
 
-#include "stat_parallel.hpp"
-#include "sum.simd.hpp"
-#include "sum.simd_declarations.hpp" // defines CV_CPU_DISPATCH_MODES_ALL=AVX2,...,BASELINE based on CMakeLists.txt content
+#شامل "stat_parallel.hpp"
+#شامل "sum.simd.hpp"
+#شامل "sum.simd_declarations.hpp" // defines CV_CPU_DISPATCH_MODES_ALL=AVX2,...,BASELINE based on CMakeLists.txt content
 
-namespace cv
+نامخلا cv
 {
 
-SumFunc getSumFunc(int depth)
+مجموع_Func get_مجموع_Func(صحیح گہرائی)
 {
     CV_INSTRUMENT_REGION();
-    CV_CPU_DISPATCH(getSumFunc, (depth),
+    CV_CPU_DISPATCH(get_مجموع_Func, (گہرائی),
         CV_CPU_DISPATCH_MODES_ALL);
 }
 
-#ifdef HAVE_OPENCL
+#اگر_تعریف_شدہ HAVE_OPENCL
 
-bool ocl_sum( InputArray _src, Scalar & res, int sum_op, InputArray _mask,
-                     InputArray _src2, bool calc2, const Scalar & res2 )
+منطقی ocl_مجموع( داخلہ_Array _src, Scalar & res, صحیح مجموع_op, داخلہ_Array نقاب_2,
+                     داخلہ_Array _src2, منطقی calc2, ثابت Scalar & res2 )
 {
-    CV_Assert(sum_op == OCL_OP_SUM || sum_op == OCL_OP_SUM_ABS || sum_op == OCL_OP_SUM_SQR);
+    CV_Assert(مجموع_op == OCL_OP_مجموع || مجموع_op == OCL_OP_مجموع_ABS || مجموع_op == OCL_OP_مجموع_SQR);
 
-    const ocl::Device & dev = ocl::Device::getDefault();
-    bool doubleSupport = dev.doubleFPConfig() > 0,
-        haveMask = _mask.kind() != _InputArray::NONE,
-        haveSrc2 = _src2.kind() != _InputArray::NONE;
-    int type = _src.type(), depth = CV_MAT_DEPTH(type), cn = CV_MAT_CN(type),
-            kercn = cn == 1 && !haveMask ? ocl::predictOptimalVectorWidth(_src, _src2) : 1,
+    ثابت ocl::Device & dev = ocl::Device::getDefault();
+    منطقی doubleSupport = dev.doubleFPConfig() > 0,
+        have_نقاب = نقاب_2.قسم() != داخلہ_Array_2::NONE,
+        haveSrc2 = _src2.قسم() != داخلہ_Array_2::NONE;
+    صحیح type = _src.type(), گہرائی = CV_MAT_گہرائی(type), cn = CV_MAT_CN(type),
+            kercn = cn == 1 && !have_نقاب ? ocl::predict_Optimal_سمتیہ_چوڑائی(_src, _src2) : 1,
             mcn = std::max(cn, kercn);
     CV_Assert(!haveSrc2 || _src2.type() == type);
-    int convert_cn = haveSrc2 ? mcn : cn;
+    صحیح convert_cn = haveSrc2 ? mcn : cn;
 
-    if ( (!doubleSupport && depth == CV_64F) || cn > 4 )
-        return false;
+    اگر ( (!doubleSupport && گہرائی == CV_64F) || cn > 4 )
+        واپس جھوٹ;
 
-    if (depth >= CV_16F)
-        return false;
+    اگر (گہرائی >= CV_16F)
+        واپس جھوٹ;
 
-    int ngroups = dev.maxComputeUnits(), dbsize = ngroups * (calc2 ? 2 : 1);
-    size_t wgs = dev.maxWorkGroupSize();
+    صحیح ngroups = dev.maxComputeUnits(), dbsize = ngroups * (calc2 ? 2 : 1);
+    size_t wgs = dev.max_Work_گروہ_سائز();
 
-    int ddepth = std::max(sum_op == OCL_OP_SUM_SQR ? CV_32F : CV_32S, depth),
+    صحیح ddepth = std::max(مجموع_op == OCL_OP_مجموع_SQR ? CV_32F : CV_32S, گہرائی),
             dtype = CV_MAKE_TYPE(ddepth, cn);
-    CV_Assert(!haveMask || _mask.type() == CV_8U || _mask.type() == CV_8S || _mask.type() == CV_Bool);
+    CV_Assert(!have_نقاب || نقاب_2.type() == CV_8U || نقاب_2.type() == CV_8S || نقاب_2.type() == CV_Bool);
 
-    int wgs2_aligned = 1;
-    while (wgs2_aligned < (int)wgs)
+    صحیح wgs2_aligned = 1;
+    جب (wgs2_aligned < (صحیح)wgs)
         wgs2_aligned <<= 1;
     wgs2_aligned >>= 1;
 
-    static const char * const opMap[3] = { "OP_SUM", "OP_SUM_ABS", "OP_SUM_SQR" };
-    char cvt[2][50];
+    ساکن ثابت حرف * ثابت opMap[3] = { "OP_SUM", "OP_SUM_ABS", "OP_SUM_SQR" };
+    حرف cvt[2][50];
     String opts = format("-D srcT=%s -D srcT1=%s -D dstT=%s -D dstTK=%s -D dstT1=%s -D ddepth=%d -D cn=%d"
                          " -D convertToDT=%s -D %s -D WGS=%d -D WGS2_ALIGNED=%d%s%s%s%s -D kercn=%d%s%s%s -D convertFromU=%s",
-                         ocl::typeToStr(CV_MAKE_TYPE(depth, mcn)), ocl::typeToStr(depth),
-                         ocl::typeToStr(dtype), ocl::typeToStr(CV_MAKE_TYPE(ddepth, mcn)),
-                         ocl::typeToStr(ddepth), ddepth, cn,
-                         ocl::convertTypeStr(depth, ddepth, mcn, cvt[0], sizeof(cvt[0])),
-                         opMap[sum_op], (int)wgs, wgs2_aligned,
+                         ocl::type_مقصد_Str(CV_MAKE_TYPE(گہرائی, mcn)), ocl::type_مقصد_Str(گہرائی),
+                         ocl::type_مقصد_Str(dtype), ocl::type_مقصد_Str(CV_MAKE_TYPE(ddepth, mcn)),
+                         ocl::type_مقصد_Str(ddepth), ddepth, cn,
+                         ocl::convertTypeStr(گہرائی, ddepth, mcn, cvt[0], حجم(cvt[0])),
+                         opMap[مجموع_op], (صحیح)wgs, wgs2_aligned,
                          doubleSupport ? " -D DOUBLE_SUPPORT" : "",
-                         haveMask ? " -D HAVE_MASK" : "",
+                         have_نقاب ? " -D HAVE_MASK" : "",
                          _src.isContinuous() ? " -D HAVE_SRC_CONT" : "",
-                         haveMask && _mask.isContinuous() ? " -D HAVE_MASK_CONT" : "", kercn,
+                         have_نقاب && نقاب_2.isContinuous() ? " -D HAVE_MASK_CONT" : "", kercn,
                          haveSrc2 ? " -D HAVE_SRC2" : "", calc2 ? " -D OP_CALC2" : "",
                          haveSrc2 && _src2.isContinuous() ? " -D HAVE_SRC2_CONT" : "",
-                         depth <= CV_32S && ddepth == CV_32S ? ocl::convertTypeStr(CV_8U, ddepth, convert_cn, cvt[1], sizeof(cvt[1])) : "noconvert");
+                         گہرائی <= CV_32S && ddepth == CV_32S ? ocl::convertTypeStr(CV_8U, ddepth, convert_cn, cvt[1], حجم(cvt[1])) : "noconvert");
 
     ocl::Kernel k("reduce", ocl::core::reduce_oclsrc, opts);
-    if (k.empty())
-        return false;
+    اگر (k.empty())
+        واپس جھوٹ;
 
     UMat src = _src.getUMat(), src2 = _src2.getUMat(),
-        db(1, dbsize, dtype), mask = _mask.getUMat();
+        db(1, dbsize, dtype), نقاب = نقاب_2.getUMat();
 
-    ocl::KernelArg srcarg = ocl::KernelArg::ReadOnlyNoSize(src),
+    ocl::KernelArg srcarg = ocl::KernelArg::Read_Only_No_سائز(src),
             dbarg = ocl::KernelArg::PtrWriteOnly(db),
-            maskarg = ocl::KernelArg::ReadOnlyNoSize(mask),
-            src2arg = ocl::KernelArg::ReadOnlyNoSize(src2);
+            maskarg = ocl::KernelArg::Read_Only_No_سائز(نقاب),
+            src2arg = ocl::KernelArg::Read_Only_No_سائز(src2);
 
-    if (haveMask)
+    اگر (have_نقاب)
     {
-        if (haveSrc2)
-            k.args(srcarg, src.cols, (int)src.total(), ngroups, dbarg, maskarg, src2arg);
-        else
-            k.args(srcarg, src.cols, (int)src.total(), ngroups, dbarg, maskarg);
+        اگر (haveSrc2)
+            k.دلائل(srcarg, src.ستون_تعداد, (صحیح)src.کل(), ngroups, dbarg, maskarg, src2arg);
+        ورنہ
+            k.دلائل(srcarg, src.ستون_تعداد, (صحیح)src.کل(), ngroups, dbarg, maskarg);
     }
-    else
+    ورنہ
     {
-        if (haveSrc2)
-            k.args(srcarg, src.cols, (int)src.total(), ngroups, dbarg, src2arg);
-        else
-            k.args(srcarg, src.cols, (int)src.total(), ngroups, dbarg);
+        اگر (haveSrc2)
+            k.دلائل(srcarg, src.ستون_تعداد, (صحیح)src.کل(), ngroups, dbarg, src2arg);
+        ورنہ
+            k.دلائل(srcarg, src.ستون_تعداد, (صحیح)src.کل(), ngroups, dbarg);
     }
 
     size_t globalsize = ngroups * wgs;
-    if (k.run(1, &globalsize, &wgs, true))
+    اگر (k.تسلسل(1, &globalsize, &wgs, سچ))
     {
-        typedef Scalar (*part_sum)(Mat m);
-        part_sum funcs[3] = { ocl_part_sum<int>, ocl_part_sum<float>, ocl_part_sum<double> },
+        قسمتعریف Scalar (*part_مجموع)(Mat m);
+        part_مجموع funcs[3] = { ocl_part_مجموع<صحیح>, ocl_part_مجموع<اعشاری>, ocl_part_مجموع<دوہرا> },
                 func = funcs[ddepth - CV_32S];
 
         Mat mres = db.getMat(ACCESS_READ);
-        if (calc2)
-            const_cast<Scalar &>(res2) = func(mres.colRange(ngroups, dbsize));
+        اگر (calc2)
+            const_cast<Scalar &>(res2) = func(mres.ستون_Range_2(ngroups, dbsize));
 
-        res = func(mres.colRange(0, ngroups));
-        return true;
+        res = func(mres.ستون_Range_2(0, ngroups));
+        واپس سچ;
     }
-    return false;
+    واپس جھوٹ;
 }
 
-#endif
+#اگر_ختم
 
 // serial implementation, also used for the pieces of the parallel version
-static Scalar sum_(const Mat& src)
+ساکن Scalar مجموع_2(ثابت Mat& src)
 {
     Scalar _res;
-    int cn = src.channels();
+    صحیح cn = src.channels();
 
-    if (src.dims <= 2)
+    اگر (src.dims <= 2)
     {
-        CALL_HAL_RET2(sum, cv_hal_sum, _res, src.data, src.step, src.type(), src.cols, src.rows, &_res[0]);
+        CALL_HAL_RET2(مجموع, cv_hal_مجموع, _res, src.ڈیٹا, src.قدم, src.type(), src.ستون_تعداد, src.صفیں, &_res[0]);
     }
-    else if (src.isContinuous())
+    ورنہ اگر (src.isContinuous())
     {
-        CALL_HAL_RET2(sum, cv_hal_sum, _res, src.data, 0, src.type(), (int)src.total(), 1, &_res[0]);
+        CALL_HAL_RET2(مجموع, cv_hal_مجموع, _res, src.ڈیٹا, 0, src.type(), (صحیح)src.کل(), 1, &_res[0]);
     }
 
-    int k, depth = src.depth();
-    SumFunc func = getSumFunc(depth);
-    if (func == nullptr) {
-        if (depth == CV_Bool && cn == 1)
-            return Scalar((double)countNonZero(src));
+    صحیح k, گہرائی = src.گہرائی();
+    مجموع_Func func = get_مجموع_Func(گہرائی);
+    اگر (func == خالی_اشاریہ) {
+        اگر (گہرائی == CV_Bool && cn == 1)
+            واپس Scalar((دوہرا)گنتی_Non_Zero(src));
         CV_Error_(Error::StsNotImplemented, ("sum: %s input is not supported, convert the input to another type (e.g. CV_32F) first",
-                                            typeToString(src.type()).c_str()));
+                                            type_مقصد_String(src.type()).c_str()));
     }
 
-    const Mat* arrays[] = {&src, 0};
+    ثابت Mat* arrays[] = {&src, 0};
     uchar* ptrs[1] = {};
     NAryMatIterator it(arrays, ptrs);
-    int total = (int)it.size, blockSize = total, partialBlockSize = 0;
-    int j, count = 0;
-    int _buf[CV_CN_MAX];
-    int* buf = (int*)&_res[0];
+    صحیح کل = (صحیح)it.size, بلاک_سائز_2 = کل, partial_بلاک_سائز = 0;
+    صحیح j, گنتی_2 = 0;
+    صحیح _buf[CV_CN_MAX];
+    صحیح* buf = (صحیح*)&_res[0];
     size_t esz = 0;
-    bool partialSumIsInt = depth < CV_32S;
-    bool blockSum = partialSumIsInt || depth == CV_16F || depth == CV_16BF;
+    منطقی partial_مجموع_Is_Int = گہرائی < CV_32S;
+    منطقی بلاک_مجموع = partial_مجموع_Is_Int || گہرائی == CV_16F || گہرائی == CV_16BF;
 
-    if( blockSum )
+    اگر( بلاک_مجموع )
     {
-        partialBlockSize = depth <= CV_8S ? (1 << 23) : (1 << 15);
-        blockSize = std::min(blockSize, partialBlockSize);
+        partial_بلاک_سائز = گہرائی <= CV_8S ? (1 << 23) : (1 << 15);
+        بلاک_سائز_2 = std::min(بلاک_سائز_2, partial_بلاک_سائز);
         buf = _buf;
-        for( k = 0; k < cn; k++ )
+        برائے( k = 0; k < cn; k++ )
             buf[k] = 0;
-        esz = src.elemSize();
+        esz = src.elem_سائز();
     }
 
-    for( size_t i = 0; i < it.nplanes; i++, ++it )
+    برائے( size_t i = 0; i < it.nplanes; i++, ++it )
     {
-        for( j = 0; j < total; j += blockSize )
+        برائے( j = 0; j < کل; j += بلاک_سائز_2 )
         {
-            int bsz = std::min(total - j, blockSize);
+            صحیح bsz = std::min(کل - j, بلاک_سائز_2);
             func( ptrs[0], 0, (uchar*)buf, bsz, cn );
-            count += bsz;
-            if( blockSum && (count + blockSize >= partialBlockSize || (i+1 >= it.nplanes && j+bsz >= total)) )
+            گنتی_2 += bsz;
+            اگر( بلاک_مجموع && (گنتی_2 + بلاک_سائز_2 >= partial_بلاک_سائز || (i+1 >= it.nplanes && j+bsz >= کل)) )
             {
-                if (partialSumIsInt) {
-                    for( k = 0; k < cn; k++ )
+                اگر (partial_مجموع_Is_Int) {
+                    برائے( k = 0; k < cn; k++ )
                     {
                         _res[k] += buf[k];
                         buf[k] = 0;
                     }
-                } else {
-                    for( k = 0; k < cn; k++ )
+                } ورنہ {
+                    برائے( k = 0; k < cn; k++ )
                     {
-                        _res[k] += ((float*)buf)[k];
+                        _res[k] += ((اعشاری*)buf)[k];
                         buf[k] = 0;
                     }
                 }
-                count = 0;
+                گنتی_2 = 0;
             }
             ptrs[0] += bsz*esz;
         }
     }
-    return _res;
+    واپس _res;
 }
 
-Scalar sum(InputArray _src)
+Scalar مجموع(داخلہ_Array _src)
 {
     CV_INSTRUMENT_REGION();
 
     Scalar _res;
-#ifdef HAVE_OPENCL
-    CV_OCL_RUN_(OCL_PERFORMANCE_CHECK(_src.isUMat()) && _src.dims() <= 2,
-                ocl_sum(_src, _res, OCL_OP_SUM),
+#اگر_تعریف_شدہ HAVE_OPENCL
+    CV_OCL_تسلسل_2(OCL_PERFORMANCE_CHECK(_src.isUMat()) && _src.dims() <= 2,
+                ocl_مجموع(_src, _res, OCL_OP_مجموع),
                 _res);
-#endif
+#اگر_ختم
 
     Mat src = _src.getMat();
     CV_CheckLE( src.channels(), 4, "cv::sum does not support more than 4 channels" );
 
     std::vector<StatChunk> chunks;
-    if (!splitForParallelStat(src, Mat(), chunks))
-        return sum_(src);
+    اگر (!بانٹو_For_Parallel_Stat(src, Mat(), chunks))
+        واپس مجموع_2(src);
 
     std::vector<Scalar> part(chunks.size());
-    parallel_for_(Range(0, (int)chunks.size()), [&](const Range& r)
+    parallel_for_(Range(0, (صحیح)chunks.size()), [&](ثابت Range& r)
     {
-        for (int i = r.start; i < r.end; i++)
-            part[i] = sum_(chunks[i].src);
+        برائے (صحیح i = r.آغاز; i < r.end; i++)
+            part[i] = مجموع_2(chunks[i].src);
     });
-    for (const Scalar& v : part)
+    برائے (ثابت Scalar& v : part)
         _res += v;
-    return _res;
+    واپس _res;
 }
 
 } // namespace

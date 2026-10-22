@@ -2,376 +2,376 @@
 // It is subject to the license terms in the LICENSE file found in the top-level directory
 // of this distribution and at http://opencv.org/license.html.
 
-#include "precomp.hpp"
-#include "opencv2/core/async.hpp"
-#include "opencv2/core/detail/async_promise.hpp"
+#شامل "precomp.hpp"
+#شامل "opencv2/core/async.hpp"
+#شامل "opencv2/core/detail/async_promise.hpp"
 
-#include "opencv2/core/cvstd.hpp"
+#شامل "opencv2/core/cvstd.hpp"
 
-#include <opencv2/core/utils/logger.defines.hpp>
-#undef CV_LOG_STRIP_LEVEL
-#define CV_LOG_STRIP_LEVEL CV_LOG_LEVEL_DEBUG + 1
-#include <opencv2/core/utils/logger.hpp>
+#شامل <opencv2/core/utils/logger.defines.hpp>
+#تعریف_منسوخ CV_LOG_STRIP_LEVEL
+#تعریف_کرو CV_LOG_STRIP_LEVEL CV_LOG_LEVEL_DEBUG + 1
+#شامل <opencv2/core/utils/logger.hpp>
 
-#ifndef OPENCV_DISABLE_THREAD_SUPPORT
+#اگر_غیر_تعریف_شدہ OPENCV_DISABLE_THREAD_SUPPORT
 
-#include <mutex>
-#include <condition_variable>
-#include <chrono>
+#شامل <mutex>
+#شامل <condition_variable>
+#شامل <chrono>
 
-namespace cv {
+نامخلا cv {
 
 /**
 Manages shared state of asynchronous result
 */
-struct AsyncArray::Impl
+ساخت AsyncArray::Impl
 {
-    int refcount;
-    void addrefFuture() CV_NOEXCEPT { CV_XADD(&refcount_future, 1); CV_XADD(&refcount, 1); } \
-    void releaseFuture() CV_NOEXCEPT { CV_XADD(&refcount_future, -1); if(1 == CV_XADD(&refcount, -1)) delete this; } \
-    int refcount_future;
-    void addrefPromise() CV_NOEXCEPT { CV_XADD(&refcount_promise, 1); CV_XADD(&refcount, 1); } \
-    void releasePromise() CV_NOEXCEPT { CV_XADD(&refcount_promise, -1); if(1 == CV_XADD(&refcount, -1)) delete this; } \
-    int refcount_promise;
+    صحیح refcount;
+    خالی addrefFuture() CV_NOEXCEPT { CV_XADD(&refcount_future, 1); CV_XADD(&refcount, 1); } \
+    خالی releaseFuture() CV_NOEXCEPT { CV_XADD(&refcount_future, -1); اگر(1 == CV_XADD(&refcount, -1)) حذف یہ; } \
+    صحیح refcount_future;
+    خالی addrefPromise() CV_NOEXCEPT { CV_XADD(&refcount_promise, 1); CV_XADD(&refcount, 1); } \
+    خالی releasePromise() CV_NOEXCEPT { CV_XADD(&refcount_promise, -1); اگر(1 == CV_XADD(&refcount, -1)) حذف یہ; } \
+    صحیح refcount_promise;
 
-    mutable std::mutex mtx;
-    mutable std::condition_variable cond_var;
+    تغیرپذیر std::mutex mtx;
+    تغیرپذیر std::condition_variable cond_var;
 
-    mutable bool has_result; // Mat, UMat or exception
+    تغیرپذیر منطقی has_نتیجہ; // Mat, UMat or exception
 
-    mutable cv::Ptr<Mat> result_mat;
-    mutable cv::Ptr<UMat> result_umat;
+    تغیرپذیر cv::Ptr<Mat> نتیجہ_mat;
+    تغیرپذیر cv::Ptr<UMat> نتیجہ_umat;
 
 
-    bool has_exception;
-#if CV__EXCEPTION_PTR
+    منطقی has_exception;
+#اگر CV__EXCEPTION_PTR
     std::exception_ptr exception;
-#endif
+#اگر_ختم
     cv::Exception cv_exception;
 
-    mutable bool result_is_fetched;
+    تغیرپذیر منطقی نتیجہ_is_fetched;
 
-    bool future_is_returned;
+    منطقی future_is_returned;
 
     Impl()
         : refcount(1), refcount_future(0), refcount_promise(1)
-        , has_result(false)
-        , has_exception(false)
-        , result_is_fetched(false)
-        , future_is_returned(false)
+        , has_نتیجہ(جھوٹ)
+        , has_exception(جھوٹ)
+        , نتیجہ_is_fetched(جھوٹ)
+        , future_is_returned(جھوٹ)
     {
         // nothing
     }
 
     ~Impl()
     {
-        if (has_result && !result_is_fetched)
+        اگر (has_نتیجہ && !نتیجہ_is_fetched)
         {
-            CV_LOG_INFO(NULL, "Asynchronous result has not been fetched");
+            CV_LOG_INFO(تہی, "Asynchronous result has not been fetched");
         }
     }
 
-    bool get(OutputArray dst, int64 timeoutNs) const
+    منطقی get(OutputArray dst, int64 timeoutNs) ثابت
     {
-        CV_Assert(!result_is_fetched);
-        if (!has_result)
+        CV_Assert(!نتیجہ_is_fetched);
+        اگر (!has_نتیجہ)
         {
-            if(refcount_promise == 0)
-                CV_Error(Error::StsInternal, "Asynchronous result producer has been destroyed");
-            if (!wait_for(timeoutNs))
-                return false;
+            اگر(refcount_promise == 0)
+                CV_Error(Error::Sts_اندرونی, "Asynchronous result producer has been destroyed");
+            اگر (!wait_for(timeoutNs))
+                واپس جھوٹ;
         }
         std::unique_lock<std::mutex> lock(mtx);
-        if (has_result)
+        اگر (has_نتیجہ)
         {
-            if (!result_mat.empty())
+            اگر (!نتیجہ_mat.empty())
             {
-                dst.move(*result_mat.get());
-                result_mat.release();
-                result_is_fetched = true;
-                return true;
+                dst.move(*نتیجہ_mat.get());
+                نتیجہ_mat.release();
+                نتیجہ_is_fetched = سچ;
+                واپس سچ;
             }
-            if (!result_umat.empty())
+            اگر (!نتیجہ_umat.empty())
             {
-                dst.move(*result_umat.get());
-                result_umat.release();
-                result_is_fetched = true;
-                return true;
+                dst.move(*نتیجہ_umat.get());
+                نتیجہ_umat.release();
+                نتیجہ_is_fetched = سچ;
+                واپس سچ;
             }
-#if CV__EXCEPTION_PTR
-            if (has_exception && exception)
+#اگر CV__EXCEPTION_PTR
+            اگر (has_exception && exception)
             {
-                result_is_fetched = true;
+                نتیجہ_is_fetched = سچ;
                 std::rethrow_exception(exception);
             }
-#endif
-            if (has_exception)
+#اگر_ختم
+            اگر (has_exception)
             {
-                result_is_fetched = true;
-                throw cv_exception;
+                نتیجہ_is_fetched = سچ;
+                پھینکو cv_exception;
             }
-            CV_Error(Error::StsInternal, "AsyncArray: invalid state of 'has_result = true'");
+            CV_Error(Error::Sts_اندرونی, "AsyncArray: invalid state of 'has_result = true'");
         }
-        CV_Assert(!has_result);
+        CV_Assert(!has_نتیجہ);
         CV_Assert(timeoutNs < 0);
-        return false;
+        واپس جھوٹ;
     }
 
-    bool valid() const CV_NOEXCEPT
+    منطقی valid() ثابت CV_NOEXCEPT
     {
-        if (result_is_fetched)
-            return false;
-        if (refcount_promise == 0 && !has_result)
-            return false;
-        return true;
+        اگر (نتیجہ_is_fetched)
+            واپس جھوٹ;
+        اگر (refcount_promise == 0 && !has_نتیجہ)
+            واپس جھوٹ;
+        واپس سچ;
     }
 
-    bool wait_for(int64 timeoutNs) const
+    منطقی wait_for(int64 timeoutNs) ثابت
     {
         CV_Assert(valid());
-        if (has_result)
-            return has_result;
-        if (timeoutNs == 0)
-            return has_result;
-        CV_LOG_INFO(NULL, "Waiting for async result ...");
+        اگر (has_نتیجہ)
+            واپس has_نتیجہ;
+        اگر (timeoutNs == 0)
+            واپس has_نتیجہ;
+        CV_LOG_INFO(تہی, "Waiting for async result ...");
         std::unique_lock<std::mutex> lock(mtx);
-        const auto cond_pred = [&]{ return has_result == true; };
-        if (timeoutNs > 0)
-            return cond_var.wait_for(lock, std::chrono::nanoseconds(timeoutNs), cond_pred);
-        else
+        ثابت خودکار cond_pred = [&]{ واپس has_نتیجہ == سچ; };
+        اگر (timeoutNs > 0)
+            واپس cond_var.wait_for(lock, std::chrono::nanoseconds(timeoutNs), cond_pred);
+        ورنہ
         {
             cond_var.wait(lock, cond_pred);
-            CV_Assert(has_result);
-            return true;
+            CV_Assert(has_نتیجہ);
+            واپس سچ;
         }
     }
 
-    AsyncArray getArrayResult()
+    AsyncArray get_Array_نتیجہ()
     {
         CV_Assert(refcount_future == 0);
-        AsyncArray result;
+        AsyncArray نتیجہ;
         addrefFuture();
-        result.p = this;
-        future_is_returned = true;
-        return result;
+        نتیجہ.p = یہ;
+        future_is_returned = سچ;
+        واپس نتیجہ;
     }
 
-    void setValue(InputArray value)
+    خالی سیٹ_قدر(داخلہ_Array value)
     {
-        if (future_is_returned && refcount_future == 0)
+        اگر (future_is_returned && refcount_future == 0)
             CV_Error(Error::StsError, "Associated AsyncArray has been destroyed");
         std::unique_lock<std::mutex> lock(mtx);
-        CV_Assert(!has_result);
-        int k = value.kind();
-        if (k == _InputArray::UMAT)
+        CV_Assert(!has_نتیجہ);
+        صحیح k = value.قسم();
+        اگر (k == داخلہ_Array_2::UMAT)
         {
-            result_umat = makePtr<UMat>();
-            value.copyTo(*result_umat.get());
+            نتیجہ_umat = makePtr<UMat>();
+            value.copy_مقصد(*نتیجہ_umat.get());
         }
-        else
+        ورنہ
         {
-            result_mat = makePtr<Mat>();
-            value.copyTo(*result_mat.get());
+            نتیجہ_mat = makePtr<Mat>();
+            value.copy_مقصد(*نتیجہ_mat.get());
         }
-        has_result = true;
+        has_نتیجہ = سچ;
         cond_var.notify_all();
     }
 
-#if CV__EXCEPTION_PTR
-    void setException(std::exception_ptr e)
+#اگر CV__EXCEPTION_PTR
+    خالی سیٹ_Exception(std::exception_ptr e)
     {
-        if (future_is_returned && refcount_future == 0)
+        اگر (future_is_returned && refcount_future == 0)
             CV_Error(Error::StsError, "Associated AsyncArray has been destroyed");
         std::unique_lock<std::mutex> lock(mtx);
-        CV_Assert(!has_result);
-        has_exception = true;
+        CV_Assert(!has_نتیجہ);
+        has_exception = سچ;
         exception = e;
-        has_result = true;
+        has_نتیجہ = سچ;
         cond_var.notify_all();
     }
-#endif
+#اگر_ختم
 
-    void setException(const cv::Exception e)
+    خالی سیٹ_Exception(ثابت cv::Exception e)
     {
-        if (future_is_returned && refcount_future == 0)
+        اگر (future_is_returned && refcount_future == 0)
             CV_Error(Error::StsError, "Associated AsyncArray has been destroyed");
         std::unique_lock<std::mutex> lock(mtx);
-        CV_Assert(!has_result);
-        has_exception = true;
+        CV_Assert(!has_نتیجہ);
+        has_exception = سچ;
         cv_exception = e;
-        has_result = true;
+        has_نتیجہ = سچ;
         cond_var.notify_all();
     }
 };
 
 }  // namespace
 
-#else  // OPENCV_DISABLE_THREAD_SUPPORT
+#ورنہ  // OPENCV_DISABLE_THREAD_SUPPORT
 
-namespace cv {
+نامخلا cv {
 
 // no threading
-struct AsyncArray::Impl
+ساخت AsyncArray::Impl
 {
-    int refcount;
-    void addrefFuture() CV_NOEXCEPT { refcount_future++; refcount++; }
-    void releaseFuture() CV_NOEXCEPT { refcount_future--; if (0 == --refcount) delete this; }
-    int refcount_future;
-    void addrefPromise() CV_NOEXCEPT { refcount_promise++; refcount++; } \
-    void releasePromise() CV_NOEXCEPT { refcount_promise--; if (0 == --refcount) delete this; }
-    int refcount_promise;
+    صحیح refcount;
+    خالی addrefFuture() CV_NOEXCEPT { refcount_future++; refcount++; }
+    خالی releaseFuture() CV_NOEXCEPT { refcount_future--; اگر (0 == --refcount) حذف یہ; }
+    صحیح refcount_future;
+    خالی addrefPromise() CV_NOEXCEPT { refcount_promise++; refcount++; } \
+    خالی releasePromise() CV_NOEXCEPT { refcount_promise--; اگر (0 == --refcount) حذف یہ; }
+    صحیح refcount_promise;
 
-    mutable bool has_result; // Mat, UMat or exception
+    تغیرپذیر منطقی has_نتیجہ; // Mat, UMat or exception
 
-    mutable cv::Ptr<Mat> result_mat;
-    mutable cv::Ptr<UMat> result_umat;
+    تغیرپذیر cv::Ptr<Mat> نتیجہ_mat;
+    تغیرپذیر cv::Ptr<UMat> نتیجہ_umat;
 
 
-    bool has_exception;
-#if CV__EXCEPTION_PTR
+    منطقی has_exception;
+#اگر CV__EXCEPTION_PTR
     std::exception_ptr exception;
-#endif
+#اگر_ختم
     cv::Exception cv_exception;
 
-    mutable bool result_is_fetched;
+    تغیرپذیر منطقی نتیجہ_is_fetched;
 
-    bool future_is_returned;
+    منطقی future_is_returned;
 
     Impl()
         : refcount(1), refcount_future(0), refcount_promise(1)
-        , has_result(false)
-        , has_exception(false)
-        , result_is_fetched(false)
-        , future_is_returned(false)
+        , has_نتیجہ(جھوٹ)
+        , has_exception(جھوٹ)
+        , نتیجہ_is_fetched(جھوٹ)
+        , future_is_returned(جھوٹ)
     {
         // nothing
     }
 
     ~Impl()
     {
-        if (has_result && !result_is_fetched)
+        اگر (has_نتیجہ && !نتیجہ_is_fetched)
         {
-            CV_LOG_INFO(NULL, "Asynchronous result has not been fetched");
+            CV_LOG_INFO(تہی, "Asynchronous result has not been fetched");
         }
     }
 
-    bool get(OutputArray dst, int64 timeoutNs) const
+    منطقی get(OutputArray dst, int64 timeoutNs) ثابت
     {
-        CV_Assert(!result_is_fetched);
-        if (!has_result)
+        CV_Assert(!نتیجہ_is_fetched);
+        اگر (!has_نتیجہ)
         {
-            CV_UNUSED(timeoutNs);
+            CV_غیر_مستعمل(timeoutNs);
             CV_Error(Error::StsError, "Result is not produced (unable to wait for result in OPENCV_DISABLE_THREAD_SUPPORT mode)");
         }
-        if (!result_mat.empty())
+        اگر (!نتیجہ_mat.empty())
         {
-            dst.move(*result_mat.get());
-            result_mat.release();
-            result_is_fetched = true;
-            return true;
+            dst.move(*نتیجہ_mat.get());
+            نتیجہ_mat.release();
+            نتیجہ_is_fetched = سچ;
+            واپس سچ;
         }
-        if (!result_umat.empty())
+        اگر (!نتیجہ_umat.empty())
         {
-            dst.move(*result_umat.get());
-            result_umat.release();
-            result_is_fetched = true;
-            return true;
+            dst.move(*نتیجہ_umat.get());
+            نتیجہ_umat.release();
+            نتیجہ_is_fetched = سچ;
+            واپس سچ;
         }
-#if CV__EXCEPTION_PTR
-        if (has_exception && exception)
+#اگر CV__EXCEPTION_PTR
+        اگر (has_exception && exception)
         {
-            result_is_fetched = true;
+            نتیجہ_is_fetched = سچ;
             std::rethrow_exception(exception);
         }
-#endif
-        if (has_exception)
+#اگر_ختم
+        اگر (has_exception)
         {
-            result_is_fetched = true;
-            throw cv_exception;
+            نتیجہ_is_fetched = سچ;
+            پھینکو cv_exception;
         }
-        CV_Error(Error::StsInternal, "AsyncArray: invalid state of 'has_result = true'");
-        return false;
+        CV_Error(Error::Sts_اندرونی, "AsyncArray: invalid state of 'has_result = true'");
+        واپس جھوٹ;
     }
 
-    bool valid() const CV_NOEXCEPT
+    منطقی valid() ثابت CV_NOEXCEPT
     {
-        if (result_is_fetched)
-            return false;
-        if (refcount_promise == 0 && !has_result)
-            return false;
-        return true;
+        اگر (نتیجہ_is_fetched)
+            واپس جھوٹ;
+        اگر (refcount_promise == 0 && !has_نتیجہ)
+            واپس جھوٹ;
+        واپس سچ;
     }
 
-    bool wait_for(int64 timeoutNs) const
+    منطقی wait_for(int64 timeoutNs) ثابت
     {
         CV_Assert(valid());
-        if (has_result)
-            return has_result;
-        if (timeoutNs == 0)
-            return has_result;
+        اگر (has_نتیجہ)
+            واپس has_نتیجہ;
+        اگر (timeoutNs == 0)
+            واپس has_نتیجہ;
         CV_Error(Error::StsError, "Unable to wait in OPENCV_DISABLE_THREAD_SUPPORT mode");
     }
 
-    AsyncArray getArrayResult()
+    AsyncArray get_Array_نتیجہ()
     {
         CV_Assert(refcount_future == 0);
-        AsyncArray result;
+        AsyncArray نتیجہ;
         addrefFuture();
-        result.p = this;
-        future_is_returned = true;
-        return result;
+        نتیجہ.p = یہ;
+        future_is_returned = سچ;
+        واپس نتیجہ;
     }
 
-    void setValue(InputArray value)
+    خالی سیٹ_قدر(داخلہ_Array value)
     {
-        if (future_is_returned && refcount_future == 0)
+        اگر (future_is_returned && refcount_future == 0)
             CV_Error(Error::StsError, "Associated AsyncArray has been destroyed");
-        CV_Assert(!has_result);
-        int k = value.kind();
-        if (k == _InputArray::UMAT)
+        CV_Assert(!has_نتیجہ);
+        صحیح k = value.قسم();
+        اگر (k == داخلہ_Array_2::UMAT)
         {
-            result_umat = makePtr<UMat>();
-            value.copyTo(*result_umat.get());
+            نتیجہ_umat = makePtr<UMat>();
+            value.copy_مقصد(*نتیجہ_umat.get());
         }
-        else
+        ورنہ
         {
-            result_mat = makePtr<Mat>();
-            value.copyTo(*result_mat.get());
+            نتیجہ_mat = makePtr<Mat>();
+            value.copy_مقصد(*نتیجہ_mat.get());
         }
-        has_result = true;
+        has_نتیجہ = سچ;
     }
 
-#if CV__EXCEPTION_PTR
-    void setException(std::exception_ptr e)
+#اگر CV__EXCEPTION_PTR
+    خالی سیٹ_Exception(std::exception_ptr e)
     {
-        if (future_is_returned && refcount_future == 0)
+        اگر (future_is_returned && refcount_future == 0)
             CV_Error(Error::StsError, "Associated AsyncArray has been destroyed");
-        CV_Assert(!has_result);
-        has_exception = true;
+        CV_Assert(!has_نتیجہ);
+        has_exception = سچ;
         exception = e;
-        has_result = true;
+        has_نتیجہ = سچ;
     }
-#endif
+#اگر_ختم
 
-    void setException(const cv::Exception e)
+    خالی سیٹ_Exception(ثابت cv::Exception e)
     {
-        if (future_is_returned && refcount_future == 0)
+        اگر (future_is_returned && refcount_future == 0)
             CV_Error(Error::StsError, "Associated AsyncArray has been destroyed");
-        CV_Assert(!has_result);
-        has_exception = true;
+        CV_Assert(!has_نتیجہ);
+        has_exception = سچ;
         cv_exception = e;
-        has_result = true;
+        has_نتیجہ = سچ;
     }
 };
 
 }
 
-#endif  // OPENCV_DISABLE_THREAD_SUPPORT
+#اگر_ختم  // OPENCV_DISABLE_THREAD_SUPPORT
 
-namespace cv {
+نامخلا cv {
 
 AsyncArray::AsyncArray() CV_NOEXCEPT
-    : p(NULL)
+    : p(تہی)
 {
 }
 
@@ -380,54 +380,54 @@ AsyncArray::~AsyncArray() CV_NOEXCEPT
     release();
 }
 
-AsyncArray::AsyncArray(const AsyncArray& o) CV_NOEXCEPT
+AsyncArray::AsyncArray(ثابت AsyncArray& o) CV_NOEXCEPT
     : p(o.p)
 {
-    if (p)
+    اگر (p)
         p->addrefFuture();
 }
 
-AsyncArray& AsyncArray::operator=(const AsyncArray& o) CV_NOEXCEPT
+AsyncArray& AsyncArray::عامل=(ثابت AsyncArray& o) CV_NOEXCEPT
 {
     Impl* newp = o.p;
-    if (newp)
+    اگر (newp)
         newp->addrefFuture();
     release();
     p = newp;
-    return *this;
+    واپس *یہ;
 }
 
-void AsyncArray::release() CV_NOEXCEPT
+خالی AsyncArray::release() CV_NOEXCEPT
 {
     Impl* impl = p;
-    p = NULL;
-    if (impl)
+    p = تہی;
+    اگر (impl)
         impl->releaseFuture();
 }
 
-bool AsyncArray::get(OutputArray dst, int64 timeoutNs) const
+منطقی AsyncArray::get(OutputArray dst, int64 timeoutNs) ثابت
 {
     CV_Assert(p);
-    return p->get(dst, timeoutNs);
+    واپس p->get(dst, timeoutNs);
 }
 
-void AsyncArray::get(OutputArray dst) const
+خالی AsyncArray::get(OutputArray dst) ثابت
 {
     CV_Assert(p);
-    bool res = p->get(dst, -1);
+    منطقی res = p->get(dst, -1);
     CV_Assert(res);
 }
 
-bool AsyncArray::wait_for(int64 timeoutNs) const
+منطقی AsyncArray::wait_for(int64 timeoutNs) ثابت
 {
     CV_Assert(p);
-    return p->wait_for(timeoutNs);
+    واپس p->wait_for(timeoutNs);
 }
 
-bool AsyncArray::valid() const CV_NOEXCEPT
+منطقی AsyncArray::valid() ثابت CV_NOEXCEPT
 {
-    if (!p) return false;
-    return p->valid();
+    اگر (!p) واپس جھوٹ;
+    واپس p->valid();
 }
 
 
@@ -436,7 +436,7 @@ bool AsyncArray::valid() const CV_NOEXCEPT
 //
 
 AsyncPromise::AsyncPromise() CV_NOEXCEPT
-    : p(new AsyncArray::Impl())
+    : p(نیا AsyncArray::Impl())
 {
 }
 
@@ -445,55 +445,55 @@ AsyncPromise::~AsyncPromise() CV_NOEXCEPT
     release();
 }
 
-AsyncPromise::AsyncPromise(const AsyncPromise& o) CV_NOEXCEPT
+AsyncPromise::AsyncPromise(ثابت AsyncPromise& o) CV_NOEXCEPT
     : p(o.p)
 {
-    if (p)
+    اگر (p)
         p->addrefPromise();
 }
 
-AsyncPromise& AsyncPromise::operator=(const AsyncPromise& o) CV_NOEXCEPT
+AsyncPromise& AsyncPromise::عامل=(ثابت AsyncPromise& o) CV_NOEXCEPT
 {
     Impl* newp = o.p;
-    if (newp)
+    اگر (newp)
         newp->addrefPromise();
     release();
     p = newp;
-    return *this;
+    واپس *یہ;
 }
 
-void AsyncPromise::release() CV_NOEXCEPT
+خالی AsyncPromise::release() CV_NOEXCEPT
 {
     Impl* impl = p;
-    p = NULL;
-    if (impl)
+    p = تہی;
+    اگر (impl)
         impl->releasePromise();
 }
 
-AsyncArray AsyncPromise::getArrayResult()
+AsyncArray AsyncPromise::get_Array_نتیجہ()
 {
     CV_Assert(p);
-    return p->getArrayResult();
+    واپس p->get_Array_نتیجہ();
 }
 
-void AsyncPromise::setValue(InputArray value)
+خالی AsyncPromise::سیٹ_قدر(داخلہ_Array value)
 {
     CV_Assert(p);
-    return p->setValue(value);
+    واپس p->سیٹ_قدر(value);
 }
 
-void AsyncPromise::setException(const cv::Exception& exception)
+خالی AsyncPromise::سیٹ_Exception(ثابت cv::Exception& exception)
 {
     CV_Assert(p);
-    return p->setException(exception);
+    واپس p->سیٹ_Exception(exception);
 }
 
-#if CV__EXCEPTION_PTR
-void AsyncPromise::setException(std::exception_ptr exception)
+#اگر CV__EXCEPTION_PTR
+خالی AsyncPromise::سیٹ_Exception(std::exception_ptr exception)
 {
     CV_Assert(p);
-    return p->setException(exception);
+    واپس p->سیٹ_Exception(exception);
 }
-#endif
+#اگر_ختم
 
 } // namespace

@@ -4,94 +4,94 @@
 // Copyright (C) 2026, BigVision LLC, all rights reserved.
 // Third party copyrights are property of their respective owners.
 
-#include "precomp.hpp"
-#include "nd_copy.hpp"
-#include "hal_replacement.hpp"
+#شامل "precomp.hpp"
+#شامل "nd_copy.hpp"
+#شامل "hal_replacement.hpp"
 
-#include "opencv2/core/hal/hal.hpp"
+#شامل "opencv2/core/hal/hal.hpp"
 
-#include <algorithm>
+#شامل <algorithm>
 
-namespace cv { namespace nd {
+نامخلا cv { نامخلا nd {
 
-View viewOf(const Mat& m)
+View view_کا(ثابت Mat& m)
 {
     View v;
-    v.data = m.data;
+    v.ڈیٹا = m.ڈیٹا;
     v.dims = m.dims;
-    v.esz = m.elemSize();
-    for (int i = 0; i < m.dims; i++)
+    v.esz = m.elem_سائز();
+    برائے (صحیح i = 0; i < m.dims; i++)
     {
         v.size[i] = m.size[i];
-        v.step[i] = (ptrdiff_t)m.step[i];
+        v.قدم[i] = (ptrdiff_t)m.قدم[i];
     }
-    return v;
+    واپس v;
 }
 
-View permute(const View& v, const int* order)
+View ترتیب_بدلو(ثابت View& v, ثابت صحیح* ترتیب)
 {
     View r;
-    r.data = v.data;
+    r.ڈیٹا = v.ڈیٹا;
     r.dims = v.dims;
     r.esz = v.esz;
-    for (int i = 0; i < v.dims; i++)
+    برائے (صحیح i = 0; i < v.dims; i++)
     {
-        int j = order[i];
+        صحیح j = ترتیب[i];
         CV_DbgAssert(0 <= j && j < v.dims);
         r.size[i] = v.size[j];
-        r.step[i] = v.step[j];
+        r.قدم[i] = v.قدم[j];
     }
-    return r;
+    واپس r;
 }
 
-void flip(View& v, int axis)
+خالی flip(View& v, صحیح axis)
 {
     CV_DbgAssert(0 <= axis && axis < v.dims);
-    if (v.size[axis] > 0)
-        v.data += (ptrdiff_t)(v.size[axis] - 1)*v.step[axis];
-    v.step[axis] = -v.step[axis];
+    اگر (v.size[axis] > 0)
+        v.ڈیٹا += (ptrdiff_t)(v.size[axis] - 1)*v.قدم[axis];
+    v.قدم[axis] = -v.قدم[axis];
 }
 
-void slice(View& v, int axis, int start, int step, int count)
+خالی قاش_2(View& v, صحیح axis, صحیح آغاز, صحیح قدم, صحیح گنتی_2)
 {
-    CV_DbgAssert(0 <= axis && axis < v.dims && count >= 0);
-    if (count > 0)
-        v.data += (ptrdiff_t)start*v.step[axis];
-    v.step[axis] *= step;
-    v.size[axis] = count;
+    CV_DbgAssert(0 <= axis && axis < v.dims && گنتی_2 >= 0);
+    اگر (گنتی_2 > 0)
+        v.ڈیٹا += (ptrdiff_t)آغاز*v.قدم[axis];
+    v.قدم[axis] *= قدم;
+    v.size[axis] = گنتی_2;
 }
 
-namespace {
+نامخلا {
 
-enum Kind
+شمار قسم_3
 {
-    KIND_MEMCPY,    // the innermost axis is contiguous in both views
-    KIND_FILL,      // the innermost axis is broadcast (step 0) in the source
-    KIND_STRIDED,
-    KIND_TRANSPOSE, // the two innermost axes are swapped between source and destination
-    KIND_SPLIT,     // 2..4 planes are read from one interleaved stream (e.g. NHWC -> NCHW)
-    KIND_MERGE      // 2..4 planes are written into one interleaved stream (e.g. NCHW -> NHWC)
+    قسم_MEMCPY,    // the innermost axis is contiguous in both views
+    قسم_FILL,      // the innermost axis is broadcast (step 0) in the source
+    قسم_STRIDED,
+    قسم_TRANSPOSE, // the two innermost axes are swapped between source and destination
+    قسم_بانٹو,     // 2..4 planes are read from one interleaved stream (e.g. NHWC -> NCHW)
+    قسم_ملاؤ      // 2..4 planes are written into one interleaved stream (e.g. NCHW -> NHWC)
 };
 
-enum
+شمار
 {
     TRANSPOSE_TILE = 64,                // in elements
-    SPLIT_CHUNK = 1024,                 // in elements
-    ROW_CHUNK_BYTES = 64*1024,
-    GATHER_BLOCK_BYTES = 8*1024,
+    بانٹو_CHUNK = 1024,                 // in elements
+    صف_CHUNK_بائٹیں = 64*1024,
+    GATHER_بلاک_بائٹیں = 8*1024,
     // costs are bytes weighted by the kernel; the copies are memory-bound,
     // so small stripes only add overhead
-    PARALLEL_MIN_COST = 1024*1024,
-    STRIPE_COST = 1024*1024
+    PARALLEL_MIN_لاگت = 1024*1024,
+    STRIPE_لاگت = 1024*1024
 };
 
-struct Plan
+ساخت Plan
 {
-    const uchar* src;
+    ثابت uchar* src;
     uchar* dst;
     size_t esz;
-    int dims;
-    int kind;
+    صحیح dims;
+    صحیح قسم;
     int64 size[MAX_VIEW_DIMS];
     ptrdiff_t sstep[MAX_VIEW_DIMS];
     ptrdiff_t dstep[MAX_VIEW_DIMS];
@@ -99,101 +99,101 @@ struct Plan
 
     // an item is a chunk of an innermost row, or a tile for KIND_TRANSPOSE
     int64 nrows, chunk, nchunks;
-    bool chunkMajor;
+    منطقی chunkMajor;
     int64 tilesA, tilesB;
     int64 nitems;
-    double cost;
+    دوہرا لاگت_2;
 };
 
-static void swapAxes(Plan& p, int i, int j)
+ساکن خالی تبادلہ_Axes(Plan& p, صحیح i, صحیح j)
 {
     std::swap(p.size[i], p.size[j]);
     std::swap(p.sstep[i], p.sstep[j]);
     std::swap(p.dstep[i], p.dstep[j]);
 }
 
-static void moveAxis(Plan& p, int k, int to)
+ساکن خالی moveAxis(Plan& p, صحیح k, صحیح مقصد)
 {
-    for (int i = k; i < to; i++)
-        swapAxes(p, i, i + 1);
+    برائے (صحیح i = k; i < مقصد; i++)
+        تبادلہ_Axes(p, i, i + 1);
 }
 
 // OR of the base pointers and all the steps: its low bits give the common alignment.
-static size_t addressBits(const Plan& p)
+ساکن size_t پتہ_بٹ(ثابت Plan& p)
 {
     size_t addrs = (size_t)p.src | (size_t)p.dst;
-    for (int i = 0; i < p.dims; i++)
+    برائے (صحیح i = 0; i < p.dims; i++)
         addrs |= (size_t)p.sstep[i] | (size_t)p.dstep[i];
-    return addrs;
+    واپس addrs;
 }
 
 // 2..4 planes via the cv::split / cv::merge HAL kernels
-static bool trySplitMerge(Plan& p)
+ساکن منطقی try_بانٹو_ملاؤ(Plan& p)
 {
-    const ptrdiff_t esz = (ptrdiff_t)p.esz;
-    const int L = p.dims - 1;
-    if (L < 1 || !(esz == 1 || esz == 2 || esz == 4 || esz == 8) || p.dstep[L] != esz)
-        return false;
-    if ((addressBits(p) & (esz - 1)) != 0)
-        return false;
+    ثابت ptrdiff_t esz = (ptrdiff_t)p.esz;
+    ثابت صحیح L = p.dims - 1;
+    اگر (L < 1 || !(esz == 1 || esz == 2 || esz == 4 || esz == 8) || p.dstep[L] != esz)
+        واپس جھوٹ;
+    اگر ((پتہ_بٹ(p) & (esz - 1)) != 0)
+        واپس جھوٹ;
 
     // split: axis k holds cn planes interleaved in the source
-    for (int k = L - 1; k >= 0; k--)
+    برائے (صحیح k = L - 1; k >= 0; k--)
     {
-        const int64 cn = p.size[k];
-        if (cn >= 2 && cn <= 4 && p.sstep[k] == esz && p.sstep[L] == cn*esz &&
+        ثابت int64 cn = p.size[k];
+        اگر (cn >= 2 && cn <= 4 && p.sstep[k] == esz && p.sstep[L] == cn*esz &&
             p.dstep[k] > 0 && p.dstep[k] % esz == 0)
         {
             moveAxis(p, k, L - 1);
-            p.kind = KIND_SPLIT;
-            return true;
+            p.قسم = قسم_بانٹو;
+            واپس سچ;
         }
     }
 
     // merge: the innermost axis holds cn planes interleaved in the destination
-    const int64 cn = p.size[L];
-    if (cn >= 2 && cn <= 4 && p.sstep[L] > 0 && p.sstep[L] % esz == 0)
+    ثابت int64 cn = p.size[L];
+    اگر (cn >= 2 && cn <= 4 && p.sstep[L] > 0 && p.sstep[L] % esz == 0)
     {
-        for (int k = L - 1; k >= 0; k--)
+        برائے (صحیح k = L - 1; k >= 0; k--)
         {
-            if (p.sstep[k] == esz && p.dstep[k] == cn*esz)
+            اگر (p.sstep[k] == esz && p.dstep[k] == cn*esz)
             {
                 moveAxis(p, k, L - 1);
-                p.kind = KIND_MERGE;
-                return true;
+                p.قسم = قسم_ملاؤ;
+                واپس سچ;
             }
         }
     }
-    return false;
+    واپس جھوٹ;
 }
 
 // Returns false when there is nothing to copy.
-static bool buildPlan(const View& s, const View& d, Plan& p)
+ساکن منطقی buildPlan(ثابت View& s, ثابت View& d, Plan& p)
 {
     CV_CheckEQ(s.esz, d.esz, "nd::copy: the element sizes must match");
     CV_Assert(s.esz > 0);
 
-    const ptrdiff_t esz = (ptrdiff_t)s.esz;
-    p.src = s.data;
-    p.dst = d.data;
+    ثابت ptrdiff_t esz = (ptrdiff_t)s.esz;
+    p.src = s.ڈیٹا;
+    p.dst = d.ڈیٹا;
     p.esz = s.esz;
 
     // Drop size-1 axes and make the destination steps positive
     // (reversing an axis in both views keeps the mapping).
-    int n = 0;
-    double total = 1;
-    for (int i = 0; i < s.dims; i++)
+    صحیح n = 0;
+    دوہرا کل = 1;
+    برائے (صحیح i = 0; i < s.dims; i++)
     {
         CV_CheckEQ(s.size[i], d.size[i], "nd::copy: the shapes must match");
-        int sz = s.size[i];
+        صحیح sz = s.size[i];
         CV_Assert(sz >= 0);
-        if (sz == 0)
-            return false;
-        total *= sz;
-        if (sz == 1)
-            continue;
-        ptrdiff_t ss = s.step[i], ds = d.step[i];
-        if (ds < 0)
+        اگر (sz == 0)
+            واپس جھوٹ;
+        کل *= sz;
+        اگر (sz == 1)
+            جاری;
+        ptrdiff_t ss = s.قدم[i], ds = d.قدم[i];
+        اگر (ds < 0)
         {
             p.src += (ptrdiff_t)(sz - 1)*ss;
             p.dst += (ptrdiff_t)(sz - 1)*ds;
@@ -207,20 +207,20 @@ static bool buildPlan(const View& s, const View& d, Plan& p)
     }
 
     // Write the destination as sequentially as possible.
-    for (int i = 1; i < n; i++)
-        for (int j = i; j > 0 && p.dstep[j-1] < p.dstep[j]; j--)
-            swapAxes(p, j-1, j);
+    برائے (صحیح i = 1; i < n; i++)
+        برائے (صحیح j = i; j > 0 && p.dstep[j-1] < p.dstep[j]; j--)
+            تبادلہ_Axes(p, j-1, j);
 
-    int m = 0;
-    for (int i = 0; i < n; i++)
+    صحیح m = 0;
+    برائے (صحیح i = 0; i < n; i++)
     {
-        if (m > 0 && p.sstep[m-1] == p.sstep[i]*p.size[i] && p.dstep[m-1] == p.dstep[i]*p.size[i])
+        اگر (m > 0 && p.sstep[m-1] == p.sstep[i]*p.size[i] && p.dstep[m-1] == p.dstep[i]*p.size[i])
         {
             p.size[m-1] *= p.size[i];
             p.sstep[m-1] = p.sstep[i];
             p.dstep[m-1] = p.dstep[i];
         }
-        else
+        ورنہ
         {
             p.size[m] = p.size[i];
             p.sstep[m] = p.sstep[i];
@@ -228,7 +228,7 @@ static bool buildPlan(const View& s, const View& d, Plan& p)
             m++;
         }
     }
-    if (m == 0)
+    اگر (m == 0)
     {
         p.size[0] = 1;
         p.sstep[0] = p.dstep[0] = esz;
@@ -236,176 +236,176 @@ static bool buildPlan(const View& s, const View& d, Plan& p)
     }
     p.dims = m;
 
-    const int L = m - 1;
-    p.tfunc = nullptr;
-    if (p.sstep[L] == esz && p.dstep[L] == esz)
-        p.kind = KIND_MEMCPY;
-    else if (p.sstep[L] == 0)
-        p.kind = KIND_FILL;
-    else if (!trySplitMerge(p))
+    ثابت صحیح L = m - 1;
+    p.tfunc = خالی_اشاریہ;
+    اگر (p.sstep[L] == esz && p.dstep[L] == esz)
+        p.قسم = قسم_MEMCPY;
+    ورنہ اگر (p.sstep[L] == 0)
+        p.قسم = قسم_FILL;
+    ورنہ اگر (!try_بانٹو_ملاؤ(p))
     {
-        p.kind = KIND_STRIDED;
+        p.قسم = قسم_STRIDED;
         // An outer axis contiguous in the source makes it a batched 2D transpose.
-        if (m >= 2 && p.dstep[L] == esz && p.sstep[L] > 0)
+        اگر (m >= 2 && p.dstep[L] == esz && p.sstep[L] > 0)
         {
-            int k = L - 1;
-            while (k >= 0 && p.sstep[k] != esz)
+            صحیح k = L - 1;
+            جب (k >= 0 && p.sstep[k] != esz)
                 k--;
             TransposeFunc f = getTransposeFunc(s.esz);
             // the kernels access the elements as uchar, ushort or int based types
-            const size_t align = std::min(s.esz & (0 - s.esz), (size_t)4);
+            ثابت size_t align = std::min(s.esz & (0 - s.esz), (size_t)4);
             // a short axis cannot fill SIMD registers; the gather is faster then
-            if (k >= 0 && f && p.size[k] >= 8 && (addressBits(p) & (align - 1)) == 0)
+            اگر (k >= 0 && f && p.size[k] >= 8 && (پتہ_بٹ(p) & (align - 1)) == 0)
             {
                 moveAxis(p, k, L - 1);
-                p.kind = KIND_TRANSPOSE;
+                p.قسم = قسم_TRANSPOSE;
                 p.tfunc = f;
             }
         }
     }
 
-    const double bytes = total*(double)esz;
-    if (p.kind == KIND_SPLIT || p.kind == KIND_MERGE)
+    ثابت دوہرا بائٹیں = کل*(دوہرا)esz;
+    اگر (p.قسم == قسم_بانٹو || p.قسم == قسم_ملاؤ)
     {
-        const int X = p.kind == KIND_SPLIT ? L : L - 1;
+        ثابت صحیح X = p.قسم == قسم_بانٹو ? L : L - 1;
         int64 nouter = 1;
-        for (int i = 0; i < L - 1; i++)
+        برائے (صحیح i = 0; i < L - 1; i++)
             nouter *= p.size[i];
         p.nrows = nouter;
-        p.chunk = SPLIT_CHUNK;
+        p.chunk = بانٹو_CHUNK;
         p.nchunks = (p.size[X] + p.chunk - 1)/p.chunk;
-        p.chunkMajor = false;
+        p.chunkMajor = جھوٹ;
         p.tilesA = p.tilesB = 1;
         p.nitems = nouter*p.nchunks;
-        p.cost = bytes*2;
+        p.لاگت_2 = بائٹیں*2;
     }
-    else if (p.kind == KIND_TRANSPOSE)
+    ورنہ اگر (p.قسم == قسم_TRANSPOSE)
     {
         int64 nouter = 1;
-        for (int i = 0; i < L - 1; i++)
+        برائے (صحیح i = 0; i < L - 1; i++)
             nouter *= p.size[i];
         p.tilesA = (p.size[L-1] + TRANSPOSE_TILE - 1)/TRANSPOSE_TILE;
         p.tilesB = (p.size[L] + TRANSPOSE_TILE - 1)/TRANSPOSE_TILE;
         p.nrows = nouter;
         p.chunk = p.nchunks = 1;
-        p.chunkMajor = false;
+        p.chunkMajor = جھوٹ;
         p.nitems = nouter*p.tilesA*p.tilesB;
-        p.cost = bytes*3;
+        p.لاگت_2 = بائٹیں*3;
     }
-    else
+    ورنہ
     {
         int64 nrows = 1;
-        for (int i = 0; i < L; i++)
+        برائے (صحیح i = 0; i < L; i++)
             nrows *= p.size[i];
-        const int64 rowLen = p.size[L];
-        const double rowBytes = (double)rowLen*esz;
-        const ptrdiff_t sstepL = std::abs(p.sstep[L]);
+        ثابت int64 صف_Len = p.size[L];
+        ثابت دوہرا صف_بائٹیں = (دوہرا)صف_Len*esz;
+        ثابت ptrdiff_t sstepL = std::مطلق_قدر(p.sstep[L]);
         p.nrows = nrows;
         p.nchunks = 1;
-        p.chunk = rowLen;
-        p.chunkMajor = false;
-        if (p.kind == KIND_STRIDED && L > 0 && nrows <= 64 && std::abs(p.sstep[L-1]) < sstepL &&
-            (double)rowLen*sstepL > 2.0*GATHER_BLOCK_BYTES)
+        p.chunk = صف_Len;
+        p.chunkMajor = جھوٹ;
+        اگر (p.قسم == قسم_STRIDED && L > 0 && nrows <= 64 && std::مطلق_قدر(p.sstep[L-1]) < sstepL &&
+            (دوہرا)صف_Len*sstepL > 2.0*GATHER_بلاک_بائٹیں)
         {
             // Rows reading interleaved source data (NHWC -> NCHW with a small C):
             // go chunk by chunk so that the rows share the cached source lines.
-            p.chunk = std::max((int64)16, (int64)(GATHER_BLOCK_BYTES/sstepL));
-            p.nchunks = (rowLen + p.chunk - 1)/p.chunk;
-            p.chunkMajor = true;
+            p.chunk = std::max((int64)16, (int64)(GATHER_بلاک_بائٹیں/sstepL));
+            p.nchunks = (صف_Len + p.chunk - 1)/p.chunk;
+            p.chunkMajor = سچ;
         }
-        else if (nrows < 64 && rowBytes >= 2.0*ROW_CHUNK_BYTES)
+        ورنہ اگر (nrows < 64 && صف_بائٹیں >= 2.0*صف_CHUNK_بائٹیں)
         {
             // few long rows: split them to have something to parallelize
-            int64 nch = std::min((int64)(rowBytes/ROW_CHUNK_BYTES), (int64)1024);
-            p.chunk = (rowLen + nch - 1)/nch;
-            p.nchunks = (rowLen + p.chunk - 1)/p.chunk;
+            int64 nch = std::min((int64)(صف_بائٹیں/صف_CHUNK_بائٹیں), (int64)1024);
+            p.chunk = (صف_Len + nch - 1)/nch;
+            p.nchunks = (صف_Len + p.chunk - 1)/p.chunk;
         }
         p.tilesA = p.tilesB = 1;
         p.nitems = nrows*p.nchunks;
-        p.cost = p.kind == KIND_MEMCPY ? bytes : bytes*4;
+        p.لاگت_2 = p.قسم == قسم_MEMCPY ? بائٹیں : بائٹیں*4;
     }
-    return true;
+    واپس سچ;
 }
 
-template<typename T> static inline bool isAligned(const void* s, const void* d, ptrdiff_t ss, ptrdiff_t ds)
+سانچہ<قسم_نام T> ساکن اندرونی منطقی isAligned(ثابت خالی* s, ثابت خالی* d, ptrdiff_t ss, ptrdiff_t ds)
 {
-    return (((size_t)s | (size_t)d | (size_t)ss | (size_t)ds) & (alignof(T) - 1)) == 0;
+    واپس (((size_t)s | (size_t)d | (size_t)ss | (size_t)ds) & (alignof(T) - 1)) == 0;
 }
 
-template<typename T> static void copyStrided_(const uchar* s, ptrdiff_t ss, uchar* d, ptrdiff_t ds, int64 n)
+سانچہ<قسم_نام T> ساکن خالی copyStrided_(ثابت uchar* s, ptrdiff_t ss, uchar* d, ptrdiff_t ds, int64 n)
 {
     int64 i = 0;
-    for (; i + 4 <= n; i += 4)
+    برائے (; i + 4 <= n; i += 4)
     {
-        T t0 = *(const T*)s, t1 = *(const T*)(s + ss);
-        T t2 = *(const T*)(s + ss*2), t3 = *(const T*)(s + ss*3);
+        T t0 = *(ثابت T*)s, t1 = *(ثابت T*)(s + ss);
+        T t2 = *(ثابت T*)(s + ss*2), t3 = *(ثابت T*)(s + ss*3);
         *(T*)d = t0; *(T*)(d + ds) = t1;
         *(T*)(d + ds*2) = t2; *(T*)(d + ds*3) = t3;
         s += ss*4;
         d += ds*4;
     }
-    for (; i < n; i++, s += ss, d += ds)
-        *(T*)d = *(const T*)s;
+    برائے (; i < n; i++, s += ss, d += ds)
+        *(T*)d = *(ثابت T*)s;
 }
 
-template<typename T> static void fill_(const uchar* s, uchar* d, ptrdiff_t ds, int64 n)
+سانچہ<قسم_نام T> ساکن خالی fill_(ثابت uchar* s, uchar* d, ptrdiff_t ds, int64 n)
 {
-    const T v = *(const T*)s;
-    for (int64 i = 0; i < n; i++, d += ds)
+    ثابت T v = *(ثابت T*)s;
+    برائے (int64 i = 0; i < n; i++, d += ds)
         *(T*)d = v;
 }
 
-struct Elem16 { uint64_t a, b; };
+ساخت Elem16 { uint64_t a, b; };
 
 // KIND_FILL and KIND_STRIDED
-static void copyRow(const Plan& p, const uchar* s, uchar* d, int64 n)
+ساکن خالی copy_صف(ثابت Plan& p, ثابت uchar* s, uchar* d, int64 n)
 {
-    const size_t esz = p.esz;
-    const int L = p.dims - 1;
-    const ptrdiff_t ss = p.sstep[L], ds = p.dstep[L];
+    ثابت size_t esz = p.esz;
+    ثابت صحیح L = p.dims - 1;
+    ثابت ptrdiff_t ss = p.sstep[L], ds = p.dstep[L];
 
-    if (p.kind == KIND_FILL)
+    اگر (p.قسم == قسم_FILL)
     {
-        if (esz == 1 && ds == 1)
+        اگر (esz == 1 && ds == 1)
             memset(d, *s, (size_t)n);
-        else if (esz == 2 && isAligned<uint16_t>(s, d, 0, ds))
+        ورنہ اگر (esz == 2 && isAligned<uint16_t>(s, d, 0, ds))
             fill_<uint16_t>(s, d, ds, n);
-        else if (esz == 4 && isAligned<uint32_t>(s, d, 0, ds))
+        ورنہ اگر (esz == 4 && isAligned<uint32_t>(s, d, 0, ds))
             fill_<uint32_t>(s, d, ds, n);
-        else if (esz == 8 && isAligned<uint64_t>(s, d, 0, ds))
+        ورنہ اگر (esz == 8 && isAligned<uint64_t>(s, d, 0, ds))
             fill_<uint64_t>(s, d, ds, n);
-        else
-            for (int64 i = 0; i < n; i++, d += ds)
-                memcpy(d, s, esz);
-        return;
+        ورنہ
+            برائے (int64 i = 0; i < n; i++, d += ds)
+                حافظہ_نقل(d, s, esz);
+        واپس;
     }
 
-    if (esz == 1)
+    اگر (esz == 1)
         copyStrided_<uchar>(s, ss, d, ds, n);
-    else if (esz == 2 && isAligned<uint16_t>(s, d, ss, ds))
+    ورنہ اگر (esz == 2 && isAligned<uint16_t>(s, d, ss, ds))
         copyStrided_<uint16_t>(s, ss, d, ds, n);
-    else if (esz == 4 && isAligned<uint32_t>(s, d, ss, ds))
+    ورنہ اگر (esz == 4 && isAligned<uint32_t>(s, d, ss, ds))
         copyStrided_<uint32_t>(s, ss, d, ds, n);
-    else if (esz == 8 && isAligned<uint64_t>(s, d, ss, ds))
+    ورنہ اگر (esz == 8 && isAligned<uint64_t>(s, d, ss, ds))
         copyStrided_<uint64_t>(s, ss, d, ds, n);
-    else if (esz == 16 && isAligned<uint64_t>(s, d, ss, ds))
+    ورنہ اگر (esz == 16 && isAligned<uint64_t>(s, d, ss, ds))
         copyStrided_<Elem16>(s, ss, d, ds, n);
-    else
-        for (int64 i = 0; i < n; i++, s += ss, d += ds)
-            memcpy(d, s, esz);
+    ورنہ
+        برائے (int64 i = 0; i < n; i++, s += ss, d += ds)
+            حافظہ_نقل(d, s, esz);
 }
 
 // Offsets of the given flat index over the first `naxes` axes.
-static void decode(const Plan& p, int naxes, int64 idx, int64* counters,
-                   const uchar*& s, uchar*& d)
+ساکن خالی decode(ثابت Plan& p, صحیح naxes, int64 idx, int64* counters,
+                   ثابت uchar*& s, uchar*& d)
 {
     s = p.src;
     d = p.dst;
-    for (int k = naxes - 1; k >= 0; k--)
+    برائے (صحیح k = naxes - 1; k >= 0; k--)
     {
         int64 q = idx / p.size[k];
         int64 i = idx - q*p.size[k];
-        if (counters)
+        اگر (counters)
             counters[k] = i;
         s += i*p.sstep[k];
         d += i*p.dstep[k];
@@ -413,61 +413,61 @@ static void decode(const Plan& p, int naxes, int64 idx, int64* counters,
     }
 }
 
-template<bool MEMCPY> static inline void copyRowT(const Plan& p, const uchar* s, uchar* d, int64 n)
+سانچہ<منطقی MEMCPY> ساکن اندرونی خالی copy_صف_T(ثابت Plan& p, ثابت uchar* s, uchar* d, int64 n)
 {
-    if (MEMCPY)
-        memcpy(d, s, (size_t)n*p.esz);
-    else
-        copyRow(p, s, d, n);
+    اگر (MEMCPY)
+        حافظہ_نقل(d, s, (size_t)n*p.esz);
+    ورنہ
+        copy_صف(p, s, d, n);
 }
 
-template<bool MEMCPY> static void runRows(const Plan& p, int64 i0, int64 i1)
+سانچہ<منطقی MEMCPY> ساکن خالی تسلسل_صفیں(ثابت Plan& p, int64 i0, int64 i1)
 {
-    const int L = p.dims - 1;
-    const int64 nch = p.nchunks, rowLen = p.size[L];
-    const ptrdiff_t sstepL = p.sstep[L], dstepL = p.dstep[L];
-    const uchar* s;
+    ثابت صحیح L = p.dims - 1;
+    ثابت int64 nch = p.nchunks, صف_Len = p.size[L];
+    ثابت ptrdiff_t sstepL = p.sstep[L], dstepL = p.dstep[L];
+    ثابت uchar* s;
     uchar* d;
 
-    if (p.chunkMajor)
+    اگر (p.chunkMajor)
     {
-        for (int64 it = i0; it < i1; it++)
+        برائے (int64 it = i0; it < i1; it++)
         {
-            int64 ch = it / p.nrows, row = it - ch*p.nrows;
-            int64 e0 = ch*p.chunk, e1 = std::min(e0 + p.chunk, rowLen);
-            decode(p, L, row, nullptr, s, d);
-            copyRowT<MEMCPY>(p, s + e0*sstepL, d + e0*dstepL, e1 - e0);
+            int64 ch = it / p.nrows, صف = it - ch*p.nrows;
+            int64 e0 = ch*p.chunk, e1 = std::min(e0 + p.chunk, صف_Len);
+            decode(p, L, صف, خالی_اشاریہ, s, d);
+            copy_صف_T<MEMCPY>(p, s + e0*sstepL, d + e0*dstepL, e1 - e0);
         }
-        return;
+        واپس;
     }
 
     int64 counters[MAX_VIEW_DIMS];
     int64 ch = i0 % nch;
     decode(p, L, i0 / nch, counters, s, d);
 
-    if (nch == 1 && L == 1)
+    اگر (nch == 1 && L == 1)
     {
-        const ptrdiff_t ss = p.sstep[0], ds = p.dstep[0];
-        for (int64 it = i0; it < i1; it++, s += ss, d += ds)
-            copyRowT<MEMCPY>(p, s, d, rowLen);
-        return;
+        ثابت ptrdiff_t ss = p.sstep[0], ds = p.dstep[0];
+        برائے (int64 it = i0; it < i1; it++, s += ss, d += ds)
+            copy_صف_T<MEMCPY>(p, s, d, صف_Len);
+        واپس;
     }
 
-    for (int64 it = i0; it < i1; )
+    برائے (int64 it = i0; it < i1; )
     {
-        int64 chEnd = std::min(nch, ch + (i1 - it));
-        int64 e0 = ch*p.chunk, e1 = std::min(chEnd*p.chunk, rowLen);
-        copyRowT<MEMCPY>(p, s + e0*sstepL, d + e0*dstepL, e1 - e0);
-        it += chEnd - ch;
-        if (chEnd < nch)
-            break;
+        int64 ch_انتہا = std::min(nch, ch + (i1 - it));
+        int64 e0 = ch*p.chunk, e1 = std::min(ch_انتہا*p.chunk, صف_Len);
+        copy_صف_T<MEMCPY>(p, s + e0*sstepL, d + e0*dstepL, e1 - e0);
+        it += ch_انتہا - ch;
+        اگر (ch_انتہا < nch)
+            توڑو;
         ch = 0;
-        for (int k = L - 1; k >= 0; k--)
+        برائے (صحیح k = L - 1; k >= 0; k--)
         {
             s += p.sstep[k];
             d += p.dstep[k];
-            if (++counters[k] < p.size[k])
-                break;
+            اگر (++counters[k] < p.size[k])
+                توڑو;
             s -= p.size[k]*p.sstep[k];
             d -= p.size[k]*p.dstep[k];
             counters[k] = 0;
@@ -475,242 +475,242 @@ template<bool MEMCPY> static void runRows(const Plan& p, int64 i0, int64 i1)
     }
 }
 
-static void runTranspose(const Plan& p, int64 i0, int64 i1)
+ساکن خالی تسلسل_Transpose(ثابت Plan& p, int64 i0, int64 i1)
 {
-    const int A = p.dims - 2, B = p.dims - 1;
-    const int64 ntiles = p.tilesA*p.tilesB;
-    for (int64 it = i0; it < i1; it++)
+    ثابت صحیح A = p.dims - 2, B = p.dims - 1;
+    ثابت int64 ntiles = p.tilesA*p.tilesB;
+    برائے (int64 it = i0; it < i1; it++)
     {
         int64 o = it / ntiles, t = it - o*ntiles;
         int64 ta = t / p.tilesB, tb = t - ta*p.tilesB;
-        const uchar* s;
+        ثابت uchar* s;
         uchar* d;
-        decode(p, A, o, nullptr, s, d);
+        decode(p, A, o, خالی_اشاریہ, s, d);
         int64 a0 = ta*TRANSPOSE_TILE, b0 = tb*TRANSPOSE_TILE;
-        int wa = (int)std::min((int64)TRANSPOSE_TILE, p.size[A] - a0);
-        int hb = (int)std::min((int64)TRANSPOSE_TILE, p.size[B] - b0);
+        صحیح wa = (صحیح)std::min((int64)TRANSPOSE_TILE, p.size[A] - a0);
+        صحیح hb = (صحیح)std::min((int64)TRANSPOSE_TILE, p.size[B] - b0);
         s += a0*p.sstep[A] + b0*p.sstep[B];
         d += a0*p.dstep[A] + b0*p.dstep[B];
-        if (cv_hal_transpose2d(s, (size_t)p.sstep[B], d, (size_t)p.dstep[A], wa, hb, (int)p.esz) == CV_HAL_ERROR_OK)
-            continue;
-        p.tfunc(s, (size_t)p.sstep[B], d, (size_t)p.dstep[A], Size(wa, hb));
+        اگر (cv_hal_transpose2d(s, (size_t)p.sstep[B], d, (size_t)p.dstep[A], wa, hb, (صحیح)p.esz) == CV_HAL_ERROR_OK)
+            جاری;
+        p.tfunc(s, (size_t)p.sstep[B], d, (size_t)p.dstep[A], سائز(wa, hb));
     }
 }
 
-static void runSplitMerge(const Plan& p, int64 i0, int64 i1)
+ساکن خالی تسلسل_بانٹو_ملاؤ(ثابت Plan& p, int64 i0, int64 i1)
 {
-    const int L = p.dims - 1;
-    const bool isSplit = p.kind == KIND_SPLIT;
-    const int C = isSplit ? L - 1 : L;    // the plane axis
-    const int X = isSplit ? L : L - 1;    // the long axis
-    const int cn = (int)p.size[C];
-    const size_t esz = p.esz;
-    for (int64 it = i0; it < i1; it++)
+    ثابت صحیح L = p.dims - 1;
+    ثابت منطقی is_بانٹو = p.قسم == قسم_بانٹو;
+    ثابت صحیح C = is_بانٹو ? L - 1 : L;    // the plane axis
+    ثابت صحیح X = is_بانٹو ? L : L - 1;    // the long axis
+    ثابت صحیح cn = (صحیح)p.size[C];
+    ثابت size_t esz = p.esz;
+    برائے (int64 it = i0; it < i1; it++)
     {
         int64 o = it / p.nchunks, ch = it - o*p.nchunks;
-        const uchar* s;
+        ثابت uchar* s;
         uchar* d;
-        decode(p, L - 1, o, nullptr, s, d);
-        const int64 e0 = ch*p.chunk;
-        const int len = (int)std::min(p.chunk, p.size[X] - e0);
+        decode(p, L - 1, o, خالی_اشاریہ, s, d);
+        ثابت int64 e0 = ch*p.chunk;
+        ثابت صحیح len = (صحیح)std::min(p.chunk, p.size[X] - e0);
         s += e0*p.sstep[X];
         d += e0*p.dstep[X];
-        if (isSplit)
+        اگر (is_بانٹو)
         {
             uchar* dptr[4];
-            for (int c = 0; c < cn; c++)
+            برائے (صحیح c = 0; c < cn; c++)
                 dptr[c] = d + c*p.dstep[C];
-            if (esz == 1) hal::split8u(s, dptr, len, cn);
-            else if (esz == 2) hal::split16u((const ushort*)s, (ushort**)dptr, len, cn);
-            else if (esz == 4) hal::split32s((const int*)s, (int**)dptr, len, cn);
-            else hal::split64s((const int64*)s, (int64**)dptr, len, cn);
+            اگر (esz == 1) hal::split8u(s, dptr, len, cn);
+            ورنہ اگر (esz == 2) hal::split16u((ثابت ushort*)s, (ushort**)dptr, len, cn);
+            ورنہ اگر (esz == 4) hal::split32s((ثابت صحیح*)s, (صحیح**)dptr, len, cn);
+            ورنہ hal::split64s((ثابت int64*)s, (int64**)dptr, len, cn);
         }
-        else
+        ورنہ
         {
-            const uchar* sptr[4];
-            for (int c = 0; c < cn; c++)
+            ثابت uchar* sptr[4];
+            برائے (صحیح c = 0; c < cn; c++)
                 sptr[c] = s + c*p.sstep[C];
-            if (esz == 1) hal::merge8u(sptr, d, len, cn);
-            else if (esz == 2) hal::merge16u((const ushort**)sptr, (ushort*)d, len, cn);
-            else if (esz == 4) hal::merge32s((const int**)sptr, (int*)d, len, cn);
-            else hal::merge64s((const int64**)sptr, (int64*)d, len, cn);
+            اگر (esz == 1) hal::merge8u(sptr, d, len, cn);
+            ورنہ اگر (esz == 2) hal::merge16u((ثابت ushort**)sptr, (ushort*)d, len, cn);
+            ورنہ اگر (esz == 4) hal::merge32s((ثابت صحیح**)sptr, (صحیح*)d, len, cn);
+            ورنہ hal::merge64s((ثابت int64**)sptr, (int64*)d, len, cn);
         }
     }
 }
 
-static void runPlan(const Plan& p, int64 i0, int64 i1)
+ساکن خالی تسلسل_Plan(ثابت Plan& p, int64 i0, int64 i1)
 {
-    if (p.kind == KIND_SPLIT || p.kind == KIND_MERGE)
-        runSplitMerge(p, i0, i1);
-    else if (p.kind == KIND_TRANSPOSE)
-        runTranspose(p, i0, i1);
-    else if (p.kind == KIND_MEMCPY)
-        runRows<true>(p, i0, i1);
-    else
-        runRows<false>(p, i0, i1);
+    اگر (p.قسم == قسم_بانٹو || p.قسم == قسم_ملاؤ)
+        تسلسل_بانٹو_ملاؤ(p, i0, i1);
+    ورنہ اگر (p.قسم == قسم_TRANSPOSE)
+        تسلسل_Transpose(p, i0, i1);
+    ورنہ اگر (p.قسم == قسم_MEMCPY)
+        تسلسل_صفیں<سچ>(p, i0, i1);
+    ورنہ
+        تسلسل_صفیں<جھوٹ>(p, i0, i1);
 }
 
 // Plans over the same rows (concat inputs, split outputs) run in lockstep, block by block,
 // so that the shared destination (or source) is accessed sequentially.
-static bool canRunInLockstep(const Plan* plans, size_t np)
+ساکن منطقی can_تسلسل_اندر_Lockstep(ثابت Plan* plans, size_t np)
 {
-    if (np < 2)
-        return false;
-    const Plan& p0 = plans[0];
-    for (size_t k = 0; k < np; k++)
+    اگر (np < 2)
+        واپس جھوٹ;
+    ثابت Plan& p0 = plans[0];
+    برائے (size_t k = 0; k < np; k++)
     {
-        const Plan& p = plans[k];
-        if (p.kind == KIND_TRANSPOSE || p.kind == KIND_SPLIT || p.kind == KIND_MERGE ||
+        ثابت Plan& p = plans[k];
+        اگر (p.قسم == قسم_TRANSPOSE || p.قسم == قسم_بانٹو || p.قسم == قسم_ملاؤ ||
             p.chunkMajor || p.nchunks != 1 || p.dims != p0.dims)
-            return false;
-        for (int i = 0; i < p.dims - 1; i++)
-            if (p.size[i] != p0.size[i])
-                return false;
+            واپس جھوٹ;
+        برائے (صحیح i = 0; i < p.dims - 1; i++)
+            اگر (p.size[i] != p0.size[i])
+                واپس جھوٹ;
     }
-    return true;
+    واپس سچ;
 }
 
-static void runPlans(const Plan* plans, size_t np)
+ساکن خالی تسلسل_Plans(ثابت Plan* plans, size_t np)
 {
-    if (np == 0)
-        return;
-    AutoBuffer<int64, 16> ofs(np + 1);
+    اگر (np == 0)
+        واپس;
+    Auto_بفر<int64, 16> ofs(np + 1);
     ofs[0] = 0;
-    double cost = 0, rowBytes = 0;
-    for (size_t k = 0; k < np; k++)
+    دوہرا لاگت_2 = 0, صف_بائٹیں = 0;
+    برائے (size_t k = 0; k < np; k++)
     {
         ofs[k+1] = ofs[k] + plans[k].nitems;
-        cost += plans[k].cost;
-        rowBytes += (double)plans[k].size[plans[k].dims - 1]*plans[k].esz;
+        لاگت_2 += plans[k].لاگت_2;
+        صف_بائٹیں += (دوہرا)plans[k].size[plans[k].dims - 1]*plans[k].esz;
     }
 
-    const bool lockstep = canRunInLockstep(plans, np);
-    const int64 total = lockstep ? plans[0].nrows : ofs[np];
-    const int64 blockRows = std::max((int64)1, (int64)(16*1024/std::max(rowBytes, 1.)));
+    ثابت منطقی lockstep = can_تسلسل_اندر_Lockstep(plans, np);
+    ثابت int64 کل = lockstep ? plans[0].nrows : ofs[np];
+    ثابت int64 بلاک_صفیں_2 = std::max((int64)1, (int64)(16*1024/std::max(صف_بائٹیں, 1.)));
 
-    auto body = [&](int64 a, int64 b)
+    خودکار body = [&](int64 a, int64 b)
     {
-        if (lockstep)
+        اگر (lockstep)
         {
-            for (int64 r = a; r < b; r += blockRows)
+            برائے (int64 r = a; r < b; r += بلاک_صفیں_2)
             {
-                int64 re = std::min(b, r + blockRows);
-                for (size_t k = 0; k < np; k++)
-                    runPlan(plans[k], r, re);
+                int64 re = std::min(b, r + بلاک_صفیں_2);
+                برائے (size_t k = 0; k < np; k++)
+                    تسلسل_Plan(plans[k], r, re);
             }
-            return;
+            واپس;
         }
-        size_t k = std::upper_bound(ofs.data(), ofs.data() + np + 1, a) - ofs.data() - 1;
-        while (a < b)
+        size_t k = std::upper_bound(ofs.ڈیٹا(), ofs.ڈیٹا() + np + 1, a) - ofs.ڈیٹا() - 1;
+        جب (a < b)
         {
             int64 e = std::min(b, ofs[k+1]);
-            runPlan(plans[k], a - ofs[k], e - ofs[k]);
+            تسلسل_Plan(plans[k], a - ofs[k], e - ofs[k]);
             a = e;
             k++;
         }
     };
 
-    if (cost < PARALLEL_MIN_COST || total < 2 || getNumThreads() <= 1)
+    اگر (لاگت_2 < PARALLEL_MIN_لاگت || کل < 2 || get_عدد_دھاگے() <= 1)
     {
-        body(0, total);
-        return;
+        body(0, کل);
+        واپس;
     }
 
     // grouped so that the range fits into int
-    const int64 ngroups = std::min(total, (int64)1 << 20);
-    const double nstripes = std::min((double)ngroups, std::max(2.0, cost/STRIPE_COST));
-    parallel_for_(Range(0, (int)ngroups), [&](const Range& r)
+    ثابت int64 ngroups = std::min(کل, (int64)1 << 20);
+    ثابت دوہرا nstripes = std::min((دوہرا)ngroups, std::max(2.0, لاگت_2/STRIPE_لاگت));
+    parallel_for_(Range(0, (صحیح)ngroups), [&](ثابت Range& r)
     {
-        body(r.start*total/ngroups, r.end*total/ngroups);
+        body(r.آغاز*کل/ngroups, r.end*کل/ngroups);
     }, nstripes);
 }
 
 // Address range [lo, hi) touched by the view.
-static void viewRange(const View& v, const uchar*& lo, const uchar*& hi)
+ساکن خالی viewRange(ثابت View& v, ثابت uchar*& lo, ثابت uchar*& hi)
 {
     ptrdiff_t a = 0, b = 0;
-    for (int i = 0; i < v.dims; i++)
+    برائے (صحیح i = 0; i < v.dims; i++)
     {
-        ptrdiff_t ext = (ptrdiff_t)(v.size[i] - 1)*v.step[i];
-        if (ext < 0) a += ext; else b += ext;
+        ptrdiff_t ext = (ptrdiff_t)(v.size[i] - 1)*v.قدم[i];
+        اگر (ext < 0) a += ext; ورنہ b += ext;
     }
-    lo = v.data + a;
-    hi = v.data + b + v.esz;
+    lo = v.ڈیٹا + a;
+    hi = v.ڈیٹا + b + v.esz;
 }
 
-static bool hasZeroSize(const View& v)
+ساکن منطقی has_Zero_سائز(ثابت View& v)
 {
-    for (int i = 0; i < v.dims; i++)
-        if (v.size[i] == 0)
-            return true;
-    return false;
+    برائے (صحیح i = 0; i < v.dims; i++)
+        اگر (v.size[i] == 0)
+            واپس سچ;
+    واپس جھوٹ;
 }
 
-static bool sameMapping(const View& s, const View& d)
+ساکن منطقی sameMapping(ثابت View& s, ثابت View& d)
 {
-    if (s.data != d.data)
-        return false;
-    for (int i = 0; i < s.dims; i++)
-        if (s.size[i] > 1 && s.step[i] != d.step[i])
-            return false;
-    return true;
+    اگر (s.ڈیٹا != d.ڈیٹا)
+        واپس جھوٹ;
+    برائے (صحیح i = 0; i < s.dims; i++)
+        اگر (s.size[i] > 1 && s.قدم[i] != d.قدم[i])
+            واپس جھوٹ;
+    واپس سچ;
 }
 
-static bool overlap(const View& s, const View& d)
+ساکن منطقی overlap(ثابت View& s, ثابت View& d)
 {
-    const uchar *slo, *shi, *dlo, *dhi;
+    ثابت uchar *slo, *shi, *dlo, *dhi;
     viewRange(s, slo, shi);
     viewRange(d, dlo, dhi);
-    return slo < dhi && dlo < shi;
+    واپس slo < dhi && dlo < shi;
 }
 
 } // namespace
 
-void copyBatch(const View* src, const View* dst, int n)
+خالی copyBatch(ثابت View* src, ثابت View* dst, صحیح n)
 {
     CV_Assert(n >= 0);
-    AutoBuffer<Plan, 4> plans(n);
+    Auto_بفر<Plan, 4> plans(n);
     size_t np = 0;
-    std::vector<AutoBuffer<uchar> > temps;
+    std::vector<Auto_بفر<uchar> > temps;
     temps.reserve(n);  // the views below point into the buffers, so they must not move
 
-    for (int i = 0; i < n; i++)
+    برائے (صحیح i = 0; i < n; i++)
     {
         View s = src[i];
-        const View& d = dst[i];
+        ثابت View& d = dst[i];
         CV_CheckEQ(s.dims, d.dims, "nd::copy: the number of dimensions must match");
-        CV_CheckLE(s.dims, (int)MAX_VIEW_DIMS, "nd::copy: too many dimensions");
-        if (hasZeroSize(s) || sameMapping(s, d))
-            continue;
+        CV_CheckLE(s.dims, (صحیح)MAX_VIEW_DIMS, "nd::copy: too many dimensions");
+        اگر (has_Zero_سائز(s) || sameMapping(s, d))
+            جاری;
         // All the copies run after this loop, so a source that overlaps any of the
         // destinations is saved first.
-        bool needTemp = false;
-        for (int j = 0; j < n && !needTemp; j++)
-            needTemp = !hasZeroSize(dst[j]) && overlap(s, dst[j]);
-        if (needTemp)
+        منطقی need_عارضی = جھوٹ;
+        برائے (صحیح j = 0; j < n && !need_عارضی; j++)
+            need_عارضی = !has_Zero_سائز(dst[j]) && overlap(s, dst[j]);
+        اگر (need_عارضی)
         {
-            size_t total = 1;
-            for (int k = 0; k < s.dims; k++)
-                total *= (size_t)s.size[k];
-            temps.emplace_back(total*s.esz);
+            size_t کل = 1;
+            برائے (صحیح k = 0; k < s.dims; k++)
+                کل *= (size_t)s.size[k];
+            temps.emplace_back(کل*s.esz);
             View t = s;
-            t.data = temps.back().data();
+            t.ڈیٹا = temps.back().ڈیٹا();
             ptrdiff_t st = (ptrdiff_t)s.esz;
-            for (int k = s.dims - 1; k >= 0; k--)
+            برائے (صحیح k = s.dims - 1; k >= 0; k--)
             {
-                t.step[k] = st;
+                t.قدم[k] = st;
                 st *= s.size[k];
             }
             copy(s, t);
             s = t;
         }
-        if (buildPlan(s, d, plans[np]))
+        اگر (buildPlan(s, d, plans[np]))
             np++;
     }
-    runPlans(plans.data(), np);
+    تسلسل_Plans(plans.ڈیٹا(), np);
 }
 
-void copy(const View& src, const View& dst)
+خالی copy(ثابت View& src, ثابت View& dst)
 {
     copyBatch(&src, &dst, 1);
 }

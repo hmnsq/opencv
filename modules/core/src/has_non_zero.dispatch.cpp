@@ -3,105 +3,105 @@
 // of this distribution and at http://opencv.org/license.html
 
 
-#include "precomp.hpp"
-#include "opencl_kernels_core.hpp"
-#include "stat.hpp"
+#شامل "precomp.hpp"
+#شامل "opencl_kernels_core.hpp"
+#شامل "stat.hpp"
 
-#include "has_non_zero.simd.hpp"
-#include "has_non_zero.simd_declarations.hpp" // defines CV_CPU_DISPATCH_MODES_ALL=AVX2,...,BASELINE based on CMakeLists.txt content
+#شامل "has_non_zero.simd.hpp"
+#شامل "has_non_zero.simd_declarations.hpp" // defines CV_CPU_DISPATCH_MODES_ALL=AVX2,...,BASELINE based on CMakeLists.txt content
 
-namespace cv {
+نامخلا cv {
 
-static HasNonZeroFunc getHasNonZeroFunc(int depth)
+ساکن HasNonZeroFunc getHasNonZeroFunc(صحیح گہرائی)
 {
     CV_INSTRUMENT_REGION();
-    CV_CPU_DISPATCH(getHasNonZeroFunc, (depth),
+    CV_CPU_DISPATCH(getHasNonZeroFunc, (گہرائی),
         CV_CPU_DISPATCH_MODES_ALL);
 }
 
-#ifdef HAVE_OPENCL
-static bool ocl_hasNonZero( InputArray _src, bool & res )
+#اگر_تعریف_شدہ HAVE_OPENCL
+ساکن منطقی ocl_hasNonZero( داخلہ_Array _src, منطقی & res )
 {
-    int type = _src.type(), depth = CV_MAT_DEPTH(type), kercn = ocl::predictOptimalVectorWidth(_src);
-    bool doubleSupport = ocl::Device::getDefault().doubleFPConfig() > 0;
+    صحیح type = _src.type(), گہرائی = CV_MAT_گہرائی(type), kercn = ocl::predict_Optimal_سمتیہ_چوڑائی(_src);
+    منطقی doubleSupport = ocl::Device::getDefault().doubleFPConfig() > 0;
 
-    if (depth == CV_64F && !doubleSupport)
-        return false;
+    اگر (گہرائی == CV_64F && !doubleSupport)
+        واپس جھوٹ;
 
-    int dbsize = ocl::Device::getDefault().maxComputeUnits();
-    size_t wgs = ocl::Device::getDefault().maxWorkGroupSize();
+    صحیح dbsize = ocl::Device::getDefault().maxComputeUnits();
+    size_t wgs = ocl::Device::getDefault().max_Work_گروہ_سائز();
 
-    int wgs2_aligned = 1;
-    while (wgs2_aligned < (int)wgs)
+    صحیح wgs2_aligned = 1;
+    جب (wgs2_aligned < (صحیح)wgs)
         wgs2_aligned <<= 1;
     wgs2_aligned >>= 1;
 
     ocl::Kernel k("reduce", ocl::core::reduce_oclsrc,
                   format("-D srcT=%s -D srcT1=%s -D cn=1 -D OP_COUNT_NON_ZERO"
                          " -D WGS=%d -D kercn=%d -D WGS2_ALIGNED=%d%s%s",
-                         ocl::typeToStr(CV_MAKE_TYPE(depth, kercn)),
-                         ocl::typeToStr(depth), (int)wgs, kercn,
+                         ocl::type_مقصد_Str(CV_MAKE_TYPE(گہرائی, kercn)),
+                         ocl::type_مقصد_Str(گہرائی), (صحیح)wgs, kercn,
                          wgs2_aligned, doubleSupport ? " -D DOUBLE_SUPPORT" : "",
                          _src.isContinuous() ? " -D HAVE_SRC_CONT" : ""));
-    if (k.empty())
-        return false;
+    اگر (k.empty())
+        واپس جھوٹ;
 
     UMat src = _src.getUMat(), db(1, dbsize, CV_32SC1);
-    k.args(ocl::KernelArg::ReadOnlyNoSize(src), src.cols, (int)src.total(),
+    k.دلائل(ocl::KernelArg::Read_Only_No_سائز(src), src.ستون_تعداد, (صحیح)src.کل(),
            dbsize, ocl::KernelArg::PtrWriteOnly(db));
 
     size_t globalsize = dbsize * wgs;
-    if (k.run(1, &globalsize, &wgs, true))
-        return res = (saturate_cast<int>(cv::sum(db.getMat(ACCESS_READ))[0])>0), true;
-    return false;
+    اگر (k.تسلسل(1, &globalsize, &wgs, سچ))
+        واپس res = (saturate_cast<صحیح>(cv::مجموع(db.getMat(ACCESS_READ))[0])>0), سچ;
+    واپس جھوٹ;
 }
-#endif
+#اگر_ختم
 
-bool hasNonZero(InputArray _src)
+منطقی hasNonZero(داخلہ_Array _src)
 {
     CV_INSTRUMENT_REGION();
 
-    int type = _src.type(), cn = CV_MAT_CN(type);
+    صحیح type = _src.type(), cn = CV_MAT_CN(type);
     CV_Assert( cn == 1 );
 
-    bool res = false;
+    منطقی res = جھوٹ;
 
-#ifdef HAVE_OPENCL
-    CV_OCL_RUN_(OCL_PERFORMANCE_CHECK(_src.isUMat()) && _src.dims() <= 2,
+#اگر_تعریف_شدہ HAVE_OPENCL
+    CV_OCL_تسلسل_2(OCL_PERFORMANCE_CHECK(_src.isUMat()) && _src.dims() <= 2,
                 ocl_hasNonZero(_src, res),
                 res)
-#endif
+#اگر_ختم
 
     Mat src = _src.getMat();
 
-    HasNonZeroFunc func = getHasNonZeroFunc(src.depth());
+    HasNonZeroFunc func = getHasNonZeroFunc(src.گہرائی());
     CV_Assert( func != 0 );
 
-    if (src.dims == 2)//fast path to avoid creating planes of single rows
+    اگر (src.dims == 2)//fast path to avoid creating planes of single rows
     {
-        if (src.isContinuous())
-            res |= func(src.ptr<uchar>(0), src.total());
-        else
-            for(int row = 0, rowsCount = src.rows ; !res && (row<rowsCount) ; ++row)
-                res |= func(src.ptr<uchar>(row), src.cols);
+        اگر (src.isContinuous())
+            res |= func(src.ptr<uchar>(0), src.کل());
+        ورنہ
+            برائے(صحیح صف = 0, صفیں_گنتی = src.صفیں ; !res && (صف<صفیں_گنتی) ; ++صف)
+                res |= func(src.ptr<uchar>(صف), src.ستون_تعداد);
     }
-    else//if (src.dims != 2)
+    ورنہ//if (src.dims != 2)
     {
-        const Mat* arrays[] = {&src, nullptr};
+        ثابت Mat* arrays[] = {&src, خالی_اشاریہ};
         Mat planes[1];
         NAryMatIterator itNAry(arrays, planes, 1);
-        for(size_t p = 0 ; !res && (p<itNAry.nplanes) ; ++p, ++itNAry)
+        برائے(size_t p = 0 ; !res && (p<itNAry.nplanes) ; ++p, ++itNAry)
         {
-            const Mat& plane = itNAry.planes[0];
-            if (plane.isContinuous())
-                res |= func(plane.ptr<uchar>(0), plane.total());
-            else
-              for(int row = 0, rowsCount = plane.rows ; !res && (row<rowsCount) ; ++row)
-                  res |= func(plane.ptr<uchar>(row), plane.cols);
+            ثابت Mat& plane = itNAry.planes[0];
+            اگر (plane.isContinuous())
+                res |= func(plane.ptr<uchar>(0), plane.کل());
+            ورنہ
+              برائے(صحیح صف = 0, صفیں_گنتی = plane.صفیں ; !res && (صف<صفیں_گنتی) ; ++صف)
+                  res |= func(plane.ptr<uchar>(صف), plane.ستون_تعداد);
         }
     }
 
-    return res;
+    واپس res;
 }
 
 } // namespace

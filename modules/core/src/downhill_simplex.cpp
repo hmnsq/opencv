@@ -38,15 +38,15 @@
 // the use of this software, even if advised of the possibility of such damage.
 //
 //M*/
-#include "precomp.hpp"
+#شامل "precomp.hpp"
 
-#if 0
-#define dprintf(x) printf x
-#define print_matrix(x) print(x)
-#else
-#define dprintf(x)
-#define print_matrix(x)
-#endif
+#اگر 0
+#تعریف_کرو dprintf(x) لکھو x
+#تعریف_کرو print_میٹرکس(x) print(x)
+#ورنہ
+#تعریف_کرو dprintf(x)
+#تعریف_کرو print_میٹرکس(x)
+#اگر_ختم
 
 /*
 
@@ -137,129 +137,129 @@ multiple lines in three dimensions as not all lines intersect in three dimension
 
 */
 
-namespace cv
+نامخلا cv
 {
 
-class DownhillSolverImpl CV_FINAL : public DownhillSolver
+جماعت DownhillSolverImpl CV_FINAL : عوامی DownhillSolver
 {
-public:
+عوامی:
     DownhillSolverImpl()
     {
         _Function=Ptr<Function>();
-        _step=Mat_<double>();
+        قدم_3=Mat_<دوہرا>();
     }
 
-    void getInitStep(OutputArray step) const CV_OVERRIDE { _step.copyTo(step); }
-    void setInitStep(InputArray step) CV_OVERRIDE
+    خالی get_Init_قدم(OutputArray قدم) ثابت CV_OVERRIDE { قدم_3.copy_مقصد(قدم); }
+    خالی سیٹ_Init_قدم(داخلہ_Array قدم) CV_OVERRIDE
     {
         // set dimensionality and make a deep copy of step
-        Mat m = step.getMat();
-        dprintf(("m.cols=%d\nm.rows=%d\n", m.cols, m.rows));
-        if( m.rows == 1 )
-            m.copyTo(_step);
-        else
-            transpose(m, _step);
+        Mat m = قدم.getMat();
+        dprintf(("m.cols=%d\nm.rows=%d\n", m.ستون_تعداد, m.صفیں));
+        اگر( m.صفیں == 1 )
+            m.copy_مقصد(قدم_3);
+        ورنہ
+            transpose(m, قدم_3);
     }
 
-    Ptr<MinProblemSolver::Function> getFunction() const CV_OVERRIDE { return _Function; }
+    Ptr<MinProblemSolver::Function> getFunction() ثابت CV_OVERRIDE { واپس _Function; }
 
-    void setFunction(const Ptr<Function>& f) CV_OVERRIDE { _Function=f; }
+    خالی سیٹ_Function(ثابت Ptr<Function>& f) CV_OVERRIDE { _Function=f; }
 
-    TermCriteria getTermCriteria() const CV_OVERRIDE { return _termcrit; }
+    رکن_Criteria get_رکن_Criteria() ثابت CV_OVERRIDE { واپس _termcrit; }
 
-    void setTermCriteria( const TermCriteria& termcrit ) CV_OVERRIDE
+    خالی سیٹ_رکن_Criteria( ثابت رکن_Criteria& termcrit ) CV_OVERRIDE
     {
-        CV_Assert( termcrit.type == (TermCriteria::MAX_ITER + TermCriteria::EPS) &&
+        CV_Assert( termcrit.type == (رکن_Criteria::MAX_ITER + رکن_Criteria::EPS) &&
                    termcrit.epsilon > 0 &&
-                   termcrit.maxCount > 0 );
+                   termcrit.max_گنتی > 0 );
         _termcrit=termcrit;
     }
 
-    double minimize( InputOutputArray x_ ) CV_OVERRIDE
+    دوہرا minimize( داخلہ_Output_Array x_ ) CV_OVERRIDE
     {
         dprintf(("hi from minimize\n"));
         CV_Assert( !_Function.empty() );
-        CV_Assert( std::min(_step.cols, _step.rows) == 1 &&
-                  std::max(_step.cols, _step.rows) >= 2 &&
-                  _step.type() == CV_64FC1 );
-        dprintf(("termcrit:\n\ttype: %d\n\tmaxCount: %d\n\tEPS: %g\n",_termcrit.type,_termcrit.maxCount,_termcrit.epsilon));
+        CV_Assert( std::min(قدم_3.ستون_تعداد, قدم_3.صفیں) == 1 &&
+                  std::max(قدم_3.ستون_تعداد, قدم_3.صفیں) >= 2 &&
+                  قدم_3.type() == CV_64FC1 );
+        dprintf(("termcrit:\n\ttype: %d\n\tmaxCount: %d\n\tEPS: %g\n",_termcrit.type,_termcrit.max_گنتی,_termcrit.epsilon));
         dprintf(("step\n"));
-        print_matrix(_step);
+        print_میٹرکس(قدم_3);
 
         Mat x = x_.getMat(), simplex;
 
-        createInitialSimplex(x, simplex, _step);
-        int count = 0;
-        double res = innerDownhillSimplex(simplex,_termcrit.epsilon, _termcrit.epsilon,
-                                          count, _termcrit.maxCount);
-        dprintf(("%d iterations done\n",count));
+        createInitialSimplex(x, simplex, قدم_3);
+        صحیح گنتی_2 = 0;
+        دوہرا res = innerDownhillSimplex(simplex,_termcrit.epsilon, _termcrit.epsilon,
+                                          گنتی_2, _termcrit.max_گنتی);
+        dprintf(("%d iterations done\n",گنتی_2));
 
-        if( !x.empty() )
+        اگر( !x.empty() )
         {
-            Mat simplex_0m(x.rows, x.cols, CV_64F, simplex.ptr<double>());
-            simplex_0m.convertTo(x, x.type());
+            Mat simplex_0m(x.صفیں, x.ستون_تعداد, CV_64F, simplex.ptr<دوہرا>());
+            simplex_0m.convert_مقصد(x, x.type());
         }
-        else
+        ورنہ
         {
-            int x_type = x_.fixedType() ? x_.type() : CV_64F;
-            simplex.row(0).convertTo(x_, x_type);
+            صحیح x_type = x_.fixedType() ? x_.type() : CV_64F;
+            simplex.صف(0).convert_مقصد(x_, x_type);
         }
-        return res;
+        واپس res;
     }
-protected:
+محفوظ:
     Ptr<MinProblemSolver::Function> _Function;
-    TermCriteria _termcrit;
-    Mat _step;
+    رکن_Criteria _termcrit;
+    Mat قدم_3;
 
-    inline void updateCoordSum(const Mat& p, Mat& coord_sum)
+    اندرونی خالی update_Coord_مجموع(ثابت Mat& p, Mat& coord_مجموع)
     {
-        int i, j, m = p.rows, n = p.cols;
-        double* coord_sum_ = coord_sum.ptr<double>();
-        CV_Assert( coord_sum.cols == n && coord_sum.rows == 1 );
+        صحیح i, j, m = p.صفیں, n = p.ستون_تعداد;
+        دوہرا* coord_مجموع_2 = coord_مجموع.ptr<دوہرا>();
+        CV_Assert( coord_مجموع.ستون_تعداد == n && coord_مجموع.صفیں == 1 );
 
-        for( j = 0; j < n; j++ )
-            coord_sum_[j] = 0.;
+        برائے( j = 0; j < n; j++ )
+            coord_مجموع_2[j] = 0.;
 
-        for( i = 0; i < m; i++ )
+        برائے( i = 0; i < m; i++ )
         {
-            const double* p_i = p.ptr<double>(i);
-            for( j = 0; j < n; j++ )
-                coord_sum_[j] += p_i[j];
+            ثابت دوہرا* p_i = p.ptr<دوہرا>(i);
+            برائے( j = 0; j < n; j++ )
+                coord_مجموع_2[j] += p_i[j];
         }
 
         dprintf(("\nupdated coord sum:\n"));
-        print_matrix(coord_sum);
+        print_میٹرکس(coord_مجموع);
 
     }
 
-    inline void createInitialSimplex( const Mat& x0, Mat& simplex, Mat& step )
+    اندرونی خالی createInitialSimplex( ثابت Mat& x0, Mat& simplex, Mat& قدم )
     {
-        int i, j, ndim = step.cols;
+        صحیح i, j, ndim = قدم.ستون_تعداد;
         CV_Assert( _Function->getDims() == ndim );
         Mat x = x0;
-        if( x0.empty() )
+        اگر( x0.empty() )
             x = Mat::zeros(1, ndim, CV_64F);
-        CV_Assert( (x.cols == 1 && x.rows == ndim) || (x.cols == ndim && x.rows == 1) );
+        CV_Assert( (x.ستون_تعداد == 1 && x.صفیں == ndim) || (x.ستون_تعداد == ndim && x.صفیں == 1) );
         CV_Assert( x.type() == CV_32F || x.type() == CV_64F );
 
         simplex.create(ndim + 1, ndim, CV_64F);
-        Mat simplex_0m(x.rows, x.cols, CV_64F, simplex.ptr<double>());
+        Mat simplex_0m(x.صفیں, x.ستون_تعداد, CV_64F, simplex.ptr<دوہرا>());
 
-        x.convertTo(simplex_0m, CV_64F);
-        double* simplex_0 = simplex.ptr<double>();
-        const double* step_ = step.ptr<double>();
-        for( i = 1; i <= ndim; i++ )
+        x.convert_مقصد(simplex_0m, CV_64F);
+        دوہرا* simplex_0 = simplex.ptr<دوہرا>();
+        ثابت دوہرا* قدم_2 = قدم.ptr<دوہرا>();
+        برائے( i = 1; i <= ndim; i++ )
         {
-            double* simplex_i = simplex.ptr<double>(i);
-            for( j = 0; j < ndim; j++ )
+            دوہرا* simplex_i = simplex.ptr<دوہرا>(i);
+            برائے( j = 0; j < ndim; j++ )
                 simplex_i[j] = simplex_0[j];
-            simplex_i[i-1] += 0.5*step_[i-1];
+            simplex_i[i-1] += 0.5*قدم_2[i-1];
         }
-        for( j = 0; j < ndim; j++ )
-            simplex_0[j] -= 0.5*step_[j];
+        برائے( j = 0; j < ndim; j++ )
+            simplex_0[j] -= 0.5*قدم_2[j];
 
         dprintf(("\nthis is simplex\n"));
-        print_matrix(simplex);
+        print_میٹرکس(simplex);
     }
 
     /*
@@ -269,197 +269,197 @@ protected:
      form a simplex - each row is an ndim vector.
      On output, fcount gives the number of function evaluations taken.
     */
-    double innerDownhillSimplex( Mat& p, double MinRange, double MinError, int& fcount, int nmax )
+    دوہرا innerDownhillSimplex( Mat& p, دوہرا MinRange, دوہرا MinError, صحیح& fcount, صحیح nmax )
     {
-        int i, j, ndim = p.cols;
-        Mat coord_sum(1, ndim, CV_64F), buf(1, ndim, CV_64F), y(1, ndim+1, CV_64F);
-        double* y_ = y.ptr<double>();
+        صحیح i, j, ndim = p.ستون_تعداد;
+        Mat coord_مجموع(1, ndim, CV_64F), buf(1, ndim, CV_64F), y(1, ndim+1, CV_64F);
+        دوہرا* y_ = y.ptr<دوہرا>();
 
         fcount = ndim+1;
-        for( i = 0; i <= ndim; i++ )
-            y_[i] = calc_f(p.ptr<double>(i));
+        برائے( i = 0; i <= ndim; i++ )
+            y_[i] = calc_f(p.ptr<دوہرا>(i));
 
-        updateCoordSum(p, coord_sum);
+        update_Coord_مجموع(p, coord_مجموع);
 
-        for (;;)
+        برائے (;;)
         {
             // find highest (worst), next-to-worst, and lowest
             // (best) points by going through all of them.
-            int ilo = 0, ihi, inhi;
-            if( y_[0] > y_[1] )
+            صحیح ilo = 0, ihi, inhi;
+            اگر( y_[0] > y_[1] )
             {
                 ihi = 0; inhi = 1;
             }
-            else
+            ورنہ
             {
                 ihi = 1; inhi = 0;
             }
-            for( i = 0; i <= ndim; i++ )
+            برائے( i = 0; i <= ndim; i++ )
             {
-                double yval = y_[i];
-                if (yval <= y_[ilo])
+                دوہرا yval = y_[i];
+                اگر (yval <= y_[ilo])
                     ilo = i;
-                if (yval > y_[ihi])
+                اگر (yval > y_[ihi])
                 {
                     inhi = ihi;
                     ihi = i;
                 }
-                else if (yval > y_[inhi] && i != ihi)
+                ورنہ اگر (yval > y_[inhi] && i != ihi)
                     inhi = i;
             }
             CV_Assert( ihi != inhi );
-            if( ilo == inhi || ilo == ihi )
+            اگر( ilo == inhi || ilo == ihi )
             {
-                for( i = 0; i <= ndim; i++ )
+                برائے( i = 0; i <= ndim; i++ )
                 {
-                    double yval = y_[i];
-                    if( yval == y_[ilo] && i != ihi && i != inhi )
+                    دوہرا yval = y_[i];
+                    اگر( yval == y_[ilo] && i != ihi && i != inhi )
                     {
                         ilo = i;
-                        break;
+                        توڑو;
                     }
                 }
             }
             dprintf(("\nthis is y on iteration %d:\n",fcount));
-            print_matrix(y);
+            print_میٹرکس(y);
 
             // check stop criterion
-            double error = fabs(y_[ihi] - y_[ilo]);
-            double range = 0;
-            for( j = 0; j < ndim; j++ )
+            دوہرا error = fabs(y_[ihi] - y_[ilo]);
+            دوہرا range = 0;
+            برائے( j = 0; j < ndim; j++ )
             {
-                double minval, maxval;
-                minval = maxval = p.at<double>(0, j);
-                for( i = 1; i <= ndim; i++ )
+                دوہرا minval, maxval;
+                minval = maxval = p.at<دوہرا>(0, j);
+                برائے( i = 1; i <= ndim; i++ )
                 {
-                    double pval = p.at<double>(i, j);
+                    دوہرا pval = p.at<دوہرا>(i, j);
                     minval = std::min(minval, pval);
                     maxval = std::max(maxval, pval);
                 }
                 range = std::max(range, fabs(maxval - minval));
             }
 
-            if( range <= MinRange || error <= MinError || fcount >= nmax )
+            اگر( range <= MinRange || error <= MinError || fcount >= nmax )
             {
                 // Put best point and value in first slot.
                 std::swap(y_[0], y_[ilo]);
-                for( j = 0; j < ndim; j++ )
+                برائے( j = 0; j < ndim; j++ )
                 {
-                    std::swap(p.at<double>(0, j), p.at<double>(ilo, j));
+                    std::swap(p.at<دوہرا>(0, j), p.at<دوہرا>(ilo, j));
                 }
-                break;
+                توڑو;
             }
 
-            double y_lo = y_[ilo], y_nhi = y_[inhi], y_hi = y_[ihi];
+            دوہرا y_lo = y_[ilo], y_nhi = y_[inhi], y_hi = y_[ihi];
             // Begin a new iteration. First, reflect the worst point about the centroid of others
-            double alpha = -1.0;
-            double y_alpha = tryNewPoint(p, coord_sum, ihi, alpha, buf, fcount);
+            دوہرا alpha = -1.0;
+            دوہرا y_alpha = try_New_نقطہ(p, coord_مجموع, ihi, alpha, buf, fcount);
 
             dprintf(("\ny_lo=%g, y_nhi=%g, y_hi=%g, y_alpha=%g, p_alpha:\n", y_lo, y_nhi, y_hi, y_alpha));
-            print_matrix(buf);
+            print_میٹرکس(buf);
 
-            if( y_alpha < y_nhi )
+            اگر( y_alpha < y_nhi )
             {
-                if( y_alpha < y_lo )
+                اگر( y_alpha < y_lo )
                 {
                     // If that's better than the best point, go twice as far in that direction
-                    double beta = -2.0;
-                    double y_beta = tryNewPoint(p, coord_sum, ihi, beta, buf, fcount);
+                    دوہرا beta = -2.0;
+                    دوہرا y_beta = try_New_نقطہ(p, coord_مجموع, ihi, beta, buf, fcount);
                     dprintf(("\ny_beta=%g, p_beta:\n", y_beta));
-                    print_matrix(buf);
-                    if( y_beta < y_alpha )
+                    print_میٹرکس(buf);
+                    اگر( y_beta < y_alpha )
                     {
                         alpha = beta;
                         y_alpha = y_beta;
                     }
                 }
-                replacePoint(p, coord_sum, y, ihi, alpha, y_alpha);
+                replace_نقطہ(p, coord_مجموع, y, ihi, alpha, y_alpha);
             }
-            else
+            ورنہ
             {
                 // The new point is worse than the second-highest,
                 // do not go so far in that direction
-                double gamma = 0.5;
-                double y_gamma = tryNewPoint(p, coord_sum, ihi, gamma, buf, fcount);
+                دوہرا gamma = 0.5;
+                دوہرا y_gamma = try_New_نقطہ(p, coord_مجموع, ihi, gamma, buf, fcount);
                 dprintf(("\ny_gamma=%g, p_gamma:\n", y_gamma));
-                print_matrix(buf);
-                if( y_gamma < y_hi )
-                    replacePoint(p, coord_sum, y, ihi, gamma, y_gamma);
-                else
+                print_میٹرکس(buf);
+                اگر( y_gamma < y_hi )
+                    replace_نقطہ(p, coord_مجموع, y, ihi, gamma, y_gamma);
+                ورنہ
                 {
                     // Can't seem to improve things.
                     // Contract the simplex to good point
                     // in hope to find a simplex landscape.
-                    for( i = 0; i <= ndim; i++ )
+                    برائے( i = 0; i <= ndim; i++ )
                     {
-                        if (i != ilo)
+                        اگر (i != ilo)
                         {
-                            for( j = 0; j < ndim; j++ )
-                                p.at<double>(i, j) = 0.5*(p.at<double>(i, j) + p.at<double>(ilo, j));
-                            y_[i] = calc_f(p.ptr<double>(i));
+                            برائے( j = 0; j < ndim; j++ )
+                                p.at<دوہرا>(i, j) = 0.5*(p.at<دوہرا>(i, j) + p.at<دوہرا>(ilo, j));
+                            y_[i] = calc_f(p.ptr<دوہرا>(i));
                         }
                     }
                     fcount += ndim;
-                    updateCoordSum(p, coord_sum);
+                    update_Coord_مجموع(p, coord_مجموع);
                 }
             }
             dprintf(("\nthis is simplex on iteration %d\n",fcount));
-            print_matrix(p);
+            print_میٹرکس(p);
         }
-        return y_[0];
+        واپس y_[0];
     }
 
-    inline double calc_f(const double* ptr)
+    اندرونی دوہرا calc_f(ثابت دوہرا* ptr)
     {
-        double res = _Function->calc(ptr);
+        دوہرا res = _Function->calc(ptr);
         CV_Assert( !cvIsNaN(res) && !cvIsInf(res) );
-        return res;
+        واپس res;
     }
 
-    double tryNewPoint( Mat& p, Mat& coord_sum, int ihi, double alpha_, Mat& ptry, int& fcount )
+    دوہرا try_New_نقطہ( Mat& p, Mat& coord_مجموع, صحیح ihi, دوہرا alpha_, Mat& ptry, صحیح& fcount )
     {
-        int j, ndim = p.cols;
+        صحیح j, ndim = p.ستون_تعداد;
 
-        double alpha = (1.0 - alpha_)/ndim;
-        double beta = alpha - alpha_;
-        double* p_ihi = p.ptr<double>(ihi);
-        double* ptry_ = ptry.ptr<double>();
-        double* coord_sum_ = coord_sum.ptr<double>();
+        دوہرا alpha = (1.0 - alpha_)/ndim;
+        دوہرا beta = alpha - alpha_;
+        دوہرا* p_ihi = p.ptr<دوہرا>(ihi);
+        دوہرا* ptry_ = ptry.ptr<دوہرا>();
+        دوہرا* coord_مجموع_2 = coord_مجموع.ptr<دوہرا>();
 
-        for( j = 0; j < ndim; j++ )
-            ptry_[j] = coord_sum_[j]*alpha - p_ihi[j]*beta;
+        برائے( j = 0; j < ndim; j++ )
+            ptry_[j] = coord_مجموع_2[j]*alpha - p_ihi[j]*beta;
 
         fcount++;
-        return calc_f(ptry_);
+        واپس calc_f(ptry_);
     }
 
-    void replacePoint( Mat& p, Mat& coord_sum, Mat& y, int ihi, double alpha_, double ytry )
+    خالی replace_نقطہ( Mat& p, Mat& coord_مجموع, Mat& y, صحیح ihi, دوہرا alpha_, دوہرا ytry )
     {
-        int j, ndim = p.cols;
+        صحیح j, ndim = p.ستون_تعداد;
 
-        double alpha = (1.0 - alpha_)/ndim;
-        double beta = alpha - alpha_;
-        double* p_ihi = p.ptr<double>(ihi);
-        double* coord_sum_ = coord_sum.ptr<double>();
+        دوہرا alpha = (1.0 - alpha_)/ndim;
+        دوہرا beta = alpha - alpha_;
+        دوہرا* p_ihi = p.ptr<دوہرا>(ihi);
+        دوہرا* coord_مجموع_2 = coord_مجموع.ptr<دوہرا>();
 
-        for( j = 0; j < ndim; j++ )
-            p_ihi[j] = coord_sum_[j]*alpha - p_ihi[j]*beta;
-        y.at<double>(ihi) = ytry;
-        updateCoordSum(p, coord_sum);
+        برائے( j = 0; j < ndim; j++ )
+            p_ihi[j] = coord_مجموع_2[j]*alpha - p_ihi[j]*beta;
+        y.at<دوہرا>(ihi) = ytry;
+        update_Coord_مجموع(p, coord_مجموع);
     }
 };
 
 
 // both minRange & minError are specified by termcrit.epsilon;
 // In addition, user may specify the number of iterations that the algorithm does.
-Ptr<DownhillSolver> DownhillSolver::create( const Ptr<MinProblemSolver::Function>& f,
-                                            InputArray initStep, TermCriteria termcrit )
+Ptr<DownhillSolver> DownhillSolver::create( ثابت Ptr<MinProblemSolver::Function>& f,
+                                            داخلہ_Array init_قدم, رکن_Criteria termcrit )
 {
     Ptr<DownhillSolver> DS = makePtr<DownhillSolverImpl>();
-    DS->setFunction(f);
-    DS->setInitStep(initStep);
-    DS->setTermCriteria(termcrit);
-    return DS;
+    DS->سیٹ_Function(f);
+    DS->سیٹ_Init_قدم(init_قدم);
+    DS->سیٹ_رکن_Criteria(termcrit);
+    واپس DS;
 }
 
 }

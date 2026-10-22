@@ -2,174 +2,174 @@
 // It is subject to the license terms in the LICENSE file found in the top-level directory
 // of this distribution and at http://opencv.org/license.html.
 
-#include "opencv2/core/utils/buffer_area.private.hpp"
-#include "opencv2/core/utils/configuration.private.hpp"
+#شامل "opencv2/core/utils/buffer_area.private.hpp"
+#شامل "opencv2/core/utils/configuration.private.hpp"
 
-#ifndef OPENCV_ENABLE_MEMORY_SANITIZER
-static bool CV_BUFFER_AREA_OVERRIDE_SAFE_MODE =
-    cv::utils::getConfigurationParameterBool("OPENCV_BUFFER_AREA_ALWAYS_SAFE", false);
-#endif
+#اگر_غیر_تعریف_شدہ OPENCV_ENABLE_حافظہ_SANITIZER
+ساکن منطقی CV_بفر_AREA_OVERRIDE_محفوظ_منوال =
+    cv::utils::getConfigurationParameterBool("OPENCV_BUFFER_AREA_ALWAYS_SAFE", جھوٹ);
+#اگر_ختم
 
-namespace cv { namespace utils {
+نامخلا cv { نامخلا utils {
 
 //==================================================================================================
 
-class BufferArea::Block
+جماعت بفر_Area::بلاک
 {
-private:
-    inline size_t reserve_count() const
+نجی:
+    اندرونی size_t reserve_گنتی() ثابت
     {
-        return alignment / type_size - 1;
+        واپس alignment / type_سائز - 1;
     }
-public:
-    Block(void **ptr_, ushort type_size_, size_t count_, ushort alignment_)
-        : ptr(ptr_), raw_mem(0), count(count_), type_size(type_size_), alignment(alignment_)
+عوامی:
+    بلاک(خالی **ptr_, ushort type_سائز_2, size_t گنتی, ushort alignment_)
+        : ptr(ptr_), raw_mem(0), گنتی_2(گنتی), type_سائز(type_سائز_2), alignment(alignment_)
     {
-        CV_Assert(ptr && *ptr == NULL);
+        CV_Assert(ptr && *ptr == تہی);
     }
-    void cleanup() const
+    خالی cleanup() ثابت
     {
         CV_DbgAssert(ptr);
-        if (raw_mem)
+        اگر (raw_mem)
             fastFree(raw_mem);
     }
-    size_t getByteCount() const
+    size_t get_Byte_گنتی() ثابت
     {
-        return type_size * (count + reserve_count());
+        واپس type_سائز * (گنتی_2 + reserve_گنتی());
     }
-    void real_allocate()
+    خالی real_allocate()
     {
-        CV_Assert(ptr && *ptr == NULL);
-        const size_t allocated_count = count + reserve_count();
-        raw_mem = fastMalloc(type_size * allocated_count);
-        if (alignment != type_size)
+        CV_Assert(ptr && *ptr == تہی);
+        ثابت size_t allocated_گنتی = گنتی_2 + reserve_گنتی();
+        raw_mem = fastMalloc(type_سائز * allocated_گنتی);
+        اگر (alignment != type_سائز)
         {
             *ptr = alignPtr(raw_mem, alignment);
             CV_Assert(reinterpret_cast<size_t>(*ptr) % alignment == 0);
-            CV_Assert(static_cast<uchar*>(*ptr) + type_size * count <= static_cast<uchar*>(raw_mem) + type_size * allocated_count);
+            CV_Assert(static_cast<uchar*>(*ptr) + type_سائز * گنتی_2 <= static_cast<uchar*>(raw_mem) + type_سائز * allocated_گنتی);
         }
-        else
+        ورنہ
         {
             *ptr = raw_mem;
         }
     }
-#ifndef OPENCV_ENABLE_MEMORY_SANITIZER
-    void * fast_allocate(void * buf) const
+#اگر_غیر_تعریف_شدہ OPENCV_ENABLE_حافظہ_SANITIZER
+    خالی * fast_allocate(خالی * buf) ثابت
     {
-        CV_Assert(ptr && *ptr == NULL);
+        CV_Assert(ptr && *ptr == تہی);
         buf = alignPtr(buf, alignment);
         CV_Assert(reinterpret_cast<size_t>(buf) % alignment == 0);
         *ptr = buf;
-        return static_cast<void*>(static_cast<uchar*>(*ptr) + type_size * count);
+        واپس static_cast<خالی*>(static_cast<uchar*>(*ptr) + type_سائز * گنتی_2);
     }
-#endif
-    bool operator==(void **other) const
+#اگر_ختم
+    منطقی عامل==(خالی **other) ثابت
     {
         CV_Assert(ptr && other);
-        return *ptr == *other;
+        واپس *ptr == *other;
     }
-    void zeroFill() const
+    خالی zeroFill() ثابت
     {
         CV_Assert(ptr && *ptr);
-        memset(static_cast<uchar*>(*ptr), 0, count * type_size);
+        memset(static_cast<uchar*>(*ptr), 0, گنتی_2 * type_سائز);
     }
-private:
-    void **ptr;
-    void * raw_mem;
-    size_t count;
-    ushort type_size;
+نجی:
+    خالی **ptr;
+    خالی * raw_mem;
+    size_t گنتی_2;
+    ushort type_سائز;
     ushort alignment;
 };
 
 //==================================================================================================
 
-#ifndef OPENCV_ENABLE_MEMORY_SANITIZER
-BufferArea::BufferArea(bool safe_) :
+#اگر_غیر_تعریف_شدہ OPENCV_ENABLE_حافظہ_SANITIZER
+بفر_Area::بفر_Area(منطقی محفوظ_2) :
     oneBuf(0),
-    totalSize(0),
-    safe(safe_ || CV_BUFFER_AREA_OVERRIDE_SAFE_MODE)
+    کل_سائز(0),
+    محفوظ_3(محفوظ_2 || CV_بفر_AREA_OVERRIDE_محفوظ_منوال)
 {
     // nothing
 }
-#else
-BufferArea::BufferArea(bool safe_)
+#ورنہ
+بفر_Area::بفر_Area(منطقی محفوظ_2)
 {
-    CV_UNUSED(safe_);
+    CV_غیر_مستعمل(محفوظ_2);
 }
-#endif
+#اگر_ختم
 
-BufferArea::~BufferArea()
+بفر_Area::~بفر_Area()
 {
     release();
 }
 
-void BufferArea::allocate_(void **ptr, ushort type_size, size_t count, ushort alignment)
+خالی بفر_Area::allocate_(خالی **ptr, ushort type_سائز, size_t گنتی_2, ushort alignment)
 {
-    blocks.push_back(Block(ptr, type_size, count, alignment));
-#ifndef OPENCV_ENABLE_MEMORY_SANITIZER
-    if (!safe)
+    بلاکیں.push_back(بلاک(ptr, type_سائز, گنتی_2, alignment));
+#اگر_غیر_تعریف_شدہ OPENCV_ENABLE_حافظہ_SANITIZER
+    اگر (!محفوظ_3)
     {
-        totalSize += blocks.back().getByteCount();
+        کل_سائز += بلاکیں.back().get_Byte_گنتی();
     }
-    else
-#endif
+    ورنہ
+#اگر_ختم
     {
-        blocks.back().real_allocate();
+        بلاکیں.back().real_allocate();
     }
 }
 
-void BufferArea::zeroFill_(void **ptr)
+خالی بفر_Area::zeroFill_(خالی **ptr)
 {
-    for(std::vector<Block>::const_iterator i = blocks.begin(); i != blocks.end(); ++i)
+    برائے(std::vector<بلاک>::const_iterator i = بلاکیں.begin(); i != بلاکیں.end(); ++i)
     {
-        if (*i == ptr)
+        اگر (*i == ptr)
         {
             i->zeroFill();
-            break;
+            توڑو;
         }
     }
 }
 
-void BufferArea::zeroFill()
+خالی بفر_Area::zeroFill()
 {
-    for(std::vector<Block>::const_iterator i = blocks.begin(); i != blocks.end(); ++i)
+    برائے(std::vector<بلاک>::const_iterator i = بلاکیں.begin(); i != بلاکیں.end(); ++i)
     {
         i->zeroFill();
     }
 }
 
-void BufferArea::commit()
+خالی بفر_Area::commit()
 {
-#ifndef OPENCV_ENABLE_MEMORY_SANITIZER
-    if (!safe)
+#اگر_غیر_تعریف_شدہ OPENCV_ENABLE_حافظہ_SANITIZER
+    اگر (!محفوظ_3)
     {
-        CV_Assert(totalSize > 0);
-        CV_Assert(oneBuf == NULL);
-        CV_Assert(!blocks.empty());
-        oneBuf = fastMalloc(totalSize);
-        void * ptr = oneBuf;
-        for(std::vector<Block>::const_iterator i = blocks.begin(); i != blocks.end(); ++i)
+        CV_Assert(کل_سائز > 0);
+        CV_Assert(oneBuf == تہی);
+        CV_Assert(!بلاکیں.empty());
+        oneBuf = fastMalloc(کل_سائز);
+        خالی * ptr = oneBuf;
+        برائے(std::vector<بلاک>::const_iterator i = بلاکیں.begin(); i != بلاکیں.end(); ++i)
         {
             ptr = i->fast_allocate(ptr);
         }
     }
-#endif
+#اگر_ختم
 }
 
-void BufferArea::release()
+خالی بفر_Area::release()
 {
-    for(std::vector<Block>::const_iterator i = blocks.begin(); i != blocks.end(); ++i)
+    برائے(std::vector<بلاک>::const_iterator i = بلاکیں.begin(); i != بلاکیں.end(); ++i)
     {
         i->cleanup();
     }
-    blocks.clear();
-#ifndef OPENCV_ENABLE_MEMORY_SANITIZER
-    if (oneBuf)
+    بلاکیں.clear();
+#اگر_غیر_تعریف_شدہ OPENCV_ENABLE_حافظہ_SANITIZER
+    اگر (oneBuf)
     {
         fastFree(oneBuf);
         oneBuf = 0;
     }
-#endif
+#اگر_ختم
 }
 
 //==================================================================================================

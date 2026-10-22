@@ -2,38 +2,38 @@
 // It is subject to the license terms in the LICENSE file found in the top-level directory
 // of this distribution and at http://opencv.org/license.html.
 
-#ifndef PARALLEL_PLUGIN_API_HPP
-#define PARALLEL_PLUGIN_API_HPP
+#اگر_غیر_تعریف_شدہ PARALLEL_PLUGIN_API_HPP
+#تعریف_کرو PARALLEL_PLUGIN_API_HPP
 
-#include <opencv2/core/cvdef.h>
-#include <opencv2/core/llapi/llapi.h>
+#شامل <opencv2/core/cvdef.h>
+#شامل <opencv2/core/llapi/llapi.h>
 
-#include "opencv2/core/parallel/parallel_backend.hpp"
+#شامل "opencv2/core/parallel/parallel_backend.hpp"
 
-#if !defined(BUILD_PLUGIN)
+#اگر !defined(BUILD_PLUGIN)
 
 /// increased for backward-compatible changes, e.g. add new function
 /// Caller API <= Plugin API -> plugin is fully compatible
 /// Caller API > Plugin API -> plugin is not fully compatible, caller should use extra checks to use plugins with older API
-#define API_VERSION 0 // preview
+#تعریف_کرو API_نسخہ 0 // preview
 
 /// increased for incompatible changes, e.g. remove function argument
 /// Caller ABI == Plugin ABI -> plugin is compatible
 /// Caller ABI > Plugin ABI -> plugin is not compatible, caller should use shim code to use old ABI plugins (caller may know how lower ABI works, so it is possible)
 /// Caller ABI < Plugin ABI -> plugin can't be used (plugin should provide interface with lower ABI to handle that)
-#define ABI_VERSION 0 // preview
+#تعریف_کرو ABI_نسخہ 0 // preview
 
-#else // !defined(BUILD_PLUGIN)
+#ورنہ // !defined(BUILD_PLUGIN)
 
-#if !defined(ABI_VERSION) || !defined(API_VERSION)
-#error "Plugin must define ABI_VERSION and API_VERSION before including parallel_plugin_api.hpp"
-#endif
+#اگر !defined(ABI_نسخہ) || !defined(API_نسخہ)
+#غلطی "Plugin must define ABI_VERSION and API_VERSION before including parallel_plugin_api.hpp"
+#اگر_ختم
 
-#endif // !defined(BUILD_PLUGIN)
+#اگر_ختم // !defined(BUILD_PLUGIN)
 
-typedef cv::parallel::ParallelForAPI* CvPluginParallelBackendAPI;
+قسمتعریف cv::parallel::ParallelForAPI* CvPluginParallelBackendAPI;
 
-struct OpenCV_Core_Parallel_Plugin_API_v0_0_api_entries
+ساخت OpenCV_Core_Parallel_Plugin_API_v0_0_api_entries
 {
     /** @brief Get parallel backend API instance
 
@@ -41,32 +41,32 @@ struct OpenCV_Core_Parallel_Plugin_API_v0_0_api_entries
 
     @note API-CALL 1, API-Version == 0
      */
-    CvResult (CV_API_CALL *getInstance)(CV_OUT CvPluginParallelBackendAPI* handle) CV_NOEXCEPT;
+    Cv_نتیجہ (CV_API_CALL *getInstance)(CV_برآمد CvPluginParallelBackendAPI* handle) CV_NOEXCEPT;
 }; // OpenCV_Core_Parallel_Plugin_API_v0_0_api_entries
 
-typedef struct OpenCV_Core_Parallel_Plugin_API_v0
+قسمتعریف ساخت OpenCV_Core_Parallel_Plugin_API_v0
 {
-    OpenCV_API_Header api_header;
-    struct OpenCV_Core_Parallel_Plugin_API_v0_0_api_entries v0;
+    Open_CV_API_سرخی api_سرخی;
+    ساخت OpenCV_Core_Parallel_Plugin_API_v0_0_api_entries v0;
 } OpenCV_Core_Parallel_Plugin_API_v0;
 
-#if ABI_VERSION == 0 && API_VERSION == 0
-typedef OpenCV_Core_Parallel_Plugin_API_v0 OpenCV_Core_Parallel_Plugin_API;
-#else
-#error "Not supported configuration: check ABI_VERSION/API_VERSION"
-#endif
+#اگر ABI_نسخہ == 0 && API_نسخہ == 0
+قسمتعریف OpenCV_Core_Parallel_Plugin_API_v0 OpenCV_Core_Parallel_Plugin_API;
+#ورنہ
+#غلطی "Not supported configuration: check ABI_VERSION/API_VERSION"
+#اگر_ختم
 
-#ifdef BUILD_PLUGIN
-extern "C" {
+#اگر_تعریف_شدہ BUILD_PLUGIN
+خارجی "C" {
 
 CV_PLUGIN_EXPORTS
-const OpenCV_Core_Parallel_Plugin_API* CV_API_CALL opencv_core_parallel_plugin_init_v0
-        (int requested_abi_version, int requested_api_version, void* reserved /*NULL*/) CV_NOEXCEPT;
+ثابت OpenCV_Core_Parallel_Plugin_API* CV_API_CALL opencv_core_parallel_plugin_init_v0
+        (صحیح requested_abi_نسخہ, صحیح requested_api_نسخہ, خالی* reserved /*NULL*/) CV_NOEXCEPT;
 
 }  // extern "C"
-#else  // BUILD_PLUGIN
-typedef const OpenCV_Core_Parallel_Plugin_API* (CV_API_CALL *FN_opencv_core_parallel_plugin_init_t)
-        (int requested_abi_version, int requested_api_version, void* reserved /*NULL*/);
-#endif  // BUILD_PLUGIN
+#ورنہ  // BUILD_PLUGIN
+قسمتعریف ثابت OpenCV_Core_Parallel_Plugin_API* (CV_API_CALL *FN_opencv_core_parallel_plugin_init_t)
+        (صحیح requested_abi_نسخہ, صحیح requested_api_نسخہ, خالی* reserved /*NULL*/);
+#اگر_ختم  // BUILD_PLUGIN
 
-#endif // PARALLEL_PLUGIN_API_HPP
+#اگر_ختم // PARALLEL_PLUGIN_API_HPP

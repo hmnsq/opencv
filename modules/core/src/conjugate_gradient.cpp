@@ -39,166 +39,166 @@
 //
 //M*/
 
-#include "precomp.hpp"
+#شامل "precomp.hpp"
 
-#define dprintf(x)
-#define print_matrix(x)
+#تعریف_کرو dprintf(x)
+#تعریف_کرو print_میٹرکس(x)
 
-namespace cv
+نامخلا cv
 {
-    double MinProblemSolver::Function::getGradientEps() const { return 1e-3; }
-    void MinProblemSolver::Function::getGradient(const double* x, double* grad)
+    دوہرا MinProblemSolver::Function::getGradientEps() ثابت { واپس 1e-3; }
+    خالی MinProblemSolver::Function::getGradient(ثابت دوہرا* x, دوہرا* grad)
     {
-        double eps = getGradientEps();
-        int i, n = getDims();
-        AutoBuffer<double> x_buf(n);
-        double* x_ = x_buf.data();
-        for( i = 0; i < n; i++ )
+        دوہرا eps = getGradientEps();
+        صحیح i, n = getDims();
+        Auto_بفر<دوہرا> x_buf(n);
+        دوہرا* x_ = x_buf.ڈیٹا();
+        برائے( i = 0; i < n; i++ )
             x_[i] = x[i];
-        for( i = 0; i < n; i++ )
+        برائے( i = 0; i < n; i++ )
         {
             x_[i] = x[i] + eps;
-            double y1 = calc(x_);
+            دوہرا y1 = calc(x_);
             x_[i] = x[i] - eps;
-            double y0 = calc(x_);
+            دوہرا y0 = calc(x_);
             grad[i] = (y1 - y0)/(2*eps);
             x_[i] = x[i];
         }
     }
 
-#define SEC_METHOD_ITERATIONS 4
-#define INITIAL_SEC_METHOD_SIGMA 0.1
-    class ConjGradSolverImpl CV_FINAL : public ConjGradSolver
+#تعریف_کرو SEC_طریقہ_ITERATIONS 4
+#تعریف_کرو INITIAL_SEC_طریقہ_SIGMA 0.1
+    جماعت ConjGradSolverImpl CV_FINAL : عوامی ConjGradSolver
     {
-    public:
-        Ptr<Function> getFunction() const CV_OVERRIDE;
-        void setFunction(const Ptr<Function>& f) CV_OVERRIDE;
-        TermCriteria getTermCriteria() const CV_OVERRIDE;
+    عوامی:
+        Ptr<Function> getFunction() ثابت CV_OVERRIDE;
+        خالی سیٹ_Function(ثابت Ptr<Function>& f) CV_OVERRIDE;
+        رکن_Criteria get_رکن_Criteria() ثابت CV_OVERRIDE;
         ConjGradSolverImpl();
-        void setTermCriteria(const TermCriteria& termcrit) CV_OVERRIDE;
-        double minimize(InputOutputArray x) CV_OVERRIDE;
-    protected:
+        خالی سیٹ_رکن_Criteria(ثابت رکن_Criteria& termcrit) CV_OVERRIDE;
+        دوہرا minimize(داخلہ_Output_Array x) CV_OVERRIDE;
+    محفوظ:
         Ptr<MinProblemSolver::Function> _Function;
-        TermCriteria _termcrit;
-        Mat_<double> d,r,buf_x,r_old;
-        Mat_<double> minimizeOnTheLine_buf1,minimizeOnTheLine_buf2;
-    private:
-        static void minimizeOnTheLine(Ptr<MinProblemSolver::Function> _f,Mat_<double>& x,const Mat_<double>& d,Mat_<double>& buf1,Mat_<double>& buf2);
+        رکن_Criteria _termcrit;
+        Mat_<دوہرا> d,r,buf_x,r_old;
+        Mat_<دوہرا> minimize_On_The_سطر_buf1,minimize_On_The_سطر_buf2;
+    نجی:
+        ساکن خالی minimize_On_The_سطر(Ptr<MinProblemSolver::Function> _f,Mat_<دوہرا>& x,ثابت Mat_<دوہرا>& d,Mat_<دوہرا>& buf1,Mat_<دوہرا>& buf2);
     };
 
-    void ConjGradSolverImpl::minimizeOnTheLine(Ptr<MinProblemSolver::Function> _f,Mat_<double>& x,const Mat_<double>& d,Mat_<double>& buf1,
-            Mat_<double>& buf2){
-        double sigma=INITIAL_SEC_METHOD_SIGMA;
+    خالی ConjGradSolverImpl::minimize_On_The_سطر(Ptr<MinProblemSolver::Function> _f,Mat_<دوہرا>& x,ثابت Mat_<دوہرا>& d,Mat_<دوہرا>& buf1,
+            Mat_<دوہرا>& buf2){
+        دوہرا sigma=INITIAL_SEC_طریقہ_SIGMA;
         buf1=0.0;
         buf2=0.0;
 
         dprintf(("before minimizeOnTheLine\n"));
         dprintf(("x:\n"));
-        print_matrix(x);
+        print_میٹرکس(x);
         dprintf(("d:\n"));
-        print_matrix(d);
+        print_میٹرکس(d);
 
-        for(int i=0;i<SEC_METHOD_ITERATIONS;i++){
-            _f->getGradient((double*)x.data,(double*)buf1.data);
+        برائے(صحیح i=0;i<SEC_طریقہ_ITERATIONS;i++){
+            _f->getGradient((دوہرا*)x.ڈیٹا,(دوہرا*)buf1.ڈیٹا);
             dprintf(("buf1:\n"));
-            print_matrix(buf1);
+            print_میٹرکس(buf1);
             x=x+sigma*d;
-            _f->getGradient((double*)x.data,(double*)buf2.data);
+            _f->getGradient((دوہرا*)x.ڈیٹا,(دوہرا*)buf2.ڈیٹا);
             dprintf(("buf2:\n"));
-            print_matrix(buf2);
-            double d1=buf1.dot(d), d2=buf2.dot(d);
-            if((d1-d2)==0){
-                break;
+            print_میٹرکس(buf2);
+            دوہرا d1=buf1.dot(d), d2=buf2.dot(d);
+            اگر((d1-d2)==0){
+                توڑو;
             }
-            double alpha=-sigma*d1/(d2-d1);
+            دوہرا alpha=-sigma*d1/(d2-d1);
             dprintf(("(buf2.dot(d)-buf1.dot(d))=%f\nalpha=%f\n",(buf2.dot(d)-buf1.dot(d)),alpha));
             x=x+(alpha-sigma)*d;
             sigma=-alpha;
         }
 
         dprintf(("after minimizeOnTheLine\n"));
-        print_matrix(x);
+        print_میٹرکس(x);
     }
 
-    double ConjGradSolverImpl::minimize(InputOutputArray x){
-        CV_Assert(_Function.empty()==false);
-        dprintf(("termcrit:\n\ttype: %d\n\tmaxCount: %d\n\tEPS: %g\n",_termcrit.type,_termcrit.maxCount,_termcrit.epsilon));
+    دوہرا ConjGradSolverImpl::minimize(داخلہ_Output_Array x){
+        CV_Assert(_Function.empty()==جھوٹ);
+        dprintf(("termcrit:\n\ttype: %d\n\tmaxCount: %d\n\tEPS: %g\n",_termcrit.type,_termcrit.max_گنتی,_termcrit.epsilon));
 
         Mat x_mat=x.getMat();
-        CV_Assert(MIN(x_mat.rows,x_mat.cols)==1);
-        int ndim=MAX(x_mat.rows,x_mat.cols);
+        CV_Assert(MIN(x_mat.صفیں,x_mat.ستون_تعداد)==1);
+        صحیح ndim=MAX(x_mat.صفیں,x_mat.ستون_تعداد);
         CV_Assert(x_mat.type()==CV_64FC1);
 
-        if(d.cols!=ndim){
+        اگر(d.ستون_تعداد!=ndim){
             d.create(1,ndim);
             r.create(1,ndim);
             r_old.create(1,ndim);
-            minimizeOnTheLine_buf1.create(1,ndim);
-            minimizeOnTheLine_buf2.create(1,ndim);
+            minimize_On_The_سطر_buf1.create(1,ndim);
+            minimize_On_The_سطر_buf2.create(1,ndim);
         }
 
-        Mat_<double> proxy_x;
-        if(x_mat.rows>1){
+        Mat_<دوہرا> proxy_x;
+        اگر(x_mat.صفیں>1){
             buf_x.create(1,ndim);
-            Mat_<double> proxy(ndim,1,buf_x.ptr<double>());
-            x_mat.copyTo(proxy);
+            Mat_<دوہرا> proxy(ndim,1,buf_x.ptr<دوہرا>());
+            x_mat.copy_مقصد(proxy);
             proxy_x=buf_x;
-        }else{
+        }ورنہ{
             proxy_x=x_mat;
         }
-        _Function->getGradient(proxy_x.ptr<double>(),d.ptr<double>());
+        _Function->getGradient(proxy_x.ptr<دوہرا>(),d.ptr<دوہرا>());
         d*=-1.0;
-        d.copyTo(r);
+        d.copy_مقصد(r);
 
         //here everything goes. check that everything is set properly
-        dprintf(("proxy_x\n"));print_matrix(proxy_x);
-        dprintf(("d first time\n"));print_matrix(d);
-        dprintf(("r\n"));print_matrix(r);
+        dprintf(("proxy_x\n"));print_میٹرکس(proxy_x);
+        dprintf(("d first time\n"));print_میٹرکس(d);
+        dprintf(("r\n"));print_میٹرکس(r);
 
-        for(int count=0;count<_termcrit.maxCount;count++){
-            minimizeOnTheLine(_Function,proxy_x,d,minimizeOnTheLine_buf1,minimizeOnTheLine_buf2);
-            r.copyTo(r_old);
-            _Function->getGradient(proxy_x.ptr<double>(),r.ptr<double>());
+        برائے(صحیح گنتی_2=0;گنتی_2<_termcrit.max_گنتی;گنتی_2++){
+            minimize_On_The_سطر(_Function,proxy_x,d,minimize_On_The_سطر_buf1,minimize_On_The_سطر_buf2);
+            r.copy_مقصد(r_old);
+            _Function->getGradient(proxy_x.ptr<دوہرا>(),r.ptr<دوہرا>());
             r*=-1.0;
-            double r_norm_sq=norm(r);
-            if(_termcrit.type==(TermCriteria::MAX_ITER+TermCriteria::EPS) && r_norm_sq<_termcrit.epsilon){
-                break;
+            دوہرا r_norm_sq=norm(r);
+            اگر(_termcrit.type==(رکن_Criteria::MAX_ITER+رکن_Criteria::EPS) && r_norm_sq<_termcrit.epsilon){
+                توڑو;
             }
             r_norm_sq=r_norm_sq*r_norm_sq;
-            double beta=MAX(0.0,(r_norm_sq-r.dot(r_old))/r_norm_sq);
+            دوہرا beta=MAX(0.0,(r_norm_sq-r.dot(r_old))/r_norm_sq);
             d=r+beta*d;
         }
 
 
 
-        if(x_mat.rows>1){
-            Mat(ndim, 1, CV_64F, proxy_x.ptr<double>()).copyTo(x);
+        اگر(x_mat.صفیں>1){
+            Mat(ndim, 1, CV_64F, proxy_x.ptr<دوہرا>()).copy_مقصد(x);
         }
-        return _Function->calc(proxy_x.ptr<double>());
+        واپس _Function->calc(proxy_x.ptr<دوہرا>());
     }
 
     ConjGradSolverImpl::ConjGradSolverImpl(){
         _Function=Ptr<Function>();
     }
-    Ptr<MinProblemSolver::Function> ConjGradSolverImpl::getFunction()const{
-        return _Function;
+    Ptr<MinProblemSolver::Function> ConjGradSolverImpl::getFunction()ثابت{
+        واپس _Function;
     }
-    void ConjGradSolverImpl::setFunction(const Ptr<Function>& f){
+    خالی ConjGradSolverImpl::سیٹ_Function(ثابت Ptr<Function>& f){
         _Function=f;
     }
-    TermCriteria ConjGradSolverImpl::getTermCriteria()const{
-        return _termcrit;
+    رکن_Criteria ConjGradSolverImpl::get_رکن_Criteria()ثابت{
+        واپس _termcrit;
     }
-    void ConjGradSolverImpl::setTermCriteria(const TermCriteria& termcrit){
-        CV_Assert((termcrit.type==(TermCriteria::MAX_ITER+TermCriteria::EPS) && termcrit.epsilon>0 && termcrit.maxCount>0) ||
-                ((termcrit.type==TermCriteria::MAX_ITER) && termcrit.maxCount>0));
+    خالی ConjGradSolverImpl::سیٹ_رکن_Criteria(ثابت رکن_Criteria& termcrit){
+        CV_Assert((termcrit.type==(رکن_Criteria::MAX_ITER+رکن_Criteria::EPS) && termcrit.epsilon>0 && termcrit.max_گنتی>0) ||
+                ((termcrit.type==رکن_Criteria::MAX_ITER) && termcrit.max_گنتی>0));
         _termcrit=termcrit;
     }
     // both minRange & minError are specified by termcrit.epsilon; In addition, user may specify the number of iterations that the algorithm does.
-    Ptr<ConjGradSolver> ConjGradSolver::create(const Ptr<MinProblemSolver::Function>& f, TermCriteria termcrit){
+    Ptr<ConjGradSolver> ConjGradSolver::create(ثابت Ptr<MinProblemSolver::Function>& f, رکن_Criteria termcrit){
         Ptr<ConjGradSolver> CG = makePtr<ConjGradSolverImpl>();
-        CG->setFunction(f);
-        CG->setTermCriteria(termcrit);
-        return CG;
+        CG->سیٹ_Function(f);
+        CG->سیٹ_رکن_Criteria(termcrit);
+        واپس CG;
     }
 }

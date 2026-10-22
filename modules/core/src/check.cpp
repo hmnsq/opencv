@@ -2,205 +2,205 @@
 // It is subject to the license terms in the LICENSE file found in the top-level directory
 // of this distribution and at http://opencv.org/license.html.
 
-#include "precomp.hpp"
+#شامل "precomp.hpp"
 
-#include <sstream>
+#شامل <sstream>
 
-#include "opencv2/core/check.hpp"
+#شامل "opencv2/core/check.hpp"
 
-namespace cv {
+نامخلا cv {
 
-const char* depthToString(int depth)
+ثابت حرف* گہرائی_مقصد_String(صحیح گہرائی)
 {
-    const char* s = detail::depthToString_(depth);
-    return s ? s : "<invalid depth>";
+    ثابت حرف* s = detail::گہرائی_مقصد_String_2(گہرائی);
+    واپس s ? s : "<invalid depth>";
 }
 
-cv::String typeToString(int type)
+cv::String type_مقصد_String(صحیح type)
 {
-    cv::String s = detail::typeToString_(type);
-    if (s.empty())
+    cv::String s = detail::type_مقصد_String_2(type);
+    اگر (s.empty())
     {
-        static cv::String invalidType("<invalid type>");
-        return invalidType;
+        ساکن cv::String invalidType("<invalid type>");
+        واپس invalidType;
     }
-    return s;
+    واپس s;
 }
 
 
-namespace detail {
+نامخلا detail {
 
-static const char* getTestOpPhraseStr(unsigned testOp)
+ساکن ثابت حرف* getTestOpPhraseStr(غیرعلامتی testOp)
 {
-    static const char* _names[] = { "{custom check}", "equal to", "not equal to", "less than or equal to", "less than", "greater than or equal to", "greater than" };
-    CV_DbgAssert(testOp < CV__LAST_TEST_OP);
-    return testOp < CV__LAST_TEST_OP ? _names[testOp] : "???";
+    ساکن ثابت حرف* نام[] = { "{custom check}", "equal to", "not equal to", "less than or equal to", "less than", "greater than or equal to", "greater than" };
+    CV_DbgAssert(testOp < CV_آخری_TEST_OP);
+    واپس testOp < CV_آخری_TEST_OP ? نام[testOp] : "???";
 }
-static const char* getTestOpMath(unsigned testOp)
+ساکن ثابت حرف* getTestOpMath(غیرعلامتی testOp)
 {
-    static const char* _names[] = { "???", "==", "!=", "<=", "<", ">=", ">" };
-    CV_DbgAssert(testOp < CV__LAST_TEST_OP);
-    return testOp < CV__LAST_TEST_OP ? _names[testOp] : "???";
+    ساکن ثابت حرف* نام[] = { "???", "==", "!=", "<=", "<", ">=", ">" };
+    CV_DbgAssert(testOp < CV_آخری_TEST_OP);
+    واپس testOp < CV_آخری_TEST_OP ? نام[testOp] : "???";
 }
 
-const char* depthToString_(int depth)
+ثابت حرف* گہرائی_مقصد_String_2(صحیح گہرائی)
 {
-    static const char* depthNames[] = { "CV_8U", "CV_8S", "CV_16U", "CV_16S", "CV_32S", "CV_32F", "CV_64F", "CV_16F",
+    ساکن ثابت حرف* گہرائی_نام[] = { "CV_8U", "CV_8S", "CV_16U", "CV_16S", "CV_32S", "CV_32F", "CV_64F", "CV_16F",
                                         "CV_16BF", "CV_Bool", "CV_64U", "CV_64S", "CV_32U",
                                         "CV_8F", "CV_8FNUZ" };
-    return (depth < CV_DEPTH_CURR_MAX && depth >= 0) ? depthNames[depth] : NULL;
+    واپس (گہرائی < CV_گہرائی_CURR_MAX && گہرائی >= 0) ? گہرائی_نام[گہرائی] : تہی;
 }
 
-cv::String typeToString_(int type)
+cv::String type_مقصد_String_2(صحیح type)
 {
-    int depth = CV_MAT_DEPTH(type);
-    int cn = CV_MAT_CN(type);
-    if (depth >= 0 && depth < CV_DEPTH_CURR_MAX)
-        return cv::format("%sC%d", depthToString_(depth), cn);
-    return cv::String();
+    صحیح گہرائی = CV_MAT_گہرائی(type);
+    صحیح cn = CV_MAT_CN(type);
+    اگر (گہرائی >= 0 && گہرائی < CV_گہرائی_CURR_MAX)
+        واپس cv::format("%sC%d", گہرائی_مقصد_String_2(گہرائی), cn);
+    واپس cv::String();
 }
 
-template<typename T> static CV_NORETURN
-void check_failed_auto_(const T& v1, const T& v2, const CheckContext& ctx)
+سانچہ<قسم_نام T> ساکن CV_NORETURN
+خالی check_failed_auto_(ثابت T& v1, ثابت T& v2, ثابت CheckContext& ctx)
 {
     std::stringstream ss;
-    ss  << ctx.message << " (expected: '" << ctx.p1_str << " " << getTestOpMath(ctx.testOp) << " " << ctx.p2_str << "'), where" << std::endl
-        << "    '" << ctx.p1_str << "' is " << v1 << std::endl;
-    if (ctx.testOp != TEST_CUSTOM && ctx.testOp < CV__LAST_TEST_OP)
+    ss  << ctx.message << " (expected: '" << ctx.p1_str << " " << getTestOpMath(ctx.testOp) << " " << ctx.p2_str << "'), where" << std::سطر_ختم
+        << "    '" << ctx.p1_str << "' is " << v1 << std::سطر_ختم;
+    اگر (ctx.testOp != TEST_CUSTOM && ctx.testOp < CV_آخری_TEST_OP)
     {
-        ss << "must be " << getTestOpPhraseStr(ctx.testOp) << std::endl;
+        ss << "must be " << getTestOpPhraseStr(ctx.testOp) << std::سطر_ختم;
     }
     ss  << "    '" << ctx.p2_str << "' is " << v2;
-    cv::error(cv::Error::StsError, ss.str(), ctx.func, ctx.file, ctx.line);
+    cv::error(cv::Error::StsError, ss.str(), ctx.func, ctx.file, ctx.سطر);
 }
-void check_failed_MatDepth(const int v1, const int v2, const CheckContext& ctx)
+خالی check_failed_Mat_گہرائی(ثابت صحیح v1, ثابت صحیح v2, ثابت CheckContext& ctx)
 {
     std::stringstream ss;
-    ss  << ctx.message << " (expected: '" << ctx.p1_str << " " << getTestOpMath(ctx.testOp) << " " << ctx.p2_str << "'), where" << std::endl
-        << "    '" << ctx.p1_str << "' is " << v1 << " (" << depthToString(v1) << ")" << std::endl;
-    if (ctx.testOp != TEST_CUSTOM && ctx.testOp < CV__LAST_TEST_OP)
+    ss  << ctx.message << " (expected: '" << ctx.p1_str << " " << getTestOpMath(ctx.testOp) << " " << ctx.p2_str << "'), where" << std::سطر_ختم
+        << "    '" << ctx.p1_str << "' is " << v1 << " (" << گہرائی_مقصد_String(v1) << ")" << std::سطر_ختم;
+    اگر (ctx.testOp != TEST_CUSTOM && ctx.testOp < CV_آخری_TEST_OP)
     {
-        ss << "must be " << getTestOpPhraseStr(ctx.testOp) << std::endl;
+        ss << "must be " << getTestOpPhraseStr(ctx.testOp) << std::سطر_ختم;
     }
-    ss  << "    '" << ctx.p2_str << "' is " << v2 << " (" << depthToString(v2) << ")";
-    cv::error(cv::Error::StsError, ss.str(), ctx.func, ctx.file, ctx.line);
+    ss  << "    '" << ctx.p2_str << "' is " << v2 << " (" << گہرائی_مقصد_String(v2) << ")";
+    cv::error(cv::Error::StsError, ss.str(), ctx.func, ctx.file, ctx.سطر);
 }
-void check_failed_MatType(const int v1, const int v2, const CheckContext& ctx)
+خالی check_failed_MatType(ثابت صحیح v1, ثابت صحیح v2, ثابت CheckContext& ctx)
 {
     std::stringstream ss;
-    ss  << ctx.message << " (expected: '" << ctx.p1_str << " " << getTestOpMath(ctx.testOp) << " " << ctx.p2_str << "'), where" << std::endl
-        << "    '" << ctx.p1_str << "' is " << v1 << " (" << typeToString(v1) << ")" << std::endl;
-    if (ctx.testOp != TEST_CUSTOM && ctx.testOp < CV__LAST_TEST_OP)
+    ss  << ctx.message << " (expected: '" << ctx.p1_str << " " << getTestOpMath(ctx.testOp) << " " << ctx.p2_str << "'), where" << std::سطر_ختم
+        << "    '" << ctx.p1_str << "' is " << v1 << " (" << type_مقصد_String(v1) << ")" << std::سطر_ختم;
+    اگر (ctx.testOp != TEST_CUSTOM && ctx.testOp < CV_آخری_TEST_OP)
     {
-        ss << "must be " << getTestOpPhraseStr(ctx.testOp) << std::endl;
+        ss << "must be " << getTestOpPhraseStr(ctx.testOp) << std::سطر_ختم;
     }
-    ss  << "    '" << ctx.p2_str << "' is " << v2 << " (" << typeToString(v2) << ")";
-    cv::error(cv::Error::StsError, ss.str(), ctx.func, ctx.file, ctx.line);
+    ss  << "    '" << ctx.p2_str << "' is " << v2 << " (" << type_مقصد_String(v2) << ")";
+    cv::error(cv::Error::StsError, ss.str(), ctx.func, ctx.file, ctx.سطر);
 }
-void check_failed_MatChannels(const int v1, const int v2, const CheckContext& ctx)
+خالی check_failed_MatChannels(ثابت صحیح v1, ثابت صحیح v2, ثابت CheckContext& ctx)
 {
-    check_failed_auto_<int>(v1, v2, ctx);
+    check_failed_auto_<صحیح>(v1, v2, ctx);
 }
-void check_failed_auto(const bool v1, const bool v2, const CheckContext& ctx)
+خالی check_failed_auto(ثابت منطقی v1, ثابت منطقی v2, ثابت CheckContext& ctx)
 {
-    check_failed_auto_<bool>(v1, v2, ctx);
+    check_failed_auto_<منطقی>(v1, v2, ctx);
 }
-void check_failed_auto(const int v1, const int v2, const CheckContext& ctx)
+خالی check_failed_auto(ثابت صحیح v1, ثابت صحیح v2, ثابت CheckContext& ctx)
 {
-    check_failed_auto_<int>(v1, v2, ctx);
+    check_failed_auto_<صحیح>(v1, v2, ctx);
 }
-void check_failed_auto(const size_t v1, const size_t v2, const CheckContext& ctx)
+خالی check_failed_auto(ثابت size_t v1, ثابت size_t v2, ثابت CheckContext& ctx)
 {
     check_failed_auto_<size_t>(v1, v2, ctx);
 }
-void check_failed_auto(const float v1, const float v2, const CheckContext& ctx)
+خالی check_failed_auto(ثابت اعشاری v1, ثابت اعشاری v2, ثابت CheckContext& ctx)
 {
-    check_failed_auto_<float>(v1, v2, ctx);
+    check_failed_auto_<اعشاری>(v1, v2, ctx);
 }
-void check_failed_auto(const double v1, const double v2, const CheckContext& ctx)
+خالی check_failed_auto(ثابت دوہرا v1, ثابت دوہرا v2, ثابت CheckContext& ctx)
 {
-    check_failed_auto_<double>(v1, v2, ctx);
+    check_failed_auto_<دوہرا>(v1, v2, ctx);
 }
-void check_failed_auto(const Size_<int> v1, const Size_<int> v2, const CheckContext& ctx)
+خالی check_failed_auto(ثابت سائز_2<صحیح> v1, ثابت سائز_2<صحیح> v2, ثابت CheckContext& ctx)
 {
-    check_failed_auto_< Size_<int> >(v1, v2, ctx);
+    check_failed_auto_< سائز_2<صحیح> >(v1, v2, ctx);
 }
 
 
-template<typename T> static CV_NORETURN
-void check_failed_auto_(const T& v, const CheckContext& ctx)
+سانچہ<قسم_نام T> ساکن CV_NORETURN
+خالی check_failed_auto_(ثابت T& v, ثابت CheckContext& ctx)
 {
     std::stringstream ss;
-    ss  << ctx.message << ":" << std::endl
-        << "    '" << ctx.p2_str << "'" << std::endl
-        << "where" << std::endl
+    ss  << ctx.message << ":" << std::سطر_ختم
+        << "    '" << ctx.p2_str << "'" << std::سطر_ختم
+        << "where" << std::سطر_ختم
         << "    '" << ctx.p1_str << "' is " << v;
-    cv::error(cv::Error::StsError, ss.str(), ctx.func, ctx.file, ctx.line);
+    cv::error(cv::Error::StsError, ss.str(), ctx.func, ctx.file, ctx.سطر);
 }
-void check_failed_MatDepth(const int v, const CheckContext& ctx)
+خالی check_failed_Mat_گہرائی(ثابت صحیح v, ثابت CheckContext& ctx)
 {
     std::stringstream ss;
-    ss  << ctx.message << ":" << std::endl
-        << "    '" << ctx.p2_str << "'" << std::endl
-        << "where" << std::endl
-        << "    '" << ctx.p1_str << "' is " << v << " (" << depthToString(v) << ")";
-    cv::error(cv::Error::StsError, ss.str(), ctx.func, ctx.file, ctx.line);
+    ss  << ctx.message << ":" << std::سطر_ختم
+        << "    '" << ctx.p2_str << "'" << std::سطر_ختم
+        << "where" << std::سطر_ختم
+        << "    '" << ctx.p1_str << "' is " << v << " (" << گہرائی_مقصد_String(v) << ")";
+    cv::error(cv::Error::StsError, ss.str(), ctx.func, ctx.file, ctx.سطر);
 }
-void check_failed_MatType(const int v, const CheckContext& ctx)
+خالی check_failed_MatType(ثابت صحیح v, ثابت CheckContext& ctx)
 {
     std::stringstream ss;
-    ss  << ctx.message << ":" << std::endl
-        << "    '" << ctx.p2_str << "'" << std::endl
-        << "where" << std::endl
-        << "    '" << ctx.p1_str << "' is " << v << " (" << typeToString(v) << ")";
-    cv::error(cv::Error::StsError, ss.str(), ctx.func, ctx.file, ctx.line);
+    ss  << ctx.message << ":" << std::سطر_ختم
+        << "    '" << ctx.p2_str << "'" << std::سطر_ختم
+        << "where" << std::سطر_ختم
+        << "    '" << ctx.p1_str << "' is " << v << " (" << type_مقصد_String(v) << ")";
+    cv::error(cv::Error::StsError, ss.str(), ctx.func, ctx.file, ctx.سطر);
 }
-void check_failed_MatChannels(const int v, const CheckContext& ctx)
+خالی check_failed_MatChannels(ثابت صحیح v, ثابت CheckContext& ctx)
 {
     std::stringstream ss;
-    ss  << ctx.message << ":" << std::endl
-        << "    '" << ctx.p2_str << "'" << std::endl
-        << "where" << std::endl
+    ss  << ctx.message << ":" << std::سطر_ختم
+        << "    '" << ctx.p2_str << "'" << std::سطر_ختم
+        << "where" << std::سطر_ختم
         << "    '" << ctx.p1_str << "' is " << v;
-    cv::error(cv::Error::BadNumChannels, ss.str(), ctx.func, ctx.file, ctx.line);
+    cv::error(cv::Error::Bad_عدد_Channels, ss.str(), ctx.func, ctx.file, ctx.سطر);
 }
-void check_failed_true(const bool v, const CheckContext& ctx)
+خالی check_failed_true(ثابت منطقی v, ثابت CheckContext& ctx)
 {
-    CV_UNUSED(v);
+    CV_غیر_مستعمل(v);
     std::stringstream ss;
-    ss  << ctx.message << ":" << std::endl
+    ss  << ctx.message << ":" << std::سطر_ختم
         << "    '" << ctx.p1_str << "' must be 'true'";
-    cv::error(cv::Error::StsError, ss.str(), ctx.func, ctx.file, ctx.line);
+    cv::error(cv::Error::StsError, ss.str(), ctx.func, ctx.file, ctx.سطر);
 }
-void check_failed_false(const bool v, const CheckContext& ctx)
+خالی check_failed_false(ثابت منطقی v, ثابت CheckContext& ctx)
 {
-    CV_UNUSED(v);
+    CV_غیر_مستعمل(v);
     std::stringstream ss;
-    ss  << ctx.message << ":" << std::endl
+    ss  << ctx.message << ":" << std::سطر_ختم
         << "    '" << ctx.p1_str << "' must be 'false'";
-    cv::error(cv::Error::StsError, ss.str(), ctx.func, ctx.file, ctx.line);
+    cv::error(cv::Error::StsError, ss.str(), ctx.func, ctx.file, ctx.سطر);
 }
-void check_failed_auto(const int v, const CheckContext& ctx)
+خالی check_failed_auto(ثابت صحیح v, ثابت CheckContext& ctx)
 {
-    check_failed_auto_<int>(v, ctx);
+    check_failed_auto_<صحیح>(v, ctx);
 }
-void check_failed_auto(const size_t v, const CheckContext& ctx)
+خالی check_failed_auto(ثابت size_t v, ثابت CheckContext& ctx)
 {
     check_failed_auto_<size_t>(v, ctx);
 }
-void check_failed_auto(const float v, const CheckContext& ctx)
+خالی check_failed_auto(ثابت اعشاری v, ثابت CheckContext& ctx)
 {
-    check_failed_auto_<float>(v, ctx);
+    check_failed_auto_<اعشاری>(v, ctx);
 }
-void check_failed_auto(const double v, const CheckContext& ctx)
+خالی check_failed_auto(ثابت دوہرا v, ثابت CheckContext& ctx)
 {
-    check_failed_auto_<double>(v, ctx);
+    check_failed_auto_<دوہرا>(v, ctx);
 }
-void check_failed_auto(const Size_<int> v, const CheckContext& ctx)
+خالی check_failed_auto(ثابت سائز_2<صحیح> v, ثابت CheckContext& ctx)
 {
-    check_failed_auto_< Size_<int> >(v, ctx);
+    check_failed_auto_< سائز_2<صحیح> >(v, ctx);
 }
-void check_failed_auto(const std::string& v, const CheckContext& ctx)
+خالی check_failed_auto(ثابت std::string& v, ثابت CheckContext& ctx)
 {
     check_failed_auto_< std::string >(v, ctx);
 }

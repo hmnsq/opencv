@@ -5,20 +5,20 @@
 // Copyright (C) 2026, Advanced Micro Devices, Inc., all rights reserved.
 
 
-#include "precomp.hpp"
-#include "opencl_kernels_core.hpp"
-#include "stat.hpp"
+#شامل "precomp.hpp"
+#شامل "opencl_kernels_core.hpp"
+#شامل "stat.hpp"
 
-#include "norm.simd.hpp"
-#include "norm.simd_declarations.hpp"
+#شامل "norm.simd.hpp"
+#شامل "norm.simd_declarations.hpp"
 
 /****************************************************************************************\
 *                                         norm                                           *
 \****************************************************************************************/
 
-namespace cv { namespace hal {
+نامخلا cv { نامخلا hal {
 
-extern const uchar popCountTable[256] =
+خارجی ثابت uchar نکالو_گنتی_جدول[256] =
 {
     0, 1, 1, 2, 1, 2, 2, 3, 1, 2, 2, 3, 2, 3, 3, 4, 1, 2, 2, 3, 2, 3, 3, 4, 2, 3, 3, 4, 3, 4, 4, 5,
     1, 2, 2, 3, 2, 3, 3, 4, 2, 3, 3, 4, 3, 4, 4, 5, 2, 3, 3, 4, 3, 4, 4, 5, 3, 4, 4, 5, 4, 5, 5, 6,
@@ -30,7 +30,7 @@ extern const uchar popCountTable[256] =
     3, 4, 4, 5, 4, 5, 5, 6, 4, 5, 5, 6, 5, 6, 6, 7, 4, 5, 5, 6, 5, 6, 6, 7, 5, 6, 6, 7, 6, 7, 7, 8
 };
 
-static const uchar popCountTable2[] =
+ساکن ثابت uchar نکالو_گنتی_Table2[] =
 {
     0, 1, 1, 1, 1, 2, 2, 2, 1, 2, 2, 2, 1, 2, 2, 2, 1, 2, 2, 2, 2, 3, 3, 3, 2, 3, 3, 3, 2, 3, 3, 3,
     1, 2, 2, 2, 2, 3, 3, 3, 2, 3, 3, 3, 2, 3, 3, 3, 1, 2, 2, 2, 2, 3, 3, 3, 2, 3, 3, 3, 2, 3, 3, 3,
@@ -42,7 +42,7 @@ static const uchar popCountTable2[] =
     2, 3, 3, 3, 3, 4, 4, 4, 3, 4, 4, 4, 3, 4, 4, 4, 2, 3, 3, 3, 3, 4, 4, 4, 3, 4, 4, 4, 3, 4, 4, 4
 };
 
-static const uchar popCountTable4[] =
+ساکن ثابت uchar نکالو_گنتی_Table4[] =
 {
     0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
     1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
@@ -55,524 +55,524 @@ static const uchar popCountTable4[] =
 };
 
 
-int normHamming(const uchar* a, int n, int cellSize)
+صحیح normHamming(ثابت uchar* a, صحیح n, صحیح cell_سائز)
 {
-    int output;
-    CALL_HAL_RET(normHamming8u, cv_hal_normHamming8u, output, a, n, cellSize);
+    صحیح output;
+    CALL_HAL_RET(normHamming8u, cv_hal_normHamming8u, output, a, n, cell_سائز);
 
-    if( cellSize == 1 )
-        return normHamming(a, n);
-    const uchar* tab = 0;
-    if( cellSize == 2 )
-        tab = popCountTable2;
-    else if( cellSize == 4 )
-        tab = popCountTable4;
-    else
-        return -1;
-    int i = 0;
-    int result = 0;
-#if (CV_SIMD || CV_SIMD_SCALABLE)
+    اگر( cell_سائز == 1 )
+        واپس normHamming(a, n);
+    ثابت uchar* tab = 0;
+    اگر( cell_سائز == 2 )
+        tab = نکالو_گنتی_Table2;
+    ورنہ اگر( cell_سائز == 4 )
+        tab = نکالو_گنتی_Table4;
+    ورنہ
+        واپس -1;
+    صحیح i = 0;
+    صحیح نتیجہ = 0;
+#اگر (CV_SIMD || CV_SIMD_SCALABLE)
     v_uint64 t = vx_setzero_u64();
-    if ( cellSize == 2)
+    اگر ( cell_سائز == 2)
     {
-        v_uint16 mask = v_reinterpret_as_u16(vx_setall_u8(0x55));
-        for(; i <= n - VTraits<v_uint8>::vlanes(); i += VTraits<v_uint8>::vlanes())
+        v_uint16 نقاب = v_reinterpret_as_u16(vx_setall_u8(0x55));
+        برائے(; i <= n - VTraits<v_uint8>::vlanes(); i += VTraits<v_uint8>::vlanes())
         {
-            v_uint16 a0 = v_reinterpret_as_u16(vx_load(a + i));
-            t = v_add(t, v_popcount(v_reinterpret_as_u64(v_and(v_or(a0, v_shr<1>(a0)), mask))));
+            v_uint16 a0 = v_reinterpret_as_u16(vx_بھرو(a + i));
+            t = v_جوڑو(t, v_popcount(v_reinterpret_as_u64(v_and(v_or(a0, v_shr<1>(a0)), نقاب))));
         }
     }
-    else    // cellSize == 4
+    ورنہ    // cellSize == 4
     {
-        v_uint16 mask = v_reinterpret_as_u16(vx_setall_u8(0x11));
-        for(; i <= n - VTraits<v_uint8>::vlanes(); i += VTraits<v_uint8>::vlanes())
+        v_uint16 نقاب = v_reinterpret_as_u16(vx_setall_u8(0x11));
+        برائے(; i <= n - VTraits<v_uint8>::vlanes(); i += VTraits<v_uint8>::vlanes())
         {
-            v_uint16 a0 = v_reinterpret_as_u16(vx_load(a + i));
+            v_uint16 a0 = v_reinterpret_as_u16(vx_بھرو(a + i));
             v_uint16 a1 = v_or(a0, v_shr<2>(a0));
-            t = v_add(t, v_popcount(v_reinterpret_as_u64(v_and(v_or(a1, v_shr<1>(a1)), mask))));
+            t = v_جوڑو(t, v_popcount(v_reinterpret_as_u64(v_and(v_or(a1, v_shr<1>(a1)), نقاب))));
 
         }
     }
-    result += (int)v_reduce_sum(t);
+    نتیجہ += (صحیح)v_reduce_مجموع(t);
     vx_cleanup();
-#elif CV_ENABLE_UNROLLED
-    for( ; i <= n - 4; i += 4 )
-        result += tab[a[i]] + tab[a[i+1]] + tab[a[i+2]] + tab[a[i+3]];
-#endif
-    for( ; i < n; i++ )
-        result += tab[a[i]];
-    return result;
+#وگرنہ_اگر CV_ENABLE_UNROLLED
+    برائے( ; i <= n - 4; i += 4 )
+        نتیجہ += tab[a[i]] + tab[a[i+1]] + tab[a[i+2]] + tab[a[i+3]];
+#اگر_ختم
+    برائے( ; i < n; i++ )
+        نتیجہ += tab[a[i]];
+    واپس نتیجہ;
 }
 
-int normHamming(const uchar* a, const uchar* b, int n, int cellSize)
+صحیح normHamming(ثابت uchar* a, ثابت uchar* b, صحیح n, صحیح cell_سائز)
 {
-    int output;
-    CALL_HAL_RET(normHammingDiff8u, cv_hal_normHammingDiff8u, output, a, b, n, cellSize);
+    صحیح output;
+    CALL_HAL_RET(normHammingDiff8u, cv_hal_normHammingDiff8u, output, a, b, n, cell_سائز);
 
-    if( cellSize == 1 )
-        return normHamming(a, b, n);
-    const uchar* tab = 0;
-    if( cellSize == 2 )
-        tab = popCountTable2;
-    else if( cellSize == 4 )
-        tab = popCountTable4;
-    else
-        return -1;
-    int i = 0;
-    int result = 0;
-#if (CV_SIMD || CV_SIMD_SCALABLE)
+    اگر( cell_سائز == 1 )
+        واپس normHamming(a, b, n);
+    ثابت uchar* tab = 0;
+    اگر( cell_سائز == 2 )
+        tab = نکالو_گنتی_Table2;
+    ورنہ اگر( cell_سائز == 4 )
+        tab = نکالو_گنتی_Table4;
+    ورنہ
+        واپس -1;
+    صحیح i = 0;
+    صحیح نتیجہ = 0;
+#اگر (CV_SIMD || CV_SIMD_SCALABLE)
     v_uint64 t = vx_setzero_u64();
-    if ( cellSize == 2)
+    اگر ( cell_سائز == 2)
     {
-        v_uint16 mask = v_reinterpret_as_u16(vx_setall_u8(0x55));
-        for(; i <= n - VTraits<v_uint8>::vlanes(); i += VTraits<v_uint8>::vlanes())
+        v_uint16 نقاب = v_reinterpret_as_u16(vx_setall_u8(0x55));
+        برائے(; i <= n - VTraits<v_uint8>::vlanes(); i += VTraits<v_uint8>::vlanes())
         {
-            v_uint16 ab0 = v_reinterpret_as_u16(v_xor(vx_load(a + i), vx_load(b + i)));
-            t = v_add(t, v_popcount(v_reinterpret_as_u64(v_and(v_or(ab0, v_shr<1>(ab0)), mask))));
+            v_uint16 ab0 = v_reinterpret_as_u16(v_xor(vx_بھرو(a + i), vx_بھرو(b + i)));
+            t = v_جوڑو(t, v_popcount(v_reinterpret_as_u64(v_and(v_or(ab0, v_shr<1>(ab0)), نقاب))));
         }
     }
-    else    // cellSize == 4
+    ورنہ    // cellSize == 4
     {
-        v_uint16 mask = v_reinterpret_as_u16(vx_setall_u8(0x11));
-        for(; i <= n - VTraits<v_uint8>::vlanes(); i += VTraits<v_uint8>::vlanes())
+        v_uint16 نقاب = v_reinterpret_as_u16(vx_setall_u8(0x11));
+        برائے(; i <= n - VTraits<v_uint8>::vlanes(); i += VTraits<v_uint8>::vlanes())
         {
-            v_uint16 ab0 = v_reinterpret_as_u16(v_xor(vx_load(a + i), vx_load(b + i)));
+            v_uint16 ab0 = v_reinterpret_as_u16(v_xor(vx_بھرو(a + i), vx_بھرو(b + i)));
             v_uint16 ab1 = v_or(ab0, v_shr<2>(ab0));
-            t = v_add(t, v_popcount(v_reinterpret_as_u64(v_and(v_or(ab1, v_shr<1>(ab1)), mask))));
+            t = v_جوڑو(t, v_popcount(v_reinterpret_as_u64(v_and(v_or(ab1, v_shr<1>(ab1)), نقاب))));
         }
     }
-    result += (int)v_reduce_sum(t);
+    نتیجہ += (صحیح)v_reduce_مجموع(t);
     vx_cleanup();
-#elif CV_ENABLE_UNROLLED
-    for( ; i <= n - 4; i += 4 )
-        result += tab[a[i] ^ b[i]] + tab[a[i+1] ^ b[i+1]] +
+#وگرنہ_اگر CV_ENABLE_UNROLLED
+    برائے( ; i <= n - 4; i += 4 )
+        نتیجہ += tab[a[i] ^ b[i]] + tab[a[i+1] ^ b[i+1]] +
                 tab[a[i+2] ^ b[i+2]] + tab[a[i+3] ^ b[i+3]];
-#endif
-    for( ; i < n; i++ )
-        result += tab[a[i] ^ b[i]];
-    return result;
+#اگر_ختم
+    برائے( ; i < n; i++ )
+        نتیجہ += tab[a[i] ^ b[i]];
+    واپس نتیجہ;
 }
 
-float normL2Sqr_(const float* a, const float* b, int n)
+اعشاری normL2Sqr_(ثابت اعشاری* a, ثابت اعشاری* b, صحیح n)
 {
-    int j = 0; float d = 0.f;
-#if (CV_SIMD || CV_SIMD_SCALABLE)
-    const int vl = VTraits<v_float32>::vlanes();
+    صحیح j = 0; اعشاری d = 0.f;
+#اگر (CV_SIMD || CV_SIMD_SCALABLE)
+    ثابت صحیح vl = VTraits<v_float32>::vlanes();
     v_float32 v_d0 = vx_setzero_f32(), v_d1 = vx_setzero_f32();
     v_float32 v_d2 = vx_setzero_f32(), v_d3 = vx_setzero_f32();
-    for (; j <= n - 4 * vl; j += 4 * vl)
+    برائے (; j <= n - 4 * vl; j += 4 * vl)
     {
-        v_float32 t0 = v_sub(vx_load(a + j), vx_load(b + j));
-        v_float32 t1 = v_sub(vx_load(a + j + vl), vx_load(b + j + vl));
+        v_float32 t0 = v_sub(vx_بھرو(a + j), vx_بھرو(b + j));
+        v_float32 t1 = v_sub(vx_بھرو(a + j + vl), vx_بھرو(b + j + vl));
         v_d0 = v_muladd(t0, t0, v_d0);
-        v_float32 t2 = v_sub(vx_load(a + j + 2 * vl), vx_load(b + j + 2 * vl));
+        v_float32 t2 = v_sub(vx_بھرو(a + j + 2 * vl), vx_بھرو(b + j + 2 * vl));
         v_d1 = v_muladd(t1, t1, v_d1);
-        v_float32 t3 = v_sub(vx_load(a + j + 3 * vl), vx_load(b + j + 3 * vl));
+        v_float32 t3 = v_sub(vx_بھرو(a + j + 3 * vl), vx_بھرو(b + j + 3 * vl));
         v_d2 = v_muladd(t2, t2, v_d2);
         v_d3 = v_muladd(t3, t3, v_d3);
     }
-    v_d0 = v_add(v_add(v_d0, v_d1), v_add(v_d2, v_d3));
-    for (; j <= n - vl; j += vl)
+    v_d0 = v_جوڑو(v_جوڑو(v_d0, v_d1), v_جوڑو(v_d2, v_d3));
+    برائے (; j <= n - vl; j += vl)
     {
-        v_float32 t0 = v_sub(vx_load(a + j), vx_load(b + j));
+        v_float32 t0 = v_sub(vx_بھرو(a + j), vx_بھرو(b + j));
         v_d0 = v_muladd(t0, t0, v_d0);
     }
-    d = v_reduce_sum(v_d0);
-#endif
-    for( ; j < n; j++ )
+    d = v_reduce_مجموع(v_d0);
+#اگر_ختم
+    برائے( ; j < n; j++ )
     {
-        float t = a[j] - b[j];
+        اعشاری t = a[j] - b[j];
         d += t*t;
     }
-    return d;
+    واپس d;
 }
 
 
-float normL1_(const float* a, const float* b, int n)
+اعشاری normL1_(ثابت اعشاری* a, ثابت اعشاری* b, صحیح n)
 {
-    int j = 0; float d = 0.f;
-#if (CV_SIMD || CV_SIMD_SCALABLE)
-    const int vl = VTraits<v_float32>::vlanes();
+    صحیح j = 0; اعشاری d = 0.f;
+#اگر (CV_SIMD || CV_SIMD_SCALABLE)
+    ثابت صحیح vl = VTraits<v_float32>::vlanes();
     v_float32 v_d0 = vx_setzero_f32(), v_d1 = vx_setzero_f32();
     v_float32 v_d2 = vx_setzero_f32(), v_d3 = vx_setzero_f32();
-    for (; j <= n - 4 * vl; j += 4 * vl)
+    برائے (; j <= n - 4 * vl; j += 4 * vl)
     {
-        v_d0 = v_add(v_d0, v_absdiff(vx_load(a + j), vx_load(b + j)));
-        v_d1 = v_add(v_d1, v_absdiff(vx_load(a + j + vl), vx_load(b + j + vl)));
-        v_d2 = v_add(v_d2, v_absdiff(vx_load(a + j + 2 * vl), vx_load(b + j + 2 * vl)));
-        v_d3 = v_add(v_d3, v_absdiff(vx_load(a + j + 3 * vl), vx_load(b + j + 3 * vl)));
+        v_d0 = v_جوڑو(v_d0, v_absdiff(vx_بھرو(a + j), vx_بھرو(b + j)));
+        v_d1 = v_جوڑو(v_d1, v_absdiff(vx_بھرو(a + j + vl), vx_بھرو(b + j + vl)));
+        v_d2 = v_جوڑو(v_d2, v_absdiff(vx_بھرو(a + j + 2 * vl), vx_بھرو(b + j + 2 * vl)));
+        v_d3 = v_جوڑو(v_d3, v_absdiff(vx_بھرو(a + j + 3 * vl), vx_بھرو(b + j + 3 * vl)));
     }
-    v_d0 = v_add(v_add(v_d0, v_d1), v_add(v_d2, v_d3));
-    for (; j <= n - vl; j += vl)
-        v_d0 = v_add(v_d0, v_absdiff(vx_load(a + j), vx_load(b + j)));
-    d = v_reduce_sum(v_d0);
-#endif
-    for( ; j < n; j++ )
-        d += std::abs(a[j] - b[j]);
-    return d;
+    v_d0 = v_جوڑو(v_جوڑو(v_d0, v_d1), v_جوڑو(v_d2, v_d3));
+    برائے (; j <= n - vl; j += vl)
+        v_d0 = v_جوڑو(v_d0, v_absdiff(vx_بھرو(a + j), vx_بھرو(b + j)));
+    d = v_reduce_مجموع(v_d0);
+#اگر_ختم
+    برائے( ; j < n; j++ )
+        d += std::مطلق_قدر(a[j] - b[j]);
+    واپس d;
 }
 
-int normL1_(const uchar* a, const uchar* b, int n)
+صحیح normL1_(ثابت uchar* a, ثابت uchar* b, صحیح n)
 {
-    int j = 0, d = 0;
-#if (CV_SIMD || CV_SIMD_SCALABLE)
-    const int vl = VTraits<v_uint8>::vlanes();
-    for (; j <= n - 4 * vl; j += 4 * vl)
-        d += v_reduce_sad(vx_load(a + j), vx_load(b + j)) +
-             v_reduce_sad(vx_load(a + j + vl), vx_load(b + j + vl)) +
-             v_reduce_sad(vx_load(a + j + 2 * vl), vx_load(b + j + 2 * vl)) +
-             v_reduce_sad(vx_load(a + j + 3 * vl), vx_load(b + j + 3 * vl));
-    for (; j <= n - vl; j += vl)
-        d += v_reduce_sad(vx_load(a + j), vx_load(b + j));
-#endif
-    for( ; j < n; j++ )
-        d += std::abs(a[j] - b[j]);
-    return d;
+    صحیح j = 0, d = 0;
+#اگر (CV_SIMD || CV_SIMD_SCALABLE)
+    ثابت صحیح vl = VTraits<v_uint8>::vlanes();
+    برائے (; j <= n - 4 * vl; j += 4 * vl)
+        d += v_reduce_sad(vx_بھرو(a + j), vx_بھرو(b + j)) +
+             v_reduce_sad(vx_بھرو(a + j + vl), vx_بھرو(b + j + vl)) +
+             v_reduce_sad(vx_بھرو(a + j + 2 * vl), vx_بھرو(b + j + 2 * vl)) +
+             v_reduce_sad(vx_بھرو(a + j + 3 * vl), vx_بھرو(b + j + 3 * vl));
+    برائے (; j <= n - vl; j += vl)
+        d += v_reduce_sad(vx_بھرو(a + j), vx_بھرو(b + j));
+#اگر_ختم
+    برائے( ; j < n; j++ )
+        d += std::مطلق_قدر(a[j] - b[j]);
+    واپس d;
 }
 
 } //cv::hal
 
 //==================================================================================================
 
-typedef int (*NormFunc)(const uchar*, const uchar*, uchar*, int, int);
-typedef int (*NormDiffFunc)(const uchar*, const uchar*, const uchar*, uchar*, int, int);
+قسمتعریف صحیح (*NormFunc)(ثابت uchar*, ثابت uchar*, uchar*, صحیح, صحیح);
+قسمتعریف صحیح (*NormDiffFunc)(ثابت uchar*, ثابت uchar*, ثابت uchar*, uchar*, صحیح, صحیح);
 
-#ifdef HAVE_OPENCL
+#اگر_تعریف_شدہ HAVE_OPENCL
 
-static bool ocl_norm( InputArray _src, int normType, InputArray _mask, double & result )
+ساکن منطقی ocl_norm( داخلہ_Array _src, صحیح normType, داخلہ_Array نقاب_2, دوہرا & نتیجہ )
 {
-    const ocl::Device & d = ocl::Device::getDefault();
+    ثابت ocl::Device & d = ocl::Device::getDefault();
 
-#ifdef __ANDROID__
-    if (d.isNVidia())
-        return false;
-#endif
-    const int cn = _src.channels();
-    if (cn > 4)
-        return false;
-    int type = _src.type(), depth = CV_MAT_DEPTH(type);
-    bool doubleSupport = d.doubleFPConfig() > 0,
-            haveMask = _mask.kind() != _InputArray::NONE;
+#اگر_تعریف_شدہ __ANDROID__
+    اگر (d.isNVidia())
+        واپس جھوٹ;
+#اگر_ختم
+    ثابت صحیح cn = _src.channels();
+    اگر (cn > 4)
+        واپس جھوٹ;
+    صحیح type = _src.type(), گہرائی = CV_MAT_گہرائی(type);
+    منطقی doubleSupport = d.doubleFPConfig() > 0,
+            have_نقاب = نقاب_2.قسم() != داخلہ_Array_2::NONE;
 
-    if (depth >= CV_16F)
-        return false;  // TODO: support FP16
+    اگر (گہرائی >= CV_16F)
+        واپس جھوٹ;  // TODO: support FP16
 
-    if ( !(normType == NORM_INF || normType == NORM_L1 || normType == NORM_L2 || normType == NORM_L2SQR) ||
-         (!doubleSupport && depth == CV_64F))
-        return false;
+    اگر ( !(normType == NORM_INF || normType == NORM_L1 || normType == NORM_L2 || normType == NORM_L2SQR) ||
+         (!doubleSupport && گہرائی == CV_64F))
+        واپس جھوٹ;
 
     UMat src = _src.getUMat();
 
-    if (normType == NORM_INF)
+    اگر (normType == NORM_INF)
     {
-        if (!ocl_minMaxIdx(_src, NULL, &result, NULL, NULL, _mask,
-                           std::max(depth, CV_32S), depth != CV_8U && depth != CV_16U))
-            return false;
+        اگر (!ocl_minMaxIdx(_src, تہی, &نتیجہ, تہی, تہی, نقاب_2,
+                           std::max(گہرائی, CV_32S), گہرائی != CV_8U && گہرائی != CV_16U))
+            واپس جھوٹ;
     }
-    else if (normType == NORM_L1 || normType == NORM_L2 || normType == NORM_L2SQR)
+    ورنہ اگر (normType == NORM_L1 || normType == NORM_L2 || normType == NORM_L2SQR)
     {
         Scalar sc;
-        bool unstype = depth == CV_8U || depth == CV_16U;
+        منطقی unstype = گہرائی == CV_8U || گہرائی == CV_16U;
 
-        if ( !ocl_sum(haveMask ? src : src.reshape(1), sc, normType == NORM_L2 || normType == NORM_L2SQR ?
-                    OCL_OP_SUM_SQR : (unstype ? OCL_OP_SUM : OCL_OP_SUM_ABS), _mask) )
-            return false;
+        اگر ( !ocl_مجموع(have_نقاب ? src : src.reshape(1), sc, normType == NORM_L2 || normType == NORM_L2SQR ?
+                    OCL_OP_مجموع_SQR : (unstype ? OCL_OP_مجموع : OCL_OP_مجموع_ABS), نقاب_2) )
+            واپس جھوٹ;
 
-        double s = 0.0;
-        for (int i = 0; i < (haveMask ? cn : 1); ++i)
+        دوہرا s = 0.0;
+        برائے (صحیح i = 0; i < (have_نقاب ? cn : 1); ++i)
             s += sc[i];
 
-        result = normType == NORM_L1 || normType == NORM_L2SQR ? s : std::sqrt(s);
+        نتیجہ = normType == NORM_L1 || normType == NORM_L2SQR ? s : std::جذر(s);
     }
 
-    return true;
+    واپس سچ;
 }
 
-#endif
+#اگر_ختم
 
-static NormFunc getNormFunc(int normType, int depth) {
+ساکن NormFunc getNormFunc(صحیح normType, صحیح گہرائی) {
     CV_INSTRUMENT_REGION();
-    CV_CPU_DISPATCH(getNormFunc, (normType, depth), CV_CPU_DISPATCH_MODES_ALL);
+    CV_CPU_DISPATCH(getNormFunc, (normType, گہرائی), CV_CPU_DISPATCH_MODES_ALL);
 }
-static NormDiffFunc getNormDiffFunc(int normType, int depth) {
+ساکن NormDiffFunc getNormDiffFunc(صحیح normType, صحیح گہرائی) {
     CV_INSTRUMENT_REGION();
-    CV_CPU_DISPATCH(getNormDiffFunc, (normType, depth), CV_CPU_DISPATCH_MODES_ALL);
+    CV_CPU_DISPATCH(getNormDiffFunc, (normType, گہرائی), CV_CPU_DISPATCH_MODES_ALL);
 }
 
-double norm( InputArray _src, int normType, InputArray _mask )
+دوہرا norm( داخلہ_Array _src, صحیح normType, داخلہ_Array نقاب_2 )
 {
     CV_INSTRUMENT_REGION();
 
-    normType &= NORM_TYPE_MASK;
+    normType &= NORM_TYPE_نقاب;
     CV_Assert( normType == NORM_INF || normType == NORM_L1 ||
                normType == NORM_L2 || normType == NORM_L2SQR ||
                ((normType == NORM_HAMMING || normType == NORM_HAMMING2) && _src.type() == CV_8U) );
 
-#if defined HAVE_OPENCL
-    double _result = 0;
-#endif
+#اگر defined HAVE_OPENCL
+    دوہرا نتیجہ_2 = 0;
+#اگر_ختم
 
-#ifdef HAVE_OPENCL
-    CV_OCL_RUN_(OCL_PERFORMANCE_CHECK(_src.isUMat()) && _src.dims() <= 2,
-                ocl_norm(_src, normType, _mask, _result),
-                _result)
-#endif
+#اگر_تعریف_شدہ HAVE_OPENCL
+    CV_OCL_تسلسل_2(OCL_PERFORMANCE_CHECK(_src.isUMat()) && _src.dims() <= 2,
+                ocl_norm(_src, normType, نقاب_2, نتیجہ_2),
+                نتیجہ_2)
+#اگر_ختم
 
-    Mat src = _src.getMat(), mask = _mask.getMat();
-    CV_Assert( mask.empty() || ((mask.type() == CV_8U || mask.type() == CV_8S || mask.type() == CV_Bool) && src.size == mask.size) );
-    if( src.empty() )
-        return 0.0;
-    int depth = src.depth(), cn = src.channels();
-    if( src.dims <= 2 )
+    Mat src = _src.getMat(), نقاب = نقاب_2.getMat();
+    CV_Assert( نقاب.empty() || ((نقاب.type() == CV_8U || نقاب.type() == CV_8S || نقاب.type() == CV_Bool) && src.size == نقاب.size) );
+    اگر( src.empty() )
+        واپس 0.0;
+    صحیح گہرائی = src.گہرائی(), cn = src.channels();
+    اگر( src.dims <= 2 )
     {
-        double result;
-        CALL_HAL_RET(norm, cv_hal_norm, result, src.data, src.step, mask.data, mask.step, src.cols, src.rows, src.type(), normType);
+        دوہرا نتیجہ;
+        CALL_HAL_RET(norm, cv_hal_norm, نتیجہ, src.ڈیٹا, src.قدم, نقاب.ڈیٹا, نقاب.قدم, src.ستون_تعداد, src.صفیں, src.type(), normType);
     }
-    else if( src.isContinuous() && mask.isContinuous() )
+    ورنہ اگر( src.isContinuous() && نقاب.isContinuous() )
     {
-        double result;
-        CALL_HAL_RET(norm, cv_hal_norm, result, src.data, 0, mask.data, 0, (int)src.total(), 1, src.type(), normType);
+        دوہرا نتیجہ;
+        CALL_HAL_RET(norm, cv_hal_norm, نتیجہ, src.ڈیٹا, 0, نقاب.ڈیٹا, 0, (صحیح)src.کل(), 1, src.type(), normType);
     }
 
-    NormFunc func = getNormFunc(normType >> 1, depth);
+    NormFunc func = getNormFunc(normType >> 1, گہرائی);
     CV_Assert( (normType >> 1) >= 3 || func != 0 );
 
-    if( src.isContinuous() && mask.empty() )
+    اگر( src.isContinuous() && نقاب.empty() )
     {
-        size_t len = src.total()*cn;
-        if( len == (size_t)(int)len )
+        size_t len = src.کل()*cn;
+        اگر( len == (size_t)(صحیح)len )
         {
-            if( depth == CV_32F )
+            اگر( گہرائی == CV_32F )
             {
-                const uchar* data = src.ptr<const uchar>();
+                ثابت uchar* ڈیٹا = src.ptr<ثابت uchar>();
 
-                if( normType == NORM_L2 || normType == NORM_L2SQR || normType == NORM_L1 )
+                اگر( normType == NORM_L2 || normType == NORM_L2SQR || normType == NORM_L1 )
                 {
-                    double result = 0;
-                    func(data, 0, (uchar*)&result, (int)len, 1);
-                    return normType == NORM_L2 ? std::sqrt(result) : result;
+                    دوہرا نتیجہ = 0;
+                    func(ڈیٹا, 0, (uchar*)&نتیجہ, (صحیح)len, 1);
+                    واپس normType == NORM_L2 ? std::جذر(نتیجہ) : نتیجہ;
                 }
-                if( normType == NORM_INF )
+                اگر( normType == NORM_INF )
                 {
-                    float result = 0;
-                    func(data, 0, (uchar*)&result, (int)len, 1);
-                    return result;
+                    اعشاری نتیجہ = 0;
+                    func(ڈیٹا, 0, (uchar*)&نتیجہ, (صحیح)len, 1);
+                    واپس نتیجہ;
                 }
             }
-            if( depth == CV_8U )
+            اگر( گہرائی == CV_8U )
             {
-                const uchar* data = src.ptr<uchar>();
+                ثابت uchar* ڈیٹا = src.ptr<uchar>();
 
-                if( normType == NORM_HAMMING )
+                اگر( normType == NORM_HAMMING )
                 {
-                    return hal::normHamming(data, (int)len, 1);
+                    واپس hal::normHamming(ڈیٹا, (صحیح)len, 1);
                 }
 
-                if( normType == NORM_HAMMING2 )
+                اگر( normType == NORM_HAMMING2 )
                 {
-                    return hal::normHamming(data, (int)len, 2);
+                    واپس hal::normHamming(ڈیٹا, (صحیح)len, 2);
                 }
             }
         }
     }
 
-    CV_Assert( mask.empty() || mask.type() == CV_8U || mask.type() == CV_8S || mask.type() == CV_Bool );
+    CV_Assert( نقاب.empty() || نقاب.type() == CV_8U || نقاب.type() == CV_8S || نقاب.type() == CV_Bool );
 
-    if( normType == NORM_HAMMING || normType == NORM_HAMMING2 )
+    اگر( normType == NORM_HAMMING || normType == NORM_HAMMING2 )
     {
-        if( !mask.empty() )
+        اگر( !نقاب.empty() )
         {
-            Mat temp;
-            bitwise_and(src, mask, temp);
-            return norm(temp, normType);
+            Mat عارضی_2;
+            bitwise_and(src, نقاب, عارضی_2);
+            واپس norm(عارضی_2, normType);
         }
-        int cellSize = normType == NORM_HAMMING ? 1 : 2;
+        صحیح cell_سائز = normType == NORM_HAMMING ? 1 : 2;
 
-        const Mat* arrays[] = {&src, 0};
+        ثابت Mat* arrays[] = {&src, 0};
         uchar* ptrs[1] = {};
         NAryMatIterator it(arrays, ptrs);
-        int total = (int)it.size;
-        int result = 0;
+        صحیح کل = (صحیح)it.size;
+        صحیح نتیجہ = 0;
 
-        for( size_t i = 0; i < it.nplanes; i++, ++it )
+        برائے( size_t i = 0; i < it.nplanes; i++, ++it )
         {
-            result += hal::normHamming(ptrs[0], total, cellSize);
+            نتیجہ += hal::normHamming(ptrs[0], کل, cell_سائز);
         }
 
-        return result;
+        واپس نتیجہ;
     }
 
-    const Mat* arrays[] = {&src, &mask, 0};
+    ثابت Mat* arrays[] = {&src, &نقاب, 0};
     uchar* ptrs[2] = {};
-    union
+    اتحاد
     {
-        double d;
-        unsigned u;
+        دوہرا d;
+        غیرعلامتی u;
         uint64 UL;
-        float f;
+        اعشاری f;
     }
-    result;
-    result.d = 0;
+    نتیجہ;
+    نتیجہ.d = 0;
     NAryMatIterator it(arrays, ptrs);
-    CV_CheckLT((size_t)it.size, (size_t)INT_MAX, "");
-    bool is_fp16 = depth == CV_16F || depth == CV_16BF;
+    CV_CheckLT((size_t)it.size, (size_t)زیادہ_سے_زیادہ_عدد, "");
+    منطقی is_fp16 = گہرائی == CV_16F || گہرائی == CV_16BF;
 
-    if ((normType == NORM_L1 && (depth <= CV_16S || depth == CV_Bool || is_fp16)) ||
-        ((normType == NORM_L2 || normType == NORM_L2SQR) && (depth <= CV_8S || depth == CV_Bool || is_fp16)))
+    اگر ((normType == NORM_L1 && (گہرائی <= CV_16S || گہرائی == CV_Bool || is_fp16)) ||
+        ((normType == NORM_L2 || normType == NORM_L2SQR) && (گہرائی <= CV_8S || گہرائی == CV_Bool || is_fp16)))
     {
         // special case to handle "integer" overflow in accumulator
-        const size_t esz = src.elemSize();
-        const int total = (int)it.size;
-        const int blockSize0 = (is_fp16 ? (1 << 10) :
-            depth == CV_Bool ? (1 << 30) :
-            normType == NORM_L1 && depth <= CV_8S ? (1 << 23) : (1 << 15))/cn;
-        const int blockSize = std::min(total, blockSize0);
-        union {
-            int i;
-            float f;
+        ثابت size_t esz = src.elem_سائز();
+        ثابت صحیح کل = (صحیح)it.size;
+        ثابت صحیح بلاک_Size0 = (is_fp16 ? (1 << 10) :
+            گہرائی == CV_Bool ? (1 << 30) :
+            normType == NORM_L1 && گہرائی <= CV_8S ? (1 << 23) : (1 << 15))/cn;
+        ثابت صحیح بلاک_سائز_2 = std::min(کل, بلاک_Size0);
+        اتحاد {
+            صحیح i;
+            اعشاری f;
         } blocksum;
         blocksum.i = 0;
-        int count = 0;
+        صحیح گنتی_2 = 0;
 
-        for (size_t i = 0; i < it.nplanes; i++, ++it)
+        برائے (size_t i = 0; i < it.nplanes; i++, ++it)
         {
-            for (int j = 0; j < total; j += blockSize)
+            برائے (صحیح j = 0; j < کل; j += بلاک_سائز_2)
             {
-                int bsz = std::min(total - j, blockSize);
+                صحیح bsz = std::min(کل - j, بلاک_سائز_2);
                 func(ptrs[0], ptrs[1], (uchar*)&blocksum, bsz, cn);
-                count += bsz;
-                if (count + blockSize >= blockSize0 || (i+1 >= it.nplanes && j+bsz >= total))
+                گنتی_2 += bsz;
+                اگر (گنتی_2 + بلاک_سائز_2 >= بلاک_Size0 || (i+1 >= it.nplanes && j+bsz >= کل))
                 {
-                    result.d += is_fp16 ? (double)blocksum.f : (double)blocksum.i;
+                    نتیجہ.d += is_fp16 ? (دوہرا)blocksum.f : (دوہرا)blocksum.i;
                     blocksum.i = 0;
-                    count = 0;
+                    گنتی_2 = 0;
                 }
                 ptrs[0] += bsz*esz;
-                if (ptrs[1])
+                اگر (ptrs[1])
                     ptrs[1] += bsz;
             }
         }
     }
-    else
+    ورنہ
     {
         // generic implementation
-        for (size_t i = 0; i < it.nplanes; i++, ++it)
+        برائے (size_t i = 0; i < it.nplanes; i++, ++it)
         {
-            func(ptrs[0], ptrs[1], (uchar*)&result, (int)it.size, cn);
+            func(ptrs[0], ptrs[1], (uchar*)&نتیجہ, (صحیح)it.size, cn);
         }
     }
 
-    if( normType == NORM_INF )
+    اگر( normType == NORM_INF )
     {
-        if(depth <= CV_32S || depth == CV_32U || depth == CV_Bool)
-            return result.u;
-        if (depth == CV_32F || is_fp16)
-            return result.f;
-        if (depth == CV_64U || depth == CV_64S)
-            return (double)result.UL;
+        اگر(گہرائی <= CV_32S || گہرائی == CV_32U || گہرائی == CV_Bool)
+            واپس نتیجہ.u;
+        اگر (گہرائی == CV_32F || is_fp16)
+            واپس نتیجہ.f;
+        اگر (گہرائی == CV_64U || گہرائی == CV_64S)
+            واپس (دوہرا)نتیجہ.UL;
     }
-    if( normType == NORM_L2 )
-        return std::sqrt(result.d);
+    اگر( normType == NORM_L2 )
+        واپس std::جذر(نتیجہ.d);
 
-    return result.d;
+    واپس نتیجہ.d;
 }
 
 //==================================================================================================
 
-#ifdef HAVE_OPENCL
-static bool ocl_norm( InputArray _src1, InputArray _src2, int normType, InputArray _mask, double & result )
+#اگر_تعریف_شدہ HAVE_OPENCL
+ساکن منطقی ocl_norm( داخلہ_Array _src1, داخلہ_Array _src2, صحیح normType, داخلہ_Array نقاب_2, دوہرا & نتیجہ )
 {
-#ifdef __ANDROID__
-    if (ocl::Device::getDefault().isNVidia())
-        return false;
-#endif
+#اگر_تعریف_شدہ __ANDROID__
+    اگر (ocl::Device::getDefault().isNVidia())
+        واپس جھوٹ;
+#اگر_ختم
 
     Scalar sc1, sc2;
-    int cn = _src1.channels();
-    if (cn > 4)
-        return false;
-    int type = _src1.type(), depth = CV_MAT_DEPTH(type);
-    bool relative = (normType & NORM_RELATIVE) != 0;
+    صحیح cn = _src1.channels();
+    اگر (cn > 4)
+        واپس جھوٹ;
+    صحیح type = _src1.type(), گہرائی = CV_MAT_گہرائی(type);
+    منطقی relative = (normType & NORM_RELATIVE) != 0;
     normType &= ~NORM_RELATIVE;
-    bool normsum = normType == NORM_L1 || normType == NORM_L2 || normType == NORM_L2SQR;
+    منطقی normsum = normType == NORM_L1 || normType == NORM_L2 || normType == NORM_L2SQR;
 
-#ifdef __APPLE__
-    if(normType == NORM_L1 && type == CV_16UC3 && !_mask.empty())
-        return false;
-#endif
+#اگر_تعریف_شدہ __APPLE__
+    اگر(normType == NORM_L1 && type == CV_16UC3 && !نقاب_2.empty())
+        واپس جھوٹ;
+#اگر_ختم
 
-    if (normsum)
+    اگر (normsum)
     {
-        if (!ocl_sum(_src1, sc1, normType == NORM_L2 || normType == NORM_L2SQR ?
-                     OCL_OP_SUM_SQR : OCL_OP_SUM, _mask, _src2, relative, sc2))
-            return false;
+        اگر (!ocl_مجموع(_src1, sc1, normType == NORM_L2 || normType == NORM_L2SQR ?
+                     OCL_OP_مجموع_SQR : OCL_OP_مجموع, نقاب_2, _src2, relative, sc2))
+            واپس جھوٹ;
     }
-    else
+    ورنہ
     {
-        if (!ocl_minMaxIdx(_src1, NULL, &sc1[0], NULL, NULL, _mask, std::max(CV_32S, depth),
-                           false, _src2, relative ? &sc2[0] : NULL))
-            return false;
+        اگر (!ocl_minMaxIdx(_src1, تہی, &sc1[0], تہی, تہی, نقاب_2, std::max(CV_32S, گہرائی),
+                           جھوٹ, _src2, relative ? &sc2[0] : تہی))
+            واپس جھوٹ;
         cn = 1;
     }
 
-    double s2 = 0;
-    for (int i = 0; i < cn; ++i)
+    دوہرا s2 = 0;
+    برائے (صحیح i = 0; i < cn; ++i)
     {
-        result += sc1[i];
-        if (relative)
+        نتیجہ += sc1[i];
+        اگر (relative)
             s2 += sc2[i];
     }
 
-    if (normType == NORM_L2)
+    اگر (normType == NORM_L2)
     {
-        result = std::sqrt(result);
-        if (relative)
-            s2 = std::sqrt(s2);
+        نتیجہ = std::جذر(نتیجہ);
+        اگر (relative)
+            s2 = std::جذر(s2);
     }
 
-    if (relative)
-        result /= (s2 + DBL_EPSILON);
+    اگر (relative)
+        نتیجہ /= (s2 + DBL_EPSILON);
 
-    return true;
+    واپس سچ;
 }  // ocl_norm()
-#endif  // HAVE_OPENCL
+#اگر_ختم  // HAVE_OPENCL
 
-double norm( InputArray _src1, InputArray _src2, int normType, InputArray _mask )
+دوہرا norm( داخلہ_Array _src1, داخلہ_Array _src2, صحیح normType, داخلہ_Array نقاب_2 )
 {
     CV_INSTRUMENT_REGION();
 
     CV_CheckTypeEQ(_src1.type(), _src2.type(), "Input type mismatch");
-    CV_Assert(_src1.sameSize(_src2));
+    CV_Assert(_src1.same_سائز(_src2));
 
-#if defined HAVE_OPENCL
-    double _result = 0;
-#endif
+#اگر defined HAVE_OPENCL
+    دوہرا نتیجہ_2 = 0;
+#اگر_ختم
 
-#ifdef HAVE_OPENCL
-    CV_OCL_RUN_(OCL_PERFORMANCE_CHECK(_src1.isUMat()),
-                ocl_norm(_src1, _src2, normType, _mask, _result),
-                _result)
-#endif
+#اگر_تعریف_شدہ HAVE_OPENCL
+    CV_OCL_تسلسل_2(OCL_PERFORMANCE_CHECK(_src1.isUMat()),
+                ocl_norm(_src1, _src2, normType, نقاب_2, نتیجہ_2),
+                نتیجہ_2)
+#اگر_ختم
 
-    Mat src1 = _src1.getMat(), src2 = _src2.getMat(), mask = _mask.getMat();
-    CV_Assert( mask.empty() || ((mask.type() == CV_8U || mask.type() == CV_8S || mask.type() == CV_Bool) && src1.size == mask.size) );
-    if( src1.empty() || src2.empty() )
-        return 0.0;
-    int depth = src1.depth(), cn = src1.channels();
-    if( src1.dims <= 2 )
+    Mat src1 = _src1.getMat(), src2 = _src2.getMat(), نقاب = نقاب_2.getMat();
+    CV_Assert( نقاب.empty() || ((نقاب.type() == CV_8U || نقاب.type() == CV_8S || نقاب.type() == CV_Bool) && src1.size == نقاب.size) );
+    اگر( src1.empty() || src2.empty() )
+        واپس 0.0;
+    صحیح گہرائی = src1.گہرائی(), cn = src1.channels();
+    اگر( src1.dims <= 2 )
     {
-        double result;
-        CALL_HAL_RET(normDiff, cv_hal_normDiff, result, src1.data, src1.step, src2.data, src2.step, mask.data, mask.step, src1.cols, src1.rows, src1.type(), normType);
+        دوہرا نتیجہ;
+        CALL_HAL_RET(normDiff, cv_hal_normDiff, نتیجہ, src1.ڈیٹا, src1.قدم, src2.ڈیٹا, src2.قدم, نقاب.ڈیٹا, نقاب.قدم, src1.ستون_تعداد, src1.صفیں, src1.type(), normType);
     }
-    else if( src1.isContinuous() && src2.isContinuous() && mask.isContinuous() )
+    ورنہ اگر( src1.isContinuous() && src2.isContinuous() && نقاب.isContinuous() )
     {
-        double result;
-        CALL_HAL_RET(normDiff, cv_hal_normDiff, result, src1.data, 0, src2.data, 0, mask.data, 0, (int)src1.total(), 1, src1.type(), normType);
+        دوہرا نتیجہ;
+        CALL_HAL_RET(normDiff, cv_hal_normDiff, نتیجہ, src1.ڈیٹا, 0, src2.ڈیٹا, 0, نقاب.ڈیٹا, 0, (صحیح)src1.کل(), 1, src1.type(), normType);
     }
 
-    if( normType & NORM_RELATIVE )
+    اگر( normType & NORM_RELATIVE )
     {
-        return norm(_src1, _src2, normType & ~NORM_RELATIVE, _mask)/(norm(_src2, normType, _mask) + DBL_EPSILON);
+        واپس norm(_src1, _src2, normType & ~NORM_RELATIVE, نقاب_2)/(norm(_src2, normType, نقاب_2) + DBL_EPSILON);
     }
 
     normType &= 7;
@@ -580,288 +580,288 @@ double norm( InputArray _src1, InputArray _src2, int normType, InputArray _mask 
                normType == NORM_L2 || normType == NORM_L2SQR ||
               ((normType == NORM_HAMMING || normType == NORM_HAMMING2) && src1.type() == CV_8U) );
 
-    NormDiffFunc func = getNormDiffFunc(normType >> 1, depth);
+    NormDiffFunc func = getNormDiffFunc(normType >> 1, گہرائی);
     CV_Assert( (normType >> 1) >= 3 || func != 0 );
 
-    if( src1.isContinuous() && src2.isContinuous() && mask.empty() )
+    اگر( src1.isContinuous() && src2.isContinuous() && نقاب.empty() )
     {
-        size_t len = src1.total()*src1.channels();
-        if( len == (size_t)(int)len )
+        size_t len = src1.کل()*src1.channels();
+        اگر( len == (size_t)(صحیح)len )
         {
-            if( src1.depth() == CV_32F )
+            اگر( src1.گہرائی() == CV_32F )
             {
-                const uchar* data1 = src1.ptr<const uchar>();
-                const uchar* data2 = src2.ptr<const uchar>();
+                ثابت uchar* data1 = src1.ptr<ثابت uchar>();
+                ثابت uchar* data2 = src2.ptr<ثابت uchar>();
 
-                if( normType == NORM_L2 || normType == NORM_L2SQR || normType == NORM_L1 )
+                اگر( normType == NORM_L2 || normType == NORM_L2SQR || normType == NORM_L1 )
                 {
-                    double result = 0;
-                    func(data1, data2, 0, (uchar*)&result, (int)len, 1);
-                    return normType == NORM_L2 ? std::sqrt(result) : result;
+                    دوہرا نتیجہ = 0;
+                    func(data1, data2, 0, (uchar*)&نتیجہ, (صحیح)len, 1);
+                    واپس normType == NORM_L2 ? std::جذر(نتیجہ) : نتیجہ;
                 }
-                if( normType == NORM_INF )
+                اگر( normType == NORM_INF )
                 {
-                    float result = 0;
-                    func(data1, data2, 0, (uchar*)&result, (int)len, 1);
-                    return result;
+                    اعشاری نتیجہ = 0;
+                    func(data1, data2, 0, (uchar*)&نتیجہ, (صحیح)len, 1);
+                    واپس نتیجہ;
                 }
             }
         }
     }
 
-    CV_Assert( mask.empty() || mask.type() == CV_8U || mask.type() == CV_8S || mask.type() == CV_Bool );
+    CV_Assert( نقاب.empty() || نقاب.type() == CV_8U || نقاب.type() == CV_8S || نقاب.type() == CV_Bool );
 
-    if( normType == NORM_HAMMING || normType == NORM_HAMMING2 )
+    اگر( normType == NORM_HAMMING || normType == NORM_HAMMING2 )
     {
-        if( !mask.empty() )
+        اگر( !نقاب.empty() )
         {
-            Mat temp;
-            bitwise_xor(src1, src2, temp);
-            bitwise_and(temp, mask, temp);
-            return norm(temp, normType);
+            Mat عارضی_2;
+            bitwise_xor(src1, src2, عارضی_2);
+            bitwise_and(عارضی_2, نقاب, عارضی_2);
+            واپس norm(عارضی_2, normType);
         }
-        int cellSize = normType == NORM_HAMMING ? 1 : 2;
+        صحیح cell_سائز = normType == NORM_HAMMING ? 1 : 2;
 
-        const Mat* arrays[] = {&src1, &src2, 0};
+        ثابت Mat* arrays[] = {&src1, &src2, 0};
         uchar* ptrs[2] = {};
         NAryMatIterator it(arrays, ptrs);
-        int total = (int)it.size;
-        int result = 0;
+        صحیح کل = (صحیح)it.size;
+        صحیح نتیجہ = 0;
 
-        for( size_t i = 0; i < it.nplanes; i++, ++it )
+        برائے( size_t i = 0; i < it.nplanes; i++, ++it )
         {
-            result += hal::normHamming(ptrs[0], ptrs[1], total, cellSize);
+            نتیجہ += hal::normHamming(ptrs[0], ptrs[1], کل, cell_سائز);
         }
 
-        return result;
+        واپس نتیجہ;
     }
 
-    const Mat* arrays[] = {&src1, &src2, &mask, 0};
+    ثابت Mat* arrays[] = {&src1, &src2, &نقاب, 0};
     uchar* ptrs[3] = {};
-    union
+    اتحاد
     {
-        double d;
-        float f;
-        unsigned u;
+        دوہرا d;
+        اعشاری f;
+        غیرعلامتی u;
         uint64 UL;
     }
-    result;
-    result.d = 0;
+    نتیجہ;
+    نتیجہ.d = 0;
     NAryMatIterator it(arrays, ptrs);
-    CV_CheckLT((size_t)it.size, (size_t)INT_MAX, "");
+    CV_CheckLT((size_t)it.size, (size_t)زیادہ_سے_زیادہ_عدد, "");
 
-    bool is_fp16 = depth == CV_16F || depth == CV_16BF;
+    منطقی is_fp16 = گہرائی == CV_16F || گہرائی == CV_16BF;
 
-    if ((normType == NORM_L1 && (depth <= CV_16S || depth == CV_Bool || is_fp16)) ||
-        ((normType == NORM_L2 || normType == NORM_L2SQR) && (depth <= CV_8S || depth == CV_Bool || is_fp16)))
+    اگر ((normType == NORM_L1 && (گہرائی <= CV_16S || گہرائی == CV_Bool || is_fp16)) ||
+        ((normType == NORM_L2 || normType == NORM_L2SQR) && (گہرائی <= CV_8S || گہرائی == CV_Bool || is_fp16)))
     {
         // special case to handle "integer" overflow in accumulator
-        const size_t esz = src1.elemSize();
-        const int total = (int)it.size;
-        const int blockSize0 = (is_fp16 ? (1 << 10) :
-            depth == CV_Bool ? (1 << 30) :
-            normType == NORM_L1 && depth <= CV_8S ? (1 << 23) : (1 << 15))/cn;
-        const int blockSize = std::min(total, blockSize0);
-        union {
-            int i;
-            float f;
+        ثابت size_t esz = src1.elem_سائز();
+        ثابت صحیح کل = (صحیح)it.size;
+        ثابت صحیح بلاک_Size0 = (is_fp16 ? (1 << 10) :
+            گہرائی == CV_Bool ? (1 << 30) :
+            normType == NORM_L1 && گہرائی <= CV_8S ? (1 << 23) : (1 << 15))/cn;
+        ثابت صحیح بلاک_سائز_2 = std::min(کل, بلاک_Size0);
+        اتحاد {
+            صحیح i;
+            اعشاری f;
         } blocksum;
         blocksum.i = 0;
-        int count = 0;
+        صحیح گنتی_2 = 0;
 
-        for (size_t i = 0; i < it.nplanes; i++, ++it)
+        برائے (size_t i = 0; i < it.nplanes; i++, ++it)
         {
-            for (int j = 0; j < total; j += blockSize)
+            برائے (صحیح j = 0; j < کل; j += بلاک_سائز_2)
             {
-                int bsz = std::min(total - j, blockSize);
+                صحیح bsz = std::min(کل - j, بلاک_سائز_2);
                 func(ptrs[0], ptrs[1], ptrs[2], (uchar*)&blocksum, bsz, cn);
-                count += bsz;
-                if (count + blockSize >= blockSize0 || (i+1 >= it.nplanes && j+bsz >= total))
+                گنتی_2 += bsz;
+                اگر (گنتی_2 + بلاک_سائز_2 >= بلاک_Size0 || (i+1 >= it.nplanes && j+bsz >= کل))
                 {
-                    result.d += is_fp16 ? (double)blocksum.f : (double)blocksum.i;
+                    نتیجہ.d += is_fp16 ? (دوہرا)blocksum.f : (دوہرا)blocksum.i;
                     blocksum.i = 0;
-                    count = 0;
+                    گنتی_2 = 0;
                 }
                 ptrs[0] += bsz*esz;
                 ptrs[1] += bsz*esz;
-                if (ptrs[2])
+                اگر (ptrs[2])
                     ptrs[2] += bsz;
             }
         }
     }
-    else
+    ورنہ
     {
         // generic implementation
-        for (size_t i = 0; i < it.nplanes; i++, ++it)
+        برائے (size_t i = 0; i < it.nplanes; i++, ++it)
         {
-            func(ptrs[0], ptrs[1], ptrs[2], (uchar*)&result, (int)it.size, cn);
+            func(ptrs[0], ptrs[1], ptrs[2], (uchar*)&نتیجہ, (صحیح)it.size, cn);
         }
     }
 
-    if( normType == NORM_INF )
+    اگر( normType == NORM_INF )
     {
-        if (depth <= CV_32S || depth == CV_32U || depth == CV_Bool)
-            return result.u;
-        if (depth == CV_32F || is_fp16)
-            return result.f;
-        if (depth == CV_64U || depth == CV_64S)
-            return (double)result.UL;
+        اگر (گہرائی <= CV_32S || گہرائی == CV_32U || گہرائی == CV_Bool)
+            واپس نتیجہ.u;
+        اگر (گہرائی == CV_32F || is_fp16)
+            واپس نتیجہ.f;
+        اگر (گہرائی == CV_64U || گہرائی == CV_64S)
+            واپس (دوہرا)نتیجہ.UL;
     }
-    if( normType == NORM_L2 )
-        return std::sqrt(result.d);
+    اگر( normType == NORM_L2 )
+        واپس std::جذر(نتیجہ.d);
 
-    return result.d;
+    واپس نتیجہ.d;
 }
 
-cv::Hamming::ResultType Hamming::operator()( const unsigned char* a, const unsigned char* b, int size ) const
+cv::Hamming::نتیجہ_Type Hamming::عامل()( ثابت غیرعلامتی حرف* a, ثابت غیرعلامتی حرف* b, صحیح size ) ثابت
 {
-    return cv::hal::normHamming(a, b, size);
+    واپس cv::hal::normHamming(a, b, size);
 }
 
-double PSNR(InputArray _src1, InputArray _src2, double R)
+دوہرا PSNR(داخلہ_Array _src1, داخلہ_Array _src2, دوہرا R)
 {
     CV_INSTRUMENT_REGION();
 
     //Input arrays must have depth CV_8U
     CV_Assert( _src1.type() == _src2.type() );
 
-    double diff = std::sqrt(norm(_src1, _src2, NORM_L2SQR)/(_src1.total()*_src1.channels()));
-    return 20*log10(R/(diff+DBL_EPSILON));
+    دوہرا diff = std::جذر(norm(_src1, _src2, NORM_L2SQR)/(_src1.کل()*_src1.channels()));
+    واپس 20*log10(R/(diff+DBL_EPSILON));
 }
 
 
-#ifdef HAVE_OPENCL
-static bool ocl_normalize( InputArray _src, InputOutputArray _dst, InputArray _mask, int dtype,
-                           double scale, double delta )
+#اگر_تعریف_شدہ HAVE_OPENCL
+ساکن منطقی ocl_normalize( داخلہ_Array _src, داخلہ_Output_Array _dst, داخلہ_Array نقاب_2, صحیح dtype,
+                           دوہرا scale, دوہرا delta )
 {
     UMat src = _src.getUMat();
 
-    if( _mask.empty() )
-        src.convertTo( _dst, dtype, scale, delta );
-    else if (src.channels() <= 4)
+    اگر( نقاب_2.empty() )
+        src.convert_مقصد( _dst, dtype, scale, delta );
+    ورنہ اگر (src.channels() <= 4)
     {
-        const ocl::Device & dev = ocl::Device::getDefault();
+        ثابت ocl::Device & dev = ocl::Device::getDefault();
 
-        int stype = _src.type(), sdepth = CV_MAT_DEPTH(stype), cn = CV_MAT_CN(stype),
-                ddepth = CV_MAT_DEPTH(dtype), wdepth = std::max(CV_32F, std::max(sdepth, ddepth)),
-                rowsPerWI = dev.isIntel() ? 4 : 1;
+        صحیح stype = _src.type(), sdepth = CV_MAT_گہرائی(stype), cn = CV_MAT_CN(stype),
+                ddepth = CV_MAT_گہرائی(dtype), wdepth = std::max(CV_32F, std::max(sdepth, ddepth)),
+                صفیں_فی_WI = dev.isIntel() ? 4 : 1;
 
-        float fscale = static_cast<float>(scale), fdelta = static_cast<float>(delta);
-        bool haveScale = std::fabs(scale - 1) > DBL_EPSILON,
+        اعشاری fscale = static_cast<اعشاری>(scale), fdelta = static_cast<اعشاری>(delta);
+        منطقی haveScale = std::fabs(scale - 1) > DBL_EPSILON,
                 haveZeroScale = !(std::fabs(scale) > DBL_EPSILON),
                 haveDelta = std::fabs(delta) > DBL_EPSILON,
                 doubleSupport = dev.doubleFPConfig() > 0;
 
-        if (!haveScale && !haveDelta && stype == dtype)
+        اگر (!haveScale && !haveDelta && stype == dtype)
         {
-            _src.copyTo(_dst, _mask);
-            return true;
+            _src.copy_مقصد(_dst, نقاب_2);
+            واپس سچ;
         }
-        if (haveZeroScale)
+        اگر (haveZeroScale)
         {
-            _dst.setTo(Scalar(delta), _mask);
-            return true;
+            _dst.سیٹ_مقصد(Scalar(delta), نقاب_2);
+            واپس سچ;
         }
 
-        if ((sdepth == CV_64F || ddepth == CV_64F) && !doubleSupport)
-            return false;
+        اگر ((sdepth == CV_64F || ddepth == CV_64F) && !doubleSupport)
+            واپس جھوٹ;
 
-        char cvt[2][50];
+        حرف cvt[2][50];
         String opts = format("-D srcT=%s -D dstT=%s -D convertToWT=%s -D cn=%d -D rowsPerWI=%d"
                              " -D convertToDT=%s -D workT=%s%s%s%s -D srcT1=%s -D dstT1=%s",
-                             ocl::typeToStr(stype), ocl::typeToStr(dtype),
-                             ocl::convertTypeStr(sdepth, wdepth, cn, cvt[0], sizeof(cvt[0])), cn,
-                             rowsPerWI, ocl::convertTypeStr(wdepth, ddepth, cn, cvt[1], sizeof(cvt[1])),
-                             ocl::typeToStr(CV_MAKE_TYPE(wdepth, cn)),
+                             ocl::type_مقصد_Str(stype), ocl::type_مقصد_Str(dtype),
+                             ocl::convertTypeStr(sdepth, wdepth, cn, cvt[0], حجم(cvt[0])), cn,
+                             صفیں_فی_WI, ocl::convertTypeStr(wdepth, ddepth, cn, cvt[1], حجم(cvt[1])),
+                             ocl::type_مقصد_Str(CV_MAKE_TYPE(wdepth, cn)),
                              doubleSupport ? " -D DOUBLE_SUPPORT" : "",
                              haveScale ? " -D HAVE_SCALE" : "",
                              haveDelta ? " -D HAVE_DELTA" : "",
-                             ocl::typeToStr(sdepth), ocl::typeToStr(ddepth));
+                             ocl::type_مقصد_Str(sdepth), ocl::type_مقصد_Str(ddepth));
 
         ocl::Kernel k("normalizek", ocl::core::normalize_oclsrc, opts);
-        if (k.empty())
-            return false;
+        اگر (k.empty())
+            واپس جھوٹ;
 
-        UMat mask = _mask.getUMat(), dst = _dst.getUMat();
+        UMat نقاب = نقاب_2.getUMat(), dst = _dst.getUMat();
 
-        ocl::KernelArg srcarg = ocl::KernelArg::ReadOnlyNoSize(src),
-                maskarg = ocl::KernelArg::ReadOnlyNoSize(mask),
+        ocl::KernelArg srcarg = ocl::KernelArg::Read_Only_No_سائز(src),
+                maskarg = ocl::KernelArg::Read_Only_No_سائز(نقاب),
                 dstarg = ocl::KernelArg::ReadWrite(dst);
 
-        if (haveScale)
+        اگر (haveScale)
         {
-            if (haveDelta)
-                k.args(srcarg, maskarg, dstarg, fscale, fdelta);
-            else
-                k.args(srcarg, maskarg, dstarg, fscale);
+            اگر (haveDelta)
+                k.دلائل(srcarg, maskarg, dstarg, fscale, fdelta);
+            ورنہ
+                k.دلائل(srcarg, maskarg, dstarg, fscale);
         }
-        else
+        ورنہ
         {
-            if (haveDelta)
-                k.args(srcarg, maskarg, dstarg, fdelta);
-            else
-                k.args(srcarg, maskarg, dstarg);
+            اگر (haveDelta)
+                k.دلائل(srcarg, maskarg, dstarg, fdelta);
+            ورنہ
+                k.دلائل(srcarg, maskarg, dstarg);
         }
 
-        size_t globalsize[2] = { (size_t)src.cols, ((size_t)src.rows + rowsPerWI - 1) / rowsPerWI };
-        return k.run(2, globalsize, NULL, false);
+        size_t globalsize[2] = { (size_t)src.ستون_تعداد, ((size_t)src.صفیں + صفیں_فی_WI - 1) / صفیں_فی_WI };
+        واپس k.تسلسل(2, globalsize, تہی, جھوٹ);
     }
-    else
+    ورنہ
     {
-        UMat temp;
-        src.convertTo( temp, dtype, scale, delta );
-        temp.copyTo( _dst, _mask );
+        UMat عارضی_2;
+        src.convert_مقصد( عارضی_2, dtype, scale, delta );
+        عارضی_2.copy_مقصد( _dst, نقاب_2 );
     }
 
-    return true;
+    واپس سچ;
 }  // ocl_normalize
-#endif  // HAVE_OPENCL
+#اگر_ختم  // HAVE_OPENCL
 
-void normalize(InputArray _src, InputOutputArray _dst, double a, double b,
-               int norm_type, int rtype, InputArray _mask)
+خالی normalize(داخلہ_Array _src, داخلہ_Output_Array _dst, دوہرا a, دوہرا b,
+               صحیح norm_type, صحیح rtype, داخلہ_Array نقاب_2)
 {
     CV_INSTRUMENT_REGION();
 
-    double scale = 1, shift = 0;
-    int type = _src.type(), depth = CV_MAT_DEPTH(type);
+    دوہرا scale = 1, سرکاؤ = 0;
+    صحیح type = _src.type(), گہرائی = CV_MAT_گہرائی(type);
 
-    if( rtype < 0 )
-        rtype = _dst.fixedType() ? _dst.depth() : depth;
+    اگر( rtype < 0 )
+        rtype = _dst.fixedType() ? _dst.گہرائی() : گہرائی;
 
-    if( norm_type == NORM_MINMAX )
+    اگر( norm_type == NORM_MINMAX )
     {
-        double smin = 0, smax = 0;
-        double dmin = MIN( a, b ), dmax = MAX( a, b );
-        minMaxIdx( _src, &smin, &smax, 0, 0, _mask );
+        دوہرا smin = 0, smax = 0;
+        دوہرا dmin = MIN( a, b ), dmax = MAX( a, b );
+        minMaxIdx( _src, &smin, &smax, 0, 0, نقاب_2 );
         scale = (dmax - dmin)*(smax - smin > DBL_EPSILON ? 1./(smax - smin) : 0);
-        if( rtype == CV_32F )
+        اگر( rtype == CV_32F )
         {
-            scale = (float)scale;
-            shift = (float)dmin - (float)(smin*scale);
+            scale = (اعشاری)scale;
+            سرکاؤ = (اعشاری)dmin - (اعشاری)(smin*scale);
         }
-        else
-            shift = dmin - smin*scale;
+        ورنہ
+            سرکاؤ = dmin - smin*scale;
     }
-    else if( norm_type == NORM_L2 || norm_type == NORM_L1 || norm_type == NORM_INF )
+    ورنہ اگر( norm_type == NORM_L2 || norm_type == NORM_L1 || norm_type == NORM_INF )
     {
-        scale = norm( _src, norm_type, _mask );
+        scale = norm( _src, norm_type, نقاب_2 );
         scale = scale > DBL_EPSILON ? a/scale : 0.;
-        shift = 0;
+        سرکاؤ = 0;
     }
-    else
+    ورنہ
         CV_Error( cv::Error::StsBadArg, "Unknown/unsupported norm type" );
 
-    CV_OCL_RUN(_dst.isUMat(),
-               ocl_normalize(_src, _dst, _mask, rtype, scale, shift))
+    CV_OCL_تسلسل(_dst.isUMat(),
+               ocl_normalize(_src, _dst, نقاب_2, rtype, scale, سرکاؤ))
 
     Mat src = _src.getMat();
-    if( _mask.empty() )
-        src.convertTo( _dst, rtype, scale, shift );
-    else
+    اگر( نقاب_2.empty() )
+        src.convert_مقصد( _dst, rtype, scale, سرکاؤ );
+    ورنہ
     {
-        Mat temp;
-        src.convertTo( temp, rtype, scale, shift );
-        temp.copyTo( _dst, _mask );
+        Mat عارضی_2;
+        src.convert_مقصد( عارضی_2, rtype, scale, سرکاؤ );
+        عارضی_2.copy_مقصد( _dst, نقاب_2 );
     }
 }
 

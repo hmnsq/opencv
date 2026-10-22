@@ -40,11 +40,11 @@
 //
 //M*/
 
-#include "precomp.hpp"
-#include <limits>
+#شامل "precomp.hpp"
+#شامل <limits>
 
-#ifdef HAVE_EIGEN
-#  if defined(_MSC_VER)
+#اگر_تعریف_شدہ HAVE_EIGEN
+#  اگر defined(_MSC_VER)
 #    pragma warning(push)
 #    pragma warning(disable:4701)  // potentially uninitialized local variable
 #    pragma warning(disable:4702)  // unreachable code
@@ -52,136 +52,136 @@
 #  endif
 #  include <Eigen/Core>
 #  include <Eigen/Eigenvalues>
-#  if defined(_MSC_VER)
+#  اگر defined(_MSC_VER)
 #    pragma warning(pop)
 #  endif
 #  include "opencv2/core/eigen.hpp"
-#endif
+#اگر_ختم
 
-namespace cv
+نامخلا cv
 {
 
-int LU(float* A, size_t astep, int m, float* b, size_t bstep, int n)
-{
-    CV_INSTRUMENT_REGION();
-
-    return hal::LU32f(A, astep, m, b, bstep, n);
-}
-
-int LU(double* A, size_t astep, int m, double* b, size_t bstep, int n)
+صحیح LU(اعشاری* A, size_t astep, صحیح m, اعشاری* b, size_t bstep, صحیح n)
 {
     CV_INSTRUMENT_REGION();
 
-    return hal::LU64f(A, astep, m, b, bstep, n);
+    واپس hal::LU32f(A, astep, m, b, bstep, n);
 }
 
-bool Cholesky(float* A, size_t astep, int m, float* b, size_t bstep, int n)
+صحیح LU(دوہرا* A, size_t astep, صحیح m, دوہرا* b, size_t bstep, صحیح n)
 {
     CV_INSTRUMENT_REGION();
 
-    return hal::Cholesky32f(A, astep, m, b, bstep, n);
+    واپس hal::LU64f(A, astep, m, b, bstep, n);
 }
 
-bool Cholesky(double* A, size_t astep, int m, double* b, size_t bstep, int n)
+منطقی Cholesky(اعشاری* A, size_t astep, صحیح m, اعشاری* b, size_t bstep, صحیح n)
 {
     CV_INSTRUMENT_REGION();
 
-    return hal::Cholesky64f(A, astep, m, b, bstep, n);
+    واپس hal::Cholesky32f(A, astep, m, b, bstep, n);
 }
 
-template<typename _Tp> static inline _Tp hypot(_Tp a, _Tp b)
+منطقی Cholesky(دوہرا* A, size_t astep, صحیح m, دوہرا* b, size_t bstep, صحیح n)
 {
-    a = std::abs(a);
-    b = std::abs(b);
-    if( a > b )
+    CV_INSTRUMENT_REGION();
+
+    واپس hal::Cholesky64f(A, astep, m, b, bstep, n);
+}
+
+سانچہ<قسم_نام _Tp> ساکن اندرونی _Tp hypot(_Tp a, _Tp b)
+{
+    a = std::مطلق_قدر(a);
+    b = std::مطلق_قدر(b);
+    اگر( a > b )
     {
         b /= a;
-        return a*std::sqrt(1 + b*b);
+        واپس a*std::جذر(1 + b*b);
     }
-    if( b > 0 )
+    اگر( b > 0 )
     {
         a /= b;
-        return b*std::sqrt(1 + a*a);
+        واپس b*std::جذر(1 + a*a);
     }
-    return 0;
+    واپس 0;
 }
 
 
-template<typename _Tp> bool
-JacobiImpl_( _Tp* A, size_t astep, _Tp* W, _Tp* V, size_t vstep, int n, uchar* buf )
+سانچہ<قسم_نام _Tp> منطقی
+JacobiImpl_( _Tp* A, size_t astep, _Tp* W, _Tp* V, size_t vstep, صحیح n, uchar* buf )
 {
-    const _Tp eps = std::numeric_limits<_Tp>::epsilon();
-    int i, j, k, m;
+    ثابت _Tp eps = std::numeric_limits<_Tp>::epsilon();
+    صحیح i, j, k, m;
 
-    astep /= sizeof(A[0]);
-    if( V )
+    astep /= حجم(A[0]);
+    اگر( V )
     {
-        vstep /= sizeof(V[0]);
-        for( i = 0; i < n; i++ )
+        vstep /= حجم(V[0]);
+        برائے( i = 0; i < n; i++ )
         {
-            for( j = 0; j < n; j++ )
+            برائے( j = 0; j < n; j++ )
                 V[i*vstep + j] = (_Tp)0;
             V[i*vstep + i] = (_Tp)1;
         }
     }
 
-    int iters, maxIters = n*n*30;
+    صحیح iters, maxIters = n*n*30;
 
-    int* indR = (int*)alignPtr(buf, sizeof(int));
-    int* indC = indR + n;
+    صحیح* indR = (صحیح*)alignPtr(buf, حجم(صحیح));
+    صحیح* indC = indR + n;
     _Tp mv = (_Tp)0;
 
-    for( k = 0; k < n; k++ )
+    برائے( k = 0; k < n; k++ )
     {
         W[k] = A[(astep + 1)*k];
-        if( k < n - 1 )
+        اگر( k < n - 1 )
         {
-            for( m = k+1, mv = std::abs(A[astep*k + m]), i = k+2; i < n; i++ )
+            برائے( m = k+1, mv = std::مطلق_قدر(A[astep*k + m]), i = k+2; i < n; i++ )
             {
-                _Tp val = std::abs(A[astep*k+i]);
-                if( mv < val )
+                _Tp val = std::مطلق_قدر(A[astep*k+i]);
+                اگر( mv < val )
                     mv = val, m = i;
             }
             indR[k] = m;
         }
-        if( k > 0 )
+        اگر( k > 0 )
         {
-            for( m = 0, mv = std::abs(A[k]), i = 1; i < k; i++ )
+            برائے( m = 0, mv = std::مطلق_قدر(A[k]), i = 1; i < k; i++ )
             {
-                _Tp val = std::abs(A[astep*i+k]);
-                if( mv < val )
+                _Tp val = std::مطلق_قدر(A[astep*i+k]);
+                اگر( mv < val )
                     mv = val, m = i;
             }
             indC[k] = m;
         }
     }
 
-    if( n > 1 ) for( iters = 0; iters < maxIters; iters++ )
+    اگر( n > 1 ) برائے( iters = 0; iters < maxIters; iters++ )
     {
         // find index (k,l) of pivot p
-        for( k = 0, mv = std::abs(A[indR[0]]), i = 1; i < n-1; i++ )
+        برائے( k = 0, mv = std::مطلق_قدر(A[indR[0]]), i = 1; i < n-1; i++ )
         {
-            _Tp val = std::abs(A[astep*i + indR[i]]);
-            if( mv < val )
+            _Tp val = std::مطلق_قدر(A[astep*i + indR[i]]);
+            اگر( mv < val )
                 mv = val, k = i;
         }
-        int l = indR[k];
-        for( i = 1; i < n; i++ )
+        صحیح l = indR[k];
+        برائے( i = 1; i < n; i++ )
         {
-            _Tp val = std::abs(A[astep*indC[i] + i]);
-            if( mv < val )
+            _Tp val = std::مطلق_قدر(A[astep*indC[i] + i]);
+            اگر( mv < val )
                 mv = val, k = indC[i], l = i;
         }
 
         _Tp p = A[astep*k + l];
-        if( std::abs(p) <= eps )
-            break;
+        اگر( std::مطلق_قدر(p) <= eps )
+            توڑو;
         _Tp y = (_Tp)((W[l] - W[k])*0.5);
-        _Tp t = std::abs(y) + hypot(p, y);
+        _Tp t = std::مطلق_قدر(y) + hypot(p, y);
         _Tp s = hypot(p, t);
         _Tp c = t/s;
         s = p/s; t = (p/t)*p;
-        if( y < 0 )
+        اگر( y < 0 )
             s = -s, t = -t;
         A[astep*k + l] = 0;
 
@@ -190,43 +190,43 @@ JacobiImpl_( _Tp* A, size_t astep, _Tp* W, _Tp* V, size_t vstep, int n, uchar* b
 
         _Tp a0, b0;
 
-#undef rotate
-#define rotate(v0, v1) a0 = v0, b0 = v1, v0 = a0*c - b0*s, v1 = a0*s + b0*c
+#تعریف_منسوخ rotate
+#تعریف_کرو rotate(v0, v1) a0 = v0, b0 = v1, v0 = a0*c - b0*s, v1 = a0*s + b0*c
 
         // rotate rows and columns k and l
-        for( i = 0; i < k; i++ )
+        برائے( i = 0; i < k; i++ )
             rotate(A[astep*i+k], A[astep*i+l]);
-        for( i = k+1; i < l; i++ )
+        برائے( i = k+1; i < l; i++ )
             rotate(A[astep*k+i], A[astep*i+l]);
-        for( i = l+1; i < n; i++ )
+        برائے( i = l+1; i < n; i++ )
             rotate(A[astep*k+i], A[astep*l+i]);
 
         // rotate eigenvectors
-        if( V )
-            for( i = 0; i < n; i++ )
+        اگر( V )
+            برائے( i = 0; i < n; i++ )
                 rotate(V[vstep*k+i], V[vstep*l+i]);
 
-#undef rotate
+#تعریف_منسوخ rotate
 
-        for( j = 0; j < 2; j++ )
+        برائے( j = 0; j < 2; j++ )
         {
-            int idx = j == 0 ? k : l;
-            if( idx < n - 1 )
+            صحیح idx = j == 0 ? k : l;
+            اگر( idx < n - 1 )
             {
-                for( m = idx+1, mv = std::abs(A[astep*idx + m]), i = idx+2; i < n; i++ )
+                برائے( m = idx+1, mv = std::مطلق_قدر(A[astep*idx + m]), i = idx+2; i < n; i++ )
                 {
-                    _Tp val = std::abs(A[astep*idx+i]);
-                    if( mv < val )
+                    _Tp val = std::مطلق_قدر(A[astep*idx+i]);
+                    اگر( mv < val )
                         mv = val, m = i;
                 }
                 indR[idx] = m;
             }
-            if( idx > 0 )
+            اگر( idx > 0 )
             {
-                for( m = 0, mv = std::abs(A[idx]), i = 1; i < idx; i++ )
+                برائے( m = 0, mv = std::مطلق_قدر(A[idx]), i = 1; i < idx; i++ )
                 {
-                    _Tp val = std::abs(A[astep*i+idx]);
-                    if( mv < val )
+                    _Tp val = std::مطلق_قدر(A[astep*i+idx]);
+                    اگر( mv < val )
                         mv = val, m = i;
                 }
                 indC[idx] = m;
@@ -235,205 +235,205 @@ JacobiImpl_( _Tp* A, size_t astep, _Tp* W, _Tp* V, size_t vstep, int n, uchar* b
     }
 
     // sort eigenvalues & eigenvectors
-    for( k = 0; k < n-1; k++ )
+    برائے( k = 0; k < n-1; k++ )
     {
         m = k;
-        for( i = k+1; i < n; i++ )
+        برائے( i = k+1; i < n; i++ )
         {
-            if( W[m] < W[i] )
+            اگر( W[m] < W[i] )
                 m = i;
         }
-        if( k != m )
+        اگر( k != m )
         {
             std::swap(W[m], W[k]);
-            if( V )
-                for( i = 0; i < n; i++ )
+            اگر( V )
+                برائے( i = 0; i < n; i++ )
                     std::swap(V[vstep*m + i], V[vstep*k + i]);
         }
     }
 
-    return true;
+    واپس سچ;
 }
 
-static bool Jacobi( float* S, size_t sstep, float* e, float* E, size_t estep, int n, uchar* buf )
+ساکن منطقی Jacobi( اعشاری* S, size_t sstep, اعشاری* e, اعشاری* E, size_t estep, صحیح n, uchar* buf )
 {
-    return JacobiImpl_(S, sstep, e, E, estep, n, buf);
+    واپس JacobiImpl_(S, sstep, e, E, estep, n, buf);
 }
 
-static bool Jacobi( double* S, size_t sstep, double* e, double* E, size_t estep, int n, uchar* buf )
+ساکن منطقی Jacobi( دوہرا* S, size_t sstep, دوہرا* e, دوہرا* E, size_t estep, صحیح n, uchar* buf )
 {
-    return JacobiImpl_(S, sstep, e, E, estep, n, buf);
+    واپس JacobiImpl_(S, sstep, e, E, estep, n, buf);
 }
 
 
-template<typename T> struct VBLAS
+سانچہ<قسم_نام T> ساخت VBLAS
 {
-    int dot(const T*, const T*, int, T*) const { return 0; }
-    int givens(T*, T*, int, T, T) const { return 0; }
+    صحیح dot(ثابت T*, ثابت T*, صحیح, T*) ثابت { واپس 0; }
+    صحیح givens(T*, T*, صحیح, T, T) ثابت { واپس 0; }
 };
 
-#if (CV_SIMD || CV_SIMD_SCALABLE)
-template<> inline int VBLAS<float>::dot(const float* a, const float* b, int n, float* result) const
+#اگر (CV_SIMD || CV_SIMD_SCALABLE)
+سانچہ<> اندرونی صحیح VBLAS<اعشاری>::dot(ثابت اعشاری* a, ثابت اعشاری* b, صحیح n, اعشاری* نتیجہ) ثابت
 {
-    if( n < 2*VTraits<v_float32>::vlanes() )
-        return 0;
-    int k = 0;
+    اگر( n < 2*VTraits<v_float32>::vlanes() )
+        واپس 0;
+    صحیح k = 0;
     v_float32 s0 = vx_setzero_f32();
-    for( ; k <= n - VTraits<v_float32>::vlanes(); k += VTraits<v_float32>::vlanes() )
+    برائے( ; k <= n - VTraits<v_float32>::vlanes(); k += VTraits<v_float32>::vlanes() )
     {
-        v_float32 a0 = vx_load(a + k);
-        v_float32 b0 = vx_load(b + k);
+        v_float32 a0 = vx_بھرو(a + k);
+        v_float32 b0 = vx_بھرو(b + k);
 
-        s0 = v_add(s0, v_mul(a0, b0));
+        s0 = v_جوڑو(s0, v_mul(a0, b0));
     }
-    *result = v_reduce_sum(s0);
+    *نتیجہ = v_reduce_مجموع(s0);
     vx_cleanup();
-    return k;
+    واپس k;
 }
 
 
-template<> inline int VBLAS<float>::givens(float* a, float* b, int n, float c, float s) const
+سانچہ<> اندرونی صحیح VBLAS<اعشاری>::givens(اعشاری* a, اعشاری* b, صحیح n, اعشاری c, اعشاری s) ثابت
 {
-    if( n < VTraits<v_float32>::vlanes())
-        return 0;
-    int k = 0;
+    اگر( n < VTraits<v_float32>::vlanes())
+        واپس 0;
+    صحیح k = 0;
     v_float32 c4 = vx_setall_f32(c), s4 = vx_setall_f32(s);
     v_float32 ns4 = vx_setall_f32(-s);
-    for( ; k <= n - VTraits<v_float32>::vlanes(); k += VTraits<v_float32>::vlanes() )
+    برائے( ; k <= n - VTraits<v_float32>::vlanes(); k += VTraits<v_float32>::vlanes() )
     {
-        v_float32 a0 = vx_load(a + k);
-        v_float32 b0 = vx_load(b + k);
+        v_float32 a0 = vx_بھرو(a + k);
+        v_float32 b0 = vx_بھرو(b + k);
         v_float32 t0 = v_fma(a0, c4, v_mul(b0, s4));
         v_float32 t1 = v_fma(a0, ns4, v_mul(b0, c4));
         v_store(a + k, t0);
         v_store(b + k, t1);
     }
     vx_cleanup();
-    return k;
+    واپس k;
 }
 
 
-#if (CV_SIMD_64F || CV_SIMD_SCALABLE_64F)
-template<> inline int VBLAS<double>::dot(const double* a, const double* b, int n, double* result) const
+#اگر (CV_SIMD_64F || CV_SIMD_SCALABLE_64F)
+سانچہ<> اندرونی صحیح VBLAS<دوہرا>::dot(ثابت دوہرا* a, ثابت دوہرا* b, صحیح n, دوہرا* نتیجہ) ثابت
 {
-    if( n < 2*VTraits<v_float64>::vlanes() )
-        return 0;
-    int k = 0;
+    اگر( n < 2*VTraits<v_float64>::vlanes() )
+        واپس 0;
+    صحیح k = 0;
     v_float64 s0 = vx_setzero_f64();
-    for( ; k <= n - VTraits<v_float64>::vlanes(); k += VTraits<v_float64>::vlanes() )
+    برائے( ; k <= n - VTraits<v_float64>::vlanes(); k += VTraits<v_float64>::vlanes() )
     {
-        v_float64 a0 = vx_load(a + k);
-        v_float64 b0 = vx_load(b + k);
+        v_float64 a0 = vx_بھرو(a + k);
+        v_float64 b0 = vx_بھرو(b + k);
 
-        s0 = v_add(s0, v_mul(a0, b0));
+        s0 = v_جوڑو(s0, v_mul(a0, b0));
     }
-    *result = v_reduce_sum(s0);
+    *نتیجہ = v_reduce_مجموع(s0);
     vx_cleanup();
-    return k;
+    واپس k;
 }
 
 
-template<> inline int VBLAS<double>::givens(double* a, double* b, int n, double c, double s) const
+سانچہ<> اندرونی صحیح VBLAS<دوہرا>::givens(دوہرا* a, دوہرا* b, صحیح n, دوہرا c, دوہرا s) ثابت
 {
-    int k = 0;
+    صحیح k = 0;
     v_float64 c2 = vx_setall_f64(c), s2 = vx_setall_f64(s);
     v_float64 ns2 = vx_setall_f64(-s);
-    for( ; k <= n - VTraits<v_float64>::vlanes(); k += VTraits<v_float64>::vlanes() )
+    برائے( ; k <= n - VTraits<v_float64>::vlanes(); k += VTraits<v_float64>::vlanes() )
     {
-        v_float64 a0 = vx_load(a + k);
-        v_float64 b0 = vx_load(b + k);
+        v_float64 a0 = vx_بھرو(a + k);
+        v_float64 b0 = vx_بھرو(b + k);
         v_float64 t0 = v_fma(a0, c2, v_mul(b0, s2));
         v_float64 t1 = v_fma(a0, ns2, v_mul(b0, c2));
         v_store(a + k, t0);
         v_store(b + k, t1);
     }
     vx_cleanup();
-    return k;
+    واپس k;
 }
 
 
-#endif // (CV_SIMD_64F || CV_SIMD_SCALABLE_64F)
-#endif // (CV_SIMD || CV_SIMD_SCALABLE)
+#اگر_ختم // (CV_SIMD_64F || CV_SIMD_SCALABLE_64F)
+#اگر_ختم // (CV_SIMD || CV_SIMD_SCALABLE)
 
-template<typename _Tp> void
+سانچہ<قسم_نام _Tp> خالی
 JacobiSVDImpl_(_Tp* At, size_t astep, _Tp* _W, _Tp* Vt, size_t vstep,
-               int m, int n, int n1, double minval, _Tp eps)
+               صحیح m, صحیح n, صحیح n1, دوہرا minval, _Tp eps)
 {
     VBLAS<_Tp> vblas;
-    AutoBuffer<double> Wbuf(n);
-    double* W = Wbuf.data();
-    int i, j, k, iter, max_iter = std::max(m, 30);
+    Auto_بفر<دوہرا> Wbuf(n);
+    دوہرا* W = Wbuf.ڈیٹا();
+    صحیح i, j, k, iter, max_iter = std::max(m, 30);
     _Tp c, s;
-    double sd;
-    astep /= sizeof(At[0]);
-    vstep /= sizeof(Vt[0]);
+    دوہرا sd;
+    astep /= حجم(At[0]);
+    vstep /= حجم(Vt[0]);
 
-    for( i = 0; i < n; i++ )
+    برائے( i = 0; i < n; i++ )
     {
-        for( k = 0, sd = 0; k < m; k++ )
+        برائے( k = 0, sd = 0; k < m; k++ )
         {
             _Tp t = At[i*astep + k];
-            sd += (double)t*t;
+            sd += (دوہرا)t*t;
         }
         W[i] = sd;
 
-        if( Vt )
+        اگر( Vt )
         {
-            for( k = 0; k < n; k++ )
+            برائے( k = 0; k < n; k++ )
                 Vt[i*vstep + k] = 0;
             Vt[i*vstep + i] = 1;
         }
     }
 
-    for( iter = 0; iter < max_iter; iter++ )
+    برائے( iter = 0; iter < max_iter; iter++ )
     {
-        bool changed = false;
+        منطقی بدلا = جھوٹ;
 
-        for( i = 0; i < n-1; i++ )
-            for( j = i+1; j < n; j++ )
+        برائے( i = 0; i < n-1; i++ )
+            برائے( j = i+1; j < n; j++ )
             {
                 _Tp *Ai = At + i*astep, *Aj = At + j*astep;
-                double a = W[i], p = 0, b = W[j];
+                دوہرا a = W[i], p = 0, b = W[j];
 
-                for( k = 0; k < m; k++ )
-                    p += (double)Ai[k]*Aj[k];
+                برائے( k = 0; k < m; k++ )
+                    p += (دوہرا)Ai[k]*Aj[k];
 
-                if( std::abs(p) <= eps*std::sqrt((double)a*b) )
-                    continue;
+                اگر( std::مطلق_قدر(p) <= eps*std::جذر((دوہرا)a*b) )
+                    جاری;
 
                 p *= 2;
-                double beta = a - b, gamma = hypot((double)p, beta);
-                if( beta < 0 )
+                دوہرا beta = a - b, gamma = hypot((دوہرا)p, beta);
+                اگر( beta < 0 )
                 {
-                    double delta = (gamma - beta)*0.5;
-                    s = (_Tp)std::sqrt(delta/gamma);
+                    دوہرا delta = (gamma - beta)*0.5;
+                    s = (_Tp)std::جذر(delta/gamma);
                     c = (_Tp)(p/(gamma*s*2));
                 }
-                else
+                ورنہ
                 {
-                    c = (_Tp)std::sqrt((gamma + beta)/(gamma*2));
+                    c = (_Tp)std::جذر((gamma + beta)/(gamma*2));
                     s = (_Tp)(p/(gamma*c*2));
                 }
 
                 a = b = 0;
-                for( k = 0; k < m; k++ )
+                برائے( k = 0; k < m; k++ )
                 {
                     _Tp t0 = c*Ai[k] + s*Aj[k];
                     _Tp t1 = -s*Ai[k] + c*Aj[k];
                     Ai[k] = t0; Aj[k] = t1;
 
-                    a += (double)t0*t0; b += (double)t1*t1;
+                    a += (دوہرا)t0*t0; b += (دوہرا)t1*t1;
                 }
                 W[i] = a; W[j] = b;
 
-                changed = true;
+                بدلا = سچ;
 
-                if( Vt )
+                اگر( Vt )
                 {
                     _Tp *Vi = Vt + i*vstep, *Vj = Vt + j*vstep;
                     k = vblas.givens(Vi, Vj, n, c, s);
 
-                    for( ; k < n; k++ )
+                    برائے( ; k < n; k++ )
                     {
                         _Tp t0 = c*Vi[k] + s*Vj[k];
                         _Tp t1 = -s*Vi[k] + c*Vj[k];
@@ -441,154 +441,154 @@ JacobiSVDImpl_(_Tp* At, size_t astep, _Tp* _W, _Tp* Vt, size_t vstep,
                     }
                 }
             }
-        if( !changed )
-            break;
+        اگر( !بدلا )
+            توڑو;
     }
 
-    for( i = 0; i < n; i++ )
+    برائے( i = 0; i < n; i++ )
     {
-        for( k = 0, sd = 0; k < m; k++ )
+        برائے( k = 0, sd = 0; k < m; k++ )
         {
             _Tp t = At[i*astep + k];
-            sd += (double)t*t;
+            sd += (دوہرا)t*t;
         }
-        W[i] = std::sqrt(sd);
+        W[i] = std::جذر(sd);
     }
 
-    for( i = 0; i < n-1; i++ )
+    برائے( i = 0; i < n-1; i++ )
     {
         j = i;
-        for( k = i+1; k < n; k++ )
+        برائے( k = i+1; k < n; k++ )
         {
-            if( W[j] < W[k] )
+            اگر( W[j] < W[k] )
                 j = k;
         }
-        if( i != j )
+        اگر( i != j )
         {
             std::swap(W[i], W[j]);
-            if( Vt )
+            اگر( Vt )
             {
-                for( k = 0; k < m; k++ )
+                برائے( k = 0; k < m; k++ )
                     std::swap(At[i*astep + k], At[j*astep + k]);
 
-                for( k = 0; k < n; k++ )
+                برائے( k = 0; k < n; k++ )
                     std::swap(Vt[i*vstep + k], Vt[j*vstep + k]);
             }
         }
     }
 
-    for( i = 0; i < n; i++ )
+    برائے( i = 0; i < n; i++ )
         _W[i] = (_Tp)W[i];
 
-    if( !Vt )
-        return;
+    اگر( !Vt )
+        واپس;
 
     RNG rng(0x12345678);
-    for( i = 0; i < n1; i++ )
+    برائے( i = 0; i < n1; i++ )
     {
         sd = i < n ? W[i] : 0;
 
-        for( int ii = 0; ii < 100 && sd <= minval; ii++ )
+        برائے( صحیح ii = 0; ii < 100 && sd <= minval; ii++ )
         {
             // if we got a zero singular value, then in order to get the corresponding left singular vector
             // we generate a random vector, project it to the previously computed left singular vectors,
             // subtract the projection and normalize the difference.
-            const _Tp val0 = (_Tp)(1./m);
-            for( k = 0; k < m; k++ )
+            ثابت _Tp val0 = (_Tp)(1./m);
+            برائے( k = 0; k < m; k++ )
             {
                 _Tp val = (rng.next() & 256) != 0 ? val0 : -val0;
                 At[i*astep + k] = val;
             }
-            for( iter = 0; iter < 2; iter++ )
+            برائے( iter = 0; iter < 2; iter++ )
             {
-                for( j = 0; j < i; j++ )
+                برائے( j = 0; j < i; j++ )
                 {
                     sd = 0;
-                    for( k = 0; k < m; k++ )
+                    برائے( k = 0; k < m; k++ )
                         sd += At[i*astep + k]*At[j*astep + k];
                     _Tp asum = 0;
-                    for( k = 0; k < m; k++ )
+                    برائے( k = 0; k < m; k++ )
                     {
                         _Tp t = (_Tp)(At[i*astep + k] - sd*At[j*astep + k]);
                         At[i*astep + k] = t;
-                        asum += std::abs(t);
+                        asum += std::مطلق_قدر(t);
                     }
                     asum = asum > eps*100 ? 1/asum : 0;
-                    for( k = 0; k < m; k++ )
+                    برائے( k = 0; k < m; k++ )
                         At[i*astep + k] *= asum;
                 }
             }
             sd = 0;
-            for( k = 0; k < m; k++ )
+            برائے( k = 0; k < m; k++ )
             {
                 _Tp t = At[i*astep + k];
-                sd += (double)t*t;
+                sd += (دوہرا)t*t;
             }
-            sd = std::sqrt(sd);
+            sd = std::جذر(sd);
         }
 
         s = (_Tp)(sd > minval ? 1/sd : 0.);
-        for( k = 0; k < m; k++ )
+        برائے( k = 0; k < m; k++ )
             At[i*astep + k] *= s;
     }
 }
 
 
-static void JacobiSVD(float* At, size_t astep, float* W, float* Vt, size_t vstep, int m, int n, int n1=-1)
+ساکن خالی JacobiSVD(اعشاری* At, size_t astep, اعشاری* W, اعشاری* Vt, size_t vstep, صحیح m, صحیح n, صحیح n1=-1)
 {
-    hal::SVD32f(At, astep, W, NULL, astep, Vt, vstep, m, n, n1);
+    hal::SVD32f(At, astep, W, تہی, astep, Vt, vstep, m, n, n1);
 }
 
-static void JacobiSVD(double* At, size_t astep, double* W, double* Vt, size_t vstep, int m, int n, int n1=-1)
+ساکن خالی JacobiSVD(دوہرا* At, size_t astep, دوہرا* W, دوہرا* Vt, size_t vstep, صحیح m, صحیح n, صحیح n1=-1)
 {
-    hal::SVD64f(At, astep, W, NULL, astep, Vt, vstep, m, n, n1);
+    hal::SVD64f(At, astep, W, تہی, astep, Vt, vstep, m, n, n1);
 }
 
-template <typename fptype> static inline int
-decodeSVDParameters(const fptype* U, const fptype* Vt, int m, int n, int n1)
+سانچہ <قسم_نام fptype> ساکن اندرونی صحیح
+decodeSVDParameters(ثابت fptype* U, ثابت fptype* Vt, صحیح m, صحیح n, صحیح n1)
 {
-    int halSVDFlag = 0;
-    if(Vt == NULL)
+    صحیح halSVDFlag = 0;
+    اگر(Vt == تہی)
         halSVDFlag = CV_HAL_SVD_NO_UV;
-    else if(n1 <= 0 || n1 == n)
+    ورنہ اگر(n1 <= 0 || n1 == n)
     {
         halSVDFlag = CV_HAL_SVD_SHORT_UV;
-        if(U == NULL)
+        اگر(U == تہی)
             halSVDFlag |= CV_HAL_SVD_MODIFY_A;
     }
-    else if(n1 == m)
+    ورنہ اگر(n1 == m)
     {
-        halSVDFlag = CV_HAL_SVD_FULL_UV;
-        if(U == NULL)
+        halSVDFlag = CV_HAL_SVD_بھرا_UV;
+        اگر(U == تہی)
             halSVDFlag |= CV_HAL_SVD_MODIFY_A;
     }
-    return halSVDFlag;
+    واپس halSVDFlag;
 }
 
-void hal::SVD32f(float* At, size_t astep, float* W, float* U, size_t ustep, float* Vt, size_t vstep, int m, int n, int n1)
+خالی hal::SVD32f(اعشاری* At, size_t astep, اعشاری* W, اعشاری* U, size_t ustep, اعشاری* Vt, size_t vstep, صحیح m, صحیح n, صحیح n1)
 {
     CALL_HAL(SVD32f, cv_hal_SVD32f, At, astep, W, U, ustep, Vt, vstep, m, n, decodeSVDParameters(U, Vt, m, n, n1))
     JacobiSVDImpl_(At, astep, W, Vt, vstep, m, n, !Vt ? 0 : n1 < 0 ? n : n1, FLT_MIN, FLT_EPSILON*2);
 }
 
-void hal::SVD64f(double* At, size_t astep, double* W, double* U, size_t ustep, double* Vt, size_t vstep, int m, int n, int n1)
+خالی hal::SVD64f(دوہرا* At, size_t astep, دوہرا* W, دوہرا* U, size_t ustep, دوہرا* Vt, size_t vstep, صحیح m, صحیح n, صحیح n1)
 {
     CALL_HAL(SVD64f, cv_hal_SVD64f, At, astep, W, U, ustep, Vt, vstep, m, n, decodeSVDParameters(U, Vt, m, n, n1))
     JacobiSVDImpl_(At, astep, W, Vt, vstep, m, n, !Vt ? 0 : n1 < 0 ? n : n1, DBL_MIN, DBL_EPSILON*10);
 }
 
 /* y[0:m,0:n] += diag(a[0:1,0:m]) * x[0:m,0:n] */
-template<typename T1, typename T2, typename T3> static void
-MatrAXPY( int m, int n, const T1* x, int dx,
-         const T2* a, int inca, T3* y, int dy )
+سانچہ<قسم_نام T1, قسم_نام T2, قسم_نام T3> ساکن خالی
+MatrAXPY( صحیح m, صحیح n, ثابت T1* x, صحیح dx,
+         ثابت T2* a, صحیح inca, T3* y, صحیح dy )
 {
-    int i;
-    for( i = 0; i < m; i++, x += dx, y += dy )
+    صحیح i;
+    برائے( i = 0; i < m; i++, x += dx, y += dy )
     {
         T2 s = a[i*inca];
-        int j = 0;
-         #if CV_ENABLE_UNROLLED
-        for(; j <= n - 4; j += 4 )
+        صحیح j = 0;
+         #اگر CV_ENABLE_UNROLLED
+        برائے(; j <= n - 4; j += 4 )
         {
             T3 t0 = (T3)(y[j]   + s*x[j]);
             T3 t1 = (T3)(y[j+1] + s*x[j+1]);
@@ -599,303 +599,303 @@ MatrAXPY( int m, int n, const T1* x, int dx,
             y[j+2] = t0;
             y[j+3] = t1;
         }
-        #endif
-        for( ; j < n; j++ )
+        #اگر_ختم
+        برائے( ; j < n; j++ )
             y[j] = (T3)(y[j] + s*x[j]);
     }
 }
 
-template<typename T> static void
-SVBkSbImpl_( int m, int n, const T* w, int incw,
-       const T* u, int ldu, bool uT,
-       const T* v, int ldv, bool vT,
-       const T* b, int ldb, int nb,
-       T* x, int ldx, double* buffer, T eps )
+سانچہ<قسم_نام T> ساکن خالی
+SVBkSbImpl_( صحیح m, صحیح n, ثابت T* w, صحیح incw,
+       ثابت T* u, صحیح ldu, منطقی uT,
+       ثابت T* v, صحیح ldv, منطقی vT,
+       ثابت T* b, صحیح ldb, صحیح nb,
+       T* x, صحیح ldx, دوہرا* بفر, T eps )
 {
-    double threshold = 0;
-    int udelta0 = uT ? ldu : 1, udelta1 = uT ? 1 : ldu;
-    int vdelta0 = vT ? ldv : 1, vdelta1 = vT ? 1 : ldv;
-    int i, j, nm = std::min(m, n);
+    دوہرا حد = 0;
+    صحیح udelta0 = uT ? ldu : 1, udelta1 = uT ? 1 : ldu;
+    صحیح vdelta0 = vT ? ldv : 1, vdelta1 = vT ? 1 : ldv;
+    صحیح i, j, nm = std::min(m, n);
 
-    if( !b )
+    اگر( !b )
         nb = m;
 
-    for( i = 0; i < n; i++ )
-        for( j = 0; j < nb; j++ )
+    برائے( i = 0; i < n; i++ )
+        برائے( j = 0; j < nb; j++ )
             x[i*ldx + j] = 0;
 
-    for( i = 0; i < nm; i++ )
-        threshold += w[i*incw];
-    threshold *= eps;
+    برائے( i = 0; i < nm; i++ )
+        حد += w[i*incw];
+    حد *= eps;
 
     // v * inv(w) * uT * b
-    for( i = 0; i < nm; i++, u += udelta0, v += vdelta0 )
+    برائے( i = 0; i < nm; i++, u += udelta0, v += vdelta0 )
     {
-        double wi = w[i*incw];
-        if( (double)std::abs(wi) <= threshold )
-            continue;
+        دوہرا wi = w[i*incw];
+        اگر( (دوہرا)std::مطلق_قدر(wi) <= حد )
+            جاری;
         wi = 1/wi;
 
-        if( nb == 1 )
+        اگر( nb == 1 )
         {
-            double s = 0;
-            if( b )
-                for( j = 0; j < m; j++ )
+            دوہرا s = 0;
+            اگر( b )
+                برائے( j = 0; j < m; j++ )
                     s += u[j*udelta1]*b[j*ldb];
-            else
+            ورنہ
                 s = u[0];
             s *= wi;
 
-            for( j = 0; j < n; j++ )
+            برائے( j = 0; j < n; j++ )
                 x[j*ldx] = (T)(x[j*ldx] + s*v[j*vdelta1]);
         }
-        else
+        ورنہ
         {
-            if( b )
+            اگر( b )
             {
-                for( j = 0; j < nb; j++ )
-                    buffer[j] = 0;
-                MatrAXPY( m, nb, b, ldb, u, udelta1, buffer, 0 );
-                for( j = 0; j < nb; j++ )
-                    buffer[j] *= wi;
+                برائے( j = 0; j < nb; j++ )
+                    بفر[j] = 0;
+                MatrAXPY( m, nb, b, ldb, u, udelta1, بفر, 0 );
+                برائے( j = 0; j < nb; j++ )
+                    بفر[j] *= wi;
             }
-            else
+            ورنہ
             {
-                for( j = 0; j < nb; j++ )
-                    buffer[j] = u[j*udelta1]*wi;
+                برائے( j = 0; j < nb; j++ )
+                    بفر[j] = u[j*udelta1]*wi;
             }
-            MatrAXPY( n, nb, buffer, 0, v, vdelta1, x, ldx );
+            MatrAXPY( n, nb, بفر, 0, v, vdelta1, x, ldx );
         }
     }
 }
 
-static void
-SVBkSb( int m, int n, const float* w, size_t wstep,
-        const float* u, size_t ustep, bool uT,
-        const float* v, size_t vstep, bool vT,
-        const float* b, size_t bstep, int nb,
-        float* x, size_t xstep, uchar* buffer )
+ساکن خالی
+SVBkSb( صحیح m, صحیح n, ثابت اعشاری* w, size_t wstep,
+        ثابت اعشاری* u, size_t ustep, منطقی uT,
+        ثابت اعشاری* v, size_t vstep, منطقی vT,
+        ثابت اعشاری* b, size_t bstep, صحیح nb,
+        اعشاری* x, size_t xstep, uchar* بفر )
 {
-    SVBkSbImpl_(m, n, w, wstep ? (int)(wstep/sizeof(w[0])) : 1,
-                u, (int)(ustep/sizeof(u[0])), uT,
-                v, (int)(vstep/sizeof(v[0])), vT,
-                b, (int)(bstep/sizeof(b[0])), nb,
-                x, (int)(xstep/sizeof(x[0])),
-                (double*)alignPtr(buffer, sizeof(double)), (float)(DBL_EPSILON*2) );
+    SVBkSbImpl_(m, n, w, wstep ? (صحیح)(wstep/حجم(w[0])) : 1,
+                u, (صحیح)(ustep/حجم(u[0])), uT,
+                v, (صحیح)(vstep/حجم(v[0])), vT,
+                b, (صحیح)(bstep/حجم(b[0])), nb,
+                x, (صحیح)(xstep/حجم(x[0])),
+                (دوہرا*)alignPtr(بفر, حجم(دوہرا)), (اعشاری)(DBL_EPSILON*2) );
 }
 
-static void
-SVBkSb( int m, int n, const double* w, size_t wstep,
-       const double* u, size_t ustep, bool uT,
-       const double* v, size_t vstep, bool vT,
-       const double* b, size_t bstep, int nb,
-       double* x, size_t xstep, uchar* buffer )
+ساکن خالی
+SVBkSb( صحیح m, صحیح n, ثابت دوہرا* w, size_t wstep,
+       ثابت دوہرا* u, size_t ustep, منطقی uT,
+       ثابت دوہرا* v, size_t vstep, منطقی vT,
+       ثابت دوہرا* b, size_t bstep, صحیح nb,
+       دوہرا* x, size_t xstep, uchar* بفر )
 {
-    SVBkSbImpl_(m, n, w, wstep ? (int)(wstep/sizeof(w[0])) : 1,
-                u, (int)(ustep/sizeof(u[0])), uT,
-                v, (int)(vstep/sizeof(v[0])), vT,
-                b, (int)(bstep/sizeof(b[0])), nb,
-                x, (int)(xstep/sizeof(x[0])),
-                (double*)alignPtr(buffer, sizeof(double)), DBL_EPSILON*2 );
+    SVBkSbImpl_(m, n, w, wstep ? (صحیح)(wstep/حجم(w[0])) : 1,
+                u, (صحیح)(ustep/حجم(u[0])), uT,
+                v, (صحیح)(vstep/حجم(v[0])), vT,
+                b, (صحیح)(bstep/حجم(b[0])), nb,
+                x, (صحیح)(xstep/حجم(x[0])),
+                (دوہرا*)alignPtr(بفر, حجم(دوہرا)), DBL_EPSILON*2 );
 }
 
 /****************************************************************************************\
 *                                 Determinant of the matrix                              *
 \****************************************************************************************/
 
-#define det2(m)   ((double)m(0,0)*m(1,1) - (double)m(0,1)*m(1,0))
-#define det3(m)   (m(0,0)*((double)m(1,1)*m(2,2) - (double)m(1,2)*m(2,1)) -  \
-                   m(0,1)*((double)m(1,0)*m(2,2) - (double)m(1,2)*m(2,0)) +  \
-                   m(0,2)*((double)m(1,0)*m(2,1) - (double)m(1,1)*m(2,0)))
+#تعریف_کرو det2(m)   ((دوہرا)m(0,0)*m(1,1) - (دوہرا)m(0,1)*m(1,0))
+#تعریف_کرو det3(m)   (m(0,0)*((دوہرا)m(1,1)*m(2,2) - (دوہرا)m(1,2)*m(2,1)) -  \
+                   m(0,1)*((دوہرا)m(1,0)*m(2,2) - (دوہرا)m(1,2)*m(2,0)) +  \
+                   m(0,2)*((دوہرا)m(1,0)*m(2,1) - (دوہرا)m(1,1)*m(2,0)))
 
-double determinant( InputArray _mat )
+دوہرا مقطع( داخلہ_Array _mat )
 {
     CV_INSTRUMENT_REGION();
 
     Mat mat = _mat.getMat();
-    double result = 0;
-    int type = mat.type(), rows = mat.rows;
-    size_t step = mat.step;
-    const uchar* m = mat.ptr();
+    دوہرا نتیجہ = 0;
+    صحیح type = mat.type(), صفیں = mat.صفیں;
+    size_t قدم = mat.قدم;
+    ثابت uchar* m = mat.ptr();
 
     CV_Assert( !mat.empty() );
-    CV_Assert( mat.rows == mat.cols && (type == CV_32F || type == CV_64F));
+    CV_Assert( mat.صفیں == mat.ستون_تعداد && (type == CV_32F || type == CV_64F));
 
-    #define Mf(y, x) ((float*)(m + y*step))[x]
-    #define Md(y, x) ((double*)(m + y*step))[x]
+    #تعریف_کرو Mf(y, x) ((اعشاری*)(m + y*قدم))[x]
+    #تعریف_کرو Md(y, x) ((دوہرا*)(m + y*قدم))[x]
 
-    if( type == CV_32F )
+    اگر( type == CV_32F )
     {
-        if( rows == 2 )
-            result = det2(Mf);
-        else if( rows == 3 )
-            result = det3(Mf);
-        else if( rows == 1 )
-            result = Mf(0,0);
-        else
+        اگر( صفیں == 2 )
+            نتیجہ = det2(Mf);
+        ورنہ اگر( صفیں == 3 )
+            نتیجہ = det3(Mf);
+        ورنہ اگر( صفیں == 1 )
+            نتیجہ = Mf(0,0);
+        ورنہ
         {
-            size_t bufSize = rows*rows*sizeof(float);
-            AutoBuffer<uchar> buffer(bufSize);
-            Mat a(rows, rows, CV_32F, buffer.data());
-            mat.copyTo(a);
+            size_t buf_سائز = صفیں*صفیں*حجم(اعشاری);
+            Auto_بفر<uchar> بفر(buf_سائز);
+            Mat a(صفیں, صفیں, CV_32F, بفر.ڈیٹا());
+            mat.copy_مقصد(a);
 
-            result = hal::LU32f(a.ptr<float>(), a.step, rows, 0, 0, 0);
-            if( result )
+            نتیجہ = hal::LU32f(a.ptr<اعشاری>(), a.قدم, صفیں, 0, 0, 0);
+            اگر( نتیجہ )
             {
-                for( int i = 0; i < rows; i++ )
-                    result *= a.at<float>(i,i);
+                برائے( صحیح i = 0; i < صفیں; i++ )
+                    نتیجہ *= a.at<اعشاری>(i,i);
             }
         }
     }
-    else
+    ورنہ
     {
-        if( rows == 2 )
-            result = det2(Md);
-        else if( rows == 3 )
-            result = det3(Md);
-        else if( rows == 1 )
-            result = Md(0,0);
-        else
+        اگر( صفیں == 2 )
+            نتیجہ = det2(Md);
+        ورنہ اگر( صفیں == 3 )
+            نتیجہ = det3(Md);
+        ورنہ اگر( صفیں == 1 )
+            نتیجہ = Md(0,0);
+        ورنہ
         {
-            size_t bufSize = rows*rows*sizeof(double);
-            AutoBuffer<uchar> buffer(bufSize);
-            Mat a(rows, rows, CV_64F, buffer.data());
-            mat.copyTo(a);
+            size_t buf_سائز = صفیں*صفیں*حجم(دوہرا);
+            Auto_بفر<uchar> بفر(buf_سائز);
+            Mat a(صفیں, صفیں, CV_64F, بفر.ڈیٹا());
+            mat.copy_مقصد(a);
 
-            result = hal::LU64f(a.ptr<double>(), a.step, rows, 0, 0, 0);
-            if( result )
+            نتیجہ = hal::LU64f(a.ptr<دوہرا>(), a.قدم, صفیں, 0, 0, 0);
+            اگر( نتیجہ )
             {
-                for( int i = 0; i < rows; i++ )
-                    result *= a.at<double>(i,i);
+                برائے( صحیح i = 0; i < صفیں; i++ )
+                    نتیجہ *= a.at<دوہرا>(i,i);
             }
         }
     }
 
-    #undef Mf
-    #undef Md
+    #تعریف_منسوخ Mf
+    #تعریف_منسوخ Md
 
-    return result;
+    واپس نتیجہ;
 }
 
 /****************************************************************************************\
 *                          Inverse (or pseudo-inverse) of a matrix                       *
 \****************************************************************************************/
 
-#define Sf( y, x ) ((float*)(srcdata + y*srcstep))[x]
-#define Sd( y, x ) ((double*)(srcdata + y*srcstep))[x]
-#define Df( y, x ) ((float*)(dstdata + y*dststep))[x]
-#define Dd( y, x ) ((double*)(dstdata + y*dststep))[x]
+#تعریف_کرو Sf( y, x ) ((اعشاری*)(srcdata + y*srcstep))[x]
+#تعریف_کرو Sd( y, x ) ((دوہرا*)(srcdata + y*srcstep))[x]
+#تعریف_کرو Df( y, x ) ((اعشاری*)(dstdata + y*dststep))[x]
+#تعریف_کرو Dd( y, x ) ((دوہرا*)(dstdata + y*dststep))[x]
 
-double invert( InputArray _src, OutputArray _dst, int method )
+دوہرا invert( داخلہ_Array _src, OutputArray _dst, صحیح طریقہ )
 {
     CV_INSTRUMENT_REGION();
 
-    bool result = false;
+    منطقی نتیجہ = جھوٹ;
     Mat src = _src.getMat();
-    int type = src.type();
+    صحیح type = src.type();
 
     CV_Assert(type == CV_32F || type == CV_64F);
 
-    size_t esz = CV_ELEM_SIZE(type);
-    int m = src.rows, n = src.cols;
+    size_t esz = CV_ELEM_سائز(type);
+    صحیح m = src.صفیں, n = src.ستون_تعداد;
 
-    if( method == DECOMP_SVD )
+    اگر( طریقہ == DECOMP_SVD )
     {
-        int nm = std::min(m, n);
+        صحیح nm = std::min(m, n);
 
-        AutoBuffer<uchar> _buf((m*nm + nm + nm*n)*esz + sizeof(double));
-        uchar* buf = alignPtr((uchar*)_buf.data(), (int)esz);
+        Auto_بفر<uchar> _buf((m*nm + nm + nm*n)*esz + حجم(دوہرا));
+        uchar* buf = alignPtr((uchar*)_buf.ڈیٹا(), (صحیح)esz);
         Mat u(m, nm, type, buf);
         Mat w(nm, 1, type, u.ptr() + m*nm*esz);
         Mat vt(nm, n, type, w.ptr() + nm*esz);
 
         SVD::compute(src, w, u, vt);
-        SVD::backSubst(w, u, vt, Mat(), _dst);
-        return type == CV_32F ?
-            (w.ptr<float>()[0] >= FLT_EPSILON ?
-             w.ptr<float>()[n-1]/w.ptr<float>()[0] : 0) :
-            (w.ptr<double>()[0] >= DBL_EPSILON ?
-             w.ptr<double>()[n-1]/w.ptr<double>()[0] : 0);
+        SVD::عقب_Subst(w, u, vt, Mat(), _dst);
+        واپس type == CV_32F ?
+            (w.ptr<اعشاری>()[0] >= FLT_EPSILON ?
+             w.ptr<اعشاری>()[n-1]/w.ptr<اعشاری>()[0] : 0) :
+            (w.ptr<دوہرا>()[0] >= DBL_EPSILON ?
+             w.ptr<دوہرا>()[n-1]/w.ptr<دوہرا>()[0] : 0);
     }
 
     CV_Assert( m == n );
 
-    if( method == DECOMP_EIG )
+    اگر( طریقہ == DECOMP_EIG )
     {
-        AutoBuffer<uchar> _buf((n*n*2 + n)*esz + sizeof(double));
-        uchar* buf = alignPtr((uchar*)_buf.data(), (int)esz);
+        Auto_بفر<uchar> _buf((n*n*2 + n)*esz + حجم(دوہرا));
+        uchar* buf = alignPtr((uchar*)_buf.ڈیٹا(), (صحیح)esz);
         Mat u(n, n, type, buf);
         Mat w(n, 1, type, u.ptr() + n*n*esz);
         Mat vt(n, n, type, w.ptr() + n*esz);
 
         eigen(src, w, vt);
         transpose(vt, u);
-        SVD::backSubst(w, u, vt, Mat(), _dst);
-        return type == CV_32F ?
-        (w.ptr<float>()[0] >= FLT_EPSILON ?
-         w.ptr<float>()[n-1]/w.ptr<float>()[0] : 0) :
-        (w.ptr<double>()[0] >= DBL_EPSILON ?
-         w.ptr<double>()[n-1]/w.ptr<double>()[0] : 0);
+        SVD::عقب_Subst(w, u, vt, Mat(), _dst);
+        واپس type == CV_32F ?
+        (w.ptr<اعشاری>()[0] >= FLT_EPSILON ?
+         w.ptr<اعشاری>()[n-1]/w.ptr<اعشاری>()[0] : 0) :
+        (w.ptr<دوہرا>()[0] >= DBL_EPSILON ?
+         w.ptr<دوہرا>()[n-1]/w.ptr<دوہرا>()[0] : 0);
     }
 
-    CV_Assert( method == DECOMP_LU || method == DECOMP_CHOLESKY );
+    CV_Assert( طریقہ == DECOMP_LU || طریقہ == DECOMP_CHOLESKY );
 
     _dst.create( n, n, type );
     Mat dst = _dst.getMat();
 
-    if( n <= 3 )
+    اگر( n <= 3 )
     {
-        const uchar* srcdata = src.ptr();
+        ثابت uchar* srcdata = src.ptr();
         uchar* dstdata = dst.ptr();
-        size_t srcstep = src.step;
-        size_t dststep = dst.step;
+        size_t srcstep = src.قدم;
+        size_t dststep = dst.قدم;
 
-        if( n == 2 )
+        اگر( n == 2 )
         {
-            if( type == CV_32FC1 )
+            اگر( type == CV_32FC1 )
             {
-                double d = det2(Sf);
-                if( d != 0. )
+                دوہرا d = det2(Sf);
+                اگر( d != 0. )
                 {
-                    result = true;
+                    نتیجہ = سچ;
                     d = 1./d;
-                #if CV_SIMD128
-                    const float d_32f = (float)d;
-                    const v_float32x4 d_vec(d_32f, -d_32f, -d_32f, d_32f);
-                    v_float32x4 s0 = v_mul(v_load_halves((const float *)srcdata, (const float *)(srcdata + srcstep)), d_vec);//0123//3120
-                    s0 = v_extract<3>(s0, v_combine_low(v_rotate_right<1>(s0), s0));
-                    v_store_low((float*)dstdata, s0);
-                    v_store_high((float*)(dstdata + dststep), s0);
-                #else
-                    double t0, t1;
+                #اگر CV_SIMD128
+                    ثابت اعشاری d_32f = (اعشاری)d;
+                    ثابت v_float32x4 d_vec(d_32f, -d_32f, -d_32f, d_32f);
+                    v_float32x4 s0 = v_mul(v_بھرو_halves((ثابت اعشاری *)srcdata, (ثابت اعشاری *)(srcdata + srcstep)), d_vec);//0123//3120
+                    s0 = v_نکالو<3>(s0, v_combine_کم(v_rotate_دایاں<1>(s0), s0));
+                    v_store_کم((اعشاری*)dstdata, s0);
+                    v_store_بلند((اعشاری*)(dstdata + dststep), s0);
+                #ورنہ
+                    دوہرا t0, t1;
                     t0 = Sf(0,0)*d;
                     t1 = Sf(1,1)*d;
-                    Df(1,1) = (float)t0;
-                    Df(0,0) = (float)t1;
+                    Df(1,1) = (اعشاری)t0;
+                    Df(0,0) = (اعشاری)t1;
                     t0 = -Sf(0,1)*d;
                     t1 = -Sf(1,0)*d;
-                    Df(0,1) = (float)t0;
-                    Df(1,0) = (float)t1;
-                #endif
+                    Df(0,1) = (اعشاری)t0;
+                    Df(1,0) = (اعشاری)t1;
+                #اگر_ختم
                 }
             }
-            else
+            ورنہ
             {
-                double d = det2(Sd);
-                if( d != 0. )
+                دوہرا d = det2(Sd);
+                اگر( d != 0. )
                 {
-                    result = true;
+                    نتیجہ = سچ;
                     d = 1./d;
-                #if CV_SIMD128_64F
+                #اگر CV_SIMD128_64F
                     v_float64x2 det = v_setall_f64(d);
-                    v_float64x2 s0 = v_mul(v_load((const double *)srcdata), det);
-                    v_float64x2 s1 = v_mul(v_load((const double *)(srcdata + srcstep)), det);
-                    v_float64x2 sm = v_extract<1>(s1, s0);//30
-                    v_float64x2 ss = v_sub(v_setall<double>(0), v_extract<1>(s0, s1));//12
-                    v_store((double*)dstdata, v_combine_low(sm, ss));//31
-                    v_store((double*)(dstdata + dststep), v_combine_high(ss, sm));//20
-                #else
-                    double t0, t1;
+                    v_float64x2 s0 = v_mul(v_بھرو((ثابت دوہرا *)srcdata), det);
+                    v_float64x2 s1 = v_mul(v_بھرو((ثابت دوہرا *)(srcdata + srcstep)), det);
+                    v_float64x2 sm = v_نکالو<1>(s1, s0);//30
+                    v_float64x2 ss = v_sub(v_setall<دوہرا>(0), v_نکالو<1>(s0, s1));//12
+                    v_store((دوہرا*)dstdata, v_combine_کم(sm, ss));//31
+                    v_store((دوہرا*)(dstdata + dststep), v_combine_بلند(ss, sm));//20
+                #ورنہ
+                    دوہرا t0, t1;
                     t0 = Sd(0,0)*d;
                     t1 = Sd(1,1)*d;
                     Dd(1,1) = t0;
@@ -904,47 +904,47 @@ double invert( InputArray _src, OutputArray _dst, int method )
                     t1 = -Sd(1,0)*d;
                     Dd(0,1) = t0;
                     Dd(1,0) = t1;
-                #endif
+                #اگر_ختم
                 }
             }
         }
-        else if( n == 3 )
+        ورنہ اگر( n == 3 )
         {
-            if( type == CV_32FC1 )
+            اگر( type == CV_32FC1 )
             {
-                double d = det3(Sf);
+                دوہرا d = det3(Sf);
 
-                if( d != 0. )
+                اگر( d != 0. )
                 {
-                    double t[12];
+                    دوہرا t[12];
 
-                    result = true;
+                    نتیجہ = سچ;
                     d = 1./d;
-                    t[0] = (((double)Sf(1,1) * Sf(2,2) - (double)Sf(1,2) * Sf(2,1)) * d);
-                    t[1] = (((double)Sf(0,2) * Sf(2,1) - (double)Sf(0,1) * Sf(2,2)) * d);
-                    t[2] = (((double)Sf(0,1) * Sf(1,2) - (double)Sf(0,2) * Sf(1,1)) * d);
+                    t[0] = (((دوہرا)Sf(1,1) * Sf(2,2) - (دوہرا)Sf(1,2) * Sf(2,1)) * d);
+                    t[1] = (((دوہرا)Sf(0,2) * Sf(2,1) - (دوہرا)Sf(0,1) * Sf(2,2)) * d);
+                    t[2] = (((دوہرا)Sf(0,1) * Sf(1,2) - (دوہرا)Sf(0,2) * Sf(1,1)) * d);
 
-                    t[3] = (((double)Sf(1,2) * Sf(2,0) - (double)Sf(1,0) * Sf(2,2)) * d);
-                    t[4] = (((double)Sf(0,0) * Sf(2,2) - (double)Sf(0,2) * Sf(2,0)) * d);
-                    t[5] = (((double)Sf(0,2) * Sf(1,0) - (double)Sf(0,0) * Sf(1,2)) * d);
+                    t[3] = (((دوہرا)Sf(1,2) * Sf(2,0) - (دوہرا)Sf(1,0) * Sf(2,2)) * d);
+                    t[4] = (((دوہرا)Sf(0,0) * Sf(2,2) - (دوہرا)Sf(0,2) * Sf(2,0)) * d);
+                    t[5] = (((دوہرا)Sf(0,2) * Sf(1,0) - (دوہرا)Sf(0,0) * Sf(1,2)) * d);
 
-                    t[6] = (((double)Sf(1,0) * Sf(2,1) - (double)Sf(1,1) * Sf(2,0)) * d);
-                    t[7] = (((double)Sf(0,1) * Sf(2,0) - (double)Sf(0,0) * Sf(2,1)) * d);
-                    t[8] = (((double)Sf(0,0) * Sf(1,1) - (double)Sf(0,1) * Sf(1,0)) * d);
+                    t[6] = (((دوہرا)Sf(1,0) * Sf(2,1) - (دوہرا)Sf(1,1) * Sf(2,0)) * d);
+                    t[7] = (((دوہرا)Sf(0,1) * Sf(2,0) - (دوہرا)Sf(0,0) * Sf(2,1)) * d);
+                    t[8] = (((دوہرا)Sf(0,0) * Sf(1,1) - (دوہرا)Sf(0,1) * Sf(1,0)) * d);
 
-                    Df(0,0) = (float)t[0]; Df(0,1) = (float)t[1]; Df(0,2) = (float)t[2];
-                    Df(1,0) = (float)t[3]; Df(1,1) = (float)t[4]; Df(1,2) = (float)t[5];
-                    Df(2,0) = (float)t[6]; Df(2,1) = (float)t[7]; Df(2,2) = (float)t[8];
+                    Df(0,0) = (اعشاری)t[0]; Df(0,1) = (اعشاری)t[1]; Df(0,2) = (اعشاری)t[2];
+                    Df(1,0) = (اعشاری)t[3]; Df(1,1) = (اعشاری)t[4]; Df(1,2) = (اعشاری)t[5];
+                    Df(2,0) = (اعشاری)t[6]; Df(2,1) = (اعشاری)t[7]; Df(2,2) = (اعشاری)t[8];
                 }
             }
-            else
+            ورنہ
             {
-                double d = det3(Sd);
-                if( d != 0. )
+                دوہرا d = det3(Sd);
+                اگر( d != 0. )
                 {
-                    result = true;
+                    نتیجہ = سچ;
                     d = 1./d;
-                    double t[9];
+                    دوہرا t[9];
 
                     t[0] = (Sd(1,1) * Sd(2,2) - Sd(1,2) * Sd(2,1)) * d;
                     t[1] = (Sd(0,2) * Sd(2,1) - Sd(0,1) * Sd(2,2)) * d;
@@ -964,60 +964,60 @@ double invert( InputArray _src, OutputArray _dst, int method )
                 }
             }
         }
-        else
+        ورنہ
         {
             CV_Assert( n == 1 );
 
-            if( type == CV_32FC1 )
+            اگر( type == CV_32FC1 )
             {
-                double d = Sf(0,0);
-                if( d != 0. )
+                دوہرا d = Sf(0,0);
+                اگر( d != 0. )
                 {
-                    result = true;
-                    Df(0,0) = (float)(1./d);
+                    نتیجہ = سچ;
+                    Df(0,0) = (اعشاری)(1./d);
                 }
             }
-            else
+            ورنہ
             {
-                double d = Sd(0,0);
-                if( d != 0. )
+                دوہرا d = Sd(0,0);
+                اگر( d != 0. )
                 {
-                    result = true;
+                    نتیجہ = سچ;
                     Dd(0,0) = 1./d;
                 }
             }
         }
-        if( !result )
+        اگر( !نتیجہ )
             dst = Scalar(0);
-        return result;
+        واپس نتیجہ;
     }
 
-   int elem_size = CV_ELEM_SIZE(type);
-    AutoBuffer<uchar> buf(n*n*elem_size);
-    Mat src1(n, n, type, buf.data());
-    src.copyTo(src1);
-    setIdentity(dst);
+   صحیح elem_سائز_2 = CV_ELEM_سائز(type);
+    Auto_بفر<uchar> buf(n*n*elem_سائز_2);
+    Mat src1(n, n, type, buf.ڈیٹا());
+    src.copy_مقصد(src1);
+    سیٹ_شناختی_عنصر(dst);
 
-    if( method == DECOMP_LU && type == CV_32F )
-        result = hal::LU32f(src1.ptr<float>(), src1.step, n, dst.ptr<float>(), dst.step, n) != 0;
-    else if( method == DECOMP_LU && type == CV_64F )
-        result = hal::LU64f(src1.ptr<double>(), src1.step, n, dst.ptr<double>(), dst.step, n) != 0;
-    else if( method == DECOMP_CHOLESKY && type == CV_32F )
-        result = hal::Cholesky32f(src1.ptr<float>(), src1.step, n, dst.ptr<float>(), dst.step, n);
-    else
-        result = hal::Cholesky64f(src1.ptr<double>(), src1.step, n, dst.ptr<double>(), dst.step, n);
+    اگر( طریقہ == DECOMP_LU && type == CV_32F )
+        نتیجہ = hal::LU32f(src1.ptr<اعشاری>(), src1.قدم, n, dst.ptr<اعشاری>(), dst.قدم, n) != 0;
+    ورنہ اگر( طریقہ == DECOMP_LU && type == CV_64F )
+        نتیجہ = hal::LU64f(src1.ptr<دوہرا>(), src1.قدم, n, dst.ptr<دوہرا>(), dst.قدم, n) != 0;
+    ورنہ اگر( طریقہ == DECOMP_CHOLESKY && type == CV_32F )
+        نتیجہ = hal::Cholesky32f(src1.ptr<اعشاری>(), src1.قدم, n, dst.ptr<اعشاری>(), dst.قدم, n);
+    ورنہ
+        نتیجہ = hal::Cholesky64f(src1.ptr<دوہرا>(), src1.قدم, n, dst.ptr<دوہرا>(), dst.قدم, n);
 
-    if( !result )
+    اگر( !نتیجہ )
         dst = Scalar(0);
 
-    return result;
+    واپس نتیجہ;
 }
 
-UMat UMat::inv(int method) const
+UMat UMat::inv(صحیح طریقہ) ثابت
 {
     UMat m;
-    invert(*this, m, method);
-    return m;
+    invert(*یہ, m, طریقہ);
+    واپس m;
 }
 
 
@@ -1025,110 +1025,110 @@ UMat UMat::inv(int method) const
 *                              Solving a linear system                                   *
 \****************************************************************************************/
 
-bool solve( InputArray _src, InputArray _src2arg, OutputArray _dst, int method )
+منطقی solve( داخلہ_Array _src, داخلہ_Array _src2arg, OutputArray _dst, صحیح طریقہ )
 {
     CV_INSTRUMENT_REGION();
 
-    bool result = true;
+    منطقی نتیجہ = سچ;
     Mat src = _src.getMat(), _src2 = _src2arg.getMat();
-    int type = src.type();
-    bool is_normal = (method & DECOMP_NORMAL) != 0;
+    صحیح type = src.type();
+    منطقی is_معمول = (طریقہ & DECOMP_معمول) != 0;
 
     CV_Assert( type == _src2.type() && (type == CV_32F || type == CV_64F) );
 
-    method &= ~DECOMP_NORMAL;
-    CV_Check(method, method == DECOMP_LU || method == DECOMP_SVD || method == DECOMP_EIG ||
-                     method == DECOMP_CHOLESKY || method == DECOMP_QR,
+    طریقہ &= ~DECOMP_معمول;
+    CV_Check(طریقہ, طریقہ == DECOMP_LU || طریقہ == DECOMP_SVD || طریقہ == DECOMP_EIG ||
+                     طریقہ == DECOMP_CHOLESKY || طریقہ == DECOMP_QR,
              "Unsupported method, see #DecompTypes");
-    CV_Assert( (method != DECOMP_LU && method != DECOMP_CHOLESKY) ||
-        is_normal || src.rows == src.cols );
+    CV_Assert( (طریقہ != DECOMP_LU && طریقہ != DECOMP_CHOLESKY) ||
+        is_معمول || src.صفیں == src.ستون_تعداد );
 
     // check case of a single equation and small matrix
-    if( (method == DECOMP_LU || method == DECOMP_CHOLESKY) && !is_normal &&
-        src.rows <= 3 && src.rows == src.cols && _src2.cols == 1 )
+    اگر( (طریقہ == DECOMP_LU || طریقہ == DECOMP_CHOLESKY) && !is_معمول &&
+        src.صفیں <= 3 && src.صفیں == src.ستون_تعداد && _src2.ستون_تعداد == 1 )
     {
-        _dst.create( src.cols, _src2.cols, src.type() );
+        _dst.create( src.ستون_تعداد, _src2.ستون_تعداد, src.type() );
         Mat dst = _dst.getMat();
 
-        #define bf(y) ((float*)(bdata + y*src2step))[0]
-        #define bd(y) ((double*)(bdata + y*src2step))[0]
+        #تعریف_کرو bf(y) ((اعشاری*)(bdata + y*src2step))[0]
+        #تعریف_کرو bd(y) ((دوہرا*)(bdata + y*src2step))[0]
 
-        const uchar* srcdata = src.ptr();
-        const uchar* bdata = _src2.ptr();
+        ثابت uchar* srcdata = src.ptr();
+        ثابت uchar* bdata = _src2.ptr();
         uchar* dstdata = dst.ptr();
-        size_t srcstep = src.step;
-        size_t src2step = _src2.step;
-        size_t dststep = dst.step;
+        size_t srcstep = src.قدم;
+        size_t src2step = _src2.قدم;
+        size_t dststep = dst.قدم;
 
-        if( src.rows == 2 )
+        اگر( src.صفیں == 2 )
         {
-            if( type == CV_32FC1 )
+            اگر( type == CV_32FC1 )
             {
-                double d = det2(Sf);
-                if( d != 0. )
+                دوہرا d = det2(Sf);
+                اگر( d != 0. )
                 {
-                    double t;
+                    دوہرا t;
                     d = 1./d;
-                    t = (float)(((double)bf(0)*Sf(1,1) - (double)bf(1)*Sf(0,1))*d);
-                    Df(1,0) = (float)(((double)bf(1)*Sf(0,0) - (double)bf(0)*Sf(1,0))*d);
-                    Df(0,0) = (float)t;
+                    t = (اعشاری)(((دوہرا)bf(0)*Sf(1,1) - (دوہرا)bf(1)*Sf(0,1))*d);
+                    Df(1,0) = (اعشاری)(((دوہرا)bf(1)*Sf(0,0) - (دوہرا)bf(0)*Sf(1,0))*d);
+                    Df(0,0) = (اعشاری)t;
                 }
-                else
-                    result = false;
+                ورنہ
+                    نتیجہ = جھوٹ;
             }
-            else
+            ورنہ
             {
-                double d = det2(Sd);
-                if( d != 0. )
+                دوہرا d = det2(Sd);
+                اگر( d != 0. )
                 {
-                    double t;
+                    دوہرا t;
                     d = 1./d;
                     t = (bd(0)*Sd(1,1) - bd(1)*Sd(0,1))*d;
                     Dd(1,0) = (bd(1)*Sd(0,0) - bd(0)*Sd(1,0))*d;
                     Dd(0,0) = t;
                 }
-                else
-                    result = false;
+                ورنہ
+                    نتیجہ = جھوٹ;
             }
         }
-        else if( src.rows == 3 )
+        ورنہ اگر( src.صفیں == 3 )
         {
-            if( type == CV_32FC1 )
+            اگر( type == CV_32FC1 )
             {
-                double d = det3(Sf);
-                if( d != 0. )
+                دوہرا d = det3(Sf);
+                اگر( d != 0. )
                 {
-                    float t[3];
+                    اعشاری t[3];
                     d = 1./d;
 
-                    t[0] = (float)(d*
-                           (bf(0)*((double)Sf(1,1)*Sf(2,2) - (double)Sf(1,2)*Sf(2,1)) -
-                            Sf(0,1)*((double)bf(1)*Sf(2,2) - (double)Sf(1,2)*bf(2)) +
-                            Sf(0,2)*((double)bf(1)*Sf(2,1) - (double)Sf(1,1)*bf(2))));
+                    t[0] = (اعشاری)(d*
+                           (bf(0)*((دوہرا)Sf(1,1)*Sf(2,2) - (دوہرا)Sf(1,2)*Sf(2,1)) -
+                            Sf(0,1)*((دوہرا)bf(1)*Sf(2,2) - (دوہرا)Sf(1,2)*bf(2)) +
+                            Sf(0,2)*((دوہرا)bf(1)*Sf(2,1) - (دوہرا)Sf(1,1)*bf(2))));
 
-                    t[1] = (float)(d*
-                           (Sf(0,0)*(double)(bf(1)*Sf(2,2) - (double)Sf(1,2)*bf(2)) -
-                            bf(0)*((double)Sf(1,0)*Sf(2,2) - (double)Sf(1,2)*Sf(2,0)) +
-                            Sf(0,2)*((double)Sf(1,0)*bf(2) - (double)bf(1)*Sf(2,0))));
+                    t[1] = (اعشاری)(d*
+                           (Sf(0,0)*(دوہرا)(bf(1)*Sf(2,2) - (دوہرا)Sf(1,2)*bf(2)) -
+                            bf(0)*((دوہرا)Sf(1,0)*Sf(2,2) - (دوہرا)Sf(1,2)*Sf(2,0)) +
+                            Sf(0,2)*((دوہرا)Sf(1,0)*bf(2) - (دوہرا)bf(1)*Sf(2,0))));
 
-                    t[2] = (float)(d*
-                           (Sf(0,0)*((double)Sf(1,1)*bf(2) - (double)bf(1)*Sf(2,1)) -
-                            Sf(0,1)*((double)Sf(1,0)*bf(2) - (double)bf(1)*Sf(2,0)) +
-                            bf(0)*((double)Sf(1,0)*Sf(2,1) - (double)Sf(1,1)*Sf(2,0))));
+                    t[2] = (اعشاری)(d*
+                           (Sf(0,0)*((دوہرا)Sf(1,1)*bf(2) - (دوہرا)bf(1)*Sf(2,1)) -
+                            Sf(0,1)*((دوہرا)Sf(1,0)*bf(2) - (دوہرا)bf(1)*Sf(2,0)) +
+                            bf(0)*((دوہرا)Sf(1,0)*Sf(2,1) - (دوہرا)Sf(1,1)*Sf(2,0))));
 
                     Df(0,0) = t[0];
                     Df(1,0) = t[1];
                     Df(2,0) = t[2];
                 }
-                else
-                    result = false;
+                ورنہ
+                    نتیجہ = جھوٹ;
             }
-            else
+            ورنہ
             {
-                double d = det3(Sd);
-                if( d != 0. )
+                دوہرا d = det3(Sd);
+                اگر( d != 0. )
                 {
-                    double t[9];
+                    دوہرا t[9];
 
                     d = 1./d;
 
@@ -1148,92 +1148,92 @@ bool solve( InputArray _src, InputArray _src2arg, OutputArray _dst, int method )
                     Dd(1,0) = t[1];
                     Dd(2,0) = t[2];
                 }
-                else
-                    result = false;
+                ورنہ
+                    نتیجہ = جھوٹ;
             }
         }
-        else
+        ورنہ
         {
-            CV_Assert( src.rows == 1 );
+            CV_Assert( src.صفیں == 1 );
 
-            if( type == CV_32FC1 )
+            اگر( type == CV_32FC1 )
             {
-                double d = Sf(0,0);
-                if( d != 0. )
-                    Df(0,0) = (float)(bf(0)/d);
-                else
-                    result = false;
+                دوہرا d = Sf(0,0);
+                اگر( d != 0. )
+                    Df(0,0) = (اعشاری)(bf(0)/d);
+                ورنہ
+                    نتیجہ = جھوٹ;
             }
-            else
+            ورنہ
             {
-                double d = Sd(0,0);
-                if( d != 0. )
+                دوہرا d = Sd(0,0);
+                اگر( d != 0. )
                     Dd(0,0) = (bd(0)/d);
-                else
-                    result = false;
+                ورنہ
+                    نتیجہ = جھوٹ;
             }
         }
-        return result;
+        واپس نتیجہ;
     }
 
-    int m = src.rows, m_ = m, n = src.cols, nb = _src2.cols;
-    size_t esz = CV_ELEM_SIZE(type), bufsize = 0;
-    size_t vstep = alignSize(n*esz, 16);
-    size_t astep = method == DECOMP_SVD && !is_normal ? alignSize(m*esz, 16) : vstep;
-    AutoBuffer<uchar> buffer;
+    صحیح m = src.صفیں, m_ = m, n = src.ستون_تعداد, nb = _src2.ستون_تعداد;
+    size_t esz = CV_ELEM_سائز(type), bufsize = 0;
+    size_t vstep = align_سائز(n*esz, 16);
+    size_t astep = طریقہ == DECOMP_SVD && !is_معمول ? align_سائز(m*esz, 16) : vstep;
+    Auto_بفر<uchar> بفر;
 
     Mat src2 = _src2;
-    _dst.create( src.cols, src2.cols, src.type() );
+    _dst.create( src.ستون_تعداد, src2.ستون_تعداد, src.type() );
     Mat dst = _dst.getMat();
 
-    if( m < n )
+    اگر( m < n )
         CV_Error(cv::Error::StsBadArg, "The function can not solve under-determined linear systems" );
 
-    if( m == n )
-        is_normal = false;
-    else if( is_normal )
+    اگر( m == n )
+        is_معمول = جھوٹ;
+    ورنہ اگر( is_معمول )
     {
         m_ = n;
-        if( method == DECOMP_SVD )
-            method = DECOMP_EIG;
+        اگر( طریقہ == DECOMP_SVD )
+            طریقہ = DECOMP_EIG;
     }
 
-    CV_Assert(m == src2.rows);
-    size_t asize = astep*(method == DECOMP_SVD || is_normal ? n : m);
+    CV_Assert(m == src2.صفیں);
+    size_t asize = astep*(طریقہ == DECOMP_SVD || is_معمول ? n : m);
     bufsize += asize + 32;
 
-    if( is_normal )
+    اگر( is_معمول )
         bufsize += n*nb*esz;
-    if( method == DECOMP_SVD || method == DECOMP_EIG )
-        bufsize += n*5*esz + n*vstep + nb*sizeof(double) + 32;
+    اگر( طریقہ == DECOMP_SVD || طریقہ == DECOMP_EIG )
+        bufsize += n*5*esz + n*vstep + nb*حجم(دوہرا) + 32;
 
-    buffer.allocate(bufsize);
-    uchar* ptr = alignPtr(buffer.data(), 16);
+    بفر.allocate(bufsize);
+    uchar* ptr = alignPtr(بفر.ڈیٹا(), 16);
 
     Mat a(m_, n, type, ptr, astep);
 
-    if( is_normal )
-        mulTransposed(src, a, true);
-    else if( method != DECOMP_SVD )
-        src.copyTo(a);
-    else
+    اگر( is_معمول )
+        mulTransposed(src, a, سچ);
+    ورنہ اگر( طریقہ != DECOMP_SVD )
+        src.copy_مقصد(a);
+    ورنہ
     {
         a = Mat(n, m_, type, ptr, astep);
         transpose(src, a);
     }
     ptr += asize;
 
-    if( !is_normal )
+    اگر( !is_معمول )
     {
-        if( method == DECOMP_LU || method == DECOMP_CHOLESKY )
-            src2.copyTo(dst);
+        اگر( طریقہ == DECOMP_LU || طریقہ == DECOMP_CHOLESKY )
+            src2.copy_مقصد(dst);
     }
-    else
+    ورنہ
     {
         // a'*b
-        if( method == DECOMP_LU || method == DECOMP_CHOLESKY )
+        اگر( طریقہ == DECOMP_LU || طریقہ == DECOMP_CHOLESKY )
             gemm( src, src2, 1, Mat(), 0, dst, GEMM_1_T );
-        else
+        ورنہ
         {
             Mat tmp(n, nb, type, ptr);
             ptr += n*nb*esz;
@@ -1242,305 +1242,305 @@ bool solve( InputArray _src, InputArray _src2arg, OutputArray _dst, int method )
         }
     }
 
-    if( method == DECOMP_LU )
+    اگر( طریقہ == DECOMP_LU )
     {
-        if( type == CV_32F )
-            result = hal::LU32f(a.ptr<float>(), a.step, n, dst.ptr<float>(), dst.step, nb) != 0;
-        else
-            result = hal::LU64f(a.ptr<double>(), a.step, n, dst.ptr<double>(), dst.step, nb) != 0;
+        اگر( type == CV_32F )
+            نتیجہ = hal::LU32f(a.ptr<اعشاری>(), a.قدم, n, dst.ptr<اعشاری>(), dst.قدم, nb) != 0;
+        ورنہ
+            نتیجہ = hal::LU64f(a.ptr<دوہرا>(), a.قدم, n, dst.ptr<دوہرا>(), dst.قدم, nb) != 0;
     }
-    else if( method == DECOMP_CHOLESKY )
+    ورنہ اگر( طریقہ == DECOMP_CHOLESKY )
     {
-        if( type == CV_32F )
-            result = hal::Cholesky32f(a.ptr<float>(), a.step, n, dst.ptr<float>(), dst.step, nb);
-        else
-            result = hal::Cholesky64f(a.ptr<double>(), a.step, n, dst.ptr<double>(), dst.step, nb);
+        اگر( type == CV_32F )
+            نتیجہ = hal::Cholesky32f(a.ptr<اعشاری>(), a.قدم, n, dst.ptr<اعشاری>(), dst.قدم, nb);
+        ورنہ
+            نتیجہ = hal::Cholesky64f(a.ptr<دوہرا>(), a.قدم, n, dst.ptr<دوہرا>(), dst.قدم, nb);
     }
-    else if( method == DECOMP_QR )
+    ورنہ اگر( طریقہ == DECOMP_QR )
     {
         Mat rhsMat;
-        if( is_normal || m == n )
+        اگر( is_معمول || m == n )
         {
-            src2.copyTo(dst);
+            src2.copy_مقصد(dst);
             rhsMat = dst;
         }
-        else
+        ورنہ
         {
             rhsMat = Mat(m, nb, type);
-            src2.copyTo(rhsMat);
+            src2.copy_مقصد(rhsMat);
         }
 
-        if( type == CV_32F )
-            result = hal::QR32f(a.ptr<float>(), a.step, a.rows, a.cols, rhsMat.cols, rhsMat.ptr<float>(), rhsMat.step, NULL) != 0;
-        else
-            result = hal::QR64f(a.ptr<double>(), a.step, a.rows, a.cols, rhsMat.cols, rhsMat.ptr<double>(), rhsMat.step, NULL) != 0;
+        اگر( type == CV_32F )
+            نتیجہ = hal::QR32f(a.ptr<اعشاری>(), a.قدم, a.صفیں, a.ستون_تعداد, rhsMat.ستون_تعداد, rhsMat.ptr<اعشاری>(), rhsMat.قدم, تہی) != 0;
+        ورنہ
+            نتیجہ = hal::QR64f(a.ptr<دوہرا>(), a.قدم, a.صفیں, a.ستون_تعداد, rhsMat.ستون_تعداد, rhsMat.ptr<دوہرا>(), rhsMat.قدم, تہی) != 0;
 
-        if (rhsMat.rows != dst.rows)
-            rhsMat.rowRange(0, dst.rows).copyTo(dst);
+        اگر (rhsMat.صفیں != dst.صفیں)
+            rhsMat.صف_Range_2(0, dst.صفیں).copy_مقصد(dst);
     }
-    else
+    ورنہ
     {
         ptr = alignPtr(ptr, 16);
         Mat v(n, n, type, ptr, vstep), w(n, 1, type, ptr + vstep*n), u;
         ptr += n*(vstep + esz);
 
-        if( method == DECOMP_EIG )
+        اگر( طریقہ == DECOMP_EIG )
         {
-            if( type == CV_32F )
-                Jacobi(a.ptr<float>(), a.step, w.ptr<float>(), v.ptr<float>(), v.step, n, ptr);
-            else
-                Jacobi(a.ptr<double>(), a.step, w.ptr<double>(), v.ptr<double>(), v.step, n, ptr);
+            اگر( type == CV_32F )
+                Jacobi(a.ptr<اعشاری>(), a.قدم, w.ptr<اعشاری>(), v.ptr<اعشاری>(), v.قدم, n, ptr);
+            ورنہ
+                Jacobi(a.ptr<دوہرا>(), a.قدم, w.ptr<دوہرا>(), v.ptr<دوہرا>(), v.قدم, n, ptr);
             u = v;
         }
-        else
+        ورنہ
         {
-            if( type == CV_32F )
-                JacobiSVD(a.ptr<float>(), a.step, w.ptr<float>(), v.ptr<float>(), v.step, m_, n);
-            else
-                JacobiSVD(a.ptr<double>(), a.step, w.ptr<double>(), v.ptr<double>(), v.step, m_, n);
+            اگر( type == CV_32F )
+                JacobiSVD(a.ptr<اعشاری>(), a.قدم, w.ptr<اعشاری>(), v.ptr<اعشاری>(), v.قدم, m_, n);
+            ورنہ
+                JacobiSVD(a.ptr<دوہرا>(), a.قدم, w.ptr<دوہرا>(), v.ptr<دوہرا>(), v.قدم, m_, n);
             u = a;
         }
 
-        if( type == CV_32F )
+        اگر( type == CV_32F )
         {
-            SVBkSb(m_, n, w.ptr<float>(), 0, u.ptr<float>(), u.step, true,
-                   v.ptr<float>(), v.step, true, src2.ptr<float>(),
-                   src2.step, nb, dst.ptr<float>(), dst.step, ptr);
+            SVBkSb(m_, n, w.ptr<اعشاری>(), 0, u.ptr<اعشاری>(), u.قدم, سچ,
+                   v.ptr<اعشاری>(), v.قدم, سچ, src2.ptr<اعشاری>(),
+                   src2.قدم, nb, dst.ptr<اعشاری>(), dst.قدم, ptr);
         }
-        else
+        ورنہ
         {
-            SVBkSb(m_, n, w.ptr<double>(), 0, u.ptr<double>(), u.step, true,
-                   v.ptr<double>(), v.step, true, src2.ptr<double>(),
-                   src2.step, nb, dst.ptr<double>(), dst.step, ptr);
+            SVBkSb(m_, n, w.ptr<دوہرا>(), 0, u.ptr<دوہرا>(), u.قدم, سچ,
+                   v.ptr<دوہرا>(), v.قدم, سچ, src2.ptr<دوہرا>(),
+                   src2.قدم, nb, dst.ptr<دوہرا>(), dst.قدم, ptr);
         }
-        result = true;
+        نتیجہ = سچ;
     }
 
-    if( !result )
+    اگر( !نتیجہ )
         dst = Scalar(0);
 
-    return result;
+    واپس نتیجہ;
 }
 
 
 /////////////////// finding eigenvalues and eigenvectors of a symmetric matrix ///////////////
 
-bool eigen( InputArray _src, OutputArray _evals, OutputArray _evects )
+منطقی eigen( داخلہ_Array _src, OutputArray _evals, OutputArray _evects )
 {
     CV_INSTRUMENT_REGION();
 
     Mat src = _src.getMat();
-    int type = src.type();
-    int n = src.rows;
+    صحیح type = src.type();
+    صحیح n = src.صفیں;
 
-    CV_Assert( src.rows == src.cols );
+    CV_Assert( src.صفیں == src.ستون_تعداد );
     CV_Assert (type == CV_32F || type == CV_64F);
 
     Mat v;
-    if( _evects.needed() )
+    اگر( _evects.needed() )
     {
         _evects.create(n, n, type);
         v = _evects.getMat();
     }
 
-#ifdef HAVE_EIGEN
-    const bool evecNeeded = _evects.needed();
-    const int esOptions = evecNeeded ? Eigen::ComputeEigenvectors : Eigen::EigenvaluesOnly;
+#اگر_تعریف_شدہ HAVE_EIGEN
+    ثابت منطقی evecNeeded = _evects.needed();
+    ثابت صحیح esOptions = evecNeeded ? Eigen::ComputeEigenvectors : Eigen::EigenvaluesOnly;
     _evals.create(n, 1, type);
     Mat evals = _evals.getMat();
-    if ( type == CV_64F )
+    اگر ( type == CV_64F )
     {
-        Eigen::MatrixXd src_eig, zeros_eig;
+        Eigen::میٹرکس_Xd src_eig, zeros_eig;
         cv::cv2eigen(src, src_eig);
 
-        Eigen::SelfAdjointEigenSolver<Eigen::MatrixXd> es;
+        Eigen::SelfAdjointEigenSolver<Eigen::میٹرکس_Xd> es;
         es.compute(src_eig, esOptions);
-        if ( es.info() == Eigen::Success )
+        اگر ( es.info() == Eigen::Success )
         {
             cv::eigen2cv(es.eigenvalues().reverse().eval(), evals);
-            if ( evecNeeded )
+            اگر ( evecNeeded )
             {
                 cv::Mat evects = _evects.getMat();
                 cv::eigen2cv(es.eigenvectors().rowwise().reverse().transpose().eval(), v);
             }
-            return true;
+            واپس سچ;
         }
-    } else { // CV_32F
-        Eigen::MatrixXf src_eig, zeros_eig;
+    } ورنہ { // CV_32F
+        Eigen::میٹرکس_Xf src_eig, zeros_eig;
         cv::cv2eigen(src, src_eig);
 
-        Eigen::SelfAdjointEigenSolver<Eigen::MatrixXf> es;
+        Eigen::SelfAdjointEigenSolver<Eigen::میٹرکس_Xf> es;
         es.compute(src_eig, esOptions);
-        if ( es.info() == Eigen::Success )
+        اگر ( es.info() == Eigen::Success )
         {
             cv::eigen2cv(es.eigenvalues().reverse().eval(), evals);
-            if ( evecNeeded )
+            اگر ( evecNeeded )
             {
                 cv::eigen2cv(es.eigenvectors().rowwise().reverse().transpose().eval(), v);
             }
-            return true;
+            واپس سچ;
         }
     }
-    return false;
-#else
+    واپس جھوٹ;
+#ورنہ
 
-    size_t elemSize = src.elemSize(), astep = alignSize(n*elemSize, 16);
-    AutoBuffer<uchar> buf(n*astep + n*5*elemSize + 32);
-    uchar* ptr = alignPtr(buf.data(), 16);
+    size_t elem_سائز = src.elem_سائز(), astep = align_سائز(n*elem_سائز, 16);
+    Auto_بفر<uchar> buf(n*astep + n*5*elem_سائز + 32);
+    uchar* ptr = alignPtr(buf.ڈیٹا(), 16);
     Mat a(n, n, type, ptr, astep), w(n, 1, type, ptr + astep*n);
-    ptr += astep*n + elemSize*n;
-    src.copyTo(a);
-    bool ok = type == CV_32F ?
-        Jacobi(a.ptr<float>(), a.step, w.ptr<float>(), v.ptr<float>(), v.step, n, ptr) :
-        Jacobi(a.ptr<double>(), a.step, w.ptr<double>(), v.ptr<double>(), v.step, n, ptr);
+    ptr += astep*n + elem_سائز*n;
+    src.copy_مقصد(a);
+    منطقی ok = type == CV_32F ?
+        Jacobi(a.ptr<اعشاری>(), a.قدم, w.ptr<اعشاری>(), v.ptr<اعشاری>(), v.قدم, n, ptr) :
+        Jacobi(a.ptr<دوہرا>(), a.قدم, w.ptr<دوہرا>(), v.ptr<دوہرا>(), v.قدم, n, ptr);
 
-    w.copyTo(_evals);
-    return ok;
-#endif
+    w.copy_مقصد(_evals);
+    واپس ok;
+#اگر_ختم
 }
 
-static void _SVDcompute( InputArray _aarr, OutputArray _w,
-                         OutputArray _u, OutputArray _vt, int flags )
+ساکن خالی _SVDcompute( داخلہ_Array _aarr, OutputArray _w,
+                         OutputArray _u, OutputArray _vt, صحیح flags )
 {
     Mat src = _aarr.getMat();
-    int m = src.rows, n = src.cols;
-    int type = src.type();
-    bool compute_uv = _u.needed() || _vt.needed();
-    bool full_uv = (flags & SVD::FULL_UV) != 0;
+    صحیح m = src.صفیں, n = src.ستون_تعداد;
+    صحیح type = src.type();
+    منطقی compute_uv = _u.needed() || _vt.needed();
+    منطقی بھرا_uv = (flags & SVD::بھرا_UV) != 0;
 
     CV_Assert( type == CV_32F || type == CV_64F );
 
-    if( flags & SVD::NO_UV )
+    اگر( flags & SVD::NO_UV )
     {
         _u.release();
         _vt.release();
-        compute_uv = full_uv = false;
+        compute_uv = بھرا_uv = جھوٹ;
     }
 
-    bool at = false;
-    if( m < n )
+    منطقی at = جھوٹ;
+    اگر( m < n )
     {
         std::swap(m, n);
-        at = true;
+        at = سچ;
     }
 
-    int urows = full_uv ? m : n;
-    size_t esz = src.elemSize(), astep = alignSize(m*esz, 16), vstep = alignSize(n*esz, 16);
-    AutoBuffer<uchar> _buf(urows*astep + n*vstep + n*esz + 32);
-    uchar* buf = alignPtr(_buf.data(), 16);
-    Mat temp_a(n, m, type, buf, astep);
-    Mat temp_w(n, 1, type, buf + urows*astep);
-    Mat temp_u(urows, m, type, buf, astep), temp_v;
+    صحیح urows = بھرا_uv ? m : n;
+    size_t esz = src.elem_سائز(), astep = align_سائز(m*esz, 16), vstep = align_سائز(n*esz, 16);
+    Auto_بفر<uchar> _buf(urows*astep + n*vstep + n*esz + 32);
+    uchar* buf = alignPtr(_buf.ڈیٹا(), 16);
+    Mat عارضی_a(n, m, type, buf, astep);
+    Mat عارضی_w(n, 1, type, buf + urows*astep);
+    Mat عارضی_u(urows, m, type, buf, astep), عارضی_v;
 
-    if( compute_uv )
-        temp_v = Mat(n, n, type, alignPtr(buf + urows*astep + n*esz, 16), vstep);
+    اگر( compute_uv )
+        عارضی_v = Mat(n, n, type, alignPtr(buf + urows*astep + n*esz, 16), vstep);
 
-    if( urows > n )
-        temp_u = Scalar::all(0);
+    اگر( urows > n )
+        عارضی_u = Scalar::all(0);
 
-    if( !at )
-        transpose(src, temp_a);
-    else
-        src.copyTo(temp_a);
+    اگر( !at )
+        transpose(src, عارضی_a);
+    ورنہ
+        src.copy_مقصد(عارضی_a);
 
-    if( type == CV_32F )
+    اگر( type == CV_32F )
     {
-        JacobiSVD(temp_a.ptr<float>(), temp_u.step, temp_w.ptr<float>(),
-              temp_v.ptr<float>(), temp_v.step, m, n, compute_uv ? urows : 0);
+        JacobiSVD(عارضی_a.ptr<اعشاری>(), عارضی_u.قدم, عارضی_w.ptr<اعشاری>(),
+              عارضی_v.ptr<اعشاری>(), عارضی_v.قدم, m, n, compute_uv ? urows : 0);
     }
-    else
+    ورنہ
     {
-        JacobiSVD(temp_a.ptr<double>(), temp_u.step, temp_w.ptr<double>(),
-              temp_v.ptr<double>(), temp_v.step, m, n, compute_uv ? urows : 0);
+        JacobiSVD(عارضی_a.ptr<دوہرا>(), عارضی_u.قدم, عارضی_w.ptr<دوہرا>(),
+              عارضی_v.ptr<دوہرا>(), عارضی_v.قدم, m, n, compute_uv ? urows : 0);
     }
-    temp_w.copyTo(_w);
-    if( compute_uv )
+    عارضی_w.copy_مقصد(_w);
+    اگر( compute_uv )
     {
-        if( !at )
+        اگر( !at )
         {
-            if( _u.needed() )
-                transpose(temp_u, _u);
-            if( _vt.needed() )
-                temp_v.copyTo(_vt);
+            اگر( _u.needed() )
+                transpose(عارضی_u, _u);
+            اگر( _vt.needed() )
+                عارضی_v.copy_مقصد(_vt);
         }
-        else
+        ورنہ
         {
-            if( _u.needed() )
-                transpose(temp_v, _u);
-            if( _vt.needed() )
-                temp_u.copyTo(_vt);
+            اگر( _u.needed() )
+                transpose(عارضی_v, _u);
+            اگر( _vt.needed() )
+                عارضی_u.copy_مقصد(_vt);
         }
     }
 }
 
 
-void SVD::compute( InputArray a, OutputArray w, OutputArray u, OutputArray vt, int flags )
+خالی SVD::compute( داخلہ_Array a, OutputArray w, OutputArray u, OutputArray vt, صحیح flags )
 {
     CV_INSTRUMENT_REGION();
 
     _SVDcompute(a, w, u, vt, flags);
 }
 
-void SVD::compute( InputArray a, OutputArray w, int flags )
+خالی SVD::compute( داخلہ_Array a, OutputArray w, صحیح flags )
 {
     CV_INSTRUMENT_REGION();
 
     _SVDcompute(a, w, noArray(), noArray(), flags);
 }
 
-void SVD::backSubst( InputArray _w, InputArray _u, InputArray _vt,
-                     InputArray _rhs, OutputArray _dst )
+خالی SVD::عقب_Subst( داخلہ_Array _w, داخلہ_Array _u, داخلہ_Array _vt,
+                     داخلہ_Array _rhs, OutputArray _dst )
 {
     Mat w = _w.getMat(), u = _u.getMat(), vt = _vt.getMat(), rhs = _rhs.getMat();
-    int type = w.type(), esz = (int)w.elemSize();
-    int m = u.rows, n = vt.cols, nb = rhs.data ? rhs.cols : m, nm = std::min(m, n);
-    size_t wstep = w.rows == 1 ? (size_t)esz : w.cols == 1 ? (size_t)w.step : (size_t)w.step + esz;
-    AutoBuffer<uchar> buffer(nb*sizeof(double) + 16);
-    CV_Assert( w.type() == u.type() && u.type() == vt.type() && u.data && vt.data && w.data );
-    CV_Assert( u.cols >= nm && vt.rows >= nm &&
-              (w.size() == Size(nm, 1) || w.size() == Size(1, nm) || w.size() == Size(vt.rows, u.cols)) );
-    CV_Assert( rhs.data == 0 || (rhs.type() == type && rhs.rows == m) );
+    صحیح type = w.type(), esz = (صحیح)w.elem_سائز();
+    صحیح m = u.صفیں, n = vt.ستون_تعداد, nb = rhs.ڈیٹا ? rhs.ستون_تعداد : m, nm = std::min(m, n);
+    size_t wstep = w.صفیں == 1 ? (size_t)esz : w.ستون_تعداد == 1 ? (size_t)w.قدم : (size_t)w.قدم + esz;
+    Auto_بفر<uchar> بفر(nb*حجم(دوہرا) + 16);
+    CV_Assert( w.type() == u.type() && u.type() == vt.type() && u.ڈیٹا && vt.ڈیٹا && w.ڈیٹا );
+    CV_Assert( u.ستون_تعداد >= nm && vt.صفیں >= nm &&
+              (w.size() == سائز(nm, 1) || w.size() == سائز(1, nm) || w.size() == سائز(vt.صفیں, u.ستون_تعداد)) );
+    CV_Assert( rhs.ڈیٹا == 0 || (rhs.type() == type && rhs.صفیں == m) );
 
     _dst.create( n, nb, type );
     Mat dst = _dst.getMat();
-    if( type == CV_32F )
-        SVBkSb(m, n, w.ptr<float>(), wstep, u.ptr<float>(), u.step, false,
-               vt.ptr<float>(), vt.step, true, rhs.ptr<float>(), rhs.step, nb,
-               dst.ptr<float>(), dst.step, buffer.data());
-    else if( type == CV_64F )
-        SVBkSb(m, n, w.ptr<double>(), wstep, u.ptr<double>(), u.step, false,
-               vt.ptr<double>(), vt.step, true, rhs.ptr<double>(), rhs.step, nb,
-               dst.ptr<double>(), dst.step, buffer.data());
-    else
+    اگر( type == CV_32F )
+        SVBkSb(m, n, w.ptr<اعشاری>(), wstep, u.ptr<اعشاری>(), u.قدم, جھوٹ,
+               vt.ptr<اعشاری>(), vt.قدم, سچ, rhs.ptr<اعشاری>(), rhs.قدم, nb,
+               dst.ptr<اعشاری>(), dst.قدم, بفر.ڈیٹا());
+    ورنہ اگر( type == CV_64F )
+        SVBkSb(m, n, w.ptr<دوہرا>(), wstep, u.ptr<دوہرا>(), u.قدم, جھوٹ,
+               vt.ptr<دوہرا>(), vt.قدم, سچ, rhs.ptr<دوہرا>(), rhs.قدم, nb,
+               dst.ptr<دوہرا>(), dst.قدم, بفر.ڈیٹا());
+    ورنہ
         CV_Error( cv::Error::StsUnsupportedFormat, "" );
 }
 
 
-SVD& SVD::operator ()(InputArray a, int flags)
+SVD& SVD::عامل ()(داخلہ_Array a, صحیح flags)
 {
     _SVDcompute(a, w, u, vt, flags);
-    return *this;
+    واپس *یہ;
 }
 
 
-void SVD::backSubst( InputArray rhs, OutputArray dst ) const
+خالی SVD::عقب_Subst( داخلہ_Array rhs, OutputArray dst ) ثابت
 {
-    backSubst( w, u, vt, rhs, dst );
+    عقب_Subst( w, u, vt, rhs, dst );
 }
 
 }
 
 
-void cv::SVDecomp(InputArray src, OutputArray w, OutputArray u, OutputArray vt, int flags)
+خالی cv::SVDecomp(داخلہ_Array src, OutputArray w, OutputArray u, OutputArray vt, صحیح flags)
 {
     CV_INSTRUMENT_REGION();
 
     SVD::compute(src, w, u, vt, flags);
 }
 
-void cv::SVBackSubst(InputArray w, InputArray u, InputArray vt, InputArray rhs, OutputArray dst)
+خالی cv::SVBackSubst(داخلہ_Array w, داخلہ_Array u, داخلہ_Array vt, داخلہ_Array rhs, OutputArray dst)
 {
     CV_INSTRUMENT_REGION();
 
-    SVD::backSubst(w, u, vt, rhs, dst);
+    SVD::عقب_Subst(w, u, vt, rhs, dst);
 }

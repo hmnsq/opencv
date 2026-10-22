@@ -42,4 +42,4 @@
 //M*/
 
 
-#include "precomp.hpp"
+#شامل "precomp.hpp"

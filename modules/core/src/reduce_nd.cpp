@@ -6,21 +6,21 @@
 
 // cv::reduce: reduction of an n-dimensional array over any set of axes.
 
-#include "precomp.hpp"
-#include "opencv2/core/hal/intrin.hpp"
+#شامل "precomp.hpp"
+#شامل "opencv2/core/hal/intrin.hpp"
 
-#include <algorithm>
-#include <cmath>
-#include <limits>
+#شامل <algorithm>
+#شامل <cmath>
+#شامل <limits>
 
-namespace cv {
+نامخلا cv {
 
-namespace {
+نامخلا {
 
-enum
+شمار
 {
     RND_MAX_DIMS = CV_MAX_DIM + 1,   // + the channel axis
-    RND_BLOCK = 1024,                // elements converted per call when the source needs conversion
+    RND_بلاک = 1024,                // elements converted per call when the source needs conversion
     RND_VCHUNK = 1024,               // innermost-axis chunk in the vertical kernel
     RND_SERIAL_WORK = 64*1024,       // below this (source elements) everything runs in one thread
     RND_STRIPE_WORK = 64*1024
@@ -28,242 +28,242 @@ enum
 
 //////////////////////////////// vector traits ////////////////////////////////
 
-template<typename T> struct VecT { enum { ok = 0 }; typedef T vtype; };
-#if (CV_SIMD || CV_SIMD_SCALABLE)
-#define CV_RND_VEC(T, V) template<> struct VecT<T> { enum { ok = 1 }; typedef V vtype; };
+سانچہ<قسم_نام T> ساخت VecT { شمار { ok = 0 }; قسمتعریف T vtype; };
+#اگر (CV_SIMD || CV_SIMD_SCALABLE)
+#تعریف_کرو CV_RND_VEC(T, V) سانچہ<> ساخت VecT<T> { شمار { ok = 1 }; قسمتعریف V vtype; };
 CV_RND_VEC(uchar, v_uint8)
 CV_RND_VEC(schar, v_int8)
 CV_RND_VEC(ushort, v_uint16)
-CV_RND_VEC(short, v_int16)
-CV_RND_VEC(unsigned, v_uint32)
-CV_RND_VEC(int, v_int32)
-CV_RND_VEC(float, v_float32)
-#if (CV_SIMD_64F || CV_SIMD_SCALABLE_64F)
-CV_RND_VEC(double, v_float64)
-#endif
-#undef CV_RND_VEC
-#endif
+CV_RND_VEC(مختصر, v_int16)
+CV_RND_VEC(غیرعلامتی, v_uint32)
+CV_RND_VEC(صحیح, v_int32)
+CV_RND_VEC(اعشاری, v_float32)
+#اگر (CV_SIMD_64F || CV_SIMD_SCALABLE_64F)
+CV_RND_VEC(دوہرا, v_float64)
+#اگر_ختم
+#تعریف_منسوخ CV_RND_VEC
+#اگر_ختم
 
 //////////////////////////////// operations ////////////////////////////////
 // apply() folds one element into an accumulator, combine() merges two accumulators,
 // finalize() turns an accumulator into the result. The vector versions are only used
 // for the accumulator types that have them (see VecT).
 
-template<typename A> struct OpSum
+سانچہ<قسم_نام A> ساخت Op_مجموع
 {
-    static A init() { return A(0); }
-    static A apply(A a, A x) { return a + x; }
-    static A combine(A a, A b) { return a + b; }
-    static A finalize(A a, int64) { return a; }
-    template<typename V> static V vapply(const V& a, const V& x) { return v_add(a, x); }
-    template<typename V> static V vcombine(const V& a, const V& b) { return v_add(a, b); }
+    ساکن A init() { واپس A(0); }
+    ساکن A apply(A a, A x) { واپس a + x; }
+    ساکن A combine(A a, A b) { واپس a + b; }
+    ساکن A finalize(A a, int64) { واپس a; }
+    سانچہ<قسم_نام V> ساکن V vapply(ثابت V& a, ثابت V& x) { واپس v_جوڑو(a, x); }
+    سانچہ<قسم_نام V> ساکن V vcombine(ثابت V& a, ثابت V& b) { واپس v_جوڑو(a, b); }
 };
 
-template<typename A> struct OpAvg : OpSum<A>
+سانچہ<قسم_نام A> ساخت OpAvg : Op_مجموع<A>
 {
-    static A finalize(A a, int64 n) { return n > 0 ? A(a/(double)n) : A(0); }
+    ساکن A finalize(A a, int64 n) { واپس n > 0 ? A(a/(دوہرا)n) : A(0); }
 };
 
-template<typename A> struct OpLogSum : OpSum<A>
+سانچہ<قسم_نام A> ساخت Op_Log_مجموع : Op_مجموع<A>
 {
-    static A finalize(A a, int64) { return A(std::log(a)); }
+    ساکن A finalize(A a, int64) { واپس A(std::لوگارتھم(a)); }
 };
 
-template<typename A> struct OpSum2 : OpSum<A>
+سانچہ<قسم_نام A> ساخت OpSum2 : Op_مجموع<A>
 {
-    static A apply(A a, A x) { return a + x*x; }
-    template<typename V> static V vapply(const V& a, const V& x) { return v_add(a, v_mul(x, x)); }
+    ساکن A apply(A a, A x) { واپس a + x*x; }
+    سانچہ<قسم_نام V> ساکن V vapply(ثابت V& a, ثابت V& x) { واپس v_جوڑو(a, v_mul(x, x)); }
 };
 
-template<typename A> struct OpL2 : OpSum2<A>
+سانچہ<قسم_نام A> ساخت OpL2 : OpSum2<A>
 {
-    static A finalize(A a, int64) { return A(std::sqrt(a)); }
+    ساکن A finalize(A a, int64) { واپس A(std::جذر(a)); }
 };
 
-template<typename A> struct OpL1 : OpSum<A>
+سانچہ<قسم_نام A> ساخت OpL1 : Op_مجموع<A>
 {
-    static A apply(A a, A x) { return a + (x < A(0) ? -x : x); }
-    template<typename V> static V vapply(const V& a, const V& x) { return v_add(a, v_abs(x)); }
+    ساکن A apply(A a, A x) { واپس a + (x < A(0) ? -x : x); }
+    سانچہ<قسم_نام V> ساکن V vapply(ثابت V& a, ثابت V& x) { واپس v_جوڑو(a, v_abs(x)); }
 };
 
-template<typename A> struct OpProd
+سانچہ<قسم_نام A> ساخت OpProd
 {
-    static A init() { return A(1); }
-    static A apply(A a, A x) { return a*x; }
-    static A combine(A a, A b) { return a*b; }
-    static A finalize(A a, int64) { return a; }
-    template<typename V> static V vapply(const V& a, const V& x) { return v_mul(a, x); }
-    template<typename V> static V vcombine(const V& a, const V& b) { return v_mul(a, b); }
+    ساکن A init() { واپس A(1); }
+    ساکن A apply(A a, A x) { واپس a*x; }
+    ساکن A combine(A a, A b) { واپس a*b; }
+    ساکن A finalize(A a, int64) { واپس a; }
+    سانچہ<قسم_نام V> ساکن V vapply(ثابت V& a, ثابت V& x) { واپس v_mul(a, x); }
+    سانچہ<قسم_نام V> ساکن V vcombine(ثابت V& a, ثابت V& b) { واپس v_mul(a, b); }
 };
 
 // Identity elements of max and min. A trait rather than a ternary on has_infinity, so that the
 // unary minus is never compiled for an unsigned A (MSVC C4146).
-template<typename A, bool hasInf = std::numeric_limits<A>::has_infinity> struct Extremes
+سانچہ<قسم_نام A, منطقی hasInf = std::numeric_limits<A>::has_infinity> ساخت Extremes
 {
-    static A low() { return std::numeric_limits<A>::lowest(); }
-    static A high() { return std::numeric_limits<A>::max(); }
+    ساکن A کم() { واپس std::numeric_limits<A>::lowest(); }
+    ساکن A بلند() { واپس std::numeric_limits<A>::max(); }
 };
 
-template<typename A> struct Extremes<A, true>
+سانچہ<قسم_نام A> ساخت Extremes<A, سچ>
 {
-    static A low() { return -std::numeric_limits<A>::infinity(); }
-    static A high() { return std::numeric_limits<A>::infinity(); }
+    ساکن A کم() { واپس -std::numeric_limits<A>::infinity(); }
+    ساکن A بلند() { واپس std::numeric_limits<A>::infinity(); }
 };
 
-template<typename A> struct OpMax
+سانچہ<قسم_نام A> ساخت OpMax
 {
-    static A init() { return Extremes<A>::low(); }
-    static A apply(A a, A x) { return a < x ? x : a; }
-    static A combine(A a, A b) { return a < b ? b : a; }
-    static A finalize(A a, int64) { return a; }
-    template<typename V> static V vapply(const V& a, const V& x) { return v_max(a, x); }
-    template<typename V> static V vcombine(const V& a, const V& b) { return v_max(a, b); }
+    ساکن A init() { واپس Extremes<A>::کم(); }
+    ساکن A apply(A a, A x) { واپس a < x ? x : a; }
+    ساکن A combine(A a, A b) { واپس a < b ? b : a; }
+    ساکن A finalize(A a, int64) { واپس a; }
+    سانچہ<قسم_نام V> ساکن V vapply(ثابت V& a, ثابت V& x) { واپس v_max(a, x); }
+    سانچہ<قسم_نام V> ساکن V vcombine(ثابت V& a, ثابت V& b) { واپس v_max(a, b); }
 };
 
-template<typename A> struct OpMin
+سانچہ<قسم_نام A> ساخت OpMin
 {
-    static A init() { return Extremes<A>::high(); }
-    static A apply(A a, A x) { return x < a ? x : a; }
-    static A combine(A a, A b) { return b < a ? b : a; }
-    static A finalize(A a, int64) { return a; }
-    template<typename V> static V vapply(const V& a, const V& x) { return v_min(a, x); }
-    template<typename V> static V vcombine(const V& a, const V& b) { return v_min(a, b); }
+    ساکن A init() { واپس Extremes<A>::بلند(); }
+    ساکن A apply(A a, A x) { واپس x < a ? x : a; }
+    ساکن A combine(A a, A b) { واپس b < a ? b : a; }
+    ساکن A finalize(A a, int64) { واپس a; }
+    سانچہ<قسم_نام V> ساکن V vapply(ثابت V& a, ثابت V& x) { واپس v_min(a, x); }
+    سانچہ<قسم_نام V> ساکن V vcombine(ثابت V& a, ثابت V& b) { واپس v_min(a, b); }
 };
 
 // second pass of log-sum-exp: sum(exp(x - m)), then m + log(sum), where m is the maximum
-template<typename A> struct OpSumExpShifted
+سانچہ<قسم_نام A> ساخت Op_مجموع_Exp_Shifted
 {
-    static A init() { return A(0); }
-    static A apply(A a, A x, A m) { return a + A(std::exp(x - m)); }
-    static A combine(A a, A b) { return a + b; }
-    static A finalize(A a, A m) { return std::isinf(m) ? m : m + A(std::log(a)); }
+    ساکن A init() { واپس A(0); }
+    ساکن A apply(A a, A x, A m) { واپس a + A(std::قوت_نما(x - m)); }
+    ساکن A combine(A a, A b) { واپس a + b; }
+    ساکن A finalize(A a, A m) { واپس std::isinf(m) ? m : m + A(std::لوگارتھم(a)); }
 };
 
 //////////////////////////////// row kernels ////////////////////////////////
 
 // horizontal: fold n contiguous elements into a scalar accumulator
-template<class Op, typename A, bool vec = (VecT<A>::ok != 0)> struct HRow
+سانچہ<جماعت Op, قسم_نام A, منطقی vec = (VecT<A>::ok != 0)> ساخت HRow
 {
-    static A run(A acc, const A* x, int64 n)
+    ساکن A تسلسل(A acc, ثابت A* x, int64 n)
     {
-        for (int64 i = 0; i < n; i++)
+        برائے (int64 i = 0; i < n; i++)
             acc = Op::apply(acc, x[i]);
-        return acc;
+        واپس acc;
     }
 };
 
 // vertical: acc[i] = apply(acc[i], x[i])
-template<class Op, typename A, bool vec = (VecT<A>::ok != 0)> struct VRow
+سانچہ<جماعت Op, قسم_نام A, منطقی vec = (VecT<A>::ok != 0)> ساخت VRow
 {
-    static void run(A* acc, const A* x, int64 n)
+    ساکن خالی تسلسل(A* acc, ثابت A* x, int64 n)
     {
-        for (int64 i = 0; i < n; i++)
+        برائے (int64 i = 0; i < n; i++)
             acc[i] = Op::apply(acc[i], x[i]);
     }
 };
 
-#if (CV_SIMD || CV_SIMD_SCALABLE)
-template<class Op, typename A> struct HRow<Op, A, true>
+#اگر (CV_SIMD || CV_SIMD_SCALABLE)
+سانچہ<جماعت Op, قسم_نام A> ساخت HRow<Op, A, سچ>
 {
-    static A run(A acc, const A* x, int64 n)
+    ساکن A تسلسل(A acc, ثابت A* x, int64 n)
     {
-        typedef typename VecT<A>::vtype V;
-        const int L = VTraits<V>::vlanes();
+        قسمتعریف قسم_نام VecT<A>::vtype V;
+        ثابت صحیح L = VTraits<V>::vlanes();
         int64 i = 0;
-        if (n >= 2*L)
+        اگر (n >= 2*L)
         {
             A buf[VTraits<V>::max_nlanes];
-            for (int k = 0; k < L; k++)
+            برائے (صحیح k = 0; k < L; k++)
                 buf[k] = Op::init();
-            V a0 = vx_load(buf), a1 = a0;
-            for (; i + 2*L <= n; i += 2*L)
+            V a0 = vx_بھرو(buf), a1 = a0;
+            برائے (; i + 2*L <= n; i += 2*L)
             {
-                a0 = Op::vapply(a0, vx_load(x + i));
-                a1 = Op::vapply(a1, vx_load(x + i + L));
+                a0 = Op::vapply(a0, vx_بھرو(x + i));
+                a1 = Op::vapply(a1, vx_بھرو(x + i + L));
             }
             v_store(buf, Op::vcombine(a0, a1));
-            for (int k = 0; k < L; k++)
+            برائے (صحیح k = 0; k < L; k++)
                 acc = Op::combine(acc, buf[k]);
         }
-        for (; i < n; i++)
+        برائے (; i < n; i++)
             acc = Op::apply(acc, x[i]);
-        return acc;
+        واپس acc;
     }
 };
 
-template<class Op, typename A> struct VRow<Op, A, true>
+سانچہ<جماعت Op, قسم_نام A> ساخت VRow<Op, A, سچ>
 {
-    static void run(A* acc, const A* x, int64 n)
+    ساکن خالی تسلسل(A* acc, ثابت A* x, int64 n)
     {
-        typedef typename VecT<A>::vtype V;
-        const int L = VTraits<V>::vlanes();
+        قسمتعریف قسم_نام VecT<A>::vtype V;
+        ثابت صحیح L = VTraits<V>::vlanes();
         int64 i = 0;
-        for (; i + L <= n; i += L)
-            v_store(acc + i, Op::vapply(vx_load(acc + i), vx_load(x + i)));
-        for (; i < n; i++)
+        برائے (; i + L <= n; i += L)
+            v_store(acc + i, Op::vapply(vx_بھرو(acc + i), vx_بھرو(x + i)));
+        برائے (; i < n; i++)
             acc[i] = Op::apply(acc[i], x[i]);
     }
 };
-#endif
+#اگر_ختم
 
 //////////////////////////////// plan ////////////////////////////////
 
-struct Plan
+ساخت Plan
 {
     // kept axes (outer first); ksstep in bytes, kdstep in result elements
-    int nk;
-    int ksize[RND_MAX_DIMS];
+    صحیح nk;
+    صحیح ksize[RND_MAX_DIMS];
     ptrdiff_t ksstep[RND_MAX_DIMS], kdstep[RND_MAX_DIMS];
     // reduced axes (outer first), steps in bytes
-    int nr;
-    int rsize[RND_MAX_DIMS];
+    صحیح nr;
+    صحیح rsize[RND_MAX_DIMS];
     ptrdiff_t rsstep[RND_MAX_DIMS];
-    bool innerReduced;      // the innermost axis is reduced (horizontal mode)
+    منطقی innerReduced;      // the innermost axis is reduced (horizontal mode)
 
-    const uchar* src;
-    int sdepth, adepth;     // source depth and accumulator depth
+    ثابت uchar* src;
+    صحیح sdepth, adepth;     // source depth and accumulator depth
     size_t sesz1;
-    int64 count;            // reduced elements per output
+    int64 گنتی_2;            // reduced elements per output
     int64 nout;             // number of outputs
-    BinaryFunc cvt;         // source -> accumulator conversion, or nullptr
+    ثنائی_Func cvt;         // source -> accumulator conversion, or nullptr
 };
 
 // iterator over the flat index space of some axes, tracking a byte offset and an element offset
-struct Iter
+ساخت Iter
 {
-    int n = 0;
-    const int* size = nullptr;
-    const ptrdiff_t* s = nullptr;
-    const ptrdiff_t* d = nullptr;
+    صحیح n = 0;
+    ثابت صحیح* size = خالی_اشاریہ;
+    ثابت ptrdiff_t* s = خالی_اشاریہ;
+    ثابت ptrdiff_t* d = خالی_اشاریہ;
     int64 idx[RND_MAX_DIMS];
     ptrdiff_t soff = 0, doff = 0;
 
-    void init(int n_, const int* size_, const ptrdiff_t* s_, const ptrdiff_t* d_, int64 flat)
+    خالی init(صحیح n_, ثابت صحیح* سائز_3, ثابت ptrdiff_t* s_, ثابت ptrdiff_t* d_, int64 flat)
     {
-        n = n_; size = size_; s = s_; d = d_;
+        n = n_; size = سائز_3; s = s_; d = d_;
         soff = doff = 0;
-        for (int k = n - 1; k >= 0; k--)
+        برائے (صحیح k = n - 1; k >= 0; k--)
         {
             int64 q = flat / size[k];
             idx[k] = flat - q*size[k];
             soff += (ptrdiff_t)idx[k]*s[k];
-            if (d)
+            اگر (d)
                 doff += (ptrdiff_t)idx[k]*d[k];
             flat = q;
         }
     }
 
-    void next()
+    خالی next()
     {
-        for (int k = n - 1; k >= 0; k--)
+        برائے (صحیح k = n - 1; k >= 0; k--)
         {
             soff += s[k];
-            if (d)
+            اگر (d)
                 doff += d[k];
-            if (++idx[k] < size[k])
-                return;
+            اگر (++idx[k] < size[k])
+                واپس;
             soff -= (ptrdiff_t)size[k]*s[k];
-            if (d)
+            اگر (d)
                 doff -= (ptrdiff_t)size[k]*d[k];
             idx[k] = 0;
         }
@@ -272,437 +272,437 @@ struct Iter
 
 // `len` accumulator-typed elements of the source row at `p`: `p` itself when it is already
 // contiguous and of the accumulator type, otherwise `tmp`/`buf`.
-template<typename A> static const A* loadRow(const Plan& pl, const uchar* p, ptrdiff_t step, int64 len,
+سانچہ<قسم_نام A> ساکن ثابت A* بھرو_صف(ثابت Plan& pl, ثابت uchar* p, ptrdiff_t قدم, int64 len,
                                              A* buf, uchar* tmp)
 {
-    if (step != (ptrdiff_t)pl.sesz1)
+    اگر (قدم != (ptrdiff_t)pl.sesz1)
     {
-        for (int64 i = 0; i < len; i++, p += step)
-            memcpy(tmp + i*pl.sesz1, p, pl.sesz1);
+        برائے (int64 i = 0; i < len; i++, p += قدم)
+            حافظہ_نقل(tmp + i*pl.sesz1, p, pl.sesz1);
         p = tmp;
     }
-    if (!pl.cvt)
-        return (const A*)p;
-    pl.cvt(p, 0, 0, 0, (uchar*)buf, 0, Size((int)len, 1), 0);
-    return buf;
+    اگر (!pl.cvt)
+        واپس (ثابت A*)p;
+    pl.cvt(p, 0, 0, 0, (uchar*)buf, 0, سائز((صحیح)len, 1), 0);
+    واپس buf;
 }
 
 // Row loop with conversion blocking: calls f(x, len) on consecutive pieces of the row.
-template<typename A, typename F> static void forRow(const Plan& pl, const uchar* p, ptrdiff_t step,
+سانچہ<قسم_نام A, قسم_نام F> ساکن خالی for_صف(ثابت Plan& pl, ثابت uchar* p, ptrdiff_t قدم,
                                                     int64 n, A* buf, uchar* tmp, F f)
 {
-    const bool direct = !pl.cvt && step == (ptrdiff_t)pl.sesz1;
-    const int64 blk = direct ? n : (int64)RND_BLOCK;
-    for (int64 e = 0; e < n; e += blk)
+    ثابت منطقی براہ_راست = !pl.cvt && قدم == (ptrdiff_t)pl.sesz1;
+    ثابت int64 blk = براہ_راست ? n : (int64)RND_بلاک;
+    برائے (int64 e = 0; e < n; e += blk)
     {
         int64 len = std::min(blk, n - e);
-        f(loadRow<A>(pl, p + e*step, step, len, buf, tmp), len);
+        f(بھرو_صف<A>(pl, p + e*قدم, قدم, len, buf, tmp), len);
     }
 }
 
 //////////////////////////////// drivers ////////////////////////////////
 
 // Parallel-split bookkeeping shared by both modes: nsplit partial results per output.
-struct Work
+ساخت Work
 {
     int64 nitems, nsplit;
-    double nstripes;
-    bool serial;
+    دوہرا nstripes;
+    منطقی serial;
 };
 
 // Horizontal mode: outputs are the kept axes, each one folds `count` elements; the flat reduced
 // index space [0, count) is split into nsplit ranges when there are too few outputs.
-template<typename A, class Op, class OpM> static void runHorizontal(const Plan& pl, const Work& w, A* res,
-                                                                   const A* mbuf, A* partial)
+سانچہ<قسم_نام A, جماعت Op, جماعت OpM> ساکن خالی تسلسل_Horizontal(ثابت Plan& pl, ثابت Work& w, A* res,
+                                                                   ثابت A* mbuf, A* partial)
 {
-    const int nr = pl.nr;
-    const int64 n = pl.rsize[nr - 1];                 // innermost reduced axis
-    const ptrdiff_t rstep = pl.rsstep[nr - 1];
-    const int64 nsplit = w.nsplit;
+    ثابت صحیح nr = pl.nr;
+    ثابت int64 n = pl.rsize[nr - 1];                 // innermost reduced axis
+    ثابت ptrdiff_t rstep = pl.rsstep[nr - 1];
+    ثابت int64 nsplit = w.nsplit;
 
-    auto body = [&](const Range& range)
+    خودکار body = [&](ثابت Range& range)
     {
-        AutoBuffer<A> bufA(RND_BLOCK);
-        AutoBuffer<uchar> bufT(RND_BLOCK*pl.sesz1);
+        Auto_بفر<A> bufA(RND_بلاک);
+        Auto_بفر<uchar> bufT(RND_بلاک*pl.sesz1);
         Iter ko, ro;
-        int64 it = range.start;
-        if (nsplit == 1)
+        int64 it = range.آغاز;
+        اگر (nsplit == 1)
             ko.init(pl.nk, pl.ksize, pl.ksstep, pl.kdstep, it);
-        while (it < range.end)
+        جب (it < range.end)
         {
-            const int64 o = it / nsplit, s = it - o*nsplit;
-            if (nsplit > 1)
+            ثابت int64 o = it / nsplit, s = it - o*nsplit;
+            اگر (nsplit > 1)
                 ko.init(pl.nk, pl.ksize, pl.ksstep, pl.kdstep, o);
-            const uchar* base = pl.src + ko.soff;
-            const A m = mbuf ? mbuf[ko.doff] : A(0);
-            int64 a = s*pl.count/nsplit, b = (s + 1)*pl.count/nsplit;
+            ثابت uchar* بنیاد = pl.src + ko.soff;
+            ثابت A m = mbuf ? mbuf[ko.doff] : A(0);
+            int64 a = s*pl.گنتی_2/nsplit, b = (s + 1)*pl.گنتی_2/nsplit;
             A acc = Op::init();
-            if (a < b)
+            اگر (a < b)
             {
-                ro.init(nr - 1, pl.rsize, pl.rsstep, nullptr, a / n);
+                ro.init(nr - 1, pl.rsize, pl.rsstep, خالی_اشاریہ, a / n);
                 int64 e = a % n;
-                while (a < b)
+                جب (a < b)
                 {
                     int64 len = std::min(n - e, b - a);
-                    forRow<A>(pl, base + ro.soff + e*rstep, rstep, len, bufA.data(), bufT.data(),
-                              [&](const A* x, int64 l) { acc = OpM::run(acc, x, l, m); });
+                    for_صف<A>(pl, بنیاد + ro.soff + e*rstep, rstep, len, bufA.ڈیٹا(), bufT.ڈیٹا(),
+                              [&](ثابت A* x, int64 l) { acc = OpM::تسلسل(acc, x, l, m); });
                     a += len;
                     e = 0;
                     ro.next();
                 }
             }
-            if (nsplit == 1)
+            اگر (nsplit == 1)
             {
-                res[ko.doff] = OpM::finalize(acc, pl.count, m);
+                res[ko.doff] = OpM::finalize(acc, pl.گنتی_2, m);
                 ko.next();
             }
-            else
+            ورنہ
                 partial[s*pl.nout + ko.doff] = acc;
             it++;
         }
     };
 
-    if (w.serial)
-        body(Range(0, (int)w.nitems));
-    else
-        parallel_for_(Range(0, (int)w.nitems), body, w.nstripes);
+    اگر (w.serial)
+        body(Range(0, (صحیح)w.nitems));
+    ورنہ
+        parallel_for_(Range(0, (صحیح)w.nitems), body, w.nstripes);
 }
 
 // Vertical mode: the innermost axis is kept; each item accumulates whole rows of a chunk of it.
-template<typename A, class Op, class OpM> static void runVertical(const Plan& pl, const Work& w, A* res,
-                                                                 const A* mbuf, A* partial)
+سانچہ<قسم_نام A, جماعت Op, جماعت OpM> ساکن خالی تسلسل_Vertical(ثابت Plan& pl, ثابت Work& w, A* res,
+                                                                 ثابت A* mbuf, A* partial)
 {
-    const int nk = pl.nk;
-    const int64 m = pl.ksize[nk - 1];
-    const ptrdiff_t kstep = pl.ksstep[nk - 1], kdstep = pl.kdstep[nk - 1];
-    const int64 nch = (m + RND_VCHUNK - 1)/RND_VCHUNK;
-    const int64 nsplit = w.nsplit;
+    ثابت صحیح nk = pl.nk;
+    ثابت int64 m = pl.ksize[nk - 1];
+    ثابت ptrdiff_t kstep = pl.ksstep[nk - 1], kdstep = pl.kdstep[nk - 1];
+    ثابت int64 nch = (m + RND_VCHUNK - 1)/RND_VCHUNK;
+    ثابت int64 nsplit = w.nsplit;
     int64 rcount = 1;
-    for (int i = 0; i < pl.nr; i++)
+    برائے (صحیح i = 0; i < pl.nr; i++)
         rcount *= pl.rsize[i];
 
-    auto body = [&](const Range& range)
+    خودکار body = [&](ثابت Range& range)
     {
-        AutoBuffer<A> bufA(RND_BLOCK), accBuf(RND_VCHUNK);
-        AutoBuffer<uchar> bufT(RND_BLOCK*pl.sesz1);
-        A* acc = accBuf.data();
+        Auto_بفر<A> bufA(RND_بلاک), accBuf(RND_VCHUNK);
+        Auto_بفر<uchar> bufT(RND_بلاک*pl.sesz1);
+        A* acc = accBuf.ڈیٹا();
         Iter ko, ro;
-        for (int64 it = range.start; it < range.end; it++)
+        برائے (int64 it = range.آغاز; it < range.end; it++)
         {
             int64 s = it % nsplit, q = it / nsplit;
             int64 ch = q % nch, o = q / nch;
             ko.init(nk - 1, pl.ksize, pl.ksstep, pl.kdstep, o);
-            const int64 e0 = ch*RND_VCHUNK, len = std::min((int64)RND_VCHUNK, m - e0);
-            const ptrdiff_t soff = ko.soff + (ptrdiff_t)e0*kstep, doff = ko.doff + (ptrdiff_t)e0*kdstep;
-            const A* mrow = mbuf ? mbuf + doff : nullptr;   // kdstep == 1 for the innermost kept axis
-            for (int64 i = 0; i < len; i++)
+            ثابت int64 e0 = ch*RND_VCHUNK, len = std::min((int64)RND_VCHUNK, m - e0);
+            ثابت ptrdiff_t soff = ko.soff + (ptrdiff_t)e0*kstep, doff = ko.doff + (ptrdiff_t)e0*kdstep;
+            ثابت A* mrow = mbuf ? mbuf + doff : خالی_اشاریہ;   // kdstep == 1 for the innermost kept axis
+            برائے (int64 i = 0; i < len; i++)
                 acc[i] = Op::init();
 
             int64 a = s*rcount/nsplit, b = (s + 1)*rcount/nsplit;
-            if (a < b)
+            اگر (a < b)
             {
-                ro.init(pl.nr, pl.rsize, pl.rsstep, nullptr, a);
-                for (; a < b; a++, ro.next())
+                ro.init(pl.nr, pl.rsize, pl.rsstep, خالی_اشاریہ, a);
+                برائے (; a < b; a++, ro.next())
                 {
-                    const uchar* p = pl.src + soff + ro.soff;
-                    const A* x = loadRow<A>(pl, p, kstep, len, bufA.data(), bufT.data());
+                    ثابت uchar* p = pl.src + soff + ro.soff;
+                    ثابت A* x = بھرو_صف<A>(pl, p, kstep, len, bufA.ڈیٹا(), bufT.ڈیٹا());
                     OpM::vrun(acc, x, len, mrow);
                 }
             }
-            if (nsplit == 1)
-                for (int64 i = 0; i < len; i++)
-                    res[doff + i] = OpM::finalize(acc[i], pl.count, mrow ? mrow[i] : A(0));
-            else
-                for (int64 i = 0; i < len; i++)
+            اگر (nsplit == 1)
+                برائے (int64 i = 0; i < len; i++)
+                    res[doff + i] = OpM::finalize(acc[i], pl.گنتی_2, mrow ? mrow[i] : A(0));
+            ورنہ
+                برائے (int64 i = 0; i < len; i++)
                     partial[s*pl.nout + doff + i] = acc[i];
         }
     };
 
-    if (w.serial)
-        body(Range(0, (int)w.nitems));
-    else
-        parallel_for_(Range(0, (int)w.nitems), body, w.nstripes);
+    اگر (w.serial)
+        body(Range(0, (صحیح)w.nitems));
+    ورنہ
+        parallel_for_(Range(0, (صحیح)w.nitems), body, w.nstripes);
 }
 
 // Adapters that give the plain operations and the shifted-exp pass one interface.
-template<typename A, class Op> struct Plain
+سانچہ<قسم_نام A, جماعت Op> ساخت Plain
 {
-    static A run(A acc, const A* x, int64 n, A) { return HRow<Op, A>::run(acc, x, n); }
-    static void vrun(A* acc, const A* x, int64 n, const A*) { VRow<Op, A>::run(acc, x, n); }
-    static A finalize(A a, int64 count, A) { return Op::finalize(a, count); }
+    ساکن A تسلسل(A acc, ثابت A* x, int64 n, A) { واپس HRow<Op, A>::تسلسل(acc, x, n); }
+    ساکن خالی vrun(A* acc, ثابت A* x, int64 n, ثابت A*) { VRow<Op, A>::تسلسل(acc, x, n); }
+    ساکن A finalize(A a, int64 گنتی_2, A) { واپس Op::finalize(a, گنتی_2); }
 };
 
-template<typename A> struct ShiftedExp
+سانچہ<قسم_نام A> ساخت ShiftedExp
 {
-    typedef OpSumExpShifted<A> Op;
-    static A run(A acc, const A* x, int64 n, A m)
+    قسمتعریف Op_مجموع_Exp_Shifted<A> Op;
+    ساکن A تسلسل(A acc, ثابت A* x, int64 n, A m)
     {
-        for (int64 i = 0; i < n; i++)
+        برائے (int64 i = 0; i < n; i++)
             acc = Op::apply(acc, x[i], m);
-        return acc;
+        واپس acc;
     }
-    static void vrun(A* acc, const A* x, int64 n, const A* m)
+    ساکن خالی vrun(A* acc, ثابت A* x, int64 n, ثابت A* m)
     {
-        for (int64 i = 0; i < n; i++)
+        برائے (int64 i = 0; i < n; i++)
             acc[i] = Op::apply(acc[i], x[i], m[i]);
     }
-    static A finalize(A a, int64, A m) { return Op::finalize(a, m); }
+    ساکن A finalize(A a, int64, A m) { واپس Op::finalize(a, m); }
 };
 
-template<typename A, class Op, class OpM> static void runPass(const Plan& pl, A* res, const A* mbuf)
+سانچہ<قسم_نام A, جماعت Op, جماعت OpM> ساکن خالی تسلسل_Pass(ثابت Plan& pl, A* res, ثابت A* mbuf)
 {
-    const double work = (double)pl.nout*(double)std::max(pl.count, (int64)1);
-    const int nthreads = work < RND_SERIAL_WORK ? 1 : getNumThreads();
+    ثابت دوہرا work = (دوہرا)pl.nout*(دوہرا)std::max(pl.گنتی_2, (int64)1);
+    ثابت صحیح nthreads = work < RND_SERIAL_WORK ? 1 : get_عدد_دھاگے();
     Work w;
     w.serial = nthreads <= 1;
     w.nsplit = 1;
-    int64 items;
-    if (pl.innerReduced)
-        items = pl.nout;
-    else
+    int64 اشیاء;
+    اگر (pl.innerReduced)
+        اشیاء = pl.nout;
+    ورنہ
     {
         int64 nouter = pl.nout/pl.ksize[pl.nk - 1];
-        items = nouter*((pl.ksize[pl.nk - 1] + RND_VCHUNK - 1)/RND_VCHUNK);
+        اشیاء = nouter*((pl.ksize[pl.nk - 1] + RND_VCHUNK - 1)/RND_VCHUNK);
     }
     // too few outputs to keep all the threads busy: split the reduction as well
-    const int64 want = 4*(int64)nthreads;
-    if (!w.serial && items < want && pl.count > 1)
+    ثابت int64 want = 4*(int64)nthreads;
+    اگر (!w.serial && اشیاء < want && pl.گنتی_2 > 1)
     {
-        int64 rows = pl.innerReduced ? pl.count/4096 : pl.count/16;
-        w.nsplit = std::max((int64)1, std::min((want + items - 1)/items, std::min(rows, (int64)256)));
+        int64 صفیں = pl.innerReduced ? pl.گنتی_2/4096 : pl.گنتی_2/16;
+        w.nsplit = std::max((int64)1, std::min((want + اشیاء - 1)/اشیاء, std::min(صفیں, (int64)256)));
         w.nsplit = std::min(w.nsplit, std::max((int64)1, (int64)(4 << 20)/std::max(pl.nout, (int64)1)));
     }
-    w.nitems = items*w.nsplit;
-    w.nstripes = std::min((double)w.nitems, std::max(1.0, work/RND_STRIPE_WORK));
-    CV_Assert(w.nitems <= INT_MAX);
+    w.nitems = اشیاء*w.nsplit;
+    w.nstripes = std::min((دوہرا)w.nitems, std::max(1.0, work/RND_STRIPE_WORK));
+    CV_Assert(w.nitems <= زیادہ_سے_زیادہ_عدد);
 
-    AutoBuffer<A> partial(w.nsplit > 1 ? (size_t)(w.nsplit*pl.nout) : 1);
-    if (pl.innerReduced)
-        runHorizontal<A, Op, OpM>(pl, w, res, mbuf, partial.data());
-    else
-        runVertical<A, Op, OpM>(pl, w, res, mbuf, partial.data());
+    Auto_بفر<A> partial(w.nsplit > 1 ? (size_t)(w.nsplit*pl.nout) : 1);
+    اگر (pl.innerReduced)
+        تسلسل_Horizontal<A, Op, OpM>(pl, w, res, mbuf, partial.ڈیٹا());
+    ورنہ
+        تسلسل_Vertical<A, Op, OpM>(pl, w, res, mbuf, partial.ڈیٹا());
 
-    if (w.nsplit > 1)
+    اگر (w.nsplit > 1)
     {
-        for (int64 o = 0; o < pl.nout; o++)
+        برائے (int64 o = 0; o < pl.nout; o++)
         {
             A acc = partial[(size_t)o];
-            for (int64 s = 1; s < w.nsplit; s++)
+            برائے (int64 s = 1; s < w.nsplit; s++)
                 acc = Op::combine(acc, partial[(size_t)(s*pl.nout + o)]);
-            res[o] = OpM::finalize(acc, pl.count, mbuf ? mbuf[o] : A(0));
+            res[o] = OpM::finalize(acc, pl.گنتی_2, mbuf ? mbuf[o] : A(0));
         }
     }
 }
 
-template<typename A> static void fillResult(A* res, int64 n, A v)
+سانچہ<قسم_نام A> ساکن خالی fill_نتیجہ(A* res, int64 n, A v)
 {
-    for (int64 i = 0; i < n; i++)
+    برائے (int64 i = 0; i < n; i++)
         res[i] = v;
 }
 
-template<typename A> static void runOp(const Plan& pl, int op, A* res)
+سانچہ<قسم_نام A> ساکن خالی تسلسل_Op(ثابت Plan& pl, صحیح op, A* res)
 {
-    if (pl.count == 0)
+    اگر (pl.گنتی_2 == 0)
     {
         // empty reduction: the identity of the operation
         A v = op == REDUCE_MAX ? OpMax<A>::init() : op == REDUCE_MIN ? OpMin<A>::init() :
               op == REDUCE_PROD ? A(1) :
-              op == REDUCE_LOG_SUM || op == REDUCE_LOG_SUM_EXP ? OpMax<A>::init() : A(0);
-        fillResult(res, pl.nout, v);
-        return;
+              op == REDUCE_LOG_مجموع || op == REDUCE_LOG_مجموع_EXP ? OpMax<A>::init() : A(0);
+        fill_نتیجہ(res, pl.nout, v);
+        واپس;
     }
-    switch (op)
+    انتخاب (op)
     {
-    case REDUCE_SUM:   runPass<A, OpSum<A>, Plain<A, OpSum<A> > >(pl, res, nullptr); break;
-    case REDUCE_AVG:   runPass<A, OpAvg<A>, Plain<A, OpAvg<A> > >(pl, res, nullptr); break;
-    case REDUCE_SUM2:  runPass<A, OpSum2<A>, Plain<A, OpSum2<A> > >(pl, res, nullptr); break;
-    case REDUCE_L1:    runPass<A, OpL1<A>, Plain<A, OpL1<A> > >(pl, res, nullptr); break;
-    case REDUCE_L2:    runPass<A, OpL2<A>, Plain<A, OpL2<A> > >(pl, res, nullptr); break;
-    case REDUCE_PROD:  runPass<A, OpProd<A>, Plain<A, OpProd<A> > >(pl, res, nullptr); break;
-    case REDUCE_LOG_SUM: runPass<A, OpLogSum<A>, Plain<A, OpLogSum<A> > >(pl, res, nullptr); break;
-    case REDUCE_LOG_SUM_EXP:
+    حالت REDUCE_مجموع:   تسلسل_Pass<A, Op_مجموع<A>, Plain<A, Op_مجموع<A> > >(pl, res, خالی_اشاریہ); توڑو;
+    حالت REDUCE_AVG:   تسلسل_Pass<A, OpAvg<A>, Plain<A, OpAvg<A> > >(pl, res, خالی_اشاریہ); توڑو;
+    حالت REDUCE_SUM2:  تسلسل_Pass<A, OpSum2<A>, Plain<A, OpSum2<A> > >(pl, res, خالی_اشاریہ); توڑو;
+    حالت REDUCE_L1:    تسلسل_Pass<A, OpL1<A>, Plain<A, OpL1<A> > >(pl, res, خالی_اشاریہ); توڑو;
+    حالت REDUCE_L2:    تسلسل_Pass<A, OpL2<A>, Plain<A, OpL2<A> > >(pl, res, خالی_اشاریہ); توڑو;
+    حالت REDUCE_PROD:  تسلسل_Pass<A, OpProd<A>, Plain<A, OpProd<A> > >(pl, res, خالی_اشاریہ); توڑو;
+    حالت REDUCE_LOG_مجموع: تسلسل_Pass<A, Op_Log_مجموع<A>, Plain<A, Op_Log_مجموع<A> > >(pl, res, خالی_اشاریہ); توڑو;
+    حالت REDUCE_LOG_مجموع_EXP:
     {
-        AutoBuffer<A> mbuf((size_t)pl.nout);
-        runPass<A, OpMax<A>, Plain<A, OpMax<A> > >(pl, mbuf.data(), nullptr);
-        runPass<A, OpSumExpShifted<A>, ShiftedExp<A> >(pl, res, mbuf.data());
-        break;
+        Auto_بفر<A> mbuf((size_t)pl.nout);
+        تسلسل_Pass<A, OpMax<A>, Plain<A, OpMax<A> > >(pl, mbuf.ڈیٹا(), خالی_اشاریہ);
+        تسلسل_Pass<A, Op_مجموع_Exp_Shifted<A>, ShiftedExp<A> >(pl, res, mbuf.ڈیٹا());
+        توڑو;
     }
-    default:
+    طےشدہ:
         CV_Error(Error::StsBadArg, "reduce: unknown reduction operation");
     }
 }
 
-template<typename A> static void runMinMax(const Plan& pl, int op, A* res)
+سانچہ<قسم_نام A> ساکن خالی تسلسل_Min_Max(ثابت Plan& pl, صحیح op, A* res)
 {
-    if (pl.count == 0)
-        fillResult(res, pl.nout, op == REDUCE_MAX ? OpMax<A>::init() : OpMin<A>::init());
-    else if (op == REDUCE_MAX)
-        runPass<A, OpMax<A>, Plain<A, OpMax<A> > >(pl, res, nullptr);
-    else
-        runPass<A, OpMin<A>, Plain<A, OpMin<A> > >(pl, res, nullptr);
+    اگر (pl.گنتی_2 == 0)
+        fill_نتیجہ(res, pl.nout, op == REDUCE_MAX ? OpMax<A>::init() : OpMin<A>::init());
+    ورنہ اگر (op == REDUCE_MAX)
+        تسلسل_Pass<A, OpMax<A>, Plain<A, OpMax<A> > >(pl, res, خالی_اشاریہ);
+    ورنہ
+        تسلسل_Pass<A, OpMin<A>, Plain<A, OpMin<A> > >(pl, res, خالی_اشاریہ);
 }
 
-static void dispatch(const Plan& pl, int op, uchar* res)
+ساکن خالی dispatch(ثابت Plan& pl, صحیح op, uchar* res)
 {
-    const bool minmax = op == REDUCE_MAX || op == REDUCE_MIN;
-    switch (pl.adepth)
+    ثابت منطقی minmax = op == REDUCE_MAX || op == REDUCE_MIN;
+    انتخاب (pl.adepth)
     {
-    case CV_32F:
-        if (minmax) runMinMax<float>(pl, op, (float*)res); else runOp<float>(pl, op, (float*)res);
-        break;
-    case CV_64F:
-        if (minmax) runMinMax<double>(pl, op, (double*)res); else runOp<double>(pl, op, (double*)res);
-        break;
-    case CV_8U:  runMinMax<uchar>(pl, op, (uchar*)res); break;
-    case CV_8S:  runMinMax<schar>(pl, op, (schar*)res); break;
-    case CV_16U: runMinMax<ushort>(pl, op, (ushort*)res); break;
-    case CV_16S: runMinMax<short>(pl, op, (short*)res); break;
-    case CV_32U: runMinMax<unsigned>(pl, op, (unsigned*)res); break;
-    case CV_32S: runMinMax<int>(pl, op, (int*)res); break;
-    case CV_64U: runMinMax<uint64_t>(pl, op, (uint64_t*)res); break;
-    case CV_64S: runMinMax<int64_t>(pl, op, (int64_t*)res); break;
-    default:
-        CV_Error(Error::StsInternal, "reduce: unexpected accumulator depth");
+    حالت CV_32F:
+        اگر (minmax) تسلسل_Min_Max<اعشاری>(pl, op, (اعشاری*)res); ورنہ تسلسل_Op<اعشاری>(pl, op, (اعشاری*)res);
+        توڑو;
+    حالت CV_64F:
+        اگر (minmax) تسلسل_Min_Max<دوہرا>(pl, op, (دوہرا*)res); ورنہ تسلسل_Op<دوہرا>(pl, op, (دوہرا*)res);
+        توڑو;
+    حالت CV_8U:  تسلسل_Min_Max<uchar>(pl, op, (uchar*)res); توڑو;
+    حالت CV_8S:  تسلسل_Min_Max<schar>(pl, op, (schar*)res); توڑو;
+    حالت CV_16U: تسلسل_Min_Max<ushort>(pl, op, (ushort*)res); توڑو;
+    حالت CV_16S: تسلسل_Min_Max<مختصر>(pl, op, (مختصر*)res); توڑو;
+    حالت CV_32U: تسلسل_Min_Max<غیرعلامتی>(pl, op, (غیرعلامتی*)res); توڑو;
+    حالت CV_32S: تسلسل_Min_Max<صحیح>(pl, op, (صحیح*)res); توڑو;
+    حالت CV_64U: تسلسل_Min_Max<uint64_t>(pl, op, (uint64_t*)res); توڑو;
+    حالت CV_64S: تسلسل_Min_Max<int64_t>(pl, op, (int64_t*)res); توڑو;
+    طےشدہ:
+        CV_Error(Error::Sts_اندرونی, "reduce: unexpected accumulator depth");
     }
 }
 
-static int accumulatorDepth(int sdepth, int ddepth, int op)
+ساکن صحیح مجمع_گہرائی(صحیح sdepth, صحیح ddepth, صحیح op)
 {
-    if (op == REDUCE_MAX || op == REDUCE_MIN)
+    اگر (op == REDUCE_MAX || op == REDUCE_MIN)
     {
-        if (sdepth == CV_16F || sdepth == CV_16BF)
-            return CV_32F;
-        return sdepth == CV_Bool ? CV_8U : sdepth;
+        اگر (sdepth == CV_16F || sdepth == CV_16BF)
+            واپس CV_32F;
+        واپس sdepth == CV_Bool ? CV_8U : sdepth;
     }
-    const bool wide = sdepth == CV_32S || sdepth == CV_32U || sdepth == CV_64S || sdepth == CV_64U ||
+    ثابت منطقی wide = sdepth == CV_32S || sdepth == CV_32U || sdepth == CV_64S || sdepth == CV_64U ||
                       sdepth == CV_64F || ddepth == CV_64F;
-    return wide ? CV_64F : CV_32F;
+    واپس wide ? CV_64F : CV_32F;
 }
 
 } // namespace
 
-ReduceParams::ReduceParams(int _rtype, const std::vector<int>& _axes, bool _keepdims, int _dtype)
+ReduceParams::ReduceParams(صحیح _rtype, ثابت std::vector<صحیح>& _axes, منطقی _keepdims, صحیح _dtype)
     : rtype(_rtype), axes(_axes), keepdims(_keepdims), dtype(_dtype)
 {
 }
 
-void reduce(InputArray _src, OutputArray _dst, const ReduceParams& params)
+خالی reduce(داخلہ_Array _src, OutputArray _dst, ثابت ReduceParams& params)
 {
     CV_INSTRUMENT_REGION();
 
-    const int op = params.rtype, dtype = params.dtype;
-    const bool keepdims = params.keepdims;
-    CV_Check(op, op >= REDUCE_SUM && op <= REDUCE_LOG_SUM_EXP, "reduce: unknown reduction operation");
+    ثابت صحیح op = params.rtype, dtype = params.dtype;
+    ثابت منطقی keepdims = params.keepdims;
+    CV_Check(op, op >= REDUCE_مجموع && op <= REDUCE_LOG_مجموع_EXP, "reduce: unknown reduction operation");
 
     Mat src = _src.getMat();
-    const int dims = src.dims, cn = src.channels();
-    const int sdepth = src.depth();
-    int ddepth = dtype < 0 ? sdepth : CV_MAT_DEPTH(dtype);
-    if ((op == REDUCE_MAX || op == REDUCE_MIN) && sdepth == CV_Bool && ddepth != CV_Bool)
+    ثابت صحیح dims = src.dims, cn = src.channels();
+    ثابت صحیح sdepth = src.گہرائی();
+    صحیح ddepth = dtype < 0 ? sdepth : CV_MAT_گہرائی(dtype);
+    اگر ((op == REDUCE_MAX || op == REDUCE_MIN) && sdepth == CV_Bool && ddepth != CV_Bool)
         CV_Error(Error::StsBadArg, "reduce: the output of max/min over bool must be bool");
 
     // which axes are reduced; empty means all of them
-    bool reduced[CV_MAX_DIM] = {false};
-    if (params.axes.empty())
-        std::fill(reduced, reduced + dims, true);
-    for (int a : params.axes)
+    منطقی reduced[CV_MAX_DIM] = {جھوٹ};
+    اگر (params.axes.empty())
+        std::fill(reduced, reduced + dims, سچ);
+    برائے (صحیح a : params.axes)
     {
         CV_CheckGE(a, -dims, "reduce: axis is out of range");
         CV_CheckLT(a, dims, "reduce: axis is out of range");
-        int ax = a < 0 ? a + dims : a;
+        صحیح ax = a < 0 ? a + dims : a;
         CV_Check(a, !reduced[ax], "reduce: duplicate axis");
-        reduced[ax] = true;
+        reduced[ax] = سچ;
     }
 
-    int keepShape[CV_MAX_DIM], outShape[CV_MAX_DIM], nout = 0;
-    for (int i = 0; i < dims; i++)
+    صحیح keepShape[CV_MAX_DIM], برآمد_Shape[CV_MAX_DIM], nout = 0;
+    برائے (صحیح i = 0; i < dims; i++)
     {
         keepShape[i] = reduced[i] ? 1 : src.size[i];
-        if (!reduced[i] || keepdims)
-            outShape[nout++] = keepShape[i];
+        اگر (!reduced[i] || keepdims)
+            برآمد_Shape[nout++] = keepShape[i];
     }
-    const int dtype_ = CV_MAKETYPE(ddepth, cn);
-    _dst.create(nout, outShape, dtype_);
+    ثابت صحیح dtype_ = CV_MAKETYPE(ddepth, cn);
+    _dst.create(nout, برآمد_Shape, dtype_);
     Mat dst = _dst.getMat();
 
     // The results are computed into a contiguous accumulator-typed buffer laid out like the
     // keepdims output (channels innermost), then converted into dst if needed.
     Plan pl;
-    pl.src = src.data;
+    pl.src = src.ڈیٹا;
     pl.sdepth = sdepth == CV_Bool ? CV_8U : sdepth;
-    pl.adepth = accumulatorDepth(sdepth, ddepth, op);
+    pl.adepth = مجمع_گہرائی(sdepth, ddepth, op);
     pl.sesz1 = CV_ELEM_SIZE1(sdepth);
-    pl.cvt = pl.sdepth == pl.adepth ? nullptr : getConvertFunc(pl.sdepth, pl.adepth);
+    pl.cvt = pl.sdepth == pl.adepth ? خالی_اشاریہ : getConvertFunc(pl.sdepth, pl.adepth);
     CV_Assert(pl.sdepth == pl.adepth || pl.cvt);
 
     // gather the axes (+ the channel axis), outer first
-    int n = 0;
-    int size[RND_MAX_DIMS];
+    صحیح n = 0;
+    صحیح size[RND_MAX_DIMS];
     ptrdiff_t sstep[RND_MAX_DIMS], dstep[RND_MAX_DIMS];
-    bool red[RND_MAX_DIMS];
+    منطقی red[RND_MAX_DIMS];
     ptrdiff_t dcur = cn;
     ptrdiff_t dsteps[CV_MAX_DIM];
-    for (int i = dims - 1; i >= 0; i--)
+    برائے (صحیح i = dims - 1; i >= 0; i--)
     {
         dsteps[i] = dcur;
         dcur *= keepShape[i];
     }
-    pl.count = 1;
-    for (int i = 0; i < dims; i++)
+    pl.گنتی_2 = 1;
+    برائے (صحیح i = 0; i < dims; i++)
     {
-        if (reduced[i])
-            pl.count *= src.size[i];
+        اگر (reduced[i])
+            pl.گنتی_2 *= src.size[i];
         size[n] = src.size[i];
-        sstep[n] = (ptrdiff_t)src.step[i];
+        sstep[n] = (ptrdiff_t)src.قدم[i];
         dstep[n] = reduced[i] ? 0 : dsteps[i];
         red[n] = reduced[i];
         n++;
     }
-    if (cn > 1)
+    اگر (cn > 1)
     {
         size[n] = cn;
         sstep[n] = (ptrdiff_t)pl.sesz1;
         dstep[n] = 1;
-        red[n] = false;
+        red[n] = جھوٹ;
         n++;
     }
 
-    pl.nout = (int64)dst.total()*cn;
-    const bool direct = pl.adepth == ddepth && dst.isContinuous();
+    pl.nout = (int64)dst.کل()*cn;
+    ثابت منطقی براہ_راست = pl.adepth == ddepth && dst.isContinuous();
     Mat resMat;
-    uchar* res = dst.data;
-    if (!direct)
+    uchar* res = dst.ڈیٹا;
+    اگر (!براہ_راست)
     {
-        resMat.create(1, (int)std::max(pl.nout, (int64)1), CV_MAKETYPE(pl.adepth, 1));
-        res = resMat.data;
+        resMat.create(1, (صحیح)std::max(pl.nout, (int64)1), CV_MAKETYPE(pl.adepth, 1));
+        res = resMat.ڈیٹا;
     }
-    if (pl.nout == 0)
-        return;
+    اگر (pl.nout == 0)
+        واپس;
 
     // drop size-1 axes, then merge neighbours of the same kind that are contiguous in both views
-    int m = 0;
-    for (int i = 0; i < n; i++)
+    صحیح m = 0;
+    برائے (صحیح i = 0; i < n; i++)
     {
-        if (size[i] == 0)
+        اگر (size[i] == 0)
         {
             // empty source along this axis
-            if (red[i])
+            اگر (red[i])
             {
-                pl.count = 0;
-                continue;
+                pl.گنتی_2 = 0;
+                جاری;
             }
-            return;
+            واپس;
         }
-        if (size[i] == 1)
-            continue;
-        if (m > 0 && red[m-1] == red[i] && sstep[m-1] == sstep[i]*size[i] &&
+        اگر (size[i] == 1)
+            جاری;
+        اگر (m > 0 && red[m-1] == red[i] && sstep[m-1] == sstep[i]*size[i] &&
             dstep[m-1] == dstep[i]*size[i])
         {
             size[m-1] *= size[i];
             sstep[m-1] = sstep[i];
             dstep[m-1] = dstep[i];
         }
-        else
+        ورنہ
         {
             size[m] = size[i];
             sstep[m] = sstep[i];
@@ -711,26 +711,26 @@ void reduce(InputArray _src, OutputArray _dst, const ReduceParams& params)
             m++;
         }
     }
-    if (m == 0)
+    اگر (m == 0)
     {
         // a single element
         size[0] = 1;
         sstep[0] = (ptrdiff_t)pl.sesz1;
         dstep[0] = 1;
-        red[0] = false;
+        red[0] = جھوٹ;
         m = 1;
     }
     pl.innerReduced = red[m-1];
     pl.nk = pl.nr = 0;
-    for (int i = 0; i < m; i++)
+    برائے (صحیح i = 0; i < m; i++)
     {
-        if (red[i])
+        اگر (red[i])
         {
             pl.rsize[pl.nr] = size[i];
             pl.rsstep[pl.nr] = sstep[i];
             pl.nr++;
         }
-        else
+        ورنہ
         {
             pl.ksize[pl.nk] = size[i];
             pl.ksstep[pl.nk] = sstep[i];
@@ -738,7 +738,7 @@ void reduce(InputArray _src, OutputArray _dst, const ReduceParams& params)
             pl.nk++;
         }
     }
-    if (pl.nk == 0)
+    اگر (pl.nk == 0)
     {
         pl.ksize[0] = 1;
         pl.ksstep[0] = 0;
@@ -748,12 +748,12 @@ void reduce(InputArray _src, OutputArray _dst, const ReduceParams& params)
 
     dispatch(pl, op, res);
 
-    if (!direct)
+    اگر (!براہ_راست)
     {
-        Mat r(dst.dims, dst.size.p, CV_MAKETYPE(pl.adepth, cn), resMat.data);
-        if (dst.dims == 0)
-            r = Mat(0, nullptr, CV_MAKETYPE(pl.adepth, cn), resMat.data);
-        r.convertTo(dst, ddepth);
+        Mat r(dst.dims, dst.size.p, CV_MAKETYPE(pl.adepth, cn), resMat.ڈیٹا);
+        اگر (dst.dims == 0)
+            r = Mat(0, خالی_اشاریہ, CV_MAKETYPE(pl.adepth, cn), resMat.ڈیٹا);
+        r.convert_مقصد(dst, ddepth);
     }
 }
 

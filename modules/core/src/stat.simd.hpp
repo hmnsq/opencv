@@ -4,147 +4,147 @@
 //
 // Copyright (C) 2026, Advanced Micro Devices, Inc., all rights reserved.
 
-#include "opencv2/core/hal/intrin.hpp"
+#شامل "opencv2/core/hal/intrin.hpp"
 
-namespace cv { namespace hal {
+نامخلا cv { نامخلا hal {
 
-extern const uchar popCountTable[256];
+خارجی ثابت uchar نکالو_گنتی_جدول[256];
 
-typedef int (*NormHammingFunc)(const uchar*, int);
-typedef int (*NormHammingDiffFunc)(const uchar*, const uchar*, int);
+قسمتعریف صحیح (*NormHammingFunc)(ثابت uchar*, صحیح);
+قسمتعریف صحیح (*NormHammingDiffFunc)(ثابت uchar*, ثابت uchar*, صحیح);
 
 CV_CPU_OPTIMIZATION_NAMESPACE_BEGIN
 
 // forward declarations
-int normHamming(const uchar* a, int n);
-int normHamming(const uchar* a, const uchar* b, int n);
+صحیح normHamming(ثابت uchar* a, صحیح n);
+صحیح normHamming(ثابت uchar* a, ثابت uchar* b, صحیح n);
 
 NormHammingFunc getNormHammingFunc();
 NormHammingDiffFunc getNormHammingDiffFunc();
 
-#ifndef CV_CPU_OPTIMIZATION_DECLARATIONS_ONLY
+#اگر_غیر_تعریف_شدہ CV_CPU_OPTIMIZATION_DECLARATIONS_ONLY
 
-#if CV_AVX2
-static inline int _mm256_extract_epi32_(__m256i reg, const int i)
+#اگر CV_AVX2
+ساکن اندرونی صحیح mm256_نکالو_epi32(__m256i reg, ثابت صحیح i)
 {
-    CV_DECL_ALIGNED(32) int reg_data[8];
+    CV_DECL_ALIGNED(32) صحیح reg_ڈیٹا[8];
     CV_DbgAssert(0 <= i && i < 8);
-    _mm256_store_si256((__m256i*)reg_data, reg);
-    return reg_data[i];
+    _mm256_store_si256((__m256i*)reg_ڈیٹا, reg);
+    واپس reg_ڈیٹا[i];
 }
-#endif
+#اگر_ختم
 
-int normHamming(const uchar* a, int n)
+صحیح normHamming(ثابت uchar* a, صحیح n)
 {
     CV_AVX_GUARD;
 
-    int i = 0;
-    int result = 0;
+    صحیح i = 0;
+    صحیح نتیجہ = 0;
 
-#if (CV_SIMD || CV_SIMD_SCALABLE)
+#اگر (CV_SIMD || CV_SIMD_SCALABLE)
     {
         v_uint64 t = vx_setzero_u64();
-        for (; i <= n - VTraits<v_uint8>::vlanes(); i += VTraits<v_uint8>::vlanes())
-            t = v_add(t, v_popcount(v_reinterpret_as_u64(vx_load(a + i))));
-        result = (int)v_reduce_sum(t);
+        برائے (; i <= n - VTraits<v_uint8>::vlanes(); i += VTraits<v_uint8>::vlanes())
+            t = v_جوڑو(t, v_popcount(v_reinterpret_as_u64(vx_بھرو(a + i))));
+        نتیجہ = (صحیح)v_reduce_مجموع(t);
         vx_cleanup();
     }
-#endif
+#اگر_ختم
 
-#if CV_POPCNT
+#اگر CV_POPCNT
     {
-#  if defined CV_POPCNT_U64
-        for(; i <= n - 8; i += 8)
+#  اگر defined CV_POPCNT_U64
+        برائے(; i <= n - 8; i += 8)
         {
             uint64_t val;
-            std::memcpy(&val, a + i, sizeof(val));
-            result += (int)CV_POPCNT_U64(val);
+            std::حافظہ_نقل(&val, a + i, حجم(val));
+            نتیجہ += (صحیح)CV_POPCNT_U64(val);
         }
 #  endif
-        for(; i <= n - 4; i += 4)
+        برائے(; i <= n - 4; i += 4)
         {
             uint32_t val;
-            std::memcpy(&val, a + i, sizeof(val));
-            result += CV_POPCNT_U32(val);
+            std::حافظہ_نقل(&val, a + i, حجم(val));
+            نتیجہ += CV_POPCNT_U32(val);
         }
     }
-#endif
-#if CV_ENABLE_UNROLLED
-    for(; i <= n - 4; i += 4)
+#اگر_ختم
+#اگر CV_ENABLE_UNROLLED
+    برائے(; i <= n - 4; i += 4)
     {
-        result += popCountTable[a[i]] + popCountTable[a[i+1]] +
-        popCountTable[a[i+2]] + popCountTable[a[i+3]];
+        نتیجہ += نکالو_گنتی_جدول[a[i]] + نکالو_گنتی_جدول[a[i+1]] +
+        نکالو_گنتی_جدول[a[i+2]] + نکالو_گنتی_جدول[a[i+3]];
     }
-#endif
-    for(; i < n; i++)
+#اگر_ختم
+    برائے(; i < n; i++)
     {
-        result += popCountTable[a[i]];
+        نتیجہ += نکالو_گنتی_جدول[a[i]];
     }
-    return result;
+    واپس نتیجہ;
 }
 
-int normHamming(const uchar* a, const uchar* b, int n)
+صحیح normHamming(ثابت uchar* a, ثابت uchar* b, صحیح n)
 {
     CV_AVX_GUARD;
 
-    int i = 0;
-    int result = 0;
+    صحیح i = 0;
+    صحیح نتیجہ = 0;
 
-#if (CV_SIMD || CV_SIMD_SCALABLE)
+#اگر (CV_SIMD || CV_SIMD_SCALABLE)
     {
         v_uint64 t = vx_setzero_u64();
-        for (; i <= n - VTraits<v_uint8>::vlanes(); i += VTraits<v_uint8>::vlanes())
-            t = v_add(t, v_popcount(v_reinterpret_as_u64(v_xor(vx_load(a + i), vx_load(b + i)))));
-        result += (int)v_reduce_sum(t);
+        برائے (; i <= n - VTraits<v_uint8>::vlanes(); i += VTraits<v_uint8>::vlanes())
+            t = v_جوڑو(t, v_popcount(v_reinterpret_as_u64(v_xor(vx_بھرو(a + i), vx_بھرو(b + i)))));
+        نتیجہ += (صحیح)v_reduce_مجموع(t);
     }
-#endif
+#اگر_ختم
 
-#if CV_POPCNT
+#اگر CV_POPCNT
     {
-#  if defined CV_POPCNT_U64
-        for(; i <= n - 8; i += 8)
+#  اگر defined CV_POPCNT_U64
+        برائے(; i <= n - 8; i += 8)
         {
             uint64_t val_a, val_b;
-            std::memcpy(&val_a, a + i, sizeof(val_a));
-            std::memcpy(&val_b, b + i, sizeof(val_b));
-            result += (int)CV_POPCNT_U64(val_a ^ val_b);
+            std::حافظہ_نقل(&val_a, a + i, حجم(val_a));
+            std::حافظہ_نقل(&val_b, b + i, حجم(val_b));
+            نتیجہ += (صحیح)CV_POPCNT_U64(val_a ^ val_b);
         }
 #  endif
-        for(; i <= n - 4; i += 4)
+        برائے(; i <= n - 4; i += 4)
         {
             uint32_t val_a, val_b;
-            std::memcpy(&val_a, a + i, sizeof(val_a));
-            std::memcpy(&val_b, b + i, sizeof(val_b));
-            result += (int)CV_POPCNT_U32(val_a ^ val_b);
+            std::حافظہ_نقل(&val_a, a + i, حجم(val_a));
+            std::حافظہ_نقل(&val_b, b + i, حجم(val_b));
+            نتیجہ += (صحیح)CV_POPCNT_U32(val_a ^ val_b);
         }
     }
-#endif
-#if CV_ENABLE_UNROLLED
-    for(; i <= n - 4; i += 4)
+#اگر_ختم
+#اگر CV_ENABLE_UNROLLED
+    برائے(; i <= n - 4; i += 4)
     {
-        result += popCountTable[a[i] ^ b[i]] + popCountTable[a[i+1] ^ b[i+1]] +
-                popCountTable[a[i+2] ^ b[i+2]] + popCountTable[a[i+3] ^ b[i+3]];
+        نتیجہ += نکالو_گنتی_جدول[a[i] ^ b[i]] + نکالو_گنتی_جدول[a[i+1] ^ b[i+1]] +
+                نکالو_گنتی_جدول[a[i+2] ^ b[i+2]] + نکالو_گنتی_جدول[a[i+3] ^ b[i+3]];
     }
-#endif
-    for(; i < n; i++)
+#اگر_ختم
+    برائے(; i < n; i++)
     {
-        result += popCountTable[a[i] ^ b[i]];
+        نتیجہ += نکالو_گنتی_جدول[a[i] ^ b[i]];
     }
-    return result;
+    واپس نتیجہ;
 }
 
 NormHammingFunc getNormHammingFunc()
 {
     NormHammingFunc f = &normHamming; // disambiguate the (a,n) overload
-    return f;
+    واپس f;
 }
 NormHammingDiffFunc getNormHammingDiffFunc()
 {
     NormHammingDiffFunc f = &normHamming; // disambiguate the (a,b,n) overload
-    return f;
+    واپس f;
 }
 
-#endif // CV_CPU_OPTIMIZATION_DECLARATIONS_ONLY
+#اگر_ختم // CV_CPU_OPTIMIZATION_DECLARATIONS_ONLY
 
-CV_CPU_OPTIMIZATION_NAMESPACE_END
+CV_CPU_OPTIMIZATION_NAMESPACE_انتہا
 }} //cv::hal

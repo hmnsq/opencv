@@ -40,14 +40,14 @@
 //
 //M*/
 
-#include "precomp.hpp"
+#شامل "precomp.hpp"
 
-namespace cv
+نامخلا cv
 {
 
 ///////////////////////////// Functions Declaration //////////////////////////////////////
 
-#define CV_RNG_COEFF 4164903690U
+#تعریف_کرو CV_RNG_COEFF 4164903690U
 
 /*
    Multiply-with-carry generator is used here:
@@ -56,11 +56,11 @@ namespace cv
    carry = floor (temp / (2^32))
 */
 
-#define  RNG_NEXT(x)    ((uint64)(unsigned)(x)*CV_RNG_COEFF + ((x) >> 32))
+#تعریف_کرو  RNG_اگلا(x)    ((uint64)(غیرعلامتی)(x)*CV_RNG_COEFF + ((x) >> 32))
 // make it jump-less
-#define  CN_NEXT(k)     (((k) + 1) & (((k) >= cn) - 1))
+#تعریف_کرو  CN_اگلا(k)     (((k) + 1) & (((k) >= cn) - 1))
 
-enum
+شمار
 {
     RNG_FLAG_SMALL = 0x40000000,
     RNG_FLAG_STDMTX = 0x80000000
@@ -70,231 +70,231 @@ enum
 *                           Pseudo-Random Number Generators (PRNGs)                     *
 \***************************************************************************************/
 
-template<typename T> static void
-randBits_( T* arr, int len, int cn, uint64* state, const Vec2l* p, int flags )
+سانچہ<قسم_نام T> ساکن خالی
+rand_بٹ( T* arr, صحیح len, صحیح cn, uint64* state, ثابت Vec2l* p, صحیح flags )
 {
-    bool small_flag = (flags & RNG_FLAG_SMALL) != 0;
-    uint64 temp = *state;
-    int i, k = 0;
+    منطقی small_flag = (flags & RNG_FLAG_SMALL) != 0;
+    uint64 عارضی_2 = *state;
+    صحیح i, k = 0;
     len *= cn;
     --cn;
 
-    if( !small_flag )
+    اگر( !small_flag )
     {
-        for( i = 0; i <= len - 4; i += 4 )
+        برائے( i = 0; i <= len - 4; i += 4 )
         {
             int64_t t0, t1;
 
-            temp = RNG_NEXT(temp);
-            t0 = ((int64_t)temp & p[k][0]) + p[k][1];
-            k = CN_NEXT(k);
-            temp = RNG_NEXT(temp);
-            t1 = ((int64_t)temp & p[k][0]) + p[k][1];
-            k = CN_NEXT(k);
+            عارضی_2 = RNG_اگلا(عارضی_2);
+            t0 = ((int64_t)عارضی_2 & p[k][0]) + p[k][1];
+            k = CN_اگلا(k);
+            عارضی_2 = RNG_اگلا(عارضی_2);
+            t1 = ((int64_t)عارضی_2 & p[k][0]) + p[k][1];
+            k = CN_اگلا(k);
             arr[i] = saturate_cast<T>(t0);
             arr[i+1] = saturate_cast<T>(t1);
 
-            temp = RNG_NEXT(temp);
-            t0 = ((int64_t)temp & p[k][0]) + p[k][1];
-            k = CN_NEXT(k);
-            temp = RNG_NEXT(temp);
-            t1 = ((int64_t)temp & p[k][0]) + p[k][1];
-            k = CN_NEXT(k);
+            عارضی_2 = RNG_اگلا(عارضی_2);
+            t0 = ((int64_t)عارضی_2 & p[k][0]) + p[k][1];
+            k = CN_اگلا(k);
+            عارضی_2 = RNG_اگلا(عارضی_2);
+            t1 = ((int64_t)عارضی_2 & p[k][0]) + p[k][1];
+            k = CN_اگلا(k);
             arr[i+2] = saturate_cast<T>(t0);
             arr[i+3] = saturate_cast<T>(t1);
         }
     }
-    else
+    ورنہ
     {
-        for( i = 0; i <= len - 4; i += 4 )
+        برائے( i = 0; i <= len - 4; i += 4 )
         {
             int64_t t0, t1, t;
-            temp = RNG_NEXT(temp);
-            t = temp;
+            عارضی_2 = RNG_اگلا(عارضی_2);
+            t = عارضی_2;
             // p[i+...][0] is within 0..255 in this branch (small_flag==true),
             // so we don't need to do (t>>...)&255,
             // the upper bits will be cleaned with ... & p[i+...][0].
             t0 = (t & p[k][0]) + p[k][1];
-            k = CN_NEXT(k);
+            k = CN_اگلا(k);
             t1 = ((t >> 8) & p[k][0]) + p[k][1];
-            k = CN_NEXT(k);
+            k = CN_اگلا(k);
             arr[i] = saturate_cast<T>(t0);
             arr[i+1] = saturate_cast<T>(t1);
 
             t0 = ((t >> 16) & p[k][0]) + p[k][1];
-            k = CN_NEXT(k);
+            k = CN_اگلا(k);
             t1 = ((t >> 24) & p[k][0]) + p[k][1];
-            k = CN_NEXT(k);
+            k = CN_اگلا(k);
             arr[i+2] = saturate_cast<T>(t0);
             arr[i+3] = saturate_cast<T>(t1);
         }
     }
 
-    for( ; i < len; i++ )
+    برائے( ; i < len; i++ )
     {
         int64_t t0;
-        temp = RNG_NEXT(temp);
+        عارضی_2 = RNG_اگلا(عارضی_2);
 
-        t0 = ((int64_t)temp & p[k][0]) + p[k][1];
-        k = CN_NEXT(k);
+        t0 = ((int64_t)عارضی_2 & p[k][0]) + p[k][1];
+        k = CN_اگلا(k);
         arr[i] = saturate_cast<T>(t0);
     }
 
-    *state = temp;
+    *state = عارضی_2;
 }
 
-struct DivStruct
+ساخت DivStruct
 {
-    unsigned d;
-    unsigned M;
-    int sh1, sh2;
+    غیرعلامتی d;
+    غیرعلامتی M;
+    صحیح sh1, sh2;
     int64_t delta;
     uint64_t diff;
 };
 
-template<typename T> static void
-randi_( T* arr, int len, int cn, uint64* state, const DivStruct* p )
+سانچہ<قسم_نام T> ساکن خالی
+randi_( T* arr, صحیح len, صحیح cn, uint64* state, ثابت DivStruct* p )
 {
-    uint64 temp = *state;
-    int k = 0;
+    uint64 عارضی_2 = *state;
+    صحیح k = 0;
     len *= cn;
     cn--;
-    for( int i = 0; i < len; i++ )
+    برائے( صحیح i = 0; i < len; i++ )
     {
-        temp = RNG_NEXT(temp);
-        unsigned t = (unsigned)temp;
-        unsigned v = (unsigned)(((uint64)t * p[k].M) >> 32);
+        عارضی_2 = RNG_اگلا(عارضی_2);
+        غیرعلامتی t = (غیرعلامتی)عارضی_2;
+        غیرعلامتی v = (غیرعلامتی)(((uint64)t * p[k].M) >> 32);
         v = (v + ((t - v) >> p[k].sh1)) >> p[k].sh2;
         int64_t res = (int64_t)(t - v*p[k].d) + p[k].delta;
-        k = CN_NEXT(k);
+        k = CN_اگلا(k);
         arr[i] = saturate_cast<T>(res);
     }
-    *state = temp;
+    *state = عارضی_2;
 }
 
-static void
-randi_( int64_t* arr, int len, int cn, uint64* state, const DivStruct* p )
+ساکن خالی
+randi_( int64_t* arr, صحیح len, صحیح cn, uint64* state, ثابت DivStruct* p )
 {
-    uint64 temp = *state;
-    int k = 0;
+    uint64 عارضی_2 = *state;
+    صحیح k = 0;
     len *= cn;
     cn--;
-    for( int i = 0; i < len; i++ )
+    برائے( صحیح i = 0; i < len; i++ )
     {
-        temp = RNG_NEXT(temp);
-        unsigned t0 = (unsigned)temp;
-        temp = RNG_NEXT(temp);
-        unsigned t1 = (unsigned)temp;
+        عارضی_2 = RNG_اگلا(عارضی_2);
+        غیرعلامتی t0 = (غیرعلامتی)عارضی_2;
+        عارضی_2 = RNG_اگلا(عارضی_2);
+        غیرعلامتی t1 = (غیرعلامتی)عارضی_2;
         int64_t t = (int64_t)((((uint64_t)t0 << 32) | t1) % p[k].diff) + p[k].delta;
-        k = CN_NEXT(k);
+        k = CN_اگلا(k);
         arr[i] = t;
     }
-    *state = temp;
+    *state = عارضی_2;
 }
 
-static void
-randi_( uint64_t* arr, int len, int cn, uint64* state, const DivStruct* p )
+ساکن خالی
+randi_( uint64_t* arr, صحیح len, صحیح cn, uint64* state, ثابت DivStruct* p )
 {
-    uint64 temp = *state;
-    int k = 0;
+    uint64 عارضی_2 = *state;
+    صحیح k = 0;
     len *= cn;
     cn--;
-    for( int i = 0; i < len; i++ )
+    برائے( صحیح i = 0; i < len; i++ )
     {
-        temp = RNG_NEXT(temp);
-        unsigned t0 = (unsigned)temp;
-        temp = RNG_NEXT(temp);
-        unsigned t1 = (unsigned)temp;
+        عارضی_2 = RNG_اگلا(عارضی_2);
+        غیرعلامتی t0 = (غیرعلامتی)عارضی_2;
+        عارضی_2 = RNG_اگلا(عارضی_2);
+        غیرعلامتی t1 = (غیرعلامتی)عارضی_2;
         uint64_t t = (((uint64_t)t0 << 32) | t1) % p[k].diff;
         int64_t delta = p[k].delta;
-        k = CN_NEXT(k);
+        k = CN_اگلا(k);
         arr[i] = delta >= 0 || t >= (uint64_t)-delta ? t + (uint64_t)delta : 0;
     }
-    *state = temp;
+    *state = عارضی_2;
 }
 
-template<typename T>
-static void randBitsWrap(void* arr, int len, int cn, uint64* state, const void* p, void*, int flags)
+سانچہ<قسم_نام T>
+ساکن خالی rand_بٹ_Wrap(خالی* arr, صحیح len, صحیح cn, uint64* state, ثابت خالی* p, خالی*, صحیح flags)
 {
-    randBits_((T*)arr, len, cn, state, (const Vec2l*)p, flags);
+    rand_بٹ((T*)arr, len, cn, state, (ثابت Vec2l*)p, flags);
 }
 
-template<typename T>
-static void randiWrap(void* arr, int len, int cn, uint64* state, const void* p, void*, int)
+سانچہ<قسم_نام T>
+ساکن خالی randiWrap(خالی* arr, صحیح len, صحیح cn, uint64* state, ثابت خالی* p, خالی*, صحیح)
 {
-    randi_((T*)arr, len, cn, state, (const DivStruct*)p);
+    randi_((T*)arr, len, cn, state, (ثابت DivStruct*)p);
 }
 
 // Narrow an f32 buffer into one of the 1-byte FP8 destinations.
-static inline void cvt32fToFP8(const float* src, void* dst, int len, int depth)
+ساکن اندرونی خالی cvt32f_مقصد_FP8(ثابت اعشاری* src, خالی* dst, صحیح len, صحیح گہرائی)
 {
-    if (depth == CV_8F_E4M3FN)        { fp8_t*   d = (fp8_t*)dst;   for (int i = 0; i < len; i++) d[i] = fp8_t(src[i]); }
-    else                              { fp8a_t* d = (fp8a_t*)dst; for (int i = 0; i < len; i++) d[i] = fp8a_t(src[i]); }
+    اگر (گہرائی == CV_8F_E4M3FN)        { fp8_t*   d = (fp8_t*)dst;   برائے (صحیح i = 0; i < len; i++) d[i] = fp8_t(src[i]); }
+    ورنہ                              { fp8a_t* d = (fp8a_t*)dst; برائے (صحیح i = 0; i < len; i++) d[i] = fp8a_t(src[i]); }
 }
-static inline bool isFP8Depth(int d) { return d >= CV_8F_E4M3FN && d <= CV_8F_E4M3FNUZ; }
+ساکن اندرونی منطقی is_FP8_گہرائی(صحیح d) { واپس d >= CV_8F_E4M3FN && d <= CV_8F_E4M3FNUZ; }
 
-static void randf_16_or_32f( void* dst, int len_, int cn, uint64* state, const void* _p, void* _fbuf, int flags )
+ساکن خالی randf_16_or_32f( خالی* dst, صحیح len_, صحیح cn, uint64* state, ثابت خالی* _p, خالی* _fbuf, صحیح flags )
 {
-    const Vec2f* p = (const Vec2f*)_p;
-    float* fbuf = (float*)_fbuf;
-    int depth = CV_MAT_DEPTH(flags);
-    uint64 temp = *state;
-    int k = 0, len = len_*cn;
-    float* arr = depth == CV_16F || depth == CV_16BF || isFP8Depth(depth) ? fbuf : (float*)dst;
+    ثابت Vec2f* p = (ثابت Vec2f*)_p;
+    اعشاری* fbuf = (اعشاری*)_fbuf;
+    صحیح گہرائی = CV_MAT_گہرائی(flags);
+    uint64 عارضی_2 = *state;
+    صحیح k = 0, len = len_*cn;
+    اعشاری* arr = گہرائی == CV_16F || گہرائی == CV_16BF || is_FP8_گہرائی(گہرائی) ? fbuf : (اعشاری*)dst;
     cn--;
-    for( int i = 0; i < len; i++ )
+    برائے( صحیح i = 0; i < len; i++ )
     {
-        int t = (int)(temp = RNG_NEXT(temp));
-        arr[i] = (float)(t*p[k][0]);
-        k = CN_NEXT(k);
+        صحیح t = (صحیح)(عارضی_2 = RNG_اگلا(عارضی_2));
+        arr[i] = (اعشاری)(t*p[k][0]);
+        k = CN_اگلا(k);
     }
-    *state = temp;
-    hal::addRNGBias32f(arr, &p[0][0], len_, cn+1);
-    if (depth == CV_16F)
+    *state = عارضی_2;
+    hal::جوڑو_RNGBias32f(arr, &p[0][0], len_, cn+1);
+    اگر (گہرائی == CV_16F)
         hal::cvt32f16f(fbuf, (hfloat*)dst, len);
-    else if (depth == CV_16BF)
+    ورنہ اگر (گہرائی == CV_16BF)
         hal::cvt32f16bf(fbuf, (bfloat*)dst, len);
-    else if (isFP8Depth(depth))
-        cvt32fToFP8(fbuf, dst, len, depth);
+    ورنہ اگر (is_FP8_گہرائی(گہرائی))
+        cvt32f_مقصد_FP8(fbuf, dst, len, گہرائی);
 }
 
-static void
-randf_64f( void* _arr, int len_, int cn, uint64* state, const void* _p, void*, int )
+ساکن خالی
+randf_64f( خالی* _arr, صحیح len_, صحیح cn, uint64* state, ثابت خالی* _p, خالی*, صحیح )
 {
-    double* arr = (double*)_arr;
-    const Vec2d* p = (const Vec2d*)_p;
-    uint64 temp = *state;
-    int k = 0, len = len_*cn;
+    دوہرا* arr = (دوہرا*)_arr;
+    ثابت Vec2d* p = (ثابت Vec2d*)_p;
+    uint64 عارضی_2 = *state;
+    صحیح k = 0, len = len_*cn;
     cn--;
-    for( int i = 0; i < len; i++ )
+    برائے( صحیح i = 0; i < len; i++ )
     {
-        temp = RNG_NEXT(temp);
-        int64_t v = (int64_t)((temp >> 32) | (temp << 32));
+        عارضی_2 = RNG_اگلا(عارضی_2);
+        int64_t v = (int64_t)((عارضی_2 >> 32) | (عارضی_2 << 32));
         arr[i] = v*p[k][0];
-        k = CN_NEXT(k);
+        k = CN_اگلا(k);
     }
-    *state = temp;
-    hal::addRNGBias64f(arr, &p[0][0], len_, cn+1);
+    *state = عارضی_2;
+    hal::جوڑو_RNGBias64f(arr, &p[0][0], len_, cn+1);
 }
 
-typedef void (*RandFunc)(void* arr, int len, int cn, uint64* state,
-                         const void* p, void* tempbuf, int flags);
+قسمتعریف خالی (*RandFunc)(خالی* arr, صحیح len, صحیح cn, uint64* state,
+                         ثابت خالی* p, خالی* tempbuf, صحیح flags);
 
-static RandFunc randTab[CV_DEPTH_MAX][CV_DEPTH_MAX] =
+ساکن RandFunc randTab[CV_گہرائی_MAX][CV_گہرائی_MAX] =
 {
     {
         randiWrap<uchar>, randiWrap<schar>, randiWrap<ushort>,
-        randiWrap<short>, randiWrap<int>, randf_16_or_32f,
+        randiWrap<مختصر>, randiWrap<صحیح>, randf_16_or_32f,
         randf_64f, randf_16_or_32f, randf_16_or_32f,
-        randiWrap<bool>, randiWrap<uint64_t>, randiWrap<int64_t>,
-        randiWrap<unsigned>,
+        randiWrap<منطقی>, randiWrap<uint64_t>, randiWrap<int64_t>,
+        randiWrap<غیرعلامتی>,
         randf_16_or_32f, randf_16_or_32f    // CV_8F_E4M3FN, E4M3FNUZ
     },
     {
-        randBitsWrap<uchar>, randBitsWrap<schar>, randBitsWrap<ushort>,
-        randBitsWrap<short>, randBitsWrap<int>, 0, 0, 0, 0,
-        randBitsWrap<bool>, randBitsWrap<uint64_t>, randBitsWrap<int64_t>,
-        randBitsWrap<unsigned>, 0, 0, 0
+        rand_بٹ_Wrap<uchar>, rand_بٹ_Wrap<schar>, rand_بٹ_Wrap<ushort>,
+        rand_بٹ_Wrap<مختصر>, rand_بٹ_Wrap<صحیح>, 0, 0, 0, 0,
+        rand_بٹ_Wrap<منطقی>, rand_بٹ_Wrap<uint64_t>, rand_بٹ_Wrap<int64_t>,
+        rand_بٹ_Wrap<غیرعلامتی>, 0, 0, 0
     }
 };
 
@@ -303,333 +303,333 @@ static RandFunc randTab[CV_DEPTH_MAX][CV_DEPTH_MAX] =
    "The Ziggurat Method for Generating Random Variables"
    by George Marsaglia and Wai Wan Tsang, Journal of Statistical Software, 2007.
 */
-static void
-randn_0_1_32f( float* arr, int len, uint64* state )
+ساکن خالی
+randn_0_1_32f( اعشاری* arr, صحیح len, uint64* state )
 {
-    const float r = 3.442620f; // The start of the right tail
-    const float rng_flt = 2.3283064365386962890625e-10f; // 2^-32
-    static unsigned kn[128];
-    static float wn[128], fn[128];
-    uint64 temp = *state;
-    static bool initialized=false;
-    int i;
+    ثابت اعشاری r = 3.442620f; // The start of the right tail
+    ثابت اعشاری rng_flt = 2.3283064365386962890625e-10f; // 2^-32
+    ساکن غیرعلامتی kn[128];
+    ساکن اعشاری wn[128], fn[128];
+    uint64 عارضی_2 = *state;
+    ساکن منطقی initialized=جھوٹ;
+    صحیح i;
 
-    if( !initialized )
+    اگر( !initialized )
     {
-        const double m1 = 2147483648.0;
-        double dn = 3.442619855899, tn = dn, vn = 9.91256303526217e-3;
+        ثابت دوہرا m1 = 2147483648.0;
+        دوہرا dn = 3.442619855899, tn = dn, vn = 9.91256303526217e-3;
 
         // Set up the tables
-        double q = vn/std::exp(-.5*dn*dn);
-        kn[0] = (unsigned)((dn/q)*m1);
+        دوہرا q = vn/std::قوت_نما(-.5*dn*dn);
+        kn[0] = (غیرعلامتی)((dn/q)*m1);
         kn[1] = 0;
 
-        wn[0] = (float)(q/m1);
-        wn[127] = (float)(dn/m1);
+        wn[0] = (اعشاری)(q/m1);
+        wn[127] = (اعشاری)(dn/m1);
 
         fn[0] = 1.f;
-        fn[127] = (float)std::exp(-.5*dn*dn);
+        fn[127] = (اعشاری)std::قوت_نما(-.5*dn*dn);
 
-        for(i=126;i>=1;i--)
+        برائے(i=126;i>=1;i--)
         {
-            dn = std::sqrt(-2.*std::log(vn/dn+std::exp(-.5*dn*dn)));
-            kn[i+1] = (unsigned)((dn/tn)*m1);
+            dn = std::جذر(-2.*std::لوگارتھم(vn/dn+std::قوت_نما(-.5*dn*dn)));
+            kn[i+1] = (غیرعلامتی)((dn/tn)*m1);
             tn = dn;
-            fn[i] = (float)std::exp(-.5*dn*dn);
-            wn[i] = (float)(dn/m1);
+            fn[i] = (اعشاری)std::قوت_نما(-.5*dn*dn);
+            wn[i] = (اعشاری)(dn/m1);
         }
-        initialized = true;
+        initialized = سچ;
     }
 
-    for( i = 0; i < len; i++ )
+    برائے( i = 0; i < len; i++ )
     {
-        float x, y;
-        for(;;)
+        اعشاری x, y;
+        برائے(;;)
         {
-            int hz = (int)temp;
-            temp = RNG_NEXT(temp);
-            int iz = hz & 127;
+            صحیح hz = (صحیح)عارضی_2;
+            عارضی_2 = RNG_اگلا(عارضی_2);
+            صحیح iz = hz & 127;
             x = hz*wn[iz];
-            if( (unsigned)std::abs(hz) < kn[iz] )
-                break;
-            if( iz == 0) // iz==0, handles the base strip
+            اگر( (غیرعلامتی)std::مطلق_قدر(hz) < kn[iz] )
+                توڑو;
+            اگر( iz == 0) // iz==0, handles the base strip
             {
-                do
+                کرو
                 {
-                    x = (unsigned)temp*rng_flt;
-                    temp = RNG_NEXT(temp);
-                    y = (unsigned)temp*rng_flt;
-                    temp = RNG_NEXT(temp);
-                    x = (float)(-std::log(x+FLT_MIN)*0.2904764);
-                    y = (float)-std::log(y+FLT_MIN);
+                    x = (غیرعلامتی)عارضی_2*rng_flt;
+                    عارضی_2 = RNG_اگلا(عارضی_2);
+                    y = (غیرعلامتی)عارضی_2*rng_flt;
+                    عارضی_2 = RNG_اگلا(عارضی_2);
+                    x = (اعشاری)(-std::لوگارتھم(x+FLT_MIN)*0.2904764);
+                    y = (اعشاری)-std::لوگارتھم(y+FLT_MIN);
                 }	// .2904764 is 1/r
-                while( y + y < x*x );
+                جب( y + y < x*x );
                 x = hz > 0 ? r + x : -r - x;
-                break;
+                توڑو;
             }
             // iz > 0, handle the wedges of other strips
-            y = (unsigned)temp*rng_flt;
-            temp = RNG_NEXT(temp);
-            if( fn[iz] + y*(fn[iz - 1] - fn[iz]) < std::exp(-.5*x*x) )
-                break;
+            y = (غیرعلامتی)عارضی_2*rng_flt;
+            عارضی_2 = RNG_اگلا(عارضی_2);
+            اگر( fn[iz] + y*(fn[iz - 1] - fn[iz]) < std::قوت_نما(-.5*x*x) )
+                توڑو;
         }
         arr[i] = x;
     }
-    *state = temp;
+    *state = عارضی_2;
 }
 
 
-double RNG::gaussian(double sigma)
+دوہرا RNG::gaussian(دوہرا sigma)
 {
-    float temp;
-    randn_0_1_32f( &temp, 1, &state );
-    return temp*sigma;
+    اعشاری عارضی_2;
+    randn_0_1_32f( &عارضی_2, 1, &state );
+    واپس عارضی_2*sigma;
 }
 
-template<typename T, typename PT> static void
-randnScale_(float* src, void* _dst, int len, int cn,
-            const void* _mean, const void* _stddev, int flags )
+سانچہ<قسم_نام T, قسم_نام PT> ساکن خالی
+randnScale_(اعشاری* src, خالی* _dst, صحیح len, صحیح cn,
+            ثابت خالی* اوسط, ثابت خالی* _stddev, صحیح flags )
 {
     T* dst = (T*)_dst;
-    const PT* mean = (const PT*)_mean;
-    const PT* stddev = (const PT*)_stddev;
-    bool stdmtx = (flags & RNG_FLAG_STDMTX) != 0;
-    int i, j, k;
-    if( !stdmtx || cn == 1 )
+    ثابت PT* اوسط_2 = (ثابت PT*)اوسط;
+    ثابت PT* stddev = (ثابت PT*)_stddev;
+    منطقی stdmtx = (flags & RNG_FLAG_STDMTX) != 0;
+    صحیح i, j, k;
+    اگر( !stdmtx || cn == 1 )
     {
-        if( cn == 1 )
+        اگر( cn == 1 )
         {
-            PT a = stddev[0], b = mean[0];
-            for( i = 0; i < len; i++ )
+            PT a = stddev[0], b = اوسط_2[0];
+            برائے( i = 0; i < len; i++ )
                 dst[i] = saturate_cast<T>(src[i]*a + b);
         }
-        else
+        ورنہ
         {
             len *= cn;
             cn--;
-            for( i = k = 0; i < len; i++ ) {
-                dst[i] = saturate_cast<T>(src[i]*stddev[k] + mean[k]);
-                k = CN_NEXT(k);
+            برائے( i = k = 0; i < len; i++ ) {
+                dst[i] = saturate_cast<T>(src[i]*stddev[k] + اوسط_2[k]);
+                k = CN_اگلا(k);
             }
         }
     }
-    else
+    ورنہ
     {
         len *= cn;
         cn--;
-        for( i = j = 0; i < len; i++ )
+        برائے( i = j = 0; i < len; i++ )
         {
-            PT s = mean[j];
-            int i0 = i - j;
-            for( k = 0; k <= cn; k++ )
+            PT s = اوسط_2[j];
+            صحیح i0 = i - j;
+            برائے( k = 0; k <= cn; k++ )
                 s += src[i0 + k]*stddev[j*(cn+1) + k];
             dst[i] = saturate_cast<T>(s);
-            j = CN_NEXT(j);
+            j = CN_اگلا(j);
         }
     }
 }
 
 // special version for 16f, 16bf and 32f
-static void
-randnScale_16_or_32f(float* fbuf, void* _dst, int len, int cn,
-                     const void* _mean, const void* _stddev, int flags)
+ساکن خالی
+randnScale_16_or_32f(اعشاری* fbuf, خالی* _dst, صحیح len, صحیح cn,
+                     ثابت خالی* اوسط, ثابت خالی* _stddev, صحیح flags)
 {
-    float* dst = (float*)_dst;
-    const float* mean = (const float*)_mean;
-    const float* stddev = (const float*)_stddev;
-    bool stdmtx = (flags & RNG_FLAG_STDMTX) != 0;
-    int depth = CV_MAT_DEPTH(flags);
-    float* arr = depth == CV_16F || depth == CV_16BF || isFP8Depth(depth) ? fbuf : dst;
-    int i, j, k;
+    اعشاری* dst = (اعشاری*)_dst;
+    ثابت اعشاری* اوسط_2 = (ثابت اعشاری*)اوسط;
+    ثابت اعشاری* stddev = (ثابت اعشاری*)_stddev;
+    منطقی stdmtx = (flags & RNG_FLAG_STDMTX) != 0;
+    صحیح گہرائی = CV_MAT_گہرائی(flags);
+    اعشاری* arr = گہرائی == CV_16F || گہرائی == CV_16BF || is_FP8_گہرائی(گہرائی) ? fbuf : dst;
+    صحیح i, j, k;
 
-    if( !stdmtx || cn == 1 )
+    اگر( !stdmtx || cn == 1 )
     {
-        if( cn == 1 )
+        اگر( cn == 1 )
         {
-            float a = stddev[0], b = mean[0];
-            for( i = 0; i < len; i++ )
+            اعشاری a = stddev[0], b = اوسط_2[0];
+            برائے( i = 0; i < len; i++ )
                 arr[i] = fbuf[i]*a + b;
         }
-        else
+        ورنہ
         {
             len *= cn;
             cn--;
-            for( i = k = 0; i < len; i++ ) {
-                arr[i] = fbuf[i]*stddev[k] + mean[k];
-                k = CN_NEXT(k);
+            برائے( i = k = 0; i < len; i++ ) {
+                arr[i] = fbuf[i]*stddev[k] + اوسط_2[k];
+                k = CN_اگلا(k);
             }
         }
     }
-    else if( depth == CV_32F )
+    ورنہ اگر( گہرائی == CV_32F )
     {
         len *= cn;
         cn--;
-        for( i = j = 0; i < len; i++ )
+        برائے( i = j = 0; i < len; i++ )
         {
-            float s = mean[j];
-            int i0 = i - j;
-            for( k = 0; k <= cn; k++ )
+            اعشاری s = اوسط_2[j];
+            صحیح i0 = i - j;
+            برائے( k = 0; k <= cn; k++ )
                 s += fbuf[i0 + k]*stddev[j*(cn+1) + k];
             dst[i] = s;
-            j = CN_NEXT(j);
+            j = CN_اگلا(j);
         }
     }
-    else
+    ورنہ
     {
-        float elembuf[CV_CN_MAX];
+        اعشاری elembuf[CV_CN_MAX];
         len *= cn;
-        for( i = 0; i < len; i += cn )
+        برائے( i = 0; i < len; i += cn )
         {
             // since we process fbuf in-place,
             // we need to copy each cn-channel element
             // prior to matrix multiplication
-            for (j = 0; j < cn; j++)
+            برائے (j = 0; j < cn; j++)
                 elembuf[j] = fbuf[i + j];
-            for (j = 0; j < cn; j++) {
-                float s = mean[j];
-                for( k = 0; k < cn; k++ )
+            برائے (j = 0; j < cn; j++) {
+                اعشاری s = اوسط_2[j];
+                برائے( k = 0; k < cn; k++ )
                     s += elembuf[k]*stddev[j*cn + k];
                 fbuf[i + j] = s;
             }
         }
     }
-    if (depth == CV_16F)
+    اگر (گہرائی == CV_16F)
         hal::cvt32f16f(fbuf, (hfloat*)dst, len);
-    else if (depth == CV_16BF)
+    ورنہ اگر (گہرائی == CV_16BF)
         hal::cvt32f16bf(fbuf, (bfloat*)dst, len);
-    else if (isFP8Depth(depth))
-        cvt32fToFP8(fbuf, dst, len, depth);
+    ورنہ اگر (is_FP8_گہرائی(گہرائی))
+        cvt32f_مقصد_FP8(fbuf, dst, len, گہرائی);
 }
 
-typedef void (*RandnScaleFunc)(float* src, void* dst, int len, int cn,
-                               const void* mean, const void* stddev, int flags);
+قسمتعریف خالی (*RandnScaleFunc)(اعشاری* src, خالی* dst, صحیح len, صحیح cn,
+                               ثابت خالی* اوسط_2, ثابت خالی* stddev, صحیح flags);
 
-static RandnScaleFunc randnScaleTab[CV_DEPTH_MAX] =
+ساکن RandnScaleFunc randnScaleTab[CV_گہرائی_MAX] =
 {
-    randnScale_<uchar, float>, randnScale_<schar, float>, randnScale_<ushort, float>,
-    randnScale_<short, float>, randnScale_<int, float>, randnScale_16_or_32f,
-    randnScale_<double, double>, randnScale_16_or_32f, randnScale_16_or_32f,
-    randnScale_<bool, float>, randnScale_<uint64_t, double>, randnScale_<int64_t, double>,
-    randnScale_<unsigned, float>,
+    randnScale_<uchar, اعشاری>, randnScale_<schar, اعشاری>, randnScale_<ushort, اعشاری>,
+    randnScale_<مختصر, اعشاری>, randnScale_<صحیح, اعشاری>, randnScale_16_or_32f,
+    randnScale_<دوہرا, دوہرا>, randnScale_16_or_32f, randnScale_16_or_32f,
+    randnScale_<منطقی, اعشاری>, randnScale_<uint64_t, دوہرا>, randnScale_<int64_t, دوہرا>,
+    randnScale_<غیرعلامتی, اعشاری>,
     randnScale_16_or_32f, randnScale_16_or_32f   // CV_8F_E4M3FN, E4M3FNUZ
 };
 
-void RNG::fill( InputOutputArray _mat, int disttype,
-                InputArray _param1arg, InputArray _param2arg,
-                bool saturateRange )
+خالی RNG::fill( داخلہ_Output_Array _mat, صحیح disttype,
+                داخلہ_Array _param1arg, داخلہ_Array _param2arg,
+                منطقی saturateRange )
 {
     CV_Assert(!_mat.empty());
 
     Mat mat = _mat.getMat(), _param1 = _param1arg.getMat(), _param2 = _param2arg.getMat();
-    int j, depth = mat.depth(), cn = mat.channels();
-    int esz1 = CV_ELEM_SIZE(depth);
-    AutoBuffer<double> _parambuf;
-    bool fast_int_mode = false;
-    bool small_flag = false;
+    صحیح j, گہرائی = mat.گہرائی(), cn = mat.channels();
+    صحیح esz1 = CV_ELEM_سائز(گہرائی);
+    Auto_بفر<دوہرا> _parambuf;
+    منطقی fast_int_منوال = جھوٹ;
+    منطقی small_flag = جھوٹ;
     RandFunc func = 0;
     RandnScaleFunc scaleFunc = 0;
 
-    CV_Assert(_param1.channels() == 1 && (_param1.rows == 1 || _param1.cols == 1) &&
-              (_param1.rows + _param1.cols - 1 == cn || _param1.rows + _param1.cols - 1 == 1 ||
-               (_param1.size() == Size(1, 4) && _param1.type() == CV_64F && cn <= 4)));
+    CV_Assert(_param1.channels() == 1 && (_param1.صفیں == 1 || _param1.ستون_تعداد == 1) &&
+              (_param1.صفیں + _param1.ستون_تعداد - 1 == cn || _param1.صفیں + _param1.ستون_تعداد - 1 == 1 ||
+               (_param1.size() == سائز(1, 4) && _param1.type() == CV_64F && cn <= 4)));
     CV_Assert( _param2.channels() == 1 &&
-               (((_param2.rows == 1 || _param2.cols == 1) &&
-                (_param2.rows + _param2.cols - 1 == cn || _param2.rows + _param2.cols - 1 == 1 ||
-                (_param1.size() == Size(1, 4) && _param1.type() == CV_64F && cn <= 4))) ||
-                (_param2.rows == cn && _param2.cols == cn && disttype == NORMAL)));
+               (((_param2.صفیں == 1 || _param2.ستون_تعداد == 1) &&
+                (_param2.صفیں + _param2.ستون_تعداد - 1 == cn || _param2.صفیں + _param2.ستون_تعداد - 1 == 1 ||
+                (_param1.size() == سائز(1, 4) && _param1.type() == CV_64F && cn <= 4))) ||
+                (_param2.صفیں == cn && _param2.ستون_تعداد == cn && disttype == معمول_3)));
 
-    const void* uni_param = 0;
-    uchar* mean = 0;
+    ثابت خالی* uni_param = 0;
+    uchar* اوسط_2 = 0;
     uchar* stddev = 0;
-    bool stdmtx = false;
-    int n1 = (int)_param1.total();
-    int n2 = (int)_param2.total();
+    منطقی stdmtx = جھوٹ;
+    صحیح n1 = (صحیح)_param1.کل();
+    صحیح n2 = (صحیح)_param2.کل();
 
-    if( disttype == UNIFORM )
+    اگر( disttype == یکساں_2 )
     {
-        _parambuf.allocate(cn*(sizeof(DivStruct)+sizeof(double)-1)/sizeof(double) + cn*4);
-        double* parambuf = _parambuf.data();
-        double* p1 = _param1.ptr<double>();
-        double* p2 = _param2.ptr<double>();
+        _parambuf.allocate(cn*(حجم(DivStruct)+حجم(دوہرا)-1)/حجم(دوہرا) + cn*4);
+        دوہرا* parambuf = _parambuf.ڈیٹا();
+        دوہرا* p1 = _param1.ptr<دوہرا>();
+        دوہرا* p2 = _param2.ptr<دوہرا>();
 
-        if( !_param1.isContinuous() || _param1.type() != CV_64F || n1 != cn )
+        اگر( !_param1.isContinuous() || _param1.type() != CV_64F || n1 != cn )
         {
             p1 = parambuf;
             Mat tmp(_param1.size(), CV_64F, p1);
-            _param1.convertTo(tmp, CV_64F);
-            for( j = n1; j < cn; j++ )
+            _param1.convert_مقصد(tmp, CV_64F);
+            برائے( j = n1; j < cn; j++ )
                 p1[j] = p1[j-n1];
         }
 
-        if( !_param2.isContinuous() || _param2.type() != CV_64F || n2 != cn )
+        اگر( !_param2.isContinuous() || _param2.type() != CV_64F || n2 != cn )
         {
             p2 = parambuf + cn;
             Mat tmp(_param2.size(), CV_64F, p2);
-            _param2.convertTo(tmp, CV_64F);
-            for( j = n2; j < cn; j++ )
+            _param2.convert_مقصد(tmp, CV_64F);
+            برائے( j = n2; j < cn; j++ )
                 p2[j] = p2[j-n2];
         }
 
-        if( CV_IS_INT_TYPE(depth) )
+        اگر( CV_IS_INT_TYPE(گہرائی) )
         {
             Vec2l* ip = (Vec2l*)(parambuf + cn*2);
             CV_DbgCheckLT((size_t)(cn*4 - 1), _parambuf.size(), "");
-            for( j = 0, fast_int_mode = true; j < cn; j++ )
+            برائے( j = 0, fast_int_منوال = سچ; j < cn; j++ )
             {
-                double a = std::min(p1[j], p2[j]);
-                double b = std::max(p1[j], p2[j]);
-                if( saturateRange )
+                دوہرا a = std::min(p1[j], p2[j]);
+                دوہرا b = std::max(p1[j], p2[j]);
+                اگر( saturateRange )
                 {
-                    a = std::max(a, depth == CV_8U || depth == CV_16U || depth == CV_32U ||
-                                 depth == CV_64U || depth == CV_Bool ? 0. :
-                                 depth == CV_8S ? -128. : depth == CV_16S ? -32768. :
-                                 depth == CV_32S ? (double)INT_MIN : (double)INT64_MIN);
-                    b = std::min(b, depth == CV_8U ? 256. : depth == CV_Bool ? 2. : depth == CV_16U ? 65536. :
-                                 depth == CV_8S ? 128. : depth == CV_16S ? 32768. : depth == CV_32U ? (double)UINT_MAX :
-                                 depth == CV_32S ? (double)INT_MAX : (double)INT64_MAX);
+                    a = std::max(a, گہرائی == CV_8U || گہرائی == CV_16U || گہرائی == CV_32U ||
+                                 گہرائی == CV_64U || گہرائی == CV_Bool ? 0. :
+                                 گہرائی == CV_8S ? -128. : گہرائی == CV_16S ? -32768. :
+                                 گہرائی == CV_32S ? (دوہرا)INT_MIN : (دوہرا)INT64_MIN);
+                    b = std::min(b, گہرائی == CV_8U ? 256. : گہرائی == CV_Bool ? 2. : گہرائی == CV_16U ? 65536. :
+                                 گہرائی == CV_8S ? 128. : گہرائی == CV_16S ? 32768. : گہرائی == CV_32U ? (دوہرا)UINT_MAX :
+                                 گہرائی == CV_32S ? (دوہرا)زیادہ_سے_زیادہ_عدد : (دوہرا)INT64_MAX);
                 }
                 ip[j][1] = (int64_t)ceil(a);
                 int64_t idiff = ip[j][0] = (int64_t)floor(b) - ip[j][1] - 1;
-                if (idiff < 0)
+                اگر (idiff < 0)
                 {
                     idiff = 0;
                     ip[j][0] = 0;
                 }
-                double diff = b - a;
+                دوہرا diff = b - a;
 
-                fast_int_mode = fast_int_mode && diff <= 4294967296. && (idiff & (idiff+1)) == 0;
-                if( fast_int_mode )
+                fast_int_منوال = fast_int_منوال && diff <= 4294967296. && (idiff & (idiff+1)) == 0;
+                اگر( fast_int_منوال )
                     small_flag = idiff <= 255;
-                else
+                ورنہ
                 {
                     int64_t minval = INT32_MIN/2, maxval = INT32_MAX;
-                    if (depth == CV_64S || depth == CV_64U)
+                    اگر (گہرائی == CV_64S || گہرائی == CV_64U)
                     {
                         minval = INT64_MIN/2;
                         maxval = INT64_MAX;
                     }
-                    if( diff > (double)maxval )
+                    اگر( diff > (دوہرا)maxval )
                         ip[j][0] = maxval;
-                    if( a < (double)minval )
+                    اگر( a < (دوہرا)minval )
                         ip[j][1] = minval;
                 }
             }
 
             uni_param = ip;
-            if( !fast_int_mode )
+            اگر( !fast_int_منوال )
             {
                 DivStruct* ds = (DivStruct*)(ip + cn);
-                CV_DbgCheckLE((void*)(ds + cn), (void*)(parambuf + _parambuf.size()), "Last byte check");
-                for( j = 0; j < cn; j++ )
+                CV_DbgCheckLE((خالی*)(ds + cn), (خالی*)(parambuf + _parambuf.size()), "Last byte check");
+                برائے( j = 0; j < cn; j++ )
                 {
                     ds[j].delta = ip[j][1];
                     ds[j].diff = ip[j][0];
-                    if (depth != CV_64U && depth != CV_64S) {
-                        unsigned d = ds[j].d = (unsigned)(ip[j][0]+1);
-                        int l = 0;
-                        while(((uint64)1 << l) < d)
+                    اگر (گہرائی != CV_64U && گہرائی != CV_64S) {
+                        غیرعلامتی d = ds[j].d = (غیرعلامتی)(ip[j][0]+1);
+                        صحیح l = 0;
+                        جب(((uint64)1 << l) < d)
                             l++;
-                        ds[j].M = (unsigned)(((uint64)1 << 32)*(((uint64)1 << l) - d)/d) + 1;
+                        ds[j].M = (غیرعلامتی)(((uint64)1 << 32)*(((uint64)1 << l) - d)/d) + 1;
                         ds[j].sh1 = std::min(l, 1);
                         ds[j].sh2 = std::max(l - 1, 0);
                     }
@@ -637,34 +637,34 @@ void RNG::fill( InputOutputArray _mat, int disttype,
                 uni_param = ds;
             }
 
-            func = randTab[fast_int_mode ? 1 : 0][depth];
+            func = randTab[fast_int_منوال ? 1 : 0][گہرائی];
         }
-        else
+        ورنہ
         {
-            double scale = depth == CV_64F ?
+            دوہرا scale = گہرائی == CV_64F ?
                 5.4210108624275221700372640043497e-20 : // 2**-64
                 2.3283064365386962890625e-10;           // 2**-32
-            double maxdiff = saturateRange ? (double)FLT_MAX : DBL_MAX;
+            دوہرا maxdiff = saturateRange ? (دوہرا)FLT_MAX : DBL_MAX;
 
             // for each channel i compute such dparam[0][i] & dparam[1][i],
             // so that a signed 32/64-bit integer X is transformed to
             // the range [param1.val[i], param2.val[i]) using
             // dparam[0][i]*X + dparam[1][i]
             CV_DbgCheckLT((size_t)(cn*4 - 1), _parambuf.size(), "");
-            if( depth != CV_64F )
+            اگر( گہرائی != CV_64F )
             {
                 Vec2f* fp = (Vec2f*)(parambuf + cn*2);
-                for( j = 0; j < cn; j++ )
+                برائے( j = 0; j < cn; j++ )
                 {
-                    fp[j][0] = (float)(std::min(maxdiff, p2[j] - p1[j])*scale);
-                    fp[j][1] = (float)((p2[j] + p1[j])*0.5);
+                    fp[j][0] = (اعشاری)(std::min(maxdiff, p2[j] - p1[j])*scale);
+                    fp[j][1] = (اعشاری)((p2[j] + p1[j])*0.5);
                 }
                 uni_param = fp;
             }
-            else
+            ورنہ
             {
                 Vec2d* dp = (Vec2d*)(parambuf + cn*2);
-                for( j = 0; j < cn; j++ )
+                برائے( j = 0; j < cn; j++ )
                 {
                     dp[j][0] = std::min(DBL_MAX, p2[j] - p1[j])*scale;
                     dp[j][1] = ((p2[j] + p1[j])*0.5);
@@ -672,76 +672,76 @@ void RNG::fill( InputOutputArray _mat, int disttype,
                 uni_param = dp;
             }
 
-            func = randTab[0][depth];
+            func = randTab[0][گہرائی];
         }
         CV_Assert( func != 0 );
     }
-    else if( disttype == RNG::NORMAL )
+    ورنہ اگر( disttype == RNG::معمول_3 )
     {
         _parambuf.allocate(MAX(n1, cn) + MAX(n2, cn));
-        double* parambuf = _parambuf.data();
+        دوہرا* parambuf = _parambuf.ڈیٹا();
 
-        int ptype = esz1 == 8 ? CV_64F : CV_32F;
+        صحیح ptype = esz1 == 8 ? CV_64F : CV_32F;
 
-        if( _param1.isContinuous() && _param1.type() == ptype && n1 >= cn)
-            mean = _param1.ptr();
-        else
+        اگر( _param1.isContinuous() && _param1.type() == ptype && n1 >= cn)
+            اوسط_2 = _param1.ptr();
+        ورنہ
         {
             Mat tmp(_param1.size(), ptype, parambuf);
-            _param1.convertTo(tmp, ptype);
-            mean = (uchar*)parambuf;
+            _param1.convert_مقصد(tmp, ptype);
+            اوسط_2 = (uchar*)parambuf;
         }
 
-        if( n1 < cn )
-            for( j = n1*esz1; j < cn*esz1; j++ )
-                mean[j] = mean[j - n1*esz1];
+        اگر( n1 < cn )
+            برائے( j = n1*esz1; j < cn*esz1; j++ )
+                اوسط_2[j] = اوسط_2[j - n1*esz1];
 
-        if( _param2.isContinuous() && _param2.type() == ptype && n2 >= cn)
+        اگر( _param2.isContinuous() && _param2.type() == ptype && n2 >= cn)
             stddev = _param2.ptr();
-        else
+        ورنہ
         {
             Mat tmp(_param2.size(), ptype, parambuf + MAX(n1, cn));
-            _param2.convertTo(tmp, ptype);
+            _param2.convert_مقصد(tmp, ptype);
             stddev = (uchar*)(parambuf + MAX(n1, cn));
         }
 
-        if( n2 < cn )
-            for( j = n2*esz1; j < cn*esz1; j++ )
+        اگر( n2 < cn )
+            برائے( j = n2*esz1; j < cn*esz1; j++ )
                 stddev[j] = stddev[j - n2*esz1];
 
-        stdmtx = _param2.rows == cn && _param2.cols == cn;
-        scaleFunc = randnScaleTab[depth];
+        stdmtx = _param2.صفیں == cn && _param2.ستون_تعداد == cn;
+        scaleFunc = randnScaleTab[گہرائی];
         CV_Assert( scaleFunc != 0 );
     }
-    else
+    ورنہ
         CV_Error( cv::Error::StsBadArg, "Unknown distribution type" );
 
-    const Mat* arrays[] = {&mat, 0};
+    ثابت Mat* arrays[] = {&mat, 0};
     uchar* ptr = 0;
     NAryMatIterator it(arrays, &ptr, 1);
-    float fbuf[BLOCK_SIZE + CV_CN_MAX];
-    int total = (int)it.size;
-    int blockSize = std::min((BLOCK_SIZE + cn - 1)/cn, total);
+    اعشاری fbuf[بلاک_سائز + CV_CN_MAX];
+    صحیح کل = (صحیح)it.size;
+    صحیح بلاک_سائز_2 = std::min((بلاک_سائز + cn - 1)/cn, کل);
     size_t esz = (size_t)esz1*cn;
-    int flags = mat.type();
+    صحیح flags = mat.type();
 
-    if( disttype == UNIFORM )
-        flags |= (small_flag ? (int)RNG_FLAG_SMALL : 0);
-    else
-        flags |= (stdmtx ? (int)RNG_FLAG_STDMTX : 0);
+    اگر( disttype == یکساں_2 )
+        flags |= (small_flag ? (صحیح)RNG_FLAG_SMALL : 0);
+    ورنہ
+        flags |= (stdmtx ? (صحیح)RNG_FLAG_STDMTX : 0);
 
-    for( size_t i = 0; i < it.nplanes; i++, ++it )
+    برائے( size_t i = 0; i < it.nplanes; i++, ++it )
     {
-        for( j = 0; j < total; j += blockSize )
+        برائے( j = 0; j < کل; j += بلاک_سائز_2 )
         {
-            int len = std::min(total - j, blockSize);
+            صحیح len = std::min(کل - j, بلاک_سائز_2);
 
-            if( disttype == UNIFORM )
+            اگر( disttype == یکساں_2 )
                 func(ptr + j*esz, len, cn, &state, uni_param, fbuf, flags);
-            else
+            ورنہ
             {
                 randn_0_1_32f(fbuf, len*cn, &state);
-                scaleFunc(fbuf, ptr + j*esz, len, cn, mean, stddev, flags);
+                scaleFunc(fbuf, ptr + j*esz, len, cn, اوسط_2, stddev, flags);
             }
         }
     }
@@ -751,71 +751,71 @@ void RNG::fill( InputOutputArray _mat, int disttype,
 
 cv::RNG& cv::theRNG()
 {
-    return getCoreTlsData().rng;
+    واپس get_Core_Tls_ڈیٹا().rng;
 }
 
-void cv::setRNGSeed(int seed)
+خالی cv::سیٹ_RNGSeed(صحیح بیج)
 {
-    theRNG() = RNG(static_cast<uint64>(seed));
+    theRNG() = RNG(static_cast<uint64>(بیج));
 }
 
 
-void cv::randu(InputOutputArray dst, InputArray low, InputArray high)
+خالی cv::randu(داخلہ_Output_Array dst, داخلہ_Array کم, داخلہ_Array بلند)
 {
     CV_INSTRUMENT_REGION();
 
-    theRNG().fill(dst, RNG::UNIFORM, low, high);
+    theRNG().fill(dst, RNG::یکساں_2, کم, بلند);
 }
 
-void cv::randn(InputOutputArray dst, InputArray mean, InputArray stddev)
+خالی cv::randn(داخلہ_Output_Array dst, داخلہ_Array اوسط_2, داخلہ_Array stddev)
 {
     CV_INSTRUMENT_REGION();
 
-    theRNG().fill(dst, RNG::NORMAL, mean, stddev);
+    theRNG().fill(dst, RNG::معمول_3, اوسط_2, stddev);
 }
 
-namespace cv
+نامخلا cv
 {
 
-template<typename T> static void
-randShuffle_( Mat& _arr, RNG& rng, double )
+سانچہ<قسم_نام T> ساکن خالی
+randShuffle_( Mat& _arr, RNG& rng, دوہرا )
 {
-    unsigned sz = (unsigned)_arr.total();
-    if( _arr.isContinuous() )
+    غیرعلامتی sz = (غیرعلامتی)_arr.کل();
+    اگر( _arr.isContinuous() )
     {
         T* arr = _arr.ptr<T>();
-        for( unsigned i = 0; i < sz; i++ )
+        برائے( غیرعلامتی i = 0; i < sz; i++ )
         {
-            unsigned j = (unsigned)rng % sz;
+            غیرعلامتی j = (غیرعلامتی)rng % sz;
             std::swap( arr[j], arr[i] );
         }
     }
-    else
+    ورنہ
     {
         CV_Assert( _arr.dims <= 2 );
-        uchar* data = _arr.ptr();
-        size_t step = _arr.step;
-        int rows = _arr.rows;
-        int cols = _arr.cols;
-        for( int i0 = 0; i0 < rows; i0++ )
+        uchar* ڈیٹا = _arr.ptr();
+        size_t قدم = _arr.قدم;
+        صحیح صفیں = _arr.صفیں;
+        صحیح ستون_تعداد = _arr.ستون_تعداد;
+        برائے( صحیح i0 = 0; i0 < صفیں; i0++ )
         {
             T* p = _arr.ptr<T>(i0);
-            for( int j0 = 0; j0 < cols; j0++ )
+            برائے( صحیح j0 = 0; j0 < ستون_تعداد; j0++ )
             {
-                unsigned k1 = (unsigned)rng % sz;
-                int i1 = (int)(k1 / cols);
-                int j1 = (int)(k1 - (unsigned)i1*(unsigned)cols);
-                std::swap( p[j0], ((T*)(data + step*i1))[j1] );
+                غیرعلامتی k1 = (غیرعلامتی)rng % sz;
+                صحیح i1 = (صحیح)(k1 / ستون_تعداد);
+                صحیح j1 = (صحیح)(k1 - (غیرعلامتی)i1*(غیرعلامتی)ستون_تعداد);
+                std::swap( p[j0], ((T*)(ڈیٹا + قدم*i1))[j1] );
             }
         }
     }
 }
 
-typedef void (*RandShuffleFunc)( Mat& dst, RNG& rng, double iterFactor );
+قسمتعریف خالی (*RandShuffleFunc)( Mat& dst, RNG& rng, دوہرا iter_ضربی_عدد );
 
 }
 
-void cv::randShuffle( InputOutputArray _dst, double iterFactor, RNG* _rng )
+خالی cv::randShuffle( داخلہ_Output_Array _dst, دوہرا iter_ضربی_عدد, RNG* _rng )
 {
     CV_INSTRUMENT_REGION();
 
@@ -825,27 +825,27 @@ void cv::randShuffle( InputOutputArray _dst, double iterFactor, RNG* _rng )
         randShuffle_<uchar>, // 1
         randShuffle_<ushort>, // 2
         randShuffle_<Vec<uchar,3> >, // 3
-        randShuffle_<int>, // 4
+        randShuffle_<صحیح>, // 4
         0,
         randShuffle_<Vec<ushort,3> >, // 6
         0,
-        randShuffle_<Vec<int,2> >, // 8
+        randShuffle_<Vec<صحیح,2> >, // 8
         0, 0, 0,
-        randShuffle_<Vec<int,3> >, // 12
+        randShuffle_<Vec<صحیح,3> >, // 12
         0, 0, 0,
-        randShuffle_<Vec<int,4> >, // 16
+        randShuffle_<Vec<صحیح,4> >, // 16
         0, 0, 0, 0, 0, 0, 0,
-        randShuffle_<Vec<int,6> >, // 24
+        randShuffle_<Vec<صحیح,6> >, // 24
         0, 0, 0, 0, 0, 0, 0,
-        randShuffle_<Vec<int,8> > // 32
+        randShuffle_<Vec<صحیح,8> > // 32
     };
 
     Mat dst = _dst.getMat();
     RNG& rng = _rng ? *_rng : theRNG();
-    CV_Assert( dst.elemSize() <= 32 );
-    RandShuffleFunc func = tab[dst.elemSize()];
+    CV_Assert( dst.elem_سائز() <= 32 );
+    RandShuffleFunc func = tab[dst.elem_سائز()];
     CV_Assert( func != 0 );
-    func( dst, rng, iterFactor );
+    func( dst, rng, iter_ضربی_عدد );
 }
 
 
@@ -895,52 +895,52 @@ void cv::randShuffle( InputOutputArray _dst, double iterFactor, RNG* _rng )
    email: m-mat @ math.sci.hiroshima-u.ac.jp (remove space)
 */
 
-cv::RNG_MT19937::RNG_MT19937(unsigned s) { seed(s); }
+cv::RNG_MT19937::RNG_MT19937(غیرعلامتی s) { بیج(s); }
 
-cv::RNG_MT19937::RNG_MT19937() { seed(5489U); }
+cv::RNG_MT19937::RNG_MT19937() { بیج(5489U); }
 
-void cv::RNG_MT19937::seed(unsigned s)
+خالی cv::RNG_MT19937::بیج(غیرعلامتی s)
 {
     state[0]= s;
-    for (mti = 1; mti < N; mti++)
+    برائے (mti = 1; mti < N; mti++)
     {
         /* See Knuth TAOCP Vol2. 3rd Ed. P.106 for multiplier. */
         state[mti] = (1812433253U * (state[mti - 1] ^ (state[mti - 1] >> 30)) + mti);
     }
 }
 
-unsigned cv::RNG_MT19937::next()
+غیرعلامتی cv::RNG_MT19937::next()
 {
     /* mag01[x] = x * MATRIX_A  for x=0,1 */
-    static unsigned mag01[2] = { 0x0U, /*MATRIX_A*/ 0x9908b0dfU};
+    ساکن غیرعلامتی mag01[2] = { 0x0U, /*MATRIX_A*/ 0x9908b0dfU};
 
-    const unsigned UPPER_MASK = 0x80000000U;
-    const unsigned LOWER_MASK = 0x7fffffffU;
+    ثابت غیرعلامتی بالائی_نقاب = 0x80000000U;
+    ثابت غیرعلامتی زیریں_نقاب = 0x7fffffffU;
 
     /* generate N words at one time */
-    if (mti >= N)
+    اگر (mti >= N)
     {
-        int kk = 0;
+        صحیح kk = 0;
 
-        for (; kk < N - M; ++kk)
+        برائے (; kk < N - M; ++kk)
         {
-            unsigned y = (state[kk] & UPPER_MASK) | (state[kk + 1] & LOWER_MASK);
+            غیرعلامتی y = (state[kk] & بالائی_نقاب) | (state[kk + 1] & زیریں_نقاب);
             state[kk] = state[kk + M] ^ (y >> 1) ^ mag01[y & 0x1U];
         }
 
-        for (; kk < N - 1; ++kk)
+        برائے (; kk < N - 1; ++kk)
         {
-            unsigned y = (state[kk] & UPPER_MASK) | (state[kk + 1] & LOWER_MASK);
+            غیرعلامتی y = (state[kk] & بالائی_نقاب) | (state[kk + 1] & زیریں_نقاب);
             state[kk] = state[kk + (M - N)] ^ (y >> 1) ^ mag01[y & 0x1U];
         }
 
-        unsigned y = (state[N - 1] & UPPER_MASK) | (state[0] & LOWER_MASK);
+        غیرعلامتی y = (state[N - 1] & بالائی_نقاب) | (state[0] & زیریں_نقاب);
         state[N - 1] = state[M - 1] ^ (y >> 1) ^ mag01[y & 0x1U];
 
         mti = 0;
     }
 
-    unsigned y = state[mti++];
+    غیرعلامتی y = state[mti++];
 
     /* Tempering */
     y ^= (y >> 11);
@@ -948,30 +948,30 @@ unsigned cv::RNG_MT19937::next()
     y ^= (y << 15) & 0xefc60000U;
     y ^= (y >> 18);
 
-    return y;
+    واپس y;
 }
 
-cv::RNG_MT19937::operator unsigned() { return next(); }
+cv::RNG_MT19937::عامل غیرعلامتی() { واپس next(); }
 
-cv::RNG_MT19937::operator int() { return (int)next();}
+cv::RNG_MT19937::عامل صحیح() { واپس (صحیح)next();}
 
-cv::RNG_MT19937::operator float() { return next() * (1.f / 4294967296.f); }
+cv::RNG_MT19937::عامل اعشاری() { واپس next() * (1.f / 4294967296.f); }
 
-cv::RNG_MT19937::operator double()
+cv::RNG_MT19937::عامل دوہرا()
 {
-    unsigned a = next() >> 5;
-    unsigned b = next() >> 6;
-    return (a * 67108864.0 + b) * (1.0 / 9007199254740992.0);
+    غیرعلامتی a = next() >> 5;
+    غیرعلامتی b = next() >> 6;
+    واپس (a * 67108864.0 + b) * (1.0 / 9007199254740992.0);
 }
 
-int cv::RNG_MT19937::uniform(int a, int b) { return (int)(next() % (b - a) + a); }
+صحیح cv::RNG_MT19937::یکساں(صحیح a, صحیح b) { واپس (صحیح)(next() % (b - a) + a); }
 
-float cv::RNG_MT19937::uniform(float a, float b) { return ((float)*this)*(b - a) + a; }
+اعشاری cv::RNG_MT19937::یکساں(اعشاری a, اعشاری b) { واپس ((اعشاری)*یہ)*(b - a) + a; }
 
-double cv::RNG_MT19937::uniform(double a, double b) { return ((double)*this)*(b - a) + a; }
+دوہرا cv::RNG_MT19937::یکساں(دوہرا a, دوہرا b) { واپس ((دوہرا)*یہ)*(b - a) + a; }
 
-unsigned cv::RNG_MT19937::operator ()(unsigned b) { return next() % b; }
+غیرعلامتی cv::RNG_MT19937::عامل ()(غیرعلامتی b) { واپس next() % b; }
 
-unsigned cv::RNG_MT19937::operator ()() { return next(); }
+غیرعلامتی cv::RNG_MT19937::عامل ()() { واپس next(); }
 
 /* End of file. */

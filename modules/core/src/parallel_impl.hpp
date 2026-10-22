@@ -1,17 +1,17 @@
 // This file is part of OpenCV project.
 // It is subject to the license terms in the LICENSE file found in the top-level directory
 // of this distribution and at http://opencv.org/license.html.
-#ifndef OPENCV_CORE_PARALLEL_IMPL_HPP
-#define OPENCV_CORE_PARALLEL_IMPL_HPP
+#اگر_غیر_تعریف_شدہ OPENCV_CORE_PARALLEL_IMPL_HPP
+#تعریف_کرو OPENCV_CORE_PARALLEL_IMPL_HPP
 
-namespace cv {
+نامخلا cv {
 
-unsigned defaultNumberOfThreads();
+غیرعلامتی default_نمبر_کا_دھاگے();
 
-void parallel_for_pthreads(const Range& range, const ParallelLoopBody& body, double nstripes);
-size_t parallel_pthreads_get_threads_num();
-void parallel_pthreads_set_threads_num(int num);
+خالی parallel_for_pthreads(ثابت Range& range, ثابت ParallelLoopBody& body, دوہرا nstripes);
+size_t parallel_pthreads_get_دھاگے_عدد();
+خالی parallel_pthreads_سیٹ_دھاگے_عدد(صحیح num);
 
 }
 
-#endif // OPENCV_CORE_PARALLEL_IMPL_HPP
+#اگر_ختم // OPENCV_CORE_PARALLEL_IMPL_HPP

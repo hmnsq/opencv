@@ -2,287 +2,287 @@
 // It is subject to the license terms in the LICENSE file found in the top-level directory
 // of this distribution and at http://opencv.org/license.html.
 
-#include "precomp.hpp"
-#include "opencv2/core/bindings_utils.hpp"
-#include <sstream>
-#include <iomanip>
-#include <opencv2/core/utils/filesystem.hpp>
-#include <opencv2/core/utils/filesystem.private.hpp>
+#شامل "precomp.hpp"
+#شامل "opencv2/core/bindings_utils.hpp"
+#شامل <sstream>
+#شامل <iomanip>
+#شامل <opencv2/core/utils/filesystem.hpp>
+#شامل <opencv2/core/utils/filesystem.private.hpp>
 
-namespace cv {
-static inline std::ostream& operator<<(std::ostream& os, const Rect& rect)
+نامخلا cv {
+ساکن اندرونی std::ostream& عامل<<(std::ostream& os, ثابت Rect& rect)
 {
-    return os << "[x=" << rect.x << ", y=" << rect.y << ", w=" << rect.width << ", h=" << rect.height << ']';
+    واپس os << "[x=" << rect.x << ", y=" << rect.y << ", w=" << rect.چوڑائی << ", h=" << rect.اونچائی << ']';
 }
-namespace utils {
+نامخلا utils {
 
-String dumpInputArray(InputArray argument)
+String dump_داخلہ_Array(داخلہ_Array argument)
 {
-    if (&argument == &noArray())
-        return "InputArray: noArray()";
+    اگر (&argument == &noArray())
+        واپس "InputArray: noArray()";
     std::ostringstream ss;
     ss << "InputArray:";
-    try {
-        do {
+    کوشش {
+        کرو {
             ss << (argument.empty() ? " empty()=true" : " empty()=false");
-            ss << cv::format(" kind=0x%08llx", (long long int)argument.kind());
-            ss << cv::format(" flags=0x%08llx", (long long int)argument.getFlags());
-            if (argument.getObj() == NULL)
+            ss << cv::format(" kind=0x%08llx", (طویل طویل صحیح)argument.قسم());
+            ss << cv::format(" flags=0x%08llx", (طویل طویل صحیح)argument.getFlags());
+            اگر (argument.getObj() == تہی)
             {
                 ss << " obj=NULL";
-                break; // done
+                توڑو; //مکمل
             }
-            ss << cv::format(" total(-1)=%lld", (long long int)argument.total(-1));
-            int dims = argument.dims(-1);
+            ss << cv::format(" total(-1)=%lld", (طویل طویل صحیح)argument.کل(-1));
+            صحیح dims = argument.dims(-1);
             ss << cv::format(" dims(-1)=%d", dims);
-            if (dims <= 2)
+            اگر (dims <= 2)
             {
-                Size size = argument.size(-1);
-                ss << cv::format(" size(-1)=%dx%d", size.width, size.height);
+                سائز size = argument.size(-1);
+                ss << cv::format(" size(-1)=%dx%d", size.چوڑائی, size.اونچائی);
             }
-            else
+            ورنہ
             {
-                int sz[CV_MAX_DIM] = {0};
+                صحیح sz[CV_MAX_DIM] = {0};
                 argument.sizend(sz, -1);
                 ss << " size(-1)=[";
-                for (int i = 0; i < dims; i++)
+                برائے (صحیح i = 0; i < dims; i++)
                 {
-                    if (i > 0)
+                    اگر (i > 0)
                         ss << ' ';
                     ss << sz[i];
                 }
                 ss << "]";
             }
-            ss << " type(-1)=" << cv::typeToString(argument.type(-1));
-        } while (0);
+            ss << " type(-1)=" << cv::type_مقصد_String(argument.type(-1));
+        } جب (0);
     }
-    catch (const std::exception& e)
+    پکڑو (ثابت std::exception& e)
     {
         ss << " ERROR: exception occurred: " << e.what();
     }
-    catch (...)
+    پکڑو (...)
     {
         ss << " ERROR: unknown exception occurred, dump is non-complete";
     }
-    return ss.str();
+    واپس ss.str();
 }
 
-CV_EXPORTS_W String dumpInputArrayOfArrays(InputArrayOfArrays argument)
+CV_EXPORTS_W String dump_داخلہ_Array_کا_Arrays(داخلہ_Array_کا_Arrays argument)
 {
-    if (&argument == &noArray())
-        return "InputArrayOfArrays: noArray()";
+    اگر (&argument == &noArray())
+        واپس "InputArrayOfArrays: noArray()";
     std::ostringstream ss;
     ss << "InputArrayOfArrays:";
-    try {
-        do {
+    کوشش {
+        کرو {
             ss << (argument.empty() ? " empty()=true" : " empty()=false");
-            ss << cv::format(" kind=0x%08llx", (long long int)argument.kind());
-            ss << cv::format(" flags=0x%08llx", (long long int)argument.getFlags());
-            if (argument.getObj() == NULL)
+            ss << cv::format(" kind=0x%08llx", (طویل طویل صحیح)argument.قسم());
+            ss << cv::format(" flags=0x%08llx", (طویل طویل صحیح)argument.getFlags());
+            اگر (argument.getObj() == تہی)
             {
                 ss << " obj=NULL";
-                break; // done
+                توڑو; //مکمل
             }
-            ss << cv::format(" total(-1)=%lld", (long long int)argument.total(-1));
+            ss << cv::format(" total(-1)=%lld", (طویل طویل صحیح)argument.کل(-1));
             ss << cv::format(" dims(-1)=%d", argument.dims(-1));
-            Size size = argument.size(-1);
-            ss << cv::format(" size(-1)=%dx%d", size.width, size.height);
-            if (argument.total(-1) > 0)
+            سائز size = argument.size(-1);
+            ss << cv::format(" size(-1)=%dx%d", size.چوڑائی, size.اونچائی);
+            اگر (argument.کل(-1) > 0)
             {
-                ss << " type(0)=" << cv::typeToString(argument.type(0));
-                int dims = argument.dims(0);
+                ss << " type(0)=" << cv::type_مقصد_String(argument.type(0));
+                صحیح dims = argument.dims(0);
                 ss << cv::format(" dims(0)=%d", dims);
-                if (dims <= 2)
+                اگر (dims <= 2)
                 {
-                    Size size0 = argument.size(0);
-                    ss << cv::format(" size(0)=%dx%d", size0.width, size0.height);
+                    سائز size0 = argument.size(0);
+                    ss << cv::format(" size(0)=%dx%d", size0.چوڑائی, size0.اونچائی);
                 }
-                else
+                ورنہ
                 {
-                    int sz[CV_MAX_DIM] = {0};
+                    صحیح sz[CV_MAX_DIM] = {0};
                     argument.sizend(sz, 0);
                     ss << " size(0)=[";
-                    for (int i = 0; i < dims; i++)
+                    برائے (صحیح i = 0; i < dims; i++)
                     {
-                        if (i > 0)
+                        اگر (i > 0)
                             ss << ' ';
                         ss << sz[i];
                     }
                     ss << "]";
                 }
             }
-        } while (0);
+        } جب (0);
     }
-    catch (const std::exception& e)
+    پکڑو (ثابت std::exception& e)
     {
         ss << " ERROR: exception occurred: " << e.what();
     }
-    catch (...)
+    پکڑو (...)
     {
         ss << " ERROR: unknown exception occurred, dump is non-complete";
     }
-    return ss.str();
+    واپس ss.str();
 }
 
-CV_EXPORTS_W String dumpInputOutputArray(InputOutputArray argument)
+CV_EXPORTS_W String dump_داخلہ_Output_Array(داخلہ_Output_Array argument)
 {
-    if (&argument == &noArray())
-        return "InputOutputArray: noArray()";
+    اگر (&argument == &noArray())
+        واپس "InputOutputArray: noArray()";
     std::ostringstream ss;
     ss << "InputOutputArray:";
-    try {
-        do {
+    کوشش {
+        کرو {
             ss << (argument.empty() ? " empty()=true" : " empty()=false");
-            ss << cv::format(" kind=0x%08llx", (long long int)argument.kind());
-            ss << cv::format(" flags=0x%08llx", (long long int)argument.getFlags());
-            if (argument.getObj() == NULL)
+            ss << cv::format(" kind=0x%08llx", (طویل طویل صحیح)argument.قسم());
+            ss << cv::format(" flags=0x%08llx", (طویل طویل صحیح)argument.getFlags());
+            اگر (argument.getObj() == تہی)
             {
                 ss << " obj=NULL";
-                break; // done
+                توڑو; //مکمل
             }
-            ss << cv::format(" total(-1)=%lld", (long long int)argument.total(-1));
-            int dims = argument.dims(-1);
+            ss << cv::format(" total(-1)=%lld", (طویل طویل صحیح)argument.کل(-1));
+            صحیح dims = argument.dims(-1);
             ss << cv::format(" dims(-1)=%d", dims);
-            if (dims <= 2)
+            اگر (dims <= 2)
             {
-                Size size = argument.size(-1);
-                ss << cv::format(" size(-1)=%dx%d", size.width, size.height);
+                سائز size = argument.size(-1);
+                ss << cv::format(" size(-1)=%dx%d", size.چوڑائی, size.اونچائی);
             }
-            else
+            ورنہ
             {
-                int sz[CV_MAX_DIM] = {0};
+                صحیح sz[CV_MAX_DIM] = {0};
                 argument.sizend(sz, -1);
                 ss << " size(-1)=[";
-                for (int i = 0; i < dims; i++)
+                برائے (صحیح i = 0; i < dims; i++)
                 {
-                    if (i > 0)
+                    اگر (i > 0)
                         ss << ' ';
                     ss << sz[i];
                 }
                 ss << "]";
             }
-            ss << " type(-1)=" << cv::typeToString(argument.type(-1));
-        } while (0);
+            ss << " type(-1)=" << cv::type_مقصد_String(argument.type(-1));
+        } جب (0);
     }
-    catch (const std::exception& e)
+    پکڑو (ثابت std::exception& e)
     {
         ss << " ERROR: exception occurred: " << e.what();
     }
-    catch (...)
+    پکڑو (...)
     {
         ss << " ERROR: unknown exception occurred, dump is non-complete";
     }
-    return ss.str();
+    واپس ss.str();
 }
 
-CV_EXPORTS_W String dumpInputOutputArrayOfArrays(InputOutputArrayOfArrays argument)
+CV_EXPORTS_W String dump_داخلہ_Output_Array_کا_Arrays(داخلہ_Output_Array_کا_Arrays argument)
 {
-    if (&argument == &noArray())
-        return "InputOutputArrayOfArrays: noArray()";
+    اگر (&argument == &noArray())
+        واپس "InputOutputArrayOfArrays: noArray()";
     std::ostringstream ss;
     ss << "InputOutputArrayOfArrays:";
-    try {
-        do {
+    کوشش {
+        کرو {
             ss << (argument.empty() ? " empty()=true" : " empty()=false");
-            ss << cv::format(" kind=0x%08llx", (long long int)argument.kind());
-            ss << cv::format(" flags=0x%08llx", (long long int)argument.getFlags());
-            if (argument.getObj() == NULL)
+            ss << cv::format(" kind=0x%08llx", (طویل طویل صحیح)argument.قسم());
+            ss << cv::format(" flags=0x%08llx", (طویل طویل صحیح)argument.getFlags());
+            اگر (argument.getObj() == تہی)
             {
                 ss << " obj=NULL";
-                break; // done
+                توڑو; //مکمل
             }
-            ss << cv::format(" total(-1)=%lld", (long long int)argument.total(-1));
+            ss << cv::format(" total(-1)=%lld", (طویل طویل صحیح)argument.کل(-1));
             ss << cv::format(" dims(-1)=%d", argument.dims(-1));
-            Size size = argument.size(-1);
-            ss << cv::format(" size(-1)=%dx%d", size.width, size.height);
-            if (argument.total(-1) > 0)
+            سائز size = argument.size(-1);
+            ss << cv::format(" size(-1)=%dx%d", size.چوڑائی, size.اونچائی);
+            اگر (argument.کل(-1) > 0)
             {
-                ss << " type(0)=" << cv::typeToString(argument.type(0));
-                int dims = argument.dims(0);
+                ss << " type(0)=" << cv::type_مقصد_String(argument.type(0));
+                صحیح dims = argument.dims(0);
                 ss << cv::format(" dims(0)=%d", dims);
-                if (dims <= 2)
+                اگر (dims <= 2)
                 {
-                    Size size0 = argument.size(0);
-                    ss << cv::format(" size(0)=%dx%d", size0.width, size0.height);
+                    سائز size0 = argument.size(0);
+                    ss << cv::format(" size(0)=%dx%d", size0.چوڑائی, size0.اونچائی);
                 }
-                else
+                ورنہ
                 {
-                    int sz[CV_MAX_DIM] = {0};
+                    صحیح sz[CV_MAX_DIM] = {0};
                     argument.sizend(sz, 0);
                     ss << " size(0)=[";
-                    for (int i = 0; i < dims; i++)
+                    برائے (صحیح i = 0; i < dims; i++)
                     {
-                        if (i > 0)
+                        اگر (i > 0)
                             ss << ' ';
                         ss << sz[i];
                     }
                     ss << "]";
                 }
             }
-        } while (0);
+        } جب (0);
     }
-    catch (const std::exception& e)
+    پکڑو (ثابت std::exception& e)
     {
         ss << " ERROR: exception occurred: " << e.what();
     }
-    catch (...)
+    پکڑو (...)
     {
         ss << " ERROR: unknown exception occurred, dump is non-complete";
     }
-    return ss.str();
+    واپس ss.str();
 }
 
-template <class T, class Formatter>
-static inline String dumpVector(const std::vector<T>& vec, Formatter format)
+سانچہ <جماعت T, جماعت Formatter>
+ساکن اندرونی String dump_سمتیہ(ثابت std::vector<T>& vec, Formatter format)
 {
     std::ostringstream oss("[", std::ios::ate);
-    if (!vec.empty())
+    اگر (!vec.empty())
     {
         format(oss) << vec[0];
-        for (std::size_t i = 1; i < vec.size(); ++i)
+        برائے (std::size_t i = 1; i < vec.size(); ++i)
         {
             oss << ", ";
             format(oss) << vec[i];
         }
     }
     oss << "]";
-    return oss.str();
+    واپس oss.str();
 }
 
-static inline std::ostream& noFormat(std::ostream& os)
+ساکن اندرونی std::ostream& noFormat(std::ostream& os)
 {
-    return os;
+    واپس os;
 }
 
-static inline std::ostream& floatFormat(std::ostream& os)
+ساکن اندرونی std::ostream& floatFormat(std::ostream& os)
 {
-    return os << std::fixed << std::setprecision(2);
+    واپس os << std::fixed << std::setprecision(2);
 }
 
-String dumpVectorOfInt(const std::vector<int>& vec)
+String dump_سمتیہ_کا_Int(ثابت std::vector<صحیح>& vec)
 {
-    return dumpVector(vec, &noFormat);
+    واپس dump_سمتیہ(vec, &noFormat);
 }
 
-String dumpVectorOfDouble(const std::vector<double>& vec)
+String dump_سمتیہ_کا_Double(ثابت std::vector<دوہرا>& vec)
 {
-    return dumpVector(vec, &floatFormat);
+    واپس dump_سمتیہ(vec, &floatFormat);
 }
 
-String dumpVectorOfRect(const std::vector<Rect>& vec)
+String dump_سمتیہ_کا_Rect(ثابت std::vector<Rect>& vec)
 {
-    return dumpVector(vec, &noFormat);
+    واپس dump_سمتیہ(vec, &noFormat);
 }
 
 
-namespace fs {
+نامخلا fs {
 cv::String getCacheDirectoryForDownloads()
 {
-#if OPENCV_HAVE_FILESYSTEM_SUPPORT
-    return cv::utils::fs::getCacheDirectory("downloads", "OPENCV_DOWNLOADS_CACHE_DIR");
-#else
+#اگر OPENCV_HAVE_FILESYSTEM_SUPPORT
+    واپس cv::utils::fs::getCacheDirectory("downloads", "OPENCV_DOWNLOADS_CACHE_DIR");
+#ورنہ
     CV_Error(Error::StsNotImplemented, "File system support is disabled in this OpenCV build!");
-#endif
+#اگر_ختم
 }
 } // namespace fs
 

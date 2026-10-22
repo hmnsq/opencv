@@ -8,68 +8,68 @@
 // Each piece is reduced by the existing serial code (including the HAL), and the results are
 // combined in piece order.
 
-#ifndef OPENCV_CORE_STAT_PARALLEL_HPP
-#define OPENCV_CORE_STAT_PARALLEL_HPP
+#اگر_غیر_تعریف_شدہ OPENCV_CORE_STAT_PARALLEL_HPP
+#تعریف_کرو OPENCV_CORE_STAT_PARALLEL_HPP
 
-namespace cv {
+نامخلا cv {
 
-struct StatChunk
+ساخت StatChunk
 {
-    Mat src, mask;
-    size_t firstElem;   // row-major index of the first element of the piece in the whole array
+    Mat src, نقاب;
+    size_t پہلا_Elem;   // row-major index of the first element of the piece in the whole array
 };
 
 // Returns false when the array is too small to be worth splitting, or cannot be split.
-static inline bool splitForParallelStat(const Mat& src, const Mat& mask, std::vector<StatChunk>& chunks)
+ساکن اندرونی منطقی بانٹو_For_Parallel_Stat(ثابت Mat& src, ثابت Mat& نقاب, std::vector<StatChunk>& chunks)
 {
-    const size_t total = src.total(), work = total*src.channels();
-    if (work < ((size_t)1 << 18))
-        return false;
-    const int nthreads = getNumThreads();
-    if (nthreads <= 1)
-        return false;
-    const int n = (int)std::min((size_t)nthreads*2, work >> 16);
-    if (n < 2)
-        return false;
+    ثابت size_t کل = src.کل(), work = کل*src.channels();
+    اگر (work < ((size_t)1 << 18))
+        واپس جھوٹ;
+    ثابت صحیح nthreads = get_عدد_دھاگے();
+    اگر (nthreads <= 1)
+        واپس جھوٹ;
+    ثابت صحیح n = (صحیح)std::min((size_t)nthreads*2, work >> 16);
+    اگر (n < 2)
+        واپس جھوٹ;
 
     chunks.clear();
-    if (src.dims <= 2 && src.rows >= n)
+    اگر (src.dims <= 2 && src.صفیں >= n)
     {
-        for (int i = 0; i < n; i++)
+        برائے (صحیح i = 0; i < n; i++)
         {
-            int r0 = (int)((int64)src.rows*i/n), r1 = (int)((int64)src.rows*(i + 1)/n);
+            صحیح r0 = (صحیح)((int64)src.صفیں*i/n), r1 = (صحیح)((int64)src.صفیں*(i + 1)/n);
             StatChunk c;
-            c.src = src.rowRange(r0, r1);
-            if (!mask.empty())
-                c.mask = mask.rowRange(r0, r1);
-            c.firstElem = (size_t)r0*src.cols;
+            c.src = src.صف_Range_2(r0, r1);
+            اگر (!نقاب.empty())
+                c.نقاب = نقاب.صف_Range_2(r0, r1);
+            c.پہلا_Elem = (size_t)r0*src.ستون_تعداد;
             chunks.push_back(c);
         }
-        return true;
+        واپس سچ;
     }
-    if (src.isContinuous() && (mask.empty() || mask.isContinuous()) && total <= (size_t)INT_MAX)
+    اگر (src.isContinuous() && (نقاب.empty() || نقاب.isContinuous()) && کل <= (size_t)زیادہ_سے_زیادہ_عدد)
     {
-        for (int i = 0; i < n; i++)
+        برائے (صحیح i = 0; i < n; i++)
         {
-            size_t e0 = total*i/n, e1 = total*(i + 1)/n;
+            size_t e0 = کل*i/n, e1 = کل*(i + 1)/n;
             StatChunk c;
-            c.src = Mat(1, (int)(e1 - e0), src.type(), (void*)(src.data + e0*src.elemSize()));
-            if (!mask.empty())
-                c.mask = Mat(1, (int)(e1 - e0), mask.type(), (void*)(mask.data + e0*mask.elemSize()));
-            c.firstElem = e0;
+            c.src = Mat(1, (صحیح)(e1 - e0), src.type(), (خالی*)(src.ڈیٹا + e0*src.elem_سائز()));
+            اگر (!نقاب.empty())
+                c.نقاب = Mat(1, (صحیح)(e1 - e0), نقاب.type(), (خالی*)(نقاب.ڈیٹا + e0*نقاب.elem_سائز()));
+            c.پہلا_Elem = e0;
             chunks.push_back(c);
         }
-        return true;
+        واپس سچ;
     }
-    return false;
+    واپس جھوٹ;
 }
 
 // row-major index of an element given by the per-dimension indices of a 2D piece
-static inline size_t chunkIndexToElem(const StatChunk& c, const int* idx)
+ساکن اندرونی size_t chunk_اشاریہ_مقصد_Elem(ثابت StatChunk& c, ثابت صحیح* idx)
 {
-    return c.firstElem + (size_t)idx[0]*c.src.cols + idx[1];
+    واپس c.پہلا_Elem + (size_t)idx[0]*c.src.ستون_تعداد + idx[1];
 }
 
 } // namespace cv
 
-#endif
+#اگر_ختم

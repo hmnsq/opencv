@@ -41,295 +41,295 @@
 //
 //M*/
 
-#include "precomp.hpp"
-#include <map>
+#شامل "precomp.hpp"
+#شامل <map>
 
-using namespace cv;
-using namespace cv::cuda;
+استعمال نامخلا cv;
+استعمال نامخلا cv::cuda;
 
-#ifdef HAVE_CUDA
+#اگر_تعریف_شدہ HAVE_CUDA
 
-namespace {
+نامخلا {
 
-class HostMemAllocator : public MatAllocator
+جماعت HostMemAllocator : عوامی MatAllocator
 {
-public:
-    explicit HostMemAllocator(unsigned int flags) : flags_(flags)
+عوامی:
+    صریح HostMemAllocator(غیرعلامتی صحیح flags) : flags_(flags)
     {
     }
 
-    UMatData* allocate(int dims, const int* sizes, int type,
-                       void* data0, size_t* step,
-                       AccessFlag /*flags*/, UMatUsageFlags /*usageFlags*/) const CV_OVERRIDE
+    UMat_ڈیٹا* allocate(صحیح dims, ثابت صحیح* sizes, صحیح type,
+                       خالی* data0, size_t* قدم,
+                       AccessFlag /*flags*/, UMatUsageFlags /*usageFlags*/) ثابت CV_OVERRIDE
     {
-        size_t total = CV_ELEM_SIZE(type);
-        for (int i = dims-1; i >= 0; i--)
+        size_t کل = CV_ELEM_سائز(type);
+        برائے (صحیح i = dims-1; i >= 0; i--)
         {
-            if (step)
+            اگر (قدم)
             {
-                if (data0 && step[i] != CV_AUTOSTEP)
+                اگر (data0 && قدم[i] != CV_AUTOSTEP)
                 {
-                    CV_Assert(total <= step[i]);
-                    total = step[i];
+                    CV_Assert(کل <= قدم[i]);
+                    کل = قدم[i];
                 }
-                else
+                ورنہ
                 {
-                    step[i] = total;
+                    قدم[i] = کل;
                 }
             }
 
-            total *= sizes[i];
+            کل *= sizes[i];
         }
 
-        UMatData* u = new UMatData(this);
-        u->size = total;
+        UMat_ڈیٹا* u = نیا UMat_ڈیٹا(یہ);
+        u->size = کل;
 
-        if (data0)
+        اگر (data0)
         {
-            u->data = u->origdata = static_cast<uchar*>(data0);
-            u->flags |= UMatData::USER_ALLOCATED;
+            u->ڈیٹا = u->origdata = static_cast<uchar*>(data0);
+            u->flags |= UMat_ڈیٹا::USER_ALLOCATED;
         }
-        else
+        ورنہ
         {
-            void* ptr = 0;
-            cudaSafeCall( cudaHostAlloc(&ptr, total, flags_) );
+            خالی* ptr = 0;
+            cuda_محفوظ_Call( cudaHostAlloc(&ptr, کل, flags_) );
 
-            u->data = u->origdata = static_cast<uchar*>(ptr);
+            u->ڈیٹا = u->origdata = static_cast<uchar*>(ptr);
         }
 
-        return u;
+        واپس u;
     }
 
-    bool allocate(UMatData* u, AccessFlag /*accessFlags*/, UMatUsageFlags /*usageFlags*/) const CV_OVERRIDE
+    منطقی allocate(UMat_ڈیٹا* u, AccessFlag /*accessFlags*/, UMatUsageFlags /*usageFlags*/) ثابت CV_OVERRIDE
     {
-        return (u != NULL);
+        واپس (u != تہی);
     }
 
-    void deallocate(UMatData* u) const CV_OVERRIDE
+    خالی deallocate(UMat_ڈیٹا* u) ثابت CV_OVERRIDE
     {
-        if (!u)
-            return;
+        اگر (!u)
+            واپس;
 
         CV_Assert(u->urefcount >= 0);
         CV_Assert(u->refcount >= 0);
 
-        if (u->refcount == 0)
+        اگر (u->refcount == 0)
         {
-            if ( !(u->flags & UMatData::USER_ALLOCATED) )
+            اگر ( !(u->flags & UMat_ڈیٹا::USER_ALLOCATED) )
             {
                 cudaFreeHost(u->origdata);
                 u->origdata = 0;
             }
 
-            delete u;
+            حذف u;
         }
     }
 
-private:
-    unsigned int flags_;
+نجی:
+    غیرعلامتی صحیح flags_;
 };
 
 } // namespace
 
-#endif
+#اگر_ختم
 
 MatAllocator* cv::cuda::HostMem::getAllocator(AllocType alloc_type)
 {
-#ifndef HAVE_CUDA
-    CV_UNUSED(alloc_type);
+#اگر_غیر_تعریف_شدہ HAVE_CUDA
+    CV_غیر_مستعمل(alloc_type);
     throw_no_cuda();
-#else
-    static std::map<unsigned int, Ptr<MatAllocator> > allocators;
+#ورنہ
+    ساکن std::map<غیرعلامتی صحیح, Ptr<MatAllocator> > allocators;
 
-    unsigned int flag = cudaHostAllocDefault;
+    غیرعلامتی صحیح flag = cudaHostAllocDefault;
 
-    switch (alloc_type)
+    انتخاب (alloc_type)
     {
-    case PAGE_LOCKED:    flag = cudaHostAllocDefault; break;
-    case SHARED:         flag = cudaHostAllocMapped;  break;
-    case WRITE_COMBINED: flag = cudaHostAllocWriteCombined; break;
-    default:             CV_Error(cv::Error::StsBadFlag, "Invalid alloc type");
+    حالت صفحہ_LOCKED:    flag = cudaHostAllocDefault; توڑو;
+    حالت SHARED:         flag = cudaHostAllocMapped;  توڑو;
+    حالت WRITE_COMBINED: flag = cudaHostAllocWriteCombined; توڑو;
+    طےشدہ:             CV_Error(cv::Error::StsBadFlag, "Invalid alloc type");
     }
 
     Ptr<MatAllocator>& a = allocators[flag];
 
-    if (a.empty())
+    اگر (a.empty())
     {
         a = makePtr<HostMemAllocator>(flag);
     }
 
-    return a.get();
-#endif
+    واپس a.get();
+#اگر_ختم
 }
 
-#ifdef HAVE_CUDA
-namespace
+#اگر_تعریف_شدہ HAVE_CUDA
+نامخلا
 {
-    size_t alignUpStep(size_t what, size_t alignment)
+    size_t align_اوپر_قدم(size_t what, size_t alignment)
     {
-        size_t alignMask = alignment - 1;
-        size_t inverseAlignMask = ~alignMask;
-        size_t res = (what + alignMask) & inverseAlignMask;
-        return res;
+        size_t align_نقاب = alignment - 1;
+        size_t inverse_Align_نقاب = ~align_نقاب;
+        size_t res = (what + align_نقاب) & inverse_Align_نقاب;
+        واپس res;
     }
 }
-#endif
+#اگر_ختم
 
-void cv::cuda::HostMem::create(int rows_, int cols_, int type_)
+خالی cv::cuda::HostMem::create(صحیح صفیں_2, صحیح ستون_تعداد_2, صحیح type_)
 {
-#ifndef HAVE_CUDA
-    CV_UNUSED(rows_);
-    CV_UNUSED(cols_);
-    CV_UNUSED(type_);
+#اگر_غیر_تعریف_شدہ HAVE_CUDA
+    CV_غیر_مستعمل(صفیں_2);
+    CV_غیر_مستعمل(ستون_تعداد_2);
+    CV_غیر_مستعمل(type_);
     throw_no_cuda();
-#else
-    if (alloc_type == SHARED)
+#ورنہ
+    اگر (alloc_type == SHARED)
     {
         DeviceInfo devInfo;
-        CV_Assert( devInfo.canMapHostMemory() );
+        CV_Assert( devInfo.can_Map_Host_حافظہ() );
     }
 
-    type_ &= Mat::TYPE_MASK;
+    type_ &= Mat::TYPE_نقاب;
 
-    if (rows == rows_ && cols == cols_ && type() == type_ && data)
-        return;
+    اگر (صفیں == صفیں_2 && ستون_تعداد == ستون_تعداد_2 && type() == type_ && ڈیٹا)
+        واپس;
 
-    if (data)
+    اگر (ڈیٹا)
         release();
 
-    CV_DbgAssert( rows_ >= 0 && cols_ >= 0 );
+    CV_DbgAssert( صفیں_2 >= 0 && ستون_تعداد_2 >= 0 );
 
-    if (rows_ > 0 && cols_ > 0)
+    اگر (صفیں_2 > 0 && ستون_تعداد_2 > 0)
     {
         flags = Mat::MAGIC_VAL + type_;
-        rows = rows_;
-        cols = cols_;
-        step = elemSize() * cols;
-        int sz[] = { rows, cols };
-        size_t steps[] = { step, (size_t)CV_ELEM_SIZE(type_) };
-        flags = updateContinuityFlag(flags, 2, sz, steps);
+        صفیں = صفیں_2;
+        ستون_تعداد = ستون_تعداد_2;
+        قدم = elem_سائز() * ستون_تعداد;
+        صحیح sz[] = { صفیں, ستون_تعداد };
+        size_t اقدام[] = { قدم, (size_t)CV_ELEM_سائز(type_) };
+        flags = updateContinuityFlag(flags, 2, sz, اقدام);
 
-        if (alloc_type == SHARED)
+        اگر (alloc_type == SHARED)
         {
             DeviceInfo devInfo;
-            step = alignUpStep(step, devInfo.textureAlignment());
+            قدم = align_اوپر_قدم(قدم, devInfo.textureAlignment());
         }
 
-        int64 _nettosize = (int64)step*rows;
+        int64 _nettosize = (int64)قدم*صفیں;
         size_t nettosize = (size_t)_nettosize;
 
-        if (_nettosize != (int64)nettosize)
+        اگر (_nettosize != (int64)nettosize)
             CV_Error(cv::Error::StsNoMem, "Too big buffer is allocated");
 
-        size_t datasize = alignSize(nettosize, (int)sizeof(*refcount));
+        size_t datasize = align_سائز(nettosize, (صحیح)حجم(*refcount));
 
-        void* ptr = 0;
+        خالی* ptr = 0;
 
-        switch (alloc_type)
+        انتخاب (alloc_type)
         {
-        case PAGE_LOCKED:    cudaSafeCall( cudaHostAlloc(&ptr, datasize, cudaHostAllocDefault) ); break;
-        case SHARED:         cudaSafeCall( cudaHostAlloc(&ptr, datasize, cudaHostAllocMapped) );  break;
-        case WRITE_COMBINED: cudaSafeCall( cudaHostAlloc(&ptr, datasize, cudaHostAllocWriteCombined) ); break;
-        default:             CV_Error(cv::Error::StsBadFlag, "Invalid alloc type");
+        حالت صفحہ_LOCKED:    cuda_محفوظ_Call( cudaHostAlloc(&ptr, datasize, cudaHostAllocDefault) ); توڑو;
+        حالت SHARED:         cuda_محفوظ_Call( cudaHostAlloc(&ptr, datasize, cudaHostAllocMapped) );  توڑو;
+        حالت WRITE_COMBINED: cuda_محفوظ_Call( cudaHostAlloc(&ptr, datasize, cudaHostAllocWriteCombined) ); توڑو;
+        طےشدہ:             CV_Error(cv::Error::StsBadFlag, "Invalid alloc type");
         }
 
-        datastart = data =  (uchar*)ptr;
-        dataend = data + nettosize;
+        datastart = ڈیٹا =  (uchar*)ptr;
+        dataend = ڈیٹا + nettosize;
 
-        refcount = (int*)cv::fastMalloc(sizeof(*refcount));
+        refcount = (صحیح*)cv::fastMalloc(حجم(*refcount));
         *refcount = 1;
     }
-#endif
+#اگر_ختم
 }
 
-HostMem cv::cuda::HostMem::reshape(int new_cn, int new_rows) const
+HostMem cv::cuda::HostMem::reshape(صحیح new_cn, صحیح new_صفیں) ثابت
 {
-    HostMem hdr = *this;
+    HostMem hdr = *یہ;
 
-    int cn = channels();
-    if (new_cn == 0)
+    صحیح cn = channels();
+    اگر (new_cn == 0)
         new_cn = cn;
 
-    int total_width = cols * cn;
+    صحیح کل_چوڑائی = ستون_تعداد * cn;
 
-    if ((new_cn > total_width || total_width % new_cn != 0) && new_rows == 0)
-        new_rows = rows * total_width / new_cn;
+    اگر ((new_cn > کل_چوڑائی || کل_چوڑائی % new_cn != 0) && new_صفیں == 0)
+        new_صفیں = صفیں * کل_چوڑائی / new_cn;
 
-    if (new_rows != 0 && new_rows != rows)
+    اگر (new_صفیں != 0 && new_صفیں != صفیں)
     {
-        int total_size = total_width * rows;
+        صحیح کل_سائز_2 = کل_چوڑائی * صفیں;
 
-        if (!isContinuous())
-            CV_Error(cv::Error::BadStep, "The matrix is not continuous, thus its number of rows can not be changed");
+        اگر (!isContinuous())
+            CV_Error(cv::Error::Bad_قدم, "The matrix is not continuous, thus its number of rows can not be changed");
 
-        if ((unsigned)new_rows > (unsigned)total_size)
-            CV_Error(cv::Error::StsOutOfRange, "Bad new number of rows");
+        اگر ((غیرعلامتی)new_صفیں > (غیرعلامتی)کل_سائز_2)
+            CV_Error(cv::Error::Sts_برآمد_کا_Range, "Bad new number of rows");
 
-        total_width = total_size / new_rows;
+        کل_چوڑائی = کل_سائز_2 / new_صفیں;
 
-        if (total_width * new_rows != total_size)
+        اگر (کل_چوڑائی * new_صفیں != کل_سائز_2)
             CV_Error(cv::Error::StsBadArg, "The total number of matrix elements is not divisible by the new number of rows");
 
-        hdr.rows = new_rows;
-        hdr.step = total_width * elemSize1();
+        hdr.صفیں = new_صفیں;
+        hdr.قدم = کل_چوڑائی * elemSize1();
     }
 
-    int new_width = total_width / new_cn;
+    صحیح new_چوڑائی = کل_چوڑائی / new_cn;
 
-    if (new_width * new_cn != total_width)
-        CV_Error(cv::Error::BadNumChannels, "The total width is not divisible by the new number of channels");
+    اگر (new_چوڑائی * new_cn != کل_چوڑائی)
+        CV_Error(cv::Error::Bad_عدد_Channels, "The total width is not divisible by the new number of channels");
 
-    hdr.cols = new_width;
-    hdr.flags = (hdr.flags & ~CV_MAT_CN_MASK) | ((new_cn - 1) << CV_CN_SHIFT);
+    hdr.ستون_تعداد = new_چوڑائی;
+    hdr.flags = (hdr.flags & ~CV_MAT_CN_نقاب) | ((new_cn - 1) << CV_CN_سرکاؤ);
 
-    return hdr;
+    واپس hdr;
 }
 
-void cv::cuda::HostMem::release()
+خالی cv::cuda::HostMem::release()
 {
-#ifdef HAVE_CUDA
-    if (refcount && CV_XADD(refcount, -1) == 1)
+#اگر_تعریف_شدہ HAVE_CUDA
+    اگر (refcount && CV_XADD(refcount, -1) == 1)
     {
         cudaFreeHost(datastart);
         fastFree(refcount);
     }
 
-    dataend = data = datastart = 0;
-    step = rows = cols = 0;
+    dataend = ڈیٹا = datastart = 0;
+    قدم = صفیں = ستون_تعداد = 0;
     refcount = 0;
-#endif
+#اگر_ختم
 }
 
-GpuMat cv::cuda::HostMem::createGpuMatHeader() const
+GpuMat cv::cuda::HostMem::create_Gpu_Mat_سرخی() ثابت
 {
-#ifndef HAVE_CUDA
+#اگر_غیر_تعریف_شدہ HAVE_CUDA
     throw_no_cuda();
-#else
+#ورنہ
     CV_Assert( alloc_type == SHARED );
 
-    void *pdev;
-    cudaSafeCall( cudaHostGetDevicePointer(&pdev, data, 0) );
+    خالی *pdev;
+    cuda_محفوظ_Call( cuda_Host_Get_Device_اشارہ_گر(&pdev, ڈیٹا, 0) );
 
-    return GpuMat(rows, cols, type(), pdev, step);
-#endif
+    واپس GpuMat(صفیں, ستون_تعداد, type(), pdev, قدم);
+#اگر_ختم
 }
 
-void cv::cuda::registerPageLocked(Mat& m)
+خالی cv::cuda::رجسٹر_صفحہ_Locked(Mat& m)
 {
-#ifndef HAVE_CUDA
-    CV_UNUSED(m);
+#اگر_غیر_تعریف_شدہ HAVE_CUDA
+    CV_غیر_مستعمل(m);
     throw_no_cuda();
-#else
+#ورنہ
     CV_Assert( m.isContinuous() );
-    cudaSafeCall( cudaHostRegister(m.data, m.step * m.rows, cudaHostRegisterPortable) );
-#endif
+    cuda_محفوظ_Call( cuda_Host_رجسٹر(m.ڈیٹا, m.قدم * m.صفیں, cuda_Host_رجسٹر_Portable) );
+#اگر_ختم
 }
 
-void cv::cuda::unregisterPageLocked(Mat& m)
+خالی cv::cuda::unregister_صفحہ_Locked(Mat& m)
 {
-#ifndef HAVE_CUDA
-    CV_UNUSED(m);
-#else
-    cudaSafeCall( cudaHostUnregister(m.data) );
-#endif
+#اگر_غیر_تعریف_شدہ HAVE_CUDA
+    CV_غیر_مستعمل(m);
+#ورنہ
+    cuda_محفوظ_Call( cudaHostUnregister(m.ڈیٹا) );
+#اگر_ختم
 }

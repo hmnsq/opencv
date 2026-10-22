@@ -2,447 +2,447 @@
 // It is subject to the license terms in the LICENSE file found in the top-level directory
 // of this distribution and at http://opencv.org/license.html.
 
-#include "../precomp.hpp"
+#شامل "../precomp.hpp"
 
-#include "opencv_data_config.hpp"
+#شامل "opencv_data_config.hpp"
 
-#include <vector>
-#include <fstream>
+#شامل <vector>
+#شامل <fstream>
 
-#include <opencv2/core/utils/logger.defines.hpp>
-#undef CV_LOG_STRIP_LEVEL
-#define CV_LOG_STRIP_LEVEL CV_LOG_LEVEL_VERBOSE + 1
-#include "opencv2/core/utils/logger.hpp"
-#include "opencv2/core/utils/filesystem.hpp"
+#شامل <opencv2/core/utils/logger.defines.hpp>
+#تعریف_منسوخ CV_LOG_STRIP_LEVEL
+#تعریف_کرو CV_LOG_STRIP_LEVEL CV_LOG_LEVEL_VERBOSE + 1
+#شامل "opencv2/core/utils/logger.hpp"
+#شامل "opencv2/core/utils/filesystem.hpp"
 
-#include <opencv2/core/utils/configuration.private.hpp>
-#include "opencv2/core/utils/filesystem.private.hpp"
+#شامل <opencv2/core/utils/configuration.private.hpp>
+#شامل "opencv2/core/utils/filesystem.private.hpp"
 
-#ifdef _WIN32
-#define WIN32_LEAN_AND_MEAN
-#include <windows.h>
-#undef small
-#undef min
-#undef max
-#undef abs
-#elif defined(__linux__)
-#include <dlfcn.h>  // requires -ldl
-#elif defined(__APPLE__)
-#include <TargetConditionals.h>
-#if TARGET_OS_MAC
-#include <dlfcn.h>
-#endif
-#endif
+#اگر_تعریف_شدہ _WIN32
+#تعریف_کرو WIN32_LEAN_AND_اوسط
+#شامل <windows.h>
+#تعریف_منسوخ small
+#تعریف_منسوخ min
+#تعریف_منسوخ max
+#تعریف_منسوخ مطلق_قدر
+#وگرنہ_اگر defined(__linux__)
+#شامل <dlfcn.h>  // requires -ldl
+#وگرنہ_اگر defined(__APPLE__)
+#شامل <TargetConditionals.h>
+#اگر ہدف_OS_MAC
+#شامل <dlfcn.h>
+#اگر_ختم
+#اگر_ختم
 
-namespace cv { namespace utils {
+نامخلا cv { نامخلا utils {
 
-static cv::Ptr< std::vector<cv::String> > g_data_search_path;
-static cv::Ptr< std::vector<cv::String> > g_data_search_subdir;
+ساکن cv::Ptr< std::vector<cv::String> > g_ڈیٹا_تلاش_راستہ;
+ساکن cv::Ptr< std::vector<cv::String> > g_ڈیٹا_تلاش_subdir;
 
-static std::vector<cv::String>& _getDataSearchPath()
+ساکن std::vector<cv::String>& get_ڈیٹا_تلاش_راستہ()
 {
-    if (g_data_search_path.empty())
-        g_data_search_path.reset(new std::vector<cv::String>());
-    return *(g_data_search_path.get());
+    اگر (g_ڈیٹا_تلاش_راستہ.empty())
+        g_ڈیٹا_تلاش_راستہ.reset(نیا std::vector<cv::String>());
+    واپس *(g_ڈیٹا_تلاش_راستہ.get());
 }
 
-static std::vector<cv::String>& _getDataSearchSubDirectory()
+ساکن std::vector<cv::String>& get_ڈیٹا_تلاش_Sub_Directory()
 {
-    if (g_data_search_subdir.empty())
+    اگر (g_ڈیٹا_تلاش_subdir.empty())
     {
-        g_data_search_subdir.reset(new std::vector<cv::String>());
-        g_data_search_subdir->push_back("data");
-        g_data_search_subdir->push_back("");
+        g_ڈیٹا_تلاش_subdir.reset(نیا std::vector<cv::String>());
+        g_ڈیٹا_تلاش_subdir->push_back("data");
+        g_ڈیٹا_تلاش_subdir->push_back("");
     }
-    return *(g_data_search_subdir.get());
+    واپس *(g_ڈیٹا_تلاش_subdir.get());
 }
 
 
-CV_EXPORTS void addDataSearchPath(const cv::String& path)
+CV_EXPORTS خالی جوڑو_ڈیٹا_تلاش_راستہ(ثابت cv::String& راستہ)
 {
-    if (!path.empty() && utils::fs::isDirectory(path))
-        _getDataSearchPath().push_back(path);
+    اگر (!راستہ.empty() && utils::fs::isDirectory(راستہ))
+        get_ڈیٹا_تلاش_راستہ().push_back(راستہ);
 }
-CV_EXPORTS void addDataSearchSubDirectory(const cv::String& subdir)
+CV_EXPORTS خالی جوڑو_ڈیٹا_تلاش_Sub_Directory(ثابت cv::String& subdir)
 {
-    _getDataSearchSubDirectory().push_back(subdir);
+    get_ڈیٹا_تلاش_Sub_Directory().push_back(subdir);
 }
 
-#if OPENCV_HAVE_FILESYSTEM_SUPPORT
-static bool isPathSep(char c)
+#اگر OPENCV_HAVE_FILESYSTEM_SUPPORT
+ساکن منطقی is_راستہ_Sep(حرف c)
 {
-    return c == '/' || c == '\\';
+    واپس c == '/' || c == '\\';
 }
-static bool isSubDirectory_(const cv::String& base_path, const cv::String& path)
+ساکن منطقی isSubDirectory_(ثابت cv::String& بنیاد_راستہ, ثابت cv::String& راستہ)
 {
-    size_t N = base_path.size();
-    if (N == 0)
-        return false;
-    if (isPathSep(base_path[N - 1]))
+    size_t N = بنیاد_راستہ.size();
+    اگر (N == 0)
+        واپس جھوٹ;
+    اگر (is_راستہ_Sep(بنیاد_راستہ[N - 1]))
         N--;
-    if (path.size() < N)
-        return false;
-    for (size_t i = 0; i < N; i++)
+    اگر (راستہ.size() < N)
+        واپس جھوٹ;
+    برائے (size_t i = 0; i < N; i++)
     {
-        if (path[i] == base_path[i])
-            continue;
-        if (isPathSep(path[i]) && isPathSep(base_path[i]))
-            continue;
-        return false;
+        اگر (راستہ[i] == بنیاد_راستہ[i])
+            جاری;
+        اگر (is_راستہ_Sep(راستہ[i]) && is_راستہ_Sep(بنیاد_راستہ[i]))
+            جاری;
+        واپس جھوٹ;
     }
-    size_t M = path.size();
-    if (M > N)
+    size_t M = راستہ.size();
+    اگر (M > N)
     {
-        if (!isPathSep(path[N]))
-            return false;
+        اگر (!is_راستہ_Sep(راستہ[N]))
+            واپس جھوٹ;
     }
-    return true;
+    واپس سچ;
 }
 
-static bool isSubDirectory(const cv::String& base_path, const cv::String& path)
+ساکن منطقی isSubDirectory(ثابت cv::String& بنیاد_راستہ, ثابت cv::String& راستہ)
 {
-    bool res = isSubDirectory_(base_path, path);
-    CV_LOG_VERBOSE(NULL, 0, "isSubDirectory(): base: " << base_path << "  path: " << path << "  => result: " << (res ? "TRUE" : "FALSE"));
-    return res;
+    منطقی res = isSubDirectory_(بنیاد_راستہ, راستہ);
+    CV_LOG_VERBOSE(تہی, 0, "isSubDirectory(): base: " << بنیاد_راستہ << "  path: " << راستہ << "  => result: " << (res ? "TRUE" : "FALSE"));
+    واپس res;
 }
-#endif //OPENCV_HAVE_FILESYSTEM_SUPPORT
+#اگر_ختم //OPENCV_HAVE_FILESYSTEM_SUPPORT
 
-static cv::String getModuleLocation(const void* addr)
+ساکن cv::String getModuleLocation(ثابت خالی* addr)
 {
-    CV_UNUSED(addr);
-#ifdef _WIN32
+    CV_غیر_مستعمل(addr);
+#اگر_تعریف_شدہ _WIN32
     HMODULE m = 0;
-#if _WIN32_WINNT >= 0x0501 && (!defined(WINAPI_FAMILY) || (WINAPI_FAMILY == WINAPI_FAMILY_DESKTOP_APP))
-    ::GetModuleHandleEx(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT,
+#اگر _WIN32_WINNT >= 0x0501 && (!defined(WINAPI_FAMILY) || (WINAPI_FAMILY == WINAPI_FAMILY_DESKTOP_APP))
+    ::GetModuleHandleEx(GET_MODULE_HANDLE_EX_FLAG_FROM_پتہ | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT,
         reinterpret_cast<LPCTSTR>(addr),
         &m);
-#endif
-    if (m)
+#اگر_ختم
+    اگر (m)
     {
-        TCHAR path[MAX_PATH];
-        const size_t path_size = sizeof(path) / sizeof(*path);
-        size_t sz = GetModuleFileName(m, path, path_size);
-        if (sz > 0 && sz < path_size)
+        TCHAR راستہ[MAX_راستہ];
+        ثابت size_t راستہ_سائز = حجم(راستہ) / حجم(*راستہ);
+        size_t sz = GetModuleFileName(m, راستہ, راستہ_سائز);
+        اگر (sz > 0 && sz < راستہ_سائز)
         {
-            path[sz] = TCHAR('\0');
-#ifdef _UNICODE
-            char char_path[MAX_PATH];
-            size_t copied = wcstombs(char_path, path, MAX_PATH);
-            CV_Assert((copied != MAX_PATH) && (copied != (size_t)-1));
-            return cv::String(char_path);
-#else
-            return cv::String(path);
-#endif
+            راستہ[sz] = TCHAR('\0');
+#اگر_تعریف_شدہ _UNICODE
+            حرف char_راستہ[MAX_راستہ];
+            size_t copied = wcstombs(char_راستہ, راستہ, MAX_راستہ);
+            CV_Assert((copied != MAX_راستہ) && (copied != (size_t)-1));
+            واپس cv::String(char_راستہ);
+#ورنہ
+            واپس cv::String(راستہ);
+#اگر_ختم
         }
     }
-#elif defined(__linux__)
+#وگرنہ_اگر defined(__linux__)
     Dl_info info;
-    if (0 != dladdr(addr, &info))
+    اگر (0 != dladdr(addr, &info))
     {
-        return cv::String(info.dli_fname);
+        واپس cv::String(info.dli_fname);
     }
-#elif defined(__APPLE__)
-# if TARGET_OS_MAC
+#وگرنہ_اگر defined(__APPLE__)
+# اگر ہدف_OS_MAC
     Dl_info info;
-    if (0 != dladdr(addr, &info))
+    اگر (0 != dladdr(addr, &info))
     {
-        return cv::String(info.dli_fname);
+        واپس cv::String(info.dli_fname);
     }
 # endif
-#else
+#ورنہ
     // not supported, skip
-#endif
-    return cv::String();
+#اگر_ختم
+    واپس cv::String();
 }
 
-bool getBinLocation(std::string& dst)
+منطقی getBinLocation(std::string& dst)
 {
-    dst = getModuleLocation((void*)getModuleLocation); // using code address, doesn't work with static linkage!
-    return !dst.empty();
+    dst = getModuleLocation((خالی*)getModuleLocation); // using code address, doesn't work with static linkage!
+    واپس !dst.empty();
 }
 
-#ifdef _WIN32
-bool getBinLocation(std::wstring& dst)
+#اگر_تعریف_شدہ _WIN32
+منطقی getBinLocation(std::wstring& dst)
 {
     HMODULE m = 0;
-#if _WIN32_WINNT >= 0x0501 && (!defined(WINAPI_FAMILY) || (WINAPI_FAMILY == WINAPI_FAMILY_DESKTOP_APP))
-    void* addr = (void*)getModuleLocation; // using code address, doesn't work with static linkage!
-    ::GetModuleHandleEx(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT,
+#اگر _WIN32_WINNT >= 0x0501 && (!defined(WINAPI_FAMILY) || (WINAPI_FAMILY == WINAPI_FAMILY_DESKTOP_APP))
+    خالی* addr = (خالی*)getModuleLocation; // using code address, doesn't work with static linkage!
+    ::GetModuleHandleEx(GET_MODULE_HANDLE_EX_FLAG_FROM_پتہ | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT,
         reinterpret_cast<LPCTSTR>(addr),
         &m);
-#endif
-    if (m)
+#اگر_ختم
+    اگر (m)
     {
-        wchar_t path[4096];
-        const size_t path_size = sizeof(path)/sizeof(*path);
-        size_t sz = GetModuleFileNameW(m, path, path_size);
-        if (sz > 0 && sz < path_size)
+        wchar_t راستہ[4096];
+        ثابت size_t راستہ_سائز = حجم(راستہ)/حجم(*راستہ);
+        size_t sz = GetModuleFileNameW(m, راستہ, راستہ_سائز);
+        اگر (sz > 0 && sz < راستہ_سائز)
         {
-            path[sz] = '\0';
-            dst.assign(path, sz);
-            return true;
+            راستہ[sz] = '\0';
+            dst.assign(راستہ, sz);
+            واپس سچ;
         }
     }
-    return false;
+    واپس جھوٹ;
 }
-#endif
+#اگر_ختم
 
-cv::String findDataFile(const cv::String& relative_path,
-                        const char* configuration_parameter,
-                        const std::vector<String>* search_paths,
-                        const std::vector<String>* subdir_paths)
+cv::String ڈھونڈو_ڈیٹا_File(ثابت cv::String& relative_راستہ,
+                        ثابت حرف* configuration_parameter,
+                        ثابت std::vector<String>* تلاش_paths,
+                        ثابت std::vector<String>* subdir_paths)
 {
-#if OPENCV_HAVE_FILESYSTEM_SUPPORT
+#اگر OPENCV_HAVE_FILESYSTEM_SUPPORT
     configuration_parameter = configuration_parameter ? configuration_parameter : "OPENCV_DATA_PATH";
-    CV_LOG_DEBUG(NULL, cv::format("utils::findDataFile('%s', %s)", relative_path.c_str(), configuration_parameter));
+    CV_LOG_DEBUG(تہی, cv::format("utils::findDataFile('%s', %s)", relative_راستہ.c_str(), configuration_parameter));
 
-#define TRY_FILE_WITH_PREFIX(prefix) \
+#تعریف_کرو TRY_FILE_WITH_سابقہ(سابقہ) \
 { \
-    cv::String path = utils::fs::join(prefix, relative_path); \
-    CV_LOG_DEBUG(NULL, cv::format("... Line %d: trying open '%s'", __LINE__, path.c_str())); \
-    FILE* f = fopen(path.c_str(), "rb"); \
-    if(f) { \
+    cv::String راستہ = utils::fs::join(سابقہ, relative_راستہ); \
+    CV_LOG_DEBUG(تہی, cv::format("... Line %d: trying open '%s'", __LINE__, راستہ.c_str())); \
+    FILE* f = fopen(راستہ.c_str(), "rb"); \
+    اگر(f) { \
         fclose(f); \
-        return path; \
+        واپس راستہ; \
     } \
 }
 
 
     // Step 0: check current directory or absolute path at first
-    TRY_FILE_WITH_PREFIX("");
+    TRY_FILE_WITH_سابقہ("");
 
 
     // Step 1
-    const std::vector<cv::String>& search_path = search_paths ? *search_paths : _getDataSearchPath();
-    for(size_t i = search_path.size(); i > 0; i--)
+    ثابت std::vector<cv::String>& تلاش_راستہ = تلاش_paths ? *تلاش_paths : get_ڈیٹا_تلاش_راستہ();
+    برائے(size_t i = تلاش_راستہ.size(); i > 0; i--)
     {
-        const cv::String& prefix = search_path[i - 1];
-        TRY_FILE_WITH_PREFIX(prefix);
+        ثابت cv::String& سابقہ = تلاش_راستہ[i - 1];
+        TRY_FILE_WITH_سابقہ(سابقہ);
     }
 
-    const std::vector<cv::String>& search_subdir = subdir_paths ? *subdir_paths : _getDataSearchSubDirectory();
+    ثابت std::vector<cv::String>& تلاش_subdir = subdir_paths ? *subdir_paths : get_ڈیٹا_تلاش_Sub_Directory();
 
 
     // Step 2
-    const cv::String configuration_parameter_s(configuration_parameter ? configuration_parameter : "");
-    const cv::utils::Paths& search_hint = configuration_parameter_s.empty() ? cv::utils::Paths()
+    ثابت cv::String configuration_parameter_s(configuration_parameter ? configuration_parameter : "");
+    ثابت cv::utils::Paths& تلاش_hint = configuration_parameter_s.empty() ? cv::utils::Paths()
                                           : getConfigurationParameterPaths((configuration_parameter_s + "_HINT").c_str());
-    for (size_t k = 0; k < search_hint.size(); k++)
+    برائے (size_t k = 0; k < تلاش_hint.size(); k++)
     {
-        cv::String datapath = search_hint[k];
-        if (datapath.empty())
-            continue;
-        if (utils::fs::isDirectory(datapath))
+        cv::String datapath = تلاش_hint[k];
+        اگر (datapath.empty())
+            جاری;
+        اگر (utils::fs::isDirectory(datapath))
         {
-            CV_LOG_DEBUG(NULL, "utils::findDataFile(): trying " << configuration_parameter << "_HINT=" << datapath);
-            for(size_t i = search_subdir.size(); i > 0; i--)
+            CV_LOG_DEBUG(تہی, "utils::findDataFile(): trying " << configuration_parameter << "_HINT=" << datapath);
+            برائے(size_t i = تلاش_subdir.size(); i > 0; i--)
             {
-                const cv::String& subdir = search_subdir[i - 1];
-                cv::String prefix = utils::fs::join(datapath, subdir);
-                TRY_FILE_WITH_PREFIX(prefix);
+                ثابت cv::String& subdir = تلاش_subdir[i - 1];
+                cv::String سابقہ = utils::fs::join(datapath, subdir);
+                TRY_FILE_WITH_سابقہ(سابقہ);
             }
         }
-        else
+        ورنہ
         {
-            CV_LOG_WARNING(NULL, configuration_parameter << "_HINT is specified but it is not a directory: " << datapath);
+            CV_LOG_WARNING(تہی, configuration_parameter << "_HINT is specified but it is not a directory: " << datapath);
         }
     }
 
 
     // Step 3
-    const cv::utils::Paths& override_paths = configuration_parameter_s.empty() ? cv::utils::Paths()
+    ثابت cv::utils::Paths& override_paths = configuration_parameter_s.empty() ? cv::utils::Paths()
                                            : getConfigurationParameterPaths(configuration_parameter);
-    for (size_t k = 0; k < override_paths.size(); k++)
+    برائے (size_t k = 0; k < override_paths.size(); k++)
     {
         cv::String datapath = override_paths[k];
-        if (datapath.empty())
-            continue;
-        if (utils::fs::isDirectory(datapath))
+        اگر (datapath.empty())
+            جاری;
+        اگر (utils::fs::isDirectory(datapath))
         {
-            CV_LOG_DEBUG(NULL, "utils::findDataFile(): trying " << configuration_parameter << "=" << datapath);
-            for(size_t i = search_subdir.size(); i > 0; i--)
+            CV_LOG_DEBUG(تہی, "utils::findDataFile(): trying " << configuration_parameter << "=" << datapath);
+            برائے(size_t i = تلاش_subdir.size(); i > 0; i--)
             {
-                const cv::String& subdir = search_subdir[i - 1];
-                cv::String prefix = utils::fs::join(datapath, subdir);
-                TRY_FILE_WITH_PREFIX(prefix);
+                ثابت cv::String& subdir = تلاش_subdir[i - 1];
+                cv::String سابقہ = utils::fs::join(datapath, subdir);
+                TRY_FILE_WITH_سابقہ(سابقہ);
             }
         }
-        else
+        ورنہ
         {
-            CV_LOG_WARNING(NULL, configuration_parameter << " is specified but it is not a directory: " << datapath);
+            CV_LOG_WARNING(تہی, configuration_parameter << " is specified but it is not a directory: " << datapath);
         }
     }
-    if (!override_paths.empty())
+    اگر (!override_paths.empty())
     {
-        CV_LOG_INFO(NULL, "utils::findDataFile(): can't find data file via " << configuration_parameter << " configuration override: " << relative_path);
-        return cv::String();
+        CV_LOG_INFO(تہی, "utils::findDataFile(): can't find data file via " << configuration_parameter << " configuration override: " << relative_راستہ);
+        واپس cv::String();
     }
 
 
     // Steps: 4, 5, 6
     cv::String cwd = utils::fs::getcwd();
     cv::String build_dir(OPENCV_BUILD_DIR);
-    bool has_tested_build_directory = false;
-    if (isSubDirectory(build_dir, cwd) || isSubDirectory(utils::fs::canonical(build_dir), utils::fs::canonical(cwd)))
+    منطقی has_tested_build_directory = جھوٹ;
+    اگر (isSubDirectory(build_dir, cwd) || isSubDirectory(utils::fs::canonical(build_dir), utils::fs::canonical(cwd)))
     {
-        CV_LOG_DEBUG(NULL, "utils::findDataFile(): the current directory is build sub-directory: " << cwd);
-        const char* build_subdirs[] = { OPENCV_DATA_BUILD_DIR_SEARCH_PATHS };
-        for (size_t k = 0; k < sizeof(build_subdirs)/sizeof(build_subdirs[0]); k++)
+        CV_LOG_DEBUG(تہی, "utils::findDataFile(): the current directory is build sub-directory: " << cwd);
+        ثابت حرف* build_subdirs[] = { OPENCV_ڈیٹا_BUILD_DIR_تلاش_PATHS };
+        برائے (size_t k = 0; k < حجم(build_subdirs)/حجم(build_subdirs[0]); k++)
         {
-            CV_LOG_DEBUG(NULL, "utils::findDataFile(): <build>/" << build_subdirs[k]);
+            CV_LOG_DEBUG(تہی, "utils::findDataFile(): <build>/" << build_subdirs[k]);
             cv::String datapath = utils::fs::join(build_dir, build_subdirs[k]);
-            if (utils::fs::isDirectory(datapath))
+            اگر (utils::fs::isDirectory(datapath))
             {
-                for(size_t i = search_subdir.size(); i > 0; i--)
+                برائے(size_t i = تلاش_subdir.size(); i > 0; i--)
                 {
-                    const cv::String& subdir = search_subdir[i - 1];
-                    cv::String prefix = utils::fs::join(datapath, subdir);
-                    TRY_FILE_WITH_PREFIX(prefix);
+                    ثابت cv::String& subdir = تلاش_subdir[i - 1];
+                    cv::String سابقہ = utils::fs::join(datapath, subdir);
+                    TRY_FILE_WITH_سابقہ(سابقہ);
                 }
             }
         }
-        has_tested_build_directory = true;
+        has_tested_build_directory = سچ;
     }
 
-    cv::String source_dir;
-    cv::String try_source_dir = cwd;
-    for (int levels = 0; levels < 3; ++levels)
+    cv::String ماخذ_dir;
+    cv::String try_ماخذ_dir = cwd;
+    برائے (صحیح سطحیں = 0; سطحیں < 3; ++سطحیں)
     {
-        if (utils::fs::exists(utils::fs::join(try_source_dir, "modules/core/include/opencv2/core/version.hpp")))
+        اگر (utils::fs::exists(utils::fs::join(try_ماخذ_dir, "modules/core/include/opencv2/core/version.hpp")))
         {
-            source_dir = try_source_dir;
-            break;
+            ماخذ_dir = try_ماخذ_dir;
+            توڑو;
         }
-        try_source_dir = utils::fs::join(try_source_dir, "/..");
+        try_ماخذ_dir = utils::fs::join(try_ماخذ_dir, "/..");
     }
-    if (!source_dir.empty())
+    اگر (!ماخذ_dir.empty())
     {
-        CV_LOG_DEBUG(NULL, "utils::findDataFile(): the current directory is source sub-directory: " << source_dir);
-        CV_LOG_DEBUG(NULL, "utils::findDataFile(): <source>" << source_dir);
-        cv::String datapath = source_dir;
-        if (utils::fs::isDirectory(datapath))
+        CV_LOG_DEBUG(تہی, "utils::findDataFile(): the current directory is source sub-directory: " << ماخذ_dir);
+        CV_LOG_DEBUG(تہی, "utils::findDataFile(): <source>" << ماخذ_dir);
+        cv::String datapath = ماخذ_dir;
+        اگر (utils::fs::isDirectory(datapath))
         {
-            for(size_t i = search_subdir.size(); i > 0; i--)
+            برائے(size_t i = تلاش_subdir.size(); i > 0; i--)
             {
-                const cv::String& subdir = search_subdir[i - 1];
-                cv::String prefix = utils::fs::join(datapath, subdir);
-                TRY_FILE_WITH_PREFIX(prefix);
+                ثابت cv::String& subdir = تلاش_subdir[i - 1];
+                cv::String سابقہ = utils::fs::join(datapath, subdir);
+                TRY_FILE_WITH_سابقہ(سابقہ);
             }
         }
     }
 
-    cv::String module_path;
-    if (getBinLocation(module_path))
+    cv::String module_راستہ;
+    اگر (getBinLocation(module_راستہ))
     {
-        CV_LOG_DEBUG(NULL, "Detected module path: '" << module_path << '\'');
+        CV_LOG_DEBUG(تہی, "Detected module path: '" << module_راستہ << '\'');
     }
-    else
+    ورنہ
     {
-        CV_LOG_INFO(NULL, "Can't detect module binaries location");
+        CV_LOG_INFO(تہی, "Can't detect module binaries location");
     }
 
-    if (!has_tested_build_directory &&
-        (isSubDirectory(build_dir, module_path) || isSubDirectory(utils::fs::canonical(build_dir), utils::fs::canonical(module_path)))
+    اگر (!has_tested_build_directory &&
+        (isSubDirectory(build_dir, module_راستہ) || isSubDirectory(utils::fs::canonical(build_dir), utils::fs::canonical(module_راستہ)))
     )
     {
-        CV_LOG_DEBUG(NULL, "utils::findDataFile(): the binary module directory is build sub-directory: " << module_path);
-        const char* build_subdirs[] = { OPENCV_DATA_BUILD_DIR_SEARCH_PATHS };
-        for (size_t k = 0; k < sizeof(build_subdirs)/sizeof(build_subdirs[0]); k++)
+        CV_LOG_DEBUG(تہی, "utils::findDataFile(): the binary module directory is build sub-directory: " << module_راستہ);
+        ثابت حرف* build_subdirs[] = { OPENCV_ڈیٹا_BUILD_DIR_تلاش_PATHS };
+        برائے (size_t k = 0; k < حجم(build_subdirs)/حجم(build_subdirs[0]); k++)
         {
-            CV_LOG_DEBUG(NULL, "utils::findDataFile(): <build>/" << build_subdirs[k]);
+            CV_LOG_DEBUG(تہی, "utils::findDataFile(): <build>/" << build_subdirs[k]);
             cv::String datapath = utils::fs::join(build_dir, build_subdirs[k]);
-            if (utils::fs::isDirectory(datapath))
+            اگر (utils::fs::isDirectory(datapath))
             {
-                for(size_t i = search_subdir.size(); i > 0; i--)
+                برائے(size_t i = تلاش_subdir.size(); i > 0; i--)
                 {
-                    const cv::String& subdir = search_subdir[i - 1];
-                    cv::String prefix = utils::fs::join(datapath, subdir);
-                    TRY_FILE_WITH_PREFIX(prefix);
+                    ثابت cv::String& subdir = تلاش_subdir[i - 1];
+                    cv::String سابقہ = utils::fs::join(datapath, subdir);
+                    TRY_FILE_WITH_سابقہ(سابقہ);
                 }
             }
         }
     }
 
-#if defined OPENCV_INSTALL_DATA_DIR_RELATIVE
-    if (!module_path.empty())  // require module path
+#اگر defined OPENCV_INSTALL_ڈیٹا_DIR_RELATIVE
+    اگر (!module_راستہ.empty())  // require module path
     {
-        size_t pos = module_path.rfind('/');
-        if (pos == cv::String::npos)
-            pos = module_path.rfind('\\');
-        cv::String module_dir = (pos == cv::String::npos) ? module_path : module_path.substr(0, pos);
-        const char* install_subdirs[] = { OPENCV_INSTALL_DATA_DIR_RELATIVE };
-        for (size_t k = 0; k < sizeof(install_subdirs)/sizeof(install_subdirs[0]); k++)
+        size_t pos = module_راستہ.rfind('/');
+        اگر (pos == cv::String::npos)
+            pos = module_راستہ.rfind('\\');
+        cv::String module_dir = (pos == cv::String::npos) ? module_راستہ : module_راستہ.substr(0, pos);
+        ثابت حرف* install_subdirs[] = { OPENCV_INSTALL_ڈیٹا_DIR_RELATIVE };
+        برائے (size_t k = 0; k < حجم(install_subdirs)/حجم(install_subdirs[0]); k++)
         {
             cv::String datapath = utils::fs::join(module_dir, install_subdirs[k]);
-            CV_LOG_DEBUG(NULL, "utils::findDataFile(): trying install path (from binary path): " << datapath);
-            if (utils::fs::isDirectory(datapath))
+            CV_LOG_DEBUG(تہی, "utils::findDataFile(): trying install path (from binary path): " << datapath);
+            اگر (utils::fs::isDirectory(datapath))
             {
-                for(size_t i = search_subdir.size(); i > 0; i--)
+                برائے(size_t i = تلاش_subdir.size(); i > 0; i--)
                 {
-                    const cv::String& subdir = search_subdir[i - 1];
-                    cv::String prefix = utils::fs::join(datapath, subdir);
-                    TRY_FILE_WITH_PREFIX(prefix);
+                    ثابت cv::String& subdir = تلاش_subdir[i - 1];
+                    cv::String سابقہ = utils::fs::join(datapath, subdir);
+                    TRY_FILE_WITH_سابقہ(سابقہ);
                 }
             }
-            else
+            ورنہ
             {
-                CV_LOG_DEBUG(NULL, "utils::findDataFile(): ... skip, not a valid directory: " << datapath);
+                CV_LOG_DEBUG(تہی, "utils::findDataFile(): ... skip, not a valid directory: " << datapath);
             }
         }
     }
-#endif
+#اگر_ختم
 
-#if defined OPENCV_INSTALL_PREFIX && defined OPENCV_DATA_INSTALL_PATH
-    cv::String install_dir(OPENCV_INSTALL_PREFIX);
+#اگر defined OPENCV_INSTALL_سابقہ && defined OPENCV_ڈیٹا_INSTALL_راستہ
+    cv::String install_dir(OPENCV_INSTALL_سابقہ);
     // use core/world module path and verify that library is running from installation directory
     // It is necessary to avoid touching of unrelated common /usr/local path
-    if (module_path.empty()) // can't determine
-        module_path = install_dir;
-    if (isSubDirectory(install_dir, module_path) || isSubDirectory(utils::fs::canonical(install_dir), utils::fs::canonical(module_path)))
+    اگر (module_راستہ.empty()) // can't determine
+        module_راستہ = install_dir;
+    اگر (isSubDirectory(install_dir, module_راستہ) || isSubDirectory(utils::fs::canonical(install_dir), utils::fs::canonical(module_راستہ)))
     {
-        cv::String datapath = utils::fs::join(install_dir, OPENCV_DATA_INSTALL_PATH);
-        if (utils::fs::isDirectory(datapath))
+        cv::String datapath = utils::fs::join(install_dir, OPENCV_ڈیٹا_INSTALL_راستہ);
+        اگر (utils::fs::isDirectory(datapath))
         {
-            CV_LOG_DEBUG(NULL, "utils::findDataFile(): trying install path: " << datapath);
-            for(size_t i = search_subdir.size(); i > 0; i--)
+            CV_LOG_DEBUG(تہی, "utils::findDataFile(): trying install path: " << datapath);
+            برائے(size_t i = تلاش_subdir.size(); i > 0; i--)
             {
-                const cv::String& subdir = search_subdir[i - 1];
-                cv::String prefix = utils::fs::join(datapath, subdir);
-                TRY_FILE_WITH_PREFIX(prefix);
+                ثابت cv::String& subdir = تلاش_subdir[i - 1];
+                cv::String سابقہ = utils::fs::join(datapath, subdir);
+                TRY_FILE_WITH_سابقہ(سابقہ);
             }
         }
     }
-#endif
+#اگر_ختم
 
-    return cv::String();  // not found
-#else // OPENCV_HAVE_FILESYSTEM_SUPPORT
-    CV_UNUSED(relative_path);
-    CV_UNUSED(configuration_parameter);
-    CV_UNUSED(search_paths);
-    CV_UNUSED(subdir_paths);
+    واپس cv::String();  // not found
+#ورنہ // OPENCV_HAVE_FILESYSTEM_SUPPORT
+    CV_غیر_مستعمل(relative_راستہ);
+    CV_غیر_مستعمل(configuration_parameter);
+    CV_غیر_مستعمل(تلاش_paths);
+    CV_غیر_مستعمل(subdir_paths);
     CV_Error(Error::StsNotImplemented, "File system support is disabled in this OpenCV build!");
-#endif // OPENCV_HAVE_FILESYSTEM_SUPPORT
+#اگر_ختم // OPENCV_HAVE_FILESYSTEM_SUPPORT
 }
 
-cv::String findDataFile(const cv::String& relative_path, bool required, const char* configuration_parameter)
+cv::String ڈھونڈو_ڈیٹا_File(ثابت cv::String& relative_راستہ, منطقی required, ثابت حرف* configuration_parameter)
 {
-#if OPENCV_HAVE_FILESYSTEM_SUPPORT
-    CV_LOG_DEBUG(NULL, cv::format("cv::utils::findDataFile('%s', %s, %s)",
-                                  relative_path.c_str(), required ? "true" : "false",
+#اگر OPENCV_HAVE_FILESYSTEM_SUPPORT
+    CV_LOG_DEBUG(تہی, cv::format("cv::utils::findDataFile('%s', %s, %s)",
+                                  relative_راستہ.c_str(), required ? "true" : "false",
                                   configuration_parameter ? configuration_parameter : "NULL"));
-    cv::String result = cv::utils::findDataFile(relative_path,
+    cv::String نتیجہ = cv::utils::ڈھونڈو_ڈیٹا_File(relative_راستہ,
                                                 configuration_parameter,
-                                                NULL,
-                                                NULL);
-    if (result.empty() && required)
-        CV_Error(cv::Error::StsError, cv::format("OpenCV: Can't find required data file: %s", relative_path.c_str()));
-    return result;
-#else // OPENCV_HAVE_FILESYSTEM_SUPPORT
-    CV_UNUSED(relative_path);
-    CV_UNUSED(required);
-    CV_UNUSED(configuration_parameter);
+                                                تہی,
+                                                تہی);
+    اگر (نتیجہ.empty() && required)
+        CV_Error(cv::Error::StsError, cv::format("OpenCV: Can't find required data file: %s", relative_راستہ.c_str()));
+    واپس نتیجہ;
+#ورنہ // OPENCV_HAVE_FILESYSTEM_SUPPORT
+    CV_غیر_مستعمل(relative_راستہ);
+    CV_غیر_مستعمل(required);
+    CV_غیر_مستعمل(configuration_parameter);
     CV_Error(Error::StsNotImplemented, "File system support is disabled in this OpenCV build!");
-#endif // OPENCV_HAVE_FILESYSTEM_SUPPORT
+#اگر_ختم // OPENCV_HAVE_FILESYSTEM_SUPPORT
 }
 
 }} // namespace

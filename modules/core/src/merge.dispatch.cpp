@@ -3,15 +3,15 @@
 // of this distribution and at http://opencv.org/license.html
 
 
-#include "precomp.hpp"
-#include "opencl_kernels_core.hpp"
+#شامل "precomp.hpp"
+#شامل "opencl_kernels_core.hpp"
 
-#include "merge.simd.hpp"
-#include "merge.simd_declarations.hpp" // defines CV_CPU_DISPATCH_MODES_ALL=AVX2,...,BASELINE based on CMakeLists.txt content
+#شامل "merge.simd.hpp"
+#شامل "merge.simd_declarations.hpp" // defines CV_CPU_DISPATCH_MODES_ALL=AVX2,...,BASELINE based on CMakeLists.txt content
 
-namespace cv { namespace hal {
+نامخلا cv { نامخلا hal {
 
-void merge8u(const uchar** src, uchar* dst, int len, int cn )
+خالی merge8u(ثابت uchar** src, uchar* dst, صحیح len, صحیح cn )
 {
     CV_INSTRUMENT_REGION();
     CALL_HAL(merge8u, cv_hal_merge8u, src, dst, len, cn)
@@ -19,7 +19,7 @@ void merge8u(const uchar** src, uchar* dst, int len, int cn )
         CV_CPU_DISPATCH_MODES_ALL);
 }
 
-void merge16u(const ushort** src, ushort* dst, int len, int cn )
+خالی merge16u(ثابت ushort** src, ushort* dst, صحیح len, صحیح cn )
 {
     CV_INSTRUMENT_REGION();
     CALL_HAL(merge16u, cv_hal_merge16u, src, dst, len, cn)
@@ -27,7 +27,7 @@ void merge16u(const ushort** src, ushort* dst, int len, int cn )
         CV_CPU_DISPATCH_MODES_ALL);
 }
 
-void merge32s(const int** src, int* dst, int len, int cn )
+خالی merge32s(ثابت صحیح** src, صحیح* dst, صحیح len, صحیح cn )
 {
     CV_INSTRUMENT_REGION();
     CALL_HAL(merge32s, cv_hal_merge32s, src, dst, len, cn)
@@ -35,7 +35,7 @@ void merge32s(const int** src, int* dst, int len, int cn )
         CV_CPU_DISPATCH_MODES_ALL);
 }
 
-void merge64s(const int64** src, int64* dst, int len, int cn )
+خالی merge64s(ثابت int64** src, int64* dst, صحیح len, صحیح cn )
 {
     CV_INSTRUMENT_REGION();
     CALL_HAL(merge64s, cv_hal_merge64s, src, dst, len, cn)
@@ -46,198 +46,198 @@ void merge64s(const int64** src, int64* dst, int len, int cn )
 } // namespace cv::hal::
 
 
-typedef void (*MergeFunc)(const void** src, void* dst, int len, int cn);
+قسمتعریف خالی (*ملاؤ_Func)(ثابت خالی** src, خالی* dst, صحیح len, صحیح cn);
 
-template<typename T, void (*fn)(const T**, T*, int, int)>
-static void mergeWrap(const void** src, void* dst, int len, int cn)
+سانچہ<قسم_نام T, خالی (*fn)(ثابت T**, T*, صحیح, صحیح)>
+ساکن خالی ملاؤ_Wrap(ثابت خالی** src, خالی* dst, صحیح len, صحیح cn)
 {
-    fn((const T**)src, (T*)dst, len, cn);
+    fn((ثابت T**)src, (T*)dst, len, cn);
 }
 
-static MergeFunc getMergeFunc(int depth)
+ساکن ملاؤ_Func get_ملاؤ_Func(صحیح گہرائی)
 {
-    static MergeFunc mergeTab[CV_DEPTH_MAX] =
+    ساکن ملاؤ_Func ملاؤ_Tab[CV_گہرائی_MAX] =
     {
-        mergeWrap<uchar, cv::hal::merge8u>, mergeWrap<uchar, cv::hal::merge8u>,
-        mergeWrap<ushort, cv::hal::merge16u>, mergeWrap<ushort, cv::hal::merge16u>,
-        mergeWrap<int, cv::hal::merge32s>, mergeWrap<int, cv::hal::merge32s>,
-        mergeWrap<int64_t, cv::hal::merge64s>, mergeWrap<ushort, cv::hal::merge16u>,
-        mergeWrap<ushort, cv::hal::merge16u>, mergeWrap<uchar, cv::hal::merge8u>,
-        mergeWrap<int64_t, cv::hal::merge64s>, mergeWrap<int64_t, cv::hal::merge64s>,
-        mergeWrap<int, cv::hal::merge32s>, mergeWrap<uchar, cv::hal::merge8u>,
-        mergeWrap<uchar, cv::hal::merge8u>, 0,
+        ملاؤ_Wrap<uchar, cv::hal::merge8u>, ملاؤ_Wrap<uchar, cv::hal::merge8u>,
+        ملاؤ_Wrap<ushort, cv::hal::merge16u>, ملاؤ_Wrap<ushort, cv::hal::merge16u>,
+        ملاؤ_Wrap<صحیح, cv::hal::merge32s>, ملاؤ_Wrap<صحیح, cv::hal::merge32s>,
+        ملاؤ_Wrap<int64_t, cv::hal::merge64s>, ملاؤ_Wrap<ushort, cv::hal::merge16u>,
+        ملاؤ_Wrap<ushort, cv::hal::merge16u>, ملاؤ_Wrap<uchar, cv::hal::merge8u>,
+        ملاؤ_Wrap<int64_t, cv::hal::merge64s>, ملاؤ_Wrap<int64_t, cv::hal::merge64s>,
+        ملاؤ_Wrap<صحیح, cv::hal::merge32s>, ملاؤ_Wrap<uchar, cv::hal::merge8u>,
+        ملاؤ_Wrap<uchar, cv::hal::merge8u>, 0,
     };
 
-    return mergeTab[depth];
+    واپس ملاؤ_Tab[گہرائی];
 }
 
-#ifdef HAVE_IPP
+#اگر_تعریف_شدہ HAVE_IPP
 
-static bool ipp_merge(const Mat* mv, Mat& dst, int channels)
+ساکن منطقی ipp_ملاؤ(ثابت Mat* mv, Mat& dst, صحیح channels)
 {
-#ifdef HAVE_IPP_IW_LL
+#اگر_تعریف_شدہ HAVE_IPP_IW_LL
     CV_INSTRUMENT_REGION_IPP();
 
-    if(channels != 3 && channels != 4)
-        return false;
+    اگر(channels != 3 && channels != 4)
+        واپس جھوٹ;
 
-    if(mv[0].dims <= 2)
+    اگر(mv[0].dims <= 2)
     {
-        IppiSize    size       = ippiSize(mv[0].size());
-        const void *srcPtrs[4] = {NULL};
-        size_t      srcStep    = mv[0].step;
-        for(int i = 0; i < channels; i++)
+        Ippi_سائز    size       = ippi_سائز(mv[0].size());
+        ثابت خالی *srcPtrs[4] = {تہی};
+        size_t      src_قدم_3    = mv[0].قدم;
+        برائے(صحیح i = 0; i < channels; i++)
         {
             srcPtrs[i] = mv[i].ptr();
-            if(srcStep != mv[i].step)
-                return false;
+            اگر(src_قدم_3 != mv[i].قدم)
+                واپس جھوٹ;
         }
 
-        return CV_INSTRUMENT_FUN_IPP(llwiCopyMerge, srcPtrs, (int)srcStep, dst.ptr(), (int)dst.step, size, (int)mv[0].elemSize1(), channels, 0) >= 0;
+        واپس CV_INSTRUMENT_FUN_IPP(llwi_Copy_ملاؤ, srcPtrs, (صحیح)src_قدم_3, dst.ptr(), (صحیح)dst.قدم, size, (صحیح)mv[0].elemSize1(), channels, 0) >= 0;
     }
-    else
+    ورنہ
     {
-        const Mat *arrays[5] = {NULL};
-        uchar     *ptrs[5]   = {NULL};
+        ثابت Mat *arrays[5] = {تہی};
+        uchar     *ptrs[5]   = {تہی};
         arrays[0] = &dst;
 
-        for(int i = 1; i < channels; i++)
+        برائے(صحیح i = 1; i < channels; i++)
         {
             arrays[i] = &mv[i-1];
         }
 
         NAryMatIterator it(arrays, ptrs);
-        IppiSize size = { (int)it.size, 1 };
+        Ippi_سائز size = { (صحیح)it.size, 1 };
 
-        for( size_t i = 0; i < it.nplanes; i++, ++it )
+        برائے( size_t i = 0; i < it.nplanes; i++, ++it )
         {
-            if(CV_INSTRUMENT_FUN_IPP(llwiCopyMerge, (const void**)&ptrs[1], 0, ptrs[0], 0, size, (int)mv[0].elemSize1(), channels, 0) < 0)
-                return false;
+            اگر(CV_INSTRUMENT_FUN_IPP(llwi_Copy_ملاؤ, (ثابت خالی**)&ptrs[1], 0, ptrs[0], 0, size, (صحیح)mv[0].elemSize1(), channels, 0) < 0)
+                واپس جھوٹ;
         }
-        return true;
+        واپس سچ;
     }
-#else
-    CV_UNUSED(dst); CV_UNUSED(mv); CV_UNUSED(channels);
-    return false;
-#endif
+#ورنہ
+    CV_غیر_مستعمل(dst); CV_غیر_مستعمل(mv); CV_غیر_مستعمل(channels);
+    واپس جھوٹ;
+#اگر_ختم
 }
-#endif
+#اگر_ختم
 
-void merge(const Mat* mv, size_t n, OutputArray _dst)
+خالی ملاؤ(ثابت Mat* mv, size_t n, OutputArray _dst)
 {
     CV_INSTRUMENT_REGION();
 
     CV_Assert( mv && n > 0 );
     CV_Assert(!mv[0].empty());
 
-    int depth = mv[0].depth();
-    bool allch1 = true;
-    int k, cn = 0;
+    صحیح گہرائی = mv[0].گہرائی();
+    منطقی allch1 = سچ;
+    صحیح k, cn = 0;
     size_t i;
 
-    for( i = 0; i < n; i++ )
+    برائے( i = 0; i < n; i++ )
     {
-        CV_Assert(mv[i].size == mv[0].size && mv[i].depth() == depth);
+        CV_Assert(mv[i].size == mv[0].size && mv[i].گہرائی() == گہرائی);
         allch1 = allch1 && mv[i].channels() == 1;
         cn += mv[i].channels();
     }
 
     CV_Assert( 0 < cn && cn <= CV_CN_MAX );
-    _dst.create(mv[0].size, CV_MAKETYPE(depth, cn));
+    _dst.create(mv[0].size, CV_MAKETYPE(گہرائی, cn));
     Mat dst = _dst.getMat();
 
-    if( n == 1 )
+    اگر( n == 1 )
     {
-        mv[0].copyTo(dst);
-        return;
+        mv[0].copy_مقصد(dst);
+        واپس;
     }
 
-    CV_IPP_RUN(allch1, ipp_merge(mv, dst, (int)n));
+    CV_IPP_تسلسل(allch1, ipp_ملاؤ(mv, dst, (صحیح)n));
 
-    if( !allch1 )
+    اگر( !allch1 )
     {
-        AutoBuffer<int> pairs(cn*2);
-        int j, ni=0;
+        Auto_بفر<صحیح> جوڑے(cn*2);
+        صحیح j, ni=0;
 
-        for( i = 0, j = 0; i < n; i++, j += ni )
+        برائے( i = 0, j = 0; i < n; i++, j += ni )
         {
             ni = mv[i].channels();
-            for( k = 0; k < ni; k++ )
+            برائے( k = 0; k < ni; k++ )
             {
-                pairs[(j+k)*2] = j + k;
-                pairs[(j+k)*2+1] = j + k;
+                جوڑے[(j+k)*2] = j + k;
+                جوڑے[(j+k)*2+1] = j + k;
             }
         }
-        mixChannels( mv, n, &dst, 1, &pairs[0], cn );
-        return;
+        mixChannels( mv, n, &dst, 1, &جوڑے[0], cn );
+        واپس;
     }
 
-    MergeFunc func = getMergeFunc(depth);
+    ملاؤ_Func func = get_ملاؤ_Func(گہرائی);
     CV_Assert( func != 0 );
 
-    size_t esz = dst.elemSize(), esz1 = dst.elemSize1();
-    size_t blocksize0 = (int)((BLOCK_SIZE + esz-1)/esz);
-    AutoBuffer<uchar> _buf((cn+1)*(sizeof(Mat*) + sizeof(uchar*)) + 16);
-    const Mat** arrays = (const Mat**)_buf.data();
+    size_t esz = dst.elem_سائز(), esz1 = dst.elemSize1();
+    size_t blocksize0 = (صحیح)((بلاک_سائز + esz-1)/esz);
+    Auto_بفر<uchar> _buf((cn+1)*(حجم(Mat*) + حجم(uchar*)) + 16);
+    ثابت Mat** arrays = (ثابت Mat**)_buf.ڈیٹا();
     uchar** ptrs = (uchar**)alignPtr(arrays + cn + 1, 16);
 
     arrays[0] = &dst;
-    for( k = 0; k < cn; k++ )
+    برائے( k = 0; k < cn; k++ )
         arrays[k+1] = &mv[k];
 
     NAryMatIterator it(arrays, ptrs, cn+1);
-    size_t total = (int)it.size;
-    size_t blocksize = std::min((size_t)CV_SPLIT_MERGE_MAX_BLOCK_SIZE(cn), cn <= 4 ? total : std::min(total, blocksize0));
+    size_t کل = (صحیح)it.size;
+    size_t blocksize = std::min((size_t)CV_بانٹو_ملاؤ_MAX_بلاک_سائز(cn), cn <= 4 ? کل : std::min(کل, blocksize0));
 
-    for( i = 0; i < it.nplanes; i++, ++it )
+    برائے( i = 0; i < it.nplanes; i++, ++it )
     {
-        for( size_t j = 0; j < total; j += blocksize )
+        برائے( size_t j = 0; j < کل; j += blocksize )
         {
-            size_t bsz = std::min(total - j, blocksize);
-            func( (const void**)&ptrs[1], ptrs[0], (int)bsz, cn );
+            size_t bsz = std::min(کل - j, blocksize);
+            func( (ثابت خالی**)&ptrs[1], ptrs[0], (صحیح)bsz, cn );
 
-            if( j + blocksize < total )
+            اگر( j + blocksize < کل )
             {
                 ptrs[0] += bsz*esz;
-                for( int t = 0; t < cn; t++ )
+                برائے( صحیح t = 0; t < cn; t++ )
                     ptrs[t+1] += bsz*esz1;
             }
         }
     }
 }
 
-#ifdef HAVE_OPENCL
+#اگر_تعریف_شدہ HAVE_OPENCL
 
-static bool ocl_merge( InputArrayOfArrays _mv, OutputArray _dst )
+ساکن منطقی ocl_ملاؤ( داخلہ_Array_کا_Arrays _mv, OutputArray _dst )
 {
     std::vector<UMat> src, ksrc;
-    _mv.getUMatVector(src);
+    _mv.get_UMat_سمتیہ(src);
     CV_Assert(!src.empty());
 
-    int type = src[0].type(), depth = CV_MAT_DEPTH(type),
-            rowsPerWI = ocl::Device::getDefault().isIntel() ? 4 : 1;
-    Size size = src[0].size();
+    صحیح type = src[0].type(), گہرائی = CV_MAT_گہرائی(type),
+            صفیں_فی_WI = ocl::Device::getDefault().isIntel() ? 4 : 1;
+    سائز size = src[0].size();
 
-    for (size_t i = 0, srcsize = src.size(); i < srcsize; ++i)
+    برائے (size_t i = 0, srcsize = src.size(); i < srcsize; ++i)
     {
-        int itype = src[i].type(), icn = CV_MAT_CN(itype), idepth = CV_MAT_DEPTH(itype),
+        صحیح itype = src[i].type(), icn = CV_MAT_CN(itype), idepth = CV_MAT_گہرائی(itype),
                 esz1 = CV_ELEM_SIZE1(idepth);
-        if (src[i].dims > 2)
-            return false;
+        اگر (src[i].dims > 2)
+            واپس جھوٹ;
 
-        CV_Assert(size == src[i].size() && depth == idepth);
+        CV_Assert(size == src[i].size() && گہرائی == idepth);
 
-        for (int cn = 0; cn < icn; ++cn)
+        برائے (صحیح cn = 0; cn < icn; ++cn)
         {
             UMat tsrc = src[i];
             tsrc.offset += cn * esz1;
             ksrc.push_back(tsrc);
         }
     }
-    int dcn = (int)ksrc.size();
+    صحیح dcn = (صحیح)ksrc.size();
 
     String srcargs, processelem, cndecl, indexdecl;
-    for (int i = 0; i < dcn; ++i)
+    برائے (صحیح i = 0; i < dcn; ++i)
     {
         srcargs += format("DECLARE_SRC_PARAM(%d)", i);
         processelem += format("PROCESS_ELEM(%d)", i);
@@ -245,39 +245,39 @@ static bool ocl_merge( InputArrayOfArrays _mv, OutputArray _dst )
         cndecl += format(" -D scn%d=%d", i, ksrc[i].channels());
     }
 
-    ocl::Kernel k("merge", ocl::core::split_merge_oclsrc,
+    ocl::Kernel k("merge", ocl::core::بانٹو_ملاؤ_oclsrc,
                   format("-D OP_MERGE -D cn=%d -D T=%s -D DECLARE_SRC_PARAMS_N=%s"
                          " -D DECLARE_INDEX_N=%s -D PROCESS_ELEMS_N=%s%s",
-                         dcn, ocl::memopTypeToStr(depth), srcargs.c_str(),
+                         dcn, ocl::memop_Type_مقصد_Str(گہرائی), srcargs.c_str(),
                          indexdecl.c_str(), processelem.c_str(), cndecl.c_str()));
-    if (k.empty())
-        return false;
+    اگر (k.empty())
+        واپس جھوٹ;
 
-    _dst.create(size, CV_MAKE_TYPE(depth, dcn));
+    _dst.create(size, CV_MAKE_TYPE(گہرائی, dcn));
     UMat dst = _dst.getUMat();
 
-    int argidx = 0;
-    for (int i = 0; i < dcn; ++i)
-        argidx = k.set(argidx, ocl::KernelArg::ReadOnlyNoSize(ksrc[i]));
-    argidx = k.set(argidx, ocl::KernelArg::WriteOnly(dst));
-    k.set(argidx, rowsPerWI);
+    صحیح argidx = 0;
+    برائے (صحیح i = 0; i < dcn; ++i)
+        argidx = k.سیٹ(argidx, ocl::KernelArg::Read_Only_No_سائز(ksrc[i]));
+    argidx = k.سیٹ(argidx, ocl::KernelArg::WriteOnly(dst));
+    k.سیٹ(argidx, صفیں_فی_WI);
 
-    size_t globalsize[2] = { (size_t)dst.cols, ((size_t)dst.rows + rowsPerWI - 1) / rowsPerWI };
-    return k.run(2, globalsize, NULL, false);
+    size_t globalsize[2] = { (size_t)dst.ستون_تعداد, ((size_t)dst.صفیں + صفیں_فی_WI - 1) / صفیں_فی_WI };
+    واپس k.تسلسل(2, globalsize, تہی, جھوٹ);
 }
 
-#endif
+#اگر_ختم
 
-void merge(InputArrayOfArrays _mv, OutputArray _dst)
+خالی ملاؤ(داخلہ_Array_کا_Arrays _mv, OutputArray _dst)
 {
     CV_INSTRUMENT_REGION();
 
-    CV_OCL_RUN(_mv.isUMatVector() && _dst.isUMat(),
-               ocl_merge(_mv, _dst))
+    CV_OCL_تسلسل(_mv.is_UMat_سمتیہ() && _dst.isUMat(),
+               ocl_ملاؤ(_mv, _dst))
 
     std::vector<Mat> mv;
-    _mv.getMatVector(mv);
-    merge(!mv.empty() ? &mv[0] : 0, mv.size(), _dst);
+    _mv.get_Mat_سمتیہ(mv);
+    ملاؤ(!mv.empty() ? &mv[0] : 0, mv.size(), _dst);
 }
 
 } // namespace

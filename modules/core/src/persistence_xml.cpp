@@ -3,767 +3,767 @@
 // of this distribution and at http://opencv.org/license.html
 
 
-#include "precomp.hpp"
-#include "persistence.hpp"
+#شامل "precomp.hpp"
+#شامل "persistence.hpp"
 
-enum
+شمار
 {
     CV_XML_INDENT = 2,
     CV_XML_INSIDE_COMMENT = 1,
-    CV_XML_INSIDE_TAG = 2,
+    CV_XML_INSIDE_لیبل = 2,
     CV_XML_INSIDE_DIRECTIVE = 3,
-    CV_XML_OPENING_TAG = 1,
-    CV_XML_CLOSING_TAG = 2,
-    CV_XML_EMPTY_TAG = 3,
-    CV_XML_HEADER_TAG = 4,
-    CV_XML_DIRECTIVE_TAG = 5
+    CV_XML_OPENING_لیبل = 1,
+    CV_XML_CLOSING_لیبل = 2,
+    CV_XML_خالی_خانے_لیبل = 3,
+    CV_XML_سرخی_لیبل = 4,
+    CV_XML_DIRECTIVE_لیبل = 5
 };
 
-namespace cv
+نامخلا cv
 {
 
-class XMLEmitter : public FileStorageEmitter
+جماعت XMLEmitter : عوامی FileStorageEmitter
 {
-public:
+عوامی:
     XMLEmitter(FileStorage_API* _fs) : fs(_fs)
     {
     }
-    virtual ~XMLEmitter() {}
+    مجازی ~XMLEmitter() {}
 
-    void writeTag( const char* key, int tag_type, const std::vector<std::string>& attrlist=std::vector<std::string>() )
+    خالی write_لیبل( ثابت حرف* کلید, صحیح لیبل_type, ثابت std::vector<std::string>& attrlist=std::vector<std::string>() )
     {
-        char* ptr = fs->bufferPtr();
-        int i, len = 0;
-        FStructData& current_struct = fs->getCurrentStruct();
-        int struct_flags = current_struct.flags;
+        حرف* ptr = fs->بفر_Ptr();
+        صحیح i, len = 0;
+        FStruct_ڈیٹا& current_struct = fs->getCurrentStruct();
+        صحیح struct_flags = current_struct.flags;
 
-        if( key && key[0] == '\0' )
-            key = 0;
+        اگر( کلید && کلید[0] == '\0' )
+            کلید = 0;
 
-        if( tag_type == CV_XML_OPENING_TAG || tag_type == CV_XML_EMPTY_TAG )
+        اگر( لیبل_type == CV_XML_OPENING_لیبل || لیبل_type == CV_XML_خالی_خانے_لیبل )
         {
-            if( FileNode::isCollection(struct_flags) )
+            اگر( File_گرہ::isCollection(struct_flags) )
             {
-                if( FileNode::isMap(struct_flags) ^ (key != 0) )
+                اگر( File_گرہ::isMap(struct_flags) ^ (کلید != 0) )
                     CV_Error( cv::Error::StsBadArg, "An attempt to add element without a key to a map, "
                              "or add element with key to sequence" );
             }
-            else
+            ورنہ
             {
-                struct_flags = FileNode::EMPTY + (key ? FileNode::MAP : FileNode::SEQ);
+                struct_flags = File_گرہ::خالی_خانے_2 + (کلید ? File_گرہ::MAP : File_گرہ::SEQ);
                 //fs->is_first = 0;
             }
 
-            if( !FileNode::isEmptyCollection(struct_flags) )
+            اگر( !File_گرہ::is_خالی_خانے_Collection(struct_flags) )
                 ptr = fs->flush();
         }
 
-        if( !key )
-            key = "_";
-        else if( key[0] == '_' && key[1] == '\0' )
+        اگر( !کلید )
+            کلید = "_";
+        ورنہ اگر( کلید[0] == '_' && کلید[1] == '\0' )
             CV_Error( cv::Error::StsBadArg, "A single _ is a reserved tag name" );
 
-        len = (int)strlen( key );
+        len = (صحیح)لڑی_لمبائی( کلید );
         *ptr++ = '<';
-        if( tag_type == CV_XML_CLOSING_TAG )
+        اگر( لیبل_type == CV_XML_CLOSING_لیبل )
         {
-            if( !attrlist.empty() )
+            اگر( !attrlist.empty() )
                 CV_Error( cv::Error::StsBadArg, "Closing tag should not include any attributes" );
             *ptr++ = '/';
         }
 
-        if( !cv_isalpha(key[0]) && key[0] != '_' )
+        اگر( !cv_isalpha(کلید[0]) && کلید[0] != '_' )
             CV_Error( cv::Error::StsBadArg, "Key should start with a letter or _" );
 
-        ptr = fs->resizeWriteBuffer( ptr, len );
-        for( i = 0; i < len; i++ )
+        ptr = fs->resize_Write_بفر( ptr, len );
+        برائے( i = 0; i < len; i++ )
         {
-            char c = key[i];
-            if( !cv_isalnum(c) && c != '_' && c != '-' )
+            حرف c = کلید[i];
+            اگر( !cv_isalnum(c) && c != '_' && c != '-' )
                 CV_Error( cv::Error::StsBadArg, "Key name may only contain alphanumeric characters [a-zA-Z0-9], '-' and '_'" );
             ptr[i] = c;
         }
         ptr += len;
 
-        int nattr = (int)attrlist.size();
+        صحیح nattr = (صحیح)attrlist.size();
         CV_Assert( nattr % 2 == 0 );
 
-        for( i = 0; i < nattr; i += 2 )
+        برائے( i = 0; i < nattr; i += 2 )
         {
             size_t len0 = attrlist[i].size();
             size_t len1 = attrlist[i+1].size();
             CV_Assert( len0 > 0 );
 
-            ptr = fs->resizeWriteBuffer( ptr, (int)(len0 + len1 + 4) );
+            ptr = fs->resize_Write_بفر( ptr, (صحیح)(len0 + len1 + 4) );
             *ptr++ = ' ';
 
-            memcpy( ptr, attrlist[i].c_str(), len0 );
+            حافظہ_نقل( ptr, attrlist[i].c_str(), len0 );
             ptr += len0;
             *ptr++ = '=';
             *ptr++ = '\"';
-            if( len1 > 0 )
-                memcpy( ptr, attrlist[i+1].c_str(), len1 );
+            اگر( len1 > 0 )
+                حافظہ_نقل( ptr, attrlist[i+1].c_str(), len1 );
             ptr += len1;
             *ptr++ = '\"';
         }
 
-        if( tag_type == CV_XML_EMPTY_TAG )
+        اگر( لیبل_type == CV_XML_خالی_خانے_لیبل )
             *ptr++ = '/';
         *ptr++ = '>';
-        fs->setBufferPtr(ptr);
-        current_struct.flags = struct_flags & ~FileNode::EMPTY;
+        fs->سیٹ_بفر_Ptr(ptr);
+        current_struct.flags = struct_flags & ~File_گرہ::خالی_خانے_2;
     }
 
-    FStructData startWriteStruct(const FStructData& parent, const char* key,
-                                 int struct_flags, const char* type_name=0)
+    FStruct_ڈیٹا آغاز_Write_Struct(ثابت FStruct_ڈیٹا& والد, ثابت حرف* کلید,
+                                 صحیح struct_flags, ثابت حرف* type_name=0)
     {
         std::vector<std::string> attrlist;
-        if( type_name && *type_name )
+        اگر( type_name && *type_name )
         {
             attrlist.push_back("type_id");
             attrlist.push_back(type_name);
         }
 
-        writeTag( key, CV_XML_OPENING_TAG, attrlist );
+        write_لیبل( کلید, CV_XML_OPENING_لیبل, attrlist );
 
-        FStructData current_struct;
-        current_struct.tag = key ? std::string(key) : std::string();
+        FStruct_ڈیٹا current_struct;
+        current_struct.لیبل = کلید ? std::string(کلید) : std::string();
         current_struct.flags = struct_flags;
-        current_struct.indent = parent.indent + CV_XML_INDENT;
+        current_struct.indent = والد.indent + CV_XML_INDENT;
 
-        return current_struct;
+        واپس current_struct;
     }
 
-    void endWriteStruct(const FStructData& current_struct)
+    خالی انتہا_Write_Struct(ثابت FStruct_ڈیٹا& current_struct)
     {
-        writeTag( current_struct.tag.c_str(), CV_XML_CLOSING_TAG );
+        write_لیبل( current_struct.لیبل.c_str(), CV_XML_CLOSING_لیبل );
     }
 
-    void write(const char* key, int value)
+    خالی اكتب(ثابت حرف* کلید, صحیح value)
     {
-        char buf[128], *ptr = fs::itoa( value, buf, 10 );
-        writeScalar( key, ptr);
+        حرف buf[128], *ptr = fs::itoa( value, buf, 10 );
+        writeScalar( کلید, ptr);
     }
 
-    void write(const char* key, int64_t value)
+    خالی اكتب(ثابت حرف* کلید, int64_t value)
     {
-        char buf[128], *ptr = fs::itoa( value, buf, 10, true );
-        writeScalar( key, ptr);
+        حرف buf[128], *ptr = fs::itoa( value, buf, 10, سچ );
+        writeScalar( کلید, ptr);
     }
 
-    void write( const char* key, double value )
+    خالی اكتب( ثابت حرف* کلید, دوہرا value )
     {
-        char buf[128];
-        writeScalar( key, fs::doubleToString( buf, sizeof(buf), value, false ) );
+        حرف buf[128];
+        writeScalar( کلید, fs::double_مقصد_String( buf, حجم(buf), value, جھوٹ ) );
     }
 
-    void write(const char* key, const char* str, bool quote)
+    خالی اكتب(ثابت حرف* کلید, ثابت حرف* str, منطقی quote)
     {
-        char buf[CV_FS_MAX_LEN*6+16];
-        char* data = (char*)str;
-        int i, len;
+        حرف buf[CV_FS_MAX_LEN*6+16];
+        حرف* ڈیٹا = (حرف*)str;
+        صحیح i, len;
 
-        if( !str )
+        اگر( !str )
             CV_Error( cv::Error::StsNullPtr, "Null string pointer" );
 
-        len = (int)strlen(str);
-        if( len > CV_FS_MAX_LEN )
+        len = (صحیح)لڑی_لمبائی(str);
+        اگر( len > CV_FS_MAX_LEN )
             CV_Error( cv::Error::StsBadArg, "The written string is too long" );
 
-        if( quote || len == 0 || str[0] != '\"' || str[0] != str[len-1] )
+        اگر( quote || len == 0 || str[0] != '\"' || str[0] != str[len-1] )
         {
-            bool need_quote = quote || len == 0;
-            data = buf;
-            *data++ = '\"';
-            for( i = 0; i < len; i++ )
+            منطقی need_quote = quote || len == 0;
+            ڈیٹا = buf;
+            *ڈیٹا++ = '\"';
+            برائے( i = 0; i < len; i++ )
             {
-                char c = str[i];
+                حرف c = str[i];
 
-                if( (uchar)c >= 128 || c == ' ' )
+                اگر( (uchar)c >= 128 || c == ' ' )
                 {
-                    *data++ = c;
-                    need_quote = true;
+                    *ڈیٹا++ = c;
+                    need_quote = سچ;
                 }
-                else if( !cv_isprint(c) || c == '<' || c == '>' || c == '&' || c == '\'' || c == '\"' )
+                ورنہ اگر( !cv_isprint(c) || c == '<' || c == '>' || c == '&' || c == '\'' || c == '\"' )
                 {
-                    *data++ = '&';
-                    if( c == '<' )
+                    *ڈیٹا++ = '&';
+                    اگر( c == '<' )
                     {
-                        memcpy(data, "lt", 2);
-                        data += 2;
+                        حافظہ_نقل(ڈیٹا, "lt", 2);
+                        ڈیٹا += 2;
                     }
-                    else if( c == '>' )
+                    ورنہ اگر( c == '>' )
                     {
-                        memcpy(data, "gt", 2);
-                        data += 2;
+                        حافظہ_نقل(ڈیٹا, "gt", 2);
+                        ڈیٹا += 2;
                     }
-                    else if( c == '&' )
+                    ورنہ اگر( c == '&' )
                     {
-                        memcpy(data, "amp", 3);
-                        data += 3;
+                        حافظہ_نقل(ڈیٹا, "amp", 3);
+                        ڈیٹا += 3;
                     }
-                    else if( c == '\'' )
+                    ورنہ اگر( c == '\'' )
                     {
-                        memcpy(data, "apos", 4);
-                        data += 4;
+                        حافظہ_نقل(ڈیٹا, "apos", 4);
+                        ڈیٹا += 4;
                     }
-                    else if( c == '\"' )
+                    ورنہ اگر( c == '\"' )
                     {
-                        memcpy( data, "quot", 4);
-                        data += 4;
+                        حافظہ_نقل( ڈیٹا, "quot", 4);
+                        ڈیٹا += 4;
                     }
-                    else
+                    ورنہ
                     {
-                        snprintf( data, sizeof(buf) - (data - buf), "#x%02x", (uchar)c );
-                        data += 4;
+                        snprintf( ڈیٹا, حجم(buf) - (ڈیٹا - buf), "#x%02x", (uchar)c );
+                        ڈیٹا += 4;
                     }
-                    *data++ = ';';
+                    *ڈیٹا++ = ';';
                     need_quote = 1;
                 }
-                else
-                    *data++ = c;
+                ورنہ
+                    *ڈیٹا++ = c;
             }
-            if( !need_quote && (cv_isdigit(str[0]) ||
+            اگر( !need_quote && (cv_isdigit(str[0]) ||
                                 str[0] == '+' || str[0] == '-' || str[0] == '.' ))
-                need_quote = true;
+                need_quote = سچ;
 
-            if( need_quote )
-                *data++ = '\"';
-            len = (int)(data - buf) - !need_quote;
-            *data++ = '\0';
-            data = buf + (int)!need_quote;
+            اگر( need_quote )
+                *ڈیٹا++ = '\"';
+            len = (صحیح)(ڈیٹا - buf) - !need_quote;
+            *ڈیٹا++ = '\0';
+            ڈیٹا = buf + (صحیح)!need_quote;
         }
 
-        writeScalar( key, data );
+        writeScalar( کلید, ڈیٹا );
     }
 
-    void writeScalar(const char* key, const char* data)
+    خالی writeScalar(ثابت حرف* کلید, ثابت حرف* ڈیٹا)
     {
-        fs->check_if_write_struct_is_delayed(false);
-        if ( fs->get_state_of_writing_base64() == FileStorage_API::Uncertain )
+        fs->check_if_write_struct_is_delayed(جھوٹ);
+        اگر ( fs->get_state_کا_writing_base64() == FileStorage_API::Uncertain )
         {
-            fs->switch_to_Base64_state( FileStorage_API::NotUse );
+            fs->switch_مقصد_Base64_state( FileStorage_API::NotUse );
         }
-        else if ( fs->get_state_of_writing_base64() == FileStorage_API::InUse )
+        ورنہ اگر ( fs->get_state_کا_writing_base64() == FileStorage_API::اندر_Use )
         {
             CV_Error( cv::Error::StsError, "At present, output Base64 data only." );
         }
 
-        int len = (int)strlen(data);
-        if( key && *key == '\0' )
-            key = 0;
+        صحیح len = (صحیح)لڑی_لمبائی(ڈیٹا);
+        اگر( کلید && *کلید == '\0' )
+            کلید = 0;
 
-        FStructData& current_struct = fs->getCurrentStruct();
-        int struct_flags = current_struct.flags;
+        FStruct_ڈیٹا& current_struct = fs->getCurrentStruct();
+        صحیح struct_flags = current_struct.flags;
 
-        if( FileNode::isMap(struct_flags) ||
-           (!FileNode::isCollection(struct_flags) && key) )
+        اگر( File_گرہ::isMap(struct_flags) ||
+           (!File_گرہ::isCollection(struct_flags) && کلید) )
         {
-            writeTag( key, CV_XML_OPENING_TAG );
-            char* ptr = fs->resizeWriteBuffer( fs->bufferPtr(), len );
-            memcpy( ptr, data, len );
-            fs->setBufferPtr( ptr + len );
-            writeTag( key, CV_XML_CLOSING_TAG );
+            write_لیبل( کلید, CV_XML_OPENING_لیبل );
+            حرف* ptr = fs->resize_Write_بفر( fs->بفر_Ptr(), len );
+            حافظہ_نقل( ptr, ڈیٹا, len );
+            fs->سیٹ_بفر_Ptr( ptr + len );
+            write_لیبل( کلید, CV_XML_CLOSING_لیبل );
         }
-        else
+        ورنہ
         {
-            char* ptr = fs->bufferPtr();
-            int new_offset = (int)(ptr - fs->bufferStart()) + len;
+            حرف* ptr = fs->بفر_Ptr();
+            صحیح new_انحراف = (صحیح)(ptr - fs->بفر_آغاز()) + len;
 
-            if( key )
+            اگر( کلید )
                 CV_Error( cv::Error::StsBadArg, "elements with keys can not be written to sequence" );
 
-            current_struct.flags = FileNode::SEQ;
+            current_struct.flags = File_گرہ::SEQ;
 
-            if( (new_offset > fs->wrapMargin() && new_offset - current_struct.indent > 10) ||
-               (ptr > fs->bufferStart() && ptr[-1] == '>') )
+            اگر( (new_انحراف > fs->wrapMargin() && new_انحراف - current_struct.indent > 10) ||
+               (ptr > fs->بفر_آغاز() && ptr[-1] == '>') )
             {
                 ptr = fs->flush();
             }
-            else if( ptr > fs->bufferStart() + current_struct.indent && ptr[-1] != '>' )
+            ورنہ اگر( ptr > fs->بفر_آغاز() + current_struct.indent && ptr[-1] != '>' )
                 *ptr++ = ' ';
 
-            memcpy( ptr, data, len );
-            fs->setBufferPtr(ptr + len);
+            حافظہ_نقل( ptr, ڈیٹا, len );
+            fs->سیٹ_بفر_Ptr(ptr + len);
         }
     }
 
-    void writeComment(const char* comment, bool eol_comment)
+    خالی writeComment(ثابت حرف* comment, منطقی eol_comment)
     {
-        FStructData& current_struct = fs->getCurrentStruct();
-        int len;
-        int multiline;
-        const char* eol;
-        char* ptr;
+        FStruct_ڈیٹا& current_struct = fs->getCurrentStruct();
+        صحیح len;
+        صحیح multiline;
+        ثابت حرف* eol;
+        حرف* ptr;
 
-        if( !comment )
+        اگر( !comment )
             CV_Error( cv::Error::StsNullPtr, "Null comment" );
 
-        if( strstr(comment, "--") != 0 )
+        اگر( لڑی_تلاش(comment, "--") != 0 )
             CV_Error( cv::Error::StsBadArg, "Double hyphen \'--\' is not allowed in the comments" );
 
-        len = (int)strlen(comment);
+        len = (صحیح)لڑی_لمبائی(comment);
         eol = strchr(comment, '\n');
         multiline = eol != 0;
-        ptr = fs->bufferPtr();
+        ptr = fs->بفر_Ptr();
 
-        if( multiline || !eol_comment || fs->bufferEnd() - ptr < len + 5 )
+        اگر( multiline || !eol_comment || fs->بفر_انتہا_2() - ptr < len + 5 )
             ptr = fs->flush();
-        else if( ptr > fs->bufferStart() + current_struct.indent )
+        ورنہ اگر( ptr > fs->بفر_آغاز() + current_struct.indent )
             *ptr++ = ' ';
 
-        if( !multiline )
+        اگر( !multiline )
         {
-            ptr = fs->resizeWriteBuffer( ptr, len + 5+4+1 );
+            ptr = fs->resize_Write_بفر( ptr, len + 5+4+1 );
             snprintf( ptr, len + 5+4+1, "<!-- %s -->", comment );
-            len = (int)strlen(ptr);
+            len = (صحیح)لڑی_لمبائی(ptr);
         }
-        else
+        ورنہ
         {
             strcpy( ptr, "<!--" );
             len = 4;
         }
 
-        fs->setBufferPtr(ptr + len);
+        fs->سیٹ_بفر_Ptr(ptr + len);
         ptr = fs->flush();
 
-        if( multiline )
+        اگر( multiline )
         {
-            while( comment )
+            جب( comment )
             {
-                if( eol )
+                اگر( eol )
                 {
-                    ptr = fs->resizeWriteBuffer( ptr, (int)(eol - comment) + 1 );
-                    memcpy( ptr, comment, eol - comment + 1 );
+                    ptr = fs->resize_Write_بفر( ptr, (صحیح)(eol - comment) + 1 );
+                    حافظہ_نقل( ptr, comment, eol - comment + 1 );
                     ptr += eol - comment;
                     comment = eol + 1;
                     eol = strchr( comment, '\n' );
                 }
-                else
+                ورنہ
                 {
-                    len = (int)strlen(comment);
-                    ptr = fs->resizeWriteBuffer( ptr, len );
-                    memcpy( ptr, comment, len );
+                    len = (صحیح)لڑی_لمبائی(comment);
+                    ptr = fs->resize_Write_بفر( ptr, len );
+                    حافظہ_نقل( ptr, comment, len );
                     ptr += len;
                     comment = 0;
                 }
-                fs->setBufferPtr(ptr);
+                fs->سیٹ_بفر_Ptr(ptr);
                 ptr = fs->flush();
             }
             strcpy( ptr, "-->" );
-            fs->setBufferPtr(ptr + 3);
+            fs->سیٹ_بفر_Ptr(ptr + 3);
             fs->flush();
         }
     }
 
-    void startNextStream()
+    خالی آغاز_اگلا_دھارا()
     {
         fs->puts( "\n<!-- next stream -->\n" );
     }
 
-protected:
+محفوظ:
     FileStorage_API* fs;
 };
 
-class XMLParser : public FileStorageParser
+جماعت XMLParser : عوامی FileStorageParser
 {
-public:
+عوامی:
     XMLParser(FileStorage_API* _fs) : fs(_fs)
     {
     }
 
-    virtual ~XMLParser() {}
+    مجازی ~XMLParser() {}
 
-    char* skipSpaces( char* ptr, int mode )
+    حرف* skipSpaces( حرف* ptr, صحیح منوال )
     {
-        if (!ptr)
+        اگر (!ptr)
             CV_PARSE_ERROR_CPP("Invalid input");
 
-        int level = 0;
+        صحیح level = 0;
 
-        for(;;)
+        برائے(;;)
         {
-            char c;
+            حرف c;
             ptr--;
 
-            if( mode == CV_XML_INSIDE_COMMENT )
+            اگر( منوال == CV_XML_INSIDE_COMMENT )
             {
-                do c = *++ptr;
-                while( cv_isprint_or_tab(c) && (c != '-' || ptr[1] != '-' || ptr[2] != '>') );
+                کرو c = *++ptr;
+                جب( cv_isprint_or_tab(c) && (c != '-' || ptr[1] != '-' || ptr[2] != '>') );
 
-                if( c == '-' )
+                اگر( c == '-' )
                 {
                     CV_Assert( ptr[1] == '-' && ptr[2] == '>' );
-                    mode = 0;
+                    منوال = 0;
                     ptr += 3;
                 }
             }
-            else if( mode == CV_XML_INSIDE_DIRECTIVE )
+            ورنہ اگر( منوال == CV_XML_INSIDE_DIRECTIVE )
             {
                 // !!!NOTE!!! This is not quite correct, but should work in most cases
-                do
+                کرو
                 {
                     c = *++ptr;
                     level += c == '<';
                     level -= c == '>';
-                    if( level < 0 )
-                        return ptr;
-                } while( cv_isprint_or_tab(c) );
+                    اگر( level < 0 )
+                        واپس ptr;
+                } جب( cv_isprint_or_tab(c) );
             }
-            else
+            ورنہ
             {
-                do c = *++ptr;
-                while( c == ' ' || c == '\t' );
+                کرو c = *++ptr;
+                جب( c == ' ' || c == '\t' );
 
-                if( c == '<' && ptr[1] == '!' && ptr[2] == '-' && ptr[3] == '-' )
+                اگر( c == '<' && ptr[1] == '!' && ptr[2] == '-' && ptr[3] == '-' )
                 {
-                    if( mode != 0 )
+                    اگر( منوال != 0 )
                         CV_PARSE_ERROR_CPP( "Comments are not allowed here" );
-                    mode = CV_XML_INSIDE_COMMENT;
+                    منوال = CV_XML_INSIDE_COMMENT;
                     ptr += 4;
                 }
-                else if( cv_isprint(c) )
-                    break;
+                ورنہ اگر( cv_isprint(c) )
+                    توڑو;
             }
 
-            if( !cv_isprint(*ptr) )
+            اگر( !cv_isprint(*ptr) )
             {
-                if( *ptr != '\0' && *ptr != '\n' && *ptr != '\r' )
+                اگر( *ptr != '\0' && *ptr != '\n' && *ptr != '\r' )
                     CV_PARSE_ERROR_CPP( "Invalid character in the stream" );
                 ptr = fs->gets();
-                if( !ptr || *ptr == '\0' )
-                    break;
+                اگر( !ptr || *ptr == '\0' )
+                    توڑو;
             }
         }
-        return ptr;
+        واپس ptr;
     }
 
-    bool getBase64Row(char* ptr, int /*indent*/, char* &beg, char* &end)
+    منطقی get_Base64_صف(حرف* ptr, صحیح /*indent*/, حرف* &beg, حرف* &end)
     {
-        beg = end = ptr = skipSpaces(ptr, CV_XML_INSIDE_TAG);
-        if( !ptr || !*ptr )
-            return false;
+        beg = end = ptr = skipSpaces(ptr, CV_XML_INSIDE_لیبل);
+        اگر( !ptr || !*ptr )
+            واپس جھوٹ;
 
         // closing XML tag
-        if ( *beg == '<' )
-            return false;
+        اگر ( *beg == '<' )
+            واپس جھوٹ;
 
         // find end of the row
-        while( cv_isprint(*ptr) )
+        جب( cv_isprint(*ptr) )
             ++ptr;
-        if ( *ptr == '\0' )
+        اگر ( *ptr == '\0' )
             CV_PARSE_ERROR_CPP( "Unexpected end of line" );
 
         end = ptr;
-        return true;
+        واپس سچ;
     }
 
-    char* parseValue( char* ptr, FileNode& node, int depth = 0 )
+    حرف* parse_قدر( حرف* ptr, File_گرہ& گرہ, صحیح گہرائی = 0 )
     {
-        if (!ptr)
+        اگر (!ptr)
             CV_PARSE_ERROR_CPP("Invalid input");
 
-        if( depth > CV_PERSISTENCE_MAX_DEPTH )
+        اگر( گہرائی > CV_PERSISTENCE_MAX_گہرائی )
             CV_PARSE_ERROR_CPP("Too many nested collections");
 
-        FileNode new_elem;
-        bool have_space = true;
-        int value_type = node.type();
-        std::string key, key2, type_name;
+        File_گرہ new_elem;
+        منطقی have_space = سچ;
+        صحیح value_type = گرہ.type();
+        std::string کلید, key2, type_name;
 
-        for(;;)
+        برائے(;;)
         {
-            char c = *ptr, d;
-            char* endptr;
+            حرف c = *ptr, d;
+            حرف* endptr;
 
             // FIXIT ptr[1], ptr[2] - out of bounds read without check or data fetch (#11061)
-            if( cv_isspace(c) || c == '\0' ||
+            اگر( cv_isspace(c) || c == '\0' ||
                 (c == '<' && ptr[1] == '!' && ptr[2] == '-') )
             {
                 ptr = skipSpaces( ptr, 0 );
-                if (!ptr)
+                اگر (!ptr)
                     CV_PARSE_ERROR_CPP("Invalid input");
-                have_space = true;
+                have_space = سچ;
                 c = *ptr;
             }
 
             d = ptr[1];  // FIXIT ptr[1] - out of bounds read without check or data fetch (#11061)
 
-            if( c =='<' || c == '\0' )
+            اگر( c =='<' || c == '\0' )
             {
-                int tag_type = 0;
-                int elem_type = FileNode::NONE;
+                صحیح لیبل_type = 0;
+                صحیح elem_type = File_گرہ::NONE;
 
-                if( d == '/' || c == '\0' )
-                    break;
+                اگر( d == '/' || c == '\0' )
+                    توڑو;
 
-                ptr = parseTag( ptr, key, type_name, tag_type );
+                ptr = parse_لیبل( ptr, کلید, type_name, لیبل_type );
 
-                if( tag_type == CV_XML_DIRECTIVE_TAG )
+                اگر( لیبل_type == CV_XML_DIRECTIVE_لیبل )
                     CV_PARSE_ERROR_CPP( "Directive tags are not allowed here" );
-                if( tag_type == CV_XML_EMPTY_TAG )
+                اگر( لیبل_type == CV_XML_خالی_خانے_لیبل )
                     CV_PARSE_ERROR_CPP( "Empty tags are not supported" );
 
-                CV_Assert(tag_type == CV_XML_OPENING_TAG);
+                CV_Assert(لیبل_type == CV_XML_OPENING_لیبل);
 
                 /* for base64 string */
-                bool binary_string = false;
+                منطقی ثنائی_string = جھوٹ;
 
-                if( !type_name.empty() )
+                اگر( !type_name.empty() )
                 {
-                    const char* tn = type_name.c_str();
-                    if( strcmp(tn, "str") == 0 )
-                        elem_type = FileNode::STRING;
-                    else if( strcmp( tn, "map" ) == 0 )
-                        elem_type = FileNode::MAP;
-                    else if( strcmp( tn, "seq" ) == 0 )
-                        elem_type = FileNode::SEQ;
-                    else if( strcmp( tn, "binary") == 0)
-                        binary_string = true;
+                    ثابت حرف* tn = type_name.c_str();
+                    اگر( strcmp(tn, "str") == 0 )
+                        elem_type = File_گرہ::STRING;
+                    ورنہ اگر( strcmp( tn, "map" ) == 0 )
+                        elem_type = File_گرہ::MAP;
+                    ورنہ اگر( strcmp( tn, "seq" ) == 0 )
+                        elem_type = File_گرہ::SEQ;
+                    ورنہ اگر( strcmp( tn, "binary") == 0)
+                        ثنائی_string = سچ;
                 }
 
-                new_elem = fs->addNode(node, key, elem_type, 0);
-                if (!binary_string)
-                    ptr = parseValue(ptr, new_elem, depth + 1);
-                else
+                new_elem = fs->جوڑو_گرہ(گرہ, کلید, elem_type, 0);
+                اگر (!ثنائی_string)
+                    ptr = parse_قدر(ptr, new_elem, گہرائی + 1);
+                ورنہ
                 {
                     ptr = fs->parseBase64( ptr, 0, new_elem);
                     ptr = skipSpaces( ptr, 0 );
-                    if (!ptr)
+                    اگر (!ptr)
                         CV_PARSE_ERROR_CPP("Invalid input");
                 }
 
-                ptr = parseTag( ptr, key2, type_name, tag_type );
-                if( tag_type != CV_XML_CLOSING_TAG || key2 != key )
+                ptr = parse_لیبل( ptr, key2, type_name, لیبل_type );
+                اگر( لیبل_type != CV_XML_CLOSING_لیبل || key2 != کلید )
                     CV_PARSE_ERROR_CPP( "Mismatched closing tag" );
-                have_space = true;
+                have_space = سچ;
             }
-            else
+            ورنہ
             {
-                if( !have_space )
+                اگر( !have_space )
                     CV_PARSE_ERROR_CPP( "There should be space between literals" );
 
-                FileNode* elem = &node;
-                if( node.type() != FileNode::NONE )
+                File_گرہ* elem = &گرہ;
+                اگر( گرہ.type() != File_گرہ::NONE )
                 {
-                    fs->convertToCollection( FileNode::SEQ, node );
-                    new_elem = fs->addNode(node, std::string(), FileNode::NONE, 0);
+                    fs->convert_مقصد_Collection( File_گرہ::SEQ, گرہ );
+                    new_elem = fs->جوڑو_گرہ(گرہ, std::string(), File_گرہ::NONE, 0);
                     elem = &new_elem;
                 }
 
-                if( value_type != FileNode::STRING &&
+                اگر( value_type != File_گرہ::STRING &&
                    (cv_isdigit(c) || ((c == '-' || c == '+') &&
                    (cv_isdigit(d) || d == '.')) || (c == '.' && cv_isalnum(d))) ) // a number
                 {
                     endptr = ptr + (c == '-' || c == '+');
-                    while( cv_isdigit(*endptr) )
+                    جب( cv_isdigit(*endptr) )
                         endptr++;
-                    if( *endptr == '.' || *endptr == 'e' )
+                    اگر( *endptr == '.' || *endptr == 'e' )
                     {
-                        double fval = fs->strtod( ptr, &endptr );
-                        elem->setValue(FileNode::REAL, &fval);
+                        دوہرا fval = fs->strtod( ptr, &endptr );
+                        elem->سیٹ_قدر(File_گرہ::REAL, &fval);
                     }
-                    else
+                    ورنہ
                     {
                         int64_t ival = strtoll( ptr, &endptr, 0 );
-                        elem->setValue(FileNode::INT, &ival);
+                        elem->سیٹ_قدر(File_گرہ::INT, &ival);
                     }
 
-                    if( endptr == ptr )
+                    اگر( endptr == ptr )
                         CV_PARSE_ERROR_CPP( "Invalid numeric value (inconsistent explicit type specification?)" );
 
                     ptr = endptr;
-                    CV_PERSISTENCE_CHECK_END_OF_BUFFER_BUG_CPP();
+                    CV_PERSISTENCE_CHECK_انتہا_کا_بفر_BUG_CPP();
                 }
-                else
+                ورنہ
                 {
                     // string
-                    int i = 0, len, is_quoted = 0;
-                    if( c == '\"' )
+                    صحیح i = 0, len, is_quoted = 0;
+                    اگر( c == '\"' )
                         is_quoted = 1;
-                    else
+                    ورنہ
                         --ptr;
                     strbuf[0] = '\0';
 
-                    for( ;; )
+                    برائے( ;; )
                     {
                         c = *++ptr;
-                        CV_PERSISTENCE_CHECK_END_OF_BUFFER_BUG_CPP();
+                        CV_PERSISTENCE_CHECK_انتہا_کا_بفر_BUG_CPP();
 
-                        if( !cv_isalnum(c) )
+                        اگر( !cv_isalnum(c) )
                         {
-                            if( c == '\"' )
+                            اگر( c == '\"' )
                             {
-                                if( !is_quoted )
+                                اگر( !is_quoted )
                                     CV_PARSE_ERROR_CPP( "Literal \" is not allowed within a string. Use &quot;" );
                                 ++ptr;
-                                break;
+                                توڑو;
                             }
-                            else if( !cv_isprint(c) || c == '<' || (!is_quoted && cv_isspace(c)))
+                            ورنہ اگر( !cv_isprint(c) || c == '<' || (!is_quoted && cv_isspace(c)))
                             {
-                                if( is_quoted )
+                                اگر( is_quoted )
                                     CV_PARSE_ERROR_CPP( "Closing \" is expected" );
-                                break;
+                                توڑو;
                             }
-                            else if( c == '\'' || c == '>' )
+                            ورنہ اگر( c == '\'' || c == '>' )
                             {
                                 CV_PARSE_ERROR_CPP( "Literal \' or > are not allowed. Use &apos; or &gt;" );
                             }
-                            else if( c == '&' )
+                            ورنہ اگر( c == '&' )
                             {
-                                if( *++ptr == '#' )
+                                اگر( *++ptr == '#' )
                                 {
-                                    int val, base = 10;
+                                    صحیح val, بنیاد = 10;
                                     ptr++;
-                                    if( *ptr == 'x' )
+                                    اگر( *ptr == 'x' )
                                     {
-                                        base = 16;
+                                        بنیاد = 16;
                                         ptr++;
                                     }
-                                    val = (int)strtol( ptr, &endptr, base );
-                                    if( (unsigned)val > (unsigned)255 ||
+                                    val = (صحیح)strtol( ptr, &endptr, بنیاد );
+                                    اگر( (غیرعلامتی)val > (غیرعلامتی)255 ||
                                        !endptr || *endptr != ';' )
                                         CV_PARSE_ERROR_CPP( "Invalid numeric value in the string" );
-                                    c = (char)val;
+                                    c = (حرف)val;
                                 }
-                                else
+                                ورنہ
                                 {
                                     endptr = ptr;
-                                    do c = *++endptr;
-                                    while( cv_isalnum(c) );
-                                    if( c != ';' )
+                                    کرو c = *++endptr;
+                                    جب( cv_isalnum(c) );
+                                    اگر( c != ';' )
                                         CV_PARSE_ERROR_CPP( "Invalid character in the symbol entity name" );
-                                    len = (int)(endptr - ptr);
-                                    if( len == 2 && memcmp( ptr, "lt", len ) == 0 )
+                                    len = (صحیح)(endptr - ptr);
+                                    اگر( len == 2 && memcmp( ptr, "lt", len ) == 0 )
                                         c = '<';
-                                    else if( len == 2 && memcmp( ptr, "gt", len ) == 0 )
+                                    ورنہ اگر( len == 2 && memcmp( ptr, "gt", len ) == 0 )
                                         c = '>';
-                                    else if( len == 3 && memcmp( ptr, "amp", len ) == 0 )
+                                    ورنہ اگر( len == 3 && memcmp( ptr, "amp", len ) == 0 )
                                         c = '&';
-                                    else if( len == 4 && memcmp( ptr, "apos", len ) == 0 )
+                                    ورنہ اگر( len == 4 && memcmp( ptr, "apos", len ) == 0 )
                                         c = '\'';
-                                    else if( len == 4 && memcmp( ptr, "quot", len ) == 0 )
+                                    ورنہ اگر( len == 4 && memcmp( ptr, "quot", len ) == 0 )
                                         c = '\"';
-                                    else
+                                    ورنہ
                                     {
-                                        if (len + 2 + i >= CV_FS_MAX_LEN)
+                                        اگر (len + 2 + i >= CV_FS_MAX_LEN)
                                             CV_PARSE_ERROR_CPP("string is too long");
-                                        memcpy( strbuf + i, ptr-1, len + 2 );
+                                        حافظہ_نقل( strbuf + i, ptr-1, len + 2 );
                                         i += len + 2;
                                     }
                                 }
                                 ptr = endptr;
-                                CV_PERSISTENCE_CHECK_END_OF_BUFFER_BUG_CPP();
+                                CV_PERSISTENCE_CHECK_انتہا_کا_بفر_BUG_CPP();
                             }
                         }
-                        if (i + 1 >= CV_FS_MAX_LEN)
+                        اگر (i + 1 >= CV_FS_MAX_LEN)
                             CV_PARSE_ERROR_CPP("Too long string literal");
                         strbuf[i++] = c;
                     }
-                    elem->setValue(FileNode::STRING, strbuf, i);
+                    elem->سیٹ_قدر(File_گرہ::STRING, strbuf, i);
                 }
 
-                if( value_type != FileNode::NONE && value_type != FileNode::SEQ && value_type != FileNode::MAP )
-                    break;
-                have_space = false;
+                اگر( value_type != File_گرہ::NONE && value_type != File_گرہ::SEQ && value_type != File_گرہ::MAP )
+                    توڑو;
+                have_space = جھوٹ;
             }
         }
-        fs->finalizeCollection(node);
+        fs->finalizeCollection(گرہ);
 
-        return ptr;
+        واپس ptr;
     }
 
-    char* parseTag( char* ptr, std::string& tag_name,
-                    std::string& type_name, int& tag_type )
+    حرف* parse_لیبل( حرف* ptr, std::string& لیبل_name,
+                    std::string& type_name, صحیح& لیبل_type )
     {
-        if (!ptr)
+        اگر (!ptr)
             CV_PARSE_ERROR_CPP("Invalid tag input");
 
-        if( *ptr == '\0' )
+        اگر( *ptr == '\0' )
             CV_PARSE_ERROR_CPP( "Unexpected end of the stream" );
 
-        if( *ptr != '<' )
+        اگر( *ptr != '<' )
             CV_PARSE_ERROR_CPP( "Tag should start with \'<\'" );
 
         ptr++;
-        CV_PERSISTENCE_CHECK_END_OF_BUFFER_BUG_CPP();
+        CV_PERSISTENCE_CHECK_انتہا_کا_بفر_BUG_CPP();
 
-        if( cv_isalnum(*ptr) || *ptr == '_' )
-            tag_type = CV_XML_OPENING_TAG;
-        else if( *ptr == '/' )
+        اگر( cv_isalnum(*ptr) || *ptr == '_' )
+            لیبل_type = CV_XML_OPENING_لیبل;
+        ورنہ اگر( *ptr == '/' )
         {
-            tag_type = CV_XML_CLOSING_TAG;
+            لیبل_type = CV_XML_CLOSING_لیبل;
             ptr++;
         }
-        else if( *ptr == '?' )
+        ورنہ اگر( *ptr == '?' )
         {
-            tag_type = CV_XML_HEADER_TAG;
+            لیبل_type = CV_XML_سرخی_لیبل;
             ptr++;
         }
-        else if( *ptr == '!' )
+        ورنہ اگر( *ptr == '!' )
         {
-            tag_type = CV_XML_DIRECTIVE_TAG;
+            لیبل_type = CV_XML_DIRECTIVE_لیبل;
             CV_Assert( ptr[1] != '-' || ptr[2] != '-' );
             ptr++;
         }
-        else
+        ورنہ
             CV_PARSE_ERROR_CPP( "Unknown tag type" );
 
-        tag_name.clear();
+        لیبل_name.clear();
         type_name.clear();
 
-        for(;;)
+        برائے(;;)
         {
-            char c, *endptr;
-            if( !cv_isalpha(*ptr) && *ptr != '_' )
+            حرف c, *endptr;
+            اگر( !cv_isalpha(*ptr) && *ptr != '_' )
                 CV_PARSE_ERROR_CPP( "Name should start with a letter or underscore" );
 
             endptr = ptr - 1;
-            do c = *++endptr;
-            while( cv_isalnum(c) || c == '_' || c == '-' );
+            کرو c = *++endptr;
+            جب( cv_isalnum(c) || c == '_' || c == '-' );
 
             std::string attrname(ptr, (size_t)(endptr - ptr));
             ptr = endptr;
-            CV_PERSISTENCE_CHECK_END_OF_BUFFER_BUG_CPP();
+            CV_PERSISTENCE_CHECK_انتہا_کا_بفر_BUG_CPP();
 
-            if( tag_name.empty() )
-                tag_name = attrname;
-            else
+            اگر( لیبل_name.empty() )
+                لیبل_name = attrname;
+            ورنہ
             {
-                if( tag_type == CV_XML_CLOSING_TAG )
+                اگر( لیبل_type == CV_XML_CLOSING_لیبل )
                     CV_PARSE_ERROR_CPP( "Closing tag should not contain any attributes" );
 
-                if( *ptr != '=' )
+                اگر( *ptr != '=' )
                 {
-                    ptr = skipSpaces( ptr, CV_XML_INSIDE_TAG );
-                    if (!ptr)
+                    ptr = skipSpaces( ptr, CV_XML_INSIDE_لیبل );
+                    اگر (!ptr)
                         CV_PARSE_ERROR_CPP("Invalid attribute");
-                    if( *ptr != '=' )
+                    اگر( *ptr != '=' )
                         CV_PARSE_ERROR_CPP( "Attribute name should be followed by \'=\'" );
                 }
 
                 c = *++ptr;
-                if( c != '\"' && c != '\'' )
+                اگر( c != '\"' && c != '\'' )
                 {
-                    ptr = skipSpaces( ptr, CV_XML_INSIDE_TAG );
-                    if(!ptr)
+                    ptr = skipSpaces( ptr, CV_XML_INSIDE_لیبل );
+                    اگر(!ptr)
                         CV_PARSE_ERROR_CPP("Invalid attribute value");
-                    if( *ptr != '\"' && *ptr != '\'' )
+                    اگر( *ptr != '\"' && *ptr != '\'' )
                         CV_PARSE_ERROR_CPP( "Attribute value should be put into single or double quotes" );
                 }
 
-                char quote = *ptr++;
+                حرف quote = *ptr++;
                 endptr = ptr;
-                for(;;)
+                برائے(;;)
                 {
                     c = *endptr++;
-                    if( c == quote )
-                        break;
-                    if( c == '\0' )
+                    اگر( c == quote )
+                        توڑو;
+                    اگر( c == '\0' )
                         CV_PARSE_ERROR_CPP( "Unexpected end of line" );
                 }
 
-                if( attrname == "type_id" )
+                اگر( attrname == "type_id" )
                 {
                     CV_Assert( type_name.empty() );
                     type_name = std::string(ptr, (size_t)(endptr - 1 - ptr));
@@ -773,99 +773,99 @@ public:
             }
 
             c = *ptr;
-            bool have_space = cv_isspace(c) || c == '\0';
+            منطقی have_space = cv_isspace(c) || c == '\0';
 
-            if( c != '>' )
+            اگر( c != '>' )
             {
-                ptr = skipSpaces( ptr, CV_XML_INSIDE_TAG );
-                if (!ptr)
+                ptr = skipSpaces( ptr, CV_XML_INSIDE_لیبل );
+                اگر (!ptr)
                     CV_PARSE_ERROR_CPP("Invalid input");
                 c = *ptr;
             }
 
-            if( c == '>' )
+            اگر( c == '>' )
             {
-                if( tag_type == CV_XML_HEADER_TAG )
+                اگر( لیبل_type == CV_XML_سرخی_لیبل )
                     CV_PARSE_ERROR_CPP( "Invalid closing tag for <?xml ..." );
                 ptr++;
-                break;
+                توڑو;
             }
-            else if( c == '?' && tag_type == CV_XML_HEADER_TAG )
+            ورنہ اگر( c == '?' && لیبل_type == CV_XML_سرخی_لیبل )
             {
-                if( ptr[1] != '>'  )  // FIXIT ptr[1] - out of bounds read without check
+                اگر( ptr[1] != '>'  )  // FIXIT ptr[1] - out of bounds read without check
                     CV_PARSE_ERROR_CPP( "Invalid closing tag for <?xml ..." );
                 ptr += 2;
-                break;
+                توڑو;
             }
-            else if( c == '/' && ptr[1] == '>' && tag_type == CV_XML_OPENING_TAG )  // FIXIT ptr[1] - out of bounds read without check
+            ورنہ اگر( c == '/' && ptr[1] == '>' && لیبل_type == CV_XML_OPENING_لیبل )  // FIXIT ptr[1] - out of bounds read without check
             {
-                tag_type = CV_XML_EMPTY_TAG;
+                لیبل_type = CV_XML_خالی_خانے_لیبل;
                 ptr += 2;
-                break;
+                توڑو;
             }
 
-            if( !have_space )
+            اگر( !have_space )
                 CV_PARSE_ERROR_CPP( "There should be space between attributes" );
         }
 
-        return ptr;
+        واپس ptr;
     }
 
-    bool parse(char* ptr)
+    منطقی parse(حرف* ptr)
     {
         CV_Assert( fs != 0 );
 
-        std::string key, key2, type_name;
-        int tag_type = 0;
-        bool ok = false;
+        std::string کلید, key2, type_name;
+        صحیح لیبل_type = 0;
+        منطقی ok = جھوٹ;
 
         // CV_XML_INSIDE_TAG is used to prohibit leading comments
-        ptr = skipSpaces( ptr, CV_XML_INSIDE_TAG );
-        if (!ptr)
+        ptr = skipSpaces( ptr, CV_XML_INSIDE_لیبل );
+        اگر (!ptr)
             CV_PARSE_ERROR_CPP("Invalid input");
 
-        if( memcmp( ptr, "<?xml", 5 ) != 0 )  // FIXIT ptr[1..] - out of bounds read without check
+        اگر( memcmp( ptr, "<?xml", 5 ) != 0 )  // FIXIT ptr[1..] - out of bounds read without check
             CV_PARSE_ERROR_CPP( "Valid XML should start with \'<?xml ...?>\'" );
 
-        ptr = parseTag( ptr, key, type_name, tag_type );
-        FileNode root_collection(fs->getFS(), 0, 0);
+        ptr = parse_لیبل( ptr, کلید, type_name, لیبل_type );
+        File_گرہ جڑ_collection(fs->getFS(), 0, 0);
 
-        while( ptr && *ptr != '\0' )
+        جب( ptr && *ptr != '\0' )
         {
             ptr = skipSpaces( ptr, 0 );
-            if (!ptr)
+            اگر (!ptr)
                 CV_PARSE_ERROR_CPP("Invalid input");
 
-            if( *ptr != '\0' )
+            اگر( *ptr != '\0' )
             {
-                ptr = parseTag( ptr, key, type_name, tag_type );
-                if( tag_type != CV_XML_OPENING_TAG || key != "opencv_storage" )
+                ptr = parse_لیبل( ptr, کلید, type_name, لیبل_type );
+                اگر( لیبل_type != CV_XML_OPENING_لیبل || کلید != "opencv_storage" )
                     CV_PARSE_ERROR_CPP( "<opencv_storage> tag is missing" );
-                FileNode root = fs->addNode(root_collection, std::string(), FileNode::MAP, 0);
-                ptr = parseValue( ptr, root );
-                ptr = parseTag( ptr, key2, type_name, tag_type );
-                if( tag_type != CV_XML_CLOSING_TAG || key != key2 )
+                File_گرہ جڑ = fs->جوڑو_گرہ(جڑ_collection, std::string(), File_گرہ::MAP, 0);
+                ptr = parse_قدر( ptr, جڑ );
+                ptr = parse_لیبل( ptr, key2, type_name, لیبل_type );
+                اگر( لیبل_type != CV_XML_CLOSING_لیبل || کلید != key2 )
                     CV_PARSE_ERROR_CPP( "</opencv_storage> tag is missing" );
                 ptr = skipSpaces( ptr, 0 );
-                ok = true;
+                ok = سچ;
             }
         }
         CV_Assert( fs->eof() );
-        return ok;
+        واپس ok;
     }
 
     FileStorage_API* fs;
-    char strbuf[CV_FS_MAX_LEN+16];
+    حرف strbuf[CV_FS_MAX_LEN+16];
 };
 
 Ptr<FileStorageEmitter> createXMLEmitter(FileStorage_API* fs)
 {
-    return makePtr<XMLEmitter>(fs);
+    واپس makePtr<XMLEmitter>(fs);
 }
 
 Ptr<FileStorageParser> createXMLParser(FileStorage_API* fs)
 {
-    return makePtr<XMLParser>(fs);
+    واپس makePtr<XMLParser>(fs);
 }
 
 }

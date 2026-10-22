@@ -6,72 +6,72 @@
 // Not a standalone header, part of filesystem.cpp
 //
 
-#include "opencv2/core/utils/plugin_loader.private.hpp"
+#شامل "opencv2/core/utils/plugin_loader.private.hpp"
 
-#if !OPENCV_HAVE_FILESYSTEM_SUPPORT
-#error "Invalid build configuration"
-#endif
+#اگر !OPENCV_HAVE_FILESYSTEM_SUPPORT
+#غلطی "Invalid build configuration"
+#اگر_ختم
 
-#if 0  // TODO
-#ifdef NDEBUG
-#define CV_LOG_STRIP_LEVEL CV_LOG_LEVEL_DEBUG + 1
-#else
-#define CV_LOG_STRIP_LEVEL CV_LOG_LEVEL_VERBOSE + 1
-#endif
-#include <opencv2/core/utils/logger.hpp>
-#endif
+#اگر 0  // TODO
+#اگر_تعریف_شدہ NDEBUG
+#تعریف_کرو CV_LOG_STRIP_LEVEL CV_LOG_LEVEL_DEBUG + 1
+#ورنہ
+#تعریف_کرو CV_LOG_STRIP_LEVEL CV_LOG_LEVEL_VERBOSE + 1
+#اگر_ختم
+#شامل <opencv2/core/utils/logger.hpp>
+#اگر_ختم
 
-namespace cv { namespace plugin { namespace impl {
+نامخلا cv { نامخلا plugin { نامخلا impl {
 
-DynamicLib::DynamicLib(const FileSystemPath_t& filename)
-    : handle(0), fname(filename), disableAutoUnloading_(false)
+DynamicLib::DynamicLib(ثابت File_System_راستہ_t& filename)
+    : handle(0), fname(filename), disableAutoUnloading_(جھوٹ)
 {
-    libraryLoad(filename);
+    library_بھرو(filename);
 }
 
 DynamicLib::~DynamicLib()
 {
-    if (!disableAutoUnloading_)
+    اگر (!disableAutoUnloading_)
     {
         libraryRelease();
     }
-    else if (handle)
+    ورنہ اگر (handle)
     {
-        CV_LOG_INFO(NULL, "skip auto unloading (disabled): " << toPrintablePath(fname));
+        CV_LOG_INFO(تہی, "skip auto unloading (disabled): " << مقصد_Printable_راستہ(fname));
         handle = 0;
     }
 }
 
-void* DynamicLib::getSymbol(const char* symbolName) const
+خالی* DynamicLib::get_علامت(ثابت حرف* علامت_Name) ثابت
 {
-    if (!handle)
+    اگر (!handle)
     {
-        return 0;
+        واپس 0;
     }
-    void* res = getSymbol_(handle, symbolName);
-    if (!res)
+    خالی* res = get_علامت_2(handle, علامت_Name);
+    اگر (!res)
     {
-        CV_LOG_DEBUG(NULL, "No symbol '" << symbolName << "' in " << toPrintablePath(fname));
+        CV_LOG_DEBUG(تہی, "No symbol '" << علامت_Name << "' in " << مقصد_Printable_راستہ(fname));
     }
-    return res;
+    واپس res;
 }
 
-std::string DynamicLib::getName() const
+std::string DynamicLib::getName() ثابت
 {
-    return toPrintablePath(fname);
+    واپس مقصد_Printable_راستہ(fname);
 }
 
-void DynamicLib::libraryLoad(const FileSystemPath_t& filename)
+خالی DynamicLib::library_بھرو(ثابت File_System_راستہ_t& filename)
 {
-    handle = libraryLoad_(filename);
-    CV_LOG_INFO(NULL, "load " << toPrintablePath(filename) << " => " << (handle ? "OK" : "FAILED"));
+    handle = library_بھرو_2(filename);
+    CV_LOG_INFO(تہی, "load " << مقصد_Printable_راستہ(filename) << " => " << (handle ? "OK" : "FAILED"));
 }
 
-void DynamicLib::libraryRelease()
+خالی DynamicLib::libraryRelease()
 {
-    if (handle)
+    اگر (handle)
     {
-        CV_LOG_INFO(NULL, "unload "<< toPrintablePath(fname));
+        CV_LOG_INFO(تہی, "unload "<< مقصد_Printable_راستہ(fname));
         libraryRelease_(handle);
         handle = 0;
     }

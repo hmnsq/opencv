@@ -1,74 +1,74 @@
 // This file is part of OpenCV project.
 // It is subject to the license terms in the LICENSE file found in the top-level directory
 // of this distribution and at http://opencv.org/license.html.
-#include "../precomp.hpp"
+#شامل "../precomp.hpp"
 
-#include "factory_parallel.hpp"
+#شامل "factory_parallel.hpp"
 
-#ifdef HAVE_TBB
+#اگر_تعریف_شدہ HAVE_TBB
 
-#include "parallel.hpp"
-#include "opencv2/core/parallel/backend/parallel_for.tbb.hpp"
+#شامل "parallel.hpp"
+#شامل "opencv2/core/parallel/backend/parallel_for.tbb.hpp"
 
-namespace cv { namespace parallel {
+نامخلا cv { نامخلا parallel {
 
-static
+ساکن
 std::shared_ptr<cv::parallel::tbb::ParallelForBackend>& getInstance()
 {
-    static std::shared_ptr<cv::parallel::tbb::ParallelForBackend> g_instance = std::make_shared<cv::parallel::tbb::ParallelForBackend>();
-    return g_instance;
+    ساکن std::shared_ptr<cv::parallel::tbb::ParallelForBackend> g_instance = std::make_shared<cv::parallel::tbb::ParallelForBackend>();
+    واپس g_instance;
 }
 
-#ifndef BUILD_PLUGIN
+#اگر_غیر_تعریف_شدہ BUILD_PLUGIN
 std::shared_ptr<cv::parallel::ParallelForAPI> createParallelBackendTBB()
 {
-    return getInstance();
+    واپس getInstance();
 }
-#endif
+#اگر_ختم
 
 }}  // namespace
 
-#ifdef BUILD_PLUGIN
+#اگر_تعریف_شدہ BUILD_PLUGIN
 
-#define ABI_VERSION 0
-#define API_VERSION 0
-#include "plugin_parallel_api.hpp"
+#تعریف_کرو ABI_نسخہ 0
+#تعریف_کرو API_نسخہ 0
+#شامل "plugin_parallel_api.hpp"
 
-static
-CvResult cv_getInstance(CV_OUT CvPluginParallelBackendAPI* handle) CV_NOEXCEPT
+ساکن
+Cv_نتیجہ cv_getInstance(CV_برآمد CvPluginParallelBackendAPI* handle) CV_NOEXCEPT
 {
-    try
+    کوشش
     {
-        if (!handle)
-            return CV_ERROR_FAIL;
+        اگر (!handle)
+            واپس CV_ERROR_FAIL;
         *handle = cv::parallel::getInstance().get();
-        return CV_ERROR_OK;
+        واپس CV_ERROR_OK;
     }
-    catch (...)
+    پکڑو (...)
     {
-        return CV_ERROR_FAIL;
+        واپس CV_ERROR_FAIL;
     }
 }
 
-static const OpenCV_Core_Parallel_Plugin_API plugin_api =
+ساکن ثابت OpenCV_Core_Parallel_Plugin_API plugin_api =
 {
     {
-        sizeof(OpenCV_Core_Parallel_Plugin_API), ABI_VERSION, API_VERSION,
-        CV_VERSION_MAJOR, CV_VERSION_MINOR, CV_VERSION_REVISION, CV_VERSION_STATUS,
-        "TBB (interface " CVAUX_STR(TBB_INTERFACE_VERSION) ") OpenCV parallel plugin"
+        حجم(OpenCV_Core_Parallel_Plugin_API), ABI_نسخہ, API_نسخہ,
+        CV_نسخہ_MAJOR, CV_نسخہ_MINOR, CV_نسخہ_REVISION, CV_نسخہ_حالت,
+        "TBB (interface " CVAUX_STR(TBB_INTERFACE_نسخہ) ") OpenCV parallel plugin"
     },
     {
         /*  1*/cv_getInstance
     }
 };
 
-const OpenCV_Core_Parallel_Plugin_API* CV_API_CALL opencv_core_parallel_plugin_init_v0(int requested_abi_version, int requested_api_version, void* /*reserved=NULL*/) CV_NOEXCEPT
+ثابت OpenCV_Core_Parallel_Plugin_API* CV_API_CALL opencv_core_parallel_plugin_init_v0(صحیح requested_abi_نسخہ, صحیح requested_api_نسخہ, خالی* /*reserved=NULL*/) CV_NOEXCEPT
 {
-    if (requested_abi_version == ABI_VERSION && requested_api_version <= API_VERSION)
-        return &plugin_api;
-    return NULL;
+    اگر (requested_abi_نسخہ == ABI_نسخہ && requested_api_نسخہ <= API_نسخہ)
+        واپس &plugin_api;
+    واپس تہی;
 }
 
-#endif  // BUILD_PLUGIN
+#اگر_ختم  // BUILD_PLUGIN
 
-#endif  // HAVE_TBB
+#اگر_ختم  // HAVE_TBB

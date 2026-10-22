@@ -6,238 +6,238 @@
 
 // Jonker-Volgenant rectangular assignment. See @cite Crouse2016 and @cite Jonker1987.
 
-#include "precomp.hpp"
+#شامل "precomp.hpp"
 
-#include <algorithm>
-#include <limits>
+#شامل <algorithm>
+#شامل <limits>
 
-namespace cv {
+نامخلا cv {
 
 // cvIsNaN/cvIsInf inspect the bit pattern, so unlike std::isfinite they still work under
 // -ffast-math.
-static inline bool isFiniteVal(double x)
+ساکن اندرونی منطقی isFiniteVal(دوہرا x)
 {
-    return !cvIsNaN(x) && !cvIsInf(x);
+    واپس !cvIsNaN(x) && !cvIsInf(x);
 }
 
 // Type the duals and the running sums are kept in. double suits all three inputs: it holds every
 // int and float value exactly, so the integer path needs no arithmetic of its own.
-template <typename T> struct LapAccumulator { typedef double type; };
+سانچہ <قسم_نام T> ساخت Lap_مجمع { قسمتعریف دوہرا type; };
 
 // A cell is usable only if it is a real cost within the threshold. Check finiteness first:
 // NaN > costThreshold is false, so a bare comparison would let NaN through as allowed.
-template <typename T>
-static inline bool cellAllowed(T value, double costThreshold)
+سانچہ <قسم_نام T>
+ساکن اندرونی منطقی cellAllowed(T value, دوہرا لاگت_حد)
 {
-    const double v = (double)value;
-    return isFiniteVal(v) && v <= costThreshold;
+    ثابت دوہرا v = (دوہرا)value;
+    واپس isFiniteVal(v) && v <= لاگت_حد;
 }
 
 // Assigns every row to its own column at the lowest total. `work` is nrows x ncols, rows <= cols,
 // all finite. Each pass adds one row by a Dijkstra search over the reduced costs.
-template <typename Acc>
-static void solveJV(const std::vector<Acc>& work, int nrows, int ncols, std::vector<int>& colOfRow)
+سانچہ <قسم_نام Acc>
+ساکن خالی solveJV(ثابت std::vector<Acc>& work, صحیح nrows, صحیح ncols, std::vector<صحیح>& ستون_کا_صف)
 {
     CV_DbgAssert(nrows <= ncols);
 
     std::vector<Acc> u((size_t)nrows, Acc(0));
     std::vector<Acc> v((size_t)ncols, Acc(0));
     std::vector<Acc> dist((size_t)ncols);
-    std::vector<int> rowOfCol((size_t)ncols, -1);
-    std::vector<int> prevRow((size_t)ncols);
+    std::vector<صحیح> صف_کا_ستون((size_t)ncols, -1);
+    std::vector<صحیح> پچھلا_صف((size_t)ncols);
     std::vector<uchar> labelled((size_t)ncols);
-    std::vector<int> remaining((size_t)ncols);   // columns not yet labelled, in no order
+    std::vector<صحیح> بقایا((size_t)ncols);   // columns not yet labelled, in no order
 
-    colOfRow.assign((size_t)nrows, -1);
+    ستون_کا_صف.assign((size_t)nrows, -1);
 
-    for (int freeRow = 0; freeRow < nrows; freeRow++)
+    برائے (صحیح free_صف = 0; free_صف < nrows; free_صف++)
     {
         std::fill(dist.begin(), dist.end(), std::numeric_limits<Acc>::max());
         std::fill(labelled.begin(), labelled.end(), (uchar)0);
-        for (int j = 0; j < ncols; j++)
-            remaining[j] = j;
-        int nremaining = ncols;
+        برائے (صحیح j = 0; j < ncols; j++)
+            بقایا[j] = j;
+        صحیح nremaining = ncols;
 
-        int row = freeRow;      // row currently being expanded
+        صحیح صف = free_صف;      // row currently being expanded
         Acc delta = Acc(0);     // length of the shortest path found so far
-        int sink = -1;          // free column that ends the augmenting path
+        صحیح sink = -1;          // free column that ends the augmenting path
 
-        while (sink < 0)
+        جب (sink < 0)
         {
-            const Acc* rowPtr = &work[(size_t)row * ncols];
-            const Acc urow = u[row];
+            ثابت Acc* صف_Ptr = &work[(size_t)صف * ncols];
+            ثابت Acc urow = u[صف];
             // One pass over the unlabelled columns relaxes them and picks the nearest. A settled
             // column is swapped off the tail so it is never read again.
-            int best = 0;
-            Acc bestDist = std::numeric_limits<Acc>::max();
-            for (int k = 0; k < nremaining; k++)
+            صحیح بہترین = 0;
+            Acc بہترین_Dist = std::numeric_limits<Acc>::max();
+            برائے (صحیح k = 0; k < nremaining; k++)
             {
-                const int j = remaining[k];
-                const Acc cand = delta + rowPtr[j] - urow - v[j];
-                if (cand < dist[j])
+                ثابت صحیح j = بقایا[k];
+                ثابت Acc cand = delta + صف_Ptr[j] - urow - v[j];
+                اگر (cand < dist[j])
                 {
                     dist[j] = cand;
-                    prevRow[j] = row;
+                    پچھلا_صف[j] = صف;
                 }
-                if (dist[j] < bestDist)
+                اگر (dist[j] < بہترین_Dist)
                 {
-                    bestDist = dist[j];
-                    best = k;
+                    بہترین_Dist = dist[j];
+                    بہترین = k;
                 }
             }
             // ncols >= nrows leaves at least one column free, and every cost is finite, so the
             // search can always reach it.
-            CV_Assert(bestDist < std::numeric_limits<Acc>::max());
+            CV_Assert(بہترین_Dist < std::numeric_limits<Acc>::max());
 
-            const int next = remaining[best];
-            remaining[best] = remaining[--nremaining];
+            ثابت صحیح next = بقایا[بہترین];
+            بقایا[بہترین] = بقایا[--nremaining];
             labelled[next] = 1;    // still needed by the dual update below
-            delta = bestDist;
+            delta = بہترین_Dist;
 
-            if (rowOfCol[next] < 0)
+            اگر (صف_کا_ستون[next] < 0)
                 sink = next;
-            else
-                row = rowOfCol[next];   // occupied, so keep going through its row
+            ورنہ
+                صف = صف_کا_ستون[next];   // occupied, so keep going through its row
         }
 
         // Shift the duals so the path edges land at zero without disturbing the matched pairs.
         // Must run before the matching below, which it reads.
-        u[freeRow] += delta;
-        for (int j = 0; j < ncols; j++)
+        u[free_صف] += delta;
+        برائے (صحیح j = 0; j < ncols; j++)
         {
-            if (labelled[j] && j != sink)
+            اگر (labelled[j] && j != sink)
             {
-                const Acc shift = delta - dist[j];
-                v[j] -= shift;
-                u[rowOfCol[j]] += shift;
+                ثابت Acc سرکاؤ = delta - dist[j];
+                v[j] -= سرکاؤ;
+                u[صف_کا_ستون[j]] += سرکاؤ;
             }
         }
 
         // Walk the path back from the free column, flipping each edge.
-        for (int j = sink;;)
+        برائے (صحیح j = sink;;)
         {
-            const int i = prevRow[j];
-            rowOfCol[j] = i;
-            const int jPrev = colOfRow[i];
-            colOfRow[i] = j;
-            if (i == freeRow)
-                break;
-            j = jPrev;
+            ثابت صحیح i = پچھلا_صف[j];
+            صف_کا_ستون[j] = i;
+            ثابت صحیح j_پچھلا = ستون_کا_صف[i];
+            ستون_کا_صف[i] = j;
+            اگر (i == free_صف)
+                توڑو;
+            j = j_پچھلا;
         }
     }
 }
 
 // Solves for one input type. `src` is read in its own type, so the padded working matrix is the
 // only copy made and no promoted duplicate of the input is allocated.
-template <typename T>
-static double solveTyped(const Mat& src, bool transposed, std::vector<int>& assignment,
-                         double costThreshold)
+سانچہ <قسم_نام T>
+ساکن دوہرا solveTyped(ثابت Mat& src, منطقی transposed, std::vector<صحیح>& assignment,
+                         دوہرا لاگت_حد)
 {
-    typedef typename LapAccumulator<T>::type Acc;
+    قسمتعریف قسم_نام Lap_مجمع<T>::type Acc;
 
-    const int nrows = src.rows;
-    const int nreal = src.cols;
+    ثابت صحیح nrows = src.صفیں;
+    ثابت صحیح nreal = src.ستون_تعداد;
 
     Mat allowed(nrows, nreal, CV_8U);
-    Acc absSum = Acc(0);
-    double maxCost = -std::numeric_limits<double>::max();
-    bool anyForbidden = false;
-    for (int i = 0; i < nrows; i++)
+    Acc abs_مجموع = Acc(0);
+    دوہرا max_لاگت = -std::numeric_limits<دوہرا>::max();
+    منطقی anyForbidden = جھوٹ;
+    برائے (صحیح i = 0; i < nrows; i++)
     {
-        const T* s = src.ptr<T>(i);
+        ثابت T* s = src.ptr<T>(i);
         uchar* a = allowed.ptr<uchar>(i);
-        for (int j = 0; j < nreal; j++)
+        برائے (صحیح j = 0; j < nreal; j++)
         {
-            const bool ok = cellAllowed<T>(s[j], costThreshold);
+            ثابت منطقی ok = cellAllowed<T>(s[j], لاگت_حد);
             a[j] = ok ? 1 : 0;
-            if (ok)
+            اگر (ok)
             {
-                absSum += (Acc)std::abs((double)s[j]);
-                maxCost = std::max(maxCost, (double)s[j]);
+                abs_مجموع += (Acc)std::مطلق_قدر((دوہرا)s[j]);
+                max_لاگت = std::max(max_لاگت, (دوہرا)s[j]);
             }
-            else
-                anyForbidden = true;
+            ورنہ
+                anyForbidden = سچ;
         }
     }
 
     // Price of leaving a row unmatched, clamped so the DBL_MAX default stays finite.
     // The 2 is required: k -> k+1 augments a path, so the delta is 2*absSum, not one edge.
-    Acc dummy = Acc(2) * absSum + Acc(1);
-    if (costThreshold < (double)dummy)
-        dummy = (Acc)costThreshold;
-    CV_Assert(isFiniteVal((double)dummy));
+    Acc dummy = Acc(2) * abs_مجموع + Acc(1);
+    اگر (لاگت_حد < (دوہرا)dummy)
+        dummy = (Acc)لاگت_حد;
+    CV_Assert(isFiniteVal((دوہرا)dummy));
 
     // A forbidden cell only has to lose to a dummy, and every row has one. The margin scales
     // because adding 1 to a very large dummy changes nothing.
-    const Acc forbidden = dummy + (Acc)std::max(1.0, std::abs((double)dummy) * 1e-12);
-    CV_Assert(isFiniteVal((double)forbidden) && forbidden > dummy);
+    ثابت Acc forbidden = dummy + (Acc)std::max(1.0, std::مطلق_قدر((دوہرا)dummy) * 1e-12);
+    CV_Assert(isFiniteVal((دوہرا)forbidden) && forbidden > dummy);
 
     // Drop the dummy columns when no row can go unmatched: nothing forbidden, every cost below the
     // no-pair price. Halves the columns on square input; a cost equal to that price is a tie.
-    const int ndummy = (anyForbidden || !(maxCost < (double)dummy)) ? nrows : 0;
-    const int ncols = nreal + ndummy;
+    ثابت صحیح ndummy = (anyForbidden || !(max_لاگت < (دوہرا)dummy)) ? nrows : 0;
+    ثابت صحیح ncols = nreal + ndummy;
 
     std::vector<Acc> work((size_t)nrows * ncols);
-    for (int i = 0; i < nrows; i++)
+    برائے (صحیح i = 0; i < nrows; i++)
     {
-        const T* s = src.ptr<T>(i);
-        const uchar* a = allowed.ptr<uchar>(i);
+        ثابت T* s = src.ptr<T>(i);
+        ثابت uchar* a = allowed.ptr<uchar>(i);
         Acc* w = &work[(size_t)i * ncols];
-        for (int j = 0; j < nreal; j++)
+        برائے (صحیح j = 0; j < nreal; j++)
             w[j] = a[j] ? (Acc)s[j] : forbidden;
-        for (int j = nreal; j < ncols; j++)
+        برائے (صحیح j = nreal; j < ncols; j++)
             w[j] = dummy;
     }
 
-    std::vector<int> colOfRow;
-    solveJV<Acc>(work, nrows, ncols, colOfRow);
+    std::vector<صحیح> ستون_کا_صف;
+    solveJV<Acc>(work, nrows, ncols, ستون_کا_صف);
 
-    double total = 0.0;
-    for (int i = 0; i < nrows; i++)
+    دوہرا کل = 0.0;
+    برائے (صحیح i = 0; i < nrows; i++)
     {
-        const int j = colOfRow[i];
+        ثابت صحیح j = ستون_کا_صف[i];
         CV_DbgAssert(j >= 0 && j < ncols);      // solveJV gives every row a column
-        if (j >= nreal || !allowed.at<uchar>(i, j))
-            continue;   // landed on a dummy column or a forbidden cell, so it stays unmatched
+        اگر (j >= nreal || !allowed.at<uchar>(i, j))
+            جاری;   // landed on a dummy column or a forbidden cell, so it stays unmatched
 
-        total += (double)src.ptr<T>(i)[j];
-        const int row = transposed ? j : i;
-        CV_DbgAssert(row >= 0 && (size_t)row < assignment.size());
-        assignment[(size_t)row] = transposed ? i : j;
+        کل += (دوہرا)src.ptr<T>(i)[j];
+        ثابت صحیح صف = transposed ? j : i;
+        CV_DbgAssert(صف >= 0 && (size_t)صف < assignment.size());
+        assignment[(size_t)صف] = transposed ? i : j;
     }
-    return total;
+    واپس کل;
 }
 
-double linearAssignment(InputArray _cost, std::vector<int>& assignment, double costThreshold)
+دوہرا خطی_Assignment(داخلہ_Array لاگت, std::vector<صحیح>& assignment, دوہرا لاگت_حد)
 {
     CV_INSTRUMENT_REGION();
 
-    Mat cost = _cost.getMat();
-    CV_Assert(cost.dims <= 2);
-    CV_Assert(!cost.empty());
+    Mat لاگت_2 = لاگت.getMat();
+    CV_Assert(لاگت_2.dims <= 2);
+    CV_Assert(!لاگت_2.empty());
 
-    assignment.assign((size_t)cost.rows, -1);
+    assignment.assign((size_t)لاگت_2.صفیں, -1);
 
-    CV_CheckType(cost.type(),
-                 cost.type() == CV_32FC1 || cost.type() == CV_64FC1 || cost.type() == CV_32SC1,
+    CV_CheckType(لاگت_2.type(),
+                 لاگت_2.type() == CV_32FC1 || لاگت_2.type() == CV_64FC1 || لاگت_2.type() == CV_32SC1,
                  "cost must be a single-channel CV_32F, CV_64F or CV_32S matrix");
-    CV_Assert(!cvIsNaN(costThreshold));
+    CV_Assert(!cvIsNaN(لاگت_حد));
 
     // The solver assigns every row, so it needs rows <= cols. Transposing also makes A and its
     // transpose give the same answer, since min(M,N) is the same either way.
-    const bool transposed = cost.rows > cost.cols;
+    ثابت منطقی transposed = لاگت_2.صفیں > لاگت_2.ستون_تعداد;
     Mat src;
-    if (transposed)
-        cv::transpose(cost, src);
-    else
-        src = cost;
+    اگر (transposed)
+        cv::transpose(لاگت_2, src);
+    ورنہ
+        src = لاگت_2;
 
-    switch (cost.depth())
+    انتخاب (لاگت_2.گہرائی())
     {
-    case CV_32F: return solveTyped<float>(src, transposed, assignment, costThreshold);
-    case CV_64F: return solveTyped<double>(src, transposed, assignment, costThreshold);
-    case CV_32S: return solveTyped<int>(src, transposed, assignment, costThreshold);
-    default:     CV_Error(Error::StsUnsupportedFormat, "unsupported cost matrix type");
+    حالت CV_32F: واپس solveTyped<اعشاری>(src, transposed, assignment, لاگت_حد);
+    حالت CV_64F: واپس solveTyped<دوہرا>(src, transposed, assignment, لاگت_حد);
+    حالت CV_32S: واپس solveTyped<صحیح>(src, transposed, assignment, لاگت_حد);
+    طےشدہ:     CV_Error(Error::StsUnsupportedFormat, "unsupported cost matrix type");
     }
 }
 

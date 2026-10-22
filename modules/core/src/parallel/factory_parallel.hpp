@@ -2,28 +2,28 @@
 // It is subject to the license terms in the LICENSE file found in the top-level directory
 // of this distribution and at http://opencv.org/license.html.
 
-#ifndef OPENCV_CORE_PARALLEL_FACTORY_HPP
-#define OPENCV_CORE_PARALLEL_FACTORY_HPP
+#اگر_غیر_تعریف_شدہ OPENCV_CORE_PARALLEL_FACTORY_HPP
+#تعریف_کرو OPENCV_CORE_PARALLEL_FACTORY_HPP
 
-#include "opencv2/core/parallel/parallel_backend.hpp"
+#شامل "opencv2/core/parallel/parallel_backend.hpp"
 
-namespace cv { namespace parallel {
+نامخلا cv { نامخلا parallel {
 
-class IParallelBackendFactory
+جماعت IParallelBackendFactory
 {
-public:
-    virtual ~IParallelBackendFactory() {}
-    virtual std::shared_ptr<cv::parallel::ParallelForAPI> create() const = 0;
+عوامی:
+    مجازی ~IParallelBackendFactory() {}
+    مجازی std::shared_ptr<cv::parallel::ParallelForAPI> create() ثابت = 0;
 };
 
 
-class StaticBackendFactory CV_FINAL: public IParallelBackendFactory
+جماعت StaticBackendFactory CV_FINAL: عوامی IParallelBackendFactory
 {
-protected:
-    std::function<std::shared_ptr<cv::parallel::ParallelForAPI>(void)> create_fn_;
+محفوظ:
+    std::function<std::shared_ptr<cv::parallel::ParallelForAPI>(خالی)> create_fn_;
 
-public:
-    StaticBackendFactory(std::function<std::shared_ptr<cv::parallel::ParallelForAPI>(void)>&& create_fn)
+عوامی:
+    StaticBackendFactory(std::function<std::shared_ptr<cv::parallel::ParallelForAPI>(خالی)>&& create_fn)
         : create_fn_(create_fn)
     {
         // nothing
@@ -31,9 +31,9 @@ public:
 
     ~StaticBackendFactory() CV_OVERRIDE {}
 
-    std::shared_ptr<cv::parallel::ParallelForAPI> create() const CV_OVERRIDE
+    std::shared_ptr<cv::parallel::ParallelForAPI> create() ثابت CV_OVERRIDE
     {
-        return create_fn_();
+        واپس create_fn_();
     }
 };
 
@@ -41,8 +41,8 @@ public:
 // PluginBackendFactory is implemented in plugin_wrapper.cpp
 //
 
-std::shared_ptr<IParallelBackendFactory> createPluginParallelBackendFactory(const std::string& baseName);
+std::shared_ptr<IParallelBackendFactory> createPluginParallelBackendFactory(ثابت std::string& بنیاد_Name);
 
 }}  // namespace
 
-#endif  // OPENCV_CORE_PARALLEL_FACTORY_HPP
+#اگر_ختم  // OPENCV_CORE_PARALLEL_FACTORY_HPP

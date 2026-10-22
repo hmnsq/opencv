@@ -2,33 +2,33 @@
 // It is subject to the license terms in the LICENSE file found in the top-level directory
 // of this distribution and at http://opencv.org/license.html
 
-#include "precomp.hpp"
+#شامل "precomp.hpp"
 
-#include "reduce.simd.hpp"
-#include "reduce.simd_declarations.hpp"
+#شامل "reduce.simd.hpp"
+#شامل "reduce.simd_declarations.hpp"
 
-namespace cv {
+نامخلا cv {
 
-typedef void (*ReduceSumFunc)(const Mat& src, Mat& dst);
-ReduceSumFunc getReduceCSumFunc(int sdepth, int ddepth);
-ReduceSumFunc getReduceRSumFunc(int sdepth, int ddepth);
-ReduceSumFunc getReduceRSum2Func(int sdepth, int ddepth);
+قسمتعریف خالی (*Reduce_مجموع_Func)(ثابت Mat& src, Mat& dst);
+Reduce_مجموع_Func getReduceCSumFunc(صحیح sdepth, صحیح ddepth);
+Reduce_مجموع_Func getReduceRSumFunc(صحیح sdepth, صحیح ddepth);
+Reduce_مجموع_Func getReduceRSum2Func(صحیح sdepth, صحیح ddepth);
 
-ReduceSumFunc getReduceCSumFunc(int sdepth, int ddepth)
+Reduce_مجموع_Func getReduceCSumFunc(صحیح sdepth, صحیح ddepth)
 {
     CV_INSTRUMENT_REGION();
     CV_CPU_DISPATCH(getReduceCSumFunc, (sdepth, ddepth),
         CV_CPU_DISPATCH_MODES_ALL);
 }
 
-ReduceSumFunc getReduceRSumFunc(int sdepth, int ddepth)
+Reduce_مجموع_Func getReduceRSumFunc(صحیح sdepth, صحیح ddepth)
 {
     CV_INSTRUMENT_REGION();
     CV_CPU_DISPATCH(getReduceRSumFunc, (sdepth, ddepth),
         CV_CPU_DISPATCH_MODES_ALL);
 }
 
-ReduceSumFunc getReduceRSum2Func(int sdepth, int ddepth)
+Reduce_مجموع_Func getReduceRSum2Func(صحیح sdepth, صحیح ddepth)
 {
     CV_INSTRUMENT_REGION();
     CV_CPU_DISPATCH(getReduceRSum2Func, (sdepth, ddepth),

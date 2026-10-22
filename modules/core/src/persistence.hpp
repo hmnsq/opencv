@@ -3,213 +3,213 @@
 // of this distribution and at http://opencv.org/license.html
 
 
-#ifndef SRC_PERSISTENCE_HPP
-#define SRC_PERSISTENCE_HPP
+#اگر_غیر_تعریف_شدہ SRC_PERSISTENCE_HPP
+#تعریف_کرو SRC_PERSISTENCE_HPP
 
-#include <deque>
-#include <sstream>
-#include <string>
-#include <iterator>
+#شامل <deque>
+#شامل <sstream>
+#شامل <string>
+#شامل <iterator>
 
-#define USE_ZLIB 1
-#if USE_ZLIB
+#تعریف_کرو USE_ZLIB 1
+#اگر USE_ZLIB
 #  ifndef _LFS64_LARGEFILE
 #    define _LFS64_LARGEFILE 0
 #  endif
-#  ifndef _FILE_OFFSET_BITS
-#    define _FILE_OFFSET_BITS 0
+#  ifndef FILE_انحراف_بٹ
+#    define FILE_انحراف_بٹ 0
 #  endif
 #  include <zlib.h>
-#else
-typedef void* gzFile;
-#endif
+#ورنہ
+قسمتعریف خالی* gzFile;
+#اگر_ختم
 
 //=====================================================================================
 
-static const size_t PARSER_BASE64_BUFFER_SIZE = 1024U * 1024U / 8U;
-static const int CV_PERSISTENCE_MAX_DEPTH = 1024;
+ساکن ثابت size_t PARSER_BASE64_بفر_سائز = 1024U * 1024U / 8U;
+ساکن ثابت صحیح CV_PERSISTENCE_MAX_گہرائی = 1024;
 
-namespace base64 {
+نامخلا base64 {
 
-enum
+شمار
 {
-    HEADER_SIZE         = 24,
-    ENCODED_HEADER_SIZE = 32
+    سرخی_سائز         = 24,
+    ENCODED_سرخی_سائز = 32
 };
 
 } // base64::
 
 //=====================================================================================
 
-#define CV_FS_MAX_LEN 4096
-#define CV_FS_MAX_FMT_PAIRS  128
+#تعریف_کرو CV_FS_MAX_LEN 4096
+#تعریف_کرو CV_FS_MAX_FMT_جوڑے  128
 
 /****************************************************************************************\
 *                            Common macros and type definitions                          *
 \****************************************************************************************/
 
-#define cv_isprint(c)     ((uchar)(c) >= (uchar)' ')
-#define cv_isprint_or_tab(c)  ((uchar)(c) >= (uchar)' ' || (c) == '\t')
+#تعریف_کرو cv_isprint(c)     ((uchar)(c) >= (uchar)' ')
+#تعریف_کرو cv_isprint_or_tab(c)  ((uchar)(c) >= (uchar)' ' || (c) == '\t')
 
-inline bool cv_isalnum(char c)
+اندرونی منطقی cv_isalnum(حرف c)
 {
-    return ('0' <= c && c <= '9') || ('a' <= c && c <= 'z') || ('A' <= c && c <= 'Z');
+    واپس ('0' <= c && c <= '9') || ('a' <= c && c <= 'z') || ('A' <= c && c <= 'Z');
 }
 
-inline bool cv_isalpha(char c)
+اندرونی منطقی cv_isalpha(حرف c)
 {
-    return ('a' <= c && c <= 'z') || ('A' <= c && c <= 'Z');
+    واپس ('a' <= c && c <= 'z') || ('A' <= c && c <= 'Z');
 }
 
-inline bool cv_isdigit(char c)
+اندرونی منطقی cv_isdigit(حرف c)
 {
-    return '0' <= c && c <= '9';
+    واپس '0' <= c && c <= '9';
 }
 
-inline bool cv_isspace(char c)
+اندرونی منطقی cv_isspace(حرف c)
 {
-    return (9 <= c && c <= 13) || c == ' ';
+    واپس (9 <= c && c <= 13) || c == ' ';
 }
 
-inline char* cv_skip_BOM(char* ptr)
+اندرونی حرف* cv_skip_BOM(حرف* ptr)
 {
-    if((uchar)ptr[0] == 0xef && (uchar)ptr[1] == 0xbb && (uchar)ptr[2] == 0xbf) //UTF-8 BOM
+    اگر((uchar)ptr[0] == 0xef && (uchar)ptr[1] == 0xbb && (uchar)ptr[2] == 0xbf) //UTF-8 BOM
     {
-      return ptr + 3;
+      واپس ptr + 3;
     }
-    return ptr;
+    واپس ptr;
 }
 
-namespace cv
+نامخلا cv
 {
-namespace fs
+نامخلا fs
 {
-int strcasecmp(const char* str1, const char* str2);
-char* itoa( int _val, char* buffer, int /*radix*/ );
-char* itoa( int64_t _val, char* buffer, int /*radix*/, bool _signed );
-char* floatToString( char* buf, size_t bufSize, float value, bool halfprecision, bool explicitZero );
-char* doubleToString( char* buf, size_t bufSize, double value, bool explicitZero );
+صحیح strcasecmp(ثابت حرف* str1, ثابت حرف* str2);
+حرف* itoa( صحیح _val, حرف* بفر, صحیح /*radix*/ );
+حرف* itoa( int64_t _val, حرف* بفر, صحیح /*radix*/, منطقی _signed );
+حرف* float_مقصد_String( حرف* buf, size_t buf_سائز, اعشاری value, منطقی halfprecision, منطقی explicitZero );
+حرف* double_مقصد_String( حرف* buf, size_t buf_سائز, دوہرا value, منطقی explicitZero );
 
-int calcStructSize( const char* dt, int initial_size );
-int calcElemSize( const char* dt, int initial_size );
-CV_DEPRECATED char* encodeFormat( int elem_type, char* dt );
-char* encodeFormat( int elem_type, char* dt, size_t dt_len );
-int decodeFormat( const char* dt, int* fmt_pairs, int max_len );
-int decodeSimpleFormat( const char* dt );
+صحیح calc_Struct_سائز( ثابت حرف* dt, صحیح initial_سائز );
+صحیح calc_Elem_سائز( ثابت حرف* dt, صحیح initial_سائز );
+CV_DEPRECATED حرف* encodeFormat( صحیح elem_type, حرف* dt );
+حرف* encodeFormat( صحیح elem_type, حرف* dt, size_t dt_len );
+صحیح decodeFormat( ثابت حرف* dt, صحیح* fmt_جوڑے, صحیح max_len );
+صحیح decodeSimpleFormat( ثابت حرف* dt );
 }
 
 
-#ifdef CV_STATIC_ANALYSIS
-#define CV_PARSE_ERROR_CPP(errmsg) do { (void)fs; abort(); } while (0)
-#else
-#define CV_PARSE_ERROR_CPP( errmsg ) \
+#اگر_تعریف_شدہ CV_STATIC_ANALYSIS
+#تعریف_کرو CV_PARSE_ERROR_CPP(errmsg) کرو { (خالی)fs; abort(); } جب (0)
+#ورنہ
+#تعریف_کرو CV_PARSE_ERROR_CPP( errmsg ) \
     fs->parseError( CV_Func, (errmsg), __FILE__, __LINE__ )
-#endif
+#اگر_ختم
 
 
-#define CV_PERSISTENCE_CHECK_END_OF_BUFFER_BUG_CPP() do { \
+#تعریف_کرو CV_PERSISTENCE_CHECK_انتہا_کا_بفر_BUG_CPP() کرو { \
     CV_DbgAssert(ptr); \
-    if((ptr)[0] == 0 && (ptr) == fs->bufferEnd() - 1) CV_PARSE_ERROR_CPP("OpenCV persistence doesn't support very long lines"); \
-} while (0)
+    اگر((ptr)[0] == 0 && (ptr) == fs->بفر_انتہا_2() - 1) CV_PARSE_ERROR_CPP("OpenCV persistence doesn't support very long lines"); \
+} جب (0)
 
 
-class FileStorageParser;
-class FileStorageEmitter;
+جماعت FileStorageParser;
+جماعت FileStorageEmitter;
 
-struct FStructData
+ساخت FStruct_ڈیٹا
 {
-    FStructData() { indent = flags = 0; }
-    FStructData( const std::string& _struct_tag,
-                 int _struct_flags, int _struct_indent )
+    FStruct_ڈیٹا() { indent = flags = 0; }
+    FStruct_ڈیٹا( ثابت std::string& struct_لیبل,
+                 صحیح _struct_flags, صحیح _struct_indent )
     {
-        tag = _struct_tag;
+        لیبل = struct_لیبل;
         flags = _struct_flags;
         indent = _struct_indent;
     }
 
-    std::string tag;
-    int flags;
-    int indent;
+    std::string لیبل;
+    صحیح flags;
+    صحیح indent;
 };
 
-class FileStorage_API
+جماعت FileStorage_API
 {
-public:
-    virtual ~FileStorage_API();
-    virtual FileStorage* getFS() = 0;
+عوامی:
+    مجازی ~FileStorage_API();
+    مجازی FileStorage* getFS() = 0;
 
-    virtual int getFormat() const = 0;
+    مجازی صحیح getFormat() ثابت = 0;
 
-    virtual void puts( const char* str ) = 0;
-    virtual char* gets() = 0;
-    virtual bool eof() = 0;
-    virtual void setEof() = 0;
-    virtual void closeFile() = 0;
-    virtual void rewind() = 0;
-    virtual char* resizeWriteBuffer( char* ptr, int len ) = 0;
-    virtual char* bufferPtr() const = 0;
-    virtual char* bufferStart() const = 0;
-    virtual char* bufferEnd() const = 0;
-    virtual void setBufferPtr(char* ptr) = 0;
-    virtual char* flush() = 0;
-    virtual void setNonEmpty() = 0;
-    virtual int wrapMargin() const = 0;
+    مجازی خالی puts( ثابت حرف* str ) = 0;
+    مجازی حرف* gets() = 0;
+    مجازی منطقی eof() = 0;
+    مجازی خالی سیٹ_Eof() = 0;
+    مجازی خالی closeFile() = 0;
+    مجازی خالی rewind() = 0;
+    مجازی حرف* resize_Write_بفر( حرف* ptr, صحیح len ) = 0;
+    مجازی حرف* بفر_Ptr() ثابت = 0;
+    مجازی حرف* بفر_آغاز() ثابت = 0;
+    مجازی حرف* بفر_انتہا_2() ثابت = 0;
+    مجازی خالی سیٹ_بفر_Ptr(حرف* ptr) = 0;
+    مجازی حرف* flush() = 0;
+    مجازی خالی سیٹ_Non_خالی_خانے() = 0;
+    مجازی صحیح wrapMargin() ثابت = 0;
 
-    virtual FStructData& getCurrentStruct() = 0;
+    مجازی FStruct_ڈیٹا& getCurrentStruct() = 0;
 
-    virtual void convertToCollection( int type, FileNode& node ) = 0;
-    virtual FileNode addNode( FileNode& collection, const std::string& key,
-                               int type, const void* value=0, int len=-1 ) = 0;
-    virtual void finalizeCollection( FileNode& collection ) = 0;
-    virtual double strtod(char* ptr, char** endptr) = 0;
+    مجازی خالی convert_مقصد_Collection( صحیح type, File_گرہ& گرہ ) = 0;
+    مجازی File_گرہ جوڑو_گرہ( File_گرہ& collection, ثابت std::string& کلید,
+                               صحیح type, ثابت خالی* value=0, صحیح len=-1 ) = 0;
+    مجازی خالی finalizeCollection( File_گرہ& collection ) = 0;
+    مجازی دوہرا strtod(حرف* ptr, حرف** endptr) = 0;
 
-    virtual char* parseBase64(char* ptr, int indent, FileNode& collection) = 0;
+    مجازی حرف* parseBase64(حرف* ptr, صحیح indent, File_گرہ& collection) = 0;
     CV_NORETURN
-    virtual void parseError(const char* funcname, const std::string& msg,
-                            const char* filename, int lineno) = 0;
+    مجازی خالی parseError(ثابت حرف* funcname, ثابت std::string& پیغام,
+                            ثابت حرف* filename, صحیح lineno) = 0;
 
-private:
-    enum Base64State{
+نجی:
+    شمار Base64State{
         Uncertain,
         NotUse,
-        InUse,
+        اندر_Use,
     };
 
-    friend class cv::FileStorage::Impl;
-    friend class cv::FileStorage;
-    friend class JSONEmitter;
-    friend class XMLEmitter;
-    friend class YAMLEmitter;
+    دوست جماعت cv::FileStorage::Impl;
+    دوست جماعت cv::FileStorage;
+    دوست جماعت JSONEmitter;
+    دوست جماعت XMLEmitter;
+    دوست جماعت YAMLEmitter;
 
-    virtual void check_if_write_struct_is_delayed(bool change_type_to_base64 = false) = 0;
-    virtual void switch_to_Base64_state(Base64State state) = 0;
-    virtual Base64State get_state_of_writing_base64() = 0;
-    virtual int get_space() = 0;
+    مجازی خالی check_if_write_struct_is_delayed(منطقی change_type_مقصد_base64 = جھوٹ) = 0;
+    مجازی خالی switch_مقصد_Base64_state(Base64State state) = 0;
+    مجازی Base64State get_state_کا_writing_base64() = 0;
+    مجازی صحیح get_space() = 0;
 };
 
-class FileStorageEmitter
+جماعت FileStorageEmitter
 {
-public:
-    virtual ~FileStorageEmitter() {}
+عوامی:
+    مجازی ~FileStorageEmitter() {}
 
-    virtual FStructData startWriteStruct( const FStructData& parent, const char* key,
-                                          int struct_flags, const char* type_name=0 ) = 0;
-    virtual void endWriteStruct(const FStructData& current_struct) = 0;
-    virtual void write(const char* key, int value) = 0;
-    virtual void write(const char* key, int64_t value) = 0;
-    virtual void write(const char* key, double value) = 0;
-    virtual void write(const char* key, const char* value, bool quote) = 0;
-    virtual void writeScalar(const char* key, const char* value) = 0;
-    virtual void writeComment(const char* comment, bool eol_comment) = 0;
-    virtual void startNextStream() = 0;
+    مجازی FStruct_ڈیٹا آغاز_Write_Struct( ثابت FStruct_ڈیٹا& والد, ثابت حرف* کلید,
+                                          صحیح struct_flags, ثابت حرف* type_name=0 ) = 0;
+    مجازی خالی انتہا_Write_Struct(ثابت FStruct_ڈیٹا& current_struct) = 0;
+    مجازی خالی اكتب(ثابت حرف* کلید, صحیح value) = 0;
+    مجازی خالی اكتب(ثابت حرف* کلید, int64_t value) = 0;
+    مجازی خالی اكتب(ثابت حرف* کلید, دوہرا value) = 0;
+    مجازی خالی اكتب(ثابت حرف* کلید, ثابت حرف* value, منطقی quote) = 0;
+    مجازی خالی writeScalar(ثابت حرف* کلید, ثابت حرف* value) = 0;
+    مجازی خالی writeComment(ثابت حرف* comment, منطقی eol_comment) = 0;
+    مجازی خالی آغاز_اگلا_دھارا() = 0;
 };
 
-class FileStorageParser
+جماعت FileStorageParser
 {
-public:
-    virtual ~FileStorageParser() {}
-    virtual bool parse(char* ptr) = 0;
-    virtual bool getBase64Row(char* ptr, int indent, char* &beg, char* &end) = 0;
+عوامی:
+    مجازی ~FileStorageParser() {}
+    مجازی منطقی parse(حرف* ptr) = 0;
+    مجازی منطقی get_Base64_صف(حرف* ptr, صحیح indent, حرف* &beg, حرف* &end) = 0;
 };
 
 Ptr<FileStorageEmitter> createXMLEmitter(FileStorage_API* fs);
@@ -222,4 +222,4 @@ Ptr<FileStorageParser> createJSONParser(FileStorage_API* fs);
 
 }
 
-#endif // SRC_PERSISTENCE_HPP
+#اگر_ختم // SRC_PERSISTENCE_HPP

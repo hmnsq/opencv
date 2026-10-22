@@ -39,20 +39,20 @@
 //
 //M*/
 
-#if defined(HAVE_DIRECTX)
-#include <d3d11.h>
-#include <d3d10.h>
-#include <d3d9.h>
+#اگر defined(HAVE_DIRECTX)
+#شامل <d3d11.h>
+#شامل <d3d10.h>
+#شامل <d3d9.h>
 
-#ifdef HAVE_OPENCL
-#include "opencv2/core/opencl/runtime/opencl_core.hpp"
+#اگر_تعریف_شدہ HAVE_OPENCL
+#شامل "opencv2/core/opencl/runtime/opencl_core.hpp"
 
-#include <CL/cl_d3d11.h>
-#ifdef HAVE_OPENCL_D3D11_NV
-#include <CL/cl_d3d11_ext.h>
-#endif
-#include <CL/cl_d3d10.h>
-#include <CL/cl_dx9_media_sharing.h>
-#endif // HAVE_OPENCL
+#شامل <CL/cl_d3d11.h>
+#اگر_تعریف_شدہ HAVE_OPENCL_D3D11_NV
+#شامل <CL/cl_d3d11_ext.h>
+#اگر_ختم
+#شامل <CL/cl_d3d10.h>
+#شامل <CL/cl_dx9_media_sharing.h>
+#اگر_ختم // HAVE_OPENCL
 
-#endif // HAVE_DIRECTX
+#اگر_ختم // HAVE_DIRECTX

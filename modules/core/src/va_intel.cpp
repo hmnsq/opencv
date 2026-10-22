@@ -5,98 +5,98 @@
 // Copyright (C) 2015, Itseez, Inc., all rights reserved.
 // Third party copyrights are property of their respective owners.
 
-#include "precomp.hpp"
+#شامل "precomp.hpp"
 
-#include <opencv2/core/utils/logger.hpp>
+#شامل <opencv2/core/utils/logger.hpp>
 
-#ifdef HAVE_VA
+#اگر_تعریف_شدہ HAVE_VA
 #  include <va/va.h>
-#else  // HAVE_VA
+#ورنہ  // HAVE_VA
 #  define NO_VA_SUPPORT_ERROR CV_Error(cv::Error::StsBadFunc, "OpenCV was build without VA support (libva)")
-#endif // HAVE_VA
+#اگر_ختم // HAVE_VA
 
-using namespace cv;
+استعمال نامخلا cv;
 
 ////////////////////////////////////////////////////////////////////////
 // CL-VA Interoperability
 
-#ifdef HAVE_OPENCL
+#اگر_تعریف_شدہ HAVE_OPENCL
 #  include "opencv2/core/opencl/runtime/opencl_core.hpp"
 #  include "opencv2/core.hpp"
 #  include "opencv2/core/ocl.hpp"
 #  include "opencl_kernels_core.hpp"
-#endif // HAVE_OPENCL
+#اگر_ختم // HAVE_OPENCL
 
-#ifdef HAVE_VA_INTEL
-#ifdef HAVE_VA_INTEL_OLD_HEADER
+#اگر_تعریف_شدہ HAVE_VA_INTEL
+#اگر_تعریف_شدہ HAVE_VA_INTEL_OLD_سرخی
 #  include <CL/va_ext.h>
-#else
+#ورنہ
 #  include <CL/cl_va_api_media_sharing_intel.h>
-#endif
-#endif
+#اگر_ختم
+#اگر_ختم
 
-#ifdef HAVE_VA
-#ifndef OPENCV_LIBVA_LINK
-#include "va_wrapper.impl.hpp"
-#else
-namespace cv { namespace detail {
-static void init_libva() { /* nothing */ }
+#اگر_تعریف_شدہ HAVE_VA
+#اگر_غیر_تعریف_شدہ OPENCV_LIBVA_LINK
+#شامل "va_wrapper.impl.hpp"
+#ورنہ
+نامخلا cv { نامخلا detail {
+ساکن خالی init_libva() { /* nothing */ }
 }}  // namespace
-#endif
-using namespace cv::detail;
-#endif
+#اگر_ختم
+استعمال نامخلا cv::detail;
+#اگر_ختم
 
-namespace cv { namespace va_intel {
+نامخلا cv { نامخلا va_intel {
 
-#ifdef HAVE_VA_INTEL
+#اگر_تعریف_شدہ HAVE_VA_INTEL
 
-class VAAPIInterop : public ocl::Context::UserContext
+جماعت VAAPIInterop : عوامی ocl::Context::UserContext
 {
-public:
+عوامی:
     VAAPIInterop(cl_platform_id platform) {
         clCreateFromVA_APIMediaSurfaceINTEL       = (clCreateFromVA_APIMediaSurfaceINTEL_fn)
-                clGetExtensionFunctionAddressForPlatform(platform, "clCreateFromVA_APIMediaSurfaceINTEL");
-        clEnqueueAcquireVA_APIMediaSurfacesINTEL  = (clEnqueueAcquireVA_APIMediaSurfacesINTEL_fn)
-                clGetExtensionFunctionAddressForPlatform(platform, "clEnqueueAcquireVA_APIMediaSurfacesINTEL");
-        clEnqueueReleaseVA_APIMediaSurfacesINTEL  = (clEnqueueReleaseVA_APIMediaSurfacesINTEL_fn)
-                clGetExtensionFunctionAddressForPlatform(platform, "clEnqueueReleaseVA_APIMediaSurfacesINTEL");
-        if (!clCreateFromVA_APIMediaSurfaceINTEL ||
-            !clEnqueueAcquireVA_APIMediaSurfacesINTEL ||
-            !clEnqueueReleaseVA_APIMediaSurfacesINTEL) {
+                cl_Get_Extension_Function_پتہ_For_Platform(platform, "clCreateFromVA_APIMediaSurfaceINTEL");
+        cl_قطار_میں_ڈالو_Acquire_VA_APIMedia_Surfaces_INTEL  = (cl_قطار_میں_ڈالو_Acquire_VA_APIMedia_Surfaces_INTEL_fn)
+                cl_Get_Extension_Function_پتہ_For_Platform(platform, "clEnqueueAcquireVA_APIMediaSurfacesINTEL");
+        cl_قطار_میں_ڈالو_Release_VA_APIMedia_Surfaces_INTEL  = (cl_قطار_میں_ڈالو_Release_VA_APIMedia_Surfaces_INTEL_fn)
+                cl_Get_Extension_Function_پتہ_For_Platform(platform, "clEnqueueReleaseVA_APIMediaSurfacesINTEL");
+        اگر (!clCreateFromVA_APIMediaSurfaceINTEL ||
+            !cl_قطار_میں_ڈالو_Acquire_VA_APIMedia_Surfaces_INTEL ||
+            !cl_قطار_میں_ڈالو_Release_VA_APIMedia_Surfaces_INTEL) {
             CV_Error(cv::Error::OpenCLInitError, "OpenCL: Can't get extension function for VA-API interop");
         }
     }
-    virtual ~VAAPIInterop() {
+    مجازی ~VAAPIInterop() {
     }
     clCreateFromVA_APIMediaSurfaceINTEL_fn       clCreateFromVA_APIMediaSurfaceINTEL;
-    clEnqueueAcquireVA_APIMediaSurfacesINTEL_fn  clEnqueueAcquireVA_APIMediaSurfacesINTEL;
-    clEnqueueReleaseVA_APIMediaSurfacesINTEL_fn  clEnqueueReleaseVA_APIMediaSurfacesINTEL;
+    cl_قطار_میں_ڈالو_Acquire_VA_APIMedia_Surfaces_INTEL_fn  cl_قطار_میں_ڈالو_Acquire_VA_APIMedia_Surfaces_INTEL;
+    cl_قطار_میں_ڈالو_Release_VA_APIMedia_Surfaces_INTEL_fn  cl_قطار_میں_ڈالو_Release_VA_APIMedia_Surfaces_INTEL;
 };
 
-#endif // HAVE_VA_INTEL
+#اگر_ختم // HAVE_VA_INTEL
 
-namespace ocl {
+نامخلا ocl {
 
-Context& initializeContextFromVA(VADisplay display, bool tryInterop)
+Context& initializeContextFromVA(VADisplay display, منطقی tryInterop)
 {
-    CV_UNUSED(display); CV_UNUSED(tryInterop);
-#if !defined(HAVE_VA)
+    CV_غیر_مستعمل(display); CV_غیر_مستعمل(tryInterop);
+#اگر !defined(HAVE_VA)
     NO_VA_SUPPORT_ERROR;
-#else  // !HAVE_VA
+#ورنہ  // !HAVE_VA
 
 #   ifdef HAVE_VA_INTEL
-    if (tryInterop)
+    اگر (tryInterop)
     {
-        cl_uint numPlatforms;
-        cl_int status = clGetPlatformIDs(0, NULL, &numPlatforms);
-        if (status != CL_SUCCESS)
+        cl_uint عدد_Platforms;
+        cl_int حالت_2 = clGetPlatformIDs(0, تہی, &عدد_Platforms);
+        اگر (حالت_2 != CL_SUCCESS)
             CV_Error(cv::Error::OpenCLInitError, "OpenCL: Can't get number of platforms");
-        if (numPlatforms == 0)
+        اگر (عدد_Platforms == 0)
             CV_Error(cv::Error::OpenCLInitError, "OpenCL: No available platforms");
 
-        std::vector<cl_platform_id> platforms(numPlatforms);
-        status = clGetPlatformIDs(numPlatforms, &platforms[0], NULL);
-        if (status != CL_SUCCESS)
+        std::vector<cl_platform_id> platforms(عدد_Platforms);
+        حالت_2 = clGetPlatformIDs(عدد_Platforms, &platforms[0], تہی);
+        اگر (حالت_2 != CL_SUCCESS)
             CV_Error(cv::Error::OpenCLInitError, "OpenCL: Can't get platform Id list");
 
         // For CL-VA interop, we must find platform/device with "cl_intel_va_api_media_sharing" extension.
@@ -106,34 +106,34 @@ Context& initializeContextFromVA(VADisplay display, bool tryInterop)
         // Note that we must obtain function pointers using specific platform ID, and can't provide pointers in advance.
         // So, we iterate and select the first platform, for which we got non-NULL pointers, device, and CL context.
 
-        int found = -1;
+        صحیح ملا = -1;
         cl_context context = 0;
         cl_device_id device = 0;
 
-        for (int i = 0; i < (int)numPlatforms; ++i)
+        برائے (صحیح i = 0; i < (صحیح)عدد_Platforms; ++i)
         {
             // Get extension function pointers
             clGetDeviceIDsFromVA_APIMediaAdapterINTEL_fn clGetDeviceIDsFromVA_APIMediaAdapterINTEL;
             clGetDeviceIDsFromVA_APIMediaAdapterINTEL = (clGetDeviceIDsFromVA_APIMediaAdapterINTEL_fn)
-                clGetExtensionFunctionAddressForPlatform(platforms[i], "clGetDeviceIDsFromVA_APIMediaAdapterINTEL");
-            if ((void*)clGetDeviceIDsFromVA_APIMediaAdapterINTEL == NULL)
+                cl_Get_Extension_Function_پتہ_For_Platform(platforms[i], "clGetDeviceIDsFromVA_APIMediaAdapterINTEL");
+            اگر ((خالی*)clGetDeviceIDsFromVA_APIMediaAdapterINTEL == تہی)
             {
-                continue;
+                جاری;
             }
 
             // Query device list
 
-            cl_uint numDevices = 0;
+            cl_uint عدد_Devices = 0;
 
-            status = clGetDeviceIDsFromVA_APIMediaAdapterINTEL(platforms[i], CL_VA_API_DISPLAY_INTEL, display,
-                                                               CL_PREFERRED_DEVICES_FOR_VA_API_INTEL, 0, NULL, &numDevices);
-            if ((status != CL_SUCCESS) || !(numDevices > 0))
-                continue;
-            numDevices = 1; // OpenCV expects only 1 device
-            status = clGetDeviceIDsFromVA_APIMediaAdapterINTEL(platforms[i], CL_VA_API_DISPLAY_INTEL, display,
-                                                               CL_PREFERRED_DEVICES_FOR_VA_API_INTEL, numDevices, &device, NULL);
-            if (status != CL_SUCCESS)
-                continue;
+            حالت_2 = clGetDeviceIDsFromVA_APIMediaAdapterINTEL(platforms[i], CL_VA_API_DISPLAY_INTEL, display,
+                                                               CL_PREFERRED_DEVICES_FOR_VA_API_INTEL, 0, تہی, &عدد_Devices);
+            اگر ((حالت_2 != CL_SUCCESS) || !(عدد_Devices > 0))
+                جاری;
+            عدد_Devices = 1; // OpenCV expects only 1 device
+            حالت_2 = clGetDeviceIDsFromVA_APIMediaAdapterINTEL(platforms[i], CL_VA_API_DISPLAY_INTEL, display,
+                                                               CL_PREFERRED_DEVICES_FOR_VA_API_INTEL, عدد_Devices, &device, تہی);
+            اگر (حالت_2 != CL_SUCCESS)
+                جاری;
 
             // Creating CL-VA media sharing OpenCL context
 
@@ -143,86 +143,86 @@ Context& initializeContextFromVA(VADisplay display, bool tryInterop)
                 0
             };
 
-            context = clCreateContext(props, numDevices, &device, NULL, NULL, &status);
-            if (status != CL_SUCCESS)
+            context = clCreateContext(props, عدد_Devices, &device, تہی, تہی, &حالت_2);
+            اگر (حالت_2 != CL_SUCCESS)
             {
                 clReleaseDevice(device);
             }
-            else
+            ورنہ
             {
-                found = i;
-                break;
+                ملا = i;
+                توڑو;
             }
         }
 
-        if (found >= 0)
+        اگر (ملا >= 0)
         {
-            cl_platform_id platform = platforms[found];
+            cl_platform_id platform = platforms[ملا];
             std::string platformName = PlatformInfo(&platform).name();
 
             OpenCLExecutionContext clExecCtx;
-            try
+            کوشش
             {
                 clExecCtx = OpenCLExecutionContext::create(platformName, platform, context, device);
-                clExecCtx.getContext().setUserContext(std::make_shared<VAAPIInterop>(platform));
+                clExecCtx.getContext().سیٹ_User_Context(std::make_shared<VAAPIInterop>(platform));
             }
-            catch (...)
+            پکڑو (...)
             {
                 clReleaseDevice(device);
                 clReleaseContext(context);
-                throw;
+                پھینکو;
             }
             clExecCtx.bind();
-            return const_cast<Context&>(clExecCtx.getContext());
+            واپس const_cast<Context&>(clExecCtx.getContext());
         }
     }
 # endif // HAVE_VA_INTEL
     {
         Context& ctx = Context::getDefault();
-        return ctx;
+        واپس ctx;
     }
-#endif  // !HAVE_VA
+#اگر_ختم  // !HAVE_VA
 }
 
-#ifdef HAVE_VA_INTEL
-static bool ocl_convert_nv12_to_bgr(cl_mem clImageY, cl_mem clImageUV, cl_mem clBuffer, int step, int cols, int rows)
+#اگر_تعریف_شدہ HAVE_VA_INTEL
+ساکن منطقی ocl_convert_nv12_مقصد_bgr(cl_mem clImageY, cl_mem clImageUV, cl_mem cl_بفر, صحیح قدم, صحیح ستون_تعداد, صحیح صفیں)
 {
     ocl::Kernel k;
     k.create("YUV2BGR_NV12_8u", cv::ocl::core::cvtclr_dx_oclsrc, "");
-    if (k.empty())
-        return false;
+    اگر (k.empty())
+        واپس جھوٹ;
 
-    k.args(clImageY, clImageUV, clBuffer, step, cols, rows);
+    k.دلائل(clImageY, clImageUV, cl_بفر, قدم, ستون_تعداد, صفیں);
 
-    size_t globalsize[] = { (size_t)cols/2, (size_t)rows/2 };
-    return k.run(2, globalsize, 0, false);
+    size_t globalsize[] = { (size_t)ستون_تعداد/2, (size_t)صفیں/2 };
+    واپس k.تسلسل(2, globalsize, 0, جھوٹ);
 }
 
-static bool ocl_convert_bgr_to_nv12(cl_mem clBuffer, int step, int cols, int rows, cl_mem clImageY, cl_mem clImageUV)
+ساکن منطقی ocl_convert_bgr_مقصد_nv12(cl_mem cl_بفر, صحیح قدم, صحیح ستون_تعداد, صحیح صفیں, cl_mem clImageY, cl_mem clImageUV)
 {
     ocl::Kernel k;
     k.create("BGR2YUV_NV12_8u", cv::ocl::core::cvtclr_dx_oclsrc, "");
-    if (k.empty())
-        return false;
+    اگر (k.empty())
+        واپس جھوٹ;
 
-    k.args(clBuffer, step, cols, rows, clImageY, clImageUV);
+    k.دلائل(cl_بفر, قدم, ستون_تعداد, صفیں, clImageY, clImageUV);
 
-    size_t globalsize[] = { (size_t)cols/2, (size_t)rows/2 };
-    return k.run(2, globalsize, 0, false);
+    size_t globalsize[] = { (size_t)ستون_تعداد/2, (size_t)صفیں/2 };
+    واپس k.تسلسل(2, globalsize, 0, جھوٹ);
 }
-#endif // HAVE_VA_INTEL
+#اگر_ختم // HAVE_VA_INTEL
 
 } // namespace cv::va_intel::ocl
 
-#if defined(HAVE_VA)
-const int NCHANNELS = 3;
+#اگر defined(HAVE_VA)
+ثابت صحیح NCHANNELS = 3;
 
-static void copy_convert_nv12_to_bgr(const VAImage& image, const unsigned char* buffer, Mat& bgr)
+ساکن خالی copy_convert_nv12_مقصد_bgr(ثابت VAImage& image, ثابت غیرعلامتی حرف* بفر, Mat& bgr)
 {
-    const float d1 = 16.0f;
-    const float d2 = 128.0f;
+    ثابت اعشاری d1 = 16.0f;
+    ثابت اعشاری d2 = 128.0f;
 
-    static const float coeffs[5] =
+    ساکن ثابت اعشاری coeffs[5] =
         {
             1.163999557f,
             2.017999649f,
@@ -231,143 +231,143 @@ static void copy_convert_nv12_to_bgr(const VAImage& image, const unsigned char* 
             1.5959997177f
         };
 
-    const size_t srcOffsetY = image.offsets[0];
-    const size_t srcOffsetUV = image.offsets[1];
+    ثابت size_t src_انحراف_Y = image.offsets[0];
+    ثابت size_t src_انحراف_UV = image.offsets[1];
 
-    const size_t srcStepY = image.pitches[0];
-    const size_t srcStepUV = image.pitches[1];
+    ثابت size_t src_قدم_Y = image.pitches[0];
+    ثابت size_t src_قدم_UV = image.pitches[1];
 
-    const size_t dstStep = bgr.step;
+    ثابت size_t dst_قدم_3 = bgr.قدم;
 
-    const unsigned char* srcY0 = buffer + srcOffsetY;
-    const unsigned char* srcUV = buffer + srcOffsetUV;
+    ثابت غیرعلامتی حرف* srcY0 = بفر + src_انحراف_Y;
+    ثابت غیرعلامتی حرف* srcUV = بفر + src_انحراف_UV;
 
-    unsigned char* dst0 = bgr.data;
+    غیرعلامتی حرف* dst0 = bgr.ڈیٹا;
 
-    for (int y = 0; y < bgr.rows; y += 2)
+    برائے (صحیح y = 0; y < bgr.صفیں; y += 2)
     {
-        const unsigned char* srcY1 = srcY0 + srcStepY;
-        unsigned char *dst1 = dst0 + dstStep;
+        ثابت غیرعلامتی حرف* srcY1 = srcY0 + src_قدم_Y;
+        غیرعلامتی حرف *dst1 = dst0 + dst_قدم_3;
 
-        for (int x = 0; x < bgr.cols; x += 2)
+        برائے (صحیح x = 0; x < bgr.ستون_تعداد; x += 2)
         {
-            float Y0 = float(srcY0[x+0]);
-            float Y1 = float(srcY0[x+1]);
-            float Y2 = float(srcY1[x+0]);
-            float Y3 = float(srcY1[x+1]);
+            اعشاری Y0 = اعشاری(srcY0[x+0]);
+            اعشاری Y1 = اعشاری(srcY0[x+1]);
+            اعشاری Y2 = اعشاری(srcY1[x+0]);
+            اعشاری Y3 = اعشاری(srcY1[x+1]);
 
-            float U = float(srcUV[2*(x/2)+0]) - d2;
-            float V = float(srcUV[2*(x/2)+1]) - d2;
+            اعشاری U = اعشاری(srcUV[2*(x/2)+0]) - d2;
+            اعشاری V = اعشاری(srcUV[2*(x/2)+1]) - d2;
 
             Y0 = std::max(0.0f, Y0 - d1) * coeffs[0];
             Y1 = std::max(0.0f, Y1 - d1) * coeffs[0];
             Y2 = std::max(0.0f, Y2 - d1) * coeffs[0];
             Y3 = std::max(0.0f, Y3 - d1) * coeffs[0];
 
-            float ruv = coeffs[4]*V;
-            float guv = coeffs[3]*V + coeffs[2]*U;
-            float buv = coeffs[1]*U;
+            اعشاری ruv = coeffs[4]*V;
+            اعشاری guv = coeffs[3]*V + coeffs[2]*U;
+            اعشاری buv = coeffs[1]*U;
 
-            dst0[(x+0)*NCHANNELS+0] = saturate_cast<unsigned char>(Y0 + buv);
-            dst0[(x+0)*NCHANNELS+1] = saturate_cast<unsigned char>(Y0 + guv);
-            dst0[(x+0)*NCHANNELS+2] = saturate_cast<unsigned char>(Y0 + ruv);
+            dst0[(x+0)*NCHANNELS+0] = saturate_cast<غیرعلامتی حرف>(Y0 + buv);
+            dst0[(x+0)*NCHANNELS+1] = saturate_cast<غیرعلامتی حرف>(Y0 + guv);
+            dst0[(x+0)*NCHANNELS+2] = saturate_cast<غیرعلامتی حرف>(Y0 + ruv);
 
-            dst0[(x+1)*NCHANNELS+0] = saturate_cast<unsigned char>(Y1 + buv);
-            dst0[(x+1)*NCHANNELS+1] = saturate_cast<unsigned char>(Y1 + guv);
-            dst0[(x+1)*NCHANNELS+2] = saturate_cast<unsigned char>(Y1 + ruv);
+            dst0[(x+1)*NCHANNELS+0] = saturate_cast<غیرعلامتی حرف>(Y1 + buv);
+            dst0[(x+1)*NCHANNELS+1] = saturate_cast<غیرعلامتی حرف>(Y1 + guv);
+            dst0[(x+1)*NCHANNELS+2] = saturate_cast<غیرعلامتی حرف>(Y1 + ruv);
 
-            dst1[(x+0)*NCHANNELS+0] = saturate_cast<unsigned char>(Y2 + buv);
-            dst1[(x+0)*NCHANNELS+1] = saturate_cast<unsigned char>(Y2 + guv);
-            dst1[(x+0)*NCHANNELS+2] = saturate_cast<unsigned char>(Y2 + ruv);
+            dst1[(x+0)*NCHANNELS+0] = saturate_cast<غیرعلامتی حرف>(Y2 + buv);
+            dst1[(x+0)*NCHANNELS+1] = saturate_cast<غیرعلامتی حرف>(Y2 + guv);
+            dst1[(x+0)*NCHANNELS+2] = saturate_cast<غیرعلامتی حرف>(Y2 + ruv);
 
-            dst1[(x+1)*NCHANNELS+0] = saturate_cast<unsigned char>(Y3 + buv);
-            dst1[(x+1)*NCHANNELS+1] = saturate_cast<unsigned char>(Y3 + guv);
-            dst1[(x+1)*NCHANNELS+2] = saturate_cast<unsigned char>(Y3 + ruv);
+            dst1[(x+1)*NCHANNELS+0] = saturate_cast<غیرعلامتی حرف>(Y3 + buv);
+            dst1[(x+1)*NCHANNELS+1] = saturate_cast<غیرعلامتی حرف>(Y3 + guv);
+            dst1[(x+1)*NCHANNELS+2] = saturate_cast<غیرعلامتی حرف>(Y3 + ruv);
         }
 
-        srcY0 = srcY1 + srcStepY;
-        srcUV += srcStepUV;
-        dst0 = dst1 + dstStep;
+        srcY0 = srcY1 + src_قدم_Y;
+        srcUV += src_قدم_UV;
+        dst0 = dst1 + dst_قدم_3;
     }
 }
 
-static void copy_convert_bgr_to_nv12(const VAImage& image, const Mat& bgr, unsigned char* buffer)
+ساکن خالی copy_convert_bgr_مقصد_nv12(ثابت VAImage& image, ثابت Mat& bgr, غیرعلامتی حرف* بفر)
 {
-    const float d1 = 16.0f;
-    const float d2 = 128.0f;
+    ثابت اعشاری d1 = 16.0f;
+    ثابت اعشاری d2 = 128.0f;
 
-    static const float coeffs[8] =
+    ساکن ثابت اعشاری coeffs[8] =
         {
             0.256999969f,  0.50399971f,   0.09799957f,   -0.1479988098f,
             -0.2909994125f, 0.438999176f, -0.3679990768f, -0.0709991455f
         };
 
-    const size_t dstOffsetY = image.offsets[0];
-    const size_t dstOffsetUV = image.offsets[1];
+    ثابت size_t dst_انحراف_Y = image.offsets[0];
+    ثابت size_t dst_انحراف_UV = image.offsets[1];
 
-    const size_t dstStepY = image.pitches[0];
-    const size_t dstStepUV = image.pitches[1];
+    ثابت size_t dst_قدم_Y = image.pitches[0];
+    ثابت size_t dst_قدم_UV = image.pitches[1];
 
-    const size_t srcStep = bgr.step;
+    ثابت size_t src_قدم_3 = bgr.قدم;
 
-    const unsigned char* src0 = bgr.data;
+    ثابت غیرعلامتی حرف* src0 = bgr.ڈیٹا;
 
-    unsigned char* dstY0 = buffer + dstOffsetY;
-    unsigned char* dstUV = buffer + dstOffsetUV;
+    غیرعلامتی حرف* dstY0 = بفر + dst_انحراف_Y;
+    غیرعلامتی حرف* dstUV = بفر + dst_انحراف_UV;
 
-    for (int y = 0; y < bgr.rows; y += 2)
+    برائے (صحیح y = 0; y < bgr.صفیں; y += 2)
     {
-        const unsigned char *src1 = src0 + srcStep;
-        unsigned char* dstY1 = dstY0 + dstStepY;
+        ثابت غیرعلامتی حرف *src1 = src0 + src_قدم_3;
+        غیرعلامتی حرف* dstY1 = dstY0 + dst_قدم_Y;
 
-        for (int x = 0; x < bgr.cols; x += 2)
+        برائے (صحیح x = 0; x < bgr.ستون_تعداد; x += 2)
         {
-            float B0 = float(src0[(x+0)*NCHANNELS+0]);
-            float G0 = float(src0[(x+0)*NCHANNELS+1]);
-            float R0 = float(src0[(x+0)*NCHANNELS+2]);
+            اعشاری B0 = اعشاری(src0[(x+0)*NCHANNELS+0]);
+            اعشاری G0 = اعشاری(src0[(x+0)*NCHANNELS+1]);
+            اعشاری R0 = اعشاری(src0[(x+0)*NCHANNELS+2]);
 
-            float B1 = float(src0[(x+1)*NCHANNELS+0]);
-            float G1 = float(src0[(x+1)*NCHANNELS+1]);
-            float R1 = float(src0[(x+1)*NCHANNELS+2]);
+            اعشاری B1 = اعشاری(src0[(x+1)*NCHANNELS+0]);
+            اعشاری G1 = اعشاری(src0[(x+1)*NCHANNELS+1]);
+            اعشاری R1 = اعشاری(src0[(x+1)*NCHANNELS+2]);
 
-            float B2 = float(src1[(x+0)*NCHANNELS+0]);
-            float G2 = float(src1[(x+0)*NCHANNELS+1]);
-            float R2 = float(src1[(x+0)*NCHANNELS+2]);
+            اعشاری B2 = اعشاری(src1[(x+0)*NCHANNELS+0]);
+            اعشاری G2 = اعشاری(src1[(x+0)*NCHANNELS+1]);
+            اعشاری R2 = اعشاری(src1[(x+0)*NCHANNELS+2]);
 
-            float B3 = float(src1[(x+1)*NCHANNELS+0]);
-            float G3 = float(src1[(x+1)*NCHANNELS+1]);
-            float R3 = float(src1[(x+1)*NCHANNELS+2]);
+            اعشاری B3 = اعشاری(src1[(x+1)*NCHANNELS+0]);
+            اعشاری G3 = اعشاری(src1[(x+1)*NCHANNELS+1]);
+            اعشاری R3 = اعشاری(src1[(x+1)*NCHANNELS+2]);
 
-            float Y0 = coeffs[0]*R0 + coeffs[1]*G0 + coeffs[2]*B0 + d1;
-            float Y1 = coeffs[0]*R1 + coeffs[1]*G1 + coeffs[2]*B1 + d1;
-            float Y2 = coeffs[0]*R2 + coeffs[1]*G2 + coeffs[2]*B2 + d1;
-            float Y3 = coeffs[0]*R3 + coeffs[1]*G3 + coeffs[2]*B3 + d1;
+            اعشاری Y0 = coeffs[0]*R0 + coeffs[1]*G0 + coeffs[2]*B0 + d1;
+            اعشاری Y1 = coeffs[0]*R1 + coeffs[1]*G1 + coeffs[2]*B1 + d1;
+            اعشاری Y2 = coeffs[0]*R2 + coeffs[1]*G2 + coeffs[2]*B2 + d1;
+            اعشاری Y3 = coeffs[0]*R3 + coeffs[1]*G3 + coeffs[2]*B3 + d1;
 
-            float U = coeffs[3]*R0 + coeffs[4]*G0 + coeffs[5]*B0 + d2;
-            float V = coeffs[5]*R0 + coeffs[6]*G0 + coeffs[7]*B0 + d2;
+            اعشاری U = coeffs[3]*R0 + coeffs[4]*G0 + coeffs[5]*B0 + d2;
+            اعشاری V = coeffs[5]*R0 + coeffs[6]*G0 + coeffs[7]*B0 + d2;
 
-            dstY0[x+0] = saturate_cast<unsigned char>(Y0);
-            dstY0[x+1] = saturate_cast<unsigned char>(Y1);
-            dstY1[x+0] = saturate_cast<unsigned char>(Y2);
-            dstY1[x+1] = saturate_cast<unsigned char>(Y3);
+            dstY0[x+0] = saturate_cast<غیرعلامتی حرف>(Y0);
+            dstY0[x+1] = saturate_cast<غیرعلامتی حرف>(Y1);
+            dstY1[x+0] = saturate_cast<غیرعلامتی حرف>(Y2);
+            dstY1[x+1] = saturate_cast<غیرعلامتی حرف>(Y3);
 
-            dstUV[2*(x/2)+0] = saturate_cast<unsigned char>(U);
-            dstUV[2*(x/2)+1] = saturate_cast<unsigned char>(V);
+            dstUV[2*(x/2)+0] = saturate_cast<غیرعلامتی حرف>(U);
+            dstUV[2*(x/2)+1] = saturate_cast<غیرعلامتی حرف>(V);
         }
 
-        src0 = src1 + srcStep;
-        dstY0 = dstY1 + dstStepY;
-        dstUV += dstStepUV;
+        src0 = src1 + src_قدم_3;
+        dstY0 = dstY1 + dst_قدم_Y;
+        dstUV += dst_قدم_UV;
     }
 }
 
 
-static void copy_convert_yv12_to_bgr(const VAImage& image, const unsigned char* buffer, Mat& bgr)
+ساکن خالی copy_convert_yv12_مقصد_bgr(ثابت VAImage& image, ثابت غیرعلامتی حرف* بفر, Mat& bgr)
 {
-    const float d1 = 16.0f;
-    const float d2 = 128.0f;
+    ثابت اعشاری d1 = 16.0f;
+    ثابت اعشاری d2 = 128.0f;
 
-    static const float coeffs[5] =
+    ساکن ثابت اعشاری coeffs[5] =
         {
             1.163999557f,
             2.017999649f,
@@ -377,176 +377,176 @@ static void copy_convert_yv12_to_bgr(const VAImage& image, const unsigned char* 
         };
 
     CV_CheckEQ((size_t)image.format.fourcc, (size_t)VA_FOURCC_YV12, "Unexpected image format");
-    CV_CheckEQ((size_t)image.num_planes, (size_t)3, "");
+    CV_CheckEQ((size_t)image.عدد_planes, (size_t)3, "");
 
-    const size_t srcOffsetY = image.offsets[0];
-    const size_t srcOffsetV = image.offsets[1];
-    const size_t srcOffsetU = image.offsets[2];
+    ثابت size_t src_انحراف_Y = image.offsets[0];
+    ثابت size_t src_انحراف_V = image.offsets[1];
+    ثابت size_t src_انحراف_U = image.offsets[2];
 
-    const size_t srcStepY = image.pitches[0];
-    const size_t srcStepU = image.pitches[1];
-    const size_t srcStepV = image.pitches[2];
+    ثابت size_t src_قدم_Y = image.pitches[0];
+    ثابت size_t src_قدم_U = image.pitches[1];
+    ثابت size_t src_قدم_V = image.pitches[2];
 
-    const size_t dstStep = bgr.step;
+    ثابت size_t dst_قدم_3 = bgr.قدم;
 
-    const unsigned char* srcY_ = buffer + srcOffsetY;
-    const unsigned char* srcV_ = buffer + srcOffsetV;
-    const unsigned char* srcU_ = buffer + srcOffsetU;
+    ثابت غیرعلامتی حرف* srcY_ = بفر + src_انحراف_Y;
+    ثابت غیرعلامتی حرف* srcV_ = بفر + src_انحراف_V;
+    ثابت غیرعلامتی حرف* srcU_ = بفر + src_انحراف_U;
 
-    for (int y = 0; y < bgr.rows; y += 2)
+    برائے (صحیح y = 0; y < bgr.صفیں; y += 2)
     {
-        const unsigned char* srcY0 = srcY_ + (srcStepY) * y;
-        const unsigned char* srcY1 = srcY0 + srcStepY;
+        ثابت غیرعلامتی حرف* srcY0 = srcY_ + (src_قدم_Y) * y;
+        ثابت غیرعلامتی حرف* srcY1 = srcY0 + src_قدم_Y;
 
-        const unsigned char* srcV = srcV_ + (srcStepV) * y / 2;
-        const unsigned char* srcU = srcU_ + (srcStepU) * y / 2;
+        ثابت غیرعلامتی حرف* srcV = srcV_ + (src_قدم_V) * y / 2;
+        ثابت غیرعلامتی حرف* srcU = srcU_ + (src_قدم_U) * y / 2;
 
-        unsigned char* dst0 = bgr.data + (dstStep) * y;
-        unsigned char* dst1 = dst0 + dstStep;
+        غیرعلامتی حرف* dst0 = bgr.ڈیٹا + (dst_قدم_3) * y;
+        غیرعلامتی حرف* dst1 = dst0 + dst_قدم_3;
 
-        for (int x = 0; x < bgr.cols; x += 2)
+        برائے (صحیح x = 0; x < bgr.ستون_تعداد; x += 2)
         {
-            float Y0 = float(srcY0[x+0]);
-            float Y1 = float(srcY0[x+1]);
-            float Y2 = float(srcY1[x+0]);
-            float Y3 = float(srcY1[x+1]);
+            اعشاری Y0 = اعشاری(srcY0[x+0]);
+            اعشاری Y1 = اعشاری(srcY0[x+1]);
+            اعشاری Y2 = اعشاری(srcY1[x+0]);
+            اعشاری Y3 = اعشاری(srcY1[x+1]);
 
-            float U = float(srcU[x/2]) - d2;
-            float V = float(srcV[x/2]) - d2;
+            اعشاری U = اعشاری(srcU[x/2]) - d2;
+            اعشاری V = اعشاری(srcV[x/2]) - d2;
 
             Y0 = std::max(0.0f, Y0 - d1) * coeffs[0];
             Y1 = std::max(0.0f, Y1 - d1) * coeffs[0];
             Y2 = std::max(0.0f, Y2 - d1) * coeffs[0];
             Y3 = std::max(0.0f, Y3 - d1) * coeffs[0];
 
-            float ruv = coeffs[4]*V;
-            float guv = coeffs[3]*V + coeffs[2]*U;
-            float buv = coeffs[1]*U;
+            اعشاری ruv = coeffs[4]*V;
+            اعشاری guv = coeffs[3]*V + coeffs[2]*U;
+            اعشاری buv = coeffs[1]*U;
 
-            dst0[(x+0)*NCHANNELS+0] = saturate_cast<unsigned char>(Y0 + buv);
-            dst0[(x+0)*NCHANNELS+1] = saturate_cast<unsigned char>(Y0 + guv);
-            dst0[(x+0)*NCHANNELS+2] = saturate_cast<unsigned char>(Y0 + ruv);
+            dst0[(x+0)*NCHANNELS+0] = saturate_cast<غیرعلامتی حرف>(Y0 + buv);
+            dst0[(x+0)*NCHANNELS+1] = saturate_cast<غیرعلامتی حرف>(Y0 + guv);
+            dst0[(x+0)*NCHANNELS+2] = saturate_cast<غیرعلامتی حرف>(Y0 + ruv);
 
-            dst0[(x+1)*NCHANNELS+0] = saturate_cast<unsigned char>(Y1 + buv);
-            dst0[(x+1)*NCHANNELS+1] = saturate_cast<unsigned char>(Y1 + guv);
-            dst0[(x+1)*NCHANNELS+2] = saturate_cast<unsigned char>(Y1 + ruv);
+            dst0[(x+1)*NCHANNELS+0] = saturate_cast<غیرعلامتی حرف>(Y1 + buv);
+            dst0[(x+1)*NCHANNELS+1] = saturate_cast<غیرعلامتی حرف>(Y1 + guv);
+            dst0[(x+1)*NCHANNELS+2] = saturate_cast<غیرعلامتی حرف>(Y1 + ruv);
 
-            dst1[(x+0)*NCHANNELS+0] = saturate_cast<unsigned char>(Y2 + buv);
-            dst1[(x+0)*NCHANNELS+1] = saturate_cast<unsigned char>(Y2 + guv);
-            dst1[(x+0)*NCHANNELS+2] = saturate_cast<unsigned char>(Y2 + ruv);
+            dst1[(x+0)*NCHANNELS+0] = saturate_cast<غیرعلامتی حرف>(Y2 + buv);
+            dst1[(x+0)*NCHANNELS+1] = saturate_cast<غیرعلامتی حرف>(Y2 + guv);
+            dst1[(x+0)*NCHANNELS+2] = saturate_cast<غیرعلامتی حرف>(Y2 + ruv);
 
-            dst1[(x+1)*NCHANNELS+0] = saturate_cast<unsigned char>(Y3 + buv);
-            dst1[(x+1)*NCHANNELS+1] = saturate_cast<unsigned char>(Y3 + guv);
-            dst1[(x+1)*NCHANNELS+2] = saturate_cast<unsigned char>(Y3 + ruv);
+            dst1[(x+1)*NCHANNELS+0] = saturate_cast<غیرعلامتی حرف>(Y3 + buv);
+            dst1[(x+1)*NCHANNELS+1] = saturate_cast<غیرعلامتی حرف>(Y3 + guv);
+            dst1[(x+1)*NCHANNELS+2] = saturate_cast<غیرعلامتی حرف>(Y3 + ruv);
         }
     }
 }
 
-static void copy_convert_bgr_to_yv12(const VAImage& image, const Mat& bgr, unsigned char* buffer)
+ساکن خالی copy_convert_bgr_مقصد_yv12(ثابت VAImage& image, ثابت Mat& bgr, غیرعلامتی حرف* بفر)
 {
-    const float d1 = 16.0f;
-    const float d2 = 128.0f;
+    ثابت اعشاری d1 = 16.0f;
+    ثابت اعشاری d2 = 128.0f;
 
-    static const float coeffs[8] =
+    ساکن ثابت اعشاری coeffs[8] =
         {
             0.256999969f,  0.50399971f,   0.09799957f,   -0.1479988098f,
             -0.2909994125f, 0.438999176f, -0.3679990768f, -0.0709991455f
         };
 
     CV_CheckEQ((size_t)image.format.fourcc, (size_t)VA_FOURCC_YV12, "Unexpected image format");
-    CV_CheckEQ((size_t)image.num_planes, (size_t)3, "");
+    CV_CheckEQ((size_t)image.عدد_planes, (size_t)3, "");
 
-    const size_t dstOffsetY = image.offsets[0];
-    const size_t dstOffsetV = image.offsets[1];
-    const size_t dstOffsetU = image.offsets[2];
+    ثابت size_t dst_انحراف_Y = image.offsets[0];
+    ثابت size_t dst_انحراف_V = image.offsets[1];
+    ثابت size_t dst_انحراف_U = image.offsets[2];
 
-    const size_t dstStepY = image.pitches[0];
-    const size_t dstStepU = image.pitches[1];
-    const size_t dstStepV = image.pitches[2];
+    ثابت size_t dst_قدم_Y = image.pitches[0];
+    ثابت size_t dst_قدم_U = image.pitches[1];
+    ثابت size_t dst_قدم_V = image.pitches[2];
 
-    unsigned char* dstY_ = buffer + dstOffsetY;
-    unsigned char* dstV_ = buffer + dstOffsetV;
-    unsigned char* dstU_ = buffer + dstOffsetU;
+    غیرعلامتی حرف* dstY_ = بفر + dst_انحراف_Y;
+    غیرعلامتی حرف* dstV_ = بفر + dst_انحراف_V;
+    غیرعلامتی حرف* dstU_ = بفر + dst_انحراف_U;
 
-    const size_t srcStep = bgr.step;
+    ثابت size_t src_قدم_3 = bgr.قدم;
 
-    for (int y = 0; y < bgr.rows; y += 2)
+    برائے (صحیح y = 0; y < bgr.صفیں; y += 2)
     {
-        unsigned char* dstY0 = dstY_ + (dstStepY) * y;
-        unsigned char* dstY1 = dstY0 + dstStepY;
+        غیرعلامتی حرف* dstY0 = dstY_ + (dst_قدم_Y) * y;
+        غیرعلامتی حرف* dstY1 = dstY0 + dst_قدم_Y;
 
-        unsigned char* dstV = dstV_ + (dstStepV) * y / 2;
-        unsigned char* dstU = dstU_ + (dstStepU) * y / 2;
+        غیرعلامتی حرف* dstV = dstV_ + (dst_قدم_V) * y / 2;
+        غیرعلامتی حرف* dstU = dstU_ + (dst_قدم_U) * y / 2;
 
-        const unsigned char* src0 = bgr.data + (srcStep) * y;
-        const unsigned char* src1 = src0 + srcStep;
+        ثابت غیرعلامتی حرف* src0 = bgr.ڈیٹا + (src_قدم_3) * y;
+        ثابت غیرعلامتی حرف* src1 = src0 + src_قدم_3;
 
-        for (int x = 0; x < bgr.cols; x += 2)
+        برائے (صحیح x = 0; x < bgr.ستون_تعداد; x += 2)
         {
-            float B0 = float(src0[(x+0)*NCHANNELS+0]);
-            float G0 = float(src0[(x+0)*NCHANNELS+1]);
-            float R0 = float(src0[(x+0)*NCHANNELS+2]);
+            اعشاری B0 = اعشاری(src0[(x+0)*NCHANNELS+0]);
+            اعشاری G0 = اعشاری(src0[(x+0)*NCHANNELS+1]);
+            اعشاری R0 = اعشاری(src0[(x+0)*NCHANNELS+2]);
 
-            float B1 = float(src0[(x+1)*NCHANNELS+0]);
-            float G1 = float(src0[(x+1)*NCHANNELS+1]);
-            float R1 = float(src0[(x+1)*NCHANNELS+2]);
+            اعشاری B1 = اعشاری(src0[(x+1)*NCHANNELS+0]);
+            اعشاری G1 = اعشاری(src0[(x+1)*NCHANNELS+1]);
+            اعشاری R1 = اعشاری(src0[(x+1)*NCHANNELS+2]);
 
-            float B2 = float(src1[(x+0)*NCHANNELS+0]);
-            float G2 = float(src1[(x+0)*NCHANNELS+1]);
-            float R2 = float(src1[(x+0)*NCHANNELS+2]);
+            اعشاری B2 = اعشاری(src1[(x+0)*NCHANNELS+0]);
+            اعشاری G2 = اعشاری(src1[(x+0)*NCHANNELS+1]);
+            اعشاری R2 = اعشاری(src1[(x+0)*NCHANNELS+2]);
 
-            float B3 = float(src1[(x+1)*NCHANNELS+0]);
-            float G3 = float(src1[(x+1)*NCHANNELS+1]);
-            float R3 = float(src1[(x+1)*NCHANNELS+2]);
+            اعشاری B3 = اعشاری(src1[(x+1)*NCHANNELS+0]);
+            اعشاری G3 = اعشاری(src1[(x+1)*NCHANNELS+1]);
+            اعشاری R3 = اعشاری(src1[(x+1)*NCHANNELS+2]);
 
-            float Y0 = coeffs[0]*R0 + coeffs[1]*G0 + coeffs[2]*B0 + d1;
-            float Y1 = coeffs[0]*R1 + coeffs[1]*G1 + coeffs[2]*B1 + d1;
-            float Y2 = coeffs[0]*R2 + coeffs[1]*G2 + coeffs[2]*B2 + d1;
-            float Y3 = coeffs[0]*R3 + coeffs[1]*G3 + coeffs[2]*B3 + d1;
+            اعشاری Y0 = coeffs[0]*R0 + coeffs[1]*G0 + coeffs[2]*B0 + d1;
+            اعشاری Y1 = coeffs[0]*R1 + coeffs[1]*G1 + coeffs[2]*B1 + d1;
+            اعشاری Y2 = coeffs[0]*R2 + coeffs[1]*G2 + coeffs[2]*B2 + d1;
+            اعشاری Y3 = coeffs[0]*R3 + coeffs[1]*G3 + coeffs[2]*B3 + d1;
 
-            float U = coeffs[3]*R0 + coeffs[4]*G0 + coeffs[5]*B0 + d2;
-            float V = coeffs[5]*R0 + coeffs[6]*G0 + coeffs[7]*B0 + d2;
+            اعشاری U = coeffs[3]*R0 + coeffs[4]*G0 + coeffs[5]*B0 + d2;
+            اعشاری V = coeffs[5]*R0 + coeffs[6]*G0 + coeffs[7]*B0 + d2;
 
-            dstY0[x+0] = saturate_cast<unsigned char>(Y0);
-            dstY0[x+1] = saturate_cast<unsigned char>(Y1);
-            dstY1[x+0] = saturate_cast<unsigned char>(Y2);
-            dstY1[x+1] = saturate_cast<unsigned char>(Y3);
+            dstY0[x+0] = saturate_cast<غیرعلامتی حرف>(Y0);
+            dstY0[x+1] = saturate_cast<غیرعلامتی حرف>(Y1);
+            dstY1[x+0] = saturate_cast<غیرعلامتی حرف>(Y2);
+            dstY1[x+1] = saturate_cast<غیرعلامتی حرف>(Y3);
 
-            dstU[x/2] = saturate_cast<unsigned char>(U);
-            dstV[x/2] = saturate_cast<unsigned char>(V);
+            dstU[x/2] = saturate_cast<غیرعلامتی حرف>(U);
+            dstV[x/2] = saturate_cast<غیرعلامتی حرف>(V);
         }
     }
 }
-#endif // HAVE_VA
+#اگر_ختم // HAVE_VA
 
-void convertToVASurface(VADisplay display, InputArray src, VASurfaceID surface, Size size)
+خالی convert_مقصد_VASurface(VADisplay display, داخلہ_Array src, VASurfaceID surface, سائز size)
 {
-    CV_UNUSED(display); CV_UNUSED(src); CV_UNUSED(surface); CV_UNUSED(size);
-#if !defined(HAVE_VA)
+    CV_غیر_مستعمل(display); CV_غیر_مستعمل(src); CV_غیر_مستعمل(surface); CV_غیر_مستعمل(size);
+#اگر !defined(HAVE_VA)
     NO_VA_SUPPORT_ERROR;
-#else  // !HAVE_VA
+#ورنہ  // !HAVE_VA
 
-    const int stype = CV_8UC3;
+    ثابت صحیح stype = CV_8UC3;
 
-    int srcType = src.type();
+    صحیح srcType = src.type();
     CV_Assert(srcType == stype);
 
-    Size srcSize = src.size();
-    CV_Assert(srcSize.width == size.width && srcSize.height == size.height);
+    سائز src_سائز = src.size();
+    CV_Assert(src_سائز.چوڑائی == size.چوڑائی && src_سائز.اونچائی == size.اونچائی);
 
-#ifdef HAVE_VA_INTEL
+#اگر_تعریف_شدہ HAVE_VA_INTEL
     ocl::OpenCLExecutionContext& ocl_context = ocl::OpenCLExecutionContext::getCurrent();
     VAAPIInterop* interop = ocl_context.getContext().getUserContext<VAAPIInterop>().get();
-    CV_LOG_IF_DEBUG(NULL, !interop,
+    CV_LOG_IF_DEBUG(تہی, !interop,
         "OpenCL/VA_INTEL: Can't interop with current OpenCL context - missing VAAPIInterop API. "
         "OpenCL context should be created through initializeContextFromVA()");
-    void* context_display = ocl_context.getContext().getOpenCLContextProperty(CL_CONTEXT_VA_API_DISPLAY_INTEL);
-    CV_LOG_IF_INFO(NULL, interop && !context_display,
+    خالی* context_display = ocl_context.getContext().getOpenCLContextProperty(CL_CONTEXT_VA_API_DISPLAY_INTEL);
+    CV_LOG_IF_INFO(تہی, interop && !context_display,
         "OpenCL/VA_INTEL: Can't interop with current OpenCL context - missing VA display, context re-creation is required");
-    bool isValidContextDisplay = (display == context_display);
-    CV_LOG_IF_INFO(NULL, interop && context_display && !isValidContextDisplay,
-        "OpenCL/VA_INTEL: Can't interop with current OpenCL context - VA display mismatch: " << context_display << "(context) vs " << (void*)display << "(surface)");
-    if (isValidContextDisplay && interop)
+    منطقی isValidContextDisplay = (display == context_display);
+    CV_LOG_IF_INFO(تہی, interop && context_display && !isValidContextDisplay,
+        "OpenCL/VA_INTEL: Can't interop with current OpenCL context - VA display mismatch: " << context_display << "(context) vs " << (خالی*)display << "(surface)");
+    اگر (isValidContextDisplay && interop)
     {
         UMat u = src.getUMat();
 
@@ -554,136 +554,136 @@ void convertToVASurface(VADisplay display, InputArray src, VASurfaceID surface, 
         CV_Assert(u.offset == 0);
         CV_Assert(u.isContinuous());
 
-        cl_mem clBuffer = (cl_mem)u.handle(ACCESS_READ);
+        cl_mem cl_بفر = (cl_mem)u.handle(ACCESS_READ);
 
         cl_context context = (cl_context)ocl_context.getContext().ptr();
 
-        cl_int status = 0;
+        cl_int حالت_2 = 0;
 
-        cl_mem clImageY = interop->clCreateFromVA_APIMediaSurfaceINTEL(context, CL_MEM_WRITE_ONLY, &surface, 0, &status);
-        if (status != CL_SUCCESS)
+        cl_mem clImageY = interop->clCreateFromVA_APIMediaSurfaceINTEL(context, CL_MEM_WRITE_ONLY, &surface, 0, &حالت_2);
+        اگر (حالت_2 != CL_SUCCESS)
             CV_Error(cv::Error::OpenCLApiCallError, "OpenCL: clCreateFromVA_APIMediaSurfaceINTEL failed (Y plane)");
-        cl_mem clImageUV = interop->clCreateFromVA_APIMediaSurfaceINTEL(context, CL_MEM_WRITE_ONLY, &surface, 1, &status);
-        if (status != CL_SUCCESS)
+        cl_mem clImageUV = interop->clCreateFromVA_APIMediaSurfaceINTEL(context, CL_MEM_WRITE_ONLY, &surface, 1, &حالت_2);
+        اگر (حالت_2 != CL_SUCCESS)
             CV_Error(cv::Error::OpenCLApiCallError, "OpenCL: clCreateFromVA_APIMediaSurfaceINTEL failed (UV plane)");
 
-        cl_command_queue q = (cl_command_queue)ocl_context.getQueue().ptr();
+        cl_command_قطار q = (cl_command_قطار)ocl_context.get_قطار().ptr();
 
         cl_mem images[2] = { clImageY, clImageUV };
-        status = interop->clEnqueueAcquireVA_APIMediaSurfacesINTEL(q, 2, images, 0, NULL, NULL);
-        if (status != CL_SUCCESS)
+        حالت_2 = interop->cl_قطار_میں_ڈالو_Acquire_VA_APIMedia_Surfaces_INTEL(q, 2, images, 0, تہی, تہی);
+        اگر (حالت_2 != CL_SUCCESS)
             CV_Error(cv::Error::OpenCLApiCallError, "OpenCL: clEnqueueAcquireVA_APIMediaSurfacesINTEL failed");
-        if (!ocl::ocl_convert_bgr_to_nv12(clBuffer, (int)u.step[0], u.cols, u.rows, clImageY, clImageUV))
+        اگر (!ocl::ocl_convert_bgr_مقصد_nv12(cl_بفر, (صحیح)u.قدم[0], u.ستون_تعداد, u.صفیں, clImageY, clImageUV))
             CV_Error(cv::Error::OpenCLApiCallError, "OpenCL: ocl_convert_bgr_to_nv12 failed");
-        interop->clEnqueueReleaseVA_APIMediaSurfacesINTEL(q, 2, images, 0, NULL, NULL);
-        if (status != CL_SUCCESS)
+        interop->cl_قطار_میں_ڈالو_Release_VA_APIMedia_Surfaces_INTEL(q, 2, images, 0, تہی, تہی);
+        اگر (حالت_2 != CL_SUCCESS)
             CV_Error(cv::Error::OpenCLApiCallError, "OpenCL: clEnqueueReleaseVA_APIMediaSurfacesINTEL failed");
 
-        status = clFinish(q); // TODO Use events
-        if (status != CL_SUCCESS)
+        حالت_2 = cl_اختتام(q); // TODO Use events
+        اگر (حالت_2 != CL_SUCCESS)
             CV_Error(cv::Error::OpenCLApiCallError, "OpenCL: clFinish failed");
 
-        status = clReleaseMemObject(clImageY); // TODO RAII
-        if (status != CL_SUCCESS)
+        حالت_2 = clReleaseMemObject(clImageY); // TODO RAII
+        اگر (حالت_2 != CL_SUCCESS)
             CV_Error(cv::Error::OpenCLApiCallError, "OpenCL: clReleaseMem failed (Y plane)");
-        status = clReleaseMemObject(clImageUV);
-        if (status != CL_SUCCESS)
+        حالت_2 = clReleaseMemObject(clImageUV);
+        اگر (حالت_2 != CL_SUCCESS)
             CV_Error(cv::Error::OpenCLApiCallError, "OpenCL: clReleaseMem failed (UV plane)");
     }
-    else
+    ورنہ
 # endif // HAVE_VA_INTEL
     {
         init_libva();
         Mat m = src.getMat();
 
         // TODO Add support for roi
-        CV_Assert(m.data == m.datastart);
+        CV_Assert(m.ڈیٹا == m.datastart);
         CV_Assert(m.isContinuous());
 
-        VAStatus status = 0;
+        VAStatus حالت_2 = 0;
 
-        status = vaSyncSurface(display, surface);
-        if (status != VA_STATUS_SUCCESS)
+        حالت_2 = vaSyncSurface(display, surface);
+        اگر (حالت_2 != VA_حالت_SUCCESS)
             CV_Error(cv::Error::StsError, "VA-API: vaSyncSurface failed");
 
-        bool indirect_buffer = false;
+        منطقی بالواسطہ_بفر = جھوٹ;
         VAImage image;
-        status = vaDeriveImage(display, surface, &image);
-        if (status != VA_STATUS_SUCCESS){
+        حالت_2 = vaDeriveImage(display, surface, &image);
+        اگر (حالت_2 != VA_حالت_SUCCESS){
             //try vaCreateImage + vaPutImage
             //pick a format
-            indirect_buffer = true;
-            int num_formats = vaMaxNumImageFormats(display);
-            if (num_formats <= 0)
+            بالواسطہ_بفر = سچ;
+            صحیح عدد_formats = va_Max_عدد_Image_Formats(display);
+            اگر (عدد_formats <= 0)
                 CV_Error(cv::Error::StsError, "VA-API: vaMaxNumImageFormats failed");
-            std::vector<VAImageFormat> fmt_list(num_formats);
+            std::vector<VAImageFormat> fmt_list(عدد_formats);
 
-            status = vaQueryImageFormats(display, fmt_list.data(), &num_formats);
-            if (status != VA_STATUS_SUCCESS)
+            حالت_2 = vaQueryImageFormats(display, fmt_list.ڈیٹا(), &عدد_formats);
+            اگر (حالت_2 != VA_حالت_SUCCESS)
                 CV_Error(cv::Error::StsError, "VA-API: vaQueryImageFormats failed");
-            VAImageFormat *selected_format = nullptr;
-            for (auto &fmt : fmt_list){
-                if (fmt.fourcc == VA_FOURCC_NV12 || fmt.fourcc == VA_FOURCC_YV12){
+            VAImageFormat *selected_format = خالی_اشاریہ;
+            برائے (خودکار &fmt : fmt_list){
+                اگر (fmt.fourcc == VA_FOURCC_NV12 || fmt.fourcc == VA_FOURCC_YV12){
                     selected_format = &fmt;
-                    break;
+                    توڑو;
                 }
             }
-            if (selected_format == nullptr)
+            اگر (selected_format == خالی_اشاریہ)
                 CV_Error(cv::Error::StsError, "VA-API: vaQueryImageFormats did not return a supported format");
 
-            status = vaCreateImage(display, selected_format, size.width, size.height, &image);
-            if (status != VA_STATUS_SUCCESS)
+            حالت_2 = vaCreateImage(display, selected_format, size.چوڑائی, size.اونچائی, &image);
+            اگر (حالت_2 != VA_حالت_SUCCESS)
                 CV_Error(cv::Error::StsError, "VA-API: vaCreateImage failed");
 
         }
 
-        unsigned char* buffer = 0;
-        status = vaMapBuffer(display, image.buf, (void **)&buffer);
-        if (status != VA_STATUS_SUCCESS)
+        غیرعلامتی حرف* بفر = 0;
+        حالت_2 = va_Map_بفر(display, image.buf, (خالی **)&بفر);
+        اگر (حالت_2 != VA_حالت_SUCCESS)
             CV_Error(cv::Error::StsError, "VA-API: vaMapBuffer failed");
 
-        if (image.format.fourcc == VA_FOURCC_NV12)
-            copy_convert_bgr_to_nv12(image, m, buffer);
-        if (image.format.fourcc == VA_FOURCC_YV12)
-            copy_convert_bgr_to_yv12(image, m, buffer);
-        else
-            CV_Check((int)image.format.fourcc, image.format.fourcc == VA_FOURCC_NV12 || image.format.fourcc == VA_FOURCC_YV12, "Unexpected image format");
+        اگر (image.format.fourcc == VA_FOURCC_NV12)
+            copy_convert_bgr_مقصد_nv12(image, m, بفر);
+        اگر (image.format.fourcc == VA_FOURCC_YV12)
+            copy_convert_bgr_مقصد_yv12(image, m, بفر);
+        ورنہ
+            CV_Check((صحیح)image.format.fourcc, image.format.fourcc == VA_FOURCC_NV12 || image.format.fourcc == VA_FOURCC_YV12, "Unexpected image format");
 
-        status = vaUnmapBuffer(display, image.buf);
-        if (status != VA_STATUS_SUCCESS)
+        حالت_2 = va_Unmap_بفر(display, image.buf);
+        اگر (حالت_2 != VA_حالت_SUCCESS)
             CV_Error(cv::Error::StsError, "VA-API: vaUnmapBuffer failed");
 
-        if (indirect_buffer){
-            status = vaPutImage(display, surface, image.image_id, 0, 0, size.width, size.height, 0, 0, size.width, size.height);
-            if (status != VA_STATUS_SUCCESS){
+        اگر (بالواسطہ_بفر){
+            حالت_2 = vaPutImage(display, surface, image.image_id, 0, 0, size.چوڑائی, size.اونچائی, 0, 0, size.چوڑائی, size.اونچائی);
+            اگر (حالت_2 != VA_حالت_SUCCESS){
                 vaDestroyImage(display, image.image_id);
                 CV_Error(cv::Error::StsError, "VA-API: vaPutImage failed");
             }
         }
 
-        status = vaDestroyImage(display, image.image_id);
-        if (status != VA_STATUS_SUCCESS)
+        حالت_2 = vaDestroyImage(display, image.image_id);
+        اگر (حالت_2 != VA_حالت_SUCCESS)
             CV_Error(cv::Error::StsError, "VA-API: vaDestroyImage failed");
     }
-#endif  // !HAVE_VA
+#اگر_ختم  // !HAVE_VA
 }
 
-void convertFromVASurface(VADisplay display, VASurfaceID surface, Size size, OutputArray dst)
+خالی convertFromVASurface(VADisplay display, VASurfaceID surface, سائز size, OutputArray dst)
 {
-    CV_UNUSED(display); CV_UNUSED(surface); CV_UNUSED(dst); CV_UNUSED(size);
-#if !defined(HAVE_VA)
+    CV_غیر_مستعمل(display); CV_غیر_مستعمل(surface); CV_غیر_مستعمل(dst); CV_غیر_مستعمل(size);
+#اگر !defined(HAVE_VA)
     NO_VA_SUPPORT_ERROR;
-#else  // !HAVE_VA
+#ورنہ  // !HAVE_VA
 
-    const int dtype = CV_8UC3;
+    ثابت صحیح dtype = CV_8UC3;
 
     // TODO Need to specify ACCESS_WRITE here somehow to prevent useless data copying!
     dst.create(size, dtype);
 
-#ifdef HAVE_VA_INTEL
+#اگر_تعریف_شدہ HAVE_VA_INTEL
     ocl::OpenCLExecutionContext& ocl_context = ocl::OpenCLExecutionContext::getCurrent();
     VAAPIInterop* interop = ocl_context.getContext().getUserContext<VAAPIInterop>().get();
-    if (display == ocl_context.getContext().getOpenCLContextProperty(CL_CONTEXT_VA_API_DISPLAY_INTEL) && interop)
+    اگر (display == ocl_context.getContext().getOpenCLContextProperty(CL_CONTEXT_VA_API_DISPLAY_INTEL) && interop)
     {
         UMat u = dst.getUMat();
 
@@ -691,113 +691,113 @@ void convertFromVASurface(VADisplay display, VASurfaceID surface, Size size, Out
         CV_Assert(u.offset == 0);
         CV_Assert(u.isContinuous());
 
-        cl_mem clBuffer = (cl_mem)u.handle(ACCESS_WRITE);
+        cl_mem cl_بفر = (cl_mem)u.handle(ACCESS_WRITE);
 
         cl_context context = (cl_context)ocl_context.getContext().ptr();
 
-        cl_int status = 0;
+        cl_int حالت_2 = 0;
 
-        cl_mem clImageY = interop->clCreateFromVA_APIMediaSurfaceINTEL(context, CL_MEM_READ_ONLY, &surface, 0, &status);
-        if (status != CL_SUCCESS)
+        cl_mem clImageY = interop->clCreateFromVA_APIMediaSurfaceINTEL(context, CL_MEM_READ_ONLY, &surface, 0, &حالت_2);
+        اگر (حالت_2 != CL_SUCCESS)
             CV_Error(cv::Error::OpenCLApiCallError, "OpenCL: clCreateFromVA_APIMediaSurfaceINTEL failed (Y plane)");
-        cl_mem clImageUV = interop->clCreateFromVA_APIMediaSurfaceINTEL(context, CL_MEM_READ_ONLY, &surface, 1, &status);
-        if (status != CL_SUCCESS)
+        cl_mem clImageUV = interop->clCreateFromVA_APIMediaSurfaceINTEL(context, CL_MEM_READ_ONLY, &surface, 1, &حالت_2);
+        اگر (حالت_2 != CL_SUCCESS)
             CV_Error(cv::Error::OpenCLApiCallError, "OpenCL: clCreateFromVA_APIMediaSurfaceINTEL failed (UV plane)");
 
-        cl_command_queue q = (cl_command_queue)ocl_context.getQueue().ptr();
+        cl_command_قطار q = (cl_command_قطار)ocl_context.get_قطار().ptr();
 
         cl_mem images[2] = { clImageY, clImageUV };
-        status = interop->clEnqueueAcquireVA_APIMediaSurfacesINTEL(q, 2, images, 0, NULL, NULL);
-        if (status != CL_SUCCESS)
+        حالت_2 = interop->cl_قطار_میں_ڈالو_Acquire_VA_APIMedia_Surfaces_INTEL(q, 2, images, 0, تہی, تہی);
+        اگر (حالت_2 != CL_SUCCESS)
             CV_Error(cv::Error::OpenCLApiCallError, "OpenCL: clEnqueueAcquireVA_APIMediaSurfacesINTEL failed");
-        if (!ocl::ocl_convert_nv12_to_bgr(clImageY, clImageUV, clBuffer, (int)u.step[0], u.cols, u.rows))
+        اگر (!ocl::ocl_convert_nv12_مقصد_bgr(clImageY, clImageUV, cl_بفر, (صحیح)u.قدم[0], u.ستون_تعداد, u.صفیں))
             CV_Error(cv::Error::OpenCLApiCallError, "OpenCL: ocl_convert_nv12_to_bgr failed");
-        status = interop->clEnqueueReleaseVA_APIMediaSurfacesINTEL(q, 2, images, 0, NULL, NULL);
-        if (status != CL_SUCCESS)
+        حالت_2 = interop->cl_قطار_میں_ڈالو_Release_VA_APIMedia_Surfaces_INTEL(q, 2, images, 0, تہی, تہی);
+        اگر (حالت_2 != CL_SUCCESS)
             CV_Error(cv::Error::OpenCLApiCallError, "OpenCL: clEnqueueReleaseVA_APIMediaSurfacesINTEL failed");
 
-        status = clFinish(q); // TODO Use events
-        if (status != CL_SUCCESS)
+        حالت_2 = cl_اختتام(q); // TODO Use events
+        اگر (حالت_2 != CL_SUCCESS)
             CV_Error(cv::Error::OpenCLApiCallError, "OpenCL: clFinish failed");
 
-        status = clReleaseMemObject(clImageY); // TODO RAII
-        if (status != CL_SUCCESS)
+        حالت_2 = clReleaseMemObject(clImageY); // TODO RAII
+        اگر (حالت_2 != CL_SUCCESS)
             CV_Error(cv::Error::OpenCLApiCallError, "OpenCL: clReleaseMem failed (Y plane)");
-        status = clReleaseMemObject(clImageUV);
-        if (status != CL_SUCCESS)
+        حالت_2 = clReleaseMemObject(clImageUV);
+        اگر (حالت_2 != CL_SUCCESS)
             CV_Error(cv::Error::OpenCLApiCallError, "OpenCL: clReleaseMem failed (UV plane)");
     }
-    else
+    ورنہ
 # endif // HAVE_VA_INTEL
     {
         init_libva();
         Mat m = dst.getMat();
 
         // TODO Add support for roi
-        CV_Assert(m.data == m.datastart);
+        CV_Assert(m.ڈیٹا == m.datastart);
         CV_Assert(m.isContinuous());
 
-        VAStatus status = 0;
+        VAStatus حالت_2 = 0;
 
-        status = vaSyncSurface(display, surface);
-        if (status != VA_STATUS_SUCCESS)
+        حالت_2 = vaSyncSurface(display, surface);
+        اگر (حالت_2 != VA_حالت_SUCCESS)
             CV_Error(cv::Error::StsError, "VA-API: vaSyncSurface failed");
 
         VAImage image;
-        status = vaDeriveImage(display, surface, &image);
-        if (status != VA_STATUS_SUCCESS){
+        حالت_2 = vaDeriveImage(display, surface, &image);
+        اگر (حالت_2 != VA_حالت_SUCCESS){
             //try vaCreateImage + vaGetImage
             //pick a format
-            int num_formats = vaMaxNumImageFormats(display);
-            if (num_formats <= 0)
+            صحیح عدد_formats = va_Max_عدد_Image_Formats(display);
+            اگر (عدد_formats <= 0)
                 CV_Error(cv::Error::StsError, "VA-API: vaMaxNumImageFormats failed");
-            std::vector<VAImageFormat> fmt_list(num_formats);
+            std::vector<VAImageFormat> fmt_list(عدد_formats);
 
-            status = vaQueryImageFormats(display, fmt_list.data(), &num_formats);
-            if (status != VA_STATUS_SUCCESS)
+            حالت_2 = vaQueryImageFormats(display, fmt_list.ڈیٹا(), &عدد_formats);
+            اگر (حالت_2 != VA_حالت_SUCCESS)
                 CV_Error(cv::Error::StsError, "VA-API: vaQueryImageFormats failed");
-            VAImageFormat *selected_format = nullptr;
-            for (auto &fmt : fmt_list){
-                if (fmt.fourcc == VA_FOURCC_NV12 || fmt.fourcc == VA_FOURCC_YV12){
+            VAImageFormat *selected_format = خالی_اشاریہ;
+            برائے (خودکار &fmt : fmt_list){
+                اگر (fmt.fourcc == VA_FOURCC_NV12 || fmt.fourcc == VA_FOURCC_YV12){
                     selected_format = &fmt;
-                    break;
+                    توڑو;
                 }
             }
-            if (selected_format == nullptr)
+            اگر (selected_format == خالی_اشاریہ)
                 CV_Error(cv::Error::StsError, "VA-API: vaQueryImageFormats did not return a supported format");
 
-            status = vaCreateImage(display, selected_format, size.width, size.height, &image);
-            if (status != VA_STATUS_SUCCESS)
+            حالت_2 = vaCreateImage(display, selected_format, size.چوڑائی, size.اونچائی, &image);
+            اگر (حالت_2 != VA_حالت_SUCCESS)
                 CV_Error(cv::Error::StsError, "VA-API: vaCreateImage failed");
 
-            status = vaGetImage(display, surface, 0, 0, size.width, size.height, image.image_id);
-            if (status != VA_STATUS_SUCCESS){
+            حالت_2 = vaGetImage(display, surface, 0, 0, size.چوڑائی, size.اونچائی, image.image_id);
+            اگر (حالت_2 != VA_حالت_SUCCESS){
                 vaDestroyImage(display, image.image_id);
                 CV_Error(cv::Error::StsError, "VA-API: vaPutImage failed");
             }
         }
 
-        unsigned char* buffer = 0;
-        status = vaMapBuffer(display, image.buf, (void **)&buffer);
-        if (status != VA_STATUS_SUCCESS)
+        غیرعلامتی حرف* بفر = 0;
+        حالت_2 = va_Map_بفر(display, image.buf, (خالی **)&بفر);
+        اگر (حالت_2 != VA_حالت_SUCCESS)
             CV_Error(cv::Error::StsError, "VA-API: vaMapBuffer failed");
 
-        if (image.format.fourcc == VA_FOURCC_NV12)
-            copy_convert_nv12_to_bgr(image, buffer, m);
-        if (image.format.fourcc == VA_FOURCC_YV12)
-            copy_convert_yv12_to_bgr(image, buffer, m);
-        else
-            CV_Check((int)image.format.fourcc, image.format.fourcc == VA_FOURCC_NV12 || image.format.fourcc == VA_FOURCC_YV12, "Unexpected image format");
+        اگر (image.format.fourcc == VA_FOURCC_NV12)
+            copy_convert_nv12_مقصد_bgr(image, بفر, m);
+        اگر (image.format.fourcc == VA_FOURCC_YV12)
+            copy_convert_yv12_مقصد_bgr(image, بفر, m);
+        ورنہ
+            CV_Check((صحیح)image.format.fourcc, image.format.fourcc == VA_FOURCC_NV12 || image.format.fourcc == VA_FOURCC_YV12, "Unexpected image format");
 
-        status = vaUnmapBuffer(display, image.buf);
-        if (status != VA_STATUS_SUCCESS)
+        حالت_2 = va_Unmap_بفر(display, image.buf);
+        اگر (حالت_2 != VA_حالت_SUCCESS)
             CV_Error(cv::Error::StsError, "VA-API: vaUnmapBuffer failed");
 
-        status = vaDestroyImage(display, image.image_id);
-        if (status != VA_STATUS_SUCCESS)
+        حالت_2 = vaDestroyImage(display, image.image_id);
+        اگر (حالت_2 != VA_حالت_SUCCESS)
             CV_Error(cv::Error::StsError, "VA-API: vaDestroyImage failed");
     }
-#endif  // !HAVE_VA
+#اگر_ختم  // !HAVE_VA
 }
 
 }} // namespace cv::va_intel

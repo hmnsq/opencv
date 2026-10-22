@@ -22,149 +22,149 @@
 * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-#ifdef HAVE_OPENCL
+#اگر_تعریف_شدہ HAVE_OPENCL
 
-namespace cv
+نامخلا cv
 {
 
-static bool intel_gpu_gemm(
-    UMat A, Size sizeA,
-    UMat B, Size sizeB,
-    UMat D, Size sizeD,
-    double alpha, double beta,
-    bool atrans, bool btrans,
-    bool& isPropagatedC2D
+ساکن منطقی intel_gpu_gemm(
+    UMat A, سائز سائز_A,
+    UMat B, سائز سائز_B,
+    UMat D, سائز سائز_D,
+    دوہرا alpha, دوہرا beta,
+    منطقی atrans, منطقی btrans,
+    منطقی& isPropagatedC2D
 )
 {
-    CV_UNUSED(sizeB);
+    CV_غیر_مستعمل(سائز_B);
 
-    int M = sizeD.height, N = sizeD.width, K = ((atrans)? sizeA.height : sizeA.width);
+    صحیح M = سائز_D.اونچائی, N = سائز_D.چوڑائی, K = ((atrans)? سائز_A.اونچائی : سائز_A.چوڑائی);
 
-    if (M < 4 || N < 4 || K < 4)  // vload4
-        return false;
+    اگر (M < 4 || N < 4 || K < 4)  // vload4
+        واپس جھوٹ;
 
-    CV_LOG_VERBOSE(NULL, 0, "M=" << M << " N=" << N << " K=" << K);
+    CV_LOG_VERBOSE(تہی, 0, "M=" << M << " N=" << N << " K=" << K);
 
     std::string kernelName;
 
-    unsigned int lx = 8, ly = 4;
-    unsigned int dx = 4, dy = 8;
+    غیرعلامتی صحیح lx = 8, ly = 4;
+    غیرعلامتی صحیح dx = 4, dy = 8;
 
-    if(!atrans && !btrans)
+    اگر(!atrans && !btrans)
     {
-        if (M % 32 == 0 && N % 32 == 0 && K % 16 == 0)
+        اگر (M % 32 == 0 && N % 32 == 0 && K % 16 == 0)
         {
             kernelName = "intelblas_gemm_buffer_NN_sp";
         }
-        else
+        ورنہ
         {
-            if (M % 2 != 0)
-                return false;
+            اگر (M % 2 != 0)
+                واپس جھوٹ;
             // vload4(0, dst_write0) - 4 cols
             // multiply by lx: 8
-            if (N % (4*8) != 0)
-                return false;
+            اگر (N % (4*8) != 0)
+                واپس جھوٹ;
             kernelName = "intelblas_gemm_buffer_NN";
         }
     }
-    else if(atrans && !btrans)
+    ورنہ اگر(atrans && !btrans)
     {
-        if (M % 32 != 0)
-            return false;
-        if (N % 32 != 0)
-            return false;
+        اگر (M % 32 != 0)
+            واپس جھوٹ;
+        اگر (N % 32 != 0)
+            واپس جھوٹ;
         kernelName = "intelblas_gemm_buffer_TN";
     }
-    else if(!atrans && btrans)
+    ورنہ اگر(!atrans && btrans)
     {
-        if (K % 4 != 0)
-            return false;
+        اگر (K % 4 != 0)
+            واپس جھوٹ;
         kernelName = "intelblas_gemm_buffer_NT";
         ly = 16;
         dx = 1;
     }
-    else
+    ورنہ
     {
-        if (M % 32 != 0)
-            return false;
-        if (N % 32 != 0)
-            return false;
-        if (K % 16 != 0)
-            return false;
+        اگر (M % 32 != 0)
+            واپس جھوٹ;
+        اگر (N % 32 != 0)
+            واپس جھوٹ;
+        اگر (K % 16 != 0)
+            واپس جھوٹ;
         kernelName = "intelblas_gemm_buffer_TT";
     }
 
-    CV_LOG_DEBUG(NULL, "kernel: " << kernelName << "  (M=" << M << " N=" << N << " K=" << K << ")");
+    CV_LOG_DEBUG(تہی, "kernel: " << kernelName << "  (M=" << M << " N=" << N << " K=" << K << ")");
 
-    const size_t gx = divUp((size_t)N, dx);
-    const size_t gy = divUp((size_t)M, dy);
+    ثابت size_t gx = div_اوپر((size_t)N, dx);
+    ثابت size_t gy = div_اوپر((size_t)M, dy);
 
     size_t local[] = {lx, ly, 1};
-    size_t global[] = {roundUp(gx, lx), roundUp(gy, ly), 1};
+    size_t global[] = {باری_اوپر(gx, lx), باری_اوپر(gy, ly), 1};
 
-    ocl::Queue q;
+    ocl::قطار q;
     String errmsg;
-    const ocl::Program program = ocl::Context::getDefault().getProg(ocl::core::intel_gemm_oclsrc, "", errmsg);
+    ثابت ocl::پروگرام_2 پروگرام = ocl::Context::getDefault().getProg(ocl::core::intel_gemm_oclsrc, "", errmsg);
 
-    if(!atrans && btrans)
+    اگر(!atrans && btrans)
     {
-        ocl::Kernel k(kernelName.c_str(), program);
-        if (k.empty())
+        ocl::Kernel k(kernelName.c_str(), پروگرام);
+        اگر (k.empty())
         {
-            return false;
+            واپس جھوٹ;
         }
 
-        k.args(ocl::KernelArg::PtrReadOnly(A),
-               (int) (A.offset / sizeof(float)),
+        k.دلائل(ocl::KernelArg::PtrReadOnly(A),
+               (صحیح) (A.offset / حجم(اعشاری)),
                ocl::KernelArg::PtrReadOnly(B),
-               (int) (B.offset / sizeof(float)),
+               (صحیح) (B.offset / حجم(اعشاری)),
                ocl::KernelArg::PtrWriteOnly(D),
-               (int) (D.offset / sizeof(float)),
+               (صحیح) (D.offset / حجم(اعشاری)),
                M, N, K,
-               (float)alpha,
-               (float)beta,
-               (int)(A.step / sizeof(float)),
-               (int)(B.step / sizeof(float)),
-               (int)(D.step / sizeof(float))
+               (اعشاری)alpha,
+               (اعشاری)beta,
+               (صحیح)(A.قدم / حجم(اعشاری)),
+               (صحیح)(B.قدم / حجم(اعشاری)),
+               (صحیح)(D.قدم / حجم(اعشاری))
         );
 
-        bool ret = k.run(2, global, local, false, q);
-        return ret;
+        منطقی ret = k.تسلسل(2, global, local, جھوٹ, q);
+        واپس ret;
     }
-    else
+    ورنہ
     {
-        int stride = (M * N < 1024 * 1024) ? 10000000 : 256;
+        صحیح stride = (M * N < 1024 * 1024) ? 10000000 : 256;
 
-        for(int start_index = 0; start_index < K; start_index += stride)
+        برائے(صحیح آغاز_اشاریہ = 0; آغاز_اشاریہ < K; آغاز_اشاریہ += stride)
         {
-             ocl::Kernel k(kernelName.c_str(), program);
-             k.args(ocl::KernelArg::PtrReadOnly(A),
-                    (int) (A.offset / sizeof(float)),
+             ocl::Kernel k(kernelName.c_str(), پروگرام);
+             k.دلائل(ocl::KernelArg::PtrReadOnly(A),
+                    (صحیح) (A.offset / حجم(اعشاری)),
                     ocl::KernelArg::PtrReadOnly(B),
-                    (int) (B.offset / sizeof(float)),
+                    (صحیح) (B.offset / حجم(اعشاری)),
                     ocl::KernelArg::PtrWriteOnly(D),
-                    (int) (D.offset / sizeof(float)),
+                    (صحیح) (D.offset / حجم(اعشاری)),
                     M, N, K,
-                    (float)alpha,
-                    (float)beta,
-                    (int)(A.step / sizeof(float)),
-                    (int)(B.step / sizeof(float)),
-                    (int)(D.step / sizeof(float)),
-                    (int) start_index,                          // 14 start_index
+                    (اعشاری)alpha,
+                    (اعشاری)beta,
+                    (صحیح)(A.قدم / حجم(اعشاری)),
+                    (صحیح)(B.قدم / حجم(اعشاری)),
+                    (صحیح)(D.قدم / حجم(اعشاری)),
+                    (صحیح) آغاز_اشاریہ,                          // 14 start_index
                     stride);
 
-            bool ret = k.run(2, global, local, false, q);
-            if (!ret)
+            منطقی ret = k.تسلسل(2, global, local, جھوٹ, q);
+            اگر (!ret)
             {
-                if (start_index != 0)
-                    isPropagatedC2D = false;  // D array content is changed, need to rewrite
-                return false;
+                اگر (آغاز_اشاریہ != 0)
+                    isPropagatedC2D = جھوٹ;  // D array content is changed, need to rewrite
+                واپس جھوٹ;
             }
         }
-        return true;
+        واپس سچ;
     }
 }
 
 } // namespace cv
 
-#endif
+#اگر_ختم
