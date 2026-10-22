@@ -49,224 +49,224 @@
 #endif
 
 #ifdef BUILD_PLUGIN
-#include "opencv2/core/utility.hpp"
-#else  // BUILD_PLUGIN
+#অন্তর্ভাৱ "opencv2/core/utility.hpp"
+#অন্যথা  // BUILD_PLUGIN
 
-#include "opencv2/opencv_modules.hpp"
-#include "cvconfig.h"
+#অন্তর্ভাৱ "opencv2/opencv_modules.hpp"
+#অন্তর্ভাৱ "cvconfig.h"
 
-#include "opencv2/core/utility.hpp"
-#include "opencv2/core/cuda.hpp"
-#include "opencv2/core/opengl.hpp"
-#include "opencv2/core/va_intel.hpp"
+#অন্তর্ভাৱ "opencv2/core/utility.hpp"
+#অন্তর্ভাৱ "opencv2/core/cuda.hpp"
+#অন্তর্ভাৱ "opencv2/core/opengl.hpp"
+#অন্তর্ভাৱ "opencv2/core/va_intel.hpp"
 
-#include "opencv2/core/private.hpp"
-#include "opencv2/core/private.cuda.hpp"
+#অন্তর্ভাৱ "opencv2/core/private.hpp"
+#অন্তর্ভাৱ "opencv2/core/private.cuda.hpp"
 #ifdef HAVE_OPENCL
-#include "opencv2/core/ocl.hpp"
+#অন্তর্ভাৱ "opencv2/core/ocl.hpp"
 #endif
 
-#include <ctype.h>
-#include <float.h>
-#include <limits.h>
-#include <math.h>
-#include <stdarg.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#অন্তর্ভাৱ <ctype.h>
+#অন্তর্ভাৱ <float.h>
+#অন্তর্ভাৱ <limits.h>
+#অন্তর্ভাৱ <math.h>
+#অন্তর্ভাৱ <stdarg.h>
+#অন্তর্ভাৱ <stdio.h>
+#অন্তর্ভাৱ <stdlib.h>
+#অন্তর্ভাৱ <string.h>
 
-#include <algorithm>
-#include <cmath>
-#include <cstdlib>
-#include <limits>
-#include <float.h>
-#include <cstring>
-#include <cassert>
+#অন্তর্ভাৱ <algorithm>
+#অন্তর্ভাৱ <cmath>
+#অন্তর্ভাৱ <cstdlib>
+#অন্তর্ভাৱ <limits>
+#অন্তর্ভাৱ <float.h>
+#অন্তর্ভাৱ <cstring>
+#অন্তর্ভাৱ <cassert>
 
 #define USE_SSE2  (cv::checkHardwareSupport(CV_CPU_SSE2))
 #define USE_SSE4_2  (cv::checkHardwareSupport(CV_CPU_SSE4_2))
 #define USE_AVX  (cv::checkHardwareSupport(CV_CPU_AVX))
 #define USE_AVX2  (cv::checkHardwareSupport(CV_CPU_AVX2))
 
-#include "opencv2/core/hal/hal.hpp"
-#include "opencv2/core/hal/intrin.hpp"
-#include "opencv2/core/neon_utils.hpp"
-#include "opencv2/core/vsx_utils.hpp"
-#include "hal_replacement.hpp"
+#অন্তর্ভাৱ "opencv2/core/hal/hal.hpp"
+#অন্তর্ভাৱ "opencv2/core/hal/intrin.hpp"
+#অন্তর্ভাৱ "opencv2/core/neon_utils.hpp"
+#অন্তর্ভাৱ "opencv2/core/vsx_utils.hpp"
+#অন্তর্ভাৱ "hal_replacement.hpp"
 
 
-namespace cv
+নামাকাশ cv
 {
 
 // -128.f ... 255.f
-extern const float g_8x32fTab[];
+বাহ্য ধ্রুৱ ভিন্ন g_8x32fTab[];
 #define CV_8TO32F(x)  cv::g_8x32fTab[(x)+128]
 
-extern const ushort g_8x16uSqrTab[];
+বাহ্য ধ্রুৱ ushort g_8x16uSqrTab[];
 #define CV_SQR_8U(x)  cv::g_8x16uSqrTab[(x)+255]
 
-extern const uchar g_Saturate8u[];
-#define CV_FAST_CAST_8U(t)   (assert(-256 <= (t) && (t) <= 512), cv::g_Saturate8u[(t)+256])
+বাহ্য ধ্রুৱ uchar g_Saturate8u[];
+#define CV_FAST_CAST_8U(t)   (প্রতিজ্ঞা(-256 <= (t) && (t) <= 512), cv::g_Saturate8u[(t)+256])
 #define CV_MIN_8U(a,b)       ((a) - CV_FAST_CAST_8U((a) - (b)))
 #define CV_MAX_8U(a,b)       ((a) + CV_FAST_CAST_8U((b) - (a)))
 
-template<typename T1, typename T2=T1, typename T3=T1> struct OpNop
+template<typename T1, typename T2=T1, typename T3=T1> সংরচনা OpNop
 {
-    typedef T1 type1;
-    typedef T2 type2;
-    typedef T3 rtype;
-    T3 operator ()(const T1 a) const { return saturate_cast<T3>(a); }
+    প্রকারনির্দেশ T1 type1;
+    প্রকারনির্দেশ T2 type2;
+    প্রকারনির্দেশ T3 rtype;
+    T3 operator ()(ধ্রুৱ T1 a) ধ্রুৱ { ঘূৰাই saturate_cast<T3>(a); }
 };
 
-template<typename T1, typename T2=T1, typename T3=T1> struct OpSqr
+template<typename T1, typename T2=T1, typename T3=T1> সংরচনা OpSqr
 {
-    typedef T1 type1;
-    typedef T2 type2;
-    typedef T3 rtype;
-    T3 operator ()(const T1 a) const { return saturate_cast<T3>(a)*saturate_cast<T3>(a); }
+    প্রকারনির্দেশ T1 type1;
+    প্রকারনির্দেশ T2 type2;
+    প্রকারনির্দেশ T3 rtype;
+    T3 operator ()(ধ্রুৱ T1 a) ধ্রুৱ { ঘূৰাই saturate_cast<T3>(a)*saturate_cast<T3>(a); }
 };
 
-template<typename T1, typename T2=T1, typename T3=T1> struct OpAdd
+template<typename T1, typename T2=T1, typename T3=T1> সংরচনা OpAdd
 {
-    typedef T1 type1;
-    typedef T2 type2;
-    typedef T3 rtype;
-    T3 operator ()(const T1 a, const T2 b) const { return saturate_cast<T3>(a + b); }
+    প্রকারনির্দেশ T1 type1;
+    প্রকারনির্দেশ T2 type2;
+    প্রকারনির্দেশ T3 rtype;
+    T3 operator ()(ধ্রুৱ T1 a, ধ্রুৱ T2 b) ধ্রুৱ { ঘূৰাই saturate_cast<T3>(a + b); }
 };
 
-template<typename T1, typename T2=T1, typename T3=T1> struct OpAddSqr
+template<typename T1, typename T2=T1, typename T3=T1> সংরচনা OpAddSqr
 {
-    typedef T1 type1;
-    typedef T2 type2;
-    typedef T3 rtype;
-    T3 operator ()(const T1 a, const T2 b) const { return saturate_cast<T3>(a + saturate_cast<T3>(b)*saturate_cast<T3>(b)); }
+    প্রকারনির্দেশ T1 type1;
+    প্রকারনির্দেশ T2 type2;
+    প্রকারনির্দেশ T3 rtype;
+    T3 operator ()(ধ্রুৱ T1 a, ধ্রুৱ T2 b) ধ্রুৱ { ঘূৰাই saturate_cast<T3>(a + saturate_cast<T3>(b)*saturate_cast<T3>(b)); }
 };
 
-template<typename T1, typename T2=T1, typename T3=T1> struct OpSub
+template<typename T1, typename T2=T1, typename T3=T1> সংরচনা OpSub
 {
-    typedef T1 type1;
-    typedef T2 type2;
-    typedef T3 rtype;
-    T3 operator ()(const T1 a, const T2 b) const { return saturate_cast<T3>(a - b); }
+    প্রকারনির্দেশ T1 type1;
+    প্রকারনির্দেশ T2 type2;
+    প্রকারনির্দেশ T3 rtype;
+    T3 operator ()(ধ্রুৱ T1 a, ধ্রুৱ T2 b) ধ্রুৱ { ঘূৰাই saturate_cast<T3>(a - b); }
 };
 
-template<typename T1, typename T2=T1, typename T3=T1> struct OpRSub
+template<typename T1, typename T2=T1, typename T3=T1> সংরচনা OpRSub
 {
-    typedef T1 type1;
-    typedef T2 type2;
-    typedef T3 rtype;
-    T3 operator ()(const T1 a, const T2 b) const { return saturate_cast<T3>(b - a); }
+    প্রকারনির্দেশ T1 type1;
+    প্রকারনির্দেশ T2 type2;
+    প্রকারনির্দেশ T3 rtype;
+    T3 operator ()(ধ্রুৱ T1 a, ধ্রুৱ T2 b) ধ্রুৱ { ঘূৰাই saturate_cast<T3>(b - a); }
 };
 
-template<typename T> struct OpMin
+template<typename T> সংরচনা OpMin
 {
-    typedef T type1;
-    typedef T type2;
-    typedef T rtype;
-    T operator ()(const T a, const T b) const { return std::min(a, b); }
+    প্রকারনির্দেশ T type1;
+    প্রকারনির্দেশ T type2;
+    প্রকারনির্দেশ T rtype;
+    T operator ()(ধ্রুৱ T a, ধ্রুৱ T b) ধ্রুৱ { ঘূৰাই std::min(a, b); }
 };
 
-template<typename T> struct OpMax
+template<typename T> সংরচনা OpMax
 {
-    typedef T type1;
-    typedef T type2;
-    typedef T rtype;
-    T operator ()(const T a, const T b) const { return std::max(a, b); }
+    প্রকারনির্দেশ T type1;
+    প্রকারনির্দেশ T type2;
+    প্রকারনির্দেশ T rtype;
+    T operator ()(ধ্রুৱ T a, ধ্রুৱ T b) ধ্রুৱ { ঘূৰাই std::max(a, b); }
 };
 
-template<typename T> struct OpAbsDiff
+template<typename T> সংরচনা OpAbsDiff
 {
-    typedef T type1;
-    typedef T type2;
-    typedef T rtype;
-    T operator()(T a, T b) const { return a > b ? a - b : b - a; }
+    প্রকারনির্দেশ T type1;
+    প্রকারনির্দেশ T type2;
+    প্রকারনির্দেশ T rtype;
+    T operator()(T a, T b) ধ্রুৱ { ঘূৰাই a > b ? a - b : b - a; }
 };
 
 // specializations to prevent "-0" results
-template<> struct OpAbsDiff<float>
+template<> সংরচনা OpAbsDiff<ভিন্ন>
 {
-    typedef float type1;
-    typedef float type2;
-    typedef float rtype;
-    float operator()(float a, float b) const { return std::abs(a - b); }
+    প্রকারনির্দেশ ভিন্ন type1;
+    প্রকারনির্দেশ ভিন্ন type2;
+    প্রকারনির্দেশ ভিন্ন rtype;
+    ভিন্ন operator()(ভিন্ন a, ভিন্ন b) ধ্রুৱ { ঘূৰাই std::abs(a - b); }
 };
-template<> struct OpAbsDiff<double>
+template<> সংরচনা OpAbsDiff<দ্ৱিগুণ>
 {
-    typedef double type1;
-    typedef double type2;
-    typedef double rtype;
-    double operator()(double a, double b) const { return std::abs(a - b); }
-};
-
-template<typename T> struct OpAnd
-{
-    typedef T type1;
-    typedef T type2;
-    typedef T rtype;
-    T operator()( T a, T b ) const { return a & b; }
+    প্রকারনির্দেশ দ্ৱিগুণ type1;
+    প্রকারনির্দেশ দ্ৱিগুণ type2;
+    প্রকারনির্দেশ দ্ৱিগুণ rtype;
+    দ্ৱিগুণ operator()(দ্ৱিগুণ a, দ্ৱিগুণ b) ধ্রুৱ { ঘূৰাই std::abs(a - b); }
 };
 
-template<typename T> struct OpOr
+template<typename T> সংরচনা OpAnd
 {
-    typedef T type1;
-    typedef T type2;
-    typedef T rtype;
-    T operator()( T a, T b ) const { return a | b; }
+    প্রকারনির্দেশ T type1;
+    প্রকারনির্দেশ T type2;
+    প্রকারনির্দেশ T rtype;
+    T operator()( T a, T b ) ধ্রুৱ { ঘূৰাই a & b; }
 };
 
-template<typename T> struct OpXor
+template<typename T> সংরচনা OpOr
 {
-    typedef T type1;
-    typedef T type2;
-    typedef T rtype;
-    T operator()( T a, T b ) const { return a ^ b; }
+    প্রকারনির্দেশ T type1;
+    প্রকারনির্দেশ T type2;
+    প্রকারনির্দেশ T rtype;
+    T operator()( T a, T b ) ধ্রুৱ { ঘূৰাই a | b; }
 };
 
-template<typename T> struct OpNot
+template<typename T> সংরচনা OpXor
 {
-    typedef T type1;
-    typedef T type2;
-    typedef T rtype;
-    T operator()( T a, T ) const { return ~a; }
+    প্রকারনির্দেশ T type1;
+    প্রকারনির্দেশ T type2;
+    প্রকারনির্দেশ T rtype;
+    T operator()( T a, T b ) ধ্রুৱ { ঘূৰাই a ^ b; }
 };
 
-template<> inline uchar OpAdd<uchar>::operator ()(uchar a, uchar b) const
-{ return CV_FAST_CAST_8U(a + b); }
+template<typename T> সংরচনা OpNot
+{
+    প্রকারনির্দেশ T type1;
+    প্রকারনির্দেশ T type2;
+    প্রকারনির্দেশ T rtype;
+    T operator()( T a, T ) ধ্রুৱ { ঘূৰাই ~a; }
+};
 
-template<> inline uchar OpSub<uchar>::operator ()(uchar a, uchar b) const
-{ return CV_FAST_CAST_8U(a - b); }
+template<> অন্তঃস্থ uchar OpAdd<uchar>::operator ()(uchar a, uchar b) ধ্রুৱ
+{ ঘূৰাই CV_FAST_CAST_8U(a + b); }
 
-template<> inline short OpAbsDiff<short>::operator ()(short a, short b) const
-{ return saturate_cast<short>(std::abs(a - b)); }
+template<> অন্তঃস্থ uchar OpSub<uchar>::operator ()(uchar a, uchar b) ধ্রুৱ
+{ ঘূৰাই CV_FAST_CAST_8U(a - b); }
 
-template<> inline schar OpAbsDiff<schar>::operator ()(schar a, schar b) const
-{ return saturate_cast<schar>(std::abs(a - b)); }
+template<> অন্তঃস্থ short OpAbsDiff<short>::operator ()(short a, short b) ধ্রুৱ
+{ ঘূৰাই saturate_cast<short>(std::abs(a - b)); }
 
-template<> inline uchar OpMin<uchar>::operator ()(uchar a, uchar b) const { return CV_MIN_8U(a, b); }
+template<> অন্তঃস্থ schar OpAbsDiff<schar>::operator ()(schar a, schar b) ধ্রুৱ
+{ ঘূৰাই saturate_cast<schar>(std::abs(a - b)); }
 
-template<> inline uchar OpMax<uchar>::operator ()(uchar a, uchar b) const { return CV_MAX_8U(a, b); }
+template<> অন্তঃস্থ uchar OpMin<uchar>::operator ()(uchar a, uchar b) ধ্রুৱ { ঘূৰাই CV_MIN_8U(a, b); }
 
-typedef void (*UnaryFunc)(const uchar* src1, size_t step1,
+template<> অন্তঃস্থ uchar OpMax<uchar>::operator ()(uchar a, uchar b) ধ্রুৱ { ঘূৰাই CV_MAX_8U(a, b); }
+
+প্রকারনির্দেশ শূন্য (*UnaryFunc)(ধ্রুৱ uchar* src1, size_t step1,
                        uchar* dst, size_t step, Size sz,
-                       void*);
+                       শূন্য*);
 
-typedef void (*BinaryFunc)(const uchar* src1, size_t step1,
-                       const uchar* src2, size_t step2,
+প্রকারনির্দেশ শূন্য (*দ্বিমিক_Func)(ধ্রুৱ uchar* src1, size_t step1,
+                       ধ্রুৱ uchar* src2, size_t step2,
                        uchar* dst, size_t step, Size sz,
-                       void*);
+                       শূন্য*);
 
-typedef void (*BinaryFuncC)(const void* src1, size_t step1,
-                       const void* src2, size_t step2,
-                       void* dst, size_t step, int width, int height,
-                       void*);
+প্রকারনির্দেশ শূন্য (*দ্বিমিক_Func_C)(ধ্রুৱ শূন্য* src1, size_t step1,
+                       ধ্রুৱ শূন্য* src2, size_t step2,
+                       শূন্য* dst, size_t step, পূর্ণাঙ্ক width, পূর্ণাঙ্ক height,
+                       শূন্য*);
 
 // Exported so the new element-wise expression engine can reuse the already-optimized,
 // CPU-dispatched convert / convert-scale kernels through a thin ElemwiseFunc adapter,
 // instead of re-implementing the whole cast matrix. (Prototype: declarations are mirrored
 // engine-side; relocate into a public core header at integration time.)
-CV_EXPORTS BinaryFunc getConvertFunc(int sdepth, int ddepth);
-CV_EXPORTS BinaryFunc getConvertScaleFunc(int sdepth, int ddepth);
-BinaryFunc getCopyMaskFunc(size_t esz);
+CV_EXPORTS দ্বিমিক_Func getConvertFunc(পূর্ণাঙ্ক sdepth, পূর্ণাঙ্ক ddepth);
+CV_EXPORTS দ্বিমিক_Func getConvertScaleFunc(পূর্ণাঙ্ক sdepth, পূর্ণাঙ্ক ddepth);
+দ্বিমিক_Func getCopyMaskFunc(size_t esz);
 
 /* default memory block for sparse array elements */
 #define  CV_SPARSE_MAT_BLOCK     (1<<12)
@@ -280,62 +280,62 @@ BinaryFunc getCopyMaskFunc(size_t esz);
 // There is some mess in code with vectors representation.
 // Both vector-column / vector-rows are used with dims=2 (as Mat2D always).
 // Reshape matrices if necessary (in case of vectors) and returns size with scaled width.
-Size getContinuousSize2D(Mat& m1, int widthScale=1);
-Size getContinuousSize2D(Mat& m1, Mat& m2, int widthScale=1);
-Size getContinuousSize2D(Mat& m1, Mat& m2, Mat& m3, int widthScale=1);
+Size getContinuousSize2D(Mat& m1, পূর্ণাঙ্ক widthScale=1);
+Size getContinuousSize2D(Mat& m1, Mat& m2, পূর্ণাঙ্ক widthScale=1);
+Size getContinuousSize2D(Mat& m1, Mat& m2, Mat& m3, পূর্ণাঙ্ক widthScale=1);
 
-void setSize( Mat& m, int _dims, const int* _sz, const size_t* _steps, bool autoSteps=false );
-void finalizeHdr(Mat& m);
-int updateContinuityFlag(int flags, int dims, const int* size, const size_t* step);
+শূন্য setSize( Mat& m, পূর্ণাঙ্ক _dims, ধ্রুৱ পূর্ণাঙ্ক* _sz, ধ্রুৱ size_t* _steps, তার্কিক autoSteps=মিছা );
+শূন্য finalizeHdr(Mat& m);
+পূর্ণাঙ্ক updateContinuityFlag(পূর্ণাঙ্ক flags, পূর্ণাঙ্ক dims, ধ্রুৱ পূর্ণাঙ্ক* size, ধ্রুৱ size_t* step);
 
-struct NoVec
+সংরচনা NoVec
 {
-    size_t operator()(const void*, const void*, void*, size_t) const { return 0; }
+    size_t operator()(ধ্রুৱ শূন্য*, ধ্রুৱ শূন্য*, শূন্য*, size_t) ধ্রুৱ { ঘূৰাই 0; }
 };
 
 #define CV_SPLIT_MERGE_MAX_BLOCK_SIZE(cn) ((INT_MAX/4)/(cn)) // HAL implementation accepts 'int' len, so INT_MAX doesn't work here
 
-enum { BLOCK_SIZE = 1024 };
+গণনা { BLOCK_SIZE = 1024 };
 
-#if defined HAVE_IPP && (IPP_VERSION_X100 >= 700)
+#যদি defined HAVE_IPP && (IPP_VERSION_X100 >= 700)
 #define ARITHM_USE_IPP 1
-#else
+#অন্যথা
 #define ARITHM_USE_IPP 0
 #endif
 
-inline bool checkScalar(const Mat& sc, int atype, _InputArray::KindFlag sckind, _InputArray::KindFlag akind)
+অন্তঃস্থ তার্কিক checkScalar(ধ্রুৱ Mat& sc, পূর্ণাঙ্ক atype, প্ৰবেশ_Array_2::KindFlag sckind, প্ৰবেশ_Array_2::KindFlag akind)
 {
-    if( sc.dims > 2 || !sc.isContinuous() )
-        return false;
+    যদি( sc.dims > 2 || !sc.isContinuous() )
+        ঘূৰাই মিছা;
     Size sz = sc.size();
-    if(sz.width != 1 && sz.height != 1)
-        return false;
-    int cn = CV_MAT_CN(atype);
-    if( akind == _InputArray::MATX && sckind != _InputArray::MATX )
-        return false;
-    return sz == Size(1, 1) || sz == Size(1, cn) || sz == Size(cn, 1) ||
+    যদি(sz.width != 1 && sz.height != 1)
+        ঘূৰাই মিছা;
+    পূর্ণাঙ্ক cn = CV_MAT_CN(atype);
+    যদি( akind == প্ৰবেশ_Array_2::MATX && sckind != প্ৰবেশ_Array_2::MATX )
+        ঘূৰাই মিছা;
+    ঘূৰাই sz == Size(1, 1) || sz == Size(1, cn) || sz == Size(cn, 1) ||
            (sz == Size(1, 4) && sc.type() == CV_64F && cn <= 4);
 }
 
-inline bool checkScalar(InputArray sc, int atype, _InputArray::KindFlag sckind, _InputArray::KindFlag akind)
+অন্তঃস্থ তার্কিক checkScalar(প্ৰবেশ_Array sc, পূর্ণাঙ্ক atype, প্ৰবেশ_Array_2::KindFlag sckind, প্ৰবেশ_Array_2::KindFlag akind)
 {
-    if( sc.dims() > 2 || !sc.isContinuous() )
-        return false;
+    যদি( sc.dims() > 2 || !sc.isContinuous() )
+        ঘূৰাই মিছা;
     Size sz = sc.size();
-    if(sz.width != 1 && sz.height != 1)
-        return false;
-    int cn = CV_MAT_CN(atype);
-    if( akind == _InputArray::MATX && sckind != _InputArray::MATX )
-        return false;
-    return sz == Size(1, 1) || sz == Size(1, cn) || sz == Size(cn, 1) ||
+    যদি(sz.width != 1 && sz.height != 1)
+        ঘূৰাই মিছা;
+    পূর্ণাঙ্ক cn = CV_MAT_CN(atype);
+    যদি( akind == প্ৰবেশ_Array_2::MATX && sckind != প্ৰবেশ_Array_2::MATX )
+        ঘূৰাই মিছা;
+    ঘূৰাই sz == Size(1, 1) || sz == Size(1, cn) || sz == Size(cn, 1) ||
            (sz == Size(1, 4) && sc.type() == CV_64F && cn <= 4);
 }
 
 // Does the OTHER operand `arr` have exactly the same shape as the scalar candidate `sc`, with the
 // single channel.
-inline bool sameShapeAsArg(const _InputArray& sc, const _InputArray& arr)
+অন্তঃস্থ তার্কিক sameShapeAsArg(ধ্রুৱ প্ৰবেশ_Array_2& sc, ধ্রুৱ প্ৰবেশ_Array_2& arr)
 {
-    return arr.channels() == 1 && sc.sameSize(arr);
+    ঘূৰাই arr.channels() == 1 && sc.sameSize(arr);
 }
 
 // New element-wise engine scalar handling. A genuine number / Scalar / Vec / Matx operand to an
@@ -348,22 +348,22 @@ inline bool sameShapeAsArg(const _InputArray& sc, const _InputArray& arr)
 // (but see isScalarLikeMat below for the shape-incompatible compat fallback).
 // `arr` is the OTHER operand: its channel count decides what a MATX scalar may broadcast over, its
 // shape whether the bindings-style column below is a scalar at all.
-inline bool isScalarArg(const _InputArray& sc, const _InputArray& arr)
+অন্তঃস্থ তার্কিক isScalarArg(ধ্রুৱ প্ৰবেশ_Array_2& sc, ধ্রুৱ প্ৰবেশ_Array_2& arr)
 {
-    const _InputArray::KindFlag kind = sc.kind();
-    const int cn = arr.channels();
-    if (kind == _InputArray::MATX)
+    ধ্রুৱ প্ৰবেশ_Array_2::KindFlag kind = sc.kind();
+    ধ্রুৱ পূর্ণাঙ্ক cn = arr.channels();
+    যদি (kind == প্ৰবেশ_Array_2::MATX)
     {
         Size sz = sc.getSz();
-        int scn0 = sz.width * sz.height;
+        পূর্ণাঙ্ক scn0 = sz.width * sz.height;
         // A genuine scalar is a 1D MATX (a Vec/Scalar/number: one of width/height is 1). A 2D MATX
         // (e.g. a Matx33) is a real matrix operand and rides broadcasting - never a scalar.
-        if (scn0 != sz.width + sz.height - 1)
-            return false;
+        যদি (scn0 != sz.width + sz.height - 1)
+            ঘূৰাই মিছা;
         // Per-channel match (incl. Vec<_,N> for an N-channel array), a 4-elem Scalar on a <4-channel
         // array, or a single broadcast value. No 4-channel cap: a multichannel scalar rides as a 0-dim
         // per-channel CONST over the caller's data (not squeezed into a 4-slot Scalar).
-        return scn0 == cn || (cn < 4 && scn0 == 4) || scn0 == 1;
+        ঘূৰাই scn0 == cn || (cn < 4 && scn0 == 4) || scn0 == 1;
     }
     // the bindings-style Scalar column. dims must be exactly 2: a 1-D [4] CV_64F array is an honest
     // broadcast operand. Direct field reads (no _InputArray getter dispatch) - this runs on EVERY
@@ -372,19 +372,19 @@ inline bool isScalarArg(const _InputArray& sc, const _InputArray& arr)
     // element-wise, exactly as in 4.x (see sameShapeAsArg). That covers both the non-continuous
     // partner that fails this very test (e.g. P.col(0)) and a genuine Scalar partner, which keeps
     // its per-channel semantics because only the Mat/UMat side is demoted.
-    if (kind == _InputArray::MAT)
+    যদি (kind == প্ৰবেশ_Array_2::MAT)
     {
-        const Mat& m = *(const Mat*)sc.getObj();
-        return m.rows == 4 && m.cols == 1 && cn <= 4 && m.dims == 2 &&
+        ধ্রুৱ Mat& m = *(ধ্রুৱ Mat*)sc.getObj();
+        ঘূৰাই m.rows == 4 && m.cols == 1 && cn <= 4 && m.dims == 2 &&
                m.type() == CV_64F && m.isContinuous() && !sameShapeAsArg(sc, arr);
     }
-    if (kind == _InputArray::UMAT)
+    যদি (kind == প্ৰবেশ_Array_2::UMAT)
     {
-        const UMat& m = *(const UMat*)sc.getObj();
-        return m.rows == 4 && m.cols == 1 && cn <= 4 && m.dims == 2 &&
+        ধ্রুৱ UMat& m = *(ধ্রুৱ UMat*)sc.getObj();
+        ঘূৰাই m.rows == 4 && m.cols == 1 && cn <= 4 && m.dims == 2 &&
                m.type() == CV_64F && m.isContinuous() && !sameShapeAsArg(sc, arr);
     }
-    return false;
+    ঘূৰাই মিছা;
 }
 
 // The remaining old arithm_op checkScalar geometry: a real Mat/UMat that LOOKS like a scalar - 1x1
@@ -392,127 +392,127 @@ inline bool isScalarArg(const _InputArray& sc, const _InputArray& arr)
 // arithm_op treats such an operand as a per-channel scalar ONLY as a fallback, when the shapes are
 // not broadcast-compatible - a call that is valid under numpy rules keeps its numpy meaning, one
 // that would throw gets the 4.x scalar semantics instead.
-inline bool isScalarLikeMat(const _InputArray& sc, int cn)
+অন্তঃস্থ তার্কিক isScalarLikeMat(ধ্রুৱ প্ৰবেশ_Array_2& sc, পূর্ণাঙ্ক cn)
 {
     // direct field reads, like isScalarArg: this probe also runs per engine call (see arithm_op's
     // compat fallback). `rows != 1 && cols != 1` exits in two inline compares for ordinary arrays.
-    int rows, cols, nval;
-    bool continuous;
-    const _InputArray::KindFlag kind = sc.kind();
-    if (kind == _InputArray::MAT)
+    পূর্ণাঙ্ক rows, cols, nval;
+    তার্কিক continuous;
+    ধ্রুৱ প্ৰবেশ_Array_2::KindFlag kind = sc.kind();
+    যদি (kind == প্ৰবেশ_Array_2::MAT)
     {
-        const Mat& m = *(const Mat*)sc.getObj();
-        if ((m.rows != 1 && m.cols != 1) || m.dims > 2) return false;
+        ধ্রুৱ Mat& m = *(ধ্রুৱ Mat*)sc.getObj();
+        যদি ((m.rows != 1 && m.cols != 1) || m.dims > 2) ঘূৰাই মিছা;
         rows = m.rows; cols = m.cols; nval = rows * cols * m.channels(); continuous = m.isContinuous();
     }
-    else if (kind == _InputArray::UMAT)
+    অন্যথা যদি (kind == প্ৰবেশ_Array_2::UMAT)
     {
-        const UMat& m = *(const UMat*)sc.getObj();
-        if ((m.rows != 1 && m.cols != 1) || m.dims > 2) return false;
+        ধ্রুৱ UMat& m = *(ধ্রুৱ UMat*)sc.getObj();
+        যদি ((m.rows != 1 && m.cols != 1) || m.dims > 2) ঘূৰাই মিছা;
         rows = m.rows; cols = m.cols; nval = rows * cols * m.channels(); continuous = m.isContinuous();
     }
-    else
-        return false;
-    if (!continuous || nval > 4 || (nval != 1 && nval != cn))
-        return false;
-    return (rows == 1 && cols == 1) || (rows == cn && cols == 1) || (rows == 1 && cols == cn);
+    অন্যথা
+        ঘূৰাই মিছা;
+    যদি (!continuous || nval > 4 || (nval != 1 && nval != cn))
+        ঘূৰাই মিছা;
+    ঘূৰাই (rows == 1 && cols == 1) || (rows == cn && cols == 1) || (rows == 1 && cols == cn);
 }
 
 // The size of the caller-provided stack buffer for scalarArgElems (4 slots of the widest depth).
 // A scalar is <= 4 values by contract, so it NEVER touches the heap.
-enum { EW_SCALAR_BUF_SIZE = 4 * sizeof(double) };
+গণনা { EW_SCALAR_BUF_SIZE = 4 * পরিমাণ(দ্ৱিগুণ) };
 
 // A scalar operand's raw payload: the MATX inline storage or the Mat data, both returned in place.
 // A UMAT scalar's values are copied device->host into `scbuf` (>= EW_SCALAR_BUF_SIZE bytes, on the
 // CALLER's stack - no heap, no UMat::getMat mapping machinery for 32 bytes of data).
 // p/d receive the data pointer and depth; returns the value count (elems x channels).
-inline int scalarArgElems(const _InputArray& sc, const uchar*& p, int& d, uchar* scbuf)
+অন্তঃস্থ পূর্ণাঙ্ক scalarArgElems(ধ্রুৱ প্ৰবেশ_Array_2& sc, ধ্রুৱ uchar*& p, পূর্ণাঙ্ক& d, uchar* scbuf)
 {
-    const _InputArray::KindFlag kind = sc.kind();
-    if (kind == _InputArray::MAT)
+    ধ্রুৱ প্ৰবেশ_Array_2::KindFlag kind = sc.kind();
+    যদি (kind == প্ৰবেশ_Array_2::MAT)
     {
-        const Mat& m = *(const Mat*)sc.getObj();
+        ধ্রুৱ Mat& m = *(ধ্রুৱ Mat*)sc.getObj();
         p = m.data;
         d = m.depth();
-        return (int)m.total() * m.channels();
+        ঘূৰাই (পূর্ণাঙ্ক)m.total() * m.channels();
     }
-    if (kind == _InputArray::UMAT)
+    যদি (kind == প্ৰবেশ_Array_2::UMAT)
     {
-        const UMat& u = *(const UMat*)sc.getObj();
+        ধ্রুৱ UMat& u = *(ধ্রুৱ UMat*)sc.getObj();
         d = u.depth();
-        int n = (int)u.total() * u.channels();
-        CV_Assert(n * (int)CV_ELEM_SIZE1(d) <= (int)EW_SCALAR_BUF_SIZE);
+        পূর্ণাঙ্ক n = (পূর্ণাঙ্ক)u.total() * u.channels();
+        CV_Assert(n * (পূর্ণাঙ্ক)CV_ELEM_SIZE1(d) <= (পূর্ণাঙ্ক)EW_SCALAR_BUF_SIZE);
         Mat header(u.dims, u.size.p, u.type(), scbuf);   // header over the caller's stack buffer
         u.copyTo(header);                                // create() is a no-op (exact match) -> the
         p = scbuf;                                       // copy lands straight in scbuf
-        return n;
+        ঘূৰাই n;
     }
-    p = (const uchar*)sc.getObj();
+    p = (ধ্রুৱ uchar*)sc.getObj();
     d = sc.depth();
     Size sz = sc.getSz();
-    return sz.width * sz.height;
+    ঘূৰাই sz.width * sz.height;
 }
 
 // Read one element of depth `d` at p as a double (no Mat, no convertTo, no dispatcher).
-inline double elemToDouble(int d, const uchar* p)
+অন্তঃস্থ দ্ৱিগুণ elemToDouble(পূর্ণাঙ্ক d, ধ্রুৱ uchar* p)
 {
-    switch (d)
+    ৱিকল্প (d)
     {
-    case CV_8U:   return *(const uchar*)p;
-    case CV_8S:   return *(const schar*)p;
-    case CV_16U:  return *(const ushort*)p;
-    case CV_16S:  return *(const short*)p;
-    case CV_32U:  return *(const unsigned*)p;
-    case CV_32S:  return *(const int*)p;
-    case CV_64U:  return (double)*(const uint64_t*)p;
-    case CV_64S:  return (double)*(const int64_t*)p;
-    case CV_16F:  return (float)*(const hfloat*)p;
-    case CV_16BF: return (float)*(const bfloat*)p;
-    case CV_32F:  return *(const float*)p;
-    case CV_64F:  return *(const double*)p;
-    default:      CV_Error(Error::StsUnsupportedFormat, "unsupported scalar depth");
+    পক্ষ CV_8U:   ঘূৰাই *(ধ্রুৱ uchar*)p;
+    পক্ষ CV_8S:   ঘূৰাই *(ধ্রুৱ schar*)p;
+    পক্ষ CV_16U:  ঘূৰাই *(ধ্রুৱ ushort*)p;
+    পক্ষ CV_16S:  ঘূৰাই *(ধ্রুৱ short*)p;
+    পক্ষ CV_32U:  ঘূৰাই *(ধ্রুৱ unsigned*)p;
+    পক্ষ CV_32S:  ঘূৰাই *(ধ্রুৱ পূর্ণাঙ্ক*)p;
+    পক্ষ CV_64U:  ঘূৰাই (দ্ৱিগুণ)*(ধ্রুৱ uint64_t*)p;
+    পক্ষ CV_64S:  ঘূৰাই (দ্ৱিগুণ)*(ধ্রুৱ int64_t*)p;
+    পক্ষ CV_16F:  ঘূৰাই (ভিন্ন)*(ধ্রুৱ hfloat*)p;
+    পক্ষ CV_16BF: ঘূৰাই (ভিন্ন)*(ধ্রুৱ bfloat*)p;
+    পক্ষ CV_32F:  ঘূৰাই *(ধ্রুৱ ভিন্ন*)p;
+    পক্ষ CV_64F:  ঘূৰাই *(ধ্রুৱ দ্ৱিগুণ*)p;
+    স্ৱভাৱ:      CV_Error(Error::StsUnsupportedFormat, "unsupported scalar depth");
     }
 }
 
 // Extract a scalar operand's values (see isScalarArg) as up to 4 doubles, straight from its
 // storage. Returns the element count.
-inline int readScalarArg(const _InputArray& sc, Scalar& out)
+অন্তঃস্থ পূর্ণাঙ্ক readScalarArg(ধ্রুৱ প্ৰবেশ_Array_2& sc, Scalar& out)
 {
     out = Scalar();                      // unused channels stay 0 (independent of the caller's Scalar)
-    const uchar* p; int d; uchar scbuf[EW_SCALAR_BUF_SIZE];
-    int n = scalarArgElems(sc, p, d, scbuf);
+    ধ্রুৱ uchar* p; পূর্ণাঙ্ক d; uchar scbuf[EW_SCALAR_BUF_SIZE];
+    পূর্ণাঙ্ক n = scalarArgElems(sc, p, d, scbuf);
     CV_Assert(n <= 4);                   // Scalar holds 4 slots; isScalarArg admits more only for MATX
     size_t esz = CV_ELEM_SIZE1(d);
-    for (int i = 0; i < n; i++)
+    বাবে (পূর্ণাঙ্ক i = 0; i < n; i++)
         out[i] = elemToDouble(d, p + (size_t)i * esz);
-    return n;
+    ঘূৰাই n;
 }
 
-void convertAndUnrollScalar( const Mat& sc, int buftype, uchar* scbuf, size_t blocksize );
+শূন্য convertAndUnrollScalar( ধ্রুৱ Mat& sc, পূর্ণাঙ্ক buftype, uchar* scbuf, size_t blocksize );
 
 #ifdef CV_COLLECT_IMPL_DATA
-struct ImplCollector
+সংরচনা ImplCollector
 {
     ImplCollector()
     {
-        useCollection   = false;
+        useCollection   = মিছা;
         implFlags       = 0;
     }
-    bool useCollection; // enable/disable impl data collection
+    তার্কিক useCollection; // enable/disable impl data collection
 
-    int implFlags;
-    std::vector<int>    implCode;
+    পূর্ণাঙ্ক implFlags;
+    std::vector<পূর্ণাঙ্ক>    implCode;
     std::vector<String> implFun;
 
     cv::Mutex mutex;
 };
 #endif
 
-struct CoreTLSData
+সংরচনা CoreTLSData
 {
     CoreTLSData() :
 //#ifdef HAVE_OPENCL
-        oclExecutionContextInitialized(false), useOpenCL(-1),
+        oclExecutionContextInitialized(মিছা), useOpenCL(-1),
 //#endif
         useIPP(-1),
         useIPP_NE(-1)
@@ -521,29 +521,29 @@ struct CoreTLSData
     RNG rng;
 //#ifdef HAVE_OPENCL
     ocl::OpenCLExecutionContext oclExecutionContext;
-    bool oclExecutionContextInitialized;
-    int useOpenCL; // 1 - use, 0 - do not use, -1 - auto/not initialized
+    তার্কিক oclExecutionContextInitialized;
+    পূর্ণাঙ্ক useOpenCL; // 1 - use, 0 - do not use, -1 - auto/not initialized
 //#endif
-    int useIPP;    // 1 - use, 0 - do not use, -1 - auto/not initialized
-    int useIPP_NE; // 1 - use, 0 - do not use, -1 - auto/not initialized
+    পূর্ণাঙ্ক useIPP;    // 1 - use, 0 - do not use, -1 - auto/not initialized
+    পূর্ণাঙ্ক useIPP_NE; // 1 - use, 0 - do not use, -1 - auto/not initialized
 };
 
 CoreTLSData& getCoreTlsData();
 
-#if defined(BUILD_SHARED_LIBS)
-#if defined _WIN32 || defined WINCE
+#যদি defined(BUILD_SHARED_LIBS)
+#যদি defined _WIN32 || defined WINCE
 #define CL_RUNTIME_EXPORT __declspec(dllexport)
-#elif defined __GNUC__
+#নোচেদ্যদি defined __GNUC__
 #define CL_RUNTIME_EXPORT __attribute__ ((visibility ("default")))
-#else
+#অন্যথা
 #define CL_RUNTIME_EXPORT
 #endif
-#else
+#অন্যথা
 #define CL_RUNTIME_EXPORT
 #endif
 
-extern CV_EXPORTS
-bool __termination;  // skip some cleanups, because process is terminating
+বাহ্য CV_EXPORTS
+তার্কিক __termination;  // skip some cleanups, because process is terminating
                      // (for example, if ExitProcess() was already called)
 
 CV_EXPORTS
@@ -553,17 +553,17 @@ cv::Mutex& getInitializationMutex();
 int64 getTimestampNS();
 
 
-#define CV_SINGLETON_LAZY_INIT_(TYPE, INITIALIZER, RET_VALUE) \
-    static TYPE* const instance = INITIALIZER; \
-    return RET_VALUE;
+#define CV_SINGLETON_LAZY_INIT_(TYPE, INITIALIZER, RET_মান) \
+    স্থির TYPE* ধ্রুৱ instance = INITIALIZER; \
+    ঘূৰাই RET_মান;
 
 #define CV_SINGLETON_LAZY_INIT(TYPE, INITIALIZER) CV_SINGLETON_LAZY_INIT_(TYPE, INITIALIZER, instance)
 #define CV_SINGLETON_LAZY_INIT_REF(TYPE, INITIALIZER) CV_SINGLETON_LAZY_INIT_(TYPE, INITIALIZER, *instance)
 
-CV_EXPORTS void releaseTlsStorageThread();
+CV_EXPORTS শূন্য releaseTlsStorageThread();
 
-int cv_snprintf(char* buf, int len, const char* fmt, ...);
-int cv_vsnprintf(char* buf, int len, const char* fmt, va_list args);
+পূর্ণাঙ্ক cv_snprintf(ৱর্ণ* buf, পূর্ণাঙ্ক len, ধ্রুৱ ৱর্ণ* fmt, ...);
+পূর্ণাঙ্ক cv_vsnprintf(ৱর্ণ* buf, পূর্ণাঙ্ক len, ধ্রুৱ ৱর্ণ* fmt, va_list args);
 }
 
 #endif  // BUILD_PLUGIN

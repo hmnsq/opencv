@@ -2,60 +2,60 @@
 // It is subject to the license terms in the LICENSE file found in the top-level directory
 // of this distribution and at http://opencv.org/license.html.
 
-#include "precomp.hpp"
+#অন্তর্ভাৱ "precomp.hpp"
 
-#include <opencv2/core/utils/trace.hpp>
-#include <opencv2/core/utils/trace.private.hpp>
-#include <opencv2/core/utils/configuration.private.hpp>
+#অন্তর্ভাৱ <opencv2/core/utils/trace.hpp>
+#অন্তর্ভাৱ <opencv2/core/utils/trace.private.hpp>
+#অন্তর্ভাৱ <opencv2/core/utils/configuration.private.hpp>
 
-#include <opencv2/core/opencl/ocl_defs.hpp>
+#অন্তর্ভাৱ <opencv2/core/opencl/ocl_defs.hpp>
 
-#include <cstdarg> // va_start
+#অন্তর্ভাৱ <cstdarg> // va_start
 
-#include <sstream>
-#include <ostream>
-#include <fstream>
+#অন্তর্ভাৱ <sstream>
+#অন্তর্ভাৱ <ostream>
+#অন্তর্ভাৱ <fstream>
 
-#if 0
-#define CV_LOG(...) CV_LOG_INFO(NULL, __VA_ARGS__)
-#else
+#যদি 0
+#define CV_LOG(...) CV_LOG_INFO(রিক্ত, __VA_ARGS__)
+#অন্যথা
 #define CV_LOG(...) {}
 #endif
 
-#if 0
-#define CV_LOG_ITT(...) CV_LOG_INFO(NULL, __VA_ARGS__)
-#else
+#যদি 0
+#define CV_LOG_ITT(...) CV_LOG_INFO(রিক্ত, __VA_ARGS__)
+#অন্যথা
 #define CV_LOG_ITT(...) {}
 #endif
 
-#if 1
+#যদি 1
 #define CV_LOG_TRACE_BAILOUT(tag, ...) CV_LOG_INFO(tag, __VA_ARGS__)
-#else
+#অন্যথা
 #define CV_LOG_TRACE_BAILOUT(...) {}
 #endif
 
-#if 0
+#যদি 0
 #define CV_LOG_PARALLEL(tag, ...) CV_LOG_INFO(tag, __VA_ARGS__)
-#else
+#অন্যথা
 #define CV_LOG_PARALLEL(...) {}
 #endif
 
-#if 0
+#যদি 0
 #define CV_LOG_CTX_STAT(tag, ...) CV_LOG_INFO(tag, __VA_ARGS__)
-#else
+#অন্যথা
 #define CV_LOG_CTX_STAT(...) {}
 #endif
 
-#if 0
+#যদি 0
 #define CV_LOG_SKIP(tag, ...) CV_LOG_INFO(tag, __VA_ARGS__)
-#else
+#অন্যথা
 #define CV_LOG_SKIP(...) {}
 #endif
 
-namespace cv {
-namespace utils {
-namespace trace {
-namespace details {
+নামাকাশ cv {
+নামাকাশ utils {
+নামাকাশ trace {
+নামাকাশ details {
 
 #ifdef OPENCV_TRACE
 
@@ -63,124 +63,124 @@ namespace details {
 #pragma warning(disable:4065) // switch statement contains 'default' but no 'case' labels
 #endif
 
-static bool getParameterTraceEnable()
+স্থির তার্কিক getParameterTraceEnable()
 {
-    static bool param_traceEnable = utils::getConfigurationParameterBool("OPENCV_TRACE", false);
-    return param_traceEnable;
+    স্থির তার্কিক param_traceEnable = utils::getConfigurationParameterBool("OPENCV_TRACE", মিছা);
+    ঘূৰাই param_traceEnable;
 }
 
 // TODO lazy configuration flags
-static int param_maxRegionDepthOpenCV = (int)utils::getConfigurationParameterSizeT("OPENCV_TRACE_DEPTH_OPENCV", 1);
-static int param_maxRegionChildrenOpenCV = (int)utils::getConfigurationParameterSizeT("OPENCV_TRACE_MAX_CHILDREN_OPENCV", 1000);
-static int param_maxRegionChildren = (int)utils::getConfigurationParameterSizeT("OPENCV_TRACE_MAX_CHILDREN", 10000);
+স্থির পূর্ণাঙ্ক param_maxRegionDepthOpenCV = (পূর্ণাঙ্ক)utils::getConfigurationParameterSizeT("OPENCV_TRACE_DEPTH_OPENCV", 1);
+স্থির পূর্ণাঙ্ক param_maxRegionChildrenOpenCV = (পূর্ণাঙ্ক)utils::getConfigurationParameterSizeT("OPENCV_TRACE_MAX_CHILDREN_OPENCV", 1000);
+স্থির পূর্ণাঙ্ক param_maxRegionChildren = (পূর্ণাঙ্ক)utils::getConfigurationParameterSizeT("OPENCV_TRACE_MAX_CHILDREN", 10000);
 
-static const cv::String& getParameterTraceLocation()
+স্থির ধ্রুৱ cv::String& getParameterTraceLocation()
 {
-    static cv::String param_traceLocation = utils::getConfigurationParameterString("OPENCV_TRACE_LOCATION", "OpenCVTrace");
-    return param_traceLocation;
+    স্থির cv::String param_traceLocation = utils::getConfigurationParameterString("OPENCV_TRACE_LOCATION", "OpenCVTrace");
+    ঘূৰাই param_traceLocation;
 }
 
 #ifdef HAVE_OPENCL
-static bool param_synchronizeOpenCL = utils::getConfigurationParameterBool("OPENCV_TRACE_SYNC_OPENCL", false);
+স্থির তার্কিক param_synchronizeOpenCL = utils::getConfigurationParameterBool("OPENCV_TRACE_SYNC_OPENCL", মিছা);
 #endif
 
 #ifdef OPENCV_WITH_ITT
-static bool param_ITT_registerParentScope = utils::getConfigurationParameterBool("OPENCV_TRACE_ITT_PARENT", false);
+স্থির তার্কিক param_ITT_registerParentScope = utils::getConfigurationParameterBool("OPENCV_TRACE_ITT_PARENT", মিছা);
 #endif
 
-static const char* _spaces(int count)
+স্থির ধ্রুৱ ৱর্ণ* _spaces(পূর্ণাঙ্ক গুনতি_2)
 {
-    static const char buf[64] =
+    স্থির ধ্রুৱ ৱর্ণ buf[64] =
 "                                                               ";
-    return &buf[63 - (count & 63)];
+    ঘূৰাই &buf[63 - (গুনতি_2 & 63)];
 }
 
 /**
  * Text-based trace messages
  */
-class TraceMessage
+শ্ৰেণী TraceMessage
 {
-public:
-    char buffer[1024];
+সার্ৱজনিক:
+    ৱর্ণ buffer[1024];
     size_t len;
-    bool hasError;
+    তার্কিক hasError;
 
     TraceMessage() :
         len(0),
-        hasError(false)
+        hasError(মিছা)
     {}
 
-    bool printf(const char* format, ...)
+    তার্কিক printf(ধ্রুৱ ৱর্ণ* format, ...)
     {
-        char* buf = &buffer[len];
-        size_t sz = sizeof(buffer) - len;
+        ৱর্ণ* buf = &buffer[len];
+        size_t sz = পরিমাণ(buffer) - len;
         va_list ap;
         va_start(ap, format);
-        int n = cv_vsnprintf(buf, (int)sz, format, ap);
+        পূর্ণাঙ্ক n = cv_vsnprintf(buf, (পূর্ণাঙ্ক)sz, format, ap);
         va_end(ap);
-        if (n < 0 || (size_t)n > sz)
+        যদি (n < 0 || (size_t)n > sz)
         {
-            hasError = true;
-            return false;
+            hasError = সঁচা;
+            ঘূৰাই মিছা;
         }
         len += n;
-        return true;
+        ঘূৰাই সঁচা;
     }
 
-    bool formatlocation(const Region::LocationStaticStorage& location)
+    তার্কিক formatlocation(ধ্রুৱ Region::LocationStaticStorage& location)
     {
-        return this->printf("l,%lld,\"%s\",%d,\"%s\",0x%llX\n",
-                (long long int)(*location.ppExtra)->global_location_id,
+        ঘূৰাই এতত্->printf("l,%lld,\"%s\",%d,\"%s\",0x%llX\n",
+                (long long পূর্ণাঙ্ক)(*location.ppExtra)->global_location_id,
                 location.filename,
-                location.line,
+                location.সাৰি,
                 location.name,
-                (long long int)(location.flags & ~0xF0000000));
+                (long long পূর্ণাঙ্ক)(location.flags & ~0xF0000000));
     }
-    bool formatRegionEnter(const Region& region)
+    তার্কিক formatRegionEnter(ধ্রুৱ Region& region)
     {
-        bool ok = this->printf("b,%d,%lld,%lld,%lld",
-                (int)region.pImpl->threadID,
-                (long long int)region.pImpl->beginTimestamp,
-                (long long int)((*region.pImpl->location.ppExtra)->global_location_id),
-                (long long int)region.pImpl->global_region_id);
-        if (region.pImpl->parentRegion && region.pImpl->parentRegion->pImpl)
+        তার্কিক ok = এতত্->printf("b,%d,%lld,%lld,%lld",
+                (পূর্ণাঙ্ক)region.pImpl->threadID,
+                (long long পূর্ণাঙ্ক)region.pImpl->beginTimestamp,
+                (long long পূর্ণাঙ্ক)((*region.pImpl->location.ppExtra)->global_location_id),
+                (long long পূর্ণাঙ্ক)region.pImpl->global_region_id);
+        যদি (region.pImpl->parentRegion && region.pImpl->parentRegion->pImpl)
         {
-            if (region.pImpl->parentRegion->pImpl->threadID != region.pImpl->threadID)
-                ok &= this->printf(",parentThread=%d,parent=%lld",
-                        (int)region.pImpl->parentRegion->pImpl->threadID,
-                        (long long int)region.pImpl->parentRegion->pImpl->global_region_id);
+            যদি (region.pImpl->parentRegion->pImpl->threadID != region.pImpl->threadID)
+                ok &= এতত্->printf(",parentThread=%d,parent=%lld",
+                        (পূর্ণাঙ্ক)region.pImpl->parentRegion->pImpl->threadID,
+                        (long long পূর্ণাঙ্ক)region.pImpl->parentRegion->pImpl->global_region_id);
         }
-        ok &= this->printf("\n");
-        return ok;
+        ok &= এতত্->printf("\n");
+        ঘূৰাই ok;
     }
-    bool formatRegionLeave(const Region& region, const RegionStatistics& result)
+    তার্কিক formatRegionLeave(ধ্রুৱ Region& region, ধ্রুৱ RegionStatistics& result)
     {
         CV_DbgAssert(region.pImpl->endTimestamp - region.pImpl->beginTimestamp == result.duration);
-        bool ok = this->printf("e,%d,%lld,%lld,%lld,%lld",
-                (int)region.pImpl->threadID,
-                (long long int)region.pImpl->endTimestamp,
-                (long long int)(*region.pImpl->location.ppExtra)->global_location_id,
-                (long long int)region.pImpl->global_region_id,
-                (long long int)result.duration);
-        if (result.currentSkippedRegions)
-            ok &= this->printf(",skip=%d", (int)result.currentSkippedRegions);
+        তার্কিক ok = এতত্->printf("e,%d,%lld,%lld,%lld,%lld",
+                (পূর্ণাঙ্ক)region.pImpl->threadID,
+                (long long পূর্ণাঙ্ক)region.pImpl->endTimestamp,
+                (long long পূর্ণাঙ্ক)(*region.pImpl->location.ppExtra)->global_location_id,
+                (long long পূর্ণাঙ্ক)region.pImpl->global_region_id,
+                (long long পূর্ণাঙ্ক)result.duration);
+        যদি (result.currentSkippedRegions)
+            ok &= এতত্->printf(",skip=%d", (পূর্ণাঙ্ক)result.currentSkippedRegions);
 #ifdef HAVE_IPP
-        if (result.durationImplIPP)
-            ok &= this->printf(",tIPP=%lld", (long long int)result.durationImplIPP);
+        যদি (result.durationImplIPP)
+            ok &= এতত্->printf(",tIPP=%lld", (long long পূর্ণাঙ্ক)result.durationImplIPP);
 #endif
 #ifdef HAVE_OPENCL
-        if (result.durationImplOpenCL)
-            ok &= this->printf(",tOCL=%lld", (long long int)result.durationImplOpenCL);
+        যদি (result.durationImplOpenCL)
+            ok &= এতত্->printf(",tOCL=%lld", (long long পূর্ণাঙ্ক)result.durationImplOpenCL);
 #endif
-        ok &= this->printf("\n");
-        return ok;
+        ok &= এতত্->printf("\n");
+        ঘূৰাই ok;
     }
-    bool recordRegionArg(const Region& region, const TraceArg& arg, const char* value)
+    তার্কিক recordRegionArg(ধ্রুৱ Region& region, ধ্রুৱ TraceArg& arg, ধ্রুৱ ৱর্ণ* value)
     {
-        return this->printf("a,%d,%lld,%lld,\"%s\",\"%s\"\n",
+        ঘূৰাই এতত্->printf("a,%d,%lld,%lld,\"%s\",\"%s\"\n",
                 region.pImpl->threadID,
-                (long long int)region.pImpl->beginTimestamp,
-                (long long int)region.pImpl->global_region_id,
+                (long long পূর্ণাঙ্ক)region.pImpl->beginTimestamp,
+                (long long পূর্ণাঙ্ক)region.pImpl->global_region_id,
                 arg.name,
                 value);
     }
@@ -188,48 +188,48 @@ public:
 
 
 #ifdef OPENCV_WITH_ITT
-static __itt_domain* domain = NULL;
+স্থির __itt_domain* domain = রিক্ত;
 
-static bool isITTEnabled()
+স্থির তার্কিক isITTEnabled()
 {
-    static volatile bool isInitialized = false;
-    static bool isEnabled = false;
-    if (!isInitialized)
+    স্থির চঞ্চল তার্কিক isInitialized = মিছা;
+    স্থির তার্কিক isEnabled = মিছা;
+    যদি (!isInitialized)
     {
         cv::AutoLock lock(cv::getInitializationMutex());
-        if (!isInitialized)
+        যদি (!isInitialized)
         {
-            bool param_traceITTEnable = utils::getConfigurationParameterBool("OPENCV_TRACE_ITT_ENABLE", true);
-            if (param_traceITTEnable)
+            তার্কিক param_traceITTEnable = utils::getConfigurationParameterBool("OPENCV_TRACE_ITT_ENABLE", সঁচা);
+            যদি (param_traceITTEnable)
             {
                 isEnabled = !!(__itt_api_version());
                 CV_LOG_ITT("ITT is " << (isEnabled ? "enabled" : "disabled"));
                 domain = __itt_domain_create("OpenCVTrace");
             }
-            else
+            অন্যথা
             {
                 CV_LOG_ITT("ITT is disabled through OpenCV parameter");
-                isEnabled = false;
+                isEnabled = মিছা;
             }
-            isInitialized = true;
+            isInitialized = সঁচা;
         }
     }
-    return isEnabled;
+    ঘূৰাই isEnabled;
 }
 #endif
 
 
-Region::LocationExtraData::LocationExtraData(const LocationStaticStorage& location)
+Region::LocationExtraData::LocationExtraData(ধ্রুৱ LocationStaticStorage& location)
 {
     CV_UNUSED(location);
-    static int g_location_id_counter = 0;
+    স্থির পূর্ণাঙ্ক g_location_id_counter = 0;
     global_location_id = CV_XADD(&g_location_id_counter, 1) + 1;
-    CV_LOG("Register location: " << global_location_id << " (" << (void*)&location << ")"
+    CV_LOG("Register location: " << global_location_id << " (" << (শূন্য*)&location << ")"
             << std::endl << "    file: " << location.filename
-            << std::endl << "    line: " << location.line
+            << std::endl << "    line: " << location.সাৰি
             << std::endl << "    name: " << location.name);
 #ifdef OPENCV_WITH_ITT
-    if (isITTEnabled())
+    যদি (isITTEnabled())
     {
         // Caching is not required here, because there is builtin cache.
         // https://software.intel.com/en-us/node/544203:
@@ -237,7 +237,7 @@ Region::LocationExtraData::LocationExtraData(const LocationStaticStorage& locati
         ittHandle_name = __itt_string_handle_create(location.name);
         ittHandle_filename = __itt_string_handle_create(location.filename);
     }
-    else
+    অন্যথা
     {
         ittHandle_name = 0;
         ittHandle_filename = 0;
@@ -245,30 +245,30 @@ Region::LocationExtraData::LocationExtraData(const LocationStaticStorage& locati
 #endif
 }
 
-/*static*/ Region::LocationExtraData* Region::LocationExtraData::init(const Region::LocationStaticStorage& location)
+/*static*/ Region::LocationExtraData* Region::LocationExtraData::init(ধ্রুৱ Region::LocationStaticStorage& location)
 {
     LocationExtraData** pLocationExtra = location.ppExtra;
     CV_DbgAssert(pLocationExtra);
-    if (*pLocationExtra == NULL)
+    যদি (*pLocationExtra == রিক্ত)
     {
         cv::AutoLock lock(cv::getInitializationMutex());
-        if (*pLocationExtra == NULL)
+        যদি (*pLocationExtra == রিক্ত)
         {
-            *pLocationExtra = new Region::LocationExtraData(location);
+            *pLocationExtra = নূতন Region::LocationExtraData(location);
             TraceStorage* s = getTraceManager().trace_storage.get();
-            if (s)
+            যদি (s)
             {
-                TraceMessage msg;
-                msg.formatlocation(location);
-                s->put(msg);
+                TraceMessage বাৰ্তা;
+                বাৰ্তা.formatlocation(location);
+                s->put(বাৰ্তা);
             }
         }
     }
-    return *pLocationExtra;
+    ঘূৰাই *pLocationExtra;
 }
 
 
-Region::Impl::Impl(TraceManagerThreadLocal& ctx, Region* parentRegion_, Region& region_, const LocationStaticStorage& location_, int64 beginTimestamp_) :
+Region::Impl::Impl(TraceManagerThreadLocal& ctx, Region* parentRegion_, Region& region_, ধ্রুৱ LocationStaticStorage& location_, int64 beginTimestamp_) :
     location(location_),
     region(region_),
     parentRegion(parentRegion_),
@@ -276,14 +276,14 @@ Region::Impl::Impl(TraceManagerThreadLocal& ctx, Region* parentRegion_, Region& 
     global_region_id(++ctx.region_counter),
     beginTimestamp(beginTimestamp_),
     endTimestamp(0),
-    directChildrenCount(0)
+    direct_Children_গুনতি(0)
 #ifdef OPENCV_WITH_ITT
-    ,itt_id_registered(false)
+    ,itt_id_registered(মিছা)
     ,itt_id(__itt_null)
 #endif
 {
     CV_DbgAssert(ctx.currentActiveRegion == parentRegion);
-    region.pImpl = this;
+    region.pImpl = এতত্;
 
     registerRegion(ctx);
 
@@ -293,23 +293,23 @@ Region::Impl::Impl(TraceManagerThreadLocal& ctx, Region* parentRegion_, Region& 
 Region::Impl::~Impl()
 {
 #ifdef OPENCV_WITH_ITT
-    if (itt_id_registered)
+    যদি (itt_id_registered)
     {
-        CV_LOG_ITT(" Destroy ITT region: I=" << (void*)this);
+        CV_LOG_ITT(" Destroy ITT region: I=" << (শূন্য*)এতত্);
         __itt_id_destroy(domain, itt_id);
-        itt_id_registered = false;
+        itt_id_registered = মিছা;
     }
 #endif
-    region.pImpl = NULL;
+    region.pImpl = রিক্ত;
 }
 
-void Region::Impl::enterRegion(TraceManagerThreadLocal& ctx)
+শূন্য Region::Impl::enterRegion(TraceManagerThreadLocal& ctx)
 {
     ctx.currentActiveRegion = &region;
 
-    if (location.flags & REGION_FLAG_FUNCTION)
+    যদি (location.flags & REGION_FLAG_FUNCTION)
     {
-        if ((location.flags & REGION_FLAG_APP_CODE) == 0)
+        যদি ((location.flags & REGION_FLAG_APP_CODE) == 0)
         {
             ctx.regionDepthOpenCV++;
         }
@@ -317,59 +317,59 @@ void Region::Impl::enterRegion(TraceManagerThreadLocal& ctx)
     }
 
     TraceStorage* s = ctx.getStorage();
-    if (s)
+    যদি (s)
     {
-        TraceMessage msg;
-        msg.formatRegionEnter(region);
-        s->put(msg);
+        TraceMessage বাৰ্তা;
+        বাৰ্তা.formatRegionEnter(region);
+        s->put(বাৰ্তা);
     }
 #ifdef OPENCV_WITH_ITT
-    if (isITTEnabled())
+    যদি (isITTEnabled())
     {
         __itt_id parentID = __itt_null;
-        if (param_ITT_registerParentScope && parentRegion && parentRegion->pImpl && parentRegion->pImpl->itt_id_registered && (location.flags & REGION_FLAG_REGION_FORCE) == 0)
+        যদি (param_ITT_registerParentScope && parentRegion && parentRegion->pImpl && parentRegion->pImpl->itt_id_registered && (location.flags & REGION_FLAG_REGION_FORCE) == 0)
             parentID = parentRegion->pImpl->itt_id;
         __itt_task_begin(domain, itt_id, parentID, (*location.ppExtra)->ittHandle_name);
     }
 #endif
 }
 
-void Region::Impl::leaveRegion(TraceManagerThreadLocal& ctx)
+শূন্য Region::Impl::leaveRegion(TraceManagerThreadLocal& ctx)
 {
     int64 duration = endTimestamp - beginTimestamp; CV_UNUSED(duration);
     RegionStatistics result;
     ctx.stat.grab(result);
     ctx.totalSkippedEvents += result.currentSkippedRegions;
-    CV_LOG(_spaces(ctx.getCurrentDepth()*4) << "leaveRegion(): " << (void*)this << " " << result);
+    CV_LOG(_spaces(ctx.getCurrentDepth()*4) << "leaveRegion(): " << (শূন্য*)এতত্ << " " << result);
 #ifdef OPENCV_WITH_ITT
-    if (isITTEnabled())
+    যদি (isITTEnabled())
     {
-        if (result.currentSkippedRegions)
+        যদি (result.currentSkippedRegions)
         {
             __itt_metadata_add(domain, itt_id, __itt_string_handle_create("skipped trace entries"), __itt_metadata_u32, 1, &result.currentSkippedRegions);
         }
 #ifdef HAVE_IPP
-        if (result.durationImplIPP)
+        যদি (result.durationImplIPP)
             __itt_metadata_add(domain, itt_id, __itt_string_handle_create("tIPP"), __itt_metadata_u64, 1, &result.durationImplIPP);
 #endif
 #ifdef HAVE_OPENCL
-        if (result.durationImplOpenCL)
+        যদি (result.durationImplOpenCL)
             __itt_metadata_add(domain, itt_id, __itt_string_handle_create("tOpenCL"), __itt_metadata_u64, 1, &result.durationImplOpenCL);
 #endif
         __itt_task_end(domain);
     }
 #endif
     TraceStorage* s = ctx.getStorage();
-    if (s)
+    যদি (s)
     {
-        TraceMessage msg;
-        msg.formatRegionLeave(region, result);
-        s->put(msg);
+        TraceMessage বাৰ্তা;
+        বাৰ্তা.formatRegionLeave(region, result);
+        s->put(বাৰ্তা);
     }
 
-    if (location.flags & REGION_FLAG_FUNCTION)
+    যদি (location.flags & REGION_FLAG_FUNCTION)
     {
-        if ((location.flags & REGION_FLAG_APP_CODE) == 0)
+        যদি ((location.flags & REGION_FLAG_APP_CODE) == 0)
         {
             ctx.regionDepthOpenCV--;
         }
@@ -379,50 +379,50 @@ void Region::Impl::leaveRegion(TraceManagerThreadLocal& ctx)
     ctx.currentActiveRegion = parentRegion;
 }
 
-void Region::Impl::release()
+শূন্য Region::Impl::release()
 {
-    delete this;
+    delete এতত্;
 }
 
-void Region::Impl::registerRegion(TraceManagerThreadLocal& ctx)
+শূন্য Region::Impl::registerRegion(TraceManagerThreadLocal& ctx)
 {
 #ifdef OPENCV_WITH_ITT
-    if (isITTEnabled())
+    যদি (isITTEnabled())
     {
-        if (!itt_id_registered)
+        যদি (!itt_id_registered)
         {
-            CV_LOG_ITT(" Register ITT region: I=" << (void*)this << " " << ctx.threadID << "-" << global_region_id);
-#if 1 // workaround for some ITT backends
-            itt_id = __itt_id_make((void*)(intptr_t)(((int64)(ctx.threadID + 1) << 32) | global_region_id), global_region_id);
-#else
-            itt_id = __itt_id_make((void*)(intptr_t)(ctx.threadID + 1), global_region_id);
+            CV_LOG_ITT(" Register ITT region: I=" << (শূন্য*)এতত্ << " " << ctx.threadID << "-" << global_region_id);
+#যদি 1 // workaround for some ITT backends
+            itt_id = __itt_id_make((শূন্য*)(intptr_t)(((int64)(ctx.threadID + 1) << 32) | global_region_id), global_region_id);
+#অন্যথা
+            itt_id = __itt_id_make((শূন্য*)(intptr_t)(ctx.threadID + 1), global_region_id);
 #endif
             __itt_id_create(domain, itt_id);
-            itt_id_registered = true;
+            itt_id_registered = সঁচা;
         }
     }
-#else
+#অন্যথা
     CV_UNUSED(ctx);
 #endif
 }
 
-void RegionStatisticsStatus::enableSkipMode(int depth)
+শূন্য RegionStatisticsStatus::enableSkipMode(পূর্ণাঙ্ক depth)
 {
     CV_DbgAssert(_skipDepth < 0);
-    CV_LOG_SKIP(NULL, "SKIP-ENABLE: depth=" << depth);
+    CV_LOG_SKIP(রিক্ত, "SKIP-ENABLE: depth=" << depth);
     _skipDepth = depth;
 }
-void RegionStatisticsStatus::checkResetSkipMode(int leaveDepth)
+শূন্য RegionStatisticsStatus::checkResetSkipMode(পূর্ণাঙ্ক leaveDepth)
 {
-    if (leaveDepth <= _skipDepth)
+    যদি (leaveDepth <= _skipDepth)
     {
-        CV_LOG_SKIP(NULL, "SKIP-RESET: leaveDepth=" << leaveDepth << " skipDepth=" << _skipDepth);
+        CV_LOG_SKIP(রিক্ত, "SKIP-RESET: leaveDepth=" << leaveDepth << " skipDepth=" << _skipDepth);
         _skipDepth = -1;
     }
 }
 
-Region::Region(const LocationStaticStorage& location) :
-    pImpl(NULL),
+Region::Region(ধ্রুৱ LocationStaticStorage& location) :
+    pImpl(রিক্ত),
     implFlags(0)
 {
     // Checks:
@@ -431,249 +431,249 @@ Region::Region(const LocationStaticStorage& location) :
     // - children count threshold
     // - region location
     // - depth (opencv nested calls)
-    if (!TraceManager::isActivated())
+    যদি (!TraceManager::isActivated())
     {
         CV_LOG("Trace is disabled. Bailout");
-        return;
+        ঘূৰাই;
     }
 
     TraceManagerThreadLocal& ctx = getTraceManager().tls.getRef();
-    CV_LOG(_spaces(ctx.getCurrentDepth()*4) << "Region(): " << (void*)this << ": " << location.name);
+    CV_LOG(_spaces(ctx.getCurrentDepth()*4) << "Region(): " << (শূন্য*)এতত্ << ": " << location.name);
 
-    Region* parentRegion = ctx.stackTopRegion();
-    const Region::LocationStaticStorage* parentLocation = ctx.stackTopLocation();
+    Region* parentRegion = ctx.স্তূপ_শীৰ্ষ_Region();
+    ধ্রুৱ Region::LocationStaticStorage* parentLocation = ctx.স্তূপ_শীৰ্ষ_Location();
 
-    if (location.flags & REGION_FLAG_REGION_NEXT)
+    যদি (location.flags & REGION_FLAG_REGION_NEXT)
     {
-        if (parentRegion && parentRegion->pImpl)
+        যদি (parentRegion && parentRegion->pImpl)
         {
             CV_DbgAssert((parentRegion->pImpl->location.flags & REGION_FLAG_FUNCTION) == 0);
             parentRegion->destroy(); parentRegion->implFlags = 0;
-            parentRegion = ctx.stackTopRegion();
-            parentLocation = ctx.stackTopLocation();
+            parentRegion = ctx.স্তূপ_শীৰ্ষ_Region();
+            parentLocation = ctx.স্তূপ_শীৰ্ষ_Location();
         }
     }
 
-    int parentChildren = 0;
-    if (parentRegion && parentRegion->pImpl)
+    পূর্ণাঙ্ক parentChildren = 0;
+    যদি (parentRegion && parentRegion->pImpl)
     {
-        if (parentLocation == NULL)
+        যদি (parentLocation == রিক্ত)
         {
             // parallel_for_body code path
-            parentChildren = CV_XADD(&parentRegion->pImpl->directChildrenCount, 1) + 1;
+            parentChildren = CV_XADD(&parentRegion->pImpl->direct_Children_গুনতি, 1) + 1;
         }
-        else
+        অন্যথা
         {
-            parentChildren = ++parentRegion->pImpl->directChildrenCount;
+            parentChildren = ++parentRegion->pImpl->direct_Children_গুনতি;
         }
     }
 
     int64 beginTimestamp = getTimestampNS();
 
-    int currentDepth = ctx.getCurrentDepth() + 1;
-    switch (location.flags & REGION_FLAG_IMPL_MASK)
+    পূর্ণাঙ্ক currentDepth = ctx.getCurrentDepth() + 1;
+    ৱিকল্প (location.flags & REGION_FLAG_IMPL_MASK)
     {
 #ifdef HAVE_IPP
-    case REGION_FLAG_IMPL_IPP:
-        if (!ctx.stat_status.ignoreDepthImplIPP)
+    পক্ষ REGION_FLAG_IMPL_IPP:
+        যদি (!ctx.stat_status.ignoreDepthImplIPP)
             ctx.stat_status.ignoreDepthImplIPP = currentDepth;
-        break;
+        ভঙ্গ;
 #endif
 #ifdef HAVE_OPENCL
-    case REGION_FLAG_IMPL_OPENCL:
-        if (!ctx.stat_status.ignoreDepthImplOpenCL)
+    পক্ষ REGION_FLAG_IMPL_OPENCL:
+        যদি (!ctx.stat_status.ignoreDepthImplOpenCL)
             ctx.stat_status.ignoreDepthImplOpenCL = currentDepth;
-        break;
+        ভঙ্গ;
 #endif
-    default:
-        break;
+    স্ৱভাৱ:
+        ভঙ্গ;
     }
 
-    ctx.stackPush(this, &location, beginTimestamp);
-    implFlags |= REGION_FLAG__NEED_STACK_POP;
+    ctx.স্তূপ_ঠেলো(এতত্, &location, beginTimestamp);
+    implFlags |= REGION_FLAG_NEED_স্তূপ_বেৰ_কৰো;
 
-    if ((location.flags & REGION_FLAG_REGION_FORCE) == 0)
+    যদি ((location.flags & REGION_FLAG_REGION_FORCE) == 0)
     {
-        if (ctx.stat_status._skipDepth >= 0 && currentDepth > ctx.stat_status._skipDepth)
+        যদি (ctx.stat_status._skipDepth >= 0 && currentDepth > ctx.stat_status._skipDepth)
         {
             CV_LOG(_spaces(ctx.getCurrentDepth()*4) << "Parent region is disabled. Bailout");
             ctx.stat.currentSkippedRegions++;
-            return;
+            ঘূৰাই;
         }
 
-        if (param_maxRegionChildrenOpenCV > 0 && (location.flags & REGION_FLAG_APP_CODE) == 0 && parentLocation && (parentLocation->flags & REGION_FLAG_APP_CODE) == 0)
+        যদি (param_maxRegionChildrenOpenCV > 0 && (location.flags & REGION_FLAG_APP_CODE) == 0 && parentLocation && (parentLocation->flags & REGION_FLAG_APP_CODE) == 0)
         {
-            if (parentChildren >= param_maxRegionChildrenOpenCV)
+            যদি (parentChildren >= param_maxRegionChildrenOpenCV)
             {
-                CV_LOG_TRACE_BAILOUT(NULL, _spaces(ctx.getCurrentDepth()*4) << "OpenCV parent region exceeds children count. Bailout");
+                CV_LOG_TRACE_BAILOUT(রিক্ত, _spaces(ctx.getCurrentDepth()*4) << "OpenCV parent region exceeds children count. Bailout");
                 ctx.stat_status.enableSkipMode(currentDepth - 1);
                 ctx.stat.currentSkippedRegions++;
-                DEBUG_ONLY(ctx.dumpStack(std::cout, false));
-                return;
+                DEBUG_ONLY(ctx.dump_স্তূপ(std::cout, মিছা));
+                ঘূৰাই;
             }
         }
-        if (param_maxRegionChildren > 0 && parentChildren >= param_maxRegionChildren)
+        যদি (param_maxRegionChildren > 0 && parentChildren >= param_maxRegionChildren)
         {
-            CV_LOG_TRACE_BAILOUT(NULL, _spaces(ctx.getCurrentDepth()*4) << "Parent region exceeds children count. Bailout");
+            CV_LOG_TRACE_BAILOUT(রিক্ত, _spaces(ctx.getCurrentDepth()*4) << "Parent region exceeds children count. Bailout");
             ctx.stat_status.enableSkipMode(currentDepth - 1);
             ctx.stat.currentSkippedRegions++;
-            DEBUG_ONLY(ctx.dumpStack(std::cout, false));
-            return;
+            DEBUG_ONLY(ctx.dump_স্তূপ(std::cout, মিছা));
+            ঘূৰাই;
         }
     }
 
     LocationExtraData::init(location);
 
-    if ((*location.ppExtra)->global_location_id == 0)
+    যদি ((*location.ppExtra)->global_location_id == 0)
     {
-        CV_LOG_TRACE_BAILOUT(NULL, _spaces(ctx.getCurrentDepth()*4) << "Region location is disabled. Bailout");
+        CV_LOG_TRACE_BAILOUT(রিক্ত, _spaces(ctx.getCurrentDepth()*4) << "Region location is disabled. Bailout");
         ctx.stat_status.enableSkipMode(currentDepth);
         ctx.stat.currentSkippedRegions++;
-        return;
+        ঘূৰাই;
     }
 
-    if (parentLocation && (parentLocation->flags & REGION_FLAG_SKIP_NESTED))
+    যদি (parentLocation && (parentLocation->flags & REGION_FLAG_SKIP_NESTED))
     {
         CV_LOG(_spaces(ctx.getCurrentDepth()*4) << "Parent region disables inner regions. Bailout");
         ctx.stat_status.enableSkipMode(currentDepth);
         ctx.stat.currentSkippedRegions++;
-        return;
+        ঘূৰাই;
     }
 
-    if (param_maxRegionDepthOpenCV)
+    যদি (param_maxRegionDepthOpenCV)
     {
-        if ((location.flags & REGION_FLAG_APP_CODE) == 0)
+        যদি ((location.flags & REGION_FLAG_APP_CODE) == 0)
         {
-            if (ctx.regionDepthOpenCV >= param_maxRegionDepthOpenCV)
+            যদি (ctx.regionDepthOpenCV >= param_maxRegionDepthOpenCV)
             {
                 CV_LOG(_spaces(ctx.getCurrentDepth()*4) << "OpenCV region depth is exceed = " << ctx.regionDepthOpenCV << ". Bailout");
-                if (ctx.stat.currentSkippedRegions == 0)
+                যদি (ctx.stat.currentSkippedRegions == 0)
                 {
-                    DEBUG_ONLY(ctx.dumpStack(std::cout, false));
+                    DEBUG_ONLY(ctx.dump_স্তূপ(std::cout, মিছা));
                 }
                 ctx.stat_status.enableSkipMode(currentDepth);
                 ctx.stat.currentSkippedRegions++;
-                return;
+                ঘূৰাই;
             }
         }
     }
 
-    new Impl(ctx, parentRegion, *this, location, beginTimestamp);
-    CV_DbgAssert(pImpl != NULL);
+    নূতন Impl(ctx, parentRegion, *এতত্, location, beginTimestamp);
+    CV_DbgAssert(pImpl != রিক্ত);
     implFlags |= REGION_FLAG__ACTIVE;
 
     // parallel_for path
-    if (parentRegion && parentRegion->pImpl)
+    যদি (parentRegion && parentRegion->pImpl)
     {
-        if (parentLocation == NULL)
+        যদি (parentLocation == রিক্ত)
         {
-            pImpl->directChildrenCount = parentChildren;
+            pImpl->direct_Children_গুনতি = parentChildren;
         }
     }
 }
 
-void Region::destroy()
+শূন্য Region::destroy()
 {
     CV_DbgAssert(implFlags != 0);
 
     TraceManagerThreadLocal& ctx = getTraceManager().tls.getRef();
-    CV_LOG(_spaces(ctx.getCurrentDepth()*4) << "Region::destruct(): " << (void*)this << " pImpl=" << pImpl << " implFlags=" << implFlags << ' ' << (ctx.stackTopLocation() ? ctx.stackTopLocation()->name : "<unknown>"));
+    CV_LOG(_spaces(ctx.getCurrentDepth()*4) << "Region::destruct(): " << (শূন্য*)এতত্ << " pImpl=" << pImpl << " implFlags=" << implFlags << ' ' << (ctx.স্তূপ_শীৰ্ষ_Location() ? ctx.স্তূপ_শীৰ্ষ_Location()->name : "<unknown>"));
 
-    CV_DbgAssert(implFlags & REGION_FLAG__NEED_STACK_POP);
-    const int currentDepth = ctx.getCurrentDepth(); CV_UNUSED(currentDepth);
+    CV_DbgAssert(implFlags & REGION_FLAG_NEED_স্তূপ_বেৰ_কৰো);
+    ধ্রুৱ পূর্ণাঙ্ক currentDepth = ctx.getCurrentDepth(); CV_UNUSED(currentDepth);
 
-    CV_LOG_CTX_STAT(NULL, _spaces(currentDepth*4) << ctx.stat << ' ' << ctx.stat_status);
+    CV_LOG_CTX_STAT(রিক্ত, _spaces(currentDepth*4) << ctx.stat << ' ' << ctx.stat_status);
 
-    const Region::LocationStaticStorage* location = ctx.stackTopLocation();
+    ধ্রুৱ Region::LocationStaticStorage* location = ctx.স্তূপ_শীৰ্ষ_Location();
     Impl::OptimizationPath myCodePath = Impl::CODE_PATH_PLAIN;
-    if (location)
+    যদি (location)
     {
-        switch (location->flags & REGION_FLAG_IMPL_MASK)
+        ৱিকল্প (location->flags & REGION_FLAG_IMPL_MASK)
         {
 #ifdef HAVE_IPP
-        case REGION_FLAG_IMPL_IPP:
+        পক্ষ REGION_FLAG_IMPL_IPP:
             myCodePath = Impl::CODE_PATH_IPP;
-            break;
+            ভঙ্গ;
 #endif
 #ifdef HAVE_OPENCL
-        case REGION_FLAG_IMPL_OPENCL:
-            if (param_synchronizeOpenCL && cv::ocl::isOpenCLActivated())
+        পক্ষ REGION_FLAG_IMPL_OPENCL:
+            যদি (param_synchronizeOpenCL && cv::ocl::isOpenCLActivated())
                 cv::ocl::finish();
             myCodePath = Impl::CODE_PATH_OPENCL;
-            break;
+            ভঙ্গ;
 #endif
-        default:
-            break;
+        স্ৱভাৱ:
+            ভঙ্গ;
         }
     }
 
     int64 endTimestamp = getTimestampNS();
-    int64 duration = endTimestamp - ctx.stackTopBeginTimestamp();
+    int64 duration = endTimestamp - ctx.স্তূপ_শীৰ্ষ_Begin_Timestamp();
 
-    bool active = isActive();
+    তার্কিক active = isActive();
 
-    if (active)
+    যদি (active)
         ctx.stat.duration = duration;
-    else if (ctx.stack.size() == ctx.parallel_for_stack_size + 1)
+    অন্যথা যদি (ctx.স্তূপ.size() == ctx.parallel_for_স্তূপ_size + 1)
         ctx.stat.duration += duration;
 
-    switch (myCodePath) {
-        case Impl::CODE_PATH_PLAIN:
+    ৱিকল্প (myCodePath) {
+        পক্ষ Impl::CODE_PATH_PLAIN:
             // nothing
-            break;
+            ভঙ্গ;
 #ifdef HAVE_IPP
-        case Impl::CODE_PATH_IPP:
-            if (ctx.stat_status.ignoreDepthImplIPP == currentDepth)
+        পক্ষ Impl::CODE_PATH_IPP:
+            যদি (ctx.stat_status.ignoreDepthImplIPP == currentDepth)
             {
                 ctx.stat.durationImplIPP += duration;
                 ctx.stat_status.ignoreDepthImplIPP = 0;
             }
-            else if (active)
+            অন্যথা যদি (active)
             {
                 ctx.stat.durationImplIPP = duration;
             }
-            break;
+            ভঙ্গ;
 #endif
 #ifdef HAVE_OPENCL
-        case Impl::CODE_PATH_OPENCL:
-            if (ctx.stat_status.ignoreDepthImplOpenCL == currentDepth)
+        পক্ষ Impl::CODE_PATH_OPENCL:
+            যদি (ctx.stat_status.ignoreDepthImplOpenCL == currentDepth)
             {
                 ctx.stat.durationImplOpenCL += duration;
                 ctx.stat_status.ignoreDepthImplOpenCL = 0;
             }
-            else if (active)
+            অন্যথা যদি (active)
             {
                 ctx.stat.durationImplOpenCL = duration;
             }
-            break;
+            ভঙ্গ;
 #endif
-        default:
-            break;
+        স্ৱভাৱ:
+            ভঙ্গ;
     }
 
-    if (pImpl)
+    যদি (pImpl)
     {
-        CV_DbgAssert((implFlags & (REGION_FLAG__ACTIVE | REGION_FLAG__NEED_STACK_POP)) == (REGION_FLAG__ACTIVE | REGION_FLAG__NEED_STACK_POP));
-        CV_DbgAssert(ctx.stackTopRegion() == this);
+        CV_DbgAssert((implFlags & (REGION_FLAG__ACTIVE | REGION_FLAG_NEED_স্তূপ_বেৰ_কৰো)) == (REGION_FLAG__ACTIVE | REGION_FLAG_NEED_স্তূপ_বেৰ_কৰো));
+        CV_DbgAssert(ctx.স্তূপ_শীৰ্ষ_Region() == এতত্);
         pImpl->endTimestamp = endTimestamp;
         pImpl->leaveRegion(ctx);
         pImpl->release();
-        pImpl = NULL;
+        pImpl = রিক্ত;
         DEBUG_ONLY(implFlags &= ~REGION_FLAG__ACTIVE);
     }
-    else
+    অন্যথা
     {
         CV_DbgAssert(ctx.stat_status._skipDepth <= currentDepth);
     }
 
-    if (implFlags & REGION_FLAG__NEED_STACK_POP)
+    যদি (implFlags & REGION_FLAG_NEED_স্তূপ_বেৰ_কৰো)
     {
-        CV_DbgAssert(ctx.stackTopRegion() == this);
-        ctx.stackPop();
+        CV_DbgAssert(ctx.স্তূপ_শীৰ্ষ_Region() == এতত্);
+        ctx.স্তূপ_বেৰ_কৰো();
         ctx.stat_status.checkResetSkipMode(currentDepth);
-        DEBUG_ONLY(implFlags &= ~REGION_FLAG__NEED_STACK_POP);
+        DEBUG_ONLY(implFlags &= ~REGION_FLAG_NEED_স্তূপ_বেৰ_কৰো);
     }
-    CV_LOG_CTX_STAT(NULL, _spaces(currentDepth*4) << "===> " << ctx.stat << ' ' << ctx.stat_status);
+    CV_LOG_CTX_STAT(রিক্ত, _spaces(currentDepth*4) << "===> " << ctx.stat << ' ' << ctx.stat_status);
 }
 
 
@@ -681,24 +681,24 @@ TraceManagerThreadLocal::~TraceManagerThreadLocal()
 {
 }
 
-void TraceManagerThreadLocal::dumpStack(std::ostream& out, bool onlyFunctions) const
+শূন্য TraceManagerThreadLocal::dump_স্তূপ(std::ostream& out, তার্কিক onlyFunctions) ধ্রুৱ
 {
     std::stringstream ss;
-    std::deque<StackEntry>::const_iterator it = stack.begin();
-    std::deque<StackEntry>::const_iterator end = stack.end();
-    int depth = 0;
-    for (; it != end; ++it)
+    std::deque<স্তূপ_Entry>::const_iterator it = স্তূপ.begin();
+    std::deque<স্তূপ_Entry>::const_iterator end = স্তূপ.end();
+    পূর্ণাঙ্ক depth = 0;
+    বাবে (; it != end; ++it)
     {
-        const Region::LocationStaticStorage* location = it->location;
-        if (location)
+        ধ্রুৱ Region::LocationStaticStorage* location = it->location;
+        যদি (location)
         {
-            if (!onlyFunctions || (location->flags & REGION_FLAG_FUNCTION))
+            যদি (!onlyFunctions || (location->flags & REGION_FLAG_FUNCTION))
             {
                 ss << _spaces(4*depth) << location->name << std::endl;
                 depth++;
             }
         }
-        else
+        অন্যথা
         {
             ss << _spaces(4*depth) << "<unknown>" << std::endl;
             depth++;
@@ -707,13 +707,13 @@ void TraceManagerThreadLocal::dumpStack(std::ostream& out, bool onlyFunctions) c
     out << ss.str();
 }
 
-class AsyncTraceStorage CV_FINAL : public TraceStorage
+শ্ৰেণী AsyncTraceStorage CV_FINAL : সার্ৱজনিক TraceStorage
 {
     mutable std::ofstream out;
-public:
-    const std::string name;
+সার্ৱজনিক:
+    ধ্রুৱ std::string name;
 
-    AsyncTraceStorage(const std::string& filename) :
+    AsyncTraceStorage(ধ্রুৱ std::string& filename) :
         out(filename.c_str(), std::ios::trunc),
         name(filename)
     {
@@ -725,24 +725,24 @@ public:
         out.close();
     }
 
-    bool put(const TraceMessage& msg) const CV_OVERRIDE
+    তার্কিক put(ধ্রুৱ TraceMessage& বাৰ্তা) ধ্রুৱ CV_OVERRIDE
     {
-        if (msg.hasError)
-            return false;
-        out << msg.buffer;
+        যদি (বাৰ্তা.hasError)
+            ঘূৰাই মিছা;
+        out << বাৰ্তা.buffer;
         //DEBUG_ONLY(std::flush(out)); // TODO configure flag
-        return true;
+        ঘূৰাই সঁচা;
     }
 };
 
-class SyncTraceStorage CV_FINAL : public TraceStorage
+শ্ৰেণী SyncTraceStorage CV_FINAL : সার্ৱজনিক TraceStorage
 {
     mutable std::ofstream out;
     mutable cv::Mutex mutex;
-public:
-    const std::string name;
+সার্ৱজনিক:
+    ধ্রুৱ std::string name;
 
-    SyncTraceStorage(const std::string& filename) :
+    SyncTraceStorage(ধ্রুৱ std::string& filename) :
         out(filename.c_str(), std::ios::trunc),
         name(filename)
     {
@@ -755,79 +755,79 @@ public:
         out.close();
     }
 
-    bool put(const TraceMessage& msg) const CV_OVERRIDE
+    তার্কিক put(ধ্রুৱ TraceMessage& বাৰ্তা) ধ্রুৱ CV_OVERRIDE
     {
-        if (msg.hasError)
-            return false;
+        যদি (বাৰ্তা.hasError)
+            ঘূৰাই মিছা;
         {
             cv::AutoLock l(mutex);
-            out << msg.buffer;
+            out << বাৰ্তা.buffer;
             std::flush(out); // TODO configure flag
         }
-        return true;
+        ঘূৰাই সঁচা;
     }
 };
 
 
-TraceStorage* TraceManagerThreadLocal::getStorage() const
+TraceStorage* TraceManagerThreadLocal::getStorage() ধ্রুৱ
 {
     // TODO configuration option for stdout/single trace file
-    if (storage.empty())
+    যদি (storage.empty())
     {
         TraceStorage* global = getTraceManager().trace_storage.get();
-        if (global)
+        যদি (global)
         {
-            const std::string filepath = cv::format("%s-%03d.txt", getParameterTraceLocation().c_str(), threadID).c_str();
-            TraceMessage msg;
-            const char* pos = strrchr(filepath.c_str(), '/'); // extract filename
+            ধ্রুৱ std::string filepath = cv::format("%s-%03d.txt", getParameterTraceLocation().c_str(), threadID).c_str();
+            TraceMessage বাৰ্তা;
+            ধ্রুৱ ৱর্ণ* pos = strrchr(filepath.c_str(), '/'); // extract filename
 #ifdef _WIN32
-            if (!pos)
+            যদি (!pos)
                 pos = strrchr(filepath.c_str(), '\\');
 #endif
-            if (!pos)
+            যদি (!pos)
                 pos = filepath.c_str();
-            else
+            অন্যথা
                 pos += 1; // fix to skip extra slash in filename beginning
-            msg.printf("#thread file: %s\n", pos);
-            global->put(msg);
-            storage.reset(new AsyncTraceStorage(filepath));
+            বাৰ্তা.printf("#thread file: %s\n", pos);
+            global->put(বাৰ্তা);
+            storage.reset(নূতন AsyncTraceStorage(filepath));
         }
     }
-    return storage.get();
+    ঘূৰাই storage.get();
 }
 
 
 
-static bool activated = false;
-static bool isInitialized = false;
+স্থির তার্কিক activated = মিছা;
+স্থির তার্কিক isInitialized = মিছা;
 
 TraceManager::TraceManager()
 {
-    (void)cv::getTimestampNS();
+    (শূন্য)cv::getTimestampNS();
 
-    isInitialized = true;
-    CV_LOG("TraceManager ctor: " << (void*)this);
+    isInitialized = সঁচা;
+    CV_LOG("TraceManager ctor: " << (শূন্য*)এতত্);
 
     CV_LOG("TraceManager configure()");
     activated = getParameterTraceEnable();
 
-    if (activated)
-        trace_storage.reset(new SyncTraceStorage(std::string(getParameterTraceLocation()) + ".txt"));
+    যদি (activated)
+        trace_storage.reset(নূতন SyncTraceStorage(std::string(getParameterTraceLocation()) + ".txt"));
 
 #ifdef OPENCV_WITH_ITT
-    if (isITTEnabled())
+    যদি (isITTEnabled())
     {
-        activated = true; // force trace pipeline activation (without OpenCV storage)
+        activated = সঁচা; // force trace pipeline activation (without OpenCV storage)
         __itt_region_begin(domain, __itt_null, __itt_null, __itt_string_handle_create("OpenCVTrace"));
     }
 #endif
 }
 TraceManager::~TraceManager()
 {
-    CV_LOG("TraceManager dtor: " << (void*)this);
+    CV_LOG("TraceManager dtor: " << (শূন্য*)এতত্);
 
 #ifdef OPENCV_WITH_ITT
-    if (isITTEnabled())
+    যদি (isITTEnabled())
     {
         __itt_region_end(domain, __itt_null);
     }
@@ -836,180 +836,180 @@ TraceManager::~TraceManager()
     std::vector<TraceManagerThreadLocal*> threads_ctx;
     tls.gather(threads_ctx);
     size_t totalEvents = 0, totalSkippedEvents = 0;
-    for (size_t i = 0; i < threads_ctx.size(); i++)
+    বাবে (size_t i = 0; i < threads_ctx.size(); i++)
     {
         TraceManagerThreadLocal* ctx = threads_ctx[i];
-        if (ctx)
+        যদি (ctx)
         {
             totalEvents += ctx->region_counter;
             totalSkippedEvents += ctx->totalSkippedEvents;
         }
     }
-    if (totalEvents || activated)
+    যদি (totalEvents || activated)
     {
-        CV_LOG_INFO(NULL, "Trace: Total events: " << totalEvents);
+        CV_LOG_INFO(রিক্ত, "Trace: Total events: " << totalEvents);
     }
-    if (totalSkippedEvents)
+    যদি (totalSkippedEvents)
     {
-        CV_LOG_WARNING(NULL, "Trace: Total skipped events: " << totalSkippedEvents);
+        CV_LOG_WARNING(রিক্ত, "Trace: Total skipped events: " << totalSkippedEvents);
     }
 
     // This is a global static object, so process starts shutdown here
     // Turn off trace
-    cv::__termination = true; // also set in DllMain() notifications handler for DLL_PROCESS_DETACH
-    activated = false;
+    cv::__termination = সঁচা; // also set in DllMain() notifications handler for DLL_PROCESS_DETACH
+    activated = মিছা;
 }
 
-bool TraceManager::isActivated()
+তার্কিক TraceManager::isActivated()
 {
     // Check if process starts shutdown, and set earlyExit to true
     // to prevent further instrumentation processing earlier.
-    if (cv::__termination)
+    যদি (cv::__termination)
     {
-        activated = false;
-        return false;
+        activated = মিছা;
+        ঘূৰাই মিছা;
     }
 
-    if (!isInitialized)
+    যদি (!isInitialized)
     {
         TraceManager& m = getTraceManager();
         CV_UNUSED(m); // TODO
     }
 
-    return activated;
+    ঘূৰাই activated;
 }
 
 
-static TraceManager* getTraceManagerCallOnce()
+স্থির TraceManager* getTraceManagerCallOnce()
 {
-    static TraceManager globalInstance;
-    return &globalInstance;
+    স্থির TraceManager globalInstance;
+    ঘূৰাই &globalInstance;
 }
 TraceManager& getTraceManager()
 {
     CV_SINGLETON_LAZY_INIT_REF(TraceManager, getTraceManagerCallOnce())
 }
 
-void parallelForSetRootRegion(const Region& rootRegion, const TraceManagerThreadLocal& root_ctx)
+শূন্য parallel_For_Set_মূল_Region(ধ্রুৱ Region& মূল_Region, ধ্রুৱ TraceManagerThreadLocal& মূল_ctx)
 {
     TraceManagerThreadLocal& ctx = getTraceManager().tls.getRef();
 
-    if (ctx.dummy_stack_top.region == &rootRegion) // already attached
-        return;
+    যদি (ctx.dummy_স্তূপ_শীৰ্ষ.region == &মূল_Region) // already attached
+        ঘূৰাই;
 
-    CV_Assert(ctx.dummy_stack_top.region == NULL);
-    ctx.dummy_stack_top = TraceManagerThreadLocal::StackEntry(const_cast<Region*>(&rootRegion), NULL, -1);
+    CV_Assert(ctx.dummy_স্তূপ_শীৰ্ষ.region == রিক্ত);
+    ctx.dummy_স্তূপ_শীৰ্ষ = TraceManagerThreadLocal::স্তূপ_Entry(const_cast<Region*>(&মূল_Region), রিক্ত, -1);
 
-    if (&ctx == &root_ctx)
+    যদি (&ctx == &মূল_ctx)
     {
         ctx.stat.grab(ctx.parallel_for_stat);
         ctx.parallel_for_stat_status = ctx.stat_status;
-        ctx.parallel_for_stack_size = ctx.stack.size();
-        return;
+        ctx.parallel_for_স্তূপ_size = ctx.স্তূপ.size();
+        ঘূৰাই;
     }
 
-    CV_Assert(ctx.stack.empty());
+    CV_Assert(ctx.স্তূপ.empty());
 
-    ctx.currentActiveRegion = const_cast<Region*>(&rootRegion);
+    ctx.currentActiveRegion = const_cast<Region*>(&মূল_Region);
 
-    ctx.regionDepth = root_ctx.regionDepth;
-    ctx.regionDepthOpenCV = root_ctx.regionDepthOpenCV;
+    ctx.regionDepth = মূল_ctx.regionDepth;
+    ctx.regionDepthOpenCV = মূল_ctx.regionDepthOpenCV;
 
-    ctx.parallel_for_stack_size = 0;
+    ctx.parallel_for_স্তূপ_size = 0;
 
-    ctx.stat_status.propagateFrom(root_ctx.stat_status);
+    ctx.stat_status.propagateFrom(মূল_ctx.stat_status);
 }
 
-void parallelForAttachNestedRegion(const Region& rootRegion)
+শূন্য parallelForAttachNestedRegion(ধ্রুৱ Region& মূল_Region)
 {
-    CV_UNUSED(rootRegion);
+    CV_UNUSED(মূল_Region);
     TraceManagerThreadLocal& ctx = getTraceManager().tls.getRef();
 
-    CV_DbgAssert(ctx.dummy_stack_top.region == &rootRegion);
+    CV_DbgAssert(ctx.dummy_স্তূপ_শীৰ্ষ.region == &মূল_Region);
 
     Region* region = ctx.getCurrentActiveRegion();
-    CV_LOG_PARALLEL(NULL, " PARALLEL_FOR: " << (void*)region << " ==> " << &rootRegion);
-    if (!region)
-        return;
+    CV_LOG_PARALLEL(রিক্ত, " PARALLEL_FOR: " << (শূন্য*)region << " ==> " << &মূল_Region);
+    যদি (!region)
+        ঘূৰাই;
 
 #ifdef OPENCV_WITH_ITT
-    if (!rootRegion.pImpl || !rootRegion.pImpl->itt_id_registered)
-        return;
+    যদি (!মূল_Region.pImpl || !মূল_Region.pImpl->itt_id_registered)
+        ঘূৰাই;
 
-    if (!region->pImpl)
-        return;
+    যদি (!region->pImpl)
+        ঘূৰাই;
 
-    CV_LOG_PARALLEL(NULL, " PARALLEL_FOR ITT: " << (void*)rootRegion.pImpl->itt_id.d1 << ":" << rootRegion.pImpl->itt_id.d2 << ":" << (void*)rootRegion.pImpl->itt_id.d3 << " => "
-                                 << (void*)region->pImpl->itt_id.d1 << ":" << region->pImpl->itt_id.d2 << ":" << (void*)region->pImpl->itt_id.d3);
-    __itt_relation_add(domain, region->pImpl->itt_id, __itt_relation_is_child_of, rootRegion.pImpl->itt_id);
+    CV_LOG_PARALLEL(রিক্ত, " PARALLEL_FOR ITT: " << (শূন্য*)মূল_Region.pImpl->itt_id.d1 << ":" << মূল_Region.pImpl->itt_id.d2 << ":" << (শূন্য*)মূল_Region.pImpl->itt_id.d3 << " => "
+                                 << (শূন্য*)region->pImpl->itt_id.d1 << ":" << region->pImpl->itt_id.d2 << ":" << (শূন্য*)region->pImpl->itt_id.d3);
+    __itt_relation_add(domain, region->pImpl->itt_id, __itt_relation_is_child_of, মূল_Region.pImpl->itt_id);
 #endif
 }
 
-void parallelForFinalize(const Region& rootRegion)
+শূন্য parallelForFinalize(ধ্রুৱ Region& মূল_Region)
 {
     TraceManagerThreadLocal& ctx = getTraceManager().tls.getRef();
 
     int64 endTimestamp = getTimestampNS();
-    int64 duration = endTimestamp - ctx.stackTopBeginTimestamp();
-    CV_LOG_PARALLEL(NULL, "parallel_for duration: " << duration << " " << &rootRegion);
+    int64 duration = endTimestamp - ctx.স্তূপ_শীৰ্ষ_Begin_Timestamp();
+    CV_LOG_PARALLEL(রিক্ত, "parallel_for duration: " << duration << " " << &মূল_Region);
 
     std::vector<TraceManagerThreadLocal*> threads_ctx;
     getTraceManager().tls.gather(threads_ctx);
     RegionStatistics parallel_for_stat;
-    for (size_t i = 0; i < threads_ctx.size(); i++)
+    বাবে (size_t i = 0; i < threads_ctx.size(); i++)
     {
         TraceManagerThreadLocal* child_ctx = threads_ctx[i];
 
-        if (child_ctx && child_ctx->stackTopRegion() == &rootRegion)
+        যদি (child_ctx && child_ctx->স্তূপ_শীৰ্ষ_Region() == &মূল_Region)
         {
-            CV_LOG_PARALLEL(NULL, "Thread=" << child_ctx->threadID << " " << child_ctx->stat);
+            CV_LOG_PARALLEL(রিক্ত, "Thread=" << child_ctx->threadID << " " << child_ctx->stat);
             RegionStatistics child_stat;
             child_ctx->stat.grab(child_stat);
             parallel_for_stat.append(child_stat);
-            if (child_ctx != &ctx)
+            যদি (child_ctx != &ctx)
             {
-                child_ctx->dummy_stack_top = TraceManagerThreadLocal::StackEntry();
+                child_ctx->dummy_স্তূপ_শীৰ্ষ = TraceManagerThreadLocal::স্তূপ_Entry();
             }
-            else
+            অন্যথা
             {
                 ctx.parallel_for_stat.grab(ctx.stat);
                 ctx.stat_status = ctx.parallel_for_stat_status;
-                child_ctx->dummy_stack_top = TraceManagerThreadLocal::StackEntry();
+                child_ctx->dummy_স্তূপ_শীৰ্ষ = TraceManagerThreadLocal::স্তূপ_Entry();
             }
         }
     }
 
-    float parallel_coeff = std::min(1.0f, duration / (float)(parallel_for_stat.duration));
-    CV_LOG_PARALLEL(NULL, "parallel_coeff=" << 1.0f / parallel_coeff);
-    CV_LOG_PARALLEL(NULL, parallel_for_stat);
-    if (parallel_coeff != 1.0f)
+    ভিন্ন parallel_coeff = std::min(1.0f, duration / (ভিন্ন)(parallel_for_stat.duration));
+    CV_LOG_PARALLEL(রিক্ত, "parallel_coeff=" << 1.0f / parallel_coeff);
+    CV_LOG_PARALLEL(রিক্ত, parallel_for_stat);
+    যদি (parallel_coeff != 1.0f)
     {
         parallel_for_stat.multiply(parallel_coeff);
-        CV_LOG_PARALLEL(NULL, parallel_for_stat);
+        CV_LOG_PARALLEL(রিক্ত, parallel_for_stat);
     }
     parallel_for_stat.duration = 0;
     ctx.stat.append(parallel_for_stat);
-    CV_LOG_PARALLEL(NULL, ctx.stat);
+    CV_LOG_PARALLEL(রিক্ত, ctx.stat);
 }
 
-struct TraceArg::ExtraData
+সংরচনা TraceArg::ExtraData
 {
 #ifdef OPENCV_WITH_ITT
     // Special fields for ITT
-    __itt_string_handle* volatile ittHandle_name;
+    __itt_string_handle* চঞ্চল ittHandle_name;
 #endif
-    ExtraData(TraceManagerThreadLocal& ctx, const TraceArg& arg)
+    ExtraData(TraceManagerThreadLocal& ctx, ধ্রুৱ TraceArg& arg)
     {
         CV_UNUSED(ctx); CV_UNUSED(arg);
 #ifdef OPENCV_WITH_ITT
-        if (isITTEnabled())
+        যদি (isITTEnabled())
         {
             // Caching is not required here, because there is builtin cache.
             // https://software.intel.com/en-us/node/544203:
             //     Consecutive calls to __itt_string_handle_create with the same name return the same value.
             ittHandle_name = __itt_string_handle_create(arg.name);
         }
-        else
+        অন্যথা
         {
             ittHandle_name = 0;
         }
@@ -1017,96 +1017,96 @@ struct TraceArg::ExtraData
     }
 };
 
-static void initTraceArg(TraceManagerThreadLocal& ctx, const TraceArg& arg)
+স্থির শূন্য initTraceArg(TraceManagerThreadLocal& ctx, ধ্রুৱ TraceArg& arg)
 {
     TraceArg::ExtraData** pExtra = arg.ppExtra;
-    if (*pExtra == NULL)
+    যদি (*pExtra == রিক্ত)
     {
         cv::AutoLock lock(cv::getInitializationMutex());
-        if (*pExtra == NULL)
+        যদি (*pExtra == রিক্ত)
         {
-            *pExtra = new TraceArg::ExtraData(ctx, arg);
+            *pExtra = নূতন TraceArg::ExtraData(ctx, arg);
         }
     }
 }
-void traceArg(const TraceArg& arg, const char* value)
+শূন্য traceArg(ধ্রুৱ TraceArg& arg, ধ্রুৱ ৱর্ণ* value)
 {
     TraceManagerThreadLocal& ctx = getTraceManager().tls.getRef();
     Region* region = ctx.getCurrentActiveRegion();
-    if (!region)
-        return;
+    যদি (!region)
+        ঘূৰাই;
     CV_Assert(region->pImpl);
     initTraceArg(ctx, arg);
-    if (!value)
+    যদি (!value)
         value = "<null>";
 #ifdef OPENCV_WITH_ITT
-    if (isITTEnabled())
+    যদি (isITTEnabled())
     {
         __itt_metadata_str_add(domain, region->pImpl->itt_id, (*arg.ppExtra)->ittHandle_name, value, strlen(value));
     }
 #endif
 }
-void traceArg(const TraceArg& arg, int value)
+শূন্য traceArg(ধ্রুৱ TraceArg& arg, পূর্ণাঙ্ক value)
 {
     TraceManagerThreadLocal& ctx = getTraceManager().tls.getRef();
     Region* region = ctx.getCurrentActiveRegion();
-    if (!region)
-        return;
+    যদি (!region)
+        ঘূৰাই;
     CV_Assert(region->pImpl);
     initTraceArg(ctx, arg);
 #ifdef OPENCV_WITH_ITT
-    if (isITTEnabled())
+    যদি (isITTEnabled())
     {
-        __itt_metadata_add(domain, region->pImpl->itt_id, (*arg.ppExtra)->ittHandle_name, sizeof(int) == 4 ? __itt_metadata_s32 : __itt_metadata_s64, 1, &value);
+        __itt_metadata_add(domain, region->pImpl->itt_id, (*arg.ppExtra)->ittHandle_name, পরিমাণ(পূর্ণাঙ্ক) == 4 ? __itt_metadata_s32 : __itt_metadata_s64, 1, &value);
     }
-#else
+#অন্যথা
     CV_UNUSED(value);
 #endif
 }
-void traceArg(const TraceArg& arg, int64 value)
+শূন্য traceArg(ধ্রুৱ TraceArg& arg, int64 value)
 {
     TraceManagerThreadLocal& ctx = getTraceManager().tls.getRef();
     Region* region = ctx.getCurrentActiveRegion();
-    if (!region)
-        return;
+    যদি (!region)
+        ঘূৰাই;
     CV_Assert(region->pImpl);
     initTraceArg(ctx, arg);
 #ifdef OPENCV_WITH_ITT
-    if (isITTEnabled())
+    যদি (isITTEnabled())
     {
         __itt_metadata_add(domain, region->pImpl->itt_id, (*arg.ppExtra)->ittHandle_name, __itt_metadata_s64, 1, &value);
     }
-#else
+#অন্যথা
     CV_UNUSED(value);
 #endif
 }
-void traceArg(const TraceArg& arg, double value)
+শূন্য traceArg(ধ্রুৱ TraceArg& arg, দ্ৱিগুণ value)
 {
     TraceManagerThreadLocal& ctx = getTraceManager().tls.getRef();
     Region* region = ctx.getCurrentActiveRegion();
-    if (!region)
-        return;
+    যদি (!region)
+        ঘূৰাই;
     CV_Assert(region->pImpl);
     initTraceArg(ctx, arg);
 #ifdef OPENCV_WITH_ITT
-    if (isITTEnabled())
+    যদি (isITTEnabled())
     {
         __itt_metadata_add(domain, region->pImpl->itt_id, (*arg.ppExtra)->ittHandle_name, __itt_metadata_double, 1, &value);
     }
-#else
+#অন্যথা
     CV_UNUSED(value);
 #endif
 }
 
-#else
+#অন্যথা
 
-Region::Region(const LocationStaticStorage&) : pImpl(NULL), implFlags(0) {}
-void Region::destroy() {}
+Region::Region(ধ্রুৱ LocationStaticStorage&) : pImpl(রিক্ত), implFlags(0) {}
+শূন্য Region::destroy() {}
 
-void traceArg(const TraceArg&, const char*) {}
-void traceArg(const TraceArg&, int) {};
-void traceArg(const TraceArg&, int64) {};
-void traceArg(const TraceArg&, double) {};
+শূন্য traceArg(ধ্রুৱ TraceArg&, ধ্রুৱ ৱর্ণ*) {}
+শূন্য traceArg(ধ্রুৱ TraceArg&, পূর্ণাঙ্ক) {};
+শূন্য traceArg(ধ্রুৱ TraceArg&, int64) {};
+শূন্য traceArg(ধ্রুৱ TraceArg&, দ্ৱিগুণ) {};
 
 #endif
 

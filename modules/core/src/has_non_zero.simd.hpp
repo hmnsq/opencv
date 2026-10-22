@@ -2,35 +2,35 @@
 // It is subject to the license terms in the LICENSE file found in the top-level directory
 // of this distribution and at http://opencv.org/license.html
 
-#include "precomp.hpp"
+#অন্তর্ভাৱ "precomp.hpp"
 
-namespace cv {
+নামাকাশ cv {
 
-typedef bool (*HasNonZeroFunc)(const void*, size_t);
+প্রকারনির্দেশ তার্কিক (*HasNonZeroFunc)(ধ্রুৱ শূন্য*, size_t);
 
 CV_CPU_OPTIMIZATION_NAMESPACE_BEGIN
 
-HasNonZeroFunc getHasNonZeroFunc(int depth);
+HasNonZeroFunc getHasNonZeroFunc(পূর্ণাঙ্ক depth);
 
 #ifndef CV_CPU_OPTIMIZATION_DECLARATIONS_ONLY
 
 #undef SIMD_ONLY
-#if (CV_SIMD || CV_SIMD_SCALABLE)
-#define SIMD_ONLY(expr) expr
-#else
-#define SIMD_ONLY(expr)
+#যদি (CV_SIMD || CV_SIMD_SCALABLE)
+#define SIMD_ONLY(ৰাশিমালা) ৰাশিমালা
+#অন্যথা
+#define SIMD_ONLY(ৰাশিমালা)
 #endif
 
 #undef DEFINE_HASNONZERO_FUNC
 #define DEFINE_HASNONZERO_FUNC(funcname, suffix, T, VT, cmp_op, scalar_nz_op) \
-static bool funcname( const void* _src, size_t len ) \
+স্থির তার্কিক funcname( ধ্রুৱ শূন্য* _src, size_t len ) \
 { \
-    const T* src = (const T*)_src; \
+    ধ্রুৱ T* src = (ধ্রুৱ T*)_src; \
     size_t i = 0; \
     SIMD_ONLY( \
-    const int vlanes = VTraits<VT>::vlanes(); \
+    ধ্রুৱ পূর্ণাঙ্ক vlanes = VTraits<VT>::vlanes(); \
     VT v_zero = vx_setzero_##suffix(); \
-    for (i = 0; i + vlanes*8 <= len; i += vlanes*8) \
+    বাবে (i = 0; i + vlanes*8 <= len; i += vlanes*8) \
     { \
         VT x0 = vx_load(src + i); \
         VT x1 = vx_load(src + i + vlanes); \
@@ -48,29 +48,29 @@ static bool funcname( const void* _src, size_t len ) \
         x4 = v_or(x4, x6); \
         x0 = v_or(x0, x4); \
         x0 = cmp_op(x0, v_zero); \
-        if (v_check_any(x0)) \
-            return true; \
+        যদি (v_check_any(x0)) \
+            ঘূৰাই সঁচা; \
     } \
-    for (; i < len; i += vlanes) \
+    বাবে (; i < len; i += vlanes) \
     { \
-        if (i + vlanes > len) { \
-            if (i == 0) \
-                break; \
+        যদি (i + vlanes > len) { \
+            যদি (i == 0) \
+                ভঙ্গ; \
             i = len - vlanes; \
         } \
         VT x0 = vx_load(src + i); \
         x0 = cmp_op(x0, v_zero); \
-        if (v_check_any(x0)) \
-            return true; \
+        যদি (v_check_any(x0)) \
+            ঘূৰাই সঁচা; \
     } \
     v_cleanup();) \
-    for( ; i < len; i++ ) \
+    বাবে( ; i < len; i++ ) \
     { \
         T x = src[i]; \
-        if (scalar_nz_op(x) != 0) \
-            return true; \
+        যদি (scalar_nz_op(x) != 0) \
+            ঘূৰাই সঁচা; \
     } \
-    return false; \
+    ঘূৰাই মিছা; \
 }
 
 #undef CHECK_NZ_INT
@@ -86,16 +86,16 @@ static bool funcname( const void* _src, size_t len ) \
 
 DEFINE_HASNONZERO_FUNC(hasNonZero8u, u8, uchar, v_uint8, v_ne, CHECK_NZ_INT)
 DEFINE_HASNONZERO_FUNC(hasNonZero16u, u16, ushort, v_uint16, v_ne, CHECK_NZ_INT)
-DEFINE_HASNONZERO_FUNC(hasNonZero32s, s32, int, v_int32, v_ne, CHECK_NZ_INT)
+DEFINE_HASNONZERO_FUNC(hasNonZero32s, s32, পূর্ণাঙ্ক, v_int32, v_ne, CHECK_NZ_INT)
 DEFINE_HASNONZERO_FUNC(hasNonZero64s, s64, int64, v_int64, v_ne, CHECK_NZ_INT)
 
-DEFINE_HASNONZERO_FUNC(hasNonZero32f, s32, int, v_int32, VEC_CMP_EQ_Z_FP, CHECK_NZ_FP)
+DEFINE_HASNONZERO_FUNC(hasNonZero32f, s32, পূর্ণাঙ্ক, v_int32, VEC_CMP_EQ_Z_FP, CHECK_NZ_FP)
 DEFINE_HASNONZERO_FUNC(hasNonZero64f, s64, int64, v_int64, VEC_CMP_EQ_Z_FP, CHECK_NZ_FP)
 DEFINE_HASNONZERO_FUNC(hasNonZero16f, u16, ushort, v_uint16, VEC_CMP_EQ_Z_FP16, CHECK_NZ_FP16)
 
-HasNonZeroFunc getHasNonZeroFunc(int depth)
+HasNonZeroFunc getHasNonZeroFunc(পূর্ণাঙ্ক depth)
 {
-    static HasNonZeroFunc hasNonZeroTab[CV_DEPTH_MAX] =
+    স্থির HasNonZeroFunc hasNonZeroTab[CV_DEPTH_MAX] =
     {
         hasNonZero8u,
         hasNonZero8u,
@@ -113,7 +113,7 @@ HasNonZeroFunc getHasNonZeroFunc(int depth)
         0
     };
 
-    return hasNonZeroTab[depth];
+    ঘূৰাই hasNonZeroTab[depth];
 }
 
 #endif

@@ -4,66 +4,66 @@
 // Copyright (C) 2026, BigVision LLC, all rights reserved.
 // Third party copyrights are property of their respective owners.
 
-#include "precomp.hpp"
-#include "nd_copy.hpp"
-#include "hal_replacement.hpp"
+#অন্তর্ভাৱ "precomp.hpp"
+#অন্তর্ভাৱ "nd_copy.hpp"
+#অন্তর্ভাৱ "hal_replacement.hpp"
 
-#include "opencv2/core/hal/hal.hpp"
+#অন্তর্ভাৱ "opencv2/core/hal/hal.hpp"
 
-#include <algorithm>
+#অন্তর্ভাৱ <algorithm>
 
-namespace cv { namespace nd {
+নামাকাশ cv { নামাকাশ nd {
 
-View viewOf(const Mat& m)
+View viewOf(ধ্রুৱ Mat& m)
 {
     View v;
     v.data = m.data;
     v.dims = m.dims;
     v.esz = m.elemSize();
-    for (int i = 0; i < m.dims; i++)
+    বাবে (পূর্ণাঙ্ক i = 0; i < m.dims; i++)
     {
         v.size[i] = m.size[i];
         v.step[i] = (ptrdiff_t)m.step[i];
     }
-    return v;
+    ঘূৰাই v;
 }
 
-View permute(const View& v, const int* order)
+View permute(ধ্রুৱ View& v, ধ্রুৱ পূর্ণাঙ্ক* order)
 {
     View r;
     r.data = v.data;
     r.dims = v.dims;
     r.esz = v.esz;
-    for (int i = 0; i < v.dims; i++)
+    বাবে (পূর্ণাঙ্ক i = 0; i < v.dims; i++)
     {
-        int j = order[i];
+        পূর্ণাঙ্ক j = order[i];
         CV_DbgAssert(0 <= j && j < v.dims);
         r.size[i] = v.size[j];
         r.step[i] = v.step[j];
     }
-    return r;
+    ঘূৰাই r;
 }
 
-void flip(View& v, int axis)
+শূন্য flip(View& v, পূর্ণাঙ্ক axis)
 {
     CV_DbgAssert(0 <= axis && axis < v.dims);
-    if (v.size[axis] > 0)
+    যদি (v.size[axis] > 0)
         v.data += (ptrdiff_t)(v.size[axis] - 1)*v.step[axis];
     v.step[axis] = -v.step[axis];
 }
 
-void slice(View& v, int axis, int start, int step, int count)
+শূন্য slice(View& v, পূর্ণাঙ্ক axis, পূর্ণাঙ্ক start, পূর্ণাঙ্ক step, পূর্ণাঙ্ক গুনতি_2)
 {
-    CV_DbgAssert(0 <= axis && axis < v.dims && count >= 0);
-    if (count > 0)
+    CV_DbgAssert(0 <= axis && axis < v.dims && গুনতি_2 >= 0);
+    যদি (গুনতি_2 > 0)
         v.data += (ptrdiff_t)start*v.step[axis];
     v.step[axis] *= step;
-    v.size[axis] = count;
+    v.size[axis] = গুনতি_2;
 }
 
-namespace {
+নামাকাশ {
 
-enum Kind
+গণনা Kind
 {
     KIND_MEMCPY,    // the innermost axis is contiguous in both views
     KIND_FILL,      // the innermost axis is broadcast (step 0) in the source
@@ -73,7 +73,7 @@ enum Kind
     KIND_MERGE      // 2..4 planes are written into one interleaved stream (e.g. NCHW -> NHWC)
 };
 
-enum
+গণনা
 {
     TRANSPOSE_TILE = 64,                // in elements
     SPLIT_CHUNK = 1024,                 // in elements
@@ -85,13 +85,13 @@ enum
     STRIPE_COST = 1024*1024
 };
 
-struct Plan
+সংরচনা Plan
 {
-    const uchar* src;
+    ধ্রুৱ uchar* src;
     uchar* dst;
     size_t esz;
-    int dims;
-    int kind;
+    পূর্ণাঙ্ক dims;
+    পূর্ণাঙ্ক kind;
     int64 size[MAX_VIEW_DIMS];
     ptrdiff_t sstep[MAX_VIEW_DIMS];
     ptrdiff_t dstep[MAX_VIEW_DIMS];
@@ -99,101 +99,101 @@ struct Plan
 
     // an item is a chunk of an innermost row, or a tile for KIND_TRANSPOSE
     int64 nrows, chunk, nchunks;
-    bool chunkMajor;
+    তার্কিক chunkMajor;
     int64 tilesA, tilesB;
     int64 nitems;
-    double cost;
+    দ্ৱিগুণ cost;
 };
 
-static void swapAxes(Plan& p, int i, int j)
+স্থির শূন্য swapAxes(Plan& p, পূর্ণাঙ্ক i, পূর্ণাঙ্ক j)
 {
     std::swap(p.size[i], p.size[j]);
     std::swap(p.sstep[i], p.sstep[j]);
     std::swap(p.dstep[i], p.dstep[j]);
 }
 
-static void moveAxis(Plan& p, int k, int to)
+স্থির শূন্য moveAxis(Plan& p, পূর্ণাঙ্ক k, পূর্ণাঙ্ক to)
 {
-    for (int i = k; i < to; i++)
+    বাবে (পূর্ণাঙ্ক i = k; i < to; i++)
         swapAxes(p, i, i + 1);
 }
 
 // OR of the base pointers and all the steps: its low bits give the common alignment.
-static size_t addressBits(const Plan& p)
+স্থির size_t addressBits(ধ্রুৱ Plan& p)
 {
     size_t addrs = (size_t)p.src | (size_t)p.dst;
-    for (int i = 0; i < p.dims; i++)
+    বাবে (পূর্ণাঙ্ক i = 0; i < p.dims; i++)
         addrs |= (size_t)p.sstep[i] | (size_t)p.dstep[i];
-    return addrs;
+    ঘূৰাই addrs;
 }
 
 // 2..4 planes via the cv::split / cv::merge HAL kernels
-static bool trySplitMerge(Plan& p)
+স্থির তার্কিক trySplitMerge(Plan& p)
 {
-    const ptrdiff_t esz = (ptrdiff_t)p.esz;
-    const int L = p.dims - 1;
-    if (L < 1 || !(esz == 1 || esz == 2 || esz == 4 || esz == 8) || p.dstep[L] != esz)
-        return false;
-    if ((addressBits(p) & (esz - 1)) != 0)
-        return false;
+    ধ্রুৱ ptrdiff_t esz = (ptrdiff_t)p.esz;
+    ধ্রুৱ পূর্ণাঙ্ক L = p.dims - 1;
+    যদি (L < 1 || !(esz == 1 || esz == 2 || esz == 4 || esz == 8) || p.dstep[L] != esz)
+        ঘূৰাই মিছা;
+    যদি ((addressBits(p) & (esz - 1)) != 0)
+        ঘূৰাই মিছা;
 
     // split: axis k holds cn planes interleaved in the source
-    for (int k = L - 1; k >= 0; k--)
+    বাবে (পূর্ণাঙ্ক k = L - 1; k >= 0; k--)
     {
-        const int64 cn = p.size[k];
-        if (cn >= 2 && cn <= 4 && p.sstep[k] == esz && p.sstep[L] == cn*esz &&
+        ধ্রুৱ int64 cn = p.size[k];
+        যদি (cn >= 2 && cn <= 4 && p.sstep[k] == esz && p.sstep[L] == cn*esz &&
             p.dstep[k] > 0 && p.dstep[k] % esz == 0)
         {
             moveAxis(p, k, L - 1);
             p.kind = KIND_SPLIT;
-            return true;
+            ঘূৰাই সঁচা;
         }
     }
 
     // merge: the innermost axis holds cn planes interleaved in the destination
-    const int64 cn = p.size[L];
-    if (cn >= 2 && cn <= 4 && p.sstep[L] > 0 && p.sstep[L] % esz == 0)
+    ধ্রুৱ int64 cn = p.size[L];
+    যদি (cn >= 2 && cn <= 4 && p.sstep[L] > 0 && p.sstep[L] % esz == 0)
     {
-        for (int k = L - 1; k >= 0; k--)
+        বাবে (পূর্ণাঙ্ক k = L - 1; k >= 0; k--)
         {
-            if (p.sstep[k] == esz && p.dstep[k] == cn*esz)
+            যদি (p.sstep[k] == esz && p.dstep[k] == cn*esz)
             {
                 moveAxis(p, k, L - 1);
                 p.kind = KIND_MERGE;
-                return true;
+                ঘূৰাই সঁচা;
             }
         }
     }
-    return false;
+    ঘূৰাই মিছা;
 }
 
 // Returns false when there is nothing to copy.
-static bool buildPlan(const View& s, const View& d, Plan& p)
+স্থির তার্কিক buildPlan(ধ্রুৱ View& s, ধ্রুৱ View& d, Plan& p)
 {
     CV_CheckEQ(s.esz, d.esz, "nd::copy: the element sizes must match");
     CV_Assert(s.esz > 0);
 
-    const ptrdiff_t esz = (ptrdiff_t)s.esz;
+    ধ্রুৱ ptrdiff_t esz = (ptrdiff_t)s.esz;
     p.src = s.data;
     p.dst = d.data;
     p.esz = s.esz;
 
     // Drop size-1 axes and make the destination steps positive
     // (reversing an axis in both views keeps the mapping).
-    int n = 0;
-    double total = 1;
-    for (int i = 0; i < s.dims; i++)
+    পূর্ণাঙ্ক n = 0;
+    দ্ৱিগুণ total = 1;
+    বাবে (পূর্ণাঙ্ক i = 0; i < s.dims; i++)
     {
         CV_CheckEQ(s.size[i], d.size[i], "nd::copy: the shapes must match");
-        int sz = s.size[i];
+        পূর্ণাঙ্ক sz = s.size[i];
         CV_Assert(sz >= 0);
-        if (sz == 0)
-            return false;
+        যদি (sz == 0)
+            ঘূৰাই মিছা;
         total *= sz;
-        if (sz == 1)
-            continue;
+        যদি (sz == 1)
+            অনুৱর্ত;
         ptrdiff_t ss = s.step[i], ds = d.step[i];
-        if (ds < 0)
+        যদি (ds < 0)
         {
             p.src += (ptrdiff_t)(sz - 1)*ss;
             p.dst += (ptrdiff_t)(sz - 1)*ds;
@@ -207,20 +207,20 @@ static bool buildPlan(const View& s, const View& d, Plan& p)
     }
 
     // Write the destination as sequentially as possible.
-    for (int i = 1; i < n; i++)
-        for (int j = i; j > 0 && p.dstep[j-1] < p.dstep[j]; j--)
+    বাবে (পূর্ণাঙ্ক i = 1; i < n; i++)
+        বাবে (পূর্ণাঙ্ক j = i; j > 0 && p.dstep[j-1] < p.dstep[j]; j--)
             swapAxes(p, j-1, j);
 
-    int m = 0;
-    for (int i = 0; i < n; i++)
+    পূর্ণাঙ্ক m = 0;
+    বাবে (পূর্ণাঙ্ক i = 0; i < n; i++)
     {
-        if (m > 0 && p.sstep[m-1] == p.sstep[i]*p.size[i] && p.dstep[m-1] == p.dstep[i]*p.size[i])
+        যদি (m > 0 && p.sstep[m-1] == p.sstep[i]*p.size[i] && p.dstep[m-1] == p.dstep[i]*p.size[i])
         {
             p.size[m-1] *= p.size[i];
             p.sstep[m-1] = p.sstep[i];
             p.dstep[m-1] = p.dstep[i];
         }
-        else
+        অন্যথা
         {
             p.size[m] = p.size[i];
             p.sstep[m] = p.sstep[i];
@@ -228,7 +228,7 @@ static bool buildPlan(const View& s, const View& d, Plan& p)
             m++;
         }
     }
-    if (m == 0)
+    যদি (m == 0)
     {
         p.size[0] = 1;
         p.sstep[0] = p.dstep[0] = esz;
@@ -236,26 +236,26 @@ static bool buildPlan(const View& s, const View& d, Plan& p)
     }
     p.dims = m;
 
-    const int L = m - 1;
+    ধ্রুৱ পূর্ণাঙ্ক L = m - 1;
     p.tfunc = nullptr;
-    if (p.sstep[L] == esz && p.dstep[L] == esz)
+    যদি (p.sstep[L] == esz && p.dstep[L] == esz)
         p.kind = KIND_MEMCPY;
-    else if (p.sstep[L] == 0)
+    অন্যথা যদি (p.sstep[L] == 0)
         p.kind = KIND_FILL;
-    else if (!trySplitMerge(p))
+    অন্যথা যদি (!trySplitMerge(p))
     {
         p.kind = KIND_STRIDED;
         // An outer axis contiguous in the source makes it a batched 2D transpose.
-        if (m >= 2 && p.dstep[L] == esz && p.sstep[L] > 0)
+        যদি (m >= 2 && p.dstep[L] == esz && p.sstep[L] > 0)
         {
-            int k = L - 1;
-            while (k >= 0 && p.sstep[k] != esz)
+            পূর্ণাঙ্ক k = L - 1;
+            যেতিয়ালৈ (k >= 0 && p.sstep[k] != esz)
                 k--;
             TransposeFunc f = getTransposeFunc(s.esz);
             // the kernels access the elements as uchar, ushort or int based types
-            const size_t align = std::min(s.esz & (0 - s.esz), (size_t)4);
+            ধ্রুৱ size_t align = std::min(s.esz & (0 - s.esz), (size_t)4);
             // a short axis cannot fill SIMD registers; the gather is faster then
-            if (k >= 0 && f && p.size[k] >= 8 && (addressBits(p) & (align - 1)) == 0)
+            যদি (k >= 0 && f && p.size[k] >= 8 && (addressBits(p) & (align - 1)) == 0)
             {
                 moveAxis(p, k, L - 1);
                 p.kind = KIND_TRANSPOSE;
@@ -264,56 +264,56 @@ static bool buildPlan(const View& s, const View& d, Plan& p)
         }
     }
 
-    const double bytes = total*(double)esz;
-    if (p.kind == KIND_SPLIT || p.kind == KIND_MERGE)
+    ধ্রুৱ দ্ৱিগুণ bytes = total*(দ্ৱিগুণ)esz;
+    যদি (p.kind == KIND_SPLIT || p.kind == KIND_MERGE)
     {
-        const int X = p.kind == KIND_SPLIT ? L : L - 1;
+        ধ্রুৱ পূর্ণাঙ্ক X = p.kind == KIND_SPLIT ? L : L - 1;
         int64 nouter = 1;
-        for (int i = 0; i < L - 1; i++)
+        বাবে (পূর্ণাঙ্ক i = 0; i < L - 1; i++)
             nouter *= p.size[i];
         p.nrows = nouter;
         p.chunk = SPLIT_CHUNK;
         p.nchunks = (p.size[X] + p.chunk - 1)/p.chunk;
-        p.chunkMajor = false;
+        p.chunkMajor = মিছা;
         p.tilesA = p.tilesB = 1;
         p.nitems = nouter*p.nchunks;
         p.cost = bytes*2;
     }
-    else if (p.kind == KIND_TRANSPOSE)
+    অন্যথা যদি (p.kind == KIND_TRANSPOSE)
     {
         int64 nouter = 1;
-        for (int i = 0; i < L - 1; i++)
+        বাবে (পূর্ণাঙ্ক i = 0; i < L - 1; i++)
             nouter *= p.size[i];
         p.tilesA = (p.size[L-1] + TRANSPOSE_TILE - 1)/TRANSPOSE_TILE;
         p.tilesB = (p.size[L] + TRANSPOSE_TILE - 1)/TRANSPOSE_TILE;
         p.nrows = nouter;
         p.chunk = p.nchunks = 1;
-        p.chunkMajor = false;
+        p.chunkMajor = মিছা;
         p.nitems = nouter*p.tilesA*p.tilesB;
         p.cost = bytes*3;
     }
-    else
+    অন্যথা
     {
         int64 nrows = 1;
-        for (int i = 0; i < L; i++)
+        বাবে (পূর্ণাঙ্ক i = 0; i < L; i++)
             nrows *= p.size[i];
-        const int64 rowLen = p.size[L];
-        const double rowBytes = (double)rowLen*esz;
-        const ptrdiff_t sstepL = std::abs(p.sstep[L]);
+        ধ্রুৱ int64 rowLen = p.size[L];
+        ধ্রুৱ দ্ৱিগুণ rowBytes = (দ্ৱিগুণ)rowLen*esz;
+        ধ্রুৱ ptrdiff_t sstepL = std::abs(p.sstep[L]);
         p.nrows = nrows;
         p.nchunks = 1;
         p.chunk = rowLen;
-        p.chunkMajor = false;
-        if (p.kind == KIND_STRIDED && L > 0 && nrows <= 64 && std::abs(p.sstep[L-1]) < sstepL &&
-            (double)rowLen*sstepL > 2.0*GATHER_BLOCK_BYTES)
+        p.chunkMajor = মিছা;
+        যদি (p.kind == KIND_STRIDED && L > 0 && nrows <= 64 && std::abs(p.sstep[L-1]) < sstepL &&
+            (দ্ৱিগুণ)rowLen*sstepL > 2.0*GATHER_BLOCK_BYTES)
         {
             // Rows reading interleaved source data (NHWC -> NCHW with a small C):
             // go chunk by chunk so that the rows share the cached source lines.
             p.chunk = std::max((int64)16, (int64)(GATHER_BLOCK_BYTES/sstepL));
             p.nchunks = (rowLen + p.chunk - 1)/p.chunk;
-            p.chunkMajor = true;
+            p.chunkMajor = সঁচা;
         }
-        else if (nrows < 64 && rowBytes >= 2.0*ROW_CHUNK_BYTES)
+        অন্যথা যদি (nrows < 64 && rowBytes >= 2.0*ROW_CHUNK_BYTES)
         {
             // few long rows: split them to have something to parallelize
             int64 nch = std::min((int64)(rowBytes/ROW_CHUNK_BYTES), (int64)1024);
@@ -324,88 +324,88 @@ static bool buildPlan(const View& s, const View& d, Plan& p)
         p.nitems = nrows*p.nchunks;
         p.cost = p.kind == KIND_MEMCPY ? bytes : bytes*4;
     }
-    return true;
+    ঘূৰাই সঁচা;
 }
 
-template<typename T> static inline bool isAligned(const void* s, const void* d, ptrdiff_t ss, ptrdiff_t ds)
+template<typename T> স্থির অন্তঃস্থ তার্কিক isAligned(ধ্রুৱ শূন্য* s, ধ্রুৱ শূন্য* d, ptrdiff_t ss, ptrdiff_t ds)
 {
-    return (((size_t)s | (size_t)d | (size_t)ss | (size_t)ds) & (alignof(T) - 1)) == 0;
+    ঘূৰাই (((size_t)s | (size_t)d | (size_t)ss | (size_t)ds) & (alignof(T) - 1)) == 0;
 }
 
-template<typename T> static void copyStrided_(const uchar* s, ptrdiff_t ss, uchar* d, ptrdiff_t ds, int64 n)
+template<typename T> স্থির শূন্য copyStrided_(ধ্রুৱ uchar* s, ptrdiff_t ss, uchar* d, ptrdiff_t ds, int64 n)
 {
     int64 i = 0;
-    for (; i + 4 <= n; i += 4)
+    বাবে (; i + 4 <= n; i += 4)
     {
-        T t0 = *(const T*)s, t1 = *(const T*)(s + ss);
-        T t2 = *(const T*)(s + ss*2), t3 = *(const T*)(s + ss*3);
+        T t0 = *(ধ্রুৱ T*)s, t1 = *(ধ্রুৱ T*)(s + ss);
+        T t2 = *(ধ্রুৱ T*)(s + ss*2), t3 = *(ধ্রুৱ T*)(s + ss*3);
         *(T*)d = t0; *(T*)(d + ds) = t1;
         *(T*)(d + ds*2) = t2; *(T*)(d + ds*3) = t3;
         s += ss*4;
         d += ds*4;
     }
-    for (; i < n; i++, s += ss, d += ds)
-        *(T*)d = *(const T*)s;
+    বাবে (; i < n; i++, s += ss, d += ds)
+        *(T*)d = *(ধ্রুৱ T*)s;
 }
 
-template<typename T> static void fill_(const uchar* s, uchar* d, ptrdiff_t ds, int64 n)
+template<typename T> স্থির শূন্য fill_(ধ্রুৱ uchar* s, uchar* d, ptrdiff_t ds, int64 n)
 {
-    const T v = *(const T*)s;
-    for (int64 i = 0; i < n; i++, d += ds)
+    ধ্রুৱ T v = *(ধ্রুৱ T*)s;
+    বাবে (int64 i = 0; i < n; i++, d += ds)
         *(T*)d = v;
 }
 
-struct Elem16 { uint64_t a, b; };
+সংরচনা Elem16 { uint64_t a, b; };
 
 // KIND_FILL and KIND_STRIDED
-static void copyRow(const Plan& p, const uchar* s, uchar* d, int64 n)
+স্থির শূন্য copyRow(ধ্রুৱ Plan& p, ধ্রুৱ uchar* s, uchar* d, int64 n)
 {
-    const size_t esz = p.esz;
-    const int L = p.dims - 1;
-    const ptrdiff_t ss = p.sstep[L], ds = p.dstep[L];
+    ধ্রুৱ size_t esz = p.esz;
+    ধ্রুৱ পূর্ণাঙ্ক L = p.dims - 1;
+    ধ্রুৱ ptrdiff_t ss = p.sstep[L], ds = p.dstep[L];
 
-    if (p.kind == KIND_FILL)
+    যদি (p.kind == KIND_FILL)
     {
-        if (esz == 1 && ds == 1)
+        যদি (esz == 1 && ds == 1)
             memset(d, *s, (size_t)n);
-        else if (esz == 2 && isAligned<uint16_t>(s, d, 0, ds))
+        অন্যথা যদি (esz == 2 && isAligned<uint16_t>(s, d, 0, ds))
             fill_<uint16_t>(s, d, ds, n);
-        else if (esz == 4 && isAligned<uint32_t>(s, d, 0, ds))
+        অন্যথা যদি (esz == 4 && isAligned<uint32_t>(s, d, 0, ds))
             fill_<uint32_t>(s, d, ds, n);
-        else if (esz == 8 && isAligned<uint64_t>(s, d, 0, ds))
+        অন্যথা যদি (esz == 8 && isAligned<uint64_t>(s, d, 0, ds))
             fill_<uint64_t>(s, d, ds, n);
-        else
-            for (int64 i = 0; i < n; i++, d += ds)
+        অন্যথা
+            বাবে (int64 i = 0; i < n; i++, d += ds)
                 memcpy(d, s, esz);
-        return;
+        ঘূৰাই;
     }
 
-    if (esz == 1)
+    যদি (esz == 1)
         copyStrided_<uchar>(s, ss, d, ds, n);
-    else if (esz == 2 && isAligned<uint16_t>(s, d, ss, ds))
+    অন্যথা যদি (esz == 2 && isAligned<uint16_t>(s, d, ss, ds))
         copyStrided_<uint16_t>(s, ss, d, ds, n);
-    else if (esz == 4 && isAligned<uint32_t>(s, d, ss, ds))
+    অন্যথা যদি (esz == 4 && isAligned<uint32_t>(s, d, ss, ds))
         copyStrided_<uint32_t>(s, ss, d, ds, n);
-    else if (esz == 8 && isAligned<uint64_t>(s, d, ss, ds))
+    অন্যথা যদি (esz == 8 && isAligned<uint64_t>(s, d, ss, ds))
         copyStrided_<uint64_t>(s, ss, d, ds, n);
-    else if (esz == 16 && isAligned<uint64_t>(s, d, ss, ds))
+    অন্যথা যদি (esz == 16 && isAligned<uint64_t>(s, d, ss, ds))
         copyStrided_<Elem16>(s, ss, d, ds, n);
-    else
-        for (int64 i = 0; i < n; i++, s += ss, d += ds)
+    অন্যথা
+        বাবে (int64 i = 0; i < n; i++, s += ss, d += ds)
             memcpy(d, s, esz);
 }
 
 // Offsets of the given flat index over the first `naxes` axes.
-static void decode(const Plan& p, int naxes, int64 idx, int64* counters,
-                   const uchar*& s, uchar*& d)
+স্থির শূন্য decode(ধ্রুৱ Plan& p, পূর্ণাঙ্ক naxes, int64 idx, int64* counters,
+                   ধ্রুৱ uchar*& s, uchar*& d)
 {
     s = p.src;
     d = p.dst;
-    for (int k = naxes - 1; k >= 0; k--)
+    বাবে (পূর্ণাঙ্ক k = naxes - 1; k >= 0; k--)
     {
         int64 q = idx / p.size[k];
         int64 i = idx - q*p.size[k];
-        if (counters)
+        যদি (counters)
             counters[k] = i;
         s += i*p.sstep[k];
         d += i*p.dstep[k];
@@ -413,61 +413,61 @@ static void decode(const Plan& p, int naxes, int64 idx, int64* counters,
     }
 }
 
-template<bool MEMCPY> static inline void copyRowT(const Plan& p, const uchar* s, uchar* d, int64 n)
+template<তার্কিক MEMCPY> স্থির অন্তঃস্থ শূন্য copyRowT(ধ্রুৱ Plan& p, ধ্রুৱ uchar* s, uchar* d, int64 n)
 {
-    if (MEMCPY)
+    যদি (MEMCPY)
         memcpy(d, s, (size_t)n*p.esz);
-    else
+    অন্যথা
         copyRow(p, s, d, n);
 }
 
-template<bool MEMCPY> static void runRows(const Plan& p, int64 i0, int64 i1)
+template<তার্কিক MEMCPY> স্থির শূন্য runRows(ধ্রুৱ Plan& p, int64 i0, int64 i1)
 {
-    const int L = p.dims - 1;
-    const int64 nch = p.nchunks, rowLen = p.size[L];
-    const ptrdiff_t sstepL = p.sstep[L], dstepL = p.dstep[L];
-    const uchar* s;
+    ধ্রুৱ পূর্ণাঙ্ক L = p.dims - 1;
+    ধ্রুৱ int64 nch = p.nchunks, rowLen = p.size[L];
+    ধ্রুৱ ptrdiff_t sstepL = p.sstep[L], dstepL = p.dstep[L];
+    ধ্রুৱ uchar* s;
     uchar* d;
 
-    if (p.chunkMajor)
+    যদি (p.chunkMajor)
     {
-        for (int64 it = i0; it < i1; it++)
+        বাবে (int64 it = i0; it < i1; it++)
         {
             int64 ch = it / p.nrows, row = it - ch*p.nrows;
             int64 e0 = ch*p.chunk, e1 = std::min(e0 + p.chunk, rowLen);
             decode(p, L, row, nullptr, s, d);
             copyRowT<MEMCPY>(p, s + e0*sstepL, d + e0*dstepL, e1 - e0);
         }
-        return;
+        ঘূৰাই;
     }
 
     int64 counters[MAX_VIEW_DIMS];
     int64 ch = i0 % nch;
     decode(p, L, i0 / nch, counters, s, d);
 
-    if (nch == 1 && L == 1)
+    যদি (nch == 1 && L == 1)
     {
-        const ptrdiff_t ss = p.sstep[0], ds = p.dstep[0];
-        for (int64 it = i0; it < i1; it++, s += ss, d += ds)
+        ধ্রুৱ ptrdiff_t ss = p.sstep[0], ds = p.dstep[0];
+        বাবে (int64 it = i0; it < i1; it++, s += ss, d += ds)
             copyRowT<MEMCPY>(p, s, d, rowLen);
-        return;
+        ঘূৰাই;
     }
 
-    for (int64 it = i0; it < i1; )
+    বাবে (int64 it = i0; it < i1; )
     {
         int64 chEnd = std::min(nch, ch + (i1 - it));
         int64 e0 = ch*p.chunk, e1 = std::min(chEnd*p.chunk, rowLen);
         copyRowT<MEMCPY>(p, s + e0*sstepL, d + e0*dstepL, e1 - e0);
         it += chEnd - ch;
-        if (chEnd < nch)
-            break;
+        যদি (chEnd < nch)
+            ভঙ্গ;
         ch = 0;
-        for (int k = L - 1; k >= 0; k--)
+        বাবে (পূর্ণাঙ্ক k = L - 1; k >= 0; k--)
         {
             s += p.sstep[k];
             d += p.dstep[k];
-            if (++counters[k] < p.size[k])
-                break;
+            যদি (++counters[k] < p.size[k])
+                ভঙ্গ;
             s -= p.size[k]*p.sstep[k];
             d -= p.size[k]*p.dstep[k];
             counters[k] = 0;
@@ -475,133 +475,133 @@ template<bool MEMCPY> static void runRows(const Plan& p, int64 i0, int64 i1)
     }
 }
 
-static void runTranspose(const Plan& p, int64 i0, int64 i1)
+স্থির শূন্য runTranspose(ধ্রুৱ Plan& p, int64 i0, int64 i1)
 {
-    const int A = p.dims - 2, B = p.dims - 1;
-    const int64 ntiles = p.tilesA*p.tilesB;
-    for (int64 it = i0; it < i1; it++)
+    ধ্রুৱ পূর্ণাঙ্ক A = p.dims - 2, B = p.dims - 1;
+    ধ্রুৱ int64 ntiles = p.tilesA*p.tilesB;
+    বাবে (int64 it = i0; it < i1; it++)
     {
         int64 o = it / ntiles, t = it - o*ntiles;
         int64 ta = t / p.tilesB, tb = t - ta*p.tilesB;
-        const uchar* s;
+        ধ্রুৱ uchar* s;
         uchar* d;
         decode(p, A, o, nullptr, s, d);
         int64 a0 = ta*TRANSPOSE_TILE, b0 = tb*TRANSPOSE_TILE;
-        int wa = (int)std::min((int64)TRANSPOSE_TILE, p.size[A] - a0);
-        int hb = (int)std::min((int64)TRANSPOSE_TILE, p.size[B] - b0);
+        পূর্ণাঙ্ক wa = (পূর্ণাঙ্ক)std::min((int64)TRANSPOSE_TILE, p.size[A] - a0);
+        পূর্ণাঙ্ক hb = (পূর্ণাঙ্ক)std::min((int64)TRANSPOSE_TILE, p.size[B] - b0);
         s += a0*p.sstep[A] + b0*p.sstep[B];
         d += a0*p.dstep[A] + b0*p.dstep[B];
-        if (cv_hal_transpose2d(s, (size_t)p.sstep[B], d, (size_t)p.dstep[A], wa, hb, (int)p.esz) == CV_HAL_ERROR_OK)
-            continue;
+        যদি (cv_hal_transpose2d(s, (size_t)p.sstep[B], d, (size_t)p.dstep[A], wa, hb, (পূর্ণাঙ্ক)p.esz) == CV_HAL_ERROR_OK)
+            অনুৱর্ত;
         p.tfunc(s, (size_t)p.sstep[B], d, (size_t)p.dstep[A], Size(wa, hb));
     }
 }
 
-static void runSplitMerge(const Plan& p, int64 i0, int64 i1)
+স্থির শূন্য runSplitMerge(ধ্রুৱ Plan& p, int64 i0, int64 i1)
 {
-    const int L = p.dims - 1;
-    const bool isSplit = p.kind == KIND_SPLIT;
-    const int C = isSplit ? L - 1 : L;    // the plane axis
-    const int X = isSplit ? L : L - 1;    // the long axis
-    const int cn = (int)p.size[C];
-    const size_t esz = p.esz;
-    for (int64 it = i0; it < i1; it++)
+    ধ্রুৱ পূর্ণাঙ্ক L = p.dims - 1;
+    ধ্রুৱ তার্কিক isSplit = p.kind == KIND_SPLIT;
+    ধ্রুৱ পূর্ণাঙ্ক C = isSplit ? L - 1 : L;    // the plane axis
+    ধ্রুৱ পূর্ণাঙ্ক X = isSplit ? L : L - 1;    // the long axis
+    ধ্রুৱ পূর্ণাঙ্ক cn = (পূর্ণাঙ্ক)p.size[C];
+    ধ্রুৱ size_t esz = p.esz;
+    বাবে (int64 it = i0; it < i1; it++)
     {
         int64 o = it / p.nchunks, ch = it - o*p.nchunks;
-        const uchar* s;
+        ধ্রুৱ uchar* s;
         uchar* d;
         decode(p, L - 1, o, nullptr, s, d);
-        const int64 e0 = ch*p.chunk;
-        const int len = (int)std::min(p.chunk, p.size[X] - e0);
+        ধ্রুৱ int64 e0 = ch*p.chunk;
+        ধ্রুৱ পূর্ণাঙ্ক len = (পূর্ণাঙ্ক)std::min(p.chunk, p.size[X] - e0);
         s += e0*p.sstep[X];
         d += e0*p.dstep[X];
-        if (isSplit)
+        যদি (isSplit)
         {
             uchar* dptr[4];
-            for (int c = 0; c < cn; c++)
+            বাবে (পূর্ণাঙ্ক c = 0; c < cn; c++)
                 dptr[c] = d + c*p.dstep[C];
-            if (esz == 1) hal::split8u(s, dptr, len, cn);
-            else if (esz == 2) hal::split16u((const ushort*)s, (ushort**)dptr, len, cn);
-            else if (esz == 4) hal::split32s((const int*)s, (int**)dptr, len, cn);
-            else hal::split64s((const int64*)s, (int64**)dptr, len, cn);
+            যদি (esz == 1) hal::split8u(s, dptr, len, cn);
+            অন্যথা যদি (esz == 2) hal::split16u((ধ্রুৱ ushort*)s, (ushort**)dptr, len, cn);
+            অন্যথা যদি (esz == 4) hal::split32s((ধ্রুৱ পূর্ণাঙ্ক*)s, (পূর্ণাঙ্ক**)dptr, len, cn);
+            অন্যথা hal::split64s((ধ্রুৱ int64*)s, (int64**)dptr, len, cn);
         }
-        else
+        অন্যথা
         {
-            const uchar* sptr[4];
-            for (int c = 0; c < cn; c++)
+            ধ্রুৱ uchar* sptr[4];
+            বাবে (পূর্ণাঙ্ক c = 0; c < cn; c++)
                 sptr[c] = s + c*p.sstep[C];
-            if (esz == 1) hal::merge8u(sptr, d, len, cn);
-            else if (esz == 2) hal::merge16u((const ushort**)sptr, (ushort*)d, len, cn);
-            else if (esz == 4) hal::merge32s((const int**)sptr, (int*)d, len, cn);
-            else hal::merge64s((const int64**)sptr, (int64*)d, len, cn);
+            যদি (esz == 1) hal::merge8u(sptr, d, len, cn);
+            অন্যথা যদি (esz == 2) hal::merge16u((ধ্রুৱ ushort**)sptr, (ushort*)d, len, cn);
+            অন্যথা যদি (esz == 4) hal::merge32s((ধ্রুৱ পূর্ণাঙ্ক**)sptr, (পূর্ণাঙ্ক*)d, len, cn);
+            অন্যথা hal::merge64s((ধ্রুৱ int64**)sptr, (int64*)d, len, cn);
         }
     }
 }
 
-static void runPlan(const Plan& p, int64 i0, int64 i1)
+স্থির শূন্য runPlan(ধ্রুৱ Plan& p, int64 i0, int64 i1)
 {
-    if (p.kind == KIND_SPLIT || p.kind == KIND_MERGE)
+    যদি (p.kind == KIND_SPLIT || p.kind == KIND_MERGE)
         runSplitMerge(p, i0, i1);
-    else if (p.kind == KIND_TRANSPOSE)
+    অন্যথা যদি (p.kind == KIND_TRANSPOSE)
         runTranspose(p, i0, i1);
-    else if (p.kind == KIND_MEMCPY)
-        runRows<true>(p, i0, i1);
-    else
-        runRows<false>(p, i0, i1);
+    অন্যথা যদি (p.kind == KIND_MEMCPY)
+        runRows<সঁচা>(p, i0, i1);
+    অন্যথা
+        runRows<মিছা>(p, i0, i1);
 }
 
 // Plans over the same rows (concat inputs, split outputs) run in lockstep, block by block,
 // so that the shared destination (or source) is accessed sequentially.
-static bool canRunInLockstep(const Plan* plans, size_t np)
+স্থির তার্কিক canRunInLockstep(ধ্রুৱ Plan* plans, size_t np)
 {
-    if (np < 2)
-        return false;
-    const Plan& p0 = plans[0];
-    for (size_t k = 0; k < np; k++)
+    যদি (np < 2)
+        ঘূৰাই মিছা;
+    ধ্রুৱ Plan& p0 = plans[0];
+    বাবে (size_t k = 0; k < np; k++)
     {
-        const Plan& p = plans[k];
-        if (p.kind == KIND_TRANSPOSE || p.kind == KIND_SPLIT || p.kind == KIND_MERGE ||
+        ধ্রুৱ Plan& p = plans[k];
+        যদি (p.kind == KIND_TRANSPOSE || p.kind == KIND_SPLIT || p.kind == KIND_MERGE ||
             p.chunkMajor || p.nchunks != 1 || p.dims != p0.dims)
-            return false;
-        for (int i = 0; i < p.dims - 1; i++)
-            if (p.size[i] != p0.size[i])
-                return false;
+            ঘূৰাই মিছা;
+        বাবে (পূর্ণাঙ্ক i = 0; i < p.dims - 1; i++)
+            যদি (p.size[i] != p0.size[i])
+                ঘূৰাই মিছা;
     }
-    return true;
+    ঘূৰাই সঁচা;
 }
 
-static void runPlans(const Plan* plans, size_t np)
+স্থির শূন্য runPlans(ধ্রুৱ Plan* plans, size_t np)
 {
-    if (np == 0)
-        return;
+    যদি (np == 0)
+        ঘূৰাই;
     AutoBuffer<int64, 16> ofs(np + 1);
     ofs[0] = 0;
-    double cost = 0, rowBytes = 0;
-    for (size_t k = 0; k < np; k++)
+    দ্ৱিগুণ cost = 0, rowBytes = 0;
+    বাবে (size_t k = 0; k < np; k++)
     {
         ofs[k+1] = ofs[k] + plans[k].nitems;
         cost += plans[k].cost;
-        rowBytes += (double)plans[k].size[plans[k].dims - 1]*plans[k].esz;
+        rowBytes += (দ্ৱিগুণ)plans[k].size[plans[k].dims - 1]*plans[k].esz;
     }
 
-    const bool lockstep = canRunInLockstep(plans, np);
-    const int64 total = lockstep ? plans[0].nrows : ofs[np];
-    const int64 blockRows = std::max((int64)1, (int64)(16*1024/std::max(rowBytes, 1.)));
+    ধ্রুৱ তার্কিক lockstep = canRunInLockstep(plans, np);
+    ধ্রুৱ int64 total = lockstep ? plans[0].nrows : ofs[np];
+    ধ্রুৱ int64 blockRows = std::max((int64)1, (int64)(16*1024/std::max(rowBytes, 1.)));
 
     auto body = [&](int64 a, int64 b)
     {
-        if (lockstep)
+        যদি (lockstep)
         {
-            for (int64 r = a; r < b; r += blockRows)
+            বাবে (int64 r = a; r < b; r += blockRows)
             {
                 int64 re = std::min(b, r + blockRows);
-                for (size_t k = 0; k < np; k++)
+                বাবে (size_t k = 0; k < np; k++)
                     runPlan(plans[k], r, re);
             }
-            return;
+            ঘূৰাই;
         }
         size_t k = std::upper_bound(ofs.data(), ofs.data() + np + 1, a) - ofs.data() - 1;
-        while (a < b)
+        যেতিয়ালৈ (a < b)
         {
             int64 e = std::min(b, ofs[k+1]);
             runPlan(plans[k], a - ofs[k], e - ofs[k]);
@@ -610,63 +610,63 @@ static void runPlans(const Plan* plans, size_t np)
         }
     };
 
-    if (cost < PARALLEL_MIN_COST || total < 2 || getNumThreads() <= 1)
+    যদি (cost < PARALLEL_MIN_COST || total < 2 || get_অঙ্ক_Threads() <= 1)
     {
         body(0, total);
-        return;
+        ঘূৰাই;
     }
 
     // grouped so that the range fits into int
-    const int64 ngroups = std::min(total, (int64)1 << 20);
-    const double nstripes = std::min((double)ngroups, std::max(2.0, cost/STRIPE_COST));
-    parallel_for_(Range(0, (int)ngroups), [&](const Range& r)
+    ধ্রুৱ int64 ngroups = std::min(total, (int64)1 << 20);
+    ধ্রুৱ দ্ৱিগুণ nstripes = std::min((দ্ৱিগুণ)ngroups, std::max(2.0, cost/STRIPE_COST));
+    parallel_for_(Range(0, (পূর্ণাঙ্ক)ngroups), [&](ধ্রুৱ Range& r)
     {
         body(r.start*total/ngroups, r.end*total/ngroups);
     }, nstripes);
 }
 
 // Address range [lo, hi) touched by the view.
-static void viewRange(const View& v, const uchar*& lo, const uchar*& hi)
+স্থির শূন্য viewRange(ধ্রুৱ View& v, ধ্রুৱ uchar*& lo, ধ্রুৱ uchar*& hi)
 {
     ptrdiff_t a = 0, b = 0;
-    for (int i = 0; i < v.dims; i++)
+    বাবে (পূর্ণাঙ্ক i = 0; i < v.dims; i++)
     {
         ptrdiff_t ext = (ptrdiff_t)(v.size[i] - 1)*v.step[i];
-        if (ext < 0) a += ext; else b += ext;
+        যদি (ext < 0) a += ext; অন্যথা b += ext;
     }
     lo = v.data + a;
     hi = v.data + b + v.esz;
 }
 
-static bool hasZeroSize(const View& v)
+স্থির তার্কিক hasZeroSize(ধ্রুৱ View& v)
 {
-    for (int i = 0; i < v.dims; i++)
-        if (v.size[i] == 0)
-            return true;
-    return false;
+    বাবে (পূর্ণাঙ্ক i = 0; i < v.dims; i++)
+        যদি (v.size[i] == 0)
+            ঘূৰাই সঁচা;
+    ঘূৰাই মিছা;
 }
 
-static bool sameMapping(const View& s, const View& d)
+স্থির তার্কিক sameMapping(ধ্রুৱ View& s, ধ্রুৱ View& d)
 {
-    if (s.data != d.data)
-        return false;
-    for (int i = 0; i < s.dims; i++)
-        if (s.size[i] > 1 && s.step[i] != d.step[i])
-            return false;
-    return true;
+    যদি (s.data != d.data)
+        ঘূৰাই মিছা;
+    বাবে (পূর্ণাঙ্ক i = 0; i < s.dims; i++)
+        যদি (s.size[i] > 1 && s.step[i] != d.step[i])
+            ঘূৰাই মিছা;
+    ঘূৰাই সঁচা;
 }
 
-static bool overlap(const View& s, const View& d)
+স্থির তার্কিক overlap(ধ্রুৱ View& s, ধ্রুৱ View& d)
 {
-    const uchar *slo, *shi, *dlo, *dhi;
+    ধ্রুৱ uchar *slo, *shi, *dlo, *dhi;
     viewRange(s, slo, shi);
     viewRange(d, dlo, dhi);
-    return slo < dhi && dlo < shi;
+    ঘূৰাই slo < dhi && dlo < shi;
 }
 
 } // namespace
 
-void copyBatch(const View* src, const View* dst, int n)
+শূন্য copyBatch(ধ্রুৱ View* src, ধ্রুৱ View* dst, পূর্ণাঙ্ক n)
 {
     CV_Assert(n >= 0);
     AutoBuffer<Plan, 4> plans(n);
@@ -674,29 +674,29 @@ void copyBatch(const View* src, const View* dst, int n)
     std::vector<AutoBuffer<uchar> > temps;
     temps.reserve(n);  // the views below point into the buffers, so they must not move
 
-    for (int i = 0; i < n; i++)
+    বাবে (পূর্ণাঙ্ক i = 0; i < n; i++)
     {
         View s = src[i];
-        const View& d = dst[i];
+        ধ্রুৱ View& d = dst[i];
         CV_CheckEQ(s.dims, d.dims, "nd::copy: the number of dimensions must match");
-        CV_CheckLE(s.dims, (int)MAX_VIEW_DIMS, "nd::copy: too many dimensions");
-        if (hasZeroSize(s) || sameMapping(s, d))
-            continue;
+        CV_CheckLE(s.dims, (পূর্ণাঙ্ক)MAX_VIEW_DIMS, "nd::copy: too many dimensions");
+        যদি (hasZeroSize(s) || sameMapping(s, d))
+            অনুৱর্ত;
         // All the copies run after this loop, so a source that overlaps any of the
         // destinations is saved first.
-        bool needTemp = false;
-        for (int j = 0; j < n && !needTemp; j++)
+        তার্কিক needTemp = মিছা;
+        বাবে (পূর্ণাঙ্ক j = 0; j < n && !needTemp; j++)
             needTemp = !hasZeroSize(dst[j]) && overlap(s, dst[j]);
-        if (needTemp)
+        যদি (needTemp)
         {
             size_t total = 1;
-            for (int k = 0; k < s.dims; k++)
+            বাবে (পূর্ণাঙ্ক k = 0; k < s.dims; k++)
                 total *= (size_t)s.size[k];
             temps.emplace_back(total*s.esz);
             View t = s;
             t.data = temps.back().data();
             ptrdiff_t st = (ptrdiff_t)s.esz;
-            for (int k = s.dims - 1; k >= 0; k--)
+            বাবে (পূর্ণাঙ্ক k = s.dims - 1; k >= 0; k--)
             {
                 t.step[k] = st;
                 st *= s.size[k];
@@ -704,13 +704,13 @@ void copyBatch(const View* src, const View* dst, int n)
             copy(s, t);
             s = t;
         }
-        if (buildPlan(s, d, plans[np]))
+        যদি (buildPlan(s, d, plans[np]))
             np++;
     }
     runPlans(plans.data(), np);
 }
 
-void copy(const View& src, const View& dst)
+শূন্য copy(ধ্রুৱ View& src, ধ্রুৱ View& dst)
 {
     copyBatch(&src, &dst, 1);
 }

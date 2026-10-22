@@ -6,13 +6,13 @@
 #ifndef SRC_PERSISTENCE_HPP
 #define SRC_PERSISTENCE_HPP
 
-#include <deque>
-#include <sstream>
-#include <string>
-#include <iterator>
+#অন্তর্ভাৱ <deque>
+#অন্তর্ভাৱ <sstream>
+#অন্তর্ভাৱ <string>
+#অন্তর্ভাৱ <iterator>
 
 #define USE_ZLIB 1
-#if USE_ZLIB
+#যদি USE_ZLIB
 #  ifndef _LFS64_LARGEFILE
 #    define _LFS64_LARGEFILE 0
 #  endif
@@ -20,18 +20,18 @@
 #    define _FILE_OFFSET_BITS 0
 #  endif
 #  include <zlib.h>
-#else
-typedef void* gzFile;
+#অন্যথা
+প্রকারনির্দেশ শূন্য* gzFile;
 #endif
 
 //=====================================================================================
 
-static const size_t PARSER_BASE64_BUFFER_SIZE = 1024U * 1024U / 8U;
-static const int CV_PERSISTENCE_MAX_DEPTH = 1024;
+স্থির ধ্রুৱ size_t PARSER_BASE64_BUFFER_SIZE = 1024U * 1024U / 8U;
+স্থির ধ্রুৱ পূর্ণাঙ্ক CV_PERSISTENCE_MAX_DEPTH = 1024;
 
-namespace base64 {
+নামাকাশ base64 {
 
-enum
+গণনা
 {
     HEADER_SIZE         = 24,
     ENCODED_HEADER_SIZE = 32
@@ -51,76 +51,76 @@ enum
 #define cv_isprint(c)     ((uchar)(c) >= (uchar)' ')
 #define cv_isprint_or_tab(c)  ((uchar)(c) >= (uchar)' ' || (c) == '\t')
 
-inline bool cv_isalnum(char c)
+অন্তঃস্থ তার্কিক cv_isalnum(ৱর্ণ c)
 {
-    return ('0' <= c && c <= '9') || ('a' <= c && c <= 'z') || ('A' <= c && c <= 'Z');
+    ঘূৰাই ('0' <= c && c <= '9') || ('a' <= c && c <= 'z') || ('A' <= c && c <= 'Z');
 }
 
-inline bool cv_isalpha(char c)
+অন্তঃস্থ তার্কিক cv_isalpha(ৱর্ণ c)
 {
-    return ('a' <= c && c <= 'z') || ('A' <= c && c <= 'Z');
+    ঘূৰাই ('a' <= c && c <= 'z') || ('A' <= c && c <= 'Z');
 }
 
-inline bool cv_isdigit(char c)
+অন্তঃস্থ তার্কিক cv_isdigit(ৱর্ণ c)
 {
-    return '0' <= c && c <= '9';
+    ঘূৰাই '0' <= c && c <= '9';
 }
 
-inline bool cv_isspace(char c)
+অন্তঃস্থ তার্কিক cv_isspace(ৱর্ণ c)
 {
-    return (9 <= c && c <= 13) || c == ' ';
+    ঘূৰাই (9 <= c && c <= 13) || c == ' ';
 }
 
-inline char* cv_skip_BOM(char* ptr)
+অন্তঃস্থ ৱর্ণ* cv_skip_BOM(ৱর্ণ* ptr)
 {
-    if((uchar)ptr[0] == 0xef && (uchar)ptr[1] == 0xbb && (uchar)ptr[2] == 0xbf) //UTF-8 BOM
+    যদি((uchar)ptr[0] == 0xef && (uchar)ptr[1] == 0xbb && (uchar)ptr[2] == 0xbf) //UTF-8 BOM
     {
-      return ptr + 3;
+      ঘূৰাই ptr + 3;
     }
-    return ptr;
+    ঘূৰাই ptr;
 }
 
-namespace cv
+নামাকাশ cv
 {
-namespace fs
+নামাকাশ fs
 {
-int strcasecmp(const char* str1, const char* str2);
-char* itoa( int _val, char* buffer, int /*radix*/ );
-char* itoa( int64_t _val, char* buffer, int /*radix*/, bool _signed );
-char* floatToString( char* buf, size_t bufSize, float value, bool halfprecision, bool explicitZero );
-char* doubleToString( char* buf, size_t bufSize, double value, bool explicitZero );
+পূর্ণাঙ্ক strcasecmp(ধ্রুৱ ৱর্ণ* str1, ধ্রুৱ ৱর্ণ* str2);
+ৱর্ণ* itoa( পূর্ণাঙ্ক _val, ৱর্ণ* buffer, পূর্ণাঙ্ক /*radix*/ );
+ৱর্ণ* itoa( int64_t _val, ৱর্ণ* buffer, পূর্ণাঙ্ক /*radix*/, তার্কিক _signed );
+ৱর্ণ* floatToString( ৱর্ণ* buf, size_t bufSize, ভিন্ন value, তার্কিক halfprecision, তার্কিক explicitZero );
+ৱর্ণ* doubleToString( ৱর্ণ* buf, size_t bufSize, দ্ৱিগুণ value, তার্কিক explicitZero );
 
-int calcStructSize( const char* dt, int initial_size );
-int calcElemSize( const char* dt, int initial_size );
-CV_DEPRECATED char* encodeFormat( int elem_type, char* dt );
-char* encodeFormat( int elem_type, char* dt, size_t dt_len );
-int decodeFormat( const char* dt, int* fmt_pairs, int max_len );
-int decodeSimpleFormat( const char* dt );
+পূর্ণাঙ্ক calcStructSize( ধ্রুৱ ৱর্ণ* dt, পূর্ণাঙ্ক initial_size );
+পূর্ণাঙ্ক calcElemSize( ধ্রুৱ ৱর্ণ* dt, পূর্ণাঙ্ক initial_size );
+CV_DEPRECATED ৱর্ণ* encodeFormat( পূর্ণাঙ্ক elem_type, ৱর্ণ* dt );
+ৱর্ণ* encodeFormat( পূর্ণাঙ্ক elem_type, ৱর্ণ* dt, size_t dt_len );
+পূর্ণাঙ্ক decodeFormat( ধ্রুৱ ৱর্ণ* dt, পূর্ণাঙ্ক* fmt_pairs, পূর্ণাঙ্ক max_len );
+পূর্ণাঙ্ক decodeSimpleFormat( ধ্রুৱ ৱর্ণ* dt );
 }
 
 
 #ifdef CV_STATIC_ANALYSIS
-#define CV_PARSE_ERROR_CPP(errmsg) do { (void)fs; abort(); } while (0)
-#else
+#define CV_PARSE_ERROR_CPP(errmsg) কৰা { (শূন্য)fs; abort(); } যেতিয়ালৈ (0)
+#অন্যথা
 #define CV_PARSE_ERROR_CPP( errmsg ) \
     fs->parseError( CV_Func, (errmsg), __FILE__, __LINE__ )
 #endif
 
 
-#define CV_PERSISTENCE_CHECK_END_OF_BUFFER_BUG_CPP() do { \
+#define CV_PERSISTENCE_CHECK_END_OF_BUFFER_BUG_CPP() কৰা { \
     CV_DbgAssert(ptr); \
-    if((ptr)[0] == 0 && (ptr) == fs->bufferEnd() - 1) CV_PARSE_ERROR_CPP("OpenCV persistence doesn't support very long lines"); \
-} while (0)
+    যদি((ptr)[0] == 0 && (ptr) == fs->bufferEnd() - 1) CV_PARSE_ERROR_CPP("OpenCV persistence doesn't support very long lines"); \
+} যেতিয়ালৈ (0)
 
 
-class FileStorageParser;
-class FileStorageEmitter;
+শ্ৰেণী FileStorageParser;
+শ্ৰেণী FileStorageEmitter;
 
-struct FStructData
+সংরচনা FStructData
 {
     FStructData() { indent = flags = 0; }
-    FStructData( const std::string& _struct_tag,
-                 int _struct_flags, int _struct_indent )
+    FStructData( ধ্রুৱ std::string& _struct_tag,
+                 পূর্ণাঙ্ক _struct_flags, পূর্ণাঙ্ক _struct_indent )
     {
         tag = _struct_tag;
         flags = _struct_flags;
@@ -128,88 +128,88 @@ struct FStructData
     }
 
     std::string tag;
-    int flags;
-    int indent;
+    পূর্ণাঙ্ক flags;
+    পূর্ণাঙ্ক indent;
 };
 
-class FileStorage_API
+শ্ৰেণী FileStorage_API
 {
-public:
-    virtual ~FileStorage_API();
-    virtual FileStorage* getFS() = 0;
+সার্ৱজনিক:
+    আভাস ~FileStorage_API();
+    আভাস FileStorage* getFS() = 0;
 
-    virtual int getFormat() const = 0;
+    আভাস পূর্ণাঙ্ক getFormat() ধ্রুৱ = 0;
 
-    virtual void puts( const char* str ) = 0;
-    virtual char* gets() = 0;
-    virtual bool eof() = 0;
-    virtual void setEof() = 0;
-    virtual void closeFile() = 0;
-    virtual void rewind() = 0;
-    virtual char* resizeWriteBuffer( char* ptr, int len ) = 0;
-    virtual char* bufferPtr() const = 0;
-    virtual char* bufferStart() const = 0;
-    virtual char* bufferEnd() const = 0;
-    virtual void setBufferPtr(char* ptr) = 0;
-    virtual char* flush() = 0;
-    virtual void setNonEmpty() = 0;
-    virtual int wrapMargin() const = 0;
+    আভাস শূন্য puts( ধ্রুৱ ৱর্ণ* str ) = 0;
+    আভাস ৱর্ণ* gets() = 0;
+    আভাস তার্কিক eof() = 0;
+    আভাস শূন্য setEof() = 0;
+    আভাস শূন্য closeFile() = 0;
+    আভাস শূন্য rewind() = 0;
+    আভাস ৱর্ণ* resizeWriteBuffer( ৱর্ণ* ptr, পূর্ণাঙ্ক len ) = 0;
+    আভাস ৱর্ণ* bufferPtr() ধ্রুৱ = 0;
+    আভাস ৱর্ণ* bufferStart() ধ্রুৱ = 0;
+    আভাস ৱর্ণ* bufferEnd() ধ্রুৱ = 0;
+    আভাস শূন্য setBufferPtr(ৱর্ণ* ptr) = 0;
+    আভাস ৱর্ণ* flush() = 0;
+    আভাস শূন্য setNonEmpty() = 0;
+    আভাস পূর্ণাঙ্ক wrapMargin() ধ্রুৱ = 0;
 
-    virtual FStructData& getCurrentStruct() = 0;
+    আভাস FStructData& getCurrentStruct() = 0;
 
-    virtual void convertToCollection( int type, FileNode& node ) = 0;
-    virtual FileNode addNode( FileNode& collection, const std::string& key,
-                               int type, const void* value=0, int len=-1 ) = 0;
-    virtual void finalizeCollection( FileNode& collection ) = 0;
-    virtual double strtod(char* ptr, char** endptr) = 0;
+    আভাস শূন্য convertToCollection( পূর্ণাঙ্ক type, File_গ্ৰন্থি& গ্ৰন্থি ) = 0;
+    আভাস File_গ্ৰন্থি add_গ্ৰন্থি( File_গ্ৰন্থি& collection, ধ্রুৱ std::string& চাবি,
+                               পূর্ণাঙ্ক type, ধ্রুৱ শূন্য* value=0, পূর্ণাঙ্ক len=-1 ) = 0;
+    আভাস শূন্য finalizeCollection( File_গ্ৰন্থি& collection ) = 0;
+    আভাস দ্ৱিগুণ strtod(ৱর্ণ* ptr, ৱর্ণ** endptr) = 0;
 
-    virtual char* parseBase64(char* ptr, int indent, FileNode& collection) = 0;
+    আভাস ৱর্ণ* parseBase64(ৱর্ণ* ptr, পূর্ণাঙ্ক indent, File_গ্ৰন্থি& collection) = 0;
     CV_NORETURN
-    virtual void parseError(const char* funcname, const std::string& msg,
-                            const char* filename, int lineno) = 0;
+    আভাস শূন্য parseError(ধ্রুৱ ৱর্ণ* funcname, ধ্রুৱ std::string& বাৰ্তা,
+                            ধ্রুৱ ৱর্ণ* filename, পূর্ণাঙ্ক lineno) = 0;
 
-private:
-    enum Base64State{
+গুপ্ত:
+    গণনা Base64State{
         Uncertain,
         NotUse,
         InUse,
     };
 
-    friend class cv::FileStorage::Impl;
-    friend class cv::FileStorage;
-    friend class JSONEmitter;
-    friend class XMLEmitter;
-    friend class YAMLEmitter;
+    friend শ্ৰেণী cv::FileStorage::Impl;
+    friend শ্ৰেণী cv::FileStorage;
+    friend শ্ৰেণী JSONEmitter;
+    friend শ্ৰেণী XMLEmitter;
+    friend শ্ৰেণী YAMLEmitter;
 
-    virtual void check_if_write_struct_is_delayed(bool change_type_to_base64 = false) = 0;
-    virtual void switch_to_Base64_state(Base64State state) = 0;
-    virtual Base64State get_state_of_writing_base64() = 0;
-    virtual int get_space() = 0;
+    আভাস শূন্য check_if_write_struct_is_delayed(তার্কিক change_type_to_base64 = মিছা) = 0;
+    আভাস শূন্য switch_to_Base64_state(Base64State state) = 0;
+    আভাস Base64State get_state_of_writing_base64() = 0;
+    আভাস পূর্ণাঙ্ক get_space() = 0;
 };
 
-class FileStorageEmitter
+শ্ৰেণী FileStorageEmitter
 {
-public:
-    virtual ~FileStorageEmitter() {}
+সার্ৱজনিক:
+    আভাস ~FileStorageEmitter() {}
 
-    virtual FStructData startWriteStruct( const FStructData& parent, const char* key,
-                                          int struct_flags, const char* type_name=0 ) = 0;
-    virtual void endWriteStruct(const FStructData& current_struct) = 0;
-    virtual void write(const char* key, int value) = 0;
-    virtual void write(const char* key, int64_t value) = 0;
-    virtual void write(const char* key, double value) = 0;
-    virtual void write(const char* key, const char* value, bool quote) = 0;
-    virtual void writeScalar(const char* key, const char* value) = 0;
-    virtual void writeComment(const char* comment, bool eol_comment) = 0;
-    virtual void startNextStream() = 0;
+    আভাস FStructData startWriteStruct( ধ্রুৱ FStructData& parent, ধ্রুৱ ৱর্ণ* চাবি,
+                                          পূর্ণাঙ্ক struct_flags, ধ্রুৱ ৱর্ণ* type_name=0 ) = 0;
+    আভাস শূন্য endWriteStruct(ধ্রুৱ FStructData& current_struct) = 0;
+    আভাস শূন্য লিখ(ধ্রুৱ ৱর্ণ* চাবি, পূর্ণাঙ্ক value) = 0;
+    আভাস শূন্য লিখ(ধ্রুৱ ৱর্ণ* চাবি, int64_t value) = 0;
+    আভাস শূন্য লিখ(ধ্রুৱ ৱর্ণ* চাবি, দ্ৱিগুণ value) = 0;
+    আভাস শূন্য লিখ(ধ্রুৱ ৱর্ণ* চাবি, ধ্রুৱ ৱর্ণ* value, তার্কিক quote) = 0;
+    আভাস শূন্য writeScalar(ধ্রুৱ ৱর্ণ* চাবি, ধ্রুৱ ৱর্ণ* value) = 0;
+    আভাস শূন্য writeComment(ধ্রুৱ ৱর্ণ* comment, তার্কিক eol_comment) = 0;
+    আভাস শূন্য startNextStream() = 0;
 };
 
-class FileStorageParser
+শ্ৰেণী FileStorageParser
 {
-public:
-    virtual ~FileStorageParser() {}
-    virtual bool parse(char* ptr) = 0;
-    virtual bool getBase64Row(char* ptr, int indent, char* &beg, char* &end) = 0;
+সার্ৱজনিক:
+    আভাস ~FileStorageParser() {}
+    আভাস তার্কিক parse(ৱর্ণ* ptr) = 0;
+    আভাস তার্কিক getBase64Row(ৱর্ণ* ptr, পূর্ণাঙ্ক indent, ৱর্ণ* &beg, ৱর্ণ* &end) = 0;
 };
 
 Ptr<FileStorageEmitter> createXMLEmitter(FileStorage_API* fs);

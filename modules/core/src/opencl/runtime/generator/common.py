@@ -1,5 +1,5 @@
-from __future__ import print_function
-import sys, os, re
+তঃ __future__ আনযন print_function
+আনযন sys, os, re
 
 #
 # Parser helpers
@@ -8,107 +8,107 @@ import sys, os, re
 def remove_comments(s):
     def replacer(match):
         s = match.group(0)
-        if s.startswith('/'):
-            return ""
-        else:
-            return s
+        যদি s.startswith('/'):
+            ঘূৰাই ""
+        অন্যথা:
+            ঘূৰাই s
     pattern = re.compile(
         r'//.*?$|/\*.*?\*/|\'(?:\\.|[^\\\'])*\'|"(?:\\.|[^\\"])*"',
         re.DOTALL | re.MULTILINE
     )
-    return re.sub(pattern, replacer, s)
+    ঘূৰাই re.sub(pattern, replacer, s)
 
 
 def getTokens(s):
-    return re.findall(r'[a-z_A-Z0-9_]+|[^[a-z_A-Z0-9_ \n\r\t]', s)
+    ঘূৰাই re.findall(r'[a-z_A-Z0-9_]+|[^[a-z_A-Z0-9_ \n\r\t]', s)
 
 
 def getParameter(pos, tokens):
     deep = 0
     p = []
-    while True:
-        if pos >= len(tokens):
-            break
-        if (tokens[pos] == ')' or tokens[pos] == ',') and deep == 0:
-            if tokens[pos] == ')':
+    যেতিয়ালৈ সঁচা:
+        যদি pos >= len(tokens):
+            ভঙ্গ
+        যদি (tokens[pos] == ')' বা tokens[pos] == ',') আৰু deep == 0:
+            যদি tokens[pos] == ')':
                 pos = len(tokens)
-            else:
+            অন্যথা:
                 pos += 1
-            break
-        if tokens[pos] == '(':
+            ভঙ্গ
+        যদি tokens[pos] == '(':
             deep += 1
-        if tokens[pos] == ')':
+        যদি tokens[pos] == ')':
             deep -= 1
         p.append(tokens[pos])
         pos += 1
-    return (' '.join(p), pos)
+    ঘূৰাই (' '.join(p), pos)
 
 
 def getParameters(i, tokens):
-    assert tokens[i] == '('
+    প্রতিজ্ঞা tokens[i] == '('
     i += 1
 
     params = []
-    while True:
-        if i >= len(tokens) or tokens[i] == ')':
-            break
+    যেতিয়ালৈ সঁচা:
+        যদি i >= len(tokens) বা tokens[i] == ')':
+            ভঙ্গ
 
         (param, i) = getParameter(i, tokens)
-        if len(param) > 0:
+        যদি len(param) > 0:
             params.append(param)
-        else:
-            assert False
-            break
+        অন্যথা:
+            প্রতিজ্ঞা মিছা
+            ভঙ্গ
 
-    if len(params) > 0 and params[0] == 'void':
+    যদি len(params) > 0 আৰু params[0] == 'void':
         del params[0]
 
-    return params
+    ঘূৰাই params
 
 def postProcessParameters(fns):
-    fns.sort(key=lambda x: x['name'])
-    for fn in fns:
+    fns.sort(চাবি=অনামন্ x: x['name'])
+    বাবে fn অন্তঃ fns:
         fn['params_full'] = list(fn['params'])
-        for i in range(len(fn['params'])):
+        বাবে i অন্তঃ range(len(fn['params'])):
             p = fn['params'][i]
-            if p.find('(') != -1:
+            যদি p.find('(') != -1:
                 p = re.sub(r'\* *([a-zA-Z0-9_]*) ?\)', '*)', p, 1)
                 fn['params'][i] = p
-                continue
+                অনুৱর্ত
             parts = re.findall(r'[a-z_A-Z0-9]+|\*', p)
-            if len(parts) > 1:
-                if parts[-1].find('*') == -1:
+            যদি len(parts) > 1:
+                যদি parts[-1].find('*') == -1:
                     del parts[-1]
             fn['params'][i] = ' '.join(parts)
 
 def readFunctionFilter(fns, fileName):
-    try:
+    যত্ন:
         f = open(fileName, "r")
-    except:
+    অপৱাদ:
         print("ERROR: Can't open filter file: %s" % fileName)
-        return 0
+        ঘূৰাই 0
 
-    count = 0
-    while f:
-        line = f.readline()
-        if not line:
-            break
-        assert isinstance(line, str)
-        if line.startswith('#') or line.startswith('//'):
-            continue
-        line = line.replace('\n', '')
-        if len(line) == 0:
-            continue
-        found = False
-        for fn in fns:
-            if fn['name'] == line:
-                found = True
-                fn['enabled'] = True
-        if not found:
-            sys.exit("FATAL ERROR: Unknown function: %s" % line)
-        count = count + 1
+    গুনতি_2 = 0
+    যেতিয়ালৈ f:
+        সাৰি = f.readline()
+        যদি নহয় সাৰি:
+            ভঙ্গ
+        প্রতিজ্ঞা isinstance(সাৰি, str)
+        যদি সাৰি.startswith('#') বা সাৰি.startswith('//'):
+            অনুৱর্ত
+        সাৰি = সাৰি.replace('\n', '')
+        যদি len(সাৰি) == 0:
+            অনুৱর্ত
+        found = মিছা
+        বাবে fn অন্তঃ fns:
+            যদি fn['name'] == সাৰি:
+                found = সঁচা
+                fn['enabled'] = সঁচা
+        যদি নহয় found:
+            sys.exit("FATAL ERROR: Unknown function: %s" % সাৰি)
+        গুনতি_2 = গুনতি_2 + 1
     f.close()
-    return count
+    ঘূৰাই গুনতি_2
 
 #
 # Generator helpers
@@ -116,11 +116,11 @@ def readFunctionFilter(fns, fileName):
 
 def outputToString(f):
     def wrapped(*args, **kwargs):
-        from io import StringIO
+        তঃ io আনযন StringIO
         old_stdout = sys.stdout
         sys.stdout = str_stdout = StringIO()
         res = f(*args, **kwargs)
-        assert res is None
+        প্রতিজ্ঞা res is None
         sys.stdout = old_stdout
         result = str_stdout.getvalue()
         result = re.sub(r'([^\n /]) [ ]+', r'\1 ', result)  # don't remove spaces at start of line
@@ -128,36 +128,36 @@ def outputToString(f):
         result = re.sub(r' \*', '*', result)
         result = re.sub(r'\( ', '(', result)
         result = re.sub(r' \)', ')', result)
-        return result
-    return wrapped
+        ঘূৰাই result
+    ঘূৰাই wrapped
 
 @outputToString
 def generateFilterNames(fns):
-    for fn in fns:
-        print('%s%s' % ('' if 'enabled' in fn else '//', fn['name']))
+    বাবে fn অন্তঃ fns:
+        print('%s%s' % ('' যদি 'enabled' অন্তঃ fn অন্যথা '//', fn['name']))
     print('#total %d' % len(fns))
 
 callback_check = re.compile(r'([^\(]*\(.*)(\* *)(\).*\(.*\))')
 
 def getTypeWithParam(t, p):
-    if callback_check.match(t):
-        return callback_check.sub(r'\1 *' + p + r'\3', t)
-    return t + ' ' + p
+    যদি callback_check.match(t):
+        ঘূৰাই callback_check.sub(r'\1 *' + p + r'\3', t)
+    ঘূৰাই t + ' ' + p
 
 @outputToString
 def generateStructDefinitions(fns, lprefix='opencl_fn', enumprefix='OPENCL_FN'):
     print('// generated by %s' % os.path.basename(sys.argv[0]))
-    for fn in fns:
-        commentStr = '' if 'enabled' in fn else '//'
+    বাবে fn অন্তঃ fns:
+        commentStr = '' যদি 'enabled' অন্তঃ fn অন্যথা '//'
         decl_args = []
-        for (i, t) in enumerate(fn['params']):
+        বাবে (i, t) অন্তঃ enumerate(fn['params']):
             decl_args.append(getTypeWithParam(t, 'p%d' % (i+1)))
         decl_args_str = '(' + (', '.join(decl_args)) + ')'
         print('%s%s%d(%s_%s, %s, %s)' % \
              (commentStr, lprefix, len(fn['params']), enumprefix, fn['name'], \
              ' '.join(fn['ret']), decl_args_str))
         print(commentStr + ('%s%s (%s *%s)(%s) =\n%s        %s_%s_switch_fn;' % \
-            ((' '.join(fn['modifiers'] + ' ') if len(fn['modifiers']) > 0 else ''),
+            ((' '.join(fn['modifiers'] + ' ') যদি len(fn['modifiers']) > 0 অন্যথা ''),
              ' '.join(fn['ret']), ' '.join(fn['calling']), fn['name'], ', '.join(fn['params']), \
              commentStr, enumprefix, fn['name'])))
         print(commentStr + ('static const struct DynamicFnEntry %s_definition = { "%s", (void**)&%s};' % (fn['name'], fn['name'], fn['name'])))
@@ -166,14 +166,14 @@ def generateStructDefinitions(fns, lprefix='opencl_fn', enumprefix='OPENCL_FN'):
 @outputToString
 def generateStaticDefinitions(fns):
     print('// generated by %s' % os.path.basename(sys.argv[0]))
-    for fn in fns:
-        commentStr = '' if 'enabled' in fn else '//'
+    বাবে fn অন্তঃ fns:
+        commentStr = '' যদি 'enabled' অন্তঃ fn অন্যথা '//'
         decl_args = []
-        for (i, t) in enumerate(fn['params']):
+        বাবে (i, t) অন্তঃ enumerate(fn['params']):
             decl_args.append(getTypeWithParam(t, 'p%d' % (i+1)))
         decl_args_str = '(' + (', '.join(decl_args)) + ')'
         print(commentStr + ('CL_RUNTIME_EXPORT %s%s (%s *%s_pfn)(%s) = %s;' % \
-            ((' '.join(fn['modifiers'] + ' ') if len(fn['modifiers']) > 0 else ''),
+            ((' '.join(fn['modifiers'] + ' ') যদি len(fn['modifiers']) > 0 অন্যথা ''),
              ' '.join(fn['ret']), ' '.join(fn['calling']), fn['name'], ', '.join(fn['params']), \
              fn['name'])))
 
@@ -181,52 +181,52 @@ def generateStaticDefinitions(fns):
 def generateListOfDefinitions(fns, name='opencl_fn_list'):
     print('// generated by %s' % os.path.basename(sys.argv[0]))
     print('static const struct DynamicFnEntry* %s[] = {' % (name))
-    for fn in fns:
-        commentStr = '' if 'enabled' in fn else '//'
-        if 'enabled' in fn:
+    বাবে fn অন্তঃ fns:
+        commentStr = '' যদি 'enabled' অন্তঃ fn অন্যথা '//'
+        যদি 'enabled' অন্তঃ fn:
             print('    &%s_definition,' % (fn['name']))
-        else:
+        অন্যথা:
             print('    NULL/*&%s_definition*/,' % (fn['name']))
-        first = False
+        first = মিছা
     print('};')
 
 @outputToString
 def generateEnums(fns, prefix='OPENCL_FN'):
     print('// generated by %s' % os.path.basename(sys.argv[0]))
     print('enum %s_ID {' % prefix)
-    for (i, fn) in enumerate(fns):
-        commentStr = '' if 'enabled' in fn else '//'
+    বাবে (i, fn) অন্তঃ enumerate(fns):
+        commentStr = '' যদি 'enabled' অন্তঃ fn অন্যথা '//'
         print(commentStr + ('    %s_%s = %d,' % (prefix, fn['name'], i)))
     print('};')
 
 @outputToString
 def generateRemapOrigin(fns):
     print('// generated by %s' % os.path.basename(sys.argv[0]))
-    for fn in fns:
+    বাবে fn অন্তঃ fns:
         print('#define %s %s_' % (fn['name'], fn['name']))
 
 @outputToString
 def generateRemapDynamic(fns):
     print('// generated by %s' % os.path.basename(sys.argv[0]))
-    for fn in fns:
+    বাবে fn অন্তঃ fns:
         print('#undef %s' % (fn['name']))
-        commentStr = '' if 'enabled' in fn else '//'
+        commentStr = '' যদি 'enabled' অন্তঃ fn অন্যথা '//'
         print(commentStr + ('#define %s %s_pfn' % (fn['name'], fn['name'])))
 
 @outputToString
 def generateFnDeclaration(fns):
     print('// generated by %s' % os.path.basename(sys.argv[0]))
-    for fn in fns:
-        commentStr = '' if 'enabled' in fn else '//'
+    বাবে fn অন্তঃ fns:
+        commentStr = '' যদি 'enabled' অন্তঃ fn অন্যথা '//'
         print(commentStr + ('extern CL_RUNTIME_EXPORT %s %s (%s *%s)(%s);' % (' '.join(fn['modifiers']), ' '.join(fn['ret']), ' '.join(fn['calling']),
-                                  fn['name'], ', '.join(fn['params'] if 'params_full' not in fn else fn['params_full']))))
+                                  fn['name'], ', '.join(fn['params'] যদি 'params_full' নহয় অন্তঃ fn অন্যথা fn['params_full']))))
 
 @outputToString
 def generateTemplates(total, lprefix, switch_name, calling_convention=''):
     print('// generated by %s' % os.path.basename(sys.argv[0]))
-    for sz in range(total):
+    বাবে sz অন্তঃ range(total):
         template_params = ['ID', '_R', 'decl_args']
-        params = ['p%d' % (i + 1) for i in range(0, sz)]
+        params = ['p%d' % (i + 1) বাবে i অন্তঃ range(0, sz)]
         print('#define %s%d(%s) \\' % (lprefix, sz, ', '.join(template_params)))
         print('    typedef _R (%s *ID##FN)decl_args; \\' % (calling_convention))
         print('    static _R %s ID##_switch_fn decl_args \\' % (calling_convention))
@@ -236,39 +236,39 @@ def generateTemplates(total, lprefix, switch_name, calling_convention=''):
 @outputToString
 def generateInlineWrappers(fns):
     print('// generated by %s' % os.path.basename(sys.argv[0]))
-    for fn in fns:
-        commentStr = '' if 'enabled' in fn else '//'
+    বাবে fn অন্তঃ fns:
+        commentStr = '' যদি 'enabled' অন্তঃ fn অন্যথা '//'
         print('#undef %s' % (fn['name']))
         print(commentStr + ('#define %s %s_fn' % (fn['name'], fn['name'])))
         params = []
         call_params = []
-        for i in range(0, len(fn['params'])):
+        বাবে i অন্তঃ range(0, len(fn['params'])):
             t = fn['params'][i]
-            if t.find('*)') >= 0:
+            যদি t.find('*)') >= 0:
                 p = re.sub(r'\*\)', (' *p%d)' % i), t, 1)
                 params.append(p)
-            else:
+            অন্যথা:
                 params.append('%s p%d' % (t, i))
             call_params.append('p%d' % (i))
 
-        if len(fn['ret']) == 1 and fn['ret'][0] == 'void':
+        যদি len(fn['ret']) == 1 আৰু fn['ret'][0] == 'void':
             print(commentStr + ('inline void %s(%s) { %s_pfn(%s); }' \
                     % (fn['name'], ', '.join(params), fn['name'], ', '.join(call_params))))
-        else:
+        অন্যথা:
             print(commentStr + ('inline %s %s(%s) { return %s_pfn(%s); }' \
                     % (' '.join(fn['ret']), fn['name'], ', '.join(params), fn['name'], ', '.join(call_params))))
 
-def ProcessTemplate(inputFile, ctx, noteLine='//\n// AUTOGENERATED, DO NOT EDIT\n//'):
-    f = open(inputFile, "r")
-    if noteLine:
-        print(noteLine)
-    for line in f:
-        if line.startswith('@'):
-            assert line[-1] == '\n'
-            line = line[:-1]  # remove '\n'
-            assert line[-1] == '@'
-            name = line[1:-1]
-            assert name in ctx, name
-            line = ctx[name] + ('\n' if len(ctx[name]) > 0 and ctx[name][-1] != '\n' else '')
-        sys.stdout.write(line)
+def ProcessTemplate(প্ৰবেশ_File, ctx, note_সাৰি='//\n// AUTOGENERATED, DO NOT EDIT\n//'):
+    f = open(প্ৰবেশ_File, "r")
+    যদি note_সাৰি:
+        print(note_সাৰি)
+    বাবে সাৰি অন্তঃ f:
+        যদি সাৰি.startswith('@'):
+            প্রতিজ্ঞা সাৰি[-1] == '\n'
+            সাৰি = সাৰি[:-1]  # remove '\n'
+            প্রতিজ্ঞা সাৰি[-1] == '@'
+            name = সাৰি[1:-1]
+            প্রতিজ্ঞা name অন্তঃ ctx, name
+            সাৰি = ctx[name] + ('\n' যদি len(ctx[name]) > 0 আৰু ctx[name][-1] != '\n' অন্যথা '')
+        sys.stdout.লিখ(সাৰি)
     f.close()

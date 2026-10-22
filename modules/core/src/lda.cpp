@@ -16,174 +16,174 @@
  *   See <http://www.opensource.org/licenses/bsd-license>
  */
 
-#include "precomp.hpp"
-#include <iostream>
-#include <map>
-#include <set>
+#অন্তর্ভাৱ "precomp.hpp"
+#অন্তর্ভাৱ <iostream>
+#অন্তর্ভাৱ <map>
+#অন্তর্ভাৱ <set>
 
-namespace cv
+নামাকাশ cv
 {
 
 // Removes duplicate elements in a given vector.
 template<typename _Tp>
-inline std::vector<_Tp> remove_dups(const std::vector<_Tp>& src) {
-    typedef typename std::set<_Tp>::const_iterator constSetIterator;
-    typedef typename std::vector<_Tp>::const_iterator constVecIterator;
+অন্তঃস্থ std::vector<_Tp> remove_dups(ধ্রুৱ std::vector<_Tp>& src) {
+    প্রকারনির্দেশ typename std::set<_Tp>::const_iterator constSetIterator;
+    প্রকারনির্দেশ typename std::vector<_Tp>::const_iterator constVecIterator;
     std::set<_Tp> set_elems;
-    for (constVecIterator it = src.begin(); it != src.end(); ++it)
+    বাবে (constVecIterator it = src.begin(); it != src.end(); ++it)
         set_elems.insert(*it);
     std::vector<_Tp> elems;
-    for (constSetIterator it = set_elems.begin(); it != set_elems.end(); ++it)
+    বাবে (constSetIterator it = set_elems.begin(); it != set_elems.end(); ++it)
         elems.push_back(*it);
-    return elems;
+    ঘূৰাই elems;
 }
 
-static Mat argsort(InputArray _src, bool ascending=true)
+স্থির Mat argsort(প্ৰবেশ_Array _src, তার্কিক ascending=সঁচা)
 {
     Mat src = _src.getMat();
-    if (src.rows != 1 && src.cols != 1) {
+    যদি (src.rows != 1 && src.cols != 1) {
         String error_message = "Wrong shape of input matrix! Expected a matrix with one row or column.";
         CV_Error(Error::StsBadArg, error_message);
     }
-    int flags = SORT_EVERY_ROW | (ascending ? SORT_ASCENDING : SORT_DESCENDING);
+    পূর্ণাঙ্ক flags = SORT_EVERY_ROW | (ascending ? SORT_ASCENDING : SORT_DESCENDING);
     Mat sorted_indices;
     sortIdx(src.reshape(1,1),sorted_indices,flags);
-    return sorted_indices;
+    ঘূৰাই sorted_indices;
 }
 
-static Mat asRowMatrix(InputArrayOfArrays src, int rtype, double alpha=1, double beta=0) {
+স্থির Mat asRowMatrix(প্ৰবেশ_Array_Of_Arrays src, পূর্ণাঙ্ক rtype, দ্ৱিগুণ alpha=1, দ্ৱিগুণ beta=0) {
     // make sure the input data is a vector of matrices or vector of vector
-    if(src.kind() != _InputArray::STD_VECTOR_MAT && src.kind() != _InputArray::STD_ARRAY_MAT &&
-        src.kind() != _InputArray::STD_VECTOR_VECTOR) {
+    যদি(src.kind() != প্ৰবেশ_Array_2::STD_VECTOR_MAT && src.kind() != প্ৰবেশ_Array_2::STD_ARRAY_MAT &&
+        src.kind() != প্ৰবেশ_Array_2::STD_VECTOR_VECTOR) {
         String error_message = "The data is expected as InputArray::STD_VECTOR_MAT (a std::vector<Mat>) or _InputArray::STD_VECTOR_VECTOR (a std::vector< std::vector<...> >).";
         CV_Error(Error::StsBadArg, error_message);
     }
     // number of samples
     size_t n = src.total();
     // return empty matrix if no matrices given
-    if(n == 0)
-        return Mat();
+    যদি(n == 0)
+        ঘূৰাই Mat();
     // dimensionality of (reshaped) samples
     size_t d = src.getMat(0).total();
     // create data matrix
-    Mat data((int)n, (int)d, rtype);
+    Mat data((পূর্ণাঙ্ক)n, (পূর্ণাঙ্ক)d, rtype);
     // now copy data
-    for(int i = 0; i < (int)n; i++) {
+    বাবে(পূর্ণাঙ্ক i = 0; i < (পূর্ণাঙ্ক)n; i++) {
         // make sure data can be reshaped, throw exception if not!
-        if(src.getMat(i).total() != d) {
-            String error_message = format("Wrong number of elements in matrix #%d! Expected %d was %d.", i, (int)d, (int)src.getMat(i).total());
+        যদি(src.getMat(i).total() != d) {
+            String error_message = format("Wrong number of elements in matrix #%d! Expected %d was %d.", i, (পূর্ণাঙ্ক)d, (পূর্ণাঙ্ক)src.getMat(i).total());
             CV_Error(Error::StsBadArg, error_message);
         }
         // get a hold of the current row
         Mat xi = data.row(i);
         // make reshape happy by cloning for non-continuous matrices
-        if(src.getMat(i).isContinuous()) {
+        যদি(src.getMat(i).isContinuous()) {
             src.getMat(i).reshape(1, 1).convertTo(xi, rtype, alpha, beta);
-        } else {
+        } অন্যথা {
             src.getMat(i).clone().reshape(1, 1).convertTo(xi, rtype, alpha, beta);
         }
     }
-    return data;
+    ঘূৰাই data;
 }
 
-static void sortMatrixColumnsByIndices(InputArray _src, InputArray _indices, OutputArray _dst) {
-    if(_indices.getMat().type() != CV_32SC1) {
+স্থির শূন্য sortMatrixColumnsByIndices(প্ৰবেশ_Array _src, প্ৰবেশ_Array _indices, OutputArray _dst) {
+    যদি(_indices.getMat().type() != CV_32SC1) {
         CV_Error(Error::StsUnsupportedFormat, "cv::sortColumnsByIndices only works on integer indices!");
     }
     Mat src = _src.getMat();
-    std::vector<int> indices = _indices.getMat();
+    std::vector<পূর্ণাঙ্ক> indices = _indices.getMat();
     _dst.create(src.rows, src.cols, src.type());
     Mat dst = _dst.getMat();
-    for(size_t idx = 0; idx < indices.size(); idx++) {
+    বাবে(size_t idx = 0; idx < indices.size(); idx++) {
         Mat originalCol = src.col(indices[idx]);
-        Mat sortedCol = dst.col((int)idx);
+        Mat sortedCol = dst.col((পূর্ণাঙ্ক)idx);
         originalCol.copyTo(sortedCol);
     }
 }
 
-static Mat sortMatrixColumnsByIndices(InputArray src, InputArray indices) {
+স্থির Mat sortMatrixColumnsByIndices(প্ৰবেশ_Array src, প্ৰবেশ_Array indices) {
     Mat dst;
     sortMatrixColumnsByIndices(src, indices, dst);
-    return dst;
+    ঘূৰাই dst;
 }
 
 
-template<typename _Tp> static bool
-isSymmetric_(InputArray src) {
+template<typename _Tp> স্থির তার্কিক
+isSymmetric_(প্ৰবেশ_Array src) {
     Mat _src = src.getMat();
-    if(_src.cols != _src.rows)
-        return false;
-    for (int i = 0; i < _src.rows; i++) {
-        for (int j = 0; j < _src.cols; j++) {
+    যদি(_src.cols != _src.rows)
+        ঘূৰাই মিছা;
+    বাবে (পূর্ণাঙ্ক i = 0; i < _src.rows; i++) {
+        বাবে (পূর্ণাঙ্ক j = 0; j < _src.cols; j++) {
             _Tp a = _src.at<_Tp> (i, j);
             _Tp b = _src.at<_Tp> (j, i);
-            if (a != b) {
-                return false;
+            যদি (a != b) {
+                ঘূৰাই মিছা;
             }
         }
     }
-    return true;
+    ঘূৰাই সঁচা;
 }
 
-template<typename _Tp> static bool
-isSymmetric_(InputArray src, double eps) {
+template<typename _Tp> স্থির তার্কিক
+isSymmetric_(প্ৰবেশ_Array src, দ্ৱিগুণ eps) {
     Mat _src = src.getMat();
-    if(_src.cols != _src.rows)
-        return false;
-    for (int i = 0; i < _src.rows; i++) {
-        for (int j = 0; j < _src.cols; j++) {
+    যদি(_src.cols != _src.rows)
+        ঘূৰাই মিছা;
+    বাবে (পূর্ণাঙ্ক i = 0; i < _src.rows; i++) {
+        বাবে (পূর্ণাঙ্ক j = 0; j < _src.cols; j++) {
             _Tp a = _src.at<_Tp> (i, j);
             _Tp b = _src.at<_Tp> (j, i);
-            if (std::abs(a - b) > eps) {
-                return false;
+            যদি (std::abs(a - b) > eps) {
+                ঘূৰাই মিছা;
             }
         }
     }
-    return true;
+    ঘূৰাই সঁচা;
 }
 
-static bool isSymmetric(InputArray src, double eps=1e-16)
+স্থির তার্কিক isSymmetric(প্ৰবেশ_Array src, দ্ৱিগুণ eps=1e-16)
 {
     Mat m = src.getMat();
-    switch (m.type()) {
-        case CV_8SC1: return isSymmetric_<char>(m); break;
-        case CV_8UC1:
-            return isSymmetric_<unsigned char>(m); break;
-        case CV_16SC1:
-            return isSymmetric_<short>(m); break;
-        case CV_16UC1:
-            return isSymmetric_<unsigned short>(m); break;
-        case CV_32SC1:
-            return isSymmetric_<int>(m); break;
-        case CV_32FC1:
-            return isSymmetric_<float>(m, eps); break;
-        case CV_64FC1:
-            return isSymmetric_<double>(m, eps); break;
-        default:
-            break;
+    ৱিকল্প (m.type()) {
+        পক্ষ CV_8SC1: ঘূৰাই isSymmetric_<ৱর্ণ>(m); ভঙ্গ;
+        পক্ষ CV_8UC1:
+            ঘূৰাই isSymmetric_<unsigned ৱর্ণ>(m); ভঙ্গ;
+        পক্ষ CV_16SC1:
+            ঘূৰাই isSymmetric_<short>(m); ভঙ্গ;
+        পক্ষ CV_16UC1:
+            ঘূৰাই isSymmetric_<unsigned short>(m); ভঙ্গ;
+        পক্ষ CV_32SC1:
+            ঘূৰাই isSymmetric_<পূর্ণাঙ্ক>(m); ভঙ্গ;
+        পক্ষ CV_32FC1:
+            ঘূৰাই isSymmetric_<ভিন্ন>(m, eps); ভঙ্গ;
+        পক্ষ CV_64FC1:
+            ঘূৰাই isSymmetric_<দ্ৱিগুণ>(m, eps); ভঙ্গ;
+        স্ৱভাৱ:
+            ভঙ্গ;
     }
-    return false;
+    ঘূৰাই মিছা;
 }
 
 
 //------------------------------------------------------------------------------
 // cv::subspaceProject
 //------------------------------------------------------------------------------
-Mat LDA::subspaceProject(InputArray _W, InputArray _mean, InputArray _src) {
+Mat LDA::subspaceProject(প্ৰবেশ_Array _W, প্ৰবেশ_Array _mean, প্ৰবেশ_Array _src) {
     // get data matrices
     Mat W = _W.getMat();
     Mat mean = _mean.getMat();
     Mat src = _src.getMat();
     // get number of samples and dimension
-    int n = src.rows;
-    int d = src.cols;
+    পূর্ণাঙ্ক n = src.rows;
+    পূর্ণাঙ্ক d = src.cols;
     // make sure the data has the correct shape
-    if(W.rows != d) {
+    যদি(W.rows != d) {
         String error_message = format("Wrong shapes for given matrices. Was size(src) = (%d,%d), size(W) = (%d,%d).", src.rows, src.cols, W.rows, W.cols);
         CV_Error(Error::StsBadArg, error_message);
     }
     // make sure mean is correct if not empty
-    if(!mean.empty() && (mean.total() != (size_t) d)) {
+    যদি(!mean.empty() && (mean.total() != (size_t) d)) {
         String error_message = format("Wrong mean shape for the given data matrix. Expected %d, but was %zu.", d, mean.total());
         CV_Error(Error::StsBadArg, error_message);
     }
@@ -192,36 +192,36 @@ Mat LDA::subspaceProject(InputArray _W, InputArray _mean, InputArray _src) {
     // make sure you operate on correct type
     src.convertTo(X, W.type());
     // safe to do, because of above assertion
-    if(!mean.empty()) {
-        for(int i=0; i<n; i++) {
+    যদি(!mean.empty()) {
+        বাবে(পূর্ণাঙ্ক i=0; i<n; i++) {
             Mat r_i = X.row(i);
             subtract(r_i, mean.reshape(1,1), r_i);
         }
     }
     // finally calculate projection as Y = (X-mean)*W
     gemm(X, W, 1.0, Mat(), 0.0, Y);
-    return Y;
+    ঘূৰাই Y;
 }
 
 //------------------------------------------------------------------------------
 // cv::subspaceReconstruct
 //------------------------------------------------------------------------------
-Mat LDA::subspaceReconstruct(InputArray _W, InputArray _mean, InputArray _src)
+Mat LDA::subspaceReconstruct(প্ৰবেশ_Array _W, প্ৰবেশ_Array _mean, প্ৰবেশ_Array _src)
 {
     // get data matrices
     Mat W = _W.getMat();
     Mat mean = _mean.getMat();
     Mat src = _src.getMat();
     // get number of samples and dimension
-    int n = src.rows;
-    int d = src.cols;
+    পূর্ণাঙ্ক n = src.rows;
+    পূর্ণাঙ্ক d = src.cols;
     // make sure the data has the correct shape
-    if(W.cols != d) {
+    যদি(W.cols != d) {
         String error_message = format("Wrong shapes for given matrices. Was size(src) = (%d,%d), size(W) = (%d,%d).", src.rows, src.cols, W.rows, W.cols);
         CV_Error(Error::StsBadArg, error_message);
     }
     // make sure mean is correct if not empty
-    if(!mean.empty() && (mean.total() != (size_t) W.rows)) {
+    যদি(!mean.empty() && (mean.total() != (size_t) W.rows)) {
         String error_message = format("Wrong mean shape for the given eigenvector matrix. Expected %d, but was %zu.", W.cols, mean.total());
         CV_Error(Error::StsBadArg, error_message);
     }
@@ -232,25 +232,25 @@ Mat LDA::subspaceReconstruct(InputArray _W, InputArray _mean, InputArray _src)
     // calculate the reconstruction
     gemm(Y, W, 1.0, Mat(), 0.0, X, GEMM_2_T);
     // safe to do because of above assertion
-    if(!mean.empty()) {
-        for(int i=0; i<n; i++) {
+    যদি(!mean.empty()) {
+        বাবে(পূর্ণাঙ্ক i=0; i<n; i++) {
             Mat r_i = X.row(i);
             add(r_i, mean.reshape(1,1), r_i);
         }
     }
-    return X;
+    ঘূৰাই X;
 }
 
 
-class EigenvalueDecomposition {
-private:
+শ্ৰেণী EigenvalueDecomposition {
+গুপ্ত:
 
     // Holds the data dimension.
-    int n;
+    পূর্ণাঙ্ক n;
 
     // Pointer to internal memory.
-    double *d, *e, *ort;
-    double **V, **H;
+    দ্ৱিগুণ *d, *e, *ort;
+    দ্ৱিগুণ **V, **H;
 
     // Holds the computed eigenvalues.
     Mat _eigenvalues;
@@ -260,49 +260,49 @@ private:
 
     // Allocates memory.
     template<typename _Tp>
-    _Tp *alloc_1d(int m) {
-        return new _Tp[m];
+    _Tp *alloc_1d(পূর্ণাঙ্ক m) {
+        ঘূৰাই নূতন _Tp[m];
     }
 
     // Allocates memory.
     template<typename _Tp>
-    _Tp *alloc_1d(int m, _Tp val) {
+    _Tp *alloc_1d(পূর্ণাঙ্ক m, _Tp val) {
         _Tp *arr = alloc_1d<_Tp> (m);
-        for (int i = 0; i < m; i++)
+        বাবে (পূর্ণাঙ্ক i = 0; i < m; i++)
             arr[i] = val;
-        return arr;
+        ঘূৰাই arr;
     }
 
     // Allocates memory.
     template<typename _Tp>
-    _Tp **alloc_2d(int m, int _n) {
-        _Tp **arr = new _Tp*[m];
-        for (int i = 0; i < m; i++)
-            arr[i] = new _Tp[_n];
-        return arr;
+    _Tp **alloc_2d(পূর্ণাঙ্ক m, পূর্ণাঙ্ক _n) {
+        _Tp **arr = নূতন _Tp*[m];
+        বাবে (পূর্ণাঙ্ক i = 0; i < m; i++)
+            arr[i] = নূতন _Tp[_n];
+        ঘূৰাই arr;
     }
 
     // Allocates memory.
     template<typename _Tp>
-    _Tp **alloc_2d(int m, int _n, _Tp val) {
+    _Tp **alloc_2d(পূর্ণাঙ্ক m, পূর্ণাঙ্ক _n, _Tp val) {
         _Tp **arr = alloc_2d<_Tp> (m, _n);
-        for (int i = 0; i < m; i++) {
-            for (int j = 0; j < _n; j++) {
+        বাবে (পূর্ণাঙ্ক i = 0; i < m; i++) {
+            বাবে (পূর্ণাঙ্ক j = 0; j < _n; j++) {
                 arr[i][j] = val;
             }
         }
-        return arr;
+        ঘূৰাই arr;
     }
 
-    static void complex_div(double xr, double xi, double yr, double yi, double& cdivr, double& cdivi) {
-        double r, dv;
+    স্থির শূন্য complex_div(দ্ৱিগুণ xr, দ্ৱিগুণ xi, দ্ৱিগুণ yr, দ্ৱিগুণ yi, দ্ৱিগুণ& cdivr, দ্ৱিগুণ& cdivi) {
+        দ্ৱিগুণ r, dv;
         CV_DbgAssert(std::abs(yr) + std::abs(yi) > 0.0);
-        if (std::abs(yr) > std::abs(yi)) {
+        যদি (std::abs(yr) > std::abs(yi)) {
             r = yi / yr;
             dv = yr + r * yi;
             cdivr = (xr + r * xi) / dv;
             cdivi = (xi - r * xr) / dv;
-        } else {
+        } অন্যথা {
             r = yr / yi;
             dv = yi + r * yr;
             cdivr = (r * xr + xi) / dv;
@@ -312,7 +312,7 @@ private:
 
     // Nonsymmetric reduction from Hessenberg to real Schur form.
 
-    void hqr2() {
+    শূন্য hqr2() {
 
         //  This is derived from the Algol procedure hqr2,
         //  by Martin and Wilkinson, Handbook for Auto. Comp.,
@@ -320,52 +320,52 @@ private:
         //  Fortran subroutine in EISPACK.
 
         // Initialize
-        const int max_iters_count = 1000 * this->n;
+        ধ্রুৱ পূর্ণাঙ্ক max_iters_গুনতি = 1000 * এতত্->n;
 
-        const int nn = this->n; CV_Assert(nn > 0);
-        int n1 = nn - 1;
-        const int low = 0;
-        const int high = nn - 1;
-        const double eps = std::numeric_limits<double>::epsilon();
-        double exshift = 0.0;
+        ধ্রুৱ পূর্ণাঙ্ক nn = এতত্->n; CV_Assert(nn > 0);
+        পূর্ণাঙ্ক n1 = nn - 1;
+        ধ্রুৱ পূর্ণাঙ্ক নিচেৰ = 0;
+        ধ্রুৱ পূর্ণাঙ্ক উপৰেৰ = nn - 1;
+        ধ্রুৱ দ্ৱিগুণ eps = std::numeric_limits<দ্ৱিগুণ>::epsilon();
+        দ্ৱিগুণ exshift = 0.0;
 
         // Store roots isolated by balanc and compute matrix norm
 
-        double norm = 0.0;
-        for (int i = 0; i < nn; i++) {
-#if 0 // 'if' condition is always false
-            if (i < low || i > high) {
+        দ্ৱিগুণ norm = 0.0;
+        বাবে (পূর্ণাঙ্ক i = 0; i < nn; i++) {
+#যদি 0 // 'if' condition is always false
+            যদি (i < নিচেৰ || i > উপৰেৰ) {
                 d[i] = H[i][i];
                 e[i] = 0.0;
             }
 #endif
-            for (int j = std::max(i - 1, 0); j < nn; j++) {
+            বাবে (পূর্ণাঙ্ক j = std::max(i - 1, 0); j < nn; j++) {
                 norm += std::abs(H[i][j]);
             }
         }
 
         // Outer loop over eigenvalue index
-        int iter = 0;
-        while (n1 >= low) {
+        পূর্ণাঙ্ক iter = 0;
+        যেতিয়ালৈ (n1 >= নিচেৰ) {
 
             // Look for single small sub-diagonal element
-            int l = n1;
-            while (l > low) {
-                if (norm < FLT_EPSILON) {
-                    break;
+            পূর্ণাঙ্ক l = n1;
+            যেতিয়ালৈ (l > নিচেৰ) {
+                যদি (norm < FLT_EPSILON) {
+                    ভঙ্গ;
                 }
-                double s = std::abs(H[l - 1][l - 1]) + std::abs(H[l][l]);
-                if (s == 0.0) {
+                দ্ৱিগুণ s = std::abs(H[l - 1][l - 1]) + std::abs(H[l][l]);
+                যদি (s == 0.0) {
                     s = norm;
                 }
-                if (std::abs(H[l][l - 1]) < eps * s) {
-                    break;
+                যদি (std::abs(H[l][l - 1]) < eps * s) {
+                    ভঙ্গ;
                 }
                 l--;
             }
 
             // Check for convergence
-            if (l == n1) {
+            যদি (l == n1) {
                 // One root found
                 H[n1][n1] = H[n1][n1] + exshift;
                 d[n1] = H[n1][n1];
@@ -373,41 +373,41 @@ private:
                 n1--;
                 iter = 0;
 
-            } else if (l == n1 - 1) {
+            } অন্যথা যদি (l == n1 - 1) {
                 // Two roots found
-                double w = H[n1][n1 - 1] * H[n1 - 1][n1];
-                double p = (H[n1 - 1][n1 - 1] - H[n1][n1]) * 0.5;
-                double q = p * p + w;
-                double z = std::sqrt(std::abs(q));
+                দ্ৱিগুণ w = H[n1][n1 - 1] * H[n1 - 1][n1];
+                দ্ৱিগুণ p = (H[n1 - 1][n1 - 1] - H[n1][n1]) * 0.5;
+                দ্ৱিগুণ q = p * p + w;
+                দ্ৱিগুণ z = std::sqrt(std::abs(q));
                 H[n1][n1] = H[n1][n1] + exshift;
                 H[n1 - 1][n1 - 1] = H[n1 - 1][n1 - 1] + exshift;
-                double x = H[n1][n1];
+                দ্ৱিগুণ x = H[n1][n1];
 
-                if (q >= 0) {
+                যদি (q >= 0) {
                     // Real pair
-                    if (p >= 0) {
+                    যদি (p >= 0) {
                         z = p + z;
-                    } else {
+                    } অন্যথা {
                         z = p - z;
                     }
                     d[n1 - 1] = x + z;
                     d[n1] = d[n1 - 1];
-                    if (z != 0.0) {
+                    যদি (z != 0.0) {
                         d[n1] = x - w / z;
                     }
                     e[n1 - 1] = 0.0;
                     e[n1] = 0.0;
                     x = H[n1][n1 - 1];
-                    double s = std::abs(x) + std::abs(z);
+                    দ্ৱিগুণ s = std::abs(x) + std::abs(z);
                     p = x / s;
                     q = z / s;
-                    double r = std::sqrt(p * p + q * q);
+                    দ্ৱিগুণ r = std::sqrt(p * p + q * q);
                     p = p / r;
                     q = q / r;
 
                     // Row modification
 
-                    for (int j = n1 - 1; j < nn; j++) {
+                    বাবে (পূর্ণাঙ্ক j = n1 - 1; j < nn; j++) {
                         z = H[n1 - 1][j];
                         H[n1 - 1][j] = q * z + p * H[n1][j];
                         H[n1][j] = q * H[n1][j] - p * z;
@@ -415,7 +415,7 @@ private:
 
                     // Column modification
 
-                    for (int i = 0; i <= n1; i++) {
+                    বাবে (পূর্ণাঙ্ক i = 0; i <= n1; i++) {
                         z = H[i][n1 - 1];
                         H[i][n1 - 1] = q * z + p * H[i][n1];
                         H[i][n1] = q * H[i][n1] - p * z;
@@ -423,13 +423,13 @@ private:
 
                     // Accumulate transformations
 
-                    for (int i = low; i <= high; i++) {
+                    বাবে (পূর্ণাঙ্ক i = নিচেৰ; i <= উপৰেৰ; i++) {
                         z = V[i][n1 - 1];
                         V[i][n1 - 1] = q * z + p * V[i][n1];
                         V[i][n1] = q * V[i][n1] - p * z;
                     }
 
-                } else {
+                } অন্যথা {
                     // Complex pair
                     d[n1 - 1] = x + p;
                     d[n1] = x + p;
@@ -439,41 +439,41 @@ private:
                 n1 = n1 - 2;
                 iter = 0;
 
-            } else {
+            } অন্যথা {
                 // No convergence yet
 
                 // Form shift
-                double x = H[n1][n1];
-                double y = 0.0;
-                double w = 0.0;
-                if (l < n1) {
+                দ্ৱিগুণ x = H[n1][n1];
+                দ্ৱিগুণ y = 0.0;
+                দ্ৱিগুণ w = 0.0;
+                যদি (l < n1) {
                     y = H[n1 - 1][n1 - 1];
                     w = H[n1][n1 - 1] * H[n1 - 1][n1];
                 }
 
                 // Wilkinson's original ad hoc shift
-                if (iter == 10) {
+                যদি (iter == 10) {
                     exshift += x;
-                    for (int i = low; i <= n1; i++) {
+                    বাবে (পূর্ণাঙ্ক i = নিচেৰ; i <= n1; i++) {
                         H[i][i] -= x;
                     }
-                    double s = std::abs(H[n1][n1 - 1]) + std::abs(H[n1 - 1][n1 - 2]);
+                    দ্ৱিগুণ s = std::abs(H[n1][n1 - 1]) + std::abs(H[n1 - 1][n1 - 2]);
                     x = y = 0.75 * s;
                     w = -0.4375 * s * s;
                 }
 
                 // MATLAB's new ad hoc shift
 
-                if (iter == 30) {
-                    double s = (y - x) * 0.5;
+                যদি (iter == 30) {
+                    দ্ৱিগুণ s = (y - x) * 0.5;
                     s = s * s + w;
-                    if (s > 0) {
+                    যদি (s > 0) {
                         s = std::sqrt(s);
-                        if (y < x) {
+                        যদি (y < x) {
                             s = -s;
                         }
                         s = x - w / ((y - x) * 0.5 + s);
-                        for (int i = low; i <= n1; i++) {
+                        বাবে (পূর্ণাঙ্ক i = নিচেৰ; i <= n1; i++) {
                             H[i][i] -= s;
                         }
                         exshift += s;
@@ -482,19 +482,19 @@ private:
                 }
 
                 iter = iter + 1;
-                if (iter > max_iters_count)
+                যদি (iter > max_iters_গুনতি)
                     CV_Error(Error::StsNoConv, "Algorithm doesn't converge (complex eigen values?)");
 
-                double p = std::numeric_limits<double>::quiet_NaN();
-                double q = std::numeric_limits<double>::quiet_NaN();
-                double r = std::numeric_limits<double>::quiet_NaN();
+                দ্ৱিগুণ p = std::numeric_limits<দ্ৱিগুণ>::quiet_NaN();
+                দ্ৱিগুণ q = std::numeric_limits<দ্ৱিগুণ>::quiet_NaN();
+                দ্ৱিগুণ r = std::numeric_limits<দ্ৱিগুণ>::quiet_NaN();
 
                 // Look for two consecutive small sub-diagonal elements
-                int m = n1 - 2;
-                while (m >= l) {
-                    double z = H[m][m];
+                পূর্ণাঙ্ক m = n1 - 2;
+                যেতিয়ালৈ (m >= l) {
+                    দ্ৱিগুণ z = H[m][m];
                     r = x - z;
-                    double s = y - z;
+                    দ্ৱিগুণ s = y - z;
                     p = (r * s - w) / H[m + 1][m] + H[m][m + 1];
                     q = H[m + 1][m + 1] - z - r - s;
                     r = H[m + 2][m + 1];
@@ -502,65 +502,65 @@ private:
                     p = p / s;
                     q = q / s;
                     r = r / s;
-                    if (m == l) {
-                        break;
+                    যদি (m == l) {
+                        ভঙ্গ;
                     }
-                    if (std::abs(H[m][m - 1]) * (std::abs(q) + std::abs(r)) < eps * (std::abs(p)
+                    যদি (std::abs(H[m][m - 1]) * (std::abs(q) + std::abs(r)) < eps * (std::abs(p)
                                                                                      * (std::abs(H[m - 1][m - 1]) + std::abs(z) + std::abs(
                                                                                                                                            H[m + 1][m + 1])))) {
-                        break;
+                        ভঙ্গ;
                     }
                     m--;
                 }
 
-                for (int i = m + 2; i <= n1; i++) {
+                বাবে (পূর্ণাঙ্ক i = m + 2; i <= n1; i++) {
                     H[i][i - 2] = 0.0;
-                    if (i > m + 2) {
+                    যদি (i > m + 2) {
                         H[i][i - 3] = 0.0;
                     }
                 }
 
                 // Double QR step involving rows l:n and columns m:n
 
-                for (int k = m; k < n1; k++) {
+                বাবে (পূর্ণাঙ্ক k = m; k < n1; k++) {
 
-                    bool notlast = (k != n1 - 1);
-                    if (k != m) {
+                    তার্কিক notlast = (k != n1 - 1);
+                    যদি (k != m) {
                         p = H[k][k - 1];
                         q = H[k + 1][k - 1];
                         r = (notlast ? H[k + 2][k - 1] : 0.0);
                         x = std::abs(p) + std::abs(q) + std::abs(r);
-                        if (x != 0.0) {
+                        যদি (x != 0.0) {
                             p = p / x;
                             q = q / x;
                             r = r / x;
                         }
                     }
-                    if (x == 0.0) {
-                        break;
+                    যদি (x == 0.0) {
+                        ভঙ্গ;
                     }
-                    double s = std::sqrt(p * p + q * q + r * r);
-                    if (p < 0) {
+                    দ্ৱিগুণ s = std::sqrt(p * p + q * q + r * r);
+                    যদি (p < 0) {
                         s = -s;
                     }
-                    if (s != 0) {
-                        if (k != m) {
+                    যদি (s != 0) {
+                        যদি (k != m) {
                             H[k][k - 1] = -s * x;
-                        } else if (l != m) {
+                        } অন্যথা যদি (l != m) {
                             H[k][k - 1] = -H[k][k - 1];
                         }
                         p = p + s;
                         x = p / s;
                         y = q / s;
-                        double z = r / s;
+                        দ্ৱিগুণ z = r / s;
                         q = q / p;
                         r = r / p;
 
                         // Row modification
 
-                        for (int j = k; j < nn; j++) {
+                        বাবে (পূর্ণাঙ্ক j = k; j < nn; j++) {
                             p = H[k][j] + q * H[k + 1][j];
-                            if (notlast) {
+                            যদি (notlast) {
                                 p = p + r * H[k + 2][j];
                                 H[k + 2][j] = H[k + 2][j] - p * z;
                             }
@@ -570,9 +570,9 @@ private:
 
                         // Column modification
 
-                        for (int i = 0; i <= std::min(n1, k + 3); i++) {
+                        বাবে (পূর্ণাঙ্ক i = 0; i <= std::min(n1, k + 3); i++) {
                             p = x * H[i][k] + y * H[i][k + 1];
-                            if (notlast) {
+                            যদি (notlast) {
                                 p = p + z * H[i][k + 2];
                                 H[i][k + 2] = H[i][k + 2] - p * r;
                             }
@@ -582,9 +582,9 @@ private:
 
                         // Accumulate transformations
 
-                        for (int i = low; i <= high; i++) {
+                        বাবে (পূর্ণাঙ্ক i = নিচেৰ; i <= উপৰেৰ; i++) {
                             p = x * V[i][k] + y * V[i][k + 1];
-                            if (notlast) {
+                            যদি (notlast) {
                                 p = p + z * V[i][k + 2];
                                 V[i][k + 2] = V[i][k + 2] - p * r;
                             }
@@ -598,78 +598,78 @@ private:
 
         // Backsubstitute to find vectors of upper triangular form
 
-        if (norm < FLT_EPSILON) {
-            return;
+        যদি (norm < FLT_EPSILON) {
+            ঘূৰাই;
         }
 
-        for (n1 = nn - 1; n1 >= 0; n1--) {
-            double p = d[n1];
-            double q = e[n1];
+        বাবে (n1 = nn - 1; n1 >= 0; n1--) {
+            দ্ৱিগুণ p = d[n1];
+            দ্ৱিগুণ q = e[n1];
 
-            if (q == 0) {
+            যদি (q == 0) {
                 // Real vector
-                double z = std::numeric_limits<double>::quiet_NaN();
-                double s = std::numeric_limits<double>::quiet_NaN();
+                দ্ৱিগুণ z = std::numeric_limits<দ্ৱিগুণ>::quiet_NaN();
+                দ্ৱিগুণ s = std::numeric_limits<দ্ৱিগুণ>::quiet_NaN();
 
-                int l = n1;
+                পূর্ণাঙ্ক l = n1;
                 H[n1][n1] = 1.0;
-                for (int i = n1 - 1; i >= 0; i--) {
-                    double w = H[i][i] - p;
-                    double r = 0.0;
-                    for (int j = l; j <= n1; j++) {
+                বাবে (পূর্ণাঙ্ক i = n1 - 1; i >= 0; i--) {
+                    দ্ৱিগুণ w = H[i][i] - p;
+                    দ্ৱিগুণ r = 0.0;
+                    বাবে (পূর্ণাঙ্ক j = l; j <= n1; j++) {
                         r = r + H[i][j] * H[j][n1];
                     }
-                    if (e[i] < 0.0) {
+                    যদি (e[i] < 0.0) {
                         z = w;
                         s = r;
-                    } else {
+                    } অন্যথা {
                         l = i;
-                        if (e[i] == 0.0) {
-                            if (w != 0.0) {
+                        যদি (e[i] == 0.0) {
+                            যদি (w != 0.0) {
                                 H[i][n1] = -r / w;
-                            } else {
+                            } অন্যথা {
                                 H[i][n1] = -r / (eps * norm);
                             }
-                        } else {
+                        } অন্যথা {
                             // Solve real equations
                             CV_DbgAssert(!cvIsNaN(z));
-                            double x = H[i][i + 1];
-                            double y = H[i + 1][i];
+                            দ্ৱিগুণ x = H[i][i + 1];
+                            দ্ৱিগুণ y = H[i + 1][i];
                             q = (d[i] - p) * (d[i] - p) + e[i] * e[i];
-                            double t = (x * s - z * r) / q;
+                            দ্ৱিগুণ t = (x * s - z * r) / q;
                             H[i][n1] = t;
-                            if (std::abs(x) > std::abs(z)) {
+                            যদি (std::abs(x) > std::abs(z)) {
                                 H[i + 1][n1] = (-r - w * t) / x;
-                            } else {
+                            } অন্যথা {
                                 CV_DbgAssert(z != 0.0);
                                 H[i + 1][n1] = (-s - y * t) / z;
                             }
                         }
 
                         // Overflow control
-                        double t = std::abs(H[i][n1]);
-                        if ((eps * t) * t > 1) {
-                            double inv_t = 1.0 / t;
-                            for (int j = i; j <= n1; j++) {
+                        দ্ৱিগুণ t = std::abs(H[i][n1]);
+                        যদি ((eps * t) * t > 1) {
+                            দ্ৱিগুণ inv_t = 1.0 / t;
+                            বাবে (পূর্ণাঙ্ক j = i; j <= n1; j++) {
                                 H[j][n1] *= inv_t;
                             }
                         }
                     }
                 }
-            } else if (q < 0) {
+            } অন্যথা যদি (q < 0) {
                 // Complex vector
-                double z = std::numeric_limits<double>::quiet_NaN();
-                double r = std::numeric_limits<double>::quiet_NaN();
-                double s = std::numeric_limits<double>::quiet_NaN();
+                দ্ৱিগুণ z = std::numeric_limits<দ্ৱিগুণ>::quiet_NaN();
+                দ্ৱিগুণ r = std::numeric_limits<দ্ৱিগুণ>::quiet_NaN();
+                দ্ৱিগুণ s = std::numeric_limits<দ্ৱিগুণ>::quiet_NaN();
 
-                int l = n1 - 1;
+                পূর্ণাঙ্ক l = n1 - 1;
 
                 // Last vector component imaginary so matrix is triangular
 
-                if (std::abs(H[n1][n1 - 1]) > std::abs(H[n1 - 1][n1])) {
+                যদি (std::abs(H[n1][n1 - 1]) > std::abs(H[n1 - 1][n1])) {
                     H[n1 - 1][n1 - 1] = q / H[n1][n1 - 1];
                     H[n1 - 1][n1] = -(H[n1][n1] - p) / H[n1][n1 - 1];
-                } else {
+                } অন্যথা {
                     complex_div(
                             0.0, -H[n1 - 1][n1],
                             H[n1 - 1][n1 - 1] - p, q,
@@ -678,36 +678,36 @@ private:
                 }
                 H[n1][n1 - 1] = 0.0;
                 H[n1][n1] = 1.0;
-                for (int i = n1 - 2; i >= 0; i--) {
-                    double ra, sa, vr, vi;
+                বাবে (পূর্ণাঙ্ক i = n1 - 2; i >= 0; i--) {
+                    দ্ৱিগুণ ra, sa, vr, vi;
                     ra = 0.0;
                     sa = 0.0;
-                    for (int j = l; j <= n1; j++) {
+                    বাবে (পূর্ণাঙ্ক j = l; j <= n1; j++) {
                         ra = ra + H[i][j] * H[j][n1 - 1];
                         sa = sa + H[i][j] * H[j][n1];
                     }
-                    double w = H[i][i] - p;
+                    দ্ৱিগুণ w = H[i][i] - p;
 
-                    if (e[i] < 0.0) {
+                    যদি (e[i] < 0.0) {
                         z = w;
                         r = ra;
                         s = sa;
-                    } else {
+                    } অন্যথা {
                         l = i;
-                        if (e[i] == 0) {
+                        যদি (e[i] == 0) {
                             complex_div(
                                     -ra, -sa,
                                     w, q,
                                     H[i][n1 - 1], H[i][n1]
                             );
-                        } else {
+                        } অন্যথা {
                             // Solve complex equations
 
-                            double x = H[i][i + 1];
-                            double y = H[i + 1][i];
+                            দ্ৱিগুণ x = H[i][i + 1];
+                            দ্ৱিগুণ y = H[i + 1][i];
                             vr = (d[i] - p) * (d[i] - p) + e[i] * e[i] - q * q;
                             vi = (d[i] - p) * 2.0 * q;
-                            if (vr == 0.0 && vi == 0.0) {
+                            যদি (vr == 0.0 && vi == 0.0) {
                                 vr = eps * norm * (std::abs(w) + std::abs(q) + std::abs(x)
                                                    + std::abs(y) + std::abs(z));
                             }
@@ -715,12 +715,12 @@ private:
                                     x * r - z * ra + q * sa, x * s - z * sa - q * ra,
                                     vr, vi,
                                     H[i][n1 - 1], H[i][n1]);
-                            if (std::abs(x) > (std::abs(z) + std::abs(q))) {
+                            যদি (std::abs(x) > (std::abs(z) + std::abs(q))) {
                                 H[i + 1][n1 - 1] = (-ra - w * H[i][n1 - 1] + q
                                                    * H[i][n1]) / x;
                                 H[i + 1][n1] = (-sa - w * H[i][n1] - q * H[i][n1
                                                                             - 1]) / x;
-                            } else {
+                            } অন্যথা {
                                 complex_div(
                                         -r - y * H[i][n1 - 1], -s - y * H[i][n1],
                                         z, q,
@@ -730,9 +730,9 @@ private:
 
                         // Overflow control
 
-                        double t = std::max(std::abs(H[i][n1 - 1]), std::abs(H[i][n1]));
-                        if ((eps * t) * t > 1) {
-                            for (int j = i; j <= n1; j++) {
+                        দ্ৱিগুণ t = std::max(std::abs(H[i][n1 - 1]), std::abs(H[i][n1]));
+                        যদি ((eps * t) * t > 1) {
+                            বাবে (পূর্ণাঙ্ক j = i; j <= n1; j++) {
                                 H[j][n1 - 1] = H[j][n1 - 1] / t;
                                 H[j][n1] = H[j][n1] / t;
                             }
@@ -744,10 +744,10 @@ private:
 
         // Vectors of isolated roots
 
-#if 0 // 'if' condition is always false
-        for (int i = 0; i < nn; i++) {
-            if (i < low || i > high) {
-                for (int j = i; j < nn; j++) {
+#যদি 0 // 'if' condition is always false
+        বাবে (পূর্ণাঙ্ক i = 0; i < nn; i++) {
+            যদি (i < নিচেৰ || i > উপৰেৰ) {
+                বাবে (পূর্ণাঙ্ক j = i; j < nn; j++) {
                     V[i][j] = H[i][j];
                 }
             }
@@ -756,10 +756,10 @@ private:
 
         // Back transformation to get eigenvectors of original matrix
 
-        for (int j = nn - 1; j >= low; j--) {
-            for (int i = low; i <= high; i++) {
-                double z = 0.0;
-                for (int k = low; k <= std::min(j, high); k++) {
+        বাবে (পূর্ণাঙ্ক j = nn - 1; j >= নিচেৰ; j--) {
+            বাবে (পূর্ণাঙ্ক i = নিচেৰ; i <= উপৰেৰ; i++) {
+                দ্ৱিগুণ z = 0.0;
+                বাবে (পূর্ণাঙ্ক k = নিচেৰ; k <= std::min(j, উপৰেৰ); k++) {
                     z += V[i][k] * H[k][j];
                 }
                 V[i][j] = z;
@@ -768,33 +768,33 @@ private:
     }
 
     // Nonsymmetric reduction to Hessenberg form.
-    void orthes() {
+    শূন্য orthes() {
         //  This is derived from the Algol procedures orthes and ortran,
         //  by Martin and Wilkinson, Handbook for Auto. Comp.,
         //  Vol.ii-Linear Algebra, and the corresponding
         //  Fortran subroutines in EISPACK.
-        int low = 0;
-        int high = n - 1;
+        পূর্ণাঙ্ক নিচেৰ = 0;
+        পূর্ণাঙ্ক উপৰেৰ = n - 1;
 
-        for (int m = low + 1; m < high; m++) {
+        বাবে (পূর্ণাঙ্ক m = নিচেৰ + 1; m < উপৰেৰ; m++) {
 
             // Scale column.
 
-            double scale = 0.0;
-            for (int i = m; i <= high; i++) {
+            দ্ৱিগুণ scale = 0.0;
+            বাবে (পূর্ণাঙ্ক i = m; i <= উপৰেৰ; i++) {
                 scale = scale + std::abs(H[i][m - 1]);
             }
-            if (scale != 0.0) {
+            যদি (scale != 0.0) {
 
                 // Compute Householder transformation.
 
-                double h = 0.0;
-                for (int i = high; i >= m; i--) {
+                দ্ৱিগুণ h = 0.0;
+                বাবে (পূর্ণাঙ্ক i = উপৰেৰ; i >= m; i--) {
                     ort[i] = H[i][m - 1] / scale;
                     h += ort[i] * ort[i];
                 }
-                double g = std::sqrt(h);
-                if (ort[m] > 0) {
+                দ্ৱিগুণ g = std::sqrt(h);
+                যদি (ort[m] > 0) {
                     g = -g;
                 }
                 h = h - ort[m] * g;
@@ -803,24 +803,24 @@ private:
                 // Apply Householder similarity transformation
                 // H = (I-u*u'/h)*H*(I-u*u')/h)
 
-                for (int j = m; j < n; j++) {
-                    double f = 0.0;
-                    for (int i = high; i >= m; i--) {
+                বাবে (পূর্ণাঙ্ক j = m; j < n; j++) {
+                    দ্ৱিগুণ f = 0.0;
+                    বাবে (পূর্ণাঙ্ক i = উপৰেৰ; i >= m; i--) {
                         f += ort[i] * H[i][j];
                     }
                     f = f / h;
-                    for (int i = m; i <= high; i++) {
+                    বাবে (পূর্ণাঙ্ক i = m; i <= উপৰেৰ; i++) {
                         H[i][j] -= f * ort[i];
                     }
                 }
 
-                for (int i = 0; i <= high; i++) {
-                    double f = 0.0;
-                    for (int j = high; j >= m; j--) {
+                বাবে (পূর্ণাঙ্ক i = 0; i <= উপৰেৰ; i++) {
+                    দ্ৱিগুণ f = 0.0;
+                    বাবে (পূর্ণাঙ্ক j = উপৰেৰ; j >= m; j--) {
                         f += ort[j] * H[i][j];
                     }
                     f = f / h;
-                    for (int j = m; j <= high; j++) {
+                    বাবে (পূর্ণাঙ্ক j = m; j <= উপৰেৰ; j++) {
                         H[i][j] -= f * ort[j];
                     }
                 }
@@ -831,25 +831,25 @@ private:
 
         // Accumulate transformations (Algol's ortran).
 
-        for (int i = 0; i < n; i++) {
-            for (int j = 0; j < n; j++) {
+        বাবে (পূর্ণাঙ্ক i = 0; i < n; i++) {
+            বাবে (পূর্ণাঙ্ক j = 0; j < n; j++) {
                 V[i][j] = (i == j ? 1.0 : 0.0);
             }
         }
 
-        for (int m = high - 1; m > low; m--) {
-            if (H[m][m - 1] != 0.0) {
-                for (int i = m + 1; i <= high; i++) {
+        বাবে (পূর্ণাঙ্ক m = উপৰেৰ - 1; m > নিচেৰ; m--) {
+            যদি (H[m][m - 1] != 0.0) {
+                বাবে (পূর্ণাঙ্ক i = m + 1; i <= উপৰেৰ; i++) {
                     ort[i] = H[i][m - 1];
                 }
-                for (int j = m; j <= high; j++) {
-                    double g = 0.0;
-                    for (int i = m; i <= high; i++) {
+                বাবে (পূর্ণাঙ্ক j = m; j <= উপৰেৰ; j++) {
+                    দ্ৱিগুণ g = 0.0;
+                    বাবে (পূর্ণাঙ্ক i = m; i <= উপৰেৰ; i++) {
                         g += ort[i] * V[i][j];
                     }
                     // Double division avoids possible underflow
                     g = (g / ort[m]) / H[m][m - 1];
-                    for (int i = m; i <= high; i++) {
+                    বাবে (পূর্ণাঙ্ক i = m; i <= উপৰেৰ; i++) {
                         V[i][j] += g * ort[i];
                     }
                 }
@@ -858,26 +858,26 @@ private:
     }
 
     // Releases all internal working memory.
-    void release() {
+    শূন্য release() {
         // releases the working data
-        delete[] d; d = NULL;
-        delete[] e; e = NULL;
-        delete[] ort; ort = NULL;
-        for (int i = 0; i < n; i++) {
-            if (H) delete[] H[i];
-            if (V) delete[] V[i];
+        delete[] d; d = রিক্ত;
+        delete[] e; e = রিক্ত;
+        delete[] ort; ort = রিক্ত;
+        বাবে (পূর্ণাঙ্ক i = 0; i < n; i++) {
+            যদি (H) delete[] H[i];
+            যদি (V) delete[] V[i];
         }
-        delete[] H; H = NULL;
-        delete[] V; V = NULL;
+        delete[] H; H = রিক্ত;
+        delete[] V; V = রিক্ত;
     }
 
     // Computes the Eigenvalue Decomposition for a matrix given in H.
-    void compute() {
+    শূন্য compute() {
         // Allocate memory for the working data.
-        V = alloc_2d<double> (n, n, 0.0);
-        d = alloc_1d<double> (n);
-        e = alloc_1d<double> (n);
-        ort = alloc_1d<double> (n);
+        V = alloc_2d<দ্ৱিগুণ> (n, n, 0.0);
+        d = alloc_1d<দ্ৱিগুণ> (n);
+        e = alloc_1d<দ্ৱিগুণ> (n);
+        ort = alloc_1d<দ্ৱিগুণ> (n);
         {
             // Reduce to Hessenberg form.
             orthes();
@@ -885,28 +885,28 @@ private:
             hqr2();
             // Copy eigenvalues to OpenCV Matrix.
             _eigenvalues.create(1, n, CV_64FC1);
-            for (int i = 0; i < n; i++) {
-                _eigenvalues.at<double> (0, i) = d[i];
+            বাবে (পূর্ণাঙ্ক i = 0; i < n; i++) {
+                _eigenvalues.at<দ্ৱিগুণ> (0, i) = d[i];
             }
             // Copy eigenvectors to OpenCV Matrix.
             _eigenvectors.create(n, n, CV_64FC1);
-            for (int i = 0; i < n; i++)
-                for (int j = 0; j < n; j++)
-                    _eigenvectors.at<double> (i, j) = V[i][j];
+            বাবে (পূর্ণাঙ্ক i = 0; i < n; i++)
+                বাবে (পূর্ণাঙ্ক j = 0; j < n; j++)
+                    _eigenvectors.at<দ্ৱিগুণ> (i, j) = V[i][j];
             // Deallocate the memory by releasing all internal working data.
             release();
         }
     }
 
-public:
+সার্ৱজনিক:
     // Initializes & computes the Eigenvalue Decomposition for a general matrix
     // given in src. This function is a port of the EigenvalueSolver in JAMA,
     // which has been released to public domain by The MathWorks and the
     // National Institute of Standards and Technology (NIST).
     EigenvalueDecomposition() :
         n(0),
-        d(NULL), e(NULL), ort(NULL),
-        V(NULL), H(NULL)
+        d(রিক্ত), e(রিক্ত), ort(রিক্ত),
+        V(রিক্ত), H(রিক্ত)
     {
         // nothing
     }
@@ -915,27 +915,27 @@ public:
     // given in src. This function is a port of the EigenvalueSolver in JAMA,
     // which has been released to public domain by The MathWorks and the
     // National Institute of Standards and Technology (NIST).
-    void compute(InputArray src, bool fallbackSymmetric = true)
+    শূন্য compute(প্ৰবেশ_Array src, তার্কিক fallbackSymmetric = সঁচা)
     {
         CV_INSTRUMENT_REGION();
 
-        if(fallbackSymmetric && isSymmetric(src)) {
+        যদি(fallbackSymmetric && isSymmetric(src)) {
             // Fall back to OpenCV for a symmetric matrix!
             cv::eigen(src, _eigenvalues, _eigenvectors);
-        } else {
+        } অন্যথা {
             Mat tmp;
             // Convert the given input matrix to double. Is there any way to
             // prevent allocating the temporary memory? Only used for copying
             // into working memory and deallocated after.
             src.getMat().convertTo(tmp, CV_64FC1);
             // Get dimension of the matrix.
-            this->n = tmp.cols;
+            এতত্->n = tmp.cols;
             // Allocate the matrix data to work on.
-            this->H = alloc_2d<double> (n, n);
+            এতত্->H = alloc_2d<দ্ৱিগুণ> (n, n);
             // Now safely copy the data.
-            for (int i = 0; i < tmp.rows; i++) {
-                for (int j = 0; j < tmp.cols; j++) {
-                    this->H[i][j] = tmp.at<double>(i, j);
+            বাবে (পূর্ণাঙ্ক i = 0; i < tmp.rows; i++) {
+                বাবে (পূর্ণাঙ্ক j = 0; j < tmp.cols; j++) {
+                    এতত্->H[i][j] = tmp.at<দ্ৱিগুণ>(i, j);
                 }
             }
             // Deallocates the temporary matrix before computing.
@@ -948,56 +948,56 @@ public:
     ~EigenvalueDecomposition() { release(); }
 
     // Returns the eigenvalues of the Eigenvalue Decomposition.
-    Mat eigenvalues() const { return _eigenvalues; }
+    Mat eigenvalues() ধ্রুৱ { ঘূৰাই _eigenvalues; }
     // Returns the eigenvectors of the Eigenvalue Decomposition.
-    Mat eigenvectors() const { return _eigenvectors; }
+    Mat eigenvectors() ধ্রুৱ { ঘূৰাই _eigenvectors; }
 };
 
-void eigenNonSymmetric(InputArray _src, OutputArray _evals, OutputArray _evects)
+শূন্য eigenNonSymmetric(প্ৰবেশ_Array _src, OutputArray _evals, OutputArray _evects)
 {
     CV_INSTRUMENT_REGION();
 
     Mat src = _src.getMat();
-    int type = src.type();
-    int n = src.rows;
+    পূর্ণাঙ্ক type = src.type();
+    পূর্ণাঙ্ক n = src.rows;
 
     CV_Assert(src.rows == src.cols);
     CV_Assert(type == CV_32F || type == CV_64F);
 
     Mat src64f;
-    if (type == CV_32F)
+    যদি (type == CV_32F)
         src.convertTo(src64f, CV_32FC1);
-    else
+    অন্যথা
         src64f = src;
 
     EigenvalueDecomposition eigensystem;
-    eigensystem.compute(src64f, false);
+    eigensystem.compute(src64f, মিছা);
 
     // EigenvalueDecomposition returns transposed and non-sorted eigenvalues
-    std::vector<double> eigenvalues64f;
+    std::vector<দ্ৱিগুণ> eigenvalues64f;
     eigensystem.eigenvalues().copyTo(eigenvalues64f);
     CV_Assert(eigenvalues64f.size() == (size_t)n);
 
-    std::vector<int> sort_indexes(n);
+    std::vector<পূর্ণাঙ্ক> sort_indexes(n);
     cv::sortIdx(eigenvalues64f, sort_indexes, SORT_EVERY_ROW | SORT_DESCENDING);
 
-    std::vector<double> sorted_eigenvalues64f(n);
-    for (int i = 0; i < n; i++) sorted_eigenvalues64f[i] = eigenvalues64f[sort_indexes[i]];
+    std::vector<দ্ৱিগুণ> sorted_eigenvalues64f(n);
+    বাবে (পূর্ণাঙ্ক i = 0; i < n; i++) sorted_eigenvalues64f[i] = eigenvalues64f[sort_indexes[i]];
 
     Mat(n, 1, CV_64F, &sorted_eigenvalues64f[0]).convertTo(_evals, type);
 
-    if( _evects.needed() )
+    যদি( _evects.needed() )
     {
         Mat eigenvectors64f = eigensystem.eigenvectors().t(); // transpose
         CV_Assert(eigenvectors64f.rows == n);
         CV_Assert(eigenvectors64f.cols == n);
-        Mat_<double> sorted_eigenvectors64f(n, n, CV_64FC1);
-        for (int i = 0; i < n; i++)
+        Mat_<দ্ৱিগুণ> sorted_eigenvectors64f(n, n, CV_64FC1);
+        বাবে (পূর্ণাঙ্ক i = 0; i < n; i++)
         {
-            double* pDst = sorted_eigenvectors64f.ptr<double>(i);
-            double* pSrc = eigenvectors64f.ptr<double>(sort_indexes[i]);
-            CV_Assert(pSrc != NULL);
-            memcpy(pDst, pSrc, n * sizeof(double));
+            দ্ৱিগুণ* pDst = sorted_eigenvectors64f.ptr<দ্ৱিগুণ>(i);
+            দ্ৱিগুণ* pSrc = eigenvectors64f.ptr<দ্ৱিগুণ>(sort_indexes[i]);
+            CV_Assert(pSrc != রিক্ত);
+            memcpy(pDst, pSrc, n * পরিমাণ(দ্ৱিগুণ));
         }
         sorted_eigenvectors64f.convertTo(_evects, type);
     }
@@ -1008,59 +1008,59 @@ void eigenNonSymmetric(InputArray _src, OutputArray _evals, OutputArray _evects)
 // Linear Discriminant Analysis implementation
 //------------------------------------------------------------------------------
 
-LDA::LDA(int num_components) : _num_components(num_components) { }
+LDA::LDA(পূর্ণাঙ্ক অঙ্ক_components) : অঙ্ক_components_2(অঙ্ক_components) { }
 
-LDA::LDA(InputArrayOfArrays src, InputArray labels, int num_components) : _num_components(num_components)
+LDA::LDA(প্ৰবেশ_Array_Of_Arrays src, প্ৰবেশ_Array labels, পূর্ণাঙ্ক অঙ্ক_components) : অঙ্ক_components_2(অঙ্ক_components)
 {
-    this->compute(src, labels); //! compute eigenvectors and eigenvalues
+    এতত্->compute(src, labels); //! compute eigenvectors and eigenvalues
 }
 
 LDA::~LDA() {}
 
-void LDA::save(const String& filename) const
+শূন্য LDA::save(ধ্রুৱ String& filename) ধ্রুৱ
 {
     FileStorage fs(filename, FileStorage::WRITE);
-    if (!fs.isOpened()) {
+    যদি (!fs.isOpened()) {
         CV_Error(Error::StsError, "File can't be opened for writing!");
     }
-    this->save(fs);
+    এতত্->save(fs);
     fs.release();
 }
 
 // Deserializes this object from a given filename.
-void LDA::load(const String& filename) {
+শূন্য LDA::load(ধ্রুৱ String& filename) {
     FileStorage fs(filename, FileStorage::READ);
-    if (!fs.isOpened())
+    যদি (!fs.isOpened())
        CV_Error(Error::StsError, "File can't be opened for reading!");
-    this->load(fs);
+    এতত্->load(fs);
     fs.release();
 }
 
 // Serializes this object to a given FileStorage.
-void LDA::save(FileStorage& fs) const {
+শূন্য LDA::save(FileStorage& fs) ধ্রুৱ {
     // write matrices
-    fs << "num_components" << _num_components;
+    fs << "num_components" << অঙ্ক_components_2;
     fs << "eigenvalues" << _eigenvalues;
     fs << "eigenvectors" << _eigenvectors;
 }
 
 // Deserializes this object from a given FileStorage.
-void LDA::load(const FileStorage& fs) {
+শূন্য LDA::load(ধ্রুৱ FileStorage& fs) {
     //read matrices
-    fs["num_components"] >> _num_components;
+    fs["num_components"] >> অঙ্ক_components_2;
     fs["eigenvalues"] >> _eigenvalues;
     fs["eigenvectors"] >> _eigenvectors;
 }
 
-void LDA::lda(InputArrayOfArrays _src, InputArray _lbls) {
+শূন্য LDA::lda(প্ৰবেশ_Array_Of_Arrays _src, প্ৰবেশ_Array _lbls) {
     // get data
     Mat src = _src.getMat();
-    std::vector<int> labels;
+    std::vector<পূর্ণাঙ্ক> labels;
     // safely copy the labels
     {
         Mat tmp = _lbls.getMat();
-        for(unsigned int i = 0; i < tmp.total(); i++) {
-            labels.push_back(tmp.at<int>(i));
+        বাবে(unsigned পূর্ণাঙ্ক i = 0; i < tmp.total(); i++) {
+            labels.push_back(tmp.at<পূর্ণাঙ্ক>(i));
         }
     }
     // turn into row sampled matrix
@@ -1068,78 +1068,78 @@ void LDA::lda(InputArrayOfArrays _src, InputArray _lbls) {
     // ensure working matrix is double precision
     src.convertTo(data, CV_64FC1);
     // maps the labels, so they're ascending: [0,1,...,C]
-    std::vector<int> mapped_labels(labels.size());
-    std::vector<int> num2label = remove_dups(labels);
-    std::map<int, int> label2num;
-    for (int i = 0; i < (int)num2label.size(); i++)
+    std::vector<পূর্ণাঙ্ক> mapped_labels(labels.size());
+    std::vector<পূর্ণাঙ্ক> num2label = remove_dups(labels);
+    std::map<পূর্ণাঙ্ক, পূর্ণাঙ্ক> label2num;
+    বাবে (পূর্ণাঙ্ক i = 0; i < (পূর্ণাঙ্ক)num2label.size(); i++)
         label2num[num2label[i]] = i;
-    for (size_t i = 0; i < labels.size(); i++)
+    বাবে (size_t i = 0; i < labels.size(); i++)
         mapped_labels[i] = label2num[labels[i]];
     // get sample size, dimension
-    int N = data.rows;
-    int D = data.cols;
+    পূর্ণাঙ্ক N = data.rows;
+    পূর্ণাঙ্ক D = data.cols;
     // number of unique labels
-    int C = (int)num2label.size();
+    পূর্ণাঙ্ক C = (পূর্ণাঙ্ক)num2label.size();
     // we can't do a LDA on one class, what do you
     // want to separate from each other then?
-    if(C == 1) {
+    যদি(C == 1) {
         String error_message = "At least two classes are needed to perform a LDA. Reason: Only one class was given!";
         CV_Error(Error::StsBadArg, error_message);
     }
     // throw error if less labels, than samples
-    if (labels.size() != static_cast<size_t>(N)) {
+    যদি (labels.size() != static_cast<size_t>(N)) {
         String error_message = format("The number of samples must equal the number of labels. Given %zu labels, %d samples. ", labels.size(), N);
         CV_Error(Error::StsBadArg, error_message);
     }
     // warn if within-classes scatter matrix becomes singular
-    if (N < D) {
+    যদি (N < D) {
         std::cout << "Warning: Less observations than feature dimension given!"
                   << "Computation will probably fail."
                   << std::endl;
     }
     // clip number of components to be a valid number
-    if ((_num_components <= 0) || (_num_components >= C)) {
-        _num_components = (C - 1);
+    যদি ((অঙ্ক_components_2 <= 0) || (অঙ্ক_components_2 >= C)) {
+        অঙ্ক_components_2 = (C - 1);
     }
     // holds the mean over all classes
     Mat meanTotal = Mat::zeros(1, D, data.type());
     // holds the mean for each class
     std::vector<Mat> meanClass(C);
-    std::vector<int> numClass(C);
+    std::vector<পূর্ণাঙ্ক> অঙ্ক_Class(C);
     // initialize
-    for (int i = 0; i < C; i++) {
-        numClass[i] = 0;
+    বাবে (পূর্ণাঙ্ক i = 0; i < C; i++) {
+        অঙ্ক_Class[i] = 0;
         meanClass[i] = Mat::zeros(1, D, data.type()); //! Dx1 image vector
     }
     // calculate sums
-    for (int i = 0; i < N; i++) {
+    বাবে (পূর্ণাঙ্ক i = 0; i < N; i++) {
         Mat instance = data.row(i);
-        int classIdx = mapped_labels[i];
+        পূর্ণাঙ্ক classIdx = mapped_labels[i];
         add(meanTotal, instance, meanTotal);
         add(meanClass[classIdx], instance, meanClass[classIdx]);
-        numClass[classIdx]++;
+        অঙ্ক_Class[classIdx]++;
     }
     // calculate total mean
-    meanTotal.convertTo(meanTotal, meanTotal.type(), 1.0 / static_cast<double> (N));
+    meanTotal.convertTo(meanTotal, meanTotal.type(), 1.0 / static_cast<দ্ৱিগুণ> (N));
     // calculate class means
-    for (int i = 0; i < C; i++) {
-        meanClass[i].convertTo(meanClass[i], meanClass[i].type(), 1.0 / static_cast<double> (numClass[i]));
+    বাবে (পূর্ণাঙ্ক i = 0; i < C; i++) {
+        meanClass[i].convertTo(meanClass[i], meanClass[i].type(), 1.0 / static_cast<দ্ৱিগুণ> (অঙ্ক_Class[i]));
     }
     // subtract class means
-    for (int i = 0; i < N; i++) {
-        int classIdx = mapped_labels[i];
+    বাবে (পূর্ণাঙ্ক i = 0; i < N; i++) {
+        পূর্ণাঙ্ক classIdx = mapped_labels[i];
         Mat instance = data.row(i);
         subtract(instance, meanClass[classIdx], instance);
     }
     // calculate within-classes scatter
     Mat Sw = Mat::zeros(D, D, data.type());
-    mulTransposed(data, Sw, true);
+    mulTransposed(data, Sw, সঁচা);
     // calculate between-classes scatter
     Mat Sb = Mat::zeros(D, D, data.type());
-    for (int i = 0; i < C; i++) {
+    বাবে (পূর্ণাঙ্ক i = 0; i < C; i++) {
         Mat tmp;
         subtract(meanClass[i], meanTotal, tmp);
-        mulTransposed(tmp, tmp, true);
+        mulTransposed(tmp, tmp, সঁচা);
         add(Sb, tmp, Sb);
     }
     // invert Sw
@@ -1154,39 +1154,39 @@ void LDA::lda(InputArrayOfArrays _src, InputArray _lbls) {
     // reshape eigenvalues, so they are stored by column
     _eigenvalues = _eigenvalues.reshape(1, 1);
     // get sorted indices descending by their eigenvalue
-    std::vector<int> sorted_indices = argsort(_eigenvalues, false);
+    std::vector<পূর্ণাঙ্ক> sorted_indices = argsort(_eigenvalues, মিছা);
     // now sort eigenvalues and eigenvectors accordingly
     _eigenvalues = sortMatrixColumnsByIndices(_eigenvalues, sorted_indices);
     _eigenvectors = sortMatrixColumnsByIndices(_eigenvectors, sorted_indices);
     // and now take only the num_components and we're out!
-    _eigenvalues = Mat(_eigenvalues, Range::all(), Range(0, _num_components));
-    _eigenvectors = Mat(_eigenvectors, Range::all(), Range(0, _num_components));
+    _eigenvalues = Mat(_eigenvalues, Range::all(), Range(0, অঙ্ক_components_2));
+    _eigenvectors = Mat(_eigenvectors, Range::all(), Range(0, অঙ্ক_components_2));
 }
 
-void LDA::compute(InputArrayOfArrays _src, InputArray _lbls) {
-    switch(_src.kind()) {
-    case _InputArray::STD_VECTOR_MAT:
-    case _InputArray::STD_ARRAY_MAT:
+শূন্য LDA::compute(প্ৰবেশ_Array_Of_Arrays _src, প্ৰবেশ_Array _lbls) {
+    ৱিকল্প(_src.kind()) {
+    পক্ষ প্ৰবেশ_Array_2::STD_VECTOR_MAT:
+    পক্ষ প্ৰবেশ_Array_2::STD_ARRAY_MAT:
         lda(asRowMatrix(_src, CV_64FC1), _lbls);
-        break;
-    case _InputArray::MAT:
+        ভঙ্গ;
+    পক্ষ প্ৰবেশ_Array_2::MAT:
         lda(_src.getMat(), _lbls);
-        break;
-    default:
+        ভঙ্গ;
+    স্ৱভাৱ:
         String error_message= format("InputArray Datatype %d is not supported.", _src.kind());
         CV_Error(Error::StsBadArg, error_message);
-        break;
+        ভঙ্গ;
     }
 }
 
 // Projects one or more row aligned samples into the LDA subspace.
-Mat LDA::project(InputArray src) {
-   return subspaceProject(_eigenvectors, Mat(), src);
+Mat LDA::project(প্ৰবেশ_Array src) {
+   ঘূৰাই subspaceProject(_eigenvectors, Mat(), src);
 }
 
 // Reconstructs projections from the LDA subspace from one or more row aligned samples.
-Mat LDA::reconstruct(InputArray src) {
-   return subspaceReconstruct(_eigenvectors, Mat(), src);
+Mat LDA::reconstruct(প্ৰবেশ_Array src) {
+   ঘূৰাই subspaceReconstruct(_eigenvectors, Mat(), src);
 }
 
 }

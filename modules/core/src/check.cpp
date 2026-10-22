@@ -2,205 +2,205 @@
 // It is subject to the license terms in the LICENSE file found in the top-level directory
 // of this distribution and at http://opencv.org/license.html.
 
-#include "precomp.hpp"
+#অন্তর্ভাৱ "precomp.hpp"
 
-#include <sstream>
+#অন্তর্ভাৱ <sstream>
 
-#include "opencv2/core/check.hpp"
+#অন্তর্ভাৱ "opencv2/core/check.hpp"
 
-namespace cv {
+নামাকাশ cv {
 
-const char* depthToString(int depth)
+ধ্রুৱ ৱর্ণ* depthToString(পূর্ণাঙ্ক depth)
 {
-    const char* s = detail::depthToString_(depth);
-    return s ? s : "<invalid depth>";
+    ধ্রুৱ ৱর্ণ* s = detail::depthToString_(depth);
+    ঘূৰাই s ? s : "<invalid depth>";
 }
 
-cv::String typeToString(int type)
+cv::String typeToString(পূর্ণাঙ্ক type)
 {
     cv::String s = detail::typeToString_(type);
-    if (s.empty())
+    যদি (s.empty())
     {
-        static cv::String invalidType("<invalid type>");
-        return invalidType;
+        স্থির cv::String invalidType("<invalid type>");
+        ঘূৰাই invalidType;
     }
-    return s;
+    ঘূৰাই s;
 }
 
 
-namespace detail {
+নামাকাশ detail {
 
-static const char* getTestOpPhraseStr(unsigned testOp)
+স্থির ধ্রুৱ ৱর্ণ* getTestOpPhraseStr(unsigned testOp)
 {
-    static const char* _names[] = { "{custom check}", "equal to", "not equal to", "less than or equal to", "less than", "greater than or equal to", "greater than" };
+    স্থির ধ্রুৱ ৱর্ণ* _names[] = { "{custom check}", "equal to", "not equal to", "less than or equal to", "less than", "greater than or equal to", "greater than" };
     CV_DbgAssert(testOp < CV__LAST_TEST_OP);
-    return testOp < CV__LAST_TEST_OP ? _names[testOp] : "???";
+    ঘূৰাই testOp < CV__LAST_TEST_OP ? _names[testOp] : "???";
 }
-static const char* getTestOpMath(unsigned testOp)
+স্থির ধ্রুৱ ৱর্ণ* getTestOpMath(unsigned testOp)
 {
-    static const char* _names[] = { "???", "==", "!=", "<=", "<", ">=", ">" };
+    স্থির ধ্রুৱ ৱর্ণ* _names[] = { "???", "==", "!=", "<=", "<", ">=", ">" };
     CV_DbgAssert(testOp < CV__LAST_TEST_OP);
-    return testOp < CV__LAST_TEST_OP ? _names[testOp] : "???";
+    ঘূৰাই testOp < CV__LAST_TEST_OP ? _names[testOp] : "???";
 }
 
-const char* depthToString_(int depth)
+ধ্রুৱ ৱর্ণ* depthToString_(পূর্ণাঙ্ক depth)
 {
-    static const char* depthNames[] = { "CV_8U", "CV_8S", "CV_16U", "CV_16S", "CV_32S", "CV_32F", "CV_64F", "CV_16F",
+    স্থির ধ্রুৱ ৱর্ণ* depthNames[] = { "CV_8U", "CV_8S", "CV_16U", "CV_16S", "CV_32S", "CV_32F", "CV_64F", "CV_16F",
                                         "CV_16BF", "CV_Bool", "CV_64U", "CV_64S", "CV_32U",
                                         "CV_8F", "CV_8FNUZ" };
-    return (depth < CV_DEPTH_CURR_MAX && depth >= 0) ? depthNames[depth] : NULL;
+    ঘূৰাই (depth < CV_DEPTH_CURR_MAX && depth >= 0) ? depthNames[depth] : রিক্ত;
 }
 
-cv::String typeToString_(int type)
+cv::String typeToString_(পূর্ণাঙ্ক type)
 {
-    int depth = CV_MAT_DEPTH(type);
-    int cn = CV_MAT_CN(type);
-    if (depth >= 0 && depth < CV_DEPTH_CURR_MAX)
-        return cv::format("%sC%d", depthToString_(depth), cn);
-    return cv::String();
+    পূর্ণাঙ্ক depth = CV_MAT_DEPTH(type);
+    পূর্ণাঙ্ক cn = CV_MAT_CN(type);
+    যদি (depth >= 0 && depth < CV_DEPTH_CURR_MAX)
+        ঘূৰাই cv::format("%sC%d", depthToString_(depth), cn);
+    ঘূৰাই cv::String();
 }
 
-template<typename T> static CV_NORETURN
-void check_failed_auto_(const T& v1, const T& v2, const CheckContext& ctx)
+template<typename T> স্থির CV_NORETURN
+শূন্য check_failed_auto_(ধ্রুৱ T& v1, ধ্রুৱ T& v2, ধ্রুৱ CheckContext& ctx)
 {
     std::stringstream ss;
     ss  << ctx.message << " (expected: '" << ctx.p1_str << " " << getTestOpMath(ctx.testOp) << " " << ctx.p2_str << "'), where" << std::endl
         << "    '" << ctx.p1_str << "' is " << v1 << std::endl;
-    if (ctx.testOp != TEST_CUSTOM && ctx.testOp < CV__LAST_TEST_OP)
+    যদি (ctx.testOp != TEST_CUSTOM && ctx.testOp < CV__LAST_TEST_OP)
     {
         ss << "must be " << getTestOpPhraseStr(ctx.testOp) << std::endl;
     }
     ss  << "    '" << ctx.p2_str << "' is " << v2;
-    cv::error(cv::Error::StsError, ss.str(), ctx.func, ctx.file, ctx.line);
+    cv::error(cv::Error::StsError, ss.str(), ctx.func, ctx.file, ctx.সাৰি);
 }
-void check_failed_MatDepth(const int v1, const int v2, const CheckContext& ctx)
+শূন্য check_failed_MatDepth(ধ্রুৱ পূর্ণাঙ্ক v1, ধ্রুৱ পূর্ণাঙ্ক v2, ধ্রুৱ CheckContext& ctx)
 {
     std::stringstream ss;
     ss  << ctx.message << " (expected: '" << ctx.p1_str << " " << getTestOpMath(ctx.testOp) << " " << ctx.p2_str << "'), where" << std::endl
         << "    '" << ctx.p1_str << "' is " << v1 << " (" << depthToString(v1) << ")" << std::endl;
-    if (ctx.testOp != TEST_CUSTOM && ctx.testOp < CV__LAST_TEST_OP)
+    যদি (ctx.testOp != TEST_CUSTOM && ctx.testOp < CV__LAST_TEST_OP)
     {
         ss << "must be " << getTestOpPhraseStr(ctx.testOp) << std::endl;
     }
     ss  << "    '" << ctx.p2_str << "' is " << v2 << " (" << depthToString(v2) << ")";
-    cv::error(cv::Error::StsError, ss.str(), ctx.func, ctx.file, ctx.line);
+    cv::error(cv::Error::StsError, ss.str(), ctx.func, ctx.file, ctx.সাৰি);
 }
-void check_failed_MatType(const int v1, const int v2, const CheckContext& ctx)
+শূন্য check_failed_MatType(ধ্রুৱ পূর্ণাঙ্ক v1, ধ্রুৱ পূর্ণাঙ্ক v2, ধ্রুৱ CheckContext& ctx)
 {
     std::stringstream ss;
     ss  << ctx.message << " (expected: '" << ctx.p1_str << " " << getTestOpMath(ctx.testOp) << " " << ctx.p2_str << "'), where" << std::endl
         << "    '" << ctx.p1_str << "' is " << v1 << " (" << typeToString(v1) << ")" << std::endl;
-    if (ctx.testOp != TEST_CUSTOM && ctx.testOp < CV__LAST_TEST_OP)
+    যদি (ctx.testOp != TEST_CUSTOM && ctx.testOp < CV__LAST_TEST_OP)
     {
         ss << "must be " << getTestOpPhraseStr(ctx.testOp) << std::endl;
     }
     ss  << "    '" << ctx.p2_str << "' is " << v2 << " (" << typeToString(v2) << ")";
-    cv::error(cv::Error::StsError, ss.str(), ctx.func, ctx.file, ctx.line);
+    cv::error(cv::Error::StsError, ss.str(), ctx.func, ctx.file, ctx.সাৰি);
 }
-void check_failed_MatChannels(const int v1, const int v2, const CheckContext& ctx)
+শূন্য check_failed_MatChannels(ধ্রুৱ পূর্ণাঙ্ক v1, ধ্রুৱ পূর্ণাঙ্ক v2, ধ্রুৱ CheckContext& ctx)
 {
-    check_failed_auto_<int>(v1, v2, ctx);
+    check_failed_auto_<পূর্ণাঙ্ক>(v1, v2, ctx);
 }
-void check_failed_auto(const bool v1, const bool v2, const CheckContext& ctx)
+শূন্য check_failed_auto(ধ্রুৱ তার্কিক v1, ধ্রুৱ তার্কিক v2, ধ্রুৱ CheckContext& ctx)
 {
-    check_failed_auto_<bool>(v1, v2, ctx);
+    check_failed_auto_<তার্কিক>(v1, v2, ctx);
 }
-void check_failed_auto(const int v1, const int v2, const CheckContext& ctx)
+শূন্য check_failed_auto(ধ্রুৱ পূর্ণাঙ্ক v1, ধ্রুৱ পূর্ণাঙ্ক v2, ধ্রুৱ CheckContext& ctx)
 {
-    check_failed_auto_<int>(v1, v2, ctx);
+    check_failed_auto_<পূর্ণাঙ্ক>(v1, v2, ctx);
 }
-void check_failed_auto(const size_t v1, const size_t v2, const CheckContext& ctx)
+শূন্য check_failed_auto(ধ্রুৱ size_t v1, ধ্রুৱ size_t v2, ধ্রুৱ CheckContext& ctx)
 {
     check_failed_auto_<size_t>(v1, v2, ctx);
 }
-void check_failed_auto(const float v1, const float v2, const CheckContext& ctx)
+শূন্য check_failed_auto(ধ্রুৱ ভিন্ন v1, ধ্রুৱ ভিন্ন v2, ধ্রুৱ CheckContext& ctx)
 {
-    check_failed_auto_<float>(v1, v2, ctx);
+    check_failed_auto_<ভিন্ন>(v1, v2, ctx);
 }
-void check_failed_auto(const double v1, const double v2, const CheckContext& ctx)
+শূন্য check_failed_auto(ধ্রুৱ দ্ৱিগুণ v1, ধ্রুৱ দ্ৱিগুণ v2, ধ্রুৱ CheckContext& ctx)
 {
-    check_failed_auto_<double>(v1, v2, ctx);
+    check_failed_auto_<দ্ৱিগুণ>(v1, v2, ctx);
 }
-void check_failed_auto(const Size_<int> v1, const Size_<int> v2, const CheckContext& ctx)
+শূন্য check_failed_auto(ধ্রুৱ Size_<পূর্ণাঙ্ক> v1, ধ্রুৱ Size_<পূর্ণাঙ্ক> v2, ধ্রুৱ CheckContext& ctx)
 {
-    check_failed_auto_< Size_<int> >(v1, v2, ctx);
+    check_failed_auto_< Size_<পূর্ণাঙ্ক> >(v1, v2, ctx);
 }
 
 
-template<typename T> static CV_NORETURN
-void check_failed_auto_(const T& v, const CheckContext& ctx)
+template<typename T> স্থির CV_NORETURN
+শূন্য check_failed_auto_(ধ্রুৱ T& v, ধ্রুৱ CheckContext& ctx)
 {
     std::stringstream ss;
     ss  << ctx.message << ":" << std::endl
         << "    '" << ctx.p2_str << "'" << std::endl
         << "where" << std::endl
         << "    '" << ctx.p1_str << "' is " << v;
-    cv::error(cv::Error::StsError, ss.str(), ctx.func, ctx.file, ctx.line);
+    cv::error(cv::Error::StsError, ss.str(), ctx.func, ctx.file, ctx.সাৰি);
 }
-void check_failed_MatDepth(const int v, const CheckContext& ctx)
+শূন্য check_failed_MatDepth(ধ্রুৱ পূর্ণাঙ্ক v, ধ্রুৱ CheckContext& ctx)
 {
     std::stringstream ss;
     ss  << ctx.message << ":" << std::endl
         << "    '" << ctx.p2_str << "'" << std::endl
         << "where" << std::endl
         << "    '" << ctx.p1_str << "' is " << v << " (" << depthToString(v) << ")";
-    cv::error(cv::Error::StsError, ss.str(), ctx.func, ctx.file, ctx.line);
+    cv::error(cv::Error::StsError, ss.str(), ctx.func, ctx.file, ctx.সাৰি);
 }
-void check_failed_MatType(const int v, const CheckContext& ctx)
+শূন্য check_failed_MatType(ধ্রুৱ পূর্ণাঙ্ক v, ধ্রুৱ CheckContext& ctx)
 {
     std::stringstream ss;
     ss  << ctx.message << ":" << std::endl
         << "    '" << ctx.p2_str << "'" << std::endl
         << "where" << std::endl
         << "    '" << ctx.p1_str << "' is " << v << " (" << typeToString(v) << ")";
-    cv::error(cv::Error::StsError, ss.str(), ctx.func, ctx.file, ctx.line);
+    cv::error(cv::Error::StsError, ss.str(), ctx.func, ctx.file, ctx.সাৰি);
 }
-void check_failed_MatChannels(const int v, const CheckContext& ctx)
+শূন্য check_failed_MatChannels(ধ্রুৱ পূর্ণাঙ্ক v, ধ্রুৱ CheckContext& ctx)
 {
     std::stringstream ss;
     ss  << ctx.message << ":" << std::endl
         << "    '" << ctx.p2_str << "'" << std::endl
         << "where" << std::endl
         << "    '" << ctx.p1_str << "' is " << v;
-    cv::error(cv::Error::BadNumChannels, ss.str(), ctx.func, ctx.file, ctx.line);
+    cv::error(cv::Error::Bad_অঙ্ক_Channels, ss.str(), ctx.func, ctx.file, ctx.সাৰি);
 }
-void check_failed_true(const bool v, const CheckContext& ctx)
+শূন্য check_failed_true(ধ্রুৱ তার্কিক v, ধ্রুৱ CheckContext& ctx)
 {
     CV_UNUSED(v);
     std::stringstream ss;
     ss  << ctx.message << ":" << std::endl
         << "    '" << ctx.p1_str << "' must be 'true'";
-    cv::error(cv::Error::StsError, ss.str(), ctx.func, ctx.file, ctx.line);
+    cv::error(cv::Error::StsError, ss.str(), ctx.func, ctx.file, ctx.সাৰি);
 }
-void check_failed_false(const bool v, const CheckContext& ctx)
+শূন্য check_failed_false(ধ্রুৱ তার্কিক v, ধ্রুৱ CheckContext& ctx)
 {
     CV_UNUSED(v);
     std::stringstream ss;
     ss  << ctx.message << ":" << std::endl
         << "    '" << ctx.p1_str << "' must be 'false'";
-    cv::error(cv::Error::StsError, ss.str(), ctx.func, ctx.file, ctx.line);
+    cv::error(cv::Error::StsError, ss.str(), ctx.func, ctx.file, ctx.সাৰি);
 }
-void check_failed_auto(const int v, const CheckContext& ctx)
+শূন্য check_failed_auto(ধ্রুৱ পূর্ণাঙ্ক v, ধ্রুৱ CheckContext& ctx)
 {
-    check_failed_auto_<int>(v, ctx);
+    check_failed_auto_<পূর্ণাঙ্ক>(v, ctx);
 }
-void check_failed_auto(const size_t v, const CheckContext& ctx)
+শূন্য check_failed_auto(ধ্রুৱ size_t v, ধ্রুৱ CheckContext& ctx)
 {
     check_failed_auto_<size_t>(v, ctx);
 }
-void check_failed_auto(const float v, const CheckContext& ctx)
+শূন্য check_failed_auto(ধ্রুৱ ভিন্ন v, ধ্রুৱ CheckContext& ctx)
 {
-    check_failed_auto_<float>(v, ctx);
+    check_failed_auto_<ভিন্ন>(v, ctx);
 }
-void check_failed_auto(const double v, const CheckContext& ctx)
+শূন্য check_failed_auto(ধ্রুৱ দ্ৱিগুণ v, ধ্রুৱ CheckContext& ctx)
 {
-    check_failed_auto_<double>(v, ctx);
+    check_failed_auto_<দ্ৱিগুণ>(v, ctx);
 }
-void check_failed_auto(const Size_<int> v, const CheckContext& ctx)
+শূন্য check_failed_auto(ধ্রুৱ Size_<পূর্ণাঙ্ক> v, ধ্রুৱ CheckContext& ctx)
 {
-    check_failed_auto_< Size_<int> >(v, ctx);
+    check_failed_auto_< Size_<পূর্ণাঙ্ক> >(v, ctx);
 }
-void check_failed_auto(const std::string& v, const CheckContext& ctx)
+শূন্য check_failed_auto(ধ্রুৱ std::string& v, ধ্রুৱ CheckContext& ctx)
 {
     check_failed_auto_< std::string >(v, ctx);
 }

@@ -38,12 +38,12 @@
 // the use of this software, even if advised of the possibility of such damage.
 //
 //M*/
-#include "precomp.hpp"
+#অন্তর্ভাৱ "precomp.hpp"
 
-#if 0
+#যদি 0
 #define dprintf(x) printf x
 #define print_matrix(x) print(x)
-#else
+#অন্যথা
 #define dprintf(x)
 #define print_matrix(x)
 #endif
@@ -137,93 +137,93 @@ multiple lines in three dimensions as not all lines intersect in three dimension
 
 */
 
-namespace cv
+নামাকাশ cv
 {
 
-class DownhillSolverImpl CV_FINAL : public DownhillSolver
+শ্ৰেণী DownhillSolverImpl CV_FINAL : সার্ৱজনিক DownhillSolver
 {
-public:
+সার্ৱজনিক:
     DownhillSolverImpl()
     {
         _Function=Ptr<Function>();
-        _step=Mat_<double>();
+        _step=Mat_<দ্ৱিগুণ>();
     }
 
-    void getInitStep(OutputArray step) const CV_OVERRIDE { _step.copyTo(step); }
-    void setInitStep(InputArray step) CV_OVERRIDE
+    শূন্য getInitStep(OutputArray step) ধ্রুৱ CV_OVERRIDE { _step.copyTo(step); }
+    শূন্য setInitStep(প্ৰবেশ_Array step) CV_OVERRIDE
     {
         // set dimensionality and make a deep copy of step
         Mat m = step.getMat();
         dprintf(("m.cols=%d\nm.rows=%d\n", m.cols, m.rows));
-        if( m.rows == 1 )
+        যদি( m.rows == 1 )
             m.copyTo(_step);
-        else
+        অন্যথা
             transpose(m, _step);
     }
 
-    Ptr<MinProblemSolver::Function> getFunction() const CV_OVERRIDE { return _Function; }
+    Ptr<MinProblemSolver::Function> getFunction() ধ্রুৱ CV_OVERRIDE { ঘূৰাই _Function; }
 
-    void setFunction(const Ptr<Function>& f) CV_OVERRIDE { _Function=f; }
+    শূন্য setFunction(ধ্রুৱ Ptr<Function>& f) CV_OVERRIDE { _Function=f; }
 
-    TermCriteria getTermCriteria() const CV_OVERRIDE { return _termcrit; }
+    TermCriteria getTermCriteria() ধ্রুৱ CV_OVERRIDE { ঘূৰাই _termcrit; }
 
-    void setTermCriteria( const TermCriteria& termcrit ) CV_OVERRIDE
+    শূন্য setTermCriteria( ধ্রুৱ TermCriteria& termcrit ) CV_OVERRIDE
     {
         CV_Assert( termcrit.type == (TermCriteria::MAX_ITER + TermCriteria::EPS) &&
                    termcrit.epsilon > 0 &&
-                   termcrit.maxCount > 0 );
+                   termcrit.max_গুনতি > 0 );
         _termcrit=termcrit;
     }
 
-    double minimize( InputOutputArray x_ ) CV_OVERRIDE
+    দ্ৱিগুণ minimize( প্ৰবেশ_Output_Array x_ ) CV_OVERRIDE
     {
         dprintf(("hi from minimize\n"));
         CV_Assert( !_Function.empty() );
         CV_Assert( std::min(_step.cols, _step.rows) == 1 &&
                   std::max(_step.cols, _step.rows) >= 2 &&
                   _step.type() == CV_64FC1 );
-        dprintf(("termcrit:\n\ttype: %d\n\tmaxCount: %d\n\tEPS: %g\n",_termcrit.type,_termcrit.maxCount,_termcrit.epsilon));
+        dprintf(("termcrit:\n\ttype: %d\n\tmaxCount: %d\n\tEPS: %g\n",_termcrit.type,_termcrit.max_গুনতি,_termcrit.epsilon));
         dprintf(("step\n"));
         print_matrix(_step);
 
         Mat x = x_.getMat(), simplex;
 
         createInitialSimplex(x, simplex, _step);
-        int count = 0;
-        double res = innerDownhillSimplex(simplex,_termcrit.epsilon, _termcrit.epsilon,
-                                          count, _termcrit.maxCount);
-        dprintf(("%d iterations done\n",count));
+        পূর্ণাঙ্ক গুনতি_2 = 0;
+        দ্ৱিগুণ res = innerDownhillSimplex(simplex,_termcrit.epsilon, _termcrit.epsilon,
+                                          গুনতি_2, _termcrit.max_গুনতি);
+        dprintf(("%d iterations done\n",গুনতি_2));
 
-        if( !x.empty() )
+        যদি( !x.empty() )
         {
-            Mat simplex_0m(x.rows, x.cols, CV_64F, simplex.ptr<double>());
+            Mat simplex_0m(x.rows, x.cols, CV_64F, simplex.ptr<দ্ৱিগুণ>());
             simplex_0m.convertTo(x, x.type());
         }
-        else
+        অন্যথা
         {
-            int x_type = x_.fixedType() ? x_.type() : CV_64F;
+            পূর্ণাঙ্ক x_type = x_.fixedType() ? x_.type() : CV_64F;
             simplex.row(0).convertTo(x_, x_type);
         }
-        return res;
+        ঘূৰাই res;
     }
-protected:
+রক্ষিত:
     Ptr<MinProblemSolver::Function> _Function;
     TermCriteria _termcrit;
     Mat _step;
 
-    inline void updateCoordSum(const Mat& p, Mat& coord_sum)
+    অন্তঃস্থ শূন্য updateCoordSum(ধ্রুৱ Mat& p, Mat& coord_sum)
     {
-        int i, j, m = p.rows, n = p.cols;
-        double* coord_sum_ = coord_sum.ptr<double>();
+        পূর্ণাঙ্ক i, j, m = p.rows, n = p.cols;
+        দ্ৱিগুণ* coord_sum_ = coord_sum.ptr<দ্ৱিগুণ>();
         CV_Assert( coord_sum.cols == n && coord_sum.rows == 1 );
 
-        for( j = 0; j < n; j++ )
+        বাবে( j = 0; j < n; j++ )
             coord_sum_[j] = 0.;
 
-        for( i = 0; i < m; i++ )
+        বাবে( i = 0; i < m; i++ )
         {
-            const double* p_i = p.ptr<double>(i);
-            for( j = 0; j < n; j++ )
+            ধ্রুৱ দ্ৱিগুণ* p_i = p.ptr<দ্ৱিগুণ>(i);
+            বাবে( j = 0; j < n; j++ )
                 coord_sum_[j] += p_i[j];
         }
 
@@ -232,30 +232,30 @@ protected:
 
     }
 
-    inline void createInitialSimplex( const Mat& x0, Mat& simplex, Mat& step )
+    অন্তঃস্থ শূন্য createInitialSimplex( ধ্রুৱ Mat& x0, Mat& simplex, Mat& step )
     {
-        int i, j, ndim = step.cols;
+        পূর্ণাঙ্ক i, j, ndim = step.cols;
         CV_Assert( _Function->getDims() == ndim );
         Mat x = x0;
-        if( x0.empty() )
+        যদি( x0.empty() )
             x = Mat::zeros(1, ndim, CV_64F);
         CV_Assert( (x.cols == 1 && x.rows == ndim) || (x.cols == ndim && x.rows == 1) );
         CV_Assert( x.type() == CV_32F || x.type() == CV_64F );
 
         simplex.create(ndim + 1, ndim, CV_64F);
-        Mat simplex_0m(x.rows, x.cols, CV_64F, simplex.ptr<double>());
+        Mat simplex_0m(x.rows, x.cols, CV_64F, simplex.ptr<দ্ৱিগুণ>());
 
         x.convertTo(simplex_0m, CV_64F);
-        double* simplex_0 = simplex.ptr<double>();
-        const double* step_ = step.ptr<double>();
-        for( i = 1; i <= ndim; i++ )
+        দ্ৱিগুণ* simplex_0 = simplex.ptr<দ্ৱিগুণ>();
+        ধ্রুৱ দ্ৱিগুণ* step_ = step.ptr<দ্ৱিগুণ>();
+        বাবে( i = 1; i <= ndim; i++ )
         {
-            double* simplex_i = simplex.ptr<double>(i);
-            for( j = 0; j < ndim; j++ )
+            দ্ৱিগুণ* simplex_i = simplex.ptr<দ্ৱিগুণ>(i);
+            বাবে( j = 0; j < ndim; j++ )
                 simplex_i[j] = simplex_0[j];
             simplex_i[i-1] += 0.5*step_[i-1];
         }
-        for( j = 0; j < ndim; j++ )
+        বাবে( j = 0; j < ndim; j++ )
             simplex_0[j] -= 0.5*step_[j];
 
         dprintf(("\nthis is simplex\n"));
@@ -269,54 +269,54 @@ protected:
      form a simplex - each row is an ndim vector.
      On output, fcount gives the number of function evaluations taken.
     */
-    double innerDownhillSimplex( Mat& p, double MinRange, double MinError, int& fcount, int nmax )
+    দ্ৱিগুণ innerDownhillSimplex( Mat& p, দ্ৱিগুণ MinRange, দ্ৱিগুণ MinError, পূর্ণাঙ্ক& fcount, পূর্ণাঙ্ক nmax )
     {
-        int i, j, ndim = p.cols;
+        পূর্ণাঙ্ক i, j, ndim = p.cols;
         Mat coord_sum(1, ndim, CV_64F), buf(1, ndim, CV_64F), y(1, ndim+1, CV_64F);
-        double* y_ = y.ptr<double>();
+        দ্ৱিগুণ* y_ = y.ptr<দ্ৱিগুণ>();
 
         fcount = ndim+1;
-        for( i = 0; i <= ndim; i++ )
-            y_[i] = calc_f(p.ptr<double>(i));
+        বাবে( i = 0; i <= ndim; i++ )
+            y_[i] = calc_f(p.ptr<দ্ৱিগুণ>(i));
 
         updateCoordSum(p, coord_sum);
 
-        for (;;)
+        বাবে (;;)
         {
             // find highest (worst), next-to-worst, and lowest
             // (best) points by going through all of them.
-            int ilo = 0, ihi, inhi;
-            if( y_[0] > y_[1] )
+            পূর্ণাঙ্ক ilo = 0, ihi, inhi;
+            যদি( y_[0] > y_[1] )
             {
                 ihi = 0; inhi = 1;
             }
-            else
+            অন্যথা
             {
                 ihi = 1; inhi = 0;
             }
-            for( i = 0; i <= ndim; i++ )
+            বাবে( i = 0; i <= ndim; i++ )
             {
-                double yval = y_[i];
-                if (yval <= y_[ilo])
+                দ্ৱিগুণ yval = y_[i];
+                যদি (yval <= y_[ilo])
                     ilo = i;
-                if (yval > y_[ihi])
+                যদি (yval > y_[ihi])
                 {
                     inhi = ihi;
                     ihi = i;
                 }
-                else if (yval > y_[inhi] && i != ihi)
+                অন্যথা যদি (yval > y_[inhi] && i != ihi)
                     inhi = i;
             }
             CV_Assert( ihi != inhi );
-            if( ilo == inhi || ilo == ihi )
+            যদি( ilo == inhi || ilo == ihi )
             {
-                for( i = 0; i <= ndim; i++ )
+                বাবে( i = 0; i <= ndim; i++ )
                 {
-                    double yval = y_[i];
-                    if( yval == y_[ilo] && i != ihi && i != inhi )
+                    দ্ৱিগুণ yval = y_[i];
+                    যদি( yval == y_[ilo] && i != ihi && i != inhi )
                     {
                         ilo = i;
-                        break;
+                        ভঙ্গ;
                     }
                 }
             }
@@ -324,50 +324,50 @@ protected:
             print_matrix(y);
 
             // check stop criterion
-            double error = fabs(y_[ihi] - y_[ilo]);
-            double range = 0;
-            for( j = 0; j < ndim; j++ )
+            দ্ৱিগুণ error = fabs(y_[ihi] - y_[ilo]);
+            দ্ৱিগুণ range = 0;
+            বাবে( j = 0; j < ndim; j++ )
             {
-                double minval, maxval;
-                minval = maxval = p.at<double>(0, j);
-                for( i = 1; i <= ndim; i++ )
+                দ্ৱিগুণ minval, maxval;
+                minval = maxval = p.at<দ্ৱিগুণ>(0, j);
+                বাবে( i = 1; i <= ndim; i++ )
                 {
-                    double pval = p.at<double>(i, j);
+                    দ্ৱিগুণ pval = p.at<দ্ৱিগুণ>(i, j);
                     minval = std::min(minval, pval);
                     maxval = std::max(maxval, pval);
                 }
                 range = std::max(range, fabs(maxval - minval));
             }
 
-            if( range <= MinRange || error <= MinError || fcount >= nmax )
+            যদি( range <= MinRange || error <= MinError || fcount >= nmax )
             {
                 // Put best point and value in first slot.
                 std::swap(y_[0], y_[ilo]);
-                for( j = 0; j < ndim; j++ )
+                বাবে( j = 0; j < ndim; j++ )
                 {
-                    std::swap(p.at<double>(0, j), p.at<double>(ilo, j));
+                    std::swap(p.at<দ্ৱিগুণ>(0, j), p.at<দ্ৱিগুণ>(ilo, j));
                 }
-                break;
+                ভঙ্গ;
             }
 
-            double y_lo = y_[ilo], y_nhi = y_[inhi], y_hi = y_[ihi];
+            দ্ৱিগুণ y_lo = y_[ilo], y_nhi = y_[inhi], y_hi = y_[ihi];
             // Begin a new iteration. First, reflect the worst point about the centroid of others
-            double alpha = -1.0;
-            double y_alpha = tryNewPoint(p, coord_sum, ihi, alpha, buf, fcount);
+            দ্ৱিগুণ alpha = -1.0;
+            দ্ৱিগুণ y_alpha = tryNewPoint(p, coord_sum, ihi, alpha, buf, fcount);
 
             dprintf(("\ny_lo=%g, y_nhi=%g, y_hi=%g, y_alpha=%g, p_alpha:\n", y_lo, y_nhi, y_hi, y_alpha));
             print_matrix(buf);
 
-            if( y_alpha < y_nhi )
+            যদি( y_alpha < y_nhi )
             {
-                if( y_alpha < y_lo )
+                যদি( y_alpha < y_lo )
                 {
                     // If that's better than the best point, go twice as far in that direction
-                    double beta = -2.0;
-                    double y_beta = tryNewPoint(p, coord_sum, ihi, beta, buf, fcount);
+                    দ্ৱিগুণ beta = -2.0;
+                    দ্ৱিগুণ y_beta = tryNewPoint(p, coord_sum, ihi, beta, buf, fcount);
                     dprintf(("\ny_beta=%g, p_beta:\n", y_beta));
                     print_matrix(buf);
-                    if( y_beta < y_alpha )
+                    যদি( y_beta < y_alpha )
                     {
                         alpha = beta;
                         y_alpha = y_beta;
@@ -375,28 +375,28 @@ protected:
                 }
                 replacePoint(p, coord_sum, y, ihi, alpha, y_alpha);
             }
-            else
+            অন্যথা
             {
                 // The new point is worse than the second-highest,
                 // do not go so far in that direction
-                double gamma = 0.5;
-                double y_gamma = tryNewPoint(p, coord_sum, ihi, gamma, buf, fcount);
+                দ্ৱিগুণ gamma = 0.5;
+                দ্ৱিগুণ y_gamma = tryNewPoint(p, coord_sum, ihi, gamma, buf, fcount);
                 dprintf(("\ny_gamma=%g, p_gamma:\n", y_gamma));
                 print_matrix(buf);
-                if( y_gamma < y_hi )
+                যদি( y_gamma < y_hi )
                     replacePoint(p, coord_sum, y, ihi, gamma, y_gamma);
-                else
+                অন্যথা
                 {
                     // Can't seem to improve things.
                     // Contract the simplex to good point
                     // in hope to find a simplex landscape.
-                    for( i = 0; i <= ndim; i++ )
+                    বাবে( i = 0; i <= ndim; i++ )
                     {
-                        if (i != ilo)
+                        যদি (i != ilo)
                         {
-                            for( j = 0; j < ndim; j++ )
-                                p.at<double>(i, j) = 0.5*(p.at<double>(i, j) + p.at<double>(ilo, j));
-                            y_[i] = calc_f(p.ptr<double>(i));
+                            বাবে( j = 0; j < ndim; j++ )
+                                p.at<দ্ৱিগুণ>(i, j) = 0.5*(p.at<দ্ৱিগুণ>(i, j) + p.at<দ্ৱিগুণ>(ilo, j));
+                            y_[i] = calc_f(p.ptr<দ্ৱিগুণ>(i));
                         }
                     }
                     fcount += ndim;
@@ -406,45 +406,45 @@ protected:
             dprintf(("\nthis is simplex on iteration %d\n",fcount));
             print_matrix(p);
         }
-        return y_[0];
+        ঘূৰাই y_[0];
     }
 
-    inline double calc_f(const double* ptr)
+    অন্তঃস্থ দ্ৱিগুণ calc_f(ধ্রুৱ দ্ৱিগুণ* ptr)
     {
-        double res = _Function->calc(ptr);
+        দ্ৱিগুণ res = _Function->calc(ptr);
         CV_Assert( !cvIsNaN(res) && !cvIsInf(res) );
-        return res;
+        ঘূৰাই res;
     }
 
-    double tryNewPoint( Mat& p, Mat& coord_sum, int ihi, double alpha_, Mat& ptry, int& fcount )
+    দ্ৱিগুণ tryNewPoint( Mat& p, Mat& coord_sum, পূর্ণাঙ্ক ihi, দ্ৱিগুণ alpha_, Mat& ptry, পূর্ণাঙ্ক& fcount )
     {
-        int j, ndim = p.cols;
+        পূর্ণাঙ্ক j, ndim = p.cols;
 
-        double alpha = (1.0 - alpha_)/ndim;
-        double beta = alpha - alpha_;
-        double* p_ihi = p.ptr<double>(ihi);
-        double* ptry_ = ptry.ptr<double>();
-        double* coord_sum_ = coord_sum.ptr<double>();
+        দ্ৱিগুণ alpha = (1.0 - alpha_)/ndim;
+        দ্ৱিগুণ beta = alpha - alpha_;
+        দ্ৱিগুণ* p_ihi = p.ptr<দ্ৱিগুণ>(ihi);
+        দ্ৱিগুণ* ptry_ = ptry.ptr<দ্ৱিগুণ>();
+        দ্ৱিগুণ* coord_sum_ = coord_sum.ptr<দ্ৱিগুণ>();
 
-        for( j = 0; j < ndim; j++ )
+        বাবে( j = 0; j < ndim; j++ )
             ptry_[j] = coord_sum_[j]*alpha - p_ihi[j]*beta;
 
         fcount++;
-        return calc_f(ptry_);
+        ঘূৰাই calc_f(ptry_);
     }
 
-    void replacePoint( Mat& p, Mat& coord_sum, Mat& y, int ihi, double alpha_, double ytry )
+    শূন্য replacePoint( Mat& p, Mat& coord_sum, Mat& y, পূর্ণাঙ্ক ihi, দ্ৱিগুণ alpha_, দ্ৱিগুণ ytry )
     {
-        int j, ndim = p.cols;
+        পূর্ণাঙ্ক j, ndim = p.cols;
 
-        double alpha = (1.0 - alpha_)/ndim;
-        double beta = alpha - alpha_;
-        double* p_ihi = p.ptr<double>(ihi);
-        double* coord_sum_ = coord_sum.ptr<double>();
+        দ্ৱিগুণ alpha = (1.0 - alpha_)/ndim;
+        দ্ৱিগুণ beta = alpha - alpha_;
+        দ্ৱিগুণ* p_ihi = p.ptr<দ্ৱিগুণ>(ihi);
+        দ্ৱিগুণ* coord_sum_ = coord_sum.ptr<দ্ৱিগুণ>();
 
-        for( j = 0; j < ndim; j++ )
+        বাবে( j = 0; j < ndim; j++ )
             p_ihi[j] = coord_sum_[j]*alpha - p_ihi[j]*beta;
-        y.at<double>(ihi) = ytry;
+        y.at<দ্ৱিগুণ>(ihi) = ytry;
         updateCoordSum(p, coord_sum);
     }
 };
@@ -452,14 +452,14 @@ protected:
 
 // both minRange & minError are specified by termcrit.epsilon;
 // In addition, user may specify the number of iterations that the algorithm does.
-Ptr<DownhillSolver> DownhillSolver::create( const Ptr<MinProblemSolver::Function>& f,
-                                            InputArray initStep, TermCriteria termcrit )
+Ptr<DownhillSolver> DownhillSolver::create( ধ্রুৱ Ptr<MinProblemSolver::Function>& f,
+                                            প্ৰবেশ_Array initStep, TermCriteria termcrit )
 {
     Ptr<DownhillSolver> DS = makePtr<DownhillSolverImpl>();
     DS->setFunction(f);
     DS->setInitStep(initStep);
     DS->setTermCriteria(termcrit);
-    return DS;
+    ঘূৰাই DS;
 }
 
 }

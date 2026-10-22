@@ -4,33 +4,33 @@
 // Copyright (C) 2026, BigVision LLC, all rights reserved.
 // Third party copyrights are property of their respective owners.
 
-#include "precomp.hpp"
+#অন্তর্ভাৱ "precomp.hpp"
 
-namespace cv {
+নামাকাশ cv {
 
 // In place (dst shares the data of a continuous src) only the header changes; otherwise the
 // elements are copied into dst.
-static void reshapeTo(InputArray _src, OutputArray _dst, const MatShape& shape)
+স্থির শূন্য reshapeTo(প্ৰবেশ_Array _src, OutputArray _dst, ধ্রুৱ MatShape& shape)
 {
     Mat src = _src.getMat();
     CV_Assert(shape.total() == src.total());
-    if (_dst.kind() == _InputArray::MAT && src.isContinuous())
+    যদি (_dst.kind() == প্ৰবেশ_Array_2::MAT && src.isContinuous())
     {
         Mat& dst = _dst.getMatRef();
-        if (dst.data && dst.data == src.data)
+        যদি (dst.data && dst.data == src.data)
         {
             dst = src.reshape(0, shape);
-            return;
+            ঘূৰাই;
         }
     }
     _dst.create(shape, src.type());
     Mat dst = _dst.getMat();
-    if (dst.data == src.data)
-        return;
-    if (dst.isContinuous())
+    যদি (dst.data == src.data)
+        ঘূৰাই;
+    যদি (dst.isContinuous())
     {
         src.copyTo(Mat(src.dims, src.size.p, src.type(), dst.data));
-        return;
+        ঘূৰাই;
     }
     // create() keeps a preallocated destination of the right shape even when it is strided
     Mat tmp;
@@ -38,25 +38,25 @@ static void reshapeTo(InputArray _src, OutputArray _dst, const MatShape& shape)
     Mat(shape.dims, shape.p, src.type(), tmp.data).copyTo(dst);
 }
 
-void squeeze(InputArray src, OutputArray dst, const std::vector<int>& axes)
+শূন্য squeeze(প্ৰবেশ_Array src, OutputArray dst, ধ্রুৱ std::vector<পূর্ণাঙ্ক>& axes)
 {
     CV_INSTRUMENT_REGION();
     reshapeTo(src, dst, src.shape().squeeze(axes));
 }
 
-void unsqueeze(InputArray src, OutputArray dst, const std::vector<int>& axes)
+শূন্য unsqueeze(প্ৰবেশ_Array src, OutputArray dst, ধ্রুৱ std::vector<পূর্ণাঙ্ক>& axes)
 {
     CV_INSTRUMENT_REGION();
     reshapeTo(src, dst, src.shape().unsqueeze(axes));
 }
 
-void flatten(InputArray src, OutputArray dst, int startAxis, int endAxis)
+শূন্য flatten(প্ৰবেশ_Array src, OutputArray dst, পূর্ণাঙ্ক startAxis, পূর্ণাঙ্ক endAxis)
 {
     CV_INSTRUMENT_REGION();
     reshapeTo(src, dst, src.shape().flatten(startAxis, endAxis));
 }
 
-void reshape(InputArray src, OutputArray dst, const std::vector<int>& newShape, bool allowZero)
+শূন্য reshape(প্ৰবেশ_Array src, OutputArray dst, ধ্রুৱ std::vector<পূর্ণাঙ্ক>& newShape, তার্কিক allowZero)
 {
     CV_INSTRUMENT_REGION();
     reshapeTo(src, dst, src.shape().reshape(MatShape(newShape), allowZero));

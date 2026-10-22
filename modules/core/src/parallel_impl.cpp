@@ -2,28 +2,28 @@
 // It is subject to the license terms in the LICENSE file found in the top-level directory
 // of this distribution and at http://opencv.org/license.html.
 
-#include "precomp.hpp"
+#অন্তর্ভাৱ "precomp.hpp"
 
-#include "parallel_impl.hpp"
+#অন্তর্ভাৱ "parallel_impl.hpp"
 
 #ifdef HAVE_PTHREADS_PF
-#include <pthread.h>
+#অন্তর্ভাৱ <pthread.h>
 
-#include <opencv2/core/utils/configuration.private.hpp>
+#অন্তর্ভাৱ <opencv2/core/utils/configuration.private.hpp>
 
-#include <opencv2/core/utils/logger.defines.hpp>
+#অন্তর্ভাৱ <opencv2/core/utils/logger.defines.hpp>
 //#undef CV_LOG_STRIP_LEVEL
 //#define CV_LOG_STRIP_LEVEL CV_LOG_LEVEL_VERBOSE + 1
-#include <opencv2/core/utils/logger.hpp>
+#অন্তর্ভাৱ <opencv2/core/utils/logger.hpp>
 
-#include <opencv2/core/utils/trace.private.hpp>
+#অন্তর্ভাৱ <opencv2/core/utils/trace.private.hpp>
 
 //#define CV_PROFILE_THREADS 64
 //#define getTickCount getCPUTickCount  // use this if getTickCount() calls are expensive (and getCPUTickCount() is accurate)
 
 //#define CV_USE_GLOBAL_WORKERS_COND_VAR  // not effective on many-core systems (10+)
 
-#include <atomic>
+#অন্তর্ভাৱ <atomic>
 
 // Spin lock's OS-level yield
 #ifdef DECLARE_CV_YIELD
@@ -39,89 +39,89 @@ DECLARE_CV_YIELD
 DECLARE_CV_PAUSE
 #endif
 #ifndef CV_PAUSE
-# if defined __GNUC__ && (defined __i386__ || defined __x86_64__)
+# যদি defined __GNUC__ && (defined __i386__ || defined __x86_64__)
 #   include <x86intrin.h> /* for __rdtsc */
-#   if !defined(__SSE2__)
-      static inline void cv_non_sse_mm_pause() { __asm__ __volatile__ ("rep; nop"); }
+#   যদি !defined(__SSE2__)
+      স্থির অন্তঃস্থ শূন্য cv_non_sse_mm_pause() { __asm__ __volatile__ ("rep; nop"); }
 #     define _mm_pause cv_non_sse_mm_pause
 #   endif
 // With Skylake CPUs and above, _mm_pause takes 140 cycles so no need for a loop.
-#   define CV_PAUSE(v) do { (void)v; _mm_pause(); } while (0)
+#   define CV_PAUSE(v) কৰা { (শূন্য)v; _mm_pause(); } যেতিয়ালৈ (0)
 # elif defined __GNUC__ && defined __aarch64__
-#   define CV_PAUSE(v) do { for (int __delay = (v); __delay > 0; --__delay) { asm volatile("yield" ::: "memory"); } } while (0)
+#   define CV_PAUSE(v) কৰা { বাবে (পূর্ণাঙ্ক __delay = (v); __delay > 0; --__delay) { asm চঞ্চল("yield" ::: "memory"); } } যেতিয়ালৈ (0)
 # elif defined __GNUC__ && defined __arm__
-#   define CV_PAUSE(v) do { for (int __delay = (v); __delay > 0; --__delay) { asm volatile("" ::: "memory"); } } while (0)
+#   define CV_PAUSE(v) কৰা { বাবে (পূর্ণাঙ্ক __delay = (v); __delay > 0; --__delay) { asm চঞ্চল("" ::: "memory"); } } যেতিয়ালৈ (0)
 # elif defined __GNUC__ && defined __mips__ && __mips_isa_rev >= 2
-#   define CV_PAUSE(v) do { for (int __delay = (v); __delay > 0; --__delay) { asm volatile("pause" ::: "memory"); } } while (0)
+#   define CV_PAUSE(v) কৰা { বাবে (পূর্ণাঙ্ক __delay = (v); __delay > 0; --__delay) { asm চঞ্চল("pause" ::: "memory"); } } যেতিয়ালৈ (0)
 # elif defined __APPLE__ && defined __POWERPC__
-#   define CV_PAUSE(v) do { for (int __delay = (v); __delay > 0; --__delay) { asm volatile("or r27,r27,r27" ::: "memory"); } } while (0)
+#   define CV_PAUSE(v) কৰা { বাবে (পূর্ণাঙ্ক __delay = (v); __delay > 0; --__delay) { asm চঞ্চল("or r27,r27,r27" ::: "memory"); } } যেতিয়ালৈ (0)
 # elif defined __GNUC__ && defined __PPC64__
-#   define CV_PAUSE(v) do { for (int __delay = (v); __delay > 0; --__delay) { asm volatile("or 27,27,27" ::: "memory"); } } while (0)
+#   define CV_PAUSE(v) কৰা { বাবে (পূর্ণাঙ্ক __delay = (v); __delay > 0; --__delay) { asm চঞ্চল("or 27,27,27" ::: "memory"); } } যেতিয়ালৈ (0)
 # elif defined __GNUC__ && defined __riscv
 // PAUSE HINT is not part of RISC-V ISA yet, but is under discussion now. For details see:
 // https://github.com/riscv/riscv-isa-manual/pull/398
 // https://github.com/riscv/riscv-isa-manual/issues/43
 // #   define CV_PAUSE(v) do { for (int __delay = (v); __delay > 0; --__delay) { asm volatile("pause"); } } while (0)
-#   define CV_PAUSE(v) do { for (int __delay = (v); __delay > 0; --__delay) { asm volatile("nop"); } } while (0)
+#   define CV_PAUSE(v) কৰা { বাবে (পূর্ণাঙ্ক __delay = (v); __delay > 0; --__delay) { asm চঞ্চল("nop"); } } যেতিয়ালৈ (0)
 # elif defined __GNUC__ && defined __loongarch__
-#   define CV_PAUSE(v) do { for (int __delay = (v); __delay > 0; --__delay) { asm volatile("nop"); } } while (0)
-# else
+#   define CV_PAUSE(v) কৰা { বাবে (পূর্ণাঙ্ক __delay = (v); __delay > 0; --__delay) { asm চঞ্চল("nop"); } } যেতিয়ালৈ (0)
+# অন্যথা
 #   warning "Can't detect 'pause' (CPU-yield) instruction on the target platform. Specify CV_PAUSE() definition via compiler flags."
-#   define CV_PAUSE(...) do { /* no-op: works, but not effective */ } while (0)
+#   define CV_PAUSE(...) কৰা { /* no-op: works, but not effective */ } যেতিয়ালৈ (0)
 # endif
 #endif // CV_PAUSE
 
 
-namespace cv
+নামাকাশ cv
 {
 
-static int CV_ACTIVE_WAIT_PAUSE_LIMIT = (int)utils::getConfigurationParameterSizeT("OPENCV_THREAD_POOL_ACTIVE_WAIT_PAUSE_LIMIT", 16);  // iterations
-static int CV_WORKER_ACTIVE_WAIT = (int)utils::getConfigurationParameterSizeT("OPENCV_THREAD_POOL_ACTIVE_WAIT_WORKER", 2000);  // iterations
-static int CV_MAIN_THREAD_ACTIVE_WAIT = (int)utils::getConfigurationParameterSizeT("OPENCV_THREAD_POOL_ACTIVE_WAIT_MAIN", 10000); // iterations
+স্থির পূর্ণাঙ্ক CV_ACTIVE_WAIT_PAUSE_LIMIT = (পূর্ণাঙ্ক)utils::getConfigurationParameterSizeT("OPENCV_THREAD_POOL_ACTIVE_WAIT_PAUSE_LIMIT", 16);  // iterations
+স্থির পূর্ণাঙ্ক CV_WORKER_ACTIVE_WAIT = (পূর্ণাঙ্ক)utils::getConfigurationParameterSizeT("OPENCV_THREAD_POOL_ACTIVE_WAIT_WORKER", 2000);  // iterations
+স্থির পূর্ণাঙ্ক CV_MAIN_THREAD_ACTIVE_WAIT = (পূর্ণাঙ্ক)utils::getConfigurationParameterSizeT("OPENCV_THREAD_POOL_ACTIVE_WAIT_MAIN", 10000); // iterations
 
-static int CV_WORKER_ACTIVE_WAIT_THREADS_LIMIT = (int)utils::getConfigurationParameterSizeT("OPENCV_THREAD_POOL_ACTIVE_WAIT_THREADS_LIMIT", 0); // number of real cores
+স্থির পূর্ণাঙ্ক CV_WORKER_ACTIVE_WAIT_THREADS_LIMIT = (পূর্ণাঙ্ক)utils::getConfigurationParameterSizeT("OPENCV_THREAD_POOL_ACTIVE_WAIT_THREADS_LIMIT", 0); // number of real cores
 
-class WorkerThread;
-class ParallelJob;
+শ্ৰেণী WorkerThread;
+শ্ৰেণী ParallelJob;
 
-class ThreadPool
+শ্ৰেণী ThreadPool
 {
-public:
-    static ThreadPool& instance()
+সার্ৱজনিক:
+    স্থির ThreadPool& instance()
     {
-        CV_SINGLETON_LAZY_INIT_REF(ThreadPool, new ThreadPool())
+        CV_SINGLETON_LAZY_INIT_REF(ThreadPool, নূতন ThreadPool())
     }
 
-    static void stop()
+    স্থির শূন্য stop()
     {
         ThreadPool& manager = instance();
         manager.reconfigure(0);
     }
 
-    void reconfigure(unsigned new_threads_count)
+    শূন্য reconfigure(unsigned new_threads_গুনতি)
     {
-        if (new_threads_count == threads.size())
-            return;
+        যদি (new_threads_গুনতি == threads.size())
+            ঘূৰাই;
         pthread_mutex_lock(&mutex);
-        reconfigure_(new_threads_count);
+        reconfigure_(new_threads_গুনতি);
         pthread_mutex_unlock(&mutex);
     }
-    bool reconfigure_(unsigned new_threads_count); // internal implementation
+    তার্কিক reconfigure_(unsigned new_threads_গুনতি); // internal implementation
 
-    void run(const Range& range, const ParallelLoopBody& body, double nstripes);
+    শূন্য run(ধ্রুৱ Range& range, ধ্রুৱ ParallelLoopBody& body, দ্ৱিগুণ nstripes);
 
-    size_t getNumOfThreads();
+    size_t get_অঙ্ক_Of_Threads();
 
-    void setNumOfThreads(unsigned n);
+    শূন্য set_অঙ্ক_Of_Threads(unsigned n);
 
     ThreadPool();
 
     ~ThreadPool();
 
-    unsigned num_threads;
+    unsigned অঙ্ক_threads;
 
     pthread_mutex_t mutex;  // guards fields (job/threads) from non-worker threads (concurrent parallel_for calls)
-#if defined(CV_USE_GLOBAL_WORKERS_COND_VAR)
+#যদি defined(CV_USE_GLOBAL_WORKERS_COND_VAR)
     pthread_cond_t cond_thread_wake;
 #endif
 
@@ -133,22 +133,22 @@ public:
     Ptr<ParallelJob> job;
 
 #ifdef CV_PROFILE_THREADS
-    double tickFreq;
+    দ্ৱিগুণ tickFreq;
     int64 jobSubmitTime;
-    struct ThreadStatistics
+    সংরচনা ThreadStatistics
     {
         ThreadStatistics() : threadWait(0)
         {
             reset();
         }
-        void reset()
+        শূন্য reset()
         {
             threadWake = 0;
             threadExecuteStart = 0;
             threadExecuteStop = 0;
             executedTasks = 0;
-            keepActive = false;
-            threadPing = getTickCount();
+            keepActive = মিছা;
+            threadPing = get_Tick_গুনতি();
         }
         int64 threadWait; // don't reset by default
         int64 threadPing; // don't reset by default
@@ -157,35 +157,35 @@ public:
         int64 threadExecuteStop;
         int64 threadFree;
         unsigned executedTasks;
-        bool keepActive;
+        তার্কিক keepActive;
 
         int64 dummy_[8]; // separate cache lines
 
-        void dump(int id, int64 baseTime, double tickFreq)
+        শূন্য dump(পূর্ণাঙ্ক id, int64 baseTime, দ্ৱিগুণ tickFreq)
         {
-            if (id < 0)
+            যদি (id < 0)
                 std::cout << "Main: ";
-            else
+            অন্যথা
                 printf("T%03d: ", id + 2);
             printf("wait=% 10.1f   ping=% 6.1f",
                     threadWait > 0 ? (threadWait - baseTime) / tickFreq * 1e6 : -0.0,
                     threadPing > 0 ? (threadPing - baseTime) / tickFreq * 1e6 : -0.0);
-            if (threadWake > 0)
+            যদি (threadWake > 0)
                 printf("   wake=% 6.1f",
                     (threadWake > 0 ? (threadWake - baseTime) / tickFreq * 1e6 : -0.0));
-            if (threadExecuteStart > 0)
+            যদি (threadExecuteStart > 0)
             {
                 printf("   exec=% 6.1f - % 6.1f   tasksDone=%5u   free=% 6.1f",
                     (threadExecuteStart > 0 ? (threadExecuteStart - baseTime) / tickFreq * 1e6 : -0.0),
                     (threadExecuteStop > 0 ? (threadExecuteStop - baseTime) / tickFreq * 1e6 : -0.0),
                     executedTasks,
                     (threadFree > 0 ? (threadFree - baseTime) / tickFreq * 1e6 : -0.0));
-                if (id >= 0)
+                যদি (id >= 0)
                     printf(" active=%s\n", keepActive ? "true" : "false");
-                else
+                অন্যথা
                     printf("\n");
             }
-            else
+            অন্যথা
                 printf("   ------------------------------------------------------------------------------\n");
         }
     };
@@ -194,23 +194,23 @@ public:
 
 };
 
-class WorkerThread
+শ্ৰেণী WorkerThread
 {
-public:
+সার্ৱজনিক:
     ThreadPool& thread_pool;
-    const unsigned id;
+    ধ্রুৱ unsigned id;
     pthread_t posix_thread;
-    bool is_created;
+    তার্কিক is_created;
 
-    std::atomic<bool> stop_thread;
+    std::atomic<তার্কিক> stop_thread;
 
-    std::atomic<bool> has_wake_signal;
+    std::atomic<তার্কিক> has_wake_signal;
 
     Ptr<ParallelJob> job;
 
     pthread_mutex_t mutex;
-#if !defined(CV_USE_GLOBAL_WORKERS_COND_VAR)
-    volatile bool isActive;
+#যদি !defined(CV_USE_GLOBAL_WORKERS_COND_VAR)
+    চঞ্চল তার্কিক isActive;
     pthread_cond_t cond_thread_wake;
 #endif
 
@@ -218,145 +218,145 @@ public:
         thread_pool(thread_pool_),
         id(id_),
         posix_thread(0),
-        is_created(false),
-        stop_thread(false),
-        has_wake_signal(false)
-#if !defined(CV_USE_GLOBAL_WORKERS_COND_VAR)
-        , isActive(true)
+        is_created(মিছা),
+        stop_thread(মিছা),
+        has_wake_signal(মিছা)
+#যদি !defined(CV_USE_GLOBAL_WORKERS_COND_VAR)
+        , isActive(সঁচা)
 #endif
     {
-        CV_LOG_VERBOSE(NULL, 1, "MainThread: initializing new worker: " << id);
-        int res = pthread_mutex_init(&mutex, NULL);
-        if (res != 0)
+        CV_LOG_VERBOSE(রিক্ত, 1, "MainThread: initializing new worker: " << id);
+        পূর্ণাঙ্ক res = pthread_mutex_init(&mutex, রিক্ত);
+        যদি (res != 0)
         {
-            CV_LOG_ERROR(NULL, id << ": Can't create thread mutex: res = " << res);
-            return;
+            CV_LOG_ERROR(রিক্ত, id << ": Can't create thread mutex: res = " << res);
+            ঘূৰাই;
         }
-#if !defined(CV_USE_GLOBAL_WORKERS_COND_VAR)
-        res = pthread_cond_init(&cond_thread_wake, NULL);
-        if (res != 0)
+#যদি !defined(CV_USE_GLOBAL_WORKERS_COND_VAR)
+        res = pthread_cond_init(&cond_thread_wake, রিক্ত);
+        যদি (res != 0)
         {
-            CV_LOG_ERROR(NULL, id << ": Can't create thread condition variable: res = " << res);
-            return;
+            CV_LOG_ERROR(রিক্ত, id << ": Can't create thread condition variable: res = " << res);
+            ঘূৰাই;
         }
 #endif
-        res = pthread_create(&posix_thread, NULL, thread_loop_wrapper, (void*)this);
-        if (res != 0)
+        res = pthread_create(&posix_thread, রিক্ত, thread_loop_wrapper, (শূন্য*)এতত্);
+        যদি (res != 0)
         {
-            CV_LOG_ERROR(NULL, id << ": Can't spawn new thread: res = " << res);
+            CV_LOG_ERROR(রিক্ত, id << ": Can't spawn new thread: res = " << res);
         }
-        else
+        অন্যথা
         {
-            is_created = true;
+            is_created = সঁচা;
         }
     }
 
     ~WorkerThread()
     {
-        CV_LOG_VERBOSE(NULL, 1, "MainThread: destroy worker thread: " << id);
-        if (is_created)
+        CV_LOG_VERBOSE(রিক্ত, 1, "MainThread: destroy worker thread: " << id);
+        যদি (is_created)
         {
-            if (!stop_thread)
+            যদি (!stop_thread)
             {
                 pthread_mutex_lock(&mutex);  // to avoid signal miss due pre-check
-                stop_thread = true;
+                stop_thread = সঁচা;
                 pthread_mutex_unlock(&mutex);
-#if defined(CV_USE_GLOBAL_WORKERS_COND_VAR)
+#যদি defined(CV_USE_GLOBAL_WORKERS_COND_VAR)
                 pthread_cond_broadcast(&thread_pool.cond_thread_wake);
-#else
+#অন্যথা
                 pthread_cond_signal(&cond_thread_wake);
 #endif
             }
-            pthread_join(posix_thread, NULL);
+            pthread_join(posix_thread, রিক্ত);
         }
-#if !defined(CV_USE_GLOBAL_WORKERS_COND_VAR)
+#যদি !defined(CV_USE_GLOBAL_WORKERS_COND_VAR)
         pthread_cond_destroy(&cond_thread_wake);
 #endif
         pthread_mutex_destroy(&mutex);
     }
 
-    void thread_body();
-    static void* thread_loop_wrapper(void* thread_object)
+    শূন্য thread_body();
+    স্থির শূন্য* thread_loop_wrapper(শূন্য* thread_object)
     {
 #ifdef OPENCV_WITH_ITT
         __itt_thread_set_name(cv::format("OpenCVThread-%03d", cv::utils::getThreadID()).c_str());
 #endif
         ((WorkerThread*)thread_object)->thread_body();
-        return 0;
+        ঘূৰাই 0;
     }
 };
 
-class ParallelJob
+শ্ৰেণী ParallelJob
 {
-public:
-    ParallelJob(const ThreadPool& thread_pool_, const Range& range_, const ParallelLoopBody& body_, int nstripes_) :
+সার্ৱজনিক:
+    ParallelJob(ধ্রুৱ ThreadPool& thread_pool_, ধ্রুৱ Range& range_, ধ্রুৱ ParallelLoopBody& body_, পূর্ণাঙ্ক nstripes_) :
         thread_pool(thread_pool_),
         body(body_),
         range(range_),
         nstripes((unsigned)nstripes_),
-        is_completed(false)
+        is_completed(মিছা)
     {
-        CV_LOG_VERBOSE(NULL, 5, "ParallelJob::ParallelJob(" << (void*)this << ")");
+        CV_LOG_VERBOSE(রিক্ত, 5, "ParallelJob::ParallelJob(" << (শূন্য*)এতত্ << ")");
         current_task.store(0, std::memory_order_relaxed);
-        active_thread_count.store(0, std::memory_order_relaxed);
-        completed_thread_count.store(0, std::memory_order_relaxed);
+        active_thread_গুনতি.store(0, std::memory_order_relaxed);
+        completed_thread_গুনতি.store(0, std::memory_order_relaxed);
         dummy0_[0] = 0, dummy1_[0] = 0, dummy2_[0] = 0; // compiler warning
     }
 
     ~ParallelJob()
     {
-        CV_LOG_VERBOSE(NULL, 5, "ParallelJob::~ParallelJob(" << (void*)this << ")");
+        CV_LOG_VERBOSE(রিক্ত, 5, "ParallelJob::~ParallelJob(" << (শূন্য*)এতত্ << ")");
     }
 
-    unsigned execute(bool is_worker_thread)
+    unsigned execute(তার্কিক is_worker_thread)
     {
         unsigned executed_tasks = 0;
-        const int task_count = range.size();
-        const int remaining_multiplier = std::min(nstripes,
+        ধ্রুৱ পূর্ণাঙ্ক task_গুনতি = range.size();
+        ধ্রুৱ পূর্ণাঙ্ক remaining_multiplier = std::min(nstripes,
                 std::max(
-                        std::min(100u, thread_pool.num_threads * 4),
-                        thread_pool.num_threads * 2
+                        std::min(100u, thread_pool.অঙ্ক_threads * 4),
+                        thread_pool.অঙ্ক_threads * 2
                 ));  // experimental value
-        for (;;)
+        বাবে (;;)
         {
-            int chunk_size = std::max(1, (task_count - current_task) / remaining_multiplier);
-            int id = current_task.fetch_add(chunk_size, std::memory_order_seq_cst);
-            if (id >= task_count)
-                break; // no more free tasks
+            পূর্ণাঙ্ক chunk_size = std::max(1, (task_গুনতি - current_task) / remaining_multiplier);
+            পূর্ণাঙ্ক id = current_task.fetch_add(chunk_size, std::memory_order_seq_cst);
+            যদি (id >= task_গুনতি)
+                ভঙ্গ; // no more free tasks
 
             executed_tasks += chunk_size;
-            int start_id = id;
-            int end_id = std::min(task_count, id + chunk_size);
-            CV_LOG_VERBOSE(NULL, 9, "Thread: job " << start_id << "-" << end_id);
+            পূর্ণাঙ্ক start_id = id;
+            পূর্ণাঙ্ক end_id = std::min(task_গুনতি, id + chunk_size);
+            CV_LOG_VERBOSE(রিক্ত, 9, "Thread: job " << start_id << "-" << end_id);
 
             //TODO: if (not pending exception)
             {
                 body.operator()(Range(range.start + start_id, range.start + end_id));
             }
-            if (is_worker_thread && is_completed)
+            যদি (is_worker_thread && is_completed)
             {
-                CV_LOG_ERROR(NULL, "\t\t\t\tBUG! Job: " << (void*)this << " " << id << " " << active_thread_count << " " << completed_thread_count);
+                CV_LOG_ERROR(রিক্ত, "\t\t\t\tBUG! Job: " << (শূন্য*)এতত্ << " " << id << " " << active_thread_গুনতি << " " << completed_thread_গুনতি);
                 CV_Assert(!is_completed); // TODO Dbg this
             }
         }
-        return executed_tasks;
+        ঘূৰাই executed_tasks;
     }
 
-    const ThreadPool& thread_pool;
-    const ParallelLoopBody& body;
-    const Range range;
-    const unsigned nstripes;
+    ধ্রুৱ ThreadPool& thread_pool;
+    ধ্রুৱ ParallelLoopBody& body;
+    ধ্রুৱ Range range;
+    ধ্রুৱ unsigned nstripes;
 
-    std::atomic<int> current_task;  // next free part of job
+    std::atomic<পূর্ণাঙ্ক> current_task;  // next free part of job
     int64 dummy0_[8];  // avoid cache-line reusing for the same atomics
 
-    std::atomic<int> active_thread_count;  // number of threads worked on this job
+    std::atomic<পূর্ণাঙ্ক> active_thread_গুনতি;  // number of threads worked on this job
     int64 dummy1_[8];  // avoid cache-line reusing for the same atomics
 
-    std::atomic<int> completed_thread_count;  // number of threads completed any activities on this job
+    std::atomic<পূর্ণাঙ্ক> completed_thread_গুনতি;  // number of threads completed any activities on this job
     int64 dummy2_[8];  // avoid cache-line reusing for the same atomics
 
-    std::atomic<bool> is_completed;
+    std::atomic<তার্কিক> is_completed;
 
     // TODO exception handling
 };
@@ -367,99 +367,99 @@ public:
 // thread writes it (but it all works out because a mutex is locked in the main
 // thread and isActive re-checked).
 // This is to solve issue #19463.
-#if !defined(CV_USE_GLOBAL_WORKERS_COND_VAR) && defined(__clang__) && defined(__has_feature)
-#if __has_feature(thread_sanitizer)
+#যদি !defined(CV_USE_GLOBAL_WORKERS_COND_VAR) && defined(__clang__) && defined(__has_feature)
+#যদি __has_feature(thread_sanitizer)
 __attribute__((no_sanitize("thread")))
 #endif
 #endif
-void WorkerThread::thread_body()
+শূন্য WorkerThread::thread_body()
 {
-    (void)cv::utils::getThreadID(); // notify OpenCV about new thread
-    CV_LOG_VERBOSE(NULL, 5, "Thread: new thread: " << id);
+    (শূন্য)cv::utils::getThreadID(); // notify OpenCV about new thread
+    CV_LOG_VERBOSE(রিক্ত, 5, "Thread: new thread: " << id);
 
-    bool allow_active_wait = true;
+    তার্কিক allow_active_wait = সঁচা;
 
 #ifdef CV_PROFILE_THREADS
     ThreadPool::ThreadStatistics& stat = thread_pool.threads_stat[id + 1];
 #endif
 
-    while (!stop_thread)
+    যেতিয়ালৈ (!stop_thread)
     {
-        CV_LOG_VERBOSE(NULL, 5, "Thread: ... loop iteration: allow_active_wait=" << allow_active_wait << "   has_wake_signal=" << has_wake_signal);
-        if (allow_active_wait && CV_WORKER_ACTIVE_WAIT > 0)
+        CV_LOG_VERBOSE(রিক্ত, 5, "Thread: ... loop iteration: allow_active_wait=" << allow_active_wait << "   has_wake_signal=" << has_wake_signal);
+        যদি (allow_active_wait && CV_WORKER_ACTIVE_WAIT > 0)
         {
-            allow_active_wait = false;
-            for (int i = 0; i < CV_WORKER_ACTIVE_WAIT; i++)
+            allow_active_wait = মিছা;
+            বাবে (পূর্ণাঙ্ক i = 0; i < CV_WORKER_ACTIVE_WAIT; i++)
             {
-                if (has_wake_signal)
-                    break;
-                if (CV_ACTIVE_WAIT_PAUSE_LIMIT > 0 && (i < CV_ACTIVE_WAIT_PAUSE_LIMIT || (i & 1)))
+                যদি (has_wake_signal)
+                    ভঙ্গ;
+                যদি (CV_ACTIVE_WAIT_PAUSE_LIMIT > 0 && (i < CV_ACTIVE_WAIT_PAUSE_LIMIT || (i & 1)))
                     CV_PAUSE(16);
-                else
+                অন্যথা
                     CV_YIELD();
             }
         }
         pthread_mutex_lock(&mutex);
 #ifdef CV_PROFILE_THREADS
-        stat.threadWait = getTickCount();
+        stat.threadWait = get_Tick_গুনতি();
 #endif
-        while (!has_wake_signal) // to handle spurious wakeups
+        যেতিয়ালৈ (!has_wake_signal) // to handle spurious wakeups
         {
             //CV_LOG_VERBOSE(NULL, 5, "Thread: wait (sleep) ...");
-#if defined(CV_USE_GLOBAL_WORKERS_COND_VAR)
+#যদি defined(CV_USE_GLOBAL_WORKERS_COND_VAR)
             pthread_cond_wait(&thread_pool.cond_thread_wake, &mutex);
-#else
-            isActive = false;
+#অন্যথা
+            isActive = মিছা;
             pthread_cond_wait(&cond_thread_wake, &mutex);
-            isActive = true;
+            isActive = সঁচা;
 #endif
-            CV_LOG_VERBOSE(NULL, 5, "Thread: wake ... (has_wake_signal=" << has_wake_signal << " stop_thread=" << stop_thread << ")")
+            CV_LOG_VERBOSE(রিক্ত, 5, "Thread: wake ... (has_wake_signal=" << has_wake_signal << " stop_thread=" << stop_thread << ")")
         }
 #ifdef CV_PROFILE_THREADS
-        stat.threadWake = getTickCount();
+        stat.threadWake = get_Tick_গুনতি();
 #endif
 
-        CV_LOG_VERBOSE(NULL, 5, "Thread: checking for new job");
-        if (CV_WORKER_ACTIVE_WAIT_THREADS_LIMIT == 0)
-            allow_active_wait = true;
+        CV_LOG_VERBOSE(রিক্ত, 5, "Thread: checking for new job");
+        যদি (CV_WORKER_ACTIVE_WAIT_THREADS_LIMIT == 0)
+            allow_active_wait = সঁচা;
         Ptr<ParallelJob> j_ptr; swap(j_ptr, job);
-        has_wake_signal = false;
+        has_wake_signal = মিছা;
         pthread_mutex_unlock(&mutex);
 
-        if (!stop_thread)
+        যদি (!stop_thread)
         {
             ParallelJob* j = j_ptr;
-            if (j)
+            যদি (j)
             {
-                CV_LOG_VERBOSE(NULL, 5, "Thread: job size=" << j->range.size() << " done=" << j->current_task);
-                if (j->current_task < j->range.size())
+                CV_LOG_VERBOSE(রিক্ত, 5, "Thread: job size=" << j->range.size() << " done=" << j->current_task);
+                যদি (j->current_task < j->range.size())
                 {
-                    int other = j->active_thread_count.fetch_add(1, std::memory_order_seq_cst);
-                    CV_LOG_VERBOSE(NULL, 5, "Thread: processing new job (with " << other << " other threads)"); CV_UNUSED(other);
+                    পূর্ণাঙ্ক other = j->active_thread_গুনতি.fetch_add(1, std::memory_order_seq_cst);
+                    CV_LOG_VERBOSE(রিক্ত, 5, "Thread: processing new job (with " << other << " other threads)"); CV_UNUSED(other);
 #ifdef CV_PROFILE_THREADS
-                    stat.threadExecuteStart = getTickCount();
-                    stat.executedTasks = j->execute(true);
-                    stat.threadExecuteStop = getTickCount();
-#else
-                    j->execute(true);
+                    stat.threadExecuteStart = get_Tick_গুনতি();
+                    stat.executedTasks = j->execute(সঁচা);
+                    stat.threadExecuteStop = get_Tick_গুনতি();
+#অন্যথা
+                    j->execute(সঁচা);
 #endif
-                    int completed = j->completed_thread_count.fetch_add(1, std::memory_order_seq_cst) + 1;
-                    int active = j->active_thread_count.load(std::memory_order_acquire);
-                    if (CV_WORKER_ACTIVE_WAIT_THREADS_LIMIT > 0)
+                    পূর্ণাঙ্ক completed = j->completed_thread_গুনতি.fetch_add(1, std::memory_order_seq_cst) + 1;
+                    পূর্ণাঙ্ক active = j->active_thread_গুনতি.load(std::memory_order_acquire);
+                    যদি (CV_WORKER_ACTIVE_WAIT_THREADS_LIMIT > 0)
                     {
-                        allow_active_wait = true;
-                        if (active >= CV_WORKER_ACTIVE_WAIT_THREADS_LIMIT && (id & 1) == 0) // turn off a half of threads
-                            allow_active_wait = false;
+                        allow_active_wait = সঁচা;
+                        যদি (active >= CV_WORKER_ACTIVE_WAIT_THREADS_LIMIT && (id & 1) == 0) // turn off a half of threads
+                            allow_active_wait = মিছা;
                     }
-                    CV_LOG_VERBOSE(NULL, 5, "Thread: completed job processing: " << active << " " << completed);
-                    if (active == completed)
+                    CV_LOG_VERBOSE(রিক্ত, 5, "Thread: completed job processing: " << active << " " << completed);
+                    যদি (active == completed)
                     {
-                        bool need_signal = !j->is_completed;
-                        j->is_completed = true;
-                        j = NULL; j_ptr.release();
-                        if (need_signal)
+                        তার্কিক need_signal = !j->is_completed;
+                        j->is_completed = সঁচা;
+                        j = রিক্ত; j_ptr.release();
+                        যদি (need_signal)
                         {
-                            CV_LOG_VERBOSE(NULL, 5, "Thread: job finished => notifying the main thread");
+                            CV_LOG_VERBOSE(রিক্ত, 5, "Thread: job finished => notifying the main thread");
                             pthread_mutex_lock(&thread_pool.mutex_notify);  // to avoid signal miss due pre-check condition
                             // empty
                             pthread_mutex_unlock(&thread_pool.mutex_notify);
@@ -467,14 +467,14 @@ void WorkerThread::thread_body()
                         }
                     }
                 }
-                else
+                অন্যথা
                 {
-                    CV_LOG_VERBOSE(NULL, 5, "Thread: no free job tasks");
+                    CV_LOG_VERBOSE(রিক্ত, 5, "Thread: no free job tasks");
                 }
             }
         }
 #ifdef CV_PROFILE_THREADS
-        stat.threadFree = getTickCount();
+        stat.threadFree = get_Tick_গুনতি();
         stat.keepActive = allow_active_wait;
 #endif
     }
@@ -486,115 +486,115 @@ ThreadPool::ThreadPool()
     tickFreq = getTickFrequency();
 #endif
 
-    int res = 0;
-    res |= pthread_mutex_init(&mutex, NULL);
-    res |= pthread_mutex_init(&mutex_notify, NULL);
-#if defined(CV_USE_GLOBAL_WORKERS_COND_VAR)
-    res |= pthread_cond_init(&cond_thread_wake, NULL);
+    পূর্ণাঙ্ক res = 0;
+    res |= pthread_mutex_init(&mutex, রিক্ত);
+    res |= pthread_mutex_init(&mutex_notify, রিক্ত);
+#যদি defined(CV_USE_GLOBAL_WORKERS_COND_VAR)
+    res |= pthread_cond_init(&cond_thread_wake, রিক্ত);
 #endif
-    res |= pthread_cond_init(&cond_thread_task_complete, NULL);
+    res |= pthread_cond_init(&cond_thread_task_complete, রিক্ত);
 
-    if (0 != res)
+    যদি (0 != res)
     {
-        CV_LOG_FATAL(NULL, "Failed to initialize ThreadPool (pthreads)");
+        CV_LOG_FATAL(রিক্ত, "Failed to initialize ThreadPool (pthreads)");
     }
-    num_threads = defaultNumberOfThreads();
+    অঙ্ক_threads = default_সংখ্যা_Of_Threads();
 }
 
-bool ThreadPool::reconfigure_(unsigned new_threads_count)
+তার্কিক ThreadPool::reconfigure_(unsigned new_threads_গুনতি)
 {
-    if (new_threads_count == threads.size())
-        return false;
+    যদি (new_threads_গুনতি == threads.size())
+        ঘূৰাই মিছা;
 
-    if (new_threads_count < threads.size())
+    যদি (new_threads_গুনতি < threads.size())
     {
-        CV_LOG_VERBOSE(NULL, 1, "MainThread: reduce worker pool: " << threads.size() << " => " << new_threads_count);
-        std::vector< Ptr<WorkerThread> > release_threads(threads.size() - new_threads_count);
-        for (size_t i = new_threads_count; i < threads.size(); ++i)
+        CV_LOG_VERBOSE(রিক্ত, 1, "MainThread: reduce worker pool: " << threads.size() << " => " << new_threads_গুনতি);
+        std::vector< Ptr<WorkerThread> > release_threads(threads.size() - new_threads_গুনতি);
+        বাবে (size_t i = new_threads_গুনতি; i < threads.size(); ++i)
         {
             pthread_mutex_lock(&threads[i]->mutex);  // to avoid signal miss due pre-check
-            threads[i]->stop_thread = true;
-            threads[i]->has_wake_signal = true;
-#if !defined(CV_USE_GLOBAL_WORKERS_COND_VAR)
+            threads[i]->stop_thread = সঁচা;
+            threads[i]->has_wake_signal = সঁচা;
+#যদি !defined(CV_USE_GLOBAL_WORKERS_COND_VAR)
             pthread_mutex_unlock(&threads[i]->mutex);
             pthread_cond_broadcast/*pthread_cond_signal*/(&threads[i]->cond_thread_wake); // wake thread
-#else
+#অন্যথা
             pthread_mutex_unlock(&threads[i]->mutex);
 #endif
-            std::swap(threads[i], release_threads[i - new_threads_count]);
+            std::swap(threads[i], release_threads[i - new_threads_গুনতি]);
         }
-#if defined(CV_USE_GLOBAL_WORKERS_COND_VAR)
-        CV_LOG_VERBOSE(NULL, 1, "MainThread: notify worker threads about termination...");
+#যদি defined(CV_USE_GLOBAL_WORKERS_COND_VAR)
+        CV_LOG_VERBOSE(রিক্ত, 1, "MainThread: notify worker threads about termination...");
         pthread_cond_broadcast(&cond_thread_wake); // wake all threads
 #endif
-        threads.resize(new_threads_count);
+        threads.resize(new_threads_গুনতি);
         release_threads.clear();  // calls thread_join which want to lock mutex
-        return false;
+        ঘূৰাই মিছা;
     }
-    else
+    অন্যথা
     {
-        CV_LOG_VERBOSE(NULL, 1, "MainThread: upgrade worker pool: " << threads.size() << " => " << new_threads_count);
-        for (size_t i = threads.size(); i < new_threads_count; ++i)
+        CV_LOG_VERBOSE(রিক্ত, 1, "MainThread: upgrade worker pool: " << threads.size() << " => " << new_threads_গুনতি);
+        বাবে (size_t i = threads.size(); i < new_threads_গুনতি; ++i)
         {
-            threads.push_back(Ptr<WorkerThread>(new WorkerThread(*this, (unsigned)i))); // spawn more threads
+            threads.push_back(Ptr<WorkerThread>(নূতন WorkerThread(*এতত্, (unsigned)i))); // spawn more threads
         }
     }
-    return false;
+    ঘূৰাই মিছা;
 }
 
 ThreadPool::~ThreadPool()
 {
     reconfigure(0);
     pthread_cond_destroy(&cond_thread_task_complete);
-#if defined(CV_USE_GLOBAL_WORKERS_COND_VAR)
+#যদি defined(CV_USE_GLOBAL_WORKERS_COND_VAR)
     pthread_cond_destroy(&cond_thread_wake);
 #endif
     pthread_mutex_destroy(&mutex);
     pthread_mutex_destroy(&mutex_notify);
 }
 
-void ThreadPool::run(const Range& range, const ParallelLoopBody& body, double nstripes)
+শূন্য ThreadPool::run(ধ্রুৱ Range& range, ধ্রুৱ ParallelLoopBody& body, দ্ৱিগুণ nstripes)
 {
-    CV_LOG_VERBOSE(NULL, 1, "MainThread: new parallel job: num_threads=" << num_threads << "   range=" << range.size() << "   nstripes=" << nstripes << "   job=" << (void*)job);
+    CV_LOG_VERBOSE(রিক্ত, 1, "MainThread: new parallel job: num_threads=" << অঙ্ক_threads << "   range=" << range.size() << "   nstripes=" << nstripes << "   job=" << (শূন্য*)job);
 #ifdef CV_PROFILE_THREADS
-    jobSubmitTime = getTickCount();
+    jobSubmitTime = get_Tick_গুনতি();
     threads_stat[0].reset();
     threads_stat[0].threadWait = jobSubmitTime;
     threads_stat[0].threadWake = jobSubmitTime;
 #endif
-    if (getNumOfThreads() > 1 &&
-        job == NULL &&
+    যদি (get_অঙ্ক_Of_Threads() > 1 &&
+        job == রিক্ত &&
         (range.size() * nstripes >= 2 || (range.size() > 1 && nstripes <= 0))
     )
     {
         pthread_mutex_lock(&mutex);
-        if (job != NULL)
+        যদি (job != রিক্ত)
         {
             pthread_mutex_unlock(&mutex);
             body(range);
-            return;
+            ঘূৰাই;
         }
-        reconfigure_(num_threads - 1);
+        reconfigure_(অঙ্ক_threads - 1);
 
         {
-            CV_LOG_VERBOSE(NULL, 1, "MainThread: initialize parallel job: " << range.size());
-            job = Ptr<ParallelJob>(new ParallelJob(*this, range, body, nstripes));
+            CV_LOG_VERBOSE(রিক্ত, 1, "MainThread: initialize parallel job: " << range.size());
+            job = Ptr<ParallelJob>(নূতন ParallelJob(*এতত্, range, body, nstripes));
             pthread_mutex_unlock(&mutex);
 
-            CV_LOG_VERBOSE(NULL, 5, "MainThread: wake worker threads...");
-            size_t num_threads_to_wake = std::min(static_cast<size_t>(range.size()), threads.size());
-            for (size_t i = 0; i < num_threads_to_wake; ++i)
+            CV_LOG_VERBOSE(রিক্ত, 5, "MainThread: wake worker threads...");
+            size_t অঙ্ক_threads_to_wake = std::min(static_cast<size_t>(range.size()), threads.size());
+            বাবে (size_t i = 0; i < অঙ্ক_threads_to_wake; ++i)
             {
-                if (job->current_task >= job->range.size())
-                    break;
+                যদি (job->current_task >= job->range.size())
+                    ভঙ্গ;
                 WorkerThread& thread = *(threads[i].get());
-                if (
-#if defined(__clang__) && defined(__has_feature)
-#if __has_feature(thread_sanitizer)
+                যদি (
+#যদি defined(__clang__) && defined(__has_feature)
+#যদি __has_feature(thread_sanitizer)
                         1 ||  // Robust workaround to avoid data race warning of `thread.job`
 #endif
 #endif
-#if !defined(CV_USE_GLOBAL_WORKERS_COND_VAR)
+#যদি !defined(CV_USE_GLOBAL_WORKERS_COND_VAR)
                         thread.isActive ||
 #endif
                         thread.has_wake_signal
@@ -603,154 +603,154 @@ void ThreadPool::run(const Range& range, const ParallelLoopBody& body, double ns
                 {
                     pthread_mutex_lock(&thread.mutex);
                     thread.job = job;
-#if !defined(CV_USE_GLOBAL_WORKERS_COND_VAR)
-                    bool isActive = thread.isActive;
+#যদি !defined(CV_USE_GLOBAL_WORKERS_COND_VAR)
+                    তার্কিক isActive = thread.isActive;
 #endif
-                    thread.has_wake_signal = true;
+                    thread.has_wake_signal = সঁচা;
 #ifdef CV_PROFILE_THREADS
                     threads_stat[i + 1].reset();
 #endif
                     pthread_mutex_unlock(&thread.mutex);
-#if !defined(CV_USE_GLOBAL_WORKERS_COND_VAR)
-                    if (!isActive)
+#যদি !defined(CV_USE_GLOBAL_WORKERS_COND_VAR)
+                    যদি (!isActive)
                     {
                         pthread_cond_broadcast/*pthread_cond_signal*/(&thread.cond_thread_wake); // wake thread
                     }
 #endif
                 }
-                else
+                অন্যথা
                 {
                     CV_Assert(thread.job.empty());
                     thread.job = job;
-                    thread.has_wake_signal = true;
+                    thread.has_wake_signal = সঁচা;
 #ifdef CV_PROFILE_THREADS
                     threads_stat[i + 1].reset();
 #endif
-#if !defined(CV_USE_GLOBAL_WORKERS_COND_VAR)
+#যদি !defined(CV_USE_GLOBAL_WORKERS_COND_VAR)
                     pthread_cond_broadcast/*pthread_cond_signal*/(&thread.cond_thread_wake); // wake thread
 #endif
                 }
             }
 #ifdef CV_PROFILE_THREADS
-            threads_stat[0].threadPing = getTickCount();
+            threads_stat[0].threadPing = get_Tick_গুনতি();
 #endif
-#if defined(CV_USE_GLOBAL_WORKERS_COND_VAR)
+#যদি defined(CV_USE_GLOBAL_WORKERS_COND_VAR)
             pthread_cond_broadcast(&cond_thread_wake); // wake all threads
 #endif
 #ifdef CV_PROFILE_THREADS
-            threads_stat[0].threadWake = getTickCount();
+            threads_stat[0].threadWake = get_Tick_গুনতি();
 #endif
-            CV_LOG_VERBOSE(NULL, 5, "MainThread: wake worker threads... (done)");
+            CV_LOG_VERBOSE(রিক্ত, 5, "MainThread: wake worker threads... (done)");
 
             {
-                ParallelJob& j = *(this->job);
+                ParallelJob& j = *(এতত্->job);
 #ifdef CV_PROFILE_THREADS
-                threads_stat[0].threadExecuteStart = getTickCount();
-                threads_stat[0].executedTasks = j.execute(false);
-                threads_stat[0].threadExecuteStop = getTickCount();
-#else
-                j.execute(false);
+                threads_stat[0].threadExecuteStart = get_Tick_গুনতি();
+                threads_stat[0].executedTasks = j.execute(মিছা);
+                threads_stat[0].threadExecuteStop = get_Tick_গুনতি();
+#অন্যথা
+                j.execute(মিছা);
 #endif
                 CV_Assert(j.current_task >= j.range.size());
-                CV_LOG_VERBOSE(NULL, 5, "MainThread: complete self-tasks: " << j.active_thread_count << " " << j.completed_thread_count);
-                if (job->is_completed || j.active_thread_count == 0)
+                CV_LOG_VERBOSE(রিক্ত, 5, "MainThread: complete self-tasks: " << j.active_thread_গুনতি << " " << j.completed_thread_গুনতি);
+                যদি (job->is_completed || j.active_thread_গুনতি == 0)
                 {
-                    job->is_completed = true;
-                    CV_LOG_VERBOSE(NULL, 5, "MainThread: no WIP worker threads");
+                    job->is_completed = সঁচা;
+                    CV_LOG_VERBOSE(রিক্ত, 5, "MainThread: no WIP worker threads");
                 }
-                else
+                অন্যথা
                 {
-                    if (CV_MAIN_THREAD_ACTIVE_WAIT > 0)
+                    যদি (CV_MAIN_THREAD_ACTIVE_WAIT > 0)
                     {
-                        for (int i = 0; i < CV_MAIN_THREAD_ACTIVE_WAIT; i++)  // don't spin too much in any case (inaccurate getTickCount())
+                        বাবে (পূর্ণাঙ্ক i = 0; i < CV_MAIN_THREAD_ACTIVE_WAIT; i++)  // don't spin too much in any case (inaccurate getTickCount())
                         {
-                            if (job->is_completed)
+                            যদি (job->is_completed)
                             {
-                                CV_LOG_VERBOSE(NULL, 5, "MainThread: job finalize (active wait) " << j.active_thread_count << " " << j.completed_thread_count);
-                                break;
+                                CV_LOG_VERBOSE(রিক্ত, 5, "MainThread: job finalize (active wait) " << j.active_thread_গুনতি << " " << j.completed_thread_গুনতি);
+                                ভঙ্গ;
                             }
-                            if (CV_ACTIVE_WAIT_PAUSE_LIMIT > 0 && (i < CV_ACTIVE_WAIT_PAUSE_LIMIT || (i & 1)))
+                            যদি (CV_ACTIVE_WAIT_PAUSE_LIMIT > 0 && (i < CV_ACTIVE_WAIT_PAUSE_LIMIT || (i & 1)))
                                 CV_PAUSE(16);
-                            else
+                            অন্যথা
                                 CV_YIELD();
                         }
                     }
-                    if (!job->is_completed)
+                    যদি (!job->is_completed)
                     {
-                        CV_LOG_VERBOSE(NULL, 5, "MainThread: prepare wait " << j.active_thread_count << " " << j.completed_thread_count);
+                        CV_LOG_VERBOSE(রিক্ত, 5, "MainThread: prepare wait " << j.active_thread_গুনতি << " " << j.completed_thread_গুনতি);
                         pthread_mutex_lock(&mutex_notify);
-                        for (;;)
+                        বাবে (;;)
                         {
-                            if (job->is_completed)
+                            যদি (job->is_completed)
                             {
-                                CV_LOG_VERBOSE(NULL, 5, "MainThread: job finalize (wait) " << j.active_thread_count << " " << j.completed_thread_count);
-                                break;
+                                CV_LOG_VERBOSE(রিক্ত, 5, "MainThread: job finalize (wait) " << j.active_thread_গুনতি << " " << j.completed_thread_গুনতি);
+                                ভঙ্গ;
                             }
-                            CV_LOG_VERBOSE(NULL, 5, "MainThread: wait completion (sleep) ...");
+                            CV_LOG_VERBOSE(রিক্ত, 5, "MainThread: wait completion (sleep) ...");
                             pthread_cond_wait(&cond_thread_task_complete, &mutex_notify);
-                            CV_LOG_VERBOSE(NULL, 5, "MainThread: wake");
+                            CV_LOG_VERBOSE(রিক্ত, 5, "MainThread: wake");
                         }
                         pthread_mutex_unlock(&mutex_notify);
                     }
                 }
             }
 #ifdef CV_PROFILE_THREADS
-            threads_stat[0].threadFree = getTickCount();
+            threads_stat[0].threadFree = get_Tick_গুনতি();
             std::cout << "Job: sz=" << range.size() << " nstripes=" << nstripes << "    Time: " << (threads_stat[0].threadFree - jobSubmitTime) / tickFreq * 1e6 << " usec" << std::endl;
-            for (int i = 0; i < (int)threads.size() + 1; i++)
+            বাবে (পূর্ণাঙ্ক i = 0; i < (পূর্ণাঙ্ক)threads.size() + 1; i++)
             {
                 threads_stat[i].dump(i - 1, jobSubmitTime, tickFreq);
             }
 #endif
-            if (job)
+            যদি (job)
             {
                 pthread_mutex_lock(&mutex);
-                CV_LOG_VERBOSE(NULL, 5, "MainThread: job release");
+                CV_LOG_VERBOSE(রিক্ত, 5, "MainThread: job release");
                 CV_Assert(job->is_completed);
                 job.release();
                 pthread_mutex_unlock(&mutex);
             }
         }
     }
-    else
+    অন্যথা
     {
         body(range);
     }
 }
 
-size_t ThreadPool::getNumOfThreads()
+size_t ThreadPool::get_অঙ্ক_Of_Threads()
 {
-    return num_threads;
+    ঘূৰাই অঙ্ক_threads;
 }
 
-void ThreadPool::setNumOfThreads(unsigned n)
+শূন্য ThreadPool::set_অঙ্ক_Of_Threads(unsigned n)
 {
-    if (n != num_threads)
+    যদি (n != অঙ্ক_threads)
     {
-        num_threads = n;
-        if (n == 1)
-           if (job == NULL) reconfigure(0);  // stop worker threads immediately
+        অঙ্ক_threads = n;
+        যদি (n == 1)
+           যদি (job == রিক্ত) reconfigure(0);  // stop worker threads immediately
     }
 }
 
-size_t parallel_pthreads_get_threads_num()
+size_t parallel_pthreads_get_threads_অঙ্ক()
 {
-    return ThreadPool::instance().getNumOfThreads();
+    ঘূৰাই ThreadPool::instance().get_অঙ্ক_Of_Threads();
 }
 
-void parallel_pthreads_set_threads_num(int num)
+শূন্য parallel_pthreads_set_threads_অঙ্ক(পূর্ণাঙ্ক num)
 {
-    if(num < 0)
+    যদি(num < 0)
     {
-        ThreadPool::instance().setNumOfThreads(0);
+        ThreadPool::instance().set_অঙ্ক_Of_Threads(0);
     }
-    else
+    অন্যথা
     {
-        ThreadPool::instance().setNumOfThreads(unsigned(num));
+        ThreadPool::instance().set_অঙ্ক_Of_Threads(unsigned(num));
     }
 }
 
-void parallel_for_pthreads(const Range& range, const ParallelLoopBody& body, double nstripes)
+শূন্য parallel_for_pthreads(ধ্রুৱ Range& range, ধ্রুৱ ParallelLoopBody& body, দ্ৱিগুণ nstripes)
 {
     ThreadPool::instance().run(range, body, nstripes);
 }
