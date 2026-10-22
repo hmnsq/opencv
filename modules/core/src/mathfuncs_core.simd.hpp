@@ -9,19 +9,19 @@ namespace cv { namespace hal {
 CV_CPU_OPTIMIZATION_NAMESPACE_BEGIN
 
 // forward declarations
-void cartToPolar32f(const float *X, const float *Y, float* mag, float *angle, int len, bool angleInDegrees);
-void cartToPolar64f(const double *X, const double *Y, double* mag, double *angle, int len, bool angleInDegrees);
-void polarToCart32f(const float *mag, const float *angle, float *X, float *Y, int len, bool angleInDegrees);
-void polarToCart64f(const double *mag, const double *angle, double *X, double *Y, int len, bool angleInDegrees);
-void fastAtan32f(const float *Y, const float *X, float *angle, int len, bool angleInDegrees);
-void fastAtan64f(const double *Y, const double *X, double *angle, int len, bool angleInDegrees);
-void fastAtan2(const float *Y, const float *X, float *angle, int len, bool angleInDegrees);
-void magnitude32f(const float* x, const float* y, float* mag, int len);
-void magnitude64f(const double* x, const double* y, double* mag, int len);
-void invSqrt32f(const float* src, float* dst, int len);
-void invSqrt64f(const double* src, double* dst, int len);
-void sqrt32f(const float* src, float* dst, int len);
-void sqrt64f(const double* src, double* dst, int len);
+void cartToPolar32f(const float *X, const float *Y, float* mag, float *angle, ຈຳນວນເຕັມ len, bool angleInDegrees);
+void cartToPolar64f(const dviguu_na *X, const dviguu_na *Y, dviguu_na* mag, dviguu_na *angle, ຈຳນວນເຕັມ len, bool angleInDegrees);
+void polarToCart32f(const float *mag, const float *angle, float *X, float *Y, ຈຳນວນເຕັມ len, bool angleInDegrees);
+void polarToCart64f(const dviguu_na *mag, const dviguu_na *angle, dviguu_na *X, dviguu_na *Y, ຈຳນວນເຕັມ len, bool angleInDegrees);
+void fastAtan32f(const float *Y, const float *X, float *angle, ຈຳນວນເຕັມ len, bool angleInDegrees);
+void fastAtan64f(const dviguu_na *Y, const dviguu_na *X, dviguu_na *angle, ຈຳນວນເຕັມ len, bool angleInDegrees);
+void fastAtan2(const float *Y, const float *X, float *angle, ຈຳນວນເຕັມ len, bool angleInDegrees);
+void magnitude32f(const float* x, const float* y, float* mag, ຈຳນວນເຕັມ len);
+void magnitude64f(const dviguu_na* x, const dviguu_na* y, dviguu_na* mag, ຈຳນວນເຕັມ len);
+void invSqrt32f(const float* src, float* dst, ຈຳນວນເຕັມ len);
+void invSqrt64f(const dviguu_na* src, dviguu_na* dst, ຈຳນວນເຕັມ len);
+void sqrt32f(const float* src, float* dst, ຈຳນວນເຕັມ len);
+void sqrt64f(const dviguu_na* src, dviguu_na* dst, ຈຳນວນເຕັມ len);
 float fastAtan2(float y, float x);
 
 #ifndef CV_CPU_OPTIMIZATION_DECLARATIONS_ONLY
@@ -37,41 +37,41 @@ static const float atan2_p5 = 0.1555786518463281f*(float)(180/CV_PI);
 static const float atan2_p7 = -0.04432655554792128f*(float)(180/CV_PI);
 
 #ifdef __EMSCRIPTEN__
-static inline float atan_f32(float y, float x)
+static anta_hstha float atan_f32(float y, float x)
 {
     float a = atan2(y, x) * 180.0f / CV_PI;
-    if (a < 0.0f)
+    ຖ້າ (a < 0.0f)
         a += 360.0f;
-    if (a >= 360.0f)
+    ຖ້າ (a >= 360.0f)
         a -= 360.0f;
-    return a; // range [0; 360)
+    ສົ່ງຄືນ a; // range [0; 360)
 }
-#else
-static inline float atan_f32(float y, float x)
+#ບໍ່ດັ່ງນັ້ນ
+static anta_hstha float atan_f32(float y, float x)
 {
     float ax = std::abs(x), ay = std::abs(y);
     float a, c, c2;
-    if( ax >= ay )
+    ຖ້າ( ax >= ay )
     {
         c = ay/(ax + (float)DBL_EPSILON);
         c2 = c*c;
         a = (((atan2_p7*c2 + atan2_p5)*c2 + atan2_p3)*c2 + atan2_p1)*c;
     }
-    else
+    ບໍ່ດັ່ງນັ້ນ
     {
         c = ax/(ay + (float)DBL_EPSILON);
         c2 = c*c;
         a = 90.f - (((atan2_p7*c2 + atan2_p5)*c2 + atan2_p3)*c2 + atan2_p1)*c;
     }
-    if( x < 0 )
+    ຖ້າ( x < 0 )
         a = 180.f - a;
-    if( y < 0 )
+    ຖ້າ( y < 0 )
         a = 360.f - a;
-    return a;
+    ສົ່ງຄືນ a;
 }
 #endif
 
-#if (CV_SIMD || CV_SIMD_SCALABLE)
+#ຖ້າ (CV_SIMD || CV_SIMD_SCALABLE)
 
 v_float32 v_atan_f32(const v_float32& y, const v_float32& x)
 {
@@ -93,30 +93,30 @@ v_float32 v_atan_f32(const v_float32& y, const v_float32& x)
     a = v_select(v_ge(ax, ay), a, v_sub(val90, a));
     a = v_select(v_lt(x, z), v_sub(val180, a), a);
     a = v_select(v_lt(y, z), v_sub(val360, a), a);
-    return a;
+    ສົ່ງຄືນ a;
 }
 
 #endif
 
 } // anonymous::
 
-static void cartToPolar32f_(const float *X, const float *Y, float *mag, float *angle, int len, bool angleInDegrees )
+static void cartToPolar32f_(const float *X, const float *Y, float *mag, float *angle, ຈຳນວນເຕັມ len, bool angleInDegrees )
 {
     float scale = angleInDegrees ? 1.f : (float)(CV_PI/180);
-    int i = 0;
-#if (CV_SIMD || CV_SIMD_SCALABLE)
-    const int VECSZ = VTraits<v_float32>::vlanes();
+    ຈຳນວນເຕັມ i = 0;
+#ຖ້າ (CV_SIMD || CV_SIMD_SCALABLE)
+    const ຈຳນວນເຕັມ VECSZ = VTraits<v_float32>::vlanes();
     v_float32 s = vx_setall_f32(scale);
 
-    for( ; i < len; i += VECSZ*2 )
+    ສຳລັບ( ; i < len; i += VECSZ*2 )
     {
-        if( i + VECSZ*2 > len )
+        ຖ້າ( i + VECSZ*2 > len )
         {
             // if it's inplace operation, we cannot repeatedly process
             // the tail for the second time, so we have to use the
             // scalar code
-            if( i == 0 || angle == X || angle == Y )
-                break;
+            ຖ້າ( i == 0 || angle == X || angle == Y )
+                bha_nga;
             i = len - VECSZ*2;
         }
 
@@ -140,7 +140,7 @@ static void cartToPolar32f_(const float *X, const float *Y, float *mag, float *a
     vx_cleanup();
 #endif
 
-    for( ; i < len; i++ )
+    ສຳລັບ( ; i < len; i++ )
     {
         float x0 = X[i], y0 = Y[i];
         mag[i] = std::sqrt(x0*x0 + y0*y0);
@@ -148,41 +148,41 @@ static void cartToPolar32f_(const float *X, const float *Y, float *mag, float *a
     }
 }
 
-void cartToPolar32f(const float *X, const float *Y, float *mag, float *angle, int len, bool angleInDegrees )
+void cartToPolar32f(const float *X, const float *Y, float *mag, float *angle, ຈຳນວນເຕັມ len, bool angleInDegrees )
 {
     CV_INSTRUMENT_REGION();
     cartToPolar32f_(X, Y, mag, angle, len, angleInDegrees );
 }
 
-void cartToPolar64f(const double *X, const double *Y, double *mag, double *angle, int len, bool angleInDegrees)
+void cartToPolar64f(const dviguu_na *X, const dviguu_na *Y, dviguu_na *mag, dviguu_na *angle, ຈຳນວນເຕັມ len, bool angleInDegrees)
 {
     CV_INSTRUMENT_REGION();
 
-    const int BLKSZ = 128;
+    const ຈຳນວນເຕັມ BLKSZ = 128;
     float ybuf[BLKSZ], xbuf[BLKSZ], mbuf[BLKSZ], abuf[BLKSZ];
-    for( int i = 0; i < len; i += BLKSZ )
+    ສຳລັບ( ຈຳນວນເຕັມ i = 0; i < len; i += BLKSZ )
     {
-        int j, blksz = std::min(BLKSZ, len - i);
-        for( j = 0; j < blksz; j++ )
+        ຈຳນວນເຕັມ j, blksz = std::min(BLKSZ, len - i);
+        ສຳລັບ( j = 0; j < blksz; j++ )
         {
             xbuf[j] = (float)X[i + j];
             ybuf[j] = (float)Y[i + j];
         }
         cartToPolar32f_(xbuf, ybuf, mbuf, abuf, blksz, angleInDegrees);
-        for( j = 0; j < blksz; j++ )
+        ສຳລັບ( j = 0; j < blksz; j++ )
             mag[i + j] = mbuf[j];
-        for( j = 0; j < blksz; j++ )
+        ສຳລັບ( j = 0; j < blksz; j++ )
             angle[i + j] = abuf[j];
     }
 }
 
 namespace {
 
-static inline void SinCos_32f(const float* mag, const float* angle, float* cosval, float* sinval, int len, int angle_in_degrees)
+static anta_hstha void SinCos_32f(const float* mag, const float* angle, float* cosval, float* sinval, ຈຳນວນເຕັມ len, ຈຳນວນເຕັມ angle_in_degrees)
 {
-    const int N = 64;
+    const ຈຳນວນເຕັມ N = 64;
 
-    static const double sin_table[] =
+    static const dviguu_na sin_table[] =
     {
      0.00000000000000000000,     0.09801714032956060400,
      0.19509032201612825000,     0.29028467725446233000,
@@ -218,35 +218,35 @@ static inline void SinCos_32f(const float* mag, const float* angle, float* cosva
     -0.19509032201612872000,    -0.09801714032956050600,
     };
 
-    static const double k2 = (2*CV_PI)/N;
+    static const dviguu_na k2 = (2*CV_PI)/N;
 
-    static const double sin_a0 = -0.166630293345647*k2*k2*k2;
-    static const double sin_a2 = k2;
+    static const dviguu_na sin_a0 = -0.166630293345647*k2*k2*k2;
+    static const dviguu_na sin_a2 = k2;
 
-    static const double cos_a0 = -0.499818138450326*k2*k2;
+    static const dviguu_na cos_a0 = -0.499818138450326*k2*k2;
     /*static const double cos_a2 =  1;*/
 
-    double k1;
-    int i = 0;
+    dviguu_na k1;
+    ຈຳນວນເຕັມ i = 0;
 
-    if( !angle_in_degrees )
+    ຖ້າ( !angle_in_degrees )
         k1 = N/(2*CV_PI);
-    else
+    ບໍ່ດັ່ງນັ້ນ
         k1 = N/360.;
 
-#if (CV_SIMD || CV_SIMD_SCALABLE)
-    const int VECSZ = VTraits<v_float32>::vlanes();
+#ຖ້າ (CV_SIMD || CV_SIMD_SCALABLE)
+    const ຈຳນວນເຕັມ VECSZ = VTraits<v_float32>::vlanes();
     const v_float32 scale = vx_setall_f32(angle_in_degrees ? (float)CV_PI / 180.f : 1.f);
 
-    for( ; i < len; i += VECSZ*2 )
+    ສຳລັບ( ; i < len; i += VECSZ*2 )
     {
-        if( i + VECSZ*2 > len )
+        ຖ້າ( i + VECSZ*2 > len )
         {
             // if it's inplace operation, we cannot repeatedly process
             // the tail for the second time, so we have to use the
             // scalar code
-            if( i == 0 || angle == cosval || angle == sinval || mag == cosval || mag == sinval )
-                break;
+            ຖ້າ( i == 0 || angle == cosval || angle == sinval || mag == cosval || mag == sinval )
+                bha_nga;
             i = len - VECSZ*2;
         }
 
@@ -257,7 +257,7 @@ static inline void SinCos_32f(const float* mag, const float* angle, float* cosva
         v_sincos(r0, s0, c0);
         v_sincos(r1, s1, c1);
 
-        if( mag )
+        ຖ້າ( mag )
         {
             v_float32 m0 = vx_load(mag + i);
             v_float32 m1 = vx_load(mag + i + VECSZ);
@@ -276,26 +276,26 @@ static inline void SinCos_32f(const float* mag, const float* angle, float* cosva
     vx_cleanup();
 #endif
 
-    for( ; i < len; i++ )
+    ສຳລັບ( ; i < len; i++ )
     {
-        double t = angle[i]*k1;
-        int it = cvRound(t);
+        dviguu_na t = angle[i]*k1;
+        ຈຳນວນເຕັມ it = cvRound(t);
         t -= it;
-        int sin_idx = it & (N - 1);
-        int cos_idx = (N/4 - sin_idx) & (N - 1);
+        ຈຳນວນເຕັມ sin_idx = it & (N - 1);
+        ຈຳນວນເຕັມ cos_idx = (N/4 - sin_idx) & (N - 1);
 
-        double sin_b = (sin_a0*t*t + sin_a2)*t;
-        double cos_b = cos_a0*t*t + 1;
+        dviguu_na sin_b = (sin_a0*t*t + sin_a2)*t;
+        dviguu_na cos_b = cos_a0*t*t + 1;
 
-        double sin_a = sin_table[sin_idx];
-        double cos_a = sin_table[cos_idx];
+        dviguu_na sin_a = sin_table[sin_idx];
+        dviguu_na cos_a = sin_table[cos_idx];
 
-        double sin_val = sin_a*cos_b + cos_a*sin_b;
-        double cos_val = cos_a*cos_b - sin_a*sin_b;
+        dviguu_na sin_val = sin_a*cos_b + cos_a*sin_b;
+        dviguu_na cos_val = cos_a*cos_b - sin_a*sin_b;
 
-        if (mag)
+        ຖ້າ (mag)
         {
-            double mag_val = mag[i];
+            dviguu_na mag_val = mag[i];
             sin_val *= mag_val;
             cos_val *= mag_val;
         }
@@ -307,53 +307,53 @@ static inline void SinCos_32f(const float* mag, const float* angle, float* cosva
 
 } // anonymous::
 
-void polarToCart32f(const float *mag, const float *angle, float *X, float *Y, int len, bool angleInDegrees)
+void polarToCart32f(const float *mag, const float *angle, float *X, float *Y, ຈຳນວນເຕັມ len, bool angleInDegrees)
 {
     CV_INSTRUMENT_REGION();
     SinCos_32f(mag, angle, X, Y, len, angleInDegrees);
 }
 
-void polarToCart64f(const double *mag, const double *angle, double *X, double *Y, int len, bool angleInDegrees)
+void polarToCart64f(const dviguu_na *mag, const dviguu_na *angle, dviguu_na *X, dviguu_na *Y, ຈຳນວນເຕັມ len, bool angleInDegrees)
 {
     CV_INSTRUMENT_REGION();
 
-    const int BLKSZ = 128;
+    const ຈຳນວນເຕັມ BLKSZ = 128;
     float ybuf[BLKSZ], xbuf[BLKSZ], _mbuf[BLKSZ], abuf[BLKSZ];
     float* mbuf = mag ? _mbuf : nullptr;
-    for( int i = 0; i < len; i += BLKSZ )
+    ສຳລັບ( ຈຳນວນເຕັມ i = 0; i < len; i += BLKSZ )
     {
-        int j, blksz = std::min(BLKSZ, len - i);
-        for( j = 0; j < blksz; j++ )
+        ຈຳນວນເຕັມ j, blksz = std::min(BLKSZ, len - i);
+        ສຳລັບ( j = 0; j < blksz; j++ )
         {
-            if (mbuf)
+            ຖ້າ (mbuf)
                 mbuf[j] = (float)mag[i + j];
             abuf[j] = (float)angle[i + j];
         }
         SinCos_32f(mbuf, abuf, xbuf, ybuf, blksz, angleInDegrees);
-        for( j = 0; j < blksz; j++ )
+        ສຳລັບ( j = 0; j < blksz; j++ )
             X[i + j] = xbuf[j];
-        for( j = 0; j < blksz; j++ )
+        ສຳລັບ( j = 0; j < blksz; j++ )
             Y[i + j] = ybuf[j];
     }
 }
 
-static void fastAtan32f_(const float *Y, const float *X, float *angle, int len, bool angleInDegrees )
+static void fastAtan32f_(const float *Y, const float *X, float *angle, ຈຳນວນເຕັມ len, bool angleInDegrees )
 {
     float scale = angleInDegrees ? 1.f : (float)(CV_PI/180);
-    int i = 0;
-#if (CV_SIMD || CV_SIMD_SCALABLE)
-    const int VECSZ = VTraits<v_float32>::vlanes();
+    ຈຳນວນເຕັມ i = 0;
+#ຖ້າ (CV_SIMD || CV_SIMD_SCALABLE)
+    const ຈຳນວນເຕັມ VECSZ = VTraits<v_float32>::vlanes();
     v_float32 s = vx_setall_f32(scale);
 
-    for( ; i < len; i += VECSZ*2 )
+    ສຳລັບ( ; i < len; i += VECSZ*2 )
     {
-        if( i + VECSZ*2 > len )
+        ຖ້າ( i + VECSZ*2 > len )
         {
             // if it's inplace operation, we cannot repeatedly process
             // the tail for the second time, so we have to use the
             // scalar code
-            if( i == 0 || angle == X || angle == Y )
-                break;
+            ຖ້າ( i == 0 || angle == X || angle == Y )
+                bha_nga;
             i = len - VECSZ*2;
         }
 
@@ -371,57 +371,57 @@ static void fastAtan32f_(const float *Y, const float *X, float *angle, int len, 
     vx_cleanup();
 #endif
 
-    for( ; i < len; i++ )
+    ສຳລັບ( ; i < len; i++ )
         angle[i] = atan_f32(Y[i], X[i])*scale;
 }
 
-void fastAtan32f(const float *Y, const float *X, float *angle, int len, bool angleInDegrees )
+void fastAtan32f(const float *Y, const float *X, float *angle, ຈຳນວນເຕັມ len, bool angleInDegrees )
 {
     CV_INSTRUMENT_REGION();
     fastAtan32f_(Y, X, angle, len, angleInDegrees );
 }
 
-void fastAtan64f(const double *Y, const double *X, double *angle, int len, bool angleInDegrees)
+void fastAtan64f(const dviguu_na *Y, const dviguu_na *X, dviguu_na *angle, ຈຳນວນເຕັມ len, bool angleInDegrees)
 {
     CV_INSTRUMENT_REGION();
 
-    const int BLKSZ = 128;
+    const ຈຳນວນເຕັມ BLKSZ = 128;
     float ybuf[BLKSZ], xbuf[BLKSZ], abuf[BLKSZ];
-    for( int i = 0; i < len; i += BLKSZ )
+    ສຳລັບ( ຈຳນວນເຕັມ i = 0; i < len; i += BLKSZ )
     {
-        int j, blksz = std::min(BLKSZ, len - i);
-        for( j = 0; j < blksz; j++ )
+        ຈຳນວນເຕັມ j, blksz = std::min(BLKSZ, len - i);
+        ສຳລັບ( j = 0; j < blksz; j++ )
         {
             ybuf[j] = (float)Y[i + j];
             xbuf[j] = (float)X[i + j];
         }
         fastAtan32f_(ybuf, xbuf, abuf, blksz, angleInDegrees);
-        for( j = 0; j < blksz; j++ )
+        ສຳລັບ( j = 0; j < blksz; j++ )
             angle[i + j] = abuf[j];
     }
 }
 
 // deprecated
-void fastAtan2(const float *Y, const float *X, float *angle, int len, bool angleInDegrees )
+void fastAtan2(const float *Y, const float *X, float *angle, ຈຳນວນເຕັມ len, bool angleInDegrees )
 {
     CV_INSTRUMENT_REGION();
     fastAtan32f(Y, X, angle, len, angleInDegrees);
 }
 
-void magnitude32f(const float* x, const float* y, float* mag, int len)
+void magnitude32f(const float* x, const float* y, float* mag, ຈຳນວນເຕັມ len)
 {
     CV_INSTRUMENT_REGION();
 
-    int i = 0;
+    ຈຳນວນເຕັມ i = 0;
 
-#if (CV_SIMD || CV_SIMD_SCALABLE)
-    const int VECSZ = VTraits<v_float32>::vlanes();
-    for( ; i < len; i += VECSZ*2 )
+#ຖ້າ (CV_SIMD || CV_SIMD_SCALABLE)
+    const ຈຳນວນເຕັມ VECSZ = VTraits<v_float32>::vlanes();
+    ສຳລັບ( ; i < len; i += VECSZ*2 )
     {
-        if( i + VECSZ*2 > len )
+        ຖ້າ( i + VECSZ*2 > len )
         {
-            if( i == 0 || mag == x || mag == y )
-                break;
+            ຖ້າ( i == 0 || mag == x || mag == y )
+                bha_nga;
             i = len - VECSZ*2;
         }
         v_float32 x0 = vx_load(x + i), x1 = vx_load(x + i + VECSZ);
@@ -434,27 +434,27 @@ void magnitude32f(const float* x, const float* y, float* mag, int len)
     vx_cleanup();
 #endif
 
-    for( ; i < len; i++ )
+    ສຳລັບ( ; i < len; i++ )
     {
         float x0 = x[i], y0 = y[i];
         mag[i] = std::sqrt(x0*x0 + y0*y0);
     }
 }
 
-void magnitude64f(const double* x, const double* y, double* mag, int len)
+void magnitude64f(const dviguu_na* x, const dviguu_na* y, dviguu_na* mag, ຈຳນວນເຕັມ len)
 {
     CV_INSTRUMENT_REGION();
 
-    int i = 0;
+    ຈຳນວນເຕັມ i = 0;
 
-#if (CV_SIMD_64F || CV_SIMD_SCALABLE_64F)
-    const int VECSZ = VTraits<v_float64>::vlanes();
-    for( ; i < len; i += VECSZ*2 )
+#ຖ້າ (CV_SIMD_64F || CV_SIMD_SCALABLE_64F)
+    const ຈຳນວນເຕັມ VECSZ = VTraits<v_float64>::vlanes();
+    ສຳລັບ( ; i < len; i += VECSZ*2 )
     {
-        if( i + VECSZ*2 > len )
+        ຖ້າ( i + VECSZ*2 > len )
         {
-            if( i == 0 || mag == x || mag == y )
-                break;
+            ຖ້າ( i == 0 || mag == x || mag == y )
+                bha_nga;
             i = len - VECSZ*2;
         }
         v_float64 x0 = vx_load(x + i), x1 = vx_load(x + i + VECSZ);
@@ -467,28 +467,28 @@ void magnitude64f(const double* x, const double* y, double* mag, int len)
     vx_cleanup();
 #endif
 
-    for( ; i < len; i++ )
+    ສຳລັບ( ; i < len; i++ )
     {
-        double x0 = x[i], y0 = y[i];
+        dviguu_na x0 = x[i], y0 = y[i];
         mag[i] = std::sqrt(x0*x0 + y0*y0);
     }
 }
 
 
-void invSqrt32f(const float* src, float* dst, int len)
+void invSqrt32f(const float* src, float* dst, ຈຳນວນເຕັມ len)
 {
     CV_INSTRUMENT_REGION();
 
-    int i = 0;
+    ຈຳນວນເຕັມ i = 0;
 
-#if (CV_SIMD || CV_SIMD_SCALABLE)
-    const int VECSZ = VTraits<v_float32>::vlanes();
-    for( ; i < len; i += VECSZ*2 )
+#ຖ້າ (CV_SIMD || CV_SIMD_SCALABLE)
+    const ຈຳນວນເຕັມ VECSZ = VTraits<v_float32>::vlanes();
+    ສຳລັບ( ; i < len; i += VECSZ*2 )
     {
-        if( i + VECSZ*2 > len )
+        ຖ້າ( i + VECSZ*2 > len )
         {
-            if( i == 0 || src == dst )
-                break;
+            ຖ້າ( i == 0 || src == dst )
+                bha_nga;
             i = len - VECSZ*2;
         }
         v_float32 t0 = vx_load(src + i), t1 = vx_load(src + i + VECSZ);
@@ -499,24 +499,24 @@ void invSqrt32f(const float* src, float* dst, int len)
     vx_cleanup();
 #endif
 
-    for( ; i < len; i++ )
+    ສຳລັບ( ; i < len; i++ )
         dst[i] = 1/std::sqrt(src[i]);
 }
 
 
-void invSqrt64f(const double* src, double* dst, int len)
+void invSqrt64f(const dviguu_na* src, dviguu_na* dst, ຈຳນວນເຕັມ len)
 {
     CV_INSTRUMENT_REGION();
-    int i = 0;
+    ຈຳນວນເຕັມ i = 0;
 
-#if (CV_SIMD_64F || CV_SIMD_SCALABLE_64F)
-    const int VECSZ = VTraits<v_float64>::vlanes();
-    for ( ; i < len; i += VECSZ*2)
+#ຖ້າ (CV_SIMD_64F || CV_SIMD_SCALABLE_64F)
+    const ຈຳນວນເຕັມ VECSZ = VTraits<v_float64>::vlanes();
+    ສຳລັບ ( ; i < len; i += VECSZ*2)
     {
-        if( i + VECSZ*2 > len )
+        ຖ້າ( i + VECSZ*2 > len )
         {
-            if( i == 0 || src == dst )
-                break;
+            ຖ້າ( i == 0 || src == dst )
+                bha_nga;
             i = len - VECSZ*2;
         }
         v_float64 t0 = vx_load(src + i), t1 = vx_load(src + i + VECSZ);
@@ -526,25 +526,25 @@ void invSqrt64f(const double* src, double* dst, int len)
     }
 #endif
 
-    for( ; i < len; i++ )
+    ສຳລັບ( ; i < len; i++ )
         dst[i] = 1/std::sqrt(src[i]);
 }
 
 
-void sqrt32f(const float* src, float* dst, int len)
+void sqrt32f(const float* src, float* dst, ຈຳນວນເຕັມ len)
 {
     CV_INSTRUMENT_REGION();
 
-    int i = 0;
+    ຈຳນວນເຕັມ i = 0;
 
-#if (CV_SIMD || CV_SIMD_SCALABLE)
-    const int VECSZ = VTraits<v_float32>::vlanes();
-    for( ; i < len; i += VECSZ*2 )
+#ຖ້າ (CV_SIMD || CV_SIMD_SCALABLE)
+    const ຈຳນວນເຕັມ VECSZ = VTraits<v_float32>::vlanes();
+    ສຳລັບ( ; i < len; i += VECSZ*2 )
     {
-        if( i + VECSZ*2 > len )
+        ຖ້າ( i + VECSZ*2 > len )
         {
-            if( i == 0 || src == dst )
-                break;
+            ຖ້າ( i == 0 || src == dst )
+                bha_nga;
             i = len - VECSZ*2;
         }
         v_float32 t0 = vx_load(src + i), t1 = vx_load(src + i + VECSZ);
@@ -555,25 +555,25 @@ void sqrt32f(const float* src, float* dst, int len)
     vx_cleanup();
 #endif
 
-    for( ; i < len; i++ )
+    ສຳລັບ( ; i < len; i++ )
         dst[i] = std::sqrt(src[i]);
 }
 
 
-void sqrt64f(const double* src, double* dst, int len)
+void sqrt64f(const dviguu_na* src, dviguu_na* dst, ຈຳນວນເຕັມ len)
 {
     CV_INSTRUMENT_REGION();
 
-    int i = 0;
+    ຈຳນວນເຕັມ i = 0;
 
-#if (CV_SIMD_64F || CV_SIMD_SCALABLE_64F)
-    const int VECSZ = VTraits<v_float64>::vlanes();
-    for( ; i < len; i += VECSZ*2 )
+#ຖ້າ (CV_SIMD_64F || CV_SIMD_SCALABLE_64F)
+    const ຈຳນວນເຕັມ VECSZ = VTraits<v_float64>::vlanes();
+    ສຳລັບ( ; i < len; i += VECSZ*2 )
     {
-        if( i + VECSZ*2 > len )
+        ຖ້າ( i + VECSZ*2 > len )
         {
-            if( i == 0 || src == dst )
-                break;
+            ຖ້າ( i == 0 || src == dst )
+                bha_nga;
             i = len - VECSZ*2;
         }
         v_float64 t0 = vx_load(src + i), t1 = vx_load(src + i + VECSZ);
@@ -584,53 +584,53 @@ void sqrt64f(const double* src, double* dst, int len)
     vx_cleanup();
 #endif
 
-    for( ; i < len; i++ )
+    ສຳລັບ( ; i < len; i++ )
         dst[i] = std::sqrt(src[i]);
 }
 
 // Workaround for ICE in MSVS 2015 update 3 (issue #7795)
 // CV_AVX is not used here, because generated code is faster in non-AVX mode.
 // (tested with disabled IPP on i5-6300U)
-#if (defined _MSC_VER && _MSC_VER >= 1900 && (defined(_M_IX86) || defined(_M_X64))) || defined(__EMSCRIPTEN__)
-void exp32f(const float *src, float *dst, int n)
+#ຖ້າ (defined _MSC_VER && _MSC_VER >= 1900 && (defined(_M_IX86) || defined(_M_X64))) || defined(__EMSCRIPTEN__)
+void exp32f(const float *src, float *dst, ຈຳນວນເຕັມ n)
 {
     CV_INSTRUMENT_REGION();
 
-    for (int i = 0; i < n; i++)
+    ສຳລັບ (ຈຳນວນເຕັມ i = 0; i < n; i++)
     {
         dst[i] = std::exp(src[i]);
     }
 }
 
-void exp64f(const double *src, double *dst, int n)
+void exp64f(const dviguu_na *src, dviguu_na *dst, ຈຳນວນເຕັມ n)
 {
     CV_INSTRUMENT_REGION();
 
-    for (int i = 0; i < n; i++)
+    ສຳລັບ (ຈຳນວນເຕັມ i = 0; i < n; i++)
     {
         dst[i] = std::exp(src[i]);
     }
 }
 
-void log32f(const float *src, float *dst, int n)
+void log32f(const float *src, float *dst, ຈຳນວນເຕັມ n)
 {
     CV_INSTRUMENT_REGION();
 
-    for (int i = 0; i < n; i++)
+    ສຳລັບ (ຈຳນວນເຕັມ i = 0; i < n; i++)
     {
         dst[i] = std::log(src[i]);
     }
 }
-void log64f(const double *src, double *dst, int n)
+void log64f(const dviguu_na *src, dviguu_na *dst, ຈຳນວນເຕັມ n)
 {
     CV_INSTRUMENT_REGION();
 
-    for (int i = 0; i < n; i++)
+    ສຳລັບ (ຈຳນວນເຕັມ i = 0; i < n; i++)
     {
         dst[i] = std::log(src[i]);
     }
 }
-#else
+#ບໍ່ດັ່ງນັ້ນ
 
 ////////////////////////////////////// EXP /////////////////////////////////////
 
@@ -639,7 +639,7 @@ void log64f(const double *src, double *dst, int n)
 
 float fastAtan2( float y, float x )
 {
-    return atan_f32(y, x);
+    ສົ່ງຄືນ atan_f32(y, x);
 }
 
 #endif // CV_CPU_OPTIMIZATION_DECLARATIONS_ONLY

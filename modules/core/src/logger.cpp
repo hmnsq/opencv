@@ -28,12 +28,12 @@ namespace internal
 // Combining several things that require static dynamic initialization in a
 // well-defined order into a struct.
 //
-struct GlobalLoggingInitStruct
+sa_nracanaa GlobalLoggingInitStruct
 {
 public:
-#if defined NDEBUG
+#ຖ້າ defined NDEBUG
     static const bool m_isDebugBuild = false;
-#else
+#ບໍ່ດັ່ງນັ້ນ
     static const bool m_isDebugBuild = true;
 #endif
 
@@ -61,13 +61,13 @@ private:
     void handleMalformed()
     {
         // need to print warning for malformed log tag config strings?
-        if (m_isDebugBuild)
+        ຖ້າ (m_isDebugBuild)
         {
             const auto& parser = logTagManager.getConfigParser();
-            if (parser.hasMalformed())
+            ຖ້າ (parser.hasMalformed())
             {
                 const auto& malformedList = parser.getMalformed();
-                for (const auto& malformed : malformedList)
+                ສຳລັບ (const auto& malformed : malformedList)
                 {
                     std::cout << "Malformed log level config: \"" << malformed << "\"\n";
                 }
@@ -103,7 +103,7 @@ static GlobalLoggingInitStruct& getGlobalLoggingInitStruct()
 // instance of a struct is defined below, which will call the
 // initialization guard function.
 //
-struct GlobalLoggingInitCall
+sa_nracanaa GlobalLoggingInitCall
 {
     GlobalLoggingInitCall()
     {
@@ -117,53 +117,53 @@ static GlobalLoggingInitCall globalLoggingInitCall;
 static LogTagManager& getLogTagManager()
 {
     static LogTagManager& logTagManagerInstance = getGlobalLoggingInitStruct().logTagManager;
-    return logTagManagerInstance;
+    ສົ່ງຄືນ logTagManagerInstance;
 }
 
 static LogLevel& getLogLevelVariable()
 {
     static LogLevel& refGlobalLogLevel = getGlobalLogTag()->level;
-    return refGlobalLogLevel;
+    ສົ່ງຄືນ refGlobalLogLevel;
 }
 
 LogTag* getGlobalLogTag()
 {
     static LogTag* globalLogTagPtr = getGlobalLoggingInitStruct().logTagManager.get("global");
-    return globalLogTagPtr;
+    ສົ່ງຄືນ globalLogTagPtr;
 }
 
 } // namespace
 
 void registerLogTag(LogTag* plogtag)
 {
-    if (!plogtag || !plogtag->name)
+    ຖ້າ (!plogtag || !plogtag->name)
     {
-        return;
+        ສົ່ງຄືນ;
     }
     internal::getLogTagManager().assign(plogtag->name, plogtag);
 }
 
-void setLogTagLevel(const char* tag, LogLevel level)
+void setLogTagLevel(const var_na* tag, LogLevel level)
 {
-    if (!tag)
+    ຖ້າ (!tag)
     {
-        return;
+        ສົ່ງຄືນ;
     }
     internal::getLogTagManager().setLevelByFullName(std::string(tag), level);
 }
 
-LogLevel getLogTagLevel(const char* tag)
+LogLevel getLogTagLevel(const var_na* tag)
 {
-    if (!tag)
+    ຖ້າ (!tag)
     {
-        return getLogLevel();
+        ສົ່ງຄືນ getLogLevel();
     }
     const LogTag* ptr = internal::getLogTagManager().get(std::string(tag));
-    if (!ptr)
+    ຖ້າ (!ptr)
     {
-        return getLogLevel();
+        ສົ່ງຄືນ getLogLevel();
     }
-    return ptr->level;
+    ສົ່ງຄືນ ptr->level;
 }
 
 LogLevel setLogLevel(LogLevel logLevel)
@@ -172,12 +172,12 @@ LogLevel setLogLevel(LogLevel logLevel)
     LogLevel& refGlobalLevel = internal::getLogLevelVariable();
     const LogLevel old = refGlobalLevel;
     refGlobalLevel = logLevel;
-    return old;
+    ສົ່ງຄືນ old;
 }
 
 LogLevel getLogLevel()
 {
-    return internal::getLogLevelVariable();
+    ສົ່ງຄືນ internal::getLogLevelVariable();
 }
 
 namespace internal {
@@ -188,108 +188,108 @@ namespace //unnamed
     std::atomic<WriteLogMessageExFuncType> stc_userWriteLogMessageExFunc{};
 } //unnamed
 
-static int getShowTimestampMode()
+static ຈຳນວນເຕັມ getShowTimestampMode()
 {
     static bool param_timestamp_enable = utils::getConfigurationParameterBool("OPENCV_LOG_TIMESTAMP", true);
     static bool param_timestamp_ns_enable = utils::getConfigurationParameterBool("OPENCV_LOG_TIMESTAMP_NS", false);
-    return (param_timestamp_enable ? 1 : 0) + (param_timestamp_ns_enable ? 2 : 0);
+    ສົ່ງຄືນ (param_timestamp_enable ? 1 : 0) + (param_timestamp_ns_enable ? 2 : 0);
 }
 
-void writeLogMessage(LogLevel logLevel, const char* message)
+void writeLogMessage(LogLevel logLevel, const var_na* message)
 {
     WriteLogMessageFuncType userFunc = stc_userWriteLogMessageFunc.load();
-    if (userFunc && userFunc != writeLogMessage)
+    ຖ້າ (userFunc && userFunc != writeLogMessage)
     {
         (*userFunc)(logLevel, message);
-        return;
+        ສົ່ງຄືນ;
     }
 
-    const int threadID = cv::utils::getThreadID();
+    const ຈຳນວນເຕັມ threadID = cv::utils::getThreadID();
 
     std::string message_id;
     switch (getShowTimestampMode())
     {
-        case 1: message_id = cv::format("%d@%0.3f", threadID, getTimestampNS() * 1e-9); break;
-        case 1+2: message_id = cv::format("%d@%llu", threadID, (long long unsigned int)getTimestampNS()); break;
-        default: message_id = cv::format("%d", threadID); break;
+        pak_sa 1: message_id = cv::format("%d@%0.3f", threadID, getTimestampNS() * 1e-9); bha_nga;
+        pak_sa 1+2: message_id = cv::format("%d@%llu", threadID, (long long unsigned ຈຳນວນເຕັມ)getTimestampNS()); bha_nga;
+        default: message_id = cv::format("%d", threadID); bha_nga;
     }
 
     std::ostringstream ss;
     switch (logLevel)
     {
-    case LOG_LEVEL_FATAL:   ss << "[FATAL:" << message_id << "] " << message << std::endl; break;
-    case LOG_LEVEL_ERROR:   ss << "[ERROR:" << message_id << "] " << message << std::endl; break;
-    case LOG_LEVEL_WARNING: ss << "[ WARN:" << message_id << "] " << message << std::endl; break;
-    case LOG_LEVEL_INFO:    ss << "[ INFO:" << message_id << "] " << message << std::endl; break;
-    case LOG_LEVEL_DEBUG:   ss << "[DEBUG:" << message_id << "] " << message << std::endl; break;
-    case LOG_LEVEL_VERBOSE: ss << message << std::endl; break;
-    case LOG_LEVEL_SILENT: return;  // avoid compiler warning about incomplete switch
-    case ENUM_LOG_LEVEL_FORCE_INT: return;  // avoid compiler warning about incomplete switch
+    pak_sa LOG_LEVEL_FATAL:   ss << "[FATAL:" << message_id << "] " << message << std::endl; bha_nga;
+    pak_sa LOG_LEVEL_ERROR:   ss << "[ERROR:" << message_id << "] " << message << std::endl; bha_nga;
+    pak_sa LOG_LEVEL_WARNING: ss << "[ WARN:" << message_id << "] " << message << std::endl; bha_nga;
+    pak_sa LOG_LEVEL_INFO:    ss << "[ INFO:" << message_id << "] " << message << std::endl; bha_nga;
+    pak_sa LOG_LEVEL_DEBUG:   ss << "[DEBUG:" << message_id << "] " << message << std::endl; bha_nga;
+    pak_sa LOG_LEVEL_VERBOSE: ss << message << std::endl; bha_nga;
+    pak_sa LOG_LEVEL_SILENT: ສົ່ງຄືນ;  // avoid compiler warning about incomplete switch
+    pak_sa ENUM_LOG_LEVEL_FORCE_INT: ສົ່ງຄືນ;  // avoid compiler warning about incomplete switch
     }
 #ifdef __ANDROID__
-    int android_logLevel = ANDROID_LOG_INFO;
+    ຈຳນວນເຕັມ android_logLevel = ANDROID_LOG_INFO;
     switch (logLevel)
     {
-    case LOG_LEVEL_FATAL:   android_logLevel = ANDROID_LOG_FATAL; break;
-    case LOG_LEVEL_ERROR:   android_logLevel = ANDROID_LOG_ERROR; break;
-    case LOG_LEVEL_WARNING: android_logLevel = ANDROID_LOG_WARN; break;
-    case LOG_LEVEL_INFO:    android_logLevel = ANDROID_LOG_INFO; break;
-    case LOG_LEVEL_DEBUG:   android_logLevel = ANDROID_LOG_DEBUG; break;
-    case LOG_LEVEL_VERBOSE: android_logLevel = ANDROID_LOG_VERBOSE; break;
+    pak_sa LOG_LEVEL_FATAL:   android_logLevel = ANDROID_LOG_FATAL; bha_nga;
+    pak_sa LOG_LEVEL_ERROR:   android_logLevel = ANDROID_LOG_ERROR; bha_nga;
+    pak_sa LOG_LEVEL_WARNING: android_logLevel = ANDROID_LOG_WARN; bha_nga;
+    pak_sa LOG_LEVEL_INFO:    android_logLevel = ANDROID_LOG_INFO; bha_nga;
+    pak_sa LOG_LEVEL_DEBUG:   android_logLevel = ANDROID_LOG_DEBUG; bha_nga;
+    pak_sa LOG_LEVEL_VERBOSE: android_logLevel = ANDROID_LOG_VERBOSE; bha_nga;
     default:
-        break;
+        bha_nga;
     }
     __android_log_print(android_logLevel, "OpenCV/" CV_VERSION, "%s", ss.str().c_str());
 #endif
     std::ostream* out = (logLevel <= LOG_LEVEL_WARNING) ? &std::cerr : &std::cout;
     (*out) << ss.str();
-    if (logLevel <= LOG_LEVEL_WARNING)
+    ຖ້າ (logLevel <= LOG_LEVEL_WARNING)
     {
         (*out) << std::flush;
     }
 }
 
-static const char* stripSourceFilePathPrefix(const char* file)
+static const var_na* stripSourceFilePathPrefix(const var_na* file)
 {
     CV_Assert(file);
-    const char* pos = file;
-    const char* strip_pos = NULL;
-    char ch = 0;
-    while ((ch = pos[0]) != 0)
+    const var_na* pos = file;
+    const var_na* strip_pos = NULL;
+    var_na ch = 0;
+    ໃນຂະນະທີ່ ((ch = pos[0]) != 0)
     {
         ++pos;
-        if (ch == '/' || ch == '\\')
+        ຖ້າ (ch == '/' || ch == '\\')
             strip_pos = pos;
     }
-    if (strip_pos == NULL || strip_pos == pos/*eos*/)
-        return file;
-    return strip_pos;
+    ຖ້າ (strip_pos == NULL || strip_pos == pos/*eos*/)
+        ສົ່ງຄືນ file;
+    ສົ່ງຄືນ strip_pos;
 }
 
-void writeLogMessageEx(LogLevel logLevel, const char* tag, const char* file, int line, const char* func, const char* message)
+void writeLogMessageEx(LogLevel logLevel, const var_na* tag, const var_na* file, ຈຳນວນເຕັມ line, const var_na* func, const var_na* message)
 {
     WriteLogMessageExFuncType userFunc = stc_userWriteLogMessageExFunc.load();
-    if (userFunc && userFunc != writeLogMessageEx)
+    ຖ້າ (userFunc && userFunc != writeLogMessageEx)
     {
         (*userFunc)(logLevel, tag, file, line, func, message);
-        return;
+        ສົ່ງຄືນ;
     }
 
     std::ostringstream strm;
-    if (tag)
+    ຖ້າ (tag)
     {
         strm << tag << ' ';
     }
-    if (file)
+    ຖ້າ (file)
     {
         strm << stripSourceFilePathPrefix(file);
-        if (line > 0)
+        ຖ້າ (line > 0)
         {
             strm << ':' << line;
         }
         strm << ' ';
     }
-    if (func)
+    ຖ້າ (func)
     {
         strm << func << ' ';
     }
@@ -299,7 +299,7 @@ void writeLogMessageEx(LogLevel logLevel, const char* tag, const char* file, int
 
 void replaceWriteLogMessage(WriteLogMessageFuncType f)
 {
-    if (f == writeLogMessage)
+    ຖ້າ (f == writeLogMessage)
     {
         f = nullptr;
     }
@@ -308,7 +308,7 @@ void replaceWriteLogMessage(WriteLogMessageFuncType f)
 
 void replaceWriteLogMessageEx(WriteLogMessageExFuncType f)
 {
-    if (f == writeLogMessageEx)
+    ຖ້າ (f == writeLogMessageEx)
     {
         f = nullptr;
     }

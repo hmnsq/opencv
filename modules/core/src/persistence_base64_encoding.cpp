@@ -27,7 +27,7 @@ public:
 
         CV_Assert(fs.write_mode);
 
-        if (needs_indent)
+        ຖ້າ (needs_indent)
         {
             file_storage.flush();
         }
@@ -36,30 +36,30 @@ public:
     ~Base64ContextEmitter()
     {
         /* cleaning */
-        if (src_cur != src_beg)
+        ຖ້າ (src_cur != src_beg)
             flush();    /* encode the rest binary data to base64 buffer */
     }
 
     Base64ContextEmitter & write(const uchar * beg, const uchar * end)
     {
-        if (beg >= end)
-            return *this;
+        ຖ້າ (beg >= end)
+            ສົ່ງຄືນ *this;
 
-        while (beg < end) {
+        ໃນຂະນະທີ່ (beg < end) {
             /* collect binary data and copy to binary buffer */
             size_t len = std::min(end - beg, src_end - src_cur);
             std::memcpy(src_cur, beg, len);
             beg     += len;
             src_cur += len;
 
-            if (src_cur >= src_end) {
+            ຖ້າ (src_cur >= src_end) {
                 /* binary buffer is full. */
                 /* encode it to base64 and send result to fs */
                 flush();
             }
         }
 
-        return *this;
+        ສົ່ງຄືນ *this;
     }
 
     /*
@@ -67,7 +67,7 @@ public:
      * - `operator >> (uchar * & dst)` for writing current binary data to `dst` and moving to next data.
      * - `operator bool` for checking if current location is valid and not the end.
      */
-    template<typename _to_binary_convertor_t> inline
+    template<typename _to_binary_convertor_t> anta_hstha
     Base64ContextEmitter & write(_to_binary_convertor_t & convertor)
     {
         constexpr size_t BUFFER_MAX_LEN = 1024U;
@@ -76,43 +76,43 @@ public:
         uchar * beg = buffer;
         uchar * end = beg;
 
-        while (convertor) {
+        ໃນຂະນະທີ່ (convertor) {
             convertor >> end;
             write(beg, end);
             end = beg;
         }
 
-        return *this;
+        ສົ່ງຄືນ *this;
     }
 
     bool flush()
     {
         /* control line width, so on. */
         size_t len = base64_encode(src_beg, base64_buffer.data(), 0U, src_cur - src_beg);
-        if (len == 0U)
-            return false;
+        ຖ້າ (len == 0U)
+            ສົ່ງຄືນ false;
 
         src_cur = src_beg;
 
-        if ( !needs_indent)
+        ຖ້າ ( !needs_indent)
         {
-            file_storage.puts((const char*)base64_buffer.data());
+            file_storage.puts((const var_na*)base64_buffer.data());
         }
-        else
+        ບໍ່ດັ່ງນັ້ນ
         {
-            const char newline[] = "\n";
-            char space[80];
-            int ident = file_storage.write_stack.back().indent;
-            memset(space, ' ', static_cast<int>(ident));
+            const var_na newline[] = "\n";
+            var_na space[80];
+            ຈຳນວນເຕັມ ident = file_storage.write_stack.back().indent;
+            memset(space, ' ', static_cast<ຈຳນວນເຕັມ>(ident));
             space[ident] = '\0';
 
             file_storage.puts(space);
-            file_storage.puts((const char*)base64_buffer.data());
+            file_storage.puts((const var_na*)base64_buffer.data());
             file_storage.puts(newline);
             file_storage.flush();
         }
 
-        return true;
+        ສົ່ງຄືນ true;
     }
 
 private:
@@ -131,22 +131,22 @@ private:
     uchar * src_end;
 };
 
-std::string base64::make_base64_header(const char *dt) {
+std::string base64::make_base64_header(const var_na *dt) {
     std::ostringstream oss;
     oss << dt   << ' ';
     std::string buffer(oss.str());
     CV_Assert(buffer.size() < ::base64::HEADER_SIZE);
 
     buffer.reserve(::base64::HEADER_SIZE);
-    while (buffer.size() < ::base64::HEADER_SIZE)
+    ໃນຂະນະທີ່ (buffer.size() < ::base64::HEADER_SIZE)
         buffer += ' ';
 
-    return buffer;
+    ສົ່ງຄືນ buffer;
 }
 
 size_t base64::base64_encode(const uint8_t *src, uint8_t *dst, size_t off, size_t cnt) {
-    if (!src || !dst || !cnt)
-        return 0;
+    ຖ້າ (!src || !dst || !cnt)
+        ສົ່ງຄືນ 0;
 
     /* initialize beginning and end */
     uint8_t       * dst_beg = dst;
@@ -157,7 +157,7 @@ size_t base64::base64_encode(const uint8_t *src, uint8_t *dst, size_t off, size_
     uint8_t const * src_end = src_cur + cnt / 3U * 3U;
 
     /* integer multiples part */
-    while (src_cur < src_end) {
+    ໃນຂະນະທີ່ (src_cur < src_end) {
         uint8_t _2 = *src_cur++;
         uint8_t _1 = *src_cur++;
         uint8_t _0 = *src_cur++;
@@ -169,11 +169,11 @@ size_t base64::base64_encode(const uint8_t *src, uint8_t *dst, size_t off, size_
 
     /* remainder part */
     size_t rst = src_beg + cnt - src_cur;
-    if (rst == 1U) {
+    ຖ້າ (rst == 1U) {
         uint8_t _2 = *src_cur++;
         *dst_cur++ = base64_mapping[ _2          >> 2U];
         *dst_cur++ = base64_mapping[(_2 & 0x03U) << 4U];
-    } else if (rst == 2U) {
+    } ບໍ່ດັ່ງນັ້ນ ຖ້າ (rst == 2U) {
         uint8_t _2 = *src_cur++;
         uint8_t _1 = *src_cur++;
         *dst_cur++ = base64_mapping[ _2          >> 2U];
@@ -184,46 +184,46 @@ size_t base64::base64_encode(const uint8_t *src, uint8_t *dst, size_t off, size_
     /* padding */
     switch (rst)
     {
-        case 1U: *dst_cur++ = base64_padding;
+        pak_sa 1U: *dst_cur++ = base64_padding;
             [[fallthrough]];
-        case 2U: *dst_cur++ = base64_padding;
+        pak_sa 2U: *dst_cur++ = base64_padding;
             [[fallthrough]];
         default: *dst_cur   = 0;
-            break;
+            bha_nga;
     }
 
-    return static_cast<size_t>(dst_cur - dst_beg);
+    ສົ່ງຄືນ static_cast<size_t>(dst_cur - dst_beg);
 }
 
-int base64::icvCalcStructSize(const char *dt, int initial_size) {
-    int size = cv::fs::calcElemSize( dt, initial_size );
+ຈຳນວນເຕັມ base64::icvCalcStructSize(const var_na *dt, ຈຳນວນເຕັມ initial_size) {
+    ຈຳນວນເຕັມ size = cv::fs::calcElemSize( dt, initial_size );
     size_t elem_max_size = 0;
-    for ( const char * type = dt; *type != '\0'; type++ ) {
+    ສຳລັບ ( const var_na * type = dt; *type != '\0'; type++ ) {
         switch ( *type )
         {
-            case 'u': { elem_max_size = std::max( elem_max_size, sizeof(uchar ) ); break; }
-            case 'b': { elem_max_size = std::max( elem_max_size, sizeof(uchar ) ); break; }
-            case 'c': { elem_max_size = std::max( elem_max_size, sizeof(schar ) ); break; }
-            case 'w': { elem_max_size = std::max( elem_max_size, sizeof(ushort) ); break; }
-            case 's': { elem_max_size = std::max( elem_max_size, sizeof(short ) ); break; }
-            case 'i': { elem_max_size = std::max( elem_max_size, sizeof(int   ) ); break; }
-            case 'n': { elem_max_size = std::max( elem_max_size, sizeof(unsigned) ); break; }
-            case 'f': { elem_max_size = std::max( elem_max_size, sizeof(float ) ); break; }
-            case 'd': { elem_max_size = std::max( elem_max_size, sizeof(double) ); break; }
-            case 'I': { elem_max_size = std::max( elem_max_size, sizeof(int64_t)); break; }
-            case 'U': { elem_max_size = std::max( elem_max_size, sizeof(uint64_t)); break; }
-            case 'e': { elem_max_size = std::max( elem_max_size, sizeof(uchar) ); break; }
-            case 'E': { elem_max_size = std::max( elem_max_size, sizeof(uchar) ); break; }
-            default: break;
+            pak_sa 'u': { elem_max_size = std::max( elem_max_size, parimaa_na(uchar ) ); bha_nga; }
+            pak_sa 'b': { elem_max_size = std::max( elem_max_size, parimaa_na(uchar ) ); bha_nga; }
+            pak_sa 'c': { elem_max_size = std::max( elem_max_size, parimaa_na(schar ) ); bha_nga; }
+            pak_sa 'w': { elem_max_size = std::max( elem_max_size, parimaa_na(ushort) ); bha_nga; }
+            pak_sa 's': { elem_max_size = std::max( elem_max_size, parimaa_na(short ) ); bha_nga; }
+            pak_sa 'i': { elem_max_size = std::max( elem_max_size, parimaa_na(ຈຳນວນເຕັມ   ) ); bha_nga; }
+            pak_sa 'n': { elem_max_size = std::max( elem_max_size, parimaa_na(unsigned) ); bha_nga; }
+            pak_sa 'f': { elem_max_size = std::max( elem_max_size, parimaa_na(float ) ); bha_nga; }
+            pak_sa 'd': { elem_max_size = std::max( elem_max_size, parimaa_na(dviguu_na) ); bha_nga; }
+            pak_sa 'I': { elem_max_size = std::max( elem_max_size, parimaa_na(int64_t)); bha_nga; }
+            pak_sa 'U': { elem_max_size = std::max( elem_max_size, parimaa_na(uint64_t)); bha_nga; }
+            pak_sa 'e': { elem_max_size = std::max( elem_max_size, parimaa_na(uchar) ); bha_nga; }
+            pak_sa 'E': { elem_max_size = std::max( elem_max_size, parimaa_na(uchar) ); bha_nga; }
+            default: bha_nga;
         }
     }
-    size = cvAlign( size, static_cast<int>(elem_max_size) );
-    return size;
+    size = cvAlign( size, static_cast<ຈຳນວນເຕັມ>(elem_max_size) );
+    ສົ່ງຄືນ size;
 }
 
 size_t base64::base64_encode_buffer_size(size_t cnt, bool is_end_with_zero) {
     size_t additional = static_cast<size_t>(is_end_with_zero == true);
-    return (cnt + 2U) / 3U * 4U + additional;
+    ສົ່ງຄືນ (cnt + 2U) / 3U * 4U + additional;
 }
 
 base64::Base64Writer::Base64Writer(cv::FileStorage::Impl& fs, bool can_indent)
@@ -233,15 +233,15 @@ base64::Base64Writer::Base64Writer(cv::FileStorage::Impl& fs, bool can_indent)
     CV_Assert(fs.write_mode);
 }
 
-void base64::Base64Writer::write(const void* _data, size_t len, const char* dt)
+void base64::Base64Writer::write(const void* _data, size_t len, const var_na* dt)
 {
     check_dt(dt);
-    RawDataToBinaryConvertor convertor(_data, static_cast<int>(len), data_type_string);
+    RawDataToBinaryConvertor convertor(_data, static_cast<ຈຳນວນເຕັມ>(len), data_type_string);
     emitter->write(convertor);
 }
 
-template<typename _to_binary_convertor_t> inline
-void base64::Base64Writer::write(_to_binary_convertor_t & convertor, const char* dt)
+template<typename _to_binary_convertor_t> anta_hstha
+void base64::Base64Writer::write(_to_binary_convertor_t & convertor, const var_na* dt)
 {
     check_dt(dt);
     emitter->write(convertor);
@@ -252,11 +252,11 @@ base64::Base64Writer::~Base64Writer()
     delete emitter;
 }
 
-void base64::Base64Writer::check_dt(const char* dt)
+void base64::Base64Writer::check_dt(const var_na* dt)
 {
-    if ( dt == 0 )
+    ຖ້າ ( dt == 0 )
         CV_Error( cv::Error::StsBadArg, "Invalid \'dt\'." );
-    else if (data_type_string.empty()) {
+    ບໍ່ດັ່ງນັ້ນ ຖ້າ (data_type_string.empty()) {
         data_type_string = dt;
 
         /* output header */
@@ -265,11 +265,11 @@ void base64::Base64Writer::check_dt(const char* dt)
         const uchar * end = beg + buffer.size();
 
         emitter->write(beg, end);
-    } else if ( data_type_string != dt )
+    } ບໍ່ດັ່ງນັ້ນ ຖ້າ ( data_type_string != dt )
         CV_Error( cv::Error::StsBadArg, "\'dt\' does not match." );
 }
 
-base64::RawDataToBinaryConvertor::RawDataToBinaryConvertor(const void* src, int len, const std::string & dt)
+base64::RawDataToBinaryConvertor::RawDataToBinaryConvertor(const void* src, ຈຳນວນເຕັມ len, const std::string & dt)
         : beg(reinterpret_cast<const uchar *>(src))
         , cur(0)
         , end(0)
@@ -288,23 +288,23 @@ base64::RawDataToBinaryConvertor::RawDataToBinaryConvertor(const void* src, int 
     end = beg + static_cast<size_t>(len);
 }
 
-inline  base64::RawDataToBinaryConvertor&  base64::RawDataToBinaryConvertor::operator >>(uchar * & dst)
+anta_hstha  base64::RawDataToBinaryConvertor&  base64::RawDataToBinaryConvertor::operator >>(uchar * & dst)
 {
     CV_DbgAssert(*this);
 
-    for (size_t i = 0U, n = to_binary_funcs.size(); i < n; i++) {
+    ສຳລັບ (size_t i = 0U, n = to_binary_funcs.size(); i < n; i++) {
         elem_to_binary_t & pack = to_binary_funcs[i];
         pack.func(cur + pack.offset, dst + pack.offset_packed);
     }
     cur += step;
     dst += step_packed;
 
-    return *this;
+    ສົ່ງຄືນ *this;
 }
 
-inline  base64::RawDataToBinaryConvertor::operator bool() const
+anta_hstha  base64::RawDataToBinaryConvertor::operator bool() const
 {
-    return cur < end;
+    ສົ່ງຄືນ cur < end;
 }
 
 size_t base64::RawDataToBinaryConvertor::make_to_binary_funcs(const std::string &dt)
@@ -312,68 +312,68 @@ size_t base64::RawDataToBinaryConvertor::make_to_binary_funcs(const std::string 
     size_t cnt = 0;
     size_t offset = 0;
     size_t offset_packed = 0;
-    char type = '\0';
+    var_na type = '\0';
 
     std::istringstream iss(dt);
-    while (!iss.eof()) {
-        if (!(iss >> cnt)) {
+    ໃນຂະນະທີ່ (!iss.eof()) {
+        ຖ້າ (!(iss >> cnt)) {
             iss.clear();
             cnt = 1;
         }
         CV_Assert(cnt > 0U);
-        if (!(iss >> type))
-            break;
+        ຖ້າ (!(iss >> type))
+            bha_nga;
 
-        while (cnt-- > 0)
+        ໃນຂະນະທີ່ (cnt-- > 0)
         {
             elem_to_binary_t pack;
 
             size_t size = 0;
             switch (type)
             {
-                case 'u':
-                case 'c':
-                    size = sizeof(uchar);
+                pak_sa 'u':
+                pak_sa 'c':
+                    size = parimaa_na(uchar);
                     pack.func = to_binary<uchar>;
-                    break;
-                case 'b':
-                    size = sizeof(uchar);
+                    bha_nga;
+                pak_sa 'b':
+                    size = parimaa_na(uchar);
                     pack.func = to_binary<bool>;
-                    break;
-                case 'w':
-                case 's':
-                    size = sizeof(ushort);
+                    bha_nga;
+                pak_sa 'w':
+                pak_sa 's':
+                    size = parimaa_na(ushort);
                     pack.func = to_binary<ushort>;
-                    break;
-                case 'n':
-                case 'i':
-                    size = sizeof(uint);
+                    bha_nga;
+                pak_sa 'n':
+                pak_sa 'i':
+                    size = parimaa_na(uint);
                     pack.func = to_binary<uint>;
-                    break;
-                case 'f':
-                    size = sizeof(float);
+                    bha_nga;
+                pak_sa 'f':
+                    size = parimaa_na(float);
                     pack.func = to_binary<float>;
-                    break;
-                case 'd':
-                    size = sizeof(double);
-                    pack.func = to_binary<double>;
-                    break;
-                case 'I':
-                case 'U':
-                    size = sizeof(uint64_t);
+                    bha_nga;
+                pak_sa 'd':
+                    size = parimaa_na(dviguu_na);
+                    pack.func = to_binary<dviguu_na>;
+                    bha_nga;
+                pak_sa 'I':
+                pak_sa 'U':
+                    size = parimaa_na(uint64_t);
                     pack.func = to_binary<uint64_t>;
-                    break;
-                case 'e':
-                case 'E':
-                    size = sizeof(uchar);
+                    bha_nga;
+                pak_sa 'e':
+                pak_sa 'E':
+                    size = parimaa_na(uchar);
                     pack.func = to_binary<uchar>;
-                    break;
-                case 'r':
+                    bha_nga;
+                pak_sa 'r':
                 default:
                     CV_Error(cv::Error::StsError, "type is not supported");
             };
 
-            offset = static_cast<size_t>(cvAlign(static_cast<int>(offset), static_cast<int>(size)));
+            offset = static_cast<size_t>(cvAlign(static_cast<ຈຳນວນເຕັມ>(offset), static_cast<ຈຳນວນເຕັມ>(size)));
             pack.offset = offset;
             offset += size;
 
@@ -385,7 +385,7 @@ size_t base64::RawDataToBinaryConvertor::make_to_binary_funcs(const std::string 
     }
 
     CV_Assert(iss.eof());
-    return offset_packed;
+    ສົ່ງຄືນ offset_packed;
 }
 
 }

@@ -12,22 +12,22 @@ NAryMatIterator::NAryMatIterator()
 {
 }
 
-NAryMatIterator::NAryMatIterator(const Mat** _arrays, Mat* _planes, int _narrays)
+NAryMatIterator::NAryMatIterator(const Mat** _arrays, Mat* _planes, ຈຳນວນເຕັມ _narrays)
 : arrays(0), planes(0), ptrs(0), narrays(0), nplanes(0), size(0), iterdepth(0), idx(0)
 {
     init(_arrays, _planes, 0, _narrays);
 }
 
-NAryMatIterator::NAryMatIterator(const Mat** _arrays, uchar** _ptrs, int _narrays)
+NAryMatIterator::NAryMatIterator(const Mat** _arrays, uchar** _ptrs, ຈຳນວນເຕັມ _narrays)
     : arrays(0), planes(0), ptrs(0), narrays(0), nplanes(0), size(0), iterdepth(0), idx(0)
 {
     init(_arrays, 0, _ptrs, _narrays);
 }
 
-void NAryMatIterator::init(const Mat** _arrays, Mat* _planes, uchar** _ptrs, int _narrays)
+void NAryMatIterator::init(const Mat** _arrays, Mat* _planes, uchar** _ptrs, ຈຳນວນເຕັມ _narrays)
 {
     CV_Assert( _arrays && (_ptrs || _planes) );
-    int i, j, d1=0, i0 = -1, d = -1;
+    ຈຳນວນເຕັມ i, j, d1=0, i0 = -1, d = -1;
 
     arrays = _arrays;
     ptrs = _ptrs;
@@ -36,9 +36,9 @@ void NAryMatIterator::init(const Mat** _arrays, Mat* _planes, uchar** _ptrs, int
     nplanes = 0;
     size = 0;
 
-    if( narrays < 0 )
+    ຖ້າ( narrays < 0 )
     {
-        for( i = 0; _arrays[i] != 0; i++ )
+        ສຳລັບ( i = 0; _arrays[i] != 0; i++ )
             ;
         narrays = i;
         CV_Assert(narrays <= 1000);
@@ -46,261 +46,261 @@ void NAryMatIterator::init(const Mat** _arrays, Mat* _planes, uchar** _ptrs, int
 
     iterdepth = 0;
 
-    for( i = 0; i < narrays; i++ )
+    ສຳລັບ( i = 0; i < narrays; i++ )
     {
         CV_Assert(arrays[i] != 0);
         const Mat& A = *arrays[i];
-        if( ptrs )
+        ຖ້າ( ptrs )
             ptrs[i] = A.data;
 
-        if( !A.data )
+        ຖ້າ( !A.data )
             continue;
 
-        if( i0 < 0 )
+        ຖ້າ( i0 < 0 )
         {
             i0 = i;
             d = A.dims;
 
             // find the first dimensionality which is different from 1;
             // in any of the arrays the first "d1" step do not affect the continuity
-            for( d1 = 0; d1 < d; d1++ )
-                if( A.size[d1] > 1 )
-                    break;
+            ສຳລັບ( d1 = 0; d1 < d; d1++ )
+                ຖ້າ( A.size[d1] > 1 )
+                    bha_nga;
         }
-        else
+        ບໍ່ດັ່ງນັ້ນ
             CV_Assert( A.size == arrays[i0]->size );
 
-        if( !A.isContinuous() )
+        ຖ້າ( !A.isContinuous() )
         {
             CV_Assert( A.step[d-1] == A.elemSize() );
-            for( j = d-1; j > d1; j-- )
-                if( A.step[j]*A.size[j] < A.step[j-1] )
-                    break;
+            ສຳລັບ( j = d-1; j > d1; j-- )
+                ຖ້າ( A.step[j]*A.size[j] < A.step[j-1] )
+                    bha_nga;
             iterdepth = std::max(iterdepth, j);
         }
     }
 
-    if( i0 >= 0 )
+    ຖ້າ( i0 >= 0 )
     {
         size = arrays[i0]->size[std::max(d-1, 0)];
-        for( j = d-1; j > iterdepth; j-- )
+        ສຳລັບ( j = d-1; j > iterdepth; j-- )
         {
             int64 total1 = (int64)size*arrays[i0]->size[j-1];
-            if( total1 != (int)total1 )
-                break;
-            size = (int)total1;
+            ຖ້າ( total1 != (ຈຳນວນເຕັມ)total1 )
+                bha_nga;
+            size = (ຈຳນວນເຕັມ)total1;
         }
 
         iterdepth = j;
-        if( iterdepth == d1 )
+        ຖ້າ( iterdepth == d1 )
             iterdepth = 0;
 
         nplanes = 1;
-        for( j = iterdepth-1; j >= 0; j-- )
+        ສຳລັບ( j = iterdepth-1; j >= 0; j-- )
             nplanes *= arrays[i0]->size[j];
     }
-    else
+    ບໍ່ດັ່ງນັ້ນ
         iterdepth = 0;
 
     idx = 0;
 
-    if( !planes )
-        return;
+    ຖ້າ( !planes )
+        ສົ່ງຄືນ;
 
-    for( i = 0; i < narrays; i++ )
+    ສຳລັບ( i = 0; i < narrays; i++ )
     {
         CV_Assert(arrays[i] != 0);
         const Mat& A = *arrays[i];
 
-        if( !A.data )
+        ຖ້າ( !A.data )
         {
             planes[i] = Mat();
             continue;
         }
 
-        planes[i] = Mat(1, (int)size, A.type(), A.data);
+        planes[i] = Mat(1, (ຈຳນວນເຕັມ)size, A.type(), A.data);
     }
 }
 
 
 NAryMatIterator& NAryMatIterator::operator ++()
 {
-    if( idx >= nplanes-1 )
-        return *this;
+    ຖ້າ( idx >= nplanes-1 )
+        ສົ່ງຄືນ *this;
     ++idx;
 
-    if( iterdepth == 1 )
+    ຖ້າ( iterdepth == 1 )
     {
-        if( ptrs )
+        ຖ້າ( ptrs )
         {
-            for( int i = 0; i < narrays; i++ )
+            ສຳລັບ( ຈຳນວນເຕັມ i = 0; i < narrays; i++ )
             {
-                if( !ptrs[i] )
+                ຖ້າ( !ptrs[i] )
                     continue;
                 ptrs[i] = arrays[i]->data + arrays[i]->step[0]*idx;
             }
         }
-        if( planes )
+        ຖ້າ( planes )
         {
-            for( int i = 0; i < narrays; i++ )
+            ສຳລັບ( ຈຳນວນເຕັມ i = 0; i < narrays; i++ )
             {
-                if( !planes[i].data )
+                ຖ້າ( !planes[i].data )
                     continue;
                 planes[i].data = arrays[i]->data + arrays[i]->step[0]*idx;
             }
         }
     }
-    else
+    ບໍ່ດັ່ງນັ້ນ
     {
-        for( int i = 0; i < narrays; i++ )
+        ສຳລັບ( ຈຳນວນເຕັມ i = 0; i < narrays; i++ )
         {
             const Mat& A = *arrays[i];
-            if( !A.data )
+            ຖ້າ( !A.data )
                 continue;
-            int _idx = (int)idx;
+            ຈຳນວນເຕັມ _idx = (ຈຳນວນເຕັມ)idx;
             uchar* data = A.data;
-            for( int j = iterdepth-1; j >= 0 && _idx > 0; j-- )
+            ສຳລັບ( ຈຳນວນເຕັມ j = iterdepth-1; j >= 0 && _idx > 0; j-- )
             {
-                int szi = A.size[j], t = _idx/szi;
+                ຈຳນວນເຕັມ szi = A.size[j], t = _idx/szi;
                 data += (_idx - t * szi)*A.step[j];
                 _idx = t;
             }
-            if( ptrs )
+            ຖ້າ( ptrs )
                 ptrs[i] = data;
-            if( planes )
+            ຖ້າ( planes )
                 planes[i].data = data;
         }
     }
 
-    return *this;
+    ສົ່ງຄືນ *this;
 }
 
-NAryMatIterator NAryMatIterator::operator ++(int)
+NAryMatIterator NAryMatIterator::operator ++(ຈຳນວນເຕັມ)
 {
     NAryMatIterator it = *this;
     ++*this;
-    return it;
+    ສົ່ງຄືນ it;
 }
 
 //==================================================================================================
 
 Point MatConstIterator::pos() const
 {
-    if( !m )
-        return Point();
+    ຖ້າ( !m )
+        ສົ່ງຄືນ Point();
     CV_DbgAssert(m->dims <= 2);
 
     ptrdiff_t ofs = ptr - m->ptr();
-    int y = (int)(ofs/m->step[0]);
-    return Point((int)((ofs - y*m->step[0])/elemSize), y);
+    ຈຳນວນເຕັມ y = (ຈຳນວນເຕັມ)(ofs/m->step[0]);
+    ສົ່ງຄືນ Point((ຈຳນວນເຕັມ)((ofs - y*m->step[0])/elemSize), y);
 }
 
-void MatConstIterator::pos(int* _idx) const
+void MatConstIterator::pos(ຈຳນວນເຕັມ* _idx) const
 {
     CV_Assert(m != 0 && _idx);
     ptrdiff_t ofs = ptr - m->ptr();
-    for( int i = 0; i < m->dims; i++ )
+    ສຳລັບ( ຈຳນວນເຕັມ i = 0; i < m->dims; i++ )
     {
         size_t s = m->step[i], v = ofs/s;
         ofs -= v*s;
-        _idx[i] = (int)v;
+        _idx[i] = (ຈຳນວນເຕັມ)v;
     }
 }
 
 ptrdiff_t MatConstIterator::lpos() const
 {
-    if(!m)
-        return 0;
-    if( m->isContinuous() )
-        return (ptr - sliceStart)/elemSize;
+    ຖ້າ(!m)
+        ສົ່ງຄືນ 0;
+    ຖ້າ( m->isContinuous() )
+        ສົ່ງຄືນ (ptr - sliceStart)/elemSize;
     ptrdiff_t ofs = ptr - m->ptr();
-    int i, d = m->dims;
-    if( d == 2 )
+    ຈຳນວນເຕັມ i, d = m->dims;
+    ຖ້າ( d == 2 )
     {
         ptrdiff_t y = ofs/m->step[0];
-        return y*m->cols + (ofs - y*m->step[0])/elemSize;
+        ສົ່ງຄືນ y*m->cols + (ofs - y*m->step[0])/elemSize;
     }
     ptrdiff_t result = 0;
-    for( i = 0; i < d; i++ )
+    ສຳລັບ( i = 0; i < d; i++ )
     {
         size_t s = m->step[i], v = ofs/s;
         ofs -= v*s;
         result = result*m->size[i] + v;
     }
-    return result;
+    ສົ່ງຄືນ result;
 }
 
 void MatConstIterator::seek(ptrdiff_t ofs, bool relative)
 {
-    if( m->isContinuous() )
+    ຖ້າ( m->isContinuous() )
     {
         ptr = (relative ? ptr : sliceStart) + ofs*elemSize;
-        if( ptr < sliceStart )
+        ຖ້າ( ptr < sliceStart )
             ptr = sliceStart;
-        else if( ptr > sliceEnd )
+        ບໍ່ດັ່ງນັ້ນ ຖ້າ( ptr > sliceEnd )
             ptr = sliceEnd;
-        return;
+        ສົ່ງຄືນ;
     }
 
-    int d = m->dims;
-    if( d == 2 )
+    ຈຳນວນເຕັມ d = m->dims;
+    ຖ້າ( d == 2 )
     {
         ptrdiff_t ofs0, y;
-        if( relative )
+        ຖ້າ( relative )
         {
             ofs0 = ptr - m->ptr();
             y = ofs0/m->step[0];
             ofs += y*m->cols + (ofs0 - y*m->step[0])/elemSize;
         }
         y = ofs/m->cols;
-        int y1 = std::min(std::max((int)y, 0), m->rows-1);
+        ຈຳນວນເຕັມ y1 = std::min(std::max((ຈຳນວນເຕັມ)y, 0), m->rows-1);
         sliceStart = m->ptr(y1);
         sliceEnd = sliceStart + m->cols*elemSize;
         ptr = y < 0 ? sliceStart : y >= m->rows ? sliceEnd :
             sliceStart + (ofs - y*m->cols)*elemSize;
-        return;
+        ສົ່ງຄືນ;
     }
 
-    if( relative )
+    ຖ້າ( relative )
         ofs += lpos();
 
-    if( ofs < 0 )
+    ຖ້າ( ofs < 0 )
         ofs = 0;
 
-    int szi = m->size[d-1];
+    ຈຳນວນເຕັມ szi = m->size[d-1];
     ptrdiff_t t = ofs/szi;
-    int v = (int)(ofs - t*szi);
+    ຈຳນວນເຕັມ v = (ຈຳນວນເຕັມ)(ofs - t*szi);
     ofs = t;
     ptr = m->ptr() + v*elemSize;
     sliceStart = m->ptr();
 
-    for( int i = d-2; i >= 0; i-- )
+    ສຳລັບ( ຈຳນວນເຕັມ i = d-2; i >= 0; i-- )
     {
         szi = m->size[i];
         t = ofs/szi;
-        v = (int)(ofs - t*szi);
+        v = (ຈຳນວນເຕັມ)(ofs - t*szi);
         ofs = t;
         sliceStart += v*m->step[i];
     }
 
     sliceEnd = sliceStart + m->size[d-1]*elemSize;
-    if( ofs > 0 )
+    ຖ້າ( ofs > 0 )
         ptr = sliceEnd;
-    else
+    ບໍ່ດັ່ງນັ້ນ
         ptr = sliceStart + (ptr - m->ptr());
 }
 
-void MatConstIterator::seek(const int* _idx, bool relative)
+void MatConstIterator::seek(const ຈຳນວນເຕັມ* _idx, bool relative)
 {
-    int d = m->dims;
+    ຈຳນວນເຕັມ d = m->dims;
     ptrdiff_t ofs = 0;
-    if( !_idx )
+    ຖ້າ( !_idx )
         ;
-    else if( d == 2 )
+    ບໍ່ດັ່ງນັ້ນ ຖ້າ( d == 2 )
         ofs = _idx[0]*m->size[1] + _idx[1];
-    else
+    ບໍ່ດັ່ງນັ້ນ
     {
-        for( int i = 0; i < d; i++ )
+        ສຳລັບ( ຈຳນວນເຕັມ i = 0; i < d; i++ )
             ofs = ofs*m->size[i] + _idx[i];
     }
     seek(ofs, relative);
@@ -310,48 +310,48 @@ void MatConstIterator::seek(const int* _idx, bool relative)
 
 SparseMatConstIterator::SparseMatConstIterator(const SparseMat* _m) : m((SparseMat*)_m), hashidx(0), ptr(0)
 {
-    if(!_m || !_m->hdr)
-        return;
+    ຖ້າ(!_m || !_m->hdr)
+        ສົ່ງຄືນ;
     SparseMat::Hdr& hdr = *m->hdr;
     const std::vector<size_t>& htab = hdr.hashtab;
     size_t i, hsize = htab.size();
-    for( i = 0; i < hsize; i++ )
+    ສຳລັບ( i = 0; i < hsize; i++ )
     {
         size_t nidx = htab[i];
-        if( nidx )
+        ຖ້າ( nidx )
         {
             hashidx = i;
             ptr = &hdr.pool[nidx] + hdr.valueOffset;
-            return;
+            ສົ່ງຄືນ;
         }
     }
 }
 
 SparseMatConstIterator& SparseMatConstIterator::operator ++()
 {
-    if( !ptr || !m || !m->hdr )
-        return *this;
+    ຖ້າ( !ptr || !m || !m->hdr )
+        ສົ່ງຄືນ *this;
     SparseMat::Hdr& hdr = *m->hdr;
     size_t next = ((const SparseMat::Node*)(ptr - hdr.valueOffset))->next;
-    if( next )
+    ຖ້າ( next )
     {
         ptr = &hdr.pool[next] + hdr.valueOffset;
-        return *this;
+        ສົ່ງຄືນ *this;
     }
     size_t i = hashidx + 1, sz = hdr.hashtab.size();
-    for( ; i < sz; i++ )
+    ສຳລັບ( ; i < sz; i++ )
     {
         size_t nidx = hdr.hashtab[i];
-        if( nidx )
+        ຖ້າ( nidx )
         {
             hashidx = i;
             ptr = &hdr.pool[nidx] + hdr.valueOffset;
-            return *this;
+            ສົ່ງຄືນ *this;
         }
     }
     hashidx = sz;
     ptr = 0;
-    return *this;
+    ສົ່ງຄືນ *this;
 }
 
 } // cv::

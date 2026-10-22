@@ -8,7 +8,7 @@
 
 namespace cv { namespace parallel {
 
-extern int numThreads;
+extern ຈຳນວນເຕັມ numThreads;
 
 std::shared_ptr<ParallelForAPI>& getCurrentParallelForAPI();
 

@@ -12,7 +12,7 @@
 #include <iterator>
 
 #define USE_ZLIB 1
-#if USE_ZLIB
+#ຖ້າ USE_ZLIB
 #  ifndef _LFS64_LARGEFILE
 #    define _LFS64_LARGEFILE 0
 #  endif
@@ -20,18 +20,18 @@
 #    define _FILE_OFFSET_BITS 0
 #  endif
 #  include <zlib.h>
-#else
+#ບໍ່ດັ່ງນັ້ນ
 typedef void* gzFile;
 #endif
 
 //=====================================================================================
 
 static const size_t PARSER_BASE64_BUFFER_SIZE = 1024U * 1024U / 8U;
-static const int CV_PERSISTENCE_MAX_DEPTH = 1024;
+static const ຈຳນວນເຕັມ CV_PERSISTENCE_MAX_DEPTH = 1024;
 
 namespace base64 {
 
-enum
+ga_nanaa
 {
     HEADER_SIZE         = 24,
     ENCODED_HEADER_SIZE = 32
@@ -51,57 +51,57 @@ enum
 #define cv_isprint(c)     ((uchar)(c) >= (uchar)' ')
 #define cv_isprint_or_tab(c)  ((uchar)(c) >= (uchar)' ' || (c) == '\t')
 
-inline bool cv_isalnum(char c)
+anta_hstha bool cv_isalnum(var_na c)
 {
-    return ('0' <= c && c <= '9') || ('a' <= c && c <= 'z') || ('A' <= c && c <= 'Z');
+    ສົ່ງຄືນ ('0' <= c && c <= '9') || ('a' <= c && c <= 'z') || ('A' <= c && c <= 'Z');
 }
 
-inline bool cv_isalpha(char c)
+anta_hstha bool cv_isalpha(var_na c)
 {
-    return ('a' <= c && c <= 'z') || ('A' <= c && c <= 'Z');
+    ສົ່ງຄືນ ('a' <= c && c <= 'z') || ('A' <= c && c <= 'Z');
 }
 
-inline bool cv_isdigit(char c)
+anta_hstha bool cv_isdigit(var_na c)
 {
-    return '0' <= c && c <= '9';
+    ສົ່ງຄືນ '0' <= c && c <= '9';
 }
 
-inline bool cv_isspace(char c)
+anta_hstha bool cv_isspace(var_na c)
 {
-    return (9 <= c && c <= 13) || c == ' ';
+    ສົ່ງຄືນ (9 <= c && c <= 13) || c == ' ';
 }
 
-inline char* cv_skip_BOM(char* ptr)
+anta_hstha var_na* cv_skip_BOM(var_na* ptr)
 {
-    if((uchar)ptr[0] == 0xef && (uchar)ptr[1] == 0xbb && (uchar)ptr[2] == 0xbf) //UTF-8 BOM
+    ຖ້າ((uchar)ptr[0] == 0xef && (uchar)ptr[1] == 0xbb && (uchar)ptr[2] == 0xbf) //UTF-8 BOM
     {
-      return ptr + 3;
+      ສົ່ງຄືນ ptr + 3;
     }
-    return ptr;
+    ສົ່ງຄືນ ptr;
 }
 
 namespace cv
 {
 namespace fs
 {
-int strcasecmp(const char* str1, const char* str2);
-char* itoa( int _val, char* buffer, int /*radix*/ );
-char* itoa( int64_t _val, char* buffer, int /*radix*/, bool _signed );
-char* floatToString( char* buf, size_t bufSize, float value, bool halfprecision, bool explicitZero );
-char* doubleToString( char* buf, size_t bufSize, double value, bool explicitZero );
+ຈຳນວນເຕັມ strcasecmp(const var_na* str1, const var_na* str2);
+var_na* itoa( ຈຳນວນເຕັມ _val, var_na* buffer, ຈຳນວນເຕັມ /*radix*/ );
+var_na* itoa( int64_t _val, var_na* buffer, ຈຳນວນເຕັມ /*radix*/, bool _signed );
+var_na* floatToString( var_na* buf, size_t bufSize, float value, bool halfprecision, bool explicitZero );
+var_na* doubleToString( var_na* buf, size_t bufSize, dviguu_na value, bool explicitZero );
 
-int calcStructSize( const char* dt, int initial_size );
-int calcElemSize( const char* dt, int initial_size );
-CV_DEPRECATED char* encodeFormat( int elem_type, char* dt );
-char* encodeFormat( int elem_type, char* dt, size_t dt_len );
-int decodeFormat( const char* dt, int* fmt_pairs, int max_len );
-int decodeSimpleFormat( const char* dt );
+ຈຳນວນເຕັມ calcStructSize( const var_na* dt, ຈຳນວນເຕັມ initial_size );
+ຈຳນວນເຕັມ calcElemSize( const var_na* dt, ຈຳນວນເຕັມ initial_size );
+CV_DEPRECATED var_na* encodeFormat( ຈຳນວນເຕັມ elem_type, var_na* dt );
+var_na* encodeFormat( ຈຳນວນເຕັມ elem_type, var_na* dt, size_t dt_len );
+ຈຳນວນເຕັມ decodeFormat( const var_na* dt, ຈຳນວນເຕັມ* fmt_pairs, ຈຳນວນເຕັມ max_len );
+ຈຳນວນເຕັມ decodeSimpleFormat( const var_na* dt );
 }
 
 
 #ifdef CV_STATIC_ANALYSIS
-#define CV_PARSE_ERROR_CPP(errmsg) do { (void)fs; abort(); } while (0)
-#else
+#define CV_PARSE_ERROR_CPP(errmsg) do { (void)fs; abort(); } ໃນຂະນະທີ່ (0)
+#ບໍ່ດັ່ງນັ້ນ
 #define CV_PARSE_ERROR_CPP( errmsg ) \
     fs->parseError( CV_Func, (errmsg), __FILE__, __LINE__ )
 #endif
@@ -109,18 +109,18 @@ int decodeSimpleFormat( const char* dt );
 
 #define CV_PERSISTENCE_CHECK_END_OF_BUFFER_BUG_CPP() do { \
     CV_DbgAssert(ptr); \
-    if((ptr)[0] == 0 && (ptr) == fs->bufferEnd() - 1) CV_PARSE_ERROR_CPP("OpenCV persistence doesn't support very long lines"); \
-} while (0)
+    ຖ້າ((ptr)[0] == 0 && (ptr) == fs->bufferEnd() - 1) CV_PARSE_ERROR_CPP("OpenCV persistence doesn't support very long lines"); \
+} ໃນຂະນະທີ່ (0)
 
 
 class FileStorageParser;
 class FileStorageEmitter;
 
-struct FStructData
+sa_nracanaa FStructData
 {
     FStructData() { indent = flags = 0; }
     FStructData( const std::string& _struct_tag,
-                 int _struct_flags, int _struct_indent )
+                 ຈຳນວນເຕັມ _struct_flags, ຈຳນວນເຕັມ _struct_indent )
     {
         tag = _struct_tag;
         flags = _struct_flags;
@@ -128,8 +128,8 @@ struct FStructData
     }
 
     std::string tag;
-    int flags;
-    int indent;
+    ຈຳນວນເຕັມ flags;
+    ຈຳນວນເຕັມ indent;
 };
 
 class FileStorage_API
@@ -138,38 +138,38 @@ public:
     virtual ~FileStorage_API();
     virtual FileStorage* getFS() = 0;
 
-    virtual int getFormat() const = 0;
+    virtual ຈຳນວນເຕັມ getFormat() const = 0;
 
-    virtual void puts( const char* str ) = 0;
-    virtual char* gets() = 0;
+    virtual void puts( const var_na* str ) = 0;
+    virtual var_na* gets() = 0;
     virtual bool eof() = 0;
     virtual void setEof() = 0;
     virtual void closeFile() = 0;
     virtual void rewind() = 0;
-    virtual char* resizeWriteBuffer( char* ptr, int len ) = 0;
-    virtual char* bufferPtr() const = 0;
-    virtual char* bufferStart() const = 0;
-    virtual char* bufferEnd() const = 0;
-    virtual void setBufferPtr(char* ptr) = 0;
-    virtual char* flush() = 0;
+    virtual var_na* resizeWriteBuffer( var_na* ptr, ຈຳນວນເຕັມ len ) = 0;
+    virtual var_na* bufferPtr() const = 0;
+    virtual var_na* bufferStart() const = 0;
+    virtual var_na* bufferEnd() const = 0;
+    virtual void setBufferPtr(var_na* ptr) = 0;
+    virtual var_na* flush() = 0;
     virtual void setNonEmpty() = 0;
-    virtual int wrapMargin() const = 0;
+    virtual ຈຳນວນເຕັມ wrapMargin() const = 0;
 
     virtual FStructData& getCurrentStruct() = 0;
 
-    virtual void convertToCollection( int type, FileNode& node ) = 0;
+    virtual void convertToCollection( ຈຳນວນເຕັມ type, FileNode& node ) = 0;
     virtual FileNode addNode( FileNode& collection, const std::string& key,
-                               int type, const void* value=0, int len=-1 ) = 0;
+                               ຈຳນວນເຕັມ type, const void* value=0, ຈຳນວນເຕັມ len=-1 ) = 0;
     virtual void finalizeCollection( FileNode& collection ) = 0;
-    virtual double strtod(char* ptr, char** endptr) = 0;
+    virtual dviguu_na strtod(var_na* ptr, var_na** endptr) = 0;
 
-    virtual char* parseBase64(char* ptr, int indent, FileNode& collection) = 0;
+    virtual var_na* parseBase64(var_na* ptr, ຈຳນວນເຕັມ indent, FileNode& collection) = 0;
     CV_NORETURN
-    virtual void parseError(const char* funcname, const std::string& msg,
-                            const char* filename, int lineno) = 0;
+    virtual void parseError(const var_na* funcname, const std::string& msg,
+                            const var_na* filename, ຈຳນວນເຕັມ lineno) = 0;
 
 private:
-    enum Base64State{
+    ga_nanaa Base64State{
         Uncertain,
         NotUse,
         InUse,
@@ -184,7 +184,7 @@ private:
     virtual void check_if_write_struct_is_delayed(bool change_type_to_base64 = false) = 0;
     virtual void switch_to_Base64_state(Base64State state) = 0;
     virtual Base64State get_state_of_writing_base64() = 0;
-    virtual int get_space() = 0;
+    virtual ຈຳນວນເຕັມ get_space() = 0;
 };
 
 class FileStorageEmitter
@@ -192,15 +192,15 @@ class FileStorageEmitter
 public:
     virtual ~FileStorageEmitter() {}
 
-    virtual FStructData startWriteStruct( const FStructData& parent, const char* key,
-                                          int struct_flags, const char* type_name=0 ) = 0;
+    virtual FStructData startWriteStruct( const FStructData& parent, const var_na* key,
+                                          ຈຳນວນເຕັມ struct_flags, const var_na* type_name=0 ) = 0;
     virtual void endWriteStruct(const FStructData& current_struct) = 0;
-    virtual void write(const char* key, int value) = 0;
-    virtual void write(const char* key, int64_t value) = 0;
-    virtual void write(const char* key, double value) = 0;
-    virtual void write(const char* key, const char* value, bool quote) = 0;
-    virtual void writeScalar(const char* key, const char* value) = 0;
-    virtual void writeComment(const char* comment, bool eol_comment) = 0;
+    virtual void write(const var_na* key, ຈຳນວນເຕັມ value) = 0;
+    virtual void write(const var_na* key, int64_t value) = 0;
+    virtual void write(const var_na* key, dviguu_na value) = 0;
+    virtual void write(const var_na* key, const var_na* value, bool quote) = 0;
+    virtual void writeScalar(const var_na* key, const var_na* value) = 0;
+    virtual void writeComment(const var_na* comment, bool eol_comment) = 0;
     virtual void startNextStream() = 0;
 };
 
@@ -208,8 +208,8 @@ class FileStorageParser
 {
 public:
     virtual ~FileStorageParser() {}
-    virtual bool parse(char* ptr) = 0;
-    virtual bool getBase64Row(char* ptr, int indent, char* &beg, char* &end) = 0;
+    virtual bool parse(var_na* ptr) = 0;
+    virtual bool getBase64Row(var_na* ptr, ຈຳນວນເຕັມ indent, var_na* &beg, var_na* &end) = 0;
 };
 
 Ptr<FileStorageEmitter> createXMLEmitter(FileStorage_API* fs);

@@ -73,7 +73,7 @@ namespace cv
 /*----------------------------------------------------------------------------
 | Software floating-point underflow tininess-detection mode.
 *----------------------------------------------------------------------------*/
-enum {
+ga_nanaa {
     tininess_beforeRounding = 0,
     tininess_afterRounding  = 1
 };
@@ -83,7 +83,7 @@ static const uint_fast8_t globalDetectTininess = tininess_afterRounding;
 /*----------------------------------------------------------------------------
 | Software floating-point exception flags.
 *----------------------------------------------------------------------------*/
-enum {
+ga_nanaa {
     flag_inexact   =  1,
     flag_underflow =  2,
     flag_overflow  =  4,
@@ -93,7 +93,7 @@ enum {
 
 // Disabled to make softfloat code stateless
 // This function may be changed in the future for better error handling
-static inline void raiseFlags( uint_fast8_t /* flags */)
+static anta_hstha void raiseFlags( uint_fast8_t /* flags */)
 {
     //exceptionFlags |= flags;
 }
@@ -101,7 +101,7 @@ static inline void raiseFlags( uint_fast8_t /* flags */)
 /*----------------------------------------------------------------------------
 | Software floating-point rounding mode.
 *----------------------------------------------------------------------------*/
-enum {
+ga_nanaa {
     round_near_even   = 0, // round to nearest, with ties to even
     round_minMag      = 1, // round to minimum magnitude (toward zero)
     round_min         = 2, // round to minimum (down)
@@ -202,11 +202,11 @@ static bool f64_lt( float64_t, float64_t );
 | Ported from OpenCV and fdlibm and added for usability
 *----------------------------------------------------------------------------*/
 
-static float32_t f32_powi( float32_t x, int y);
-static float64_t f64_powi( float64_t x, int y);
+static float32_t f32_powi( float32_t x, ຈຳນວນເຕັມ y);
+static float64_t f64_powi( float64_t x, ຈຳນວນເຕັມ y);
 static float64_t f64_sin_kernel(float64_t x);
 static float64_t f64_cos_kernel(float64_t x);
-static void f64_sincos_reduce(const float64_t& x, float64_t& y, int& n);
+static void f64_sincos_reduce(const float64_t& x, float64_t& y, ຈຳນວນເຕັມ& n);
 
 static float32_t f32_exp( float32_t x);
 static float64_t f64_exp(float64_t x);
@@ -227,20 +227,20 @@ softfloat::softfloat( const uint64_t a ) { *this = ui64_to_f32(a); }
 softfloat::softfloat( const  int32_t a ) { *this =  i32_to_f32(a); }
 softfloat::softfloat( const  int64_t a ) { *this =  i64_to_f32(a); }
 
-softfloat::operator softdouble() const { return f32_to_f64(*this); }
+softfloat::operator softdouble() const { ສົ່ງຄືນ f32_to_f64(*this); }
 
-softfloat softfloat::operator + (const softfloat& a) const { return f32_add(*this, a); }
-softfloat softfloat::operator - (const softfloat& a) const { return f32_sub(*this, a); }
-softfloat softfloat::operator * (const softfloat& a) const { return f32_mul(*this, a); }
-softfloat softfloat::operator / (const softfloat& a) const { return f32_div(*this, a); }
-softfloat softfloat::operator % (const softfloat& a) const { return f32_rem(*this, a); }
+softfloat softfloat::operator + (const softfloat& a) const { ສົ່ງຄືນ f32_add(*this, a); }
+softfloat softfloat::operator - (const softfloat& a) const { ສົ່ງຄືນ f32_sub(*this, a); }
+softfloat softfloat::operator * (const softfloat& a) const { ສົ່ງຄືນ f32_mul(*this, a); }
+softfloat softfloat::operator / (const softfloat& a) const { ສົ່ງຄືນ f32_div(*this, a); }
+softfloat softfloat::operator % (const softfloat& a) const { ສົ່ງຄືນ f32_rem(*this, a); }
 
-bool softfloat::operator == ( const softfloat& a ) const { return  f32_eq(*this, a); }
-bool softfloat::operator != ( const softfloat& a ) const { return !f32_eq(*this, a); }
-bool softfloat::operator >  ( const softfloat& a ) const { return  f32_lt(a, *this); }
-bool softfloat::operator >= ( const softfloat& a ) const { return  f32_le(a, *this); }
-bool softfloat::operator <  ( const softfloat& a ) const { return  f32_lt(*this, a); }
-bool softfloat::operator <= ( const softfloat& a ) const { return  f32_le(*this, a); }
+bool softfloat::operator == ( const softfloat& a ) const { ສົ່ງຄືນ  f32_eq(*this, a); }
+bool softfloat::operator != ( const softfloat& a ) const { ສົ່ງຄືນ !f32_eq(*this, a); }
+bool softfloat::operator >  ( const softfloat& a ) const { ສົ່ງຄືນ  f32_lt(a, *this); }
+bool softfloat::operator >= ( const softfloat& a ) const { ສົ່ງຄືນ  f32_le(a, *this); }
+bool softfloat::operator <  ( const softfloat& a ) const { ສົ່ງຄືນ  f32_lt(*this, a); }
+bool softfloat::operator <= ( const softfloat& a ) const { ສົ່ງຄືນ  f32_le(*this, a); }
 
 softdouble::softdouble( const uint32_t a ) { *this = ui32_to_f64(a); }
 softdouble::softdouble( const uint64_t a ) { *this = ui64_to_f64(a); }
@@ -249,58 +249,58 @@ softdouble::softdouble( const  int64_t a ) { *this =  i64_to_f64(a); }
 
 }
 
-int cvTrunc(const cv::softfloat& a) { return cv::f32_to_i32_r_minMag(a, false); }
-int cvRound(const cv::softfloat& a) { return cv::f32_to_i32(a, cv::round_near_even, false); }
-int cvFloor(const cv::softfloat& a) { return cv::f32_to_i32(a, cv::round_min, false); }
-int cvCeil (const cv::softfloat& a) { return cv::f32_to_i32(a, cv::round_max, false); }
+ຈຳນວນເຕັມ cvTrunc(const cv::softfloat& a) { ສົ່ງຄືນ cv::f32_to_i32_r_minMag(a, false); }
+ຈຳນວນເຕັມ cvRound(const cv::softfloat& a) { ສົ່ງຄືນ cv::f32_to_i32(a, cv::round_near_even, false); }
+ຈຳນວນເຕັມ cvFloor(const cv::softfloat& a) { ສົ່ງຄືນ cv::f32_to_i32(a, cv::round_min, false); }
+ຈຳນວນເຕັມ cvCeil (const cv::softfloat& a) { ສົ່ງຄືນ cv::f32_to_i32(a, cv::round_max, false); }
 
-int cvTrunc(const cv::softdouble& a) { return cv::f64_to_i32_r_minMag(a, false); }
-int cvRound(const cv::softdouble& a) { return cv::f64_to_i32(a, cv::round_near_even, false); }
-int cvFloor(const cv::softdouble& a) { return cv::f64_to_i32(a, cv::round_min, false); }
-int cvCeil (const cv::softdouble& a) { return cv::f64_to_i32(a, cv::round_max, false); }
+ຈຳນວນເຕັມ cvTrunc(const cv::softdouble& a) { ສົ່ງຄືນ cv::f64_to_i32_r_minMag(a, false); }
+ຈຳນວນເຕັມ cvRound(const cv::softdouble& a) { ສົ່ງຄືນ cv::f64_to_i32(a, cv::round_near_even, false); }
+ຈຳນວນເຕັມ cvFloor(const cv::softdouble& a) { ສົ່ງຄືນ cv::f64_to_i32(a, cv::round_min, false); }
+ຈຳນວນເຕັມ cvCeil (const cv::softdouble& a) { ສົ່ງຄືນ cv::f64_to_i32(a, cv::round_max, false); }
 
-int64_t cvRound64(const cv::softdouble& a) { return cv::f64_to_i64(a, cv::round_near_even, false); }
+int64_t cvRound64(const cv::softdouble& a) { ສົ່ງຄືນ cv::f64_to_i64(a, cv::round_near_even, false); }
 
 namespace cv
 {
-softdouble::operator softfloat() const { return f64_to_f32(*this); }
+softdouble::operator softfloat() const { ສົ່ງຄືນ f64_to_f32(*this); }
 
-softdouble softdouble::operator + (const softdouble& a) const { return f64_add(*this, a); }
-softdouble softdouble::operator - (const softdouble& a) const { return f64_sub(*this, a); }
-softdouble softdouble::operator * (const softdouble& a) const { return f64_mul(*this, a); }
-softdouble softdouble::operator / (const softdouble& a) const { return f64_div(*this, a); }
-softdouble softdouble::operator % (const softdouble& a) const { return f64_rem(*this, a); }
+softdouble softdouble::operator + (const softdouble& a) const { ສົ່ງຄືນ f64_add(*this, a); }
+softdouble softdouble::operator - (const softdouble& a) const { ສົ່ງຄືນ f64_sub(*this, a); }
+softdouble softdouble::operator * (const softdouble& a) const { ສົ່ງຄືນ f64_mul(*this, a); }
+softdouble softdouble::operator / (const softdouble& a) const { ສົ່ງຄືນ f64_div(*this, a); }
+softdouble softdouble::operator % (const softdouble& a) const { ສົ່ງຄືນ f64_rem(*this, a); }
 
-bool softdouble::operator == (const softdouble& a) const { return  f64_eq(*this, a); }
-bool softdouble::operator != (const softdouble& a) const { return !f64_eq(*this, a); }
-bool softdouble::operator >  (const softdouble& a) const { return  f64_lt(a, *this); }
-bool softdouble::operator >= (const softdouble& a) const { return  f64_le(a, *this); }
-bool softdouble::operator <  (const softdouble& a) const { return  f64_lt(*this, a); }
-bool softdouble::operator <= (const softdouble& a) const { return  f64_le(*this, a); }
+bool softdouble::operator == (const softdouble& a) const { ສົ່ງຄືນ  f64_eq(*this, a); }
+bool softdouble::operator != (const softdouble& a) const { ສົ່ງຄືນ !f64_eq(*this, a); }
+bool softdouble::operator >  (const softdouble& a) const { ສົ່ງຄືນ  f64_lt(a, *this); }
+bool softdouble::operator >= (const softdouble& a) const { ສົ່ງຄືນ  f64_le(a, *this); }
+bool softdouble::operator <  (const softdouble& a) const { ສົ່ງຄືນ  f64_lt(*this, a); }
+bool softdouble::operator <= (const softdouble& a) const { ສົ່ງຄືນ  f64_le(*this, a); }
 
 /*----------------------------------------------------------------------------
 | Overloads for math functions
 *----------------------------------------------------------------------------*/
 
-softfloat  mulAdd( const softfloat&  a, const softfloat&  b, const softfloat & c) { return f32_mulAdd(a, b, c); }
-softdouble mulAdd( const softdouble& a, const softdouble& b, const softdouble& c) { return f64_mulAdd(a, b, c); }
+softfloat  mulAdd( const softfloat&  a, const softfloat&  b, const softfloat & c) { ສົ່ງຄືນ f32_mulAdd(a, b, c); }
+softdouble mulAdd( const softdouble& a, const softdouble& b, const softdouble& c) { ສົ່ງຄືນ f64_mulAdd(a, b, c); }
 
-softfloat  sqrt( const softfloat&  a ) { return f32_sqrt(a); }
-softdouble sqrt( const softdouble& a ) { return f64_sqrt(a); }
+softfloat  sqrt( const softfloat&  a ) { ສົ່ງຄືນ f32_sqrt(a); }
+softdouble sqrt( const softdouble& a ) { ສົ່ງຄືນ f64_sqrt(a); }
 
-softfloat  exp( const softfloat&  a) { return f32_exp(a); }
-softdouble exp( const softdouble& a) { return f64_exp(a); }
+softfloat  exp( const softfloat&  a) { ສົ່ງຄືນ f32_exp(a); }
+softdouble exp( const softdouble& a) { ສົ່ງຄືນ f64_exp(a); }
 
-softfloat  log( const softfloat&  a ) { return f32_log(a); }
-softdouble log( const softdouble& a ) { return f64_log(a); }
+softfloat  log( const softfloat&  a ) { ສົ່ງຄືນ f32_log(a); }
+softdouble log( const softdouble& a ) { ສົ່ງຄືນ f64_log(a); }
 
-softfloat  pow( const softfloat&  a, const softfloat&  b) { return f32_pow(a, b); }
-softdouble pow( const softdouble& a, const softdouble& b) { return f64_pow(a, b); }
+softfloat  pow( const softfloat&  a, const softfloat&  b) { ສົ່ງຄືນ f32_pow(a, b); }
+softdouble pow( const softdouble& a, const softdouble& b) { ສົ່ງຄືນ f64_pow(a, b); }
 
-softfloat cbrt(const softfloat& a) { return f32_cbrt(a); }
+softfloat cbrt(const softfloat& a) { ສົ່ງຄືນ f32_cbrt(a); }
 
-softdouble sin(const softdouble& a) { return f64_sin(a); }
-softdouble cos(const softdouble& a) { return f64_cos(a); }
+softdouble sin(const softdouble& a) { ສົ່ງຄືນ f64_sin(a); }
+softdouble cos(const softdouble& a) { ສົ່ງຄືນ f64_cos(a); }
 
 /*----------------------------------------------------------------------------
 | The values to return on conversions to 32-bit integer formats that raise an
@@ -324,11 +324,11 @@ softdouble cos(const softdouble& a) { return f64_cos(a); }
 | "Common NaN" structure, used to transfer NaN representations from one format
 | to another.
 *----------------------------------------------------------------------------*/
-struct commonNaN {
+sa_nracanaa commonNaN {
     bool sign;
 #ifndef WORDS_BIGENDIAN
     uint64_t v0, v64;
-#else
+#ບໍ່ດັ່ງນັ້ນ
     uint64_t v64, v0;
 #endif
 };
@@ -351,13 +351,13 @@ struct commonNaN {
 | location pointed to by `zPtr'.  If the NaN is a signaling NaN, the invalid
 | exception is raised.
 *----------------------------------------------------------------------------*/
-static void softfloat_f32UIToCommonNaN( uint_fast32_t uiA, struct commonNaN *zPtr );
+static void softfloat_f32UIToCommonNaN( uint_fast32_t uiA, sa_nracanaa commonNaN *zPtr );
 
 /*----------------------------------------------------------------------------
 | Converts the common NaN pointed to by `aPtr' into a 32-bit floating-point
 | NaN, and returns the bit pattern of this value as an unsigned integer.
 *----------------------------------------------------------------------------*/
-static uint_fast32_t softfloat_commonNaNToF32UI( const struct commonNaN *aPtr );
+static uint_fast32_t softfloat_commonNaNToF32UI( const sa_nracanaa commonNaN *aPtr );
 
 /*----------------------------------------------------------------------------
 | Interpreting `uiA' and `uiB' as the bit patterns of two 32-bit floating-
@@ -387,13 +387,13 @@ static uint_fast32_t softfloat_propagateNaNF32UI( uint_fast32_t uiA, uint_fast32
 | location pointed to by `zPtr'.  If the NaN is a signaling NaN, the invalid
 | exception is raised.
 *----------------------------------------------------------------------------*/
-static void softfloat_f64UIToCommonNaN( uint_fast64_t uiA, struct commonNaN *zPtr );
+static void softfloat_f64UIToCommonNaN( uint_fast64_t uiA, sa_nracanaa commonNaN *zPtr );
 
 /*----------------------------------------------------------------------------
 | Converts the common NaN pointed to by `aPtr' into a 64-bit floating-point
 | NaN, and returns the bit pattern of this value as an unsigned integer.
 *----------------------------------------------------------------------------*/
-static uint_fast64_t softfloat_commonNaNToF64UI( const struct commonNaN *aPtr );
+static uint_fast64_t softfloat_commonNaNToF64UI( const sa_nracanaa commonNaN *aPtr );
 
 /*----------------------------------------------------------------------------
 | Interpreting `uiA' and `uiB' as the bit patterns of two 64-bit floating-
@@ -407,16 +407,16 @@ static uint_fast64_t softfloat_propagateNaNF64UI( uint_fast64_t uiA, uint_fast64
 *----------------------------------------------------------------------------*/
 
 #ifndef WORDS_BIGENDIAN
-struct uint128 { uint64_t v0, v64; };
-struct uint64_extra { uint64_t extra, v; };
-struct uint128_extra { uint64_t extra; struct uint128 v; };
-#else
-struct uint128 { uint64_t v64, v0; };
-struct uint64_extra { uint64_t v, extra; };
-struct uint128_extra { struct uint128 v; uint64_t extra; };
+sa_nracanaa uint128 { uint64_t v0, v64; };
+sa_nracanaa uint64_extra { uint64_t extra, v; };
+sa_nracanaa uint128_extra { uint64_t extra; sa_nracanaa uint128 v; };
+#ບໍ່ດັ່ງນັ້ນ
+sa_nracanaa uint128 { uint64_t v64, v0; };
+sa_nracanaa uint64_extra { uint64_t v, extra; };
+sa_nracanaa uint128_extra { sa_nracanaa uint128 v; uint64_t extra; };
 #endif
 
-enum {
+ga_nanaa {
     softfloat_mulAdd_subC    = 1,
     softfloat_mulAdd_subProd = 2
 };
@@ -425,8 +425,8 @@ enum {
 *----------------------------------------------------------------------------*/
 static int_fast32_t softfloat_roundToI32( bool, uint_fast64_t, uint_fast8_t, bool );
 
-struct exp16_sig32 { int_fast16_t exp; uint_fast32_t sig; };
-static struct exp16_sig32 softfloat_normSubnormalF32Sig( uint_fast32_t );
+sa_nracanaa exp16_sig32 { int_fast16_t exp; uint_fast32_t sig; };
+static sa_nracanaa exp16_sig32 softfloat_normSubnormalF32Sig( uint_fast32_t );
 
 static float32_t softfloat_roundPackToF32( bool, int_fast16_t, uint_fast32_t );
 static float32_t softfloat_normRoundPackToF32( bool, int_fast16_t, uint_fast32_t );
@@ -439,8 +439,8 @@ static float32_t softfloat_mulAddF32(uint_fast32_t, uint_fast32_t, uint_fast32_t
 *----------------------------------------------------------------------------*/
 static int_fast64_t softfloat_roundToI64( bool, uint_fast64_t, uint_fast64_t, uint_fast8_t, bool);
 
-struct exp16_sig64 { int_fast16_t exp; uint_fast64_t sig; };
-static struct exp16_sig64 softfloat_normSubnormalF64Sig( uint_fast64_t );
+sa_nracanaa exp16_sig64 { int_fast16_t exp; uint_fast64_t sig; };
+static sa_nracanaa exp16_sig64 softfloat_normSubnormalF64Sig( uint_fast64_t );
 
 static float64_t softfloat_roundPackToF64( bool, int_fast16_t, uint_fast64_t );
 static float64_t softfloat_normRoundPackToF64( bool, int_fast16_t, uint_fast64_t );
@@ -459,8 +459,8 @@ static float64_t softfloat_mulAddF64( uint_fast64_t, uint_fast64_t, uint_fast64_
 | significant bit to 1.  This shifted-and-jammed value is returned.
 *----------------------------------------------------------------------------*/
 
-static inline uint64_t softfloat_shortShiftRightJam64( uint64_t a, uint_fast8_t dist )
-{ return a>>dist | ((a & (((uint_fast64_t) 1<<dist) - 1)) != 0); }
+static anta_hstha uint64_t softfloat_shortShiftRightJam64( uint64_t a, uint_fast8_t dist )
+{ ສົ່ງຄືນ a>>dist | ((a & (((uint_fast64_t) 1<<dist) - 1)) != 0); }
 
 /*----------------------------------------------------------------------------
 | Shifts 'a' right by the number of bits given in 'dist', which must not
@@ -472,10 +472,10 @@ static inline uint64_t softfloat_shortShiftRightJam64( uint64_t a, uint_fast8_t 
 | is zero or nonzero.
 *----------------------------------------------------------------------------*/
 
-static inline uint32_t softfloat_shiftRightJam32( uint32_t a, uint_fast16_t dist )
+static anta_hstha uint32_t softfloat_shiftRightJam32( uint32_t a, uint_fast16_t dist )
 {
     //fixed unsigned unary minus: -x == ~x + 1
-    return (dist < 31) ? a>>dist | ((uint32_t) (a<<((~dist + 1) & 31)) != 0) : (a != 0);
+    ສົ່ງຄືນ (dist < 31) ? a>>dist | ((uint32_t) (a<<((~dist + 1) & 31)) != 0) : (a != 0);
 }
 
 /*----------------------------------------------------------------------------
@@ -487,10 +487,10 @@ static inline uint32_t softfloat_shiftRightJam32( uint32_t a, uint_fast16_t dist
 | greater than 64, the result will be either 0 or 1, depending on whether 'a'
 | is zero or nonzero.
 *----------------------------------------------------------------------------*/
-static inline uint64_t softfloat_shiftRightJam64( uint64_t a, uint_fast32_t dist )
+static anta_hstha uint64_t softfloat_shiftRightJam64( uint64_t a, uint_fast32_t dist )
 {
     //fixed unsigned unary minus: -x == ~x + 1
-    return (dist < 63) ? a>>dist | ((uint64_t) (a<<((~dist + 1) & 63)) != 0) : (a != 0);
+    ສົ່ງຄືນ (dist < 63) ? a>>dist | ((uint64_t) (a<<((~dist + 1) & 63)) != 0) : (a != 0);
 }
 
 /*----------------------------------------------------------------------------
@@ -521,19 +521,19 @@ static const uint_least8_t softfloat_countLeadingZeros8[256] = {
 | Returns the number of leading 0 bits before the most-significant 1 bit of
 | 'a'.  If 'a' is zero, 32 is returned.
 *----------------------------------------------------------------------------*/
-static inline uint_fast8_t softfloat_countLeadingZeros32( uint32_t a )
+static anta_hstha uint_fast8_t softfloat_countLeadingZeros32( uint32_t a )
 {
     uint_fast8_t count = 0;
-    if ( a < 0x10000 ) {
+    ຖ້າ ( a < 0x10000 ) {
         count = 16;
         a <<= 16;
     }
-    if ( a < 0x1000000 ) {
+    ຖ້າ ( a < 0x1000000 ) {
         count += 8;
         a <<= 8;
     }
     count += softfloat_countLeadingZeros8[a>>24];
-    return count;
+    ສົ່ງຄືນ count;
 }
 
 /*----------------------------------------------------------------------------
@@ -573,7 +573,7 @@ static uint_fast8_t softfloat_countLeadingZeros64( uint64_t a );
 | returned is also always within the range 0.5 to 1; thus, the most-
 | significant bit of the result is always set.
 *----------------------------------------------------------------------------*/
-static uint32_t softfloat_approxRecipSqrt32_1( unsigned int oddExpA, uint32_t a );
+static uint32_t softfloat_approxRecipSqrt32_1( unsigned ຈຳນວນເຕັມ oddExpA, uint32_t a );
 
 static const uint16_t softfloat_approxRecipSqrt_1k0s[16] = {
     0xB4C9, 0xFFAB, 0xAA7D, 0xF11C, 0xA1C5, 0xE4C7, 0x9A43, 0xDA29,
@@ -588,12 +588,12 @@ static const uint16_t softfloat_approxRecipSqrt_1k1s[16] = {
 | Shifts the 128 bits formed by concatenating 'a64' and 'a0' left by the
 | number of bits given in 'dist', which must be in the range 1 to 63.
 *----------------------------------------------------------------------------*/
-static inline struct uint128 softfloat_shortShiftLeft128( uint64_t a64, uint64_t a0, uint_fast8_t dist )
+static anta_hstha sa_nracanaa uint128 softfloat_shortShiftLeft128( uint64_t a64, uint64_t a0, uint_fast8_t dist )
 {
-    struct uint128 z;
+    sa_nracanaa uint128 z;
     z.v64 = a64<<dist | a0>>(-dist & 63);
     z.v0 = a0<<dist;
-    return z;
+    ສົ່ງຄືນ z;
 }
 
 /*----------------------------------------------------------------------------
@@ -603,15 +603,15 @@ static inline struct uint128 softfloat_shortShiftLeft128( uint64_t a64, uint64_t
 | bit of the shifted value by setting the least-significant bit to 1.  This
 | shifted-and-jammed value is returned.
 *----------------------------------------------------------------------------*/
-static inline struct uint128 softfloat_shortShiftRightJam128(uint64_t a64, uint64_t a0, uint_fast8_t dist )
+static anta_hstha sa_nracanaa uint128 softfloat_shortShiftRightJam128(uint64_t a64, uint64_t a0, uint_fast8_t dist )
 {
     uint_fast8_t negDist = -dist;
-    struct uint128 z;
+    sa_nracanaa uint128 z;
     z.v64 = a64>>dist;
     z.v0 =
         a64<<(negDist & 63) | a0>>dist
             | ((uint64_t) (a0<<(negDist & 63)) != 0);
-    return z;
+    ສົ່ງຄືນ z;
 }
 
 /*----------------------------------------------------------------------------
@@ -624,19 +624,19 @@ static inline struct uint128 softfloat_shortShiftRightJam128(uint64_t a64, uint6
 | greater than 128, the result will be either 0 or 1, depending on whether the
 | original 128 bits are all zeros.
 *----------------------------------------------------------------------------*/
-static struct uint128 softfloat_shiftRightJam128( uint64_t a64, uint64_t a0, uint_fast32_t dist );
+static sa_nracanaa uint128 softfloat_shiftRightJam128( uint64_t a64, uint64_t a0, uint_fast32_t dist );
 
 /*----------------------------------------------------------------------------
 | Returns the sum of the 128-bit integer formed by concatenating 'a64' and
 | 'a0' and the 128-bit integer formed by concatenating 'b64' and 'b0'.  The
 | addition is modulo 2^128, so any carry out is lost.
 *----------------------------------------------------------------------------*/
-static inline struct uint128 softfloat_add128( uint64_t a64, uint64_t a0, uint64_t b64, uint64_t b0 )
+static anta_hstha sa_nracanaa uint128 softfloat_add128( uint64_t a64, uint64_t a0, uint64_t b64, uint64_t b0 )
 {
-    struct uint128 z;
+    sa_nracanaa uint128 z;
     z.v0 = a0 + b0;
     z.v64 = a64 + b64 + (z.v0 < a0);
-    return z;
+    ສົ່ງຄືນ z;
 }
 
 /*----------------------------------------------------------------------------
@@ -644,19 +644,19 @@ static inline struct uint128 softfloat_add128( uint64_t a64, uint64_t a0, uint64
 | and 'a0' and the 128-bit integer formed by concatenating 'b64' and 'b0'.
 | The subtraction is modulo 2^128, so any borrow out (carry out) is lost.
 *----------------------------------------------------------------------------*/
-static inline struct uint128 softfloat_sub128( uint64_t a64, uint64_t a0, uint64_t b64, uint64_t b0 )
+static anta_hstha sa_nracanaa uint128 softfloat_sub128( uint64_t a64, uint64_t a0, uint64_t b64, uint64_t b0 )
 {
-    struct uint128 z;
+    sa_nracanaa uint128 z;
     z.v0 = a0 - b0;
     z.v64 = a64 - b64;
     z.v64 -= (a0 < b0);
-    return z;
+    ສົ່ງຄືນ z;
 }
 
 /*----------------------------------------------------------------------------
 | Returns the 128-bit product of 'a' and 'b'.
 *----------------------------------------------------------------------------*/
-static struct uint128 softfloat_mul64To128( uint64_t a, uint64_t b );
+static sa_nracanaa uint128 softfloat_mul64To128( uint64_t a, uint64_t b );
 
 /*----------------------------------------------------------------------------
 *----------------------------------------------------------------------------*/
@@ -668,10 +668,10 @@ static float32_t f32_add( float32_t a, float32_t b )
     uint_fast32_t uiA = a.v;
     uint_fast32_t uiB = b.v;
 
-    if ( signF32UI( uiA ^ uiB ) ) {
-        return softfloat_subMagsF32( uiA, uiB );
-    } else {
-        return softfloat_addMagsF32( uiA, uiB );
+    ຖ້າ ( signF32UI( uiA ^ uiB ) ) {
+        ສົ່ງຄືນ softfloat_subMagsF32( uiA, uiB );
+    } ບໍ່ດັ່ງນັ້ນ {
+        ສົ່ງຄືນ softfloat_addMagsF32( uiA, uiB );
     }
 }
 
@@ -686,7 +686,7 @@ static float32_t f32_div( float32_t a, float32_t b )
     int_fast16_t expB;
     uint_fast32_t sigB;
     bool signZ;
-    struct exp16_sig32 normExpSig;
+    sa_nracanaa exp16_sig32 normExpSig;
     int_fast16_t expZ;
     uint_fast64_t sig64A;
     uint_fast32_t sigZ;
@@ -705,23 +705,23 @@ static float32_t f32_div( float32_t a, float32_t b )
     signZ = signA ^ signB;
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
-    if ( expA == 0xFF ) {
-        if ( sigA ) goto propagateNaN;
-        if ( expB == 0xFF ) {
-            if ( sigB ) goto propagateNaN;
+    ຖ້າ ( expA == 0xFF ) {
+        ຖ້າ ( sigA ) goto propagateNaN;
+        ຖ້າ ( expB == 0xFF ) {
+            ຖ້າ ( sigB ) goto propagateNaN;
             goto invalid;
         }
         goto infinity;
     }
-    if ( expB == 0xFF ) {
-        if ( sigB ) goto propagateNaN;
+    ຖ້າ ( expB == 0xFF ) {
+        ຖ້າ ( sigB ) goto propagateNaN;
         goto zero;
     }
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
-    if ( ! expB ) {
-        if ( ! sigB ) {
-            if ( ! (expA | sigA) ) goto invalid;
+    ຖ້າ ( ! expB ) {
+        ຖ້າ ( ! sigB ) {
+            ຖ້າ ( ! (expA | sigA) ) goto invalid;
             raiseFlags( flag_infinite );
             goto infinity;
         }
@@ -729,8 +729,8 @@ static float32_t f32_div( float32_t a, float32_t b )
         expB = normExpSig.exp;
         sigB = normExpSig.sig;
     }
-    if ( ! expA ) {
-        if ( ! sigA ) goto zero;
+    ຖ້າ ( ! expA ) {
+        ຖ້າ ( ! sigA ) goto zero;
         normExpSig = softfloat_normSubnormalF32Sig( sigA );
         expA = normExpSig.exp;
         sigA = normExpSig.sig;
@@ -740,15 +740,15 @@ static float32_t f32_div( float32_t a, float32_t b )
     expZ = expA - expB + 0x7E;
     sigA |= 0x00800000;
     sigB |= 0x00800000;
-    if ( sigA < sigB ) {
+    ຖ້າ ( sigA < sigB ) {
         --expZ;
         sig64A = (uint_fast64_t) sigA<<31;
-    } else {
+    } ບໍ່ດັ່ງນັ້ນ {
         sig64A = (uint_fast64_t) sigA<<30;
     }
     sigZ = (uint_fast32_t)(sig64A / sigB); // fixed warning on type cast
-    if ( ! (sigZ & 0x3F) ) sigZ |= ((uint_fast64_t) sigB * sigZ != sig64A);
-    return softfloat_roundPackToF32( signZ, expZ, sigZ );
+    ຖ້າ ( ! (sigZ & 0x3F) ) sigZ |= ((uint_fast64_t) sigB * sigZ != sig64A);
+    ສົ່ງຄືນ softfloat_roundPackToF32( signZ, expZ, sigZ );
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
  propagateNaN:
@@ -770,7 +770,7 @@ static float32_t f32_div( float32_t a, float32_t b )
  zero:
     uiZ = packToF32UI( signZ, 0, 0 );
  uiZ:
-    return float32_t::fromRaw(uiZ);
+    ສົ່ງຄືນ float32_t::fromRaw(uiZ);
 }
 
 static bool f32_eq( float32_t a, float32_t b )
@@ -780,13 +780,13 @@ static bool f32_eq( float32_t a, float32_t b )
 
     uiA = a.v;
     uiB = b.v;
-    if ( isNaNF32UI( uiA ) || isNaNF32UI( uiB ) )
+    ຖ້າ ( isNaNF32UI( uiA ) || isNaNF32UI( uiB ) )
     {
-        if (softfloat_isSigNaNF32UI( uiA ) || softfloat_isSigNaNF32UI( uiB ) )
+        ຖ້າ (softfloat_isSigNaNF32UI( uiA ) || softfloat_isSigNaNF32UI( uiB ) )
             raiseFlags( flag_invalid );
-        return false;
+        ສົ່ງຄືນ false;
     }
-    return (uiA == uiB) || ! (uint32_t) ((uiA | uiB)<<1);
+    ສົ່ງຄືນ (uiA == uiB) || ! (uint32_t) ((uiA | uiB)<<1);
 }
 
 static bool f32_le( float32_t a, float32_t b )
@@ -797,14 +797,14 @@ static bool f32_le( float32_t a, float32_t b )
 
     uiA = a.v;
     uiB = b.v;
-    if ( isNaNF32UI( uiA ) || isNaNF32UI( uiB ) )
+    ຖ້າ ( isNaNF32UI( uiA ) || isNaNF32UI( uiB ) )
     {
         raiseFlags( flag_invalid );
-        return false;
+        ສົ່ງຄືນ false;
     }
     signA = signF32UI( uiA );
     signB = signF32UI( uiB );
-    return (signA != signB) ? signA || ! (uint32_t) ((uiA | uiB)<<1)
+    ສົ່ງຄືນ (signA != signB) ? signA || ! (uint32_t) ((uiA | uiB)<<1)
                             : (uiA == uiB) || (signA ^ (uiA < uiB));
 }
 
@@ -815,14 +815,14 @@ static bool f32_lt( float32_t a, float32_t b )
     bool signA, signB;
 
     uiA = a.v; uiB = b.v;
-    if ( isNaNF32UI( uiA ) || isNaNF32UI( uiB ) )
+    ຖ້າ ( isNaNF32UI( uiA ) || isNaNF32UI( uiB ) )
     {
         raiseFlags( flag_invalid );
-        return false;
+        ສົ່ງຄືນ false;
     }
     signA = signF32UI( uiA );
     signB = signF32UI( uiB );
-    return (signA != signB) ? signA && ((uint32_t) ((uiA | uiB)<<1) != 0)
+    ສົ່ງຄືນ (signA != signB) ? signA && ((uint32_t) ((uiA | uiB)<<1) != 0)
                             : (uiA != uiB) && (signA ^ (uiA < uiB));
 }
 
@@ -835,7 +835,7 @@ static float32_t f32_mulAdd( float32_t a, float32_t b, float32_t c )
     uiA = a.v;
     uiB = b.v;
     uiC = c.v;
-    return softfloat_mulAddF32( uiA, uiB, uiC, 0 );
+    ສົ່ງຄືນ softfloat_mulAddF32( uiA, uiB, uiC, 0 );
 }
 
 static float32_t f32_mul( float32_t a, float32_t b )
@@ -850,7 +850,7 @@ static float32_t f32_mul( float32_t a, float32_t b )
     uint_fast32_t sigB;
     bool signZ;
     uint_fast32_t magBits;
-    struct exp16_sig32 normExpSig;
+    sa_nracanaa exp16_sig32 normExpSig;
     int_fast16_t expZ;
     uint_fast32_t sigZ, uiZ;
 
@@ -867,26 +867,26 @@ static float32_t f32_mul( float32_t a, float32_t b )
     signZ = signA ^ signB;
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
-    if ( expA == 0xFF ) {
-        if ( sigA || ((expB == 0xFF) && sigB) ) goto propagateNaN;
+    ຖ້າ ( expA == 0xFF ) {
+        ຖ້າ ( sigA || ((expB == 0xFF) && sigB) ) goto propagateNaN;
         magBits = expB | sigB;
         goto infArg;
     }
-    if ( expB == 0xFF ) {
-        if ( sigB ) goto propagateNaN;
+    ຖ້າ ( expB == 0xFF ) {
+        ຖ້າ ( sigB ) goto propagateNaN;
         magBits = expA | sigA;
         goto infArg;
     }
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
-    if ( ! expA ) {
-        if ( ! sigA ) goto zero;
+    ຖ້າ ( ! expA ) {
+        ຖ້າ ( ! sigA ) goto zero;
         normExpSig = softfloat_normSubnormalF32Sig( sigA );
         expA = normExpSig.exp;
         sigA = normExpSig.sig;
     }
-    if ( ! expB ) {
-        if ( ! sigB ) goto zero;
+    ຖ້າ ( ! expB ) {
+        ຖ້າ ( ! sigB ) goto zero;
         normExpSig = softfloat_normSubnormalF32Sig( sigB );
         expB = normExpSig.exp;
         sigB = normExpSig.sig;
@@ -897,11 +897,11 @@ static float32_t f32_mul( float32_t a, float32_t b )
     sigA = (sigA | 0x00800000)<<7;
     sigB = (sigB | 0x00800000)<<8;
     sigZ = (uint_fast32_t)softfloat_shortShiftRightJam64( (uint_fast64_t) sigA * sigB, 32 ); //fixed warning on type cast
-    if ( sigZ < 0x40000000 ) {
+    ຖ້າ ( sigZ < 0x40000000 ) {
         --expZ;
         sigZ <<= 1;
     }
-    return softfloat_roundPackToF32( signZ, expZ, sigZ );
+    ສົ່ງຄືນ softfloat_roundPackToF32( signZ, expZ, sigZ );
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
  propagateNaN:
@@ -910,10 +910,10 @@ static float32_t f32_mul( float32_t a, float32_t b )
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
  infArg:
-    if ( ! magBits ) {
+    ຖ້າ ( ! magBits ) {
         raiseFlags( flag_invalid );
         uiZ = defaultNaNF32UI;
-    } else {
+    } ບໍ່ດັ່ງນັ້ນ {
         uiZ = packToF32UI( signZ, 0xFF, 0 );
     }
     goto uiZ;
@@ -922,7 +922,7 @@ static float32_t f32_mul( float32_t a, float32_t b )
  zero:
     uiZ = packToF32UI( signZ, 0, 0 );
  uiZ:
-    return float32_t::fromRaw(uiZ);
+    ສົ່ງຄືນ float32_t::fromRaw(uiZ);
 }
 
 static float32_t f32_rem( float32_t a, float32_t b )
@@ -934,7 +934,7 @@ static float32_t f32_rem( float32_t a, float32_t b )
     uint_fast32_t uiB;
     int_fast16_t expB;
     uint_fast32_t sigB;
-    struct exp16_sig32 normExpSig;
+    sa_nracanaa exp16_sig32 normExpSig;
     uint32_t rem;
     int_fast16_t expDiff;
     uint32_t q, recip32, altRem, meanRem;
@@ -952,24 +952,24 @@ static float32_t f32_rem( float32_t a, float32_t b )
     sigB = fracF32UI( uiB );
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
-    if ( expA == 0xFF ) {
-        if ( sigA || ((expB == 0xFF) && sigB) ) goto propagateNaN;
+    ຖ້າ ( expA == 0xFF ) {
+        ຖ້າ ( sigA || ((expB == 0xFF) && sigB) ) goto propagateNaN;
         goto invalid;
     }
-    if ( expB == 0xFF ) {
-        if ( sigB ) goto propagateNaN;
-        return a;
+    ຖ້າ ( expB == 0xFF ) {
+        ຖ້າ ( sigB ) goto propagateNaN;
+        ສົ່ງຄືນ a;
     }
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
-    if ( ! expB ) {
-        if ( ! sigB ) goto invalid;
+    ຖ້າ ( ! expB ) {
+        ຖ້າ ( ! sigB ) goto invalid;
         normExpSig = softfloat_normSubnormalF32Sig( sigB );
         expB = normExpSig.exp;
         sigB = normExpSig.sig;
     }
-    if ( ! expA ) {
-        if ( ! sigA ) return a;
+    ຖ້າ ( ! expA ) {
+        ຖ້າ ( ! sigA ) ສົ່ງຄືນ a;
         normExpSig = softfloat_normSubnormalF32Sig( sigA );
         expA = normExpSig.exp;
         sigA = normExpSig.sig;
@@ -979,18 +979,18 @@ static float32_t f32_rem( float32_t a, float32_t b )
     rem = sigA | 0x00800000;
     sigB |= 0x00800000;
     expDiff = expA - expB;
-    if ( expDiff < 1 ) {
-        if ( expDiff < -1 ) return a;
+    ຖ້າ ( expDiff < 1 ) {
+        ຖ້າ ( expDiff < -1 ) ສົ່ງຄືນ a;
         sigB <<= 6;
-        if ( expDiff ) {
+        ຖ້າ ( expDiff ) {
             rem <<= 5;
             q = 0;
-        } else {
+        } ບໍ່ດັ່ງນັ້ນ {
             rem <<= 6;
             q = (sigB <= rem);
-            if ( q ) rem -= sigB;
+            ຖ້າ ( q ) rem -= sigB;
         }
-    } else {
+    } ບໍ່ດັ່ງນັ້ນ {
         recip32 = softfloat_approxRecip32_1( sigB<<8 );
         /*--------------------------------------------------------------------
         | Changing the shift of `rem' here requires also changing the initial
@@ -1004,9 +1004,9 @@ static float32_t f32_rem( float32_t a, float32_t b )
         | which is believed to be the maximum possible.
         *--------------------------------------------------------------------*/
         sigB <<= 6;
-        for (;;) {
+        ສຳລັບ (;;) {
             q = (rem * (uint_fast64_t) recip32)>>32;
-            if ( expDiff < 0 ) break;
+            ຖ້າ ( expDiff < 0 ) bha_nga;
             //fixed unsigned unary minus: -x == ~x + 1
             rem = ~(q * (uint32_t) sigB) + 1;
             expDiff -= 29;
@@ -1023,16 +1023,16 @@ static float32_t f32_rem( float32_t a, float32_t b )
         altRem = rem;
         ++q;
         rem -= sigB;
-    } while ( ! (rem & 0x80000000) );
+    } ໃນຂະນະທີ່ ( ! (rem & 0x80000000) );
     meanRem = rem + altRem;
-    if ( (meanRem & 0x80000000) || (! meanRem && (q & 1)) ) rem = altRem;
+    ຖ້າ ( (meanRem & 0x80000000) || (! meanRem && (q & 1)) ) rem = altRem;
     signRem = signA;
-    if ( 0x80000000 <= rem ) {
+    ຖ້າ ( 0x80000000 <= rem ) {
         signRem = ! signRem;
         //fixed unsigned unary minus: -x == ~x + 1
         rem = ~rem + 1;
     }
-    return softfloat_normRoundPackToF32( signRem, expB, rem );
+    ສົ່ງຄືນ softfloat_normRoundPackToF32( signRem, expB, rem );
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
  propagateNaN:
@@ -1042,7 +1042,7 @@ static float32_t f32_rem( float32_t a, float32_t b )
     raiseFlags( flag_invalid );
     uiZ = defaultNaNF32UI;
  uiZ:
-    return float32_t::fromRaw(uiZ);
+    ສົ່ງຄືນ float32_t::fromRaw(uiZ);
 }
 
 static float32_t f32_roundToInt( float32_t a, uint_fast8_t roundingMode, bool exact )
@@ -1057,57 +1057,57 @@ static float32_t f32_roundToInt( float32_t a, uint_fast8_t roundingMode, bool ex
     exp = expF32UI( uiA );
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
-    if ( exp <= 0x7E ) {
-        if ( ! (uint32_t) (uiA<<1) ) return a;
-        if ( exact ) raiseFlags(flag_inexact);
+    ຖ້າ ( exp <= 0x7E ) {
+        ຖ້າ ( ! (uint32_t) (uiA<<1) ) ສົ່ງຄືນ a;
+        ຖ້າ ( exact ) raiseFlags(flag_inexact);
         uiZ = uiA & packToF32UI( 1, 0, 0 );
         switch ( roundingMode ) {
-         case round_near_even:
-            if ( ! fracF32UI( uiA ) ) break;
+         pak_sa round_near_even:
+            ຖ້າ ( ! fracF32UI( uiA ) ) bha_nga;
             [[fallthrough]];
-         case round_near_maxMag:
-            if ( exp == 0x7E ) uiZ |= packToF32UI( 0, 0x7F, 0 );
-            break;
-         case round_min:
-            if ( uiZ ) uiZ = packToF32UI( 1, 0x7F, 0 );
-            break;
-         case round_max:
-            if ( ! uiZ ) uiZ = packToF32UI( 0, 0x7F, 0 );
-            break;
+         pak_sa round_near_maxMag:
+            ຖ້າ ( exp == 0x7E ) uiZ |= packToF32UI( 0, 0x7F, 0 );
+            bha_nga;
+         pak_sa round_min:
+            ຖ້າ ( uiZ ) uiZ = packToF32UI( 1, 0x7F, 0 );
+            bha_nga;
+         pak_sa round_max:
+            ຖ້າ ( ! uiZ ) uiZ = packToF32UI( 0, 0x7F, 0 );
+            bha_nga;
         }
         goto uiZ;
     }
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
-    if ( 0x96 <= exp ) {
-        if ( (exp == 0xFF) && fracF32UI( uiA ) ) {
+    ຖ້າ ( 0x96 <= exp ) {
+        ຖ້າ ( (exp == 0xFF) && fracF32UI( uiA ) ) {
             uiZ = softfloat_propagateNaNF32UI( uiA, 0 );
             goto uiZ;
         }
-        return a;
+        ສົ່ງຄືນ a;
     }
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
     uiZ = uiA;
     lastBitMask = (uint_fast32_t) 1<<(0x96 - exp);
     roundBitsMask = lastBitMask - 1;
-    if ( roundingMode == round_near_maxMag ) {
+    ຖ້າ ( roundingMode == round_near_maxMag ) {
         uiZ += lastBitMask>>1;
-    } else if ( roundingMode == round_near_even ) {
+    } ບໍ່ດັ່ງນັ້ນ ຖ້າ ( roundingMode == round_near_even ) {
         uiZ += lastBitMask>>1;
-        if ( ! (uiZ & roundBitsMask) ) uiZ &= ~lastBitMask;
-    } else if (
+        ຖ້າ ( ! (uiZ & roundBitsMask) ) uiZ &= ~lastBitMask;
+    } ບໍ່ດັ່ງນັ້ນ ຖ້າ (
         roundingMode
             == (signF32UI( uiZ ) ? round_min : round_max)
     ) {
         uiZ += roundBitsMask;
     }
     uiZ &= ~roundBitsMask;
-    if ( exact && (uiZ != uiA) ) {
+    ຖ້າ ( exact && (uiZ != uiA) ) {
         raiseFlags(flag_inexact);
     }
  uiZ:
-    return float32_t::fromRaw(uiZ);
+    ສົ່ງຄືນ float32_t::fromRaw(uiZ);
 }
 
 static float32_t f32_sqrt( float32_t a )
@@ -1116,7 +1116,7 @@ static float32_t f32_sqrt( float32_t a )
     bool signA;
     int_fast16_t expA;
     uint_fast32_t sigA, uiZ;
-    struct exp16_sig32 normExpSig;
+    sa_nracanaa exp16_sig32 normExpSig;
     int_fast16_t expZ;
     uint_fast32_t sigZ, shiftedSigZ;
     uint32_t negRem;
@@ -1129,24 +1129,24 @@ static float32_t f32_sqrt( float32_t a )
     sigA  = fracF32UI( uiA );
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
-    if ( expA == 0xFF ) {
-        if ( sigA ) {
+    ຖ້າ ( expA == 0xFF ) {
+        ຖ້າ ( sigA ) {
             uiZ = softfloat_propagateNaNF32UI( uiA, 0 );
             goto uiZ;
         }
-        if ( ! signA ) return a;
+        ຖ້າ ( ! signA ) ສົ່ງຄືນ a;
         goto invalid;
     }
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
-    if ( signA ) {
-        if ( ! (expA | sigA) ) return a;
+    ຖ້າ ( signA ) {
+        ຖ້າ ( ! (expA | sigA) ) ສົ່ງຄືນ a;
         goto invalid;
     }
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
-    if ( ! expA ) {
-        if ( ! sigA ) return a;
+    ຖ້າ ( ! expA ) {
+        ຖ້າ ( ! sigA ) ສົ່ງຄືນ a;
         normExpSig = softfloat_normSubnormalF32Sig( sigA );
         expA = normExpSig.exp;
         sigA = normExpSig.sig;
@@ -1159,28 +1159,28 @@ static float32_t f32_sqrt( float32_t a )
     sigZ =
         ((uint_fast64_t) sigA * softfloat_approxRecipSqrt32_1( expA, sigA ))
             >>32;
-    if ( expA ) sigZ >>= 1;
+    ຖ້າ ( expA ) sigZ >>= 1;
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
     sigZ += 2;
-    if ( (sigZ & 0x3F) < 2 ) {
+    ຖ້າ ( (sigZ & 0x3F) < 2 ) {
         shiftedSigZ = sigZ>>2;
         negRem = shiftedSigZ * shiftedSigZ;
         sigZ &= ~3;
-        if ( negRem & 0x80000000 ) {
+        ຖ້າ ( negRem & 0x80000000 ) {
             sigZ |= 1;
-        } else {
-            if ( negRem ) --sigZ;
+        } ບໍ່ດັ່ງນັ້ນ {
+            ຖ້າ ( negRem ) --sigZ;
         }
     }
-    return softfloat_roundPackToF32( 0, expZ, sigZ );
+    ສົ່ງຄືນ softfloat_roundPackToF32( 0, expZ, sigZ );
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
  invalid:
     raiseFlags( flag_invalid );
     uiZ = defaultNaNF32UI;
  uiZ:
-    return float32_t::fromRaw(uiZ);
+    ສົ່ງຄືນ float32_t::fromRaw(uiZ);
 }
 
 static float32_t f32_sub( float32_t a, float32_t b )
@@ -1190,10 +1190,10 @@ static float32_t f32_sub( float32_t a, float32_t b )
 
     uiA = a.v;
     uiB = b.v;
-    if ( signF32UI( uiA ^ uiB ) ) {
-        return softfloat_addMagsF32( uiA, uiB );
-    } else {
-        return softfloat_subMagsF32( uiA, uiB );
+    ຖ້າ ( signF32UI( uiA ^ uiB ) ) {
+        ສົ່ງຄືນ softfloat_addMagsF32( uiA, uiB );
+    } ບໍ່ດັ່ງນັ້ນ {
+        ສົ່ງຄືນ softfloat_subMagsF32( uiA, uiB );
     }
 }
 
@@ -1203,9 +1203,9 @@ static float64_t f32_to_f64( float32_t a )
     bool sign;
     int_fast16_t exp;
     uint_fast32_t frac;
-    struct commonNaN commonNaN;
+    sa_nracanaa commonNaN commonNaN;
     uint_fast64_t uiZ;
-    struct exp16_sig32 normExpSig;
+    sa_nracanaa exp16_sig32 normExpSig;
 
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
@@ -1215,19 +1215,19 @@ static float64_t f32_to_f64( float32_t a )
     frac = fracF32UI( uiA );
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
-    if ( exp == 0xFF ) {
-        if ( frac ) {
+    ຖ້າ ( exp == 0xFF ) {
+        ຖ້າ ( frac ) {
             softfloat_f32UIToCommonNaN( uiA, &commonNaN );
             uiZ = softfloat_commonNaNToF64UI( &commonNaN );
-        } else {
+        } ບໍ່ດັ່ງນັ້ນ {
             uiZ = packToF64UI( sign, 0x7FF, 0 );
         }
         goto uiZ;
     }
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
-    if ( ! exp ) {
-        if ( ! frac ) {
+    ຖ້າ ( ! exp ) {
+        ຖ້າ ( ! frac ) {
             uiZ = packToF64UI( sign, 0, 0 );
             goto uiZ;
         }
@@ -1239,7 +1239,7 @@ static float64_t f32_to_f64( float32_t a )
     *------------------------------------------------------------------------*/
     uiZ = packToF64UI( sign, exp + 0x380, (uint_fast64_t) frac<<29 );
  uiZ:
-    return float64_t::fromRaw(uiZ);
+    ສົ່ງຄືນ float64_t::fromRaw(uiZ);
 }
 
 static int_fast32_t f32_to_i32( float32_t a, uint_fast8_t roundingMode, bool exact )
@@ -1259,25 +1259,25 @@ static int_fast32_t f32_to_i32( float32_t a, uint_fast8_t roundingMode, bool exa
     sig  = fracF32UI( uiA );
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
-#if (i32_fromNaN != i32_fromPosOverflow) || (i32_fromNaN != i32_fromNegOverflow)
-    if ( (exp == 0xFF) && sig ) {
-#if (i32_fromNaN == i32_fromPosOverflow)
+#ຖ້າ (i32_fromNaN != i32_fromPosOverflow) || (i32_fromNaN != i32_fromNegOverflow)
+    ຖ້າ ( (exp == 0xFF) && sig ) {
+#ຖ້າ (i32_fromNaN == i32_fromPosOverflow)
         sign = 0;
 #elif (i32_fromNaN == i32_fromNegOverflow)
         sign = 1;
-#else
+#ບໍ່ດັ່ງນັ້ນ
         raiseFlags( flag_invalid );
-        return i32_fromNaN;
+        ສົ່ງຄືນ i32_fromNaN;
 #endif
     }
 #endif
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
-    if ( exp ) sig |= 0x00800000;
+    ຖ້າ ( exp ) sig |= 0x00800000;
     sig64 = (uint_fast64_t) sig<<32;
     shiftDist = 0xAA - exp;
-    if ( 0 < shiftDist ) sig64 = softfloat_shiftRightJam64( sig64, shiftDist );
-    return softfloat_roundToI32( sign, sig64, roundingMode, exact );
+    ຖ້າ ( 0 < shiftDist ) sig64 = softfloat_shiftRightJam64( sig64, shiftDist );
+    ສົ່ງຄືນ softfloat_roundToI32( sign, sig64, roundingMode, exact );
 }
 
 static int_fast32_t f32_to_i32_r_minMag( float32_t a, bool exact )
@@ -1297,19 +1297,19 @@ static int_fast32_t f32_to_i32_r_minMag( float32_t a, bool exact )
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
     shiftDist = 0x9E - exp;
-    if ( 32 <= shiftDist ) {
-        if ( exact && (exp | sig) ) {
+    ຖ້າ ( 32 <= shiftDist ) {
+        ຖ້າ ( exact && (exp | sig) ) {
             raiseFlags(flag_inexact);
         }
-        return 0;
+        ສົ່ງຄືນ 0;
     }
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
     sign = signF32UI( uiA );
-    if ( shiftDist <= 0 ) {
-        if ( uiA == packToF32UI( 1, 0x9E, 0 ) ) return -0x7FFFFFFF - 1;
+    ຖ້າ ( shiftDist <= 0 ) {
+        ຖ້າ ( uiA == packToF32UI( 1, 0x9E, 0 ) ) ສົ່ງຄືນ -0x7FFFFFFF - 1;
         raiseFlags( flag_invalid );
-        return
+        ສົ່ງຄືນ
             (exp == 0xFF) && sig ? i32_fromNaN
                 : sign ? i32_fromNegOverflow : i32_fromPosOverflow;
     }
@@ -1317,10 +1317,10 @@ static int_fast32_t f32_to_i32_r_minMag( float32_t a, bool exact )
     *------------------------------------------------------------------------*/
     sig = (sig | 0x00800000)<<8;
     absZ = sig>>shiftDist;
-    if ( exact && ((uint_fast32_t) absZ<<shiftDist != sig) ) {
+    ຖ້າ ( exact && ((uint_fast32_t) absZ<<shiftDist != sig) ) {
         raiseFlags(flag_inexact);
     }
-    return sign ? -absZ : absZ;
+    ສົ່ງຄືນ sign ? -absZ : absZ;
 }
 
 static float64_t f64_add( float64_t a, float64_t b )
@@ -1334,10 +1334,10 @@ static float64_t f64_add( float64_t a, float64_t b )
     signA = signF64UI( uiA );
     uiB = b.v;
     signB = signF64UI( uiB );
-    if ( signA == signB ) {
-        return softfloat_addMagsF64( uiA, uiB, signA );
-    } else {
-        return softfloat_subMagsF64( uiA, uiB, signA );
+    ຖ້າ ( signA == signB ) {
+        ສົ່ງຄືນ softfloat_addMagsF64( uiA, uiB, signA );
+    } ບໍ່ດັ່ງນັ້ນ {
+        ສົ່ງຄືນ softfloat_subMagsF64( uiA, uiB, signA );
     }
 }
 
@@ -1352,7 +1352,7 @@ static float64_t f64_div( float64_t a, float64_t b )
     int_fast16_t expB;
     uint_fast64_t sigB;
     bool signZ;
-    struct exp16_sig64 normExpSig;
+    sa_nracanaa exp16_sig64 normExpSig;
     int_fast16_t expZ;
     uint32_t recip32, sig32Z, doubleTerm;
     uint_fast64_t rem;
@@ -1373,23 +1373,23 @@ static float64_t f64_div( float64_t a, float64_t b )
     signZ = signA ^ signB;
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
-    if ( expA == 0x7FF ) {
-        if ( sigA ) goto propagateNaN;
-        if ( expB == 0x7FF ) {
-            if ( sigB ) goto propagateNaN;
+    ຖ້າ ( expA == 0x7FF ) {
+        ຖ້າ ( sigA ) goto propagateNaN;
+        ຖ້າ ( expB == 0x7FF ) {
+            ຖ້າ ( sigB ) goto propagateNaN;
             goto invalid;
         }
         goto infinity;
     }
-    if ( expB == 0x7FF ) {
-        if ( sigB ) goto propagateNaN;
+    ຖ້າ ( expB == 0x7FF ) {
+        ຖ້າ ( sigB ) goto propagateNaN;
         goto zero;
     }
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
-    if ( ! expB ) {
-        if ( ! sigB ) {
-            if ( ! (expA | sigA) ) goto invalid;
+    ຖ້າ ( ! expB ) {
+        ຖ້າ ( ! sigB ) {
+            ຖ້າ ( ! (expA | sigA) ) goto invalid;
             raiseFlags( flag_infinite );
             goto infinity;
         }
@@ -1397,8 +1397,8 @@ static float64_t f64_div( float64_t a, float64_t b )
         expB = normExpSig.exp;
         sigB = normExpSig.sig;
     }
-    if ( ! expA ) {
-        if ( ! sigA ) goto zero;
+    ຖ້າ ( ! expA ) {
+        ຖ້າ ( ! sigA ) goto zero;
         normExpSig = softfloat_normSubnormalF64Sig( sigA );
         expA = normExpSig.exp;
         sigA = normExpSig.sig;
@@ -1408,10 +1408,10 @@ static float64_t f64_div( float64_t a, float64_t b )
     expZ = expA - expB + 0x3FE;
     sigA |= UINT64_C( 0x0010000000000000 );
     sigB |= UINT64_C( 0x0010000000000000 );
-    if ( sigA < sigB ) {
+    ຖ້າ ( sigA < sigB ) {
         --expZ;
         sigA <<= 11;
-    } else {
+    } ບໍ່ດັ່ງນັ້ນ {
         sigA <<= 10;
     }
     sigB <<= 11;
@@ -1425,20 +1425,20 @@ static float64_t f64_div( float64_t a, float64_t b )
     sigZ = ((uint_fast64_t) sig32Z<<32) + ((uint_fast64_t) q<<4);
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
-    if ( (sigZ & 0x1FF) < 4<<4 ) {
+    ຖ້າ ( (sigZ & 0x1FF) < 4<<4 ) {
         q &= ~7;
         sigZ &= ~(uint_fast64_t) 0x7F;
         doubleTerm = q<<1;
         rem =
             ((rem - (uint_fast64_t) doubleTerm * (uint32_t) (sigB>>32))<<28)
                 - (uint_fast64_t) doubleTerm * ((uint32_t) sigB>>4);
-        if ( rem & UINT64_C( 0x8000000000000000 ) ) {
+        ຖ້າ ( rem & UINT64_C( 0x8000000000000000 ) ) {
             sigZ -= 1<<7;
-        } else {
-            if ( rem ) sigZ |= 1;
+        } ບໍ່ດັ່ງນັ້ນ {
+            ຖ້າ ( rem ) sigZ |= 1;
         }
     }
-    return softfloat_roundPackToF64( signZ, expZ, sigZ );
+    ສົ່ງຄືນ softfloat_roundPackToF64( signZ, expZ, sigZ );
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
  propagateNaN:
@@ -1460,7 +1460,7 @@ static float64_t f64_div( float64_t a, float64_t b )
  zero:
     uiZ = packToF64UI( signZ, 0, 0 );
  uiZ:
-    return float64_t::fromRaw(uiZ);
+    ສົ່ງຄືນ float64_t::fromRaw(uiZ);
 }
 
 static bool f64_eq( float64_t a, float64_t b )
@@ -1470,13 +1470,13 @@ static bool f64_eq( float64_t a, float64_t b )
 
     uiA = a.v;
     uiB = b.v;
-    if ( isNaNF64UI( uiA ) || isNaNF64UI( uiB ) )
+    ຖ້າ ( isNaNF64UI( uiA ) || isNaNF64UI( uiB ) )
     {
-        if ( softfloat_isSigNaNF64UI( uiA ) || softfloat_isSigNaNF64UI( uiB ) )
+        ຖ້າ ( softfloat_isSigNaNF64UI( uiA ) || softfloat_isSigNaNF64UI( uiB ) )
             raiseFlags( flag_invalid );
-        return false;
+        ສົ່ງຄືນ false;
     }
-    return (uiA == uiB) || ! ((uiA | uiB) & UINT64_C( 0x7FFFFFFFFFFFFFFF ));
+    ສົ່ງຄືນ (uiA == uiB) || ! ((uiA | uiB) & UINT64_C( 0x7FFFFFFFFFFFFFFF ));
 }
 
 static bool f64_le( float64_t a, float64_t b )
@@ -1487,13 +1487,13 @@ static bool f64_le( float64_t a, float64_t b )
 
     uiA = a.v;
     uiB = b.v;
-    if ( isNaNF64UI( uiA ) || isNaNF64UI( uiB ) ) {
+    ຖ້າ ( isNaNF64UI( uiA ) || isNaNF64UI( uiB ) ) {
         raiseFlags( flag_invalid );
-        return false;
+        ສົ່ງຄືນ false;
     }
     signA = signF64UI( uiA );
     signB = signF64UI( uiB );
-    return (signA != signB) ? signA || ! ((uiA | uiB) & UINT64_C( 0x7FFFFFFFFFFFFFFF ))
+    ສົ່ງຄືນ (signA != signB) ? signA || ! ((uiA | uiB) & UINT64_C( 0x7FFFFFFFFFFFFFFF ))
                             : (uiA == uiB) || (signA ^ (uiA < uiB));
 }
 
@@ -1505,13 +1505,13 @@ static bool f64_lt( float64_t a, float64_t b )
 
     uiA = a.v;
     uiB = b.v;
-    if ( isNaNF64UI( uiA ) || isNaNF64UI( uiB ) ) {
+    ຖ້າ ( isNaNF64UI( uiA ) || isNaNF64UI( uiB ) ) {
         raiseFlags( flag_invalid );
-        return false;
+        ສົ່ງຄືນ false;
     }
     signA = signF64UI( uiA );
     signB = signF64UI( uiB );
-    return (signA != signB) ? signA && ((uiA | uiB) & UINT64_C( 0x7FFFFFFFFFFFFFFF ))
+    ສົ່ງຄືນ (signA != signB) ? signA && ((uiA | uiB) & UINT64_C( 0x7FFFFFFFFFFFFFFF ))
                             : (uiA != uiB) && (signA ^ (uiA < uiB));
 }
 
@@ -1524,7 +1524,7 @@ static float64_t f64_mulAdd( float64_t a, float64_t b, float64_t c )
     uiA = a.v;
     uiB = b.v;
     uiC = c.v;
-    return softfloat_mulAddF64( uiA, uiB, uiC, 0 );
+    ສົ່ງຄືນ softfloat_mulAddF64( uiA, uiB, uiC, 0 );
 }
 
 static float64_t f64_mul( float64_t a, float64_t b )
@@ -1539,9 +1539,9 @@ static float64_t f64_mul( float64_t a, float64_t b )
     uint_fast64_t sigB;
     bool signZ;
     uint_fast64_t magBits;
-    struct exp16_sig64 normExpSig;
+    sa_nracanaa exp16_sig64 normExpSig;
     int_fast16_t expZ;
-    struct uint128 sig128Z;
+    sa_nracanaa uint128 sig128Z;
     uint_fast64_t sigZ, uiZ;
 
     /*------------------------------------------------------------------------
@@ -1557,26 +1557,26 @@ static float64_t f64_mul( float64_t a, float64_t b )
     signZ = signA ^ signB;
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
-    if ( expA == 0x7FF ) {
-        if ( sigA || ((expB == 0x7FF) && sigB) ) goto propagateNaN;
+    ຖ້າ ( expA == 0x7FF ) {
+        ຖ້າ ( sigA || ((expB == 0x7FF) && sigB) ) goto propagateNaN;
         magBits = expB | sigB;
         goto infArg;
     }
-    if ( expB == 0x7FF ) {
-        if ( sigB ) goto propagateNaN;
+    ຖ້າ ( expB == 0x7FF ) {
+        ຖ້າ ( sigB ) goto propagateNaN;
         magBits = expA | sigA;
         goto infArg;
     }
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
-    if ( ! expA ) {
-        if ( ! sigA ) goto zero;
+    ຖ້າ ( ! expA ) {
+        ຖ້າ ( ! sigA ) goto zero;
         normExpSig = softfloat_normSubnormalF64Sig( sigA );
         expA = normExpSig.exp;
         sigA = normExpSig.sig;
     }
-    if ( ! expB ) {
-        if ( ! sigB ) goto zero;
+    ຖ້າ ( ! expB ) {
+        ຖ້າ ( ! sigB ) goto zero;
         normExpSig = softfloat_normSubnormalF64Sig( sigB );
         expB = normExpSig.exp;
         sigB = normExpSig.sig;
@@ -1589,11 +1589,11 @@ static float64_t f64_mul( float64_t a, float64_t b )
     sig128Z = softfloat_mul64To128( sigA, sigB );
     sigZ = sig128Z.v64 | (sig128Z.v0 != 0);
 
-    if ( sigZ < UINT64_C( 0x4000000000000000 ) ) {
+    ຖ້າ ( sigZ < UINT64_C( 0x4000000000000000 ) ) {
         --expZ;
         sigZ <<= 1;
     }
-    return softfloat_roundPackToF64( signZ, expZ, sigZ );
+    ສົ່ງຄືນ softfloat_roundPackToF64( signZ, expZ, sigZ );
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
  propagateNaN:
@@ -1602,10 +1602,10 @@ static float64_t f64_mul( float64_t a, float64_t b )
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
  infArg:
-    if ( ! magBits ) {
+    ຖ້າ ( ! magBits ) {
         raiseFlags( flag_invalid );
         uiZ = defaultNaNF64UI;
-    } else {
+    } ບໍ່ດັ່ງນັ້ນ {
         uiZ = packToF64UI( signZ, 0x7FF, 0 );
     }
     goto uiZ;
@@ -1614,7 +1614,7 @@ static float64_t f64_mul( float64_t a, float64_t b )
  zero:
     uiZ = packToF64UI( signZ, 0, 0 );
  uiZ:
-    return float64_t::fromRaw(uiZ);
+    ສົ່ງຄືນ float64_t::fromRaw(uiZ);
 }
 
 static float64_t f64_rem( float64_t a, float64_t b )
@@ -1626,7 +1626,7 @@ static float64_t f64_rem( float64_t a, float64_t b )
     uint_fast64_t uiB;
     int_fast16_t expB;
     uint_fast64_t sigB;
-    struct exp16_sig64 normExpSig;
+    sa_nracanaa exp16_sig64 normExpSig;
     uint64_t rem;
     int_fast16_t expDiff;
     uint32_t q, recip32;
@@ -1646,27 +1646,27 @@ static float64_t f64_rem( float64_t a, float64_t b )
     sigB = fracF64UI( uiB );
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
-    if ( expA == 0x7FF ) {
-        if ( sigA || ((expB == 0x7FF) && sigB) ) goto propagateNaN;
+    ຖ້າ ( expA == 0x7FF ) {
+        ຖ້າ ( sigA || ((expB == 0x7FF) && sigB) ) goto propagateNaN;
         goto invalid;
     }
-    if ( expB == 0x7FF ) {
-        if ( sigB ) goto propagateNaN;
-        return a;
+    ຖ້າ ( expB == 0x7FF ) {
+        ຖ້າ ( sigB ) goto propagateNaN;
+        ສົ່ງຄືນ a;
     }
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
-    if ( expA < expB - 1 ) return a;
+    ຖ້າ ( expA < expB - 1 ) ສົ່ງຄືນ a;
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
-    if ( ! expB ) {
-        if ( ! sigB ) goto invalid;
+    ຖ້າ ( ! expB ) {
+        ຖ້າ ( ! sigB ) goto invalid;
         normExpSig = softfloat_normSubnormalF64Sig( sigB );
         expB = normExpSig.exp;
         sigB = normExpSig.sig;
     }
-    if ( ! expA ) {
-        if ( ! sigA ) return a;
+    ຖ້າ ( ! expA ) {
+        ຖ້າ ( ! sigA ) ສົ່ງຄືນ a;
         normExpSig = softfloat_normSubnormalF64Sig( sigA );
         expA = normExpSig.exp;
         sigA = normExpSig.sig;
@@ -1676,18 +1676,18 @@ static float64_t f64_rem( float64_t a, float64_t b )
     rem = sigA | UINT64_C( 0x0010000000000000 );
     sigB |= UINT64_C( 0x0010000000000000 );
     expDiff = expA - expB;
-    if ( expDiff < 1 ) {
-        if ( expDiff < -1 ) return a;
+    ຖ້າ ( expDiff < 1 ) {
+        ຖ້າ ( expDiff < -1 ) ສົ່ງຄືນ a;
         sigB <<= 9;
-        if ( expDiff ) {
+        ຖ້າ ( expDiff ) {
             rem <<= 8;
             q = 0;
-        } else {
+        } ບໍ່ດັ່ງນັ້ນ {
             rem <<= 9;
             q = (sigB <= rem);
-            if ( q ) rem -= sigB;
+            ຖ້າ ( q ) rem -= sigB;
         }
-    } else {
+    } ບໍ່ດັ່ງນັ້ນ {
         recip32 = softfloat_approxRecip32_1( sigB>>21 );
         /*--------------------------------------------------------------------
         | Changing the shift of `rem' here requires also changing the initial
@@ -1701,13 +1701,13 @@ static float64_t f64_rem( float64_t a, float64_t b )
         | the maximum possible.
         *--------------------------------------------------------------------*/
         sigB <<= 9;
-        for (;;) {
+        ສຳລັບ (;;) {
             q64 = (uint32_t) (rem>>32) * (uint_fast64_t) recip32;
-            if ( expDiff < 0 ) break;
+            ຖ້າ ( expDiff < 0 ) bha_nga;
             q = (q64 + 0x80000000)>>32;
             rem <<= 29;
             rem -= q * (uint64_t) sigB;
-            if ( rem & UINT64_C( 0x8000000000000000 ) ) rem += sigB;
+            ຖ້າ ( rem & UINT64_C( 0x8000000000000000 ) ) rem += sigB;
             expDiff -= 29;
         }
         /*--------------------------------------------------------------------
@@ -1715,7 +1715,7 @@ static float64_t f64_rem( float64_t a, float64_t b )
         *--------------------------------------------------------------------*/
         q = (uint32_t) (q64>>32)>>(~expDiff & 31);
         rem = (rem<<(expDiff + 30)) - q * (uint64_t) sigB;
-        if ( rem & UINT64_C( 0x8000000000000000 ) ) {
+        ຖ້າ ( rem & UINT64_C( 0x8000000000000000 ) ) {
             altRem = rem + sigB;
             goto selectRem;
         }
@@ -1726,21 +1726,21 @@ static float64_t f64_rem( float64_t a, float64_t b )
         altRem = rem;
         ++q;
         rem -= sigB;
-    } while ( ! (rem & UINT64_C( 0x8000000000000000 )) );
+    } ໃນຂະນະທີ່ ( ! (rem & UINT64_C( 0x8000000000000000 )) );
  selectRem:
     meanRem = rem + altRem;
-    if (
+    ຖ້າ (
         (meanRem & UINT64_C( 0x8000000000000000 )) || (! meanRem && (q & 1))
     ) {
         rem = altRem;
     }
     signRem = signA;
-    if ( rem & UINT64_C( 0x8000000000000000 ) ) {
+    ຖ້າ ( rem & UINT64_C( 0x8000000000000000 ) ) {
         signRem = ! signRem;
         //fixed unsigned unary minus: -x == ~x + 1
         rem = ~rem + 1;
     }
-    return softfloat_normRoundPackToF64( signRem, expB, rem );
+    ສົ່ງຄືນ softfloat_normRoundPackToF64( signRem, expB, rem );
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
  propagateNaN:
@@ -1750,7 +1750,7 @@ static float64_t f64_rem( float64_t a, float64_t b )
     raiseFlags( flag_invalid );
     uiZ = defaultNaNF64UI;
  uiZ:
-    return float64_t::fromRaw(uiZ);
+    ສົ່ງຄືນ float64_t::fromRaw(uiZ);
 }
 
 static float64_t f64_roundToInt( float64_t a, uint_fast8_t roundingMode, bool exact )
@@ -1765,57 +1765,57 @@ static float64_t f64_roundToInt( float64_t a, uint_fast8_t roundingMode, bool ex
     exp = expF64UI( uiA );
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
-    if ( exp <= 0x3FE ) {
-        if ( ! (uiA & UINT64_C( 0x7FFFFFFFFFFFFFFF )) ) return a;
-        if ( exact ) raiseFlags(flag_inexact);
+    ຖ້າ ( exp <= 0x3FE ) {
+        ຖ້າ ( ! (uiA & UINT64_C( 0x7FFFFFFFFFFFFFFF )) ) ສົ່ງຄືນ a;
+        ຖ້າ ( exact ) raiseFlags(flag_inexact);
         uiZ = uiA & packToF64UI( 1, 0, 0 );
         switch ( roundingMode ) {
-         case round_near_even:
-            if ( ! fracF64UI( uiA ) ) break;
+         pak_sa round_near_even:
+            ຖ້າ ( ! fracF64UI( uiA ) ) bha_nga;
             [[fallthrough]];
-         case round_near_maxMag:
-            if ( exp == 0x3FE ) uiZ |= packToF64UI( 0, 0x3FF, 0 );
-            break;
-         case round_min:
-            if ( uiZ ) uiZ = packToF64UI( 1, 0x3FF, 0 );
-            break;
-         case round_max:
-            if ( ! uiZ ) uiZ = packToF64UI( 0, 0x3FF, 0 );
-            break;
+         pak_sa round_near_maxMag:
+            ຖ້າ ( exp == 0x3FE ) uiZ |= packToF64UI( 0, 0x3FF, 0 );
+            bha_nga;
+         pak_sa round_min:
+            ຖ້າ ( uiZ ) uiZ = packToF64UI( 1, 0x3FF, 0 );
+            bha_nga;
+         pak_sa round_max:
+            ຖ້າ ( ! uiZ ) uiZ = packToF64UI( 0, 0x3FF, 0 );
+            bha_nga;
         }
         goto uiZ;
     }
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
-    if ( 0x433 <= exp ) {
-        if ( (exp == 0x7FF) && fracF64UI( uiA ) ) {
+    ຖ້າ ( 0x433 <= exp ) {
+        ຖ້າ ( (exp == 0x7FF) && fracF64UI( uiA ) ) {
             uiZ = softfloat_propagateNaNF64UI( uiA, 0 );
             goto uiZ;
         }
-        return a;
+        ສົ່ງຄືນ a;
     }
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
     uiZ = uiA;
     lastBitMask = (uint_fast64_t) 1<<(0x433 - exp);
     roundBitsMask = lastBitMask - 1;
-    if ( roundingMode == round_near_maxMag ) {
+    ຖ້າ ( roundingMode == round_near_maxMag ) {
         uiZ += lastBitMask>>1;
-    } else if ( roundingMode == round_near_even ) {
+    } ບໍ່ດັ່ງນັ້ນ ຖ້າ ( roundingMode == round_near_even ) {
         uiZ += lastBitMask>>1;
-        if ( ! (uiZ & roundBitsMask) ) uiZ &= ~lastBitMask;
-    } else if (
+        ຖ້າ ( ! (uiZ & roundBitsMask) ) uiZ &= ~lastBitMask;
+    } ບໍ່ດັ່ງນັ້ນ ຖ້າ (
         roundingMode
             == (signF64UI( uiZ ) ? round_min : round_max)
     ) {
         uiZ += roundBitsMask;
     }
     uiZ &= ~roundBitsMask;
-    if ( exact && (uiZ != uiA) ) {
+    ຖ້າ ( exact && (uiZ != uiA) ) {
         raiseFlags(flag_inexact);
     }
  uiZ:
-    return float64_t::fromRaw(uiZ);
+    ສົ່ງຄືນ float64_t::fromRaw(uiZ);
 }
 
 static float64_t f64_sqrt( float64_t a )
@@ -1824,7 +1824,7 @@ static float64_t f64_sqrt( float64_t a )
     bool signA;
     int_fast16_t expA;
     uint_fast64_t sigA, uiZ;
-    struct exp16_sig64 normExpSig;
+    sa_nracanaa exp16_sig64 normExpSig;
     int_fast16_t expZ;
     uint32_t sig32A, recipSqrt32, sig32Z;
     uint_fast64_t rem;
@@ -1839,24 +1839,24 @@ static float64_t f64_sqrt( float64_t a )
     sigA  = fracF64UI( uiA );
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
-    if ( expA == 0x7FF ) {
-        if ( sigA ) {
+    ຖ້າ ( expA == 0x7FF ) {
+        ຖ້າ ( sigA ) {
             uiZ = softfloat_propagateNaNF64UI( uiA, 0 );
             goto uiZ;
         }
-        if ( ! signA ) return a;
+        ຖ້າ ( ! signA ) ສົ່ງຄືນ a;
         goto invalid;
     }
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
-    if ( signA ) {
-        if ( ! (expA | sigA) ) return a;
+    ຖ້າ ( signA ) {
+        ຖ້າ ( ! (expA | sigA) ) ສົ່ງຄືນ a;
         goto invalid;
     }
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
-    if ( ! expA ) {
-        if ( ! sigA ) return a;
+    ຖ້າ ( ! expA ) {
+        ຖ້າ ( ! sigA ) ສົ່ງຄືນ a;
         normExpSig = softfloat_normSubnormalF64Sig( sigA );
         expA = normExpSig.exp;
         sigA = normExpSig.sig;
@@ -1872,10 +1872,10 @@ static float64_t f64_sqrt( float64_t a )
     sig32A = (uint32_t)(sigA>>21); //fixed warning on type cast
     recipSqrt32 = softfloat_approxRecipSqrt32_1( expA, sig32A );
     sig32Z = ((uint_fast64_t) sig32A * recipSqrt32)>>32;
-    if ( expA ) {
+    ຖ້າ ( expA ) {
         sigA <<= 8;
         sig32Z >>= 1;
-    } else {
+    } ບໍ່ດັ່ງນັ້ນ {
         sigA <<= 9;
     }
     rem = sigA - (uint_fast64_t) sig32Z * sig32Z;
@@ -1883,24 +1883,24 @@ static float64_t f64_sqrt( float64_t a )
     sigZ = ((uint_fast64_t) sig32Z<<32 | 1<<5) + ((uint_fast64_t) q<<3);
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
-    if ( (sigZ & 0x1FF) < 0x22 ) {
+    ຖ້າ ( (sigZ & 0x1FF) < 0x22 ) {
         sigZ &= ~(uint_fast64_t) 0x3F;
         shiftedSigZ = sigZ>>6;
         rem = (sigA<<52) - shiftedSigZ * shiftedSigZ;
-        if ( rem & UINT64_C( 0x8000000000000000 ) ) {
+        ຖ້າ ( rem & UINT64_C( 0x8000000000000000 ) ) {
             --sigZ;
-        } else {
-            if ( rem ) sigZ |= 1;
+        } ບໍ່ດັ່ງນັ້ນ {
+            ຖ້າ ( rem ) sigZ |= 1;
         }
     }
-    return softfloat_roundPackToF64( 0, expZ, sigZ );
+    ສົ່ງຄືນ softfloat_roundPackToF64( 0, expZ, sigZ );
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
  invalid:
     raiseFlags( flag_invalid );
     uiZ = defaultNaNF64UI;
  uiZ:
-    return float64_t::fromRaw(uiZ);
+    ສົ່ງຄືນ float64_t::fromRaw(uiZ);
 }
 
 static float64_t f64_sub( float64_t a, float64_t b )
@@ -1915,10 +1915,10 @@ static float64_t f64_sub( float64_t a, float64_t b )
     uiB = b.v;
     signB = signF64UI( uiB );
 
-    if ( signA == signB ) {
-        return softfloat_subMagsF64( uiA, uiB, signA );
-    } else {
-        return softfloat_addMagsF64( uiA, uiB, signA );
+    ຖ້າ ( signA == signB ) {
+        ສົ່ງຄືນ softfloat_subMagsF64( uiA, uiB, signA );
+    } ບໍ່ດັ່ງນັ້ນ {
+        ສົ່ງຄືນ softfloat_addMagsF64( uiA, uiB, signA );
     }
 }
 
@@ -1928,7 +1928,7 @@ static float32_t f64_to_f32( float64_t a )
     bool sign;
     int_fast16_t exp;
     uint_fast64_t frac;
-    struct commonNaN commonNaN;
+    sa_nracanaa commonNaN commonNaN;
     uint_fast32_t uiZ, frac32;
 
     /*------------------------------------------------------------------------
@@ -1939,11 +1939,11 @@ static float32_t f64_to_f32( float64_t a )
     frac = fracF64UI( uiA );
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
-    if ( exp == 0x7FF ) {
-        if ( frac ) {
+    ຖ້າ ( exp == 0x7FF ) {
+        ຖ້າ ( frac ) {
             softfloat_f64UIToCommonNaN( uiA, &commonNaN );
             uiZ = softfloat_commonNaNToF32UI( &commonNaN );
-        } else {
+        } ບໍ່ດັ່ງນັ້ນ {
             uiZ = packToF32UI( sign, 0xFF, 0 );
         }
         goto uiZ;
@@ -1951,15 +1951,15 @@ static float32_t f64_to_f32( float64_t a )
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
     frac32 = (uint_fast32_t)softfloat_shortShiftRightJam64( frac, 22 ); //fixed warning on type cast
-    if ( ! (exp | frac32) ) {
+    ຖ້າ ( ! (exp | frac32) ) {
         uiZ = packToF32UI( sign, 0, 0 );
         goto uiZ;
     }
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
-    return softfloat_roundPackToF32( sign, exp - 0x381, frac32 | 0x40000000 );
+    ສົ່ງຄືນ softfloat_roundPackToF32( sign, exp - 0x381, frac32 | 0x40000000 );
  uiZ:
-    return float32_t::fromRaw(uiZ);
+    ສົ່ງຄືນ float32_t::fromRaw(uiZ);
 }
 
 static int_fast32_t f64_to_i32( float64_t a, uint_fast8_t roundingMode, bool exact )
@@ -1978,24 +1978,24 @@ static int_fast32_t f64_to_i32( float64_t a, uint_fast8_t roundingMode, bool exa
     sig  = fracF64UI( uiA );
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
-#if (i32_fromNaN != i32_fromPosOverflow) || (i32_fromNaN != i32_fromNegOverflow)
-    if ( (exp == 0x7FF) && sig ) {
-#if (i32_fromNaN == i32_fromPosOverflow)
+#ຖ້າ (i32_fromNaN != i32_fromPosOverflow) || (i32_fromNaN != i32_fromNegOverflow)
+    ຖ້າ ( (exp == 0x7FF) && sig ) {
+#ຖ້າ (i32_fromNaN == i32_fromPosOverflow)
         sign = 0;
 #elif (i32_fromNaN == i32_fromNegOverflow)
         sign = 1;
-#else
+#ບໍ່ດັ່ງນັ້ນ
         raiseFlags( flag_invalid );
-        return i32_fromNaN;
+        ສົ່ງຄືນ i32_fromNaN;
 #endif
     }
 #endif
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
-    if ( exp ) sig |= UINT64_C( 0x0010000000000000 );
+    ຖ້າ ( exp ) sig |= UINT64_C( 0x0010000000000000 );
     shiftDist = 0x427 - exp;
-    if ( 0 < shiftDist ) sig = softfloat_shiftRightJam64( sig, shiftDist );
-    return softfloat_roundToI32( sign, sig, roundingMode, exact );
+    ຖ້າ ( 0 < shiftDist ) sig = softfloat_shiftRightJam64( sig, shiftDist );
+    ສົ່ງຄືນ softfloat_roundToI32( sign, sig, roundingMode, exact );
 }
 
 static int_fast64_t f64_to_i64(float64_t a, uint_fast8_t roundingMode, bool exact )
@@ -2014,42 +2014,42 @@ static int_fast64_t f64_to_i64(float64_t a, uint_fast8_t roundingMode, bool exac
     sig = fracF64UI(uiA);
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
-#if (i64_fromNaN != i64_fromPosOverflow) || (i64_fromNaN != i64_fromNegOverflow)
-    if ((exp == 0x7FF) && sig) {
-#if (i64_fromNaN == i64_fromPosOverflow)
+#ຖ້າ (i64_fromNaN != i64_fromPosOverflow) || (i64_fromNaN != i64_fromNegOverflow)
+    ຖ້າ ((exp == 0x7FF) && sig) {
+#ຖ້າ (i64_fromNaN == i64_fromPosOverflow)
         sign = 0;
 #elif (i64_fromNaN == i64_fromNegOverflow)
         sign = 1;
-#else
+#ບໍ່ດັ່ງນັ້ນ
         raiseFlags(flag_invalid);
-        return i64_fromNaN;
+        ສົ່ງຄືນ i64_fromNaN;
 #endif
     }
 #endif
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
-    if (exp) sig |= UINT64_C(0x0010000000000000);
+    ຖ້າ (exp) sig |= UINT64_C(0x0010000000000000);
     shiftDist = 0x433 - exp;
-    if (shiftDist <= 0) {
+    ຖ້າ (shiftDist <= 0) {
         bool isValid = shiftDist >= -11;
-        if (isValid)
+        ຖ້າ (isValid)
         {
             uint_fast64_t z = sig << -shiftDist;
-            if (0 == (z & UINT64_C(0x8000000000000000)))
+            ຖ້າ (0 == (z & UINT64_C(0x8000000000000000)))
             {
-                return sign ? -(int_fast64_t)z : (int_fast64_t)z;
+                ສົ່ງຄືນ sign ? -(int_fast64_t)z : (int_fast64_t)z;
             }
         }
         raiseFlags(flag_invalid);
-        return sign ? i64_fromNegOverflow : i64_fromPosOverflow;
+        ສົ່ງຄືນ sign ? i64_fromNegOverflow : i64_fromPosOverflow;
     }
-    else {
-        if (shiftDist < 64)
-            return
+    ບໍ່ດັ່ງນັ້ນ {
+        ຖ້າ (shiftDist < 64)
+            ສົ່ງຄືນ
                 softfloat_roundToI64(
                     sign, sig >> shiftDist, sig << (-shiftDist & 63), roundingMode, exact);
-        else
-            return
+        ບໍ່ດັ່ງນັ້ນ
+            ສົ່ງຄືນ
                 softfloat_roundToI64(
                     sign, 0, (shiftDist == 64) ? sig : (sig != 0), roundingMode, exact);
     }
@@ -2072,26 +2072,26 @@ static int_fast32_t f64_to_i32_r_minMag( float64_t a, bool exact )
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
     shiftDist = 0x433 - exp;
-    if ( 53 <= shiftDist ) {
-        if ( exact && (exp | sig) ) {
+    ຖ້າ ( 53 <= shiftDist ) {
+        ຖ້າ ( exact && (exp | sig) ) {
             raiseFlags(flag_inexact);
         }
-        return 0;
+        ສົ່ງຄືນ 0;
     }
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
     sign = signF64UI( uiA );
-    if ( shiftDist < 22 ) {
-        if (
+    ຖ້າ ( shiftDist < 22 ) {
+        ຖ້າ (
             sign && (exp == 0x41E) && (sig < UINT64_C( 0x0000000000200000 ))
         ) {
-            if ( exact && sig ) {
+            ຖ້າ ( exact && sig ) {
                 raiseFlags(flag_inexact);
             }
-            return -0x7FFFFFFF - 1;
+            ສົ່ງຄືນ -0x7FFFFFFF - 1;
         }
         raiseFlags( flag_invalid );
-        return
+        ສົ່ງຄືນ
             (exp == 0x7FF) && sig ? i32_fromNaN
                 : sign ? i32_fromNegOverflow : i32_fromPosOverflow;
     }
@@ -2099,10 +2099,10 @@ static int_fast32_t f64_to_i32_r_minMag( float64_t a, bool exact )
     *------------------------------------------------------------------------*/
     sig |= UINT64_C( 0x0010000000000000 );
     absZ = (int_fast32_t)(sig>>shiftDist); //fixed warning on type cast
-    if ( exact && ((uint_fast64_t) (uint_fast32_t) absZ<<shiftDist != sig) ) {
+    ຖ້າ ( exact && ((uint_fast64_t) (uint_fast32_t) absZ<<shiftDist != sig) ) {
         raiseFlags(flag_inexact);
     }
-    return sign ? -absZ : absZ;
+    ສົ່ງຄືນ sign ? -absZ : absZ;
 }
 
 static float32_t i32_to_f32( int32_t a )
@@ -2111,12 +2111,12 @@ static float32_t i32_to_f32( int32_t a )
     uint_fast32_t absA;
 
     sign = (a < 0);
-    if ( ! (a & 0x7FFFFFFF) ) {
-        return float32_t::fromRaw(sign ? packToF32UI( 1, 0x9E, 0 ) : 0);
+    ຖ້າ ( ! (a & 0x7FFFFFFF) ) {
+        ສົ່ງຄືນ float32_t::fromRaw(sign ? packToF32UI( 1, 0x9E, 0 ) : 0);
     }
     //fixed unsigned unary minus: -x == ~x + 1
     absA = sign ? (~(uint_fast32_t) a + 1) : (uint_fast32_t) a;
-    return softfloat_normRoundPackToF32( sign, 0x9C, absA );
+    ສົ່ງຄືນ softfloat_normRoundPackToF32( sign, 0x9C, absA );
 }
 
 static float64_t i32_to_f64( int32_t a )
@@ -2126,9 +2126,9 @@ static float64_t i32_to_f64( int32_t a )
     uint_fast32_t absA;
     int_fast8_t shiftDist;
 
-    if ( ! a ) {
+    ຖ້າ ( ! a ) {
         uiZ = 0;
-    } else {
+    } ບໍ່ດັ່ງນັ້ນ {
         sign = (a < 0);
         //fixed unsigned unary minus: -x == ~x + 1
         absA = sign ? (~(uint_fast32_t) a + 1) : (uint_fast32_t) a;
@@ -2137,7 +2137,7 @@ static float64_t i32_to_f64( int32_t a )
             packToF64UI(
                 sign, 0x432 - shiftDist, (uint_fast64_t) absA<<shiftDist );
     }
-    return float64_t::fromRaw(uiZ);
+    ສົ່ງຄືນ float64_t::fromRaw(uiZ);
 }
 
 static float32_t i64_to_f32( int64_t a )
@@ -2151,15 +2151,15 @@ static float32_t i64_to_f32( int64_t a )
     //fixed unsigned unary minus: -x == ~x + 1
     absA = sign ? (~(uint_fast64_t) a + 1) : (uint_fast64_t) a;
     shiftDist = softfloat_countLeadingZeros64( absA ) - 40;
-    if ( 0 <= shiftDist ) {
-        return float32_t::fromRaw(a ? packToF32UI(sign, 0x95 - shiftDist, (uint_fast32_t) absA<<shiftDist ) : 0);
-    } else {
+    ຖ້າ ( 0 <= shiftDist ) {
+        ສົ່ງຄືນ float32_t::fromRaw(a ? packToF32UI(sign, 0x95 - shiftDist, (uint_fast32_t) absA<<shiftDist ) : 0);
+    } ບໍ່ດັ່ງນັ້ນ {
         shiftDist += 7;
         sig =
             (shiftDist < 0)
                 ? (uint_fast32_t) softfloat_shortShiftRightJam64( absA, -shiftDist ) //fixed warning on type cast
                 : (uint_fast32_t) absA<<shiftDist;
-        return softfloat_roundPackToF32( sign, 0x9C - shiftDist, sig );
+        ສົ່ງຄືນ softfloat_roundPackToF32( sign, 0x9C - shiftDist, sig );
     }
 }
 
@@ -2169,12 +2169,12 @@ static float64_t i64_to_f64( int64_t a )
     uint_fast64_t absA;
 
     sign = (a < 0);
-    if ( ! (a & UINT64_C( 0x7FFFFFFFFFFFFFFF )) ) {
-        return float64_t::fromRaw(sign ? packToF64UI( 1, 0x43E, 0 ) : 0);
+    ຖ້າ ( ! (a & UINT64_C( 0x7FFFFFFFFFFFFFFF )) ) {
+        ສົ່ງຄືນ float64_t::fromRaw(sign ? packToF64UI( 1, 0x43E, 0 ) : 0);
     }
     //fixed unsigned unary minus: -x == ~x + 1
     absA = sign ? (~(uint_fast64_t) a + 1) : (uint_fast64_t) a;
-    return softfloat_normRoundPackToF64( sign, 0x43C, absA );
+    ສົ່ງຄືນ softfloat_normRoundPackToF64( sign, 0x43C, absA );
 }
 
 static float32_t softfloat_addMagsF32( uint_fast32_t uiA, uint_fast32_t uiB )
@@ -2198,44 +2198,44 @@ static float32_t softfloat_addMagsF32( uint_fast32_t uiA, uint_fast32_t uiB )
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
     expDiff = expA - expB;
-    if ( ! expDiff ) {
+    ຖ້າ ( ! expDiff ) {
         /*--------------------------------------------------------------------
         *--------------------------------------------------------------------*/
-        if ( ! expA ) {
+        ຖ້າ ( ! expA ) {
             uiZ = uiA + sigB;
             goto uiZ;
         }
-        if ( expA == 0xFF ) {
-            if ( sigA | sigB ) goto propagateNaN;
+        ຖ້າ ( expA == 0xFF ) {
+            ຖ້າ ( sigA | sigB ) goto propagateNaN;
             uiZ = uiA;
             goto uiZ;
         }
         signZ = signF32UI( uiA );
         expZ = expA;
         sigZ = 0x01000000 + sigA + sigB;
-        if ( ! (sigZ & 1) && (expZ < 0xFE) ) {
+        ຖ້າ ( ! (sigZ & 1) && (expZ < 0xFE) ) {
             uiZ = packToF32UI( signZ, expZ, sigZ>>1 );
             goto uiZ;
         }
         sigZ <<= 6;
-    } else {
+    } ບໍ່ດັ່ງນັ້ນ {
         /*--------------------------------------------------------------------
         *--------------------------------------------------------------------*/
         signZ = signF32UI( uiA );
         sigA <<= 6;
         sigB <<= 6;
-        if ( expDiff < 0 ) {
-            if ( expB == 0xFF ) {
-                if ( sigB ) goto propagateNaN;
+        ຖ້າ ( expDiff < 0 ) {
+            ຖ້າ ( expB == 0xFF ) {
+                ຖ້າ ( sigB ) goto propagateNaN;
                 uiZ = packToF32UI( signZ, 0xFF, 0 );
                 goto uiZ;
             }
             expZ = expB;
             sigA += expA ? 0x20000000 : sigA;
             sigA = softfloat_shiftRightJam32( sigA, -expDiff );
-        } else {
-            if ( expA == 0xFF ) {
-                if ( sigA ) goto propagateNaN;
+        } ບໍ່ດັ່ງນັ້ນ {
+            ຖ້າ ( expA == 0xFF ) {
+                ຖ້າ ( sigA ) goto propagateNaN;
                 uiZ = uiA;
                 goto uiZ;
             }
@@ -2244,18 +2244,18 @@ static float32_t softfloat_addMagsF32( uint_fast32_t uiA, uint_fast32_t uiB )
             sigB = softfloat_shiftRightJam32( sigB, expDiff );
         }
         sigZ = 0x20000000 + sigA + sigB;
-        if ( sigZ < 0x40000000 ) {
+        ຖ້າ ( sigZ < 0x40000000 ) {
             --expZ;
             sigZ <<= 1;
         }
     }
-    return softfloat_roundPackToF32( signZ, expZ, sigZ );
+    ສົ່ງຄືນ softfloat_roundPackToF32( signZ, expZ, sigZ );
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
  propagateNaN:
     uiZ = softfloat_propagateNaNF32UI( uiA, uiB );
  uiZ:
-    return float32_t::fromRaw(uiZ);
+    ສົ່ງຄືນ float32_t::fromRaw(uiZ);
 }
 
 static float64_t
@@ -2279,71 +2279,71 @@ static float64_t
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
     expDiff = expA - expB;
-    if ( ! expDiff ) {
+    ຖ້າ ( ! expDiff ) {
         /*--------------------------------------------------------------------
         *--------------------------------------------------------------------*/
-        if ( ! expA ) {
+        ຖ້າ ( ! expA ) {
             uiZ = uiA + sigB;
             goto uiZ;
         }
-        if ( expA == 0x7FF ) {
-            if ( sigA | sigB ) goto propagateNaN;
+        ຖ້າ ( expA == 0x7FF ) {
+            ຖ້າ ( sigA | sigB ) goto propagateNaN;
             uiZ = uiA;
             goto uiZ;
         }
         expZ = expA;
         sigZ = UINT64_C( 0x0020000000000000 ) + sigA + sigB;
         sigZ <<= 9;
-    } else {
+    } ບໍ່ດັ່ງນັ້ນ {
         /*--------------------------------------------------------------------
         *--------------------------------------------------------------------*/
         sigA <<= 9;
         sigB <<= 9;
-        if ( expDiff < 0 ) {
-            if ( expB == 0x7FF ) {
-                if ( sigB ) goto propagateNaN;
+        ຖ້າ ( expDiff < 0 ) {
+            ຖ້າ ( expB == 0x7FF ) {
+                ຖ້າ ( sigB ) goto propagateNaN;
                 uiZ = packToF64UI( signZ, 0x7FF, 0 );
                 goto uiZ;
             }
             expZ = expB;
-            if ( expA ) {
+            ຖ້າ ( expA ) {
                 sigA += UINT64_C( 0x2000000000000000 );
-            } else {
+            } ບໍ່ດັ່ງນັ້ນ {
                 sigA <<= 1;
             }
             sigA = softfloat_shiftRightJam64( sigA, -expDiff );
-        } else {
-            if ( expA == 0x7FF ) {
-                if ( sigA ) goto propagateNaN;
+        } ບໍ່ດັ່ງນັ້ນ {
+            ຖ້າ ( expA == 0x7FF ) {
+                ຖ້າ ( sigA ) goto propagateNaN;
                 uiZ = uiA;
                 goto uiZ;
             }
             expZ = expA;
-            if ( expB ) {
+            ຖ້າ ( expB ) {
                 sigB += UINT64_C( 0x2000000000000000 );
-            } else {
+            } ບໍ່ດັ່ງນັ້ນ {
                 sigB <<= 1;
             }
             sigB = softfloat_shiftRightJam64( sigB, expDiff );
         }
         sigZ = UINT64_C( 0x2000000000000000 ) + sigA + sigB;
-        if ( sigZ < UINT64_C( 0x4000000000000000 ) ) {
+        ຖ້າ ( sigZ < UINT64_C( 0x4000000000000000 ) ) {
             --expZ;
             sigZ <<= 1;
         }
     }
-    return softfloat_roundPackToF64( signZ, expZ, sigZ );
+    ສົ່ງຄືນ softfloat_roundPackToF64( signZ, expZ, sigZ );
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
  propagateNaN:
     uiZ = softfloat_propagateNaNF64UI( uiA, uiB );
  uiZ:
-    return float64_t::fromRaw(uiZ);
+    ສົ່ງຄືນ float64_t::fromRaw(uiZ);
 }
 
-static uint32_t softfloat_approxRecipSqrt32_1( unsigned int oddExpA, uint32_t a )
+static uint32_t softfloat_approxRecipSqrt32_1( unsigned ຈຳນວນເຕັມ oddExpA, uint32_t a )
 {
-    int index;
+    ຈຳນວນເຕັມ index;
     uint16_t eps, r0;
     uint_fast32_t ESqrR0;
     uint32_t sigma0;
@@ -2356,33 +2356,33 @@ static uint32_t softfloat_approxRecipSqrt32_1( unsigned int oddExpA, uint32_t a 
              - ((softfloat_approxRecipSqrt_1k1s[index] * (uint_fast32_t) eps)
                     >>20);
     ESqrR0 = (uint_fast32_t) r0 * r0;
-    if ( ! oddExpA ) ESqrR0 <<= 1;
+    ຖ້າ ( ! oddExpA ) ESqrR0 <<= 1;
     sigma0 = ~(uint_fast32_t) (((uint32_t) ESqrR0 * (uint_fast64_t) a)>>23);
     r = (uint_fast32_t)(((uint_fast32_t) r0<<16) + ((r0 * (uint_fast64_t) sigma0)>>25)); //fixed warning on type cast
     sqrSigma0 = ((uint_fast64_t) sigma0 * sigma0)>>32;
     r += ((uint32_t) ((r>>1) + (r>>3) - ((uint_fast32_t) r0<<14))
               * (uint_fast64_t) sqrSigma0)
              >>48;
-    if ( ! (r & 0x80000000) ) r = 0x80000000;
-    return r;
+    ຖ້າ ( ! (r & 0x80000000) ) r = 0x80000000;
+    ສົ່ງຄືນ r;
 }
 
 /*----------------------------------------------------------------------------
 | Converts the common NaN pointed to by `aPtr' into a 32-bit floating-point
 | NaN, and returns the bit pattern of this value as an unsigned integer.
 *----------------------------------------------------------------------------*/
-static uint_fast32_t softfloat_commonNaNToF32UI( const struct commonNaN *aPtr )
+static uint_fast32_t softfloat_commonNaNToF32UI( const sa_nracanaa commonNaN *aPtr )
 {
-    return (uint_fast32_t) aPtr->sign<<31 | 0x7FC00000 | aPtr->v64>>41;
+    ສົ່ງຄືນ (uint_fast32_t) aPtr->sign<<31 | 0x7FC00000 | aPtr->v64>>41;
 }
 
 /*----------------------------------------------------------------------------
 | Converts the common NaN pointed to by `aPtr' into a 64-bit floating-point
 | NaN, and returns the bit pattern of this value as an unsigned integer.
 *----------------------------------------------------------------------------*/
-static uint_fast64_t softfloat_commonNaNToF64UI( const struct commonNaN *aPtr )
+static uint_fast64_t softfloat_commonNaNToF64UI( const sa_nracanaa commonNaN *aPtr )
 {
-    return
+    ສົ່ງຄືນ
         (uint_fast64_t) aPtr->sign<<63 | UINT64_C( 0x7FF8000000000000 )
             | aPtr->v64>>12;
 }
@@ -2394,23 +2394,23 @@ static uint_fast8_t softfloat_countLeadingZeros64( uint64_t a )
 
     count = 0;
     a32 = a>>32;
-    if ( ! a32 ) {
+    ຖ້າ ( ! a32 ) {
         count = 32;
         a32 = (uint32_t) a; //fixed warning on type cast
     }
     /*------------------------------------------------------------------------
     | From here, result is current count + count leading zeros of `a32'.
     *------------------------------------------------------------------------*/
-    if ( a32 < 0x10000 ) {
+    ຖ້າ ( a32 < 0x10000 ) {
         count += 16;
         a32 <<= 16;
     }
-    if ( a32 < 0x1000000 ) {
+    ຖ້າ ( a32 < 0x1000000 ) {
         count += 8;
         a32 <<= 8;
     }
     count += softfloat_countLeadingZeros8[a32>>24];
-    return count;
+    ສົ່ງຄືນ count;
 }
 
 /*----------------------------------------------------------------------------
@@ -2419,9 +2419,9 @@ static uint_fast8_t softfloat_countLeadingZeros64( uint64_t a )
 | location pointed to by `zPtr'.  If the NaN is a signaling NaN, the invalid
 | exception is raised.
 *----------------------------------------------------------------------------*/
-static void softfloat_f32UIToCommonNaN( uint_fast32_t uiA, struct commonNaN *zPtr )
+static void softfloat_f32UIToCommonNaN( uint_fast32_t uiA, sa_nracanaa commonNaN *zPtr )
 {
-    if ( softfloat_isSigNaNF32UI( uiA ) ) {
+    ຖ້າ ( softfloat_isSigNaNF32UI( uiA ) ) {
         raiseFlags( flag_invalid );
     }
     zPtr->sign = (uiA>>31) != 0;
@@ -2435,9 +2435,9 @@ static void softfloat_f32UIToCommonNaN( uint_fast32_t uiA, struct commonNaN *zPt
 | location pointed to by `zPtr'.  If the NaN is a signaling NaN, the invalid
 | exception is raised.
 *----------------------------------------------------------------------------*/
-static void softfloat_f64UIToCommonNaN( uint_fast64_t uiA, struct commonNaN *zPtr )
+static void softfloat_f64UIToCommonNaN( uint_fast64_t uiA, sa_nracanaa commonNaN *zPtr )
 {
-    if ( softfloat_isSigNaNF64UI( uiA ) ) {
+    ຖ້າ ( softfloat_isSigNaNF64UI( uiA ) ) {
         raiseFlags( flag_invalid );
     }
     zPtr->sign = (uiA>>63) != 0;
@@ -2445,10 +2445,10 @@ static void softfloat_f64UIToCommonNaN( uint_fast64_t uiA, struct commonNaN *zPt
     zPtr->v0   = 0;
 }
 
-static struct uint128 softfloat_mul64To128( uint64_t a, uint64_t b )
+static sa_nracanaa uint128 softfloat_mul64To128( uint64_t a, uint64_t b )
 {
     uint32_t a32, a0, b32, b0;
-    struct uint128 z;
+    sa_nracanaa uint128 z;
     uint64_t mid1, mid;
 
     a32 = a>>32;
@@ -2463,7 +2463,7 @@ static struct uint128 softfloat_mul64To128( uint64_t a, uint64_t b )
     mid <<= 32;
     z.v0 += mid;
     z.v64 += (z.v0 < mid);
-    return z;
+    ສົ່ງຄືນ z;
 }
 
 static float32_t
@@ -2481,7 +2481,7 @@ static float32_t
     uint_fast32_t sigC;
     bool signProd;
     uint_fast32_t magBits, uiZ;
-    struct exp16_sig32 normExpSig;
+    sa_nracanaa exp16_sig32 normExpSig;
     int_fast16_t expProd;
     uint_fast64_t sigProd;
     bool signZ;
@@ -2505,18 +2505,18 @@ static float32_t
     signProd = signA ^ signB ^ (op == softfloat_mulAdd_subProd);
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
-    if ( expA == 0xFF ) {
-        if ( sigA || ((expB == 0xFF) && sigB) ) goto propagateNaN_ABC;
+    ຖ້າ ( expA == 0xFF ) {
+        ຖ້າ ( sigA || ((expB == 0xFF) && sigB) ) goto propagateNaN_ABC;
         magBits = expB | sigB;
         goto infProdArg;
     }
-    if ( expB == 0xFF ) {
-        if ( sigB ) goto propagateNaN_ABC;
+    ຖ້າ ( expB == 0xFF ) {
+        ຖ້າ ( sigB ) goto propagateNaN_ABC;
         magBits = expA | sigA;
         goto infProdArg;
     }
-    if ( expC == 0xFF ) {
-        if ( sigC ) {
+    ຖ້າ ( expC == 0xFF ) {
+        ຖ້າ ( sigC ) {
             uiZ = 0;
             goto propagateNaN_ZC;
         }
@@ -2525,14 +2525,14 @@ static float32_t
     }
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
-    if ( ! expA ) {
-        if ( ! sigA ) goto zeroProd;
+    ຖ້າ ( ! expA ) {
+        ຖ້າ ( ! sigA ) goto zeroProd;
         normExpSig = softfloat_normSubnormalF32Sig( sigA );
         expA = normExpSig.exp;
         sigA = normExpSig.sig;
     }
-    if ( ! expB ) {
-        if ( ! sigB ) goto zeroProd;
+    ຖ້າ ( ! expB ) {
+        ຖ້າ ( ! sigB ) goto zeroProd;
         normExpSig = softfloat_normSubnormalF32Sig( sigB );
         expB = normExpSig.exp;
         sigB = normExpSig.sig;
@@ -2543,13 +2543,13 @@ static float32_t
     sigA = (sigA | 0x00800000)<<7;
     sigB = (sigB | 0x00800000)<<7;
     sigProd = (uint_fast64_t) sigA * sigB;
-    if ( sigProd < UINT64_C( 0x2000000000000000 ) ) {
+    ຖ້າ ( sigProd < UINT64_C( 0x2000000000000000 ) ) {
         --expProd;
         sigProd <<= 1;
     }
     signZ = signProd;
-    if ( ! expC ) {
-        if ( ! sigC ) {
+    ຖ້າ ( ! expC ) {
+        ຖ້າ ( ! sigC ) {
             expZ = expProd - 1;
             sigZ = (uint_fast32_t) softfloat_shortShiftRightJam64( sigProd, 31 ); //fixed warning on type cast
             goto roundPack;
@@ -2562,13 +2562,13 @@ static float32_t
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
     expDiff = expProd - expC;
-    if ( signProd == signC ) {
+    ຖ້າ ( signProd == signC ) {
         /*--------------------------------------------------------------------
         *--------------------------------------------------------------------*/
-        if ( expDiff <= 0 ) {
+        ຖ້າ ( expDiff <= 0 ) {
             expZ = expC;
             sigZ = sigC + (uint_fast32_t) softfloat_shiftRightJam64( sigProd, 32 - expDiff ); //fixed warning on type cast
-        } else {
+        } ບໍ່ດັ່ງນັ້ນ {
             expZ = expProd;
             sig64Z =
                 sigProd
@@ -2576,42 +2576,42 @@ static float32_t
                           (uint_fast64_t) sigC<<32, expDiff );
             sigZ = (uint_fast32_t) softfloat_shortShiftRightJam64( sig64Z, 32 ); //fixed warning on type cast
         }
-        if ( sigZ < 0x40000000 ) {
+        ຖ້າ ( sigZ < 0x40000000 ) {
             --expZ;
             sigZ <<= 1;
         }
-    } else {
+    } ບໍ່ດັ່ງນັ້ນ {
         /*--------------------------------------------------------------------
         *--------------------------------------------------------------------*/
         sig64C = (uint_fast64_t) sigC<<32;
-        if ( expDiff < 0 ) {
+        ຖ້າ ( expDiff < 0 ) {
             signZ = signC;
             expZ = expC;
             sig64Z = sig64C - softfloat_shiftRightJam64( sigProd, -expDiff );
-        } else if ( ! expDiff ) {
+        } ບໍ່ດັ່ງນັ້ນ ຖ້າ ( ! expDiff ) {
             expZ = expProd;
             sig64Z = sigProd - sig64C;
-            if ( ! sig64Z ) goto completeCancellation;
-            if ( sig64Z & UINT64_C( 0x8000000000000000 ) ) {
+            ຖ້າ ( ! sig64Z ) goto completeCancellation;
+            ຖ້າ ( sig64Z & UINT64_C( 0x8000000000000000 ) ) {
                 signZ = ! signZ;
                 //fixed unsigned unary minus: -x == ~x + 1
                 sig64Z = ~sig64Z + 1;
             }
-        } else {
+        } ບໍ່ດັ່ງນັ້ນ {
             expZ = expProd;
             sig64Z = sigProd - softfloat_shiftRightJam64( sig64C, expDiff );
         }
         shiftDist = softfloat_countLeadingZeros64( sig64Z ) - 1;
         expZ -= shiftDist;
         shiftDist -= 32;
-        if ( shiftDist < 0 ) {
+        ຖ້າ ( shiftDist < 0 ) {
             sigZ = (uint_fast32_t) softfloat_shortShiftRightJam64( sig64Z, -shiftDist ); //fixed warning on type cast
-        } else {
+        } ບໍ່ດັ່ງນັ້ນ {
             sigZ = (uint_fast32_t) sig64Z<<shiftDist;
         }
     }
  roundPack:
-    return softfloat_roundPackToF32( signZ, expZ, sigZ );
+    ສົ່ງຄືນ softfloat_roundPackToF32( signZ, expZ, sigZ );
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
  propagateNaN_ABC:
@@ -2620,11 +2620,11 @@ static float32_t
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
  infProdArg:
-    if ( magBits ) {
+    ຖ້າ ( magBits ) {
         uiZ = packToF32UI( signProd, 0xFF, 0 );
-        if ( expC != 0xFF ) goto uiZ;
-        if ( sigC ) goto propagateNaN_ZC;
-        if ( signProd == signC ) goto uiZ;
+        ຖ້າ ( expC != 0xFF ) goto uiZ;
+        ຖ້າ ( sigC ) goto propagateNaN_ZC;
+        ຖ້າ ( signProd == signC ) goto uiZ;
     }
     raiseFlags( flag_invalid );
     uiZ = defaultNaNF32UI;
@@ -2635,13 +2635,13 @@ static float32_t
     *------------------------------------------------------------------------*/
  zeroProd:
     uiZ = uiC;
-    if ( ! (expC | sigC) && (signProd != signC) ) {
+    ຖ້າ ( ! (expC | sigC) && (signProd != signC) ) {
  completeCancellation:
         uiZ =
             packToF32UI((globalRoundingMode == round_min), 0, 0 );
     }
  uiZ:
-    return float32_t::fromRaw(uiZ);
+    ສົ່ງຄືນ float32_t::fromRaw(uiZ);
 }
 
 static float64_t
@@ -2659,12 +2659,12 @@ static float64_t
     uint_fast64_t sigC;
     bool signZ;
     uint_fast64_t magBits, uiZ;
-    struct exp16_sig64 normExpSig;
+    sa_nracanaa exp16_sig64 normExpSig;
     int_fast16_t expZ;
-    struct uint128 sig128Z;
+    sa_nracanaa uint128 sig128Z;
     uint_fast64_t sigZ;
     int_fast16_t expDiff;
-    struct uint128 sig128C;
+    sa_nracanaa uint128 sig128C;
     int_fast8_t shiftDist;
 
     /*------------------------------------------------------------------------
@@ -2681,18 +2681,18 @@ static float64_t
     signZ = signA ^ signB ^ (op == softfloat_mulAdd_subProd);
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
-    if ( expA == 0x7FF ) {
-        if ( sigA || ((expB == 0x7FF) && sigB) ) goto propagateNaN_ABC;
+    ຖ້າ ( expA == 0x7FF ) {
+        ຖ້າ ( sigA || ((expB == 0x7FF) && sigB) ) goto propagateNaN_ABC;
         magBits = expB | sigB;
         goto infProdArg;
     }
-    if ( expB == 0x7FF ) {
-        if ( sigB ) goto propagateNaN_ABC;
+    ຖ້າ ( expB == 0x7FF ) {
+        ຖ້າ ( sigB ) goto propagateNaN_ABC;
         magBits = expA | sigA;
         goto infProdArg;
     }
-    if ( expC == 0x7FF ) {
-        if ( sigC ) {
+    ຖ້າ ( expC == 0x7FF ) {
+        ຖ້າ ( sigC ) {
             uiZ = 0;
             goto propagateNaN_ZC;
         }
@@ -2701,14 +2701,14 @@ static float64_t
     }
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
-    if ( ! expA ) {
-        if ( ! sigA ) goto zeroProd;
+    ຖ້າ ( ! expA ) {
+        ຖ້າ ( ! sigA ) goto zeroProd;
         normExpSig = softfloat_normSubnormalF64Sig( sigA );
         expA = normExpSig.exp;
         sigA = normExpSig.sig;
     }
-    if ( ! expB ) {
-        if ( ! sigB ) goto zeroProd;
+    ຖ້າ ( ! expB ) {
+        ຖ້າ ( ! sigB ) goto zeroProd;
         normExpSig = softfloat_normSubnormalF64Sig( sigB );
         expB = normExpSig.exp;
         sigB = normExpSig.sig;
@@ -2719,14 +2719,14 @@ static float64_t
     sigA = (sigA | UINT64_C( 0x0010000000000000 ))<<10;
     sigB = (sigB | UINT64_C( 0x0010000000000000 ))<<10;
     sig128Z = softfloat_mul64To128( sigA, sigB );
-    if ( sig128Z.v64 < UINT64_C( 0x2000000000000000 ) ) {
+    ຖ້າ ( sig128Z.v64 < UINT64_C( 0x2000000000000000 ) ) {
         --expZ;
         sig128Z =
             softfloat_add128(
                 sig128Z.v64, sig128Z.v0, sig128Z.v64, sig128Z.v0 );
     }
-    if ( ! expC ) {
-        if ( ! sigC ) {
+    ຖ້າ ( ! expC ) {
+        ຖ້າ ( ! sigC ) {
             --expZ;
             sigZ = sig128Z.v64<<1 | (sig128Z.v0 != 0);
             goto roundPack;
@@ -2741,64 +2741,64 @@ static float64_t
     //fixed initialization
     sig128C.v0 = sig128C.v64 = 0;
     expDiff = expZ - expC;
-    if ( expDiff < 0 ) {
+    ຖ້າ ( expDiff < 0 ) {
         expZ = expC;
-        if ( (signZ == signC) || (expDiff < -1) ) {
+        ຖ້າ ( (signZ == signC) || (expDiff < -1) ) {
             sig128Z.v64 = softfloat_shiftRightJam64( sig128Z.v64, -expDiff );
-        } else {
+        } ບໍ່ດັ່ງນັ້ນ {
             sig128Z =
                 softfloat_shortShiftRightJam128( sig128Z.v64, sig128Z.v0, 1 );
         }
-    } else if ( expDiff ) {
+    } ບໍ່ດັ່ງນັ້ນ ຖ້າ ( expDiff ) {
         sig128C = softfloat_shiftRightJam128( sigC, 0, expDiff );
     }
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
-    if ( signZ == signC ) {
+    ຖ້າ ( signZ == signC ) {
         /*--------------------------------------------------------------------
         *--------------------------------------------------------------------*/
-        if ( expDiff <= 0 ) {
+        ຖ້າ ( expDiff <= 0 ) {
             sigZ = (sigC + sig128Z.v64) | (sig128Z.v0 != 0);
-        } else {
+        } ບໍ່ດັ່ງນັ້ນ {
             sig128Z =
                 softfloat_add128(
                     sig128Z.v64, sig128Z.v0, sig128C.v64, sig128C.v0 );
             sigZ = sig128Z.v64 | (sig128Z.v0 != 0);
         }
-        if ( sigZ < UINT64_C( 0x4000000000000000 ) ) {
+        ຖ້າ ( sigZ < UINT64_C( 0x4000000000000000 ) ) {
             --expZ;
             sigZ <<= 1;
         }
-    } else {
+    } ບໍ່ດັ່ງນັ້ນ {
         /*--------------------------------------------------------------------
         *--------------------------------------------------------------------*/
-        if ( expDiff < 0 ) {
+        ຖ້າ ( expDiff < 0 ) {
             signZ = signC;
             sig128Z = softfloat_sub128( sigC, 0, sig128Z.v64, sig128Z.v0 );
-        } else if ( ! expDiff ) {
+        } ບໍ່ດັ່ງນັ້ນ ຖ້າ ( ! expDiff ) {
             sig128Z.v64 = sig128Z.v64 - sigC;
-            if ( ! (sig128Z.v64 | sig128Z.v0) ) goto completeCancellation;
-            if ( sig128Z.v64 & UINT64_C( 0x8000000000000000 ) ) {
+            ຖ້າ ( ! (sig128Z.v64 | sig128Z.v0) ) goto completeCancellation;
+            ຖ້າ ( sig128Z.v64 & UINT64_C( 0x8000000000000000 ) ) {
                 signZ = ! signZ;
                 sig128Z = softfloat_sub128( 0, 0, sig128Z.v64, sig128Z.v0 );
             }
-        } else {
+        } ບໍ່ດັ່ງນັ້ນ {
             sig128Z =
                 softfloat_sub128(
                     sig128Z.v64, sig128Z.v0, sig128C.v64, sig128C.v0 );
         }
         /*--------------------------------------------------------------------
         *--------------------------------------------------------------------*/
-        if ( ! sig128Z.v64 ) {
+        ຖ້າ ( ! sig128Z.v64 ) {
             expZ -= 64;
             sig128Z.v64 = sig128Z.v0;
             sig128Z.v0 = 0;
         }
         shiftDist = softfloat_countLeadingZeros64( sig128Z.v64 ) - 1;
         expZ -= shiftDist;
-        if ( shiftDist < 0 ) {
+        ຖ້າ ( shiftDist < 0 ) {
             sigZ = softfloat_shortShiftRightJam64( sig128Z.v64, -shiftDist );
-        } else {
+        } ບໍ່ດັ່ງນັ້ນ {
             sig128Z =
                 softfloat_shortShiftLeft128(
                     sig128Z.v64, sig128Z.v0, shiftDist );
@@ -2807,7 +2807,7 @@ static float64_t
         sigZ |= (sig128Z.v0 != 0);
     }
  roundPack:
-    return softfloat_roundPackToF64( signZ, expZ, sigZ );
+    ສົ່ງຄືນ softfloat_roundPackToF64( signZ, expZ, sigZ );
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
  propagateNaN_ABC:
@@ -2816,11 +2816,11 @@ static float64_t
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
  infProdArg:
-    if ( magBits ) {
+    ຖ້າ ( magBits ) {
         uiZ = packToF64UI( signZ, 0x7FF, 0 );
-        if ( expC != 0x7FF ) goto uiZ;
-        if ( sigC ) goto propagateNaN_ZC;
-        if ( signZ == signC ) goto uiZ;
+        ຖ້າ ( expC != 0x7FF ) goto uiZ;
+        ຖ້າ ( sigC ) goto propagateNaN_ZC;
+        ຖ້າ ( signZ == signC ) goto uiZ;
     }
     raiseFlags( flag_invalid );
     uiZ = defaultNaNF64UI;
@@ -2831,13 +2831,13 @@ static float64_t
     *------------------------------------------------------------------------*/
  zeroProd:
     uiZ = uiC;
-    if ( ! (expC | sigC) && (signZ != signC) ) {
+    ຖ້າ ( ! (expC | sigC) && (signZ != signC) ) {
  completeCancellation:
         uiZ =
             packToF64UI((globalRoundingMode == round_min), 0, 0 );
     }
  uiZ:
-    return float64_t::fromRaw(uiZ);
+    ສົ່ງຄືນ float64_t::fromRaw(uiZ);
 }
 
 static float32_t
@@ -2847,10 +2847,10 @@ static float32_t
 
     shiftDist = softfloat_countLeadingZeros32( sig ) - 1;
     exp -= shiftDist;
-    if ( (7 <= shiftDist) && ((unsigned int) exp < 0xFD) ) {
-        return float32_t::fromRaw(packToF32UI( sign, sig ? exp : 0, sig<<(shiftDist - 7) ));
-    } else {
-        return softfloat_roundPackToF32( sign, exp, sig<<shiftDist );
+    ຖ້າ ( (7 <= shiftDist) && ((unsigned ຈຳນວນເຕັມ) exp < 0xFD) ) {
+        ສົ່ງຄືນ float32_t::fromRaw(packToF32UI( sign, sig ? exp : 0, sig<<(shiftDist - 7) ));
+    } ບໍ່ດັ່ງນັ້ນ {
+        ສົ່ງຄືນ softfloat_roundPackToF32( sign, exp, sig<<shiftDist );
     }
 }
 
@@ -2861,33 +2861,33 @@ static float64_t
 
     shiftDist = softfloat_countLeadingZeros64( sig ) - 1;
     exp -= shiftDist;
-    if ( (10 <= shiftDist) && ((unsigned int) exp < 0x7FD) ) {
-        return float64_t::fromRaw(packToF64UI( sign, sig ? exp : 0, sig<<(shiftDist - 10) ));
-    } else {
-        return softfloat_roundPackToF64( sign, exp, sig<<shiftDist );
+    ຖ້າ ( (10 <= shiftDist) && ((unsigned ຈຳນວນເຕັມ) exp < 0x7FD) ) {
+        ສົ່ງຄືນ float64_t::fromRaw(packToF64UI( sign, sig ? exp : 0, sig<<(shiftDist - 10) ));
+    } ບໍ່ດັ່ງນັ້ນ {
+        ສົ່ງຄືນ softfloat_roundPackToF64( sign, exp, sig<<shiftDist );
     }
 }
 
-static struct exp16_sig32 softfloat_normSubnormalF32Sig( uint_fast32_t sig )
+static sa_nracanaa exp16_sig32 softfloat_normSubnormalF32Sig( uint_fast32_t sig )
 {
     int_fast8_t shiftDist;
-    struct exp16_sig32 z;
+    sa_nracanaa exp16_sig32 z;
 
     shiftDist = softfloat_countLeadingZeros32( sig ) - 8;
     z.exp = 1 - shiftDist;
     z.sig = sig<<shiftDist;
-    return z;
+    ສົ່ງຄືນ z;
 }
 
-static struct exp16_sig64 softfloat_normSubnormalF64Sig( uint_fast64_t sig )
+static sa_nracanaa exp16_sig64 softfloat_normSubnormalF64Sig( uint_fast64_t sig )
 {
     int_fast8_t shiftDist;
-    struct exp16_sig64 z;
+    sa_nracanaa exp16_sig64 z;
 
     shiftDist = softfloat_countLeadingZeros64( sig ) - 11;
     z.exp = 1 - shiftDist;
     z.sig = sig<<shiftDist;
-    return z;
+    ສົ່ງຄືນ z;
 }
 
 /*----------------------------------------------------------------------------
@@ -2902,11 +2902,11 @@ static uint_fast32_t
     bool isSigNaNA;
 
     isSigNaNA = softfloat_isSigNaNF32UI( uiA );
-    if ( isSigNaNA || softfloat_isSigNaNF32UI( uiB ) ) {
+    ຖ້າ ( isSigNaNA || softfloat_isSigNaNF32UI( uiB ) ) {
         raiseFlags( flag_invalid );
-        if ( isSigNaNA ) return uiA | 0x00400000;
+        ຖ້າ ( isSigNaNA ) ສົ່ງຄືນ uiA | 0x00400000;
     }
-    return (isNaNF32UI( uiA ) ? uiA : uiB) | 0x00400000;
+    ສົ່ງຄືນ (isNaNF32UI( uiA ) ? uiA : uiB) | 0x00400000;
 }
 
 /*----------------------------------------------------------------------------
@@ -2921,11 +2921,11 @@ static uint_fast64_t
     bool isSigNaNA;
 
     isSigNaNA = softfloat_isSigNaNF64UI( uiA );
-    if ( isSigNaNA || softfloat_isSigNaNF64UI( uiB ) ) {
+    ຖ້າ ( isSigNaNA || softfloat_isSigNaNF64UI( uiB ) ) {
         raiseFlags( flag_invalid );
-        if ( isSigNaNA ) return uiA | UINT64_C( 0x0008000000000000 );
+        ຖ້າ ( isSigNaNA ) ສົ່ງຄືນ uiA | UINT64_C( 0x0008000000000000 );
     }
-    return (isNaNF64UI( uiA ) ? uiA : uiB) | UINT64_C( 0x0008000000000000 );
+    ສົ່ງຄືນ (isNaNF64UI( uiA ) ? uiA : uiB) | UINT64_C( 0x0008000000000000 );
 }
 
 static float32_t
@@ -2942,7 +2942,7 @@ static float32_t
     roundingMode = globalRoundingMode;
     roundNearEven = (roundingMode == round_near_even);
     roundIncrement = 0x40;
-    if ( ! roundNearEven && (roundingMode != round_near_maxMag) ) {
+    ຖ້າ ( ! roundNearEven && (roundingMode != round_near_maxMag) ) {
         roundIncrement =
             (roundingMode
                  == (sign ? round_min : round_max))
@@ -2952,8 +2952,8 @@ static float32_t
     roundBits = sig & 0x7F;
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
-    if ( 0xFD <= (unsigned int) exp ) {
-        if ( exp < 0 ) {
+    ຖ້າ ( 0xFD <= (unsigned ຈຳນວນເຕັມ) exp ) {
+        ຖ້າ ( exp < 0 ) {
             /*----------------------------------------------------------------
             *----------------------------------------------------------------*/
             isTiny =
@@ -2962,10 +2962,10 @@ static float32_t
             sig = softfloat_shiftRightJam32( sig, -exp );
             exp = 0;
             roundBits = sig & 0x7F;
-            if ( isTiny && roundBits ) {
+            ຖ້າ ( isTiny && roundBits ) {
                 raiseFlags( flag_underflow );
             }
-        } else if ( (0xFD < exp) || (0x80000000 <= sig + roundIncrement) ) {
+        } ບໍ່ດັ່ງນັ້ນ ຖ້າ ( (0xFD < exp) || (0x80000000 <= sig + roundIncrement) ) {
             /*----------------------------------------------------------------
             *----------------------------------------------------------------*/
             raiseFlags(
@@ -2977,21 +2977,21 @@ static float32_t
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
     sig = (sig + roundIncrement)>>7;
-    if ( roundBits ) {
+    ຖ້າ ( roundBits ) {
         raiseFlags(flag_inexact);
-        if ( roundingMode == round_odd ) {
+        ຖ້າ ( roundingMode == round_odd ) {
             sig |= 1;
             goto packReturn;
         }
     }
     sig &= ~(uint_fast32_t) (! (roundBits ^ 0x40) & roundNearEven);
-    if ( ! sig ) exp = 0;
+    ຖ້າ ( ! sig ) exp = 0;
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
  packReturn:
     uiZ = packToF32UI( sign, exp, sig );
  uiZ:
-    return float32_t::fromRaw(uiZ);
+    ສົ່ງຄືນ float32_t::fromRaw(uiZ);
 }
 
 static float64_t
@@ -3008,7 +3008,7 @@ static float64_t
     roundingMode = globalRoundingMode;
     roundNearEven = (roundingMode == round_near_even);
     roundIncrement = 0x200;
-    if ( ! roundNearEven && (roundingMode != round_near_maxMag) ) {
+    ຖ້າ ( ! roundNearEven && (roundingMode != round_near_maxMag) ) {
         roundIncrement =
             (roundingMode
                  == (sign ? round_min : round_max))
@@ -3018,8 +3018,8 @@ static float64_t
     roundBits = sig & 0x3FF;
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
-    if ( 0x7FD <= (uint16_t) exp ) {
-        if ( exp < 0 ) {
+    ຖ້າ ( 0x7FD <= (uint16_t) exp ) {
+        ຖ້າ ( exp < 0 ) {
             /*----------------------------------------------------------------
             *----------------------------------------------------------------*/
             isTiny =
@@ -3029,10 +3029,10 @@ static float64_t
             sig = softfloat_shiftRightJam64( sig, -exp );
             exp = 0;
             roundBits = sig & 0x3FF;
-            if ( isTiny && roundBits ) {
+            ຖ້າ ( isTiny && roundBits ) {
                 raiseFlags( flag_underflow );
             }
-        } else if (
+        } ບໍ່ດັ່ງນັ້ນ ຖ້າ (
             (0x7FD < exp)
                 || (UINT64_C( 0x8000000000000000 ) <= sig + roundIncrement)
         ) {
@@ -3047,21 +3047,21 @@ static float64_t
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
     sig = (sig + roundIncrement)>>10;
-    if ( roundBits ) {
+    ຖ້າ ( roundBits ) {
         raiseFlags(flag_inexact);
-        if ( roundingMode == round_odd ) {
+        ຖ້າ ( roundingMode == round_odd ) {
             sig |= 1;
             goto packReturn;
         }
     }
     sig &= ~(uint_fast64_t) (! (roundBits ^ 0x200) & roundNearEven);
-    if ( ! sig ) exp = 0;
+    ຖ້າ ( ! sig ) exp = 0;
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
  packReturn:
     uiZ = packToF64UI( sign, exp, sig );
  uiZ:
-    return float64_t::fromRaw(uiZ);
+    ສົ່ງຄືນ float64_t::fromRaw(uiZ);
 }
 
 static int_fast32_t
@@ -3071,14 +3071,14 @@ static int_fast32_t
     bool roundNearEven;
     uint_fast16_t roundIncrement, roundBits;
     uint_fast32_t sig32;
-    union { uint32_t ui; int32_t i; } uZ;
+    sa_ngha { uint32_t ui; int32_t i; } uZ;
     int_fast32_t z;
 
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
     roundNearEven = (roundingMode == round_near_even);
     roundIncrement = 0x800;
-    if ( ! roundNearEven && (roundingMode != round_near_maxMag) ) {
+    ຖ້າ ( ! roundNearEven && (roundingMode != round_near_maxMag) ) {
         roundIncrement =
             (roundingMode
                  == (sign ? round_min : round_max))
@@ -3087,22 +3087,22 @@ static int_fast32_t
     }
     roundBits = sig & 0xFFF;
     sig += roundIncrement;
-    if ( sig & UINT64_C( 0xFFFFF00000000000 ) ) goto invalid;
+    ຖ້າ ( sig & UINT64_C( 0xFFFFF00000000000 ) ) goto invalid;
     sig32 = (uint_fast32_t)(sig>>12); //fixed warning on type cast
     sig32 &= ~(uint_fast32_t) (! (roundBits ^ 0x800) & roundNearEven);
     //fixed unsigned unary minus: -x == ~x + 1
     uZ.ui = sign ? (~sig32 + 1) : sig32;
     z = uZ.i;
-    if ( z && ((z < 0) ^ sign) ) goto invalid;
-    if ( exact && roundBits ) {
+    ຖ້າ ( z && ((z < 0) ^ sign) ) goto invalid;
+    ຖ້າ ( exact && roundBits ) {
         raiseFlags(flag_inexact);
     }
-    return z;
+    ສົ່ງຄືນ z;
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
  invalid:
     raiseFlags( flag_invalid );
-    return sign ? i32_fromNegOverflow : i32_fromPosOverflow;
+    ສົ່ງຄືນ sign ? i32_fromNegOverflow : i32_fromPosOverflow;
 }
 
 static int_fast64_t
@@ -3110,22 +3110,22 @@ static int_fast64_t
     bool sign, uint_fast64_t sig, uint_fast64_t sigExtra, uint_fast8_t roundingMode, bool exact )
 {
     bool roundNearEven, doIncrement;
-    union { uint64_t ui; int64_t i; } uZ;
+    sa_ngha { uint64_t ui; int64_t i; } uZ;
     int_fast64_t z;
 
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
     roundNearEven = (roundingMode == round_near_even);
     doIncrement = (UINT64_C(0x8000000000000000) <= sigExtra);
-    if (!roundNearEven && (roundingMode != round_near_maxMag)) {
+    ຖ້າ (!roundNearEven && (roundingMode != round_near_maxMag)) {
         doIncrement =
             (roundingMode
                 == (sign ? round_min : round_max))
             && sigExtra;
     }
-    if (doIncrement) {
+    ຖ້າ (doIncrement) {
         ++sig;
-        if (!sig) goto invalid;
+        ຖ້າ (!sig) goto invalid;
         sig &=
             ~(uint_fast64_t)
             (!(sigExtra & UINT64_C(0x7FFFFFFFFFFFFFFF))
@@ -3133,32 +3133,32 @@ static int_fast64_t
     }
     uZ.ui = sign ? (~sig + 1) : sig;
     z = uZ.i;
-    if (z && ((z < 0) ^ sign)) goto invalid;
-    if (exact && sigExtra) {
+    ຖ້າ (z && ((z < 0) ^ sign)) goto invalid;
+    ຖ້າ (exact && sigExtra) {
         raiseFlags(flag_inexact);
     }
-    return z;
+    ສົ່ງຄືນ z;
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
 invalid:
     raiseFlags(flag_invalid);
-    return sign ? i64_fromNegOverflow : i64_fromPosOverflow;
+    ສົ່ງຄືນ sign ? i64_fromNegOverflow : i64_fromPosOverflow;
 }
 
-static struct uint128
+static sa_nracanaa uint128
  softfloat_shiftRightJam128( uint64_t a64, uint64_t a0, uint_fast32_t dist )
 {
     uint_fast8_t u8NegDist;
-    struct uint128 z;
+    sa_nracanaa uint128 z;
 
-    if ( dist < 64 ) {
+    ຖ້າ ( dist < 64 ) {
         //fixed unsigned unary minus: -x == ~x + 1 , fixed type cast
         u8NegDist = (uint_fast8_t)(~dist + 1);
         z.v64 = a64>>dist;
         z.v0 =
             a64<<(u8NegDist & 63) | a0>>dist
                 | ((uint64_t) (a0<<(u8NegDist & 63)) != 0);
-    } else {
+    } ບໍ່ດັ່ງນັ້ນ {
         z.v64 = 0;
         z.v0 =
             (dist < 127)
@@ -3167,7 +3167,7 @@ static struct uint128
                              != 0)
                 : ((a64 | a0) != 0);
     }
-    return z;
+    ສົ່ງຄືນ z;
 }
 
 static float32_t softfloat_subMagsF32( uint_fast32_t uiA, uint_fast32_t uiB )
@@ -3193,48 +3193,48 @@ static float32_t softfloat_subMagsF32( uint_fast32_t uiA, uint_fast32_t uiB )
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
     expDiff = expA - expB;
-    if ( ! expDiff ) {
+    ຖ້າ ( ! expDiff ) {
         /*--------------------------------------------------------------------
         *--------------------------------------------------------------------*/
-        if ( expA == 0xFF ) {
-            if ( sigA | sigB ) goto propagateNaN;
+        ຖ້າ ( expA == 0xFF ) {
+            ຖ້າ ( sigA | sigB ) goto propagateNaN;
             raiseFlags( flag_invalid );
             uiZ = defaultNaNF32UI;
             goto uiZ;
         }
         sigDiff = sigA - sigB;
-        if ( ! sigDiff ) {
+        ຖ້າ ( ! sigDiff ) {
             uiZ =
                 packToF32UI(
                     (globalRoundingMode == round_min), 0, 0 );
             goto uiZ;
         }
-        if ( expA ) --expA;
+        ຖ້າ ( expA ) --expA;
         signZ = signF32UI( uiA );
-        if ( sigDiff < 0 ) {
+        ຖ້າ ( sigDiff < 0 ) {
             signZ = ! signZ;
             sigDiff = -sigDiff;
         }
         shiftDist = softfloat_countLeadingZeros32( sigDiff ) - 8;
         expZ = expA - shiftDist;
-        if ( expZ < 0 ) {
+        ຖ້າ ( expZ < 0 ) {
             shiftDist = (int_fast8_t)expA; //fixed type cast
             expZ = 0;
         }
         uiZ = packToF32UI( signZ, expZ, sigDiff<<shiftDist );
         goto uiZ;
-    } else {
+    } ບໍ່ດັ່ງນັ້ນ {
         /*--------------------------------------------------------------------
         *--------------------------------------------------------------------*/
         signZ = signF32UI( uiA );
         sigA <<= 7;
         sigB <<= 7;
-        if ( expDiff < 0 ) {
+        ຖ້າ ( expDiff < 0 ) {
             /*----------------------------------------------------------------
             *----------------------------------------------------------------*/
             signZ = ! signZ;
-            if ( expB == 0xFF ) {
-                if ( sigB ) goto propagateNaN;
+            ຖ້າ ( expB == 0xFF ) {
+                ຖ້າ ( sigB ) goto propagateNaN;
                 uiZ = packToF32UI( signZ, 0xFF, 0 );
                 goto uiZ;
             }
@@ -3242,11 +3242,11 @@ static float32_t softfloat_subMagsF32( uint_fast32_t uiA, uint_fast32_t uiB )
             sigX = sigB | 0x40000000;
             sigY = sigA + (expA ? 0x40000000 : sigA);
             expDiff = -expDiff;
-        } else {
+        } ບໍ່ດັ່ງນັ້ນ {
             /*----------------------------------------------------------------
             *----------------------------------------------------------------*/
-            if ( expA == 0xFF ) {
-                if ( sigA ) goto propagateNaN;
+            ຖ້າ ( expA == 0xFF ) {
+                ຖ້າ ( sigA ) goto propagateNaN;
                 uiZ = uiA;
                 goto uiZ;
             }
@@ -3254,7 +3254,7 @@ static float32_t softfloat_subMagsF32( uint_fast32_t uiA, uint_fast32_t uiB )
             sigX = sigA | 0x40000000;
             sigY = sigB + (expB ? 0x40000000 : sigB);
         }
-        return
+        ສົ່ງຄືນ
             softfloat_normRoundPackToF32(
                 signZ, expZ, sigX - softfloat_shiftRightJam32( sigY, expDiff )
             );
@@ -3264,7 +3264,7 @@ static float32_t softfloat_subMagsF32( uint_fast32_t uiA, uint_fast32_t uiB )
  propagateNaN:
     uiZ = softfloat_propagateNaNF32UI( uiA, uiB );
  uiZ:
-    return float32_t::fromRaw(uiZ);
+    ສົ່ງຄືນ float32_t::fromRaw(uiZ);
 }
 
 static float64_t
@@ -3290,46 +3290,46 @@ static float64_t
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
     expDiff = expA - expB;
-    if ( ! expDiff ) {
+    ຖ້າ ( ! expDiff ) {
         /*--------------------------------------------------------------------
         *--------------------------------------------------------------------*/
-        if ( expA == 0x7FF ) {
-            if ( sigA | sigB ) goto propagateNaN;
+        ຖ້າ ( expA == 0x7FF ) {
+            ຖ້າ ( sigA | sigB ) goto propagateNaN;
             raiseFlags( flag_invalid );
             uiZ = defaultNaNF64UI;
             goto uiZ;
         }
         sigDiff = sigA - sigB;
-        if ( ! sigDiff ) {
+        ຖ້າ ( ! sigDiff ) {
             uiZ =
                 packToF64UI(
                     (globalRoundingMode == round_min), 0, 0 );
             goto uiZ;
         }
-        if ( expA ) --expA;
-        if ( sigDiff < 0 ) {
+        ຖ້າ ( expA ) --expA;
+        ຖ້າ ( sigDiff < 0 ) {
             signZ = ! signZ;
             sigDiff = -sigDiff;
         }
         shiftDist = softfloat_countLeadingZeros64( sigDiff ) - 11;
         expZ = expA - shiftDist;
-        if ( expZ < 0 ) {
+        ຖ້າ ( expZ < 0 ) {
             shiftDist = (int_fast8_t)expA; //fixed type cast
             expZ = 0;
         }
         uiZ = packToF64UI( signZ, expZ, sigDiff<<shiftDist );
         goto uiZ;
-    } else {
+    } ບໍ່ດັ່ງນັ້ນ {
         /*--------------------------------------------------------------------
         *--------------------------------------------------------------------*/
         sigA <<= 10;
         sigB <<= 10;
-        if ( expDiff < 0 ) {
+        ຖ້າ ( expDiff < 0 ) {
             /*----------------------------------------------------------------
             *----------------------------------------------------------------*/
             signZ = ! signZ;
-            if ( expB == 0x7FF ) {
-                if ( sigB ) goto propagateNaN;
+            ຖ້າ ( expB == 0x7FF ) {
+                ຖ້າ ( sigB ) goto propagateNaN;
                 uiZ = packToF64UI( signZ, 0x7FF, 0 );
                 goto uiZ;
             }
@@ -3338,11 +3338,11 @@ static float64_t
             sigB |= UINT64_C( 0x4000000000000000 );
             expZ = expB;
             sigZ = sigB - sigA;
-        } else {
+        } ບໍ່ດັ່ງນັ້ນ {
             /*----------------------------------------------------------------
             *----------------------------------------------------------------*/
-            if ( expA == 0x7FF ) {
-                if ( sigA ) goto propagateNaN;
+            ຖ້າ ( expA == 0x7FF ) {
+                ຖ້າ ( sigA ) goto propagateNaN;
                 uiZ = uiA;
                 goto uiZ;
             }
@@ -3352,25 +3352,25 @@ static float64_t
             expZ = expA;
             sigZ = sigA - sigB;
         }
-        return softfloat_normRoundPackToF64( signZ, expZ - 1, sigZ );
+        ສົ່ງຄືນ softfloat_normRoundPackToF64( signZ, expZ - 1, sigZ );
     }
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
  propagateNaN:
     uiZ = softfloat_propagateNaNF64UI( uiA, uiB );
  uiZ:
-    return float64_t::fromRaw(uiZ);
+    ສົ່ງຄືນ float64_t::fromRaw(uiZ);
 }
 
 static float32_t ui32_to_f32( uint32_t a )
 {
-    if ( ! a ) {
-        return float32_t::fromRaw(0);
+    ຖ້າ ( ! a ) {
+        ສົ່ງຄືນ float32_t::fromRaw(0);
     }
-    if ( a & 0x80000000 ) {
-        return softfloat_roundPackToF32( 0, 0x9D, a>>1 | (a & 1) );
-    } else {
-        return softfloat_normRoundPackToF32( 0, 0x9C, a );
+    ຖ້າ ( a & 0x80000000 ) {
+        ສົ່ງຄືນ softfloat_roundPackToF32( 0, 0x9D, a>>1 | (a & 1) );
+    } ບໍ່ດັ່ງນັ້ນ {
+        ສົ່ງຄືນ softfloat_normRoundPackToF32( 0, 0x9C, a );
     }
 }
 
@@ -3379,14 +3379,14 @@ static float64_t ui32_to_f64( uint32_t a )
     uint_fast64_t uiZ;
     int_fast8_t shiftDist;
 
-    if ( ! a ) {
+    ຖ້າ ( ! a ) {
         uiZ = 0;
-    } else {
+    } ບໍ່ດັ່ງນັ້ນ {
         shiftDist = softfloat_countLeadingZeros32( a ) + 21;
         uiZ =
             packToF64UI( 0, 0x432 - shiftDist, (uint_fast64_t) a<<shiftDist );
     }
-    return float64_t::fromRaw(uiZ);
+    ສົ່ງຄືນ float64_t::fromRaw(uiZ);
 }
 
 static float32_t ui64_to_f32( uint64_t a )
@@ -3395,28 +3395,28 @@ static float32_t ui64_to_f32( uint64_t a )
     uint_fast32_t sig;
 
     shiftDist = softfloat_countLeadingZeros64( a ) - 40;
-    if ( 0 <= shiftDist ) {
-        return float32_t::fromRaw(a ? packToF32UI(0, 0x95 - shiftDist, (uint_fast32_t) a<<shiftDist ) : 0);
-    } else {
+    ຖ້າ ( 0 <= shiftDist ) {
+        ສົ່ງຄືນ float32_t::fromRaw(a ? packToF32UI(0, 0x95 - shiftDist, (uint_fast32_t) a<<shiftDist ) : 0);
+    } ບໍ່ດັ່ງນັ້ນ {
         shiftDist += 7;
         sig =
             (shiftDist < 0) ? (uint_fast32_t) softfloat_shortShiftRightJam64( a, -shiftDist ) //fixed warning on type cast
                 : (uint_fast32_t) a<<shiftDist;
-        return softfloat_roundPackToF32( 0, 0x9C - shiftDist, sig );
+        ສົ່ງຄືນ softfloat_roundPackToF32( 0, 0x9C - shiftDist, sig );
     }
 }
 
 static float64_t ui64_to_f64( uint64_t a )
 {
-    if ( ! a ) {
-        return float64_t::fromRaw(0);
+    ຖ້າ ( ! a ) {
+        ສົ່ງຄືນ float64_t::fromRaw(0);
     }
-    if ( a & UINT64_C( 0x8000000000000000 ) ) {
-        return
+    ຖ້າ ( a & UINT64_C( 0x8000000000000000 ) ) {
+        ສົ່ງຄືນ
             softfloat_roundPackToF64(
                 0, 0x43D, softfloat_shortShiftRightJam64( a, 1 ) );
-    } else {
-        return softfloat_normRoundPackToF64( 0, 0x43C, a );
+    } ບໍ່ດັ່ງນັ້ນ {
+        ສົ່ງຄືນ softfloat_normRoundPackToF64( 0, 0x43C, a );
     }
 }
 
@@ -3507,8 +3507,8 @@ static const float64_t exp_max_val(3000*(1 << EXPTAB_SCALE)); // log10(DBL_MAX) 
 static float32_t f32_exp( float32_t x)
 {
     //special cases
-    if(x.isNaN()) return float32_t::nan();
-    if(x.isInf()) return (x == float32_t::inf()) ? x : float32_t::zero();
+    ຖ້າ(x.isNaN()) ສົ່ງຄືນ float32_t::nan();
+    ຖ້າ(x.isInf()) ສົ່ງຄືນ (x == float32_t::inf()) ? x : float32_t::zero();
 
     static const float64_t
         A4 = float64_t::one() / EXPPOLY_32F_A0,
@@ -3517,26 +3517,26 @@ static float32_t f32_exp( float32_t x)
         A1 = float64_t::fromRaw(0x3fac6af0d93cf576) / EXPPOLY_32F_A0; // .5550339366753125211915322047004666939128e-1 / EXPPOLY_32F_A0;
 
     float64_t x0;
-    if(expF32UI(x.v) > 127 + 10)
+    ຖ້າ(expF32UI(x.v) > 127 + 10)
         x0 = signF32UI(x.v) ? -exp_max_val : exp_max_val;
-    else
+    ບໍ່ດັ່ງນັ້ນ
         x0 = f32_to_f64(x) * exp_prescale;
 
-    int val0 = f64_to_i32(x0, round_near_even, false);
-    int t = (val0 >> EXPTAB_SCALE) + 1023;
+    ຈຳນວນເຕັມ val0 = f64_to_i32(x0, round_near_even, false);
+    ຈຳນວນເຕັມ t = (val0 >> EXPTAB_SCALE) + 1023;
     t = t < 0 ? 0 : (t > 2047 ? 2047 : t);
     float64_t buf; buf.v = packToF64UI(0, t, 0);
 
     x0 = (x0 - f64_roundToInt(x0, round_near_even, false)) * exp_postscale;
 
-    return (buf * EXPPOLY_32F_A0 * float64_t::fromRaw(expTab[val0 & EXPTAB_MASK]) * ((((x0 + A1)*x0 + A2)*x0 + A3)*x0 + A4));
+    ສົ່ງຄືນ (buf * EXPPOLY_32F_A0 * float64_t::fromRaw(expTab[val0 & EXPTAB_MASK]) * ((((x0 + A1)*x0 + A2)*x0 + A3)*x0 + A4));
 }
 
 static float64_t f64_exp(float64_t x)
 {
     //special cases
-    if(x.isNaN()) return float64_t::nan();
-    if(x.isInf()) return (x == float64_t::inf()) ? x : float64_t::zero();
+    ຖ້າ(x.isNaN()) ສົ່ງຄືນ float64_t::nan();
+    ຖ້າ(x.isInf()) ສົ່ງຄືນ (x == float64_t::inf()) ? x : float64_t::zero();
 
     static const float64_t
         A5 = float64_t::one() / EXPPOLY_32F_A0,
@@ -3547,19 +3547,19 @@ static float64_t f64_exp(float64_t x)
         A0 = float64_t::fromRaw(0x3f55e7aa1566c2a4) / EXPPOLY_32F_A0; // .13369713757180123244806654839424e-2 / EXPPOLY_32F_A0
 
     float64_t x0;
-    if(expF64UI(x.v) > 1023 + 10)
+    ຖ້າ(expF64UI(x.v) > 1023 + 10)
         x0 = signF64UI(x.v) ? -exp_max_val : exp_max_val;
-    else
+    ບໍ່ດັ່ງນັ້ນ
         x0 = x * exp_prescale;
 
-    int val0 = cvRound(x0);
-    int t = (val0 >> EXPTAB_SCALE) + 1023;
+    ຈຳນວນເຕັມ val0 = cvRound(x0);
+    ຈຳນວນເຕັມ t = (val0 >> EXPTAB_SCALE) + 1023;
     t = t < 0 ? 0 : (t > 2047 ? 2047 : t);
     float64_t buf; buf.v = packToF64UI(0, t, 0);
 
     x0 = (x0 - f64_roundToInt(x0, round_near_even, false)) * exp_postscale;
 
-    return buf * EXPPOLY_32F_A0 * float64_t::fromRaw(expTab[val0 & EXPTAB_MASK]) * (((((A0*x0 + A1)*x0 + A2)*x0 + A3)*x0 + A4)*x0 + A5);
+    ສົ່ງຄືນ buf * EXPPOLY_32F_A0 * float64_t::fromRaw(expTab[val0 & EXPTAB_MASK]) * (((((A0*x0 + A1)*x0 + A2)*x0 + A3)*x0 + A4)*x0 + A5);
 }
 
 #undef EXPTAB_SCALE
@@ -3835,11 +3835,11 @@ static const float64_t ln_2 = float64_t::fromRaw(0x3fe62e42fefa39ef);
 static float32_t f32_log(float32_t x)
 {
     //special cases
-    if(x.isNaN() || x < float32_t::zero()) return float32_t::nan();
-    if(x == float32_t::zero()) return -float32_t::inf();
+    ຖ້າ(x.isNaN() || x < float32_t::zero()) ສົ່ງຄືນ float32_t::nan();
+    ຖ້າ(x == float32_t::zero()) ສົ່ງຄືນ -float32_t::inf();
 
     //first 8 bits of mantissa
-    int h0 = (x.v >> (23 - LOGTAB_SCALE)) & ((1 << LOGTAB_SCALE) - 1);
+    ຈຳນວນເຕັມ h0 = (x.v >> (23 - LOGTAB_SCALE)) & ((1 << LOGTAB_SCALE) - 1);
     //buf == 0.00000000_the_rest_mantissa_bits
     float64_t buf; buf.v = packToF64UI(0, 1023, ((uint64_t)x.v << 29) & ((1LL << (52 - LOGTAB_SCALE)) - 1));
     buf -= float64_t::one();
@@ -3849,18 +3849,18 @@ static float32_t f32_log(float32_t x)
 
     float64_t x0 = buf * tab1;
     //if last elements of icvLogTab
-    if(h0 == 255) x0 += float64_t(-float64_t::one() / float64_t(512));
+    ຖ້າ(h0 == 255) x0 += float64_t(-float64_t::one() / float64_t(512));
 
     float64_t y0 = ln_2 * float64_t(expF32UI(x.v) - 127) + tab0 + x0*x0*x0/float64_t(3) - x0*x0/float64_t(2) + x0;
 
-    return y0;
+    ສົ່ງຄືນ y0;
 }
 
 static float64_t f64_log(float64_t x)
 {
     //special cases
-    if(x.isNaN() || x < float64_t::zero()) return float64_t::nan();
-    if(x == float64_t::zero()) return -float64_t::inf();
+    ຖ້າ(x.isNaN() || x < float64_t::zero()) ສົ່ງຄືນ float64_t::nan();
+    ຖ້າ(x == float64_t::zero()) ສົ່ງຄືນ -float64_t::inf();
 
     static const float64_t
     A7(1),
@@ -3873,7 +3873,7 @@ static float64_t f64_log(float64_t x)
     A0(-float64_t::one() / float64_t(8));
 
     //first 8 bits of mantissa
-    int h0 = (x.v >> (52 - LOGTAB_SCALE)) & ((1 << LOGTAB_SCALE) - 1);
+    ຈຳນວນເຕັມ h0 = (x.v >> (52 - LOGTAB_SCALE)) & ((1 << LOGTAB_SCALE) - 1);
     //buf == 0.00000000_the_rest_mantissa_bits
     float64_t buf; buf.v = packToF64UI(0, 1023, x.v & ((1LL << (52 - LOGTAB_SCALE)) - 1));
     buf -= float64_t::one();
@@ -3883,10 +3883,10 @@ static float64_t f64_log(float64_t x)
 
     float64_t x0 = buf * tab1;
     //if last elements of icvLogTab
-    if(h0 == 255) x0 += float64_t(-float64_t::one()/float64_t(512));
+    ຖ້າ(h0 == 255) x0 += float64_t(-float64_t::one()/float64_t(512));
     float64_t xq = x0*x0;
 
-    return ln_2 * float64_t( expF64UI(x.v) - 1023) + tab0 + (((A0*xq + A2)*xq + A4)*xq + A6)*xq +
+    ສົ່ງຄືນ ln_2 * float64_t( expF64UI(x.v) - 1023) + tab0 + (((A0*xq + A2)*xq + A4)*xq + A6)*xq +
            (((A1*xq + A3)*xq + A5)*xq + A7)*x0;
 }
 
@@ -3897,12 +3897,12 @@ static float64_t f64_log(float64_t x)
 static float32_t f32_cbrt(float32_t x)
 {
     //special cases
-    if (x.isNaN()) return float32_t::nan();
-    if (x.isInf()) return x;
+    ຖ້າ (x.isNaN()) ສົ່ງຄືນ float32_t::nan();
+    ຖ້າ (x.isInf()) ສົ່ງຄືນ x;
 
-    int s = signF32UI(x.v);
-    int ex = expF32UI(x.v) - 127;
-    int shx = ex % 3;
+    ຈຳນວນເຕັມ s = signF32UI(x.v);
+    ຈຳນວນເຕັມ ex = expF32UI(x.v) - 127;
+    ຈຳນວນເຕັມ shx = ex % 3;
     shx -= shx >= 0 ? 3 : 0;
     ex = (ex - shx) / 3 - 1; /* exponent of cube root */
     float64_t fr; fr.v = packToF64UI(0, shx + 1023, ((uint64_t)fracF32UI(x.v)) << 29);
@@ -3926,7 +3926,7 @@ static float32_t f32_cbrt(float32_t x)
 
     // checks for "+0" and "-0", reset sign bit
     float32_t y; y.v = ((x.v & ((1u << 31) - 1)) != 0) ? packToF32UI(s, ex + 127, (uint32_t)(fracF64UI(fr.v) >> 29)) : 0;
-    return y;
+    ສົ່ງຄືນ y;
 }
 
 /// POW functions ///
@@ -3939,23 +3939,23 @@ static float32_t f32_pow( float32_t x, float32_t y)
     bool useInf = (y > zero) == (ax > one);
     float32_t v;
     //special cases
-    if(ynan) v = nan;
-    else if(yinf) v = (ax == one || xnan) ? nan : (useInf ? inf : zero);
-    else if(y == zero) v = one;
-    else if(y == one ) v = x;
-    else //here y is ok
+    ຖ້າ(ynan) v = nan;
+    ບໍ່ດັ່ງນັ້ນ ຖ້າ(yinf) v = (ax == one || xnan) ? nan : (useInf ? inf : zero);
+    ບໍ່ດັ່ງນັ້ນ ຖ້າ(y == zero) v = one;
+    ບໍ່ດັ່ງນັ້ນ ຖ້າ(y == one ) v = x;
+    ບໍ່ດັ່ງນັ້ນ //here y is ok
     {
-        if(xnan) v = nan;
-        else if(xinf) v = (y < zero) ? zero : inf;
-        else if(y == f32_roundToInt(y, round_near_even, false)) v = f32_powi(x, f32_to_i32(y, round_near_even, false));
-        else if(x  < zero) v = nan;
+        ຖ້າ(xnan) v = nan;
+        ບໍ່ດັ່ງນັ້ນ ຖ້າ(xinf) v = (y < zero) ? zero : inf;
+        ບໍ່ດັ່ງນັ້ນ ຖ້າ(y == f32_roundToInt(y, round_near_even, false)) v = f32_powi(x, f32_to_i32(y, round_near_even, false));
+        ບໍ່ດັ່ງນັ້ນ ຖ້າ(x  < zero) v = nan;
         // (0 ** 0) == 1
-        else if(x == zero) v = (y < zero) ? inf : (y == zero ? one : zero);
+        ບໍ່ດັ່ງນັ້ນ ຖ້າ(x == zero) v = (y < zero) ? inf : (y == zero ? one : zero);
         // here x and y are ok
-        else v = f32_exp(y * f32_log(x));
+        ບໍ່ດັ່ງນັ້ນ v = f32_exp(y * f32_log(x));
     }
 
-    return v;
+    ສົ່ງຄືນ v;
 }
 
 static float64_t f64_pow( float64_t x, float64_t y)
@@ -3966,43 +3966,43 @@ static float64_t f64_pow( float64_t x, float64_t y)
     bool useInf = (y > zero) == (ax > one);
     float64_t v;
     //special cases
-    if(ynan) v = nan;
-    else if(yinf) v = (ax == one || xnan) ? nan : (useInf ? inf : zero);
-    else if(y == zero) v = one;
-    else if(y == one ) v = x;
-    else //here y is ok
+    ຖ້າ(ynan) v = nan;
+    ບໍ່ດັ່ງນັ້ນ ຖ້າ(yinf) v = (ax == one || xnan) ? nan : (useInf ? inf : zero);
+    ບໍ່ດັ່ງນັ້ນ ຖ້າ(y == zero) v = one;
+    ບໍ່ດັ່ງນັ້ນ ຖ້າ(y == one ) v = x;
+    ບໍ່ດັ່ງນັ້ນ //here y is ok
     {
-        if(xnan) v = nan;
-        else if(xinf) v = (y < zero) ? zero : inf;
-        else if(y == f64_roundToInt(y, round_near_even, false)) v = f64_powi(x, f64_to_i32(y, round_near_even, false));
-        else if(x  < zero) v = nan;
+        ຖ້າ(xnan) v = nan;
+        ບໍ່ດັ່ງນັ້ນ ຖ້າ(xinf) v = (y < zero) ? zero : inf;
+        ບໍ່ດັ່ງນັ້ນ ຖ້າ(y == f64_roundToInt(y, round_near_even, false)) v = f64_powi(x, f64_to_i32(y, round_near_even, false));
+        ບໍ່ດັ່ງນັ້ນ ຖ້າ(x  < zero) v = nan;
         // (0 ** 0) == 1
-        else if(x == zero) v = (y < zero) ? inf : (y == zero ? one : zero);
+        ບໍ່ດັ່ງນັ້ນ ຖ້າ(x == zero) v = (y < zero) ? inf : (y == zero ? one : zero);
         // here x and y are ok
-        else v = f64_exp(y * f64_log(x));
+        ບໍ່ດັ່ງນັ້ນ v = f64_exp(y * f64_log(x));
     }
 
-    return v;
+    ສົ່ງຄືນ v;
 }
 
 // These functions are for internal use only
 
-static float32_t f32_powi( float32_t x, int y)
+static float32_t f32_powi( float32_t x, ຈຳນວນເຕັມ y)
 {
     float32_t v;
     //special case: (0 ** 0) == 1
-    if(x == float32_t::zero())
+    ຖ້າ(x == float32_t::zero())
         v = (y < 0) ? float32_t::inf() : (y == 0 ? float32_t::one() : float32_t::zero());
     // here x and y are ok
-    else
+    ບໍ່ດັ່ງນັ້ນ
     {
         float32_t a = float32_t::one(), b = x;
-        int p = std::abs(y);
-        if( y < 0 )
+        ຈຳນວນເຕັມ p = std::abs(y);
+        ຖ້າ( y < 0 )
             b = float32_t::one()/b;
-        while( p > 1 )
+        ໃນຂະນະທີ່( p > 1 )
         {
-            if( p & 1 )
+            ຖ້າ( p & 1 )
                 a *= b;
             b *= b;
             p >>= 1;
@@ -4010,25 +4010,25 @@ static float32_t f32_powi( float32_t x, int y)
         v = a * b;
     }
 
-    return v;
+    ສົ່ງຄືນ v;
 }
 
-static float64_t f64_powi( float64_t x, int y)
+static float64_t f64_powi( float64_t x, ຈຳນວນເຕັມ y)
 {
     float64_t v;
     //special case: (0 ** 0) == 1
-    if(x == float64_t::zero())
+    ຖ້າ(x == float64_t::zero())
         v = (y < 0) ? float64_t::inf() : (y == 0 ? float64_t::one() : float64_t::zero());
     // here x and y are ok
-    else
+    ບໍ່ດັ່ງນັ້ນ
     {
         float64_t a = float64_t::one(), b = x;
-        int p = std::abs(y);
-        if( y < 0 )
+        ຈຳນວນເຕັມ p = std::abs(y);
+        ຖ້າ( y < 0 )
             b = float64_t::one()/b;
-        while( p > 1 )
+        ໃນຂະນະທີ່( p > 1 )
         {
-            if( p & 1 )
+            ຖ້າ( p & 1 )
                 a *= b;
             b *= b;
             p >>= 1;
@@ -4036,7 +4036,7 @@ static float64_t f64_powi( float64_t x, int y)
         v = a * b;
     }
 
-    return v;
+    ສົ່ງຄືນ v;
 }
 
 /*
@@ -4096,14 +4096,14 @@ S6  = float64_t::fromRaw( 0x3DE5D93A5ACFD57C );
 
 static float64_t f64_sin_kernel(float64_t x)
 {
-    if(x.getExp() < -27)
+    ຖ້າ(x.getExp() < -27)
     {
-        if(x != x.zero()) raiseFlags(flag_inexact);
-        return x;
+        ຖ້າ(x != x.zero()) raiseFlags(flag_inexact);
+        ສົ່ງຄືນ x;
     }
 
     float64_t z = x*x;
-    return x*mulAdd(z, mulAdd(z, mulAdd(z, mulAdd(z, mulAdd(z, mulAdd(z,
+    ສົ່ງຄືນ x*mulAdd(z, mulAdd(z, mulAdd(z, mulAdd(z, mulAdd(z, mulAdd(z,
                     S6, S5), S4), S3), S2), S1), x.one());
 }
 
@@ -4163,40 +4163,40 @@ C6  = float64_t::fromRaw( 0xBDA8FAE9BE8838D4 );
 
 static float64_t f64_cos_kernel(float64_t x)
 {
-    if(x.getExp() < -27)
+    ຖ້າ(x.getExp() < -27)
     {
-        if(x != x.zero()) raiseFlags(flag_inexact);
-        return x.one();
+        ຖ້າ(x != x.zero()) raiseFlags(flag_inexact);
+        ສົ່ງຄືນ x.one();
     }
 
     float64_t z = x*x;
-    return mulAdd(mulAdd(z, mulAdd(z, mulAdd(z, mulAdd(z, mulAdd(z, mulAdd(z,
+    ສົ່ງຄືນ mulAdd(mulAdd(z, mulAdd(z, mulAdd(z, mulAdd(z, mulAdd(z, mulAdd(z,
                   C6, C5), C4), C3), C2), C1), -half), z, x.one());
 }
 
-static void f64_sincos_reduce(const float64_t& x, float64_t& y, int& n)
+static void f64_sincos_reduce(const float64_t& x, float64_t& y, ຈຳນວນເຕັມ& n)
 {
-    if(abs(x) < piby4)
+    ຖ້າ(abs(x) < piby4)
     {
         n = 0, y = x;
     }
-    else
+    ບໍ່ດັ່ງນັ້ນ
     {
         /* argument reduction needed */
         float64_t p = f64_rem(x, pi2);
         float64_t v = p - float64_t::eps().setExp(-10);
-        if(abs(v) <= piby4)
+        ຖ້າ(abs(v) <= piby4)
         {
             n = 0; y = p;
         }
-        else if(abs(v) <= (float64_t(3)*piby4))
+        ບໍ່ດັ່ງນັ້ນ ຖ້າ(abs(v) <= (float64_t(3)*piby4))
         {
             n = (p > 0) ? 1 : 3;
             y = (p > 0) ? p - piby2 : p + piby2;
-            if(p > 0) n = 1, y = p - piby2;
-            else      n = 3, y = p + piby2;
+            ຖ້າ(p > 0) n = 1, y = p - piby2;
+            ບໍ່ດັ່ງນັ້ນ      n = 3, y = p + piby2;
         }
-        else
+        ບໍ່ດັ່ງນັ້ນ
         {
             n = 2;
             y = (p > 0) ? p - p.pi() : p + p.pi();
@@ -4236,16 +4236,16 @@ static void f64_sincos_reduce(const float64_t& x, float64_t& y, int& n)
 
 static float64_t f64_sin( float64_t x )
 {
-    if(x.isInf() || x.isNaN()) return x.nan();
+    ຖ້າ(x.isInf() || x.isNaN()) ສົ່ງຄືນ x.nan();
 
-    float64_t y; int n;
+    float64_t y; ຈຳນວນເຕັມ n;
     f64_sincos_reduce(x, y, n);
     switch (n)
     {
-    case 0:  return  f64_sin_kernel(y);
-    case 1:  return  f64_cos_kernel(y);
-    case 2:  return -f64_sin_kernel(y);
-    default: return -f64_cos_kernel(y);
+    pak_sa 0:  ສົ່ງຄືນ  f64_sin_kernel(y);
+    pak_sa 1:  ສົ່ງຄືນ  f64_cos_kernel(y);
+    pak_sa 2:  ສົ່ງຄືນ -f64_sin_kernel(y);
+    default: ສົ່ງຄືນ -f64_cos_kernel(y);
     }
 }
 
@@ -4281,16 +4281,16 @@ static float64_t f64_sin( float64_t x )
 
 static float64_t f64_cos( float64_t x )
 {
-    if(x.isInf() || x.isNaN()) return x.nan();
+    ຖ້າ(x.isInf() || x.isNaN()) ສົ່ງຄືນ x.nan();
 
-    float64_t y; int n;
+    float64_t y; ຈຳນວນເຕັມ n;
     f64_sincos_reduce(x, y, n);
     switch (n)
     {
-    case 0:  return  f64_cos_kernel(y);
-    case 1:  return -f64_sin_kernel(y);
-    case 2:  return -f64_cos_kernel(y);
-    default: return  f64_sin_kernel(y);
+    pak_sa 0:  ສົ່ງຄືນ  f64_cos_kernel(y);
+    pak_sa 1:  ສົ່ງຄືນ -f64_sin_kernel(y);
+    pak_sa 2:  ສົ່ງຄືນ -f64_cos_kernel(y);
+    default: ສົ່ງຄືນ  f64_sin_kernel(y);
     }
 }
 

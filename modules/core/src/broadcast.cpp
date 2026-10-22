@@ -32,36 +32,36 @@ namespace cv {
 //             needed (mixed channel counts, or multichannel with differing back()).
 //   CH_ELEM : channels stay inside the element (esz = full elemSize, no channel dim). Used with
 //             expandChannels=false; the body handles channels itself (deinterleave fast path).
-enum ChMode { CH_FOLD, CH_DIM, CH_ELEM };
+ga_nanaa ChMode { CH_FOLD, CH_DIM, CH_ELEM };
 
-static void matLayout(const Mat& m, ChMode mode, MatShape& shp, MatStep& step, int& esz1)
+static void matLayout(const Mat& m, ChMode mode, MatShape& shp, MatStep& step, ຈຳນວນເຕັມ& esz1)
 {
-    const int nd = m.dims, cn = m.channels();
-    if (mode == CH_ELEM)
+    const ຈຳນວນເຕັມ nd = m.dims, cn = m.channels();
+    ຖ້າ (mode == CH_ELEM)
     {
-        esz1 = (int)m.elemSize();                       // one full (cn-channel) pixel
+        esz1 = (ຈຳນວນເຕັມ)m.elemSize();                       // one full (cn-channel) pixel
         shp.resize(nd);
-        for (int i = 0; i < nd; i++) { shp[i] = m.size[i]; step[i] = m.step[i] / esz1; }
-        return;
+        ສຳລັບ (ຈຳນວນເຕັມ i = 0; i < nd; i++) { shp[i] = m.size[i]; step[i] = m.step[i] / esz1; }
+        ສົ່ງຄືນ;
     }
-    esz1 = (int)m.elemSize1();                           // one scalar (channel value)
-    if (mode == CH_DIM)
+    esz1 = (ຈຳນວນເຕັມ)m.elemSize1();                           // one scalar (channel value)
+    ຖ້າ (mode == CH_DIM)
     {
         shp.resize(nd + 1);
-        for (int i = 0; i < nd; i++) { shp[i] = m.size[i]; step[i] = m.step[i] / esz1; }
+        ສຳລັບ (ຈຳນວນເຕັມ i = 0; i < nd; i++) { shp[i] = m.size[i]; step[i] = m.step[i] / esz1; }
         shp[nd] = cn; step[nd] = 1;                      // channels = explicit innermost dim
     }
-    else // CH_FOLD
+    ບໍ່ດັ່ງນັ້ນ // CH_FOLD
     {
-        if (nd == 0)                                     // 0-dim scalar: channels are the only dim
+        ຖ້າ (nd == 0)                                     // 0-dim scalar: channels are the only dim
         {
             shp.assign(1, cn);
             step[0] = 1;
         }
-        else
+        ບໍ່ດັ່ງນັ້ນ
         {
             shp.resize(nd);
-            for (int i = 0; i < nd; i++) { shp[i] = m.size[i]; step[i] = m.step[i] / esz1; }
+            ສຳລັບ (ຈຳນວນເຕັມ i = 0; i < nd; i++) { shp[i] = m.size[i]; step[i] = m.step[i] / esz1; }
             shp[nd - 1] *= cn;                           // fold channels into the innermost dim
             step[nd - 1] = 1;                            // scalars are contiguous there
         }
@@ -73,83 +73,83 @@ static void matLayout(const Mat& m, ChMode mode, MatShape& shp, MatStep& step, i
 // channel-mode decision entirely.
 static bool isSingleChannelScalar(const Mat& m)
 {
-    return m.channels() == 1 && m.total() == 1;
+    ສົ່ງຄືນ m.channels() == 1 && m.total() == 1;
 }
 
 // Decide (globally, across all operands) how channels are presented for expandChannels=true:
 // CH_FOLD when no channel broadcast is needed, CH_DIM when it is. Single-channel scalars are
 // excluded first; among the rest, multichannel operands must all share the same cn (an (n,m) mix
 // with both > 1 is an error).
-static ChMode decideChannelMode(const Mat* const* arrays, int K)
+static ChMode decideChannelMode(const Mat* const* arrays, ຈຳນວນເຕັມ K)
 {
-    int N = 1;                                           // the single multichannel count, if any
-    for (int k = 0; k < K; k++)
+    ຈຳນວນເຕັມ N = 1;                                           // the single multichannel count, if any
+    ສຳລັບ (ຈຳນວນເຕັມ k = 0; k < K; k++)
     {
-        if (isSingleChannelScalar(*arrays[k])) continue;
-        int c = arrays[k]->channels();
-        if (c > 1) { if (N == 1) N = c; else CV_Assert(N == c && "ew: (n,m) channel mix unsupported"); }
+        ຖ້າ (isSingleChannelScalar(*arrays[k])) continue;
+        ຈຳນວນເຕັມ c = arrays[k]->channels();
+        ຖ້າ (c > 1) { ຖ້າ (N == 1) N = c; ບໍ່ດັ່ງນັ້ນ CV_Assert(N == c && "ew: (n,m) channel mix unsupported"); }
     }
-    if (N == 1) return CH_FOLD;                          // all single-channel -> fold (a no-op)
+    ຖ້າ (N == 1) ສົ່ງຄືນ CH_FOLD;                          // all single-channel -> fold (a no-op)
 
     bool allMulti = true, sameBack = true;
-    int back = -1;
-    for (int k = 0; k < K; k++)
+    ຈຳນວນເຕັມ back = -1;
+    ສຳລັບ (ຈຳນວນເຕັມ k = 0; k < K; k++)
     {
         const Mat& a = *arrays[k];
-        if (isSingleChannelScalar(a)) continue;
-        if (a.channels() != N) allMulti = false;
-        int b = a.dims > 0 ? a.size[a.dims - 1] : 1;   // 0-dim scalar has no spatial back (=1)
-        if (back < 0) back = b; else if (b != back) sameBack = false;
+        ຖ້າ (isSingleChannelScalar(a)) continue;
+        ຖ້າ (a.channels() != N) allMulti = false;
+        ຈຳນວນເຕັມ b = a.dims > 0 ? a.size[a.dims - 1] : 1;   // 0-dim scalar has no spatial back (=1)
+        ຖ້າ (back < 0) back = b; ບໍ່ດັ່ງນັ້ນ ຖ້າ (b != back) sameBack = false;
     }
-    return (allMulti && sameBack) ? CH_FOLD : CH_DIM;    // fold only if no channel broadcast
+    ສົ່ງຄືນ (allMulti && sameBack) ? CH_FOLD : CH_DIM;    // fold only if no channel broadcast
 }
 
 // numpy-style broadcast of several right-aligned shapes.
-static bool broadcastShape(const MatShape* shps, int K, MatShape& out)
+static bool broadcastShape(const MatShape* shps, ຈຳນວນເຕັມ K, MatShape& out)
 {
     size_t nd = 0;
-    for (int k = 0; k < K; k++) nd = std::max(nd, shps[k].size());
+    ສຳລັບ (ຈຳນວນເຕັມ k = 0; k < K; k++) nd = std::max(nd, shps[k].size());
     out.assign(nd, 1);
-    for (int k = 0; k < K; k++)
+    ສຳລັບ (ຈຳນວນເຕັມ k = 0; k < K; k++)
     {
         const MatShape& s = shps[k];
         size_t off = nd - s.size();
-        for (size_t i = 0; i < s.size(); i++)
+        ສຳລັບ (size_t i = 0; i < s.size(); i++)
         {
-            int d = s[i], &o = out[off + i];
-            if (o == 1) o = d;
-            else if (d != 1 && d != o) return false;
+            ຈຳນວນເຕັມ d = s[i], &o = out[off + i];
+            ຖ້າ (o == 1) o = d;
+            ບໍ່ດັ່ງນັ້ນ ຖ້າ (d != 1 && d != o) ສົ່ງຄືນ false;
         }
     }
-    return true;
+    ສົ່ງຄືນ true;
 }
 
 // Right-align an arg's own (shp,step) to nd dims; broadcast dims get step 0.
-static void alignArg(const MatShape& shp, const MatStep& step, int nd,
+static void alignArg(const MatShape& shp, const MatStep& step, ຈຳນວນເຕັມ nd,
                      MatStep& as, MatShape& ash)
 {
     as.clear();
     ash.assign(nd, 1);
-    int off = nd - (int)shp.size();
-    for (int i = 0; i < (int)shp.size(); i++)
+    ຈຳນວນເຕັມ off = nd - (ຈຳນວນເຕັມ)shp.size();
+    ສຳລັບ (ຈຳນວນເຕັມ i = 0; i < (ຈຳນວນເຕັມ)shp.size(); i++)
     {
-        int d = shp[i];
+        ຈຳນວນເຕັມ d = shp[i];
         ash[off + i] = d;
         as[off + i] = (d == 1) ? 0 : step[i];
     }
 }
 
 // Collapse adjacent dims that are contiguous (and broadcast-consistent) across all args.
-static int collapseDims(MatStep* S, MatShape* H, int K, MatShape& D)
+static ຈຳນວນເຕັມ collapseDims(MatStep* S, MatShape* H, ຈຳນວນເຕັມ K, MatShape& D)
 {
-    int nd = (int)D.size();
-    if (nd <= 1) return nd;
+    ຈຳນວນເຕັມ nd = (ຈຳນວນເຕັມ)D.size();
+    ຖ້າ (nd <= 1) ສົ່ງຄືນ nd;
 
-    int j = nd - 1;
-    for (int i = j - 1; i >= 0; i--)
+    ຈຳນວນເຕັມ j = nd - 1;
+    ສຳລັບ (ຈຳນວນເຕັມ i = j - 1; i >= 0; i--)
     {
         bool contig = true, scalar = true, consist = true;
-        for (int k = 0; k < K; k++)
+        ສຳລັບ (ຈຳນວນເຕັມ k = 0; k < K; k++)
         {
             size_t st = S[k][j] * (size_t)H[k][j];
             bool prevScalar = H[k][j] == 1;
@@ -158,37 +158,37 @@ static int collapseDims(MatStep* S, MatShape* H, int K, MatShape& D)
             scalar  = scalar  && curScalar;
             consist = consist && (curScalar == prevScalar);
         }
-        if (contig && (consist || scalar))
+        ຖ້າ (contig && (consist || scalar))
         {
-            for (int k = 0; k < K; k++) H[k][j] *= H[k][i];
+            ສຳລັບ (ຈຳນວນເຕັມ k = 0; k < K; k++) H[k][j] *= H[k][i];
             D[j] *= D[i];
         }
-        else
+        ບໍ່ດັ່ງນັ້ນ
         {
             j--;
-            if (i < j)
+            ຖ້າ (i < j)
             {
-                for (int k = 0; k < K; k++) { H[k][j] = H[k][i]; S[k][j] = S[k][i]; }
+                ສຳລັບ (ຈຳນວນເຕັມ k = 0; k < K; k++) { H[k][j] = H[k][i]; S[k][j] = S[k][i]; }
                 D[j] = D[i];
             }
         }
     }
 
-    int m = nd - j;
-    for (int d = 0; d < m; d++)
+    ຈຳນວນເຕັມ m = nd - j;
+    ສຳລັບ (ຈຳນວນເຕັມ d = 0; d < m; d++)
     {
         D[d] = D[j + d];
-        for (int k = 0; k < K; k++) { S[k][d] = S[k][j + d]; H[k][d] = H[k][j + d]; }
+        ສຳລັບ (ຈຳນວນເຕັມ k = 0; k < K; k++) { S[k][d] = S[k][j + d]; H[k][d] = H[k][j + d]; }
     }
     D.resize(m);
-    for (int k = 0; k < K; k++) H[k].resize(m);
+    ສຳລັບ (ຈຳນວນເຕັມ k = 0; k < K; k++) H[k].resize(m);
 
     // Zero out steps of broadcast (size-1) dims (numpy step==0 trick).
-    for (int d = 0; d < m; d++)
-        for (int k = 0; k < K; k++)
-            if (H[k][d] == 1) S[k][d] = 0;
+    ສຳລັບ (ຈຳນວນເຕັມ d = 0; d < m; d++)
+        ສຳລັບ (ຈຳນວນເຕັມ k = 0; k < K; k++)
+            ຖ້າ (H[k][d] == 1) S[k][d] = 0;
 
-    return m;
+    ສົ່ງຄືນ m;
 }
 
 // Fast geometry for the dominant case: every operand is either (a) an array sharing ONE common
@@ -198,35 +198,35 @@ static int collapseDims(MatStep* S, MatShape* H, int K, MatShape& D)
 // broadcastShape / alignArg / collapseDims and all their per-operand buffers entirely. Returns
 // false (leaving outputs untouched) when the operands don't fit, so the caller runs general
 // geometry. expandChannels=false (CH_ELEM) keeps channels in the element and is left to general.
-static bool fastSameShape(const Mat* const* arrays, int K, bool expandChannels,
-                          uchar** base, int* esz1, MatStep* S, MatShape& D, int& m)
+static bool fastSameShape(const Mat* const* arrays, ຈຳນວນເຕັມ K, bool expandChannels,
+                          uchar** base, ຈຳນວນເຕັມ* esz1, MatStep* S, MatShape& D, ຈຳນວນເຕັມ& m)
 {
-    if (!expandChannels) return false;
-    int ref = -1;
-    for (int k = 0; k < K; k++)
-        if (!isSingleChannelScalar(*arrays[k])) { ref = k; break; }
-    if (ref < 0) return false;                       // all single-channel scalars: let general handle
+    ຖ້າ (!expandChannels) ສົ່ງຄືນ false;
+    ຈຳນວນເຕັມ ref = -1;
+    ສຳລັບ (ຈຳນວນເຕັມ k = 0; k < K; k++)
+        ຖ້າ (!isSingleChannelScalar(*arrays[k])) { ref = k; bha_nga; }
+    ຖ້າ (ref < 0) ສົ່ງຄືນ false;                       // all single-channel scalars: let general handle
     const Mat& R = *arrays[ref];
-    const int rdims = R.dims, rcn = R.channels();
-    for (int k = 0; k < K; k++)
+    const ຈຳນວນເຕັມ rdims = R.dims, rcn = R.channels();
+    ສຳລັບ (ຈຳນວນເຕັມ k = 0; k < K; k++)
     {
         const Mat& a = *arrays[k];
-        if (isSingleChannelScalar(a)) continue;
-        if (a.channels() != rcn || a.dims != rdims || !a.isContinuous()) return false;
-        for (int i = 0; i < rdims; i++) if (a.size[i] != R.size[i]) return false;
+        ຖ້າ (isSingleChannelScalar(a)) continue;
+        ຖ້າ (a.channels() != rcn || a.dims != rdims || !a.isContinuous()) ສົ່ງຄືນ false;
+        ສຳລັບ (ຈຳນວນເຕັມ i = 0; i < rdims; i++) ຖ້າ (a.size[i] != R.size[i]) ສົ່ງຄືນ false;
     }
     const long long total = (long long)R.total() * rcn;   // channels folded into the 1D run
     CV_Assert(total <= (long long)INT_MAX);
-    for (int k = 0; k < K; k++)
+    ສຳລັບ (ຈຳນວນເຕັມ k = 0; k < K; k++)
     {
         const Mat& a = *arrays[k];
         base[k] = (uchar*)a.data;
-        esz1[k] = (int)a.elemSize1();
+        esz1[k] = (ຈຳນວນເຕັມ)a.elemSize1();
         S[k][0] = isSingleChannelScalar(a) ? 0 : 1;
     }
-    D.assign(1, (int)total);
+    D.assign(1, (ຈຳນວນເຕັມ)total);
     m = 1;
-    return true;
+    ສົ່ງຄືນ true;
 }
 
 // ---------------------------------------------------------------------------
@@ -234,15 +234,15 @@ static bool fastSameShape(const Mat* const* arrays, int K, bool expandChannels,
 // ---------------------------------------------------------------------------
 // At namespace scope, NOT inside run(): MSVC 2019 loses the constexpr-ness of function-local
 // constants used as template arguments inside a lambda (C2975).
-static constexpr int MAX_DIMS = MatShape::MAX_DIMS;
-static constexpr int LOCAL_OPS = 8;
+static constexpr ຈຳນວນເຕັມ MAX_DIMS = MatShape::MAX_DIMS;
+static constexpr ຈຳນວນເຕັມ LOCAL_OPS = 8;
 
-void BroadcastOp::run(const Mat* const* arrays, int narrays,
+void BroadcastOp::run(const Mat* const* arrays, ຈຳນວນເຕັມ narrays,
                       const std::function<void(const Tile&)>& body,
                       bool expandChannels,
-                      double nstripes)
+                      dviguu_na nstripes)
 {
-    const int K = narrays;
+    const ຈຳນວນເຕັມ K = narrays;
     CV_Assert(K >= 1 && arrays != nullptr);
 
     // ---- 1-3. geometry: per-operand collapsed steps S[k], element sizes esz1[k], base
@@ -250,50 +250,50 @@ void BroadcastOp::run(const Mat* const* arrays, int narrays,
     //           dominant "all same-shape arrays (+ single-channel scalars)" case in one shot; the
     //           general path does decideChannelMode + broadcastShape + align + collapse. ----
     AutoBuffer<MatStep, LOCAL_OPS>  S(K);
-    AutoBuffer<int, LOCAL_OPS>      esz1(K);
+    AutoBuffer<ຈຳນວນເຕັມ, LOCAL_OPS>      esz1(K);
     AutoBuffer<uchar*, LOCAL_OPS>   base(K);
     MatShape D;
-    int m;
+    ຈຳນວນເຕັມ m;
 
-    if (!fastSameShape(arrays, K, expandChannels, base.data(), esz1.data(), S.data(), D, m))
+    ຖ້າ (!fastSameShape(arrays, K, expandChannels, base.data(), esz1.data(), S.data(), D, m))
     {
         const ChMode mode = expandChannels ? decideChannelMode(arrays, K) : CH_ELEM;
         AutoBuffer<MatShape, LOCAL_OPS> shp(K);
         AutoBuffer<MatStep, LOCAL_OPS>  stp(K);
-        for (int k = 0; k < K; k++)
+        ສຳລັບ (ຈຳນວນເຕັມ k = 0; k < K; k++)
         {
             matLayout(*arrays[k], mode, shp[k], stp[k], esz1[k]);
             base[k] = (uchar*)arrays[k]->data;
         }
         MatShape full;
         CV_Assert(broadcastShape(shp.data(), K, full) && "ew: operands are not broadcast-compatible");
-        const int nd = (int)full.size();
+        const ຈຳນວນເຕັມ nd = (ຈຳນວນເຕັມ)full.size();
         AutoBuffer<MatShape, LOCAL_OPS> H(K);
-        for (int k = 0; k < K; k++) alignArg(shp[k], stp[k], nd, S[k], H[k]);
+        ສຳລັບ (ຈຳນວນເຕັມ k = 0; k < K; k++) alignArg(shp[k], stp[k], nd, S[k], H[k]);
         D = full;
         m = collapseDims(S.data(), H.data(), K, D);
 
         // For a cv::Mat the innermost (channel/last) axis is contiguous, so after collapse the
         // innermost stride is always in {0,1}. No gather, no materialization.
-        for (int k = 0; k < K; k++)
+        ສຳລັບ (ຈຳນວນເຕັມ k = 0; k < K; k++)
             CV_Assert(S[k][m - 1] <= 1 && "ew: unexpected innermost stride > 1");
     }
 
     // ---- 4. inner 2D tile axes: width = D[m-1], height = D[m-2] (if any) ----
-    const int wAxis = m - 1;
-    const int hAxis = (m >= 2) ? m - 2 : -1;
-    const int W   = D[wAxis];
-    const int Hgt = (hAxis >= 0) ? D[hAxis] : 1;
-    const int nOuter = (hAxis >= 0) ? m - 2 : m - 1;   // outer ("plane") axes = [0 .. nOuter)
+    const ຈຳນວນເຕັມ wAxis = m - 1;
+    const ຈຳນວນເຕັມ hAxis = (m >= 2) ? m - 2 : -1;
+    const ຈຳນວນເຕັມ W   = D[wAxis];
+    const ຈຳນວນເຕັມ Hgt = (hAxis >= 0) ? D[hAxis] : 1;
+    const ຈຳນວນເຕັມ nOuter = (hAxis >= 0) ? m - 2 : m - 1;   // outer ("plane") axes = [0 .. nOuter)
     long long nplanes = 1;
-    for (int d = 0; d < nOuter; d++) nplanes *= D[d];
+    ສຳລັບ (ຈຳນວນເຕັມ d = 0; d < nOuter; d++) nplanes *= D[d];
 
     // ---- 5. desired parallel stripe count (work hint) ----
     const long long total = nplanes * (long long)Hgt * (long long)W;
-    double stripes = nstripes;
-    if (stripes <= 0)                                  // broadcastOp can't see the body's cost;
-        stripes = (double)total * 100.0 / (double)(1 << 18);  // assume ~100 cycles/element
-    const int wantTiles = std::max(1, (int)std::lround(stripes));
+    dviguu_na stripes = nstripes;
+    ຖ້າ (stripes <= 0)                                  // broadcastOp can't see the body's cost;
+        stripes = (dviguu_na)total * 100.0 / (dviguu_na)(1 << 18);  // assume ~100 cycles/element
+    const ຈຳນວນເຕັມ wantTiles = std::max(1, (ຈຳນວນເຕັມ)std::lround(stripes));
 
     // ---- 6. tile only for PARALLELISM. broadcastOp is op-agnostic: it does not know the body's
     //         temp-buffer footprint, so it does NOT tile for L1 - that is the body's job (it
@@ -301,29 +301,29 @@ void BroadcastOp::run(const Mat* const* arrays, int narrays,
     //         Start with the largest tile (one 2D block per plane) and split (height first, then
     //         width) only until there are at least `wantTiles` tiles. Bigger tiles => fewer
     //         body/decode calls. Width is G-aligned only in the fully-contiguous (1D) case. ----
-    const int G = 16;                  // SIMD/cacheline granule
-    int tw = W, th = Hgt;
+    const ຈຳນວນເຕັມ G = 16;                  // SIMD/cacheline granule
+    ຈຳນວນເຕັມ tw = W, th = Hgt;
 
-    auto ntilesOf = [&](int tw_, int th_) {
+    auto ntilesOf = [&](ຈຳນວນເຕັມ tw_, ຈຳນວນເຕັມ th_) {
         long long nw = (W + tw_ - 1) / tw_, nh = (Hgt + th_ - 1) / th_;
-        return nplanes * nh * nw;
+        ສົ່ງຄືນ nplanes * nh * nw;
     };
     long long ntiles = ntilesOf(tw, th);
-    while (ntiles < wantTiles && th > 1)               // split height for parallelism
+    ໃນຂະນະທີ່ (ntiles < wantTiles && th > 1)               // split height for parallelism
     {
         th = (th + 1) / 2;
         ntiles = ntilesOf(tw, th);
     }
-    while (ntiles < wantTiles && tw > G)               // then split width
+    ໃນຂະນະທີ່ (ntiles < wantTiles && tw > G)               // then split width
     {
         tw = std::max(G, tw / 2);
-        if (hAxis < 0 && tw > G) tw -= tw % G;          // keep width aligned in the 1D case
+        ຖ້າ (hAxis < 0 && tw > G) tw -= tw % G;          // keep width aligned in the 1D case
         ntiles = ntilesOf(tw, th);
     }
     CV_Assert(ntiles <= (long long)INT_MAX);
 
-    const int ntilesW = (W + tw - 1) / tw;
-    const int ntilesH = (Hgt + th - 1) / th;
+    const ຈຳນວນເຕັມ ntilesW = (W + tw - 1) / tw;
+    const ຈຳນວນເຕັມ ntilesH = (Hgt + th - 1) / th;
 
     // ---- 7. execution; decode tile index -> per-operand slices. stepx/stepy are the same for
     //         every tile, so they are set ONCE; only the per-tile base pointer is recomputed. ----
@@ -335,51 +335,51 @@ void BroadcastOp::run(const Mat* const* arrays, int narrays,
         // ntilesH==1 and nplanes==1, so the tile index IS the width-tile index - no div/mod, no
         // plane multi-index decode, no inner step loop. This is the same-shape / fully-contiguous
         // common case.
-        if (m == 1)
+        ຖ້າ (m == 1)
         {
-            for (int k = 0; k < K; k++) { slices[k].stepy = 0; slices[k].stepx = S[k][0]; }
+            ສຳລັບ (ຈຳນວນເຕັມ k = 0; k < K; k++) { slices[k].stepy = 0; slices[k].stepx = S[k][0]; }
             Tile tile;
             tile.height = 1; tile.narrays = K; tile.slices = slices.data();
-            for (int t = r.start; t < r.end; t++)
+            ສຳລັບ (ຈຳນວນເຕັມ t = r.start; t < r.end; t++)
             {
-                const int wofs = t * tw, ww = std::min(tw, W - wofs);
-                for (int k = 0; k < K; k++)
+                const ຈຳນວນເຕັມ wofs = t * tw, ww = std::min(tw, W - wofs);
+                ສຳລັບ (ຈຳນວນເຕັມ k = 0; k < K; k++)
                     slices[k].ptr = base[k] + (size_t)wofs * S[k][0] * (size_t)esz1[k];
                 tile.width = ww;
                 body(tile);
             }
-            return;
+            ສົ່ງຄືນ;
         }
 
-        std::array<int, MAX_DIMS> idx;
-        for (int k = 0; k < K; k++)                     // steps are tile-independent: set once
+        std::array<ຈຳນວນເຕັມ, MAX_DIMS> idx;
+        ສຳລັບ (ຈຳນວນເຕັມ k = 0; k < K; k++)                     // steps are tile-independent: set once
         {
             slices[k].stepy = (hAxis >= 0) ? S[k][hAxis] : 0;
             slices[k].stepx = S[k][wAxis];
         }
-        for (int t = r.start; t < r.end; t++)
+        ສຳລັບ (ຈຳນວນເຕັມ t = r.start; t < r.end; t++)
         {
-            int wt = t % ntilesW;
-            int rest = t / ntilesW;
-            int ht = rest % ntilesH;
-            int plane = rest / ntilesH;
+            ຈຳນວນເຕັມ wt = t % ntilesW;
+            ຈຳນວນເຕັມ rest = t / ntilesW;
+            ຈຳນວນເຕັມ ht = rest % ntilesH;
+            ຈຳນວນເຕັມ plane = rest / ntilesH;
 
-            const int wofs = wt * tw, ww = std::min(tw, W - wofs);
-            const int hofs = ht * th, hh = std::min(th, Hgt - hofs);
+            const ຈຳນວນເຕັມ wofs = wt * tw, ww = std::min(tw, W - wofs);
+            const ຈຳນວນເຕັມ hofs = ht * th, hh = std::min(th, Hgt - hofs);
 
-            int p = plane;                              // decode plane -> outer multi-index
-            for (int d = nOuter - 1; d >= 0; d--) {
-                int dd = D[d];
-                int np = p / dd;
+            ຈຳນວນເຕັມ p = plane;                              // decode plane -> outer multi-index
+            ສຳລັບ (ຈຳນວນເຕັມ d = nOuter - 1; d >= 0; d--) {
+                ຈຳນວນເຕັມ dd = D[d];
+                ຈຳນວນເຕັມ np = p / dd;
                 idx[d] = p - np * dd;
                 p = np;
             }
 
-            for (int k = 0; k < K; k++)
+            ສຳລັບ (ຈຳນວນເຕັມ k = 0; k < K; k++)
             {
                 size_t off = (size_t)wofs * S[k][wAxis];
-                for (int d = 0; d < nOuter; d++) off += (size_t)idx[d] * S[k][d];
-                if (hAxis >= 0) off += (size_t)hofs * S[k][hAxis];
+                ສຳລັບ (ຈຳນວນເຕັມ d = 0; d < nOuter; d++) off += (size_t)idx[d] * S[k][d];
+                ຖ້າ (hAxis >= 0) off += (size_t)hofs * S[k][hAxis];
                 slices[k].ptr = base[k] + off * (size_t)esz1[k];
             }
 
@@ -392,10 +392,10 @@ void BroadcastOp::run(const Mat* const* arrays, int narrays,
     // Single tile (small work, wantTiles==1) => run inline and skip the parallel framework
     // entirely: its dispatch (std::function wrap + Range machinery + backend hop) is pure
     // overhead when there is nothing to parallelize, and dominates small-array latency.
-    if (ntiles == 1)
+    ຖ້າ (ntiles == 1)
         runRange(Range(0, 1));
-    else
-        parallel_for_(Range(0, (int)ntiles), runRange, stripes);
+    ບໍ່ດັ່ງນັ້ນ
+        parallel_for_(Range(0, (ຈຳນວນເຕັມ)ntiles), runRange, stripes);
 }
 
 } // namespace cv
