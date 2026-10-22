@@ -2,228 +2,228 @@
 // It is subject to the license terms in the LICENSE file found in the top-level directory
 // of this distribution and at http://opencv.org/license.html
 
-#include "precomp.hpp"
-#include "persistence.hpp"
+#ضمن "precomp.hpp"
+#ضمن "persistence.hpp"
 
-namespace cv
+نطاق cv
 {
 
-void write( FileStorage& fs, const String& name, const Mat& m )
+فراغ اكتب( FileStorage& fs, ثابت String& name, ثابت Mat& m )
 {
-    char dt[22];
+    حرف dt[22];
 
-    if( m.dims == 2 || m.empty() )
+    إذا( m.dims == 2 || m.empty() )
     {
-        fs.startWriteStruct(name, FileNode::MAP, String("opencv-matrix"));
+        fs.startWriteStruct(name, File_كلي::MAP, String("opencv-matrix"));
         fs << "rows" << m.rows;
         fs << "cols" << m.cols;
-        fs << "dt" << fs::encodeFormat( m.type(), dt, sizeof(dt) );
+        fs << "dt" << fs::encodeFormat( m.type(), dt, حجم(dt) );
         fs << "data" << "[:";
-        for( int i = 0; i < m.rows; i++ )
+        لكل( صحيح i = 0; i < m.rows; i++ )
             fs.writeRaw(dt, m.ptr(i), m.cols*m.elemSize());
         fs << "]";
         fs.endWriteStruct();
     }
-    else
+    وإلا
     {
-        fs.startWriteStruct(name, FileNode::MAP, String("opencv-nd-matrix"));
+        fs.startWriteStruct(name, File_كلي::MAP, String("opencv-nd-matrix"));
         fs << "sizes" << "[:";
-        fs.writeRaw( "i", m.size.p, m.dims*sizeof(int) );
+        fs.writeRaw( "i", m.size.p, m.dims*حجم(صحيح) );
         fs << "]";
-        fs << "dt" << fs::encodeFormat( m.type(), dt, sizeof(dt) );
+        fs << "dt" << fs::encodeFormat( m.type(), dt, حجم(dt) );
         fs << "data" << "[:";
-        const Mat* arrays[] = {&m, 0};
+        ثابت Mat* arrays[] = {&m, 0};
         uchar* ptrs[1] = {};
         NAryMatIterator it(arrays, ptrs);
         size_t total = it.size*m.elemSize();
 
-        for( size_t i = 0; i < it.nplanes; i++, ++it )
+        لكل( size_t i = 0; i < it.nplanes; i++, ++it )
             fs.writeRaw( dt, ptrs[0], total );
         fs << "]";
         fs.endWriteStruct();
     }
 }
 
-struct SparseNodeCmp
+بنية Sparse_كلي_Cmp
 {
-    SparseNodeCmp(int _dims) : dims(_dims) {}
-    bool operator()(const SparseMat::Node* a, const SparseMat::Node* b)
+    Sparse_كلي_Cmp(صحيح _dims) : dims(_dims) {}
+    منطقي operator()(ثابت SparseMat::Node* a, ثابت SparseMat::Node* b)
     {
-        for( int i = 0; i < dims; i++ )
+        لكل( صحيح i = 0; i < dims; i++ )
         {
-            int d = a->idx[i] - b->idx[i];
-            if(d)
-                return d < 0;
+            صحيح d = a->idx[i] - b->idx[i];
+            إذا(d)
+                أرجع d < 0;
         }
-        return false;
+        أرجع خطأ;
     }
 
-    int dims;
+    صحيح dims;
 };
 
-void write( FileStorage& fs, const String& name, const SparseMat& m )
+فراغ اكتب( FileStorage& fs, ثابت String& name, ثابت SparseMat& m )
 {
-    char dt[22];
+    حرف dt[22];
 
-    fs.startWriteStruct(name, FileNode::MAP, String("opencv-sparse-matrix"));
+    fs.startWriteStruct(name, File_كلي::MAP, String("opencv-sparse-matrix"));
     fs << "sizes" << "[:";
-    int dims = m.dims();
-    if( dims > 0 )
-        fs.writeRaw("i", m.hdr->size, dims*sizeof(int) );
+    صحيح dims = m.dims();
+    إذا( dims > 0 )
+        fs.writeRaw("i", m.hdr->size, dims*حجم(صحيح) );
     fs << "]";
-    fs << "dt" << fs::encodeFormat( m.type(), dt, sizeof(dt) );
+    fs << "dt" << fs::encodeFormat( m.type(), dt, حجم(dt) );
     fs << "data" << "[:";
 
     size_t i = 0, n = m.nzcount();
-    AutoBuffer<const SparseMat::Node*> elems(n);
+    AutoBuffer<ثابت SparseMat::Node*> elems(n);
     SparseMatConstIterator it = m.begin(), it_end = m.end();
 
-    for( ; it != it_end; ++it )
+    لكل( ; it != it_end; ++it )
     {
-        CV_Assert(it.node() != 0);
-        elems[i++] = it.node();
+        CV_Assert(it.كلي() != 0);
+        elems[i++] = it.كلي();
     }
 
-    std::sort(elems.begin(), elems.end(), SparseNodeCmp(dims));
-    const SparseMat::Node* prev_node = 0;
+    std::sort(elems.begin(), elems.end(), Sparse_كلي_Cmp(dims));
+    ثابت SparseMat::Node* prev_كلي = 0;
     size_t esz = m.elemSize();
 
-    for( i = 0; i < n; i++ )
+    لكل( i = 0; i < n; i++ )
     {
-        const SparseMat::Node* node = elems[i];
-        int k = 0;
+        ثابت SparseMat::Node* كلي = elems[i];
+        صحيح k = 0;
 
-        if( prev_node )
+        إذا( prev_كلي )
         {
-            for( ; k < dims; k++ )
-                if( node->idx[k] != prev_node->idx[k] )
-                    break;
+            لكل( ; k < dims; k++ )
+                إذا( كلي->idx[k] != prev_كلي->idx[k] )
+                    اكسر;
             CV_Assert( k < dims );
-            if( k < dims - 1 )
+            إذا( k < dims - 1 )
                 writeScalar( fs, k - dims + 1 );
         }
-        for( ; k < dims; k++ )
-            writeScalar( fs, node->idx[k] );
-        prev_node = node;
+        لكل( ; k < dims; k++ )
+            writeScalar( fs, كلي->idx[k] );
+        prev_كلي = كلي;
 
-        const uchar* value = &m.value<uchar>(node);
+        ثابت uchar* value = &m.value<uchar>(كلي);
         fs.writeRaw(dt, value, esz);
     }
 
     fs << "]" << "}";
 }
 
-void read(const FileNode& node, Mat& m, const Mat& default_mat)
+فراغ اقرأ(ثابت File_كلي& كلي, Mat& m, ثابت Mat& default_mat)
 {
-    if( node.empty() )
+    إذا( كلي.empty() )
     {
         default_mat.copyTo(m);
-        return;
+        أرجع;
     }
 
     std::string dt;
-    int rows, cols, elem_type;
+    صحيح rows, cols, elem_type;
 
-    read(node["dt"], dt, std::string());
+    اقرأ(كلي["dt"], dt, std::string());
     CV_Assert( !dt.empty() );
 
     elem_type = fs::decodeSimpleFormat( dt.c_str() );
 
-    read(node["rows"], rows, -1);
-    if( rows >= 0 )
+    اقرأ(كلي["rows"], rows, -1);
+    إذا( rows >= 0 )
     {
-        read(node["cols"], cols, -1);
+        اقرأ(كلي["cols"], cols, -1);
         m.create(rows, cols, elem_type);
     }
-    else
+    وإلا
     {
-        int sizes[CV_MAX_DIM] = {0}, dims;
-        FileNode sizes_node = node["sizes"];
-        CV_Assert( !sizes_node.empty() );
+        صحيح sizes[CV_MAX_DIM] = {0}, dims;
+        File_كلي sizes_كلي = كلي["sizes"];
+        CV_Assert( !sizes_كلي.empty() );
 
-        dims = (int)sizes_node.size();
+        dims = (صحيح)sizes_كلي.size();
         CV_Assert( dims >= 0 && dims <= CV_MAX_DIM );
-        sizes_node.readRaw("i", sizes, dims*sizeof(sizes[0]));
+        sizes_كلي.readRaw("i", sizes, dims*حجم(sizes[0]));
 
         m.create(dims, sizes, elem_type);
     }
 
-    FileNode data_node = node["data"];
-    CV_Assert(!data_node.empty());
+    File_كلي data_كلي = كلي["data"];
+    CV_Assert(!data_كلي.empty());
 
-    size_t nelems = data_node.size();
-    if (nelems == 0)
+    size_t nelems = data_كلي.size();
+    إذا (nelems == 0)
     {
         m = Mat();
-        return;
+        أرجع;
     }
     CV_Assert(nelems == m.total()*m.channels());
 
-    data_node.readRaw(dt, (uchar*)m.ptr(), m.total()*m.elemSize());
+    data_كلي.readRaw(dt, (uchar*)m.ptr(), m.total()*m.elemSize());
 }
 
-void read( const FileNode& node, SparseMat& m, const SparseMat& default_mat )
+فراغ اقرأ( ثابت File_كلي& كلي, SparseMat& m, ثابت SparseMat& default_mat )
 {
-    if( node.empty() )
+    إذا( كلي.empty() )
     {
         default_mat.copyTo(m);
-        return;
+        أرجع;
     }
 
     std::string dt;
-    read(node["dt"], dt, std::string());
+    اقرأ(كلي["dt"], dt, std::string());
     CV_Assert( !dt.empty() );
 
-    int elem_type = fs::decodeSimpleFormat( dt.c_str() );
+    صحيح elem_type = fs::decodeSimpleFormat( dt.c_str() );
 
-    int sizes[CV_MAX_DIM] = {0};
-    FileNode sizes_node = node["sizes"];
-    CV_Assert( !sizes_node.empty() );
+    صحيح sizes[CV_MAX_DIM] = {0};
+    File_كلي sizes_كلي = كلي["sizes"];
+    CV_Assert( !sizes_كلي.empty() );
 
-    int dims = (int)sizes_node.size();
+    صحيح dims = (صحيح)sizes_كلي.size();
     CV_Assert( dims > 0 && dims <= CV_MAX_DIM );
-    sizes_node.readRaw("i", sizes, dims*sizeof(sizes[0]));
+    sizes_كلي.readRaw("i", sizes, dims*حجم(sizes[0]));
 
     m.create(dims, sizes, elem_type);
 
-    FileNode data = node["data"];
+    File_كلي data = كلي["data"];
     CV_Assert( data.isSeq() );
 
-    int cn = CV_MAT_CN(elem_type);
-    int idx[CV_MAX_DIM] = {0};
+    صحيح cn = CV_MAT_CN(elem_type);
+    صحيح idx[CV_MAX_DIM] = {0};
     size_t i, sz = data.size();
     size_t esz = m.elemSize();
-    FileNodeIterator it = data.begin();
+    File_كلي_Iterator it = data.begin();
 
-    for( i = 0; i < sz; )
+    لكل( i = 0; i < sz; )
     {
-        FileNode n = *it;
-        int k = (int)n;
-        if( i > 0 && k >= 0 )
+        File_كلي n = *it;
+        صحيح k = (صحيح)n;
+        إذا( i > 0 && k >= 0 )
         {
             CV_Assert( k < sizes[dims-1] );
             idx[dims-1] = k;
         }
-        else
+        وإلا
         {
-            if( i > 0 )
+            إذا( i > 0 )
             {
                 // write() stores the first changed dimension as k - dims + 1
                 k = dims + k - 1;
                 CV_Assert( k >= 0 );
             }
-            else
+            وإلا
             {
                 CV_Assert( k >= 0 && k < sizes[0] );
                 idx[0] = k, k = 1;
             }
-            for( ; k < dims; k++ )
+            لكل( ; k < dims; k++ )
             {
                 ++it;
                 i++;
                 n = *it;
                 CV_Assert( n.isInt() );
-                int idx_k = (int)n;
+                صحيح idx_k = (صحيح)n;
                 CV_Assert( idx_k >= 0 && idx_k < sizes[k] );
                 idx[k] = idx_k;
             }
@@ -236,94 +236,94 @@ void read( const FileNode& node, SparseMat& m, const SparseMat& default_mat )
     }
 }
 
-void read(const FileNode& node, KeyPoint& value, const KeyPoint& default_value)
+فراغ اقرأ(ثابت File_كلي& كلي, مبودي_Point& value, ثابت مبودي_Point& default_درج)
 {
-    if( node.empty() )
+    إذا( كلي.empty() )
     {
-        value = default_value;
-        return;
+        value = default_درج;
+        أرجع;
     }
-    node >> value;
+    كلي >> value;
 }
 
-void read(const FileNode& node, DMatch& value, const DMatch& default_value)
+فراغ اقرأ(ثابت File_كلي& كلي, DMatch& value, ثابت DMatch& default_درج)
 {
-    if( node.empty() )
+    إذا( كلي.empty() )
     {
-        value = default_value;
-        return;
+        value = default_درج;
+        أرجع;
     }
-    node >> value;
+    كلي >> value;
 }
 
 #ifdef CV__LEGACY_PERSISTENCE
-void write( FileStorage& fs, const std::string& name, const std::vector<KeyPoint>& vec)
+فراغ اكتب( FileStorage& fs, ثابت std::string& name, ثابت std::vector<مبودي_Point>& vec)
 {
     // from template implementation
-    cv::internal::WriteStructContext ws(fs, name, FileNode::SEQ);
-    write(fs, vec);
+    cv::internal::WriteStructContext ws(fs, name, File_كلي::SEQ);
+    اكتب(fs, vec);
 }
 
-void read(const FileNode& node, std::vector<KeyPoint>& keypoints)
+فراغ اقرأ(ثابت File_كلي& كلي, std::vector<مبودي_Point>& keypoints)
 {
-    FileNode first_node = *(node.begin());
-    if (first_node.isSeq())
+    File_كلي first_كلي = *(كلي.begin());
+    إذا (first_كلي.isSeq())
     {
         // modern scheme
 #ifdef OPENCV_TRAITS_ENABLE_DEPRECATED
-        FileNodeIterator it = node.begin();
+        File_كلي_Iterator it = كلي.begin();
         size_t total = (size_t)it.remaining;
         keypoints.resize(total);
-        for (size_t i = 0; i < total; ++i, ++it)
+        لكل (size_t i = 0; i < total; ++i, ++it)
         {
             (*it) >> keypoints[i];
         }
-#else
-        FileNodeIterator it = node.begin();
+#وإلا
+        File_كلي_Iterator it = كلي.begin();
         it >> keypoints;
 #endif
-        return;
+        أرجع;
     }
     keypoints.clear();
-    FileNodeIterator it = node.begin(), it_end = node.end();
-    for( ; it != it_end; )
+    File_كلي_Iterator it = كلي.begin(), it_end = كلي.end();
+    لكل( ; it != it_end; )
     {
-        KeyPoint kpt;
+        مبودي_Point kpt;
         it >> kpt.pt.x >> kpt.pt.y >> kpt.size >> kpt.angle >> kpt.response >> kpt.octave >> kpt.class_id;
         keypoints.push_back(kpt);
     }
 }
 
-void write( FileStorage& fs, const std::string& name, const std::vector<DMatch>& vec)
+فراغ اكتب( FileStorage& fs, ثابت std::string& name, ثابت std::vector<DMatch>& vec)
 {
     // from template implementation
-    cv::internal::WriteStructContext ws(fs, name, FileNode::SEQ);
-    write(fs, vec);
+    cv::internal::WriteStructContext ws(fs, name, File_كلي::SEQ);
+    اكتب(fs, vec);
 }
 
-void read(const FileNode& node, std::vector<DMatch>& matches)
+فراغ اقرأ(ثابت File_كلي& كلي, std::vector<DMatch>& matches)
 {
-    FileNode first_node = *(node.begin());
-    if (first_node.isSeq())
+    File_كلي first_كلي = *(كلي.begin());
+    إذا (first_كلي.isSeq())
     {
         // modern scheme
 #ifdef OPENCV_TRAITS_ENABLE_DEPRECATED
-        FileNodeIterator it = node.begin();
+        File_كلي_Iterator it = كلي.begin();
         size_t total = (size_t)it.remaining;
         matches.resize(total);
-        for (size_t i = 0; i < total; ++i, ++it)
+        لكل (size_t i = 0; i < total; ++i, ++it)
         {
             (*it) >> matches[i];
         }
-#else
-        FileNodeIterator it = node.begin();
+#وإلا
+        File_كلي_Iterator it = كلي.begin();
         it >> matches;
 #endif
-        return;
+        أرجع;
     }
     matches.clear();
-    FileNodeIterator it = node.begin(), it_end = node.end();
-    for( ; it != it_end; )
+    File_كلي_Iterator it = كلي.begin(), it_end = كلي.end();
+    لكل( ; it != it_end; )
     {
         DMatch m;
         it >> m.queryIdx >> m.trainIdx >> m.imgIdx >> m.distance;

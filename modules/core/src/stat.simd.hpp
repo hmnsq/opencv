@@ -4,144 +4,144 @@
 //
 // Copyright (C) 2026, Advanced Micro Devices, Inc., all rights reserved.
 
-#include "opencv2/core/hal/intrin.hpp"
+#ضمن "opencv2/core/hal/intrin.hpp"
 
-namespace cv { namespace hal {
+نطاق cv { نطاق hal {
 
-extern const uchar popCountTable[256];
+خارجي ثابت uchar چرو_كدي_Table[256];
 
-typedef int (*NormHammingFunc)(const uchar*, int);
-typedef int (*NormHammingDiffFunc)(const uchar*, const uchar*, int);
+تعريفنوع صحيح (*NormHammingFunc)(ثابت uchar*, صحيح);
+تعريفنوع صحيح (*NormHammingDiffFunc)(ثابت uchar*, ثابت uchar*, صحيح);
 
 CV_CPU_OPTIMIZATION_NAMESPACE_BEGIN
 
 // forward declarations
-int normHamming(const uchar* a, int n);
-int normHamming(const uchar* a, const uchar* b, int n);
+صحيح normHamming(ثابت uchar* a, صحيح n);
+صحيح normHamming(ثابت uchar* a, ثابت uchar* b, صحيح n);
 
 NormHammingFunc getNormHammingFunc();
 NormHammingDiffFunc getNormHammingDiffFunc();
 
 #ifndef CV_CPU_OPTIMIZATION_DECLARATIONS_ONLY
 
-#if CV_AVX2
-static inline int _mm256_extract_epi32_(__m256i reg, const int i)
+#إذا CV_AVX2
+ساكن مضمن صحيح _mm256_extract_epi32_(__m256i reg, ثابت صحيح i)
 {
-    CV_DECL_ALIGNED(32) int reg_data[8];
+    CV_DECL_ALIGNED(32) صحيح reg_data[8];
     CV_DbgAssert(0 <= i && i < 8);
     _mm256_store_si256((__m256i*)reg_data, reg);
-    return reg_data[i];
+    أرجع reg_data[i];
 }
 #endif
 
-int normHamming(const uchar* a, int n)
+صحيح normHamming(ثابت uchar* a, صحيح n)
 {
     CV_AVX_GUARD;
 
-    int i = 0;
-    int result = 0;
+    صحيح i = 0;
+    صحيح result = 0;
 
-#if (CV_SIMD || CV_SIMD_SCALABLE)
+#إذا (CV_SIMD || CV_SIMD_SCALABLE)
     {
         v_uint64 t = vx_setzero_u64();
-        for (; i <= n - VTraits<v_uint8>::vlanes(); i += VTraits<v_uint8>::vlanes())
+        لكل (; i <= n - VTraits<v_uint8>::vlanes(); i += VTraits<v_uint8>::vlanes())
             t = v_add(t, v_popcount(v_reinterpret_as_u64(vx_load(a + i))));
-        result = (int)v_reduce_sum(t);
+        result = (صحيح)v_reduce_sum(t);
         vx_cleanup();
     }
 #endif
 
-#if CV_POPCNT
+#إذا CV_POPCNT
     {
-#  if defined CV_POPCNT_U64
-        for(; i <= n - 8; i += 8)
+#  إذا defined CV_POPCNT_U64
+        لكل(; i <= n - 8; i += 8)
         {
             uint64_t val;
-            std::memcpy(&val, a + i, sizeof(val));
-            result += (int)CV_POPCNT_U64(val);
+            std::memcpy(&val, a + i, حجم(val));
+            result += (صحيح)CV_POPCNT_U64(val);
         }
 #  endif
-        for(; i <= n - 4; i += 4)
+        لكل(; i <= n - 4; i += 4)
         {
             uint32_t val;
-            std::memcpy(&val, a + i, sizeof(val));
+            std::memcpy(&val, a + i, حجم(val));
             result += CV_POPCNT_U32(val);
         }
     }
 #endif
-#if CV_ENABLE_UNROLLED
-    for(; i <= n - 4; i += 4)
+#إذا CV_ENABLE_UNROLLED
+    لكل(; i <= n - 4; i += 4)
     {
-        result += popCountTable[a[i]] + popCountTable[a[i+1]] +
-        popCountTable[a[i+2]] + popCountTable[a[i+3]];
+        result += چرو_كدي_Table[a[i]] + چرو_كدي_Table[a[i+1]] +
+        چرو_كدي_Table[a[i+2]] + چرو_كدي_Table[a[i+3]];
     }
 #endif
-    for(; i < n; i++)
+    لكل(; i < n; i++)
     {
-        result += popCountTable[a[i]];
+        result += چرو_كدي_Table[a[i]];
     }
-    return result;
+    أرجع result;
 }
 
-int normHamming(const uchar* a, const uchar* b, int n)
+صحيح normHamming(ثابت uchar* a, ثابت uchar* b, صحيح n)
 {
     CV_AVX_GUARD;
 
-    int i = 0;
-    int result = 0;
+    صحيح i = 0;
+    صحيح result = 0;
 
-#if (CV_SIMD || CV_SIMD_SCALABLE)
+#إذا (CV_SIMD || CV_SIMD_SCALABLE)
     {
         v_uint64 t = vx_setzero_u64();
-        for (; i <= n - VTraits<v_uint8>::vlanes(); i += VTraits<v_uint8>::vlanes())
+        لكل (; i <= n - VTraits<v_uint8>::vlanes(); i += VTraits<v_uint8>::vlanes())
             t = v_add(t, v_popcount(v_reinterpret_as_u64(v_xor(vx_load(a + i), vx_load(b + i)))));
-        result += (int)v_reduce_sum(t);
+        result += (صحيح)v_reduce_sum(t);
     }
 #endif
 
-#if CV_POPCNT
+#إذا CV_POPCNT
     {
-#  if defined CV_POPCNT_U64
-        for(; i <= n - 8; i += 8)
+#  إذا defined CV_POPCNT_U64
+        لكل(; i <= n - 8; i += 8)
         {
             uint64_t val_a, val_b;
-            std::memcpy(&val_a, a + i, sizeof(val_a));
-            std::memcpy(&val_b, b + i, sizeof(val_b));
-            result += (int)CV_POPCNT_U64(val_a ^ val_b);
+            std::memcpy(&val_a, a + i, حجم(val_a));
+            std::memcpy(&val_b, b + i, حجم(val_b));
+            result += (صحيح)CV_POPCNT_U64(val_a ^ val_b);
         }
 #  endif
-        for(; i <= n - 4; i += 4)
+        لكل(; i <= n - 4; i += 4)
         {
             uint32_t val_a, val_b;
-            std::memcpy(&val_a, a + i, sizeof(val_a));
-            std::memcpy(&val_b, b + i, sizeof(val_b));
-            result += (int)CV_POPCNT_U32(val_a ^ val_b);
+            std::memcpy(&val_a, a + i, حجم(val_a));
+            std::memcpy(&val_b, b + i, حجم(val_b));
+            result += (صحيح)CV_POPCNT_U32(val_a ^ val_b);
         }
     }
 #endif
-#if CV_ENABLE_UNROLLED
-    for(; i <= n - 4; i += 4)
+#إذا CV_ENABLE_UNROLLED
+    لكل(; i <= n - 4; i += 4)
     {
-        result += popCountTable[a[i] ^ b[i]] + popCountTable[a[i+1] ^ b[i+1]] +
-                popCountTable[a[i+2] ^ b[i+2]] + popCountTable[a[i+3] ^ b[i+3]];
+        result += چرو_كدي_Table[a[i] ^ b[i]] + چرو_كدي_Table[a[i+1] ^ b[i+1]] +
+                چرو_كدي_Table[a[i+2] ^ b[i+2]] + چرو_كدي_Table[a[i+3] ^ b[i+3]];
     }
 #endif
-    for(; i < n; i++)
+    لكل(; i < n; i++)
     {
-        result += popCountTable[a[i] ^ b[i]];
+        result += چرو_كدي_Table[a[i] ^ b[i]];
     }
-    return result;
+    أرجع result;
 }
 
 NormHammingFunc getNormHammingFunc()
 {
     NormHammingFunc f = &normHamming; // disambiguate the (a,n) overload
-    return f;
+    أرجع f;
 }
 NormHammingDiffFunc getNormHammingDiffFunc()
 {
     NormHammingDiffFunc f = &normHamming; // disambiguate the (a,b,n) overload
-    return f;
+    أرجع f;
 }
 
 #endif // CV_CPU_OPTIMIZATION_DECLARATIONS_ONLY

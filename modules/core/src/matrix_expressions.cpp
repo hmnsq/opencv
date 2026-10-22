@@ -9,209 +9,209 @@
 //
 // */
 
-#include "precomp.hpp"
-#include <opencv2/core/utils/logger.hpp>
+#ضمن "precomp.hpp"
+#ضمن <opencv2/core/utils/logger.hpp>
 
-namespace cv
+نطاق cv
 {
 
 //This and its overload below are used in various MatExpr operator overloads
 //implemented to check that Matrix operands exist.
-static void checkOperandsExist(const Mat& a)
+ساكن فراغ checkOperandsExist(ثابت Mat& a)
 {
-    if (a.empty())
+    إذا (a.empty())
     {
         CV_Error(cv::Error::StsBadArg, "Matrix operand is an empty matrix.");
     }
 }
 
-static void checkOperandsExist(const Mat& a, const Mat& b)
+ساكن فراغ checkOperandsExist(ثابت Mat& a, ثابت Mat& b)
 {
-    if (a.empty() || b.empty())
+    إذا (a.empty() || b.empty())
     {
         CV_Error(cv::Error::StsBadArg, "One or more matrix operands are empty.");
     }
 }
 
 
-class MatOp_Identity CV_FINAL : public MatOp
+صنف MatOp_Identity CV_FINAL : عام MatOp
 {
-public:
+عام:
     MatOp_Identity() {}
     virtual ~MatOp_Identity() {}
 
-    bool elementWise(const MatExpr& /*expr*/) const CV_OVERRIDE { return true; }
-    void assign(const MatExpr& expr, Mat& m, int type=-1) const CV_OVERRIDE;
+    منطقي elementWise(ثابت Mat_فرچ& /*فرچ*/) ثابت CV_OVERRIDE { أرجع true; }
+    فراغ assign(ثابت Mat_فرچ& فرچ, Mat& m, صحيح type=-1) ثابت CV_OVERRIDE;
 
-    static void makeExpr(MatExpr& res, const Mat& m);
+    ساكن فراغ make_فرچ(Mat_فرچ& res, ثابت Mat& m);
 };
 
-static MatOp_Identity g_MatOp_Identity;
+ساكن MatOp_Identity g_MatOp_Identity;
 
-class MatOp_AddEx CV_FINAL : public MatOp
+صنف MatOp_AddEx CV_FINAL : عام MatOp
 {
-public:
+عام:
     MatOp_AddEx() {}
     virtual ~MatOp_AddEx() {}
 
-    bool elementWise(const MatExpr& /*expr*/) const CV_OVERRIDE { return true; }
-    void assign(const MatExpr& expr, Mat& m, int type=-1) const CV_OVERRIDE;
+    منطقي elementWise(ثابت Mat_فرچ& /*فرچ*/) ثابت CV_OVERRIDE { أرجع true; }
+    فراغ assign(ثابت Mat_فرچ& فرچ, Mat& m, صحيح type=-1) ثابت CV_OVERRIDE;
 
-    void add(const MatExpr& e1, const Scalar& s, MatExpr& res) const CV_OVERRIDE;
-    void subtract(const Scalar& s, const MatExpr& expr, MatExpr& res) const CV_OVERRIDE;
-    void multiply(const MatExpr& e1, double s, MatExpr& res) const CV_OVERRIDE;
-    void divide(double s, const MatExpr& e, MatExpr& res) const CV_OVERRIDE;
+    فراغ add(ثابت Mat_فرچ& e1, ثابت Scalar& s, Mat_فرچ& res) ثابت CV_OVERRIDE;
+    فراغ subtract(ثابت Scalar& s, ثابت Mat_فرچ& فرچ, Mat_فرچ& res) ثابت CV_OVERRIDE;
+    فراغ multiply(ثابت Mat_فرچ& e1, مزدوج s, Mat_فرچ& res) ثابت CV_OVERRIDE;
+    فراغ divide(مزدوج s, ثابت Mat_فرچ& e, Mat_فرچ& res) ثابت CV_OVERRIDE;
 
-    void transpose(const MatExpr& e1, MatExpr& res) const CV_OVERRIDE;
-    void abs(const MatExpr& expr, MatExpr& res) const CV_OVERRIDE;
+    فراغ transpose(ثابت Mat_فرچ& e1, Mat_فرچ& res) ثابت CV_OVERRIDE;
+    فراغ abs(ثابت Mat_فرچ& فرچ, Mat_فرچ& res) ثابت CV_OVERRIDE;
 
-    static void makeExpr(MatExpr& res, const Mat& a, const Mat& b, double alpha, double beta, const Scalar& s=Scalar());
+    ساكن فراغ make_فرچ(Mat_فرچ& res, ثابت Mat& a, ثابت Mat& b, مزدوج alpha, مزدوج beta, ثابت Scalar& s=Scalar());
 };
 
-static MatOp_AddEx g_MatOp_AddEx;
+ساكن MatOp_AddEx g_MatOp_AddEx;
 
-class MatOp_Bin CV_FINAL : public MatOp
+صنف MatOp_Bin CV_FINAL : عام MatOp
 {
-public:
+عام:
     MatOp_Bin() {}
     virtual ~MatOp_Bin() {}
 
-    bool elementWise(const MatExpr& /*expr*/) const CV_OVERRIDE { return true; }
-    void assign(const MatExpr& expr, Mat& m, int type=-1) const CV_OVERRIDE;
+    منطقي elementWise(ثابت Mat_فرچ& /*فرچ*/) ثابت CV_OVERRIDE { أرجع true; }
+    فراغ assign(ثابت Mat_فرچ& فرچ, Mat& m, صحيح type=-1) ثابت CV_OVERRIDE;
 
-    void multiply(const MatExpr& e1, double s, MatExpr& res) const CV_OVERRIDE;
-    void divide(double s, const MatExpr& e, MatExpr& res) const CV_OVERRIDE;
+    فراغ multiply(ثابت Mat_فرچ& e1, مزدوج s, Mat_فرچ& res) ثابت CV_OVERRIDE;
+    فراغ divide(مزدوج s, ثابت Mat_فرچ& e, Mat_فرچ& res) ثابت CV_OVERRIDE;
 
-    static void makeExpr(MatExpr& res, char op, const Mat& a, const Mat& b, double scale=1);
-    static void makeExpr(MatExpr& res, char op, const Mat& a, const Scalar& s);
+    ساكن فراغ make_فرچ(Mat_فرچ& res, حرف op, ثابت Mat& a, ثابت Mat& b, مزدوج scale=1);
+    ساكن فراغ make_فرچ(Mat_فرچ& res, حرف op, ثابت Mat& a, ثابت Scalar& s);
 };
 
-static MatOp_Bin g_MatOp_Bin;
+ساكن MatOp_Bin g_MatOp_Bin;
 
-class MatOp_Cmp CV_FINAL : public MatOp
+صنف MatOp_Cmp CV_FINAL : عام MatOp
 {
-public:
+عام:
     MatOp_Cmp() {}
     virtual ~MatOp_Cmp() {}
 
-    bool elementWise(const MatExpr& /*expr*/) const CV_OVERRIDE { return true; }
-    void assign(const MatExpr& expr, Mat& m, int type=-1) const CV_OVERRIDE;
+    منطقي elementWise(ثابت Mat_فرچ& /*فرچ*/) ثابت CV_OVERRIDE { أرجع true; }
+    فراغ assign(ثابت Mat_فرچ& فرچ, Mat& m, صحيح type=-1) ثابت CV_OVERRIDE;
 
-    static void makeExpr(MatExpr& res, int cmpop, const Mat& a, const Mat& b);
-    static void makeExpr(MatExpr& res, int cmpop, const Mat& a, double alpha);
+    ساكن فراغ make_فرچ(Mat_فرچ& res, صحيح cmpop, ثابت Mat& a, ثابت Mat& b);
+    ساكن فراغ make_فرچ(Mat_فرچ& res, صحيح cmpop, ثابت Mat& a, مزدوج alpha);
 };
 
-static MatOp_Cmp g_MatOp_Cmp;
+ساكن MatOp_Cmp g_MatOp_Cmp;
 
-class MatOp_GEMM CV_FINAL : public MatOp
+صنف MatOp_GEMM CV_FINAL : عام MatOp
 {
-public:
+عام:
     MatOp_GEMM() {}
     virtual ~MatOp_GEMM() {}
 
-    bool elementWise(const MatExpr& /*expr*/) const CV_OVERRIDE { return false; }
-    void assign(const MatExpr& expr, Mat& m, int type=-1) const CV_OVERRIDE;
+    منطقي elementWise(ثابت Mat_فرچ& /*فرچ*/) ثابت CV_OVERRIDE { أرجع خطأ; }
+    فراغ assign(ثابت Mat_فرچ& فرچ, Mat& m, صحيح type=-1) ثابت CV_OVERRIDE;
 
-    void add(const MatExpr& e1, const MatExpr& e2, MatExpr& res) const CV_OVERRIDE;
-    void subtract(const MatExpr& e1, const MatExpr& e2, MatExpr& res) const CV_OVERRIDE;
-    void multiply(const MatExpr& e, double s, MatExpr& res) const CV_OVERRIDE;
+    فراغ add(ثابت Mat_فرچ& e1, ثابت Mat_فرچ& e2, Mat_فرچ& res) ثابت CV_OVERRIDE;
+    فراغ subtract(ثابت Mat_فرچ& e1, ثابت Mat_فرچ& e2, Mat_فرچ& res) ثابت CV_OVERRIDE;
+    فراغ multiply(ثابت Mat_فرچ& e, مزدوج s, Mat_فرچ& res) ثابت CV_OVERRIDE;
 
-    void transpose(const MatExpr& expr, MatExpr& res) const CV_OVERRIDE;
+    فراغ transpose(ثابت Mat_فرچ& فرچ, Mat_فرچ& res) ثابت CV_OVERRIDE;
 
-    Size size(const MatExpr& expr) const CV_OVERRIDE
+    Size size(ثابت Mat_فرچ& فرچ) ثابت CV_OVERRIDE
     {
-        return Size(
-            (expr.flags & GEMM_2_T) ? expr.b.rows : expr.b.cols,
-            (expr.flags & GEMM_1_T) ? expr.a.cols : expr.a.rows
+        أرجع Size(
+            (فرچ.flags & GEMM_2_T) ? فرچ.b.rows : فرچ.b.cols,
+            (فرچ.flags & GEMM_1_T) ? فرچ.a.cols : فرچ.a.rows
         );
     }
 
-    static void makeExpr(MatExpr& res, int flags, const Mat& a, const Mat& b,
-                         double alpha=1, const Mat& c=Mat(), double beta=1);
+    ساكن فراغ make_فرچ(Mat_فرچ& res, صحيح flags, ثابت Mat& a, ثابت Mat& b,
+                         مزدوج alpha=1, ثابت Mat& c=Mat(), مزدوج beta=1);
 
 };
 
-static MatOp_GEMM g_MatOp_GEMM;
+ساكن MatOp_GEMM g_MatOp_GEMM;
 
-class MatOp_Invert CV_FINAL : public MatOp
+صنف MatOp_Invert CV_FINAL : عام MatOp
 {
-public:
+عام:
     MatOp_Invert() {}
     virtual ~MatOp_Invert() {}
 
-    bool elementWise(const MatExpr& /*expr*/) const CV_OVERRIDE { return false; }
-    void assign(const MatExpr& expr, Mat& m, int type=-1) const CV_OVERRIDE;
+    منطقي elementWise(ثابت Mat_فرچ& /*فرچ*/) ثابت CV_OVERRIDE { أرجع خطأ; }
+    فراغ assign(ثابت Mat_فرچ& فرچ, Mat& m, صحيح type=-1) ثابت CV_OVERRIDE;
 
-    void matmul(const MatExpr& expr1, const MatExpr& expr2, MatExpr& res) const CV_OVERRIDE;
+    فراغ matmul(ثابت Mat_فرچ& expr1, ثابت Mat_فرچ& expr2, Mat_فرچ& res) ثابت CV_OVERRIDE;
 
-    static void makeExpr(MatExpr& res, int method, const Mat& m);
+    ساكن فراغ make_فرچ(Mat_فرچ& res, صحيح method, ثابت Mat& m);
 };
 
-static MatOp_Invert g_MatOp_Invert;
+ساكن MatOp_Invert g_MatOp_Invert;
 
-class MatOp_T CV_FINAL : public MatOp
+صنف MatOp_T CV_FINAL : عام MatOp
 {
-public:
+عام:
     MatOp_T() {}
     virtual ~MatOp_T() {}
 
-    bool elementWise(const MatExpr& /*expr*/) const CV_OVERRIDE { return false; }
-    void assign(const MatExpr& expr, Mat& m, int type=-1) const CV_OVERRIDE;
+    منطقي elementWise(ثابت Mat_فرچ& /*فرچ*/) ثابت CV_OVERRIDE { أرجع خطأ; }
+    فراغ assign(ثابت Mat_فرچ& فرچ, Mat& m, صحيح type=-1) ثابت CV_OVERRIDE;
 
-    void multiply(const MatExpr& e1, double s, MatExpr& res) const CV_OVERRIDE;
-    void transpose(const MatExpr& expr, MatExpr& res) const CV_OVERRIDE;
+    فراغ multiply(ثابت Mat_فرچ& e1, مزدوج s, Mat_فرچ& res) ثابت CV_OVERRIDE;
+    فراغ transpose(ثابت Mat_فرچ& فرچ, Mat_فرچ& res) ثابت CV_OVERRIDE;
 
-    static void makeExpr(MatExpr& res, const Mat& a, double alpha=1);
+    ساكن فراغ make_فرچ(Mat_فرچ& res, ثابت Mat& a, مزدوج alpha=1);
 };
 
-static MatOp_T g_MatOp_T;
+ساكن MatOp_T g_MatOp_T;
 
-class MatOp_Solve CV_FINAL : public MatOp
+صنف MatOp_Solve CV_FINAL : عام MatOp
 {
-public:
+عام:
     MatOp_Solve() {}
     virtual ~MatOp_Solve() {}
 
-    bool elementWise(const MatExpr& /*expr*/) const CV_OVERRIDE { return false; }
-    void assign(const MatExpr& expr, Mat& m, int type=-1) const CV_OVERRIDE;
+    منطقي elementWise(ثابت Mat_فرچ& /*فرچ*/) ثابت CV_OVERRIDE { أرجع خطأ; }
+    فراغ assign(ثابت Mat_فرچ& فرچ, Mat& m, صحيح type=-1) ثابت CV_OVERRIDE;
 
-    static void makeExpr(MatExpr& res, int method, const Mat& a, const Mat& b);
+    ساكن فراغ make_فرچ(Mat_فرچ& res, صحيح method, ثابت Mat& a, ثابت Mat& b);
 };
 
-static MatOp_Solve g_MatOp_Solve;
+ساكن MatOp_Solve g_MatOp_Solve;
 
-class MatOp_Initializer CV_FINAL : public MatOp
+صنف MatOp_Initializer CV_FINAL : عام MatOp
 {
-public:
+عام:
     MatOp_Initializer() {}
     virtual ~MatOp_Initializer() {}
 
-    bool elementWise(const MatExpr& /*expr*/) const CV_OVERRIDE { return false; }
-    void assign(const MatExpr& expr, Mat& m, int type=-1) const CV_OVERRIDE;
+    منطقي elementWise(ثابت Mat_فرچ& /*فرچ*/) ثابت CV_OVERRIDE { أرجع خطأ; }
+    فراغ assign(ثابت Mat_فرچ& فرچ, Mat& m, صحيح type=-1) ثابت CV_OVERRIDE;
 
-    void multiply(const MatExpr& e, double s, MatExpr& res) const CV_OVERRIDE;
+    فراغ multiply(ثابت Mat_فرچ& e, مزدوج s, Mat_فرچ& res) ثابت CV_OVERRIDE;
 
-    static void makeExpr(MatExpr& res, int method, Size sz, int type, double alpha=1);
-    static void makeExpr(MatExpr& res, int method, int ndims, const int* sizes, int type, double alpha=1);
+    ساكن فراغ make_فرچ(Mat_فرچ& res, صحيح method, Size sz, صحيح type, مزدوج alpha=1);
+    ساكن فراغ make_فرچ(Mat_فرچ& res, صحيح method, صحيح ndims, ثابت صحيح* sizes, صحيح type, مزدوج alpha=1);
 };
 
-static MatOp_Initializer* getGlobalMatOpInitializer()
+ساكن MatOp_Initializer* getGlobalMatOpInitializer()
 {
-    CV_SINGLETON_LAZY_INIT(MatOp_Initializer, new MatOp_Initializer())
+    CV_SINGLETON_LAZY_INIT(MatOp_Initializer, جديد MatOp_Initializer())
 }
 
-static inline bool isIdentity(const MatExpr& e) { return e.op == &g_MatOp_Identity; }
-static inline bool isAddEx(const MatExpr& e) { return e.op == &g_MatOp_AddEx; }
-static inline bool isScaled(const MatExpr& e) { return isAddEx(e) && (!e.b.data || e.beta == 0) && e.s == Scalar(); }
-static inline bool isBin(const MatExpr& e, char c) { return e.op == &g_MatOp_Bin && e.flags == c; }
-static inline bool isCmp(const MatExpr& e) { return e.op == &g_MatOp_Cmp; }
-static inline bool isReciprocal(const MatExpr& e) { return isBin(e,'/') && (!e.b.data || e.beta == 0); }
-static inline bool isT(const MatExpr& e) { return e.op == &g_MatOp_T; }
-static inline bool isInv(const MatExpr& e) { return e.op == &g_MatOp_Invert; }
-static inline bool isSolve(const MatExpr& e) { return e.op == &g_MatOp_Solve; }
+ساكن مضمن منطقي isIdentity(ثابت Mat_فرچ& e) { أرجع e.op == &g_MatOp_Identity; }
+ساكن مضمن منطقي isAddEx(ثابت Mat_فرچ& e) { أرجع e.op == &g_MatOp_AddEx; }
+ساكن مضمن منطقي isScaled(ثابت Mat_فرچ& e) { أرجع isAddEx(e) && (!e.b.data || e.beta == 0) && e.s == Scalar(); }
+ساكن مضمن منطقي isBin(ثابت Mat_فرچ& e, حرف c) { أرجع e.op == &g_MatOp_Bin && e.flags == c; }
+ساكن مضمن منطقي isCmp(ثابت Mat_فرچ& e) { أرجع e.op == &g_MatOp_Cmp; }
+ساكن مضمن منطقي isReciprocal(ثابت Mat_فرچ& e) { أرجع isBin(e,'/') && (!e.b.data || e.beta == 0); }
+ساكن مضمن منطقي isT(ثابت Mat_فرچ& e) { أرجع e.op == &g_MatOp_T; }
+ساكن مضمن منطقي isInv(ثابت Mat_فرچ& e) { أرجع e.op == &g_MatOp_Invert; }
+ساكن مضمن منطقي isSolve(ثابت Mat_فرچ& e) { أرجع e.op == &g_MatOp_Solve; }
 //static inline bool isGEMM(const MatExpr& e) { return e.op == &g_MatOp_GEMM; }
-static inline bool isMatProd(const MatExpr& e) { return e.op == &g_MatOp_GEMM && (!e.c.data || e.beta == 0); }
-static inline bool isInitializer(const MatExpr& e) { return e.op == getGlobalMatOpInitializer(); }
+ساكن مضمن منطقي isMatProd(ثابت Mat_فرچ& e) { أرجع e.op == &g_MatOp_GEMM && (!e.c.data || e.beta == 0); }
+ساكن مضمن منطقي isInitializer(ثابت Mat_فرچ& e) { أرجع e.op == getGlobalMatOpInitializer(); }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -219,1138 +219,1138 @@ MatOp::MatOp() {}
 MatOp::~MatOp() {}
 
 
-bool MatOp::elementWise(const MatExpr& /*expr*/) const
+منطقي MatOp::elementWise(ثابت Mat_فرچ& /*فرچ*/) ثابت
 {
-    return false;
+    أرجع خطأ;
 }
 
-void MatOp::roi(const MatExpr& expr, const Range& rowRange, const Range& colRange, MatExpr& e) const
+فراغ MatOp::roi(ثابت Mat_فرچ& فرچ, ثابت Range& rowRange, ثابت Range& colRange, Mat_فرچ& e) ثابت
 {
-    if( elementWise(expr) )
+    إذا( elementWise(فرچ) )
     {
-        e = MatExpr(expr.op, expr.flags, Mat(), Mat(), Mat(),
-                    expr.alpha, expr.beta, expr.s);
-        if(expr.a.data)
-            e.a = expr.a(rowRange, colRange);
-        if(expr.b.data)
-            e.b = expr.b(rowRange, colRange);
-        if(expr.c.data)
-            e.c = expr.c(rowRange, colRange);
+        e = Mat_فرچ(فرچ.op, فرچ.flags, Mat(), Mat(), Mat(),
+                    فرچ.alpha, فرچ.beta, فرچ.s);
+        إذا(فرچ.a.data)
+            e.a = فرچ.a(rowRange, colRange);
+        إذا(فرچ.b.data)
+            e.b = فرچ.b(rowRange, colRange);
+        إذا(فرچ.c.data)
+            e.c = فرچ.c(rowRange, colRange);
     }
-    else
+    وإلا
     {
         Mat m;
-        expr.op->assign(expr, m);
-        e = MatExpr(&g_MatOp_Identity, 0, m(rowRange, colRange), Mat(), Mat());
+        فرچ.op->assign(فرچ, m);
+        e = Mat_فرچ(&g_MatOp_Identity, 0, m(rowRange, colRange), Mat(), Mat());
     }
 }
 
-void MatOp::diag(const MatExpr& expr, int d, MatExpr& e) const
+فراغ MatOp::diag(ثابت Mat_فرچ& فرچ, صحيح d, Mat_فرچ& e) ثابت
 {
-    if( elementWise(expr) )
+    إذا( elementWise(فرچ) )
     {
-        e = MatExpr(expr.op, expr.flags, Mat(), Mat(), Mat(),
-                    expr.alpha, expr.beta, expr.s);
-        if(expr.a.data)
-            e.a = expr.a.diag(d);
-        if(expr.b.data)
-            e.b = expr.b.diag(d);
-        if(expr.c.data)
-            e.c = expr.c.diag(d);
+        e = Mat_فرچ(فرچ.op, فرچ.flags, Mat(), Mat(), Mat(),
+                    فرچ.alpha, فرچ.beta, فرچ.s);
+        إذا(فرچ.a.data)
+            e.a = فرچ.a.diag(d);
+        إذا(فرچ.b.data)
+            e.b = فرچ.b.diag(d);
+        إذا(فرچ.c.data)
+            e.c = فرچ.c.diag(d);
     }
-    else
+    وإلا
     {
         Mat m;
-        expr.op->assign(expr, m);
-        e = MatExpr(&g_MatOp_Identity, 0, m.diag(d), Mat(), Mat());
+        فرچ.op->assign(فرچ, m);
+        e = Mat_فرچ(&g_MatOp_Identity, 0, m.diag(d), Mat(), Mat());
     }
 }
 
 
-void MatOp::augAssignAdd(const MatExpr& expr, Mat& m) const
+فراغ MatOp::augAssignAdd(ثابت Mat_فرچ& فرچ, Mat& m) ثابت
 {
     Mat temp;
-    expr.op->assign(expr, temp);
+    فرچ.op->assign(فرچ, temp);
     m += temp;
 }
 
 
-void MatOp::augAssignSubtract(const MatExpr& expr, Mat& m) const
+فراغ MatOp::augAssignSubtract(ثابت Mat_فرچ& فرچ, Mat& m) ثابت
 {
     Mat temp;
-    expr.op->assign(expr, temp);
+    فرچ.op->assign(فرچ, temp);
     m -= temp;
 }
 
 
-void MatOp::augAssignMultiply(const MatExpr& expr, Mat& m) const
+فراغ MatOp::augAssignMultiply(ثابت Mat_فرچ& فرچ, Mat& m) ثابت
 {
     Mat temp;
-    expr.op->assign(expr, temp);
+    فرچ.op->assign(فرچ, temp);
     m *= temp;
 }
 
 
-void MatOp::augAssignDivide(const MatExpr& expr, Mat& m) const
+فراغ MatOp::augAssignDivide(ثابت Mat_فرچ& فرچ, Mat& m) ثابت
 {
     Mat temp;
-    expr.op->assign(expr, temp);
+    فرچ.op->assign(فرچ, temp);
     m /= temp;
 }
 
 
-void MatOp::augAssignAnd(const MatExpr& expr, Mat& m) const
+فراغ MatOp::augAssignAnd(ثابت Mat_فرچ& فرچ, Mat& m) ثابت
 {
     Mat temp;
-    expr.op->assign(expr, temp);
+    فرچ.op->assign(فرچ, temp);
     m &= temp;
 }
 
 
-void MatOp::augAssignOr(const MatExpr& expr, Mat& m) const
+فراغ MatOp::augAssignOr(ثابت Mat_فرچ& فرچ, Mat& m) ثابت
 {
     Mat temp;
-    expr.op->assign(expr, temp);
+    فرچ.op->assign(فرچ, temp);
     m |= temp;
 }
 
 
-void MatOp::augAssignXor(const MatExpr& expr, Mat& m) const
+فراغ MatOp::augAssignXor(ثابت Mat_فرچ& فرچ, Mat& m) ثابت
 {
     Mat temp;
-    expr.op->assign(expr, temp);
+    فرچ.op->assign(فرچ, temp);
     m ^= temp;
 }
 
 
-void MatOp::add(const MatExpr& e1, const MatExpr& e2, MatExpr& res) const
+فراغ MatOp::add(ثابت Mat_فرچ& e1, ثابت Mat_فرچ& e2, Mat_فرچ& res) ثابت
 {
     CV_INSTRUMENT_REGION();
 
-    if( this == e2.op )
+    إذا( هذا == e2.op )
     {
-        double alpha = 1, beta = 1;
+        مزدوج alpha = 1, beta = 1;
         Scalar s;
         Mat m1, m2;
-        if( isAddEx(e1) && (!e1.b.data || e1.beta == 0) )
+        إذا( isAddEx(e1) && (!e1.b.data || e1.beta == 0) )
         {
             m1 = e1.a;
             alpha = e1.alpha;
             s = e1.s;
         }
-        else
+        وإلا
             e1.op->assign(e1, m1);
 
-        if( isAddEx(e2) && (!e2.b.data || e2.beta == 0) )
+        إذا( isAddEx(e2) && (!e2.b.data || e2.beta == 0) )
         {
             m2 = e2.a;
             beta = e2.alpha;
             s += e2.s;
         }
-        else
+        وإلا
             e2.op->assign(e2, m2);
-        MatOp_AddEx::makeExpr(res, m1, m2, alpha, beta, s);
+        MatOp_AddEx::make_فرچ(res, m1, m2, alpha, beta, s);
     }
-    else
+    وإلا
         e2.op->add(e1, e2, res);
 }
 
 
-void MatOp::add(const MatExpr& expr1, const Scalar& s, MatExpr& res) const
+فراغ MatOp::add(ثابت Mat_فرچ& expr1, ثابت Scalar& s, Mat_فرچ& res) ثابت
 {
     CV_INSTRUMENT_REGION();
 
     Mat m1;
     expr1.op->assign(expr1, m1);
-    MatOp_AddEx::makeExpr(res, m1, Mat(), 1, 0, s);
+    MatOp_AddEx::make_فرچ(res, m1, Mat(), 1, 0, s);
 }
 
 
-void MatOp::subtract(const MatExpr& e1, const MatExpr& e2, MatExpr& res) const
+فراغ MatOp::subtract(ثابت Mat_فرچ& e1, ثابت Mat_فرچ& e2, Mat_فرچ& res) ثابت
 {
     CV_INSTRUMENT_REGION();
 
-    if( this == e2.op )
+    إذا( هذا == e2.op )
     {
-        double alpha = 1, beta = -1;
+        مزدوج alpha = 1, beta = -1;
         Scalar s;
         Mat m1, m2;
-        if( isAddEx(e1) && (!e1.b.data || e1.beta == 0) )
+        إذا( isAddEx(e1) && (!e1.b.data || e1.beta == 0) )
         {
             m1 = e1.a;
             alpha = e1.alpha;
             s = e1.s;
         }
-        else
+        وإلا
             e1.op->assign(e1, m1);
 
-        if( isAddEx(e2) && (!e2.b.data || e2.beta == 0) )
+        إذا( isAddEx(e2) && (!e2.b.data || e2.beta == 0) )
         {
             m2 = e2.a;
             beta = -e2.alpha;
             s -= e2.s;
         }
-        else
+        وإلا
             e2.op->assign(e2, m2);
-        MatOp_AddEx::makeExpr(res, m1, m2, alpha, beta, s);
+        MatOp_AddEx::make_فرچ(res, m1, m2, alpha, beta, s);
     }
-    else
+    وإلا
         e2.op->subtract(e1, e2, res);
 }
 
 
-void MatOp::subtract(const Scalar& s, const MatExpr& expr, MatExpr& res) const
+فراغ MatOp::subtract(ثابت Scalar& s, ثابت Mat_فرچ& فرچ, Mat_فرچ& res) ثابت
 {
     CV_INSTRUMENT_REGION();
 
     Mat m;
-    expr.op->assign(expr, m);
-    MatOp_AddEx::makeExpr(res, m, Mat(), -1, 0, s);
+    فرچ.op->assign(فرچ, m);
+    MatOp_AddEx::make_فرچ(res, m, Mat(), -1, 0, s);
 }
 
 
-void MatOp::multiply(const MatExpr& e1, const MatExpr& e2, MatExpr& res, double scale) const
+فراغ MatOp::multiply(ثابت Mat_فرچ& e1, ثابت Mat_فرچ& e2, Mat_فرچ& res, مزدوج scale) ثابت
 {
     CV_INSTRUMENT_REGION();
 
-    if( this == e2.op )
+    إذا( هذا == e2.op )
     {
         Mat m1, m2;
 
-        if( isReciprocal(e1) )
+        إذا( isReciprocal(e1) )
         {
-            if( isScaled(e2) )
+            إذا( isScaled(e2) )
             {
                 scale *= e2.alpha;
                 m2 = e2.a;
             }
-            else
+            وإلا
                 e2.op->assign(e2, m2);
 
-            MatOp_Bin::makeExpr(res, '/', m2, e1.a, scale/e1.alpha);
+            MatOp_Bin::make_فرچ(res, '/', m2, e1.a, scale/e1.alpha);
         }
-        else
+        وإلا
         {
-            char op = '*';
-            if( isScaled(e1) )
+            حرف op = '*';
+            إذا( isScaled(e1) )
             {
                 m1 = e1.a;
                 scale *= e1.alpha;
             }
-            else
+            وإلا
                 e1.op->assign(e1, m1);
 
-            if( isScaled(e2) )
+            إذا( isScaled(e2) )
             {
                 m2 = e2.a;
                 scale *= e2.alpha;
             }
-            else if( isReciprocal(e2) )
+            وإلا إذا( isReciprocal(e2) )
             {
                 op = '/';
                 m2 = e2.a;
                 scale *= e2.alpha;
             }
-            else
+            وإلا
                 e2.op->assign(e2, m2);
 
-            MatOp_Bin::makeExpr(res, op, m1, m2, scale);
+            MatOp_Bin::make_فرچ(res, op, m1, m2, scale);
         }
     }
-    else
+    وإلا
         e2.op->multiply(e1, e2, res, scale);
 }
 
 
-void MatOp::multiply(const MatExpr& expr, double s, MatExpr& res) const
+فراغ MatOp::multiply(ثابت Mat_فرچ& فرچ, مزدوج s, Mat_فرچ& res) ثابت
 {
     CV_INSTRUMENT_REGION();
 
     Mat m;
-    expr.op->assign(expr, m);
-    MatOp_AddEx::makeExpr(res, m, Mat(), s, 0);
+    فرچ.op->assign(فرچ, m);
+    MatOp_AddEx::make_فرچ(res, m, Mat(), s, 0);
 }
 
 
-void MatOp::divide(const MatExpr& e1, const MatExpr& e2, MatExpr& res, double scale) const
+فراغ MatOp::divide(ثابت Mat_فرچ& e1, ثابت Mat_فرچ& e2, Mat_فرچ& res, مزدوج scale) ثابت
 {
     CV_INSTRUMENT_REGION();
 
-    if( this == e2.op )
+    إذا( هذا == e2.op )
     {
-        if( isReciprocal(e1) && isReciprocal(e2) )
-            MatOp_Bin::makeExpr(res, '/', e2.a, e1.a, e1.alpha/e2.alpha);
-        else
+        إذا( isReciprocal(e1) && isReciprocal(e2) )
+            MatOp_Bin::make_فرچ(res, '/', e2.a, e1.a, e1.alpha/e2.alpha);
+        وإلا
         {
             Mat m1, m2;
-            char op = '/';
+            حرف op = '/';
 
-            if( isScaled(e1) )
+            إذا( isScaled(e1) )
             {
                 m1 = e1.a;
                 scale *= e1.alpha;
             }
-            else
+            وإلا
                 e1.op->assign(e1, m1);
 
-            if( isScaled(e2) )
+            إذا( isScaled(e2) )
             {
                 m2 = e2.a;
                 scale /= e2.alpha;
             }
-            else if( isReciprocal(e2) )
+            وإلا إذا( isReciprocal(e2) )
             {
                 m2 = e2.a;
                 scale /= e2.alpha;
                 op = '*';
             }
-            else
+            وإلا
                 e2.op->assign(e2, m2);
-            MatOp_Bin::makeExpr(res, op, m1, m2, scale);
+            MatOp_Bin::make_فرچ(res, op, m1, m2, scale);
         }
     }
-    else
+    وإلا
         e2.op->divide(e1, e2, res, scale);
 }
 
 
-void MatOp::divide(double s, const MatExpr& expr, MatExpr& res) const
+فراغ MatOp::divide(مزدوج s, ثابت Mat_فرچ& فرچ, Mat_فرچ& res) ثابت
 {
     CV_INSTRUMENT_REGION();
 
     Mat m;
-    expr.op->assign(expr, m);
-    MatOp_Bin::makeExpr(res, '/', m, Mat(), s);
+    فرچ.op->assign(فرچ, m);
+    MatOp_Bin::make_فرچ(res, '/', m, Mat(), s);
 }
 
 
-void MatOp::abs(const MatExpr& expr, MatExpr& res) const
+فراغ MatOp::abs(ثابت Mat_فرچ& فرچ, Mat_فرچ& res) ثابت
 {
     CV_INSTRUMENT_REGION();
 
     Mat m;
-    expr.op->assign(expr, m);
-    MatOp_Bin::makeExpr(res, 'a', m, Mat());
+    فرچ.op->assign(فرچ, m);
+    MatOp_Bin::make_فرچ(res, 'a', m, Mat());
 }
 
 
-void MatOp::transpose(const MatExpr& expr, MatExpr& res) const
+فراغ MatOp::transpose(ثابت Mat_فرچ& فرچ, Mat_فرچ& res) ثابت
 {
     CV_INSTRUMENT_REGION();
 
     Mat m;
-    expr.op->assign(expr, m);
-    MatOp_T::makeExpr(res, m, 1);
+    فرچ.op->assign(فرچ, m);
+    MatOp_T::make_فرچ(res, m, 1);
 }
 
 
-void MatOp::matmul(const MatExpr& e1, const MatExpr& e2, MatExpr& res) const
+فراغ MatOp::matmul(ثابت Mat_فرچ& e1, ثابت Mat_فرچ& e2, Mat_فرچ& res) ثابت
 {
-    if( this == e2.op )
+    إذا( هذا == e2.op )
     {
-        double scale = 1;
-        int flags = 0;
+        مزدوج scale = 1;
+        صحيح flags = 0;
         Mat m1, m2;
 
-        if( isT(e1) )
+        إذا( isT(e1) )
         {
             flags = cv::GEMM_1_T;
             scale = e1.alpha;
             m1 = e1.a;
         }
-        else if( isScaled(e1) )
+        وإلا إذا( isScaled(e1) )
         {
             scale = e1.alpha;
             m1 = e1.a;
         }
-        else
+        وإلا
             e1.op->assign(e1, m1);
 
-        if( isT(e2) )
+        إذا( isT(e2) )
         {
             flags |= cv::GEMM_2_T;
             scale *= e2.alpha;
             m2 = e2.a;
         }
-        else if( isScaled(e2) )
+        وإلا إذا( isScaled(e2) )
         {
             scale *= e2.alpha;
             m2 = e2.a;
         }
-        else
+        وإلا
             e2.op->assign(e2, m2);
 
-        MatOp_GEMM::makeExpr(res, flags, m1, m2, scale);
+        MatOp_GEMM::make_فرچ(res, flags, m1, m2, scale);
     }
-    else
+    وإلا
         e2.op->matmul(e1, e2, res);
 }
 
 
-void MatOp::invert(const MatExpr& expr, int method, MatExpr& res) const
+فراغ MatOp::invert(ثابت Mat_فرچ& فرچ, صحيح method, Mat_فرچ& res) ثابت
 {
     Mat m;
-    expr.op->assign(expr, m);
-    MatOp_Invert::makeExpr(res, method, m);
+    فرچ.op->assign(فرچ, m);
+    MatOp_Invert::make_فرچ(res, method, m);
 }
 
 
-Size MatOp::size(const MatExpr& expr) const
+Size MatOp::size(ثابت Mat_فرچ& فرچ) ثابت
 {
-    return !expr.a.empty() ? expr.a.size() : expr.b.empty() ? expr.b.size() : expr.c.size();
+    أرجع !فرچ.a.empty() ? فرچ.a.size() : فرچ.b.empty() ? فرچ.b.size() : فرچ.c.size();
 }
 
-int MatOp::type(const MatExpr& expr) const
+صحيح MatOp::type(ثابت Mat_فرچ& فرچ) ثابت
 {
     CV_INSTRUMENT_REGION();
 
-    return !expr.a.empty() ? expr.a.type() : expr.b.empty() ? expr.b.type() : expr.c.type();
+    أرجع !فرچ.a.empty() ? فرچ.a.type() : فرچ.b.empty() ? فرچ.b.type() : فرچ.c.type();
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////
 
-MatExpr::MatExpr(const Mat& m) : op(&g_MatOp_Identity), flags(0), a(m), b(Mat()), c(Mat()), alpha(1), beta(0), s(Scalar())
+Mat_فرچ::Mat_فرچ(ثابت Mat& m) : op(&g_MatOp_Identity), flags(0), a(m), b(Mat()), c(Mat()), alpha(1), beta(0), s(Scalar())
 {
 }
 
-MatExpr MatExpr::row(int y) const
+Mat_فرچ Mat_فرچ::row(صحيح y) ثابت
 {
-    MatExpr e;
-    op->roi(*this, Range(y, y+1), Range::all(), e);
-    return e;
+    Mat_فرچ e;
+    op->roi(*هذا, Range(y, y+1), Range::all(), e);
+    أرجع e;
 }
 
-MatExpr MatExpr::col(int x) const
+Mat_فرچ Mat_فرچ::col(صحيح x) ثابت
 {
-    MatExpr e;
-    op->roi(*this, Range::all(), Range(x, x+1), e);
-    return e;
+    Mat_فرچ e;
+    op->roi(*هذا, Range::all(), Range(x, x+1), e);
+    أرجع e;
 }
 
-MatExpr MatExpr::diag(int d) const
+Mat_فرچ Mat_فرچ::diag(صحيح d) ثابت
 {
-    MatExpr e;
-    op->diag(*this, d, e);
-    return e;
+    Mat_فرچ e;
+    op->diag(*هذا, d, e);
+    أرجع e;
 }
 
-MatExpr MatExpr::operator()( const Range& rowRange, const Range& colRange ) const
+Mat_فرچ Mat_فرچ::operator()( ثابت Range& rowRange, ثابت Range& colRange ) ثابت
 {
-    MatExpr e;
-    op->roi(*this, rowRange, colRange, e);
-    return e;
+    Mat_فرچ e;
+    op->roi(*هذا, rowRange, colRange, e);
+    أرجع e;
 }
 
-MatExpr MatExpr::operator()( const Rect& roi ) const
+Mat_فرچ Mat_فرچ::operator()( ثابت Rect& roi ) ثابت
 {
-    MatExpr e;
-    op->roi(*this, Range(roi.y, roi.y + roi.height), Range(roi.x, roi.x + roi.width), e);
-    return e;
+    Mat_فرچ e;
+    op->roi(*هذا, Range(roi.y, roi.y + roi.height), Range(roi.x, roi.x + roi.width), e);
+    أرجع e;
 }
 
-Mat MatExpr::cross(const Mat& m) const
+Mat Mat_فرچ::cross(ثابت Mat& m) ثابت
 {
-    return ((Mat)*this).cross(m);
+    أرجع ((Mat)*هذا).cross(m);
 }
 
-double MatExpr::dot(const Mat& m) const
+مزدوج Mat_فرچ::dot(ثابت Mat& m) ثابت
 {
-    return ((Mat)*this).dot(m);
+    أرجع ((Mat)*هذا).dot(m);
 }
 
-MatExpr MatExpr::t() const
+Mat_فرچ Mat_فرچ::t() ثابت
 {
-    MatExpr e;
-    op->transpose(*this, e);
-    return e;
+    Mat_فرچ e;
+    op->transpose(*هذا, e);
+    أرجع e;
 }
 
-MatExpr MatExpr::inv(int method) const
+Mat_فرچ Mat_فرچ::inv(صحيح method) ثابت
 {
-    MatExpr e;
-    op->invert(*this, method, e);
-    return e;
+    Mat_فرچ e;
+    op->invert(*هذا, method, e);
+    أرجع e;
 }
 
-MatExpr MatExpr::mul(const MatExpr& e, double scale) const
+Mat_فرچ Mat_فرچ::mul(ثابت Mat_فرچ& e, مزدوج scale) ثابت
 {
-    MatExpr en;
-    op->multiply(*this, e, en, scale);
-    return en;
+    Mat_فرچ en;
+    op->multiply(*هذا, e, en, scale);
+    أرجع en;
 }
 
-MatExpr MatExpr::mul(const Mat& m, double scale) const
+Mat_فرچ Mat_فرچ::mul(ثابت Mat& m, مزدوج scale) ثابت
 {
-    MatExpr e;
-    op->multiply(*this, MatExpr(m), e, scale);
-    return e;
+    Mat_فرچ e;
+    op->multiply(*هذا, Mat_فرچ(m), e, scale);
+    أرجع e;
 }
 
-MatExpr operator + (const Mat& a, const Mat& b)
+Mat_فرچ operator + (ثابت Mat& a, ثابت Mat& b)
 {
     checkOperandsExist(a, b);
-    MatExpr e;
-    MatOp_AddEx::makeExpr(e, a, b, 1, 1);
-    return e;
+    Mat_فرچ e;
+    MatOp_AddEx::make_فرچ(e, a, b, 1, 1);
+    أرجع e;
 }
 
-MatExpr operator + (const Mat& a, const Scalar& s)
+Mat_فرچ operator + (ثابت Mat& a, ثابت Scalar& s)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_AddEx::makeExpr(e, a, Mat(), 1, 0, s);
-    return e;
+    Mat_فرچ e;
+    MatOp_AddEx::make_فرچ(e, a, Mat(), 1, 0, s);
+    أرجع e;
 }
 
-MatExpr operator + (const Scalar& s, const Mat& a)
+Mat_فرچ operator + (ثابت Scalar& s, ثابت Mat& a)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_AddEx::makeExpr(e, a, Mat(), 1, 0, s);
-    return e;
+    Mat_فرچ e;
+    MatOp_AddEx::make_فرچ(e, a, Mat(), 1, 0, s);
+    أرجع e;
 }
 
-MatExpr operator + (const MatExpr& e, const Mat& m)
+Mat_فرچ operator + (ثابت Mat_فرچ& e, ثابت Mat& m)
 {
-    MatExpr en;
-    e.op->add(e, MatExpr(m), en);
-    return en;
+    Mat_فرچ en;
+    e.op->add(e, Mat_فرچ(m), en);
+    أرجع en;
 }
 
-MatExpr operator + (const Mat& m, const MatExpr& e)
+Mat_فرچ operator + (ثابت Mat& m, ثابت Mat_فرچ& e)
 {
     checkOperandsExist(m);
-    MatExpr en;
-    e.op->add(e, MatExpr(m), en);
-    return en;
+    Mat_فرچ en;
+    e.op->add(e, Mat_فرچ(m), en);
+    أرجع en;
 }
 
-MatExpr operator + (const MatExpr& e, const Scalar& s)
+Mat_فرچ operator + (ثابت Mat_فرچ& e, ثابت Scalar& s)
 {
-    MatExpr en;
+    Mat_فرچ en;
     e.op->add(e, s, en);
-    return en;
+    أرجع en;
 }
 
-MatExpr operator + (const Scalar& s, const MatExpr& e)
+Mat_فرچ operator + (ثابت Scalar& s, ثابت Mat_فرچ& e)
 {
-    MatExpr en;
+    Mat_فرچ en;
     e.op->add(e, s, en);
-    return en;
+    أرجع en;
 }
 
-MatExpr operator + (const MatExpr& e1, const MatExpr& e2)
+Mat_فرچ operator + (ثابت Mat_فرچ& e1, ثابت Mat_فرچ& e2)
 {
-    MatExpr en;
+    Mat_فرچ en;
     e1.op->add(e1, e2, en);
-    return en;
+    أرجع en;
 }
 
-MatExpr operator - (const Mat& a, const Mat& b)
+Mat_فرچ operator - (ثابت Mat& a, ثابت Mat& b)
 {
     checkOperandsExist(a, b);
-    MatExpr e;
-    MatOp_AddEx::makeExpr(e, a, b, 1, -1);
-    return e;
+    Mat_فرچ e;
+    MatOp_AddEx::make_فرچ(e, a, b, 1, -1);
+    أرجع e;
 }
 
-MatExpr operator - (const Mat& a, const Scalar& s)
+Mat_فرچ operator - (ثابت Mat& a, ثابت Scalar& s)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_AddEx::makeExpr(e, a, Mat(), 1, 0, -s);
-    return e;
+    Mat_فرچ e;
+    MatOp_AddEx::make_فرچ(e, a, Mat(), 1, 0, -s);
+    أرجع e;
 }
 
-MatExpr operator - (const Scalar& s, const Mat& a)
+Mat_فرچ operator - (ثابت Scalar& s, ثابت Mat& a)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_AddEx::makeExpr(e, a, Mat(), -1, 0, s);
-    return e;
+    Mat_فرچ e;
+    MatOp_AddEx::make_فرچ(e, a, Mat(), -1, 0, s);
+    أرجع e;
 }
 
-MatExpr operator - (const MatExpr& e, const Mat& m)
+Mat_فرچ operator - (ثابت Mat_فرچ& e, ثابت Mat& m)
 {
     checkOperandsExist(m);
-    MatExpr en;
-    e.op->subtract(e, MatExpr(m), en);
-    return en;
+    Mat_فرچ en;
+    e.op->subtract(e, Mat_فرچ(m), en);
+    أرجع en;
 }
 
-MatExpr operator - (const Mat& m, const MatExpr& e)
+Mat_فرچ operator - (ثابت Mat& m, ثابت Mat_فرچ& e)
 {
     checkOperandsExist(m);
-    MatExpr en;
-    e.op->subtract(MatExpr(m), e, en);
-    return en;
+    Mat_فرچ en;
+    e.op->subtract(Mat_فرچ(m), e, en);
+    أرجع en;
 }
 
-MatExpr operator - (const MatExpr& e, const Scalar& s)
+Mat_فرچ operator - (ثابت Mat_فرچ& e, ثابت Scalar& s)
 {
-    MatExpr en;
+    Mat_فرچ en;
     e.op->add(e, -s, en);
-    return en;
+    أرجع en;
 }
 
-MatExpr operator - (const Scalar& s, const MatExpr& e)
+Mat_فرچ operator - (ثابت Scalar& s, ثابت Mat_فرچ& e)
 {
-    MatExpr en;
+    Mat_فرچ en;
     e.op->subtract(s, e, en);
-    return en;
+    أرجع en;
 }
 
-MatExpr operator - (const MatExpr& e1, const MatExpr& e2)
+Mat_فرچ operator - (ثابت Mat_فرچ& e1, ثابت Mat_فرچ& e2)
 {
-    MatExpr en;
+    Mat_فرچ en;
     e1.op->subtract(e1, e2, en);
-    return en;
+    أرجع en;
 }
 
-MatExpr operator - (const Mat& m)
+Mat_فرچ operator - (ثابت Mat& m)
 {
     checkOperandsExist(m);
-    MatExpr e;
-    MatOp_AddEx::makeExpr(e, m, Mat(), -1, 0);
-    return e;
+    Mat_فرچ e;
+    MatOp_AddEx::make_فرچ(e, m, Mat(), -1, 0);
+    أرجع e;
 }
 
-MatExpr operator - (const MatExpr& e)
+Mat_فرچ operator - (ثابت Mat_فرچ& e)
 {
-    MatExpr en;
+    Mat_فرچ en;
     e.op->subtract(Scalar(0), e, en);
-    return en;
+    أرجع en;
 }
 
-MatExpr operator * (const Mat& a, const Mat& b)
+Mat_فرچ operator * (ثابت Mat& a, ثابت Mat& b)
 {
     checkOperandsExist(a, b);
-    MatExpr e;
-    MatOp_GEMM::makeExpr(e, 0, a, b);
-    return e;
+    Mat_فرچ e;
+    MatOp_GEMM::make_فرچ(e, 0, a, b);
+    أرجع e;
 }
 
-MatExpr operator * (const Mat& a, double s)
+Mat_فرچ operator * (ثابت Mat& a, مزدوج s)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_AddEx::makeExpr(e, a, Mat(), s, 0);
-    return e;
+    Mat_فرچ e;
+    MatOp_AddEx::make_فرچ(e, a, Mat(), s, 0);
+    أرجع e;
 }
 
-MatExpr operator * (double s, const Mat& a)
+Mat_فرچ operator * (مزدوج s, ثابت Mat& a)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_AddEx::makeExpr(e, a, Mat(), s, 0);
-    return e;
+    Mat_فرچ e;
+    MatOp_AddEx::make_فرچ(e, a, Mat(), s, 0);
+    أرجع e;
 }
 
-MatExpr operator * (const MatExpr& e, const Mat& m)
+Mat_فرچ operator * (ثابت Mat_فرچ& e, ثابت Mat& m)
 {
-    MatExpr en;
-    e.op->matmul(e, MatExpr(m), en);
-    return en;
+    Mat_فرچ en;
+    e.op->matmul(e, Mat_فرچ(m), en);
+    أرجع en;
 }
 
-MatExpr operator * (const Mat& m, const MatExpr& e)
+Mat_فرچ operator * (ثابت Mat& m, ثابت Mat_فرچ& e)
 {
     checkOperandsExist(m);
-    MatExpr en;
-    e.op->matmul(MatExpr(m), e, en);
-    return en;
+    Mat_فرچ en;
+    e.op->matmul(Mat_فرچ(m), e, en);
+    أرجع en;
 }
 
-MatExpr operator * (const MatExpr& e, double s)
+Mat_فرچ operator * (ثابت Mat_فرچ& e, مزدوج s)
 {
-    MatExpr en;
+    Mat_فرچ en;
     e.op->multiply(e, s, en);
-    return en;
+    أرجع en;
 }
 
-MatExpr operator * (double s, const MatExpr& e)
+Mat_فرچ operator * (مزدوج s, ثابت Mat_فرچ& e)
 {
-    MatExpr en;
+    Mat_فرچ en;
     e.op->multiply(e, s, en);
-    return en;
+    أرجع en;
 }
 
-MatExpr operator * (const MatExpr& e1, const MatExpr& e2)
+Mat_فرچ operator * (ثابت Mat_فرچ& e1, ثابت Mat_فرچ& e2)
 {
-    MatExpr en;
+    Mat_فرچ en;
     e1.op->matmul(e1, e2, en);
-    return en;
+    أرجع en;
 }
 
-MatExpr operator / (const Mat& a, const Mat& b)
+Mat_فرچ operator / (ثابت Mat& a, ثابت Mat& b)
 {
     checkOperandsExist(a, b);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, '/', a, b);
-    return e;
+    Mat_فرچ e;
+    MatOp_Bin::make_فرچ(e, '/', a, b);
+    أرجع e;
 }
 
-MatExpr operator / (const Mat& a, double s)
+Mat_فرچ operator / (ثابت Mat& a, مزدوج s)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_AddEx::makeExpr(e, a, Mat(), 1./s, 0);
-    return e;
+    Mat_فرچ e;
+    MatOp_AddEx::make_فرچ(e, a, Mat(), 1./s, 0);
+    أرجع e;
 }
 
-MatExpr operator / (double s, const Mat& a)
+Mat_فرچ operator / (مزدوج s, ثابت Mat& a)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, '/', a, Mat(), s);
-    return e;
+    Mat_فرچ e;
+    MatOp_Bin::make_فرچ(e, '/', a, Mat(), s);
+    أرجع e;
 }
 
-MatExpr operator / (const MatExpr& e, const Mat& m)
+Mat_فرچ operator / (ثابت Mat_فرچ& e, ثابت Mat& m)
 {
-    MatExpr en;
-    e.op->divide(e, MatExpr(m), en);
-    return en;
+    Mat_فرچ en;
+    e.op->divide(e, Mat_فرچ(m), en);
+    أرجع en;
 }
 
-MatExpr operator / (const Mat& m, const MatExpr& e)
+Mat_فرچ operator / (ثابت Mat& m, ثابت Mat_فرچ& e)
 {
     checkOperandsExist(m);
-    MatExpr en;
-    e.op->divide(MatExpr(m), e, en);
-    return en;
+    Mat_فرچ en;
+    e.op->divide(Mat_فرچ(m), e, en);
+    أرجع en;
 }
 
-MatExpr operator / (const MatExpr& e, double s)
+Mat_فرچ operator / (ثابت Mat_فرچ& e, مزدوج s)
 {
-    MatExpr en;
+    Mat_فرچ en;
     e.op->multiply(e, 1./s, en);
-    return en;
+    أرجع en;
 }
 
-MatExpr operator / (double s, const MatExpr& e)
+Mat_فرچ operator / (مزدوج s, ثابت Mat_فرچ& e)
 {
-    MatExpr en;
+    Mat_فرچ en;
     e.op->divide(s, e, en);
-    return en;
+    أرجع en;
 }
 
-MatExpr operator / (const MatExpr& e1, const MatExpr& e2)
+Mat_فرچ operator / (ثابت Mat_فرچ& e1, ثابت Mat_فرچ& e2)
 {
-    MatExpr en;
+    Mat_فرچ en;
     e1.op->divide(e1, e2, en);
-    return en;
+    أرجع en;
 }
 
-MatExpr operator < (const Mat& a, const Mat& b)
+Mat_فرچ operator < (ثابت Mat& a, ثابت Mat& b)
 {
     checkOperandsExist(a, b);
-    MatExpr e;
-    MatOp_Cmp::makeExpr(e, cv::CMP_LT, a, b);
-    return e;
+    Mat_فرچ e;
+    MatOp_Cmp::make_فرچ(e, cv::CMP_LT, a, b);
+    أرجع e;
 }
 
-MatExpr operator < (const Mat& a, double s)
+Mat_فرچ operator < (ثابت Mat& a, مزدوج s)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Cmp::makeExpr(e, cv::CMP_LT, a, s);
-    return e;
+    Mat_فرچ e;
+    MatOp_Cmp::make_فرچ(e, cv::CMP_LT, a, s);
+    أرجع e;
 }
 
-MatExpr operator < (double s, const Mat& a)
+Mat_فرچ operator < (مزدوج s, ثابت Mat& a)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Cmp::makeExpr(e, cv::CMP_GT, a, s);
-    return e;
+    Mat_فرچ e;
+    MatOp_Cmp::make_فرچ(e, cv::CMP_GT, a, s);
+    أرجع e;
 }
 
-MatExpr operator <= (const Mat& a, const Mat& b)
+Mat_فرچ operator <= (ثابت Mat& a, ثابت Mat& b)
 {
     checkOperandsExist(a, b);
-    MatExpr e;
-    MatOp_Cmp::makeExpr(e, cv::CMP_LE, a, b);
-    return e;
+    Mat_فرچ e;
+    MatOp_Cmp::make_فرچ(e, cv::CMP_LE, a, b);
+    أرجع e;
 }
 
-MatExpr operator <= (const Mat& a, double s)
+Mat_فرچ operator <= (ثابت Mat& a, مزدوج s)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Cmp::makeExpr(e, cv::CMP_LE, a, s);
-    return e;
+    Mat_فرچ e;
+    MatOp_Cmp::make_فرچ(e, cv::CMP_LE, a, s);
+    أرجع e;
 }
 
-MatExpr operator <= (double s, const Mat& a)
+Mat_فرچ operator <= (مزدوج s, ثابت Mat& a)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Cmp::makeExpr(e, cv::CMP_GE, a, s);
-    return e;
+    Mat_فرچ e;
+    MatOp_Cmp::make_فرچ(e, cv::CMP_GE, a, s);
+    أرجع e;
 }
 
-MatExpr operator == (const Mat& a, const Mat& b)
+Mat_فرچ operator == (ثابت Mat& a, ثابت Mat& b)
 {
     checkOperandsExist(a, b);
-    MatExpr e;
-    MatOp_Cmp::makeExpr(e, cv::CMP_EQ, a, b);
-    return e;
+    Mat_فرچ e;
+    MatOp_Cmp::make_فرچ(e, cv::CMP_EQ, a, b);
+    أرجع e;
 }
 
-MatExpr operator == (const Mat& a, double s)
+Mat_فرچ operator == (ثابت Mat& a, مزدوج s)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Cmp::makeExpr(e, cv::CMP_EQ, a, s);
-    return e;
+    Mat_فرچ e;
+    MatOp_Cmp::make_فرچ(e, cv::CMP_EQ, a, s);
+    أرجع e;
 }
 
-MatExpr operator == (double s, const Mat& a)
+Mat_فرچ operator == (مزدوج s, ثابت Mat& a)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Cmp::makeExpr(e, cv::CMP_EQ, a, s);
-    return e;
+    Mat_فرچ e;
+    MatOp_Cmp::make_فرچ(e, cv::CMP_EQ, a, s);
+    أرجع e;
 }
 
-MatExpr operator != (const Mat& a, const Mat& b)
+Mat_فرچ operator != (ثابت Mat& a, ثابت Mat& b)
 {
     checkOperandsExist(a, b);
-    MatExpr e;
-    MatOp_Cmp::makeExpr(e, cv::CMP_NE, a, b);
-    return e;
+    Mat_فرچ e;
+    MatOp_Cmp::make_فرچ(e, cv::CMP_NE, a, b);
+    أرجع e;
 }
 
-MatExpr operator != (const Mat& a, double s)
+Mat_فرچ operator != (ثابت Mat& a, مزدوج s)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Cmp::makeExpr(e, cv::CMP_NE, a, s);
-    return e;
+    Mat_فرچ e;
+    MatOp_Cmp::make_فرچ(e, cv::CMP_NE, a, s);
+    أرجع e;
 }
 
-MatExpr operator != (double s, const Mat& a)
+Mat_فرچ operator != (مزدوج s, ثابت Mat& a)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Cmp::makeExpr(e, cv::CMP_NE, a, s);
-    return e;
+    Mat_فرچ e;
+    MatOp_Cmp::make_فرچ(e, cv::CMP_NE, a, s);
+    أرجع e;
 }
 
-MatExpr operator >= (const Mat& a, const Mat& b)
+Mat_فرچ operator >= (ثابت Mat& a, ثابت Mat& b)
 {
     checkOperandsExist(a, b);
-    MatExpr e;
-    MatOp_Cmp::makeExpr(e, cv::CMP_GE, a, b);
-    return e;
+    Mat_فرچ e;
+    MatOp_Cmp::make_فرچ(e, cv::CMP_GE, a, b);
+    أرجع e;
 }
 
-MatExpr operator >= (const Mat& a, double s)
+Mat_فرچ operator >= (ثابت Mat& a, مزدوج s)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Cmp::makeExpr(e, cv::CMP_GE, a, s);
-    return e;
+    Mat_فرچ e;
+    MatOp_Cmp::make_فرچ(e, cv::CMP_GE, a, s);
+    أرجع e;
 }
 
-MatExpr operator >= (double s, const Mat& a)
+Mat_فرچ operator >= (مزدوج s, ثابت Mat& a)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Cmp::makeExpr(e, cv::CMP_LE, a, s);
-    return e;
+    Mat_فرچ e;
+    MatOp_Cmp::make_فرچ(e, cv::CMP_LE, a, s);
+    أرجع e;
 }
 
-MatExpr operator > (const Mat& a, const Mat& b)
+Mat_فرچ operator > (ثابت Mat& a, ثابت Mat& b)
 {
     checkOperandsExist(a, b);
-    MatExpr e;
-    MatOp_Cmp::makeExpr(e, cv::CMP_GT, a, b);
-    return e;
+    Mat_فرچ e;
+    MatOp_Cmp::make_فرچ(e, cv::CMP_GT, a, b);
+    أرجع e;
 }
 
-MatExpr operator > (const Mat& a, double s)
+Mat_فرچ operator > (ثابت Mat& a, مزدوج s)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Cmp::makeExpr(e, cv::CMP_GT, a, s);
-    return e;
+    Mat_فرچ e;
+    MatOp_Cmp::make_فرچ(e, cv::CMP_GT, a, s);
+    أرجع e;
 }
 
-MatExpr operator > (double s, const Mat& a)
+Mat_فرچ operator > (مزدوج s, ثابت Mat& a)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Cmp::makeExpr(e, cv::CMP_LT, a, s);
-    return e;
+    Mat_فرچ e;
+    MatOp_Cmp::make_فرچ(e, cv::CMP_LT, a, s);
+    أرجع e;
 }
 
-MatExpr min(const Mat& a, const Mat& b)
+Mat_فرچ min(ثابت Mat& a, ثابت Mat& b)
 {
     CV_INSTRUMENT_REGION();
 
     checkOperandsExist(a, b);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, 'm', a, b);
-    return e;
+    Mat_فرچ e;
+    MatOp_Bin::make_فرچ(e, 'm', a, b);
+    أرجع e;
 }
 
-MatExpr min(const Mat& a, double s)
+Mat_فرچ min(ثابت Mat& a, مزدوج s)
 {
     CV_INSTRUMENT_REGION();
 
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, 'n', a, s);
-    return e;
+    Mat_فرچ e;
+    MatOp_Bin::make_فرچ(e, 'n', a, s);
+    أرجع e;
 }
 
-MatExpr min(double s, const Mat& a)
+Mat_فرچ min(مزدوج s, ثابت Mat& a)
 {
     CV_INSTRUMENT_REGION();
 
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, 'n', a, s);
-    return e;
+    Mat_فرچ e;
+    MatOp_Bin::make_فرچ(e, 'n', a, s);
+    أرجع e;
 }
 
-MatExpr max(const Mat& a, const Mat& b)
+Mat_فرچ max(ثابت Mat& a, ثابت Mat& b)
 {
     CV_INSTRUMENT_REGION();
 
     checkOperandsExist(a, b);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, 'M', a, b);
-    return e;
+    Mat_فرچ e;
+    MatOp_Bin::make_فرچ(e, 'M', a, b);
+    أرجع e;
 }
 
-MatExpr max(const Mat& a, double s)
+Mat_فرچ max(ثابت Mat& a, مزدوج s)
 {
     CV_INSTRUMENT_REGION();
 
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, 'N', a, s);
-    return e;
+    Mat_فرچ e;
+    MatOp_Bin::make_فرچ(e, 'N', a, s);
+    أرجع e;
 }
 
-MatExpr max(double s, const Mat& a)
+Mat_فرچ max(مزدوج s, ثابت Mat& a)
 {
     CV_INSTRUMENT_REGION();
 
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, 'N', a, s);
-    return e;
+    Mat_فرچ e;
+    MatOp_Bin::make_فرچ(e, 'N', a, s);
+    أرجع e;
 }
 
-MatExpr operator & (const Mat& a, const Mat& b)
+Mat_فرچ operator & (ثابت Mat& a, ثابت Mat& b)
 {
     checkOperandsExist(a, b);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, '&', a, b);
-    return e;
+    Mat_فرچ e;
+    MatOp_Bin::make_فرچ(e, '&', a, b);
+    أرجع e;
 }
 
-MatExpr operator & (const Mat& a, const Scalar& s)
+Mat_فرچ operator & (ثابت Mat& a, ثابت Scalar& s)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, '&', a, s);
-    return e;
+    Mat_فرچ e;
+    MatOp_Bin::make_فرچ(e, '&', a, s);
+    أرجع e;
 }
 
-MatExpr operator & (const Scalar& s, const Mat& a)
+Mat_فرچ operator & (ثابت Scalar& s, ثابت Mat& a)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, '&', a, s);
-    return e;
+    Mat_فرچ e;
+    MatOp_Bin::make_فرچ(e, '&', a, s);
+    أرجع e;
 }
 
-MatExpr operator | (const Mat& a, const Mat& b)
+Mat_فرچ operator | (ثابت Mat& a, ثابت Mat& b)
 {
     checkOperandsExist(a, b);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, '|', a, b);
-    return e;
+    Mat_فرچ e;
+    MatOp_Bin::make_فرچ(e, '|', a, b);
+    أرجع e;
 }
 
-MatExpr operator | (const Mat& a, const Scalar& s)
+Mat_فرچ operator | (ثابت Mat& a, ثابت Scalar& s)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, '|', a, s);
-    return e;
+    Mat_فرچ e;
+    MatOp_Bin::make_فرچ(e, '|', a, s);
+    أرجع e;
 }
 
-MatExpr operator | (const Scalar& s, const Mat& a)
+Mat_فرچ operator | (ثابت Scalar& s, ثابت Mat& a)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, '|', a, s);
-    return e;
+    Mat_فرچ e;
+    MatOp_Bin::make_فرچ(e, '|', a, s);
+    أرجع e;
 }
 
-MatExpr operator ^ (const Mat& a, const Mat& b)
+Mat_فرچ operator ^ (ثابت Mat& a, ثابت Mat& b)
 {
     checkOperandsExist(a, b);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, '^', a, b);
-    return e;
+    Mat_فرچ e;
+    MatOp_Bin::make_فرچ(e, '^', a, b);
+    أرجع e;
 }
 
-MatExpr operator ^ (const Mat& a, const Scalar& s)
+Mat_فرچ operator ^ (ثابت Mat& a, ثابت Scalar& s)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, '^', a, s);
-    return e;
+    Mat_فرچ e;
+    MatOp_Bin::make_فرچ(e, '^', a, s);
+    أرجع e;
 }
 
-MatExpr operator ^ (const Scalar& s, const Mat& a)
+Mat_فرچ operator ^ (ثابت Scalar& s, ثابت Mat& a)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, '^', a, s);
-    return e;
+    Mat_فرچ e;
+    MatOp_Bin::make_فرچ(e, '^', a, s);
+    أرجع e;
 }
 
-MatExpr operator ~(const Mat& a)
+Mat_فرچ operator ~(ثابت Mat& a)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, '~', a, Scalar());
-    return e;
+    Mat_فرچ e;
+    MatOp_Bin::make_فرچ(e, '~', a, Scalar());
+    أرجع e;
 }
 
-MatExpr abs(const Mat& a)
+Mat_فرچ abs(ثابت Mat& a)
 {
     CV_INSTRUMENT_REGION();
 
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, 'a', a, Scalar());
-    return e;
+    Mat_فرچ e;
+    MatOp_Bin::make_فرچ(e, 'a', a, Scalar());
+    أرجع e;
 }
 
-MatExpr abs(const MatExpr& e)
+Mat_فرچ abs(ثابت Mat_فرچ& e)
 {
     CV_INSTRUMENT_REGION();
 
-    MatExpr en;
+    Mat_فرچ en;
     e.op->abs(e, en);
-    return en;
+    أرجع en;
 }
 
 
-Size MatExpr::size() const
+Size Mat_فرچ::size() ثابت
 {
-    if( isT(*this) || isInv(*this) )
-        return Size(a.rows, a.cols);
-    if( isSolve(*this) )
-        return Size(b.cols, a.cols);
-    if( isInitializer(*this) )
-        return a.size();
-    return op ? op->size(*this) : Size();
+    إذا( isT(*هذا) || isInv(*هذا) )
+        أرجع Size(a.rows, a.cols);
+    إذا( isSolve(*هذا) )
+        أرجع Size(b.cols, a.cols);
+    إذا( isInitializer(*هذا) )
+        أرجع a.size();
+    أرجع op ? op->size(*هذا) : Size();
 }
 
 
-int MatExpr::type() const
+صحيح Mat_فرچ::type() ثابت
 {
     CV_INSTRUMENT_REGION();
 
-    if( isInitializer(*this) )
-        return a.type();
-    if( isCmp(*this) )
-        return CV_MAKETYPE(CV_8U, a.channels());
-    return op ? op->type(*this) : -1;
+    إذا( isInitializer(*هذا) )
+        أرجع a.type();
+    إذا( isCmp(*هذا) )
+        أرجع CV_MAKETYPE(CV_8U, a.channels());
+    أرجع op ? op->type(*هذا) : -1;
 }
 
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void MatOp_Identity::assign(const MatExpr& e, Mat& m, int _type) const
+فراغ MatOp_Identity::assign(ثابت Mat_فرچ& e, Mat& m, صحيح _type) ثابت
 {
-    if( _type == -1 || _type == e.a.type() )
+    إذا( _type == -1 || _type == e.a.type() )
         m = e.a;
-    else
+    وإلا
     {
         CV_Assert( CV_MAT_CN(_type) == e.a.channels() );
         e.a.convertTo(m, _type);
     }
 }
 
-inline void MatOp_Identity::makeExpr(MatExpr& res, const Mat& m)
+مضمن فراغ MatOp_Identity::make_فرچ(Mat_فرچ& res, ثابت Mat& m)
 {
-    res = MatExpr(&g_MatOp_Identity, 0, m, Mat(), Mat(), 1, 0);
+    res = Mat_فرچ(&g_MatOp_Identity, 0, m, Mat(), Mat(), 1, 0);
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void MatOp_AddEx::assign(const MatExpr& e, Mat& m, int _type) const
+فراغ MatOp_AddEx::assign(ثابت Mat_فرچ& e, Mat& m, صحيح _type) ثابت
 {
     Mat temp, &dst = _type == -1 || e.a.type() == _type ? m : temp;
-    if( e.b.data )
+    إذا( e.b.data )
     {
-        if( e.s == Scalar() || !e.s.isReal() )
+        إذا( e.s == Scalar() || !e.s.isReal() )
         {
-            if( e.alpha == 1 )
+            إذا( e.alpha == 1 )
             {
-                if( e.beta == 1 )
+                إذا( e.beta == 1 )
                     cv::add(e.a, e.b, dst);
-                else if( e.beta == -1 )
+                وإلا إذا( e.beta == -1 )
                     cv::subtract(e.a, e.b, dst);
-                else
+                وإلا
                     cv::scaleAdd(e.b, e.beta, e.a, dst);
             }
-            else if( e.beta == 1 )
+            وإلا إذا( e.beta == 1 )
             {
-                if( e.alpha == -1 )
+                إذا( e.alpha == -1 )
                     cv::subtract(e.b, e.a, dst);
-                else
+                وإلا
                     cv::scaleAdd(e.a, e.alpha, e.b, dst);
             }
-            else
+            وإلا
                 cv::addWeighted(e.a, e.alpha, e.b, e.beta, 0, dst);
 
-            if( !e.s.isReal() )
+            إذا( !e.s.isReal() )
                 cv::add(dst, e.s, dst);
         }
-        else
+        وإلا
         {
-            if (e.a.channels() > 1)
-                CV_LOG_ONCE_WARNING(NULL, "OpenCV/MatExpr: processing of multi-channel arrays might be changed in the future: "
+            إذا (e.a.channels() > 1)
+                CV_LOG_ONCE_WARNING(عدم, "OpenCV/MatExpr: processing of multi-channel arrays might be changed in the future: "
                                           "https://github.com/opencv/opencv/issues/16739");
             cv::addWeighted(e.a, e.alpha, e.b, e.beta, e.s[0], dst);
         }
     }
-    else if( e.s.isReal() && (dst.data != m.data || fabs(e.alpha) != 1))
+    وإلا إذا( e.s.isReal() && (dst.data != m.data || fabs(e.alpha) != 1))
     {
-        if (e.a.channels() > 1 && e.s[0] != 0.0)
-            CV_LOG_ONCE_WARNING(NULL, "OpenCV/MatExpr: processing of multi-channel arrays might be changed in the future: "
+        إذا (e.a.channels() > 1 && e.s[0] != 0.0)
+            CV_LOG_ONCE_WARNING(عدم, "OpenCV/MatExpr: processing of multi-channel arrays might be changed in the future: "
                                       "https://github.com/opencv/opencv/issues/16739");
         e.a.convertTo(m, _type, e.alpha, e.s[0]);
-        return;
+        أرجع;
     }
-    else if( e.alpha == 1 )
+    وإلا إذا( e.alpha == 1 )
         cv::add(e.a, e.s, dst);
-    else if( e.alpha == -1 )
+    وإلا إذا( e.alpha == -1 )
         cv::subtract(e.s, e.a, dst);
-    else
+    وإلا
     {
         e.a.convertTo(dst, e.a.type(), e.alpha);
         cv::add(dst, e.s, dst);
     }
 
-    if( dst.data != m.data )
+    إذا( dst.data != m.data )
         dst.convertTo(m, m.type());
 }
 
 
-void MatOp_AddEx::add(const MatExpr& e, const Scalar& s, MatExpr& res) const
+فراغ MatOp_AddEx::add(ثابت Mat_فرچ& e, ثابت Scalar& s, Mat_فرچ& res) ثابت
 {
     CV_INSTRUMENT_REGION();
 
@@ -1359,7 +1359,7 @@ void MatOp_AddEx::add(const MatExpr& e, const Scalar& s, MatExpr& res) const
 }
 
 
-void MatOp_AddEx::subtract(const Scalar& s, const MatExpr& e, MatExpr& res) const
+فراغ MatOp_AddEx::subtract(ثابت Scalar& s, ثابت Mat_فرچ& e, Mat_فرچ& res) ثابت
 {
     CV_INSTRUMENT_REGION();
 
@@ -1369,7 +1369,7 @@ void MatOp_AddEx::subtract(const Scalar& s, const MatExpr& e, MatExpr& res) cons
     res.s = s - res.s;
 }
 
-void MatOp_AddEx::multiply(const MatExpr& e, double s, MatExpr& res) const
+فراغ MatOp_AddEx::multiply(ثابت Mat_فرچ& e, مزدوج s, Mat_فرچ& res) ثابت
 {
     CV_INSTRUMENT_REGION();
 
@@ -1379,160 +1379,160 @@ void MatOp_AddEx::multiply(const MatExpr& e, double s, MatExpr& res) const
     res.s *= s;
 }
 
-void MatOp_AddEx::divide(double s, const MatExpr& e, MatExpr& res) const
+فراغ MatOp_AddEx::divide(مزدوج s, ثابت Mat_فرچ& e, Mat_فرچ& res) ثابت
 {
     CV_INSTRUMENT_REGION();
 
-    if( isScaled(e) )
-        MatOp_Bin::makeExpr(res, '/', e.a, Mat(), s/e.alpha);
-    else
+    إذا( isScaled(e) )
+        MatOp_Bin::make_فرچ(res, '/', e.a, Mat(), s/e.alpha);
+    وإلا
         MatOp::divide(s, e, res);
 }
 
 
-void MatOp_AddEx::transpose(const MatExpr& e, MatExpr& res) const
+فراغ MatOp_AddEx::transpose(ثابت Mat_فرچ& e, Mat_فرچ& res) ثابت
 {
     CV_INSTRUMENT_REGION();
 
-    if( isScaled(e) )
-        MatOp_T::makeExpr(res, e.a, e.alpha);
-    else
+    إذا( isScaled(e) )
+        MatOp_T::make_فرچ(res, e.a, e.alpha);
+    وإلا
         MatOp::transpose(e, res);
 }
 
-void MatOp_AddEx::abs(const MatExpr& e, MatExpr& res) const
+فراغ MatOp_AddEx::abs(ثابت Mat_فرچ& e, Mat_فرچ& res) ثابت
 {
     CV_INSTRUMENT_REGION();
 
-    if( (!e.b.data || e.beta == 0) && fabs(e.alpha) == 1 )
-        MatOp_Bin::makeExpr(res, 'a', e.a, -e.s*e.alpha);
-    else if( e.b.data && e.alpha + e.beta == 0 && e.alpha*e.beta == -1 )
-        MatOp_Bin::makeExpr(res, 'a', e.a, e.b);
-    else
+    إذا( (!e.b.data || e.beta == 0) && fabs(e.alpha) == 1 )
+        MatOp_Bin::make_فرچ(res, 'a', e.a, -e.s*e.alpha);
+    وإلا إذا( e.b.data && e.alpha + e.beta == 0 && e.alpha*e.beta == -1 )
+        MatOp_Bin::make_فرچ(res, 'a', e.a, e.b);
+    وإلا
         MatOp::abs(e, res);
 }
 
-inline void MatOp_AddEx::makeExpr(MatExpr& res, const Mat& a, const Mat& b, double alpha, double beta, const Scalar& s)
+مضمن فراغ MatOp_AddEx::make_فرچ(Mat_فرچ& res, ثابت Mat& a, ثابت Mat& b, مزدوج alpha, مزدوج beta, ثابت Scalar& s)
 {
-    res = MatExpr(&g_MatOp_AddEx, 0, a, b, Mat(), alpha, beta, s);
+    res = Mat_فرچ(&g_MatOp_AddEx, 0, a, b, Mat(), alpha, beta, s);
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void MatOp_Bin::assign(const MatExpr& e, Mat& m, int _type) const
+فراغ MatOp_Bin::assign(ثابت Mat_فرچ& e, Mat& m, صحيح _type) ثابت
 {
     Mat temp, &dst = _type == -1 || e.a.type() == _type ? m : temp;
 
-    if( e.flags == '*' )
+    إذا( e.flags == '*' )
         cv::multiply(e.a, e.b, dst, e.alpha);
-    else if( e.flags == '/' && e.b.data )
+    وإلا إذا( e.flags == '/' && e.b.data )
         cv::divide(e.a, e.b, dst, e.alpha);
-    else if( e.flags == '/' && !e.b.data )
+    وإلا إذا( e.flags == '/' && !e.b.data )
         cv::divide(e.alpha, e.a, dst );
-    else if( e.flags == '&' && e.b.data )
+    وإلا إذا( e.flags == '&' && e.b.data )
         bitwise_and(e.a, e.b, dst);
-    else if( e.flags == '&' && !e.b.data )
+    وإلا إذا( e.flags == '&' && !e.b.data )
         bitwise_and(e.a, e.s, dst);
-    else if( e.flags == '|' && e.b.data )
+    وإلا إذا( e.flags == '|' && e.b.data )
         bitwise_or(e.a, e.b, dst);
-    else if( e.flags == '|' && !e.b.data )
+    وإلا إذا( e.flags == '|' && !e.b.data )
         bitwise_or(e.a, e.s, dst);
-    else if( e.flags == '^' && e.b.data )
+    وإلا إذا( e.flags == '^' && e.b.data )
         bitwise_xor(e.a, e.b, dst);
-    else if( e.flags == '^' && !e.b.data )
+    وإلا إذا( e.flags == '^' && !e.b.data )
         bitwise_xor(e.a, e.s, dst);
-    else if( e.flags == '~' && !e.b.data )
+    وإلا إذا( e.flags == '~' && !e.b.data )
         bitwise_not(e.a, dst);
-    else if( e.flags == 'm' )
+    وإلا إذا( e.flags == 'm' )
         cv::min(e.a, e.b, dst);
-    else if( e.flags == 'n' )
+    وإلا إذا( e.flags == 'n' )
         cv::min(e.a, e.s[0], dst);
-    else if( e.flags == 'M' )
+    وإلا إذا( e.flags == 'M' )
         cv::max(e.a, e.b, dst);
-    else if( e.flags == 'N' )
+    وإلا إذا( e.flags == 'N' )
         cv::max(e.a, e.s[0], dst);
-    else if( e.flags == 'a' && e.b.data )
+    وإلا إذا( e.flags == 'a' && e.b.data )
         cv::absdiff(e.a, e.b, dst);
-    else if( e.flags == 'a' && !e.b.data )
+    وإلا إذا( e.flags == 'a' && !e.b.data )
         cv::absdiff(e.a, e.s, dst);
-    else
+    وإلا
         CV_Error(cv::Error::StsError, "Unknown operation");
 
-    if( dst.data != m.data )
+    إذا( dst.data != m.data )
         dst.convertTo(m, _type);
 }
 
-void MatOp_Bin::multiply(const MatExpr& e, double s, MatExpr& res) const
+فراغ MatOp_Bin::multiply(ثابت Mat_فرچ& e, مزدوج s, Mat_فرچ& res) ثابت
 {
     CV_INSTRUMENT_REGION();
 
-    if( e.flags == '*' || e.flags == '/' )
+    إذا( e.flags == '*' || e.flags == '/' )
     {
         res = e;
         res.alpha *= s;
     }
-    else
+    وإلا
         MatOp::multiply(e, s, res);
 }
 
-void MatOp_Bin::divide(double s, const MatExpr& e, MatExpr& res) const
+فراغ MatOp_Bin::divide(مزدوج s, ثابت Mat_فرچ& e, Mat_فرچ& res) ثابت
 {
     CV_INSTRUMENT_REGION();
 
-    if( e.flags == '/' && (!e.b.data || e.beta == 0) )
-        MatOp_AddEx::makeExpr(res, e.a, Mat(), s/e.alpha, 0);
-    else
+    إذا( e.flags == '/' && (!e.b.data || e.beta == 0) )
+        MatOp_AddEx::make_فرچ(res, e.a, Mat(), s/e.alpha, 0);
+    وإلا
         MatOp::divide(s, e, res);
 }
 
-inline void MatOp_Bin::makeExpr(MatExpr& res, char op, const Mat& a, const Mat& b, double scale)
+مضمن فراغ MatOp_Bin::make_فرچ(Mat_فرچ& res, حرف op, ثابت Mat& a, ثابت Mat& b, مزدوج scale)
 {
-    res = MatExpr(&g_MatOp_Bin, op, a, b, Mat(), scale, b.data ? 1 : 0);
+    res = Mat_فرچ(&g_MatOp_Bin, op, a, b, Mat(), scale, b.data ? 1 : 0);
 }
 
-inline void MatOp_Bin::makeExpr(MatExpr& res, char op, const Mat& a, const Scalar& s)
+مضمن فراغ MatOp_Bin::make_فرچ(Mat_فرچ& res, حرف op, ثابت Mat& a, ثابت Scalar& s)
 {
-    res = MatExpr(&g_MatOp_Bin, op, a, Mat(), Mat(), 1, 0, s);
+    res = Mat_فرچ(&g_MatOp_Bin, op, a, Mat(), Mat(), 1, 0, s);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void MatOp_Cmp::assign(const MatExpr& e, Mat& m, int _type) const
+فراغ MatOp_Cmp::assign(ثابت Mat_فرچ& e, Mat& m, صحيح _type) ثابت
 {
     Mat temp, &dst = _type == -1 || _type == CV_8U ? m : temp;
 
-    if( e.b.data )
+    إذا( e.b.data )
         cv::compare(e.a, e.b, dst, e.flags);
-    else
+    وإلا
         cv::compare(e.a, e.alpha, dst, e.flags);
 
-    if( dst.data != m.data )
+    إذا( dst.data != m.data )
         dst.convertTo(m, _type);
 }
 
-inline void MatOp_Cmp::makeExpr(MatExpr& res, int cmpop, const Mat& a, const Mat& b)
+مضمن فراغ MatOp_Cmp::make_فرچ(Mat_فرچ& res, صحيح cmpop, ثابت Mat& a, ثابت Mat& b)
 {
-    res = MatExpr(&g_MatOp_Cmp, cmpop, a, b, Mat(), 1, 1);
+    res = Mat_فرچ(&g_MatOp_Cmp, cmpop, a, b, Mat(), 1, 1);
 }
 
-inline void MatOp_Cmp::makeExpr(MatExpr& res, int cmpop, const Mat& a, double alpha)
+مضمن فراغ MatOp_Cmp::make_فرچ(Mat_فرچ& res, صحيح cmpop, ثابت Mat& a, مزدوج alpha)
 {
-    res = MatExpr(&g_MatOp_Cmp, cmpop, a, Mat(), Mat(), alpha, 1);
+    res = Mat_فرچ(&g_MatOp_Cmp, cmpop, a, Mat(), Mat(), alpha, 1);
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void MatOp_T::assign(const MatExpr& e, Mat& m, int _type) const
+فراغ MatOp_T::assign(ثابت Mat_فرچ& e, Mat& m, صحيح _type) ثابت
 {
     Mat temp, &dst = _type == -1 || _type == e.a.type() ? m : temp;
 
     cv::transpose(e.a, dst);
 
-    if( dst.data != m.data || e.alpha != 1 )
+    إذا( dst.data != m.data || e.alpha != 1 )
         dst.convertTo(m, _type, e.alpha);
 }
 
-void MatOp_T::multiply(const MatExpr& e, double s, MatExpr& res) const
+فراغ MatOp_T::multiply(ثابت Mat_فرچ& e, مزدوج s, Mat_فرچ& res) ثابت
 {
     CV_INSTRUMENT_REGION();
 
@@ -1540,71 +1540,71 @@ void MatOp_T::multiply(const MatExpr& e, double s, MatExpr& res) const
     res.alpha *= s;
 }
 
-void MatOp_T::transpose(const MatExpr& e, MatExpr& res) const
+فراغ MatOp_T::transpose(ثابت Mat_فرچ& e, Mat_فرچ& res) ثابت
 {
     CV_INSTRUMENT_REGION();
 
-    if( e.alpha == 1 )
-        MatOp_Identity::makeExpr(res, e.a);
-    else
-        MatOp_AddEx::makeExpr(res, e.a, Mat(), e.alpha, 0);
+    إذا( e.alpha == 1 )
+        MatOp_Identity::make_فرچ(res, e.a);
+    وإلا
+        MatOp_AddEx::make_فرچ(res, e.a, Mat(), e.alpha, 0);
 }
 
-inline void MatOp_T::makeExpr(MatExpr& res, const Mat& a, double alpha)
+مضمن فراغ MatOp_T::make_فرچ(Mat_فرچ& res, ثابت Mat& a, مزدوج alpha)
 {
-    res = MatExpr(&g_MatOp_T, 0, a, Mat(), Mat(), alpha, 0);
+    res = Mat_فرچ(&g_MatOp_T, 0, a, Mat(), Mat(), alpha, 0);
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void MatOp_GEMM::assign(const MatExpr& e, Mat& m, int _type) const
+فراغ MatOp_GEMM::assign(ثابت Mat_فرچ& e, Mat& m, صحيح _type) ثابت
 {
     Mat temp, &dst = _type == -1 || _type == e.a.type() ? m : temp;
 
     cv::gemm(e.a, e.b, e.alpha, e.c, e.beta, dst, e.flags);
-    if( dst.data != m.data )
+    إذا( dst.data != m.data )
         dst.convertTo(m, _type);
 }
 
-void MatOp_GEMM::add(const MatExpr& e1, const MatExpr& e2, MatExpr& res) const
+فراغ MatOp_GEMM::add(ثابت Mat_فرچ& e1, ثابت Mat_فرچ& e2, Mat_فرچ& res) ثابت
 {
     CV_INSTRUMENT_REGION();
 
-    bool i1 = isIdentity(e1), i2 = isIdentity(e2);
-    double alpha1 = i1 ? 1 : e1.alpha, alpha2 = i2 ? 1 : e2.alpha;
+    منطقي i1 = isIdentity(e1), i2 = isIdentity(e2);
+    مزدوج alpha1 = i1 ? 1 : e1.alpha, alpha2 = i2 ? 1 : e2.alpha;
 
-    if( isMatProd(e1) && (i2 || isScaled(e2) || isT(e2)) )
-        MatOp_GEMM::makeExpr(res, (e1.flags & ~cv::GEMM_3_T)|(isT(e2) ? cv::GEMM_3_T : 0),
+    إذا( isMatProd(e1) && (i2 || isScaled(e2) || isT(e2)) )
+        MatOp_GEMM::make_فرچ(res, (e1.flags & ~cv::GEMM_3_T)|(isT(e2) ? cv::GEMM_3_T : 0),
                              e1.a, e1.b, alpha1, e2.a, alpha2);
-    else if( isMatProd(e2) && (i1 || isScaled(e1) || isT(e1)) )
-        MatOp_GEMM::makeExpr(res, (e2.flags & ~cv::GEMM_3_T)|(isT(e1) ? cv::GEMM_3_T : 0),
+    وإلا إذا( isMatProd(e2) && (i1 || isScaled(e1) || isT(e1)) )
+        MatOp_GEMM::make_فرچ(res, (e2.flags & ~cv::GEMM_3_T)|(isT(e1) ? cv::GEMM_3_T : 0),
                              e2.a, e2.b, alpha2, e1.a, alpha1);
-    else if( this == e2.op )
+    وإلا إذا( هذا == e2.op )
         MatOp::add(e1, e2, res);
-    else
+    وإلا
         e2.op->add(e1, e2, res);
 }
 
-void MatOp_GEMM::subtract(const MatExpr& e1, const MatExpr& e2, MatExpr& res) const
+فراغ MatOp_GEMM::subtract(ثابت Mat_فرچ& e1, ثابت Mat_فرچ& e2, Mat_فرچ& res) ثابت
 {
     CV_INSTRUMENT_REGION();
 
-    bool i1 = isIdentity(e1), i2 = isIdentity(e2);
-    double alpha1 = i1 ? 1 : e1.alpha, alpha2 = i2 ? 1 : e2.alpha;
+    منطقي i1 = isIdentity(e1), i2 = isIdentity(e2);
+    مزدوج alpha1 = i1 ? 1 : e1.alpha, alpha2 = i2 ? 1 : e2.alpha;
 
-    if( isMatProd(e1) && (i2 || isScaled(e2) || isT(e2)) )
-        MatOp_GEMM::makeExpr(res, (e1.flags & ~cv::GEMM_3_T)|(isT(e2) ? cv::GEMM_3_T : 0),
+    إذا( isMatProd(e1) && (i2 || isScaled(e2) || isT(e2)) )
+        MatOp_GEMM::make_فرچ(res, (e1.flags & ~cv::GEMM_3_T)|(isT(e2) ? cv::GEMM_3_T : 0),
                              e1.a, e1.b, alpha1, e2.a, -alpha2);
-    else if( isMatProd(e2) && (i1 || isScaled(e1) || isT(e1)) )
-        MatOp_GEMM::makeExpr(res, (e2.flags & ~cv::GEMM_3_T)|(isT(e1) ? cv::GEMM_3_T : 0),
+    وإلا إذا( isMatProd(e2) && (i1 || isScaled(e1) || isT(e1)) )
+        MatOp_GEMM::make_فرچ(res, (e2.flags & ~cv::GEMM_3_T)|(isT(e1) ? cv::GEMM_3_T : 0),
                             e2.a, e2.b, -alpha2, e1.a, alpha1);
-    else if( this == e2.op )
+    وإلا إذا( هذا == e2.op )
         MatOp::subtract(e1, e2, res);
-    else
+    وإلا
         e2.op->subtract(e1, e2, res);
 }
 
-void MatOp_GEMM::multiply(const MatExpr& e, double s, MatExpr& res) const
+فراغ MatOp_GEMM::multiply(ثابت Mat_فرچ& e, مزدوج s, Mat_فرچ& res) ثابت
 {
     CV_INSTRUMENT_REGION();
 
@@ -1613,7 +1613,7 @@ void MatOp_GEMM::multiply(const MatExpr& e, double s, MatExpr& res) const
     res.beta *= s;
 }
 
-void MatOp_GEMM::transpose(const MatExpr& e, MatExpr& res) const
+فراغ MatOp_GEMM::transpose(ثابت Mat_فرچ& e, Mat_فرچ& res) ثابت
 {
     CV_INSTRUMENT_REGION();
 
@@ -1624,74 +1624,74 @@ void MatOp_GEMM::transpose(const MatExpr& e, MatExpr& res) const
     swap(res.a, res.b);
 }
 
-inline void MatOp_GEMM::makeExpr(MatExpr& res, int flags, const Mat& a, const Mat& b,
-                                 double alpha, const Mat& c, double beta)
+مضمن فراغ MatOp_GEMM::make_فرچ(Mat_فرچ& res, صحيح flags, ثابت Mat& a, ثابت Mat& b,
+                                 مزدوج alpha, ثابت Mat& c, مزدوج beta)
 {
-    res = MatExpr(&g_MatOp_GEMM, flags, a, b, c, alpha, beta);
+    res = Mat_فرچ(&g_MatOp_GEMM, flags, a, b, c, alpha, beta);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void MatOp_Invert::assign(const MatExpr& e, Mat& m, int _type) const
+فراغ MatOp_Invert::assign(ثابت Mat_فرچ& e, Mat& m, صحيح _type) ثابت
 {
     Mat temp, &dst = _type == -1 || _type == e.a.type() ? m : temp;
 
     cv::invert(e.a, dst, e.flags);
-    if( dst.data != m.data )
+    إذا( dst.data != m.data )
         dst.convertTo(m, _type);
 }
 
-void MatOp_Invert::matmul(const MatExpr& e1, const MatExpr& e2, MatExpr& res) const
+فراغ MatOp_Invert::matmul(ثابت Mat_فرچ& e1, ثابت Mat_فرچ& e2, Mat_فرچ& res) ثابت
 {
-    if( isInv(e1) && isIdentity(e2) )
-        MatOp_Solve::makeExpr(res, e1.flags, e1.a, e2.a);
-    else if( this == e2.op )
+    إذا( isInv(e1) && isIdentity(e2) )
+        MatOp_Solve::make_فرچ(res, e1.flags, e1.a, e2.a);
+    وإلا إذا( هذا == e2.op )
         MatOp::matmul(e1, e2, res);
-    else
+    وإلا
         e2.op->matmul(e1, e2, res);
 }
 
-inline void MatOp_Invert::makeExpr(MatExpr& res, int method, const Mat& m)
+مضمن فراغ MatOp_Invert::make_فرچ(Mat_فرچ& res, صحيح method, ثابت Mat& m)
 {
-    res = MatExpr(&g_MatOp_Invert, method, m, Mat(), Mat(), 1, 0);
+    res = Mat_فرچ(&g_MatOp_Invert, method, m, Mat(), Mat(), 1, 0);
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void MatOp_Solve::assign(const MatExpr& e, Mat& m, int _type) const
+فراغ MatOp_Solve::assign(ثابت Mat_فرچ& e, Mat& m, صحيح _type) ثابت
 {
     Mat temp, &dst = _type == -1 || _type == e.a.type() ? m : temp;
 
     cv::solve(e.a, e.b, dst, e.flags);
-    if( dst.data != m.data )
+    إذا( dst.data != m.data )
         dst.convertTo(m, _type);
 }
 
-inline void MatOp_Solve::makeExpr(MatExpr& res, int method, const Mat& a, const Mat& b)
+مضمن فراغ MatOp_Solve::make_فرچ(Mat_فرچ& res, صحيح method, ثابت Mat& a, ثابت Mat& b)
 {
-    res = MatExpr(&g_MatOp_Solve, method, a, b, Mat(), 1, 1);
+    res = Mat_فرچ(&g_MatOp_Solve, method, a, b, Mat(), 1, 1);
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void MatOp_Initializer::assign(const MatExpr& e, Mat& m, int _type) const
+فراغ MatOp_Initializer::assign(ثابت Mat_فرچ& e, Mat& m, صحيح _type) ثابت
 {
-    if( _type == -1 )
+    إذا( _type == -1 )
         _type = e.a.type();
 
     m.create(e.a.size, _type);
 
-    if( e.flags == 'I' && e.a.dims <= 2 )
+    إذا( e.flags == 'I' && e.a.dims <= 2 )
         setIdentity(m, Scalar(e.alpha));
-    else if( e.flags == '0' )
+    وإلا إذا( e.flags == '0' )
         m = Scalar();
-    else if( e.flags == '1' )
+    وإلا إذا( e.flags == '1' )
         m = Scalar(e.alpha);
-    else
+    وإلا
         CV_Error(cv::Error::StsError, "Invalid matrix initializer type");
 }
 
-void MatOp_Initializer::multiply(const MatExpr& e, double s, MatExpr& res) const
+فراغ MatOp_Initializer::multiply(ثابت Mat_فرچ& e, مزدوج s, Mat_فرچ& res) ثابت
 {
     CV_INSTRUMENT_REGION();
 
@@ -1699,39 +1699,39 @@ void MatOp_Initializer::multiply(const MatExpr& e, double s, MatExpr& res) const
     res.alpha *= s;
 }
 
-inline void MatOp_Initializer::makeExpr(MatExpr& res, int method, Size sz, int type, double alpha)
+مضمن فراغ MatOp_Initializer::make_فرچ(Mat_فرچ& res, صحيح method, Size sz, صحيح type, مزدوج alpha)
 {
-    res = MatExpr(getGlobalMatOpInitializer(), method, Mat(sz, type, (void*)(size_t)0xEEEEEEEE), Mat(), Mat(), alpha, 0);
+    res = Mat_فرچ(getGlobalMatOpInitializer(), method, Mat(sz, type, (فراغ*)(size_t)0xEEEEEEEE), Mat(), Mat(), alpha, 0);
 }
 
-inline void MatOp_Initializer::makeExpr(MatExpr& res, int method, int ndims, const int* sizes, int type, double alpha)
+مضمن فراغ MatOp_Initializer::make_فرچ(Mat_فرچ& res, صحيح method, صحيح ndims, ثابت صحيح* sizes, صحيح type, مزدوج alpha)
 {
-    res = MatExpr(getGlobalMatOpInitializer(), method, Mat(ndims, sizes, type, (void*)(size_t)0xEEEEEEEE), Mat(), Mat(), alpha, 0);
+    res = Mat_فرچ(getGlobalMatOpInitializer(), method, Mat(ndims, sizes, type, (فراغ*)(size_t)0xEEEEEEEE), Mat(), Mat(), alpha, 0);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-MatExpr Mat::t() const
+Mat_فرچ Mat::t() ثابت
 {
     CV_INSTRUMENT_REGION();
 
-    checkOperandsExist(*this);
-    MatExpr e;
-    MatOp_T::makeExpr(e, *this);
-    return e;
+    checkOperandsExist(*هذا);
+    Mat_فرچ e;
+    MatOp_T::make_فرچ(e, *هذا);
+    أرجع e;
 }
 
-MatExpr Mat::inv(int method) const
+Mat_فرچ Mat::inv(صحيح method) ثابت
 {
     CV_INSTRUMENT_REGION();
 
-    MatExpr e;
-    MatOp_Invert::makeExpr(e, method, *this);
-    return e;
+    Mat_فرچ e;
+    MatOp_Invert::make_فرچ(e, method, *هذا);
+    أرجع e;
 }
 
 
-MatExpr Mat::mul(InputArray m, double scale) const
+Mat_فرچ Mat::mul(شغرو_Array m, مزدوج scale) ثابت
 {
     CV_INSTRUMENT_REGION();
 
@@ -1740,105 +1740,105 @@ MatExpr Mat::mul(InputArray m, double scale) const
     // a non-owning view of caller memory (e.g. a scalar bound to _InputArray(const double&),
     // a Matx or a Vec) that the returned MatExpr can outlive, so snapshot it.
     // See https://github.com/opencv/opencv/issues/23577
-    if( !m.isMat() && !m.isUMat() )
+    إذا( !m.isMat() && !m.isUMat() )
         b = b.clone();
 
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, '*', *this, b, scale);
-    return e;
+    Mat_فرچ e;
+    MatOp_Bin::make_فرچ(e, '*', *هذا, b, scale);
+    أرجع e;
 }
 
-MatExpr Mat::zeros(int rows, int cols, int type)
+Mat_فرچ Mat::zeros(صحيح rows, صحيح cols, صحيح type)
 {
     CV_INSTRUMENT_REGION();
 
-    MatExpr e;
-    MatOp_Initializer::makeExpr(e, '0', Size(cols, rows), type);
-    return e;
+    Mat_فرچ e;
+    MatOp_Initializer::make_فرچ(e, '0', Size(cols, rows), type);
+    أرجع e;
 }
 
-MatExpr Mat::zeros(Size size, int type)
+Mat_فرچ Mat::zeros(Size size, صحيح type)
 {
     CV_INSTRUMENT_REGION();
 
-    MatExpr e;
-    MatOp_Initializer::makeExpr(e, '0', size, type);
-    return e;
+    Mat_فرچ e;
+    MatOp_Initializer::make_فرچ(e, '0', size, type);
+    أرجع e;
 }
 
-MatExpr Mat::zeros(int ndims, const int* sizes, int type)
+Mat_فرچ Mat::zeros(صحيح ndims, ثابت صحيح* sizes, صحيح type)
 {
     CV_INSTRUMENT_REGION();
 
-    MatExpr e;
-    MatOp_Initializer::makeExpr(e, '0', ndims, sizes, type);
-    return e;
+    Mat_فرچ e;
+    MatOp_Initializer::make_فرچ(e, '0', ndims, sizes, type);
+    أرجع e;
 }
 
-MatExpr Mat::zeros(const MatShape& shape, int type)
+Mat_فرچ Mat::zeros(ثابت MatShape& shape, صحيح type)
 {
     CV_INSTRUMENT_REGION();
 
-    MatExpr e;
-    MatOp_Initializer::makeExpr(e, '0', shape.dims, shape.p, type);
-    return e;
+    Mat_فرچ e;
+    MatOp_Initializer::make_فرچ(e, '0', shape.dims, shape.p, type);
+    أرجع e;
 }
 
-MatExpr Mat::ones(int rows, int cols, int type)
+Mat_فرچ Mat::ones(صحيح rows, صحيح cols, صحيح type)
 {
     CV_INSTRUMENT_REGION();
 
-    MatExpr e;
-    MatOp_Initializer::makeExpr(e, '1', Size(cols, rows), type);
-    return e;
+    Mat_فرچ e;
+    MatOp_Initializer::make_فرچ(e, '1', Size(cols, rows), type);
+    أرجع e;
 }
 
-MatExpr Mat::ones(Size size, int type)
+Mat_فرچ Mat::ones(Size size, صحيح type)
 {
     CV_INSTRUMENT_REGION();
 
-    MatExpr e;
-    MatOp_Initializer::makeExpr(e, '1', size, type);
-    return e;
+    Mat_فرچ e;
+    MatOp_Initializer::make_فرچ(e, '1', size, type);
+    أرجع e;
 }
 
-MatExpr Mat::ones(int ndims, const int* sizes, int type)
+Mat_فرچ Mat::ones(صحيح ndims, ثابت صحيح* sizes, صحيح type)
 {
     CV_INSTRUMENT_REGION();
 
-    MatExpr e;
-    MatOp_Initializer::makeExpr(e, '1', ndims, sizes, type);
-    return e;
+    Mat_فرچ e;
+    MatOp_Initializer::make_فرچ(e, '1', ndims, sizes, type);
+    أرجع e;
 }
 
-MatExpr Mat::ones(const MatShape& shape, int type)
+Mat_فرچ Mat::ones(ثابت MatShape& shape, صحيح type)
 {
     CV_INSTRUMENT_REGION();
 
-    MatExpr e;
-    MatOp_Initializer::makeExpr(e, '1', shape.dims, shape.p, type);
-    return e;
+    Mat_فرچ e;
+    MatOp_Initializer::make_فرچ(e, '1', shape.dims, shape.p, type);
+    أرجع e;
 }
 
-MatExpr Mat::eye(int rows, int cols, int type)
+Mat_فرچ Mat::eye(صحيح rows, صحيح cols, صحيح type)
 {
     CV_INSTRUMENT_REGION();
 
-    MatExpr e;
-    MatOp_Initializer::makeExpr(e, 'I', Size(cols, rows), type);
-    return e;
+    Mat_فرچ e;
+    MatOp_Initializer::make_فرچ(e, 'I', Size(cols, rows), type);
+    أرجع e;
 }
 
-MatExpr Mat::eye(Size size, int type)
+Mat_فرچ Mat::eye(Size size, صحيح type)
 {
     CV_INSTRUMENT_REGION();
 
-    MatExpr e;
-    MatOp_Initializer::makeExpr(e, 'I', size, type);
-    return e;
+    Mat_فرچ e;
+    MatOp_Initializer::make_فرچ(e, 'I', size, type);
+    أرجع e;
 }
 
-void MatExpr::swap(MatExpr& other)
+فراغ Mat_فرچ::swap(Mat_فرچ& other)
 {
     using std::swap;
 
@@ -1855,16 +1855,16 @@ void MatExpr::swap(MatExpr& other)
     swap(s, other.s);
 }
 
-_InputArray::_InputArray(const MatExpr& expr)
+شغرو_Array_2::شغرو_Array_2(ثابت Mat_فرچ& فرچ)
 {
-    if (!isIdentity(expr))
+    إذا (!isIdentity(فرچ))
     {
-        Mat result = expr;  // TODO improve through refcount == 1 of expr.a (inplace operation is possible - except gemm?)
-        MatExpr result_expr(result);
-        swap(const_cast<MatExpr&>(expr), result_expr);
+        Mat result = فرچ;  // TODO improve through refcount == 1 of expr.a (inplace operation is possible - except gemm?)
+        Mat_فرچ result_فرچ(result);
+        swap(const_cast<Mat_فرچ&>(فرچ), result_فرچ);
     }
-    CV_Assert(isIdentity(expr));
-    init(FIXED_TYPE + FIXED_SIZE + MAT + ACCESS_READ, &expr.a);
+    CV_Assert(isIdentity(فرچ));
+    init(FIXED_TYPE + FIXED_SIZE + MAT + ACCESS_READ, &فرچ.a);
 }
 
 } // cv::
