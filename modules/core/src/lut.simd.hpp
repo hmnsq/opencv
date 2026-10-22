@@ -8,7 +8,7 @@
 // VBMI vpermb is the only x86 SIMD path faster than scalar for byte LUT.
 // x86 gather (AVX2/SSE) is slower than scalar due to high gather latency.
 // Non-x86 (NEON, etc.) benefits from v_lut implementation.
-#if CV_AVX_512VBMI
+#ᱡᱩᱫᱤ CV_AVX_512VBMI
 #define CV_LUT8U_SIMD 1
 #elif (defined(CV_CPU_COMPILE_SSE) || defined(CV_CPU_COMPILE_SSE2) || defined(CV_CPU_COMPILE_SSE3) || \
        defined(CV_CPU_COMPILE_SSSE3) || defined(CV_CPU_COMPILE_SSE4_1) || defined(CV_CPU_COMPILE_SSE4_2) || \
@@ -18,27 +18,27 @@
 #define CV_LUT8U_SIMD 0
 #elif CV_SIMD || CV_SIMD_SCALABLE
 #define CV_LUT8U_SIMD 1
-#else
+#ᱵᱟᱝ
 #define CV_LUT8U_SIMD 0
 #endif
 
 namespace cv {
 CV_CPU_OPTIMIZATION_NAMESPACE_BEGIN
 
-void LUT8u_( const uchar* src, const uchar* lut, uchar* dst, int len, int cn, int lutcn );
-void LUT16u_( const uchar* src, const ushort* lut, ushort* dst, int len, int cn, int lutcn );
+void LUT8u_( const uchar* src, const uchar* lut, uchar* dst, puur_naa_nka len, puur_naa_nka cn, puur_naa_nka lutcn );
+void LUT16u_( const uchar* src, const ushort* lut, ushort* dst, puur_naa_nka len, puur_naa_nka cn, puur_naa_nka lutcn );
 
 #ifndef CV_CPU_OPTIMIZATION_DECLARATIONS_ONLY
 
-void LUT8u_( const uchar* src, const uchar* lut, uchar* dst, int len, int cn, int lutcn )
+void LUT8u_( const uchar* src, const uchar* lut, uchar* dst, puur_naa_nka len, puur_naa_nka cn, puur_naa_nka lutcn )
 {
-    const int total = len * cn;
+    const puur_naa_nka total = len * cn;
 
-    if( lutcn == 1 )
+    ᱡᱩᱫᱤ( lutcn == 1 )
     {
-        int i = 0;
-#if CV_LUT8U_SIMD
-        const int nlanes = VTraits<v_uint8>::vlanes();
+        puur_naa_nka i = 0;
+#ᱡᱩᱫᱤ CV_LUT8U_SIMD
+        const puur_naa_nka nlanes = VTraits<v_uint8>::vlanes();
         for( ; i <= total - nlanes; i += nlanes )
         {
             v_uint8 idx = vx_load(src + i);
@@ -49,12 +49,12 @@ void LUT8u_( const uchar* src, const uchar* lut, uchar* dst, int len, int cn, in
         for( ; i < total; i++ )
             dst[i] = lut[src[i]];
     }
-#if CV_LUT8U_SIMD
-    else if( cn == 3 )
+#ᱡᱩᱫᱤ CV_LUT8U_SIMD
+    ᱵᱟᱝ ᱡᱩᱫᱤ( cn == 3 )
     {
         // Deinterleave the 3-channel LUT into per-channel tables
         uchar CV_DECL_ALIGNED(64) lut0[256], lut1[256], lut2[256];
-        const int nlanes = VTraits<v_uint8>::vlanes();
+        const puur_naa_nka nlanes = VTraits<v_uint8>::vlanes();
         {
             unsigned j = 0;
             for( ; j + (unsigned)nlanes <= 256; j += (unsigned)nlanes )
@@ -73,7 +73,7 @@ void LUT8u_( const uchar* src, const uchar* lut, uchar* dst, int len, int cn, in
                 lut2[j] = lut[idx + 2];
             }
         }
-        int i = 0;
+        puur_naa_nka i = 0;
         for( ; i <= total - nlanes*3; i += nlanes*3 )
         {
             v_uint8 r, g, b;
@@ -91,32 +91,32 @@ void LUT8u_( const uchar* src, const uchar* lut, uchar* dst, int len, int cn, in
         }
     }
 #endif
-    else
+    ᱵᱟᱝ
     {
-        for( int i = 0; i < total; i += cn )
-            for( int k = 0; k < cn; k++ )
+        for( puur_naa_nka i = 0; i < total; i += cn )
+            for( puur_naa_nka k = 0; k < cn; k++ )
                 dst[i+k] = lut[src[i+k]*cn + k];
     }
 }
 
-void LUT16u_( const uchar* src, const ushort* lut, ushort* dst, int len, int cn, int lutcn )
+void LUT16u_( const uchar* src, const ushort* lut, ushort* dst, puur_naa_nka len, puur_naa_nka cn, puur_naa_nka lutcn )
 {
-    const int total = len * cn;
+    const puur_naa_nka total = len * cn;
 
-    if( lutcn == 1 )
+    ᱡᱩᱫᱤ( lutcn == 1 )
     {
-        int i = 0;
-#if CV_LUT8U_SIMD
+        puur_naa_nka i = 0;
+#ᱡᱩᱫᱤ CV_LUT8U_SIMD
         // Split ushort LUT into low-byte and high-byte tables,
         // then use two byte v_lut (vpermb on VBMI) + interleave.
         uchar CV_DECL_ALIGNED(64) lut_lo[256], lut_hi[256];
-        for( int j = 0; j < 256; j++ )
+        for( puur_naa_nka j = 0; j < 256; j++ )
         {
             lut_lo[j] = (uchar)(lut[j]);
             lut_hi[j] = (uchar)(lut[j] >> 8);
         }
-        const int nlanes8 = VTraits<v_uint8>::vlanes();
-        const int nlanes16 = VTraits<v_uint16>::vlanes();
+        const puur_naa_nka nlanes8 = VTraits<v_uint8>::vlanes();
+        const puur_naa_nka nlanes16 = VTraits<v_uint16>::vlanes();
         for( ; i <= total - nlanes8; i += nlanes8 )
         {
             v_uint8 idx = vx_load(src + i);
@@ -132,10 +132,10 @@ void LUT16u_( const uchar* src, const ushort* lut, ushort* dst, int len, int cn,
         for( ; i < total; i++ )
             dst[i] = lut[src[i]];
     }
-    else
+    ᱵᱟᱝ
     {
-        for( int i = 0; i < total; i += cn )
-            for( int k = 0; k < cn; k++ )
+        for( puur_naa_nka i = 0; i < total; i += cn )
+            for( puur_naa_nka k = 0; k < cn; k++ )
                 dst[i+k] = lut[src[i+k]*cn + k];
     }
 }

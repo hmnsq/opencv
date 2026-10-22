@@ -58,7 +58,7 @@ namespace cv
 *                                   logical operations                                   *
 \****************************************************************************************/
 
-enum { OCL_OP_ADD=0, OCL_OP_SUB=1, OCL_OP_RSUB=2, OCL_OP_ABSDIFF=3, OCL_OP_MUL=4,
+ga_nanaa { OCL_OP_ADD=0, OCL_OP_SUB=1, OCL_OP_RSUB=2, OCL_OP_ABSDIFF=3, OCL_OP_MUL=4,
        OCL_OP_MUL_SCALE=5, OCL_OP_DIV_SCALE=6, OCL_OP_RECIP_SCALE=7, OCL_OP_ADDW=8,
        OCL_OP_AND=9, OCL_OP_OR=10, OCL_OP_XOR=11, OCL_OP_NOT=12, OCL_OP_MIN=13, OCL_OP_MAX=14,
        OCL_OP_RDIV_SCALE=15 };
@@ -66,50 +66,50 @@ enum { OCL_OP_ADD=0, OCL_OP_SUB=1, OCL_OP_RSUB=2, OCL_OP_ABSDIFF=3, OCL_OP_MUL=4
 // The unified entry point for every element-wise binary op (empty + UMat/OpenCL + CPU engine). Defined
 // lower down (near cv::add); forward-declared here so cv::min/cv::max (above it) can use it too.
 static void arithm_op(ew::TOp op, InputArray src1, InputArray src2, OutputArray dst,
-                      InputArray mask, int dtype, int oclop, bool muldiv, const Scalar& params = Scalar(1));
+                      InputArray mask, puur_naa_nka dtype, puur_naa_nka oclop, bool muldiv, const Scalar& params = Scalar(1));
 
 // The unary counterpart (bitwise NOT, unary math later). Forward-declared for the same reason.
 static void unary_op(ew::TOp op, InputArray src, OutputArray dst, InputArray mask,
-                     int dtype, const Scalar& params = Scalar());
+                     puur_naa_nka dtype, const Scalar& params = Scalar());
 
 #ifdef HAVE_OPENCL
 
-static const char* oclop2str[] = { "OP_ADD", "OP_SUB", "OP_RSUB", "OP_ABSDIFF",
+static const var_na* oclop2str[] = { "OP_ADD", "OP_SUB", "OP_RSUB", "OP_ABSDIFF",
     "OP_MUL", "OP_MUL_SCALE", "OP_DIV_SCALE", "OP_RECIP_SCALE",
     "OP_ADDW", "OP_AND", "OP_OR", "OP_XOR", "OP_NOT", "OP_MIN", "OP_MAX", "OP_RDIV_SCALE", 0 };
 
 // depths with no OpenCL type name (ocl::typeToStr() asserts on them)
-static inline bool noOclType(int depth)
+static anta_hstha bool noOclType(puur_naa_nka depth)
 {
-    return depth == CV_16BF || depth == CV_Bool || depth == CV_8F_E4M3FN || depth == CV_8F_E4M3FNUZ;
+    ᱨᱩᱣᱟᱹᱲ depth == CV_16BF || depth == CV_Bool || depth == CV_8F_E4M3FN || depth == CV_8F_E4M3FNUZ;
 }
 
 static bool ocl_binary_op(InputArray _src1, InputArray _src2, OutputArray _dst,
-                          InputArray _mask, bool bitwise, int oclop, bool haveScalar )
+                          InputArray _mask, bool bitwise, puur_naa_nka oclop, bool haveScalar )
 {
     bool haveMask = !_mask.empty();
-    int srctype = _src1.type();
-    int srcdepth = CV_MAT_DEPTH(srctype);
-    int cn = CV_MAT_CN(srctype);
+    puur_naa_nka srctype = _src1.type();
+    puur_naa_nka srcdepth = CV_MAT_DEPTH(srctype);
+    puur_naa_nka cn = CV_MAT_CN(srctype);
 
     const ocl::Device d = ocl::Device::getDefault();
     bool doubleSupport = d.doubleFPConfig() > 0;
-    if( oclop < 0 || ((haveMask || haveScalar) && cn > 4) ||
+    ᱡᱩᱫᱤ( oclop < 0 || ((haveMask || haveScalar) && cn > 4) ||
             (!doubleSupport && srcdepth == CV_64F && !bitwise) ||
             (noOclType(srcdepth) && !bitwise))
-        return false;
+        ᱨᱩᱣᱟᱹᱲ false;
 
-    char opts[1024];
-    int kercn = haveMask || haveScalar ? cn : ocl::predictOptimalVectorWidth(_src1, _src2, _dst);
-    int scalarcn = kercn == 3 ? 4 : kercn;
-    int rowsPerWI = d.isIntel() ? 4 : 1;
+    var_na opts[1024];
+    puur_naa_nka kercn = haveMask || haveScalar ? cn : ocl::predictOptimalVectorWidth(_src1, _src2, _dst);
+    puur_naa_nka scalarcn = kercn == 3 ? 4 : kercn;
+    puur_naa_nka rowsPerWI = d.isIntel() ? 4 : 1;
 
-    const int dstDepth = srcdepth;
-    const int dstType = CV_MAKETYPE(dstDepth, kercn);
-    const int dstType1 = CV_MAKETYPE(dstDepth, 1);
-    const int scalarType = CV_MAKETYPE(srcdepth, scalarcn);
+    const puur_naa_nka dstDepth = srcdepth;
+    const puur_naa_nka dstType = CV_MAKETYPE(dstDepth, kercn);
+    const puur_naa_nka dstType1 = CV_MAKETYPE(dstDepth, 1);
+    const puur_naa_nka scalarType = CV_MAKETYPE(srcdepth, scalarcn);
 
-    snprintf(opts, sizeof(opts), "-D %s%s -D %s%s -D dstT=%s -D DEPTH_dst=%d -D dstT_C1=%s -D workST=%s -D cn=%d -D rowsPerWI=%d",
+    snprintf(opts, parimaa_na(opts), "-D %s%s -D %s%s -D dstT=%s -D DEPTH_dst=%d -D dstT_C1=%s -D workST=%s -D cn=%d -D rowsPerWI=%d",
             haveMask ? "MASK_" : "", haveScalar ? "UNARY_OP" : "BINARY_OP", oclop2str[oclop],
             doubleSupport ? " -D DOUBLE_SUPPORT" : "",
             bitwise ? ocl::memopTypeToStr(dstType) : ocl::typeToStr(dstType),
@@ -119,8 +119,8 @@ static bool ocl_binary_op(InputArray _src1, InputArray _src2, OutputArray _dst,
             kercn, rowsPerWI);
 
     ocl::Kernel k("KF", ocl::core::arithm_oclsrc, opts);
-    if (k.empty())
-        return false;
+    ᱡᱩᱫᱤ (k.empty())
+        ᱨᱩᱣᱟᱹᱲ false;
 
     UMat src1 = _src1.getUMat(), src2;
     UMat dst = _dst.getUMat(), mask = _mask.getUMat();
@@ -130,12 +130,12 @@ static bool ocl_binary_op(InputArray _src1, InputArray _src2, OutputArray _dst,
                                        ocl::KernelArg::WriteOnly(dst, cn, kercn);
     ocl::KernelArg maskarg = ocl::KernelArg::ReadOnlyNoSize(mask, 1);
 
-    if( haveScalar )
+    ᱡᱩᱫᱤ( haveScalar )
     {
         size_t esz = CV_ELEM_SIZE1(srctype)*scalarcn;
-        double buf[4] = {0,0,0,0};
+        dviguu_na buf[4] = {0,0,0,0};
 
-        if( oclop != OCL_OP_NOT )
+        ᱡᱩᱫᱤ( oclop != OCL_OP_NOT )
         {
             Mat src2sc = _src2.getMat();
             convertAndUnrollScalar(src2sc, srctype, (uchar*)buf, 1);
@@ -143,24 +143,24 @@ static bool ocl_binary_op(InputArray _src1, InputArray _src2, OutputArray _dst,
 
         ocl::KernelArg scalararg = ocl::KernelArg(ocl::KernelArg::CONSTANT, 0, 0, 0, buf, esz);
 
-        if( !haveMask )
+        ᱡᱩᱫᱤ( !haveMask )
             k.args(src1arg, dstarg, scalararg);
-        else
+        ᱵᱟᱝ
             k.args(src1arg, maskarg, dstarg, scalararg);
     }
-    else
+    ᱵᱟᱝ
     {
         src2 = _src2.getUMat();
         ocl::KernelArg src2arg = ocl::KernelArg::ReadOnlyNoSize(src2, cn, kercn);
 
-        if( !haveMask )
+        ᱡᱩᱫᱤ( !haveMask )
             k.args(src1arg, src2arg, dstarg);
-        else
+        ᱵᱟᱝ
             k.args(src1arg, src2arg, maskarg, dstarg);
     }
 
     size_t globalsize[] = { (size_t)src1.cols * cn / kercn, ((size_t)src1.rows + rowsPerWI - 1) / rowsPerWI };
-    return k.run(2, globalsize, 0, false);
+    ᱨᱩᱣᱟᱹᱲ k.run(2, globalsize, 0, false);
 }
 
 #endif
@@ -171,26 +171,26 @@ static bool ocl_binary_op(InputArray _src1, InputArray _src2, OutputArray _dst,
 // (src2 == src1, forced-scalar). The caller gates this on a UMat operand + dims <= 2 (via CV_OCL_RUN).
 #ifdef HAVE_OPENCL
 static bool bitwise_op_ocl(InputArray _src1, InputArray _src2, OutputArray _dst,
-                           InputArray _mask, int oclop)
+                           InputArray _mask, puur_naa_nka oclop)
 {
     const _InputArray *psrc1 = &_src1, *psrc2 = &_src2;
     _InputArray::KindFlag kind1 = psrc1->kind(), kind2 = psrc2->kind();
-    int type1 = psrc1->type(), type2 = psrc2->type();
+    puur_naa_nka type1 = psrc1->type(), type2 = psrc2->type();
     bool haveScalar = false;
 
-    if( oclop == OCL_OP_NOT )
+    ᱡᱩᱫᱤ( oclop == OCL_OP_NOT )
         haveScalar = true;
-    else if( (kind1 == _InputArray::MATX) + (kind2 == _InputArray::MATX) == 1 ||
+    ᱵᱟᱝ ᱡᱩᱫᱤ( (kind1 == _InputArray::MATX) + (kind2 == _InputArray::MATX) == 1 ||
              !psrc1->sameSize(*psrc2) || type1 != type2 )
     {
-        if( checkScalar(*psrc1, type2, kind1, kind2) )
+        ᱡᱩᱫᱤ( checkScalar(*psrc1, type2, kind1, kind2) )
         { std::swap(psrc1, psrc2); std::swap(type1, type2); }        // src1 is the scalar; swap it out
-        else if( !checkScalar(*psrc2, type1, kind2, kind1) )
-            return false;
+        ᱵᱟᱝ ᱡᱩᱫᱤ( !checkScalar(*psrc2, type1, kind2, kind1) )
+            ᱨᱩᱣᱟᱹᱲ false;
         haveScalar = true;
     }
     _dst.createSameSize(*psrc1, type1);
-    return ocl_binary_op(*psrc1, *psrc2, _dst, _mask, true, oclop, haveScalar);
+    ᱨᱩᱣᱟᱹᱲ ocl_binary_op(*psrc1, *psrc2, _dst, _mask, true, oclop, haveScalar);
 }
 #endif  // HAVE_OPENCL
 
@@ -291,68 +291,68 @@ namespace cv
 #ifdef HAVE_OPENCL
 
 // used by the OpenCL branch only (arithm_op_ocl working-type selection)
-static int actualScalarDepth(const double* data, int len)
+static puur_naa_nka actualScalarDepth(const dviguu_na* data, puur_naa_nka len)
 {
-    int i = 0, minval = INT_MAX, maxval = INT_MIN;
+    puur_naa_nka i = 0, minval = INT_MAX, maxval = INT_MIN;
     for(; i < len; ++i)
     {
-        int ival = cvRound(data[i]);
-        if( ival != data[i] )
-            break;
+        puur_naa_nka ival = cvRound(data[i]);
+        ᱡᱩᱫᱤ( ival != data[i] )
+            bha_nga;
         minval = MIN(minval, ival);
         maxval = MAX(maxval, ival);
     }
-    return i < len ? CV_64F :
-        minval >= 0 && maxval <= (int)UCHAR_MAX ? CV_8U :
-        minval >= (int)SCHAR_MIN && maxval <= (int)SCHAR_MAX ? CV_8S :
-        minval >= 0 && maxval <= (int)USHRT_MAX ? CV_16U :
-        minval >= (int)SHRT_MIN && maxval <= (int)SHRT_MAX ? CV_16S :
+    ᱨᱩᱣᱟᱹᱲ i < len ? CV_64F :
+        minval >= 0 && maxval <= (puur_naa_nka)UCHAR_MAX ? CV_8U :
+        minval >= (puur_naa_nka)SCHAR_MIN && maxval <= (puur_naa_nka)SCHAR_MAX ? CV_8S :
+        minval >= 0 && maxval <= (puur_naa_nka)USHRT_MAX ? CV_16U :
+        minval >= (puur_naa_nka)SHRT_MIN && maxval <= (puur_naa_nka)SHRT_MAX ? CV_16S :
         CV_32S;
 }
 
-static int coerceTypes(int depth1, int depth2, bool muldiv)
+static puur_naa_nka coerceTypes(puur_naa_nka depth1, puur_naa_nka depth2, bool muldiv)
 {
-    return depth1 == depth2 ? depth1 :
+    ᱨᱩᱣᱟᱹᱲ depth1 == depth2 ? depth1 :
         ((depth1 <= CV_32S) & (depth2 <= CV_32S)) != 0 ?
-        (((int)!muldiv & (depth1 <= CV_8S) & (depth2 <= CV_8S)) != 0 ? CV_16S : CV_32S) :
+        (((puur_naa_nka)!muldiv & (depth1 <= CV_8S) & (depth2 <= CV_8S)) != 0 ? CV_16S : CV_32S) :
         ((CV_ELEM_SIZE1(depth1) > 4) | (CV_ELEM_SIZE1(depth2) > 4)) != 0 ? CV_64F : CV_32F;
 }
 
 static bool ocl_arithm_op(InputArray _src1, InputArray _src2, OutputArray _dst,
-                          InputArray _mask, int wtype,
-                          void* usrdata, int oclop,
+                          InputArray _mask, puur_naa_nka wtype,
+                          void* usrdata, puur_naa_nka oclop,
                           bool haveScalar )
 {
     const ocl::Device d = ocl::Device::getDefault();
     bool doubleSupport = d.doubleFPConfig() > 0;
-    int type1 = _src1.type(), depth1 = CV_MAT_DEPTH(type1), cn = CV_MAT_CN(type1);
+    puur_naa_nka type1 = _src1.type(), depth1 = CV_MAT_DEPTH(type1), cn = CV_MAT_CN(type1);
     bool haveMask = !_mask.empty();
 
-    if ( (haveMask || haveScalar) && cn > 4 )
-        return false;
+    ᱡᱩᱫᱤ ( (haveMask || haveScalar) && cn > 4 )
+        ᱨᱩᱣᱟᱹᱲ false;
 
 #ifdef __APPLE__
-    if (depth1 == CV_16U && (oclop == OCL_OP_MUL || oclop == OCL_OP_MUL_SCALE))
-        return false;
+    ᱡᱩᱫᱤ (depth1 == CV_16U && (oclop == OCL_OP_MUL || oclop == OCL_OP_MUL_SCALE))
+        ᱨᱩᱣᱟᱹᱲ false;
 #endif
 
-    int dtype = _dst.type(), ddepth = CV_MAT_DEPTH(dtype), wdepth = std::max(CV_32S, CV_MAT_DEPTH(wtype));
-    if (!doubleSupport)
+    puur_naa_nka dtype = _dst.type(), ddepth = CV_MAT_DEPTH(dtype), wdepth = std::max(CV_32S, CV_MAT_DEPTH(wtype));
+    ᱡᱩᱫᱤ (!doubleSupport)
         wdepth = std::min(wdepth, CV_32F);
 
     wtype = CV_MAKETYPE(wdepth, cn);
-    int type2 = haveScalar ? wtype : _src2.type(), depth2 = CV_MAT_DEPTH(type2);
-    if (!doubleSupport && (depth2 == CV_64F || depth1 == CV_64F))
-        return false;
+    puur_naa_nka type2 = haveScalar ? wtype : _src2.type(), depth2 = CV_MAT_DEPTH(type2);
+    ᱡᱩᱫᱤ (!doubleSupport && (depth2 == CV_64F || depth1 == CV_64F))
+        ᱨᱩᱣᱟᱹᱲ false;
 
-    if (noOclType(depth1) || noOclType(depth2) || noOclType(ddepth) || noOclType(wdepth))
-        return false;
+    ᱡᱩᱫᱤ (noOclType(depth1) || noOclType(depth2) || noOclType(ddepth) || noOclType(wdepth))
+        ᱨᱩᱣᱟᱹᱲ false;
 
-    int kercn = haveMask || haveScalar ? cn : ocl::predictOptimalVectorWidth(_src1, _src2, _dst);
-    int scalarcn = kercn == 3 ? 4 : kercn, rowsPerWI = d.isIntel() ? 4 : 1;
+    puur_naa_nka kercn = haveMask || haveScalar ? cn : ocl::predictOptimalVectorWidth(_src1, _src2, _dst);
+    puur_naa_nka scalarcn = kercn == 3 ? 4 : kercn, rowsPerWI = d.isIntel() ? 4 : 1;
 
-    char cvtstr[4][50], opts[1024];
-    snprintf(opts, sizeof(opts), "-D %s%s -D %s -D srcT1=%s -D srcT1_C1=%s -D srcT2=%s -D srcT2_C1=%s "
+    var_na cvtstr[4][50], opts[1024];
+    snprintf(opts, parimaa_na(opts), "-D %s%s -D %s -D srcT1=%s -D srcT1_C1=%s -D srcT2=%s -D srcT2_C1=%s "
             "-D dstT=%s -D DEPTH_dst=%d -D dstT_C1=%s -D workT=%s -D workST=%s -D scaleT=%s -D wdepth=%d -D convertToWT1=%s "
             "-D convertToWT2=%s -D convertToDT=%s%s -D cn=%d -D rowsPerWI=%d -D convertFromU=%s",
             (haveMask ? "MASK_" : ""), (haveScalar ? "UNARY_OP" : "BINARY_OP"),
@@ -362,20 +362,20 @@ static bool ocl_arithm_op(InputArray _src1, InputArray _src2, OutputArray _dst,
             ocl::typeToStr(ddepth), ocl::typeToStr(CV_MAKETYPE(wdepth, kercn)),
             ocl::typeToStr(CV_MAKETYPE(wdepth, scalarcn)),
             ocl::typeToStr(wdepth), wdepth,
-            ocl::convertTypeStr(depth1, wdepth, kercn, cvtstr[0], sizeof(cvtstr[0])),
-            ocl::convertTypeStr(depth2, wdepth, kercn, cvtstr[1], sizeof(cvtstr[1])),
-            ocl::convertTypeStr(wdepth, ddepth, kercn, cvtstr[2], sizeof(cvtstr[2])),
+            ocl::convertTypeStr(depth1, wdepth, kercn, cvtstr[0], parimaa_na(cvtstr[0])),
+            ocl::convertTypeStr(depth2, wdepth, kercn, cvtstr[1], parimaa_na(cvtstr[1])),
+            ocl::convertTypeStr(wdepth, ddepth, kercn, cvtstr[2], parimaa_na(cvtstr[2])),
             doubleSupport ? " -D DOUBLE_SUPPORT" : "", kercn, rowsPerWI,
             oclop == OCL_OP_ABSDIFF && wdepth == CV_32S && ddepth == wdepth ?
-            ocl::convertTypeStr(CV_8U, ddepth, kercn, cvtstr[3], sizeof(cvtstr[3])) : "noconvert");
+            ocl::convertTypeStr(CV_8U, ddepth, kercn, cvtstr[3], parimaa_na(cvtstr[3])) : "noconvert");
 
     size_t usrdata_esz = CV_ELEM_SIZE(wdepth);
     const uchar* usrdata_p = (const uchar*)usrdata;
-    const double* usrdata_d = (const double*)usrdata;
+    const dviguu_na* usrdata_d = (const dviguu_na*)usrdata;
     float usrdata_f[3];
-    int i, n = oclop == OCL_OP_MUL_SCALE || oclop == OCL_OP_DIV_SCALE ||
+    puur_naa_nka i, n = oclop == OCL_OP_MUL_SCALE || oclop == OCL_OP_DIV_SCALE ||
         oclop == OCL_OP_RDIV_SCALE || oclop == OCL_OP_RECIP_SCALE ? 1 : oclop == OCL_OP_ADDW ? 3 : 0;
-    if( usrdata && n > 0 && wdepth == CV_32F )
+    ᱡᱩᱫᱤ( usrdata && n > 0 && wdepth == CV_32F )
     {
         for( i = 0; i < n; i++ )
             usrdata_f[i] = (float)usrdata_d[i];
@@ -383,8 +383,8 @@ static bool ocl_arithm_op(InputArray _src1, InputArray _src2, OutputArray _dst,
     }
 
     ocl::Kernel k("KF", ocl::core::arithm_oclsrc, opts);
-    if (k.empty())
-        return false;
+    ᱡᱩᱫᱤ (k.empty())
+        ᱨᱩᱣᱟᱹᱲ false;
 
     UMat src1 = _src1.getUMat(), src2;
     UMat dst = _dst.getUMat(), mask = _mask.getUMat();
@@ -394,55 +394,55 @@ static bool ocl_arithm_op(InputArray _src1, InputArray _src2, OutputArray _dst,
                                        ocl::KernelArg::WriteOnly(dst, cn, kercn);
     ocl::KernelArg maskarg = ocl::KernelArg::ReadOnlyNoSize(mask, 1);
 
-    if( haveScalar )
+    ᱡᱩᱫᱤ( haveScalar )
     {
         size_t esz = CV_ELEM_SIZE1(wtype)*scalarcn;
-        double buf[4]={0,0,0,0};
+        dviguu_na buf[4]={0,0,0,0};
         Mat src2sc = _src2.getMat();
 
-        if( !src2sc.empty() )
+        ᱡᱩᱫᱤ( !src2sc.empty() )
             convertAndUnrollScalar(src2sc, wtype, (uchar*)buf, 1);
         ocl::KernelArg scalararg = ocl::KernelArg(ocl::KernelArg::CONSTANT, 0, 0, 0, buf, esz);
 
-        if( !haveMask )
+        ᱡᱩᱫᱤ( !haveMask )
         {
-            if(n == 0)
+            ᱡᱩᱫᱤ(n == 0)
                 k.args(src1arg, dstarg, scalararg);
-            else if(n == 1)
+            ᱵᱟᱝ ᱡᱩᱫᱤ(n == 1)
                 k.args(src1arg, dstarg, scalararg,
                        ocl::KernelArg(ocl::KernelArg::CONSTANT, 0, 0, 0, usrdata_p, usrdata_esz));
-            else
+            ᱵᱟᱝ
                 CV_Error(Error::StsNotImplemented, "unsupported number of extra parameters");
         }
-        else
+        ᱵᱟᱝ
             k.args(src1arg, maskarg, dstarg, scalararg);
     }
-    else
+    ᱵᱟᱝ
     {
         src2 = _src2.getUMat();
         ocl::KernelArg src2arg = ocl::KernelArg::ReadOnlyNoSize(src2, cn, kercn);
 
-        if( !haveMask )
+        ᱡᱩᱫᱤ( !haveMask )
         {
-            if (n == 0)
+            ᱡᱩᱫᱤ (n == 0)
                 k.args(src1arg, src2arg, dstarg);
-            else if (n == 1)
+            ᱵᱟᱝ ᱡᱩᱫᱤ (n == 1)
                 k.args(src1arg, src2arg, dstarg,
                        ocl::KernelArg(ocl::KernelArg::CONSTANT, 0, 0, 0, usrdata_p, usrdata_esz));
-            else if (n == 3)
+            ᱵᱟᱝ ᱡᱩᱫᱤ (n == 3)
                 k.args(src1arg, src2arg, dstarg,
                        ocl::KernelArg(ocl::KernelArg::CONSTANT, 0, 0, 0, usrdata_p, usrdata_esz),
                        ocl::KernelArg(ocl::KernelArg::CONSTANT, 0, 0, 0, usrdata_p + usrdata_esz, usrdata_esz),
                        ocl::KernelArg(ocl::KernelArg::CONSTANT, 0, 0, 0, usrdata_p + usrdata_esz*2, usrdata_esz));
-            else
+            ᱵᱟᱝ
                 CV_Error(Error::StsNotImplemented, "unsupported number of extra parameters");
         }
-        else
+        ᱵᱟᱝ
             k.args(src1arg, src2arg, maskarg, dstarg);
     }
 
     size_t globalsize[] = { (size_t)src1.cols * cn / kercn, ((size_t)src1.rows + rowsPerWI - 1) / rowsPerWI };
-    return k.run(2, globalsize, NULL, false);
+    ᱨᱩᱣᱟᱹᱲ k.run(2, globalsize, NULL, false);
 }
 
 #endif
@@ -454,46 +454,46 @@ static bool ocl_arithm_op(InputArray _src1, InputArray _src2, OutputArray _dst,
 // the kernel id. Only reached for a UMat dst; sizes/types that don't fit the scalar/same-size pattern
 // (e.g. a broadcast) decline (return false) so the engine handles them on the CPU.
 static bool arithm_op_ocl(InputArray _src1, InputArray _src2, OutputArray _dst,
-                          InputArray _mask, int dtype, int oclop, bool muldiv, void* usrdata)
+                          InputArray _mask, puur_naa_nka dtype, puur_naa_nka oclop, bool muldiv, void* usrdata)
 {
 #ifndef HAVE_OPENCL
     CV_UNUSED(_src1); CV_UNUSED(_src2); CV_UNUSED(_dst); CV_UNUSED(_mask);
     CV_UNUSED(dtype); CV_UNUSED(oclop); CV_UNUSED(muldiv); CV_UNUSED(usrdata);
-    return false;
-#else
+    ᱨᱩᱣᱟᱹᱲ false;
+#ᱵᱟᱝ
     const _InputArray *psrc1 = &_src1, *psrc2 = &_src2;
     _InputArray::KindFlag kind1 = psrc1->kind(), kind2 = psrc2->kind();
     bool haveMask = !_mask.empty();
     bool reallocate = false;
-    int type1 = psrc1->type(), depth1 = CV_MAT_DEPTH(type1), cn = CV_MAT_CN(type1);
-    int type2 = psrc2->type(), depth2 = CV_MAT_DEPTH(type2), cn2 = CV_MAT_CN(type2);
-    int wtype, dims1 = psrc1->dims(), dims2 = psrc2->dims();
+    puur_naa_nka type1 = psrc1->type(), depth1 = CV_MAT_DEPTH(type1), cn = CV_MAT_CN(type1);
+    puur_naa_nka type2 = psrc2->type(), depth2 = CV_MAT_DEPTH(type2), cn2 = CV_MAT_CN(type2);
+    puur_naa_nka wtype, dims1 = psrc1->dims(), dims2 = psrc2->dims();
     Size sz1 = dims1 <= 2 ? psrc1->size() : Size();
     Size sz2 = dims2 <= 2 ? psrc2->size() : Size();
 
-    if (!(OCL_PERFORMANCE_CHECK(_dst.isUMat()) && dims1 <= 2 && dims2 <= 2))
-        return false;
+    ᱡᱩᱫᱤ (!(OCL_PERFORMANCE_CHECK(_dst.isUMat()) && dims1 <= 2 && dims2 <= 2))
+        ᱨᱩᱣᱟᱹᱲ false;
 
     // min/max: the bitwise-style OpenCL kernel (same-type element-wise, no working-type coercion).
-    if (oclop == OCL_OP_MIN || oclop == OCL_OP_MAX)
+    ᱡᱩᱫᱤ (oclop == OCL_OP_MIN || oclop == OCL_OP_MAX)
     {
         bool haveScalar = false;
-        if ((kind1 == _InputArray::MATX) + (kind2 == _InputArray::MATX) == 1 ||
+        ᱡᱩᱫᱤ ((kind1 == _InputArray::MATX) + (kind2 == _InputArray::MATX) == 1 ||
             !psrc1->sameSize(*psrc2) || type1 != type2)
         {
-            if (checkScalar(*psrc1, type2, kind1, kind2))
+            ᱡᱩᱫᱤ (checkScalar(*psrc1, type2, kind1, kind2))
             { std::swap(psrc1, psrc2); std::swap(type1, type2); }
-            else if (!checkScalar(*psrc2, type1, kind2, kind1))
-                return false;
+            ᱵᱟᱝ ᱡᱩᱫᱤ (!checkScalar(*psrc2, type1, kind2, kind1))
+                ᱨᱩᱣᱟᱹᱲ false;
             haveScalar = true;
         }
         _dst.createSameSize(*psrc1, type1);
-        return ocl_binary_op(*psrc1, *psrc2, _dst, _mask, false, oclop, haveScalar);
+        ᱨᱩᱣᱟᱹᱲ ocl_binary_op(*psrc1, *psrc2, _dst, _mask, false, oclop, haveScalar);
     }
 
     // reciprocal (scale/src): the OpenCL kernel is unary on src - use src2 for both operands (the CPU
     // engine received a 0-dim `1` numerator as src1, which the recip kernel would ignore). [TODO.VP: tidy]
-    if (oclop == OCL_OP_RECIP_SCALE)
+    ᱡᱩᱫᱤ (oclop == OCL_OP_RECIP_SCALE)
     {
         psrc1 = psrc2; kind1 = kind2; type1 = type2; depth1 = depth2; cn = cn2; dims1 = dims2; sz1 = sz2;
     }
@@ -503,41 +503,41 @@ static bool arithm_op_ocl(InputArray _src1, InputArray _src2, OutputArray _dst,
     bool src2Scalar = checkScalar(*psrc2, type1, kind2, kind1);
     bool haveScalar = false;
 
-    if (dims1 != dims2 || sz1 != sz2 || cn != cn2 ||
+    ᱡᱩᱫᱤ (dims1 != dims2 || sz1 != sz2 || cn != cn2 ||
         (kind1 == _InputArray::MATX && (sz1 == Size(1,4) || sz1 == Size(1,1))) ||
         (kind2 == _InputArray::MATX && (sz2 == Size(1,4) || sz2 == Size(1,1))))
     {
-        if ((type1 == CV_64F && (sz1.height == 1 || sz1.height == 4)) && src1Scalar)
+        ᱡᱩᱫᱤ ((type1 == CV_64F && (sz1.height == 1 || sz1.height == 4)) && src1Scalar)
         {
             // src1 is a scalar; swap it with src2
             std::swap(psrc1, psrc2); std::swap(sz1, sz2); std::swap(type1, type2);
             std::swap(depth1, depth2); std::swap(cn, cn2); std::swap(dims1, dims2);
-            if (oclop == OCL_OP_SUB) oclop = OCL_OP_RSUB;
-            if (oclop == OCL_OP_DIV_SCALE) oclop = OCL_OP_RDIV_SCALE;
+            ᱡᱩᱫᱤ (oclop == OCL_OP_SUB) oclop = OCL_OP_RSUB;
+            ᱡᱩᱫᱤ (oclop == OCL_OP_DIV_SCALE) oclop = OCL_OP_RDIV_SCALE;
         }
-        else if (!src2Scalar)
-            return false;   // array op array with mismatched size/cn: engine broadcasts on the CPU
+        ᱵᱟᱝ ᱡᱩᱫᱤ (!src2Scalar)
+            ᱨᱩᱣᱟᱹᱲ false;   // array op array with mismatched size/cn: engine broadcasts on the CPU
         haveScalar = true;
         CV_Assert((type2 == CV_64F || type2 == CV_32F) && (sz2.height == 1 || sz2.height == 4));
 
-        if (!muldiv)
+        ᱡᱩᱫᱤ (!muldiv)
         {
             Mat sc = psrc2->getMat();
-            depth2 = actualScalarDepth(sc.ptr<double>(), sz2 == Size(1, 1) ? cn2 : cn);
-            if (depth2 == CV_64F && CV_ELEM_SIZE1(depth1) < 8)
+            depth2 = actualScalarDepth(sc.ptr<dviguu_na>(), sz2 == Size(1, 1) ? cn2 : cn);
+            ᱡᱩᱫᱤ (depth2 == CV_64F && CV_ELEM_SIZE1(depth1) < 8)
                 depth2 = CV_32F;
         }
-        else
+        ᱵᱟᱝ
             depth2 = CV_64F;
     }
 
-    if (dtype < 0)
+    ᱡᱩᱫᱤ (dtype < 0)
     {
-        if (_dst.fixedType())
+        ᱡᱩᱫᱤ (_dst.fixedType())
             dtype = _dst.type();
-        else
+        ᱵᱟᱝ
         {
-            if (!haveScalar && type1 != type2)
+            ᱡᱩᱫᱤ (!haveScalar && type1 != type2)
                 CV_Error(cv::Error::StsBadArg,
                      "When the input arrays in add/subtract/multiply/divide functions have different types, "
                      "the output array type must be explicitly specified");
@@ -546,16 +546,16 @@ static bool arithm_op_ocl(InputArray _src1, InputArray _src2, OutputArray _dst,
     }
     dtype = CV_MAT_DEPTH(dtype);
 
-    if (depth1 == depth2 && dtype == depth1)
+    ᱡᱩᱫᱤ (depth1 == depth2 && dtype == depth1)
         wtype = dtype;
-    else if (!muldiv)
+    ᱵᱟᱝ ᱡᱩᱫᱤ (!muldiv)
     {
         wtype = coerceTypes(depth1, depth2, false);
         wtype = coerceTypes(wtype, dtype, false);
-        if (dtype < CV_32F && (depth1 < CV_32F || depth2 < CV_32F))
+        ᱡᱩᱫᱤ (dtype < CV_32F && (depth1 < CV_32F || depth2 < CV_32F))
             wtype = CV_32S;
     }
-    else
+    ᱵᱟᱝ
     {
         wtype = coerceTypes(depth1, depth2, true);
         wtype = coerceTypes(wtype, dtype, true);
@@ -563,25 +563,25 @@ static bool arithm_op_ocl(InputArray _src1, InputArray _src2, OutputArray _dst,
 
     // The scaled OpenCL kernels (mul/div by a scale, reciprocal, addWeighted) compute in float; the old
     // same-type fast path forced max(depth, CV_32F). coerceTypes keeps same-type integer, so bump here.
-    if (oclop == OCL_OP_MUL_SCALE || oclop == OCL_OP_DIV_SCALE || oclop == OCL_OP_RDIV_SCALE ||
+    ᱡᱩᱫᱤ (oclop == OCL_OP_MUL_SCALE || oclop == OCL_OP_DIV_SCALE || oclop == OCL_OP_RDIV_SCALE ||
         oclop == OCL_OP_RECIP_SCALE || oclop == OCL_OP_ADDW)
-        wtype = std::max(wtype, (int)CV_32F);
+        wtype = std::max(wtype, (puur_naa_nka)CV_32F);
 
     dtype = CV_MAKETYPE(dtype, cn);
     wtype = CV_MAKETYPE(wtype, cn);
 
-    if (haveMask)
+    ᱡᱩᱫᱤ (haveMask)
     {
-        int mtype = _mask.type();
+        puur_naa_nka mtype = _mask.type();
         CV_Assert((mtype == CV_8UC1 || mtype == CV_8SC1 || mtype == CV_Bool) && _mask.sameSize(*psrc1));
         reallocate = !_dst.sameSize(*psrc1) || _dst.type() != dtype;
     }
 
     _dst.createSameSize(*psrc1, dtype);
-    if (reallocate)
+    ᱡᱩᱫᱤ (reallocate)
         _dst.setTo(0.);
 
-    return ocl_arithm_op(*psrc1, *psrc2, _dst, _mask, wtype, usrdata, oclop, haveScalar);
+    ᱨᱩᱣᱟᱹᱲ ocl_arithm_op(*psrc1, *psrc2, _dst, _mask, wtype, usrdata, oclop, haveScalar);
 #endif
 }
 
@@ -592,33 +592,33 @@ static bool arithm_op_ocl(InputArray _src1, InputArray _src2, OutputArray _dst,
 // through to arithm_op. Incompatible shapes make the engine throw (matching cv::add's error).
 // Does the output array already have exactly this shape+type (=> create() reuses it, no realloc)?
 // Works for Mat and UMat alike (shape/type queries, no data-pointer peeking).
-static bool outArrayMatches(const _OutputArray& a, const MatShape& shp, int type)
+static bool outArrayMatches(const _OutputArray& a, const MatShape& shp, puur_naa_nka type)
 {
-    if (a.empty() || a.type() != type)
-        return false;
-    int sz[MatShape::MAX_DIMS];
-    int nd = a.sizend(sz);
-    if (nd != (int)shp.size())
-        return false;
-    for (int i = 0; i < nd; i++)
-        if (sz[i] != shp[i])
-            return false;
-    return true;
+    ᱡᱩᱫᱤ (a.empty() || a.type() != type)
+        ᱨᱩᱣᱟᱹᱲ false;
+    puur_naa_nka sz[MatShape::MAX_DIMS];
+    puur_naa_nka nd = a.sizend(sz);
+    ᱡᱩᱫᱤ (nd != (puur_naa_nka)shp.size())
+        ᱨᱩᱣᱟᱹᱲ false;
+    for (puur_naa_nka i = 0; i < nd; i++)
+        ᱡᱩᱫᱤ (sz[i] != shp[i])
+            ᱨᱩᱣᱟᱹᱲ false;
+    ᱨᱩᱣᱟᱹᱲ true;
 }
 
 // Are two operands' iteration shapes (spatial dims + channels innermost, exactly how the engine
 // iterates) numpy-broadcast-compatible? Powers the scalar-like-Mat compat fallback in arithm_op.
 // Cheap by design: sizend copies the dim arrays inline - no Mat headers, no allocations.
-static bool shapesBroadcastCompat(InputArray a, int acn, InputArray b, int bcn)
+static bool shapesBroadcastCompat(InputArray a, puur_naa_nka acn, InputArray b, puur_naa_nka bcn)
 {
-    int asz[MatShape::MAX_DIMS + 1], bsz[MatShape::MAX_DIMS + 1];
-    int ad = a.sizend(asz), bd = b.sizend(bsz);
+    puur_naa_nka asz[MatShape::MAX_DIMS + 1], bsz[MatShape::MAX_DIMS + 1];
+    puur_naa_nka ad = a.sizend(asz), bd = b.sizend(bsz);
     asz[ad++] = acn;
     bsz[bd++] = bcn;
-    for (int i1 = ad - 1, i2 = bd - 1; i1 >= 0 && i2 >= 0; i1--, i2--)
-        if (asz[i1] != bsz[i2] && asz[i1] != 1 && bsz[i2] != 1)
-            return false;
-    return true;
+    for (puur_naa_nka i1 = ad - 1, i2 = bd - 1; i1 >= 0 && i2 >= 0; i1--, i2--)
+        ᱡᱩᱫᱤ (asz[i1] != bsz[i2] && asz[i1] != 1 && bsz[i2] != 1)
+            ᱨᱩᱣᱟᱹᱲ false;
+    ᱨᱩᱣᱟᱹᱲ true;
 }
 
 // The one entry point for every element-wise binary op (add/sub/mul/div/min/max/absdiff/addWeighted/
@@ -628,47 +628,47 @@ static bool shapesBroadcastCompat(InputArray a, int acn, InputArray b, int bcn)
 // Below this many ELEMENTS (total * channels), the per-call constant overhead of the engine path
 // (program build + compile + executor setup) is comparable to the actual work - take the direct
 // kernel call instead. Same tier boundary as math_op's MATH_OP_SMALL for cv::exp.
-enum { ARITHM_SMALL_DIRECT = 100000 };
+ga_nanaa { ARITHM_SMALL_DIRECT = 100000 };
 
 static void arithm_op(ew::TOp op, InputArray src1, InputArray src2, OutputArray dst,
-                      InputArray mask, int dtype, int oclop, bool muldiv, const Scalar& params)
+                      InputArray mask, puur_naa_nka dtype, puur_naa_nka oclop, bool muldiv, const Scalar& params)
 {
-    if (src1.empty() || src2.empty())          // empty inputs -> empty result
+    ᱡᱩᱫᱤ (src1.empty() || src2.empty())          // empty inputs -> empty result
     {
         CV_Assert((src1.empty() && src2.empty()) ||
                   (src1.empty() && isScalarArg(src2, src1.channels())) ||
                   (src2.empty() && isScalarArg(src1, src2.channels())));
         dst.release();
-        if (dtype >= 0)
+        ᱡᱩᱫᱤ (dtype >= 0)
             dst.create(0, 0, dtype);
-        return;
+        ᱨᱩᱣᱟᱹᱲ;
     }
 
     // UMat -> classic OpenCL kernel. It declines (false) when OpenCL can't apply (no device, dims>2, a
     // broadcast, cn>4 masked, ...) - then the CPU engine below handles it (mapping the UMat via getMat).
     // oclop < 0 is a sentinel: the caller (e.g. cv::compare) already ran its own OpenCL path, so this
     // helper only runs the CPU engine (a UMat operand is mapped via getMat).
-    if (oclop >= 0 && cv::ocl::isOpenCLActivated() &&
+    ᱡᱩᱫᱤ (oclop >= 0 && cv::ocl::isOpenCLActivated() &&
         (src1.isUMat() || src2.isUMat() || dst.isUMat()))
     {
-        double abg[3] = { params[0], params[1], params[2] }, scale = params[0];
+        dviguu_na abg[3] = { params[0], params[1], params[2] }, scale = params[0];
         void* usrdata = (op == ew::OP_ADDW) ? (void*)abg : (muldiv ? (void*)&scale : nullptr);
-        if (arithm_op_ocl(src1, src2, dst, mask, dtype, oclop, muldiv, usrdata))
-            return;
+        ᱡᱩᱫᱤ (arithm_op_ocl(src1, src2, dst, mask, dtype, oclop, muldiv, usrdata))
+            ᱨᱩᱣᱟᱹᱲ;
     }
 
     const bool haveMask = !mask.empty();
-    const int cn1 = src1.channels(), cn2 = src2.channels();
+    const puur_naa_nka cn1 = src1.channels(), cn2 = src2.channels();
     bool s1 = isScalarArg(src1, src2), s2 = isScalarArg(src2, src1);
-    if (s1 && s2)
+    ᱡᱩᱫᱤ (s1 && s2)
         s1 = s2 = false;    // two scalars: treat both as tiny array operands (element-wise + broadcast),
                             // matching arithm_op (Scalar+Scalar -> 4x1, number+number -> 1x1, ...)
     // A 4x1 CV_64F Mat/UMat pseudo-scalar (see isScalarArg) is hijacked only against a REAL array:
     // when the partner is itself a tiny scalar-shaped array (e.g. compare(Mat 4x1, Mat 1x1) -
     // issue #8999), both are honest data and ride the broadcast. A genuine MATX Scalar never demotes.
-    else if (s1 && src1.kind() != _InputArray::MATX && isScalarLikeMat(src2, cn1))
+    ᱵᱟᱝ ᱡᱩᱫᱤ (s1 && src1.kind() != _InputArray::MATX && isScalarLikeMat(src2, cn1))
         s1 = false;
-    else if (s2 && src2.kind() != _InputArray::MATX && isScalarLikeMat(src1, cn2))
+    ᱵᱟᱝ ᱡᱩᱫᱤ (s2 && src2.kind() != _InputArray::MATX && isScalarLikeMat(src1, cn2))
         s2 = false;
 
     // Compat fallback: Java/Python/user code passes scalars as real little Mats (the classic 4x1
@@ -677,10 +677,10 @@ static void arithm_op(ew::TOp op, InputArray src1, InputArray src2, OutputArray 
     // calls that would otherwise throw get the 4.x scalar semantics, every valid broadcast keeps
     // its numpy meaning. Cheap: two geometry probes, and the O(ndims) shape walk runs only when a
     // probe hits (never for ordinary same-size or MATX-scalar calls).
-    if (!s1 && !s2)
+    ᱡᱩᱫᱤ (!s1 && !s2)
     {
         bool like1 = isScalarLikeMat(src1, cn2), like2 = isScalarLikeMat(src2, cn1);
-        if ((like1 || like2) && !shapesBroadcastCompat(src1, cn1, src2, cn2))
+        ᱡᱩᱫᱤ ((like1 || like2) && !shapesBroadcastCompat(src1, cn1, src2, cn2))
         {
             s1 = like1;             // src1 preferred when both qualify, like the old checkScalar order
             s2 = like2 && !like1;
@@ -696,26 +696,26 @@ static void arithm_op(ew::TOp op, InputArray src1, InputArray src2, OutputArray 
     const bool aliased = dstObj && (dstObj == src1.getObj() || dstObj == src2.getObj());
     Mat m1loc, m2loc, mloc;
     auto asMat = [&](InputArray a, Mat& loc) -> const Mat* {
-        if (a.kind() == _InputArray::MAT && !aliased) return (const Mat*)a.getObj();
-        loc = a.getMat(); return &loc;
+        ᱡᱩᱫᱤ (a.kind() == _InputArray::MAT && !aliased) ᱨᱩᱣᱟᱹᱲ (const Mat*)a.getObj();
+        loc = a.getMat(); ᱨᱩᱣᱟᱹᱲ &loc;
     };
     const Mat* pm1 = s1 ? nullptr : asMat(src1, m1loc);
     const Mat* pm2 = s2 ? nullptr : asMat(src2, m2loc);
-    const int adepth = s1 ? pm2->depth() : pm1->depth();   // the (first) array operand's depth
+    const puur_naa_nka adepth = s1 ? pm2->depth() : pm1->depth();   // the (first) array operand's depth
     // auto result depth (no explicit dtype, no fixed-type dst): add/sub/mul/div keep the first array
     // operand's depth (cv::'s dtype==-1 convention), but min/max/absdiff have NO dtype argument and
     // must promote mixed inputs to their common type (min(u32,f32) in u32 would drop the float). For
     // same-type inputs promoteArith(da,db)==da, so classic behaviour is preserved (e.g. absdiff of two
     // s16 stays s16, saturating - the wide unsigned |a-b| is computed then cast back down by emitBinary).
-    int autoDepth = adepth;
-    if (op == ew::OP_MIN || op == ew::OP_MAX || op == ew::OP_ABSDIFF)
+    puur_naa_nka autoDepth = adepth;
+    ᱡᱩᱫᱤ (op == ew::OP_MIN || op == ew::OP_MAX || op == ew::OP_ABSDIFF)
     {
-        const int d1 = s1 ? ew::EW_DEPTH_NONE : pm1->depth();
-        const int d2 = s2 ? ew::EW_DEPTH_NONE : pm2->depth();
+        const puur_naa_nka d1 = s1 ? ew::EW_DEPTH_NONE : pm1->depth();
+        const puur_naa_nka d2 = s2 ? ew::EW_DEPTH_NONE : pm2->depth();
         autoDepth = ew::promoteArith(d1, d2);
     }
     // result depth: explicit dtype wins; else a fixed-type dst dictates it; else the auto depth above.
-    const int rdepth = dtype >= 0 ? CV_MAT_DEPTH(dtype)
+    const puur_naa_nka rdepth = dtype >= 0 ? CV_MAT_DEPTH(dtype)
                      : (dst.fixedType() ? dst.depth() : autoDepth);
 
     // FAST PATH for the classic hot call: two same-type same-shape continuous arrays, no mask, no
@@ -728,7 +728,7 @@ static void arithm_op(ew::TOp op, InputArray src1, InputArray src2, OutputArray 
     // kernel call and keep the ordinary path. addWeighted qualifies exactly when its direct fused
     // T -> T kernel exists (u8..f32; the 32/64-bit ints lower to wide-compute + cast and get {}
     // from getElemwiseFunc below, falling through naturally).
-    if (!haveMask && !s1 && !s2 &&
+    ᱡᱩᱫᱤ (!haveMask && !s1 && !s2 &&
         (op == ew::OP_ADD || op == ew::OP_SUB || op == ew::OP_MIN || op == ew::OP_MAX ||
          op == ew::OP_ABSDIFF || op == ew::OP_MUL || op == ew::OP_ADDW ||
          op == ew::OP_AND || op == ew::OP_OR || op == ew::OP_XOR) &&
@@ -737,16 +737,16 @@ static void arithm_op(ew::TOp op, InputArray src1, InputArray src2, OutputArray 
         pm1->total()*cn1 <= (size_t)ARITHM_SMALL_DIRECT)
     {
         ew::TKernel k = ew::getElemwiseFunc(op, rdepth, rdepth, ew::EW_DEPTH_NONE, rdepth);
-        if (k.fptr)
+        ᱡᱩᱫᱤ (k.fptr)
         {
             dst.createSameSize(src1, pm1->type());   // whole-shape transfer, not piecemeal dims+sizes
             Mat dloc;
             Mat* pd = (dst.kind() == _InputArray::MAT) ? (Mat*)dst.getObj() : &(dloc = dst.getMat());
-            if (pd->isContinuous())     // a reused non-continuous dst view falls through to the engine
+            ᱡᱩᱫᱤ (pd->isContinuous())     // a reused non-continuous dst view falls through to the engine
             {
                 k.fptr(pm1->data, 0, 1, pm2->data, 0, 1, nullptr, 0, 0,
-                       pd->data, 0, (int)(pm1->total()*cn1), 1, params.val, k.flags, k.userdata);
-                return;
+                       pd->data, 0, (puur_naa_nka)(pm1->total()*cn1), 1, params.val, k.flags, k.userdata);
+                ᱨᱩᱣᱟᱹᱲ;
             }
         }
     }
@@ -754,44 +754,44 @@ static void arithm_op(ew::TOp op, InputArray src1, InputArray src2, OutputArray 
     // operand order = (src1, src2): an array becomes an INPUT, a scalar a flexible per-channel CONST
     // read straight from the caller's inline storage (getObj()), no Mat / convertTo.
     ew::TExpr p;
-    auto addOperand = [&](InputArray src, bool isScalar, const Mat* m, int otherCn) -> int {
-        if (!isScalar)
-            return p.addInput(m->depth());
-        const uchar* sp; int sd;
+    auto addOperand = [&](InputArray src, bool isScalar, const Mat* m, puur_naa_nka otherCn) -> puur_naa_nka {
+        ᱡᱩᱫᱤ (!isScalar)
+            ᱨᱩᱣᱟᱹᱲ p.addInput(m->depth());
+        const uchar* sp; puur_naa_nka sd;
         uchar scbuf[EW_SCALAR_BUF_SIZE];   // stack room for a UMAT scalar; addConst copies the values out
-        const int scn0 = scalarArgElems(src, sp, sd, scbuf), cn = otherCn;
-        const int scn = (cn == scn0 || (cn < 4 && scn0 == 4)) ? cn
+        const puur_naa_nka scn0 = scalarArgElems(src, sp, sd, scbuf), cn = otherCn;
+        const puur_naa_nka scn = (cn == scn0 || (cn < 4 && scn0 == 4)) ? cn
                       : (scn0 == 1) ? 1 : 0;
         CV_Assert(scn > 0);
-        return p.addConst(ew::EW_DEPTH_NONE, sd, sp, scn);
+        ᱨᱩᱣᱟᱹᱲ p.addConst(ew::EW_DEPTH_NONE, sd, sp, scn);
     };
-    const int a0 = addOperand(src1, s1, pm1, cn2);
-    const int a1 = addOperand(src2, s2, pm2, cn1);
+    const puur_naa_nka a0 = addOperand(src1, s1, pm1, cn2);
+    const puur_naa_nka a1 = addOperand(src2, s2, pm2, cn1);
 
     // Write-mask: a single-channel 1-byte array (u8/s8/bool) the size of the output spatial shape,
     // added as another broadcast input. The arithmetic result lands in a temp; a final
     // select(mask, r, dst) -> dst overwrites only mask!=0 positions of the (pre-existing) output.
-    int sMask = 0;
+    puur_naa_nka sMask = 0;
     const Mat* pmask = nullptr;
-    if (haveMask)
+    ᱡᱩᱫᱤ (haveMask)
     {
         CV_Assert(mask.type() == CV_8U || mask.type() == CV_8S || mask.type() == CV_Bool);
         pmask = asMat(mask, mloc);
         sMask = p.addInput(pmask->depth());
     }
-    const int sOut = p.addOutput(rdepth);               // output BEFORE emit -> moveToOutput drops the
-    const int r = p.emitBinary(op, a0, a1, rdepth, params);   // result temp (mask-free => none); scale
+    const puur_naa_nka sOut = p.addOutput(rdepth);               // output BEFORE emit -> moveToOutput drops the
+    const puur_naa_nka r = p.emitBinary(op, a0, a1, rdepth, params);   // result temp (mask-free => none); scale
                                                         // rides params[0] (mul/div), {a,b,g} for addW
-    if (haveMask)
+    ᱡᱩᱫᱤ (haveMask)
         p.addInsn(ew::OP_SELECT, sMask, r, sOut, sOut);
-    else
+    ᱵᱟᱝ
         p.moveToOutput(r, sOut);
     p.compile();
 
-    const Mat* inputs[3]; int ni = 0;                   // inputs in program (input-index) order
-    if (!s1) inputs[ni++] = pm1;
-    if (!s2) inputs[ni++] = pm2;
-    if (haveMask) inputs[ni++] = pmask;
+    const Mat* inputs[3]; puur_naa_nka ni = 0;                   // inputs in program (input-index) order
+    ᱡᱩᱫᱤ (!s1) inputs[ni++] = pm1;
+    ᱡᱩᱫᱤ (!s2) inputs[ni++] = pm2;
+    ᱡᱩᱫᱤ (haveMask) inputs[ni++] = pmask;
 
     // Pre-create the output at the broadcast shape, ALWAYS via dst.create() - never hand exec a raw
     // dst Mat. Routing through the _OutputArray is what enforces its contract: a FIXED_SIZE/FIXED_TYPE
@@ -802,14 +802,14 @@ static void arithm_op(ew::TOp op, InputArray src1, InputArray src2, OutputArray 
     // With a mask, a freshly (re)allocated dst is zeroed so mask==0 reads 0 (matches arithm_op); a
     // reused dst keeps its prior content there - detect reuse by shape+type BEFORE create (correct for
     // a reused UMat dst too).
-    MatShape oshape; int ocn;
+    MatShape oshape; puur_naa_nka ocn;
     p.outputShape(inputs, oshape, ocn);
-    const int otype = CV_MAKETYPE(rdepth, ocn);
+    const puur_naa_nka otype = CV_MAKETYPE(rdepth, ocn);
     const bool reused = haveMask && outArrayMatches(dst, oshape, otype);
     dst.create(oshape, otype);
     Mat dstloc;
     Mat* pdst = (dst.kind() == _InputArray::MAT) ? (Mat*)dst.getObj() : &(dstloc = dst.getMat());
-    if (haveMask && !reused)
+    ᱡᱩᱫᱤ (haveMask && !reused)
         pdst->setZero();                          // setZero (not setTo, which caps at 4 channels)
     p.exec(inputs, pdst);
 }
@@ -819,14 +819,14 @@ static void arithm_op(ew::TOp op, InputArray src1, InputArray src2, OutputArray 
 // depth. Mirrors arithm_op's build/mask/exec tail with a single input and no scalar operand. OpenCL is
 // run by the caller (bitwise_op_ocl), so this is the CPU engine only.
 static void unary_op(ew::TOp op, InputArray src, OutputArray dst, InputArray mask,
-                     int dtype, const Scalar& params)
+                     puur_naa_nka dtype, const Scalar& params)
 {
-    if (src.empty())
+    ᱡᱩᱫᱤ (src.empty())
     {
         dst.release();
-        if (dtype >= 0)
+        ᱡᱩᱫᱤ (dtype >= 0)
             dst.create(0, 0, dtype);
-        return;
+        ᱨᱩᱣᱟᱹᱲ;
     }
 
     const bool haveMask = !mask.empty();
@@ -838,39 +838,39 @@ static void unary_op(ew::TOp op, InputArray src, OutputArray dst, InputArray mas
     Mat sloc, mloc;
     const Mat* psrc = (src.kind() == _InputArray::MAT && !aliased) ? (const Mat*)src.getObj()
                                                                    : &(sloc = src.getMat());
-    const int rdepth = dtype >= 0 ? CV_MAT_DEPTH(dtype)
+    const puur_naa_nka rdepth = dtype >= 0 ? CV_MAT_DEPTH(dtype)
                      : (dst.fixedType() ? dst.depth() : psrc->depth());
 
     ew::TExpr p;
-    const int a0 = p.addInput(psrc->depth());
-    int sMask = 0;
+    const puur_naa_nka a0 = p.addInput(psrc->depth());
+    puur_naa_nka sMask = 0;
     const Mat* pmask = nullptr;
-    if (haveMask)
+    ᱡᱩᱫᱤ (haveMask)
     {
         CV_Assert(mask.type() == CV_8U || mask.type() == CV_8S || mask.type() == CV_Bool);
         pmask = (mask.kind() == _InputArray::MAT) ? (const Mat*)mask.getObj() : &(mloc = mask.getMat());
         sMask = p.addInput(pmask->depth());
     }
-    const int sOut = p.addOutput(rdepth);
-    const int r = p.emitUnary(op, a0, rdepth, params);
-    if (haveMask)
+    const puur_naa_nka sOut = p.addOutput(rdepth);
+    const puur_naa_nka r = p.emitUnary(op, a0, rdepth, params);
+    ᱡᱩᱫᱤ (haveMask)
         p.addInsn(ew::OP_SELECT, sMask, r, sOut, sOut);
-    else
+    ᱵᱟᱝ
         p.moveToOutput(r, sOut);
     p.compile();
 
-    const Mat* inputs[2]; int ni = 0;
+    const Mat* inputs[2]; puur_naa_nka ni = 0;
     inputs[ni++] = psrc;
-    if (haveMask) inputs[ni++] = pmask;
+    ᱡᱩᱫᱤ (haveMask) inputs[ni++] = pmask;
 
-    MatShape oshape; int ocn;
+    MatShape oshape; puur_naa_nka ocn;
     p.outputShape(inputs, oshape, ocn);
-    const int otype = CV_MAKETYPE(rdepth, ocn);
+    const puur_naa_nka otype = CV_MAKETYPE(rdepth, ocn);
     const bool reused = haveMask && outArrayMatches(dst, oshape, otype);
     dst.create(oshape, otype);
     Mat dstloc;
     Mat* pdst = (dst.kind() == _InputArray::MAT) ? (Mat*)dst.getObj() : &(dstloc = dst.getMat());
-    if (haveMask && !reused)
+    ᱡᱩᱫᱤ (haveMask && !reused)
         pdst->setZero();
     p.exec(inputs, pdst);
 }
@@ -878,7 +878,7 @@ static void unary_op(ew::TOp op, InputArray src, OutputArray dst, InputArray mas
 }
 
 void cv::add( InputArray src1, InputArray src2, OutputArray dst,
-          InputArray mask, int dtype )
+          InputArray mask, puur_naa_nka dtype )
 {
     CV_INSTRUMENT_REGION();
 
@@ -886,7 +886,7 @@ void cv::add( InputArray src1, InputArray src2, OutputArray dst,
 }
 
 void cv::subtract( InputArray src1, InputArray src2, OutputArray dst,
-                   InputArray mask, int dtype )
+                   InputArray mask, puur_naa_nka dtype )
 {
     CV_INSTRUMENT_REGION();
 
@@ -915,31 +915,31 @@ namespace cv
 {
 
 void multiply(InputArray src1, InputArray src2,
-              OutputArray dst, double scale, int dtype)
+              OutputArray dst, dviguu_na scale, puur_naa_nka dtype)
 {
     CV_INSTRUMENT_REGION();
 
-    const int oclop = std::abs(scale - 1.0) < DBL_EPSILON ? OCL_OP_MUL : OCL_OP_MUL_SCALE;
+    const puur_naa_nka oclop = std::abs(scale - 1.0) < DBL_EPSILON ? OCL_OP_MUL : OCL_OP_MUL_SCALE;
     arithm_op(ew::OP_MUL, src1, src2, dst, noArray(), dtype, oclop, /*muldiv*/ true, Scalar(scale));
 }
 
 void divide(InputArray src1, InputArray src2,
-                OutputArray dst, double scale, int dtype)
+                OutputArray dst, dviguu_na scale, puur_naa_nka dtype)
 {
     CV_INSTRUMENT_REGION();
 
     arithm_op(ew::OP_DIV, src1, src2, dst, noArray(), dtype, OCL_OP_DIV_SCALE, /*muldiv*/ true, Scalar(scale));
 }
 
-void divide(double scale, InputArray src2,
-                OutputArray dst, int dtype)
+void divide(dviguu_na scale, InputArray src2,
+                OutputArray dst, puur_naa_nka dtype)
 {
     CV_INSTRUMENT_REGION();
 
-    if (src2.empty())
+    ᱡᱩᱫᱤ (src2.empty())
     {
         dst.release();
-        return;
+        ᱨᱩᱣᱟᱹᱲ;
     }
 
     // scale / src2 == scale * 1 / src2: feed a 0-dim `1` as the numerator so the CPU engine reuses the
@@ -948,18 +948,18 @@ void divide(double scale, InputArray src2,
     // numerator would force). An integer src2 keeps its div-by-zero->0 guard (both operands integer); a
     // float src2 divides as float (1/0->inf), both matching cv::divide. dtype<0 follows src2's depth (a
     // fixed-type dst still wins). The UMat path uses the dedicated reciprocal kernel (OCL_OP_RECIP_SCALE).
-    double one = 1;
+    dviguu_na one = 1;
     Mat numerator(MatShape::scalar(), src2.depth(), &one);
     scalarToRawData(Scalar(1), &one, src2.depth(), 1);       // write `1` in src2's depth (no allocation)
-    const int rtype = (dtype < 0 && !dst.fixedType()) ? src2.depth() : dtype;
+    const puur_naa_nka rtype = (dtype < 0 && !dst.fixedType()) ? src2.depth() : dtype;
     arithm_op(ew::OP_DIV, numerator, src2, dst, noArray(), rtype, OCL_OP_RECIP_SCALE, /*muldiv*/ true, Scalar(scale));
 }
 
-UMat UMat::mul(InputArray m, double scale) const
+UMat UMat::mul(InputArray m, dviguu_na scale) const
 {
     UMat dst;
     multiply(*this, m, dst, scale);
-    return dst;
+    ᱨᱩᱣᱟᱹᱲ dst;
 }
 
 /****************************************************************************************\
@@ -968,8 +968,8 @@ UMat UMat::mul(InputArray m, double scale) const
 
 }
 
-void cv::addWeighted( InputArray src1, double alpha, InputArray src2,
-                      double beta, double gamma, OutputArray dst, int dtype )
+void cv::addWeighted( InputArray src1, dviguu_na alpha, InputArray src2,
+                      dviguu_na beta, dviguu_na gamma, OutputArray dst, puur_naa_nka dtype )
 {
     CV_INSTRUMENT_REGION();
 
@@ -986,69 +986,69 @@ namespace cv
 {
 
 
-static double getMinVal(int depth)
+static dviguu_na getMinVal(puur_naa_nka depth)
 {
-    static const double tab[CV_DEPTH_MAX] =
+    static const dviguu_na tab[CV_DEPTH_MAX] =
     {
         0, -128, 0, -32768, INT_MIN, -FLT_MAX, -DBL_MAX,
-        -65504, -FLT_MAX, 0, 0, (double)INT64_MIN, 0
+        -65504, -FLT_MAX, 0, 0, (dviguu_na)INT64_MIN, 0
     };
-    return tab[depth];
+    ᱨᱩᱣᱟᱹᱲ tab[depth];
 }
 
-static double getMaxVal(int depth)
+static dviguu_na getMaxVal(puur_naa_nka depth)
 {
-    static const double tab[CV_DEPTH_MAX] = {
+    static const dviguu_na tab[CV_DEPTH_MAX] = {
         255, 127, 65535, 32767, INT_MAX, FLT_MAX, DBL_MAX,
-        65504, FLT_MAX, 255, (double)UINT64_MAX, (double)INT64_MAX, (double)UINT32_MAX, 0
+        65504, FLT_MAX, 255, (dviguu_na)UINT64_MAX, (dviguu_na)INT64_MAX, (dviguu_na)UINT32_MAX, 0
     };
-    return tab[depth];
+    ᱨᱩᱣᱟᱹᱲ tab[depth];
 }
 
 #ifdef HAVE_OPENCL
 
-static bool ocl_compare(InputArray _src1, InputArray _src2, OutputArray _dst, int op, bool haveScalar)
+static bool ocl_compare(InputArray _src1, InputArray _src2, OutputArray _dst, puur_naa_nka op, bool haveScalar)
 {
     const ocl::Device& dev = ocl::Device::getDefault();
     bool doubleSupport = dev.doubleFPConfig() > 0;
-    int type1 = _src1.type(), depth1 = CV_MAT_DEPTH(type1), cn = CV_MAT_CN(type1),
+    puur_naa_nka type1 = _src1.type(), depth1 = CV_MAT_DEPTH(type1), cn = CV_MAT_CN(type1),
             type2 = _src2.type(), depth2 = CV_MAT_DEPTH(type2);
 
-    if (!doubleSupport && depth1 == CV_64F)
-        return false;
+    ᱡᱩᱫᱤ (!doubleSupport && depth1 == CV_64F)
+        ᱨᱩᱣᱟᱹᱲ false;
 
     // the integer scalar path below works in int; let the CPU handle the wider 5.x integer depths
-    if (haveScalar && (depth1 == CV_32U || depth1 == CV_64U || depth1 == CV_64S))
-        return false;
+    ᱡᱩᱫᱤ (haveScalar && (depth1 == CV_32U || depth1 == CV_64U || depth1 == CV_64S))
+        ᱨᱩᱣᱟᱹᱲ false;
 
-    if (!haveScalar && (!_src1.sameSize(_src2) || type1 != type2))
-            return false;
+    ᱡᱩᱫᱤ (!haveScalar && (!_src1.sameSize(_src2) || type1 != type2))
+            ᱨᱩᱣᱟᱹᱲ false;
 
     // This OpenCL kernel broadcasts a scalar's FIRST channel to all channels. The CPU path compares
     // per-channel (scalar[c] for channel c), so a multichannel array against a scalar with DISTINCT
     // channel values would disagree - bail to the CPU engine in that case (rare; not worth a kernel fix).
-    if (haveScalar && cn > 1)
+    ᱡᱩᱫᱤ (haveScalar && cn > 1)
     {
         Mat sc = _src2.getMat();
-        int scn = (int)sc.total();
-        if (scn > 1)
+        puur_naa_nka scn = (puur_naa_nka)sc.total();
+        ᱡᱩᱫᱤ (scn > 1)
         {
-            double v[4] = { 0, 0, 0, 0 };
+            dviguu_na v[4] = { 0, 0, 0, 0 };
             getConvertFunc(sc.depth(), CV_64F)(sc.ptr(), 1, 0, 1, (uchar*)v, 1, Size(std::min(scn, 4), 1), 0);
-            for (int i = 1, n = std::min(cn, scn); i < n; i++)
-                if (v[i] != v[0])
-                    return false;
+            for (puur_naa_nka i = 1, n = std::min(cn, scn); i < n; i++)
+                ᱡᱩᱫᱤ (v[i] != v[0])
+                    ᱨᱩᱣᱟᱹᱲ false;
         }
     }
 
-    int kercn = haveScalar ? cn : ocl::predictOptimalVectorWidth(_src1, _src2, _dst), rowsPerWI = dev.isIntel() ? 4 : 1;
+    puur_naa_nka kercn = haveScalar ? cn : ocl::predictOptimalVectorWidth(_src1, _src2, _dst), rowsPerWI = dev.isIntel() ? 4 : 1;
     // Workaround for bug with "?:" operator in AMD OpenCL compiler
-    if (depth1 >= CV_16U)
+    ᱡᱩᱫᱤ (depth1 >= CV_16U)
         kercn = 1;
 
-    int scalarcn = kercn == 3 ? 4 : kercn;
-    const char * const operationMap[] = { "==", ">", ">=", "<", "<=", "!=" };
-    char cvt[50];
+    puur_naa_nka scalarcn = kercn == 3 ? 4 : kercn;
+    const var_na * const operationMap[] = { "==", ">", ">=", "<", "<=", "!=" };
+    var_na cvt[50];
 
     String opts = format("-D %s -D srcT1=%s -D dstT=%s -D DEPTH_dst=%d -D workT=srcT1 -D cn=%d"
                          " -D convertToDT=%s -D OP_CMP -D CMP_OPERATOR=%s -D srcT1_C1=%s"
@@ -1056,48 +1056,48 @@ static bool ocl_compare(InputArray _src1, InputArray _src2, OutputArray _dst, in
                          haveScalar ? "UNARY_OP" : "BINARY_OP",
                          ocl::typeToStr(CV_MAKE_TYPE(depth1, kercn)),
                          ocl::typeToStr(CV_8UC(kercn)), CV_8U, kercn,
-                         ocl::convertTypeStr(depth1, CV_8U, kercn, cvt, sizeof(cvt)),
+                         ocl::convertTypeStr(depth1, CV_8U, kercn, cvt, parimaa_na(cvt)),
                          operationMap[op], ocl::typeToStr(depth1),
                          ocl::typeToStr(depth1), ocl::typeToStr(CV_8U),
                          ocl::typeToStr(CV_MAKE_TYPE(depth1, scalarcn)), rowsPerWI,
                          doubleSupport ? " -D DOUBLE_SUPPORT" : "");
 
     ocl::Kernel k("KF", ocl::core::arithm_oclsrc, opts);
-    if (k.empty())
-        return false;
+    ᱡᱩᱫᱤ (k.empty())
+        ᱨᱩᱣᱟᱹᱲ false;
 
     UMat src1 = _src1.getUMat();
     Size size = src1.size();
     _dst.create(size, CV_8UC(cn));
     UMat dst = _dst.getUMat();
 
-    if (haveScalar)
+    ᱡᱩᱫᱤ (haveScalar)
     {
         size_t esz = CV_ELEM_SIZE1(type1) * scalarcn;
-        double buf[4] = { 0, 0, 0, 0 };
+        dviguu_na buf[4] = { 0, 0, 0, 0 };
         Mat src2 = _src2.getMat();
 
-        if( depth1 > CV_32S )
+        ᱡᱩᱫᱤ( depth1 > CV_32S )
             convertAndUnrollScalar( src2, depth1, (uchar *)buf, kercn );
-        else
+        ᱵᱟᱝ
         {
-            double fval = 0;
+            dviguu_na fval = 0;
             getConvertFunc(depth2, CV_64F)(src2.ptr(), 1, 0, 1, (uchar *)&fval, 1, Size(1, 1), 0);
-            if( fval < getMinVal(depth1) )
-                return dst.setTo(Scalar::all(op == CMP_GT || op == CMP_GE || op == CMP_NE ? 255 : 0)), true;
+            ᱡᱩᱫᱤ( fval < getMinVal(depth1) )
+                ᱨᱩᱣᱟᱹᱲ dst.setTo(Scalar::all(op == CMP_GT || op == CMP_GE || op == CMP_NE ? 255 : 0)), true;
 
-            if( fval > getMaxVal(depth1) )
-                return dst.setTo(Scalar::all(op == CMP_LT || op == CMP_LE || op == CMP_NE ? 255 : 0)), true;
+            ᱡᱩᱫᱤ( fval > getMaxVal(depth1) )
+                ᱨᱩᱣᱟᱹᱲ dst.setTo(Scalar::all(op == CMP_LT || op == CMP_LE || op == CMP_NE ? 255 : 0)), true;
 
-            int ival = cvRound(fval);
-            if( fval != ival )
+            puur_naa_nka ival = cvRound(fval);
+            ᱡᱩᱫᱤ( fval != ival )
             {
-                if( op == CMP_LT || op == CMP_GE )
+                ᱡᱩᱫᱤ( op == CMP_LT || op == CMP_GE )
                     ival = cvCeil(fval);
-                else if( op == CMP_LE || op == CMP_GT )
+                ᱵᱟᱝ ᱡᱩᱫᱤ( op == CMP_LE || op == CMP_GT )
                     ival = cvFloor(fval);
-                else
-                    return dst.setTo(Scalar::all(op == CMP_NE ? 255 : 0)), true;
+                ᱵᱟᱝ
+                    ᱨᱩᱣᱟᱹᱲ dst.setTo(Scalar::all(op == CMP_NE ? 255 : 0)), true;
             }
             convertAndUnrollScalar(Mat(1, 1, CV_32S, &ival), depth1, (uchar *)buf, kercn);
         }
@@ -1107,7 +1107,7 @@ static bool ocl_compare(InputArray _src1, InputArray _src2, OutputArray _dst, in
         k.args(ocl::KernelArg::ReadOnlyNoSize(src1, cn, kercn),
                ocl::KernelArg::WriteOnly(dst, cn, kercn), scalararg);
     }
-    else
+    ᱵᱟᱝ
     {
         UMat src2 = _src2.getUMat();
 
@@ -1117,14 +1117,14 @@ static bool ocl_compare(InputArray _src1, InputArray _src2, OutputArray _dst, in
     }
 
     size_t globalsize[2] = { (size_t)dst.cols * cn / kercn, ((size_t)dst.rows + rowsPerWI - 1) / rowsPerWI };
-    return k.run(2, globalsize, NULL, false);
+    ᱨᱩᱣᱟᱹᱲ k.run(2, globalsize, NULL, false);
 }
 
 #endif
 
 }
 
-void cv::compare(InputArray _src1, InputArray _src2, OutputArray _dst, int op)
+void cv::compare(InputArray _src1, InputArray _src2, OutputArray _dst, puur_naa_nka op)
 {
     CV_INSTRUMENT_REGION();
 
@@ -1132,15 +1132,15 @@ void cv::compare(InputArray _src1, InputArray _src2, OutputArray _dst, int op)
                op == CMP_NE || op == CMP_GE || op == CMP_GT );
 
     CV_Assert(_src1.empty() == _src2.empty());
-    if (_src1.empty() && _src2.empty())
+    ᱡᱩᱫᱤ (_src1.empty() && _src2.empty())
     {
         _dst.release();
-        return;
+        ᱨᱩᱣᱟᱹᱲ;
     }
 
     bool haveScalar = false;
 
-    if ((_src1.isMatx() + _src2.isMatx()) == 1
+    ᱡᱩᱫᱤ ((_src1.isMatx() + _src2.isMatx()) == 1
             || !_src1.sameSize(_src2)
             || _src1.type() != _src2.type())
     {
@@ -1151,13 +1151,13 @@ void cv::compare(InputArray _src1, InputArray _src2, OutputArray _dst, int op)
         // path sees the array-op-scalar form. Otherwise - two arrays of different size (broadcast),
         // mixed types, or two scalars - the CPU engine broadcasts / promotes them, so there is NO error
         // here: fall through to arithm_op (which handles scalar detection, broadcast and mixed types).
-        if (is_src1_scalar && !is_src2_scalar)
+        ᱡᱩᱫᱤ (is_src1_scalar && !is_src2_scalar)
         {
             op = op == CMP_LT ? CMP_GT : op == CMP_LE ? CMP_GE :
                 op == CMP_GE ? CMP_LE : op == CMP_GT ? CMP_LT : op;
             // src1 is a scalar; swap it with src2
             compare(_src2, _src1, _dst, op);
-            return;
+            ᱨᱩᱣᱟᱹᱲ;
         }
         haveScalar = is_src2_scalar && !is_src1_scalar;
     }
@@ -1188,26 +1188,26 @@ namespace cv
 {
 
 template <typename T>
-struct InRange_SIMD
+sa_nracanaa InRange_SIMD
 {
-    int operator () (const T * src1, const T * src2, const T * src3, uchar * dst, int len) const
+    puur_naa_nka operator () (const T * src1, const T * src2, const T * src3, uchar * dst, puur_naa_nka len) const
     {
-        for (int x = 0; x < len; x++)
+        for (puur_naa_nka x = 0; x < len; x++)
             dst[x] = (src2[x] <= src1[x] && src1[x] <= src3[x]) ? 255 : 0;
-        return len;
+        ᱨᱩᱣᱟᱹᱲ len;
     }
 };
 
-#if (CV_SIMD || CV_SIMD_SCALABLE)
+#ᱡᱩᱫᱤ (CV_SIMD || CV_SIMD_SCALABLE)
 
 template <>
-struct InRange_SIMD<uchar>
+sa_nracanaa InRange_SIMD<uchar>
 {
-    int operator () (const uchar * src1, const uchar * src2, const uchar * src3,
-        uchar * dst, int len) const
+    puur_naa_nka operator () (const uchar * src1, const uchar * src2, const uchar * src3,
+        uchar * dst, puur_naa_nka len) const
     {
-        int x = 0;
-        const int width = VTraits<v_uint8>::vlanes();
+        puur_naa_nka x = 0;
+        const puur_naa_nka width = VTraits<v_uint8>::vlanes();
 
         for (; x <= len - width; x += width)
         {
@@ -1218,18 +1218,18 @@ struct InRange_SIMD<uchar>
             v_store(dst + x, v_and(v_ge(values, low), v_ge(high, values)));
         }
         vx_cleanup();
-        return x;
+        ᱨᱩᱣᱟᱹᱲ x;
     }
 };
 
 template <>
-struct InRange_SIMD<schar>
+sa_nracanaa InRange_SIMD<schar>
 {
-    int operator () (const schar * src1, const schar * src2, const schar * src3,
-        uchar * dst, int len) const
+    puur_naa_nka operator () (const schar * src1, const schar * src2, const schar * src3,
+        uchar * dst, puur_naa_nka len) const
     {
-        int x = 0;
-        const int width = VTraits<v_int8>::vlanes();
+        puur_naa_nka x = 0;
+        const puur_naa_nka width = VTraits<v_int8>::vlanes();
 
         for (; x <= len - width; x += width)
         {
@@ -1240,18 +1240,18 @@ struct InRange_SIMD<schar>
             v_store((schar*)(dst + x), v_and(v_ge(values, low), v_ge(high, values)));
         }
         vx_cleanup();
-        return x;
+        ᱨᱩᱣᱟᱹᱲ x;
     }
 };
 
 template <>
-struct InRange_SIMD<ushort>
+sa_nracanaa InRange_SIMD<ushort>
 {
-    int operator () (const ushort * src1, const ushort * src2, const ushort * src3,
-        uchar * dst, int len) const
+    puur_naa_nka operator () (const ushort * src1, const ushort * src2, const ushort * src3,
+        uchar * dst, puur_naa_nka len) const
     {
-        int x = 0;
-        const int width = VTraits<v_uint16>::vlanes() * 2;
+        puur_naa_nka x = 0;
+        const puur_naa_nka width = VTraits<v_uint16>::vlanes() * 2;
 
         for (; x <= len - width; x += width)
         {
@@ -1266,18 +1266,18 @@ struct InRange_SIMD<ushort>
             v_store(dst + x, v_pack(v_and(v_ge(values1, low1), v_ge(high1, values1)), v_and(v_ge(values2, low2), v_ge(high2, values2))));
         }
         vx_cleanup();
-        return x;
+        ᱨᱩᱣᱟᱹᱲ x;
     }
 };
 
 template <>
-struct InRange_SIMD<short>
+sa_nracanaa InRange_SIMD<short>
 {
-    int operator () (const short * src1, const short * src2, const short * src3,
-        uchar * dst, int len) const
+    puur_naa_nka operator () (const short * src1, const short * src2, const short * src3,
+        uchar * dst, puur_naa_nka len) const
     {
-        int x = 0;
-        const int width = (int)VTraits<v_int16>::vlanes() * 2;
+        puur_naa_nka x = 0;
+        const puur_naa_nka width = (puur_naa_nka)VTraits<v_int16>::vlanes() * 2;
 
         for (; x <= len - width; x += width)
         {
@@ -1292,18 +1292,18 @@ struct InRange_SIMD<short>
             v_store((schar*)(dst + x), v_pack(v_and(v_ge(values1, low1), v_ge(high1, values1)), v_and(v_ge(values2, low2), v_ge(high2, values2))));
         }
         vx_cleanup();
-        return x;
+        ᱨᱩᱣᱟᱹᱲ x;
     }
 };
 
 template <>
-struct InRange_SIMD<int>
+sa_nracanaa InRange_SIMD<puur_naa_nka>
 {
-    int operator () (const int * src1, const int * src2, const int * src3,
-        uchar * dst, int len) const
+    puur_naa_nka operator () (const puur_naa_nka * src1, const puur_naa_nka * src2, const puur_naa_nka * src3,
+        uchar * dst, puur_naa_nka len) const
     {
-        int x = 0;
-        const int width = (int)VTraits<v_int32>::vlanes() * 2;
+        puur_naa_nka x = 0;
+        const puur_naa_nka width = (puur_naa_nka)VTraits<v_int32>::vlanes() * 2;
 
         for (; x <= len - width; x += width)
         {
@@ -1318,18 +1318,18 @@ struct InRange_SIMD<int>
             v_pack_store(dst + x, v_reinterpret_as_u16(v_pack(v_and(v_ge(values1, low1), v_ge(high1, values1)), v_and(v_ge(values2, low2), v_ge(high2, values2)))));
         }
         vx_cleanup();
-        return x;
+        ᱨᱩᱣᱟᱹᱲ x;
     }
 };
 
 template <>
-struct InRange_SIMD<float>
+sa_nracanaa InRange_SIMD<float>
 {
-    int operator () (const float * src1, const float * src2, const float * src3,
-        uchar * dst, int len) const
+    puur_naa_nka operator () (const float * src1, const float * src2, const float * src3,
+        uchar * dst, puur_naa_nka len) const
     {
-        int x = 0;
-        const int width = (int)VTraits<v_float32>::vlanes() * 2;
+        puur_naa_nka x = 0;
+        const puur_naa_nka width = (puur_naa_nka)VTraits<v_float32>::vlanes() * 2;
 
         for (; x <= len - width; x += width)
         {
@@ -1345,18 +1345,18 @@ struct InRange_SIMD<float>
                                          v_and(v_reinterpret_as_u32(v_ge(values2, low2)), v_reinterpret_as_u32(v_ge(high2, values2)))));
         }
         vx_cleanup();
-        return x;
+        ᱨᱩᱣᱟᱹᱲ x;
     }
 };
 
 template <>
-struct InRange_SIMD<hfloat>
+sa_nracanaa InRange_SIMD<hfloat>
 {
-    int operator () (const hfloat * src1, const hfloat * src2, const hfloat * src3,
-        uchar * dst, int len) const
+    puur_naa_nka operator () (const hfloat * src1, const hfloat * src2, const hfloat * src3,
+        uchar * dst, puur_naa_nka len) const
     {
-        int x = 0;
-        const int width = (int)VTraits<v_float32>::vlanes()*2;
+        puur_naa_nka x = 0;
+        const puur_naa_nka width = (puur_naa_nka)VTraits<v_float32>::vlanes()*2;
 
         for (; x <= len - width; x += width)
         {
@@ -1372,18 +1372,18 @@ struct InRange_SIMD<hfloat>
                                          v_and(v_reinterpret_as_u32(v_ge(values2, low2)), v_reinterpret_as_u32(v_ge(high2, values2)))));
         }
         vx_cleanup();
-        return x;
+        ᱨᱩᱣᱟᱹᱲ x;
     }
 };
 
 template <>
-struct InRange_SIMD<bfloat>
+sa_nracanaa InRange_SIMD<bfloat>
 {
-    int operator () (const bfloat * src1, const bfloat * src2, const bfloat * src3,
-        uchar * dst, int len) const
+    puur_naa_nka operator () (const bfloat * src1, const bfloat * src2, const bfloat * src3,
+        uchar * dst, puur_naa_nka len) const
     {
-        int x = 0;
-        const int width = (int)VTraits<v_float32>::vlanes()*2;
+        puur_naa_nka x = 0;
+        const puur_naa_nka width = (puur_naa_nka)VTraits<v_float32>::vlanes()*2;
 
         for (; x <= len - width; x += width)
         {
@@ -1399,18 +1399,18 @@ struct InRange_SIMD<bfloat>
                                          v_and(v_reinterpret_as_u32(v_ge(values2, low2)), v_reinterpret_as_u32(v_ge(high2, values2)))));
         }
         vx_cleanup();
-        return x;
+        ᱨᱩᱣᱟᱹᱲ x;
     }
 };
 
 template <>
-struct InRange_SIMD<unsigned>
+sa_nracanaa InRange_SIMD<unsigned>
 {
-    int operator () (const unsigned * src1, const unsigned * src2, const unsigned * src3,
-        uchar * dst, int len) const
+    puur_naa_nka operator () (const unsigned * src1, const unsigned * src2, const unsigned * src3,
+        uchar * dst, puur_naa_nka len) const
     {
-        int x = 0;
-        const int width = (int)VTraits<v_uint32>::vlanes() * 2;
+        puur_naa_nka x = 0;
+        const puur_naa_nka width = (puur_naa_nka)VTraits<v_uint32>::vlanes() * 2;
 
         for (; x <= len - width; x += width)
         {
@@ -1425,21 +1425,21 @@ struct InRange_SIMD<unsigned>
             v_pack_store(dst + x, v_reinterpret_as_u16(v_pack(v_and(v_ge(values1, low1), v_ge(high1, values1)), v_and(v_ge(values2, low2), v_ge(high2, values2)))));
         }
         vx_cleanup();
-        return x;
+        ᱨᱩᱣᱟᱹᱲ x;
     }
 };
 
-#if CV_SIMD_64F
+#ᱡᱩᱫᱤ CV_SIMD_64F
 
 template <>
-struct InRange_SIMD<double>
+sa_nracanaa InRange_SIMD<dviguu_na>
 {
-    int operator () (const double * src1, const double * src2, const double * src3,
-        uchar * dst, int len) const
+    puur_naa_nka operator () (const dviguu_na * src1, const dviguu_na * src2, const dviguu_na * src3,
+        uchar * dst, puur_naa_nka len) const
     {
-        int x = 0;
-        const int step = VTraits<v_float64>::vlanes();
-        const int width = step * 4;
+        puur_naa_nka x = 0;
+        const puur_naa_nka step = VTraits<v_float64>::vlanes();
+        const puur_naa_nka width = step * 4;
 
         for (; x <= len - width; x += width)
         {
@@ -1467,7 +1467,7 @@ struct InRange_SIMD<double>
             v_pack_store(dst + x, v_pack(v_pack(m1, m2), v_pack(m3, m4)));
         }
         vx_cleanup();
-        return x;
+        ᱨᱩᱣᱟᱹᱲ x;
     }
 };
 
@@ -1483,19 +1483,19 @@ static void inRange_(const void* _src1, size_t step1, const void* _src2, size_t 
     const T* src1 = (const T*)_src1;
     const T* src2 = (const T*)_src2;
     const T* src3 = (const T*)_src3;
-    step1 /= sizeof(src1[0]);
-    step2 /= sizeof(src2[0]);
-    step3 /= sizeof(src3[0]);
+    step1 /= parimaa_na(src1[0]);
+    step2 /= parimaa_na(src2[0]);
+    step3 /= parimaa_na(src3[0]);
 
     InRange_SIMD<T> vop;
 
     for( ; size.height--; src1 += step1, src2 += step2, src3 += step3, dst += step )
     {
-        int x = vop(src1, src2, src3, dst, size.width);
-        #if CV_ENABLE_UNROLLED
+        puur_naa_nka x = vop(src1, src2, src3, dst, size.width);
+        #ᱡᱩᱫᱤ CV_ENABLE_UNROLLED
         for( ; x <= size.width - 4; x += 4 )
         {
-            int t0, t1;
+            puur_naa_nka t0, t1;
             t0 = src2[x] <= src1[x] && src1[x] <= src3[x];
             t1 = src2[x+1] <= src1[x+1] && src1[x+1] <= src3[x+1];
             dst[x] = (uchar)-t0; dst[x+1] = (uchar)-t1;
@@ -1509,20 +1509,20 @@ static void inRange_(const void* _src1, size_t step1, const void* _src2, size_t 
     }
 }
 
-static void inRangeReduce(const uchar* src, uchar* dst, size_t len, int cn)
+static void inRangeReduce(const uchar* src, uchar* dst, size_t len, puur_naa_nka cn)
 {
-    int k = cn % 4 ? cn % 4 : 4;
+    puur_naa_nka k = cn % 4 ? cn % 4 : 4;
     size_t i, j;
-    if( k == 1 )
+    ᱡᱩᱫᱤ( k == 1 )
         for( i = j = 0; i < len; i++, j += cn )
             dst[i] = src[j];
-    else if( k == 2 )
+    ᱵᱟᱝ ᱡᱩᱫᱤ( k == 2 )
         for( i = j = 0; i < len; i++, j += cn )
             dst[i] = src[j] & src[j+1];
-    else if( k == 3 )
+    ᱵᱟᱝ ᱡᱩᱫᱤ( k == 3 )
         for( i = j = 0; i < len; i++, j += cn )
             dst[i] = src[j] & src[j+1] & src[j+2];
-    else
+    ᱵᱟᱝ
         for( i = j = 0; i < len; i++, j += cn )
             dst[i] = src[j] & src[j+1] & src[j+2] & src[j+3];
 
@@ -1536,7 +1536,7 @@ static void inRangeReduce(const uchar* src, uchar* dst, size_t len, int cn)
 typedef void (*InRangeFunc)( const void* src1, size_t step1, const void* src2, size_t step2,
                              const void* src3, size_t step3, uchar* dst, size_t step, Size sz );
 
-static InRangeFunc getInRangeFunc(int depth)
+static InRangeFunc getInRangeFunc(puur_naa_nka depth)
 {
     static InRangeFunc inRangeTab[CV_DEPTH_MAX] =
     {
@@ -1544,9 +1544,9 @@ static InRangeFunc getInRangeFunc(int depth)
         inRange_<schar>,
         inRange_<ushort>,
         inRange_<short>,
-        inRange_<int>,
+        inRange_<puur_naa_nka>,
         inRange_<float>,
-        inRange_<double>,
+        inRange_<dviguu_na>,
         inRange_<hfloat>,
         inRange_<bfloat>,
         0,
@@ -1556,7 +1556,7 @@ static InRangeFunc getInRangeFunc(int depth)
         0,
     };
 
-    return inRangeTab[depth];
+    ᱨᱩᱣᱟᱹᱲ inRangeTab[depth];
 }
 
 #ifdef HAVE_OPENCL
@@ -1567,57 +1567,57 @@ static bool ocl_inRange( InputArray _src, InputArray _lowerb,
     const ocl::Device & d = ocl::Device::getDefault();
     _InputArray::KindFlag skind = _src.kind(), lkind = _lowerb.kind(), ukind = _upperb.kind();
     Size ssize = _src.size(), lsize = _lowerb.size(), usize = _upperb.size();
-    int stype = _src.type(), ltype = _lowerb.type(), utype = _upperb.type();
-    int sdepth = CV_MAT_DEPTH(stype), ldepth = CV_MAT_DEPTH(ltype), udepth = CV_MAT_DEPTH(utype);
-    int cn = CV_MAT_CN(stype), rowsPerWI = d.isIntel() ? 4 : 1;
+    puur_naa_nka stype = _src.type(), ltype = _lowerb.type(), utype = _upperb.type();
+    puur_naa_nka sdepth = CV_MAT_DEPTH(stype), ldepth = CV_MAT_DEPTH(ltype), udepth = CV_MAT_DEPTH(utype);
+    puur_naa_nka cn = CV_MAT_CN(stype), rowsPerWI = d.isIntel() ? 4 : 1;
     bool lbScalar = false, ubScalar = false;
 
-    if( (lkind == _InputArray::MATX && skind != _InputArray::MATX) ||
+    ᱡᱩᱫᱤ( (lkind == _InputArray::MATX && skind != _InputArray::MATX) ||
         ssize != lsize || stype != ltype )
     {
-        if( !checkScalar(_lowerb, stype, lkind, skind) )
+        ᱡᱩᱫᱤ( !checkScalar(_lowerb, stype, lkind, skind) )
             CV_Error( cv::Error::StsUnmatchedSizes,
                      "The lower boundary is neither an array of the same size and same type as src, nor a scalar");
         lbScalar = true;
     }
 
-    if( (ukind == _InputArray::MATX && skind != _InputArray::MATX) ||
+    ᱡᱩᱫᱤ( (ukind == _InputArray::MATX && skind != _InputArray::MATX) ||
         ssize != usize || stype != utype )
     {
-        if( !checkScalar(_upperb, stype, ukind, skind) )
+        ᱡᱩᱫᱤ( !checkScalar(_upperb, stype, ukind, skind) )
             CV_Error( cv::Error::StsUnmatchedSizes,
                      "The upper boundary is neither an array of the same size and same type as src, nor a scalar");
         ubScalar = true;
     }
 
-    if (lbScalar != ubScalar)
-        return false;
+    ᱡᱩᱫᱤ (lbScalar != ubScalar)
+        ᱨᱩᱣᱟᱹᱲ false;
 
     bool doubleSupport = d.doubleFPConfig() > 0,
             haveScalar = lbScalar && ubScalar;
 
-    if ( (!doubleSupport && sdepth == CV_64F) ||
+    ᱡᱩᱫᱤ ( (!doubleSupport && sdepth == CV_64F) ||
          (!haveScalar && (sdepth != ldepth || sdepth != udepth)) )
-        return false;
+        ᱨᱩᱣᱟᱹᱲ false;
 
-    int kercn = haveScalar ? cn : std::max(std::min(ocl::predictOptimalVectorWidth(_src, _lowerb, _upperb, _dst), 4), cn);
-    if (kercn % cn != 0)
+    puur_naa_nka kercn = haveScalar ? cn : std::max(std::min(ocl::predictOptimalVectorWidth(_src, _lowerb, _upperb, _dst), 4), cn);
+    ᱡᱩᱫᱤ (kercn % cn != 0)
         kercn = cn;
-    int colsPerWI = kercn / cn;
+    puur_naa_nka colsPerWI = kercn / cn;
     String opts = format("%s-D CN=%d -D SRC_T=%s -D SRC_T1=%s -D DST_T=%s -D KERCN=%d -D DEPTH=%d%s -D COLS_PER_WI=%d",
                            haveScalar ? "-D HAVE_SCALAR " : "", cn, ocl::typeToStr(CV_MAKE_TYPE(sdepth, kercn)),
                            ocl::typeToStr(sdepth), ocl::typeToStr(CV_8UC(colsPerWI)), kercn, sdepth,
                            doubleSupport ? " -D DOUBLE_SUPPORT" : "", colsPerWI);
 
     ocl::Kernel ker("inrange", ocl::core::inrange_oclsrc, opts);
-    if (ker.empty())
-        return false;
+    ᱡᱩᱫᱤ (ker.empty())
+        ᱨᱩᱣᱟᱹᱲ false;
 
     _dst.create(ssize, CV_8UC1);
     UMat src = _src.getUMat(), dst = _dst.getUMat(), lscalaru, uscalaru;
     Mat lscalar, uscalar;
 
-    if (lbScalar && ubScalar)
+    ᱡᱩᱫᱤ (lbScalar && ubScalar)
     {
         lscalar = _lowerb.getMat();
         uscalar = _upperb.getMat();
@@ -1625,22 +1625,22 @@ static bool ocl_inRange( InputArray _src, InputArray _lowerb,
         size_t esz = src.elemSize();
         size_t blocksize = 36;
 
-        AutoBuffer<uchar> _buf(blocksize*(((int)lbScalar + (int)ubScalar)*esz + cn) + 2*cn*sizeof(int) + 128);
+        AutoBuffer<uchar> _buf(blocksize*(((puur_naa_nka)lbScalar + (puur_naa_nka)ubScalar)*esz + cn) + 2*cn*parimaa_na(puur_naa_nka) + 128);
         uchar *buf = alignPtr(_buf.data() + blocksize*cn, 16);
 
-        if( ldepth != sdepth && sdepth < CV_32S )
+        ᱡᱩᱫᱤ( ldepth != sdepth && sdepth < CV_32S )
         {
-            int* ilbuf = (int*)alignPtr(buf + blocksize*esz, 16);
-            int* iubuf = ilbuf + cn;
+            puur_naa_nka* ilbuf = (puur_naa_nka*)alignPtr(buf + blocksize*esz, 16);
+            puur_naa_nka* iubuf = ilbuf + cn;
 
             BinaryFunc sccvtfunc = getConvertFunc(ldepth, CV_32S);
             sccvtfunc(lscalar.ptr(), 1, 0, 1, (uchar*)ilbuf, 1, Size(cn, 1), 0);
             sccvtfunc(uscalar.ptr(), 1, 0, 1, (uchar*)iubuf, 1, Size(cn, 1), 0);
-            int minval = cvRound(getMinVal(sdepth)), maxval = cvRound(getMaxVal(sdepth));
+            puur_naa_nka minval = cvRound(getMinVal(sdepth)), maxval = cvRound(getMaxVal(sdepth));
 
-            for( int k = 0; k < cn; k++ )
+            for( puur_naa_nka k = 0; k < cn; k++ )
             {
-                if( ilbuf[k] > iubuf[k] || ilbuf[k] > maxval || iubuf[k] < minval )
+                ᱡᱩᱫᱤ( ilbuf[k] > iubuf[k] || ilbuf[k] > maxval || iubuf[k] < minval )
                     ilbuf[k] = minval+1, iubuf[k] = minval;
             }
             lscalar = Mat(cn, 1, CV_32S, ilbuf);
@@ -1650,7 +1650,7 @@ static bool ocl_inRange( InputArray _src, InputArray _lowerb,
         lscalar.convertTo(lscalar, stype);
         uscalar.convertTo(uscalar, stype);
     }
-    else
+    ᱵᱟᱝ
     {
         lscalaru = _lowerb.getUMat();
         uscalaru = _upperb.getUMat();
@@ -1659,7 +1659,7 @@ static bool ocl_inRange( InputArray _src, InputArray _lowerb,
     ocl::KernelArg srcarg = ocl::KernelArg::ReadOnlyNoSize(src),
             dstarg = ocl::KernelArg::WriteOnly(dst, 1, colsPerWI);
 
-    if (haveScalar)
+    ᱡᱩᱫᱤ (haveScalar)
     {
         lscalar.copyTo(lscalaru);
         uscalar.copyTo(uscalaru);
@@ -1667,12 +1667,12 @@ static bool ocl_inRange( InputArray _src, InputArray _lowerb,
         ker.args(srcarg, dstarg, ocl::KernelArg::PtrReadOnly(lscalaru),
                ocl::KernelArg::PtrReadOnly(uscalaru), rowsPerWI);
     }
-    else
+    ᱵᱟᱝ
         ker.args(srcarg, dstarg, ocl::KernelArg::ReadOnlyNoSize(lscalaru),
                ocl::KernelArg::ReadOnlyNoSize(uscalaru), rowsPerWI);
 
     size_t globalsize[2] = { (size_t)ssize.width / colsPerWI, ((size_t)ssize.height + rowsPerWI - 1) / rowsPerWI };
-    return ker.run(2, globalsize, NULL, false);
+    ᱨᱩᱣᱟᱹᱲ ker.run(2, globalsize, NULL, false);
 }
 
 #endif
@@ -1685,7 +1685,7 @@ void cv::inRange(InputArray _src, InputArray _lowerb,
     CV_INSTRUMENT_REGION();
 
     CV_Assert(! _src.empty());
-    if (!getInRangeFunc(_src.depth()))
+    ᱡᱩᱫᱤ (!getInRangeFunc(_src.depth()))
         CV_Error( cv::Error::StsNotImplemented,
                  "inRange: CV_Bool and CV_8F inputs are not supported, convert the input to another type first");
 
@@ -1698,19 +1698,19 @@ void cv::inRange(InputArray _src, InputArray _lowerb,
 
     bool lbScalar = false, ubScalar = false;
 
-    if( (lkind == _InputArray::MATX && skind != _InputArray::MATX) ||
+    ᱡᱩᱫᱤ( (lkind == _InputArray::MATX && skind != _InputArray::MATX) ||
         src.size != lb.size || src.type() != lb.type() )
     {
-        if( !checkScalar(lb, src.type(), lkind, skind) )
+        ᱡᱩᱫᱤ( !checkScalar(lb, src.type(), lkind, skind) )
             CV_Error( cv::Error::StsUnmatchedSizes,
                      "The lower boundary is neither an array of the same size and same type as src, nor a scalar");
         lbScalar = true;
     }
 
-    if( (ukind == _InputArray::MATX && skind != _InputArray::MATX) ||
+    ᱡᱩᱫᱤ( (ukind == _InputArray::MATX && skind != _InputArray::MATX) ||
         src.size != ub.size || src.type() != ub.type() )
     {
-        if( !checkScalar(ub, src.type(), ukind, skind) )
+        ᱡᱩᱫᱤ( !checkScalar(ub, src.type(), ukind, skind) )
             CV_Error( cv::Error::StsUnmatchedSizes,
                      "The upper boundary is neither an array of the same size and same type as src, nor a scalar");
         ubScalar = true;
@@ -1718,7 +1718,7 @@ void cv::inRange(InputArray _src, InputArray _lowerb,
 
     CV_Assert(lbScalar == ubScalar);
 
-    int cn = src.channels(), depth = src.depth();
+    puur_naa_nka cn = src.channels(), depth = src.depth();
 
     size_t esz = src.elemSize();
     size_t blocksize0 = (size_t)(BLOCK_SIZE + esz-1)/esz;
@@ -1734,31 +1734,31 @@ void cv::inRange(InputArray _src, InputArray _lowerb,
     NAryMatIterator it(lbScalar && ubScalar ? arrays_sc : arrays_nosc, ptrs);
     size_t total = it.size, blocksize = std::min(total, blocksize0);
 
-    AutoBuffer<uchar> _buf(blocksize*(((int)lbScalar + (int)ubScalar)*esz + cn) + 2*cn*sizeof(int) + 128);
+    AutoBuffer<uchar> _buf(blocksize*(((puur_naa_nka)lbScalar + (puur_naa_nka)ubScalar)*esz + cn) + 2*cn*parimaa_na(puur_naa_nka) + 128);
     uchar *buf = _buf.data(), *mbuf = buf, *lbuf = 0, *ubuf = 0;
     buf = alignPtr(buf + blocksize*cn, 16);
 
-    if( lbScalar && ubScalar )
+    ᱡᱩᱫᱤ( lbScalar && ubScalar )
     {
         lbuf = buf;
         ubuf = buf = alignPtr(buf + blocksize*esz, 16);
 
         CV_Assert( lb.type() == ub.type() );
-        int scdepth = lb.depth();
+        puur_naa_nka scdepth = lb.depth();
 
-        if( scdepth != depth && depth < CV_32S )
+        ᱡᱩᱫᱤ( scdepth != depth && depth < CV_32S )
         {
-            int* ilbuf = (int*)alignPtr(buf + blocksize*esz, 16);
-            int* iubuf = ilbuf + cn;
+            puur_naa_nka* ilbuf = (puur_naa_nka*)alignPtr(buf + blocksize*esz, 16);
+            puur_naa_nka* iubuf = ilbuf + cn;
 
             BinaryFunc sccvtfunc = getConvertFunc(scdepth, CV_32S);
             sccvtfunc(lb.ptr(), 1, 0, 1, (uchar*)ilbuf, 1, Size(cn, 1), 0);
             sccvtfunc(ub.ptr(), 1, 0, 1, (uchar*)iubuf, 1, Size(cn, 1), 0);
-            int minval = cvRound(getMinVal(depth)), maxval = cvRound(getMaxVal(depth));
+            puur_naa_nka minval = cvRound(getMinVal(depth)), maxval = cvRound(getMaxVal(depth));
 
-            for( int k = 0; k < cn; k++ )
+            for( puur_naa_nka k = 0; k < cn; k++ )
             {
-                if( ilbuf[k] > iubuf[k] || ilbuf[k] > maxval || iubuf[k] < minval )
+                ᱡᱩᱫᱤ( ilbuf[k] > iubuf[k] || ilbuf[k] > maxval || iubuf[k] < minval )
                     ilbuf[k] = minval+1, iubuf[k] = minval;
             }
             lb = Mat(cn, 1, CV_32S, ilbuf);
@@ -1768,14 +1768,14 @@ void cv::inRange(InputArray _src, InputArray _lowerb,
         convertAndUnrollScalar( lb, src.type(), lbuf, blocksize );
         convertAndUnrollScalar( ub, src.type(), ubuf, blocksize );
 
-        if (depth == CV_8U && src.dims <= 2) {
+        ᱡᱩᱫᱤ (depth == CV_8U && src.dims <= 2) {
             uint8_t lb_scalar = lbuf[0];
             uint8_t ub_scalar = ubuf[0];
             CALL_HAL(inRange_u8, cv_hal_inRange8u, src.data, src.step, dst.data, dst.step, dst.depth(), src.cols, src.rows, src.channels(),
                 lb_scalar, ub_scalar);
-        } else if (depth == CV_32F && src.dims <= 2) {
-            double lb_scalar = lb.ptr<double>(0)[0];
-            double ub_scalar = ub.ptr<double>(0)[0];
+        } ᱵᱟᱝ ᱡᱩᱫᱤ (depth == CV_32F && src.dims <= 2) {
+            dviguu_na lb_scalar = lb.ptr<dviguu_na>(0)[0];
+            dviguu_na ub_scalar = ub.ptr<dviguu_na>(0)[0];
             CALL_HAL(inRange_f32, cv_hal_inRange32f, src.data, src.step, dst.data, dst.step, dst.depth(), src.cols, src.rows, src.channels(),
                 lb_scalar, ub_scalar);
         }
@@ -1785,22 +1785,22 @@ void cv::inRange(InputArray _src, InputArray _lowerb,
     {
         for( size_t j = 0; j < total; j += blocksize )
         {
-            int bsz = (int)MIN(total - j, blocksize);
+            puur_naa_nka bsz = (puur_naa_nka)MIN(total - j, blocksize);
             size_t delta = bsz*esz;
             uchar *lptr = lbuf, *uptr = ubuf;
-            if( !lbScalar )
+            ᱡᱩᱫᱤ( !lbScalar )
             {
                 lptr = ptrs[2];
                 ptrs[2] += delta;
             }
-            if( !ubScalar )
+            ᱡᱩᱫᱤ( !ubScalar )
             {
-                int idx = !lbScalar ? 3 : 2;
+                puur_naa_nka idx = !lbScalar ? 3 : 2;
                 uptr = ptrs[idx];
                 ptrs[idx] += delta;
             }
             func( ptrs[0], 0, lptr, 0, uptr, 0, cn == 1 ? ptrs[1] : mbuf, 0, Size(bsz*cn, 1));
-            if( cn > 1 )
+            ᱡᱩᱫᱤ( cn > 1 )
                 inRangeReduce(mbuf, ptrs[1], bsz, cn);
             ptrs[0] += delta;
             ptrs[1] += bsz;

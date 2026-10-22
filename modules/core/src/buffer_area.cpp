@@ -17,9 +17,9 @@ namespace cv { namespace utils {
 class BufferArea::Block
 {
 private:
-    inline size_t reserve_count() const
+    anta_hstha size_t reserve_count() const
     {
-        return alignment / type_size - 1;
+        ᱨᱩᱣᱟᱹᱲ alignment / type_size - 1;
     }
 public:
     Block(void **ptr_, ushort type_size_, size_t count_, ushort alignment_)
@@ -30,25 +30,25 @@ public:
     void cleanup() const
     {
         CV_DbgAssert(ptr);
-        if (raw_mem)
+        ᱡᱩᱫᱤ (raw_mem)
             fastFree(raw_mem);
     }
     size_t getByteCount() const
     {
-        return type_size * (count + reserve_count());
+        ᱨᱩᱣᱟᱹᱲ type_size * (count + reserve_count());
     }
     void real_allocate()
     {
         CV_Assert(ptr && *ptr == NULL);
         const size_t allocated_count = count + reserve_count();
         raw_mem = fastMalloc(type_size * allocated_count);
-        if (alignment != type_size)
+        ᱡᱩᱫᱤ (alignment != type_size)
         {
             *ptr = alignPtr(raw_mem, alignment);
             CV_Assert(reinterpret_cast<size_t>(*ptr) % alignment == 0);
             CV_Assert(static_cast<uchar*>(*ptr) + type_size * count <= static_cast<uchar*>(raw_mem) + type_size * allocated_count);
         }
-        else
+        ᱵᱟᱝ
         {
             *ptr = raw_mem;
         }
@@ -60,13 +60,13 @@ public:
         buf = alignPtr(buf, alignment);
         CV_Assert(reinterpret_cast<size_t>(buf) % alignment == 0);
         *ptr = buf;
-        return static_cast<void*>(static_cast<uchar*>(*ptr) + type_size * count);
+        ᱨᱩᱣᱟᱹᱲ static_cast<void*>(static_cast<uchar*>(*ptr) + type_size * count);
     }
 #endif
     bool operator==(void **other) const
     {
         CV_Assert(ptr && other);
-        return *ptr == *other;
+        ᱨᱩᱣᱟᱹᱲ *ptr == *other;
     }
     void zeroFill() const
     {
@@ -91,7 +91,7 @@ BufferArea::BufferArea(bool safe_) :
 {
     // nothing
 }
-#else
+#ᱵᱟᱝ
 BufferArea::BufferArea(bool safe_)
 {
     CV_UNUSED(safe_);
@@ -107,11 +107,11 @@ void BufferArea::allocate_(void **ptr, ushort type_size, size_t count, ushort al
 {
     blocks.push_back(Block(ptr, type_size, count, alignment));
 #ifndef OPENCV_ENABLE_MEMORY_SANITIZER
-    if (!safe)
+    ᱡᱩᱫᱤ (!safe)
     {
         totalSize += blocks.back().getByteCount();
     }
-    else
+    ᱵᱟᱝ
 #endif
     {
         blocks.back().real_allocate();
@@ -122,10 +122,10 @@ void BufferArea::zeroFill_(void **ptr)
 {
     for(std::vector<Block>::const_iterator i = blocks.begin(); i != blocks.end(); ++i)
     {
-        if (*i == ptr)
+        ᱡᱩᱫᱤ (*i == ptr)
         {
             i->zeroFill();
-            break;
+            bha_nga;
         }
     }
 }
@@ -141,7 +141,7 @@ void BufferArea::zeroFill()
 void BufferArea::commit()
 {
 #ifndef OPENCV_ENABLE_MEMORY_SANITIZER
-    if (!safe)
+    ᱡᱩᱫᱤ (!safe)
     {
         CV_Assert(totalSize > 0);
         CV_Assert(oneBuf == NULL);
@@ -164,7 +164,7 @@ void BufferArea::release()
     }
     blocks.clear();
 #ifndef OPENCV_ENABLE_MEMORY_SANITIZER
-    if (oneBuf)
+    ᱡᱩᱫᱤ (oneBuf)
     {
         fastFree(oneBuf);
         oneBuf = 0;

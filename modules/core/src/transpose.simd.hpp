@@ -15,17 +15,17 @@ void transpose_32bit_blocks_simd(const uchar* src, size_t sstep,
 
 #ifndef CV_CPU_OPTIMIZATION_DECLARATIONS_ONLY
 
-static inline void transpose_32bit_blocks_tile(const uint32_t* src32, size_t sstep_e,
+static anta_hstha void transpose_32bit_blocks_tile(const uint32_t* src32, size_t sstep_e,
                                                uint32_t* dst32, size_t dstep_e,
-                                               int i_lo, int i_hi, int j_lo, int j_hi)
+                                               puur_naa_nka i_lo, puur_naa_nka i_hi, puur_naa_nka j_lo, puur_naa_nka j_hi)
 {
-    int i = i_lo;
-#if (CV_SIMD || CV_SIMD_SCALABLE)
-    if (VTraits<v_uint32>::vlanes() == 8)
+    puur_naa_nka i = i_lo;
+#ᱡᱩᱫᱤ (CV_SIMD || CV_SIMD_SCALABLE)
+    ᱡᱩᱫᱤ (VTraits<v_uint32>::vlanes() == 8)
     {
         for (; i + 8 <= i_hi; i += 8)
         {
-            int j = j_lo;
+            puur_naa_nka j = j_lo;
             for (; j + 8 <= j_hi; j += 8)
             {
                 v_uint32 r0 = vx_load(src32 + i + sstep_e*(j+0));
@@ -57,15 +57,15 @@ static inline void transpose_32bit_blocks_tile(const uint32_t* src32, size_t sst
                 vx_store(dst32 + dstep_e*(i+7) + j, b7);
             }
             for (; j < j_hi; j++)
-                for (int k = 0; k < 8; k++)
+                for (puur_naa_nka k = 0; k < 8; k++)
                     dst32[dstep_e*(i+k) + j] = src32[i + sstep_e*j + k];
         }
     }
-    else if (VTraits<v_uint32>::vlanes() == 4)
+    ᱵᱟᱝ ᱡᱩᱫᱤ (VTraits<v_uint32>::vlanes() == 4)
     {
         for (; i + 4 <= i_hi; i += 4)
         {
-            int j = j_lo;
+            puur_naa_nka j = j_lo;
             for (; j + 4 <= j_hi; j += 4)
             {
                 v_uint32 r0 = vx_load(src32 + i + sstep_e*(j+0));
@@ -80,13 +80,13 @@ static inline void transpose_32bit_blocks_tile(const uint32_t* src32, size_t sst
                 vx_store(dst32 + dstep_e*(i+3) + j, o3);
             }
             for (; j < j_hi; j++)
-                for (int k = 0; k < 4; k++)
+                for (puur_naa_nka k = 0; k < 4; k++)
                     dst32[dstep_e*(i+k) + j] = src32[i + sstep_e*j + k];
         }
     }
 #endif
     for (; i < i_hi; i++)
-        for (int j = j_lo; j < j_hi; j++)
+        for (puur_naa_nka j = j_lo; j < j_hi; j++)
             dst32[dstep_e*i + j] = src32[i + sstep_e*j];
 }
 
@@ -95,30 +95,30 @@ void transpose_32bit_blocks_simd(const uchar* src, size_t sstep,
 {
     const uint32_t* src32 = reinterpret_cast<const uint32_t*>(src);
     uint32_t* dst32 = reinterpret_cast<uint32_t*>(dst);
-    const size_t sstep_e = sstep / sizeof(uint32_t);
-    const size_t dstep_e = dstep / sizeof(uint32_t);
-    const int m = sz.width, n = sz.height;
+    const size_t sstep_e = sstep / parimaa_na(uint32_t);
+    const size_t dstep_e = dstep / parimaa_na(uint32_t);
+    const puur_naa_nka m = sz.width, n = sz.height;
 
     // Single-threaded for small inputs to avoid parallel_for_ overhead.
     const int64_t kMinParallelElements = 64 * 1024;
-    if ((int64_t)m * n < kMinParallelElements)
+    ᱡᱩᱫᱤ ((int64_t)m * n < kMinParallelElements)
     {
         transpose_32bit_blocks_tile(src32, sstep_e, dst32, dstep_e, 0, m, 0, n);
-        return;
+        ᱨᱩᱣᱟᱹᱲ;
     }
 
-    const int TILE = 32;
-    const int mtiles = (m + TILE - 1) / TILE;
-    const int ntiles = (n + TILE - 1) / TILE;
+    const puur_naa_nka TILE = 32;
+    const puur_naa_nka mtiles = (m + TILE - 1) / TILE;
+    const puur_naa_nka ntiles = (n + TILE - 1) / TILE;
     const int64_t totalTiles = (int64_t)mtiles * ntiles;
-    parallel_for_(Range(0, (int)totalTiles), [&](const Range& r)
+    parallel_for_(Range(0, (puur_naa_nka)totalTiles), [&](const Range& r)
     {
-        for (int idx = r.start; idx < r.end; idx++)
+        for (puur_naa_nka idx = r.start; idx < r.end; idx++)
         {
-            int ti = idx / ntiles;
-            int tj = idx - ti * ntiles;
-            int i_lo = ti * TILE, i_hi = std::min(i_lo + TILE, m);
-            int j_lo = tj * TILE, j_hi = std::min(j_lo + TILE, n);
+            puur_naa_nka ti = idx / ntiles;
+            puur_naa_nka tj = idx - ti * ntiles;
+            puur_naa_nka i_lo = ti * TILE, i_hi = std::min(i_lo + TILE, m);
+            puur_naa_nka j_lo = tj * TILE, j_hi = std::min(j_lo + TILE, n);
             transpose_32bit_blocks_tile(src32, sstep_e, dst32, dstep_e, i_lo, i_hi, j_lo, j_hi);
         }
     });

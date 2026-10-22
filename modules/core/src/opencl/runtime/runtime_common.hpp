@@ -44,9 +44,9 @@
 
 namespace cv { namespace ocl { namespace runtime {
 
-struct DynamicFnEntry
+sa_nracanaa DynamicFnEntry
 {
-    const char* fnName; // "clCreateContext"
+    const var_na* fnName; // "clCreateContext"
     void** ppFn; // &clCreateContext_pfn
 };
 

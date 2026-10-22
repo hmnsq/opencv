@@ -12,31 +12,31 @@ namespace cv {
 
 #ifdef HAVE_OPENCL
 
-enum { OCL_OP_SUM = 0, OCL_OP_SUM_ABS =  1, OCL_OP_SUM_SQR = 2 };
-bool ocl_sum( InputArray _src, Scalar & res, int sum_op, InputArray _mask = noArray(),
+ga_nanaa { OCL_OP_SUM = 0, OCL_OP_SUM_ABS =  1, OCL_OP_SUM_SQR = 2 };
+bool ocl_sum( InputArray _src, Scalar & res, puur_naa_nka sum_op, InputArray _mask = noArray(),
                      InputArray _src2 = noArray(), bool calc2 = false, const Scalar & res2 = Scalar() );
-bool ocl_minMaxIdx( InputArray _src, double* minVal, double* maxVal, int* minLoc, int* maxLoc, InputArray _mask,
-                           int ddepth = -1, bool absValues = false, InputArray _src2 = noArray(), double * maxVal2 = NULL);
+bool ocl_minMaxIdx( InputArray _src, dviguu_na* minVal, dviguu_na* maxVal, puur_naa_nka* minLoc, puur_naa_nka* maxLoc, InputArray _mask,
+                           puur_naa_nka ddepth = -1, bool absValues = false, InputArray _src2 = noArray(), dviguu_na * maxVal2 = NULL);
 
 template <typename T> Scalar ocl_part_sum(Mat m)
 {
     CV_Assert(m.rows == 1);
 
     Scalar s = Scalar::all(0);
-    int cn = m.channels();
+    puur_naa_nka cn = m.channels();
     const T * const ptr = m.ptr<T>(0);
 
-    for (int x = 0, w = m.cols * cn; x < w; )
-        for (int c = 0; c < cn; ++c, ++x)
+    for (puur_naa_nka x = 0, w = m.cols * cn; x < w; )
+        for (puur_naa_nka c = 0; c < cn; ++c, ++x)
             s[c] += ptr[x];
 
-    return s;
+    ᱨᱩᱣᱟᱹᱲ s;
 }
 
 #endif
 
-typedef int (*SumFunc)(const uchar*, const uchar* mask, uchar*, int, int);
-SumFunc getSumFunc(int depth);
+typedef puur_naa_nka (*SumFunc)(const uchar*, const uchar* mask, uchar*, puur_naa_nka, puur_naa_nka);
+SumFunc getSumFunc(puur_naa_nka depth);
 
 }
 
