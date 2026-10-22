@@ -39,56 +39,56 @@
 //
 //M*/
 
-#include "precomp.hpp"
+#ضمن "precomp.hpp"
 
-#include "opencv2/core.hpp"
-#include "opencv2/core/ocl.hpp"
-#include "opencv2/core/directx.hpp"
-#include "opencl_kernels_core.hpp"
+#ضمن "opencv2/core.hpp"
+#ضمن "opencv2/core/ocl.hpp"
+#ضمن "opencv2/core/directx.hpp"
+#ضمن "opencl_kernels_core.hpp"
 
-#ifdef HAVE_DIRECTX
-#include <vector>
-#include "directx.inc.hpp"
-#else // HAVE_DIRECTX
-#define NO_DIRECTX_SUPPORT_ERROR CV_Error(cv::Error::StsBadFunc, "OpenCV was build without DirectX support")
-#endif
+#که_تعریف_شوی HAVE_DIRECTX
+#ضمن <vector>
+#ضمن "directx.inc.hpp"
+#وإلا // HAVE_DIRECTX
+#تعریف_کړه NO_DIRECTX_SUPPORT_ERROR CV_Error(cv::Error::StsBadFunc, "OpenCV was build without DirectX support")
+#د_که_پای
 
-#ifndef HAVE_OPENCL
-#define NO_OPENCL_SUPPORT_ERROR CV_Error(cv::Error::StsBadFunc, "OpenCV was build without OpenCL support")
-#endif // HAVE_OPENCL
+#که_نه_تعریف_شوی HAVE_OPENCL
+#تعریف_کړه NO_OPENCL_SUPPORT_ERROR CV_Error(cv::Error::StsBadFunc, "OpenCV was build without OpenCL support")
+#د_که_پای // HAVE_OPENCL
 
-using namespace cv::ocl;
+کارول نطاق cv::ocl;
 
-namespace cv { namespace directx {
+نطاق cv { نطاق directx {
 
-int getTypeFromDXGI_FORMAT(const int iDXGI_FORMAT)
+صحيح getTypeFromDXGI_FORMAT(ثابت صحيح iDXGI_FORMAT)
 {
-    CV_UNUSED(iDXGI_FORMAT);
-#if !defined(HAVE_DIRECTX)
+    CV_ناکارول_شوی(iDXGI_FORMAT);
+#إذا !defined(HAVE_DIRECTX)
     NO_DIRECTX_SUPPORT_ERROR;
-#else
-    const int errorType = -1;
-    switch ((enum DXGI_FORMAT)iDXGI_FORMAT)
+#وإلا
+    ثابت صحيح errorType = -1;
+    بدل ((تعداد DXGI_FORMAT)iDXGI_FORMAT)
     {
     //case DXGI_FORMAT_UNKNOWN:
     //case DXGI_FORMAT_R32G32B32A32_TYPELESS:
-    case DXGI_FORMAT_R32G32B32A32_FLOAT: return CV_32FC4;
-    case DXGI_FORMAT_R32G32B32A32_UINT:
-    case DXGI_FORMAT_R32G32B32A32_SINT:  return CV_32SC4;
+    حالة DXGI_FORMAT_R32G32B32A32_FLOAT: أرجع CV_32FC4;
+    حالة DXGI_FORMAT_R32G32B32A32_UINT:
+    حالة DXGI_FORMAT_R32G32B32A32_SINT:  أرجع CV_32SC4;
     //case DXGI_FORMAT_R32G32B32_TYPELESS:
-    case DXGI_FORMAT_R32G32B32_FLOAT: return CV_32FC3;
-    case DXGI_FORMAT_R32G32B32_UINT:
-    case DXGI_FORMAT_R32G32B32_SINT: return CV_32SC3;
+    حالة DXGI_FORMAT_R32G32B32_FLOAT: أرجع CV_32FC3;
+    حالة DXGI_FORMAT_R32G32B32_UINT:
+    حالة DXGI_FORMAT_R32G32B32_SINT: أرجع CV_32SC3;
     //case DXGI_FORMAT_R16G16B16A16_TYPELESS:
-    case DXGI_FORMAT_R16G16B16A16_FLOAT: return CV_16FC4;
-    case DXGI_FORMAT_R16G16B16A16_UNORM:
-    case DXGI_FORMAT_R16G16B16A16_UINT: return CV_16UC4;
-    case DXGI_FORMAT_R16G16B16A16_SNORM:
-    case DXGI_FORMAT_R16G16B16A16_SINT: return CV_16SC4;
+    حالة DXGI_FORMAT_R16G16B16A16_FLOAT: أرجع CV_16FC4;
+    حالة DXGI_FORMAT_R16G16B16A16_UNORM:
+    حالة DXGI_FORMAT_R16G16B16A16_UINT: أرجع CV_16UC4;
+    حالة DXGI_FORMAT_R16G16B16A16_SNORM:
+    حالة DXGI_FORMAT_R16G16B16A16_SINT: أرجع CV_16SC4;
     //case DXGI_FORMAT_R32G32_TYPELESS:
-    case DXGI_FORMAT_R32G32_FLOAT: return CV_32FC2;
-    case DXGI_FORMAT_R32G32_UINT:
-    case DXGI_FORMAT_R32G32_SINT: return CV_32SC2;
+    حالة DXGI_FORMAT_R32G32_FLOAT: أرجع CV_32FC2;
+    حالة DXGI_FORMAT_R32G32_UINT:
+    حالة DXGI_FORMAT_R32G32_SINT: أرجع CV_32SC2;
     //case DXGI_FORMAT_R32G8X24_TYPELESS:
     //case DXGI_FORMAT_D32_FLOAT_S8X24_UINT:
     //case DXGI_FORMAT_R32_FLOAT_X8X24_TYPELESS:
@@ -98,48 +98,48 @@ int getTypeFromDXGI_FORMAT(const int iDXGI_FORMAT)
     //case DXGI_FORMAT_R10G10B10A2_UINT:
     //case DXGI_FORMAT_R11G11B10_FLOAT:
     //case DXGI_FORMAT_R8G8B8A8_TYPELESS:
-    case DXGI_FORMAT_R8G8B8A8_UNORM:
-    case DXGI_FORMAT_R8G8B8A8_UNORM_SRGB:
-    case DXGI_FORMAT_R8G8B8A8_UINT: return CV_8UC4;
-    case DXGI_FORMAT_R8G8B8A8_SNORM:
-    case DXGI_FORMAT_R8G8B8A8_SINT: return CV_8SC4;
+    حالة DXGI_FORMAT_R8G8B8A8_UNORM:
+    حالة DXGI_FORMAT_R8G8B8A8_UNORM_SRGB:
+    حالة DXGI_FORMAT_R8G8B8A8_UINT: أرجع CV_8UC4;
+    حالة DXGI_FORMAT_R8G8B8A8_SNORM:
+    حالة DXGI_FORMAT_R8G8B8A8_SINT: أرجع CV_8SC4;
     //case DXGI_FORMAT_R16G16_TYPELESS:
-    case DXGI_FORMAT_R16G16_FLOAT: return CV_16FC2;
-    case DXGI_FORMAT_R16G16_UNORM:
-    case DXGI_FORMAT_R16G16_UINT: return CV_16UC2;
-    case DXGI_FORMAT_R16G16_SNORM:
-    case DXGI_FORMAT_R16G16_SINT: return CV_16SC2;
+    حالة DXGI_FORMAT_R16G16_FLOAT: أرجع CV_16FC2;
+    حالة DXGI_FORMAT_R16G16_UNORM:
+    حالة DXGI_FORMAT_R16G16_UINT: أرجع CV_16UC2;
+    حالة DXGI_FORMAT_R16G16_SNORM:
+    حالة DXGI_FORMAT_R16G16_SINT: أرجع CV_16SC2;
     //case DXGI_FORMAT_R32_TYPELESS:
-    case DXGI_FORMAT_D32_FLOAT:
-    case DXGI_FORMAT_R32_FLOAT: return CV_32FC1;
-    case DXGI_FORMAT_R32_UINT:
-    case DXGI_FORMAT_R32_SINT: return CV_32SC1;
+    حالة DXGI_FORMAT_D32_FLOAT:
+    حالة DXGI_FORMAT_R32_FLOAT: أرجع CV_32FC1;
+    حالة DXGI_FORMAT_R32_UINT:
+    حالة DXGI_FORMAT_R32_SINT: أرجع CV_32SC1;
     //case DXGI_FORMAT_R24G8_TYPELESS:
     //case DXGI_FORMAT_D24_UNORM_S8_UINT:
     //case DXGI_FORMAT_R24_UNORM_X8_TYPELESS:
     //case DXGI_FORMAT_X24_TYPELESS_G8_UINT:
     //case DXGI_FORMAT_R8G8_TYPELESS:
-    case DXGI_FORMAT_R8G8_UNORM:
-    case DXGI_FORMAT_R8G8_UINT: return CV_8UC2;
-    case DXGI_FORMAT_R8G8_SNORM:
-    case DXGI_FORMAT_R8G8_SINT: return CV_8SC2;
+    حالة DXGI_FORMAT_R8G8_UNORM:
+    حالة DXGI_FORMAT_R8G8_UINT: أرجع CV_8UC2;
+    حالة DXGI_FORMAT_R8G8_SNORM:
+    حالة DXGI_FORMAT_R8G8_SINT: أرجع CV_8SC2;
     //case DXGI_FORMAT_R16_TYPELESS:
-    case DXGI_FORMAT_R16_FLOAT: return CV_16FC1;
-    case DXGI_FORMAT_D16_UNORM:
-    case DXGI_FORMAT_R16_UNORM:
-    case DXGI_FORMAT_R16_UINT: return CV_16UC1;
-    case DXGI_FORMAT_R16_SNORM:
-    case DXGI_FORMAT_R16_SINT: return CV_16SC1;
+    حالة DXGI_FORMAT_R16_FLOAT: أرجع CV_16FC1;
+    حالة DXGI_FORMAT_D16_UNORM:
+    حالة DXGI_FORMAT_R16_UNORM:
+    حالة DXGI_FORMAT_R16_UINT: أرجع CV_16UC1;
+    حالة DXGI_FORMAT_R16_SNORM:
+    حالة DXGI_FORMAT_R16_SINT: أرجع CV_16SC1;
     //case DXGI_FORMAT_R8_TYPELESS:
-    case DXGI_FORMAT_R8_UNORM:
-    case DXGI_FORMAT_R8_UINT: return CV_8UC1;
-    case DXGI_FORMAT_R8_SNORM:
-    case DXGI_FORMAT_R8_SINT: return CV_8SC1;
-    case DXGI_FORMAT_A8_UNORM: return CV_8UC1;
+    حالة DXGI_FORMAT_R8_UNORM:
+    حالة DXGI_FORMAT_R8_UINT: أرجع CV_8UC1;
+    حالة DXGI_FORMAT_R8_SNORM:
+    حالة DXGI_FORMAT_R8_SINT: أرجع CV_8SC1;
+    حالة DXGI_FORMAT_A8_UNORM: أرجع CV_8UC1;
     //case DXGI_FORMAT_R1_UNORM:
     //case DXGI_FORMAT_R9G9B9E5_SHAREDEXP:
-    case DXGI_FORMAT_R8G8_B8G8_UNORM:
-    case DXGI_FORMAT_G8R8_G8B8_UNORM: return CV_8UC4;
+    حالة DXGI_FORMAT_R8G8_B8G8_UNORM:
+    حالة DXGI_FORMAT_G8R8_G8B8_UNORM: أرجع CV_8UC4;
     //case DXGI_FORMAT_BC1_TYPELESS:
     //case DXGI_FORMAT_BC1_UNORM:
     //case DXGI_FORMAT_BC1_UNORM_SRGB:
@@ -157,251 +157,251 @@ int getTypeFromDXGI_FORMAT(const int iDXGI_FORMAT)
     //case DXGI_FORMAT_BC5_SNORM:
     //case DXGI_FORMAT_B5G6R5_UNORM:
     //case DXGI_FORMAT_B5G5R5A1_UNORM:
-    case DXGI_FORMAT_B8G8R8A8_UNORM:
-    case DXGI_FORMAT_B8G8R8X8_UNORM: return CV_8UC4;
+    حالة DXGI_FORMAT_B8G8R8A8_UNORM:
+    حالة DXGI_FORMAT_B8G8R8X8_UNORM: أرجع CV_8UC4;
     //case DXGI_FORMAT_R10G10B10_XR_BIAS_A2_UNORM:
     //case DXGI_FORMAT_B8G8R8A8_TYPELESS:
-    case DXGI_FORMAT_B8G8R8A8_UNORM_SRGB: return CV_8UC4;
+    حالة DXGI_FORMAT_B8G8R8A8_UNORM_SRGB: أرجع CV_8UC4;
     //case DXGI_FORMAT_B8G8R8X8_TYPELESS:
-    case DXGI_FORMAT_B8G8R8X8_UNORM_SRGB: return CV_8UC4;
+    حالة DXGI_FORMAT_B8G8R8X8_UNORM_SRGB: أرجع CV_8UC4;
     //case DXGI_FORMAT_BC6H_TYPELESS:
     //case DXGI_FORMAT_BC6H_UF16:
     //case DXGI_FORMAT_BC6H_SF16:
     //case DXGI_FORMAT_BC7_TYPELESS:
     //case DXGI_FORMAT_BC7_UNORM:
     //case DXGI_FORMAT_BC7_UNORM_SRGB:
-#ifdef HAVE_DIRECTX_NV12 //D3DX11 should support DXGI_FORMAT_NV12.
-    case DXGI_FORMAT_NV12: return CV_8UC3;
-#endif
-    default: break;
+#که_تعریف_شوی HAVE_DIRECTX_NV12 //D3DX11 should support DXGI_FORMAT_NV12.
+    حالة DXGI_FORMAT_NV12: أرجع CV_8UC3;
+#د_که_پای
+    افتراضي: اكسر;
     }
-    return errorType;
-#endif
+    أرجع errorType;
+#د_که_پای
 }
 
-int getTypeFromD3DFORMAT(const int iD3DFORMAT)
+صحيح getTypeFromD3DFORMAT(ثابت صحيح iD3DFORMAT)
 {
-    CV_UNUSED(iD3DFORMAT);
-#if !defined(HAVE_DIRECTX)
+    CV_ناکارول_شوی(iD3DFORMAT);
+#إذا !defined(HAVE_DIRECTX)
     NO_DIRECTX_SUPPORT_ERROR;
-#else
-    const int errorType = -1;
-    switch ((enum _D3DFORMAT)iD3DFORMAT)
+#وإلا
+    ثابت صحيح errorType = -1;
+    بدل ((تعداد _D3DFORMAT)iD3DFORMAT)
     {
     //case D3DFMT_UNKNOWN:
-    case D3DFMT_R8G8B8: return CV_8UC3;
-    case D3DFMT_A8R8G8B8:
-    case D3DFMT_X8R8G8B8: return CV_8UC4;
+    حالة D3DFMT_R8G8B8: أرجع CV_8UC3;
+    حالة D3DFMT_A8R8G8B8:
+    حالة D3DFMT_X8R8G8B8: أرجع CV_8UC4;
     //case D3DFMT_R5G6B5:
     //case D3DFMT_X1R5G5B5:
     //case D3DFMT_A1R5G5B5:
     //case D3DFMT_A4R4G4B4:
     //case D3DFMT_R3G3B2:
-    case D3DFMT_A8: return CV_8UC1;
+    حالة D3DFMT_A8: أرجع CV_8UC1;
     //case D3DFMT_A8R3G3B2:
     //case D3DFMT_X4R4G4B4:
     //case D3DFMT_A2B10G10R10:
-    case D3DFMT_A8B8G8R8:
-    case D3DFMT_X8B8G8R8: return CV_8UC4;
+    حالة D3DFMT_A8B8G8R8:
+    حالة D3DFMT_X8B8G8R8: أرجع CV_8UC4;
     //case D3DFMT_G16R16:
     //case D3DFMT_A2R10G10B10:
     //case D3DFMT_A16B16G16R16:
 
-    case D3DFMT_A8P8: return CV_8UC2;
-    case D3DFMT_P8: return CV_8UC1;
+    حالة D3DFMT_A8P8: أرجع CV_8UC2;
+    حالة D3DFMT_P8: أرجع CV_8UC1;
 
-    case D3DFMT_L8: return CV_8UC1;
-    case D3DFMT_A8L8: return CV_8UC2;
+    حالة D3DFMT_L8: أرجع CV_8UC1;
+    حالة D3DFMT_A8L8: أرجع CV_8UC2;
     //case D3DFMT_A4L4:
 
-    case D3DFMT_V8U8: return CV_8UC2;
+    حالة D3DFMT_V8U8: أرجع CV_8UC2;
     //case D3DFMT_L6V5U5:
-    case D3DFMT_X8L8V8U8:
-    case D3DFMT_Q8W8V8U8: return CV_8UC4;
-    case D3DFMT_V16U16: return CV_16UC4; // TODO 16SC4 ?
+    حالة D3DFMT_X8L8V8U8:
+    حالة D3DFMT_Q8W8V8U8: أرجع CV_8UC4;
+    حالة D3DFMT_V16U16: أرجع CV_16UC4; // TODO 16SC4 ?
     //case D3DFMT_A2W10V10U10:
 
-    case D3DFMT_D16_LOCKABLE: return CV_16UC1;
-    case D3DFMT_D32: return CV_32SC1;
+    حالة D3DFMT_D16_LOCKABLE: أرجع CV_16UC1;
+    حالة D3DFMT_D32: أرجع CV_32SC1;
     //case D3DFMT_D15S1:
     //case D3DFMT_D24S8:
     //case D3DFMT_D24X8:
     //case D3DFMT_D24X4S4:
-    case D3DFMT_D16: return CV_16UC1;
+    حالة D3DFMT_D16: أرجع CV_16UC1;
 
-    case D3DFMT_D32F_LOCKABLE: return CV_32FC1;
-    default: break;
+    حالة D3DFMT_D32F_LOCKABLE: أرجع CV_32FC1;
+    افتراضي: اكسر;
     }
-    return errorType;
-#endif
+    أرجع errorType;
+#د_که_پای
 }
 
-#if defined(HAVE_DIRECTX) && defined(HAVE_OPENCL)
+#إذا defined(HAVE_DIRECTX) && defined(HAVE_OPENCL)
 
-#ifdef HAVE_OPENCL_D3D11_NV
-class OpenCL_D3D11_NV : public ocl::Context::UserContext
+#که_تعریف_شوی HAVE_OPENCL_D3D11_NV
+صنف OpenCL_D3D11_NV : عام ocl::Context::UserContext
 {
-public:
+عام:
     OpenCL_D3D11_NV(cl_platform_id platform, ID3D11Device*_device) : device(_device)
     {
         clCreateFromD3D11Texture2DNV = (clCreateFromD3D11Texture2DNV_fn)
-            clGetExtensionFunctionAddressForPlatform(platform, "clCreateFromD3D11Texture2DNV");
-        clEnqueueAcquireD3D11ObjectsNV = (clEnqueueAcquireD3D11ObjectsNV_fn)
-            clGetExtensionFunctionAddressForPlatform(platform, "clEnqueueAcquireD3D11ObjectsNV");
-        clEnqueueReleaseD3D11ObjectsNV = (clEnqueueReleaseD3D11ObjectsNV_fn)
-            clGetExtensionFunctionAddressForPlatform(platform, "clEnqueueReleaseD3D11ObjectsNV");
-        if (!clCreateFromD3D11Texture2DNV || !clEnqueueAcquireD3D11ObjectsNV || !clEnqueueReleaseD3D11ObjectsNV)
+            cl_Get_Extension_Function_پته_For_Platform(platform, "clCreateFromD3D11Texture2DNV");
+        cl_کتار_ته_ورزیاتول_Acquire_D3_D11_Objects_NV = (cl_کتار_ته_ورزیاتول_Acquire_D3_D11_Objects_NV_fn)
+            cl_Get_Extension_Function_پته_For_Platform(platform, "clEnqueueAcquireD3D11ObjectsNV");
+        cl_کتار_ته_ورزیاتول_Release_D3_D11_Objects_NV = (cl_کتار_ته_ورزیاتول_Release_D3_D11_Objects_NV_fn)
+            cl_Get_Extension_Function_پته_For_Platform(platform, "clEnqueueReleaseD3D11ObjectsNV");
+        إذا (!clCreateFromD3D11Texture2DNV || !cl_کتار_ته_ورزیاتول_Acquire_D3_D11_Objects_NV || !cl_کتار_ته_ورزیاتول_Release_D3_D11_Objects_NV)
         {
             CV_Error(cv::Error::OpenCLInitError, "OpenCL: Can't find functions for D3D11_NV");
         }
-        device->AddRef();
+        device->جمع_کړه_Ref();
     }
     ~OpenCL_D3D11_NV() {
         device->Release();
     }
     ID3D11Device* device;
     clCreateFromD3D11Texture2DNV_fn clCreateFromD3D11Texture2DNV;
-    clEnqueueAcquireD3D11ObjectsNV_fn clEnqueueAcquireD3D11ObjectsNV;
-    clEnqueueReleaseD3D11ObjectsNV_fn clEnqueueReleaseD3D11ObjectsNV;
+    cl_کتار_ته_ورزیاتول_Acquire_D3_D11_Objects_NV_fn cl_کتار_ته_ورزیاتول_Acquire_D3_D11_Objects_NV;
+    cl_کتار_ته_ورزیاتول_Release_D3_D11_Objects_NV_fn cl_کتار_ته_ورزیاتول_Release_D3_D11_Objects_NV;
 };
-#endif
+#د_که_پای
 
-class OpenCL_D3D11 : public ocl::Context::UserContext
+صنف OpenCL_D3D11 : عام ocl::Context::UserContext
 {
-public:
+عام:
     OpenCL_D3D11(cl_platform_id platform, ID3D11Device* _device) : device(_device)
     {
         clCreateFromD3D11Texture2DKHR = (clCreateFromD3D11Texture2DKHR_fn)
-            clGetExtensionFunctionAddressForPlatform(platform, "clCreateFromD3D11Texture2DKHR");
-        clEnqueueAcquireD3D11ObjectsKHR = (clEnqueueAcquireD3D11ObjectsKHR_fn)
-            clGetExtensionFunctionAddressForPlatform(platform, "clEnqueueAcquireD3D11ObjectsKHR");
-        clEnqueueReleaseD3D11ObjectsKHR = (clEnqueueReleaseD3D11ObjectsKHR_fn)
-            clGetExtensionFunctionAddressForPlatform(platform, "clEnqueueReleaseD3D11ObjectsKHR");
-        if (!clCreateFromD3D11Texture2DKHR || !clEnqueueAcquireD3D11ObjectsKHR || !clEnqueueReleaseD3D11ObjectsKHR)
+            cl_Get_Extension_Function_پته_For_Platform(platform, "clCreateFromD3D11Texture2DKHR");
+        cl_کتار_ته_ورزیاتول_Acquire_D3_D11_Objects_KHR = (cl_کتار_ته_ورزیاتول_Acquire_D3_D11_Objects_KHR_fn)
+            cl_Get_Extension_Function_پته_For_Platform(platform, "clEnqueueAcquireD3D11ObjectsKHR");
+        cl_کتار_ته_ورزیاتول_Release_D3_D11_Objects_KHR = (cl_کتار_ته_ورزیاتول_Release_D3_D11_Objects_KHR_fn)
+            cl_Get_Extension_Function_پته_For_Platform(platform, "clEnqueueReleaseD3D11ObjectsKHR");
+        إذا (!clCreateFromD3D11Texture2DKHR || !cl_کتار_ته_ورزیاتول_Acquire_D3_D11_Objects_KHR || !cl_کتار_ته_ورزیاتول_Release_D3_D11_Objects_KHR)
         {
             CV_Error(cv::Error::OpenCLInitError, "OpenCL: Can't find functions for D3D11");
         }
-        device->AddRef();
+        device->جمع_کړه_Ref();
     }
     ~OpenCL_D3D11() {
         device->Release();
     }
     ID3D11Device* device;
     clCreateFromD3D11Texture2DKHR_fn clCreateFromD3D11Texture2DKHR;
-    clEnqueueAcquireD3D11ObjectsKHR_fn clEnqueueAcquireD3D11ObjectsKHR;
-    clEnqueueReleaseD3D11ObjectsKHR_fn clEnqueueReleaseD3D11ObjectsKHR;
+    cl_کتار_ته_ورزیاتول_Acquire_D3_D11_Objects_KHR_fn cl_کتار_ته_ورزیاتول_Acquire_D3_D11_Objects_KHR;
+    cl_کتار_ته_ورزیاتول_Release_D3_D11_Objects_KHR_fn cl_کتار_ته_ورزیاتول_Release_D3_D11_Objects_KHR;
 };
 
-class OpenCL_D3D9 : public ocl::Context::UserContext
+صنف OpenCL_D3D9 : عام ocl::Context::UserContext
 {
-public:
+عام:
     OpenCL_D3D9(cl_platform_id platform, IDirect3DDevice9* _device, IDirect3DDevice9Ex* _deviceEx)
         : device(_device)
         , deviceEx(_deviceEx)
     {
         clCreateFromDX9MediaSurfaceKHR = (clCreateFromDX9MediaSurfaceKHR_fn)
-            clGetExtensionFunctionAddressForPlatform(platform, "clCreateFromDX9MediaSurfaceKHR");
-        clEnqueueAcquireDX9MediaSurfacesKHR = (clEnqueueAcquireDX9MediaSurfacesKHR_fn)
-            clGetExtensionFunctionAddressForPlatform(platform, "clEnqueueAcquireDX9MediaSurfacesKHR");
-        clEnqueueReleaseDX9MediaSurfacesKHR = (clEnqueueReleaseDX9MediaSurfacesKHR_fn)
-            clGetExtensionFunctionAddressForPlatform(platform, "clEnqueueReleaseDX9MediaSurfacesKHR");
-        if (!clCreateFromDX9MediaSurfaceKHR || !clEnqueueAcquireDX9MediaSurfacesKHR || !clEnqueueReleaseDX9MediaSurfacesKHR)
+            cl_Get_Extension_Function_پته_For_Platform(platform, "clCreateFromDX9MediaSurfaceKHR");
+        cl_کتار_ته_ورزیاتول_Acquire_DX9_Media_Surfaces_KHR = (cl_کتار_ته_ورزیاتول_Acquire_DX9_Media_Surfaces_KHR_fn)
+            cl_Get_Extension_Function_پته_For_Platform(platform, "clEnqueueAcquireDX9MediaSurfacesKHR");
+        cl_کتار_ته_ورزیاتول_Release_DX9_Media_Surfaces_KHR = (cl_کتار_ته_ورزیاتول_Release_DX9_Media_Surfaces_KHR_fn)
+            cl_Get_Extension_Function_پته_For_Platform(platform, "clEnqueueReleaseDX9MediaSurfacesKHR");
+        إذا (!clCreateFromDX9MediaSurfaceKHR || !cl_کتار_ته_ورزیاتول_Acquire_DX9_Media_Surfaces_KHR || !cl_کتار_ته_ورزیاتول_Release_DX9_Media_Surfaces_KHR)
         {
             CV_Error(cv::Error::OpenCLInitError, "OpenCL: Can't find functions for D3D9");
         }
-        if (device)
-            device->AddRef();
-        if (deviceEx)
-            deviceEx->AddRef();
+        إذا (device)
+            device->جمع_کړه_Ref();
+        إذا (deviceEx)
+            deviceEx->جمع_کړه_Ref();
     }
     ~OpenCL_D3D9() {
-        if (device)
+        إذا (device)
             device->Release();
-        if (deviceEx)
+        إذا (deviceEx)
             deviceEx->Release();
     }
     IDirect3DDevice9* device;
     IDirect3DDevice9Ex* deviceEx;
     clCreateFromDX9MediaSurfaceKHR_fn clCreateFromDX9MediaSurfaceKHR;
-    clEnqueueAcquireDX9MediaSurfacesKHR_fn clEnqueueAcquireDX9MediaSurfacesKHR;
-    clEnqueueReleaseDX9MediaSurfacesKHR_fn clEnqueueReleaseDX9MediaSurfacesKHR;
+    cl_کتار_ته_ورزیاتول_Acquire_DX9_Media_Surfaces_KHR_fn cl_کتار_ته_ورزیاتول_Acquire_DX9_Media_Surfaces_KHR;
+    cl_کتار_ته_ورزیاتول_Release_DX9_Media_Surfaces_KHR_fn cl_کتار_ته_ورزیاتول_Release_DX9_Media_Surfaces_KHR;
 };
 
-class OpenCL_D3D10 : public ocl::Context::UserContext
+صنف OpenCL_D3D10 : عام ocl::Context::UserContext
 {
-public:
+عام:
     OpenCL_D3D10(cl_platform_id platform, ID3D10Device* _device) : device(_device)
     {
         clCreateFromD3D10Texture2DKHR = (clCreateFromD3D10Texture2DKHR_fn)
-            clGetExtensionFunctionAddressForPlatform(platform, "clCreateFromD3D10Texture2DKHR");
-        clEnqueueAcquireD3D10ObjectsKHR = (clEnqueueAcquireD3D10ObjectsKHR_fn)
-            clGetExtensionFunctionAddressForPlatform(platform, "clEnqueueAcquireD3D10ObjectsKHR");
-        clEnqueueReleaseD3D10ObjectsKHR = (clEnqueueReleaseD3D10ObjectsKHR_fn)
-            clGetExtensionFunctionAddressForPlatform(platform, "clEnqueueReleaseD3D10ObjectsKHR");
-        if (!clCreateFromD3D10Texture2DKHR || !clEnqueueAcquireD3D10ObjectsKHR || !clEnqueueReleaseD3D10ObjectsKHR)
+            cl_Get_Extension_Function_پته_For_Platform(platform, "clCreateFromD3D10Texture2DKHR");
+        cl_کتار_ته_ورزیاتول_Acquire_D3_D10_Objects_KHR = (cl_کتار_ته_ورزیاتول_Acquire_D3_D10_Objects_KHR_fn)
+            cl_Get_Extension_Function_پته_For_Platform(platform, "clEnqueueAcquireD3D10ObjectsKHR");
+        cl_کتار_ته_ورزیاتول_Release_D3_D10_Objects_KHR = (cl_کتار_ته_ورزیاتول_Release_D3_D10_Objects_KHR_fn)
+            cl_Get_Extension_Function_پته_For_Platform(platform, "clEnqueueReleaseD3D10ObjectsKHR");
+        إذا (!clCreateFromD3D10Texture2DKHR || !cl_کتار_ته_ورزیاتول_Acquire_D3_D10_Objects_KHR || !cl_کتار_ته_ورزیاتول_Release_D3_D10_Objects_KHR)
         {
             CV_Error(cv::Error::OpenCLInitError, "OpenCL: Can't find functions for D3D10");
         }
-        device->AddRef();
+        device->جمع_کړه_Ref();
     }
     ~OpenCL_D3D10() {
         device->Release();
     }
     ID3D10Device* device;
     clCreateFromD3D10Texture2DKHR_fn clCreateFromD3D10Texture2DKHR;
-    clEnqueueAcquireD3D10ObjectsKHR_fn clEnqueueAcquireD3D10ObjectsKHR;
-    clEnqueueReleaseD3D10ObjectsKHR_fn clEnqueueReleaseD3D10ObjectsKHR;
+    cl_کتار_ته_ورزیاتول_Acquire_D3_D10_Objects_KHR_fn cl_کتار_ته_ورزیاتول_Acquire_D3_D10_Objects_KHR;
+    cl_کتار_ته_ورزیاتول_Release_D3_D10_Objects_KHR_fn cl_کتار_ته_ورزیاتول_Release_D3_D10_Objects_KHR;
 };
-#endif
+#د_که_پای
 
-namespace ocl {
+نطاق ocl {
 
 Context& initializeContextFromD3D11Device(ID3D11Device* pD3D11Device)
 {
-    CV_UNUSED(pD3D11Device);
-#if !defined(HAVE_DIRECTX)
+    CV_ناکارول_شوی(pD3D11Device);
+#إذا !defined(HAVE_DIRECTX)
     NO_DIRECTX_SUPPORT_ERROR;
-#elif !defined(HAVE_OPENCL)
+#وإلاإذا !defined(HAVE_OPENCL)
     NO_OPENCL_SUPPORT_ERROR;
-#else
-    cl_uint numPlatforms;
-    cl_int status = clGetPlatformIDs(0, NULL, &numPlatforms);
-    if (status != CL_SUCCESS)
+#وإلا
+    cl_uint عدد_Platforms;
+    cl_int حالت = clGetPlatformIDs(0, عدم, &عدد_Platforms);
+    إذا (حالت != CL_SUCCESS)
         CV_Error(cv::Error::OpenCLInitError, "OpenCL: Can't get number of platforms");
-    if (numPlatforms == 0)
+    إذا (عدد_Platforms == 0)
         CV_Error(cv::Error::OpenCLInitError, "OpenCL: No available platforms");
 
-    std::vector<cl_platform_id> platforms(numPlatforms);
-    status = clGetPlatformIDs(numPlatforms, &platforms[0], NULL);
-    if (status != CL_SUCCESS)
+    std::vector<cl_platform_id> platforms(عدد_Platforms);
+    حالت = clGetPlatformIDs(عدد_Platforms, &platforms[0], عدم);
+    إذا (حالت != CL_SUCCESS)
         CV_Error(cv::Error::OpenCLInitError, "OpenCL: Can't get platforms");
 
     // TODO Filter platforms by name from OPENCV_OPENCL_DEVICE
 
-    for (int i = 0; i < (int)numPlatforms; i++)
+    لكل (صحيح i = 0; i < (صحيح)عدد_Platforms; i++)
     {
         cl_platform_id platform = platforms[i];
         std::string platformName = PlatformInfo(&platform).name();
 
-        int found = -1;
-        cl_device_id device = NULL;
-        cl_uint numDevices = 0;
-        cl_context context = NULL;
+        صحيح وموندل = -1;
+        cl_device_id device = عدم;
+        cl_uint عدد_Devices = 0;
+        cl_context context = عدم;
 
-#ifdef HAVE_OPENCL_D3D11_NV
+#که_تعریف_شوی HAVE_OPENCL_D3D11_NV
         // Get extension function "clGetDeviceIDsFromD3D11NV" (part of OpenCL extension "cl_nv_d3d11_sharing")
         clGetDeviceIDsFromD3D11NV_fn clGetDeviceIDsFromD3D11NV = (clGetDeviceIDsFromD3D11NV_fn)
-            clGetExtensionFunctionAddressForPlatform(platforms[i], "clGetDeviceIDsFromD3D11NV");
-        if (clGetDeviceIDsFromD3D11NV) {
+            cl_Get_Extension_Function_پته_For_Platform(platforms[i], "clGetDeviceIDsFromD3D11NV");
+        إذا (clGetDeviceIDsFromD3D11NV) {
             // try with CL_PREFERRED_DEVICES_FOR_D3D11_NV
-            do {
-                device = NULL;
-                numDevices = 0;
-                status = clGetDeviceIDsFromD3D11NV(platforms[i], CL_D3D11_DEVICE_NV, pD3D11Device,
-                    CL_PREFERRED_DEVICES_FOR_D3D11_NV, 1, &device, &numDevices);
-                if (status != CL_SUCCESS)
-                    break;
-                if (numDevices > 0)
+            افعل {
+                device = عدم;
+                عدد_Devices = 0;
+                حالت = clGetDeviceIDsFromD3D11NV(platforms[i], CL_D3D11_DEVICE_NV, pD3D11Device,
+                    CL_PREFERRED_DEVICES_FOR_D3D11_NV, 1, &device, &عدد_Devices);
+                إذا (حالت != CL_SUCCESS)
+                    اكسر;
+                إذا (عدد_Devices > 0)
                 {
                     cl_context_properties properties[] = {
                             CL_CONTEXT_PLATFORM, (cl_context_properties)platforms[i],
@@ -410,26 +410,26 @@ Context& initializeContextFromD3D11Device(ID3D11Device* pD3D11Device)
                             0
                     };
 
-                    context = clCreateContext(properties, 1, &device, NULL, NULL, &status);
-                    if (status != CL_SUCCESS)
+                    context = clCreateContext(properties, 1, &device, عدم, عدم, &حالت);
+                    إذا (حالت != CL_SUCCESS)
                     {
                         clReleaseDevice(device);
                     }
-                    else
+                    وإلا
                     {
-                        found = i;
+                        وموندل = i;
                     }
                 }
-            } while (0);
+            } طالما (0);
             // try with CL_ALL_DEVICES_FOR_D3D11_NV
-            if (found < 0) do {
-                device = NULL;
-                numDevices = 0;
-                status = clGetDeviceIDsFromD3D11NV(platforms[i], CL_D3D11_DEVICE_NV, pD3D11Device,
-                    CL_ALL_DEVICES_FOR_D3D11_NV, 1, &device, &numDevices);
-                if (status != CL_SUCCESS)
-                    break;
-                if (numDevices > 0)
+            إذا (وموندل < 0) افعل {
+                device = عدم;
+                عدد_Devices = 0;
+                حالت = clGetDeviceIDsFromD3D11NV(platforms[i], CL_D3D11_DEVICE_NV, pD3D11Device,
+                    CL_ALL_DEVICES_FOR_D3D11_NV, 1, &device, &عدد_Devices);
+                إذا (حالت != CL_SUCCESS)
+                    اكسر;
+                إذا (عدد_Devices > 0)
                 {
                     cl_context_properties properties[] = {
                             CL_CONTEXT_PLATFORM, (cl_context_properties)platforms[i],
@@ -437,461 +437,461 @@ Context& initializeContextFromD3D11Device(ID3D11Device* pD3D11Device)
                             //CL_CONTEXT_INTEROP_USER_SYNC, CL_FALSE,
                             0
                     };
-                    context = clCreateContext(properties, 1, &device, NULL, NULL, &status);
-                    if (status != CL_SUCCESS)
+                    context = clCreateContext(properties, 1, &device, عدم, عدم, &حالت);
+                    إذا (حالت != CL_SUCCESS)
                     {
                         clReleaseDevice(device);
                     }
-                    else
+                    وإلا
                     {
-                        found = i;
+                        وموندل = i;
                     }
                 }
-            } while (0);
-            if (found >= 0) {
+            } طالما (0);
+            إذا (وموندل >= 0) {
                 OpenCLExecutionContext clExecCtx;
-                try
+                حاول
                 {
                     clExecCtx = OpenCLExecutionContext::create(platformName, platform, context, device);
-                    clExecCtx.getContext().setUserContext(std::make_shared<OpenCL_D3D11_NV>(platform, pD3D11Device));
+                    clExecCtx.getContext().سېټ_User_Context(std::make_shared<OpenCL_D3D11_NV>(platform, pD3D11Device));
                 }
-                catch (...)
+                امسك (...)
                 {
                     clReleaseDevice(device);
                     clReleaseContext(context);
-                    throw;
+                    ارم;
                 }
                 clExecCtx.bind();
-                return const_cast<Context&>(clExecCtx.getContext());
+                أرجع const_cast<Context&>(clExecCtx.getContext());
             }
         }
-#endif
+#د_که_پای
         // Get extension function "clGetDeviceIDsFromD3D11KHR" (part of OpenCL extension "cl_khr_d3d11_sharing")
         clGetDeviceIDsFromD3D11KHR_fn clGetDeviceIDsFromD3D11KHR = (clGetDeviceIDsFromD3D11KHR_fn)
-            clGetExtensionFunctionAddressForPlatform(platforms[i], "clGetDeviceIDsFromD3D11KHR");
-        if (clGetDeviceIDsFromD3D11KHR)
+            cl_Get_Extension_Function_پته_For_Platform(platforms[i], "clGetDeviceIDsFromD3D11KHR");
+        إذا (clGetDeviceIDsFromD3D11KHR)
         {
             // try with CL_PREFERRED_DEVICES_FOR_D3D11_KHR
-            do {
+            افعل {
 
-                device = NULL;
-                numDevices = 0;
+                device = عدم;
+                عدد_Devices = 0;
 
-                status = clGetDeviceIDsFromD3D11KHR(platforms[i], CL_D3D11_DEVICE_KHR, pD3D11Device,
-                    CL_PREFERRED_DEVICES_FOR_D3D11_KHR, 1, &device, &numDevices);
+                حالت = clGetDeviceIDsFromD3D11KHR(platforms[i], CL_D3D11_DEVICE_KHR, pD3D11Device,
+                    CL_PREFERRED_DEVICES_FOR_D3D11_KHR, 1, &device, &عدد_Devices);
 
-                if (status != CL_SUCCESS)
-                    break;
-                if (numDevices > 0)
+                إذا (حالت != CL_SUCCESS)
+                    اكسر;
+                إذا (عدد_Devices > 0)
                 {
                     cl_context_properties properties[] = {
                             CL_CONTEXT_PLATFORM, (cl_context_properties)platforms[i],
                             CL_CONTEXT_D3D11_DEVICE_KHR, (cl_context_properties)(pD3D11Device),
                             CL_CONTEXT_INTEROP_USER_SYNC, CL_FALSE,
-                            NULL, NULL
+                            عدم, عدم
                     };
-                    context = clCreateContext(properties, 1, &device, NULL, NULL, &status);
-                    if (status != CL_SUCCESS)
+                    context = clCreateContext(properties, 1, &device, عدم, عدم, &حالت);
+                    إذا (حالت != CL_SUCCESS)
                     {
                         clReleaseDevice(device);
                     }
-                    else
+                    وإلا
                     {
-                        found = i;
+                        وموندل = i;
                     }
                 }
-            } while (0);
+            } طالما (0);
             // try with CL_ALL_DEVICES_FOR_D3D11_KHR
-            if (found < 0) do {
-                device = NULL;
-                numDevices = 0;
-                status = clGetDeviceIDsFromD3D11KHR(platforms[i], CL_D3D11_DEVICE_KHR, pD3D11Device,
-                    CL_ALL_DEVICES_FOR_D3D11_KHR, 1, &device, &numDevices);
-                if (status != CL_SUCCESS)
-                    break;
-                if (numDevices > 0)
+            إذا (وموندل < 0) افعل {
+                device = عدم;
+                عدد_Devices = 0;
+                حالت = clGetDeviceIDsFromD3D11KHR(platforms[i], CL_D3D11_DEVICE_KHR, pD3D11Device,
+                    CL_ALL_DEVICES_FOR_D3D11_KHR, 1, &device, &عدد_Devices);
+                إذا (حالت != CL_SUCCESS)
+                    اكسر;
+                إذا (عدد_Devices > 0)
                 {
                     cl_context_properties properties[] = {
                             CL_CONTEXT_PLATFORM, (cl_context_properties)platforms[i],
                             CL_CONTEXT_D3D11_DEVICE_KHR, (cl_context_properties)(pD3D11Device),
                             CL_CONTEXT_INTEROP_USER_SYNC, CL_FALSE,
-                            NULL, NULL
+                            عدم, عدم
                     };
-                    context = clCreateContext(properties, 1, &device, NULL, NULL, &status);
-                    if (status != CL_SUCCESS)
+                    context = clCreateContext(properties, 1, &device, عدم, عدم, &حالت);
+                    إذا (حالت != CL_SUCCESS)
                     {
                         clReleaseDevice(device);
                     }
-                    else
+                    وإلا
                     {
-                        found = i;
+                        وموندل = i;
                     }
                 }
-            } while (0);
+            } طالما (0);
 
-            if (found >= 0) {
+            إذا (وموندل >= 0) {
                 OpenCLExecutionContext clExecCtx;
-                try
+                حاول
                 {
                     clExecCtx = OpenCLExecutionContext::create(platformName, platform, context, device);
-                    clExecCtx.getContext().setUserContext(std::make_shared<OpenCL_D3D11>(platform, pD3D11Device));
+                    clExecCtx.getContext().سېټ_User_Context(std::make_shared<OpenCL_D3D11>(platform, pD3D11Device));
                 }
-                catch (...)
+                امسك (...)
                 {
                     clReleaseDevice(device);
                     clReleaseContext(context);
-                    throw;
+                    ارم;
                 }
                 clExecCtx.bind();
-                return const_cast<Context&>(clExecCtx.getContext());
+                أرجع const_cast<Context&>(clExecCtx.getContext());
             }
         }
     }
 
     CV_Error(cv::Error::OpenCLInitError, "OpenCL: Can't create context for DirectX interop");
-#endif
+#د_که_پای
 }
 
 Context& initializeContextFromD3D10Device(ID3D10Device* pD3D10Device)
 {
-    CV_UNUSED(pD3D10Device);
-#if !defined(HAVE_DIRECTX)
+    CV_ناکارول_شوی(pD3D10Device);
+#إذا !defined(HAVE_DIRECTX)
     NO_DIRECTX_SUPPORT_ERROR;
-#elif !defined(HAVE_OPENCL)
+#وإلاإذا !defined(HAVE_OPENCL)
     NO_OPENCL_SUPPORT_ERROR;
-#else
-    cl_uint numPlatforms;
-    cl_int status = clGetPlatformIDs(0, NULL, &numPlatforms);
-    if (status != CL_SUCCESS)
+#وإلا
+    cl_uint عدد_Platforms;
+    cl_int حالت = clGetPlatformIDs(0, عدم, &عدد_Platforms);
+    إذا (حالت != CL_SUCCESS)
         CV_Error(cv::Error::OpenCLInitError, "OpenCL: Can't get number of platforms");
-    if (numPlatforms == 0)
+    إذا (عدد_Platforms == 0)
         CV_Error(cv::Error::OpenCLInitError, "OpenCL: No available platforms");
 
-    std::vector<cl_platform_id> platforms(numPlatforms);
-    status = clGetPlatformIDs(numPlatforms, &platforms[0], NULL);
-    if (status != CL_SUCCESS)
+    std::vector<cl_platform_id> platforms(عدد_Platforms);
+    حالت = clGetPlatformIDs(عدد_Platforms, &platforms[0], عدم);
+    إذا (حالت != CL_SUCCESS)
         CV_Error(cv::Error::OpenCLInitError, "OpenCL: Can't get platforms");
 
     // TODO Filter platforms by name from OPENCV_OPENCL_DEVICE
-    for (int i = 0; i < (int)numPlatforms; i++)
+    لكل (صحيح i = 0; i < (صحيح)عدد_Platforms; i++)
     {
         cl_platform_id platform = platforms[i];
         std::string platformName = PlatformInfo(&platform).name();
-        int found = -1;
-        cl_device_id device = NULL;
-        cl_uint numDevices = 0;
-        cl_context context = NULL;
+        صحيح وموندل = -1;
+        cl_device_id device = عدم;
+        cl_uint عدد_Devices = 0;
+        cl_context context = عدم;
 
         clGetDeviceIDsFromD3D10KHR_fn clGetDeviceIDsFromD3D10KHR = (clGetDeviceIDsFromD3D10KHR_fn)
-            clGetExtensionFunctionAddressForPlatform(platforms[i], "clGetDeviceIDsFromD3D10KHR");
-        if (!clGetDeviceIDsFromD3D10KHR)
-            continue;
+            cl_Get_Extension_Function_پته_For_Platform(platforms[i], "clGetDeviceIDsFromD3D10KHR");
+        إذا (!clGetDeviceIDsFromD3D10KHR)
+            استمر;
 
         // try with CL_PREFERRED_DEVICES_FOR_D3D10_KHR
-        do {
-            device = NULL;
-            numDevices = 0;
-            status = clGetDeviceIDsFromD3D10KHR(platforms[i], CL_D3D10_DEVICE_KHR, pD3D10Device,
-                CL_PREFERRED_DEVICES_FOR_D3D10_KHR, 1, &device, &numDevices);
-            if (status != CL_SUCCESS)
-                break;
-            if (numDevices > 0)
+        افعل {
+            device = عدم;
+            عدد_Devices = 0;
+            حالت = clGetDeviceIDsFromD3D10KHR(platforms[i], CL_D3D10_DEVICE_KHR, pD3D10Device,
+                CL_PREFERRED_DEVICES_FOR_D3D10_KHR, 1, &device, &عدد_Devices);
+            إذا (حالت != CL_SUCCESS)
+                اكسر;
+            إذا (عدد_Devices > 0)
             {
                 cl_context_properties properties[] = {
                         CL_CONTEXT_PLATFORM, (cl_context_properties)platforms[i],
                         CL_CONTEXT_D3D10_DEVICE_KHR, (cl_context_properties)(pD3D10Device),
                         CL_CONTEXT_INTEROP_USER_SYNC, CL_FALSE,
-                        NULL, NULL
+                        عدم, عدم
                 };
-                context = clCreateContext(properties, 1, &device, NULL, NULL, &status);
-                if (status != CL_SUCCESS)
+                context = clCreateContext(properties, 1, &device, عدم, عدم, &حالت);
+                إذا (حالت != CL_SUCCESS)
                 {
                     clReleaseDevice(device);
                 }
-                else
+                وإلا
                 {
-                    found = i;
+                    وموندل = i;
                 }
             }
-        } while (0);
+        } طالما (0);
         // try with CL_ALL_DEVICES_FOR_D3D10_KHR
-        if (found < 0) do
+        إذا (وموندل < 0) افعل
         {
-            device = NULL;
-            numDevices = 0;
-            status = clGetDeviceIDsFromD3D10KHR(platforms[i], CL_D3D10_DEVICE_KHR, pD3D10Device,
-                CL_ALL_DEVICES_FOR_D3D10_KHR, 1, &device, &numDevices);
-            if (status != CL_SUCCESS)
-                break;
-            if (numDevices > 0)
+            device = عدم;
+            عدد_Devices = 0;
+            حالت = clGetDeviceIDsFromD3D10KHR(platforms[i], CL_D3D10_DEVICE_KHR, pD3D10Device,
+                CL_ALL_DEVICES_FOR_D3D10_KHR, 1, &device, &عدد_Devices);
+            إذا (حالت != CL_SUCCESS)
+                اكسر;
+            إذا (عدد_Devices > 0)
             {
                 cl_context_properties properties[] = {
                         CL_CONTEXT_PLATFORM, (cl_context_properties)platforms[i],
                         CL_CONTEXT_D3D10_DEVICE_KHR, (cl_context_properties)(pD3D10Device),
                         CL_CONTEXT_INTEROP_USER_SYNC, CL_FALSE,
-                        NULL, NULL
+                        عدم, عدم
                 };
-                context = clCreateContext(properties, 1, &device, NULL, NULL, &status);
-                if (status != CL_SUCCESS)
+                context = clCreateContext(properties, 1, &device, عدم, عدم, &حالت);
+                إذا (حالت != CL_SUCCESS)
                 {
                     clReleaseDevice(device);
                 }
-                else
+                وإلا
                 {
-                    found = i;
+                    وموندل = i;
                 }
             }
-        } while (0);
+        } طالما (0);
 
-        if (found >= 0) {
+        إذا (وموندل >= 0) {
             OpenCLExecutionContext clExecCtx;
-            try
+            حاول
             {
                 clExecCtx = OpenCLExecutionContext::create(platformName, platform, context, device);
-                clExecCtx.getContext().setUserContext(std::make_shared<OpenCL_D3D10>(platform, pD3D10Device));
+                clExecCtx.getContext().سېټ_User_Context(std::make_shared<OpenCL_D3D10>(platform, pD3D10Device));
             }
-            catch (...)
+            امسك (...)
             {
                 clReleaseDevice(device);
                 clReleaseContext(context);
-                throw;
+                ارم;
             }
             clExecCtx.bind();
-            return const_cast<Context&>(clExecCtx.getContext());
+            أرجع const_cast<Context&>(clExecCtx.getContext());
         }
     }
     CV_Error(cv::Error::OpenCLInitError, "OpenCL: Can't create context for DirectX interop");
-#endif
+#د_که_پای
 }
 
 Context& initializeContextFromDirect3DDevice9Ex(IDirect3DDevice9Ex* pDirect3DDevice9Ex)
 {
-    CV_UNUSED(pDirect3DDevice9Ex);
-#if !defined(HAVE_DIRECTX)
+    CV_ناکارول_شوی(pDirect3DDevice9Ex);
+#إذا !defined(HAVE_DIRECTX)
     NO_DIRECTX_SUPPORT_ERROR;
-#elif !defined(HAVE_OPENCL)
+#وإلاإذا !defined(HAVE_OPENCL)
     NO_OPENCL_SUPPORT_ERROR;
-#else
-    cl_uint numPlatforms;
-    cl_int status = clGetPlatformIDs(0, NULL, &numPlatforms);
-    if (status != CL_SUCCESS)
+#وإلا
+    cl_uint عدد_Platforms;
+    cl_int حالت = clGetPlatformIDs(0, عدم, &عدد_Platforms);
+    إذا (حالت != CL_SUCCESS)
         CV_Error(cv::Error::OpenCLInitError, "OpenCL: Can't get number of platforms");
-    if (numPlatforms == 0)
+    إذا (عدد_Platforms == 0)
         CV_Error(cv::Error::OpenCLInitError, "OpenCL: No available platforms");
 
-    std::vector<cl_platform_id> platforms(numPlatforms);
-    status = clGetPlatformIDs(numPlatforms, &platforms[0], NULL);
-    if (status != CL_SUCCESS)
+    std::vector<cl_platform_id> platforms(عدد_Platforms);
+    حالت = clGetPlatformIDs(عدد_Platforms, &platforms[0], عدم);
+    إذا (حالت != CL_SUCCESS)
         CV_Error(cv::Error::OpenCLInitError, "OpenCL: Can't get platforms");
 
     // TODO Filter platforms by name from OPENCV_OPENCL_DEVICE
-    for (int i = 0; i < (int)numPlatforms; i++)
+    لكل (صحيح i = 0; i < (صحيح)عدد_Platforms; i++)
     {
         cl_platform_id platform = platforms[i];
         std::string platformName = PlatformInfo(&platform).name();
-        int found = -1;
-        cl_device_id device = NULL;
-        cl_uint numDevices = 0;
-        cl_context context = NULL;
+        صحيح وموندل = -1;
+        cl_device_id device = عدم;
+        cl_uint عدد_Devices = 0;
+        cl_context context = عدم;
 
         clGetDeviceIDsFromDX9MediaAdapterKHR_fn clGetDeviceIDsFromDX9MediaAdapterKHR = (clGetDeviceIDsFromDX9MediaAdapterKHR_fn)
-            clGetExtensionFunctionAddressForPlatform(platforms[i], "clGetDeviceIDsFromDX9MediaAdapterKHR");
-        if (!clGetDeviceIDsFromDX9MediaAdapterKHR)
-            continue;
+            cl_Get_Extension_Function_پته_For_Platform(platforms[i], "clGetDeviceIDsFromDX9MediaAdapterKHR");
+        إذا (!clGetDeviceIDsFromDX9MediaAdapterKHR)
+            استمر;
 
         // try with CL_PREFERRED_DEVICES_FOR_DX9_MEDIA_ADAPTER_KHR
-        do {
-            device = NULL;
-            numDevices = 0;
+        افعل {
+            device = عدم;
+            عدد_Devices = 0;
             cl_dx9_media_adapter_type_khr type = CL_ADAPTER_D3D9EX_KHR;
-            status = clGetDeviceIDsFromDX9MediaAdapterKHR(platforms[i], 1, &type, &pDirect3DDevice9Ex,
-                CL_PREFERRED_DEVICES_FOR_DX9_MEDIA_ADAPTER_KHR, 1, &device, &numDevices);
-            if (status != CL_SUCCESS)
-                break;
-            if (numDevices > 0)
+            حالت = clGetDeviceIDsFromDX9MediaAdapterKHR(platforms[i], 1, &type, &pDirect3DDevice9Ex,
+                CL_PREFERRED_DEVICES_FOR_DX9_MEDIA_ADAPTER_KHR, 1, &device, &عدد_Devices);
+            إذا (حالت != CL_SUCCESS)
+                اكسر;
+            إذا (عدد_Devices > 0)
             {
                 cl_context_properties properties[] = {
                         CL_CONTEXT_PLATFORM, (cl_context_properties)platforms[i],
                         CL_CONTEXT_ADAPTER_D3D9EX_KHR, (cl_context_properties)(pDirect3DDevice9Ex),
                         CL_CONTEXT_INTEROP_USER_SYNC, CL_FALSE,
-                        NULL, NULL
+                        عدم, عدم
                 };
-                context = clCreateContext(properties, 1, &device, NULL, NULL, &status);
-                if (status != CL_SUCCESS)
+                context = clCreateContext(properties, 1, &device, عدم, عدم, &حالت);
+                إذا (حالت != CL_SUCCESS)
                 {
                     clReleaseDevice(device);
                 }
-                else
+                وإلا
                 {
-                    found = i;
+                    وموندل = i;
                 }
             }
-        } while (0);
+        } طالما (0);
         // try with CL_ALL_DEVICES_FOR_DX9_MEDIA_ADAPTER_KHR
-        if (found < 0) do
+        إذا (وموندل < 0) افعل
         {
-            device = NULL;
-            numDevices = 0;
+            device = عدم;
+            عدد_Devices = 0;
             cl_dx9_media_adapter_type_khr type = CL_ADAPTER_D3D9EX_KHR;
-            status = clGetDeviceIDsFromDX9MediaAdapterKHR(platforms[i], 1, &type, &pDirect3DDevice9Ex,
-                CL_ALL_DEVICES_FOR_DX9_MEDIA_ADAPTER_KHR, 1, &device, &numDevices);
-            if (status != CL_SUCCESS)
-                break;
-            if (numDevices > 0)
+            حالت = clGetDeviceIDsFromDX9MediaAdapterKHR(platforms[i], 1, &type, &pDirect3DDevice9Ex,
+                CL_ALL_DEVICES_FOR_DX9_MEDIA_ADAPTER_KHR, 1, &device, &عدد_Devices);
+            إذا (حالت != CL_SUCCESS)
+                اكسر;
+            إذا (عدد_Devices > 0)
             {
                 cl_context_properties properties[] = {
                         CL_CONTEXT_PLATFORM, (cl_context_properties)platforms[i],
                         CL_CONTEXT_ADAPTER_D3D9EX_KHR, (cl_context_properties)(pDirect3DDevice9Ex),
                         CL_CONTEXT_INTEROP_USER_SYNC, CL_FALSE,
-                        NULL, NULL
+                        عدم, عدم
                 };
-                context = clCreateContext(properties, 1, &device, NULL, NULL, &status);
-                if (status != CL_SUCCESS)
+                context = clCreateContext(properties, 1, &device, عدم, عدم, &حالت);
+                إذا (حالت != CL_SUCCESS)
                 {
                     clReleaseDevice(device);
                 }
-                else
+                وإلا
                 {
-                    found = i;
+                    وموندل = i;
                 }
             }
-        } while (0);
+        } طالما (0);
 
-        if (found >= 0) {
+        إذا (وموندل >= 0) {
             OpenCLExecutionContext clExecCtx;
-            try
+            حاول
             {
                 clExecCtx = OpenCLExecutionContext::create(platformName, platform, context, device);
-                clExecCtx.getContext().setUserContext(std::make_shared<OpenCL_D3D9>(platform, nullptr, pDirect3DDevice9Ex));
+                clExecCtx.getContext().سېټ_User_Context(std::make_shared<OpenCL_D3D9>(platform, تش_اشاره, pDirect3DDevice9Ex));
             }
-            catch (...)
+            امسك (...)
             {
                 clReleaseDevice(device);
                 clReleaseContext(context);
-                throw;
+                ارم;
             }
             clExecCtx.bind();
-            return const_cast<Context&>(clExecCtx.getContext());
+            أرجع const_cast<Context&>(clExecCtx.getContext());
         }
     }
     CV_Error(cv::Error::OpenCLInitError, "OpenCL: Can't create context for DirectX interop");
-#endif
+#د_که_پای
 }
 
 Context& initializeContextFromDirect3DDevice9(IDirect3DDevice9* pDirect3DDevice9)
 {
-    CV_UNUSED(pDirect3DDevice9);
-#if !defined(HAVE_DIRECTX)
+    CV_ناکارول_شوی(pDirect3DDevice9);
+#إذا !defined(HAVE_DIRECTX)
     NO_DIRECTX_SUPPORT_ERROR;
-#elif !defined(HAVE_OPENCL)
+#وإلاإذا !defined(HAVE_OPENCL)
     NO_OPENCL_SUPPORT_ERROR;
-#else
-    cl_uint numPlatforms;
-    cl_int status = clGetPlatformIDs(0, NULL, &numPlatforms);
-    if (status != CL_SUCCESS)
+#وإلا
+    cl_uint عدد_Platforms;
+    cl_int حالت = clGetPlatformIDs(0, عدم, &عدد_Platforms);
+    إذا (حالت != CL_SUCCESS)
         CV_Error(cv::Error::OpenCLInitError, "OpenCL: Can't get number of platforms");
-    if (numPlatforms == 0)
+    إذا (عدد_Platforms == 0)
         CV_Error(cv::Error::OpenCLInitError, "OpenCL: No available platforms");
 
-    std::vector<cl_platform_id> platforms(numPlatforms);
-    status = clGetPlatformIDs(numPlatforms, &platforms[0], NULL);
-    if (status != CL_SUCCESS)
+    std::vector<cl_platform_id> platforms(عدد_Platforms);
+    حالت = clGetPlatformIDs(عدد_Platforms, &platforms[0], عدم);
+    إذا (حالت != CL_SUCCESS)
         CV_Error(cv::Error::OpenCLInitError, "OpenCL: Can't get platforms");
 
     // TODO Filter platforms by name from OPENCV_OPENCL_DEVICE
-    for (int i = 0; i < (int)numPlatforms; i++)
+    لكل (صحيح i = 0; i < (صحيح)عدد_Platforms; i++)
     {
         cl_platform_id platform = platforms[i];
         std::string platformName = PlatformInfo(&platform).name();
-        int found = -1;
-        cl_device_id device = NULL;
-        cl_uint numDevices = 0;
-        cl_context context = NULL;
+        صحيح وموندل = -1;
+        cl_device_id device = عدم;
+        cl_uint عدد_Devices = 0;
+        cl_context context = عدم;
 
         clGetDeviceIDsFromDX9MediaAdapterKHR_fn clGetDeviceIDsFromDX9MediaAdapterKHR = (clGetDeviceIDsFromDX9MediaAdapterKHR_fn)
-            clGetExtensionFunctionAddressForPlatform(platforms[i], "clGetDeviceIDsFromDX9MediaAdapterKHR");
-        if (!clGetDeviceIDsFromDX9MediaAdapterKHR)
-            continue;
+            cl_Get_Extension_Function_پته_For_Platform(platforms[i], "clGetDeviceIDsFromDX9MediaAdapterKHR");
+        إذا (!clGetDeviceIDsFromDX9MediaAdapterKHR)
+            استمر;
 
         // try with CL_PREFERRED_DEVICES_FOR_DX9_MEDIA_ADAPTER_KHR
-        do {
-            device = NULL;
-            numDevices = 0;
+        افعل {
+            device = عدم;
+            عدد_Devices = 0;
             cl_dx9_media_adapter_type_khr type = CL_ADAPTER_D3D9_KHR;
-            status = clGetDeviceIDsFromDX9MediaAdapterKHR(platforms[i], 1, &type, &pDirect3DDevice9,
-                CL_PREFERRED_DEVICES_FOR_DX9_MEDIA_ADAPTER_KHR, 1, &device, &numDevices);
-            if (status != CL_SUCCESS)
-                break;
-            if (numDevices > 0)
+            حالت = clGetDeviceIDsFromDX9MediaAdapterKHR(platforms[i], 1, &type, &pDirect3DDevice9,
+                CL_PREFERRED_DEVICES_FOR_DX9_MEDIA_ADAPTER_KHR, 1, &device, &عدد_Devices);
+            إذا (حالت != CL_SUCCESS)
+                اكسر;
+            إذا (عدد_Devices > 0)
             {
                 cl_context_properties properties[] = {
                         CL_CONTEXT_PLATFORM, (cl_context_properties)platforms[i],
                         CL_CONTEXT_ADAPTER_D3D9_KHR, (cl_context_properties)(pDirect3DDevice9),
                         CL_CONTEXT_INTEROP_USER_SYNC, CL_FALSE,
-                        NULL, NULL
+                        عدم, عدم
                 };
-                context = clCreateContext(properties, 1, &device, NULL, NULL, &status);
-                if (status != CL_SUCCESS)
+                context = clCreateContext(properties, 1, &device, عدم, عدم, &حالت);
+                إذا (حالت != CL_SUCCESS)
                 {
                     clReleaseDevice(device);
                 }
-                else
+                وإلا
                 {
-                    found = i;
-                    break;
+                    وموندل = i;
+                    اكسر;
                 }
             }
-        } while (0);
+        } طالما (0);
         // try with CL_ALL_DEVICES_FOR_DX9_MEDIA_ADAPTER_KHR
-        if (found < 0) do
+        إذا (وموندل < 0) افعل
         {
-            device = NULL;
-            numDevices = 0;
+            device = عدم;
+            عدد_Devices = 0;
             cl_dx9_media_adapter_type_khr type = CL_ADAPTER_D3D9_KHR;
-            status = clGetDeviceIDsFromDX9MediaAdapterKHR(platforms[i], 1, &type, &pDirect3DDevice9,
-                CL_ALL_DEVICES_FOR_DX9_MEDIA_ADAPTER_KHR, 1, &device, &numDevices);
-            if (status != CL_SUCCESS)
-                break;
-            if (numDevices > 0)
+            حالت = clGetDeviceIDsFromDX9MediaAdapterKHR(platforms[i], 1, &type, &pDirect3DDevice9,
+                CL_ALL_DEVICES_FOR_DX9_MEDIA_ADAPTER_KHR, 1, &device, &عدد_Devices);
+            إذا (حالت != CL_SUCCESS)
+                اكسر;
+            إذا (عدد_Devices > 0)
             {
                 cl_context_properties properties[] = {
                         CL_CONTEXT_PLATFORM, (cl_context_properties)platforms[i],
                         CL_CONTEXT_ADAPTER_D3D9_KHR, (cl_context_properties)(pDirect3DDevice9),
                         CL_CONTEXT_INTEROP_USER_SYNC, CL_FALSE,
-                        NULL, NULL
+                        عدم, عدم
                 };
-                context = clCreateContext(properties, 1, &device, NULL, NULL, &status);
-                if (status != CL_SUCCESS)
+                context = clCreateContext(properties, 1, &device, عدم, عدم, &حالت);
+                إذا (حالت != CL_SUCCESS)
                 {
                     clReleaseDevice(device);
                 }
-                else
+                وإلا
                 {
-                    found = i;
-                    break;
+                    وموندل = i;
+                    اكسر;
                 }
             }
-        } while (0);
+        } طالما (0);
 
-        if (found >= 0) {
+        إذا (وموندل >= 0) {
             OpenCLExecutionContext clExecCtx;
-            try
+            حاول
             {
                 clExecCtx = OpenCLExecutionContext::create(platformName, platform, context, device);
-                clExecCtx.getContext().setUserContext(std::make_shared<OpenCL_D3D9>(platform, pDirect3DDevice9, nullptr));
+                clExecCtx.getContext().سېټ_User_Context(std::make_shared<OpenCL_D3D9>(platform, pDirect3DDevice9, تش_اشاره));
             }
-            catch (...)
+            امسك (...)
             {
                 clReleaseDevice(device);
                 clReleaseContext(context);
-                throw;
+                ارم;
             }
             clExecCtx.bind();
-            return const_cast<Context&>(clExecCtx.getContext());
+            أرجع const_cast<Context&>(clExecCtx.getContext());
         }
     }
     CV_Error(cv::Error::OpenCLInitError, "OpenCL: Can't create context for DirectX interop");
-#endif
+#د_که_پای
 }
 
 } // namespace cv::ocl
@@ -899,72 +899,72 @@ Context& initializeContextFromDirect3DDevice9(IDirect3DDevice9* pDirect3DDevice9
 } // namespace directx
 
 
-namespace ocl {
+نطاق ocl {
 
-#if defined(HAVE_DIRECTX) && defined(HAVE_OPENCL)
-#ifdef HAVE_DIRECTX_NV12
+#إذا defined(HAVE_DIRECTX) && defined(HAVE_OPENCL)
+#که_تعریف_شوی HAVE_DIRECTX_NV12
 
-static
-bool ocl_convert_nv12_to_bgr(
+ساكن
+منطقي ocl_convert_nv12_منزل_bgr(
     cl_mem clImageY,
     cl_mem clImageUV,
-    cl_mem clBuffer,
-    int step,
-    int cols,
-    int rows)
+    cl_mem cl_بفر,
+    صحيح ګام,
+    صحيح ستون_شمېر,
+    صحيح لیکې)
 {
     ocl::Kernel k;
     k.create("YUV2BGR_NV12_8u", cv::ocl::core::cvtclr_dx_oclsrc, "");
-    if (k.empty())
-        return false;
+    إذا (k.empty())
+        أرجع خطأ;
 
-    k.args(clImageY, clImageUV, clBuffer, step, cols, rows);
+    k.دلیلونه(clImageY, clImageUV, cl_بفر, ګام, ستون_شمېر, لیکې);
 
-    size_t globalsize[] = { (size_t)cols/2, (size_t)rows/2 };
-    return k.run(2, globalsize, 0, false);
+    size_t globalsize[] = { (size_t)ستون_شمېر/2, (size_t)لیکې/2 };
+    أرجع k.پرلپسې(2, globalsize, 0, خطأ);
 }
 
 
-static
-bool ocl_convert_bgr_to_nv12(
-    cl_mem clBuffer,
-    int step,
-    int cols,
-    int rows,
+ساكن
+منطقي ocl_convert_bgr_منزل_nv12(
+    cl_mem cl_بفر,
+    صحيح ګام,
+    صحيح ستون_شمېر,
+    صحيح لیکې,
     cl_mem clImageY,
     cl_mem clImageUV)
 {
     ocl::Kernel k;
     k.create("BGR2YUV_NV12_8u", cv::ocl::core::cvtclr_dx_oclsrc, "");
-    if (k.empty())
-        return false;
+    إذا (k.empty())
+        أرجع خطأ;
 
-    k.args(clBuffer, step, cols, rows, clImageY, clImageUV);
+    k.دلیلونه(cl_بفر, ګام, ستون_شمېر, لیکې, clImageY, clImageUV);
 
-    size_t globalsize[] = { (size_t)cols/2, (size_t)rows/2 };
-    return k.run(2, globalsize, 0, false);
+    size_t globalsize[] = { (size_t)ستون_شمېر/2, (size_t)لیکې/2 };
+    أرجع k.پرلپسې(2, globalsize, 0, خطأ);
 }
 
-#endif // HAVE_DIRECTX_NV12
-#endif // HAVE_DIRECTX && HAVE_OPENCL
+#د_که_پای // HAVE_DIRECTX_NV12
+#د_که_پای // HAVE_DIRECTX && HAVE_OPENCL
 
 } // namespace ocl
 
 
-namespace directx {
+نطاق directx {
 
-#if defined(HAVE_DIRECTX) && defined(HAVE_OPENCL)
-static void __convertToD3D11Texture2DKHR(InputArray src, ID3D11Texture2D* pD3D11Texture2D)
+#إذا defined(HAVE_DIRECTX) && defined(HAVE_OPENCL)
+ساكن فراغ __convertToD3D11Texture2DKHR(ننوت_Array src, ID3D11Texture2D* pD3D11Texture2D)
 {
     D3D11_TEXTURE2D_DESC desc = { 0 };
     pD3D11Texture2D->GetDesc(&desc);
 
-    int srcType = src.type();
-    int textureType = getTypeFromDXGI_FORMAT(desc.Format);
+    صحيح srcType = src.type();
+    صحيح textureType = getTypeFromDXGI_FORMAT(desc.Format);
     CV_Assert(textureType == srcType);
 
-    Size srcSize = src.size();
-    CV_Assert(srcSize.width == (int)desc.Width && srcSize.height == (int)desc.Height);
+    اندازه src_اندازه = src.size();
+    CV_Assert(src_اندازه.پلنوالی == (صحيح)desc.پلنوالی_2 && src_اندازه.لوړوالی == (صحيح)desc.لوړوالی_2);
 
     UMat u = src.getUMat();
 
@@ -972,99 +972,99 @@ static void __convertToD3D11Texture2DKHR(InputArray src, ID3D11Texture2D* pD3D11
     CV_Assert(u.offset == 0);
     CV_Assert(u.isContinuous());
 
-    cl_mem clBuffer = (cl_mem)u.handle(ACCESS_READ);
+    cl_mem cl_بفر = (cl_mem)u.handle(ACCESS_READ);
 
     ocl::Context& ctx = ocl::OpenCLExecutionContext::getCurrent().getContext();
     cl_context context = (cl_context)ctx.ptr();
     OpenCL_D3D11* impl = ctx.getUserContext<OpenCL_D3D11>().get();
-    if (nullptr == impl)
+    إذا (تش_اشاره == impl)
         CV_Error(cv::Error::OpenCLApiCallError, "OpenCL: Context initilized without DirectX interoperability");
 
-    cl_int status = 0;
+    cl_int حالت = 0;
     cl_mem clImage = 0;
-#ifdef HAVE_DIRECTX_NV12
+#که_تعریف_شوی HAVE_DIRECTX_NV12
     cl_mem clImageUV = 0;
-#endif
-    clImage = impl->clCreateFromD3D11Texture2DKHR(context, CL_MEM_WRITE_ONLY, pD3D11Texture2D, 0, &status);
-    if (status != CL_SUCCESS)
+#د_که_پای
+    clImage = impl->clCreateFromD3D11Texture2DKHR(context, CL_MEM_WRITE_ONLY, pD3D11Texture2D, 0, &حالت);
+    إذا (حالت != CL_SUCCESS)
         CV_Error(cv::Error::OpenCLApiCallError, "OpenCL: clCreateFromD3D11Texture2DKHR failed");
 
-#ifdef HAVE_DIRECTX_NV12
-    if(DXGI_FORMAT_NV12 == desc.Format)
+#که_تعریف_شوی HAVE_DIRECTX_NV12
+    إذا(DXGI_FORMAT_NV12 == desc.Format)
     {
-        clImageUV = impl->clCreateFromD3D11Texture2DKHR(context, CL_MEM_WRITE_ONLY, pD3D11Texture2D, 1, &status);
-        if (status != CL_SUCCESS)
+        clImageUV = impl->clCreateFromD3D11Texture2DKHR(context, CL_MEM_WRITE_ONLY, pD3D11Texture2D, 1, &حالت);
+        إذا (حالت != CL_SUCCESS)
             CV_Error(cv::Error::OpenCLApiCallError, "OpenCL: clCreateFromD3D11Texture2DKHR failed");
     }
-#endif
+#د_که_پای
 
-    cl_command_queue q = (cl_command_queue)Queue::getDefault().ptr();
+    cl_command_کتار q = (cl_command_کتار)کتار::getDefault().ptr();
 
-    status = impl->clEnqueueAcquireD3D11ObjectsKHR(q, 1, &clImage, 0, NULL, NULL);
-    if (status != CL_SUCCESS)
+    حالت = impl->cl_کتار_ته_ورزیاتول_Acquire_D3_D11_Objects_KHR(q, 1, &clImage, 0, عدم, عدم);
+    إذا (حالت != CL_SUCCESS)
         CV_Error(cv::Error::OpenCLApiCallError, "OpenCL: clEnqueueAcquireD3D11ObjectsKHR failed");
 
-#ifdef HAVE_DIRECTX_NV12
-    if(DXGI_FORMAT_NV12 == desc.Format)
+#که_تعریف_شوی HAVE_DIRECTX_NV12
+    إذا(DXGI_FORMAT_NV12 == desc.Format)
     {
-        status = impl->clEnqueueAcquireD3D11ObjectsKHR(q, 1, &clImageUV, 0, NULL, NULL);
-        if (status != CL_SUCCESS)
+        حالت = impl->cl_کتار_ته_ورزیاتول_Acquire_D3_D11_Objects_KHR(q, 1, &clImageUV, 0, عدم, عدم);
+        إذا (حالت != CL_SUCCESS)
             CV_Error(cv::Error::OpenCLApiCallError, "OpenCL: clEnqueueAcquireD3D11ObjectsKHR failed");
 
-        if(!ocl::ocl_convert_bgr_to_nv12(clBuffer, (int)u.step[0], u.cols, u.rows, clImage, clImageUV))
+        إذا(!ocl::ocl_convert_bgr_منزل_nv12(cl_بفر, (صحيح)u.ګام[0], u.ستون_شمېر, u.لیکې, clImage, clImageUV))
             CV_Error(cv::Error::OpenCLApiCallError, "OpenCL: ocl_convert_bgr_to_nv12 failed");
 
-        status = impl->clEnqueueReleaseD3D11ObjectsKHR(q, 1, &clImageUV, 0, NULL, NULL);
-        if (status != CL_SUCCESS)
+        حالت = impl->cl_کتار_ته_ورزیاتول_Release_D3_D11_Objects_KHR(q, 1, &clImageUV, 0, عدم, عدم);
+        إذا (حالت != CL_SUCCESS)
             CV_Error(cv::Error::OpenCLApiCallError, "OpenCL: clEnqueueReleaseD3D11ObjectsKHR failed");
     }
-    else
-#endif
+    وإلا
+#د_که_پای
     {
         size_t offset = 0; // TODO
         size_t origin[3] = { 0, 0, 0 };
-        size_t region[3] = { (size_t)u.cols, (size_t)u.rows, 1 };
+        size_t region[3] = { (size_t)u.ستون_شمېر, (size_t)u.لیکې, 1 };
 
-        status = clEnqueueCopyBufferToImage(q, clBuffer, clImage, offset, origin, region, 0, NULL, NULL);
-        if (status != CL_SUCCESS)
+        حالت = cl_کتار_ته_ورزیاتول_Copy_بفر_منزل_Image(q, cl_بفر, clImage, offset, origin, region, 0, عدم, عدم);
+        إذا (حالت != CL_SUCCESS)
             CV_Error(cv::Error::OpenCLApiCallError, "OpenCL: clEnqueueCopyBufferToImage failed");
     }
 
-    status = impl->clEnqueueReleaseD3D11ObjectsKHR(q, 1, &clImage, 0, NULL, NULL);
-    if (status != CL_SUCCESS)
+    حالت = impl->cl_کتار_ته_ورزیاتول_Release_D3_D11_Objects_KHR(q, 1, &clImage, 0, عدم, عدم);
+    إذا (حالت != CL_SUCCESS)
         CV_Error(cv::Error::OpenCLApiCallError, "OpenCL: clEnqueueReleaseD3D11ObjectsKHR failed");
 
-    status = clFinish(q); // TODO Use events
-    if (status != CL_SUCCESS)
+    حالت = cl_پای(q); // TODO Use events
+    إذا (حالت != CL_SUCCESS)
         CV_Error(cv::Error::OpenCLApiCallError, "OpenCL: clFinish failed");
 
-    status = clReleaseMemObject(clImage); // TODO RAII
-    if (status != CL_SUCCESS)
+    حالت = clReleaseMemObject(clImage); // TODO RAII
+    إذا (حالت != CL_SUCCESS)
         CV_Error(cv::Error::OpenCLApiCallError, "OpenCL: clReleaseMem failed");
 
-#ifdef HAVE_DIRECTX_NV12
-    if(DXGI_FORMAT_NV12 == desc.Format)
+#که_تعریف_شوی HAVE_DIRECTX_NV12
+    إذا(DXGI_FORMAT_NV12 == desc.Format)
     {
-        status = clReleaseMemObject(clImageUV);
-        if (status != CL_SUCCESS)
+        حالت = clReleaseMemObject(clImageUV);
+        إذا (حالت != CL_SUCCESS)
             CV_Error(cv::Error::OpenCLApiCallError, "OpenCL: clReleaseMem failed");
     }
-#endif
+#د_که_پای
 }
-#endif
+#د_که_پای
 
-#if defined(HAVE_OPENCL_D3D11_NV)
-static void __convertToD3D11Texture2DNV(InputArray src, ID3D11Texture2D* pD3D11Texture2D)
+#إذا defined(HAVE_OPENCL_D3D11_NV)
+ساكن فراغ __convertToD3D11Texture2DNV(ننوت_Array src, ID3D11Texture2D* pD3D11Texture2D)
 {
     D3D11_TEXTURE2D_DESC desc = { 0 };
     pD3D11Texture2D->GetDesc(&desc);
 
-    int srcType = src.type();
-    int textureType = getTypeFromDXGI_FORMAT(desc.Format);
+    صحيح srcType = src.type();
+    صحيح textureType = getTypeFromDXGI_FORMAT(desc.Format);
     CV_Assert(textureType == srcType);
 
-    Size srcSize = src.size();
-    CV_Assert(srcSize.width == (int)desc.Width && srcSize.height == (int)desc.Height);
+    اندازه src_اندازه = src.size();
+    CV_Assert(src_اندازه.پلنوالی == (صحيح)desc.پلنوالی_2 && src_اندازه.لوړوالی == (صحيح)desc.لوړوالی_2);
 
     UMat u = src.getUMat();
 
@@ -1072,353 +1072,353 @@ static void __convertToD3D11Texture2DNV(InputArray src, ID3D11Texture2D* pD3D11T
     CV_Assert(u.offset == 0);
     CV_Assert(u.isContinuous());
 
-    cl_mem clBuffer = (cl_mem)u.handle(ACCESS_READ);
+    cl_mem cl_بفر = (cl_mem)u.handle(ACCESS_READ);
 
     ocl::Context& ctx = ocl::OpenCLExecutionContext::getCurrent().getContext();
     cl_context context = (cl_context)ctx.ptr();
     OpenCL_D3D11_NV* impl = ctx.getUserContext<OpenCL_D3D11_NV>().get();
-    if (nullptr == impl)
+    إذا (تش_اشاره == impl)
         CV_Error(cv::Error::OpenCLApiCallError, "OpenCL: Context initilized without DirectX interoperability");
 
-    cl_int status = 0;
+    cl_int حالت = 0;
     cl_mem clImage = 0;
-#ifdef HAVE_DIRECTX_NV12
+#که_تعریف_شوی HAVE_DIRECTX_NV12
     cl_mem clImageUV = 0;
-#endif
-    clImage = impl->clCreateFromD3D11Texture2DNV(context, CL_MEM_WRITE_ONLY, pD3D11Texture2D, 0, &status);
-    if (status != CL_SUCCESS)
+#د_که_پای
+    clImage = impl->clCreateFromD3D11Texture2DNV(context, CL_MEM_WRITE_ONLY, pD3D11Texture2D, 0, &حالت);
+    إذا (حالت != CL_SUCCESS)
         CV_Error(cv::Error::OpenCLApiCallError, "OpenCL: clCreateFromD3D11Texture2DNV failed");
 
-#ifdef HAVE_DIRECTX_NV12
-    if (DXGI_FORMAT_NV12 == desc.Format)
+#که_تعریف_شوی HAVE_DIRECTX_NV12
+    إذا (DXGI_FORMAT_NV12 == desc.Format)
     {
-        clImageUV = impl->clCreateFromD3D11Texture2DNV(context, CL_MEM_WRITE_ONLY, pD3D11Texture2D, 1, &status);
-        if (status != CL_SUCCESS)
+        clImageUV = impl->clCreateFromD3D11Texture2DNV(context, CL_MEM_WRITE_ONLY, pD3D11Texture2D, 1, &حالت);
+        إذا (حالت != CL_SUCCESS)
             CV_Error(cv::Error::OpenCLApiCallError, "OpenCL: clCreateFromD3D11Texture2DNV failed");
     }
-#endif
-    cl_command_queue q = (cl_command_queue)Queue::getDefault().ptr();
-    status = impl->clEnqueueAcquireD3D11ObjectsNV(q, 1, &clImage, 0, NULL, NULL);
-    if (status != CL_SUCCESS)
+#د_که_پای
+    cl_command_کتار q = (cl_command_کتار)کتار::getDefault().ptr();
+    حالت = impl->cl_کتار_ته_ورزیاتول_Acquire_D3_D11_Objects_NV(q, 1, &clImage, 0, عدم, عدم);
+    إذا (حالت != CL_SUCCESS)
         CV_Error(cv::Error::OpenCLApiCallError, "OpenCL: clEnqueueAcquireD3D11ObjectsNV failed");
 
-#ifdef HAVE_DIRECTX_NV12
-    if(DXGI_FORMAT_NV12 == desc.Format)
+#که_تعریف_شوی HAVE_DIRECTX_NV12
+    إذا(DXGI_FORMAT_NV12 == desc.Format)
     {
-        status = impl->clEnqueueAcquireD3D11ObjectsNV(q, 1, &clImageUV, 0, NULL, NULL);
-        if (status != CL_SUCCESS)
+        حالت = impl->cl_کتار_ته_ورزیاتول_Acquire_D3_D11_Objects_NV(q, 1, &clImageUV, 0, عدم, عدم);
+        إذا (حالت != CL_SUCCESS)
             CV_Error(cv::Error::OpenCLApiCallError, "OpenCL: clEnqueueAcquireD3D11ObjectsNV failed");
 
-        if(!ocl::ocl_convert_bgr_to_nv12(clBuffer, (int)u.step[0], u.cols, u.rows, clImage, clImageUV))
+        إذا(!ocl::ocl_convert_bgr_منزل_nv12(cl_بفر, (صحيح)u.ګام[0], u.ستون_شمېر, u.لیکې, clImage, clImageUV))
             CV_Error(cv::Error::OpenCLApiCallError, "OpenCL: ocl_convert_bgr_to_nv12 failed");
 
-        status = impl->clEnqueueReleaseD3D11ObjectsNV(q, 1, &clImageUV, 0, NULL, NULL);
-        if (status != CL_SUCCESS)
+        حالت = impl->cl_کتار_ته_ورزیاتول_Release_D3_D11_Objects_NV(q, 1, &clImageUV, 0, عدم, عدم);
+        إذا (حالت != CL_SUCCESS)
             CV_Error(cv::Error::OpenCLApiCallError, "OpenCL: clEnqueueReleaseD3D11ObjectsNV failed");
     }
-    else
-#endif
+    وإلا
+#د_که_پای
     {
         size_t offset = 0; // TODO
         size_t origin[3] = { 0, 0, 0 };
-        size_t region[3] = { (size_t)u.cols, (size_t)u.rows, 1 };
+        size_t region[3] = { (size_t)u.ستون_شمېر, (size_t)u.لیکې, 1 };
 
-        status = clEnqueueCopyBufferToImage(q, clBuffer, clImage, offset, origin, region, 0, NULL, NULL);
-        if (status != CL_SUCCESS)
+        حالت = cl_کتار_ته_ورزیاتول_Copy_بفر_منزل_Image(q, cl_بفر, clImage, offset, origin, region, 0, عدم, عدم);
+        إذا (حالت != CL_SUCCESS)
             CV_Error(cv::Error::OpenCLApiCallError, "OpenCL: clEnqueueCopyBufferToImage failed");
     }
 
-    status = impl->clEnqueueReleaseD3D11ObjectsNV(q, 1, &clImage, 0, NULL, NULL);
-    if (status != CL_SUCCESS)
+    حالت = impl->cl_کتار_ته_ورزیاتول_Release_D3_D11_Objects_NV(q, 1, &clImage, 0, عدم, عدم);
+    إذا (حالت != CL_SUCCESS)
         CV_Error(cv::Error::OpenCLApiCallError, "OpenCL: clEnqueueReleaseD3D11ObjectsNV failed");
 
-    status = clFinish(q); // TODO Use events
-    if (status != CL_SUCCESS)
+    حالت = cl_پای(q); // TODO Use events
+    إذا (حالت != CL_SUCCESS)
         CV_Error(cv::Error::OpenCLApiCallError, "OpenCL: clFinish failed");
 
-    status = clReleaseMemObject(clImage); // TODO RAII
-    if (status != CL_SUCCESS)
+    حالت = clReleaseMemObject(clImage); // TODO RAII
+    إذا (حالت != CL_SUCCESS)
         CV_Error(cv::Error::OpenCLApiCallError, "OpenCL: clReleaseMem failed");
 
-#ifdef HAVE_DIRECTX_NV12
-    if(DXGI_FORMAT_NV12 == desc.Format)
+#که_تعریف_شوی HAVE_DIRECTX_NV12
+    إذا(DXGI_FORMAT_NV12 == desc.Format)
     {
-        status = clReleaseMemObject(clImageUV);
-        if (status != CL_SUCCESS)
+        حالت = clReleaseMemObject(clImageUV);
+        إذا (حالت != CL_SUCCESS)
             CV_Error(cv::Error::OpenCLApiCallError, "OpenCL: clReleaseMem failed");
     }
-#endif
+#د_که_پای
 }
-#endif
+#د_که_پای
 
-#if defined(HAVE_DIRECTX) && defined(HAVE_OPENCL)
-static void __convertFromD3D11Texture2DKHR(ID3D11Texture2D* pD3D11Texture2D, OutputArray dst)
+#إذا defined(HAVE_DIRECTX) && defined(HAVE_OPENCL)
+ساكن فراغ __convertFromD3D11Texture2DKHR(ID3D11Texture2D* pD3D11Texture2D, OutputArray dst)
 {
     D3D11_TEXTURE2D_DESC desc = { 0 };
     pD3D11Texture2D->GetDesc(&desc);
 
-    int textureType = getTypeFromDXGI_FORMAT(desc.Format);
+    صحيح textureType = getTypeFromDXGI_FORMAT(desc.Format);
     CV_Assert(textureType >= 0);
 
     // TODO Need to specify ACCESS_WRITE here somehow to prevent useless data copying!
-    dst.create(Size(desc.Width, desc.Height), textureType);
+    dst.create(اندازه(desc.پلنوالی_2, desc.لوړوالی_2), textureType);
     UMat u = dst.getUMat();
 
     // TODO Add support for roi
     CV_Assert(u.offset == 0);
     CV_Assert(u.isContinuous());
 
-    cl_mem clBuffer = (cl_mem)u.handle(ACCESS_READ);
+    cl_mem cl_بفر = (cl_mem)u.handle(ACCESS_READ);
 
     ocl::Context& ctx = ocl::OpenCLExecutionContext::getCurrent().getContext();
     cl_context context = (cl_context)ctx.ptr();
     OpenCL_D3D11* impl = ctx.getUserContext<OpenCL_D3D11>().get();
-    if (nullptr == impl)
+    إذا (تش_اشاره == impl)
         CV_Error(cv::Error::OpenCLApiCallError, "OpenCL: Context initilized without DirectX interoperability");
 
-    cl_int status = 0;
+    cl_int حالت = 0;
     cl_mem clImage = 0;
 
-    clImage = impl->clCreateFromD3D11Texture2DKHR(context, CL_MEM_READ_ONLY, pD3D11Texture2D, 0, &status);
-    if (status != CL_SUCCESS)
+    clImage = impl->clCreateFromD3D11Texture2DKHR(context, CL_MEM_READ_ONLY, pD3D11Texture2D, 0, &حالت);
+    إذا (حالت != CL_SUCCESS)
         CV_Error(cv::Error::OpenCLApiCallError, "OpenCL: clCreateFromD3D11Texture2DKHR failed");
 
-#ifdef HAVE_DIRECTX_NV12
+#که_تعریف_شوی HAVE_DIRECTX_NV12
     cl_mem clImageUV = 0;
-    if(DXGI_FORMAT_NV12 == desc.Format)
+    إذا(DXGI_FORMAT_NV12 == desc.Format)
     {
-        clImageUV = impl->clCreateFromD3D11Texture2DKHR(context, CL_MEM_READ_ONLY, pD3D11Texture2D, 1, &status);
-        if (status != CL_SUCCESS)
+        clImageUV = impl->clCreateFromD3D11Texture2DKHR(context, CL_MEM_READ_ONLY, pD3D11Texture2D, 1, &حالت);
+        إذا (حالت != CL_SUCCESS)
             CV_Error(cv::Error::OpenCLApiCallError, "OpenCL: clCreateFromD3D11Texture2DKHR failed");
     }
-#endif
+#د_که_پای
 
-    cl_command_queue q = (cl_command_queue)Queue::getDefault().ptr();
+    cl_command_کتار q = (cl_command_کتار)کتار::getDefault().ptr();
 
-    status = impl->clEnqueueAcquireD3D11ObjectsKHR(q, 1, &clImage, 0, NULL, NULL);
-    if (status != CL_SUCCESS)
+    حالت = impl->cl_کتار_ته_ورزیاتول_Acquire_D3_D11_Objects_KHR(q, 1, &clImage, 0, عدم, عدم);
+    إذا (حالت != CL_SUCCESS)
         CV_Error(cv::Error::OpenCLApiCallError, "OpenCL: clEnqueueAcquireD3D11ObjectsKHR failed");
 
-#ifdef HAVE_DIRECTX_NV12
-    if(DXGI_FORMAT_NV12 == desc.Format)
+#که_تعریف_شوی HAVE_DIRECTX_NV12
+    إذا(DXGI_FORMAT_NV12 == desc.Format)
     {
-        status = impl->clEnqueueAcquireD3D11ObjectsKHR(q, 1, &clImageUV, 0, NULL, NULL);
-        if (status != CL_SUCCESS)
+        حالت = impl->cl_کتار_ته_ورزیاتول_Acquire_D3_D11_Objects_KHR(q, 1, &clImageUV, 0, عدم, عدم);
+        إذا (حالت != CL_SUCCESS)
             CV_Error(cv::Error::OpenCLApiCallError, "OpenCL: clEnqueueAcquireD3D11ObjectsKHR failed");
 
-        if(!ocl::ocl_convert_nv12_to_bgr(clImage, clImageUV, clBuffer, (int)u.step[0], u.cols, u.rows))
+        إذا(!ocl::ocl_convert_nv12_منزل_bgr(clImage, clImageUV, cl_بفر, (صحيح)u.ګام[0], u.ستون_شمېر, u.لیکې))
             CV_Error(cv::Error::OpenCLApiCallError, "OpenCL: ocl_convert_nv12_to_bgr failed");
 
-        status = impl->clEnqueueReleaseD3D11ObjectsKHR(q, 1, &clImageUV, 0, NULL, NULL);
-        if (status != CL_SUCCESS)
+        حالت = impl->cl_کتار_ته_ورزیاتول_Release_D3_D11_Objects_KHR(q, 1, &clImageUV, 0, عدم, عدم);
+        إذا (حالت != CL_SUCCESS)
             CV_Error(cv::Error::OpenCLApiCallError, "OpenCL: clEnqueueReleaseD3D11ObjectsKHR failed");
     }
-    else
-#endif
+    وإلا
+#د_که_پای
     {
         size_t offset = 0; // TODO
         size_t origin[3] = { 0, 0, 0 };
-        size_t region[3] = { (size_t)u.cols, (size_t)u.rows, 1 };
+        size_t region[3] = { (size_t)u.ستون_شمېر, (size_t)u.لیکې, 1 };
 
-        status = clEnqueueCopyImageToBuffer(q, clImage, clBuffer, origin, region, offset, 0, NULL, NULL);
-        if (status != CL_SUCCESS)
+        حالت = cl_کتار_ته_ورزیاتول_Copy_Image_منزل_بفر(q, clImage, cl_بفر, origin, region, offset, 0, عدم, عدم);
+        إذا (حالت != CL_SUCCESS)
             CV_Error(cv::Error::OpenCLApiCallError, "OpenCL: clEnqueueCopyImageToBuffer failed");
     }
 
-    status = impl->clEnqueueReleaseD3D11ObjectsKHR(q, 1, &clImage, 0, NULL, NULL);
-    if (status != CL_SUCCESS)
+    حالت = impl->cl_کتار_ته_ورزیاتول_Release_D3_D11_Objects_KHR(q, 1, &clImage, 0, عدم, عدم);
+    إذا (حالت != CL_SUCCESS)
         CV_Error(cv::Error::OpenCLApiCallError, "OpenCL: clEnqueueReleaseD3D11ObjectsKHR failed");
 
-    status = clFinish(q); // TODO Use events
-    if (status != CL_SUCCESS)
+    حالت = cl_پای(q); // TODO Use events
+    إذا (حالت != CL_SUCCESS)
         CV_Error(cv::Error::OpenCLApiCallError, "OpenCL: clFinish failed");
 
-    status = clReleaseMemObject(clImage); // TODO RAII
-    if (status != CL_SUCCESS)
+    حالت = clReleaseMemObject(clImage); // TODO RAII
+    إذا (حالت != CL_SUCCESS)
         CV_Error(cv::Error::OpenCLApiCallError, "OpenCL: clReleaseMem failed");
 
-#ifdef HAVE_DIRECTX_NV12
-    if(DXGI_FORMAT_NV12 == desc.Format)
+#که_تعریف_شوی HAVE_DIRECTX_NV12
+    إذا(DXGI_FORMAT_NV12 == desc.Format)
     {
-        status = clReleaseMemObject(clImageUV);
-        if (status != CL_SUCCESS)
+        حالت = clReleaseMemObject(clImageUV);
+        إذا (حالت != CL_SUCCESS)
             CV_Error(cv::Error::OpenCLApiCallError, "OpenCL: clReleaseMem failed");
     }
-#endif
+#د_که_پای
 }
-#endif
+#د_که_پای
 
-#if defined(HAVE_OPENCL_D3D11_NV)
-static void __convertFromD3D11Texture2DNV(ID3D11Texture2D* pD3D11Texture2D, OutputArray dst)
+#إذا defined(HAVE_OPENCL_D3D11_NV)
+ساكن فراغ __convertFromD3D11Texture2DNV(ID3D11Texture2D* pD3D11Texture2D, OutputArray dst)
 {
     D3D11_TEXTURE2D_DESC desc = { 0 };
     pD3D11Texture2D->GetDesc(&desc);
 
-    int textureType = getTypeFromDXGI_FORMAT(desc.Format);
+    صحيح textureType = getTypeFromDXGI_FORMAT(desc.Format);
     CV_Assert(textureType >= 0);
 
     // TODO Need to specify ACCESS_WRITE here somehow to prevent useless data copying!
-    dst.create(Size(desc.Width, desc.Height), textureType);
+    dst.create(اندازه(desc.پلنوالی_2, desc.لوړوالی_2), textureType);
     UMat u = dst.getUMat();
 
     // TODO Add support for roi
     CV_Assert(u.offset == 0);
     CV_Assert(u.isContinuous());
 
-    cl_mem clBuffer = (cl_mem)u.handle(ACCESS_READ);
+    cl_mem cl_بفر = (cl_mem)u.handle(ACCESS_READ);
 
     ocl::Context& ctx = ocl::OpenCLExecutionContext::getCurrent().getContext();
     cl_context context = (cl_context)ctx.ptr();
     OpenCL_D3D11_NV* impl = ctx.getUserContext<OpenCL_D3D11_NV>().get();
-    if (nullptr == impl)
+    إذا (تش_اشاره == impl)
         CV_Error(cv::Error::OpenCLApiCallError, "OpenCL: Context initilized without DirectX interoperability");
 
-    cl_int status = 0;
+    cl_int حالت = 0;
     cl_mem clImage = 0;
 
-    clImage = impl->clCreateFromD3D11Texture2DNV(context, CL_MEM_READ_ONLY, pD3D11Texture2D, 0, &status);
-    if (status != CL_SUCCESS)
+    clImage = impl->clCreateFromD3D11Texture2DNV(context, CL_MEM_READ_ONLY, pD3D11Texture2D, 0, &حالت);
+    إذا (حالت != CL_SUCCESS)
         CV_Error(cv::Error::OpenCLApiCallError, "OpenCL: clCreateFromD3D11Texture2DNV failed");
 
-#ifdef HAVE_DIRECTX_NV12
+#که_تعریف_شوی HAVE_DIRECTX_NV12
     cl_mem clImageUV = 0;
-    if(DXGI_FORMAT_NV12 == desc.Format)
+    إذا(DXGI_FORMAT_NV12 == desc.Format)
     {
-        clImageUV = impl->clCreateFromD3D11Texture2DNV(context, CL_MEM_READ_ONLY, pD3D11Texture2D, 1, &status);
-        if (status != CL_SUCCESS)
+        clImageUV = impl->clCreateFromD3D11Texture2DNV(context, CL_MEM_READ_ONLY, pD3D11Texture2D, 1, &حالت);
+        إذا (حالت != CL_SUCCESS)
             CV_Error(cv::Error::OpenCLApiCallError, "OpenCL: clCreateFromD3D11Texture2DNV failed");
     }
-#endif
+#د_که_پای
 
-    cl_command_queue q = (cl_command_queue)Queue::getDefault().ptr();
-    status = impl->clEnqueueAcquireD3D11ObjectsNV(q, 1, &clImage, 0, NULL, NULL);
-    if (status != CL_SUCCESS)
+    cl_command_کتار q = (cl_command_کتار)کتار::getDefault().ptr();
+    حالت = impl->cl_کتار_ته_ورزیاتول_Acquire_D3_D11_Objects_NV(q, 1, &clImage, 0, عدم, عدم);
+    إذا (حالت != CL_SUCCESS)
         CV_Error(cv::Error::OpenCLApiCallError, "OpenCL: clEnqueueAcquireD3D11ObjectsNV failed");
 
-#ifdef HAVE_DIRECTX_NV12
-    if (DXGI_FORMAT::DXGI_FORMAT_NV12 == desc.Format)
+#که_تعریف_شوی HAVE_DIRECTX_NV12
+    إذا (DXGI_FORMAT::DXGI_FORMAT_NV12 == desc.Format)
     {
-        status = impl->clEnqueueAcquireD3D11ObjectsNV(q, 1, &clImageUV, 0, NULL, NULL);
-        if (status != CL_SUCCESS)
+        حالت = impl->cl_کتار_ته_ورزیاتول_Acquire_D3_D11_Objects_NV(q, 1, &clImageUV, 0, عدم, عدم);
+        إذا (حالت != CL_SUCCESS)
             CV_Error(cv::Error::OpenCLApiCallError, "OpenCL: clEnqueueAcquireD3D11ObjectsNV failed");
 
-        if (!ocl::ocl_convert_nv12_to_bgr(clImage, clImageUV, clBuffer, (int)u.step[0], u.cols, u.rows))
+        إذا (!ocl::ocl_convert_nv12_منزل_bgr(clImage, clImageUV, cl_بفر, (صحيح)u.ګام[0], u.ستون_شمېر, u.لیکې))
             CV_Error(cv::Error::OpenCLApiCallError, "OpenCL: ocl_convert_nv12_to_bgr failed");
 
-        status = impl->clEnqueueReleaseD3D11ObjectsNV(q, 1, &clImageUV, 0, NULL, NULL);
-        if (status != CL_SUCCESS)
+        حالت = impl->cl_کتار_ته_ورزیاتول_Release_D3_D11_Objects_NV(q, 1, &clImageUV, 0, عدم, عدم);
+        إذا (حالت != CL_SUCCESS)
             CV_Error(cv::Error::OpenCLApiCallError, "OpenCL: clEnqueueReleaseD3D11ObjectsNV failed");
     }
-    else
-#endif
+    وإلا
+#د_که_پای
     {
         size_t offset = 0; // TODO
         size_t origin[3] = { 0, 0, 0 };
-        size_t region[3] = { (size_t)u.cols, (size_t)u.rows, 1 };
+        size_t region[3] = { (size_t)u.ستون_شمېر, (size_t)u.لیکې, 1 };
 
-        status = clEnqueueCopyImageToBuffer(q, clImage, clBuffer, origin, region, offset, 0, NULL, NULL);
-        if (status != CL_SUCCESS)
+        حالت = cl_کتار_ته_ورزیاتول_Copy_Image_منزل_بفر(q, clImage, cl_بفر, origin, region, offset, 0, عدم, عدم);
+        إذا (حالت != CL_SUCCESS)
             CV_Error(cv::Error::OpenCLApiCallError, "OpenCL: clEnqueueCopyImageToBuffer failed");
     }
 
-    status = impl->clEnqueueReleaseD3D11ObjectsNV(q, 1, &clImage, 0, NULL, NULL);
-    if (status != CL_SUCCESS)
+    حالت = impl->cl_کتار_ته_ورزیاتول_Release_D3_D11_Objects_NV(q, 1, &clImage, 0, عدم, عدم);
+    إذا (حالت != CL_SUCCESS)
         CV_Error(cv::Error::OpenCLApiCallError, "OpenCL: clEnqueueReleaseD3D11ObjectsNV failed");
 
-    status = clFinish(q); // TODO Use events
-    if (status != CL_SUCCESS)
+    حالت = cl_پای(q); // TODO Use events
+    إذا (حالت != CL_SUCCESS)
         CV_Error(cv::Error::OpenCLApiCallError, "OpenCL: clFinish failed");
 
-    status = clReleaseMemObject(clImage); // TODO RAII
-    if (status != CL_SUCCESS)
+    حالت = clReleaseMemObject(clImage); // TODO RAII
+    إذا (حالت != CL_SUCCESS)
         CV_Error(cv::Error::OpenCLApiCallError, "OpenCL: clReleaseMem failed");
 
-#ifdef HAVE_DIRECTX_NV12
-    if(DXGI_FORMAT_NV12 == desc.Format)
+#که_تعریف_شوی HAVE_DIRECTX_NV12
+    إذا(DXGI_FORMAT_NV12 == desc.Format)
     {
-        status = clReleaseMemObject(clImageUV);
-        if (status != CL_SUCCESS)
+        حالت = clReleaseMemObject(clImageUV);
+        إذا (حالت != CL_SUCCESS)
             CV_Error(cv::Error::OpenCLApiCallError, "OpenCL: clReleaseMem failed");
     }
-#endif
+#د_که_پای
 }
-#endif
+#د_که_پای
 
-void convertToD3D11Texture2D(InputArray src, ID3D11Texture2D* pD3D11Texture2D)
+فراغ convert_منزل_D3_D11_Texture2_D(ننوت_Array src, ID3D11Texture2D* pD3D11Texture2D)
 {
-    CV_UNUSED(src); CV_UNUSED(pD3D11Texture2D);
-#if !defined(HAVE_DIRECTX)
+    CV_ناکارول_شوی(src); CV_ناکارول_شوی(pD3D11Texture2D);
+#إذا !defined(HAVE_DIRECTX)
     NO_DIRECTX_SUPPORT_ERROR;
-#elif !defined(HAVE_OPENCL)
+#وإلاإذا !defined(HAVE_OPENCL)
     NO_OPENCL_SUPPORT_ERROR;
-#else
+#وإلا
 
     ocl::Context& ctx = ocl::OpenCLExecutionContext::getCurrent().getContext();
-#ifdef HAVE_OPENCL_D3D11_NV
+#که_تعریف_شوی HAVE_OPENCL_D3D11_NV
     OpenCL_D3D11_NV* impl_nv = ctx.getUserContext<OpenCL_D3D11_NV>().get();
-    if (impl_nv) {
+    إذا (impl_nv) {
         __convertToD3D11Texture2DNV(src,pD3D11Texture2D);
-        return;
+        أرجع;
     }
-#endif
+#د_که_پای
     OpenCL_D3D11* impl = ctx.getUserContext<OpenCL_D3D11>().get();
-    if (impl) {
+    إذا (impl) {
         __convertToD3D11Texture2DKHR(src, pD3D11Texture2D);
     }
-    else {
+    وإلا {
         CV_Error(cv::Error::OpenCLApiCallError, "OpenCL: Context initilized without DirectX interoperability");
     }
-#endif
+#د_که_پای
 }
 
-void convertFromD3D11Texture2D(ID3D11Texture2D* pD3D11Texture2D, OutputArray dst)
+فراغ convertFromD3D11Texture2D(ID3D11Texture2D* pD3D11Texture2D, OutputArray dst)
 {
-    CV_UNUSED(pD3D11Texture2D); CV_UNUSED(dst);
-#if !defined(HAVE_DIRECTX)
+    CV_ناکارول_شوی(pD3D11Texture2D); CV_ناکارول_شوی(dst);
+#إذا !defined(HAVE_DIRECTX)
     NO_DIRECTX_SUPPORT_ERROR;
-#elif !defined(HAVE_OPENCL)
+#وإلاإذا !defined(HAVE_OPENCL)
     NO_OPENCL_SUPPORT_ERROR;
-#else
+#وإلا
 
     ocl::Context& ctx = ocl::OpenCLExecutionContext::getCurrent().getContext();
-#ifdef HAVE_OPENCL_D3D11_NV
+#که_تعریف_شوی HAVE_OPENCL_D3D11_NV
     OpenCL_D3D11_NV* impl_nv = ctx.getUserContext<OpenCL_D3D11_NV>().get();
-    if (impl_nv) {
+    إذا (impl_nv) {
         __convertFromD3D11Texture2DNV(pD3D11Texture2D,dst);
-        return;
+        أرجع;
     }
-#endif
+#د_که_پای
     OpenCL_D3D11* impl = ctx.getUserContext<OpenCL_D3D11>().get();
-    if (impl) {
+    إذا (impl) {
         __convertFromD3D11Texture2DKHR(pD3D11Texture2D, dst);
     }
-    else {
+    وإلا {
         CV_Error(cv::Error::OpenCLApiCallError, "OpenCL: Context initilized without DirectX interoperability");
     }
-#endif
+#د_که_پای
 }
 
-void convertToD3D10Texture2D(InputArray src, ID3D10Texture2D* pD3D10Texture2D)
+فراغ convert_منزل_D3_D10_Texture2_D(ننوت_Array src, ID3D10Texture2D* pD3D10Texture2D)
 {
-    CV_UNUSED(src); CV_UNUSED(pD3D10Texture2D);
-#if !defined(HAVE_DIRECTX)
+    CV_ناکارول_شوی(src); CV_ناکارول_شوی(pD3D10Texture2D);
+#إذا !defined(HAVE_DIRECTX)
     NO_DIRECTX_SUPPORT_ERROR;
-#elif defined(HAVE_OPENCL)
+#وإلاإذا defined(HAVE_OPENCL)
 
     ocl::Context& ctx = ocl::OpenCLExecutionContext::getCurrent().getContext();
     OpenCL_D3D10* impl = ctx.getUserContext<OpenCL_D3D10>().get();
-    if (nullptr == impl)
+    إذا (تش_اشاره == impl)
         CV_Error(cv::Error::OpenCLApiCallError, "OpenCL: Context initilized without DirectX interoperability");
 
     D3D10_TEXTURE2D_DESC desc = { 0 };
     pD3D10Texture2D->GetDesc(&desc);
 
-    int srcType = src.type();
-    int textureType = getTypeFromDXGI_FORMAT(desc.Format);
+    صحيح srcType = src.type();
+    صحيح textureType = getTypeFromDXGI_FORMAT(desc.Format);
     CV_Assert(textureType == srcType);
 
-    Size srcSize = src.size();
-    CV_Assert(srcSize.width == (int)desc.Width && srcSize.height == (int)desc.Height);
+    اندازه src_اندازه = src.size();
+    CV_Assert(src_اندازه.پلنوالی == (صحيح)desc.پلنوالی_2 && src_اندازه.لوړوالی == (صحيح)desc.لوړوالی_2);
 
     cl_context context = (cl_context)ctx.ptr();
 
@@ -1428,125 +1428,125 @@ void convertToD3D10Texture2D(InputArray src, ID3D10Texture2D* pD3D10Texture2D)
     CV_Assert(u.offset == 0);
     CV_Assert(u.isContinuous());
 
-    cl_int status = 0;
-    cl_mem clImage = impl->clCreateFromD3D10Texture2DKHR(context, CL_MEM_WRITE_ONLY, pD3D10Texture2D, 0, &status);
-    if (status != CL_SUCCESS)
+    cl_int حالت = 0;
+    cl_mem clImage = impl->clCreateFromD3D10Texture2DKHR(context, CL_MEM_WRITE_ONLY, pD3D10Texture2D, 0, &حالت);
+    إذا (حالت != CL_SUCCESS)
         CV_Error(cv::Error::OpenCLApiCallError, "OpenCL: clCreateFromD3D10Texture2DKHR failed");
 
-    cl_mem clBuffer = (cl_mem)u.handle(ACCESS_READ);
+    cl_mem cl_بفر = (cl_mem)u.handle(ACCESS_READ);
 
-    cl_command_queue q = (cl_command_queue)Queue::getDefault().ptr();
-    status = impl->clEnqueueAcquireD3D10ObjectsKHR(q, 1, &clImage, 0, NULL, NULL);
-    if (status != CL_SUCCESS)
+    cl_command_کتار q = (cl_command_کتار)کتار::getDefault().ptr();
+    حالت = impl->cl_کتار_ته_ورزیاتول_Acquire_D3_D10_Objects_KHR(q, 1, &clImage, 0, عدم, عدم);
+    إذا (حالت != CL_SUCCESS)
         CV_Error(cv::Error::OpenCLApiCallError, "OpenCL: clEnqueueAcquireD3D10ObjectsKHR failed");
     size_t offset = 0; // TODO
     size_t dst_origin[3] = {0, 0, 0};
-    size_t region[3] = {(size_t)u.cols, (size_t)u.rows, 1};
-    status = clEnqueueCopyBufferToImage(q, clBuffer, clImage, offset, dst_origin, region, 0, NULL, NULL);
-    if (status != CL_SUCCESS)
+    size_t region[3] = {(size_t)u.ستون_شمېر, (size_t)u.لیکې, 1};
+    حالت = cl_کتار_ته_ورزیاتول_Copy_بفر_منزل_Image(q, cl_بفر, clImage, offset, dst_origin, region, 0, عدم, عدم);
+    إذا (حالت != CL_SUCCESS)
         CV_Error(cv::Error::OpenCLApiCallError, "OpenCL: clEnqueueCopyBufferToImage failed");
-    status = impl->clEnqueueReleaseD3D10ObjectsKHR(q, 1, &clImage, 0, NULL, NULL);
-    if (status != CL_SUCCESS)
+    حالت = impl->cl_کتار_ته_ورزیاتول_Release_D3_D10_Objects_KHR(q, 1, &clImage, 0, عدم, عدم);
+    إذا (حالت != CL_SUCCESS)
         CV_Error(cv::Error::OpenCLApiCallError, "OpenCL: clEnqueueReleaseD3D10ObjectsKHR failed");
 
-    status = clFinish(q); // TODO Use events
-    if (status != CL_SUCCESS)
+    حالت = cl_پای(q); // TODO Use events
+    إذا (حالت != CL_SUCCESS)
         CV_Error(cv::Error::OpenCLApiCallError, "OpenCL: clFinish failed");
 
-    status = clReleaseMemObject(clImage); // TODO RAII
-    if (status != CL_SUCCESS)
+    حالت = clReleaseMemObject(clImage); // TODO RAII
+    إذا (حالت != CL_SUCCESS)
         CV_Error(cv::Error::OpenCLApiCallError, "OpenCL: clReleaseMem failed");
-#else
+#وإلا
     // TODO memcpy
     NO_OPENCL_SUPPORT_ERROR;
-#endif
+#د_که_پای
 }
 
-void convertFromD3D10Texture2D(ID3D10Texture2D* pD3D10Texture2D, OutputArray dst)
+فراغ convertFromD3D10Texture2D(ID3D10Texture2D* pD3D10Texture2D, OutputArray dst)
 {
-    CV_UNUSED(pD3D10Texture2D); CV_UNUSED(dst);
-#if !defined(HAVE_DIRECTX)
+    CV_ناکارول_شوی(pD3D10Texture2D); CV_ناکارول_شوی(dst);
+#إذا !defined(HAVE_DIRECTX)
     NO_DIRECTX_SUPPORT_ERROR;
-#elif defined(HAVE_OPENCL)
+#وإلاإذا defined(HAVE_OPENCL)
     ocl::Context& ctx = ocl::OpenCLExecutionContext::getCurrent().getContext();
     OpenCL_D3D10* impl = ctx.getUserContext<OpenCL_D3D10>().get();
-    if (nullptr == impl)
+    إذا (تش_اشاره == impl)
         CV_Error(cv::Error::OpenCLApiCallError, "OpenCL: Context initilized without DirectX interoperability");
 
     D3D10_TEXTURE2D_DESC desc = { 0 };
     pD3D10Texture2D->GetDesc(&desc);
 
-    int textureType = getTypeFromDXGI_FORMAT(desc.Format);
+    صحيح textureType = getTypeFromDXGI_FORMAT(desc.Format);
     CV_Assert(textureType >= 0);
 
     cl_context context = (cl_context)ctx.ptr();
 
     // TODO Need to specify ACCESS_WRITE here somehow to prevent useless data copying!
-    dst.create(Size(desc.Width, desc.Height), textureType);
+    dst.create(اندازه(desc.پلنوالی_2, desc.لوړوالی_2), textureType);
     UMat u = dst.getUMat();
 
     // TODO Add support for roi
     CV_Assert(u.offset == 0);
     CV_Assert(u.isContinuous());
 
-    cl_int status = 0;
-    cl_mem clImage = impl->clCreateFromD3D10Texture2DKHR(context, CL_MEM_READ_ONLY, pD3D10Texture2D, 0, &status);
-    if (status != CL_SUCCESS)
+    cl_int حالت = 0;
+    cl_mem clImage = impl->clCreateFromD3D10Texture2DKHR(context, CL_MEM_READ_ONLY, pD3D10Texture2D, 0, &حالت);
+    إذا (حالت != CL_SUCCESS)
         CV_Error(cv::Error::OpenCLApiCallError, "OpenCL: clCreateFromD3D10Texture2DKHR failed");
 
-    cl_mem clBuffer = (cl_mem)u.handle(ACCESS_READ);
+    cl_mem cl_بفر = (cl_mem)u.handle(ACCESS_READ);
 
-    cl_command_queue q = (cl_command_queue)Queue::getDefault().ptr();
-    status = impl->clEnqueueAcquireD3D10ObjectsKHR(q, 1, &clImage, 0, NULL, NULL);
-    if (status != CL_SUCCESS)
+    cl_command_کتار q = (cl_command_کتار)کتار::getDefault().ptr();
+    حالت = impl->cl_کتار_ته_ورزیاتول_Acquire_D3_D10_Objects_KHR(q, 1, &clImage, 0, عدم, عدم);
+    إذا (حالت != CL_SUCCESS)
         CV_Error(cv::Error::OpenCLApiCallError, "OpenCL: clEnqueueAcquireD3D10ObjectsKHR failed");
     size_t offset = 0; // TODO
     size_t src_origin[3] = {0, 0, 0};
-    size_t region[3] = {(size_t)u.cols, (size_t)u.rows, 1};
-    status = clEnqueueCopyImageToBuffer(q, clImage, clBuffer, src_origin, region, offset, 0, NULL, NULL);
-    if (status != CL_SUCCESS)
+    size_t region[3] = {(size_t)u.ستون_شمېر, (size_t)u.لیکې, 1};
+    حالت = cl_کتار_ته_ورزیاتول_Copy_Image_منزل_بفر(q, clImage, cl_بفر, src_origin, region, offset, 0, عدم, عدم);
+    إذا (حالت != CL_SUCCESS)
         CV_Error(cv::Error::OpenCLApiCallError, "OpenCL: clEnqueueCopyImageToBuffer failed");
-    status = impl->clEnqueueReleaseD3D10ObjectsKHR(q, 1, &clImage, 0, NULL, NULL);
-    if (status != CL_SUCCESS)
+    حالت = impl->cl_کتار_ته_ورزیاتول_Release_D3_D10_Objects_KHR(q, 1, &clImage, 0, عدم, عدم);
+    إذا (حالت != CL_SUCCESS)
         CV_Error(cv::Error::OpenCLApiCallError, "OpenCL: clEnqueueReleaseD3D10ObjectsKHR failed");
 
-    status = clFinish(q); // TODO Use events
-    if (status != CL_SUCCESS)
+    حالت = cl_پای(q); // TODO Use events
+    إذا (حالت != CL_SUCCESS)
         CV_Error(cv::Error::OpenCLApiCallError, "OpenCL: clFinish failed");
 
-    status = clReleaseMemObject(clImage); // TODO RAII
-    if (status != CL_SUCCESS)
+    حالت = clReleaseMemObject(clImage); // TODO RAII
+    إذا (حالت != CL_SUCCESS)
         CV_Error(cv::Error::OpenCLApiCallError, "OpenCL: clReleaseMem failed");
-#else
+#وإلا
     // TODO memcpy
     NO_OPENCL_SUPPORT_ERROR;
-#endif
+#د_که_پای
 }
 
-void convertToDirect3DSurface9(InputArray src, IDirect3DSurface9* pDirect3DSurface9, void* surfaceSharedHandle)
+فراغ convert_منزل_Direct3_DSurface9(ننوت_Array src, IDirect3DSurface9* pDirect3DSurface9, فراغ* surfaceSharedHandle)
 {
-    CV_UNUSED(src); CV_UNUSED(pDirect3DSurface9); CV_UNUSED(surfaceSharedHandle);
-#if !defined(HAVE_DIRECTX)
+    CV_ناکارول_شوی(src); CV_ناکارول_شوی(pDirect3DSurface9); CV_ناکارول_شوی(surfaceSharedHandle);
+#إذا !defined(HAVE_DIRECTX)
     NO_DIRECTX_SUPPORT_ERROR;
-#elif defined(HAVE_OPENCL)
+#وإلاإذا defined(HAVE_OPENCL)
 
     ocl::Context& ctx = ocl::OpenCLExecutionContext::getCurrent().getContext();
     OpenCL_D3D9* impl = ctx.getUserContext<OpenCL_D3D9>().get();
-    if (nullptr == impl)
+    إذا (تش_اشاره == impl)
         CV_Error(cv::Error::OpenCLApiCallError, "OpenCL: Context initilized without DirectX interoperability");
 
     D3DSURFACE_DESC desc;
-    if (FAILED(pDirect3DSurface9->GetDesc(&desc)))
+    إذا (FAILED(pDirect3DSurface9->GetDesc(&desc)))
     {
         CV_Error(cv::Error::OpenCLApiCallError, "OpenCL: Can't get D3D surface description");
     }
 
-    int srcType = src.type();
-    int surfaceType = getTypeFromD3DFORMAT(desc.Format);
+    صحيح srcType = src.type();
+    صحيح surfaceType = getTypeFromD3DFORMAT(desc.Format);
     CV_Assert(surfaceType == srcType);
 
-    Size srcSize = src.size();
-    CV_Assert(srcSize.width == (int)desc.Width && srcSize.height == (int)desc.Height);
+    اندازه src_اندازه = src.size();
+    CV_Assert(src_اندازه.پلنوالی == (صحيح)desc.پلنوالی_2 && src_اندازه.لوړوالی == (صحيح)desc.لوړوالی_2);
 
     cl_context context = (cl_context)ctx.ptr();
 
@@ -1556,109 +1556,109 @@ void convertToDirect3DSurface9(InputArray src, IDirect3DSurface9* pDirect3DSurfa
     CV_Assert(u.offset == 0);
     CV_Assert(u.isContinuous());
 
-    cl_int status = 0;
+    cl_int حالت = 0;
     cl_dx9_surface_info_khr surfaceInfo = {pDirect3DSurface9, (HANDLE)surfaceSharedHandle};
     cl_mem clImage = impl->clCreateFromDX9MediaSurfaceKHR(context, CL_MEM_WRITE_ONLY,
         impl->deviceEx ? CL_ADAPTER_D3D9EX_KHR : CL_ADAPTER_D3D9_KHR,
-            &surfaceInfo, 0, &status);
-    if (status != CL_SUCCESS)
+            &surfaceInfo, 0, &حالت);
+    إذا (حالت != CL_SUCCESS)
         CV_Error(cv::Error::OpenCLApiCallError, "OpenCL: clCreateFromDX9MediaSurfaceKHR failed");
 
-    cl_mem clBuffer = (cl_mem)u.handle(ACCESS_READ);
+    cl_mem cl_بفر = (cl_mem)u.handle(ACCESS_READ);
 
-    cl_command_queue q = (cl_command_queue)Queue::getDefault().ptr();
-    status = impl->clEnqueueAcquireDX9MediaSurfacesKHR(q, 1, &clImage, 0, NULL, NULL);
-    if (status != CL_SUCCESS)
+    cl_command_کتار q = (cl_command_کتار)کتار::getDefault().ptr();
+    حالت = impl->cl_کتار_ته_ورزیاتول_Acquire_DX9_Media_Surfaces_KHR(q, 1, &clImage, 0, عدم, عدم);
+    إذا (حالت != CL_SUCCESS)
         CV_Error(cv::Error::OpenCLApiCallError, "OpenCL: clEnqueueAcquireDX9MediaSurfacesKHR failed");
     size_t offset = 0; // TODO
     size_t dst_origin[3] = {0, 0, 0};
-    size_t region[3] = {(size_t)u.cols, (size_t)u.rows, 1};
-    status = clEnqueueCopyBufferToImage(q, clBuffer, clImage, offset, dst_origin, region, 0, NULL, NULL);
-    if (status != CL_SUCCESS)
+    size_t region[3] = {(size_t)u.ستون_شمېر, (size_t)u.لیکې, 1};
+    حالت = cl_کتار_ته_ورزیاتول_Copy_بفر_منزل_Image(q, cl_بفر, clImage, offset, dst_origin, region, 0, عدم, عدم);
+    إذا (حالت != CL_SUCCESS)
         CV_Error(cv::Error::OpenCLApiCallError, "OpenCL: clEnqueueCopyBufferToImage failed");
-    status = impl->clEnqueueReleaseDX9MediaSurfacesKHR(q, 1, &clImage, 0, NULL, NULL);
-    if (status != CL_SUCCESS)
+    حالت = impl->cl_کتار_ته_ورزیاتول_Release_DX9_Media_Surfaces_KHR(q, 1, &clImage, 0, عدم, عدم);
+    إذا (حالت != CL_SUCCESS)
         CV_Error(cv::Error::OpenCLApiCallError, "OpenCL: clEnqueueReleaseDX9MediaSurfacesKHR failed");
 
-    status = clFinish(q); // TODO Use events
-    if (status != CL_SUCCESS)
+    حالت = cl_پای(q); // TODO Use events
+    إذا (حالت != CL_SUCCESS)
         CV_Error(cv::Error::OpenCLApiCallError, "OpenCL: clFinish failed");
 
-    status = clReleaseMemObject(clImage); // TODO RAII
-    if (status != CL_SUCCESS)
+    حالت = clReleaseMemObject(clImage); // TODO RAII
+    إذا (حالت != CL_SUCCESS)
         CV_Error(cv::Error::OpenCLApiCallError, "OpenCL: clReleaseMem failed");
-#else
+#وإلا
     // TODO pDirect3DSurface9->LockRect() + memcpy + Unlock()
     NO_OPENCL_SUPPORT_ERROR;
-#endif
+#د_که_پای
 }
 
-void convertFromDirect3DSurface9(IDirect3DSurface9* pDirect3DSurface9, OutputArray dst, void* surfaceSharedHandle)
+فراغ convertFromDirect3DSurface9(IDirect3DSurface9* pDirect3DSurface9, OutputArray dst, فراغ* surfaceSharedHandle)
 {
-    CV_UNUSED(pDirect3DSurface9); CV_UNUSED(dst); CV_UNUSED(surfaceSharedHandle);
-#if !defined(HAVE_DIRECTX)
+    CV_ناکارول_شوی(pDirect3DSurface9); CV_ناکارول_شوی(dst); CV_ناکارول_شوی(surfaceSharedHandle);
+#إذا !defined(HAVE_DIRECTX)
     NO_DIRECTX_SUPPORT_ERROR;
-#elif defined(HAVE_OPENCL)
+#وإلاإذا defined(HAVE_OPENCL)
 
     ocl::Context& ctx = ocl::OpenCLExecutionContext::getCurrent().getContext();
     OpenCL_D3D9* impl = ctx.getUserContext<OpenCL_D3D9>().get();
-    if (nullptr == impl)
+    إذا (تش_اشاره == impl)
         CV_Error(cv::Error::OpenCLApiCallError, "OpenCL: Context initilized without DirectX interoperability");
 
     D3DSURFACE_DESC desc;
-    if (FAILED(pDirect3DSurface9->GetDesc(&desc)))
+    إذا (FAILED(pDirect3DSurface9->GetDesc(&desc)))
     {
         CV_Error(cv::Error::OpenCLApiCallError, "OpenCL: Can't get D3D surface description");
     }
 
-    int surfaceType = getTypeFromD3DFORMAT(desc.Format);
+    صحيح surfaceType = getTypeFromD3DFORMAT(desc.Format);
     CV_Assert(surfaceType >= 0);
 
     cl_context context = (cl_context)ctx.ptr();
 
     // TODO Need to specify ACCESS_WRITE here somehow to prevent useless data copying!
-    dst.create(Size(desc.Width, desc.Height), surfaceType);
+    dst.create(اندازه(desc.پلنوالی_2, desc.لوړوالی_2), surfaceType);
     UMat u = dst.getUMat();
 
     // TODO Add support for roi
     CV_Assert(u.offset == 0);
     CV_Assert(u.isContinuous());
 
-    cl_int status = 0;
+    cl_int حالت = 0;
     cl_dx9_surface_info_khr surfaceInfo = {pDirect3DSurface9, (HANDLE)surfaceSharedHandle};
     cl_mem clImage = impl->clCreateFromDX9MediaSurfaceKHR(context, CL_MEM_READ_ONLY,
             impl->deviceEx ? CL_ADAPTER_D3D9EX_KHR : CL_ADAPTER_D3D9_KHR,
-            &surfaceInfo, 0, &status);
-    if (status != CL_SUCCESS)
+            &surfaceInfo, 0, &حالت);
+    إذا (حالت != CL_SUCCESS)
         CV_Error(cv::Error::OpenCLApiCallError, "OpenCL: clCreateFromDX9MediaSurfaceKHR failed");
 
-    cl_mem clBuffer = (cl_mem)u.handle(ACCESS_WRITE);
+    cl_mem cl_بفر = (cl_mem)u.handle(ACCESS_WRITE);
 
-    cl_command_queue q = (cl_command_queue)Queue::getDefault().ptr();
-    status = impl->clEnqueueAcquireDX9MediaSurfacesKHR(q, 1, &clImage, 0, NULL, NULL);
-    if (status != CL_SUCCESS)
+    cl_command_کتار q = (cl_command_کتار)کتار::getDefault().ptr();
+    حالت = impl->cl_کتار_ته_ورزیاتول_Acquire_DX9_Media_Surfaces_KHR(q, 1, &clImage, 0, عدم, عدم);
+    إذا (حالت != CL_SUCCESS)
         CV_Error(cv::Error::OpenCLApiCallError, "OpenCL: clEnqueueAcquireDX9MediaSurfacesKHR failed");
     size_t offset = 0; // TODO
     size_t src_origin[3] = {0, 0, 0};
-    size_t region[3] = {(size_t)u.cols, (size_t)u.rows, 1};
-    status = clEnqueueCopyImageToBuffer(q, clImage, clBuffer, src_origin, region, offset, 0, NULL, NULL);
-    if (status != CL_SUCCESS)
+    size_t region[3] = {(size_t)u.ستون_شمېر, (size_t)u.لیکې, 1};
+    حالت = cl_کتار_ته_ورزیاتول_Copy_Image_منزل_بفر(q, clImage, cl_بفر, src_origin, region, offset, 0, عدم, عدم);
+    إذا (حالت != CL_SUCCESS)
         CV_Error(cv::Error::OpenCLApiCallError, "OpenCL: clEnqueueCopyImageToBuffer failed");
-    status = impl->clEnqueueReleaseDX9MediaSurfacesKHR(q, 1, &clImage, 0, NULL, NULL);
-    if (status != CL_SUCCESS)
+    حالت = impl->cl_کتار_ته_ورزیاتول_Release_DX9_Media_Surfaces_KHR(q, 1, &clImage, 0, عدم, عدم);
+    إذا (حالت != CL_SUCCESS)
         CV_Error(cv::Error::OpenCLApiCallError, "OpenCL: clEnqueueReleaseDX9MediaSurfacesKHR failed");
 
-    status = clFinish(q); // TODO Use events
-    if (status != CL_SUCCESS)
+    حالت = cl_پای(q); // TODO Use events
+    إذا (حالت != CL_SUCCESS)
         CV_Error(cv::Error::OpenCLApiCallError, "OpenCL: clFinish failed");
 
-    status = clReleaseMemObject(clImage); // TODO RAII
-    if (status != CL_SUCCESS)
+    حالت = clReleaseMemObject(clImage); // TODO RAII
+    إذا (حالت != CL_SUCCESS)
         CV_Error(cv::Error::OpenCLApiCallError, "OpenCL: clReleaseMem failed");
-#else
+#وإلا
     // TODO pDirect3DSurface9->LockRect() + memcpy + Unlock()
     NO_OPENCL_SUPPORT_ERROR;
-#endif
+#د_که_پای
 }
 
 } } // namespace cv::directx

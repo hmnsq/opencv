@@ -40,121 +40,121 @@
 //
 //M*/
 
-#include "precomp.hpp"
+#ضمن "precomp.hpp"
 
-using namespace cv;
-using namespace cv::cuda;
+کارول نطاق cv;
+کارول نطاق cv::cuda;
 
-int cv::cuda::getCudaEnabledDeviceCount()
+صحيح cv::cuda::get_Cuda_Enabled_Device_شمېر()
 {
-#ifndef HAVE_CUDA
-    return 0;
-#else
-    int count;
-    cudaError_t error = cudaGetDeviceCount(&count);
+#که_نه_تعریف_شوی HAVE_CUDA
+    أرجع 0;
+#وإلا
+    صحيح شمېر_2;
+    cudaError_t error = cuda_Get_Device_شمېر(&شمېر_2);
 
-    if (error == cudaErrorInsufficientDriver)
-        return -1;
+    إذا (error == cudaErrorInsufficientDriver)
+        أرجع -1;
 
-    if (error == cudaErrorNoDevice)
-        return 0;
+    إذا (error == cudaErrorNoDevice)
+        أرجع 0;
 
-    cudaSafeCall( error );
-    return count;
-#endif
+    cuda_خوندي_Call( error );
+    أرجع شمېر_2;
+#د_که_پای
 }
 
-void cv::cuda::setDevice(int device)
+فراغ cv::cuda::سېټ_Device(صحيح device)
 {
-#ifndef HAVE_CUDA
-    CV_UNUSED(device);
+#که_نه_تعریف_شوی HAVE_CUDA
+    CV_ناکارول_شوی(device);
     throw_no_cuda();
-#else
-    cudaSafeCall( cudaSetDevice(device) );
-    cudaSafeCall( cudaFree(0) );
-#endif
+#وإلا
+    cuda_خوندي_Call( cuda_سېټ_Device(device) );
+    cuda_خوندي_Call( cudaFree(0) );
+#د_که_پای
 }
 
-int cv::cuda::getDevice()
+صحيح cv::cuda::getDevice()
 {
-#ifndef HAVE_CUDA
+#که_نه_تعریف_شوی HAVE_CUDA
     throw_no_cuda();
-#else
-    int device;
-    cudaSafeCall( cudaGetDevice(&device) );
-    return device;
-#endif
+#وإلا
+    صحيح device;
+    cuda_خوندي_Call( cudaGetDevice(&device) );
+    أرجع device;
+#د_که_پای
 }
 
-void cv::cuda::resetDevice()
+فراغ cv::cuda::resetDevice()
 {
-#ifndef HAVE_CUDA
+#که_نه_تعریف_شوی HAVE_CUDA
     throw_no_cuda();
-#else
-    cudaSafeCall( cudaDeviceReset() );
-#endif
+#وإلا
+    cuda_خوندي_Call( cudaDeviceReset() );
+#د_که_پای
 }
 
-bool cv::cuda::deviceSupports(FeatureSet feature_set)
+منطقي cv::cuda::deviceSupports(Feature_سېټ feature_سېټ)
 {
-#ifndef HAVE_CUDA
-    CV_UNUSED(feature_set);
+#که_نه_تعریف_شوی HAVE_CUDA
+    CV_ناکارول_شوی(feature_سېټ);
     throw_no_cuda();
-#else
-    static int versions[] =
+#وإلا
+    ساكن صحيح versions[] =
     {
         -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1
     };
-    static const int cache_size = static_cast<int>(sizeof(versions) / sizeof(versions[0]));
+    ساكن ثابت صحيح cache_اندازه = static_cast<صحيح>(حجم(versions) / حجم(versions[0]));
 
-    const int devId = getDevice();
+    ثابت صحيح devId = getDevice();
 
-    int version;
+    صحيح نسخه;
 
-    if (devId < cache_size && versions[devId] >= 0)
+    إذا (devId < cache_اندازه && versions[devId] >= 0)
     {
-        version = versions[devId];
+        نسخه = versions[devId];
     }
-    else
+    وإلا
     {
         DeviceInfo dev(devId);
-        version = dev.majorVersion() * 10 + dev.minorVersion();
-        if (devId < cache_size)
-            versions[devId] = version;
+        نسخه = dev.major_نسخه() * 10 + dev.minor_نسخه();
+        إذا (devId < cache_اندازه)
+            versions[devId] = نسخه;
     }
 
-    return TargetArchs::builtWith(feature_set) && (version >= feature_set);
-#endif
+    أرجع موخه_Archs::builtWith(feature_سېټ) && (نسخه >= feature_سېټ);
+#د_که_پای
 }
 
 ////////////////////////////////////////////////////////////////////////
 // TargetArchs
 
-#ifdef HAVE_CUDA
+#که_تعریف_شوی HAVE_CUDA
 
-namespace
+نطاق
 {
-    class CudaArch
+    صنف CudaArch
     {
-    public:
+    عام:
         CudaArch();
 
-        bool builtWith(FeatureSet feature_set) const;
-        bool hasPtx(int major, int minor) const;
-        bool hasBin(int major, int minor) const;
-        bool hasEqualOrLessPtx(int major, int minor) const;
-        bool hasEqualOrGreaterPtx(int major, int minor) const;
-        bool hasEqualOrGreaterBin(int major, int minor) const;
+        منطقي builtWith(Feature_سېټ feature_سېټ) ثابت;
+        منطقي hasPtx(صحيح major, صحيح minor) ثابت;
+        منطقي hasBin(صحيح major, صحيح minor) ثابت;
+        منطقي hasEqualOrLessPtx(صحيح major, صحيح minor) ثابت;
+        منطقي hasEqualOrGreaterPtx(صحيح major, صحيح minor) ثابت;
+        منطقي hasEqualOrGreaterBin(صحيح major, صحيح minor) ثابت;
 
-    private:
-        static void fromStr(const char* set_as_str, std::vector<int>& arr);
+    خاص:
+        ساكن فراغ fromStr(ثابت حرف* سېټ_as_str, std::vector<صحيح>& arr);
 
-        std::vector<int> bin;
-        std::vector<int> ptx;
-        std::vector<int> features;
+        std::vector<صحيح> bin;
+        std::vector<صحيح> ptx;
+        std::vector<صحيح> features;
     };
 
-    const CudaArch cudaArch;
+    ثابت CudaArch cudaArch;
 
     CudaArch::CudaArch()
     {
@@ -163,57 +163,57 @@ namespace
         fromStr(CUDA_ARCH_FEATURES, features);
     }
 
-    bool CudaArch::builtWith(FeatureSet feature_set) const
+    منطقي CudaArch::builtWith(Feature_سېټ feature_سېټ) ثابت
     {
-        return !features.empty() && (features.back() >= feature_set);
+        أرجع !features.empty() && (features.back() >= feature_سېټ);
     }
 
-    bool CudaArch::hasPtx(int major, int minor) const
+    منطقي CudaArch::hasPtx(صحيح major, صحيح minor) ثابت
     {
-        return std::find(ptx.begin(), ptx.end(), major * 10 + minor) != ptx.end();
+        أرجع std::find(ptx.begin(), ptx.end(), major * 10 + minor) != ptx.end();
     }
 
-    bool CudaArch::hasBin(int major, int minor) const
+    منطقي CudaArch::hasBin(صحيح major, صحيح minor) ثابت
     {
-        return std::find(bin.begin(), bin.end(), major * 10 + minor) != bin.end();
+        أرجع std::find(bin.begin(), bin.end(), major * 10 + minor) != bin.end();
     }
 
-    bool CudaArch::hasEqualOrLessPtx(int major, int minor) const
+    منطقي CudaArch::hasEqualOrLessPtx(صحيح major, صحيح minor) ثابت
     {
-        return !ptx.empty() && (ptx.front() <= major * 10 + minor);
+        أرجع !ptx.empty() && (ptx.front() <= major * 10 + minor);
     }
 
-    bool CudaArch::hasEqualOrGreaterPtx(int major, int minor) const
+    منطقي CudaArch::hasEqualOrGreaterPtx(صحيح major, صحيح minor) ثابت
     {
-        return !ptx.empty() && (ptx.back() >= major * 10 + minor);
+        أرجع !ptx.empty() && (ptx.back() >= major * 10 + minor);
     }
 
-    bool CudaArch::hasEqualOrGreaterBin(int major, int minor) const
+    منطقي CudaArch::hasEqualOrGreaterBin(صحيح major, صحيح minor) ثابت
     {
-        return !bin.empty() && (bin.back() >= major * 10 + minor);
+        أرجع !bin.empty() && (bin.back() >= major * 10 + minor);
     }
 
-    void CudaArch::fromStr(const char* set_as_str, std::vector<int>& arr)
+    فراغ CudaArch::fromStr(ثابت حرف* سېټ_as_str, std::vector<صحيح>& arr)
     {
         arr.clear();
 
-        const size_t len = strlen(set_as_str);
+        ثابت size_t len = مزي_اوږدوالی(سېټ_as_str);
 
         size_t pos = 0;
-        while (pos < len)
+        طالما (pos < len)
         {
-            if (isspace(set_as_str[pos]))
+            إذا (که_تشه(سېټ_as_str[pos]))
             {
                 ++pos;
             }
-            else
+            وإلا
             {
-                int cur_value;
-                int chars_read;
-                int args_read = sscanf(set_as_str + pos, "%d%n", &cur_value, &chars_read);
-                CV_Assert( args_read == 1 );
+                صحيح cur_ارزښت;
+                صحيح chars_read;
+                صحيح دلیلونه_read = له_مزي_ولوله(سېټ_as_str + pos, "%d%n", &cur_ارزښت, &chars_read);
+                CV_Assert( دلیلونه_read == 1 );
 
-                arr.push_back(cur_value);
+                arr.push_back(cur_ارزښت);
                 pos += chars_read;
             }
         }
@@ -222,1013 +222,1013 @@ namespace
     }
 }
 
-#endif
+#د_که_پای
 
-bool cv::cuda::TargetArchs::builtWith(cv::cuda::FeatureSet feature_set)
+منطقي cv::cuda::موخه_Archs::builtWith(cv::cuda::Feature_سېټ feature_سېټ)
 {
-#ifndef HAVE_CUDA
-    CV_UNUSED(feature_set);
+#که_نه_تعریف_شوی HAVE_CUDA
+    CV_ناکارول_شوی(feature_سېټ);
     throw_no_cuda();
-#else
-    return cudaArch.builtWith(feature_set);
-#endif
+#وإلا
+    أرجع cudaArch.builtWith(feature_سېټ);
+#د_که_پای
 }
 
-bool cv::cuda::TargetArchs::hasPtx(int major, int minor)
+منطقي cv::cuda::موخه_Archs::hasPtx(صحيح major, صحيح minor)
 {
-#ifndef HAVE_CUDA
-    CV_UNUSED(major);
-    CV_UNUSED(minor);
+#که_نه_تعریف_شوی HAVE_CUDA
+    CV_ناکارول_شوی(major);
+    CV_ناکارول_شوی(minor);
     throw_no_cuda();
-#else
-    return cudaArch.hasPtx(major, minor);
-#endif
+#وإلا
+    أرجع cudaArch.hasPtx(major, minor);
+#د_که_پای
 }
 
-bool cv::cuda::TargetArchs::hasBin(int major, int minor)
+منطقي cv::cuda::موخه_Archs::hasBin(صحيح major, صحيح minor)
 {
-#ifndef HAVE_CUDA
-    CV_UNUSED(major);
-    CV_UNUSED(minor);
+#که_نه_تعریف_شوی HAVE_CUDA
+    CV_ناکارول_شوی(major);
+    CV_ناکارول_شوی(minor);
     throw_no_cuda();
-#else
-    return cudaArch.hasBin(major, minor);
-#endif
+#وإلا
+    أرجع cudaArch.hasBin(major, minor);
+#د_که_پای
 }
 
-bool cv::cuda::TargetArchs::hasEqualOrLessPtx(int major, int minor)
+منطقي cv::cuda::موخه_Archs::hasEqualOrLessPtx(صحيح major, صحيح minor)
 {
-#ifndef HAVE_CUDA
-    CV_UNUSED(major);
-    CV_UNUSED(minor);
+#که_نه_تعریف_شوی HAVE_CUDA
+    CV_ناکارول_شوی(major);
+    CV_ناکارول_شوی(minor);
     throw_no_cuda();
-#else
-    return cudaArch.hasEqualOrLessPtx(major, minor);
-#endif
+#وإلا
+    أرجع cudaArch.hasEqualOrLessPtx(major, minor);
+#د_که_پای
 }
 
-bool cv::cuda::TargetArchs::hasEqualOrGreaterPtx(int major, int minor)
+منطقي cv::cuda::موخه_Archs::hasEqualOrGreaterPtx(صحيح major, صحيح minor)
 {
-#ifndef HAVE_CUDA
-    CV_UNUSED(major);
-    CV_UNUSED(minor);
+#که_نه_تعریف_شوی HAVE_CUDA
+    CV_ناکارول_شوی(major);
+    CV_ناکارول_شوی(minor);
     throw_no_cuda();
-#else
-    return cudaArch.hasEqualOrGreaterPtx(major, minor);
-#endif
+#وإلا
+    أرجع cudaArch.hasEqualOrGreaterPtx(major, minor);
+#د_که_پای
 }
 
-bool cv::cuda::TargetArchs::hasEqualOrGreaterBin(int major, int minor)
+منطقي cv::cuda::موخه_Archs::hasEqualOrGreaterBin(صحيح major, صحيح minor)
 {
-#ifndef HAVE_CUDA
-    CV_UNUSED(major);
-    CV_UNUSED(minor);
+#که_نه_تعریف_شوی HAVE_CUDA
+    CV_ناکارول_شوی(major);
+    CV_ناکارول_شوی(minor);
     throw_no_cuda();
-#else
-    return cudaArch.hasEqualOrGreaterBin(major, minor);
-#endif
+#وإلا
+    أرجع cudaArch.hasEqualOrGreaterBin(major, minor);
+#د_که_پای
 }
 
 ////////////////////////////////////////////////////////////////////////
 // DeviceInfo
 
-#ifdef HAVE_CUDA
+#که_تعریف_شوی HAVE_CUDA
 
-namespace
+نطاق
 {
-    class DeviceProps
+    صنف DeviceProps
     {
-    public:
+    عام:
         DeviceProps();
 
-        const cudaDeviceProp* get(int devID) const;
+        ثابت cudaDeviceProp* get(صحيح devID) ثابت;
 
-    private:
+    خاص:
         std::vector<cudaDeviceProp> props_;
     };
 
     DeviceProps::DeviceProps()
     {
-        int count = getCudaEnabledDeviceCount();
+        صحيح شمېر_2 = get_Cuda_Enabled_Device_شمېر();
 
-        if (count > 0)
+        إذا (شمېر_2 > 0)
         {
-            props_.resize(count);
+            props_.resize(شمېر_2);
 
-            for (int devID = 0; devID < count; ++devID)
+            لكل (صحيح devID = 0; devID < شمېر_2; ++devID)
             {
-                cudaSafeCall( cudaGetDeviceProperties(&props_[devID], devID) );
+                cuda_خوندي_Call( cudaGetDeviceProperties(&props_[devID], devID) );
             }
         }
     }
 
-    const cudaDeviceProp* DeviceProps::get(int devID) const
+    ثابت cudaDeviceProp* DeviceProps::get(صحيح devID) ثابت
     {
         CV_Assert( static_cast<size_t>(devID) < props_.size() );
 
-        return &props_[devID];
+        أرجع &props_[devID];
     }
 
     DeviceProps& deviceProps()
     {
-        static DeviceProps props;
-        return props;
+        ساكن DeviceProps props;
+        أرجع props;
     }
 }
 
-#endif
+#د_که_پای
 
-const char* cv::cuda::DeviceInfo::name() const
+ثابت حرف* cv::cuda::DeviceInfo::name() ثابت
 {
-#ifndef HAVE_CUDA
+#که_نه_تعریف_شوی HAVE_CUDA
     throw_no_cuda();
-#else
-    return deviceProps().get(device_id_)->name;
-#endif
+#وإلا
+    أرجع deviceProps().get(device_id_)->name;
+#د_که_پای
 }
 
-size_t cv::cuda::DeviceInfo::totalGlobalMem() const
+size_t cv::cuda::DeviceInfo::ټول_Global_Mem() ثابت
 {
-#ifndef HAVE_CUDA
+#که_نه_تعریف_شوی HAVE_CUDA
     throw_no_cuda();
-#else
-    return deviceProps().get(device_id_)->totalGlobalMem;
-#endif
+#وإلا
+    أرجع deviceProps().get(device_id_)->ټول_Global_Mem;
+#د_که_پای
 }
 
-size_t cv::cuda::DeviceInfo::sharedMemPerBlock() const
+size_t cv::cuda::DeviceInfo::shared_Mem_فی_بلاک() ثابت
 {
-#ifndef HAVE_CUDA
+#که_نه_تعریف_شوی HAVE_CUDA
     throw_no_cuda();
-#else
-    return deviceProps().get(device_id_)->sharedMemPerBlock;
-#endif
+#وإلا
+    أرجع deviceProps().get(device_id_)->shared_Mem_فی_بلاک;
+#د_که_پای
 }
 
-int cv::cuda::DeviceInfo::regsPerBlock() const
+صحيح cv::cuda::DeviceInfo::regs_فی_بلاک() ثابت
 {
-#ifndef HAVE_CUDA
+#که_نه_تعریف_شوی HAVE_CUDA
     throw_no_cuda();
-#else
-    return deviceProps().get(device_id_)->regsPerBlock;
-#endif
+#وإلا
+    أرجع deviceProps().get(device_id_)->regs_فی_بلاک;
+#د_که_پای
 }
 
-int cv::cuda::DeviceInfo::warpSize() const
+صحيح cv::cuda::DeviceInfo::warp_اندازه() ثابت
 {
-#ifndef HAVE_CUDA
+#که_نه_تعریف_شوی HAVE_CUDA
     throw_no_cuda();
-#else
-    return deviceProps().get(device_id_)->warpSize;
-#endif
+#وإلا
+    أرجع deviceProps().get(device_id_)->warp_اندازه;
+#د_که_پای
 }
 
-size_t cv::cuda::DeviceInfo::memPitch() const
+size_t cv::cuda::DeviceInfo::memPitch() ثابت
 {
-#ifndef HAVE_CUDA
+#که_نه_تعریف_شوی HAVE_CUDA
     throw_no_cuda();
-#else
-    return deviceProps().get(device_id_)->memPitch;
-#endif
+#وإلا
+    أرجع deviceProps().get(device_id_)->memPitch;
+#د_که_پای
 }
 
-int cv::cuda::DeviceInfo::maxThreadsPerBlock() const
+صحيح cv::cuda::DeviceInfo::max_تارونه_فی_بلاک() ثابت
 {
-#ifndef HAVE_CUDA
+#که_نه_تعریف_شوی HAVE_CUDA
     throw_no_cuda();
-#else
-    return deviceProps().get(device_id_)->maxThreadsPerBlock;
-#endif
+#وإلا
+    أرجع deviceProps().get(device_id_)->max_تارونه_فی_بلاک;
+#د_که_پای
 }
 
-Vec3i cv::cuda::DeviceInfo::maxThreadsDim() const
+Vec3i cv::cuda::DeviceInfo::max_تارونه_Dim() ثابت
 {
-#ifndef HAVE_CUDA
+#که_نه_تعریف_شوی HAVE_CUDA
     throw_no_cuda();
-#else
-    return Vec3i(deviceProps().get(device_id_)->maxThreadsDim);
-#endif
+#وإلا
+    أرجع Vec3i(deviceProps().get(device_id_)->max_تارونه_Dim);
+#د_که_پای
 }
 
-Vec3i cv::cuda::DeviceInfo::maxGridSize() const
+Vec3i cv::cuda::DeviceInfo::max_Grid_اندازه() ثابت
 {
-#ifndef HAVE_CUDA
+#که_نه_تعریف_شوی HAVE_CUDA
     throw_no_cuda();
-#else
-    return Vec3i(deviceProps().get(device_id_)->maxGridSize);
-#endif
+#وإلا
+    أرجع Vec3i(deviceProps().get(device_id_)->max_Grid_اندازه);
+#د_که_پای
 }
 
-int cv::cuda::DeviceInfo::clockRate() const
+صحيح cv::cuda::DeviceInfo::clock_شرح() ثابت
 {
-#ifndef HAVE_CUDA
+#که_نه_تعریف_شوی HAVE_CUDA
     throw_no_cuda();
-#else
-    int clockRate;
-    cudaSafeCall(cudaDeviceGetAttribute(&clockRate, cudaDevAttrClockRate, device_id_));
-    return clockRate;
-#endif
+#وإلا
+    صحيح clock_شرح;
+    cuda_خوندي_Call(cudaDeviceGetAttribute(&clock_شرح, cuda_Dev_Attr_Clock_شرح, device_id_));
+    أرجع clock_شرح;
+#د_که_پای
 }
 
-size_t cv::cuda::DeviceInfo::totalConstMem() const
+size_t cv::cuda::DeviceInfo::ټول_Const_Mem() ثابت
 {
-#ifndef HAVE_CUDA
+#که_نه_تعریف_شوی HAVE_CUDA
     throw_no_cuda();
-#else
-    return deviceProps().get(device_id_)->totalConstMem;
-#endif
+#وإلا
+    أرجع deviceProps().get(device_id_)->ټول_Const_Mem;
+#د_که_پای
 }
 
-int cv::cuda::DeviceInfo::majorVersion() const
+صحيح cv::cuda::DeviceInfo::major_نسخه() ثابت
 {
-#ifndef HAVE_CUDA
+#که_نه_تعریف_شوی HAVE_CUDA
     throw_no_cuda();
-#else
-    return deviceProps().get(device_id_)->major;
-#endif
+#وإلا
+    أرجع deviceProps().get(device_id_)->major;
+#د_که_پای
 }
 
-int cv::cuda::DeviceInfo::minorVersion() const
+صحيح cv::cuda::DeviceInfo::minor_نسخه() ثابت
 {
-#ifndef HAVE_CUDA
+#که_نه_تعریف_شوی HAVE_CUDA
     throw_no_cuda();
-#else
-    return deviceProps().get(device_id_)->minor;
-#endif
+#وإلا
+    أرجع deviceProps().get(device_id_)->minor;
+#د_که_پای
 }
 
-size_t cv::cuda::DeviceInfo::textureAlignment() const
+size_t cv::cuda::DeviceInfo::textureAlignment() ثابت
 {
-#ifndef HAVE_CUDA
+#که_نه_تعریف_شوی HAVE_CUDA
     throw_no_cuda();
-#else
-    return deviceProps().get(device_id_)->textureAlignment;
-#endif
+#وإلا
+    أرجع deviceProps().get(device_id_)->textureAlignment;
+#د_که_پای
 }
 
-size_t cv::cuda::DeviceInfo::texturePitchAlignment() const
+size_t cv::cuda::DeviceInfo::texturePitchAlignment() ثابت
 {
-#ifndef HAVE_CUDA
+#که_نه_تعریف_شوی HAVE_CUDA
     throw_no_cuda();
-#else
-    return deviceProps().get(device_id_)->texturePitchAlignment;
-#endif
+#وإلا
+    أرجع deviceProps().get(device_id_)->texturePitchAlignment;
+#د_که_پای
 }
 
-int cv::cuda::DeviceInfo::multiProcessorCount() const
+صحيح cv::cuda::DeviceInfo::multi_Processor_شمېر() ثابت
 {
-#ifndef HAVE_CUDA
+#که_نه_تعریف_شوی HAVE_CUDA
     throw_no_cuda();
-#else
-    return deviceProps().get(device_id_)->multiProcessorCount;
-#endif
+#وإلا
+    أرجع deviceProps().get(device_id_)->multi_Processor_شمېر;
+#د_که_پای
 }
 
-bool cv::cuda::DeviceInfo::kernelExecTimeoutEnabled() const
+منطقي cv::cuda::DeviceInfo::kernelExecTimeoutEnabled() ثابت
 {
-#ifndef HAVE_CUDA
+#که_نه_تعریف_شوی HAVE_CUDA
     throw_no_cuda();
-#else
-    int kernelExecTimeoutEnabled;
-    cudaSafeCall(cudaDeviceGetAttribute(&kernelExecTimeoutEnabled, cudaDevAttrKernelExecTimeout, device_id_));
-    return kernelExecTimeoutEnabled != 0;
-#endif
+#وإلا
+    صحيح kernelExecTimeoutEnabled;
+    cuda_خوندي_Call(cudaDeviceGetAttribute(&kernelExecTimeoutEnabled, cudaDevAttrKernelExecTimeout, device_id_));
+    أرجع kernelExecTimeoutEnabled != 0;
+#د_که_پای
 }
 
-bool cv::cuda::DeviceInfo::integrated() const
+منطقي cv::cuda::DeviceInfo::integrated() ثابت
 {
-#ifndef HAVE_CUDA
+#که_نه_تعریف_شوی HAVE_CUDA
     throw_no_cuda();
-#else
-    return deviceProps().get(device_id_)->integrated != 0;
-#endif
+#وإلا
+    أرجع deviceProps().get(device_id_)->integrated != 0;
+#د_که_پای
 }
 
-bool cv::cuda::DeviceInfo::canMapHostMemory() const
+منطقي cv::cuda::DeviceInfo::can_Map_Host_حافظه() ثابت
 {
-#ifndef HAVE_CUDA
+#که_نه_تعریف_شوی HAVE_CUDA
     throw_no_cuda();
-#else
-    return deviceProps().get(device_id_)->canMapHostMemory != 0;
-#endif
+#وإلا
+    أرجع deviceProps().get(device_id_)->can_Map_Host_حافظه != 0;
+#د_که_پای
 }
 
-DeviceInfo::ComputeMode cv::cuda::DeviceInfo::computeMode() const
+DeviceInfo::Compute_ډېرپېښ cv::cuda::DeviceInfo::compute_ډېرپېښ() ثابت
 {
-#ifndef HAVE_CUDA
+#که_نه_تعریف_شوی HAVE_CUDA
     throw_no_cuda();
-#else
-    static const ComputeMode tbl[] =
+#وإلا
+    ساكن ثابت Compute_ډېرپېښ tbl[] =
     {
-        ComputeModeDefault,
-        ComputeModeExclusive,
-        ComputeModeProhibited,
-        ComputeModeExclusiveProcess
+        Compute_ډېرپېښ_Default,
+        Compute_ډېرپېښ_Exclusive,
+        Compute_ډېرپېښ_Prohibited,
+        Compute_ډېرپېښ_Exclusive_Process
     };
 
-    int computeMode;
-    cudaSafeCall(cudaDeviceGetAttribute(&computeMode, cudaDevAttrComputeMode, device_id_));
-    return tbl[computeMode];
-#endif
+    صحيح compute_ډېرپېښ;
+    cuda_خوندي_Call(cudaDeviceGetAttribute(&compute_ډېرپېښ, cuda_Dev_Attr_Compute_ډېرپېښ, device_id_));
+    أرجع tbl[compute_ډېرپېښ];
+#د_که_پای
 }
 
-int cv::cuda::DeviceInfo::maxTexture1D() const
+صحيح cv::cuda::DeviceInfo::maxTexture1D() ثابت
 {
-#ifndef HAVE_CUDA
+#که_نه_تعریف_شوی HAVE_CUDA
     throw_no_cuda();
-#else
-    return deviceProps().get(device_id_)->maxTexture1D;
-#endif
+#وإلا
+    أرجع deviceProps().get(device_id_)->maxTexture1D;
+#د_که_پای
 }
 
-int cv::cuda::DeviceInfo::maxTexture1DMipmap() const
+صحيح cv::cuda::DeviceInfo::maxTexture1DMipmap() ثابت
 {
-#ifndef HAVE_CUDA
+#که_نه_تعریف_شوی HAVE_CUDA
     throw_no_cuda();
-#else
-    #if CUDA_VERSION >= 5000
-        return deviceProps().get(device_id_)->maxTexture1DMipmap;
-    #else
+#وإلا
+    #إذا CUDA_نسخه >= 5000
+        أرجع deviceProps().get(device_id_)->maxTexture1DMipmap;
+    #وإلا
         CV_Error(Error::StsNotImplemented, "This function requires CUDA 5.0");
-        return 0;
-    #endif
-#endif
+        أرجع 0;
+    #د_که_پای
+#د_که_پای
 }
 
-int cv::cuda::DeviceInfo::maxTexture1DLinear() const
+صحيح cv::cuda::DeviceInfo::maxTexture1DLinear() ثابت
 {
-#ifndef HAVE_CUDA
+#که_نه_تعریف_شوی HAVE_CUDA
     throw_no_cuda();
-#else
-    #if CUDA_VERSION >= 13000
-        size_t maxWidthInElements;
+#وإلا
+    #إذا CUDA_نسخه >= 13000
+        size_t max_پلنوالی_دننه_Elements;
         cudaChannelFormatDesc fmtDesc = cudaCreateChannelDesc<float4>();
-        cudaSafeCall(cudaDeviceGetTexture1DLinearMaxWidth(&maxWidthInElements, &fmtDesc, device_id_));
-        return maxWidthInElements;
-    #else
-        return deviceProps().get(device_id_)->maxTexture1DLinear;
-    #endif
-#endif
+        cuda_خوندي_Call(cuda_Device_Get_Texture1_DLinear_Max_پلنوالی(&max_پلنوالی_دننه_Elements, &fmtDesc, device_id_));
+        أرجع max_پلنوالی_دننه_Elements;
+    #وإلا
+        أرجع deviceProps().get(device_id_)->maxTexture1DLinear;
+    #د_که_پای
+#د_که_پای
 }
 
-Vec2i cv::cuda::DeviceInfo::maxTexture2D() const
+Vec2i cv::cuda::DeviceInfo::maxTexture2D() ثابت
 {
-#ifndef HAVE_CUDA
+#که_نه_تعریف_شوی HAVE_CUDA
     throw_no_cuda();
-#else
-    return Vec2i(deviceProps().get(device_id_)->maxTexture2D);
-#endif
+#وإلا
+    أرجع Vec2i(deviceProps().get(device_id_)->maxTexture2D);
+#د_که_پای
 }
 
-Vec2i cv::cuda::DeviceInfo::maxTexture2DMipmap() const
+Vec2i cv::cuda::DeviceInfo::maxTexture2DMipmap() ثابت
 {
-#ifndef HAVE_CUDA
+#که_نه_تعریف_شوی HAVE_CUDA
     throw_no_cuda();
-#else
-    #if CUDA_VERSION >= 5000
-        return Vec2i(deviceProps().get(device_id_)->maxTexture2DMipmap);
-    #else
+#وإلا
+    #إذا CUDA_نسخه >= 5000
+        أرجع Vec2i(deviceProps().get(device_id_)->maxTexture2DMipmap);
+    #وإلا
         CV_Error(Error::StsNotImplemented, "This function requires CUDA 5.0");
-        return Vec2i();
-    #endif
-#endif
+        أرجع Vec2i();
+    #د_که_پای
+#د_که_پای
 }
 
-Vec3i cv::cuda::DeviceInfo::maxTexture2DLinear() const
+Vec3i cv::cuda::DeviceInfo::maxTexture2DLinear() ثابت
 {
-#ifndef HAVE_CUDA
+#که_نه_تعریف_شوی HAVE_CUDA
     throw_no_cuda();
-#else
-    return Vec3i(deviceProps().get(device_id_)->maxTexture2DLinear);
-#endif
+#وإلا
+    أرجع Vec3i(deviceProps().get(device_id_)->maxTexture2DLinear);
+#د_که_پای
 }
 
-Vec2i cv::cuda::DeviceInfo::maxTexture2DGather() const
+Vec2i cv::cuda::DeviceInfo::maxTexture2DGather() ثابت
 {
-#ifndef HAVE_CUDA
+#که_نه_تعریف_شوی HAVE_CUDA
     throw_no_cuda();
-#else
-    return Vec2i(deviceProps().get(device_id_)->maxTexture2DGather);
-#endif
+#وإلا
+    أرجع Vec2i(deviceProps().get(device_id_)->maxTexture2DGather);
+#د_که_پای
 }
 
-Vec3i cv::cuda::DeviceInfo::maxTexture3D() const
+Vec3i cv::cuda::DeviceInfo::maxTexture3D() ثابت
 {
-#ifndef HAVE_CUDA
+#که_نه_تعریف_شوی HAVE_CUDA
     throw_no_cuda();
-#else
-    return Vec3i(deviceProps().get(device_id_)->maxTexture3D);
-#endif
+#وإلا
+    أرجع Vec3i(deviceProps().get(device_id_)->maxTexture3D);
+#د_که_پای
 }
 
-int cv::cuda::DeviceInfo::maxTextureCubemap() const
+صحيح cv::cuda::DeviceInfo::maxTextureCubemap() ثابت
 {
-#ifndef HAVE_CUDA
+#که_نه_تعریف_شوی HAVE_CUDA
     throw_no_cuda();
-#else
-    return deviceProps().get(device_id_)->maxTextureCubemap;
-#endif
+#وإلا
+    أرجع deviceProps().get(device_id_)->maxTextureCubemap;
+#د_که_پای
 }
 
-Vec2i cv::cuda::DeviceInfo::maxTexture1DLayered() const
+Vec2i cv::cuda::DeviceInfo::maxTexture1DLayered() ثابت
 {
-#ifndef HAVE_CUDA
+#که_نه_تعریف_شوی HAVE_CUDA
     throw_no_cuda();
-#else
-    return Vec2i(deviceProps().get(device_id_)->maxTexture1DLayered);
-#endif
+#وإلا
+    أرجع Vec2i(deviceProps().get(device_id_)->maxTexture1DLayered);
+#د_که_پای
 }
 
-Vec3i cv::cuda::DeviceInfo::maxTexture2DLayered() const
+Vec3i cv::cuda::DeviceInfo::maxTexture2DLayered() ثابت
 {
-#ifndef HAVE_CUDA
+#که_نه_تعریف_شوی HAVE_CUDA
     throw_no_cuda();
-#else
-    return Vec3i(deviceProps().get(device_id_)->maxTexture2DLayered);
-#endif
+#وإلا
+    أرجع Vec3i(deviceProps().get(device_id_)->maxTexture2DLayered);
+#د_که_پای
 }
 
-Vec2i cv::cuda::DeviceInfo::maxTextureCubemapLayered() const
+Vec2i cv::cuda::DeviceInfo::maxTextureCubemapLayered() ثابت
 {
-#ifndef HAVE_CUDA
+#که_نه_تعریف_شوی HAVE_CUDA
     throw_no_cuda();
-#else
-    return Vec2i(deviceProps().get(device_id_)->maxTextureCubemapLayered);
-#endif
+#وإلا
+    أرجع Vec2i(deviceProps().get(device_id_)->maxTextureCubemapLayered);
+#د_که_پای
 }
 
-int cv::cuda::DeviceInfo::maxSurface1D() const
+صحيح cv::cuda::DeviceInfo::maxSurface1D() ثابت
 {
-#ifndef HAVE_CUDA
+#که_نه_تعریف_شوی HAVE_CUDA
     throw_no_cuda();
-#else
-    return deviceProps().get(device_id_)->maxSurface1D;
-#endif
+#وإلا
+    أرجع deviceProps().get(device_id_)->maxSurface1D;
+#د_که_پای
 }
 
-Vec2i cv::cuda::DeviceInfo::maxSurface2D() const
+Vec2i cv::cuda::DeviceInfo::maxSurface2D() ثابت
 {
-#ifndef HAVE_CUDA
+#که_نه_تعریف_شوی HAVE_CUDA
     throw_no_cuda();
-#else
-    return Vec2i(deviceProps().get(device_id_)->maxSurface2D);
-#endif
+#وإلا
+    أرجع Vec2i(deviceProps().get(device_id_)->maxSurface2D);
+#د_که_پای
 }
 
-Vec3i cv::cuda::DeviceInfo::maxSurface3D() const
+Vec3i cv::cuda::DeviceInfo::maxSurface3D() ثابت
 {
-#ifndef HAVE_CUDA
+#که_نه_تعریف_شوی HAVE_CUDA
     throw_no_cuda();
-#else
-    return Vec3i(deviceProps().get(device_id_)->maxSurface3D);
-#endif
+#وإلا
+    أرجع Vec3i(deviceProps().get(device_id_)->maxSurface3D);
+#د_که_پای
 }
 
-Vec2i cv::cuda::DeviceInfo::maxSurface1DLayered() const
+Vec2i cv::cuda::DeviceInfo::maxSurface1DLayered() ثابت
 {
-#ifndef HAVE_CUDA
+#که_نه_تعریف_شوی HAVE_CUDA
     throw_no_cuda();
-#else
-    return Vec2i(deviceProps().get(device_id_)->maxSurface1DLayered);
-#endif
+#وإلا
+    أرجع Vec2i(deviceProps().get(device_id_)->maxSurface1DLayered);
+#د_که_پای
 }
 
-Vec3i cv::cuda::DeviceInfo::maxSurface2DLayered() const
+Vec3i cv::cuda::DeviceInfo::maxSurface2DLayered() ثابت
 {
-#ifndef HAVE_CUDA
+#که_نه_تعریف_شوی HAVE_CUDA
     throw_no_cuda();
-#else
-    return Vec3i(deviceProps().get(device_id_)->maxSurface2DLayered);
-#endif
+#وإلا
+    أرجع Vec3i(deviceProps().get(device_id_)->maxSurface2DLayered);
+#د_که_پای
 }
 
-int cv::cuda::DeviceInfo::maxSurfaceCubemap() const
+صحيح cv::cuda::DeviceInfo::maxSurfaceCubemap() ثابت
 {
-#ifndef HAVE_CUDA
+#که_نه_تعریف_شوی HAVE_CUDA
     throw_no_cuda();
-#else
-    return deviceProps().get(device_id_)->maxSurfaceCubemap;
-#endif
+#وإلا
+    أرجع deviceProps().get(device_id_)->maxSurfaceCubemap;
+#د_که_پای
 }
 
-Vec2i cv::cuda::DeviceInfo::maxSurfaceCubemapLayered() const
+Vec2i cv::cuda::DeviceInfo::maxSurfaceCubemapLayered() ثابت
 {
-#ifndef HAVE_CUDA
+#که_نه_تعریف_شوی HAVE_CUDA
     throw_no_cuda();
-#else
-    return Vec2i(deviceProps().get(device_id_)->maxSurfaceCubemapLayered);
-#endif
+#وإلا
+    أرجع Vec2i(deviceProps().get(device_id_)->maxSurfaceCubemapLayered);
+#د_که_پای
 }
 
-size_t cv::cuda::DeviceInfo::surfaceAlignment() const
+size_t cv::cuda::DeviceInfo::surfaceAlignment() ثابت
 {
-#ifndef HAVE_CUDA
+#که_نه_تعریف_شوی HAVE_CUDA
     throw_no_cuda();
-#else
-    return deviceProps().get(device_id_)->surfaceAlignment;
-#endif
+#وإلا
+    أرجع deviceProps().get(device_id_)->surfaceAlignment;
+#د_که_پای
 }
 
-bool cv::cuda::DeviceInfo::concurrentKernels() const
+منطقي cv::cuda::DeviceInfo::concurrentKernels() ثابت
 {
-#ifndef HAVE_CUDA
+#که_نه_تعریف_شوی HAVE_CUDA
     throw_no_cuda();
-#else
-    return deviceProps().get(device_id_)->concurrentKernels != 0;
-#endif
+#وإلا
+    أرجع deviceProps().get(device_id_)->concurrentKernels != 0;
+#د_که_پای
 }
 
-bool cv::cuda::DeviceInfo::ECCEnabled() const
+منطقي cv::cuda::DeviceInfo::ECCEnabled() ثابت
 {
-#ifndef HAVE_CUDA
+#که_نه_تعریف_شوی HAVE_CUDA
     throw_no_cuda();
-#else
-    return deviceProps().get(device_id_)->ECCEnabled != 0;
-#endif
+#وإلا
+    أرجع deviceProps().get(device_id_)->ECCEnabled != 0;
+#د_که_پای
 }
 
-int cv::cuda::DeviceInfo::pciBusID() const
+صحيح cv::cuda::DeviceInfo::pciBusID() ثابت
 {
-#ifndef HAVE_CUDA
+#که_نه_تعریف_شوی HAVE_CUDA
     throw_no_cuda();
-#else
-    return deviceProps().get(device_id_)->pciBusID;
-#endif
+#وإلا
+    أرجع deviceProps().get(device_id_)->pciBusID;
+#د_که_پای
 }
 
-int cv::cuda::DeviceInfo::pciDeviceID() const
+صحيح cv::cuda::DeviceInfo::pciDeviceID() ثابت
 {
-#ifndef HAVE_CUDA
+#که_نه_تعریف_شوی HAVE_CUDA
     throw_no_cuda();
-#else
-    return deviceProps().get(device_id_)->pciDeviceID;
-#endif
+#وإلا
+    أرجع deviceProps().get(device_id_)->pciDeviceID;
+#د_که_پای
 }
 
-int cv::cuda::DeviceInfo::pciDomainID() const
+صحيح cv::cuda::DeviceInfo::pciDomainID() ثابت
 {
-#ifndef HAVE_CUDA
+#که_نه_تعریف_شوی HAVE_CUDA
     throw_no_cuda();
-#else
-    return deviceProps().get(device_id_)->pciDomainID;
-#endif
+#وإلا
+    أرجع deviceProps().get(device_id_)->pciDomainID;
+#د_که_پای
 }
 
-bool cv::cuda::DeviceInfo::tccDriver() const
+منطقي cv::cuda::DeviceInfo::tccDriver() ثابت
 {
-#ifndef HAVE_CUDA
+#که_نه_تعریف_شوی HAVE_CUDA
     throw_no_cuda();
-#else
-    return deviceProps().get(device_id_)->tccDriver != 0;
-#endif
+#وإلا
+    أرجع deviceProps().get(device_id_)->tccDriver != 0;
+#د_که_پای
 }
 
-int cv::cuda::DeviceInfo::asyncEngineCount() const
+صحيح cv::cuda::DeviceInfo::async_Engine_شمېر() ثابت
 {
-#ifndef HAVE_CUDA
+#که_نه_تعریف_شوی HAVE_CUDA
     throw_no_cuda();
-#else
-    return deviceProps().get(device_id_)->asyncEngineCount;
-#endif
+#وإلا
+    أرجع deviceProps().get(device_id_)->async_Engine_شمېر;
+#د_که_پای
 }
 
-bool cv::cuda::DeviceInfo::unifiedAddressing() const
+منطقي cv::cuda::DeviceInfo::unifiedAddressing() ثابت
 {
-#ifndef HAVE_CUDA
+#که_نه_تعریف_شوی HAVE_CUDA
     throw_no_cuda();
-#else
-    return deviceProps().get(device_id_)->unifiedAddressing != 0;
-#endif
+#وإلا
+    أرجع deviceProps().get(device_id_)->unifiedAddressing != 0;
+#د_که_پای
 }
 
-int cv::cuda::DeviceInfo::memoryClockRate() const
+صحيح cv::cuda::DeviceInfo::حافظه_Clock_شرح() ثابت
 {
-#ifndef HAVE_CUDA
+#که_نه_تعریف_شوی HAVE_CUDA
     throw_no_cuda();
-#else
-    int memoryClockRate;
-    cudaSafeCall(cudaDeviceGetAttribute(&memoryClockRate, cudaDevAttrMemoryClockRate, device_id_));
-    return memoryClockRate;
-#endif
+#وإلا
+    صحيح حافظه_Clock_شرح;
+    cuda_خوندي_Call(cudaDeviceGetAttribute(&حافظه_Clock_شرح, cuda_Dev_Attr_حافظه_Clock_شرح, device_id_));
+    أرجع حافظه_Clock_شرح;
+#د_که_پای
 }
 
-int cv::cuda::DeviceInfo::memoryBusWidth() const
+صحيح cv::cuda::DeviceInfo::حافظه_Bus_پلنوالی() ثابت
 {
-#ifndef HAVE_CUDA
+#که_نه_تعریف_شوی HAVE_CUDA
     throw_no_cuda();
-#else
-    return deviceProps().get(device_id_)->memoryBusWidth;
-#endif
+#وإلا
+    أرجع deviceProps().get(device_id_)->حافظه_Bus_پلنوالی;
+#د_که_پای
 }
 
-int cv::cuda::DeviceInfo::l2CacheSize() const
+صحيح cv::cuda::DeviceInfo::l2_Cache_اندازه() ثابت
 {
-#ifndef HAVE_CUDA
+#که_نه_تعریف_شوی HAVE_CUDA
     throw_no_cuda();
-#else
-    return deviceProps().get(device_id_)->l2CacheSize;
-#endif
+#وإلا
+    أرجع deviceProps().get(device_id_)->l2_Cache_اندازه;
+#د_که_پای
 }
 
-int cv::cuda::DeviceInfo::maxThreadsPerMultiProcessor() const
+صحيح cv::cuda::DeviceInfo::max_تارونه_فی_Multi_Processor() ثابت
 {
-#ifndef HAVE_CUDA
+#که_نه_تعریف_شوی HAVE_CUDA
     throw_no_cuda();
-#else
-    return deviceProps().get(device_id_)->maxThreadsPerMultiProcessor;
-#endif
+#وإلا
+    أرجع deviceProps().get(device_id_)->max_تارونه_فی_Multi_Processor;
+#د_که_پای
 }
 
-void cv::cuda::DeviceInfo::queryMemory(size_t& _totalMemory, size_t& _freeMemory) const
+فراغ cv::cuda::DeviceInfo::query_حافظه(size_t& ټول_حافظه, size_t& free_حافظه) ثابت
 {
-#ifndef HAVE_CUDA
-    CV_UNUSED(_totalMemory);
-    CV_UNUSED(_freeMemory);
+#که_نه_تعریف_شوی HAVE_CUDA
+    CV_ناکارول_شوی(ټول_حافظه);
+    CV_ناکارول_شوی(free_حافظه);
     throw_no_cuda();
-#else
-    int prevDeviceID = getDevice();
-    if (prevDeviceID != device_id_)
-        setDevice(device_id_);
+#وإلا
+    صحيح prevDeviceID = getDevice();
+    إذا (prevDeviceID != device_id_)
+        سېټ_Device(device_id_);
 
-    cudaSafeCall( cudaMemGetInfo(&_freeMemory, &_totalMemory) );
+    cuda_خوندي_Call( cudaMemGetInfo(&free_حافظه, &ټول_حافظه) );
 
-    if (prevDeviceID != device_id_)
-        setDevice(prevDeviceID);
-#endif
+    إذا (prevDeviceID != device_id_)
+        سېټ_Device(prevDeviceID);
+#د_که_پای
 }
 
-bool cv::cuda::DeviceInfo::isCompatible() const
+منطقي cv::cuda::DeviceInfo::isCompatible() ثابت
 {
-#ifndef HAVE_CUDA
+#که_نه_تعریف_شوی HAVE_CUDA
     throw_no_cuda();
-#else
+#وإلا
     // Check PTX compatibility
-    if (TargetArchs::hasEqualOrLessPtx(majorVersion(), minorVersion()))
-        return true;
+    إذا (موخه_Archs::hasEqualOrLessPtx(major_نسخه(), minor_نسخه()))
+        أرجع ریښتیا;
 
     // Check BIN compatibility
-    for (int i = minorVersion(); i >= 0; --i)
-        if (TargetArchs::hasBin(majorVersion(), i))
-            return true;
+    لكل (صحيح i = minor_نسخه(); i >= 0; --i)
+        إذا (موخه_Archs::hasBin(major_نسخه(), i))
+            أرجع ریښتیا;
 
-    return false;
-#endif
+    أرجع خطأ;
+#د_که_پای
 }
 
 ////////////////////////////////////////////////////////////////////////
 // print info
 
-#ifdef HAVE_CUDA
+#که_تعریف_شوی HAVE_CUDA
 
-namespace
+نطاق
 {
-    int convertSMVer2Cores(int major, int minor)
+    صحيح convertSMVer2Cores(صحيح major, صحيح minor)
     {
         // Defines for GPU Architecture types (using the SM version to determine the # of cores per SM
-        typedef struct {
-            int SM; // 0xMm (hexadecimal notation), M = SM Major version, and m = SM minor version
-            int Cores;
+        تعريفنوع بنية {
+            صحيح SM; // 0xMm (hexadecimal notation), M = SM Major version, and m = SM minor version
+            صحيح Cores;
         } SMtoCores;
 
-        SMtoCores gpuArchCoresPerSM[] =  { { 0x10,  8 }, { 0x11,  8 }, { 0x12,  8 }, { 0x13,  8 }, { 0x20, 32 }, { 0x21, 48 }, {0x30, 192}, {0x35, 192}, { -1, -1 }  };
+        SMtoCores gpu_Arch_Cores_فی_SM[] =  { { 0x10,  8 }, { 0x11,  8 }, { 0x12,  8 }, { 0x13,  8 }, { 0x20, 32 }, { 0x21, 48 }, {0x30, 192}, {0x35, 192}, { -1, -1 }  };
 
-        int index = 0;
-        while (gpuArchCoresPerSM[index].SM != -1)
+        صحيح شاخص = 0;
+        طالما (gpu_Arch_Cores_فی_SM[شاخص].SM != -1)
         {
-            if (gpuArchCoresPerSM[index].SM == ((major << 4) + minor) )
-                return gpuArchCoresPerSM[index].Cores;
-            index++;
+            إذا (gpu_Arch_Cores_فی_SM[شاخص].SM == ((major << 4) + minor) )
+                أرجع gpu_Arch_Cores_فی_SM[شاخص].Cores;
+            شاخص++;
         }
 
-        return -1;
+        أرجع -1;
     }
 }
 
-#endif
+#د_که_پای
 
-void cv::cuda::printCudaDeviceInfo(int device)
+فراغ cv::cuda::printCudaDeviceInfo(صحيح device)
 {
-#ifndef HAVE_CUDA
-    CV_UNUSED(device);
+#که_نه_تعریف_شوی HAVE_CUDA
+    CV_ناکارول_شوی(device);
     throw_no_cuda();
-#else
-    int count = getCudaEnabledDeviceCount();
-    bool valid = (device >= 0) && (device < count);
+#وإلا
+    صحيح شمېر_2 = get_Cuda_Enabled_Device_شمېر();
+    منطقي valid = (device >= 0) && (device < شمېر_2);
 
-    int beg = valid ? device   : 0;
-    int end = valid ? device+1 : count;
+    صحيح beg = valid ? device   : 0;
+    صحيح end = valid ? device+1 : شمېر_2;
 
-    printf("*** CUDA Device Query (Runtime API) version (CUDART static linking) *** \n\n");
-    printf("Device count: %d\n", count);
+    چاپ_کړه("*** CUDA Device Query (Runtime API) version (CUDART static linking) *** \n\n");
+    چاپ_کړه("Device count: %d\n", شمېر_2);
 
-    int driverVersion = 0, runtimeVersion = 0;
-    cudaSafeCall( cudaDriverGetVersion(&driverVersion) );
-    cudaSafeCall( cudaRuntimeGetVersion(&runtimeVersion) );
+    صحيح driver_نسخه = 0, runtime_نسخه = 0;
+    cuda_خوندي_Call( cuda_Driver_Get_نسخه(&driver_نسخه) );
+    cuda_خوندي_Call( cuda_Runtime_Get_نسخه(&runtime_نسخه) );
 
-    const char *computeMode[] = {
+    ثابت حرف *compute_ډېرپېښ[] = {
         "Default (multiple host threads can use ::cudaSetDevice() with device simultaneously)",
         "Exclusive (only one host thread in one process is able to use ::cudaSetDevice() with this device)",
         "Prohibited (no host thread can use ::cudaSetDevice() with this device)",
         "Exclusive Process (many threads in one process is able to use ::cudaSetDevice() with this device)",
         "Unknown",
-        NULL
+        عدم
     };
 
-    for(int dev = beg; dev < end; ++dev)
+    لكل(صحيح dev = beg; dev < end; ++dev)
     {
         cudaDeviceProp prop;
-        cudaSafeCall( cudaGetDeviceProperties(&prop, dev) );
+        cuda_خوندي_Call( cudaGetDeviceProperties(&prop, dev) );
 
-        printf("\nDevice %d: \"%s\"\n", dev, prop.name);
-        printf("  CUDA Driver Version / Runtime Version          %d.%d / %d.%d\n", driverVersion/1000, driverVersion%100, runtimeVersion/1000, runtimeVersion%100);
-        printf("  CUDA Capability Major/Minor version number:    %d.%d\n", prop.major, prop.minor);
-        printf("  Total amount of global memory:                 %.0f MBytes (%llu bytes)\n", (float)prop.totalGlobalMem/1048576.0f, (unsigned long long) prop.totalGlobalMem);
+        چاپ_کړه("\nDevice %d: \"%s\"\n", dev, prop.name);
+        چاپ_کړه("  CUDA Driver Version / Runtime Version          %d.%d / %d.%d\n", driver_نسخه/1000, driver_نسخه%100, runtime_نسخه/1000, runtime_نسخه%100);
+        چاپ_کړه("  CUDA Capability Major/Minor version number:    %d.%d\n", prop.major, prop.minor);
+        چاپ_کړه("  Total amount of global memory:                 %.0f MBytes (%llu bytes)\n", (عائم)prop.ټول_Global_Mem/1048576.0f, (بینښه اوږد اوږد) prop.ټول_Global_Mem);
 
-        int cores = convertSMVer2Cores(prop.major, prop.minor);
-        if (cores > 0)
-            printf("  (%2d) Multiprocessors x (%2d) CUDA Cores/MP:     %d CUDA Cores\n", prop.multiProcessorCount, cores, cores * prop.multiProcessorCount);
+        صحيح cores = convertSMVer2Cores(prop.major, prop.minor);
+        إذا (cores > 0)
+            چاپ_کړه("  (%2d) Multiprocessors x (%2d) CUDA Cores/MP:     %d CUDA Cores\n", prop.multi_Processor_شمېر, cores, cores * prop.multi_Processor_شمېر);
 
-        int clockRate;
-        cudaSafeCall(cudaDeviceGetAttribute(&clockRate, cudaDevAttrClockRate, dev));
-        printf("  GPU Clock Speed:                               %.2f GHz\n", clockRate * 1e-6f);
+        صحيح clock_شرح;
+        cuda_خوندي_Call(cudaDeviceGetAttribute(&clock_شرح, cuda_Dev_Attr_Clock_شرح, dev));
+        چاپ_کړه("  GPU Clock Speed:                               %.2f GHz\n", clock_شرح * 1e-6f);
 
-        printf("  Max Texture Dimension Size (x,y,z)             1D=(%d), 2D=(%d,%d), 3D=(%d,%d,%d)\n",
+        چاپ_کړه("  Max Texture Dimension Size (x,y,z)             1D=(%d), 2D=(%d,%d), 3D=(%d,%d,%d)\n",
             prop.maxTexture1D, prop.maxTexture2D[0], prop.maxTexture2D[1],
             prop.maxTexture3D[0], prop.maxTexture3D[1], prop.maxTexture3D[2]);
-        printf("  Max Layered Texture Size (dim) x layers        1D=(%d) x %d, 2D=(%d,%d) x %d\n",
+        چاپ_کړه("  Max Layered Texture Size (dim) x layers        1D=(%d) x %d, 2D=(%d,%d) x %d\n",
             prop.maxTexture1DLayered[0], prop.maxTexture1DLayered[1],
             prop.maxTexture2DLayered[0], prop.maxTexture2DLayered[1], prop.maxTexture2DLayered[2]);
 
-        printf("  Total amount of constant memory:               %u bytes\n", (int)prop.totalConstMem);
-        printf("  Total amount of shared memory per block:       %u bytes\n", (int)prop.sharedMemPerBlock);
-        printf("  Total number of registers available per block: %d\n", prop.regsPerBlock);
-        printf("  Warp size:                                     %d\n", prop.warpSize);
-        printf("  Maximum number of threads per block:           %d\n", prop.maxThreadsPerBlock);
-        printf("  Maximum sizes of each dimension of a block:    %d x %d x %d\n", prop.maxThreadsDim[0], prop.maxThreadsDim[1], prop.maxThreadsDim[2]);
-        printf("  Maximum sizes of each dimension of a grid:     %d x %d x %d\n", prop.maxGridSize[0], prop.maxGridSize[1],  prop.maxGridSize[2]);
-        printf("  Maximum memory pitch:                          %u bytes\n", (int)prop.memPitch);
-        printf("  Texture alignment:                             %u bytes\n", (int)prop.textureAlignment);
+        چاپ_کړه("  Total amount of constant memory:               %u bytes\n", (صحيح)prop.ټول_Const_Mem);
+        چاپ_کړه("  Total amount of shared memory per block:       %u bytes\n", (صحيح)prop.shared_Mem_فی_بلاک);
+        چاپ_کړه("  Total number of registers available per block: %d\n", prop.regs_فی_بلاک);
+        چاپ_کړه("  Warp size:                                     %d\n", prop.warp_اندازه);
+        چاپ_کړه("  Maximum number of threads per block:           %d\n", prop.max_تارونه_فی_بلاک);
+        چاپ_کړه("  Maximum sizes of each dimension of a block:    %d x %d x %d\n", prop.max_تارونه_Dim[0], prop.max_تارونه_Dim[1], prop.max_تارونه_Dim[2]);
+        چاپ_کړه("  Maximum sizes of each dimension of a grid:     %d x %d x %d\n", prop.max_Grid_اندازه[0], prop.max_Grid_اندازه[1],  prop.max_Grid_اندازه[2]);
+        چاپ_کړه("  Maximum memory pitch:                          %u bytes\n", (صحيح)prop.memPitch);
+        چاپ_کړه("  Texture alignment:                             %u bytes\n", (صحيح)prop.textureAlignment);
 
-        printf("  Concurrent copy and execution:                 %s with %d copy engine(s)\n", (prop.asyncEngineCount ? "Yes" : "No"), prop.asyncEngineCount);
-        int kernelExecTimeoutEnabled;
-        cudaSafeCall(cudaDeviceGetAttribute(&kernelExecTimeoutEnabled, cudaDevAttrKernelExecTimeout, dev));
-        printf("  Run time limit on kernels:                     %s\n", kernelExecTimeoutEnabled ? "Yes" : "No");
-        printf("  Integrated GPU sharing Host Memory:            %s\n", prop.integrated ? "Yes" : "No");
-        printf("  Support host page-locked memory mapping:       %s\n", prop.canMapHostMemory ? "Yes" : "No");
+        چاپ_کړه("  Concurrent copy and execution:                 %s with %d copy engine(s)\n", (prop.async_Engine_شمېر ? "Yes" : "No"), prop.async_Engine_شمېر);
+        صحيح kernelExecTimeoutEnabled;
+        cuda_خوندي_Call(cudaDeviceGetAttribute(&kernelExecTimeoutEnabled, cudaDevAttrKernelExecTimeout, dev));
+        چاپ_کړه("  Run time limit on kernels:                     %s\n", kernelExecTimeoutEnabled ? "Yes" : "No");
+        چاپ_کړه("  Integrated GPU sharing Host Memory:            %s\n", prop.integrated ? "Yes" : "No");
+        چاپ_کړه("  Support host page-locked memory mapping:       %s\n", prop.can_Map_Host_حافظه ? "Yes" : "No");
 
-        printf("  Concurrent kernel execution:                   %s\n", prop.concurrentKernels ? "Yes" : "No");
-        printf("  Alignment requirement for Surfaces:            %s\n", prop.surfaceAlignment ? "Yes" : "No");
-        printf("  Device has ECC support enabled:                %s\n", prop.ECCEnabled ? "Yes" : "No");
-        printf("  Device is using TCC driver mode:               %s\n", prop.tccDriver ? "Yes" : "No");
-        printf("  Device supports Unified Addressing (UVA):      %s\n", prop.unifiedAddressing ? "Yes" : "No");
-        printf("  Device PCI Bus ID / PCI location ID:           %d / %d\n", prop.pciBusID, prop.pciDeviceID );
+        چاپ_کړه("  Concurrent kernel execution:                   %s\n", prop.concurrentKernels ? "Yes" : "No");
+        چاپ_کړه("  Alignment requirement for Surfaces:            %s\n", prop.surfaceAlignment ? "Yes" : "No");
+        چاپ_کړه("  Device has ECC support enabled:                %s\n", prop.ECCEnabled ? "Yes" : "No");
+        چاپ_کړه("  Device is using TCC driver mode:               %s\n", prop.tccDriver ? "Yes" : "No");
+        چاپ_کړه("  Device supports Unified Addressing (UVA):      %s\n", prop.unifiedAddressing ? "Yes" : "No");
+        چاپ_کړه("  Device PCI Bus ID / PCI location ID:           %d / %d\n", prop.pciBusID, prop.pciDeviceID );
 
-        int propComputeMode;
-        cudaSafeCall(cudaDeviceGetAttribute(&propComputeMode, cudaDevAttrComputeMode, dev));
-        printf("  Compute Mode:\n");
-        printf("      %s \n", computeMode[propComputeMode]);
+        صحيح prop_Compute_ډېرپېښ;
+        cuda_خوندي_Call(cudaDeviceGetAttribute(&prop_Compute_ډېرپېښ, cuda_Dev_Attr_Compute_ډېرپېښ, dev));
+        چاپ_کړه("  Compute Mode:\n");
+        چاپ_کړه("      %s \n", compute_ډېرپېښ[prop_Compute_ډېرپېښ]);
     }
 
-    printf("\n");
-    printf("deviceQuery, CUDA Driver = CUDART");
-    printf(", CUDA Driver Version  = %d.%d", driverVersion / 1000, driverVersion % 100);
-    printf(", CUDA Runtime Version = %d.%d", runtimeVersion/1000, runtimeVersion%100);
-    printf(", NumDevs = %d\n\n", count);
+    چاپ_کړه("\n");
+    چاپ_کړه("deviceQuery, CUDA Driver = CUDART");
+    چاپ_کړه(", CUDA Driver Version  = %d.%d", driver_نسخه / 1000, driver_نسخه % 100);
+    چاپ_کړه(", CUDA Runtime Version = %d.%d", runtime_نسخه/1000, runtime_نسخه%100);
+    چاپ_کړه(", NumDevs = %d\n\n", شمېر_2);
 
     fflush(stdout);
-#endif
+#د_که_پای
 }
 
-void cv::cuda::printShortCudaDeviceInfo(int device)
+فراغ cv::cuda::printShortCudaDeviceInfo(صحيح device)
 {
-#ifndef HAVE_CUDA
-    CV_UNUSED(device);
+#که_نه_تعریف_شوی HAVE_CUDA
+    CV_ناکارول_شوی(device);
     throw_no_cuda();
-#else
-    int count = getCudaEnabledDeviceCount();
-    bool valid = (device >= 0) && (device < count);
+#وإلا
+    صحيح شمېر_2 = get_Cuda_Enabled_Device_شمېر();
+    منطقي valid = (device >= 0) && (device < شمېر_2);
 
-    int beg = valid ? device   : 0;
-    int end = valid ? device+1 : count;
+    صحيح beg = valid ? device   : 0;
+    صحيح end = valid ? device+1 : شمېر_2;
 
-    int driverVersion = 0, runtimeVersion = 0;
-    cudaSafeCall( cudaDriverGetVersion(&driverVersion) );
-    cudaSafeCall( cudaRuntimeGetVersion(&runtimeVersion) );
+    صحيح driver_نسخه = 0, runtime_نسخه = 0;
+    cuda_خوندي_Call( cuda_Driver_Get_نسخه(&driver_نسخه) );
+    cuda_خوندي_Call( cuda_Runtime_Get_نسخه(&runtime_نسخه) );
 
-    for(int dev = beg; dev < end; ++dev)
+    لكل(صحيح dev = beg; dev < end; ++dev)
     {
         cudaDeviceProp prop;
-        cudaSafeCall( cudaGetDeviceProperties(&prop, dev) );
+        cuda_خوندي_Call( cudaGetDeviceProperties(&prop, dev) );
 
-        const char *arch_str = prop.major < 2 ? " (not Fermi)" : "";
-        printf("Device %d:  \"%s\"  %.0fMb", dev, prop.name, (float)prop.totalGlobalMem/1048576.0f);
-        printf(", sm_%d%d%s", prop.major, prop.minor, arch_str);
+        ثابت حرف *arch_str = prop.major < 2 ? " (not Fermi)" : "";
+        چاپ_کړه("Device %d:  \"%s\"  %.0fMb", dev, prop.name, (عائم)prop.ټول_Global_Mem/1048576.0f);
+        چاپ_کړه(", sm_%d%d%s", prop.major, prop.minor, arch_str);
 
-        int cores = convertSMVer2Cores(prop.major, prop.minor);
-        if (cores > 0)
-            printf(", %d cores", cores * prop.multiProcessorCount);
+        صحيح cores = convertSMVer2Cores(prop.major, prop.minor);
+        إذا (cores > 0)
+            چاپ_کړه(", %d cores", cores * prop.multi_Processor_شمېر);
 
-        printf(", Driver/Runtime ver.%d.%d/%d.%d\n", driverVersion/1000, driverVersion%100, runtimeVersion/1000, runtimeVersion%100);
+        چاپ_کړه(", Driver/Runtime ver.%d.%d/%d.%d\n", driver_نسخه/1000, driver_نسخه%100, runtime_نسخه/1000, runtime_نسخه%100);
     }
 
     fflush(stdout);
-#endif
+#د_که_پای
 }
 
 ////////////////////////////////////////////////////////////////////////
 // Error handling
 
-#ifdef HAVE_CUDA
+#که_تعریف_شوی HAVE_CUDA
 
-namespace
+نطاق
 {
-    #define error_entry(entry)  { entry, #entry }
+    #تعریف_کړه error_ثبت(ثبت)  { ثبت, #entry }
 
-    struct ErrorEntry
+    بنية Error_ثبت
     {
-        int code;
-        const char* str;
+        صحيح کوډ;
+        ثابت حرف* str;
     };
 
-    struct ErrorEntryComparer
+    بنية Error_ثبت_Comparer
     {
-        int code;
-        ErrorEntryComparer(int code_) : code(code_) {}
-        bool operator()(const ErrorEntry& e) const { return e.code == code; }
+        صحيح کوډ;
+        Error_ثبت_Comparer(صحيح کوډ_2) : کوډ(کوډ_2) {}
+        منطقي چلوونکی()(ثابت Error_ثبت& e) ثابت { أرجع e.کوډ == کوډ; }
     };
 
-    const ErrorEntry npp_errors [] =
+    ثابت Error_ثبت npp_errors [] =
     {
-    #if defined (_MSC_VER)
-        error_entry( NPP_NOT_SUFFICIENT_COMPUTE_CAPABILITY ),
-    #endif
+    #إذا defined (_MSC_VER)
+        error_ثبت( NPP_NOT_SUFFICIENT_COMPUTE_CAPABILITY ),
+    #د_که_پای
 
-    #if NPP_VERSION < 5500
-        error_entry( NPP_BAD_ARG_ERROR ),
-        error_entry( NPP_COEFF_ERROR ),
-        error_entry( NPP_RECT_ERROR ),
-        error_entry( NPP_QUAD_ERROR ),
-        error_entry( NPP_MEMFREE_ERR ),
-        error_entry( NPP_MEMSET_ERR ),
-        error_entry( NPP_MEM_ALLOC_ERR ),
-        error_entry( NPP_HISTO_NUMBER_OF_LEVELS_ERROR ),
-        error_entry( NPP_MIRROR_FLIP_ERR ),
-        error_entry( NPP_INVALID_INPUT ),
-        error_entry( NPP_POINTER_ERROR ),
-        error_entry( NPP_WARNING ),
-        error_entry( NPP_ODD_ROI_WARNING ),
-    #else
-        error_entry( NPP_INVALID_HOST_POINTER_ERROR ),
-        error_entry( NPP_INVALID_DEVICE_POINTER_ERROR ),
-        error_entry( NPP_LUT_PALETTE_BITSIZE_ERROR ),
-        error_entry( NPP_ZC_MODE_NOT_SUPPORTED_ERROR ),
-        error_entry( NPP_MEMFREE_ERROR ),
-        error_entry( NPP_MEMSET_ERROR ),
-        error_entry( NPP_QUALITY_INDEX_ERROR ),
-        error_entry( NPP_HISTOGRAM_NUMBER_OF_LEVELS_ERROR ),
-        error_entry( NPP_CHANNEL_ORDER_ERROR ),
-        error_entry( NPP_ZERO_MASK_VALUE_ERROR ),
-        error_entry( NPP_QUADRANGLE_ERROR ),
-        error_entry( NPP_RECTANGLE_ERROR ),
-        error_entry( NPP_COEFFICIENT_ERROR ),
-        error_entry( NPP_NUMBER_OF_CHANNELS_ERROR ),
-        error_entry( NPP_COI_ERROR ),
-        error_entry( NPP_DIVISOR_ERROR ),
-        error_entry( NPP_CHANNEL_ERROR ),
-        error_entry( NPP_STRIDE_ERROR ),
-        error_entry( NPP_ANCHOR_ERROR ),
-        error_entry( NPP_MASK_SIZE_ERROR ),
-        error_entry( NPP_MIRROR_FLIP_ERROR ),
-        error_entry( NPP_MOMENT_00_ZERO_ERROR ),
-        error_entry( NPP_THRESHOLD_NEGATIVE_LEVEL_ERROR ),
-        error_entry( NPP_THRESHOLD_ERROR ),
-        error_entry( NPP_CONTEXT_MATCH_ERROR ),
-        error_entry( NPP_FFT_FLAG_ERROR ),
-        error_entry( NPP_FFT_ORDER_ERROR ),
-        error_entry( NPP_SCALE_RANGE_ERROR ),
-        error_entry( NPP_DATA_TYPE_ERROR ),
-        error_entry( NPP_OUT_OFF_RANGE_ERROR ),
-        error_entry( NPP_DIVIDE_BY_ZERO_ERROR ),
-        error_entry( NPP_MEMORY_ALLOCATION_ERR ),
-        error_entry( NPP_RANGE_ERROR ),
-        error_entry( NPP_BAD_ARGUMENT_ERROR ),
-        error_entry( NPP_NO_MEMORY_ERROR ),
-        error_entry( NPP_ERROR_RESERVED ),
-        error_entry( NPP_NO_OPERATION_WARNING ),
-        error_entry( NPP_DIVIDE_BY_ZERO_WARNING ),
-        error_entry( NPP_WRONG_INTERSECTION_ROI_WARNING ),
-    #endif
+    #إذا NPP_نسخه < 5500
+        error_ثبت( NPP_BAD_ARG_ERROR ),
+        error_ثبت( NPP_COEFF_ERROR ),
+        error_ثبت( NPP_RECT_ERROR ),
+        error_ثبت( NPP_QUAD_ERROR ),
+        error_ثبت( NPP_MEMFREE_ERR ),
+        error_ثبت( NPP_MEMSET_ERR ),
+        error_ثبت( NPP_MEM_ALLOC_ERR ),
+        error_ثبت( NPP_HISTO_شمېره_د_پوړونه_ERROR ),
+        error_ثبت( NPP_MIRROR_FLIP_ERR ),
+        error_ثبت( NPP_INVALID_ننوت ),
+        error_ثبت( NPP_اشاره_ګر_ERROR ),
+        error_ثبت( NPP_WARNING ),
+        error_ثبت( NPP_ODD_ROI_WARNING ),
+    #وإلا
+        error_ثبت( NPP_INVALID_HOST_اشاره_ګر_ERROR ),
+        error_ثبت( NPP_INVALID_DEVICE_اشاره_ګر_ERROR ),
+        error_ثبت( NPP_LUT_PALETTE_BITSIZE_ERROR ),
+        error_ثبت( NPP_ZC_ډېرپېښ_NOT_SUPPORTED_ERROR ),
+        error_ثبت( NPP_MEMFREE_ERROR ),
+        error_ثبت( NPP_MEMSET_ERROR ),
+        error_ثبت( NPP_QUALITY_شاخص_ERROR ),
+        error_ثبت( NPP_HISTOGRAM_شمېره_د_پوړونه_ERROR ),
+        error_ثبت( NPP_CHANNEL_ترتیب_ERROR ),
+        error_ثبت( NPP_ZERO_ماسک_ارزښت_ERROR ),
+        error_ثبت( NPP_QUADRANGLE_ERROR ),
+        error_ثبت( NPP_RECTANGLE_ERROR ),
+        error_ثبت( NPP_COEFFICIENT_ERROR ),
+        error_ثبت( NPP_شمېره_د_CHANNELS_ERROR ),
+        error_ثبت( NPP_COI_ERROR ),
+        error_ثبت( NPP_وېشونکی_ERROR ),
+        error_ثبت( NPP_CHANNEL_ERROR ),
+        error_ثبت( NPP_STRIDE_ERROR ),
+        error_ثبت( NPP_ANCHOR_ERROR ),
+        error_ثبت( NPP_ماسک_اندازه_ERROR ),
+        error_ثبت( NPP_MIRROR_FLIP_ERROR ),
+        error_ثبت( NPP_MOMENT_00_ZERO_ERROR ),
+        error_ثبت( NPP_پوله_NEGATIVE_LEVEL_ERROR ),
+        error_ثبت( NPP_پوله_ERROR ),
+        error_ثبت( NPP_CONTEXT_سمون_ERROR ),
+        error_ثبت( NPP_FFT_FLAG_ERROR ),
+        error_ثبت( NPP_FFT_ترتیب_ERROR ),
+        error_ثبت( NPP_SCALE_RANGE_ERROR ),
+        error_ثبت( NPP_معلومات_TYPE_ERROR ),
+        error_ثبت( NPP_بهر_OFF_RANGE_ERROR ),
+        error_ثبت( NPP_DIVIDE_BY_ZERO_ERROR ),
+        error_ثبت( NPP_حافظه_ویش_ERR ),
+        error_ثبت( NPP_RANGE_ERROR ),
+        error_ثبت( NPP_BAD_دلیل_ERROR ),
+        error_ثبت( NPP_NO_حافظه_ERROR ),
+        error_ثبت( NPP_ERROR_RESERVED ),
+        error_ثبت( NPP_NO_OPERATION_WARNING ),
+        error_ثبت( NPP_DIVIDE_BY_ZERO_WARNING ),
+        error_ثبت( NPP_WRONG_INTERSECTION_ROI_WARNING ),
+    #د_که_پای
 
-        error_entry( NPP_NOT_SUPPORTED_MODE_ERROR ),
-        error_entry( NPP_ROUND_MODE_NOT_SUPPORTED_ERROR ),
-        error_entry( NPP_RESIZE_NO_OPERATION_ERROR ),
-        error_entry( NPP_LUT_NUMBER_OF_LEVELS_ERROR ),
-        error_entry( NPP_TEXTURE_BIND_ERROR ),
-        error_entry( NPP_WRONG_INTERSECTION_ROI_ERROR ),
-        error_entry( NPP_NOT_EVEN_STEP_ERROR ),
-        error_entry( NPP_INTERPOLATION_ERROR ),
-        error_entry( NPP_RESIZE_FACTOR_ERROR ),
-        error_entry( NPP_HAAR_CLASSIFIER_PIXEL_MATCH_ERROR ),
-        error_entry( NPP_MEMCPY_ERROR ),
-        error_entry( NPP_ALIGNMENT_ERROR ),
-        error_entry( NPP_STEP_ERROR ),
-        error_entry( NPP_SIZE_ERROR ),
-        error_entry( NPP_NULL_POINTER_ERROR ),
-        error_entry( NPP_CUDA_KERNEL_EXECUTION_ERROR ),
-        error_entry( NPP_NOT_IMPLEMENTED_ERROR ),
-        error_entry( NPP_ERROR ),
-        error_entry( NPP_NO_ERROR ),
-        error_entry( NPP_SUCCESS ),
-        error_entry( NPP_WRONG_INTERSECTION_QUAD_WARNING ),
-        error_entry( NPP_MISALIGNED_DST_ROI_WARNING ),
-        error_entry( NPP_AFFINE_QUAD_INCORRECT_WARNING ),
-        error_entry( NPP_DOUBLE_SIZE_WARNING )
+        error_ثبت( NPP_NOT_SUPPORTED_ډېرپېښ_ERROR ),
+        error_ثبت( NPP_پړاو_ډېرپېښ_NOT_SUPPORTED_ERROR ),
+        error_ثبت( NPP_RESIZE_NO_OPERATION_ERROR ),
+        error_ثبت( NPP_LUT_شمېره_د_پوړونه_ERROR ),
+        error_ثبت( NPP_TEXTURE_BIND_ERROR ),
+        error_ثبت( NPP_WRONG_INTERSECTION_ROI_ERROR ),
+        error_ثبت( NPP_NOT_EVEN_ګام_ERROR ),
+        error_ثبت( NPP_INTERPOLATION_ERROR ),
+        error_ثبت( NPP_RESIZE_ضریب_ERROR ),
+        error_ثبت( NPP_HAAR_CLASSIFIER_PIXEL_سمون_ERROR ),
+        error_ثبت( NPP_MEMCPY_ERROR ),
+        error_ثبت( NPP_ALIGNMENT_ERROR ),
+        error_ثبت( NPP_ګام_ERROR ),
+        error_ثبت( NPP_اندازه_ERROR ),
+        error_ثبت( NPP_NULL_اشاره_ګر_ERROR ),
+        error_ثبت( NPP_CUDA_KERNEL_EXECUTION_ERROR ),
+        error_ثبت( NPP_NOT_IMPLEMENTED_ERROR ),
+        error_ثبت( NPP_ERROR ),
+        error_ثبت( NPP_NO_ERROR ),
+        error_ثبت( NPP_SUCCESS ),
+        error_ثبت( NPP_WRONG_INTERSECTION_QUAD_WARNING ),
+        error_ثبت( NPP_MISALIGNED_DST_ROI_WARNING ),
+        error_ثبت( NPP_AFFINE_QUAD_INCORRECT_WARNING ),
+        error_ثبت( NPP_DOUBLE_اندازه_WARNING )
     };
 
-    const size_t npp_error_num = sizeof(npp_errors) / sizeof(npp_errors[0]);
+    ثابت size_t npp_error_عدد = حجم(npp_errors) / حجم(npp_errors[0]);
 
-    const ErrorEntry cu_errors [] =
+    ثابت Error_ثبت cu_errors [] =
     {
-        error_entry( CUDA_SUCCESS                              ),
-        error_entry( CUDA_ERROR_INVALID_VALUE                  ),
-        error_entry( CUDA_ERROR_OUT_OF_MEMORY                  ),
-        error_entry( CUDA_ERROR_NOT_INITIALIZED                ),
-        error_entry( CUDA_ERROR_DEINITIALIZED                  ),
-        error_entry( CUDA_ERROR_PROFILER_DISABLED              ),
-        error_entry( CUDA_ERROR_PROFILER_NOT_INITIALIZED       ),
-        error_entry( CUDA_ERROR_PROFILER_ALREADY_STARTED       ),
-        error_entry( CUDA_ERROR_PROFILER_ALREADY_STOPPED       ),
-        error_entry( CUDA_ERROR_NO_DEVICE                      ),
-        error_entry( CUDA_ERROR_INVALID_DEVICE                 ),
-        error_entry( CUDA_ERROR_INVALID_IMAGE                  ),
-        error_entry( CUDA_ERROR_INVALID_CONTEXT                ),
-        error_entry( CUDA_ERROR_CONTEXT_ALREADY_CURRENT        ),
-        error_entry( CUDA_ERROR_MAP_FAILED                     ),
-        error_entry( CUDA_ERROR_UNMAP_FAILED                   ),
-        error_entry( CUDA_ERROR_ARRAY_IS_MAPPED                ),
-        error_entry( CUDA_ERROR_ALREADY_MAPPED                 ),
-        error_entry( CUDA_ERROR_NO_BINARY_FOR_GPU              ),
-        error_entry( CUDA_ERROR_ALREADY_ACQUIRED               ),
-        error_entry( CUDA_ERROR_NOT_MAPPED                     ),
-        error_entry( CUDA_ERROR_NOT_MAPPED_AS_ARRAY            ),
-        error_entry( CUDA_ERROR_NOT_MAPPED_AS_POINTER          ),
-        error_entry( CUDA_ERROR_ECC_UNCORRECTABLE              ),
-        error_entry( CUDA_ERROR_UNSUPPORTED_LIMIT              ),
-        error_entry( CUDA_ERROR_CONTEXT_ALREADY_IN_USE         ),
-        error_entry( CUDA_ERROR_INVALID_SOURCE                 ),
-        error_entry( CUDA_ERROR_FILE_NOT_FOUND                 ),
-        error_entry( CUDA_ERROR_SHARED_OBJECT_SYMBOL_NOT_FOUND ),
-        error_entry( CUDA_ERROR_SHARED_OBJECT_INIT_FAILED      ),
-        error_entry( CUDA_ERROR_OPERATING_SYSTEM               ),
-        error_entry( CUDA_ERROR_INVALID_HANDLE                 ),
-        error_entry( CUDA_ERROR_NOT_FOUND                      ),
-        error_entry( CUDA_ERROR_NOT_READY                      ),
-        error_entry( CUDA_ERROR_LAUNCH_FAILED                  ),
-        error_entry( CUDA_ERROR_LAUNCH_OUT_OF_RESOURCES        ),
-        error_entry( CUDA_ERROR_LAUNCH_TIMEOUT                 ),
-        error_entry( CUDA_ERROR_LAUNCH_INCOMPATIBLE_TEXTURING  ),
-        error_entry( CUDA_ERROR_PEER_ACCESS_ALREADY_ENABLED    ),
-        error_entry( CUDA_ERROR_PEER_ACCESS_NOT_ENABLED        ),
-        error_entry( CUDA_ERROR_PRIMARY_CONTEXT_ACTIVE         ),
-        error_entry( CUDA_ERROR_CONTEXT_IS_DESTROYED           ),
-        error_entry( CUDA_ERROR_ASSERT                         ),
-        error_entry( CUDA_ERROR_TOO_MANY_PEERS                 ),
-        error_entry( CUDA_ERROR_HOST_MEMORY_ALREADY_REGISTERED ),
-        error_entry( CUDA_ERROR_HOST_MEMORY_NOT_REGISTERED     ),
-        error_entry( CUDA_ERROR_UNKNOWN                        )
+        error_ثبت( CUDA_SUCCESS                              ),
+        error_ثبت( CUDA_ERROR_INVALID_ارزښت                  ),
+        error_ثبت( CUDA_ERROR_بهر_د_حافظه                  ),
+        error_ثبت( CUDA_ERROR_NOT_INITIALIZED                ),
+        error_ثبت( CUDA_ERROR_DEINITIALIZED                  ),
+        error_ثبت( CUDA_ERROR_PROFILER_DISABLED              ),
+        error_ثبت( CUDA_ERROR_PROFILER_NOT_INITIALIZED       ),
+        error_ثبت( CUDA_ERROR_PROFILER_ALREADY_STARTED       ),
+        error_ثبت( CUDA_ERROR_PROFILER_ALREADY_STOPPED       ),
+        error_ثبت( CUDA_ERROR_NO_DEVICE                      ),
+        error_ثبت( CUDA_ERROR_INVALID_DEVICE                 ),
+        error_ثبت( CUDA_ERROR_INVALID_IMAGE                  ),
+        error_ثبت( CUDA_ERROR_INVALID_CONTEXT                ),
+        error_ثبت( CUDA_ERROR_CONTEXT_ALREADY_CURRENT        ),
+        error_ثبت( CUDA_ERROR_MAP_FAILED                     ),
+        error_ثبت( CUDA_ERROR_UNMAP_FAILED                   ),
+        error_ثبت( CUDA_ERROR_ARRAY_IS_MAPPED                ),
+        error_ثبت( CUDA_ERROR_ALREADY_MAPPED                 ),
+        error_ثبت( CUDA_ERROR_NO_دوګونی_FOR_GPU              ),
+        error_ثبت( CUDA_ERROR_ALREADY_ACQUIRED               ),
+        error_ثبت( CUDA_ERROR_NOT_MAPPED                     ),
+        error_ثبت( CUDA_ERROR_NOT_MAPPED_AS_ARRAY            ),
+        error_ثبت( CUDA_ERROR_NOT_MAPPED_AS_اشاره_ګر          ),
+        error_ثبت( CUDA_ERROR_ECC_UNCORRECTABLE              ),
+        error_ثبت( CUDA_ERROR_UNSUPPORTED_حد              ),
+        error_ثبت( CUDA_ERROR_CONTEXT_ALREADY_دننه_USE         ),
+        error_ثبت( CUDA_ERROR_INVALID_سرچینه                 ),
+        error_ثبت( CUDA_ERROR_FILE_NOT_وموندل                 ),
+        error_ثبت( CUDA_ERROR_SHARED_OBJECT_نښه_NOT_وموندل ),
+        error_ثبت( CUDA_ERROR_SHARED_OBJECT_INIT_FAILED      ),
+        error_ثبت( CUDA_ERROR_OPERATING_SYSTEM               ),
+        error_ثبت( CUDA_ERROR_INVALID_HANDLE                 ),
+        error_ثبت( CUDA_ERROR_NOT_وموندل                      ),
+        error_ثبت( CUDA_ERROR_NOT_READY                      ),
+        error_ثبت( CUDA_ERROR_LAUNCH_FAILED                  ),
+        error_ثبت( CUDA_ERROR_LAUNCH_بهر_د_RESOURCES        ),
+        error_ثبت( CUDA_ERROR_LAUNCH_TIMEOUT                 ),
+        error_ثبت( CUDA_ERROR_LAUNCH_INCOMPATIBLE_TEXTURING  ),
+        error_ثبت( CUDA_ERROR_PEER_ACCESS_ALREADY_ENABLED    ),
+        error_ثبت( CUDA_ERROR_PEER_ACCESS_NOT_ENABLED        ),
+        error_ثبت( CUDA_ERROR_PRIMARY_CONTEXT_فعال         ),
+        error_ثبت( CUDA_ERROR_CONTEXT_IS_DESTROYED           ),
+        error_ثبت( CUDA_ERROR_ASSERT                         ),
+        error_ثبت( CUDA_ERROR_TOO_MANY_PEERS                 ),
+        error_ثبت( CUDA_ERROR_HOST_حافظه_ALREADY_REGISTERED ),
+        error_ثبت( CUDA_ERROR_HOST_حافظه_NOT_REGISTERED     ),
+        error_ثبت( CUDA_ERROR_UNKNOWN                        )
     };
 
-    const size_t cu_errors_num = sizeof(cu_errors) / sizeof(cu_errors[0]);
+    ثابت size_t cu_errors_عدد = حجم(cu_errors) / حجم(cu_errors[0]);
 
-    cv::String getErrorString(int code, const ErrorEntry* errors, size_t n)
+    cv::String getErrorString(صحيح کوډ, ثابت Error_ثبت* errors, size_t n)
     {
-        size_t idx = std::find_if(errors, errors + n, ErrorEntryComparer(code)) - errors;
+        size_t idx = std::find_if(errors, errors + n, Error_ثبت_Comparer(کوډ)) - errors;
 
-        const char* msg = (idx != n) ? errors[idx].str : "Unknown error code";
-        cv::String str = cv::format("%s [Code = %d]", msg, code);
+        ثابت حرف* پیغام = (idx != n) ? errors[idx].str : "Unknown error code";
+        cv::String str = cv::format("%s [Code = %d]", پیغام, کوډ);
 
-        return str;
+        أرجع str;
     }
 }
 
-#endif
+#د_که_پای
 
-String cv::cuda::getNppErrorMessage(int code)
+String cv::cuda::get_Npp_Error_پیغام(صحيح کوډ)
 {
-#ifndef HAVE_CUDA
-    CV_UNUSED(code);
-    return String();
-#else
-    return getErrorString(code, npp_errors, npp_error_num);
-#endif
+#که_نه_تعریف_شوی HAVE_CUDA
+    CV_ناکارول_شوی(کوډ);
+    أرجع String();
+#وإلا
+    أرجع getErrorString(کوډ, npp_errors, npp_error_عدد);
+#د_که_پای
 }
 
-String cv::cuda::getCudaDriverApiErrorMessage(int code)
+String cv::cuda::get_Cuda_Driver_Api_Error_پیغام(صحيح کوډ)
 {
-#ifndef HAVE_CUDA
-    CV_UNUSED(code);
-    return String();
-#else
-    return getErrorString(code, cu_errors, cu_errors_num);
-#endif
+#که_نه_تعریف_شوی HAVE_CUDA
+    CV_ناکارول_شوی(کوډ);
+    أرجع String();
+#وإلا
+    أرجع getErrorString(کوډ, cu_errors, cu_errors_عدد);
+#د_که_پای
 }

@@ -39,160 +39,160 @@
 //
 //M*/
 
-#include "precomp.hpp"
-#include "opencv2/core/opencl/runtime/opencl_clfft.hpp"
-#include "opencv2/core/opencl/runtime/opencl_core.hpp"
-#include "opencl_kernels_core.hpp"
-#include "dxt.hpp"
-#include "dxt.simd.hpp"
-#include "dxt.simd_declarations.hpp"
-#include <map>
+#ضمن "precomp.hpp"
+#ضمن "opencv2/core/opencl/runtime/opencl_clfft.hpp"
+#ضمن "opencv2/core/opencl/runtime/opencl_core.hpp"
+#ضمن "opencl_kernels_core.hpp"
+#ضمن "dxt.hpp"
+#ضمن "dxt.simd.hpp"
+#ضمن "dxt.simd_declarations.hpp"
+#ضمن <map>
 
-namespace cv
+نطاق cv
 {
 
-#if IPP_VERSION_X100 >= 710
-#define USE_IPP_DFT 1
-#else
-#undef USE_IPP_DFT
-#endif
+#إذا IPP_نسخه_X100 >= 710
+#تعریف_کړه USE_IPP_DFT 1
+#وإلا
+#تعریف_لغوه USE_IPP_DFT
+#د_که_پای
 
-#if defined USE_IPP_DFT
-#if IPP_VERSION_X100 >= 202220
-#define IPP_DISABLE_DFT32F ((depth == CV_32F) && (ippCPUID_AVX512F&cv::ipp::getIppFeatures()))
-#else
-#define IPP_DISABLE_DFT32F false
-#endif
-#endif
+#إذا defined USE_IPP_DFT
+#إذا IPP_نسخه_X100 >= 202220
+#تعریف_کړه IPP_DISABLE_DFT32F ((ژوروالی == CV_32F) && (ippCPUID_AVX512F&cv::ipp::getIppFeatures()))
+#وإلا
+#تعریف_کړه IPP_DISABLE_DFT32F خطأ
+#د_که_پای
+#د_که_پای
 
 /****************************************************************************************\
                                Discrete Fourier Transform
 \****************************************************************************************/
 
-#ifdef HAVE_OPENCL
+#که_تعریف_شوی HAVE_OPENCL
 // factorization used by the OpenCL radix selection
-static int
-DFTFactorize( int n, int* factors )
+ساكن صحيح
+DFTFactorize( صحيح n, صحيح* factors )
 {
-    int nf = 0, f, i, j;
+    صحيح nf = 0, f, i, j;
 
-    if( n <= 5 )
+    إذا( n <= 5 )
     {
         factors[0] = n;
-        return 1;
+        أرجع 1;
     }
 
     f = (((n - 1)^n)+1) >> 1;
-    if( f > 1 )
+    إذا( f > 1 )
     {
         factors[nf++] = f;
         n = f == n ? 1 : n/f;
     }
 
-    for( f = 3; n > 1; )
+    لكل( f = 3; n > 1; )
     {
-        int d = n/f;
-        if( d*f == n )
+        صحيح d = n/f;
+        إذا( d*f == n )
         {
             factors[nf++] = f;
             n = d;
         }
-        else
+        وإلا
         {
             f += 2;
-            if( f*f > n )
-                break;
+            إذا( f*f > n )
+                اكسر;
         }
     }
 
-    if( n > 1 )
+    إذا( n > 1 )
         factors[nf++] = n;
 
     f = (factors[0] & 1) == 0;
-    for( i = f; i < (nf+f)/2; i++ )
-        CV_SWAP( factors[i], factors[nf-i-1+f], j );
+    لكل( i = f; i < (nf+f)/2; i++ )
+        CV_بدلون( factors[i], factors[nf-i-1+f], j );
 
-    return nf;
+    أرجع nf;
 }
-#endif
+#د_که_پای
 
-#ifdef USE_IPP_DFT
-static IppStatus ippsDFTFwd_CToC( const Complex<float>* src, Complex<float>* dst,
-                             const void* spec, uchar* buf)
+#که_تعریف_شوی USE_IPP_DFT
+ساكن Ipp_حالت ippsDFTFwd_CToC( ثابت Complex<عائم>* src, Complex<عائم>* dst,
+                             ثابت فراغ* spec, uchar* buf)
 {
-    return CV_INSTRUMENT_FUN_IPP(ippsDFTFwd_CToC_32fc, (const Ipp32fc*)src, (Ipp32fc*)dst,
-                                 (const IppsDFTSpec_C_32fc*)spec, buf);
+    أرجع CV_INSTRUMENT_FUN_IPP(ippsDFTFwd_CToC_32fc, (ثابت Ipp32fc*)src, (Ipp32fc*)dst,
+                                 (ثابت IppsDFTSpec_C_32fc*)spec, buf);
 }
 
-static IppStatus ippsDFTFwd_CToC( const Complex<double>* src, Complex<double>* dst,
-                             const void* spec, uchar* buf)
+ساكن Ipp_حالت ippsDFTFwd_CToC( ثابت Complex<مزدوج>* src, Complex<مزدوج>* dst,
+                             ثابت فراغ* spec, uchar* buf)
 {
-    return CV_INSTRUMENT_FUN_IPP(ippsDFTFwd_CToC_64fc, (const Ipp64fc*)src, (Ipp64fc*)dst,
-                                 (const IppsDFTSpec_C_64fc*)spec, buf);
+    أرجع CV_INSTRUMENT_FUN_IPP(ippsDFTFwd_CToC_64fc, (ثابت Ipp64fc*)src, (Ipp64fc*)dst,
+                                 (ثابت IppsDFTSpec_C_64fc*)spec, buf);
 }
 
-static IppStatus ippsDFTInv_CToC( const Complex<float>* src, Complex<float>* dst,
-                             const void* spec, uchar* buf)
+ساكن Ipp_حالت ippsDFTInv_CToC( ثابت Complex<عائم>* src, Complex<عائم>* dst,
+                             ثابت فراغ* spec, uchar* buf)
 {
-    return CV_INSTRUMENT_FUN_IPP(ippsDFTInv_CToC_32fc, (const Ipp32fc*)src, (Ipp32fc*)dst,
-                                 (const IppsDFTSpec_C_32fc*)spec, buf);
+    أرجع CV_INSTRUMENT_FUN_IPP(ippsDFTInv_CToC_32fc, (ثابت Ipp32fc*)src, (Ipp32fc*)dst,
+                                 (ثابت IppsDFTSpec_C_32fc*)spec, buf);
 }
 
-static IppStatus ippsDFTInv_CToC( const Complex<double>* src, Complex<double>* dst,
-                                  const void* spec, uchar* buf)
+ساكن Ipp_حالت ippsDFTInv_CToC( ثابت Complex<مزدوج>* src, Complex<مزدوج>* dst,
+                                  ثابت فراغ* spec, uchar* buf)
 {
-    return CV_INSTRUMENT_FUN_IPP(ippsDFTInv_CToC_64fc, (const Ipp64fc*)src, (Ipp64fc*)dst,
-                                 (const IppsDFTSpec_C_64fc*)spec, buf);
+    أرجع CV_INSTRUMENT_FUN_IPP(ippsDFTInv_CToC_64fc, (ثابت Ipp64fc*)src, (Ipp64fc*)dst,
+                                 (ثابت IppsDFTSpec_C_64fc*)spec, buf);
 }
 
-static IppStatus ippsDFTFwd_RToPack( const float* src, float* dst,
-                                     const void* spec, uchar* buf)
+ساكن Ipp_حالت ippsDFTFwd_RToPack( ثابت عائم* src, عائم* dst,
+                                     ثابت فراغ* spec, uchar* buf)
 {
-    return CV_INSTRUMENT_FUN_IPP(ippsDFTFwd_RToPack_32f, src, dst, (const IppsDFTSpec_R_32f*)spec, buf);
+    أرجع CV_INSTRUMENT_FUN_IPP(ippsDFTFwd_RToPack_32f, src, dst, (ثابت IppsDFTSpec_R_32f*)spec, buf);
 }
 
-static IppStatus ippsDFTFwd_RToPack( const double* src, double* dst,
-                                     const void* spec, uchar* buf)
+ساكن Ipp_حالت ippsDFTFwd_RToPack( ثابت مزدوج* src, مزدوج* dst,
+                                     ثابت فراغ* spec, uchar* buf)
 {
-    return CV_INSTRUMENT_FUN_IPP(ippsDFTFwd_RToPack_64f, src, dst, (const IppsDFTSpec_R_64f*)spec, buf);
+    أرجع CV_INSTRUMENT_FUN_IPP(ippsDFTFwd_RToPack_64f, src, dst, (ثابت IppsDFTSpec_R_64f*)spec, buf);
 }
 
-static IppStatus ippsDFTInv_PackToR( const float* src, float* dst,
-                                     const void* spec, uchar* buf)
+ساكن Ipp_حالت ipps_DFTInv_Pack_منزل_R( ثابت عائم* src, عائم* dst,
+                                     ثابت فراغ* spec, uchar* buf)
 {
-    return CV_INSTRUMENT_FUN_IPP(ippsDFTInv_PackToR_32f, src, dst, (const IppsDFTSpec_R_32f*)spec, buf);
+    أرجع CV_INSTRUMENT_FUN_IPP(ipps_DFTInv_Pack_منزل_R_32f, src, dst, (ثابت IppsDFTSpec_R_32f*)spec, buf);
 }
 
-static IppStatus ippsDFTInv_PackToR( const double* src, double* dst,
-                                     const void* spec, uchar* buf)
+ساكن Ipp_حالت ipps_DFTInv_Pack_منزل_R( ثابت مزدوج* src, مزدوج* dst,
+                                     ثابت فراغ* spec, uchar* buf)
 {
-    return CV_INSTRUMENT_FUN_IPP(ippsDFTInv_PackToR_64f, src, dst, (const IppsDFTSpec_R_64f*)spec, buf);
+    أرجع CV_INSTRUMENT_FUN_IPP(ipps_DFTInv_Pack_منزل_R_64f, src, dst, (ثابت IppsDFTSpec_R_64f*)spec, buf);
 }
-#endif
+#د_که_پای
 
-struct OcvDftOptions;
+بنية OcvDftOptions;
 
-typedef void (*DFTFunc)(const OcvDftOptions & c, const void* src, void* dst);
+تعريفنوع فراغ (*DFTFunc)(ثابت OcvDftOptions & c, ثابت فراغ* src, فراغ* dst);
 
 // Per-transform options of the 1D engine: the immutable plan (shared by all rows), the kernel
 // table resolved for the current CPU, and the per-executor workspace (see dxt.hpp).
-struct OcvDftOptions {
-    double scale;
-    int n;
+بنية OcvDftOptions {
+    مزدوج scale;
+    صحيح n;
 
-    bool isInverse;
-    bool isComplex;     // DFT_COMPLEX_OUTPUT (forward) / complex input (inverse) for real transforms
+    منطقي isInverse;
+    منطقي isComplex;     // DFT_COMPLEX_OUTPUT (forward) / complex input (inverse) for real transforms
 
     DFTFunc dft_func;
-    bool useIpp;
+    منطقي useIpp;
 
-#ifdef USE_IPP_DFT
+#که_تعریف_شوی USE_IPP_DFT
     uchar* ipp_spec;
     uchar* ipp_work;
-#endif
+#د_که_پای
 
-    const DftPlan* plan;
-    const DFTKernels* kernels;
+    ثابت DftPlan* plan;
+    ثابت DFTKernels* kernels;
     uchar* workspace;
 
     OcvDftOptions()
@@ -202,13 +202,13 @@ struct OcvDftOptions {
         workspace = 0;
         scale = 0;
         n = 0;
-        isInverse = false;
-        isComplex = false;
-        useIpp = false;
-#ifdef USE_IPP_DFT
+        isInverse = خطأ;
+        isComplex = خطأ;
+        useIpp = خطأ;
+#که_تعریف_شوی USE_IPP_DFT
         ipp_spec = 0;
         ipp_work = 0;
-#endif
+#د_که_پای
         dft_func = 0;
     }
 };
@@ -218,18 +218,18 @@ struct OcvDftOptions {
                      New 1D engine: kernel table, plan builder, driver
 \****************************************************************************************/
 
-static DFTKernels getDFTKernelsDispatch(int depth)
+ساكن DFTKernels getDFTKernelsDispatch(صحيح ژوروالی)
 {
-    CV_CPU_DISPATCH(getDFTKernels_, (depth), CV_CPU_DISPATCH_MODES_ALL);
+    CV_CPU_DISPATCH(getDFTKernels_, (ژوروالی), CV_CPU_DISPATCH_MODES_ALL);
 }
 
 // The kernel tables are resolved once for the best available ISA; all further calls go
 // through the function pointers with no dispatch overhead.
-static const DFTKernels& getDFTKernels(int depth)
+ساكن ثابت DFTKernels& getDFTKernels(صحيح ژوروالی)
 {
-    static const DFTKernels k32 = getDFTKernelsDispatch(CV_32F);
-    static const DFTKernels k64 = getDFTKernelsDispatch(CV_64F);
-    return depth == CV_32F ? k32 : k64;
+    ساكن ثابت DFTKernels k32 = getDFTKernelsDispatch(CV_32F);
+    ساكن ثابت DFTKernels k64 = getDFTKernelsDispatch(CV_64F);
+    أرجع ژوروالی == CV_32F ? k32 : k64;
 }
 
 // exp(-2*pi*i*m/M) in double precision, m in [0, M): m = B*a + b -> hi[a]*lo[b] with B a power of
@@ -237,178 +237,178 @@ static const DFTKernels& getDFTKernels(int depth)
 // sin/cos every 16 entries, so the error stays within a few ulps while only ~(B + M/B)/16 + 4
 // trigonometric calls are made (4 for small M). Cheap to build, which matters because cv::dft()
 // builds a fresh plan on every call.
-struct DftTwiddleGen
+بنية DftTwiddleGen
 {
-    int M, logB, maskB;
-    AutoBuffer<double, 1024> buf;
-    double *hi_re, *hi_im, *lo_re, *lo_im;
+    صحيح M, logB, ماسک_B;
+    Auto_بفر<مزدوج, 1024> buf;
+    مزدوج *hi_re, *hi_im, *lo_re, *lo_im;
 
     // re[i] + i*im[i] = w^i, i in [0, count), w = (wr, wi) = exp(i*stepAngle); the rotation
     // recurrence is re-seeded with exact sin/cos every 16 entries
-    static void fillTable(double* re, double* im, int count, double wr, double wi, double stepAngle)
+    ساكن فراغ fill_جدول(مزدوج* re, مزدوج* im, صحيح شمېر_2, مزدوج wr, مزدوج wi, مزدوج ګام_Angle)
     {
-        for (int i0 = 0; i0 < count; i0 += 16)
+        لكل (صحيح i0 = 0; i0 < شمېر_2; i0 += 16)
         {
-            double t0 = stepAngle*i0;
-            double cr = i0 == 0 ? 1 : cos(t0), ci = i0 == 0 ? 0 : sin(t0);
-            int i1 = std::min(i0 + 16, count);
-            for (int i = i0; i < i1; i++)
+            مزدوج t0 = ګام_Angle*i0;
+            مزدوج cr = i0 == 0 ? 1 : کوساین(t0), ci = i0 == 0 ? 0 : ساین(t0);
+            صحيح i1 = std::min(i0 + 16, شمېر_2);
+            لكل (صحيح i = i0; i < i1; i++)
             {
                 re[i] = cr; im[i] = ci;
-                double t = cr*wr - ci*wi;
+                مزدوج t = cr*wr - ci*wi;
                 ci = cr*wi + ci*wr;
                 cr = t;
             }
         }
     }
 
-    void init(int _M)
+    فراغ init(صحيح _M)
     {
         M = _M;
         logB = 0;
-        while ((1LL << (2*logB)) < M) logB++;   // B = 2^logB >= sqrt(M)
-        int B = 1 << logB;
-        maskB = B - 1;
-        int nhi = (M + B - 1)/B;
+        طالما ((1LL << (2*logB)) < M) logB++;   // B = 2^logB >= sqrt(M)
+        صحيح B = 1 << logB;
+        ماسک_B = B - 1;
+        صحيح nhi = (M + B - 1)/B;
         buf.allocate(2*(B + nhi));
-        hi_re = buf.data(); hi_im = hi_re + nhi;
+        hi_re = buf.معلومات(); hi_im = hi_re + nhi;
         lo_re = hi_im + nhi; lo_im = lo_re + B;
-        double a = -2*CV_PI/M;
+        مزدوج a = -2*CV_PI/M;
         // the two step angles are computed exactly (4 trigonometric calls in total for small M)
-        fillTable(lo_re, lo_im, B, cos(a), sin(a), a);
-        fillTable(hi_re, hi_im, nhi, cos(a*B), sin(a*B), a*B);
+        fill_جدول(lo_re, lo_im, B, کوساین(a), ساین(a), a);
+        fill_جدول(hi_re, hi_im, nhi, کوساین(a*B), ساین(a*B), a*B);
     }
 
     // exp(-2*pi*i*m/M) for any m >= 0 (the angle is periodic: only m mod M matters; callers may
     // ask for m == M, e.g. the rotation step of a chain that covers the whole period)
-    void get(int m, double& re, double& im) const
+    فراغ get(صحيح m, مزدوج& re, مزدوج& im) ثابت
     {
         CV_DbgAssert(m >= 0);
-        if (m >= M)
+        إذا (m >= M)
             m %= M;
-        int a = m >> logB, b = m & maskB;
+        صحيح a = m >> logB, b = m & ماسک_B;
         re = hi_re[a]*lo_re[b] - hi_im[a]*lo_im[b];
         im = hi_re[a]*lo_im[b] + hi_im[a]*lo_re[b];
     }
 };
 
-template<typename T>
-void DftPlan::fillTables(size_t ntw, bool need_rtw, bool need_dct)
+کينډۍ<ډول_نوم T>
+فراغ DftPlan::fillTables(size_t ntw, منطقي need_rtw, منطقي need_dct)
 {
-    DftPlan& p = *this;
+    DftPlan& p = *هذا;
     // all angles come from one base table exp(-2*pi*i*m/M), M a multiple of every angle grid used:
     // C2C: M = nc; real kinds with even n: M = n (=2nc) or 4n for DCT (W_4n^k); odd real: M = n = nc.
-    int M = nc*(need_dct ? 8 : need_rtw ? 2 : 1);
+    صحيح M = nc*(need_dct ? 8 : need_rtw ? 2 : 1);
     DftTwiddleGen gen;
     gen.init(M);
-    p.tw.allocate((ntw*sizeof(T) + sizeof(double) - 1)/sizeof(double) + 1);
-    T* cur = (T*)p.tw.data();
-    int maxL = 1;
-    for (int s = 0; s < p.nstages; s++)
-        if (p.stages[s].radix <= 8) maxL = std::max(maxL, p.stages[s].span);
-    AutoBuffer<double, 2048> twd_buf(2*maxL);     // leg-1 twiddles of the current stage in double
-    double* twd = twd_buf.data();
-    for (int s = 0; s < p.nstages; s++)
+    p.tw.allocate((ntw*حجم(T) + حجم(مزدوج) - 1)/حجم(مزدوج) + 1);
+    T* cur = (T*)p.tw.معلومات();
+    صحيح maxL = 1;
+    لكل (صحيح s = 0; s < p.nstages; s++)
+        إذا (p.stages[s].radix <= 8) maxL = std::max(maxL, p.stages[s].پراختیا);
+    Auto_بفر<مزدوج, 2048> twd_buf(2*maxL);     // leg-1 twiddles of the current stage in double
+    مزدوج* twd = twd_buf.معلومات();
+    لكل (صحيح s = 0; s < p.nstages; s++)
     {
         DftStage& st = p.stages[s];
-        int r = st.radix, L = st.span, ts = st.tw_stride;
+        صحيح r = st.radix, L = st.پراختیا, ts = st.tw_stride;
         T* twr = cur; T* twi = cur + (r - 1)*ts;
         cur = twi + (r - 1)*ts;
-        int step = M/(r*L);
-        if (r <= 8)
+        صحيح ګام = M/(r*L);
+        إذا (r <= 8)
         {
             // Leg 1 (W_{rL}^j) by K independent interleaved rotation recurrences (a single chain is
             // latency-bound), each re-seeded from the exact generator every 16 of its steps; legs
             // q >= 2 as t_q(j) = t_{q-1}(j)*t_1(j), independent per entry (error <= q ulps).
-            constexpr int K = 8;
-            double cr[K], ci[K], wr, wi;
-            gen.get(K*step, wr, wi);
-            double* t1r = twd; double* t1i = twd + L;      // leg 1 kept in double for the products
-            for (int j0 = 0; j0 < L; j0 += 16*K)           // blocks of 16 steps per chain
+            constexpr صحيح K = 8;
+            مزدوج cr[K], ci[K], wr, wi;
+            gen.get(K*ګام, wr, wi);
+            مزدوج* t1r = twd; مزدوج* t1i = twd + L;      // leg 1 kept in double for the products
+            لكل (صحيح j0 = 0; j0 < L; j0 += 16*K)           // blocks of 16 steps per chain
             {
-                for (int k = 0; k < K; k++)
-                    gen.get(std::min(j0 + k, L - 1)*step, cr[k], ci[k]);
-                int j1 = std::min(j0 + 16*K, L);
-                for (int j = j0; j < j1; j += K)
-                    for (int k = 0; k < K && j + k < L; k++)
+                لكل (صحيح k = 0; k < K; k++)
+                    gen.get(std::min(j0 + k, L - 1)*ګام, cr[k], ci[k]);
+                صحيح j1 = std::min(j0 + 16*K, L);
+                لكل (صحيح j = j0; j < j1; j += K)
+                    لكل (صحيح k = 0; k < K && j + k < L; k++)
                     {
                         t1r[j+k] = cr[k]; t1i[j+k] = ci[k];
-                        double t = cr[k]*wr - ci[k]*wi;
+                        مزدوج t = cr[k]*wr - ci[k]*wi;
                         ci[k] = cr[k]*wi + ci[k]*wr;
                         cr[k] = t;
                     }
             }
-            for (int j = 0; j < L; j++)     // separate pass: vectorizes, the recurrence loop does not
+            لكل (صحيح j = 0; j < L; j++)     // separate pass: vectorizes, the recurrence loop does not
             {
                 twr[j] = (T)t1r[j]; twi[j] = (T)t1i[j];
             }
-            for (int q = 2; q < r; q++)
+            لكل (صحيح q = 2; q < r; q++)
             {
-                const T* pr = twr + (q-2)*ts; const T* pi = twi + (q-2)*ts;
+                ثابت T* pr = twr + (q-2)*ts; ثابت T* pi = twi + (q-2)*ts;
                 T* tr = twr + (q-1)*ts; T* ti = twi + (q-1)*ts;
-                for (int j = 0; j < L; j++)
+                لكل (صحيح j = 0; j < L; j++)
                 {
-                    double ar = pr[j], ai = pi[j], br = t1r[j], bi = t1i[j];
+                    مزدوج ar = pr[j], ai = pi[j], br = t1r[j], bi = t1i[j];
                     tr[j] = (T)(ar*br - ai*bi);
                     ti[j] = (T)(ar*bi + ai*br);
                 }
             }
         }
-        else
+        وإلا
         {
             // large odd radix: exact-ish generator lookup per entry
-            for (int q = 1; q < r; q++)
-                for (int j = 0; j < L; j++)
+            لكل (صحيح q = 1; q < r; q++)
+                لكل (صحيح j = 0; j < L; j++)
                 {
-                    double re, im;
-                    gen.get(q*j*step, re, im);
+                    مزدوج re, im;
+                    gen.get(q*j*ګام, re, im);
                     twr[(q-1)*ts + j] = (T)re;
                     twi[(q-1)*ts + j] = (T)im;
                 }
         }
         st.tw_re = twr; st.tw_im = twi;
         st.cs = st.sn = 0;
-        if (r >= 7)
+        إذا (r >= 7)
         {
-            int h = (r - 1)/2;
+            صحيح h = (r - 1)/2;
             T* cs = cur; T* sn = cur + h*h;
             cur = sn + h*h;
-            for (int pp = 1; pp <= h; pp++)
-                for (int k = 1; k <= h; k++)
+            لكل (صحيح pp = 1; pp <= h; pp++)
+                لكل (صحيح k = 1; k <= h; k++)
                 {
-                    double t = 2*CV_PI*((double)pp*k/r);
-                    cs[(pp-1)*h + (k-1)] = (T)cos(t);
-                    sn[(pp-1)*h + (k-1)] = (T)sin(t);
+                    مزدوج t = 2*CV_PI*((مزدوج)pp*k/r);
+                    cs[(pp-1)*h + (k-1)] = (T)کوساین(t);
+                    sn[(pp-1)*h + (k-1)] = (T)ساین(t);
                 }
             st.cs = cs; st.sn = sn;
         }
     }
     p.rtw_re = p.rtw_im = p.dct_re = p.dct_im = 0;
-    if (need_rtw)
+    إذا (need_rtw)
     {
         // W_n^k, k in [0, nc]
         T* wr = cur; T* wi = cur + (nc + 1);
         cur = wi + (nc + 1);
-        int step = M/n;
-        for (int k = 0; k <= nc; k++)
+        صحيح ګام = M/n;
+        لكل (صحيح k = 0; k <= nc; k++)
         {
-            double re, im;
-            gen.get(k*step, re, im);
+            مزدوج re, im;
+            gen.get(k*ګام, re, im);
             wr[k] = (T)re; wi[k] = (T)im;
         }
         p.rtw_re = wr; p.rtw_im = wi;
     }
-    if (need_dct)
+    إذا (need_dct)
     {
         // s*W_4n^k, k in [0, nc]; s = 2*sqrt(1/(2n)) forward, sqrt(1/(2n)) inverse (the original normalization)
         T* wr = cur; T* wi = cur + (nc + 1);
         cur = wi + (nc + 1);
-        double scale = (p.kind == DFT_KIND_DCT ? 2 : 1)*std::sqrt(1./(2*n));
-        int step = M/(4*n);
-        for (int k = 0; k <= nc; k++)
+        مزدوج scale = (p.ډول == DFT_ډول_DCT ? 2 : 1)*std::جذر(1./(2*n));
+        صحيح ګام = M/(4*n);
+        لكل (صحيح k = 0; k <= nc; k++)
         {
-            double re, im;
-            gen.get(k*step, re, im);
+            مزدوج re, im;
+            gen.get(k*ګام, re, im);
             wr[k] = (T)(re*scale); wi[k] = (T)(im*scale);
         }
         p.dct_re = wr; p.dct_im = wi;
@@ -416,71 +416,71 @@ void DftPlan::fillTables(size_t ntw, bool need_rtw, bool need_dct)
 }
 
 // See dxt.hpp for the contract (in particular where `vl` must come from).
-void DftPlan::build(int _kind, int _n, int _depth, int _vl)
+فراغ DftPlan::build(صحيح ډول_2, صحيح _n, صحيح ژوروالی_2, صحيح _vl)
 {
-    DftPlan& p = *this;
+    DftPlan& p = *هذا;
     CV_Assert(_n >= 1 && _vl >= 1);
-    CV_Assert(_depth == CV_32F || _depth == CV_64F);
-    bool real_kind = _kind != DFT_KIND_C2C;
-    bool dct_kind = _kind == DFT_KIND_DCT || _kind == DFT_KIND_IDCT;
-    if (dct_kind)
+    CV_Assert(ژوروالی_2 == CV_32F || ژوروالی_2 == CV_64F);
+    منطقي real_ډول = ډول_2 != DFT_ډول_C2_C;
+    منطقي dct_ډول = ډول_2 == DFT_ډول_DCT || ډول_2 == DFT_ډول_IDCT;
+    إذا (dct_ډول)
         CV_Assert(_n % 2 == 0);   // cv::dct() supports even n only (n == 1 is handled by the caller)
-    p.kind = _kind; p.n = _n; p.depth = _depth; p.vl = _vl;
-    p.nc = real_kind && _n % 2 == 0 ? _n/2 : _n;
+    p.ډول = ډول_2; p.n = _n; p.ژوروالی = ژوروالی_2; p.vl = _vl;
+    p.nc = real_ډول && _n % 2 == 0 ? _n/2 : _n;
     CV_Assert(nc < (1 << 28));
-    size_t esz = depth == CV_32F ? sizeof(float) : sizeof(double);
-    p.real_input = kind == DFT_KIND_R2C && (n & 1) != 0;
-    p.need_tmp = kind == DFT_KIND_C2R || kind == DFT_KIND_DCT || kind == DFT_KIND_IDCT;
-    p.pingpong = false;
+    size_t esz = ژوروالی == CV_32F ? حجم(عائم) : حجم(مزدوج);
+    p.real_ننوت = ډول == DFT_ډول_R2_C && (n & 1) != 0;
+    p.need_tmp = ډول == DFT_ډول_C2_R || ډول == DFT_ډول_DCT || ډول == DFT_ډول_IDCT;
+    p.pingpong = خطأ;
 
     // factorization: 2^k part first (fused first stage r0 + radix-4 stages), then 3s, 5s, other odd.
     // (A radix-8 middle stage was tried and measured slower on NEON: with per-leg twiddle tables it
     // does not save loads over two radix-4 stages and keeps 16 data vectors live.)
-    int k2 = 0, rest = nc;
-    while ((rest & 1) == 0) { rest >>= 1; k2++; }
-    int r0 = k2 == 0 ? 1 : k2 == 1 ? 2 : (k2 & 1) ? 8 : 4;
-    p.first_radix = r0;
-    int radices[DFT_MAX_STAGES], nst = 0;
-    for (int m = k2 - (r0 == 1 ? 0 : r0 == 2 ? 1 : r0 == 4 ? 2 : 3); m > 0; m -= 2) { CV_Assert(nst < DFT_MAX_STAGES); radices[nst++] = 4; }
+    صحيح k2 = 0, rest = nc;
+    طالما ((rest & 1) == 0) { rest >>= 1; k2++; }
+    صحيح r0 = k2 == 0 ? 1 : k2 == 1 ? 2 : (k2 & 1) ? 8 : 4;
+    p.لومړی_radix = r0;
+    صحيح radices[DFT_MAX_STAGES], nst = 0;
+    لكل (صحيح m = k2 - (r0 == 1 ? 0 : r0 == 2 ? 1 : r0 == 4 ? 2 : 3); m > 0; m -= 2) { CV_Assert(nst < DFT_MAX_STAGES); radices[nst++] = 4; }
     rest = nc >> k2;
-    while (rest % 3 == 0) { CV_Assert(nst < DFT_MAX_STAGES); radices[nst++] = 3; rest /= 3; }
-    while (rest % 5 == 0) { CV_Assert(nst < DFT_MAX_STAGES); radices[nst++] = 5; rest /= 5; }
-    for (int f = 7; rest > 1; f += 2)
+    طالما (rest % 3 == 0) { CV_Assert(nst < DFT_MAX_STAGES); radices[nst++] = 3; rest /= 3; }
+    طالما (rest % 5 == 0) { CV_Assert(nst < DFT_MAX_STAGES); radices[nst++] = 5; rest /= 5; }
+    لكل (صحيح f = 7; rest > 1; f += 2)
     {
-        if (f*f > rest)
+        إذا (f*f > rest)
         {
             CV_Assert(nst < DFT_MAX_STAGES);
             radices[nst++] = rest;
-            break;
+            اكسر;
         }
-        while (rest % f == 0) { CV_Assert(nst < DFT_MAX_STAGES); radices[nst++] = f; rest /= f; }
+        طالما (rest % f == 0) { CV_Assert(nst < DFT_MAX_STAGES); radices[nst++] = f; rest /= f; }
     }
     p.nstages = nst;
 
     // stages
-    int L = r0, max_h = 0;
+    صحيح L = r0, max_h = 0;
     size_t ntw = 0;
-    for (int s = 0; s < nst; s++)
+    لكل (صحيح s = 0; s < nst; s++)
     {
         DftStage& st = p.stages[s];
-        int r = radices[s];
-        st.radix = r; st.span = L; st.ngroups = nc/(r*L); st.tw_stride = L;
-        if (vl > 1 && L >= vl)
+        صحيح r = radices[s];
+        st.radix = r; st.پراختیا = L; st.ngroups = nc/(r*L); st.tw_stride = L;
+        إذا (vl > 1 && L >= vl)
         {
-            st.mode = DFT_STAGE_FULL;
+            st.ډېرپېښ = DFT_STAGE_ډک;
             st.nsteps = st.ngroups*((L + vl - 1)/vl);
-            if (L % vl != 0)
-                p.pingpong = true;   // back-off clamp => overlapping stores => must be out-of-place
+            إذا (L % vl != 0)
+                p.pingpong = ریښتیا;   // back-off clamp => overlapping stores => must be out-of-place
         }
-        else
+        وإلا
         {
-            st.mode = DFT_STAGE_SCALAR;
+            st.ډېرپېښ = DFT_STAGE_SCALAR;
             st.nsteps = st.ngroups*L;
         }
         ntw += 2*(size_t)(r - 1)*st.tw_stride;
-        if (r >= 7)
+        إذا (r >= 7)
         {
-            int h = (r - 1)/2;
+            صحيح h = (r - 1)/2;
             ntw += 2*(size_t)h*h;
             max_h = std::max(max_h, h);
         }
@@ -494,93 +494,93 @@ void DftPlan::build(int _kind, int _n, int _depth, int _vl)
     //    scalar gather (im index unused when real_input);
     //  - r0 > 1: the r0 inputs of group g are the column x[base(g) + q*nc/r0]; itab[base(g)] = g*r0
     //    tells the transposed first stage where the outputs of column base(g) go.
-    int seq[DFT_MAX_STAGES + 1], nseq = 0;
-    if (r0 > 1) seq[nseq++] = r0;
-    for (int s = 0; s < nst; s++) seq[nseq++] = radices[s];
-    int digits[DFT_MAX_STAGES + 1], weights[DFT_MAX_STAGES + 1];
+    صحيح seq[DFT_MAX_STAGES + 1], nseq = 0;
+    إذا (r0 > 1) seq[nseq++] = r0;
+    لكل (صحيح s = 0; s < nst; s++) seq[nseq++] = radices[s];
+    صحيح digits[DFT_MAX_STAGES + 1], weights[DFT_MAX_STAGES + 1];
     {
-        int Ls = 1;
-        for (int s = 0; s < nseq; s++)
+        صحيح Ls = 1;
+        لكل (صحيح s = 0; s < nseq; s++)
         {
             digits[s] = 0;
             weights[s] = nc/(Ls*seq[s]);
             Ls *= seq[s];
         }
     }
-    if (r0 == 1)
+    إذا (r0 == 1)
     {
         p.itab.allocate(nc*2);
-        int* it_all = p.itab.data();
+        صحيح* it_all = p.itab.معلومات();
         // the two lowest digits are enumerated by plain nested loops, the higher ones by a counter
-        int n_in = std::min(nseq, 2);
-        int r_0 = n_in > 0 ? seq[0] : 1, w_0 = n_in > 0 ? weights[0] : 0;
-        int r_1 = n_in > 1 ? seq[1] : 1, w_1 = n_in > 1 ? weights[1] : 0;
-        for (int pos = 0, rev_hi = 0; pos < nc; )
+        صحيح n_دننه = std::min(nseq, 2);
+        صحيح r_0 = n_دننه > 0 ? seq[0] : 1, w_0 = n_دننه > 0 ? weights[0] : 0;
+        صحيح r_1 = n_دننه > 1 ? seq[1] : 1, w_1 = n_دننه > 1 ? weights[1] : 0;
+        لكل (صحيح pos = 0, rev_hi = 0; pos < nc; )
         {
-            for (int d1 = 0; d1 < r_1; d1++)
+            لكل (صحيح d1 = 0; d1 < r_1; d1++)
             {
-                int rev = rev_hi + d1*w_1;
-                int* it = it_all + pos*2;
-                if (p.real_input)
+                صحيح rev = rev_hi + d1*w_1;
+                صحيح* it = it_all + pos*2;
+                إذا (p.real_ننوت)
                 {
-                    for (int d0 = 0; d0 < r_0; d0++, rev += w_0)
+                    لكل (صحيح d0 = 0; d0 < r_0; d0++, rev += w_0)
                     {
                         it[d0*2] = rev; it[d0*2+1] = rev;
                     }
                 }
-                else
+                وإلا
                 {
-                    for (int d0 = 0; d0 < r_0; d0++, rev += w_0)
+                    لكل (صحيح d0 = 0; d0 < r_0; d0++, rev += w_0)
                     {
                         it[d0*2] = rev*2; it[d0*2+1] = rev*2 + 1;
                     }
                 }
                 pos += r_0;
             }
-            for (int s = n_in; s < nseq; s++)
+            لكل (صحيح s = n_دننه; s < nseq; s++)
             {
                 rev_hi += weights[s];
-                if (++digits[s] < seq[s])
-                    break;
+                إذا (++digits[s] < seq[s])
+                    اكسر;
                 digits[s] = 0;
                 rev_hi -= seq[s]*weights[s];
             }
         }
     }
-    else
+    وإلا
     {
         // gtab[base(g)] = g*r0, written in increasing base order (sequential stores): base is
         // counted up with the digits s = nseq-1 (base weight 1) .. 1 (base weight weights[1]),
         // g follows incrementally with the digit weights gw[s] = L_s/r0. The two fastest digits
         // are enumerated by plain nested loops.
-        int M = nc/r0;
+        صحيح M = nc/r0;
         p.itab.allocate(M);
-        int* gtab = p.itab.data();
-        int gw[DFT_MAX_STAGES + 1];
+        صحيح* gtab = p.itab.معلومات();
+        صحيح gw[DFT_MAX_STAGES + 1];
         {
-            int Ls = 1;
-            for (int s = 0; s < nseq; s++)
+            صحيح Ls = 1;
+            لكل (صحيح s = 0; s < nseq; s++)
             {
                 gw[s] = Ls/r0;      // valid for s >= 1 (L_s is a multiple of r0)
                 Ls *= seq[s];
             }
         }
-        int sa = nseq - 1, sb = nseq - 2;                  // fastest and second fastest digits
-        int r_a = sa >= 1 ? seq[sa] : 1, g_a = sa >= 1 ? gw[sa] : 0;
-        int r_b = sb >= 1 ? seq[sb] : 1, g_b = sb >= 1 ? gw[sb] : 0;
-        for (int base = 0, g_hi = 0; base < M; )
+        صحيح sa = nseq - 1, sb = nseq - 2;                  // fastest and second fastest digits
+        صحيح r_a = sa >= 1 ? seq[sa] : 1, g_a = sa >= 1 ? gw[sa] : 0;
+        صحيح r_b = sb >= 1 ? seq[sb] : 1, g_b = sb >= 1 ? gw[sb] : 0;
+        لكل (صحيح بنسټ = 0, g_hi = 0; بنسټ < M; )
         {
-            for (int db = 0; db < r_b; db++)
+            لكل (صحيح db = 0; db < r_b; db++)
             {
-                int g = (g_hi + db*g_b)*r0;
-                for (int da = 0; da < r_a; da++, g += g_a*r0)
-                    gtab[base++] = g;
+                صحيح g = (g_hi + db*g_b)*r0;
+                لكل (صحيح da = 0; da < r_a; da++, g += g_a*r0)
+                    gtab[بنسټ++] = g;
             }
-            for (int s = sb - 1; s >= 1; s--)
+            لكل (صحيح s = sb - 1; s >= 1; s--)
             {
                 g_hi += gw[s];
-                if (++digits[s] < seq[s])
-                    break;
+                إذا (++digits[s] < seq[s])
+                    اكسر;
                 digits[s] = 0;
                 g_hi -= seq[s]*gw[s];
             }
@@ -588,133 +588,133 @@ void DftPlan::build(int _kind, int _n, int _depth, int _vl)
     }
 
     // twiddle tables
-    bool need_rtw = real_kind && n % 2 == 0;
-    if (need_rtw) ntw += 2*(size_t)(nc + 1);
-    if (dct_kind) ntw += 2*(size_t)(nc + 1);
-    if (depth == CV_32F)
-        fillTables<float>(ntw, need_rtw, dct_kind);
-    else
-        fillTables<double>(ntw, need_rtw, dct_kind);
+    منطقي need_rtw = real_ډول && n % 2 == 0;
+    إذا (need_rtw) ntw += 2*(size_t)(nc + 1);
+    إذا (dct_ډول) ntw += 2*(size_t)(nc + 1);
+    إذا (ژوروالی == CV_32F)
+        fillTables<عائم>(ntw, need_rtw, dct_ډول);
+    وإلا
+        fillTables<مزدوج>(ntw, need_rtw, dct_ډول);
 
     // workspace layout (from the 64-byte aligned base): pair0 (re, im), optional pair1 (re, im) or
     // the interleaved temp, radix-odd scratch (a[h], b[h] complex per lane).
-    size_t pair_bytes = 2*(size_t)nc*esz;
-    bool two_pairs = p.pingpong || p.need_tmp;
-    p.pair1_ofs = two_pairs ? pair_bytes : 0;
-    p.scratch_ofs = pair_bytes*(two_pairs ? 2 : 1);
-    size_t scratch_bytes = 4*(size_t)max_h*std::max(vl, 1)*esz;
-    p.ws_bytes = p.scratch_ofs + scratch_bytes + 64;
+    size_t pair_بایټونه = 2*(size_t)nc*esz;
+    منطقي two_جوړې = p.pingpong || p.need_tmp;
+    p.pair1_ofs = two_جوړې ? pair_بایټونه : 0;
+    p.scratch_ofs = pair_بایټونه*(two_جوړې ? 2 : 1);
+    size_t scratch_بایټونه = 4*(size_t)max_h*std::max(vl, 1)*esz;
+    p.ws_بایټونه = p.scratch_ofs + scratch_بایټونه + 64;
 }
 
 // Runs the transform described by c.plan: A (preproc) -> B stages (ping-pong) -> C (postproc).
 // No allocations. sstep/dstep are in elements (used by DCT/IDCT only; 1 otherwise).
-static void runDft(const OcvDftOptions& c, const void* src, size_t sstep, void* dst, size_t dstep,
-                   bool complex_io)
+ساكن فراغ پرلپسې_Dft(ثابت OcvDftOptions& c, ثابت فراغ* src, size_t sstep, فراغ* dst, size_t dstep,
+                   منطقي complex_io)
 {
-    const DftPlan& p = *c.plan;
-    const DFTKernels& k = *c.kernels;
+    ثابت DftPlan& p = *c.plan;
+    ثابت DFTKernels& k = *c.kernels;
     CV_DbgAssert(p.vl == k.vlanes);
-    size_t esz = p.depth == CV_32F ? sizeof(float) : sizeof(double);
-    uchar* base = alignPtr(c.workspace, 64);
-    uchar* re0 = base;
+    size_t esz = p.ژوروالی == CV_32F ? حجم(عائم) : حجم(مزدوج);
+    uchar* بنسټ = alignPtr(c.workspace, 64);
+    uchar* re0 = بنسټ;
     uchar* im0 = re0 + p.nc*esz;
-    uchar* re1 = base + p.pair1_ofs;
+    uchar* re1 = بنسټ + p.pair1_ofs;
     uchar* im1 = re1 + p.nc*esz;
-    uchar* scratch = base + p.scratch_ofs;
+    uchar* scratch = بنسټ + p.scratch_ofs;
 
-    const void* asrc = src;
+    ثابت فراغ* asrc = src;
     size_t astep = sstep;
-    bool conj = false;
-    if (p.kind == DFT_KIND_C2R)
+    منطقي conj = خطأ;
+    إذا (p.ډول == DFT_ډول_C2_R)
     {
         k.preprocCCS(p, src, re1, complex_io);
-        asrc = re1; astep = 1; conj = true;
+        asrc = re1; astep = 1; conj = ریښتیا;
     }
-    else if (p.kind == DFT_KIND_IDCT)
+    وإلا إذا (p.ډول == DFT_ډول_IDCT)
     {
         k.preprocIDCT(p, src, sstep, re1);
-        asrc = re1; astep = 1; conj = true;
+        asrc = re1; astep = 1; conj = ریښتیا;
     }
-    else if (p.kind == DFT_KIND_DCT)
+    وإلا إذا (p.ډول == DFT_ډول_DCT)
     {
         k.preprocDCT(p, src, sstep, re1);
         asrc = re1; astep = 1;
     }
-    else if (p.kind == DFT_KIND_C2C)
+    وإلا إذا (p.ډول == DFT_ډول_C2_C)
         conj = c.isInverse;
-    CV_DbgAssert(astep == 1 || p.first_radix == 1);
+    CV_DbgAssert(astep == 1 || p.لومړی_radix == 1);
 
-    DftPreprocFunc pre = p.first_radix == 1 ? k.preprocRadix0 : p.first_radix == 2 ? k.preprocRadix2 :
-                         p.first_radix == 4 ? k.preprocRadix4 : k.preprocRadix8;
+    DftPreprocFunc pre = p.لومړی_radix == 1 ? k.preprocRadix0 : p.لومړی_radix == 2 ? k.preprocRadix2 :
+                         p.لومړی_radix == 4 ? k.preprocRadix4 : k.preprocRadix8;
     pre(p, asrc, astep, re0, im0, conj);
 
     uchar *sre = re0, *sim = im0, *dre = re1, *dim = im1;
-    for (int i = 0; i < p.nstages; i++)
+    لكل (صحيح i = 0; i < p.nstages; i++)
     {
-        const DftStage& st = p.stages[i];
+        ثابت DftStage& st = p.stages[i];
         DftStageFunc fn = st.radix == 4 ? k.radix4 : st.radix == 3 ? k.radix3 :
                           st.radix == 5 ? k.radix5 : k.radixOdd;
-        if (p.pingpong)
+        إذا (p.pingpong)
         {
             fn(st, sre, sim, dre, dim, scratch);
             std::swap(sre, dre); std::swap(sim, dim);
         }
-        else
+        وإلا
             fn(st, sre, sim, sre, sim, scratch);
     }
 
-    double scale = c.scale;
-    switch (p.kind)
+    مزدوج scale = c.scale;
+    بدل (p.ډول)
     {
-    case DFT_KIND_C2C:
+    حالة DFT_ډول_C2_C:
         k.postprocDFT(p, sre, sim, dst, scale, c.isInverse ? -scale : scale);
-        break;
-    case DFT_KIND_R2C:
+        اكسر;
+    حالة DFT_ډول_R2_C:
         k.postprocRealDFT(p, sre, sim, dst, scale, complex_io);
-        break;
-    case DFT_KIND_C2R:
-        if (p.nc == p.n)
+        اكسر;
+    حالة DFT_ډول_C2_R:
+        إذا (p.nc == p.n)
             k.postprocReal(p, sre, dst, scale);
-        else
+        وإلا
             k.postprocDFT(p, sre, sim, dst, scale, -scale);
-        break;
-    case DFT_KIND_DCT:
+        اكسر;
+    حالة DFT_ډول_DCT:
         k.postprocDCT(p, sre, sim, dst, dstep);
-        break;
-    default:
-        CV_Assert(p.kind == DFT_KIND_IDCT);
+        اكسر;
+    افتراضي:
+        CV_Assert(p.ډول == DFT_ډول_IDCT);
         k.postprocIDCT(p, sre, sim, dst, dstep);
     }
 }
 
 // mixed-radix complex discrete Fourier transform (forward or inverse)
-template<typename T> static void
-DFT(const OcvDftOptions & c, const Complex<T>* src, Complex<T>* dst)
+کينډۍ<ډول_نوم T> ساكن فراغ
+DFT(ثابت OcvDftOptions & c, ثابت Complex<T>* src, Complex<T>* dst)
 {
-    if( c.useIpp )
+    إذا( c.useIpp )
     {
-#ifdef USE_IPP_DFT
-        if( !c.isInverse )
+#که_تعریف_شوی USE_IPP_DFT
+        إذا( !c.isInverse )
         {
-            if (ippsDFTFwd_CToC( src, dst, c.ipp_spec, c.ipp_work ) >= 0)
+            إذا (ippsDFTFwd_CToC( src, dst, c.ipp_spec, c.ipp_work ) >= 0)
             {
-                CV_IMPL_ADD(CV_IMPL_IPP);
-                return;
+                CV_IMPL_جمع_کړه(CV_IMPL_IPP);
+                أرجع;
             }
         }
-        else
+        وإلا
         {
-            if (ippsDFTInv_CToC( src, dst, c.ipp_spec, c.ipp_work ) >= 0)
+            إذا (ippsDFTInv_CToC( src, dst, c.ipp_spec, c.ipp_work ) >= 0)
             {
-                CV_IMPL_ADD(CV_IMPL_IPP);
-                return;
+                CV_IMPL_جمع_کړه(CV_IMPL_IPP);
+                أرجع;
             }
         }
-        setIppErrorStatus();
-#endif
+        سېټ_Ipp_Error_حالت();
+#د_که_پای
     }
 
-    runDft(c, src, 1, dst, 1, false);
+    پرلپسې_Dft(c, src, 1, dst, 1, خطأ);
 }
 
 
@@ -722,99 +722,99 @@ DFT(const OcvDftOptions & c, const Complex<T>* src, Complex<T>* dst)
    output vector format:
      re(0), re(1), im(1), ... , re(n/2-1), im((n+1)/2-1) [, re((n+1)/2)] OR ...
      re(0), 0, re(1), im(1), ..., re(n/2-1), im((n+1)/2-1) [, re((n+1)/2), 0] */
-template<typename T> static void
-RealDFT(const OcvDftOptions & c, const T* src, T* dst)
+کينډۍ<ډول_نوم T> ساكن فراغ
+RealDFT(ثابت OcvDftOptions & c, ثابت T* src, T* dst)
 {
-    int complex_output = c.isComplex;
+    صحيح complex_output = c.isComplex;
 
-    if( c.useIpp )
+    إذا( c.useIpp )
     {
-#ifdef USE_IPP_DFT
-        int n = c.n;
+#که_تعریف_شوی USE_IPP_DFT
+        صحيح n = c.n;
         T* ipp_dst = dst + complex_output;
-        if (ippsDFTFwd_RToPack( src, ipp_dst, c.ipp_spec, c.ipp_work ) >=0)
+        إذا (ippsDFTFwd_RToPack( src, ipp_dst, c.ipp_spec, c.ipp_work ) >=0)
         {
-            if( complex_output )
+            إذا( complex_output )
             {
                 ipp_dst[-1] = ipp_dst[0];
                 ipp_dst[0] = 0;
-                if( (n & 1) == 0 )
+                إذا( (n & 1) == 0 )
                     ipp_dst[n] = 0;
             }
-            CV_IMPL_ADD(CV_IMPL_IPP);
-            return;
+            CV_IMPL_جمع_کړه(CV_IMPL_IPP);
+            أرجع;
         }
-        setIppErrorStatus();
-#endif
+        سېټ_Ipp_Error_حالت();
+#د_که_پای
     }
-    runDft(c, src, 1, dst, 1, complex_output != 0);
+    پرلپسې_Dft(c, src, 1, dst, 1, complex_output != 0);
 }
 
 /* Inverse FFT of complex conjugate-symmetric vector
    input vector format:
       re[0], re[1], im[1], ... , re[n/2-1], im[n/2-1], re[n/2] OR
       re(0), 0, re(1), im(1), ..., re(n/2-1), im((n+1)/2-1) [, re((n+1)/2), 0] */
-template<typename T> static void
-CCSIDFT(const OcvDftOptions & c, const T* src, T* dst)
+کينډۍ<ډول_نوم T> ساكن فراغ
+CCSIDFT(ثابت OcvDftOptions & c, ثابت T* src, T* dst)
 {
-    int complex_input = c.isComplex;
+    صحيح complex_ننوت = c.isComplex;
 
-    if( complex_input )
+    إذا( complex_ننوت )
         CV_Assert( src != dst );
-    if( c.useIpp )
+    إذا( c.useIpp )
     {
-#ifdef USE_IPP_DFT
+#که_تعریف_شوی USE_IPP_DFT
         // IPP expects the packed format; with complex input the packed spectrum is src+1 once
         // im(0) (always zero) is overwritten with re(0)
-        const T* ipp_src = src;
+        ثابت T* ipp_src = src;
         T save_s1 = 0;
-        if( complex_input )
+        إذا( complex_ننوت )
         {
             save_s1 = src[1];
             ((T*)src)[1] = src[0];
             ipp_src = src + 1;
         }
-        IppStatus status = ippsDFTInv_PackToR( ipp_src, dst, c.ipp_spec, c.ipp_work );
-        if( complex_input )
+        Ipp_حالت حالت = ipps_DFTInv_Pack_منزل_R( ipp_src, dst, c.ipp_spec, c.ipp_work );
+        إذا( complex_ننوت )
             ((T*)src)[1] = save_s1;
-        if( status >= 0 )
+        إذا( حالت >= 0 )
         {
-            CV_IMPL_ADD(CV_IMPL_IPP);
-            return;
+            CV_IMPL_جمع_کړه(CV_IMPL_IPP);
+            أرجع;
         }
-        setIppErrorStatus();
-#endif
+        سېټ_Ipp_Error_حالت();
+#د_که_پای
     }
-    runDft(c, src, 1, dst, 1, complex_input != 0);
+    پرلپسې_Dft(c, src, 1, dst, 1, complex_ننوت != 0);
 }
 
-static void
-CopyColumn( const uchar* _src, size_t src_step,
-            uchar* _dst, size_t dst_step,
-            int len, size_t elem_size )
+ساكن فراغ
+Copy_ستنه( ثابت uchar* _src, size_t src_ګام,
+            uchar* _dst, size_t dst_ګام,
+            صحيح len, size_t elem_اندازه_2 )
 {
-    int i, t0, t1;
-    const int* src = (const int*)_src;
-    int* dst = (int*)_dst;
-    src_step /= sizeof(src[0]);
-    dst_step /= sizeof(dst[0]);
+    صحيح i, t0, t1;
+    ثابت صحيح* src = (ثابت صحيح*)_src;
+    صحيح* dst = (صحيح*)_dst;
+    src_ګام /= حجم(src[0]);
+    dst_ګام /= حجم(dst[0]);
 
-    if( elem_size == sizeof(int) )
+    إذا( elem_اندازه_2 == حجم(صحيح) )
     {
-        for( i = 0; i < len; i++, src += src_step, dst += dst_step )
+        لكل( i = 0; i < len; i++, src += src_ګام, dst += dst_ګام )
             dst[0] = src[0];
     }
-    else if( elem_size == sizeof(int)*2 )
+    وإلا إذا( elem_اندازه_2 == حجم(صحيح)*2 )
     {
-        for( i = 0; i < len; i++, src += src_step, dst += dst_step )
+        لكل( i = 0; i < len; i++, src += src_ګام, dst += dst_ګام )
         {
             t0 = src[0]; t1 = src[1];
             dst[0] = t0; dst[1] = t1;
         }
     }
-    else if( elem_size == sizeof(int)*4 )
+    وإلا إذا( elem_اندازه_2 == حجم(صحيح)*4 )
     {
-        for( i = 0; i < len; i++, src += src_step, dst += dst_step )
+        لكل( i = 0; i < len; i++, src += src_ګام, dst += dst_ګام )
         {
             t0 = src[0]; t1 = src[1];
             dst[0] = t0; dst[1] = t1;
@@ -829,449 +829,449 @@ CopyColumn( const uchar* _src, size_t src_step,
 // into `ncols` contiguous column buffers of `len` elements each: dst + k*len*elem_size holds
 // column k. Row-wise: each source row is read once, sequentially. (Row steps are only
 // guaranteed to be multiples of the element size, hence the byte arithmetic.)
-template<typename T> static inline void
-copyFromColumns_( const uchar* src, size_t src_step, T* dst, int ncols, int len )
+کينډۍ<ډول_نوم T> ساكن مضمن فراغ
+copyFromColumns_( ثابت uchar* src, size_t src_ګام, T* dst, صحيح ncols, صحيح len )
 {
-    for( int i = 0; i < len; i++, src += src_step )
+    لكل( صحيح i = 0; i < len; i++, src += src_ګام )
     {
-        const T* s = (const T*)src;
-        for( int k = 0; k < ncols; k++ )
+        ثابت T* s = (ثابت T*)src;
+        لكل( صحيح k = 0; k < ncols; k++ )
             dst[(size_t)k*len + i] = s[k];
     }
 }
 
-static void
-CopyFromColumns( const uchar* src, size_t src_step, uchar* dst, int ncols, int len, size_t elem_size )
+ساكن فراغ
+CopyFromColumns( ثابت uchar* src, size_t src_ګام, uchar* dst, صحيح ncols, صحيح len, size_t elem_اندازه_2 )
 {
-    if( elem_size == sizeof(int) )
-        copyFromColumns_(src, src_step, (int*)dst, ncols, len);
-    else if( elem_size == sizeof(int64) )
-        copyFromColumns_(src, src_step, (int64*)dst, ncols, len);
-    else
+    إذا( elem_اندازه_2 == حجم(صحيح) )
+        copyFromColumns_(src, src_ګام, (صحيح*)dst, ncols, len);
+    وإلا إذا( elem_اندازه_2 == حجم(int64) )
+        copyFromColumns_(src, src_ګام, (int64*)dst, ncols, len);
+    وإلا
     {
-        CV_Assert( elem_size == sizeof(int64)*2 );
-        copyFromColumns_(src, src_step, (Vec<int64, 2>*)dst, ncols, len);
+        CV_Assert( elem_اندازه_2 == حجم(int64)*2 );
+        copyFromColumns_(src, src_ګام, (Vec<int64, 2>*)dst, ncols, len);
     }
 }
 
 // The inverse of CopyFromColumns: `ncols` contiguous column buffers -> `ncols` adjacent columns
 // of `dst` (row step in bytes), written row by row.
-template<typename T> static inline void
-copyToColumns_( const T* src, uchar* dst, size_t dst_step, int ncols, int len )
+کينډۍ<ډول_نوم T> ساكن مضمن فراغ
+copy_منزل_Columns( ثابت T* src, uchar* dst, size_t dst_ګام, صحيح ncols, صحيح len )
 {
-    for( int i = 0; i < len; i++, dst += dst_step )
+    لكل( صحيح i = 0; i < len; i++, dst += dst_ګام )
     {
         T* d = (T*)dst;
-        for( int k = 0; k < ncols; k++ )
+        لكل( صحيح k = 0; k < ncols; k++ )
             d[k] = src[(size_t)k*len + i];
     }
 }
 
-static void
-CopyToColumns( const uchar* src, uchar* dst, size_t dst_step, int ncols, int len, size_t elem_size )
+ساكن فراغ
+Copy_منزل_Columns( ثابت uchar* src, uchar* dst, size_t dst_ګام, صحيح ncols, صحيح len, size_t elem_اندازه_2 )
 {
-    if( elem_size == sizeof(int) )
-        copyToColumns_((const int*)src, dst, dst_step, ncols, len);
-    else if( elem_size == sizeof(int64) )
-        copyToColumns_((const int64*)src, dst, dst_step, ncols, len);
-    else
+    إذا( elem_اندازه_2 == حجم(صحيح) )
+        copy_منزل_Columns((ثابت صحيح*)src, dst, dst_ګام, ncols, len);
+    وإلا إذا( elem_اندازه_2 == حجم(int64) )
+        copy_منزل_Columns((ثابت int64*)src, dst, dst_ګام, ncols, len);
+    وإلا
     {
-        CV_Assert( elem_size == sizeof(int64)*2 );
-        copyToColumns_((const Vec<int64, 2>*)src, dst, dst_step, ncols, len);
+        CV_Assert( elem_اندازه_2 == حجم(int64)*2 );
+        copy_منزل_Columns((ثابت Vec<int64, 2>*)src, dst, dst_ګام, ncols, len);
     }
 }
 
-static void
-ExpandCCS( uchar* _ptr, int n, int elem_size )
+ساكن فراغ
+ExpandCCS( uchar* _ptr, صحيح n, صحيح elem_اندازه_2 )
 {
-    int i;
-    if( elem_size == (int)sizeof(float) )
+    صحيح i;
+    إذا( elem_اندازه_2 == (صحيح)حجم(عائم) )
     {
-        float* p = (float*)_ptr;
-        for( i = 1; i < (n+1)/2; i++ )
+        عائم* p = (عائم*)_ptr;
+        لكل( i = 1; i < (n+1)/2; i++ )
         {
             p[(n-i)*2] = p[i*2-1];
             p[(n-i)*2+1] = -p[i*2];
         }
-        if( (n & 1) == 0 )
+        إذا( (n & 1) == 0 )
         {
             p[n] = p[n-1];
             p[n+1] = 0.f;
             n--;
         }
-        for( i = n-1; i > 0; i-- )
+        لكل( i = n-1; i > 0; i-- )
             p[i+1] = p[i];
         p[1] = 0.f;
     }
-    else
+    وإلا
     {
-        double* p = (double*)_ptr;
-        for( i = 1; i < (n+1)/2; i++ )
+        مزدوج* p = (مزدوج*)_ptr;
+        لكل( i = 1; i < (n+1)/2; i++ )
         {
             p[(n-i)*2] = p[i*2-1];
             p[(n-i)*2+1] = -p[i*2];
         }
-        if( (n & 1) == 0 )
+        إذا( (n & 1) == 0 )
         {
             p[n] = p[n-1];
             p[n+1] = 0.f;
             n--;
         }
-        for( i = n-1; i > 0; i-- )
+        لكل( i = n-1; i > 0; i-- )
             p[i+1] = p[i];
         p[1] = 0.f;
     }
 }
 
-template<typename T, void (*fn)(const OcvDftOptions&, const T*, T*)>
-static void dftWrap(const OcvDftOptions & c, const void* src, void* dst)
+کينډۍ<ډول_نوم T, فراغ (*fn)(ثابت OcvDftOptions&, ثابت T*, T*)>
+ساكن فراغ dftWrap(ثابت OcvDftOptions & c, ثابت فراغ* src, فراغ* dst)
 {
-    fn(c, (const T*)src, (T*)dst);
+    fn(c, (ثابت T*)src, (T*)dst);
 }
 
 }
 
-#ifdef USE_IPP_DFT
-typedef IppStatus (CV_STDCALL* IppDFTGetSizeFunc)(int, int, IppHintAlgorithm, int*, int*, int*);
-typedef IppStatus (CV_STDCALL* IppDFTInitFunc)(int, int, IppHintAlgorithm, void*, uchar*);
+#که_تعریف_شوی USE_IPP_DFT
+تعريفنوع Ipp_حالت (CV_STDCALL* Ipp_DFTGet_اندازه_Func)(صحيح, صحيح, IppHintAlgorithm, صحيح*, صحيح*, صحيح*);
+تعريفنوع Ipp_حالت (CV_STDCALL* IppDFTInitFunc)(صحيح, صحيح, IppHintAlgorithm, فراغ*, uchar*);
 
-template<typename SpecType, IppStatus (CV_STDCALL *init_fn)(int, int, IppHintAlgorithm, SpecType*, Ipp8u*)>
-static IppStatus CV_STDCALL ippDFTInitWrap(int n, int flags, IppHintAlgorithm hint, void* spec, Ipp8u* initbuf)
+کينډۍ<ډول_نوم SpecType, Ipp_حالت (CV_STDCALL *init_fn)(صحيح, صحيح, IppHintAlgorithm, SpecType*, Ipp8u*)>
+ساكن Ipp_حالت CV_STDCALL ippDFTInitWrap(صحيح n, صحيح flags, IppHintAlgorithm hint, فراغ* spec, Ipp8u* initbuf)
 {
-    return init_fn(n, flags, hint, (SpecType*)spec, initbuf);
+    أرجع init_fn(n, flags, hint, (SpecType*)spec, initbuf);
 }
-#endif
+#د_که_پای
 
-namespace cv
+نطاق cv
 {
-#if defined USE_IPP_DFT
+#إذا defined USE_IPP_DFT
 
-typedef IppStatus (CV_STDCALL* ippiDFT_C_Func)(const Ipp32fc*, int, Ipp32fc*, int, const IppiDFTSpec_C_32fc*, Ipp8u*);
-typedef IppStatus (CV_STDCALL* ippiDFT_R_Func)(const Ipp32f* , int, Ipp32f* , int, const IppiDFTSpec_R_32f* , Ipp8u*);
+تعريفنوع Ipp_حالت (CV_STDCALL* ippiDFT_C_Func)(ثابت Ipp32fc*, صحيح, Ipp32fc*, صحيح, ثابت IppiDFTSpec_C_32fc*, Ipp8u*);
+تعريفنوع Ipp_حالت (CV_STDCALL* ippiDFT_R_Func)(ثابت Ipp32f* , صحيح, Ipp32f* , صحيح, ثابت IppiDFTSpec_R_32f* , Ipp8u*);
 
-template <typename Dft>
-class Dft_C_IPPLoop_Invoker : public ParallelLoopBody
+کينډۍ <ډول_نوم Dft>
+صنف Dft_C_IPPLoop_Invoker : عام ParallelLoopBody
 {
-public:
+عام:
 
-    Dft_C_IPPLoop_Invoker(const uchar * _src, size_t _src_step, uchar * _dst, size_t _dst_step, int _width,
-                          const Dft& _ippidft, int _norm_flag, bool *_ok) :
+    Dft_C_IPPLoop_Invoker(ثابت uchar * _src, size_t src_ګام_2, uchar * _dst, size_t dst_ګام_2, صحيح پلنوالی_3,
+                          ثابت Dft& _ippidft, صحيح _norm_flag, منطقي *_ok) :
         ParallelLoopBody(),
-        src(_src), src_step(_src_step), dst(_dst), dst_step(_dst_step), width(_width),
+        src(_src), src_ګام(src_ګام_2), dst(_dst), dst_ګام(dst_ګام_2), پلنوالی(پلنوالی_3),
         ippidft(_ippidft), norm_flag(_norm_flag), ok(_ok)
     {
-        *ok = true;
+        *ok = ریښتیا;
     }
 
-    virtual void operator()(const Range& range) const CV_OVERRIDE
+    مجازي فراغ چلوونکی()(ثابت Range& range) ثابت CV_OVERRIDE
     {
-        IppStatus status;
-        Ipp8u* pBuffer = 0;
+        Ipp_حالت حالت;
+        Ipp8u* p_بفر = 0;
         Ipp8u* pMemInit= 0;
-        int sizeBuffer=0;
-        int sizeSpec=0;
-        int sizeInit=0;
+        صحيح اندازه_بفر=0;
+        صحيح اندازه_Spec=0;
+        صحيح اندازه_Init=0;
 
-        IppiSize srcRoiSize = {width, 1};
+        Ippi_اندازه src_Roi_اندازه = {پلنوالی, 1};
 
-        status = ippiDFTGetSize_C_32fc(srcRoiSize, norm_flag, ippAlgHintNone, &sizeSpec, &sizeInit, &sizeBuffer );
-        if ( status < 0 )
+        حالت = ippi_DFTGet_اندازه_C_32fc(src_Roi_اندازه, norm_flag, ippAlgHintNone, &اندازه_Spec, &اندازه_Init, &اندازه_بفر );
+        إذا ( حالت < 0 )
         {
-            *ok = false;
-            return;
+            *ok = خطأ;
+            أرجع;
         }
 
-        IppiDFTSpec_C_32fc* pDFTSpec = (IppiDFTSpec_C_32fc*)CV_IPP_MALLOC( sizeSpec );
+        IppiDFTSpec_C_32fc* pDFTSpec = (IppiDFTSpec_C_32fc*)CV_IPP_MALLOC( اندازه_Spec );
 
-        if ( sizeInit > 0 )
-            pMemInit = (Ipp8u*)CV_IPP_MALLOC( sizeInit );
+        إذا ( اندازه_Init > 0 )
+            pMemInit = (Ipp8u*)CV_IPP_MALLOC( اندازه_Init );
 
-        if ( sizeBuffer > 0 )
-            pBuffer = (Ipp8u*)CV_IPP_MALLOC( sizeBuffer );
+        إذا ( اندازه_بفر > 0 )
+            p_بفر = (Ipp8u*)CV_IPP_MALLOC( اندازه_بفر );
 
-        status = ippiDFTInit_C_32fc( srcRoiSize, norm_flag, ippAlgHintNone, pDFTSpec, pMemInit );
+        حالت = ippiDFTInit_C_32fc( src_Roi_اندازه, norm_flag, ippAlgHintNone, pDFTSpec, pMemInit );
 
-        if ( sizeInit > 0 )
+        إذا ( اندازه_Init > 0 )
             ippFree( pMemInit );
 
-        if ( status < 0 )
+        إذا ( حالت < 0 )
         {
             ippFree( pDFTSpec );
-            if ( sizeBuffer > 0 )
-                ippFree( pBuffer );
-            *ok = false;
-            return;
+            إذا ( اندازه_بفر > 0 )
+                ippFree( p_بفر );
+            *ok = خطأ;
+            أرجع;
         }
 
-        for( int i = range.start; i < range.end; ++i)
-            if(!ippidft((Ipp32fc*)(src + src_step * i), src_step, (Ipp32fc*)(dst + dst_step * i), dst_step,
-                        pDFTSpec, (Ipp8u*)pBuffer))
+        لكل( صحيح i = range.پیل; i < range.end; ++i)
+            إذا(!ippidft((Ipp32fc*)(src + src_ګام * i), src_ګام, (Ipp32fc*)(dst + dst_ګام * i), dst_ګام,
+                        pDFTSpec, (Ipp8u*)p_بفر))
             {
-                *ok = false;
+                *ok = خطأ;
             }
 
-        if ( sizeBuffer > 0 )
-            ippFree( pBuffer );
+        إذا ( اندازه_بفر > 0 )
+            ippFree( p_بفر );
 
         ippFree( pDFTSpec );
-        CV_IMPL_ADD(CV_IMPL_IPP|CV_IMPL_MT);
+        CV_IMPL_جمع_کړه(CV_IMPL_IPP|CV_IMPL_MT);
     }
 
-private:
-    const uchar * src;
-    size_t src_step;
+خاص:
+    ثابت uchar * src;
+    size_t src_ګام;
     uchar * dst;
-    size_t dst_step;
-    int width;
-    const Dft& ippidft;
-    int norm_flag;
-    bool *ok;
+    size_t dst_ګام;
+    صحيح پلنوالی;
+    ثابت Dft& ippidft;
+    صحيح norm_flag;
+    منطقي *ok;
 
-    const Dft_C_IPPLoop_Invoker& operator= (const Dft_C_IPPLoop_Invoker&);
+    ثابت Dft_C_IPPLoop_Invoker& چلوونکی= (ثابت Dft_C_IPPLoop_Invoker&);
 };
 
-template <typename Dft>
-class Dft_R_IPPLoop_Invoker : public ParallelLoopBody
+کينډۍ <ډول_نوم Dft>
+صنف Dft_R_IPPLoop_Invoker : عام ParallelLoopBody
 {
-public:
+عام:
 
-    Dft_R_IPPLoop_Invoker(const uchar * _src, size_t _src_step, uchar * _dst, size_t _dst_step, int _width,
-                          const Dft& _ippidft, int _norm_flag, bool *_ok) :
+    Dft_R_IPPLoop_Invoker(ثابت uchar * _src, size_t src_ګام_2, uchar * _dst, size_t dst_ګام_2, صحيح پلنوالی_3,
+                          ثابت Dft& _ippidft, صحيح _norm_flag, منطقي *_ok) :
         ParallelLoopBody(),
-        src(_src), src_step(_src_step), dst(_dst), dst_step(_dst_step), width(_width),
+        src(_src), src_ګام(src_ګام_2), dst(_dst), dst_ګام(dst_ګام_2), پلنوالی(پلنوالی_3),
         ippidft(_ippidft), norm_flag(_norm_flag), ok(_ok)
     {
-        *ok = true;
+        *ok = ریښتیا;
     }
 
-    virtual void operator()(const Range& range) const CV_OVERRIDE
+    مجازي فراغ چلوونکی()(ثابت Range& range) ثابت CV_OVERRIDE
     {
-        IppStatus status;
-        Ipp8u* pBuffer = 0;
+        Ipp_حالت حالت;
+        Ipp8u* p_بفر = 0;
         Ipp8u* pMemInit= 0;
-        int sizeBuffer=0;
-        int sizeSpec=0;
-        int sizeInit=0;
+        صحيح اندازه_بفر=0;
+        صحيح اندازه_Spec=0;
+        صحيح اندازه_Init=0;
 
-        IppiSize srcRoiSize = {width, 1};
+        Ippi_اندازه src_Roi_اندازه = {پلنوالی, 1};
 
-        status = ippiDFTGetSize_R_32f(srcRoiSize, norm_flag, ippAlgHintNone, &sizeSpec, &sizeInit, &sizeBuffer );
-        if ( status < 0 )
+        حالت = ippi_DFTGet_اندازه_R_32f(src_Roi_اندازه, norm_flag, ippAlgHintNone, &اندازه_Spec, &اندازه_Init, &اندازه_بفر );
+        إذا ( حالت < 0 )
         {
-            *ok = false;
-            return;
+            *ok = خطأ;
+            أرجع;
         }
 
-        IppiDFTSpec_R_32f* pDFTSpec = (IppiDFTSpec_R_32f*)CV_IPP_MALLOC( sizeSpec );
+        IppiDFTSpec_R_32f* pDFTSpec = (IppiDFTSpec_R_32f*)CV_IPP_MALLOC( اندازه_Spec );
 
-        if ( sizeInit > 0 )
-            pMemInit = (Ipp8u*)CV_IPP_MALLOC( sizeInit );
+        إذا ( اندازه_Init > 0 )
+            pMemInit = (Ipp8u*)CV_IPP_MALLOC( اندازه_Init );
 
-        if ( sizeBuffer > 0 )
-            pBuffer = (Ipp8u*)CV_IPP_MALLOC( sizeBuffer );
+        إذا ( اندازه_بفر > 0 )
+            p_بفر = (Ipp8u*)CV_IPP_MALLOC( اندازه_بفر );
 
-        status = ippiDFTInit_R_32f( srcRoiSize, norm_flag, ippAlgHintNone, pDFTSpec, pMemInit );
+        حالت = ippiDFTInit_R_32f( src_Roi_اندازه, norm_flag, ippAlgHintNone, pDFTSpec, pMemInit );
 
-        if ( sizeInit > 0 )
+        إذا ( اندازه_Init > 0 )
             ippFree( pMemInit );
 
-        if ( status < 0 )
+        إذا ( حالت < 0 )
         {
             ippFree( pDFTSpec );
-            if ( sizeBuffer > 0 )
-                ippFree( pBuffer );
-            *ok = false;
-            return;
+            إذا ( اندازه_بفر > 0 )
+                ippFree( p_بفر );
+            *ok = خطأ;
+            أرجع;
         }
 
-        for( int i = range.start; i < range.end; ++i)
-            if(!ippidft((float*)(src + src_step * i), src_step, (float*)(dst + dst_step * i), dst_step,
-                        pDFTSpec, (Ipp8u*)pBuffer))
+        لكل( صحيح i = range.پیل; i < range.end; ++i)
+            إذا(!ippidft((عائم*)(src + src_ګام * i), src_ګام, (عائم*)(dst + dst_ګام * i), dst_ګام,
+                        pDFTSpec, (Ipp8u*)p_بفر))
             {
-                *ok = false;
+                *ok = خطأ;
             }
 
-        if ( sizeBuffer > 0 )
-            ippFree( pBuffer );
+        إذا ( اندازه_بفر > 0 )
+            ippFree( p_بفر );
 
         ippFree( pDFTSpec );
-        CV_IMPL_ADD(CV_IMPL_IPP|CV_IMPL_MT);
+        CV_IMPL_جمع_کړه(CV_IMPL_IPP|CV_IMPL_MT);
     }
 
-private:
-    const uchar * src;
-    size_t src_step;
+خاص:
+    ثابت uchar * src;
+    size_t src_ګام;
     uchar * dst;
-    size_t dst_step;
-    int width;
-    const Dft& ippidft;
-    int norm_flag;
-    bool *ok;
+    size_t dst_ګام;
+    صحيح پلنوالی;
+    ثابت Dft& ippidft;
+    صحيح norm_flag;
+    منطقي *ok;
 
-    const Dft_R_IPPLoop_Invoker& operator= (const Dft_R_IPPLoop_Invoker&);
+    ثابت Dft_R_IPPLoop_Invoker& چلوونکی= (ثابت Dft_R_IPPLoop_Invoker&);
 };
 
-template <typename Dft>
-bool Dft_C_IPPLoop(const uchar * src, size_t src_step, uchar * dst, size_t dst_step, int width, int height, const Dft& ippidft, int norm_flag)
+کينډۍ <ډول_نوم Dft>
+منطقي Dft_C_IPPLoop(ثابت uchar * src, size_t src_ګام, uchar * dst, size_t dst_ګام, صحيح پلنوالی, صحيح لوړوالی, ثابت Dft& ippidft, صحيح norm_flag)
 {
-    bool ok;
-    parallel_for_(Range(0, height), Dft_C_IPPLoop_Invoker<Dft>(src, src_step, dst, dst_step, width, ippidft, norm_flag, &ok), (width * height)/(double)(1<<16) );
-    return ok;
+    منطقي ok;
+    parallel_for_(Range(0, لوړوالی), Dft_C_IPPLoop_Invoker<Dft>(src, src_ګام, dst, dst_ګام, پلنوالی, ippidft, norm_flag, &ok), (پلنوالی * لوړوالی)/(مزدوج)(1<<16) );
+    أرجع ok;
 }
 
-template <typename Dft>
-bool Dft_R_IPPLoop(const uchar * src, size_t src_step, uchar * dst, size_t dst_step, int width, int height, const Dft& ippidft, int norm_flag)
+کينډۍ <ډول_نوم Dft>
+منطقي Dft_R_IPPLoop(ثابت uchar * src, size_t src_ګام, uchar * dst, size_t dst_ګام, صحيح پلنوالی, صحيح لوړوالی, ثابت Dft& ippidft, صحيح norm_flag)
 {
-    bool ok;
-    parallel_for_(Range(0, height), Dft_R_IPPLoop_Invoker<Dft>(src, src_step, dst, dst_step, width, ippidft, norm_flag, &ok), (width * height)/(double)(1<<16) );
-    return ok;
+    منطقي ok;
+    parallel_for_(Range(0, لوړوالی), Dft_R_IPPLoop_Invoker<Dft>(src, src_ګام, dst, dst_ګام, پلنوالی, ippidft, norm_flag, &ok), (پلنوالی * لوړوالی)/(مزدوج)(1<<16) );
+    أرجع ok;
 }
 
-struct IPPDFT_C_Functor
+بنية IPPDFT_C_Functor
 {
     IPPDFT_C_Functor(ippiDFT_C_Func _func) : ippiDFT_CToC_32fc_C1R(_func){}
 
-    bool operator()(const Ipp32fc* src, size_t srcStep, Ipp32fc* dst, size_t dstStep, const IppiDFTSpec_C_32fc* pDFTSpec, Ipp8u* pBuffer) const
+    منطقي چلوونکی()(ثابت Ipp32fc* src, size_t src_ګام_3, Ipp32fc* dst, size_t dst_ګام_3, ثابت IppiDFTSpec_C_32fc* pDFTSpec, Ipp8u* p_بفر) ثابت
     {
-        return ippiDFT_CToC_32fc_C1R ? CV_INSTRUMENT_FUN_IPP(ippiDFT_CToC_32fc_C1R, src, static_cast<int>(srcStep), dst, static_cast<int>(dstStep), pDFTSpec, pBuffer) >= 0 : false;
+        أرجع ippiDFT_CToC_32fc_C1R ? CV_INSTRUMENT_FUN_IPP(ippiDFT_CToC_32fc_C1R, src, static_cast<صحيح>(src_ګام_3), dst, static_cast<صحيح>(dst_ګام_3), pDFTSpec, p_بفر) >= 0 : خطأ;
     }
-private:
+خاص:
     ippiDFT_C_Func ippiDFT_CToC_32fc_C1R;
 };
 
-struct IPPDFT_R_Functor
+بنية IPPDFT_R_Functor
 {
-    IPPDFT_R_Functor(ippiDFT_R_Func _func) : ippiDFT_PackToR_32f_C1R(_func){}
+    IPPDFT_R_Functor(ippiDFT_R_Func _func) : ippi_DFT_Pack_منزل_R_32f_C1_R(_func){}
 
-    bool operator()(const Ipp32f* src, size_t srcStep, Ipp32f* dst, size_t dstStep, const IppiDFTSpec_R_32f* pDFTSpec, Ipp8u* pBuffer) const
+    منطقي چلوونکی()(ثابت Ipp32f* src, size_t src_ګام_3, Ipp32f* dst, size_t dst_ګام_3, ثابت IppiDFTSpec_R_32f* pDFTSpec, Ipp8u* p_بفر) ثابت
     {
-        return ippiDFT_PackToR_32f_C1R ? CV_INSTRUMENT_FUN_IPP(ippiDFT_PackToR_32f_C1R, src, static_cast<int>(srcStep), dst, static_cast<int>(dstStep), pDFTSpec, pBuffer) >= 0 : false;
+        أرجع ippi_DFT_Pack_منزل_R_32f_C1_R ? CV_INSTRUMENT_FUN_IPP(ippi_DFT_Pack_منزل_R_32f_C1_R, src, static_cast<صحيح>(src_ګام_3), dst, static_cast<صحيح>(dst_ګام_3), pDFTSpec, p_بفر) >= 0 : خطأ;
     }
-private:
-    ippiDFT_R_Func ippiDFT_PackToR_32f_C1R;
+خاص:
+    ippiDFT_R_Func ippi_DFT_Pack_منزل_R_32f_C1_R;
 };
 
-static bool ippi_DFT_C_32F(const uchar * src, size_t src_step, uchar * dst, size_t dst_step, int width, int height, bool inv, int norm_flag)
+ساكن منطقي ippi_DFT_C_32F(ثابت uchar * src, size_t src_ګام, uchar * dst, size_t dst_ګام, صحيح پلنوالی, صحيح لوړوالی, منطقي inv, صحيح norm_flag)
 {
     CV_INSTRUMENT_REGION_IPP();
 
-    IppStatus status;
-    Ipp8u* pBuffer = 0;
+    Ipp_حالت حالت;
+    Ipp8u* p_بفر = 0;
     Ipp8u* pMemInit= 0;
-    int sizeBuffer=0;
-    int sizeSpec=0;
-    int sizeInit=0;
+    صحيح اندازه_بفر=0;
+    صحيح اندازه_Spec=0;
+    صحيح اندازه_Init=0;
 
-    IppiSize srcRoiSize = {width, height};
+    Ippi_اندازه src_Roi_اندازه = {پلنوالی, لوړوالی};
 
-    status = ippiDFTGetSize_C_32fc(srcRoiSize, norm_flag, ippAlgHintNone, &sizeSpec, &sizeInit, &sizeBuffer );
-    if ( status < 0 )
-        return false;
+    حالت = ippi_DFTGet_اندازه_C_32fc(src_Roi_اندازه, norm_flag, ippAlgHintNone, &اندازه_Spec, &اندازه_Init, &اندازه_بفر );
+    إذا ( حالت < 0 )
+        أرجع خطأ;
 
-    IppiDFTSpec_C_32fc* pDFTSpec = (IppiDFTSpec_C_32fc*)CV_IPP_MALLOC( sizeSpec );
+    IppiDFTSpec_C_32fc* pDFTSpec = (IppiDFTSpec_C_32fc*)CV_IPP_MALLOC( اندازه_Spec );
 
-    if ( sizeInit > 0 )
-        pMemInit = (Ipp8u*)CV_IPP_MALLOC( sizeInit );
+    إذا ( اندازه_Init > 0 )
+        pMemInit = (Ipp8u*)CV_IPP_MALLOC( اندازه_Init );
 
-    if ( sizeBuffer > 0 )
-        pBuffer = (Ipp8u*)CV_IPP_MALLOC( sizeBuffer );
+    إذا ( اندازه_بفر > 0 )
+        p_بفر = (Ipp8u*)CV_IPP_MALLOC( اندازه_بفر );
 
-    status = ippiDFTInit_C_32fc( srcRoiSize, norm_flag, ippAlgHintNone, pDFTSpec, pMemInit );
+    حالت = ippiDFTInit_C_32fc( src_Roi_اندازه, norm_flag, ippAlgHintNone, pDFTSpec, pMemInit );
 
-    if ( sizeInit > 0 )
+    إذا ( اندازه_Init > 0 )
         ippFree( pMemInit );
 
-    if ( status < 0 )
+    إذا ( حالت < 0 )
     {
         ippFree( pDFTSpec );
-        if ( sizeBuffer > 0 )
-            ippFree( pBuffer );
-        return false;
+        إذا ( اندازه_بفر > 0 )
+            ippFree( p_بفر );
+        أرجع خطأ;
     }
 
-    if (!inv)
-        status = CV_INSTRUMENT_FUN_IPP(ippiDFTFwd_CToC_32fc_C1R, (Ipp32fc*)src, static_cast<int>(src_step), (Ipp32fc*)dst, static_cast<int>(dst_step), pDFTSpec, pBuffer);
-    else
-        status = CV_INSTRUMENT_FUN_IPP(ippiDFTInv_CToC_32fc_C1R, (Ipp32fc*)src, static_cast<int>(src_step), (Ipp32fc*)dst, static_cast<int>(dst_step), pDFTSpec, pBuffer);
+    إذا (!inv)
+        حالت = CV_INSTRUMENT_FUN_IPP(ippiDFTFwd_CToC_32fc_C1R, (Ipp32fc*)src, static_cast<صحيح>(src_ګام), (Ipp32fc*)dst, static_cast<صحيح>(dst_ګام), pDFTSpec, p_بفر);
+    وإلا
+        حالت = CV_INSTRUMENT_FUN_IPP(ippiDFTInv_CToC_32fc_C1R, (Ipp32fc*)src, static_cast<صحيح>(src_ګام), (Ipp32fc*)dst, static_cast<صحيح>(dst_ګام), pDFTSpec, p_بفر);
 
-    if ( sizeBuffer > 0 )
-        ippFree( pBuffer );
+    إذا ( اندازه_بفر > 0 )
+        ippFree( p_بفر );
 
     ippFree( pDFTSpec );
 
-    if(status >= 0)
+    إذا(حالت >= 0)
     {
-        CV_IMPL_ADD(CV_IMPL_IPP);
-        return true;
+        CV_IMPL_جمع_کړه(CV_IMPL_IPP);
+        أرجع ریښتیا;
     }
-    return false;
+    أرجع خطأ;
 }
 
-static bool ippi_DFT_R_32F(const uchar * src, size_t src_step, uchar * dst, size_t dst_step, int width, int height, bool inv, int norm_flag)
+ساكن منطقي ippi_DFT_R_32F(ثابت uchar * src, size_t src_ګام, uchar * dst, size_t dst_ګام, صحيح پلنوالی, صحيح لوړوالی, منطقي inv, صحيح norm_flag)
 {
     CV_INSTRUMENT_REGION_IPP();
 
-    IppStatus status;
-    Ipp8u* pBuffer = 0;
+    Ipp_حالت حالت;
+    Ipp8u* p_بفر = 0;
     Ipp8u* pMemInit= 0;
-    int sizeBuffer=0;
-    int sizeSpec=0;
-    int sizeInit=0;
+    صحيح اندازه_بفر=0;
+    صحيح اندازه_Spec=0;
+    صحيح اندازه_Init=0;
 
-    IppiSize srcRoiSize = {width, height};
+    Ippi_اندازه src_Roi_اندازه = {پلنوالی, لوړوالی};
 
-    status = ippiDFTGetSize_R_32f(srcRoiSize, norm_flag, ippAlgHintNone, &sizeSpec, &sizeInit, &sizeBuffer );
-    if ( status < 0 )
-        return false;
+    حالت = ippi_DFTGet_اندازه_R_32f(src_Roi_اندازه, norm_flag, ippAlgHintNone, &اندازه_Spec, &اندازه_Init, &اندازه_بفر );
+    إذا ( حالت < 0 )
+        أرجع خطأ;
 
-    IppiDFTSpec_R_32f* pDFTSpec = (IppiDFTSpec_R_32f*)CV_IPP_MALLOC( sizeSpec );
+    IppiDFTSpec_R_32f* pDFTSpec = (IppiDFTSpec_R_32f*)CV_IPP_MALLOC( اندازه_Spec );
 
-    if ( sizeInit > 0 )
-        pMemInit = (Ipp8u*)CV_IPP_MALLOC( sizeInit );
+    إذا ( اندازه_Init > 0 )
+        pMemInit = (Ipp8u*)CV_IPP_MALLOC( اندازه_Init );
 
-    if ( sizeBuffer > 0 )
-        pBuffer = (Ipp8u*)CV_IPP_MALLOC( sizeBuffer );
+    إذا ( اندازه_بفر > 0 )
+        p_بفر = (Ipp8u*)CV_IPP_MALLOC( اندازه_بفر );
 
-    status = ippiDFTInit_R_32f( srcRoiSize, norm_flag, ippAlgHintNone, pDFTSpec, pMemInit );
+    حالت = ippiDFTInit_R_32f( src_Roi_اندازه, norm_flag, ippAlgHintNone, pDFTSpec, pMemInit );
 
-    if ( sizeInit > 0 )
+    إذا ( اندازه_Init > 0 )
         ippFree( pMemInit );
 
-    if ( status < 0 )
+    إذا ( حالت < 0 )
     {
         ippFree( pDFTSpec );
-        if ( sizeBuffer > 0 )
-            ippFree( pBuffer );
-        return false;
+        إذا ( اندازه_بفر > 0 )
+            ippFree( p_بفر );
+        أرجع خطأ;
     }
 
-    if (!inv)
-        status = CV_INSTRUMENT_FUN_IPP(ippiDFTFwd_RToPack_32f_C1R, (float*)src, static_cast<int>(src_step), (float*)dst, static_cast<int>(dst_step), pDFTSpec, pBuffer);
-    else
-        status = CV_INSTRUMENT_FUN_IPP(ippiDFTInv_PackToR_32f_C1R, (float*)src, static_cast<int>(src_step), (float*)dst, static_cast<int>(dst_step), pDFTSpec, pBuffer);
+    إذا (!inv)
+        حالت = CV_INSTRUMENT_FUN_IPP(ippiDFTFwd_RToPack_32f_C1R, (عائم*)src, static_cast<صحيح>(src_ګام), (عائم*)dst, static_cast<صحيح>(dst_ګام), pDFTSpec, p_بفر);
+    وإلا
+        حالت = CV_INSTRUMENT_FUN_IPP(ippi_DFTInv_Pack_منزل_R_32f_C1_R, (عائم*)src, static_cast<صحيح>(src_ګام), (عائم*)dst, static_cast<صحيح>(dst_ګام), pDFTSpec, p_بفر);
 
-    if ( sizeBuffer > 0 )
-        ippFree( pBuffer );
+    إذا ( اندازه_بفر > 0 )
+        ippFree( p_بفر );
 
     ippFree( pDFTSpec );
 
-    if(status >= 0)
+    إذا(حالت >= 0)
     {
-        CV_IMPL_ADD(CV_IMPL_IPP);
-        return true;
+        CV_IMPL_جمع_کړه(CV_IMPL_IPP);
+        أرجع ریښتیا;
     }
-    return false;
+    أرجع خطأ;
 }
 
-#endif
+#د_که_پای
 }
 
-#ifdef HAVE_OPENCL
+#که_تعریف_شوی HAVE_OPENCL
 
-namespace cv
+نطاق cv
 {
 
-enum FftType
+تعداد FftType
 {
     R2R = 0, // real to CCS in case forward transform, CCS to real otherwise
     C2R = 1, // complex to real in case inverse transform
@@ -1279,61 +1279,61 @@ enum FftType
     C2C = 3  // complex to complex
 };
 
-struct OCL_FftPlan
+بنية OCL_FftPlan
 {
-private:
+خاص:
     UMat twiddles;
     String buildOptions;
-    int thread_count;
-    int dft_size;
-    int dft_depth;
-    bool status;
+    صحيح thread_شمېر;
+    صحيح dft_اندازه;
+    صحيح dft_ژوروالی;
+    منطقي حالت;
 
-public:
-    OCL_FftPlan(int _size, int _depth) : dft_size(_size), dft_depth(_depth), status(true)
+عام:
+    OCL_FftPlan(صحيح اندازه_4, صحيح ژوروالی_2) : dft_اندازه(اندازه_4), dft_ژوروالی(ژوروالی_2), حالت(ریښتیا)
     {
-        CV_Assert( dft_depth == CV_32F || dft_depth == CV_64F );
+        CV_Assert( dft_ژوروالی == CV_32F || dft_ژوروالی == CV_64F );
 
-        int min_radix;
-        std::vector<int> radixes, blocks;
-        ocl_getRadixes(dft_size, radixes, blocks, min_radix);
-        thread_count = dft_size / min_radix;
+        صحيح min_radix;
+        std::vector<صحيح> radixes, بلاکونه;
+        ocl_getRadixes(dft_اندازه, radixes, بلاکونه, min_radix);
+        thread_شمېر = dft_اندازه / min_radix;
 
-        if (thread_count > (int) ocl::Device::getDefault().maxWorkGroupSize())
+        إذا (thread_شمېر > (صحيح) ocl::Device::getDefault().max_Work_ډله_اندازه())
         {
-            status = false;
-            return;
+            حالت = خطأ;
+            أرجع;
         }
 
         // generate string with radix calls
         String radix_processing;
-        int n = 1, twiddle_size = 0;
-        for (size_t i=0; i<radixes.size(); i++)
+        صحيح n = 1, twiddle_اندازه = 0;
+        لكل (size_t i=0; i<radixes.size(); i++)
         {
-            int radix = radixes[i], block = blocks[i];
-            if (block > 1)
-                radix_processing += format("fft_radix%d_B%d(smem,twiddles+%d,ind,%d,%d);", radix, block, twiddle_size, n, dft_size/radix);
-            else
-                radix_processing += format("fft_radix%d(smem,twiddles+%d,ind,%d,%d);", radix, twiddle_size, n, dft_size/radix);
-            twiddle_size += (radix-1)*n;
+            صحيح radix = radixes[i], بلاک_2 = بلاکونه[i];
+            إذا (بلاک_2 > 1)
+                radix_processing += format("fft_radix%d_B%d(smem,twiddles+%d,ind,%d,%d);", radix, بلاک_2, twiddle_اندازه, n, dft_اندازه/radix);
+            وإلا
+                radix_processing += format("fft_radix%d(smem,twiddles+%d,ind,%d,%d);", radix, twiddle_اندازه, n, dft_اندازه/radix);
+            twiddle_اندازه += (radix-1)*n;
             n *= radix;
         }
 
-        twiddles.create(1, twiddle_size, CV_MAKE_TYPE(dft_depth, 2));
-        if (dft_depth == CV_32F)
-            fillRadixTable<float>(twiddles, radixes);
-        else
-            fillRadixTable<double>(twiddles, radixes);
+        twiddles.create(1, twiddle_اندازه, CV_MAKE_TYPE(dft_ژوروالی, 2));
+        إذا (dft_ژوروالی == CV_32F)
+            fill_Radix_جدول<عائم>(twiddles, radixes);
+        وإلا
+            fill_Radix_جدول<مزدوج>(twiddles, radixes);
 
         buildOptions = format("-D LOCAL_SIZE=%d -D kercn=%d -D FT=%s -D CT=%s%s -D RADIX_PROCESS=%s",
-                              dft_size, min_radix, ocl::typeToStr(dft_depth), ocl::typeToStr(CV_MAKE_TYPE(dft_depth, 2)),
-                              dft_depth == CV_64F ? " -D DOUBLE_SUPPORT" : "", radix_processing.c_str());
+                              dft_اندازه, min_radix, ocl::type_منزل_Str(dft_ژوروالی), ocl::type_منزل_Str(CV_MAKE_TYPE(dft_ژوروالی, 2)),
+                              dft_ژوروالی == CV_64F ? " -D DOUBLE_SUPPORT" : "", radix_processing.c_str());
     }
 
-    bool enqueueTransform(InputArray _src, OutputArray _dst, int num_dfts, int flags, int fftType, bool rows = true) const
+    منطقي کتار_ته_ورزیاتول_Transform(ننوت_Array _src, OutputArray _dst, صحيح عدد_dfts, صحيح flags, صحيح fftType, منطقي لیکې = ریښتیا) ثابت
     {
-        if (!status)
-            return false;
+        إذا (!حالت)
+            أرجع خطأ;
 
         UMat src = _src.getUMat();
         UMat dst = _dst.getUMat();
@@ -1342,24 +1342,24 @@ public:
         size_t localsize[2];
         String kernel_name;
 
-        bool is1d = (flags & DFT_ROWS) != 0 || num_dfts == 1;
-        bool inv = (flags & DFT_INVERSE) != 0;
+        منطقي is1d = (flags & DFT_لیکې) != 0 || عدد_dfts == 1;
+        منطقي inv = (flags & DFT_INVERSE) != 0;
         String options = buildOptions;
 
-        if (rows)
+        إذا (لیکې)
         {
-            globalsize[0] = thread_count; globalsize[1] = src.rows;
-            localsize[0] = thread_count; localsize[1] = 1;
+            globalsize[0] = thread_شمېر; globalsize[1] = src.لیکې;
+            localsize[0] = thread_شمېر; localsize[1] = 1;
             kernel_name = !inv ? "fft_multi_radix_rows" : "ifft_multi_radix_rows";
-            if ((is1d || inv) && (flags & DFT_SCALE))
+            إذا ((is1d || inv) && (flags & DFT_SCALE))
                 options += " -D DFT_SCALE";
         }
-        else
+        وإلا
         {
-            globalsize[0] = num_dfts; globalsize[1] = thread_count;
-            localsize[0] = 1; localsize[1] = thread_count;
+            globalsize[0] = عدد_dfts; globalsize[1] = thread_شمېر;
+            localsize[0] = 1; localsize[1] = thread_شمېر;
             kernel_name = !inv ? "fft_multi_radix_cols" : "ifft_multi_radix_cols";
-            if (flags & DFT_SCALE)
+            إذا (flags & DFT_SCALE)
                 options += " -D DFT_SCALE";
         }
 
@@ -1367,145 +1367,145 @@ public:
         options += dst.channels() == 1 ? " -D REAL_OUTPUT" : " -D COMPLEX_OUTPUT";
         options += is1d ? " -D IS_1D" : "";
 
-        if (!inv)
+        إذا (!inv)
         {
-            if ((is1d && src.channels() == 1) || (rows && (fftType == R2R)))
+            إذا ((is1d && src.channels() == 1) || (لیکې && (fftType == R2R)))
                 options += " -D NO_CONJUGATE";
         }
-        else
+        وإلا
         {
-            if (rows && (fftType == C2R || fftType == R2R))
+            إذا (لیکې && (fftType == C2R || fftType == R2R))
                 options += " -D NO_CONJUGATE";
-            if (dst.cols % 2 == 0)
+            إذا (dst.ستون_شمېر % 2 == 0)
                 options += " -D EVEN";
         }
 
         ocl::Kernel k(kernel_name.c_str(), ocl::core::fft_oclsrc, options);
-        if (k.empty())
-            return false;
+        إذا (k.empty())
+            أرجع خطأ;
 
-        k.args(ocl::KernelArg::ReadOnly(src), ocl::KernelArg::WriteOnly(dst), ocl::KernelArg::ReadOnlyNoSize(twiddles), thread_count, num_dfts);
-        return k.run(2, globalsize, localsize, false);
+        k.دلیلونه(ocl::KernelArg::ReadOnly(src), ocl::KernelArg::WriteOnly(dst), ocl::KernelArg::Read_Only_No_اندازه(twiddles), thread_شمېر, عدد_dfts);
+        أرجع k.پرلپسې(2, globalsize, localsize, خطأ);
     }
 
-private:
-    static void ocl_getRadixes(int cols, std::vector<int>& radixes, std::vector<int>& blocks, int& min_radix)
+خاص:
+    ساكن فراغ ocl_getRadixes(صحيح ستون_شمېر, std::vector<صحيح>& radixes, std::vector<صحيح>& بلاکونه, صحيح& min_radix)
     {
-        int factors[34];
-        int nf = DFTFactorize(cols, factors);
+        صحيح factors[34];
+        صحيح nf = DFTFactorize(ستون_شمېر, factors);
 
-        int n = 1;
-        int factor_index = 0;
-        min_radix = INT_MAX;
+        صحيح n = 1;
+        صحيح ضریب_شاخص = 0;
+        min_radix = لوی_عدد;
 
         // 2^n transforms
-        if ((factors[factor_index] & 1) == 0)
+        إذا ((factors[ضریب_شاخص] & 1) == 0)
         {
-            for( ; n < factors[factor_index];)
+            لكل( ; n < factors[ضریب_شاخص];)
             {
-                int radix = 2, block = 1;
-                if (8*n <= factors[0])
+                صحيح radix = 2, بلاک_2 = 1;
+                إذا (8*n <= factors[0])
                     radix = 8;
-                else if (4*n <= factors[0])
+                وإلا إذا (4*n <= factors[0])
                 {
                     radix = 4;
-                    if (cols % 12 == 0)
-                        block = 3;
-                    else if (cols % 8 == 0)
-                        block = 2;
+                    إذا (ستون_شمېر % 12 == 0)
+                        بلاک_2 = 3;
+                    وإلا إذا (ستون_شمېر % 8 == 0)
+                        بلاک_2 = 2;
                 }
-                else
+                وإلا
                 {
-                    if (cols % 10 == 0)
-                        block = 5;
-                    else if (cols % 8 == 0)
-                        block = 4;
-                    else if (cols % 6 == 0)
-                        block = 3;
-                    else if (cols % 4 == 0)
-                        block = 2;
+                    إذا (ستون_شمېر % 10 == 0)
+                        بلاک_2 = 5;
+                    وإلا إذا (ستون_شمېر % 8 == 0)
+                        بلاک_2 = 4;
+                    وإلا إذا (ستون_شمېر % 6 == 0)
+                        بلاک_2 = 3;
+                    وإلا إذا (ستون_شمېر % 4 == 0)
+                        بلاک_2 = 2;
                 }
 
                 radixes.push_back(radix);
-                blocks.push_back(block);
-                min_radix = min(min_radix, block*radix);
+                بلاکونه.push_back(بلاک_2);
+                min_radix = min(min_radix, بلاک_2*radix);
                 n *= radix;
             }
-            factor_index++;
+            ضریب_شاخص++;
         }
 
         // all the other transforms
-        for( ; factor_index < nf; factor_index++)
+        لكل( ; ضریب_شاخص < nf; ضریب_شاخص++)
         {
-            int radix = factors[factor_index], block = 1;
-            if (radix == 3)
+            صحيح radix = factors[ضریب_شاخص], بلاک_2 = 1;
+            إذا (radix == 3)
             {
-                if (cols % 12 == 0)
-                    block = 4;
-                else if (cols % 9 == 0)
-                    block = 3;
-                else if (cols % 6 == 0)
-                    block = 2;
+                إذا (ستون_شمېر % 12 == 0)
+                    بلاک_2 = 4;
+                وإلا إذا (ستون_شمېر % 9 == 0)
+                    بلاک_2 = 3;
+                وإلا إذا (ستون_شمېر % 6 == 0)
+                    بلاک_2 = 2;
             }
-            else if (radix == 5)
+            وإلا إذا (radix == 5)
             {
-                if (cols % 10 == 0)
-                    block = 2;
+                إذا (ستون_شمېر % 10 == 0)
+                    بلاک_2 = 2;
             }
             radixes.push_back(radix);
-            blocks.push_back(block);
-            min_radix = min(min_radix, block*radix);
+            بلاکونه.push_back(بلاک_2);
+            min_radix = min(min_radix, بلاک_2*radix);
         }
     }
 
-    template <typename T>
-    static void fillRadixTable(UMat twiddles, const std::vector<int>& radixes)
+    کينډۍ <ډول_نوم T>
+    ساكن فراغ fill_Radix_جدول(UMat twiddles, ثابت std::vector<صحيح>& radixes)
     {
         Mat tw = twiddles.getMat(ACCESS_WRITE);
         T* ptr = tw.ptr<T>();
-        int ptr_index = 0;
+        صحيح ptr_شاخص = 0;
 
-        int n = 1;
-        for (size_t i=0; i<radixes.size(); i++)
+        صحيح n = 1;
+        لكل (size_t i=0; i<radixes.size(); i++)
         {
-            int radix = radixes[i];
+            صحيح radix = radixes[i];
             n *= radix;
 
-            for (int j=1; j<radix; j++)
+            لكل (صحيح j=1; j<radix; j++)
             {
-                double theta = -CV_2PI*j/n;
+                مزدوج theta = -CV_2PI*j/n;
 
-                for (int k=0; k<(n/radix); k++)
+                لكل (صحيح k=0; k<(n/radix); k++)
                 {
-                    ptr[ptr_index++] = (T) cos(k*theta);
-                    ptr[ptr_index++] = (T) sin(k*theta);
+                    ptr[ptr_شاخص++] = (T) کوساین(k*theta);
+                    ptr[ptr_شاخص++] = (T) ساین(k*theta);
                 }
             }
         }
     }
 };
 
-class OCL_FftPlanCache
+صنف OCL_FftPlanCache
 {
-public:
-    static OCL_FftPlanCache & getInstance()
+عام:
+    ساكن OCL_FftPlanCache & getInstance()
     {
-        CV_SINGLETON_LAZY_INIT_REF(OCL_FftPlanCache, new OCL_FftPlanCache())
+        CV_SINGLETON_LAZY_INIT_REF(OCL_FftPlanCache, جديد OCL_FftPlanCache())
     }
 
-    Ptr<OCL_FftPlan> getFftPlan(int dft_size, int depth)
+    Ptr<OCL_FftPlan> getFftPlan(صحيح dft_اندازه, صحيح ژوروالی)
     {
-        int key = (dft_size << 16) | (depth & 0xFFFF);
-        std::map<int, Ptr<OCL_FftPlan> >::iterator f = planStorage.find(key);
-        if (f != planStorage.end())
+        صحيح کلی = (dft_اندازه << 16) | (ژوروالی & 0xFFFF);
+        std::map<صحيح, Ptr<OCL_FftPlan> >::iterator f = planStorage.find(کلی);
+        إذا (f != planStorage.end())
         {
-            return f->second;
+            أرجع f->second;
         }
-        else
+        وإلا
         {
-            Ptr<OCL_FftPlan> newPlan = Ptr<OCL_FftPlan>(new OCL_FftPlan(dft_size, depth));
-            planStorage[key] = newPlan;
-            return newPlan;
+            Ptr<OCL_FftPlan> newPlan = Ptr<OCL_FftPlan>(جديد OCL_FftPlan(dft_اندازه, ژوروالی));
+            planStorage[کلی] = newPlan;
+            أرجع newPlan;
         }
     }
 
@@ -1514,214 +1514,214 @@ public:
         planStorage.clear();
     }
 
-protected:
+محمي:
     OCL_FftPlanCache() :
         planStorage()
     {
     }
-    std::map<int, Ptr<OCL_FftPlan> > planStorage;
+    std::map<صحيح, Ptr<OCL_FftPlan> > planStorage;
 };
 
-static bool ocl_dft_rows(InputArray _src, OutputArray _dst, int nonzero_rows, int flags, int fftType)
+ساكن منطقي ocl_dft_لیکې(ننوت_Array _src, OutputArray _dst, صحيح nonzero_لیکې, صحيح flags, صحيح fftType)
 {
-    int type = _src.type(), depth = CV_MAT_DEPTH(type);
-    Ptr<OCL_FftPlan> plan = OCL_FftPlanCache::getInstance().getFftPlan(_src.cols(), depth);
-    return plan->enqueueTransform(_src, _dst, nonzero_rows, flags, fftType, true);
+    صحيح type = _src.type(), ژوروالی = CV_MAT_ژوروالی(type);
+    Ptr<OCL_FftPlan> plan = OCL_FftPlanCache::getInstance().getFftPlan(_src.ستون_شمېر(), ژوروالی);
+    أرجع plan->کتار_ته_ورزیاتول_Transform(_src, _dst, nonzero_لیکې, flags, fftType, ریښتیا);
 }
 
-static bool ocl_dft_cols(InputArray _src, OutputArray _dst, int nonzero_cols, int flags, int fftType)
+ساكن منطقي ocl_dft_ستون_شمېر(ننوت_Array _src, OutputArray _dst, صحيح nonzero_ستون_شمېر, صحيح flags, صحيح fftType)
 {
-    int type = _src.type(), depth = CV_MAT_DEPTH(type);
-    Ptr<OCL_FftPlan> plan = OCL_FftPlanCache::getInstance().getFftPlan(_src.rows(), depth);
-    return plan->enqueueTransform(_src, _dst, nonzero_cols, flags, fftType, false);
+    صحيح type = _src.type(), ژوروالی = CV_MAT_ژوروالی(type);
+    Ptr<OCL_FftPlan> plan = OCL_FftPlanCache::getInstance().getFftPlan(_src.لیکې(), ژوروالی);
+    أرجع plan->کتار_ته_ورزیاتول_Transform(_src, _dst, nonzero_ستون_شمېر, flags, fftType, خطأ);
 }
 
-inline FftType determineFFTType(bool real_input, bool complex_input, bool real_output, bool complex_output, bool inv)
+مضمن FftType determineFFTType(منطقي real_ننوت, منطقي complex_ننوت, منطقي real_output, منطقي complex_output, منطقي inv)
 {
     // output format is not specified
-    if (!real_output && !complex_output)
-        complex_output = true;
+    إذا (!real_output && !complex_output)
+        complex_output = ریښتیا;
 
     // input or output format is ambiguous
-    if (real_input == complex_input || real_output == complex_output)
+    إذا (real_ننوت == complex_ننوت || real_output == complex_output)
         CV_Error(Error::StsBadArg, "Invalid FFT input or output format");
 
-    FftType result = real_input ? (real_output ? R2R : R2C) : (real_output ? C2R : C2C);
+    FftType پایله = real_ننوت ? (real_output ? R2R : R2C) : (real_output ? C2R : C2C);
 
     // Forward Complex to CCS not supported
-    if (result == C2R && !inv)
-        result = C2C;
+    إذا (پایله == C2R && !inv)
+        پایله = C2C;
 
     // Inverse CCS to Complex not supported
-    if (result == R2C && inv)
-        result = R2R;
+    إذا (پایله == R2C && inv)
+        پایله = R2R;
 
-    return result;
+    أرجع پایله;
 }
 
-static bool ocl_dft(InputArray _src, OutputArray _dst, int flags, int nonzero_rows)
+ساكن منطقي ocl_dft(ننوت_Array _src, OutputArray _dst, صحيح flags, صحيح nonzero_لیکې)
 {
-    int type = _src.type(), cn = CV_MAT_CN(type), depth = CV_MAT_DEPTH(type);
-    Size ssize = _src.size();
-    bool doubleSupport = ocl::Device::getDefault().doubleFPConfig() > 0;
+    صحيح type = _src.type(), cn = CV_MAT_CN(type), ژوروالی = CV_MAT_ژوروالی(type);
+    اندازه ssize = _src.size();
+    منطقي doubleSupport = ocl::Device::getDefault().doubleFPConfig() > 0;
 
-    if (!(cn == 1 || cn == 2)
-        || !(depth == CV_32F || (depth == CV_64F && doubleSupport))
+    إذا (!(cn == 1 || cn == 2)
+        || !(ژوروالی == CV_32F || (ژوروالی == CV_64F && doubleSupport))
         || ((flags & DFT_REAL_OUTPUT) && (flags & DFT_COMPLEX_OUTPUT)))
-        return false;
+        أرجع خطأ;
 
     // if is not a multiplication of prime numbers { 2, 3, 5 }
-    if (ssize.area() != getOptimalDFTSize(ssize.area()))
-        return false;
+    إذا (ssize.area() != getOptimalDFTSize(ssize.area()))
+        أرجع خطأ;
 
     UMat src = _src.getUMat();
-    bool inv = (flags & DFT_INVERSE) != 0 ? 1 : 0;
+    منطقي inv = (flags & DFT_INVERSE) != 0 ? 1 : 0;
 
-    if( nonzero_rows <= 0 || nonzero_rows > _src.rows() )
-        nonzero_rows = _src.rows();
-    bool is1d = (flags & DFT_ROWS) != 0 || nonzero_rows == 1;
+    إذا( nonzero_لیکې <= 0 || nonzero_لیکې > _src.لیکې() )
+        nonzero_لیکې = _src.لیکې();
+    منطقي is1d = (flags & DFT_لیکې) != 0 || nonzero_لیکې == 1;
 
     FftType fftType = determineFFTType(cn == 1, cn == 2,
         (flags & DFT_REAL_OUTPUT) != 0, (flags & DFT_COMPLEX_OUTPUT) != 0, inv);
 
     UMat output;
-    if (fftType == C2C || fftType == R2C)
+    إذا (fftType == C2C || fftType == R2C)
     {
         // complex output
-        _dst.createSameSize(src, CV_MAKETYPE(depth, 2));
+        _dst.create_Same_اندازه(src, CV_MAKETYPE(ژوروالی, 2));
         output = _dst.getUMat();
     }
-    else
+    وإلا
     {
         // real output
-        if (is1d)
+        إذا (is1d)
         {
-            _dst.createSameSize(src, CV_MAKETYPE(depth, 1));
+            _dst.create_Same_اندازه(src, CV_MAKETYPE(ژوروالی, 1));
             output = _dst.getUMat();
         }
-        else
+        وإلا
         {
-            _dst.createSameSize(src, CV_MAKETYPE(depth, 1));
-            output.create(src.size, CV_MAKETYPE(depth, 2));
+            _dst.create_Same_اندازه(src, CV_MAKETYPE(ژوروالی, 1));
+            output.create(src.size, CV_MAKETYPE(ژوروالی, 2));
         }
     }
 
-    bool result = false;
-    if (!inv)
+    منطقي پایله = خطأ;
+    إذا (!inv)
     {
-        int nonzero_cols = fftType == R2R ? output.cols/2 + 1 : output.cols;
-        result = ocl_dft_rows(src, output, nonzero_rows, flags, fftType);
-        if (!is1d)
-            result = result && ocl_dft_cols(output, _dst, nonzero_cols, flags, fftType);
+        صحيح nonzero_ستون_شمېر = fftType == R2R ? output.ستون_شمېر/2 + 1 : output.ستون_شمېر;
+        پایله = ocl_dft_لیکې(src, output, nonzero_لیکې, flags, fftType);
+        إذا (!is1d)
+            پایله = پایله && ocl_dft_ستون_شمېر(output, _dst, nonzero_ستون_شمېر, flags, fftType);
     }
-    else
+    وإلا
     {
-        if (fftType == C2C)
+        إذا (fftType == C2C)
         {
             // complex output
-            result = ocl_dft_rows(src, output, nonzero_rows, flags, fftType);
-            if (!is1d)
-                result = result && ocl_dft_cols(output, output, output.cols, flags, fftType);
+            پایله = ocl_dft_لیکې(src, output, nonzero_لیکې, flags, fftType);
+            إذا (!is1d)
+                پایله = پایله && ocl_dft_ستون_شمېر(output, output, output.ستون_شمېر, flags, fftType);
         }
-        else
+        وإلا
         {
-            if (is1d)
+            إذا (is1d)
             {
-                result = ocl_dft_rows(src, output, nonzero_rows, flags, fftType);
+                پایله = ocl_dft_لیکې(src, output, nonzero_لیکې, flags, fftType);
             }
-            else
+            وإلا
             {
-                int nonzero_cols = src.cols/2 + 1;
-                result = ocl_dft_cols(src, output, nonzero_cols, flags, fftType);
-                result = result && ocl_dft_rows(output, _dst, nonzero_rows, flags, fftType);
+                صحيح nonzero_ستون_شمېر = src.ستون_شمېر/2 + 1;
+                پایله = ocl_dft_ستون_شمېر(src, output, nonzero_ستون_شمېر, flags, fftType);
+                پایله = پایله && ocl_dft_لیکې(output, _dst, nonzero_لیکې, flags, fftType);
             }
         }
     }
-    return result;
+    أرجع پایله;
 }
 
 } // namespace cv;
 
-#endif
+#د_که_پای
 
-#ifdef HAVE_CLAMDFFT
+#که_تعریف_شوی HAVE_CLAMDFFT
 
-namespace cv {
+نطاق cv {
 
-#define CLAMDDFT_Assert(func) \
+#تعریف_کړه CLAMDDFT_Assert(func) \
     { \
-        clfftStatus s = (func); \
+        clfft_حالت s = (func); \
         CV_Assert(s == CLFFT_SUCCESS); \
     }
 
-class PlanCache
+صنف PlanCache
 {
-    struct FftPlan
+    بنية FftPlan
     {
-        FftPlan(const Size & _dft_size, int _src_step, int _dst_step, bool _doubleFP, bool _inplace, int _flags, FftType _fftType) :
-            dft_size(_dft_size), src_step(_src_step), dst_step(_dst_step),
+        FftPlan(ثابت اندازه & dft_اندازه_2, صحيح src_ګام_2, صحيح dst_ګام_2, منطقي _doubleFP, منطقي _inplace, صحيح _flags, FftType _fftType) :
+            dft_اندازه(dft_اندازه_2), src_ګام(src_ګام_2), dst_ګام(dst_ګام_2),
             doubleFP(_doubleFP), inplace(_inplace), flags(_flags), fftType(_fftType),
             context((cl_context)ocl::Context::getDefault().ptr()), plHandle(0)
         {
-            bool dft_inverse = (flags & DFT_INVERSE) != 0;
-            bool dft_scale = (flags & DFT_SCALE) != 0;
-            bool dft_rows = (flags & DFT_ROWS) != 0;
+            منطقي dft_inverse = (flags & DFT_INVERSE) != 0;
+            منطقي dft_scale = (flags & DFT_SCALE) != 0;
+            منطقي dft_لیکې = (flags & DFT_لیکې) != 0;
 
-            clfftLayout inLayout = CLFFT_REAL, outLayout = CLFFT_REAL;
-            clfftDim dim = dft_size.height == 1 || dft_rows ? CLFFT_1D : CLFFT_2D;
+            clfftLayout دننه_Layout = CLFFT_REAL, بهر_Layout = CLFFT_REAL;
+            clfftDim dim = dft_اندازه.لوړوالی == 1 || dft_لیکې ? CLFFT_1D : CLFFT_2D;
 
-            size_t batchSize = dft_rows ? dft_size.height : 1;
-            size_t clLengthsIn[3] = { (size_t)dft_size.width, dft_rows ? 1 : (size_t)dft_size.height, 1 };
-            size_t clStridesIn[3] = { 1, 1, 1 };
-            size_t clStridesOut[3]  = { 1, 1, 1 };
-            int elemSize = doubleFP ? sizeof(double) : sizeof(float);
+            size_t batch_اندازه = dft_لیکې ? dft_اندازه.لوړوالی : 1;
+            size_t cl_Lengths_دننه[3] = { (size_t)dft_اندازه.پلنوالی, dft_لیکې ? 1 : (size_t)dft_اندازه.لوړوالی, 1 };
+            size_t cl_Strides_دننه[3] = { 1, 1, 1 };
+            size_t cl_Strides_بهر[3]  = { 1, 1, 1 };
+            صحيح elem_اندازه = doubleFP ? حجم(مزدوج) : حجم(عائم);
 
-            switch (fftType)
+            بدل (fftType)
             {
-            case C2C:
-                inLayout = CLFFT_COMPLEX_INTERLEAVED;
-                outLayout = CLFFT_COMPLEX_INTERLEAVED;
-                clStridesIn[1] = src_step / (elemSize << 1);
-                clStridesOut[1] = dst_step / (elemSize << 1);
-                break;
-            case R2C:
-                inLayout = CLFFT_REAL;
-                outLayout = CLFFT_HERMITIAN_INTERLEAVED;
-                clStridesIn[1] = src_step / elemSize;
-                clStridesOut[1] = dst_step / (elemSize << 1);
-                break;
-            case C2R:
-                inLayout = CLFFT_HERMITIAN_INTERLEAVED;
-                outLayout = CLFFT_REAL;
-                clStridesIn[1] = src_step / (elemSize << 1);
-                clStridesOut[1] = dst_step / elemSize;
-                break;
-            case R2R:
-            default:
+            حالة C2C:
+                دننه_Layout = CLFFT_COMPLEX_INTERLEAVED;
+                بهر_Layout = CLFFT_COMPLEX_INTERLEAVED;
+                cl_Strides_دننه[1] = src_ګام / (elem_اندازه << 1);
+                cl_Strides_بهر[1] = dst_ګام / (elem_اندازه << 1);
+                اكسر;
+            حالة R2C:
+                دننه_Layout = CLFFT_REAL;
+                بهر_Layout = CLFFT_HERMITIAN_INTERLEAVED;
+                cl_Strides_دننه[1] = src_ګام / elem_اندازه;
+                cl_Strides_بهر[1] = dst_ګام / (elem_اندازه << 1);
+                اكسر;
+            حالة C2R:
+                دننه_Layout = CLFFT_HERMITIAN_INTERLEAVED;
+                بهر_Layout = CLFFT_REAL;
+                cl_Strides_دننه[1] = src_ګام / (elem_اندازه << 1);
+                cl_Strides_بهر[1] = dst_ګام / elem_اندازه;
+                اكسر;
+            حالة R2R:
+            افتراضي:
                 CV_Error(Error::StsNotImplemented, "AMD Fft does not support this type");
-                break;
+                اكسر;
             }
 
-            clStridesIn[2] = dft_rows ? clStridesIn[1] : dft_size.width * clStridesIn[1];
-            clStridesOut[2] = dft_rows ? clStridesOut[1] : dft_size.width * clStridesOut[1];
+            cl_Strides_دننه[2] = dft_لیکې ? cl_Strides_دننه[1] : dft_اندازه.پلنوالی * cl_Strides_دننه[1];
+            cl_Strides_بهر[2] = dft_لیکې ? cl_Strides_بهر[1] : dft_اندازه.پلنوالی * cl_Strides_بهر[1];
 
-            CLAMDDFT_Assert(clfftCreateDefaultPlan(&plHandle, (cl_context)ocl::Context::getDefault().ptr(), dim, clLengthsIn))
+            CLAMDDFT_Assert(clfftCreateDefaultPlan(&plHandle, (cl_context)ocl::Context::getDefault().ptr(), dim, cl_Lengths_دننه))
 
             // setting plan properties
-            CLAMDDFT_Assert(clfftSetPlanPrecision(plHandle, doubleFP ? CLFFT_DOUBLE : CLFFT_SINGLE));
-            CLAMDDFT_Assert(clfftSetResultLocation(plHandle, inplace ? CLFFT_INPLACE : CLFFT_OUTOFPLACE))
-            CLAMDDFT_Assert(clfftSetLayout(plHandle, inLayout, outLayout))
-            CLAMDDFT_Assert(clfftSetPlanBatchSize(plHandle, batchSize))
-            CLAMDDFT_Assert(clfftSetPlanInStride(plHandle, dim, clStridesIn))
-            CLAMDDFT_Assert(clfftSetPlanOutStride(plHandle, dim, clStridesOut))
-            CLAMDDFT_Assert(clfftSetPlanDistance(plHandle, clStridesIn[dim], clStridesOut[dim]))
+            CLAMDDFT_Assert(clfft_سېټ_Plan_Precision(plHandle, doubleFP ? CLFFT_DOUBLE : CLFFT_SINGLE));
+            CLAMDDFT_Assert(clfft_سېټ_پایله_Location(plHandle, inplace ? CLFFT_INPLACE : CLFFT_OUTOFPLACE))
+            CLAMDDFT_Assert(clfft_سېټ_Layout(plHandle, دننه_Layout, بهر_Layout))
+            CLAMDDFT_Assert(clfft_سېټ_Plan_Batch_اندازه(plHandle, batch_اندازه))
+            CLAMDDFT_Assert(clfft_سېټ_Plan_دننه_Stride(plHandle, dim, cl_Strides_دننه))
+            CLAMDDFT_Assert(clfft_سېټ_Plan_بهر_Stride(plHandle, dim, cl_Strides_بهر))
+            CLAMDDFT_Assert(clfft_سېټ_Plan_واټن(plHandle, cl_Strides_دننه[dim], cl_Strides_بهر[dim]))
 
-            float scale = dft_scale ? 1.0f / (dft_rows ? dft_size.width : dft_size.area()) : 1.0f;
-            CLAMDDFT_Assert(clfftSetPlanScale(plHandle, dft_inverse ? CLFFT_BACKWARD : CLFFT_FORWARD, scale))
+            عائم scale = dft_scale ? 1.0f / (dft_لیکې ? dft_اندازه.پلنوالی : dft_اندازه.area()) : 1.0f;
+            CLAMDDFT_Assert(clfft_سېټ_Plan_Scale(plHandle, dft_inverse ? CLFFT_BACKWARD : CLFFT_FORWARD, scale))
 
             // ready to bake
-            cl_command_queue queue = (cl_command_queue)ocl::Queue::getDefault().ptr();
-            CLAMDDFT_Assert(clfftBakePlan(plHandle, 1, &queue, NULL, NULL))
+            cl_command_کتار کتار_2 = (cl_command_کتار)ocl::کتار::getDefault().ptr();
+            CLAMDDFT_Assert(clfftBakePlan(plHandle, 1, &کتار_2, عدم, عدم))
         }
 
         ~FftPlan()
@@ -1731,58 +1731,58 @@ class PlanCache
             /*clfftDestroyPlan(&plHandle);*/
         }
 
-        friend class PlanCache;
+        ملګری صنف PlanCache;
 
-    private:
-        Size dft_size;
-        int src_step, dst_step;
-        bool doubleFP;
-        bool inplace;
-        int flags;
+    خاص:
+        اندازه dft_اندازه;
+        صحيح src_ګام, dst_ګام;
+        منطقي doubleFP;
+        منطقي inplace;
+        صحيح flags;
         FftType fftType;
 
         cl_context context;
         clfftPlanHandle plHandle;
     };
 
-public:
-    static PlanCache & getInstance()
+عام:
+    ساكن PlanCache & getInstance()
     {
-        CV_SINGLETON_LAZY_INIT_REF(PlanCache, new PlanCache())
+        CV_SINGLETON_LAZY_INIT_REF(PlanCache, جديد PlanCache())
     }
 
-    clfftPlanHandle getPlanHandle(const Size & dft_size, int src_step, int dst_step, bool doubleFP,
-                                  bool inplace, int flags, FftType fftType)
+    clfftPlanHandle getPlanHandle(ثابت اندازه & dft_اندازه, صحيح src_ګام, صحيح dst_ګام, منطقي doubleFP,
+                                  منطقي inplace, صحيح flags, FftType fftType)
     {
         cl_context currentContext = (cl_context)ocl::Context::getDefault().ptr();
 
-        for (size_t i = 0, size = planStorage.size(); i < size; ++i)
+        لكل (size_t i = 0, size = planStorage.size(); i < size; ++i)
         {
-            const FftPlan * const plan = planStorage[i];
+            ثابت FftPlan * ثابت plan = planStorage[i];
 
-            if (plan->dft_size == dft_size &&
+            إذا (plan->dft_اندازه == dft_اندازه &&
                 plan->flags == flags &&
-                plan->src_step == src_step &&
-                plan->dst_step == dst_step &&
+                plan->src_ګام == src_ګام &&
+                plan->dst_ګام == dst_ګام &&
                 plan->doubleFP == doubleFP &&
                 plan->fftType == fftType &&
                 plan->inplace == inplace)
             {
-                if (plan->context != currentContext)
+                إذا (plan->context != currentContext)
                 {
                     planStorage.erase(planStorage.begin() + i);
-                    break;
+                    اكسر;
                 }
 
-                return plan->plHandle;
+                أرجع plan->plHandle;
             }
         }
 
         // no baked plan is found, so let's create a new one
-        Ptr<FftPlan> newPlan = Ptr<FftPlan>(new FftPlan(dft_size, src_step, dst_step, doubleFP, inplace, flags, fftType));
+        Ptr<FftPlan> newPlan = Ptr<FftPlan>(جديد FftPlan(dft_اندازه, src_ګام, dst_ګام, doubleFP, inplace, flags, fftType));
         planStorage.push_back(newPlan);
 
-        return newPlan->plHandle;
+        أرجع newPlan->plHandle;
     }
 
     ~PlanCache()
@@ -1790,7 +1790,7 @@ public:
         planStorage.clear();
     }
 
-protected:
+محمي:
     PlanCache() :
         planStorage()
     {
@@ -1799,13 +1799,13 @@ protected:
     std::vector<Ptr<FftPlan> > planStorage;
 };
 
-extern "C" {
+خارجي "C" {
 
-static void CL_CALLBACK oclCleanupCallback(cl_event e, cl_int, void *p)
+ساكن فراغ CL_CALLBACK oclCleanupCallback(cl_event e, cl_int, فراغ *p)
 {
-    UMatData * u = (UMatData *)p;
+    UMat_معلومات * u = (UMat_معلومات *)p;
 
-    if( u && CV_XADD(&u->urefcount, -1) == 1 )
+    إذا( u && CV_XADD(&u->urefcount, -1) == 1 )
         u->currAllocator->deallocate(u);
     u = 0;
 
@@ -1814,90 +1814,90 @@ static void CL_CALLBACK oclCleanupCallback(cl_event e, cl_int, void *p)
 
 }
 
-static bool ocl_dft_amdfft(InputArray _src, OutputArray _dst, int flags)
+ساكن منطقي ocl_dft_amdfft(ننوت_Array _src, OutputArray _dst, صحيح flags)
 {
-    int type = _src.type(), depth = CV_MAT_DEPTH(type), cn = CV_MAT_CN(type);
-    Size ssize = _src.size();
+    صحيح type = _src.type(), ژوروالی = CV_MAT_ژوروالی(type), cn = CV_MAT_CN(type);
+    اندازه ssize = _src.size();
 
-    bool doubleSupport = ocl::Device::getDefault().doubleFPConfig() > 0;
-    if ( (!doubleSupport && depth == CV_64F) ||
+    منطقي doubleSupport = ocl::Device::getDefault().doubleFPConfig() > 0;
+    إذا ( (!doubleSupport && ژوروالی == CV_64F) ||
          !(type == CV_32FC1 || type == CV_32FC2 || type == CV_64FC1 || type == CV_64FC2) ||
          _src.offset() != 0)
-        return false;
+        أرجع خطأ;
 
     // if is not a multiplication of prime numbers { 2, 3, 5 }
-    if (ssize.area() != getOptimalDFTSize(ssize.area()))
-        return false;
+    إذا (ssize.area() != getOptimalDFTSize(ssize.area()))
+        أرجع خطأ;
 
-    int dst_complex_input = cn == 2 ? 1 : 0;
-    bool dft_inverse = (flags & DFT_INVERSE) != 0 ? 1 : 0;
-    int dft_complex_output = (flags & DFT_COMPLEX_OUTPUT) != 0;
-    bool dft_real_output = (flags & DFT_REAL_OUTPUT) != 0;
+    صحيح dst_complex_ننوت = cn == 2 ? 1 : 0;
+    منطقي dft_inverse = (flags & DFT_INVERSE) != 0 ? 1 : 0;
+    صحيح dft_complex_output = (flags & DFT_COMPLEX_OUTPUT) != 0;
+    منطقي dft_real_output = (flags & DFT_REAL_OUTPUT) != 0;
 
     CV_Assert(dft_complex_output + dft_real_output < 2);
-    FftType fftType = (FftType)(dst_complex_input << 0 | dft_complex_output << 1);
+    FftType fftType = (FftType)(dst_complex_ننوت << 0 | dft_complex_output << 1);
 
-    switch (fftType)
+    بدل (fftType)
     {
-    case C2C:
-        _dst.create(ssize.height, ssize.width, CV_MAKE_TYPE(depth, 2));
-        break;
-    case R2C: // TODO implement it if possible
-    case C2R: // TODO implement it if possible
-    case R2R: // AMD Fft does not support this type
-    default:
-        return false;
+    حالة C2C:
+        _dst.create(ssize.لوړوالی, ssize.پلنوالی, CV_MAKE_TYPE(ژوروالی, 2));
+        اكسر;
+    حالة R2C: // TODO implement it if possible
+    حالة C2R: // TODO implement it if possible
+    حالة R2R: // AMD Fft does not support this type
+    افتراضي:
+        أرجع خطأ;
     }
 
     UMat src = _src.getUMat(), dst = _dst.getUMat();
-    if (!ocl::internal::isCLBuffer(src) || !ocl::internal::isCLBuffer(dst))
-        return false;
-    bool inplace = src.u == dst.u;
+    إذا (!ocl::internal::isCLBuffer(src) || !ocl::internal::isCLBuffer(dst))
+        أرجع خطأ;
+    منطقي inplace = src.u == dst.u;
 
     clfftPlanHandle plHandle = PlanCache::getInstance().
-            getPlanHandle(ssize, (int)src.step, (int)dst.step,
-                          depth == CV_64F, inplace, flags, fftType);
+            getPlanHandle(ssize, (صحيح)src.ګام, (صحيح)dst.ګام,
+                          ژوروالی == CV_64F, inplace, flags, fftType);
 
     // get the bufferSize
-    size_t bufferSize = 0;
-    CLAMDDFT_Assert(clfftGetTmpBufSize(plHandle, &bufferSize))
-    UMat tmpBuffer(1, (int)bufferSize, CV_8UC1);
+    size_t بفر_اندازه = 0;
+    CLAMDDFT_Assert(clfft_Get_Tmp_Buf_اندازه(plHandle, &بفر_اندازه))
+    UMat tmp_بفر(1, (صحيح)بفر_اندازه, CV_8UC1);
 
     cl_mem srcarg = (cl_mem)src.handle(ACCESS_READ);
     cl_mem dstarg = (cl_mem)dst.handle(ACCESS_RW);
 
-    cl_command_queue queue = (cl_command_queue)ocl::Queue::getDefault().ptr();
+    cl_command_کتار کتار_2 = (cl_command_کتار)ocl::کتار::getDefault().ptr();
     cl_event e = 0;
 
-    CLAMDDFT_Assert(clfftEnqueueTransform(plHandle, dft_inverse ? CLFFT_BACKWARD : CLFFT_FORWARD,
-                                          1, &queue, 0, NULL, &e,
-                                          &srcarg, &dstarg, (cl_mem)tmpBuffer.handle(ACCESS_RW)))
+    CLAMDDFT_Assert(clfft_کتار_ته_ورزیاتول_Transform(plHandle, dft_inverse ? CLFFT_BACKWARD : CLFFT_FORWARD,
+                                          1, &کتار_2, 0, عدم, &e,
+                                          &srcarg, &dstarg, (cl_mem)tmp_بفر.handle(ACCESS_RW)))
 
-    tmpBuffer.addref();
-    clSetEventCallback(e, CL_COMPLETE, oclCleanupCallback, tmpBuffer.u);
-    return true;
+    tmp_بفر.addref();
+    cl_سېټ_Event_Callback(e, CL_COMPLETE, oclCleanupCallback, tmp_بفر.u);
+    أرجع ریښتیا;
 }
 
-#undef DFT_ASSERT
+#تعریف_لغوه DFT_ASSERT
 
 }
 
-#endif // HAVE_CLAMDFFT
+#د_که_پای // HAVE_CLAMDFFT
 
-namespace cv
+نطاق cv
 {
 
-template <typename T>
-static void complementComplex(T * ptr, size_t step, int n, int len, int dft_dims)
+کينډۍ <ډول_نوم T>
+ساكن فراغ complementComplex(T * ptr, size_t ګام, صحيح n, صحيح len, صحيح dft_dims)
 {
     T* p0 = (T*)ptr;
-    size_t dstep = step/sizeof(p0[0]);
-    for(int i = 0; i < len; i++ )
+    size_t dstep = ګام/حجم(p0[0]);
+    لكل(صحيح i = 0; i < len; i++ )
     {
         T* p = p0 + dstep*i;
         T* q = dft_dims == 1 || i == 0 || i*2 == len ? p : p0 + dstep*(len-i);
 
-        for( int j = 1; j < (n+1)/2; j++ )
+        لكل( صحيح j = 1; j < (n+1)/2; j++ )
         {
             p[(n-j)*2] = q[j*2];
             p[(n-j)*2+1] = -q[j*2+1];
@@ -1905,184 +1905,184 @@ static void complementComplex(T * ptr, size_t step, int n, int len, int dft_dims
     }
 }
 
-static void complementComplexOutput(int depth, uchar * ptr, size_t step, int count, int len, int dft_dims)
+ساكن فراغ complementComplexOutput(صحيح ژوروالی, uchar * ptr, size_t ګام, صحيح شمېر_2, صحيح len, صحيح dft_dims)
 {
-    if( depth == CV_32F )
-        complementComplex((float*)ptr, step, count, len, dft_dims);
-    else
-        complementComplex((double*)ptr, step, count, len, dft_dims);
+    إذا( ژوروالی == CV_32F )
+        complementComplex((عائم*)ptr, ګام, شمېر_2, len, dft_dims);
+    وإلا
+        complementComplex((مزدوج*)ptr, ګام, شمېر_2, len, dft_dims);
 }
 
-enum DftMode {
+تعداد Dft_ډېرپېښ {
     InvalidDft = 0,
-    FwdRealToCCS,
-    FwdRealToComplex,
-    FwdComplexToComplex,
+    Fwd_Real_منزل_CCS,
+    Fwd_Real_منزل_Complex,
+    Fwd_Complex_منزل_Complex,
     InvCCSToReal,
-    InvComplexToReal,
-    InvComplexToComplex,
+    Inv_Complex_منزل_Real,
+    Inv_Complex_منزل_Complex,
 };
 
-enum DftDims {
+تعداد DftDims {
     InvalidDim = 0,
     OneDim,
-    OneDimColWise,
+    One_Dim_ستون_Wise,
     TwoDims
 };
 
-inline const char * modeName(DftMode m)
+مضمن ثابت حرف * ډېرپېښ_Name(Dft_ډېرپېښ m)
 {
-    switch (m)
+    بدل (m)
     {
-    case InvalidDft: return "InvalidDft";
-    case FwdRealToCCS: return "FwdRealToCCS";
-    case FwdRealToComplex: return "FwdRealToComplex";
-    case FwdComplexToComplex: return "FwdComplexToComplex";
-    case InvCCSToReal: return "InvCCSToReal";
-    case InvComplexToReal: return "InvComplexToReal";
-    case InvComplexToComplex: return "InvComplexToComplex";
+    حالة InvalidDft: أرجع "InvalidDft";
+    حالة Fwd_Real_منزل_CCS: أرجع "FwdRealToCCS";
+    حالة Fwd_Real_منزل_Complex: أرجع "FwdRealToComplex";
+    حالة Fwd_Complex_منزل_Complex: أرجع "FwdComplexToComplex";
+    حالة InvCCSToReal: أرجع "InvCCSToReal";
+    حالة Inv_Complex_منزل_Real: أرجع "InvComplexToReal";
+    حالة Inv_Complex_منزل_Complex: أرجع "InvComplexToComplex";
     }
-    return 0;
+    أرجع 0;
 }
 
-inline const char * dimsName(DftDims d)
+مضمن ثابت حرف * dimsName(DftDims d)
 {
-    switch (d)
+    بدل (d)
     {
-    case InvalidDim: return "InvalidDim";
-    case OneDim: return "OneDim";
-    case OneDimColWise: return "OneDimColWise";
-    case TwoDims: return "TwoDims";
+    حالة InvalidDim: أرجع "InvalidDim";
+    حالة OneDim: أرجع "OneDim";
+    حالة One_Dim_ستون_Wise: أرجع "OneDimColWise";
+    حالة TwoDims: أرجع "TwoDims";
     };
-    return 0;
+    أرجع 0;
 }
 
-template <typename T>
-inline bool isInv(T mode)
+کينډۍ <ډول_نوم T>
+مضمن منطقي isInv(T ډېرپېښ)
 {
-    switch ((DftMode)mode)
+    بدل ((Dft_ډېرپېښ)ډېرپېښ)
     {
-        case InvCCSToReal:
-        case InvComplexToReal:
-        case InvComplexToComplex: return true;
-        default: return false;
+        حالة InvCCSToReal:
+        حالة Inv_Complex_منزل_Real:
+        حالة Inv_Complex_منزل_Complex: أرجع ریښتیا;
+        افتراضي: أرجع خطأ;
     }
 }
 
-inline DftMode determineMode(bool inv, int cn1, int cn2)
+مضمن Dft_ډېرپېښ determine_ډېرپېښ(منطقي inv, صحيح cn1, صحيح cn2)
 {
-    if (!inv)
+    إذا (!inv)
     {
-        if (cn1 == 1 && cn2 == 1)
-            return FwdRealToCCS;
-        else if (cn1 == 1 && cn2 == 2)
-            return FwdRealToComplex;
-        else if (cn1 == 2 && cn2 == 2)
-            return FwdComplexToComplex;
+        إذا (cn1 == 1 && cn2 == 1)
+            أرجع Fwd_Real_منزل_CCS;
+        وإلا إذا (cn1 == 1 && cn2 == 2)
+            أرجع Fwd_Real_منزل_Complex;
+        وإلا إذا (cn1 == 2 && cn2 == 2)
+            أرجع Fwd_Complex_منزل_Complex;
     }
-    else
+    وإلا
     {
-        if (cn1 == 1 && cn2 == 1)
-            return InvCCSToReal;
-        else if (cn1 == 2 && cn2 == 1)
-            return InvComplexToReal;
-        else if (cn1 == 2 && cn2 == 2)
-            return InvComplexToComplex;
+        إذا (cn1 == 1 && cn2 == 1)
+            أرجع InvCCSToReal;
+        وإلا إذا (cn1 == 2 && cn2 == 1)
+            أرجع Inv_Complex_منزل_Real;
+        وإلا إذا (cn1 == 2 && cn2 == 2)
+            أرجع Inv_Complex_منزل_Complex;
     }
-    return InvalidDft;
+    أرجع InvalidDft;
 }
 
 
-inline DftDims determineDims(int rows, int cols, bool isRowWise, bool isContinuous)
+مضمن DftDims determineDims(صحيح لیکې, صحيح ستون_شمېر, منطقي is_لیکه_Wise, منطقي isContinuous)
 {
     // printf("%d x %d (%d, %d)\n", rows, cols, isRowWise, isContinuous);
-    if (isRowWise)
-        return OneDim;
-    if (cols == 1 && rows > 1) // one-column-shaped input
+    إذا (is_لیکه_Wise)
+        أرجع OneDim;
+    إذا (ستون_شمېر == 1 && لیکې > 1) // one-column-shaped input
     {
-        if (isContinuous)
-            return OneDim;
-        else
-            return OneDimColWise;
+        إذا (isContinuous)
+            أرجع OneDim;
+        وإلا
+            أرجع One_Dim_ستون_Wise;
     }
-    if (rows == 1)
-        return OneDim;
-    if (cols > 1 && rows > 1)
-        return TwoDims;
-    return InvalidDim;
+    إذا (لیکې == 1)
+        أرجع OneDim;
+    إذا (ستون_شمېر > 1 && لیکې > 1)
+        أرجع TwoDims;
+    أرجع InvalidDim;
 }
 
-class OcvDftBasicImpl CV_FINAL : public hal::DFT1D
+صنف OcvDftBasicImpl CV_FINAL : عام hal::DFT1D
 {
-public:
+عام:
     OcvDftOptions opt;
     // the plan is built once in init(), the workspace is allocated once here and reused by
     // every apply() (zero allocations per transform)
     DftPlan plan;
-    AutoBuffer<uchar> ws;
-#ifdef USE_IPP_DFT
-    AutoBuffer<uchar> ippbuf;
-    AutoBuffer<uchar> ippworkbuf;
+    Auto_بفر<uchar> ws;
+#که_تعریف_شوی USE_IPP_DFT
+    Auto_بفر<uchar> ippbuf;
+    Auto_بفر<uchar> ippworkbuf;
     size_t ipp_worksize;
-#endif
+#د_که_پای
 
-public:
+عام:
     OcvDftBasicImpl()
     {
-#ifdef USE_IPP_DFT
+#که_تعریف_شوی USE_IPP_DFT
         ipp_worksize = 0;
-#endif
+#د_که_پای
     }
-    void init(int len, int count, int depth, int flags, bool *needBuffer)
+    فراغ init(صحيح len, صحيح شمېر_2, صحيح ژوروالی, صحيح flags, منطقي *need_بفر)
     {
-        int stage = (flags & CV_HAL_DFT_STAGE_COLS) != 0 ? 1 : 0;
+        صحيح stage = (flags & CV_HAL_DFT_STAGE_ستون_شمېر) != 0 ? 1 : 0;
         opt.isInverse = (flags & CV_HAL_DFT_INVERSE) != 0;
-        bool real_transform = (flags & CV_HAL_DFT_REAL_OUTPUT) != 0;
+        منطقي real_transform = (flags & CV_HAL_DFT_REAL_OUTPUT) != 0;
         opt.isComplex = (stage == 0) && (flags & CV_HAL_DFT_COMPLEX_OUTPUT) != 0;
-        bool needAnotherStage = (flags & CV_HAL_DFT_TWO_STAGE) != 0;
+        منطقي needAnotherStage = (flags & CV_HAL_DFT_TWO_STAGE) != 0;
 
         opt.scale = 1;
         opt.n = len;
 
-        opt.useIpp = false;
-    #ifdef USE_IPP_DFT
+        opt.useIpp = خطأ;
+    #که_تعریف_شوی USE_IPP_DFT
         opt.ipp_spec = 0;
         opt.ipp_work = 0;
 
-        if( CV_IPP_CHECK_COND && (opt.n*count >= 64) && !IPP_DISABLE_DFT32F) // use IPP DFT if available
+        إذا( CV_IPP_CHECK_COND && (opt.n*شمېر_2 >= 64) && !IPP_DISABLE_DFT32F) // use IPP DFT if available
         {
-            int ipp_norm_flag = (flags & CV_HAL_DFT_SCALE) == 0 ? 8 : opt.isInverse ? 2 : 1;
-            int specsize=0, initsize=0, worksize=0;
-            IppDFTGetSizeFunc getSizeFunc = 0;
+            صحيح ipp_norm_flag = (flags & CV_HAL_DFT_SCALE) == 0 ? 8 : opt.isInverse ? 2 : 1;
+            صحيح specsize=0, initsize=0, worksize=0;
+            Ipp_DFTGet_اندازه_Func get_اندازه_Func = 0;
             IppDFTInitFunc initFunc = 0;
 
-            if( real_transform && stage == 0 )
+            إذا( real_transform && stage == 0 )
             {
-                if( depth == CV_32F )
+                إذا( ژوروالی == CV_32F )
                 {
-                    getSizeFunc = ippsDFTGetSize_R_32f;
+                    get_اندازه_Func = ipps_DFTGet_اندازه_R_32f;
                     initFunc = ippDFTInitWrap<IppsDFTSpec_R_32f, ippsDFTInit_R_32f>;
                 }
-                else
+                وإلا
                 {
-                    getSizeFunc = ippsDFTGetSize_R_64f;
+                    get_اندازه_Func = ipps_DFTGet_اندازه_R_64f;
                     initFunc = ippDFTInitWrap<IppsDFTSpec_R_64f, ippsDFTInit_R_64f>;
                 }
             }
-            else
+            وإلا
             {
-                if( depth == CV_32F )
+                إذا( ژوروالی == CV_32F )
                 {
-                    getSizeFunc = ippsDFTGetSize_C_32fc;
+                    get_اندازه_Func = ipps_DFTGet_اندازه_C_32fc;
                     initFunc = ippDFTInitWrap<IppsDFTSpec_C_32fc, ippsDFTInit_C_32fc>;
                 }
-                else
+                وإلا
                 {
-                    getSizeFunc = ippsDFTGetSize_C_64fc;
+                    get_اندازه_Func = ipps_DFTGet_اندازه_C_64fc;
                     initFunc = ippDFTInitWrap<IppsDFTSpec_C_64fc, ippsDFTInit_C_64fc>;
                 }
             }
-            if( getSizeFunc(opt.n, ipp_norm_flag, ippAlgHintNone, &specsize, &initsize, &worksize) >= 0 )
+            إذا( get_اندازه_Func(opt.n, ipp_norm_flag, ippAlgHintNone, &specsize, &initsize, &worksize) >= 0 )
             {
                 ippbuf.allocate(specsize + initsize + 64);
                 opt.ipp_spec = alignPtr(&ippbuf[0], 32);
@@ -2090,98 +2090,98 @@ public:
                 opt.ipp_work = alignPtr(&ippworkbuf[0], 32);
                 ipp_worksize = (size_t)worksize;
                 uchar* initbuf = alignPtr((uchar*)opt.ipp_spec + specsize, 32);
-                if( initFunc(opt.n, ipp_norm_flag, ippAlgHintNone, opt.ipp_spec, initbuf) >= 0 )
-                    opt.useIpp = true;
+                إذا( initFunc(opt.n, ipp_norm_flag, ippAlgHintNone, opt.ipp_spec, initbuf) >= 0 )
+                    opt.useIpp = ریښتیا;
             }
-            else
-                setIppErrorStatus();
+            وإلا
+                سېټ_Ipp_Error_حالت();
         }
-    #endif
+    #د_که_پای
 
         {
             // The plan is built even when IPP is enabled: the IPP calls fall back to the generic
             // code on failure.
-            const DFTKernels& kernels = getDFTKernels(depth);
-            int kind = stage == 0 && real_transform ? (opt.isInverse ? DFT_KIND_C2R : DFT_KIND_R2C)
-                                                    : DFT_KIND_C2C;
-            plan.build(kind, len, depth, kernels.vlanes);
-            ws.allocate(plan.ws_bytes);
+            ثابت DFTKernels& kernels = getDFTKernels(ژوروالی);
+            صحيح ډول = stage == 0 && real_transform ? (opt.isInverse ? DFT_ډول_C2_R : DFT_ډول_R2_C)
+                                                    : DFT_ډول_C2_C;
+            plan.build(ډول, len, ژوروالی, kernels.vlanes);
+            ws.allocate(plan.ws_بایټونه);
             opt.plan = &plan;
             opt.kernels = &kernels;
-            opt.workspace = ws.data();
-            if (needBuffer)
-                *needBuffer = false;   // the engine supports in-place for every kind
+            opt.workspace = ws.معلومات();
+            إذا (need_بفر)
+                *need_بفر = خطأ;   // the engine supports in-place for every kind
         }
 
         {
-            static DFTFunc dft_tbl[6] =
+            ساكن DFTFunc dft_tbl[6] =
             {
-                dftWrap<Complexf, DFT<float>>,
-                dftWrap<float, RealDFT<float>>,
-                dftWrap<float, CCSIDFT<float>>,
-                dftWrap<Complexd, DFT<double>>,
-                dftWrap<double, RealDFT<double>>,
-                dftWrap<double, CCSIDFT<double>>
+                dftWrap<Complexf, DFT<عائم>>,
+                dftWrap<عائم, RealDFT<عائم>>,
+                dftWrap<عائم, CCSIDFT<عائم>>,
+                dftWrap<Complexd, DFT<مزدوج>>,
+                dftWrap<مزدوج, RealDFT<مزدوج>>,
+                dftWrap<مزدوج, CCSIDFT<مزدوج>>
             };
-            int idx = 0;
-            if (stage == 0)
+            صحيح idx = 0;
+            إذا (stage == 0)
             {
-                if (real_transform)
+                إذا (real_transform)
                 {
-                    if (!opt.isInverse)
+                    إذا (!opt.isInverse)
                         idx = 1;
-                    else
+                    وإلا
                         idx = 2;
                 }
             }
-            if (depth == CV_64F)
+            إذا (ژوروالی == CV_64F)
                 idx += 3;
 
             opt.dft_func = dft_tbl[idx];
         }
 
-        if(!needAnotherStage && (flags & CV_HAL_DFT_SCALE) != 0)
+        إذا(!needAnotherStage && (flags & CV_HAL_DFT_SCALE) != 0)
         {
-            int rowCount = count;
-            if (stage == 0 && (flags & CV_HAL_DFT_ROWS) != 0)
-                rowCount = 1;
-            opt.scale = 1./(len * rowCount);
+            صحيح لیکه_شمېر = شمېر_2;
+            إذا (stage == 0 && (flags & CV_HAL_DFT_لیکې) != 0)
+                لیکه_شمېر = 1;
+            opt.scale = 1./(len * لیکه_شمېر);
         }
     }
 
-    void apply(const uchar *src, uchar *dst) CV_OVERRIDE
+    فراغ apply(ثابت uchar *src, uchar *dst) CV_OVERRIDE
     {
         opt.dft_func(opt, src, dst);
     }
 
     // Size of a private workspace for applyWithWorkspace(). It covers both the engine workspace
     // and, when IPP is used, the IPP work buffer (only one of them is touched per call).
-    size_t workspaceSize() const
+    size_t workspace_اندازه() ثابت
     {
-        size_t sz = opt.plan ? plan.ws_bytes : 0;
-#ifdef USE_IPP_DFT
-        if (opt.useIpp)
+        size_t sz = opt.plan ? plan.ws_بایټونه : 0;
+#که_تعریف_شوی USE_IPP_DFT
+        إذا (opt.useIpp)
             sz = std::max(sz, ipp_worksize + 64);
-#endif
-        return sz;
+#د_که_پای
+        أرجع sz;
     }
 
     // Same as apply(), but with a caller-provided workspace: several threads may run the same
     // transform as long as each of them uses its own workspace. The plan is immutable and the
     // IPP spec is read-only after init, so both are shared; the IPP work buffer is per call and
     // must therefore be private to the thread, too.
-    void applyWithWorkspace(const uchar *src, uchar *dst, uchar* workspace) const
+    فراغ applyWithWorkspace(ثابت uchar *src, uchar *dst, uchar* workspace) ثابت
     {
         OcvDftOptions opt_ = opt;
         opt_.workspace = workspace;
-#ifdef USE_IPP_DFT
-        if (opt_.useIpp)
+#که_تعریف_شوی USE_IPP_DFT
+        إذا (opt_.useIpp)
             opt_.ipp_work = alignPtr(workspace, 32);
-#endif
+#د_که_پای
         opt_.dft_func(opt_, src, dst);
     }
 
-    void free() {}
+    فراغ حرر() {}
 };
 
 // 2D transforms (and the multi-row 1D batches) distribute the rows / the column pairs over
@@ -2194,603 +2194,603 @@ public:
 // accesses do not alias in the cache (which they do when columns are copied one or two at a
 // time and the row step is a multiple of a page). The batch is sized so that the column buffers
 // stay within DFT_COLS_BATCH_BYTES (~L1-resident), between DFT_COLS_BATCH_MIN and _MAX columns.
-static const int DFT_COLS_BATCH_MIN = 4;
-static const int DFT_COLS_BATCH_MAX = 16;
-static const size_t DFT_COLS_BATCH_BYTES = 1 << 17;
+ساكن ثابت صحيح DFT_ستون_شمېر_BATCH_MIN = 4;
+ساكن ثابت صحيح DFT_ستون_شمېر_BATCH_MAX = 16;
+ساكن ثابت size_t DFT_ستون_شمېر_BATCH_بایټونه = 1 << 17;
 
-static int dftColsBatch(int len, size_t complex_elem_size)
+ساكن صحيح dft_ستون_شمېر_Batch(صحيح len, size_t complex_elem_اندازه)
 {
-    int batch = (int)(DFT_COLS_BATCH_BYTES/((size_t)len*complex_elem_size));
-    return std::max(DFT_COLS_BATCH_MIN, std::min(DFT_COLS_BATCH_MAX, batch));
+    صحيح batch = (صحيح)(DFT_ستون_شمېر_BATCH_بایټونه/((size_t)len*complex_elem_اندازه));
+    أرجع std::max(DFT_ستون_شمېر_BATCH_MIN, std::min(DFT_ستون_شمېر_BATCH_MAX, batch));
 }
 
-static double dftParallelStripes(int count, int len)
+ساكن مزدوج dftParallelStripes(صحيح شمېر_2, صحيح len)
 {
-    const double quantum = 0.5e6;
-    return (double)count*len*std::max(std::log((double)len)/std::log(2.), 1.)/quantum;
+    ثابت مزدوج وخت_ټوټه = 0.5e6;
+    أرجع (مزدوج)شمېر_2*len*std::max(std::لوګاریتم((مزدوج)len)/std::لوګاریتم(2.), 1.)/وخت_ټوټه;
 }
 
-class OcvDftImpl CV_FINAL : public hal::DFT2D
+صنف OcvDftImpl CV_FINAL : عام hal::DFT2D
 {
-protected:
+محمي:
     Ptr<hal::DFT1D> contextA;
     Ptr<hal::DFT1D> contextB;
-    const OcvDftBasicImpl* basicA;   // contextA/contextB when they are our own implementation
-    const OcvDftBasicImpl* basicB;   // (parallel path); 0 for external HAL contexts
-    bool needBufferA;
-    bool needBufferB;
-    bool inv;
-    int width;
-    int height;
-    DftMode mode;
-    int elem_size;
-    int complex_elem_size;
-    int depth;
-    bool real_transform;
-    int nonzero_rows;
-    bool isRowTransform;
-    bool isScaled;
-    std::vector<int> stages;
-    bool useIpp;
-    int src_channels;
-    int dst_channels;
+    ثابت OcvDftBasicImpl* basicA;   // contextA/contextB when they are our own implementation
+    ثابت OcvDftBasicImpl* basicB;   // (parallel path); 0 for external HAL contexts
+    منطقي need_بفر_A;
+    منطقي need_بفر_B;
+    منطقي inv;
+    صحيح پلنوالی;
+    صحيح لوړوالی;
+    Dft_ډېرپېښ ډېرپېښ;
+    صحيح elem_اندازه_2;
+    صحيح complex_elem_اندازه;
+    صحيح ژوروالی;
+    منطقي real_transform;
+    صحيح nonzero_لیکې;
+    منطقي is_لیکه_Transform;
+    منطقي isScaled;
+    std::vector<صحيح> stages;
+    منطقي useIpp;
+    صحيح src_channels;
+    صحيح dst_channels;
 
-    AutoBuffer<uchar> tmp_bufA;
-    AutoBuffer<uchar> tmp_bufB;
-    AutoBuffer<uchar> buf0;
-    AutoBuffer<uchar> buf1;
+    Auto_بفر<uchar> tmp_bufA;
+    Auto_بفر<uchar> tmp_bufB;
+    Auto_بفر<uchar> buf0;
+    Auto_بفر<uchar> buf1;
 
-public:
+عام:
     OcvDftImpl()
     {
         basicA = basicB = 0;
-        needBufferA = false;
-        needBufferB = false;
-        inv = false;
-        width = 0;
-        height = 0;
-        mode = InvalidDft;
-        elem_size = 0;
-        complex_elem_size = 0;
-        depth = 0;
-        real_transform = false;
-        nonzero_rows = 0;
-        isRowTransform = false;
-        isScaled = false;
-        useIpp = false;
+        need_بفر_A = خطأ;
+        need_بفر_B = خطأ;
+        inv = خطأ;
+        پلنوالی = 0;
+        لوړوالی = 0;
+        ډېرپېښ = InvalidDft;
+        elem_اندازه_2 = 0;
+        complex_elem_اندازه = 0;
+        ژوروالی = 0;
+        real_transform = خطأ;
+        nonzero_لیکې = 0;
+        is_لیکه_Transform = خطأ;
+        isScaled = خطأ;
+        useIpp = خطأ;
         src_channels = 0;
         dst_channels = 0;
     }
 
-    void init(int _width, int _height, int _depth, int _src_channels, int _dst_channels, int flags, int _nonzero_rows)
+    فراغ init(صحيح پلنوالی_3, صحيح لوړوالی_3, صحيح ژوروالی_2, صحيح _src_channels, صحيح _dst_channels, صحيح flags, صحيح nonzero_لیکې_2)
     {
-        bool isComplex = _src_channels != _dst_channels;
-        nonzero_rows = _nonzero_rows;
-        width = _width;
-        height = _height;
-        depth = _depth;
+        منطقي isComplex = _src_channels != _dst_channels;
+        nonzero_لیکې = nonzero_لیکې_2;
+        پلنوالی = پلنوالی_3;
+        لوړوالی = لوړوالی_3;
+        ژوروالی = ژوروالی_2;
         src_channels = _src_channels;
         dst_channels = _dst_channels;
-        bool isInverse = (flags & CV_HAL_DFT_INVERSE) != 0;
-        bool isInplace = (flags & CV_HAL_DFT_IS_INPLACE) != 0;
-        bool isContinuous = (flags & CV_HAL_DFT_IS_CONTINUOUS) != 0;
-        mode = determineMode(isInverse, _src_channels, _dst_channels);
+        منطقي isInverse = (flags & CV_HAL_DFT_INVERSE) != 0;
+        منطقي isInplace = (flags & CV_HAL_DFT_IS_INPLACE) != 0;
+        منطقي isContinuous = (flags & CV_HAL_DFT_IS_CONTINUOUS) != 0;
+        ډېرپېښ = determine_ډېرپېښ(isInverse, _src_channels, _dst_channels);
         inv = isInverse;
-        isRowTransform = (flags & CV_HAL_DFT_ROWS) != 0;
+        is_لیکه_Transform = (flags & CV_HAL_DFT_لیکې) != 0;
         isScaled = (flags & CV_HAL_DFT_SCALE) != 0;
-        needBufferA = false;
-        needBufferB = false;
-        real_transform = (mode != FwdComplexToComplex && mode != InvComplexToComplex);
+        need_بفر_A = خطأ;
+        need_بفر_B = خطأ;
+        real_transform = (ډېرپېښ != Fwd_Complex_منزل_Complex && ډېرپېښ != Inv_Complex_منزل_Complex);
 
-        elem_size = (depth == CV_32F) ? sizeof(float) : sizeof(double);
-        complex_elem_size = elem_size * 2;
-        if( !real_transform )
-            elem_size = complex_elem_size;
+        elem_اندازه_2 = (ژوروالی == CV_32F) ? حجم(عائم) : حجم(مزدوج);
+        complex_elem_اندازه = elem_اندازه_2 * 2;
+        إذا( !real_transform )
+            elem_اندازه_2 = complex_elem_اندازه;
 
-#if defined USE_IPP_DFT
+#إذا defined USE_IPP_DFT
         CV_IPP_CHECK()
         {
-            if (nonzero_rows == 0 && depth == CV_32F && ((width * height)>(int)(1<<6)))
+            إذا (nonzero_لیکې == 0 && ژوروالی == CV_32F && ((پلنوالی * لوړوالی)>(صحيح)(1<<6)))
             {
-                if (mode == FwdComplexToComplex || mode == InvComplexToComplex || mode == FwdRealToCCS || mode == InvCCSToReal)
+                إذا (ډېرپېښ == Fwd_Complex_منزل_Complex || ډېرپېښ == Inv_Complex_منزل_Complex || ډېرپېښ == Fwd_Real_منزل_CCS || ډېرپېښ == InvCCSToReal)
                 {
-                    useIpp = true;
-                    return;
+                    useIpp = ریښتیا;
+                    أرجع;
                 }
             }
         }
-#endif
+#د_که_پای
 
-        DftDims dims = determineDims(height, width, isRowTransform, isContinuous);
-        if (dims == TwoDims)
+        DftDims dims = determineDims(لوړوالی, پلنوالی, is_لیکه_Transform, isContinuous);
+        إذا (dims == TwoDims)
         {
             stages.resize(2);
-            if (mode == InvCCSToReal || mode == InvComplexToReal)
+            إذا (ډېرپېښ == InvCCSToReal || ډېرپېښ == Inv_Complex_منزل_Real)
             {
                 stages[0] = 1;
                 stages[1] = 0;
             }
-            else
+            وإلا
             {
                 stages[0] = 0;
                 stages[1] = 1;
             }
         }
-        else
+        وإلا
         {
             stages.resize(1);
-            if (dims == OneDimColWise)
+            إذا (dims == One_Dim_ستون_Wise)
                 stages[0] = 1;
-            else
+            وإلا
                 stages[0] = 0;
         }
 
-        for(uint stageIndex = 0; stageIndex < stages.size(); ++stageIndex)
+        لكل(uint stage_شاخص = 0; stage_شاخص < stages.size(); ++stage_شاخص)
         {
-            if (stageIndex == 1)
+            إذا (stage_شاخص == 1)
             {
-                isInplace = true;
-                isComplex = false;
+                isInplace = ریښتیا;
+                isComplex = خطأ;
             }
 
-            int stage = stages[stageIndex];
-            bool isLastStage = (stageIndex + 1 == stages.size());
+            صحيح stage = stages[stage_شاخص];
+            منطقي is_وروستی_Stage = (stage_شاخص + 1 == stages.size());
 
-            int len, count;
+            صحيح len, شمېر_2;
 
-            int f = 0;
-            if (inv)
+            صحيح f = 0;
+            إذا (inv)
                 f |= CV_HAL_DFT_INVERSE;
-            if (isScaled)
+            إذا (isScaled)
                 f |= CV_HAL_DFT_SCALE;
-            if (isRowTransform)
-                f |= CV_HAL_DFT_ROWS;
-            if (isComplex)
+            إذا (is_لیکه_Transform)
+                f |= CV_HAL_DFT_لیکې;
+            إذا (isComplex)
                 f |= CV_HAL_DFT_COMPLEX_OUTPUT;
-            if (real_transform)
+            إذا (real_transform)
                 f |= CV_HAL_DFT_REAL_OUTPUT;
-            if (!isLastStage)
+            إذا (!is_وروستی_Stage)
                 f |= CV_HAL_DFT_TWO_STAGE;
 
-            if( stage == 0 ) // row-wise transform
+            إذا( stage == 0 ) // row-wise transform
             {
-                if (width == 1 && !isRowTransform )
+                إذا (پلنوالی == 1 && !is_لیکه_Transform )
                 {
-                    len = height;
-                    count = width;
+                    len = لوړوالی;
+                    شمېر_2 = پلنوالی;
                 }
-                else
+                وإلا
                 {
-                    len = width;
-                    count = height;
+                    len = پلنوالی;
+                    شمېر_2 = لوړوالی;
                 }
-                needBufferA = isInplace;
-                contextA = hal::DFT1D::create(len, count, depth, f, &needBufferA);
-                basicA = dynamic_cast<const OcvDftBasicImpl*>(contextA.get());
-                if (needBufferA)
-                    tmp_bufA.allocate(len * complex_elem_size);
+                need_بفر_A = isInplace;
+                contextA = hal::DFT1D::create(len, شمېر_2, ژوروالی, f, &need_بفر_A);
+                basicA = dynamic_cast<ثابت OcvDftBasicImpl*>(contextA.get());
+                إذا (need_بفر_A)
+                    tmp_bufA.allocate(len * complex_elem_اندازه);
             }
-            else
+            وإلا
             {
-                len = height;
-                count = width;
-                f |= CV_HAL_DFT_STAGE_COLS;
-                needBufferB = isInplace;
-                contextB = hal::DFT1D::create(len, count, depth, f, &needBufferB);
-                basicB = dynamic_cast<const OcvDftBasicImpl*>(contextB.get());
-                if (needBufferB)
-                    tmp_bufB.allocate(len * complex_elem_size);
+                len = لوړوالی;
+                شمېر_2 = پلنوالی;
+                f |= CV_HAL_DFT_STAGE_ستون_شمېر;
+                need_بفر_B = isInplace;
+                contextB = hal::DFT1D::create(len, شمېر_2, ژوروالی, f, &need_بفر_B);
+                basicB = dynamic_cast<ثابت OcvDftBasicImpl*>(contextB.get());
+                إذا (need_بفر_B)
+                    tmp_bufB.allocate(len * complex_elem_اندازه);
 
-                buf0.allocate(len * complex_elem_size);
-                buf1.allocate(len * complex_elem_size);
+                buf0.allocate(len * complex_elem_اندازه);
+                buf1.allocate(len * complex_elem_اندازه);
             }
         }
     }
 
-    void apply(const uchar * src, size_t src_step, uchar * dst, size_t dst_step) CV_OVERRIDE
+    فراغ apply(ثابت uchar * src, size_t src_ګام, uchar * dst, size_t dst_ګام) CV_OVERRIDE
     {
-#if defined USE_IPP_DFT
-        if (useIpp)
+#إذا defined USE_IPP_DFT
+        إذا (useIpp)
         {
-            int ipp_norm_flag = !isScaled ? 8 : inv ? 2 : 1;
-            if (!isRowTransform)
+            صحيح ipp_norm_flag = !isScaled ? 8 : inv ? 2 : 1;
+            إذا (!is_لیکه_Transform)
             {
-                if (mode == FwdComplexToComplex || mode == InvComplexToComplex)
+                إذا (ډېرپېښ == Fwd_Complex_منزل_Complex || ډېرپېښ == Inv_Complex_منزل_Complex)
                 {
-                    if (ippi_DFT_C_32F(src, src_step, dst, dst_step, width, height, inv, ipp_norm_flag))
+                    إذا (ippi_DFT_C_32F(src, src_ګام, dst, dst_ګام, پلنوالی, لوړوالی, inv, ipp_norm_flag))
                     {
-                        CV_IMPL_ADD(CV_IMPL_IPP);
-                        return;
+                        CV_IMPL_جمع_کړه(CV_IMPL_IPP);
+                        أرجع;
                     }
-                    setIppErrorStatus();
+                    سېټ_Ipp_Error_حالت();
                 }
-                else if (mode == FwdRealToCCS || mode == InvCCSToReal)
+                وإلا إذا (ډېرپېښ == Fwd_Real_منزل_CCS || ډېرپېښ == InvCCSToReal)
                 {
-                    if (ippi_DFT_R_32F(src, src_step, dst, dst_step, width, height, inv, ipp_norm_flag))
+                    إذا (ippi_DFT_R_32F(src, src_ګام, dst, dst_ګام, پلنوالی, لوړوالی, inv, ipp_norm_flag))
                     {
-                        CV_IMPL_ADD(CV_IMPL_IPP);
-                        return;
+                        CV_IMPL_جمع_کړه(CV_IMPL_IPP);
+                        أرجع;
                     }
-                    setIppErrorStatus();
+                    سېټ_Ipp_Error_حالت();
                 }
             }
-            else
+            وإلا
             {
-                if (mode == FwdComplexToComplex || mode == InvComplexToComplex)
+                إذا (ډېرپېښ == Fwd_Complex_منزل_Complex || ډېرپېښ == Inv_Complex_منزل_Complex)
                 {
                     ippiDFT_C_Func ippiFunc = inv ? (ippiDFT_C_Func)ippiDFTInv_CToC_32fc_C1R : (ippiDFT_C_Func)ippiDFTFwd_CToC_32fc_C1R;
-                    if (Dft_C_IPPLoop(src, src_step, dst, dst_step, width, height, IPPDFT_C_Functor(ippiFunc),ipp_norm_flag))
+                    إذا (Dft_C_IPPLoop(src, src_ګام, dst, dst_ګام, پلنوالی, لوړوالی, IPPDFT_C_Functor(ippiFunc),ipp_norm_flag))
                     {
-                        CV_IMPL_ADD(CV_IMPL_IPP|CV_IMPL_MT);
-                        return;
+                        CV_IMPL_جمع_کړه(CV_IMPL_IPP|CV_IMPL_MT);
+                        أرجع;
                     }
-                    setIppErrorStatus();
+                    سېټ_Ipp_Error_حالت();
                 }
-                else if (mode == FwdRealToCCS || mode == InvCCSToReal)
+                وإلا إذا (ډېرپېښ == Fwd_Real_منزل_CCS || ډېرپېښ == InvCCSToReal)
                 {
-                    ippiDFT_R_Func ippiFunc = inv ? (ippiDFT_R_Func)ippiDFTInv_PackToR_32f_C1R : (ippiDFT_R_Func)ippiDFTFwd_RToPack_32f_C1R;
-                    if (Dft_R_IPPLoop(src, src_step, dst, dst_step, width, height, IPPDFT_R_Functor(ippiFunc),ipp_norm_flag))
+                    ippiDFT_R_Func ippiFunc = inv ? (ippiDFT_R_Func)ippi_DFTInv_Pack_منزل_R_32f_C1_R : (ippiDFT_R_Func)ippiDFTFwd_RToPack_32f_C1R;
+                    إذا (Dft_R_IPPLoop(src, src_ګام, dst, dst_ګام, پلنوالی, لوړوالی, IPPDFT_R_Functor(ippiFunc),ipp_norm_flag))
                     {
-                        CV_IMPL_ADD(CV_IMPL_IPP|CV_IMPL_MT);
-                        return;
+                        CV_IMPL_جمع_کړه(CV_IMPL_IPP|CV_IMPL_MT);
+                        أرجع;
                     }
-                    setIppErrorStatus();
+                    سېټ_Ipp_Error_حالت();
                 }
             }
-            return;
+            أرجع;
         }
-#endif
+#د_که_پای
 
-        for(uint stageIndex = 0; stageIndex < stages.size(); ++stageIndex)
+        لكل(uint stage_شاخص = 0; stage_شاخص < stages.size(); ++stage_شاخص)
         {
-            int stage_src_channels = src_channels;
-            int stage_dst_channels = dst_channels;
+            صحيح stage_src_channels = src_channels;
+            صحيح stage_dst_channels = dst_channels;
 
-            if (stageIndex == 1)
+            إذا (stage_شاخص == 1)
             {
                 src = dst;
-                src_step = dst_step;
+                src_ګام = dst_ګام;
                 stage_src_channels = stage_dst_channels;
             }
 
-            int stage = stages[stageIndex];
-            bool isLastStage = (stageIndex + 1 == stages.size());
-            bool isComplex = stage_src_channels != stage_dst_channels;
+            صحيح stage = stages[stage_شاخص];
+            منطقي is_وروستی_Stage = (stage_شاخص + 1 == stages.size());
+            منطقي isComplex = stage_src_channels != stage_dst_channels;
 
-            if( stage == 0 )
-                rowDft(src, src_step, dst, dst_step, isComplex, isLastStage);
-            else
-                colDft(src, src_step, dst, dst_step, stage_src_channels, stage_dst_channels, isLastStage);
+            إذا( stage == 0 )
+                لیکه_Dft(src, src_ګام, dst, dst_ګام, isComplex, is_وروستی_Stage);
+            وإلا
+                ستون_Dft(src, src_ګام, dst, dst_ګام, stage_src_channels, stage_dst_channels, is_وروستی_Stage);
         }
     }
 
-protected:
+محمي:
 
-    void rowDft(const uchar* src_data, size_t src_step, uchar* dst_data, size_t dst_step, bool isComplex, bool isLastStage)
+    فراغ لیکه_Dft(ثابت uchar* src_معلومات, size_t src_ګام, uchar* dst_معلومات, size_t dst_ګام, منطقي isComplex, منطقي is_وروستی_Stage)
     {
-        int len, count;
-        if (width == 1 && !isRowTransform )
+        صحيح len, شمېر_2;
+        إذا (پلنوالی == 1 && !is_لیکه_Transform )
         {
-            len = height;
-            count = width;
+            len = لوړوالی;
+            شمېر_2 = پلنوالی;
         }
-        else
+        وإلا
         {
-            len = width;
-            count = height;
+            len = پلنوالی;
+            شمېر_2 = لوړوالی;
         }
-        int dptr_offset = 0;
-        int dst_full_len = len*elem_size;
+        صحيح dptr_دننه_واټن = 0;
+        صحيح dst_ډک_len = len*elem_اندازه_2;
 
-        if( needBufferA )
+        إذا( need_بفر_A )
         {
-            if (mode == FwdRealToCCS && (len & 1) && len > 1)
-                dptr_offset = elem_size;
+            إذا (ډېرپېښ == Fwd_Real_منزل_CCS && (len & 1) && len > 1)
+                dptr_دننه_واټن = elem_اندازه_2;
         }
 
-        if( !inv && isComplex )
-            dst_full_len += (len & 1) ? elem_size : complex_elem_size;
+        إذا( !inv && isComplex )
+            dst_ډک_len += (len & 1) ? elem_اندازه_2 : complex_elem_اندازه;
 
-        int nz = nonzero_rows;
-        if( nz <= 0 || nz > count )
-            nz = count;
+        صحيح nz = nonzero_لیکې;
+        إذا( nz <= 0 || nz > شمېر_2 )
+            nz = شمېر_2;
 
-        size_t ws_size = basicA ? basicA->workspaceSize() : 0;
-        double nstripes = dftParallelStripes(nz, len);
-        if( ws_size > 0 && nz > 1 && nstripes >= 1.5 )
+        size_t ws_اندازه = basicA ? basicA->workspace_اندازه() : 0;
+        مزدوج nstripes = dftParallelStripes(nz, len);
+        إذا( ws_اندازه > 0 && nz > 1 && nstripes >= 1.5 )
         {
             // every worker gets its own workspace (and row buffer) once per range
-            const OcvDftBasicImpl* ctx = basicA;
-            auto processRows = [&, ctx](const Range& range)
+            ثابت OcvDftBasicImpl* ctx = basicA;
+            خپلکاری process_لیکې = [&, ctx](ثابت Range& range)
             {
-                AutoBuffer<uchar> ws(ws_size);
-                AutoBuffer<uchar> rowbuf(needBufferA ? len * complex_elem_size : 0);
-                for( int i = range.start; i < range.end; i++ )
+                Auto_بفر<uchar> ws(ws_اندازه);
+                Auto_بفر<uchar> rowbuf(need_بفر_A ? len * complex_elem_اندازه : 0);
+                لكل( صحيح i = range.پیل; i < range.end; i++ )
                 {
-                    const uchar* sptr = src_data + src_step * i;
-                    uchar* dptr0 = dst_data + dst_step * i;
-                    uchar* dptr = needBufferA ? rowbuf.data() : dptr0;
-                    ctx->applyWithWorkspace(sptr, dptr, ws.data());
-                    if( needBufferA )
-                        memcpy( dptr0, dptr + dptr_offset, dst_full_len );
+                    ثابت uchar* sptr = src_معلومات + src_ګام * i;
+                    uchar* dptr0 = dst_معلومات + dst_ګام * i;
+                    uchar* dptr = need_بفر_A ? rowbuf.معلومات() : dptr0;
+                    ctx->applyWithWorkspace(sptr, dptr, ws.معلومات());
+                    إذا( need_بفر_A )
+                        حافظه_نقل( dptr0, dptr + dptr_دننه_واټن, dst_ډک_len );
                 }
             };
-            parallel_for_(Range(0, nz), processRows, nstripes);
+            parallel_for_(Range(0, nz), process_لیکې, nstripes);
         }
-        else
+        وإلا
         {
-            for( int i = 0; i < nz; i++ )
+            لكل( صحيح i = 0; i < nz; i++ )
             {
-                const uchar* sptr = src_data + src_step * i;
-                uchar* dptr0 = dst_data + dst_step * i;
+                ثابت uchar* sptr = src_معلومات + src_ګام * i;
+                uchar* dptr0 = dst_معلومات + dst_ګام * i;
                 uchar* dptr = dptr0;
 
-                if( needBufferA )
-                    dptr = tmp_bufA.data();
+                إذا( need_بفر_A )
+                    dptr = tmp_bufA.معلومات();
 
                 contextA->apply(sptr, dptr);
 
-                if( needBufferA )
-                    memcpy( dptr0, dptr + dptr_offset, dst_full_len );
+                إذا( need_بفر_A )
+                    حافظه_نقل( dptr0, dptr + dptr_دننه_واټن, dst_ډک_len );
             }
         }
 
-        for( int i = nz; i < count; i++ )
+        لكل( صحيح i = nz; i < شمېر_2; i++ )
         {
-            uchar* dptr0 = dst_data + dst_step * i;
-            memset( dptr0, 0, dst_full_len );
+            uchar* dptr0 = dst_معلومات + dst_ګام * i;
+            memset( dptr0, 0, dst_ډک_len );
         }
-        if(isLastStage &&  mode == FwdRealToComplex)
-            complementComplexOutput(depth, dst_data, dst_step, len, nz, 1);
+        إذا(is_وروستی_Stage &&  ډېرپېښ == Fwd_Real_منزل_Complex)
+            complementComplexOutput(ژوروالی, dst_معلومات, dst_ګام, len, nz, 1);
     }
 
-    void colDft(const uchar* src_data, size_t src_step, uchar* dst_data, size_t dst_step, int stage_src_channels, int stage_dst_channels, bool isLastStage)
+    فراغ ستون_Dft(ثابت uchar* src_معلومات, size_t src_ګام, uchar* dst_معلومات, size_t dst_ګام, صحيح stage_src_channels, صحيح stage_dst_channels, منطقي is_وروستی_Stage)
     {
-        int len = height;
-        int count = width;
-        int a = 0, b = count;
+        صحيح len = لوړوالی;
+        صحيح شمېر_2 = پلنوالی;
+        صحيح a = 0, b = شمېر_2;
         uchar *dbuf0, *dbuf1;
-        const uchar* sptr0 = src_data;
-        uchar* dptr0 = dst_data;
+        ثابت uchar* sptr0 = src_معلومات;
+        uchar* dptr0 = dst_معلومات;
 
-        dbuf0 = buf0.data(), dbuf1 = buf1.data();
+        dbuf0 = buf0.معلومات(), dbuf1 = buf1.معلومات();
 
-        if( needBufferB )
+        إذا( need_بفر_B )
         {
-            dbuf1 = tmp_bufB.data();
-            dbuf0 = buf1.data();
+            dbuf1 = tmp_bufB.معلومات();
+            dbuf0 = buf1.معلومات();
         }
 
-        if( real_transform )
+        إذا( real_transform )
         {
-            int even;
+            صحيح even;
             a = 1;
-            even = (count & 1) == 0;
-            b = (count+1)/2;
-            if( !inv )
+            even = (شمېر_2 & 1) == 0;
+            b = (شمېر_2+1)/2;
+            إذا( !inv )
             {
-                memset( buf0.data(), 0, len*complex_elem_size );
-                CopyColumn( sptr0, src_step, buf0.data(), complex_elem_size, len, elem_size );
-                sptr0 += stage_dst_channels*elem_size;
-                if( even )
+                memset( buf0.معلومات(), 0, len*complex_elem_اندازه );
+                Copy_ستنه( sptr0, src_ګام, buf0.معلومات(), complex_elem_اندازه, len, elem_اندازه_2 );
+                sptr0 += stage_dst_channels*elem_اندازه_2;
+                إذا( even )
                 {
-                    memset( buf1.data(), 0, len*complex_elem_size );
-                    CopyColumn( sptr0 + (count-2)*elem_size, src_step,
-                                buf1.data(), complex_elem_size, len, elem_size );
+                    memset( buf1.معلومات(), 0, len*complex_elem_اندازه );
+                    Copy_ستنه( sptr0 + (شمېر_2-2)*elem_اندازه_2, src_ګام,
+                                buf1.معلومات(), complex_elem_اندازه, len, elem_اندازه_2 );
                 }
             }
-            else if( stage_src_channels == 1 )
+            وإلا إذا( stage_src_channels == 1 )
             {
-                CopyColumn( sptr0, src_step, buf0.data(), elem_size, len, elem_size );
-                ExpandCCS( buf0.data(), len, elem_size );
-                if( even )
+                Copy_ستنه( sptr0, src_ګام, buf0.معلومات(), elem_اندازه_2, len, elem_اندازه_2 );
+                ExpandCCS( buf0.معلومات(), len, elem_اندازه_2 );
+                إذا( even )
                 {
-                    CopyColumn( sptr0 + (count-1)*elem_size, src_step,
-                                buf1.data(), elem_size, len, elem_size );
-                    ExpandCCS( buf1.data(), len, elem_size );
+                    Copy_ستنه( sptr0 + (شمېر_2-1)*elem_اندازه_2, src_ګام,
+                                buf1.معلومات(), elem_اندازه_2, len, elem_اندازه_2 );
+                    ExpandCCS( buf1.معلومات(), len, elem_اندازه_2 );
                 }
-                sptr0 += elem_size;
+                sptr0 += elem_اندازه_2;
             }
-            else
+            وإلا
             {
-                CopyColumn( sptr0, src_step, buf0.data(), complex_elem_size, len, complex_elem_size );
-                if( even )
+                Copy_ستنه( sptr0, src_ګام, buf0.معلومات(), complex_elem_اندازه, len, complex_elem_اندازه );
+                إذا( even )
                 {
-                    CopyColumn( sptr0 + b*complex_elem_size, src_step,
-                                   buf1.data(), complex_elem_size, len, complex_elem_size );
+                    Copy_ستنه( sptr0 + b*complex_elem_اندازه, src_ګام,
+                                   buf1.معلومات(), complex_elem_اندازه, len, complex_elem_اندازه );
                 }
-                sptr0 += complex_elem_size;
+                sptr0 += complex_elem_اندازه;
             }
 
-            if( even )
-                contextB->apply(buf1.data(), dbuf1);
-            contextB->apply(buf0.data(), dbuf0);
+            إذا( even )
+                contextB->apply(buf1.معلومات(), dbuf1);
+            contextB->apply(buf0.معلومات(), dbuf0);
 
-            if( stage_dst_channels == 1 )
+            إذا( stage_dst_channels == 1 )
             {
-                if( !inv )
+                إذا( !inv )
                 {
                     // copy the half of output vector to the first/last column.
                     // before doing that, defgragment the vector
-                    memcpy( dbuf0 + elem_size, dbuf0, elem_size );
-                    CopyColumn( dbuf0 + elem_size, elem_size, dptr0,
-                                   dst_step, len, elem_size );
-                    if( even )
+                    حافظه_نقل( dbuf0 + elem_اندازه_2, dbuf0, elem_اندازه_2 );
+                    Copy_ستنه( dbuf0 + elem_اندازه_2, elem_اندازه_2, dptr0,
+                                   dst_ګام, len, elem_اندازه_2 );
+                    إذا( even )
                     {
-                        memcpy( dbuf1 + elem_size, dbuf1, elem_size );
-                        CopyColumn( dbuf1 + elem_size, elem_size,
-                                       dptr0 + (count-1)*elem_size,
-                                       dst_step, len, elem_size );
+                        حافظه_نقل( dbuf1 + elem_اندازه_2, dbuf1, elem_اندازه_2 );
+                        Copy_ستنه( dbuf1 + elem_اندازه_2, elem_اندازه_2,
+                                       dptr0 + (شمېر_2-1)*elem_اندازه_2,
+                                       dst_ګام, len, elem_اندازه_2 );
                     }
-                    dptr0 += elem_size;
+                    dptr0 += elem_اندازه_2;
                 }
-                else
+                وإلا
                 {
                     // copy the real part of the complex vector to the first/last column
-                    CopyColumn( dbuf0, complex_elem_size, dptr0, dst_step, len, elem_size );
-                    if( even )
-                        CopyColumn( dbuf1, complex_elem_size, dptr0 + (count-1)*elem_size,
-                                       dst_step, len, elem_size );
-                    dptr0 += elem_size;
+                    Copy_ستنه( dbuf0, complex_elem_اندازه, dptr0, dst_ګام, len, elem_اندازه_2 );
+                    إذا( even )
+                        Copy_ستنه( dbuf1, complex_elem_اندازه, dptr0 + (شمېر_2-1)*elem_اندازه_2,
+                                       dst_ګام, len, elem_اندازه_2 );
+                    dptr0 += elem_اندازه_2;
                 }
             }
-            else
+            وإلا
             {
                 CV_Assert( !inv );
-                CopyColumn( dbuf0, complex_elem_size, dptr0,
-                               dst_step, len, complex_elem_size );
-                if( even )
-                    CopyColumn( dbuf1, complex_elem_size,
-                                   dptr0 + b*complex_elem_size,
-                                   dst_step, len, complex_elem_size );
-                dptr0 += complex_elem_size;
+                Copy_ستنه( dbuf0, complex_elem_اندازه, dptr0,
+                               dst_ګام, len, complex_elem_اندازه );
+                إذا( even )
+                    Copy_ستنه( dbuf1, complex_elem_اندازه,
+                                   dptr0 + b*complex_elem_اندازه,
+                                   dst_ګام, len, complex_elem_اندازه );
+                dptr0 += complex_elem_اندازه;
             }
         }
 
         // the remaining columns are processed in batches of cols_batch columns: copied row-wise into
         // contiguous per-column buffers, transformed one by one, copied back row-wise
-        int ncols = b - a;
-        const int cols_batch = dftColsBatch(len, complex_elem_size);
-        int nbatches = (ncols + cols_batch - 1)/cols_batch;
-        size_t ws_size = basicB ? basicB->workspaceSize() : 0;
-        size_t colbuf_size = (size_t)len*complex_elem_size;
-        const OcvDftBasicImpl* ctx = basicB;
-        auto processBatches = [&, ctx](const Range& range)
+        صحيح ncols = b - a;
+        ثابت صحيح ستون_شمېر_batch = dft_ستون_شمېر_Batch(len, complex_elem_اندازه);
+        صحيح nbatches = (ncols + ستون_شمېر_batch - 1)/ستون_شمېر_batch;
+        size_t ws_اندازه = basicB ? basicB->workspace_اندازه() : 0;
+        size_t colbuf_اندازه = (size_t)len*complex_elem_اندازه;
+        ثابت OcvDftBasicImpl* ctx = basicB;
+        خپلکاری processBatches = [&, ctx](ثابت Range& range)
         {
-            AutoBuffer<uchar> ws(ws_size);
-            AutoBuffer<uchar> cbuf(colbuf_size*cols_batch*(needBufferB ? 2 : 1));
-            uchar* cbuf0 = cbuf.data();
-            uchar* cdbuf0 = needBufferB ? cbuf0 + colbuf_size*cols_batch : cbuf0;
-            for( int bi = range.start; bi < range.end; bi++ )
+            Auto_بفر<uchar> ws(ws_اندازه);
+            Auto_بفر<uchar> cbuf(colbuf_اندازه*ستون_شمېر_batch*(need_بفر_B ? 2 : 1));
+            uchar* cbuf0 = cbuf.معلومات();
+            uchar* cdbuf0 = need_بفر_B ? cbuf0 + colbuf_اندازه*ستون_شمېر_batch : cbuf0;
+            لكل( صحيح bi = range.پیل; bi < range.end; bi++ )
             {
-                int c0 = bi*cols_batch;
-                int nc = std::min(cols_batch, ncols - c0);
-                const uchar* sptr = sptr0 + (size_t)c0*complex_elem_size;
-                uchar* dptr = dptr0 + (size_t)c0*complex_elem_size;
-                CopyFromColumns( sptr, src_step, cbuf0, nc, len, complex_elem_size );
-                for( int k = 0; k < nc; k++ )
+                صحيح c0 = bi*ستون_شمېر_batch;
+                صحيح nc = std::min(ستون_شمېر_batch, ncols - c0);
+                ثابت uchar* sptr = sptr0 + (size_t)c0*complex_elem_اندازه;
+                uchar* dptr = dptr0 + (size_t)c0*complex_elem_اندازه;
+                CopyFromColumns( sptr, src_ګام, cbuf0, nc, len, complex_elem_اندازه );
+                لكل( صحيح k = 0; k < nc; k++ )
                 {
-                    if( ctx )
-                        ctx->applyWithWorkspace(cbuf0 + k*colbuf_size, cdbuf0 + k*colbuf_size, ws.data());
-                    else
-                        contextB->apply(cbuf0 + k*colbuf_size, cdbuf0 + k*colbuf_size);
+                    إذا( ctx )
+                        ctx->applyWithWorkspace(cbuf0 + k*colbuf_اندازه, cdbuf0 + k*colbuf_اندازه, ws.معلومات());
+                    وإلا
+                        contextB->apply(cbuf0 + k*colbuf_اندازه, cdbuf0 + k*colbuf_اندازه);
                 }
-                CopyToColumns( cdbuf0, dptr, dst_step, nc, len, complex_elem_size );
+                Copy_منزل_Columns( cdbuf0, dptr, dst_ګام, nc, len, complex_elem_اندازه );
             }
         };
-        double nstripes = dftParallelStripes(ncols, len);
-        if( ctx && nbatches > 1 && nstripes >= 1.5 )
+        مزدوج nstripes = dftParallelStripes(ncols, len);
+        إذا( ctx && nbatches > 1 && nstripes >= 1.5 )
             parallel_for_(Range(0, nbatches), processBatches, nstripes);
-        else
+        وإلا
             processBatches(Range(0, nbatches));
-        if(isLastStage && mode == FwdRealToComplex)
-            complementComplexOutput(depth, dst_data, dst_step, count, len, 2);
+        إذا(is_وروستی_Stage && ډېرپېښ == Fwd_Real_منزل_Complex)
+            complementComplexOutput(ژوروالی, dst_معلومات, dst_ګام, شمېر_2, len, 2);
     }
 };
 
-struct ReplacementDFT1D : public hal::DFT1D
+بنية ReplacementDFT1D : عام hal::DFT1D
 {
     cvhalDFT *context;
-    bool isInitialized;
+    منطقي isInitialized;
 
-    ReplacementDFT1D() : context(0), isInitialized(false) {}
-    bool init(int len, int count, int depth, int flags, bool *needBuffer)
+    ReplacementDFT1D() : context(0), isInitialized(خطأ) {}
+    منطقي init(صحيح len, صحيح شمېر_2, صحيح ژوروالی, صحيح flags, منطقي *need_بفر)
     {
-        int res = cv_hal_dftInit1D(&context, len, count, depth, flags, needBuffer);
+        صحيح res = cv_hal_dftInit1D(&context, len, شمېر_2, ژوروالی, flags, need_بفر);
         isInitialized = (res == CV_HAL_ERROR_OK);
-        return isInitialized;
+        أرجع isInitialized;
     }
-    void apply(const uchar *src, uchar *dst) CV_OVERRIDE
+    فراغ apply(ثابت uchar *src, uchar *dst) CV_OVERRIDE
     {
-        if (isInitialized)
+        إذا (isInitialized)
         {
             CALL_HAL(dft1D, cv_hal_dft1D, context, src, dst);
         }
     }
     ~ReplacementDFT1D()
     {
-        if (isInitialized)
+        إذا (isInitialized)
         {
             CALL_HAL(dftFree1D, cv_hal_dftFree1D, context);
         }
     }
 };
 
-struct ReplacementDFT2D : public hal::DFT2D
+بنية ReplacementDFT2D : عام hal::DFT2D
 {
     cvhalDFT *context;
-    bool isInitialized;
+    منطقي isInitialized;
 
-    ReplacementDFT2D() : context(0), isInitialized(false) {}
-    bool init(int width, int height, int depth,
-              int src_channels, int dst_channels,
-              int flags, int nonzero_rows)
+    ReplacementDFT2D() : context(0), isInitialized(خطأ) {}
+    منطقي init(صحيح پلنوالی, صحيح لوړوالی, صحيح ژوروالی,
+              صحيح src_channels, صحيح dst_channels,
+              صحيح flags, صحيح nonzero_لیکې)
     {
-        int res = cv_hal_dftInit2D(&context, width, height, depth, src_channels, dst_channels, flags, nonzero_rows);
+        صحيح res = cv_hal_dftInit2D(&context, پلنوالی, لوړوالی, ژوروالی, src_channels, dst_channels, flags, nonzero_لیکې);
         isInitialized = (res == CV_HAL_ERROR_OK);
-        return isInitialized;
+        أرجع isInitialized;
     }
-    void apply(const uchar *src, size_t src_step, uchar *dst, size_t dst_step) CV_OVERRIDE
+    فراغ apply(ثابت uchar *src, size_t src_ګام, uchar *dst, size_t dst_ګام) CV_OVERRIDE
     {
-        if (isInitialized)
+        إذا (isInitialized)
         {
-            CALL_HAL(dft2D, cv_hal_dft2D, context, src, src_step, dst, dst_step);
+            CALL_HAL(dft2D, cv_hal_dft2D, context, src, src_ګام, dst, dst_ګام);
         }
     }
     ~ReplacementDFT2D()
     {
-        if (isInitialized)
+        إذا (isInitialized)
         {
             CALL_HAL(dftFree2D, cv_hal_dftFree1D, context);
         }
     }
 };
 
-namespace hal {
+نطاق hal {
 
 //================== 1D ======================
 
-Ptr<DFT1D> DFT1D::create(int len, int count, int depth, int flags, bool *needBuffer)
+Ptr<DFT1D> DFT1D::create(صحيح len, صحيح شمېر_2, صحيح ژوروالی, صحيح flags, منطقي *need_بفر)
 {
     {
-        ReplacementDFT1D *impl = new ReplacementDFT1D();
-        if (impl->init(len, count, depth, flags, needBuffer))
+        ReplacementDFT1D *impl = جديد ReplacementDFT1D();
+        إذا (impl->init(len, شمېر_2, ژوروالی, flags, need_بفر))
         {
-            return Ptr<DFT1D>(impl);
+            أرجع Ptr<DFT1D>(impl);
         }
-        delete impl;
+        ړنګول impl;
     }
     {
-        OcvDftBasicImpl *impl = new OcvDftBasicImpl();
-        impl->init(len, count, depth, flags, needBuffer);
-        return Ptr<DFT1D>(impl);
+        OcvDftBasicImpl *impl = جديد OcvDftBasicImpl();
+        impl->init(len, شمېر_2, ژوروالی, flags, need_بفر);
+        أرجع Ptr<DFT1D>(impl);
     }
 }
 
 //================== 2D ======================
 
-Ptr<DFT2D> DFT2D::create(int width, int height, int depth,
-                         int src_channels, int dst_channels,
-                         int flags, int nonzero_rows)
+Ptr<DFT2D> DFT2D::create(صحيح پلنوالی, صحيح لوړوالی, صحيح ژوروالی,
+                         صحيح src_channels, صحيح dst_channels,
+                         صحيح flags, صحيح nonzero_لیکې)
 {
     {
-        ReplacementDFT2D *impl = new ReplacementDFT2D();
-        if (impl->init(width, height, depth, src_channels, dst_channels, flags, nonzero_rows))
+        ReplacementDFT2D *impl = جديد ReplacementDFT2D();
+        إذا (impl->init(پلنوالی, لوړوالی, ژوروالی, src_channels, dst_channels, flags, nonzero_لیکې))
         {
-            return Ptr<DFT2D>(impl);
+            أرجع Ptr<DFT2D>(impl);
         }
-        delete impl;
+        ړنګول impl;
     }
     {
-        if(width == 1 && nonzero_rows > 0 )
+        إذا(پلنوالی == 1 && nonzero_لیکې > 0 )
         {
             CV_Error( cv::Error::StsNotImplemented,
             "This mode (using nonzero_rows with a single-column matrix) breaks the function's logic, so it is prohibited.\n"
             "For fast convolution/correlation use 2-column matrix or single-row matrix instead" );
         }
-        OcvDftImpl *impl = new OcvDftImpl();
-        impl->init(width, height, depth, src_channels, dst_channels, flags, nonzero_rows);
-        return Ptr<DFT2D>(impl);
+        OcvDftImpl *impl = جديد OcvDftImpl();
+        impl->init(پلنوالی, لوړوالی, ژوروالی, src_channels, dst_channels, flags, nonzero_لیکې);
+        أرجع Ptr<DFT2D>(impl);
     }
 }
 
@@ -2798,488 +2798,488 @@ Ptr<DFT2D> DFT2D::create(int width, int height, int depth,
 } // cv::
 
 
-void cv::dft( InputArray _src0, OutputArray _dst, int flags, int nonzero_rows )
+فراغ cv::dft( ننوت_Array _src0, OutputArray _dst, صحيح flags, صحيح nonzero_لیکې )
 {
     CV_INSTRUMENT_REGION();
 
-#ifdef HAVE_CLAMDFFT
-    CV_OCL_RUN(ocl::haveAmdFft() && ocl::Device::getDefault().type() != ocl::Device::TYPE_CPU &&
-            _dst.isUMat() && _src0.dims() <= 2 && nonzero_rows == 0,
+#که_تعریف_شوی HAVE_CLAMDFFT
+    CV_OCL_پرلپسې(ocl::haveAmdFft() && ocl::Device::getDefault().type() != ocl::Device::TYPE_CPU &&
+            _dst.isUMat() && _src0.dims() <= 2 && nonzero_لیکې == 0,
                ocl_dft_amdfft(_src0, _dst, flags))
-#endif
+#د_که_پای
 
-#ifdef HAVE_OPENCL
-    CV_OCL_RUN(_dst.isUMat() && _src0.dims() <= 2,
-               ocl_dft(_src0, _dst, flags, nonzero_rows))
-#endif
+#که_تعریف_شوی HAVE_OPENCL
+    CV_OCL_پرلپسې(_dst.isUMat() && _src0.dims() <= 2,
+               ocl_dft(_src0, _dst, flags, nonzero_لیکې))
+#د_که_پای
 
     Mat src0 = _src0.getMat(), src = src0;
-    if (src.empty())
+    إذا (src.empty())
     {
         _dst.release();
-        return;
+        أرجع;
     }
-    bool inv = (flags & DFT_INVERSE) != 0;
-    int type = src.type();
-    int depth = src.depth();
+    منطقي inv = (flags & DFT_INVERSE) != 0;
+    صحيح type = src.type();
+    صحيح ژوروالی = src.ژوروالی();
 
     CV_Assert( type == CV_32FC1 || type == CV_32FC2 || type == CV_64FC1 || type == CV_64FC2 );
 
     // Fail if DFT_COMPLEX_INPUT is specified, but src is not 2 channels.
-    CV_Assert( !((flags & DFT_COMPLEX_INPUT) && src.channels() != 2) );
+    CV_Assert( !((flags & DFT_COMPLEX_ننوت) && src.channels() != 2) );
 
-    if( !inv && src.channels() == 1 && (flags & DFT_COMPLEX_OUTPUT) )
-        _dst.createSameSize( src, CV_MAKETYPE(depth, 2) );
-    else if( inv && src.channels() == 2 && (flags & DFT_REAL_OUTPUT) )
-        _dst.createSameSize( src, depth );
-    else
-        _dst.createSameSize( src, type );
+    إذا( !inv && src.channels() == 1 && (flags & DFT_COMPLEX_OUTPUT) )
+        _dst.create_Same_اندازه( src, CV_MAKETYPE(ژوروالی, 2) );
+    وإلا إذا( inv && src.channels() == 2 && (flags & DFT_REAL_OUTPUT) )
+        _dst.create_Same_اندازه( src, ژوروالی );
+    وإلا
+        _dst.create_Same_اندازه( src, type );
 
     Mat dst = _dst.getMat();
 
-    int f = 0;
-    if (src.isContinuous() && dst.isContinuous())
+    صحيح f = 0;
+    إذا (src.isContinuous() && dst.isContinuous())
         f |= CV_HAL_DFT_IS_CONTINUOUS;
-    if (inv)
+    إذا (inv)
         f |= CV_HAL_DFT_INVERSE;
-    if (flags & DFT_ROWS)
-        f |= CV_HAL_DFT_ROWS;
-    if (flags & DFT_SCALE)
+    إذا (flags & DFT_لیکې)
+        f |= CV_HAL_DFT_لیکې;
+    إذا (flags & DFT_SCALE)
         f |= CV_HAL_DFT_SCALE;
-    if (src.data == dst.data)
+    إذا (src.معلومات == dst.معلومات)
         f |= CV_HAL_DFT_IS_INPLACE;
-    Ptr<hal::DFT2D> c = hal::DFT2D::create(src.cols, src.rows, depth, src.channels(), dst.channels(), f, nonzero_rows);
-    c->apply(src.data, src.step, dst.data, dst.step);
+    Ptr<hal::DFT2D> c = hal::DFT2D::create(src.ستون_شمېر, src.لیکې, ژوروالی, src.channels(), dst.channels(), f, nonzero_لیکې);
+    c->apply(src.معلومات, src.ګام, dst.معلومات, dst.ګام);
 }
 
 
-void cv::idft( InputArray src, OutputArray dst, int flags, int nonzero_rows )
+فراغ cv::idft( ننوت_Array src, OutputArray dst, صحيح flags, صحيح nonzero_لیکې )
 {
     CV_INSTRUMENT_REGION();
 
-    dft( src, dst, flags | DFT_INVERSE, nonzero_rows );
+    dft( src, dst, flags | DFT_INVERSE, nonzero_لیکې );
 }
 
-#ifdef HAVE_OPENCL
+#که_تعریف_شوی HAVE_OPENCL
 
-namespace cv {
+نطاق cv {
 
-static bool ocl_mulSpectrums( InputArray _srcA, InputArray _srcB,
-                              OutputArray _dst, int flags, bool conjB )
+ساكن منطقي ocl_mulSpectrums( ننوت_Array _srcA, ننوت_Array _srcB,
+                              OutputArray _dst, صحيح flags, منطقي conjB )
 {
-    int atype = _srcA.type(), btype = _srcB.type(),
-            rowsPerWI = ocl::Device::getDefault().isIntel() ? 4 : 1;
-    Size asize = _srcA.size(), bsize = _srcB.size();
+    صحيح atype = _srcA.type(), btype = _srcB.type(),
+            لیکې_فی_WI = ocl::Device::getDefault().isIntel() ? 4 : 1;
+    اندازه asize = _srcA.size(), bsize = _srcB.size();
     CV_Assert(asize == bsize);
 
-    if ( !(atype == CV_32FC2 && btype == CV_32FC2) || flags != 0 )
-        return false;
+    إذا ( !(atype == CV_32FC2 && btype == CV_32FC2) || flags != 0 )
+        أرجع خطأ;
 
     UMat A = _srcA.getUMat(), B = _srcB.getUMat();
     CV_Assert(A.size() == B.size());
 
-    _dst.createSameSize(A, atype);
+    _dst.create_Same_اندازه(A, atype);
     UMat dst = _dst.getUMat();
 
     ocl::Kernel k("mulAndScaleSpectrums",
                   ocl::core::mulspectrums_oclsrc,
                   format("%s", conjB ? "-D CONJ" : ""));
-    if (k.empty())
-        return false;
+    إذا (k.empty())
+        أرجع خطأ;
 
-    k.args(ocl::KernelArg::ReadOnlyNoSize(A), ocl::KernelArg::ReadOnlyNoSize(B),
-           ocl::KernelArg::WriteOnly(dst), rowsPerWI);
+    k.دلیلونه(ocl::KernelArg::Read_Only_No_اندازه(A), ocl::KernelArg::Read_Only_No_اندازه(B),
+           ocl::KernelArg::WriteOnly(dst), لیکې_فی_WI);
 
-    size_t globalsize[2] = { (size_t)asize.width, ((size_t)asize.height + rowsPerWI - 1) / rowsPerWI };
-    return k.run(2, globalsize, NULL, false);
+    size_t globalsize[2] = { (size_t)asize.پلنوالی, ((size_t)asize.لوړوالی + لیکې_فی_WI - 1) / لیکې_فی_WI };
+    أرجع k.پرلپسې(2, globalsize, عدم, خطأ);
 }
 
 }
 
-#endif
+#د_که_پای
 
-namespace {
+نطاق {
 
-#define VAL(buf, elem) (((T*)((char*)data ## buf + (step ## buf * (elem))))[0])
-#define MUL_SPECTRUMS_COL(A, B, C) \
+#تعریف_کړه VAL(buf, elem) (((T*)((حرف*)معلومات ## buf + (ګام ## buf * (elem))))[0])
+#تعریف_کړه MUL_SPECTRUMS_ستون(A, B, C) \
     VAL(C, 0) = VAL(A, 0) * VAL(B, 0); \
-    for (size_t j = 1; j <= rows - 2; j += 2) \
+    لكل (size_t j = 1; j <= لیکې - 2; j += 2) \
     { \
-        double a_re = VAL(A, j), a_im = VAL(A, j + 1); \
-        double b_re = VAL(B, j), b_im = VAL(B, j + 1); \
-        if (conjB) b_im = -b_im; \
-        double c_re = a_re * b_re - a_im * b_im; \
-        double c_im = a_re * b_im + a_im * b_re; \
+        مزدوج a_re = VAL(A, j), a_im = VAL(A, j + 1); \
+        مزدوج b_re = VAL(B, j), b_im = VAL(B, j + 1); \
+        إذا (conjB) b_im = -b_im; \
+        مزدوج c_re = a_re * b_re - a_im * b_im; \
+        مزدوج c_im = a_re * b_im + a_im * b_re; \
         VAL(C, j) = (T)c_re; VAL(C, j + 1) = (T)c_im; \
     } \
-    if ((rows & 1) == 0) \
-        VAL(C, rows-1) = VAL(A, rows-1) * VAL(B, rows-1)
+    إذا ((لیکې & 1) == 0) \
+        VAL(C, لیکې-1) = VAL(A, لیکې-1) * VAL(B, لیکې-1)
 
-template <typename T, bool conjB> static inline
-void mulSpectrums_processCol_noinplace(const T* dataA, const T* dataB, T* dataC, size_t stepA, size_t stepB, size_t stepC, size_t rows)
+کينډۍ <ډول_نوم T, منطقي conjB> ساكن مضمن
+فراغ mul_Spectrums_process_ستون_noinplace(ثابت T* معلومات_A, ثابت T* معلومات_B, T* معلومات_C, size_t ګام_A, size_t ګام_B, size_t ګام_C, size_t لیکې)
 {
-    MUL_SPECTRUMS_COL(A, B, C);
+    MUL_SPECTRUMS_ستون(A, B, C);
 }
 
-template <typename T, bool conjB> static inline
-void mulSpectrums_processCol_inplaceA(const T* dataB, T* dataAC, size_t stepB, size_t stepAC, size_t rows)
+کينډۍ <ډول_نوم T, منطقي conjB> ساكن مضمن
+فراغ mul_Spectrums_process_ستون_inplace_A(ثابت T* معلومات_B, T* معلومات_AC, size_t ګام_B, size_t ګام_AC, size_t لیکې)
 {
-    MUL_SPECTRUMS_COL(AC, B, AC);
+    MUL_SPECTRUMS_ستون(AC, B, AC);
 }
-template <typename T, bool conjB, bool inplaceA> static inline
-void mulSpectrums_processCol(const T* dataA, const T* dataB, T* dataC, size_t stepA, size_t stepB, size_t stepC, size_t rows)
+کينډۍ <ډول_نوم T, منطقي conjB, منطقي inplaceA> ساكن مضمن
+فراغ mul_Spectrums_process_ستون(ثابت T* معلومات_A, ثابت T* معلومات_B, T* معلومات_C, size_t ګام_A, size_t ګام_B, size_t ګام_C, size_t لیکې)
 {
-    if (inplaceA)
-        mulSpectrums_processCol_inplaceA<T, conjB>(dataB, dataC, stepB, stepC, rows);
-    else
-        mulSpectrums_processCol_noinplace<T, conjB>(dataA, dataB, dataC, stepA, stepB, stepC, rows);
+    إذا (inplaceA)
+        mul_Spectrums_process_ستون_inplace_A<T, conjB>(معلومات_B, معلومات_C, ګام_B, ګام_C, لیکې);
+    وإلا
+        mul_Spectrums_process_ستون_noinplace<T, conjB>(معلومات_A, معلومات_B, معلومات_C, ګام_A, ګام_B, ګام_C, لیکې);
 }
-#undef MUL_SPECTRUMS_COL
-#undef VAL
+#تعریف_لغوه MUL_SPECTRUMS_ستون
+#تعریف_لغوه VAL
 
-template <typename T, bool conjB, bool inplaceA> static inline
-void mulSpectrums_processCols(const T* dataA, const T* dataB, T* dataC, size_t stepA, size_t stepB, size_t stepC, size_t rows, size_t cols)
+کينډۍ <ډول_نوم T, منطقي conjB, منطقي inplaceA> ساكن مضمن
+فراغ mul_Spectrums_process_ستون_شمېر(ثابت T* معلومات_A, ثابت T* معلومات_B, T* معلومات_C, size_t ګام_A, size_t ګام_B, size_t ګام_C, size_t لیکې, size_t ستون_شمېر)
 {
-    mulSpectrums_processCol<T, conjB, inplaceA>(dataA, dataB, dataC, stepA, stepB, stepC, rows);
-    if ((cols & 1) == 0)
+    mul_Spectrums_process_ستون<T, conjB, inplaceA>(معلومات_A, معلومات_B, معلومات_C, ګام_A, ګام_B, ګام_C, لیکې);
+    إذا ((ستون_شمېر & 1) == 0)
     {
-        mulSpectrums_processCol<T, conjB, inplaceA>(dataA + cols - 1, dataB + cols - 1, dataC + cols - 1, stepA, stepB, stepC, rows);
+        mul_Spectrums_process_ستون<T, conjB, inplaceA>(معلومات_A + ستون_شمېر - 1, معلومات_B + ستون_شمېر - 1, معلومات_C + ستون_شمېر - 1, ګام_A, ګام_B, ګام_C, لیکې);
     }
 }
 
-#define VAL(buf, elem) (data ## buf[(elem)])
-#define MUL_SPECTRUMS_ROW(A, B, C) \
-    for (size_t j = j0; j < j1; j += 2) \
+#تعریف_کړه VAL(buf, elem) (معلومات ## buf[(elem)])
+#تعریف_کړه MUL_SPECTRUMS_لیکه(A, B, C) \
+    لكل (size_t j = j0; j < j1; j += 2) \
     { \
-        double a_re = VAL(A, j), a_im = VAL(A, j + 1); \
-        double b_re = VAL(B, j), b_im = VAL(B, j + 1); \
-        if (conjB) b_im = -b_im; \
-        double c_re = a_re * b_re - a_im * b_im; \
-        double c_im = a_re * b_im + a_im * b_re; \
+        مزدوج a_re = VAL(A, j), a_im = VAL(A, j + 1); \
+        مزدوج b_re = VAL(B, j), b_im = VAL(B, j + 1); \
+        إذا (conjB) b_im = -b_im; \
+        مزدوج c_re = a_re * b_re - a_im * b_im; \
+        مزدوج c_im = a_re * b_im + a_im * b_re; \
         VAL(C, j) = (T)c_re; VAL(C, j + 1) = (T)c_im; \
     }
-template <typename T, bool conjB> static inline
-void mulSpectrums_processRow_noinplace(const T* dataA, const T* dataB, T* dataC, size_t j0, size_t j1)
+کينډۍ <ډول_نوم T, منطقي conjB> ساكن مضمن
+فراغ mul_Spectrums_process_لیکه_noinplace(ثابت T* معلومات_A, ثابت T* معلومات_B, T* معلومات_C, size_t j0, size_t j1)
 {
-    MUL_SPECTRUMS_ROW(A, B, C);
+    MUL_SPECTRUMS_لیکه(A, B, C);
 }
-template <typename T, bool conjB> static inline
-void mulSpectrums_processRow_inplaceA(const T* dataB, T* dataAC, size_t j0, size_t j1)
+کينډۍ <ډول_نوم T, منطقي conjB> ساكن مضمن
+فراغ mul_Spectrums_process_لیکه_inplace_A(ثابت T* معلومات_B, T* معلومات_AC, size_t j0, size_t j1)
 {
-    MUL_SPECTRUMS_ROW(AC, B, AC);
+    MUL_SPECTRUMS_لیکه(AC, B, AC);
 }
-template <typename T, bool conjB, bool inplaceA> static inline
-void mulSpectrums_processRow(const T* dataA, const T* dataB, T* dataC, size_t j0, size_t j1)
+کينډۍ <ډول_نوم T, منطقي conjB, منطقي inplaceA> ساكن مضمن
+فراغ mul_Spectrums_process_لیکه(ثابت T* معلومات_A, ثابت T* معلومات_B, T* معلومات_C, size_t j0, size_t j1)
 {
-    if (inplaceA)
-        mulSpectrums_processRow_inplaceA<T, conjB>(dataB, dataC, j0, j1);
-    else
-        mulSpectrums_processRow_noinplace<T, conjB>(dataA, dataB, dataC, j0, j1);
+    إذا (inplaceA)
+        mul_Spectrums_process_لیکه_inplace_A<T, conjB>(معلومات_B, معلومات_C, j0, j1);
+    وإلا
+        mul_Spectrums_process_لیکه_noinplace<T, conjB>(معلومات_A, معلومات_B, معلومات_C, j0, j1);
 }
-#undef MUL_SPECTRUMS_ROW
-#undef VAL
+#تعریف_لغوه MUL_SPECTRUMS_لیکه
+#تعریف_لغوه VAL
 
-template <typename T, bool conjB, bool inplaceA> static inline
-void mulSpectrums_processRows(const T* dataA, const T* dataB, T* dataC, size_t stepA, size_t stepB, size_t stepC, size_t rows, size_t cols, size_t j0, size_t j1, bool is_1d_CN1)
+کينډۍ <ډول_نوم T, منطقي conjB, منطقي inplaceA> ساكن مضمن
+فراغ mul_Spectrums_process_لیکې(ثابت T* معلومات_A, ثابت T* معلومات_B, T* معلومات_C, size_t ګام_A, size_t ګام_B, size_t ګام_C, size_t لیکې, size_t ستون_شمېر, size_t j0, size_t j1, منطقي is_1d_CN1)
 {
-    while (rows-- > 0)
+    طالما (لیکې-- > 0)
     {
-        if (is_1d_CN1)
-            dataC[0] = dataA[0]*dataB[0];
-        mulSpectrums_processRow<T, conjB, inplaceA>(dataA, dataB, dataC, j0, j1);
-        if (is_1d_CN1 && (cols & 1) == 0)
-            dataC[j1] = dataA[j1]*dataB[j1];
+        إذا (is_1d_CN1)
+            معلومات_C[0] = معلومات_A[0]*معلومات_B[0];
+        mul_Spectrums_process_لیکه<T, conjB, inplaceA>(معلومات_A, معلومات_B, معلومات_C, j0, j1);
+        إذا (is_1d_CN1 && (ستون_شمېر & 1) == 0)
+            معلومات_C[j1] = معلومات_A[j1]*معلومات_B[j1];
 
-        dataA = (const T*)(((char*)dataA) + stepA);
-        dataB = (const T*)(((char*)dataB) + stepB);
-        dataC =       (T*)(((char*)dataC) + stepC);
+        معلومات_A = (ثابت T*)(((حرف*)معلومات_A) + ګام_A);
+        معلومات_B = (ثابت T*)(((حرف*)معلومات_B) + ګام_B);
+        معلومات_C =       (T*)(((حرف*)معلومات_C) + ګام_C);
     }
 }
 
 
-template <typename T, bool conjB, bool inplaceA> static inline
-void mulSpectrums_Impl_(const T* dataA, const T* dataB, T* dataC, size_t stepA, size_t stepB, size_t stepC, size_t rows, size_t cols, size_t j0, size_t j1, bool is_1d, bool isCN1)
+کينډۍ <ډول_نوم T, منطقي conjB, منطقي inplaceA> ساكن مضمن
+فراغ mulSpectrums_Impl_(ثابت T* معلومات_A, ثابت T* معلومات_B, T* معلومات_C, size_t ګام_A, size_t ګام_B, size_t ګام_C, size_t لیکې, size_t ستون_شمېر, size_t j0, size_t j1, منطقي is_1d, منطقي isCN1)
 {
-    if (!is_1d && isCN1)
+    إذا (!is_1d && isCN1)
     {
-        mulSpectrums_processCols<T, conjB, inplaceA>(dataA, dataB, dataC, stepA, stepB, stepC, rows, cols);
+        mul_Spectrums_process_ستون_شمېر<T, conjB, inplaceA>(معلومات_A, معلومات_B, معلومات_C, ګام_A, ګام_B, ګام_C, لیکې, ستون_شمېر);
     }
-    mulSpectrums_processRows<T, conjB, inplaceA>(dataA, dataB, dataC, stepA, stepB, stepC, rows, cols, j0, j1, is_1d && isCN1);
+    mul_Spectrums_process_لیکې<T, conjB, inplaceA>(معلومات_A, معلومات_B, معلومات_C, ګام_A, ګام_B, ګام_C, لیکې, ستون_شمېر, j0, j1, is_1d && isCN1);
 }
-template <typename T, bool conjB> static inline
-void mulSpectrums_Impl(const T* dataA, const T* dataB, T* dataC, size_t stepA, size_t stepB, size_t stepC, size_t rows, size_t cols, size_t j0, size_t j1, bool is_1d, bool isCN1)
+کينډۍ <ډول_نوم T, منطقي conjB> ساكن مضمن
+فراغ mulSpectrums_Impl(ثابت T* معلومات_A, ثابت T* معلومات_B, T* معلومات_C, size_t ګام_A, size_t ګام_B, size_t ګام_C, size_t لیکې, size_t ستون_شمېر, size_t j0, size_t j1, منطقي is_1d, منطقي isCN1)
 {
-    if (dataA == dataC)
-        mulSpectrums_Impl_<T, conjB, true>(dataA, dataB, dataC, stepA, stepB, stepC, rows, cols, j0, j1, is_1d, isCN1);
-    else
-        mulSpectrums_Impl_<T, conjB, false>(dataA, dataB, dataC, stepA, stepB, stepC, rows, cols, j0, j1, is_1d, isCN1);
+    إذا (معلومات_A == معلومات_C)
+        mulSpectrums_Impl_<T, conjB, ریښتیا>(معلومات_A, معلومات_B, معلومات_C, ګام_A, ګام_B, ګام_C, لیکې, ستون_شمېر, j0, j1, is_1d, isCN1);
+    وإلا
+        mulSpectrums_Impl_<T, conjB, خطأ>(معلومات_A, معلومات_B, معلومات_C, ګام_A, ګام_B, ګام_C, لیکې, ستون_شمېر, j0, j1, is_1d, isCN1);
 }
 
 } // namespace
 
-void cv::mulSpectrums( InputArray _srcA, InputArray _srcB,
-                       OutputArray _dst, int flags, bool conjB )
+فراغ cv::mulSpectrums( ننوت_Array _srcA, ننوت_Array _srcB,
+                       OutputArray _dst, صحيح flags, منطقي conjB )
 {
     CV_INSTRUMENT_REGION();
 
-    if (_srcA.empty() && _srcB.empty())
+    إذا (_srcA.empty() && _srcB.empty())
     {
         _dst.release();
-        return;
+        أرجع;
     }
 
-    int type = _srcA.type();
+    صحيح type = _srcA.type();
     CV_Assert( type == _srcB.type() && _srcA.size() == _srcB.size() );
     CV_Assert( type == CV_32FC1 || type == CV_32FC2 || type == CV_64FC1 || type == CV_64FC2 );
     CV_Assert( !_srcA.empty() && !_srcB.empty() );
 
-    CV_OCL_RUN(_dst.isUMat() && _srcA.dims() <= 2 && _srcB.dims() <= 2,
+    CV_OCL_پرلپسې(_dst.isUMat() && _srcA.dims() <= 2 && _srcB.dims() <= 2,
             ocl_mulSpectrums(_srcA, _srcB, _dst, flags, conjB))
 
     Mat srcA = _srcA.getMat(), srcB = _srcB.getMat();
-    int depth = srcA.depth(), cn = srcA.channels();
-    size_t rows = srcA.rows, cols = srcA.cols;
+    صحيح ژوروالی = srcA.ژوروالی(), cn = srcA.channels();
+    size_t لیکې = srcA.لیکې, ستون_شمېر = srcA.ستون_شمېر;
 
-    _dst.create( srcA.rows, srcA.cols, type );
+    _dst.create( srcA.لیکې, srcA.ستون_شمېر, type );
     Mat dst = _dst.getMat();
 
     // correct inplace support
     // Case 'dst.data == srcA.data' is handled by implementation,
     // because it is used frequently (filter2D, matchTemplate)
-    if (dst.data == srcB.data)
+    إذا (dst.معلومات == srcB.معلومات)
         srcB = srcB.clone(); // workaround for B only
 
-    bool is_1d = (flags & DFT_ROWS)
-        || (rows == 1)
-        || (cols == 1 && srcA.isContinuous() && srcB.isContinuous() && dst.isContinuous());
+    منطقي is_1d = (flags & DFT_لیکې)
+        || (لیکې == 1)
+        || (ستون_شمېر == 1 && srcA.isContinuous() && srcB.isContinuous() && dst.isContinuous());
 
-    if( is_1d && !(flags & DFT_ROWS) )
-        cols = cols + rows - 1, rows = 1;
+    إذا( is_1d && !(flags & DFT_لیکې) )
+        ستون_شمېر = ستون_شمېر + لیکې - 1, لیکې = 1;
 
-    bool isCN1 = cn == 1;
+    منطقي isCN1 = cn == 1;
     size_t j0 = isCN1 ? 1 : 0;
-    size_t j1 = cols*cn - (((cols & 1) == 0 && cn == 1) ? 1 : 0);
+    size_t j1 = ستون_شمېر*cn - (((ستون_شمېر & 1) == 0 && cn == 1) ? 1 : 0);
 
-    if (depth == CV_32F)
+    إذا (ژوروالی == CV_32F)
     {
-        const float* dataA = srcA.ptr<float>();
-        const float* dataB = srcB.ptr<float>();
-        float* dataC = dst.ptr<float>();
-        if (!conjB)
-            mulSpectrums_Impl<float, false>(dataA, dataB, dataC, srcA.step, srcB.step, dst.step, rows, cols, j0, j1, is_1d, isCN1);
-        else
-            mulSpectrums_Impl<float, true>(dataA, dataB, dataC, srcA.step, srcB.step, dst.step, rows, cols, j0, j1, is_1d, isCN1);
+        ثابت عائم* معلومات_A = srcA.ptr<عائم>();
+        ثابت عائم* معلومات_B = srcB.ptr<عائم>();
+        عائم* معلومات_C = dst.ptr<عائم>();
+        إذا (!conjB)
+            mulSpectrums_Impl<عائم, خطأ>(معلومات_A, معلومات_B, معلومات_C, srcA.ګام, srcB.ګام, dst.ګام, لیکې, ستون_شمېر, j0, j1, is_1d, isCN1);
+        وإلا
+            mulSpectrums_Impl<عائم, ریښتیا>(معلومات_A, معلومات_B, معلومات_C, srcA.ګام, srcB.ګام, dst.ګام, لیکې, ستون_شمېر, j0, j1, is_1d, isCN1);
     }
-    else
+    وإلا
     {
-        const double* dataA = srcA.ptr<double>();
-        const double* dataB = srcB.ptr<double>();
-        double* dataC = dst.ptr<double>();
-        if (!conjB)
-            mulSpectrums_Impl<double, false>(dataA, dataB, dataC, srcA.step, srcB.step, dst.step, rows, cols, j0, j1, is_1d, isCN1);
-        else
-            mulSpectrums_Impl<double, true>(dataA, dataB, dataC, srcA.step, srcB.step, dst.step, rows, cols, j0, j1, is_1d, isCN1);
+        ثابت مزدوج* معلومات_A = srcA.ptr<مزدوج>();
+        ثابت مزدوج* معلومات_B = srcB.ptr<مزدوج>();
+        مزدوج* معلومات_C = dst.ptr<مزدوج>();
+        إذا (!conjB)
+            mulSpectrums_Impl<مزدوج, خطأ>(معلومات_A, معلومات_B, معلومات_C, srcA.ګام, srcB.ګام, dst.ګام, لیکې, ستون_شمېر, j0, j1, is_1d, isCN1);
+        وإلا
+            mulSpectrums_Impl<مزدوج, ریښتیا>(معلومات_A, معلومات_B, معلومات_C, srcA.ګام, srcB.ګام, dst.ګام, لیکې, ستون_شمېر, j0, j1, is_1d, isCN1);
     }
 }
 
-void cv::divSpectrums( InputArray _srcA, InputArray _srcB, OutputArray _dst, int flags, bool conjB)
+فراغ cv::divSpectrums( ننوت_Array _srcA, ننوت_Array _srcB, OutputArray _dst, صحيح flags, منطقي conjB)
 {
     Mat srcA = _srcA.getMat(), srcB = _srcB.getMat();
-    if (srcA.empty() && srcB.empty())
+    إذا (srcA.empty() && srcB.empty())
     {
         _dst.release();
-        return;
+        أرجع;
     }
-    int depth = srcA.depth(), cn = srcA.channels(), type = srcA.type();
-    int rows = srcA.rows, cols = srcA.cols;
-    int j, k;
+    صحيح ژوروالی = srcA.ژوروالی(), cn = srcA.channels(), type = srcA.type();
+    صحيح لیکې = srcA.لیکې, ستون_شمېر = srcA.ستون_شمېر;
+    صحيح j, k;
 
     CV_Assert( type == srcB.type() && srcA.size() == srcB.size() );
     CV_Assert( type == CV_32FC1 || type == CV_32FC2 || type == CV_64FC1 || type == CV_64FC2 );
     CV_Assert( !srcA.empty() && !srcB.empty() );
 
-    _dst.create( srcA.rows, srcA.cols, type );
+    _dst.create( srcA.لیکې, srcA.ستون_شمېر, type );
     Mat dst = _dst.getMat();
 
-    CV_Assert(dst.data != srcA.data); // non-inplace check
-    CV_Assert(dst.data != srcB.data); // non-inplace check
+    CV_Assert(dst.معلومات != srcA.معلومات); // non-inplace check
+    CV_Assert(dst.معلومات != srcB.معلومات); // non-inplace check
 
-    bool is_1d = (flags & DFT_ROWS) || (rows == 1 || (cols == 1 &&
+    منطقي is_1d = (flags & DFT_لیکې) || (لیکې == 1 || (ستون_شمېر == 1 &&
     srcA.isContinuous() && srcB.isContinuous() && dst.isContinuous()));
 
-    if( is_1d && !(flags & DFT_ROWS) )
-        cols = cols + rows - 1, rows = 1;
+    إذا( is_1d && !(flags & DFT_لیکې) )
+        ستون_شمېر = ستون_شمېر + لیکې - 1, لیکې = 1;
 
-    int ncols = cols*cn;
-    int j0 = cn == 1;
-    int j1 = ncols - (cols % 2 == 0 && cn == 1);
+    صحيح ncols = ستون_شمېر*cn;
+    صحيح j0 = cn == 1;
+    صحيح j1 = ncols - (ستون_شمېر % 2 == 0 && cn == 1);
 
-    if( depth == CV_32F )
+    إذا( ژوروالی == CV_32F )
     {
-        const float* dataA = srcA.ptr<float>();
-        const float* dataB = srcB.ptr<float>();
-        float* dataC = dst.ptr<float>();
-        float eps = FLT_EPSILON; // prevent div0 problems
+        ثابت عائم* معلومات_A = srcA.ptr<عائم>();
+        ثابت عائم* معلومات_B = srcB.ptr<عائم>();
+        عائم* معلومات_C = dst.ptr<عائم>();
+        عائم eps = FLT_EPSILON; // prevent div0 problems
 
-        size_t stepA = srcA.step/sizeof(dataA[0]);
-        size_t stepB = srcB.step/sizeof(dataB[0]);
-        size_t stepC = dst.step/sizeof(dataC[0]);
+        size_t ګام_A = srcA.ګام/حجم(معلومات_A[0]);
+        size_t ګام_B = srcB.ګام/حجم(معلومات_B[0]);
+        size_t ګام_C = dst.ګام/حجم(معلومات_C[0]);
 
-        if( !is_1d && cn == 1 )
+        إذا( !is_1d && cn == 1 )
         {
-            for( k = 0; k < (cols % 2 ? 1 : 2); k++ )
+            لكل( k = 0; k < (ستون_شمېر % 2 ? 1 : 2); k++ )
             {
-                if( k == 1 )
-                    dataA += cols - 1, dataB += cols - 1, dataC += cols - 1;
-                dataC[0] = dataA[0] / (dataB[0] + eps);
-                if( rows % 2 == 0 )
-                    dataC[(rows-1)*stepC] = dataA[(rows-1)*stepA] / (dataB[(rows-1)*stepB] + eps);
-                if( !conjB )
-                    for( j = 1; j <= rows - 2; j += 2 )
+                إذا( k == 1 )
+                    معلومات_A += ستون_شمېر - 1, معلومات_B += ستون_شمېر - 1, معلومات_C += ستون_شمېر - 1;
+                معلومات_C[0] = معلومات_A[0] / (معلومات_B[0] + eps);
+                إذا( لیکې % 2 == 0 )
+                    معلومات_C[(لیکې-1)*ګام_C] = معلومات_A[(لیکې-1)*ګام_A] / (معلومات_B[(لیکې-1)*ګام_B] + eps);
+                إذا( !conjB )
+                    لكل( j = 1; j <= لیکې - 2; j += 2 )
                     {
-                        double denom = (double)dataB[j*stepB]*dataB[j*stepB] +
-                        (double)dataB[(j+1)*stepB]*dataB[(j+1)*stepB] + (double)eps;
+                        مزدوج denom = (مزدوج)معلومات_B[j*ګام_B]*معلومات_B[j*ګام_B] +
+                        (مزدوج)معلومات_B[(j+1)*ګام_B]*معلومات_B[(j+1)*ګام_B] + (مزدوج)eps;
 
-                        double re = (double)dataA[j*stepA]*dataB[j*stepB] +
-                        (double)dataA[(j+1)*stepA]*dataB[(j+1)*stepB];
+                        مزدوج re = (مزدوج)معلومات_A[j*ګام_A]*معلومات_B[j*ګام_B] +
+                        (مزدوج)معلومات_A[(j+1)*ګام_A]*معلومات_B[(j+1)*ګام_B];
 
-                        double im = (double)dataA[(j+1)*stepA]*dataB[j*stepB] -
-                        (double)dataA[j*stepA]*dataB[(j+1)*stepB];
+                        مزدوج im = (مزدوج)معلومات_A[(j+1)*ګام_A]*معلومات_B[j*ګام_B] -
+                        (مزدوج)معلومات_A[j*ګام_A]*معلومات_B[(j+1)*ګام_B];
 
-                        dataC[j*stepC] = (float)(re / denom);
-                        dataC[(j+1)*stepC] = (float)(im / denom);
+                        معلومات_C[j*ګام_C] = (عائم)(re / denom);
+                        معلومات_C[(j+1)*ګام_C] = (عائم)(im / denom);
                     }
-                    else
-                        for( j = 1; j <= rows - 2; j += 2 )
+                    وإلا
+                        لكل( j = 1; j <= لیکې - 2; j += 2 )
                         {
 
-                            double denom = (double)dataB[j*stepB]*dataB[j*stepB] +
-                            (double)dataB[(j+1)*stepB]*dataB[(j+1)*stepB] + (double)eps;
+                            مزدوج denom = (مزدوج)معلومات_B[j*ګام_B]*معلومات_B[j*ګام_B] +
+                            (مزدوج)معلومات_B[(j+1)*ګام_B]*معلومات_B[(j+1)*ګام_B] + (مزدوج)eps;
 
-                            double re = (double)dataA[j*stepA]*dataB[j*stepB] -
-                            (double)dataA[(j+1)*stepA]*dataB[(j+1)*stepB];
+                            مزدوج re = (مزدوج)معلومات_A[j*ګام_A]*معلومات_B[j*ګام_B] -
+                            (مزدوج)معلومات_A[(j+1)*ګام_A]*معلومات_B[(j+1)*ګام_B];
 
-                            double im = (double)dataA[(j+1)*stepA]*dataB[j*stepB] +
-                            (double)dataA[j*stepA]*dataB[(j+1)*stepB];
+                            مزدوج im = (مزدوج)معلومات_A[(j+1)*ګام_A]*معلومات_B[j*ګام_B] +
+                            (مزدوج)معلومات_A[j*ګام_A]*معلومات_B[(j+1)*ګام_B];
 
-                            dataC[j*stepC] = (float)(re / denom);
-                            dataC[(j+1)*stepC] = (float)(im / denom);
+                            معلومات_C[j*ګام_C] = (عائم)(re / denom);
+                            معلومات_C[(j+1)*ګام_C] = (عائم)(im / denom);
                         }
-                    if( k == 1 )
-                        dataA -= cols - 1, dataB -= cols - 1, dataC -= cols - 1;
+                    إذا( k == 1 )
+                        معلومات_A -= ستون_شمېر - 1, معلومات_B -= ستون_شمېر - 1, معلومات_C -= ستون_شمېر - 1;
             }
         }
 
-        for( ; rows--; dataA += stepA, dataB += stepB, dataC += stepC )
+        لكل( ; لیکې--; معلومات_A += ګام_A, معلومات_B += ګام_B, معلومات_C += ګام_C )
         {
-            if( is_1d && cn == 1 )
+            إذا( is_1d && cn == 1 )
             {
-                dataC[0] = dataA[0] / (dataB[0] + eps);
-                if( cols % 2 == 0 )
-                    dataC[j1] = dataA[j1] / (dataB[j1] + eps);
+                معلومات_C[0] = معلومات_A[0] / (معلومات_B[0] + eps);
+                إذا( ستون_شمېر % 2 == 0 )
+                    معلومات_C[j1] = معلومات_A[j1] / (معلومات_B[j1] + eps);
             }
 
-            if( !conjB )
-                for( j = j0; j < j1; j += 2 )
+            إذا( !conjB )
+                لكل( j = j0; j < j1; j += 2 )
                 {
-                    double denom = (double)dataB[j]*dataB[j] + (double)dataB[j+1]*dataB[j+1] + (double)eps;
-                    double re = (double)dataA[j]*dataB[j] + (double)dataA[j+1]*dataB[j+1];
-                    double im = (double)dataA[j+1]*dataB[j] - (double)dataA[j]*dataB[j+1];
-                    dataC[j] = (float)(re / denom);
-                    dataC[j+1] = (float)(im / denom);
+                    مزدوج denom = (مزدوج)معلومات_B[j]*معلومات_B[j] + (مزدوج)معلومات_B[j+1]*معلومات_B[j+1] + (مزدوج)eps;
+                    مزدوج re = (مزدوج)معلومات_A[j]*معلومات_B[j] + (مزدوج)معلومات_A[j+1]*معلومات_B[j+1];
+                    مزدوج im = (مزدوج)معلومات_A[j+1]*معلومات_B[j] - (مزدوج)معلومات_A[j]*معلومات_B[j+1];
+                    معلومات_C[j] = (عائم)(re / denom);
+                    معلومات_C[j+1] = (عائم)(im / denom);
                 }
-                else
-                    for( j = j0; j < j1; j += 2 )
+                وإلا
+                    لكل( j = j0; j < j1; j += 2 )
                     {
-                        double denom = (double)dataB[j]*dataB[j] + (double)dataB[j+1]*dataB[j+1] + (double)eps;
-                        double re = (double)dataA[j]*dataB[j] - (double)dataA[j+1]*dataB[j+1];
-                        double im = (double)dataA[j+1]*dataB[j] + (double)dataA[j]*dataB[j+1];
-                        dataC[j] = (float)(re / denom);
-                        dataC[j+1] = (float)(im / denom);
+                        مزدوج denom = (مزدوج)معلومات_B[j]*معلومات_B[j] + (مزدوج)معلومات_B[j+1]*معلومات_B[j+1] + (مزدوج)eps;
+                        مزدوج re = (مزدوج)معلومات_A[j]*معلومات_B[j] - (مزدوج)معلومات_A[j+1]*معلومات_B[j+1];
+                        مزدوج im = (مزدوج)معلومات_A[j+1]*معلومات_B[j] + (مزدوج)معلومات_A[j]*معلومات_B[j+1];
+                        معلومات_C[j] = (عائم)(re / denom);
+                        معلومات_C[j+1] = (عائم)(im / denom);
                     }
         }
     }
-    else
+    وإلا
     {
-        const double* dataA = srcA.ptr<double>();
-        const double* dataB = srcB.ptr<double>();
-        double* dataC = dst.ptr<double>();
-        double eps = DBL_EPSILON; // prevent div0 problems
+        ثابت مزدوج* معلومات_A = srcA.ptr<مزدوج>();
+        ثابت مزدوج* معلومات_B = srcB.ptr<مزدوج>();
+        مزدوج* معلومات_C = dst.ptr<مزدوج>();
+        مزدوج eps = DBL_EPSILON; // prevent div0 problems
 
-        size_t stepA = srcA.step/sizeof(dataA[0]);
-        size_t stepB = srcB.step/sizeof(dataB[0]);
-        size_t stepC = dst.step/sizeof(dataC[0]);
+        size_t ګام_A = srcA.ګام/حجم(معلومات_A[0]);
+        size_t ګام_B = srcB.ګام/حجم(معلومات_B[0]);
+        size_t ګام_C = dst.ګام/حجم(معلومات_C[0]);
 
-        if( !is_1d && cn == 1 )
+        إذا( !is_1d && cn == 1 )
         {
-            for( k = 0; k < (cols % 2 ? 1 : 2); k++ )
+            لكل( k = 0; k < (ستون_شمېر % 2 ? 1 : 2); k++ )
             {
-                if( k == 1 )
-                    dataA += cols - 1, dataB += cols - 1, dataC += cols - 1;
-                dataC[0] = dataA[0] / (dataB[0] + eps);
-                if( rows % 2 == 0 )
-                    dataC[(rows-1)*stepC] = dataA[(rows-1)*stepA] / (dataB[(rows-1)*stepB] + eps);
-                if( !conjB )
-                    for( j = 1; j <= rows - 2; j += 2 )
+                إذا( k == 1 )
+                    معلومات_A += ستون_شمېر - 1, معلومات_B += ستون_شمېر - 1, معلومات_C += ستون_شمېر - 1;
+                معلومات_C[0] = معلومات_A[0] / (معلومات_B[0] + eps);
+                إذا( لیکې % 2 == 0 )
+                    معلومات_C[(لیکې-1)*ګام_C] = معلومات_A[(لیکې-1)*ګام_A] / (معلومات_B[(لیکې-1)*ګام_B] + eps);
+                إذا( !conjB )
+                    لكل( j = 1; j <= لیکې - 2; j += 2 )
                     {
-                        double denom = dataB[j*stepB]*dataB[j*stepB] +
-                        dataB[(j+1)*stepB]*dataB[(j+1)*stepB] + eps;
+                        مزدوج denom = معلومات_B[j*ګام_B]*معلومات_B[j*ګام_B] +
+                        معلومات_B[(j+1)*ګام_B]*معلومات_B[(j+1)*ګام_B] + eps;
 
-                        double re = dataA[j*stepA]*dataB[j*stepB] +
-                        dataA[(j+1)*stepA]*dataB[(j+1)*stepB];
+                        مزدوج re = معلومات_A[j*ګام_A]*معلومات_B[j*ګام_B] +
+                        معلومات_A[(j+1)*ګام_A]*معلومات_B[(j+1)*ګام_B];
 
-                        double im = dataA[(j+1)*stepA]*dataB[j*stepB] -
-                        dataA[j*stepA]*dataB[(j+1)*stepB];
+                        مزدوج im = معلومات_A[(j+1)*ګام_A]*معلومات_B[j*ګام_B] -
+                        معلومات_A[j*ګام_A]*معلومات_B[(j+1)*ګام_B];
 
-                        dataC[j*stepC] = re / denom;
-                        dataC[(j+1)*stepC] = im / denom;
+                        معلومات_C[j*ګام_C] = re / denom;
+                        معلومات_C[(j+1)*ګام_C] = im / denom;
                     }
-                    else
-                        for( j = 1; j <= rows - 2; j += 2 )
+                    وإلا
+                        لكل( j = 1; j <= لیکې - 2; j += 2 )
                         {
-                            double denom = dataB[j*stepB]*dataB[j*stepB] +
-                            dataB[(j+1)*stepB]*dataB[(j+1)*stepB] + eps;
+                            مزدوج denom = معلومات_B[j*ګام_B]*معلومات_B[j*ګام_B] +
+                            معلومات_B[(j+1)*ګام_B]*معلومات_B[(j+1)*ګام_B] + eps;
 
-                            double re = dataA[j*stepA]*dataB[j*stepB] -
-                            dataA[(j+1)*stepA]*dataB[(j+1)*stepB];
+                            مزدوج re = معلومات_A[j*ګام_A]*معلومات_B[j*ګام_B] -
+                            معلومات_A[(j+1)*ګام_A]*معلومات_B[(j+1)*ګام_B];
 
-                            double im = dataA[(j+1)*stepA]*dataB[j*stepB] +
-                            dataA[j*stepA]*dataB[(j+1)*stepB];
+                            مزدوج im = معلومات_A[(j+1)*ګام_A]*معلومات_B[j*ګام_B] +
+                            معلومات_A[j*ګام_A]*معلومات_B[(j+1)*ګام_B];
 
-                            dataC[j*stepC] = re / denom;
-                            dataC[(j+1)*stepC] = im / denom;
+                            معلومات_C[j*ګام_C] = re / denom;
+                            معلومات_C[(j+1)*ګام_C] = im / denom;
                         }
-                    if( k == 1 )
-                        dataA -= cols - 1, dataB -= cols - 1, dataC -= cols - 1;
+                    إذا( k == 1 )
+                        معلومات_A -= ستون_شمېر - 1, معلومات_B -= ستون_شمېر - 1, معلومات_C -= ستون_شمېر - 1;
             }
         }
 
-        for( ; rows--; dataA += stepA, dataB += stepB, dataC += stepC )
+        لكل( ; لیکې--; معلومات_A += ګام_A, معلومات_B += ګام_B, معلومات_C += ګام_C )
         {
-            if( is_1d && cn == 1 )
+            إذا( is_1d && cn == 1 )
             {
-                dataC[0] = dataA[0] / (dataB[0] + eps);
-                if( cols % 2 == 0 )
-                    dataC[j1] = dataA[j1] / (dataB[j1] + eps);
+                معلومات_C[0] = معلومات_A[0] / (معلومات_B[0] + eps);
+                إذا( ستون_شمېر % 2 == 0 )
+                    معلومات_C[j1] = معلومات_A[j1] / (معلومات_B[j1] + eps);
             }
 
-            if( !conjB )
-                for( j = j0; j < j1; j += 2 )
+            إذا( !conjB )
+                لكل( j = j0; j < j1; j += 2 )
                 {
-                    double denom = dataB[j]*dataB[j] + dataB[j+1]*dataB[j+1] + eps;
-                    double re = dataA[j]*dataB[j] + dataA[j+1]*dataB[j+1];
-                    double im = dataA[j+1]*dataB[j] - dataA[j]*dataB[j+1];
-                    dataC[j] = re / denom;
-                    dataC[j+1] = im / denom;
+                    مزدوج denom = معلومات_B[j]*معلومات_B[j] + معلومات_B[j+1]*معلومات_B[j+1] + eps;
+                    مزدوج re = معلومات_A[j]*معلومات_B[j] + معلومات_A[j+1]*معلومات_B[j+1];
+                    مزدوج im = معلومات_A[j+1]*معلومات_B[j] - معلومات_A[j]*معلومات_B[j+1];
+                    معلومات_C[j] = re / denom;
+                    معلومات_C[j+1] = im / denom;
                 }
-                else
-                    for( j = j0; j < j1; j += 2 )
+                وإلا
+                    لكل( j = j0; j < j1; j += 2 )
                     {
-                        double denom = dataB[j]*dataB[j] + dataB[j+1]*dataB[j+1] + eps;
-                        double re = dataA[j]*dataB[j] - dataA[j+1]*dataB[j+1];
-                        double im = dataA[j+1]*dataB[j] + dataA[j]*dataB[j+1];
-                        dataC[j] = re / denom;
-                        dataC[j+1] = im / denom;
+                        مزدوج denom = معلومات_B[j]*معلومات_B[j] + معلومات_B[j+1]*معلومات_B[j+1] + eps;
+                        مزدوج re = معلومات_A[j]*معلومات_B[j] - معلومات_A[j+1]*معلومات_B[j+1];
+                        مزدوج im = معلومات_A[j+1]*معلومات_B[j] + معلومات_A[j]*معلومات_B[j+1];
+                        معلومات_C[j] = re / denom;
+                        معلومات_C[j+1] = im / denom;
                     }
         }
     }
@@ -3289,7 +3289,7 @@ void cv::divSpectrums( InputArray _srcA, InputArray _srcB, OutputArray _dst, int
                                Discrete Cosine Transform
 \****************************************************************************************/
 
-namespace cv
+نطاق cv
 {
 
 /* DCT is calculated using DFT, as described here:
@@ -3297,561 +3297,561 @@ namespace cv
 */
 // DCT-II / DCT-III through the new engine (plan kinds DFT_KIND_DCT / DFT_KIND_IDCT).
 // src_step / dst_step are in bytes.
-template<typename T> static void
-DCT( const OcvDftOptions & c, const T* src, size_t src_step, T* dst, size_t dst_step )
+کينډۍ<ډول_نوم T> ساكن فراغ
+DCT( ثابت OcvDftOptions & c, ثابت T* src, size_t src_ګام, T* dst, size_t dst_ګام )
 {
-    if( c.n == 1 )
+    إذا( c.n == 1 )
     {
         dst[0] = src[0];
-        return;
+        أرجع;
     }
-    runDft(c, src, src_step/sizeof(T), dst, dst_step/sizeof(T), false);
+    پرلپسې_Dft(c, src, src_ګام/حجم(T), dst, dst_ګام/حجم(T), خطأ);
 }
 
-template<typename T> static void
-IDCT( const OcvDftOptions & c, const T* src, size_t src_step, T* dst, size_t dst_step )
+کينډۍ<ډول_نوم T> ساكن فراغ
+IDCT( ثابت OcvDftOptions & c, ثابت T* src, size_t src_ګام, T* dst, size_t dst_ګام )
 {
-    if( c.n == 1 )
+    إذا( c.n == 1 )
     {
         dst[0] = src[0];
-        return;
+        أرجع;
     }
-    runDft(c, src, src_step/sizeof(T), dst, dst_step/sizeof(T), false);
+    پرلپسې_Dft(c, src, src_ګام/حجم(T), dst, dst_ګام/حجم(T), خطأ);
 }
 
-typedef void (*DCTFunc)(const OcvDftOptions & c, const void* src, size_t src_step,
-                        void* dst, size_t dst_step);
+تعريفنوع فراغ (*DCTFunc)(ثابت OcvDftOptions & c, ثابت فراغ* src, size_t src_ګام,
+                        فراغ* dst, size_t dst_ګام);
 
-template<typename T, void (*fn)(const OcvDftOptions&, const T*, size_t, T*, size_t)>
-static void dctWrap(const OcvDftOptions & c, const void* src, size_t src_step, void* dst, size_t dst_step)
+کينډۍ<ډول_نوم T, فراغ (*fn)(ثابت OcvDftOptions&, ثابت T*, size_t, T*, size_t)>
+ساكن فراغ dctWrap(ثابت OcvDftOptions & c, ثابت فراغ* src, size_t src_ګام, فراغ* dst, size_t dst_ګام)
 {
-    fn(c, (const T*)src, src_step, (T*)dst, dst_step);
+    fn(c, (ثابت T*)src, src_ګام, (T*)dst, dst_ګام);
 }
 
 }
 
-#ifdef HAVE_IPP
-namespace cv
+#که_تعریف_شوی HAVE_IPP
+نطاق cv
 {
 
-#if IPP_VERSION_X100 >= 900
-typedef IppStatus (CV_STDCALL * ippiDCTFunc)(const Ipp32f* pSrc, int srcStep, Ipp32f* pDst, int dstStep, const void* pDCTSpec, Ipp8u* pBuffer);
-typedef IppStatus (CV_STDCALL * ippiDCTInit)(void* pDCTSpec, IppiSize roiSize, Ipp8u* pMemInit );
-typedef IppStatus (CV_STDCALL * ippiDCTGetSize)(IppiSize roiSize, int* pSizeSpec, int* pSizeInit, int* pSizeBuf);
+#إذا IPP_نسخه_X100 >= 900
+تعريفنوع Ipp_حالت (CV_STDCALL * ippiDCTFunc)(ثابت Ipp32f* pSrc, صحيح src_ګام_3, Ipp32f* pDst, صحيح dst_ګام_3, ثابت فراغ* pDCTSpec, Ipp8u* p_بفر);
+تعريفنوع Ipp_حالت (CV_STDCALL * ippiDCTInit)(فراغ* pDCTSpec, Ippi_اندازه roi_اندازه, Ipp8u* pMemInit );
+تعريفنوع Ipp_حالت (CV_STDCALL * ippi_DCTGet_اندازه)(Ippi_اندازه roi_اندازه, صحيح* p_اندازه_Spec, صحيح* p_اندازه_Init, صحيح* p_اندازه_Buf);
 
-template<typename SpecType, IppStatus (CV_STDCALL *fn)(const Ipp32f*, int, Ipp32f*, int, const SpecType*, Ipp8u*)>
-static IppStatus CV_STDCALL ippiDCTWrap(const Ipp32f* pSrc, int srcStep, Ipp32f* pDst, int dstStep, const void* pDCTSpec, Ipp8u* pBuffer)
+کينډۍ<ډول_نوم SpecType, Ipp_حالت (CV_STDCALL *fn)(ثابت Ipp32f*, صحيح, Ipp32f*, صحيح, ثابت SpecType*, Ipp8u*)>
+ساكن Ipp_حالت CV_STDCALL ippiDCTWrap(ثابت Ipp32f* pSrc, صحيح src_ګام_3, Ipp32f* pDst, صحيح dst_ګام_3, ثابت فراغ* pDCTSpec, Ipp8u* p_بفر)
 {
-    return fn(pSrc, srcStep, pDst, dstStep, (const SpecType*)pDCTSpec, pBuffer);
+    أرجع fn(pSrc, src_ګام_3, pDst, dst_ګام_3, (ثابت SpecType*)pDCTSpec, p_بفر);
 }
 
-template<typename SpecType, IppStatus (CV_STDCALL *fn)(SpecType*, IppiSize, Ipp8u*)>
-static IppStatus CV_STDCALL ippiDCTInitWrap(void* pDCTSpec, IppiSize roiSize, Ipp8u* pMemInit)
+کينډۍ<ډول_نوم SpecType, Ipp_حالت (CV_STDCALL *fn)(SpecType*, Ippi_اندازه, Ipp8u*)>
+ساكن Ipp_حالت CV_STDCALL ippiDCTInitWrap(فراغ* pDCTSpec, Ippi_اندازه roi_اندازه, Ipp8u* pMemInit)
 {
-    return fn((SpecType*)pDCTSpec, roiSize, pMemInit);
+    أرجع fn((SpecType*)pDCTSpec, roi_اندازه, pMemInit);
 }
 
-template<IppStatus (CV_STDCALL *fn)(IppiSize, int*, int*, int*)>
-static IppStatus CV_STDCALL ippiDCTGetSizeWrap(IppiSize roiSize, int* pSizeSpec, int* pSizeInit, int* pSizeBuf)
+کينډۍ<Ipp_حالت (CV_STDCALL *fn)(Ippi_اندازه, صحيح*, صحيح*, صحيح*)>
+ساكن Ipp_حالت CV_STDCALL ippi_DCTGet_اندازه_Wrap(Ippi_اندازه roi_اندازه, صحيح* p_اندازه_Spec, صحيح* p_اندازه_Init, صحيح* p_اندازه_Buf)
 {
-    return fn(roiSize, pSizeSpec, pSizeInit, pSizeBuf);
+    أرجع fn(roi_اندازه, p_اندازه_Spec, p_اندازه_Init, p_اندازه_Buf);
 }
 
-#elif IPP_VERSION_X100 >= 700
-typedef IppStatus (CV_STDCALL * ippiDCTFunc)(const Ipp32f*, int, Ipp32f*, int, const void*, Ipp8u*);
-typedef IppStatus (CV_STDCALL * ippiDCTInitAlloc)(void**, IppiSize, IppHintAlgorithm);
-typedef IppStatus (CV_STDCALL * ippiDCTFree)(void* pDCTSpec);
-typedef IppStatus (CV_STDCALL * ippiDCTGetBufSize)(const void*, int*);
+#وإلاإذا IPP_نسخه_X100 >= 700
+تعريفنوع Ipp_حالت (CV_STDCALL * ippiDCTFunc)(ثابت Ipp32f*, صحيح, Ipp32f*, صحيح, ثابت فراغ*, Ipp8u*);
+تعريفنوع Ipp_حالت (CV_STDCALL * ippiDCTInitAlloc)(فراغ**, Ippi_اندازه, IppHintAlgorithm);
+تعريفنوع Ipp_حالت (CV_STDCALL * ippiDCTFree)(فراغ* pDCTSpec);
+تعريفنوع Ipp_حالت (CV_STDCALL * ippi_DCTGet_Buf_اندازه)(ثابت فراغ*, صحيح*);
 
-template<typename SpecType, IppStatus (CV_STDCALL *fn)(const Ipp32f*, int, Ipp32f*, int, const SpecType*, Ipp8u*)>
-static IppStatus CV_STDCALL ippiDCTWrap(const Ipp32f* pSrc, int srcStep, Ipp32f* pDst, int dstStep, const void* pDCTSpec, Ipp8u* pBuffer)
+کينډۍ<ډول_نوم SpecType, Ipp_حالت (CV_STDCALL *fn)(ثابت Ipp32f*, صحيح, Ipp32f*, صحيح, ثابت SpecType*, Ipp8u*)>
+ساكن Ipp_حالت CV_STDCALL ippiDCTWrap(ثابت Ipp32f* pSrc, صحيح src_ګام_3, Ipp32f* pDst, صحيح dst_ګام_3, ثابت فراغ* pDCTSpec, Ipp8u* p_بفر)
 {
-    return fn(pSrc, srcStep, pDst, dstStep, (const SpecType*)pDCTSpec, pBuffer);
+    أرجع fn(pSrc, src_ګام_3, pDst, dst_ګام_3, (ثابت SpecType*)pDCTSpec, p_بفر);
 }
 
-template<typename SpecType, IppStatus (CV_STDCALL *fn)(SpecType**, IppiSize, IppHintAlgorithm)>
-static IppStatus CV_STDCALL ippiDCTInitAllocWrap(void** pDCTSpec, IppiSize roiSize, IppHintAlgorithm hint)
+کينډۍ<ډول_نوم SpecType, Ipp_حالت (CV_STDCALL *fn)(SpecType**, Ippi_اندازه, IppHintAlgorithm)>
+ساكن Ipp_حالت CV_STDCALL ippiDCTInitAllocWrap(فراغ** pDCTSpec, Ippi_اندازه roi_اندازه, IppHintAlgorithm hint)
 {
-    return fn((SpecType**)pDCTSpec, roiSize, hint);
+    أرجع fn((SpecType**)pDCTSpec, roi_اندازه, hint);
 }
 
-template<typename SpecType, IppStatus (CV_STDCALL *fn)(SpecType*)>
-static IppStatus CV_STDCALL ippiDCTFreeWrap(void* pDCTSpec)
+کينډۍ<ډول_نوم SpecType, Ipp_حالت (CV_STDCALL *fn)(SpecType*)>
+ساكن Ipp_حالت CV_STDCALL ippiDCTFreeWrap(فراغ* pDCTSpec)
 {
-    return fn((SpecType*)pDCTSpec);
+    أرجع fn((SpecType*)pDCTSpec);
 }
 
-template<typename SpecType, IppStatus (CV_STDCALL *fn)(const SpecType*, int*)>
-static IppStatus CV_STDCALL ippiDCTGetBufSizeWrap(const void* pDCTSpec, int* pSize)
+کينډۍ<ډول_نوم SpecType, Ipp_حالت (CV_STDCALL *fn)(ثابت SpecType*, صحيح*)>
+ساكن Ipp_حالت CV_STDCALL ippi_DCTGet_Buf_اندازه_Wrap(ثابت فراغ* pDCTSpec, صحيح* p_اندازه)
 {
-    return fn((const SpecType*)pDCTSpec, pSize);
+    أرجع fn((ثابت SpecType*)pDCTSpec, p_اندازه);
 }
-#endif
+#د_که_پای
 
-class DctIPPLoop_Invoker : public ParallelLoopBody
+صنف DctIPPLoop_Invoker : عام ParallelLoopBody
 {
-public:
-    DctIPPLoop_Invoker(const uchar * _src, size_t _src_step, uchar * _dst, size_t _dst_step, int _width, bool _inv, bool *_ok) :
-        ParallelLoopBody(), src(_src), src_step(_src_step), dst(_dst), dst_step(_dst_step), width(_width), inv(_inv), ok(_ok)
+عام:
+    DctIPPLoop_Invoker(ثابت uchar * _src, size_t src_ګام_2, uchar * _dst, size_t dst_ګام_2, صحيح پلنوالی_3, منطقي _inv, منطقي *_ok) :
+        ParallelLoopBody(), src(_src), src_ګام(src_ګام_2), dst(_dst), dst_ګام(dst_ګام_2), پلنوالی(پلنوالی_3), inv(_inv), ok(_ok)
     {
-        *ok = true;
+        *ok = ریښتیا;
     }
 
-    virtual void operator()(const Range& range) const CV_OVERRIDE
+    مجازي فراغ چلوونکی()(ثابت Range& range) ثابت CV_OVERRIDE
     {
-        if(*ok == false)
-            return;
+        إذا(*ok == خطأ)
+            أرجع;
 
-#if IPP_VERSION_X100 >= 900
-        IppiSize srcRoiSize = {width, 1};
+#إذا IPP_نسخه_X100 >= 900
+        Ippi_اندازه src_Roi_اندازه = {پلنوالی, 1};
 
-        int specSize    = 0;
-        int initSize    = 0;
-        int bufferSize  = 0;
+        صحيح spec_اندازه    = 0;
+        صحيح init_اندازه    = 0;
+        صحيح بفر_اندازه  = 0;
 
-        Ipp8u* pDCTSpec = NULL;
-        Ipp8u* pBuffer  = NULL;
-        Ipp8u* pInitBuf = NULL;
+        Ipp8u* pDCTSpec = عدم;
+        Ipp8u* p_بفر  = عدم;
+        Ipp8u* pInitBuf = عدم;
 
-        #define IPP_RETURN              \
-            if(pDCTSpec)                \
+        #تعریف_کړه IPP_RETURN              \
+            إذا(pDCTSpec)                \
                 ippFree(pDCTSpec);      \
-            if(pBuffer)                 \
-                ippFree(pBuffer);       \
-            if(pInitBuf)                \
+            إذا(p_بفر)                 \
+                ippFree(p_بفر);       \
+            إذا(pInitBuf)                \
                 ippFree(pInitBuf);      \
-            return;
+            أرجع;
 
         ippiDCTFunc     ippiDCT_32f_C1R   = inv ? ippiDCTWrap<IppiDCTInvSpec_32f, ippiDCTInv_32f_C1R> : ippiDCTWrap<IppiDCTFwdSpec_32f, ippiDCTFwd_32f_C1R>;
         ippiDCTInit     ippDctInit     = inv ? ippiDCTInitWrap<IppiDCTInvSpec_32f, ippiDCTInvInit_32f> : ippiDCTInitWrap<IppiDCTFwdSpec_32f, ippiDCTFwdInit_32f>;
-        ippiDCTGetSize  ippDctGetSize  = inv ? ippiDCTGetSizeWrap<ippiDCTInvGetSize_32f> : ippiDCTGetSizeWrap<ippiDCTFwdGetSize_32f>;
+        ippi_DCTGet_اندازه  ipp_Dct_Get_اندازه  = inv ? ippi_DCTGet_اندازه_Wrap<ippi_DCTInv_Get_اندازه_32f> : ippi_DCTGet_اندازه_Wrap<ippi_DCTFwd_Get_اندازه_32f>;
 
-        if(ippDctGetSize(srcRoiSize, &specSize, &initSize, &bufferSize) < 0)
+        إذا(ipp_Dct_Get_اندازه(src_Roi_اندازه, &spec_اندازه, &init_اندازه, &بفر_اندازه) < 0)
         {
-            *ok = false;
-            return;
+            *ok = خطأ;
+            أرجع;
         }
 
-        pDCTSpec = (Ipp8u*)CV_IPP_MALLOC(specSize);
-        if(!pDCTSpec && specSize)
+        pDCTSpec = (Ipp8u*)CV_IPP_MALLOC(spec_اندازه);
+        إذا(!pDCTSpec && spec_اندازه)
         {
-            *ok = false;
-            return;
+            *ok = خطأ;
+            أرجع;
         }
 
-        pBuffer  = (Ipp8u*)CV_IPP_MALLOC(bufferSize);
-        if(!pBuffer && bufferSize)
+        p_بفر  = (Ipp8u*)CV_IPP_MALLOC(بفر_اندازه);
+        إذا(!p_بفر && بفر_اندازه)
         {
-            *ok = false;
+            *ok = خطأ;
             IPP_RETURN
         }
-        pInitBuf = (Ipp8u*)CV_IPP_MALLOC(initSize);
-        if(!pInitBuf && initSize)
+        pInitBuf = (Ipp8u*)CV_IPP_MALLOC(init_اندازه);
+        إذا(!pInitBuf && init_اندازه)
         {
-            *ok = false;
-            IPP_RETURN
-        }
-
-        if(ippDctInit(pDCTSpec, srcRoiSize, pInitBuf) < 0)
-        {
-            *ok = false;
+            *ok = خطأ;
             IPP_RETURN
         }
 
-        for(int i = range.start; i < range.end; ++i)
+        إذا(ippDctInit(pDCTSpec, src_Roi_اندازه, pInitBuf) < 0)
         {
-            if(CV_INSTRUMENT_FUN_IPP(ippiDCT_32f_C1R, (float*)(src + src_step * i), static_cast<int>(src_step), (float*)(dst + dst_step * i), static_cast<int>(dst_step), pDCTSpec, pBuffer) < 0)
+            *ok = خطأ;
+            IPP_RETURN
+        }
+
+        لكل(صحيح i = range.پیل; i < range.end; ++i)
+        {
+            إذا(CV_INSTRUMENT_FUN_IPP(ippiDCT_32f_C1R, (عائم*)(src + src_ګام * i), static_cast<صحيح>(src_ګام), (عائم*)(dst + dst_ګام * i), static_cast<صحيح>(dst_ګام), pDCTSpec, p_بفر) < 0)
             {
-                *ok = false;
+                *ok = خطأ;
                 IPP_RETURN
             }
         }
         IPP_RETURN
-#undef IPP_RETURN
-#elif IPP_VERSION_X100 >= 700
-        void* pDCTSpec;
-        AutoBuffer<uchar> buf;
-        uchar* pBuffer = 0;
-        int bufSize=0;
+#تعریف_لغوه IPP_RETURN
+#وإلاإذا IPP_نسخه_X100 >= 700
+        فراغ* pDCTSpec;
+        Auto_بفر<uchar> buf;
+        uchar* p_بفر = 0;
+        صحيح buf_اندازه=0;
 
-        IppiSize srcRoiSize = {width, 1};
+        Ippi_اندازه src_Roi_اندازه = {پلنوالی, 1};
 
-        CV_SUPPRESS_DEPRECATED_START
+        CV_SUPPRESS_DEPRECATED_پیل
 
         ippiDCTFunc ippDctFun           = inv ? ippiDCTWrap<IppiDCTInvSpec_32f, ippiDCTInv_32f_C1R>             : ippiDCTWrap<IppiDCTFwdSpec_32f, ippiDCTFwd_32f_C1R>;
         ippiDCTInitAlloc ippInitAlloc   = inv ? ippiDCTInitAllocWrap<IppiDCTInvSpec_32f, ippiDCTInvInitAlloc_32f>   : ippiDCTInitAllocWrap<IppiDCTFwdSpec_32f, ippiDCTFwdInitAlloc_32f>;
         ippiDCTFree ippFree             = inv ? ippiDCTFreeWrap<IppiDCTInvSpec_32f, ippiDCTInvFree_32f>             : ippiDCTFreeWrap<IppiDCTFwdSpec_32f, ippiDCTFwdFree_32f>;
-        ippiDCTGetBufSize ippGetBufSize = inv ? ippiDCTGetBufSizeWrap<IppiDCTInvSpec_32f, ippiDCTInvGetBufSize_32f> : ippiDCTGetBufSizeWrap<IppiDCTFwdSpec_32f, ippiDCTFwdGetBufSize_32f>;
+        ippi_DCTGet_Buf_اندازه ipp_Get_Buf_اندازه = inv ? ippi_DCTGet_Buf_اندازه_Wrap<IppiDCTInvSpec_32f, ippi_DCTInv_Get_Buf_اندازه_32f> : ippi_DCTGet_Buf_اندازه_Wrap<IppiDCTFwdSpec_32f, ippi_DCTFwd_Get_Buf_اندازه_32f>;
 
-        if (ippInitAlloc(&pDCTSpec, srcRoiSize, ippAlgHintNone)>=0 && ippGetBufSize(pDCTSpec, &bufSize)>=0)
+        إذا (ippInitAlloc(&pDCTSpec, src_Roi_اندازه, ippAlgHintNone)>=0 && ipp_Get_Buf_اندازه(pDCTSpec, &buf_اندازه)>=0)
         {
-            buf.allocate( bufSize );
-            pBuffer = (uchar*)buf;
+            buf.allocate( buf_اندازه );
+            p_بفر = (uchar*)buf;
 
-            for( int i = range.start; i < range.end; ++i)
+            لكل( صحيح i = range.پیل; i < range.end; ++i)
             {
-                if(ippDctFun((float*)(src + src_step * i), static_cast<int>(src_step), (float*)(dst + dst_step * i), static_cast<int>(dst_step), pDCTSpec, (Ipp8u*)pBuffer) < 0)
+                إذا(ippDctFun((عائم*)(src + src_ګام * i), static_cast<صحيح>(src_ګام), (عائم*)(dst + dst_ګام * i), static_cast<صحيح>(dst_ګام), pDCTSpec, (Ipp8u*)p_بفر) < 0)
                 {
-                    *ok = false;
-                    break;
+                    *ok = خطأ;
+                    اكسر;
                 }
             }
         }
-        else
-            *ok = false;
+        وإلا
+            *ok = خطأ;
 
-        if (pDCTSpec)
+        إذا (pDCTSpec)
             ippFree(pDCTSpec);
 
-        CV_SUPPRESS_DEPRECATED_END
-#else
-        CV_UNUSED(range);
-        *ok = false;
-#endif
+        CV_SUPPRESS_DEPRECATED_پای_ټکی
+#وإلا
+        CV_ناکارول_شوی(range);
+        *ok = خطأ;
+#د_که_پای
     }
 
-private:
-    const uchar * src;
-    size_t src_step;
+خاص:
+    ثابت uchar * src;
+    size_t src_ګام;
     uchar * dst;
-    size_t dst_step;
-    int width;
-    bool inv;
-    bool *ok;
+    size_t dst_ګام;
+    صحيح پلنوالی;
+    منطقي inv;
+    منطقي *ok;
 };
 
-static bool DctIPPLoop(const uchar * src, size_t src_step, uchar * dst, size_t dst_step, int width, int height, bool inv)
+ساكن منطقي DctIPPLoop(ثابت uchar * src, size_t src_ګام, uchar * dst, size_t dst_ګام, صحيح پلنوالی, صحيح لوړوالی, منطقي inv)
 {
-    bool ok;
-    parallel_for_(Range(0, height), DctIPPLoop_Invoker(src, src_step, dst, dst_step, width, inv, &ok), height/(double)(1<<4) );
-    return ok;
+    منطقي ok;
+    parallel_for_(Range(0, لوړوالی), DctIPPLoop_Invoker(src, src_ګام, dst, dst_ګام, پلنوالی, inv, &ok), لوړوالی/(مزدوج)(1<<4) );
+    أرجع ok;
 }
 
-static bool ippi_DCT_32f(const uchar * src, size_t src_step, uchar * dst, size_t dst_step, int width, int height, bool inv, bool row)
+ساكن منطقي ippi_DCT_32f(ثابت uchar * src, size_t src_ګام, uchar * dst, size_t dst_ګام, صحيح پلنوالی, صحيح لوړوالی, منطقي inv, منطقي لیکه)
 {
     CV_INSTRUMENT_REGION_IPP();
 
-    if(row)
-        return DctIPPLoop(src, src_step, dst, dst_step, width, height, inv);
-    else
+    إذا(لیکه)
+        أرجع DctIPPLoop(src, src_ګام, dst, dst_ګام, پلنوالی, لوړوالی, inv);
+    وإلا
     {
-#if IPP_VERSION_X100 >= 900
-        IppiSize srcRoiSize = {width, height};
+#إذا IPP_نسخه_X100 >= 900
+        Ippi_اندازه src_Roi_اندازه = {پلنوالی, لوړوالی};
 
-        int specSize    = 0;
-        int initSize    = 0;
-        int bufferSize  = 0;
+        صحيح spec_اندازه    = 0;
+        صحيح init_اندازه    = 0;
+        صحيح بفر_اندازه  = 0;
 
-        Ipp8u* pDCTSpec = NULL;
-        Ipp8u* pBuffer  = NULL;
-        Ipp8u* pInitBuf = NULL;
+        Ipp8u* pDCTSpec = عدم;
+        Ipp8u* p_بفر  = عدم;
+        Ipp8u* pInitBuf = عدم;
 
-        #define IPP_RELEASE             \
-            if(pDCTSpec)                \
+        #تعریف_کړه IPP_RELEASE             \
+            إذا(pDCTSpec)                \
                 ippFree(pDCTSpec);      \
-            if(pBuffer)                 \
-                ippFree(pBuffer);       \
-            if(pInitBuf)                \
+            إذا(p_بفر)                 \
+                ippFree(p_بفر);       \
+            إذا(pInitBuf)                \
                 ippFree(pInitBuf);      \
 
         ippiDCTFunc     ippiDCT_32f_C1R      = inv ? ippiDCTWrap<IppiDCTInvSpec_32f, ippiDCTInv_32f_C1R> : ippiDCTWrap<IppiDCTFwdSpec_32f, ippiDCTFwd_32f_C1R>;
         ippiDCTInit     ippDctInit     = inv ? ippiDCTInitWrap<IppiDCTInvSpec_32f, ippiDCTInvInit_32f> : ippiDCTInitWrap<IppiDCTFwdSpec_32f, ippiDCTFwdInit_32f>;
-        ippiDCTGetSize  ippDctGetSize  = inv ? ippiDCTGetSizeWrap<ippiDCTInvGetSize_32f> : ippiDCTGetSizeWrap<ippiDCTFwdGetSize_32f>;
+        ippi_DCTGet_اندازه  ipp_Dct_Get_اندازه  = inv ? ippi_DCTGet_اندازه_Wrap<ippi_DCTInv_Get_اندازه_32f> : ippi_DCTGet_اندازه_Wrap<ippi_DCTFwd_Get_اندازه_32f>;
 
-        if(ippDctGetSize(srcRoiSize, &specSize, &initSize, &bufferSize) < 0)
-            return false;
+        إذا(ipp_Dct_Get_اندازه(src_Roi_اندازه, &spec_اندازه, &init_اندازه, &بفر_اندازه) < 0)
+            أرجع خطأ;
 
-        pDCTSpec = (Ipp8u*)CV_IPP_MALLOC(specSize);
-        if(!pDCTSpec && specSize)
-            return false;
+        pDCTSpec = (Ipp8u*)CV_IPP_MALLOC(spec_اندازه);
+        إذا(!pDCTSpec && spec_اندازه)
+            أرجع خطأ;
 
-        pBuffer  = (Ipp8u*)CV_IPP_MALLOC(bufferSize);
-        if(!pBuffer && bufferSize)
+        p_بفر  = (Ipp8u*)CV_IPP_MALLOC(بفر_اندازه);
+        إذا(!p_بفر && بفر_اندازه)
         {
             IPP_RELEASE
-            return false;
+            أرجع خطأ;
         }
-        pInitBuf = (Ipp8u*)CV_IPP_MALLOC(initSize);
-        if(!pInitBuf && initSize)
+        pInitBuf = (Ipp8u*)CV_IPP_MALLOC(init_اندازه);
+        إذا(!pInitBuf && init_اندازه)
         {
             IPP_RELEASE
-            return false;
-        }
-
-        if(ippDctInit(pDCTSpec, srcRoiSize, pInitBuf) < 0)
-        {
-            IPP_RELEASE
-            return false;
+            أرجع خطأ;
         }
 
-        if(CV_INSTRUMENT_FUN_IPP(ippiDCT_32f_C1R, (float*)src, static_cast<int>(src_step), (float*)dst, static_cast<int>(dst_step), pDCTSpec, pBuffer) < 0)
+        إذا(ippDctInit(pDCTSpec, src_Roi_اندازه, pInitBuf) < 0)
         {
             IPP_RELEASE
-            return false;
+            أرجع خطأ;
+        }
+
+        إذا(CV_INSTRUMENT_FUN_IPP(ippiDCT_32f_C1R, (عائم*)src, static_cast<صحيح>(src_ګام), (عائم*)dst, static_cast<صحيح>(dst_ګام), pDCTSpec, p_بفر) < 0)
+        {
+            IPP_RELEASE
+            أرجع خطأ;
         }
 
         IPP_RELEASE
-        return true;
-#undef IPP_RELEASE
-#elif IPP_VERSION_X100 >= 700
-        IppStatus status;
-        void* pDCTSpec;
-        AutoBuffer<uchar> buf;
-        uchar* pBuffer = 0;
-        int bufSize=0;
+        أرجع ریښتیا;
+#تعریف_لغوه IPP_RELEASE
+#وإلاإذا IPP_نسخه_X100 >= 700
+        Ipp_حالت حالت;
+        فراغ* pDCTSpec;
+        Auto_بفر<uchar> buf;
+        uchar* p_بفر = 0;
+        صحيح buf_اندازه=0;
 
-        IppiSize srcRoiSize = {width, height};
+        Ippi_اندازه src_Roi_اندازه = {پلنوالی, لوړوالی};
 
-        CV_SUPPRESS_DEPRECATED_START
+        CV_SUPPRESS_DEPRECATED_پیل
 
         ippiDCTFunc ippDctFun           = inv ? ippiDCTWrap<IppiDCTInvSpec_32f, ippiDCTInv_32f_C1R>             : ippiDCTWrap<IppiDCTFwdSpec_32f, ippiDCTFwd_32f_C1R>;
         ippiDCTInitAlloc ippInitAlloc   = inv ? ippiDCTInitAllocWrap<IppiDCTInvSpec_32f, ippiDCTInvInitAlloc_32f>   : ippiDCTInitAllocWrap<IppiDCTFwdSpec_32f, ippiDCTFwdInitAlloc_32f>;
         ippiDCTFree ippFree             = inv ? ippiDCTFreeWrap<IppiDCTInvSpec_32f, ippiDCTInvFree_32f>             : ippiDCTFreeWrap<IppiDCTFwdSpec_32f, ippiDCTFwdFree_32f>;
-        ippiDCTGetBufSize ippGetBufSize = inv ? ippiDCTGetBufSizeWrap<IppiDCTInvSpec_32f, ippiDCTInvGetBufSize_32f> : ippiDCTGetBufSizeWrap<IppiDCTFwdSpec_32f, ippiDCTFwdGetBufSize_32f>;
+        ippi_DCTGet_Buf_اندازه ipp_Get_Buf_اندازه = inv ? ippi_DCTGet_Buf_اندازه_Wrap<IppiDCTInvSpec_32f, ippi_DCTInv_Get_Buf_اندازه_32f> : ippi_DCTGet_Buf_اندازه_Wrap<IppiDCTFwdSpec_32f, ippi_DCTFwd_Get_Buf_اندازه_32f>;
 
-        status = ippStsErr;
+        حالت = ippStsErr;
 
-        if (ippInitAlloc(&pDCTSpec, srcRoiSize, ippAlgHintNone)>=0 && ippGetBufSize(pDCTSpec, &bufSize)>=0)
+        إذا (ippInitAlloc(&pDCTSpec, src_Roi_اندازه, ippAlgHintNone)>=0 && ipp_Get_Buf_اندازه(pDCTSpec, &buf_اندازه)>=0)
         {
-            buf.allocate( bufSize );
-            pBuffer = (uchar*)buf;
+            buf.allocate( buf_اندازه );
+            p_بفر = (uchar*)buf;
 
-            status = ippDctFun((float*)src, static_cast<int>(src_step), (float*)dst, static_cast<int>(dst_step), pDCTSpec, (Ipp8u*)pBuffer);
+            حالت = ippDctFun((عائم*)src, static_cast<صحيح>(src_ګام), (عائم*)dst, static_cast<صحيح>(dst_ګام), pDCTSpec, (Ipp8u*)p_بفر);
         }
 
-        if (pDCTSpec)
+        إذا (pDCTSpec)
             ippFree(pDCTSpec);
 
-        CV_SUPPRESS_DEPRECATED_END
+        CV_SUPPRESS_DEPRECATED_پای_ټکی
 
-        return status >= 0;
-#else
-        CV_UNUSED(src); CV_UNUSED(dst); CV_UNUSED(inv); CV_UNUSED(row);
-        return false;
-#endif
+        أرجع حالت >= 0;
+#وإلا
+        CV_ناکارول_شوی(src); CV_ناکارول_شوی(dst); CV_ناکارول_شوی(inv); CV_ناکارول_شوی(لیکه);
+        أرجع خطأ;
+#د_که_پای
     }
 }
 }
-#endif
+#د_که_پای
 
-namespace cv {
+نطاق cv {
 
-class OcvDctImpl CV_FINAL : public hal::DCT2D
+صنف OcvDctImpl CV_FINAL : عام hal::DCT2D
 {
-public:
+عام:
     OcvDftOptions opt;
     DCTFunc dct_func;
     // per-stage plan + workspace, (re)built once per stage length, never per row
     DftPlan plan;
-    AutoBuffer<uchar> ws;
-    bool isRowTransform;
-    bool isInverse;
-    bool isContinuous;
-    int start_stage;
-    int end_stage;
-    int width;
-    int height;
-    int depth;
+    Auto_بفر<uchar> ws;
+    منطقي is_لیکه_Transform;
+    منطقي isInverse;
+    منطقي isContinuous;
+    صحيح پیل_stage;
+    صحيح پای_ټکی_stage;
+    صحيح پلنوالی;
+    صحيح لوړوالی;
+    صحيح ژوروالی;
 
-    void init(int _width, int _height, int _depth, int flags)
+    فراغ init(صحيح پلنوالی_3, صحيح لوړوالی_3, صحيح ژوروالی_2, صحيح flags)
     {
-        width = _width;
-        height = _height;
-        depth = _depth;
+        پلنوالی = پلنوالی_3;
+        لوړوالی = لوړوالی_3;
+        ژوروالی = ژوروالی_2;
         isInverse = (flags & CV_HAL_DFT_INVERSE) != 0;
-        isRowTransform = (flags & CV_HAL_DFT_ROWS) != 0;
+        is_لیکه_Transform = (flags & CV_HAL_DFT_لیکې) != 0;
         isContinuous = (flags & CV_HAL_DFT_IS_CONTINUOUS) != 0;
-        static DCTFunc dct_tbl[4] =
+        ساكن DCTFunc dct_tbl[4] =
         {
-            dctWrap<float, DCT<float>>,
-            dctWrap<float, IDCT<float>>,
-            dctWrap<double, DCT<double>>,
-            dctWrap<double, IDCT<double>>
+            dctWrap<عائم, DCT<عائم>>,
+            dctWrap<عائم, IDCT<عائم>>,
+            dctWrap<مزدوج, DCT<مزدوج>>,
+            dctWrap<مزدوج, IDCT<مزدوج>>
         };
-        dct_func = dct_tbl[(int)isInverse + (depth == CV_64F)*2];
-        opt.isComplex = false;
-        opt.isInverse = false;
+        dct_func = dct_tbl[(صحيح)isInverse + (ژوروالی == CV_64F)*2];
+        opt.isComplex = خطأ;
+        opt.isInverse = خطأ;
         opt.scale = 1.;
 
-        if (isRowTransform || height == 1 || (width == 1 && isContinuous))
+        إذا (is_لیکه_Transform || لوړوالی == 1 || (پلنوالی == 1 && isContinuous))
         {
-            start_stage = end_stage = 0;
+            پیل_stage = پای_ټکی_stage = 0;
         }
-        else
+        وإلا
         {
-            start_stage = (width == 1);
-            end_stage = 1;
+            پیل_stage = (پلنوالی == 1);
+            پای_ټکی_stage = 1;
         }
     }
-    void apply(const uchar *src, size_t src_step, uchar *dst, size_t dst_step) CV_OVERRIDE
+    فراغ apply(ثابت uchar *src, size_t src_ګام, uchar *dst, size_t dst_ګام) CV_OVERRIDE
     {
-        CV_IPP_RUN(IPP_VERSION_X100 >= 700 && depth == CV_32F, ippi_DCT_32f(src, src_step, dst, dst_step, width, height, isInverse, isRowTransform))
+        CV_IPP_پرلپسې(IPP_نسخه_X100 >= 700 && ژوروالی == CV_32F, ippi_DCT_32f(src, src_ګام, dst, dst_ګام, پلنوالی, لوړوالی, isInverse, is_لیکه_Transform))
 
-        int prev_len = 0;
-        int elem_size = (depth == CV_32F) ? sizeof(float) : sizeof(double);
-        const DFTKernels& kernels = getDFTKernels(depth);
+        صحيح prev_len = 0;
+        صحيح elem_اندازه_2 = (ژوروالی == CV_32F) ? حجم(عائم) : حجم(مزدوج);
+        ثابت DFTKernels& kernels = getDFTKernels(ژوروالی);
 
-        for(int stage = start_stage ; stage <= end_stage; stage++ )
+        لكل(صحيح stage = پیل_stage ; stage <= پای_ټکی_stage; stage++ )
         {
-            const uchar* sptr = src;
+            ثابت uchar* sptr = src;
             uchar* dptr = dst;
             size_t sstep0, sstep1, dstep0, dstep1;
-            int len, count;
+            صحيح len, شمېر_2;
 
-            if( stage == 0 )
+            إذا( stage == 0 )
             {
-                len = width;
-                count = height;
-                if( len == 1 && !isRowTransform )
+                len = پلنوالی;
+                شمېر_2 = لوړوالی;
+                إذا( len == 1 && !is_لیکه_Transform )
                 {
-                    len = height;
-                    count = 1;
+                    len = لوړوالی;
+                    شمېر_2 = 1;
                 }
-                sstep0 = src_step;
-                dstep0 = dst_step;
-                sstep1 = dstep1 = elem_size;
+                sstep0 = src_ګام;
+                dstep0 = dst_ګام;
+                sstep1 = dstep1 = elem_اندازه_2;
             }
-            else
+            وإلا
             {
-                len = height;
-                count = width;
-                sstep1 = src_step;
-                dstep1 = dst_step;
-                sstep0 = dstep0 = elem_size;
+                len = لوړوالی;
+                شمېر_2 = پلنوالی;
+                sstep1 = src_ګام;
+                dstep1 = dst_ګام;
+                sstep0 = dstep0 = elem_اندازه_2;
             }
 
             opt.n = len;
 
-            if( len != prev_len )
+            إذا( len != prev_len )
             {
-                if( len > 1 && (len & 1) )
+                إذا( len > 1 && (len & 1) )
                     CV_Error( cv::Error::StsNotImplemented, "Odd-size DCT\'s are not implemented" );
-                if( len > 1 )
+                إذا( len > 1 )
                 {
-                    plan.build(isInverse ? DFT_KIND_IDCT : DFT_KIND_DCT, len, depth, kernels.vlanes);
-                    ws.allocate(plan.ws_bytes);
+                    plan.build(isInverse ? DFT_ډول_IDCT : DFT_ډول_DCT, len, ژوروالی, kernels.vlanes);
+                    ws.allocate(plan.ws_بایټونه);
                 }
                 opt.plan = &plan;
                 opt.kernels = &kernels;
-                opt.workspace = ws.data();
+                opt.workspace = ws.معلومات();
                 prev_len = len;
             }
             // otherwise reuse the plan built on the previous stage (same length, only the steps differ)
-            double nstripes = dftParallelStripes(count, len);
-            if( len > 1 && count > 1 && nstripes >= 1.5 )
+            مزدوج nstripes = dftParallelStripes(شمېر_2, len);
+            إذا( len > 1 && شمېر_2 > 1 && nstripes >= 1.5 )
             {
                 // the plan is shared, every worker gets its own workspace once per range
-                auto processLines = [&](const Range& range)
+                خپلکاری process_کرښې = [&](ثابت Range& range)
                 {
                     OcvDftOptions opt_ = opt;
-                    AutoBuffer<uchar> ws_(plan.ws_bytes);
-                    opt_.workspace = ws_.data();
-                    for( int i = range.start; i < range.end; i++ )
+                    Auto_بفر<uchar> ws_(plan.ws_بایټونه);
+                    opt_.workspace = ws_.معلومات();
+                    لكل( صحيح i = range.پیل; i < range.end; i++ )
                         dct_func( opt_, sptr + i*sstep0, sstep1, dptr + i*dstep0, dstep1 );
                 };
-                parallel_for_(Range(0, count), processLines, nstripes);
+                parallel_for_(Range(0, شمېر_2), process_کرښې, nstripes);
             }
-            else
+            وإلا
             {
-                for(unsigned i = 0; i < static_cast<unsigned>(count); i++ )
+                لكل(بینښه i = 0; i < static_cast<بینښه>(شمېر_2); i++ )
                     dct_func( opt, sptr + i*sstep0, sstep1, dptr + i*dstep0, dstep1 );
             }
             src = dst;
-            src_step = dst_step;
+            src_ګام = dst_ګام;
         }
     }
 };
 
-struct ReplacementDCT2D : public hal::DCT2D
+بنية ReplacementDCT2D : عام hal::DCT2D
 {
     cvhalDFT *context;
-    bool isInitialized;
+    منطقي isInitialized;
 
-    ReplacementDCT2D() : context(0), isInitialized(false) {}
-    bool init(int width, int height, int depth, int flags)
+    ReplacementDCT2D() : context(0), isInitialized(خطأ) {}
+    منطقي init(صحيح پلنوالی, صحيح لوړوالی, صحيح ژوروالی, صحيح flags)
     {
-        int res = cv_hal_dctInit2D(&context, width, height, depth, flags);
+        صحيح res = cv_hal_dctInit2D(&context, پلنوالی, لوړوالی, ژوروالی, flags);
         isInitialized = (res == CV_HAL_ERROR_OK);
-        return isInitialized;
+        أرجع isInitialized;
     }
-    void apply(const uchar *src_data, size_t src_step, uchar *dst_data, size_t dst_step) CV_OVERRIDE
+    فراغ apply(ثابت uchar *src_معلومات, size_t src_ګام, uchar *dst_معلومات, size_t dst_ګام) CV_OVERRIDE
     {
-        if (isInitialized)
+        إذا (isInitialized)
         {
-            CALL_HAL(dct2D, cv_hal_dct2D, context, src_data, src_step, dst_data, dst_step);
+            CALL_HAL(dct2D, cv_hal_dct2D, context, src_معلومات, src_ګام, dst_معلومات, dst_ګام);
         }
     }
     ~ReplacementDCT2D()
     {
-        if (isInitialized)
+        إذا (isInitialized)
         {
             CALL_HAL(dctFree2D, cv_hal_dctFree2D, context);
         }
     }
 };
 
-namespace hal {
+نطاق hal {
 
-Ptr<DCT2D> DCT2D::create(int width, int height, int depth, int flags)
+Ptr<DCT2D> DCT2D::create(صحيح پلنوالی, صحيح لوړوالی, صحيح ژوروالی, صحيح flags)
 {
     {
-        ReplacementDCT2D *impl = new ReplacementDCT2D();
-        if (impl->init(width, height, depth, flags))
+        ReplacementDCT2D *impl = جديد ReplacementDCT2D();
+        إذا (impl->init(پلنوالی, لوړوالی, ژوروالی, flags))
         {
-            return Ptr<DCT2D>(impl);
+            أرجع Ptr<DCT2D>(impl);
         }
-        delete impl;
+        ړنګول impl;
     }
     {
-        OcvDctImpl *impl = new OcvDctImpl();
-        impl->init(width, height, depth, flags);
-        return Ptr<DCT2D>(impl);
+        OcvDctImpl *impl = جديد OcvDctImpl();
+        impl->init(پلنوالی, لوړوالی, ژوروالی, flags);
+        أرجع Ptr<DCT2D>(impl);
     }
 }
 
 } // cv::hal::
 } // cv::
 
-void cv::dct( InputArray _src0, OutputArray _dst, int flags )
+فراغ cv::dct( ننوت_Array _src0, OutputArray _dst, صحيح flags )
 {
     CV_INSTRUMENT_REGION();
 
     Mat src0 = _src0.getMat(), src = src0;
-    if (src.empty())
+    إذا (src.empty())
     {
         _dst.release();
-        return;
+        أرجع;
     }
-    int type = src.type(), depth = src.depth();
+    صحيح type = src.type(), ژوروالی = src.ژوروالی();
 
     CV_Assert( type == CV_32FC1 || type == CV_64FC1 );
-    _dst.create( src.rows, src.cols, type );
+    _dst.create( src.لیکې, src.ستون_شمېر, type );
     Mat dst = _dst.getMat();
 
-    int f = 0;
-    if ((flags & DFT_ROWS) != 0)
-        f |= CV_HAL_DFT_ROWS;
-    if ((flags & DCT_INVERSE) != 0)
+    صحيح f = 0;
+    إذا ((flags & DFT_لیکې) != 0)
+        f |= CV_HAL_DFT_لیکې;
+    إذا ((flags & DCT_INVERSE) != 0)
         f |= CV_HAL_DFT_INVERSE;
-    if (src.isContinuous() && dst.isContinuous())
+    إذا (src.isContinuous() && dst.isContinuous())
         f |= CV_HAL_DFT_IS_CONTINUOUS;
 
-    Ptr<hal::DCT2D> c = hal::DCT2D::create(src.cols, src.rows, depth, f);
-    c->apply(src.data, src.step, dst.data, dst.step);
+    Ptr<hal::DCT2D> c = hal::DCT2D::create(src.ستون_شمېر, src.لیکې, ژوروالی, f);
+    c->apply(src.معلومات, src.ګام, dst.معلومات, dst.ګام);
 }
 
 
-void cv::idct( InputArray src, OutputArray dst, int flags )
+فراغ cv::idct( ننوت_Array src, OutputArray dst, صحيح flags )
 {
     CV_INSTRUMENT_REGION();
 
     dct( src, dst, flags | DCT_INVERSE );
 }
 
-namespace cv
+نطاق cv
 {
 
-static const int optimalDFTSizeTab[] = {
+ساكن ثابت صحيح optimalDFTSizeTab[] = {
 1, 2, 3, 4, 5, 6, 8, 9, 10, 12, 15, 16, 18, 20, 24, 25, 27, 30, 32, 36, 40, 45, 48,
 50, 54, 60, 64, 72, 75, 80, 81, 90, 96, 100, 108, 120, 125, 128, 135, 144, 150, 160,
 162, 180, 192, 200, 216, 225, 240, 243, 250, 256, 270, 288, 300, 320, 324, 360, 375,
@@ -4034,21 +4034,21 @@ static const int optimalDFTSizeTab[] = {
 
 }
 
-int cv::getOptimalDFTSize( int size0 )
+صحيح cv::getOptimalDFTSize( صحيح size0 )
 {
-    int a = 0, b = sizeof(optimalDFTSizeTab)/sizeof(optimalDFTSizeTab[0]) - 1;
-    if( (unsigned)size0 >= (unsigned)optimalDFTSizeTab[b] )
-        return -1;
+    صحيح a = 0, b = حجم(optimalDFTSizeTab)/حجم(optimalDFTSizeTab[0]) - 1;
+    إذا( (بینښه)size0 >= (بینښه)optimalDFTSizeTab[b] )
+        أرجع -1;
 
-    while( a < b )
+    طالما( a < b )
     {
-        int c = (a + b) >> 1;
-        if( size0 <= optimalDFTSizeTab[c] )
+        صحيح c = (a + b) >> 1;
+        إذا( size0 <= optimalDFTSizeTab[c] )
             b = c;
-        else
+        وإلا
             a = c+1;
     }
 
-    return optimalDFTSizeTab[b];
+    أرجع optimalDFTSizeTab[b];
 }
 /* End of file. */

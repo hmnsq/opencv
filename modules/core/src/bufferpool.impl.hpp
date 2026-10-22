@@ -4,25 +4,25 @@
 //
 // Copyright (C) 2014, Advanced Micro Devices, Inc., all rights reserved.
 
-#ifndef __OPENCV_CORE_BUFFER_POOL_IMPL_HPP__
-#define __OPENCV_CORE_BUFFER_POOL_IMPL_HPP__
+#که_نه_تعریف_شوی __OPENCV_CORE_BUFFER_POOL_IMPL_HPP__
+#تعریف_کړه __OPENCV_CORE_BUFFER_POOL_IMPL_HPP__
 
-#include "opencv2/core/bufferpool.hpp"
+#ضمن "opencv2/core/bufferpool.hpp"
 
-namespace cv {
+نطاق cv {
 
-class DummyBufferPoolController : public BufferPoolController
+صنف Dummy_بفر_Pool_Controller : عام بفر_Pool_Controller
 {
-public:
-    DummyBufferPoolController() { }
-    virtual ~DummyBufferPoolController() { }
+عام:
+    Dummy_بفر_Pool_Controller() { }
+    مجازي ~Dummy_بفر_Pool_Controller() { }
 
-    virtual size_t getReservedSize() const CV_OVERRIDE { return (size_t)-1; }
-    virtual size_t getMaxReservedSize() const CV_OVERRIDE { return (size_t)-1; }
-    virtual void setMaxReservedSize(size_t size) CV_OVERRIDE { CV_UNUSED(size); }
-    virtual void freeAllReservedBuffers() CV_OVERRIDE { }
+    مجازي size_t get_Reserved_اندازه() ثابت CV_OVERRIDE { أرجع (size_t)-1; }
+    مجازي size_t get_Max_Reserved_اندازه() ثابت CV_OVERRIDE { أرجع (size_t)-1; }
+    مجازي فراغ سېټ_Max_Reserved_اندازه(size_t size) CV_OVERRIDE { CV_ناکارول_شوی(size); }
+    مجازي فراغ freeAllReservedBuffers() CV_OVERRIDE { }
 };
 
 } // namespace
 
-#endif // __OPENCV_CORE_BUFFER_POOL_IMPL_HPP__
+#د_که_پای // __OPENCV_CORE_BUFFER_POOL_IMPL_HPP__

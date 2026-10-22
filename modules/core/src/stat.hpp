@@ -3,41 +3,41 @@
 // of this distribution and at http://opencv.org/license.html
 
 
-#ifndef SRC_STAT_HPP
-#define SRC_STAT_HPP
+#که_نه_تعریف_شوی SRC_STAT_HPP
+#تعریف_کړه SRC_STAT_HPP
 
-#include "opencv2/core/mat.hpp"
+#ضمن "opencv2/core/mat.hpp"
 
-namespace cv {
+نطاق cv {
 
-#ifdef HAVE_OPENCL
+#که_تعریف_شوی HAVE_OPENCL
 
-enum { OCL_OP_SUM = 0, OCL_OP_SUM_ABS =  1, OCL_OP_SUM_SQR = 2 };
-bool ocl_sum( InputArray _src, Scalar & res, int sum_op, InputArray _mask = noArray(),
-                     InputArray _src2 = noArray(), bool calc2 = false, const Scalar & res2 = Scalar() );
-bool ocl_minMaxIdx( InputArray _src, double* minVal, double* maxVal, int* minLoc, int* maxLoc, InputArray _mask,
-                           int ddepth = -1, bool absValues = false, InputArray _src2 = noArray(), double * maxVal2 = NULL);
+تعداد { OCL_OP_مجموعه = 0, OCL_OP_مجموعه_ABS =  1, OCL_OP_مجموعه_SQR = 2 };
+منطقي ocl_مجموعه( ننوت_Array _src, Scalar & res, صحيح مجموعه_op, ننوت_Array ماسک_2 = noArray(),
+                     ننوت_Array _src2 = noArray(), منطقي calc2 = خطأ, ثابت Scalar & res2 = Scalar() );
+منطقي ocl_minMaxIdx( ننوت_Array _src, مزدوج* minVal, مزدوج* maxVal, صحيح* minLoc, صحيح* maxLoc, ننوت_Array ماسک_2,
+                           صحيح ddepth = -1, منطقي abs_ارزښتونه = خطأ, ننوت_Array _src2 = noArray(), مزدوج * maxVal2 = عدم);
 
-template <typename T> Scalar ocl_part_sum(Mat m)
+کينډۍ <ډول_نوم T> Scalar ocl_part_مجموعه(Mat m)
 {
-    CV_Assert(m.rows == 1);
+    CV_Assert(m.لیکې == 1);
 
     Scalar s = Scalar::all(0);
-    int cn = m.channels();
-    const T * const ptr = m.ptr<T>(0);
+    صحيح cn = m.channels();
+    ثابت T * ثابت ptr = m.ptr<T>(0);
 
-    for (int x = 0, w = m.cols * cn; x < w; )
-        for (int c = 0; c < cn; ++c, ++x)
+    لكل (صحيح x = 0, w = m.ستون_شمېر * cn; x < w; )
+        لكل (صحيح c = 0; c < cn; ++c, ++x)
             s[c] += ptr[x];
 
-    return s;
+    أرجع s;
 }
 
-#endif
+#د_که_پای
 
-typedef int (*SumFunc)(const uchar*, const uchar* mask, uchar*, int, int);
-SumFunc getSumFunc(int depth);
+تعريفنوع صحيح (*مجموعه_Func)(ثابت uchar*, ثابت uchar* ماسک, uchar*, صحيح, صحيح);
+مجموعه_Func get_مجموعه_Func(صحيح ژوروالی);
 
 }
 
-#endif // SRC_STAT_HPP
+#د_که_پای // SRC_STAT_HPP

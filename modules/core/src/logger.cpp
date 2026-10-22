@@ -2,76 +2,76 @@
 // It is subject to the license terms in the LICENSE file found in the top-level directory
 // of this distribution and at http://opencv.org/license.html.
 
-#include "precomp.hpp"
+#ضمن "precomp.hpp"
 
-#include <opencv2/core/utils/configuration.private.hpp>
-#include <opencv2/core/utils/logger.hpp>
-#include "utils/logtagmanager.hpp"
-#include "utils/logtagconfigparser.hpp"
+#ضمن <opencv2/core/utils/configuration.private.hpp>
+#ضمن <opencv2/core/utils/logger.hpp>
+#ضمن "utils/logtagmanager.hpp"
+#ضمن "utils/logtagconfigparser.hpp"
 
-#include <sstream>
-#include <iostream>
-#include <fstream>
-#include <atomic>
+#ضمن <sstream>
+#ضمن <iostream>
+#ضمن <fstream>
+#ضمن <atomic>
 
-#ifdef __ANDROID__
+#که_تعریف_شوی __ANDROID__
 # include <android/log.h>
-#endif
+#د_که_پای
 
-namespace cv {
-namespace utils {
-namespace logging {
+نطاق cv {
+نطاق utils {
+نطاق logging {
 
-namespace internal
+نطاق internal
 {
 
 // Combining several things that require static dynamic initialization in a
 // well-defined order into a struct.
 //
-struct GlobalLoggingInitStruct
+بنية GlobalLoggingInitStruct
 {
-public:
-#if defined NDEBUG
-    static const bool m_isDebugBuild = false;
-#else
-    static const bool m_isDebugBuild = true;
-#endif
+عام:
+#إذا defined NDEBUG
+    ساكن ثابت منطقي m_isDebugBuild = خطأ;
+#وإلا
+    ساكن ثابت منطقي m_isDebugBuild = ریښتیا;
+#د_که_پای
 
-public:
-    static LogLevel m_defaultUnconfiguredGlobalLevel;
+عام:
+    ساكن LogLevel m_defaultUnconfiguredGlobalLevel;
 
-public:
-    LogTagManager logTagManager;
+عام:
+    Log_نښان_Manager log_نښان_Manager;
 
     GlobalLoggingInitStruct()
-        : logTagManager(m_defaultUnconfiguredGlobalLevel)
+        : log_نښان_Manager(m_defaultUnconfiguredGlobalLevel)
     {
-        (void)getInitializationMutex();  // ensure initialization of global objects
+        (فراغ)getInitializationMutex();  // ensure initialization of global objects
 
         applyConfigString();
         handleMalformed();
     }
 
-private:
-    void applyConfigString()
+خاص:
+    فراغ applyConfigString()
     {
-        logTagManager.setConfigString(utils::getConfigurationParameterString("OPENCV_LOG_LEVEL", ""));
+        log_نښان_Manager.سېټ_Config_String(utils::getConfigurationParameterString("OPENCV_LOG_LEVEL", ""));
     }
 
-    void handleMalformed()
+    فراغ handleMalformed()
     {
         // need to print warning for malformed log tag config strings?
-        if (m_isDebugBuild)
+        إذا (m_isDebugBuild)
         {
-            const auto& parser = logTagManager.getConfigParser();
-            if (parser.hasMalformed())
+            ثابت خپلکاری& parser = log_نښان_Manager.getConfigParser();
+            إذا (parser.hasMalformed())
             {
-                const auto& malformedList = parser.getMalformed();
-                for (const auto& malformed : malformedList)
+                ثابت خپلکاری& malformedList = parser.getMalformed();
+                لكل (ثابت خپلکاری& malformed : malformedList)
                 {
-                    std::cout << "Malformed log level config: \"" << malformed << "\"\n";
+                    std::وتنه << "Malformed log level config: \"" << malformed << "\"\n";
                 }
-                std::cout.flush();
+                std::وتنه.flush();
             }
         }
     }
@@ -93,9 +93,9 @@ LogLevel GlobalLoggingInitStruct::m_defaultUnconfiguredGlobalLevel = GlobalLoggi
 // An initialization guard function only guarantees initialization upon
 // the first call to this function.
 //
-static GlobalLoggingInitStruct& getGlobalLoggingInitStruct()
+ساكن GlobalLoggingInitStruct& getGlobalLoggingInitStruct()
 {
-    CV_SINGLETON_LAZY_INIT_REF(GlobalLoggingInitStruct, new GlobalLoggingInitStruct());
+    CV_SINGLETON_LAZY_INIT_REF(GlobalLoggingInitStruct, جديد GlobalLoggingInitStruct());
 }
 
 // To ensure that the combined struct defined above is initialized even
@@ -103,216 +103,216 @@ static GlobalLoggingInitStruct& getGlobalLoggingInitStruct()
 // instance of a struct is defined below, which will call the
 // initialization guard function.
 //
-struct GlobalLoggingInitCall
+بنية GlobalLoggingInitCall
 {
     GlobalLoggingInitCall()
     {
         getGlobalLoggingInitStruct();
-        (void)getGlobalLogTag();  // complete initialization of logger structures
+        (فراغ)get_Global_Log_نښان();  // complete initialization of logger structures
     }
 };
 
-static GlobalLoggingInitCall globalLoggingInitCall;
+ساكن GlobalLoggingInitCall globalLoggingInitCall;
 
-static LogTagManager& getLogTagManager()
+ساكن Log_نښان_Manager& get_Log_نښان_Manager()
 {
-    static LogTagManager& logTagManagerInstance = getGlobalLoggingInitStruct().logTagManager;
-    return logTagManagerInstance;
+    ساكن Log_نښان_Manager& log_نښان_Manager_Instance = getGlobalLoggingInitStruct().log_نښان_Manager;
+    أرجع log_نښان_Manager_Instance;
 }
 
-static LogLevel& getLogLevelVariable()
+ساكن LogLevel& getLogLevelVariable()
 {
-    static LogLevel& refGlobalLogLevel = getGlobalLogTag()->level;
-    return refGlobalLogLevel;
+    ساكن LogLevel& refGlobalLogLevel = get_Global_Log_نښان()->level;
+    أرجع refGlobalLogLevel;
 }
 
-LogTag* getGlobalLogTag()
+Log_نښان* get_Global_Log_نښان()
 {
-    static LogTag* globalLogTagPtr = getGlobalLoggingInitStruct().logTagManager.get("global");
-    return globalLogTagPtr;
+    ساكن Log_نښان* global_Log_نښان_Ptr = getGlobalLoggingInitStruct().log_نښان_Manager.get("global");
+    أرجع global_Log_نښان_Ptr;
 }
 
 } // namespace
 
-void registerLogTag(LogTag* plogtag)
+فراغ ثبتوونکی_Log_نښان(Log_نښان* plogtag)
 {
-    if (!plogtag || !plogtag->name)
+    إذا (!plogtag || !plogtag->name)
     {
-        return;
+        أرجع;
     }
-    internal::getLogTagManager().assign(plogtag->name, plogtag);
+    internal::get_Log_نښان_Manager().assign(plogtag->name, plogtag);
 }
 
-void setLogTagLevel(const char* tag, LogLevel level)
+فراغ سېټ_Log_نښان_Level(ثابت حرف* نښان, LogLevel level)
 {
-    if (!tag)
+    إذا (!نښان)
     {
-        return;
+        أرجع;
     }
-    internal::getLogTagManager().setLevelByFullName(std::string(tag), level);
+    internal::get_Log_نښان_Manager().سېټ_Level_By_ډک_Name(std::string(نښان), level);
 }
 
-LogLevel getLogTagLevel(const char* tag)
+LogLevel get_Log_نښان_Level(ثابت حرف* نښان)
 {
-    if (!tag)
+    إذا (!نښان)
     {
-        return getLogLevel();
+        أرجع getLogLevel();
     }
-    const LogTag* ptr = internal::getLogTagManager().get(std::string(tag));
-    if (!ptr)
+    ثابت Log_نښان* ptr = internal::get_Log_نښان_Manager().get(std::string(نښان));
+    إذا (!ptr)
     {
-        return getLogLevel();
+        أرجع getLogLevel();
     }
-    return ptr->level;
+    أرجع ptr->level;
 }
 
-LogLevel setLogLevel(LogLevel logLevel)
+LogLevel سېټ_Log_Level(LogLevel logLevel)
 {
     // note: not thread safe, use sparingly and do not critically depend on outcome
     LogLevel& refGlobalLevel = internal::getLogLevelVariable();
-    const LogLevel old = refGlobalLevel;
+    ثابت LogLevel old = refGlobalLevel;
     refGlobalLevel = logLevel;
-    return old;
+    أرجع old;
 }
 
 LogLevel getLogLevel()
 {
-    return internal::getLogLevelVariable();
+    أرجع internal::getLogLevelVariable();
 }
 
-namespace internal {
+نطاق internal {
 
-namespace //unnamed
+نطاق //unnamed
 {
-    std::atomic<WriteLogMessageFuncType> stc_userWriteLogMessageFunc{};
-    std::atomic<WriteLogMessageExFuncType> stc_userWriteLogMessageExFunc{};
+    std::atomic<Write_Log_پیغام_Func_Type> stc_user_Write_Log_پیغام_Func{};
+    std::atomic<Write_Log_پیغام_Ex_Func_Type> stc_user_Write_Log_پیغام_Ex_Func{};
 } //unnamed
 
-static int getShowTimestampMode()
+ساكن صحيح get_Show_Timestamp_ډېرپېښ()
 {
-    static bool param_timestamp_enable = utils::getConfigurationParameterBool("OPENCV_LOG_TIMESTAMP", true);
-    static bool param_timestamp_ns_enable = utils::getConfigurationParameterBool("OPENCV_LOG_TIMESTAMP_NS", false);
-    return (param_timestamp_enable ? 1 : 0) + (param_timestamp_ns_enable ? 2 : 0);
+    ساكن منطقي param_timestamp_enable = utils::getConfigurationParameterBool("OPENCV_LOG_TIMESTAMP", ریښتیا);
+    ساكن منطقي param_timestamp_ns_enable = utils::getConfigurationParameterBool("OPENCV_LOG_TIMESTAMP_NS", خطأ);
+    أرجع (param_timestamp_enable ? 1 : 0) + (param_timestamp_ns_enable ? 2 : 0);
 }
 
-void writeLogMessage(LogLevel logLevel, const char* message)
+فراغ write_Log_پیغام(LogLevel logLevel, ثابت حرف* message)
 {
-    WriteLogMessageFuncType userFunc = stc_userWriteLogMessageFunc.load();
-    if (userFunc && userFunc != writeLogMessage)
+    Write_Log_پیغام_Func_Type userFunc = stc_user_Write_Log_پیغام_Func.load();
+    إذا (userFunc && userFunc != write_Log_پیغام)
     {
         (*userFunc)(logLevel, message);
-        return;
+        أرجع;
     }
 
-    const int threadID = cv::utils::getThreadID();
+    ثابت صحيح threadID = cv::utils::getThreadID();
 
-    std::string message_id;
-    switch (getShowTimestampMode())
+    std::string پیغام_id;
+    بدل (get_Show_Timestamp_ډېرپېښ())
     {
-        case 1: message_id = cv::format("%d@%0.3f", threadID, getTimestampNS() * 1e-9); break;
-        case 1+2: message_id = cv::format("%d@%llu", threadID, (long long unsigned int)getTimestampNS()); break;
-        default: message_id = cv::format("%d", threadID); break;
+        حالة 1: پیغام_id = cv::format("%d@%0.3f", threadID, getTimestampNS() * 1e-9); اكسر;
+        حالة 1+2: پیغام_id = cv::format("%d@%llu", threadID, (اوږد اوږد بینښه صحيح)getTimestampNS()); اكسر;
+        افتراضي: پیغام_id = cv::format("%d", threadID); اكسر;
     }
 
     std::ostringstream ss;
-    switch (logLevel)
+    بدل (logLevel)
     {
-    case LOG_LEVEL_FATAL:   ss << "[FATAL:" << message_id << "] " << message << std::endl; break;
-    case LOG_LEVEL_ERROR:   ss << "[ERROR:" << message_id << "] " << message << std::endl; break;
-    case LOG_LEVEL_WARNING: ss << "[ WARN:" << message_id << "] " << message << std::endl; break;
-    case LOG_LEVEL_INFO:    ss << "[ INFO:" << message_id << "] " << message << std::endl; break;
-    case LOG_LEVEL_DEBUG:   ss << "[DEBUG:" << message_id << "] " << message << std::endl; break;
-    case LOG_LEVEL_VERBOSE: ss << message << std::endl; break;
-    case LOG_LEVEL_SILENT: return;  // avoid compiler warning about incomplete switch
-    case ENUM_LOG_LEVEL_FORCE_INT: return;  // avoid compiler warning about incomplete switch
+    حالة LOG_LEVEL_FATAL:   ss << "[FATAL:" << پیغام_id << "] " << message << std::کرښه_پای; اكسر;
+    حالة LOG_LEVEL_ERROR:   ss << "[ERROR:" << پیغام_id << "] " << message << std::کرښه_پای; اكسر;
+    حالة LOG_LEVEL_WARNING: ss << "[ WARN:" << پیغام_id << "] " << message << std::کرښه_پای; اكسر;
+    حالة LOG_LEVEL_INFO:    ss << "[ INFO:" << پیغام_id << "] " << message << std::کرښه_پای; اكسر;
+    حالة LOG_LEVEL_DEBUG:   ss << "[DEBUG:" << پیغام_id << "] " << message << std::کرښه_پای; اكسر;
+    حالة LOG_LEVEL_VERBOSE: ss << message << std::کرښه_پای; اكسر;
+    حالة LOG_LEVEL_SILENT: أرجع;  // avoid compiler warning about incomplete switch
+    حالة ENUM_LOG_LEVEL_FORCE_INT: أرجع;  // avoid compiler warning about incomplete switch
     }
-#ifdef __ANDROID__
-    int android_logLevel = ANDROID_LOG_INFO;
-    switch (logLevel)
+#که_تعریف_شوی __ANDROID__
+    صحيح android_logLevel = ANDROID_LOG_INFO;
+    بدل (logLevel)
     {
-    case LOG_LEVEL_FATAL:   android_logLevel = ANDROID_LOG_FATAL; break;
-    case LOG_LEVEL_ERROR:   android_logLevel = ANDROID_LOG_ERROR; break;
-    case LOG_LEVEL_WARNING: android_logLevel = ANDROID_LOG_WARN; break;
-    case LOG_LEVEL_INFO:    android_logLevel = ANDROID_LOG_INFO; break;
-    case LOG_LEVEL_DEBUG:   android_logLevel = ANDROID_LOG_DEBUG; break;
-    case LOG_LEVEL_VERBOSE: android_logLevel = ANDROID_LOG_VERBOSE; break;
-    default:
-        break;
+    حالة LOG_LEVEL_FATAL:   android_logLevel = ANDROID_LOG_FATAL; اكسر;
+    حالة LOG_LEVEL_ERROR:   android_logLevel = ANDROID_LOG_ERROR; اكسر;
+    حالة LOG_LEVEL_WARNING: android_logLevel = ANDROID_LOG_WARN; اكسر;
+    حالة LOG_LEVEL_INFO:    android_logLevel = ANDROID_LOG_INFO; اكسر;
+    حالة LOG_LEVEL_DEBUG:   android_logLevel = ANDROID_LOG_DEBUG; اكسر;
+    حالة LOG_LEVEL_VERBOSE: android_logLevel = ANDROID_LOG_VERBOSE; اكسر;
+    افتراضي:
+        اكسر;
     }
-    __android_log_print(android_logLevel, "OpenCV/" CV_VERSION, "%s", ss.str().c_str());
-#endif
-    std::ostream* out = (logLevel <= LOG_LEVEL_WARNING) ? &std::cerr : &std::cout;
+    __android_log_print(android_logLevel, "OpenCV/" CV_نسخه, "%s", ss.str().c_str());
+#د_که_پای
+    std::ostream* out = (logLevel <= LOG_LEVEL_WARNING) ? &std::cerr : &std::وتنه;
     (*out) << ss.str();
-    if (logLevel <= LOG_LEVEL_WARNING)
+    إذا (logLevel <= LOG_LEVEL_WARNING)
     {
         (*out) << std::flush;
     }
 }
 
-static const char* stripSourceFilePathPrefix(const char* file)
+ساكن ثابت حرف* strip_سرچینه_File_لار_مختاړی(ثابت حرف* file)
 {
     CV_Assert(file);
-    const char* pos = file;
-    const char* strip_pos = NULL;
-    char ch = 0;
-    while ((ch = pos[0]) != 0)
+    ثابت حرف* pos = file;
+    ثابت حرف* strip_pos = عدم;
+    حرف ch = 0;
+    طالما ((ch = pos[0]) != 0)
     {
         ++pos;
-        if (ch == '/' || ch == '\\')
+        إذا (ch == '/' || ch == '\\')
             strip_pos = pos;
     }
-    if (strip_pos == NULL || strip_pos == pos/*eos*/)
-        return file;
-    return strip_pos;
+    إذا (strip_pos == عدم || strip_pos == pos/*eos*/)
+        أرجع file;
+    أرجع strip_pos;
 }
 
-void writeLogMessageEx(LogLevel logLevel, const char* tag, const char* file, int line, const char* func, const char* message)
+فراغ write_Log_پیغام_Ex(LogLevel logLevel, ثابت حرف* نښان, ثابت حرف* file, صحيح کرښه, ثابت حرف* func, ثابت حرف* message)
 {
-    WriteLogMessageExFuncType userFunc = stc_userWriteLogMessageExFunc.load();
-    if (userFunc && userFunc != writeLogMessageEx)
+    Write_Log_پیغام_Ex_Func_Type userFunc = stc_user_Write_Log_پیغام_Ex_Func.load();
+    إذا (userFunc && userFunc != write_Log_پیغام_Ex)
     {
-        (*userFunc)(logLevel, tag, file, line, func, message);
-        return;
+        (*userFunc)(logLevel, نښان, file, کرښه, func, message);
+        أرجع;
     }
 
     std::ostringstream strm;
-    if (tag)
+    إذا (نښان)
     {
-        strm << tag << ' ';
+        strm << نښان << ' ';
     }
-    if (file)
+    إذا (file)
     {
-        strm << stripSourceFilePathPrefix(file);
-        if (line > 0)
+        strm << strip_سرچینه_File_لار_مختاړی(file);
+        إذا (کرښه > 0)
         {
-            strm << ':' << line;
+            strm << ':' << کرښه;
         }
         strm << ' ';
     }
-    if (func)
+    إذا (func)
     {
         strm << func << ' ';
     }
     strm << message;
-    writeLogMessage(logLevel, strm.str().c_str());
+    write_Log_پیغام(logLevel, strm.str().c_str());
 }
 
-void replaceWriteLogMessage(WriteLogMessageFuncType f)
+فراغ replace_Write_Log_پیغام(Write_Log_پیغام_Func_Type f)
 {
-    if (f == writeLogMessage)
+    إذا (f == write_Log_پیغام)
     {
-        f = nullptr;
+        f = تش_اشاره;
     }
-    stc_userWriteLogMessageFunc.store(f);
+    stc_user_Write_Log_پیغام_Func.store(f);
 }
 
-void replaceWriteLogMessageEx(WriteLogMessageExFuncType f)
+فراغ replace_Write_Log_پیغام_Ex(Write_Log_پیغام_Ex_Func_Type f)
 {
-    if (f == writeLogMessageEx)
+    إذا (f == write_Log_پیغام_Ex)
     {
-        f = nullptr;
+        f = تش_اشاره;
     }
-    stc_userWriteLogMessageExFunc.store(f);
+    stc_user_Write_Log_پیغام_Ex_Func.store(f);
 }
 
 } // namespace

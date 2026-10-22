@@ -40,328 +40,328 @@
 //
 //M*/
 
-#include "precomp.hpp"
-#include <cstdint>
+#ضمن "precomp.hpp"
+#ضمن <cstdint>
 
-using namespace cv;
-using namespace cv::cuda;
+کارول نطاق cv;
+کارول نطاق cv::cuda;
 
-#if defined(_MSC_VER)
-#pragma warning(disable : 4702)  // unreachable code
-#endif
+#إذا defined(_MSC_VER)
+#لارښوونه warning(disable : 4702)  // unreachable code
+#د_که_پای
 
 /////////////////////////////////////////////////////////////
 /// MemoryStack
 
-#ifdef HAVE_CUDA
+#که_تعریف_شوی HAVE_CUDA
 
-namespace
+نطاق
 {
-    class MemoryPool;
+    صنف حافظه_Pool;
 
-    class MemoryStack
+    صنف حافظه_ډېری
     {
-    public:
-        uchar* requestMemory(size_t size);
-        void returnMemory(uchar* ptr);
+    عام:
+        uchar* request_حافظه(size_t size);
+        فراغ return_حافظه(uchar* ptr);
 
         uchar* datastart;
         uchar* dataend;
         uchar* tip;
 
-        bool isFree;
-        MemoryPool* pool;
+        منطقي isFree;
+        حافظه_Pool* pool;
 
-    #if !defined(NDEBUG)
+    #إذا !defined(NDEBUG)
         std::vector<size_t> allocations;
-    #endif
+    #د_که_پای
     };
 
-    uchar* MemoryStack::requestMemory(size_t size)
+    uchar* حافظه_ډېری::request_حافظه(size_t size)
     {
-        const size_t freeMem = dataend - tip;
+        ثابت size_t freeMem = dataend - tip;
 
-        if (size > freeMem)
-            return 0;
+        إذا (size > freeMem)
+            أرجع 0;
 
         uchar* ptr = tip;
 
         tip += size;
 
-    #if !defined(NDEBUG)
+    #إذا !defined(NDEBUG)
         allocations.push_back(size);
-    #endif
+    #د_که_پای
 
-        return ptr;
+        أرجع ptr;
     }
 
-    void MemoryStack::returnMemory(uchar* ptr)
+    فراغ حافظه_ډېری::return_حافظه(uchar* ptr)
     {
         CV_DbgAssert( ptr >= datastart && ptr < dataend );
 
-    #if !defined(NDEBUG)
-        const size_t allocSize = tip - ptr;
-        CV_Assert( allocSize == allocations.back() );
+    #إذا !defined(NDEBUG)
+        ثابت size_t alloc_اندازه = tip - ptr;
+        CV_Assert( alloc_اندازه == allocations.back() );
         allocations.pop_back();
-    #endif
+    #د_که_پای
 
         tip = ptr;
     }
 }
 
-#endif
+#د_که_پای
 
 /////////////////////////////////////////////////////////////
 /// MemoryPool
 
-#ifdef HAVE_CUDA
+#که_تعریف_شوی HAVE_CUDA
 
-namespace
+نطاق
 {
-    class MemoryPool
+    صنف حافظه_Pool
     {
-    public:
-        MemoryPool();
-        ~MemoryPool() { release(); }
+    عام:
+        حافظه_Pool();
+        ~حافظه_Pool() { release(); }
 
-        void initialize(size_t stackSize, int stackCount);
-        void release();
+        فراغ initialize(size_t ډېری_اندازه, صحيح ډېری_شمېر);
+        فراغ release();
 
-        MemoryStack* getFreeMemStack();
-        void returnMemStack(MemoryStack* memStack);
+        حافظه_ډېری* get_Free_Mem_ډېری();
+        فراغ return_Mem_ډېری(حافظه_ډېری* mem_ډېری);
 
-    private:
-        void initilizeImpl();
+    خاص:
+        فراغ initilizeImpl();
 
         Mutex mtx_;
 
-        bool initialized_;
-        size_t stackSize_;
-        int stackCount_;
+        منطقي initialized_;
+        size_t ډېری_اندازه_2;
+        صحيح ډېری_شمېر_2;
 
         uchar* mem_;
 
-        std::vector<MemoryStack> stacks_;
+        std::vector<حافظه_ډېری> stacks_;
 
-        MemoryPool(const MemoryPool&); //= delete;
+        حافظه_Pool(ثابت حافظه_Pool&); //= delete;
     };
 
-    MemoryPool::MemoryPool() : initialized_(false), mem_(0)
+    حافظه_Pool::حافظه_Pool() : initialized_(خطأ), mem_(0)
     {
         // default : 10 Mb, 5 stacks
-        stackSize_ = 10 * 1024 * 1024;
-        stackCount_ = 5;
+        ډېری_اندازه_2 = 10 * 1024 * 1024;
+        ډېری_شمېر_2 = 5;
     }
 
-    void MemoryPool::initialize(size_t stackSize, int stackCount)
+    فراغ حافظه_Pool::initialize(size_t ډېری_اندازه, صحيح ډېری_شمېر)
     {
-        AutoLock lock(mtx_);
+        Auto_قلف lock(mtx_);
 
         release();
 
-        stackSize_ = stackSize;
-        stackCount_ = stackCount;
+        ډېری_اندازه_2 = ډېری_اندازه;
+        ډېری_شمېر_2 = ډېری_شمېر;
 
         initilizeImpl();
     }
 
-    void MemoryPool::initilizeImpl()
+    فراغ حافظه_Pool::initilizeImpl()
     {
-        const size_t totalSize = stackSize_ * stackCount_;
+        ثابت size_t ټول_اندازه = ډېری_اندازه_2 * ډېری_شمېر_2;
 
-        if (totalSize > 0)
+        إذا (ټول_اندازه > 0)
         {
-            cudaError_t err = cudaMalloc(&mem_, totalSize);
-            if (err != cudaSuccess)
-                return;
+            cudaError_t err = cudaMalloc(&mem_, ټول_اندازه);
+            إذا (err != cudaSuccess)
+                أرجع;
 
-            stacks_.resize(stackCount_);
+            stacks_.resize(ډېری_شمېر_2);
 
             uchar* ptr = mem_;
 
-            for (int i = 0; i < stackCount_; ++i)
+            لكل (صحيح i = 0; i < ډېری_شمېر_2; ++i)
             {
                 stacks_[i].datastart = ptr;
-                stacks_[i].dataend = ptr + stackSize_;
+                stacks_[i].dataend = ptr + ډېری_اندازه_2;
                 stacks_[i].tip = ptr;
-                stacks_[i].isFree = true;
-                stacks_[i].pool = this;
+                stacks_[i].isFree = ریښتیا;
+                stacks_[i].pool = هذا;
 
-                ptr += stackSize_;
+                ptr += ډېری_اندازه_2;
             }
 
-            initialized_ = true;
+            initialized_ = ریښتیا;
         }
     }
 
-    void MemoryPool::release()
+    فراغ حافظه_Pool::release()
     {
-        if (mem_)
+        إذا (mem_)
         {
-#if !defined(NDEBUG)
-            for (int i = 0; i < stackCount_; ++i)
+#إذا !defined(NDEBUG)
+            لكل (صحيح i = 0; i < ډېری_شمېر_2; ++i)
             {
                 CV_DbgAssert( stacks_[i].isFree );
                 CV_DbgAssert( stacks_[i].tip == stacks_[i].datastart );
             }
-#endif
+#د_که_پای
 
             cudaFree(mem_);
 
             mem_ = 0;
-            initialized_ = false;
+            initialized_ = خطأ;
         }
     }
 
-    MemoryStack* MemoryPool::getFreeMemStack()
+    حافظه_ډېری* حافظه_Pool::get_Free_Mem_ډېری()
     {
-        AutoLock lock(mtx_);
+        Auto_قلف lock(mtx_);
 
-        if (!initialized_)
+        إذا (!initialized_)
             initilizeImpl();
 
-        if (!mem_)
-            return 0;
+        إذا (!mem_)
+            أرجع 0;
 
-        for (int i = 0; i < stackCount_; ++i)
+        لكل (صحيح i = 0; i < ډېری_شمېر_2; ++i)
         {
-            if (stacks_[i].isFree)
+            إذا (stacks_[i].isFree)
             {
-                stacks_[i].isFree = false;
-                return &stacks_[i];
+                stacks_[i].isFree = خطأ;
+                أرجع &stacks_[i];
             }
         }
 
-        return 0;
+        أرجع 0;
     }
 
-    void MemoryPool::returnMemStack(MemoryStack* memStack)
+    فراغ حافظه_Pool::return_Mem_ډېری(حافظه_ډېری* mem_ډېری)
     {
-        AutoLock lock(mtx_);
+        Auto_قلف lock(mtx_);
 
-        CV_DbgAssert( !memStack->isFree );
+        CV_DbgAssert( !mem_ډېری->isFree );
 
-#if !defined(NDEBUG)
-        bool found = false;
-        for (int i = 0; i < stackCount_; ++i)
+#إذا !defined(NDEBUG)
+        منطقي وموندل = خطأ;
+        لكل (صحيح i = 0; i < ډېری_شمېر_2; ++i)
         {
-            if (memStack == &stacks_[i])
+            إذا (mem_ډېری == &stacks_[i])
             {
-                found = true;
-                break;
+                وموندل = ریښتیا;
+                اكسر;
             }
         }
-        CV_DbgAssert( found );
-#endif
+        CV_DbgAssert( وموندل );
+#د_که_پای
 
-        CV_DbgAssert( memStack->tip == memStack->datastart );
+        CV_DbgAssert( mem_ډېری->tip == mem_ډېری->datastart );
 
-        memStack->isFree = true;
+        mem_ډېری->isFree = ریښتیا;
     }
 }
 
-#endif
+#د_که_پای
 
 ////////////////////////////////////////////////////////////////
 /// Stream::Impl
 
-#ifndef HAVE_CUDA
+#که_نه_تعریف_شوی HAVE_CUDA
 
-class cv::cuda::Stream::Impl
+صنف cv::cuda::بهیر::Impl
 {
-public:
-    Impl(void* ptr = 0)
+عام:
+    Impl(فراغ* ptr = 0)
     {
-        CV_UNUSED(ptr);
+        CV_ناکارول_شوی(ptr);
         throw_no_cuda();
     }
 };
 
-#else
+#وإلا
 
-namespace
+نطاق
 {
-    class StackAllocator;
+    صنف ډېری_Allocator;
 }
 
-class cv::cuda::Stream::Impl
+صنف cv::cuda::بهیر::Impl
 {
-public:
-    cudaStream_t stream;
-    bool ownStream;
+عام:
+    cuda_بهیر_t stream;
+    منطقي own_بهیر;
 
     Ptr<GpuMat::Allocator> allocator;
 
     Impl();
-    Impl(const Ptr<GpuMat::Allocator>& allocator);
-    Impl(const unsigned int cudaFlags);
-    explicit Impl(cudaStream_t stream);
+    Impl(ثابت Ptr<GpuMat::Allocator>& allocator);
+    Impl(ثابت بینښه صحيح cudaFlags);
+    څرګند Impl(cuda_بهیر_t stream);
 
     ~Impl();
 };
 
-cv::cuda::Stream::Impl::Impl() : stream(0), ownStream(false)
+cv::cuda::بهیر::Impl::Impl() : stream(0), own_بهیر(خطأ)
 {
-    cudaSafeCall( cudaStreamCreate(&stream) );
-    ownStream = true;
+    cuda_خوندي_Call( cuda_بهیر_Create(&stream) );
+    own_بهیر = ریښتیا;
 
-    allocator = makePtr<StackAllocator>(stream);
+    allocator = makePtr<ډېری_Allocator>(stream);
 }
 
-cv::cuda::Stream::Impl::Impl(const Ptr<GpuMat::Allocator>& allocator) : stream(0), ownStream(false), allocator(allocator)
+cv::cuda::بهیر::Impl::Impl(ثابت Ptr<GpuMat::Allocator>& allocator) : stream(0), own_بهیر(خطأ), allocator(allocator)
 {
-    cudaSafeCall( cudaStreamCreate(&stream) );
-    ownStream = true;
+    cuda_خوندي_Call( cuda_بهیر_Create(&stream) );
+    own_بهیر = ریښتیا;
 }
 
-cv::cuda::Stream::Impl::Impl(const unsigned int cudaFlags) : stream(0), ownStream(false)
+cv::cuda::بهیر::Impl::Impl(ثابت بینښه صحيح cudaFlags) : stream(0), own_بهیر(خطأ)
 {
-    cudaSafeCall(cudaStreamCreateWithFlags(&stream, cudaFlags));
-    ownStream = true;
-    allocator = makePtr<StackAllocator>(stream);
+    cuda_خوندي_Call(cuda_بهیر_Create_With_Flags(&stream, cudaFlags));
+    own_بهیر = ریښتیا;
+    allocator = makePtr<ډېری_Allocator>(stream);
 }
 
-cv::cuda::Stream::Impl::Impl(cudaStream_t stream_) : stream(stream_), ownStream(false)
+cv::cuda::بهیر::Impl::Impl(cuda_بهیر_t بهیر_3) : stream(بهیر_3), own_بهیر(خطأ)
 {
-    allocator = makePtr<StackAllocator>(stream);
+    allocator = makePtr<ډېری_Allocator>(stream);
 }
 
-cv::cuda::Stream::Impl::~Impl()
+cv::cuda::بهیر::Impl::~Impl()
 {
     allocator.release();
 
-    if (stream && ownStream)
+    إذا (stream && own_بهیر)
     {
-        cudaStreamDestroy(stream);
+        cuda_بهیر_Destroy(stream);
     }
 }
 
-#endif
+#د_که_پای
 
 /////////////////////////////////////////////////////////////
 /// DefaultDeviceInitializer
 
-#ifdef HAVE_CUDA
+#که_تعریف_شوی HAVE_CUDA
 
-namespace cv { namespace cuda
+نطاق cv { نطاق cuda
 {
-    class DefaultDeviceInitializer
+    صنف DefaultDeviceInitializer
     {
-    public:
+    عام:
         DefaultDeviceInitializer();
         ~DefaultDeviceInitializer();
 
-        Stream& getNullStream(int deviceId);
-        MemoryPool& getMemoryPool(int deviceId);
+        بهیر& get_Null_بهیر(صحيح deviceId);
+        حافظه_Pool& get_حافظه_Pool(صحيح deviceId);
 
-    private:
-        void initStreams();
-        void initPools();
+    خاص:
+        فراغ initStreams();
+        فراغ initPools();
 
-        std::vector<Ptr<Stream> > streams_;
+        std::vector<Ptr<بهیر> > streams_;
         Mutex streams_mtx_;
 
-        std::vector<Ptr<MemoryPool> > pools_;
+        std::vector<Ptr<حافظه_Pool> > pools_;
         Mutex pools_mtx_;
     };
 
@@ -373,506 +373,506 @@ namespace cv { namespace cuda
     {
         streams_.clear();
 
-        for (size_t i = 0; i < pools_.size(); ++i)
+        لكل (size_t i = 0; i < pools_.size(); ++i)
         {
-            cudaSetDevice(static_cast<int>(i));
+            cuda_سېټ_Device(static_cast<صحيح>(i));
             pools_[i]->release();
         }
 
         pools_.clear();
     }
 
-    Stream& DefaultDeviceInitializer::getNullStream(int deviceId)
+    بهیر& DefaultDeviceInitializer::get_Null_بهیر(صحيح deviceId)
     {
-        AutoLock lock(streams_mtx_);
+        Auto_قلف lock(streams_mtx_);
 
-        if (streams_.empty())
+        إذا (streams_.empty())
         {
-            int deviceCount = getCudaEnabledDeviceCount();
+            صحيح device_شمېر = get_Cuda_Enabled_Device_شمېر();
 
-            if (deviceCount > 0)
-                streams_.resize(deviceCount);
+            إذا (device_شمېر > 0)
+                streams_.resize(device_شمېر);
         }
 
-        CV_DbgAssert( deviceId >= 0 && deviceId < static_cast<int>(streams_.size()) );
+        CV_DbgAssert( deviceId >= 0 && deviceId < static_cast<صحيح>(streams_.size()) );
 
-        if (streams_[deviceId].empty())
+        إذا (streams_[deviceId].empty())
         {
-            cudaStream_t stream = NULL;
-            Ptr<Stream::Impl> impl = makePtr<Stream::Impl>(stream);
-            streams_[deviceId] = Ptr<Stream>(new Stream(impl));
+            cuda_بهیر_t stream = عدم;
+            Ptr<بهیر::Impl> impl = makePtr<بهیر::Impl>(stream);
+            streams_[deviceId] = Ptr<بهیر>(جديد بهیر(impl));
         }
 
-        return *streams_[deviceId];
+        أرجع *streams_[deviceId];
     }
 
-    MemoryPool& DefaultDeviceInitializer::getMemoryPool(int deviceId)
+    حافظه_Pool& DefaultDeviceInitializer::get_حافظه_Pool(صحيح deviceId)
     {
-        AutoLock lock(pools_mtx_);
+        Auto_قلف lock(pools_mtx_);
 
-        if (pools_.empty())
+        إذا (pools_.empty())
         {
-            int deviceCount = getCudaEnabledDeviceCount();
+            صحيح device_شمېر = get_Cuda_Enabled_Device_شمېر();
 
-            if (deviceCount > 0)
+            إذا (device_شمېر > 0)
             {
-                pools_.resize(deviceCount);
-                for (size_t i = 0; i < pools_.size(); ++i)
+                pools_.resize(device_شمېر);
+                لكل (size_t i = 0; i < pools_.size(); ++i)
                 {
-                    cudaSetDevice(static_cast<int>(i));
-                    pools_[i] = makePtr<MemoryPool>();
+                    cuda_سېټ_Device(static_cast<صحيح>(i));
+                    pools_[i] = makePtr<حافظه_Pool>();
                 }
             }
         }
 
-        CV_DbgAssert( deviceId >= 0 && deviceId < static_cast<int>(pools_.size()) );
+        CV_DbgAssert( deviceId >= 0 && deviceId < static_cast<صحيح>(pools_.size()) );
 
-        MemoryPool* p = pools_[deviceId];
+        حافظه_Pool* p = pools_[deviceId];
         CV_Assert(p);
-        return *p;
+        أرجع *p;
     }
 
     DefaultDeviceInitializer initializer;
 }}
 
-#endif
+#د_که_پای
 
 /////////////////////////////////////////////////////////////
 /// Stream
 
-cv::cuda::Stream::Stream()
+cv::cuda::بهیر::بهیر()
 {
-#ifndef HAVE_CUDA
+#که_نه_تعریف_شوی HAVE_CUDA
     throw_no_cuda();
-#else
+#وإلا
     impl_ = makePtr<Impl>();
-#endif
+#د_که_پای
 }
 
-cv::cuda::Stream::Stream(const Ptr<GpuMat::Allocator>& allocator)
+cv::cuda::بهیر::بهیر(ثابت Ptr<GpuMat::Allocator>& allocator)
 {
-#ifndef HAVE_CUDA
-    CV_UNUSED(allocator);
+#که_نه_تعریف_شوی HAVE_CUDA
+    CV_ناکارول_شوی(allocator);
     throw_no_cuda();
-#else
+#وإلا
     impl_ = makePtr<Impl>(allocator);
-#endif
+#د_که_پای
 }
 
-cv::cuda::Stream::Stream(const size_t cudaFlags)
+cv::cuda::بهیر::بهیر(ثابت size_t cudaFlags)
 {
-#ifndef HAVE_CUDA
-    CV_UNUSED(cudaFlags);
+#که_نه_تعریف_شوی HAVE_CUDA
+    CV_ناکارول_شوی(cudaFlags);
     throw_no_cuda();
-#else
+#وإلا
     impl_ = makePtr<Impl>(cudaFlags & UINT_MAX);
-#endif
+#د_که_پای
 }
 
-bool cv::cuda::Stream::queryIfComplete() const
+منطقي cv::cuda::بهیر::queryIfComplete() ثابت
 {
-#ifndef HAVE_CUDA
+#که_نه_تعریف_شوی HAVE_CUDA
     throw_no_cuda();
-#else
-    cudaError_t err = cudaStreamQuery(impl_->stream);
+#وإلا
+    cudaError_t err = cuda_بهیر_Query(impl_->stream);
 
-    if (err == cudaErrorNotReady || err == cudaSuccess)
-        return err == cudaSuccess;
+    إذا (err == cudaErrorNotReady || err == cudaSuccess)
+        أرجع err == cudaSuccess;
 
-    cudaSafeCall(err);
-    return false;
-#endif
+    cuda_خوندي_Call(err);
+    أرجع خطأ;
+#د_که_پای
 }
 
-void cv::cuda::Stream::waitForCompletion()
+فراغ cv::cuda::بهیر::waitForCompletion()
 {
-#ifndef HAVE_CUDA
+#که_نه_تعریف_شوی HAVE_CUDA
     throw_no_cuda();
-#else
-    cudaSafeCall( cudaStreamSynchronize(impl_->stream) );
-#endif
+#وإلا
+    cuda_خوندي_Call( cuda_بهیر_Synchronize(impl_->stream) );
+#د_که_پای
 }
 
-void cv::cuda::Stream::waitEvent(const Event& event)
+فراغ cv::cuda::بهیر::waitEvent(ثابت Event& event)
 {
-#ifndef HAVE_CUDA
-    CV_UNUSED(event);
+#که_نه_تعریف_شوی HAVE_CUDA
+    CV_ناکارول_شوی(event);
     throw_no_cuda();
-#else
-    cudaSafeCall( cudaStreamWaitEvent(impl_->stream, EventAccessor::getEvent(event), 0) );
-#endif
+#وإلا
+    cuda_خوندي_Call( cuda_بهیر_Wait_Event(impl_->stream, EventAccessor::getEvent(event), 0) );
+#د_که_پای
 }
 
-#if defined(HAVE_CUDA) && (CUDART_VERSION >= 5000)
+#إذا defined(HAVE_CUDA) && (CUDART_نسخه >= 5000)
 
-namespace
+نطاق
 {
-    struct CallbackData
+    بنية Callback_معلومات
     {
-        Stream::StreamCallback callback;
-        void* userData;
+        بهیر::بهیر_Callback callback;
+        فراغ* user_معلومات;
 
-        CallbackData(Stream::StreamCallback callback_, void* userData_) : callback(callback_), userData(userData_) {}
+        Callback_معلومات(بهیر::بهیر_Callback callback_, فراغ* user_معلومات_2) : callback(callback_), user_معلومات(user_معلومات_2) {}
     };
 
-    void CUDART_CB cudaStreamCallback(cudaStream_t, cudaError_t status, void* userData)
+    فراغ CUDART_CB cuda_بهیر_Callback(cuda_بهیر_t, cudaError_t حالت, فراغ* user_معلومات)
     {
-        CallbackData* data = reinterpret_cast<CallbackData*>(userData);
-        data->callback(static_cast<int>(status), data->userData);
-        delete data;
+        Callback_معلومات* معلومات = reinterpret_cast<Callback_معلومات*>(user_معلومات);
+        معلومات->callback(static_cast<صحيح>(حالت), معلومات->user_معلومات);
+        ړنګول معلومات;
     }
 }
 
-#endif
+#د_که_پای
 
-void cv::cuda::Stream::enqueueHostCallback(StreamCallback callback, void* userData)
+فراغ cv::cuda::بهیر::کتار_ته_ورزیاتول_Host_Callback(بهیر_Callback callback, فراغ* user_معلومات)
 {
-#ifndef HAVE_CUDA
-    CV_UNUSED(callback);
-    CV_UNUSED(userData);
+#که_نه_تعریف_شوی HAVE_CUDA
+    CV_ناکارول_شوی(callback);
+    CV_ناکارول_شوی(user_معلومات);
     throw_no_cuda();
-#else
-    #if CUDART_VERSION < 5000
-        CV_UNUSED(callback);
-        CV_UNUSED(userData);
+#وإلا
+    #إذا CUDART_نسخه < 5000
+        CV_ناکارول_شوی(callback);
+        CV_ناکارول_شوی(user_معلومات);
         CV_Error(cv::Error::StsNotImplemented, "This function requires CUDA >= 5.0");
-    #else
-        CallbackData* data = new CallbackData(callback, userData);
+    #وإلا
+        Callback_معلومات* معلومات = جديد Callback_معلومات(callback, user_معلومات);
 
-        cudaSafeCall( cudaStreamAddCallback(impl_->stream, cudaStreamCallback, data, 0) );
-    #endif
-#endif
+        cuda_خوندي_Call( cuda_بهیر_جمع_کړه_Callback(impl_->stream, cuda_بهیر_Callback, معلومات, 0) );
+    #د_که_پای
+#د_که_پای
 }
 
-Stream& cv::cuda::Stream::Null()
+بهیر& cv::cuda::بهیر::Null()
 {
-#ifndef HAVE_CUDA
+#که_نه_تعریف_شوی HAVE_CUDA
     throw_no_cuda();
-#else
-    const int deviceId = getDevice();
-    return initializer.getNullStream(deviceId);
-#endif
+#وإلا
+    ثابت صحيح deviceId = getDevice();
+    أرجع initializer.get_Null_بهیر(deviceId);
+#د_که_پای
 }
 
-void* cv::cuda::Stream::cudaPtr() const
+فراغ* cv::cuda::بهیر::cudaPtr() ثابت
 {
-#ifndef HAVE_CUDA
-    return nullptr;
-#else
-    return impl_->stream;
-#endif
+#که_نه_تعریف_شوی HAVE_CUDA
+    أرجع تش_اشاره;
+#وإلا
+    أرجع impl_->stream;
+#د_که_پای
 }
 
-cv::cuda::Stream::operator bool_type() const
+cv::cuda::بهیر::چلوونکی bool_type() ثابت
 {
-#ifndef HAVE_CUDA
-    return 0;
-#else
-    return (impl_->stream != 0) ? &Stream::this_type_does_not_support_comparisons : 0;
-#endif
+#که_نه_تعریف_شوی HAVE_CUDA
+    أرجع 0;
+#وإلا
+    أرجع (impl_->stream != 0) ? &بهیر::this_type_does_not_support_comparisons : 0;
+#د_که_پای
 }
 
-#ifdef HAVE_CUDA
+#که_تعریف_شوی HAVE_CUDA
 
-cudaStream_t cv::cuda::StreamAccessor::getStream(const Stream& stream)
+cuda_بهیر_t cv::cuda::بهیر_Accessor::get_بهیر(ثابت بهیر& stream)
 {
-    return stream.impl_->stream;
+    أرجع stream.impl_->stream;
 }
 
-Stream cv::cuda::StreamAccessor::wrapStream(cudaStream_t stream)
+بهیر cv::cuda::بهیر_Accessor::wrap_بهیر(cuda_بهیر_t stream)
 {
-    return Stream(makePtr<Stream::Impl>(stream));
+    أرجع بهیر(makePtr<بهیر::Impl>(stream));
 }
 
-#endif
+#د_که_پای
 
-Stream cv::cuda::wrapStream(size_t cudaStreamMemoryAddress) {
-#ifndef HAVE_CUDA
-    CV_UNUSED(cudaStreamMemoryAddress);
+بهیر cv::cuda::wrap_بهیر(size_t cuda_بهیر_حافظه_پته) {
+#که_نه_تعریف_شوی HAVE_CUDA
+    CV_ناکارول_شوی(cuda_بهیر_حافظه_پته);
     throw_no_cuda();
-#else
-    return cv::cuda::StreamAccessor::wrapStream(reinterpret_cast<cudaStream_t>(cudaStreamMemoryAddress));
-#endif
+#وإلا
+    أرجع cv::cuda::بهیر_Accessor::wrap_بهیر(reinterpret_cast<cuda_بهیر_t>(cuda_بهیر_حافظه_پته));
+#د_که_پای
 }
 
 /////////////////////////////////////////////////////////////
 /// StackAllocator
 
-#ifdef HAVE_CUDA
+#که_تعریف_شوی HAVE_CUDA
 
-namespace
+نطاق
 {
-    bool enableMemoryPool = false;
+    منطقي enable_حافظه_Pool = خطأ;
 
-    class StackAllocator : public GpuMat::Allocator
+    صنف ډېری_Allocator : عام GpuMat::Allocator
     {
-    public:
-        explicit StackAllocator(cudaStream_t stream);
-        ~StackAllocator();
+    عام:
+        څرګند ډېری_Allocator(cuda_بهیر_t stream);
+        ~ډېری_Allocator();
 
-        bool allocate(GpuMat* mat, int rows, int cols, size_t elemSize) CV_OVERRIDE;
-        void free(GpuMat* mat) CV_OVERRIDE;
+        منطقي allocate(GpuMat* mat, صحيح لیکې, صحيح ستون_شمېر, size_t elem_اندازه) CV_OVERRIDE;
+        فراغ حرر(GpuMat* mat) CV_OVERRIDE;
 
-    private:
-        StackAllocator(const StackAllocator&);
-        StackAllocator& operator =(const StackAllocator&);
+    خاص:
+        ډېری_Allocator(ثابت ډېری_Allocator&);
+        ډېری_Allocator& چلوونکی =(ثابت ډېری_Allocator&);
 
-        cudaStream_t stream_;
-        MemoryStack* memStack_;
+        cuda_بهیر_t بهیر_3;
+        حافظه_ډېری* mem_ډېری_2;
         size_t alignment_;
     };
 
-    StackAllocator::StackAllocator(cudaStream_t stream) : stream_(stream), memStack_(0)
+    ډېری_Allocator::ډېری_Allocator(cuda_بهیر_t stream) : بهیر_3(stream), mem_ډېری_2(0)
     {
-        if (enableMemoryPool)
+        إذا (enable_حافظه_Pool)
         {
-            const int deviceId = getDevice();
-            memStack_ = initializer.getMemoryPool(deviceId).getFreeMemStack();
+            ثابت صحيح deviceId = getDevice();
+            mem_ډېری_2 = initializer.get_حافظه_Pool(deviceId).get_Free_Mem_ډېری();
             DeviceInfo devInfo(deviceId);
             alignment_ = devInfo.textureAlignment();
         }
     }
 
-    StackAllocator::~StackAllocator()
+    ډېری_Allocator::~ډېری_Allocator()
     {
-        if (memStack_ != 0)
+        إذا (mem_ډېری_2 != 0)
         {
-            cudaStreamSynchronize(stream_);
-            memStack_->pool->returnMemStack(memStack_);
+            cuda_بهیر_Synchronize(بهیر_3);
+            mem_ډېری_2->pool->return_Mem_ډېری(mem_ډېری_2);
         }
     }
 
-    size_t alignUp(size_t what, size_t alignment)
+    size_t align_پورته(size_t what, size_t alignment)
     {
-        size_t alignMask = alignment-1;
-        size_t inverseAlignMask = ~alignMask;
-        size_t res = (what + alignMask) & inverseAlignMask;
-        return res;
+        size_t align_ماسک = alignment-1;
+        size_t inverse_Align_ماسک = ~align_ماسک;
+        size_t res = (what + align_ماسک) & inverse_Align_ماسک;
+        أرجع res;
     }
 
-    bool StackAllocator::allocate(GpuMat* mat, int rows, int cols, size_t elemSize)
+    منطقي ډېری_Allocator::allocate(GpuMat* mat, صحيح لیکې, صحيح ستون_شمېر, size_t elem_اندازه)
     {
-        if (memStack_ == 0)
-            return false;
+        إذا (mem_ډېری_2 == 0)
+            أرجع خطأ;
 
-        size_t pitch, memSize;
+        size_t pitch, mem_اندازه;
 
-        if (rows > 1 && cols > 1)
+        إذا (لیکې > 1 && ستون_شمېر > 1)
         {
-            pitch = alignUp(cols * elemSize, alignment_);
-            memSize = pitch * rows;
+            pitch = align_پورته(ستون_شمېر * elem_اندازه, alignment_);
+            mem_اندازه = pitch * لیکې;
         }
-        else
+        وإلا
         {
             // Single row or single column must be continuous
-            pitch = elemSize * cols;
-            memSize = alignUp(elemSize * cols * rows, 64);
+            pitch = elem_اندازه * ستون_شمېر;
+            mem_اندازه = align_پورته(elem_اندازه * ستون_شمېر * لیکې, 64);
         }
 
-        uchar* ptr = memStack_->requestMemory(memSize);
+        uchar* ptr = mem_ډېری_2->request_حافظه(mem_اندازه);
 
-        if (ptr == 0)
-            return false;
+        إذا (ptr == 0)
+            أرجع خطأ;
 
-        mat->data = ptr;
-        mat->step = pitch;
-        mat->refcount = (int*) fastMalloc(sizeof(int));
+        mat->معلومات = ptr;
+        mat->ګام = pitch;
+        mat->refcount = (صحيح*) fastMalloc(حجم(صحيح));
 
-        return true;
+        أرجع ریښتیا;
     }
 
-    void StackAllocator::free(GpuMat* mat)
+    فراغ ډېری_Allocator::حرر(GpuMat* mat)
     {
-        if (memStack_ == 0)
-            return;
+        إذا (mem_ډېری_2 == 0)
+            أرجع;
 
-        memStack_->returnMemory(mat->datastart);
+        mem_ډېری_2->return_حافظه(mat->datastart);
         fastFree(mat->refcount);
     }
 }
 
-#endif
+#د_که_پای
 
 /////////////////////////////////////////////////////////////
 /// BufferPool
 
-void cv::cuda::setBufferPoolUsage(bool on)
+فراغ cv::cuda::سېټ_بفر_Pool_Usage(منطقي on)
 {
-#ifndef HAVE_CUDA
-    CV_UNUSED(on);
+#که_نه_تعریف_شوی HAVE_CUDA
+    CV_ناکارول_شوی(on);
     throw_no_cuda();
-#else
-    enableMemoryPool = on;
-#endif
+#وإلا
+    enable_حافظه_Pool = on;
+#د_که_پای
 }
 
-void cv::cuda::setBufferPoolConfig(int deviceId, size_t stackSize, int stackCount)
+فراغ cv::cuda::سېټ_بفر_Pool_Config(صحيح deviceId, size_t ډېری_اندازه, صحيح ډېری_شمېر)
 {
-#ifndef HAVE_CUDA
-    CV_UNUSED(deviceId);
-    CV_UNUSED(stackSize);
-    CV_UNUSED(stackCount);
+#که_نه_تعریف_شوی HAVE_CUDA
+    CV_ناکارول_شوی(deviceId);
+    CV_ناکارول_شوی(ډېری_اندازه);
+    CV_ناکارول_شوی(ډېری_شمېر);
     throw_no_cuda();
-#else
-    const int currentDevice = getDevice();
+#وإلا
+    ثابت صحيح currentDevice = getDevice();
 
-    if (deviceId >= 0)
+    إذا (deviceId >= 0)
     {
-        setDevice(deviceId);
-        initializer.getMemoryPool(deviceId).initialize(stackSize, stackCount);
+        سېټ_Device(deviceId);
+        initializer.get_حافظه_Pool(deviceId).initialize(ډېری_اندازه, ډېری_شمېر);
     }
-    else
+    وإلا
     {
-        const int deviceCount = getCudaEnabledDeviceCount();
+        ثابت صحيح device_شمېر = get_Cuda_Enabled_Device_شمېر();
 
-        for (deviceId = 0; deviceId < deviceCount; ++deviceId)
+        لكل (deviceId = 0; deviceId < device_شمېر; ++deviceId)
         {
-            setDevice(deviceId);
-            initializer.getMemoryPool(deviceId).initialize(stackSize, stackCount);
+            سېټ_Device(deviceId);
+            initializer.get_حافظه_Pool(deviceId).initialize(ډېری_اندازه, ډېری_شمېر);
         }
     }
 
-    setDevice(currentDevice);
-#endif
+    سېټ_Device(currentDevice);
+#د_که_پای
 }
 
-#ifndef HAVE_CUDA
-cv::cuda::BufferPool::BufferPool(Stream& stream)
+#که_نه_تعریف_شوی HAVE_CUDA
+cv::cuda::بفر_Pool::بفر_Pool(بهیر& stream)
 {
-    CV_UNUSED(stream);
+    CV_ناکارول_شوی(stream);
     throw_no_cuda();
 }
-#else
-cv::cuda::BufferPool::BufferPool(Stream& stream) : allocator_(stream.impl_->allocator)
+#وإلا
+cv::cuda::بفر_Pool::بفر_Pool(بهیر& stream) : allocator_(stream.impl_->allocator)
 {
 }
-#endif
+#د_که_پای
 
-GpuMat cv::cuda::BufferPool::getBuffer(int rows, int cols, int type)
+GpuMat cv::cuda::بفر_Pool::get_بفر(صحيح لیکې, صحيح ستون_شمېر, صحيح type)
 {
-#ifndef HAVE_CUDA
-    CV_UNUSED(rows);
-    CV_UNUSED(cols);
-    CV_UNUSED(type);
+#که_نه_تعریف_شوی HAVE_CUDA
+    CV_ناکارول_شوی(لیکې);
+    CV_ناکارول_شوی(ستون_شمېر);
+    CV_ناکارول_شوی(type);
     throw_no_cuda();
-#else
+#وإلا
     GpuMat buf(allocator_);
-    buf.create(rows, cols, type);
-    return buf;
-#endif
+    buf.create(لیکې, ستون_شمېر, type);
+    أرجع buf;
+#د_که_پای
 }
 
 
 ////////////////////////////////////////////////////////////////
 // Event
 
-#ifndef HAVE_CUDA
+#که_نه_تعریف_شوی HAVE_CUDA
 
-class cv::cuda::Event::Impl
+صنف cv::cuda::Event::Impl
 {
-public:
-    Impl(unsigned int)
+عام:
+    Impl(بینښه صحيح)
     {
         throw_no_cuda();
     }
 };
 
-#else
+#وإلا
 
-class cv::cuda::Event::Impl
+صنف cv::cuda::Event::Impl
 {
-public:
+عام:
     cudaEvent_t event;
-    bool ownEvent;
+    منطقي ownEvent;
 
-    explicit Impl(unsigned int flags);
-    explicit Impl(cudaEvent_t event);
+    څرګند Impl(بینښه صحيح flags);
+    څرګند Impl(cudaEvent_t event);
     ~Impl();
 };
 
-cv::cuda::Event::Impl::Impl(unsigned int flags) : event(0), ownEvent(false)
+cv::cuda::Event::Impl::Impl(بینښه صحيح flags) : event(0), ownEvent(خطأ)
 {
-    cudaSafeCall( cudaEventCreateWithFlags(&event, flags) );
-    ownEvent = true;
+    cuda_خوندي_Call( cudaEventCreateWithFlags(&event, flags) );
+    ownEvent = ریښتیا;
 }
 
-cv::cuda::Event::Impl::Impl(cudaEvent_t e) : event(e), ownEvent(false)
+cv::cuda::Event::Impl::Impl(cudaEvent_t e) : event(e), ownEvent(خطأ)
 {
 }
 
 cv::cuda::Event::Impl::~Impl()
 {
-    if (event && ownEvent)
+    إذا (event && ownEvent)
     {
         cudaEventDestroy(event);
     }
 }
 
-cudaEvent_t cv::cuda::EventAccessor::getEvent(const Event& event)
+cudaEvent_t cv::cuda::EventAccessor::getEvent(ثابت Event& event)
 {
-    return event.impl_->event;
+    أرجع event.impl_->event;
 }
 
 Event cv::cuda::EventAccessor::wrapEvent(cudaEvent_t event)
 {
-    return Event(makePtr<Event::Impl>(event));
+    أرجع Event(makePtr<Event::Impl>(event));
 }
 
-#endif
+#د_که_پای
 
-cv::cuda::Event::Event(const Event::CreateFlags flags)
+cv::cuda::Event::Event(ثابت Event::CreateFlags flags)
 {
-#ifndef HAVE_CUDA
-    CV_UNUSED(flags);
+#که_نه_تعریف_شوی HAVE_CUDA
+    CV_ناکارول_شوی(flags);
     throw_no_cuda();
-#else
+#وإلا
     impl_ = makePtr<Impl>(flags);
-#endif
+#د_که_پای
 }
 
-void cv::cuda::Event::record(Stream& stream)
+فراغ cv::cuda::Event::ریکارډ(بهیر& stream)
 {
-#ifndef HAVE_CUDA
-    CV_UNUSED(stream);
+#که_نه_تعریف_شوی HAVE_CUDA
+    CV_ناکارول_شوی(stream);
     throw_no_cuda();
-#else
-    cudaSafeCall( cudaEventRecord(impl_->event, StreamAccessor::getStream(stream)) );
-#endif
+#وإلا
+    cuda_خوندي_Call( cuda_Event_ریکارډ(impl_->event, بهیر_Accessor::get_بهیر(stream)) );
+#د_که_پای
 }
 
-bool cv::cuda::Event::queryIfComplete() const
+منطقي cv::cuda::Event::queryIfComplete() ثابت
 {
-#ifndef HAVE_CUDA
+#که_نه_تعریف_شوی HAVE_CUDA
     throw_no_cuda();
-#else
+#وإلا
     cudaError_t err = cudaEventQuery(impl_->event);
 
-    if (err == cudaErrorNotReady || err == cudaSuccess)
-        return err == cudaSuccess;
+    إذا (err == cudaErrorNotReady || err == cudaSuccess)
+        أرجع err == cudaSuccess;
 
-    cudaSafeCall(err);
-    return false;
-#endif
+    cuda_خوندي_Call(err);
+    أرجع خطأ;
+#د_که_پای
 }
 
-void cv::cuda::Event::waitForCompletion()
+فراغ cv::cuda::Event::waitForCompletion()
 {
-#ifndef HAVE_CUDA
+#که_نه_تعریف_شوی HAVE_CUDA
     throw_no_cuda();
-#else
-    cudaSafeCall( cudaEventSynchronize(impl_->event) );
-#endif
+#وإلا
+    cuda_خوندي_Call( cudaEventSynchronize(impl_->event) );
+#د_که_پای
 }
 
-float cv::cuda::Event::elapsedTime(const Event& start, const Event& end)
+عائم cv::cuda::Event::elapsed_وخت(ثابت Event& پیل, ثابت Event& end)
 {
-#ifndef HAVE_CUDA
-    CV_UNUSED(start);
-    CV_UNUSED(end);
+#که_نه_تعریف_شوی HAVE_CUDA
+    CV_ناکارول_شوی(پیل);
+    CV_ناکارول_شوی(end);
     throw_no_cuda();
-#else
-    float ms;
-    cudaSafeCall( cudaEventElapsedTime(&ms, start.impl_->event, end.impl_->event) );
-    return ms;
-#endif
+#وإلا
+    عائم ms;
+    cuda_خوندي_Call( cuda_Event_Elapsed_وخت(&ms, پیل.impl_->event, end.impl_->event) );
+    أرجع ms;
+#د_که_پای
 }

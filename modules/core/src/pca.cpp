@@ -41,380 +41,380 @@
 //
 //M*/
 
-#include "precomp.hpp"
+#ضمن "precomp.hpp"
 
 /****************************************************************************************\
 *                                          PCA                                           *
 \****************************************************************************************/
 
-namespace cv
+نطاق cv
 {
 
 PCA::PCA() {}
 
-PCA::PCA(InputArray data, InputArray _mean, int flags, int maxComponents)
+PCA::PCA(ننوت_Array معلومات, ننوت_Array منځنۍ, صحيح flags, صحيح maxComponents)
 {
-    operator()(data, _mean, flags, maxComponents);
+    چلوونکی()(معلومات, منځنۍ, flags, maxComponents);
 }
 
-PCA::PCA(InputArray data, InputArray _mean, int flags, double retainedVariance)
+PCA::PCA(ننوت_Array معلومات, ننوت_Array منځنۍ, صحيح flags, مزدوج retainedVariance)
 {
-    operator()(data, _mean, flags, retainedVariance);
+    چلوونکی()(معلومات, منځنۍ, flags, retainedVariance);
 }
 
-PCA& PCA::operator()(InputArray _data, InputArray __mean, int flags, int maxComponents)
+PCA& PCA::چلوونکی()(ننوت_Array معلومات_3, ننوت_Array __mean, صحيح flags, صحيح maxComponents)
 {
-    Mat data = _data.getMat(), _mean = __mean.getMat();
-    int covar_flags = cv::COVAR_SCALE;
-    int len, in_count;
-    Size mean_sz;
+    Mat معلومات = معلومات_3.getMat(), منځنۍ = __mean.getMat();
+    صحيح covar_flags = cv::COVAR_SCALE;
+    صحيح len, دننه_شمېر;
+    اندازه منځنۍ_sz;
 
-    CV_Assert( data.channels() == 1 );
-    if( flags & PCA::DATA_AS_COL )
+    CV_Assert( معلومات.channels() == 1 );
+    إذا( flags & PCA::معلومات_AS_ستون )
     {
-        len = data.rows;
-        in_count = data.cols;
-        covar_flags |= cv::COVAR_COLS;
-        mean_sz = Size(1, len);
+        len = معلومات.لیکې;
+        دننه_شمېر = معلومات.ستون_شمېر;
+        covar_flags |= cv::COVAR_ستون_شمېر;
+        منځنۍ_sz = اندازه(1, len);
     }
-    else
+    وإلا
     {
-        len = data.cols;
-        in_count = data.rows;
-        covar_flags |= cv::COVAR_ROWS;
-        mean_sz = Size(len, 1);
+        len = معلومات.ستون_شمېر;
+        دننه_شمېر = معلومات.لیکې;
+        covar_flags |= cv::COVAR_لیکې;
+        منځنۍ_sz = اندازه(len, 1);
     }
 
-    int count = std::min(len, in_count), out_count = count;
-    if( maxComponents > 0 )
-        out_count = std::min(count, maxComponents);
+    صحيح شمېر_2 = std::min(len, دننه_شمېر), بهر_شمېر = شمېر_2;
+    إذا( maxComponents > 0 )
+        بهر_شمېر = std::min(شمېر_2, maxComponents);
 
     // "scrambled" way to compute PCA (when cols(A)>rows(A)):
     // B = A'A; B*x=b*x; C = AA'; C*y=c*y -> AA'*y=c*y -> A'A*(A'*y)=c*(A'*y) -> c = b, x=A'*y
-    if( len <= in_count )
-        covar_flags |= cv::COVAR_NORMAL;
+    إذا( len <= دننه_شمېر )
+        covar_flags |= cv::COVAR_نورمال;
 
-    int ctype = std::max(CV_32F, data.depth());
-    mean.create( mean_sz, ctype );
+    صحيح ctype = std::max(CV_32F, معلومات.ژوروالی());
+    منځنۍ_2.create( منځنۍ_sz, ctype );
 
-    Mat covar( count, count, ctype );
+    Mat covar( شمېر_2, شمېر_2, ctype );
 
-    if( !_mean.empty() )
+    إذا( !منځنۍ.empty() )
     {
-        CV_Assert( _mean.size() == mean_sz );
-        _mean.convertTo(mean, ctype);
+        CV_Assert( منځنۍ.size() == منځنۍ_sz );
+        منځنۍ.convert_منزل(منځنۍ_2, ctype);
         covar_flags |= cv::COVAR_USE_AVG;
     }
 
-    calcCovarMatrix( data, covar, mean, covar_flags, ctype );
+    calc_Covar_ماتریکس( معلومات, covar, منځنۍ_2, covar_flags, ctype );
     eigen( covar, eigenvalues, eigenvectors );
 
-    if( !(covar_flags & cv::COVAR_NORMAL) )
+    إذا( !(covar_flags & cv::COVAR_نورمال) )
     {
         // PCA::DATA_AS_ROW: cols(A)>rows(A). x=A'*y -> x'=y'*A
         // PCA::DATA_AS_COL: rows(A)>cols(A). x=A''*y -> x'=y'*A'
-        Mat tmp_data, tmp_mean = repeat(mean, data.rows/mean.rows, data.cols/mean.cols);
-        if( data.type() != ctype || tmp_mean.data == mean.data )
+        Mat tmp_معلومات, tmp_منځنۍ = repeat(منځنۍ_2, معلومات.لیکې/منځنۍ_2.لیکې, معلومات.ستون_شمېر/منځنۍ_2.ستون_شمېر);
+        إذا( معلومات.type() != ctype || tmp_منځنۍ.معلومات == منځنۍ_2.معلومات )
         {
-            data.convertTo( tmp_data, ctype );
-            subtract( tmp_data, tmp_mean, tmp_data );
+            معلومات.convert_منزل( tmp_معلومات, ctype );
+            کمول( tmp_معلومات, tmp_منځنۍ, tmp_معلومات );
         }
-        else
+        وإلا
         {
-            subtract( data, tmp_mean, tmp_mean );
-            tmp_data = tmp_mean;
+            کمول( معلومات, tmp_منځنۍ, tmp_منځنۍ );
+            tmp_معلومات = tmp_منځنۍ;
         }
 
-        Mat evects1(count, len, ctype);
-        gemm( eigenvectors, tmp_data, 1, Mat(), 0, evects1,
-            (flags & PCA::DATA_AS_COL) ? cv::GEMM_2_T : 0);
+        Mat evects1(شمېر_2, len, ctype);
+        gemm( eigenvectors, tmp_معلومات, 1, Mat(), 0, evects1,
+            (flags & PCA::معلومات_AS_ستون) ? cv::GEMM_2_T : 0);
         eigenvectors = evects1;
 
         // normalize eigenvectors
-        int i;
-        for( i = 0; i < out_count; i++ )
+        صحيح i;
+        لكل( i = 0; i < بهر_شمېر; i++ )
         {
-            Mat vec = eigenvectors.row(i);
+            Mat vec = eigenvectors.لیکه(i);
             normalize(vec, vec);
         }
     }
 
-    if( count > out_count )
+    إذا( شمېر_2 > بهر_شمېر )
     {
         // use clone() to physically copy the data and thus deallocate the original matrices
-        eigenvalues = eigenvalues.rowRange(0,out_count).clone();
-        eigenvectors = eigenvectors.rowRange(0,out_count).clone();
+        eigenvalues = eigenvalues.لیکه_Range_2(0,بهر_شمېر).clone();
+        eigenvectors = eigenvectors.لیکه_Range_2(0,بهر_شمېر).clone();
     }
-    return *this;
+    أرجع *هذا;
 }
 
-void PCA::write(FileStorage& fs ) const
+فراغ PCA::اكتب(FileStorage& fs ) ثابت
 {
     CV_Assert( fs.isOpened() );
 
     fs << "name" << "PCA";
     fs << "vectors" << eigenvectors;
     fs << "values" << eigenvalues;
-    fs << "mean" << mean;
+    fs << "mean" << منځنۍ_2;
 }
 
-void PCA::read(const FileNode& fn)
+فراغ PCA::اقرأ(ثابت File_غوټه& fn)
 {
     CV_Assert( !fn.empty() );
     CV_Assert( (String)fn["name"] == "PCA" );
 
-    cv::read(fn["vectors"], eigenvectors);
-    cv::read(fn["values"], eigenvalues);
-    cv::read(fn["mean"], mean);
+    cv::اقرأ(fn["vectors"], eigenvectors);
+    cv::اقرأ(fn["values"], eigenvalues);
+    cv::اقرأ(fn["mean"], منځنۍ_2);
 }
 
-template <typename T>
-int computeCumulativeEnergy(const Mat& eigenvalues, double retainedVariance)
+کينډۍ <ډول_نوم T>
+صحيح computeCumulativeEnergy(ثابت Mat& eigenvalues, مزدوج retainedVariance)
 {
-    CV_DbgAssert( eigenvalues.type() == DataType<T>::type );
+    CV_DbgAssert( eigenvalues.type() == معلومات_Type_2<T>::type );
 
-    Mat g(eigenvalues.size(), DataType<T>::type);
+    Mat g(eigenvalues.size(), معلومات_Type_2<T>::type);
 
-    for(int ig = 0; ig < g.rows; ig++)
+    لكل(صحيح ig = 0; ig < g.لیکې; ig++)
     {
         g.at<T>(ig, 0) = 0;
-        for(int im = 0; im <= ig; im++)
+        لكل(صحيح im = 0; im <= ig; im++)
         {
             g.at<T>(ig,0) += eigenvalues.at<T>(im,0);
         }
     }
 
-    int L;
+    صحيح L;
 
-    for(L = 0; L < eigenvalues.rows; L++)
+    لكل(L = 0; L < eigenvalues.لیکې; L++)
     {
-        double energy = g.at<T>(L, 0) / g.at<T>(g.rows - 1, 0);
-        if(energy > retainedVariance)
-            break;
+        مزدوج energy = g.at<T>(L, 0) / g.at<T>(g.لیکې - 1, 0);
+        إذا(energy > retainedVariance)
+            اكسر;
     }
 
     L = std::max(2, L);
 
-    return L;
+    أرجع L;
 }
 
-PCA& PCA::operator()(InputArray _data, InputArray __mean, int flags, double retainedVariance)
+PCA& PCA::چلوونکی()(ننوت_Array معلومات_3, ننوت_Array __mean, صحيح flags, مزدوج retainedVariance)
 {
-    Mat data = _data.getMat(), _mean = __mean.getMat();
-    int covar_flags = cv::COVAR_SCALE;
-    int len, in_count;
-    Size mean_sz;
+    Mat معلومات = معلومات_3.getMat(), منځنۍ = __mean.getMat();
+    صحيح covar_flags = cv::COVAR_SCALE;
+    صحيح len, دننه_شمېر;
+    اندازه منځنۍ_sz;
 
-    CV_Assert( data.channels() == 1 );
-    if( flags & PCA::DATA_AS_COL )
+    CV_Assert( معلومات.channels() == 1 );
+    إذا( flags & PCA::معلومات_AS_ستون )
     {
-        len = data.rows;
-        in_count = data.cols;
-        covar_flags |= cv::COVAR_COLS;
-        mean_sz = Size(1, len);
+        len = معلومات.لیکې;
+        دننه_شمېر = معلومات.ستون_شمېر;
+        covar_flags |= cv::COVAR_ستون_شمېر;
+        منځنۍ_sz = اندازه(1, len);
     }
-    else
+    وإلا
     {
-        len = data.cols;
-        in_count = data.rows;
-        covar_flags |= cv::COVAR_ROWS;
-        mean_sz = Size(len, 1);
+        len = معلومات.ستون_شمېر;
+        دننه_شمېر = معلومات.لیکې;
+        covar_flags |= cv::COVAR_لیکې;
+        منځنۍ_sz = اندازه(len, 1);
     }
 
     CV_Assert( retainedVariance > 0 && retainedVariance <= 1 );
 
-    int count = std::min(len, in_count);
+    صحيح شمېر_2 = std::min(len, دننه_شمېر);
 
     // "scrambled" way to compute PCA (when cols(A)>rows(A)):
     // B = A'A; B*x=b*x; C = AA'; C*y=c*y -> AA'*y=c*y -> A'A*(A'*y)=c*(A'*y) -> c = b, x=A'*y
-    if( len <= in_count )
-        covar_flags |= cv::COVAR_NORMAL;
+    إذا( len <= دننه_شمېر )
+        covar_flags |= cv::COVAR_نورمال;
 
-    int ctype = std::max(CV_32F, data.depth());
-    mean.create( mean_sz, ctype );
+    صحيح ctype = std::max(CV_32F, معلومات.ژوروالی());
+    منځنۍ_2.create( منځنۍ_sz, ctype );
 
-    Mat covar( count, count, ctype );
+    Mat covar( شمېر_2, شمېر_2, ctype );
 
-    if( !_mean.empty() )
+    إذا( !منځنۍ.empty() )
     {
-        CV_Assert( _mean.size() == mean_sz );
-        _mean.convertTo(mean, ctype);
+        CV_Assert( منځنۍ.size() == منځنۍ_sz );
+        منځنۍ.convert_منزل(منځنۍ_2, ctype);
         covar_flags |= cv::COVAR_USE_AVG;
     }
 
-    calcCovarMatrix( data, covar, mean, covar_flags, ctype );
+    calc_Covar_ماتریکس( معلومات, covar, منځنۍ_2, covar_flags, ctype );
     eigen( covar, eigenvalues, eigenvectors );
 
-    if( !(covar_flags & cv::COVAR_NORMAL) )
+    إذا( !(covar_flags & cv::COVAR_نورمال) )
     {
         // PCA::DATA_AS_ROW: cols(A)>rows(A). x=A'*y -> x'=y'*A
         // PCA::DATA_AS_COL: rows(A)>cols(A). x=A''*y -> x'=y'*A'
-        Mat tmp_data, tmp_mean = repeat(mean, data.rows/mean.rows, data.cols/mean.cols);
-        if( data.type() != ctype || tmp_mean.data == mean.data )
+        Mat tmp_معلومات, tmp_منځنۍ = repeat(منځنۍ_2, معلومات.لیکې/منځنۍ_2.لیکې, معلومات.ستون_شمېر/منځنۍ_2.ستون_شمېر);
+        إذا( معلومات.type() != ctype || tmp_منځنۍ.معلومات == منځنۍ_2.معلومات )
         {
-            data.convertTo( tmp_data, ctype );
-            subtract( tmp_data, tmp_mean, tmp_data );
+            معلومات.convert_منزل( tmp_معلومات, ctype );
+            کمول( tmp_معلومات, tmp_منځنۍ, tmp_معلومات );
         }
-        else
+        وإلا
         {
-            subtract( data, tmp_mean, tmp_mean );
-            tmp_data = tmp_mean;
+            کمول( معلومات, tmp_منځنۍ, tmp_منځنۍ );
+            tmp_معلومات = tmp_منځنۍ;
         }
 
-        Mat evects1(count, len, ctype);
-        gemm( eigenvectors, tmp_data, 1, Mat(), 0, evects1,
-            (flags & PCA::DATA_AS_COL) ? cv::GEMM_2_T : 0);
+        Mat evects1(شمېر_2, len, ctype);
+        gemm( eigenvectors, tmp_معلومات, 1, Mat(), 0, evects1,
+            (flags & PCA::معلومات_AS_ستون) ? cv::GEMM_2_T : 0);
         eigenvectors = evects1;
 
         // normalize all eigenvectors
-        int i;
-        for( i = 0; i < eigenvectors.rows; i++ )
+        صحيح i;
+        لكل( i = 0; i < eigenvectors.لیکې; i++ )
         {
-            Mat vec = eigenvectors.row(i);
+            Mat vec = eigenvectors.لیکه(i);
             normalize(vec, vec);
         }
     }
 
     // compute the cumulative energy content for each eigenvector
-    int L;
-    if (ctype == CV_32F)
-        L = computeCumulativeEnergy<float>(eigenvalues, retainedVariance);
-    else
-        L = computeCumulativeEnergy<double>(eigenvalues, retainedVariance);
+    صحيح L;
+    إذا (ctype == CV_32F)
+        L = computeCumulativeEnergy<عائم>(eigenvalues, retainedVariance);
+    وإلا
+        L = computeCumulativeEnergy<مزدوج>(eigenvalues, retainedVariance);
 
     // use clone() to physically copy the data and thus deallocate the original matrices
-    eigenvalues = eigenvalues.rowRange(0,L).clone();
-    eigenvectors = eigenvectors.rowRange(0,L).clone();
+    eigenvalues = eigenvalues.لیکه_Range_2(0,L).clone();
+    eigenvectors = eigenvectors.لیکه_Range_2(0,L).clone();
 
-    return *this;
+    أرجع *هذا;
 }
 
-void PCA::project(InputArray _data, OutputArray result) const
+فراغ PCA::project(ننوت_Array معلومات_3, OutputArray پایله) ثابت
 {
-    Mat data = _data.getMat();
-    CV_Assert( !mean.empty() && !eigenvectors.empty() &&
-        ((mean.rows == 1 && mean.cols == data.cols) || (mean.cols == 1 && mean.rows == data.rows)));
-    Mat tmp_data, tmp_mean = repeat(mean, data.rows/mean.rows, data.cols/mean.cols);
-    int ctype = mean.type();
-    if( data.type() != ctype || tmp_mean.data == mean.data )
+    Mat معلومات = معلومات_3.getMat();
+    CV_Assert( !منځنۍ_2.empty() && !eigenvectors.empty() &&
+        ((منځنۍ_2.لیکې == 1 && منځنۍ_2.ستون_شمېر == معلومات.ستون_شمېر) || (منځنۍ_2.ستون_شمېر == 1 && منځنۍ_2.لیکې == معلومات.لیکې)));
+    Mat tmp_معلومات, tmp_منځنۍ = repeat(منځنۍ_2, معلومات.لیکې/منځنۍ_2.لیکې, معلومات.ستون_شمېر/منځنۍ_2.ستون_شمېر);
+    صحيح ctype = منځنۍ_2.type();
+    إذا( معلومات.type() != ctype || tmp_منځنۍ.معلومات == منځنۍ_2.معلومات )
     {
-        data.convertTo( tmp_data, ctype );
-        subtract( tmp_data, tmp_mean, tmp_data );
+        معلومات.convert_منزل( tmp_معلومات, ctype );
+        کمول( tmp_معلومات, tmp_منځنۍ, tmp_معلومات );
     }
-    else
+    وإلا
     {
-        subtract( data, tmp_mean, tmp_mean );
-        tmp_data = tmp_mean;
+        کمول( معلومات, tmp_منځنۍ, tmp_منځنۍ );
+        tmp_معلومات = tmp_منځنۍ;
     }
-    if( mean.rows == 1 )
-        gemm( tmp_data, eigenvectors, 1, Mat(), 0, result, GEMM_2_T );
-    else
-        gemm( eigenvectors, tmp_data, 1, Mat(), 0, result, 0 );
+    إذا( منځنۍ_2.لیکې == 1 )
+        gemm( tmp_معلومات, eigenvectors, 1, Mat(), 0, پایله, GEMM_2_T );
+    وإلا
+        gemm( eigenvectors, tmp_معلومات, 1, Mat(), 0, پایله, 0 );
 }
 
-Mat PCA::project(InputArray data) const
+Mat PCA::project(ننوت_Array معلومات) ثابت
 {
-    Mat result;
-    project(data, result);
-    return result;
+    Mat پایله;
+    project(معلومات, پایله);
+    أرجع پایله;
 }
 
-void PCA::backProject(InputArray _data, OutputArray result) const
+فراغ PCA::شا_Project(ننوت_Array معلومات_3, OutputArray پایله) ثابت
 {
-    Mat data = _data.getMat();
-    CV_Assert( !mean.empty() && !eigenvectors.empty() &&
-        ((mean.rows == 1 && eigenvectors.rows == data.cols) ||
-         (mean.cols == 1 && eigenvectors.rows == data.rows)));
+    Mat معلومات = معلومات_3.getMat();
+    CV_Assert( !منځنۍ_2.empty() && !eigenvectors.empty() &&
+        ((منځنۍ_2.لیکې == 1 && eigenvectors.لیکې == معلومات.ستون_شمېر) ||
+         (منځنۍ_2.ستون_شمېر == 1 && eigenvectors.لیکې == معلومات.لیکې)));
 
-    Mat tmp_data, tmp_mean;
-    data.convertTo(tmp_data, mean.type());
-    if( mean.rows == 1 )
+    Mat tmp_معلومات, tmp_منځنۍ;
+    معلومات.convert_منزل(tmp_معلومات, منځنۍ_2.type());
+    إذا( منځنۍ_2.لیکې == 1 )
     {
-        tmp_mean = repeat(mean, data.rows, 1);
-        gemm( tmp_data, eigenvectors, 1, tmp_mean, 1, result, 0 );
+        tmp_منځنۍ = repeat(منځنۍ_2, معلومات.لیکې, 1);
+        gemm( tmp_معلومات, eigenvectors, 1, tmp_منځنۍ, 1, پایله, 0 );
     }
-    else
+    وإلا
     {
-        tmp_mean = repeat(mean, 1, data.cols);
-        gemm( eigenvectors, tmp_data, 1, tmp_mean, 1, result, GEMM_1_T );
+        tmp_منځنۍ = repeat(منځنۍ_2, 1, معلومات.ستون_شمېر);
+        gemm( eigenvectors, tmp_معلومات, 1, tmp_منځنۍ, 1, پایله, GEMM_1_T );
     }
 }
 
-Mat PCA::backProject(InputArray data) const
+Mat PCA::شا_Project(ننوت_Array معلومات) ثابت
 {
-    Mat result;
-    backProject(data, result);
-    return result;
+    Mat پایله;
+    شا_Project(معلومات, پایله);
+    أرجع پایله;
 }
 
 }
 
-void cv::PCACompute(InputArray data, InputOutputArray mean,
-                    OutputArray eigenvectors, int maxComponents)
+فراغ cv::PCACompute(ننوت_Array معلومات, ننوت_Output_Array منځنۍ_2,
+                    OutputArray eigenvectors, صحيح maxComponents)
 {
     CV_INSTRUMENT_REGION();
 
     PCA pca;
-    pca(data, mean, 0, maxComponents);
-    pca.mean.copyTo(mean);
-    pca.eigenvectors.copyTo(eigenvectors);
+    pca(معلومات, منځنۍ_2, 0, maxComponents);
+    pca.منځنۍ_2.copy_منزل(منځنۍ_2);
+    pca.eigenvectors.copy_منزل(eigenvectors);
 }
 
-void cv::PCACompute(InputArray data, InputOutputArray mean,
+فراغ cv::PCACompute(ننوت_Array معلومات, ننوت_Output_Array منځنۍ_2,
                     OutputArray eigenvectors, OutputArray eigenvalues,
-                    int maxComponents)
+                    صحيح maxComponents)
 {
     CV_INSTRUMENT_REGION();
 
     PCA pca;
-    pca(data, mean, 0, maxComponents);
-    pca.mean.copyTo(mean);
-    pca.eigenvectors.copyTo(eigenvectors);
-    pca.eigenvalues.copyTo(eigenvalues);
+    pca(معلومات, منځنۍ_2, 0, maxComponents);
+    pca.منځنۍ_2.copy_منزل(منځنۍ_2);
+    pca.eigenvectors.copy_منزل(eigenvectors);
+    pca.eigenvalues.copy_منزل(eigenvalues);
 }
 
-void cv::PCACompute(InputArray data, InputOutputArray mean,
-                    OutputArray eigenvectors, double retainedVariance)
+فراغ cv::PCACompute(ننوت_Array معلومات, ننوت_Output_Array منځنۍ_2,
+                    OutputArray eigenvectors, مزدوج retainedVariance)
 {
     CV_INSTRUMENT_REGION();
 
     PCA pca;
-    pca(data, mean, 0, retainedVariance);
-    pca.mean.copyTo(mean);
-    pca.eigenvectors.copyTo(eigenvectors);
+    pca(معلومات, منځنۍ_2, 0, retainedVariance);
+    pca.منځنۍ_2.copy_منزل(منځنۍ_2);
+    pca.eigenvectors.copy_منزل(eigenvectors);
 }
 
-void cv::PCACompute(InputArray data, InputOutputArray mean,
+فراغ cv::PCACompute(ننوت_Array معلومات, ننوت_Output_Array منځنۍ_2,
                     OutputArray eigenvectors, OutputArray eigenvalues,
-                    double retainedVariance)
+                    مزدوج retainedVariance)
 {
     CV_INSTRUMENT_REGION();
 
     PCA pca;
-    pca(data, mean, 0, retainedVariance);
-    pca.mean.copyTo(mean);
-    pca.eigenvectors.copyTo(eigenvectors);
-    pca.eigenvalues.copyTo(eigenvalues);
+    pca(معلومات, منځنۍ_2, 0, retainedVariance);
+    pca.منځنۍ_2.copy_منزل(منځنۍ_2);
+    pca.eigenvectors.copy_منزل(eigenvectors);
+    pca.eigenvalues.copy_منزل(eigenvalues);
 }
 
-void cv::PCAProject(InputArray data, InputArray mean,
-                    InputArray eigenvectors, OutputArray result)
+فراغ cv::PCAProject(ننوت_Array معلومات, ننوت_Array منځنۍ_2,
+                    ننوت_Array eigenvectors, OutputArray پایله)
 {
     CV_INSTRUMENT_REGION();
 
     PCA pca;
-    pca.mean = mean.getMat();
+    pca.منځنۍ_2 = منځنۍ_2.getMat();
     pca.eigenvectors = eigenvectors.getMat();
-    pca.project(data, result);
+    pca.project(معلومات, پایله);
 }
 
-void cv::PCABackProject(InputArray data, InputArray mean,
-                    InputArray eigenvectors, OutputArray result)
+فراغ cv::PCABackProject(ننوت_Array معلومات, ننوت_Array منځنۍ_2,
+                    ننوت_Array eigenvectors, OutputArray پایله)
 {
     CV_INSTRUMENT_REGION();
 
     PCA pca;
-    pca.mean = mean.getMat();
+    pca.منځنۍ_2 = منځنۍ_2.getMat();
     pca.eigenvectors = eigenvectors.getMat();
-    pca.backProject(data, result);
+    pca.شا_Project(معلومات, پایله);
 }

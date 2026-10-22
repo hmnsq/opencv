@@ -2,117 +2,117 @@
 // It is subject to the license terms in the LICENSE file found in the top-level directory
 // of this distribution and at http://opencv.org/license.html
 
-#include "precomp.hpp"
+#ضمن "precomp.hpp"
 
-namespace cv {
+نطاق cv {
 CV_CPU_OPTIMIZATION_NAMESPACE_BEGIN
 
-typedef void (*ReduceSumFunc)(const Mat& src, Mat& dst);
-ReduceSumFunc getReduceCSumFunc(int sdepth, int ddepth);
-ReduceSumFunc getReduceRSumFunc(int sdepth, int ddepth);
-ReduceSumFunc getReduceRSum2Func(int sdepth, int ddepth);
+تعريفنوع فراغ (*Reduce_مجموعه_Func)(ثابت Mat& src, Mat& dst);
+Reduce_مجموعه_Func getReduceCSumFunc(صحيح sdepth, صحيح ddepth);
+Reduce_مجموعه_Func getReduceRSumFunc(صحيح sdepth, صحيح ddepth);
+Reduce_مجموعه_Func getReduceRSum2Func(صحيح sdepth, صحيح ddepth);
 
-#ifndef CV_CPU_OPTIMIZATION_DECLARATIONS_ONLY
+#که_نه_تعریف_شوی CV_CPU_OPTIMIZATION_DECLARATIONS_ONLY
 
 // =====================================================================
 //  Col reduce SUM (dim=1): sum each row into cn output values
 // =====================================================================
 
-#if (CV_SIMD || CV_SIMD_SCALABLE)
+#إذا (CV_SIMD || CV_SIMD_SCALABLE)
 
 // --- uchar → int ---
 // Uses u16 intermediate accumulator to halve the number of widen operations:
 // u8→u16 per iteration, u16→u32 flush every 128 iterations (max u16 value: 128*255=32640 < 65535)
-static void reduceColSum_8u32s(const Mat& srcmat, Mat& dstmat)
+ساكن فراغ reduce_ستون_مجموعه_8u32s(ثابت Mat& srcmat, Mat& dstmat)
 {
-    const int cn = srcmat.channels();
-    const int cols = srcmat.cols;
-    const int width = cols * cn;
+    ثابت صحيح cn = srcmat.channels();
+    ثابت صحيح ستون_شمېر = srcmat.ستون_شمېر;
+    ثابت صحيح پلنوالی = ستون_شمېر * cn;
 
-    auto body = [&](const Range& range) {
-        for (int y = range.start; y < range.end; y++)
+    خپلکاری body = [&](ثابت Range& range) {
+        لكل (صحيح y = range.پیل; y < range.end; y++)
         {
-            const uchar* src = srcmat.ptr<uchar>(y);
-            int* dst = dstmat.ptr<int>(y);
+            ثابت uchar* src = srcmat.ptr<uchar>(y);
+            صحيح* dst = dstmat.ptr<صحيح>(y);
 
-            if (cn == 1)
+            إذا (cn == 1)
             {
-#if defined(CV_NEON_DOT)
+#إذا defined(CV_NEON_DOT)
                 // ARMv8.2 DOTPROD: vdotq_u32(acc, src, ones) — single instruction byte sum
                 // u32 lane max 1020/iter, overflow at ~4.2M iter (67MB) — safe without flush
-                const uint8x16_t ones = vdupq_n_u8(1);
-                uint32x4_t v_sum = vdupq_n_u32(0);
-                int x = 0;
-                for (; x <= width - 16; x += 16)
-                    v_sum = vdotq_u32(v_sum, vld1q_u8(src + x), ones);
-                int total = (int)vaddvq_u32(v_sum);
-                for (; x < width; x++)
-                    total += (int)src[x];
-                dst[0] = total;
-#elif CV_NEON && (defined(__aarch64__) || defined(_M_ARM64))
+                ثابت uint8x16_t ones = vdupq_n_u8(1);
+                uint32x4_t v_مجموعه = vdupq_n_u32(0);
+                صحيح x = 0;
+                لكل (; x <= پلنوالی - 16; x += 16)
+                    v_مجموعه = vdotq_u32(v_مجموعه, vld1q_u8(src + x), ones);
+                صحيح ټول = (صحيح)vaddvq_u32(v_مجموعه);
+                لكل (; x < پلنوالی; x++)
+                    ټول += (صحيح)src[x];
+                dst[0] = ټول;
+#وإلاإذا CV_NEON && (defined(__aarch64__) || defined(_M_ARM64))
                 // AArch64 fallback: vpaddlq chain
-                uint32x4_t v_sum = vdupq_n_u32(0);
-                int x = 0;
-                for (; x <= width - 16; x += 16)
-                    v_sum = vaddq_u32(v_sum, vpaddlq_u16(vpaddlq_u8(vld1q_u8(src + x))));
-                int total = (int)vaddvq_u32(v_sum);
-                for (; x < width; x++)
-                    total += (int)src[x];
-                dst[0] = total;
-#elif CV_AVX2
+                uint32x4_t v_مجموعه = vdupq_n_u32(0);
+                صحيح x = 0;
+                لكل (; x <= پلنوالی - 16; x += 16)
+                    v_مجموعه = vaddq_u32(v_مجموعه, vpaddlq_u16(vpaddlq_u8(vld1q_u8(src + x))));
+                صحيح ټول = (صحيح)vaddvq_u32(v_مجموعه);
+                لكل (; x < پلنوالی; x++)
+                    ټول += (صحيح)src[x];
+                dst[0] = ټول;
+#وإلاإذا CV_AVX2
                 // Intel AVX2: _mm256_sad_epu8 — 32 bytes → 4×u64 sum, 1 cycle
-                const __m256i zero = _mm256_setzero_si256();
+                ثابت __m256i zero = _mm256_setzero_si256();
                 __m256i vsum = zero;
-                int x = 0;
-                for (; x <= width - 32; x += 32)
-                    vsum = _mm256_add_epi64(vsum, _mm256_sad_epu8(
-                        _mm256_loadu_si256((const __m256i*)(src + x)), zero));
+                صحيح x = 0;
+                لكل (; x <= پلنوالی - 32; x += 32)
+                    vsum = mm256_جمع_کړه_epi64(vsum, _mm256_sad_epu8(
+                        _mm256_loadu_si256((ثابت __m256i*)(src + x)), zero));
                 // 8-byte tail: reduce max scalar tail from 31 to 7
                 // Use _mm256_inserti128_si256 instead of _mm256_castsi128_si256:
                 // the latter leaves upper 128 bits undefined per Intel spec,
                 // causing MSVC to expose stale register data to _mm256_sad_epu8.
-                for (; x <= width - 8; x += 8)
-                    vsum = _mm256_add_epi64(vsum, _mm256_sad_epu8(
-                        _mm256_inserti128_si256(_mm256_setzero_si256(), _mm_loadl_epi64((const __m128i*)(src + x)), 0), zero));
+                لكل (; x <= پلنوالی - 8; x += 8)
+                    vsum = mm256_جمع_کړه_epi64(vsum, _mm256_sad_epu8(
+                        _mm256_inserti128_si256(_mm256_setzero_si256(), _mm_loadl_epi64((ثابت __m128i*)(src + x)), 0), zero));
                 __m128i lo128 = _mm256_castsi256_si128(vsum);
                 __m128i hi128 = _mm256_extracti128_si256(vsum, 1);
-                __m128i s = _mm_add_epi64(lo128, hi128);
-                s = _mm_add_epi64(s, _mm_unpackhi_epi64(s, s));
-                int total = _mm_cvtsi128_si32(s);
-                for (; x < width; x++)
-                    total += (int)src[x];
-                dst[0] = total;
-#elif CV_SSE2
+                __m128i s = mm_جمع_کړه_epi64(lo128, hi128);
+                s = mm_جمع_کړه_epi64(s, _mm_unpackhi_epi64(s, s));
+                صحيح ټول = _mm_cvtsi128_si32(s);
+                لكل (; x < پلنوالی; x++)
+                    ټول += (صحيح)src[x];
+                dst[0] = ټول;
+#وإلاإذا CV_SSE2
                 // Intel SSE2: _mm_sad_epu8 — 16 bytes → 2×u64 sum
-                const __m128i zero = _mm_setzero_si128();
+                ثابت __m128i zero = _mm_setzero_si128();
                 __m128i vsum = zero;
-                int x = 0;
-                for (; x <= width - 16; x += 16)
-                    vsum = _mm_add_epi64(vsum, _mm_sad_epu8(
-                        _mm_loadu_si128((const __m128i*)(src + x)), zero));
-                __m128i s = _mm_add_epi64(vsum, _mm_unpackhi_epi64(vsum, vsum));
-                int total = _mm_cvtsi128_si32(s);
-                for (; x < width; x++)
-                    total += (int)src[x];
-                dst[0] = total;
-#else
-                const int vlanes8 = VTraits<v_uint8>::vlanes();
-                v_uint32 v_sum = vx_setzero_u32();
+                صحيح x = 0;
+                لكل (; x <= پلنوالی - 16; x += 16)
+                    vsum = mm_جمع_کړه_epi64(vsum, _mm_sad_epu8(
+                        _mm_loadu_si128((ثابت __m128i*)(src + x)), zero));
+                __m128i s = mm_جمع_کړه_epi64(vsum, _mm_unpackhi_epi64(vsum, vsum));
+                صحيح ټول = _mm_cvtsi128_si32(s);
+                لكل (; x < پلنوالی; x++)
+                    ټول += (صحيح)src[x];
+                dst[0] = ټول;
+#وإلا
+                ثابت صحيح vlanes8 = VTraits<v_uint8>::vlanes();
+                v_uint32 v_مجموعه = vx_setzero_u32();
                 v_uint16 v_sum16 = vx_setzero_u16();
-                int x = 0, batch = 0;
-                const int flush_at = 128;
+                صحيح x = 0, batch = 0;
+                ثابت صحيح flush_at = 128;
 
-                for (; x <= width - vlanes8; x += vlanes8)
+                لكل (; x <= پلنوالی - vlanes8; x += vlanes8)
                 {
                     v_uint16 lo, hi;
-                    v_expand(vx_load(src + x), lo, hi);
-                    v_sum16 = v_add(v_sum16, v_add(lo, hi));
+                    v_expand(vx_بارول(src + x), lo, hi);
+                    v_sum16 = v_جمع_کړه(v_sum16, v_جمع_کړه(lo, hi));
 
-                    if (++batch >= flush_at)
+                    إذا (++batch >= flush_at)
                     {
                         v_uint32 a, b;
                         v_expand(v_sum16, a, b);
-                        v_sum = v_add(v_sum, v_add(a, b));
+                        v_مجموعه = v_جمع_کړه(v_مجموعه, v_جمع_کړه(a, b));
                         v_sum16 = vx_setzero_u16();
                         batch = 0;
                     }
@@ -120,26 +120,26 @@ static void reduceColSum_8u32s(const Mat& srcmat, Mat& dstmat)
                 {
                     v_uint32 a, b;
                     v_expand(v_sum16, a, b);
-                    v_sum = v_add(v_sum, v_add(a, b));
+                    v_مجموعه = v_جمع_کړه(v_مجموعه, v_جمع_کړه(a, b));
                 }
 
-                int total = (int)v_reduce_sum(v_sum);
-                for (; x < width; x++)
-                    total += (int)src[x];
-                dst[0] = total;
-#endif
+                صحيح ټول = (صحيح)v_reduce_مجموعه(v_مجموعه);
+                لكل (; x < پلنوالی; x++)
+                    ټول += (صحيح)src[x];
+                dst[0] = ټول;
+#د_که_پای
             }
-            else if (cn == 4)
+            وإلا إذا (cn == 4)
             {
-#if defined(CV_NEON_DOT)
+#إذا defined(CV_NEON_DOT)
                 // ARMv8.2 DOTPROD: vld4q_u8 deinterleave + vdotq_u32 per-channel
                 // vld4q_u8 reads 16 pixels (64 bytes), deinterleaves into 4 × u8x16
                 // vdotq_u32 sums each channel's 16 bytes into 4 partial u32 sums
-                const uint8x16_t ones = vdupq_n_u8(1);
+                ثابت uint8x16_t ones = vdupq_n_u8(1);
                 uint32x4_t acc0 = vdupq_n_u32(0), acc1 = vdupq_n_u32(0);
                 uint32x4_t acc2 = vdupq_n_u32(0), acc3 = vdupq_n_u32(0);
-                int x = 0;
-                for (; x <= cols - 16; x += 16)
+                صحيح x = 0;
+                لكل (; x <= ستون_شمېر - 16; x += 16)
                 {
                     uint8x16x4_t v = vld4q_u8(src + x * 4);
                     acc0 = vdotq_u32(acc0, v.val[0], ones);
@@ -147,65 +147,65 @@ static void reduceColSum_8u32s(const Mat& srcmat, Mat& dstmat)
                     acc2 = vdotq_u32(acc2, v.val[2], ones);
                     acc3 = vdotq_u32(acc3, v.val[3], ones);
                 }
-                dst[0] = (int)vaddvq_u32(acc0);
-                dst[1] = (int)vaddvq_u32(acc1);
-                dst[2] = (int)vaddvq_u32(acc2);
-                dst[3] = (int)vaddvq_u32(acc3);
-                for (; x < cols; x++)
+                dst[0] = (صحيح)vaddvq_u32(acc0);
+                dst[1] = (صحيح)vaddvq_u32(acc1);
+                dst[2] = (صحيح)vaddvq_u32(acc2);
+                dst[3] = (صحيح)vaddvq_u32(acc3);
+                لكل (; x < ستون_شمېر; x++)
                 {
-                    dst[0] += (int)src[x * 4];
-                    dst[1] += (int)src[x * 4 + 1];
-                    dst[2] += (int)src[x * 4 + 2];
-                    dst[3] += (int)src[x * 4 + 3];
+                    dst[0] += (صحيح)src[x * 4];
+                    dst[1] += (صحيح)src[x * 4 + 1];
+                    dst[2] += (صحيح)src[x * 4 + 2];
+                    dst[3] += (صحيح)src[x * 4 + 3];
                 }
-#elif CV_NEON && (defined(__aarch64__) || defined(_M_ARM64))
+#وإلاإذا CV_NEON && (defined(__aarch64__) || defined(_M_ARM64))
                 // AArch64 fallback: vld4q_u8 deinterleave + vaddlvq_u8 per-channel
-                int sums[4] = {0, 0, 0, 0};
-                int x = 0;
-                for (; x <= cols - 16; x += 16)
+                صحيح sums[4] = {0, 0, 0, 0};
+                صحيح x = 0;
+                لكل (; x <= ستون_شمېر - 16; x += 16)
                 {
                     uint8x16x4_t v = vld4q_u8(src + x * 4);
-                    sums[0] += (int)vaddlvq_u8(v.val[0]);
-                    sums[1] += (int)vaddlvq_u8(v.val[1]);
-                    sums[2] += (int)vaddlvq_u8(v.val[2]);
-                    sums[3] += (int)vaddlvq_u8(v.val[3]);
+                    sums[0] += (صحيح)vaddlvq_u8(v.val[0]);
+                    sums[1] += (صحيح)vaddlvq_u8(v.val[1]);
+                    sums[2] += (صحيح)vaddlvq_u8(v.val[2]);
+                    sums[3] += (صحيح)vaddlvq_u8(v.val[3]);
                 }
                 dst[0] = sums[0]; dst[1] = sums[1];
                 dst[2] = sums[2]; dst[3] = sums[3];
-                for (; x < cols; x++)
+                لكل (; x < ستون_شمېر; x++)
                 {
-                    dst[0] += (int)src[x * 4];
-                    dst[1] += (int)src[x * 4 + 1];
-                    dst[2] += (int)src[x * 4 + 2];
-                    dst[3] += (int)src[x * 4 + 3];
+                    dst[0] += (صحيح)src[x * 4];
+                    dst[1] += (صحيح)src[x * 4 + 1];
+                    dst[2] += (صحيح)src[x * 4 + 2];
+                    dst[3] += (صحيح)src[x * 4 + 3];
                 }
-#elif CV_AVX2
+#وإلاإذا CV_AVX2
                 // Intel AVX2: shuffle + unpack to group channels, full-register SAD
-                const __m256i zero = _mm256_setzero_si256();
-                const __m256i shuf_mask = _mm256_setr_epi8(
+                ثابت __m256i zero = _mm256_setzero_si256();
+                ثابت __m256i shuf_ماسک = _mm256_setr_epi8(
                     0,4,8,12, 1,5,9,13, 2,6,10,14, 3,7,11,15,
                     0,4,8,12, 1,5,9,13, 2,6,10,14, 3,7,11,15);
-                int x = 0;
+                صحيح x = 0;
                 // 16 pixels/iter with unpack (full-register SAD)
                 {
-                    __m256i sum_bg = zero, sum_ra = zero;
-                    for (; x <= cols - 16; x += 16)
+                    __m256i مجموعه_bg = zero, مجموعه_ra = zero;
+                    لكل (; x <= ستون_شمېر - 16; x += 16)
                     {
-                        __m256i v0 = _mm256_loadu_si256((const __m256i*)(src + x * 4));
-                        __m256i v1 = _mm256_loadu_si256((const __m256i*)(src + x * 4 + 32));
-                        __m256i g0 = _mm256_shuffle_epi8(v0, shuf_mask);
-                        __m256i g1 = _mm256_shuffle_epi8(v1, shuf_mask);
+                        __m256i v0 = _mm256_loadu_si256((ثابت __m256i*)(src + x * 4));
+                        __m256i v1 = _mm256_loadu_si256((ثابت __m256i*)(src + x * 4 + 32));
+                        __m256i g0 = _mm256_shuffle_epi8(v0, shuf_ماسک);
+                        __m256i g1 = _mm256_shuffle_epi8(v1, shuf_ماسک);
                         __m256i bg = _mm256_unpacklo_epi32(g0, g1);
                         __m256i ra = _mm256_unpackhi_epi32(g0, g1);
-                        sum_bg = _mm256_add_epi64(sum_bg, _mm256_sad_epu8(bg, zero));
-                        sum_ra = _mm256_add_epi64(sum_ra, _mm256_sad_epu8(ra, zero));
+                        مجموعه_bg = mm256_جمع_کړه_epi64(مجموعه_bg, _mm256_sad_epu8(bg, zero));
+                        مجموعه_ra = mm256_جمع_کړه_epi64(مجموعه_ra, _mm256_sad_epu8(ra, zero));
                     }
-                    __m128i bg_lo = _mm256_castsi256_si128(sum_bg);
-                    __m128i bg_hi = _mm256_extracti128_si256(sum_bg, 1);
-                    __m128i bg_s = _mm_add_epi64(bg_lo, bg_hi);
-                    __m128i ra_lo = _mm256_castsi256_si128(sum_ra);
-                    __m128i ra_hi = _mm256_extracti128_si256(sum_ra, 1);
-                    __m128i ra_s = _mm_add_epi64(ra_lo, ra_hi);
+                    __m128i bg_lo = _mm256_castsi256_si128(مجموعه_bg);
+                    __m128i bg_hi = _mm256_extracti128_si256(مجموعه_bg, 1);
+                    __m128i bg_s = mm_جمع_کړه_epi64(bg_lo, bg_hi);
+                    __m128i ra_lo = _mm256_castsi256_si128(مجموعه_ra);
+                    __m128i ra_hi = _mm256_extracti128_si256(مجموعه_ra, 1);
+                    __m128i ra_s = mm_جمع_کړه_epi64(ra_lo, ra_hi);
                     dst[0] = _mm_cvtsi128_si32(bg_s);                     // B
                     dst[1] = _mm_cvtsi128_si32(_mm_srli_si128(bg_s, 8));  // G
                     dst[2] = _mm_cvtsi128_si32(ra_s);                     // R
@@ -213,91 +213,91 @@ static void reduceColSum_8u32s(const Mat& srcmat, Mat& dstmat)
                 }
                 // 8-pixel tail with and/srli
                 {
-                    const __m256i mask_lo32 = _mm256_set1_epi64x(0x00000000FFFFFFFFLL);
-                    __m256i sum_br = zero, sum_ga = zero;
-                    for (; x <= cols - 8; x += 8)
+                    ثابت __m256i ماسک_lo32 = _mm256_set1_epi64x(0x00000000FFFFFFFFLL);
+                    __m256i مجموعه_br = zero, مجموعه_ga = zero;
+                    لكل (; x <= ستون_شمېر - 8; x += 8)
                     {
-                        __m256i v = _mm256_loadu_si256((const __m256i*)(src + x * 4));
-                        __m256i grouped = _mm256_shuffle_epi8(v, shuf_mask);
-                        __m256i br = _mm256_and_si256(grouped, mask_lo32);
+                        __m256i v = _mm256_loadu_si256((ثابت __m256i*)(src + x * 4));
+                        __m256i grouped = _mm256_shuffle_epi8(v, shuf_ماسک);
+                        __m256i br = _mm256_and_si256(grouped, ماسک_lo32);
                         __m256i ga = _mm256_srli_epi64(grouped, 32);
-                        sum_br = _mm256_add_epi64(sum_br, _mm256_sad_epu8(br, zero));
-                        sum_ga = _mm256_add_epi64(sum_ga, _mm256_sad_epu8(ga, zero));
+                        مجموعه_br = mm256_جمع_کړه_epi64(مجموعه_br, _mm256_sad_epu8(br, zero));
+                        مجموعه_ga = mm256_جمع_کړه_epi64(مجموعه_ga, _mm256_sad_epu8(ga, zero));
                     }
-                    __m128i br_lo = _mm256_castsi256_si128(sum_br);
-                    __m128i br_hi = _mm256_extracti128_si256(sum_br, 1);
-                    __m128i br_s = _mm_add_epi64(br_lo, br_hi);
-                    __m128i ga_lo = _mm256_castsi256_si128(sum_ga);
-                    __m128i ga_hi = _mm256_extracti128_si256(sum_ga, 1);
-                    __m128i ga_s = _mm_add_epi64(ga_lo, ga_hi);
+                    __m128i br_lo = _mm256_castsi256_si128(مجموعه_br);
+                    __m128i br_hi = _mm256_extracti128_si256(مجموعه_br, 1);
+                    __m128i br_s = mm_جمع_کړه_epi64(br_lo, br_hi);
+                    __m128i ga_lo = _mm256_castsi256_si128(مجموعه_ga);
+                    __m128i ga_hi = _mm256_extracti128_si256(مجموعه_ga, 1);
+                    __m128i ga_s = mm_جمع_کړه_epi64(ga_lo, ga_hi);
                     dst[0] += _mm_cvtsi128_si32(br_s);
                     dst[1] += _mm_cvtsi128_si32(ga_s);
                     dst[2] += _mm_cvtsi128_si32(_mm_srli_si128(br_s, 8));
                     dst[3] += _mm_cvtsi128_si32(_mm_srli_si128(ga_s, 8));
                 }
-                for (; x < cols; x++)
+                لكل (; x < ستون_شمېر; x++)
                 {
-                    dst[0] += (int)src[x * 4];
-                    dst[1] += (int)src[x * 4 + 1];
-                    dst[2] += (int)src[x * 4 + 2];
-                    dst[3] += (int)src[x * 4 + 3];
+                    dst[0] += (صحيح)src[x * 4];
+                    dst[1] += (صحيح)src[x * 4 + 1];
+                    dst[2] += (صحيح)src[x * 4 + 2];
+                    dst[3] += (صحيح)src[x * 4 + 3];
                 }
-#elif CV_SSSE3
+#وإلاإذا CV_SSSE3
                 // Intel SSSE3: _mm_shuffle_epi8 deinterleave + _mm_sad_epu8
                 // 16 bytes = 4 pixels × 4 channels per iteration
-                const __m128i zero = _mm_setzero_si128();
-                const __m128i shuf_mask = _mm_setr_epi8(
+                ثابت __m128i zero = _mm_setzero_si128();
+                ثابت __m128i shuf_ماسک = _mm_setr_epi8(
                     0,4,8,12, 1,5,9,13, 2,6,10,14, 3,7,11,15);
-                const __m128i mask_lo32 = _mm_set1_epi64x(0x00000000FFFFFFFFLL);
-                __m128i sum_br = zero, sum_ga = zero;
-                int x = 0;
-                for (; x <= cols - 4; x += 4)
+                ثابت __m128i ماسک_lo32 = _mm_set1_epi64x(0x00000000FFFFFFFFLL);
+                __m128i مجموعه_br = zero, مجموعه_ga = zero;
+                صحيح x = 0;
+                لكل (; x <= ستون_شمېر - 4; x += 4)
                 {
-                    __m128i v = _mm_loadu_si128((const __m128i*)(src + x * 4));
-                    __m128i grouped = _mm_shuffle_epi8(v, shuf_mask);
-                    __m128i br = _mm_and_si128(grouped, mask_lo32);
+                    __m128i v = _mm_loadu_si128((ثابت __m128i*)(src + x * 4));
+                    __m128i grouped = _mm_shuffle_epi8(v, shuf_ماسک);
+                    __m128i br = _mm_and_si128(grouped, ماسک_lo32);
                     __m128i ga = _mm_srli_epi64(grouped, 32);
-                    sum_br = _mm_add_epi64(sum_br, _mm_sad_epu8(br, zero));
-                    sum_ga = _mm_add_epi64(sum_ga, _mm_sad_epu8(ga, zero));
+                    مجموعه_br = mm_جمع_کړه_epi64(مجموعه_br, _mm_sad_epu8(br, zero));
+                    مجموعه_ga = mm_جمع_کړه_epi64(مجموعه_ga, _mm_sad_epu8(ga, zero));
                 }
-                dst[0] = _mm_cvtsi128_si32(sum_br);
-                dst[1] = _mm_cvtsi128_si32(sum_ga);
-                dst[2] = _mm_cvtsi128_si32(_mm_srli_si128(sum_br, 8));
-                dst[3] = _mm_cvtsi128_si32(_mm_srli_si128(sum_ga, 8));
-                for (; x < cols; x++)
+                dst[0] = _mm_cvtsi128_si32(مجموعه_br);
+                dst[1] = _mm_cvtsi128_si32(مجموعه_ga);
+                dst[2] = _mm_cvtsi128_si32(_mm_srli_si128(مجموعه_br, 8));
+                dst[3] = _mm_cvtsi128_si32(_mm_srli_si128(مجموعه_ga, 8));
+                لكل (; x < ستون_شمېر; x++)
                 {
-                    dst[0] += (int)src[x * 4];
-                    dst[1] += (int)src[x * 4 + 1];
-                    dst[2] += (int)src[x * 4 + 2];
-                    dst[3] += (int)src[x * 4 + 3];
+                    dst[0] += (صحيح)src[x * 4];
+                    dst[1] += (صحيح)src[x * 4 + 1];
+                    dst[2] += (صحيح)src[x * 4 + 2];
+                    dst[3] += (صحيح)src[x * 4 + 3];
                 }
-#else
-                const int vlanes8 = VTraits<v_uint8>::vlanes();
+#وإلا
+                ثابت صحيح vlanes8 = VTraits<v_uint8>::vlanes();
                 v_uint32 vsum0 = vx_setzero_u32(), vsum1 = vx_setzero_u32();
                 v_uint32 vsum2 = vx_setzero_u32(), vsum3 = vx_setzero_u32();
                 v_uint16 vs16_0 = vx_setzero_u16(), vs16_1 = vx_setzero_u16();
                 v_uint16 vs16_2 = vx_setzero_u16(), vs16_3 = vx_setzero_u16();
-                int x = 0, batch = 0;
-                const int flush_at = 128;
+                صحيح x = 0, batch = 0;
+                ثابت صحيح flush_at = 128;
 
-                for (; x <= cols - vlanes8; x += vlanes8)
+                لكل (; x <= ستون_شمېر - vlanes8; x += vlanes8)
                 {
                     v_uint8 ch0, ch1, ch2, ch3;
-                    v_load_deinterleave(src + x * 4, ch0, ch1, ch2, ch3);
+                    v_بارول_deinterleave(src + x * 4, ch0, ch1, ch2, ch3);
 
                     v_uint16 lo, hi;
-                    v_expand(ch0, lo, hi); vs16_0 = v_add(vs16_0, v_add(lo, hi));
-                    v_expand(ch1, lo, hi); vs16_1 = v_add(vs16_1, v_add(lo, hi));
-                    v_expand(ch2, lo, hi); vs16_2 = v_add(vs16_2, v_add(lo, hi));
-                    v_expand(ch3, lo, hi); vs16_3 = v_add(vs16_3, v_add(lo, hi));
+                    v_expand(ch0, lo, hi); vs16_0 = v_جمع_کړه(vs16_0, v_جمع_کړه(lo, hi));
+                    v_expand(ch1, lo, hi); vs16_1 = v_جمع_کړه(vs16_1, v_جمع_کړه(lo, hi));
+                    v_expand(ch2, lo, hi); vs16_2 = v_جمع_کړه(vs16_2, v_جمع_کړه(lo, hi));
+                    v_expand(ch3, lo, hi); vs16_3 = v_جمع_کړه(vs16_3, v_جمع_کړه(lo, hi));
 
-                    if (++batch >= flush_at)
+                    إذا (++batch >= flush_at)
                     {
                         v_uint32 a, b;
-                        v_expand(vs16_0, a, b); vsum0 = v_add(vsum0, v_add(a, b));
-                        v_expand(vs16_1, a, b); vsum1 = v_add(vsum1, v_add(a, b));
-                        v_expand(vs16_2, a, b); vsum2 = v_add(vsum2, v_add(a, b));
-                        v_expand(vs16_3, a, b); vsum3 = v_add(vsum3, v_add(a, b));
+                        v_expand(vs16_0, a, b); vsum0 = v_جمع_کړه(vsum0, v_جمع_کړه(a, b));
+                        v_expand(vs16_1, a, b); vsum1 = v_جمع_کړه(vsum1, v_جمع_کړه(a, b));
+                        v_expand(vs16_2, a, b); vsum2 = v_جمع_کړه(vsum2, v_جمع_کړه(a, b));
+                        v_expand(vs16_3, a, b); vsum3 = v_جمع_کړه(vsum3, v_جمع_کړه(a, b));
                         vs16_0 = vx_setzero_u16(); vs16_1 = vx_setzero_u16();
                         vs16_2 = vx_setzero_u16(); vs16_3 = vx_setzero_u16();
                         batch = 0;
@@ -305,149 +305,149 @@ static void reduceColSum_8u32s(const Mat& srcmat, Mat& dstmat)
                 }
                 {
                     v_uint32 a, b;
-                    v_expand(vs16_0, a, b); vsum0 = v_add(vsum0, v_add(a, b));
-                    v_expand(vs16_1, a, b); vsum1 = v_add(vsum1, v_add(a, b));
-                    v_expand(vs16_2, a, b); vsum2 = v_add(vsum2, v_add(a, b));
-                    v_expand(vs16_3, a, b); vsum3 = v_add(vsum3, v_add(a, b));
+                    v_expand(vs16_0, a, b); vsum0 = v_جمع_کړه(vsum0, v_جمع_کړه(a, b));
+                    v_expand(vs16_1, a, b); vsum1 = v_جمع_کړه(vsum1, v_جمع_کړه(a, b));
+                    v_expand(vs16_2, a, b); vsum2 = v_جمع_کړه(vsum2, v_جمع_کړه(a, b));
+                    v_expand(vs16_3, a, b); vsum3 = v_جمع_کړه(vsum3, v_جمع_کړه(a, b));
                 }
 
-                dst[0] = (int)v_reduce_sum(vsum0);
-                dst[1] = (int)v_reduce_sum(vsum1);
-                dst[2] = (int)v_reduce_sum(vsum2);
-                dst[3] = (int)v_reduce_sum(vsum3);
+                dst[0] = (صحيح)v_reduce_مجموعه(vsum0);
+                dst[1] = (صحيح)v_reduce_مجموعه(vsum1);
+                dst[2] = (صحيح)v_reduce_مجموعه(vsum2);
+                dst[3] = (صحيح)v_reduce_مجموعه(vsum3);
 
-                for (; x < cols; x++)
+                لكل (; x < ستون_شمېر; x++)
                 {
-                    dst[0] += (int)src[x * 4];
-                    dst[1] += (int)src[x * 4 + 1];
-                    dst[2] += (int)src[x * 4 + 2];
-                    dst[3] += (int)src[x * 4 + 3];
+                    dst[0] += (صحيح)src[x * 4];
+                    dst[1] += (صحيح)src[x * 4 + 1];
+                    dst[2] += (صحيح)src[x * 4 + 2];
+                    dst[3] += (صحيح)src[x * 4 + 3];
                 }
-#endif
+#د_که_پای
             }
-            else
+            وإلا
             {
                 // generic cn: scalar fallback
-                for (int c = 0; c < cn; c++)
-                    dst[c] = (int)src[c];
-                for (int x = cn; x < width; x += cn)
-                    for (int c = 0; c < cn; c++)
-                        dst[c] += (int)src[x + c];
+                لكل (صحيح c = 0; c < cn; c++)
+                    dst[c] = (صحيح)src[c];
+                لكل (صحيح x = cn; x < پلنوالی; x += cn)
+                    لكل (صحيح c = 0; c < cn; c++)
+                        dst[c] += (صحيح)src[x + c];
             }
         }
     };
 
-    parallel_for_(Range(0, srcmat.rows), body);
+    parallel_for_(Range(0, srcmat.لیکې), body);
     v_cleanup();
 }
 
 // --- uchar → float ---
-static void reduceColSum_8u32f(const Mat& srcmat, Mat& dstmat)
+ساكن فراغ reduce_ستون_مجموعه_8u32f(ثابت Mat& srcmat, Mat& dstmat)
 {
-    const int cn = srcmat.channels();
-    const int cols = srcmat.cols;
-    const int width = cols * cn;
+    ثابت صحيح cn = srcmat.channels();
+    ثابت صحيح ستون_شمېر = srcmat.ستون_شمېر;
+    ثابت صحيح پلنوالی = ستون_شمېر * cn;
 
-    auto body = [&](const Range& range) {
-        for (int y = range.start; y < range.end; y++)
+    خپلکاری body = [&](ثابت Range& range) {
+        لكل (صحيح y = range.پیل; y < range.end; y++)
         {
-            const uchar* src = srcmat.ptr<uchar>(y);
-            float* dst = dstmat.ptr<float>(y);
+            ثابت uchar* src = srcmat.ptr<uchar>(y);
+            عائم* dst = dstmat.ptr<عائم>(y);
 
             // compute in int, then convert to float
-            AutoBuffer<int> ibuf(cn);
-            int* sums = ibuf.data();
-            for (int c = 0; c < cn; c++)
+            Auto_بفر<صحيح> ibuf(cn);
+            صحيح* sums = ibuf.معلومات();
+            لكل (صحيح c = 0; c < cn; c++)
                 sums[c] = 0;
 
-            if (cn == 1)
+            إذا (cn == 1)
             {
-#if defined(CV_NEON_DOT)
-                const uint8x16_t ones = vdupq_n_u8(1);
-                uint32x4_t v_sum = vdupq_n_u32(0);
-                int x = 0;
-                for (; x <= width - 16; x += 16)
-                    v_sum = vdotq_u32(v_sum, vld1q_u8(src + x), ones);
-                sums[0] = (int)vaddvq_u32(v_sum);
-                for (; x < width; x++)
-                    sums[0] += (int)src[x];
-#elif CV_NEON && (defined(__aarch64__) || defined(_M_ARM64))
-                uint32x4_t v_sum = vdupq_n_u32(0);
-                int x = 0;
-                for (; x <= width - 16; x += 16)
-                    v_sum = vaddq_u32(v_sum, vpaddlq_u16(vpaddlq_u8(vld1q_u8(src + x))));
-                sums[0] = (int)vaddvq_u32(v_sum);
-                for (; x < width; x++)
-                    sums[0] += (int)src[x];
-#elif CV_AVX2
-                const __m256i zero = _mm256_setzero_si256();
+#إذا defined(CV_NEON_DOT)
+                ثابت uint8x16_t ones = vdupq_n_u8(1);
+                uint32x4_t v_مجموعه = vdupq_n_u32(0);
+                صحيح x = 0;
+                لكل (; x <= پلنوالی - 16; x += 16)
+                    v_مجموعه = vdotq_u32(v_مجموعه, vld1q_u8(src + x), ones);
+                sums[0] = (صحيح)vaddvq_u32(v_مجموعه);
+                لكل (; x < پلنوالی; x++)
+                    sums[0] += (صحيح)src[x];
+#وإلاإذا CV_NEON && (defined(__aarch64__) || defined(_M_ARM64))
+                uint32x4_t v_مجموعه = vdupq_n_u32(0);
+                صحيح x = 0;
+                لكل (; x <= پلنوالی - 16; x += 16)
+                    v_مجموعه = vaddq_u32(v_مجموعه, vpaddlq_u16(vpaddlq_u8(vld1q_u8(src + x))));
+                sums[0] = (صحيح)vaddvq_u32(v_مجموعه);
+                لكل (; x < پلنوالی; x++)
+                    sums[0] += (صحيح)src[x];
+#وإلاإذا CV_AVX2
+                ثابت __m256i zero = _mm256_setzero_si256();
                 __m256i vsum = zero;
-                int x = 0;
-                for (; x <= width - 32; x += 32)
-                    vsum = _mm256_add_epi64(vsum, _mm256_sad_epu8(
-                        _mm256_loadu_si256((const __m256i*)(src + x)), zero));
+                صحيح x = 0;
+                لكل (; x <= پلنوالی - 32; x += 32)
+                    vsum = mm256_جمع_کړه_epi64(vsum, _mm256_sad_epu8(
+                        _mm256_loadu_si256((ثابت __m256i*)(src + x)), zero));
                 // 8-byte tail: reduce max scalar tail from 31 to 7
                 // Use _mm256_inserti128_si256 instead of _mm256_castsi128_si256:
                 // the latter leaves upper 128 bits undefined per Intel spec,
                 // causing MSVC to expose stale register data to _mm256_sad_epu8.
-                for (; x <= width - 8; x += 8)
-                    vsum = _mm256_add_epi64(vsum, _mm256_sad_epu8(
-                        _mm256_inserti128_si256(_mm256_setzero_si256(), _mm_loadl_epi64((const __m128i*)(src + x)), 0), zero));
+                لكل (; x <= پلنوالی - 8; x += 8)
+                    vsum = mm256_جمع_کړه_epi64(vsum, _mm256_sad_epu8(
+                        _mm256_inserti128_si256(_mm256_setzero_si256(), _mm_loadl_epi64((ثابت __m128i*)(src + x)), 0), zero));
                 __m128i lo128 = _mm256_castsi256_si128(vsum);
                 __m128i hi128 = _mm256_extracti128_si256(vsum, 1);
-                __m128i s = _mm_add_epi64(lo128, hi128);
-                s = _mm_add_epi64(s, _mm_unpackhi_epi64(s, s));
+                __m128i s = mm_جمع_کړه_epi64(lo128, hi128);
+                s = mm_جمع_کړه_epi64(s, _mm_unpackhi_epi64(s, s));
                 sums[0] = _mm_cvtsi128_si32(s);
-                for (; x < width; x++)
-                    sums[0] += (int)src[x];
-#elif CV_SSE2
-                const __m128i zero = _mm_setzero_si128();
+                لكل (; x < پلنوالی; x++)
+                    sums[0] += (صحيح)src[x];
+#وإلاإذا CV_SSE2
+                ثابت __m128i zero = _mm_setzero_si128();
                 __m128i vsum = zero;
-                int x = 0;
-                for (; x <= width - 16; x += 16)
-                    vsum = _mm_add_epi64(vsum, _mm_sad_epu8(
-                        _mm_loadu_si128((const __m128i*)(src + x)), zero));
-                __m128i s = _mm_add_epi64(vsum, _mm_unpackhi_epi64(vsum, vsum));
+                صحيح x = 0;
+                لكل (; x <= پلنوالی - 16; x += 16)
+                    vsum = mm_جمع_کړه_epi64(vsum, _mm_sad_epu8(
+                        _mm_loadu_si128((ثابت __m128i*)(src + x)), zero));
+                __m128i s = mm_جمع_کړه_epi64(vsum, _mm_unpackhi_epi64(vsum, vsum));
                 sums[0] = _mm_cvtsi128_si32(s);
-                for (; x < width; x++)
-                    sums[0] += (int)src[x];
-#else
-                const int vlanes8 = VTraits<v_uint8>::vlanes();
-                v_uint32 v_sum = vx_setzero_u32();
+                لكل (; x < پلنوالی; x++)
+                    sums[0] += (صحيح)src[x];
+#وإلا
+                ثابت صحيح vlanes8 = VTraits<v_uint8>::vlanes();
+                v_uint32 v_مجموعه = vx_setzero_u32();
                 v_uint16 v_sum16 = vx_setzero_u16();
-                int x = 0, batch = 0;
+                صحيح x = 0, batch = 0;
 
-                for (; x <= width - vlanes8; x += vlanes8)
+                لكل (; x <= پلنوالی - vlanes8; x += vlanes8)
                 {
                     v_uint16 lo, hi;
-                    v_expand(vx_load(src + x), lo, hi);
-                    v_sum16 = v_add(v_sum16, v_add(lo, hi));
-                    if (++batch >= 128)
+                    v_expand(vx_بارول(src + x), lo, hi);
+                    v_sum16 = v_جمع_کړه(v_sum16, v_جمع_کړه(lo, hi));
+                    إذا (++batch >= 128)
                     {
                         v_uint32 a, b;
                         v_expand(v_sum16, a, b);
-                        v_sum = v_add(v_sum, v_add(a, b));
+                        v_مجموعه = v_جمع_کړه(v_مجموعه, v_جمع_کړه(a, b));
                         v_sum16 = vx_setzero_u16();
                         batch = 0;
                     }
                 }
                 v_uint32 a, b;
                 v_expand(v_sum16, a, b);
-                v_sum = v_add(v_sum, v_add(a, b));
+                v_مجموعه = v_جمع_کړه(v_مجموعه, v_جمع_کړه(a, b));
 
-                sums[0] = (int)v_reduce_sum(v_sum);
-                for (; x < width; x++)
-                    sums[0] += (int)src[x];
-#endif
+                sums[0] = (صحيح)v_reduce_مجموعه(v_مجموعه);
+                لكل (; x < پلنوالی; x++)
+                    sums[0] += (صحيح)src[x];
+#د_که_پای
             }
-            else if (cn == 4)
+            وإلا إذا (cn == 4)
             {
-#if defined(CV_NEON_DOT)
-                const uint8x16_t ones = vdupq_n_u8(1);
+#إذا defined(CV_NEON_DOT)
+                ثابت uint8x16_t ones = vdupq_n_u8(1);
                 uint32x4_t acc0 = vdupq_n_u32(0), acc1 = vdupq_n_u32(0);
                 uint32x4_t acc2 = vdupq_n_u32(0), acc3 = vdupq_n_u32(0);
-                int x = 0;
-                for (; x <= cols - 16; x += 16)
+                صحيح x = 0;
+                لكل (; x <= ستون_شمېر - 16; x += 16)
                 {
                     uint8x16x4_t v = vld4q_u8(src + x * 4);
                     acc0 = vdotq_u32(acc0, v.val[0], ones);
@@ -455,61 +455,61 @@ static void reduceColSum_8u32f(const Mat& srcmat, Mat& dstmat)
                     acc2 = vdotq_u32(acc2, v.val[2], ones);
                     acc3 = vdotq_u32(acc3, v.val[3], ones);
                 }
-                sums[0] = (int)vaddvq_u32(acc0);
-                sums[1] = (int)vaddvq_u32(acc1);
-                sums[2] = (int)vaddvq_u32(acc2);
-                sums[3] = (int)vaddvq_u32(acc3);
-                for (; x < cols; x++)
+                sums[0] = (صحيح)vaddvq_u32(acc0);
+                sums[1] = (صحيح)vaddvq_u32(acc1);
+                sums[2] = (صحيح)vaddvq_u32(acc2);
+                sums[3] = (صحيح)vaddvq_u32(acc3);
+                لكل (; x < ستون_شمېر; x++)
                 {
-                    sums[0] += (int)src[x * 4];
-                    sums[1] += (int)src[x * 4 + 1];
-                    sums[2] += (int)src[x * 4 + 2];
-                    sums[3] += (int)src[x * 4 + 3];
+                    sums[0] += (صحيح)src[x * 4];
+                    sums[1] += (صحيح)src[x * 4 + 1];
+                    sums[2] += (صحيح)src[x * 4 + 2];
+                    sums[3] += (صحيح)src[x * 4 + 3];
                 }
-#elif CV_NEON && (defined(__aarch64__) || defined(_M_ARM64))
-                int x = 0;
-                for (; x <= cols - 16; x += 16)
+#وإلاإذا CV_NEON && (defined(__aarch64__) || defined(_M_ARM64))
+                صحيح x = 0;
+                لكل (; x <= ستون_شمېر - 16; x += 16)
                 {
                     uint8x16x4_t v = vld4q_u8(src + x * 4);
-                    sums[0] += (int)vaddlvq_u8(v.val[0]);
-                    sums[1] += (int)vaddlvq_u8(v.val[1]);
-                    sums[2] += (int)vaddlvq_u8(v.val[2]);
-                    sums[3] += (int)vaddlvq_u8(v.val[3]);
+                    sums[0] += (صحيح)vaddlvq_u8(v.val[0]);
+                    sums[1] += (صحيح)vaddlvq_u8(v.val[1]);
+                    sums[2] += (صحيح)vaddlvq_u8(v.val[2]);
+                    sums[3] += (صحيح)vaddlvq_u8(v.val[3]);
                 }
-                for (; x < cols; x++)
+                لكل (; x < ستون_شمېر; x++)
                 {
-                    sums[0] += (int)src[x * 4];
-                    sums[1] += (int)src[x * 4 + 1];
-                    sums[2] += (int)src[x * 4 + 2];
-                    sums[3] += (int)src[x * 4 + 3];
+                    sums[0] += (صحيح)src[x * 4];
+                    sums[1] += (صحيح)src[x * 4 + 1];
+                    sums[2] += (صحيح)src[x * 4 + 2];
+                    sums[3] += (صحيح)src[x * 4 + 3];
                 }
-#elif CV_AVX2
+#وإلاإذا CV_AVX2
                 // Intel AVX2: shuffle + unpack to group channels, full-register SAD
-                const __m256i zero = _mm256_setzero_si256();
-                const __m256i shuf_mask = _mm256_setr_epi8(
+                ثابت __m256i zero = _mm256_setzero_si256();
+                ثابت __m256i shuf_ماسک = _mm256_setr_epi8(
                     0,4,8,12, 1,5,9,13, 2,6,10,14, 3,7,11,15,
                     0,4,8,12, 1,5,9,13, 2,6,10,14, 3,7,11,15);
-                int x = 0;
+                صحيح x = 0;
                 // 16 pixels/iter with unpack (full-register SAD)
                 {
-                    __m256i sum_bg = zero, sum_ra = zero;
-                    for (; x <= cols - 16; x += 16)
+                    __m256i مجموعه_bg = zero, مجموعه_ra = zero;
+                    لكل (; x <= ستون_شمېر - 16; x += 16)
                     {
-                        __m256i v0 = _mm256_loadu_si256((const __m256i*)(src + x * 4));
-                        __m256i v1 = _mm256_loadu_si256((const __m256i*)(src + x * 4 + 32));
-                        __m256i g0 = _mm256_shuffle_epi8(v0, shuf_mask);
-                        __m256i g1 = _mm256_shuffle_epi8(v1, shuf_mask);
+                        __m256i v0 = _mm256_loadu_si256((ثابت __m256i*)(src + x * 4));
+                        __m256i v1 = _mm256_loadu_si256((ثابت __m256i*)(src + x * 4 + 32));
+                        __m256i g0 = _mm256_shuffle_epi8(v0, shuf_ماسک);
+                        __m256i g1 = _mm256_shuffle_epi8(v1, shuf_ماسک);
                         __m256i bg = _mm256_unpacklo_epi32(g0, g1);
                         __m256i ra = _mm256_unpackhi_epi32(g0, g1);
-                        sum_bg = _mm256_add_epi64(sum_bg, _mm256_sad_epu8(bg, zero));
-                        sum_ra = _mm256_add_epi64(sum_ra, _mm256_sad_epu8(ra, zero));
+                        مجموعه_bg = mm256_جمع_کړه_epi64(مجموعه_bg, _mm256_sad_epu8(bg, zero));
+                        مجموعه_ra = mm256_جمع_کړه_epi64(مجموعه_ra, _mm256_sad_epu8(ra, zero));
                     }
-                    __m128i bg_lo = _mm256_castsi256_si128(sum_bg);
-                    __m128i bg_hi = _mm256_extracti128_si256(sum_bg, 1);
-                    __m128i bg_s = _mm_add_epi64(bg_lo, bg_hi);
-                    __m128i ra_lo = _mm256_castsi256_si128(sum_ra);
-                    __m128i ra_hi = _mm256_extracti128_si256(sum_ra, 1);
-                    __m128i ra_s = _mm_add_epi64(ra_lo, ra_hi);
+                    __m128i bg_lo = _mm256_castsi256_si128(مجموعه_bg);
+                    __m128i bg_hi = _mm256_extracti128_si256(مجموعه_bg, 1);
+                    __m128i bg_s = mm_جمع_کړه_epi64(bg_lo, bg_hi);
+                    __m128i ra_lo = _mm256_castsi256_si128(مجموعه_ra);
+                    __m128i ra_hi = _mm256_extracti128_si256(مجموعه_ra, 1);
+                    __m128i ra_s = mm_جمع_کړه_epi64(ra_lo, ra_hi);
                     sums[0] = _mm_cvtsi128_si32(bg_s);                     // B
                     sums[1] = _mm_cvtsi128_si32(_mm_srli_si128(bg_s, 8));  // G
                     sums[2] = _mm_cvtsi128_si32(ra_s);                     // R
@@ -517,90 +517,90 @@ static void reduceColSum_8u32f(const Mat& srcmat, Mat& dstmat)
                 }
                 // 8-pixel tail with and/srli
                 {
-                    const __m256i mask_lo32 = _mm256_set1_epi64x(0x00000000FFFFFFFFLL);
-                    __m256i sum_br = zero, sum_ga = zero;
-                    for (; x <= cols - 8; x += 8)
+                    ثابت __m256i ماسک_lo32 = _mm256_set1_epi64x(0x00000000FFFFFFFFLL);
+                    __m256i مجموعه_br = zero, مجموعه_ga = zero;
+                    لكل (; x <= ستون_شمېر - 8; x += 8)
                     {
-                        __m256i v = _mm256_loadu_si256((const __m256i*)(src + x * 4));
-                        __m256i grouped = _mm256_shuffle_epi8(v, shuf_mask);
-                        __m256i br = _mm256_and_si256(grouped, mask_lo32);
+                        __m256i v = _mm256_loadu_si256((ثابت __m256i*)(src + x * 4));
+                        __m256i grouped = _mm256_shuffle_epi8(v, shuf_ماسک);
+                        __m256i br = _mm256_and_si256(grouped, ماسک_lo32);
                         __m256i ga = _mm256_srli_epi64(grouped, 32);
-                        sum_br = _mm256_add_epi64(sum_br, _mm256_sad_epu8(br, zero));
-                        sum_ga = _mm256_add_epi64(sum_ga, _mm256_sad_epu8(ga, zero));
+                        مجموعه_br = mm256_جمع_کړه_epi64(مجموعه_br, _mm256_sad_epu8(br, zero));
+                        مجموعه_ga = mm256_جمع_کړه_epi64(مجموعه_ga, _mm256_sad_epu8(ga, zero));
                     }
-                    __m128i br_lo = _mm256_castsi256_si128(sum_br);
-                    __m128i br_hi = _mm256_extracti128_si256(sum_br, 1);
-                    __m128i br_s = _mm_add_epi64(br_lo, br_hi);
-                    __m128i ga_lo = _mm256_castsi256_si128(sum_ga);
-                    __m128i ga_hi = _mm256_extracti128_si256(sum_ga, 1);
-                    __m128i ga_s = _mm_add_epi64(ga_lo, ga_hi);
+                    __m128i br_lo = _mm256_castsi256_si128(مجموعه_br);
+                    __m128i br_hi = _mm256_extracti128_si256(مجموعه_br, 1);
+                    __m128i br_s = mm_جمع_کړه_epi64(br_lo, br_hi);
+                    __m128i ga_lo = _mm256_castsi256_si128(مجموعه_ga);
+                    __m128i ga_hi = _mm256_extracti128_si256(مجموعه_ga, 1);
+                    __m128i ga_s = mm_جمع_کړه_epi64(ga_lo, ga_hi);
                     sums[0] += _mm_cvtsi128_si32(br_s);
                     sums[1] += _mm_cvtsi128_si32(ga_s);
                     sums[2] += _mm_cvtsi128_si32(_mm_srli_si128(br_s, 8));
                     sums[3] += _mm_cvtsi128_si32(_mm_srli_si128(ga_s, 8));
                 }
-                for (; x < cols; x++)
+                لكل (; x < ستون_شمېر; x++)
                 {
-                    sums[0] += (int)src[x * 4];
-                    sums[1] += (int)src[x * 4 + 1];
-                    sums[2] += (int)src[x * 4 + 2];
-                    sums[3] += (int)src[x * 4 + 3];
+                    sums[0] += (صحيح)src[x * 4];
+                    sums[1] += (صحيح)src[x * 4 + 1];
+                    sums[2] += (صحيح)src[x * 4 + 2];
+                    sums[3] += (صحيح)src[x * 4 + 3];
                 }
-#elif CV_SSSE3
+#وإلاإذا CV_SSSE3
                 // Intel SSSE3: _mm_shuffle_epi8 deinterleave + _mm_sad_epu8
-                const __m128i zero = _mm_setzero_si128();
-                const __m128i shuf_mask = _mm_setr_epi8(
+                ثابت __m128i zero = _mm_setzero_si128();
+                ثابت __m128i shuf_ماسک = _mm_setr_epi8(
                     0,4,8,12, 1,5,9,13, 2,6,10,14, 3,7,11,15);
-                const __m128i mask_lo32 = _mm_set1_epi64x(0x00000000FFFFFFFFLL);
-                __m128i sum_br = zero, sum_ga = zero;
-                int x = 0;
-                for (; x <= cols - 4; x += 4)
+                ثابت __m128i ماسک_lo32 = _mm_set1_epi64x(0x00000000FFFFFFFFLL);
+                __m128i مجموعه_br = zero, مجموعه_ga = zero;
+                صحيح x = 0;
+                لكل (; x <= ستون_شمېر - 4; x += 4)
                 {
-                    __m128i v = _mm_loadu_si128((const __m128i*)(src + x * 4));
-                    __m128i grouped = _mm_shuffle_epi8(v, shuf_mask);
-                    __m128i br = _mm_and_si128(grouped, mask_lo32);
+                    __m128i v = _mm_loadu_si128((ثابت __m128i*)(src + x * 4));
+                    __m128i grouped = _mm_shuffle_epi8(v, shuf_ماسک);
+                    __m128i br = _mm_and_si128(grouped, ماسک_lo32);
                     __m128i ga = _mm_srli_epi64(grouped, 32);
-                    sum_br = _mm_add_epi64(sum_br, _mm_sad_epu8(br, zero));
-                    sum_ga = _mm_add_epi64(sum_ga, _mm_sad_epu8(ga, zero));
+                    مجموعه_br = mm_جمع_کړه_epi64(مجموعه_br, _mm_sad_epu8(br, zero));
+                    مجموعه_ga = mm_جمع_کړه_epi64(مجموعه_ga, _mm_sad_epu8(ga, zero));
                 }
-                sums[0] = _mm_cvtsi128_si32(sum_br);
-                sums[1] = _mm_cvtsi128_si32(sum_ga);
-                sums[2] = _mm_cvtsi128_si32(_mm_srli_si128(sum_br, 8));
-                sums[3] = _mm_cvtsi128_si32(_mm_srli_si128(sum_ga, 8));
-                for (; x < cols; x++)
+                sums[0] = _mm_cvtsi128_si32(مجموعه_br);
+                sums[1] = _mm_cvtsi128_si32(مجموعه_ga);
+                sums[2] = _mm_cvtsi128_si32(_mm_srli_si128(مجموعه_br, 8));
+                sums[3] = _mm_cvtsi128_si32(_mm_srli_si128(مجموعه_ga, 8));
+                لكل (; x < ستون_شمېر; x++)
                 {
-                    sums[0] += (int)src[x * 4];
-                    sums[1] += (int)src[x * 4 + 1];
-                    sums[2] += (int)src[x * 4 + 2];
-                    sums[3] += (int)src[x * 4 + 3];
+                    sums[0] += (صحيح)src[x * 4];
+                    sums[1] += (صحيح)src[x * 4 + 1];
+                    sums[2] += (صحيح)src[x * 4 + 2];
+                    sums[3] += (صحيح)src[x * 4 + 3];
                 }
-#else
-                const int vlanes8 = VTraits<v_uint8>::vlanes();
+#وإلا
+                ثابت صحيح vlanes8 = VTraits<v_uint8>::vlanes();
                 v_uint32 vsum0 = vx_setzero_u32(), vsum1 = vx_setzero_u32();
                 v_uint32 vsum2 = vx_setzero_u32(), vsum3 = vx_setzero_u32();
                 v_uint16 vs16_0 = vx_setzero_u16(), vs16_1 = vx_setzero_u16();
                 v_uint16 vs16_2 = vx_setzero_u16(), vs16_3 = vx_setzero_u16();
-                int x = 0, batch = 0;
-                const int flush_at = 128;
+                صحيح x = 0, batch = 0;
+                ثابت صحيح flush_at = 128;
 
-                for (; x <= cols - vlanes8; x += vlanes8)
+                لكل (; x <= ستون_شمېر - vlanes8; x += vlanes8)
                 {
                     v_uint8 ch0, ch1, ch2, ch3;
-                    v_load_deinterleave(src + x * 4, ch0, ch1, ch2, ch3);
+                    v_بارول_deinterleave(src + x * 4, ch0, ch1, ch2, ch3);
 
                     v_uint16 lo, hi;
-                    v_expand(ch0, lo, hi); vs16_0 = v_add(vs16_0, v_add(lo, hi));
-                    v_expand(ch1, lo, hi); vs16_1 = v_add(vs16_1, v_add(lo, hi));
-                    v_expand(ch2, lo, hi); vs16_2 = v_add(vs16_2, v_add(lo, hi));
-                    v_expand(ch3, lo, hi); vs16_3 = v_add(vs16_3, v_add(lo, hi));
+                    v_expand(ch0, lo, hi); vs16_0 = v_جمع_کړه(vs16_0, v_جمع_کړه(lo, hi));
+                    v_expand(ch1, lo, hi); vs16_1 = v_جمع_کړه(vs16_1, v_جمع_کړه(lo, hi));
+                    v_expand(ch2, lo, hi); vs16_2 = v_جمع_کړه(vs16_2, v_جمع_کړه(lo, hi));
+                    v_expand(ch3, lo, hi); vs16_3 = v_جمع_کړه(vs16_3, v_جمع_کړه(lo, hi));
 
-                    if (++batch >= flush_at)
+                    إذا (++batch >= flush_at)
                     {
                         v_uint32 a, b;
-                        v_expand(vs16_0, a, b); vsum0 = v_add(vsum0, v_add(a, b));
-                        v_expand(vs16_1, a, b); vsum1 = v_add(vsum1, v_add(a, b));
-                        v_expand(vs16_2, a, b); vsum2 = v_add(vsum2, v_add(a, b));
-                        v_expand(vs16_3, a, b); vsum3 = v_add(vsum3, v_add(a, b));
+                        v_expand(vs16_0, a, b); vsum0 = v_جمع_کړه(vsum0, v_جمع_کړه(a, b));
+                        v_expand(vs16_1, a, b); vsum1 = v_جمع_کړه(vsum1, v_جمع_کړه(a, b));
+                        v_expand(vs16_2, a, b); vsum2 = v_جمع_کړه(vsum2, v_جمع_کړه(a, b));
+                        v_expand(vs16_3, a, b); vsum3 = v_جمع_کړه(vsum3, v_جمع_کړه(a, b));
                         vs16_0 = vx_setzero_u16(); vs16_1 = vx_setzero_u16();
                         vs16_2 = vx_setzero_u16(); vs16_3 = vx_setzero_u16();
                         batch = 0;
@@ -608,185 +608,185 @@ static void reduceColSum_8u32f(const Mat& srcmat, Mat& dstmat)
                 }
                 {
                     v_uint32 a, b;
-                    v_expand(vs16_0, a, b); vsum0 = v_add(vsum0, v_add(a, b));
-                    v_expand(vs16_1, a, b); vsum1 = v_add(vsum1, v_add(a, b));
-                    v_expand(vs16_2, a, b); vsum2 = v_add(vsum2, v_add(a, b));
-                    v_expand(vs16_3, a, b); vsum3 = v_add(vsum3, v_add(a, b));
+                    v_expand(vs16_0, a, b); vsum0 = v_جمع_کړه(vsum0, v_جمع_کړه(a, b));
+                    v_expand(vs16_1, a, b); vsum1 = v_جمع_کړه(vsum1, v_جمع_کړه(a, b));
+                    v_expand(vs16_2, a, b); vsum2 = v_جمع_کړه(vsum2, v_جمع_کړه(a, b));
+                    v_expand(vs16_3, a, b); vsum3 = v_جمع_کړه(vsum3, v_جمع_کړه(a, b));
                 }
 
-                sums[0] = (int)v_reduce_sum(vsum0);
-                sums[1] = (int)v_reduce_sum(vsum1);
-                sums[2] = (int)v_reduce_sum(vsum2);
-                sums[3] = (int)v_reduce_sum(vsum3);
+                sums[0] = (صحيح)v_reduce_مجموعه(vsum0);
+                sums[1] = (صحيح)v_reduce_مجموعه(vsum1);
+                sums[2] = (صحيح)v_reduce_مجموعه(vsum2);
+                sums[3] = (صحيح)v_reduce_مجموعه(vsum3);
 
-                for (; x < cols; x++)
+                لكل (; x < ستون_شمېر; x++)
                 {
-                    sums[0] += (int)src[x * 4];
-                    sums[1] += (int)src[x * 4 + 1];
-                    sums[2] += (int)src[x * 4 + 2];
-                    sums[3] += (int)src[x * 4 + 3];
+                    sums[0] += (صحيح)src[x * 4];
+                    sums[1] += (صحيح)src[x * 4 + 1];
+                    sums[2] += (صحيح)src[x * 4 + 2];
+                    sums[3] += (صحيح)src[x * 4 + 3];
                 }
-#endif
+#د_که_پای
             }
-            else
+            وإلا
             {
-                for (int x = 0, c = 0; x < width; x++, c = (c+1)&-(c < cn-1))
-                    sums[c] += (int)src[x];
+                لكل (صحيح x = 0, c = 0; x < پلنوالی; x++, c = (c+1)&-(c < cn-1))
+                    sums[c] += (صحيح)src[x];
             }
-            for (int c = 0; c < cn; c++)
-                dst[c] = (float)sums[c];
+            لكل (صحيح c = 0; c < cn; c++)
+                dst[c] = (عائم)sums[c];
         }
     };
-    parallel_for_(Range(0, srcmat.rows), body);
+    parallel_for_(Range(0, srcmat.لیکې), body);
     v_cleanup();
 }
 
 // --- 16-bit (ushort/short) → float ---
-template<typename SrcT, typename VecSrc, typename VecDst>
-static void reduceColSum_16_32f(const Mat& srcmat, Mat& dstmat)
+کينډۍ<ډول_نوم SrcT, ډول_نوم VecSrc, ډول_نوم VecDst>
+ساكن فراغ reduce_ستون_مجموعه_16_32f(ثابت Mat& srcmat, Mat& dstmat)
 {
-    const int cn = srcmat.channels();
-    const int width = srcmat.cols * cn;
-    const int vlanes = VTraits<VecSrc>::vlanes();
+    ثابت صحيح cn = srcmat.channels();
+    ثابت صحيح پلنوالی = srcmat.ستون_شمېر * cn;
+    ثابت صحيح vlanes = VTraits<VecSrc>::vlanes();
 
-    auto body = [&](const Range& range) {
-        for (int y = range.start; y < range.end; y++)
+    خپلکاری body = [&](ثابت Range& range) {
+        لكل (صحيح y = range.پیل; y < range.end; y++)
         {
-            const SrcT* src = srcmat.ptr<SrcT>(y);
-            float* dst = dstmat.ptr<float>(y);
+            ثابت SrcT* src = srcmat.ptr<SrcT>(y);
+            عائم* dst = dstmat.ptr<عائم>(y);
 
-            if (cn == 1)
+            إذا (cn == 1)
             {
                 VecDst v_sum0 = v_setzero_<VecDst>(), v_sum1 = v_setzero_<VecDst>();
-                int x = 0;
-                for (; x <= width - vlanes; x += vlanes)
+                صحيح x = 0;
+                لكل (; x <= پلنوالی - vlanes; x += vlanes)
                 {
                     VecDst lo, hi;
-                    v_expand(vx_load(src + x), lo, hi);
-                    v_sum0 = v_add(v_sum0, lo);
-                    v_sum1 = v_add(v_sum1, hi);
+                    v_expand(vx_بارول(src + x), lo, hi);
+                    v_sum0 = v_جمع_کړه(v_sum0, lo);
+                    v_sum1 = v_جمع_کړه(v_sum1, hi);
                 }
-                dst[0] = (float)(v_reduce_sum(v_sum0) + v_reduce_sum(v_sum1));
-                for (; x < width; x++)
-                    dst[0] += (float)src[x];
+                dst[0] = (عائم)(v_reduce_مجموعه(v_sum0) + v_reduce_مجموعه(v_sum1));
+                لكل (; x < پلنوالی; x++)
+                    dst[0] += (عائم)src[x];
             }
-            else
+            وإلا
             {
-                for (int c = 0; c < cn; c++)
+                لكل (صحيح c = 0; c < cn; c++)
                     dst[c] = 0;
-                for (int x = 0, c = 0; x < width; x++, c = (c+1)&-(c < cn-1))
-                    dst[c] += (float)src[x];
+                لكل (صحيح x = 0, c = 0; x < پلنوالی; x++, c = (c+1)&-(c < cn-1))
+                    dst[c] += (عائم)src[x];
             }
         }
     };
-    parallel_for_(Range(0, srcmat.rows), body);
+    parallel_for_(Range(0, srcmat.لیکې), body);
     v_cleanup();
 }
 
-static void reduceColSum_16u32f(const Mat& srcmat, Mat& dstmat)
-{ reduceColSum_16_32f<ushort, v_uint16, v_uint32>(srcmat, dstmat); }
+ساكن فراغ reduce_ستون_مجموعه_16u32f(ثابت Mat& srcmat, Mat& dstmat)
+{ reduce_ستون_مجموعه_16_32f<ushort, v_uint16, v_uint32>(srcmat, dstmat); }
 
-static void reduceColSum_16s32f(const Mat& srcmat, Mat& dstmat)
-{ reduceColSum_16_32f<short, v_int16, v_int32>(srcmat, dstmat); }
+ساكن فراغ reduce_ستون_مجموعه_16s32f(ثابت Mat& srcmat, Mat& dstmat)
+{ reduce_ستون_مجموعه_16_32f<لنډ, v_int16, v_int32>(srcmat, dstmat); }
 
 // --- float/double → same type ---
-template<typename T, typename VecT>
-static void reduceColSum_FP(const Mat& srcmat, Mat& dstmat)
+کينډۍ<ډول_نوم T, ډول_نوم VecT>
+ساكن فراغ reduce_ستون_مجموعه_FP(ثابت Mat& srcmat, Mat& dstmat)
 {
-    const int cn = srcmat.channels();
-    const int width = srcmat.cols * cn;
-    const int vlanes = VTraits<VecT>::vlanes();
+    ثابت صحيح cn = srcmat.channels();
+    ثابت صحيح پلنوالی = srcmat.ستون_شمېر * cn;
+    ثابت صحيح vlanes = VTraits<VecT>::vlanes();
 
-    auto body = [&](const Range& range) {
-        for (int y = range.start; y < range.end; y++)
+    خپلکاری body = [&](ثابت Range& range) {
+        لكل (صحيح y = range.پیل; y < range.end; y++)
         {
-            const T* src = srcmat.ptr<T>(y);
+            ثابت T* src = srcmat.ptr<T>(y);
             T* dst = dstmat.ptr<T>(y);
 
-            if (cn == 1)
+            إذا (cn == 1)
             {
                 VecT s0 = v_setzero_<VecT>(), s1 = v_setzero_<VecT>();
                 VecT s2 = v_setzero_<VecT>(), s3 = v_setzero_<VecT>();
-                int x = 0;
-                for (; x <= width - vlanes * 4; x += vlanes * 4)
+                صحيح x = 0;
+                لكل (; x <= پلنوالی - vlanes * 4; x += vlanes * 4)
                 {
-                    s0 = v_add(s0, vx_load(src + x));
-                    s1 = v_add(s1, vx_load(src + x + vlanes));
-                    s2 = v_add(s2, vx_load(src + x + vlanes * 2));
-                    s3 = v_add(s3, vx_load(src + x + vlanes * 3));
+                    s0 = v_جمع_کړه(s0, vx_بارول(src + x));
+                    s1 = v_جمع_کړه(s1, vx_بارول(src + x + vlanes));
+                    s2 = v_جمع_کړه(s2, vx_بارول(src + x + vlanes * 2));
+                    s3 = v_جمع_کړه(s3, vx_بارول(src + x + vlanes * 3));
                 }
-                s0 = v_add(v_add(s0, s1), v_add(s2, s3));
-                for (; x <= width - vlanes; x += vlanes)
-                    s0 = v_add(s0, vx_load(src + x));
-                T total = (T)v_reduce_sum(s0);
-                for (; x < width; x++)
-                    total += src[x];
-                dst[0] = total;
+                s0 = v_جمع_کړه(v_جمع_کړه(s0, s1), v_جمع_کړه(s2, s3));
+                لكل (; x <= پلنوالی - vlanes; x += vlanes)
+                    s0 = v_جمع_کړه(s0, vx_بارول(src + x));
+                T ټول = (T)v_reduce_مجموعه(s0);
+                لكل (; x < پلنوالی; x++)
+                    ټول += src[x];
+                dst[0] = ټول;
             }
-            else
+            وإلا
             {
-                for (int c = 0; c < cn; c++)
+                لكل (صحيح c = 0; c < cn; c++)
                     dst[c] = 0;
-                for (int x = 0, c = 0; x < width; x++, c = (c+1)&-(c < cn-1))
+                لكل (صحيح x = 0, c = 0; x < پلنوالی; x++, c = (c+1)&-(c < cn-1))
                     dst[c] += src[x];
             }
         }
     };
-    parallel_for_(Range(0, srcmat.rows), body);
+    parallel_for_(Range(0, srcmat.لیکې), body);
     v_cleanup();
 }
 
-static void reduceColSum_32f32f(const Mat& srcmat, Mat& dstmat)
-{ reduceColSum_FP<float, v_float32>(srcmat, dstmat); }
+ساكن فراغ reduce_ستون_مجموعه_32f32f(ثابت Mat& srcmat, Mat& dstmat)
+{ reduce_ستون_مجموعه_FP<عائم, v_float32>(srcmat, dstmat); }
 
-#if CV_SIMD_64F
+#إذا CV_SIMD_64F
 // --- float → double ---
-static void reduceColSum_32f64f(const Mat& srcmat, Mat& dstmat)
+ساكن فراغ reduce_ستون_مجموعه_32f64f(ثابت Mat& srcmat, Mat& dstmat)
 {
-    const int cn = srcmat.channels();
-    const int width = srcmat.cols * cn;
-    const int vlanes32 = VTraits<v_float32>::vlanes();
+    ثابت صحيح cn = srcmat.channels();
+    ثابت صحيح پلنوالی = srcmat.ستون_شمېر * cn;
+    ثابت صحيح vlanes32 = VTraits<v_float32>::vlanes();
 
-    auto body = [&](const Range& range) {
-        for (int y = range.start; y < range.end; y++)
+    خپلکاری body = [&](ثابت Range& range) {
+        لكل (صحيح y = range.پیل; y < range.end; y++)
         {
-            const float* src = srcmat.ptr<float>(y);
-            double* dst = dstmat.ptr<double>(y);
+            ثابت عائم* src = srcmat.ptr<عائم>(y);
+            مزدوج* dst = dstmat.ptr<مزدوج>(y);
 
-            if (cn == 1)
+            إذا (cn == 1)
             {
                 v_float64 v_sum0 = vx_setzero_f64();
                 v_float64 v_sum1 = vx_setzero_f64();
-                int x = 0;
-                for (; x <= width - vlanes32; x += vlanes32)
+                صحيح x = 0;
+                لكل (; x <= پلنوالی - vlanes32; x += vlanes32)
                 {
-                    v_float32 v = vx_load(src + x);
-                    v_sum0 = v_add(v_sum0, v_cvt_f64(v));
-                    v_sum1 = v_add(v_sum1, v_cvt_f64_high(v));
+                    v_float32 v = vx_بارول(src + x);
+                    v_sum0 = v_جمع_کړه(v_sum0, v_cvt_f64(v));
+                    v_sum1 = v_جمع_کړه(v_sum1, v_cvt_f64_لوړ(v));
                 }
-                v_float64 v_total = v_add(v_sum0, v_sum1);
+                v_float64 v_ټول = v_جمع_کړه(v_sum0, v_sum1);
 
-                double total = v_reduce_sum(v_total);
-                for (; x < width; x++)
-                    total += (double)src[x];
-                dst[0] = total;
+                مزدوج ټول = v_reduce_مجموعه(v_ټول);
+                لكل (; x < پلنوالی; x++)
+                    ټول += (مزدوج)src[x];
+                dst[0] = ټول;
             }
-            else
+            وإلا
             {
-                for (int c = 0; c < cn; c++)
+                لكل (صحيح c = 0; c < cn; c++)
                     dst[c] = 0;
-                for (int x = 0, c = 0; x < width; x++, c = (c+1)&-(c < cn-1))
-                    dst[c] += (double)src[x];
+                لكل (صحيح x = 0, c = 0; x < پلنوالی; x++, c = (c+1)&-(c < cn-1))
+                    dst[c] += (مزدوج)src[x];
             }
         }
     };
-    parallel_for_(Range(0, srcmat.rows), body);
+    parallel_for_(Range(0, srcmat.لیکې), body);
     v_cleanup();
 }
 
-static void reduceColSum_64f64f(const Mat& srcmat, Mat& dstmat)
-{ reduceColSum_FP<double, v_float64>(srcmat, dstmat); }
-#endif // CV_SIMD_64F
+ساكن فراغ reduce_ستون_مجموعه_64f64f(ثابت Mat& srcmat, Mat& dstmat)
+{ reduce_ستون_مجموعه_FP<مزدوج, v_float64>(srcmat, dstmat); }
+#د_که_پای // CV_SIMD_64F
 
 // =====================================================================
 //  Row reduce SUM (dim=0): sum each column across all rows
@@ -795,149 +795,149 @@ static void reduceColSum_64f64f(const Mat& srcmat, Mat& dstmat)
 // --- uchar → int ---
 // Uses u16 intermediate accumulator for vertical sum: accumulate u8→u16 per row,
 // flush u16→u32 every 256 rows (max u16 value: 256*255=65280 < 65535)
-static void reduceRowSum_8u32s(const Mat& srcmat, Mat& dstmat)
+ساكن فراغ reduce_لیکه_مجموعه_8u32s(ثابت Mat& srcmat, Mat& dstmat)
 {
-    const int width_cn = srcmat.cols * srcmat.channels();
-    const int height = srcmat.rows;
-    const int vlanes16 = VTraits<v_uint16>::vlanes();
-    const int vlanes32 = VTraits<v_int32>::vlanes();
+    ثابت صحيح پلنوالی_cn = srcmat.ستون_شمېر * srcmat.channels();
+    ثابت صحيح لوړوالی = srcmat.لیکې;
+    ثابت صحيح vlanes16 = VTraits<v_uint16>::vlanes();
+    ثابت صحيح vlanes32 = VTraits<v_int32>::vlanes();
 
-    auto body = [&](const Range& range) {
-        const int start = range.start;
-        const int end = range.end;
-        const int len = end - start;
+    خپلکاری body = [&](ثابت Range& range) {
+        ثابت صحيح پیل = range.پیل;
+        ثابت صحيح end = range.end;
+        ثابت صحيح len = end - پیل;
 
-        AutoBuffer<int> buf32_storage(len);
-        AutoBuffer<ushort> buf16_storage(len);
-        int* buf32 = buf32_storage.data();
-        ushort* buf16 = buf16_storage.data();
+        Auto_بفر<صحيح> buf32_storage(len);
+        Auto_بفر<ushort> buf16_storage(len);
+        صحيح* buf32 = buf32_storage.معلومات();
+        ushort* buf16 = buf16_storage.معلومات();
 
         // init from first row
-        const uchar* src0 = srcmat.ptr<uchar>(0) + start;
-        for (int i = 0; i < len; i++)
-            buf32[i] = (int)src0[i];
+        ثابت uchar* src0 = srcmat.ptr<uchar>(0) + پیل;
+        لكل (صحيح i = 0; i < len; i++)
+            buf32[i] = (صحيح)src0[i];
 
-        if (height <= 1)
+        إذا (لوړوالی <= 1)
         {
-            int* dst = dstmat.ptr<int>(0) + start;
-            for (int i = 0; i < len; i++)
+            صحيح* dst = dstmat.ptr<صحيح>(0) + پیل;
+            لكل (صحيح i = 0; i < len; i++)
                 dst[i] = buf32[i];
-            return;
+            أرجع;
         }
 
-        memset(buf16, 0, len * sizeof(ushort));
-        const int flush_at = 256; // 256*255 = 65280 < 65535 (u16 safe)
-        int flush_count = 0;
+        memset(buf16, 0, len * حجم(ushort));
+        ثابت صحيح flush_at = 256; // 256*255 = 65280 < 65535 (u16 safe)
+        صحيح flush_شمېر = 0;
 
-        for (int row = 1; row < height; row++)
+        لكل (صحيح لیکه = 1; لیکه < لوړوالی; لیکه++)
         {
-            const uchar* src = srcmat.ptr<uchar>(row) + start;
-            int i = 0;
+            ثابت uchar* src = srcmat.ptr<uchar>(لیکه) + پیل;
+            صحيح i = 0;
 
-#if CV_NEON && (defined(__aarch64__) || defined(_M_ARM64))
+#إذا CV_NEON && (defined(__aarch64__) || defined(_M_ARM64))
             // AArch64: vaddw_u8 — single-instruction widening add (u16 += u8)
-            for (; i <= len - 16; i += 16)
+            لكل (; i <= len - 16; i += 16)
             {
                 uint8x16_t v = vld1q_u8(src + i);
                 uint16x8_t acc_lo = vld1q_u16(buf16 + i);
                 uint16x8_t acc_hi = vld1q_u16(buf16 + i + 8);
-                vst1q_u16(buf16 + i,     vaddw_u8(acc_lo, vget_low_u8(v)));
-                vst1q_u16(buf16 + i + 8, vaddw_high_u8(acc_hi, v));
+                vst1q_u16(buf16 + i,     vaddw_u8(acc_lo, vget_ټیټ_u8(v)));
+                vst1q_u16(buf16 + i + 8, vaddw_لوړ_u8(acc_hi, v));
             }
-#elif CV_RVV
-            const int vl = (int)__riscv_vsetvlmax_e8m2();
-            for (; i <= len - vl; i += vl)
+#وإلاإذا CV_RVV
+            ثابت صحيح vl = (صحيح)__riscv_vsetvlmax_e8m2();
+            لكل (; i <= len - vl; i += vl)
             {
                 vuint8m2_t vs = __riscv_vle8_v_u8m2(src + i, vl);
                 vuint16m4_t va = __riscv_vle16_v_u16m4(buf16 + i, vl);
                 va = __riscv_vwaddu_wv_u16m4(va, vs, vl);
                 __riscv_vse16_v_u16m4(buf16 + i, va, vl);
             }
-#else
-            const int vlanes8 = VTraits<v_uint8>::vlanes();
-            for (; i <= len - vlanes8; i += vlanes8)
+#وإلا
+            ثابت صحيح vlanes8 = VTraits<v_uint8>::vlanes();
+            لكل (; i <= len - vlanes8; i += vlanes8)
             {
                 v_uint16 lo, hi;
-                v_expand(vx_load(src + i), lo, hi);
-                v_store(buf16 + i, v_add(vx_load(buf16 + i), lo));
-                v_store(buf16 + i + vlanes16, v_add(vx_load(buf16 + i + vlanes16), hi));
+                v_expand(vx_بارول(src + i), lo, hi);
+                v_store(buf16 + i, v_جمع_کړه(vx_بارول(buf16 + i), lo));
+                v_store(buf16 + i + vlanes16, v_جمع_کړه(vx_بارول(buf16 + i + vlanes16), hi));
             }
-#endif
-            for (; i < len; i++)
+#د_که_پای
+            لكل (; i < len; i++)
                 buf16[i] += (ushort)src[i];
 
-            if (++flush_count >= flush_at || row == height - 1)
+            إذا (++flush_شمېر >= flush_at || لیکه == لوړوالی - 1)
             {
                 // flush u16 → u32
-                int j = 0;
-                for (; j <= len - vlanes16; j += vlanes16)
+                صحيح j = 0;
+                لكل (; j <= len - vlanes16; j += vlanes16)
                 {
                     v_uint32 lo, hi;
-                    v_expand(vx_load(buf16 + j), lo, hi);
-                    v_store(buf32 + j, v_add(vx_load(buf32 + j), v_reinterpret_as_s32(lo)));
-                    v_store(buf32 + j + vlanes32, v_add(vx_load(buf32 + j + vlanes32), v_reinterpret_as_s32(hi)));
+                    v_expand(vx_بارول(buf16 + j), lo, hi);
+                    v_store(buf32 + j, v_جمع_کړه(vx_بارول(buf32 + j), v_reinterpret_as_s32(lo)));
+                    v_store(buf32 + j + vlanes32, v_جمع_کړه(vx_بارول(buf32 + j + vlanes32), v_reinterpret_as_s32(hi)));
                 }
-                for (; j < len; j++)
-                    buf32[j] += (int)buf16[j];
-                memset(buf16, 0, len * sizeof(ushort));
-                flush_count = 0;
+                لكل (; j < len; j++)
+                    buf32[j] += (صحيح)buf16[j];
+                memset(buf16, 0, len * حجم(ushort));
+                flush_شمېر = 0;
             }
         }
 
-        int* dst = dstmat.ptr<int>(0) + start;
-        for (int i = 0; i < len; i++)
+        صحيح* dst = dstmat.ptr<صحيح>(0) + پیل;
+        لكل (صحيح i = 0; i < len; i++)
             dst[i] = buf32[i];
     };
 
-    parallel_for_(Range(0, width_cn), body, width_cn * CV_ELEM_SIZE(srcmat.depth()) / 64);
+    parallel_for_(Range(0, پلنوالی_cn), body, پلنوالی_cn * CV_ELEM_اندازه(srcmat.ژوروالی()) / 64);
     v_cleanup();
 }
 
 // --- uchar → float ---
-static void reduceRowSum_8u32f(const Mat& srcmat, Mat& dstmat)
+ساكن فراغ reduce_لیکه_مجموعه_8u32f(ثابت Mat& srcmat, Mat& dstmat)
 {
     // compute in int, then convert to float
-    Mat temp(dstmat.rows, dstmat.cols, CV_32SC(srcmat.channels()));
-    reduceRowSum_8u32s(srcmat, temp);
-    temp.convertTo(dstmat, dstmat.type());
+    Mat لنډمهاله_2(dstmat.لیکې, dstmat.ستون_شمېر, CV_32SC(srcmat.channels()));
+    reduce_لیکه_مجموعه_8u32s(srcmat, لنډمهاله_2);
+    لنډمهاله_2.convert_منزل(dstmat, dstmat.type());
 }
 
 // --- 16-bit (ushort/short) → float row reduce ---
-template<typename SrcT, typename VecSrc, typename VecDst>
-static void reduceRowSum_16_32f(const Mat& srcmat, Mat& dstmat)
+کينډۍ<ډول_نوم SrcT, ډول_نوم VecSrc, ډول_نوم VecDst>
+ساكن فراغ reduce_لیکه_مجموعه_16_32f(ثابت Mat& srcmat, Mat& dstmat)
 {
-    const int width_cn = srcmat.cols * srcmat.channels();
-    const int height = srcmat.rows;
-    const int vlanes16 = VTraits<VecSrc>::vlanes();
-    const int vlanes32 = vlanes16 / 2;
+    ثابت صحيح پلنوالی_cn = srcmat.ستون_شمېر * srcmat.channels();
+    ثابت صحيح لوړوالی = srcmat.لیکې;
+    ثابت صحيح vlanes16 = VTraits<VecSrc>::vlanes();
+    ثابت صحيح vlanes32 = vlanes16 / 2;
 
-    auto body = [&](const Range& range) {
-        const int start = range.start;
-        const int end = range.end;
-        const int len = end - start;
-        float* dst = dstmat.ptr<float>(0) + start;
+    خپلکاری body = [&](ثابت Range& range) {
+        ثابت صحيح پیل = range.پیل;
+        ثابت صحيح end = range.end;
+        ثابت صحيح len = end - پیل;
+        عائم* dst = dstmat.ptr<عائم>(0) + پیل;
 
-        int i = 0;
-        for (; i <= len - vlanes16 * 4; i += vlanes16 * 4)
+        صحيح i = 0;
+        لكل (; i <= len - vlanes16 * 4; i += vlanes16 * 4)
         {
-            const SrcT* src0 = srcmat.ptr<SrcT>(0) + start + i;
+            ثابت SrcT* src0 = srcmat.ptr<SrcT>(0) + پیل + i;
             VecDst a0, a1, a2, a3, a4, a5, a6, a7;
-            v_expand(vx_load(src0), a0, a1);
-            v_expand(vx_load(src0 + vlanes16), a2, a3);
-            v_expand(vx_load(src0 + vlanes16*2), a4, a5);
-            v_expand(vx_load(src0 + vlanes16*3), a6, a7);
-            for (int row = 1; row < height; row++)
+            v_expand(vx_بارول(src0), a0, a1);
+            v_expand(vx_بارول(src0 + vlanes16), a2, a3);
+            v_expand(vx_بارول(src0 + vlanes16*2), a4, a5);
+            v_expand(vx_بارول(src0 + vlanes16*3), a6, a7);
+            لكل (صحيح لیکه = 1; لیکه < لوړوالی; لیکه++)
             {
-                const SrcT* src = srcmat.ptr<SrcT>(row) + start + i;
+                ثابت SrcT* src = srcmat.ptr<SrcT>(لیکه) + پیل + i;
                 VecDst lo, hi;
-                v_expand(vx_load(src), lo, hi);
-                a0 = v_add(a0, lo); a1 = v_add(a1, hi);
-                v_expand(vx_load(src + vlanes16), lo, hi);
-                a2 = v_add(a2, lo); a3 = v_add(a3, hi);
-                v_expand(vx_load(src + vlanes16*2), lo, hi);
-                a4 = v_add(a4, lo); a5 = v_add(a5, hi);
-                v_expand(vx_load(src + vlanes16*3), lo, hi);
-                a6 = v_add(a6, lo); a7 = v_add(a7, hi);
+                v_expand(vx_بارول(src), lo, hi);
+                a0 = v_جمع_کړه(a0, lo); a1 = v_جمع_کړه(a1, hi);
+                v_expand(vx_بارول(src + vlanes16), lo, hi);
+                a2 = v_جمع_کړه(a2, lo); a3 = v_جمع_کړه(a3, hi);
+                v_expand(vx_بارول(src + vlanes16*2), lo, hi);
+                a4 = v_جمع_کړه(a4, lo); a5 = v_جمع_کړه(a5, hi);
+                v_expand(vx_بارول(src + vlanes16*3), lo, hi);
+                a6 = v_جمع_کړه(a6, lo); a7 = v_جمع_کړه(a7, hi);
             }
             v_store(dst + i, v_cvt_f32(v_reinterpret_as_s32(a0)));
             v_store(dst + i + vlanes32, v_cvt_f32(v_reinterpret_as_s32(a1)));
@@ -948,71 +948,71 @@ static void reduceRowSum_16_32f(const Mat& srcmat, Mat& dstmat)
             v_store(dst + i + vlanes32*6, v_cvt_f32(v_reinterpret_as_s32(a6)));
             v_store(dst + i + vlanes32*7, v_cvt_f32(v_reinterpret_as_s32(a7)));
         }
-        for (; i <= len - vlanes16; i += vlanes16)
+        لكل (; i <= len - vlanes16; i += vlanes16)
         {
             VecDst a0, a1;
-            v_expand(vx_load(srcmat.ptr<SrcT>(0) + start + i), a0, a1);
-            for (int row = 1; row < height; row++)
+            v_expand(vx_بارول(srcmat.ptr<SrcT>(0) + پیل + i), a0, a1);
+            لكل (صحيح لیکه = 1; لیکه < لوړوالی; لیکه++)
             {
                 VecDst lo, hi;
-                v_expand(vx_load(srcmat.ptr<SrcT>(row) + start + i), lo, hi);
-                a0 = v_add(a0, lo); a1 = v_add(a1, hi);
+                v_expand(vx_بارول(srcmat.ptr<SrcT>(لیکه) + پیل + i), lo, hi);
+                a0 = v_جمع_کړه(a0, lo); a1 = v_جمع_کړه(a1, hi);
             }
             v_store(dst + i, v_cvt_f32(v_reinterpret_as_s32(a0)));
             v_store(dst + i + vlanes32, v_cvt_f32(v_reinterpret_as_s32(a1)));
         }
-        for (; i < len; i++)
+        لكل (; i < len; i++)
         {
-            int val = (int)*(srcmat.ptr<SrcT>(0) + start + i);
-            for (int row = 1; row < height; row++)
-                val += (int)*(srcmat.ptr<SrcT>(row) + start + i);
-            dst[i] = (float)val;
+            صحيح val = (صحيح)*(srcmat.ptr<SrcT>(0) + پیل + i);
+            لكل (صحيح لیکه = 1; لیکه < لوړوالی; لیکه++)
+                val += (صحيح)*(srcmat.ptr<SrcT>(لیکه) + پیل + i);
+            dst[i] = (عائم)val;
         }
     };
 
-    parallel_for_(Range(0, width_cn), body, width_cn * CV_ELEM_SIZE(srcmat.depth()) / 64);
+    parallel_for_(Range(0, پلنوالی_cn), body, پلنوالی_cn * CV_ELEM_اندازه(srcmat.ژوروالی()) / 64);
     v_cleanup();
 }
 
-static void reduceRowSum_16u32f(const Mat& srcmat, Mat& dstmat)
-{ reduceRowSum_16_32f<ushort, v_uint16, v_uint32>(srcmat, dstmat); }
+ساكن فراغ reduce_لیکه_مجموعه_16u32f(ثابت Mat& srcmat, Mat& dstmat)
+{ reduce_لیکه_مجموعه_16_32f<ushort, v_uint16, v_uint32>(srcmat, dstmat); }
 
-static void reduceRowSum_16s32f(const Mat& srcmat, Mat& dstmat)
-{ reduceRowSum_16_32f<short, v_int16, v_int32>(srcmat, dstmat); }
+ساكن فراغ reduce_لیکه_مجموعه_16s32f(ثابت Mat& srcmat, Mat& dstmat)
+{ reduce_لیکه_مجموعه_16_32f<لنډ, v_int16, v_int32>(srcmat, dstmat); }
 
 // --- float/double → same type row reduce ---
-template<typename T, typename VecT>
-static void reduceRowSum_FP(const Mat& srcmat, Mat& dstmat)
+کينډۍ<ډول_نوم T, ډول_نوم VecT>
+ساكن فراغ reduce_لیکه_مجموعه_FP(ثابت Mat& srcmat, Mat& dstmat)
 {
-    const int width_cn = srcmat.cols * srcmat.channels();
-    const int height = srcmat.rows;
-    const int vlanes = VTraits<VecT>::vlanes();
+    ثابت صحيح پلنوالی_cn = srcmat.ستون_شمېر * srcmat.channels();
+    ثابت صحيح لوړوالی = srcmat.لیکې;
+    ثابت صحيح vlanes = VTraits<VecT>::vlanes();
 
-    auto body = [&](const Range& range) {
-        const int start = range.start;
-        const int end = range.end;
-        const int len = end - start;
-        T* dst = dstmat.ptr<T>(0) + start;
+    خپلکاری body = [&](ثابت Range& range) {
+        ثابت صحيح پیل = range.پیل;
+        ثابت صحيح end = range.end;
+        ثابت صحيح len = end - پیل;
+        T* dst = dstmat.ptr<T>(0) + پیل;
 
-        int i = 0;
-        for (; i <= len - vlanes * 8; i += vlanes * 8)
+        صحيح i = 0;
+        لكل (; i <= len - vlanes * 8; i += vlanes * 8)
         {
-            const T* src0 = srcmat.ptr<T>(0) + start + i;
-            VecT s0 = vx_load(src0), s1 = vx_load(src0 + vlanes);
-            VecT s2 = vx_load(src0 + vlanes*2), s3 = vx_load(src0 + vlanes*3);
-            VecT s4 = vx_load(src0 + vlanes*4), s5 = vx_load(src0 + vlanes*5);
-            VecT s6 = vx_load(src0 + vlanes*6), s7 = vx_load(src0 + vlanes*7);
-            for (int row = 1; row < height; row++)
+            ثابت T* src0 = srcmat.ptr<T>(0) + پیل + i;
+            VecT s0 = vx_بارول(src0), s1 = vx_بارول(src0 + vlanes);
+            VecT s2 = vx_بارول(src0 + vlanes*2), s3 = vx_بارول(src0 + vlanes*3);
+            VecT s4 = vx_بارول(src0 + vlanes*4), s5 = vx_بارول(src0 + vlanes*5);
+            VecT s6 = vx_بارول(src0 + vlanes*6), s7 = vx_بارول(src0 + vlanes*7);
+            لكل (صحيح لیکه = 1; لیکه < لوړوالی; لیکه++)
             {
-                const T* src = srcmat.ptr<T>(row) + start + i;
-                s0 = v_add(s0, vx_load(src));
-                s1 = v_add(s1, vx_load(src + vlanes));
-                s2 = v_add(s2, vx_load(src + vlanes*2));
-                s3 = v_add(s3, vx_load(src + vlanes*3));
-                s4 = v_add(s4, vx_load(src + vlanes*4));
-                s5 = v_add(s5, vx_load(src + vlanes*5));
-                s6 = v_add(s6, vx_load(src + vlanes*6));
-                s7 = v_add(s7, vx_load(src + vlanes*7));
+                ثابت T* src = srcmat.ptr<T>(لیکه) + پیل + i;
+                s0 = v_جمع_کړه(s0, vx_بارول(src));
+                s1 = v_جمع_کړه(s1, vx_بارول(src + vlanes));
+                s2 = v_جمع_کړه(s2, vx_بارول(src + vlanes*2));
+                s3 = v_جمع_کړه(s3, vx_بارول(src + vlanes*3));
+                s4 = v_جمع_کړه(s4, vx_بارول(src + vlanes*4));
+                s5 = v_جمع_کړه(s5, vx_بارول(src + vlanes*5));
+                s6 = v_جمع_کړه(s6, vx_بارول(src + vlanes*6));
+                s7 = v_جمع_کړه(s7, vx_بارول(src + vlanes*7));
             }
             v_store(dst + i, s0);
             v_store(dst + i + vlanes, s1);
@@ -1023,262 +1023,262 @@ static void reduceRowSum_FP(const Mat& srcmat, Mat& dstmat)
             v_store(dst + i + vlanes*6, s6);
             v_store(dst + i + vlanes*7, s7);
         }
-        for (; i <= len - vlanes; i += vlanes)
+        لكل (; i <= len - vlanes; i += vlanes)
         {
-            VecT s0 = vx_load(srcmat.ptr<T>(0) + start + i);
-            for (int row = 1; row < height; row++)
-                s0 = v_add(s0, vx_load(srcmat.ptr<T>(row) + start + i));
+            VecT s0 = vx_بارول(srcmat.ptr<T>(0) + پیل + i);
+            لكل (صحيح لیکه = 1; لیکه < لوړوالی; لیکه++)
+                s0 = v_جمع_کړه(s0, vx_بارول(srcmat.ptr<T>(لیکه) + پیل + i));
             v_store(dst + i, s0);
         }
-        for (; i < len; i++)
+        لكل (; i < len; i++)
         {
-            T val = *(srcmat.ptr<T>(0) + start + i);
-            for (int row = 1; row < height; row++)
-                val += *(srcmat.ptr<T>(row) + start + i);
+            T val = *(srcmat.ptr<T>(0) + پیل + i);
+            لكل (صحيح لیکه = 1; لیکه < لوړوالی; لیکه++)
+                val += *(srcmat.ptr<T>(لیکه) + پیل + i);
             dst[i] = val;
         }
     };
 
-    parallel_for_(Range(0, width_cn), body, width_cn * CV_ELEM_SIZE(srcmat.depth()) / 64);
+    parallel_for_(Range(0, پلنوالی_cn), body, پلنوالی_cn * CV_ELEM_اندازه(srcmat.ژوروالی()) / 64);
     v_cleanup();
 }
 
-static void reduceRowSum_32f32f(const Mat& srcmat, Mat& dstmat)
-{ reduceRowSum_FP<float, v_float32>(srcmat, dstmat); }
+ساكن فراغ reduce_لیکه_مجموعه_32f32f(ثابت Mat& srcmat, Mat& dstmat)
+{ reduce_لیکه_مجموعه_FP<عائم, v_float32>(srcmat, dstmat); }
 
-#if CV_SIMD_64F
+#إذا CV_SIMD_64F
 // --- float → double ---
-static void reduceRowSum_32f64f(const Mat& srcmat, Mat& dstmat)
+ساكن فراغ reduce_لیکه_مجموعه_32f64f(ثابت Mat& srcmat, Mat& dstmat)
 {
-    const int width_cn = srcmat.cols * srcmat.channels();
-    const int height = srcmat.rows;
-    const int vlanes32 = VTraits<v_float32>::vlanes();
-    const int vlanes64 = VTraits<v_float64>::vlanes();
+    ثابت صحيح پلنوالی_cn = srcmat.ستون_شمېر * srcmat.channels();
+    ثابت صحيح لوړوالی = srcmat.لیکې;
+    ثابت صحيح vlanes32 = VTraits<v_float32>::vlanes();
+    ثابت صحيح vlanes64 = VTraits<v_float64>::vlanes();
 
-    auto body = [&](const Range& range) {
-        const int start = range.start;
-        const int end = range.end;
-        const int len = end - start;
+    خپلکاری body = [&](ثابت Range& range) {
+        ثابت صحيح پیل = range.پیل;
+        ثابت صحيح end = range.end;
+        ثابت صحيح len = end - پیل;
 
-        AutoBuffer<double> buf_storage(len);
-        double* buf = buf_storage.data();
+        Auto_بفر<مزدوج> buf_storage(len);
+        مزدوج* buf = buf_storage.معلومات();
 
-        const float* src0 = srcmat.ptr<float>(0) + start;
-        for (int i = 0; i < len; i++)
-            buf[i] = (double)src0[i];
+        ثابت عائم* src0 = srcmat.ptr<عائم>(0) + پیل;
+        لكل (صحيح i = 0; i < len; i++)
+            buf[i] = (مزدوج)src0[i];
 
-        for (int row = 1; row < height; row++)
+        لكل (صحيح لیکه = 1; لیکه < لوړوالی; لیکه++)
         {
-            const float* src = srcmat.ptr<float>(row) + start;
-            int i = 0;
-            for (; i <= len - vlanes32; i += vlanes32)
+            ثابت عائم* src = srcmat.ptr<عائم>(لیکه) + پیل;
+            صحيح i = 0;
+            لكل (; i <= len - vlanes32; i += vlanes32)
             {
-                v_float32 v = vx_load(src + i);
-                v_store(buf + i, v_add(vx_load(buf + i), v_cvt_f64(v)));
-                v_store(buf + i + vlanes64, v_add(vx_load(buf + i + vlanes64), v_cvt_f64_high(v)));
+                v_float32 v = vx_بارول(src + i);
+                v_store(buf + i, v_جمع_کړه(vx_بارول(buf + i), v_cvt_f64(v)));
+                v_store(buf + i + vlanes64, v_جمع_کړه(vx_بارول(buf + i + vlanes64), v_cvt_f64_لوړ(v)));
             }
-            for (; i < len; i++)
-                buf[i] += (double)src[i];
+            لكل (; i < len; i++)
+                buf[i] += (مزدوج)src[i];
         }
 
-        double* dst = dstmat.ptr<double>(0) + start;
-        memcpy(dst, buf, len * sizeof(double));
+        مزدوج* dst = dstmat.ptr<مزدوج>(0) + پیل;
+        حافظه_نقل(dst, buf, len * حجم(مزدوج));
     };
 
-    parallel_for_(Range(0, width_cn), body, width_cn * CV_ELEM_SIZE(srcmat.depth()) / 64);
+    parallel_for_(Range(0, پلنوالی_cn), body, پلنوالی_cn * CV_ELEM_اندازه(srcmat.ژوروالی()) / 64);
     v_cleanup();
 }
 
-static void reduceRowSum_64f64f(const Mat& srcmat, Mat& dstmat)
-{ reduceRowSum_FP<double, v_float64>(srcmat, dstmat); }
-#endif // CV_SIMD_64F
+ساكن فراغ reduce_لیکه_مجموعه_64f64f(ثابت Mat& srcmat, Mat& dstmat)
+{ reduce_لیکه_مجموعه_FP<مزدوج, v_float64>(srcmat, dstmat); }
+#د_که_پای // CV_SIMD_64F
 
-#endif // CV_SIMD || CV_SIMD_SCALABLE
+#د_که_پای // CV_SIMD || CV_SIMD_SCALABLE
 
-#if CV_SIMD_SCALABLE
-static inline v_float32 reduceRowSum2Acc4(const v_float32& acc,
-                                           const float* src0, const float* src1,
-                                           const float* src2, const float* src3)
+#إذا CV_SIMD_SCALABLE
+ساكن مضمن v_float32 reduce_لیکه_Sum2_Acc4(ثابت v_float32& acc,
+                                           ثابت عائم* src0, ثابت عائم* src1,
+                                           ثابت عائم* src2, ثابت عائم* src3)
 {
-    v_float32 sum = acc;
-    v_float32 x = vx_load(src0);
-    sum = v_fma(x, x, sum);
-    x = vx_load(src1);
-    sum = v_fma(x, x, sum);
-    x = vx_load(src2);
-    sum = v_fma(x, x, sum);
-    x = vx_load(src3);
-    return v_fma(x, x, sum);
+    v_float32 مجموعه = acc;
+    v_float32 x = vx_بارول(src0);
+    مجموعه = v_fma(x, x, مجموعه);
+    x = vx_بارول(src1);
+    مجموعه = v_fma(x, x, مجموعه);
+    x = vx_بارول(src2);
+    مجموعه = v_fma(x, x, مجموعه);
+    x = vx_بارول(src3);
+    أرجع v_fma(x, x, مجموعه);
 }
 
 // dim=0, REDUCE_SUM2 for CV_32F using scalable universal intrinsics.
-static void reduceRowSum2_32f32f(const Mat& srcmat, Mat& dstmat)
+ساكن فراغ reduce_لیکه_Sum2_32f32f(ثابت Mat& srcmat, Mat& dstmat)
 {
-    const int width = srcmat.cols * srcmat.channels();
-    const int height = srcmat.rows;
-    const int vlanes = VTraits<v_float32>::vlanes();
-    const int block = vlanes * 4;
-    AutoBuffer<float> buffer(width);
-    float* buf = buffer.data();
+    ثابت صحيح پلنوالی = srcmat.ستون_شمېر * srcmat.channels();
+    ثابت صحيح لوړوالی = srcmat.لیکې;
+    ثابت صحيح vlanes = VTraits<v_float32>::vlanes();
+    ثابت صحيح بلاک_2 = vlanes * 4;
+    Auto_بفر<عائم> بفر(پلنوالی);
+    عائم* buf = بفر.معلومات();
 
-    const float* src = srcmat.ptr<float>(0);
-    int i = 0;
-    for (; i <= width - block; i += block)
+    ثابت عائم* src = srcmat.ptr<عائم>(0);
+    صحيح i = 0;
+    لكل (; i <= پلنوالی - بلاک_2; i += بلاک_2)
     {
-        v_float32 x0 = vx_load(src + i);
-        v_float32 x1 = vx_load(src + i + vlanes);
-        v_float32 x2 = vx_load(src + i + vlanes * 2);
-        v_float32 x3 = vx_load(src + i + vlanes * 3);
+        v_float32 x0 = vx_بارول(src + i);
+        v_float32 x1 = vx_بارول(src + i + vlanes);
+        v_float32 x2 = vx_بارول(src + i + vlanes * 2);
+        v_float32 x3 = vx_بارول(src + i + vlanes * 3);
         v_store(buf + i, v_mul(x0, x0));
         v_store(buf + i + vlanes, v_mul(x1, x1));
         v_store(buf + i + vlanes * 2, v_mul(x2, x2));
         v_store(buf + i + vlanes * 3, v_mul(x3, x3));
     }
-    for (; i <= width - vlanes; i += vlanes)
+    لكل (; i <= پلنوالی - vlanes; i += vlanes)
     {
-        v_float32 x = vx_load(src + i);
+        v_float32 x = vx_بارول(src + i);
         v_store(buf + i, v_mul(x, x));
     }
-    for (; i < width; i++)
+    لكل (; i < پلنوالی; i++)
         buf[i] = src[i] * src[i];
 
-    int row = 1;
+    صحيح لیکه = 1;
     // Four rows per pass amortize buffer traffic while preserving source-row
     // accumulation order. The outer loop stays serial: splitting width into
     // tiny parallel stripes under-fills scalable vectors and adds scheduling
     // overhead for this memory-streaming kernel.
-    for (; row <= height - 4; row += 4)
+    لكل (; لیکه <= لوړوالی - 4; لیکه += 4)
     {
-        const float* src0 = srcmat.ptr<float>(row);
-        const float* src1 = srcmat.ptr<float>(row + 1);
-        const float* src2 = srcmat.ptr<float>(row + 2);
-        const float* src3 = srcmat.ptr<float>(row + 3);
+        ثابت عائم* src0 = srcmat.ptr<عائم>(لیکه);
+        ثابت عائم* src1 = srcmat.ptr<عائم>(لیکه + 1);
+        ثابت عائم* src2 = srcmat.ptr<عائم>(لیکه + 2);
+        ثابت عائم* src3 = srcmat.ptr<عائم>(لیکه + 3);
 
         i = 0;
-        for (; i <= width - block; i += block)
+        لكل (; i <= پلنوالی - بلاک_2; i += بلاک_2)
         {
-            v_float32 sum0 = vx_load(buf + i);
-            v_float32 sum1 = vx_load(buf + i + vlanes);
-            v_float32 sum2 = vx_load(buf + i + vlanes * 2);
-            v_float32 sum3 = vx_load(buf + i + vlanes * 3);
-            sum0 = reduceRowSum2Acc4(sum0, src0 + i, src1 + i, src2 + i, src3 + i);
-            sum1 = reduceRowSum2Acc4(sum1, src0 + i + vlanes, src1 + i + vlanes,
+            v_float32 sum0 = vx_بارول(buf + i);
+            v_float32 sum1 = vx_بارول(buf + i + vlanes);
+            v_float32 sum2 = vx_بارول(buf + i + vlanes * 2);
+            v_float32 sum3 = vx_بارول(buf + i + vlanes * 3);
+            sum0 = reduce_لیکه_Sum2_Acc4(sum0, src0 + i, src1 + i, src2 + i, src3 + i);
+            sum1 = reduce_لیکه_Sum2_Acc4(sum1, src0 + i + vlanes, src1 + i + vlanes,
                                      src2 + i + vlanes, src3 + i + vlanes);
-            sum2 = reduceRowSum2Acc4(sum2, src0 + i + vlanes * 2, src1 + i + vlanes * 2,
+            sum2 = reduce_لیکه_Sum2_Acc4(sum2, src0 + i + vlanes * 2, src1 + i + vlanes * 2,
                                      src2 + i + vlanes * 2, src3 + i + vlanes * 2);
-            sum3 = reduceRowSum2Acc4(sum3, src0 + i + vlanes * 3, src1 + i + vlanes * 3,
+            sum3 = reduce_لیکه_Sum2_Acc4(sum3, src0 + i + vlanes * 3, src1 + i + vlanes * 3,
                                      src2 + i + vlanes * 3, src3 + i + vlanes * 3);
             v_store(buf + i, sum0);
             v_store(buf + i + vlanes, sum1);
             v_store(buf + i + vlanes * 2, sum2);
             v_store(buf + i + vlanes * 3, sum3);
         }
-        for (; i <= width - vlanes; i += vlanes)
+        لكل (; i <= پلنوالی - vlanes; i += vlanes)
         {
-            v_float32 sum = vx_load(buf + i);
-            sum = reduceRowSum2Acc4(sum, src0 + i, src1 + i, src2 + i, src3 + i);
-            v_store(buf + i, sum);
+            v_float32 مجموعه = vx_بارول(buf + i);
+            مجموعه = reduce_لیکه_Sum2_Acc4(مجموعه, src0 + i, src1 + i, src2 + i, src3 + i);
+            v_store(buf + i, مجموعه);
         }
-        for (; i < width; i++)
+        لكل (; i < پلنوالی; i++)
         {
-            float sum = buf[i];
-            float x = src0[i]; sum += x * x;
-            x = src1[i]; sum += x * x;
-            x = src2[i]; sum += x * x;
-            x = src3[i]; sum += x * x;
-            buf[i] = sum;
+            عائم مجموعه = buf[i];
+            عائم x = src0[i]; مجموعه += x * x;
+            x = src1[i]; مجموعه += x * x;
+            x = src2[i]; مجموعه += x * x;
+            x = src3[i]; مجموعه += x * x;
+            buf[i] = مجموعه;
         }
     }
 
-    for (; row < height; row++)
+    لكل (; لیکه < لوړوالی; لیکه++)
     {
-        src = srcmat.ptr<float>(row);
+        src = srcmat.ptr<عائم>(لیکه);
         i = 0;
-        for (; i <= width - block; i += block)
+        لكل (; i <= پلنوالی - بلاک_2; i += بلاک_2)
         {
-            v_float32 sum0 = vx_load(buf + i);
-            v_float32 sum1 = vx_load(buf + i + vlanes);
-            v_float32 sum2 = vx_load(buf + i + vlanes * 2);
-            v_float32 sum3 = vx_load(buf + i + vlanes * 3);
-            v_float32 x0 = vx_load(src + i);
-            v_float32 x1 = vx_load(src + i + vlanes);
-            v_float32 x2 = vx_load(src + i + vlanes * 2);
-            v_float32 x3 = vx_load(src + i + vlanes * 3);
+            v_float32 sum0 = vx_بارول(buf + i);
+            v_float32 sum1 = vx_بارول(buf + i + vlanes);
+            v_float32 sum2 = vx_بارول(buf + i + vlanes * 2);
+            v_float32 sum3 = vx_بارول(buf + i + vlanes * 3);
+            v_float32 x0 = vx_بارول(src + i);
+            v_float32 x1 = vx_بارول(src + i + vlanes);
+            v_float32 x2 = vx_بارول(src + i + vlanes * 2);
+            v_float32 x3 = vx_بارول(src + i + vlanes * 3);
             v_store(buf + i, v_fma(x0, x0, sum0));
             v_store(buf + i + vlanes, v_fma(x1, x1, sum1));
             v_store(buf + i + vlanes * 2, v_fma(x2, x2, sum2));
             v_store(buf + i + vlanes * 3, v_fma(x3, x3, sum3));
         }
-        for (; i <= width - vlanes; i += vlanes)
+        لكل (; i <= پلنوالی - vlanes; i += vlanes)
         {
-            v_float32 x = vx_load(src + i);
-            v_store(buf + i, v_fma(x, x, vx_load(buf + i)));
+            v_float32 x = vx_بارول(src + i);
+            v_store(buf + i, v_fma(x, x, vx_بارول(buf + i)));
         }
-        for (; i < width; i++)
+        لكل (; i < پلنوالی; i++)
             buf[i] += src[i] * src[i];
     }
 
     // Delay output stores until all source rows are consumed, preserving the
     // existing overlap-safe behavior of the proposed optimized path.
-    memcpy(dstmat.ptr<float>(), buf, width * sizeof(float));
+    حافظه_نقل(dstmat.ptr<عائم>(), buf, پلنوالی * حجم(عائم));
     v_cleanup();
 }
-#endif
+#د_که_پای
 
 // =====================================================================
 //  Dispatchers
 // =====================================================================
 
-ReduceSumFunc getReduceCSumFunc(int sdepth, int ddepth)
+Reduce_مجموعه_Func getReduceCSumFunc(صحيح sdepth, صحيح ddepth)
 {
-#if (CV_SIMD || CV_SIMD_SCALABLE)
-    if (sdepth == CV_8U && ddepth == CV_32S) return reduceColSum_8u32s;
-    if (sdepth == CV_8U && ddepth == CV_32F) return reduceColSum_8u32f;
-    if (sdepth == CV_16U && ddepth == CV_32F) return reduceColSum_16u32f;
-    if (sdepth == CV_16S && ddepth == CV_32F) return reduceColSum_16s32f;
-    if (sdepth == CV_32F && ddepth == CV_32F) return reduceColSum_32f32f;
-#if CV_SIMD_64F
-    if (sdepth == CV_32F && ddepth == CV_64F) return reduceColSum_32f64f;
-    if (sdepth == CV_64F && ddepth == CV_64F) return reduceColSum_64f64f;
-#endif
-#else
-    CV_UNUSED(sdepth);
-    CV_UNUSED(ddepth);
-#endif
-    return nullptr;
+#إذا (CV_SIMD || CV_SIMD_SCALABLE)
+    إذا (sdepth == CV_8U && ddepth == CV_32S) أرجع reduce_ستون_مجموعه_8u32s;
+    إذا (sdepth == CV_8U && ddepth == CV_32F) أرجع reduce_ستون_مجموعه_8u32f;
+    إذا (sdepth == CV_16U && ddepth == CV_32F) أرجع reduce_ستون_مجموعه_16u32f;
+    إذا (sdepth == CV_16S && ddepth == CV_32F) أرجع reduce_ستون_مجموعه_16s32f;
+    إذا (sdepth == CV_32F && ddepth == CV_32F) أرجع reduce_ستون_مجموعه_32f32f;
+#إذا CV_SIMD_64F
+    إذا (sdepth == CV_32F && ddepth == CV_64F) أرجع reduce_ستون_مجموعه_32f64f;
+    إذا (sdepth == CV_64F && ddepth == CV_64F) أرجع reduce_ستون_مجموعه_64f64f;
+#د_که_پای
+#وإلا
+    CV_ناکارول_شوی(sdepth);
+    CV_ناکارول_شوی(ddepth);
+#د_که_پای
+    أرجع تش_اشاره;
 }
 
-ReduceSumFunc getReduceRSumFunc(int sdepth, int ddepth)
+Reduce_مجموعه_Func getReduceRSumFunc(صحيح sdepth, صحيح ddepth)
 {
-#if (CV_SIMD || CV_SIMD_SCALABLE)
-    if (sdepth == CV_8U && ddepth == CV_32S) return reduceRowSum_8u32s;
-    if (sdepth == CV_8U && ddepth == CV_32F) return reduceRowSum_8u32f;
-    if (sdepth == CV_16U && ddepth == CV_32F) return reduceRowSum_16u32f;
-    if (sdepth == CV_16S && ddepth == CV_32F) return reduceRowSum_16s32f;
-    if (sdepth == CV_32F && ddepth == CV_32F) return reduceRowSum_32f32f;
-#if CV_SIMD_64F
-    if (sdepth == CV_32F && ddepth == CV_64F) return reduceRowSum_32f64f;
-    if (sdepth == CV_64F && ddepth == CV_64F) return reduceRowSum_64f64f;
-#endif
-#else
-    CV_UNUSED(sdepth);
-    CV_UNUSED(ddepth);
-#endif
-    return nullptr;
+#إذا (CV_SIMD || CV_SIMD_SCALABLE)
+    إذا (sdepth == CV_8U && ddepth == CV_32S) أرجع reduce_لیکه_مجموعه_8u32s;
+    إذا (sdepth == CV_8U && ddepth == CV_32F) أرجع reduce_لیکه_مجموعه_8u32f;
+    إذا (sdepth == CV_16U && ddepth == CV_32F) أرجع reduce_لیکه_مجموعه_16u32f;
+    إذا (sdepth == CV_16S && ddepth == CV_32F) أرجع reduce_لیکه_مجموعه_16s32f;
+    إذا (sdepth == CV_32F && ddepth == CV_32F) أرجع reduce_لیکه_مجموعه_32f32f;
+#إذا CV_SIMD_64F
+    إذا (sdepth == CV_32F && ddepth == CV_64F) أرجع reduce_لیکه_مجموعه_32f64f;
+    إذا (sdepth == CV_64F && ddepth == CV_64F) أرجع reduce_لیکه_مجموعه_64f64f;
+#د_که_پای
+#وإلا
+    CV_ناکارول_شوی(sdepth);
+    CV_ناکارول_شوی(ddepth);
+#د_که_پای
+    أرجع تش_اشاره;
 }
 
-ReduceSumFunc getReduceRSum2Func(int sdepth, int ddepth)
+Reduce_مجموعه_Func getReduceRSum2Func(صحيح sdepth, صحيح ddepth)
 {
-#if CV_SIMD_SCALABLE
-    if (sdepth == CV_32F && ddepth == CV_32F) return reduceRowSum2_32f32f;
-#else
-    CV_UNUSED(sdepth);
-    CV_UNUSED(ddepth);
-#endif
-    return nullptr;
+#إذا CV_SIMD_SCALABLE
+    إذا (sdepth == CV_32F && ddepth == CV_32F) أرجع reduce_لیکه_Sum2_32f32f;
+#وإلا
+    CV_ناکارول_شوی(sdepth);
+    CV_ناکارول_شوی(ddepth);
+#د_که_پای
+    أرجع تش_اشاره;
 }
 
-#endif // CV_CPU_OPTIMIZATION_DECLARATIONS_ONLY
+#د_که_پای // CV_CPU_OPTIMIZATION_DECLARATIONS_ONLY
 
-CV_CPU_OPTIMIZATION_NAMESPACE_END
+CV_CPU_OPTIMIZATION_NAMESPACE_پای_ټکی
 } // namespace cv

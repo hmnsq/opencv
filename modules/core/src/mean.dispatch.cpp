@@ -3,497 +3,497 @@
 // of this distribution and at http://opencv.org/license.html
 
 
-#include "precomp.hpp"
-#include "opencl_kernels_core.hpp"
-#include "stat.hpp"
-#include "stat_parallel.hpp"
+#ضمن "precomp.hpp"
+#ضمن "opencl_kernels_core.hpp"
+#ضمن "stat.hpp"
+#ضمن "stat_parallel.hpp"
 
-#include "mean.simd.hpp"
-#include "mean.simd_declarations.hpp" // defines CV_CPU_DISPATCH_MODES_ALL=AVX2,...,BASELINE based on CMakeLists.txt content
+#ضمن "mean.simd.hpp"
+#ضمن "mean.simd_declarations.hpp" // defines CV_CPU_DISPATCH_MODES_ALL=AVX2,...,BASELINE based on CMakeLists.txt content
 
 
-namespace cv {
+نطاق cv {
 
 // serial implementation, also used for the pieces of the parallel version
-static Scalar mean_(const Mat& src, const Mat& mask)
+ساكن Scalar منځنۍ_3(ثابت Mat& src, ثابت Mat& ماسک)
 {
-    CV_Assert( mask.empty() || ((mask.type() == CV_8U || mask.type() == CV_8S || mask.type() == CV_Bool) && src.size == mask.size) );
-    if (src.empty())
-        return Scalar::all(0.0);
+    CV_Assert( ماسک.empty() || ((ماسک.type() == CV_8U || ماسک.type() == CV_8S || ماسک.type() == CV_Bool) && src.size == ماسک.size) );
+    إذا (src.empty())
+        أرجع Scalar::all(0.0);
 
-    int k, cn = src.channels(), depth = src.depth();
+    صحيح k, cn = src.channels(), ژوروالی = src.ژوروالی();
     Scalar s = Scalar::all(0.0);
 
     CV_Assert( cn <= 4 );
 
-    if (src.isContinuous() && mask.isContinuous())
+    إذا (src.isContinuous() && ماسک.isContinuous())
     {
-        CALL_HAL_RET2(meanStdDev, cv_hal_meanStdDev, s, src.data, 0, (int)src.total(), 1, src.type(),
-                      &s[0], nullptr /*stddev*/, mask.data, 0);
+        CALL_HAL_RET2(منځنۍ_Std_Dev, cv_hal_منځنۍ_Std_Dev, s, src.معلومات, 0, (صحيح)src.ټول(), 1, src.type(),
+                      &s[0], تش_اشاره /*stddev*/, ماسک.معلومات, 0);
     }
-    else
+    وإلا
     {
-        if (src.dims <= 2)
+        إذا (src.dims <= 2)
         {
-            CALL_HAL_RET2(meanStdDev, cv_hal_meanStdDev, s, src.data, src.step, src.cols, src.rows, src.type(),
-                          &s[0], nullptr, mask.data, mask.step);
+            CALL_HAL_RET2(منځنۍ_Std_Dev, cv_hal_منځنۍ_Std_Dev, s, src.معلومات, src.ګام, src.ستون_شمېر, src.لیکې, src.type(),
+                          &s[0], تش_اشاره, ماسک.معلومات, ماسک.ګام);
         }
     }
 
-    SumFunc func = getSumFunc(depth);
+    مجموعه_Func func = get_مجموعه_Func(ژوروالی);
 
     CV_Assert( func != 0 );
 
-    const Mat* arrays[] = {&src, &mask, 0};
+    ثابت Mat* arrays[] = {&src, &ماسک, 0};
     uchar* ptrs[2] = {};
     NAryMatIterator it(arrays, ptrs);
-    int total = (int)it.size, blockSize = total, partialBlockSize = 0;
-    int j, count = 0;
-    int _buf[CV_CN_MAX];
-    int* buf = (int*)&s[0];
-    bool partialSumIsInt = depth < CV_32S;
-    bool blockSum = partialSumIsInt || depth == CV_16F || depth == CV_16BF;
+    صحيح ټول = (صحيح)it.size, بلاک_اندازه_2 = ټول, partial_بلاک_اندازه = 0;
+    صحيح j, شمېر_2 = 0;
+    صحيح _buf[CV_CN_MAX];
+    صحيح* buf = (صحيح*)&s[0];
+    منطقي partial_مجموعه_Is_Int = ژوروالی < CV_32S;
+    منطقي بلاک_مجموعه = partial_مجموعه_Is_Int || ژوروالی == CV_16F || ژوروالی == CV_16BF;
     size_t esz = 0, nz0 = 0;
 
-    if( blockSum )
+    إذا( بلاک_مجموعه )
     {
-        partialBlockSize = depth <= CV_8S ? (1 << 23) : (1 << 15);
-        blockSize = std::min(blockSize, partialBlockSize);
+        partial_بلاک_اندازه = ژوروالی <= CV_8S ? (1 << 23) : (1 << 15);
+        بلاک_اندازه_2 = std::min(بلاک_اندازه_2, partial_بلاک_اندازه);
         buf = _buf;
-        for( k = 0; k < cn; k++ )
+        لكل( k = 0; k < cn; k++ )
             buf[k] = 0;
-        esz = src.elemSize();
+        esz = src.elem_اندازه();
     }
 
-    for( size_t i = 0; i < it.nplanes; i++, ++it )
+    لكل( size_t i = 0; i < it.nplanes; i++, ++it )
     {
-        for( j = 0; j < total; j += blockSize )
+        لكل( j = 0; j < ټول; j += بلاک_اندازه_2 )
         {
-            int bsz = std::min(total - j, blockSize);
-            int nz = func( ptrs[0], ptrs[1], (uchar*)buf, bsz, cn );
-            count += nz;
+            صحيح bsz = std::min(ټول - j, بلاک_اندازه_2);
+            صحيح nz = func( ptrs[0], ptrs[1], (uchar*)buf, bsz, cn );
+            شمېر_2 += nz;
             nz0 += nz;
-            if( blockSum && (count + blockSize >= partialBlockSize || (i+1 >= it.nplanes && j+bsz >= total)) )
+            إذا( بلاک_مجموعه && (شمېر_2 + بلاک_اندازه_2 >= partial_بلاک_اندازه || (i+1 >= it.nplanes && j+bsz >= ټول)) )
             {
-                if (partialSumIsInt) {
-                    for( k = 0; k < cn; k++ )
+                إذا (partial_مجموعه_Is_Int) {
+                    لكل( k = 0; k < cn; k++ )
                     {
                         s[k] += buf[k];
                         buf[k] = 0;
                     }
-                } else {
-                    for( k = 0; k < cn; k++ )
+                } وإلا {
+                    لكل( k = 0; k < cn; k++ )
                     {
-                        s[k] += ((float*)buf)[k];
+                        s[k] += ((عائم*)buf)[k];
                         buf[k] = 0;
                     }
                 }
-                count = 0;
+                شمېر_2 = 0;
             }
             ptrs[0] += bsz*esz;
-            if( ptrs[1] )
+            إذا( ptrs[1] )
                 ptrs[1] += bsz;
         }
     }
-    return s*(nz0 ? 1./nz0 : 0);
+    أرجع s*(nz0 ? 1./nz0 : 0);
 }
 
 // number of elements a piece contributes to the mean
-static double statCount(const StatChunk& c)
+ساكن مزدوج stat_شمېر(ثابت StatChunk& c)
 {
-    return c.mask.empty() ? (double)c.src.total() : (double)countNonZero(c.mask);
+    أرجع c.ماسک.empty() ? (مزدوج)c.src.ټول() : (مزدوج)شمېر_Non_Zero(c.ماسک);
 }
 
-Scalar mean(InputArray _src, InputArray _mask)
+Scalar منځنۍ_2(ننوت_Array _src, ننوت_Array ماسک_2)
 {
     CV_INSTRUMENT_REGION();
 
-    Mat src = _src.getMat(), mask = _mask.getMat();
-    CV_Assert( mask.empty() || mask.type() == CV_8U || mask.type() == CV_8S || mask.type() == CV_Bool);
+    Mat src = _src.getMat(), ماسک = ماسک_2.getMat();
+    CV_Assert( ماسک.empty() || ماسک.type() == CV_8U || ماسک.type() == CV_8S || ماسک.type() == CV_Bool);
 
     std::vector<StatChunk> chunks;
-    if (src.channels() > 4 || !splitForParallelStat(src, mask, chunks))
-        return mean_(src, mask);
+    إذا (src.channels() > 4 || !وېشل_For_Parallel_Stat(src, ماسک, chunks))
+        أرجع منځنۍ_3(src, ماسک);
 
-    const int n = (int)chunks.size();
+    ثابت صحيح n = (صحيح)chunks.size();
     std::vector<Scalar> part(n);
-    std::vector<double> cnt(n);
-    parallel_for_(Range(0, n), [&](const Range& r)
+    std::vector<مزدوج> cnt(n);
+    parallel_for_(Range(0, n), [&](ثابت Range& r)
     {
-        for (int i = r.start; i < r.end; i++)
+        لكل (صحيح i = r.پیل; i < r.end; i++)
         {
-            part[i] = mean_(chunks[i].src, chunks[i].mask);
-            cnt[i] = statCount(chunks[i]);
+            part[i] = منځنۍ_3(chunks[i].src, chunks[i].ماسک);
+            cnt[i] = stat_شمېر(chunks[i]);
         }
     });
     Scalar s = Scalar::all(0.0);
-    double total = 0;
-    for (int i = 0; i < n; i++)
+    مزدوج ټول = 0;
+    لكل (صحيح i = 0; i < n; i++)
     {
         s += part[i]*cnt[i];
-        total += cnt[i];
+        ټول += cnt[i];
     }
-    return s*(total > 0 ? 1./total : 0);
+    أرجع s*(ټول > 0 ? 1./ټول : 0);
 }
 
-static SumSqrFunc getSumSqrFunc(int depth)
+ساكن مجموعه_Sqr_Func get_مجموعه_Sqr_Func(صحيح ژوروالی)
 {
     CV_INSTRUMENT_REGION();
-    CV_CPU_DISPATCH(getSumSqrFunc, (depth),
+    CV_CPU_DISPATCH(get_مجموعه_Sqr_Func, (ژوروالی),
         CV_CPU_DISPATCH_MODES_ALL);
 }
 
-#ifdef HAVE_OPENCL
-static bool ocl_meanStdDev( InputArray _src, OutputArray _mean, OutputArray _sdv, InputArray _mask )
+#که_تعریف_شوی HAVE_OPENCL
+ساكن منطقي ocl_منځنۍ_Std_Dev( ننوت_Array _src, OutputArray منځنۍ, OutputArray _sdv, ننوت_Array ماسک_2 )
 {
     CV_INSTRUMENT_REGION_OPENCL();
 
-    bool haveMask = _mask.kind() != _InputArray::NONE;
-    int nz = haveMask ? -1 : (int)_src.total();
-    Scalar mean(0), stddev(0);
-    const int cn = _src.channels();
-    if (cn > 4)
-        return false;
+    منطقي have_ماسک = ماسک_2.ډول() != ننوت_Array_2::NONE;
+    صحيح nz = have_ماسک ? -1 : (صحيح)_src.ټول();
+    Scalar منځنۍ_2(0), stddev(0);
+    ثابت صحيح cn = _src.channels();
+    إذا (cn > 4)
+        أرجع خطأ;
 
     {
-        int type = _src.type(), depth = CV_MAT_DEPTH(type);
-        bool doubleSupport = ocl::Device::getDefault().doubleFPConfig() > 0,
+        صحيح type = _src.type(), ژوروالی = CV_MAT_ژوروالی(type);
+        منطقي doubleSupport = ocl::Device::getDefault().doubleFPConfig() > 0,
                 isContinuous = _src.isContinuous(),
-                isMaskContinuous = _mask.isContinuous();
-        const ocl::Device &defDev = ocl::Device::getDefault();
-        int groups = defDev.maxComputeUnits();
-        if (defDev.isIntel())
+                is_ماسک_Continuous = ماسک_2.isContinuous();
+        ثابت ocl::Device &defDev = ocl::Device::getDefault();
+        صحيح groups = defDev.maxComputeUnits();
+        إذا (defDev.isIntel())
         {
-            static const int subSliceEUCount = 10;
-            groups = (groups / subSliceEUCount) * 2;
+            ساكن ثابت صحيح sub_ټوټه_EUCount = 10;
+            groups = (groups / sub_ټوټه_EUCount) * 2;
         }
-        size_t wgs = defDev.maxWorkGroupSize();
+        size_t wgs = defDev.max_Work_ډله_اندازه();
 
-        int ddepth = std::max(CV_32S, depth), sqddepth = std::max(CV_32F, depth),
+        صحيح ddepth = std::max(CV_32S, ژوروالی), sqddepth = std::max(CV_32F, ژوروالی),
                 dtype = CV_MAKE_TYPE(ddepth, cn),
                 sqdtype = CV_MAKETYPE(sqddepth, cn);
-        CV_Assert(!haveMask || _mask.type() == CV_8U || _mask.type() == CV_8S || _mask.type() == CV_Bool);
+        CV_Assert(!have_ماسک || ماسک_2.type() == CV_8U || ماسک_2.type() == CV_8S || ماسک_2.type() == CV_Bool);
 
-        int wgs2_aligned = 1;
-        while (wgs2_aligned < (int)wgs)
+        صحيح wgs2_aligned = 1;
+        طالما (wgs2_aligned < (صحيح)wgs)
             wgs2_aligned <<= 1;
         wgs2_aligned >>= 1;
 
-        if ( (!doubleSupport && depth == CV_64F) )
-            return false;
+        إذا ( (!doubleSupport && ژوروالی == CV_64F) )
+            أرجع خطأ;
 
-        char cvt[2][50];
+        حرف cvt[2][50];
         String opts = format("-D srcT=%s -D srcT1=%s -D dstT=%s -D dstT1=%s -D sqddepth=%d"
                              " -D sqdstT=%s -D sqdstT1=%s -D convertToSDT=%s -D cn=%d%s%s"
                              " -D convertToDT=%s -D WGS=%d -D WGS2_ALIGNED=%d%s%s",
-                             ocl::typeToStr(type), ocl::typeToStr(depth),
-                             ocl::typeToStr(dtype), ocl::typeToStr(ddepth), sqddepth,
-                             ocl::typeToStr(sqdtype), ocl::typeToStr(sqddepth),
-                             ocl::convertTypeStr(depth, sqddepth, cn, cvt[0], sizeof(cvt[0])),
+                             ocl::type_منزل_Str(type), ocl::type_منزل_Str(ژوروالی),
+                             ocl::type_منزل_Str(dtype), ocl::type_منزل_Str(ddepth), sqddepth,
+                             ocl::type_منزل_Str(sqdtype), ocl::type_منزل_Str(sqddepth),
+                             ocl::convertTypeStr(ژوروالی, sqddepth, cn, cvt[0], حجم(cvt[0])),
                              cn, isContinuous ? " -D HAVE_SRC_CONT" : "",
-                             isMaskContinuous ? " -D HAVE_MASK_CONT" : "",
-                             ocl::convertTypeStr(depth, ddepth, cn, cvt[1], sizeof(cvt[1])),
-                             (int)wgs, wgs2_aligned, haveMask ? " -D HAVE_MASK" : "",
+                             is_ماسک_Continuous ? " -D HAVE_MASK_CONT" : "",
+                             ocl::convertTypeStr(ژوروالی, ddepth, cn, cvt[1], حجم(cvt[1])),
+                             (صحيح)wgs, wgs2_aligned, have_ماسک ? " -D HAVE_MASK" : "",
                              doubleSupport ? " -D DOUBLE_SUPPORT" : "");
 
         ocl::Kernel k("meanStdDev", ocl::core::meanstddev_oclsrc, opts);
-        if (k.empty())
-            return false;
+        إذا (k.empty())
+            أرجع خطأ;
 
-        int dbsize = groups * ((haveMask ? CV_ELEM_SIZE1(CV_32S) : 0) +
-                               CV_ELEM_SIZE(sqdtype) + CV_ELEM_SIZE(dtype));
-        UMat src = _src.getUMat(), db(1, dbsize, CV_8UC1), mask = _mask.getUMat();
+        صحيح dbsize = groups * ((have_ماسک ? CV_ELEM_SIZE1(CV_32S) : 0) +
+                               CV_ELEM_اندازه(sqdtype) + CV_ELEM_اندازه(dtype));
+        UMat src = _src.getUMat(), db(1, dbsize, CV_8UC1), ماسک = ماسک_2.getUMat();
 
-        ocl::KernelArg srcarg = ocl::KernelArg::ReadOnlyNoSize(src),
+        ocl::KernelArg srcarg = ocl::KernelArg::Read_Only_No_اندازه(src),
                 dbarg = ocl::KernelArg::PtrWriteOnly(db),
-                maskarg = ocl::KernelArg::ReadOnlyNoSize(mask);
+                maskarg = ocl::KernelArg::Read_Only_No_اندازه(ماسک);
 
-        if (haveMask)
-            k.args(srcarg, src.cols, (int)src.total(), groups, dbarg, maskarg);
-        else
-            k.args(srcarg, src.cols, (int)src.total(), groups, dbarg);
+        إذا (have_ماسک)
+            k.دلیلونه(srcarg, src.ستون_شمېر, (صحيح)src.ټول(), groups, dbarg, maskarg);
+        وإلا
+            k.دلیلونه(srcarg, src.ستون_شمېر, (صحيح)src.ټول(), groups, dbarg);
 
         size_t globalsize = groups * wgs;
 
-        if(!k.run(1, &globalsize, &wgs, false))
-            return false;
+        إذا(!k.پرلپسې(1, &globalsize, &wgs, خطأ))
+            أرجع خطأ;
 
-        typedef Scalar (* part_sum)(Mat m);
-        part_sum funcs[3] = { ocl_part_sum<int>, ocl_part_sum<float>, ocl_part_sum<double> };
+        تعريفنوع Scalar (* part_مجموعه)(Mat m);
+        part_مجموعه funcs[3] = { ocl_part_مجموعه<صحيح>, ocl_part_مجموعه<عائم>, ocl_part_مجموعه<مزدوج> };
         Mat dbm = db.getMat(ACCESS_READ);
 
-        mean = funcs[ddepth - CV_32S](Mat(1, groups, dtype, dbm.ptr()));
-        stddev = funcs[sqddepth - CV_32S](Mat(1, groups, sqdtype, dbm.ptr() + groups * CV_ELEM_SIZE(dtype)));
+        منځنۍ_2 = funcs[ddepth - CV_32S](Mat(1, groups, dtype, dbm.ptr()));
+        stddev = funcs[sqddepth - CV_32S](Mat(1, groups, sqdtype, dbm.ptr() + groups * CV_ELEM_اندازه(dtype)));
 
-        if (haveMask)
-            nz = saturate_cast<int>(funcs[0](Mat(1, groups, CV_32SC1, dbm.ptr() +
-                                                 groups * (CV_ELEM_SIZE(dtype) +
-                                                           CV_ELEM_SIZE(sqdtype))))[0]);
+        إذا (have_ماسک)
+            nz = saturate_cast<صحيح>(funcs[0](Mat(1, groups, CV_32SC1, dbm.ptr() +
+                                                 groups * (CV_ELEM_اندازه(dtype) +
+                                                           CV_ELEM_اندازه(sqdtype))))[0]);
     }
 
-    double total = nz != 0 ? 1.0 / nz : 0;
-    int k, j;
-    for (int i = 0; i < cn; ++i)
+    مزدوج ټول = nz != 0 ? 1.0 / nz : 0;
+    صحيح k, j;
+    لكل (صحيح i = 0; i < cn; ++i)
     {
-        mean[i] *= total;
-        stddev[i] = std::sqrt(std::max(stddev[i] * total - mean[i] * mean[i] , 0.));
+        منځنۍ_2[i] *= ټول;
+        stddev[i] = std::جذر(std::max(stddev[i] * ټول - منځنۍ_2[i] * منځنۍ_2[i] , 0.));
     }
 
-    for( j = 0; j < 2; j++ )
+    لكل( j = 0; j < 2; j++ )
     {
-        const double * const sptr = j == 0 ? &mean[0] : &stddev[0];
-        _OutputArray _dst = j == 0 ? _mean : _sdv;
-        if( !_dst.needed() )
-            continue;
+        ثابت مزدوج * ثابت sptr = j == 0 ? &منځنۍ_2[0] : &stddev[0];
+        _OutputArray _dst = j == 0 ? منځنۍ : _sdv;
+        إذا( !_dst.needed() )
+            استمر;
 
-        if( !_dst.fixedSize() )
-            _dst.create(cn, 1, CV_64F, -1, true);
+        إذا( !_dst.fixed_اندازه() )
+            _dst.create(cn, 1, CV_64F, -1, ریښتیا);
         Mat dst = _dst.getMat();
-        int dcn = (int)dst.total();
+        صحيح dcn = (صحيح)dst.ټول();
         CV_Assert( dst.type() == CV_64F && dst.isContinuous() &&
-                   (dst.cols == 1 || dst.rows == 1) && dcn >= cn );
-        double* dptr = dst.ptr<double>();
-        for( k = 0; k < cn; k++ )
+                   (dst.ستون_شمېر == 1 || dst.لیکې == 1) && dcn >= cn );
+        مزدوج* dptr = dst.ptr<مزدوج>();
+        لكل( k = 0; k < cn; k++ )
             dptr[k] = sptr[k];
-        for( ; k < dcn; k++ )
+        لكل( ; k < dcn; k++ )
             dptr[k] = 0;
     }
 
-    return true;
+    أرجع ریښتیا;
 }
-#endif
+#د_که_پای
 
 // serial implementation, also used for the pieces of the parallel version
-static void meanStdDev_(InputArray _src, OutputArray _mean, OutputArray _sdv, InputArray _mask)
+ساكن فراغ منځنۍ_Std_Dev_2(ننوت_Array _src, OutputArray منځنۍ, OutputArray _sdv, ننوت_Array ماسک_2)
 {
     CV_Assert(!_src.empty());
-    CV_Assert( _mask.empty() || _mask.type() == CV_8U || _mask.type() == CV_8S || _mask.type() == CV_Bool );
+    CV_Assert( ماسک_2.empty() || ماسک_2.type() == CV_8U || ماسک_2.type() == CV_8S || ماسک_2.type() == CV_Bool );
 
-    CV_OCL_RUN(OCL_PERFORMANCE_CHECK(_src.isUMat()) && _src.dims() <= 2,
-               ocl_meanStdDev(_src, _mean, _sdv, _mask))
+    CV_OCL_پرلپسې(OCL_PERFORMANCE_CHECK(_src.isUMat()) && _src.dims() <= 2,
+               ocl_منځنۍ_Std_Dev(_src, منځنۍ, _sdv, ماسک_2))
 
-    Mat src = _src.getMat(), mask = _mask.getMat();
+    Mat src = _src.getMat(), ماسک = ماسک_2.getMat();
 
-    CV_Assert(mask.empty() || ((mask.type() == CV_8U || mask.type() == CV_8S || mask.type() == CV_Bool) && src.size == mask.size));
+    CV_Assert(ماسک.empty() || ((ماسک.type() == CV_8U || ماسک.type() == CV_8S || ماسک.type() == CV_Bool) && src.size == ماسک.size));
 
-    int k, cn = src.channels(), depth = src.depth();
-    Mat mean_mat, stddev_mat;
+    صحيح k, cn = src.channels(), ژوروالی = src.ژوروالی();
+    Mat منځنۍ_mat, stddev_mat;
 
-    if(_mean.needed())
+    إذا(منځنۍ.needed())
     {
-        if( !_mean.fixedSize() )
-            _mean.create(cn, 1, CV_64F, -1, true);
+        إذا( !منځنۍ.fixed_اندازه() )
+            منځنۍ.create(cn, 1, CV_64F, -1, ریښتیا);
 
-        mean_mat = _mean.getMat();
-        int dcn = (int)mean_mat.total();
-        CV_Assert( mean_mat.type() == CV_64F && mean_mat.isContinuous() &&
-                   (mean_mat.cols == 1 || mean_mat.rows == 1) && dcn >= cn );
+        منځنۍ_mat = منځنۍ.getMat();
+        صحيح dcn = (صحيح)منځنۍ_mat.ټول();
+        CV_Assert( منځنۍ_mat.type() == CV_64F && منځنۍ_mat.isContinuous() &&
+                   (منځنۍ_mat.ستون_شمېر == 1 || منځنۍ_mat.لیکې == 1) && dcn >= cn );
 
-        double* dptr = mean_mat.ptr<double>();
-        for(k = cn ; k < dcn; k++ )
+        مزدوج* dptr = منځنۍ_mat.ptr<مزدوج>();
+        لكل(k = cn ; k < dcn; k++ )
             dptr[k] = 0;
     }
 
-    if (_sdv.needed())
+    إذا (_sdv.needed())
     {
-        if( !_sdv.fixedSize() )
-            _sdv.create(cn, 1, CV_64F, -1, true);
+        إذا( !_sdv.fixed_اندازه() )
+            _sdv.create(cn, 1, CV_64F, -1, ریښتیا);
 
         stddev_mat = _sdv.getMat();
-        int dcn = (int)stddev_mat.total();
+        صحيح dcn = (صحيح)stddev_mat.ټول();
         CV_Assert( stddev_mat.type() == CV_64F && stddev_mat.isContinuous() &&
-                   (stddev_mat.cols == 1 || stddev_mat.rows == 1) && dcn >= cn );
+                   (stddev_mat.ستون_شمېر == 1 || stddev_mat.لیکې == 1) && dcn >= cn );
 
-        double* dptr = stddev_mat.ptr<double>();
-        for(k = cn ; k < dcn; k++ )
+        مزدوج* dptr = stddev_mat.ptr<مزدوج>();
+        لكل(k = cn ; k < dcn; k++ )
             dptr[k] = 0;
 
     }
 
-    if (src.isContinuous() && mask.isContinuous())
+    إذا (src.isContinuous() && ماسک.isContinuous())
     {
-        CALL_HAL(meanStdDev, cv_hal_meanStdDev, src.data, 0, (int)src.total(), 1, src.type(),
-                 _mean.needed() ? mean_mat.ptr<double>() : nullptr,
-                 _sdv.needed() ? stddev_mat.ptr<double>() : nullptr,
-                 mask.data, 0);
+        CALL_HAL(منځنۍ_Std_Dev, cv_hal_منځنۍ_Std_Dev, src.معلومات, 0, (صحيح)src.ټول(), 1, src.type(),
+                 منځنۍ.needed() ? منځنۍ_mat.ptr<مزدوج>() : تش_اشاره,
+                 _sdv.needed() ? stddev_mat.ptr<مزدوج>() : تش_اشاره,
+                 ماسک.معلومات, 0);
     }
-    else
+    وإلا
     {
-        if (src.dims <= 2)
+        إذا (src.dims <= 2)
         {
-            CALL_HAL(meanStdDev, cv_hal_meanStdDev, src.data, src.step, src.cols, src.rows, src.type(),
-                     _mean.needed() ? mean_mat.ptr<double>() : nullptr,
-                     _sdv.needed() ? stddev_mat.ptr<double>() : nullptr,
-                     mask.data, mask.step);
+            CALL_HAL(منځنۍ_Std_Dev, cv_hal_منځنۍ_Std_Dev, src.معلومات, src.ګام, src.ستون_شمېر, src.لیکې, src.type(),
+                     منځنۍ.needed() ? منځنۍ_mat.ptr<مزدوج>() : تش_اشاره,
+                     _sdv.needed() ? stddev_mat.ptr<مزدوج>() : تش_اشاره,
+                     ماسک.معلومات, ماسک.ګام);
         }
     }
 
-    SumSqrFunc func = getSumSqrFunc(depth);
+    مجموعه_Sqr_Func func = get_مجموعه_Sqr_Func(ژوروالی);
 
     CV_Assert( func != 0 );
 
-    const Mat* arrays[] = {&src, &mask, 0};
+    ثابت Mat* arrays[] = {&src, &ماسک, 0};
     uchar* ptrs[2] = {};
     NAryMatIterator it(arrays, ptrs);
-    int total = (int)it.size, blockSize = total, partialBlockSize = 0;
-    int j;
-    int64_t count = 0, nz0 = 0;
-    double _buf[CV_CN_MAX*4];
-    double *s = _buf, *sq = s + cn;
-    int *sbuf = (int*)s, *sqbuf = (int*)sq;
-    bool partialSumIsInt = depth < CV_32S;
-    bool blockSum = partialSumIsInt || depth == CV_16F || depth == CV_16BF;
-    bool blockSqSum = depth <= CV_8S;
+    صحيح ټول = (صحيح)it.size, بلاک_اندازه_2 = ټول, partial_بلاک_اندازه = 0;
+    صحيح j;
+    int64_t شمېر_2 = 0, nz0 = 0;
+    مزدوج _buf[CV_CN_MAX*4];
+    مزدوج *s = _buf, *sq = s + cn;
+    صحيح *sbuf = (صحيح*)s, *sqbuf = (صحيح*)sq;
+    منطقي partial_مجموعه_Is_Int = ژوروالی < CV_32S;
+    منطقي بلاک_مجموعه = partial_مجموعه_Is_Int || ژوروالی == CV_16F || ژوروالی == CV_16BF;
+    منطقي بلاک_Sq_مجموعه = ژوروالی <= CV_8S;
     size_t esz = 0;
 
-    for( k = 0; k < cn; k++ )
+    لكل( k = 0; k < cn; k++ )
         s[k] = sq[k] = 0;
 
-    if( blockSum )
+    إذا( بلاک_مجموعه )
     {
-        partialBlockSize = 1 << 15;
-        blockSize = std::min(blockSize, partialBlockSize);
-        sbuf = (int*)(sq + cn);
-        if( blockSqSum )
+        partial_بلاک_اندازه = 1 << 15;
+        بلاک_اندازه_2 = std::min(بلاک_اندازه_2, partial_بلاک_اندازه);
+        sbuf = (صحيح*)(sq + cn);
+        إذا( بلاک_Sq_مجموعه )
             sqbuf = sbuf + cn;
-        for( k = 0; k < cn; k++ )
+        لكل( k = 0; k < cn; k++ )
             sbuf[k] = sqbuf[k] = 0;
-        esz = src.elemSize();
+        esz = src.elem_اندازه();
     }
 
-    for( size_t i = 0; i < it.nplanes; i++, ++it )
+    لكل( size_t i = 0; i < it.nplanes; i++, ++it )
     {
-        for( j = 0; j < total; j += blockSize )
+        لكل( j = 0; j < ټول; j += بلاک_اندازه_2 )
         {
-            int bsz = std::min(total - j, blockSize);
-            int nz = func( ptrs[0], ptrs[1], (uchar*)sbuf, (uchar*)sqbuf, bsz, cn );
-            count += nz;
+            صحيح bsz = std::min(ټول - j, بلاک_اندازه_2);
+            صحيح nz = func( ptrs[0], ptrs[1], (uchar*)sbuf, (uchar*)sqbuf, bsz, cn );
+            شمېر_2 += nz;
             nz0 += nz;
-            if( blockSum && (count + blockSize >= partialBlockSize || (i+1 >= it.nplanes && j+bsz >= total)) )
+            إذا( بلاک_مجموعه && (شمېر_2 + بلاک_اندازه_2 >= partial_بلاک_اندازه || (i+1 >= it.nplanes && j+bsz >= ټول)) )
             {
-                if (partialSumIsInt) {
-                    for( k = 0; k < cn; k++ )
+                إذا (partial_مجموعه_Is_Int) {
+                    لكل( k = 0; k < cn; k++ )
                     {
                         s[k] += sbuf[k];
                         sbuf[k] = 0;
                     }
-                } else {
-                    for( k = 0; k < cn; k++ )
+                } وإلا {
+                    لكل( k = 0; k < cn; k++ )
                     {
-                        s[k] += ((float*)sbuf)[k];
+                        s[k] += ((عائم*)sbuf)[k];
                         sbuf[k] = 0;
                     }
                 }
-                if( blockSqSum )
+                إذا( بلاک_Sq_مجموعه )
                 {
-                    for( k = 0; k < cn; k++ )
+                    لكل( k = 0; k < cn; k++ )
                     {
                         sq[k] += sqbuf[k];
                         sqbuf[k] = 0;
                     }
                 }
-                count = 0;
+                شمېر_2 = 0;
             }
             ptrs[0] += bsz*esz;
-            if( ptrs[1] )
+            إذا( ptrs[1] )
                 ptrs[1] += bsz;
         }
     }
 
-    double scale = nz0 ? 1./nz0 : 0.;
-    for( k = 0; k < cn; k++ )
+    مزدوج scale = nz0 ? 1./nz0 : 0.;
+    لكل( k = 0; k < cn; k++ )
     {
         s[k] *= scale;
-        sq[k] = std::sqrt(std::max(sq[k]*scale - s[k]*s[k], 0.));
+        sq[k] = std::جذر(std::max(sq[k]*scale - s[k]*s[k], 0.));
     }
 
-    if (_mean.needed())
+    إذا (منځنۍ.needed())
     {
-        const double* sptr = s;
-        double* dptr = mean_mat.ptr<double>();
-        for( k = 0; k < cn; k++ )
+        ثابت مزدوج* sptr = s;
+        مزدوج* dptr = منځنۍ_mat.ptr<مزدوج>();
+        لكل( k = 0; k < cn; k++ )
             dptr[k] = sptr[k];
     }
 
-    if (_sdv.needed())
+    إذا (_sdv.needed())
     {
-        const double* sptr = sq;
-        double* dptr = stddev_mat.ptr<double>();
-        for( k = 0; k < cn; k++ )
+        ثابت مزدوج* sptr = sq;
+        مزدوج* dptr = stddev_mat.ptr<مزدوج>();
+        لكل( k = 0; k < cn; k++ )
             dptr[k] = sptr[k];
     }
 }
 
-static void writeStatResult(OutputArray _dst, int cn, const Scalar& v)
+ساكن فراغ write_Stat_پایله(OutputArray _dst, صحيح cn, ثابت Scalar& v)
 {
-    if (!_dst.needed())
-        return;
-    if (!_dst.fixedSize())
-        _dst.create(cn, 1, CV_64F, -1, true);
+    إذا (!_dst.needed())
+        أرجع;
+    إذا (!_dst.fixed_اندازه())
+        _dst.create(cn, 1, CV_64F, -1, ریښتیا);
     Mat d = _dst.getMat();
-    int dcn = (int)d.total();
-    CV_Assert( d.type() == CV_64F && d.isContinuous() && (d.cols == 1 || d.rows == 1) && dcn >= cn );
-    double* p = d.ptr<double>();
-    for (int k = 0; k < dcn; k++)
+    صحيح dcn = (صحيح)d.ټول();
+    CV_Assert( d.type() == CV_64F && d.isContinuous() && (d.ستون_شمېر == 1 || d.لیکې == 1) && dcn >= cn );
+    مزدوج* p = d.ptr<مزدوج>();
+    لكل (صحيح k = 0; k < dcn; k++)
         p[k] = k < cn ? v[k] : 0;
 }
 
-void meanStdDev(InputArray _src, OutputArray _mean, OutputArray _sdv, InputArray _mask)
+فراغ منځنۍ_Std_Dev(ننوت_Array _src, OutputArray منځنۍ, OutputArray _sdv, ننوت_Array ماسک_2)
 {
     CV_INSTRUMENT_REGION();
 
     std::vector<StatChunk> chunks;
-    if (!_src.isUMat() && !_src.empty())
+    إذا (!_src.isUMat() && !_src.empty())
     {
-        Mat src = _src.getMat(), mask = _mask.getMat();
-        const int cn = src.channels();
-        const bool maskOk = mask.empty() || ((mask.type() == CV_8U || mask.type() == CV_8S || mask.type() == CV_Bool) &&
-                                             src.size == mask.size);
-        if (cn <= 4 && maskOk && splitForParallelStat(src, mask, chunks))
+        Mat src = _src.getMat(), ماسک = ماسک_2.getMat();
+        ثابت صحيح cn = src.channels();
+        ثابت منطقي ماسک_Ok = ماسک.empty() || ((ماسک.type() == CV_8U || ماسک.type() == CV_8S || ماسک.type() == CV_Bool) &&
+                                             src.size == ماسک.size);
+        إذا (cn <= 4 && ماسک_Ok && وېشل_For_Parallel_Stat(src, ماسک, chunks))
         {
-            const int n = (int)chunks.size();
+            ثابت صحيح n = (صحيح)chunks.size();
             std::vector<Scalar> m(n), sd(n);
-            std::vector<double> cnt(n);
-            parallel_for_(Range(0, n), [&](const Range& r)
+            std::vector<مزدوج> cnt(n);
+            parallel_for_(Range(0, n), [&](ثابت Range& r)
             {
-                for (int i = r.start; i < r.end; i++)
+                لكل (صحيح i = r.پیل; i < r.end; i++)
                 {
                     Mat mi, si;
-                    meanStdDev_(chunks[i].src, mi, si, chunks[i].mask);
-                    for (int k = 0; k < cn; k++)
+                    منځنۍ_Std_Dev_2(chunks[i].src, mi, si, chunks[i].ماسک);
+                    لكل (صحيح k = 0; k < cn; k++)
                     {
-                        m[i][k] = mi.at<double>(k);
-                        sd[i][k] = si.at<double>(k);
+                        m[i][k] = mi.at<مزدوج>(k);
+                        sd[i][k] = si.at<مزدوج>(k);
                     }
-                    cnt[i] = statCount(chunks[i]);
+                    cnt[i] = stat_شمېر(chunks[i]);
                 }
             });
             // combine the pieces: the variance is the mean of the piece variances plus the
             // variance of the piece means, both weighted by the piece sizes
-            double total = 0;
+            مزدوج ټول = 0;
             Scalar M = Scalar::all(0.0), V = Scalar::all(0.0);
-            for (int i = 0; i < n; i++)
+            لكل (صحيح i = 0; i < n; i++)
             {
                 M += m[i]*cnt[i];
-                total += cnt[i];
+                ټول += cnt[i];
             }
-            if (total > 0)
-                M *= 1./total;
-            for (int i = 0; i < n; i++)
-                for (int k = 0; k < cn; k++)
+            إذا (ټول > 0)
+                M *= 1./ټول;
+            لكل (صحيح i = 0; i < n; i++)
+                لكل (صحيح k = 0; k < cn; k++)
                 {
-                    double dm = m[i][k] - M[k];
+                    مزدوج dm = m[i][k] - M[k];
                     V[k] += cnt[i]*(sd[i][k]*sd[i][k] + dm*dm);
                 }
             Scalar SD;
-            for (int k = 0; k < cn; k++)
-                SD[k] = total > 0 ? std::sqrt(std::max(V[k]/total, 0.)) : 0;
-            writeStatResult(_mean, cn, M);
-            writeStatResult(_sdv, cn, SD);
-            return;
+            لكل (صحيح k = 0; k < cn; k++)
+                SD[k] = ټول > 0 ? std::جذر(std::max(V[k]/ټول, 0.)) : 0;
+            write_Stat_پایله(منځنۍ, cn, M);
+            write_Stat_پایله(_sdv, cn, SD);
+            أرجع;
         }
     }
-    meanStdDev_(_src, _mean, _sdv, _mask);
+    منځنۍ_Std_Dev_2(_src, منځنۍ, _sdv, ماسک_2);
 }
 
 } // namespace

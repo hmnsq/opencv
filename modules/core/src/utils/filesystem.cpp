@@ -2,180 +2,180 @@
 // It is subject to the license terms in the LICENSE file found in the top-level directory
 // of this distribution and at http://opencv.org/license.html.
 
-#include "../precomp.hpp"
+#ضمن "../precomp.hpp"
 
-#include <opencv2/core/utils/configuration.private.hpp>
+#ضمن <opencv2/core/utils/configuration.private.hpp>
 
-#include <opencv2/core/utils/logger.hpp>
+#ضمن <opencv2/core/utils/logger.hpp>
 
-#include "opencv2/core/utils/filesystem.private.hpp"
-#include "opencv2/core/utils/filesystem.hpp"
+#ضمن "opencv2/core/utils/filesystem.private.hpp"
+#ضمن "opencv2/core/utils/filesystem.hpp"
 
 //#define DEBUG_FS_UTILS
 
-#ifdef DEBUG_FS_UTILS
-#include <iostream>
-#define DBG(...) __VA_ARGS__
-#else
-#define DBG(...)
-#endif
+#که_تعریف_شوی DEBUG_FS_UTILS
+#ضمن <iostream>
+#تعریف_کړه DBG(...) __VA_ARGS__
+#وإلا
+#تعریف_کړه DBG(...)
+#د_که_پای
 
 
-#if OPENCV_HAVE_FILESYSTEM_SUPPORT
+#إذا OPENCV_HAVE_FILESYSTEM_SUPPORT
 
-#ifdef _WIN32
-#define WIN32_LEAN_AND_MEAN
-#undef NOMINMAX
-#define NOMINMAX
-#include <windows.h>
-#include <direct.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <errno.h>
-#include <io.h>
-#include <stdio.h>
-#elif defined __linux__ || defined __APPLE__ || defined __HAIKU__ || defined __FreeBSD__ || defined __GNU__ || defined __EMSCRIPTEN__ || defined __QNX__ || defined __CYGWIN__
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-#include <unistd.h>
-#include <errno.h>
-#endif
+#که_تعریف_شوی _WIN32
+#تعریف_کړه WIN32_LEAN_AND_منځنۍ
+#تعریف_لغوه NOMINMAX
+#تعریف_کړه NOMINMAX
+#ضمن <windows.h>
+#ضمن <direct.h>
+#ضمن <sys/types.h>
+#ضمن <sys/stat.h>
+#ضمن <errno.h>
+#ضمن <io.h>
+#ضمن <stdio.h>
+#وإلاإذا defined __linux__ || defined __APPLE__ || defined __HAIKU__ || defined __FreeBSD__ || defined __GNU__ || defined __EMSCRIPTEN__ || defined __QNX__ || defined __CYGWIN__
+#ضمن <sys/types.h>
+#ضمن <sys/stat.h>
+#ضمن <fcntl.h>
+#ضمن <unistd.h>
+#ضمن <errno.h>
+#د_که_پای
 
-#endif // OPENCV_HAVE_FILESYSTEM_SUPPORT
+#د_که_پای // OPENCV_HAVE_FILESYSTEM_SUPPORT
 
-namespace cv { namespace utils { namespace fs {
+نطاق cv { نطاق utils { نطاق fs {
 
-#ifdef _WIN32
-static const char native_separator = '\\';
-#else
-static const char native_separator = '/';
-#endif
+#که_تعریف_شوی _WIN32
+ساكن ثابت حرف native_separator = '\\';
+#وإلا
+ساكن ثابت حرف native_separator = '/';
+#د_که_پای
 
-static inline
-bool isPathSeparator(char c)
+ساكن مضمن
+منطقي is_لار_Separator(حرف c)
 {
-    return c == '/' || c == '\\';
+    أرجع c == '/' || c == '\\';
 }
 
-cv::String join(const cv::String& base, const cv::String& path)
+cv::String join(ثابت cv::String& بنسټ, ثابت cv::String& لار)
 {
-    if (base.empty())
-        return path;
-    if (path.empty())
-        return base;
+    إذا (بنسټ.empty())
+        أرجع لار;
+    إذا (لار.empty())
+        أرجع بنسټ;
 
-    bool baseSep = isPathSeparator(base[base.size() - 1]);
-    bool pathSep = isPathSeparator(path[0]);
-    String result;
-    if (baseSep && pathSep)
+    منطقي بنسټ_Sep = is_لار_Separator(بنسټ[بنسټ.size() - 1]);
+    منطقي لار_Sep = is_لار_Separator(لار[0]);
+    String پایله;
+    إذا (بنسټ_Sep && لار_Sep)
     {
-        result = base + path.substr(1);
+        پایله = بنسټ + لار.substr(1);
     }
-    else if (!baseSep && !pathSep)
+    وإلا إذا (!بنسټ_Sep && !لار_Sep)
     {
-        result = base + native_separator + path;
+        پایله = بنسټ + native_separator + لار;
     }
-    else
+    وإلا
     {
-        result = base + path;
+        پایله = بنسټ + لار;
     }
-    return result;
+    أرجع پایله;
 }
 
-CV_EXPORTS cv::String getParent(const cv::String &path)
+CV_EXPORTS cv::String get_پلار(ثابت cv::String &لار)
 {
-    std::string::size_type loc = path.find_last_of("/\\");
-    if (loc == std::string::npos)
-        return std::string();
-    return std::string(path, 0, loc);
+    std::string::size_type loc = لار.find_last_of("/\\");
+    إذا (loc == std::string::npos)
+        أرجع std::string();
+    أرجع std::string(لار, 0, loc);
 }
 
-CV_EXPORTS std::wstring getParent(const std::wstring& path)
+CV_EXPORTS std::wstring get_پلار(ثابت std::wstring& لار)
 {
-    std::wstring::size_type loc = path.find_last_of(L"/\\");
-    if (loc == std::wstring::npos)
-        return std::wstring();
-    return std::wstring(path, 0, loc);
+    std::wstring::size_type loc = لار.find_last_of(L"/\\");
+    إذا (loc == std::wstring::npos)
+        أرجع std::wstring();
+    أرجع std::wstring(لار, 0, loc);
 }
 
-#if OPENCV_HAVE_FILESYSTEM_SUPPORT
+#إذا OPENCV_HAVE_FILESYSTEM_SUPPORT
 
-cv::String canonical(const cv::String& path)
+cv::String canonical(ثابت cv::String& لار)
 {
-    cv::String result;
-#ifdef _WIN32
-    const char* result_str = _fullpath(NULL, path.c_str(), 0);
-#else
-    const char* result_str = realpath(path.c_str(), NULL);
-#endif
-    if (result_str)
+    cv::String پایله;
+#که_تعریف_شوی _WIN32
+    ثابت حرف* پایله_str = _fullpath(عدم, لار.c_str(), 0);
+#وإلا
+    ثابت حرف* پایله_str = realpath(لار.c_str(), عدم);
+#د_که_پای
+    إذا (پایله_str)
     {
-        result = cv::String(result_str);
-        free((void*)result_str);
+        پایله = cv::String(پایله_str);
+        حرر((فراغ*)پایله_str);
     }
-    return result.empty() ? path : result;
+    أرجع پایله.empty() ? لار : پایله;
 }
 
 
-bool exists(const cv::String& path)
+منطقي exists(ثابت cv::String& لار)
 {
     CV_INSTRUMENT_REGION();
 
-#if defined _WIN32 || defined WINCE
-    BOOL status = TRUE;
+#إذا defined _WIN32 || defined WINCE
+    BOOL حالت = TRUE;
     {
-        WIN32_FILE_ATTRIBUTE_DATA all_attrs;
-#ifdef WINRT
-        wchar_t wpath[MAX_PATH];
-        size_t copied = mbstowcs(wpath, path.c_str(), MAX_PATH);
-        CV_Assert((copied != MAX_PATH) && (copied != (size_t)-1));
-        status = ::GetFileAttributesExW(wpath, GetFileExInfoStandard, &all_attrs);
-#else
-        status = ::GetFileAttributesExA(path.c_str(), GetFileExInfoStandard, &all_attrs);
-#endif
+        WIN32_FILE_ATTRIBUTE_معلومات all_attrs;
+#که_تعریف_شوی WINRT
+        wchar_t wpath[MAX_لار];
+        size_t copied = mbstowcs(wpath, لار.c_str(), MAX_لار);
+        CV_Assert((copied != MAX_لار) && (copied != (size_t)-1));
+        حالت = ::Get_File_ځانګړتیاوې_Ex_W(wpath, GetFileExInfoStandard, &all_attrs);
+#وإلا
+        حالت = ::Get_File_ځانګړتیاوې_Ex_A(لار.c_str(), GetFileExInfoStandard, &all_attrs);
+#د_که_پای
     }
 
-    return !!status;
-#else
-    struct stat stat_buf;
-    return (0 == stat(path.c_str(), &stat_buf));
-#endif
+    أرجع !!حالت;
+#وإلا
+    بنية stat stat_buf;
+    أرجع (0 == stat(لار.c_str(), &stat_buf));
+#د_که_پای
 }
 
-CV_EXPORTS void remove_all(const cv::String& path)
+CV_EXPORTS فراغ remove_all(ثابت cv::String& لار)
 {
-    if (!exists(path))
-        return;
-    if (isDirectory(path))
+    إذا (!exists(لار))
+        أرجع;
+    إذا (isDirectory(لار))
     {
         std::vector<String> entries;
-        utils::fs::glob(path, cv::String(), entries, false, true);
-        for (size_t i = 0; i < entries.size(); i++)
+        utils::fs::glob(لار, cv::String(), entries, خطأ, ریښتیا);
+        لكل (size_t i = 0; i < entries.size(); i++)
         {
-            const String& e = entries[i];
+            ثابت String& e = entries[i];
             remove_all(e);
         }
-#ifdef _MSC_VER
-        bool result = _rmdir(path.c_str()) == 0;
-#else
-        bool result = rmdir(path.c_str()) == 0;
-#endif
-        if (!result)
+#که_تعریف_شوی _MSC_VER
+        منطقي پایله = _rmdir(لار.c_str()) == 0;
+#وإلا
+        منطقي پایله = rmdir(لار.c_str()) == 0;
+#د_که_پای
+        إذا (!پایله)
         {
-            CV_LOG_ERROR(NULL, "Can't remove directory: " << path);
+            CV_LOG_ERROR(عدم, "Can't remove directory: " << لار);
         }
     }
-    else
+    وإلا
     {
-#ifdef _MSC_VER
-        bool result = _unlink(path.c_str()) == 0;
-#else
-        bool result = unlink(path.c_str()) == 0;
-#endif
-        if (!result)
+#که_تعریف_شوی _MSC_VER
+        منطقي پایله = _unlink(لار.c_str()) == 0;
+#وإلا
+        منطقي پایله = unlink(لار.c_str()) == 0;
+#د_که_پای
+        إذا (!پایله)
         {
-            CV_LOG_ERROR(NULL, "Can't remove file: " << path);
+            CV_LOG_ERROR(عدم, "Can't remove file: " << لار);
         }
     }
 }
@@ -184,418 +184,418 @@ CV_EXPORTS void remove_all(const cv::String& path)
 cv::String getcwd()
 {
     CV_INSTRUMENT_REGION();
-    cv::AutoBuffer<char, 4096> buf;
-#if defined WIN32 || defined _WIN32 || defined WINCE
-#ifdef WINRT
-    return cv::String();
-#else
-    DWORD sz = GetCurrentDirectoryA(0, NULL);
+    cv::Auto_بفر<حرف, 4096> buf;
+#إذا defined WIN32 || defined _WIN32 || defined WINCE
+#که_تعریف_شوی WINRT
+    أرجع cv::String();
+#وإلا
+    DWORD sz = GetCurrentDirectoryA(0, عدم);
     buf.allocate((size_t)sz);
-    sz = GetCurrentDirectoryA((DWORD)buf.size(), buf.data());
-    return cv::String(buf.data(), (size_t)sz);
-#endif
-#elif defined __linux__ || defined __APPLE__ || defined __HAIKU__ || defined __FreeBSD__ || defined __EMSCRIPTEN__ || defined __QNX__ || defined __CYGWIN__
-    for(;;)
+    sz = GetCurrentDirectoryA((DWORD)buf.size(), buf.معلومات());
+    أرجع cv::String(buf.معلومات(), (size_t)sz);
+#د_که_پای
+#وإلاإذا defined __linux__ || defined __APPLE__ || defined __HAIKU__ || defined __FreeBSD__ || defined __EMSCRIPTEN__ || defined __QNX__ || defined __CYGWIN__
+    لكل(;;)
     {
-        char* p = ::getcwd(buf.data(), buf.size());
-        if (p == NULL)
+        حرف* p = ::getcwd(buf.معلومات(), buf.size());
+        إذا (p == عدم)
         {
-            if (errno == ERANGE)
+            إذا (errno == ERANGE)
             {
                 buf.allocate(buf.size() * 2);
-                continue;
+                استمر;
             }
-            return cv::String();
+            أرجع cv::String();
         }
-        break;
+        اكسر;
     }
-    return cv::String(buf.data(), (size_t)strlen(buf.data()));
-#else
-    return cv::String();
-#endif
+    أرجع cv::String(buf.معلومات(), (size_t)مزي_اوږدوالی(buf.معلومات()));
+#وإلا
+    أرجع cv::String();
+#د_که_پای
 }
 
 
-bool createDirectory(const cv::String& path)
+منطقي createDirectory(ثابت cv::String& لار)
 {
     CV_INSTRUMENT_REGION();
-#if defined WIN32 || defined _WIN32 || defined WINCE
-#ifdef WINRT
-    wchar_t wpath[MAX_PATH];
-    size_t copied = mbstowcs(wpath, path.c_str(), MAX_PATH);
-    CV_Assert((copied != MAX_PATH) && (copied != (size_t)-1));
-    int result = CreateDirectoryA(wpath, NULL) ? 0 : -1;
-#else
-    int result = _mkdir(path.c_str());
-#endif
-#elif defined __linux__ || defined __APPLE__ || defined __HAIKU__ || defined __FreeBSD__ || defined __EMSCRIPTEN__ || defined __QNX__ || defined __CYGWIN__
-    int result = mkdir(path.c_str(), 0777);
-#else
-    int result = -1;
-#endif
+#إذا defined WIN32 || defined _WIN32 || defined WINCE
+#که_تعریف_شوی WINRT
+    wchar_t wpath[MAX_لار];
+    size_t copied = mbstowcs(wpath, لار.c_str(), MAX_لار);
+    CV_Assert((copied != MAX_لار) && (copied != (size_t)-1));
+    صحيح پایله = CreateDirectoryA(wpath, عدم) ? 0 : -1;
+#وإلا
+    صحيح پایله = _mkdir(لار.c_str());
+#د_که_پای
+#وإلاإذا defined __linux__ || defined __APPLE__ || defined __HAIKU__ || defined __FreeBSD__ || defined __EMSCRIPTEN__ || defined __QNX__ || defined __CYGWIN__
+    صحيح پایله = mkdir(لار.c_str(), 0777);
+#وإلا
+    صحيح پایله = -1;
+#د_که_پای
 
-    if (result == -1)
+    إذا (پایله == -1)
     {
-        return isDirectory(path);
+        أرجع isDirectory(لار);
     }
-    return true;
+    أرجع ریښتیا;
 }
 
-bool createDirectories(const cv::String& path_)
+منطقي createDirectories(ثابت cv::String& لار_3)
 {
-    cv::String path = path_;
-    for (;;)
+    cv::String لار = لار_3;
+    لكل (;;)
     {
-        char last_char = path.empty() ? 0 : path[path.length() - 1];
-        if (isPathSeparator(last_char))
+        حرف وروستی_char = لار.empty() ? 0 : لار[لار.length() - 1];
+        إذا (is_لار_Separator(وروستی_char))
         {
-            path = path.substr(0, path.length() - 1);
-            continue;
+            لار = لار.substr(0, لار.length() - 1);
+            استمر;
         }
-        break;
+        اكسر;
     }
 
-    if (path.empty() || path == "./" || path == ".\\" || path == ".")
-        return true;
-    if (isDirectory(path))
-        return true;
+    إذا (لار.empty() || لار == "./" || لار == ".\\" || لار == ".")
+        أرجع ریښتیا;
+    إذا (isDirectory(لار))
+        أرجع ریښتیا;
 
-    size_t pos = path.rfind('/');
-    if (pos == cv::String::npos)
-        pos = path.rfind('\\');
-    if (pos != cv::String::npos)
+    size_t pos = لار.rfind('/');
+    إذا (pos == cv::String::npos)
+        pos = لار.rfind('\\');
+    إذا (pos != cv::String::npos)
     {
-        cv::String parent_directory = path.substr(0, pos);
-        if (!parent_directory.empty())
+        cv::String پلار_directory = لار.substr(0, pos);
+        إذا (!پلار_directory.empty())
         {
-            if (!createDirectories(parent_directory))
-                return false;
+            إذا (!createDirectories(پلار_directory))
+                أرجع خطأ;
         }
     }
 
-    return createDirectory(path);
+    أرجع createDirectory(لار);
 }
 
-#ifdef _WIN32
+#که_تعریف_شوی _WIN32
 
-struct FileLock::Impl
+بنية File_قلف::Impl
 {
-    Impl(const char* fname)
+    Impl(ثابت حرف* fname)
     {
         // http://support.microsoft.com/kb/316609
-        int numRetries = 5;
-        do
+        صحيح عدد_Retries = 5;
+        افعل
         {
-            handle = ::CreateFileA(fname, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL,
-                                OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
-            if (INVALID_HANDLE_VALUE == handle)
+            handle = ::CreateFileA(fname, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, عدم,
+                                OPEN_EXISTING, FILE_ATTRIBUTE_نورمال, عدم);
+            إذا (INVALID_HANDLE_ارزښت == handle)
             {
-                if (ERROR_SHARING_VIOLATION == GetLastError())
+                إذا (ERROR_SHARING_VIOLATION == Get_وروستی_Error())
                 {
-                    numRetries--;
+                    عدد_Retries--;
                     Sleep(250);
-                    continue;
+                    استمر;
                 }
-                else
+                وإلا
                 {
                     CV_Error_(Error::StsAssert, ("Can't open lock file: %s", fname));
                 }
             }
-            break;
-        } while (numRetries > 0);
+            اكسر;
+        } طالما (عدد_Retries > 0);
     }
     ~Impl()
     {
-        if (INVALID_HANDLE_VALUE != handle)
+        إذا (INVALID_HANDLE_ارزښت != handle)
         {
             ::CloseHandle(handle);
         }
     }
 
-    bool lock()
+    منطقي lock()
     {
         OVERLAPPED overlapped;
-        std::memset(&overlapped, 0, sizeof(overlapped));
-        return !!::LockFileEx(handle, LOCKFILE_EXCLUSIVE_LOCK, 0, MAXDWORD, MAXDWORD, &overlapped);
+        std::memset(&overlapped, 0, حجم(overlapped));
+        أرجع !!::قلف_File_Ex(handle, LOCKFILE_EXCLUSIVE_قلف, 0, MAXDWORD, MAXDWORD, &overlapped);
     }
-    bool unlock()
+    منطقي unlock()
     {
         OVERLAPPED overlapped;
-        std::memset(&overlapped, 0, sizeof(overlapped));
-        return !!::UnlockFileEx(handle, 0, MAXDWORD, MAXDWORD, &overlapped);
+        std::memset(&overlapped, 0, حجم(overlapped));
+        أرجع !!::UnlockFileEx(handle, 0, MAXDWORD, MAXDWORD, &overlapped);
     }
 
-    bool lock_shared()
+    منطقي قلف_shared()
     {
         OVERLAPPED overlapped;
-        std::memset(&overlapped, 0, sizeof(overlapped));
-        return !!::LockFileEx(handle, 0, 0, MAXDWORD, MAXDWORD, &overlapped);
+        std::memset(&overlapped, 0, حجم(overlapped));
+        أرجع !!::قلف_File_Ex(handle, 0, 0, MAXDWORD, MAXDWORD, &overlapped);
     }
-    bool unlock_shared()
+    منطقي unlock_shared()
     {
-        return unlock();
+        أرجع unlock();
     }
 
     HANDLE handle;
 
-private:
-    Impl(const Impl&); // disabled
-    Impl& operator=(const Impl&); // disabled
+خاص:
+    Impl(ثابت Impl&); // disabled
+    Impl& چلوونکی=(ثابت Impl&); // disabled
 };
 
-#elif defined __linux__ || defined __APPLE__ || defined __HAIKU__ || defined __FreeBSD__ || defined __GNU__ || defined __EMSCRIPTEN__ || defined __QNX__ || defined __CYGWIN__
+#وإلاإذا defined __linux__ || defined __APPLE__ || defined __HAIKU__ || defined __FreeBSD__ || defined __GNU__ || defined __EMSCRIPTEN__ || defined __QNX__ || defined __CYGWIN__
 
-struct FileLock::Impl
+بنية File_قلف::Impl
 {
-    Impl(const char* fname)
+    Impl(ثابت حرف* fname)
     {
         handle = ::open(fname, O_RDWR);
         CV_Assert(handle != -1);
     }
     ~Impl()
     {
-        if (handle >= 0)
+        إذا (handle >= 0)
             ::close(handle);
     }
 
-    bool lock()
+    منطقي lock()
     {
-        struct ::flock l;
-        std::memset(&l, 0, sizeof(l));
+        بنية ::flock l;
+        std::memset(&l, 0, حجم(l));
         l.l_type = F_WRLCK;
         l.l_whence = SEEK_SET;
-        l.l_start = 0;
+        l.l_پیل = 0;
         l.l_len = 0;
-        DBG(std::cout << "Lock..." << std::endl);
-        bool res = -1 != ::fcntl(handle, F_SETLKW, &l);
-        return res;
+        DBG(std::وتنه << "Lock..." << std::کرښه_پای);
+        منطقي res = -1 != ::fcntl(handle, F_SETLKW, &l);
+        أرجع res;
     }
-    bool unlock()
+    منطقي unlock()
     {
-        struct ::flock l;
-        std::memset(&l, 0, sizeof(l));
+        بنية ::flock l;
+        std::memset(&l, 0, حجم(l));
         l.l_type = F_UNLCK;
         l.l_whence = SEEK_SET;
-        l.l_start = 0;
+        l.l_پیل = 0;
         l.l_len = 0;
-        DBG(std::cout << "Unlock..." << std::endl);
-        bool res = -1 != ::fcntl(handle, F_SETLK, &l);
-        return res;
+        DBG(std::وتنه << "Unlock..." << std::کرښه_پای);
+        منطقي res = -1 != ::fcntl(handle, F_SETLK, &l);
+        أرجع res;
     }
 
-    bool lock_shared()
+    منطقي قلف_shared()
     {
-        struct ::flock l;
-        std::memset(&l, 0, sizeof(l));
+        بنية ::flock l;
+        std::memset(&l, 0, حجم(l));
         l.l_type = F_RDLCK;
         l.l_whence = SEEK_SET;
-        l.l_start = 0;
+        l.l_پیل = 0;
         l.l_len = 0;
-        DBG(std::cout << "Lock read..." << std::endl);
-        bool res = -1 != ::fcntl(handle, F_SETLKW, &l);
-        return res;
+        DBG(std::وتنه << "Lock read..." << std::کرښه_پای);
+        منطقي res = -1 != ::fcntl(handle, F_SETLKW, &l);
+        أرجع res;
     }
-    bool unlock_shared()
+    منطقي unlock_shared()
     {
-        return unlock();
+        أرجع unlock();
     }
 
-    int handle;
+    صحيح handle;
 
-private:
-    Impl(const Impl&); // disabled
-    Impl& operator=(const Impl&); // disabled
+خاص:
+    Impl(ثابت Impl&); // disabled
+    Impl& چلوونکی=(ثابت Impl&); // disabled
 };
 
-#endif
+#د_که_پای
 
-FileLock::FileLock(const char* fname)
-    : pImpl(new Impl(fname))
+File_قلف::File_قلف(ثابت حرف* fname)
+    : pImpl(جديد Impl(fname))
 {
     // nothing
 }
-FileLock::~FileLock()
+File_قلف::~File_قلف()
 {
-    delete pImpl;
-    pImpl = NULL;
+    ړنګول pImpl;
+    pImpl = عدم;
 }
 
-void FileLock::lock() { CV_Assert(pImpl->lock()); }
-void FileLock::unlock() { CV_Assert(pImpl->unlock()); }
-void FileLock::lock_shared() { CV_Assert(pImpl->lock_shared()); }
-void FileLock::unlock_shared() { CV_Assert(pImpl->unlock_shared()); }
+فراغ File_قلف::lock() { CV_Assert(pImpl->lock()); }
+فراغ File_قلف::unlock() { CV_Assert(pImpl->unlock()); }
+فراغ File_قلف::قلف_shared() { CV_Assert(pImpl->قلف_shared()); }
+فراغ File_قلف::unlock_shared() { CV_Assert(pImpl->unlock_shared()); }
 
 
 
-cv::String getCacheDirectory(const char* sub_directory_name, const char* configuration_name)
+cv::String getCacheDirectory(ثابت حرف* sub_directory_name, ثابت حرف* configuration_name)
 {
-    String cache_path;
-    if (configuration_name)
+    String cache_لار_2;
+    إذا (configuration_name)
     {
-        cache_path = utils::getConfigurationParameterString(configuration_name, "");
+        cache_لار_2 = utils::getConfigurationParameterString(configuration_name, "");
     }
-    if (cache_path.empty())
+    إذا (cache_لار_2.empty())
     {
-        cv::String default_cache_path;
-#ifdef _WIN32
-        wchar_t tmp_path_buf_w[MAX_PATH+1] = {0};
-        DWORD res = GetTempPathW(MAX_PATH, tmp_path_buf_w);
-        if (res > 0 && res <= MAX_PATH)
+        cv::String default_cache_لار;
+#که_تعریف_شوی _WIN32
+        wchar_t tmp_لار_buf_w[MAX_لار+1] = {0};
+        DWORD res = Get_لنډمهاله_لار_W(MAX_لار, tmp_لار_buf_w);
+        إذا (res > 0 && res <= MAX_لار)
         {
             // Convert from UTF-16 to UTF-8 to support Unicode paths
-            int len = WideCharToMultiByte(CP_UTF8, 0, tmp_path_buf_w, -1, NULL, 0, NULL, NULL);
-            if (len > 0)
+            صحيح len = Wide_Char_منزل_Multi_Byte(CP_UTF8, 0, tmp_لار_buf_w, -1, عدم, 0, عدم, عدم);
+            إذا (len > 0)
             {
-                std::vector<char> utf8_buf(len);
-                WideCharToMultiByte(CP_UTF8, 0, tmp_path_buf_w, -1, utf8_buf.data(), len, NULL, NULL);
-                default_cache_path = std::string(utf8_buf.data());
+                std::vector<حرف> utf8_buf(len);
+                Wide_Char_منزل_Multi_Byte(CP_UTF8, 0, tmp_لار_buf_w, -1, utf8_buf.معلومات(), len, عدم, عدم);
+                default_cache_لار = std::string(utf8_buf.معلومات());
             }
         }
-#elif defined __ANDROID__
+#وإلاإذا defined __ANDROID__
         // no defaults
-#elif defined __APPLE__
-        const std::string tmpdir_env = utils::getConfigurationParameterString("TMPDIR");
-        if (!tmpdir_env.empty() && utils::fs::isDirectory(tmpdir_env))
+#وإلاإذا defined __APPLE__
+        ثابت std::string tmpdir_env = utils::getConfigurationParameterString("TMPDIR");
+        إذا (!tmpdir_env.empty() && utils::fs::isDirectory(tmpdir_env))
         {
-            default_cache_path = tmpdir_env;
+            default_cache_لار = tmpdir_env;
         }
-        else
+        وإلا
         {
-            default_cache_path = "/tmp/";
-            CV_LOG_WARNING(NULL, "Using world accessible cache directory. This may be not secure: " << default_cache_path);
+            default_cache_لار = "/tmp/";
+            CV_LOG_WARNING(عدم, "Using world accessible cache directory. This may be not secure: " << default_cache_لار);
         }
-#elif defined __linux__ || defined __HAIKU__ || defined __FreeBSD__ || defined __GNU__
+#وإلاإذا defined __linux__ || defined __HAIKU__ || defined __FreeBSD__ || defined __GNU__
         // https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html
-        if (default_cache_path.empty())
+        إذا (default_cache_لار.empty())
         {
-            const std::string xdg_cache_env = utils::getConfigurationParameterString("XDG_CACHE_HOME");
-            if (!xdg_cache_env.empty() && utils::fs::isDirectory(xdg_cache_env))
+            ثابت std::string xdg_cache_env = utils::getConfigurationParameterString("XDG_CACHE_HOME");
+            إذا (!xdg_cache_env.empty() && utils::fs::isDirectory(xdg_cache_env))
             {
-                default_cache_path = xdg_cache_env;
+                default_cache_لار = xdg_cache_env;
             }
         }
-        if (default_cache_path.empty())
+        إذا (default_cache_لار.empty())
         {
-            const std::string home_env = utils::getConfigurationParameterString("HOME");
-            if (!home_env.empty() && utils::fs::isDirectory(home_env))
+            ثابت std::string home_env = utils::getConfigurationParameterString("HOME");
+            إذا (!home_env.empty() && utils::fs::isDirectory(home_env))
             {
-                cv::String home_path = home_env;
-                cv::String home_cache_path = utils::fs::join(home_path, ".cache/");
-                if (utils::fs::isDirectory(home_cache_path))
+                cv::String home_لار = home_env;
+                cv::String home_cache_لار = utils::fs::join(home_لار, ".cache/");
+                إذا (utils::fs::isDirectory(home_cache_لار))
                 {
-                    default_cache_path = home_cache_path;
+                    default_cache_لار = home_cache_لار;
                 }
             }
         }
-        if (default_cache_path.empty())
+        إذا (default_cache_لار.empty())
         {
-            const char* temp_path = "/var/tmp/";
-            if (utils::fs::isDirectory(temp_path))
+            ثابت حرف* لنډمهاله_لار = "/var/tmp/";
+            إذا (utils::fs::isDirectory(لنډمهاله_لار))
             {
-                default_cache_path = temp_path;
-                CV_LOG_WARNING(NULL, "Using world accessible cache directory. This may be not secure: " << default_cache_path);
+                default_cache_لار = لنډمهاله_لار;
+                CV_LOG_WARNING(عدم, "Using world accessible cache directory. This may be not secure: " << default_cache_لار);
             }
         }
-        if (default_cache_path.empty())
+        إذا (default_cache_لار.empty())
         {
-            default_cache_path = "/tmp/";
-            CV_LOG_WARNING(NULL, "Using world accessible cache directory. This may be not secure: " << default_cache_path);
+            default_cache_لار = "/tmp/";
+            CV_LOG_WARNING(عدم, "Using world accessible cache directory. This may be not secure: " << default_cache_لار);
         }
-#else
+#وإلا
         // no defaults
-#endif
-        CV_LOG_VERBOSE(NULL, 0, "default_cache_path = " << default_cache_path);
-        if (!default_cache_path.empty())
+#د_که_پای
+        CV_LOG_VERBOSE(عدم, 0, "default_cache_path = " << default_cache_لار);
+        إذا (!default_cache_لار.empty())
         {
-            if (utils::fs::isDirectory(default_cache_path))
+            إذا (utils::fs::isDirectory(default_cache_لار))
             {
-                cv::String default_cache_path_base = utils::fs::join(default_cache_path, "opencv");
-                default_cache_path = utils::fs::join(default_cache_path_base, CVAUX_STR(CV_VERSION_MAJOR) ".x" CV_VERSION_STATUS);
-                if (utils::getConfigurationParameterBool("OPENCV_CACHE_SHOW_CLEANUP_MESSAGE", true)
-                    && !utils::fs::isDirectory(default_cache_path))
+                cv::String default_cache_لار_بنسټ = utils::fs::join(default_cache_لار, "opencv");
+                default_cache_لار = utils::fs::join(default_cache_لار_بنسټ, CVAUX_STR(CV_نسخه_MAJOR) ".x" CV_نسخه_حالت);
+                إذا (utils::getConfigurationParameterBool("OPENCV_CACHE_SHOW_CLEANUP_MESSAGE", ریښتیا)
+                    && !utils::fs::isDirectory(default_cache_لار))
                 {
                     std::vector<cv::String> existedCacheDirs;
-                    try
+                    حاول
                     {
-                        utils::fs::glob_relative(default_cache_path_base, "*", existedCacheDirs, false, true);
+                        utils::fs::glob_relative(default_cache_لار_بنسټ, "*", existedCacheDirs, خطأ, ریښتیا);
                     }
-                    catch (...)
+                    امسك (...)
                     {
                         // ignore
                     }
-                    if (!existedCacheDirs.empty())
+                    إذا (!existedCacheDirs.empty())
                     {
-                        CV_LOG_WARNING(NULL, "Creating new OpenCV cache directory: " << default_cache_path);
-                        CV_LOG_WARNING(NULL, "There are several neighbour directories, probably created by old OpenCV versions.");
-                        CV_LOG_WARNING(NULL, "Feel free to cleanup these unused directories:");
-                        for (size_t i = 0; i < existedCacheDirs.size(); i++)
+                        CV_LOG_WARNING(عدم, "Creating new OpenCV cache directory: " << default_cache_لار);
+                        CV_LOG_WARNING(عدم, "There are several neighbour directories, probably created by old OpenCV versions.");
+                        CV_LOG_WARNING(عدم, "Feel free to cleanup these unused directories:");
+                        لكل (size_t i = 0; i < existedCacheDirs.size(); i++)
                         {
-                            CV_LOG_WARNING(NULL, "  - " << existedCacheDirs[i]);
+                            CV_LOG_WARNING(عدم, "  - " << existedCacheDirs[i]);
                         }
-                        CV_LOG_WARNING(NULL, "Note: This message is showed only once.");
+                        CV_LOG_WARNING(عدم, "Note: This message is showed only once.");
                     }
                 }
-                if (sub_directory_name && sub_directory_name[0] != '\0')
-                    default_cache_path = utils::fs::join(default_cache_path, cv::String(sub_directory_name) + native_separator);
-                if (!utils::fs::createDirectories(default_cache_path))
+                إذا (sub_directory_name && sub_directory_name[0] != '\0')
+                    default_cache_لار = utils::fs::join(default_cache_لار, cv::String(sub_directory_name) + native_separator);
+                إذا (!utils::fs::createDirectories(default_cache_لار))
                 {
-                    CV_LOG_DEBUG(NULL, "Can't create OpenCV cache sub-directory: " << default_cache_path);
+                    CV_LOG_DEBUG(عدم, "Can't create OpenCV cache sub-directory: " << default_cache_لار);
                 }
-                else
+                وإلا
                 {
-                    cache_path = default_cache_path;
+                    cache_لار_2 = default_cache_لار;
                 }
             }
-            else
+            وإلا
             {
-                CV_LOG_INFO(NULL, "Can't find default cache directory (does it exist?): " << default_cache_path);
+                CV_LOG_INFO(عدم, "Can't find default cache directory (does it exist?): " << default_cache_لار);
             }
         }
-        else
+        وإلا
         {
-            CV_LOG_DEBUG(NULL, "OpenCV has no support to discover default cache directory on the current platform");
+            CV_LOG_DEBUG(عدم, "OpenCV has no support to discover default cache directory on the current platform");
         }
     }
-    else
+    وإلا
     {
-        if (cache_path == "disabled")
-            return cache_path;
-        if (!isDirectory(cache_path))
+        إذا (cache_لار_2 == "disabled")
+            أرجع cache_لار_2;
+        إذا (!isDirectory(cache_لار_2))
         {
-            CV_LOG_WARNING(NULL, "Specified non-existed directory, creating OpenCV sub-directory for caching purposes: " << cache_path);
-            if (!createDirectories(cache_path))
+            CV_LOG_WARNING(عدم, "Specified non-existed directory, creating OpenCV sub-directory for caching purposes: " << cache_لار_2);
+            إذا (!createDirectories(cache_لار_2))
             {
-                CV_LOG_ERROR(NULL, "Can't create OpenCV cache sub-directory: " << cache_path);
-                cache_path.clear();
+                CV_LOG_ERROR(عدم, "Can't create OpenCV cache sub-directory: " << cache_لار_2);
+                cache_لار_2.clear();
             }
         }
     }
-    CV_Assert(cache_path.empty() || utils::fs::isDirectory(cache_path));
-    if (!cache_path.empty())
+    CV_Assert(cache_لار_2.empty() || utils::fs::isDirectory(cache_لار_2));
+    إذا (!cache_لار_2.empty())
     {
-        if (!isPathSeparator(cache_path[cache_path.size() - 1]))
+        إذا (!is_لار_Separator(cache_لار_2[cache_لار_2.size() - 1]))
         {
-            cache_path += native_separator;
+            cache_لار_2 += native_separator;
         }
     }
-    return cache_path;
+    أرجع cache_لار_2;
 }
 
-#else
-#define NOT_IMPLEMENTED CV_Error(Error::StsNotImplemented, "");
-cv::String canonical(const cv::String& /*path*/) { NOT_IMPLEMENTED }
-bool exists(const cv::String& /*path*/) { NOT_IMPLEMENTED }
-void remove_all(const cv::String& /*path*/) { NOT_IMPLEMENTED }
+#وإلا
+#تعریف_کړه NOT_IMPLEMENTED CV_Error(Error::StsNotImplemented, "");
+cv::String canonical(ثابت cv::String& /*لار*/) { NOT_IMPLEMENTED }
+منطقي exists(ثابت cv::String& /*لار*/) { NOT_IMPLEMENTED }
+فراغ remove_all(ثابت cv::String& /*لار*/) { NOT_IMPLEMENTED }
 cv::String getcwd() { NOT_IMPLEMENTED }
-bool createDirectory(const cv::String& /*path*/) { NOT_IMPLEMENTED }
-bool createDirectories(const cv::String& /*path*/) { NOT_IMPLEMENTED }
-cv::String getCacheDirectory(const char* /*sub_directory_name*/, const char* /*configuration_name = NULL*/) { NOT_IMPLEMENTED }
-#undef NOT_IMPLEMENTED
-#endif // OPENCV_HAVE_FILESYSTEM_SUPPORT
+منطقي createDirectory(ثابت cv::String& /*لار*/) { NOT_IMPLEMENTED }
+منطقي createDirectories(ثابت cv::String& /*لار*/) { NOT_IMPLEMENTED }
+cv::String getCacheDirectory(ثابت حرف* /*sub_directory_name*/, ثابت حرف* /*configuration_name = NULL*/) { NOT_IMPLEMENTED }
+#تعریف_لغوه NOT_IMPLEMENTED
+#د_که_پای // OPENCV_HAVE_FILESYSTEM_SUPPORT
 
 }}} // namespace
 
 
-#if OPENCV_HAVE_FILESYSTEM_SUPPORT
-#include "plugin_loader.impl.hpp"
-#endif
+#إذا OPENCV_HAVE_FILESYSTEM_SUPPORT
+#ضمن "plugin_loader.impl.hpp"
+#د_که_پای

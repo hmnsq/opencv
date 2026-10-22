@@ -2,54 +2,54 @@
 // It is subject to the license terms in the LICENSE file found in the top-level directory
 // of this distribution and at http://opencv.org/license.html.
 
-#ifndef OPENCV_CORE_LOGTAGCONFIGPARSER_HPP
-#define OPENCV_CORE_LOGTAGCONFIGPARSER_HPP
+#که_نه_تعریف_شوی OPENCV_CORE_LOGTAGCONFIGPARSER_HPP
+#تعریف_کړه OPENCV_CORE_LOGTAGCONFIGPARSER_HPP
 
-#if 1 // if not already in precompiled headers
-#include <string>
-#include <vector>
-#include <functional>
-#endif
+#إذا 1 // if not already in precompiled headers
+#ضمن <string>
+#ضمن <vector>
+#ضمن <functional>
+#د_که_پای
 
-#include <opencv2/core/utils/logtag.hpp>
-#include "logtagconfig.hpp"
+#ضمن <opencv2/core/utils/logtag.hpp>
+#ضمن "logtagconfig.hpp"
 
-namespace cv {
-namespace utils {
-namespace logging {
+نطاق cv {
+نطاق utils {
+نطاق logging {
 
-class LogTagConfigParser
+صنف Log_نښان_Config_Parser
 {
-public:
-    LogTagConfigParser(LogLevel defaultUnconfiguredGlobalLevel = LOG_LEVEL_VERBOSE);
-    explicit LogTagConfigParser(const std::string& input);
-    ~LogTagConfigParser();
+عام:
+    Log_نښان_Config_Parser(LogLevel defaultUnconfiguredGlobalLevel = LOG_LEVEL_VERBOSE);
+    څرګند Log_نښان_Config_Parser(ثابت std::string& ننوت_2);
+    ~Log_نښان_Config_Parser();
 
-public:
-    bool parse(const std::string& input);
-    bool hasMalformed() const;
-    const LogTagConfig& getGlobalConfig() const;
-    const std::vector<LogTagConfig>& getFullNameConfigs() const;
-    const std::vector<LogTagConfig>& getFirstPartConfigs() const;
-    const std::vector<LogTagConfig>& getAnyPartConfigs() const;
-    const std::vector<std::string>& getMalformed() const;
+عام:
+    منطقي parse(ثابت std::string& ننوت_2);
+    منطقي hasMalformed() ثابت;
+    ثابت Log_نښان_Config& getGlobalConfig() ثابت;
+    ثابت std::vector<Log_نښان_Config>& get_ډک_Name_Configs() ثابت;
+    ثابت std::vector<Log_نښان_Config>& get_لومړی_Part_Configs() ثابت;
+    ثابت std::vector<Log_نښان_Config>& getAnyPartConfigs() ثابت;
+    ثابت std::vector<std::string>& getMalformed() ثابت;
 
-private:
-    void segmentTokens();
-    void parseNameAndLevel(const std::string& s);
-    void parseWildcard(const std::string& name, LogLevel level);
-    static std::pair<LogLevel, bool> parseLogLevel(const std::string& s);
-    static std::string toString(LogLevel level);
+خاص:
+    فراغ segment_نښې();
+    فراغ parseNameAndLevel(ثابت std::string& s);
+    فراغ parseWildcard(ثابت std::string& name, LogLevel level);
+    ساكن std::pair<LogLevel, منطقي> parseLogLevel(ثابت std::string& s);
+    ساكن std::string منزل_String(LogLevel level);
 
-private:
-    std::string m_input;
-    LogTagConfig m_parsedGlobal;
-    std::vector<LogTagConfig> m_parsedFullName;
-    std::vector<LogTagConfig> m_parsedFirstPart;
-    std::vector<LogTagConfig> m_parsedAnyPart;
+خاص:
+    std::string m_ننوت;
+    Log_نښان_Config m_parsedGlobal;
+    std::vector<Log_نښان_Config> m_parsed_ډک_Name;
+    std::vector<Log_نښان_Config> m_parsed_لومړی_Part;
+    std::vector<Log_نښان_Config> m_parsedAnyPart;
     std::vector<std::string> m_malformed;
 };
 
 }}} //namespace
 
-#endif
+#د_که_پای

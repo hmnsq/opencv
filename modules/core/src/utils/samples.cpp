@@ -2,73 +2,73 @@
 // It is subject to the license terms in the LICENSE file found in the top-level directory
 // of this distribution and at http://opencv.org/license.html.
 
-#include "../precomp.hpp"
+#ضمن "../precomp.hpp"
 
-#include <vector>
+#ضمن <vector>
 
-#include <opencv2/core/utils/logger.defines.hpp>
-#undef CV_LOG_STRIP_LEVEL
-#define CV_LOG_STRIP_LEVEL CV_LOG_LEVEL_VERBOSE + 1
-#include "opencv2/core/utils/logger.hpp"
-#include "opencv2/core/utils/filesystem.hpp"
-#include "opencv2/core/utils/filesystem.private.hpp"
+#ضمن <opencv2/core/utils/logger.defines.hpp>
+#تعریف_لغوه CV_LOG_STRIP_LEVEL
+#تعریف_کړه CV_LOG_STRIP_LEVEL CV_LOG_LEVEL_VERBOSE + 1
+#ضمن "opencv2/core/utils/logger.hpp"
+#ضمن "opencv2/core/utils/filesystem.hpp"
+#ضمن "opencv2/core/utils/filesystem.private.hpp"
 
-namespace cv { namespace samples {
+نطاق cv { نطاق samples {
 
-static cv::Ptr< std::vector<cv::String> > g_data_search_path;
-static cv::Ptr< std::vector<cv::String> > g_data_search_subdir;
+ساكن cv::Ptr< std::vector<cv::String> > g_معلومات_پلټنه_لار;
+ساكن cv::Ptr< std::vector<cv::String> > g_معلومات_پلټنه_subdir;
 
-static std::vector<cv::String>& _getDataSearchPath()
+ساكن std::vector<cv::String>& get_معلومات_پلټنه_لار()
 {
-    if (g_data_search_path.empty())
-        g_data_search_path.reset(new std::vector<cv::String>());
-    return *(g_data_search_path.get());
+    إذا (g_معلومات_پلټنه_لار.empty())
+        g_معلومات_پلټنه_لار.reset(جديد std::vector<cv::String>());
+    أرجع *(g_معلومات_پلټنه_لار.get());
 }
 
-static std::vector<cv::String>& _getDataSearchSubDirectory()
+ساكن std::vector<cv::String>& get_معلومات_پلټنه_Sub_Directory()
 {
-    if (g_data_search_subdir.empty())
+    إذا (g_معلومات_پلټنه_subdir.empty())
     {
-        g_data_search_subdir.reset(new std::vector<cv::String>());
-        g_data_search_subdir->push_back("samples/data");
-        g_data_search_subdir->push_back("data");
-        g_data_search_subdir->push_back("");
+        g_معلومات_پلټنه_subdir.reset(جديد std::vector<cv::String>());
+        g_معلومات_پلټنه_subdir->push_back("samples/data");
+        g_معلومات_پلټنه_subdir->push_back("data");
+        g_معلومات_پلټنه_subdir->push_back("");
     }
-    return *(g_data_search_subdir.get());
+    أرجع *(g_معلومات_پلټنه_subdir.get());
 }
 
 
-CV_EXPORTS void addSamplesDataSearchPath(const cv::String& path)
+CV_EXPORTS فراغ جمع_کړه_Samples_معلومات_پلټنه_لار(ثابت cv::String& لار)
 {
-    if (utils::fs::isDirectory(path))
-        _getDataSearchPath().push_back(path);
+    إذا (utils::fs::isDirectory(لار))
+        get_معلومات_پلټنه_لار().push_back(لار);
 }
-CV_EXPORTS void addSamplesDataSearchSubDirectory(const cv::String& subdir)
+CV_EXPORTS فراغ جمع_کړه_Samples_معلومات_پلټنه_Sub_Directory(ثابت cv::String& subdir)
 {
-    _getDataSearchSubDirectory().push_back(subdir);
+    get_معلومات_پلټنه_Sub_Directory().push_back(subdir);
 }
 
-cv::String findFile(const cv::String& relative_path, bool required, bool silentMode)
+cv::String پیدا_کړه_File(ثابت cv::String& relative_لار, منطقي required, منطقي silent_ډېرپېښ)
 {
-#if OPENCV_HAVE_FILESYSTEM_SUPPORT
-    CV_LOG_DEBUG(NULL, cv::format("cv::samples::findFile('%s', %s)", relative_path.c_str(), required ? "true" : "false"));
-    cv::String result = cv::utils::findDataFile(relative_path,
+#إذا OPENCV_HAVE_FILESYSTEM_SUPPORT
+    CV_LOG_DEBUG(عدم, cv::format("cv::samples::findFile('%s', %s)", relative_لار.c_str(), required ? "true" : "false"));
+    cv::String پایله = cv::utils::پیدا_کړه_معلومات_File(relative_لار,
                                                 "OPENCV_SAMPLES_DATA_PATH",
-                                                &_getDataSearchPath(),
-                                                &_getDataSearchSubDirectory());
-    if (result != relative_path && !silentMode)
+                                                &get_معلومات_پلټنه_لار(),
+                                                &get_معلومات_پلټنه_Sub_Directory());
+    إذا (پایله != relative_لار && !silent_ډېرپېښ)
     {
-        CV_LOG_WARNING(NULL, "cv::samples::findFile('" << relative_path << "') => '" << result << "'");
+        CV_LOG_WARNING(عدم, "cv::samples::findFile('" << relative_لار << "') => '" << پایله << "'");
     }
-    if (result.empty() && required)
-        CV_Error(cv::Error::StsError, cv::format("OpenCV samples: Can't find required data file: %s", relative_path.c_str()));
-    return result;
-#else
-    CV_UNUSED(relative_path);
-    CV_UNUSED(required);
-    CV_UNUSED(silentMode);
+    إذا (پایله.empty() && required)
+        CV_Error(cv::Error::StsError, cv::format("OpenCV samples: Can't find required data file: %s", relative_لار.c_str()));
+    أرجع پایله;
+#وإلا
+    CV_ناکارول_شوی(relative_لار);
+    CV_ناکارول_شوی(required);
+    CV_ناکارول_شوی(silent_ډېرپېښ);
     CV_Error(Error::StsNotImplemented, "File system support is disabled in this OpenCV build!");
-#endif
+#د_که_پای
 }
 
 

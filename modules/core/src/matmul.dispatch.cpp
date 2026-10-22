@@ -41,392 +41,392 @@
 //
 //M*/
 
-#include "precomp.hpp"
-#include <opencv2/core/utils/logger.hpp>
+#ضمن "precomp.hpp"
+#ضمن <opencv2/core/utils/logger.hpp>
 
-#include "opencl_kernels_core.hpp"
-#include "opencv2/core/opencl/runtime/opencl_clblas.hpp"
-#include "opencv2/core/opencl/runtime/opencl_core.hpp"
-#include "intel_gpu_gemm.inl.hpp"
+#ضمن "opencl_kernels_core.hpp"
+#ضمن "opencv2/core/opencl/runtime/opencl_clblas.hpp"
+#ضمن "opencv2/core/opencl/runtime/opencl_core.hpp"
+#ضمن "intel_gpu_gemm.inl.hpp"
 
-#include "matmul.simd.hpp"
-#include "matmul.simd_declarations.hpp" // defines CV_CPU_DISPATCH_MODES_ALL=AVX2,...,BASELINE based on CMakeLists.txt content
+#ضمن "matmul.simd.hpp"
+#ضمن "matmul.simd_declarations.hpp" // defines CV_CPU_DISPATCH_MODES_ALL=AVX2,...,BASELINE based on CMakeLists.txt content
 
-namespace cv
+نطاق cv
 {
 
 /****************************************************************************************\
 *                                         GEMM                                           *
 \****************************************************************************************/
 
-#ifdef HAVE_CLAMDBLAS
+#که_تعریف_شوی HAVE_CLAMDBLAS
 
-static bool ocl_gemm_amdblas( InputArray matA, InputArray matB, double alpha,
-                      InputArray matC, double beta, OutputArray matD, int flags )
+ساكن منطقي ocl_gemm_amdblas( ننوت_Array matA, ننوت_Array matB, مزدوج alpha,
+                      ننوت_Array matC, مزدوج beta, OutputArray matD, صحيح flags )
 {
-    int type = matA.type(), esz = CV_ELEM_SIZE(type);
-    bool haveC = matC.kind() != cv::_InputArray::NONE;
-    Size sizeA = matA.size(), sizeB = matB.size(), sizeC = haveC ? matC.size() : Size(0, 0);
-    bool atrans = (flags & GEMM_1_T) != 0, btrans = (flags & GEMM_2_T) != 0, ctrans = (flags & GEMM_3_T) != 0;
+    صحيح type = matA.type(), esz = CV_ELEM_اندازه(type);
+    منطقي haveC = matC.ډول() != cv::ننوت_Array_2::NONE;
+    اندازه اندازه_A = matA.size(), اندازه_B = matB.size(), اندازه_C = haveC ? matC.size() : اندازه(0, 0);
+    منطقي atrans = (flags & GEMM_1_T) != 0, btrans = (flags & GEMM_2_T) != 0, ctrans = (flags & GEMM_3_T) != 0;
 
-    if (atrans)
-        sizeA = Size(sizeA.height, sizeA.width);
-    if (btrans)
-        sizeB = Size(sizeB.height, sizeB.width);
-    if (haveC && ctrans)
-        sizeC = Size(sizeC.height, sizeC.width);
+    إذا (atrans)
+        اندازه_A = اندازه(اندازه_A.لوړوالی, اندازه_A.پلنوالی);
+    إذا (btrans)
+        اندازه_B = اندازه(اندازه_B.لوړوالی, اندازه_B.پلنوالی);
+    إذا (haveC && ctrans)
+        اندازه_C = اندازه(اندازه_C.لوړوالی, اندازه_C.پلنوالی);
 
-    Size sizeD(sizeB.width, sizeA.height);
+    اندازه اندازه_D(اندازه_B.پلنوالی, اندازه_A.لوړوالی);
 
     CV_Assert( matB.type() == type && (!haveC || matC.type() == type) );
-    CV_Assert( sizeA.width == sizeB.height && (!haveC || sizeC == sizeD) );
+    CV_Assert( اندازه_A.پلنوالی == اندازه_B.لوړوالی && (!haveC || اندازه_C == اندازه_D) );
 
-    matD.create(sizeD, type);
-    if ( matA.offset() % esz != 0 || matA.step() % esz != 0 ||
-         matB.offset() % esz != 0 || matB.step() % esz != 0 ||
-         (haveC && (matC.offset() % esz != 0 || matC.step() % esz != 0)) )
-        return false;
+    matD.create(اندازه_D, type);
+    إذا ( matA.offset() % esz != 0 || matA.ګام() % esz != 0 ||
+         matB.offset() % esz != 0 || matB.ګام() % esz != 0 ||
+         (haveC && (matC.offset() % esz != 0 || matC.ګام() % esz != 0)) )
+        أرجع خطأ;
 
     UMat A = matA.getUMat(), B = matB.getUMat(), D = matD.getUMat();
-    if (!ocl::internal::isCLBuffer(A) || !ocl::internal::isCLBuffer(B) || !ocl::internal::isCLBuffer(D))
+    إذا (!ocl::internal::isCLBuffer(A) || !ocl::internal::isCLBuffer(B) || !ocl::internal::isCLBuffer(D))
     {
-        return false;
+        أرجع خطأ;
     }
-    if (haveC)
+    إذا (haveC)
     {
         UMat C = matC.getUMat();
-        if (!ocl::internal::isCLBuffer(C))
-            return false;
+        إذا (!ocl::internal::isCLBuffer(C))
+            أرجع خطأ;
     }
-    if (haveC)
-        ctrans ? transpose(matC, D) : matC.copyTo(D);
-    else
-        D.setTo(Scalar::all(0));
+    إذا (haveC)
+        ctrans ? transpose(matC, D) : matC.copy_منزل(D);
+    وإلا
+        D.سېټ_منزل(Scalar::all(0));
 
-    int M = sizeD.height, N = sizeD.width, K = sizeA.width;
-    int lda = (int)A.step / esz, ldb = (int)B.step / esz, ldc = (int)D.step / esz;
-    int offa = (int)A.offset / esz, offb = (int)B.offset / esz, offc = (int)D.offset / esz;
+    صحيح M = اندازه_D.لوړوالی, N = اندازه_D.پلنوالی, K = اندازه_A.پلنوالی;
+    صحيح lda = (صحيح)A.ګام / esz, ldb = (صحيح)B.ګام / esz, ldc = (صحيح)D.ګام / esz;
+    صحيح offa = (صحيح)A.offset / esz, offb = (صحيح)B.offset / esz, offc = (صحيح)D.offset / esz;
 
-    cl_command_queue clq = (cl_command_queue)ocl::Queue::getDefault().ptr();
+    cl_command_کتار clq = (cl_command_کتار)ocl::کتار::getDefault().ptr();
     clblasTranspose transA = atrans ? clblasTrans : clblasNoTrans;
     clblasTranspose transB = btrans ? clblasTrans : clblasNoTrans;
-    clblasOrder order = clblasRowMajor;
-    clblasStatus status = clblasSuccess;
+    clblas_ترتیب ترتیب = clblas_لیکه_Major;
+    clblas_حالت حالت = clblasSuccess;
 
-    if (type == CV_32FC1)
-        status = clblasSgemm(order, transA, transB, M, N, K,
-                             (cl_float)alpha, (const cl_mem)A.handle(ACCESS_READ), offa, lda,
-                             (const cl_mem)B.handle(ACCESS_READ), offb, ldb,
+    إذا (type == CV_32FC1)
+        حالت = clblasSgemm(ترتیب, transA, transB, M, N, K,
+                             (cl_float)alpha, (ثابت cl_mem)A.handle(ACCESS_READ), offa, lda,
+                             (ثابت cl_mem)B.handle(ACCESS_READ), offb, ldb,
                              (cl_float)beta, (cl_mem)D.handle(ACCESS_RW), offc, ldc,
-                             1, &clq, 0, NULL, NULL);
-    else if (type == CV_64FC1)
-        status = clblasDgemm(order, transA, transB, M, N, K,
-                             alpha, (const cl_mem)A.handle(ACCESS_READ), offa, lda,
-                             (const cl_mem)B.handle(ACCESS_READ), offb, ldb,
+                             1, &clq, 0, عدم, عدم);
+    وإلا إذا (type == CV_64FC1)
+        حالت = clblasDgemm(ترتیب, transA, transB, M, N, K,
+                             alpha, (ثابت cl_mem)A.handle(ACCESS_READ), offa, lda,
+                             (ثابت cl_mem)B.handle(ACCESS_READ), offb, ldb,
                              beta, (cl_mem)D.handle(ACCESS_RW), offc, ldc,
-                             1, &clq, 0, NULL, NULL);
-    else if (type == CV_32FC2)
+                             1, &clq, 0, عدم, عدم);
+    وإلا إذا (type == CV_32FC2)
     {
          cl_float2 alpha_2 = { { (cl_float)alpha, 0 } };
          cl_float2 beta_2  = { { (cl_float)beta, 0 } };
-         status = clblasCgemm(order, transA, transB, M, N, K,
-                              alpha_2, (const cl_mem)A.handle(ACCESS_READ), offa, lda,
-                              (const cl_mem)B.handle(ACCESS_READ), offb, ldb,
+         حالت = clblasCgemm(ترتیب, transA, transB, M, N, K,
+                              alpha_2, (ثابت cl_mem)A.handle(ACCESS_READ), offa, lda,
+                              (ثابت cl_mem)B.handle(ACCESS_READ), offb, ldb,
                               beta_2, (cl_mem)D.handle(ACCESS_RW), offc, ldc,
-                              1, &clq, 0, NULL, NULL);
+                              1, &clq, 0, عدم, عدم);
     }
-    else if (type == CV_64FC2)
+    وإلا إذا (type == CV_64FC2)
     {
         cl_double2 alpha_2 = { { alpha, 0 } };
         cl_double2 beta_2  = { { beta, 0 } };
-        status = clblasZgemm(order, transA, transB, M, N, K,
-                             alpha_2, (const cl_mem)A.handle(ACCESS_READ), offa, lda,
-                             (const cl_mem)B.handle(ACCESS_READ), offb, ldb,
+        حالت = clblasZgemm(ترتیب, transA, transB, M, N, K,
+                             alpha_2, (ثابت cl_mem)A.handle(ACCESS_READ), offa, lda,
+                             (ثابت cl_mem)B.handle(ACCESS_READ), offb, ldb,
                              beta_2, (cl_mem)D.handle(ACCESS_RW), offc, ldc,
-                             1, &clq, 0, NULL, NULL);
+                             1, &clq, 0, عدم, عدم);
     }
-    else
+    وإلا
         CV_Error(Error::StsUnsupportedFormat, "");
 
-    return status == clblasSuccess;
+    أرجع حالت == clblasSuccess;
 }
 
-#endif
+#د_که_پای
 
-#ifdef HAVE_OPENCL
-static bool ocl_gemm( InputArray matA, InputArray matB, double alpha,
-                      InputArray matC, double beta, OutputArray matD, int flags )
+#که_تعریف_شوی HAVE_OPENCL
+ساكن منطقي ocl_gemm( ننوت_Array matA, ننوت_Array matB, مزدوج alpha,
+                      ننوت_Array matC, مزدوج beta, OutputArray matD, صحيح flags )
 {
-    int type = matA.type();
-    int depth = CV_MAT_DEPTH(type);
-    int cn = CV_MAT_CN(type);
+    صحيح type = matA.type();
+    صحيح ژوروالی = CV_MAT_ژوروالی(type);
+    صحيح cn = CV_MAT_CN(type);
 
     CV_CheckTypeEQ(type, matB.type(), "");
     CV_CheckType(type, type == CV_32FC1 || type == CV_64FC1 || type == CV_32FC2 || type == CV_64FC2, "");
 
-    const ocl::Device & dev = ocl::Device::getDefault();
-    bool doubleSupport = dev.doubleFPConfig() > 0;
+    ثابت ocl::Device & dev = ocl::Device::getDefault();
+    منطقي doubleSupport = dev.doubleFPConfig() > 0;
 
-    if (!doubleSupport && depth == CV_64F)
-        return false;
+    إذا (!doubleSupport && ژوروالی == CV_64F)
+        أرجع خطأ;
 
-    bool haveC = matC.kind() != cv::_InputArray::NONE;
-    Size sizeA = matA.size(), sizeB = matB.size(), sizeC = haveC ? matC.size() : Size(0, 0);
-    bool atrans = (flags & GEMM_1_T) != 0, btrans = (flags & GEMM_2_T) != 0, ctrans = (flags & GEMM_3_T) != 0;
+    منطقي haveC = matC.ډول() != cv::ننوت_Array_2::NONE;
+    اندازه اندازه_A = matA.size(), اندازه_B = matB.size(), اندازه_C = haveC ? matC.size() : اندازه(0, 0);
+    منطقي atrans = (flags & GEMM_1_T) != 0, btrans = (flags & GEMM_2_T) != 0, ctrans = (flags & GEMM_3_T) != 0;
 
-    if (haveC)
+    إذا (haveC)
         CV_CheckTypeEQ(type, matC.type(), "");
 
-    Size sizeD(((btrans) ? sizeB.height : sizeB.width),
-               ((atrans) ? sizeA.width : sizeA.height));
+    اندازه اندازه_D(((btrans) ? اندازه_B.لوړوالی : اندازه_B.پلنوالی),
+               ((atrans) ? اندازه_A.پلنوالی : اندازه_A.لوړوالی));
 
-    if (atrans)
-        sizeA = Size(sizeA.height, sizeA.width);
-    if (btrans)
-        sizeB = Size(sizeB.height, sizeB.width);
-    if (haveC && ctrans)
-        sizeC = Size(sizeC.height, sizeC.width);
+    إذا (atrans)
+        اندازه_A = اندازه(اندازه_A.لوړوالی, اندازه_A.پلنوالی);
+    إذا (btrans)
+        اندازه_B = اندازه(اندازه_B.لوړوالی, اندازه_B.پلنوالی);
+    إذا (haveC && ctrans)
+        اندازه_C = اندازه(اندازه_C.لوړوالی, اندازه_C.پلنوالی);
 
-    CV_CheckEQ(sizeA.width, sizeB.height, "");
-    if (haveC)
-        CV_CheckEQ(sizeC, sizeD, "");
+    CV_CheckEQ(اندازه_A.پلنوالی, اندازه_B.لوړوالی, "");
+    إذا (haveC)
+        CV_CheckEQ(اندازه_C, اندازه_D, "");
 
     UMat A = matA.getUMat();
     UMat B = matB.getUMat();
 
-    matD.create(sizeD, type);
+    matD.create(اندازه_D, type);
     UMat D = matD.getUMat();
 
-    bool isPropagatedC2D = false;  // D content is updated with C / C.t()
+    منطقي isPropagatedC2D = خطأ;  // D content is updated with C / C.t()
 
-    if (dev.intelSubgroupsSupport() && (depth == CV_32F) && cn == 1)
+    إذا (dev.intelSubgroupsSupport() && (ژوروالی == CV_32F) && cn == 1)
     {
-        if (haveC && beta != 0.0)
+        إذا (haveC && beta != 0.0)
         {
-            ctrans ? transpose(matC, D) : matC.copyTo(D);
-            isPropagatedC2D = true;
+            ctrans ? transpose(matC, D) : matC.copy_منزل(D);
+            isPropagatedC2D = ریښتیا;
         }
-        else
+        وإلا
         {
             beta = 0.0;
         }
 
-        bool res = intel_gpu_gemm(A, matA.size(),
+        منطقي res = intel_gpu_gemm(A, matA.size(),
                                   B, matB.size(),
-                                  D, sizeD,
+                                  D, اندازه_D,
                                   alpha,
                                   beta,
                                   atrans, btrans,
                                   isPropagatedC2D);
-        if (res)
-            return true;
+        إذا (res)
+            أرجع ریښتیا;
         // fallback on generic OpenCL code
     }
 
-    if (sizeD.width < 8 || sizeD.height < 8)
-        return false;
+    إذا (اندازه_D.پلنوالی < 8 || اندازه_D.لوړوالی < 8)
+        أرجع خطأ;
 
     String opts;
 
-    int wg_size = (int)dev.maxWorkGroupSize();
-    int sizeDmin = std::min(sizeD.width, sizeD.height);
-    wg_size = std::min(wg_size, sizeDmin * sizeDmin);
-    int block_size = (wg_size / (32*cn) < 32) ? (wg_size / (16*cn) < 16) ? (wg_size / (8*cn) < 8) ? 1 : 8 : 16 : 32;
+    صحيح wg_اندازه = (صحيح)dev.max_Work_ډله_اندازه();
+    صحيح اندازه_Dmin = std::min(اندازه_D.پلنوالی, اندازه_D.لوړوالی);
+    wg_اندازه = std::min(wg_اندازه, اندازه_Dmin * اندازه_Dmin);
+    صحيح بلاک_اندازه_3 = (wg_اندازه / (32*cn) < 32) ? (wg_اندازه / (16*cn) < 16) ? (wg_اندازه / (8*cn) < 8) ? 1 : 8 : 16 : 32;
 
-    if (atrans)
+    إذا (atrans)
         A = A.t();
 
-    if (btrans)
+    إذا (btrans)
         B = B.t();
 
-    if (haveC && !isPropagatedC2D)
-        ctrans ? transpose(matC, D) : matC.copyTo(D);
+    إذا (haveC && !isPropagatedC2D)
+        ctrans ? transpose(matC, D) : matC.copy_منزل(D);
 
-    int vectorWidths[] = { 4, 4, 2, 2, 1, 4, cn, -1 };
-    int kercn = ocl::checkOptimalVectorWidth(vectorWidths, B, D);
+    صحيح ویکټور_Widths[] = { 4, 4, 2, 2, 1, 4, cn, -1 };
+    صحيح kercn = ocl::check_Optimal_ویکټور_پلنوالی(ویکټور_Widths, B, D);
 
     opts += format(" -D T=%s -D T1=%s -D WT=%s -D cn=%d -D kercn=%d -D LOCAL_SIZE=%d%s%s%s",
-                      ocl::typeToStr(type), ocl::typeToStr(depth), ocl::typeToStr(CV_MAKETYPE(depth, kercn)),
-                      cn, kercn, block_size,
-                      (sizeA.width % block_size !=0) ? " -D NO_MULT" : "",
+                      ocl::type_منزل_Str(type), ocl::type_منزل_Str(ژوروالی), ocl::type_منزل_Str(CV_MAKETYPE(ژوروالی, kercn)),
+                      cn, kercn, بلاک_اندازه_3,
+                      (اندازه_A.پلنوالی % بلاک_اندازه_3 !=0) ? " -D NO_MULT" : "",
                       haveC ? " -D HAVE_C" : "",
                       doubleSupport ? " -D DOUBLE_SUPPORT" : "");
 
     ocl::Kernel k("gemm", cv::ocl::core::gemm_oclsrc, opts);
-    if (k.empty())
-        return false;
+    إذا (k.empty())
+        أرجع خطأ;
 
-    if (depth == CV_64F)
-        k.args(ocl::KernelArg::ReadOnlyNoSize(A),
-               ocl::KernelArg::ReadOnlyNoSize(B, cn, kercn),
+    إذا (ژوروالی == CV_64F)
+        k.دلیلونه(ocl::KernelArg::Read_Only_No_اندازه(A),
+               ocl::KernelArg::Read_Only_No_اندازه(B, cn, kercn),
                ocl::KernelArg::ReadWrite(D, cn, kercn),
-               sizeA.width, alpha, beta);
-    else
-        k.args(ocl::KernelArg::ReadOnlyNoSize(A),
-               ocl::KernelArg::ReadOnlyNoSize(B, cn, kercn),
+               اندازه_A.پلنوالی, alpha, beta);
+    وإلا
+        k.دلیلونه(ocl::KernelArg::Read_Only_No_اندازه(A),
+               ocl::KernelArg::Read_Only_No_اندازه(B, cn, kercn),
                ocl::KernelArg::ReadWrite(D, cn, kercn),
-               sizeA.width, (float)alpha, (float)beta);
+               اندازه_A.پلنوالی, (عائم)alpha, (عائم)beta);
 
-    size_t globalsize[2] = { (size_t)sizeD.width * cn / kercn, (size_t)sizeD.height};
-    size_t localsize[2] = { (size_t)block_size, (size_t)block_size};
+    size_t globalsize[2] = { (size_t)اندازه_D.پلنوالی * cn / kercn, (size_t)اندازه_D.لوړوالی};
+    size_t localsize[2] = { (size_t)بلاک_اندازه_3, (size_t)بلاک_اندازه_3};
 
-    return k.run(2, globalsize, block_size !=1 ? localsize : NULL, false);
+    أرجع k.پرلپسې(2, globalsize, بلاک_اندازه_3 !=1 ? localsize : عدم, خطأ);
 }
-#endif
+#د_که_پای
 
 
-namespace hal {
+نطاق hal {
 
-void gemm32f(const float* src1, size_t src1_step, const float* src2, size_t src2_step,
-             float alpha, const float* src3, size_t src3_step, float beta, float* dst, size_t dst_step,
-             int m_a, int n_a, int n_d, int flags)
+فراغ gemm32f(ثابت عائم* src1, size_t src1_ګام, ثابت عائم* src2, size_t src2_ګام,
+             عائم alpha, ثابت عائم* src3, size_t src3_ګام, عائم beta, عائم* dst, size_t dst_ګام,
+             صحيح m_a, صحيح n_a, صحيح n_d, صحيح flags)
 {
     CV_INSTRUMENT_REGION();
-    CALL_HAL(gemm32f, cv_hal_gemm32f, src1, src1_step, src2, src2_step, alpha, src3, src3_step, beta, dst, dst_step, m_a, n_a, n_d, flags)
-#ifdef CV_GEMM_BASELINE_ONLY
-    CV_CPU_CALL_BASELINE(gemm32f, (src1, src1_step, src2, src2_step, alpha, src3, src3_step, beta, dst, dst_step, m_a, n_a, n_d, flags));
-#else
-    CV_CPU_DISPATCH(gemm32f, (src1, src1_step, src2, src2_step, alpha, src3, src3_step, beta, dst, dst_step, m_a, n_a, n_d, flags),
+    CALL_HAL(gemm32f, cv_hal_gemm32f, src1, src1_ګام, src2, src2_ګام, alpha, src3, src3_ګام, beta, dst, dst_ګام, m_a, n_a, n_d, flags)
+#که_تعریف_شوی CV_GEMM_BASELINE_ONLY
+    CV_CPU_CALL_BASELINE(gemm32f, (src1, src1_ګام, src2, src2_ګام, alpha, src3, src3_ګام, beta, dst, dst_ګام, m_a, n_a, n_d, flags));
+#وإلا
+    CV_CPU_DISPATCH(gemm32f, (src1, src1_ګام, src2, src2_ګام, alpha, src3, src3_ګام, beta, dst, dst_ګام, m_a, n_a, n_d, flags),
         CV_CPU_DISPATCH_MODES_ALL);
-#endif
+#د_که_پای
 }
 
-void gemm64f(const double* src1, size_t src1_step, const double* src2, size_t src2_step,
-             double alpha, const double* src3, size_t src3_step, double beta, double* dst, size_t dst_step,
-             int m_a, int n_a, int n_d, int flags)
+فراغ gemm64f(ثابت مزدوج* src1, size_t src1_ګام, ثابت مزدوج* src2, size_t src2_ګام,
+             مزدوج alpha, ثابت مزدوج* src3, size_t src3_ګام, مزدوج beta, مزدوج* dst, size_t dst_ګام,
+             صحيح m_a, صحيح n_a, صحيح n_d, صحيح flags)
 {
     CV_INSTRUMENT_REGION();
-    CALL_HAL(gemm64f, cv_hal_gemm64f, src1, src1_step, src2, src2_step, alpha, src3, src3_step, beta, dst, dst_step, m_a, n_a, n_d, flags)
-#ifdef CV_GEMM_BASELINE_ONLY
-    CV_CPU_CALL_BASELINE(gemm64f, (src1, src1_step, src2, src2_step, alpha, src3, src3_step, beta, dst, dst_step, m_a, n_a, n_d, flags));
-#else
-    CV_CPU_DISPATCH(gemm64f, (src1, src1_step, src2, src2_step, alpha, src3, src3_step, beta, dst, dst_step, m_a, n_a, n_d, flags),
+    CALL_HAL(gemm64f, cv_hal_gemm64f, src1, src1_ګام, src2, src2_ګام, alpha, src3, src3_ګام, beta, dst, dst_ګام, m_a, n_a, n_d, flags)
+#که_تعریف_شوی CV_GEMM_BASELINE_ONLY
+    CV_CPU_CALL_BASELINE(gemm64f, (src1, src1_ګام, src2, src2_ګام, alpha, src3, src3_ګام, beta, dst, dst_ګام, m_a, n_a, n_d, flags));
+#وإلا
+    CV_CPU_DISPATCH(gemm64f, (src1, src1_ګام, src2, src2_ګام, alpha, src3, src3_ګام, beta, dst, dst_ګام, m_a, n_a, n_d, flags),
         CV_CPU_DISPATCH_MODES_ALL);
-#endif
+#د_که_پای
 }
 
-void gemm32fc(const float* src1, size_t src1_step, const float* src2, size_t src2_step,
-              float alpha, const float* src3, size_t src3_step, float beta, float* dst, size_t dst_step,
-              int m_a, int n_a, int n_d, int flags)
+فراغ gemm32fc(ثابت عائم* src1, size_t src1_ګام, ثابت عائم* src2, size_t src2_ګام,
+              عائم alpha, ثابت عائم* src3, size_t src3_ګام, عائم beta, عائم* dst, size_t dst_ګام,
+              صحيح m_a, صحيح n_a, صحيح n_d, صحيح flags)
 {
     CV_INSTRUMENT_REGION();
-    CALL_HAL(gemm32fc, cv_hal_gemm32fc, src1, src1_step, src2, src2_step, alpha, src3, src3_step, beta, dst, dst_step, m_a, n_a, n_d, flags)
-#ifdef CV_GEMM_BASELINE_ONLY
-    CV_CPU_CALL_BASELINE(gemm32fc, (src1, src1_step, src2, src2_step, alpha, src3, src3_step, beta, dst, dst_step, m_a, n_a, n_d, flags));
-#else
-    CV_CPU_DISPATCH(gemm32fc, (src1, src1_step, src2, src2_step, alpha, src3, src3_step, beta, dst, dst_step, m_a, n_a, n_d, flags),
+    CALL_HAL(gemm32fc, cv_hal_gemm32fc, src1, src1_ګام, src2, src2_ګام, alpha, src3, src3_ګام, beta, dst, dst_ګام, m_a, n_a, n_d, flags)
+#که_تعریف_شوی CV_GEMM_BASELINE_ONLY
+    CV_CPU_CALL_BASELINE(gemm32fc, (src1, src1_ګام, src2, src2_ګام, alpha, src3, src3_ګام, beta, dst, dst_ګام, m_a, n_a, n_d, flags));
+#وإلا
+    CV_CPU_DISPATCH(gemm32fc, (src1, src1_ګام, src2, src2_ګام, alpha, src3, src3_ګام, beta, dst, dst_ګام, m_a, n_a, n_d, flags),
         CV_CPU_DISPATCH_MODES_ALL);
-#endif
+#د_که_پای
 }
 
-void gemm64fc(const double* src1, size_t src1_step, const double* src2, size_t src2_step,
-              double alpha, const double* src3, size_t src3_step, double beta, double* dst, size_t dst_step,
-              int m_a, int n_a, int n_d, int flags)
+فراغ gemm64fc(ثابت مزدوج* src1, size_t src1_ګام, ثابت مزدوج* src2, size_t src2_ګام,
+              مزدوج alpha, ثابت مزدوج* src3, size_t src3_ګام, مزدوج beta, مزدوج* dst, size_t dst_ګام,
+              صحيح m_a, صحيح n_a, صحيح n_d, صحيح flags)
 {
     CV_INSTRUMENT_REGION();
-    CALL_HAL(gemm64fc, cv_hal_gemm64fc, src1, src1_step, src2, src2_step, alpha, src3, src3_step, beta, dst, dst_step, m_a, n_a, n_d, flags)
-#ifdef CV_GEMM_BASELINE_ONLY
-    CV_CPU_CALL_BASELINE(gemm64fc, (src1, src1_step, src2, src2_step, alpha, src3, src3_step, beta, dst, dst_step, m_a, n_a, n_d, flags));
-#else
-    CV_CPU_DISPATCH(gemm64fc, (src1, src1_step, src2, src2_step, alpha, src3, src3_step, beta, dst, dst_step, m_a, n_a, n_d, flags),
+    CALL_HAL(gemm64fc, cv_hal_gemm64fc, src1, src1_ګام, src2, src2_ګام, alpha, src3, src3_ګام, beta, dst, dst_ګام, m_a, n_a, n_d, flags)
+#که_تعریف_شوی CV_GEMM_BASELINE_ONLY
+    CV_CPU_CALL_BASELINE(gemm64fc, (src1, src1_ګام, src2, src2_ګام, alpha, src3, src3_ګام, beta, dst, dst_ګام, m_a, n_a, n_d, flags));
+#وإلا
+    CV_CPU_DISPATCH(gemm64fc, (src1, src1_ګام, src2, src2_ګام, alpha, src3, src3_ګام, beta, dst, dst_ګام, m_a, n_a, n_d, flags),
         CV_CPU_DISPATCH_MODES_ALL);
-#endif
+#د_که_پای
 }
 
 } // namespace hal
 
-void gemm(InputArray matA, InputArray matB, double alpha,
-          InputArray matC, double beta, OutputArray _matD, int flags)
+فراغ gemm(ننوت_Array matA, ننوت_Array matB, مزدوج alpha,
+          ننوت_Array matC, مزدوج beta, OutputArray _matD, صحيح flags)
 {
-#ifdef HAVE_CLAMDBLAS
-    CV_OCL_RUN(ocl::haveAmdBlas() && matA.dims() <= 2 && matB.dims() <= 2 && matC.dims() <= 2 && _matD.isUMat() &&
-        matA.cols() > 20 && matA.rows() > 20 && matB.cols() > 20, // since it works incorrect for small sizes
+#که_تعریف_شوی HAVE_CLAMDBLAS
+    CV_OCL_پرلپسې(ocl::haveAmdBlas() && matA.dims() <= 2 && matB.dims() <= 2 && matC.dims() <= 2 && _matD.isUMat() &&
+        matA.ستون_شمېر() > 20 && matA.لیکې() > 20 && matB.ستون_شمېر() > 20, // since it works incorrect for small sizes
         ocl_gemm_amdblas(matA, matB, alpha, matC, beta, _matD, flags))
-#endif
+#د_که_پای
 
-#ifdef HAVE_OPENCL
-    CV_OCL_RUN(_matD.isUMat() && matA.dims() <= 2 && matB.dims() <= 2 && matC.dims() <= 2,
+#که_تعریف_شوی HAVE_OPENCL
+    CV_OCL_پرلپسې(_matD.isUMat() && matA.dims() <= 2 && matB.dims() <= 2 && matC.dims() <= 2,
                ocl_gemm(matA, matB, alpha, matC, beta, _matD, flags))
-#endif
+#د_که_پای
 
     Mat A = matA.getMat(), B = matB.getMat(), C = beta != 0.0 ? matC.getMat() : Mat();
-    Size a_size = A.size(), d_size;
-    int len = 0, type = A.type();
+    اندازه a_اندازه = A.size(), d_اندازه;
+    صحيح len = 0, type = A.type();
 
     CV_Assert_N( type == B.type(), (type == CV_32FC1 || type == CV_64FC1 || type == CV_32FC2 || type == CV_64FC2) );
 
-    switch( flags & (GEMM_1_T|GEMM_2_T) )
+    بدل( flags & (GEMM_1_T|GEMM_2_T) )
     {
-    case 0:
-        d_size = Size( B.cols, a_size.height );
-        len = B.rows;
-        CV_Assert( a_size.width == len );
-        break;
-    case 1:
-        d_size = Size( B.cols, a_size.width );
-        len = B.rows;
-        CV_Assert( a_size.height == len );
-        break;
-    case 2:
-        d_size = Size( B.rows, a_size.height );
-        len = B.cols;
-        CV_Assert( a_size.width == len );
-        break;
-    case 3:
-        d_size = Size( B.rows, a_size.width );
-        len = B.cols;
-        CV_Assert( a_size.height == len );
-        break;
+    حالة 0:
+        d_اندازه = اندازه( B.ستون_شمېر, a_اندازه.لوړوالی );
+        len = B.لیکې;
+        CV_Assert( a_اندازه.پلنوالی == len );
+        اكسر;
+    حالة 1:
+        d_اندازه = اندازه( B.ستون_شمېر, a_اندازه.پلنوالی );
+        len = B.لیکې;
+        CV_Assert( a_اندازه.لوړوالی == len );
+        اكسر;
+    حالة 2:
+        d_اندازه = اندازه( B.لیکې, a_اندازه.لوړوالی );
+        len = B.ستون_شمېر;
+        CV_Assert( a_اندازه.پلنوالی == len );
+        اكسر;
+    حالة 3:
+        d_اندازه = اندازه( B.لیکې, a_اندازه.پلنوالی );
+        len = B.ستون_شمېر;
+        CV_Assert( a_اندازه.لوړوالی == len );
+        اكسر;
     }
 
-    if( !C.empty() )
+    إذا( !C.empty() )
     {
         CV_Assert_N( C.type() == type,
-            (((flags&GEMM_3_T) == 0 && C.rows == d_size.height && C.cols == d_size.width) ||
-             ((flags&GEMM_3_T) != 0 && C.rows == d_size.width && C.cols == d_size.height)));
+            (((flags&GEMM_3_T) == 0 && C.لیکې == d_اندازه.لوړوالی && C.ستون_شمېر == d_اندازه.پلنوالی) ||
+             ((flags&GEMM_3_T) != 0 && C.لیکې == d_اندازه.پلنوالی && C.ستون_شمېر == d_اندازه.لوړوالی)));
     }
 
-    _matD.create( d_size.height, d_size.width, type );
+    _matD.create( d_اندازه.لوړوالی, d_اندازه.پلنوالی, type );
     Mat D = _matD.getMat();
-    if( (flags & GEMM_3_T) != 0 && C.data == D.data )
+    إذا( (flags & GEMM_3_T) != 0 && C.معلومات == D.معلومات )
     {
         transpose( C, C );
         flags &= ~GEMM_3_T;
     }
 
     Mat *DProxyPtr = &D, DProxy;
-    if( D.data == A.data || D.data == B.data )
+    إذا( D.معلومات == A.معلومات || D.معلومات == B.معلومات )
     {
-        DProxy = Mat(d_size.height, d_size.width, D.type());
+        DProxy = Mat(d_اندازه.لوړوالی, d_اندازه.پلنوالی, D.type());
         DProxyPtr = &DProxy;
     }
 
-    if( type == CV_32FC1 )
-        hal::gemm32f(A.ptr<float>(), A.step, B.ptr<float>(), B.step, static_cast<float>(alpha),
-                     C.ptr<float>(), C.step, static_cast<float>(beta),
-                     DProxyPtr->ptr<float>(), DProxyPtr->step,
-                     a_size.height, a_size.width, DProxyPtr->cols, flags);
-    else if( type == CV_64FC1 )
-        hal::gemm64f(A.ptr<double>(), A.step, B.ptr<double>(), B.step, alpha,
-                     C.ptr<double>(), C.step, beta,
-                     DProxyPtr->ptr<double>(), DProxyPtr->step,
-                     a_size.height, a_size.width, DProxyPtr->cols, flags);
-    else if( type == CV_32FC2 )
-        hal::gemm32fc(A.ptr<float>(), A.step, B.ptr<float>(), B.step, static_cast<float>(alpha),
-                      C.ptr<float>(), C.step, static_cast<float>(beta),
-                      DProxyPtr->ptr<float>(), DProxyPtr->step,
-                      a_size.height, a_size.width, DProxyPtr->cols, flags);
-    else
+    إذا( type == CV_32FC1 )
+        hal::gemm32f(A.ptr<عائم>(), A.ګام, B.ptr<عائم>(), B.ګام, static_cast<عائم>(alpha),
+                     C.ptr<عائم>(), C.ګام, static_cast<عائم>(beta),
+                     DProxyPtr->ptr<عائم>(), DProxyPtr->ګام,
+                     a_اندازه.لوړوالی, a_اندازه.پلنوالی, DProxyPtr->ستون_شمېر, flags);
+    وإلا إذا( type == CV_64FC1 )
+        hal::gemm64f(A.ptr<مزدوج>(), A.ګام, B.ptr<مزدوج>(), B.ګام, alpha,
+                     C.ptr<مزدوج>(), C.ګام, beta,
+                     DProxyPtr->ptr<مزدوج>(), DProxyPtr->ګام,
+                     a_اندازه.لوړوالی, a_اندازه.پلنوالی, DProxyPtr->ستون_شمېر, flags);
+    وإلا إذا( type == CV_32FC2 )
+        hal::gemm32fc(A.ptr<عائم>(), A.ګام, B.ptr<عائم>(), B.ګام, static_cast<عائم>(alpha),
+                      C.ptr<عائم>(), C.ګام, static_cast<عائم>(beta),
+                      DProxyPtr->ptr<عائم>(), DProxyPtr->ګام,
+                      a_اندازه.لوړوالی, a_اندازه.پلنوالی, DProxyPtr->ستون_شمېر, flags);
+    وإلا
     {
         CV_Assert( type == CV_64FC2 );
-        hal::gemm64fc(A.ptr<double>(), A.step, B.ptr<double>(), B.step, alpha,
-                      C.ptr<double>(), C.step, beta,
-                      DProxyPtr->ptr<double>(), DProxyPtr->step,
-                      a_size.height, a_size.width, DProxyPtr->cols, flags);
+        hal::gemm64fc(A.ptr<مزدوج>(), A.ګام, B.ptr<مزدوج>(), B.ګام, alpha,
+                      C.ptr<مزدوج>(), C.ګام, beta,
+                      DProxyPtr->ptr<مزدوج>(), DProxyPtr->ګام,
+                      a_اندازه.لوړوالی, a_اندازه.پلنوالی, DProxyPtr->ستون_شمېر, flags);
     }
 
-    if(DProxyPtr != &D)
-        DProxyPtr->copyTo(D);
+    إذا(DProxyPtr != &D)
+        DProxyPtr->copy_منزل(D);
 }
 
 
@@ -435,97 +435,97 @@ void gemm(InputArray matA, InputArray matB, double alpha,
 *                                        Transform                                       *
 \****************************************************************************************/
 
-static TransformFunc getTransformFunc(int depth)
+ساكن TransformFunc getTransformFunc(صحيح ژوروالی)
 {
     CV_INSTRUMENT_REGION();
-    CV_CPU_DISPATCH(getTransformFunc, (depth),
+    CV_CPU_DISPATCH(getTransformFunc, (ژوروالی),
         CV_CPU_DISPATCH_MODES_ALL);
 }
 
-static TransformFunc getDiagTransformFunc(int depth)
+ساكن TransformFunc getDiagTransformFunc(صحيح ژوروالی)
 {
     CV_INSTRUMENT_REGION();
-    CV_CPU_DISPATCH(getDiagTransformFunc, (depth),
+    CV_CPU_DISPATCH(getDiagTransformFunc, (ژوروالی),
         CV_CPU_DISPATCH_MODES_ALL);
 }
 
-void transform(InputArray _src, OutputArray _dst, InputArray _mtx)
+فراغ transform(ننوت_Array _src, OutputArray _dst, ننوت_Array _mtx)
 {
     CV_INSTRUMENT_REGION();
 
     Mat src = _src.getMat(), m = _mtx.getMat();
-    int depth = src.depth(), scn = src.channels(), dcn = m.rows;
-    CV_Assert( scn == m.cols || scn + 1 == m.cols );
-    bool isDiag = false;
+    صحيح ژوروالی = src.ژوروالی(), scn = src.channels(), dcn = m.لیکې;
+    CV_Assert( scn == m.ستون_شمېر || scn + 1 == m.ستون_شمېر );
+    منطقي isDiag = خطأ;
 
-    _dst.createSameSize( src, CV_MAKETYPE(depth, dcn) );
+    _dst.create_Same_اندازه( src, CV_MAKETYPE(ژوروالی, dcn) );
     Mat dst = _dst.getMat();
 
-    if (src.data == dst.data)  // inplace case
+    إذا (src.معلومات == dst.معلومات)  // inplace case
     {
         CV_Assert(scn == dcn);
         src = src.clone();  // TODO Add performance warning
     }
 
-    int mtype = depth == CV_32S || depth == CV_64F ? CV_64F : CV_32F;
-    AutoBuffer<double> _mbuf;
-    double* mbuf;
+    صحيح mtype = ژوروالی == CV_32S || ژوروالی == CV_64F ? CV_64F : CV_32F;
+    Auto_بفر<مزدوج> _mbuf;
+    مزدوج* mbuf;
 
-    if( !m.isContinuous() || m.type() != mtype || m.cols != scn + 1 )
+    إذا( !m.isContinuous() || m.type() != mtype || m.ستون_شمېر != scn + 1 )
     {
         _mbuf.allocate(dcn*(scn+1));
-        mbuf = _mbuf.data();
+        mbuf = _mbuf.معلومات();
         Mat tmp(dcn, scn+1, mtype, mbuf);
-        memset(tmp.ptr(), 0, tmp.total()*tmp.elemSize());
-        if( m.cols == scn+1 )
-            m.convertTo(tmp, mtype);
-        else
+        memset(tmp.ptr(), 0, tmp.ټول()*tmp.elem_اندازه());
+        إذا( m.ستون_شمېر == scn+1 )
+            m.convert_منزل(tmp, mtype);
+        وإلا
         {
-            Mat tmppart = tmp.colRange(0, m.cols);
-            m.convertTo(tmppart, mtype);
+            Mat tmppart = tmp.ستون_Range_2(0, m.ستون_شمېر);
+            m.convert_منزل(tmppart, mtype);
         }
         m = tmp;
     }
-    else
-        mbuf = m.ptr<double>();
+    وإلا
+        mbuf = m.ptr<مزدوج>();
 
-    if( scn == dcn )
+    إذا( scn == dcn )
     {
-        int i, j;
-        double eps = mtype == CV_32F ? FLT_EPSILON : DBL_EPSILON;
+        صحيح i, j;
+        مزدوج eps = mtype == CV_32F ? FLT_EPSILON : DBL_EPSILON;
 
-        if( scn == 1 )
+        إذا( scn == 1 )
         {
-            double alpha, beta;
-            if( mtype == CV_32F )
-                alpha = m.at<float>(0), beta = m.at<float>(1);
-            else
-                alpha = m.at<double>(0), beta = m.at<double>(1);
-            src.convertTo(dst, dst.type(), alpha, beta);
-            return;
+            مزدوج alpha, beta;
+            إذا( mtype == CV_32F )
+                alpha = m.at<عائم>(0), beta = m.at<عائم>(1);
+            وإلا
+                alpha = m.at<مزدوج>(0), beta = m.at<مزدوج>(1);
+            src.convert_منزل(dst, dst.type(), alpha, beta);
+            أرجع;
         }
 
-        for( i = 0, isDiag = true; isDiag && i < scn; i++ )
+        لكل( i = 0, isDiag = ریښتیا; isDiag && i < scn; i++ )
         {
-            for( j = 0; isDiag && j < scn; j++ )
+            لكل( j = 0; isDiag && j < scn; j++ )
             {
-                double v = mtype == CV_32F ? m.at<float>(i, j) : m.at<double>(i, j);
-                if( i != j && fabs(v) > eps )
-                    isDiag = false;
+                مزدوج v = mtype == CV_32F ? m.at<عائم>(i, j) : m.at<مزدوج>(i, j);
+                إذا( i != j && fabs(v) > eps )
+                    isDiag = خطأ;
             }
         }
     }
 
-    TransformFunc func = isDiag ? getDiagTransformFunc(depth): getTransformFunc(depth);
+    TransformFunc func = isDiag ? getDiagTransformFunc(ژوروالی): getTransformFunc(ژوروالی);
     CV_Assert( func != 0 );
 
-    const Mat* arrays[] = {&src, &dst, 0};
+    ثابت Mat* arrays[] = {&src, &dst, 0};
     uchar* ptrs[2] = {};
     NAryMatIterator it(arrays, ptrs);
-    size_t i, total = it.size;
+    size_t i, ټول = it.size;
 
-    for( i = 0; i < it.nplanes; i++, ++it )
-        func( ptrs[0], ptrs[1], (uchar*)mbuf, (int)total, scn, dcn );
+    لكل( i = 0; i < it.nplanes; i++, ++it )
+        func( ptrs[0], ptrs[1], (uchar*)mbuf, (صحيح)ټول, scn, dcn );
 }
 
 
@@ -534,123 +534,123 @@ void transform(InputArray _src, OutputArray _dst, InputArray _mtx)
 *                                  Perspective Transform                                 *
 \****************************************************************************************/
 
-static TransformFunc getPerspectiveTransform(int depth)
+ساكن TransformFunc getPerspectiveTransform(صحيح ژوروالی)
 {
     CV_INSTRUMENT_REGION();
-    CV_CPU_DISPATCH(getPerspectiveTransform, (depth),
+    CV_CPU_DISPATCH(getPerspectiveTransform, (ژوروالی),
         CV_CPU_DISPATCH_MODES_ALL);
 }
 
-void perspectiveTransform(InputArray _src, OutputArray _dst, InputArray _mtx)
+فراغ perspectiveTransform(ننوت_Array _src, OutputArray _dst, ننوت_Array _mtx)
 {
     CV_INSTRUMENT_REGION();
 
     Mat src = _src.getMat(), m = _mtx.getMat();
-    int depth = src.depth(), scn = src.channels(), dcn = m.rows-1;
-    CV_Assert( scn + 1 == m.cols );
-    CV_Assert( depth == CV_32F || depth == CV_64F );
+    صحيح ژوروالی = src.ژوروالی(), scn = src.channels(), dcn = m.لیکې-1;
+    CV_Assert( scn + 1 == m.ستون_شمېر );
+    CV_Assert( ژوروالی == CV_32F || ژوروالی == CV_64F );
 
-    _dst.createSameSize( src, CV_MAKETYPE(depth, dcn) );
+    _dst.create_Same_اندازه( src, CV_MAKETYPE(ژوروالی, dcn) );
     Mat dst = _dst.getMat();
 
-    const int mtype = CV_64F;
-    AutoBuffer<double> _mbuf;
-    double* mbuf = m.ptr<double>();
+    ثابت صحيح mtype = CV_64F;
+    Auto_بفر<مزدوج> _mbuf;
+    مزدوج* mbuf = m.ptr<مزدوج>();
 
-    if( !m.isContinuous() || m.type() != mtype )
+    إذا( !m.isContinuous() || m.type() != mtype )
     {
         _mbuf.allocate((dcn+1)*(scn+1));
-        mbuf = _mbuf.data();
+        mbuf = _mbuf.معلومات();
         Mat tmp(dcn+1, scn+1, mtype, mbuf);
-        m.convertTo(tmp, mtype);
+        m.convert_منزل(tmp, mtype);
         m = tmp;
     }
 
-    TransformFunc func = getPerspectiveTransform(depth);
+    TransformFunc func = getPerspectiveTransform(ژوروالی);
     CV_Assert( func != 0 );
 
-    const Mat* arrays[] = {&src, &dst, 0};
+    ثابت Mat* arrays[] = {&src, &dst, 0};
     uchar* ptrs[2] = {};
     NAryMatIterator it(arrays, ptrs);
-    size_t i, total = it.size;
+    size_t i, ټول = it.size;
 
-    for( i = 0; i < it.nplanes; i++, ++it )
-        func( ptrs[0], ptrs[1], (uchar*)mbuf, (int)total, scn, dcn );
+    لكل( i = 0; i < it.nplanes; i++, ++it )
+        func( ptrs[0], ptrs[1], (uchar*)mbuf, (صحيح)ټول, scn, dcn );
 }
 
 /****************************************************************************************\
 *                                       ScaleAdd                                         *
 \****************************************************************************************/
 
-#ifdef HAVE_OPENCL
+#که_تعریف_شوی HAVE_OPENCL
 
-static bool ocl_scaleAdd( InputArray _src1, double alpha, InputArray _src2, OutputArray _dst, int type )
+ساكن منطقي ocl_scale_جمع_کړه( ننوت_Array _src1, مزدوج alpha, ننوت_Array _src2, OutputArray _dst, صحيح type )
 {
-    const ocl::Device & d = ocl::Device::getDefault();
+    ثابت ocl::Device & d = ocl::Device::getDefault();
 
-    bool doubleSupport = d.doubleFPConfig() > 0;
-    Size size = _src1.size();
-    int depth = CV_MAT_DEPTH(type);
-    if ( (!doubleSupport && depth == CV_64F) || size != _src2.size() )
-        return false;
+    منطقي doubleSupport = d.doubleFPConfig() > 0;
+    اندازه size = _src1.size();
+    صحيح ژوروالی = CV_MAT_ژوروالی(type);
+    إذا ( (!doubleSupport && ژوروالی == CV_64F) || size != _src2.size() )
+        أرجع خطأ;
 
     _dst.create(size, type);
-    int cn = CV_MAT_CN(type), wdepth = std::max(depth, CV_32F);
-    int kercn = ocl::predictOptimalVectorWidthMax(_src1, _src2, _dst),
-        rowsPerWI = d.isIntel() ? 4 : 1;
+    صحيح cn = CV_MAT_CN(type), wdepth = std::max(ژوروالی, CV_32F);
+    صحيح kercn = ocl::predict_Optimal_ویکټور_پلنوالی_Max(_src1, _src2, _dst),
+        لیکې_فی_WI = d.isIntel() ? 4 : 1;
 
-    char cvt[2][50];
+    حرف cvt[2][50];
     ocl::Kernel k("KF", ocl::core::arithm_oclsrc,
                   format("-D OP_SCALE_ADD -D BINARY_OP -D dstT=%s -D DEPTH_dst=%d -D workT=%s -D convertToWT1=%s"
                          " -D srcT1=dstT -D srcT2=dstT -D convertToDT=%s -D workT1=%s"
                          " -D wdepth=%d%s -D rowsPerWI=%d",
-                         ocl::typeToStr(CV_MAKE_TYPE(depth, kercn)), depth,
-                         ocl::typeToStr(CV_MAKE_TYPE(wdepth, kercn)),
-                         ocl::convertTypeStr(depth, wdepth, kercn, cvt[0], sizeof(cvt[0])),
-                         ocl::convertTypeStr(wdepth, depth, kercn, cvt[1], sizeof(cvt[1])),
-                         ocl::typeToStr(wdepth), wdepth,
-                         doubleSupport ? " -D DOUBLE_SUPPORT" : "", rowsPerWI));
-    if (k.empty())
-        return false;
+                         ocl::type_منزل_Str(CV_MAKE_TYPE(ژوروالی, kercn)), ژوروالی,
+                         ocl::type_منزل_Str(CV_MAKE_TYPE(wdepth, kercn)),
+                         ocl::convertTypeStr(ژوروالی, wdepth, kercn, cvt[0], حجم(cvt[0])),
+                         ocl::convertTypeStr(wdepth, ژوروالی, kercn, cvt[1], حجم(cvt[1])),
+                         ocl::type_منزل_Str(wdepth), wdepth,
+                         doubleSupport ? " -D DOUBLE_SUPPORT" : "", لیکې_فی_WI));
+    إذا (k.empty())
+        أرجع خطأ;
 
     UMat src1 = _src1.getUMat(), src2 = _src2.getUMat(), dst = _dst.getUMat();
 
-    ocl::KernelArg src1arg = ocl::KernelArg::ReadOnlyNoSize(src1),
-            src2arg = ocl::KernelArg::ReadOnlyNoSize(src2),
+    ocl::KernelArg src1arg = ocl::KernelArg::Read_Only_No_اندازه(src1),
+            src2arg = ocl::KernelArg::Read_Only_No_اندازه(src2),
             dstarg = ocl::KernelArg::WriteOnly(dst, cn, kercn);
 
-    if (wdepth == CV_32F)
-        k.args(src1arg, src2arg, dstarg, (float)alpha);
-    else
-        k.args(src1arg, src2arg, dstarg, alpha);
+    إذا (wdepth == CV_32F)
+        k.دلیلونه(src1arg, src2arg, dstarg, (عائم)alpha);
+    وإلا
+        k.دلیلونه(src1arg, src2arg, dstarg, alpha);
 
-    size_t globalsize[2] = { (size_t)dst.cols * cn / kercn, ((size_t)dst.rows + rowsPerWI - 1) / rowsPerWI };
-    return k.run(2, globalsize, NULL, false);
+    size_t globalsize[2] = { (size_t)dst.ستون_شمېر * cn / kercn, ((size_t)dst.لیکې + لیکې_فی_WI - 1) / لیکې_فی_WI };
+    أرجع k.پرلپسې(2, globalsize, عدم, خطأ);
 }
 
-#endif
+#د_که_پای
 
-static ScaleAddFunc getScaleAddFunc(int depth)
+ساكن Scale_جمع_کړه_Func get_Scale_جمع_کړه_Func(صحيح ژوروالی)
 {
     CV_INSTRUMENT_REGION();
-    CV_CPU_DISPATCH(getScaleAddFunc, (depth),
+    CV_CPU_DISPATCH(get_Scale_جمع_کړه_Func, (ژوروالی),
         CV_CPU_DISPATCH_MODES_ALL);
 }
 
-void scaleAdd(InputArray _src1, double alpha, InputArray _src2, OutputArray _dst)
+فراغ scale_جمع_کړه(ننوت_Array _src1, مزدوج alpha, ننوت_Array _src2, OutputArray _dst)
 {
     CV_INSTRUMENT_REGION();
 
-    int type = _src1.type(), depth = CV_MAT_DEPTH(type), cn = CV_MAT_CN(type);
+    صحيح type = _src1.type(), ژوروالی = CV_MAT_ژوروالی(type), cn = CV_MAT_CN(type);
     CV_Assert( type == _src2.type() );
 
-    CV_OCL_RUN(_src1.dims() <= 2 && _src2.dims() <= 2 && _dst.isUMat(),
-            ocl_scaleAdd(_src1, alpha, _src2, _dst, type))
+    CV_OCL_پرلپسې(_src1.dims() <= 2 && _src2.dims() <= 2 && _dst.isUMat(),
+            ocl_scale_جمع_کړه(_src1, alpha, _src2, _dst, type))
 
-    if( depth != CV_32F && depth != CV_64F )
+    إذا( ژوروالی != CV_32F && ژوروالی != CV_64F )
     {
-        addWeighted(_src1, alpha, _src2, 1, 0, _dst, depth);
-        return;
+        جمع_کړه_Weighted(_src1, alpha, _src2, 1, 0, _dst, ژوروالی);
+        أرجع;
     }
 
     Mat src1 = _src1.getMat(), src2 = _src2.getMat();
@@ -659,155 +659,155 @@ void scaleAdd(InputArray _src1, double alpha, InputArray _src2, OutputArray _dst
     _dst.create(src1.size, type);
     Mat dst = _dst.getMat();
 
-    float falpha = (float)alpha;
-    void* palpha = depth == CV_32F ? (void*)&falpha : (void*)&alpha;
+    عائم falpha = (عائم)alpha;
+    فراغ* palpha = ژوروالی == CV_32F ? (فراغ*)&falpha : (فراغ*)&alpha;
 
-    ScaleAddFunc func = getScaleAddFunc(depth);
+    Scale_جمع_کړه_Func func = get_Scale_جمع_کړه_Func(ژوروالی);
     CV_Assert(func);
 
-    if (src1.isContinuous() && src2.isContinuous() && dst.isContinuous())
+    إذا (src1.isContinuous() && src2.isContinuous() && dst.isContinuous())
     {
-        size_t len = src1.total()*cn;
-        func(src1.ptr(), src2.ptr(), dst.ptr(), (int)len, palpha);
-        return;
+        size_t len = src1.ټول()*cn;
+        func(src1.ptr(), src2.ptr(), dst.ptr(), (صحيح)len, palpha);
+        أرجع;
     }
 
-    const Mat* arrays[] = {&src1, &src2, &dst, 0};
+    ثابت Mat* arrays[] = {&src1, &src2, &dst, 0};
     uchar* ptrs[3] = {};
     NAryMatIterator it(arrays, ptrs);
     size_t i, len = it.size*cn;
 
-    for( i = 0; i < it.nplanes; i++, ++it )
-        func( ptrs[0], ptrs[1], ptrs[2], (int)len, palpha );
+    لكل( i = 0; i < it.nplanes; i++, ++it )
+        func( ptrs[0], ptrs[1], ptrs[2], (صحيح)len, palpha );
 }
 
 /****************************************************************************************\
 *                                 Covariation Matrix                                     *
 \****************************************************************************************/
 
-void calcCovarMatrix( const Mat* data, int nsamples, Mat& covar, Mat& _mean, int flags, int ctype )
+فراغ calc_Covar_ماتریکس( ثابت Mat* معلومات, صحيح nsamples, Mat& covar, Mat& منځنۍ, صحيح flags, صحيح ctype )
 {
     CV_INSTRUMENT_REGION();
 
-    CV_Assert_N( data, nsamples > 0 );
-    Size size = data[0].size();
-    int sz = size.width * size.height, esz = (int)data[0].elemSize();
-    int type = data[0].type();
-    Mat mean;
-    ctype = std::max(std::max(CV_MAT_DEPTH(ctype >= 0 ? ctype : type), _mean.depth()), CV_32F);
+    CV_Assert_N( معلومات, nsamples > 0 );
+    اندازه size = معلومات[0].size();
+    صحيح sz = size.پلنوالی * size.لوړوالی, esz = (صحيح)معلومات[0].elem_اندازه();
+    صحيح type = معلومات[0].type();
+    Mat منځنۍ_2;
+    ctype = std::max(std::max(CV_MAT_ژوروالی(ctype >= 0 ? ctype : type), منځنۍ.ژوروالی()), CV_32F);
 
-    if( (flags & cv::COVAR_USE_AVG) != 0 )
+    إذا( (flags & cv::COVAR_USE_AVG) != 0 )
     {
-        CV_Assert( _mean.size() == size );
-        if( _mean.isContinuous() && _mean.type() == ctype )
-            mean = _mean.reshape(1, 1);
-        else
+        CV_Assert( منځنۍ.size() == size );
+        إذا( منځنۍ.isContinuous() && منځنۍ.type() == ctype )
+            منځنۍ_2 = منځنۍ.reshape(1, 1);
+        وإلا
         {
-            _mean.convertTo(mean, ctype);
-            mean = mean.reshape(1, 1);
+            منځنۍ.convert_منزل(منځنۍ_2, ctype);
+            منځنۍ_2 = منځنۍ_2.reshape(1, 1);
         }
     }
 
-    Mat _data(nsamples, sz, type);
+    Mat معلومات_3(nsamples, sz, type);
 
-    for( int i = 0; i < nsamples; i++ )
+    لكل( صحيح i = 0; i < nsamples; i++ )
     {
-        CV_Assert_N( data[i].size() == size, data[i].type() == type );
-        if( data[i].isContinuous() )
-            memcpy( _data.ptr(i), data[i].ptr(), sz*esz );
-        else
+        CV_Assert_N( معلومات[i].size() == size, معلومات[i].type() == type );
+        إذا( معلومات[i].isContinuous() )
+            حافظه_نقل( معلومات_3.ptr(i), معلومات[i].ptr(), sz*esz );
+        وإلا
         {
-            Mat dataRow(size.height, size.width, type, _data.ptr(i));
-            data[i].copyTo(dataRow);
+            Mat معلومات_لیکه(size.لوړوالی, size.پلنوالی, type, معلومات_3.ptr(i));
+            معلومات[i].copy_منزل(معلومات_لیکه);
         }
     }
 
-    calcCovarMatrix( _data, covar, mean, (flags & ~(cv::COVAR_ROWS|cv::COVAR_COLS)) | cv::COVAR_ROWS, ctype );
-    if( (flags & cv::COVAR_USE_AVG) == 0 )
-        _mean = mean.reshape(1, size.height);
+    calc_Covar_ماتریکس( معلومات_3, covar, منځنۍ_2, (flags & ~(cv::COVAR_لیکې|cv::COVAR_ستون_شمېر)) | cv::COVAR_لیکې, ctype );
+    إذا( (flags & cv::COVAR_USE_AVG) == 0 )
+        منځنۍ = منځنۍ_2.reshape(1, size.لوړوالی);
 }
 
-void calcCovarMatrix( InputArray _src, OutputArray _covar, InputOutputArray _mean, int flags, int ctype )
+فراغ calc_Covar_ماتریکس( ننوت_Array _src, OutputArray _covar, ننوت_Output_Array منځنۍ, صحيح flags, صحيح ctype )
 {
     CV_INSTRUMENT_REGION();
 
-    if(_src.kind() == _InputArray::STD_VECTOR_MAT || _src.kind() == _InputArray::STD_ARRAY_MAT)
+    إذا(_src.ډول() == ننوت_Array_2::STD_ویکټور_MAT || _src.ډول() == ننوت_Array_2::STD_ARRAY_MAT)
     {
         std::vector<cv::Mat> src;
-        _src.getMatVector(src);
+        _src.get_Mat_ویکټور(src);
 
         CV_Assert( src.size() > 0 );
 
-        Size size = src[0].size();
-        int type = src[0].type();
+        اندازه size = src[0].size();
+        صحيح type = src[0].type();
 
-        ctype = std::max(std::max(CV_MAT_DEPTH(ctype >= 0 ? ctype : type), _mean.depth()), CV_32F);
+        ctype = std::max(std::max(CV_MAT_ژوروالی(ctype >= 0 ? ctype : type), منځنۍ.ژوروالی()), CV_32F);
 
-        Mat _data(static_cast<int>(src.size()), size.area(), type);
+        Mat معلومات_3(static_cast<صحيح>(src.size()), size.area(), type);
 
-        int i = 0;
-        for(std::vector<cv::Mat>::iterator each = src.begin(); each != src.end(); ++each, ++i )
+        صحيح i = 0;
+        لكل(std::vector<cv::Mat>::iterator each = src.begin(); each != src.end(); ++each, ++i )
         {
             CV_Assert_N( (*each).size() == size, (*each).type() == type );
-            Mat dataRow(size.height, size.width, type, _data.ptr(i));
-            (*each).copyTo(dataRow);
+            Mat معلومات_لیکه(size.لوړوالی, size.پلنوالی, type, معلومات_3.ptr(i));
+            (*each).copy_منزل(معلومات_لیکه);
         }
 
-        Mat mean;
-        if( (flags & cv::COVAR_USE_AVG) != 0 )
+        Mat منځنۍ_2;
+        إذا( (flags & cv::COVAR_USE_AVG) != 0 )
         {
-            CV_Assert( _mean.size() == size );
-            Mat mean0 = _mean.getMat();
+            CV_Assert( منځنۍ.size() == size );
+            Mat mean0 = منځنۍ.getMat();
 
-            if( mean0.isContinuous() && mean0.type() == ctype )
-                mean = mean0.reshape(1, 1);
-            else
+            إذا( mean0.isContinuous() && mean0.type() == ctype )
+                منځنۍ_2 = mean0.reshape(1, 1);
+            وإلا
             {
-                mean0.convertTo(mean, ctype);
-                mean = mean.reshape(1, 1);
+                mean0.convert_منزل(منځنۍ_2, ctype);
+                منځنۍ_2 = منځنۍ_2.reshape(1, 1);
             }
         }
 
-        calcCovarMatrix( _data, _covar, mean, (flags & ~(cv::COVAR_ROWS|cv::COVAR_COLS)) | cv::COVAR_ROWS, ctype );
+        calc_Covar_ماتریکس( معلومات_3, _covar, منځنۍ_2, (flags & ~(cv::COVAR_لیکې|cv::COVAR_ستون_شمېر)) | cv::COVAR_لیکې, ctype );
 
-        if( (flags & cv::COVAR_USE_AVG) == 0 )
+        إذا( (flags & cv::COVAR_USE_AVG) == 0 )
         {
-            mean = mean.reshape(1, size.height);
-            mean.copyTo(_mean);
+            منځنۍ_2 = منځنۍ_2.reshape(1, size.لوړوالی);
+            منځنۍ_2.copy_منزل(منځنۍ);
         }
-        return;
+        أرجع;
     }
 
-    Mat data = _src.getMat(), mean;
-    CV_Assert( ((flags & cv::COVAR_ROWS) != 0) ^ ((flags & cv::COVAR_COLS) != 0) );
-    bool takeRows = (flags & cv::COVAR_ROWS) != 0;
-    int type = data.type();
-    int nsamples = takeRows ? data.rows : data.cols;
+    Mat معلومات = _src.getMat(), منځنۍ_2;
+    CV_Assert( ((flags & cv::COVAR_لیکې) != 0) ^ ((flags & cv::COVAR_ستون_شمېر) != 0) );
+    منطقي take_لیکې = (flags & cv::COVAR_لیکې) != 0;
+    صحيح type = معلومات.type();
+    صحيح nsamples = take_لیکې ? معلومات.لیکې : معلومات.ستون_شمېر;
     CV_Assert( nsamples > 0 );
-    Size size = takeRows ? Size(data.cols, 1) : Size(1, data.rows);
+    اندازه size = take_لیکې ? اندازه(معلومات.ستون_شمېر, 1) : اندازه(1, معلومات.لیکې);
 
-    if( (flags & cv::COVAR_USE_AVG) != 0 )
+    إذا( (flags & cv::COVAR_USE_AVG) != 0 )
     {
-        mean = _mean.getMat();
-        ctype = std::max(std::max(CV_MAT_DEPTH(ctype >= 0 ? ctype : type), mean.depth()), CV_32F);
-        CV_Assert( mean.size() == size );
-        if( mean.type() != ctype )
+        منځنۍ_2 = منځنۍ.getMat();
+        ctype = std::max(std::max(CV_MAT_ژوروالی(ctype >= 0 ? ctype : type), منځنۍ_2.ژوروالی()), CV_32F);
+        CV_Assert( منځنۍ_2.size() == size );
+        إذا( منځنۍ_2.type() != ctype )
         {
-            _mean.create(mean.size(), ctype);
-            Mat tmp = _mean.getMat();
-            mean.convertTo(tmp, ctype);
-            mean = tmp;
+            منځنۍ.create(منځنۍ_2.size(), ctype);
+            Mat tmp = منځنۍ.getMat();
+            منځنۍ_2.convert_منزل(tmp, ctype);
+            منځنۍ_2 = tmp;
         }
     }
-    else
+    وإلا
     {
-        ctype = std::max(CV_MAT_DEPTH(ctype >= 0 ? ctype : type), CV_32F);
-        reduce( _src, _mean, takeRows ? 0 : 1, REDUCE_AVG, ctype );
-        mean = _mean.getMat();
+        ctype = std::max(CV_MAT_ژوروالی(ctype >= 0 ? ctype : type), CV_32F);
+        reduce( _src, منځنۍ, take_لیکې ? 0 : 1, REDUCE_AVG, ctype );
+        منځنۍ_2 = منځنۍ.getMat();
     }
 
-    mulTransposed( data, _covar, ((flags & cv::COVAR_NORMAL) == 0) ^ takeRows,
-        mean, (flags & cv::COVAR_SCALE) != 0 ? 1./nsamples : 1, ctype );
+    mulTransposed( معلومات, _covar, ((flags & cv::COVAR_نورمال) == 0) ^ take_لیکې,
+        منځنۍ_2, (flags & cv::COVAR_SCALE) != 0 ? 1./nsamples : 1, ctype );
 }
 
 
@@ -816,43 +816,43 @@ void calcCovarMatrix( InputArray _src, OutputArray _covar, InputOutputArray _mea
 *                                        Mahalanobis                                     *
 \****************************************************************************************/
 
-static MahalanobisImplFunc getMahalanobisImplFunc(int depth)
+ساكن MahalanobisImplFunc getMahalanobisImplFunc(صحيح ژوروالی)
 {
-#ifdef CV_MAHALANOBIS_BASELINE_ONLY
-    CV_CPU_CALL_BASELINE(getMahalanobisImplFunc, (depth));
-#else
+#که_تعریف_شوی CV_MAHALANOBIS_BASELINE_ONLY
+    CV_CPU_CALL_BASELINE(getMahalanobisImplFunc, (ژوروالی));
+#وإلا
     CV_INSTRUMENT_REGION();
-    CV_CPU_DISPATCH(getMahalanobisImplFunc, (depth),
+    CV_CPU_DISPATCH(getMahalanobisImplFunc, (ژوروالی),
         CV_CPU_DISPATCH_MODES_ALL);
-#endif
+#د_که_پای
 }
 
 
-double Mahalanobis(InputArray _v1, InputArray _v2, InputArray _icovar)
+مزدوج Mahalanobis(ننوت_Array _v1, ننوت_Array _v2, ننوت_Array _icovar)
 {
     CV_INSTRUMENT_REGION();
 
     Mat v1 = _v1.getMat(), v2 = _v2.getMat(), icovar = _icovar.getMat();
-    int type = v1.type(), depth = v1.depth();
-    Size sz = v1.size();
-    int len = sz.width*sz.height*v1.channels();
-    AutoBuffer<double> buf(len);
+    صحيح type = v1.type(), ژوروالی = v1.ژوروالی();
+    اندازه sz = v1.size();
+    صحيح len = sz.پلنوالی*sz.لوړوالی*v1.channels();
+    Auto_بفر<مزدوج> buf(len);
 
     CV_Assert_N( type == v2.type(), type == icovar.type(),
-        sz == v2.size(), len == icovar.rows && len == icovar.cols );
+        sz == v2.size(), len == icovar.لیکې && len == icovar.ستون_شمېر );
 
-    sz.width *= v1.channels();
-    if( v1.isContinuous() && v2.isContinuous() )
+    sz.پلنوالی *= v1.channels();
+    إذا( v1.isContinuous() && v2.isContinuous() )
     {
-        sz.width *= sz.height;
-        sz.height = 1;
+        sz.پلنوالی *= sz.لوړوالی;
+        sz.لوړوالی = 1;
     }
 
-    MahalanobisImplFunc func = getMahalanobisImplFunc(depth);
+    MahalanobisImplFunc func = getMahalanobisImplFunc(ژوروالی);
     CV_Assert(func);
 
-    double result = func(v1, v2, icovar, buf.data(), len);
-    return std::sqrt(result);
+    مزدوج پایله = func(v1, v2, icovar, buf.معلومات(), len);
+    أرجع std::جذر(پایله);
 }
 
 
@@ -861,68 +861,68 @@ double Mahalanobis(InputArray _v1, InputArray _v2, InputArray _icovar)
 *                                        MulTransposed                                   *
 \****************************************************************************************/
 
-static MulTransposedFunc getMulTransposedFunc(int stype, int dtype, bool ata)
+ساكن MulTransposedFunc getMulTransposedFunc(صحيح stype, صحيح dtype, منطقي ata)
 {
-#ifdef CV_MULTRANSPOSED_BASELINE_ONLY
+#که_تعریف_شوی CV_MULTRANSPOSED_BASELINE_ONLY
     CV_CPU_CALL_BASELINE(getMulTransposedFunc, (stype, dtype, ata));
-#else
+#وإلا
     CV_INSTRUMENT_REGION();
     CV_CPU_DISPATCH(getMulTransposedFunc, (stype, dtype, ata),
         CV_CPU_DISPATCH_MODES_ALL);
-#endif
+#د_که_پای
 }
 
-void mulTransposed(InputArray _src, OutputArray _dst, bool ata,
-                   InputArray _delta, double scale, int dtype)
+فراغ mulTransposed(ننوت_Array _src, OutputArray _dst, منطقي ata,
+                   ننوت_Array _delta, مزدوج scale, صحيح dtype)
 {
     CV_INSTRUMENT_REGION();
 
     Mat src = _src.getMat(), delta = _delta.getMat();
-    const int gemm_level = 100; // boundary above which GEMM is faster.
-    int stype = src.type();
-    dtype = std::max(std::max(CV_MAT_DEPTH(dtype >= 0 ? dtype : stype), delta.depth()), CV_32F);
+    ثابت صحيح gemm_level = 100; // boundary above which GEMM is faster.
+    صحيح stype = src.type();
+    dtype = std::max(std::max(CV_MAT_ژوروالی(dtype >= 0 ? dtype : stype), delta.ژوروالی()), CV_32F);
     CV_Assert( src.channels() == 1 );
 
-    if( !delta.empty() )
+    إذا( !delta.empty() )
     {
         CV_Assert_N( delta.channels() == 1,
-            (delta.rows == src.rows || delta.rows == 1),
-            (delta.cols == src.cols || delta.cols == 1));
-        if( delta.type() != dtype )
-            delta.convertTo(delta, dtype);
+            (delta.لیکې == src.لیکې || delta.لیکې == 1),
+            (delta.ستون_شمېر == src.ستون_شمېر || delta.ستون_شمېر == 1));
+        إذا( delta.type() != dtype )
+            delta.convert_منزل(delta, dtype);
     }
 
-    int dsize = ata ? src.cols : src.rows;
+    صحيح dsize = ata ? src.ستون_شمېر : src.لیکې;
     _dst.create( dsize, dsize, dtype );
     Mat dst = _dst.getMat();
 
-    if( src.data == dst.data || (stype == dtype &&
-        (dst.cols >= gemm_level && dst.rows >= gemm_level &&
-         src.cols >= gemm_level && src.rows >= gemm_level)))
+    إذا( src.معلومات == dst.معلومات || (stype == dtype &&
+        (dst.ستون_شمېر >= gemm_level && dst.لیکې >= gemm_level &&
+         src.ستون_شمېر >= gemm_level && src.لیکې >= gemm_level)))
     {
         Mat src2;
-        const Mat* tsrc = &src;
-        if( !delta.empty() )
+        ثابت Mat* tsrc = &src;
+        إذا( !delta.empty() )
         {
-            if( delta.size() == src.size() )
-                subtract( src, delta, src2 );
-            else
+            إذا( delta.size() == src.size() )
+                کمول( src, delta, src2 );
+            وإلا
             {
-                repeat(delta, src.rows/delta.rows, src.cols/delta.cols, src2);
-                subtract( src, src2, src2 );
+                repeat(delta, src.لیکې/delta.لیکې, src.ستون_شمېر/delta.ستون_شمېر, src2);
+                کمول( src, src2, src2 );
             }
             tsrc = &src2;
         }
         gemm( *tsrc, *tsrc, scale, Mat(), 0, dst, ata ? GEMM_1_T : GEMM_2_T );
     }
-    else
+    وإلا
     {
         MulTransposedFunc func = getMulTransposedFunc(stype, dtype, ata);
-        if( !func )
+        إذا( !func )
             CV_Error( cv::Error::StsUnsupportedFormat, "" );
 
         func( src, dst, delta, scale );
-        completeSymm( dst, false );
+        completeSymm( dst, خطأ );
     }
 }
 
@@ -930,54 +930,54 @@ void mulTransposed(InputArray _src, OutputArray _dst, bool ata,
 *                                      Dot Product                                       *
 \****************************************************************************************/
 
-static double dotProd_8u(const void* src1, const void* src2, int len)
+ساكن مزدوج dotProd_8u(ثابت فراغ* src1, ثابت فراغ* src2, صحيح len)
 {
     CV_INSTRUMENT_REGION();
-    CV_CPU_DISPATCH(dotProd_8u, ((const uchar*)src1, (const uchar*)src2, len),
+    CV_CPU_DISPATCH(dotProd_8u, ((ثابت uchar*)src1, (ثابت uchar*)src2, len),
         CV_CPU_DISPATCH_MODES_ALL);
 }
-static double dotProd_8s(const void* src1, const void* src2, int len)
+ساكن مزدوج dotProd_8s(ثابت فراغ* src1, ثابت فراغ* src2, صحيح len)
 {
     CV_INSTRUMENT_REGION();
-    CV_CPU_DISPATCH(dotProd_8s, ((const schar*)src1, (const schar*)src2, len),
+    CV_CPU_DISPATCH(dotProd_8s, ((ثابت schar*)src1, (ثابت schar*)src2, len),
         CV_CPU_DISPATCH_MODES_ALL);
 }
-static double dotProd_16u(const void* src1, const void* src2, int len)
+ساكن مزدوج dotProd_16u(ثابت فراغ* src1, ثابت فراغ* src2, صحيح len)
 {
     CV_INSTRUMENT_REGION();
-    CV_CPU_DISPATCH(dotProd_16u, ((const ushort*)src1, (const ushort*)src2, len),
+    CV_CPU_DISPATCH(dotProd_16u, ((ثابت ushort*)src1, (ثابت ushort*)src2, len),
         CV_CPU_DISPATCH_MODES_ALL);
 }
-static double dotProd_16s(const void* src1, const void* src2, int len)
+ساكن مزدوج dotProd_16s(ثابت فراغ* src1, ثابت فراغ* src2, صحيح len)
 {
     CV_INSTRUMENT_REGION();
-    CV_CPU_DISPATCH(dotProd_16s, ((const short*)src1, (const short*)src2, len),
+    CV_CPU_DISPATCH(dotProd_16s, ((ثابت لنډ*)src1, (ثابت لنډ*)src2, len),
         CV_CPU_DISPATCH_MODES_ALL);
 }
-static double dotProd_32s(const void* src1, const void* src2, int len)
+ساكن مزدوج dotProd_32s(ثابت فراغ* src1, ثابت فراغ* src2, صحيح len)
 {
     CV_INSTRUMENT_REGION();
-    CV_CPU_DISPATCH(dotProd_32s, ((const int*)src1, (const int*)src2, len),
+    CV_CPU_DISPATCH(dotProd_32s, ((ثابت صحيح*)src1, (ثابت صحيح*)src2, len),
         CV_CPU_DISPATCH_MODES_ALL);
 }
-static double dotProd_32f(const void* src1, const void* src2, int len)
+ساكن مزدوج dotProd_32f(ثابت فراغ* src1, ثابت فراغ* src2, صحيح len)
 {
     CV_INSTRUMENT_REGION();
-    CV_CPU_DISPATCH(dotProd_32f, ((const float*)src1, (const float*)src2, len),
+    CV_CPU_DISPATCH(dotProd_32f, ((ثابت عائم*)src1, (ثابت عائم*)src2, len),
         CV_CPU_DISPATCH_MODES_ALL);
 }
-static double dotProd_64f(const void* src1, const void* src2, int len)
+ساكن مزدوج dotProd_64f(ثابت فراغ* src1, ثابت فراغ* src2, صحيح len)
 {
     CV_INSTRUMENT_REGION();
-    CV_CPU_DISPATCH(dotProd_64f, ((const double*)src1, (const double*)src2, len),
+    CV_CPU_DISPATCH(dotProd_64f, ((ثابت مزدوج*)src1, (ثابت مزدوج*)src2, len),
         CV_CPU_DISPATCH_MODES_ALL);
 }
 
-typedef double (*DotProdFunc)(const void* src1, const void* src2, int len);
+تعريفنوع مزدوج (*DotProdFunc)(ثابت فراغ* src1, ثابت فراغ* src2, صحيح len);
 
-static DotProdFunc getDotProdFunc(int depth)
+ساكن DotProdFunc getDotProdFunc(صحيح ژوروالی)
 {
-    static DotProdFunc dotProdTab[CV_DEPTH_MAX] =
+    ساكن DotProdFunc dotProdTab[CV_ژوروالی_MAX] =
     {
         dotProd_8u, dotProd_8s,
         dotProd_16u, dotProd_16s,
@@ -985,113 +985,113 @@ static DotProdFunc getDotProdFunc(int depth)
         dotProd_64f, 0
     };
 
-    return dotProdTab[depth];
+    أرجع dotProdTab[ژوروالی];
 }
 
-double Mat::dot(InputArray _mat) const
+مزدوج Mat::dot(ننوت_Array _mat) ثابت
 {
     CV_INSTRUMENT_REGION();
 
     Mat mat = _mat.getMat();
     CV_Assert_N( mat.type() == type(), mat.size == size);
 
-    int cn = channels();
-    if (this->dims <= 2)
+    صحيح cn = channels();
+    إذا (هذا->dims <= 2)
     {
-        double product = 0;
-        CALL_HAL_RET(dotProduct, cv_hal_dotProduct, product, this->data, this->step, mat.data, mat.step,
-                     this->cols * cn, this->rows, this->depth());
+        مزدوج حاصل_ضرب = 0;
+        CALL_HAL_RET(dot_حاصل_ضرب, cv_hal_dot_حاصل_ضرب, حاصل_ضرب, هذا->معلومات, هذا->ګام, mat.معلومات, mat.ګام,
+                     هذا->ستون_شمېر * cn, هذا->لیکې, هذا->ژوروالی());
     }
 
-    DotProdFunc func = getDotProdFunc(depth());
+    DotProdFunc func = getDotProdFunc(ژوروالی());
     CV_Assert(func != 0 );
 
-    if( isContinuous() && mat.isContinuous() )
+    إذا( isContinuous() && mat.isContinuous() )
     {
-        size_t len = total()*cn;
-        if( len == (size_t)(int)len )
-            return func(data, mat.data, (int)len);
+        size_t len = ټول()*cn;
+        إذا( len == (size_t)(صحيح)len )
+            أرجع func(معلومات, mat.معلومات, (صحيح)len);
     }
 
-    const Mat* arrays[] = {this, &mat, 0};
+    ثابت Mat* arrays[] = {هذا, &mat, 0};
     uchar* ptrs[2] = {};
     NAryMatIterator it(arrays, ptrs);
-    int len = (int)(it.size*cn);
-    double r = 0;
+    صحيح len = (صحيح)(it.size*cn);
+    مزدوج r = 0;
 
-    for( size_t i = 0; i < it.nplanes; i++, ++it )
+    لكل( size_t i = 0; i < it.nplanes; i++, ++it )
         r += func( ptrs[0], ptrs[1], len );
 
-    return r;
+    أرجع r;
 }
 
 
-#ifdef HAVE_OPENCL
+#که_تعریف_شوی HAVE_OPENCL
 
-static bool ocl_dot( InputArray _src1, InputArray _src2, double & res )
+ساكن منطقي ocl_dot( ننوت_Array _src1, ننوت_Array _src2, مزدوج & res )
 {
     UMat src1 = _src1.getUMat().reshape(1), src2 = _src2.getUMat().reshape(1);
 
-    int type = src1.type(), depth = CV_MAT_DEPTH(type),
-            kercn = ocl::predictOptimalVectorWidth(src1, src2);
-    bool doubleSupport = ocl::Device::getDefault().doubleFPConfig() > 0;
+    صحيح type = src1.type(), ژوروالی = CV_MAT_ژوروالی(type),
+            kercn = ocl::predict_Optimal_ویکټور_پلنوالی(src1, src2);
+    منطقي doubleSupport = ocl::Device::getDefault().doubleFPConfig() > 0;
 
-    if ( !doubleSupport && depth == CV_64F )
-        return false;
+    إذا ( !doubleSupport && ژوروالی == CV_64F )
+        أرجع خطأ;
 
-    int dbsize = ocl::Device::getDefault().maxComputeUnits();
-    size_t wgs = ocl::Device::getDefault().maxWorkGroupSize();
-    int ddepth = std::max(CV_32F, depth);
+    صحيح dbsize = ocl::Device::getDefault().maxComputeUnits();
+    size_t wgs = ocl::Device::getDefault().max_Work_ډله_اندازه();
+    صحيح ddepth = std::max(CV_32F, ژوروالی);
 
-    int wgs2_aligned = 1;
-    while (wgs2_aligned < (int)wgs)
+    صحيح wgs2_aligned = 1;
+    طالما (wgs2_aligned < (صحيح)wgs)
         wgs2_aligned <<= 1;
     wgs2_aligned >>= 1;
 
-    char cvt[50];
+    حرف cvt[50];
     ocl::Kernel k("reduce", ocl::core::reduce_oclsrc,
                   format("-D srcT=%s -D srcT1=%s -D dstT=%s -D dstTK=%s -D ddepth=%d -D convertToDT=%s -D OP_DOT "
                          "-D WGS=%d -D WGS2_ALIGNED=%d%s%s%s -D kercn=%d",
-                         ocl::typeToStr(CV_MAKE_TYPE(depth, kercn)), ocl::typeToStr(depth),
-                         ocl::typeToStr(ddepth), ocl::typeToStr(CV_MAKE_TYPE(ddepth, kercn)),
-                         ddepth, ocl::convertTypeStr(depth, ddepth, kercn, cvt, sizeof(cvt)),
-                         (int)wgs, wgs2_aligned, doubleSupport ? " -D DOUBLE_SUPPORT" : "",
+                         ocl::type_منزل_Str(CV_MAKE_TYPE(ژوروالی, kercn)), ocl::type_منزل_Str(ژوروالی),
+                         ocl::type_منزل_Str(ddepth), ocl::type_منزل_Str(CV_MAKE_TYPE(ddepth, kercn)),
+                         ddepth, ocl::convertTypeStr(ژوروالی, ddepth, kercn, cvt, حجم(cvt)),
+                         (صحيح)wgs, wgs2_aligned, doubleSupport ? " -D DOUBLE_SUPPORT" : "",
                          _src1.isContinuous() ? " -D HAVE_SRC_CONT" : "",
                          _src2.isContinuous() ? " -D HAVE_SRC2_CONT" : "", kercn));
-    if (k.empty())
-        return false;
+    إذا (k.empty())
+        أرجع خطأ;
 
     UMat db(1, dbsize, ddepth);
 
-    ocl::KernelArg src1arg = ocl::KernelArg::ReadOnlyNoSize(src1),
-            src2arg = ocl::KernelArg::ReadOnlyNoSize(src2),
+    ocl::KernelArg src1arg = ocl::KernelArg::Read_Only_No_اندازه(src1),
+            src2arg = ocl::KernelArg::Read_Only_No_اندازه(src2),
             dbarg = ocl::KernelArg::PtrWriteOnly(db);
 
-    k.args(src1arg, src1.cols, (int)src1.total(), dbsize, dbarg, src2arg);
+    k.دلیلونه(src1arg, src1.ستون_شمېر, (صحيح)src1.ټول(), dbsize, dbarg, src2arg);
 
     size_t globalsize = dbsize * wgs;
-    if (k.run(1, &globalsize, &wgs, true))
+    إذا (k.پرلپسې(1, &globalsize, &wgs, ریښتیا))
     {
-        res = sum(db.getMat(ACCESS_READ))[0];
-        return true;
+        res = مجموعه(db.getMat(ACCESS_READ))[0];
+        أرجع ریښتیا;
     }
-    return false;
+    أرجع خطأ;
 }
 
-#endif
+#د_که_پای
 
-double UMat::dot(InputArray m) const
+مزدوج UMat::dot(ننوت_Array m) ثابت
 {
     CV_INSTRUMENT_REGION();
 
-    CV_Assert(m.sameSize(*this) && m.type() == type());
+    CV_Assert(m.same_اندازه(*هذا) && m.type() == type());
 
-#ifdef HAVE_OPENCL
-    double r = 0;
-    CV_OCL_RUN_(dims <= 2, ocl_dot(*this, m, r), r)
-#endif
+#که_تعریف_شوی HAVE_OPENCL
+    مزدوج r = 0;
+    CV_OCL_پرلپسې_2(dims <= 2, ocl_dot(*هذا, m, r), r)
+#د_که_پای
 
-    return getMat(ACCESS_READ).dot(m);
+    أرجع getMat(ACCESS_READ).dot(m);
 }
 
 }  // namespace cv::

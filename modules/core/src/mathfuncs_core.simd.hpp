@@ -2,80 +2,80 @@
 // It is subject to the license terms in the LICENSE file found in the top-level directory
 // of this distribution and at http://opencv.org/license.html.
 
-#include "mathfuncs.hpp"
+#ضمن "mathfuncs.hpp"
 
-namespace cv { namespace hal {
+نطاق cv { نطاق hal {
 
 CV_CPU_OPTIMIZATION_NAMESPACE_BEGIN
 
 // forward declarations
-void cartToPolar32f(const float *X, const float *Y, float* mag, float *angle, int len, bool angleInDegrees);
-void cartToPolar64f(const double *X, const double *Y, double* mag, double *angle, int len, bool angleInDegrees);
-void polarToCart32f(const float *mag, const float *angle, float *X, float *Y, int len, bool angleInDegrees);
-void polarToCart64f(const double *mag, const double *angle, double *X, double *Y, int len, bool angleInDegrees);
-void fastAtan32f(const float *Y, const float *X, float *angle, int len, bool angleInDegrees);
-void fastAtan64f(const double *Y, const double *X, double *angle, int len, bool angleInDegrees);
-void fastAtan2(const float *Y, const float *X, float *angle, int len, bool angleInDegrees);
-void magnitude32f(const float* x, const float* y, float* mag, int len);
-void magnitude64f(const double* x, const double* y, double* mag, int len);
-void invSqrt32f(const float* src, float* dst, int len);
-void invSqrt64f(const double* src, double* dst, int len);
-void sqrt32f(const float* src, float* dst, int len);
-void sqrt64f(const double* src, double* dst, int len);
-float fastAtan2(float y, float x);
+فراغ cart_منزل_Polar32f(ثابت عائم *X, ثابت عائم *Y, عائم* mag, عائم *angle, صحيح len, منطقي angle_دننه_Degrees);
+فراغ cart_منزل_Polar64f(ثابت مزدوج *X, ثابت مزدوج *Y, مزدوج* mag, مزدوج *angle, صحيح len, منطقي angle_دننه_Degrees);
+فراغ polar_منزل_Cart32f(ثابت عائم *mag, ثابت عائم *angle, عائم *X, عائم *Y, صحيح len, منطقي angle_دننه_Degrees);
+فراغ polar_منزل_Cart64f(ثابت مزدوج *mag, ثابت مزدوج *angle, مزدوج *X, مزدوج *Y, صحيح len, منطقي angle_دننه_Degrees);
+فراغ fastAtan32f(ثابت عائم *Y, ثابت عائم *X, عائم *angle, صحيح len, منطقي angle_دننه_Degrees);
+فراغ fastAtan64f(ثابت مزدوج *Y, ثابت مزدوج *X, مزدوج *angle, صحيح len, منطقي angle_دننه_Degrees);
+فراغ fastAtan2(ثابت عائم *Y, ثابت عائم *X, عائم *angle, صحيح len, منطقي angle_دننه_Degrees);
+فراغ magnitude32f(ثابت عائم* x, ثابت عائم* y, عائم* mag, صحيح len);
+فراغ magnitude64f(ثابت مزدوج* x, ثابت مزدوج* y, مزدوج* mag, صحيح len);
+فراغ invSqrt32f(ثابت عائم* src, عائم* dst, صحيح len);
+فراغ invSqrt64f(ثابت مزدوج* src, مزدوج* dst, صحيح len);
+فراغ sqrt32f(ثابت عائم* src, عائم* dst, صحيح len);
+فراغ sqrt64f(ثابت مزدوج* src, مزدوج* dst, صحيح len);
+عائم fastAtan2(عائم y, عائم x);
 
-#ifndef CV_CPU_OPTIMIZATION_DECLARATIONS_ONLY
+#که_نه_تعریف_شوی CV_CPU_OPTIMIZATION_DECLARATIONS_ONLY
 
-using namespace std;
-using namespace cv;
+کارول نطاق std;
+کارول نطاق cv;
 
-namespace {
+نطاق {
 
-static const float atan2_p1 = 0.9997878412794807f*(float)(180/CV_PI);
-static const float atan2_p3 = -0.3258083974640975f*(float)(180/CV_PI);
-static const float atan2_p5 = 0.1555786518463281f*(float)(180/CV_PI);
-static const float atan2_p7 = -0.04432655554792128f*(float)(180/CV_PI);
+ساكن ثابت عائم atan2_p1 = 0.9997878412794807f*(عائم)(180/CV_PI);
+ساكن ثابت عائم atan2_p3 = -0.3258083974640975f*(عائم)(180/CV_PI);
+ساكن ثابت عائم atan2_p5 = 0.1555786518463281f*(عائم)(180/CV_PI);
+ساكن ثابت عائم atan2_p7 = -0.04432655554792128f*(عائم)(180/CV_PI);
 
-#ifdef __EMSCRIPTEN__
-static inline float atan_f32(float y, float x)
+#که_تعریف_شوی __EMSCRIPTEN__
+ساكن مضمن عائم atan_f32(عائم y, عائم x)
 {
-    float a = atan2(y, x) * 180.0f / CV_PI;
-    if (a < 0.0f)
+    عائم a = atan2(y, x) * 180.0f / CV_PI;
+    إذا (a < 0.0f)
         a += 360.0f;
-    if (a >= 360.0f)
+    إذا (a >= 360.0f)
         a -= 360.0f;
-    return a; // range [0; 360)
+    أرجع a; // range [0; 360)
 }
-#else
-static inline float atan_f32(float y, float x)
+#وإلا
+ساكن مضمن عائم atan_f32(عائم y, عائم x)
 {
-    float ax = std::abs(x), ay = std::abs(y);
-    float a, c, c2;
-    if( ax >= ay )
+    عائم ax = std::مطلق_قیمت(x), ay = std::مطلق_قیمت(y);
+    عائم a, c, c2;
+    إذا( ax >= ay )
     {
-        c = ay/(ax + (float)DBL_EPSILON);
+        c = ay/(ax + (عائم)DBL_EPSILON);
         c2 = c*c;
         a = (((atan2_p7*c2 + atan2_p5)*c2 + atan2_p3)*c2 + atan2_p1)*c;
     }
-    else
+    وإلا
     {
-        c = ax/(ay + (float)DBL_EPSILON);
+        c = ax/(ay + (عائم)DBL_EPSILON);
         c2 = c*c;
         a = 90.f - (((atan2_p7*c2 + atan2_p5)*c2 + atan2_p3)*c2 + atan2_p1)*c;
     }
-    if( x < 0 )
+    إذا( x < 0 )
         a = 180.f - a;
-    if( y < 0 )
+    إذا( y < 0 )
         a = 360.f - a;
-    return a;
+    أرجع a;
 }
-#endif
+#د_که_پای
 
-#if (CV_SIMD || CV_SIMD_SCALABLE)
+#إذا (CV_SIMD || CV_SIMD_SCALABLE)
 
-v_float32 v_atan_f32(const v_float32& y, const v_float32& x)
+v_float32 v_atan_f32(ثابت v_float32& y, ثابت v_float32& x)
 {
-    v_float32 eps = vx_setall_f32((float)DBL_EPSILON);
+    v_float32 eps = vx_setall_f32((عائم)DBL_EPSILON);
     v_float32 z = vx_setzero_f32();
     v_float32 p7 = vx_setall_f32(atan2_p7);
     v_float32 p5 = vx_setall_f32(atan2_p5);
@@ -87,43 +87,43 @@ v_float32 v_atan_f32(const v_float32& y, const v_float32& x)
 
     v_float32 ax = v_abs(x);
     v_float32 ay = v_abs(y);
-    v_float32 c = v_div(v_min(ax, ay), v_add(v_max(ax, ay), eps));
+    v_float32 c = v_div(v_min(ax, ay), v_جمع_کړه(v_max(ax, ay), eps));
     v_float32 cc = v_mul(c, c);
     v_float32 a = v_mul(v_fma(v_fma(v_fma(cc, p7, p5), cc, p3), cc, p1), c);
     a = v_select(v_ge(ax, ay), a, v_sub(val90, a));
     a = v_select(v_lt(x, z), v_sub(val180, a), a);
     a = v_select(v_lt(y, z), v_sub(val360, a), a);
-    return a;
+    أرجع a;
 }
 
-#endif
+#د_که_پای
 
 } // anonymous::
 
-static void cartToPolar32f_(const float *X, const float *Y, float *mag, float *angle, int len, bool angleInDegrees )
+ساكن فراغ cart_منزل_Polar32f_2(ثابت عائم *X, ثابت عائم *Y, عائم *mag, عائم *angle, صحيح len, منطقي angle_دننه_Degrees )
 {
-    float scale = angleInDegrees ? 1.f : (float)(CV_PI/180);
-    int i = 0;
-#if (CV_SIMD || CV_SIMD_SCALABLE)
-    const int VECSZ = VTraits<v_float32>::vlanes();
+    عائم scale = angle_دننه_Degrees ? 1.f : (عائم)(CV_PI/180);
+    صحيح i = 0;
+#إذا (CV_SIMD || CV_SIMD_SCALABLE)
+    ثابت صحيح VECSZ = VTraits<v_float32>::vlanes();
     v_float32 s = vx_setall_f32(scale);
 
-    for( ; i < len; i += VECSZ*2 )
+    لكل( ; i < len; i += VECSZ*2 )
     {
-        if( i + VECSZ*2 > len )
+        إذا( i + VECSZ*2 > len )
         {
             // if it's inplace operation, we cannot repeatedly process
             // the tail for the second time, so we have to use the
             // scalar code
-            if( i == 0 || angle == X || angle == Y )
-                break;
+            إذا( i == 0 || angle == X || angle == Y )
+                اكسر;
             i = len - VECSZ*2;
         }
 
-        v_float32 x0 = vx_load(X + i);
-        v_float32 y0 = vx_load(Y + i);
-        v_float32 x1 = vx_load(X + i + VECSZ);
-        v_float32 y1 = vx_load(Y + i + VECSZ);
+        v_float32 x0 = vx_بارول(X + i);
+        v_float32 y0 = vx_بارول(Y + i);
+        v_float32 x1 = vx_بارول(X + i + VECSZ);
+        v_float32 y1 = vx_بارول(Y + i + VECSZ);
 
         v_float32 m0 = v_sqrt(v_muladd(x0, x0, v_mul(y0, y0)));
         v_float32 m1 = v_sqrt(v_muladd(x1, x1, v_mul(y1, y1)));
@@ -138,51 +138,51 @@ static void cartToPolar32f_(const float *X, const float *Y, float *mag, float *a
         v_store(angle + i + VECSZ, r1);
     }
     vx_cleanup();
-#endif
+#د_که_پای
 
-    for( ; i < len; i++ )
+    لكل( ; i < len; i++ )
     {
-        float x0 = X[i], y0 = Y[i];
-        mag[i] = std::sqrt(x0*x0 + y0*y0);
+        عائم x0 = X[i], y0 = Y[i];
+        mag[i] = std::جذر(x0*x0 + y0*y0);
         angle[i] = atan_f32(y0, x0)*scale;
     }
 }
 
-void cartToPolar32f(const float *X, const float *Y, float *mag, float *angle, int len, bool angleInDegrees )
+فراغ cart_منزل_Polar32f(ثابت عائم *X, ثابت عائم *Y, عائم *mag, عائم *angle, صحيح len, منطقي angle_دننه_Degrees )
 {
     CV_INSTRUMENT_REGION();
-    cartToPolar32f_(X, Y, mag, angle, len, angleInDegrees );
+    cart_منزل_Polar32f_2(X, Y, mag, angle, len, angle_دننه_Degrees );
 }
 
-void cartToPolar64f(const double *X, const double *Y, double *mag, double *angle, int len, bool angleInDegrees)
+فراغ cart_منزل_Polar64f(ثابت مزدوج *X, ثابت مزدوج *Y, مزدوج *mag, مزدوج *angle, صحيح len, منطقي angle_دننه_Degrees)
 {
     CV_INSTRUMENT_REGION();
 
-    const int BLKSZ = 128;
-    float ybuf[BLKSZ], xbuf[BLKSZ], mbuf[BLKSZ], abuf[BLKSZ];
-    for( int i = 0; i < len; i += BLKSZ )
+    ثابت صحيح BLKSZ = 128;
+    عائم ybuf[BLKSZ], xbuf[BLKSZ], mbuf[BLKSZ], abuf[BLKSZ];
+    لكل( صحيح i = 0; i < len; i += BLKSZ )
     {
-        int j, blksz = std::min(BLKSZ, len - i);
-        for( j = 0; j < blksz; j++ )
+        صحيح j, blksz = std::min(BLKSZ, len - i);
+        لكل( j = 0; j < blksz; j++ )
         {
-            xbuf[j] = (float)X[i + j];
-            ybuf[j] = (float)Y[i + j];
+            xbuf[j] = (عائم)X[i + j];
+            ybuf[j] = (عائم)Y[i + j];
         }
-        cartToPolar32f_(xbuf, ybuf, mbuf, abuf, blksz, angleInDegrees);
-        for( j = 0; j < blksz; j++ )
+        cart_منزل_Polar32f_2(xbuf, ybuf, mbuf, abuf, blksz, angle_دننه_Degrees);
+        لكل( j = 0; j < blksz; j++ )
             mag[i + j] = mbuf[j];
-        for( j = 0; j < blksz; j++ )
+        لكل( j = 0; j < blksz; j++ )
             angle[i + j] = abuf[j];
     }
 }
 
-namespace {
+نطاق {
 
-static inline void SinCos_32f(const float* mag, const float* angle, float* cosval, float* sinval, int len, int angle_in_degrees)
+ساكن مضمن فراغ SinCos_32f(ثابت عائم* mag, ثابت عائم* angle, عائم* cosval, عائم* sinval, صحيح len, صحيح angle_دننه_degrees)
 {
-    const int N = 64;
+    ثابت صحيح N = 64;
 
-    static const double sin_table[] =
+    ساكن ثابت مزدوج sin_جدول[] =
     {
      0.00000000000000000000,     0.09801714032956060400,
      0.19509032201612825000,     0.29028467725446233000,
@@ -218,49 +218,49 @@ static inline void SinCos_32f(const float* mag, const float* angle, float* cosva
     -0.19509032201612872000,    -0.09801714032956050600,
     };
 
-    static const double k2 = (2*CV_PI)/N;
+    ساكن ثابت مزدوج k2 = (2*CV_PI)/N;
 
-    static const double sin_a0 = -0.166630293345647*k2*k2*k2;
-    static const double sin_a2 = k2;
+    ساكن ثابت مزدوج sin_a0 = -0.166630293345647*k2*k2*k2;
+    ساكن ثابت مزدوج sin_a2 = k2;
 
-    static const double cos_a0 = -0.499818138450326*k2*k2;
+    ساكن ثابت مزدوج cos_a0 = -0.499818138450326*k2*k2;
     /*static const double cos_a2 =  1;*/
 
-    double k1;
-    int i = 0;
+    مزدوج k1;
+    صحيح i = 0;
 
-    if( !angle_in_degrees )
+    إذا( !angle_دننه_degrees )
         k1 = N/(2*CV_PI);
-    else
+    وإلا
         k1 = N/360.;
 
-#if (CV_SIMD || CV_SIMD_SCALABLE)
-    const int VECSZ = VTraits<v_float32>::vlanes();
-    const v_float32 scale = vx_setall_f32(angle_in_degrees ? (float)CV_PI / 180.f : 1.f);
+#إذا (CV_SIMD || CV_SIMD_SCALABLE)
+    ثابت صحيح VECSZ = VTraits<v_float32>::vlanes();
+    ثابت v_float32 scale = vx_setall_f32(angle_دننه_degrees ? (عائم)CV_PI / 180.f : 1.f);
 
-    for( ; i < len; i += VECSZ*2 )
+    لكل( ; i < len; i += VECSZ*2 )
     {
-        if( i + VECSZ*2 > len )
+        إذا( i + VECSZ*2 > len )
         {
             // if it's inplace operation, we cannot repeatedly process
             // the tail for the second time, so we have to use the
             // scalar code
-            if( i == 0 || angle == cosval || angle == sinval || mag == cosval || mag == sinval )
-                break;
+            إذا( i == 0 || angle == cosval || angle == sinval || mag == cosval || mag == sinval )
+                اكسر;
             i = len - VECSZ*2;
         }
 
-        v_float32 r0 = v_mul(vx_load(angle + i), scale);
-        v_float32 r1 = v_mul(vx_load(angle + i + VECSZ), scale);
+        v_float32 r0 = v_mul(vx_بارول(angle + i), scale);
+        v_float32 r1 = v_mul(vx_بارول(angle + i + VECSZ), scale);
 
         v_float32 c0, c1, s0, s1;
         v_sincos(r0, s0, c0);
         v_sincos(r1, s1, c1);
 
-        if( mag )
+        إذا( mag )
         {
-            v_float32 m0 = vx_load(mag + i);
-            v_float32 m1 = vx_load(mag + i + VECSZ);
+            v_float32 m0 = vx_بارول(mag + i);
+            v_float32 m1 = vx_بارول(mag + i + VECSZ);
             c0 = v_mul(c0, m0);
             c1 = v_mul(c1, m1);
             s0 = v_mul(s0, m0);
@@ -274,93 +274,93 @@ static inline void SinCos_32f(const float* mag, const float* angle, float* cosva
         v_store(sinval + i + VECSZ, s1);
     }
     vx_cleanup();
-#endif
+#د_که_پای
 
-    for( ; i < len; i++ )
+    لكل( ; i < len; i++ )
     {
-        double t = angle[i]*k1;
-        int it = cvRound(t);
+        مزدوج t = angle[i]*k1;
+        صحيح it = cv_پړاو(t);
         t -= it;
-        int sin_idx = it & (N - 1);
-        int cos_idx = (N/4 - sin_idx) & (N - 1);
+        صحيح sin_idx = it & (N - 1);
+        صحيح cos_idx = (N/4 - sin_idx) & (N - 1);
 
-        double sin_b = (sin_a0*t*t + sin_a2)*t;
-        double cos_b = cos_a0*t*t + 1;
+        مزدوج sin_b = (sin_a0*t*t + sin_a2)*t;
+        مزدوج cos_b = cos_a0*t*t + 1;
 
-        double sin_a = sin_table[sin_idx];
-        double cos_a = sin_table[cos_idx];
+        مزدوج sin_a = sin_جدول[sin_idx];
+        مزدوج cos_a = sin_جدول[cos_idx];
 
-        double sin_val = sin_a*cos_b + cos_a*sin_b;
-        double cos_val = cos_a*cos_b - sin_a*sin_b;
+        مزدوج sin_val = sin_a*cos_b + cos_a*sin_b;
+        مزدوج cos_val = cos_a*cos_b - sin_a*sin_b;
 
-        if (mag)
+        إذا (mag)
         {
-            double mag_val = mag[i];
+            مزدوج mag_val = mag[i];
             sin_val *= mag_val;
             cos_val *= mag_val;
         }
 
-        sinval[i] = (float)sin_val;
-        cosval[i] = (float)cos_val;
+        sinval[i] = (عائم)sin_val;
+        cosval[i] = (عائم)cos_val;
     }
 }
 
 } // anonymous::
 
-void polarToCart32f(const float *mag, const float *angle, float *X, float *Y, int len, bool angleInDegrees)
+فراغ polar_منزل_Cart32f(ثابت عائم *mag, ثابت عائم *angle, عائم *X, عائم *Y, صحيح len, منطقي angle_دننه_Degrees)
 {
     CV_INSTRUMENT_REGION();
-    SinCos_32f(mag, angle, X, Y, len, angleInDegrees);
+    SinCos_32f(mag, angle, X, Y, len, angle_دننه_Degrees);
 }
 
-void polarToCart64f(const double *mag, const double *angle, double *X, double *Y, int len, bool angleInDegrees)
+فراغ polar_منزل_Cart64f(ثابت مزدوج *mag, ثابت مزدوج *angle, مزدوج *X, مزدوج *Y, صحيح len, منطقي angle_دننه_Degrees)
 {
     CV_INSTRUMENT_REGION();
 
-    const int BLKSZ = 128;
-    float ybuf[BLKSZ], xbuf[BLKSZ], _mbuf[BLKSZ], abuf[BLKSZ];
-    float* mbuf = mag ? _mbuf : nullptr;
-    for( int i = 0; i < len; i += BLKSZ )
+    ثابت صحيح BLKSZ = 128;
+    عائم ybuf[BLKSZ], xbuf[BLKSZ], _mbuf[BLKSZ], abuf[BLKSZ];
+    عائم* mbuf = mag ? _mbuf : تش_اشاره;
+    لكل( صحيح i = 0; i < len; i += BLKSZ )
     {
-        int j, blksz = std::min(BLKSZ, len - i);
-        for( j = 0; j < blksz; j++ )
+        صحيح j, blksz = std::min(BLKSZ, len - i);
+        لكل( j = 0; j < blksz; j++ )
         {
-            if (mbuf)
-                mbuf[j] = (float)mag[i + j];
-            abuf[j] = (float)angle[i + j];
+            إذا (mbuf)
+                mbuf[j] = (عائم)mag[i + j];
+            abuf[j] = (عائم)angle[i + j];
         }
-        SinCos_32f(mbuf, abuf, xbuf, ybuf, blksz, angleInDegrees);
-        for( j = 0; j < blksz; j++ )
+        SinCos_32f(mbuf, abuf, xbuf, ybuf, blksz, angle_دننه_Degrees);
+        لكل( j = 0; j < blksz; j++ )
             X[i + j] = xbuf[j];
-        for( j = 0; j < blksz; j++ )
+        لكل( j = 0; j < blksz; j++ )
             Y[i + j] = ybuf[j];
     }
 }
 
-static void fastAtan32f_(const float *Y, const float *X, float *angle, int len, bool angleInDegrees )
+ساكن فراغ fastAtan32f_(ثابت عائم *Y, ثابت عائم *X, عائم *angle, صحيح len, منطقي angle_دننه_Degrees )
 {
-    float scale = angleInDegrees ? 1.f : (float)(CV_PI/180);
-    int i = 0;
-#if (CV_SIMD || CV_SIMD_SCALABLE)
-    const int VECSZ = VTraits<v_float32>::vlanes();
+    عائم scale = angle_دننه_Degrees ? 1.f : (عائم)(CV_PI/180);
+    صحيح i = 0;
+#إذا (CV_SIMD || CV_SIMD_SCALABLE)
+    ثابت صحيح VECSZ = VTraits<v_float32>::vlanes();
     v_float32 s = vx_setall_f32(scale);
 
-    for( ; i < len; i += VECSZ*2 )
+    لكل( ; i < len; i += VECSZ*2 )
     {
-        if( i + VECSZ*2 > len )
+        إذا( i + VECSZ*2 > len )
         {
             // if it's inplace operation, we cannot repeatedly process
             // the tail for the second time, so we have to use the
             // scalar code
-            if( i == 0 || angle == X || angle == Y )
-                break;
+            إذا( i == 0 || angle == X || angle == Y )
+                اكسر;
             i = len - VECSZ*2;
         }
 
-        v_float32 y0 = vx_load(Y + i);
-        v_float32 x0 = vx_load(X + i);
-        v_float32 y1 = vx_load(Y + i + VECSZ);
-        v_float32 x1 = vx_load(X + i + VECSZ);
+        v_float32 y0 = vx_بارول(Y + i);
+        v_float32 x0 = vx_بارول(X + i);
+        v_float32 y1 = vx_بارول(Y + i + VECSZ);
+        v_float32 x1 = vx_بارول(X + i + VECSZ);
 
         v_float32 r0 = v_mul(v_atan_f32(y0, x0), s);
         v_float32 r1 = v_mul(v_atan_f32(y1, x1), s);
@@ -369,281 +369,281 @@ static void fastAtan32f_(const float *Y, const float *X, float *angle, int len, 
         v_store(angle + i + VECSZ, r1);
     }
     vx_cleanup();
-#endif
+#د_که_پای
 
-    for( ; i < len; i++ )
+    لكل( ; i < len; i++ )
         angle[i] = atan_f32(Y[i], X[i])*scale;
 }
 
-void fastAtan32f(const float *Y, const float *X, float *angle, int len, bool angleInDegrees )
+فراغ fastAtan32f(ثابت عائم *Y, ثابت عائم *X, عائم *angle, صحيح len, منطقي angle_دننه_Degrees )
 {
     CV_INSTRUMENT_REGION();
-    fastAtan32f_(Y, X, angle, len, angleInDegrees );
+    fastAtan32f_(Y, X, angle, len, angle_دننه_Degrees );
 }
 
-void fastAtan64f(const double *Y, const double *X, double *angle, int len, bool angleInDegrees)
+فراغ fastAtan64f(ثابت مزدوج *Y, ثابت مزدوج *X, مزدوج *angle, صحيح len, منطقي angle_دننه_Degrees)
 {
     CV_INSTRUMENT_REGION();
 
-    const int BLKSZ = 128;
-    float ybuf[BLKSZ], xbuf[BLKSZ], abuf[BLKSZ];
-    for( int i = 0; i < len; i += BLKSZ )
+    ثابت صحيح BLKSZ = 128;
+    عائم ybuf[BLKSZ], xbuf[BLKSZ], abuf[BLKSZ];
+    لكل( صحيح i = 0; i < len; i += BLKSZ )
     {
-        int j, blksz = std::min(BLKSZ, len - i);
-        for( j = 0; j < blksz; j++ )
+        صحيح j, blksz = std::min(BLKSZ, len - i);
+        لكل( j = 0; j < blksz; j++ )
         {
-            ybuf[j] = (float)Y[i + j];
-            xbuf[j] = (float)X[i + j];
+            ybuf[j] = (عائم)Y[i + j];
+            xbuf[j] = (عائم)X[i + j];
         }
-        fastAtan32f_(ybuf, xbuf, abuf, blksz, angleInDegrees);
-        for( j = 0; j < blksz; j++ )
+        fastAtan32f_(ybuf, xbuf, abuf, blksz, angle_دننه_Degrees);
+        لكل( j = 0; j < blksz; j++ )
             angle[i + j] = abuf[j];
     }
 }
 
 // deprecated
-void fastAtan2(const float *Y, const float *X, float *angle, int len, bool angleInDegrees )
+فراغ fastAtan2(ثابت عائم *Y, ثابت عائم *X, عائم *angle, صحيح len, منطقي angle_دننه_Degrees )
 {
     CV_INSTRUMENT_REGION();
-    fastAtan32f(Y, X, angle, len, angleInDegrees);
+    fastAtan32f(Y, X, angle, len, angle_دننه_Degrees);
 }
 
-void magnitude32f(const float* x, const float* y, float* mag, int len)
+فراغ magnitude32f(ثابت عائم* x, ثابت عائم* y, عائم* mag, صحيح len)
 {
     CV_INSTRUMENT_REGION();
 
-    int i = 0;
+    صحيح i = 0;
 
-#if (CV_SIMD || CV_SIMD_SCALABLE)
-    const int VECSZ = VTraits<v_float32>::vlanes();
-    for( ; i < len; i += VECSZ*2 )
+#إذا (CV_SIMD || CV_SIMD_SCALABLE)
+    ثابت صحيح VECSZ = VTraits<v_float32>::vlanes();
+    لكل( ; i < len; i += VECSZ*2 )
     {
-        if( i + VECSZ*2 > len )
+        إذا( i + VECSZ*2 > len )
         {
-            if( i == 0 || mag == x || mag == y )
-                break;
+            إذا( i == 0 || mag == x || mag == y )
+                اكسر;
             i = len - VECSZ*2;
         }
-        v_float32 x0 = vx_load(x + i), x1 = vx_load(x + i + VECSZ);
-        v_float32 y0 = vx_load(y + i), y1 = vx_load(y + i + VECSZ);
+        v_float32 x0 = vx_بارول(x + i), x1 = vx_بارول(x + i + VECSZ);
+        v_float32 y0 = vx_بارول(y + i), y1 = vx_بارول(y + i + VECSZ);
         x0 = v_sqrt(v_muladd(x0, x0, v_mul(y0, y0)));
         x1 = v_sqrt(v_muladd(x1, x1, v_mul(y1, y1)));
         v_store(mag + i, x0);
         v_store(mag + i + VECSZ, x1);
     }
     vx_cleanup();
-#endif
+#د_که_پای
 
-    for( ; i < len; i++ )
+    لكل( ; i < len; i++ )
     {
-        float x0 = x[i], y0 = y[i];
-        mag[i] = std::sqrt(x0*x0 + y0*y0);
+        عائم x0 = x[i], y0 = y[i];
+        mag[i] = std::جذر(x0*x0 + y0*y0);
     }
 }
 
-void magnitude64f(const double* x, const double* y, double* mag, int len)
+فراغ magnitude64f(ثابت مزدوج* x, ثابت مزدوج* y, مزدوج* mag, صحيح len)
 {
     CV_INSTRUMENT_REGION();
 
-    int i = 0;
+    صحيح i = 0;
 
-#if (CV_SIMD_64F || CV_SIMD_SCALABLE_64F)
-    const int VECSZ = VTraits<v_float64>::vlanes();
-    for( ; i < len; i += VECSZ*2 )
+#إذا (CV_SIMD_64F || CV_SIMD_SCALABLE_64F)
+    ثابت صحيح VECSZ = VTraits<v_float64>::vlanes();
+    لكل( ; i < len; i += VECSZ*2 )
     {
-        if( i + VECSZ*2 > len )
+        إذا( i + VECSZ*2 > len )
         {
-            if( i == 0 || mag == x || mag == y )
-                break;
+            إذا( i == 0 || mag == x || mag == y )
+                اكسر;
             i = len - VECSZ*2;
         }
-        v_float64 x0 = vx_load(x + i), x1 = vx_load(x + i + VECSZ);
-        v_float64 y0 = vx_load(y + i), y1 = vx_load(y + i + VECSZ);
+        v_float64 x0 = vx_بارول(x + i), x1 = vx_بارول(x + i + VECSZ);
+        v_float64 y0 = vx_بارول(y + i), y1 = vx_بارول(y + i + VECSZ);
         x0 = v_sqrt(v_muladd(x0, x0, v_mul(y0, y0)));
         x1 = v_sqrt(v_muladd(x1, x1, v_mul(y1, y1)));
         v_store(mag + i, x0);
         v_store(mag + i + VECSZ, x1);
     }
     vx_cleanup();
-#endif
+#د_که_پای
 
-    for( ; i < len; i++ )
+    لكل( ; i < len; i++ )
     {
-        double x0 = x[i], y0 = y[i];
-        mag[i] = std::sqrt(x0*x0 + y0*y0);
+        مزدوج x0 = x[i], y0 = y[i];
+        mag[i] = std::جذر(x0*x0 + y0*y0);
     }
 }
 
 
-void invSqrt32f(const float* src, float* dst, int len)
+فراغ invSqrt32f(ثابت عائم* src, عائم* dst, صحيح len)
 {
     CV_INSTRUMENT_REGION();
 
-    int i = 0;
+    صحيح i = 0;
 
-#if (CV_SIMD || CV_SIMD_SCALABLE)
-    const int VECSZ = VTraits<v_float32>::vlanes();
-    for( ; i < len; i += VECSZ*2 )
+#إذا (CV_SIMD || CV_SIMD_SCALABLE)
+    ثابت صحيح VECSZ = VTraits<v_float32>::vlanes();
+    لكل( ; i < len; i += VECSZ*2 )
     {
-        if( i + VECSZ*2 > len )
+        إذا( i + VECSZ*2 > len )
         {
-            if( i == 0 || src == dst )
-                break;
+            إذا( i == 0 || src == dst )
+                اكسر;
             i = len - VECSZ*2;
         }
-        v_float32 t0 = vx_load(src + i), t1 = vx_load(src + i + VECSZ);
+        v_float32 t0 = vx_بارول(src + i), t1 = vx_بارول(src + i + VECSZ);
         t0 = v_invsqrt(t0);
         t1 = v_invsqrt(t1);
         v_store(dst + i, t0); v_store(dst + i + VECSZ, t1);
     }
     vx_cleanup();
-#endif
+#د_که_پای
 
-    for( ; i < len; i++ )
-        dst[i] = 1/std::sqrt(src[i]);
+    لكل( ; i < len; i++ )
+        dst[i] = 1/std::جذر(src[i]);
 }
 
 
-void invSqrt64f(const double* src, double* dst, int len)
+فراغ invSqrt64f(ثابت مزدوج* src, مزدوج* dst, صحيح len)
 {
     CV_INSTRUMENT_REGION();
-    int i = 0;
+    صحيح i = 0;
 
-#if (CV_SIMD_64F || CV_SIMD_SCALABLE_64F)
-    const int VECSZ = VTraits<v_float64>::vlanes();
-    for ( ; i < len; i += VECSZ*2)
+#إذا (CV_SIMD_64F || CV_SIMD_SCALABLE_64F)
+    ثابت صحيح VECSZ = VTraits<v_float64>::vlanes();
+    لكل ( ; i < len; i += VECSZ*2)
     {
-        if( i + VECSZ*2 > len )
+        إذا( i + VECSZ*2 > len )
         {
-            if( i == 0 || src == dst )
-                break;
+            إذا( i == 0 || src == dst )
+                اكسر;
             i = len - VECSZ*2;
         }
-        v_float64 t0 = vx_load(src + i), t1 = vx_load(src + i + VECSZ);
+        v_float64 t0 = vx_بارول(src + i), t1 = vx_بارول(src + i + VECSZ);
         t0 = v_invsqrt(t0);
         t1 = v_invsqrt(t1);
         v_store(dst + i, t0); v_store(dst + i + VECSZ, t1);
     }
-#endif
+#د_که_پای
 
-    for( ; i < len; i++ )
-        dst[i] = 1/std::sqrt(src[i]);
+    لكل( ; i < len; i++ )
+        dst[i] = 1/std::جذر(src[i]);
 }
 
 
-void sqrt32f(const float* src, float* dst, int len)
+فراغ sqrt32f(ثابت عائم* src, عائم* dst, صحيح len)
 {
     CV_INSTRUMENT_REGION();
 
-    int i = 0;
+    صحيح i = 0;
 
-#if (CV_SIMD || CV_SIMD_SCALABLE)
-    const int VECSZ = VTraits<v_float32>::vlanes();
-    for( ; i < len; i += VECSZ*2 )
+#إذا (CV_SIMD || CV_SIMD_SCALABLE)
+    ثابت صحيح VECSZ = VTraits<v_float32>::vlanes();
+    لكل( ; i < len; i += VECSZ*2 )
     {
-        if( i + VECSZ*2 > len )
+        إذا( i + VECSZ*2 > len )
         {
-            if( i == 0 || src == dst )
-                break;
+            إذا( i == 0 || src == dst )
+                اكسر;
             i = len - VECSZ*2;
         }
-        v_float32 t0 = vx_load(src + i), t1 = vx_load(src + i + VECSZ);
+        v_float32 t0 = vx_بارول(src + i), t1 = vx_بارول(src + i + VECSZ);
         t0 = v_sqrt(t0);
         t1 = v_sqrt(t1);
         v_store(dst + i, t0); v_store(dst + i + VECSZ, t1);
     }
     vx_cleanup();
-#endif
+#د_که_پای
 
-    for( ; i < len; i++ )
-        dst[i] = std::sqrt(src[i]);
+    لكل( ; i < len; i++ )
+        dst[i] = std::جذر(src[i]);
 }
 
 
-void sqrt64f(const double* src, double* dst, int len)
+فراغ sqrt64f(ثابت مزدوج* src, مزدوج* dst, صحيح len)
 {
     CV_INSTRUMENT_REGION();
 
-    int i = 0;
+    صحيح i = 0;
 
-#if (CV_SIMD_64F || CV_SIMD_SCALABLE_64F)
-    const int VECSZ = VTraits<v_float64>::vlanes();
-    for( ; i < len; i += VECSZ*2 )
+#إذا (CV_SIMD_64F || CV_SIMD_SCALABLE_64F)
+    ثابت صحيح VECSZ = VTraits<v_float64>::vlanes();
+    لكل( ; i < len; i += VECSZ*2 )
     {
-        if( i + VECSZ*2 > len )
+        إذا( i + VECSZ*2 > len )
         {
-            if( i == 0 || src == dst )
-                break;
+            إذا( i == 0 || src == dst )
+                اكسر;
             i = len - VECSZ*2;
         }
-        v_float64 t0 = vx_load(src + i), t1 = vx_load(src + i + VECSZ);
+        v_float64 t0 = vx_بارول(src + i), t1 = vx_بارول(src + i + VECSZ);
         t0 = v_sqrt(t0);
         t1 = v_sqrt(t1);
         v_store(dst + i, t0); v_store(dst + i + VECSZ, t1);
     }
     vx_cleanup();
-#endif
+#د_که_پای
 
-    for( ; i < len; i++ )
-        dst[i] = std::sqrt(src[i]);
+    لكل( ; i < len; i++ )
+        dst[i] = std::جذر(src[i]);
 }
 
 // Workaround for ICE in MSVS 2015 update 3 (issue #7795)
 // CV_AVX is not used here, because generated code is faster in non-AVX mode.
 // (tested with disabled IPP on i5-6300U)
-#if (defined _MSC_VER && _MSC_VER >= 1900 && (defined(_M_IX86) || defined(_M_X64))) || defined(__EMSCRIPTEN__)
-void exp32f(const float *src, float *dst, int n)
+#إذا (defined _MSC_VER && _MSC_VER >= 1900 && (defined(_M_IX86) || defined(_M_X64))) || defined(__EMSCRIPTEN__)
+فراغ exp32f(ثابت عائم *src, عائم *dst, صحيح n)
 {
     CV_INSTRUMENT_REGION();
 
-    for (int i = 0; i < n; i++)
+    لكل (صحيح i = 0; i < n; i++)
     {
-        dst[i] = std::exp(src[i]);
+        dst[i] = std::توانیز_تابع(src[i]);
     }
 }
 
-void exp64f(const double *src, double *dst, int n)
+فراغ exp64f(ثابت مزدوج *src, مزدوج *dst, صحيح n)
 {
     CV_INSTRUMENT_REGION();
 
-    for (int i = 0; i < n; i++)
+    لكل (صحيح i = 0; i < n; i++)
     {
-        dst[i] = std::exp(src[i]);
+        dst[i] = std::توانیز_تابع(src[i]);
     }
 }
 
-void log32f(const float *src, float *dst, int n)
+فراغ log32f(ثابت عائم *src, عائم *dst, صحيح n)
 {
     CV_INSTRUMENT_REGION();
 
-    for (int i = 0; i < n; i++)
+    لكل (صحيح i = 0; i < n; i++)
     {
-        dst[i] = std::log(src[i]);
+        dst[i] = std::لوګاریتم(src[i]);
     }
 }
-void log64f(const double *src, double *dst, int n)
+فراغ log64f(ثابت مزدوج *src, مزدوج *dst, صحيح n)
 {
     CV_INSTRUMENT_REGION();
 
-    for (int i = 0; i < n; i++)
+    لكل (صحيح i = 0; i < n; i++)
     {
-        dst[i] = std::log(src[i]);
+        dst[i] = std::لوګاریتم(src[i]);
     }
 }
-#else
+#وإلا
 
 ////////////////////////////////////// EXP /////////////////////////////////////
 
 
-#endif // issue 7795
+#د_که_پای // issue 7795
 
-float fastAtan2( float y, float x )
+عائم fastAtan2( عائم y, عائم x )
 {
-    return atan_f32(y, x);
+    أرجع atan_f32(y, x);
 }
 
-#endif // CV_CPU_OPTIMIZATION_DECLARATIONS_ONLY
+#د_که_پای // CV_CPU_OPTIMIZATION_DECLARATIONS_ONLY
 
-CV_CPU_OPTIMIZATION_NAMESPACE_END
+CV_CPU_OPTIMIZATION_NAMESPACE_پای_ټکی
 
 }} // namespace cv::hal
