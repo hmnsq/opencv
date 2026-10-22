@@ -40,9 +40,9 @@
 //
 //M*/
 
-#include "precomp.hpp"
+#अन्तर्भाव "precomp.hpp"
 
-namespace cv
+नामाकाश cv
 {
 
 ///////////////////////////// Functions Declaration //////////////////////////////////////
@@ -60,7 +60,7 @@ namespace cv
 // make it jump-less
 #define  CN_NEXT(k)     (((k) + 1) & (((k) >= cn) - 1))
 
-enum
+गणना
 {
     RNG_FLAG_SMALL = 0x40000000,
     RNG_FLAG_STDMTX = 0x80000000
@@ -70,18 +70,18 @@ enum
 *                           Pseudo-Random Number Generators (PRNGs)                     *
 \***************************************************************************************/
 
-template<typename T> static void
-randBits_( T* arr, int len, int cn, uint64* state, const Vec2l* p, int flags )
+template<typename T> स्थिर शून्य
+randBits_( T* arr, पूर्णाङ्क len, पूर्णाङ्क cn, uint64* state, ध्रुव Vec2l* p, पूर्णाङ्क flags )
 {
-    bool small_flag = (flags & RNG_FLAG_SMALL) != 0;
+    तार्किक small_flag = (flags & RNG_FLAG_SMALL) != 0;
     uint64 temp = *state;
-    int i, k = 0;
+    पूर्णाङ्क i, k = 0;
     len *= cn;
     --cn;
 
-    if( !small_flag )
+    सचे( !small_flag )
     {
-        for( i = 0; i <= len - 4; i += 4 )
+        अत्थाय( i = 0; i <= len - 4; i += 4 )
         {
             int64_t t0, t1;
 
@@ -104,9 +104,9 @@ randBits_( T* arr, int len, int cn, uint64* state, const Vec2l* p, int flags )
             arr[i+3] = saturate_cast<T>(t1);
         }
     }
-    else
+    अञ्ञथा
     {
-        for( i = 0; i <= len - 4; i += 4 )
+        अत्थाय( i = 0; i <= len - 4; i += 4 )
         {
             int64_t t0, t1, t;
             temp = RNG_NEXT(temp);
@@ -130,7 +130,7 @@ randBits_( T* arr, int len, int cn, uint64* state, const Vec2l* p, int flags )
         }
     }
 
-    for( ; i < len; i++ )
+    अत्थाय( ; i < len; i++ )
     {
         int64_t t0;
         temp = RNG_NEXT(temp);
@@ -143,23 +143,23 @@ randBits_( T* arr, int len, int cn, uint64* state, const Vec2l* p, int flags )
     *state = temp;
 }
 
-struct DivStruct
+संरचना DivStruct
 {
     unsigned d;
     unsigned M;
-    int sh1, sh2;
+    पूर्णाङ्क sh1, sh2;
     int64_t delta;
     uint64_t diff;
 };
 
-template<typename T> static void
-randi_( T* arr, int len, int cn, uint64* state, const DivStruct* p )
+template<typename T> स्थिर शून्य
+randi_( T* arr, पूर्णाङ्क len, पूर्णाङ्क cn, uint64* state, ध्रुव DivStruct* p )
 {
     uint64 temp = *state;
-    int k = 0;
+    पूर्णाङ्क k = 0;
     len *= cn;
     cn--;
-    for( int i = 0; i < len; i++ )
+    अत्थाय( पूर्णाङ्क i = 0; i < len; i++ )
     {
         temp = RNG_NEXT(temp);
         unsigned t = (unsigned)temp;
@@ -172,14 +172,14 @@ randi_( T* arr, int len, int cn, uint64* state, const DivStruct* p )
     *state = temp;
 }
 
-static void
-randi_( int64_t* arr, int len, int cn, uint64* state, const DivStruct* p )
+स्थिर शून्य
+randi_( int64_t* arr, पूर्णाङ्क len, पूर्णाङ्क cn, uint64* state, ध्रुव DivStruct* p )
 {
     uint64 temp = *state;
-    int k = 0;
+    पूर्णाङ्क k = 0;
     len *= cn;
     cn--;
-    for( int i = 0; i < len; i++ )
+    अत्थाय( पूर्णाङ्क i = 0; i < len; i++ )
     {
         temp = RNG_NEXT(temp);
         unsigned t0 = (unsigned)temp;
@@ -192,14 +192,14 @@ randi_( int64_t* arr, int len, int cn, uint64* state, const DivStruct* p )
     *state = temp;
 }
 
-static void
-randi_( uint64_t* arr, int len, int cn, uint64* state, const DivStruct* p )
+स्थिर शून्य
+randi_( uint64_t* arr, पूर्णाङ्क len, पूर्णाङ्क cn, uint64* state, ध्रुव DivStruct* p )
 {
     uint64 temp = *state;
-    int k = 0;
+    पूर्णाङ्क k = 0;
     len *= cn;
     cn--;
-    for( int i = 0; i < len; i++ )
+    अत्थाय( पूर्णाङ्क i = 0; i < len; i++ )
     {
         temp = RNG_NEXT(temp);
         unsigned t0 = (unsigned)temp;
@@ -214,59 +214,59 @@ randi_( uint64_t* arr, int len, int cn, uint64* state, const DivStruct* p )
 }
 
 template<typename T>
-static void randBitsWrap(void* arr, int len, int cn, uint64* state, const void* p, void*, int flags)
+स्थिर शून्य randBitsWrap(शून्य* arr, पूर्णाङ्क len, पूर्णाङ्क cn, uint64* state, ध्रुव शून्य* p, शून्य*, पूर्णाङ्क flags)
 {
-    randBits_((T*)arr, len, cn, state, (const Vec2l*)p, flags);
+    randBits_((T*)arr, len, cn, state, (ध्रुव Vec2l*)p, flags);
 }
 
 template<typename T>
-static void randiWrap(void* arr, int len, int cn, uint64* state, const void* p, void*, int)
+स्थिर शून्य randiWrap(शून्य* arr, पूर्णाङ्क len, पूर्णाङ्क cn, uint64* state, ध्रुव शून्य* p, शून्य*, पूर्णाङ्क)
 {
-    randi_((T*)arr, len, cn, state, (const DivStruct*)p);
+    randi_((T*)arr, len, cn, state, (ध्रुव DivStruct*)p);
 }
 
 // Narrow an f32 buffer into one of the 1-byte FP8 destinations.
-static inline void cvt32fToFP8(const float* src, void* dst, int len, int depth)
+स्थिर अन्तःस्थ शून्य cvt32fToFP8(ध्रुव भिन्न* src, शून्य* dst, पूर्णाङ्क len, पूर्णाङ्क depth)
 {
-    if (depth == CV_8F_E4M3FN)        { fp8_t*   d = (fp8_t*)dst;   for (int i = 0; i < len; i++) d[i] = fp8_t(src[i]); }
-    else                              { fp8a_t* d = (fp8a_t*)dst; for (int i = 0; i < len; i++) d[i] = fp8a_t(src[i]); }
+    सचे (depth == CV_8F_E4M3FN)        { fp8_t*   d = (fp8_t*)dst;   अत्थाय (पूर्णाङ्क i = 0; i < len; i++) d[i] = fp8_t(src[i]); }
+    अञ्ञथा                              { fp8a_t* d = (fp8a_t*)dst; अत्थाय (पूर्णाङ्क i = 0; i < len; i++) d[i] = fp8a_t(src[i]); }
 }
-static inline bool isFP8Depth(int d) { return d >= CV_8F_E4M3FN && d <= CV_8F_E4M3FNUZ; }
+स्थिर अन्तःस्थ तार्किक isFP8Depth(पूर्णाङ्क d) { पटिनिवत्त d >= CV_8F_E4M3FN && d <= CV_8F_E4M3FNUZ; }
 
-static void randf_16_or_32f( void* dst, int len_, int cn, uint64* state, const void* _p, void* _fbuf, int flags )
+स्थिर शून्य randf_16_or_32f( शून्य* dst, पूर्णाङ्क len_, पूर्णाङ्क cn, uint64* state, ध्रुव शून्य* _p, शून्य* _fbuf, पूर्णाङ्क flags )
 {
-    const Vec2f* p = (const Vec2f*)_p;
-    float* fbuf = (float*)_fbuf;
-    int depth = CV_MAT_DEPTH(flags);
+    ध्रुव Vec2f* p = (ध्रुव Vec2f*)_p;
+    भिन्न* fbuf = (भिन्न*)_fbuf;
+    पूर्णाङ्क depth = CV_MAT_DEPTH(flags);
     uint64 temp = *state;
-    int k = 0, len = len_*cn;
-    float* arr = depth == CV_16F || depth == CV_16BF || isFP8Depth(depth) ? fbuf : (float*)dst;
+    पूर्णाङ्क k = 0, len = len_*cn;
+    भिन्न* arr = depth == CV_16F || depth == CV_16BF || isFP8Depth(depth) ? fbuf : (भिन्न*)dst;
     cn--;
-    for( int i = 0; i < len; i++ )
+    अत्थाय( पूर्णाङ्क i = 0; i < len; i++ )
     {
-        int t = (int)(temp = RNG_NEXT(temp));
-        arr[i] = (float)(t*p[k][0]);
+        पूर्णाङ्क t = (पूर्णाङ्क)(temp = RNG_NEXT(temp));
+        arr[i] = (भिन्न)(t*p[k][0]);
         k = CN_NEXT(k);
     }
     *state = temp;
     hal::addRNGBias32f(arr, &p[0][0], len_, cn+1);
-    if (depth == CV_16F)
+    सचे (depth == CV_16F)
         hal::cvt32f16f(fbuf, (hfloat*)dst, len);
-    else if (depth == CV_16BF)
+    अञ्ञथा सचे (depth == CV_16BF)
         hal::cvt32f16bf(fbuf, (bfloat*)dst, len);
-    else if (isFP8Depth(depth))
+    अञ्ञथा सचे (isFP8Depth(depth))
         cvt32fToFP8(fbuf, dst, len, depth);
 }
 
-static void
-randf_64f( void* _arr, int len_, int cn, uint64* state, const void* _p, void*, int )
+स्थिर शून्य
+randf_64f( शून्य* _arr, पूर्णाङ्क len_, पूर्णाङ्क cn, uint64* state, ध्रुव शून्य* _p, शून्य*, पूर्णाङ्क )
 {
-    double* arr = (double*)_arr;
-    const Vec2d* p = (const Vec2d*)_p;
+    द्विगुण* arr = (द्विगुण*)_arr;
+    ध्रुव Vec2d* p = (ध्रुव Vec2d*)_p;
     uint64 temp = *state;
-    int k = 0, len = len_*cn;
+    पूर्णाङ्क k = 0, len = len_*cn;
     cn--;
-    for( int i = 0; i < len; i++ )
+    अत्थाय( पूर्णाङ्क i = 0; i < len; i++ )
     {
         temp = RNG_NEXT(temp);
         int64_t v = (int64_t)((temp >> 32) | (temp << 32));
@@ -277,23 +277,23 @@ randf_64f( void* _arr, int len_, int cn, uint64* state, const void* _p, void*, i
     hal::addRNGBias64f(arr, &p[0][0], len_, cn+1);
 }
 
-typedef void (*RandFunc)(void* arr, int len, int cn, uint64* state,
-                         const void* p, void* tempbuf, int flags);
+प्रकारनिर्देश शून्य (*RandFunc)(शून्य* arr, पूर्णाङ्क len, पूर्णाङ्क cn, uint64* state,
+                         ध्रुव शून्य* p, शून्य* tempbuf, पूर्णाङ्क flags);
 
-static RandFunc randTab[CV_DEPTH_MAX][CV_DEPTH_MAX] =
+स्थिर RandFunc randTab[CV_DEPTH_MAX][CV_DEPTH_MAX] =
 {
     {
         randiWrap<uchar>, randiWrap<schar>, randiWrap<ushort>,
-        randiWrap<short>, randiWrap<int>, randf_16_or_32f,
+        randiWrap<short>, randiWrap<पूर्णाङ्क>, randf_16_or_32f,
         randf_64f, randf_16_or_32f, randf_16_or_32f,
-        randiWrap<bool>, randiWrap<uint64_t>, randiWrap<int64_t>,
+        randiWrap<तार्किक>, randiWrap<uint64_t>, randiWrap<int64_t>,
         randiWrap<unsigned>,
         randf_16_or_32f, randf_16_or_32f    // CV_8F_E4M3FN, E4M3FNUZ
     },
     {
         randBitsWrap<uchar>, randBitsWrap<schar>, randBitsWrap<ushort>,
-        randBitsWrap<short>, randBitsWrap<int>, 0, 0, 0, 0,
-        randBitsWrap<bool>, randBitsWrap<uint64_t>, randBitsWrap<int64_t>,
+        randBitsWrap<short>, randBitsWrap<पूर्णाङ्क>, 0, 0, 0, 0,
+        randBitsWrap<तार्किक>, randBitsWrap<uint64_t>, randBitsWrap<int64_t>,
         randBitsWrap<unsigned>, 0, 0, 0
     }
 };
@@ -303,75 +303,75 @@ static RandFunc randTab[CV_DEPTH_MAX][CV_DEPTH_MAX] =
    "The Ziggurat Method for Generating Random Variables"
    by George Marsaglia and Wai Wan Tsang, Journal of Statistical Software, 2007.
 */
-static void
-randn_0_1_32f( float* arr, int len, uint64* state )
+स्थिर शून्य
+randn_0_1_32f( भिन्न* arr, पूर्णाङ्क len, uint64* state )
 {
-    const float r = 3.442620f; // The start of the right tail
-    const float rng_flt = 2.3283064365386962890625e-10f; // 2^-32
-    static unsigned kn[128];
-    static float wn[128], fn[128];
+    ध्रुव भिन्न r = 3.442620f; // The start of the right tail
+    ध्रुव भिन्न rng_flt = 2.3283064365386962890625e-10f; // 2^-32
+    स्थिर unsigned kn[128];
+    स्थिर भिन्न wn[128], fn[128];
     uint64 temp = *state;
-    static bool initialized=false;
-    int i;
+    स्थिर तार्किक initialized=मिच्छा;
+    पूर्णाङ्क i;
 
-    if( !initialized )
+    सचे( !initialized )
     {
-        const double m1 = 2147483648.0;
-        double dn = 3.442619855899, tn = dn, vn = 9.91256303526217e-3;
+        ध्रुव द्विगुण m1 = 2147483648.0;
+        द्विगुण dn = 3.442619855899, tn = dn, vn = 9.91256303526217e-3;
 
         // Set up the tables
-        double q = vn/std::exp(-.5*dn*dn);
+        द्विगुण q = vn/std::exp(-.5*dn*dn);
         kn[0] = (unsigned)((dn/q)*m1);
         kn[1] = 0;
 
-        wn[0] = (float)(q/m1);
-        wn[127] = (float)(dn/m1);
+        wn[0] = (भिन्न)(q/m1);
+        wn[127] = (भिन्न)(dn/m1);
 
         fn[0] = 1.f;
-        fn[127] = (float)std::exp(-.5*dn*dn);
+        fn[127] = (भिन्न)std::exp(-.5*dn*dn);
 
-        for(i=126;i>=1;i--)
+        अत्थाय(i=126;i>=1;i--)
         {
             dn = std::sqrt(-2.*std::log(vn/dn+std::exp(-.5*dn*dn)));
             kn[i+1] = (unsigned)((dn/tn)*m1);
             tn = dn;
-            fn[i] = (float)std::exp(-.5*dn*dn);
-            wn[i] = (float)(dn/m1);
+            fn[i] = (भिन्न)std::exp(-.5*dn*dn);
+            wn[i] = (भिन्न)(dn/m1);
         }
-        initialized = true;
+        initialized = सच्च;
     }
 
-    for( i = 0; i < len; i++ )
+    अत्थाय( i = 0; i < len; i++ )
     {
-        float x, y;
-        for(;;)
+        भिन्न x, y;
+        अत्थाय(;;)
         {
-            int hz = (int)temp;
+            पूर्णाङ्क hz = (पूर्णाङ्क)temp;
             temp = RNG_NEXT(temp);
-            int iz = hz & 127;
+            पूर्णाङ्क iz = hz & 127;
             x = hz*wn[iz];
-            if( (unsigned)std::abs(hz) < kn[iz] )
-                break;
-            if( iz == 0) // iz==0, handles the base strip
+            सचे( (unsigned)std::abs(hz) < kn[iz] )
+                भङ्ग;
+            सचे( iz == 0) // iz==0, handles the base strip
             {
-                do
+                करोहि
                 {
                     x = (unsigned)temp*rng_flt;
                     temp = RNG_NEXT(temp);
                     y = (unsigned)temp*rng_flt;
                     temp = RNG_NEXT(temp);
-                    x = (float)(-std::log(x+FLT_MIN)*0.2904764);
-                    y = (float)-std::log(y+FLT_MIN);
+                    x = (भिन्न)(-std::log(x+FLT_MIN)*0.2904764);
+                    y = (भिन्न)-std::log(y+FLT_MIN);
                 }	// .2904764 is 1/r
-                while( y + y < x*x );
+                याव( y + y < x*x );
                 x = hz > 0 ? r + x : -r - x;
-                break;
+                भङ्ग;
             }
             // iz > 0, handle the wedges of other strips
             y = (unsigned)temp*rng_flt;
             temp = RNG_NEXT(temp);
-            if( fn[iz] + y*(fn[iz - 1] - fn[iz]) < std::exp(-.5*x*x) )
-                break;
+            सचे( fn[iz] + y*(fn[iz - 1] - fn[iz]) < std::exp(-.5*x*x) )
+                भङ्ग;
         }
         arr[i] = x;
     }
@@ -379,49 +379,49 @@ randn_0_1_32f( float* arr, int len, uint64* state )
 }
 
 
-double RNG::gaussian(double sigma)
+द्विगुण RNG::gaussian(द्विगुण sigma)
 {
-    float temp;
+    भिन्न temp;
     randn_0_1_32f( &temp, 1, &state );
-    return temp*sigma;
+    पटिनिवत्त temp*sigma;
 }
 
-template<typename T, typename PT> static void
-randnScale_(float* src, void* _dst, int len, int cn,
-            const void* _mean, const void* _stddev, int flags )
+template<typename T, typename PT> स्थिर शून्य
+randnScale_(भिन्न* src, शून्य* _dst, पूर्णाङ्क len, पूर्णाङ्क cn,
+            ध्रुव शून्य* _mean, ध्रुव शून्य* _stddev, पूर्णाङ्क flags )
 {
     T* dst = (T*)_dst;
-    const PT* mean = (const PT*)_mean;
-    const PT* stddev = (const PT*)_stddev;
-    bool stdmtx = (flags & RNG_FLAG_STDMTX) != 0;
-    int i, j, k;
-    if( !stdmtx || cn == 1 )
+    ध्रुव PT* mean = (ध्रुव PT*)_mean;
+    ध्रुव PT* stddev = (ध्रुव PT*)_stddev;
+    तार्किक stdmtx = (flags & RNG_FLAG_STDMTX) != 0;
+    पूर्णाङ्क i, j, k;
+    सचे( !stdmtx || cn == 1 )
     {
-        if( cn == 1 )
+        सचे( cn == 1 )
         {
             PT a = stddev[0], b = mean[0];
-            for( i = 0; i < len; i++ )
+            अत्थाय( i = 0; i < len; i++ )
                 dst[i] = saturate_cast<T>(src[i]*a + b);
         }
-        else
+        अञ्ञथा
         {
             len *= cn;
             cn--;
-            for( i = k = 0; i < len; i++ ) {
+            अत्थाय( i = k = 0; i < len; i++ ) {
                 dst[i] = saturate_cast<T>(src[i]*stddev[k] + mean[k]);
                 k = CN_NEXT(k);
             }
         }
     }
-    else
+    अञ्ञथा
     {
         len *= cn;
         cn--;
-        for( i = j = 0; i < len; i++ )
+        अत्थाय( i = j = 0; i < len; i++ )
         {
             PT s = mean[j];
-            int i0 = i - j;
-            for( k = 0; k <= cn; k++ )
+            पूर्णाङ्क i0 = i - j;
+            अत्थाय( k = 0; k <= cn; k++ )
                 s += src[i0 + k]*stddev[j*(cn+1) + k];
             dst[i] = saturate_cast<T>(s);
             j = CN_NEXT(j);
@@ -430,102 +430,102 @@ randnScale_(float* src, void* _dst, int len, int cn,
 }
 
 // special version for 16f, 16bf and 32f
-static void
-randnScale_16_or_32f(float* fbuf, void* _dst, int len, int cn,
-                     const void* _mean, const void* _stddev, int flags)
+स्थिर शून्य
+randnScale_16_or_32f(भिन्न* fbuf, शून्य* _dst, पूर्णाङ्क len, पूर्णाङ्क cn,
+                     ध्रुव शून्य* _mean, ध्रुव शून्य* _stddev, पूर्णाङ्क flags)
 {
-    float* dst = (float*)_dst;
-    const float* mean = (const float*)_mean;
-    const float* stddev = (const float*)_stddev;
-    bool stdmtx = (flags & RNG_FLAG_STDMTX) != 0;
-    int depth = CV_MAT_DEPTH(flags);
-    float* arr = depth == CV_16F || depth == CV_16BF || isFP8Depth(depth) ? fbuf : dst;
-    int i, j, k;
+    भिन्न* dst = (भिन्न*)_dst;
+    ध्रुव भिन्न* mean = (ध्रुव भिन्न*)_mean;
+    ध्रुव भिन्न* stddev = (ध्रुव भिन्न*)_stddev;
+    तार्किक stdmtx = (flags & RNG_FLAG_STDMTX) != 0;
+    पूर्णाङ्क depth = CV_MAT_DEPTH(flags);
+    भिन्न* arr = depth == CV_16F || depth == CV_16BF || isFP8Depth(depth) ? fbuf : dst;
+    पूर्णाङ्क i, j, k;
 
-    if( !stdmtx || cn == 1 )
+    सचे( !stdmtx || cn == 1 )
     {
-        if( cn == 1 )
+        सचे( cn == 1 )
         {
-            float a = stddev[0], b = mean[0];
-            for( i = 0; i < len; i++ )
+            भिन्न a = stddev[0], b = mean[0];
+            अत्थाय( i = 0; i < len; i++ )
                 arr[i] = fbuf[i]*a + b;
         }
-        else
+        अञ्ञथा
         {
             len *= cn;
             cn--;
-            for( i = k = 0; i < len; i++ ) {
+            अत्थाय( i = k = 0; i < len; i++ ) {
                 arr[i] = fbuf[i]*stddev[k] + mean[k];
                 k = CN_NEXT(k);
             }
         }
     }
-    else if( depth == CV_32F )
+    अञ्ञथा सचे( depth == CV_32F )
     {
         len *= cn;
         cn--;
-        for( i = j = 0; i < len; i++ )
+        अत्थाय( i = j = 0; i < len; i++ )
         {
-            float s = mean[j];
-            int i0 = i - j;
-            for( k = 0; k <= cn; k++ )
+            भिन्न s = mean[j];
+            पूर्णाङ्क i0 = i - j;
+            अत्थाय( k = 0; k <= cn; k++ )
                 s += fbuf[i0 + k]*stddev[j*(cn+1) + k];
             dst[i] = s;
             j = CN_NEXT(j);
         }
     }
-    else
+    अञ्ञथा
     {
-        float elembuf[CV_CN_MAX];
+        भिन्न elembuf[CV_CN_MAX];
         len *= cn;
-        for( i = 0; i < len; i += cn )
+        अत्थाय( i = 0; i < len; i += cn )
         {
             // since we process fbuf in-place,
             // we need to copy each cn-channel element
             // prior to matrix multiplication
-            for (j = 0; j < cn; j++)
+            अत्थाय (j = 0; j < cn; j++)
                 elembuf[j] = fbuf[i + j];
-            for (j = 0; j < cn; j++) {
-                float s = mean[j];
-                for( k = 0; k < cn; k++ )
+            अत्थाय (j = 0; j < cn; j++) {
+                भिन्न s = mean[j];
+                अत्थाय( k = 0; k < cn; k++ )
                     s += elembuf[k]*stddev[j*cn + k];
                 fbuf[i + j] = s;
             }
         }
     }
-    if (depth == CV_16F)
+    सचे (depth == CV_16F)
         hal::cvt32f16f(fbuf, (hfloat*)dst, len);
-    else if (depth == CV_16BF)
+    अञ्ञथा सचे (depth == CV_16BF)
         hal::cvt32f16bf(fbuf, (bfloat*)dst, len);
-    else if (isFP8Depth(depth))
+    अञ्ञथा सचे (isFP8Depth(depth))
         cvt32fToFP8(fbuf, dst, len, depth);
 }
 
-typedef void (*RandnScaleFunc)(float* src, void* dst, int len, int cn,
-                               const void* mean, const void* stddev, int flags);
+प्रकारनिर्देश शून्य (*RandnScaleFunc)(भिन्न* src, शून्य* dst, पूर्णाङ्क len, पूर्णाङ्क cn,
+                               ध्रुव शून्य* mean, ध्रुव शून्य* stddev, पूर्णाङ्क flags);
 
-static RandnScaleFunc randnScaleTab[CV_DEPTH_MAX] =
+स्थिर RandnScaleFunc randnScaleTab[CV_DEPTH_MAX] =
 {
-    randnScale_<uchar, float>, randnScale_<schar, float>, randnScale_<ushort, float>,
-    randnScale_<short, float>, randnScale_<int, float>, randnScale_16_or_32f,
-    randnScale_<double, double>, randnScale_16_or_32f, randnScale_16_or_32f,
-    randnScale_<bool, float>, randnScale_<uint64_t, double>, randnScale_<int64_t, double>,
-    randnScale_<unsigned, float>,
+    randnScale_<uchar, भिन्न>, randnScale_<schar, भिन्न>, randnScale_<ushort, भिन्न>,
+    randnScale_<short, भिन्न>, randnScale_<पूर्णाङ्क, भिन्न>, randnScale_16_or_32f,
+    randnScale_<द्विगुण, द्विगुण>, randnScale_16_or_32f, randnScale_16_or_32f,
+    randnScale_<तार्किक, भिन्न>, randnScale_<uint64_t, द्विगुण>, randnScale_<int64_t, द्विगुण>,
+    randnScale_<unsigned, भिन्न>,
     randnScale_16_or_32f, randnScale_16_or_32f   // CV_8F_E4M3FN, E4M3FNUZ
 };
 
-void RNG::fill( InputOutputArray _mat, int disttype,
-                InputArray _param1arg, InputArray _param2arg,
-                bool saturateRange )
+शून्य RNG::fill( निवेशः_Output_Array _mat, पूर्णाङ्क disttype,
+                निवेशः_Array _param1arg, निवेशः_Array _param2arg,
+                तार्किक saturateRange )
 {
     CV_Assert(!_mat.empty());
 
     Mat mat = _mat.getMat(), _param1 = _param1arg.getMat(), _param2 = _param2arg.getMat();
-    int j, depth = mat.depth(), cn = mat.channels();
-    int esz1 = CV_ELEM_SIZE(depth);
-    AutoBuffer<double> _parambuf;
-    bool fast_int_mode = false;
-    bool small_flag = false;
+    पूर्णाङ्क j, depth = mat.depth(), cn = mat.channels();
+    पूर्णाङ्क esz1 = CV_ELEM_SIZE(depth);
+    AutoBuffer<द्विगुण> _parambuf;
+    तार्किक fast_int_mode = मिच्छा;
+    तार्किक small_flag = मिच्छा;
     RandFunc func = 0;
     RandnScaleFunc scaleFunc = 0;
 
@@ -538,96 +538,96 @@ void RNG::fill( InputOutputArray _mat, int disttype,
                 (_param1.size() == Size(1, 4) && _param1.type() == CV_64F && cn <= 4))) ||
                 (_param2.rows == cn && _param2.cols == cn && disttype == NORMAL)));
 
-    const void* uni_param = 0;
+    ध्रुव शून्य* uni_param = 0;
     uchar* mean = 0;
     uchar* stddev = 0;
-    bool stdmtx = false;
-    int n1 = (int)_param1.total();
-    int n2 = (int)_param2.total();
+    तार्किक stdmtx = मिच्छा;
+    पूर्णाङ्क n1 = (पूर्णाङ्क)_param1.total();
+    पूर्णाङ्क n2 = (पूर्णाङ्क)_param2.total();
 
-    if( disttype == UNIFORM )
+    सचे( disttype == UNIFORM )
     {
-        _parambuf.allocate(cn*(sizeof(DivStruct)+sizeof(double)-1)/sizeof(double) + cn*4);
-        double* parambuf = _parambuf.data();
-        double* p1 = _param1.ptr<double>();
-        double* p2 = _param2.ptr<double>();
+        _parambuf.allocate(cn*(परिमाण(DivStruct)+परिमाण(द्विगुण)-1)/परिमाण(द्विगुण) + cn*4);
+        द्विगुण* parambuf = _parambuf.data();
+        द्विगुण* p1 = _param1.ptr<द्विगुण>();
+        द्विगुण* p2 = _param2.ptr<द्विगुण>();
 
-        if( !_param1.isContinuous() || _param1.type() != CV_64F || n1 != cn )
+        सचे( !_param1.isContinuous() || _param1.type() != CV_64F || n1 != cn )
         {
             p1 = parambuf;
             Mat tmp(_param1.size(), CV_64F, p1);
             _param1.convertTo(tmp, CV_64F);
-            for( j = n1; j < cn; j++ )
+            अत्थाय( j = n1; j < cn; j++ )
                 p1[j] = p1[j-n1];
         }
 
-        if( !_param2.isContinuous() || _param2.type() != CV_64F || n2 != cn )
+        सचे( !_param2.isContinuous() || _param2.type() != CV_64F || n2 != cn )
         {
             p2 = parambuf + cn;
             Mat tmp(_param2.size(), CV_64F, p2);
             _param2.convertTo(tmp, CV_64F);
-            for( j = n2; j < cn; j++ )
+            अत्थाय( j = n2; j < cn; j++ )
                 p2[j] = p2[j-n2];
         }
 
-        if( CV_IS_INT_TYPE(depth) )
+        सचे( CV_IS_INT_TYPE(depth) )
         {
             Vec2l* ip = (Vec2l*)(parambuf + cn*2);
             CV_DbgCheckLT((size_t)(cn*4 - 1), _parambuf.size(), "");
-            for( j = 0, fast_int_mode = true; j < cn; j++ )
+            अत्थाय( j = 0, fast_int_mode = सच्च; j < cn; j++ )
             {
-                double a = std::min(p1[j], p2[j]);
-                double b = std::max(p1[j], p2[j]);
-                if( saturateRange )
+                द्विगुण a = std::min(p1[j], p2[j]);
+                द्विगुण b = std::max(p1[j], p2[j]);
+                सचे( saturateRange )
                 {
                     a = std::max(a, depth == CV_8U || depth == CV_16U || depth == CV_32U ||
                                  depth == CV_64U || depth == CV_Bool ? 0. :
                                  depth == CV_8S ? -128. : depth == CV_16S ? -32768. :
-                                 depth == CV_32S ? (double)INT_MIN : (double)INT64_MIN);
+                                 depth == CV_32S ? (द्विगुण)INT_MIN : (द्विगुण)INT64_MIN);
                     b = std::min(b, depth == CV_8U ? 256. : depth == CV_Bool ? 2. : depth == CV_16U ? 65536. :
-                                 depth == CV_8S ? 128. : depth == CV_16S ? 32768. : depth == CV_32U ? (double)UINT_MAX :
-                                 depth == CV_32S ? (double)INT_MAX : (double)INT64_MAX);
+                                 depth == CV_8S ? 128. : depth == CV_16S ? 32768. : depth == CV_32U ? (द्विगुण)UINT_MAX :
+                                 depth == CV_32S ? (द्विगुण)INT_MAX : (द्विगुण)INT64_MAX);
                 }
                 ip[j][1] = (int64_t)ceil(a);
                 int64_t idiff = ip[j][0] = (int64_t)floor(b) - ip[j][1] - 1;
-                if (idiff < 0)
+                सचे (idiff < 0)
                 {
                     idiff = 0;
                     ip[j][0] = 0;
                 }
-                double diff = b - a;
+                द्विगुण diff = b - a;
 
                 fast_int_mode = fast_int_mode && diff <= 4294967296. && (idiff & (idiff+1)) == 0;
-                if( fast_int_mode )
+                सचे( fast_int_mode )
                     small_flag = idiff <= 255;
-                else
+                अञ्ञथा
                 {
                     int64_t minval = INT32_MIN/2, maxval = INT32_MAX;
-                    if (depth == CV_64S || depth == CV_64U)
+                    सचे (depth == CV_64S || depth == CV_64U)
                     {
                         minval = INT64_MIN/2;
                         maxval = INT64_MAX;
                     }
-                    if( diff > (double)maxval )
+                    सचे( diff > (द्विगुण)maxval )
                         ip[j][0] = maxval;
-                    if( a < (double)minval )
+                    सचे( a < (द्विगुण)minval )
                         ip[j][1] = minval;
                 }
             }
 
             uni_param = ip;
-            if( !fast_int_mode )
+            सचे( !fast_int_mode )
             {
                 DivStruct* ds = (DivStruct*)(ip + cn);
-                CV_DbgCheckLE((void*)(ds + cn), (void*)(parambuf + _parambuf.size()), "Last byte check");
-                for( j = 0; j < cn; j++ )
+                CV_DbgCheckLE((शून्य*)(ds + cn), (शून्य*)(parambuf + _parambuf.size()), "Last byte check");
+                अत्थाय( j = 0; j < cn; j++ )
                 {
                     ds[j].delta = ip[j][1];
                     ds[j].diff = ip[j][0];
-                    if (depth != CV_64U && depth != CV_64S) {
+                    सचे (depth != CV_64U && depth != CV_64S) {
                         unsigned d = ds[j].d = (unsigned)(ip[j][0]+1);
-                        int l = 0;
-                        while(((uint64)1 << l) < d)
+                        पूर्णाङ्क l = 0;
+                        याव(((uint64)1 << l) < d)
                             l++;
                         ds[j].M = (unsigned)(((uint64)1 << 32)*(((uint64)1 << l) - d)/d) + 1;
                         ds[j].sh1 = std::min(l, 1);
@@ -639,32 +639,32 @@ void RNG::fill( InputOutputArray _mat, int disttype,
 
             func = randTab[fast_int_mode ? 1 : 0][depth];
         }
-        else
+        अञ्ञथा
         {
-            double scale = depth == CV_64F ?
+            द्विगुण scale = depth == CV_64F ?
                 5.4210108624275221700372640043497e-20 : // 2**-64
                 2.3283064365386962890625e-10;           // 2**-32
-            double maxdiff = saturateRange ? (double)FLT_MAX : DBL_MAX;
+            द्विगुण maxdiff = saturateRange ? (द्विगुण)FLT_MAX : DBL_MAX;
 
             // for each channel i compute such dparam[0][i] & dparam[1][i],
             // so that a signed 32/64-bit integer X is transformed to
             // the range [param1.val[i], param2.val[i]) using
             // dparam[0][i]*X + dparam[1][i]
             CV_DbgCheckLT((size_t)(cn*4 - 1), _parambuf.size(), "");
-            if( depth != CV_64F )
+            सचे( depth != CV_64F )
             {
                 Vec2f* fp = (Vec2f*)(parambuf + cn*2);
-                for( j = 0; j < cn; j++ )
+                अत्थाय( j = 0; j < cn; j++ )
                 {
-                    fp[j][0] = (float)(std::min(maxdiff, p2[j] - p1[j])*scale);
-                    fp[j][1] = (float)((p2[j] + p1[j])*0.5);
+                    fp[j][0] = (भिन्न)(std::min(maxdiff, p2[j] - p1[j])*scale);
+                    fp[j][1] = (भिन्न)((p2[j] + p1[j])*0.5);
                 }
                 uni_param = fp;
             }
-            else
+            अञ्ञथा
             {
                 Vec2d* dp = (Vec2d*)(parambuf + cn*2);
-                for( j = 0; j < cn; j++ )
+                अत्थाय( j = 0; j < cn; j++ )
                 {
                     dp[j][0] = std::min(DBL_MAX, p2[j] - p1[j])*scale;
                     dp[j][1] = ((p2[j] + p1[j])*0.5);
@@ -676,69 +676,69 @@ void RNG::fill( InputOutputArray _mat, int disttype,
         }
         CV_Assert( func != 0 );
     }
-    else if( disttype == RNG::NORMAL )
+    अञ्ञथा सचे( disttype == RNG::NORMAL )
     {
         _parambuf.allocate(MAX(n1, cn) + MAX(n2, cn));
-        double* parambuf = _parambuf.data();
+        द्विगुण* parambuf = _parambuf.data();
 
-        int ptype = esz1 == 8 ? CV_64F : CV_32F;
+        पूर्णाङ्क ptype = esz1 == 8 ? CV_64F : CV_32F;
 
-        if( _param1.isContinuous() && _param1.type() == ptype && n1 >= cn)
+        सचे( _param1.isContinuous() && _param1.type() == ptype && n1 >= cn)
             mean = _param1.ptr();
-        else
+        अञ्ञथा
         {
             Mat tmp(_param1.size(), ptype, parambuf);
             _param1.convertTo(tmp, ptype);
             mean = (uchar*)parambuf;
         }
 
-        if( n1 < cn )
-            for( j = n1*esz1; j < cn*esz1; j++ )
+        सचे( n1 < cn )
+            अत्थाय( j = n1*esz1; j < cn*esz1; j++ )
                 mean[j] = mean[j - n1*esz1];
 
-        if( _param2.isContinuous() && _param2.type() == ptype && n2 >= cn)
+        सचे( _param2.isContinuous() && _param2.type() == ptype && n2 >= cn)
             stddev = _param2.ptr();
-        else
+        अञ्ञथा
         {
             Mat tmp(_param2.size(), ptype, parambuf + MAX(n1, cn));
             _param2.convertTo(tmp, ptype);
             stddev = (uchar*)(parambuf + MAX(n1, cn));
         }
 
-        if( n2 < cn )
-            for( j = n2*esz1; j < cn*esz1; j++ )
+        सचे( n2 < cn )
+            अत्थाय( j = n2*esz1; j < cn*esz1; j++ )
                 stddev[j] = stddev[j - n2*esz1];
 
         stdmtx = _param2.rows == cn && _param2.cols == cn;
         scaleFunc = randnScaleTab[depth];
         CV_Assert( scaleFunc != 0 );
     }
-    else
+    अञ्ञथा
         CV_Error( cv::Error::StsBadArg, "Unknown distribution type" );
 
-    const Mat* arrays[] = {&mat, 0};
+    ध्रुव Mat* arrays[] = {&mat, 0};
     uchar* ptr = 0;
     NAryMatIterator it(arrays, &ptr, 1);
-    float fbuf[BLOCK_SIZE + CV_CN_MAX];
-    int total = (int)it.size;
-    int blockSize = std::min((BLOCK_SIZE + cn - 1)/cn, total);
+    भिन्न fbuf[BLOCK_SIZE + CV_CN_MAX];
+    पूर्णाङ्क total = (पूर्णाङ्क)it.size;
+    पूर्णाङ्क blockSize = std::min((BLOCK_SIZE + cn - 1)/cn, total);
     size_t esz = (size_t)esz1*cn;
-    int flags = mat.type();
+    पूर्णाङ्क flags = mat.type();
 
-    if( disttype == UNIFORM )
-        flags |= (small_flag ? (int)RNG_FLAG_SMALL : 0);
-    else
-        flags |= (stdmtx ? (int)RNG_FLAG_STDMTX : 0);
+    सचे( disttype == UNIFORM )
+        flags |= (small_flag ? (पूर्णाङ्क)RNG_FLAG_SMALL : 0);
+    अञ्ञथा
+        flags |= (stdmtx ? (पूर्णाङ्क)RNG_FLAG_STDMTX : 0);
 
-    for( size_t i = 0; i < it.nplanes; i++, ++it )
+    अत्थाय( size_t i = 0; i < it.nplanes; i++, ++it )
     {
-        for( j = 0; j < total; j += blockSize )
+        अत्थाय( j = 0; j < total; j += blockSize )
         {
-            int len = std::min(total - j, blockSize);
+            पूर्णाङ्क len = std::min(total - j, blockSize);
 
-            if( disttype == UNIFORM )
+            सचे( disttype == UNIFORM )
                 func(ptr + j*esz, len, cn, &state, uni_param, fbuf, flags);
-            else
+            अञ्ञथा
             {
                 randn_0_1_32f(fbuf, len*cn, &state);
                 scaleFunc(fbuf, ptr + j*esz, len, cn, mean, stddev, flags);
@@ -751,71 +751,71 @@ void RNG::fill( InputOutputArray _mat, int disttype,
 
 cv::RNG& cv::theRNG()
 {
-    return getCoreTlsData().rng;
+    पटिनिवत्त getCoreTlsData().rng;
 }
 
-void cv::setRNGSeed(int seed)
+शून्य cv::setRNGSeed(पूर्णाङ्क seed)
 {
     theRNG() = RNG(static_cast<uint64>(seed));
 }
 
 
-void cv::randu(InputOutputArray dst, InputArray low, InputArray high)
+शून्य cv::randu(निवेशः_Output_Array dst, निवेशः_Array नीचः, निवेशः_Array उच्चः)
 {
     CV_INSTRUMENT_REGION();
 
-    theRNG().fill(dst, RNG::UNIFORM, low, high);
+    theRNG().fill(dst, RNG::UNIFORM, नीचः, उच्चः);
 }
 
-void cv::randn(InputOutputArray dst, InputArray mean, InputArray stddev)
+शून्य cv::randn(निवेशः_Output_Array dst, निवेशः_Array mean, निवेशः_Array stddev)
 {
     CV_INSTRUMENT_REGION();
 
     theRNG().fill(dst, RNG::NORMAL, mean, stddev);
 }
 
-namespace cv
+नामाकाश cv
 {
 
-template<typename T> static void
-randShuffle_( Mat& _arr, RNG& rng, double )
+template<typename T> स्थिर शून्य
+randShuffle_( Mat& _arr, RNG& rng, द्विगुण )
 {
     unsigned sz = (unsigned)_arr.total();
-    if( _arr.isContinuous() )
+    सचे( _arr.isContinuous() )
     {
         T* arr = _arr.ptr<T>();
-        for( unsigned i = 0; i < sz; i++ )
+        अत्थाय( unsigned i = 0; i < sz; i++ )
         {
             unsigned j = (unsigned)rng % sz;
             std::swap( arr[j], arr[i] );
         }
     }
-    else
+    अञ्ञथा
     {
         CV_Assert( _arr.dims <= 2 );
         uchar* data = _arr.ptr();
         size_t step = _arr.step;
-        int rows = _arr.rows;
-        int cols = _arr.cols;
-        for( int i0 = 0; i0 < rows; i0++ )
+        पूर्णाङ्क rows = _arr.rows;
+        पूर्णाङ्क cols = _arr.cols;
+        अत्थाय( पूर्णाङ्क i0 = 0; i0 < rows; i0++ )
         {
             T* p = _arr.ptr<T>(i0);
-            for( int j0 = 0; j0 < cols; j0++ )
+            अत्थाय( पूर्णाङ्क j0 = 0; j0 < cols; j0++ )
             {
                 unsigned k1 = (unsigned)rng % sz;
-                int i1 = (int)(k1 / cols);
-                int j1 = (int)(k1 - (unsigned)i1*(unsigned)cols);
+                पूर्णाङ्क i1 = (पूर्णाङ्क)(k1 / cols);
+                पूर्णाङ्क j1 = (पूर्णाङ्क)(k1 - (unsigned)i1*(unsigned)cols);
                 std::swap( p[j0], ((T*)(data + step*i1))[j1] );
             }
         }
     }
 }
 
-typedef void (*RandShuffleFunc)( Mat& dst, RNG& rng, double iterFactor );
+प्रकारनिर्देश शून्य (*RandShuffleFunc)( Mat& dst, RNG& rng, द्विगुण iterFactor );
 
 }
 
-void cv::randShuffle( InputOutputArray _dst, double iterFactor, RNG* _rng )
+शून्य cv::randShuffle( निवेशः_Output_Array _dst, द्विगुण iterFactor, RNG* _rng )
 {
     CV_INSTRUMENT_REGION();
 
@@ -825,19 +825,19 @@ void cv::randShuffle( InputOutputArray _dst, double iterFactor, RNG* _rng )
         randShuffle_<uchar>, // 1
         randShuffle_<ushort>, // 2
         randShuffle_<Vec<uchar,3> >, // 3
-        randShuffle_<int>, // 4
+        randShuffle_<पूर्णाङ्क>, // 4
         0,
         randShuffle_<Vec<ushort,3> >, // 6
         0,
-        randShuffle_<Vec<int,2> >, // 8
+        randShuffle_<Vec<पूर्णाङ्क,2> >, // 8
         0, 0, 0,
-        randShuffle_<Vec<int,3> >, // 12
+        randShuffle_<Vec<पूर्णाङ्क,3> >, // 12
         0, 0, 0,
-        randShuffle_<Vec<int,4> >, // 16
+        randShuffle_<Vec<पूर्णाङ्क,4> >, // 16
         0, 0, 0, 0, 0, 0, 0,
-        randShuffle_<Vec<int,6> >, // 24
+        randShuffle_<Vec<पूर्णाङ्क,6> >, // 24
         0, 0, 0, 0, 0, 0, 0,
-        randShuffle_<Vec<int,8> > // 32
+        randShuffle_<Vec<पूर्णाङ्क,8> > // 32
     };
 
     Mat dst = _dst.getMat();
@@ -899,10 +899,10 @@ cv::RNG_MT19937::RNG_MT19937(unsigned s) { seed(s); }
 
 cv::RNG_MT19937::RNG_MT19937() { seed(5489U); }
 
-void cv::RNG_MT19937::seed(unsigned s)
+शून्य cv::RNG_MT19937::seed(unsigned s)
 {
     state[0]= s;
-    for (mti = 1; mti < N; mti++)
+    अत्थाय (mti = 1; mti < N; mti++)
     {
         /* See Knuth TAOCP Vol2. 3rd Ed. P.106 for multiplier. */
         state[mti] = (1812433253U * (state[mti - 1] ^ (state[mti - 1] >> 30)) + mti);
@@ -912,23 +912,23 @@ void cv::RNG_MT19937::seed(unsigned s)
 unsigned cv::RNG_MT19937::next()
 {
     /* mag01[x] = x * MATRIX_A  for x=0,1 */
-    static unsigned mag01[2] = { 0x0U, /*MATRIX_A*/ 0x9908b0dfU};
+    स्थिर unsigned mag01[2] = { 0x0U, /*MATRIX_A*/ 0x9908b0dfU};
 
-    const unsigned UPPER_MASK = 0x80000000U;
-    const unsigned LOWER_MASK = 0x7fffffffU;
+    ध्रुव unsigned UPPER_MASK = 0x80000000U;
+    ध्रुव unsigned LOWER_MASK = 0x7fffffffU;
 
     /* generate N words at one time */
-    if (mti >= N)
+    सचे (mti >= N)
     {
-        int kk = 0;
+        पूर्णाङ्क kk = 0;
 
-        for (; kk < N - M; ++kk)
+        अत्थाय (; kk < N - M; ++kk)
         {
             unsigned y = (state[kk] & UPPER_MASK) | (state[kk + 1] & LOWER_MASK);
             state[kk] = state[kk + M] ^ (y >> 1) ^ mag01[y & 0x1U];
         }
 
-        for (; kk < N - 1; ++kk)
+        अत्थाय (; kk < N - 1; ++kk)
         {
             unsigned y = (state[kk] & UPPER_MASK) | (state[kk + 1] & LOWER_MASK);
             state[kk] = state[kk + (M - N)] ^ (y >> 1) ^ mag01[y & 0x1U];
@@ -948,30 +948,30 @@ unsigned cv::RNG_MT19937::next()
     y ^= (y << 15) & 0xefc60000U;
     y ^= (y >> 18);
 
-    return y;
+    पटिनिवत्त y;
 }
 
-cv::RNG_MT19937::operator unsigned() { return next(); }
+cv::RNG_MT19937::operator unsigned() { पटिनिवत्त next(); }
 
-cv::RNG_MT19937::operator int() { return (int)next();}
+cv::RNG_MT19937::operator पूर्णाङ्क() { पटिनिवत्त (पूर्णाङ्क)next();}
 
-cv::RNG_MT19937::operator float() { return next() * (1.f / 4294967296.f); }
+cv::RNG_MT19937::operator भिन्न() { पटिनिवत्त next() * (1.f / 4294967296.f); }
 
-cv::RNG_MT19937::operator double()
+cv::RNG_MT19937::operator द्विगुण()
 {
     unsigned a = next() >> 5;
     unsigned b = next() >> 6;
-    return (a * 67108864.0 + b) * (1.0 / 9007199254740992.0);
+    पटिनिवत्त (a * 67108864.0 + b) * (1.0 / 9007199254740992.0);
 }
 
-int cv::RNG_MT19937::uniform(int a, int b) { return (int)(next() % (b - a) + a); }
+पूर्णाङ्क cv::RNG_MT19937::uniform(पूर्णाङ्क a, पूर्णाङ्क b) { पटिनिवत्त (पूर्णाङ्क)(next() % (b - a) + a); }
 
-float cv::RNG_MT19937::uniform(float a, float b) { return ((float)*this)*(b - a) + a; }
+भिन्न cv::RNG_MT19937::uniform(भिन्न a, भिन्न b) { पटिनिवत्त ((भिन्न)*एतत्)*(b - a) + a; }
 
-double cv::RNG_MT19937::uniform(double a, double b) { return ((double)*this)*(b - a) + a; }
+द्विगुण cv::RNG_MT19937::uniform(द्विगुण a, द्विगुण b) { पटिनिवत्त ((द्विगुण)*एतत्)*(b - a) + a; }
 
-unsigned cv::RNG_MT19937::operator ()(unsigned b) { return next() % b; }
+unsigned cv::RNG_MT19937::operator ()(unsigned b) { पटिनिवत्त next() % b; }
 
-unsigned cv::RNG_MT19937::operator ()() { return next(); }
+unsigned cv::RNG_MT19937::operator ()() { पटिनिवत्त next(); }
 
 /* End of file. */

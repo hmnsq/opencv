@@ -39,24 +39,24 @@
 //
 //M*/
 
-#include "precomp.hpp"
-#include "opencl_kernels_core.hpp"
-#include "umatrix.hpp"
+#अन्तर्भाव "precomp.hpp"
+#अन्तर्भाव "opencl_kernels_core.hpp"
+#अन्तर्भाव "umatrix.hpp"
 
-#include <opencv2/core/utils/tls.hpp>
+#अन्तर्भाव <opencv2/core/utils/tls.hpp>
 
 ///////////////////////////////// UMat implementation ///////////////////////////////
 
-namespace cv {
+नामाकाश cv {
 
 // forward decls, implementation is below in this file
-void setSize(UMat& m, int _dims, const int* _sz, const size_t* _steps,
-             bool autoSteps = false);
+शून्य setSize(UMat& m, पूर्णाङ्क _dims, ध्रुव पूर्णाङ्क* _sz, ध्रुव size_t* _steps,
+             तार्किक autoSteps = मिच्छा);
 
-void updateContinuityFlag(UMat& m);
-void finalizeHdr(UMat& m);
+शून्य updateContinuityFlag(UMat& m);
+शून्य finalizeHdr(UMat& m);
 
-UMatData::UMatData(const MatAllocator* allocator)
+UMatData::UMatData(ध्रुव MatAllocator* allocator)
 {
     prevAllocator = currAllocator = allocator;
     urefcount = refcount = mapcount = 0;
@@ -66,7 +66,7 @@ UMatData::UMatData(const MatAllocator* allocator)
     handle = 0;
     userdata = 0;
     allocatorFlags_ = 0;
-    originalUMatData = NULL;
+    originalUMatData = रिक्त;
 }
 
 UMatData::~UMatData()
@@ -76,42 +76,42 @@ UMatData::~UMatData()
     CV_Assert(mapcount == 0);
     data = origdata = 0;
     size = 0;
-    bool isAsyncCleanup = !!(flags & UMatData::ASYNC_CLEANUP);
+    तार्किक isAsyncCleanup = !!(flags & UMatData::ASYNC_CLEANUP);
     flags = static_cast<UMatData::MemoryFlag>(0);
     handle = 0;
     userdata = 0;
     allocatorFlags_ = 0;
-    if (originalUMatData)
+    सचे (originalUMatData)
     {
-        bool showWarn = false;
+        तार्किक showWarn = मिच्छा;
         UMatData* u = originalUMatData;
-        bool zero_Ref = CV_XADD(&(u->refcount), -1) == 1;
-        if (zero_Ref)
+        तार्किक zero_Ref = CV_XADD(&(u->refcount), -1) == 1;
+        सचे (zero_Ref)
         {
             // simulate Mat::deallocate
-            if (u->mapcount != 0)
+            सचे (u->mapcount != 0)
             {
                 (u->currAllocator ? u->currAllocator : /* TODO allocator ? allocator :*/ Mat::getDefaultAllocator())->unmap(u);
             }
-            else
+            अञ्ञथा
             {
                 // we don't do "map", so we can't do "unmap"
             }
         }
-        bool zero_URef = CV_XADD(&(u->urefcount), -1) == 1;
-        if (zero_Ref && !zero_URef)
-            showWarn = true;
-        if (zero_Ref && zero_URef) // oops, we need to free resources
+        तार्किक zero_URef = CV_XADD(&(u->urefcount), -1) == 1;
+        सचे (zero_Ref && !zero_URef)
+            showWarn = सच्च;
+        सचे (zero_Ref && zero_URef) // oops, we need to free resources
         {
             showWarn = !isAsyncCleanup;
             // simulate UMat::deallocate
             u->currAllocator->deallocate(u);
         }
 #ifndef NDEBUG
-        if (showWarn)
+        सचे (showWarn)
         {
-            static int warn_message_showed = 0;
-            if (warn_message_showed++ < 100)
+            स्थिर पूर्णाङ्क warn_message_showed = 0;
+            सचे (warn_message_showed++ < 100)
             {
                 fflush(stdout);
                 fprintf(stderr, "\n! OPENCV warning: getUMat()/getMat() call chain possible problem."
@@ -120,106 +120,106 @@ UMatData::~UMatData()
                 fflush(stderr);
             }
         }
-#else
+#अञ्ञथा
         CV_UNUSED(showWarn);
 #endif
-        originalUMatData = NULL;
+        originalUMatData = रिक्त;
     }
 }
 
 #ifndef OPENCV_DISABLE_THREAD_SUPPORT
 
 // it should be a prime number for the best hash function
-enum { UMAT_NLOCKS = 31 };
-static Mutex umatLocks[UMAT_NLOCKS];
+गणना { UMAT_NLOCKS = 31 };
+स्थिर Mutex umatLocks[UMAT_NLOCKS];
 
-static size_t getUMatDataLockIndex(const UMatData* u)
+स्थिर size_t getUMatDataLockIndex(ध्रुव UMatData* u)
 {
-    size_t idx = ((size_t)(void*)u) % UMAT_NLOCKS;
-    return idx;
+    size_t idx = ((size_t)(शून्य*)u) % UMAT_NLOCKS;
+    पटिनिवत्त idx;
 }
 
-void UMatData::lock()
+शून्य UMatData::lock()
 {
-    size_t idx = getUMatDataLockIndex(this);
+    size_t idx = getUMatDataLockIndex(एतत्);
     //printf("%d lock(%d)\n", cv::utils::getThreadID(), (int)idx);
     umatLocks[idx].lock();
 }
 
-void UMatData::unlock()
+शून्य UMatData::unlock()
 {
-    size_t idx = getUMatDataLockIndex(this);
+    size_t idx = getUMatDataLockIndex(एतत्);
     //printf("%d unlock(%d)\n", cv::utils::getThreadID(), (int)idx);
     umatLocks[idx].unlock();
 }
 
 
 // Do not allow several lock() calls with different UMatData objects.
-struct UMatDataAutoLocker
+संरचना UMatDataAutoLocker
 {
-    int usage_count;
+    पूर्णाङ्क usage_गणनम्;
     UMatData* locked_objects[2];
-    UMatDataAutoLocker() : usage_count(0) { locked_objects[0] = NULL; locked_objects[1] = NULL; }
+    UMatDataAutoLocker() : usage_गणनम्(0) { locked_objects[0] = रिक्त; locked_objects[1] = रिक्त; }
 
-    void lock(UMatData*& u1)
+    शून्य lock(UMatData*& u1)
     {
-        bool locked_1 = (u1 == locked_objects[0] || u1 == locked_objects[1]);
-        if (locked_1)
+        तार्किक locked_1 = (u1 == locked_objects[0] || u1 == locked_objects[1]);
+        सचे (locked_1)
         {
-            u1 = NULL;
-            return;
+            u1 = रिक्त;
+            पटिनिवत्त;
         }
-        CV_Assert(usage_count == 0);  // UMatDataAutoLock can't be used multiple times from the same thread
-        usage_count = 1;
+        CV_Assert(usage_गणनम् == 0);  // UMatDataAutoLock can't be used multiple times from the same thread
+        usage_गणनम् = 1;
         locked_objects[0] = u1;
         u1->lock();
     }
-    void lock(UMatData*& u1, UMatData*& u2)
+    शून्य lock(UMatData*& u1, UMatData*& u2)
     {
-        bool locked_1 = (u1 == locked_objects[0] || u1 == locked_objects[1]);
-        bool locked_2 = (u2 == locked_objects[0] || u2 == locked_objects[1]);
-        if (locked_1)
-            u1 = NULL;
-        if (locked_2)
-            u2 = NULL;
-        if (locked_1 && locked_2)
-            return;
-        CV_Assert(usage_count == 0);  // UMatDataAutoLock can't be used multiple times from the same thread
-        usage_count = 1;
+        तार्किक locked_1 = (u1 == locked_objects[0] || u1 == locked_objects[1]);
+        तार्किक locked_2 = (u2 == locked_objects[0] || u2 == locked_objects[1]);
+        सचे (locked_1)
+            u1 = रिक्त;
+        सचे (locked_2)
+            u2 = रिक्त;
+        सचे (locked_1 && locked_2)
+            पटिनिवत्त;
+        CV_Assert(usage_गणनम् == 0);  // UMatDataAutoLock can't be used multiple times from the same thread
+        usage_गणनम् = 1;
         locked_objects[0] = u1;
         locked_objects[1] = u2;
-        if (u1)
+        सचे (u1)
             u1->lock();
-        if (u2)
+        सचे (u2)
             u2->lock();
     }
-    void release(UMatData* u1, UMatData* u2)
+    शून्य release(UMatData* u1, UMatData* u2)
     {
-        if (u1 == NULL && u2 == NULL)
-            return;
-        CV_Assert(usage_count == 1);
-        usage_count = 0;
-        if (u1)
+        सचे (u1 == रिक्त && u2 == रिक्त)
+            पटिनिवत्त;
+        CV_Assert(usage_गणनम् == 1);
+        usage_गणनम् = 0;
+        सचे (u1)
             u1->unlock();
-        if (u2)
+        सचे (u2)
             u2->unlock();
-        locked_objects[0] = NULL; locked_objects[1] = NULL;
+        locked_objects[0] = रिक्त; locked_objects[1] = रिक्त;
     }
 };
-static TLSData<UMatDataAutoLocker>& getUMatDataAutoLockerTLS()
+स्थिर TLSData<UMatDataAutoLocker>& getUMatDataAutoLockerTLS()
 {
-    CV_SINGLETON_LAZY_INIT_REF(TLSData<UMatDataAutoLocker>, new TLSData<UMatDataAutoLocker>());
+    CV_SINGLETON_LAZY_INIT_REF(TLSData<UMatDataAutoLocker>, नूतन TLSData<UMatDataAutoLocker>());
 }
-static UMatDataAutoLocker& getUMatDataAutoLocker() { return getUMatDataAutoLockerTLS().getRef(); }
+स्थिर UMatDataAutoLocker& getUMatDataAutoLocker() { पटिनिवत्त getUMatDataAutoLockerTLS().getRef(); }
 
 
-UMatDataAutoLock::UMatDataAutoLock(UMatData* u) : u1(u), u2(NULL)
+UMatDataAutoLock::UMatDataAutoLock(UMatData* u) : u1(u), u2(रिक्त)
 {
     getUMatDataAutoLocker().lock(u1);
 }
 UMatDataAutoLock::UMatDataAutoLock(UMatData* u1_, UMatData* u2_) : u1(u1_), u2(u2_)
 {
-    if (getUMatDataLockIndex(u1) > getUMatDataLockIndex(u2))
+    सचे (getUMatDataLockIndex(u1) > getUMatDataLockIndex(u2))
     {
         std::swap(u1, u2);
     }
@@ -230,19 +230,19 @@ UMatDataAutoLock::~UMatDataAutoLock()
     getUMatDataAutoLocker().release(u1, u2);
 }
 
-#else
+#अञ्ञथा
 
-void UMatData::lock()
+शून्य UMatData::lock()
 {
     // nothing in OPENCV_DISABLE_THREAD_SUPPORT mode
 }
 
-void UMatData::unlock()
+शून्य UMatData::unlock()
 {
     // nothing in OPENCV_DISABLE_THREAD_SUPPORT mode
 }
 
-UMatDataAutoLock::UMatDataAutoLock(UMatData* u) : u1(u), u2(NULL)
+UMatDataAutoLock::UMatDataAutoLock(UMatData* u) : u1(u), u2(रिक्त)
 {
     // nothing in OPENCV_DISABLE_THREAD_SUPPORT mode
 }
@@ -263,68 +263,68 @@ UMat::UMat(UMatUsageFlags _usageFlags) CV_NOEXCEPT
 : flags(MAGIC_VAL), dims(0), rows(0), cols(0), allocator(0), usageFlags(_usageFlags), u(0), offset(0)
 {}
 
-UMat::UMat(int _rows, int _cols, int _type, UMatUsageFlags _usageFlags)
+UMat::UMat(पूर्णाङ्क _rows, पूर्णाङ्क _cols, पूर्णाङ्क _type, UMatUsageFlags _usageFlags)
 : flags(MAGIC_VAL), dims(0), rows(0), cols(0), allocator(0), usageFlags(_usageFlags), u(0), offset(0)
 {
     create(_rows, _cols, _type);
 }
 
-UMat::UMat(int _rows, int _cols, int _type, const Scalar& _s, UMatUsageFlags _usageFlags)
+UMat::UMat(पूर्णाङ्क _rows, पूर्णाङ्क _cols, पूर्णाङ्क _type, ध्रुव Scalar& _s, UMatUsageFlags _usageFlags)
 : flags(MAGIC_VAL), dims(0), rows(0), cols(0), allocator(0), usageFlags(_usageFlags), u(0), offset(0)
 {
     create(_rows, _cols, _type);
-    *this = _s;
+    *एतत् = _s;
 }
 
-UMat::UMat(Size _sz, int _type, UMatUsageFlags _usageFlags)
+UMat::UMat(Size _sz, पूर्णाङ्क _type, UMatUsageFlags _usageFlags)
 : flags(MAGIC_VAL), dims(0), rows(0), cols(0), allocator(0), usageFlags(_usageFlags), u(0), offset(0)
 {
     create( _sz.height, _sz.width, _type );
 }
 
-UMat::UMat(Size _sz, int _type, const Scalar& _s, UMatUsageFlags _usageFlags)
+UMat::UMat(Size _sz, पूर्णाङ्क _type, ध्रुव Scalar& _s, UMatUsageFlags _usageFlags)
 : flags(MAGIC_VAL), dims(0), rows(0), cols(0), allocator(0), usageFlags(_usageFlags), u(0), offset(0)
 {
     create(_sz.height, _sz.width, _type);
-    *this = _s;
+    *एतत् = _s;
 }
 
-UMat::UMat(int _dims, const int* _sz, int _type, UMatUsageFlags _usageFlags)
+UMat::UMat(पूर्णाङ्क _dims, ध्रुव पूर्णाङ्क* _sz, पूर्णाङ्क _type, UMatUsageFlags _usageFlags)
 : flags(MAGIC_VAL), dims(0), rows(0), cols(0), allocator(0), usageFlags(_usageFlags), u(0), offset(0)
 {
     create(_dims, _sz, _type);
 }
 
-UMat::UMat(int _dims, const int* _sz, int _type, const Scalar& _s, UMatUsageFlags _usageFlags)
+UMat::UMat(पूर्णाङ्क _dims, ध्रुव पूर्णाङ्क* _sz, पूर्णाङ्क _type, ध्रुव Scalar& _s, UMatUsageFlags _usageFlags)
 : flags(MAGIC_VAL), dims(0), rows(0), cols(0), allocator(0), usageFlags(_usageFlags), u(0), offset(0)
 {
     create(_dims, _sz, _type);
-    *this = _s;
+    *एतत् = _s;
 }
 
-UMat::UMat(const MatShape& _shape, int _type, UMatUsageFlags _usageFlags)
+UMat::UMat(ध्रुव MatShape& _shape, पूर्णाङ्क _type, UMatUsageFlags _usageFlags)
 : flags(MAGIC_VAL), dims(0), rows(0), cols(0), allocator(0), usageFlags(_usageFlags), u(0), offset(0)
 {
     create(_shape.dims, _shape.p, _type);
 }
 
-UMat::UMat(const MatShape& _shape, int _type, const Scalar& _s, UMatUsageFlags _usageFlags)
+UMat::UMat(ध्रुव MatShape& _shape, पूर्णाङ्क _type, ध्रुव Scalar& _s, UMatUsageFlags _usageFlags)
 : flags(MAGIC_VAL), dims(0), rows(0), cols(0), allocator(0), usageFlags(_usageFlags), u(0), offset(0)
 {
     create(_shape.dims, _shape.p, _type);
-    *this = _s;
+    *एतत् = _s;
 }
 
-UMat::UMat(const UMat& m)
+UMat::UMat(ध्रुव UMat& m)
 : flags(m.flags), dims(m.dims), rows(m.rows), cols(m.cols), allocator(m.allocator),
   usageFlags(m.usageFlags), u(m.u), offset(m.offset), size(m.size), step(m.step)
 {
     addref();
 }
 
-UMat& UMat::operator=(const UMat& m)
+UMat& UMat::operator=(ध्रुव UMat& m)
 {
-    if( this != &m )
+    सचे( एतत् != &m )
     {
         const_cast<UMat&>(m).addref();
         release();
@@ -339,73 +339,73 @@ UMat& UMat::operator=(const UMat& m)
         u = m.u;
         offset = m.offset;
     }
-    return *this;
+    पटिनिवत्त *एतत्;
 }
 
-UMat UMat::clone() const
+UMat UMat::clone() ध्रुव
 {
     UMat m;
     copyTo(m);
-    return m;
+    पटिनिवत्त m;
 }
 
-void UMat::assignTo(UMat& m, int _type) const
+शून्य UMat::assignTo(UMat& m, पूर्णाङ्क _type) ध्रुव
 {
-    if( _type < 0 )
-        m = *this;
-    else
+    सचे( _type < 0 )
+        m = *एतत्;
+    अञ्ञथा
         convertTo(m, _type);
 }
 
-void UMat::create(int _rows, int _cols, int _type, UMatUsageFlags _usageFlags)
+शून्य UMat::create(पूर्णाङ्क _rows, पूर्णाङ्क _cols, पूर्णाङ्क _type, UMatUsageFlags _usageFlags)
 {
-    int sz[] = {_rows, _cols};
+    पूर्णाङ्क sz[] = {_rows, _cols};
     create(2, sz, _type, _usageFlags);
 }
 
-void UMat::create(Size _sz, int _type, UMatUsageFlags _usageFlags)
+शून्य UMat::create(Size _sz, पूर्णाङ्क _type, UMatUsageFlags _usageFlags)
 {
     create(_sz.height, _sz.width, _type, _usageFlags);
 }
 
-void UMat::createSameSize(InputArray arr, int _type, UMatUsageFlags _usageFlags)
+शून्य UMat::createSameSize(निवेशः_Array arr, पूर्णाङ्क _type, UMatUsageFlags _usageFlags)
 {
     create(arr.shape(), _type, _usageFlags);
 }
 
-void UMat::addref()
+शून्य UMat::addref()
 {
-    if( u )
+    सचे( u )
         CV_XADD(&(u->urefcount), 1);
 }
 
-void UMat::release()
+शून्य UMat::release()
 {
-    if( u && CV_XADD(&(u->urefcount), -1) == 1 )
+    सचे( u && CV_XADD(&(u->urefcount), -1) == 1 )
         deallocate();
     u = 0;
     size.clear();
     dims = cols = rows = 0;
 }
 
-bool UMat::empty() const
+तार्किक UMat::empty() ध्रुव
 {
-    return u == 0 || total() == 0;
+    पटिनिवत्त u == 0 || total() == 0;
 }
 
-size_t UMat::total() const
+size_t UMat::total() ध्रुव
 {
-    if( dims <= 2 )
-        return (size_t)rows * cols;
+    सचे( dims <= 2 )
+        पटिनिवत्त (size_t)rows * cols;
     size_t p = 1;
-    for( int i = 0; i < dims; i++ )
+    अत्थाय( पूर्णाङ्क i = 0; i < dims; i++ )
         p *= size[i];
-    return p;
+    पटिनिवत्त p;
 }
 
-MatShape UMat::shape() const
+MatShape UMat::shape() ध्रुव
 {
-    return size;
+    पटिनिवत्त size;
 }
 
 UMat::UMat(UMat&& m)
@@ -418,15 +418,15 @@ UMat::UMat(UMat&& m)
     m.usageFlags = USAGE_DEFAULT;
     m.dims = m.rows = m.cols = 0;
     m.size.clear();
-    m.allocator = NULL;
-    m.u = NULL;
+    m.allocator = रिक्त;
+    m.u = रिक्त;
     m.offset = 0;
 }
 
 UMat& UMat::operator=(UMat&& m)
 {
-    if (this == &m)
-      return *this;
+    सचे (एतत् == &m)
+      पटिनिवत्त *एतत्;
     release();
     flags = m.flags; dims = m.dims; rows = m.rows; cols = m.cols;
     allocator = m.allocator; usageFlags = m.usageFlags;
@@ -437,23 +437,23 @@ UMat& UMat::operator=(UMat&& m)
     m.flags = MAGIC_VAL;
     m.usageFlags = USAGE_DEFAULT;
     m.dims = m.rows = m.cols = 0;
-    m.allocator = NULL;
-    m.u = NULL;
+    m.allocator = रिक्त;
+    m.u = रिक्त;
     m.offset = 0;
-    return *this;
+    पटिनिवत्त *एतत्;
 }
 
 
 MatAllocator* UMat::getStdAllocator()
 {
 #ifdef HAVE_OPENCL
-    if (ocl::useOpenCL())
-        return ocl::getOpenCLAllocator();
+    सचे (ocl::useOpenCL())
+        पटिनिवत्त ocl::getOpenCLAllocator();
 #endif
-    return Mat::getDefaultAllocator();
+    पटिनिवत्त Mat::getDefaultAllocator();
 }
 
-void swap( UMat& a, UMat& b )
+शून्य swap( UMat& a, UMat& b )
 {
     std::swap(a.flags, b.flags);
     std::swap(a.dims, b.dims);
@@ -468,103 +468,103 @@ void swap( UMat& a, UMat& b )
 }
 
 
-void setSize( UMat& m, int _dims, const int* _sz,
-              const size_t* _steps, bool autoSteps )
+शून्य setSize( UMat& m, पूर्णाङ्क _dims, ध्रुव पूर्णाङ्क* _sz,
+              ध्रुव size_t* _steps, तार्किक autoSteps )
 {
     CV_Assert( 0 <= _dims && _dims <= CV_MAX_DIM && _dims <= MatShape::MAX_DIMS);
 
     m.dims = _dims;
     m.size = MatShape(_dims, _sz);
     m.step[std::max(_dims-1, 0)] = CV_ELEM_SIZE(m.flags);
-    for (int i = _dims-2; i >= 0; i--) {
+    अत्थाय (पूर्णाङ्क i = _dims-2; i >= 0; i--) {
         size_t autostep = m.size[i+1]*m.step[i+1];
-        if (_steps) {
+        सचे (_steps) {
             m.step[i] = _steps[i];
             //CV_Assert(m.step[i] >= autostep);
-        } else if (autoSteps) {
+        } अञ्ञथा सचे (autoSteps) {
             m.step[i] = autostep;
-        } else {
+        } अञ्ञथा {
             m.step[i] = 0;
         }
     }
 
-    if( _dims <= 2 )
+    सचे( _dims <= 2 )
     {
         m.cols = _dims == 0 ? 1 : _sz ? _sz[_dims > 1] : 0;
         m.rows = _dims < 2 ? 1 : _sz ? _sz[0] : 0;
-    } else {
+    } अञ्ञथा {
         m.cols = m.rows = -1;
     }
 }
 
 
-void UMat::updateContinuityFlag()
+शून्य UMat::updateContinuityFlag()
 {
     flags = cv::updateContinuityFlag(flags, dims, size.p, step.p);
 }
 
 
-void finalizeHdr(UMat& m)
+शून्य finalizeHdr(UMat& m)
 {
     m.updateContinuityFlag();
-    int d = m.dims;
-    if( d > 2 )
+    पूर्णाङ्क d = m.dims;
+    सचे( d > 2 )
         m.rows = m.cols = -1;
 }
 
 
-UMat Mat::getUMat(AccessFlag accessFlags, UMatUsageFlags usageFlags) const
+UMat Mat::getUMat(AccessFlag accessFlags, UMatUsageFlags usageFlags) ध्रुव
 {
     UMat hdr;
-    if(!data)
-        return hdr;
-    if (data != datastart)
+    सचे(!data)
+        पटिनिवत्त hdr;
+    सचे (data != datastart)
     {
         Size wholeSize;
         Point ofs;
         locateROI(wholeSize, ofs);
         Size sz(cols, rows);
-        if (ofs.x != 0 || ofs.y != 0)
+        सचे (ofs.x != 0 || ofs.y != 0)
         {
-            Mat src = *this;
-            int dtop = ofs.y;
-            int dbottom = wholeSize.height - src.rows - ofs.y;
-            int dleft = ofs.x;
-            int dright = wholeSize.width - src.cols - ofs.x;
+            Mat src = *एतत्;
+            पूर्णाङ्क dtop = ofs.y;
+            पूर्णाङ्क dbottom = wholeSize.height - src.rows - ofs.y;
+            पूर्णाङ्क dleft = ofs.x;
+            पूर्णाङ्क dright = wholeSize.width - src.cols - ofs.x;
             src.adjustROI(dtop, dbottom, dleft, dright);
-            return src.getUMat(accessFlags, usageFlags)(cv::Rect(ofs.x, ofs.y, sz.width, sz.height));
+            पटिनिवत्त src.getUMat(accessFlags, usageFlags)(cv::Rect(ofs.x, ofs.y, sz.width, sz.height));
         }
     }
     CV_Assert(data == datastart);
 
     accessFlags |= ACCESS_RW;
-    UMatData* new_u = NULL;
+    UMatData* new_u = रिक्त;
     MatStep new_step = step;
     {
         MatAllocator *a = allocator, *a0 = getDefaultAllocator();
-        if(!a)
+        सचे(!a)
             a = a0;
         new_u = a->allocate(dims, size.p, type(), data, new_step.p, accessFlags, usageFlags);
         new_u->originalUMatData = u;
     }
-    bool allocated = false;
-    try
+    तार्किक allocated = मिच्छा;
+    यत्न
     {
         allocated = UMat::getStdAllocator()->allocate(new_u, accessFlags, usageFlags);
     }
-    catch (const cv::Exception& e)
+    गृहाण (ध्रुव cv::Exception& e)
     {
         fprintf(stderr, "Exception: %s\n", e.what());
     }
-    if (!allocated)
+    सचे (!allocated)
     {
         allocated = getDefaultAllocator()->allocate(new_u, accessFlags, usageFlags);
         CV_Assert(allocated);
     }
-    if (u != NULL)
+    सचे (u != रिक्त)
     {
 #ifdef HAVE_OPENCL
-        if (ocl::useOpenCL() && new_u->currAllocator == ocl::getOpenCLAllocator())
+        सचे (ocl::useOpenCL() && new_u->currAllocator == ocl::getOpenCLAllocator())
         {
             CV_Assert(new_u->tempUMat());
         }
@@ -572,7 +572,7 @@ UMat Mat::getUMat(AccessFlag accessFlags, UMatUsageFlags usageFlags) const
         CV_XADD(&(u->refcount), 1);
         CV_XADD(&(u->urefcount), 1);
     }
-    try
+    यत्न
     {
         hdr.flags = flags;
         hdr.usageFlags = usageFlags;
@@ -581,28 +581,28 @@ UMat Mat::getUMat(AccessFlag accessFlags, UMatUsageFlags usageFlags) const
         hdr.u = new_u;
         hdr.offset = 0; //data - datastart;
         hdr.addref();
-        return hdr;
+        पटिनिवत्त hdr;
     }
-    catch(...)
+    गृहाण(...)
     {
-        if (u != NULL)
+        सचे (u != रिक्त)
         {
             CV_XADD(&(u->refcount), -1);
             CV_XADD(&(u->urefcount), -1);
         }
         new_u->currAllocator->deallocate(new_u);
-        throw;
+        क्षिप;
     }
 
 }
 
-void UMat::create(int d0, const int* _sizes, int _type, UMatUsageFlags _usageFlags)
+शून्य UMat::create(पूर्णाङ्क d0, ध्रुव पूर्णाङ्क* _sizes, पूर्णाङ्क _type, UMatUsageFlags _usageFlags)
 {
-    int sz1 = 1, d = d0;
-    int i;
-    if (d == 0) {
+    पूर्णाङ्क sz1 = 1, d = d0;
+    पूर्णाङ्क i;
+    सचे (d == 0) {
         d = 1;
-        _sizes = (const int*)&sz1;
+        _sizes = (ध्रुव पूर्णाङ्क*)&sz1;
     }
     CV_Assert(0 <= d && d <= CV_MAX_DIM && _sizes);
     _type = CV_MAT_TYPE(_type);
@@ -611,132 +611,132 @@ void UMat::create(int d0, const int* _sizes, int _type, UMatUsageFlags _usageFla
     // ...then don't change the existing usageFlags
     // it is not possible to change usage from non-default to USAGE_DEFAULT through create()
     // ...instead must construct UMat()
-    if (_usageFlags == cv::USAGE_DEFAULT)
+    सचे (_usageFlags == cv::USAGE_DEFAULT)
     {
         _usageFlags = usageFlags;
     }
 
-    if( u && d == dims && _type == type() && _usageFlags == usageFlags )
+    सचे( u && d == dims && _type == type() && _usageFlags == usageFlags )
     {
-        for( i = 0; i < d; i++ )
-            if( size[i] != _sizes[i] )
-                break;
-        if( i == d )
-            return;
+        अत्थाय( i = 0; i < d; i++ )
+            सचे( size[i] != _sizes[i] )
+                भङ्ग;
+        सचे( i == d )
+            पटिनिवत्त;
     }
 
-    int _sizes_backup[CV_MAX_DIM]; // #5991
-    if (_sizes == (this->size.p))
+    पूर्णाङ्क _sizes_backup[CV_MAX_DIM]; // #5991
+    सचे (_sizes == (एतत्->size.p))
     {
-        for(i = 0; i < d; i++ )
+        अत्थाय(i = 0; i < d; i++ )
             _sizes_backup[i] = _sizes[i];
         _sizes = _sizes_backup;
     }
 
     release();
     usageFlags = _usageFlags;
-    if( d == 0 )
-        return;
+    सचे( d == 0 )
+        पटिनिवत्त;
     flags = (_type & CV_MAT_TYPE_MASK) | MAGIC_VAL;
-    setSize(*this, d, _sizes, 0, true);
+    setSize(*एतत्, d, _sizes, 0, सच्च);
     offset = 0;
 
-    if( total() > 0 )
+    सचे( total() > 0 )
     {
         MatAllocator *a = allocator, *a0 = getStdAllocator();
-        if (!a)
+        सचे (!a)
         {
             a = a0;
             a0 = Mat::getDefaultAllocator();
         }
-        try
+        यत्न
         {
             u = a->allocate(dims, size.p, _type, 0, step.p, ACCESS_RW /* ignored */, usageFlags);
             CV_Assert(u != 0);
         }
-        catch(...)
+        गृहाण(...)
         {
-            if(a != a0)
+            सचे(a != a0)
                 u = a0->allocate(dims, size.p, _type, 0, step.p, ACCESS_RW /* ignored */, usageFlags);
             CV_Assert(u != 0);
         }
         CV_Assert( step[dims-1] == (size_t)CV_ELEM_SIZE(flags) );
     }
 
-    finalizeHdr(*this);
+    finalizeHdr(*एतत्);
     addref();
     size.dims = dims = d0;
 }
 
-void UMat::create(const std::vector<int>& _sizes, int _type, UMatUsageFlags _usageFlags)
+शून्य UMat::create(ध्रुव std::vector<पूर्णाङ्क>& _sizes, पूर्णाङ्क _type, UMatUsageFlags _usageFlags)
 {
-    create((int)_sizes.size(), _sizes.data(), _type, _usageFlags);
+    create((पूर्णाङ्क)_sizes.size(), _sizes.data(), _type, _usageFlags);
 }
 
-void UMat::create(const MatShape& _shape, int _type, UMatUsageFlags _usageFlags)
+शून्य UMat::create(ध्रुव MatShape& _shape, पूर्णाङ्क _type, UMatUsageFlags _usageFlags)
 {
-    if (_shape.dims < 0) {
+    सचे (_shape.dims < 0) {
         release();
-    } else {
+    } अञ्ञथा {
         create(_shape.dims, _shape.p, _type, _usageFlags);
         size.layout = _shape.layout;
         size.C = _shape.C;
     }
 }
 
-void UMat::fit(int _dims, const int* _sizes, int _type, UMatUsageFlags _usageFlags)
+शून्य UMat::fit(पूर्णाङ्क _dims, ध्रुव पूर्णाङ्क* _sizes, पूर्णाङ्क _type, UMatUsageFlags _usageFlags)
 {
-    if (_usageFlags == cv::USAGE_DEFAULT)
+    सचे (_usageFlags == cv::USAGE_DEFAULT)
         _usageFlags = usageFlags;
     size_t oldTotalBytes = u ? u->size : 0;
     size_t esz = CV_ELEM_SIZE(_type), newTotal = _dims >= 0;
-    for (int i = 0; i < _dims; i++)
+    अत्थाय (पूर्णाङ्क i = 0; i < _dims; i++)
         newTotal *= _sizes[i];
     size_t newTotalBytes = newTotal*esz;
-    if (newTotalBytes > 0 &&
+    सचे (newTotalBytes > 0 &&
         (!isContinuous() ||
          newTotalBytes > oldTotalBytes ||
          offset != 0 ||
          _usageFlags != usageFlags)) {
         create(_dims, _sizes, _type, _usageFlags);
-    } else {
+    } अञ्ञथा {
         flags = (flags & ~Mat::TYPE_MASK) | CV_MAT_TYPE(_type);
-        int _dummy_size = 0;
-        setSize(*this, (_dims >= 0 ? _dims : 1), (_dims >= 0 ? _sizes : &_dummy_size), nullptr, true);
-        finalizeHdr(*this);
+        पूर्णाङ्क _dummy_size = 0;
+        setSize(*एतत्, (_dims >= 0 ? _dims : 1), (_dims >= 0 ? _sizes : &_dummy_size), nullptr, सच्च);
+        finalizeHdr(*एतत्);
     }
 }
 
-void UMat::fit(const std::vector<int>& _shape, int _type, UMatUsageFlags _usageFlags)
+शून्य UMat::fit(ध्रुव std::vector<पूर्णाङ्क>& _shape, पूर्णाङ्क _type, UMatUsageFlags _usageFlags)
 {
-    fit((int)_shape.size(), _shape.data(), _type, _usageFlags);
+    fit((पूर्णाङ्क)_shape.size(), _shape.data(), _type, _usageFlags);
 }
 
-void UMat::fit(const MatShape& _shape, int _type, UMatUsageFlags _usageFlags)
+शून्य UMat::fit(ध्रुव MatShape& _shape, पूर्णाङ्क _type, UMatUsageFlags _usageFlags)
 {
     fit(_shape.dims, _shape.p, _type, _usageFlags);
     size.layout = _shape.layout;
     size.C = _shape.C;
 }
 
-void UMat::fit(int _rows, int _cols, int _type, UMatUsageFlags _usageFlags)
+शून्य UMat::fit(पूर्णाङ्क _rows, पूर्णाङ्क _cols, पूर्णाङ्क _type, UMatUsageFlags _usageFlags)
 {
     _type &= TYPE_MASK;
-    int sz[] = {_rows, _cols};
+    पूर्णाङ्क sz[] = {_rows, _cols};
     fit(2, sz, _type, _usageFlags);
 }
 
-void UMat::fit(Size _sz, int _type, UMatUsageFlags _usageFlags)
+शून्य UMat::fit(Size _sz, पूर्णाङ्क _type, UMatUsageFlags _usageFlags)
 {
     fit(_sz.height, _sz.width, _type, _usageFlags);
 }
 
-void UMat::fitSameSize(InputArray m, int _type, UMatUsageFlags _usageFlags)
+शून्य UMat::fitSameSize(निवेशः_Array m, पूर्णाङ्क _type, UMatUsageFlags _usageFlags)
 {
     fit(m.shape(), _type, _usageFlags);
 }
 
-void UMat::copySize(const UMat& m)
+शून्य UMat::copySize(ध्रुव UMat& m)
 {
     dims = m.dims;
     cols = m.cols;
@@ -750,31 +750,31 @@ UMat::~UMat()
     release();
 }
 
-void UMat::deallocate()
+शून्य UMat::deallocate()
 {
     UMatData* u_ = u;
-    u = NULL;
+    u = रिक्त;
     u_->currAllocator->deallocate(u_);
 }
 
 
-UMat::UMat(const UMat& m, const Range& _rowRange, const Range& _colRange)
+UMat::UMat(ध्रुव UMat& m, ध्रुव Range& _rowRange, ध्रुव Range& _colRange)
     : flags(MAGIC_VAL), dims(0), rows(0), cols(0), allocator(0), usageFlags(USAGE_DEFAULT), u(0), offset(0)
 {
     CV_Assert( m.dims >= 2 && m.dims <= MatShape::MAX_DIMS );
-    if( m.dims > 2 )
+    सचे( m.dims > 2 )
     {
         Range rs[MatShape::MAX_DIMS];
         rs[0] = _rowRange;
         rs[1] = _colRange;
-        for( int i = 2; i < m.dims; i++ )
+        अत्थाय( पूर्णाङ्क i = 2; i < m.dims; i++ )
             rs[i] = Range::all();
-        *this = m(rs);
-        return;
+        *एतत् = m(rs);
+        पटिनिवत्त;
     }
 
-    *this = m;
-    if( _rowRange != Range::all() && _rowRange != Range(0,rows) )
+    *एतत् = m;
+    सचे( _rowRange != Range::all() && _rowRange != Range(0,rows) )
     {
         CV_Assert( 0 <= _rowRange.start &&
                   _rowRange.start <= _rowRange.end &&
@@ -784,7 +784,7 @@ UMat::UMat(const UMat& m, const Range& _rowRange, const Range& _colRange)
         flags |= SUBMATRIX_FLAG;
     }
 
-    if( _colRange != Range::all() && _colRange != Range(0,cols) )
+    सचे( _colRange != Range::all() && _colRange != Range(0,cols) )
     {
         CV_Assert( 0 <= _colRange.start &&
                   _colRange.start <= _colRange.end &&
@@ -796,7 +796,7 @@ UMat::UMat(const UMat& m, const Range& _rowRange, const Range& _colRange)
 
     updateContinuityFlag();
 
-    if( rows <= 0 || cols <= 0 )
+    सचे( rows <= 0 || cols <= 0 )
     {
         release();
         rows = cols = 0;
@@ -804,7 +804,7 @@ UMat::UMat(const UMat& m, const Range& _rowRange, const Range& _colRange)
 }
 
 
-UMat::UMat(const UMat& m, const Rect& roi)
+UMat::UMat(ध्रुव UMat& m, ध्रुव Rect& roi)
     : flags(m.flags), dims(2), rows(roi.height), cols(roi.width),
     allocator(m.allocator), usageFlags(m.usageFlags), u(m.u),
     offset(m.offset + roi.y*m.step[0]), size(2)
@@ -815,7 +815,7 @@ UMat::UMat(const UMat& m, const Rect& roi)
     offset += roi.x*esz;
     CV_Assert( 0 <= roi.x && 0 <= roi.width && roi.x + roi.width <= m.cols &&
               0 <= roi.y && 0 <= roi.height && roi.y + roi.height <= m.rows );
-    if( roi.width < m.cols || roi.height < m.rows )
+    सचे( roi.width < m.cols || roi.height < m.rows )
         flags |= SUBMATRIX_FLAG;
 
     size[0] = rows;
@@ -826,7 +826,7 @@ UMat::UMat(const UMat& m, const Rect& roi)
     updateContinuityFlag();
 
     addref();
-    if( rows <= 0 || cols <= 0 )
+    सचे( rows <= 0 || cols <= 0 )
     {
         rows = cols = 0;
         release();
@@ -834,22 +834,22 @@ UMat::UMat(const UMat& m, const Rect& roi)
 }
 
 
-UMat::UMat(const UMat& m, const Range* ranges)
+UMat::UMat(ध्रुव UMat& m, ध्रुव Range* ranges)
     : flags(MAGIC_VAL), dims(0), rows(0), cols(0), allocator(0), usageFlags(USAGE_DEFAULT), u(0), offset(0)
 {
-    int i, d = m.dims;
+    पूर्णाङ्क i, d = m.dims;
 
     CV_Assert(ranges);
-    for( i = 0; i < d; i++ )
+    अत्थाय( i = 0; i < d; i++ )
     {
         Range r = ranges[i];
         CV_Assert( r == Range::all() || (0 <= r.start && r.start < r.end && r.end <= m.size[i]) );
     }
-    *this = m;
-    for( i = 0; i < d; i++ )
+    *एतत् = m;
+    अत्थाय( i = 0; i < d; i++ )
     {
         Range r = ranges[i];
-        if( r != Range::all() && r != Range(0, size.p[i]))
+        सचे( r != Range::all() && r != Range(0, size.p[i]))
         {
             size.p[i] = r.end - r.start;
             offset += r.start*step.p[i];
@@ -857,29 +857,29 @@ UMat::UMat(const UMat& m, const Range* ranges)
         }
     }
 
-    if (d <= 2) {
+    सचे (d <= 2) {
         rows = d == 2 ? size[0] : 1;
         cols = d <= 0 ? (d >= 0) : size[d > 1];
     }
     updateContinuityFlag();
 }
 
-UMat::UMat(const UMat& m, const std::vector<Range>& ranges)
+UMat::UMat(ध्रुव UMat& m, ध्रुव std::vector<Range>& ranges)
     : flags(MAGIC_VAL), dims(0), rows(0), cols(0), allocator(0), usageFlags(USAGE_DEFAULT), u(0), offset(0)
 {
-    int i, d = m.dims;
+    पूर्णाङ्क i, d = m.dims;
 
-    CV_Assert((int)ranges.size() == d);
-    for (i = 0; i < d; i++)
+    CV_Assert((पूर्णाङ्क)ranges.size() == d);
+    अत्थाय (i = 0; i < d; i++)
     {
         Range r = ranges[i];
         CV_Assert(r == Range::all() || (0 <= r.start && r.start < r.end && r.end <= m.size[i]));
     }
-    *this = m;
-    for (i = 0; i < d; i++)
+    *एतत् = m;
+    अत्थाय (i = 0; i < d; i++)
     {
         Range r = ranges[i];
-        if (r != Range::all() && r != Range(0, size.p[i]))
+        सचे (r != Range::all() && r != Range(0, size.p[i]))
         {
             size.p[i] = r.end - r.start;
             offset += r.start*step.p[i];
@@ -887,26 +887,26 @@ UMat::UMat(const UMat& m, const std::vector<Range>& ranges)
         }
     }
 
-    if (d <= 2) {
+    सचे (d <= 2) {
         rows = d == 2 ? size[0] : 1;
         cols = d <= 0 ? (d >= 0) : size[d > 1];
     }
     updateContinuityFlag();
 }
 
-UMat UMat::diag(int d) const
+UMat UMat::diag(पूर्णाङ्क d) ध्रुव
 {
     CV_Assert( dims <= 2 );
-    UMat m = *this;
+    UMat m = *एतत्;
     size_t esz = elemSize();
-    int len;
+    पूर्णाङ्क len;
 
-    if( d >= 0 )
+    सचे( d >= 0 )
     {
         len = std::min(cols - d, rows);
         m.offset += esz*d;
     }
-    else
+    अञ्ञथा
     {
         len = std::min(rows + d, cols);
         m.offset -= step[0]*d;
@@ -919,121 +919,121 @@ UMat UMat::diag(int d) const
 
     m.updateContinuityFlag();
 
-    if( size() != Size(1,1) )
+    सचे( size() != Size(1,1) )
         m.flags |= SUBMATRIX_FLAG;
 
-    return m;
+    पटिनिवत्त m;
 }
 
-void UMat::locateROI( Size& wholeSize, Point& ofs ) const
+शून्य UMat::locateROI( Size& wholeSize, Point& ofs ) ध्रुव
 {
     CV_Assert( dims <= 2 && step[0] > 0 );
     size_t esz = elemSize(), minstep;
     ptrdiff_t delta1 = (ptrdiff_t)offset, delta2 = (ptrdiff_t)u->size;
 
-    if( delta1 == 0 )
+    सचे( delta1 == 0 )
         ofs.x = ofs.y = 0;
-    else
+    अञ्ञथा
     {
-        ofs.y = (int)(delta1/step[0]);
-        ofs.x = (int)((delta1 - step[0]*ofs.y)/esz);
+        ofs.y = (पूर्णाङ्क)(delta1/step[0]);
+        ofs.x = (पूर्णाङ्क)((delta1 - step[0]*ofs.y)/esz);
         CV_DbgAssert( offset == (size_t)(ofs.y*step[0] + ofs.x*esz) );
     }
     minstep = (ofs.x + cols)*esz;
-    wholeSize.height = (int)((delta2 - minstep)/step[0] + 1);
+    wholeSize.height = (पूर्णाङ्क)((delta2 - minstep)/step[0] + 1);
     wholeSize.height = std::max(wholeSize.height, ofs.y + rows);
-    wholeSize.width = (int)((delta2 - step*(wholeSize.height-1))/esz);
+    wholeSize.width = (पूर्णाङ्क)((delta2 - step*(wholeSize.height-1))/esz);
     wholeSize.width = std::max(wholeSize.width, ofs.x + cols);
 }
 
 
-UMat& UMat::adjustROI( int dtop, int dbottom, int dleft, int dright )
+UMat& UMat::adjustROI( पूर्णाङ्क dtop, पूर्णाङ्क dbottom, पूर्णाङ्क dleft, पूर्णाङ्क dright )
 {
     CV_Assert( dims == 2 && step[0] > 0 );
     Size wholeSize; Point ofs;
     size_t esz = elemSize();
     locateROI( wholeSize, ofs );
-    int row1 = std::min(std::max(ofs.y - dtop, 0), wholeSize.height), row2 = std::max(0, std::min(ofs.y + rows + dbottom, wholeSize.height));
-    int col1 = std::min(std::max(ofs.x - dleft, 0), wholeSize.width), col2 = std::max(0, std::min(ofs.x + cols + dright, wholeSize.width));
-    if(row1 > row2)
+    पूर्णाङ्क row1 = std::min(std::max(ofs.y - dtop, 0), wholeSize.height), row2 = std::max(0, std::min(ofs.y + rows + dbottom, wholeSize.height));
+    पूर्णाङ्क col1 = std::min(std::max(ofs.x - dleft, 0), wholeSize.width), col2 = std::max(0, std::min(ofs.x + cols + dright, wholeSize.width));
+    सचे(row1 > row2)
         std::swap(row1, row2);
-    if(col1 > col2)
+    सचे(col1 > col2)
         std::swap(col1, col2);
 
     offset += (row1 - ofs.y)*step + (col1 - ofs.x)*esz;
     rows = row2 - row1; cols = col2 - col1;
     size.p[0] = rows; size.p[1] = cols;
     updateContinuityFlag();
-    return *this;
+    पटिनिवत्त *एतत्;
 }
 
 
-UMat UMat::reshape(int new_cn, int new_rows) const
+UMat UMat::reshape(पूर्णाङ्क new_cn, पूर्णाङ्क new_rows) ध्रुव
 {
-    int cn = channels();
-    UMat hdr = *this;
+    पूर्णाङ्क cn = channels();
+    UMat hdr = *एतत्;
 
-    if( dims > 2 && new_rows == 0 && new_cn != 0 && size[dims-1]*cn % new_cn == 0 )
+    सचे( dims > 2 && new_rows == 0 && new_cn != 0 && size[dims-1]*cn % new_cn == 0 )
     {
         hdr.flags = (hdr.flags & ~CV_MAT_CN_MASK) | ((new_cn-1) << CV_CN_SHIFT);
         hdr.step[dims-1] = CV_ELEM_SIZE(hdr.flags);
         hdr.size[dims-1] = hdr.size[dims-1]*cn / new_cn;
-        return hdr;
+        पटिनिवत्त hdr;
     }
 
     CV_Assert( dims <= 2 );
 
-    if( new_cn == 0 )
+    सचे( new_cn == 0 )
         new_cn = cn;
 
-    int total_width = cols * cn;
+    पूर्णाङ्क total_width = cols * cn;
 
-    if( (new_cn > total_width || total_width % new_cn != 0) && new_rows == 0 )
+    सचे( (new_cn > total_width || total_width % new_cn != 0) && new_rows == 0 )
         new_rows = rows * total_width / new_cn;
 
-    if( new_rows != 0 && new_rows != rows )
+    सचे( new_rows != 0 && new_rows != rows )
     {
-        int total_size = total_width * rows;
-        if( !isContinuous() )
+        पूर्णाङ्क total_size = total_width * rows;
+        सचे( !isContinuous() )
             CV_Error( cv::Error::BadStep,
             "The matrix is not continuous, thus its number of rows can not be changed" );
 
         total_width = total_size / new_rows;
 
-        if( total_width * new_rows != total_size )
+        सचे( total_width * new_rows != total_size )
             CV_Error( cv::Error::StsBadArg, "The total number of matrix elements "
                                     "is not divisible by the new number of rows" );
 
         hdr.size[0] = hdr.rows = new_rows;
         hdr.step[0] = total_width * elemSize1();
-    } else {
+    } अञ्ञथा {
         hdr.size[0] = hdr.rows = rows;
-        if (dims <= 1)
+        सचे (dims <= 1)
             hdr.step[0] = cols * CV_ELEM_SIZE(flags);
     }
 
-    int new_width = total_width / new_cn;
+    पूर्णाङ्क new_width = total_width / new_cn;
 
-    if( new_width * new_cn != total_width )
-        CV_Error( cv::Error::BadNumChannels,
+    सचे( new_width * new_cn != total_width )
+        CV_Error( cv::Error::Bad_अङ्कः_Channels,
         "The total width is not divisible by the new number of channels" );
 
     hdr.size.dims = hdr.dims = 2;
     hdr.size[1] = hdr.cols = new_width;
     hdr.flags = (hdr.flags & ~CV_MAT_CN_MASK) | ((new_cn-1) << CV_CN_SHIFT);
     hdr.step[1] = CV_ELEM_SIZE(hdr.flags);
-    return hdr;
+    पटिनिवत्त hdr;
 }
 
 #ifdef HAVE_OPENCL
-namespace {
-static bool ocl_setDiag(const UMat& d, UMat& m, int len)
+नामाकाश {
+स्थिर तार्किक ocl_setDiag(ध्रुव UMat& d, UMat& m, पूर्णाङ्क len)
 {
-    int cn = d.channels();
-    int depth = d.depth();
+    पूर्णाङ्क cn = d.channels();
+    पूर्णाङ्क depth = d.depth();
 
-    if (depth == CV_64F && !ocl::Device::getDefault().doubleFPConfig())
-        return false;
+    सचे (depth == CV_64F && !ocl::Device::getDefault().doubleFPConfig())
+        पटिनिवत्त मिच्छा;
 
     String opts = format("-D SET_DIAG -D T1=%s -D cn=%d -D IS_ROW_VECTOR=%d",
                          ocl::memopTypeToStr(depth),
@@ -1041,141 +1041,141 @@ static bool ocl_setDiag(const UMat& d, UMat& m, int len)
                          (d.rows == 1) ? 1 : 0);
 
     ocl::Kernel k("setDiag", ocl::core::copyset_oclsrc, opts);
-    if (k.empty())
-        return false;
+    सचे (k.empty())
+        पटिनिवत्त मिच्छा;
 
     k.args(ocl::KernelArg::WriteOnly(m),
            ocl::KernelArg::ReadOnlyNoSize(d),
            len);
 
     size_t globalsize[2] = { (size_t)len, (size_t)len };
-    return k.run(2, globalsize, NULL, false);
+    पटिनिवत्त k.run(2, globalsize, रिक्त, मिच्छा);
 }
 }
 #endif
 
-UMat UMat::diag(const UMat& d, UMatUsageFlags usageFlags)
+UMat UMat::diag(ध्रुव UMat& d, UMatUsageFlags usageFlags)
 {
     CV_INSTRUMENT_REGION();
 
     CV_Assert(d.cols == 1 || d.rows == 1);
-    int len = d.rows + d.cols - 1;
+    पूर्णाङ्क len = d.rows + d.cols - 1;
 
 #ifdef HAVE_OPENCL
-    if (ocl::useOpenCL())
+    सचे (ocl::useOpenCL())
     {
         UMat m(len, len, d.type(), usageFlags);
-        if (ocl_setDiag(d, m, len))
+        सचे (ocl_setDiag(d, m, len))
         {
             CV_IMPL_ADD(CV_IMPL_OCL);
-            return m;
+            पटिनिवत्त m;
         }
     }
 #endif
 
     UMat m(len, len, d.type(), Scalar(0), usageFlags);
     UMat md = m.diag();
-    if( d.cols == 1 )
+    सचे( d.cols == 1 )
         d.copyTo(md);
-    else
+    अञ्ञथा
         transpose(d, md);
-    return m;
+    पटिनिवत्त m;
 }
 
-int UMat::checkVector(int _elemChannels, int _depth, bool _requireContinuous) const
+पूर्णाङ्क UMat::checkVector(पूर्णाङ्क _elemChannels, पूर्णाङ्क _depth, तार्किक _requireContinuous) ध्रुव
 {
-    return (depth() == _depth || _depth <= 0) &&
+    पटिनिवत्त (depth() == _depth || _depth <= 0) &&
         (isContinuous() || !_requireContinuous) &&
         ((dims <= 2 && (((rows == 1 || cols == 1) && channels() == _elemChannels) ||
                         (cols == _elemChannels && channels() == 1))) ||
         (dims == 3 && channels() == 1 && size.p[2] == _elemChannels && (size.p[0] == 1 || size.p[1] == 1) &&
          (isContinuous() || step.p[1] == step.p[2]*size.p[2])))
-    ? (int)(total()*channels()/_elemChannels) : -1;
+    ? (पूर्णाङ्क)(total()*channels()/_elemChannels) : -1;
 }
 
-UMat UMat::reshape(int _cn, int _newndims, const int* _newsz) const
+UMat UMat::reshape(पूर्णाङ्क _cn, पूर्णाङ्क _newndims, ध्रुव पूर्णाङ्क* _newsz) ध्रुव
 {
-    if(_newndims == dims)
+    सचे(_newndims == dims)
     {
-        if(_newsz == 0)
-            return reshape(_cn);
-        if(_newndims == 2)
-            return reshape(_cn, _newsz[0]);
+        सचे(_newsz == 0)
+            पटिनिवत्त reshape(_cn);
+        सचे(_newndims == 2)
+            पटिनिवत्त reshape(_cn, _newsz[0]);
     }
 
-    if (isContinuous())
+    सचे (isContinuous())
     {
         CV_Assert(_cn >= 0 && _newndims >= 0 && _newndims <= CV_MAX_DIM && (_newndims == 0 || _newsz != 0));
 
-        if (_cn == 0)
-            _cn = this->channels();
-        else
+        सचे (_cn == 0)
+            _cn = एतत्->channels();
+        अञ्ञथा
             CV_Assert(_cn <= CV_CN_MAX);
 
-        size_t total_elem1_ref = this->total() * this->channels();
+        size_t total_elem1_ref = एतत्->total() * एतत्->channels();
         size_t total_elem1 = _cn;
 
-        AutoBuffer<int, 4> newsz_buf( (size_t)std::max(_newndims, 1) );
+        AutoBuffer<पूर्णाङ्क, 4> newsz_buf( (size_t)std::max(_newndims, 1) );
 
-        int m1_idx = -1;
+        पूर्णाङ्क m1_idx = -1;
 
-        for (int i = 0; i < _newndims; i++)
+        अत्थाय (पूर्णाङ्क i = 0; i < _newndims; i++)
         {
-            if (_newsz[i] >= 0) {
-                if (_newsz[i] == 0 && i < dims)
+            सचे (_newsz[i] >= 0) {
+                सचे (_newsz[i] == 0 && i < dims)
                     newsz_buf[i] = size.p[i];
-                else
+                अञ्ञथा
                     newsz_buf[i] = _newsz[i];
                 total_elem1 *= (size_t)newsz_buf[i];
-            } else {
-                if (m1_idx >= 0)
+            } अञ्ञथा {
+                सचे (m1_idx >= 0)
                     CV_Error(cv::Error::StsBadSize, "More than one '-1' occured in the new shape");
                 m1_idx = i;
             }
         }
 
-        if (m1_idx >= 0) {
-            if (total_elem1 == 0) {
+        सचे (m1_idx >= 0) {
+            सचे (total_elem1 == 0) {
                 CV_Assert(total_elem1_ref == 0);
                 total_elem1 = 1;
             }
             CV_Assert(total_elem1_ref % total_elem1 == 0);
-            newsz_buf[m1_idx] = (int)(total_elem1_ref / total_elem1);
-        } else if (total_elem1 != total_elem1_ref) {
+            newsz_buf[m1_idx] = (पूर्णाङ्क)(total_elem1_ref / total_elem1);
+        } अञ्ञथा सचे (total_elem1 != total_elem1_ref) {
             CV_Error(cv::Error::StsUnmatchedSizes, "Requested and source matrices have different count of elements");
         }
 
-        UMat hdr = *this;
+        UMat hdr = *एतत्;
         hdr.flags = (hdr.flags & ~CV_MAT_CN_MASK) | ((_cn-1) << CV_CN_SHIFT);
-        setSize(hdr, _newndims, newsz_buf.data(), NULL, true);
+        setSize(hdr, _newndims, newsz_buf.data(), रिक्त, सच्च);
 
-        return hdr;
+        पटिनिवत्त hdr;
     }
 
     CV_Error(cv::Error::StsNotImplemented, "Reshaping of n-dimensional non-continuous matrices is not supported yet");
 }
 
-UMat UMat::reshape(int _cn, const MatShape& _newshape) const
+UMat UMat::reshape(पूर्णाङ्क _cn, ध्रुव MatShape& _newshape) ध्रुव
 {
-    if (_newshape.dims < 0) {
-        int newshape[] = {0};
-        return reshape(_cn, 1, newshape);
+    सचे (_newshape.dims < 0) {
+        पूर्णाङ्क newshape[] = {0};
+        पटिनिवत्त reshape(_cn, 1, newshape);
     }
-    return reshape(_cn, _newshape.dims, _newshape.p);
+    पटिनिवत्त reshape(_cn, _newshape.dims, _newshape.p);
 }
 
-Mat UMat::getMat(AccessFlag accessFlags) const
+Mat UMat::getMat(AccessFlag accessFlags) ध्रुव
 {
-    if(!u)
-        return Mat();
+    सचे(!u)
+        पटिनिवत्त Mat();
     // TODO Support ACCESS_READ (ACCESS_WRITE) without unnecessary data transfers
     accessFlags |= ACCESS_RW;
     UMatDataAutoLock autolock(u);
-    try
+    यत्न
     {
-        if(CV_XADD(&u->refcount, 1) == 0)
+        सचे(CV_XADD(&u->refcount, 1) == 0)
             u->currAllocator->map(u, accessFlags);
-        if (u->data != 0)
+        सचे (u->data != 0)
         {
             Mat hdr(dims, size.p, type(), u->data + offset, step.p);
             hdr.flags = flags;
@@ -1183,42 +1183,42 @@ Mat UMat::getMat(AccessFlag accessFlags) const
             hdr.datastart = u->data;
             hdr.data = u->data + offset;
             hdr.datalimit = hdr.dataend = u->data + u->size;
-            return hdr;
+            पटिनिवत्त hdr;
         }
     }
-    catch(...)
+    गृहाण(...)
     {
         CV_XADD(&u->refcount, -1);
-        throw;
+        क्षिप;
     }
     CV_XADD(&u->refcount, -1);
     CV_Assert(u->data != 0 && "Error mapping of UMat to host memory.");
-    return Mat();
+    पटिनिवत्त Mat();
 }
 
-void* UMat::handle(AccessFlag accessFlags) const
+शून्य* UMat::handle(AccessFlag accessFlags) ध्रुव
 {
-    if( !u )
-        return 0;
+    सचे( !u )
+        पटिनिवत्त 0;
 
     CV_Assert(u->refcount == 0);
     CV_Assert(!u->deviceCopyObsolete() || u->copyOnMap());
-    if (u->deviceCopyObsolete())
+    सचे (u->deviceCopyObsolete())
     {
         u->currAllocator->unmap(u);
     }
 
-    if (!!(accessFlags & ACCESS_WRITE))
-        u->markHostCopyObsolete(true);
+    सचे (!!(accessFlags & ACCESS_WRITE))
+        u->markHostCopyObsolete(सच्च);
 
-    return u->handle;
+    पटिनिवत्त u->handle;
 }
 
-void UMat::ndoffset(size_t* ofs) const
+शून्य UMat::ndoffset(size_t* ofs) ध्रुव
 {
     // offset = step[0]*ofs[0] + step[1]*ofs[1] + step[2]*ofs[2] + ...;
     size_t val = offset;
-    for( int i = 0; i < dims; i++ )
+    अत्थाय( पूर्णाङ्क i = 0; i < dims; i++ )
     {
         size_t s = step.p[i];
         ofs[i] = val / s;
@@ -1226,82 +1226,82 @@ void UMat::ndoffset(size_t* ofs) const
     }
 }
 
-void UMat::copyTo(OutputArray _dst) const
+शून्य UMat::copyTo(OutputArray _dst) ध्रुव
 {
     CV_INSTRUMENT_REGION();
 
 #ifdef HAVE_CUDA
-    if (_dst.isGpuMat())
+    सचे (_dst.isGpuMat())
     {
-        _dst.getGpuMat().upload(*this);
-        return;
+        _dst.getGpuMat().upload(*एतत्);
+        पटिनिवत्त;
     }
 #endif
 
-    int stype = type();
-    int dtype = _dst.type();
-    if( _dst.fixedType() && dtype != stype )
+    पूर्णाङ्क stype = type();
+    पूर्णाङ्क dtype = _dst.type();
+    सचे( _dst.fixedType() && dtype != stype )
     {
         CV_Assert( CV_MAT_CN(stype) == CV_MAT_CN(dtype) );
         convertTo( _dst, dtype );
-        return;
+        पटिनिवत्त;
     }
 
-    if( dims == 0 && empty() )
+    सचे( dims == 0 && empty() )
     {
         _dst.release();
-        void* obj = _dst.getObj();
-        if (_dst.isMat())
+        शून्य* obj = _dst.getObj();
+        सचे (_dst.isMat())
             reinterpret_cast<Mat*>(obj)->flags = Mat::MAGIC_VAL | Mat::CONTINUOUS_FLAG | stype;
-        else if (_dst.isUMat())
+        अञ्ञथा सचे (_dst.isUMat())
             reinterpret_cast<UMat*>(obj)->flags = UMat::MAGIC_VAL | UMat::CONTINUOUS_FLAG | stype;
-        else if (_dst.isGpuMat())
+        अञ्ञथा सचे (_dst.isGpuMat())
             reinterpret_cast<cuda::GpuMat*>(obj)->flags = stype;
-        return;
+        पटिनिवत्त;
     }
 
     _dst.create( dims, size.p, stype );
-    if (empty())
-        return;
+    सचे (empty())
+        पटिनिवत्त;
 
     size_t sz[CV_MAX_DIM] = {1}, srcofs[CV_MAX_DIM]={0}, dstofs[CV_MAX_DIM]={0};
     size_t esz = CV_ELEM_SIZE(stype);
-    int i, d = std::max(dims, 1);
-    for( i = 0; i < d; i++ )
+    पूर्णाङ्क i, d = std::max(dims, 1);
+    अत्थाय( i = 0; i < d; i++ )
         sz[i] = size.p[i];
     sz[d-1] *= esz;
     ndoffset(srcofs);
     srcofs[d-1] *= esz;
 
-    if( _dst.isUMat() )
+    सचे( _dst.isUMat() )
     {
         UMat dst = _dst.getUMat();
         CV_Assert(dst.u);
-        if( u == dst.u && dst.offset == offset )
-            return;
+        सचे( u == dst.u && dst.offset == offset )
+            पटिनिवत्त;
 
-        if (u->currAllocator == dst.u->currAllocator)
+        सचे (u->currAllocator == dst.u->currAllocator)
         {
             dst.ndoffset(dstofs);
             dstofs[dims-1] *= esz;
-            u->currAllocator->copy(u, dst.u, d, sz, srcofs, step.p, dstofs, dst.step.p, false);
-            return;
+            u->currAllocator->copy(u, dst.u, d, sz, srcofs, step.p, dstofs, dst.step.p, मिच्छा);
+            पटिनिवत्त;
         }
 
         // different allocators: never map a device destination, upload into it instead
         // (through a host Mat when both sides are device memory)
         MatAllocator* hostAllocator = Mat::getDefaultAllocator();
-        if (dst.u->currAllocator != hostAllocator)
+        सचे (dst.u->currAllocator != hostAllocator)
         {
-            if (u->currAllocator == hostAllocator)
+            सचे (u->currAllocator == hostAllocator)
                 getMat(ACCESS_READ).copyTo(_dst);
-            else
+            अञ्ञथा
             {
                 Mat tmp;
                 copyTo(tmp);
                 tmp.copyTo(_dst);
             }
-            return;
+            पटिनिवत्त;
         }
     }
 
@@ -1309,47 +1309,47 @@ void UMat::copyTo(OutputArray _dst) const
     u->currAllocator->download(u, dst.ptr(), d, sz, srcofs, step.p, dst.step.p);
 }
 
-void UMat::copyTo(OutputArray _dst, InputArray _mask) const
+शून्य UMat::copyTo(OutputArray _dst, निवेशः_Array _mask) ध्रुव
 {
     CV_INSTRUMENT_REGION();
 
-    if( _mask.empty() )
+    सचे( _mask.empty() )
     {
         copyTo(_dst);
-        return;
+        पटिनिवत्त;
     }
 #ifdef HAVE_OPENCL
-    int cn = channels(), mtype = _mask.type(), mdepth = CV_MAT_DEPTH(mtype), mcn = CV_MAT_CN(mtype);
+    पूर्णाङ्क cn = channels(), mtype = _mask.type(), mdepth = CV_MAT_DEPTH(mtype), mcn = CV_MAT_CN(mtype);
     CV_Assert( (mdepth == CV_8U || mdepth == CV_8S || mdepth == CV_Bool) && (mcn == 1 || mcn == cn) );
 
-    if (ocl::useOpenCL() && _dst.isUMat() && dims <= 2)
+    सचे (ocl::useOpenCL() && _dst.isUMat() && dims <= 2)
     {
         UMatData * prevu = _dst.getUMat().u;
         _dst.create( size, type() );
 
         UMat dst = _dst.getUMat();
 
-        bool haveDstUninit = false;
-        if( prevu != dst.u ) // do not leave dst uninitialized
-            haveDstUninit = true;
+        तार्किक haveDstUninit = मिच्छा;
+        सचे( prevu != dst.u ) // do not leave dst uninitialized
+            haveDstUninit = सच्च;
 
         String opts = format("-D COPY_TO_MASK -D T1=%s -D scn=%d -D mcn=%d%s",
                              ocl::memopTypeToStr(depth()), cn, mcn,
                              haveDstUninit ? " -D HAVE_DST_UNINIT" : "");
 
         ocl::Kernel k("copyToMask", ocl::core::copyset_oclsrc, opts);
-        if (!k.empty())
+        सचे (!k.empty())
         {
-            k.args(ocl::KernelArg::ReadOnlyNoSize(*this),
+            k.args(ocl::KernelArg::ReadOnlyNoSize(*एतत्),
                    ocl::KernelArg::ReadOnlyNoSize(_mask.getUMat()),
                    haveDstUninit ? ocl::KernelArg::WriteOnly(dst) :
                                    ocl::KernelArg::ReadWrite(dst));
 
             size_t globalsize[2] = { (size_t)cols, (size_t)rows };
-            if (k.run(2, globalsize, NULL, false))
+            सचे (k.run(2, globalsize, रिक्त, मिच्छा))
             {
                 CV_IMPL_ADD(CV_IMPL_OCL);
-                return;
+                पटिनिवत्त;
             }
         }
     }
@@ -1363,116 +1363,116 @@ void UMat::copyTo(OutputArray _dst, InputArray _mask) const
 // void UMat::convertTo moved to convert.dispatch.cpp
 //
 
-UMat& UMat::setTo(InputArray _value, InputArray _mask)
+UMat& UMat::setTo(निवेशः_Array मानम्, निवेशः_Array _mask)
 {
     CV_INSTRUMENT_REGION();
 
-    bool haveMask = !_mask.empty();
+    तार्किक haveMask = !_mask.empty();
 #ifdef HAVE_OPENCL
-    int tp = type(), cn = CV_MAT_CN(tp), d = CV_MAT_DEPTH(tp);
+    पूर्णाङ्क tp = type(), cn = CV_MAT_CN(tp), d = CV_MAT_DEPTH(tp);
 
-    if( dims <= 2 && cn <= 4 && CV_MAT_DEPTH(tp) < CV_64F && ocl::useOpenCL() )
+    सचे( dims <= 2 && cn <= 4 && CV_MAT_DEPTH(tp) < CV_64F && ocl::useOpenCL() )
     {
-        Mat value = _value.getMat();
-        CV_Assert( checkScalar(value, type(), _value.kind(), _InputArray::UMAT) );
-        int kercn = haveMask || cn == 3 ? cn : std::max(cn, ocl::predictOptimalVectorWidth(*this)),
+        Mat value = मानम्.getMat();
+        CV_Assert( checkScalar(value, type(), मानम्.kind(), निवेशः_Array_2::UMAT) );
+        पूर्णाङ्क kercn = haveMask || cn == 3 ? cn : std::max(cn, ocl::predictOptimalVectorWidth(*एतत्)),
                 kertp = CV_MAKE_TYPE(d, kercn);
 
-        double buf[16] = { 0, 0, 0, 0, 0, 0, 0, 0,
+        द्विगुण buf[16] = { 0, 0, 0, 0, 0, 0, 0, 0,
                            0, 0, 0, 0, 0, 0, 0, 0 };
         convertAndUnrollScalar(value, tp, (uchar *)buf, kercn / cn);
 
-        int scalarcn = kercn == 3 ? 4 : kercn, rowsPerWI = ocl::Device::getDefault().isIntel() ? 4 : 1;
+        पूर्णाङ्क scalarcn = kercn == 3 ? 4 : kercn, rowsPerWI = ocl::Device::getDefault().isIntel() ? 4 : 1;
         String opts = format("-D dstT=%s -D rowsPerWI=%d -D dstST=%s -D dstT1=%s -D cn=%d",
                              ocl::memopTypeToStr(kertp), rowsPerWI,
                              ocl::memopTypeToStr(CV_MAKETYPE(d, scalarcn)),
                              ocl::memopTypeToStr(d), kercn);
 
         ocl::Kernel setK(haveMask ? "setMask" : "set", ocl::core::copyset_oclsrc, opts);
-        if( !setK.empty() )
+        सचे( !setK.empty() )
         {
             ocl::KernelArg scalararg(ocl::KernelArg::CONSTANT, 0, 0, 0, buf, CV_ELEM_SIZE(d) * scalarcn);
             UMat mask;
 
-            if( haveMask )
+            सचे( haveMask )
             {
                 mask = _mask.getUMat();
                 CV_Assert( mask.size() == size() && (mask.type() == CV_8U || mask.type() == CV_8S || mask.type() == CV_Bool) );
                 ocl::KernelArg maskarg = ocl::KernelArg::ReadOnlyNoSize(mask),
-                        dstarg = ocl::KernelArg::ReadWrite(*this);
+                        dstarg = ocl::KernelArg::ReadWrite(*एतत्);
                 setK.args(maskarg, dstarg, scalararg);
             }
-            else
+            अञ्ञथा
             {
-                ocl::KernelArg dstarg = ocl::KernelArg::WriteOnly(*this, cn, kercn);
+                ocl::KernelArg dstarg = ocl::KernelArg::WriteOnly(*एतत्, cn, kercn);
                 setK.args(dstarg, scalararg);
             }
 
             size_t globalsize[] = { (size_t)cols * cn / kercn, ((size_t)rows + rowsPerWI - 1) / rowsPerWI };
-            if( setK.run(2, globalsize, NULL, false) )
+            सचे( setK.run(2, globalsize, रिक्त, मिच्छा) )
             {
                 CV_IMPL_ADD(CV_IMPL_OCL);
-                return *this;
+                पटिनिवत्त *एतत्;
             }
         }
     }
 #endif
     Mat m = getMat(haveMask ? ACCESS_RW : ACCESS_WRITE);
-    m.setTo(_value, _mask);
-    return *this;
+    m.setTo(मानम्, _mask);
+    पटिनिवत्त *एतत्;
 }
 
-UMat& UMat::operator = (const Scalar& s)
+UMat& UMat::operator = (ध्रुव Scalar& s)
 {
     setTo(s);
-    return *this;
+    पटिनिवत्त *एतत्;
 }
 
-UMat UMat::t() const
+UMat UMat::t() ध्रुव
 {
     UMat m;
-    transpose(*this, m);
-    return m;
+    transpose(*एतत्, m);
+    पटिनिवत्त m;
 }
 
-UMat UMat::zeros(int rows, int cols, int type, UMatUsageFlags usageFlags)
+UMat UMat::zeros(पूर्णाङ्क rows, पूर्णाङ्क cols, पूर्णाङ्क type, UMatUsageFlags usageFlags)
 {
-    return UMat(rows, cols, type, Scalar::all(0), usageFlags);
+    पटिनिवत्त UMat(rows, cols, type, Scalar::all(0), usageFlags);
 }
 
-UMat UMat::zeros(Size size, int type, UMatUsageFlags usageFlags)
+UMat UMat::zeros(Size size, पूर्णाङ्क type, UMatUsageFlags usageFlags)
 {
-    return UMat(size, type, Scalar::all(0), usageFlags);
+    पटिनिवत्त UMat(size, type, Scalar::all(0), usageFlags);
 }
 
-UMat UMat::zeros(int ndims, const int* sz, int type, UMatUsageFlags usageFlags)
+UMat UMat::zeros(पूर्णाङ्क ndims, ध्रुव पूर्णाङ्क* sz, पूर्णाङ्क type, UMatUsageFlags usageFlags)
 {
-    return UMat(ndims, sz, type, Scalar::all(0), usageFlags);
+    पटिनिवत्त UMat(ndims, sz, type, Scalar::all(0), usageFlags);
 }
 
-UMat UMat::zeros(const MatShape& shape, int type, UMatUsageFlags usageFlags)
+UMat UMat::zeros(ध्रुव MatShape& shape, पूर्णाङ्क type, UMatUsageFlags usageFlags)
 {
-    return UMat(shape.dims, shape.p, type, Scalar::all(0), usageFlags);
+    पटिनिवत्त UMat(shape.dims, shape.p, type, Scalar::all(0), usageFlags);
 }
 
-UMat UMat::ones(int rows, int cols, int type, UMatUsageFlags usageFlags)
+UMat UMat::ones(पूर्णाङ्क rows, पूर्णाङ्क cols, पूर्णाङ्क type, UMatUsageFlags usageFlags)
 {
-    return UMat(rows, cols, type, Scalar(1), usageFlags);
+    पटिनिवत्त UMat(rows, cols, type, Scalar(1), usageFlags);
 }
 
-UMat UMat::ones(Size size, int type, UMatUsageFlags usageFlags)
+UMat UMat::ones(Size size, पूर्णाङ्क type, UMatUsageFlags usageFlags)
 {
-    return UMat(size, type, Scalar(1), usageFlags);
+    पटिनिवत्त UMat(size, type, Scalar(1), usageFlags);
 }
 
-UMat UMat::ones(int ndims, const int* sz, int type, UMatUsageFlags usageFlags)
+UMat UMat::ones(पूर्णाङ्क ndims, ध्रुव पूर्णाङ्क* sz, पूर्णाङ्क type, UMatUsageFlags usageFlags)
 {
-    return UMat(ndims, sz, type, Scalar(1), usageFlags);
+    पटिनिवत्त UMat(ndims, sz, type, Scalar(1), usageFlags);
 }
 
-UMat UMat::ones(const MatShape& shape, int type, UMatUsageFlags usageFlags)
+UMat UMat::ones(ध्रुव MatShape& shape, पूर्णाङ्क type, UMatUsageFlags usageFlags)
 {
-    return UMat(shape.dims, shape.p, type, Scalar(1), usageFlags);
+    पटिनिवत्त UMat(shape.dims, shape.p, type, Scalar(1), usageFlags);
 }
 
 }

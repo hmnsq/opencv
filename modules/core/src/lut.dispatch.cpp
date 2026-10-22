@@ -3,53 +3,53 @@
 // of this distribution and at http://opencv.org/license.html
 // Copyright (C) 2026, Advanced Micro Devices, Inc., all rights reserved.
 
-#include "precomp.hpp"
+#अन्तर्भाव "precomp.hpp"
 
-#include "lut.simd.hpp"
-#include "lut.simd_declarations.hpp" // defines CV_CPU_DISPATCH_MODES_ALL=AVX512_ICL,...,BASELINE based on CMakeLists.txt content
+#अन्तर्भाव "lut.simd.hpp"
+#अन्तर्भाव "lut.simd_declarations.hpp" // defines CV_CPU_DISPATCH_MODES_ALL=AVX512_ICL,...,BASELINE based on CMakeLists.txt content
 
-namespace cv {
+नामाकाश cv {
 
-namespace {
+नामाकाश {
 
-typedef void (*LUT8uFunc)( const uchar*, const uchar*, uchar*, int, int, int );
-typedef void (*LUT16uFunc)( const uchar*, const ushort*, ushort*, int, int, int );
+प्रकारनिर्देश शून्य (*LUT8uFunc)( ध्रुव uchar*, ध्रुव uchar*, uchar*, पूर्णाङ्क, पूर्णाङ्क, पूर्णाङ्क );
+प्रकारनिर्देश शून्य (*LUT16uFunc)( ध्रुव uchar*, ध्रुव ushort*, ushort*, पूर्णाङ्क, पूर्णाङ्क, पूर्णाङ्क );
 
-static LUT8uFunc resolveLUT8uFunc()
+स्थिर LUT8uFunc resolveLUT8uFunc()
 {
-#if CV_TRY_AVX512_ICL
-    if (cv::checkHardwareSupport(CV_CPU_AVX512_ICL))
-        return opt_AVX512_ICL::LUT8u_;
+#सचे CV_TRY_AVX512_ICL
+    सचे (cv::checkHardwareSupport(CV_CPU_AVX512_ICL))
+        पटिनिवत्त opt_AVX512_ICL::LUT8u_;
 #endif
-    return cpu_baseline::LUT8u_;
+    पटिनिवत्त cpu_baseline::LUT8u_;
 }
 
-static LUT16uFunc resolveLUT16uFunc()
+स्थिर LUT16uFunc resolveLUT16uFunc()
 {
-#if CV_TRY_AVX512_ICL
-    if (cv::checkHardwareSupport(CV_CPU_AVX512_ICL))
-        return opt_AVX512_ICL::LUT16u_;
+#सचे CV_TRY_AVX512_ICL
+    सचे (cv::checkHardwareSupport(CV_CPU_AVX512_ICL))
+        पटिनिवत्त opt_AVX512_ICL::LUT16u_;
 #endif
-    return cpu_baseline::LUT16u_;
+    पटिनिवत्त cpu_baseline::LUT16u_;
 }
 
 } // namespace
 
-void LUT8u_dispatch( const uchar* src, const uchar* lut, uchar* dst, int len, int cn, int lutcn );
+शून्य LUT8u_dispatch( ध्रुव uchar* src, ध्रुव uchar* lut, uchar* dst, पूर्णाङ्क len, पूर्णाङ्क cn, पूर्णाङ्क lutcn );
 
-void LUT8u_dispatch( const uchar* src, const uchar* lut, uchar* dst, int len, int cn, int lutcn )
+शून्य LUT8u_dispatch( ध्रुव uchar* src, ध्रुव uchar* lut, uchar* dst, पूर्णाङ्क len, पूर्णाङ्क cn, पूर्णाङ्क lutcn )
 {
     CV_INSTRUMENT_REGION();
-    static LUT8uFunc fn = resolveLUT8uFunc();
+    स्थिर LUT8uFunc fn = resolveLUT8uFunc();
     fn(src, lut, dst, len, cn, lutcn);
 }
 
-void LUT16u_dispatch( const uchar* src, const ushort* lut, ushort* dst, int len, int cn, int lutcn );
+शून्य LUT16u_dispatch( ध्रुव uchar* src, ध्रुव ushort* lut, ushort* dst, पूर्णाङ्क len, पूर्णाङ्क cn, पूर्णाङ्क lutcn );
 
-void LUT16u_dispatch( const uchar* src, const ushort* lut, ushort* dst, int len, int cn, int lutcn )
+शून्य LUT16u_dispatch( ध्रुव uchar* src, ध्रुव ushort* lut, ushort* dst, पूर्णाङ्क len, पूर्णाङ्क cn, पूर्णाङ्क lutcn )
 {
     CV_INSTRUMENT_REGION();
-    static LUT16uFunc fn = resolveLUT16uFunc();
+    स्थिर LUT16uFunc fn = resolveLUT16uFunc();
     fn(src, lut, dst, len, cn, lutcn);
 }
 

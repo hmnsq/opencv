@@ -41,38 +41,38 @@
 //
 //M*/
 
-#include "precomp.hpp"
-#include <map>
+#अन्तर्भाव "precomp.hpp"
+#अन्तर्भाव <map>
 
-using namespace cv;
-using namespace cv::cuda;
+using नामाकाश cv;
+using नामाकाश cv::cuda;
 
 #ifdef HAVE_CUDA
 
-namespace {
+नामाकाश {
 
-class HostMemAllocator : public MatAllocator
+वग्ग HostMemAllocator : सार्वजनिक MatAllocator
 {
-public:
-    explicit HostMemAllocator(unsigned int flags) : flags_(flags)
+सार्वजनिक:
+    explicit HostMemAllocator(unsigned पूर्णाङ्क flags) : flags_(flags)
     {
     }
 
-    UMatData* allocate(int dims, const int* sizes, int type,
-                       void* data0, size_t* step,
-                       AccessFlag /*flags*/, UMatUsageFlags /*usageFlags*/) const CV_OVERRIDE
+    UMatData* allocate(पूर्णाङ्क dims, ध्रुव पूर्णाङ्क* sizes, पूर्णाङ्क type,
+                       शून्य* data0, size_t* step,
+                       AccessFlag /*flags*/, UMatUsageFlags /*usageFlags*/) ध्रुव CV_OVERRIDE
     {
         size_t total = CV_ELEM_SIZE(type);
-        for (int i = dims-1; i >= 0; i--)
+        अत्थाय (पूर्णाङ्क i = dims-1; i >= 0; i--)
         {
-            if (step)
+            सचे (step)
             {
-                if (data0 && step[i] != CV_AUTOSTEP)
+                सचे (data0 && step[i] != CV_AUTOSTEP)
                 {
                     CV_Assert(total <= step[i]);
                     total = step[i];
                 }
-                else
+                अञ्ञथा
                 {
                     step[i] = total;
                 }
@@ -81,41 +81,41 @@ public:
             total *= sizes[i];
         }
 
-        UMatData* u = new UMatData(this);
+        UMatData* u = नूतन UMatData(एतत्);
         u->size = total;
 
-        if (data0)
+        सचे (data0)
         {
             u->data = u->origdata = static_cast<uchar*>(data0);
             u->flags |= UMatData::USER_ALLOCATED;
         }
-        else
+        अञ्ञथा
         {
-            void* ptr = 0;
+            शून्य* ptr = 0;
             cudaSafeCall( cudaHostAlloc(&ptr, total, flags_) );
 
             u->data = u->origdata = static_cast<uchar*>(ptr);
         }
 
-        return u;
+        पटिनिवत्त u;
     }
 
-    bool allocate(UMatData* u, AccessFlag /*accessFlags*/, UMatUsageFlags /*usageFlags*/) const CV_OVERRIDE
+    तार्किक allocate(UMatData* u, AccessFlag /*accessFlags*/, UMatUsageFlags /*usageFlags*/) ध्रुव CV_OVERRIDE
     {
-        return (u != NULL);
+        पटिनिवत्त (u != रिक्त);
     }
 
-    void deallocate(UMatData* u) const CV_OVERRIDE
+    शून्य deallocate(UMatData* u) ध्रुव CV_OVERRIDE
     {
-        if (!u)
-            return;
+        सचे (!u)
+            पटिनिवत्त;
 
         CV_Assert(u->urefcount >= 0);
         CV_Assert(u->refcount >= 0);
 
-        if (u->refcount == 0)
+        सचे (u->refcount == 0)
         {
-            if ( !(u->flags & UMatData::USER_ALLOCATED) )
+            सचे ( !(u->flags & UMatData::USER_ALLOCATED) )
             {
                 cudaFreeHost(u->origdata);
                 u->origdata = 0;
@@ -125,8 +125,8 @@ public:
         }
     }
 
-private:
-    unsigned int flags_;
+गुप्त:
+    unsigned पूर्णाङ्क flags_;
 };
 
 } // namespace
@@ -138,52 +138,52 @@ MatAllocator* cv::cuda::HostMem::getAllocator(AllocType alloc_type)
 #ifndef HAVE_CUDA
     CV_UNUSED(alloc_type);
     throw_no_cuda();
-#else
-    static std::map<unsigned int, Ptr<MatAllocator> > allocators;
+#अञ्ञथा
+    स्थिर std::map<unsigned पूर्णाङ्क, Ptr<MatAllocator> > allocators;
 
-    unsigned int flag = cudaHostAllocDefault;
+    unsigned पूर्णाङ्क flag = cudaHostAllocDefault;
 
-    switch (alloc_type)
+    विकल्प (alloc_type)
     {
-    case PAGE_LOCKED:    flag = cudaHostAllocDefault; break;
-    case SHARED:         flag = cudaHostAllocMapped;  break;
-    case WRITE_COMBINED: flag = cudaHostAllocWriteCombined; break;
-    default:             CV_Error(cv::Error::StsBadFlag, "Invalid alloc type");
+    पक्ष PAGE_LOCKED:    flag = cudaHostAllocDefault; भङ्ग;
+    पक्ष SHARED:         flag = cudaHostAllocMapped;  भङ्ग;
+    पक्ष WRITE_COMBINED: flag = cudaHostAllocWriteCombined; भङ्ग;
+    स्वभाव:             CV_Error(cv::Error::StsBadFlag, "Invalid alloc type");
     }
 
     Ptr<MatAllocator>& a = allocators[flag];
 
-    if (a.empty())
+    सचे (a.empty())
     {
         a = makePtr<HostMemAllocator>(flag);
     }
 
-    return a.get();
+    पटिनिवत्त a.get();
 #endif
 }
 
 #ifdef HAVE_CUDA
-namespace
+नामाकाश
 {
     size_t alignUpStep(size_t what, size_t alignment)
     {
         size_t alignMask = alignment - 1;
         size_t inverseAlignMask = ~alignMask;
         size_t res = (what + alignMask) & inverseAlignMask;
-        return res;
+        पटिनिवत्त res;
     }
 }
 #endif
 
-void cv::cuda::HostMem::create(int rows_, int cols_, int type_)
+शून्य cv::cuda::HostMem::create(पूर्णाङ्क rows_, पूर्णाङ्क cols_, पूर्णाङ्क type_)
 {
 #ifndef HAVE_CUDA
     CV_UNUSED(rows_);
     CV_UNUSED(cols_);
     CV_UNUSED(type_);
     throw_no_cuda();
-#else
-    if (alloc_type == SHARED)
+#अञ्ञथा
+    सचे (alloc_type == SHARED)
     {
         DeviceInfo devInfo;
         CV_Assert( devInfo.canMapHostMemory() );
@@ -191,25 +191,25 @@ void cv::cuda::HostMem::create(int rows_, int cols_, int type_)
 
     type_ &= Mat::TYPE_MASK;
 
-    if (rows == rows_ && cols == cols_ && type() == type_ && data)
-        return;
+    सचे (rows == rows_ && cols == cols_ && type() == type_ && data)
+        पटिनिवत्त;
 
-    if (data)
+    सचे (data)
         release();
 
     CV_DbgAssert( rows_ >= 0 && cols_ >= 0 );
 
-    if (rows_ > 0 && cols_ > 0)
+    सचे (rows_ > 0 && cols_ > 0)
     {
         flags = Mat::MAGIC_VAL + type_;
         rows = rows_;
         cols = cols_;
         step = elemSize() * cols;
-        int sz[] = { rows, cols };
+        पूर्णाङ्क sz[] = { rows, cols };
         size_t steps[] = { step, (size_t)CV_ELEM_SIZE(type_) };
         flags = updateContinuityFlag(flags, 2, sz, steps);
 
-        if (alloc_type == SHARED)
+        सचे (alloc_type == SHARED)
         {
             DeviceInfo devInfo;
             step = alignUpStep(step, devInfo.textureAlignment());
@@ -218,77 +218,77 @@ void cv::cuda::HostMem::create(int rows_, int cols_, int type_)
         int64 _nettosize = (int64)step*rows;
         size_t nettosize = (size_t)_nettosize;
 
-        if (_nettosize != (int64)nettosize)
+        सचे (_nettosize != (int64)nettosize)
             CV_Error(cv::Error::StsNoMem, "Too big buffer is allocated");
 
-        size_t datasize = alignSize(nettosize, (int)sizeof(*refcount));
+        size_t datasize = alignSize(nettosize, (पूर्णाङ्क)परिमाण(*refcount));
 
-        void* ptr = 0;
+        शून्य* ptr = 0;
 
-        switch (alloc_type)
+        विकल्प (alloc_type)
         {
-        case PAGE_LOCKED:    cudaSafeCall( cudaHostAlloc(&ptr, datasize, cudaHostAllocDefault) ); break;
-        case SHARED:         cudaSafeCall( cudaHostAlloc(&ptr, datasize, cudaHostAllocMapped) );  break;
-        case WRITE_COMBINED: cudaSafeCall( cudaHostAlloc(&ptr, datasize, cudaHostAllocWriteCombined) ); break;
-        default:             CV_Error(cv::Error::StsBadFlag, "Invalid alloc type");
+        पक्ष PAGE_LOCKED:    cudaSafeCall( cudaHostAlloc(&ptr, datasize, cudaHostAllocDefault) ); भङ्ग;
+        पक्ष SHARED:         cudaSafeCall( cudaHostAlloc(&ptr, datasize, cudaHostAllocMapped) );  भङ्ग;
+        पक्ष WRITE_COMBINED: cudaSafeCall( cudaHostAlloc(&ptr, datasize, cudaHostAllocWriteCombined) ); भङ्ग;
+        स्वभाव:             CV_Error(cv::Error::StsBadFlag, "Invalid alloc type");
         }
 
         datastart = data =  (uchar*)ptr;
         dataend = data + nettosize;
 
-        refcount = (int*)cv::fastMalloc(sizeof(*refcount));
+        refcount = (पूर्णाङ्क*)cv::fastMalloc(परिमाण(*refcount));
         *refcount = 1;
     }
 #endif
 }
 
-HostMem cv::cuda::HostMem::reshape(int new_cn, int new_rows) const
+HostMem cv::cuda::HostMem::reshape(पूर्णाङ्क new_cn, पूर्णाङ्क new_rows) ध्रुव
 {
-    HostMem hdr = *this;
+    HostMem hdr = *एतत्;
 
-    int cn = channels();
-    if (new_cn == 0)
+    पूर्णाङ्क cn = channels();
+    सचे (new_cn == 0)
         new_cn = cn;
 
-    int total_width = cols * cn;
+    पूर्णाङ्क total_width = cols * cn;
 
-    if ((new_cn > total_width || total_width % new_cn != 0) && new_rows == 0)
+    सचे ((new_cn > total_width || total_width % new_cn != 0) && new_rows == 0)
         new_rows = rows * total_width / new_cn;
 
-    if (new_rows != 0 && new_rows != rows)
+    सचे (new_rows != 0 && new_rows != rows)
     {
-        int total_size = total_width * rows;
+        पूर्णाङ्क total_size = total_width * rows;
 
-        if (!isContinuous())
+        सचे (!isContinuous())
             CV_Error(cv::Error::BadStep, "The matrix is not continuous, thus its number of rows can not be changed");
 
-        if ((unsigned)new_rows > (unsigned)total_size)
+        सचे ((unsigned)new_rows > (unsigned)total_size)
             CV_Error(cv::Error::StsOutOfRange, "Bad new number of rows");
 
         total_width = total_size / new_rows;
 
-        if (total_width * new_rows != total_size)
+        सचे (total_width * new_rows != total_size)
             CV_Error(cv::Error::StsBadArg, "The total number of matrix elements is not divisible by the new number of rows");
 
         hdr.rows = new_rows;
         hdr.step = total_width * elemSize1();
     }
 
-    int new_width = total_width / new_cn;
+    पूर्णाङ्क new_width = total_width / new_cn;
 
-    if (new_width * new_cn != total_width)
-        CV_Error(cv::Error::BadNumChannels, "The total width is not divisible by the new number of channels");
+    सचे (new_width * new_cn != total_width)
+        CV_Error(cv::Error::Bad_अङ्कः_Channels, "The total width is not divisible by the new number of channels");
 
     hdr.cols = new_width;
     hdr.flags = (hdr.flags & ~CV_MAT_CN_MASK) | ((new_cn - 1) << CV_CN_SHIFT);
 
-    return hdr;
+    पटिनिवत्त hdr;
 }
 
-void cv::cuda::HostMem::release()
+शून्य cv::cuda::HostMem::release()
 {
 #ifdef HAVE_CUDA
-    if (refcount && CV_XADD(refcount, -1) == 1)
+    सचे (refcount && CV_XADD(refcount, -1) == 1)
     {
         cudaFreeHost(datastart);
         fastFree(refcount);
@@ -300,36 +300,36 @@ void cv::cuda::HostMem::release()
 #endif
 }
 
-GpuMat cv::cuda::HostMem::createGpuMatHeader() const
+GpuMat cv::cuda::HostMem::createGpuMatHeader() ध्रुव
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
+#अञ्ञथा
     CV_Assert( alloc_type == SHARED );
 
-    void *pdev;
+    शून्य *pdev;
     cudaSafeCall( cudaHostGetDevicePointer(&pdev, data, 0) );
 
-    return GpuMat(rows, cols, type(), pdev, step);
+    पटिनिवत्त GpuMat(rows, cols, type(), pdev, step);
 #endif
 }
 
-void cv::cuda::registerPageLocked(Mat& m)
+शून्य cv::cuda::registerPageLocked(Mat& m)
 {
 #ifndef HAVE_CUDA
     CV_UNUSED(m);
     throw_no_cuda();
-#else
+#अञ्ञथा
     CV_Assert( m.isContinuous() );
     cudaSafeCall( cudaHostRegister(m.data, m.step * m.rows, cudaHostRegisterPortable) );
 #endif
 }
 
-void cv::cuda::unregisterPageLocked(Mat& m)
+शून्य cv::cuda::unregisterPageLocked(Mat& m)
 {
 #ifndef HAVE_CUDA
     CV_UNUSED(m);
-#else
+#अञ्ञथा
     cudaSafeCall( cudaHostUnregister(m.data) );
 #endif
 }

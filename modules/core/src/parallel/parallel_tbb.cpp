@@ -1,28 +1,28 @@
 // This file is part of OpenCV project.
 // It is subject to the license terms in the LICENSE file found in the top-level directory
 // of this distribution and at http://opencv.org/license.html.
-#include "../precomp.hpp"
+#अन्तर्भाव "../precomp.hpp"
 
-#include "factory_parallel.hpp"
+#अन्तर्भाव "factory_parallel.hpp"
 
 #ifdef HAVE_TBB
 
-#include "parallel.hpp"
-#include "opencv2/core/parallel/backend/parallel_for.tbb.hpp"
+#अन्तर्भाव "parallel.hpp"
+#अन्तर्भाव "opencv2/core/parallel/backend/parallel_for.tbb.hpp"
 
-namespace cv { namespace parallel {
+नामाकाश cv { नामाकाश parallel {
 
-static
+स्थिर
 std::shared_ptr<cv::parallel::tbb::ParallelForBackend>& getInstance()
 {
-    static std::shared_ptr<cv::parallel::tbb::ParallelForBackend> g_instance = std::make_shared<cv::parallel::tbb::ParallelForBackend>();
-    return g_instance;
+    स्थिर std::shared_ptr<cv::parallel::tbb::ParallelForBackend> g_instance = std::make_shared<cv::parallel::tbb::ParallelForBackend>();
+    पटिनिवत्त g_instance;
 }
 
 #ifndef BUILD_PLUGIN
 std::shared_ptr<cv::parallel::ParallelForAPI> createParallelBackendTBB()
 {
-    return getInstance();
+    पटिनिवत्त getInstance();
 }
 #endif
 
@@ -32,28 +32,28 @@ std::shared_ptr<cv::parallel::ParallelForAPI> createParallelBackendTBB()
 
 #define ABI_VERSION 0
 #define API_VERSION 0
-#include "plugin_parallel_api.hpp"
+#अन्तर्भाव "plugin_parallel_api.hpp"
 
-static
+स्थिर
 CvResult cv_getInstance(CV_OUT CvPluginParallelBackendAPI* handle) CV_NOEXCEPT
 {
-    try
+    यत्न
     {
-        if (!handle)
-            return CV_ERROR_FAIL;
+        सचे (!handle)
+            पटिनिवत्त CV_ERROR_FAIL;
         *handle = cv::parallel::getInstance().get();
-        return CV_ERROR_OK;
+        पटिनिवत्त CV_ERROR_OK;
     }
-    catch (...)
+    गृहाण (...)
     {
-        return CV_ERROR_FAIL;
+        पटिनिवत्त CV_ERROR_FAIL;
     }
 }
 
-static const OpenCV_Core_Parallel_Plugin_API plugin_api =
+स्थिर ध्रुव OpenCV_Core_Parallel_Plugin_API plugin_api =
 {
     {
-        sizeof(OpenCV_Core_Parallel_Plugin_API), ABI_VERSION, API_VERSION,
+        परिमाण(OpenCV_Core_Parallel_Plugin_API), ABI_VERSION, API_VERSION,
         CV_VERSION_MAJOR, CV_VERSION_MINOR, CV_VERSION_REVISION, CV_VERSION_STATUS,
         "TBB (interface " CVAUX_STR(TBB_INTERFACE_VERSION) ") OpenCV parallel plugin"
     },
@@ -62,11 +62,11 @@ static const OpenCV_Core_Parallel_Plugin_API plugin_api =
     }
 };
 
-const OpenCV_Core_Parallel_Plugin_API* CV_API_CALL opencv_core_parallel_plugin_init_v0(int requested_abi_version, int requested_api_version, void* /*reserved=NULL*/) CV_NOEXCEPT
+ध्रुव OpenCV_Core_Parallel_Plugin_API* CV_API_CALL opencv_core_parallel_plugin_init_v0(पूर्णाङ्क requested_abi_version, पूर्णाङ्क requested_api_version, शून्य* /*reserved=NULL*/) CV_NOEXCEPT
 {
-    if (requested_abi_version == ABI_VERSION && requested_api_version <= API_VERSION)
-        return &plugin_api;
-    return NULL;
+    सचे (requested_abi_version == ABI_VERSION && requested_api_version <= API_VERSION)
+        पटिनिवत्त &plugin_api;
+    पटिनिवत्त रिक्त;
 }
 
 #endif  // BUILD_PLUGIN

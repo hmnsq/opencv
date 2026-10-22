@@ -3,16 +3,16 @@
 // of this distribution and at http://opencv.org/license.html
 
 
-#include "precomp.hpp"
-#include "opencl_kernels_core.hpp"
-#include "stat.hpp"
+#अन्तर्भाव "precomp.hpp"
+#अन्तर्भाव "opencl_kernels_core.hpp"
+#अन्तर्भाव "stat.hpp"
 
-#include "has_non_zero.simd.hpp"
-#include "has_non_zero.simd_declarations.hpp" // defines CV_CPU_DISPATCH_MODES_ALL=AVX2,...,BASELINE based on CMakeLists.txt content
+#अन्तर्भाव "has_non_zero.simd.hpp"
+#अन्तर्भाव "has_non_zero.simd_declarations.hpp" // defines CV_CPU_DISPATCH_MODES_ALL=AVX2,...,BASELINE based on CMakeLists.txt content
 
-namespace cv {
+नामाकाश cv {
 
-static HasNonZeroFunc getHasNonZeroFunc(int depth)
+स्थिर HasNonZeroFunc getHasNonZeroFunc(पूर्णाङ्क depth)
 {
     CV_INSTRUMENT_REGION();
     CV_CPU_DISPATCH(getHasNonZeroFunc, (depth),
@@ -20,19 +20,19 @@ static HasNonZeroFunc getHasNonZeroFunc(int depth)
 }
 
 #ifdef HAVE_OPENCL
-static bool ocl_hasNonZero( InputArray _src, bool & res )
+स्थिर तार्किक ocl_hasNonZero( निवेशः_Array _src, तार्किक & res )
 {
-    int type = _src.type(), depth = CV_MAT_DEPTH(type), kercn = ocl::predictOptimalVectorWidth(_src);
-    bool doubleSupport = ocl::Device::getDefault().doubleFPConfig() > 0;
+    पूर्णाङ्क type = _src.type(), depth = CV_MAT_DEPTH(type), kercn = ocl::predictOptimalVectorWidth(_src);
+    तार्किक doubleSupport = ocl::Device::getDefault().doubleFPConfig() > 0;
 
-    if (depth == CV_64F && !doubleSupport)
-        return false;
+    सचे (depth == CV_64F && !doubleSupport)
+        पटिनिवत्त मिच्छा;
 
-    int dbsize = ocl::Device::getDefault().maxComputeUnits();
+    पूर्णाङ्क dbsize = ocl::Device::getDefault().maxComputeUnits();
     size_t wgs = ocl::Device::getDefault().maxWorkGroupSize();
 
-    int wgs2_aligned = 1;
-    while (wgs2_aligned < (int)wgs)
+    पूर्णाङ्क wgs2_aligned = 1;
+    याव (wgs2_aligned < (पूर्णाङ्क)wgs)
         wgs2_aligned <<= 1;
     wgs2_aligned >>= 1;
 
@@ -40,31 +40,31 @@ static bool ocl_hasNonZero( InputArray _src, bool & res )
                   format("-D srcT=%s -D srcT1=%s -D cn=1 -D OP_COUNT_NON_ZERO"
                          " -D WGS=%d -D kercn=%d -D WGS2_ALIGNED=%d%s%s",
                          ocl::typeToStr(CV_MAKE_TYPE(depth, kercn)),
-                         ocl::typeToStr(depth), (int)wgs, kercn,
+                         ocl::typeToStr(depth), (पूर्णाङ्क)wgs, kercn,
                          wgs2_aligned, doubleSupport ? " -D DOUBLE_SUPPORT" : "",
                          _src.isContinuous() ? " -D HAVE_SRC_CONT" : ""));
-    if (k.empty())
-        return false;
+    सचे (k.empty())
+        पटिनिवत्त मिच्छा;
 
     UMat src = _src.getUMat(), db(1, dbsize, CV_32SC1);
-    k.args(ocl::KernelArg::ReadOnlyNoSize(src), src.cols, (int)src.total(),
+    k.args(ocl::KernelArg::ReadOnlyNoSize(src), src.cols, (पूर्णाङ्क)src.total(),
            dbsize, ocl::KernelArg::PtrWriteOnly(db));
 
     size_t globalsize = dbsize * wgs;
-    if (k.run(1, &globalsize, &wgs, true))
-        return res = (saturate_cast<int>(cv::sum(db.getMat(ACCESS_READ))[0])>0), true;
-    return false;
+    सचे (k.run(1, &globalsize, &wgs, सच्च))
+        पटिनिवत्त res = (saturate_cast<पूर्णाङ्क>(cv::sum(db.getMat(ACCESS_READ))[0])>0), सच्च;
+    पटिनिवत्त मिच्छा;
 }
 #endif
 
-bool hasNonZero(InputArray _src)
+तार्किक hasNonZero(निवेशः_Array _src)
 {
     CV_INSTRUMENT_REGION();
 
-    int type = _src.type(), cn = CV_MAT_CN(type);
+    पूर्णाङ्क type = _src.type(), cn = CV_MAT_CN(type);
     CV_Assert( cn == 1 );
 
-    bool res = false;
+    तार्किक res = मिच्छा;
 
 #ifdef HAVE_OPENCL
     CV_OCL_RUN_(OCL_PERFORMANCE_CHECK(_src.isUMat()) && _src.dims() <= 2,
@@ -77,31 +77,31 @@ bool hasNonZero(InputArray _src)
     HasNonZeroFunc func = getHasNonZeroFunc(src.depth());
     CV_Assert( func != 0 );
 
-    if (src.dims == 2)//fast path to avoid creating planes of single rows
+    सचे (src.dims == 2)//fast path to avoid creating planes of single rows
     {
-        if (src.isContinuous())
+        सचे (src.isContinuous())
             res |= func(src.ptr<uchar>(0), src.total());
-        else
-            for(int row = 0, rowsCount = src.rows ; !res && (row<rowsCount) ; ++row)
+        अञ्ञथा
+            अत्थाय(पूर्णाङ्क row = 0, rows_गणनम् = src.rows ; !res && (row<rows_गणनम्) ; ++row)
                 res |= func(src.ptr<uchar>(row), src.cols);
     }
-    else//if (src.dims != 2)
+    अञ्ञथा//if (src.dims != 2)
     {
-        const Mat* arrays[] = {&src, nullptr};
+        ध्रुव Mat* arrays[] = {&src, nullptr};
         Mat planes[1];
         NAryMatIterator itNAry(arrays, planes, 1);
-        for(size_t p = 0 ; !res && (p<itNAry.nplanes) ; ++p, ++itNAry)
+        अत्थाय(size_t p = 0 ; !res && (p<itNAry.nplanes) ; ++p, ++itNAry)
         {
-            const Mat& plane = itNAry.planes[0];
-            if (plane.isContinuous())
+            ध्रुव Mat& plane = itNAry.planes[0];
+            सचे (plane.isContinuous())
                 res |= func(plane.ptr<uchar>(0), plane.total());
-            else
-              for(int row = 0, rowsCount = plane.rows ; !res && (row<rowsCount) ; ++row)
+            अञ्ञथा
+              अत्थाय(पूर्णाङ्क row = 0, rows_गणनम् = plane.rows ; !res && (row<rows_गणनम्) ; ++row)
                   res |= func(plane.ptr<uchar>(row), plane.cols);
         }
     }
 
-    return res;
+    पटिनिवत्त res;
 }
 
 } // namespace
