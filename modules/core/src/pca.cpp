@@ -41,7 +41,7 @@
 //
 //M*/
 
-#include "precomp.hpp"
+#समावेश "precomp.hpp"
 
 /****************************************************************************************\
 *                                          PCA                                           *
@@ -52,103 +52,103 @@ namespace cv
 
 PCA::PCA() {}
 
-PCA::PCA(InputArray data, InputArray _mean, int flags, int maxComponents)
+PCA::PCA(निवेश_Array तथ्य, निवेश_Array _mean, पूर्णांक flags, पूर्णांक maxComponents)
 {
-    operator()(data, _mean, flags, maxComponents);
+    चालक()(तथ्य, _mean, flags, maxComponents);
 }
 
-PCA::PCA(InputArray data, InputArray _mean, int flags, double retainedVariance)
+PCA::PCA(निवेश_Array तथ्य, निवेश_Array _mean, पूर्णांक flags, द्विगुन retainedVariance)
 {
-    operator()(data, _mean, flags, retainedVariance);
+    चालक()(तथ्य, _mean, flags, retainedVariance);
 }
 
-PCA& PCA::operator()(InputArray _data, InputArray __mean, int flags, int maxComponents)
+PCA& PCA::चालक()(निवेश_Array तथ्य_3, निवेश_Array __mean, पूर्णांक flags, पूर्णांक maxComponents)
 {
-    Mat data = _data.getMat(), _mean = __mean.getMat();
-    int covar_flags = cv::COVAR_SCALE;
-    int len, in_count;
-    Size mean_sz;
+    Mat तथ्य = तथ्य_3.getMat(), _mean = __mean.getMat();
+    पूर्णांक covar_flags = cv::COVAR_SCALE;
+    पूर्णांक len, in_गिनती;
+    आकार mean_sz;
 
-    CV_Assert( data.channels() == 1 );
-    if( flags & PCA::DATA_AS_COL )
+    CV_Assert( तथ्य.channels() == 1 );
+    अगर( flags & PCA::तथ्य_AS_COL )
     {
-        len = data.rows;
-        in_count = data.cols;
+        len = तथ्य.rows;
+        in_गिनती = तथ्य.cols;
         covar_flags |= cv::COVAR_COLS;
-        mean_sz = Size(1, len);
+        mean_sz = आकार(1, len);
     }
-    else
+    अन्यथा
     {
-        len = data.cols;
-        in_count = data.rows;
+        len = तथ्य.cols;
+        in_गिनती = तथ्य.rows;
         covar_flags |= cv::COVAR_ROWS;
-        mean_sz = Size(len, 1);
+        mean_sz = आकार(len, 1);
     }
 
-    int count = std::min(len, in_count), out_count = count;
-    if( maxComponents > 0 )
-        out_count = std::min(count, maxComponents);
+    पूर्णांक गिनती_2 = std::min(len, in_गिनती), out_गिनती = गिनती_2;
+    अगर( maxComponents > 0 )
+        out_गिनती = std::min(गिनती_2, maxComponents);
 
     // "scrambled" way to compute PCA (when cols(A)>rows(A)):
     // B = A'A; B*x=b*x; C = AA'; C*y=c*y -> AA'*y=c*y -> A'A*(A'*y)=c*(A'*y) -> c = b, x=A'*y
-    if( len <= in_count )
+    अगर( len <= in_गिनती )
         covar_flags |= cv::COVAR_NORMAL;
 
-    int ctype = std::max(CV_32F, data.depth());
+    पूर्णांक ctype = std::max(CV_32F, तथ्य.depth());
     mean.create( mean_sz, ctype );
 
-    Mat covar( count, count, ctype );
+    Mat covar( गिनती_2, गिनती_2, ctype );
 
-    if( !_mean.empty() )
+    अगर( !_mean.empty() )
     {
         CV_Assert( _mean.size() == mean_sz );
         _mean.convertTo(mean, ctype);
         covar_flags |= cv::COVAR_USE_AVG;
     }
 
-    calcCovarMatrix( data, covar, mean, covar_flags, ctype );
+    calcCovarMatrix( तथ्य, covar, mean, covar_flags, ctype );
     eigen( covar, eigenvalues, eigenvectors );
 
-    if( !(covar_flags & cv::COVAR_NORMAL) )
+    अगर( !(covar_flags & cv::COVAR_NORMAL) )
     {
         // PCA::DATA_AS_ROW: cols(A)>rows(A). x=A'*y -> x'=y'*A
         // PCA::DATA_AS_COL: rows(A)>cols(A). x=A''*y -> x'=y'*A'
-        Mat tmp_data, tmp_mean = repeat(mean, data.rows/mean.rows, data.cols/mean.cols);
-        if( data.type() != ctype || tmp_mean.data == mean.data )
+        Mat tmp_तथ्य, tmp_mean = repeat(mean, तथ्य.rows/mean.rows, तथ्य.cols/mean.cols);
+        अगर( तथ्य.type() != ctype || tmp_mean.तथ्य == mean.तथ्य )
         {
-            data.convertTo( tmp_data, ctype );
-            subtract( tmp_data, tmp_mean, tmp_data );
+            तथ्य.convertTo( tmp_तथ्य, ctype );
+            subtract( tmp_तथ्य, tmp_mean, tmp_तथ्य );
         }
-        else
+        अन्यथा
         {
-            subtract( data, tmp_mean, tmp_mean );
-            tmp_data = tmp_mean;
+            subtract( तथ्य, tmp_mean, tmp_mean );
+            tmp_तथ्य = tmp_mean;
         }
 
-        Mat evects1(count, len, ctype);
-        gemm( eigenvectors, tmp_data, 1, Mat(), 0, evects1,
-            (flags & PCA::DATA_AS_COL) ? cv::GEMM_2_T : 0);
+        Mat evects1(गिनती_2, len, ctype);
+        gemm( eigenvectors, tmp_तथ्य, 1, Mat(), 0, evects1,
+            (flags & PCA::तथ्य_AS_COL) ? cv::GEMM_2_T : 0);
         eigenvectors = evects1;
 
         // normalize eigenvectors
-        int i;
-        for( i = 0; i < out_count; i++ )
+        पूर्णांक i;
+        क्रम( i = 0; i < out_गिनती; i++ )
         {
             Mat vec = eigenvectors.row(i);
             normalize(vec, vec);
         }
     }
 
-    if( count > out_count )
+    अगर( गिनती_2 > out_गिनती )
     {
         // use clone() to physically copy the data and thus deallocate the original matrices
-        eigenvalues = eigenvalues.rowRange(0,out_count).clone();
-        eigenvectors = eigenvectors.rowRange(0,out_count).clone();
+        eigenvalues = eigenvalues.rowRange(0,out_गिनती).clone();
+        eigenvectors = eigenvectors.rowRange(0,out_गिनती).clone();
     }
-    return *this;
+    वापस *यह;
 }
 
-void PCA::write(FileStorage& fs ) const
+व्योम PCA::ग_लिखो(FileStorage& fs ) स्थिर
 {
     CV_Assert( fs.isOpened() );
 
@@ -158,117 +158,117 @@ void PCA::write(FileStorage& fs ) const
     fs << "mean" << mean;
 }
 
-void PCA::read(const FileNode& fn)
+व्योम PCA::पढ़ो(स्थिर File_गाँठ& fn)
 {
     CV_Assert( !fn.empty() );
     CV_Assert( (String)fn["name"] == "PCA" );
 
-    cv::read(fn["vectors"], eigenvectors);
-    cv::read(fn["values"], eigenvalues);
-    cv::read(fn["mean"], mean);
+    cv::पढ़ो(fn["vectors"], eigenvectors);
+    cv::पढ़ो(fn["values"], eigenvalues);
+    cv::पढ़ो(fn["mean"], mean);
 }
 
-template <typename T>
-int computeCumulativeEnergy(const Mat& eigenvalues, double retainedVariance)
+ढाँचा <typename T>
+पूर्णांक computeCumulativeEnergy(स्थिर Mat& eigenvalues, द्विगुन retainedVariance)
 {
-    CV_DbgAssert( eigenvalues.type() == DataType<T>::type );
+    CV_DbgAssert( eigenvalues.type() == तथ्य_Type_2<T>::type );
 
-    Mat g(eigenvalues.size(), DataType<T>::type);
+    Mat g(eigenvalues.size(), तथ्य_Type_2<T>::type);
 
-    for(int ig = 0; ig < g.rows; ig++)
+    क्रम(पूर्णांक ig = 0; ig < g.rows; ig++)
     {
         g.at<T>(ig, 0) = 0;
-        for(int im = 0; im <= ig; im++)
+        क्रम(पूर्णांक im = 0; im <= ig; im++)
         {
             g.at<T>(ig,0) += eigenvalues.at<T>(im,0);
         }
     }
 
-    int L;
+    पूर्णांक L;
 
-    for(L = 0; L < eigenvalues.rows; L++)
+    क्रम(L = 0; L < eigenvalues.rows; L++)
     {
-        double energy = g.at<T>(L, 0) / g.at<T>(g.rows - 1, 0);
-        if(energy > retainedVariance)
-            break;
+        द्विगुन energy = g.at<T>(L, 0) / g.at<T>(g.rows - 1, 0);
+        अगर(energy > retainedVariance)
+            अवरोध;
     }
 
     L = std::max(2, L);
 
-    return L;
+    वापस L;
 }
 
-PCA& PCA::operator()(InputArray _data, InputArray __mean, int flags, double retainedVariance)
+PCA& PCA::चालक()(निवेश_Array तथ्य_3, निवेश_Array __mean, पूर्णांक flags, द्विगुन retainedVariance)
 {
-    Mat data = _data.getMat(), _mean = __mean.getMat();
-    int covar_flags = cv::COVAR_SCALE;
-    int len, in_count;
-    Size mean_sz;
+    Mat तथ्य = तथ्य_3.getMat(), _mean = __mean.getMat();
+    पूर्णांक covar_flags = cv::COVAR_SCALE;
+    पूर्णांक len, in_गिनती;
+    आकार mean_sz;
 
-    CV_Assert( data.channels() == 1 );
-    if( flags & PCA::DATA_AS_COL )
+    CV_Assert( तथ्य.channels() == 1 );
+    अगर( flags & PCA::तथ्य_AS_COL )
     {
-        len = data.rows;
-        in_count = data.cols;
+        len = तथ्य.rows;
+        in_गिनती = तथ्य.cols;
         covar_flags |= cv::COVAR_COLS;
-        mean_sz = Size(1, len);
+        mean_sz = आकार(1, len);
     }
-    else
+    अन्यथा
     {
-        len = data.cols;
-        in_count = data.rows;
+        len = तथ्य.cols;
+        in_गिनती = तथ्य.rows;
         covar_flags |= cv::COVAR_ROWS;
-        mean_sz = Size(len, 1);
+        mean_sz = आकार(len, 1);
     }
 
     CV_Assert( retainedVariance > 0 && retainedVariance <= 1 );
 
-    int count = std::min(len, in_count);
+    पूर्णांक गिनती_2 = std::min(len, in_गिनती);
 
     // "scrambled" way to compute PCA (when cols(A)>rows(A)):
     // B = A'A; B*x=b*x; C = AA'; C*y=c*y -> AA'*y=c*y -> A'A*(A'*y)=c*(A'*y) -> c = b, x=A'*y
-    if( len <= in_count )
+    अगर( len <= in_गिनती )
         covar_flags |= cv::COVAR_NORMAL;
 
-    int ctype = std::max(CV_32F, data.depth());
+    पूर्णांक ctype = std::max(CV_32F, तथ्य.depth());
     mean.create( mean_sz, ctype );
 
-    Mat covar( count, count, ctype );
+    Mat covar( गिनती_2, गिनती_2, ctype );
 
-    if( !_mean.empty() )
+    अगर( !_mean.empty() )
     {
         CV_Assert( _mean.size() == mean_sz );
         _mean.convertTo(mean, ctype);
         covar_flags |= cv::COVAR_USE_AVG;
     }
 
-    calcCovarMatrix( data, covar, mean, covar_flags, ctype );
+    calcCovarMatrix( तथ्य, covar, mean, covar_flags, ctype );
     eigen( covar, eigenvalues, eigenvectors );
 
-    if( !(covar_flags & cv::COVAR_NORMAL) )
+    अगर( !(covar_flags & cv::COVAR_NORMAL) )
     {
         // PCA::DATA_AS_ROW: cols(A)>rows(A). x=A'*y -> x'=y'*A
         // PCA::DATA_AS_COL: rows(A)>cols(A). x=A''*y -> x'=y'*A'
-        Mat tmp_data, tmp_mean = repeat(mean, data.rows/mean.rows, data.cols/mean.cols);
-        if( data.type() != ctype || tmp_mean.data == mean.data )
+        Mat tmp_तथ्य, tmp_mean = repeat(mean, तथ्य.rows/mean.rows, तथ्य.cols/mean.cols);
+        अगर( तथ्य.type() != ctype || tmp_mean.तथ्य == mean.तथ्य )
         {
-            data.convertTo( tmp_data, ctype );
-            subtract( tmp_data, tmp_mean, tmp_data );
+            तथ्य.convertTo( tmp_तथ्य, ctype );
+            subtract( tmp_तथ्य, tmp_mean, tmp_तथ्य );
         }
-        else
+        अन्यथा
         {
-            subtract( data, tmp_mean, tmp_mean );
-            tmp_data = tmp_mean;
+            subtract( तथ्य, tmp_mean, tmp_mean );
+            tmp_तथ्य = tmp_mean;
         }
 
-        Mat evects1(count, len, ctype);
-        gemm( eigenvectors, tmp_data, 1, Mat(), 0, evects1,
-            (flags & PCA::DATA_AS_COL) ? cv::GEMM_2_T : 0);
+        Mat evects1(गिनती_2, len, ctype);
+        gemm( eigenvectors, tmp_तथ्य, 1, Mat(), 0, evects1,
+            (flags & PCA::तथ्य_AS_COL) ? cv::GEMM_2_T : 0);
         eigenvectors = evects1;
 
         // normalize all eigenvectors
-        int i;
-        for( i = 0; i < eigenvectors.rows; i++ )
+        पूर्णांक i;
+        क्रम( i = 0; i < eigenvectors.rows; i++ )
         {
             Mat vec = eigenvectors.row(i);
             normalize(vec, vec);
@@ -276,145 +276,145 @@ PCA& PCA::operator()(InputArray _data, InputArray __mean, int flags, double reta
     }
 
     // compute the cumulative energy content for each eigenvector
-    int L;
-    if (ctype == CV_32F)
-        L = computeCumulativeEnergy<float>(eigenvalues, retainedVariance);
-    else
-        L = computeCumulativeEnergy<double>(eigenvalues, retainedVariance);
+    पूर्णांक L;
+    अगर (ctype == CV_32F)
+        L = computeCumulativeEnergy<भग्न>(eigenvalues, retainedVariance);
+    अन्यथा
+        L = computeCumulativeEnergy<द्विगुन>(eigenvalues, retainedVariance);
 
     // use clone() to physically copy the data and thus deallocate the original matrices
     eigenvalues = eigenvalues.rowRange(0,L).clone();
     eigenvectors = eigenvectors.rowRange(0,L).clone();
 
-    return *this;
+    वापस *यह;
 }
 
-void PCA::project(InputArray _data, OutputArray result) const
+व्योम PCA::project(निवेश_Array तथ्य_3, OutputArray परिणाम) स्थिर
 {
-    Mat data = _data.getMat();
+    Mat तथ्य = तथ्य_3.getMat();
     CV_Assert( !mean.empty() && !eigenvectors.empty() &&
-        ((mean.rows == 1 && mean.cols == data.cols) || (mean.cols == 1 && mean.rows == data.rows)));
-    Mat tmp_data, tmp_mean = repeat(mean, data.rows/mean.rows, data.cols/mean.cols);
-    int ctype = mean.type();
-    if( data.type() != ctype || tmp_mean.data == mean.data )
+        ((mean.rows == 1 && mean.cols == तथ्य.cols) || (mean.cols == 1 && mean.rows == तथ्य.rows)));
+    Mat tmp_तथ्य, tmp_mean = repeat(mean, तथ्य.rows/mean.rows, तथ्य.cols/mean.cols);
+    पूर्णांक ctype = mean.type();
+    अगर( तथ्य.type() != ctype || tmp_mean.तथ्य == mean.तथ्य )
     {
-        data.convertTo( tmp_data, ctype );
-        subtract( tmp_data, tmp_mean, tmp_data );
+        तथ्य.convertTo( tmp_तथ्य, ctype );
+        subtract( tmp_तथ्य, tmp_mean, tmp_तथ्य );
     }
-    else
+    अन्यथा
     {
-        subtract( data, tmp_mean, tmp_mean );
-        tmp_data = tmp_mean;
+        subtract( तथ्य, tmp_mean, tmp_mean );
+        tmp_तथ्य = tmp_mean;
     }
-    if( mean.rows == 1 )
-        gemm( tmp_data, eigenvectors, 1, Mat(), 0, result, GEMM_2_T );
-    else
-        gemm( eigenvectors, tmp_data, 1, Mat(), 0, result, 0 );
+    अगर( mean.rows == 1 )
+        gemm( tmp_तथ्य, eigenvectors, 1, Mat(), 0, परिणाम, GEMM_2_T );
+    अन्यथा
+        gemm( eigenvectors, tmp_तथ्य, 1, Mat(), 0, परिणाम, 0 );
 }
 
-Mat PCA::project(InputArray data) const
+Mat PCA::project(निवेश_Array तथ्य) स्थिर
 {
-    Mat result;
-    project(data, result);
-    return result;
+    Mat परिणाम;
+    project(तथ्य, परिणाम);
+    वापस परिणाम;
 }
 
-void PCA::backProject(InputArray _data, OutputArray result) const
+व्योम PCA::backProject(निवेश_Array तथ्य_3, OutputArray परिणाम) स्थिर
 {
-    Mat data = _data.getMat();
+    Mat तथ्य = तथ्य_3.getMat();
     CV_Assert( !mean.empty() && !eigenvectors.empty() &&
-        ((mean.rows == 1 && eigenvectors.rows == data.cols) ||
-         (mean.cols == 1 && eigenvectors.rows == data.rows)));
+        ((mean.rows == 1 && eigenvectors.rows == तथ्य.cols) ||
+         (mean.cols == 1 && eigenvectors.rows == तथ्य.rows)));
 
-    Mat tmp_data, tmp_mean;
-    data.convertTo(tmp_data, mean.type());
-    if( mean.rows == 1 )
+    Mat tmp_तथ्य, tmp_mean;
+    तथ्य.convertTo(tmp_तथ्य, mean.type());
+    अगर( mean.rows == 1 )
     {
-        tmp_mean = repeat(mean, data.rows, 1);
-        gemm( tmp_data, eigenvectors, 1, tmp_mean, 1, result, 0 );
+        tmp_mean = repeat(mean, तथ्य.rows, 1);
+        gemm( tmp_तथ्य, eigenvectors, 1, tmp_mean, 1, परिणाम, 0 );
     }
-    else
+    अन्यथा
     {
-        tmp_mean = repeat(mean, 1, data.cols);
-        gemm( eigenvectors, tmp_data, 1, tmp_mean, 1, result, GEMM_1_T );
+        tmp_mean = repeat(mean, 1, तथ्य.cols);
+        gemm( eigenvectors, tmp_तथ्य, 1, tmp_mean, 1, परिणाम, GEMM_1_T );
     }
 }
 
-Mat PCA::backProject(InputArray data) const
+Mat PCA::backProject(निवेश_Array तथ्य) स्थिर
 {
-    Mat result;
-    backProject(data, result);
-    return result;
+    Mat परिणाम;
+    backProject(तथ्य, परिणाम);
+    वापस परिणाम;
 }
 
 }
 
-void cv::PCACompute(InputArray data, InputOutputArray mean,
-                    OutputArray eigenvectors, int maxComponents)
+व्योम cv::PCACompute(निवेश_Array तथ्य, निवेश_Output_Array mean,
+                    OutputArray eigenvectors, पूर्णांक maxComponents)
 {
     CV_INSTRUMENT_REGION();
 
     PCA pca;
-    pca(data, mean, 0, maxComponents);
+    pca(तथ्य, mean, 0, maxComponents);
     pca.mean.copyTo(mean);
     pca.eigenvectors.copyTo(eigenvectors);
 }
 
-void cv::PCACompute(InputArray data, InputOutputArray mean,
+व्योम cv::PCACompute(निवेश_Array तथ्य, निवेश_Output_Array mean,
                     OutputArray eigenvectors, OutputArray eigenvalues,
-                    int maxComponents)
+                    पूर्णांक maxComponents)
 {
     CV_INSTRUMENT_REGION();
 
     PCA pca;
-    pca(data, mean, 0, maxComponents);
+    pca(तथ्य, mean, 0, maxComponents);
     pca.mean.copyTo(mean);
     pca.eigenvectors.copyTo(eigenvectors);
     pca.eigenvalues.copyTo(eigenvalues);
 }
 
-void cv::PCACompute(InputArray data, InputOutputArray mean,
-                    OutputArray eigenvectors, double retainedVariance)
+व्योम cv::PCACompute(निवेश_Array तथ्य, निवेश_Output_Array mean,
+                    OutputArray eigenvectors, द्विगुन retainedVariance)
 {
     CV_INSTRUMENT_REGION();
 
     PCA pca;
-    pca(data, mean, 0, retainedVariance);
+    pca(तथ्य, mean, 0, retainedVariance);
     pca.mean.copyTo(mean);
     pca.eigenvectors.copyTo(eigenvectors);
 }
 
-void cv::PCACompute(InputArray data, InputOutputArray mean,
+व्योम cv::PCACompute(निवेश_Array तथ्य, निवेश_Output_Array mean,
                     OutputArray eigenvectors, OutputArray eigenvalues,
-                    double retainedVariance)
+                    द्विगुन retainedVariance)
 {
     CV_INSTRUMENT_REGION();
 
     PCA pca;
-    pca(data, mean, 0, retainedVariance);
+    pca(तथ्य, mean, 0, retainedVariance);
     pca.mean.copyTo(mean);
     pca.eigenvectors.copyTo(eigenvectors);
     pca.eigenvalues.copyTo(eigenvalues);
 }
 
-void cv::PCAProject(InputArray data, InputArray mean,
-                    InputArray eigenvectors, OutputArray result)
+व्योम cv::PCAProject(निवेश_Array तथ्य, निवेश_Array mean,
+                    निवेश_Array eigenvectors, OutputArray परिणाम)
 {
     CV_INSTRUMENT_REGION();
 
     PCA pca;
     pca.mean = mean.getMat();
     pca.eigenvectors = eigenvectors.getMat();
-    pca.project(data, result);
+    pca.project(तथ्य, परिणाम);
 }
 
-void cv::PCABackProject(InputArray data, InputArray mean,
-                    InputArray eigenvectors, OutputArray result)
+व्योम cv::PCABackProject(निवेश_Array तथ्य, निवेश_Array mean,
+                    निवेश_Array eigenvectors, OutputArray परिणाम)
 {
     CV_INSTRUMENT_REGION();
 
     PCA pca;
     pca.mean = mean.getMat();
     pca.eigenvectors = eigenvectors.getMat();
-    pca.backProject(data, result);
+    pca.backProject(तथ्य, परिणाम);
 }

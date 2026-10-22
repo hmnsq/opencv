@@ -3,224 +3,224 @@
 // of this distribution and at http://opencv.org/license.html
 
 
-#include "precomp.hpp"
-#include "opencl_kernels_core.hpp"
-#include "stat.hpp"
+#समावेश "precomp.hpp"
+#समावेश "opencl_kernels_core.hpp"
+#समावेश "stat.hpp"
 
-#include "stat_parallel.hpp"
-#include "sum.simd.hpp"
-#include "sum.simd_declarations.hpp" // defines CV_CPU_DISPATCH_MODES_ALL=AVX2,...,BASELINE based on CMakeLists.txt content
+#समावेश "stat_parallel.hpp"
+#समावेश "sum.simd.hpp"
+#समावेश "sum.simd_declarations.hpp" // defines CV_CPU_DISPATCH_MODES_ALL=AVX2,...,BASELINE based on CMakeLists.txt content
 
 namespace cv
 {
 
-SumFunc getSumFunc(int depth)
+योग_Func get_योग_Func(पूर्णांक depth)
 {
     CV_INSTRUMENT_REGION();
-    CV_CPU_DISPATCH(getSumFunc, (depth),
+    CV_CPU_DISPATCH(get_योग_Func, (depth),
         CV_CPU_DISPATCH_MODES_ALL);
 }
 
-#ifdef HAVE_OPENCL
+#अगर_घोषित HAVE_OPENCL
 
-bool ocl_sum( InputArray _src, Scalar & res, int sum_op, InputArray _mask,
-                     InputArray _src2, bool calc2, const Scalar & res2 )
+bool ocl_योग( निवेश_Array _src, Scalar & res, पूर्णांक योग_op, निवेश_Array _mask,
+                     निवेश_Array _src2, bool calc2, स्थिर Scalar & res2 )
 {
-    CV_Assert(sum_op == OCL_OP_SUM || sum_op == OCL_OP_SUM_ABS || sum_op == OCL_OP_SUM_SQR);
+    CV_Assert(योग_op == OCL_OP_योग || योग_op == OCL_OP_योग_ABS || योग_op == OCL_OP_योग_SQR);
 
-    const ocl::Device & dev = ocl::Device::getDefault();
+    स्थिर ocl::Device & dev = ocl::Device::getDefault();
     bool doubleSupport = dev.doubleFPConfig() > 0,
-        haveMask = _mask.kind() != _InputArray::NONE,
-        haveSrc2 = _src2.kind() != _InputArray::NONE;
-    int type = _src.type(), depth = CV_MAT_DEPTH(type), cn = CV_MAT_CN(type),
+        haveMask = _mask.kind() != निवेश_Array_2::NONE,
+        haveSrc2 = _src2.kind() != निवेश_Array_2::NONE;
+    पूर्णांक type = _src.type(), depth = CV_MAT_DEPTH(type), cn = CV_MAT_CN(type),
             kercn = cn == 1 && !haveMask ? ocl::predictOptimalVectorWidth(_src, _src2) : 1,
             mcn = std::max(cn, kercn);
     CV_Assert(!haveSrc2 || _src2.type() == type);
-    int convert_cn = haveSrc2 ? mcn : cn;
+    पूर्णांक convert_cn = haveSrc2 ? mcn : cn;
 
-    if ( (!doubleSupport && depth == CV_64F) || cn > 4 )
-        return false;
+    अगर ( (!doubleSupport && depth == CV_64F) || cn > 4 )
+        वापस false;
 
-    if (depth >= CV_16F)
-        return false;
+    अगर (depth >= CV_16F)
+        वापस false;
 
-    int ngroups = dev.maxComputeUnits(), dbsize = ngroups * (calc2 ? 2 : 1);
-    size_t wgs = dev.maxWorkGroupSize();
+    पूर्णांक ngroups = dev.maxComputeUnits(), dbsize = ngroups * (calc2 ? 2 : 1);
+    माप_प्रकार wgs = dev.max_Work_Group_आकार();
 
-    int ddepth = std::max(sum_op == OCL_OP_SUM_SQR ? CV_32F : CV_32S, depth),
+    पूर्णांक ddepth = std::max(योग_op == OCL_OP_योग_SQR ? CV_32F : CV_32S, depth),
             dtype = CV_MAKE_TYPE(ddepth, cn);
     CV_Assert(!haveMask || _mask.type() == CV_8U || _mask.type() == CV_8S || _mask.type() == CV_Bool);
 
-    int wgs2_aligned = 1;
-    while (wgs2_aligned < (int)wgs)
+    पूर्णांक wgs2_aligned = 1;
+    जबतक (wgs2_aligned < (पूर्णांक)wgs)
         wgs2_aligned <<= 1;
     wgs2_aligned >>= 1;
 
-    static const char * const opMap[3] = { "OP_SUM", "OP_SUM_ABS", "OP_SUM_SQR" };
-    char cvt[2][50];
+    अटल स्थिर अक्षर * स्थिर opMap[3] = { "OP_SUM", "OP_SUM_ABS", "OP_SUM_SQR" };
+    अक्षर cvt[2][50];
     String opts = format("-D srcT=%s -D srcT1=%s -D dstT=%s -D dstTK=%s -D dstT1=%s -D ddepth=%d -D cn=%d"
                          " -D convertToDT=%s -D %s -D WGS=%d -D WGS2_ALIGNED=%d%s%s%s%s -D kercn=%d%s%s%s -D convertFromU=%s",
                          ocl::typeToStr(CV_MAKE_TYPE(depth, mcn)), ocl::typeToStr(depth),
                          ocl::typeToStr(dtype), ocl::typeToStr(CV_MAKE_TYPE(ddepth, mcn)),
                          ocl::typeToStr(ddepth), ddepth, cn,
-                         ocl::convertTypeStr(depth, ddepth, mcn, cvt[0], sizeof(cvt[0])),
-                         opMap[sum_op], (int)wgs, wgs2_aligned,
+                         ocl::convertTypeStr(depth, ddepth, mcn, cvt[0], माप(cvt[0])),
+                         opMap[योग_op], (पूर्णांक)wgs, wgs2_aligned,
                          doubleSupport ? " -D DOUBLE_SUPPORT" : "",
                          haveMask ? " -D HAVE_MASK" : "",
                          _src.isContinuous() ? " -D HAVE_SRC_CONT" : "",
                          haveMask && _mask.isContinuous() ? " -D HAVE_MASK_CONT" : "", kercn,
                          haveSrc2 ? " -D HAVE_SRC2" : "", calc2 ? " -D OP_CALC2" : "",
                          haveSrc2 && _src2.isContinuous() ? " -D HAVE_SRC2_CONT" : "",
-                         depth <= CV_32S && ddepth == CV_32S ? ocl::convertTypeStr(CV_8U, ddepth, convert_cn, cvt[1], sizeof(cvt[1])) : "noconvert");
+                         depth <= CV_32S && ddepth == CV_32S ? ocl::convertTypeStr(CV_8U, ddepth, convert_cn, cvt[1], माप(cvt[1])) : "noconvert");
 
     ocl::Kernel k("reduce", ocl::core::reduce_oclsrc, opts);
-    if (k.empty())
-        return false;
+    अगर (k.empty())
+        वापस false;
 
     UMat src = _src.getUMat(), src2 = _src2.getUMat(),
         db(1, dbsize, dtype), mask = _mask.getUMat();
 
-    ocl::KernelArg srcarg = ocl::KernelArg::ReadOnlyNoSize(src),
+    ocl::KernelArg srcarg = ocl::KernelArg::Read_Only_No_आकार(src),
             dbarg = ocl::KernelArg::PtrWriteOnly(db),
-            maskarg = ocl::KernelArg::ReadOnlyNoSize(mask),
-            src2arg = ocl::KernelArg::ReadOnlyNoSize(src2);
+            maskarg = ocl::KernelArg::Read_Only_No_आकार(mask),
+            src2arg = ocl::KernelArg::Read_Only_No_आकार(src2);
 
-    if (haveMask)
+    अगर (haveMask)
     {
-        if (haveSrc2)
-            k.args(srcarg, src.cols, (int)src.total(), ngroups, dbarg, maskarg, src2arg);
-        else
-            k.args(srcarg, src.cols, (int)src.total(), ngroups, dbarg, maskarg);
+        अगर (haveSrc2)
+            k.args(srcarg, src.cols, (पूर्णांक)src.योग(), ngroups, dbarg, maskarg, src2arg);
+        अन्यथा
+            k.args(srcarg, src.cols, (पूर्णांक)src.योग(), ngroups, dbarg, maskarg);
     }
-    else
+    अन्यथा
     {
-        if (haveSrc2)
-            k.args(srcarg, src.cols, (int)src.total(), ngroups, dbarg, src2arg);
-        else
-            k.args(srcarg, src.cols, (int)src.total(), ngroups, dbarg);
+        अगर (haveSrc2)
+            k.args(srcarg, src.cols, (पूर्णांक)src.योग(), ngroups, dbarg, src2arg);
+        अन्यथा
+            k.args(srcarg, src.cols, (पूर्णांक)src.योग(), ngroups, dbarg);
     }
 
-    size_t globalsize = ngroups * wgs;
-    if (k.run(1, &globalsize, &wgs, true))
+    माप_प्रकार globalsize = ngroups * wgs;
+    अगर (k.run(1, &globalsize, &wgs, true))
     {
-        typedef Scalar (*part_sum)(Mat m);
-        part_sum funcs[3] = { ocl_part_sum<int>, ocl_part_sum<float>, ocl_part_sum<double> },
+        प्रकार Scalar (*part_योग)(Mat m);
+        part_योग funcs[3] = { ocl_part_योग<पूर्णांक>, ocl_part_योग<भग्न>, ocl_part_योग<द्विगुन> },
                 func = funcs[ddepth - CV_32S];
 
         Mat mres = db.getMat(ACCESS_READ);
-        if (calc2)
+        अगर (calc2)
             const_cast<Scalar &>(res2) = func(mres.colRange(ngroups, dbsize));
 
         res = func(mres.colRange(0, ngroups));
-        return true;
+        वापस true;
     }
-    return false;
+    वापस false;
 }
 
-#endif
+#पूर्ण_अगर
 
 // serial implementation, also used for the pieces of the parallel version
-static Scalar sum_(const Mat& src)
+अटल Scalar योग_4(स्थिर Mat& src)
 {
     Scalar _res;
-    int cn = src.channels();
+    पूर्णांक cn = src.channels();
 
-    if (src.dims <= 2)
+    अगर (src.dims <= 2)
     {
-        CALL_HAL_RET2(sum, cv_hal_sum, _res, src.data, src.step, src.type(), src.cols, src.rows, &_res[0]);
+        CALL_HAL_RET2(योग_2, cv_hal_योग, _res, src.तथ्य, src.step, src.type(), src.cols, src.rows, &_res[0]);
     }
-    else if (src.isContinuous())
+    अन्यथा अगर (src.isContinuous())
     {
-        CALL_HAL_RET2(sum, cv_hal_sum, _res, src.data, 0, src.type(), (int)src.total(), 1, &_res[0]);
+        CALL_HAL_RET2(योग_2, cv_hal_योग, _res, src.तथ्य, 0, src.type(), (पूर्णांक)src.योग(), 1, &_res[0]);
     }
 
-    int k, depth = src.depth();
-    SumFunc func = getSumFunc(depth);
-    if (func == nullptr) {
-        if (depth == CV_Bool && cn == 1)
-            return Scalar((double)countNonZero(src));
+    पूर्णांक k, depth = src.depth();
+    योग_Func func = get_योग_Func(depth);
+    अगर (func == nullptr) {
+        अगर (depth == CV_Bool && cn == 1)
+            वापस Scalar((द्विगुन)गिनती_Non_Zero(src));
         CV_Error_(Error::StsNotImplemented, ("sum: %s input is not supported, convert the input to another type (e.g. CV_32F) first",
                                             typeToString(src.type()).c_str()));
     }
 
-    const Mat* arrays[] = {&src, 0};
+    स्थिर Mat* arrays[] = {&src, 0};
     uchar* ptrs[1] = {};
     NAryMatIterator it(arrays, ptrs);
-    int total = (int)it.size, blockSize = total, partialBlockSize = 0;
-    int j, count = 0;
-    int _buf[CV_CN_MAX];
-    int* buf = (int*)&_res[0];
-    size_t esz = 0;
-    bool partialSumIsInt = depth < CV_32S;
-    bool blockSum = partialSumIsInt || depth == CV_16F || depth == CV_16BF;
+    पूर्णांक योग = (पूर्णांक)it.size, block_आकार = योग, partial_Block_आकार = 0;
+    पूर्णांक j, गिनती_2 = 0;
+    पूर्णांक _buf[CV_CN_MAX];
+    पूर्णांक* buf = (पूर्णांक*)&_res[0];
+    माप_प्रकार esz = 0;
+    bool partial_योग_Is_Int = depth < CV_32S;
+    bool block_योग = partial_योग_Is_Int || depth == CV_16F || depth == CV_16BF;
 
-    if( blockSum )
+    अगर( block_योग )
     {
-        partialBlockSize = depth <= CV_8S ? (1 << 23) : (1 << 15);
-        blockSize = std::min(blockSize, partialBlockSize);
+        partial_Block_आकार = depth <= CV_8S ? (1 << 23) : (1 << 15);
+        block_आकार = std::min(block_आकार, partial_Block_आकार);
         buf = _buf;
-        for( k = 0; k < cn; k++ )
+        क्रम( k = 0; k < cn; k++ )
             buf[k] = 0;
-        esz = src.elemSize();
+        esz = src.elem_आकार();
     }
 
-    for( size_t i = 0; i < it.nplanes; i++, ++it )
+    क्रम( माप_प्रकार i = 0; i < it.nplanes; i++, ++it )
     {
-        for( j = 0; j < total; j += blockSize )
+        क्रम( j = 0; j < योग; j += block_आकार )
         {
-            int bsz = std::min(total - j, blockSize);
+            पूर्णांक bsz = std::min(योग - j, block_आकार);
             func( ptrs[0], 0, (uchar*)buf, bsz, cn );
-            count += bsz;
-            if( blockSum && (count + blockSize >= partialBlockSize || (i+1 >= it.nplanes && j+bsz >= total)) )
+            गिनती_2 += bsz;
+            अगर( block_योग && (गिनती_2 + block_आकार >= partial_Block_आकार || (i+1 >= it.nplanes && j+bsz >= योग)) )
             {
-                if (partialSumIsInt) {
-                    for( k = 0; k < cn; k++ )
+                अगर (partial_योग_Is_Int) {
+                    क्रम( k = 0; k < cn; k++ )
                     {
                         _res[k] += buf[k];
                         buf[k] = 0;
                     }
-                } else {
-                    for( k = 0; k < cn; k++ )
+                } अन्यथा {
+                    क्रम( k = 0; k < cn; k++ )
                     {
-                        _res[k] += ((float*)buf)[k];
+                        _res[k] += ((भग्न*)buf)[k];
                         buf[k] = 0;
                     }
                 }
-                count = 0;
+                गिनती_2 = 0;
             }
             ptrs[0] += bsz*esz;
         }
     }
-    return _res;
+    वापस _res;
 }
 
-Scalar sum(InputArray _src)
+Scalar योग_2(निवेश_Array _src)
 {
     CV_INSTRUMENT_REGION();
 
     Scalar _res;
-#ifdef HAVE_OPENCL
+#अगर_घोषित HAVE_OPENCL
     CV_OCL_RUN_(OCL_PERFORMANCE_CHECK(_src.isUMat()) && _src.dims() <= 2,
-                ocl_sum(_src, _res, OCL_OP_SUM),
+                ocl_योग(_src, _res, OCL_OP_योग),
                 _res);
-#endif
+#पूर्ण_अगर
 
     Mat src = _src.getMat();
     CV_CheckLE( src.channels(), 4, "cv::sum does not support more than 4 channels" );
 
     std::vector<StatChunk> chunks;
-    if (!splitForParallelStat(src, Mat(), chunks))
-        return sum_(src);
+    अगर (!splitForParallelStat(src, Mat(), chunks))
+        वापस योग_4(src);
 
     std::vector<Scalar> part(chunks.size());
-    parallel_for_(Range(0, (int)chunks.size()), [&](const Range& r)
+    parallel_for_(Range(0, (पूर्णांक)chunks.size()), [&](स्थिर Range& r)
     {
-        for (int i = r.start; i < r.end; i++)
-            part[i] = sum_(chunks[i].src);
+        क्रम (पूर्णांक i = r.start; i < r.end; i++)
+            part[i] = योग_4(chunks[i].src);
     });
-    for (const Scalar& v : part)
+    क्रम (स्थिर Scalar& v : part)
         _res += v;
-    return _res;
+    वापस _res;
 }
 
 } // namespace

@@ -2,61 +2,61 @@
 // It is subject to the license terms in the LICENSE file found in the top-level directory
 // of this distribution and at http://opencv.org/license.html.
 
-#include "precomp.hpp"
-#include "opencl_kernels_core.hpp"
+#समावेश "precomp.hpp"
+#समावेश "opencl_kernels_core.hpp"
 
-#include "nan_mask.simd.hpp"
-#include "nan_mask.simd_declarations.hpp" // defines CV_CPU_DISPATCH_MODES_ALL=AVX2,...,BASELINE based on CMakeLists.txt content
+#समावेश "nan_mask.simd.hpp"
+#समावेश "nan_mask.simd_declarations.hpp" // defines CV_CPU_DISPATCH_MODES_ALL=AVX2,...,BASELINE based on CMakeLists.txt content
 
 namespace cv {
 
-#ifdef HAVE_OPENCL
+#अगर_घोषित HAVE_OPENCL
 
-static bool ocl_patchNaNs( InputOutputArray _a, double value )
+अटल bool ocl_patchNaNs( निवेश_Output_Array _a, द्विगुन value )
 {
-    int ftype = _a.depth();
+    पूर्णांक ftype = _a.depth();
 
-    const ocl::Device d = ocl::Device::getDefault();
+    स्थिर ocl::Device d = ocl::Device::getDefault();
     bool doubleSupport = d.doubleFPConfig() > 0;
-    if (!doubleSupport && ftype == CV_64F)
+    अगर (!doubleSupport && ftype == CV_64F)
     {
-        return false;
+        वापस false;
     }
 
-    int rowsPerWI = ocl::Device::getDefault().isIntel() ? 4 : 1;
+    पूर्णांक rowsPerWI = ocl::Device::getDefault().isIntel() ? 4 : 1;
     ocl::Kernel k("KF", ocl::core::arithm_oclsrc,
                      format("-D UNARY_OP -D OP_PATCH_NANS -D dstT=%s -D DEPTH_dst=%d -D rowsPerWI=%d %s",
                             ftype == CV_64F ? "double" : "float", ftype, rowsPerWI,
                             doubleSupport ? "-D DOUBLE_SUPPORT" : ""));
-    if (k.empty())
-        return false;
+    अगर (k.empty())
+        वापस false;
 
     UMat a = _a.getUMat();
-    int cn = a.channels();
+    पूर्णांक cn = a.channels();
 
     // to pass float or double to args
-    if (ftype == CV_32F)
+    अगर (ftype == CV_32F)
     {
-        k.args(ocl::KernelArg::ReadOnlyNoSize(a), ocl::KernelArg::WriteOnly(a, cn), (float)value);
+        k.args(ocl::KernelArg::Read_Only_No_आकार(a), ocl::KernelArg::WriteOnly(a, cn), (भग्न)value);
     }
-    else // CV_64F
+    अन्यथा // CV_64F
     {
-        k.args(ocl::KernelArg::ReadOnlyNoSize(a), ocl::KernelArg::WriteOnly(a, cn), value);
+        k.args(ocl::KernelArg::Read_Only_No_आकार(a), ocl::KernelArg::WriteOnly(a, cn), value);
     }
 
-    size_t globalsize[2] = { (size_t)a.cols * cn, ((size_t)a.rows + rowsPerWI - 1) / rowsPerWI };
-    return k.run(2, globalsize, NULL, false);
+    माप_प्रकार globalsize[2] = { (माप_प्रकार)a.cols * cn, ((माप_प्रकार)a.rows + rowsPerWI - 1) / rowsPerWI };
+    वापस k.run(2, globalsize, शून्य, false);
 }
 
-#endif
+#पूर्ण_अगर
 
-static PatchNanFunc getPatchNanFunc(bool isDouble)
+अटल PatchNanFunc getPatchNanFunc(bool isDouble)
 {
     CV_INSTRUMENT_REGION();
     CV_CPU_DISPATCH(getPatchNanFunc, (isDouble), CV_CPU_DISPATCH_MODES_ALL);
 }
 
-void patchNaNs( InputOutputArray _a, double _val )
+व्योम patchNaNs( निवेश_Output_Array _a, द्विगुन _val )
 {
     CV_INSTRUMENT_REGION();
     CV_Assert( _a.depth() == CV_32F || _a.depth() == CV_64F);
@@ -65,67 +65,67 @@ void patchNaNs( InputOutputArray _a, double _val )
                ocl_patchNaNs(_a, _val))
 
     Mat a = _a.getMat();
-    const Mat* arrays[] = {&a, 0};
+    स्थिर Mat* arrays[] = {&a, 0};
     uchar* ptrs[1] = {};
     NAryMatIterator it(arrays, ptrs);
-    size_t len = it.size*a.channels();
+    माप_प्रकार len = it.size*a.channels();
 
     PatchNanFunc func = getPatchNanFunc(_a.depth() == CV_64F);
 
-    for (size_t i = 0; i < it.nplanes; i++, ++it)
+    क्रम (माप_प्रकार i = 0; i < it.nplanes; i++, ++it)
     {
         func(ptrs[0], len, _val);
     }
 }
 
 
-#ifdef HAVE_OPENCL
+#अगर_घोषित HAVE_OPENCL
 
-static bool ocl_finiteMask(const UMat img, UMat mask)
+अटल bool ocl_finiteMask(स्थिर UMat img, UMat mask)
 {
-    int channels = img.channels();
-    int depth = img.depth();
+    पूर्णांक channels = img.channels();
+    पूर्णांक depth = img.depth();
 
-    const ocl::Device d = ocl::Device::getDefault();
+    स्थिर ocl::Device d = ocl::Device::getDefault();
     bool doubleSupport = d.doubleFPConfig() > 0;
-    if (!doubleSupport && depth == CV_64F)
+    अगर (!doubleSupport && depth == CV_64F)
     {
-        return false;
+        वापस false;
     }
 
-    int rowsPerWI = ocl::Device::getDefault().isIntel() ? 4 : 1;
+    पूर्णांक rowsPerWI = ocl::Device::getDefault().isIntel() ? 4 : 1;
     ocl::Kernel k("finiteMask", ocl::core::finitemask_oclsrc,
                   format("-D srcT=%s -D cn=%d -D rowsPerWI=%d %s",
                          depth == CV_32F ? "float" : "double", channels, rowsPerWI,
                          doubleSupport ? "-D DOUBLE_SUPPORT" : ""));
-    if (k.empty())
-        return false;
+    अगर (k.empty())
+        वापस false;
 
-    k.args(ocl::KernelArg::ReadOnlyNoSize(img), ocl::KernelArg::WriteOnly(mask));
+    k.args(ocl::KernelArg::Read_Only_No_आकार(img), ocl::KernelArg::WriteOnly(mask));
 
-    size_t globalsize[2] = { (size_t)img.cols, ((size_t)img.rows + rowsPerWI - 1) / rowsPerWI };
-    return k.run(2, globalsize, NULL, false);
+    माप_प्रकार globalsize[2] = { (माप_प्रकार)img.cols, ((माप_प्रकार)img.rows + rowsPerWI - 1) / rowsPerWI };
+    वापस k.run(2, globalsize, शून्य, false);
 }
 
-#endif
+#पूर्ण_अगर
 
-static FiniteMaskFunc getFiniteMaskFunc(bool isDouble, int cn)
+अटल FiniteMaskFunc getFiniteMaskFunc(bool isDouble, पूर्णांक cn)
 {
     CV_INSTRUMENT_REGION();
     CV_CPU_DISPATCH(getFiniteMaskFunc, (isDouble, cn), CV_CPU_DISPATCH_MODES_ALL);
 }
 
-void finiteMask(InputArray _src, OutputArray _mask)
+व्योम finiteMask(निवेश_Array _src, OutputArray _mask)
 {
     CV_INSTRUMENT_REGION();
 
-    int channels = _src.channels();
-    int depth = _src.depth();
+    पूर्णांक channels = _src.channels();
+    पूर्णांक depth = _src.depth();
     CV_Assert( channels > 0 && channels <= 4);
     CV_Assert( depth == CV_32F || depth == CV_64F );
-    std::vector<int> vsz(_src.dims());
-    _src.sizend(vsz.data());
-    _mask.create(_src.dims(), vsz.data(), CV_8UC1);
+    std::vector<पूर्णांक> vsz(_src.dims());
+    _src.sizend(vsz.तथ्य());
+    _mask.create(_src.dims(), vsz.तथ्य(), CV_8UC1);
 
     CV_OCL_RUN(_src.isUMat() && _mask.isUMat() && _src.dims() <= 2,
                ocl_finiteMask(_src.getUMat(), _mask.getUMat()));
@@ -133,20 +133,20 @@ void finiteMask(InputArray _src, OutputArray _mask)
     Mat src = _src.getMat();
     Mat mask = _mask.getMat();
 
-    const Mat *arrays[]={&src, &mask, 0};
+    स्थिर Mat *arrays[]={&src, &mask, 0};
     Mat planes[2];
     NAryMatIterator it(arrays, planes);
-    size_t total = planes[0].total();
-    size_t i, nplanes = it.nplanes;
+    माप_प्रकार योग = planes[0].योग();
+    माप_प्रकार i, nplanes = it.nplanes;
 
     FiniteMaskFunc func = getFiniteMaskFunc((depth == CV_64F), channels);
 
-    for( i = 0; i < nplanes; i++, ++it )
+    क्रम( i = 0; i < nplanes; i++, ++it )
     {
-        const uchar* sptr = planes[0].ptr();
+        स्थिर uchar* sptr = planes[0].ptr();
         uchar* dptr = planes[1].ptr();
 
-        func(sptr, dptr, total);
+        func(sptr, dptr, योग);
     }
 }
 } //namespace cv

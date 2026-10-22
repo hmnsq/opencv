@@ -6,18 +6,18 @@
 
 // cv::reduce: reduction of an n-dimensional array over any set of axes.
 
-#include "precomp.hpp"
-#include "opencv2/core/hal/intrin.hpp"
+#समावेश "precomp.hpp"
+#समावेश "opencv2/core/hal/intrin.hpp"
 
-#include <algorithm>
-#include <cmath>
-#include <limits>
+#समावेश <algorithm>
+#समावेश <cmath>
+#समावेश <limits>
 
 namespace cv {
 
 namespace {
 
-enum
+क्रमागत
 {
     RND_MAX_DIMS = CV_MAX_DIM + 1,   // + the channel axis
     RND_BLOCK = 1024,                // elements converted per call when the source needs conversion
@@ -28,243 +28,243 @@ enum
 
 //////////////////////////////// vector traits ////////////////////////////////
 
-template<typename T> struct VecT { enum { ok = 0 }; typedef T vtype; };
-#if (CV_SIMD || CV_SIMD_SCALABLE)
-#define CV_RND_VEC(T, V) template<> struct VecT<T> { enum { ok = 1 }; typedef V vtype; };
+ढाँचा<typename T> काष्ठा VecT { क्रमागत { ok = 0 }; प्रकार T vtype; };
+#अगर (CV_SIMD || CV_SIMD_SCALABLE)
+#घोषणा CV_RND_VEC(T, V) ढाँचा<> काष्ठा VecT<T> { क्रमागत { ok = 1 }; प्रकार V vtype; };
 CV_RND_VEC(uchar, v_uint8)
 CV_RND_VEC(schar, v_int8)
 CV_RND_VEC(ushort, v_uint16)
-CV_RND_VEC(short, v_int16)
-CV_RND_VEC(unsigned, v_uint32)
-CV_RND_VEC(int, v_int32)
-CV_RND_VEC(float, v_float32)
-#if (CV_SIMD_64F || CV_SIMD_SCALABLE_64F)
-CV_RND_VEC(double, v_float64)
-#endif
-#undef CV_RND_VEC
-#endif
+CV_RND_VEC(लघु, v_int16)
+CV_RND_VEC(अचिन्हित, v_uint32)
+CV_RND_VEC(पूर्णांक, v_int32)
+CV_RND_VEC(भग्न, v_float32)
+#अगर (CV_SIMD_64F || CV_SIMD_SCALABLE_64F)
+CV_RND_VEC(द्विगुन, v_float64)
+#पूर्ण_अगर
+#अघोषित CV_RND_VEC
+#पूर्ण_अगर
 
 //////////////////////////////// operations ////////////////////////////////
 // apply() folds one element into an accumulator, combine() merges two accumulators,
 // finalize() turns an accumulator into the result. The vector versions are only used
 // for the accumulator types that have them (see VecT).
 
-template<typename A> struct OpSum
+ढाँचा<typename A> काष्ठा Op_योग
 {
-    static A init() { return A(0); }
-    static A apply(A a, A x) { return a + x; }
-    static A combine(A a, A b) { return a + b; }
-    static A finalize(A a, int64) { return a; }
-    template<typename V> static V vapply(const V& a, const V& x) { return v_add(a, x); }
-    template<typename V> static V vcombine(const V& a, const V& b) { return v_add(a, b); }
+    अटल A init() { वापस A(0); }
+    अटल A apply(A a, A x) { वापस a + x; }
+    अटल A combine(A a, A b) { वापस a + b; }
+    अटल A finalize(A a, int64) { वापस a; }
+    ढाँचा<typename V> अटल V vapply(स्थिर V& a, स्थिर V& x) { वापस v_add(a, x); }
+    ढाँचा<typename V> अटल V vcombine(स्थिर V& a, स्थिर V& b) { वापस v_add(a, b); }
 };
 
-template<typename A> struct OpAvg : OpSum<A>
+ढाँचा<typename A> काष्ठा OpAvg : Op_योग<A>
 {
-    static A finalize(A a, int64 n) { return n > 0 ? A(a/(double)n) : A(0); }
+    अटल A finalize(A a, int64 n) { वापस n > 0 ? A(a/(द्विगुन)n) : A(0); }
 };
 
-template<typename A> struct OpLogSum : OpSum<A>
+ढाँचा<typename A> काष्ठा Op_Log_योग : Op_योग<A>
 {
-    static A finalize(A a, int64) { return A(std::log(a)); }
+    अटल A finalize(A a, int64) { वापस A(std::log(a)); }
 };
 
-template<typename A> struct OpSum2 : OpSum<A>
+ढाँचा<typename A> काष्ठा OpSum2 : Op_योग<A>
 {
-    static A apply(A a, A x) { return a + x*x; }
-    template<typename V> static V vapply(const V& a, const V& x) { return v_add(a, v_mul(x, x)); }
+    अटल A apply(A a, A x) { वापस a + x*x; }
+    ढाँचा<typename V> अटल V vapply(स्थिर V& a, स्थिर V& x) { वापस v_add(a, v_mul(x, x)); }
 };
 
-template<typename A> struct OpL2 : OpSum2<A>
+ढाँचा<typename A> काष्ठा OpL2 : OpSum2<A>
 {
-    static A finalize(A a, int64) { return A(std::sqrt(a)); }
+    अटल A finalize(A a, int64) { वापस A(std::वर्ग_मूल(a)); }
 };
 
-template<typename A> struct OpL1 : OpSum<A>
+ढाँचा<typename A> काष्ठा OpL1 : Op_योग<A>
 {
-    static A apply(A a, A x) { return a + (x < A(0) ? -x : x); }
-    template<typename V> static V vapply(const V& a, const V& x) { return v_add(a, v_abs(x)); }
+    अटल A apply(A a, A x) { वापस a + (x < A(0) ? -x : x); }
+    ढाँचा<typename V> अटल V vapply(स्थिर V& a, स्थिर V& x) { वापस v_add(a, v_abs(x)); }
 };
 
-template<typename A> struct OpProd
+ढाँचा<typename A> काष्ठा OpProd
 {
-    static A init() { return A(1); }
-    static A apply(A a, A x) { return a*x; }
-    static A combine(A a, A b) { return a*b; }
-    static A finalize(A a, int64) { return a; }
-    template<typename V> static V vapply(const V& a, const V& x) { return v_mul(a, x); }
-    template<typename V> static V vcombine(const V& a, const V& b) { return v_mul(a, b); }
+    अटल A init() { वापस A(1); }
+    अटल A apply(A a, A x) { वापस a*x; }
+    अटल A combine(A a, A b) { वापस a*b; }
+    अटल A finalize(A a, int64) { वापस a; }
+    ढाँचा<typename V> अटल V vapply(स्थिर V& a, स्थिर V& x) { वापस v_mul(a, x); }
+    ढाँचा<typename V> अटल V vcombine(स्थिर V& a, स्थिर V& b) { वापस v_mul(a, b); }
 };
 
 // Identity elements of max and min. A trait rather than a ternary on has_infinity, so that the
 // unary minus is never compiled for an unsigned A (MSVC C4146).
-template<typename A, bool hasInf = std::numeric_limits<A>::has_infinity> struct Extremes
+ढाँचा<typename A, bool hasInf = std::numeric_limits<A>::has_infinity> काष्ठा Extremes
 {
-    static A low() { return std::numeric_limits<A>::lowest(); }
-    static A high() { return std::numeric_limits<A>::max(); }
+    अटल A निचला() { वापस std::numeric_limits<A>::lowest(); }
+    अटल A ऊपरी() { वापस std::numeric_limits<A>::max(); }
 };
 
-template<typename A> struct Extremes<A, true>
+ढाँचा<typename A> काष्ठा Extremes<A, true>
 {
-    static A low() { return -std::numeric_limits<A>::infinity(); }
-    static A high() { return std::numeric_limits<A>::infinity(); }
+    अटल A निचला() { वापस -std::numeric_limits<A>::infinity(); }
+    अटल A ऊपरी() { वापस std::numeric_limits<A>::infinity(); }
 };
 
-template<typename A> struct OpMax
+ढाँचा<typename A> काष्ठा OpMax
 {
-    static A init() { return Extremes<A>::low(); }
-    static A apply(A a, A x) { return a < x ? x : a; }
-    static A combine(A a, A b) { return a < b ? b : a; }
-    static A finalize(A a, int64) { return a; }
-    template<typename V> static V vapply(const V& a, const V& x) { return v_max(a, x); }
-    template<typename V> static V vcombine(const V& a, const V& b) { return v_max(a, b); }
+    अटल A init() { वापस Extremes<A>::निचला(); }
+    अटल A apply(A a, A x) { वापस a < x ? x : a; }
+    अटल A combine(A a, A b) { वापस a < b ? b : a; }
+    अटल A finalize(A a, int64) { वापस a; }
+    ढाँचा<typename V> अटल V vapply(स्थिर V& a, स्थिर V& x) { वापस v_max(a, x); }
+    ढाँचा<typename V> अटल V vcombine(स्थिर V& a, स्थिर V& b) { वापस v_max(a, b); }
 };
 
-template<typename A> struct OpMin
+ढाँचा<typename A> काष्ठा OpMin
 {
-    static A init() { return Extremes<A>::high(); }
-    static A apply(A a, A x) { return x < a ? x : a; }
-    static A combine(A a, A b) { return b < a ? b : a; }
-    static A finalize(A a, int64) { return a; }
-    template<typename V> static V vapply(const V& a, const V& x) { return v_min(a, x); }
-    template<typename V> static V vcombine(const V& a, const V& b) { return v_min(a, b); }
+    अटल A init() { वापस Extremes<A>::ऊपरी(); }
+    अटल A apply(A a, A x) { वापस x < a ? x : a; }
+    अटल A combine(A a, A b) { वापस b < a ? b : a; }
+    अटल A finalize(A a, int64) { वापस a; }
+    ढाँचा<typename V> अटल V vapply(स्थिर V& a, स्थिर V& x) { वापस v_min(a, x); }
+    ढाँचा<typename V> अटल V vcombine(स्थिर V& a, स्थिर V& b) { वापस v_min(a, b); }
 };
 
 // second pass of log-sum-exp: sum(exp(x - m)), then m + log(sum), where m is the maximum
-template<typename A> struct OpSumExpShifted
+ढाँचा<typename A> काष्ठा Op_योग_Exp_Shifted
 {
-    static A init() { return A(0); }
-    static A apply(A a, A x, A m) { return a + A(std::exp(x - m)); }
-    static A combine(A a, A b) { return a + b; }
-    static A finalize(A a, A m) { return std::isinf(m) ? m : m + A(std::log(a)); }
+    अटल A init() { वापस A(0); }
+    अटल A apply(A a, A x, A m) { वापस a + A(std::exp(x - m)); }
+    अटल A combine(A a, A b) { वापस a + b; }
+    अटल A finalize(A a, A m) { वापस std::isinf(m) ? m : m + A(std::log(a)); }
 };
 
 //////////////////////////////// row kernels ////////////////////////////////
 
 // horizontal: fold n contiguous elements into a scalar accumulator
-template<class Op, typename A, bool vec = (VecT<A>::ok != 0)> struct HRow
+ढाँचा<श्रेणी Op, typename A, bool vec = (VecT<A>::ok != 0)> काष्ठा HRow
 {
-    static A run(A acc, const A* x, int64 n)
+    अटल A run(A acc, स्थिर A* x, int64 n)
     {
-        for (int64 i = 0; i < n; i++)
+        क्रम (int64 i = 0; i < n; i++)
             acc = Op::apply(acc, x[i]);
-        return acc;
+        वापस acc;
     }
 };
 
 // vertical: acc[i] = apply(acc[i], x[i])
-template<class Op, typename A, bool vec = (VecT<A>::ok != 0)> struct VRow
+ढाँचा<श्रेणी Op, typename A, bool vec = (VecT<A>::ok != 0)> काष्ठा VRow
 {
-    static void run(A* acc, const A* x, int64 n)
+    अटल व्योम run(A* acc, स्थिर A* x, int64 n)
     {
-        for (int64 i = 0; i < n; i++)
+        क्रम (int64 i = 0; i < n; i++)
             acc[i] = Op::apply(acc[i], x[i]);
     }
 };
 
-#if (CV_SIMD || CV_SIMD_SCALABLE)
-template<class Op, typename A> struct HRow<Op, A, true>
+#अगर (CV_SIMD || CV_SIMD_SCALABLE)
+ढाँचा<श्रेणी Op, typename A> काष्ठा HRow<Op, A, true>
 {
-    static A run(A acc, const A* x, int64 n)
+    अटल A run(A acc, स्थिर A* x, int64 n)
     {
-        typedef typename VecT<A>::vtype V;
-        const int L = VTraits<V>::vlanes();
+        प्रकार typename VecT<A>::vtype V;
+        स्थिर पूर्णांक L = VTraits<V>::vlanes();
         int64 i = 0;
-        if (n >= 2*L)
+        अगर (n >= 2*L)
         {
             A buf[VTraits<V>::max_nlanes];
-            for (int k = 0; k < L; k++)
+            क्रम (पूर्णांक k = 0; k < L; k++)
                 buf[k] = Op::init();
             V a0 = vx_load(buf), a1 = a0;
-            for (; i + 2*L <= n; i += 2*L)
+            क्रम (; i + 2*L <= n; i += 2*L)
             {
                 a0 = Op::vapply(a0, vx_load(x + i));
                 a1 = Op::vapply(a1, vx_load(x + i + L));
             }
             v_store(buf, Op::vcombine(a0, a1));
-            for (int k = 0; k < L; k++)
+            क्रम (पूर्णांक k = 0; k < L; k++)
                 acc = Op::combine(acc, buf[k]);
         }
-        for (; i < n; i++)
+        क्रम (; i < n; i++)
             acc = Op::apply(acc, x[i]);
-        return acc;
+        वापस acc;
     }
 };
 
-template<class Op, typename A> struct VRow<Op, A, true>
+ढाँचा<श्रेणी Op, typename A> काष्ठा VRow<Op, A, true>
 {
-    static void run(A* acc, const A* x, int64 n)
+    अटल व्योम run(A* acc, स्थिर A* x, int64 n)
     {
-        typedef typename VecT<A>::vtype V;
-        const int L = VTraits<V>::vlanes();
+        प्रकार typename VecT<A>::vtype V;
+        स्थिर पूर्णांक L = VTraits<V>::vlanes();
         int64 i = 0;
-        for (; i + L <= n; i += L)
+        क्रम (; i + L <= n; i += L)
             v_store(acc + i, Op::vapply(vx_load(acc + i), vx_load(x + i)));
-        for (; i < n; i++)
+        क्रम (; i < n; i++)
             acc[i] = Op::apply(acc[i], x[i]);
     }
 };
-#endif
+#पूर्ण_अगर
 
 //////////////////////////////// plan ////////////////////////////////
 
-struct Plan
+काष्ठा Plan
 {
     // kept axes (outer first); ksstep in bytes, kdstep in result elements
-    int nk;
-    int ksize[RND_MAX_DIMS];
-    ptrdiff_t ksstep[RND_MAX_DIMS], kdstep[RND_MAX_DIMS];
+    पूर्णांक nk;
+    पूर्णांक ksize[RND_MAX_DIMS];
+    सूचक_भेद_प्रकार ksstep[RND_MAX_DIMS], kdstep[RND_MAX_DIMS];
     // reduced axes (outer first), steps in bytes
-    int nr;
-    int rsize[RND_MAX_DIMS];
-    ptrdiff_t rsstep[RND_MAX_DIMS];
+    पूर्णांक nr;
+    पूर्णांक rsize[RND_MAX_DIMS];
+    सूचक_भेद_प्रकार rsstep[RND_MAX_DIMS];
     bool innerReduced;      // the innermost axis is reduced (horizontal mode)
 
-    const uchar* src;
-    int sdepth, adepth;     // source depth and accumulator depth
-    size_t sesz1;
-    int64 count;            // reduced elements per output
+    स्थिर uchar* src;
+    पूर्णांक sdepth, adepth;     // source depth and accumulator depth
+    माप_प्रकार sesz1;
+    int64 गिनती_2;            // reduced elements per output
     int64 nout;             // number of outputs
-    BinaryFunc cvt;         // source -> accumulator conversion, or nullptr
+    द्विआधारी_Func cvt;         // source -> accumulator conversion, or nullptr
 };
 
 // iterator over the flat index space of some axes, tracking a byte offset and an element offset
-struct Iter
+काष्ठा Iter
 {
-    int n = 0;
-    const int* size = nullptr;
-    const ptrdiff_t* s = nullptr;
-    const ptrdiff_t* d = nullptr;
+    पूर्णांक n = 0;
+    स्थिर पूर्णांक* size = nullptr;
+    स्थिर सूचक_भेद_प्रकार* s = nullptr;
+    स्थिर सूचक_भेद_प्रकार* d = nullptr;
     int64 idx[RND_MAX_DIMS];
-    ptrdiff_t soff = 0, doff = 0;
+    सूचक_भेद_प्रकार soff = 0, doff = 0;
 
-    void init(int n_, const int* size_, const ptrdiff_t* s_, const ptrdiff_t* d_, int64 flat)
+    व्योम init(पूर्णांक n_, स्थिर पूर्णांक* आकार_3, स्थिर सूचक_भेद_प्रकार* s_, स्थिर सूचक_भेद_प्रकार* d_, int64 flat)
     {
-        n = n_; size = size_; s = s_; d = d_;
+        n = n_; size = आकार_3; s = s_; d = d_;
         soff = doff = 0;
-        for (int k = n - 1; k >= 0; k--)
+        क्रम (पूर्णांक k = n - 1; k >= 0; k--)
         {
             int64 q = flat / size[k];
             idx[k] = flat - q*size[k];
-            soff += (ptrdiff_t)idx[k]*s[k];
-            if (d)
-                doff += (ptrdiff_t)idx[k]*d[k];
+            soff += (सूचक_भेद_प्रकार)idx[k]*s[k];
+            अगर (d)
+                doff += (सूचक_भेद_प्रकार)idx[k]*d[k];
             flat = q;
         }
     }
 
-    void next()
+    व्योम next()
     {
-        for (int k = n - 1; k >= 0; k--)
+        क्रम (पूर्णांक k = n - 1; k >= 0; k--)
         {
             soff += s[k];
-            if (d)
+            अगर (d)
                 doff += d[k];
-            if (++idx[k] < size[k])
-                return;
-            soff -= (ptrdiff_t)size[k]*s[k];
-            if (d)
-                doff -= (ptrdiff_t)size[k]*d[k];
+            अगर (++idx[k] < size[k])
+                वापस;
+            soff -= (सूचक_भेद_प्रकार)size[k]*s[k];
+            अगर (d)
+                doff -= (सूचक_भेद_प्रकार)size[k]*d[k];
             idx[k] = 0;
         }
     }
@@ -272,28 +272,28 @@ struct Iter
 
 // `len` accumulator-typed elements of the source row at `p`: `p` itself when it is already
 // contiguous and of the accumulator type, otherwise `tmp`/`buf`.
-template<typename A> static const A* loadRow(const Plan& pl, const uchar* p, ptrdiff_t step, int64 len,
+ढाँचा<typename A> अटल स्थिर A* loadRow(स्थिर Plan& pl, स्थिर uchar* p, सूचक_भेद_प्रकार step, int64 len,
                                              A* buf, uchar* tmp)
 {
-    if (step != (ptrdiff_t)pl.sesz1)
+    अगर (step != (सूचक_भेद_प्रकार)pl.sesz1)
     {
-        for (int64 i = 0; i < len; i++, p += step)
-            memcpy(tmp + i*pl.sesz1, p, pl.sesz1);
+        क्रम (int64 i = 0; i < len; i++, p += step)
+            स_नकल(tmp + i*pl.sesz1, p, pl.sesz1);
         p = tmp;
     }
-    if (!pl.cvt)
-        return (const A*)p;
-    pl.cvt(p, 0, 0, 0, (uchar*)buf, 0, Size((int)len, 1), 0);
-    return buf;
+    अगर (!pl.cvt)
+        वापस (स्थिर A*)p;
+    pl.cvt(p, 0, 0, 0, (uchar*)buf, 0, आकार((पूर्णांक)len, 1), 0);
+    वापस buf;
 }
 
 // Row loop with conversion blocking: calls f(x, len) on consecutive pieces of the row.
-template<typename A, typename F> static void forRow(const Plan& pl, const uchar* p, ptrdiff_t step,
+ढाँचा<typename A, typename F> अटल व्योम forRow(स्थिर Plan& pl, स्थिर uchar* p, सूचक_भेद_प्रकार step,
                                                     int64 n, A* buf, uchar* tmp, F f)
 {
-    const bool direct = !pl.cvt && step == (ptrdiff_t)pl.sesz1;
-    const int64 blk = direct ? n : (int64)RND_BLOCK;
-    for (int64 e = 0; e < n; e += blk)
+    स्थिर bool direct = !pl.cvt && step == (सूचक_भेद_प्रकार)pl.sesz1;
+    स्थिर int64 blk = direct ? n : (int64)RND_BLOCK;
+    क्रम (int64 e = 0; e < n; e += blk)
     {
         int64 len = std::min(blk, n - e);
         f(loadRow<A>(pl, p + e*step, step, len, buf, tmp), len);
@@ -303,332 +303,332 @@ template<typename A, typename F> static void forRow(const Plan& pl, const uchar*
 //////////////////////////////// drivers ////////////////////////////////
 
 // Parallel-split bookkeeping shared by both modes: nsplit partial results per output.
-struct Work
+काष्ठा Work
 {
     int64 nitems, nsplit;
-    double nstripes;
+    द्विगुन nstripes;
     bool serial;
 };
 
 // Horizontal mode: outputs are the kept axes, each one folds `count` elements; the flat reduced
 // index space [0, count) is split into nsplit ranges when there are too few outputs.
-template<typename A, class Op, class OpM> static void runHorizontal(const Plan& pl, const Work& w, A* res,
-                                                                   const A* mbuf, A* partial)
+ढाँचा<typename A, श्रेणी Op, श्रेणी OpM> अटल व्योम runHorizontal(स्थिर Plan& pl, स्थिर Work& w, A* res,
+                                                                   स्थिर A* mbuf, A* partial)
 {
-    const int nr = pl.nr;
-    const int64 n = pl.rsize[nr - 1];                 // innermost reduced axis
-    const ptrdiff_t rstep = pl.rsstep[nr - 1];
-    const int64 nsplit = w.nsplit;
+    स्थिर पूर्णांक nr = pl.nr;
+    स्थिर int64 n = pl.rsize[nr - 1];                 // innermost reduced axis
+    स्थिर सूचक_भेद_प्रकार rstep = pl.rsstep[nr - 1];
+    स्थिर int64 nsplit = w.nsplit;
 
-    auto body = [&](const Range& range)
+    स्वतः body = [&](स्थिर Range& range)
     {
-        AutoBuffer<A> bufA(RND_BLOCK);
-        AutoBuffer<uchar> bufT(RND_BLOCK*pl.sesz1);
+        Auto_बफर<A> bufA(RND_BLOCK);
+        Auto_बफर<uchar> bufT(RND_BLOCK*pl.sesz1);
         Iter ko, ro;
         int64 it = range.start;
-        if (nsplit == 1)
+        अगर (nsplit == 1)
             ko.init(pl.nk, pl.ksize, pl.ksstep, pl.kdstep, it);
-        while (it < range.end)
+        जबतक (it < range.end)
         {
-            const int64 o = it / nsplit, s = it - o*nsplit;
-            if (nsplit > 1)
+            स्थिर int64 o = it / nsplit, s = it - o*nsplit;
+            अगर (nsplit > 1)
                 ko.init(pl.nk, pl.ksize, pl.ksstep, pl.kdstep, o);
-            const uchar* base = pl.src + ko.soff;
-            const A m = mbuf ? mbuf[ko.doff] : A(0);
-            int64 a = s*pl.count/nsplit, b = (s + 1)*pl.count/nsplit;
+            स्थिर uchar* base = pl.src + ko.soff;
+            स्थिर A m = mbuf ? mbuf[ko.doff] : A(0);
+            int64 a = s*pl.गिनती_2/nsplit, b = (s + 1)*pl.गिनती_2/nsplit;
             A acc = Op::init();
-            if (a < b)
+            अगर (a < b)
             {
                 ro.init(nr - 1, pl.rsize, pl.rsstep, nullptr, a / n);
                 int64 e = a % n;
-                while (a < b)
+                जबतक (a < b)
                 {
                     int64 len = std::min(n - e, b - a);
-                    forRow<A>(pl, base + ro.soff + e*rstep, rstep, len, bufA.data(), bufT.data(),
-                              [&](const A* x, int64 l) { acc = OpM::run(acc, x, l, m); });
+                    forRow<A>(pl, base + ro.soff + e*rstep, rstep, len, bufA.तथ्य(), bufT.तथ्य(),
+                              [&](स्थिर A* x, int64 l) { acc = OpM::run(acc, x, l, m); });
                     a += len;
                     e = 0;
                     ro.next();
                 }
             }
-            if (nsplit == 1)
+            अगर (nsplit == 1)
             {
-                res[ko.doff] = OpM::finalize(acc, pl.count, m);
+                res[ko.doff] = OpM::finalize(acc, pl.गिनती_2, m);
                 ko.next();
             }
-            else
+            अन्यथा
                 partial[s*pl.nout + ko.doff] = acc;
             it++;
         }
     };
 
-    if (w.serial)
-        body(Range(0, (int)w.nitems));
-    else
-        parallel_for_(Range(0, (int)w.nitems), body, w.nstripes);
+    अगर (w.serial)
+        body(Range(0, (पूर्णांक)w.nitems));
+    अन्यथा
+        parallel_for_(Range(0, (पूर्णांक)w.nitems), body, w.nstripes);
 }
 
 // Vertical mode: the innermost axis is kept; each item accumulates whole rows of a chunk of it.
-template<typename A, class Op, class OpM> static void runVertical(const Plan& pl, const Work& w, A* res,
-                                                                 const A* mbuf, A* partial)
+ढाँचा<typename A, श्रेणी Op, श्रेणी OpM> अटल व्योम runVertical(स्थिर Plan& pl, स्थिर Work& w, A* res,
+                                                                 स्थिर A* mbuf, A* partial)
 {
-    const int nk = pl.nk;
-    const int64 m = pl.ksize[nk - 1];
-    const ptrdiff_t kstep = pl.ksstep[nk - 1], kdstep = pl.kdstep[nk - 1];
-    const int64 nch = (m + RND_VCHUNK - 1)/RND_VCHUNK;
-    const int64 nsplit = w.nsplit;
+    स्थिर पूर्णांक nk = pl.nk;
+    स्थिर int64 m = pl.ksize[nk - 1];
+    स्थिर सूचक_भेद_प्रकार kstep = pl.ksstep[nk - 1], kdstep = pl.kdstep[nk - 1];
+    स्थिर int64 nch = (m + RND_VCHUNK - 1)/RND_VCHUNK;
+    स्थिर int64 nsplit = w.nsplit;
     int64 rcount = 1;
-    for (int i = 0; i < pl.nr; i++)
+    क्रम (पूर्णांक i = 0; i < pl.nr; i++)
         rcount *= pl.rsize[i];
 
-    auto body = [&](const Range& range)
+    स्वतः body = [&](स्थिर Range& range)
     {
-        AutoBuffer<A> bufA(RND_BLOCK), accBuf(RND_VCHUNK);
-        AutoBuffer<uchar> bufT(RND_BLOCK*pl.sesz1);
-        A* acc = accBuf.data();
+        Auto_बफर<A> bufA(RND_BLOCK), accBuf(RND_VCHUNK);
+        Auto_बफर<uchar> bufT(RND_BLOCK*pl.sesz1);
+        A* acc = accBuf.तथ्य();
         Iter ko, ro;
-        for (int64 it = range.start; it < range.end; it++)
+        क्रम (int64 it = range.start; it < range.end; it++)
         {
             int64 s = it % nsplit, q = it / nsplit;
             int64 ch = q % nch, o = q / nch;
             ko.init(nk - 1, pl.ksize, pl.ksstep, pl.kdstep, o);
-            const int64 e0 = ch*RND_VCHUNK, len = std::min((int64)RND_VCHUNK, m - e0);
-            const ptrdiff_t soff = ko.soff + (ptrdiff_t)e0*kstep, doff = ko.doff + (ptrdiff_t)e0*kdstep;
-            const A* mrow = mbuf ? mbuf + doff : nullptr;   // kdstep == 1 for the innermost kept axis
-            for (int64 i = 0; i < len; i++)
+            स्थिर int64 e0 = ch*RND_VCHUNK, len = std::min((int64)RND_VCHUNK, m - e0);
+            स्थिर सूचक_भेद_प्रकार soff = ko.soff + (सूचक_भेद_प्रकार)e0*kstep, doff = ko.doff + (सूचक_भेद_प्रकार)e0*kdstep;
+            स्थिर A* mrow = mbuf ? mbuf + doff : nullptr;   // kdstep == 1 for the innermost kept axis
+            क्रम (int64 i = 0; i < len; i++)
                 acc[i] = Op::init();
 
             int64 a = s*rcount/nsplit, b = (s + 1)*rcount/nsplit;
-            if (a < b)
+            अगर (a < b)
             {
                 ro.init(pl.nr, pl.rsize, pl.rsstep, nullptr, a);
-                for (; a < b; a++, ro.next())
+                क्रम (; a < b; a++, ro.next())
                 {
-                    const uchar* p = pl.src + soff + ro.soff;
-                    const A* x = loadRow<A>(pl, p, kstep, len, bufA.data(), bufT.data());
+                    स्थिर uchar* p = pl.src + soff + ro.soff;
+                    स्थिर A* x = loadRow<A>(pl, p, kstep, len, bufA.तथ्य(), bufT.तथ्य());
                     OpM::vrun(acc, x, len, mrow);
                 }
             }
-            if (nsplit == 1)
-                for (int64 i = 0; i < len; i++)
-                    res[doff + i] = OpM::finalize(acc[i], pl.count, mrow ? mrow[i] : A(0));
-            else
-                for (int64 i = 0; i < len; i++)
+            अगर (nsplit == 1)
+                क्रम (int64 i = 0; i < len; i++)
+                    res[doff + i] = OpM::finalize(acc[i], pl.गिनती_2, mrow ? mrow[i] : A(0));
+            अन्यथा
+                क्रम (int64 i = 0; i < len; i++)
                     partial[s*pl.nout + doff + i] = acc[i];
         }
     };
 
-    if (w.serial)
-        body(Range(0, (int)w.nitems));
-    else
-        parallel_for_(Range(0, (int)w.nitems), body, w.nstripes);
+    अगर (w.serial)
+        body(Range(0, (पूर्णांक)w.nitems));
+    अन्यथा
+        parallel_for_(Range(0, (पूर्णांक)w.nitems), body, w.nstripes);
 }
 
 // Adapters that give the plain operations and the shifted-exp pass one interface.
-template<typename A, class Op> struct Plain
+ढाँचा<typename A, श्रेणी Op> काष्ठा Plain
 {
-    static A run(A acc, const A* x, int64 n, A) { return HRow<Op, A>::run(acc, x, n); }
-    static void vrun(A* acc, const A* x, int64 n, const A*) { VRow<Op, A>::run(acc, x, n); }
-    static A finalize(A a, int64 count, A) { return Op::finalize(a, count); }
+    अटल A run(A acc, स्थिर A* x, int64 n, A) { वापस HRow<Op, A>::run(acc, x, n); }
+    अटल व्योम vrun(A* acc, स्थिर A* x, int64 n, स्थिर A*) { VRow<Op, A>::run(acc, x, n); }
+    अटल A finalize(A a, int64 गिनती_2, A) { वापस Op::finalize(a, गिनती_2); }
 };
 
-template<typename A> struct ShiftedExp
+ढाँचा<typename A> काष्ठा ShiftedExp
 {
-    typedef OpSumExpShifted<A> Op;
-    static A run(A acc, const A* x, int64 n, A m)
+    प्रकार Op_योग_Exp_Shifted<A> Op;
+    अटल A run(A acc, स्थिर A* x, int64 n, A m)
     {
-        for (int64 i = 0; i < n; i++)
+        क्रम (int64 i = 0; i < n; i++)
             acc = Op::apply(acc, x[i], m);
-        return acc;
+        वापस acc;
     }
-    static void vrun(A* acc, const A* x, int64 n, const A* m)
+    अटल व्योम vrun(A* acc, स्थिर A* x, int64 n, स्थिर A* m)
     {
-        for (int64 i = 0; i < n; i++)
+        क्रम (int64 i = 0; i < n; i++)
             acc[i] = Op::apply(acc[i], x[i], m[i]);
     }
-    static A finalize(A a, int64, A m) { return Op::finalize(a, m); }
+    अटल A finalize(A a, int64, A m) { वापस Op::finalize(a, m); }
 };
 
-template<typename A, class Op, class OpM> static void runPass(const Plan& pl, A* res, const A* mbuf)
+ढाँचा<typename A, श्रेणी Op, श्रेणी OpM> अटल व्योम runPass(स्थिर Plan& pl, A* res, स्थिर A* mbuf)
 {
-    const double work = (double)pl.nout*(double)std::max(pl.count, (int64)1);
-    const int nthreads = work < RND_SERIAL_WORK ? 1 : getNumThreads();
+    स्थिर द्विगुन work = (द्विगुन)pl.nout*(द्विगुन)std::max(pl.गिनती_2, (int64)1);
+    स्थिर पूर्णांक nthreads = work < RND_SERIAL_WORK ? 1 : get_अंक_Threads();
     Work w;
     w.serial = nthreads <= 1;
     w.nsplit = 1;
-    int64 items;
-    if (pl.innerReduced)
-        items = pl.nout;
-    else
+    int64 वस्तुएँ;
+    अगर (pl.innerReduced)
+        वस्तुएँ = pl.nout;
+    अन्यथा
     {
         int64 nouter = pl.nout/pl.ksize[pl.nk - 1];
-        items = nouter*((pl.ksize[pl.nk - 1] + RND_VCHUNK - 1)/RND_VCHUNK);
+        वस्तुएँ = nouter*((pl.ksize[pl.nk - 1] + RND_VCHUNK - 1)/RND_VCHUNK);
     }
     // too few outputs to keep all the threads busy: split the reduction as well
-    const int64 want = 4*(int64)nthreads;
-    if (!w.serial && items < want && pl.count > 1)
+    स्थिर int64 want = 4*(int64)nthreads;
+    अगर (!w.serial && वस्तुएँ < want && pl.गिनती_2 > 1)
     {
-        int64 rows = pl.innerReduced ? pl.count/4096 : pl.count/16;
-        w.nsplit = std::max((int64)1, std::min((want + items - 1)/items, std::min(rows, (int64)256)));
+        int64 rows = pl.innerReduced ? pl.गिनती_2/4096 : pl.गिनती_2/16;
+        w.nsplit = std::max((int64)1, std::min((want + वस्तुएँ - 1)/वस्तुएँ, std::min(rows, (int64)256)));
         w.nsplit = std::min(w.nsplit, std::max((int64)1, (int64)(4 << 20)/std::max(pl.nout, (int64)1)));
     }
-    w.nitems = items*w.nsplit;
-    w.nstripes = std::min((double)w.nitems, std::max(1.0, work/RND_STRIPE_WORK));
-    CV_Assert(w.nitems <= INT_MAX);
+    w.nitems = वस्तुएँ*w.nsplit;
+    w.nstripes = std::min((द्विगुन)w.nitems, std::max(1.0, work/RND_STRIPE_WORK));
+    CV_Assert(w.nitems <= पूर्णांक_उच्च);
 
-    AutoBuffer<A> partial(w.nsplit > 1 ? (size_t)(w.nsplit*pl.nout) : 1);
-    if (pl.innerReduced)
-        runHorizontal<A, Op, OpM>(pl, w, res, mbuf, partial.data());
-    else
-        runVertical<A, Op, OpM>(pl, w, res, mbuf, partial.data());
+    Auto_बफर<A> partial(w.nsplit > 1 ? (माप_प्रकार)(w.nsplit*pl.nout) : 1);
+    अगर (pl.innerReduced)
+        runHorizontal<A, Op, OpM>(pl, w, res, mbuf, partial.तथ्य());
+    अन्यथा
+        runVertical<A, Op, OpM>(pl, w, res, mbuf, partial.तथ्य());
 
-    if (w.nsplit > 1)
+    अगर (w.nsplit > 1)
     {
-        for (int64 o = 0; o < pl.nout; o++)
+        क्रम (int64 o = 0; o < pl.nout; o++)
         {
-            A acc = partial[(size_t)o];
-            for (int64 s = 1; s < w.nsplit; s++)
-                acc = Op::combine(acc, partial[(size_t)(s*pl.nout + o)]);
-            res[o] = OpM::finalize(acc, pl.count, mbuf ? mbuf[o] : A(0));
+            A acc = partial[(माप_प्रकार)o];
+            क्रम (int64 s = 1; s < w.nsplit; s++)
+                acc = Op::combine(acc, partial[(माप_प्रकार)(s*pl.nout + o)]);
+            res[o] = OpM::finalize(acc, pl.गिनती_2, mbuf ? mbuf[o] : A(0));
         }
     }
 }
 
-template<typename A> static void fillResult(A* res, int64 n, A v)
+ढाँचा<typename A> अटल व्योम fill_परिणाम(A* res, int64 n, A v)
 {
-    for (int64 i = 0; i < n; i++)
+    क्रम (int64 i = 0; i < n; i++)
         res[i] = v;
 }
 
-template<typename A> static void runOp(const Plan& pl, int op, A* res)
+ढाँचा<typename A> अटल व्योम runOp(स्थिर Plan& pl, पूर्णांक op, A* res)
 {
-    if (pl.count == 0)
+    अगर (pl.गिनती_2 == 0)
     {
         // empty reduction: the identity of the operation
         A v = op == REDUCE_MAX ? OpMax<A>::init() : op == REDUCE_MIN ? OpMin<A>::init() :
               op == REDUCE_PROD ? A(1) :
-              op == REDUCE_LOG_SUM || op == REDUCE_LOG_SUM_EXP ? OpMax<A>::init() : A(0);
-        fillResult(res, pl.nout, v);
-        return;
+              op == REDUCE_LOG_योग || op == REDUCE_LOG_योग_EXP ? OpMax<A>::init() : A(0);
+        fill_परिणाम(res, pl.nout, v);
+        वापस;
     }
-    switch (op)
+    चयन (op)
     {
-    case REDUCE_SUM:   runPass<A, OpSum<A>, Plain<A, OpSum<A> > >(pl, res, nullptr); break;
-    case REDUCE_AVG:   runPass<A, OpAvg<A>, Plain<A, OpAvg<A> > >(pl, res, nullptr); break;
-    case REDUCE_SUM2:  runPass<A, OpSum2<A>, Plain<A, OpSum2<A> > >(pl, res, nullptr); break;
-    case REDUCE_L1:    runPass<A, OpL1<A>, Plain<A, OpL1<A> > >(pl, res, nullptr); break;
-    case REDUCE_L2:    runPass<A, OpL2<A>, Plain<A, OpL2<A> > >(pl, res, nullptr); break;
-    case REDUCE_PROD:  runPass<A, OpProd<A>, Plain<A, OpProd<A> > >(pl, res, nullptr); break;
-    case REDUCE_LOG_SUM: runPass<A, OpLogSum<A>, Plain<A, OpLogSum<A> > >(pl, res, nullptr); break;
-    case REDUCE_LOG_SUM_EXP:
+    हाल REDUCE_योग:   runPass<A, Op_योग<A>, Plain<A, Op_योग<A> > >(pl, res, nullptr); अवरोध;
+    हाल REDUCE_AVG:   runPass<A, OpAvg<A>, Plain<A, OpAvg<A> > >(pl, res, nullptr); अवरोध;
+    हाल REDUCE_SUM2:  runPass<A, OpSum2<A>, Plain<A, OpSum2<A> > >(pl, res, nullptr); अवरोध;
+    हाल REDUCE_L1:    runPass<A, OpL1<A>, Plain<A, OpL1<A> > >(pl, res, nullptr); अवरोध;
+    हाल REDUCE_L2:    runPass<A, OpL2<A>, Plain<A, OpL2<A> > >(pl, res, nullptr); अवरोध;
+    हाल REDUCE_PROD:  runPass<A, OpProd<A>, Plain<A, OpProd<A> > >(pl, res, nullptr); अवरोध;
+    हाल REDUCE_LOG_योग: runPass<A, Op_Log_योग<A>, Plain<A, Op_Log_योग<A> > >(pl, res, nullptr); अवरोध;
+    हाल REDUCE_LOG_योग_EXP:
     {
-        AutoBuffer<A> mbuf((size_t)pl.nout);
-        runPass<A, OpMax<A>, Plain<A, OpMax<A> > >(pl, mbuf.data(), nullptr);
-        runPass<A, OpSumExpShifted<A>, ShiftedExp<A> >(pl, res, mbuf.data());
-        break;
+        Auto_बफर<A> mbuf((माप_प्रकार)pl.nout);
+        runPass<A, OpMax<A>, Plain<A, OpMax<A> > >(pl, mbuf.तथ्य(), nullptr);
+        runPass<A, Op_योग_Exp_Shifted<A>, ShiftedExp<A> >(pl, res, mbuf.तथ्य());
+        अवरोध;
     }
-    default:
+    शेष:
         CV_Error(Error::StsBadArg, "reduce: unknown reduction operation");
     }
 }
 
-template<typename A> static void runMinMax(const Plan& pl, int op, A* res)
+ढाँचा<typename A> अटल व्योम runMinMax(स्थिर Plan& pl, पूर्णांक op, A* res)
 {
-    if (pl.count == 0)
-        fillResult(res, pl.nout, op == REDUCE_MAX ? OpMax<A>::init() : OpMin<A>::init());
-    else if (op == REDUCE_MAX)
+    अगर (pl.गिनती_2 == 0)
+        fill_परिणाम(res, pl.nout, op == REDUCE_MAX ? OpMax<A>::init() : OpMin<A>::init());
+    अन्यथा अगर (op == REDUCE_MAX)
         runPass<A, OpMax<A>, Plain<A, OpMax<A> > >(pl, res, nullptr);
-    else
+    अन्यथा
         runPass<A, OpMin<A>, Plain<A, OpMin<A> > >(pl, res, nullptr);
 }
 
-static void dispatch(const Plan& pl, int op, uchar* res)
+अटल व्योम dispatch(स्थिर Plan& pl, पूर्णांक op, uchar* res)
 {
-    const bool minmax = op == REDUCE_MAX || op == REDUCE_MIN;
-    switch (pl.adepth)
+    स्थिर bool minmax = op == REDUCE_MAX || op == REDUCE_MIN;
+    चयन (pl.adepth)
     {
-    case CV_32F:
-        if (minmax) runMinMax<float>(pl, op, (float*)res); else runOp<float>(pl, op, (float*)res);
-        break;
-    case CV_64F:
-        if (minmax) runMinMax<double>(pl, op, (double*)res); else runOp<double>(pl, op, (double*)res);
-        break;
-    case CV_8U:  runMinMax<uchar>(pl, op, (uchar*)res); break;
-    case CV_8S:  runMinMax<schar>(pl, op, (schar*)res); break;
-    case CV_16U: runMinMax<ushort>(pl, op, (ushort*)res); break;
-    case CV_16S: runMinMax<short>(pl, op, (short*)res); break;
-    case CV_32U: runMinMax<unsigned>(pl, op, (unsigned*)res); break;
-    case CV_32S: runMinMax<int>(pl, op, (int*)res); break;
-    case CV_64U: runMinMax<uint64_t>(pl, op, (uint64_t*)res); break;
-    case CV_64S: runMinMax<int64_t>(pl, op, (int64_t*)res); break;
-    default:
+    हाल CV_32F:
+        अगर (minmax) runMinMax<भग्न>(pl, op, (भग्न*)res); अन्यथा runOp<भग्न>(pl, op, (भग्न*)res);
+        अवरोध;
+    हाल CV_64F:
+        अगर (minmax) runMinMax<द्विगुन>(pl, op, (द्विगुन*)res); अन्यथा runOp<द्विगुन>(pl, op, (द्विगुन*)res);
+        अवरोध;
+    हाल CV_8U:  runMinMax<uchar>(pl, op, (uchar*)res); अवरोध;
+    हाल CV_8S:  runMinMax<schar>(pl, op, (schar*)res); अवरोध;
+    हाल CV_16U: runMinMax<ushort>(pl, op, (ushort*)res); अवरोध;
+    हाल CV_16S: runMinMax<लघु>(pl, op, (लघु*)res); अवरोध;
+    हाल CV_32U: runMinMax<अचिन्हित>(pl, op, (अचिन्हित*)res); अवरोध;
+    हाल CV_32S: runMinMax<पूर्णांक>(pl, op, (पूर्णांक*)res); अवरोध;
+    हाल CV_64U: runMinMax<uint64_t>(pl, op, (uint64_t*)res); अवरोध;
+    हाल CV_64S: runMinMax<int64_t>(pl, op, (int64_t*)res); अवरोध;
+    शेष:
         CV_Error(Error::StsInternal, "reduce: unexpected accumulator depth");
     }
 }
 
-static int accumulatorDepth(int sdepth, int ddepth, int op)
+अटल पूर्णांक accumulatorDepth(पूर्णांक sdepth, पूर्णांक ddepth, पूर्णांक op)
 {
-    if (op == REDUCE_MAX || op == REDUCE_MIN)
+    अगर (op == REDUCE_MAX || op == REDUCE_MIN)
     {
-        if (sdepth == CV_16F || sdepth == CV_16BF)
-            return CV_32F;
-        return sdepth == CV_Bool ? CV_8U : sdepth;
+        अगर (sdepth == CV_16F || sdepth == CV_16BF)
+            वापस CV_32F;
+        वापस sdepth == CV_Bool ? CV_8U : sdepth;
     }
-    const bool wide = sdepth == CV_32S || sdepth == CV_32U || sdepth == CV_64S || sdepth == CV_64U ||
+    स्थिर bool wide = sdepth == CV_32S || sdepth == CV_32U || sdepth == CV_64S || sdepth == CV_64U ||
                       sdepth == CV_64F || ddepth == CV_64F;
-    return wide ? CV_64F : CV_32F;
+    वापस wide ? CV_64F : CV_32F;
 }
 
 } // namespace
 
-ReduceParams::ReduceParams(int _rtype, const std::vector<int>& _axes, bool _keepdims, int _dtype)
+ReduceParams::ReduceParams(पूर्णांक _rtype, स्थिर std::vector<पूर्णांक>& _axes, bool _keepdims, पूर्णांक _dtype)
     : rtype(_rtype), axes(_axes), keepdims(_keepdims), dtype(_dtype)
 {
 }
 
-void reduce(InputArray _src, OutputArray _dst, const ReduceParams& params)
+व्योम reduce(निवेश_Array _src, OutputArray _dst, स्थिर ReduceParams& params)
 {
     CV_INSTRUMENT_REGION();
 
-    const int op = params.rtype, dtype = params.dtype;
-    const bool keepdims = params.keepdims;
-    CV_Check(op, op >= REDUCE_SUM && op <= REDUCE_LOG_SUM_EXP, "reduce: unknown reduction operation");
+    स्थिर पूर्णांक op = params.rtype, dtype = params.dtype;
+    स्थिर bool keepdims = params.keepdims;
+    CV_Check(op, op >= REDUCE_योग && op <= REDUCE_LOG_योग_EXP, "reduce: unknown reduction operation");
 
     Mat src = _src.getMat();
-    const int dims = src.dims, cn = src.channels();
-    const int sdepth = src.depth();
-    int ddepth = dtype < 0 ? sdepth : CV_MAT_DEPTH(dtype);
-    if ((op == REDUCE_MAX || op == REDUCE_MIN) && sdepth == CV_Bool && ddepth != CV_Bool)
+    स्थिर पूर्णांक dims = src.dims, cn = src.channels();
+    स्थिर पूर्णांक sdepth = src.depth();
+    पूर्णांक ddepth = dtype < 0 ? sdepth : CV_MAT_DEPTH(dtype);
+    अगर ((op == REDUCE_MAX || op == REDUCE_MIN) && sdepth == CV_Bool && ddepth != CV_Bool)
         CV_Error(Error::StsBadArg, "reduce: the output of max/min over bool must be bool");
 
     // which axes are reduced; empty means all of them
     bool reduced[CV_MAX_DIM] = {false};
-    if (params.axes.empty())
+    अगर (params.axes.empty())
         std::fill(reduced, reduced + dims, true);
-    for (int a : params.axes)
+    क्रम (पूर्णांक a : params.axes)
     {
         CV_CheckGE(a, -dims, "reduce: axis is out of range");
         CV_CheckLT(a, dims, "reduce: axis is out of range");
-        int ax = a < 0 ? a + dims : a;
+        पूर्णांक ax = a < 0 ? a + dims : a;
         CV_Check(a, !reduced[ax], "reduce: duplicate axis");
         reduced[ax] = true;
     }
 
-    int keepShape[CV_MAX_DIM], outShape[CV_MAX_DIM], nout = 0;
-    for (int i = 0; i < dims; i++)
+    पूर्णांक keepShape[CV_MAX_DIM], outShape[CV_MAX_DIM], nout = 0;
+    क्रम (पूर्णांक i = 0; i < dims; i++)
     {
         keepShape[i] = reduced[i] ? 1 : src.size[i];
-        if (!reduced[i] || keepdims)
+        अगर (!reduced[i] || keepdims)
             outShape[nout++] = keepShape[i];
     }
-    const int dtype_ = CV_MAKETYPE(ddepth, cn);
+    स्थिर पूर्णांक dtype_ = CV_MAKETYPE(ddepth, cn);
     _dst.create(nout, outShape, dtype_);
     Mat dst = _dst.getMat();
 
     // The results are computed into a contiguous accumulator-typed buffer laid out like the
     // keepdims output (channels innermost), then converted into dst if needed.
     Plan pl;
-    pl.src = src.data;
+    pl.src = src.तथ्य;
     pl.sdepth = sdepth == CV_Bool ? CV_8U : sdepth;
     pl.adepth = accumulatorDepth(sdepth, ddepth, op);
     pl.sesz1 = CV_ELEM_SIZE1(sdepth);
@@ -636,73 +636,73 @@ void reduce(InputArray _src, OutputArray _dst, const ReduceParams& params)
     CV_Assert(pl.sdepth == pl.adepth || pl.cvt);
 
     // gather the axes (+ the channel axis), outer first
-    int n = 0;
-    int size[RND_MAX_DIMS];
-    ptrdiff_t sstep[RND_MAX_DIMS], dstep[RND_MAX_DIMS];
+    पूर्णांक n = 0;
+    पूर्णांक size[RND_MAX_DIMS];
+    सूचक_भेद_प्रकार sstep[RND_MAX_DIMS], dstep[RND_MAX_DIMS];
     bool red[RND_MAX_DIMS];
-    ptrdiff_t dcur = cn;
-    ptrdiff_t dsteps[CV_MAX_DIM];
-    for (int i = dims - 1; i >= 0; i--)
+    सूचक_भेद_प्रकार dcur = cn;
+    सूचक_भेद_प्रकार dsteps[CV_MAX_DIM];
+    क्रम (पूर्णांक i = dims - 1; i >= 0; i--)
     {
         dsteps[i] = dcur;
         dcur *= keepShape[i];
     }
-    pl.count = 1;
-    for (int i = 0; i < dims; i++)
+    pl.गिनती_2 = 1;
+    क्रम (पूर्णांक i = 0; i < dims; i++)
     {
-        if (reduced[i])
-            pl.count *= src.size[i];
+        अगर (reduced[i])
+            pl.गिनती_2 *= src.size[i];
         size[n] = src.size[i];
-        sstep[n] = (ptrdiff_t)src.step[i];
+        sstep[n] = (सूचक_भेद_प्रकार)src.step[i];
         dstep[n] = reduced[i] ? 0 : dsteps[i];
         red[n] = reduced[i];
         n++;
     }
-    if (cn > 1)
+    अगर (cn > 1)
     {
         size[n] = cn;
-        sstep[n] = (ptrdiff_t)pl.sesz1;
+        sstep[n] = (सूचक_भेद_प्रकार)pl.sesz1;
         dstep[n] = 1;
         red[n] = false;
         n++;
     }
 
-    pl.nout = (int64)dst.total()*cn;
-    const bool direct = pl.adepth == ddepth && dst.isContinuous();
+    pl.nout = (int64)dst.योग()*cn;
+    स्थिर bool direct = pl.adepth == ddepth && dst.isContinuous();
     Mat resMat;
-    uchar* res = dst.data;
-    if (!direct)
+    uchar* res = dst.तथ्य;
+    अगर (!direct)
     {
-        resMat.create(1, (int)std::max(pl.nout, (int64)1), CV_MAKETYPE(pl.adepth, 1));
-        res = resMat.data;
+        resMat.create(1, (पूर्णांक)std::max(pl.nout, (int64)1), CV_MAKETYPE(pl.adepth, 1));
+        res = resMat.तथ्य;
     }
-    if (pl.nout == 0)
-        return;
+    अगर (pl.nout == 0)
+        वापस;
 
     // drop size-1 axes, then merge neighbours of the same kind that are contiguous in both views
-    int m = 0;
-    for (int i = 0; i < n; i++)
+    पूर्णांक m = 0;
+    क्रम (पूर्णांक i = 0; i < n; i++)
     {
-        if (size[i] == 0)
+        अगर (size[i] == 0)
         {
             // empty source along this axis
-            if (red[i])
+            अगर (red[i])
             {
-                pl.count = 0;
-                continue;
+                pl.गिनती_2 = 0;
+                जारी;
             }
-            return;
+            वापस;
         }
-        if (size[i] == 1)
-            continue;
-        if (m > 0 && red[m-1] == red[i] && sstep[m-1] == sstep[i]*size[i] &&
+        अगर (size[i] == 1)
+            जारी;
+        अगर (m > 0 && red[m-1] == red[i] && sstep[m-1] == sstep[i]*size[i] &&
             dstep[m-1] == dstep[i]*size[i])
         {
             size[m-1] *= size[i];
             sstep[m-1] = sstep[i];
             dstep[m-1] = dstep[i];
         }
-        else
+        अन्यथा
         {
             size[m] = size[i];
             sstep[m] = sstep[i];
@@ -711,26 +711,26 @@ void reduce(InputArray _src, OutputArray _dst, const ReduceParams& params)
             m++;
         }
     }
-    if (m == 0)
+    अगर (m == 0)
     {
         // a single element
         size[0] = 1;
-        sstep[0] = (ptrdiff_t)pl.sesz1;
+        sstep[0] = (सूचक_भेद_प्रकार)pl.sesz1;
         dstep[0] = 1;
         red[0] = false;
         m = 1;
     }
     pl.innerReduced = red[m-1];
     pl.nk = pl.nr = 0;
-    for (int i = 0; i < m; i++)
+    क्रम (पूर्णांक i = 0; i < m; i++)
     {
-        if (red[i])
+        अगर (red[i])
         {
             pl.rsize[pl.nr] = size[i];
             pl.rsstep[pl.nr] = sstep[i];
             pl.nr++;
         }
-        else
+        अन्यथा
         {
             pl.ksize[pl.nk] = size[i];
             pl.ksstep[pl.nk] = sstep[i];
@@ -738,7 +738,7 @@ void reduce(InputArray _src, OutputArray _dst, const ReduceParams& params)
             pl.nk++;
         }
     }
-    if (pl.nk == 0)
+    अगर (pl.nk == 0)
     {
         pl.ksize[0] = 1;
         pl.ksstep[0] = 0;
@@ -748,11 +748,11 @@ void reduce(InputArray _src, OutputArray _dst, const ReduceParams& params)
 
     dispatch(pl, op, res);
 
-    if (!direct)
+    अगर (!direct)
     {
-        Mat r(dst.dims, dst.size.p, CV_MAKETYPE(pl.adepth, cn), resMat.data);
-        if (dst.dims == 0)
-            r = Mat(0, nullptr, CV_MAKETYPE(pl.adepth, cn), resMat.data);
+        Mat r(dst.dims, dst.size.p, CV_MAKETYPE(pl.adepth, cn), resMat.तथ्य);
+        अगर (dst.dims == 0)
+            r = Mat(0, nullptr, CV_MAKETYPE(pl.adepth, cn), resMat.तथ्य);
         r.convertTo(dst, ddepth);
     }
 }

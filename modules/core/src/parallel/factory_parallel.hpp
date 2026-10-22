@@ -2,28 +2,28 @@
 // It is subject to the license terms in the LICENSE file found in the top-level directory
 // of this distribution and at http://opencv.org/license.html.
 
-#ifndef OPENCV_CORE_PARALLEL_FACTORY_HPP
-#define OPENCV_CORE_PARALLEL_FACTORY_HPP
+#अगर_अघोषित OPENCV_CORE_PARALLEL_FACTORY_HPP
+#घोषणा OPENCV_CORE_PARALLEL_FACTORY_HPP
 
-#include "opencv2/core/parallel/parallel_backend.hpp"
+#समावेश "opencv2/core/parallel/parallel_backend.hpp"
 
 namespace cv { namespace parallel {
 
-class IParallelBackendFactory
+श्रेणी IParallelBackendFactory
 {
-public:
-    virtual ~IParallelBackendFactory() {}
-    virtual std::shared_ptr<cv::parallel::ParallelForAPI> create() const = 0;
+खुला:
+    भव ~IParallelBackendFactory() {}
+    भव std::shared_ptr<cv::parallel::ParallelForAPI> create() स्थिर = 0;
 };
 
 
-class StaticBackendFactory CV_FINAL: public IParallelBackendFactory
+श्रेणी StaticBackendFactory CV_FINAL: खुला IParallelBackendFactory
 {
-protected:
-    std::function<std::shared_ptr<cv::parallel::ParallelForAPI>(void)> create_fn_;
+रक्षित:
+    std::function<std::shared_ptr<cv::parallel::ParallelForAPI>(व्योम)> create_fn_;
 
-public:
-    StaticBackendFactory(std::function<std::shared_ptr<cv::parallel::ParallelForAPI>(void)>&& create_fn)
+खुला:
+    StaticBackendFactory(std::function<std::shared_ptr<cv::parallel::ParallelForAPI>(व्योम)>&& create_fn)
         : create_fn_(create_fn)
     {
         // nothing
@@ -31,9 +31,9 @@ public:
 
     ~StaticBackendFactory() CV_OVERRIDE {}
 
-    std::shared_ptr<cv::parallel::ParallelForAPI> create() const CV_OVERRIDE
+    std::shared_ptr<cv::parallel::ParallelForAPI> create() स्थिर CV_OVERRIDE
     {
-        return create_fn_();
+        वापस create_fn_();
     }
 };
 
@@ -41,8 +41,8 @@ public:
 // PluginBackendFactory is implemented in plugin_wrapper.cpp
 //
 
-std::shared_ptr<IParallelBackendFactory> createPluginParallelBackendFactory(const std::string& baseName);
+std::shared_ptr<IParallelBackendFactory> createPluginParallelBackendFactory(स्थिर std::string& baseName);
 
 }}  // namespace
 
-#endif  // OPENCV_CORE_PARALLEL_FACTORY_HPP
+#पूर्ण_अगर  // OPENCV_CORE_PARALLEL_FACTORY_HPP

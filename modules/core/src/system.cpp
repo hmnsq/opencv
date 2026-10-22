@@ -41,118 +41,118 @@
 //
 //M*/
 
-#include "precomp.hpp"
+#समावेश "precomp.hpp"
 //#include "opencv2/core/core_c.h"
-#include <atomic>
-#include <exception>
-#include <iostream>
-#include <ostream>
+#समावेश <atomic>
+#समावेश <exception>
+#समावेश <iostream>
+#समावेश <ostream>
 
-#ifdef __QNX__
-    #include <unistd.h>
-    #include <sys/neutrino.h>
-    #include <sys/syspage.h>
-#ifdef __aarch64__
-    #include <aarch64/syspage.h>
-#endif
-#endif
+#अगर_घोषित __QNX__
+    #समावेश <unistd.h>
+    #समावेश <sys/neutrino.h>
+    #समावेश <sys/syspage.h>
+#अगर_घोषित __aarch64__
+    #समावेश <aarch64/syspage.h>
+#पूर्ण_अगर
+#पूर्ण_अगर
 
-#include <opencv2/core/utils/configuration.private.hpp>
-#include <opencv2/core/utils/trace.private.hpp>
+#समावेश <opencv2/core/utils/configuration.private.hpp>
+#समावेश <opencv2/core/utils/trace.private.hpp>
 
-#include <opencv2/core/utils/logger.hpp>
+#समावेश <opencv2/core/utils/logger.hpp>
 
-#include <opencv2/core/utils/tls.hpp>
-#include <opencv2/core/utils/instrumentation.hpp>
+#समावेश <opencv2/core/utils/tls.hpp>
+#समावेश <opencv2/core/utils/instrumentation.hpp>
 
-#include <opencv2/core/utils/filesystem.private.hpp>
+#समावेश <opencv2/core/utils/filesystem.private.hpp>
 
-#include <opencv2/core/utils/fp_control_utils.hpp>
-#include <opencv2/core/utils/fp_control.private.hpp>
+#समावेश <opencv2/core/utils/fp_control_utils.hpp>
+#समावेश <opencv2/core/utils/fp_control.private.hpp>
 
 namespace cv {
 
-static void _initSystem()
+अटल व्योम _initSystem()
 {
-#ifdef __ANDROID__
+#अगर_घोषित __ANDROID__
     // https://github.com/opencv/opencv/issues/14906
     // "ios_base::Init" object is not a part of Android's "iostream" header (in case of clang toolchain, NDK 20).
     // Ref1: https://en.cppreference.com/w/cpp/io/ios_base/Init
     //       The header <iostream> behaves as if it defines (directly or indirectly) an instance of std::ios_base::Init with static storage duration
     // Ref2: https://github.com/gcc-mirror/gcc/blob/gcc-8-branch/libstdc%2B%2B-v3/include/std/iostream#L73-L74
-    static std::ios_base::Init s_iostream_initializer;
-#endif
+    अटल std::ios_base::Init s_iostream_initializer;
+#पूर्ण_अगर
 }
 
-static Mutex* __initialization_mutex = NULL;
+अटल Mutex* __initialization_mutex = शून्य;
 Mutex& getInitializationMutex()
 {
-    if (__initialization_mutex == NULL)
+    अगर (__initialization_mutex == शून्य)
     {
-        (void)_initSystem();
-        __initialization_mutex = new Mutex();
+        (व्योम)_initSystem();
+        __initialization_mutex = नया Mutex();
     }
-    return *__initialization_mutex;
+    वापस *__initialization_mutex;
 }
 // force initialization (single-threaded environment)
 Mutex* __initialization_mutex_initializer = &getInitializationMutex();
 
-static bool param_dumpErrors = utils::getConfigurationParameterBool("OPENCV_DUMP_ERRORS",
-#if defined(_DEBUG) || defined(__ANDROID__)
+अटल bool param_dumpErrors = utils::getConfigurationParameterBool("OPENCV_DUMP_ERRORS",
+#अगर defined(_DEBUG) || defined(__ANDROID__)
     true
-#else
+#अन्यथा
     false
-#endif
+#पूर्ण_अगर
 );
 
-void* allocSingletonBuffer(size_t size) { return fastMalloc(size); }
-void* allocSingletonNewBuffer(size_t size) { return malloc(size); }
+व्योम* alloc_Singleton_बफर(माप_प्रकार size) { वापस fastMalloc(size); }
+व्योम* alloc_Singleton_New_बफर(माप_प्रकार size) { वापस दो_स्मृति(size); }
 
 
 } // namespace cv
 
-#ifndef CV_ERROR_SET_TERMINATE_HANDLER  // build config option
-# if defined(_WIN32)
+#अगर_अघोषित CV_ERROR_SET_TERMINATE_HANDLER  // build config option
+# अगर defined(_WIN32)
 #   define CV_ERROR_SET_TERMINATE_HANDLER 1
 # endif
-#endif
-#if defined(CV_ERROR_SET_TERMINATE_HANDLER) && !CV_ERROR_SET_TERMINATE_HANDLER
+#पूर्ण_अगर
+#अगर defined(CV_ERROR_SET_TERMINATE_HANDLER) && !CV_ERROR_SET_TERMINATE_HANDLER
 # undef CV_ERROR_SET_TERMINATE_HANDLER
-#endif
+#पूर्ण_अगर
 
-#ifdef _MSC_VER
-# if _MSC_VER >= 1700
+#अगर_घोषित _MSC_VER
+# अगर _MSC_VER >= 1700
 #  pragma warning(disable:4447) // Disable warning 'main' signature found without threading model
 # endif
-#endif
+#पूर्ण_अगर
 
-#ifdef CV_ERROR_SET_TERMINATE_HANDLER
-#include <cstdlib>        // std::abort
-#endif
+#अगर_घोषित CV_ERROR_SET_TERMINATE_HANDLER
+#समावेश <cstdlib>        // std::abort
+#पूर्ण_अगर
 
-#if defined __ANDROID__ || defined __unix__ || defined __FreeBSD__ || defined __OpenBSD__ || defined __HAIKU__ || defined __Fuchsia__ || defined __QNX__
+#अगर defined __ANDROID__ || defined __unix__ || defined __FreeBSD__ || defined __OpenBSD__ || defined __HAIKU__ || defined __Fuchsia__ || defined __QNX__
 #  include <unistd.h>
 #  include <fcntl.h>
-#if defined __QNX__
+#अगर defined __QNX__
 #  include <sys/elf.h>
 #  include <sys/auxv.h>
 using Elf64_auxv_t = auxv64_t;
 #  include <elfdefinitions.h>
-const uint64_t AT_HWCAP = NT_GNU_HWCAP;
-#else
+स्थिर uint64_t AT_HWCAP = NT_GNU_HWCAP;
+#अन्यथा
 #  include <elf.h>
-#endif
-#if defined __ANDROID__ || defined __linux__
+#पूर्ण_अगर
+#अगर defined __ANDROID__ || defined __linux__
 #  include <linux/auxvec.h>
-#endif
-#endif
+#पूर्ण_अगर
+#पूर्ण_अगर
 
-#if defined __ANDROID__ && defined HAVE_CPUFEATURES
+#अगर defined __ANDROID__ && defined HAVE_CPUFEATURES
 #  include <cpu-features.h>
-#endif
+#पूर्ण_अगर
 
 
-#if ((defined __ppc64__ || defined __PPC64__) && (defined HAVE_GETAUXVAL || defined HAVE_ELF_AUX_INFO))
+#अगर ((defined __ppc64__ || defined __PPC64__) && (defined HAVE_GETAUXVAL || defined HAVE_ELF_AUX_INFO))
 # include "sys/auxv.h"
 # ifndef AT_HWCAP2
 #   define AT_HWCAP2 26
@@ -166,165 +166,165 @@ const uint64_t AT_HWCAP = NT_GNU_HWCAP;
 # ifndef PPC_FEATURE_HAS_VSX
 #   define PPC_FEATURE_HAS_VSX 0x00000080
 # endif
-#endif
+#पूर्ण_अगर
 
-#if defined __loongarch64
-#include "sys/auxv.h"
-#define LA_HWCAP_LSX   (1<<4)
-#define LA_HWCAP_LASX  (1<<5)
-#endif
+#अगर defined __loongarch64
+#समावेश "sys/auxv.h"
+#घोषणा LA_HWCAP_LSX   (1<<4)
+#घोषणा LA_HWCAP_LASX  (1<<5)
+#पूर्ण_अगर
 
-#if defined _WIN32 || defined WINCE
-#ifndef _WIN32_WINNT           // This is needed for the declaration of TryEnterCriticalSection in winbase.h with Visual Studio 2005 (and older?)
-  #define _WIN32_WINNT 0x0400  // http://msdn.microsoft.com/en-us/library/ms686857(VS.85).aspx
-#endif
-#include <windows.h>
-#include <combaseapi.h>
-#if (_WIN32_WINNT >= 0x0602)
-  #include <synchapi.h>
-#endif
-#if ((_WIN32_WINNT >= 0x0600) && !defined(CV_DISABLE_FLS)) || defined(CV_FORCE_FLS)
-  #include <fibersapi.h>
-  #define CV_USE_FLS
-#endif
-#undef small
-#undef min
-#undef max
-#undef abs
-#include <tchar.h>
+#अगर defined _WIN32 || defined WINCE
+#अगर_अघोषित _WIN32_WINNT           // This is needed for the declaration of TryEnterCriticalSection in winbase.h with Visual Studio 2005 (and older?)
+  #घोषणा _WIN32_WINNT 0x0400  // http://msdn.microsoft.com/en-us/library/ms686857(VS.85).aspx
+#पूर्ण_अगर
+#समावेश <windows.h>
+#समावेश <combaseapi.h>
+#अगर (_WIN32_WINNT >= 0x0602)
+  #समावेश <synchapi.h>
+#पूर्ण_अगर
+#अगर ((_WIN32_WINNT >= 0x0600) && !defined(CV_DISABLE_FLS)) || defined(CV_FORCE_FLS)
+  #समावेश <fibersapi.h>
+  #घोषणा CV_USE_FLS
+#पूर्ण_अगर
+#अघोषित small
+#अघोषित min
+#अघोषित max
+#अघोषित असल
+#समावेश <tchar.h>
 
-#ifdef WINRT
-#include <wrl/client.h>
-#ifndef __cplusplus_winrt
-#include <windows.storage.h>
-#pragma comment(lib, "runtimeobject.lib")
-#endif // WINRT
+#अगर_घोषित WINRT
+#समावेश <wrl/client.h>
+#अगर_अघोषित __cplusplus_winrt
+#समावेश <windows.storage.h>
+#आशय comment(lib, "runtimeobject.lib")
+#पूर्ण_अगर // WINRT
 
-std::wstring GetTempPathWinRT()
+std::wstring Get_अस्थायी_Path_Win_RT()
 {
-#ifdef __cplusplus_winrt
-    return std::wstring(Windows::Storage::ApplicationData::Current->TemporaryFolder->Path->Data());
-#else
-    Microsoft::WRL::ComPtr<ABI::Windows::Storage::IApplicationDataStatics> appdataFactory;
-    Microsoft::WRL::ComPtr<ABI::Windows::Storage::IApplicationData> appdataRef;
+#अगर_घोषित __cplusplus_winrt
+    वापस std::wstring(Windows::Storage::Application_तथ्य::Current->TemporaryFolder->Path->तथ्य_4());
+#अन्यथा
+    Microsoft::WRL::ComPtr<ABI::Windows::Storage::IApplication_तथ्य_Statics> appdataFactory;
+    Microsoft::WRL::ComPtr<ABI::Windows::Storage::IApplication_तथ्य> appdataRef;
     Microsoft::WRL::ComPtr<ABI::Windows::Storage::IStorageFolder> storagefolderRef;
     Microsoft::WRL::ComPtr<ABI::Windows::Storage::IStorageItem> storageitemRef;
     HSTRING str;
-    HSTRING_HEADER hstrHead;
+    HSTRING_HEADER hstr_शीर्ष;
     std::wstring wstr;
-    if (FAILED(WindowsCreateStringReference(RuntimeClass_Windows_Storage_ApplicationData,
-                                            (UINT32)wcslen(RuntimeClass_Windows_Storage_ApplicationData), &hstrHead, &str)))
-        return wstr;
-    if (FAILED(RoGetActivationFactory(str, IID_PPV_ARGS(appdataFactory.ReleaseAndGetAddressOf()))))
-        return wstr;
-    if (FAILED(appdataFactory->get_Current(appdataRef.ReleaseAndGetAddressOf())))
-        return wstr;
-    if (FAILED(appdataRef->get_TemporaryFolder(storagefolderRef.ReleaseAndGetAddressOf())))
-        return wstr;
-    if (FAILED(storagefolderRef.As(&storageitemRef)))
-        return wstr;
-    str = NULL;
-    if (FAILED(storageitemRef->get_Path(&str)))
-        return wstr;
-    wstr = WindowsGetStringRawBuffer(str, NULL);
+    अगर (FAILED(WindowsCreateStringReference(Runtime_Class_Windows_Storage_Application_तथ्य,
+                                            (UINT32)wcslen(Runtime_Class_Windows_Storage_Application_तथ्य), &hstr_शीर्ष, &str)))
+        वापस wstr;
+    अगर (FAILED(RoGetActivationFactory(str, IID_PPV_ARGS(appdataFactory.ReleaseAndGetAddressOf()))))
+        वापस wstr;
+    अगर (FAILED(appdataFactory->get_Current(appdataRef.ReleaseAndGetAddressOf())))
+        वापस wstr;
+    अगर (FAILED(appdataRef->get_TemporaryFolder(storagefolderRef.ReleaseAndGetAddressOf())))
+        वापस wstr;
+    अगर (FAILED(storagefolderRef.As(&storageitemRef)))
+        वापस wstr;
+    str = शून्य;
+    अगर (FAILED(storageitemRef->get_Path(&str)))
+        वापस wstr;
+    wstr = Windows_Get_String_Raw_बफर(str, शून्य);
     WindowsDeleteString(str);
-    return wstr;
-#endif
+    वापस wstr;
+#पूर्ण_अगर
 }
 
-std::wstring GetTempFileNameWinRT(std::wstring prefix)
+std::wstring Get_अस्थायी_File_Name_Win_RT(std::wstring prefix)
 {
-    wchar_t guidStr[40];
+    ब_अक्षर_प्रकार guidStr[40];
     GUID g;
     CoCreateGuid(&g);
-    wchar_t* mask = L"%08x_%04x_%04x_%02x%02x_%02x%02x%02x%02x%02x%02x";
-    swprintf(&guidStr[0], sizeof(guidStr)/sizeof(wchar_t), mask,
+    ब_अक्षर_प्रकार* mask = L"%08x_%04x_%04x_%02x%02x_%02x%02x%02x%02x%02x%02x";
+    swprintf(&guidStr[0], माप(guidStr)/माप(ब_अक्षर_प्रकार), mask,
              g.Data1, g.Data2, g.Data3, UINT(g.Data4[0]), UINT(g.Data4[1]),
              UINT(g.Data4[2]), UINT(g.Data4[3]), UINT(g.Data4[4]),
              UINT(g.Data4[5]), UINT(g.Data4[6]), UINT(g.Data4[7]));
 
-    return prefix.append(std::wstring(guidStr));
+    वापस prefix.append(std::wstring(guidStr));
 }
 
-#endif
-#else
-#ifndef OPENCV_DISABLE_THREAD_SUPPORT
-#include <pthread.h>
-#endif
-#include <sys/time.h>
-#include <time.h>
+#पूर्ण_अगर
+#अन्यथा
+#अगर_अघोषित OPENCV_DISABLE_THREAD_SUPPORT
+#समावेश <pthread.h>
+#पूर्ण_अगर
+#समावेश <sys/time.h>
+#समावेश <time.h>
 
-#if defined __MACH__ && defined __APPLE__
-#include <mach/mach.h>
-#include <mach/mach_time.h>
-#include <sys/sysctl.h>
-#endif
+#अगर defined __MACH__ && defined __APPLE__
+#समावेश <mach/mach.h>
+#समावेश <mach/mach_time.h>
+#समावेश <sys/sysctl.h>
+#पूर्ण_अगर
 
-#endif
+#पूर्ण_अगर
 
-#ifdef _OPENMP
-#include "omp.h"
-#endif
+#अगर_घोषित _OPENMP
+#समावेश "omp.h"
+#पूर्ण_अगर
 
-#if defined __unix__ || defined __APPLE__ || defined __EMSCRIPTEN__ || defined __FreeBSD__ || defined __OpenBSD__ || defined __GLIBC__ || defined __HAIKU__
-#include <unistd.h>
-#include <stdio.h>
-#include <sys/types.h>
-#if defined __ANDROID__
-#include <sys/sysconf.h>
-#endif
-#endif
+#अगर defined __unix__ || defined __APPLE__ || defined __EMSCRIPTEN__ || defined __FreeBSD__ || defined __OpenBSD__ || defined __GLIBC__ || defined __HAIKU__
+#समावेश <unistd.h>
+#समावेश <stdio.h>
+#समावेश <sys/types.h>
+#अगर defined __ANDROID__
+#समावेश <sys/sysconf.h>
+#पूर्ण_अगर
+#पूर्ण_अगर
 
-#ifdef __ANDROID__
+#अगर_घोषित __ANDROID__
 # include <android/log.h>
-#endif
+#पूर्ण_अगर
 
-#ifdef DECLARE_CV_CPUID_X86
+#अगर_घोषित DECLARE_CV_CPUID_X86
 DECLARE_CV_CPUID_X86
-#endif
-#ifndef CV_CPUID_X86
-  #if defined _MSC_VER && (defined _M_IX86 || defined _M_X64)
-    #if _MSC_VER >= 1400  // MSVS 2005
-      #include <intrin.h>  // __cpuidex()
-      #define CV_CPUID_X86 __cpuidex
-    #else
-      #error "Required MSVS 2005+"
-    #endif
-  #elif defined __GNUC__ && (defined __i386__ || defined __x86_64__)
-    static void cv_cpuid(int* cpuid_data, int reg_eax, int reg_ecx)
+#पूर्ण_अगर
+#अगर_अघोषित CV_CPUID_X86
+  #अगर defined _MSC_VER && (defined _M_IX86 || defined _M_X64)
+    #अगर _MSC_VER >= 1400  // MSVS 2005
+      #समावेश <intrin.h>  // __cpuidex()
+      #घोषणा CV_CPUID_X86 __cpuidex
+    #अन्यथा
+      #त्रुटि "Required MSVS 2005+"
+    #पूर्ण_अगर
+  #या_अगर defined __GNUC__ && (defined __i386__ || defined __x86_64__)
+    अटल व्योम cv_cpuid(पूर्णांक* cpuid_तथ्य, पूर्णांक reg_eax, पूर्णांक reg_ecx)
     {
-        int __eax = reg_eax, __ebx = 0, __ecx = reg_ecx, __edx = 0;
+        पूर्णांक __eax = reg_eax, __ebx = 0, __ecx = reg_ecx, __edx = 0;
 // tested with available compilers (-fPIC -O2 -m32/-m64): https://godbolt.org/
-#if !defined(__PIC__) \
+#अगर !defined(__PIC__) \
     || defined(__x86_64__) || __GNUC__ >= 5 \
     || defined(__clang__) || defined(__INTEL_COMPILER)
         __asm__("cpuid\n\t"
                 : "+a" (__eax), "=b" (__ebx), "+c" (__ecx), "=d" (__edx)
         );
-#elif defined(__i386__)  // ebx may be reserved as the PIC register
+#या_अगर defined(__i386__)  // ebx may be reserved as the PIC register
         __asm__("xchg{l}\t{%%}ebx, %1\n\t"
                 "cpuid\n\t"
                 "xchg{l}\t{%%}ebx, %1\n\t"
                 : "+a" (__eax), "=&r" (__ebx), "+c" (__ecx), "=d" (__edx)
         );
-#else
-#error "Configuration error"
-#endif
-        cpuid_data[0] = __eax; cpuid_data[1] = __ebx; cpuid_data[2] = __ecx; cpuid_data[3] = __edx;
+#अन्यथा
+#त्रुटि "Configuration error"
+#पूर्ण_अगर
+        cpuid_तथ्य[0] = __eax; cpuid_तथ्य[1] = __ebx; cpuid_तथ्य[2] = __ecx; cpuid_तथ्य[3] = __edx;
     }
-    #define CV_CPUID_X86 cv_cpuid
-  #endif
-#endif
+    #घोषणा CV_CPUID_X86 cv_cpuid
+  #पूर्ण_अगर
+#पूर्ण_अगर
 
-#include <chrono>
+#समावेश <chrono>
 
 namespace cv
 {
 
-Exception::Exception() { code = Error::StsOk; line = 0; }
+Exception::Exception() { code = Error::StsOk; पंक्ति = 0; }
 
-Exception::Exception(Error::Code _code, const String& _err, const String& _func, const String& _file, int _line)
-: code(_code), err(_err), func(_func), file(_file), line(_line)
+Exception::Exception(Error::Code _code, स्थिर String& _err, स्थिर String& _func, स्थिर String& _file, पूर्णांक पंक्ति_3)
+: code(_code), err(_err), func(_func), file(_file), पंक्ति(पंक्ति_3)
 {
     formatMessage();
 }
@@ -334,115 +334,115 @@ Exception::~Exception() CV_NOEXCEPT {}
 /*!
  \return the error description and the context as a text string.
  */
-const char* Exception::what() const CV_NOEXCEPT { return msg.c_str(); }
+स्थिर अक्षर* Exception::what() स्थिर CV_NOEXCEPT { वापस संदेश.c_str(); }
 
-void Exception::formatMessage()
+व्योम Exception::formatMessage()
 {
-    size_t pos = err.find('\n');
+    माप_प्रकार pos = err.find('\n');
     bool multiline = pos != cv::String::npos;
-    if (multiline)
+    अगर (multiline)
     {
         std::stringstream ss;
-        size_t prev_pos = 0;
-        while (pos != cv::String::npos)
+        माप_प्रकार पूर्व_pos = 0;
+        जबतक (pos != cv::String::npos)
         {
-           ss << "> " << err.substr(prev_pos, pos - prev_pos) << std::endl;
-           prev_pos = pos + 1;
-           pos = err.find('\n', prev_pos);
+           ss << "> " << err.substr(पूर्व_pos, pos - पूर्व_pos) << std::प_पूर्ण;
+           पूर्व_pos = pos + 1;
+           pos = err.find('\n', पूर्व_pos);
         }
-        ss << "> " << err.substr(prev_pos);
-        if (err[err.size() - 1] != '\n')
-            ss << std::endl;
+        ss << "> " << err.substr(पूर्व_pos);
+        अगर (err[err.size() - 1] != '\n')
+            ss << std::प_पूर्ण;
         err = ss.str();
     }
-    if (func.size() > 0)
+    अगर (func.size() > 0)
     {
-        if (multiline)
-            msg = format("OpenCV(%s) %s:%d: error: (%d:%s) in function '%s'\n%s", CV_VERSION, file.c_str(), line, code, codeMessage(), func.c_str(), err.c_str());
-        else
-            msg = format("OpenCV(%s) %s:%d: error: (%d:%s) %s in function '%s'\n", CV_VERSION, file.c_str(), line, code, codeMessage(), err.c_str(), func.c_str());
+        अगर (multiline)
+            संदेश = format("OpenCV(%s) %s:%d: error: (%d:%s) in function '%s'\n%s", CV_VERSION, file.c_str(), पंक्ति, code, codeMessage(), func.c_str(), err.c_str());
+        अन्यथा
+            संदेश = format("OpenCV(%s) %s:%d: error: (%d:%s) %s in function '%s'\n", CV_VERSION, file.c_str(), पंक्ति, code, codeMessage(), err.c_str(), func.c_str());
     }
-    else
+    अन्यथा
     {
-        msg = format("OpenCV(%s) %s:%d: error: (%d:%s) %s%s", CV_VERSION, file.c_str(), line, code, codeMessage(), err.c_str(), multiline ? "" : "\n");
+        संदेश = format("OpenCV(%s) %s:%d: error: (%d:%s) %s%s", CV_VERSION, file.c_str(), पंक्ति, code, codeMessage(), err.c_str(), multiline ? "" : "\n");
     }
 }
 
-const char * Exception::codeMessage() const
+स्थिर अक्षर * Exception::codeMessage() स्थिर
 {
-    switch (code)
+    चयन (code)
     {
-    case cv::Error::StsOk :                  return "No Error";
-    case cv::Error::StsBackTrace :           return "Backtrace";
-    case cv::Error::StsError :               return "Unspecified error";
-    case cv::Error::StsInternal :            return "Internal error";
-    case cv::Error::StsNoMem :               return "Insufficient memory";
-    case cv::Error::StsBadArg :              return "Bad argument";
-    case cv::Error::StsNoConv :              return "Iterations do not converge";
-    case cv::Error::StsAutoTrace :           return "Autotrace call";
-    case cv::Error::StsBadSize :             return "Incorrect size of input array";
-    case cv::Error::StsNullPtr :             return "Null pointer";
-    case cv::Error::StsDivByZero :           return "Division by zero occurred";
-    case cv::Error::BadStep :                return "Image step is wrong";
-    case cv::Error::StsInplaceNotSupported : return "Inplace operation is not supported";
-    case cv::Error::StsObjectNotFound :      return "Requested object was not found";
-    case cv::Error::BadDepth :               return "Input image depth is not supported by function";
-    case cv::Error::StsUnmatchedFormats :    return "Formats of input arguments do not match";
-    case cv::Error::StsUnmatchedSizes :      return "Sizes of input arguments do not match";
-    case cv::Error::StsOutOfRange :          return "One of the arguments\' values is out of range";
-    case cv::Error::StsUnsupportedFormat :   return "Unsupported format or combination of formats";
-    case cv::Error::BadCOI :                 return "Input COI is not supported";
-    case cv::Error::BadNumChannels :         return "Bad number of channels";
-    case cv::Error::StsBadFlag :             return "Bad flag (parameter or structure field)";
-    case cv::Error::StsBadPoint :            return "Bad parameter of type CvPoint";
-    case cv::Error::StsBadMask :             return "Bad type of mask argument";
-    case cv::Error::StsParseError :          return "Parsing error";
-    case cv::Error::StsNotImplemented :      return "The function/feature is not implemented";
-    case cv::Error::StsBadMemBlock :         return "Memory block has been corrupted";
-    case cv::Error::StsAssert :              return "Assertion failed";
-    case cv::Error::GpuNotSupported :        return "No CUDA support";
-    case cv::Error::GpuApiCallError :        return "Gpu API call";
-    case cv::Error::OpenGlNotSupported :     return "No OpenGL support";
-    case cv::Error::OpenGlApiCallError :     return "OpenGL API call";
-    case cv::Error::OpenCLApiCallError :     return "OpenCL API call error";
-    case cv::Error::OpenCLDoubleNotSupported:return "OpenCL device does not support double";
-    case cv::Error::OpenCLInitError :        return "OpenCL initialization error";
-    case cv::Error::OpenCLNoAMDBlasFft :     return "Missing OpenCL AMD BLAS FFT";
-    default:
+    हाल cv::Error::StsOk :                  वापस "No Error";
+    हाल cv::Error::StsBackTrace :           वापस "Backtrace";
+    हाल cv::Error::StsError :               वापस "Unspecified error";
+    हाल cv::Error::StsInternal :            वापस "Internal error";
+    हाल cv::Error::StsNoMem :               वापस "Insufficient memory";
+    हाल cv::Error::StsBadArg :              वापस "Bad argument";
+    हाल cv::Error::StsNoConv :              वापस "Iterations do not converge";
+    हाल cv::Error::StsAutoTrace :           वापस "Autotrace call";
+    हाल cv::Error::Sts_Bad_आकार :             वापस "Incorrect size of input array";
+    हाल cv::Error::StsNullPtr :             वापस "Null pointer";
+    हाल cv::Error::StsDivByZero :           वापस "Division by zero occurred";
+    हाल cv::Error::BadStep :                वापस "Image step is wrong";
+    हाल cv::Error::StsInplaceNotSupported : वापस "Inplace operation is not supported";
+    हाल cv::Error::StsObjectNotFound :      वापस "Requested object was not found";
+    हाल cv::Error::BadDepth :               वापस "Input image depth is not supported by function";
+    हाल cv::Error::StsUnmatchedFormats :    वापस "Formats of input arguments do not match";
+    हाल cv::Error::StsUnmatchedSizes :      वापस "Sizes of input arguments do not match";
+    हाल cv::Error::StsOutOfRange :          वापस "One of the arguments\' values is out of range";
+    हाल cv::Error::StsUnsupportedFormat :   वापस "Unsupported format or combination of formats";
+    हाल cv::Error::BadCOI :                 वापस "Input COI is not supported";
+    हाल cv::Error::Bad_अंक_Channels :         वापस "Bad number of channels";
+    हाल cv::Error::StsBadFlag :             वापस "Bad flag (parameter or structure field)";
+    हाल cv::Error::StsBadPoint :            वापस "Bad parameter of type CvPoint";
+    हाल cv::Error::StsBadMask :             वापस "Bad type of mask argument";
+    हाल cv::Error::StsParseError :          वापस "Parsing error";
+    हाल cv::Error::StsNotImplemented :      वापस "The function/feature is not implemented";
+    हाल cv::Error::StsBadMemBlock :         वापस "Memory block has been corrupted";
+    हाल cv::Error::StsAssert :              वापस "Assertion failed";
+    हाल cv::Error::GpuNotSupported :        वापस "No CUDA support";
+    हाल cv::Error::GpuApiCallError :        वापस "Gpu API call";
+    हाल cv::Error::OpenGlNotSupported :     वापस "No OpenGL support";
+    हाल cv::Error::OpenGlApiCallError :     वापस "OpenGL API call";
+    हाल cv::Error::OpenCLApiCallError :     वापस "OpenCL API call error";
+    हाल cv::Error::OpenCLDoubleNotSupported:वापस "OpenCL device does not support double";
+    हाल cv::Error::OpenCLInitError :        वापस "OpenCL initialization error";
+    हाल cv::Error::OpenCLNoAMDBlasFft :     वापस "Missing OpenCL AMD BLAS FFT";
+    शेष:
     {
-        static char buf[256] {0};
-        snprintf(buf, sizeof(buf), "Unknown %s code %d", code >= 0 ? "status":"error", code);
-        return buf;
+        अटल अक्षर buf[256] {0};
+        snprintf(buf, माप(buf), "Unknown %s code %d", code >= 0 ? "status":"error", code);
+        वापस buf;
     }
     };
 
 }
 
-static const char* g_hwFeatureNames[CV_HARDWARE_MAX_FEATURE] = { NULL };
+अटल स्थिर अक्षर* g_hwFeatureNames[CV_HARDWARE_MAX_FEATURE] = { शून्य };
 
-static const char* getHWFeatureName(int id)
+अटल स्थिर अक्षर* getHWFeatureName(पूर्णांक id)
 {
-    return (0 <= id && id < CV_HARDWARE_MAX_FEATURE) ? g_hwFeatureNames[id] : NULL;
+    वापस (0 <= id && id < CV_HARDWARE_MAX_FEATURE) ? g_hwFeatureNames[id] : शून्य;
 }
-static const char* getHWFeatureNameSafe(int id)
+अटल स्थिर अक्षर* getHWFeatureNameSafe(पूर्णांक id)
 {
-    const char* name = getHWFeatureName(id);
-    return name ? name : "Unknown feature";
+    स्थिर अक्षर* name = getHWFeatureName(id);
+    वापस name ? name : "Unknown feature";
 }
 
-struct HWFeatures
+काष्ठा HWFeatures
 {
-    enum { MAX_FEATURE = CV_HARDWARE_MAX_FEATURE };
+    क्रमागत { MAX_FEATURE = CV_HARDWARE_MAX_FEATURE };
 
     HWFeatures(bool run_initialize = false)
     {
-        if (run_initialize)
+        अगर (run_initialize)
             initialize();
     }
 
-    static void initializeNames()
+    अटल व्योम initializeNames()
     {
-        for (int i = 0; i < CV_HARDWARE_MAX_FEATURE; i++)
+        क्रम (पूर्णांक i = 0; i < CV_HARDWARE_MAX_FEATURE; i++)
         {
             g_hwFeatureNames[i] = 0;
         }
@@ -503,83 +503,83 @@ struct HWFeatures
         g_hwFeatureNames[CPU_LASX] = "LASX";
     }
 
-    void initialize(void)
+    व्योम initialize(व्योम)
     {
-        if (utils::getConfigurationParameterBool("OPENCV_DUMP_CONFIG"))
+        अगर (utils::getConfigurationParameterBool("OPENCV_DUMP_CONFIG"))
         {
-            fprintf(stderr, "\nOpenCV build configuration is:\n%s\n",
+            ख_लिखो(मानक_त्रुटि, "\nOpenCV build configuration is:\n%s\n",
                 cv::getBuildInformation().c_str());
         }
 
         initializeNames();
 
-    #ifdef CV_CPUID_X86
-        int cpuid_data[4] = { 0, 0, 0, 0 };
-        int cpuid_data_ex[4] = { 0, 0, 0, 0 };
+    #अगर_घोषित CV_CPUID_X86
+        पूर्णांक cpuid_तथ्य[4] = { 0, 0, 0, 0 };
+        पूर्णांक cpuid_तथ्य_ex[4] = { 0, 0, 0, 0 };
 
-        CV_CPUID_X86(cpuid_data, 1, 0/*unused*/);
+        CV_CPUID_X86(cpuid_तथ्य, 1, 0/*unused*/);
 
-        int x86_family = (cpuid_data[0] >> 8) & 15;
-        if( x86_family >= 6 )
+        पूर्णांक x86_family = (cpuid_तथ्य[0] >> 8) & 15;
+        अगर( x86_family >= 6 )
         {
-            have[CV_CPU_MMX]    = (cpuid_data[3] & (1<<23)) != 0;
-            have[CV_CPU_SSE]    = (cpuid_data[3] & (1<<25)) != 0;
-            have[CV_CPU_SSE2]   = (cpuid_data[3] & (1<<26)) != 0;
-            have[CV_CPU_SSE3]   = (cpuid_data[2] & (1<<0)) != 0;
-            have[CV_CPU_SSSE3]  = (cpuid_data[2] & (1<<9)) != 0;
-            have[CV_CPU_FMA3]   = (cpuid_data[2] & (1<<12)) != 0;
-            have[CV_CPU_SSE4_1] = (cpuid_data[2] & (1<<19)) != 0;
-            have[CV_CPU_SSE4_2] = (cpuid_data[2] & (1<<20)) != 0;
-            have[CV_CPU_POPCNT] = (cpuid_data[2] & (1<<23)) != 0;
-            have[CV_CPU_AVX]    = (cpuid_data[2] & (1<<28)) != 0;
-            have[CV_CPU_FP16]   = (cpuid_data[2] & (1<<29)) != 0;
+            have[CV_CPU_MMX]    = (cpuid_तथ्य[3] & (1<<23)) != 0;
+            have[CV_CPU_SSE]    = (cpuid_तथ्य[3] & (1<<25)) != 0;
+            have[CV_CPU_SSE2]   = (cpuid_तथ्य[3] & (1<<26)) != 0;
+            have[CV_CPU_SSE3]   = (cpuid_तथ्य[2] & (1<<0)) != 0;
+            have[CV_CPU_SSSE3]  = (cpuid_तथ्य[2] & (1<<9)) != 0;
+            have[CV_CPU_FMA3]   = (cpuid_तथ्य[2] & (1<<12)) != 0;
+            have[CV_CPU_SSE4_1] = (cpuid_तथ्य[2] & (1<<19)) != 0;
+            have[CV_CPU_SSE4_2] = (cpuid_तथ्य[2] & (1<<20)) != 0;
+            have[CV_CPU_POPCNT] = (cpuid_तथ्य[2] & (1<<23)) != 0;
+            have[CV_CPU_AVX]    = (cpuid_तथ्य[2] & (1<<28)) != 0;
+            have[CV_CPU_FP16]   = (cpuid_तथ्य[2] & (1<<29)) != 0;
 
             // make the second call to the cpuid command in order to get
             // information about extended features like AVX2
-            CV_CPUID_X86(cpuid_data_ex, 7, 0);
+            CV_CPUID_X86(cpuid_तथ्य_ex, 7, 0);
 
-            have[CV_CPU_AVX2]   = (cpuid_data_ex[1] & (1<<5)) != 0;
+            have[CV_CPU_AVX2]   = (cpuid_तथ्य_ex[1] & (1<<5)) != 0;
 
-            have[CV_CPU_AVX_512F]         = (cpuid_data_ex[1] & (1<<16)) != 0;
-            have[CV_CPU_AVX_512DQ]        = (cpuid_data_ex[1] & (1<<17)) != 0;
-            have[CV_CPU_AVX_512IFMA]      = (cpuid_data_ex[1] & (1<<21)) != 0;
-            have[CV_CPU_AVX_512PF]        = (cpuid_data_ex[1] & (1<<26)) != 0;
-            have[CV_CPU_AVX_512ER]        = (cpuid_data_ex[1] & (1<<27)) != 0;
-            have[CV_CPU_AVX_512CD]        = (cpuid_data_ex[1] & (1<<28)) != 0;
-            have[CV_CPU_AVX_512BW]        = (cpuid_data_ex[1] & (1<<30)) != 0;
-            have[CV_CPU_AVX_512VL]        = (cpuid_data_ex[1] & (1<<31)) != 0;
-            have[CV_CPU_AVX_512VBMI]      = (cpuid_data_ex[2] & (1<<1))  != 0;
-            have[CV_CPU_AVX_512VBMI2]     = (cpuid_data_ex[2] & (1<<6))  != 0;
-            have[CV_CPU_AVX_512VNNI]      = (cpuid_data_ex[2] & (1<<11)) != 0;
-            have[CV_CPU_AVX_512BITALG]    = (cpuid_data_ex[2] & (1<<12)) != 0;
-            have[CV_CPU_AVX_512VPOPCNTDQ] = (cpuid_data_ex[2] & (1<<14)) != 0;
-            have[CV_CPU_AVX_5124VNNIW]    = (cpuid_data_ex[3] & (1<<2))  != 0;
-            have[CV_CPU_AVX_5124FMAPS]    = (cpuid_data_ex[3] & (1<<3))  != 0;
+            have[CV_CPU_AVX_512F]         = (cpuid_तथ्य_ex[1] & (1<<16)) != 0;
+            have[CV_CPU_AVX_512DQ]        = (cpuid_तथ्य_ex[1] & (1<<17)) != 0;
+            have[CV_CPU_AVX_512IFMA]      = (cpuid_तथ्य_ex[1] & (1<<21)) != 0;
+            have[CV_CPU_AVX_512PF]        = (cpuid_तथ्य_ex[1] & (1<<26)) != 0;
+            have[CV_CPU_AVX_512ER]        = (cpuid_तथ्य_ex[1] & (1<<27)) != 0;
+            have[CV_CPU_AVX_512CD]        = (cpuid_तथ्य_ex[1] & (1<<28)) != 0;
+            have[CV_CPU_AVX_512BW]        = (cpuid_तथ्य_ex[1] & (1<<30)) != 0;
+            have[CV_CPU_AVX_512VL]        = (cpuid_तथ्य_ex[1] & (1<<31)) != 0;
+            have[CV_CPU_AVX_512VBMI]      = (cpuid_तथ्य_ex[2] & (1<<1))  != 0;
+            have[CV_CPU_AVX_512VBMI2]     = (cpuid_तथ्य_ex[2] & (1<<6))  != 0;
+            have[CV_CPU_AVX_512VNNI]      = (cpuid_तथ्य_ex[2] & (1<<11)) != 0;
+            have[CV_CPU_AVX_512BITALG]    = (cpuid_तथ्य_ex[2] & (1<<12)) != 0;
+            have[CV_CPU_AVX_512VPOPCNTDQ] = (cpuid_तथ्य_ex[2] & (1<<14)) != 0;
+            have[CV_CPU_AVX_5124VNNIW]    = (cpuid_तथ्य_ex[3] & (1<<2))  != 0;
+            have[CV_CPU_AVX_5124FMAPS]    = (cpuid_तथ्य_ex[3] & (1<<3))  != 0;
 
             // CPUID leaf 7, subleaf 1 for AVX-VNNI
-            int cpuid_data_ex1[4] = { 0, 0, 0, 0 };
-            CV_CPUID_X86(cpuid_data_ex1, 7, 1);
-            have[CV_CPU_AVX_VNNI]         = (cpuid_data_ex1[0] & (1<<4))  != 0;
+            पूर्णांक cpuid_तथ्य_ex1[4] = { 0, 0, 0, 0 };
+            CV_CPUID_X86(cpuid_तथ्य_ex1, 7, 1);
+            have[CV_CPU_AVX_VNNI]         = (cpuid_तथ्य_ex1[0] & (1<<4))  != 0;
 
             bool have_AVX_OS_support = true;
             bool have_AVX512_OS_support = true;
-            if (!(cpuid_data[2] & (1<<27)))
+            अगर (!(cpuid_तथ्य[2] & (1<<27)))
                 have_AVX_OS_support = false; // OS uses XSAVE_XRSTORE and CPU support AVX
-            else
+            अन्यथा
             {
-                int xcr0 = 0;
-            #ifdef _XCR_XFEATURE_ENABLED_MASK // requires immintrin.h
-                xcr0 = (int)_xgetbv(_XCR_XFEATURE_ENABLED_MASK);
-            #elif defined __GNUC__ && (defined __i386__ || defined __x86_64__)
+                पूर्णांक xcr0 = 0;
+            #अगर_घोषित _XCR_XFEATURE_ENABLED_MASK // requires immintrin.h
+                xcr0 = (पूर्णांक)_xgetbv(_XCR_XFEATURE_ENABLED_MASK);
+            #या_अगर defined __GNUC__ && (defined __i386__ || defined __x86_64__)
                 __asm__ ("xgetbv\n\t" : "=a" (xcr0) : "c" (0) : "%edx" );
-            #endif
-                if ((xcr0 & 0x6) != 0x6)
+            #पूर्ण_अगर
+                अगर ((xcr0 & 0x6) != 0x6)
                     have_AVX_OS_support = false; // YMM registers
-                if ((xcr0 & 0xe6) != 0xe6)
+                अगर ((xcr0 & 0xe6) != 0xe6)
                     have_AVX512_OS_support = false; // ZMM registers
             }
 
-            if (!have_AVX_OS_support)
+            अगर (!have_AVX_OS_support)
             {
                 have[CV_CPU_AVX] = false;
                 have[CV_CPU_FP16] = false;
@@ -587,7 +587,7 @@ struct HWFeatures
                 have[CV_CPU_FMA3] = false;
                 have[CV_CPU_AVX_VNNI] = false;
             }
-            if (!have_AVX_OS_support || !have_AVX512_OS_support)
+            अगर (!have_AVX_OS_support || !have_AVX512_OS_support)
             {
                 have[CV_CPU_AVX_512F] = false;
                 have[CV_CPU_AVX_512BW] = false;
@@ -607,7 +607,7 @@ struct HWFeatures
             }
 
             have[CV_CPU_AVX512_COMMON] = have[CV_CPU_AVX_512F] && have[CV_CPU_AVX_512CD];
-            if (have[CV_CPU_AVX512_COMMON])
+            अगर (have[CV_CPU_AVX512_COMMON])
             {
                 have[CV_CPU_AVX512_KNL] = have[CV_CPU_AVX_512ER]  && have[CV_CPU_AVX_512PF];
                 have[CV_CPU_AVX512_KNM] = have[CV_CPU_AVX512_KNL] && have[CV_CPU_AVX_5124FMAPS] &&
@@ -620,7 +620,7 @@ struct HWFeatures
                                           have[CV_CPU_AVX_512VNNI] &&
                                           have[CV_CPU_AVX_512VBMI2] && have[CV_CPU_AVX_512BITALG] && have[CV_CPU_AVX_512VPOPCNTDQ];
             }
-            else
+            अन्यथा
             {
                 have[CV_CPU_AVX512_KNL] = false;
                 have[CV_CPU_AVX512_KNM] = false;
@@ -630,289 +630,289 @@ struct HWFeatures
                 have[CV_CPU_AVX512_ICL] = false;
             }
         }
-    #endif // CV_CPUID_X86
+    #पूर्ण_अगर // CV_CPUID_X86
 
-    #if defined __ANDROID__ || defined __linux__ || defined __QNX__
-    #ifdef __aarch64__
+    #अगर defined __ANDROID__ || defined __linux__ || defined __QNX__
+    #अगर_घोषित __aarch64__
         have[CV_CPU_NEON] = true;
         have[CV_CPU_FP16] = true;
-        int cpufile = open("/proc/self/auxv", O_RDONLY);
+        पूर्णांक cpufile = खोलो("/proc/self/auxv", O_RDONLY);
 
-        if (cpufile >= 0)
+        अगर (cpufile >= 0)
         {
             Elf64_auxv_t auxv;
-            const size_t size_auxv_t = sizeof(auxv);
+            स्थिर माप_प्रकार आकार_auxv_t = माप(auxv);
 
-            while ((size_t)read(cpufile, &auxv, size_auxv_t) == size_auxv_t)
+            जबतक ((माप_प्रकार)पढ़ो(cpufile, &auxv, आकार_auxv_t) == आकार_auxv_t)
             {
                 // see https://elixir.bootlin.com/linux/latest/source/arch/arm64/include/uapi/asm/hwcap.h
-                if (auxv.a_type == AT_HWCAP)
+                अगर (auxv.a_type == AT_HWCAP)
                 {
                     have[CV_CPU_NEON_DOTPROD] = (auxv.a_un.a_val & (1 << 20)) != 0; // HWCAP_ASIMDDP
                     have[CV_CPU_NEON_FP16] = (auxv.a_un.a_val & (1 << 10)) != 0; // HWCAP_ASIMDHP
                     have[CV_CPU_SVE] = (auxv.a_un.a_val & (1 << 22)) != 0; // HWCAP_SVE
                 }
-#if defined(AT_HWCAP2)
-                else if (auxv.a_type == AT_HWCAP2)
+#अगर defined(AT_HWCAP2)
+                अन्यथा अगर (auxv.a_type == AT_HWCAP2)
                 {
                     have[CV_CPU_NEON_BF16] = (auxv.a_un.a_val & (1 << 14)) != 0; // HWCAP2_BF16
                 }
-#endif
+#पूर्ण_अगर
             }
 
-            close(cpufile);
+            बंद(cpufile);
         }
-    #elif defined __arm__ && defined __ANDROID__
-      #if defined HAVE_CPUFEATURES
-        CV_LOG_INFO(NULL, "calling android_getCpuFeatures() ...");
+    #या_अगर defined __arm__ && defined __ANDROID__
+      #अगर defined HAVE_CPUFEATURES
+        CV_LOG_INFO(शून्य, "calling android_getCpuFeatures() ...");
         uint64_t features = android_getCpuFeatures();
-        CV_LOG_INFO(NULL, cv::format("calling android_getCpuFeatures() ... Done (%llx)", (long long)features));
+        CV_LOG_INFO(शून्य, cv::format("calling android_getCpuFeatures() ... Done (%llx)", (दीर्घ दीर्घ)features));
         have[CV_CPU_NEON] = (features & ANDROID_CPU_ARM_FEATURE_NEON) != 0;
         have[CV_CPU_FP16] = (features & ANDROID_CPU_ARM_FEATURE_VFP_FP16) != 0;
-      #else
-        CV_LOG_INFO(NULL, "cpufeatures library is not available for CPU detection");
-        #if CV_NEON
-        CV_LOG_INFO(NULL, "- NEON instructions is enabled via build flags");
+      #अन्यथा
+        CV_LOG_INFO(शून्य, "cpufeatures library is not available for CPU detection");
+        #अगर CV_NEON
+        CV_LOG_INFO(शून्य, "- NEON instructions is enabled via build flags");
         have[CV_CPU_NEON] = true;
-        #else
-        CV_LOG_INFO(NULL, "- NEON instructions is NOT enabled via build flags");
-        #endif
-        #if CV_FP16
-        CV_LOG_INFO(NULL, "- FP16 instructions is enabled via build flags");
+        #अन्यथा
+        CV_LOG_INFO(शून्य, "- NEON instructions is NOT enabled via build flags");
+        #पूर्ण_अगर
+        #अगर CV_FP16
+        CV_LOG_INFO(शून्य, "- FP16 instructions is enabled via build flags");
         have[CV_CPU_FP16] = true;
-        #else
-        CV_LOG_INFO(NULL, "- FP16 instructions is NOT enabled via build flags");
-        #endif
-      #endif
-    #elif defined __arm__
-        int cpufile = open("/proc/self/auxv", O_RDONLY);
+        #अन्यथा
+        CV_LOG_INFO(शून्य, "- FP16 instructions is NOT enabled via build flags");
+        #पूर्ण_अगर
+      #पूर्ण_अगर
+    #या_अगर defined __arm__
+        पूर्णांक cpufile = खोलो("/proc/self/auxv", O_RDONLY);
 
-        if (cpufile >= 0)
+        अगर (cpufile >= 0)
         {
             Elf32_auxv_t auxv;
-            const size_t size_auxv_t = sizeof(auxv);
+            स्थिर माप_प्रकार आकार_auxv_t = माप(auxv);
 
-            while ((size_t)read(cpufile, &auxv, size_auxv_t) == size_auxv_t)
+            जबतक ((माप_प्रकार)पढ़ो(cpufile, &auxv, आकार_auxv_t) == आकार_auxv_t)
             {
-                if (auxv.a_type == AT_HWCAP)
+                अगर (auxv.a_type == AT_HWCAP)
                 {
                     have[CV_CPU_NEON] = (auxv.a_un.a_val & 4096) != 0;
                     have[CV_CPU_FP16] = (auxv.a_un.a_val & 2) != 0;
-                    break;
+                    अवरोध;
                 }
             }
 
-            close(cpufile);
+            बंद(cpufile);
         }
-    #endif
-    #elif (defined __APPLE__)
-    #if defined __ARM_NEON
+    #पूर्ण_अगर
+    #या_अगर (defined __APPLE__)
+    #अगर defined __ARM_NEON
         have[CV_CPU_NEON] = true;
-    #endif
-    #if (defined __ARM_FP  && (((__ARM_FP & 0x2) != 0) && defined __ARM_NEON))
+    #पूर्ण_अगर
+    #अगर (defined __ARM_FP  && (((__ARM_FP & 0x2) != 0) && defined __ARM_NEON))
         have[CV_CPU_FP16] = have[CV_CPU_NEON_FP16] = true;
-    #endif
+    #पूर्ण_अगर
     // system.cpp may be compiled w/o special -march=armv8...+dotprod, -march=armv8...+bf16 etc.,
     // so we check for the features in any case, no mater what are the compile flags.
     // We check the real hardware capabilities here.
-    int has_feat_dotprod = 0;
-    size_t has_feat_dotprod_size = sizeof(has_feat_dotprod);
-    sysctlbyname("hw.optional.arm.FEAT_DotProd", &has_feat_dotprod, &has_feat_dotprod_size, NULL, 0);
-    if (has_feat_dotprod) {
+    पूर्णांक has_feat_dotprod = 0;
+    माप_प्रकार has_feat_dotprod_आकार = माप(has_feat_dotprod);
+    sysctlbyname("hw.optional.arm.FEAT_DotProd", &has_feat_dotprod, &has_feat_dotprod_आकार, शून्य, 0);
+    अगर (has_feat_dotprod) {
         have[CV_CPU_NEON_DOTPROD] = true;
     }
-    int has_feat_bf16 = 0;
-    size_t has_feat_bf16_size = sizeof(has_feat_bf16);
-    sysctlbyname("hw.optional.arm.FEAT_BF16", &has_feat_bf16, &has_feat_bf16_size, NULL, 0);
-    if (has_feat_bf16) {
+    पूर्णांक has_feat_bf16 = 0;
+    माप_प्रकार has_feat_bf16_आकार = माप(has_feat_bf16);
+    sysctlbyname("hw.optional.arm.FEAT_BF16", &has_feat_bf16, &has_feat_bf16_आकार, शून्य, 0);
+    अगर (has_feat_bf16) {
         have[CV_CPU_NEON_BF16] = true;
     }
-    #elif (defined __clang__)
-    #if defined __ARM_NEON
+    #या_अगर (defined __clang__)
+    #अगर defined __ARM_NEON
         have[CV_CPU_NEON] = true;
-        #if (defined __ARM_FP  && ((__ARM_FP & 0x2) != 0))
+        #अगर (defined __ARM_FP  && ((__ARM_FP & 0x2) != 0))
         have[CV_CPU_FP16] = true;
-        #endif
-    #endif
-    #endif
-    #if defined _ARM_ && (defined(_WIN32_WCE) && _WIN32_WCE >= 0x800)
+        #पूर्ण_अगर
+    #पूर्ण_अगर
+    #पूर्ण_अगर
+    #अगर defined _ARM_ && (defined(_WIN32_WCE) && _WIN32_WCE >= 0x800)
         have[CV_CPU_NEON] = true;
-    #endif
-    #if defined _M_ARM64 || defined _M_ARM64EC
+    #पूर्ण_अगर
+    #अगर defined _M_ARM64 || defined _M_ARM64EC
         have[CV_CPU_NEON] = true;
-    #endif
-    #ifdef __riscv_vector
+    #पूर्ण_अगर
+    #अगर_घोषित __riscv_vector
         have[CV_CPU_RISCVV] = true;
-    #endif
-    #ifdef __mips_msa
+    #पूर्ण_अगर
+    #अगर_घोषित __mips_msa
         have[CV_CPU_MSA] = true;
-    #endif
+    #पूर्ण_अगर
 
-    #if (defined __ppc64__ || defined __PPC64__) && defined HAVE_GETAUXVAL
-        unsigned int hwcap = getauxval(AT_HWCAP);
-        if (hwcap & PPC_FEATURE_HAS_VSX) {
+    #अगर (defined __ppc64__ || defined __PPC64__) && defined HAVE_GETAUXVAL
+        अचिन्हित पूर्णांक hwcap = getauxval(AT_HWCAP);
+        अगर (hwcap & PPC_FEATURE_HAS_VSX) {
             hwcap = getauxval(AT_HWCAP2);
-            if (hwcap & PPC_FEATURE2_ARCH_3_00) {
+            अगर (hwcap & PPC_FEATURE2_ARCH_3_00) {
                 have[CV_CPU_VSX] = have[CV_CPU_VSX3] = true;
-            } else {
+            } अन्यथा {
                 have[CV_CPU_VSX] = (hwcap & PPC_FEATURE2_ARCH_2_07) != 0;
             }
         }
-    #elif (defined __ppc64__ || defined __PPC64__) && defined HAVE_ELF_AUX_INFO
-        unsigned long hwcap = 0, hwcap2 = 0;
-        if (elf_aux_info(AT_HWCAP, &hwcap, sizeof(hwcap)) != 0)
+    #या_अगर (defined __ppc64__ || defined __PPC64__) && defined HAVE_ELF_AUX_INFO
+        अचिन्हित दीर्घ hwcap = 0, hwcap2 = 0;
+        अगर (elf_aux_info(AT_HWCAP, &hwcap, माप(hwcap)) != 0)
             hwcap = 0;
-        if (hwcap & PPC_FEATURE_HAS_VSX) {
-            if (elf_aux_info(AT_HWCAP2, &hwcap2, sizeof(hwcap2)) != 0)
+        अगर (hwcap & PPC_FEATURE_HAS_VSX) {
+            अगर (elf_aux_info(AT_HWCAP2, &hwcap2, माप(hwcap2)) != 0)
                 hwcap2 = 0;
-            if (hwcap2 & PPC_FEATURE2_ARCH_3_00) {
+            अगर (hwcap2 & PPC_FEATURE2_ARCH_3_00) {
                 have[CV_CPU_VSX] = have[CV_CPU_VSX3] = true;
-            } else {
+            } अन्यथा {
                 have[CV_CPU_VSX] = (hwcap2 & PPC_FEATURE2_ARCH_2_07) != 0;
             }
         }
-    #else
+    #अन्यथा
         // TODO: AIX
-        #if CV_VSX || defined _ARCH_PWR8 || defined __POWER9_VECTOR__
+        #अगर CV_VSX || defined _ARCH_PWR8 || defined __POWER9_VECTOR__
             have[CV_CPU_VSX] = true;
-        #endif
-        #if CV_VSX3 || defined __POWER9_VECTOR__
+        #पूर्ण_अगर
+        #अगर CV_VSX3 || defined __POWER9_VECTOR__
             have[CV_CPU_VSX3] = true;
-        #endif
-    #endif
+        #पूर्ण_अगर
+    #पूर्ण_अगर
 
-    #if defined __riscv && defined __riscv_vector
+    #अगर defined __riscv && defined __riscv_vector
         have[CV_CPU_RVV] = true;
-        #if (defined __riscv_zvfh && __riscv_zvfh) || (defined __riscv_zvfhmin && __riscv_zvfhmin)
+        #अगर (defined __riscv_zvfh && __riscv_zvfh) || (defined __riscv_zvfhmin && __riscv_zvfhmin)
             have[CV_CPU_FP16] = true;
-        #endif
-        #if defined __riscv_zvfh && __riscv_zvfh
+        #पूर्ण_अगर
+        #अगर defined __riscv_zvfh && __riscv_zvfh
             have[CV_CPU_RVV_ZVFH] = true;
-        #endif
-    #endif
+        #पूर्ण_अगर
+    #पूर्ण_अगर
 
-    #if defined __loongarch64 && defined __linux__
-        int flag = (int)getauxval(AT_HWCAP);
+    #अगर defined __loongarch64 && defined __linux__
+        पूर्णांक flag = (पूर्णांक)getauxval(AT_HWCAP);
 
         have[CV_CPU_LSX] = (flag & LA_HWCAP_LSX) != 0;
         have[CV_CPU_LASX] = (flag & LA_HWCAP_LASX) != 0;
-    #endif
+    #पूर्ण_अगर
 
         bool skip_baseline_check = false;
-        if (utils::getConfigurationParameterBool("OPENCV_SKIP_CPU_BASELINE_CHECK"))
+        अगर (utils::getConfigurationParameterBool("OPENCV_SKIP_CPU_BASELINE_CHECK"))
         {
             skip_baseline_check = true;
         }
-        int baseline_features[] = { CV_CPU_BASELINE_FEATURES };
-        if (!checkFeatures(baseline_features, sizeof(baseline_features) / sizeof(baseline_features[0]))
+        पूर्णांक baseline_features[] = { CV_CPU_BASELINE_FEATURES };
+        अगर (!checkFeatures(baseline_features, माप(baseline_features) / माप(baseline_features[0]))
             && !skip_baseline_check)
         {
-            fprintf(stderr, "\n"
+            ख_लिखो(मानक_त्रुटि, "\n"
                     "******************************************************************\n"
                     "* FATAL ERROR:                                                   *\n"
                     "* This OpenCV build doesn't support current CPU/HW configuration *\n"
                     "*                                                                *\n"
                     "* Use OPENCV_DUMP_CONFIG=1 environment variable for details      *\n"
                     "******************************************************************\n");
-            fprintf(stderr, "\nRequired baseline features:\n");
-            checkFeatures(baseline_features, sizeof(baseline_features) / sizeof(baseline_features[0]), true);
+            ख_लिखो(मानक_त्रुटि, "\nRequired baseline features:\n");
+            checkFeatures(baseline_features, माप(baseline_features) / माप(baseline_features[0]), true);
             CV_Error(cv::Error::StsAssert, "Missing support for required CPU baseline features. Check OpenCV build configuration and required CPU/HW setup.");
         }
 
-        readSettings(baseline_features, sizeof(baseline_features) / sizeof(baseline_features[0]));
+        readSettings(baseline_features, माप(baseline_features) / माप(baseline_features[0]));
     }
 
-    bool checkFeatures(const int* features, int count, bool dump = false)
+    bool checkFeatures(स्थिर पूर्णांक* features, पूर्णांक गिनती_2, bool dump = false)
     {
-        bool result = true;
-        for (int i = 0; i < count; i++)
+        bool परिणाम = true;
+        क्रम (पूर्णांक i = 0; i < गिनती_2; i++)
         {
-            int feature = features[i];
-            if (feature)
+            पूर्णांक feature = features[i];
+            अगर (feature)
             {
-                if (have[feature])
+                अगर (have[feature])
                 {
-                    if (dump) fprintf(stderr, "    ID=%3d (%s) - OK\n", feature, getHWFeatureNameSafe(feature));
+                    अगर (dump) ख_लिखो(मानक_त्रुटि, "    ID=%3d (%s) - OK\n", feature, getHWFeatureNameSafe(feature));
                 }
-                else
+                अन्यथा
                 {
-                    result = false;
-                    if (dump) fprintf(stderr, "    ID=%3d (%s) - NOT AVAILABLE\n", feature, getHWFeatureNameSafe(feature));
+                    परिणाम = false;
+                    अगर (dump) ख_लिखो(मानक_त्रुटि, "    ID=%3d (%s) - NOT AVAILABLE\n", feature, getHWFeatureNameSafe(feature));
                 }
             }
         }
-        return result;
+        वापस परिणाम;
     }
 
-    static inline bool isSymbolSeparator(char c)
+    अटल अंतरभूत bool is_प्रतीक_Separator(अक्षर c)
     {
-        return c == ',' || c == ';';
+        वापस c == ',' || c == ';';
     }
 
-    void readSettings(const int* baseline_features, int baseline_count)
+    व्योम readSettings(स्थिर पूर्णांक* baseline_features, पूर्णांक baseline_गिनती)
     {
         bool dump = true;
         std::string disabled_features = utils::getConfigurationParameterString("OPENCV_CPU_DISABLE");
-        if (!disabled_features.empty())
+        अगर (!disabled_features.empty())
         {
-            const char* start = disabled_features.c_str();
-            for (;;)
+            स्थिर अक्षर* start = disabled_features.c_str();
+            क्रम (;;)
             {
-                while (start[0] != 0 && isSymbolSeparator(start[0]))
+                जबतक (start[0] != 0 && is_प्रतीक_Separator(start[0]))
                 {
                     start++;
                 }
-                if (start[0] == 0)
-                    break;
-                const char* end = start;
-                while (end[0] != 0 && !isSymbolSeparator(end[0]))
+                अगर (start[0] == 0)
+                    अवरोध;
+                स्थिर अक्षर* end = start;
+                जबतक (end[0] != 0 && !is_प्रतीक_Separator(end[0]))
                 {
                     end++;
                 }
-                if (end == start)
-                    continue;
+                अगर (end == start)
+                    जारी;
                 cv::String feature(start, end);
                 start = end;
 
                 CV_Assert(feature.size() > 0);
 
                 bool found = false;
-                for (int i = 0; i < CV_HARDWARE_MAX_FEATURE; i++)
+                क्रम (पूर्णांक i = 0; i < CV_HARDWARE_MAX_FEATURE; i++)
                 {
-                    if (!g_hwFeatureNames[i]) continue;
-                    size_t len = strlen(g_hwFeatureNames[i]);
-                    if (len != feature.size()) continue;
-                    if (feature.compare(g_hwFeatureNames[i]) == 0)
+                    अगर (!g_hwFeatureNames[i]) जारी;
+                    माप_प्रकार len = म_माप(g_hwFeatureNames[i]);
+                    अगर (len != feature.size()) जारी;
+                    अगर (feature.compare(g_hwFeatureNames[i]) == 0)
                     {
                         bool isBaseline = false;
-                        for (int k = 0; k < baseline_count; k++)
+                        क्रम (पूर्णांक k = 0; k < baseline_गिनती; k++)
                         {
-                            if (baseline_features[k] == i)
+                            अगर (baseline_features[k] == i)
                             {
                                 isBaseline = true;
-                                break;
+                                अवरोध;
                             }
                         }
-                        if (isBaseline)
+                        अगर (isBaseline)
                         {
-                            if (dump) fprintf(stderr, "OPENCV: Trying to disable baseline CPU feature: '%s'."
+                            अगर (dump) ख_लिखो(मानक_त्रुटि, "OPENCV: Trying to disable baseline CPU feature: '%s'."
                                                       "This has very limited effect, because code optimizations for this feature are executed unconditionally "
                                                       "in the most cases.\n", getHWFeatureNameSafe(i));
                         }
-                        if (!have[i])
+                        अगर (!have[i])
                         {
-                            if (dump) fprintf(stderr, "OPENCV: Trying to disable unavailable CPU feature on the current platform: '%s'.\n",
+                            अगर (dump) ख_लिखो(मानक_त्रुटि, "OPENCV: Trying to disable unavailable CPU feature on the current platform: '%s'.\n",
                                 getHWFeatureNameSafe(i));
                         }
                         have[i] = false;
 
                         found = true;
-                        break;
+                        अवरोध;
                     }
                 }
-                if (!found)
+                अगर (!found)
                 {
-                    if (dump) fprintf(stderr, "OPENCV: Trying to disable unknown CPU feature: '%s'.\n", feature.c_str());
+                    अगर (dump) ख_लिखो(मानक_त्रुटि, "OPENCV: Trying to disable unknown CPU feature: '%s'.\n", feature.c_str());
                 }
             }
         }
@@ -921,98 +921,98 @@ struct HWFeatures
     bool have[MAX_FEATURE+1]{};
 };
 
-static HWFeatures  featuresEnabled(true), featuresDisabled = HWFeatures(false);
-static HWFeatures* currentFeatures = &featuresEnabled;
+अटल HWFeatures  featuresEnabled(true), featuresDisabled = HWFeatures(false);
+अटल HWFeatures* currentFeatures = &featuresEnabled;
 
-bool checkHardwareSupport(int feature)
+bool checkHardwareSupport(पूर्णांक feature)
 {
-    if (feature < 0 || feature >= CV_HARDWARE_MAX_FEATURE)
-        return false;
-    return currentFeatures->have[feature];
+    अगर (feature < 0 || feature >= CV_HARDWARE_MAX_FEATURE)
+        वापस false;
+    वापस currentFeatures->have[feature];
 }
 
-String getHardwareFeatureName(int feature)
+String getHardwareFeatureName(पूर्णांक feature)
 {
-    const char* name = getHWFeatureName(feature);
-    return name ? String(name) : String();
+    स्थिर अक्षर* name = getHWFeatureName(feature);
+    वापस name ? String(name) : String();
 }
 
-std::string getCPUFeaturesLine()
+std::string get_CPUFeatures_पंक्ति()
 {
-    const int features[] = { CV_CPU_BASELINE_FEATURES, CV_CPU_DISPATCH_FEATURES };
-    const int sz = sizeof(features) / sizeof(features[0]);
-    std::string result;
+    स्थिर पूर्णांक features[] = { CV_CPU_BASELINE_FEATURES, CV_CPU_DISPATCH_FEATURES };
+    स्थिर पूर्णांक sz = माप(features) / माप(features[0]);
+    std::string परिणाम;
     std::string prefix;
-    for (int i = 1; i < sz; ++i)
+    क्रम (पूर्णांक i = 1; i < sz; ++i)
     {
-        if (features[i] == 0)
+        अगर (features[i] == 0)
         {
             prefix = "*";
-            continue;
+            जारी;
         }
-        if (i != 1) result.append(" ");
-        result.append(prefix);
-        result.append(getHWFeatureNameSafe(features[i]));
-        if (!checkHardwareSupport(features[i])) result.append("?");
+        अगर (i != 1) परिणाम.append(" ");
+        परिणाम.append(prefix);
+        परिणाम.append(getHWFeatureNameSafe(features[i]));
+        अगर (!checkHardwareSupport(features[i])) परिणाम.append("?");
     }
-    return result;
+    वापस परिणाम;
 }
 
-volatile bool useOptimizedFlag = true;
+अस्थिर bool useOptimizedFlag = true;
 
-void setUseOptimized( bool flag )
+व्योम setUseOptimized( bool flag )
 {
     useOptimizedFlag = flag;
     currentFeatures = flag ? &featuresEnabled : &featuresDisabled;
 
     ipp::setUseIPP(flag);
-#ifdef HAVE_OPENCL
+#अगर_घोषित HAVE_OPENCL
     ocl::setUseOpenCL(flag);
-#endif
+#पूर्ण_अगर
 }
 
-bool useOptimized(void)
+bool useOptimized(व्योम)
 {
-    return useOptimizedFlag;
+    वापस useOptimizedFlag;
 }
 
-int64 getTickCount(void)
+int64 get_Tick_गिनती(व्योम)
 {
     std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now();
-    return (int64)now.time_since_epoch().count();
+    वापस (int64)now.time_since_epoch().गिनती_2();
 }
 
-double getTickFrequency(void)
+द्विगुन getTickFrequency(व्योम)
 {
     using clock_period_t = std::chrono::steady_clock::duration::period;
-    double clock_freq = clock_period_t::den / clock_period_t::num;
-    return clock_freq;
+    द्विगुन clock_freq = clock_period_t::den / clock_period_t::num;
+    वापस clock_freq;
 }
 
-#if defined __GNUC__ && (defined __i386__ || defined __x86_64__ || defined __ppc__)
-#if defined(__i386__)
+#अगर defined __GNUC__ && (defined __i386__ || defined __x86_64__ || defined __ppc__)
+#अगर defined(__i386__)
 
-int64 getCPUTickCount(void)
+int64 get_CPUTick_गिनती(व्योम)
 {
     int64 x;
-    __asm__ volatile (".byte 0x0f, 0x31" : "=A" (x));
-    return x;
+    __asm__ अस्थिर (".byte 0x0f, 0x31" : "=A" (x));
+    वापस x;
 }
-#elif defined(__x86_64__)
+#या_अगर defined(__x86_64__)
 
-int64 getCPUTickCount(void)
+int64 get_CPUTick_गिनती(व्योम)
 {
-    unsigned hi, lo;
+    अचिन्हित hi, lo;
     __asm__ __volatile__ ("rdtsc" : "=a"(lo), "=d"(hi));
-    return (int64)lo | ((int64)hi << 32);
+    वापस (int64)lo | ((int64)hi << 32);
 }
 
-#elif defined(__ppc__)
+#या_अगर defined(__ppc__)
 
-int64 getCPUTickCount(void)
+int64 get_CPUTick_गिनती(व्योम)
 {
-    unsigned upper, lower, tmp;
-    __asm__ volatile(
+    अचिन्हित upper, lower, tmp;
+    __asm__ अस्थिर(
                      "0:                  \n"
                      "\tmftbu   %0           \n"
                      "\tmftb    %1           \n"
@@ -1021,24 +1021,24 @@ int64 getCPUTickCount(void)
                      "\tbne     0b         \n"
                      : "=r"(upper),"=r"(lower),"=r"(tmp)
                      );
-    return lower | ((int64)upper << 32);
+    वापस lower | ((int64)upper << 32);
 }
 
-#else
+#अन्यथा
 
-#error "RDTSC not defined"
+#त्रुटि "RDTSC not defined"
 
-#endif
+#पूर्ण_अगर
 
-#elif defined _MSC_VER && defined _WIN32 && defined _M_IX86
+#या_अगर defined _MSC_VER && defined _WIN32 && defined _M_IX86
 
-int64 getCPUTickCount(void)
+int64 get_CPUTick_गिनती(व्योम)
 {
     __asm _emit 0x0f;
     __asm _emit 0x31;
 }
 
-#else
+#अन्यथा
 
 //#ifdef HAVE_IPP
 //int64 getCPUTickCount(void)
@@ -1046,25 +1046,25 @@ int64 getCPUTickCount(void)
 //    return ippGetCpuClocks();
 //}
 //#else
-int64 getCPUTickCount(void)
+int64 get_CPUTick_गिनती(व्योम)
 {
-    return getTickCount();
+    वापस get_Tick_गिनती();
 }
 //#endif
 
-#endif
+#पूर्ण_अगर
 
 
 namespace internal {
 
-class Timestamp
+श्रेणी Timestamp
 {
-public:
-    const int64 zeroTickCount;
-    const double ns_in_ticks;
+खुला:
+    स्थिर int64 zero_Tick_गिनती;
+    स्थिर द्विगुन ns_in_ticks;
 
     Timestamp()
-        : zeroTickCount(getTickCount())
+        : zero_Tick_गिनती(get_Tick_गिनती())
         , ns_in_ticks(1e9 / getTickFrequency())
     {
         // nothing
@@ -1072,340 +1072,340 @@ public:
 
     int64 getTimestamp()
     {
-        int64 t = getTickCount();
-        return (int64)((t - zeroTickCount) * ns_in_ticks);
+        int64 t = get_Tick_गिनती();
+        वापस (int64)((t - zero_Tick_गिनती) * ns_in_ticks);
     }
 
-    static Timestamp& getInstance()
+    अटल Timestamp& getInstance()
     {
-        static Timestamp g_timestamp;
-        return g_timestamp;
+        अटल Timestamp g_timestamp;
+        वापस g_timestamp;
     }
 };
 
-class InitTimestamp {
-public:
+श्रेणी InitTimestamp {
+खुला:
     InitTimestamp() {
         Timestamp::getInstance();
     }
 };
-static InitTimestamp g_initialize_timestamp;  // force zero timestamp initialization
+अटल InitTimestamp g_initialize_timestamp;  // force zero timestamp initialization
 
 }  // namespace
 
 int64 getTimestampNS()
 {
-    return internal::Timestamp::getInstance().getTimestamp();
+    वापस internal::Timestamp::getInstance().getTimestamp();
 }
 
 
-const String& getBuildInformation()
+स्थिर String& getBuildInformation()
 {
-    static String build_info =
-#include "version_string.inc"
+    अटल String build_info =
+#समावेश "version_string.inc"
     ;
-    return build_info;
+    वापस build_info;
 }
 
-String getVersionString() { return String(CV_VERSION); }
+String getVersionString() { वापस String(CV_VERSION); }
 
-int getVersionMajor() { return CV_VERSION_MAJOR; }
+पूर्णांक getVersionMajor() { वापस CV_VERSION_MAJOR; }
 
-int getVersionMinor() { return CV_VERSION_MINOR; }
+पूर्णांक getVersionMinor() { वापस CV_VERSION_MINOR; }
 
-int getVersionRevision() { return CV_VERSION_REVISION; }
+पूर्णांक getVersionRevision() { वापस CV_VERSION_REVISION; }
 
-String format( const char* fmt, ... )
+String format( स्थिर अक्षर* fmt, ... )
 {
-    AutoBuffer<char, 1024> buf;
+    Auto_बफर<अक्षर, 1024> buf;
 
-    for ( ; ; )
+    क्रम ( ; ; )
     {
-        va_list va;
-        va_start(va, fmt);
-        int bsize = static_cast<int>(buf.size());
-        int len = cv_vsnprintf(buf.data(), bsize, fmt, va);
-        va_end(va);
+        बहु_सूची va;
+        बहु_शुरू(va, fmt);
+        पूर्णांक bsize = static_cast<पूर्णांक>(buf.size());
+        पूर्णांक len = cv_vsnprintf(buf.तथ्य(), bsize, fmt, va);
+        बहु_पूर्ण(va);
 
         CV_Assert(len >= 0 && "Check format string for errors");
-        if (len >= bsize)
+        अगर (len >= bsize)
         {
             buf.resize(len + 1);
-            continue;
+            जारी;
         }
         buf[bsize - 1] = 0;
-        return String(buf.data(), len);
+        वापस String(buf.तथ्य(), len);
     }
 }
 
-String tempfile( const char* suffix )
+String tempfile( स्थिर अक्षर* suffix )
 {
-#if OPENCV_HAVE_FILESYSTEM_SUPPORT
+#अगर OPENCV_HAVE_FILESYSTEM_SUPPORT
     String fname;
 
-    std::string temp_dir = utils::getConfigurationParameterString("OPENCV_TEMP_PATH");
+    std::string अस्थायी_dir = utils::getConfigurationParameterString("OPENCV_TEMP_PATH");
 
-#if defined _WIN32
-#ifdef WINRT
+#अगर defined _WIN32
+#अगर_घोषित WINRT
     RoInitialize(RO_INIT_MULTITHREADED);
-    std::wstring temp_dir_rt = GetTempPathWinRT();
+    std::wstring अस्थायी_dir_rt = Get_अस्थायी_Path_Win_RT();
 
-    std::wstring temp_file = GetTempFileNameWinRT(L"ocv");
-    if (temp_file.empty())
-        return String();
+    std::wstring अस्थायी_file = Get_अस्थायी_File_Name_Win_RT(L"ocv");
+    अगर (अस्थायी_file.empty())
+        वापस String();
 
-    temp_file = temp_dir_rt.append(std::wstring(L"\\")).append(temp_file);
-    DeleteFileW(temp_file.c_str());
+    अस्थायी_file = अस्थायी_dir_rt.append(std::wstring(L"\\")).append(अस्थायी_file);
+    DeleteFileW(अस्थायी_file.c_str());
 
-    char aname[MAX_PATH];
-    size_t copied = wcstombs(aname, temp_file.c_str(), MAX_PATH);
-    CV_Assert((copied != MAX_PATH) && (copied != (size_t)-1));
+    अक्षर aname[MAX_PATH];
+    माप_प्रकार copied = wcstombs(aname, अस्थायी_file.c_str(), MAX_PATH);
+    CV_Assert((copied != MAX_PATH) && (copied != (माप_प्रकार)-1));
     fname = String(aname);
     RoUninitialize();
-#elif defined(_WIN32_WCE)
-    const auto kMaxPathSize = MAX_PATH+1;
-    wchar_t temp_dir_ce[kMaxPathSize] = {0};
-    wchar_t temp_file[kMaxPathSize] = {0};
+#या_अगर defined(_WIN32_WCE)
+    स्थिर स्वतः k_Max_Path_आकार = MAX_PATH+1;
+    ब_अक्षर_प्रकार अस्थायी_dir_ce[k_Max_Path_आकार] = {0};
+    ब_अक्षर_प्रकार अस्थायी_file[k_Max_Path_आकार] = {0};
 
-    ::GetTempPathW(kMaxPathSize, temp_dir_ce);
+    ::Get_अस्थायी_Path_W(k_Max_Path_आकार, अस्थायी_dir_ce);
 
-    if(0 != ::GetTempFileNameW(temp_dir_ce, L"ocv", 0, temp_file)) {
-        DeleteFileW(temp_file);
-        char aname[MAX_PATH];
-        size_t copied = wcstombs(aname, temp_file, MAX_PATH);
-        CV_Assert((copied != MAX_PATH) && (copied != (size_t)-1));
+    अगर(0 != ::Get_अस्थायी_File_Name_W(अस्थायी_dir_ce, L"ocv", 0, अस्थायी_file)) {
+        DeleteFileW(अस्थायी_file);
+        अक्षर aname[MAX_PATH];
+        माप_प्रकार copied = wcstombs(aname, अस्थायी_file, MAX_PATH);
+        CV_Assert((copied != MAX_PATH) && (copied != (माप_प्रकार)-1));
         fname = String(aname);
     }
-#else
+#अन्यथा
     // Use GUID-based naming to avoid race condition with GetTempFileNameA
     // See issue #19648
-    wchar_t temp_dir2_w[MAX_PATH] = { 0 };
+    ब_अक्षर_प्रकार अस्थायी_dir2_w[MAX_PATH] = { 0 };
 
-    if (temp_dir.empty())
+    अगर (अस्थायी_dir.empty())
     {
-        ::GetTempPathW(sizeof(temp_dir2_w)/sizeof(wchar_t), temp_dir2_w);
+        ::Get_अस्थायी_Path_W(माप(अस्थायी_dir2_w)/माप(ब_अक्षर_प्रकार), अस्थायी_dir2_w);
         // Convert from UTF-16 to UTF-8 to support Unicode paths
-        int len = WideCharToMultiByte(CP_UTF8, 0, temp_dir2_w, -1, NULL, 0, NULL, NULL);
-        if (len > 0)
+        पूर्णांक len = WideCharToMultiByte(CP_UTF8, 0, अस्थायी_dir2_w, -1, शून्य, 0, शून्य, शून्य);
+        अगर (len > 0)
         {
-            std::vector<char> utf8_buf(len);
-            WideCharToMultiByte(CP_UTF8, 0, temp_dir2_w, -1, utf8_buf.data(), len, NULL, NULL);
-            temp_dir = std::string(utf8_buf.data());
+            std::vector<अक्षर> utf8_buf(len);
+            WideCharToMultiByte(CP_UTF8, 0, अस्थायी_dir2_w, -1, utf8_buf.तथ्य(), len, शून्य, शून्य);
+            अस्थायी_dir = std::string(utf8_buf.तथ्य());
         }
     }
 
     GUID g;
     HRESULT hr = CoCreateGuid(&g);
-    if (FAILED(hr))
-        return String();
-    char guidStr[40];
-    const char* mask = "%08x_%04x_%04x_%02x%02x_%02x%02x%02x%02x%02x%02x";
-    snprintf(guidStr, sizeof(guidStr), mask,
-            g.Data1, g.Data2, g.Data3, (unsigned int)g.Data4[0], (unsigned int)g.Data4[1],
-            (unsigned int)g.Data4[2], (unsigned int)g.Data4[3], (unsigned int)g.Data4[4],
-            (unsigned int)g.Data4[5], (unsigned int)g.Data4[6], (unsigned int)g.Data4[7]);
+    अगर (FAILED(hr))
+        वापस String();
+    अक्षर guidStr[40];
+    स्थिर अक्षर* mask = "%08x_%04x_%04x_%02x%02x_%02x%02x%02x%02x%02x%02x";
+    snprintf(guidStr, माप(guidStr), mask,
+            g.Data1, g.Data2, g.Data3, (अचिन्हित पूर्णांक)g.Data4[0], (अचिन्हित पूर्णांक)g.Data4[1],
+            (अचिन्हित पूर्णांक)g.Data4[2], (अचिन्हित पूर्णांक)g.Data4[3], (अचिन्हित पूर्णांक)g.Data4[4],
+            (अचिन्हित पूर्णांक)g.Data4[5], (अचिन्हित पूर्णांक)g.Data4[6], (अचिन्हित पूर्णांक)g.Data4[7]);
 
-    fname = temp_dir;
-    if (!fname.empty() && fname[fname.size()-1] != '\\' && fname[fname.size()-1] != '/')
+    fname = अस्थायी_dir;
+    अगर (!fname.empty() && fname[fname.size()-1] != '\\' && fname[fname.size()-1] != '/')
         fname += "\\";
     fname = fname + "ocv" + guidStr;
-#endif
-# else
+#पूर्ण_अगर
+# अन्यथा
 #  ifdef __ANDROID__
     //char defaultTemplate[] = "/mnt/sdcard/__opencv_temp.XXXXXX";
-    char defaultTemplate[] = "/data/local/tmp/__opencv_temp.XXXXXX";
-#  else
-    char defaultTemplate[] = "/tmp/__opencv_temp.XXXXXX";
+    अक्षर defaultTemplate[] = "/data/local/tmp/__opencv_temp.XXXXXX";
+#  अन्यथा
+    अक्षर defaultTemplate[] = "/tmp/__opencv_temp.XXXXXX";
 #  endif
 
-    if (temp_dir.empty())
+    अगर (अस्थायी_dir.empty())
         fname = defaultTemplate;
-    else
+    अन्यथा
     {
-        fname = temp_dir;
-        char ech = fname[fname.size() - 1];
-        if(ech != '/' && ech != '\\')
+        fname = अस्थायी_dir;
+        अक्षर ech = fname[fname.size() - 1];
+        अगर(ech != '/' && ech != '\\')
             fname = fname + "/";
         fname = fname + "__opencv_temp.XXXXXX";
     }
 
-    const int fd = mkstemp((char*)fname.c_str());
-    if (fd == -1) return String();
+    स्थिर पूर्णांक fd = mkstemp((अक्षर*)fname.c_str());
+    अगर (fd == -1) वापस String();
 
-    close(fd);
-    remove(fname.c_str());
+    बंद(fd);
+    हटाओ(fname.c_str());
 # endif
 
-    if (suffix)
+    अगर (suffix)
     {
-        if (suffix[0] != '.')
-            return fname + "." + suffix;
-        else
-            return fname + suffix;
+        अगर (suffix[0] != '.')
+            वापस fname + "." + suffix;
+        अन्यथा
+            वापस fname + suffix;
     }
-    return fname;
-#else // OPENCV_HAVE_FILESYSTEM_SUPPORT
+    वापस fname;
+#अन्यथा // OPENCV_HAVE_FILESYSTEM_SUPPORT
     CV_UNUSED(suffix);
     CV_Error(Error::StsNotImplemented, "File system support is disabled in this OpenCV build!");
-#endif // OPENCV_HAVE_FILESYSTEM_SUPPORT
+#पूर्ण_अगर // OPENCV_HAVE_FILESYSTEM_SUPPORT
 }
 
-static ErrorCallback customErrorCallback = 0;
-static void* customErrorCallbackData = 0;
-static bool breakOnError = false;
+अटल ErrorCallback customErrorCallback = 0;
+अटल व्योम* custom_Error_Callback_तथ्य = 0;
+अटल bool breakOnError = false;
 
 bool setBreakOnError(bool value)
 {
-    bool prevVal = breakOnError;
+    bool पूर्व_Val = breakOnError;
     breakOnError = value;
-    return prevVal;
+    वापस पूर्व_Val;
 }
 
-int cv_snprintf(char* buf, int len, const char* fmt, ...)
+पूर्णांक cv_snprintf(अक्षर* buf, पूर्णांक len, स्थिर अक्षर* fmt, ...)
 {
-    va_list va;
-    va_start(va, fmt);
-    int res = cv_vsnprintf(buf, len, fmt, va);
-    va_end(va);
-    return res;
+    बहु_सूची va;
+    बहु_शुरू(va, fmt);
+    पूर्णांक res = cv_vsnprintf(buf, len, fmt, va);
+    बहु_पूर्ण(va);
+    वापस res;
 }
 
-int cv_vsnprintf(char* buf, int len, const char* fmt, va_list args)
+पूर्णांक cv_vsnprintf(अक्षर* buf, पूर्णांक len, स्थिर अक्षर* fmt, बहु_सूची args)
 {
-#if defined _MSC_VER
-    if (len <= 0) return len == 0 ? 1024 : -1;
-    int res = _vsnprintf_s(buf, len, _TRUNCATE, fmt, args);
+#अगर defined _MSC_VER
+    अगर (len <= 0) वापस len == 0 ? 1024 : -1;
+    पूर्णांक res = _vsnprintf_s(buf, len, _TRUNCATE, fmt, args);
     // ensure null terminating on VS
-    if (res >= 0 && res < len)
+    अगर (res >= 0 && res < len)
     {
         buf[res] = 0;
-        return res;
+        वापस res;
     }
-    else
+    अन्यथा
     {
         buf[len - 1] = 0; // truncate happened
-        return res >= len ? res : (len * 2);
+        वापस res >= len ? res : (len * 2);
     }
-#else
-    return vsnprintf(buf, len, fmt, args);
-#endif
+#अन्यथा
+    वापस vsnprintf(buf, len, fmt, args);
+#पूर्ण_अगर
 }
 
-static void dumpException(const Exception& exc)
+अटल व्योम dumpException(स्थिर Exception& exc)
 {
-    const char* errorStr = exc.codeMessage();
-    char buf[1 << 12];
+    स्थिर अक्षर* errorStr = exc.codeMessage();
+    अक्षर buf[1 << 12];
 
-    cv_snprintf(buf, sizeof(buf),
+    cv_snprintf(buf, माप(buf),
         "OpenCV(%s) Error: %s (%s) in %s, file %s, line %d",
         CV_VERSION,
         errorStr, exc.err.c_str(), exc.func.size() > 0 ?
-        exc.func.c_str() : "unknown function", exc.file.c_str(), exc.line);
-#ifdef __ANDROID__
+        exc.func.c_str() : "unknown function", exc.file.c_str(), exc.पंक्ति);
+#अगर_घोषित __ANDROID__
     __android_log_print(ANDROID_LOG_ERROR, "cv::error()", "%s", buf);
-#else
-    fflush(stdout); fflush(stderr);
-    fprintf(stderr, "%s\n", buf);
-    fflush(stderr);
-#endif
+#अन्यथा
+    ख_साफ(मानक_निकास); ख_साफ(मानक_त्रुटि);
+    ख_लिखो(मानक_त्रुटि, "%s\n", buf);
+    ख_साफ(मानक_त्रुटि);
+#पूर्ण_अगर
 }
 
-#ifdef CV_ERROR_SET_TERMINATE_HANDLER
-static bool cv_terminate_handler_installed = false;
-static std::terminate_handler cv_old_terminate_handler;
-static cv::Exception cv_terminate_handler_exception;
-static bool param_setupTerminateHandler = utils::getConfigurationParameterBool("OPENCV_SETUP_TERMINATE_HANDLER", true);
-static void cv_terminate_handler() {
-    std::cerr << "OpenCV: terminate handler is called! The last OpenCV error is:\n";
+#अगर_घोषित CV_ERROR_SET_TERMINATE_HANDLER
+अटल bool cv_terminate_handler_installed = false;
+अटल std::terminate_handler cv_old_terminate_handler;
+अटल cv::Exception cv_terminate_handler_exception;
+अटल bool param_setupTerminateHandler = utils::getConfigurationParameterBool("OPENCV_SETUP_TERMINATE_HANDLER", true);
+अटल व्योम cv_terminate_handler() {
+    std::अ_त्रुटि << "OpenCV: terminate handler is called! The last OpenCV error is:\n";
     dumpException(cv_terminate_handler_exception);
-    if (false /*cv_old_terminate_handler*/)  // buggy behavior is observed with doubled "abort/retry/ignore" windows
+    अगर (false /*cv_old_terminate_handler*/)  // buggy behavior is observed with doubled "abort/retry/ignore" windows
         cv_old_terminate_handler();
-    abort();
+    पात();
 }
 
-#endif
+#पूर्ण_अगर
 
-#ifdef __GNUC__
-# if defined __clang__ || defined __APPLE__
+#अगर_घोषित __GNUC__
+# अगर defined __clang__ || defined __APPLE__
 #   pragma GCC diagnostic push
 #   pragma GCC diagnostic ignored "-Winvalid-noreturn"
 # endif
-#endif
+#पूर्ण_अगर
 
-void error( const Exception& exc )
+व्योम error( स्थिर Exception& exc )
 {
-#ifdef CV_ERROR_SET_TERMINATE_HANDLER
+#अगर_घोषित CV_ERROR_SET_TERMINATE_HANDLER
     {
         cv::AutoLock lock(getInitializationMutex());
-        if (!cv_terminate_handler_installed)
+        अगर (!cv_terminate_handler_installed)
         {
-            if (param_setupTerminateHandler)
+            अगर (param_setupTerminateHandler)
                 cv_old_terminate_handler = std::set_terminate(cv_terminate_handler);
             cv_terminate_handler_installed = true;
         }
         cv_terminate_handler_exception = exc;
     }
-#endif
+#पूर्ण_अगर
 
-    if (customErrorCallback != 0)
+    अगर (customErrorCallback != 0)
         customErrorCallback(exc.code, exc.func.c_str(), exc.err.c_str(),
-                            exc.file.c_str(), exc.line, customErrorCallbackData);
-    else if (param_dumpErrors)
+                            exc.file.c_str(), exc.पंक्ति, custom_Error_Callback_तथ्य);
+    अन्यथा अगर (param_dumpErrors)
     {
         dumpException(exc);
     }
 
-    if(breakOnError)
+    अगर(breakOnError)
     {
         std::terminate();
     }
 
-    throw exc;
-#ifdef __GNUC__
-# if !defined __clang__ && !defined __APPLE__
+    फेंको exc;
+#अगर_घोषित __GNUC__
+# अगर !defined __clang__ && !defined __APPLE__
     // this suppresses this warning: "noreturn" function does return [enabled by default]
     __builtin_trap();
     // or use infinite loop: for (;;) {}
 # endif
-#endif
+#पूर्ण_अगर
 }
 
-void error(Error::Code _code, const String& _err, const char* _func, const char* _file, int _line)
+व्योम error(Error::Code _code, स्थिर String& _err, स्थिर अक्षर* _func, स्थिर अक्षर* _file, पूर्णांक पंक्ति_3)
 {
-    error(cv::Exception(_code, _err, _func, _file, _line));
-#ifdef __GNUC__
-# if !defined __clang__ && !defined __APPLE__
+    error(cv::Exception(_code, _err, _func, _file, पंक्ति_3));
+#अगर_घोषित __GNUC__
+# अगर !defined __clang__ && !defined __APPLE__
     // this suppresses this warning: "noreturn" function does return [enabled by default]
     __builtin_trap();
     // or use infinite loop: for (;;) {}
 # endif
-#endif
+#पूर्ण_अगर
 }
 
-#ifdef __GNUC__
-# if defined __clang__ || defined __APPLE__
+#अगर_घोषित __GNUC__
+# अगर defined __clang__ || defined __APPLE__
 #   pragma GCC diagnostic pop
 # endif
-#endif
+#पूर्ण_अगर
 
 
 ErrorCallback
-redirectError( ErrorCallback errCallback, void* userdata, void** prevUserdata)
+redirectError( ErrorCallback errCallback, व्योम* userdata, व्योम** पूर्व_Userdata)
 {
-    if( prevUserdata )
-        *prevUserdata = customErrorCallbackData;
+    अगर( पूर्व_Userdata )
+        *पूर्व_Userdata = custom_Error_Callback_तथ्य;
 
-    ErrorCallback prevCallback = customErrorCallback;
+    ErrorCallback पूर्व_Callback = customErrorCallback;
 
     customErrorCallback     = errCallback;
-    customErrorCallbackData = userdata;
+    custom_Error_Callback_तथ्य = userdata;
 
-    return prevCallback;
+    वापस पूर्व_Callback;
 }
 
-void terminate(Error::Code _code, const String& _err, const char* _func, const char* _file, int _line) CV_NOEXCEPT
+व्योम terminate(Error::Code _code, स्थिर String& _err, स्थिर अक्षर* _func, स्थिर अक्षर* _file, पूर्णांक पंक्ति_3) CV_NOEXCEPT
 {
-    dumpException(cv::Exception(_code, _err, _func, _file, _line));
+    dumpException(cv::Exception(_code, _err, _func, _file, पंक्ति_3));
     std::terminate();
 }
 
@@ -1419,53 +1419,53 @@ bool __termination = false;
 
 namespace details {
 
-#ifndef OPENCV_DISABLE_THREAD_SUPPORT
+#अगर_अघोषित OPENCV_DISABLE_THREAD_SUPPORT
 
-#ifdef _WIN32
-#ifdef _MSC_VER
-#pragma warning(disable:4505) // unreferenced local function has been removed
-#endif
-#ifndef TLS_OUT_OF_INDEXES
-#define TLS_OUT_OF_INDEXES ((DWORD)0xFFFFFFFF)
-#endif
-#endif
+#अगर_घोषित _WIN32
+#अगर_घोषित _MSC_VER
+#आशय warning(disable:4505) // unreferenced local function has been removed
+#पूर्ण_अगर
+#अगर_अघोषित TLS_OUT_OF_INDEXES
+#घोषणा TLS_OUT_OF_INDEXES ((DWORD)0xFFFFFFFF)
+#पूर्ण_अगर
+#पूर्ण_अगर
 
 // TLS platform abstraction layer
-class TlsAbstraction
+श्रेणी TlsAbstraction
 {
-public:
+खुला:
     TlsAbstraction();
     ~TlsAbstraction()
     {
         // TlsAbstraction singleton should not be released
         // There is no reliable way to avoid problems caused by static initialization order fiasco
         // NB: Do NOT use logging here
-        fprintf(stderr, "OpenCV FATAL: TlsAbstraction::~TlsAbstraction() call is not expected\n");
-        fflush(stderr);
+        ख_लिखो(मानक_त्रुटि, "OpenCV FATAL: TlsAbstraction::~TlsAbstraction() call is not expected\n");
+        ख_साफ(मानक_त्रुटि);
     }
 
-    void* getData() const;
-    void setData(void *pData);
+    व्योम* get_तथ्य() स्थिर;
+    व्योम set_तथ्य(व्योम *p_तथ्य);
 
-    void releaseSystemResources();
+    व्योम releaseSystemResources();
 
-private:
+निजी:
 
-#ifdef _WIN32
-#ifndef WINRT
-    DWORD tlsKey;
+#अगर_घोषित _WIN32
+#अगर_अघोषित WINRT
+    DWORD tls_कुंजी;
     bool disposed;
-#endif
-#else // _WIN32
-    pthread_key_t  tlsKey;
+#पूर्ण_अगर
+#अन्यथा // _WIN32
+    pthread_key_t  tls_कुंजी;
     std::atomic<bool> disposed;
-#endif
+#पूर्ण_अगर
 };
 
-class TlsAbstractionReleaseGuard
+श्रेणी TlsAbstractionReleaseGuard
 {
     TlsAbstraction& tls_;
-public:
+खुला:
     TlsAbstractionReleaseGuard(TlsAbstraction& tls) : tls_(tls)
     {
         /* nothing */
@@ -1477,132 +1477,132 @@ public:
 };
 
 // TODO use reference
-static TlsAbstraction* getTlsAbstraction()
+अटल TlsAbstraction* getTlsAbstraction()
 {
-    static TlsAbstraction *g_tls = new TlsAbstraction();  // memory leak is intended here to avoid disposing of TLS container
-    static TlsAbstractionReleaseGuard g_tlsReleaseGuard(*g_tls);
-    return g_tls;
+    अटल TlsAbstraction *g_tls = नया TlsAbstraction();  // memory leak is intended here to avoid disposing of TLS container
+    अटल TlsAbstractionReleaseGuard g_tlsReleaseGuard(*g_tls);
+    वापस g_tls;
 }
 
 
-#ifdef _WIN32
-#ifdef WINRT
-static __declspec( thread ) void* tlsData = NULL; // using C++11 thread attribute for local thread data
+#अगर_घोषित _WIN32
+#अगर_घोषित WINRT
+अटल __declspec( thread ) व्योम* tls_तथ्य = शून्य; // using C++11 thread attribute for local thread data
 TlsAbstraction::TlsAbstraction() {}
-void TlsAbstraction::releaseSystemResources()
+व्योम TlsAbstraction::releaseSystemResources()
 {
     cv::__termination = true;  // DllMain is missing in static builds
 }
-void* TlsAbstraction::getData() const
+व्योम* TlsAbstraction::get_तथ्य() स्थिर
 {
-    return tlsData;
+    वापस tls_तथ्य;
 }
-void TlsAbstraction::setData(void *pData)
+व्योम TlsAbstraction::set_तथ्य(व्योम *p_तथ्य)
 {
-    tlsData = pData;
+    tls_तथ्य = p_तथ्य;
 }
-#else //WINRT
-#ifdef CV_USE_FLS
-static void NTAPI opencv_fls_destructor(void* pData);
-#endif // CV_USE_FLS
+#अन्यथा //WINRT
+#अगर_घोषित CV_USE_FLS
+अटल व्योम NTAPI opencv_fls_destructor(व्योम* p_तथ्य);
+#पूर्ण_अगर // CV_USE_FLS
 TlsAbstraction::TlsAbstraction()
     : disposed(false)
 {
-#ifndef CV_USE_FLS
-    tlsKey = TlsAlloc();
-#else // CV_USE_FLS
-    tlsKey = FlsAlloc(opencv_fls_destructor);
-#endif // CV_USE_FLS
-    CV_Assert(tlsKey != TLS_OUT_OF_INDEXES);
+#अगर_अघोषित CV_USE_FLS
+    tls_कुंजी = TlsAlloc();
+#अन्यथा // CV_USE_FLS
+    tls_कुंजी = FlsAlloc(opencv_fls_destructor);
+#पूर्ण_अगर // CV_USE_FLS
+    CV_Assert(tls_कुंजी != TLS_OUT_OF_INDEXES);
 }
-void TlsAbstraction::releaseSystemResources()
+व्योम TlsAbstraction::releaseSystemResources()
 {
     cv::__termination = true;  // DllMain is missing in static builds
     disposed = true;
-#ifndef CV_USE_FLS
-    TlsFree(tlsKey);
-#else // CV_USE_FLS
-    FlsFree(tlsKey);
-#endif // CV_USE_FLS
-    tlsKey = TLS_OUT_OF_INDEXES;
+#अगर_अघोषित CV_USE_FLS
+    TlsFree(tls_कुंजी);
+#अन्यथा // CV_USE_FLS
+    FlsFree(tls_कुंजी);
+#पूर्ण_अगर // CV_USE_FLS
+    tls_कुंजी = TLS_OUT_OF_INDEXES;
 }
-void* TlsAbstraction::getData() const
+व्योम* TlsAbstraction::get_तथ्य() स्थिर
 {
-    if (disposed)
-        return NULL;
-#ifndef CV_USE_FLS
-    return TlsGetValue(tlsKey);
-#else // CV_USE_FLS
-    return FlsGetValue(tlsKey);
-#endif // CV_USE_FLS
+    अगर (disposed)
+        वापस शून्य;
+#अगर_अघोषित CV_USE_FLS
+    वापस Tls_Get_मूल्य(tls_कुंजी);
+#अन्यथा // CV_USE_FLS
+    वापस Fls_Get_मूल्य(tls_कुंजी);
+#पूर्ण_अगर // CV_USE_FLS
 }
-void TlsAbstraction::setData(void *pData)
+व्योम TlsAbstraction::set_तथ्य(व्योम *p_तथ्य)
 {
-    if (disposed)
-        return;  // no-op
-#ifndef CV_USE_FLS
-    CV_Assert(TlsSetValue(tlsKey, pData) == TRUE);
-#else // CV_USE_FLS
-    CV_Assert(FlsSetValue(tlsKey, pData) == TRUE);
-#endif // CV_USE_FLS
+    अगर (disposed)
+        वापस;  // no-op
+#अगर_अघोषित CV_USE_FLS
+    CV_Assert(Tls_Set_मूल्य(tls_कुंजी, p_तथ्य) == TRUE);
+#अन्यथा // CV_USE_FLS
+    CV_Assert(Fls_Set_मूल्य(tls_कुंजी, p_तथ्य) == TRUE);
+#पूर्ण_अगर // CV_USE_FLS
 }
-#endif // WINRT
-#else // _WIN32
-static void opencv_tls_destructor(void* pData);
+#पूर्ण_अगर // WINRT
+#अन्यथा // _WIN32
+अटल व्योम opencv_tls_destructor(व्योम* p_तथ्य);
 TlsAbstraction::TlsAbstraction()
     : disposed(false)
 {
-    CV_Assert(pthread_key_create(&tlsKey, opencv_tls_destructor) == 0);
+    CV_Assert(pthread_key_create(&tls_कुंजी, opencv_tls_destructor) == 0);
 }
-void TlsAbstraction::releaseSystemResources()
+व्योम TlsAbstraction::releaseSystemResources()
 {
     cv::__termination = true;  // DllMain is missing in static builds
     disposed = true;
-    if (pthread_key_delete(tlsKey) != 0)
+    अगर (pthread_key_delete(tls_कुंजी) != 0)
     {
         // Don't use logging here
-        fprintf(stderr, "OpenCV ERROR: TlsAbstraction::~TlsAbstraction(): pthread_key_delete() call failed\n");
-        fflush(stderr);
+        ख_लिखो(मानक_त्रुटि, "OpenCV ERROR: TlsAbstraction::~TlsAbstraction(): pthread_key_delete() call failed\n");
+        ख_साफ(मानक_त्रुटि);
     }
 }
-void* TlsAbstraction::getData() const
+व्योम* TlsAbstraction::get_तथ्य() स्थिर
 {
-    if (disposed)
-        return NULL;
-    return pthread_getspecific(tlsKey);
+    अगर (disposed)
+        वापस शून्य;
+    वापस pthread_getspecific(tls_कुंजी);
 }
-void TlsAbstraction::setData(void *pData)
+व्योम TlsAbstraction::set_तथ्य(व्योम *p_तथ्य)
 {
-    if (disposed)
-        return;  // no-op
-    CV_Assert(pthread_setspecific(tlsKey, pData) == 0);
+    अगर (disposed)
+        वापस;  // no-op
+    CV_Assert(pthread_setspecific(tls_कुंजी, p_तथ्य) == 0);
 }
-#endif
+#पूर्ण_अगर
 
 // Per-thread data structure
-struct ThreadData
+काष्ठा Thread_तथ्य
 {
-    ThreadData()
+    Thread_तथ्य()
     {
         idx = 0;
         slots.reserve(32);
     }
 
-    std::vector<void*> slots; // Data array for a thread
-    size_t idx;               // Thread index in TLS storage. This is not OS thread ID!
+    std::vector<व्योम*> slots; // Data array for a thread
+    माप_प्रकार idx;               // Thread index in TLS storage. This is not OS thread ID!
 };
 
 
-static bool g_isTlsStorageInitialized = false;
+अटल bool g_isTlsStorageInitialized = false;
 
 // Main TLS storage class
-class TlsStorage
+श्रेणी TlsStorage
 {
-public:
+खुला:
     TlsStorage() :
-        tlsSlotsSize(0)
+        tls_Slots_आकार(0)
     {
-        (void)getTlsAbstraction();  // ensure singeton initialization (for correct order of atexit calls)
+        (व्योम)getTlsAbstraction();  // ensure singeton initialization (for correct order of atexit calls)
         tlsSlots.reserve(32);
         threads.reserve(32);
         g_isTlsStorageInitialized = true;
@@ -1612,216 +1612,216 @@ public:
         // TlsStorage object should not be released
         // There is no reliable way to avoid problems caused by static initialization order fiasco
         // Don't use logging here
-        fprintf(stderr, "OpenCV FATAL: TlsStorage::~TlsStorage() call is not expected\n");
-        fflush(stderr);
+        ख_लिखो(मानक_त्रुटि, "OpenCV FATAL: TlsStorage::~TlsStorage() call is not expected\n");
+        ख_साफ(मानक_त्रुटि);
     }
 
-    void releaseThread(void* tlsValue = NULL)
+    व्योम releaseThread(व्योम* tls_मूल्य = शून्य)
     {
         TlsAbstraction* tls = getTlsAbstraction();
-        if (NULL == tls)
-            return;  // TLS singleton is not available (terminated)
-        ThreadData *pTD = tlsValue == NULL ? (ThreadData*)tls->getData() : (ThreadData*)tlsValue;
-        if (pTD == NULL)
-            return;  // no OpenCV TLS data for this thread
+        अगर (शून्य == tls)
+            वापस;  // TLS singleton is not available (terminated)
+        Thread_तथ्य *pTD = tls_मूल्य == शून्य ? (Thread_तथ्य*)tls->get_तथ्य() : (Thread_तथ्य*)tls_मूल्य;
+        अगर (pTD == शून्य)
+            वापस;  // no OpenCV TLS data for this thread
         AutoLock guard(mtxGlobalAccess);
-        for (size_t i = 0; i < threads.size(); i++)
+        क्रम (माप_प्रकार i = 0; i < threads.size(); i++)
         {
-            if (pTD == threads[i])
+            अगर (pTD == threads[i])
             {
-                threads[i] = NULL;
-                if (tlsValue == NULL)
-                    tls->setData(0);
-                std::vector<void*>& thread_slots = pTD->slots;
-                for (size_t slotIdx = 0; slotIdx < thread_slots.size(); slotIdx++)
+                threads[i] = शून्य;
+                अगर (tls_मूल्य == शून्य)
+                    tls->set_तथ्य(0);
+                std::vector<व्योम*>& thread_slots = pTD->slots;
+                क्रम (माप_प्रकार slotIdx = 0; slotIdx < thread_slots.size(); slotIdx++)
                 {
-                    void* pData = thread_slots[slotIdx];
-                    thread_slots[slotIdx] = NULL;
-                    if (!pData)
-                        continue;
+                    व्योम* p_तथ्य = thread_slots[slotIdx];
+                    thread_slots[slotIdx] = शून्य;
+                    अगर (!p_तथ्य)
+                        जारी;
                     TLSDataContainer* container = tlsSlots[slotIdx].container;
-                    if (container)
-                        container->deleteDataInstance(pData);
-                    else
+                    अगर (container)
+                        container->delete_तथ्य_Instance(p_तथ्य);
+                    अन्यथा
                     {
-                        fprintf(stderr, "OpenCV ERROR: TLS: container for slotIdx=%d is NULL. Can't release thread data\n", (int)slotIdx);
-                        fflush(stderr);
+                        ख_लिखो(मानक_त्रुटि, "OpenCV ERROR: TLS: container for slotIdx=%d is NULL. Can't release thread data\n", (पूर्णांक)slotIdx);
+                        ख_साफ(मानक_त्रुटि);
                     }
                 }
-                delete pTD;
-                return;
+                मिटाओ pTD;
+                वापस;
             }
         }
-        fprintf(stderr, "OpenCV WARNING: TLS: Can't release thread TLS data (unknown pointer or data race): %p\n", (void*)pTD); fflush(stderr);
+        ख_लिखो(मानक_त्रुटि, "OpenCV WARNING: TLS: Can't release thread TLS data (unknown pointer or data race): %p\n", (व्योम*)pTD); ख_साफ(मानक_त्रुटि);
     }
 
     // Reserve TLS storage index
-    size_t reserveSlot(TLSDataContainer* container)
+    माप_प्रकार reserveSlot(TLSDataContainer* container)
     {
         AutoLock guard(mtxGlobalAccess);
-        CV_Assert(tlsSlotsSize == tlsSlots.size());
+        CV_Assert(tls_Slots_आकार == tlsSlots.size());
 
         // Find unused slots
-        for(size_t slot = 0; slot < tlsSlotsSize; slot++)
+        क्रम(माप_प्रकार slot = 0; slot < tls_Slots_आकार; slot++)
         {
-            if (tlsSlots[slot].container == NULL)
+            अगर (tlsSlots[slot].container == शून्य)
             {
                 tlsSlots[slot].container = container;
-                return slot;
+                वापस slot;
             }
         }
 
         // Create new slot
-        tlsSlots.push_back(TlsSlotInfo(container)); tlsSlotsSize++;
-        return tlsSlotsSize - 1;
+        tlsSlots.push_back(TlsSlotInfo(container)); tls_Slots_आकार++;
+        वापस tls_Slots_आकार - 1;
     }
 
     // Release TLS storage index and pass associated data to caller
-    void releaseSlot(size_t slotIdx, std::vector<void*> &dataVec, bool keepSlot = false)
+    व्योम releaseSlot(माप_प्रकार slotIdx, std::vector<व्योम*> &तथ्य_Vec, bool keepSlot = false)
     {
         AutoLock guard(mtxGlobalAccess);
-        CV_Assert(tlsSlotsSize == tlsSlots.size());
-        CV_Assert(tlsSlotsSize > slotIdx);
+        CV_Assert(tls_Slots_आकार == tlsSlots.size());
+        CV_Assert(tls_Slots_आकार > slotIdx);
 
-        for(size_t i = 0; i < threads.size(); i++)
+        क्रम(माप_प्रकार i = 0; i < threads.size(); i++)
         {
-            if(threads[i])
+            अगर(threads[i])
             {
-                std::vector<void*>& thread_slots = threads[i]->slots;
-                if (thread_slots.size() > slotIdx && thread_slots[slotIdx])
+                std::vector<व्योम*>& thread_slots = threads[i]->slots;
+                अगर (thread_slots.size() > slotIdx && thread_slots[slotIdx])
                 {
-                    dataVec.push_back(thread_slots[slotIdx]);
-                    thread_slots[slotIdx] = NULL;
+                    तथ्य_Vec.push_back(thread_slots[slotIdx]);
+                    thread_slots[slotIdx] = शून्य;
                 }
             }
         }
 
-        if (!keepSlot)
+        अगर (!keepSlot)
         {
-            tlsSlots[slotIdx].container = NULL;  // mark slot as free (see reserveSlot() implementation)
+            tlsSlots[slotIdx].container = शून्य;  // mark slot as free (see reserveSlot() implementation)
         }
     }
 
     // Get data by TLS storage index
-    void* getData(size_t slotIdx) const
+    व्योम* get_तथ्य(माप_प्रकार slotIdx) स्थिर
     {
-#ifndef CV_THREAD_SANITIZER
-        CV_Assert(tlsSlotsSize > slotIdx);
-#endif
+#अगर_अघोषित CV_THREAD_SANITIZER
+        CV_Assert(tls_Slots_आकार > slotIdx);
+#पूर्ण_अगर
 
         TlsAbstraction* tls = getTlsAbstraction();
-        if (NULL == tls)
-            return NULL;  // TLS singleton is not available (terminated)
+        अगर (शून्य == tls)
+            वापस शून्य;  // TLS singleton is not available (terminated)
 
-        ThreadData* threadData = (ThreadData*)tls->getData();
-        if(threadData && threadData->slots.size() > slotIdx)
-            return threadData->slots[slotIdx];
+        Thread_तथ्य* thread_तथ्य = (Thread_तथ्य*)tls->get_तथ्य();
+        अगर(thread_तथ्य && thread_तथ्य->slots.size() > slotIdx)
+            वापस thread_तथ्य->slots[slotIdx];
 
-        return NULL;
+        वापस शून्य;
     }
 
     // Gather data from threads by TLS storage index
-    void gather(size_t slotIdx, std::vector<void*> &dataVec)
+    व्योम gather(माप_प्रकार slotIdx, std::vector<व्योम*> &तथ्य_Vec)
     {
         AutoLock guard(mtxGlobalAccess);
-        CV_Assert(tlsSlotsSize == tlsSlots.size());
-        CV_Assert(tlsSlotsSize > slotIdx);
+        CV_Assert(tls_Slots_आकार == tlsSlots.size());
+        CV_Assert(tls_Slots_आकार > slotIdx);
 
-        for(size_t i = 0; i < threads.size(); i++)
+        क्रम(माप_प्रकार i = 0; i < threads.size(); i++)
         {
-            if(threads[i])
+            अगर(threads[i])
             {
-                std::vector<void*>& thread_slots = threads[i]->slots;
-                if (thread_slots.size() > slotIdx && thread_slots[slotIdx])
-                    dataVec.push_back(thread_slots[slotIdx]);
+                std::vector<व्योम*>& thread_slots = threads[i]->slots;
+                अगर (thread_slots.size() > slotIdx && thread_slots[slotIdx])
+                    तथ्य_Vec.push_back(thread_slots[slotIdx]);
             }
         }
     }
 
     // Set data to storage index
-    void setData(size_t slotIdx, void* pData)
+    व्योम set_तथ्य(माप_प्रकार slotIdx, व्योम* p_तथ्य)
     {
-#ifndef CV_THREAD_SANITIZER
-        CV_Assert(tlsSlotsSize > slotIdx);
-#endif
+#अगर_अघोषित CV_THREAD_SANITIZER
+        CV_Assert(tls_Slots_आकार > slotIdx);
+#पूर्ण_अगर
 
         TlsAbstraction* tls = getTlsAbstraction();
-        if (NULL == tls)
-            return;  // TLS singleton is not available (terminated)
+        अगर (शून्य == tls)
+            वापस;  // TLS singleton is not available (terminated)
 
-        ThreadData* threadData = (ThreadData*)tls->getData();
-        if(!threadData)
+        Thread_तथ्य* thread_तथ्य = (Thread_तथ्य*)tls->get_तथ्य();
+        अगर(!thread_तथ्य)
         {
-            threadData = new ThreadData;
-            tls->setData((void*)threadData);
+            thread_तथ्य = नया Thread_तथ्य;
+            tls->set_तथ्य((व्योम*)thread_तथ्य);
             {
                 AutoLock guard(mtxGlobalAccess);
 
                 bool found = false;
                 // Find unused slots
-                for(size_t slot = 0; slot < threads.size(); slot++)
+                क्रम(माप_प्रकार slot = 0; slot < threads.size(); slot++)
                 {
-                    if (threads[slot] == NULL)
+                    अगर (threads[slot] == शून्य)
                     {
-                        threadData->idx = (int)slot;
-                        threads[slot] = threadData;
+                        thread_तथ्य->idx = (पूर्णांक)slot;
+                        threads[slot] = thread_तथ्य;
                         found = true;
-                        break;
+                        अवरोध;
                     }
                 }
 
-                if (!found)
+                अगर (!found)
                 {
                     // Create new slot
-                    threadData->idx = threads.size();
-                    threads.push_back(threadData);
+                    thread_तथ्य->idx = threads.size();
+                    threads.push_back(thread_तथ्य);
                 }
             }
         }
 
-        if(slotIdx >= threadData->slots.size())
+        अगर(slotIdx >= thread_तथ्य->slots.size())
         {
             AutoLock guard(mtxGlobalAccess); // keep synchronization with gather() calls
-            threadData->slots.resize(slotIdx + 1, NULL);
+            thread_तथ्य->slots.resize(slotIdx + 1, शून्य);
         }
-        threadData->slots[slotIdx] = pData;
+        thread_तथ्य->slots[slotIdx] = p_तथ्य;
     }
 
-private:
+निजी:
     Mutex  mtxGlobalAccess;           // Shared objects operation guard
-    size_t tlsSlotsSize;              // equal to tlsSlots.size() in synchronized sections
+    माप_प्रकार tls_Slots_आकार;              // equal to tlsSlots.size() in synchronized sections
                                       // without synchronization this counter doesn't decrease - it is used for slotIdx sanity checks
 
-    struct TlsSlotInfo
+    काष्ठा TlsSlotInfo
     {
         TlsSlotInfo(TLSDataContainer* _container) : container(_container) {}
         TLSDataContainer* container;  // attached container (to dispose data of terminated threads)
     };
-    std::vector<struct TlsSlotInfo> tlsSlots;  // TLS keys state
-    std::vector<ThreadData*> threads; // Array for all allocated data. Thread data pointers are placed here to allow data cleanup
+    std::vector<काष्ठा TlsSlotInfo> tlsSlots;  // TLS keys state
+    std::vector<Thread_तथ्य*> threads; // Array for all allocated data. Thread data pointers are placed here to allow data cleanup
 };
 
 // Create global TLS storage object
-static TlsStorage &getTlsStorage()
+अटल TlsStorage &getTlsStorage()
 {
-    CV_SINGLETON_LAZY_INIT_REF(TlsStorage, new TlsStorage())
+    CV_SINGLETON_LAZY_INIT_REF(TlsStorage, नया TlsStorage())
 }
 
-#ifndef _WIN32  // pthread key destructor
-static void opencv_tls_destructor(void* pData)
+#अगर_अघोषित _WIN32  // pthread key destructor
+अटल व्योम opencv_tls_destructor(व्योम* p_तथ्य)
 {
-    if (!g_isTlsStorageInitialized)
-        return;  // nothing to release, so prefer to avoid creation of new global structures
-    getTlsStorage().releaseThread(pData);
+    अगर (!g_isTlsStorageInitialized)
+        वापस;  // nothing to release, so prefer to avoid creation of new global structures
+    getTlsStorage().releaseThread(p_तथ्य);
 }
-#else // _WIN32
-#ifdef CV_USE_FLS
-static void WINAPI opencv_fls_destructor(void* pData)
+#अन्यथा // _WIN32
+#अगर_घोषित CV_USE_FLS
+अटल व्योम WINAPI opencv_fls_destructor(व्योम* p_तथ्य)
 {
     // Empiric detection of ExitProcess call
     DWORD code = STILL_ACTIVE/*259*/;
     BOOL res = GetExitCodeProcess(GetCurrentProcess(), &code);
-    if (res && code != STILL_ACTIVE)
+    अगर (res && code != STILL_ACTIVE)
     {
         // Looks like we are in ExitProcess() call
         // This is FLS specific only because their callback is called before DllMain.
@@ -1833,915 +1833,915 @@ static void WINAPI opencv_fls_destructor(void* pData)
         cv::__termination = true;
     }
 
-    if (!g_isTlsStorageInitialized)
-        return;  // nothing to release, so prefer to avoid creation of new global structures
-    getTlsStorage().releaseThread(pData);
+    अगर (!g_isTlsStorageInitialized)
+        वापस;  // nothing to release, so prefer to avoid creation of new global structures
+    getTlsStorage().releaseThread(p_तथ्य);
 }
-#endif // CV_USE_FLS
-#endif // _WIN32
+#पूर्ण_अगर // CV_USE_FLS
+#पूर्ण_अगर // _WIN32
 
-static TlsStorage* const g_force_initialization_of_TlsStorage
-#if defined __GNUC__
+अटल TlsStorage* स्थिर g_force_initialization_of_TlsStorage
+#अगर defined __GNUC__
     __attribute__((unused))
-#endif
+#पूर्ण_अगर
     = &getTlsStorage();
 
 
-#else  // OPENCV_DISABLE_THREAD_SUPPORT
+#अन्यथा  // OPENCV_DISABLE_THREAD_SUPPORT
 
 // no threading (OPENCV_DISABLE_THREAD_SUPPORT=ON)
-class TlsStorage
+श्रेणी TlsStorage
 {
-public:
+खुला:
     TlsStorage()
     {
         slots.reserve(32);
     }
     ~TlsStorage()
     {
-        for (size_t slotIdx = 0; slotIdx < slots.size(); slotIdx++)
+        क्रम (माप_प्रकार slotIdx = 0; slotIdx < slots.size(); slotIdx++)
         {
             SlotInfo& s = slots[slotIdx];
             TLSDataContainer* container = s.container;
-            if (container && s.data)
+            अगर (container && s.तथ्य)
             {
-                container->deleteDataInstance(s.data);  // Can't use from SlotInfo destructor
-                s.data = nullptr;
+                container->delete_तथ्य_Instance(s.तथ्य);  // Can't use from SlotInfo destructor
+                s.तथ्य = nullptr;
             }
         }
     }
 
     // Reserve TLS storage index
-    size_t reserveSlot(TLSDataContainer* container)
+    माप_प्रकार reserveSlot(TLSDataContainer* container)
     {
-        size_t slotsSize = slots.size();
-        for (size_t slot = 0; slot < slotsSize; slot++)
+        माप_प्रकार slots_आकार = slots.size();
+        क्रम (माप_प्रकार slot = 0; slot < slots_आकार; slot++)
         {
             SlotInfo& s = slots[slot];
-            if (s.container == NULL)
+            अगर (s.container == शून्य)
             {
-                CV_Assert(!s.data);
+                CV_Assert(!s.तथ्य);
                 s.container = container;
-                return slot;
+                वापस slot;
             }
         }
 
         // create new slot
         slots.push_back(SlotInfo(container));
-        return slotsSize;
+        वापस slots_आकार;
     }
 
     // Release TLS storage index and pass associated data to caller
-    void releaseSlot(size_t slotIdx, std::vector<void*> &dataVec, bool keepSlot = false)
+    व्योम releaseSlot(माप_प्रकार slotIdx, std::vector<व्योम*> &तथ्य_Vec, bool keepSlot = false)
     {
         CV_Assert(slotIdx < slots.size());
         SlotInfo& s = slots[slotIdx];
-        void* data = s.data;
-        if (data)
+        व्योम* तथ्य = s.तथ्य;
+        अगर (तथ्य)
         {
-            dataVec.push_back(data);
-            s.data = nullptr;
+            तथ्य_Vec.push_back(तथ्य);
+            s.तथ्य = nullptr;
         }
-        if (!keepSlot)
+        अगर (!keepSlot)
         {
-            s.container = NULL;  // mark slot as free (see reserveSlot() implementation)
+            s.container = शून्य;  // mark slot as free (see reserveSlot() implementation)
         }
     }
 
     // Get data by TLS storage index
-    void* getData(size_t slotIdx) const
+    व्योम* get_तथ्य(माप_प्रकार slotIdx) स्थिर
     {
         CV_Assert(slotIdx < slots.size());
-        const SlotInfo& s = slots[slotIdx];
-        return s.data;
+        स्थिर SlotInfo& s = slots[slotIdx];
+        वापस s.तथ्य;
     }
 
     // Gather data from threads by TLS storage index
-    void gather(size_t slotIdx, std::vector<void*> &dataVec)
+    व्योम gather(माप_प्रकार slotIdx, std::vector<व्योम*> &तथ्य_Vec)
     {
         CV_Assert(slotIdx < slots.size());
         SlotInfo& s = slots[slotIdx];
-        void* data = s.data;
-        if (data)
-            dataVec.push_back(data);
-        return;
+        व्योम* तथ्य = s.तथ्य;
+        अगर (तथ्य)
+            तथ्य_Vec.push_back(तथ्य);
+        वापस;
     }
 
     // Set data to storage index
-    void setData(size_t slotIdx, void* pData)
+    व्योम set_तथ्य(माप_प्रकार slotIdx, व्योम* p_तथ्य)
     {
         CV_Assert(slotIdx < slots.size());
         SlotInfo& s = slots[slotIdx];
-        s.data = pData;
+        s.तथ्य = p_तथ्य;
     }
 
-private:
-    struct SlotInfo
+निजी:
+    काष्ठा SlotInfo
     {
-        SlotInfo(TLSDataContainer* _container) : container(_container), data(nullptr) {}
+        SlotInfo(TLSDataContainer* _container) : container(_container), तथ्य(nullptr) {}
         TLSDataContainer* container;  // attached container (to dispose data)
-        void* data;
+        व्योम* तथ्य;
     };
-    std::vector<struct SlotInfo> slots;
+    std::vector<काष्ठा SlotInfo> slots;
 };
 
-static TlsStorage& getTlsStorage()
+अटल TlsStorage& getTlsStorage()
 {
-    static TlsStorage g_storage;  // no threading
-    return g_storage;
+    अटल TlsStorage g_storage;  // no threading
+    वापस g_storage;
 }
 
-#endif  // OPENCV_DISABLE_THREAD_SUPPORT
+#पूर्ण_अगर  // OPENCV_DISABLE_THREAD_SUPPORT
 
 } // namespace details
 using namespace details;
 
-void releaseTlsStorageThread()
+व्योम releaseTlsStorageThread()
 {
-#ifndef OPENCV_DISABLE_THREAD_SUPPORT
-    if (!g_isTlsStorageInitialized)
-        return;  // nothing to release, so prefer to avoid creation of new global structures
+#अगर_अघोषित OPENCV_DISABLE_THREAD_SUPPORT
+    अगर (!g_isTlsStorageInitialized)
+        वापस;  // nothing to release, so prefer to avoid creation of new global structures
     getTlsStorage().releaseThread();
-#endif
+#पूर्ण_अगर
 }
 
 TLSDataContainer::TLSDataContainer()
 {
-    key_ = (int)getTlsStorage().reserveSlot(this); // Reserve key from TLS storage
+    कुंजी_2 = (पूर्णांक)getTlsStorage().reserveSlot(यह); // Reserve key from TLS storage
 }
 
 TLSDataContainer::~TLSDataContainer()
 {
-    CV_Assert(key_ == -1); // Key must be released in child object
+    CV_Assert(कुंजी_2 == -1); // Key must be released in child object
 }
 
-void TLSDataContainer::gatherData(std::vector<void*> &data) const
+व्योम TLSDataContainer::gather_तथ्य(std::vector<व्योम*> &तथ्य) स्थिर
 {
-    getTlsStorage().gather(key_, data);
+    getTlsStorage().gather(कुंजी_2, तथ्य);
 }
 
-void TLSDataContainer::detachData(std::vector<void*> &data)
+व्योम TLSDataContainer::detach_तथ्य(std::vector<व्योम*> &तथ्य)
 {
-    getTlsStorage().releaseSlot(key_, data, true);
+    getTlsStorage().releaseSlot(कुंजी_2, तथ्य, true);
 }
 
-void TLSDataContainer::release()
+व्योम TLSDataContainer::release()
 {
-    if (key_ == -1)
-        return;  // already released
-    std::vector<void*> data; data.reserve(32);
-    getTlsStorage().releaseSlot(key_, data, false); // Release key and get stored data for proper destruction
-    key_ = -1;
-    for(size_t i = 0; i < data.size(); i++)  // Delete all associated data
-        deleteDataInstance(data[i]);
+    अगर (कुंजी_2 == -1)
+        वापस;  // already released
+    std::vector<व्योम*> तथ्य; तथ्य.reserve(32);
+    getTlsStorage().releaseSlot(कुंजी_2, तथ्य, false); // Release key and get stored data for proper destruction
+    कुंजी_2 = -1;
+    क्रम(माप_प्रकार i = 0; i < तथ्य.size(); i++)  // Delete all associated data
+        delete_तथ्य_Instance(तथ्य[i]);
 }
 
-void TLSDataContainer::cleanup()
+व्योम TLSDataContainer::cleanup()
 {
-    std::vector<void*> data; data.reserve(32);
-    getTlsStorage().releaseSlot(key_, data, true); // Extract stored data with removal from TLS tables
-    for(size_t i = 0; i < data.size(); i++)  // Delete all associated data
-        deleteDataInstance(data[i]);
+    std::vector<व्योम*> तथ्य; तथ्य.reserve(32);
+    getTlsStorage().releaseSlot(कुंजी_2, तथ्य, true); // Extract stored data with removal from TLS tables
+    क्रम(माप_प्रकार i = 0; i < तथ्य.size(); i++)  // Delete all associated data
+        delete_तथ्य_Instance(तथ्य[i]);
 }
 
-void* TLSDataContainer::getData() const
+व्योम* TLSDataContainer::get_तथ्य() स्थिर
 {
-    CV_Assert(key_ != -1 && "Can't fetch data from terminated TLS container.");
-    void* pData = getTlsStorage().getData(key_); // Check if data was already allocated
-    if(!pData)
+    CV_Assert(कुंजी_2 != -1 && "Can't fetch data from terminated TLS container.");
+    व्योम* p_तथ्य = getTlsStorage().get_तथ्य(कुंजी_2); // Check if data was already allocated
+    अगर(!p_तथ्य)
     {
         // Create new data instance and save it to TLS storage
-        pData = createDataInstance();
-        try
+        p_तथ्य = create_तथ्य_Instance();
+        प्रयास
         {
-            getTlsStorage().setData(key_, pData);
+            getTlsStorage().set_तथ्य(कुंजी_2, p_तथ्य);
         }
-        catch (...)
+        पकड़ो (...)
         {
-            deleteDataInstance(pData);
-            throw;
+            delete_तथ्य_Instance(p_तथ्य);
+            फेंको;
         }
     }
-    return pData;
+    वापस p_तथ्य;
 }
 
-static TLSData<CoreTLSData>& getCoreTlsDataTLS()
+अटल TLSData<CoreTLSData>& get_Core_Tls_तथ्य_TLS()
 {
-    CV_SINGLETON_LAZY_INIT_REF(TLSData<CoreTLSData>, new TLSData<CoreTLSData>())
+    CV_SINGLETON_LAZY_INIT_REF(TLSData<CoreTLSData>, नया TLSData<CoreTLSData>())
 }
 
-CoreTLSData& getCoreTlsData()
+CoreTLSData& get_Core_Tls_तथ्य()
 {
-    return getCoreTlsDataTLS().getRef();
+    वापस get_Core_Tls_तथ्य_TLS().getRef();
 }
 
-#if defined CVAPI_EXPORTS && defined _WIN32 && !defined WINCE
-#ifdef WINRT
-    #pragma warning(disable:4447) // Disable warning 'main' signature found without threading model
-#endif
+#अगर defined CVAPI_EXPORTS && defined _WIN32 && !defined WINCE
+#अगर_घोषित WINRT
+    #आशय warning(disable:4447) // Disable warning 'main' signature found without threading model
+#पूर्ण_अगर
 
-extern "C"
+बाह्य "C"
 BOOL WINAPI DllMain(HINSTANCE, DWORD fdwReason, LPVOID lpReserved);
 
-extern "C"
+बाह्य "C"
 BOOL WINAPI DllMain(HINSTANCE, DWORD fdwReason, LPVOID lpReserved)
 {
-    if (fdwReason == DLL_THREAD_DETACH || fdwReason == DLL_PROCESS_DETACH)
+    अगर (fdwReason == DLL_THREAD_DETACH || fdwReason == DLL_PROCESS_DETACH)
     {
-        if (lpReserved != NULL) // called after ExitProcess() call
+        अगर (lpReserved != शून्य) // called after ExitProcess() call
         {
             cv::__termination = true;
         }
-        else
+        अन्यथा
         {
             // Not allowed to free resources if lpReserved is non-null
             // http://msdn.microsoft.com/en-us/library/windows/desktop/ms682583.aspx
             releaseTlsStorageThread();
         }
     }
-    return TRUE;
+    वापस TRUE;
 }
-#endif
+#पूर्ण_अगर
 
 
 namespace {
 
-#ifdef OPENCV_WITH_ITT
+#अगर_घोषित OPENCV_WITH_ITT
 bool overrideThreadName()
 {
-    static bool param = utils::getConfigurationParameterBool("OPENCV_TRACE_ITT_SET_THREAD_NAME", false);
-    return param;
+    अटल bool param = utils::getConfigurationParameterBool("OPENCV_TRACE_ITT_SET_THREAD_NAME", false);
+    वापस param;
 }
-#endif
+#पूर्ण_अगर
 
-static int g_threadNum = 0;
-class ThreadID {
-public:
-    const int id;
+अटल पूर्णांक g_thread_अंक = 0;
+श्रेणी ThreadID {
+खुला:
+    स्थिर पूर्णांक id;
     ThreadID() :
-        id(CV_XADD(&g_threadNum, 1))
+        id(CV_XADD(&g_thread_अंक, 1))
     {
-#ifdef OPENCV_WITH_ITT
-        if (overrideThreadName())
+#अगर_घोषित OPENCV_WITH_ITT
+        अगर (overrideThreadName())
             __itt_thread_set_name(cv::format("OpenCVThread-%03d", id).c_str());
-#endif
+#पूर्ण_अगर
     }
 };
 
-static TLSData<ThreadID>& getThreadIDTLS()
+अटल TLSData<ThreadID>& getThreadIDTLS()
 {
-    CV_SINGLETON_LAZY_INIT_REF(TLSData<ThreadID>, new TLSData<ThreadID>());
+    CV_SINGLETON_LAZY_INIT_REF(TLSData<ThreadID>, नया TLSData<ThreadID>());
 }
 
 } // namespace
-int utils::getThreadID() { return getThreadIDTLS().get()->id; }
+पूर्णांक utils::getThreadID() { वापस getThreadIDTLS().लो()->id; }
 
 
-class ParseError
+श्रेणी ParseError
 {
-    std::string bad_value;
-public:
-    ParseError(const std::string &bad_value_) :bad_value(bad_value_) {}
-    std::string toString(const std::string &param) const
+    std::string bad_मूल्य;
+खुला:
+    ParseError(स्थिर std::string &bad_मूल्य_2) :bad_मूल्य(bad_मूल्य_2) {}
+    std::string toString(स्थिर std::string &param) स्थिर
     {
         std::ostringstream out;
-        out << "Invalid value for parameter " << param << ": " << bad_value;
-        return out.str();
+        out << "Invalid value for parameter " << param << ": " << bad_मूल्य;
+        वापस out.str();
     }
 };
 
-template <typename T>
-T parseOption(const std::string &);
+ढाँचा <typename T>
+T parseOption(स्थिर std::string &);
 
-template<>
-inline bool parseOption(const std::string & value)
+ढाँचा<>
+अंतरभूत bool parseOption(स्थिर std::string & value)
 {
-    if (value == "1" || value == "True" || value == "true" || value == "TRUE")
+    अगर (value == "1" || value == "True" || value == "true" || value == "TRUE")
     {
-        return true;
+        वापस true;
     }
-    if (value == "0" || value == "False" || value == "false" || value == "FALSE")
+    अगर (value == "0" || value == "False" || value == "false" || value == "FALSE")
     {
-        return false;
+        वापस false;
     }
-    throw ParseError(value);
+    फेंको ParseError(value);
 }
 
-template<>
-inline size_t parseOption(const std::string &value)
+ढाँचा<>
+अंतरभूत माप_प्रकार parseOption(स्थिर std::string &value)
 {
-    size_t pos = 0;
-    for (; pos < value.size(); pos++)
+    माप_प्रकार pos = 0;
+    क्रम (; pos < value.size(); pos++)
     {
-        if (!isdigit(value[pos]))
-            break;
+        अगर (!है_अंक(value[pos]))
+            अवरोध;
     }
-    cv::String valueStr = value.substr(0, pos);
+    cv::String मूल्य_Str = value.substr(0, pos);
     cv::String suffixStr = value.substr(pos, value.length() - pos);
-    size_t v = (size_t)std::stoull(valueStr);
-    if (suffixStr.length() == 0)
-        return v;
-    else if (suffixStr == "MB" || suffixStr == "Mb" || suffixStr == "mb")
-        return v * 1024 * 1024;
-    else if (suffixStr == "KB" || suffixStr == "Kb" || suffixStr == "kb")
-        return v * 1024;
-    throw ParseError(value);
+    माप_प्रकार v = (माप_प्रकार)std::stoull(मूल्य_Str);
+    अगर (suffixStr.length() == 0)
+        वापस v;
+    अन्यथा अगर (suffixStr == "MB" || suffixStr == "Mb" || suffixStr == "mb")
+        वापस v * 1024 * 1024;
+    अन्यथा अगर (suffixStr == "KB" || suffixStr == "Kb" || suffixStr == "kb")
+        वापस v * 1024;
+    फेंको ParseError(value);
 }
 
-template<>
-inline cv::String parseOption(const std::string &value)
+ढाँचा<>
+अंतरभूत cv::String parseOption(स्थिर std::string &value)
 {
-    return value;
+    वापस value;
 }
 
-template<>
-inline utils::Paths parseOption(const std::string &value)
+ढाँचा<>
+अंतरभूत utils::Paths parseOption(स्थिर std::string &value)
 {
-    utils::Paths result;
-#ifdef _WIN32
-    const char sep = ';';
-#else
-    const char sep = ':';
-#endif
-    size_t start_pos = 0;
-    while (start_pos != std::string::npos)
+    utils::Paths परिणाम;
+#अगर_घोषित _WIN32
+    स्थिर अक्षर sep = ';';
+#अन्यथा
+    स्थिर अक्षर sep = ':';
+#पूर्ण_अगर
+    माप_प्रकार start_pos = 0;
+    जबतक (start_pos != std::string::npos)
     {
-        const size_t pos = value.find(sep, start_pos);
-        const std::string one_piece(value, start_pos, pos == std::string::npos ? pos : pos - start_pos);
-        if (!one_piece.empty())
-            result.push_back(one_piece);
+        स्थिर माप_प्रकार pos = value.find(sep, start_pos);
+        स्थिर std::string one_piece(value, start_pos, pos == std::string::npos ? pos : pos - start_pos);
+        अगर (!one_piece.empty())
+            परिणाम.push_back(one_piece);
         start_pos = pos == std::string::npos ? pos : pos + 1;
     }
-    return result;
+    वापस परिणाम;
 }
 
-static inline const char * envRead(const char * name)
+अटल अंतरभूत स्थिर अक्षर * envRead(स्थिर अक्षर * name)
 {
-#ifdef NO_GETENV
+#अगर_घोषित NO_GETENV
     CV_UNUSED(name);
-    return NULL;
-#else
-    return getenv(name);
-#endif
+    वापस शून्य;
+#अन्यथा
+    वापस दो_पर्या(name);
+#पूर्ण_अगर
 }
 
-template<typename T>
-inline T read(const std::string & k, const T & defaultValue)
+ढाँचा<typename T>
+अंतरभूत T पढ़ो(स्थिर std::string & k, स्थिर T & default_मूल्य_2)
 {
-    try
+    प्रयास
     {
-        const char * res = envRead(k.c_str());
-        if (res)
-            return parseOption<T>(std::string(res));
+        स्थिर अक्षर * res = envRead(k.c_str());
+        अगर (res)
+            वापस parseOption<T>(std::string(res));
     }
-    catch (const ParseError &err)
+    पकड़ो (स्थिर ParseError &err)
     {
         CV_Error(cv::Error::StsBadArg, err.toString(k));
     }
-    return defaultValue;
+    वापस default_मूल्य_2;
 }
 
-bool utils::getConfigurationParameterBool(const char* name, bool defaultValue)
+bool utils::getConfigurationParameterBool(स्थिर अक्षर* name, bool default_मूल्य_2)
 {
-    return read<bool>(name, defaultValue);
+    वापस पढ़ो<bool>(name, default_मूल्य_2);
 }
 
-size_t utils::getConfigurationParameterSizeT(const char* name, size_t defaultValue)
+माप_प्रकार utils::get_Configuration_Parameter_आकार_T(स्थिर अक्षर* name, माप_प्रकार default_मूल्य_2)
 {
-    return read<size_t>(name, defaultValue);
+    वापस पढ़ो<माप_प्रकार>(name, default_मूल्य_2);
 }
 
-std::string utils::getConfigurationParameterString(const char* name, const std::string & defaultValue)
+std::string utils::getConfigurationParameterString(स्थिर अक्षर* name, स्थिर std::string & default_मूल्य_2)
 {
-    return read<cv::String>(name, defaultValue);
+    वापस पढ़ो<cv::String>(name, default_मूल्य_2);
 }
 
-utils::Paths utils::getConfigurationParameterPaths(const char* name, const utils::Paths &defaultValue)
+utils::Paths utils::getConfigurationParameterPaths(स्थिर अक्षर* name, स्थिर utils::Paths &default_मूल्य_2)
 {
-    return read<utils::Paths>(name, defaultValue);
+    वापस पढ़ो<utils::Paths>(name, default_मूल्य_2);
 }
 
 
-#ifdef CV_COLLECT_IMPL_DATA
-ImplCollector& getImplData()
+#अगर_घोषित CV_COLLECT_IMPL_तथ्य
+ImplCollector& get_Impl_तथ्य()
 {
-    CV_SINGLETON_LAZY_INIT_REF(ImplCollector, new ImplCollector())
+    CV_SINGLETON_LAZY_INIT_REF(ImplCollector, नया ImplCollector())
 }
 
-void setImpl(int flags)
+व्योम setImpl(पूर्णांक flags)
 {
-    cv::AutoLock lock(getImplData().mutex);
+    cv::AutoLock lock(get_Impl_तथ्य().mutex);
 
-    getImplData().implFlags = flags;
-    getImplData().implCode.clear();
-    getImplData().implFun.clear();
+    get_Impl_तथ्य().implFlags = flags;
+    get_Impl_तथ्य().implCode.सफा();
+    get_Impl_तथ्य().implFun.सफा();
 }
 
-void addImpl(int flag, const char* func)
+व्योम addImpl(पूर्णांक flag, स्थिर अक्षर* func)
 {
-    cv::AutoLock lock(getImplData().mutex);
+    cv::AutoLock lock(get_Impl_तथ्य().mutex);
 
-    getImplData().implFlags |= flag;
-    if(func) // use lazy collection if name was not specified
+    get_Impl_तथ्य().implFlags |= flag;
+    अगर(func) // use lazy collection if name was not specified
     {
-        size_t index = getImplData().implCode.size();
-        if(!index || (getImplData().implCode[index-1] != flag || getImplData().implFun[index-1].compare(func))) // avoid duplicates
+        माप_प्रकार सूचकांक = get_Impl_तथ्य().implCode.size();
+        अगर(!सूचकांक || (get_Impl_तथ्य().implCode[सूचकांक-1] != flag || get_Impl_तथ्य().implFun[सूचकांक-1].compare(func))) // avoid duplicates
         {
-            getImplData().implCode.push_back(flag);
-            getImplData().implFun.push_back(func);
+            get_Impl_तथ्य().implCode.push_back(flag);
+            get_Impl_तथ्य().implFun.push_back(func);
         }
     }
 }
 
-int getImpl(std::vector<int> &impl, std::vector<String> &funName)
+पूर्णांक getImpl(std::vector<पूर्णांक> &impl, std::vector<String> &funName)
 {
-    cv::AutoLock lock(getImplData().mutex);
+    cv::AutoLock lock(get_Impl_तथ्य().mutex);
 
-    impl    = getImplData().implCode;
-    funName = getImplData().implFun;
-    return getImplData().implFlags; // return actual flags for lazy collection
+    impl    = get_Impl_तथ्य().implCode;
+    funName = get_Impl_तथ्य().implFun;
+    वापस get_Impl_तथ्य().implFlags; // return actual flags for lazy collection
 }
 
 bool useCollection()
 {
-    return getImplData().useCollection;
+    वापस get_Impl_तथ्य().useCollection;
 }
 
-void setUseCollection(bool flag)
+व्योम setUseCollection(bool flag)
 {
-    cv::AutoLock lock(getImplData().mutex);
+    cv::AutoLock lock(get_Impl_तथ्य().mutex);
 
-    getImplData().useCollection = flag;
+    get_Impl_तथ्य().useCollection = flag;
 }
-#endif
+#पूर्ण_अगर
 
 namespace instr
 {
 bool useInstrumentation()
 {
-#ifdef ENABLE_INSTRUMENTATION
-    return getInstrumentStruct().useInstr;
-#else
-    return false;
-#endif
+#अगर_घोषित ENABLE_INSTRUMENTATION
+    वापस getInstrumentStruct().useInstr;
+#अन्यथा
+    वापस false;
+#पूर्ण_अगर
 }
 
-void setUseInstrumentation(bool flag)
+व्योम setUseInstrumentation(bool flag)
 {
-#ifdef ENABLE_INSTRUMENTATION
+#अगर_घोषित ENABLE_INSTRUMENTATION
     getInstrumentStruct().useInstr = flag;
-#else
+#अन्यथा
     CV_UNUSED(flag);
-#endif
+#पूर्ण_अगर
 }
 
-InstrNode* getTrace()
+Instr_गाँठ* getTrace()
 {
-#ifdef ENABLE_INSTRUMENTATION
-    return &getInstrumentStruct().rootNode;
-#else
-    return NULL;
-#endif
+#अगर_घोषित ENABLE_INSTRUMENTATION
+    वापस &getInstrumentStruct().मूल_गाँठ_2;
+#अन्यथा
+    वापस शून्य;
+#पूर्ण_अगर
 }
 
-void resetTrace()
+व्योम resetTrace()
 {
-#ifdef ENABLE_INSTRUMENTATION
-    getInstrumentStruct().rootNode.removeChilds();
-    getInstrumentTLSStruct().pCurrentNode = &getInstrumentStruct().rootNode;
-#endif
+#अगर_घोषित ENABLE_INSTRUMENTATION
+    getInstrumentStruct().मूल_गाँठ_2.removeChilds();
+    getInstrumentTLSStruct().p_Current_गाँठ = &getInstrumentStruct().मूल_गाँठ_2;
+#पूर्ण_अगर
 }
 
-void setFlags(FLAGS modeFlags)
+व्योम setFlags(FLAGS modeFlags)
 {
-#ifdef ENABLE_INSTRUMENTATION
+#अगर_घोषित ENABLE_INSTRUMENTATION
     getInstrumentStruct().flags = modeFlags;
-#else
+#अन्यथा
     CV_UNUSED(modeFlags);
-#endif
+#पूर्ण_अगर
 }
 FLAGS getFlags()
 {
-#ifdef ENABLE_INSTRUMENTATION
-    return (FLAGS)getInstrumentStruct().flags;
-#else
-    return (FLAGS)0;
-#endif
+#अगर_घोषित ENABLE_INSTRUMENTATION
+    वापस (FLAGS)getInstrumentStruct().flags;
+#अन्यथा
+    वापस (FLAGS)0;
+#पूर्ण_अगर
 }
 
-NodeData::NodeData(const char* funName, const char* fileName, int lineNum, void* retAddress, bool alwaysExpand, cv::instr::TYPE instrType, cv::instr::IMPL implType)
+गाँठ_तथ्य::गाँठ_तथ्य(स्थिर अक्षर* funName, स्थिर अक्षर* fileName, पूर्णांक पंक्ति_अंक, व्योम* retAddress, bool alwaysExpand, cv::instr::TYPE instrType, cv::instr::IMPL implType)
 {
     m_funName       = funName ? cv::String(funName) : cv::String();  // std::string doesn't accept NULL
     m_instrType     = instrType;
     m_implType      = implType;
     m_fileName      = fileName;
-    m_lineNum       = lineNum;
+    m_पंक्ति_अंक       = पंक्ति_अंक;
     m_retAddress    = retAddress;
     m_alwaysExpand  = alwaysExpand;
 
     m_threads    = 1;
-    m_counter    = 0;
-    m_ticksTotal = 0;
+    m_गणक    = 0;
+    m_ticks_योग = 0;
 
     m_funError  = false;
 }
-NodeData::NodeData(NodeData &ref)
+गाँठ_तथ्य::गाँठ_तथ्य(गाँठ_तथ्य &ref)
 {
-    *this = ref;
+    *यह = ref;
 }
-NodeData& NodeData::operator=(const NodeData &right)
+गाँठ_तथ्य& गाँठ_तथ्य::चालक=(स्थिर गाँठ_तथ्य &दाँए)
 {
-    this->m_funName      = right.m_funName;
-    this->m_instrType    = right.m_instrType;
-    this->m_implType     = right.m_implType;
-    this->m_fileName     = right.m_fileName;
-    this->m_lineNum      = right.m_lineNum;
-    this->m_retAddress   = right.m_retAddress;
-    this->m_alwaysExpand = right.m_alwaysExpand;
+    यह->m_funName      = दाँए.m_funName;
+    यह->m_instrType    = दाँए.m_instrType;
+    यह->m_implType     = दाँए.m_implType;
+    यह->m_fileName     = दाँए.m_fileName;
+    यह->m_पंक्ति_अंक      = दाँए.m_पंक्ति_अंक;
+    यह->m_retAddress   = दाँए.m_retAddress;
+    यह->m_alwaysExpand = दाँए.m_alwaysExpand;
 
-    this->m_threads     = right.m_threads;
-    this->m_counter     = right.m_counter;
-    this->m_ticksTotal  = right.m_ticksTotal;
+    यह->m_threads     = दाँए.m_threads;
+    यह->m_गणक     = दाँए.m_गणक;
+    यह->m_ticks_योग  = दाँए.m_ticks_योग;
 
-    this->m_funError    = right.m_funError;
+    यह->m_funError    = दाँए.m_funError;
 
-    return *this;
+    वापस *यह;
 }
-NodeData::~NodeData()
+गाँठ_तथ्य::~गाँठ_तथ्य()
 {
 }
-bool operator==(const NodeData& left, const NodeData& right)
+bool चालक==(स्थिर गाँठ_तथ्य& बाँए, स्थिर गाँठ_तथ्य& दाँए)
 {
-    if(left.m_lineNum == right.m_lineNum && left.m_funName == right.m_funName && left.m_fileName == right.m_fileName)
+    अगर(बाँए.m_पंक्ति_अंक == दाँए.m_पंक्ति_अंक && बाँए.m_funName == दाँए.m_funName && बाँए.m_fileName == दाँए.m_fileName)
     {
-        if(left.m_retAddress == right.m_retAddress || !(cv::instr::getFlags()&cv::instr::FLAGS_EXPAND_SAME_NAMES || left.m_alwaysExpand))
-            return true;
+        अगर(बाँए.m_retAddress == दाँए.m_retAddress || !(cv::instr::getFlags()&cv::instr::FLAGS_EXPAND_SAME_NAMES || बाँए.m_alwaysExpand))
+            वापस true;
     }
-    return false;
+    वापस false;
 }
 
-#ifdef ENABLE_INSTRUMENTATION
+#अगर_घोषित ENABLE_INSTRUMENTATION
 InstrStruct& getInstrumentStruct()
 {
-    static InstrStruct instr;
-    return instr;
+    अटल InstrStruct instr;
+    वापस instr;
 }
 
 InstrTLSStruct& getInstrumentTLSStruct()
 {
-    return *getInstrumentStruct().tlsStruct.get();
+    वापस *getInstrumentStruct().tlsStruct.लो();
 }
 
-InstrNode* getCurrentNode()
+Instr_गाँठ* get_Current_गाँठ()
 {
-    return getInstrumentTLSStruct().pCurrentNode;
+    वापस getInstrumentTLSStruct().p_Current_गाँठ;
 }
 
-IntrumentationRegion::IntrumentationRegion(const char* funName, const char* fileName, int lineNum, void *retAddress, bool alwaysExpand, TYPE instrType, IMPL implType)
+IntrumentationRegion::IntrumentationRegion(स्थिर अक्षर* funName, स्थिर अक्षर* fileName, पूर्णांक पंक्ति_अंक, व्योम *retAddress, bool alwaysExpand, TYPE instrType, IMPL implType)
 {
     m_disabled    = false;
     m_regionTicks = 0;
 
     InstrStruct *pStruct = &getInstrumentStruct();
-    if(pStruct->useInstr)
+    अगर(pStruct->useInstr)
     {
         InstrTLSStruct *pTLS = &getInstrumentTLSStruct();
 
         // Disable in case of failure
-        if(!pTLS->pCurrentNode)
+        अगर(!pTLS->p_Current_गाँठ)
         {
             m_disabled = true;
-            return;
+            वापस;
         }
 
-        int depth = pTLS->pCurrentNode->getDepth();
-        if(pStruct->maxDepth && pStruct->maxDepth <= depth)
+        पूर्णांक depth = pTLS->p_Current_गाँठ->getDepth();
+        अगर(pStruct->maxDepth && pStruct->maxDepth <= depth)
         {
             m_disabled = true;
-            return;
+            वापस;
         }
 
-        NodeData payload(funName, fileName, lineNum, retAddress, alwaysExpand, instrType, implType);
-        Node<NodeData>* pChild = NULL;
+        गाँठ_तथ्य payload(funName, fileName, पंक्ति_अंक, retAddress, alwaysExpand, instrType, implType);
+        Node<गाँठ_तथ्य>* pChild = शून्य;
 
-        if(pStruct->flags&FLAGS_MAPPING)
+        अगर(pStruct->flags&FLAGS_MAPPING)
         {
             // Critical section
             cv::AutoLock guard(pStruct->mutexCreate); // Guard from concurrent child creation
-            pChild = pTLS->pCurrentNode->findChild(payload);
-            if(!pChild)
+            pChild = pTLS->p_Current_गाँठ->findChild(payload);
+            अगर(!pChild)
             {
-                pChild = new Node<NodeData>(payload);
-                pTLS->pCurrentNode->addChild(pChild);
+                pChild = नया Node<गाँठ_तथ्य>(payload);
+                pTLS->p_Current_गाँठ->addChild(pChild);
             }
         }
-        else
+        अन्यथा
         {
-            pChild = pTLS->pCurrentNode->findChild(payload);
-            if(!pChild)
+            pChild = pTLS->p_Current_गाँठ->findChild(payload);
+            अगर(!pChild)
             {
                 m_disabled = true;
-                return;
+                वापस;
             }
         }
-        pTLS->pCurrentNode = pChild;
+        pTLS->p_Current_गाँठ = pChild;
 
-        m_regionTicks = getTickCount();
+        m_regionTicks = get_Tick_गिनती();
     }
 }
 
 IntrumentationRegion::~IntrumentationRegion()
 {
     InstrStruct *pStruct = &getInstrumentStruct();
-    if(pStruct->useInstr)
+    अगर(pStruct->useInstr)
     {
-        if(!m_disabled)
+        अगर(!m_disabled)
         {
             InstrTLSStruct *pTLS = &getInstrumentTLSStruct();
 
-            if (pTLS->pCurrentNode->m_payload.m_implType == cv::instr::IMPL_OPENCL &&
-                (pTLS->pCurrentNode->m_payload.m_instrType == cv::instr::TYPE_FUN ||
-                    pTLS->pCurrentNode->m_payload.m_instrType == cv::instr::TYPE_WRAPPER))
+            अगर (pTLS->p_Current_गाँठ->m_payload.m_implType == cv::instr::IMPL_OPENCL &&
+                (pTLS->p_Current_गाँठ->m_payload.m_instrType == cv::instr::TYPE_FUN ||
+                    pTLS->p_Current_गाँठ->m_payload.m_instrType == cv::instr::TYPE_WRAPPER))
             {
                 cv::ocl::finish(); // TODO Support "async" OpenCL instrumentation
             }
 
-            uint64 ticks = (getTickCount() - m_regionTicks);
+            uint64 ticks = (get_Tick_गिनती() - m_regionTicks);
             {
-                cv::AutoLock guard(pStruct->mutexCount); // Concurrent ticks accumulation
-                pTLS->pCurrentNode->m_payload.m_counter++;
-                pTLS->pCurrentNode->m_payload.m_ticksTotal += ticks;
-                pTLS->pCurrentNode->m_payload.m_tls.get()->m_ticksTotal += ticks;
+                cv::AutoLock guard(pStruct->mutex_गिनती); // Concurrent ticks accumulation
+                pTLS->p_Current_गाँठ->m_payload.m_गणक++;
+                pTLS->p_Current_गाँठ->m_payload.m_ticks_योग += ticks;
+                pTLS->p_Current_गाँठ->m_payload.m_tls.लो()->m_ticks_योग += ticks;
             }
 
-            pTLS->pCurrentNode = pTLS->pCurrentNode->m_pParent;
+            pTLS->p_Current_गाँठ = pTLS->p_Current_गाँठ->m_pParent;
         }
     }
 }
-#endif
+#पूर्ण_अगर
 }
 
 namespace ipp
 {
 
-#ifdef HAVE_IPP
-struct IPPInitSingleton
+#अगर_घोषित HAVE_IPP
+काष्ठा IPPInitSingleton
 {
-public:
+खुला:
     IPPInitSingleton()
     {
         useIPP         = true;
 
-#if defined(OPENCV_ALGO_HINT_DEFAULT)
+#अगर defined(OPENCV_ALGO_HINT_DEFAULT)
         useIPP_NE      = OPENCV_ALGO_HINT_DEFAULT == cv::ALGO_HINT_APPROX;
-#else
+#अन्यथा
         useIPP_NE      = false;
-#endif
+#पूर्ण_अगर
         ippStatus      = 0;
-        funcname       = NULL;
-        filename       = NULL;
+        funcname       = शून्य;
+        filename       = शून्य;
         linen          = 0;
         cpuFeatures    = 0;
         ippFeatures    = 0;
-        ippTopFeatures = 0;
-        pIppLibInfo    = NULL;
+        ipp_शीर्ष_Features = 0;
+        pIppLibInfo    = शून्य;
 
-        ippStatus = ippGetCpuFeatures(&cpuFeatures, NULL);
-        if(ippStatus < 0)
+        ippStatus = ippGetCpuFeatures(&cpuFeatures, शून्य);
+        अगर(ippStatus < 0)
         {
-            CV_LOG_ERROR(NULL, "ERROR: IPP cannot detect CPU features, IPP was disabled");
+            CV_LOG_ERROR(शून्य, "ERROR: IPP cannot detect CPU features, IPP was disabled");
             useIPP = false;
-            return;
+            वापस;
         }
         ippFeatures = cpuFeatures;
 
         std::string env = utils::getConfigurationParameterString("OPENCV_IPP");
-        if(!env.empty())
+        अगर(!env.empty())
         {
-#if IPP_VERSION_X100 >= 201900
-            const Ipp64u minorFeatures = ippCPUID_MOVBE|ippCPUID_AES|ippCPUID_CLMUL|ippCPUID_ABR|ippCPUID_RDRAND|ippCPUID_F16C|
+#अगर IPP_VERSION_X100 >= 201900
+            स्थिर Ipp64u minorFeatures = ippCPUID_MOVBE|ippCPUID_AES|ippCPUID_CLMUL|ippCPUID_ABR|ippCPUID_RDRAND|ippCPUID_F16C|
                 ippCPUID_ADCOX|ippCPUID_RDSEED|ippCPUID_PREFETCHW|ippCPUID_SHA|ippCPUID_MPX|ippCPUID_AVX512CD|ippCPUID_AVX512ER|
                 ippCPUID_AVX512PF|ippCPUID_AVX512BW|ippCPUID_AVX512DQ|ippCPUID_AVX512VL|ippCPUID_AVX512VBMI|ippCPUID_AVX512_4FMADDPS|
                 ippCPUID_AVX512_4VNNIW|ippCPUID_AVX512IFMA;
-#elif IPP_VERSION_X100 >= 201703
-            const Ipp64u minorFeatures = ippCPUID_MOVBE|ippCPUID_AES|ippCPUID_CLMUL|ippCPUID_ABR|ippCPUID_RDRAND|ippCPUID_F16C|
+#या_अगर IPP_VERSION_X100 >= 201703
+            स्थिर Ipp64u minorFeatures = ippCPUID_MOVBE|ippCPUID_AES|ippCPUID_CLMUL|ippCPUID_ABR|ippCPUID_RDRAND|ippCPUID_F16C|
                 ippCPUID_ADCOX|ippCPUID_RDSEED|ippCPUID_PREFETCHW|ippCPUID_SHA|ippCPUID_MPX|ippCPUID_AVX512CD|ippCPUID_AVX512ER|
                 ippCPUID_AVX512PF|ippCPUID_AVX512BW|ippCPUID_AVX512DQ|ippCPUID_AVX512VL|ippCPUID_AVX512VBMI;
-#elif IPP_VERSION_X100 >= 201700
-            const Ipp64u minorFeatures = ippCPUID_MOVBE|ippCPUID_AES|ippCPUID_CLMUL|ippCPUID_ABR|ippCPUID_RDRAND|ippCPUID_F16C|
+#या_अगर IPP_VERSION_X100 >= 201700
+            स्थिर Ipp64u minorFeatures = ippCPUID_MOVBE|ippCPUID_AES|ippCPUID_CLMUL|ippCPUID_ABR|ippCPUID_RDRAND|ippCPUID_F16C|
                 ippCPUID_ADCOX|ippCPUID_RDSEED|ippCPUID_PREFETCHW|ippCPUID_SHA|ippCPUID_AVX512CD|ippCPUID_AVX512ER|
                 ippCPUID_AVX512PF|ippCPUID_AVX512BW|ippCPUID_AVX512DQ|ippCPUID_AVX512VL|ippCPUID_AVX512VBMI;
-#else
-            const Ipp64u minorFeatures = 0;
-#endif
+#अन्यथा
+            स्थिर Ipp64u minorFeatures = 0;
+#पूर्ण_अगर
 
             env = toLowerCase(env);
-            if(env.substr(0, 2) == "ne")
+            अगर(env.substr(0, 2) == "ne")
             {
                 useIPP_NE = true;
                 env = env.substr(3, env.size());
             }
 
-            if(env == "disabled")
+            अगर(env == "disabled")
             {
-                CV_LOG_WARNING(NULL, "WARNING: IPP was disabled by OPENCV_IPP environment variable");
+                CV_LOG_WARNING(शून्य, "WARNING: IPP was disabled by OPENCV_IPP environment variable");
                 useIPP = false;
             }
-            else if(env == "sse42")
+            अन्यथा अगर(env == "sse42")
                 ippFeatures = minorFeatures|ippCPUID_SSE2|ippCPUID_SSE3|ippCPUID_SSSE3|ippCPUID_SSE41|ippCPUID_SSE42;
-            else if(env == "avx2")
+            अन्यथा अगर(env == "avx2")
                 ippFeatures = minorFeatures|ippCPUID_SSE2|ippCPUID_SSE3|ippCPUID_SSSE3|ippCPUID_SSE41|ippCPUID_SSE42|ippCPUID_AVX|ippCPUID_AVX2;
-#if IPP_VERSION_X100 >= 201700
-#if defined (_M_AMD64) || defined (__x86_64__)
-            else if(env == "avx512")
+#अगर IPP_VERSION_X100 >= 201700
+#अगर defined (_M_AMD64) || defined (__x86_64__)
+            अन्यथा अगर(env == "avx512")
                 ippFeatures = minorFeatures|ippCPUID_SSE2|ippCPUID_SSE3|ippCPUID_SSSE3|ippCPUID_SSE41|ippCPUID_SSE42|ippCPUID_AVX|ippCPUID_AVX2|ippCPUID_AVX512F;
-#endif
-#endif
-            else
-                CV_LOG_ERROR(NULL, "ERROR: Improper value of OPENCV_IPP: " << env.c_str() << ". Correct values are: disabled, sse42, avx2, avx512 (Intel64 only)");
+#पूर्ण_अगर
+#पूर्ण_अगर
+            अन्यथा
+                CV_LOG_ERROR(शून्य, "ERROR: Improper value of OPENCV_IPP: " << env.c_str() << ". Correct values are: disabled, sse42, avx2, avx512 (Intel64 only)");
 
             // Trim unsupported features
             ippFeatures &= cpuFeatures;
         }
 
         // Disable AVX1 since we don't track regressions for it. SSE42 will be used instead
-        if(cpuFeatures&ippCPUID_AVX && !(cpuFeatures&ippCPUID_AVX2))
+        अगर(cpuFeatures&ippCPUID_AVX && !(cpuFeatures&ippCPUID_AVX2))
             ippFeatures &= ~((Ipp64u)ippCPUID_AVX);
 
         // IPP integrations in OpenCV support only SSE4.2, AVX2 and AVX-512 optimizations.
-        if(!(
-#if IPP_VERSION_X100 >= 201700
+        अगर(!(
+#अगर IPP_VERSION_X100 >= 201700
             cpuFeatures&ippCPUID_AVX512F ||
-#endif
+#पूर्ण_अगर
             cpuFeatures&ippCPUID_AVX2 ||
             cpuFeatures&ippCPUID_SSE42
             ))
         {
             useIPP = false;
-            return;
+            वापस;
         }
 
-        if(ippFeatures == cpuFeatures)
+        अगर(ippFeatures == cpuFeatures)
             IPP_INITIALIZER(0)
-        else
+        अन्यथा
             IPP_INITIALIZER(ippFeatures)
         ippFeatures = ippGetEnabledCpuFeatures();
 
         // Detect top level optimizations to make comparison easier for optimizations dependent conditions
-#if IPP_VERSION_X100 >= 201700
-        if(ippFeatures&ippCPUID_AVX512F)
+#अगर IPP_VERSION_X100 >= 201700
+        अगर(ippFeatures&ippCPUID_AVX512F)
         {
-            if((ippFeatures&ippCPUID_AVX512_SKX) == ippCPUID_AVX512_SKX)
-                ippTopFeatures = ippCPUID_AVX512_SKX;
-            else if((ippFeatures&ippCPUID_AVX512_KNL) == ippCPUID_AVX512_KNL)
-                ippTopFeatures = ippCPUID_AVX512_KNL;
-            else
-                ippTopFeatures = ippCPUID_AVX512F; // Unknown AVX512 configuration
+            अगर((ippFeatures&ippCPUID_AVX512_SKX) == ippCPUID_AVX512_SKX)
+                ipp_शीर्ष_Features = ippCPUID_AVX512_SKX;
+            अन्यथा अगर((ippFeatures&ippCPUID_AVX512_KNL) == ippCPUID_AVX512_KNL)
+                ipp_शीर्ष_Features = ippCPUID_AVX512_KNL;
+            अन्यथा
+                ipp_शीर्ष_Features = ippCPUID_AVX512F; // Unknown AVX512 configuration
         }
-        else
-#endif
-        if(ippFeatures&ippCPUID_AVX2)
-            ippTopFeatures = ippCPUID_AVX2;
-        else if(ippFeatures&ippCPUID_SSE42)
-            ippTopFeatures = ippCPUID_SSE42;
+        अन्यथा
+#पूर्ण_अगर
+        अगर(ippFeatures&ippCPUID_AVX2)
+            ipp_शीर्ष_Features = ippCPUID_AVX2;
+        अन्यथा अगर(ippFeatures&ippCPUID_SSE42)
+            ipp_शीर्ष_Features = ippCPUID_SSE42;
 
         pIppLibInfo = ippiGetLibVersion();
 
         // workaround: https://github.com/opencv/opencv/issues/12959
         std::string ippName(pIppLibInfo->Name ? pIppLibInfo->Name : "");
-        if (ippName.find("SSE4.2") != std::string::npos)
+        अगर (ippName.find("SSE4.2") != std::string::npos)
         {
-            ippTopFeatures = ippCPUID_SSE42;
+            ipp_शीर्ष_Features = ippCPUID_SSE42;
         }
     }
 
-public:
+खुला:
     bool        useIPP;
     bool        useIPP_NE;
 
-    int         ippStatus;  // 0 - all is ok, -1 - IPP functions failed
-    const char *funcname;
-    const char *filename;
-    int         linen;
+    पूर्णांक         ippStatus;  // 0 - all is ok, -1 - IPP functions failed
+    स्थिर अक्षर *funcname;
+    स्थिर अक्षर *filename;
+    पूर्णांक         linen;
     Ipp64u      ippFeatures;
     Ipp64u      cpuFeatures;
-    Ipp64u      ippTopFeatures;
-    const IppLibraryVersion *pIppLibInfo;
+    Ipp64u      ipp_शीर्ष_Features;
+    स्थिर IppLibraryVersion *pIppLibInfo;
 };
 
-static IPPInitSingleton& getIPPSingleton()
+अटल IPPInitSingleton& getIPPSingleton()
 {
-    CV_SINGLETON_LAZY_INIT_REF(IPPInitSingleton, new IPPInitSingleton())
+    CV_SINGLETON_LAZY_INIT_REF(IPPInitSingleton, नया IPPInitSingleton())
 }
-#endif
+#पूर्ण_अगर
 
-unsigned long long getIppFeatures()
+अचिन्हित दीर्घ दीर्घ getIppFeatures()
 {
-#ifdef HAVE_IPP
-    return getIPPSingleton().ippFeatures;
-#else
-    return 0;
-#endif
+#अगर_घोषित HAVE_IPP
+    वापस getIPPSingleton().ippFeatures;
+#अन्यथा
+    वापस 0;
+#पूर्ण_अगर
 }
 
-#ifdef HAVE_IPP
-unsigned long long getIppTopFeatures()
+#अगर_घोषित HAVE_IPP
+अचिन्हित दीर्घ दीर्घ get_Ipp_शीर्ष_Features()
 {
-    return getIPPSingleton().ippTopFeatures;
+    वापस getIPPSingleton().ipp_शीर्ष_Features;
 }
-#endif
+#पूर्ण_अगर
 
-void setIppStatus(int status, const char * const _funcname, const char * const _filename, int _line)
+व्योम setIppStatus(पूर्णांक status, स्थिर अक्षर * स्थिर _funcname, स्थिर अक्षर * स्थिर _filename, पूर्णांक पंक्ति_3)
 {
-#ifdef HAVE_IPP
+#अगर_घोषित HAVE_IPP
     getIPPSingleton().ippStatus = status;
     getIPPSingleton().funcname = _funcname;
     getIPPSingleton().filename = _filename;
-    getIPPSingleton().linen = _line;
-#else
-    CV_UNUSED(status); CV_UNUSED(_funcname); CV_UNUSED(_filename); CV_UNUSED(_line);
-#endif
+    getIPPSingleton().linen = पंक्ति_3;
+#अन्यथा
+    CV_UNUSED(status); CV_UNUSED(_funcname); CV_UNUSED(_filename); CV_UNUSED(पंक्ति_3);
+#पूर्ण_अगर
 }
 
-int getIppStatus()
+पूर्णांक getIppStatus()
 {
-#ifdef HAVE_IPP
-    return getIPPSingleton().ippStatus;
-#else
-    return 0;
-#endif
+#अगर_घोषित HAVE_IPP
+    वापस getIPPSingleton().ippStatus;
+#अन्यथा
+    वापस 0;
+#पूर्ण_अगर
 }
 
 String getIppErrorLocation()
 {
-#ifdef HAVE_IPP
-    return format("%s:%d %s", getIPPSingleton().filename ? getIPPSingleton().filename : "", getIPPSingleton().linen, getIPPSingleton().funcname ? getIPPSingleton().funcname : "");
-#else
-    return String();
-#endif
+#अगर_घोषित HAVE_IPP
+    वापस format("%s:%d %s", getIPPSingleton().filename ? getIPPSingleton().filename : "", getIPPSingleton().linen, getIPPSingleton().funcname ? getIPPSingleton().funcname : "");
+#अन्यथा
+    वापस String();
+#पूर्ण_अगर
 }
 
 String getIppVersion()
 {
-#ifdef HAVE_IPP
-    const IppLibraryVersion *pInfo = getIPPSingleton().pIppLibInfo;
-    if(pInfo)
-        return format("%s %s %s", pInfo->Name, pInfo->Version, pInfo->BuildDate);
-    else
-        return String("error");
-#else
-    return String("disabled");
-#endif
+#अगर_घोषित HAVE_IPP
+    स्थिर IppLibraryVersion *pInfo = getIPPSingleton().pIppLibInfo;
+    अगर(pInfo)
+        वापस format("%s %s %s", pInfo->Name, pInfo->Version, pInfo->BuildDate);
+    अन्यथा
+        वापस String("error");
+#अन्यथा
+    वापस String("disabled");
+#पूर्ण_अगर
 }
 
 bool useIPP()
 {
-#ifdef HAVE_IPP
-    CoreTLSData& data = getCoreTlsData();
-    if (data.useIPP < 0)
+#अगर_घोषित HAVE_IPP
+    CoreTLSData& तथ्य = get_Core_Tls_तथ्य();
+    अगर (तथ्य.useIPP < 0)
     {
-        data.useIPP = getIPPSingleton().useIPP;
+        तथ्य.useIPP = getIPPSingleton().useIPP;
     }
-    return (data.useIPP > 0);
-#else
-    return false;
-#endif
+    वापस (तथ्य.useIPP > 0);
+#अन्यथा
+    वापस false;
+#पूर्ण_अगर
 }
 
-void setUseIPP(bool flag)
+व्योम setUseIPP(bool flag)
 {
-    CoreTLSData& data = getCoreTlsData();
-#ifdef HAVE_IPP
-    data.useIPP = (getIPPSingleton().useIPP)?flag:false;
-#else
+    CoreTLSData& तथ्य = get_Core_Tls_तथ्य();
+#अगर_घोषित HAVE_IPP
+    तथ्य.useIPP = (getIPPSingleton().useIPP)?flag:false;
+#अन्यथा
     CV_UNUSED(flag);
-    data.useIPP = false;
-#endif
+    तथ्य.useIPP = false;
+#पूर्ण_अगर
 }
 
 bool useIPP_NotExact()
 {
-#ifdef HAVE_IPP
-    CoreTLSData& data = getCoreTlsData();
-    if (data.useIPP_NE < 0)
+#अगर_घोषित HAVE_IPP
+    CoreTLSData& तथ्य = get_Core_Tls_तथ्य();
+    अगर (तथ्य.useIPP_NE < 0)
     {
-        data.useIPP_NE = getIPPSingleton().useIPP_NE;
+        तथ्य.useIPP_NE = getIPPSingleton().useIPP_NE;
     }
-    return (data.useIPP_NE > 0);
-#else
-    return false;
-#endif
+    वापस (तथ्य.useIPP_NE > 0);
+#अन्यथा
+    वापस false;
+#पूर्ण_अगर
 }
 
-void setUseIPP_NotExact(bool flag)
+व्योम setUseIPP_NotExact(bool flag)
 {
-    CoreTLSData& data = getCoreTlsData();
-#ifdef HAVE_IPP
-    data.useIPP_NE = flag;
-#else
+    CoreTLSData& तथ्य = get_Core_Tls_तथ्य();
+#अगर_घोषित HAVE_IPP
+    तथ्य.useIPP_NE = flag;
+#अन्यथा
     CV_UNUSED(flag);
-    data.useIPP_NE = false;
-#endif
+    तथ्य.useIPP_NE = false;
+#पूर्ण_अगर
 }
 
 } // namespace ipp
@@ -2749,85 +2749,85 @@ void setUseIPP_NotExact(bool flag)
 
 namespace details {
 
-#if OPENCV_IMPL_FP_HINTS_X86
-#ifndef _MM_DENORMALS_ZERO_ON  // requires pmmintrin.h (SSE3)
-#define _MM_DENORMALS_ZERO_ON 0x0040
-#endif
-#ifndef _MM_DENORMALS_ZERO_MASK  // requires pmmintrin.h (SSE3)
-#define _MM_DENORMALS_ZERO_MASK 0x0040
-#endif
-#endif
+#अगर OPENCV_IMPL_FP_HINTS_X86
+#अगर_अघोषित _MM_DENORMALS_ZERO_ON  // requires pmmintrin.h (SSE3)
+#घोषणा _MM_DENORMALS_ZERO_ON 0x0040
+#पूर्ण_अगर
+#अगर_अघोषित _MM_DENORMALS_ZERO_MASK  // requires pmmintrin.h (SSE3)
+#घोषणा _MM_DENORMALS_ZERO_MASK 0x0040
+#पूर्ण_अगर
+#पूर्ण_अगर
 
-void setFPDenormalsIgnoreHint(bool ignore, CV_OUT FPDenormalsModeState& state)
+व्योम setFPDenormalsIgnoreHint(bool ignore, CV_OUT FPDenormalsModeState& state)
 {
-#if OPENCV_IMPL_FP_HINTS_X86
-    unsigned mask = _MM_FLUSH_ZERO_MASK;
-    unsigned value = ignore ? _MM_FLUSH_ZERO_ON : 0;
-    if (featuresEnabled.have[CPU_SSE3])
+#अगर OPENCV_IMPL_FP_HINTS_X86
+    अचिन्हित mask = _MM_FLUSH_ZERO_MASK;
+    अचिन्हित value = ignore ? _MM_FLUSH_ZERO_ON : 0;
+    अगर (featuresEnabled.have[CPU_SSE3])
     {
         mask |= _MM_DENORMALS_ZERO_MASK;
         value |= ignore ? _MM_DENORMALS_ZERO_ON : 0;
     }
-    const unsigned old_flags = _mm_getcsr();
-    const unsigned old_value = old_flags & mask;
-    unsigned flags = (old_flags & ~mask) | value;
-    CV_LOG_DEBUG(NULL, "core: update FP mxcsr flags = " << cv::format("0x%08x", flags));
+    स्थिर अचिन्हित old_flags = _mm_getcsr();
+    स्थिर अचिन्हित old_मूल्य = old_flags & mask;
+    अचिन्हित flags = (old_flags & ~mask) | value;
+    CV_LOG_DEBUG(शून्य, "core: update FP mxcsr flags = " << cv::format("0x%08x", flags));
     // save state
     state.reserved[0] = (uint32_t)mask;
-    state.reserved[1] = (uint32_t)old_value;
+    state.reserved[1] = (uint32_t)old_मूल्य;
     _mm_setcsr(flags);
-#else
+#अन्यथा
     CV_UNUSED(ignore); CV_UNUSED(state);
-#endif
+#पूर्ण_अगर
 }
 
-int saveFPDenormalsState(CV_OUT FPDenormalsModeState& state)
+पूर्णांक saveFPDenormalsState(CV_OUT FPDenormalsModeState& state)
 {
-#if OPENCV_IMPL_FP_HINTS_X86
-    unsigned mask = _MM_FLUSH_ZERO_MASK;
-    if (featuresEnabled.have[CPU_SSE3])
+#अगर OPENCV_IMPL_FP_HINTS_X86
+    अचिन्हित mask = _MM_FLUSH_ZERO_MASK;
+    अगर (featuresEnabled.have[CPU_SSE3])
     {
         mask |= _MM_DENORMALS_ZERO_MASK;
     }
-    const unsigned old_flags = _mm_getcsr();
-    const unsigned old_value = old_flags & mask;
+    स्थिर अचिन्हित old_flags = _mm_getcsr();
+    स्थिर अचिन्हित old_मूल्य = old_flags & mask;
     // save state
     state.reserved[0] = (uint32_t)mask;
-    state.reserved[1] = (uint32_t)old_value;
-    return 2;
-#else
+    state.reserved[1] = (uint32_t)old_मूल्य;
+    वापस 2;
+#अन्यथा
     CV_UNUSED(state);
-    return 0;
-#endif
+    वापस 0;
+#पूर्ण_अगर
 }
 
-bool restoreFPDenormalsState(const FPDenormalsModeState& state)
+bool restoreFPDenormalsState(स्थिर FPDenormalsModeState& state)
 {
-#if OPENCV_IMPL_FP_HINTS_X86
-    const unsigned mask = (unsigned)state.reserved[0];
+#अगर OPENCV_IMPL_FP_HINTS_X86
+    स्थिर अचिन्हित mask = (अचिन्हित)state.reserved[0];
     CV_DbgAssert(mask != 0); // invalid state (ensure that state is properly saved earlier)
-    const unsigned value = (unsigned)state.reserved[1];
-    CV_DbgCheck((int)value, value == (value & mask), "invalid SSE FP state");
-    const unsigned old_flags = _mm_getcsr();
-    unsigned flags = (old_flags & ~mask) | value;
-    CV_LOG_DEBUG(NULL, "core: restore FP mxcsr flags = " << cv::format("0x%08x", flags));
+    स्थिर अचिन्हित value = (अचिन्हित)state.reserved[1];
+    CV_DbgCheck((पूर्णांक)value, value == (value & mask), "invalid SSE FP state");
+    स्थिर अचिन्हित old_flags = _mm_getcsr();
+    अचिन्हित flags = (old_flags & ~mask) | value;
+    CV_LOG_DEBUG(शून्य, "core: restore FP mxcsr flags = " << cv::format("0x%08x", flags));
     _mm_setcsr(flags);
-    return true;
-#else
+    वापस true;
+#अन्यथा
     CV_UNUSED(state);
-    return false;
-#endif
+    वापस false;
+#पूर्ण_अगर
 }
 
 }  // namespace details
 
 AlgorithmHint getDefaultAlgorithmHint()
 {
-#ifdef OPENCV_ALGO_HINT_DEFAULT
-    return OPENCV_ALGO_HINT_DEFAULT;
-#else
-    return ALGO_HINT_ACCURATE;
-#endif
+#अगर_घोषित OPENCV_ALGO_HINT_DEFAULT
+    वापस OPENCV_ALGO_HINT_DEFAULT;
+#अन्यथा
+    वापस ALGO_HINT_ACCURATE;
+#पूर्ण_अगर
 };
 
 } // namespace cv

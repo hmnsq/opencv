@@ -2,985 +2,985 @@
 // It is subject to the license terms in the LICENSE file found in the top-level directory
 // of this distribution and at http://opencv.org/license.html
 
-#include "precomp.hpp"
-#include "bufferpool.impl.hpp"
+#समावेश "precomp.hpp"
+#समावेश "bufferpool.impl.hpp"
 
 namespace cv {
 
-std::string layoutToString(DataLayout layout)
+std::string layoutToString(तथ्य_Layout layout)
 {
-    return
-        layout == DATA_LAYOUT_ND ? "ND" :
-        layout == DATA_LAYOUT_NCHW ? "NCHW" :
-        layout == DATA_LAYOUT_NHWC ? "NHWC" :
-        layout == DATA_LAYOUT_BLOCK ? "BLOCK" :
-        layout == DATA_LAYOUT_NCDHW ? "NCDHW" :
-        layout == DATA_LAYOUT_NDHWC ? "NDHWC" :
-        layout == DATA_LAYOUT_PLANAR ? "PLANAR" :
-        layout == DATA_LAYOUT_UNKNOWN ? "Unknown" : "???";
+    वापस
+        layout == तथ्य_LAYOUT_ND ? "ND" :
+        layout == तथ्य_LAYOUT_NCHW ? "NCHW" :
+        layout == तथ्य_LAYOUT_NHWC ? "NHWC" :
+        layout == तथ्य_LAYOUT_BLOCK ? "BLOCK" :
+        layout == तथ्य_LAYOUT_NCDHW ? "NCDHW" :
+        layout == तथ्य_LAYOUT_NDHWC ? "NDHWC" :
+        layout == तथ्य_LAYOUT_PLANAR ? "PLANAR" :
+        layout == तथ्य_LAYOUT_UNKNOWN ? "Unknown" : "???";
 }
 
-bool operator == (const MatShape& size1, const MatShape& size2)
+bool चालक == (स्थिर MatShape& size1, स्थिर MatShape& size2)
 {
-    if (size1.dims != size2.dims)
-        return false;
-    if (size1.layout != size2.layout &&
-        size1.layout != DATA_LAYOUT_UNKNOWN &&
-        size2.layout != DATA_LAYOUT_UNKNOWN)
-        return false;
-    if (size1.layout == DATA_LAYOUT_BLOCK &&
-        size2.layout == DATA_LAYOUT_BLOCK &&
+    अगर (size1.dims != size2.dims)
+        वापस false;
+    अगर (size1.layout != size2.layout &&
+        size1.layout != तथ्य_LAYOUT_UNKNOWN &&
+        size2.layout != तथ्य_LAYOUT_UNKNOWN)
+        वापस false;
+    अगर (size1.layout == तथ्य_LAYOUT_BLOCK &&
+        size2.layout == तथ्य_LAYOUT_BLOCK &&
         size1.C != size2.C)
-        return false;
-    for (int i = 0; i < size1.dims; i++) {
-        if (size1.p[i] != size2.p[i])
-            return false;
+        वापस false;
+    क्रम (पूर्णांक i = 0; i < size1.dims; i++) {
+        अगर (size1.p[i] != size2.p[i])
+            वापस false;
     }
-    return true;
+    वापस true;
 }
 
-bool operator != (const MatShape& size1, const MatShape& size2)
+bool चालक != (स्थिर MatShape& size1, स्थिर MatShape& size2)
 {
-    return !(size1 == size2);
+    वापस !(size1 == size2);
 }
 
 /////////////////////////// MatShape ////////////////////////////////
 
 MatShape MatShape::scalar()
 {
-    return MatShape(0);
+    वापस MatShape(0);
 }
 
-void MatShape::clear()
+व्योम MatShape::सफा()
 {
     dims = -1;
-    layout = DATA_LAYOUT_UNKNOWN;
+    layout = तथ्य_LAYOUT_UNKNOWN;
     C = 0;
-    for (int i = 0; i < MAX_DIMS; i++)
+    क्रम (पूर्णांक i = 0; i < MAX_DIMS; i++)
         p[i] = 0;
 }
 
-void MatShape::resize(size_t newSize, int value)
+व्योम MatShape::resize(माप_प्रकार new_आकार, पूर्णांक value)
 {
-    CV_Assert(newSize < (size_t)MAX_DIMS);
-    int old_dims = std::max(dims, 0);
-    dims = (int)newSize;
-    for (int i = old_dims; i < dims; i++)
+    CV_Assert(new_आकार < (माप_प्रकार)MAX_DIMS);
+    पूर्णांक old_dims = std::max(dims, 0);
+    dims = (पूर्णांक)new_आकार;
+    क्रम (पूर्णांक i = old_dims; i < dims; i++)
         p[i] = value;
 }
 
-void MatShape::reserve(size_t)
+व्योम MatShape::reserve(माप_प्रकार)
 {
     // no op; maybe need to add a check for overflow, but we check it anyway in other operations
 }
 
-void MatShape::assign(size_t newSize, int value)
+व्योम MatShape::assign(माप_प्रकार new_आकार, पूर्णांक value)
 {
-    CV_Assert(newSize < (size_t)MAX_DIMS);
-    dims = (int)newSize;
-    for (int i = 0; i < dims; i++)
+    CV_Assert(new_आकार < (माप_प्रकार)MAX_DIMS);
+    dims = (पूर्णांक)new_आकार;
+    क्रम (पूर्णांक i = 0; i < dims; i++)
         p[i] = value;
 }
 
-void MatShape::assign(int newSize, int value)
+व्योम MatShape::assign(पूर्णांक new_आकार, पूर्णांक value)
 {
-    assign((size_t)newSize, value);
+    assign((माप_प्रकार)new_आकार, value);
 }
 
-void MatShape::assign(const int* begin, const int* end)
+व्योम MatShape::assign(स्थिर पूर्णांक* begin, स्थिर पूर्णांक* end)
 {
     assign_(begin, end);
 }
 
-void MatShape::assign_(const int* begin, const int* end)
+व्योम MatShape::assign_(स्थिर पूर्णांक* begin, स्थिर पूर्णांक* end)
 {
-    ptrdiff_t newSize = end - begin;
-    CV_Assert(0 <= newSize && newSize < (ptrdiff_t)MAX_DIMS);
-    dims = (int)newSize;
-    for (int i = 0; i < dims; i++)
+    सूचक_भेद_प्रकार new_आकार = end - begin;
+    CV_Assert(0 <= new_आकार && new_आकार < (सूचक_भेद_प्रकार)MAX_DIMS);
+    dims = (पूर्णांक)new_आकार;
+    क्रम (पूर्णांक i = 0; i < dims; i++)
         p[i] = begin[i];
 }
 
-int* MatShape::begin() { return p; }
-const int* MatShape::begin() const { return p; }
-int* MatShape::end() { return p + std::max(dims, 0); }
-const int* MatShape::end() const { return p + std::max(dims, 0); }
-int& MatShape::back() { return p[std::max(dims-1, 0)]; }
-const int& MatShape::back() const { return p[std::max(dims-1, 0)]; }
+पूर्णांक* MatShape::begin() { वापस p; }
+स्थिर पूर्णांक* MatShape::begin() स्थिर { वापस p; }
+पूर्णांक* MatShape::end() { वापस p + std::max(dims, 0); }
+स्थिर पूर्णांक* MatShape::end() स्थिर { वापस p + std::max(dims, 0); }
+पूर्णांक& MatShape::back() { वापस p[std::max(dims-1, 0)]; }
+स्थिर पूर्णांक& MatShape::back() स्थिर { वापस p[std::max(dims-1, 0)]; }
 
-void MatShape::push_back(int value)
+व्योम MatShape::push_back(पूर्णांक value)
 {
     CV_Assert(dims+1 < MAX_DIMS);
     dims = std::max(dims+1, 1);
     p[dims-1] = value;
 }
 
-void MatShape::emplace_back(int value)
+व्योम MatShape::emplace_back(पूर्णांक value)
 {
     push_back(value);
 }
 
-void MatShape::insert(int* where, int value)
+व्योम MatShape::insert(पूर्णांक* where, पूर्णांक value)
 {
-    int old_dims = std::max(dims, 0);
+    पूर्णांक old_dims = std::max(dims, 0);
     CV_Assert(old_dims+1 < MAX_DIMS);
-    ptrdiff_t ofs = where - p;
+    सूचक_भेद_प्रकार ofs = where - p;
     CV_Assert(0 <= ofs && ofs <= old_dims);
     dims = old_dims+1;
-    for (int i = old_dims-1; i >= (int)ofs; i--)
+    क्रम (पूर्णांक i = old_dims-1; i >= (पूर्णांक)ofs; i--)
         p[i+1] = p[i];
     p[ofs] = value;
 }
 
-void MatShape::insert(int* where, size_t count, int value)
+व्योम MatShape::insert(पूर्णांक* where, माप_प्रकार गिनती_2, पूर्णांक value)
 {
-    int old_dims = std::max(dims, 0);
-    CV_Assert((size_t)(old_dims+count) < (size_t)MAX_DIMS);
-    ptrdiff_t ofs = where - p;
+    पूर्णांक old_dims = std::max(dims, 0);
+    CV_Assert((माप_प्रकार)(old_dims+गिनती_2) < (माप_प्रकार)MAX_DIMS);
+    सूचक_भेद_प्रकार ofs = where - p;
     CV_Assert(0 <= ofs && ofs <= old_dims);
-    dims = (int)(old_dims+count);
-    for (int i = old_dims-1; i >= (int)ofs; i--)
-        p[i+count] = p[i];
-    for (int i = 0; i < (int)count; i++)
+    dims = (पूर्णांक)(old_dims+गिनती_2);
+    क्रम (पूर्णांक i = old_dims-1; i >= (पूर्णांक)ofs; i--)
+        p[i+गिनती_2] = p[i];
+    क्रम (पूर्णांक i = 0; i < (पूर्णांक)गिनती_2; i++)
         p[i+ofs] = value;
 }
 
-void MatShape::insert(int* where, int count, int value)
+व्योम MatShape::insert(पूर्णांक* where, पूर्णांक गिनती_2, पूर्णांक value)
 {
-    insert(where, (size_t)count, value);
+    insert(where, (माप_प्रकार)गिनती_2, value);
 }
 
-void MatShape::insert(int* where, const int* begin, const int* end)
+व्योम MatShape::insert(पूर्णांक* where, स्थिर पूर्णांक* begin, स्थिर पूर्णांक* end)
 {
-    insert_(where, begin, end);
+    जोड़ो(where, begin, end);
 }
 
-void MatShape::insert_(int* where, const int* begin, const int* end)
+व्योम MatShape::जोड़ो(पूर्णांक* where, स्थिर पूर्णांक* begin, स्थिर पूर्णांक* end)
 {
-    int old_dims = std::max(dims, 0);
-    ptrdiff_t delta = end - begin;
+    पूर्णांक old_dims = std::max(dims, 0);
+    सूचक_भेद_प्रकार delta = end - begin;
     CV_Assert(0 <= delta && old_dims+delta < MAX_DIMS);
-    ptrdiff_t ofs = where - p;
+    सूचक_भेद_प्रकार ofs = where - p;
     CV_Assert(0 <= ofs && ofs <= old_dims);
-    dims = (int)(old_dims+delta);
-    for (int i = old_dims-1; i >= (int)ofs; i--)
+    dims = (पूर्णांक)(old_dims+delta);
+    क्रम (पूर्णांक i = old_dims-1; i >= (पूर्णांक)ofs; i--)
         p[i+delta] = p[i];
-    for (int i = 0; i < (int)delta; i++)
+    क्रम (पूर्णांक i = 0; i < (पूर्णांक)delta; i++)
         p[i+ofs] = begin[i];
 }
 
-void MatShape::erase(int* where)
+व्योम MatShape::erase(पूर्णांक* where)
 {
     CV_Assert(dims > 0);
-    ptrdiff_t ofs = where - p;
+    सूचक_भेद_प्रकार ofs = where - p;
     CV_Assert(0 <= ofs && ofs <= dims);
-    if (ofs == dims)
-        return;
+    अगर (ofs == dims)
+        वापस;
     dims--;
-    for (int i = (int)ofs+1; i <= dims; i++)
+    क्रम (पूर्णांक i = (पूर्णांक)ofs+1; i <= dims; i++)
         p[i-1] = p[i];
 }
 
-size_t MatShape::total() const
+माप_प्रकार MatShape::योग() स्थिर
 {
-    size_t result = 1;
-    if (dims < 0)
-        return 0;
-    for (int i = 0; i < dims; i++)
-        result *= p[i];
-    return result;
+    माप_प्रकार परिणाम = 1;
+    अगर (dims < 0)
+        वापस 0;
+    क्रम (पूर्णांक i = 0; i < dims; i++)
+        परिणाम *= p[i];
+    वापस परिणाम;
 }
 
-std::vector<int> MatShape::vec() const
+std::vector<पूर्णांक> MatShape::vec() स्थिर
 {
-    if (dims < 0)
-        return std::vector<int>(1, 0);
-    return std::vector<int>(p, p + dims);
+    अगर (dims < 0)
+        वापस std::vector<पूर्णांक>(1, 0);
+    वापस std::vector<पूर्णांक>(p, p + dims);
 }
 
-std::string MatShape::str() const
+std::string MatShape::str() स्थिर
 {
     std::stringstream sstrm;
-    if (empty()) {
+    अगर (empty()) {
         sstrm << "<empty>";
-    } else if (dims == 0) {
+    } अन्यथा अगर (dims == 0) {
         sstrm << "<scalar>";
-    } else {
+    } अन्यथा {
         sstrm << "[";
-        for (int i = 0; i < dims; i++) {
+        क्रम (पूर्णांक i = 0; i < dims; i++) {
             sstrm << (i > 0 ? " x " : "") << p[i];
         }
         sstrm << "]";
     }
-    return sstrm.str();
+    वापस sstrm.str();
 }
 
-static void finalizeBlockLayout(MatShape& size, int C=0)
+अटल व्योम finalizeBlockLayout(MatShape& size, पूर्णांक C=0)
 {
-    if (size.layout == DATA_LAYOUT_BLOCK) {
+    अगर (size.layout == तथ्य_LAYOUT_BLOCK) {
         CV_Assert(size.dims >= 4);
-        int C0 = size.p[size.dims-1];
+        पूर्णांक C0 = size.p[size.dims-1];
         CV_Assert(C0 > 1 && (C0 & (C0-1)) == 0);
         size.C = C > 0 ? C : size.p[1]*size.p[size.dims-1];
-    } else {
+    } अन्यथा {
         size.C = 0;
     }
-    for (int i = std::max(size.dims, 0); i < MatShape::MAX_DIMS; i++)
+    क्रम (पूर्णांक i = std::max(size.dims, 0); i < MatShape::MAX_DIMS; i++)
         size.p[i] = 0;
-    if (size.dims == 0)
+    अगर (size.dims == 0)
         size.p[0] = 1;
 }
 
 MatShape::MatShape()
 {
-    clear();
+    सफा();
 }
 
-MatShape::MatShape(size_t dims_, const int* size_, DataLayout layout_, int C_)
+MatShape::MatShape(माप_प्रकार dims_, स्थिर पूर्णांक* आकार_3, तथ्य_Layout layout_, पूर्णांक C_)
 {
     layout = layout_;
-    CV_Assert(dims_ <= (size_t)MAX_DIMS);
-    dims = (int)dims_;
-    for (int i = 0; i < dims; i++) {
-        p[i] = size_ ? size_[i] : 0;
+    CV_Assert(dims_ <= (माप_प्रकार)MAX_DIMS);
+    dims = (पूर्णांक)dims_;
+    क्रम (पूर्णांक i = 0; i < dims; i++) {
+        p[i] = आकार_3 ? आकार_3[i] : 0;
     }
-    finalizeBlockLayout(*this, C_);
+    finalizeBlockLayout(*यह, C_);
 }
 
-MatShape::MatShape(size_t dims_, int value, DataLayout layout_)
+MatShape::MatShape(माप_प्रकार dims_, पूर्णांक value, तथ्य_Layout layout_)
 {
     layout = layout_;
-    CV_Assert(dims_ <= (size_t)MAX_DIMS);
-    dims = (int)dims_;
-    for (int i = 0; i < dims; i++) {
+    CV_Assert(dims_ <= (माप_प्रकार)MAX_DIMS);
+    dims = (पूर्णांक)dims_;
+    क्रम (पूर्णांक i = 0; i < dims; i++) {
         p[i] = value;
     }
-    finalizeBlockLayout(*this, 0);
+    finalizeBlockLayout(*यह, 0);
 }
 
-MatShape::MatShape(std::initializer_list<int> shape)
+MatShape::MatShape(std::initializer_list<पूर्णांक> shape)
 {
-    layout = DATA_LAYOUT_UNKNOWN;
-    CV_Assert(shape.size() <= (size_t)MAX_DIMS);
-    dims = (int)shape.size();
-    auto it = shape.begin();
-    for (int i = 0; i < dims; i++, ++it) {
+    layout = तथ्य_LAYOUT_UNKNOWN;
+    CV_Assert(shape.size() <= (माप_प्रकार)MAX_DIMS);
+    dims = (पूर्णांक)shape.size();
+    स्वतः it = shape.begin();
+    क्रम (पूर्णांक i = 0; i < dims; i++, ++it) {
         p[i] = *it;
     }
-    finalizeBlockLayout(*this, 0);
+    finalizeBlockLayout(*यह, 0);
 }
 
-MatShape::MatShape(int dims_, int value, DataLayout layout_)
+MatShape::MatShape(पूर्णांक dims_, पूर्णांक value, तथ्य_Layout layout_)
 {
     layout = layout_;
     CV_Assert(dims_ <= MAX_DIMS);
     dims = dims_;
-    for (int i = 0; i < dims; i++) {
+    क्रम (पूर्णांक i = 0; i < dims; i++) {
         p[i] = value;
     }
-    finalizeBlockLayout(*this, 0);
+    finalizeBlockLayout(*यह, 0);
 }
 
-MatShape::MatShape(const std::vector<int>& shape_, DataLayout layout_, int C_)
+MatShape::MatShape(स्थिर std::vector<पूर्णांक>& shape_, तथ्य_Layout layout_, पूर्णांक C_)
 {
     layout = layout_;
-    size_t shape_size = shape_.size();
-    CV_Assert(shape_size < (size_t)MAX_DIMS);
-    dims = (int)shape_size;
-    for (int i = 0; i < dims; i++) {
+    माप_प्रकार shape_आकार = shape_.size();
+    CV_Assert(shape_आकार < (माप_प्रकार)MAX_DIMS);
+    dims = (पूर्णांक)shape_आकार;
+    क्रम (पूर्णांक i = 0; i < dims; i++) {
         p[i] = shape_[i];
     }
-    finalizeBlockLayout(*this, C_);
+    finalizeBlockLayout(*यह, C_);
 }
 
-MatShape::MatShape(const int* begin, const int* end, DataLayout layout_, int C_)
+MatShape::MatShape(स्थिर पूर्णांक* begin, स्थिर पूर्णांक* end, तथ्य_Layout layout_, पूर्णांक C_)
 {
     layout = layout_;
-    ptrdiff_t shape_size = end - begin;
-    CV_Assert(0 <= shape_size && shape_size < MAX_DIMS);
-    dims = (int)shape_size;
-    for (int i = 0; i < dims; i++) {
+    सूचक_भेद_प्रकार shape_आकार = end - begin;
+    CV_Assert(0 <= shape_आकार && shape_आकार < MAX_DIMS);
+    dims = (पूर्णांक)shape_आकार;
+    क्रम (पूर्णांक i = 0; i < dims; i++) {
         p[i] = begin[i];
     }
-    finalizeBlockLayout(*this, C_);
+    finalizeBlockLayout(*यह, C_);
 }
 
-MatShape::MatShape(const MatShape& shape)
+MatShape::MatShape(स्थिर MatShape& shape)
 {
     dims = shape.dims;
     layout = shape.layout;
     C = shape.C;
-    for (int i = 0; i < MAX_DIMS; i++)
+    क्रम (पूर्णांक i = 0; i < MAX_DIMS; i++)
         p[i] = shape.p[i];
 }
 
-MatShape& MatShape::operator = (const MatShape& shape)
+MatShape& MatShape::चालक = (स्थिर MatShape& shape)
 {
-    if (this != &shape) {
+    अगर (यह != &shape) {
         dims = shape.dims;
         layout = shape.layout;
         C = shape.C;
-        for (int i = 0; i < MAX_DIMS; i++)
+        क्रम (पूर्णांक i = 0; i < MAX_DIMS; i++)
             p[i] = shape.p[i];
     }
-    return *this;
+    वापस *यह;
 }
 
-bool MatShape::hasSymbols() const
+bool MatShape::hasSymbols() स्थिर
 {
-    for (int i = 0; i < dims; i++) {
-        if (p[i] < 0)
-            return true;
+    क्रम (पूर्णांक i = 0; i < dims; i++) {
+        अगर (p[i] < 0)
+            वापस true;
     }
-    return false;
+    वापस false;
 }
 
-int MatShape::channels() const
+पूर्णांक MatShape::channels() स्थिर
 {
-    CV_Assert(layout == DATA_LAYOUT_BLOCK || layout == DATA_LAYOUT_NCHW || layout == DATA_LAYOUT_NHWC);
-    return layout == DATA_LAYOUT_BLOCK ? C : p[layout == DATA_LAYOUT_NCHW ? 1 : dims-1];
+    CV_Assert(layout == तथ्य_LAYOUT_BLOCK || layout == तथ्य_LAYOUT_NCHW || layout == तथ्य_LAYOUT_NHWC);
+    वापस layout == तथ्य_LAYOUT_BLOCK ? C : p[layout == तथ्य_LAYOUT_NCHW ? 1 : dims-1];
 }
 
-MatShape MatShape::toLayout(DataLayout newLayout, int C0) const
+MatShape MatShape::toLayout(तथ्य_Layout newLayout, पूर्णांक C0) स्थिर
 {
-    CV_Assert(layout == DATA_LAYOUT_BLOCK || layout == DATA_LAYOUT_NCHW || layout == DATA_LAYOUT_NHWC);
-    CV_Assert(newLayout == DATA_LAYOUT_BLOCK || newLayout == DATA_LAYOUT_NCHW || newLayout == DATA_LAYOUT_NHWC);
+    CV_Assert(layout == तथ्य_LAYOUT_BLOCK || layout == तथ्य_LAYOUT_NCHW || layout == तथ्य_LAYOUT_NHWC);
+    CV_Assert(newLayout == तथ्य_LAYOUT_BLOCK || newLayout == तथ्य_LAYOUT_NCHW || newLayout == तथ्य_LAYOUT_NHWC);
 
-    MatShape newsize = *this;
+    MatShape newsize = *यह;
     newsize.layout = newLayout;
 
-    if (newLayout == DATA_LAYOUT_BLOCK) {
+    अगर (newLayout == तथ्य_LAYOUT_BLOCK) {
         // any => BLOCK
         CV_Assert_N(C0 > 1, (C0 & (C0-1)) == 0);
-        int Corig = channels();
+        पूर्णांक Corig = channels();
         newsize.C = Corig;
 
-        if (layout == DATA_LAYOUT_NHWC) {
-            for (int i = 2; i < dims; i++) {
+        अगर (layout == तथ्य_LAYOUT_NHWC) {
+            क्रम (पूर्णांक i = 2; i < dims; i++) {
                 newsize.p[i] = p[i-1];
             }
         }
 
-        newsize.dims += layout != DATA_LAYOUT_BLOCK;
+        newsize.dims += layout != तथ्य_LAYOUT_BLOCK;
         newsize.p[1] = (Corig + C0 - 1)/C0;
         newsize.p[newsize.dims-1] = C0;
-    } else if (layout == DATA_LAYOUT_BLOCK) {
+    } अन्यथा अगर (layout == तथ्य_LAYOUT_BLOCK) {
         // BLOCK => any (except for BLOCK, which is handled above)
         newsize.C = 0;
-        if (newLayout == DATA_LAYOUT_NHWC) {
-            for (int i = 2; i < dims; i++) {
+        अगर (newLayout == तथ्य_LAYOUT_NHWC) {
+            क्रम (पूर्णांक i = 2; i < dims; i++) {
                 newsize.p[i-1] = p[i];
             }
         }
-        newsize.p[newLayout == DATA_LAYOUT_NCHW ? 1 : dims-2] = C;
+        newsize.p[newLayout == तथ्य_LAYOUT_NCHW ? 1 : dims-2] = C;
         newsize.dims--;
-    } else {
+    } अन्यथा {
         CV_Assert_N(C0 <= 1);
 
-        if (newLayout == layout)
-            return newsize;
+        अगर (newLayout == layout)
+            वापस newsize;
 
         // NHWC => NCHW
-        if (newLayout == DATA_LAYOUT_NCHW) {
-            for (int i = 2; i < dims; i++)
+        अगर (newLayout == तथ्य_LAYOUT_NCHW) {
+            क्रम (पूर्णांक i = 2; i < dims; i++)
                 newsize.p[i] = p[i-1];
             newsize.p[1] = p[dims-1];
-        } else {
+        } अन्यथा {
             // NCHW => NHWC
-            for (int i = 2; i < dims; i++)
+            क्रम (पूर्णांक i = 2; i < dims; i++)
                 newsize.p[i-1] = p[i];
             newsize.p[dims-1] = p[1];
         }
     }
 
-    return newsize;
+    वापस newsize;
 }
 
-static int normalizeShapeAxis(int axis, int dims)
+अटल पूर्णांक normalizeShapeAxis(पूर्णांक axis, पूर्णांक dims)
 {
     CV_CheckGE(axis, -dims, "axis is out of range");
     CV_CheckLT(axis, dims, "axis is out of range");
-    return axis < 0 ? axis + dims : axis;
+    वापस axis < 0 ? axis + dims : axis;
 }
 
 // The semantic NCHW form {N, C, spatial...} of a block ('NC1HWC0') shape, so that axes and
 // element counts are the logical ones rather than the C0-padded ones.
-static MatShape toSemantic(const MatShape& shape)
+अटल MatShape toSemantic(स्थिर MatShape& shape)
 {
     CV_CheckGE(shape.dims, 3, "a block shape is {N, C1, spatial..., C0}");
-    return shape.toLayout(DATA_LAYOUT_NCHW);
+    वापस shape.toLayout(तथ्य_LAYOUT_NCHW);
 }
 
 // Blocks such a result again. Once N or C changes, elements cross the padded C0 lanes and
 // the data needs a repack, which a shape operation cannot express.
-static MatShape toBlockOf(MatShape result, const MatShape& src, const char* op)
+अटल MatShape toBlockOf(MatShape परिणाम, स्थिर MatShape& src, स्थिर अक्षर* op)
 {
-    if (result.dims < 2 || result.p[0] != src.p[0] || result.p[1] != src.C)
+    अगर (परिणाम.dims < 2 || परिणाम.p[0] != src.p[0] || परिणाम.p[1] != src.C)
         CV_Error_(Error::StsNotImplemented,
                   ("%s: the block layout is kept only when the batch and the channel axes stay "
                    "unchanged; convert the shape with toLayout() first", op));
-    CV_CheckLE(result.dims + 1, (int)MatShape::MAX_DIMS, "too many dimensions");
-    result.layout = DATA_LAYOUT_NCHW;
-    return result.toLayout(DATA_LAYOUT_BLOCK, src.p[src.dims-1]);
+    CV_CheckLE(परिणाम.dims + 1, (पूर्णांक)MatShape::MAX_DIMS, "too many dimensions");
+    परिणाम.layout = तथ्य_LAYOUT_NCHW;
+    वापस परिणाम.toLayout(तथ्य_LAYOUT_BLOCK, src.p[src.dims-1]);
 }
 
-MatShape MatShape::squeeze(const std::vector<int>& axes) const
+MatShape MatShape::squeeze(स्थिर std::vector<पूर्णांक>& axes) स्थिर
 {
     CV_Assert(dims >= 0);
-    if (layout == DATA_LAYOUT_BLOCK)
-        return toBlockOf(toSemantic(*this).squeeze(axes), *this, "squeeze");
-    bool remove[MAX_DIMS] = {false};
-    if (axes.empty())
+    अगर (layout == तथ्य_LAYOUT_BLOCK)
+        वापस toBlockOf(toSemantic(*यह).squeeze(axes), *यह, "squeeze");
+    bool हटाओ[MAX_DIMS] = {false};
+    अगर (axes.empty())
     {
-        for (int i = 0; i < dims; i++)
-            remove[i] = p[i] == 1;
+        क्रम (पूर्णांक i = 0; i < dims; i++)
+            हटाओ[i] = p[i] == 1;
     }
-    for (int a : axes)
+    क्रम (पूर्णांक a : axes)
     {
-        int i = normalizeShapeAxis(a, dims);
-        CV_Check(a, !remove[i], "squeeze: duplicate axis");
+        पूर्णांक i = normalizeShapeAxis(a, dims);
+        CV_Check(a, !हटाओ[i], "squeeze: duplicate axis");
         CV_Check(p[i], p[i] == 1, "squeeze: the size of a squeezed axis must be 1");
-        remove[i] = true;
+        हटाओ[i] = true;
     }
     // a new number of axes: the layout of this shape does not apply
-    MatShape result;
-    result.dims = 0;
-    for (int i = 0; i < dims; i++)
-        if (!remove[i])
-            result.p[result.dims++] = p[i];
-    return result;
+    MatShape परिणाम;
+    परिणाम.dims = 0;
+    क्रम (पूर्णांक i = 0; i < dims; i++)
+        अगर (!हटाओ[i])
+            परिणाम.p[परिणाम.dims++] = p[i];
+    वापस परिणाम;
 }
 
-MatShape MatShape::unsqueeze(const std::vector<int>& axes) const
+MatShape MatShape::unsqueeze(स्थिर std::vector<पूर्णांक>& axes) स्थिर
 {
     CV_Assert(dims >= 0);
-    if (layout == DATA_LAYOUT_BLOCK)
-        return toBlockOf(toSemantic(*this).unsqueeze(axes), *this, "unsqueeze");
-    const int outDims = dims + (int)axes.size();
-    CV_CheckLE(outDims, (int)MAX_DIMS, "unsqueeze: too many dimensions");
+    अगर (layout == तथ्य_LAYOUT_BLOCK)
+        वापस toBlockOf(toSemantic(*यह).unsqueeze(axes), *यह, "unsqueeze");
+    स्थिर पूर्णांक outDims = dims + (पूर्णांक)axes.size();
+    CV_CheckLE(outDims, (पूर्णांक)MAX_DIMS, "unsqueeze: too many dimensions");
     bool insert[MAX_DIMS] = {false};
-    for (int a : axes)
+    क्रम (पूर्णांक a : axes)
     {
-        int i = normalizeShapeAxis(a, outDims);
+        पूर्णांक i = normalizeShapeAxis(a, outDims);
         CV_Check(a, !insert[i], "unsqueeze: duplicate axis");
         insert[i] = true;
     }
     // a new number of axes: the layout of this shape does not apply
-    MatShape result;
-    result.dims = outDims;
-    for (int i = 0, j = 0; i < outDims; i++)
-        result.p[i] = insert[i] ? 1 : p[j++];
-    return result;
+    MatShape परिणाम;
+    परिणाम.dims = outDims;
+    क्रम (पूर्णांक i = 0, j = 0; i < outDims; i++)
+        परिणाम.p[i] = insert[i] ? 1 : p[j++];
+    वापस परिणाम;
 }
 
-MatShape MatShape::flatten(int startAxis, int endAxis) const
+MatShape MatShape::flatten(पूर्णांक startAxis, पूर्णांक endAxis) स्थिर
 {
     CV_Assert(dims >= 0);
-    if (layout == DATA_LAYOUT_BLOCK)
-        return toBlockOf(toSemantic(*this).flatten(startAxis, endAxis), *this, "flatten");
-    if (dims == 0)
+    अगर (layout == तथ्य_LAYOUT_BLOCK)
+        वापस toBlockOf(toSemantic(*यह).flatten(startAxis, endAxis), *यह, "flatten");
+    अगर (dims == 0)
     {
         CV_Check(startAxis, startAxis == 0 || startAxis == -1, "flatten: axis is out of range");
         CV_Check(endAxis, endAxis == 0 || endAxis == -1, "flatten: axis is out of range");
-        return MatShape({1});
+        वापस MatShape({1});
     }
-    int start = normalizeShapeAxis(startAxis, dims), end = normalizeShapeAxis(endAxis, dims);
+    पूर्णांक start = normalizeShapeAxis(startAxis, dims), end = normalizeShapeAxis(endAxis, dims);
     CV_CheckLE(start, end, "flatten: startAxis must not follow endAxis");
     int64 merged = 1;
-    for (int i = start; i <= end; i++)
+    क्रम (पूर्णांक i = start; i <= end; i++)
         merged *= p[i];
-    CV_CheckLE((double)merged, (double)INT_MAX, "flatten: the result is too big");
+    CV_CheckLE((द्विगुन)merged, (द्विगुन)पूर्णांक_उच्च, "flatten: the result is too big");
     // a new number of axes: the layout of this shape does not apply
-    MatShape result;
-    result.dims = 0;
-    for (int i = 0; i < dims; i++)
+    MatShape परिणाम;
+    परिणाम.dims = 0;
+    क्रम (पूर्णांक i = 0; i < dims; i++)
     {
-        if (i == start)
-            result.p[result.dims++] = (int)merged;
-        else if (i < start || i > end)
-            result.p[result.dims++] = p[i];
+        अगर (i == start)
+            परिणाम.p[परिणाम.dims++] = (पूर्णांक)merged;
+        अन्यथा अगर (i < start || i > end)
+            परिणाम.p[परिणाम.dims++] = p[i];
     }
-    return result;
+    वापस परिणाम;
 }
 
-MatShape MatShape::reshape(const MatShape& newShape, bool allowZero) const
+MatShape MatShape::reshape(स्थिर MatShape& newShape, bool allowZero) स्थिर
 {
     CV_Assert(dims >= 0 && newShape.dims >= 0);
-    if (layout == DATA_LAYOUT_BLOCK)
-        return toBlockOf(toSemantic(*this).reshape(newShape, allowZero), *this, "reshape");
+    अगर (layout == तथ्य_LAYOUT_BLOCK)
+        वापस toBlockOf(toSemantic(*यह).reshape(newShape, allowZero), *यह, "reshape");
     // a new number of axes: neither the layout of this shape nor the one of the spec applies
-    MatShape result;
-    result.dims = newShape.dims;
-    std::copy(newShape.p, newShape.p + newShape.dims, result.p);
-    int inferred = -1;
+    MatShape परिणाम;
+    परिणाम.dims = newShape.dims;
+    std::copy(newShape.p, newShape.p + newShape.dims, परिणाम.p);
+    पूर्णांक inferred = -1;
     int64 known = 1;
-    for (int i = 0; i < result.dims; i++)
+    क्रम (पूर्णांक i = 0; i < परिणाम.dims; i++)
     {
-        int& sz = result.p[i];
-        if (sz == -1)
+        पूर्णांक& sz = परिणाम.p[i];
+        अगर (sz == -1)
         {
             CV_Check(i, inferred < 0, "reshape: at most one axis may be -1");
             inferred = i;
-            continue;
+            जारी;
         }
         CV_Check(sz, sz >= 0, "reshape: sizes must be -1 or non-negative");
-        if (sz == 0 && !allowZero)
+        अगर (sz == 0 && !allowZero)
         {
             CV_Check(i, i < dims, "reshape: 0 refers to an axis the source does not have");
             sz = p[i];
         }
         known *= sz;
     }
-    const int64 total_ = (int64)total();
-    if (inferred >= 0)
+    स्थिर int64 योग_3 = (int64)योग();
+    अगर (inferred >= 0)
     {
-        CV_Check((double)known, known != 0, "reshape: cannot infer the -1 axis next to a zero-size axis");
-        CV_Check((double)total_, total_ % known == 0, "reshape: the number of elements does not match");
-        CV_CheckLE((double)(total_/known), (double)INT_MAX, "reshape: the result is too big");
-        result.p[inferred] = (int)(total_/known);
+        CV_Check((द्विगुन)known, known != 0, "reshape: cannot infer the -1 axis next to a zero-size axis");
+        CV_Check((द्विगुन)योग_3, योग_3 % known == 0, "reshape: the number of elements does not match");
+        CV_CheckLE((द्विगुन)(योग_3/known), (द्विगुन)पूर्णांक_उच्च, "reshape: the result is too big");
+        परिणाम.p[inferred] = (पूर्णांक)(योग_3/known);
     }
-    else if (known != total_)
+    अन्यथा अगर (known != योग_3)
         CV_Error_(Error::StsBadArg, ("reshape: the number of elements does not match: %lld vs %lld",
-                                     (long long)known, (long long)total_));
-    return result;
+                                     (दीर्घ दीर्घ)known, (दीर्घ दीर्घ)योग_3));
+    वापस परिणाम;
 }
 
-MatShape MatShape::expand(const MatShape& another) const
+MatShape MatShape::expand(स्थिर MatShape& another) स्थिर
 {
-    if (dims == 0)
-        return another;
-    if (another.dims == 0)
-        return *this;
+    अगर (dims == 0)
+        वापस another;
+    अगर (another.dims == 0)
+        वापस *यह;
 
-    if ((layout == DATA_LAYOUT_NCHW || layout == DATA_LAYOUT_NHWC) &&
-        (another.layout == DATA_LAYOUT_NCHW || another.layout == DATA_LAYOUT_NHWC)) {
+    अगर ((layout == तथ्य_LAYOUT_NCHW || layout == तथ्य_LAYOUT_NHWC) &&
+        (another.layout == तथ्य_LAYOUT_NCHW || another.layout == तथ्य_LAYOUT_NHWC)) {
         CV_Assert(layout == another.layout);
     }
     // [TODO] support block layout
-    CV_Assert(layout != DATA_LAYOUT_BLOCK && another.layout != DATA_LAYOUT_BLOCK);
+    CV_Assert(layout != तथ्य_LAYOUT_BLOCK && another.layout != तथ्य_LAYOUT_BLOCK);
 
-    MatShape result;
+    MatShape परिणाम;
 
-    if (dims < 0 || another.dims < 0)
-        return result;
+    अगर (dims < 0 || another.dims < 0)
+        वापस परिणाम;
 
-    result = *this;
-    result.dims = std::max(dims, another.dims);
-    result.layout = layout == DATA_LAYOUT_UNKNOWN ? another.layout :
-        layout == DATA_LAYOUT_ND && (another.layout == DATA_LAYOUT_NCHW ||
-        another.layout == DATA_LAYOUT_NHWC) ? another.layout : layout;
-    for (int i = result.dims-1; i >= 0; i--) {
-        int i1 = i - (result.dims - dims);
-        int i2 = i - (result.dims - another.dims);
-        int sz1 = i1 < 0 ? 1 : p[i1];
-        int sz2 = i2 < 0 ? 1 : another.p[i2];
+    परिणाम = *यह;
+    परिणाम.dims = std::max(dims, another.dims);
+    परिणाम.layout = layout == तथ्य_LAYOUT_UNKNOWN ? another.layout :
+        layout == तथ्य_LAYOUT_ND && (another.layout == तथ्य_LAYOUT_NCHW ||
+        another.layout == तथ्य_LAYOUT_NHWC) ? another.layout : layout;
+    क्रम (पूर्णांक i = परिणाम.dims-1; i >= 0; i--) {
+        पूर्णांक i1 = i - (परिणाम.dims - dims);
+        पूर्णांक i2 = i - (परिणाम.dims - another.dims);
+        पूर्णांक sz1 = i1 < 0 ? 1 : p[i1];
+        पूर्णांक sz2 = i2 < 0 ? 1 : another.p[i2];
         CV_Assert(sz1 == sz2 || sz1 == 1 || sz2 == 1);
         // [TODO] handle symbolic shapes
-        result.p[i] = sz1 != 1 ? sz1 : sz2;
+        परिणाम.p[i] = sz1 != 1 ? sz1 : sz2;
     }
-    return result;
+    वापस परिणाम;
 }
 
 /////////////////////////// MatAllocator ////////////////////////////
 
-void MatAllocator::map(UMatData*, AccessFlag) const
+व्योम MatAllocator::map(UMat_तथ्य*, AccessFlag) स्थिर
 {
 }
 
-void MatAllocator::unmap(UMatData* u) const
+व्योम MatAllocator::unmap(UMat_तथ्य* u) स्थिर
 {
-    if(u->urefcount == 0 && u->refcount == 0)
+    अगर(u->urefcount == 0 && u->refcount == 0)
     {
         deallocate(u);
     }
 }
 
-void MatAllocator::download(UMatData* u, void* dstptr,
-         int dims, const size_t sz[],
-         const size_t srcofs[], const size_t srcstep[],
-         const size_t dststep[]) const
+व्योम MatAllocator::download(UMat_तथ्य* u, व्योम* dstptr,
+         पूर्णांक dims, स्थिर माप_प्रकार sz[],
+         स्थिर माप_प्रकार srcofs[], स्थिर माप_प्रकार srcstep[],
+         स्थिर माप_प्रकार dststep[]) स्थिर
 {
-    if(!u)
-        return;
-    int isz[CV_MAX_DIM];
-    uchar* srcptr = u->data;
-    for( int i = 0; i < dims; i++ )
+    अगर(!u)
+        वापस;
+    पूर्णांक isz[CV_MAX_DIM];
+    uchar* srcptr = u->तथ्य;
+    क्रम( पूर्णांक i = 0; i < dims; i++ )
     {
-        CV_Assert( sz[i] <= (size_t)INT_MAX );
-        if( sz[i] == 0 )
-            return;
-        if( srcofs )
+        CV_Assert( sz[i] <= (माप_प्रकार)पूर्णांक_उच्च );
+        अगर( sz[i] == 0 )
+            वापस;
+        अगर( srcofs )
             srcptr += srcofs[i]*(i <= dims-2 ? srcstep[i] : 1);
-        isz[i] = (int)sz[i];
+        isz[i] = (पूर्णांक)sz[i];
     }
 
     Mat src(dims, isz, CV_8U, srcptr, srcstep);
     Mat dst(dims, isz, CV_8U, dstptr, dststep);
 
-    const Mat* arrays[] = { &src, &dst };
+    स्थिर Mat* arrays[] = { &src, &dst };
     uchar* ptrs[2];
     NAryMatIterator it(arrays, ptrs, 2);
-    size_t planesz = it.size;
+    माप_प्रकार planesz = it.size;
 
-    for( size_t j = 0; j < it.nplanes; j++, ++it )
-        memcpy(ptrs[1], ptrs[0], planesz);
+    क्रम( माप_प्रकार j = 0; j < it.nplanes; j++, ++it )
+        स_नकल(ptrs[1], ptrs[0], planesz);
 }
 
 
-void MatAllocator::upload(UMatData* u, const void* srcptr, int dims, const size_t sz[],
-                    const size_t dstofs[], const size_t dststep[],
-                    const size_t srcstep[]) const
+व्योम MatAllocator::upload(UMat_तथ्य* u, स्थिर व्योम* srcptr, पूर्णांक dims, स्थिर माप_प्रकार sz[],
+                    स्थिर माप_प्रकार dstofs[], स्थिर माप_प्रकार dststep[],
+                    स्थिर माप_प्रकार srcstep[]) स्थिर
 {
-    if(!u)
-        return;
-    int isz[CV_MAX_DIM];
-    uchar* dstptr = u->data;
-    for( int i = 0; i < dims; i++ )
+    अगर(!u)
+        वापस;
+    पूर्णांक isz[CV_MAX_DIM];
+    uchar* dstptr = u->तथ्य;
+    क्रम( पूर्णांक i = 0; i < dims; i++ )
     {
-        CV_Assert( sz[i] <= (size_t)INT_MAX );
-        if( sz[i] == 0 )
-            return;
-        if( dstofs )
+        CV_Assert( sz[i] <= (माप_प्रकार)पूर्णांक_उच्च );
+        अगर( sz[i] == 0 )
+            वापस;
+        अगर( dstofs )
             dstptr += dstofs[i]*(i <= dims-2 ? dststep[i] : 1);
-        isz[i] = (int)sz[i];
+        isz[i] = (पूर्णांक)sz[i];
     }
 
-    Mat src(dims, isz, CV_8U, (void*)srcptr, srcstep);
+    Mat src(dims, isz, CV_8U, (व्योम*)srcptr, srcstep);
     Mat dst(dims, isz, CV_8U, dstptr, dststep);
 
-    const Mat* arrays[] = { &src, &dst };
+    स्थिर Mat* arrays[] = { &src, &dst };
     uchar* ptrs[2];
     NAryMatIterator it(arrays, ptrs, 2);
-    size_t planesz = it.size;
+    माप_प्रकार planesz = it.size;
 
-    for( size_t j = 0; j < it.nplanes; j++, ++it )
-        memcpy(ptrs[1], ptrs[0], planesz);
+    क्रम( माप_प्रकार j = 0; j < it.nplanes; j++, ++it )
+        स_नकल(ptrs[1], ptrs[0], planesz);
 }
 
-void MatAllocator::copy(UMatData* usrc, UMatData* udst, int dims, const size_t sz[],
-                  const size_t srcofs[], const size_t srcstep[],
-                  const size_t dstofs[], const size_t dststep[], bool /*sync*/) const
+व्योम MatAllocator::copy(UMat_तथ्य* usrc, UMat_तथ्य* udst, पूर्णांक dims, स्थिर माप_प्रकार sz[],
+                  स्थिर माप_प्रकार srcofs[], स्थिर माप_प्रकार srcstep[],
+                  स्थिर माप_प्रकार dstofs[], स्थिर माप_प्रकार dststep[], bool /*sync*/) स्थिर
 {
     CV_INSTRUMENT_REGION();
 
-    if(!usrc || !udst)
-        return;
-    int isz[CV_MAX_DIM];
-    uchar* srcptr = usrc->data;
-    uchar* dstptr = udst->data;
-    for( int i = 0; i < dims; i++ )
+    अगर(!usrc || !udst)
+        वापस;
+    पूर्णांक isz[CV_MAX_DIM];
+    uchar* srcptr = usrc->तथ्य;
+    uchar* dstptr = udst->तथ्य;
+    क्रम( पूर्णांक i = 0; i < dims; i++ )
     {
-        CV_Assert( sz[i] <= (size_t)INT_MAX );
-        if( sz[i] == 0 )
-            return;
-        if( srcofs )
+        CV_Assert( sz[i] <= (माप_प्रकार)पूर्णांक_उच्च );
+        अगर( sz[i] == 0 )
+            वापस;
+        अगर( srcofs )
             srcptr += srcofs[i]*(i <= dims-2 ? srcstep[i] : 1);
-        if( dstofs )
+        अगर( dstofs )
             dstptr += dstofs[i]*(i <= dims-2 ? dststep[i] : 1);
-        isz[i] = (int)sz[i];
+        isz[i] = (पूर्णांक)sz[i];
     }
 
     Mat src(dims, isz, CV_8U, srcptr, srcstep);
     Mat dst(dims, isz, CV_8U, dstptr, dststep);
 
-    const Mat* arrays[] = { &src, &dst };
+    स्थिर Mat* arrays[] = { &src, &dst };
     uchar* ptrs[2];
     NAryMatIterator it(arrays, ptrs, 2);
-    size_t planesz = it.size;
+    माप_प्रकार planesz = it.size;
 
-    for( size_t j = 0; j < it.nplanes; j++, ++it )
-        memcpy(ptrs[1], ptrs[0], planesz);
+    क्रम( माप_प्रकार j = 0; j < it.nplanes; j++, ++it )
+        स_नकल(ptrs[1], ptrs[0], planesz);
 }
 
-BufferPoolController* MatAllocator::getBufferPoolController(const char* id) const
+बफर_Pool_Controller* MatAllocator::get_बफर_Pool_Controller(स्थिर अक्षर* id) स्थिर
 {
     CV_UNUSED(id);
-    static DummyBufferPoolController dummy;
-    return &dummy;
+    अटल Dummy_बफर_Pool_Controller dummy;
+    वापस &dummy;
 }
 
-class StdMatAllocator CV_FINAL : public MatAllocator
+श्रेणी StdMatAllocator CV_FINAL : खुला MatAllocator
 {
-public:
-    UMatData* allocate(int dims, const int* sizes, int type,
-                       void* data0, size_t* step, AccessFlag /*flags*/, UMatUsageFlags /*usageFlags*/) const CV_OVERRIDE
+खुला:
+    UMat_तथ्य* allocate(पूर्णांक dims, स्थिर पूर्णांक* sizes, पूर्णांक type,
+                       व्योम* data0, माप_प्रकार* step, AccessFlag /*flags*/, UMatUsageFlags /*usageFlags*/) स्थिर CV_OVERRIDE
     {
-        size_t total = CV_ELEM_SIZE(type);
-        for( int i = dims-1; i >= 0; i-- )
+        माप_प्रकार योग = CV_ELEM_आकार(type);
+        क्रम( पूर्णांक i = dims-1; i >= 0; i-- )
         {
-            if( step )
+            अगर( step )
             {
-                if( data0 && step[i] != CV_AUTOSTEP )
+                अगर( data0 && step[i] != CV_AUTOSTEP )
                 {
-                    CV_Assert(total <= step[i]);
-                    total = step[i];
+                    CV_Assert(योग <= step[i]);
+                    योग = step[i];
                 }
-                else
-                    step[i] = total;
+                अन्यथा
+                    step[i] = योग;
             }
-            total *= sizes[i];
+            योग *= sizes[i];
         }
-        uchar* data = data0 ? (uchar*)data0 : (uchar*)fastMalloc(total);
-        UMatData* u = new UMatData(this);
-        u->data = u->origdata = data;
-        u->size = total;
-        if(data0)
-            u->flags |= UMatData::USER_ALLOCATED;
+        uchar* तथ्य = data0 ? (uchar*)data0 : (uchar*)fastMalloc(योग);
+        UMat_तथ्य* u = नया UMat_तथ्य(यह);
+        u->तथ्य = u->origdata = तथ्य;
+        u->size = योग;
+        अगर(data0)
+            u->flags |= UMat_तथ्य::USER_ALLOCATED;
 
-        return u;
+        वापस u;
     }
 
-    bool allocate(UMatData* u, AccessFlag /*accessFlags*/, UMatUsageFlags /*usageFlags*/) const CV_OVERRIDE
+    bool allocate(UMat_तथ्य* u, AccessFlag /*accessFlags*/, UMatUsageFlags /*usageFlags*/) स्थिर CV_OVERRIDE
     {
-        if(!u) return false;
-        return true;
+        अगर(!u) वापस false;
+        वापस true;
     }
 
-    void deallocate(UMatData* u) const CV_OVERRIDE
+    व्योम deallocate(UMat_तथ्य* u) स्थिर CV_OVERRIDE
     {
-        if(!u)
-            return;
+        अगर(!u)
+            वापस;
 
         CV_Assert(u->urefcount == 0);
         CV_Assert(u->refcount == 0);
-        if( !(u->flags & UMatData::USER_ALLOCATED) )
+        अगर( !(u->flags & UMat_तथ्य::USER_ALLOCATED) )
         {
             fastFree(u->origdata);
             u->origdata = 0;
         }
-        delete u;
+        मिटाओ u;
     }
 };
 
-static
+अटल
 MatAllocator*& getDefaultAllocatorMatRef()
 {
-    static MatAllocator* g_matAllocator = Mat::getStdAllocator();
-    return g_matAllocator;
+    अटल MatAllocator* g_matAllocator = Mat::getStdAllocator();
+    वापस g_matAllocator;
 }
 
 MatAllocator* Mat::getDefaultAllocator()
 {
-    return getDefaultAllocatorMatRef();
+    वापस getDefaultAllocatorMatRef();
 }
 
-void Mat::setDefaultAllocator(MatAllocator* allocator)
+व्योम Mat::setDefaultAllocator(MatAllocator* allocator)
 {
     getDefaultAllocatorMatRef() = allocator;
 }
 
 MatAllocator* Mat::getStdAllocator()
 {
-    CV_SINGLETON_LAZY_INIT(MatAllocator, new StdMatAllocator())
+    CV_SINGLETON_LAZY_INIT(MatAllocator, नया StdMatAllocator())
 }
 
 //==================================================================================================
 
-void setSize( Mat& m, int _dims, const int* _sz, const size_t* _steps, bool autoSteps)
+व्योम set_आकार( Mat& m, पूर्णांक _dims, स्थिर पूर्णांक* _sz, स्थिर माप_प्रकार* _steps, bool autoSteps)
 {
     CV_Assert( 0 <= _dims && _dims <= CV_MAX_DIM && _dims <= MatShape::MAX_DIMS);
 
     m.dims = _dims;
     m.size = MatShape(_dims, _sz);
-    m.step[std::max(_dims-1, 0)] = CV_ELEM_SIZE(m.flags);
-    for (int i = _dims-2; i >= 0; i--) {
-        size_t autostep = m.size[i+1]*m.step[i+1];
-        if (_steps) {
+    m.step[std::max(_dims-1, 0)] = CV_ELEM_आकार(m.flags);
+    क्रम (पूर्णांक i = _dims-2; i >= 0; i--) {
+        माप_प्रकार autostep = m.size[i+1]*m.step[i+1];
+        अगर (_steps) {
             m.step[i] = _steps[i];
             //CV_Assert(m.step[i] >= autostep);
-        } else if (autoSteps) {
+        } अन्यथा अगर (autoSteps) {
             m.step[i] = autostep;
-        } else {
+        } अन्यथा {
             m.step[i] = 0;
         }
     }
 
-    if( _dims <= 2 )
+    अगर( _dims <= 2 )
     {
         m.cols = _dims == 0 ? 1 : _sz ? _sz[_dims > 1] : 0;
         m.rows = _dims < 2 ? 1 : _sz ? _sz[0] : 0;
-    } else {
+    } अन्यथा {
         m.cols = m.rows = -1;
     }
 }
 
-int updateContinuityFlag(int flags, int dims, const int* size, const size_t* step)
+पूर्णांक updateContinuityFlag(पूर्णांक flags, पूर्णांक dims, स्थिर पूर्णांक* size, स्थिर माप_प्रकार* step)
 {
-    int i, j;
-    if (dims <= 1)
-        return flags | Mat::CONTINUOUS_FLAG;
-    for( i = 0; i < dims; i++ )
+    पूर्णांक i, j;
+    अगर (dims <= 1)
+        वापस flags | Mat::CONTINUOUS_FLAG;
+    क्रम( i = 0; i < dims; i++ )
     {
-        if( size[i] > 1 )
-            break;
+        अगर( size[i] > 1 )
+            अवरोध;
     }
 
     uint64 t = (uint64)size[std::min(i, dims-1)]*CV_MAT_CN(flags);
-    for( j = dims-1; j > i; j-- )
+    क्रम( j = dims-1; j > i; j-- )
     {
         t *= size[j];
-        if( step[j]*size[j] < step[j-1] )
-            break;
+        अगर( step[j]*size[j] < step[j-1] )
+            अवरोध;
     }
 
-    if( j <= i && t == (uint64)(int)t )
-        return flags | Mat::CONTINUOUS_FLAG;
-    return flags & ~Mat::CONTINUOUS_FLAG;
+    अगर( j <= i && t == (uint64)(पूर्णांक)t )
+        वापस flags | Mat::CONTINUOUS_FLAG;
+    वापस flags & ~Mat::CONTINUOUS_FLAG;
 }
 
-void Mat::updateContinuityFlag()
+व्योम Mat::updateContinuityFlag()
 {
     flags = cv::updateContinuityFlag(flags, dims, size.p, step.p);
 }
 
-void finalizeHdr(Mat& m)
+व्योम finalizeHdr(Mat& m)
 {
     m.updateContinuityFlag();
-    int d = m.dims;
-    if( d > 2 )
+    पूर्णांक d = m.dims;
+    अगर( d > 2 )
         m.rows = m.cols = -1;
-    if(m.u)
-        m.datastart = m.data = m.u->data;
-    if( m.data && d > 0 )
+    अगर(m.u)
+        m.datastart = m.तथ्य = m.u->तथ्य;
+    अगर( m.तथ्य && d > 0 )
     {
         m.datalimit = m.datastart + m.size[0]*m.step[0];
-        if( m.size[0] > 0 )
+        अगर( m.size[0] > 0 )
         {
-            int lastdim = d > 0 ? d - 1 : 0;
+            पूर्णांक lastdim = d > 0 ? d - 1 : 0;
             m.dataend = m.ptr() + m.size[lastdim]*m.step[lastdim];
-            for( int i = 0; i < d-1; i++ )
+            क्रम( पूर्णांक i = 0; i < d-1; i++ )
                 m.dataend += (m.size[i] - 1)*m.step[i];
         }
-        else
+        अन्यथा
             m.dataend = m.datalimit;
     }
-    else
-        m.dataend = m.datalimit = m.data;
+    अन्यथा
+        m.dataend = m.datalimit = m.तथ्य;
 }
 
 //======================================= Mat ======================================================
 
 Mat::Mat() CV_NOEXCEPT
-    : flags(MAGIC_VAL), dims(0), rows(0), cols(0), data(0), datastart(0), dataend(0),
+    : flags(MAGIC_VAL), dims(0), rows(0), cols(0), तथ्य(0), datastart(0), dataend(0),
       datalimit(0), allocator(0), u(0)
 {}
 
-Mat::Mat(int _rows, int _cols, int _type)
-    : flags(MAGIC_VAL), dims(0), rows(0), cols(0), data(0), datastart(0), dataend(0),
+Mat::Mat(पूर्णांक _rows, पूर्णांक _cols, पूर्णांक _type)
+    : flags(MAGIC_VAL), dims(0), rows(0), cols(0), तथ्य(0), datastart(0), dataend(0),
       datalimit(0), allocator(0), u(0)
 {
     create(_rows, _cols, _type);
 }
 
-Mat::Mat(int _rows, int _cols, int _type, const Scalar& _s)
-    : flags(MAGIC_VAL), dims(0), rows(0), cols(0), data(0), datastart(0), dataend(0),
+Mat::Mat(पूर्णांक _rows, पूर्णांक _cols, पूर्णांक _type, स्थिर Scalar& _s)
+    : flags(MAGIC_VAL), dims(0), rows(0), cols(0), तथ्य(0), datastart(0), dataend(0),
       datalimit(0), allocator(0), u(0)
 {
     create(_rows, _cols, _type);
-    *this = _s;
+    *यह = _s;
 }
 
-Mat::Mat(Size _sz, int _type)
-    : flags(MAGIC_VAL), dims(0), rows(0), cols(0), data(0), datastart(0), dataend(0),
+Mat::Mat(आकार _sz, पूर्णांक _type)
+    : flags(MAGIC_VAL), dims(0), rows(0), cols(0), तथ्य(0), datastart(0), dataend(0),
       datalimit(0), allocator(0), u(0)
 {
     create( _sz.height, _sz.width, _type );
 }
 
-Mat::Mat(Size _sz, int _type, const Scalar& _s)
-    : flags(MAGIC_VAL), dims(0), rows(0), cols(0), data(0), datastart(0), dataend(0),
+Mat::Mat(आकार _sz, पूर्णांक _type, स्थिर Scalar& _s)
+    : flags(MAGIC_VAL), dims(0), rows(0), cols(0), तथ्य(0), datastart(0), dataend(0),
       datalimit(0), allocator(0), u(0)
 {
     create(_sz.height, _sz.width, _type);
-    *this = _s;
+    *यह = _s;
 }
 
-Mat::Mat(int _dims, const int* _sz, int _type)
-    : flags(MAGIC_VAL), dims(0), rows(0), cols(0), data(0), datastart(0), dataend(0),
+Mat::Mat(पूर्णांक _dims, स्थिर पूर्णांक* _sz, पूर्णांक _type)
+    : flags(MAGIC_VAL), dims(0), rows(0), cols(0), तथ्य(0), datastart(0), dataend(0),
       datalimit(0), allocator(0), u(0)
 {
     create(_dims, _sz, _type);
 }
 
-Mat::Mat(int _dims, const int* _sz, int _type, const Scalar& _s)
-    : flags(MAGIC_VAL), dims(0), rows(0), cols(0), data(0), datastart(0), dataend(0),
+Mat::Mat(पूर्णांक _dims, स्थिर पूर्णांक* _sz, पूर्णांक _type, स्थिर Scalar& _s)
+    : flags(MAGIC_VAL), dims(0), rows(0), cols(0), तथ्य(0), datastart(0), dataend(0),
       datalimit(0), allocator(0), u(0)
 {
     create(_dims, _sz, _type);
-    *this = _s;
+    *यह = _s;
 }
 
-Mat::Mat(const std::vector<int>& _sz, int _type)
-    : flags(MAGIC_VAL), dims(0), rows(0), cols(0), data(0), datastart(0), dataend(0),
+Mat::Mat(स्थिर std::vector<पूर्णांक>& _sz, पूर्णांक _type)
+    : flags(MAGIC_VAL), dims(0), rows(0), cols(0), तथ्य(0), datastart(0), dataend(0),
       datalimit(0), allocator(0), u(0)
 {
     create(_sz, _type);
 }
 
-Mat::Mat(const std::vector<int>& _sz, int _type, const Scalar& _s)
-    : flags(MAGIC_VAL), dims(0), rows(0), cols(0), data(0), datastart(0), dataend(0),
+Mat::Mat(स्थिर std::vector<पूर्णांक>& _sz, पूर्णांक _type, स्थिर Scalar& _s)
+    : flags(MAGIC_VAL), dims(0), rows(0), cols(0), तथ्य(0), datastart(0), dataend(0),
       datalimit(0), allocator(0), u(0)
 {
     create(_sz, _type);
-    *this = _s;
+    *यह = _s;
 }
 
-Mat::Mat(const MatShape& _shape, int _type)
-    : flags(MAGIC_VAL), dims(0), rows(0), cols(0), data(0), datastart(0), dataend(0),
+Mat::Mat(स्थिर MatShape& _shape, पूर्णांक _type)
+    : flags(MAGIC_VAL), dims(0), rows(0), cols(0), तथ्य(0), datastart(0), dataend(0),
       datalimit(0), allocator(0), u(0)
 {
     create(_shape, _type);
 }
 
-Mat::Mat(std::initializer_list<int> _shape, int _type)
-    : flags(MAGIC_VAL), dims(0), rows(0), cols(0), data(0), datastart(0), dataend(0),
+Mat::Mat(std::initializer_list<पूर्णांक> _shape, पूर्णांक _type)
+    : flags(MAGIC_VAL), dims(0), rows(0), cols(0), तथ्य(0), datastart(0), dataend(0),
       datalimit(0), allocator(0), u(0)
 {
     create(_shape, _type);
 }
 
-Mat::Mat(const MatShape& _shape, int _type, const Scalar& _s)
-    : flags(MAGIC_VAL), dims(0), rows(0), cols(0), data(0), datastart(0), dataend(0),
+Mat::Mat(स्थिर MatShape& _shape, पूर्णांक _type, स्थिर Scalar& _s)
+    : flags(MAGIC_VAL), dims(0), rows(0), cols(0), तथ्य(0), datastart(0), dataend(0),
       datalimit(0), allocator(0), u(0)
 {
     create(_shape, _type);
-    *this = _s;
+    *यह = _s;
 }
 
-Mat::Mat(std::initializer_list<int> _shape, int _type, const Scalar& _s)
-    : flags(MAGIC_VAL), dims(0), rows(0), cols(0), data(0), datastart(0), dataend(0),
+Mat::Mat(std::initializer_list<पूर्णांक> _shape, पूर्णांक _type, स्थिर Scalar& _s)
+    : flags(MAGIC_VAL), dims(0), rows(0), cols(0), तथ्य(0), datastart(0), dataend(0),
       datalimit(0), allocator(0), u(0)
 {
     create(_shape, _type);
-    *this = _s;
+    *यह = _s;
 }
 
-Mat::Mat(const Mat& m)
-    : flags(m.flags), dims(m.dims), rows(m.rows), cols(m.cols), data(m.data),
+Mat::Mat(स्थिर Mat& m)
+    : flags(m.flags), dims(m.dims), rows(m.rows), cols(m.cols), तथ्य(m.तथ्य),
       datastart(m.datastart), dataend(m.dataend), datalimit(m.datalimit), allocator(m.allocator),
       u(m.u), size(m.size), step(m.step)
 {
-    if( u )
+    अगर( u )
         CV_XADD(&u->refcount, 1);
 }
 
-Mat::Mat(int _rows, int _cols, int _type, void* _data, size_t _step)
+Mat::Mat(पूर्णांक _rows, पूर्णांक _cols, पूर्णांक _type, व्योम* तथ्य_3, माप_प्रकार _step)
     : flags(MAGIC_VAL + (_type & TYPE_MASK)), dims(2), rows(_rows), cols(_cols),
-      data((uchar*)_data), datastart((uchar*)_data), dataend(0), datalimit(0),
+      तथ्य((uchar*)तथ्य_3), datastart((uchar*)तथ्य_3), dataend(0), datalimit(0),
       allocator(0), u(0), size(2)
 {
-    CV_Assert(total() == 0 || data != NULL);
+    CV_Assert(योग() == 0 || तथ्य != शून्य);
 
-    size_t esz = CV_ELEM_SIZE(_type), esz1 = CV_ELEM_SIZE1(_type);
-    size_t minstep = cols * esz;
-    if( _step == AUTO_STEP )
+    माप_प्रकार esz = CV_ELEM_आकार(_type), esz1 = CV_ELEM_SIZE1(_type);
+    माप_प्रकार minstep = cols * esz;
+    अगर( _step == AUTO_STEP )
     {
         _step = minstep;
     }
-    else
+    अन्यथा
     {
         CV_Assert( _step >= minstep );
-        if (_step % esz1 != 0)
+        अगर (_step % esz1 != 0)
         {
             CV_Error(Error::BadStep, "Step must be a multiple of esz1");
         }
@@ -994,24 +994,24 @@ Mat::Mat(int _rows, int _cols, int _type, void* _data, size_t _step)
     updateContinuityFlag();
 }
 
-Mat::Mat(Size _sz, int _type, void* _data, size_t _step)
+Mat::Mat(आकार _sz, पूर्णांक _type, व्योम* तथ्य_3, माप_प्रकार _step)
     : flags(MAGIC_VAL + (_type & TYPE_MASK)), dims(2), rows(_sz.height), cols(_sz.width),
-      data((uchar*)_data), datastart((uchar*)_data), dataend(0), datalimit(0),
+      तथ्य((uchar*)तथ्य_3), datastart((uchar*)तथ्य_3), dataend(0), datalimit(0),
       allocator(0), u(0), size(2)
 {
-    CV_Assert(total() == 0 || data != NULL);
+    CV_Assert(योग() == 0 || तथ्य != शून्य);
 
-    size_t esz = CV_ELEM_SIZE(_type), esz1 = CV_ELEM_SIZE1(_type);
-    size_t minstep = cols*esz;
-    if( _step == AUTO_STEP || (_step < minstep && rows == 1))
+    माप_प्रकार esz = CV_ELEM_आकार(_type), esz1 = CV_ELEM_SIZE1(_type);
+    माप_प्रकार minstep = cols*esz;
+    अगर( _step == AUTO_STEP || (_step < minstep && rows == 1))
     {
         _step = minstep;
     }
-    else
+    अन्यथा
     {
         CV_CheckGE(_step, minstep, "");
 
-        if (_step % esz1 != 0)
+        अगर (_step % esz1 != 0)
         {
             CV_Error(Error::BadStep, "Step must be a multiple of esz1");
         }
@@ -1031,11 +1031,11 @@ Mat::~Mat()
     release();
 }
 
-Mat& Mat::operator = (const Mat& m)
+Mat& Mat::चालक = (स्थिर Mat& m)
 {
-    if( this != &m )
+    अगर( यह != &m )
     {
-        if( m.u )
+        अगर( m.u )
             CV_XADD(&m.u->refcount, 1);
         release();
         flags = m.flags;
@@ -1044,281 +1044,281 @@ Mat& Mat::operator = (const Mat& m)
         cols = m.cols;
         size = m.size;
         step = m.step;
-        data = m.data;
+        तथ्य = m.तथ्य;
         datastart = m.datastart;
         dataend = m.dataend;
         datalimit = m.datalimit;
         allocator = m.allocator;
         u = m.u;
     }
-    return *this;
+    वापस *यह;
 }
 
-Mat Mat::clone() const
+Mat Mat::clone() स्थिर
 {
     Mat m;
     copyTo(m);
-    return m;
+    वापस m;
 }
 
-void Mat::assignTo( Mat& m, int _type ) const
+व्योम Mat::assignTo( Mat& m, पूर्णांक _type ) स्थिर
 {
-    if( _type < 0 )
-        m = *this;
-    else
+    अगर( _type < 0 )
+        m = *यह;
+    अन्यथा
         convertTo(m, _type);
 }
 
-void Mat::create(int _rows, int _cols, int _type)
+व्योम Mat::create(पूर्णांक _rows, पूर्णांक _cols, पूर्णांक _type)
 {
     _type &= TYPE_MASK;
-    if( dims <= 2 && rows == _rows && cols == _cols && type() == _type && data )
-        return;
-    int sz[] = {_rows, _cols};
+    अगर( dims <= 2 && rows == _rows && cols == _cols && type() == _type && तथ्य )
+        वापस;
+    पूर्णांक sz[] = {_rows, _cols};
     create(2, sz, _type);
 }
 
-void Mat::create(Size _sz, int _type)
+व्योम Mat::create(आकार _sz, पूर्णांक _type)
 {
     create(_sz.height, _sz.width, _type);
 }
 
-void Mat::createSameSize(InputArray m, int type)
+व्योम Mat::create_Same_आकार(निवेश_Array m, पूर्णांक type)
 {
     MatShape msize = m.shape();
     create(msize, type);
 }
 
-void Mat::fit(int _dims, const int* _sizes, int _type)
+व्योम Mat::fit(पूर्णांक _dims, स्थिर पूर्णांक* _sizes, पूर्णांक _type)
 {
-    size_t oldTotalBytes = u ? u->size : 0;
-    size_t esz = CV_ELEM_SIZE(_type), newTotal = _dims >= 0;
-    for (int i = 0; i < _dims; i++)
-        newTotal *= _sizes[i];
-    size_t newTotalBytes = newTotal*esz;
-    if (newTotalBytes > 0 && (!isContinuous() ||
-                              newTotalBytes > oldTotalBytes ||
-                              data != datastart)) {
+    माप_प्रकार old_योग_Bytes = u ? u->size : 0;
+    माप_प्रकार esz = CV_ELEM_आकार(_type), new_योग = _dims >= 0;
+    क्रम (पूर्णांक i = 0; i < _dims; i++)
+        new_योग *= _sizes[i];
+    माप_प्रकार new_योग_Bytes = new_योग*esz;
+    अगर (new_योग_Bytes > 0 && (!isContinuous() ||
+                              new_योग_Bytes > old_योग_Bytes ||
+                              तथ्य != datastart)) {
         create(_dims, _sizes, _type);
-    } else {
+    } अन्यथा {
         flags = (flags & ~Mat::TYPE_MASK) | CV_MAT_TYPE(_type);
-        int _dummy_size = 0;
-        setSize(*this, (_dims >= 0 ? _dims : 1), (_dims >= 0 ? _sizes : &_dummy_size), nullptr, true);
-        finalizeHdr(*this);
+        पूर्णांक dummy_आकार = 0;
+        set_आकार(*यह, (_dims >= 0 ? _dims : 1), (_dims >= 0 ? _sizes : &dummy_आकार), nullptr, true);
+        finalizeHdr(*यह);
     }
 }
 
-void Mat::fit(const std::vector<int>& _shape, int _type)
+व्योम Mat::fit(स्थिर std::vector<पूर्णांक>& _shape, पूर्णांक _type)
 {
-    fit((int)_shape.size(), _shape.data(), _type);
+    fit((पूर्णांक)_shape.size(), _shape.तथ्य(), _type);
 }
 
-void Mat::fit(const MatShape& _shape, int _type)
+व्योम Mat::fit(स्थिर MatShape& _shape, पूर्णांक _type)
 {
     fit(_shape.dims, _shape.p, _type);
     size.layout = _shape.layout;
     size.C = _shape.C;
 }
 
-void Mat::fit(std::initializer_list<int> _shape, int _type)
+व्योम Mat::fit(std::initializer_list<पूर्णांक> _shape, पूर्णांक _type)
 {
-    int new_shape[MatShape::MAX_DIMS];
-    int new_ndims = (int)_shape.size();
+    पूर्णांक new_shape[MatShape::MAX_DIMS];
+    पूर्णांक new_ndims = (पूर्णांक)_shape.size();
     CV_Assert(new_ndims <= MatShape::MAX_DIMS);
-    auto it = _shape.begin();
-    for (int i = 0; i < new_ndims; i++, ++it)
+    स्वतः it = _shape.begin();
+    क्रम (पूर्णांक i = 0; i < new_ndims; i++, ++it)
         new_shape[i] = *it;
     fit(new_ndims, new_shape, _type);
 }
 
-void Mat::fit(int _rows, int _cols, int _type)
+व्योम Mat::fit(पूर्णांक _rows, पूर्णांक _cols, पूर्णांक _type)
 {
     _type &= TYPE_MASK;
-    int sz[] = {_rows, _cols};
+    पूर्णांक sz[] = {_rows, _cols};
     fit(2, sz, _type);
 }
 
-void Mat::fit(Size _sz, int _type)
+व्योम Mat::fit(आकार _sz, पूर्णांक _type)
 {
     fit(_sz.height, _sz.width, _type);
 }
 
-void Mat::fitSameSize(InputArray m, int _type)
+व्योम Mat::fit_Same_आकार(निवेश_Array m, पूर्णांक _type)
 {
     fit(m.shape(), _type);
 }
 
-void Mat::addref()
+व्योम Mat::addref()
 {
-    if( u )
+    अगर( u )
         CV_XADD(&u->refcount, 1);
 }
 
-void Mat::release()
+व्योम Mat::release()
 {
-    if( u && CV_XADD(&u->refcount, -1) == 1 )
+    अगर( u && CV_XADD(&u->refcount, -1) == 1 )
         deallocate();
-    u = NULL;
-    datastart = dataend = datalimit = data = 0;
-    for(int i = 0; i < dims; i++)
+    u = शून्य;
+    datastart = dataend = datalimit = तथ्य = 0;
+    क्रम(पूर्णांक i = 0; i < dims; i++)
         size.p[i] = 0;
     flags = (flags & CV_MAT_TYPE_MASK) | MAGIC_VAL;
     dims = rows = cols = 0;
-    size.clear();
+    size.सफा();
 }
 
-size_t Mat::step1(int i) const
+माप_प्रकार Mat::step1(पूर्णांक i) स्थिर
 {
-    return step.p[i] / elemSize1();
+    वापस step.p[i] / elemSize1();
 }
 
-bool Mat::empty() const
+bool Mat::empty() स्थिर
 {
-    return data == 0 || total() == 0;
+    वापस तथ्य == 0 || योग() == 0;
 }
 
-size_t Mat::total() const
+माप_प्रकार Mat::योग() स्थिर
 {
-    if( dims <= 2 )
-        return (size_t)rows * cols;
-    size_t p = 1;
-    for( int i = 0; i < dims; i++ )
+    अगर( dims <= 2 )
+        वापस (माप_प्रकार)rows * cols;
+    माप_प्रकार p = 1;
+    क्रम( पूर्णांक i = 0; i < dims; i++ )
         p *= size[i];
-    return p;
+    वापस p;
 }
 
-size_t Mat::total(int startDim, int endDim) const
+माप_प्रकार Mat::योग(पूर्णांक startDim, पूर्णांक endDim) स्थिर
 {
     CV_Assert( 0 <= startDim && startDim <= endDim);
-    size_t p = 1;
-    int endDim_ = endDim <= dims ? endDim : dims;
-    for( int i = startDim; i < endDim_; i++ )
+    माप_प्रकार p = 1;
+    पूर्णांक endDim_ = endDim <= dims ? endDim : dims;
+    क्रम( पूर्णांक i = startDim; i < endDim_; i++ )
         p *= size[i];
-    return p;
+    वापस p;
 }
 
 Mat::Mat(Mat&& m) CV_NOEXCEPT
-    : flags(m.flags), dims(m.dims), rows(m.rows), cols(m.cols), data(m.data),
+    : flags(m.flags), dims(m.dims), rows(m.rows), cols(m.cols), तथ्य(m.तथ्य),
       datastart(m.datastart), dataend(m.dataend), datalimit(m.datalimit), allocator(m.allocator),
       u(m.u), size(m.size), step(m.step)
 {
     m.flags = MAGIC_VAL; m.dims = m.rows = m.cols = 0;
-    m.size.clear(); m.step.clear();
-    m.data = NULL; m.datastart = NULL; m.dataend = NULL; m.datalimit = NULL;
-    m.allocator = NULL;
-    m.u = NULL;
+    m.size.सफा(); m.step.सफा();
+    m.तथ्य = शून्य; m.datastart = शून्य; m.dataend = शून्य; m.datalimit = शून्य;
+    m.allocator = शून्य;
+    m.u = शून्य;
 }
 
 
-Mat& Mat::operator = (Mat&& m)
+Mat& Mat::चालक = (Mat&& m)
 {
-    if (this == &m)
-      return *this;
+    अगर (यह == &m)
+      वापस *यह;
 
     release();
-    flags = m.flags; dims = m.dims; rows = m.rows; cols = m.cols; data = m.data;
+    flags = m.flags; dims = m.dims; rows = m.rows; cols = m.cols; तथ्य = m.तथ्य;
     size = m.size; step = m.step;
     datastart = m.datastart; dataend = m.dataend; datalimit = m.datalimit; allocator = m.allocator;
     u = m.u;
     m.flags = MAGIC_VAL; m.dims = m.rows = m.cols = 0;
-    m.size.clear(); m.step.clear();
-    m.data = NULL; m.datastart = NULL; m.dataend = NULL; m.datalimit = NULL;
-    m.allocator = NULL;
-    m.u = NULL;
-    return *this;
+    m.size.सफा(); m.step.सफा();
+    m.तथ्य = शून्य; m.datastart = शून्य; m.dataend = शून्य; m.datalimit = शून्य;
+    m.allocator = शून्य;
+    m.u = शून्य;
+    वापस *यह;
 }
 
 
-void Mat::create(int d0, const int* _sizes, int _type)
+व्योम Mat::create(पूर्णांक d0, स्थिर पूर्णांक* _sizes, पूर्णांक _type)
 {
-    int sz1 = 1, d = d0;
-    int i;
-    if (d == 0) {
+    पूर्णांक sz1 = 1, d = d0;
+    पूर्णांक i;
+    अगर (d == 0) {
         d = 1;
-        _sizes = (const int*)&sz1;
+        _sizes = (स्थिर पूर्णांक*)&sz1;
     }
     CV_Assert(0 <= d && d <= CV_MAX_DIM && _sizes);
     _type = CV_MAT_TYPE(_type);
 
-    if( data && d == dims && _type == type() )
+    अगर( तथ्य && d == dims && _type == type() )
     {
-        for( i = 0; i < d; i++ )
-            if( size[i] != _sizes[i] )
-                break;
-        if( i == d )
-            return;
+        क्रम( i = 0; i < d; i++ )
+            अगर( size[i] != _sizes[i] )
+                अवरोध;
+        अगर( i == d )
+            वापस;
     }
 
-    int _sizes_backup[CV_MAX_DIM]; // #5991
-    if (_sizes == (this->size.p))
+    पूर्णांक _sizes_backup[CV_MAX_DIM]; // #5991
+    अगर (_sizes == (यह->size.p))
     {
-        for(i = 0; i < d; i++ )
+        क्रम(i = 0; i < d; i++ )
             _sizes_backup[i] = _sizes[i];
         _sizes = _sizes_backup;
     }
 
     release();
-    if( d == 0 )
-        return;
+    अगर( d == 0 )
+        वापस;
     flags = (_type & CV_MAT_TYPE_MASK) | MAGIC_VAL;
-    setSize(*this, d, _sizes, 0, true);
+    set_आकार(*यह, d, _sizes, 0, true);
 
-    if( total() > 0 )
+    अगर( योग() > 0 )
     {
         MatAllocator *a = allocator, *a0 = getDefaultAllocator();
-        if(!a)
+        अगर(!a)
             a = a0;
-        try
+        प्रयास
         {
             u = a->allocate(dims, size.p, _type, 0, step.p, ACCESS_RW /* ignored */, USAGE_DEFAULT);
             CV_Assert(u != 0);
             allocator = a;
         }
-        catch (...)
+        पकड़ो (...)
         {
-            if (a == a0)
-                throw;
+            अगर (a == a0)
+                फेंको;
             u = a0->allocate(dims, size.p, _type, 0, step.p, ACCESS_RW /* ignored */, USAGE_DEFAULT);
             CV_Assert(u != 0);
             allocator = a0;
         }
-        CV_Assert( step[dims-1] == (size_t)CV_ELEM_SIZE(flags) );
+        CV_Assert( step[dims-1] == (माप_प्रकार)CV_ELEM_आकार(flags) );
     }
 
     addref();
-    finalizeHdr(*this);
+    finalizeHdr(*यह);
     size.dims = dims = d0;
 }
 
-void Mat::create(const std::vector<int>& _sizes, int _type)
+व्योम Mat::create(स्थिर std::vector<पूर्णांक>& _sizes, पूर्णांक _type)
 {
-    create((int)_sizes.size(), _sizes.data(), _type);
+    create((पूर्णांक)_sizes.size(), _sizes.तथ्य(), _type);
 }
 
-void Mat::create(const MatShape& _shape, int _type)
+व्योम Mat::create(स्थिर MatShape& _shape, पूर्णांक _type)
 {
-    if (_shape.dims < 0) {
+    अगर (_shape.dims < 0) {
         release();
-        return;
+        वापस;
     }
     create(_shape.dims, _shape.p, _type);
     size.layout = _shape.layout;
     size.C = _shape.C;
 }
 
-void Mat::create(std::initializer_list<int> _shape, int _type)
+व्योम Mat::create(std::initializer_list<पूर्णांक> _shape, पूर्णांक _type)
 {
-    int new_shape[MatShape::MAX_DIMS];
-    int new_ndims = (int)_shape.size();
+    पूर्णांक new_shape[MatShape::MAX_DIMS];
+    पूर्णांक new_ndims = (पूर्णांक)_shape.size();
     CV_Assert(new_ndims <= MatShape::MAX_DIMS);
-    auto it = _shape.begin();
-    for (int i = 0; i < new_ndims; i++, ++it)
+    स्वतः it = _shape.begin();
+    क्रम (पूर्णांक i = 0; i < new_ndims; i++, ++it)
         new_shape[i] = *it;
 
     create(new_ndims, new_shape, _type);
 }
 
-void Mat::copySize(const Mat& m)
+व्योम Mat::copy_आकार(स्थिर Mat& m)
 {
     dims = m.dims;
     cols = m.cols;
@@ -1327,65 +1327,65 @@ void Mat::copySize(const Mat& m)
     step = m.step;
 }
 
-void Mat::deallocate()
+व्योम Mat::deallocate()
 {
-    if(u)
+    अगर(u)
     {
-        UMatData* u_ = u;
-        u = NULL;
+        UMat_तथ्य* u_ = u;
+        u = शून्य;
         (u_->currAllocator ? u_->currAllocator : allocator ? allocator : getDefaultAllocator())->unmap(u_);
     }
 }
 
-Mat::Mat(const Mat& m, const Range& _rowRange, const Range& _colRange)
-    : flags(MAGIC_VAL), dims(0), rows(0), cols(0), data(0), datastart(0), dataend(0),
+Mat::Mat(स्थिर Mat& m, स्थिर Range& _rowRange, स्थिर Range& _colRange)
+    : flags(MAGIC_VAL), dims(0), rows(0), cols(0), तथ्य(0), datastart(0), dataend(0),
       datalimit(0), allocator(0), u(0)
 {
     CV_Assert(m.dims <= MatShape::MAX_DIMS);
     CV_Assert(m.dims >= 2 ||
               (m.dims == 1 && (_rowRange == Range::all() ||
                                _rowRange == Range(0, m.rows))));
-    if( m.dims > 2 )
+    अगर( m.dims > 2 )
     {
         Range rs[MatShape::MAX_DIMS];
         rs[0] = _rowRange;
         rs[1] = _colRange;
-        for( int i = 2; i < m.dims; i++ )
+        क्रम( पूर्णांक i = 2; i < m.dims; i++ )
             rs[i] = Range::all();
-        *this = m(rs);
-        return;
+        *यह = m(rs);
+        वापस;
     }
 
-    *this = m;
-    try
+    *यह = m;
+    प्रयास
     {
-        if( _rowRange != Range::all() && _rowRange != Range(0,rows) )
+        अगर( _rowRange != Range::all() && _rowRange != Range(0,rows) )
         {
             CV_Assert( 0 <= _rowRange.start && _rowRange.start <= _rowRange.end
                        && _rowRange.end <= m.rows );
             size[0] = rows = _rowRange.size();
-            data += step*_rowRange.start;
+            तथ्य += step*_rowRange.start;
             flags |= SUBMATRIX_FLAG;
         }
 
-        if( _colRange != Range::all() && _colRange != Range(0,cols) )
+        अगर( _colRange != Range::all() && _colRange != Range(0,cols) )
         {
             CV_Assert( 0 <= _colRange.start && _colRange.start <= _colRange.end
                        && _colRange.end <= m.cols );
             size[dims > 1] = cols = _colRange.size();
-            data += _colRange.start*elemSize();
+            तथ्य += _colRange.start*elem_आकार();
             flags |= SUBMATRIX_FLAG;
         }
     }
-    catch(...)
+    पकड़ो(...)
     {
         release();
-        throw;
+        फेंको;
     }
 
     updateContinuityFlag();
 
-    if( rows <= 0 || cols <= 0 )
+    अगर( rows <= 0 || cols <= 0 )
     {
         release();
         rows = cols = 0;
@@ -1393,19 +1393,19 @@ Mat::Mat(const Mat& m, const Range& _rowRange, const Range& _colRange)
 }
 
 
-Mat::Mat(const Mat& m, const Rect& roi)
+Mat::Mat(स्थिर Mat& m, स्थिर Rect& roi)
     : flags(m.flags), dims(2), rows(roi.height), cols(roi.width),
-    data(m.data + roi.y*m.step[0]),
+    तथ्य(m.तथ्य + roi.y*m.step[0]),
     datastart(m.datastart), dataend(m.dataend), datalimit(m.datalimit),
     allocator(m.allocator), u(m.u), size(2)
 {
     CV_Assert( m.dims <= 2 );
 
-    size_t esz = CV_ELEM_SIZE(flags);
-    data += roi.x*esz;
+    माप_प्रकार esz = CV_ELEM_आकार(flags);
+    तथ्य += roi.x*esz;
     CV_Assert( 0 <= roi.x && 0 <= roi.width && roi.x + roi.width <= m.cols &&
               0 <= roi.y && 0 <= roi.height && roi.y + roi.height <= m.rows );
-    if( roi.width < m.cols || roi.height < m.rows )
+    अगर( roi.width < m.cols || roi.height < m.rows )
         flags |= SUBMATRIX_FLAG;
 
     size[0] = rows;
@@ -1415,7 +1415,7 @@ Mat::Mat(const Mat& m, const Rect& roi)
     updateContinuityFlag();
 
     addref();
-    if( rows <= 0 || cols <= 0 )
+    अगर( rows <= 0 || cols <= 0 )
     {
         rows = cols = 0;
         release();
@@ -1423,119 +1423,119 @@ Mat::Mat(const Mat& m, const Rect& roi)
 }
 
 
-Mat::Mat(int _dims, const int* _sizes, int _type, void* _data, const size_t* _steps)
-    : flags(MAGIC_VAL), dims(0), rows(0), cols(0), data(0), datastart(0), dataend(0),
+Mat::Mat(पूर्णांक _dims, स्थिर पूर्णांक* _sizes, पूर्णांक _type, व्योम* तथ्य_3, स्थिर माप_प्रकार* _steps)
+    : flags(MAGIC_VAL), dims(0), rows(0), cols(0), तथ्य(0), datastart(0), dataend(0),
       datalimit(0), allocator(0), u(0)
 {
     flags |= CV_MAT_TYPE(_type);
-    datastart = data = (uchar*)_data;
-    if (_dims > 0 || _data != nullptr)
-        setSize(*this, _dims, _sizes, _steps, true);
-    finalizeHdr(*this);
+    datastart = तथ्य = (uchar*)तथ्य_3;
+    अगर (_dims > 0 || तथ्य_3 != nullptr)
+        set_आकार(*यह, _dims, _sizes, _steps, true);
+    finalizeHdr(*यह);
 }
 
 
-Mat::Mat(const std::vector<int>& _sizes, int _type, void* _data, const size_t* _steps)
-    : flags(MAGIC_VAL), dims(0), rows(0), cols(0), data(0), datastart(0), dataend(0),
+Mat::Mat(स्थिर std::vector<पूर्णांक>& _sizes, पूर्णांक _type, व्योम* तथ्य_3, स्थिर माप_प्रकार* _steps)
+    : flags(MAGIC_VAL), dims(0), rows(0), cols(0), तथ्य(0), datastart(0), dataend(0),
       datalimit(0), allocator(0), u(0)
 {
     flags |= CV_MAT_TYPE(_type);
-    datastart = data = (uchar*)_data;
-    int _dims = (int)_sizes.size();
-    if (_dims > 0 || _data != nullptr)
-        setSize(*this, _dims, _sizes.data(), _steps, true);
-    finalizeHdr(*this);
+    datastart = तथ्य = (uchar*)तथ्य_3;
+    पूर्णांक _dims = (पूर्णांक)_sizes.size();
+    अगर (_dims > 0 || तथ्य_3 != nullptr)
+        set_आकार(*यह, _dims, _sizes.तथ्य(), _steps, true);
+    finalizeHdr(*यह);
 }
 
-Mat::Mat(const MatShape& _shape, int _type, void* _data, const size_t* _steps)
-    : flags(MAGIC_VAL), dims(0), rows(0), cols(0), data(0), datastart(0), dataend(0),
+Mat::Mat(स्थिर MatShape& _shape, पूर्णांक _type, व्योम* तथ्य_3, स्थिर माप_प्रकार* _steps)
+    : flags(MAGIC_VAL), dims(0), rows(0), cols(0), तथ्य(0), datastart(0), dataend(0),
       datalimit(0), allocator(0), u(0)
 {
     flags |= CV_MAT_TYPE(_type);
-    datastart = data = (uchar*)_data;
-    if (_shape.dims >= 0) {
-        setSize(*this, _shape.dims, _shape.p, _steps, true);
+    datastart = तथ्य = (uchar*)तथ्य_3;
+    अगर (_shape.dims >= 0) {
+        set_आकार(*यह, _shape.dims, _shape.p, _steps, true);
     }
-    else {
-        CV_Assert(!data);
+    अन्यथा {
+        CV_Assert(!तथ्य);
     }
-    finalizeHdr(*this);
+    finalizeHdr(*यह);
 }
 
-Mat::Mat(std::initializer_list<int> _shape, int _type, void* _data, const size_t* _steps)
-    : flags(MAGIC_VAL), dims(0), rows(0), cols(0), data(0), datastart(0), dataend(0),
+Mat::Mat(std::initializer_list<पूर्णांक> _shape, पूर्णांक _type, व्योम* तथ्य_3, स्थिर माप_प्रकार* _steps)
+    : flags(MAGIC_VAL), dims(0), rows(0), cols(0), तथ्य(0), datastart(0), dataend(0),
       datalimit(0), allocator(0), u(0)
 {
-    int new_shape[MatShape::MAX_DIMS];
-    int _dims = (int)_shape.size();
+    पूर्णांक new_shape[MatShape::MAX_DIMS];
+    पूर्णांक _dims = (पूर्णांक)_shape.size();
     CV_Assert(_dims <= MatShape::MAX_DIMS);
-    auto it = _shape.begin();
-    for (int i = 0; i < _dims; i++, ++it)
+    स्वतः it = _shape.begin();
+    क्रम (पूर्णांक i = 0; i < _dims; i++, ++it)
         new_shape[i] = *it;
 
     flags |= CV_MAT_TYPE(_type);
-    datastart = data = (uchar*)_data;
-    if (_dims > 0 || _data != nullptr)
-        setSize(*this, _dims, new_shape, _steps, true);
-    finalizeHdr(*this);
+    datastart = तथ्य = (uchar*)तथ्य_3;
+    अगर (_dims > 0 || तथ्य_3 != nullptr)
+        set_आकार(*यह, _dims, new_shape, _steps, true);
+    finalizeHdr(*यह);
 }
 
-Mat::Mat(const Mat& m, const Range* ranges)
-    : flags(MAGIC_VAL), dims(0), rows(0), cols(0), data(0), datastart(0), dataend(0),
+Mat::Mat(स्थिर Mat& m, स्थिर Range* ranges)
+    : flags(MAGIC_VAL), dims(0), rows(0), cols(0), तथ्य(0), datastart(0), dataend(0),
       datalimit(0), allocator(0), u(0)
 {
-    int d = m.dims;
+    पूर्णांक d = m.dims;
 
     CV_Assert(ranges);
-    for( int i = 0; i < d; i++ )
+    क्रम( पूर्णांक i = 0; i < d; i++ )
     {
         Range r = ranges[i];
         CV_Assert( r == Range::all() || (0 <= r.start && r.start < r.end && r.end <= m.size[i]) );
     }
-    *this = m;
-    for( int i = 0; i < d; i++ )
+    *यह = m;
+    क्रम( पूर्णांक i = 0; i < d; i++ )
     {
         Range r = ranges[i];
-        if( r != Range::all() && r != Range(0, size.p[i]))
+        अगर( r != Range::all() && r != Range(0, size.p[i]))
         {
             size.p[i] = r.end - r.start;
-            data += r.start*step.p[i];
+            तथ्य += r.start*step.p[i];
             flags |= SUBMATRIX_FLAG;
         }
     }
 
-    if (d <= 2) {
+    अगर (d <= 2) {
         rows = d == 2 ? size[0] : 1;
         cols = d <= 0 ? (d >= 0) : size[d > 1];
     }
     updateContinuityFlag();
 }
 
-Mat::Mat(const Mat& m, const std::vector<Range>& ranges)
-    : flags(MAGIC_VAL), dims(0), rows(0), cols(0), data(0), datastart(0), dataend(0),
+Mat::Mat(स्थिर Mat& m, स्थिर std::vector<Range>& ranges)
+    : flags(MAGIC_VAL), dims(0), rows(0), cols(0), तथ्य(0), datastart(0), dataend(0),
     datalimit(0), allocator(0), u(0)
 {
-    int d = m.dims;
+    पूर्णांक d = m.dims;
 
-    CV_Assert((int)ranges.size() == d);
-    for (int i = 0; i < d; i++)
+    CV_Assert((पूर्णांक)ranges.size() == d);
+    क्रम (पूर्णांक i = 0; i < d; i++)
     {
         Range r = ranges[i];
         CV_Assert(r == Range::all() || (0 <= r.start && r.start < r.end && r.end <= m.size[i]));
     }
-    *this = m;
-    for (int i = 0; i < d; i++)
+    *यह = m;
+    क्रम (पूर्णांक i = 0; i < d; i++)
     {
         Range r = ranges[i];
-        if (r != Range::all() && r != Range(0, size.p[i]))
+        अगर (r != Range::all() && r != Range(0, size.p[i]))
         {
             size.p[i] = r.end - r.start;
-            data += r.start*step.p[i];
+            तथ्य += r.start*step.p[i];
             flags |= SUBMATRIX_FLAG;
         }
     }
 
-    if (d <= 2) {
+    अगर (d <= 2) {
         rows = d == 2 ? size[0] : 1;
         cols = d <= 0 ? (d >= 0) : size[d > 1];
     }
@@ -1543,22 +1543,22 @@ Mat::Mat(const Mat& m, const std::vector<Range>& ranges)
 }
 
 
-Mat Mat::diag(int d) const
+Mat Mat::diag(पूर्णांक d) स्थिर
 {
     CV_Assert( dims == 2 );
-    Mat m = *this;
-    size_t esz = elemSize();
-    int len;
+    Mat m = *यह;
+    माप_प्रकार esz = elem_आकार();
+    पूर्णांक len;
 
-    if( d >= 0 )
+    अगर( d >= 0 )
     {
         len = std::min(cols - d, rows);
-        m.data += esz*d;
+        m.तथ्य += esz*d;
     }
-    else
+    अन्यथा
     {
         len = std::min(rows + d, cols);
-        m.data -= step[0]*d;
+        m.तथ्य -= step[0]*d;
     }
     CV_DbgAssert( len > 0 );
 
@@ -1568,138 +1568,138 @@ Mat Mat::diag(int d) const
 
     m.updateContinuityFlag();
 
-    if( size() != Size(1,1) )
+    अगर( size() != आकार(1,1) )
         m.flags |= SUBMATRIX_FLAG;
 
-    return m;
+    वापस m;
 }
 
 
-void Mat::pop_back(size_t nelems)
+व्योम Mat::pop_back(माप_प्रकार nelems)
 {
-    CV_Assert( nelems <= (size_t)size.p[0] );
+    CV_Assert( nelems <= (माप_प्रकार)size.p[0] );
     CV_Assert( dims >= 1 );
 
-    if( isSubmatrix() )
-        *this = rowRange(0, size.p[0] - (int)nelems);
-    else
+    अगर( isSubmatrix() )
+        *यह = rowRange(0, size.p[0] - (पूर्णांक)nelems);
+    अन्यथा
     {
-        size.p[0] -= (int)nelems;
-        if (dims == 2)
+        size.p[0] -= (पूर्णांक)nelems;
+        अगर (dims == 2)
             rows = size.p[0];
-        else if (dims == 1)
+        अन्यथा अगर (dims == 1)
             cols = size.p[0];
         dataend -= nelems*step.p[0];
     }
 }
 
 
-void Mat::push_back_(const void* elem)
+व्योम Mat::धकेलो_back(स्थिर व्योम* elem)
 {
-    size_t r = size.p[0];
-    if( isSubmatrix() || dataend + step.p[0] > datalimit )
+    माप_प्रकार r = size.p[0];
+    अगर( isSubmatrix() || dataend + step.p[0] > datalimit )
         reserve( std::max(r + 1, (r*3+1)/2) );
 
-    size_t esz = elemSize();
-    memcpy(data + r*step.p[0], elem, esz);
-    size.p[0] = int(r + 1);
-    if (dims == 2)
+    माप_प्रकार esz = elem_आकार();
+    स_नकल(तथ्य + r*step.p[0], elem, esz);
+    size.p[0] = पूर्णांक(r + 1);
+    अगर (dims == 2)
         rows = size.p[0];
-    else if (dims == 1)
+    अन्यथा अगर (dims == 1)
         cols = size.p[0];
     dataend += step.p[0];
     uint64 tsz = size.p[0];
-    for( int i = 1; i < dims; i++ )
+    क्रम( पूर्णांक i = 1; i < dims; i++ )
         tsz *= size.p[i];
-    if( esz < step.p[0] || tsz != (uint64)(int)tsz )
+    अगर( esz < step.p[0] || tsz != (uint64)(पूर्णांक)tsz )
         flags &= ~CONTINUOUS_FLAG;
 }
 
 
-void Mat::reserve(size_t nelems)
+व्योम Mat::reserve(माप_प्रकार nelems)
 {
-    const size_t MIN_SIZE = 64;
+    स्थिर माप_प्रकार MIN_आकार = 64;
 
-    CV_Assert( (int)nelems >= 0 );
-    if( !isSubmatrix() && step.p[0] != 0 && data + step.p[0]*nelems <= datalimit )
-        return;
+    CV_Assert( (पूर्णांक)nelems >= 0 );
+    अगर( !isSubmatrix() && step.p[0] != 0 && तथ्य + step.p[0]*nelems <= datalimit )
+        वापस;
 
-    int r = size.p[0];
-    if( (size_t)r >= nelems)
-        return;
+    पूर्णांक r = size.p[0];
+    अगर( (माप_प्रकार)r >= nelems)
+        वापस;
 
     MatShape newsize = size;
-    size_t esz = elemSize();
+    माप_प्रकार esz = elem_आकार();
     newsize.dims = std::max(newsize.dims, 1);
-    if (dims > 1 && r == 0 && step.p[0] == 0) {
+    अगर (dims > 1 && r == 0 && step.p[0] == 0) {
         step.p[0] = size.p[1] * (dims == 2 ? esz : step.p[1]);
     }
-    newsize.p[0] = (int)nelems;
-    size_t newbytes = newsize.total() * esz;
-    if (newbytes < MIN_SIZE) {
+    newsize.p[0] = (पूर्णांक)nelems;
+    माप_प्रकार newbytes = newsize.योग() * esz;
+    अगर (newbytes < MIN_आकार) {
         newsize.p[0] = 1;
-        newsize.p[0] = int(MIN_SIZE / newsize.total() / esz);
+        newsize.p[0] = पूर्णांक(MIN_आकार / newsize.योग() / esz);
     }
 
     Mat m(newsize, type());
-    if( r > 0)
+    अगर( r > 0)
     {
         Mat mpart = m.rowRange(0, r);
         copyTo(mpart);
     }
 
-    *this = m;
+    *यह = m;
     size.p[0] = r;
 
-    if (dims == 2)
+    अगर (dims == 2)
         rows = size.p[0];
-    else if (dims == 1)
+    अन्यथा अगर (dims == 1)
         cols = size.p[0];
-    dataend = data + step.p[0]*r;
+    dataend = तथ्य + step.p[0]*r;
 }
 
 
-void Mat::reserveBuffer(size_t nbytes)
+व्योम Mat::reserve_बफर(माप_प्रकार nbytes)
 {
-    size_t esz = 1;
-    int mtype = CV_8UC1;
-    if (!empty())
+    माप_प्रकार esz = 1;
+    पूर्णांक mtype = CV_8UC1;
+    अगर (!empty())
     {
-        if (!isSubmatrix() && data + nbytes <= dataend)//Should it be datalimit?
-            return;
-        esz = elemSize();
+        अगर (!isSubmatrix() && तथ्य + nbytes <= dataend)//Should it be datalimit?
+            वापस;
+        esz = elem_आकार();
         mtype = type();
     }
 
-    size_t nelems = (nbytes - 1) / esz + 1;
+    माप_प्रकार nelems = (nbytes - 1) / esz + 1;
 
-#if SIZE_MAX > UINT_MAX
-    CV_Assert(nelems <= size_t(INT_MAX)*size_t(INT_MAX));
-    int newrows = nelems > size_t(INT_MAX) ? nelems > 0x400*size_t(INT_MAX) ? nelems > 0x100000 * size_t(INT_MAX) ? nelems > 0x40000000 * size_t(INT_MAX) ?
-                  size_t(INT_MAX) : 0x40000000 : 0x100000 : 0x400 : 1;
-#else
-    int newrows = nelems > size_t(INT_MAX) ? 2 : 1;
-#endif
-    int newcols = (int)((nelems - 1) / newrows + 1);
+#अगर SIZE_MAX > अच_पूर्णांक_उच्च
+    CV_Assert(nelems <= माप_प्रकार(पूर्णांक_उच्च)*माप_प्रकार(पूर्णांक_उच्च));
+    पूर्णांक newrows = nelems > माप_प्रकार(पूर्णांक_उच्च) ? nelems > 0x400*माप_प्रकार(पूर्णांक_उच्च) ? nelems > 0x100000 * माप_प्रकार(पूर्णांक_उच्च) ? nelems > 0x40000000 * माप_प्रकार(पूर्णांक_उच्च) ?
+                  माप_प्रकार(पूर्णांक_उच्च) : 0x40000000 : 0x100000 : 0x400 : 1;
+#अन्यथा
+    पूर्णांक newrows = nelems > माप_प्रकार(पूर्णांक_उच्च) ? 2 : 1;
+#पूर्ण_अगर
+    पूर्णांक newcols = (पूर्णांक)((nelems - 1) / newrows + 1);
 
     create(newrows, newcols, mtype);
 }
 
 
-void Mat::resize(size_t nelems)
+व्योम Mat::resize(माप_प्रकार nelems)
 {
-    int r = size.p[0];
-    if( r == (int)nelems )
-        return;
-    CV_Assert( (int)nelems >= 0 );
+    पूर्णांक r = size.p[0];
+    अगर( r == (पूर्णांक)nelems )
+        वापस;
+    CV_Assert( (पूर्णांक)nelems >= 0 );
 
-    if( isSubmatrix() || data + step.p[0]*nelems > datalimit )
+    अगर( isSubmatrix() || तथ्य + step.p[0]*nelems > datalimit )
         reserve(nelems);
 
-    size.p[0] = (int)nelems;
-    if (dims == 2)
+    size.p[0] = (पूर्णांक)nelems;
+    अगर (dims == 2)
         rows = size.p[0];
-    else if (dims == 1)
+    अन्यथा अगर (dims == 1)
         cols = size.p[0];
     dataend += (size.p[0] - r)*(int64_t)step.p[0];
 
@@ -1707,383 +1707,383 @@ void Mat::resize(size_t nelems)
 }
 
 
-void Mat::resize(size_t nelems, const Scalar& s)
+व्योम Mat::resize(माप_प्रकार nelems, स्थिर Scalar& s)
 {
-    int saveRows = size.p[0];
+    पूर्णांक saveRows = size.p[0];
     resize(nelems);
 
-    if( size.p[0] > saveRows )
+    अगर( size.p[0] > saveRows )
     {
         Mat part = rowRange(saveRows, size.p[0]);
         part = s;
     }
 }
 
-void Mat::push_back(const Mat& elems)
+व्योम Mat::push_back(स्थिर Mat& elems)
 {
-    size_t r = size.p[0];
-    size_t delta = elems.size.p[0];
-    if( delta == 0 )
-        return;
-    if( this == &elems )
+    माप_प्रकार r = size.p[0];
+    माप_प्रकार delta = elems.size.p[0];
+    अगर( delta == 0 )
+        वापस;
+    अगर( यह == &elems )
     {
         Mat tmp = elems;
         push_back(tmp);
-        return;
+        वापस;
     }
-    if( !data )
+    अगर( !तथ्य )
     {
-        *this = elems.clone();
-        return;
+        *यह = elems.clone();
+        वापस;
     }
     CV_Assert(dims > 0);
 
     size.p[0] = elems.size.p[0];
     bool eq = size == elems.size;
-    size.p[0] = int(r);
-    if( !eq )
+    size.p[0] = पूर्णांक(r);
+    अगर( !eq )
         CV_Error(cv::Error::StsUnmatchedSizes, "Pushed vector length is not equal to matrix row length");
-    if( type() != elems.type() )
+    अगर( type() != elems.type() )
         CV_Error(cv::Error::StsUnmatchedFormats, "Pushed vector type is not the same as matrix type");
-    size_t esz = elemSize();
-    size_t minstep = dims <= 1 ? esz : size.p[1] * (dims == 2 ? esz : step.p[1]);
-    size_t step0 = step.p[0];
-    if (step0 < minstep) {
-        if (size.p[0] <= 1)
+    माप_प्रकार esz = elem_आकार();
+    माप_प्रकार minstep = dims <= 1 ? esz : size.p[1] * (dims == 2 ? esz : step.p[1]);
+    माप_प्रकार step0 = step.p[0];
+    अगर (step0 < minstep) {
+        अगर (size.p[0] <= 1)
             step.p[0] = step0 = minstep;
     }
 
-    if( isSubmatrix() || dataend + step0*delta > datalimit )
+    अगर( isSubmatrix() || dataend + step0*delta > datalimit )
         reserve( std::max(r + delta, (r*3+1)/2) );
 
-    size.p[0] += int(delta);
-    if (dims == 2)
+    size.p[0] += पूर्णांक(delta);
+    अगर (dims == 2)
         rows = size.p[0];
-    else if (dims == 1)
+    अन्यथा अगर (dims == 1)
         cols = size.p[0];
     dataend += step0*delta;
 
     //updateContinuityFlag(*this);
 
-    if( isContinuous() && elems.isContinuous() )
-        memcpy(data + r*step0, elems.data, elems.total()*elems.elemSize());
-    else
+    अगर( isContinuous() && elems.isContinuous() )
+        स_नकल(तथ्य + r*step0, elems.तथ्य, elems.योग()*elems.elem_आकार());
+    अन्यथा
     {
-        Mat part = rowRange(int(r), int(r + delta));
+        Mat part = rowRange(पूर्णांक(r), पूर्णांक(r + delta));
         elems.copyTo(part);
     }
 }
 
 
-void Mat::locateROI( Size& wholeSize, Point& ofs ) const
+व्योम Mat::locateROI( आकार& whole_आकार, Point& ofs ) स्थिर
 {
     CV_Assert( dims <= 2 && step[0] > 0 );
-    size_t esz = elemSize(), minstep;
-    ptrdiff_t delta1 = data - datastart, delta2 = dataend - datastart;
+    माप_प्रकार esz = elem_आकार(), minstep;
+    सूचक_भेद_प्रकार delta1 = तथ्य - datastart, delta2 = dataend - datastart;
 
-    if( delta1 == 0 )
+    अगर( delta1 == 0 )
         ofs.x = ofs.y = 0;
-    else
+    अन्यथा
     {
-        ofs.y = (int)(delta1/step[0]);
-        ofs.x = (int)((delta1 - step[0]*ofs.y)/esz);
-        CV_DbgAssert( data == datastart + ofs.y*step[0] + ofs.x*esz );
+        ofs.y = (पूर्णांक)(delta1/step[0]);
+        ofs.x = (पूर्णांक)((delta1 - step[0]*ofs.y)/esz);
+        CV_DbgAssert( तथ्य == datastart + ofs.y*step[0] + ofs.x*esz );
     }
     minstep = (ofs.x + cols)*esz;
-    wholeSize.height = (int)((delta2 - minstep)/step[0] + 1);
-    wholeSize.height = std::max(wholeSize.height, ofs.y + rows);
-    wholeSize.width = (int)((delta2 - step*(wholeSize.height-1))/esz);
-    wholeSize.width = std::max(wholeSize.width, ofs.x + cols);
+    whole_आकार.height = (पूर्णांक)((delta2 - minstep)/step[0] + 1);
+    whole_आकार.height = std::max(whole_आकार.height, ofs.y + rows);
+    whole_आकार.width = (पूर्णांक)((delta2 - step*(whole_आकार.height-1))/esz);
+    whole_आकार.width = std::max(whole_आकार.width, ofs.x + cols);
 }
 
-Mat& Mat::adjustROI( int dtop, int dbottom, int dleft, int dright )
+Mat& Mat::adjustROI( पूर्णांक dtop, पूर्णांक dbottom, पूर्णांक dleft, पूर्णांक dright )
 {
     CV_Assert( dims <= 2 && step[0] > 0 );
-    Size wholeSize; Point ofs;
-    size_t esz = elemSize();
-    locateROI( wholeSize, ofs );
-    int row1 = std::min(std::max(ofs.y - dtop, 0), wholeSize.height), row2 = std::max(0, std::min(ofs.y + rows + dbottom, wholeSize.height));
-    int col1 = std::min(std::max(ofs.x - dleft, 0), wholeSize.width), col2 = std::max(0, std::min(ofs.x + cols + dright, wholeSize.width));
-    if(row1 > row2)
+    आकार whole_आकार; Point ofs;
+    माप_प्रकार esz = elem_आकार();
+    locateROI( whole_आकार, ofs );
+    पूर्णांक row1 = std::min(std::max(ofs.y - dtop, 0), whole_आकार.height), row2 = std::max(0, std::min(ofs.y + rows + dbottom, whole_आकार.height));
+    पूर्णांक col1 = std::min(std::max(ofs.x - dleft, 0), whole_आकार.width), col2 = std::max(0, std::min(ofs.x + cols + dright, whole_आकार.width));
+    अगर(row1 > row2)
         std::swap(row1, row2);
-    if(col1 > col2)
+    अगर(col1 > col2)
         std::swap(col1, col2);
 
-    if (dims == 1) {
-        data += (col1 - ofs.x)*(std::ptrdiff_t)esz;
+    अगर (dims == 1) {
+        तथ्य += (col1 - ofs.x)*(std::सूचक_भेद_प्रकार)esz;
         cols = col2 - col1;
         size.p[0] = cols;
-    } else {
-        data += (row1 - ofs.y)*(std::ptrdiff_t)step + (col1 - ofs.x)*(std::ptrdiff_t)esz;
+    } अन्यथा {
+        तथ्य += (row1 - ofs.y)*(std::सूचक_भेद_प्रकार)step + (col1 - ofs.x)*(std::सूचक_भेद_प्रकार)esz;
         rows = row2 - row1; cols = col2 - col1;
         size.p[0] = rows; size.p[1] = cols;
         updateContinuityFlag();
     }
-    return *this;
+    वापस *यह;
 }
 
-Mat Mat::reshape(int new_cn, int new_rows) const
+Mat Mat::reshape(पूर्णांक new_cn, पूर्णांक new_rows) स्थिर
 {
-    int cn = channels();
-    Mat hdr = *this;
+    पूर्णांक cn = channels();
+    Mat hdr = *यह;
 
-    if( new_cn == 0 )
+    अगर( new_cn == 0 )
         new_cn = cn;
 
-    if( dims > 2 )
+    अगर( dims > 2 )
     {
-        if( new_rows == 0 )
+        अगर( new_rows == 0 )
         {
             // special case: just change the number of channnels; retain the same shape,
             // except for the last, innermost dimension
             CV_Assert(size[dims-1]*cn % new_cn == 0);
             hdr.flags = (hdr.flags & ~CV_MAT_CN_MASK) | ((new_cn-1) << CV_CN_SHIFT);
-            hdr.step[dims-1] = CV_ELEM_SIZE(hdr.flags);
+            hdr.step[dims-1] = CV_ELEM_आकार(hdr.flags);
             hdr.size[dims-1] = hdr.size[dims-1]*cn / new_cn;
-            return hdr;
+            वापस hdr;
         }
         CV_Assert( new_rows > 0 );
-        int sz[] = { new_rows, (int)(total()*cn/new_rows) };
-        return reshape(new_cn, 2, sz);
+        पूर्णांक sz[] = { new_rows, (पूर्णांक)(योग()*cn/new_rows) };
+        वापस reshape(new_cn, 2, sz);
     }
 
-    int total_width = cols * cn;
+    पूर्णांक योग_width = cols * cn;
 
-    if( (new_cn > total_width || total_width % new_cn != 0) && new_rows == 0 )
-        new_rows = rows * total_width / new_cn;
+    अगर( (new_cn > योग_width || योग_width % new_cn != 0) && new_rows == 0 )
+        new_rows = rows * योग_width / new_cn;
 
-    if( new_rows != 0 && new_rows != rows )
+    अगर( new_rows != 0 && new_rows != rows )
     {
-        int total_size = total_width * rows;
-        if( !isContinuous() )
+        पूर्णांक योग_आकार_2 = योग_width * rows;
+        अगर( !isContinuous() )
             CV_Error( cv::Error::BadStep,
             "The matrix is not continuous, thus its number of rows can not be changed" );
 
-        total_width = total_size / new_rows;
+        योग_width = योग_आकार_2 / new_rows;
 
-        if( total_width * new_rows != total_size )
+        अगर( योग_width * new_rows != योग_आकार_2 )
             CV_Error( cv::Error::StsBadArg, "The total number of matrix elements "
                                     "is not divisible by the new number of rows" );
 
         hdr.size[0] = hdr.rows = new_rows;
-        hdr.step[0] = total_width * elemSize1();
-    } else {
+        hdr.step[0] = योग_width * elemSize1();
+    } अन्यथा {
         hdr.size[0] = hdr.rows = rows;
-        if (dims <= 1)
-            hdr.step[0] = cols * CV_ELEM_SIZE(flags);
+        अगर (dims <= 1)
+            hdr.step[0] = cols * CV_ELEM_आकार(flags);
     }
 
-    int new_width = total_width / new_cn;
+    पूर्णांक new_width = योग_width / new_cn;
 
-    if( new_width * new_cn != total_width )
-        CV_Error( cv::Error::BadNumChannels,
+    अगर( new_width * new_cn != योग_width )
+        CV_Error( cv::Error::Bad_अंक_Channels,
         "The total width is not divisible by the new number of channels" );
 
     hdr.size.dims = hdr.dims = 2;
     hdr.size[1] = hdr.cols = new_width;
     hdr.flags = (hdr.flags & ~CV_MAT_CN_MASK) | ((new_cn-1) << CV_CN_SHIFT);
-    hdr.step[1] = CV_ELEM_SIZE(hdr.flags);
-    return hdr;
+    hdr.step[1] = CV_ELEM_आकार(hdr.flags);
+    वापस hdr;
 }
 
-Mat Mat::reshape(int _cn, int _newndims, const int* _newsz) const
+Mat Mat::reshape(पूर्णांक _cn, पूर्णांक _newndims, स्थिर पूर्णांक* _newsz) स्थिर
 {
-    if(_newndims == dims)
+    अगर(_newndims == dims)
     {
-        if(_newsz == 0)
-            return reshape(_cn);
-        if(_newndims == 2)
-            return reshape(_cn, _newsz[0]);
+        अगर(_newsz == 0)
+            वापस reshape(_cn);
+        अगर(_newndims == 2)
+            वापस reshape(_cn, _newsz[0]);
     }
 
-    if (isContinuous())
+    अगर (isContinuous())
     {
         CV_Assert(_cn >= 0 && _newndims >= 0 && _newndims <= CV_MAX_DIM && (_newndims == 0 || _newsz != 0));
 
-        if (_cn == 0)
-            _cn = this->channels();
-        else
+        अगर (_cn == 0)
+            _cn = यह->channels();
+        अन्यथा
             CV_Assert(_cn <= CV_CN_MAX);
 
-        size_t total_elem1_ref = this->total() * this->channels();
-        size_t total_elem1 = _cn;
+        माप_प्रकार योग_elem1_ref = यह->योग() * यह->channels();
+        माप_प्रकार योग_elem1 = _cn;
 
-        AutoBuffer<int, 4> newsz_buf( (size_t)_newndims );
+        Auto_बफर<पूर्णांक, 4> newsz_buf( (माप_प्रकार)_newndims );
 
-        int m1_idx = -1;
+        पूर्णांक m1_idx = -1;
 
-        for (int i = 0; i < _newndims; i++)
+        क्रम (पूर्णांक i = 0; i < _newndims; i++)
         {
-            if (_newsz[i] >= 0) {
-                if (_newsz[i] == 0 && i < dims)
+            अगर (_newsz[i] >= 0) {
+                अगर (_newsz[i] == 0 && i < dims)
                     newsz_buf[i] = size.p[i];
-                else
+                अन्यथा
                     newsz_buf[i] = _newsz[i];
-                total_elem1 *= (size_t)newsz_buf[i];
-            } else {
-                if (m1_idx >= 0)
-                    CV_Error(cv::Error::StsBadSize, "More than one '-1' occured in the new shape");
+                योग_elem1 *= (माप_प्रकार)newsz_buf[i];
+            } अन्यथा {
+                अगर (m1_idx >= 0)
+                    CV_Error(cv::Error::Sts_Bad_आकार, "More than one '-1' occured in the new shape");
                 m1_idx = i;
             }
         }
 
-        if (m1_idx >= 0) {
-            if (total_elem1 == 0) {
-                CV_Assert(total_elem1_ref == 0);
-                total_elem1 = 1;
+        अगर (m1_idx >= 0) {
+            अगर (योग_elem1 == 0) {
+                CV_Assert(योग_elem1_ref == 0);
+                योग_elem1 = 1;
             }
-            CV_Assert(total_elem1_ref % total_elem1 == 0);
-            newsz_buf[m1_idx] = (int)(total_elem1_ref / total_elem1);
-        } else if (total_elem1 != total_elem1_ref) {
+            CV_Assert(योग_elem1_ref % योग_elem1 == 0);
+            newsz_buf[m1_idx] = (पूर्णांक)(योग_elem1_ref / योग_elem1);
+        } अन्यथा अगर (योग_elem1 != योग_elem1_ref) {
             CV_Error(cv::Error::StsUnmatchedSizes, "Requested and source matrices have different count of elements");
         }
 
-        Mat hdr = *this;
+        Mat hdr = *यह;
         hdr.flags = (hdr.flags & ~CV_MAT_CN_MASK) | ((_cn-1) << CV_CN_SHIFT);
-        setSize(hdr, _newndims, newsz_buf.data(), NULL, true);
+        set_आकार(hdr, _newndims, newsz_buf.तथ्य(), शून्य, true);
 
-        return hdr;
+        वापस hdr;
     }
 
     CV_Error(cv::Error::StsNotImplemented, "Reshaping of n-dimensional non-continuous matrices is not supported yet");
     // TBD
 }
 
-Mat Mat::reshape(int _cn, const std::vector<int>& _newshape) const
+Mat Mat::reshape(पूर्णांक _cn, स्थिर std::vector<पूर्णांक>& _newshape) स्थिर
 {
-    int newdims = (int)_newshape.size();
-    if(newdims == 0 && empty())
+    पूर्णांक newdims = (पूर्णांक)_newshape.size();
+    अगर(newdims == 0 && empty())
     {
-        return *this;
+        वापस *यह;
     }
 
-    return reshape(_cn, newdims, newdims > 0 ? &_newshape[0] : 0);
+    वापस reshape(_cn, newdims, newdims > 0 ? &_newshape[0] : 0);
 }
 
-Mat Mat::reshape(int _cn, const MatShape& _newshape) const
+Mat Mat::reshape(पूर्णांक _cn, स्थिर MatShape& _newshape) स्थिर
 {
-    if (_newshape.dims < 0) {
-        int newshape[] = {0};
-        return reshape(_cn, 1, newshape);
+    अगर (_newshape.dims < 0) {
+        पूर्णांक newshape[] = {0};
+        वापस reshape(_cn, 1, newshape);
     }
-    return reshape(_cn, _newshape.dims, _newshape.p);
+    वापस reshape(_cn, _newshape.dims, _newshape.p);
 }
 
-Mat Mat::reshape(int _cn, std::initializer_list<int> newshape_) const
+Mat Mat::reshape(पूर्णांक _cn, std::initializer_list<पूर्णांक> newshape_) स्थिर
 {
-    int newshape[MatShape::MAX_DIMS];
-    size_t i, newshape_dims = newshape_.size();
-    CV_Assert(newshape_dims <= (size_t)MatShape::MAX_DIMS);
-    auto it = newshape_.begin();
-    for (i = 0; i < newshape_dims; i++, ++it)
+    पूर्णांक newshape[MatShape::MAX_DIMS];
+    माप_प्रकार i, newshape_dims = newshape_.size();
+    CV_Assert(newshape_dims <= (माप_प्रकार)MatShape::MAX_DIMS);
+    स्वतः it = newshape_.begin();
+    क्रम (i = 0; i < newshape_dims; i++, ++it)
         newshape[i] = *it;
-    return reshape(_cn, (int)newshape_dims, newshape);
+    वापस reshape(_cn, (पूर्णांक)newshape_dims, newshape);
 }
 
-Mat Mat::reinterpret(int type) const
+Mat Mat::reinterpret(पूर्णांक type) स्थिर
 {
     type = CV_MAT_TYPE(type);
-    CV_Assert(CV_ELEM_SIZE(this->type()) == CV_ELEM_SIZE(type));
-    Mat m = *this;
+    CV_Assert(CV_ELEM_आकार(यह->type()) == CV_ELEM_आकार(type));
+    Mat m = *यह;
     m.flags = (m.flags & ~CV_MAT_TYPE_MASK) | type;
     m.updateContinuityFlag();
-    return m;
+    वापस m;
 }
 
-Mat Mat::diag(const Mat& d)
+Mat Mat::diag(स्थिर Mat& d)
 {
     CV_Assert( d.cols == 1 || d.rows == 1 );
-    int len = d.rows + d.cols - 1;
+    पूर्णांक len = d.rows + d.cols - 1;
     Mat m(len, len, d.type(), Scalar(0));
     Mat md = m.diag();
-    if( d.cols == 1 )
+    अगर( d.cols == 1 )
         d.copyTo(md);
-    else
+    अन्यथा
         transpose(d, md);
-    return m;
+    वापस m;
 }
 
-int Mat::checkVector(int _elemChannels, int _depth, bool _requireContinuous) const
+पूर्णांक Mat::checkVector(पूर्णांक _elemChannels, पूर्णांक _depth, bool _requireContinuous) स्थिर
 {
-    return data && (depth() == _depth || _depth <= 0) &&
+    वापस तथ्य && (depth() == _depth || _depth <= 0) &&
         (isContinuous() || !_requireContinuous) &&
         ((dims <= 2 && (((rows == 1 || cols == 1) && channels() == _elemChannels) ||
                         (cols == _elemChannels && channels() == 1))) ||
         (dims == 3 && channels() == 1 && size.p[2] == _elemChannels && (size.p[0] == 1 || size.p[1] == 1) &&
          (isContinuous() || step.p[1] == step.p[2]*size.p[2])))
-    ? (int)(total()*channels()/_elemChannels) : -1;
+    ? (पूर्णांक)(योग()*channels()/_elemChannels) : -1;
 }
 
 
-static inline Size getContinuousSize_(int flags, int cols, int rows, int widthScale)
+अटल अंतरभूत आकार get_Continuous_आकार(पूर्णांक flags, पूर्णांक cols, पूर्णांक rows, पूर्णांक widthScale)
 {
     int64 sz = (int64)cols * rows * widthScale;
-    bool has_int_overflow = sz >= INT_MAX;
+    bool has_int_overflow = sz >= पूर्णांक_उच्च;
     bool isContiguous = (flags & Mat::CONTINUOUS_FLAG) != 0;
-    return (isContiguous && !has_int_overflow)
-            ? Size((int)sz, 1)
-            : Size(cols * widthScale, rows);
+    वापस (isContiguous && !has_int_overflow)
+            ? आकार((पूर्णांक)sz, 1)
+            : आकार(cols * widthScale, rows);
 }
 
-Size getContinuousSize2D(Mat& m1, int widthScale)
+आकार getContinuousSize2D(Mat& m1, पूर्णांक widthScale)
 {
     CV_CheckLE(m1.dims, 2, "");
-    return getContinuousSize_(m1.flags,
+    वापस get_Continuous_आकार(m1.flags,
                               m1.cols, m1.rows, widthScale);
 }
-Size getContinuousSize2D(Mat& m1, Mat& m2, int widthScale)
+आकार getContinuousSize2D(Mat& m1, Mat& m2, पूर्णांक widthScale)
 {
     CV_CheckLE(m1.dims, 2, "");
     CV_CheckLE(m2.dims, 2, "");
-    const Size sz1 = m1.size();
-    if (sz1 != m2.size())  // reshape all matrixes to the same size (#4159)
+    स्थिर आकार sz1 = m1.size();
+    अगर (sz1 != m2.size())  // reshape all matrixes to the same size (#4159)
     {
-        size_t total_sz = m1.total();
-        CV_CheckEQ(total_sz, m2.total(), "");
+        माप_प्रकार योग_sz = m1.योग();
+        CV_CheckEQ(योग_sz, m2.योग(), "");
         bool is_m1_vector = m1.cols == 1 || m1.rows == 1;
         bool is_m2_vector = m2.cols == 1 || m2.rows == 1;
         CV_Assert(is_m1_vector); CV_Assert(is_m2_vector);
-        int total = (int)total_sz;  // vector-column
+        पूर्णांक योग = (पूर्णांक)योग_sz;  // vector-column
         bool isContiguous = ((m1.flags & m2.flags) & Mat::CONTINUOUS_FLAG) != 0;
-        bool has_int_overflow = ((int64)total_sz * widthScale) >= INT_MAX;
-        if (isContiguous && !has_int_overflow)
-            total = 1; // vector-row
-        m1 = m1.reshape(0, total);
-        m2 = m2.reshape(0, total);
+        bool has_int_overflow = ((int64)योग_sz * widthScale) >= पूर्णांक_उच्च;
+        अगर (isContiguous && !has_int_overflow)
+            योग = 1; // vector-row
+        m1 = m1.reshape(0, योग);
+        m2 = m2.reshape(0, योग);
         CV_Assert(m1.cols == m2.cols && m1.rows == m2.rows);
-        return Size(m1.cols * widthScale, m1.rows);
+        वापस आकार(m1.cols * widthScale, m1.rows);
     }
-    return getContinuousSize_(m1.flags & m2.flags,
+    वापस get_Continuous_आकार(m1.flags & m2.flags,
                               m1.cols, m1.rows, widthScale);
 }
 
-Size getContinuousSize2D(Mat& m1, Mat& m2, Mat& m3, int widthScale)
+आकार getContinuousSize2D(Mat& m1, Mat& m2, Mat& m3, पूर्णांक widthScale)
 {
     CV_CheckLE(m1.dims, 2, "");
     CV_CheckLE(m2.dims, 2, "");
     CV_CheckLE(m3.dims, 2, "");
-    const Size sz1 = m1.size();
-    if (sz1 != m2.size() || sz1 != m3.size())  // reshape all matrixes to the same size (#4159)
+    स्थिर आकार sz1 = m1.size();
+    अगर (sz1 != m2.size() || sz1 != m3.size())  // reshape all matrixes to the same size (#4159)
     {
-        size_t total_sz = m1.total();
-        CV_CheckEQ(total_sz, m2.total(), "");
-        CV_CheckEQ(total_sz, m3.total(), "");
+        माप_प्रकार योग_sz = m1.योग();
+        CV_CheckEQ(योग_sz, m2.योग(), "");
+        CV_CheckEQ(योग_sz, m3.योग(), "");
         bool is_m1_vector = m1.cols == 1 || m1.rows == 1;
         bool is_m2_vector = m2.cols == 1 || m2.rows == 1;
         bool is_m3_vector = m3.cols == 1 || m3.rows == 1;
         CV_Assert(is_m1_vector); CV_Assert(is_m2_vector); CV_Assert(is_m3_vector);
-        int total = (int)total_sz;  // vector-column
+        पूर्णांक योग = (पूर्णांक)योग_sz;  // vector-column
         bool isContiguous = ((m1.flags & m2.flags & m3.flags) & Mat::CONTINUOUS_FLAG) != 0;
-        bool has_int_overflow = ((int64)total_sz * widthScale) >= INT_MAX;
-        if (isContiguous && !has_int_overflow)
-            total = 1; // vector-row
-        m1 = m1.reshape(0, total);
-        m2 = m2.reshape(0, total);
-        m3 = m3.reshape(0, total);
+        bool has_int_overflow = ((int64)योग_sz * widthScale) >= पूर्णांक_उच्च;
+        अगर (isContiguous && !has_int_overflow)
+            योग = 1; // vector-row
+        m1 = m1.reshape(0, योग);
+        m2 = m2.reshape(0, योग);
+        m3 = m3.reshape(0, योग);
         CV_Assert(m1.cols == m2.cols && m1.rows == m2.rows && m1.cols == m3.cols && m1.rows == m3.rows);
-        return Size(m1.cols * widthScale, m1.rows);
+        वापस आकार(m1.cols * widthScale, m1.rows);
     }
-    return getContinuousSize_(m1.flags & m2.flags & m3.flags,
+    वापस get_Continuous_आकार(m1.flags & m2.flags & m3.flags,
                               m1.cols, m1.rows, widthScale);
 }
 

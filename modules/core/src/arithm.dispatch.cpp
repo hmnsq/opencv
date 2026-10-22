@@ -8,131 +8,131 @@
 //                          specific entry points; candidates for CV_EXPORTS later);
 //   - getElemwiseFunc(...): the op-level router used by the compiler.
 
-#include "precomp.hpp"
-#include "arithm_expr.hpp"
-#include "arithm.simd.hpp"
-#include "arithm.simd_declarations.hpp"
+#समावेश "precomp.hpp"
+#समावेश "arithm_expr.hpp"
+#समावेश "arithm.simd.hpp"
+#समावेश "arithm.simd_declarations.hpp"
 
 namespace cv { namespace ew {
 
 // ---- tier 2: pick the kernel optimized for the current CPU ---------------------------------------
-TKernel getAddFunc(int T, int R)            { CV_CPU_DISPATCH(getAddFunc_,     (T, R),          CV_CPU_DISPATCH_MODES_ALL); }
-TKernel getSubFunc(int T, int R)            { CV_CPU_DISPATCH(getSubFunc_,     (T, R),          CV_CPU_DISPATCH_MODES_ALL); }
-TKernel getMulFunc(int T, int R)            { CV_CPU_DISPATCH(getMulFunc_,     (T, R),          CV_CPU_DISPATCH_MODES_ALL); }
-TKernel getDivFunc(int T, int R, bool chk)  { CV_CPU_DISPATCH(getDivFunc_,     (T, R, chk),     CV_CPU_DISPATCH_MODES_ALL); }
-TKernel getMinFunc(int T, int R)            { CV_CPU_DISPATCH(getMinFunc_,     (T, R),          CV_CPU_DISPATCH_MODES_ALL); }
-TKernel getMaxFunc(int T, int R)            { CV_CPU_DISPATCH(getMaxFunc_,     (T, R),          CV_CPU_DISPATCH_MODES_ALL); }
-TKernel getAbsdiffFunc(int T, int R)        { CV_CPU_DISPATCH(getAbsdiffFunc_, (T, R),          CV_CPU_DISPATCH_MODES_ALL); }
-TKernel getHypotFunc(int T, int R)          { CV_CPU_DISPATCH(getHypotFunc_,   (T, R),          CV_CPU_DISPATCH_MODES_ALL); }
-TKernel getAtan2Func(int T, int R)          { CV_CPU_DISPATCH(getAtan2Func_,   (T, R),          CV_CPU_DISPATCH_MODES_ALL); }
-TKernel getCmpFunc(TOp op, int T)           { CV_CPU_DISPATCH(getCmpFunc_,     (op, T),         CV_CPU_DISPATCH_MODES_ALL); }
-TKernel getBitwiseFunc(TOp op, int esz)     { CV_CPU_DISPATCH(getBitwiseFunc_, (op, esz),       CV_CPU_DISPATCH_MODES_ALL); }
-TKernel getNotFunc(int esz)                 { CV_CPU_DISPATCH(getNotFunc_,     (esz),           CV_CPU_DISPATCH_MODES_ALL); }
-TKernel getAddWeightedFunc(int T, int R)    { CV_CPU_DISPATCH(getAddWeightedFunc_, (T, R),      CV_CPU_DISPATCH_MODES_ALL); }
-TKernel getSelectFunc(int mdepth, int T)    { CV_CPU_DISPATCH(getSelectFunc_,  (mdepth, T),     CV_CPU_DISPATCH_MODES_ALL); }
-TKernel getClampFunc(int T)                 { CV_CPU_DISPATCH(getClampFunc_,   (T),             CV_CPU_DISPATCH_MODES_ALL); }
-static TKernel getCastFunc(int sd, int dd, bool scaled)
+TKernel getAddFunc(पूर्णांक T, पूर्णांक R)            { CV_CPU_DISPATCH(getAddFunc_,     (T, R),          CV_CPU_DISPATCH_MODES_ALL); }
+TKernel getSubFunc(पूर्णांक T, पूर्णांक R)            { CV_CPU_DISPATCH(getSubFunc_,     (T, R),          CV_CPU_DISPATCH_MODES_ALL); }
+TKernel getMulFunc(पूर्णांक T, पूर्णांक R)            { CV_CPU_DISPATCH(getMulFunc_,     (T, R),          CV_CPU_DISPATCH_MODES_ALL); }
+TKernel getDivFunc(पूर्णांक T, पूर्णांक R, bool chk)  { CV_CPU_DISPATCH(getDivFunc_,     (T, R, chk),     CV_CPU_DISPATCH_MODES_ALL); }
+TKernel getMinFunc(पूर्णांक T, पूर्णांक R)            { CV_CPU_DISPATCH(getMinFunc_,     (T, R),          CV_CPU_DISPATCH_MODES_ALL); }
+TKernel getMaxFunc(पूर्णांक T, पूर्णांक R)            { CV_CPU_DISPATCH(getMaxFunc_,     (T, R),          CV_CPU_DISPATCH_MODES_ALL); }
+TKernel getAbsdiffFunc(पूर्णांक T, पूर्णांक R)        { CV_CPU_DISPATCH(getAbsdiffFunc_, (T, R),          CV_CPU_DISPATCH_MODES_ALL); }
+TKernel getHypotFunc(पूर्णांक T, पूर्णांक R)          { CV_CPU_DISPATCH(getHypotFunc_,   (T, R),          CV_CPU_DISPATCH_MODES_ALL); }
+TKernel getAtan2Func(पूर्णांक T, पूर्णांक R)          { CV_CPU_DISPATCH(getAtan2Func_,   (T, R),          CV_CPU_DISPATCH_MODES_ALL); }
+TKernel getCmpFunc(शीर्ष op, पूर्णांक T)           { CV_CPU_DISPATCH(getCmpFunc_,     (op, T),         CV_CPU_DISPATCH_MODES_ALL); }
+TKernel getBitwiseFunc(शीर्ष op, पूर्णांक esz)     { CV_CPU_DISPATCH(getBitwiseFunc_, (op, esz),       CV_CPU_DISPATCH_MODES_ALL); }
+TKernel getNotFunc(पूर्णांक esz)                 { CV_CPU_DISPATCH(getNotFunc_,     (esz),           CV_CPU_DISPATCH_MODES_ALL); }
+TKernel getAddWeightedFunc(पूर्णांक T, पूर्णांक R)    { CV_CPU_DISPATCH(getAddWeightedFunc_, (T, R),      CV_CPU_DISPATCH_MODES_ALL); }
+TKernel getSelectFunc(पूर्णांक mdepth, पूर्णांक T)    { CV_CPU_DISPATCH(getSelectFunc_,  (mdepth, T),     CV_CPU_DISPATCH_MODES_ALL); }
+TKernel getClampFunc(पूर्णांक T)                 { CV_CPU_DISPATCH(getClampFunc_,   (T),             CV_CPU_DISPATCH_MODES_ALL); }
+अटल TKernel getCastFunc(पूर्णांक sd, पूर्णांक dd, bool scaled)
                                             { CV_CPU_DISPATCH(getCastFunc_,    (sd, dd, scaled),CV_CPU_DISPATCH_MODES_ALL); }
 
 // ---- tier 3: op-level dispatcher used by the compiler --------------------------------------------
-TKernel getElemwiseFunc(TOp op, int depth0, int depth1, int depth2, int rdepth)
+TKernel getElemwiseFunc(शीर्ष op, पूर्णांक depth0, पूर्णांक depth1, पूर्णांक depth2, पूर्णांक rdepth)
 {
-    (void)depth2;
+    (व्योम)depth2;
 
-    if (op == OP_CAST)          return getCastFunc(depth0, rdepth, false);
-    if (op == OP_CONVERT_SCALE) return getCastFunc(depth0, rdepth, true);
+    अगर (op == OP_CAST)          वापस getCastFunc(depth0, rdepth, false);
+    अगर (op == OP_CONVERT_SCALE) वापस getCastFunc(depth0, rdepth, true);
 
-    if (op == OP_ADD || op == OP_SUB)
+    अगर (op == OP_ADD || op == OP_SUB)
     {
-        if (depth0 != depth1) return {};   // operands must be the same type
-        return op == OP_ADD ? getAddFunc(depth0, rdepth) : getSubFunc(depth0, rdepth);
+        अगर (depth0 != depth1) वापस {};   // operands must be the same type
+        वापस op == OP_ADD ? getAddFunc(depth0, rdepth) : getSubFunc(depth0, rdepth);
     }
 
     // OP_ADDW (addWeighted): a*alpha+b*beta+gamma; operands same type T, result R (T/f32 for small ints
     // + f16/bf16/f32, f64 otherwise). alpha/beta/gamma travel in the instruction's params.
-    if (op == OP_ADDW)
+    अगर (op == OP_ADDW)
     {
-        if (depth0 != depth1) return {};
-        return getAddWeightedFunc(depth0, rdepth);
+        अगर (depth0 != depth1) वापस {};
+        वापस getAddWeightedFunc(depth0, rdepth);
     }
 
     // OP_MUL / OP_DIV / OP_POW: operands same type T; compute in the float work type (rdepth).
-    if (op == OP_MUL || op == OP_DIV || op == OP_POW)
+    अगर (op == OP_MUL || op == OP_DIV || op == OP_POW)
     {
-        if (depth0 != depth1) return {};
-        if (op == OP_MUL) return getMulFunc(depth0, rdepth);
-        if (op == OP_POW) return getPowFunc(depth0, rdepth);
+        अगर (depth0 != depth1) वापस {};
+        अगर (op == OP_MUL) वापस getMulFunc(depth0, rdepth);
+        अगर (op == OP_POW) वापस getPowFunc(depth0, rdepth);
         // integer inputs guard divide-by-zero (-> 0); floats do not (a/0 -> inf, matching cv::divide).
-        const bool isflt = depth0==CV_16F || depth0==CV_16BF || depth0==CV_32F || depth0==CV_64F;
-        return getDivFunc(depth0, rdepth, !isflt);
+        स्थिर bool isflt = depth0==CV_16F || depth0==CV_16BF || depth0==CV_32F || depth0==CV_64F;
+        वापस getDivFunc(depth0, rdepth, !isflt);
     }
 
     // OP_MIN / OP_MAX: T x T -> T.
-    if (op == OP_MIN || op == OP_MAX)
+    अगर (op == OP_MIN || op == OP_MAX)
     {
-        if (depth0 != depth1 || rdepth != depth0) return {};
-        return op == OP_MIN ? getMinFunc(depth0, rdepth) : getMaxFunc(depth0, rdepth);
+        अगर (depth0 != depth1 || rdepth != depth0) वापस {};
+        वापस op == OP_MIN ? getMinFunc(depth0, rdepth) : getMaxFunc(depth0, rdepth);
     }
 
     // OP_ABSDIFF: result is absdiffResultDepth(T) (unsigned same width for signed).
-    if (op == OP_ABSDIFF)
+    अगर (op == OP_ABSDIFF)
     {
-        if (depth0 != depth1) return {};
-        return getAbsdiffFunc(depth0, rdepth);
+        अगर (depth0 != depth1) वापस {};
+        वापस getAbsdiffFunc(depth0, rdepth);
     }
 
     // OP_CMP_*: T x T -> u8 mask (0 / 1 / 255, value via TKernel::flags).
-    if (opCategory(op) == CAT_COMPARE)
+    अगर (opCategory(op) == CAT_COMPARE)
     {
-        if (depth0 != depth1 || rdepth != CV_8U) return {};
-        return getCmpFunc(op, depth0);
+        अगर (depth0 != depth1 || rdepth != CV_8U) वापस {};
+        वापस getCmpFunc(op, depth0);
     }
 
     // OP_AND / OP_OR / OP_XOR: bit-pattern op, T x T -> T (same depth), dispatched by element size.
-    if (op == OP_AND || op == OP_OR || op == OP_XOR)
+    अगर (op == OP_AND || op == OP_OR || op == OP_XOR)
     {
-        if (depth0 != depth1 || rdepth != depth0) return {};
-        return getBitwiseFunc(op, CV_ELEM_SIZE1(depth0));
+        अगर (depth0 != depth1 || rdepth != depth0) वापस {};
+        वापस getBitwiseFunc(op, CV_ELEM_SIZE1(depth0));
     }
 
     // OP_NOT: ~x, one input, T -> T (same depth), dispatched by element size.
-    if (op == OP_NOT)
+    अगर (op == OP_NOT)
     {
-        if (rdepth != depth0) return {};
-        return getNotFunc(CV_ELEM_SIZE1(depth0));
+        अगर (rdepth != depth0) वापस {};
+        वापस getNotFunc(CV_ELEM_SIZE1(depth0));
     }
 
     // OP_HYPOT / OP_ATAN2: T x T -> T over the float depths (integer inputs are the compiler's job).
-    if (op == OP_HYPOT || op == OP_ATAN2)
+    अगर (op == OP_HYPOT || op == OP_ATAN2)
     {
-        if (depth0 != depth1) return {};
-        return op == OP_HYPOT ? getHypotFunc(depth0, rdepth) : getAtan2Func(depth0, rdepth);
+        अगर (depth0 != depth1) वापस {};
+        वापस op == OP_HYPOT ? getHypotFunc(depth0, rdepth) : getAtan2Func(depth0, rdepth);
     }
 
     // unary math: T -> T over the float depths (math.simd.hpp). Anything else - integer input,
     // widening/narrowing result - is the compiler's job (cast to a float working type first).
-    if (op == OP_SQRT || op == OP_EXP || op == OP_LOG || op == OP_SIN || op == OP_COS ||
+    अगर (op == OP_SQRT || op == OP_EXP || op == OP_LOG || op == OP_SIN || op == OP_COS ||
         op == OP_TANH || op == OP_ERF || op == OP_RELU)
     {
-        if (rdepth != depth0) return {};
-        return getMathFunc(op, depth0);
+        अगर (rdepth != depth0) वापस {};
+        वापस getMathFunc(op, depth0);
     }
 
     // OP_SELECT: depth0 is the (1-byte, never cast) mask; both branches and dst share one depth.
-    if (op == OP_SELECT)
+    अगर (op == OP_SELECT)
     {
-        if (depth1 != depth2 || rdepth != depth1) return {};
-        return getSelectFunc(depth0, rdepth);
+        अगर (depth1 != depth2 || rdepth != depth1) वापस {};
+        वापस getSelectFunc(depth0, rdepth);
     }
 
     // OP_CLAMP: x, lo, hi and dst all share one depth (emitTernary unifies them).
-    if (op == OP_CLAMP)
+    अगर (op == OP_CLAMP)
     {
-        if (depth1 != depth0 || depth2 != depth0 || rdepth != depth0) return {};
-        return getClampFunc(rdepth);
+        अगर (depth1 != depth0 || depth2 != depth0 || rdepth != depth0) वापस {};
+        वापस getClampFunc(rdepth);
     }
 
-    return {};
+    वापस {};
 }
 
 }} // namespace cv::ew
@@ -142,10 +142,10 @@ namespace cv { namespace hal {
 // Legacy cv::hal entry point, still declared in core/hal/hal.hpp and used by external code (the
 // G-API fluid backend in opencv_contrib calls it directly): forward to the element-wise engine's
 // u8 multiply kernel. `scale` is a pointer to a double, as in the old contract.
-void mul8u(const uchar* src1, size_t step1, const uchar* src2, size_t step2,
-           uchar* dst, size_t step, int width, int height, void* scale)
+व्योम mul8u(स्थिर uchar* src1, माप_प्रकार step1, स्थिर uchar* src2, माप_प्रकार step2,
+           uchar* dst, माप_प्रकार step, पूर्णांक width, पूर्णांक height, व्योम* scale)
 {
-    const double params[] = { scale ? *(const double*)scale : 1.0 };
+    स्थिर द्विगुन params[] = { scale ? *(स्थिर द्विगुन*)scale : 1.0 };
     ew::TKernel k = ew::getMulFunc(CV_8U, CV_8U);
     k.fptr(src1, step1, 1, src2, step2, 1, nullptr, 0, 0, dst, step, width, height,
            params, k.flags, k.userdata);
@@ -154,32 +154,32 @@ void mul8u(const uchar* src1, size_t step1, const uchar* src2, size_t step2,
 // Legacy cv::hal bitwise entry points, still declared in core/hal/hal.hpp and used by other modules
 // (e.g. opencv_objdetect's aruco) and external code: forward to the element-wise engine's byte-wise
 // bitwise kernels. No scalar params - bitwise ops ignore them.
-static void bitwise8u(ew::TOp op, const uchar* src1, size_t step1, const uchar* src2, size_t step2,
-                      uchar* dst, size_t step, int width, int height)
+अटल व्योम bitwise8u(ew::शीर्ष op, स्थिर uchar* src1, माप_प्रकार step1, स्थिर uchar* src2, माप_प्रकार step2,
+                      uchar* dst, माप_प्रकार step, पूर्णांक width, पूर्णांक height)
 {
-    const double noparams[4] = {};
+    स्थिर द्विगुन noparams[4] = {};
     ew::TKernel k = ew::getBitwiseFunc(op, 1);
     CV_Assert(k.fptr != nullptr);
     k.fptr(src1, step1, 1, src2, step2, 1, nullptr, 0, 0, dst, step, width, height,
            noparams, k.flags, k.userdata);
 }
 
-void and8u(const uchar* src1, size_t step1, const uchar* src2, size_t step2,
-           uchar* dst, size_t step, int width, int height, void*)
+व्योम and8u(स्थिर uchar* src1, माप_प्रकार step1, स्थिर uchar* src2, माप_प्रकार step2,
+           uchar* dst, माप_प्रकार step, पूर्णांक width, पूर्णांक height, व्योम*)
 { bitwise8u(ew::OP_AND, src1, step1, src2, step2, dst, step, width, height); }
 
-void or8u(const uchar* src1, size_t step1, const uchar* src2, size_t step2,
-          uchar* dst, size_t step, int width, int height, void*)
+व्योम or8u(स्थिर uchar* src1, माप_प्रकार step1, स्थिर uchar* src2, माप_प्रकार step2,
+          uchar* dst, माप_प्रकार step, पूर्णांक width, पूर्णांक height, व्योम*)
 { bitwise8u(ew::OP_OR, src1, step1, src2, step2, dst, step, width, height); }
 
-void xor8u(const uchar* src1, size_t step1, const uchar* src2, size_t step2,
-           uchar* dst, size_t step, int width, int height, void*)
+व्योम xor8u(स्थिर uchar* src1, माप_प्रकार step1, स्थिर uchar* src2, माप_प्रकार step2,
+           uchar* dst, माप_प्रकार step, पूर्णांक width, पूर्णांक height, व्योम*)
 { bitwise8u(ew::OP_XOR, src1, step1, src2, step2, dst, step, width, height); }
 
-void not8u(const uchar* src1, size_t step1, const uchar* /*src2*/, size_t /*step2*/,
-           uchar* dst, size_t step, int width, int height, void*)
+व्योम not8u(स्थिर uchar* src1, माप_प्रकार step1, स्थिर uchar* /*src2*/, माप_प्रकार /*step2*/,
+           uchar* dst, माप_प्रकार step, पूर्णांक width, पूर्णांक height, व्योम*)
 {
-    const double noparams[4] = {};
+    स्थिर द्विगुन noparams[4] = {};
     ew::TKernel k = ew::getNotFunc(1);
     CV_Assert(k.fptr != nullptr);
     k.fptr(src1, step1, 1, nullptr, 0, 0, nullptr, 0, 0, dst, step, width, height,

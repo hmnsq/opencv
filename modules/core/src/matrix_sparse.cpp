@@ -2,183 +2,183 @@
 // It is subject to the license terms in the LICENSE file found in the top-level directory
 // of this distribution and at http://opencv.org/license.html
 
-#include "precomp.hpp"
-#include "opencv2/core/mat.hpp"
+#समावेश "precomp.hpp"
+#समावेश "opencv2/core/mat.hpp"
 
 namespace cv {
 
-template<typename T1, typename T2> void
-convertData_(const void* _from, void* _to, int cn)
+ढाँचा<typename T1, typename T2> व्योम
+convert_तथ्य(स्थिर व्योम* _from, व्योम* _to, पूर्णांक cn)
 {
-    const T1* from = (const T1*)_from;
+    स्थिर T1* from = (स्थिर T1*)_from;
     T2* to = (T2*)_to;
-    if( cn == 1 )
+    अगर( cn == 1 )
         *to = saturate_cast<T2>(*from);
-    else
-        for( int i = 0; i < cn; i++ )
+    अन्यथा
+        क्रम( पूर्णांक i = 0; i < cn; i++ )
             to[i] = saturate_cast<T2>(from[i]);
 }
 
-template<typename T1, typename T2> void
-convertScaleData_(const void* _from, void* _to, int cn, double alpha, double beta)
+ढाँचा<typename T1, typename T2> व्योम
+convert_Scale_तथ्य(स्थिर व्योम* _from, व्योम* _to, पूर्णांक cn, द्विगुन alpha, द्विगुन beta)
 {
-    const T1* from = (const T1*)_from;
+    स्थिर T1* from = (स्थिर T1*)_from;
     T2* to = (T2*)_to;
-    if( cn == 1 )
+    अगर( cn == 1 )
         *to = saturate_cast<T2>(*from*alpha + beta);
-    else
-        for( int i = 0; i < cn; i++ )
+    अन्यथा
+        क्रम( पूर्णांक i = 0; i < cn; i++ )
             to[i] = saturate_cast<T2>(from[i]*alpha + beta);
 }
 
-typedef void (*ConvertData)(const void* from, void* to, int cn);
-typedef void (*ConvertScaleData)(const void* from, void* to, int cn, double alpha, double beta);
+प्रकार व्योम (*Convert_तथ्य)(स्थिर व्योम* from, व्योम* to, पूर्णांक cn);
+प्रकार व्योम (*Convert_Scale_तथ्य)(स्थिर व्योम* from, व्योम* to, पूर्णांक cn, द्विगुन alpha, द्विगुन beta);
 
-static ConvertData getConvertElem(int fromType, int toType)
+अटल Convert_तथ्य getConvertElem(पूर्णांक fromType, पूर्णांक toType)
 {
-    static ConvertData tab[CV_DEPTH_MAX][CV_DEPTH_MAX] =
-    {{ convertData_<uchar, uchar>, convertData_<uchar, schar>,
-      convertData_<uchar, ushort>, convertData_<uchar, short>,
-      convertData_<uchar, int>, convertData_<uchar, float>,
-      convertData_<uchar, double>, 0 },
+    अटल Convert_तथ्य tab[CV_DEPTH_MAX][CV_DEPTH_MAX] =
+    {{ convert_तथ्य<uchar, uchar>, convert_तथ्य<uchar, schar>,
+      convert_तथ्य<uchar, ushort>, convert_तथ्य<uchar, लघु>,
+      convert_तथ्य<uchar, पूर्णांक>, convert_तथ्य<uchar, भग्न>,
+      convert_तथ्य<uchar, द्विगुन>, 0 },
 
-    { convertData_<schar, uchar>, convertData_<schar, schar>,
-      convertData_<schar, ushort>, convertData_<schar, short>,
-      convertData_<schar, int>, convertData_<schar, float>,
-      convertData_<schar, double>, 0 },
+    { convert_तथ्य<schar, uchar>, convert_तथ्य<schar, schar>,
+      convert_तथ्य<schar, ushort>, convert_तथ्य<schar, लघु>,
+      convert_तथ्य<schar, पूर्णांक>, convert_तथ्य<schar, भग्न>,
+      convert_तथ्य<schar, द्विगुन>, 0 },
 
-    { convertData_<ushort, uchar>, convertData_<ushort, schar>,
-      convertData_<ushort, ushort>, convertData_<ushort, short>,
-      convertData_<ushort, int>, convertData_<ushort, float>,
-      convertData_<ushort, double>, 0 },
+    { convert_तथ्य<ushort, uchar>, convert_तथ्य<ushort, schar>,
+      convert_तथ्य<ushort, ushort>, convert_तथ्य<ushort, लघु>,
+      convert_तथ्य<ushort, पूर्णांक>, convert_तथ्य<ushort, भग्न>,
+      convert_तथ्य<ushort, द्विगुन>, 0 },
 
-    { convertData_<short, uchar>, convertData_<short, schar>,
-      convertData_<short, ushort>, convertData_<short, short>,
-      convertData_<short, int>, convertData_<short, float>,
-      convertData_<short, double>, 0 },
+    { convert_तथ्य<लघु, uchar>, convert_तथ्य<लघु, schar>,
+      convert_तथ्य<लघु, ushort>, convert_तथ्य<लघु, लघु>,
+      convert_तथ्य<लघु, पूर्णांक>, convert_तथ्य<लघु, भग्न>,
+      convert_तथ्य<लघु, द्विगुन>, 0 },
 
-    { convertData_<int, uchar>, convertData_<int, schar>,
-      convertData_<int, ushort>, convertData_<int, short>,
-      convertData_<int, int>, convertData_<int, float>,
-      convertData_<int, double>, 0 },
+    { convert_तथ्य<पूर्णांक, uchar>, convert_तथ्य<पूर्णांक, schar>,
+      convert_तथ्य<पूर्णांक, ushort>, convert_तथ्य<पूर्णांक, लघु>,
+      convert_तथ्य<पूर्णांक, पूर्णांक>, convert_तथ्य<पूर्णांक, भग्न>,
+      convert_तथ्य<पूर्णांक, द्विगुन>, 0 },
 
-    { convertData_<float, uchar>, convertData_<float, schar>,
-      convertData_<float, ushort>, convertData_<float, short>,
-      convertData_<float, int>, convertData_<float, float>,
-      convertData_<float, double>, 0 },
+    { convert_तथ्य<भग्न, uchar>, convert_तथ्य<भग्न, schar>,
+      convert_तथ्य<भग्न, ushort>, convert_तथ्य<भग्न, लघु>,
+      convert_तथ्य<भग्न, पूर्णांक>, convert_तथ्य<भग्न, भग्न>,
+      convert_तथ्य<भग्न, द्विगुन>, 0 },
 
-    { convertData_<double, uchar>, convertData_<double, schar>,
-      convertData_<double, ushort>, convertData_<double, short>,
-      convertData_<double, int>, convertData_<double, float>,
-      convertData_<double, double>, 0 },
+    { convert_तथ्य<द्विगुन, uchar>, convert_तथ्य<द्विगुन, schar>,
+      convert_तथ्य<द्विगुन, ushort>, convert_तथ्य<द्विगुन, लघु>,
+      convert_तथ्य<द्विगुन, पूर्णांक>, convert_तथ्य<द्विगुन, भग्न>,
+      convert_तथ्य<द्विगुन, द्विगुन>, 0 },
 
     { 0, 0, 0, 0, 0, 0, 0, 0 }};
 
-    ConvertData func = tab[CV_MAT_DEPTH(fromType)][CV_MAT_DEPTH(toType)];
+    Convert_तथ्य func = tab[CV_MAT_DEPTH(fromType)][CV_MAT_DEPTH(toType)];
     CV_Assert( func != 0 );
-    return func;
+    वापस func;
 }
 
-static ConvertScaleData getConvertScaleElem(int fromType, int toType)
+अटल Convert_Scale_तथ्य getConvertScaleElem(पूर्णांक fromType, पूर्णांक toType)
 {
-    static ConvertScaleData tab[CV_DEPTH_MAX][CV_DEPTH_MAX] =
-    {{ convertScaleData_<uchar, uchar>, convertScaleData_<uchar, schar>,
-      convertScaleData_<uchar, ushort>, convertScaleData_<uchar, short>,
-      convertScaleData_<uchar, int>, convertScaleData_<uchar, float>,
-      convertScaleData_<uchar, double>, 0 },
+    अटल Convert_Scale_तथ्य tab[CV_DEPTH_MAX][CV_DEPTH_MAX] =
+    {{ convert_Scale_तथ्य<uchar, uchar>, convert_Scale_तथ्य<uchar, schar>,
+      convert_Scale_तथ्य<uchar, ushort>, convert_Scale_तथ्य<uchar, लघु>,
+      convert_Scale_तथ्य<uchar, पूर्णांक>, convert_Scale_तथ्य<uchar, भग्न>,
+      convert_Scale_तथ्य<uchar, द्विगुन>, 0 },
 
-    { convertScaleData_<schar, uchar>, convertScaleData_<schar, schar>,
-      convertScaleData_<schar, ushort>, convertScaleData_<schar, short>,
-      convertScaleData_<schar, int>, convertScaleData_<schar, float>,
-      convertScaleData_<schar, double>, 0 },
+    { convert_Scale_तथ्य<schar, uchar>, convert_Scale_तथ्य<schar, schar>,
+      convert_Scale_तथ्य<schar, ushort>, convert_Scale_तथ्य<schar, लघु>,
+      convert_Scale_तथ्य<schar, पूर्णांक>, convert_Scale_तथ्य<schar, भग्न>,
+      convert_Scale_तथ्य<schar, द्विगुन>, 0 },
 
-    { convertScaleData_<ushort, uchar>, convertScaleData_<ushort, schar>,
-      convertScaleData_<ushort, ushort>, convertScaleData_<ushort, short>,
-      convertScaleData_<ushort, int>, convertScaleData_<ushort, float>,
-      convertScaleData_<ushort, double>, 0 },
+    { convert_Scale_तथ्य<ushort, uchar>, convert_Scale_तथ्य<ushort, schar>,
+      convert_Scale_तथ्य<ushort, ushort>, convert_Scale_तथ्य<ushort, लघु>,
+      convert_Scale_तथ्य<ushort, पूर्णांक>, convert_Scale_तथ्य<ushort, भग्न>,
+      convert_Scale_तथ्य<ushort, द्विगुन>, 0 },
 
-    { convertScaleData_<short, uchar>, convertScaleData_<short, schar>,
-      convertScaleData_<short, ushort>, convertScaleData_<short, short>,
-      convertScaleData_<short, int>, convertScaleData_<short, float>,
-      convertScaleData_<short, double>, 0 },
+    { convert_Scale_तथ्य<लघु, uchar>, convert_Scale_तथ्य<लघु, schar>,
+      convert_Scale_तथ्य<लघु, ushort>, convert_Scale_तथ्य<लघु, लघु>,
+      convert_Scale_तथ्य<लघु, पूर्णांक>, convert_Scale_तथ्य<लघु, भग्न>,
+      convert_Scale_तथ्य<लघु, द्विगुन>, 0 },
 
-    { convertScaleData_<int, uchar>, convertScaleData_<int, schar>,
-      convertScaleData_<int, ushort>, convertScaleData_<int, short>,
-      convertScaleData_<int, int>, convertScaleData_<int, float>,
-      convertScaleData_<int, double>, 0 },
+    { convert_Scale_तथ्य<पूर्णांक, uchar>, convert_Scale_तथ्य<पूर्णांक, schar>,
+      convert_Scale_तथ्य<पूर्णांक, ushort>, convert_Scale_तथ्य<पूर्णांक, लघु>,
+      convert_Scale_तथ्य<पूर्णांक, पूर्णांक>, convert_Scale_तथ्य<पूर्णांक, भग्न>,
+      convert_Scale_तथ्य<पूर्णांक, द्विगुन>, 0 },
 
-    { convertScaleData_<float, uchar>, convertScaleData_<float, schar>,
-      convertScaleData_<float, ushort>, convertScaleData_<float, short>,
-      convertScaleData_<float, int>, convertScaleData_<float, float>,
-      convertScaleData_<float, double>, 0 },
+    { convert_Scale_तथ्य<भग्न, uchar>, convert_Scale_तथ्य<भग्न, schar>,
+      convert_Scale_तथ्य<भग्न, ushort>, convert_Scale_तथ्य<भग्न, लघु>,
+      convert_Scale_तथ्य<भग्न, पूर्णांक>, convert_Scale_तथ्य<भग्न, भग्न>,
+      convert_Scale_तथ्य<भग्न, द्विगुन>, 0 },
 
-    { convertScaleData_<double, uchar>, convertScaleData_<double, schar>,
-      convertScaleData_<double, ushort>, convertScaleData_<double, short>,
-      convertScaleData_<double, int>, convertScaleData_<double, float>,
-      convertScaleData_<double, double>, 0 },
+    { convert_Scale_तथ्य<द्विगुन, uchar>, convert_Scale_तथ्य<द्विगुन, schar>,
+      convert_Scale_तथ्य<द्विगुन, ushort>, convert_Scale_तथ्य<द्विगुन, लघु>,
+      convert_Scale_तथ्य<द्विगुन, पूर्णांक>, convert_Scale_तथ्य<द्विगुन, भग्न>,
+      convert_Scale_तथ्य<द्विगुन, द्विगुन>, 0 },
 
     { 0, 0, 0, 0, 0, 0, 0, 0 }};
 
-    ConvertScaleData func = tab[CV_MAT_DEPTH(fromType)][CV_MAT_DEPTH(toType)];
+    Convert_Scale_तथ्य func = tab[CV_MAT_DEPTH(fromType)][CV_MAT_DEPTH(toType)];
     CV_Assert( func != 0 );
-    return func;
+    वापस func;
 }
 
-enum { HASH_SIZE0 = 8 };
+क्रमागत { HASH_SIZE0 = 8 };
 
-static inline void copyElem(const uchar* from, uchar* to, size_t elemSize)
+अटल अंतरभूत व्योम copyElem(स्थिर uchar* from, uchar* to, माप_प्रकार elem_आकार)
 {
-    size_t i;
-    for( i = 0; i + sizeof(int) <= elemSize; i += sizeof(int) )
-        *(int*)(to + i) = *(const int*)(from + i);
-    for( ; i < elemSize; i++ )
+    माप_प्रकार i;
+    क्रम( i = 0; i + माप(पूर्णांक) <= elem_आकार; i += माप(पूर्णांक) )
+        *(पूर्णांक*)(to + i) = *(स्थिर पूर्णांक*)(from + i);
+    क्रम( ; i < elem_आकार; i++ )
         to[i] = from[i];
 }
 
-static inline bool isZeroElem(const uchar* data, size_t elemSize)
+अटल अंतरभूत bool isZeroElem(स्थिर uchar* तथ्य, माप_प्रकार elem_आकार)
 {
-    size_t i;
-    for( i = 0; i + sizeof(int) <= elemSize; i += sizeof(int) )
-        if( *(int*)(data + i) != 0 )
-            return false;
-    for( ; i < elemSize; i++ )
-        if( data[i] != 0 )
-            return false;
-    return true;
+    माप_प्रकार i;
+    क्रम( i = 0; i + माप(पूर्णांक) <= elem_आकार; i += माप(पूर्णांक) )
+        अगर( *(पूर्णांक*)(तथ्य + i) != 0 )
+            वापस false;
+    क्रम( ; i < elem_आकार; i++ )
+        अगर( तथ्य[i] != 0 )
+            वापस false;
+    वापस true;
 }
 
-SparseMat::Hdr::Hdr( int _dims, const int* _sizes, int _type )
+SparseMat::Hdr::Hdr( पूर्णांक _dims, स्थिर पूर्णांक* _sizes, पूर्णांक _type )
 {
     refcount = 1;
 
     dims = _dims;
-    valueOffset = (int)alignSize(sizeof(SparseMat::Node) - MAX_DIM*sizeof(int) +
-                                 dims*sizeof(int), CV_ELEM_SIZE1(_type));
-    nodeSize = alignSize(valueOffset +
-        CV_ELEM_SIZE(_type), (int)sizeof(size_t));
+    मूल्य_Offset = (पूर्णांक)align_आकार(माप(SparseMat::Node) - MAX_DIM*माप(पूर्णांक) +
+                                 dims*माप(पूर्णांक), CV_ELEM_SIZE1(_type));
+    गाँठ_आकार = align_आकार(मूल्य_Offset +
+        CV_ELEM_आकार(_type), (पूर्णांक)माप(माप_प्रकार));
 
-    int i;
-    for( i = 0; i < dims; i++ )
+    पूर्णांक i;
+    क्रम( i = 0; i < dims; i++ )
         size[i] = _sizes[i];
-    for( ; i < CV_MAX_DIM; i++ )
+    क्रम( ; i < CV_MAX_DIM; i++ )
         size[i] = 0;
-    clear();
+    सफा();
 }
 
-void SparseMat::Hdr::clear()
+व्योम SparseMat::Hdr::सफा()
 {
-    hashtab.clear();
+    hashtab.सफा();
     hashtab.resize(HASH_SIZE0);
-    pool.clear();
-#if defined(__GNUC__)  && (__GNUC__ == 13) && !defined(__clang__) && (__cplusplus >= 202002L)
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wstringop-overflow"
-#endif
-    pool.resize(nodeSize);
-#if defined(__GNUC__)  && (__GNUC__ == 13) && !defined(__clang__) && (__cplusplus >= 202002L)
-#pragma GCC diagnostic pop
-#endif
-    nodeCount = freeList = 0;
+    pool.सफा();
+#अगर defined(__GNUC__)  && (__GNUC__ == 13) && !defined(__clang__) && (__cplusplus >= 202002L)
+#आशय GCC diagnostic push
+#आशय GCC diagnostic ignored "-Wstringop-overflow"
+#पूर्ण_अगर
+    pool.resize(गाँठ_आकार);
+#अगर defined(__GNUC__)  && (__GNUC__ == 13) && !defined(__clang__) && (__cplusplus >= 202002L)
+#आशय GCC diagnostic pop
+#पूर्ण_अगर
+    गाँठ_गिनती = freeList = 0;
 }
 
 ///////////////////////////// SparseMat /////////////////////////////
@@ -187,13 +187,13 @@ SparseMat::SparseMat()
     : flags(MAGIC_VAL), hdr(0)
 {}
 
-SparseMat::SparseMat(int _dims, const int* _sizes, int _type)
+SparseMat::SparseMat(पूर्णांक _dims, स्थिर पूर्णांक* _sizes, पूर्णांक _type)
     : flags(MAGIC_VAL), hdr(0)
 {
     create(_dims, _sizes, _type);
 }
 
-SparseMat::SparseMat(const SparseMat& m)
+SparseMat::SparseMat(स्थिर SparseMat& m)
     : flags(m.flags), hdr(m.hdr)
 {
     addref();
@@ -204,223 +204,223 @@ SparseMat::~SparseMat()
     release();
 }
 
-SparseMat& SparseMat::operator = (const SparseMat& m)
+SparseMat& SparseMat::चालक = (स्थिर SparseMat& m)
 {
-    if( this != &m )
+    अगर( यह != &m )
     {
-        if( m.hdr )
+        अगर( m.hdr )
             CV_XADD(&m.hdr->refcount, 1);
         release();
         flags = m.flags;
         hdr = m.hdr;
     }
-    return *this;
+    वापस *यह;
 }
 
-SparseMat& SparseMat::operator=(const Mat& m)
+SparseMat& SparseMat::चालक=(स्थिर Mat& m)
 {
-    return (*this = SparseMat(m));
+    वापस (*यह = SparseMat(m));
 }
 
-void SparseMat::assignTo(SparseMat& m, int _type) const
+व्योम SparseMat::assignTo(SparseMat& m, पूर्णांक _type) स्थिर
 {
-    if( _type < 0 )
-        m = *this;
-    else
+    अगर( _type < 0 )
+        m = *यह;
+    अन्यथा
         convertTo(m, _type);
 }
 
-void SparseMat::addref()
+व्योम SparseMat::addref()
 {
-    if( hdr )
+    अगर( hdr )
         CV_XADD(&hdr->refcount, 1);
 }
 
-void SparseMat::release()
+व्योम SparseMat::release()
 {
-    if( hdr && CV_XADD(&hdr->refcount, -1) == 1 )
-        delete hdr;
+    अगर( hdr && CV_XADD(&hdr->refcount, -1) == 1 )
+        मिटाओ hdr;
     hdr = 0;
 }
 
-size_t SparseMat::hash(int i0) const
+माप_प्रकार SparseMat::hash(पूर्णांक i0) स्थिर
 {
-    return (size_t)i0;
+    वापस (माप_प्रकार)i0;
 }
 
-size_t SparseMat::hash(int i0, int i1) const
+माप_प्रकार SparseMat::hash(पूर्णांक i0, पूर्णांक i1) स्थिर
 {
-    return (size_t)(unsigned)i0 * HASH_SCALE + (unsigned)i1;
+    वापस (माप_प्रकार)(अचिन्हित)i0 * HASH_SCALE + (अचिन्हित)i1;
 }
 
-size_t SparseMat::hash(int i0, int i1, int i2) const
+माप_प्रकार SparseMat::hash(पूर्णांक i0, पूर्णांक i1, पूर्णांक i2) स्थिर
 {
-    return ((size_t)(unsigned)i0 * HASH_SCALE + (unsigned)i1) * HASH_SCALE + (unsigned)i2;
+    वापस ((माप_प्रकार)(अचिन्हित)i0 * HASH_SCALE + (अचिन्हित)i1) * HASH_SCALE + (अचिन्हित)i2;
 }
 
-size_t SparseMat::hash(const int* idx) const
+माप_प्रकार SparseMat::hash(स्थिर पूर्णांक* idx) स्थिर
 {
-    size_t h = (unsigned)idx[0];
-    if( !hdr )
-        return 0;
-    int d = hdr->dims;
-    for(int i = 1; i < d; i++ )
-        h = h * HASH_SCALE + (unsigned)idx[i];
-    return h;
+    माप_प्रकार h = (अचिन्हित)idx[0];
+    अगर( !hdr )
+        वापस 0;
+    पूर्णांक d = hdr->dims;
+    क्रम(पूर्णांक i = 1; i < d; i++ )
+        h = h * HASH_SCALE + (अचिन्हित)idx[i];
+    वापस h;
 }
 
 
-SparseMat::SparseMat(const Mat& m)
+SparseMat::SparseMat(स्थिर Mat& m)
 : flags(MAGIC_VAL), hdr(0)
 {
     create( m.dims, m.size.p, m.type() );
 
-    int i, idx[CV_MAX_DIM] = {0}, d = m.dims, lastSize = m.size[d - 1];
-    size_t esz = m.elemSize();
-    const uchar* dptr = m.ptr();
+    पूर्णांक i, idx[CV_MAX_DIM] = {0}, d = m.dims, last_आकार = m.size[d - 1];
+    माप_प्रकार esz = m.elem_आकार();
+    स्थिर uchar* dptr = m.ptr();
 
-    for(;;)
+    क्रम(;;)
     {
-        for( i = 0; i < lastSize; i++, dptr += esz )
+        क्रम( i = 0; i < last_आकार; i++, dptr += esz )
         {
-            if( isZeroElem(dptr, esz) )
-                continue;
+            अगर( isZeroElem(dptr, esz) )
+                जारी;
             idx[d-1] = i;
-            uchar* to = newNode(idx, hash(idx));
+            uchar* to = new_गाँठ(idx, hash(idx));
             copyElem( dptr, to, esz );
         }
 
-        for( i = d - 2; i >= 0; i-- )
+        क्रम( i = d - 2; i >= 0; i-- )
         {
             dptr += m.step[i] - m.size[i+1]*m.step[i+1];
-            if( ++idx[i] < m.size[i] )
-                break;
+            अगर( ++idx[i] < m.size[i] )
+                अवरोध;
             idx[i] = 0;
         }
-        if( i < 0 )
-            break;
+        अगर( i < 0 )
+            अवरोध;
     }
 }
 
-void SparseMat::create(int d, const int* _sizes, int _type)
+व्योम SparseMat::create(पूर्णांक d, स्थिर पूर्णांक* _sizes, पूर्णांक _type)
 {
     CV_Assert( _sizes && 0 < d && d <= CV_MAX_DIM );
-    for( int i = 0; i < d; i++ )
+    क्रम( पूर्णांक i = 0; i < d; i++ )
         CV_Assert( _sizes[i] > 0 );
     _type = CV_MAT_TYPE(_type);
-    if( hdr && _type == type() && hdr->dims == d && hdr->refcount == 1 )
+    अगर( hdr && _type == type() && hdr->dims == d && hdr->refcount == 1 )
     {
-        int i;
-        for( i = 0; i < d; i++ )
-            if( _sizes[i] != hdr->size[i] )
-                break;
-        if( i == d )
+        पूर्णांक i;
+        क्रम( i = 0; i < d; i++ )
+            अगर( _sizes[i] != hdr->size[i] )
+                अवरोध;
+        अगर( i == d )
         {
-            clear();
-            return;
+            सफा();
+            वापस;
         }
     }
-    int _sizes_backup[CV_MAX_DIM]; // #5991
-    if (hdr && _sizes == hdr->size)
+    पूर्णांक _sizes_backup[CV_MAX_DIM]; // #5991
+    अगर (hdr && _sizes == hdr->size)
     {
-        for(int i = 0; i < d; i++ )
+        क्रम(पूर्णांक i = 0; i < d; i++ )
             _sizes_backup[i] = _sizes[i];
         _sizes = _sizes_backup;
     }
     release();
     flags = MAGIC_VAL | _type;
-    hdr = new Hdr(d, _sizes, _type);
+    hdr = नया Hdr(d, _sizes, _type);
 }
 
-void SparseMat::copyTo( SparseMat& m ) const
+व्योम SparseMat::copyTo( SparseMat& m ) स्थिर
 {
-    if( hdr == m.hdr )
-        return;
-    if( !hdr )
+    अगर( hdr == m.hdr )
+        वापस;
+    अगर( !hdr )
     {
         m.release();
-        return;
+        वापस;
     }
     m.create( hdr->dims, hdr->size, type() );
     SparseMatConstIterator from = begin();
-    size_t N = nzcount(), esz = elemSize();
+    माप_प्रकार N = nzcount(), esz = elem_आकार();
 
-    for( size_t i = 0; i < N; i++, ++from )
+    क्रम( माप_प्रकार i = 0; i < N; i++, ++from )
     {
-        const Node* n = from.node();
-        uchar* to = m.newNode(n->idx, n->hashval);
+        स्थिर Node* n = from.गाँठ();
+        uchar* to = m.new_गाँठ(n->idx, n->hashval);
         copyElem( from.ptr, to, esz );
     }
 }
 
-void SparseMat::copyTo( Mat& m ) const
+व्योम SparseMat::copyTo( Mat& m ) स्थिर
 {
     CV_Assert( hdr );
-    int ndims = dims();
+    पूर्णांक ndims = dims();
     m.create( ndims, hdr->size, type() );
     m = Scalar(0);
 
     SparseMatConstIterator from = begin();
-    size_t N = nzcount(), esz = elemSize();
+    माप_प्रकार N = nzcount(), esz = elem_आकार();
 
-    for( size_t i = 0; i < N; i++, ++from )
+    क्रम( माप_प्रकार i = 0; i < N; i++, ++from )
     {
-        const Node* n = from.node();
+        स्थिर Node* n = from.गाँठ();
         copyElem( from.ptr, (ndims > 1 ? m.ptr(n->idx) : m.ptr(n->idx[0])), esz);
     }
 }
 
 
-void SparseMat::convertTo( SparseMat& m, int rtype, double alpha ) const
+व्योम SparseMat::convertTo( SparseMat& m, पूर्णांक rtype, द्विगुन alpha ) स्थिर
 {
-    int cn = channels();
-    if( rtype < 0 )
+    पूर्णांक cn = channels();
+    अगर( rtype < 0 )
         rtype = type();
     rtype = CV_MAKETYPE(rtype, cn);
-    if( hdr == m.hdr && rtype != type()  )
+    अगर( hdr == m.hdr && rtype != type()  )
     {
-        SparseMat temp;
-        convertTo(temp, rtype, alpha);
-        m = temp;
-        return;
+        SparseMat अस्थायी_2;
+        convertTo(अस्थायी_2, rtype, alpha);
+        m = अस्थायी_2;
+        वापस;
     }
 
     CV_Assert(hdr != 0);
-    if( hdr != m.hdr )
+    अगर( hdr != m.hdr )
         m.create( hdr->dims, hdr->size, rtype );
 
     SparseMatConstIterator from = begin();
-    size_t N = nzcount();
+    माप_प्रकार N = nzcount();
 
-    if( alpha == 1 )
+    अगर( alpha == 1 )
     {
-        ConvertData cvtfunc = getConvertElem(type(), rtype);
+        Convert_तथ्य cvtfunc = getConvertElem(type(), rtype);
         CV_Assert(cvtfunc);
-        for( size_t i = 0; i < N; i++, ++from )
+        क्रम( माप_प्रकार i = 0; i < N; i++, ++from )
         {
-            const Node* n = from.node();
-            uchar* to = hdr == m.hdr ? from.ptr : m.newNode(n->idx, n->hashval);
+            स्थिर Node* n = from.गाँठ();
+            uchar* to = hdr == m.hdr ? from.ptr : m.new_गाँठ(n->idx, n->hashval);
             cvtfunc( from.ptr, to, cn );
         }
     }
-    else
+    अन्यथा
     {
-        ConvertScaleData cvtfunc = getConvertScaleElem(type(), rtype);
+        Convert_Scale_तथ्य cvtfunc = getConvertScaleElem(type(), rtype);
         CV_Assert(cvtfunc);
-        for( size_t i = 0; i < N; i++, ++from )
+        क्रम( माप_प्रकार i = 0; i < N; i++, ++from )
         {
-            const Node* n = from.node();
-            uchar* to = hdr == m.hdr ? from.ptr : m.newNode(n->idx, n->hashval);
+            स्थिर Node* n = from.गाँठ();
+            uchar* to = hdr == m.hdr ? from.ptr : m.new_गाँठ(n->idx, n->hashval);
             cvtfunc( from.ptr, to, cn, alpha, 0 );
         }
     }
 }
 
 
-void SparseMat::convertTo( Mat& m, int rtype, double alpha, double beta ) const
+व्योम SparseMat::convertTo( Mat& m, पूर्णांक rtype, द्विगुन alpha, द्विगुन beta ) स्थिर
 {
-    int cn = channels();
-    if( rtype < 0 )
+    पूर्णांक cn = channels();
+    अगर( rtype < 0 )
         rtype = type();
     rtype = CV_MAKETYPE(rtype, cn);
 
@@ -429,212 +429,212 @@ void SparseMat::convertTo( Mat& m, int rtype, double alpha, double beta ) const
     m = Scalar(beta);
 
     SparseMatConstIterator from = begin();
-    size_t N = nzcount();
+    माप_प्रकार N = nzcount();
 
-    if( alpha == 1 && beta == 0 )
+    अगर( alpha == 1 && beta == 0 )
     {
-        ConvertData cvtfunc = getConvertElem(type(), rtype);
-        for( size_t i = 0; i < N; i++, ++from )
+        Convert_तथ्य cvtfunc = getConvertElem(type(), rtype);
+        क्रम( माप_प्रकार i = 0; i < N; i++, ++from )
         {
-            const Node* n = from.node();
+            स्थिर Node* n = from.गाँठ();
             uchar* to = m.ptr(n->idx);
             cvtfunc( from.ptr, to, cn );
         }
     }
-    else
+    अन्यथा
     {
-        ConvertScaleData cvtfunc = getConvertScaleElem(type(), rtype);
-        for( size_t i = 0; i < N; i++, ++from )
+        Convert_Scale_तथ्य cvtfunc = getConvertScaleElem(type(), rtype);
+        क्रम( माप_प्रकार i = 0; i < N; i++, ++from )
         {
-            const Node* n = from.node();
+            स्थिर Node* n = from.गाँठ();
             uchar* to = m.ptr(n->idx);
             cvtfunc( from.ptr, to, cn, alpha, beta );
         }
     }
 }
 
-void SparseMat::clear()
+व्योम SparseMat::सफा()
 {
-    if( hdr )
-        hdr->clear();
+    अगर( hdr )
+        hdr->सफा();
 }
 
-uchar* SparseMat::ptr(int i0, bool createMissing, size_t* hashval)
+uchar* SparseMat::ptr(पूर्णांक i0, bool createMissing, माप_प्रकार* hashval)
 {
     CV_Assert( hdr && hdr->dims == 1 );
-    size_t h = hashval ? *hashval : hash(i0);
-    size_t hidx = h & (hdr->hashtab.size() - 1), nidx = hdr->hashtab[hidx];
+    माप_प्रकार h = hashval ? *hashval : hash(i0);
+    माप_प्रकार hidx = h & (hdr->hashtab.size() - 1), nidx = hdr->hashtab[hidx];
     uchar* pool = &hdr->pool[0];
-    while( nidx != 0 )
+    जबतक( nidx != 0 )
     {
         Node* elem = (Node*)(pool + nidx);
-        if( elem->hashval == h && elem->idx[0] == i0 )
-            return &value<uchar>(elem);
+        अगर( elem->hashval == h && elem->idx[0] == i0 )
+            वापस &value<uchar>(elem);
         nidx = elem->next;
     }
 
-    if( createMissing )
+    अगर( createMissing )
     {
-        int idx[] = { i0 };
-        return newNode( idx, h );
+        पूर्णांक idx[] = { i0 };
+        वापस new_गाँठ( idx, h );
     }
-    return NULL;
+    वापस शून्य;
 }
 
-uchar* SparseMat::ptr(int i0, int i1, bool createMissing, size_t* hashval)
+uchar* SparseMat::ptr(पूर्णांक i0, पूर्णांक i1, bool createMissing, माप_प्रकार* hashval)
 {
     CV_Assert( hdr && hdr->dims == 2 );
-    size_t h = hashval ? *hashval : hash(i0, i1);
-    size_t hidx = h & (hdr->hashtab.size() - 1), nidx = hdr->hashtab[hidx];
+    माप_प्रकार h = hashval ? *hashval : hash(i0, i1);
+    माप_प्रकार hidx = h & (hdr->hashtab.size() - 1), nidx = hdr->hashtab[hidx];
     uchar* pool = &hdr->pool[0];
-    while( nidx != 0 )
+    जबतक( nidx != 0 )
     {
         Node* elem = (Node*)(pool + nidx);
-        if( elem->hashval == h && elem->idx[0] == i0 && elem->idx[1] == i1 )
-            return &value<uchar>(elem);
+        अगर( elem->hashval == h && elem->idx[0] == i0 && elem->idx[1] == i1 )
+            वापस &value<uchar>(elem);
         nidx = elem->next;
     }
 
-    if( createMissing )
+    अगर( createMissing )
     {
-        int idx[] = { i0, i1 };
-        return newNode( idx, h );
+        पूर्णांक idx[] = { i0, i1 };
+        वापस new_गाँठ( idx, h );
     }
-    return NULL;
+    वापस शून्य;
 }
 
-uchar* SparseMat::ptr(int i0, int i1, int i2, bool createMissing, size_t* hashval)
+uchar* SparseMat::ptr(पूर्णांक i0, पूर्णांक i1, पूर्णांक i2, bool createMissing, माप_प्रकार* hashval)
 {
     CV_Assert( hdr && hdr->dims == 3 );
-    size_t h = hashval ? *hashval : hash(i0, i1, i2);
-    size_t hidx = h & (hdr->hashtab.size() - 1), nidx = hdr->hashtab[hidx];
+    माप_प्रकार h = hashval ? *hashval : hash(i0, i1, i2);
+    माप_प्रकार hidx = h & (hdr->hashtab.size() - 1), nidx = hdr->hashtab[hidx];
     uchar* pool = &hdr->pool[0];
-    while( nidx != 0 )
+    जबतक( nidx != 0 )
     {
         Node* elem = (Node*)(pool + nidx);
-        if( elem->hashval == h && elem->idx[0] == i0 &&
+        अगर( elem->hashval == h && elem->idx[0] == i0 &&
             elem->idx[1] == i1 && elem->idx[2] == i2 )
-            return &value<uchar>(elem);
+            वापस &value<uchar>(elem);
         nidx = elem->next;
     }
 
-    if( createMissing )
+    अगर( createMissing )
     {
-        int idx[] = { i0, i1, i2 };
-        return newNode( idx, h );
+        पूर्णांक idx[] = { i0, i1, i2 };
+        वापस new_गाँठ( idx, h );
     }
-    return NULL;
+    वापस शून्य;
 }
 
-uchar* SparseMat::ptr(const int* idx, bool createMissing, size_t* hashval)
+uchar* SparseMat::ptr(स्थिर पूर्णांक* idx, bool createMissing, माप_प्रकार* hashval)
 {
     CV_Assert( hdr );
-    int i, d = hdr->dims;
-    size_t h = hashval ? *hashval : hash(idx);
-    size_t hidx = h & (hdr->hashtab.size() - 1), nidx = hdr->hashtab[hidx];
+    पूर्णांक i, d = hdr->dims;
+    माप_प्रकार h = hashval ? *hashval : hash(idx);
+    माप_प्रकार hidx = h & (hdr->hashtab.size() - 1), nidx = hdr->hashtab[hidx];
     uchar* pool = &hdr->pool[0];
-    while( nidx != 0 )
+    जबतक( nidx != 0 )
     {
         Node* elem = (Node*)(pool + nidx);
-        if( elem->hashval == h )
+        अगर( elem->hashval == h )
         {
-            for( i = 0; i < d; i++ )
-                if( elem->idx[i] != idx[i] )
-                    break;
-            if( i == d )
-                return &value<uchar>(elem);
+            क्रम( i = 0; i < d; i++ )
+                अगर( elem->idx[i] != idx[i] )
+                    अवरोध;
+            अगर( i == d )
+                वापस &value<uchar>(elem);
         }
         nidx = elem->next;
     }
 
-    return createMissing ? newNode(idx, h) : NULL;
+    वापस createMissing ? new_गाँठ(idx, h) : शून्य;
 }
 
-void SparseMat::erase(int i0, int i1, size_t* hashval)
+व्योम SparseMat::erase(पूर्णांक i0, पूर्णांक i1, माप_प्रकार* hashval)
 {
     CV_Assert( hdr && hdr->dims == 2 );
-    size_t h = hashval ? *hashval : hash(i0, i1);
-    size_t hidx = h & (hdr->hashtab.size() - 1), nidx = hdr->hashtab[hidx], previdx=0;
+    माप_प्रकार h = hashval ? *hashval : hash(i0, i1);
+    माप_प्रकार hidx = h & (hdr->hashtab.size() - 1), nidx = hdr->hashtab[hidx], previdx=0;
     uchar* pool = &hdr->pool[0];
-    while( nidx != 0 )
+    जबतक( nidx != 0 )
     {
         Node* elem = (Node*)(pool + nidx);
-        if( elem->hashval == h && elem->idx[0] == i0 && elem->idx[1] == i1 )
-            break;
+        अगर( elem->hashval == h && elem->idx[0] == i0 && elem->idx[1] == i1 )
+            अवरोध;
         previdx = nidx;
         nidx = elem->next;
     }
 
-    if( nidx )
-        removeNode(hidx, nidx, previdx);
+    अगर( nidx )
+        remove_गाँठ(hidx, nidx, previdx);
 }
 
-void SparseMat::erase(int i0, int i1, int i2, size_t* hashval)
+व्योम SparseMat::erase(पूर्णांक i0, पूर्णांक i1, पूर्णांक i2, माप_प्रकार* hashval)
 {
     CV_Assert( hdr && hdr->dims == 3 );
-    size_t h = hashval ? *hashval : hash(i0, i1, i2);
-    size_t hidx = h & (hdr->hashtab.size() - 1), nidx = hdr->hashtab[hidx], previdx=0;
+    माप_प्रकार h = hashval ? *hashval : hash(i0, i1, i2);
+    माप_प्रकार hidx = h & (hdr->hashtab.size() - 1), nidx = hdr->hashtab[hidx], previdx=0;
     uchar* pool = &hdr->pool[0];
-    while( nidx != 0 )
+    जबतक( nidx != 0 )
     {
         Node* elem = (Node*)(pool + nidx);
-        if( elem->hashval == h && elem->idx[0] == i0 &&
+        अगर( elem->hashval == h && elem->idx[0] == i0 &&
             elem->idx[1] == i1 && elem->idx[2] == i2 )
-            break;
+            अवरोध;
         previdx = nidx;
         nidx = elem->next;
     }
 
-    if( nidx )
-        removeNode(hidx, nidx, previdx);
+    अगर( nidx )
+        remove_गाँठ(hidx, nidx, previdx);
 }
 
-void SparseMat::erase(const int* idx, size_t* hashval)
+व्योम SparseMat::erase(स्थिर पूर्णांक* idx, माप_प्रकार* hashval)
 {
     CV_Assert( hdr );
-    int i, d = hdr->dims;
-    size_t h = hashval ? *hashval : hash(idx);
-    size_t hidx = h & (hdr->hashtab.size() - 1), nidx = hdr->hashtab[hidx], previdx=0;
+    पूर्णांक i, d = hdr->dims;
+    माप_प्रकार h = hashval ? *hashval : hash(idx);
+    माप_प्रकार hidx = h & (hdr->hashtab.size() - 1), nidx = hdr->hashtab[hidx], previdx=0;
     uchar* pool = &hdr->pool[0];
-    while( nidx != 0 )
+    जबतक( nidx != 0 )
     {
         Node* elem = (Node*)(pool + nidx);
-        if( elem->hashval == h )
+        अगर( elem->hashval == h )
         {
-            for( i = 0; i < d; i++ )
-                if( elem->idx[i] != idx[i] )
-                    break;
-            if( i == d )
-                break;
+            क्रम( i = 0; i < d; i++ )
+                अगर( elem->idx[i] != idx[i] )
+                    अवरोध;
+            अगर( i == d )
+                अवरोध;
         }
         previdx = nidx;
         nidx = elem->next;
     }
 
-    if( nidx )
-        removeNode(hidx, nidx, previdx);
+    अगर( nidx )
+        remove_गाँठ(hidx, nidx, previdx);
 }
 
-void SparseMat::resizeHashTab(size_t newsize)
+व्योम SparseMat::resizeHashTab(माप_प्रकार newsize)
 {
-    newsize = std::max(newsize, (size_t)8);
-    if((newsize & (newsize-1)) != 0)
-        newsize = (size_t)1 << cvCeil(std::log((double)newsize)/CV_LOG2);
+    newsize = std::max(newsize, (माप_प्रकार)8);
+    अगर((newsize & (newsize-1)) != 0)
+        newsize = (माप_प्रकार)1 << cvCeil(std::log((द्विगुन)newsize)/CV_LOG2);
 
-    size_t hsize = hdr->hashtab.size();
-    std::vector<size_t> _newh(newsize);
-    size_t* newh = &_newh[0];
-    for( size_t i = 0; i < newsize; i++ )
+    माप_प्रकार hsize = hdr->hashtab.size();
+    std::vector<माप_प्रकार> _newh(newsize);
+    माप_प्रकार* newh = &_newh[0];
+    क्रम( माप_प्रकार i = 0; i < newsize; i++ )
         newh[i] = 0;
     uchar* pool = &hdr->pool[0];
-    for( size_t i = 0; i < hsize; i++ )
+    क्रम( माप_प्रकार i = 0; i < hsize; i++ )
     {
-        size_t nidx = hdr->hashtab[i];
-        while( nidx )
+        माप_प्रकार nidx = hdr->hashtab[i];
+        जबतक( nidx )
         {
             Node* elem = (Node*)(pool + nidx);
-            size_t next = elem->next;
-            size_t newhidx = elem->hashval & (newsize - 1);
+            माप_प्रकार next = elem->next;
+            माप_प्रकार newhidx = elem->hashval & (newsize - 1);
             elem->next = newh[newhidx];
             newh[newhidx] = nidx;
             nidx = next;
@@ -643,214 +643,214 @@ void SparseMat::resizeHashTab(size_t newsize)
     hdr->hashtab = _newh;
 }
 
-uchar* SparseMat::newNode(const int* idx, size_t hashval)
+uchar* SparseMat::new_गाँठ(स्थिर पूर्णांक* idx, माप_प्रकार hashval)
 {
-    const int HASH_MAX_FILL_FACTOR=3;
+    स्थिर पूर्णांक HASH_MAX_FILL_FACTOR=3;
     CV_Assert(hdr);
-    size_t hsize = hdr->hashtab.size();
-    if( ++hdr->nodeCount > hsize*HASH_MAX_FILL_FACTOR )
+    माप_प्रकार hsize = hdr->hashtab.size();
+    अगर( ++hdr->गाँठ_गिनती > hsize*HASH_MAX_FILL_FACTOR )
     {
-        resizeHashTab(std::max(hsize*2, (size_t)8));
+        resizeHashTab(std::max(hsize*2, (माप_प्रकार)8));
         hsize = hdr->hashtab.size();
     }
 
-    if( !hdr->freeList )
+    अगर( !hdr->freeList )
     {
-        size_t i, nsz = hdr->nodeSize, psize = hdr->pool.size(),
+        माप_प्रकार i, nsz = hdr->गाँठ_आकार, psize = hdr->pool.size(),
             newpsize = std::max(psize*3/2, 8*nsz);
         newpsize = (newpsize/nsz)*nsz;
         hdr->pool.resize(newpsize);
         uchar* pool = &hdr->pool[0];
         hdr->freeList = std::max(psize, nsz);
-        for( i = hdr->freeList; i < newpsize - nsz; i += nsz )
+        क्रम( i = hdr->freeList; i < newpsize - nsz; i += nsz )
             ((Node*)(pool + i))->next = i + nsz;
         ((Node*)(pool + i))->next = 0;
     }
-    size_t nidx = hdr->freeList;
+    माप_प्रकार nidx = hdr->freeList;
     Node* elem = (Node*)&hdr->pool[nidx];
     hdr->freeList = elem->next;
     elem->hashval = hashval;
-    size_t hidx = hashval & (hsize - 1);
+    माप_प्रकार hidx = hashval & (hsize - 1);
     elem->next = hdr->hashtab[hidx];
     hdr->hashtab[hidx] = nidx;
 
-    int i, d = hdr->dims;
-    for( i = 0; i < d; i++ )
+    पूर्णांक i, d = hdr->dims;
+    क्रम( i = 0; i < d; i++ )
         elem->idx[i] = idx[i];
-    size_t esz = elemSize();
+    माप_प्रकार esz = elem_आकार();
     uchar* p = &value<uchar>(elem);
-    if( esz == sizeof(float) )
-        *((float*)p) = 0.f;
-    else if( esz == sizeof(double) )
-        *((double*)p) = 0.;
-    else
-        memset(p, 0, esz);
+    अगर( esz == माप(भग्न) )
+        *((भग्न*)p) = 0.f;
+    अन्यथा अगर( esz == माप(द्विगुन) )
+        *((द्विगुन*)p) = 0.;
+    अन्यथा
+        स_रखो(p, 0, esz);
 
-    return p;
+    वापस p;
 }
 
 
-void SparseMat::removeNode(size_t hidx, size_t nidx, size_t previdx)
+व्योम SparseMat::remove_गाँठ(माप_प्रकार hidx, माप_प्रकार nidx, माप_प्रकार previdx)
 {
-    Node* n = node(nidx);
-    if( previdx )
+    Node* n = गाँठ(nidx);
+    अगर( previdx )
     {
-        Node* prev = node(previdx);
-        prev->next = n->next;
+        Node* पूर्व = गाँठ(previdx);
+        पूर्व->next = n->next;
     }
-    else
+    अन्यथा
         hdr->hashtab[hidx] = n->next;
     n->next = hdr->freeList;
     hdr->freeList = nidx;
-    --hdr->nodeCount;
+    --hdr->गाँठ_गिनती;
 }
 
 //
 // Operations
 //
-double norm( const SparseMat& src, int normType )
+द्विगुन norm( स्थिर SparseMat& src, पूर्णांक normType )
 {
     CV_INSTRUMENT_REGION();
 
     SparseMatConstIterator it = src.begin();
 
-    size_t i, N = src.nzcount();
+    माप_प्रकार i, N = src.nzcount();
     normType &= NORM_TYPE_MASK;
-    int type = src.type();
-    double result = 0;
+    पूर्णांक type = src.type();
+    द्विगुन परिणाम = 0;
 
     CV_Assert( normType == NORM_INF || normType == NORM_L1 || normType == NORM_L2 );
 
-    if( type == CV_32F )
+    अगर( type == CV_32F )
     {
-        if( normType == NORM_INF )
-            for( i = 0; i < N; i++, ++it )
+        अगर( normType == NORM_INF )
+            क्रम( i = 0; i < N; i++, ++it )
             {
                 CV_Assert(it.ptr);
-                result = std::max(result, std::abs((double)it.value<float>()));
+                परिणाम = std::max(परिणाम, std::असल((द्विगुन)it.value<भग्न>()));
             }
-        else if( normType == NORM_L1 )
-            for( i = 0; i < N; i++, ++it )
+        अन्यथा अगर( normType == NORM_L1 )
+            क्रम( i = 0; i < N; i++, ++it )
             {
                 CV_Assert(it.ptr);
-                result += std::abs(it.value<float>());
+                परिणाम += std::असल(it.value<भग्न>());
             }
-        else
-            for( i = 0; i < N; i++, ++it )
+        अन्यथा
+            क्रम( i = 0; i < N; i++, ++it )
             {
                 CV_Assert(it.ptr);
-                double v = it.value<float>();
-                result += v*v;
+                द्विगुन v = it.value<भग्न>();
+                परिणाम += v*v;
             }
     }
-    else if( type == CV_64F )
+    अन्यथा अगर( type == CV_64F )
     {
-        if( normType == NORM_INF )
-            for( i = 0; i < N; i++, ++it )
+        अगर( normType == NORM_INF )
+            क्रम( i = 0; i < N; i++, ++it )
             {
                 CV_Assert(it.ptr);
-                result = std::max(result, std::abs(it.value<double>()));
+                परिणाम = std::max(परिणाम, std::असल(it.value<द्विगुन>()));
             }
-        else if( normType == NORM_L1 )
-            for( i = 0; i < N; i++, ++it )
+        अन्यथा अगर( normType == NORM_L1 )
+            क्रम( i = 0; i < N; i++, ++it )
             {
                 CV_Assert(it.ptr);
-                result += std::abs(it.value<double>());
+                परिणाम += std::असल(it.value<द्विगुन>());
             }
-        else
-            for( i = 0; i < N; i++, ++it )
+        अन्यथा
+            क्रम( i = 0; i < N; i++, ++it )
             {
                 CV_Assert(it.ptr);
-                double v = it.value<double>();
-                result += v*v;
+                द्विगुन v = it.value<द्विगुन>();
+                परिणाम += v*v;
             }
     }
-    else
+    अन्यथा
         CV_Error( cv::Error::StsUnsupportedFormat, "Only 32f and 64f are supported" );
 
-    if( normType == NORM_L2 )
-        result = std::sqrt(result);
-    return result;
+    अगर( normType == NORM_L2 )
+        परिणाम = std::वर्ग_मूल(परिणाम);
+    वापस परिणाम;
 }
 
-void minMaxLoc( const SparseMat& src, double* _minval, double* _maxval, int* _minidx, int* _maxidx )
+व्योम minMaxLoc( स्थिर SparseMat& src, द्विगुन* _minval, द्विगुन* _maxval, पूर्णांक* _minidx, पूर्णांक* _maxidx )
 {
     CV_INSTRUMENT_REGION();
 
     SparseMatConstIterator it = src.begin();
-    size_t i, N = src.nzcount(), d = src.hdr ? src.hdr->dims : 0;
-    int type = src.type();
-    const int *minidx = 0, *maxidx = 0;
+    माप_प्रकार i, N = src.nzcount(), d = src.hdr ? src.hdr->dims : 0;
+    पूर्णांक type = src.type();
+    स्थिर पूर्णांक *minidx = 0, *maxidx = 0;
 
-    if( type == CV_32F )
+    अगर( type == CV_32F )
     {
-        float minval = FLT_MAX, maxval = -FLT_MAX;
-        for( i = 0; i < N; i++, ++it )
+        भग्न minval = भग्न_उच्च, maxval = -भग्न_उच्च;
+        क्रम( i = 0; i < N; i++, ++it )
         {
             CV_Assert(it.ptr);
-            float v = it.value<float>();
-            if( v < minval )
+            भग्न v = it.value<भग्न>();
+            अगर( v < minval )
             {
                 minval = v;
-                minidx = it.node()->idx;
+                minidx = it.गाँठ()->idx;
             }
-            if( v > maxval )
+            अगर( v > maxval )
             {
                 maxval = v;
-                maxidx = it.node()->idx;
+                maxidx = it.गाँठ()->idx;
             }
         }
-        if( _minval )
+        अगर( _minval )
             *_minval = minval;
-        if( _maxval )
+        अगर( _maxval )
             *_maxval = maxval;
     }
-    else if( type == CV_64F )
+    अन्यथा अगर( type == CV_64F )
     {
-        double minval = DBL_MAX, maxval = -DBL_MAX;
-        for( i = 0; i < N; i++, ++it )
+        द्विगुन minval = द्विग_उच्च, maxval = -द्विग_उच्च;
+        क्रम( i = 0; i < N; i++, ++it )
         {
             CV_Assert(it.ptr);
-            double v = it.value<double>();
-            if( v < minval )
+            द्विगुन v = it.value<द्विगुन>();
+            अगर( v < minval )
             {
                 minval = v;
-                minidx = it.node()->idx;
+                minidx = it.गाँठ()->idx;
             }
-            if( v > maxval )
+            अगर( v > maxval )
             {
                 maxval = v;
-                maxidx = it.node()->idx;
+                maxidx = it.गाँठ()->idx;
             }
         }
-        if( _minval )
+        अगर( _minval )
             *_minval = minval;
-        if( _maxval )
+        अगर( _maxval )
             *_maxval = maxval;
     }
-    else
+    अन्यथा
         CV_Error( cv::Error::StsUnsupportedFormat, "Only 32f and 64f are supported" );
 
-    if( _minidx && minidx )
-        for( i = 0; i < d; i++ )
+    अगर( _minidx && minidx )
+        क्रम( i = 0; i < d; i++ )
             _minidx[i] = minidx[i];
-    if( _maxidx && maxidx )
-        for( i = 0; i < d; i++ )
+    अगर( _maxidx && maxidx )
+        क्रम( i = 0; i < d; i++ )
             _maxidx[i] = maxidx[i];
 }
 
 
-void normalize( const SparseMat& src, SparseMat& dst, double a, int norm_type )
+व्योम normalize( स्थिर SparseMat& src, SparseMat& dst, द्विगुन a, पूर्णांक norm_type )
 {
     CV_INSTRUMENT_REGION();
 
-    double scale = 1;
-    if( norm_type == NORM_L2 || norm_type == NORM_L1 || norm_type == NORM_INF )
+    द्विगुन scale = 1;
+    अगर( norm_type == NORM_L2 || norm_type == NORM_L1 || norm_type == NORM_INF )
     {
         scale = norm( src, norm_type );
-        scale = scale > DBL_EPSILON ? a/scale : 0.;
+        scale = scale > द्विग_अंतर ? a/scale : 0.;
     }
-    else
+    अन्यथा
         CV_Error( cv::Error::StsBadArg, "Unknown/unsupported norm type" );
 
     src.convertTo( dst, -1, scale );

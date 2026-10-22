@@ -3,88 +3,88 @@
 // of this distribution and at http://opencv.org/license.html
 
 
-#include "precomp.hpp"
-#include "opencl_kernels_core.hpp"
+#समावेश "precomp.hpp"
+#समावेश "opencl_kernels_core.hpp"
 
-#include "convert_scale.simd.hpp"
-#include "convert_scale.simd_declarations.hpp" // defines CV_CPU_DISPATCH_MODES_ALL=AVX2,...,BASELINE based on CMakeLists.txt content
+#समावेश "convert_scale.simd.hpp"
+#समावेश "convert_scale.simd_declarations.hpp" // defines CV_CPU_DISPATCH_MODES_ALL=AVX2,...,BASELINE based on CMakeLists.txt content
 
 namespace cv
 {
 
-static BinaryFunc getCvtScaleAbsFunc(int depth)
+अटल द्विआधारी_Func getCvtScaleAbsFunc(पूर्णांक depth)
 {
     CV_INSTRUMENT_REGION();
     CV_CPU_DISPATCH(getCvtScaleAbsFunc, (depth),
         CV_CPU_DISPATCH_MODES_ALL);
 }
 
-BinaryFunc getConvertScaleFunc(int sdepth, int ddepth)
+द्विआधारी_Func getConvertScaleFunc(पूर्णांक sdepth, पूर्णांक ddepth)
 {
     CV_INSTRUMENT_REGION();
     CV_CPU_DISPATCH(getConvertScaleFunc, (sdepth, ddepth),
         CV_CPU_DISPATCH_MODES_ALL);
 }
 
-#ifdef HAVE_OPENCL
+#अगर_घोषित HAVE_OPENCL
 
-static bool ocl_convertScaleAbs( InputArray _src, OutputArray _dst, double alpha, double beta )
+अटल bool ocl_convertScaleAbs( निवेश_Array _src, OutputArray _dst, द्विगुन alpha, द्विगुन beta )
 {
-    const ocl::Device & d = ocl::Device::getDefault();
+    स्थिर ocl::Device & d = ocl::Device::getDefault();
 
-    int type = _src.type(), depth = CV_MAT_DEPTH(type), cn = CV_MAT_CN(type);
+    पूर्णांक type = _src.type(), depth = CV_MAT_DEPTH(type), cn = CV_MAT_CN(type);
     bool doubleSupport = d.doubleFPConfig() > 0;
-    if (!doubleSupport && depth == CV_64F)
-        return false;
+    अगर (!doubleSupport && depth == CV_64F)
+        वापस false;
 
-    _dst.createSameSize(_src, CV_8UC(cn));
-    int kercn = 1;
-    if (d.isIntel())
+    _dst.create_Same_आकार(_src, CV_8UC(cn));
+    पूर्णांक kercn = 1;
+    अगर (d.isIntel())
     {
-        static const int vectorWidths[] = {4, 4, 4, 4, 4, 4, 4, -1};
+        अटल स्थिर पूर्णांक vectorWidths[] = {4, 4, 4, 4, 4, 4, 4, -1};
         kercn = ocl::checkOptimalVectorWidth( vectorWidths, _src, _dst,
                                               noArray(), noArray(), noArray(),
                                               noArray(), noArray(), noArray(),
                                               noArray(), ocl::OCL_VECTOR_MAX);
     }
-    else
+    अन्यथा
         kercn = ocl::predictOptimalVectorWidthMax(_src, _dst);
 
-    int rowsPerWI = d.isIntel() ? 4 : 1;
-    char cvt[2][50];
-    int wdepth = std::max(depth, CV_32F);
+    पूर्णांक rowsPerWI = d.isIntel() ? 4 : 1;
+    अक्षर cvt[2][50];
+    पूर्णांक wdepth = std::max(depth, CV_32F);
     String build_opt = format("-D OP_CONVERT_SCALE_ABS -D UNARY_OP -D dstT=%s -D DEPTH_dst=%d -D srcT1=%s"
                          " -D workT=%s -D wdepth=%d -D convertToWT1=%s -D convertToDT=%s"
                          " -D workT1=%s -D rowsPerWI=%d%s",
                          ocl::typeToStr(CV_8UC(kercn)), CV_8U,
                          ocl::typeToStr(CV_MAKE_TYPE(depth, kercn)),
                          ocl::typeToStr(CV_MAKE_TYPE(wdepth, kercn)), wdepth,
-                         ocl::convertTypeStr(depth, wdepth, kercn, cvt[0], sizeof(cvt[0])),
-                         ocl::convertTypeStr(wdepth, CV_8U, kercn, cvt[1], sizeof(cvt[1])),
+                         ocl::convertTypeStr(depth, wdepth, kercn, cvt[0], माप(cvt[0])),
+                         ocl::convertTypeStr(wdepth, CV_8U, kercn, cvt[1], माप(cvt[1])),
                          ocl::typeToStr(wdepth), rowsPerWI,
                          doubleSupport ? " -D DOUBLE_SUPPORT" : "");
     ocl::Kernel k("KF", ocl::core::arithm_oclsrc, build_opt);
-    if (k.empty())
-        return false;
+    अगर (k.empty())
+        वापस false;
 
     UMat src = _src.getUMat();
     UMat dst = _dst.getUMat();
 
-    ocl::KernelArg srcarg = ocl::KernelArg::ReadOnlyNoSize(src),
+    ocl::KernelArg srcarg = ocl::KernelArg::Read_Only_No_आकार(src),
             dstarg = ocl::KernelArg::WriteOnly(dst, cn, kercn);
 
-    if (wdepth == CV_32F)
-        k.args(srcarg, dstarg, (float)alpha, (float)beta);
-    else if (wdepth == CV_64F)
+    अगर (wdepth == CV_32F)
+        k.args(srcarg, dstarg, (भग्न)alpha, (भग्न)beta);
+    अन्यथा अगर (wdepth == CV_64F)
         k.args(srcarg, dstarg, alpha, beta);
 
-    size_t globalsize[2] = { (size_t)src.cols * cn / kercn, ((size_t)src.rows + rowsPerWI - 1) / rowsPerWI };
-    return k.run(2, globalsize, NULL, false);
+    माप_प्रकार globalsize[2] = { (माप_प्रकार)src.cols * cn / kercn, ((माप_प्रकार)src.rows + rowsPerWI - 1) / rowsPerWI };
+    वापस k.run(2, globalsize, शून्य, false);
 }
 
-#endif
+#पूर्ण_अगर
 
-void convertScaleAbs(InputArray _src, OutputArray _dst, double alpha, double beta)
+व्योम convertScaleAbs(निवेश_Array _src, OutputArray _dst, द्विगुन alpha, द्विगुन beta)
 {
     CV_INSTRUMENT_REGION();
 
@@ -92,26 +92,26 @@ void convertScaleAbs(InputArray _src, OutputArray _dst, double alpha, double bet
                ocl_convertScaleAbs(_src, _dst, alpha, beta))
 
     Mat src = _src.getMat();
-    int cn = src.channels();
-    double scale[] = {alpha, beta};
+    पूर्णांक cn = src.channels();
+    द्विगुन scale[] = {alpha, beta};
     _dst.create( src.size, CV_8UC(cn) );
     Mat dst = _dst.getMat();
-    BinaryFunc func = getCvtScaleAbsFunc(src.depth());
+    द्विआधारी_Func func = getCvtScaleAbsFunc(src.depth());
     CV_Assert( func != 0 );
 
-    if( src.dims <= 2 )
+    अगर( src.dims <= 2 )
     {
-        Size sz = getContinuousSize2D(src, dst, cn);
+        आकार sz = getContinuousSize2D(src, dst, cn);
         func( src.ptr(), src.step, 0, 0, dst.ptr(), dst.step, sz, scale );
     }
-    else
+    अन्यथा
     {
-        const Mat* arrays[] = {&src, &dst, 0};
+        स्थिर Mat* arrays[] = {&src, &dst, 0};
         uchar* ptrs[2] = {};
         NAryMatIterator it(arrays, ptrs);
-        Size sz((int)it.size*cn, 1);
+        आकार sz((पूर्णांक)it.size*cn, 1);
 
-        for( size_t i = 0; i < it.nplanes; i++, ++it )
+        क्रम( माप_प्रकार i = 0; i < it.nplanes; i++, ++it )
             func( ptrs[0], 0, 0, 0, ptrs[1], 0, sz, scale );
     }
 }

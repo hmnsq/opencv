@@ -8,42 +8,42 @@
 // and slice.
 // Each of them only describes a source and a destination view; channels stay inside the element.
 
-#ifndef OPENCV_CORE_ND_COPY_HPP
-#define OPENCV_CORE_ND_COPY_HPP
+#अगर_अघोषित OPENCV_CORE_ND_COPY_HPP
+#घोषणा OPENCV_CORE_ND_COPY_HPP
 
 namespace cv { namespace nd {
 
-enum { MAX_VIEW_DIMS = CV_MAX_DIM };
+क्रमागत { MAX_VIEW_DIMS = CV_MAX_DIM };
 
-struct View
+काष्ठा View
 {
-    uchar* data = nullptr;
-    int dims = 0;
-    size_t esz = 0;                    // element size in bytes, channels included
-    int size[MAX_VIEW_DIMS];
-    ptrdiff_t step[MAX_VIEW_DIMS];     // in bytes; 0 = broadcast, negative = reversed
+    uchar* तथ्य = nullptr;
+    पूर्णांक dims = 0;
+    माप_प्रकार esz = 0;                    // element size in bytes, channels included
+    पूर्णांक size[MAX_VIEW_DIMS];
+    सूचक_भेद_प्रकार step[MAX_VIEW_DIMS];     // in bytes; 0 = broadcast, negative = reversed
 };
 
-View viewOf(const Mat& m);
+View viewOf(स्थिर Mat& m);
 
 // The i-th axis of the result is the order[i]-th axis of v.
-View permute(const View& v, const int* order);
+View permute(स्थिर View& v, स्थिर पूर्णांक* order);
 
-void flip(View& v, int axis);
+व्योम flip(View& v, पूर्णांक axis);
 
 // Keep `count` elements along the axis, starting at `start`; `step` may be negative.
-void slice(View& v, int axis, int start, int step, int count);
+व्योम slice(View& v, पूर्णांक axis, पूर्णांक start, पूर्णांक step, पूर्णांक गिनती_2);
 
 // The views must have the same dims, sizes and esz. Overlapping views are allowed.
-void copy(const View& src, const View& dst);
+व्योम copy(स्थिर View& src, स्थिर View& dst);
 
 // n independent copies executed in one parallel pass.
-void copyBatch(const View* src, const View* dst, int n);
+व्योम copyBatch(स्थिर View* src, स्थिर View* dst, पूर्णांक n);
 
 // cv::transpose kernel for the element size, or nullptr; defined in matrix_transform.cpp.
-typedef void (*TransposeFunc)(const uchar* src, size_t sstep, uchar* dst, size_t dstep, Size sz);
-TransposeFunc getTransposeFunc(size_t esz);
+प्रकार व्योम (*TransposeFunc)(स्थिर uchar* src, माप_प्रकार sstep, uchar* dst, माप_प्रकार dstep, आकार sz);
+TransposeFunc getTransposeFunc(माप_प्रकार esz);
 
 }} // namespace cv::nd
 
-#endif
+#पूर्ण_अगर

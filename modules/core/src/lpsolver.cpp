@@ -38,41 +38,41 @@
 // the use of this software, even if advised of the possibility of such damage.
 //
 //M*/
-#include "precomp.hpp"
-#include <climits>
-#include <algorithm>
+#समावेश "precomp.hpp"
+#समावेश <climits>
+#समावेश <algorithm>
 
-#define dprintf(x)
-#define print_matrix(x)
+#घोषणा dprintf(x)
+#घोषणा print_matrix(x)
 
 namespace cv
 {
 
 using std::vector;
 
-#ifdef ALEX_DEBUG
-static void print_simplex_state(const Mat& c,const Mat& b,double v,const std::vector<int> N,const std::vector<int> B){
-    printf("\tprint simplex state\n");
+#अगर_घोषित ALEX_DEBUG
+अटल व्योम print_simplex_state(स्थिर Mat& c,स्थिर Mat& b,द्विगुन v,स्थिर std::vector<पूर्णांक> N,स्थिर std::vector<पूर्णांक> B){
+    म_लिखो("\tprint simplex state\n");
 
-    printf("v=%g\n",v);
+    म_लिखो("v=%g\n",v);
 
-    printf("here c goes\n");
+    म_लिखो("here c goes\n");
     print_matrix(c);
 
-    printf("non-basic: ");
+    म_लिखो("non-basic: ");
     print(Mat(N));
-    printf("\n");
+    म_लिखो("\n");
 
-    printf("here b goes\n");
+    म_लिखो("here b goes\n");
     print_matrix(b);
-    printf("basic: ");
+    म_लिखो("basic: ");
 
     print(Mat(B));
-    printf("\n");
+    म_लिखो("\n");
 }
-#else
-#define print_simplex_state(c,b,v,N,B)
-#endif
+#अन्यथा
+#घोषणा print_simplex_state(c,b,v,N,B)
+#पूर्ण_अगर
 
 /**Due to technical considerations, the format of input b and c is somewhat special:
  *both b and c should be one column bigger than corresponding b and c of linear problem and the leftmost column will be used internally
@@ -80,17 +80,17 @@ static void print_simplex_state(const Mat& c,const Mat& b,double v,const std::ve
  it also initializes N and B and does not make any assumptions about their init values
  * @return SOLVELP_UNFEASIBLE if problem is unfeasible, 0 if feasible.
 */
-static int initialize_simplex(Mat_<double>& c, Mat_<double>& b,double& v,vector<int>& N,vector<int>& B,vector<unsigned int>& indexToRow);
-static inline void pivot(Mat_<double>& c,Mat_<double>& b,double& v,vector<int>& N,vector<int>& B,int leaving_index,
-        int entering_index,vector<unsigned int>& indexToRow);
+अटल पूर्णांक initialize_simplex(Mat_<द्विगुन>& c, Mat_<द्विगुन>& b,द्विगुन& v,vector<पूर्णांक>& N,vector<पूर्णांक>& B,vector<अचिन्हित पूर्णांक>& सूचकांक_To_Row);
+अटल अंतरभूत व्योम pivot(Mat_<द्विगुन>& c,Mat_<द्विगुन>& b,द्विगुन& v,vector<पूर्णांक>& N,vector<पूर्णांक>& B,पूर्णांक leaving_सूचकांक,
+        पूर्णांक entering_सूचकांक,vector<अचिन्हित पूर्णांक>& सूचकांक_To_Row);
 /**@return SOLVELP_UNBOUNDED means the problem is unbdd, SOLVELP_MULTI means multiple solutions, SOLVELP_SINGLE means one solution.
  */
-static int inner_simplex(Mat_<double>& c, Mat_<double>& b,double& v,vector<int>& N,vector<int>& B,vector<unsigned int>& indexToRow);
-static void swap_columns(Mat_<double>& A,int col1,int col2);
-#define SWAP(type,a,b) {type tmp=(a);(a)=(b);(b)=tmp;}
+अटल पूर्णांक inner_simplex(Mat_<द्विगुन>& c, Mat_<द्विगुन>& b,द्विगुन& v,vector<पूर्णांक>& N,vector<पूर्णांक>& B,vector<अचिन्हित पूर्णांक>& सूचकांक_To_Row);
+अटल व्योम swap_columns(Mat_<द्विगुन>& A,पूर्णांक col1,पूर्णांक col2);
+#घोषणा SWAP(type,a,b) {type tmp=(a);(a)=(b);(b)=tmp;}
 
 //return codes:-2 (no_sol - unbdd),-1(no_sol - unfsbl), 0(single_sol), 1(multiple_sol=>least_l2_norm)
-int solveLP(InputArray Func_, InputArray Constr_, OutputArray z_, double constr_eps)
+पूर्णांक solveLP(निवेश_Array Func_, निवेश_Array Constr_, OutputArray z_, द्विगुन constr_eps)
 {
     dprintf(("call to solveLP\n"));
 
@@ -99,46 +99,46 @@ int solveLP(InputArray Func_, InputArray Constr_, OutputArray z_, double constr_
     CV_Assert(Constr_.type()==CV_64FC1 || Constr_.type()==CV_32FC1);
     CV_Assert((Func_.rows()==1 && (Constr_.cols()-Func_.cols()==1))||
             (Func_.cols()==1 && (Constr_.cols()-Func_.rows()==1)));
-    if (z_.fixedType())
+    अगर (z_.fixedType())
         CV_CheckType(z_.type(), z_.type() == CV_64FC1 || z_.type() == CV_32FC1 || z_.type() == CV_32SC1, "");
 
     Mat Func = Func_.getMat();
     Mat Constr = Constr_.getMat();
 
     //copy arguments for we will shall modify them
-    Mat_<double> bigC=Mat_<double>(1,(Func.rows==1?Func.cols:Func.rows)+1),
-        bigB=Mat_<double>(Constr.rows,Constr.cols+1);
-    if(Func.rows==1){
+    Mat_<द्विगुन> bigC=Mat_<द्विगुन>(1,(Func.rows==1?Func.cols:Func.rows)+1),
+        bigB=Mat_<द्विगुन>(Constr.rows,Constr.cols+1);
+    अगर(Func.rows==1){
         Func.convertTo(bigC.colRange(1,bigC.cols),CV_64FC1);
-    }else{
+    }अन्यथा{
         Mat FuncT=Func.t();
         FuncT.convertTo(bigC.colRange(1,bigC.cols),CV_64FC1);
     }
     Constr.convertTo(bigB.colRange(1,bigB.cols),CV_64FC1);
-    double v=0;
-    vector<int> N,B;
-    vector<unsigned int> indexToRow;
+    द्विगुन v=0;
+    vector<पूर्णांक> N,B;
+    vector<अचिन्हित पूर्णांक> सूचकांक_To_Row;
 
-    if(initialize_simplex(bigC,bigB,v,N,B,indexToRow)==SOLVELP_UNFEASIBLE){
-        return SOLVELP_UNFEASIBLE;
+    अगर(initialize_simplex(bigC,bigB,v,N,B,सूचकांक_To_Row)==SOLVELP_UNFEASIBLE){
+        वापस SOLVELP_UNFEASIBLE;
     }
-    Mat_<double> c=bigC.colRange(1,bigC.cols),
+    Mat_<द्विगुन> c=bigC.colRange(1,bigC.cols),
         b=bigB.colRange(1,bigB.cols);
 
-    int res=0;
-    if((res=inner_simplex(c,b,v,N,B,indexToRow))==SOLVELP_UNBOUNDED){
-        return SOLVELP_UNBOUNDED;
+    पूर्णांक res=0;
+    अगर((res=inner_simplex(c,b,v,N,B,सूचकांक_To_Row))==SOLVELP_UNBOUNDED){
+        वापस SOLVELP_UNBOUNDED;
     }
 
     //return the optimal solution
     Mat z(c.cols,1,CV_64FC1);
-    MatIterator_<double> it=z.begin<double>();
-    unsigned int nsize = (unsigned int)N.size();
-    for(int i=1;i<=c.cols;i++,it++){
-        if(indexToRow[i]<nsize){
+    MatIterator_<द्विगुन> it=z.begin<द्विगुन>();
+    अचिन्हित पूर्णांक nsize = (अचिन्हित पूर्णांक)N.size();
+    क्रम(पूर्णांक i=1;i<=c.cols;i++,it++){
+        अगर(सूचकांक_To_Row[i]<nsize){
             *it=0;
-        }else{
-            *it=b.at<double>(indexToRow[i]-nsize,b.cols-1);
+        }अन्यथा{
+            *it=b.at<द्विगुन>(सूचकांक_To_Row[i]-nsize,b.cols-1);
         }
     }
 
@@ -147,92 +147,92 @@ int solveLP(InputArray Func_, InputArray Constr_, OutputArray z_, double constr_
     //check constraints feasibility
     Mat prod = Constr(Rect(0, 0, Constr.cols - 1, Constr.rows)) * z;
     Mat constr_check = Constr.col(Constr.cols - 1) - prod;
-    double min_value = 0.0;
-    minMaxIdx(constr_check, &min_value);
-    if (min_value < -constr_eps)
+    द्विगुन min_मूल्य = 0.0;
+    minMaxIdx(constr_check, &min_मूल्य);
+    अगर (min_मूल्य < -constr_eps)
     {
-        return SOLVELP_LOST;
+        वापस SOLVELP_LOST;
     }
 
-    return res;
+    वापस res;
 }
 
-int solveLP(InputArray Func, InputArray Constr, OutputArray z)
+पूर्णांक solveLP(निवेश_Array Func, निवेश_Array Constr, OutputArray z)
 {
-    return solveLP(Func, Constr, z, 1e-12);
+    वापस solveLP(Func, Constr, z, 1e-12);
 }
 
-static int initialize_simplex(Mat_<double>& c, Mat_<double>& b,double& v,vector<int>& N,vector<int>& B,vector<unsigned int>& indexToRow){
+अटल पूर्णांक initialize_simplex(Mat_<द्विगुन>& c, Mat_<द्विगुन>& b,द्विगुन& v,vector<पूर्णांक>& N,vector<पूर्णांक>& B,vector<अचिन्हित पूर्णांक>& सूचकांक_To_Row){
     N.resize(c.cols);
     N[0]=0;
-    for (std::vector<int>::iterator it = N.begin()+1 ; it != N.end(); ++it){
+    क्रम (std::vector<पूर्णांक>::iterator it = N.begin()+1 ; it != N.end(); ++it){
         *it=it[-1]+1;
     }
     B.resize(b.rows);
-    B[0]=(int)N.size();
-    for (std::vector<int>::iterator it = B.begin()+1 ; it != B.end(); ++it){
+    B[0]=(पूर्णांक)N.size();
+    क्रम (std::vector<पूर्णांक>::iterator it = B.begin()+1 ; it != B.end(); ++it){
         *it=it[-1]+1;
     }
-    indexToRow.resize(c.cols+b.rows);
-    indexToRow[0]=0;
-    for (std::vector<unsigned int>::iterator it = indexToRow.begin()+1 ; it != indexToRow.end(); ++it){
+    सूचकांक_To_Row.resize(c.cols+b.rows);
+    सूचकांक_To_Row[0]=0;
+    क्रम (std::vector<अचिन्हित पूर्णांक>::iterator it = सूचकांक_To_Row.begin()+1 ; it != सूचकांक_To_Row.end(); ++it){
         *it=it[-1]+1;
     }
     v=0;
 
-    int k=0;
+    पूर्णांक k=0;
     {
-        double min=DBL_MAX;
-        for(int i=0;i<b.rows;i++){
-            if(b(i,b.cols-1)<min){
+        द्विगुन min=द्विग_उच्च;
+        क्रम(पूर्णांक i=0;i<b.rows;i++){
+            अगर(b(i,b.cols-1)<min){
                 min=b(i,b.cols-1);
                 k=i;
             }
         }
     }
 
-    if(b(k,b.cols-1)>=0){
+    अगर(b(k,b.cols-1)>=0){
         N.erase(N.begin());
-        for (std::vector<unsigned int>::iterator it = indexToRow.begin()+1 ; it != indexToRow.end(); ++it){
+        क्रम (std::vector<अचिन्हित पूर्णांक>::iterator it = सूचकांक_To_Row.begin()+1 ; it != सूचकांक_To_Row.end(); ++it){
             --(*it);
         }
-        return 0;
+        वापस 0;
     }
 
-    Mat_<double> old_c=c.clone();
+    Mat_<द्विगुन> old_c=c.clone();
     c=0;
     c(0,0)=-1;
-    for(int i=0;i<b.rows;i++){
+    क्रम(पूर्णांक i=0;i<b.rows;i++){
         b(i,0)=-1;
     }
 
     print_simplex_state(c,b,v,N,B);
 
     dprintf(("\tWE MAKE PIVOT\n"));
-    pivot(c,b,v,N,B,k,0,indexToRow);
+    pivot(c,b,v,N,B,k,0,सूचकांक_To_Row);
 
     print_simplex_state(c,b,v,N,B);
 
-    inner_simplex(c,b,v,N,B,indexToRow);
+    inner_simplex(c,b,v,N,B,सूचकांक_To_Row);
 
     dprintf(("\tAFTER INNER_SIMPLEX\n"));
     print_simplex_state(c,b,v,N,B);
 
-    unsigned int nsize = (unsigned int)N.size();
-    if(indexToRow[0]>=nsize){
-        int iterator_offset=indexToRow[0]-nsize;
-        if(b(iterator_offset,b.cols-1)>0){
-            return SOLVELP_UNFEASIBLE;
+    अचिन्हित पूर्णांक nsize = (अचिन्हित पूर्णांक)N.size();
+    अगर(सूचकांक_To_Row[0]>=nsize){
+        पूर्णांक iterator_offset=सूचकांक_To_Row[0]-nsize;
+        अगर(b(iterator_offset,b.cols-1)>0){
+            वापस SOLVELP_UNFEASIBLE;
         }
-        pivot(c,b,v,N,B,iterator_offset,0,indexToRow);
+        pivot(c,b,v,N,B,iterator_offset,0,सूचकांक_To_Row);
     }
 
-    vector<int>::iterator iterator;
+    vector<पूर्णांक>::iterator iterator;
     {
-        int iterator_offset=indexToRow[0];
+        पूर्णांक iterator_offset=सूचकांक_To_Row[0];
         iterator=N.begin()+iterator_offset;
         std::iter_swap(iterator,N.begin());
-        SWAP(int,indexToRow[*iterator],indexToRow[0]);
+        SWAP(पूर्णांक,सूचकांक_To_Row[*iterator],सूचकांक_To_Row[0]);
         swap_columns(c,iterator_offset,0);
         swap_columns(b,iterator_offset,0);
     }
@@ -243,15 +243,15 @@ static int initialize_simplex(Mat_<double>& c, Mat_<double>& b,double& v,vector<
     //start from 1, because we ignore x_0
     c=0;
     v=0;
-    for(int I=1;I<old_c.cols;I++){
-        if(indexToRow[I]<nsize){
+    क्रम(पूर्णांक I=1;I<old_c.cols;I++){
+        अगर(सूचकांक_To_Row[I]<nsize){
             dprintf(("I=%d from nonbasic\n",I));
-            int iterator_offset=indexToRow[I];
+            पूर्णांक iterator_offset=सूचकांक_To_Row[I];
             c(0,iterator_offset)+=old_c(0,I);
             print_matrix(c);
-        }else{
+        }अन्यथा{
             dprintf(("I=%d from basic\n",I));
-            int iterator_offset=indexToRow[I]-nsize;
+            पूर्णांक iterator_offset=सूचकांक_To_Row[I]-nsize;
             c-=old_c(0,I)*b.row(iterator_offset).colRange(0,b.cols-1);
             v+=old_c(0,I)*b(iterator_offset,b.cols-1);
             print_matrix(c);
@@ -262,50 +262,50 @@ static int initialize_simplex(Mat_<double>& c, Mat_<double>& b,double& v,vector<
     print_simplex_state(c,b,v,N,B);
 
     N.erase(N.begin());
-    for (std::vector<unsigned int>::iterator it = indexToRow.begin()+1 ; it != indexToRow.end(); ++it){
+    क्रम (std::vector<अचिन्हित पूर्णांक>::iterator it = सूचकांक_To_Row.begin()+1 ; it != सूचकांक_To_Row.end(); ++it){
         --(*it);
     }
-    return 0;
+    वापस 0;
 }
 
-static int inner_simplex(Mat_<double>& c, Mat_<double>& b,double& v,vector<int>& N,vector<int>& B,vector<unsigned int>& indexToRow){
+अटल पूर्णांक inner_simplex(Mat_<द्विगुन>& c, Mat_<द्विगुन>& b,द्विगुन& v,vector<पूर्णांक>& N,vector<पूर्णांक>& B,vector<अचिन्हित पूर्णांक>& सूचकांक_To_Row){
 
-    for(;;){
-        MatIterator_<double> pos_ptr;
-        int e=-1,pos_ctr=0,min_var=INT_MAX;
+    क्रम(;;){
+        MatIterator_<द्विगुन> pos_ptr;
+        पूर्णांक e=-1,pos_ctr=0,min_var=पूर्णांक_उच्च;
         bool all_nonzero=true;
-        for(pos_ptr=c.begin();pos_ptr!=c.end();pos_ptr++,pos_ctr++){
-            if(*pos_ptr==0){
+        क्रम(pos_ptr=c.begin();pos_ptr!=c.end();pos_ptr++,pos_ctr++){
+            अगर(*pos_ptr==0){
                 all_nonzero=false;
             }
-            if(*pos_ptr>0){
-                if(N[pos_ctr]<min_var){
+            अगर(*pos_ptr>0){
+                अगर(N[pos_ctr]<min_var){
                     e=pos_ctr;
                     min_var=N[pos_ctr];
                 }
             }
         }
-        if(e==-1){
+        अगर(e==-1){
             dprintf(("hello from e==-1\n"));
             print_matrix(c);
-            if(all_nonzero==true){
-                return SOLVELP_SINGLE;
-            }else{
-                return SOLVELP_MULTI;
+            अगर(all_nonzero==true){
+                वापस SOLVELP_SINGLE;
+            }अन्यथा{
+                वापस SOLVELP_MULTI;
             }
         }
 
-        int l=-1;
-        min_var=INT_MAX;
-        double min=DBL_MAX;
-        int row_it=0;
-        MatIterator_<double> min_row_ptr=b.begin();
-        for(MatIterator_<double> it=b.begin();it!=b.end();it+=b.cols,row_it++){
-            double myite=0;
+        पूर्णांक l=-1;
+        min_var=पूर्णांक_उच्च;
+        द्विगुन min=द्विग_उच्च;
+        पूर्णांक row_it=0;
+        MatIterator_<द्विगुन> min_row_ptr=b.begin();
+        क्रम(MatIterator_<द्विगुन> it=b.begin();it!=b.end();it+=b.cols,row_it++){
+            द्विगुन myite=0;
             //check constraints, select the tightest one, reinforcing Bland's rule
-            if((myite=it[e])>0){
-                double val=it[b.cols-1]/myite;
-                if(val<min || (val==min && B[row_it]<min_var)){
+            अगर((myite=it[e])>0){
+                द्विगुन val=it[b.cols-1]/myite;
+                अगर(val<min || (val==min && B[row_it]<min_var)){
                     min_var=B[row_it];
                     min_row_ptr=it;
                     min=val;
@@ -313,12 +313,12 @@ static int inner_simplex(Mat_<double>& c, Mat_<double>& b,double& v,vector<int>&
                 }
             }
         }
-        if(l==-1){
-            return SOLVELP_UNBOUNDED;
+        अगर(l==-1){
+            वापस SOLVELP_UNBOUNDED;
         }
         dprintf(("the tightest constraint is in row %d with %g\n",l,min));
 
-        pivot(c,b,v,N,B,l,e,indexToRow);
+        pivot(c,b,v,N,B,l,e,सूचकांक_To_Row);
 
         dprintf(("objective, v=%g\n",v));
         print_matrix(c);
@@ -331,49 +331,49 @@ static int inner_simplex(Mat_<double>& c, Mat_<double>& b,double& v,vector<int>&
     }
 }
 
-static inline void pivot(Mat_<double>& c,Mat_<double>& b,double& v,vector<int>& N,vector<int>& B,
-        int leaving_index,int entering_index,vector<unsigned int>& indexToRow){
-    double Coef=b(leaving_index,entering_index);
-    for(int i=0;i<b.cols;i++){
-        if(i==entering_index){
-            b(leaving_index,i)=1/Coef;
-        }else{
-            b(leaving_index,i)/=Coef;
+अटल अंतरभूत व्योम pivot(Mat_<द्विगुन>& c,Mat_<द्विगुन>& b,द्विगुन& v,vector<पूर्णांक>& N,vector<पूर्णांक>& B,
+        पूर्णांक leaving_सूचकांक,पूर्णांक entering_सूचकांक,vector<अचिन्हित पूर्णांक>& सूचकांक_To_Row){
+    द्विगुन Coef=b(leaving_सूचकांक,entering_सूचकांक);
+    क्रम(पूर्णांक i=0;i<b.cols;i++){
+        अगर(i==entering_सूचकांक){
+            b(leaving_सूचकांक,i)=1/Coef;
+        }अन्यथा{
+            b(leaving_सूचकांक,i)/=Coef;
         }
     }
 
-    for(int i=0;i<b.rows;i++){
-        if(i!=leaving_index){
-            double coef=b(i,entering_index);
-            for(int j=0;j<b.cols;j++){
-                if(j==entering_index){
-                    b(i,j)=-coef*b(leaving_index,j);
-                }else{
-                    b(i,j)-=(coef*b(leaving_index,j));
+    क्रम(पूर्णांक i=0;i<b.rows;i++){
+        अगर(i!=leaving_सूचकांक){
+            द्विगुन coef=b(i,entering_सूचकांक);
+            क्रम(पूर्णांक j=0;j<b.cols;j++){
+                अगर(j==entering_सूचकांक){
+                    b(i,j)=-coef*b(leaving_सूचकांक,j);
+                }अन्यथा{
+                    b(i,j)-=(coef*b(leaving_सूचकांक,j));
                 }
             }
         }
     }
 
     //objective function
-    Coef=c(0,entering_index);
-    for(int i=0;i<(b.cols-1);i++){
-        if(i==entering_index){
-            c(0,i)=-Coef*b(leaving_index,i);
-        }else{
-            c(0,i)-=Coef*b(leaving_index,i);
+    Coef=c(0,entering_सूचकांक);
+    क्रम(पूर्णांक i=0;i<(b.cols-1);i++){
+        अगर(i==entering_सूचकांक){
+            c(0,i)=-Coef*b(leaving_सूचकांक,i);
+        }अन्यथा{
+            c(0,i)-=Coef*b(leaving_सूचकांक,i);
         }
     }
     dprintf(("v was %g\n",v));
-    v+=Coef*b(leaving_index,b.cols-1);
+    v+=Coef*b(leaving_सूचकांक,b.cols-1);
 
-    SWAP(int,N[entering_index],B[leaving_index]);
-    SWAP(int,indexToRow[N[entering_index]],indexToRow[B[leaving_index]]);
+    SWAP(पूर्णांक,N[entering_सूचकांक],B[leaving_सूचकांक]);
+    SWAP(पूर्णांक,सूचकांक_To_Row[N[entering_सूचकांक]],सूचकांक_To_Row[B[leaving_सूचकांक]]);
 }
 
-static inline void swap_columns(Mat_<double>& A,int col1,int col2){
-    for(int i=0;i<A.rows;i++){
-        double tmp=A(i,col1);
+अटल अंतरभूत व्योम swap_columns(Mat_<द्विगुन>& A,पूर्णांक col1,पूर्णांक col2){
+    क्रम(पूर्णांक i=0;i<A.rows;i++){
+        द्विगुन tmp=A(i,col1);
         A(i,col1)=A(i,col2);
         A(i,col2)=tmp;
     }

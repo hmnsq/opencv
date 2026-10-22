@@ -2,21 +2,21 @@
 // It is subject to the license terms in the LICENSE file found in the top-level directory
 // of this distribution and at http://opencv.org/license.html.
 
-#include "precomp.hpp"
+#समावेश "precomp.hpp"
 
-#include <opencv2/core/utils/configuration.private.hpp>
-#include <opencv2/core/utils/logger.hpp>
-#include "utils/logtagmanager.hpp"
-#include "utils/logtagconfigparser.hpp"
+#समावेश <opencv2/core/utils/configuration.private.hpp>
+#समावेश <opencv2/core/utils/logger.hpp>
+#समावेश "utils/logtagmanager.hpp"
+#समावेश "utils/logtagconfigparser.hpp"
 
-#include <sstream>
-#include <iostream>
-#include <fstream>
-#include <atomic>
+#समावेश <sstream>
+#समावेश <iostream>
+#समावेश <fstream>
+#समावेश <atomic>
 
-#ifdef __ANDROID__
+#अगर_घोषित __ANDROID__
 # include <android/log.h>
-#endif
+#पूर्ण_अगर
 
 namespace cv {
 namespace utils {
@@ -28,50 +28,50 @@ namespace internal
 // Combining several things that require static dynamic initialization in a
 // well-defined order into a struct.
 //
-struct GlobalLoggingInitStruct
+काष्ठा GlobalLoggingInitStruct
 {
-public:
-#if defined NDEBUG
-    static const bool m_isDebugBuild = false;
-#else
-    static const bool m_isDebugBuild = true;
-#endif
+खुला:
+#अगर defined न_संशोधन
+    अटल स्थिर bool m_isDebugBuild = false;
+#अन्यथा
+    अटल स्थिर bool m_isDebugBuild = true;
+#पूर्ण_अगर
 
-public:
-    static LogLevel m_defaultUnconfiguredGlobalLevel;
+खुला:
+    अटल LogLevel m_defaultUnconfiguredGlobalLevel;
 
-public:
+खुला:
     LogTagManager logTagManager;
 
     GlobalLoggingInitStruct()
         : logTagManager(m_defaultUnconfiguredGlobalLevel)
     {
-        (void)getInitializationMutex();  // ensure initialization of global objects
+        (व्योम)getInitializationMutex();  // ensure initialization of global objects
 
         applyConfigString();
         handleMalformed();
     }
 
-private:
-    void applyConfigString()
+निजी:
+    व्योम applyConfigString()
     {
         logTagManager.setConfigString(utils::getConfigurationParameterString("OPENCV_LOG_LEVEL", ""));
     }
 
-    void handleMalformed()
+    व्योम handleMalformed()
     {
         // need to print warning for malformed log tag config strings?
-        if (m_isDebugBuild)
+        अगर (m_isDebugBuild)
         {
-            const auto& parser = logTagManager.getConfigParser();
-            if (parser.hasMalformed())
+            स्थिर स्वतः& parser = logTagManager.getConfigParser();
+            अगर (parser.hasMalformed())
             {
-                const auto& malformedList = parser.getMalformed();
-                for (const auto& malformed : malformedList)
+                स्थिर स्वतः& malformedList = parser.getMalformed();
+                क्रम (स्थिर स्वतः& malformed : malformedList)
                 {
-                    std::cout << "Malformed log level config: \"" << malformed << "\"\n";
+                    std::अ_बाहर << "Malformed log level config: \"" << malformed << "\"\n";
                 }
-                std::cout.flush();
+                std::अ_बाहर.सफाई();
             }
         }
     }
@@ -93,9 +93,9 @@ LogLevel GlobalLoggingInitStruct::m_defaultUnconfiguredGlobalLevel = GlobalLoggi
 // An initialization guard function only guarantees initialization upon
 // the first call to this function.
 //
-static GlobalLoggingInitStruct& getGlobalLoggingInitStruct()
+अटल GlobalLoggingInitStruct& getGlobalLoggingInitStruct()
 {
-    CV_SINGLETON_LAZY_INIT_REF(GlobalLoggingInitStruct, new GlobalLoggingInitStruct());
+    CV_SINGLETON_LAZY_INIT_REF(GlobalLoggingInitStruct, नया GlobalLoggingInitStruct());
 }
 
 // To ensure that the combined struct defined above is initialized even
@@ -103,81 +103,81 @@ static GlobalLoggingInitStruct& getGlobalLoggingInitStruct()
 // instance of a struct is defined below, which will call the
 // initialization guard function.
 //
-struct GlobalLoggingInitCall
+काष्ठा GlobalLoggingInitCall
 {
     GlobalLoggingInitCall()
     {
         getGlobalLoggingInitStruct();
-        (void)getGlobalLogTag();  // complete initialization of logger structures
+        (व्योम)getGlobalLogTag();  // complete initialization of logger structures
     }
 };
 
-static GlobalLoggingInitCall globalLoggingInitCall;
+अटल GlobalLoggingInitCall globalLoggingInitCall;
 
-static LogTagManager& getLogTagManager()
+अटल LogTagManager& getLogTagManager()
 {
-    static LogTagManager& logTagManagerInstance = getGlobalLoggingInitStruct().logTagManager;
-    return logTagManagerInstance;
+    अटल LogTagManager& logTagManagerInstance = getGlobalLoggingInitStruct().logTagManager;
+    वापस logTagManagerInstance;
 }
 
-static LogLevel& getLogLevelVariable()
+अटल LogLevel& getLogLevelVariable()
 {
-    static LogLevel& refGlobalLogLevel = getGlobalLogTag()->level;
-    return refGlobalLogLevel;
+    अटल LogLevel& refGlobalLogLevel = getGlobalLogTag()->level;
+    वापस refGlobalLogLevel;
 }
 
 LogTag* getGlobalLogTag()
 {
-    static LogTag* globalLogTagPtr = getGlobalLoggingInitStruct().logTagManager.get("global");
-    return globalLogTagPtr;
+    अटल LogTag* globalLogTagPtr = getGlobalLoggingInitStruct().logTagManager.लो("global");
+    वापस globalLogTagPtr;
 }
 
 } // namespace
 
-void registerLogTag(LogTag* plogtag)
+व्योम registerLogTag(LogTag* plogtag)
 {
-    if (!plogtag || !plogtag->name)
+    अगर (!plogtag || !plogtag->name)
     {
-        return;
+        वापस;
     }
     internal::getLogTagManager().assign(plogtag->name, plogtag);
 }
 
-void setLogTagLevel(const char* tag, LogLevel level)
+व्योम setLogTagLevel(स्थिर अक्षर* tag, LogLevel level)
 {
-    if (!tag)
+    अगर (!tag)
     {
-        return;
+        वापस;
     }
     internal::getLogTagManager().setLevelByFullName(std::string(tag), level);
 }
 
-LogLevel getLogTagLevel(const char* tag)
+LogLevel getLogTagLevel(स्थिर अक्षर* tag)
 {
-    if (!tag)
+    अगर (!tag)
     {
-        return getLogLevel();
+        वापस getLogLevel();
     }
-    const LogTag* ptr = internal::getLogTagManager().get(std::string(tag));
-    if (!ptr)
+    स्थिर LogTag* ptr = internal::getLogTagManager().लो(std::string(tag));
+    अगर (!ptr)
     {
-        return getLogLevel();
+        वापस getLogLevel();
     }
-    return ptr->level;
+    वापस ptr->level;
 }
 
 LogLevel setLogLevel(LogLevel logLevel)
 {
     // note: not thread safe, use sparingly and do not critically depend on outcome
     LogLevel& refGlobalLevel = internal::getLogLevelVariable();
-    const LogLevel old = refGlobalLevel;
+    स्थिर LogLevel old = refGlobalLevel;
     refGlobalLevel = logLevel;
-    return old;
+    वापस old;
 }
 
 LogLevel getLogLevel()
 {
-    return internal::getLogLevelVariable();
+    वापस internal::getLogLevelVariable();
 }
 
 namespace internal {
@@ -188,108 +188,108 @@ namespace //unnamed
     std::atomic<WriteLogMessageExFuncType> stc_userWriteLogMessageExFunc{};
 } //unnamed
 
-static int getShowTimestampMode()
+अटल पूर्णांक getShowTimestampMode()
 {
-    static bool param_timestamp_enable = utils::getConfigurationParameterBool("OPENCV_LOG_TIMESTAMP", true);
-    static bool param_timestamp_ns_enable = utils::getConfigurationParameterBool("OPENCV_LOG_TIMESTAMP_NS", false);
-    return (param_timestamp_enable ? 1 : 0) + (param_timestamp_ns_enable ? 2 : 0);
+    अटल bool param_timestamp_enable = utils::getConfigurationParameterBool("OPENCV_LOG_TIMESTAMP", true);
+    अटल bool param_timestamp_ns_enable = utils::getConfigurationParameterBool("OPENCV_LOG_TIMESTAMP_NS", false);
+    वापस (param_timestamp_enable ? 1 : 0) + (param_timestamp_ns_enable ? 2 : 0);
 }
 
-void writeLogMessage(LogLevel logLevel, const char* message)
+व्योम writeLogMessage(LogLevel logLevel, स्थिर अक्षर* message)
 {
     WriteLogMessageFuncType userFunc = stc_userWriteLogMessageFunc.load();
-    if (userFunc && userFunc != writeLogMessage)
+    अगर (userFunc && userFunc != writeLogMessage)
     {
         (*userFunc)(logLevel, message);
-        return;
+        वापस;
     }
 
-    const int threadID = cv::utils::getThreadID();
+    स्थिर पूर्णांक threadID = cv::utils::getThreadID();
 
     std::string message_id;
-    switch (getShowTimestampMode())
+    चयन (getShowTimestampMode())
     {
-        case 1: message_id = cv::format("%d@%0.3f", threadID, getTimestampNS() * 1e-9); break;
-        case 1+2: message_id = cv::format("%d@%llu", threadID, (long long unsigned int)getTimestampNS()); break;
-        default: message_id = cv::format("%d", threadID); break;
+        हाल 1: message_id = cv::format("%d@%0.3f", threadID, getTimestampNS() * 1e-9); अवरोध;
+        हाल 1+2: message_id = cv::format("%d@%llu", threadID, (दीर्घ दीर्घ अचिन्हित पूर्णांक)getTimestampNS()); अवरोध;
+        शेष: message_id = cv::format("%d", threadID); अवरोध;
     }
 
     std::ostringstream ss;
-    switch (logLevel)
+    चयन (logLevel)
     {
-    case LOG_LEVEL_FATAL:   ss << "[FATAL:" << message_id << "] " << message << std::endl; break;
-    case LOG_LEVEL_ERROR:   ss << "[ERROR:" << message_id << "] " << message << std::endl; break;
-    case LOG_LEVEL_WARNING: ss << "[ WARN:" << message_id << "] " << message << std::endl; break;
-    case LOG_LEVEL_INFO:    ss << "[ INFO:" << message_id << "] " << message << std::endl; break;
-    case LOG_LEVEL_DEBUG:   ss << "[DEBUG:" << message_id << "] " << message << std::endl; break;
-    case LOG_LEVEL_VERBOSE: ss << message << std::endl; break;
-    case LOG_LEVEL_SILENT: return;  // avoid compiler warning about incomplete switch
-    case ENUM_LOG_LEVEL_FORCE_INT: return;  // avoid compiler warning about incomplete switch
+    हाल LOG_LEVEL_FATAL:   ss << "[FATAL:" << message_id << "] " << message << std::प_पूर्ण; अवरोध;
+    हाल LOG_LEVEL_ERROR:   ss << "[ERROR:" << message_id << "] " << message << std::प_पूर्ण; अवरोध;
+    हाल LOG_LEVEL_WARNING: ss << "[ WARN:" << message_id << "] " << message << std::प_पूर्ण; अवरोध;
+    हाल LOG_LEVEL_INFO:    ss << "[ INFO:" << message_id << "] " << message << std::प_पूर्ण; अवरोध;
+    हाल LOG_LEVEL_DEBUG:   ss << "[DEBUG:" << message_id << "] " << message << std::प_पूर्ण; अवरोध;
+    हाल LOG_LEVEL_VERBOSE: ss << message << std::प_पूर्ण; अवरोध;
+    हाल LOG_LEVEL_SILENT: वापस;  // avoid compiler warning about incomplete switch
+    हाल ENUM_LOG_LEVEL_FORCE_INT: वापस;  // avoid compiler warning about incomplete switch
     }
-#ifdef __ANDROID__
-    int android_logLevel = ANDROID_LOG_INFO;
-    switch (logLevel)
+#अगर_घोषित __ANDROID__
+    पूर्णांक android_logLevel = ANDROID_LOG_INFO;
+    चयन (logLevel)
     {
-    case LOG_LEVEL_FATAL:   android_logLevel = ANDROID_LOG_FATAL; break;
-    case LOG_LEVEL_ERROR:   android_logLevel = ANDROID_LOG_ERROR; break;
-    case LOG_LEVEL_WARNING: android_logLevel = ANDROID_LOG_WARN; break;
-    case LOG_LEVEL_INFO:    android_logLevel = ANDROID_LOG_INFO; break;
-    case LOG_LEVEL_DEBUG:   android_logLevel = ANDROID_LOG_DEBUG; break;
-    case LOG_LEVEL_VERBOSE: android_logLevel = ANDROID_LOG_VERBOSE; break;
-    default:
-        break;
+    हाल LOG_LEVEL_FATAL:   android_logLevel = ANDROID_LOG_FATAL; अवरोध;
+    हाल LOG_LEVEL_ERROR:   android_logLevel = ANDROID_LOG_ERROR; अवरोध;
+    हाल LOG_LEVEL_WARNING: android_logLevel = ANDROID_LOG_WARN; अवरोध;
+    हाल LOG_LEVEL_INFO:    android_logLevel = ANDROID_LOG_INFO; अवरोध;
+    हाल LOG_LEVEL_DEBUG:   android_logLevel = ANDROID_LOG_DEBUG; अवरोध;
+    हाल LOG_LEVEL_VERBOSE: android_logLevel = ANDROID_LOG_VERBOSE; अवरोध;
+    शेष:
+        अवरोध;
     }
     __android_log_print(android_logLevel, "OpenCV/" CV_VERSION, "%s", ss.str().c_str());
-#endif
-    std::ostream* out = (logLevel <= LOG_LEVEL_WARNING) ? &std::cerr : &std::cout;
+#पूर्ण_अगर
+    std::ब_प्रवाह* out = (logLevel <= LOG_LEVEL_WARNING) ? &std::अ_त्रुटि : &std::अ_बाहर;
     (*out) << ss.str();
-    if (logLevel <= LOG_LEVEL_WARNING)
+    अगर (logLevel <= LOG_LEVEL_WARNING)
     {
-        (*out) << std::flush;
+        (*out) << std::सफाई;
     }
 }
 
-static const char* stripSourceFilePathPrefix(const char* file)
+अटल स्थिर अक्षर* stripSourceFilePathPrefix(स्थिर अक्षर* file)
 {
     CV_Assert(file);
-    const char* pos = file;
-    const char* strip_pos = NULL;
-    char ch = 0;
-    while ((ch = pos[0]) != 0)
+    स्थिर अक्षर* pos = file;
+    स्थिर अक्षर* strip_pos = शून्य;
+    अक्षर ch = 0;
+    जबतक ((ch = pos[0]) != 0)
     {
         ++pos;
-        if (ch == '/' || ch == '\\')
+        अगर (ch == '/' || ch == '\\')
             strip_pos = pos;
     }
-    if (strip_pos == NULL || strip_pos == pos/*eos*/)
-        return file;
-    return strip_pos;
+    अगर (strip_pos == शून्य || strip_pos == pos/*eos*/)
+        वापस file;
+    वापस strip_pos;
 }
 
-void writeLogMessageEx(LogLevel logLevel, const char* tag, const char* file, int line, const char* func, const char* message)
+व्योम writeLogMessageEx(LogLevel logLevel, स्थिर अक्षर* tag, स्थिर अक्षर* file, पूर्णांक पंक्ति, स्थिर अक्षर* func, स्थिर अक्षर* message)
 {
     WriteLogMessageExFuncType userFunc = stc_userWriteLogMessageExFunc.load();
-    if (userFunc && userFunc != writeLogMessageEx)
+    अगर (userFunc && userFunc != writeLogMessageEx)
     {
-        (*userFunc)(logLevel, tag, file, line, func, message);
-        return;
+        (*userFunc)(logLevel, tag, file, पंक्ति, func, message);
+        वापस;
     }
 
     std::ostringstream strm;
-    if (tag)
+    अगर (tag)
     {
         strm << tag << ' ';
     }
-    if (file)
+    अगर (file)
     {
         strm << stripSourceFilePathPrefix(file);
-        if (line > 0)
+        अगर (पंक्ति > 0)
         {
-            strm << ':' << line;
+            strm << ':' << पंक्ति;
         }
         strm << ' ';
     }
-    if (func)
+    अगर (func)
     {
         strm << func << ' ';
     }
@@ -297,18 +297,18 @@ void writeLogMessageEx(LogLevel logLevel, const char* tag, const char* file, int
     writeLogMessage(logLevel, strm.str().c_str());
 }
 
-void replaceWriteLogMessage(WriteLogMessageFuncType f)
+व्योम replaceWriteLogMessage(WriteLogMessageFuncType f)
 {
-    if (f == writeLogMessage)
+    अगर (f == writeLogMessage)
     {
         f = nullptr;
     }
     stc_userWriteLogMessageFunc.store(f);
 }
 
-void replaceWriteLogMessageEx(WriteLogMessageExFuncType f)
+व्योम replaceWriteLogMessageEx(WriteLogMessageExFuncType f)
 {
-    if (f == writeLogMessageEx)
+    अगर (f == writeLogMessageEx)
     {
         f = nullptr;
     }

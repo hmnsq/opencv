@@ -4,33 +4,33 @@
 //
 // Copyright (C) 2026, Advanced Micro Devices, Inc., all rights reserved.
 
-#include "precomp.hpp"
+#समावेश "precomp.hpp"
 
-#include "stat.simd.hpp"
-#include "stat.simd_declarations.hpp" // defines CV_CPU_DISPATCH_MODES_ALL=AVX2,...,BASELINE based on CMakeLists.txt content
+#समावेश "stat.simd.hpp"
+#समावेश "stat.simd_declarations.hpp" // defines CV_CPU_DISPATCH_MODES_ALL=AVX2,...,BASELINE based on CMakeLists.txt content
 
 namespace cv { namespace hal {
 
 // Resolve the SIMD implementation ONCE via a cached function pointer. normHamming
 // is called per-descriptor in hot matcher loops on short (32/64-byte) descriptors,
 // where a per-call dispatch chain + CV_INSTRUMENT_REGION dominate the cost.
-static NormHammingFunc getNormHammingFunc() {
+अटल NormHammingFunc getNormHammingFunc() {
     CV_CPU_DISPATCH(getNormHammingFunc, (), CV_CPU_DISPATCH_MODES_ALL);
 }
-static NormHammingDiffFunc getNormHammingDiffFunc() {
+अटल NormHammingDiffFunc getNormHammingDiffFunc() {
     CV_CPU_DISPATCH(getNormHammingDiffFunc, (), CV_CPU_DISPATCH_MODES_ALL);
 }
 
-int normHamming(const uchar* a, int n)
+पूर्णांक normHamming(स्थिर uchar* a, पूर्णांक n)
 {
-    static const NormHammingFunc fn = getNormHammingFunc();
-    return fn(a, n);
+    अटल स्थिर NormHammingFunc fn = getNormHammingFunc();
+    वापस fn(a, n);
 }
 
-int normHamming(const uchar* a, const uchar* b, int n)
+पूर्णांक normHamming(स्थिर uchar* a, स्थिर uchar* b, पूर्णांक n)
 {
-    static const NormHammingDiffFunc fn = getNormHammingDiffFunc();
-    return fn(a, b, n);
+    अटल स्थिर NormHammingDiffFunc fn = getNormHammingDiffFunc();
+    वापस fn(a, b, n);
 }
 
 }} //cv::hal

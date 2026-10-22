@@ -3,73 +3,73 @@
 // of this distribution and at http://opencv.org/license.html
 
 
-#include "precomp.hpp"
-#include "stat.hpp"
+#समावेश "precomp.hpp"
+#समावेश "stat.hpp"
 
 namespace cv {
 CV_CPU_OPTIMIZATION_NAMESPACE_BEGIN
 
-template<typename T, typename ST, int (*fn)(const T*, const uchar*, ST*, int, int)>
-static int sumWrap(const uchar* src, const uchar* mask, uchar* sum, int len, int cn)
+ढाँचा<typename T, typename ST, पूर्णांक (*fn)(स्थिर T*, स्थिर uchar*, ST*, पूर्णांक, पूर्णांक)>
+अटल पूर्णांक योग_Wrap(स्थिर uchar* src, स्थिर uchar* mask, uchar* योग_2, पूर्णांक len, पूर्णांक cn)
 {
-    return fn((const T*)src, mask, (ST*)sum, len, cn);
+    वापस fn((स्थिर T*)src, mask, (ST*)योग_2, len, cn);
 }
 
-SumFunc getSumFunc(int depth);
+योग_Func get_योग_Func(पूर्णांक depth);
 
-#ifndef CV_CPU_OPTIMIZATION_DECLARATIONS_ONLY
+#अगर_अघोषित CV_CPU_OPTIMIZATION_DECLARATIONS_ONLY
 
-template <typename T, typename ST>
-struct Sum_SIMD
+ढाँचा <typename T, typename ST>
+काष्ठा योग_SIMD
 {
-    Sum_SIMD(int) {}
-    int operator () (const T*, const uchar*, ST*, int, int) const
+    योग_SIMD(पूर्णांक) {}
+    पूर्णांक चालक () (स्थिर T*, स्थिर uchar*, ST*, पूर्णांक, पूर्णांक) स्थिर
     {
-        return 0;
+        वापस 0;
     }
 };
 
-#if (CV_SIMD || CV_SIMD_SCALABLE)
+#अगर (CV_SIMD || CV_SIMD_SCALABLE)
 
-#undef REDUCE_PARTIAL_SUMS
-#define REDUCE_PARTIAL_SUMS() \
-    if (cn == 1) \
-        dst[0] += v_reduce_sum(v_add(v_add(s0, s1), s2)); \
-    else if (cn == 2) { \
+#अघोषित REDUCE_PARTIAL_SUMS
+#घोषणा REDUCE_PARTIAL_SUMS() \
+    अगर (cn == 1) \
+        dst[0] += v_reduce_योग(v_add(v_add(s0, s1), s2)); \
+    अन्यथा अगर (cn == 2) { \
         s0 = v_add(v_add(s0, s1), s2); \
-        dst[0] += v_reduce_sum(v_and(s0, m0)); \
-        dst[1] += v_reduce_sum(v_and(s0, m1)); \
-    } else if (cn == 3) { \
-        dst[0] += v_reduce_sum(v_add(v_add(v_and(s0, m0), v_and(s1, m1)), v_and(s2, m2))); \
-        dst[1] += v_reduce_sum(v_add(v_add(v_and(s0, m3), v_and(s1, m4)), v_and(s2, m5))); \
-        dst[2] += v_reduce_sum(v_add(v_add(v_and(s0, m6), v_and(s1, m7)), v_and(s2, m8))); \
-    } else if (cn == 4) { \
+        dst[0] += v_reduce_योग(v_and(s0, m0)); \
+        dst[1] += v_reduce_योग(v_and(s0, m1)); \
+    } अन्यथा अगर (cn == 3) { \
+        dst[0] += v_reduce_योग(v_add(v_add(v_and(s0, m0), v_and(s1, m1)), v_and(s2, m2))); \
+        dst[1] += v_reduce_योग(v_add(v_add(v_and(s0, m3), v_and(s1, m4)), v_and(s2, m5))); \
+        dst[2] += v_reduce_योग(v_add(v_add(v_and(s0, m6), v_and(s1, m7)), v_and(s2, m8))); \
+    } अन्यथा अगर (cn == 4) { \
         s0 = v_add(v_add(s0, s1), s2); \
-        dst[0] += v_reduce_sum(v_and(s0, m0)); \
-        dst[1] += v_reduce_sum(v_and(s0, m1)); \
-        dst[2] += v_reduce_sum(v_and(s0, m2)); \
-        dst[3] += v_reduce_sum(v_and(s0, m3)); \
+        dst[0] += v_reduce_योग(v_and(s0, m0)); \
+        dst[1] += v_reduce_योग(v_and(s0, m1)); \
+        dst[2] += v_reduce_योग(v_and(s0, m2)); \
+        dst[3] += v_reduce_योग(v_and(s0, m3)); \
     }
 
-template<typename ST>
-static void init_maskbuf(ST* maskbuf, int cn, int simd_width)
+ढाँचा<typename ST>
+अटल व्योम init_maskbuf(ST* maskbuf, पूर्णांक cn, पूर्णांक simd_width)
 {
-    memset(maskbuf, 0, simd_width*9*sizeof(maskbuf[0]));
-    if (cn == 1)
+    स_रखो(maskbuf, 0, simd_width*9*माप(maskbuf[0]));
+    अगर (cn == 1)
         ;
-    else if (cn == 2)
-        for (int i = 0; i < simd_width; i += 2) {
+    अन्यथा अगर (cn == 2)
+        क्रम (पूर्णांक i = 0; i < simd_width; i += 2) {
             maskbuf[i] = (ST)-1;
             maskbuf[i+1+simd_width] = (ST)-1;
         }
-    else if (cn == 3)
-        for (int i = 0; i < simd_width*3; i += 3) {
+    अन्यथा अगर (cn == 3)
+        क्रम (पूर्णांक i = 0; i < simd_width*3; i += 3) {
             maskbuf[i] = (ST)-1;
             maskbuf[i+1+simd_width*3] = (ST)-1;
             maskbuf[i+2+simd_width*6] = (ST)-1;
         }
-    else if (cn == 4 && simd_width >= 4) {
-        for (int i = 0; i < simd_width; i += 4) {
+    अन्यथा अगर (cn == 4 && simd_width >= 4) {
+        क्रम (पूर्णांक i = 0; i < simd_width; i += 4) {
             maskbuf[i] = (ST)-1;
             maskbuf[i+1+simd_width] = (ST)-1;
             maskbuf[i+2+simd_width*2] = (ST)-1;
@@ -78,24 +78,24 @@ static void init_maskbuf(ST* maskbuf, int cn, int simd_width)
     }
 }
 
-#undef DEFINE_SUM_SIMD_8
-#define DEFINE_SUM_SIMD_8(T, ST, iST, VecT, load_op) \
-template<> struct Sum_SIMD<T, ST> \
+#अघोषित DEFINE_योग_SIMD_8
+#घोषणा DEFINE_योग_SIMD_8(T, ST, iST, VecT, load_op) \
+ढाँचा<> काष्ठा योग_SIMD<T, ST> \
 { \
-    Sum_SIMD(int cn) \
+    योग_SIMD(पूर्णांक cn) \
     { \
         init_maskbuf((iST*)maskbuf, cn, VTraits<VecT>::vlanes()); \
     } \
-    int operator ()(const T* src, const uchar* mask, ST* dst, int len, int cn) const \
+    पूर्णांक चालक ()(स्थिर T* src, स्थिर uchar* mask, ST* dst, पूर्णांक len, पूर्णांक cn) स्थिर \
     { \
-        if (mask || (cn < 1 || cn > 4)) \
-            return 0; \
+        अगर (mask || (cn < 1 || cn > 4)) \
+            वापस 0; \
         len *= cn; \
-        int x = 0, simd_width = VTraits<VecT>::vlanes(); \
+        पूर्णांक x = 0, simd_width = VTraits<VecT>::vlanes(); \
         VecT m0 = vx_load(maskbuf), m1, m2, m3, m4, m5, m6, m7, m8; \
-        if (cn == 1) { \
+        अगर (cn == 1) { \
             m1 = m2 = m3 = m4 = m5 = m6 = m7 = m8 = m0; \
-        } else { \
+        } अन्यथा { \
             m1 = vx_load(maskbuf + simd_width); \
             m2 = vx_load(maskbuf + simd_width*2); \
             m3 = vx_load(maskbuf + simd_width*3); \
@@ -106,42 +106,42 @@ template<> struct Sum_SIMD<T, ST> \
             m8 = vx_load(maskbuf + simd_width*8); \
         } \
         VecT s0 = v_xor(m0, m0), s1 = s0, s2 = s0; \
-        for (; x <= len - simd_width*6; x += simd_width*6) { \
-            auto v0 = load_op(src + x); \
-            auto v1 = load_op(src + x + simd_width*2); \
-            auto v2 = load_op(src + x + simd_width*4); \
-            s0 = v_add(s0, v_expand_low(v0)); \
-            s1 = v_add(s1, v_expand_high(v0)); \
-            s2 = v_add(s2, v_expand_low(v1)); \
-            s0 = v_add(s0, v_expand_high(v1)); \
-            s1 = v_add(s1, v_expand_low(v2)); \
-            s2 = v_add(s2, v_expand_high(v2)); \
+        क्रम (; x <= len - simd_width*6; x += simd_width*6) { \
+            स्वतः v0 = load_op(src + x); \
+            स्वतः v1 = load_op(src + x + simd_width*2); \
+            स्वतः v2 = load_op(src + x + simd_width*4); \
+            s0 = v_add(s0, v_expand_निचला(v0)); \
+            s1 = v_add(s1, v_expand_ऊपरी(v0)); \
+            s2 = v_add(s2, v_expand_निचला(v1)); \
+            s0 = v_add(s0, v_expand_ऊपरी(v1)); \
+            s1 = v_add(s1, v_expand_निचला(v2)); \
+            s2 = v_add(s2, v_expand_ऊपरी(v2)); \
         } \
         REDUCE_PARTIAL_SUMS(); \
         vx_cleanup(); \
-        return x / cn; \
+        वापस x / cn; \
     } \
     ST maskbuf[VTraits<VecT>::max_nlanes*9]; \
 };
 
-#undef DEFINE_SUM_SIMD_16
-#define DEFINE_SUM_SIMD_16(T, ST, iST, VecT, load_op) \
-template<> struct Sum_SIMD<T, ST> \
+#अघोषित DEFINE_योग_SIMD_16
+#घोषणा DEFINE_योग_SIMD_16(T, ST, iST, VecT, load_op) \
+ढाँचा<> काष्ठा योग_SIMD<T, ST> \
 { \
-    Sum_SIMD(int cn) \
+    योग_SIMD(पूर्णांक cn) \
     { \
         init_maskbuf((iST*)maskbuf, cn, VTraits<VecT>::vlanes()); \
     } \
-    int operator ()(const T* src, const uchar* mask, ST* dst, int len, int cn) const \
+    पूर्णांक चालक ()(स्थिर T* src, स्थिर uchar* mask, ST* dst, पूर्णांक len, पूर्णांक cn) स्थिर \
     { \
-        if (mask || (cn < 1 || cn > 4)) \
-            return 0; \
+        अगर (mask || (cn < 1 || cn > 4)) \
+            वापस 0; \
         len *= cn; \
-        int x = 0, simd_width = VTraits<VecT>::vlanes(); \
+        पूर्णांक x = 0, simd_width = VTraits<VecT>::vlanes(); \
         VecT m0 = vx_load(maskbuf), m1, m2, m3, m4, m5, m6, m7, m8; \
-        if (cn == 1) { \
+        अगर (cn == 1) { \
             m1 = m2 = m3 = m4 = m5 = m6 = m7 = m8 = m0; \
-        } else { \
+        } अन्यथा { \
             m1 = vx_load(maskbuf + simd_width); \
             m2 = vx_load(maskbuf + simd_width*2); \
             m3 = vx_load(maskbuf + simd_width*3); \
@@ -152,53 +152,53 @@ template<> struct Sum_SIMD<T, ST> \
             m8 = vx_load(maskbuf + simd_width*8); \
         } \
         VecT s0 = v_xor(m0, m0), s1 = s0, s2 = s0; \
-        for (; x <= len - simd_width*3; x += simd_width*3) { \
-            auto v0 = load_op(src + x); \
-            auto v1 = load_op(src + x + simd_width); \
-            auto v2 = load_op(src + x + simd_width*2); \
+        क्रम (; x <= len - simd_width*3; x += simd_width*3) { \
+            स्वतः v0 = load_op(src + x); \
+            स्वतः v1 = load_op(src + x + simd_width); \
+            स्वतः v2 = load_op(src + x + simd_width*2); \
             s0 = v_add(s0, v0); \
             s1 = v_add(s1, v1); \
             s2 = v_add(s2, v2); \
         } \
         REDUCE_PARTIAL_SUMS(); \
         vx_cleanup(); \
-        return x / cn; \
+        वापस x / cn; \
     } \
     ST maskbuf[VTraits<VecT>::max_nlanes*9]; \
 };
 
-#undef load_u8_as_s16
-#undef load_u16_as_s32
-#define load_u8_as_s16(addr) v_reinterpret_as_s16(vx_load_expand(addr))
-#define load_u16_as_s32(addr) v_reinterpret_as_s32(vx_load_expand(addr))
+#अघोषित load_u8_as_s16
+#अघोषित load_u16_as_s32
+#घोषणा load_u8_as_s16(addr) v_reinterpret_as_s16(vx_load_expand(addr))
+#घोषणा load_u16_as_s32(addr) v_reinterpret_as_s32(vx_load_expand(addr))
 
-DEFINE_SUM_SIMD_8(uchar, int, int, v_int32, load_u8_as_s16)
-DEFINE_SUM_SIMD_8(schar, int, int, v_int32, vx_load_expand)
-DEFINE_SUM_SIMD_16(ushort, int, int, v_int32, load_u16_as_s32)
-DEFINE_SUM_SIMD_16(short, int, int, v_int32, vx_load_expand)
-DEFINE_SUM_SIMD_16(hfloat, float, int, v_float32, vx_load_expand)
-DEFINE_SUM_SIMD_16(bfloat, float, int, v_float32, vx_load_expand)
+DEFINE_योग_SIMD_8(uchar, पूर्णांक, पूर्णांक, v_int32, load_u8_as_s16)
+DEFINE_योग_SIMD_8(schar, पूर्णांक, पूर्णांक, v_int32, vx_load_expand)
+DEFINE_योग_SIMD_16(ushort, पूर्णांक, पूर्णांक, v_int32, load_u16_as_s32)
+DEFINE_योग_SIMD_16(लघु, पूर्णांक, पूर्णांक, v_int32, vx_load_expand)
+DEFINE_योग_SIMD_16(hfloat, भग्न, पूर्णांक, v_float32, vx_load_expand)
+DEFINE_योग_SIMD_16(bfloat, भग्न, पूर्णांक, v_float32, vx_load_expand)
 
-#if (CV_SIMD_64F || CV_SIMD_SCALABLE_64F)
+#अगर (CV_SIMD_64F || CV_SIMD_SCALABLE_64F)
 
-#undef DEFINE_SUM_SIMD_32
-#define DEFINE_SUM_SIMD_32(T, ST, iST, VecT) \
-template<> struct Sum_SIMD<T, ST> \
+#अघोषित DEFINE_योग_SIMD_32
+#घोषणा DEFINE_योग_SIMD_32(T, ST, iST, VecT) \
+ढाँचा<> काष्ठा योग_SIMD<T, ST> \
 { \
-    Sum_SIMD(int cn) \
+    योग_SIMD(पूर्णांक cn) \
     { \
         init_maskbuf((iST*)maskbuf, cn, VTraits<VecT>::vlanes()); \
     } \
-    int operator ()(const T* src, const uchar* mask, ST* dst, int len, int cn) const \
+    पूर्णांक चालक ()(स्थिर T* src, स्थिर uchar* mask, ST* dst, पूर्णांक len, पूर्णांक cn) स्थिर \
     { \
-        int x = 0, simd_width = VTraits<VecT>::vlanes(); \
-        if (mask || (cn < 1 || cn > 3+(simd_width>=4))) \
-            return 0; \
+        पूर्णांक x = 0, simd_width = VTraits<VecT>::vlanes(); \
+        अगर (mask || (cn < 1 || cn > 3+(simd_width>=4))) \
+            वापस 0; \
         len *= cn; \
         VecT m0 = vx_load(maskbuf), m1, m2, m3, m4, m5, m6, m7, m8; \
-        if (cn == 1) { \
+        अगर (cn == 1) { \
             m1 = m2 = m3 = m4 = m5 = m6 = m7 = m8 = m0; \
-        } else { \
+        } अन्यथा { \
             m1 = vx_load(maskbuf + simd_width); \
             m2 = vx_load(maskbuf + simd_width*2); \
             m3 = vx_load(maskbuf + simd_width*3); \
@@ -209,55 +209,55 @@ template<> struct Sum_SIMD<T, ST> \
             m8 = vx_load(maskbuf + simd_width*8); \
         } \
         VecT s0 = v_xor(m0, m0), s1 = s0, s2 = s0; \
-        for (; x <= len - simd_width*6; x += simd_width*6) { \
-            auto v0 = vx_load(src + x); \
-            auto v1 = vx_load(src + x + simd_width*2); \
-            auto v2 = vx_load(src + x + simd_width*4); \
+        क्रम (; x <= len - simd_width*6; x += simd_width*6) { \
+            स्वतः v0 = vx_load(src + x); \
+            स्वतः v1 = vx_load(src + x + simd_width*2); \
+            स्वतः v2 = vx_load(src + x + simd_width*4); \
             s0 = v_add(s0, v_cvt_f64(v0)); \
-            s1 = v_add(s1, v_cvt_f64_high(v0)); \
+            s1 = v_add(s1, v_cvt_f64_ऊपरी(v0)); \
             s2 = v_add(s2, v_cvt_f64(v1)); \
-            s0 = v_add(s0, v_cvt_f64_high(v1)); \
+            s0 = v_add(s0, v_cvt_f64_ऊपरी(v1)); \
             s1 = v_add(s1, v_cvt_f64(v2)); \
-            s2 = v_add(s2, v_cvt_f64_high(v2)); \
+            s2 = v_add(s2, v_cvt_f64_ऊपरी(v2)); \
         } \
         REDUCE_PARTIAL_SUMS(); \
         vx_cleanup(); \
-        return x / cn; \
+        वापस x / cn; \
     } \
     ST maskbuf[VTraits<VecT>::max_nlanes*9]; \
 };
 
-DEFINE_SUM_SIMD_32(int, double, int64, v_float64)
-DEFINE_SUM_SIMD_32(float, double, int64, v_float64)
-#endif
-#endif
+DEFINE_योग_SIMD_32(पूर्णांक, द्विगुन, int64, v_float64)
+DEFINE_योग_SIMD_32(भग्न, द्विगुन, int64, v_float64)
+#पूर्ण_अगर
+#पूर्ण_अगर
 
-template<typename T, typename ST, typename WT=T>
-static int sum_(const T* src0, const uchar* mask, ST* dst, int len, int cn )
+ढाँचा<typename T, typename ST, typename WT=T>
+अटल पूर्णांक योग_4(स्थिर T* src0, स्थिर uchar* mask, ST* dst, पूर्णांक len, पूर्णांक cn )
 {
-    const T* src = src0;
-    if( !mask )
+    स्थिर T* src = src0;
+    अगर( !mask )
     {
-        Sum_SIMD<T, ST> vop(cn);
-        int i0 = vop(src0, mask, dst, len, cn), i = i0, k = cn % 4;
+        योग_SIMD<T, ST> vop(cn);
+        पूर्णांक i0 = vop(src0, mask, dst, len, cn), i = i0, k = cn % 4;
         src += i0 * cn;
 
-        if( k == 1 )
+        अगर( k == 1 )
         {
             ST s0 = dst[0];
 
-            #if CV_ENABLE_UNROLLED
-            for(; i <= len - 4; i += 4, src += cn*4 )
+            #अगर CV_ENABLE_UNROLLED
+            क्रम(; i <= len - 4; i += 4, src += cn*4 )
                 s0 += (WT)src[0] + (WT)src[cn] + (WT)src[cn*2] + (WT)src[cn*3];
-            #endif
-            for( ; i < len; i++, src += cn )
+            #पूर्ण_अगर
+            क्रम( ; i < len; i++, src += cn )
                 s0 += (WT)src[0];
             dst[0] = s0;
         }
-        else if( k == 2 )
+        अन्यथा अगर( k == 2 )
         {
             ST s0 = dst[0], s1 = dst[1];
-            for( ; i < len; i++, src += cn )
+            क्रम( ; i < len; i++, src += cn )
             {
                 s0 += (WT)src[0];
                 s1 += (WT)src[1];
@@ -265,10 +265,10 @@ static int sum_(const T* src0, const uchar* mask, ST* dst, int len, int cn )
             dst[0] = s0;
             dst[1] = s1;
         }
-        else if( k == 3 )
+        अन्यथा अगर( k == 3 )
         {
             ST s0 = dst[0], s1 = dst[1], s2 = dst[2];
-            for( ; i < len; i++, src += cn )
+            क्रम( ; i < len; i++, src += cn )
             {
                 s0 += (WT)src[0];
                 s1 += (WT)src[1];
@@ -279,11 +279,11 @@ static int sum_(const T* src0, const uchar* mask, ST* dst, int len, int cn )
             dst[2] = s2;
         }
 
-        for( ; k < cn; k += 4 )
+        क्रम( ; k < cn; k += 4 )
         {
             src = src0 + i0*cn + k;
             ST s0 = dst[k], s1 = dst[k+1], s2 = dst[k+2], s3 = dst[k+3];
-            for( i = i0; i < len; i++, src += cn )
+            क्रम( i = i0; i < len; i++, src += cn )
             {
                 s0 += (WT)src[0]; s1 += (WT)src[1];
                 s2 += (WT)src[2]; s3 += (WT)src[3];
@@ -293,26 +293,26 @@ static int sum_(const T* src0, const uchar* mask, ST* dst, int len, int cn )
             dst[k+2] = s2;
             dst[k+3] = s3;
         }
-        return len;
+        वापस len;
     }
 
-    int i, nzm = 0;
-    if( cn == 1 )
+    पूर्णांक i, nzm = 0;
+    अगर( cn == 1 )
     {
         ST s = dst[0];
-        for( i = 0; i < len; i++ )
-            if( mask[i] )
+        क्रम( i = 0; i < len; i++ )
+            अगर( mask[i] )
             {
                 s += (WT)src[i];
                 nzm++;
             }
         dst[0] = s;
     }
-    else if( cn == 3 )
+    अन्यथा अगर( cn == 3 )
     {
         ST s0 = dst[0], s1 = dst[1], s2 = dst[2];
-        for( i = 0; i < len; i++, src += 3 )
-            if( mask[i] )
+        क्रम( i = 0; i < len; i++, src += 3 )
+            अगर( mask[i] )
             {
                 s0 += (WT)src[0];
                 s1 += (WT)src[1];
@@ -323,14 +323,14 @@ static int sum_(const T* src0, const uchar* mask, ST* dst, int len, int cn )
         dst[1] = s1;
         dst[2] = s2;
     }
-    else
+    अन्यथा
     {
-        for( i = 0; i < len; i++, src += cn )
-            if( mask[i] )
+        क्रम( i = 0; i < len; i++, src += cn )
+            अगर( mask[i] )
             {
-                int k = 0;
-                #if CV_ENABLE_UNROLLED
-                for( ; k <= cn - 4; k += 4 )
+                पूर्णांक k = 0;
+                #अगर CV_ENABLE_UNROLLED
+                क्रम( ; k <= cn - 4; k += 4 )
                 {
                     ST s0, s1;
                     s0 = dst[k] + (WT)src[k];
@@ -340,76 +340,76 @@ static int sum_(const T* src0, const uchar* mask, ST* dst, int len, int cn )
                     s1 = dst[k+3] + (WT)src[k+3];
                     dst[k+2] = s0; dst[k+3] = s1;
                 }
-                #endif
-                for( ; k < cn; k++ )
+                #पूर्ण_अगर
+                क्रम( ; k < cn; k++ )
                     dst[k] += (WT)src[k];
                 nzm++;
             }
     }
-    return nzm;
+    वापस nzm;
 }
 
 
-static int sum8u( const uchar* src, const uchar* mask, int* dst, int len, int cn )
-{ CV_INSTRUMENT_REGION(); return sum_(src, mask, dst, len, cn); }
+अटल पूर्णांक sum8u( स्थिर uchar* src, स्थिर uchar* mask, पूर्णांक* dst, पूर्णांक len, पूर्णांक cn )
+{ CV_INSTRUMENT_REGION(); वापस योग_4(src, mask, dst, len, cn); }
 
-static int sum8s( const schar* src, const uchar* mask, int* dst, int len, int cn )
-{ CV_INSTRUMENT_REGION(); return sum_(src, mask, dst, len, cn); }
+अटल पूर्णांक sum8s( स्थिर schar* src, स्थिर uchar* mask, पूर्णांक* dst, पूर्णांक len, पूर्णांक cn )
+{ CV_INSTRUMENT_REGION(); वापस योग_4(src, mask, dst, len, cn); }
 
-static int sum16u( const ushort* src, const uchar* mask, int* dst, int len, int cn )
-{ CV_INSTRUMENT_REGION(); return sum_(src, mask, dst, len, cn); }
+अटल पूर्णांक sum16u( स्थिर ushort* src, स्थिर uchar* mask, पूर्णांक* dst, पूर्णांक len, पूर्णांक cn )
+{ CV_INSTRUMENT_REGION(); वापस योग_4(src, mask, dst, len, cn); }
 
-static int sum16s( const short* src, const uchar* mask, int* dst, int len, int cn )
-{ CV_INSTRUMENT_REGION(); return sum_(src, mask, dst, len, cn); }
+अटल पूर्णांक sum16s( स्थिर लघु* src, स्थिर uchar* mask, पूर्णांक* dst, पूर्णांक len, पूर्णांक cn )
+{ CV_INSTRUMENT_REGION(); वापस योग_4(src, mask, dst, len, cn); }
 
-static int sum32u( const unsigned* src, const uchar* mask, double* dst, int len, int cn )
-{ CV_INSTRUMENT_REGION(); return sum_<unsigned, double, uint64>(src, mask, dst, len, cn); }
+अटल पूर्णांक sum32u( स्थिर अचिन्हित* src, स्थिर uchar* mask, द्विगुन* dst, पूर्णांक len, पूर्णांक cn )
+{ CV_INSTRUMENT_REGION(); वापस योग_4<अचिन्हित, द्विगुन, uint64>(src, mask, dst, len, cn); }
 
-static int sum32s( const int* src, const uchar* mask, double* dst, int len, int cn )
-{ CV_INSTRUMENT_REGION(); return sum_<int, double, int64>(src, mask, dst, len, cn); }
+अटल पूर्णांक sum32s( स्थिर पूर्णांक* src, स्थिर uchar* mask, द्विगुन* dst, पूर्णांक len, पूर्णांक cn )
+{ CV_INSTRUMENT_REGION(); वापस योग_4<पूर्णांक, द्विगुन, int64>(src, mask, dst, len, cn); }
 
-static int sum64u( const uint64* src, const uchar* mask, double* dst, int len, int cn )
-{ CV_INSTRUMENT_REGION(); return sum_(src, mask, dst, len, cn); }
+अटल पूर्णांक sum64u( स्थिर uint64* src, स्थिर uchar* mask, द्विगुन* dst, पूर्णांक len, पूर्णांक cn )
+{ CV_INSTRUMENT_REGION(); वापस योग_4(src, mask, dst, len, cn); }
 
-static int sum64s( const int64* src, const uchar* mask, double* dst, int len, int cn )
-{ CV_INSTRUMENT_REGION(); return sum_(src, mask, dst, len, cn); }
+अटल पूर्णांक sum64s( स्थिर int64* src, स्थिर uchar* mask, द्विगुन* dst, पूर्णांक len, पूर्णांक cn )
+{ CV_INSTRUMENT_REGION(); वापस योग_4(src, mask, dst, len, cn); }
 
-static int sum32f( const float* src, const uchar* mask, double* dst, int len, int cn )
-{ CV_INSTRUMENT_REGION(); return sum_(src, mask, dst, len, cn); }
+अटल पूर्णांक sum32f( स्थिर भग्न* src, स्थिर uchar* mask, द्विगुन* dst, पूर्णांक len, पूर्णांक cn )
+{ CV_INSTRUMENT_REGION(); वापस योग_4(src, mask, dst, len, cn); }
 
-static int sum64f( const double* src, const uchar* mask, double* dst, int len, int cn )
-{ CV_INSTRUMENT_REGION(); return sum_(src, mask, dst, len, cn); }
+अटल पूर्णांक sum64f( स्थिर द्विगुन* src, स्थिर uchar* mask, द्विगुन* dst, पूर्णांक len, पूर्णांक cn )
+{ CV_INSTRUMENT_REGION(); वापस योग_4(src, mask, dst, len, cn); }
 
-static int sum16f( const hfloat* src, const uchar* mask, float* dst, int len, int cn )
-{ CV_INSTRUMENT_REGION(); return sum_<hfloat, float, float>(src, mask, dst, len, cn); }
+अटल पूर्णांक sum16f( स्थिर hfloat* src, स्थिर uchar* mask, भग्न* dst, पूर्णांक len, पूर्णांक cn )
+{ CV_INSTRUMENT_REGION(); वापस योग_4<hfloat, भग्न, भग्न>(src, mask, dst, len, cn); }
 
-static int sum16bf( const bfloat* src, const uchar* mask, float* dst, int len, int cn )
-{ CV_INSTRUMENT_REGION(); return sum_<bfloat, float, float>(src, mask, dst, len, cn); }
+अटल पूर्णांक sum16bf( स्थिर bfloat* src, स्थिर uchar* mask, भग्न* dst, पूर्णांक len, पूर्णांक cn )
+{ CV_INSTRUMENT_REGION(); वापस योग_4<bfloat, भग्न, भग्न>(src, mask, dst, len, cn); }
 
-SumFunc getSumFunc(int depth)
+योग_Func get_योग_Func(पूर्णांक depth)
 {
-    static SumFunc sumTab[CV_DEPTH_MAX] =
+    अटल योग_Func योग_Tab[CV_DEPTH_MAX] =
     {
-        sumWrap<uchar, int, sum8u>,
-        sumWrap<schar, int, sum8s>,
-        sumWrap<ushort, int, sum16u>,
-        sumWrap<short, int, sum16s>,
-        sumWrap<int, double, sum32s>,
-        sumWrap<float, double, sum32f>,
-        sumWrap<double, double, sum64f>,
-        sumWrap<hfloat, float, sum16f>,
-        sumWrap<bfloat, float, sum16bf>,
+        योग_Wrap<uchar, पूर्णांक, sum8u>,
+        योग_Wrap<schar, पूर्णांक, sum8s>,
+        योग_Wrap<ushort, पूर्णांक, sum16u>,
+        योग_Wrap<लघु, पूर्णांक, sum16s>,
+        योग_Wrap<पूर्णांक, द्विगुन, sum32s>,
+        योग_Wrap<भग्न, द्विगुन, sum32f>,
+        योग_Wrap<द्विगुन, द्विगुन, sum64f>,
+        योग_Wrap<hfloat, भग्न, sum16f>,
+        योग_Wrap<bfloat, भग्न, sum16bf>,
         0,
-        sumWrap<uint64, double, sum64u>,
-        sumWrap<int64, double, sum64s>,
-        sumWrap<unsigned, double, sum32u>,
+        योग_Wrap<uint64, द्विगुन, sum64u>,
+        योग_Wrap<int64, द्विगुन, sum64s>,
+        योग_Wrap<अचिन्हित, द्विगुन, sum32u>,
         0
     };
 
-    return sumTab[depth];
+    वापस योग_Tab[depth];
 }
 
-#endif
+#पूर्ण_अगर
 
 CV_CPU_OPTIMIZATION_NAMESPACE_END
 } // namespace

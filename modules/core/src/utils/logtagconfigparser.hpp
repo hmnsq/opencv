@@ -2,47 +2,47 @@
 // It is subject to the license terms in the LICENSE file found in the top-level directory
 // of this distribution and at http://opencv.org/license.html.
 
-#ifndef OPENCV_CORE_LOGTAGCONFIGPARSER_HPP
-#define OPENCV_CORE_LOGTAGCONFIGPARSER_HPP
+#अगर_अघोषित OPENCV_CORE_LOGTAGCONFIGPARSER_HPP
+#घोषणा OPENCV_CORE_LOGTAGCONFIGPARSER_HPP
 
-#if 1 // if not already in precompiled headers
-#include <string>
-#include <vector>
-#include <functional>
-#endif
+#अगर 1 // if not already in precompiled headers
+#समावेश <string>
+#समावेश <vector>
+#समावेश <functional>
+#पूर्ण_अगर
 
-#include <opencv2/core/utils/logtag.hpp>
-#include "logtagconfig.hpp"
+#समावेश <opencv2/core/utils/logtag.hpp>
+#समावेश "logtagconfig.hpp"
 
 namespace cv {
 namespace utils {
 namespace logging {
 
-class LogTagConfigParser
+श्रेणी LogTagConfigParser
 {
-public:
+खुला:
     LogTagConfigParser(LogLevel defaultUnconfiguredGlobalLevel = LOG_LEVEL_VERBOSE);
-    explicit LogTagConfigParser(const std::string& input);
+    explicit LogTagConfigParser(स्थिर std::string& निवेश_2);
     ~LogTagConfigParser();
 
-public:
-    bool parse(const std::string& input);
-    bool hasMalformed() const;
-    const LogTagConfig& getGlobalConfig() const;
-    const std::vector<LogTagConfig>& getFullNameConfigs() const;
-    const std::vector<LogTagConfig>& getFirstPartConfigs() const;
-    const std::vector<LogTagConfig>& getAnyPartConfigs() const;
-    const std::vector<std::string>& getMalformed() const;
+खुला:
+    bool parse(स्थिर std::string& निवेश_2);
+    bool hasMalformed() स्थिर;
+    स्थिर LogTagConfig& getGlobalConfig() स्थिर;
+    स्थिर std::vector<LogTagConfig>& getFullNameConfigs() स्थिर;
+    स्थिर std::vector<LogTagConfig>& getFirstPartConfigs() स्थिर;
+    स्थिर std::vector<LogTagConfig>& getAnyPartConfigs() स्थिर;
+    स्थिर std::vector<std::string>& getMalformed() स्थिर;
 
-private:
-    void segmentTokens();
-    void parseNameAndLevel(const std::string& s);
-    void parseWildcard(const std::string& name, LogLevel level);
-    static std::pair<LogLevel, bool> parseLogLevel(const std::string& s);
-    static std::string toString(LogLevel level);
+निजी:
+    व्योम segmentTokens();
+    व्योम parseNameAndLevel(स्थिर std::string& s);
+    व्योम parseWildcard(स्थिर std::string& name, LogLevel level);
+    अटल std::pair<LogLevel, bool> parseLogLevel(स्थिर std::string& s);
+    अटल std::string toString(LogLevel level);
 
-private:
-    std::string m_input;
+निजी:
+    std::string m_निवेश;
     LogTagConfig m_parsedGlobal;
     std::vector<LogTagConfig> m_parsedFullName;
     std::vector<LogTagConfig> m_parsedFirstPart;
@@ -52,4 +52,4 @@ private:
 
 }}} //namespace
 
-#endif
+#पूर्ण_अगर

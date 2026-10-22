@@ -4,25 +4,25 @@
 //
 // Copyright (C) 2014, Advanced Micro Devices, Inc., all rights reserved.
 
-#ifndef __OPENCV_CORE_BUFFER_POOL_IMPL_HPP__
-#define __OPENCV_CORE_BUFFER_POOL_IMPL_HPP__
+#अगर_अघोषित __OPENCV_CORE_BUFFER_POOL_IMPL_HPP__
+#घोषणा __OPENCV_CORE_BUFFER_POOL_IMPL_HPP__
 
-#include "opencv2/core/bufferpool.hpp"
+#समावेश "opencv2/core/bufferpool.hpp"
 
 namespace cv {
 
-class DummyBufferPoolController : public BufferPoolController
+श्रेणी Dummy_बफर_Pool_Controller : खुला बफर_Pool_Controller
 {
-public:
-    DummyBufferPoolController() { }
-    virtual ~DummyBufferPoolController() { }
+खुला:
+    Dummy_बफर_Pool_Controller() { }
+    भव ~Dummy_बफर_Pool_Controller() { }
 
-    virtual size_t getReservedSize() const CV_OVERRIDE { return (size_t)-1; }
-    virtual size_t getMaxReservedSize() const CV_OVERRIDE { return (size_t)-1; }
-    virtual void setMaxReservedSize(size_t size) CV_OVERRIDE { CV_UNUSED(size); }
-    virtual void freeAllReservedBuffers() CV_OVERRIDE { }
+    भव माप_प्रकार get_Reserved_आकार() स्थिर CV_OVERRIDE { वापस (माप_प्रकार)-1; }
+    भव माप_प्रकार get_Max_Reserved_आकार() स्थिर CV_OVERRIDE { वापस (माप_प्रकार)-1; }
+    भव व्योम set_Max_Reserved_आकार(माप_प्रकार size) CV_OVERRIDE { CV_UNUSED(size); }
+    भव व्योम freeAllReservedBuffers() CV_OVERRIDE { }
 };
 
 } // namespace
 
-#endif // __OPENCV_CORE_BUFFER_POOL_IMPL_HPP__
+#पूर्ण_अगर // __OPENCV_CORE_BUFFER_POOL_IMPL_HPP__
