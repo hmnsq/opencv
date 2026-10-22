@@ -2,60 +2,60 @@
 // It is subject to the license terms in the LICENSE file found in the top-level directory
 // of this distribution and at http://opencv.org/license.html.
 
-#include "precomp.hpp"
+#ضمن "precomp.hpp"
 
-#include <opencv2/core/utils/trace.hpp>
-#include <opencv2/core/utils/trace.private.hpp>
-#include <opencv2/core/utils/configuration.private.hpp>
+#ضمن <opencv2/core/utils/trace.hpp>
+#ضمن <opencv2/core/utils/trace.private.hpp>
+#ضمن <opencv2/core/utils/configuration.private.hpp>
 
-#include <opencv2/core/opencl/ocl_defs.hpp>
+#ضمن <opencv2/core/opencl/ocl_defs.hpp>
 
-#include <cstdarg> // va_start
+#ضمن <cstdarg> // va_start
 
-#include <sstream>
-#include <ostream>
-#include <fstream>
+#ضمن <sstream>
+#ضمن <ostream>
+#ضمن <fstream>
 
-#if 0
-#define CV_LOG(...) CV_LOG_INFO(NULL, __VA_ARGS__)
-#else
+#𐤀𐤌 0
+#define CV_LOG(...) CV_LOG_INFO(عدم, __VA_ARGS__)
+#وإلا
 #define CV_LOG(...) {}
 #endif
 
-#if 0
-#define CV_LOG_ITT(...) CV_LOG_INFO(NULL, __VA_ARGS__)
-#else
+#𐤀𐤌 0
+#define CV_LOG_ITT(...) CV_LOG_INFO(عدم, __VA_ARGS__)
+#وإلا
 #define CV_LOG_ITT(...) {}
 #endif
 
-#if 1
+#𐤀𐤌 1
 #define CV_LOG_TRACE_BAILOUT(tag, ...) CV_LOG_INFO(tag, __VA_ARGS__)
-#else
+#وإلا
 #define CV_LOG_TRACE_BAILOUT(...) {}
 #endif
 
-#if 0
+#𐤀𐤌 0
 #define CV_LOG_PARALLEL(tag, ...) CV_LOG_INFO(tag, __VA_ARGS__)
-#else
+#وإلا
 #define CV_LOG_PARALLEL(...) {}
 #endif
 
-#if 0
+#𐤀𐤌 0
 #define CV_LOG_CTX_STAT(tag, ...) CV_LOG_INFO(tag, __VA_ARGS__)
-#else
+#وإلا
 #define CV_LOG_CTX_STAT(...) {}
 #endif
 
-#if 0
+#𐤀𐤌 0
 #define CV_LOG_SKIP(tag, ...) CV_LOG_INFO(tag, __VA_ARGS__)
-#else
+#وإلا
 #define CV_LOG_SKIP(...) {}
 #endif
 
-namespace cv {
-namespace utils {
-namespace trace {
-namespace details {
+نطاق cv {
+نطاق utils {
+نطاق trace {
+نطاق details {
 
 #ifdef OPENCV_TRACE
 
@@ -63,124 +63,124 @@ namespace details {
 #pragma warning(disable:4065) // switch statement contains 'default' but no 'case' labels
 #endif
 
-static bool getParameterTraceEnable()
+ساكن منطقي getParameterTraceEnable()
 {
-    static bool param_traceEnable = utils::getConfigurationParameterBool("OPENCV_TRACE", false);
-    return param_traceEnable;
+    ساكن منطقي param_traceEnable = utils::getConfigurationParameterBool("OPENCV_TRACE", خطأ);
+    أرجع param_traceEnable;
 }
 
 // TODO lazy configuration flags
-static int param_maxRegionDepthOpenCV = (int)utils::getConfigurationParameterSizeT("OPENCV_TRACE_DEPTH_OPENCV", 1);
-static int param_maxRegionChildrenOpenCV = (int)utils::getConfigurationParameterSizeT("OPENCV_TRACE_MAX_CHILDREN_OPENCV", 1000);
-static int param_maxRegionChildren = (int)utils::getConfigurationParameterSizeT("OPENCV_TRACE_MAX_CHILDREN", 10000);
+ساكن صحيح param_maxRegionDepthOpenCV = (صحيح)utils::getConfigurationParameterSizeT("OPENCV_TRACE_DEPTH_OPENCV", 1);
+ساكن صحيح param_maxRegionChildrenOpenCV = (صحيح)utils::getConfigurationParameterSizeT("OPENCV_TRACE_MAX_CHILDREN_OPENCV", 1000);
+ساكن صحيح param_maxRegionChildren = (صحيح)utils::getConfigurationParameterSizeT("OPENCV_TRACE_MAX_CHILDREN", 10000);
 
-static const cv::String& getParameterTraceLocation()
+ساكن ثابت cv::String& getParameterTraceLocation()
 {
-    static cv::String param_traceLocation = utils::getConfigurationParameterString("OPENCV_TRACE_LOCATION", "OpenCVTrace");
-    return param_traceLocation;
+    ساكن cv::String param_traceLocation = utils::getConfigurationParameterString("OPENCV_TRACE_LOCATION", "OpenCVTrace");
+    أرجع param_traceLocation;
 }
 
 #ifdef HAVE_OPENCL
-static bool param_synchronizeOpenCL = utils::getConfigurationParameterBool("OPENCV_TRACE_SYNC_OPENCL", false);
+ساكن منطقي param_synchronizeOpenCL = utils::getConfigurationParameterBool("OPENCV_TRACE_SYNC_OPENCL", خطأ);
 #endif
 
 #ifdef OPENCV_WITH_ITT
-static bool param_ITT_registerParentScope = utils::getConfigurationParameterBool("OPENCV_TRACE_ITT_PARENT", false);
+ساكن منطقي param_ITT_registerParentScope = utils::getConfigurationParameterBool("OPENCV_TRACE_ITT_PARENT", خطأ);
 #endif
 
-static const char* _spaces(int count)
+ساكن ثابت حرف* _spaces(صحيح count)
 {
-    static const char buf[64] =
+    ساكن ثابت حرف buf[64] =
 "                                                               ";
-    return &buf[63 - (count & 63)];
+    أرجع &buf[63 - (count & 63)];
 }
 
 /**
  * Text-based trace messages
  */
-class TraceMessage
+صنف TraceMessage
 {
-public:
-    char buffer[1024];
+عام:
+    حرف buffer[1024];
     size_t len;
-    bool hasError;
+    منطقي hasError;
 
     TraceMessage() :
         len(0),
-        hasError(false)
+        hasError(خطأ)
     {}
 
-    bool printf(const char* format, ...)
+    منطقي printf(ثابت حرف* format, ...)
     {
-        char* buf = &buffer[len];
-        size_t sz = sizeof(buffer) - len;
+        حرف* buf = &buffer[len];
+        size_t sz = حجم(buffer) - len;
         va_list ap;
         va_start(ap, format);
-        int n = cv_vsnprintf(buf, (int)sz, format, ap);
+        صحيح n = cv_vsnprintf(buf, (صحيح)sz, format, ap);
         va_end(ap);
-        if (n < 0 || (size_t)n > sz)
+        𐤀𐤌 (n < 0 || (size_t)n > sz)
         {
             hasError = true;
-            return false;
+            أرجع خطأ;
         }
         len += n;
-        return true;
+        أرجع true;
     }
 
-    bool formatlocation(const Region::LocationStaticStorage& location)
+    منطقي formatlocation(ثابت Region::LocationStaticStorage& location)
     {
-        return this->printf("l,%lld,\"%s\",%d,\"%s\",0x%llX\n",
-                (long long int)(*location.ppExtra)->global_location_id,
+        أرجع هذا->printf("l,%lld,\"%s\",%d,\"%s\",0x%llX\n",
+                (long long صحيح)(*location.ppExtra)->global_location_id,
                 location.filename,
                 location.line,
                 location.name,
-                (long long int)(location.flags & ~0xF0000000));
+                (long long صحيح)(location.flags & ~0xF0000000));
     }
-    bool formatRegionEnter(const Region& region)
+    منطقي formatRegionEnter(ثابت Region& region)
     {
-        bool ok = this->printf("b,%d,%lld,%lld,%lld",
-                (int)region.pImpl->threadID,
-                (long long int)region.pImpl->beginTimestamp,
-                (long long int)((*region.pImpl->location.ppExtra)->global_location_id),
-                (long long int)region.pImpl->global_region_id);
-        if (region.pImpl->parentRegion && region.pImpl->parentRegion->pImpl)
+        منطقي ok = هذا->printf("b,%d,%lld,%lld,%lld",
+                (صحيح)region.pImpl->threadID,
+                (long long صحيح)region.pImpl->beginTimestamp,
+                (long long صحيح)((*region.pImpl->location.ppExtra)->global_location_id),
+                (long long صحيح)region.pImpl->global_region_id);
+        𐤀𐤌 (region.pImpl->parentRegion && region.pImpl->parentRegion->pImpl)
         {
-            if (region.pImpl->parentRegion->pImpl->threadID != region.pImpl->threadID)
-                ok &= this->printf(",parentThread=%d,parent=%lld",
-                        (int)region.pImpl->parentRegion->pImpl->threadID,
-                        (long long int)region.pImpl->parentRegion->pImpl->global_region_id);
+            𐤀𐤌 (region.pImpl->parentRegion->pImpl->threadID != region.pImpl->threadID)
+                ok &= هذا->printf(",parentThread=%d,parent=%lld",
+                        (صحيح)region.pImpl->parentRegion->pImpl->threadID,
+                        (long long صحيح)region.pImpl->parentRegion->pImpl->global_region_id);
         }
-        ok &= this->printf("\n");
-        return ok;
+        ok &= هذا->printf("\n");
+        أرجع ok;
     }
-    bool formatRegionLeave(const Region& region, const RegionStatistics& result)
+    منطقي formatRegionLeave(ثابت Region& region, ثابت RegionStatistics& result)
     {
         CV_DbgAssert(region.pImpl->endTimestamp - region.pImpl->beginTimestamp == result.duration);
-        bool ok = this->printf("e,%d,%lld,%lld,%lld,%lld",
-                (int)region.pImpl->threadID,
-                (long long int)region.pImpl->endTimestamp,
-                (long long int)(*region.pImpl->location.ppExtra)->global_location_id,
-                (long long int)region.pImpl->global_region_id,
-                (long long int)result.duration);
-        if (result.currentSkippedRegions)
-            ok &= this->printf(",skip=%d", (int)result.currentSkippedRegions);
+        منطقي ok = هذا->printf("e,%d,%lld,%lld,%lld,%lld",
+                (صحيح)region.pImpl->threadID,
+                (long long صحيح)region.pImpl->endTimestamp,
+                (long long صحيح)(*region.pImpl->location.ppExtra)->global_location_id,
+                (long long صحيح)region.pImpl->global_region_id,
+                (long long صحيح)result.duration);
+        𐤀𐤌 (result.currentSkippedRegions)
+            ok &= هذا->printf(",skip=%d", (صحيح)result.currentSkippedRegions);
 #ifdef HAVE_IPP
-        if (result.durationImplIPP)
-            ok &= this->printf(",tIPP=%lld", (long long int)result.durationImplIPP);
+        𐤀𐤌 (result.durationImplIPP)
+            ok &= هذا->printf(",tIPP=%lld", (long long صحيح)result.durationImplIPP);
 #endif
 #ifdef HAVE_OPENCL
-        if (result.durationImplOpenCL)
-            ok &= this->printf(",tOCL=%lld", (long long int)result.durationImplOpenCL);
+        𐤀𐤌 (result.durationImplOpenCL)
+            ok &= هذا->printf(",tOCL=%lld", (long long صحيح)result.durationImplOpenCL);
 #endif
-        ok &= this->printf("\n");
-        return ok;
+        ok &= هذا->printf("\n");
+        أرجع ok;
     }
-    bool recordRegionArg(const Region& region, const TraceArg& arg, const char* value)
+    منطقي recordRegionArg(ثابت Region& region, ثابت TraceArg& arg, ثابت حرف* value)
     {
-        return this->printf("a,%d,%lld,%lld,\"%s\",\"%s\"\n",
+        أرجع هذا->printf("a,%d,%lld,%lld,\"%s\",\"%s\"\n",
                 region.pImpl->threadID,
-                (long long int)region.pImpl->beginTimestamp,
-                (long long int)region.pImpl->global_region_id,
+                (long long صحيح)region.pImpl->beginTimestamp,
+                (long long صحيح)region.pImpl->global_region_id,
                 arg.name,
                 value);
     }
@@ -188,48 +188,48 @@ public:
 
 
 #ifdef OPENCV_WITH_ITT
-static __itt_domain* domain = NULL;
+ساكن __itt_domain* domain = عدم;
 
-static bool isITTEnabled()
+ساكن منطقي isITTEnabled()
 {
-    static volatile bool isInitialized = false;
-    static bool isEnabled = false;
-    if (!isInitialized)
+    ساكن متطاير منطقي isInitialized = خطأ;
+    ساكن منطقي isEnabled = خطأ;
+    𐤀𐤌 (!isInitialized)
     {
         cv::AutoLock lock(cv::getInitializationMutex());
-        if (!isInitialized)
+        𐤀𐤌 (!isInitialized)
         {
-            bool param_traceITTEnable = utils::getConfigurationParameterBool("OPENCV_TRACE_ITT_ENABLE", true);
-            if (param_traceITTEnable)
+            منطقي param_traceITTEnable = utils::getConfigurationParameterBool("OPENCV_TRACE_ITT_ENABLE", true);
+            𐤀𐤌 (param_traceITTEnable)
             {
                 isEnabled = !!(__itt_api_version());
                 CV_LOG_ITT("ITT is " << (isEnabled ? "enabled" : "disabled"));
                 domain = __itt_domain_create("OpenCVTrace");
             }
-            else
+            وإلا
             {
                 CV_LOG_ITT("ITT is disabled through OpenCV parameter");
-                isEnabled = false;
+                isEnabled = خطأ;
             }
             isInitialized = true;
         }
     }
-    return isEnabled;
+    أرجع isEnabled;
 }
 #endif
 
 
-Region::LocationExtraData::LocationExtraData(const LocationStaticStorage& location)
+Region::LocationExtraData::LocationExtraData(ثابت LocationStaticStorage& location)
 {
     CV_UNUSED(location);
-    static int g_location_id_counter = 0;
+    ساكن صحيح g_location_id_counter = 0;
     global_location_id = CV_XADD(&g_location_id_counter, 1) + 1;
-    CV_LOG("Register location: " << global_location_id << " (" << (void*)&location << ")"
+    CV_LOG("Register location: " << global_location_id << " (" << (فراغ*)&location << ")"
             << std::endl << "    file: " << location.filename
             << std::endl << "    line: " << location.line
             << std::endl << "    name: " << location.name);
 #ifdef OPENCV_WITH_ITT
-    if (isITTEnabled())
+    𐤀𐤌 (isITTEnabled())
     {
         // Caching is not required here, because there is builtin cache.
         // https://software.intel.com/en-us/node/544203:
@@ -237,7 +237,7 @@ Region::LocationExtraData::LocationExtraData(const LocationStaticStorage& locati
         ittHandle_name = __itt_string_handle_create(location.name);
         ittHandle_filename = __itt_string_handle_create(location.filename);
     }
-    else
+    وإلا
     {
         ittHandle_name = 0;
         ittHandle_filename = 0;
@@ -245,18 +245,18 @@ Region::LocationExtraData::LocationExtraData(const LocationStaticStorage& locati
 #endif
 }
 
-/*static*/ Region::LocationExtraData* Region::LocationExtraData::init(const Region::LocationStaticStorage& location)
+/*static*/ Region::LocationExtraData* Region::LocationExtraData::init(ثابت Region::LocationStaticStorage& location)
 {
     LocationExtraData** pLocationExtra = location.ppExtra;
     CV_DbgAssert(pLocationExtra);
-    if (*pLocationExtra == NULL)
+    𐤀𐤌 (*pLocationExtra == عدم)
     {
         cv::AutoLock lock(cv::getInitializationMutex());
-        if (*pLocationExtra == NULL)
+        𐤀𐤌 (*pLocationExtra == عدم)
         {
-            *pLocationExtra = new Region::LocationExtraData(location);
+            *pLocationExtra = جديد Region::LocationExtraData(location);
             TraceStorage* s = getTraceManager().trace_storage.get();
-            if (s)
+            𐤀𐤌 (s)
             {
                 TraceMessage msg;
                 msg.formatlocation(location);
@@ -264,11 +264,11 @@ Region::LocationExtraData::LocationExtraData(const LocationStaticStorage& locati
             }
         }
     }
-    return *pLocationExtra;
+    أرجع *pLocationExtra;
 }
 
 
-Region::Impl::Impl(TraceManagerThreadLocal& ctx, Region* parentRegion_, Region& region_, const LocationStaticStorage& location_, int64 beginTimestamp_) :
+Region::Impl::Impl(TraceManagerThreadLocal& ctx, Region* parentRegion_, Region& region_, ثابت LocationStaticStorage& location_, int64 beginTimestamp_) :
     location(location_),
     region(region_),
     parentRegion(parentRegion_),
@@ -278,12 +278,12 @@ Region::Impl::Impl(TraceManagerThreadLocal& ctx, Region* parentRegion_, Region& 
     endTimestamp(0),
     directChildrenCount(0)
 #ifdef OPENCV_WITH_ITT
-    ,itt_id_registered(false)
+    ,itt_id_registered(خطأ)
     ,itt_id(__itt_null)
 #endif
 {
     CV_DbgAssert(ctx.currentActiveRegion == parentRegion);
-    region.pImpl = this;
+    region.pImpl = هذا;
 
     registerRegion(ctx);
 
@@ -293,23 +293,23 @@ Region::Impl::Impl(TraceManagerThreadLocal& ctx, Region* parentRegion_, Region& 
 Region::Impl::~Impl()
 {
 #ifdef OPENCV_WITH_ITT
-    if (itt_id_registered)
+    𐤀𐤌 (itt_id_registered)
     {
-        CV_LOG_ITT(" Destroy ITT region: I=" << (void*)this);
+        CV_LOG_ITT(" Destroy ITT region: I=" << (فراغ*)هذا);
         __itt_id_destroy(domain, itt_id);
-        itt_id_registered = false;
+        itt_id_registered = خطأ;
     }
 #endif
-    region.pImpl = NULL;
+    region.pImpl = عدم;
 }
 
-void Region::Impl::enterRegion(TraceManagerThreadLocal& ctx)
+فراغ Region::Impl::enterRegion(TraceManagerThreadLocal& ctx)
 {
     ctx.currentActiveRegion = &region;
 
-    if (location.flags & REGION_FLAG_FUNCTION)
+    𐤀𐤌 (location.flags & REGION_FLAG_FUNCTION)
     {
-        if ((location.flags & REGION_FLAG_APP_CODE) == 0)
+        𐤀𐤌 ((location.flags & REGION_FLAG_APP_CODE) == 0)
         {
             ctx.regionDepthOpenCV++;
         }
@@ -317,59 +317,59 @@ void Region::Impl::enterRegion(TraceManagerThreadLocal& ctx)
     }
 
     TraceStorage* s = ctx.getStorage();
-    if (s)
+    𐤀𐤌 (s)
     {
         TraceMessage msg;
         msg.formatRegionEnter(region);
         s->put(msg);
     }
 #ifdef OPENCV_WITH_ITT
-    if (isITTEnabled())
+    𐤀𐤌 (isITTEnabled())
     {
         __itt_id parentID = __itt_null;
-        if (param_ITT_registerParentScope && parentRegion && parentRegion->pImpl && parentRegion->pImpl->itt_id_registered && (location.flags & REGION_FLAG_REGION_FORCE) == 0)
+        𐤀𐤌 (param_ITT_registerParentScope && parentRegion && parentRegion->pImpl && parentRegion->pImpl->itt_id_registered && (location.flags & REGION_FLAG_REGION_FORCE) == 0)
             parentID = parentRegion->pImpl->itt_id;
         __itt_task_begin(domain, itt_id, parentID, (*location.ppExtra)->ittHandle_name);
     }
 #endif
 }
 
-void Region::Impl::leaveRegion(TraceManagerThreadLocal& ctx)
+فراغ Region::Impl::leaveRegion(TraceManagerThreadLocal& ctx)
 {
     int64 duration = endTimestamp - beginTimestamp; CV_UNUSED(duration);
     RegionStatistics result;
     ctx.stat.grab(result);
     ctx.totalSkippedEvents += result.currentSkippedRegions;
-    CV_LOG(_spaces(ctx.getCurrentDepth()*4) << "leaveRegion(): " << (void*)this << " " << result);
+    CV_LOG(_spaces(ctx.getCurrentDepth()*4) << "leaveRegion(): " << (فراغ*)هذا << " " << result);
 #ifdef OPENCV_WITH_ITT
-    if (isITTEnabled())
+    𐤀𐤌 (isITTEnabled())
     {
-        if (result.currentSkippedRegions)
+        𐤀𐤌 (result.currentSkippedRegions)
         {
             __itt_metadata_add(domain, itt_id, __itt_string_handle_create("skipped trace entries"), __itt_metadata_u32, 1, &result.currentSkippedRegions);
         }
 #ifdef HAVE_IPP
-        if (result.durationImplIPP)
+        𐤀𐤌 (result.durationImplIPP)
             __itt_metadata_add(domain, itt_id, __itt_string_handle_create("tIPP"), __itt_metadata_u64, 1, &result.durationImplIPP);
 #endif
 #ifdef HAVE_OPENCL
-        if (result.durationImplOpenCL)
+        𐤀𐤌 (result.durationImplOpenCL)
             __itt_metadata_add(domain, itt_id, __itt_string_handle_create("tOpenCL"), __itt_metadata_u64, 1, &result.durationImplOpenCL);
 #endif
         __itt_task_end(domain);
     }
 #endif
     TraceStorage* s = ctx.getStorage();
-    if (s)
+    𐤀𐤌 (s)
     {
         TraceMessage msg;
         msg.formatRegionLeave(region, result);
         s->put(msg);
     }
 
-    if (location.flags & REGION_FLAG_FUNCTION)
+    𐤀𐤌 (location.flags & REGION_FLAG_FUNCTION)
     {
-        if ((location.flags & REGION_FLAG_APP_CODE) == 0)
+        𐤀𐤌 ((location.flags & REGION_FLAG_APP_CODE) == 0)
         {
             ctx.regionDepthOpenCV--;
         }
@@ -379,50 +379,50 @@ void Region::Impl::leaveRegion(TraceManagerThreadLocal& ctx)
     ctx.currentActiveRegion = parentRegion;
 }
 
-void Region::Impl::release()
+فراغ Region::Impl::release()
 {
-    delete this;
+    delete هذا;
 }
 
-void Region::Impl::registerRegion(TraceManagerThreadLocal& ctx)
+فراغ Region::Impl::registerRegion(TraceManagerThreadLocal& ctx)
 {
 #ifdef OPENCV_WITH_ITT
-    if (isITTEnabled())
+    𐤀𐤌 (isITTEnabled())
     {
-        if (!itt_id_registered)
+        𐤀𐤌 (!itt_id_registered)
         {
-            CV_LOG_ITT(" Register ITT region: I=" << (void*)this << " " << ctx.threadID << "-" << global_region_id);
-#if 1 // workaround for some ITT backends
-            itt_id = __itt_id_make((void*)(intptr_t)(((int64)(ctx.threadID + 1) << 32) | global_region_id), global_region_id);
-#else
-            itt_id = __itt_id_make((void*)(intptr_t)(ctx.threadID + 1), global_region_id);
+            CV_LOG_ITT(" Register ITT region: I=" << (فراغ*)هذا << " " << ctx.threadID << "-" << global_region_id);
+#𐤀𐤌 1 // workaround for some ITT backends
+            itt_id = __itt_id_make((فراغ*)(intptr_t)(((int64)(ctx.threadID + 1) << 32) | global_region_id), global_region_id);
+#وإلا
+            itt_id = __itt_id_make((فراغ*)(intptr_t)(ctx.threadID + 1), global_region_id);
 #endif
             __itt_id_create(domain, itt_id);
             itt_id_registered = true;
         }
     }
-#else
+#وإلا
     CV_UNUSED(ctx);
 #endif
 }
 
-void RegionStatisticsStatus::enableSkipMode(int depth)
+فراغ RegionStatisticsStatus::enableSkipMode(صحيح depth)
 {
     CV_DbgAssert(_skipDepth < 0);
-    CV_LOG_SKIP(NULL, "SKIP-ENABLE: depth=" << depth);
+    CV_LOG_SKIP(عدم, "SKIP-ENABLE: depth=" << depth);
     _skipDepth = depth;
 }
-void RegionStatisticsStatus::checkResetSkipMode(int leaveDepth)
+فراغ RegionStatisticsStatus::checkResetSkipMode(صحيح leaveDepth)
 {
-    if (leaveDepth <= _skipDepth)
+    𐤀𐤌 (leaveDepth <= _skipDepth)
     {
-        CV_LOG_SKIP(NULL, "SKIP-RESET: leaveDepth=" << leaveDepth << " skipDepth=" << _skipDepth);
+        CV_LOG_SKIP(عدم, "SKIP-RESET: leaveDepth=" << leaveDepth << " skipDepth=" << _skipDepth);
         _skipDepth = -1;
     }
 }
 
-Region::Region(const LocationStaticStorage& location) :
-    pImpl(NULL),
+Region::Region(ثابت LocationStaticStorage& location) :
+    pImpl(عدم),
     implFlags(0)
 {
     // Checks:
@@ -431,21 +431,21 @@ Region::Region(const LocationStaticStorage& location) :
     // - children count threshold
     // - region location
     // - depth (opencv nested calls)
-    if (!TraceManager::isActivated())
+    𐤀𐤌 (!TraceManager::isActivated())
     {
         CV_LOG("Trace is disabled. Bailout");
-        return;
+        أرجع;
     }
 
     TraceManagerThreadLocal& ctx = getTraceManager().tls.getRef();
-    CV_LOG(_spaces(ctx.getCurrentDepth()*4) << "Region(): " << (void*)this << ": " << location.name);
+    CV_LOG(_spaces(ctx.getCurrentDepth()*4) << "Region(): " << (فراغ*)هذا << ": " << location.name);
 
     Region* parentRegion = ctx.stackTopRegion();
-    const Region::LocationStaticStorage* parentLocation = ctx.stackTopLocation();
+    ثابت Region::LocationStaticStorage* parentLocation = ctx.stackTopLocation();
 
-    if (location.flags & REGION_FLAG_REGION_NEXT)
+    𐤀𐤌 (location.flags & REGION_FLAG_REGION_NEXT)
     {
-        if (parentRegion && parentRegion->pImpl)
+        𐤀𐤌 (parentRegion && parentRegion->pImpl)
         {
             CV_DbgAssert((parentRegion->pImpl->location.flags & REGION_FLAG_FUNCTION) == 0);
             parentRegion->destroy(); parentRegion->implFlags = 0;
@@ -454,15 +454,15 @@ Region::Region(const LocationStaticStorage& location) :
         }
     }
 
-    int parentChildren = 0;
-    if (parentRegion && parentRegion->pImpl)
+    صحيح parentChildren = 0;
+    𐤀𐤌 (parentRegion && parentRegion->pImpl)
     {
-        if (parentLocation == NULL)
+        𐤀𐤌 (parentLocation == عدم)
         {
             // parallel_for_body code path
             parentChildren = CV_XADD(&parentRegion->pImpl->directChildrenCount, 1) + 1;
         }
-        else
+        وإلا
         {
             parentChildren = ++parentRegion->pImpl->directChildrenCount;
         }
@@ -470,210 +470,210 @@ Region::Region(const LocationStaticStorage& location) :
 
     int64 beginTimestamp = getTimestampNS();
 
-    int currentDepth = ctx.getCurrentDepth() + 1;
-    switch (location.flags & REGION_FLAG_IMPL_MASK)
+    صحيح currentDepth = ctx.getCurrentDepth() + 1;
+    بدل (location.flags & REGION_FLAG_IMPL_MASK)
     {
 #ifdef HAVE_IPP
-    case REGION_FLAG_IMPL_IPP:
-        if (!ctx.stat_status.ignoreDepthImplIPP)
+    حالة REGION_FLAG_IMPL_IPP:
+        𐤀𐤌 (!ctx.stat_status.ignoreDepthImplIPP)
             ctx.stat_status.ignoreDepthImplIPP = currentDepth;
-        break;
+        اكسر;
 #endif
 #ifdef HAVE_OPENCL
-    case REGION_FLAG_IMPL_OPENCL:
-        if (!ctx.stat_status.ignoreDepthImplOpenCL)
+    حالة REGION_FLAG_IMPL_OPENCL:
+        𐤀𐤌 (!ctx.stat_status.ignoreDepthImplOpenCL)
             ctx.stat_status.ignoreDepthImplOpenCL = currentDepth;
-        break;
+        اكسر;
 #endif
-    default:
-        break;
+    افتراضي:
+        اكسر;
     }
 
-    ctx.stackPush(this, &location, beginTimestamp);
+    ctx.stackPush(هذا, &location, beginTimestamp);
     implFlags |= REGION_FLAG__NEED_STACK_POP;
 
-    if ((location.flags & REGION_FLAG_REGION_FORCE) == 0)
+    𐤀𐤌 ((location.flags & REGION_FLAG_REGION_FORCE) == 0)
     {
-        if (ctx.stat_status._skipDepth >= 0 && currentDepth > ctx.stat_status._skipDepth)
+        𐤀𐤌 (ctx.stat_status._skipDepth >= 0 && currentDepth > ctx.stat_status._skipDepth)
         {
             CV_LOG(_spaces(ctx.getCurrentDepth()*4) << "Parent region is disabled. Bailout");
             ctx.stat.currentSkippedRegions++;
-            return;
+            أرجع;
         }
 
-        if (param_maxRegionChildrenOpenCV > 0 && (location.flags & REGION_FLAG_APP_CODE) == 0 && parentLocation && (parentLocation->flags & REGION_FLAG_APP_CODE) == 0)
+        𐤀𐤌 (param_maxRegionChildrenOpenCV > 0 && (location.flags & REGION_FLAG_APP_CODE) == 0 && parentLocation && (parentLocation->flags & REGION_FLAG_APP_CODE) == 0)
         {
-            if (parentChildren >= param_maxRegionChildrenOpenCV)
+            𐤀𐤌 (parentChildren >= param_maxRegionChildrenOpenCV)
             {
-                CV_LOG_TRACE_BAILOUT(NULL, _spaces(ctx.getCurrentDepth()*4) << "OpenCV parent region exceeds children count. Bailout");
+                CV_LOG_TRACE_BAILOUT(عدم, _spaces(ctx.getCurrentDepth()*4) << "OpenCV parent region exceeds children count. Bailout");
                 ctx.stat_status.enableSkipMode(currentDepth - 1);
                 ctx.stat.currentSkippedRegions++;
-                DEBUG_ONLY(ctx.dumpStack(std::cout, false));
-                return;
+                DEBUG_ONLY(ctx.dumpStack(std::cout, خطأ));
+                أرجع;
             }
         }
-        if (param_maxRegionChildren > 0 && parentChildren >= param_maxRegionChildren)
+        𐤀𐤌 (param_maxRegionChildren > 0 && parentChildren >= param_maxRegionChildren)
         {
-            CV_LOG_TRACE_BAILOUT(NULL, _spaces(ctx.getCurrentDepth()*4) << "Parent region exceeds children count. Bailout");
+            CV_LOG_TRACE_BAILOUT(عدم, _spaces(ctx.getCurrentDepth()*4) << "Parent region exceeds children count. Bailout");
             ctx.stat_status.enableSkipMode(currentDepth - 1);
             ctx.stat.currentSkippedRegions++;
-            DEBUG_ONLY(ctx.dumpStack(std::cout, false));
-            return;
+            DEBUG_ONLY(ctx.dumpStack(std::cout, خطأ));
+            أرجع;
         }
     }
 
     LocationExtraData::init(location);
 
-    if ((*location.ppExtra)->global_location_id == 0)
+    𐤀𐤌 ((*location.ppExtra)->global_location_id == 0)
     {
-        CV_LOG_TRACE_BAILOUT(NULL, _spaces(ctx.getCurrentDepth()*4) << "Region location is disabled. Bailout");
+        CV_LOG_TRACE_BAILOUT(عدم, _spaces(ctx.getCurrentDepth()*4) << "Region location is disabled. Bailout");
         ctx.stat_status.enableSkipMode(currentDepth);
         ctx.stat.currentSkippedRegions++;
-        return;
+        أرجع;
     }
 
-    if (parentLocation && (parentLocation->flags & REGION_FLAG_SKIP_NESTED))
+    𐤀𐤌 (parentLocation && (parentLocation->flags & REGION_FLAG_SKIP_NESTED))
     {
         CV_LOG(_spaces(ctx.getCurrentDepth()*4) << "Parent region disables inner regions. Bailout");
         ctx.stat_status.enableSkipMode(currentDepth);
         ctx.stat.currentSkippedRegions++;
-        return;
+        أرجع;
     }
 
-    if (param_maxRegionDepthOpenCV)
+    𐤀𐤌 (param_maxRegionDepthOpenCV)
     {
-        if ((location.flags & REGION_FLAG_APP_CODE) == 0)
+        𐤀𐤌 ((location.flags & REGION_FLAG_APP_CODE) == 0)
         {
-            if (ctx.regionDepthOpenCV >= param_maxRegionDepthOpenCV)
+            𐤀𐤌 (ctx.regionDepthOpenCV >= param_maxRegionDepthOpenCV)
             {
                 CV_LOG(_spaces(ctx.getCurrentDepth()*4) << "OpenCV region depth is exceed = " << ctx.regionDepthOpenCV << ". Bailout");
-                if (ctx.stat.currentSkippedRegions == 0)
+                𐤀𐤌 (ctx.stat.currentSkippedRegions == 0)
                 {
-                    DEBUG_ONLY(ctx.dumpStack(std::cout, false));
+                    DEBUG_ONLY(ctx.dumpStack(std::cout, خطأ));
                 }
                 ctx.stat_status.enableSkipMode(currentDepth);
                 ctx.stat.currentSkippedRegions++;
-                return;
+                أرجع;
             }
         }
     }
 
-    new Impl(ctx, parentRegion, *this, location, beginTimestamp);
-    CV_DbgAssert(pImpl != NULL);
+    جديد Impl(ctx, parentRegion, *هذا, location, beginTimestamp);
+    CV_DbgAssert(pImpl != عدم);
     implFlags |= REGION_FLAG__ACTIVE;
 
     // parallel_for path
-    if (parentRegion && parentRegion->pImpl)
+    𐤀𐤌 (parentRegion && parentRegion->pImpl)
     {
-        if (parentLocation == NULL)
+        𐤀𐤌 (parentLocation == عدم)
         {
             pImpl->directChildrenCount = parentChildren;
         }
     }
 }
 
-void Region::destroy()
+فراغ Region::destroy()
 {
     CV_DbgAssert(implFlags != 0);
 
     TraceManagerThreadLocal& ctx = getTraceManager().tls.getRef();
-    CV_LOG(_spaces(ctx.getCurrentDepth()*4) << "Region::destruct(): " << (void*)this << " pImpl=" << pImpl << " implFlags=" << implFlags << ' ' << (ctx.stackTopLocation() ? ctx.stackTopLocation()->name : "<unknown>"));
+    CV_LOG(_spaces(ctx.getCurrentDepth()*4) << "Region::destruct(): " << (فراغ*)هذا << " pImpl=" << pImpl << " implFlags=" << implFlags << ' ' << (ctx.stackTopLocation() ? ctx.stackTopLocation()->name : "<unknown>"));
 
     CV_DbgAssert(implFlags & REGION_FLAG__NEED_STACK_POP);
-    const int currentDepth = ctx.getCurrentDepth(); CV_UNUSED(currentDepth);
+    ثابت صحيح currentDepth = ctx.getCurrentDepth(); CV_UNUSED(currentDepth);
 
-    CV_LOG_CTX_STAT(NULL, _spaces(currentDepth*4) << ctx.stat << ' ' << ctx.stat_status);
+    CV_LOG_CTX_STAT(عدم, _spaces(currentDepth*4) << ctx.stat << ' ' << ctx.stat_status);
 
-    const Region::LocationStaticStorage* location = ctx.stackTopLocation();
+    ثابت Region::LocationStaticStorage* location = ctx.stackTopLocation();
     Impl::OptimizationPath myCodePath = Impl::CODE_PATH_PLAIN;
-    if (location)
+    𐤀𐤌 (location)
     {
-        switch (location->flags & REGION_FLAG_IMPL_MASK)
+        بدل (location->flags & REGION_FLAG_IMPL_MASK)
         {
 #ifdef HAVE_IPP
-        case REGION_FLAG_IMPL_IPP:
+        حالة REGION_FLAG_IMPL_IPP:
             myCodePath = Impl::CODE_PATH_IPP;
-            break;
+            اكسر;
 #endif
 #ifdef HAVE_OPENCL
-        case REGION_FLAG_IMPL_OPENCL:
-            if (param_synchronizeOpenCL && cv::ocl::isOpenCLActivated())
+        حالة REGION_FLAG_IMPL_OPENCL:
+            𐤀𐤌 (param_synchronizeOpenCL && cv::ocl::isOpenCLActivated())
                 cv::ocl::finish();
             myCodePath = Impl::CODE_PATH_OPENCL;
-            break;
+            اكسر;
 #endif
-        default:
-            break;
+        افتراضي:
+            اكسر;
         }
     }
 
     int64 endTimestamp = getTimestampNS();
     int64 duration = endTimestamp - ctx.stackTopBeginTimestamp();
 
-    bool active = isActive();
+    منطقي active = isActive();
 
-    if (active)
+    𐤀𐤌 (active)
         ctx.stat.duration = duration;
-    else if (ctx.stack.size() == ctx.parallel_for_stack_size + 1)
+    وإلا 𐤀𐤌 (ctx.stack.size() == ctx.parallel_for_stack_size + 1)
         ctx.stat.duration += duration;
 
-    switch (myCodePath) {
-        case Impl::CODE_PATH_PLAIN:
+    بدل (myCodePath) {
+        حالة Impl::CODE_PATH_PLAIN:
             // nothing
-            break;
+            اكسر;
 #ifdef HAVE_IPP
-        case Impl::CODE_PATH_IPP:
-            if (ctx.stat_status.ignoreDepthImplIPP == currentDepth)
+        حالة Impl::CODE_PATH_IPP:
+            𐤀𐤌 (ctx.stat_status.ignoreDepthImplIPP == currentDepth)
             {
                 ctx.stat.durationImplIPP += duration;
                 ctx.stat_status.ignoreDepthImplIPP = 0;
             }
-            else if (active)
+            وإلا 𐤀𐤌 (active)
             {
                 ctx.stat.durationImplIPP = duration;
             }
-            break;
+            اكسر;
 #endif
 #ifdef HAVE_OPENCL
-        case Impl::CODE_PATH_OPENCL:
-            if (ctx.stat_status.ignoreDepthImplOpenCL == currentDepth)
+        حالة Impl::CODE_PATH_OPENCL:
+            𐤀𐤌 (ctx.stat_status.ignoreDepthImplOpenCL == currentDepth)
             {
                 ctx.stat.durationImplOpenCL += duration;
                 ctx.stat_status.ignoreDepthImplOpenCL = 0;
             }
-            else if (active)
+            وإلا 𐤀𐤌 (active)
             {
                 ctx.stat.durationImplOpenCL = duration;
             }
-            break;
+            اكسر;
 #endif
-        default:
-            break;
+        افتراضي:
+            اكسر;
     }
 
-    if (pImpl)
+    𐤀𐤌 (pImpl)
     {
         CV_DbgAssert((implFlags & (REGION_FLAG__ACTIVE | REGION_FLAG__NEED_STACK_POP)) == (REGION_FLAG__ACTIVE | REGION_FLAG__NEED_STACK_POP));
-        CV_DbgAssert(ctx.stackTopRegion() == this);
+        CV_DbgAssert(ctx.stackTopRegion() == هذا);
         pImpl->endTimestamp = endTimestamp;
         pImpl->leaveRegion(ctx);
         pImpl->release();
-        pImpl = NULL;
+        pImpl = عدم;
         DEBUG_ONLY(implFlags &= ~REGION_FLAG__ACTIVE);
     }
-    else
+    وإلا
     {
         CV_DbgAssert(ctx.stat_status._skipDepth <= currentDepth);
     }
 
-    if (implFlags & REGION_FLAG__NEED_STACK_POP)
+    𐤀𐤌 (implFlags & REGION_FLAG__NEED_STACK_POP)
     {
-        CV_DbgAssert(ctx.stackTopRegion() == this);
+        CV_DbgAssert(ctx.stackTopRegion() == هذا);
         ctx.stackPop();
         ctx.stat_status.checkResetSkipMode(currentDepth);
         DEBUG_ONLY(implFlags &= ~REGION_FLAG__NEED_STACK_POP);
     }
-    CV_LOG_CTX_STAT(NULL, _spaces(currentDepth*4) << "===> " << ctx.stat << ' ' << ctx.stat_status);
+    CV_LOG_CTX_STAT(عدم, _spaces(currentDepth*4) << "===> " << ctx.stat << ' ' << ctx.stat_status);
 }
 
 
@@ -681,24 +681,24 @@ TraceManagerThreadLocal::~TraceManagerThreadLocal()
 {
 }
 
-void TraceManagerThreadLocal::dumpStack(std::ostream& out, bool onlyFunctions) const
+فراغ TraceManagerThreadLocal::dumpStack(std::ostream& out, منطقي onlyFunctions) ثابت
 {
     std::stringstream ss;
     std::deque<StackEntry>::const_iterator it = stack.begin();
     std::deque<StackEntry>::const_iterator end = stack.end();
-    int depth = 0;
-    for (; it != end; ++it)
+    صحيح depth = 0;
+    لكل (; it != end; ++it)
     {
-        const Region::LocationStaticStorage* location = it->location;
-        if (location)
+        ثابت Region::LocationStaticStorage* location = it->location;
+        𐤀𐤌 (location)
         {
-            if (!onlyFunctions || (location->flags & REGION_FLAG_FUNCTION))
+            𐤀𐤌 (!onlyFunctions || (location->flags & REGION_FLAG_FUNCTION))
             {
                 ss << _spaces(4*depth) << location->name << std::endl;
                 depth++;
             }
         }
-        else
+        وإلا
         {
             ss << _spaces(4*depth) << "<unknown>" << std::endl;
             depth++;
@@ -707,13 +707,13 @@ void TraceManagerThreadLocal::dumpStack(std::ostream& out, bool onlyFunctions) c
     out << ss.str();
 }
 
-class AsyncTraceStorage CV_FINAL : public TraceStorage
+صنف AsyncTraceStorage CV_FINAL : عام TraceStorage
 {
     mutable std::ofstream out;
-public:
-    const std::string name;
+عام:
+    ثابت std::string name;
 
-    AsyncTraceStorage(const std::string& filename) :
+    AsyncTraceStorage(ثابت std::string& filename) :
         out(filename.c_str(), std::ios::trunc),
         name(filename)
     {
@@ -725,24 +725,24 @@ public:
         out.close();
     }
 
-    bool put(const TraceMessage& msg) const CV_OVERRIDE
+    منطقي put(ثابت TraceMessage& msg) ثابت CV_OVERRIDE
     {
-        if (msg.hasError)
-            return false;
+        𐤀𐤌 (msg.hasError)
+            أرجع خطأ;
         out << msg.buffer;
         //DEBUG_ONLY(std::flush(out)); // TODO configure flag
-        return true;
+        أرجع true;
     }
 };
 
-class SyncTraceStorage CV_FINAL : public TraceStorage
+صنف SyncTraceStorage CV_FINAL : عام TraceStorage
 {
     mutable std::ofstream out;
     mutable cv::Mutex mutex;
-public:
-    const std::string name;
+عام:
+    ثابت std::string name;
 
-    SyncTraceStorage(const std::string& filename) :
+    SyncTraceStorage(ثابت std::string& filename) :
         out(filename.c_str(), std::ios::trunc),
         name(filename)
     {
@@ -755,67 +755,67 @@ public:
         out.close();
     }
 
-    bool put(const TraceMessage& msg) const CV_OVERRIDE
+    منطقي put(ثابت TraceMessage& msg) ثابت CV_OVERRIDE
     {
-        if (msg.hasError)
-            return false;
+        𐤀𐤌 (msg.hasError)
+            أرجع خطأ;
         {
             cv::AutoLock l(mutex);
             out << msg.buffer;
             std::flush(out); // TODO configure flag
         }
-        return true;
+        أرجع true;
     }
 };
 
 
-TraceStorage* TraceManagerThreadLocal::getStorage() const
+TraceStorage* TraceManagerThreadLocal::getStorage() ثابت
 {
     // TODO configuration option for stdout/single trace file
-    if (storage.empty())
+    𐤀𐤌 (storage.empty())
     {
         TraceStorage* global = getTraceManager().trace_storage.get();
-        if (global)
+        𐤀𐤌 (global)
         {
-            const std::string filepath = cv::format("%s-%03d.txt", getParameterTraceLocation().c_str(), threadID).c_str();
+            ثابت std::string filepath = cv::format("%s-%03d.txt", getParameterTraceLocation().c_str(), threadID).c_str();
             TraceMessage msg;
-            const char* pos = strrchr(filepath.c_str(), '/'); // extract filename
+            ثابت حرف* pos = strrchr(filepath.c_str(), '/'); // extract filename
 #ifdef _WIN32
-            if (!pos)
+            𐤀𐤌 (!pos)
                 pos = strrchr(filepath.c_str(), '\\');
 #endif
-            if (!pos)
+            𐤀𐤌 (!pos)
                 pos = filepath.c_str();
-            else
+            وإلا
                 pos += 1; // fix to skip extra slash in filename beginning
             msg.printf("#thread file: %s\n", pos);
             global->put(msg);
-            storage.reset(new AsyncTraceStorage(filepath));
+            storage.reset(جديد AsyncTraceStorage(filepath));
         }
     }
-    return storage.get();
+    أرجع storage.get();
 }
 
 
 
-static bool activated = false;
-static bool isInitialized = false;
+ساكن منطقي activated = خطأ;
+ساكن منطقي isInitialized = خطأ;
 
 TraceManager::TraceManager()
 {
-    (void)cv::getTimestampNS();
+    (فراغ)cv::getTimestampNS();
 
     isInitialized = true;
-    CV_LOG("TraceManager ctor: " << (void*)this);
+    CV_LOG("TraceManager ctor: " << (فراغ*)هذا);
 
     CV_LOG("TraceManager configure()");
     activated = getParameterTraceEnable();
 
-    if (activated)
-        trace_storage.reset(new SyncTraceStorage(std::string(getParameterTraceLocation()) + ".txt"));
+    𐤀𐤌 (activated)
+        trace_storage.reset(جديد SyncTraceStorage(std::string(getParameterTraceLocation()) + ".txt"));
 
 #ifdef OPENCV_WITH_ITT
-    if (isITTEnabled())
+    𐤀𐤌 (isITTEnabled())
     {
         activated = true; // force trace pipeline activation (without OpenCV storage)
         __itt_region_begin(domain, __itt_null, __itt_null, __itt_string_handle_create("OpenCVTrace"));
@@ -824,10 +824,10 @@ TraceManager::TraceManager()
 }
 TraceManager::~TraceManager()
 {
-    CV_LOG("TraceManager dtor: " << (void*)this);
+    CV_LOG("TraceManager dtor: " << (فراغ*)هذا);
 
 #ifdef OPENCV_WITH_ITT
-    if (isITTEnabled())
+    𐤀𐤌 (isITTEnabled())
     {
         __itt_region_end(domain, __itt_null);
     }
@@ -836,76 +836,76 @@ TraceManager::~TraceManager()
     std::vector<TraceManagerThreadLocal*> threads_ctx;
     tls.gather(threads_ctx);
     size_t totalEvents = 0, totalSkippedEvents = 0;
-    for (size_t i = 0; i < threads_ctx.size(); i++)
+    لكل (size_t i = 0; i < threads_ctx.size(); i++)
     {
         TraceManagerThreadLocal* ctx = threads_ctx[i];
-        if (ctx)
+        𐤀𐤌 (ctx)
         {
             totalEvents += ctx->region_counter;
             totalSkippedEvents += ctx->totalSkippedEvents;
         }
     }
-    if (totalEvents || activated)
+    𐤀𐤌 (totalEvents || activated)
     {
-        CV_LOG_INFO(NULL, "Trace: Total events: " << totalEvents);
+        CV_LOG_INFO(عدم, "Trace: Total events: " << totalEvents);
     }
-    if (totalSkippedEvents)
+    𐤀𐤌 (totalSkippedEvents)
     {
-        CV_LOG_WARNING(NULL, "Trace: Total skipped events: " << totalSkippedEvents);
+        CV_LOG_WARNING(عدم, "Trace: Total skipped events: " << totalSkippedEvents);
     }
 
     // This is a global static object, so process starts shutdown here
     // Turn off trace
     cv::__termination = true; // also set in DllMain() notifications handler for DLL_PROCESS_DETACH
-    activated = false;
+    activated = خطأ;
 }
 
-bool TraceManager::isActivated()
+منطقي TraceManager::isActivated()
 {
     // Check if process starts shutdown, and set earlyExit to true
     // to prevent further instrumentation processing earlier.
-    if (cv::__termination)
+    𐤀𐤌 (cv::__termination)
     {
-        activated = false;
-        return false;
+        activated = خطأ;
+        أرجع خطأ;
     }
 
-    if (!isInitialized)
+    𐤀𐤌 (!isInitialized)
     {
         TraceManager& m = getTraceManager();
         CV_UNUSED(m); // TODO
     }
 
-    return activated;
+    أرجع activated;
 }
 
 
-static TraceManager* getTraceManagerCallOnce()
+ساكن TraceManager* getTraceManagerCallOnce()
 {
-    static TraceManager globalInstance;
-    return &globalInstance;
+    ساكن TraceManager globalInstance;
+    أرجع &globalInstance;
 }
 TraceManager& getTraceManager()
 {
     CV_SINGLETON_LAZY_INIT_REF(TraceManager, getTraceManagerCallOnce())
 }
 
-void parallelForSetRootRegion(const Region& rootRegion, const TraceManagerThreadLocal& root_ctx)
+فراغ parallelForSetRootRegion(ثابت Region& rootRegion, ثابت TraceManagerThreadLocal& root_ctx)
 {
     TraceManagerThreadLocal& ctx = getTraceManager().tls.getRef();
 
-    if (ctx.dummy_stack_top.region == &rootRegion) // already attached
-        return;
+    𐤀𐤌 (ctx.dummy_stack_top.region == &rootRegion) // already attached
+        أرجع;
 
-    CV_Assert(ctx.dummy_stack_top.region == NULL);
-    ctx.dummy_stack_top = TraceManagerThreadLocal::StackEntry(const_cast<Region*>(&rootRegion), NULL, -1);
+    CV_Assert(ctx.dummy_stack_top.region == عدم);
+    ctx.dummy_stack_top = TraceManagerThreadLocal::StackEntry(const_cast<Region*>(&rootRegion), عدم, -1);
 
-    if (&ctx == &root_ctx)
+    𐤀𐤌 (&ctx == &root_ctx)
     {
         ctx.stat.grab(ctx.parallel_for_stat);
         ctx.parallel_for_stat_status = ctx.stat_status;
         ctx.parallel_for_stack_size = ctx.stack.size();
-        return;
+        أرجع;
     }
 
     CV_Assert(ctx.stack.empty());
@@ -920,7 +920,7 @@ void parallelForSetRootRegion(const Region& rootRegion, const TraceManagerThread
     ctx.stat_status.propagateFrom(root_ctx.stat_status);
 }
 
-void parallelForAttachNestedRegion(const Region& rootRegion)
+فراغ parallelForAttachNestedRegion(ثابت Region& rootRegion)
 {
     CV_UNUSED(rootRegion);
     TraceManagerThreadLocal& ctx = getTraceManager().tls.getRef();
@@ -928,49 +928,49 @@ void parallelForAttachNestedRegion(const Region& rootRegion)
     CV_DbgAssert(ctx.dummy_stack_top.region == &rootRegion);
 
     Region* region = ctx.getCurrentActiveRegion();
-    CV_LOG_PARALLEL(NULL, " PARALLEL_FOR: " << (void*)region << " ==> " << &rootRegion);
-    if (!region)
-        return;
+    CV_LOG_PARALLEL(عدم, " PARALLEL_FOR: " << (فراغ*)region << " ==> " << &rootRegion);
+    𐤀𐤌 (!region)
+        أرجع;
 
 #ifdef OPENCV_WITH_ITT
-    if (!rootRegion.pImpl || !rootRegion.pImpl->itt_id_registered)
-        return;
+    𐤀𐤌 (!rootRegion.pImpl || !rootRegion.pImpl->itt_id_registered)
+        أرجع;
 
-    if (!region->pImpl)
-        return;
+    𐤀𐤌 (!region->pImpl)
+        أرجع;
 
-    CV_LOG_PARALLEL(NULL, " PARALLEL_FOR ITT: " << (void*)rootRegion.pImpl->itt_id.d1 << ":" << rootRegion.pImpl->itt_id.d2 << ":" << (void*)rootRegion.pImpl->itt_id.d3 << " => "
-                                 << (void*)region->pImpl->itt_id.d1 << ":" << region->pImpl->itt_id.d2 << ":" << (void*)region->pImpl->itt_id.d3);
+    CV_LOG_PARALLEL(عدم, " PARALLEL_FOR ITT: " << (فراغ*)rootRegion.pImpl->itt_id.d1 << ":" << rootRegion.pImpl->itt_id.d2 << ":" << (فراغ*)rootRegion.pImpl->itt_id.d3 << " => "
+                                 << (فراغ*)region->pImpl->itt_id.d1 << ":" << region->pImpl->itt_id.d2 << ":" << (فراغ*)region->pImpl->itt_id.d3);
     __itt_relation_add(domain, region->pImpl->itt_id, __itt_relation_is_child_of, rootRegion.pImpl->itt_id);
 #endif
 }
 
-void parallelForFinalize(const Region& rootRegion)
+فراغ parallelForFinalize(ثابت Region& rootRegion)
 {
     TraceManagerThreadLocal& ctx = getTraceManager().tls.getRef();
 
     int64 endTimestamp = getTimestampNS();
     int64 duration = endTimestamp - ctx.stackTopBeginTimestamp();
-    CV_LOG_PARALLEL(NULL, "parallel_for duration: " << duration << " " << &rootRegion);
+    CV_LOG_PARALLEL(عدم, "parallel_for duration: " << duration << " " << &rootRegion);
 
     std::vector<TraceManagerThreadLocal*> threads_ctx;
     getTraceManager().tls.gather(threads_ctx);
     RegionStatistics parallel_for_stat;
-    for (size_t i = 0; i < threads_ctx.size(); i++)
+    لكل (size_t i = 0; i < threads_ctx.size(); i++)
     {
         TraceManagerThreadLocal* child_ctx = threads_ctx[i];
 
-        if (child_ctx && child_ctx->stackTopRegion() == &rootRegion)
+        𐤀𐤌 (child_ctx && child_ctx->stackTopRegion() == &rootRegion)
         {
-            CV_LOG_PARALLEL(NULL, "Thread=" << child_ctx->threadID << " " << child_ctx->stat);
+            CV_LOG_PARALLEL(عدم, "Thread=" << child_ctx->threadID << " " << child_ctx->stat);
             RegionStatistics child_stat;
             child_ctx->stat.grab(child_stat);
             parallel_for_stat.append(child_stat);
-            if (child_ctx != &ctx)
+            𐤀𐤌 (child_ctx != &ctx)
             {
                 child_ctx->dummy_stack_top = TraceManagerThreadLocal::StackEntry();
             }
-            else
+            وإلا
             {
                 ctx.parallel_for_stat.grab(ctx.stat);
                 ctx.stat_status = ctx.parallel_for_stat_status;
@@ -979,37 +979,37 @@ void parallelForFinalize(const Region& rootRegion)
         }
     }
 
-    float parallel_coeff = std::min(1.0f, duration / (float)(parallel_for_stat.duration));
-    CV_LOG_PARALLEL(NULL, "parallel_coeff=" << 1.0f / parallel_coeff);
-    CV_LOG_PARALLEL(NULL, parallel_for_stat);
-    if (parallel_coeff != 1.0f)
+    عائم parallel_coeff = std::min(1.0f, duration / (عائم)(parallel_for_stat.duration));
+    CV_LOG_PARALLEL(عدم, "parallel_coeff=" << 1.0f / parallel_coeff);
+    CV_LOG_PARALLEL(عدم, parallel_for_stat);
+    𐤀𐤌 (parallel_coeff != 1.0f)
     {
         parallel_for_stat.multiply(parallel_coeff);
-        CV_LOG_PARALLEL(NULL, parallel_for_stat);
+        CV_LOG_PARALLEL(عدم, parallel_for_stat);
     }
     parallel_for_stat.duration = 0;
     ctx.stat.append(parallel_for_stat);
-    CV_LOG_PARALLEL(NULL, ctx.stat);
+    CV_LOG_PARALLEL(عدم, ctx.stat);
 }
 
-struct TraceArg::ExtraData
+بنية TraceArg::ExtraData
 {
 #ifdef OPENCV_WITH_ITT
     // Special fields for ITT
-    __itt_string_handle* volatile ittHandle_name;
+    __itt_string_handle* متطاير ittHandle_name;
 #endif
-    ExtraData(TraceManagerThreadLocal& ctx, const TraceArg& arg)
+    ExtraData(TraceManagerThreadLocal& ctx, ثابت TraceArg& arg)
     {
         CV_UNUSED(ctx); CV_UNUSED(arg);
 #ifdef OPENCV_WITH_ITT
-        if (isITTEnabled())
+        𐤀𐤌 (isITTEnabled())
         {
             // Caching is not required here, because there is builtin cache.
             // https://software.intel.com/en-us/node/544203:
             //     Consecutive calls to __itt_string_handle_create with the same name return the same value.
             ittHandle_name = __itt_string_handle_create(arg.name);
         }
-        else
+        وإلا
         {
             ittHandle_name = 0;
         }
@@ -1017,96 +1017,96 @@ struct TraceArg::ExtraData
     }
 };
 
-static void initTraceArg(TraceManagerThreadLocal& ctx, const TraceArg& arg)
+ساكن فراغ initTraceArg(TraceManagerThreadLocal& ctx, ثابت TraceArg& arg)
 {
     TraceArg::ExtraData** pExtra = arg.ppExtra;
-    if (*pExtra == NULL)
+    𐤀𐤌 (*pExtra == عدم)
     {
         cv::AutoLock lock(cv::getInitializationMutex());
-        if (*pExtra == NULL)
+        𐤀𐤌 (*pExtra == عدم)
         {
-            *pExtra = new TraceArg::ExtraData(ctx, arg);
+            *pExtra = جديد TraceArg::ExtraData(ctx, arg);
         }
     }
 }
-void traceArg(const TraceArg& arg, const char* value)
+فراغ traceArg(ثابت TraceArg& arg, ثابت حرف* value)
 {
     TraceManagerThreadLocal& ctx = getTraceManager().tls.getRef();
     Region* region = ctx.getCurrentActiveRegion();
-    if (!region)
-        return;
+    𐤀𐤌 (!region)
+        أرجع;
     CV_Assert(region->pImpl);
     initTraceArg(ctx, arg);
-    if (!value)
+    𐤀𐤌 (!value)
         value = "<null>";
 #ifdef OPENCV_WITH_ITT
-    if (isITTEnabled())
+    𐤀𐤌 (isITTEnabled())
     {
         __itt_metadata_str_add(domain, region->pImpl->itt_id, (*arg.ppExtra)->ittHandle_name, value, strlen(value));
     }
 #endif
 }
-void traceArg(const TraceArg& arg, int value)
+فراغ traceArg(ثابت TraceArg& arg, صحيح value)
 {
     TraceManagerThreadLocal& ctx = getTraceManager().tls.getRef();
     Region* region = ctx.getCurrentActiveRegion();
-    if (!region)
-        return;
+    𐤀𐤌 (!region)
+        أرجع;
     CV_Assert(region->pImpl);
     initTraceArg(ctx, arg);
 #ifdef OPENCV_WITH_ITT
-    if (isITTEnabled())
+    𐤀𐤌 (isITTEnabled())
     {
-        __itt_metadata_add(domain, region->pImpl->itt_id, (*arg.ppExtra)->ittHandle_name, sizeof(int) == 4 ? __itt_metadata_s32 : __itt_metadata_s64, 1, &value);
+        __itt_metadata_add(domain, region->pImpl->itt_id, (*arg.ppExtra)->ittHandle_name, حجم(صحيح) == 4 ? __itt_metadata_s32 : __itt_metadata_s64, 1, &value);
     }
-#else
+#وإلا
     CV_UNUSED(value);
 #endif
 }
-void traceArg(const TraceArg& arg, int64 value)
+فراغ traceArg(ثابت TraceArg& arg, int64 value)
 {
     TraceManagerThreadLocal& ctx = getTraceManager().tls.getRef();
     Region* region = ctx.getCurrentActiveRegion();
-    if (!region)
-        return;
+    𐤀𐤌 (!region)
+        أرجع;
     CV_Assert(region->pImpl);
     initTraceArg(ctx, arg);
 #ifdef OPENCV_WITH_ITT
-    if (isITTEnabled())
+    𐤀𐤌 (isITTEnabled())
     {
         __itt_metadata_add(domain, region->pImpl->itt_id, (*arg.ppExtra)->ittHandle_name, __itt_metadata_s64, 1, &value);
     }
-#else
+#وإلا
     CV_UNUSED(value);
 #endif
 }
-void traceArg(const TraceArg& arg, double value)
+فراغ traceArg(ثابت TraceArg& arg, مزدوج value)
 {
     TraceManagerThreadLocal& ctx = getTraceManager().tls.getRef();
     Region* region = ctx.getCurrentActiveRegion();
-    if (!region)
-        return;
+    𐤀𐤌 (!region)
+        أرجع;
     CV_Assert(region->pImpl);
     initTraceArg(ctx, arg);
 #ifdef OPENCV_WITH_ITT
-    if (isITTEnabled())
+    𐤀𐤌 (isITTEnabled())
     {
         __itt_metadata_add(domain, region->pImpl->itt_id, (*arg.ppExtra)->ittHandle_name, __itt_metadata_double, 1, &value);
     }
-#else
+#وإلا
     CV_UNUSED(value);
 #endif
 }
 
-#else
+#وإلا
 
-Region::Region(const LocationStaticStorage&) : pImpl(NULL), implFlags(0) {}
-void Region::destroy() {}
+Region::Region(ثابت LocationStaticStorage&) : pImpl(عدم), implFlags(0) {}
+فراغ Region::destroy() {}
 
-void traceArg(const TraceArg&, const char*) {}
-void traceArg(const TraceArg&, int) {};
-void traceArg(const TraceArg&, int64) {};
-void traceArg(const TraceArg&, double) {};
+فراغ traceArg(ثابت TraceArg&, ثابت حرف*) {}
+فراغ traceArg(ثابت TraceArg&, صحيح) {};
+فراغ traceArg(ثابت TraceArg&, int64) {};
+فراغ traceArg(ثابت TraceArg&, مزدوج) {};
 
 #endif
 

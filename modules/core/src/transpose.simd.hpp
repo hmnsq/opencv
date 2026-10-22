@@ -4,29 +4,29 @@
 // Copyright (C) 2026, BigVision LLC, all rights reserved.
 // Third party copyrights are property of their respective owners.
 
-#include "opencv2/core/hal/intrin.hpp"
+#ضمن "opencv2/core/hal/intrin.hpp"
 
-namespace cv {
+نطاق cv {
 
 CV_CPU_OPTIMIZATION_NAMESPACE_BEGIN
 
-void transpose_32bit_blocks_simd(const uchar* src, size_t sstep,
+فراغ transpose_32bit_blocks_simd(ثابت uchar* src, size_t sstep,
                                  uchar* dst, size_t dstep, Size sz);
 
 #ifndef CV_CPU_OPTIMIZATION_DECLARATIONS_ONLY
 
-static inline void transpose_32bit_blocks_tile(const uint32_t* src32, size_t sstep_e,
+ساكن مضمن فراغ transpose_32bit_blocks_tile(ثابت uint32_t* src32, size_t sstep_e,
                                                uint32_t* dst32, size_t dstep_e,
-                                               int i_lo, int i_hi, int j_lo, int j_hi)
+                                               صحيح i_lo, صحيح i_hi, صحيح j_lo, صحيح j_hi)
 {
-    int i = i_lo;
-#if (CV_SIMD || CV_SIMD_SCALABLE)
-    if (VTraits<v_uint32>::vlanes() == 8)
+    صحيح i = i_lo;
+#𐤀𐤌 (CV_SIMD || CV_SIMD_SCALABLE)
+    𐤀𐤌 (VTraits<v_uint32>::vlanes() == 8)
     {
-        for (; i + 8 <= i_hi; i += 8)
+        لكل (; i + 8 <= i_hi; i += 8)
         {
-            int j = j_lo;
-            for (; j + 8 <= j_hi; j += 8)
+            صحيح j = j_lo;
+            لكل (; j + 8 <= j_hi; j += 8)
             {
                 v_uint32 r0 = vx_load(src32 + i + sstep_e*(j+0));
                 v_uint32 r1 = vx_load(src32 + i + sstep_e*(j+1));
@@ -56,17 +56,17 @@ static inline void transpose_32bit_blocks_tile(const uint32_t* src32, size_t sst
                 vx_store(dst32 + dstep_e*(i+6) + j, b6);
                 vx_store(dst32 + dstep_e*(i+7) + j, b7);
             }
-            for (; j < j_hi; j++)
-                for (int k = 0; k < 8; k++)
+            لكل (; j < j_hi; j++)
+                لكل (صحيح k = 0; k < 8; k++)
                     dst32[dstep_e*(i+k) + j] = src32[i + sstep_e*j + k];
         }
     }
-    else if (VTraits<v_uint32>::vlanes() == 4)
+    وإلا 𐤀𐤌 (VTraits<v_uint32>::vlanes() == 4)
     {
-        for (; i + 4 <= i_hi; i += 4)
+        لكل (; i + 4 <= i_hi; i += 4)
         {
-            int j = j_lo;
-            for (; j + 4 <= j_hi; j += 4)
+            صحيح j = j_lo;
+            لكل (; j + 4 <= j_hi; j += 4)
             {
                 v_uint32 r0 = vx_load(src32 + i + sstep_e*(j+0));
                 v_uint32 r1 = vx_load(src32 + i + sstep_e*(j+1));
@@ -79,46 +79,46 @@ static inline void transpose_32bit_blocks_tile(const uint32_t* src32, size_t sst
                 vx_store(dst32 + dstep_e*(i+2) + j, o2);
                 vx_store(dst32 + dstep_e*(i+3) + j, o3);
             }
-            for (; j < j_hi; j++)
-                for (int k = 0; k < 4; k++)
+            لكل (; j < j_hi; j++)
+                لكل (صحيح k = 0; k < 4; k++)
                     dst32[dstep_e*(i+k) + j] = src32[i + sstep_e*j + k];
         }
     }
 #endif
-    for (; i < i_hi; i++)
-        for (int j = j_lo; j < j_hi; j++)
+    لكل (; i < i_hi; i++)
+        لكل (صحيح j = j_lo; j < j_hi; j++)
             dst32[dstep_e*i + j] = src32[i + sstep_e*j];
 }
 
-void transpose_32bit_blocks_simd(const uchar* src, size_t sstep,
+فراغ transpose_32bit_blocks_simd(ثابت uchar* src, size_t sstep,
                                  uchar* dst, size_t dstep, Size sz)
 {
-    const uint32_t* src32 = reinterpret_cast<const uint32_t*>(src);
+    ثابت uint32_t* src32 = reinterpret_cast<ثابت uint32_t*>(src);
     uint32_t* dst32 = reinterpret_cast<uint32_t*>(dst);
-    const size_t sstep_e = sstep / sizeof(uint32_t);
-    const size_t dstep_e = dstep / sizeof(uint32_t);
-    const int m = sz.width, n = sz.height;
+    ثابت size_t sstep_e = sstep / حجم(uint32_t);
+    ثابت size_t dstep_e = dstep / حجم(uint32_t);
+    ثابت صحيح m = sz.width, n = sz.height;
 
     // Single-threaded for small inputs to avoid parallel_for_ overhead.
-    const int64_t kMinParallelElements = 64 * 1024;
-    if ((int64_t)m * n < kMinParallelElements)
+    ثابت int64_t kMinParallelElements = 64 * 1024;
+    𐤀𐤌 ((int64_t)m * n < kMinParallelElements)
     {
         transpose_32bit_blocks_tile(src32, sstep_e, dst32, dstep_e, 0, m, 0, n);
-        return;
+        أرجع;
     }
 
-    const int TILE = 32;
-    const int mtiles = (m + TILE - 1) / TILE;
-    const int ntiles = (n + TILE - 1) / TILE;
-    const int64_t totalTiles = (int64_t)mtiles * ntiles;
-    parallel_for_(Range(0, (int)totalTiles), [&](const Range& r)
+    ثابت صحيح TILE = 32;
+    ثابت صحيح mtiles = (m + TILE - 1) / TILE;
+    ثابت صحيح ntiles = (n + TILE - 1) / TILE;
+    ثابت int64_t totalTiles = (int64_t)mtiles * ntiles;
+    parallel_for_(Range(0, (صحيح)totalTiles), [&](ثابت Range& r)
     {
-        for (int idx = r.start; idx < r.end; idx++)
+        لكل (صحيح idx = r.start; idx < r.end; idx++)
         {
-            int ti = idx / ntiles;
-            int tj = idx - ti * ntiles;
-            int i_lo = ti * TILE, i_hi = std::min(i_lo + TILE, m);
-            int j_lo = tj * TILE, j_hi = std::min(j_lo + TILE, n);
+            صحيح ti = idx / ntiles;
+            صحيح tj = idx - ti * ntiles;
+            صحيح i_lo = ti * TILE, i_hi = std::min(i_lo + TILE, m);
+            صحيح j_lo = tj * TILE, j_hi = std::min(j_lo + TILE, n);
             transpose_32bit_blocks_tile(src32, sstep_e, dst32, dstep_e, i_lo, i_hi, j_lo, j_hi);
         }
     });

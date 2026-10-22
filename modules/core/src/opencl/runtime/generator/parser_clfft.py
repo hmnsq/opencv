@@ -1,36 +1,36 @@
 #!/bin/python
 # usage:
 #     cat clFFT.h | $0
-from __future__ import print_function
-import sys, re;
+من __future__ استورد print_function
+استورد sys, re;
 
-from common import remove_comments, getTokens, getParameters, postProcessParameters
+من common استورد remove_comments, getTokens, getParameters, postProcessParameters
 
 
-try:
-    if len(sys.argv) > 1:
+حاول:
+    𐤀𐤌 len(sys.argv) > 1:
         f = open(sys.argv[1], "r")
-    else:
+    وإلا:
         f = sys.stdin
-except:
+استثناء:
     sys.exit("ERROR. Can't open input file")
 
 fns = []
 
-while True:
+طالما صحيح:
     line = f.readline()
-    if len(line) == 0:
-        break
-    assert isinstance(line, str)
+    𐤀𐤌 len(line) == 0:
+        اكسر
+    أكد isinstance(line, str)
     line = line.strip()
-    if line.startswith('CLFFTAPI'):
+    𐤀𐤌 line.startswith('CLFFTAPI'):
         line = re.sub(r'\n', r'', line)
-        while True:
+        طالما صحيح:
             nl = f.readline()
             nl = nl.strip()
             nl = re.sub(r'\n', r'', nl)
-            if len(nl) == 0:
-                break;
+            𐤀𐤌 len(nl) == 0:
+                اكسر;
             line += ' ' + nl
 
         line = remove_comments(line)
@@ -43,19 +43,19 @@ while True:
         calling = []
 
         i = 0
-        while True:
-            if parts[i] == "CLFFTAPI":
+        طالما صحيح:
+            𐤀𐤌 parts[i] == "CLFFTAPI":
                 modifiers.append(parts[i])
-            else:
-                break
+            وإلا:
+                اكسر
             i += 1
-        while (i < len(parts)):
-            if not parts[i] == '(':
+        طالما (i < len(parts)):
+            𐤀𐤌 𐤋𐤀 parts[i] == '(':
                 ret.append(parts[i])
-            else:
+            وإلا:
                 del ret[-1]
                 i -= 1
-                break
+                اكسر
             i += 1
 
         fn['modifiers'] = []  # modifiers
@@ -68,7 +68,7 @@ while True:
 
         params = getParameters(i, parts)
 
-        if len(params) > 0 and params[0] == 'void':
+        𐤀𐤌 len(params) > 0 𐤅 params[0] == 'void':
             del params[0]
 
         fn['params'] = params
@@ -82,17 +82,17 @@ print('Found %d functions' % len(fns))
 
 postProcessParameters(fns)
 
-from pprint import pprint
+من pprint استورد pprint
 pprint(fns)
 
-from common import *
+من common استورد *
 
 filterFileName='./filter/opencl_clfft_functions.list'
 numEnabled = readFunctionFilter(fns, filterFileName)
 
 functionsFilter = generateFilterNames(fns)
 filter_file = open(filterFileName, 'w')
-filter_file.write(functionsFilter)
+filter_file.اكتب(functionsFilter)
 
 ctx = {}
 ctx['CLAMDFFT_REMAP_ORIGIN'] = generateRemapOrigin(fns)
