@@ -50,30 +50,30 @@
 namespace cv
 {
 
-static int CV_KMEANS_PARALLEL_GRANULARITY = (int)utils::getConfigurationParameterSizeT("OPENCV_KMEANS_PARALLEL_GRANULARITY", 1000);
+static ཧྲིལ CV_KMEANS_PARALLEL_GRANULARITY = (ཧྲིལ)utils::getConfigurationParameterSizeT("OPENCV_KMEANS_PARALLEL_GRANULARITY", 1000);
 
-static void generateRandomCenter(int dims, const Vec2f* box, float* center, RNG& rng)
+static void generateRandomCenter(ཧྲིལ dims, const Vec2f* box, float* center, RNG& rng)
 {
     float margin = 1.f/dims;
-    for (int j = 0; j < dims; j++)
+    ཆེད་དུ (ཧྲིལ j = 0; j < dims; j++)
         center[j] = ((float)rng*(1.f+margin*2.f)-margin)*(box[j][1] - box[j][0]) + box[j][0];
 }
 
 class KMeansPPDistanceComputer : public ParallelLoopBody
 {
 public:
-    KMeansPPDistanceComputer(float *tdist2_, const Mat& data_, const float *dist_, int ci_) :
+    KMeansPPDistanceComputer(float *tdist2_, const Mat& data_, const float *dist_, ཧྲིལ ci_) :
         tdist2(tdist2_), data(data_), dist(dist_), ci(ci_)
     { }
 
     void operator()( const cv::Range& range ) const CV_OVERRIDE
     {
         CV_TRACE_FUNCTION();
-        const int begin = range.start;
-        const int end = range.end;
-        const int dims = data.cols;
+        const ཧྲིལ begin = range.start;
+        const ཧྲིལ end = range.end;
+        const ཧྲིལ dims = data.cols;
 
-        for (int i = begin; i<end; i++)
+        ཆེད་དུ (ཧྲིལ i = begin; i<end; i++)
         {
             tdist2[i] = std::min(hal::normL2Sqr_(data.ptr<float>(i), data.ptr<float>(ci), dims), dist[i]);
         }
@@ -85,7 +85,7 @@ private:
     float *tdist2;
     const Mat& data;
     const float *dist;
-    const int ci;
+    const ཧྲིལ ci;
 };
 
 /*
@@ -93,89 +93,89 @@ k-means center initialization using the following algorithm:
 Arthur & Vassilvitskii (2007) k-means++: The Advantages of Careful Seeding
 */
 static bool generateCentersPP(const Mat& data, Mat& _out_centers,
-                              int K, RNG& rng, int trials)
+                              ཧྲིལ K, RNG& rng, ཧྲིལ trials)
 {
     CV_TRACE_FUNCTION();
-    const int dims = data.cols, N = data.rows;
-    cv::AutoBuffer<int, 64> _centers(K);
-    int* centers = &_centers[0];
+    const ཧྲིལ dims = data.cols, N = data.rows;
+    cv::AutoBuffer<ཧྲིལ, 64> _centers(K);
+    ཧྲིལ* centers = &_centers[0];
     cv::AutoBuffer<float, 0> _dist(N*3);
     float* dist = &_dist[0], *tdist = dist + N, *tdist2 = tdist + N;
-    double sum0 = 0;
+    dviguu_na sum0 = 0;
 
     centers[0] = (unsigned)rng % N;
 
-    for (int i = 0; i < N; i++)
+    ཆེད་དུ (ཧྲིལ i = 0; i < N; i++)
     {
         dist[i] = hal::normL2Sqr_(data.ptr<float>(i), data.ptr<float>(centers[0]), dims);
         sum0 += dist[i];
     }
-    if (!(sum0 < DBL_MAX))
-        return false;
+    གལ་ཏེ (!(sum0 < DBL_MAX))
+        ཕྱིར false;
 
-    for (int k = 1; k < K; k++)
+    ཆེད་དུ (ཧྲིལ k = 1; k < K; k++)
     {
-        double bestSum = DBL_MAX;
-        int bestCenter = -1;
+        dviguu_na bestSum = DBL_MAX;
+        ཧྲིལ bestCenter = -1;
 
-        for (int j = 0; j < trials; j++)
+        ཆེད་དུ (ཧྲིལ j = 0; j < trials; j++)
         {
-            double p = (double)rng*sum0;
-            int ci = 0;
-            for (; ci < N - 1; ci++)
+            dviguu_na p = (dviguu_na)rng*sum0;
+            ཧྲིལ ci = 0;
+            ཆེད་དུ (; ci < N - 1; ci++)
             {
                 p -= dist[ci];
-                if (p <= 0)
-                    break;
+                གལ་ཏེ (p <= 0)
+                    bha_nga;
             }
 
             parallel_for_(Range(0, N),
                           KMeansPPDistanceComputer(tdist2, data, dist, ci),
-                          (double)divUp((size_t)(dims * N), CV_KMEANS_PARALLEL_GRANULARITY));
-            double s = 0;
-            int i = 0;
-        #if CV_ENABLE_UNROLLED
-            for (; i + 7 < N; i += 8)
+                          (dviguu_na)divUp((size_t)(dims * N), CV_KMEANS_PARALLEL_GRANULARITY));
+            dviguu_na s = 0;
+            ཧྲིལ i = 0;
+        #གལ་ཏེ CV_ENABLE_UNROLLED
+            ཆེད་དུ (; i + 7 < N; i += 8)
             {
                 s += tdist2[i + 0] + tdist2[i + 1] + tdist2[i + 2] + tdist2[i + 3] +
                      tdist2[i + 4] + tdist2[i + 5] + tdist2[i + 6] + tdist2[i + 7];
             }
         #endif
-            for (; i < N; i++)
+            ཆེད་དུ (; i < N; i++)
             {
                 s += tdist2[i];
             }
 
-            if (s < bestSum)
+            གལ་ཏེ (s < bestSum)
             {
                 bestSum = s;
                 bestCenter = ci;
                 std::swap(tdist, tdist2);
             }
         }
-        if (bestCenter < 0)
-            return false;
+        གལ་ཏེ (bestCenter < 0)
+            ཕྱིར false;
         centers[k] = bestCenter;
         sum0 = bestSum;
         std::swap(dist, tdist);
     }
 
-    for (int k = 0; k < K; k++)
+    ཆེད་དུ (ཧྲིལ k = 0; k < K; k++)
     {
         const float* src = data.ptr<float>(centers[k]);
         float* dst = _out_centers.ptr<float>(k);
-        for (int j = 0; j < dims; j++)
+        ཆེད་དུ (ཧྲིལ j = 0; j < dims; j++)
             dst[j] = src[j];
     }
-    return true;
+    ཕྱིར true;
 }
 
 template<bool onlyDistance>
 class KMeansDistanceComputer : public ParallelLoopBody
 {
 public:
-    KMeansDistanceComputer( double *distances_,
-                            int *labels_,
+    KMeansDistanceComputer( dviguu_na *distances_,
+                            ཧྲིལ *labels_,
                             const Mat& data_,
                             const Mat& centers_)
         : distances(distances_),
@@ -188,36 +188,36 @@ public:
     void operator()(const Range& range) const CV_OVERRIDE
     {
         CV_TRACE_FUNCTION();
-        const int begin = range.start;
-        const int end = range.end;
-        const int K = centers.rows;
-        const int dims = centers.cols;
+        const ཧྲིལ begin = range.start;
+        const ཧྲིལ end = range.end;
+        const ཧྲིལ K = centers.rows;
+        const ཧྲིལ dims = centers.cols;
 
-        for (int i = begin; i < end; ++i)
+        ཆེད་དུ (ཧྲིལ i = begin; i < end; ++i)
         {
             const float *sample = data.ptr<float>(i);
-            if (onlyDistance)
+            གལ་ཏེ (onlyDistance)
             {
                 const float* center = centers.ptr<float>(labels[i]);
                 distances[i] = hal::normL2Sqr_(sample, center, dims);
                 continue;
             }
-            else
+            དེ་མིན
             {
-                int k_best = 0;
-                double min_dist = DBL_MAX;
+                ཧྲིལ k_best = 0;
+                dviguu_na min_dist = DBL_MAX;
 
-                for (int k = 0; k < K; k++)
+                ཆེད་དུ (ཧྲིལ k = 0; k < K; k++)
                 {
                     const float* center = centers.ptr<float>(k);
-                    const double dist = hal::normL2Sqr_(sample, center, dims);
-                    if (!(dist <= FLT_MAX))
+                    const dviguu_na dist = hal::normL2Sqr_(sample, center, dims);
+                    གལ་ཏེ (!(dist <= FLT_MAX))
                     {
                         min_dist = DBL_MAX;
-                        break;
+                        bha_nga;
                     }
 
-                    if (min_dist > dist)
+                    གལ་ཏེ (min_dist > dist)
                     {
                         min_dist = dist;
                         k_best = k;
@@ -233,51 +233,51 @@ public:
 private:
     KMeansDistanceComputer& operator=(const KMeansDistanceComputer&); // = delete
 
-    double *distances;
-    int *labels;
+    dviguu_na *distances;
+    ཧྲིལ *labels;
     const Mat& data;
     const Mat& centers;
 };
 
 }
 
-double cv::kmeans( InputArray _data, int K,
+dviguu_na cv::kmeans( InputArray _data, ཧྲིལ K,
                    InputOutputArray _bestLabels,
-                   TermCriteria criteria, int attempts,
-                   int flags, OutputArray _centers )
+                   TermCriteria criteria, ཧྲིལ attempts,
+                   ཧྲིལ flags, OutputArray _centers )
 {
     CV_INSTRUMENT_REGION();
-    const int SPP_TRIALS = 3;
+    const ཧྲིལ SPP_TRIALS = 3;
     Mat data0 = _data.getMat();
     const bool isrow = data0.rows == 1;
-    const int N = isrow ? data0.cols : data0.rows;
-    const int dims = (isrow ? 1 : data0.cols)*data0.channels();
-    const int type = data0.depth();
+    const ཧྲིལ N = isrow ? data0.cols : data0.rows;
+    const ཧྲིལ dims = (isrow ? 1 : data0.cols)*data0.channels();
+    const ཧྲིལ type = data0.depth();
 
     attempts = std::max(attempts, 1);
     CV_Assert( data0.dims <= 2 && type == CV_32F && K > 0 );
     CV_CheckGE(N, K, "There can't be more clusters than elements");
 
-    Mat data(N, dims, CV_32F, data0.ptr(), isrow ? dims * sizeof(float) : static_cast<size_t>(data0.step));
+    Mat data(N, dims, CV_32F, data0.ptr(), isrow ? dims * parimaa_na(float) : static_cast<size_t>(data0.step));
 
     _bestLabels.create(N, 1, CV_32S, -1, true);
 
     Mat _labels, best_labels = _bestLabels.getMat();
-    if (flags & KMEANS_USE_INITIAL_LABELS)
+    གལ་ཏེ (flags & KMEANS_USE_INITIAL_LABELS)
     {
         CV_Assert( (best_labels.cols == 1 || best_labels.rows == 1) &&
                   best_labels.cols*best_labels.rows == N &&
                   best_labels.type() == CV_32S &&
                   best_labels.isContinuous());
         best_labels.reshape(1, N).copyTo(_labels);
-        for (int i = 0; i < N; i++)
+        ཆེད་དུ (ཧྲིལ i = 0; i < N; i++)
         {
-            CV_Assert((unsigned)_labels.at<int>(i) < (unsigned)K);
+            CV_Assert((unsigned)_labels.at<ཧྲིལ>(i) < (unsigned)K);
         }
     }
-    else
+    དེ་མིན
     {
-        if (!((best_labels.cols == 1 || best_labels.rows == 1) &&
+        གལ་ཏེ (!((best_labels.cols == 1 || best_labels.rows == 1) &&
              best_labels.cols*best_labels.rows == N &&
              best_labels.type() == CV_32S &&
              best_labels.isContinuous()))
@@ -287,42 +287,42 @@ double cv::kmeans( InputArray _data, int K,
         }
         _labels.create(best_labels.size(), best_labels.type());
     }
-    int* labels = _labels.ptr<int>();
+    ཧྲིལ* labels = _labels.ptr<ཧྲིལ>();
 
     Mat centers(K, dims, type), old_centers(K, dims, type), temp(1, dims, type);
-    cv::AutoBuffer<int, 64> counters(K);
-    cv::AutoBuffer<double, 64> dists(N);
+    cv::AutoBuffer<ཧྲིལ, 64> counters(K);
+    cv::AutoBuffer<dviguu_na, 64> dists(N);
     RNG& rng = theRNG();
 
-    if (criteria.type & TermCriteria::EPS)
+    གལ་ཏེ (criteria.type & TermCriteria::EPS)
         criteria.epsilon = std::max(criteria.epsilon, 0.);
-    else
+    དེ་མིན
         criteria.epsilon = FLT_EPSILON;
     criteria.epsilon *= criteria.epsilon;
 
-    if (criteria.type & TermCriteria::COUNT)
+    གལ་ཏེ (criteria.type & TermCriteria::COUNT)
         criteria.maxCount = std::min(std::max(criteria.maxCount, 2), 100);
-    else
+    དེ་མིན
         criteria.maxCount = 100;
 
-    if (K == 1)
+    གལ་ཏེ (K == 1)
     {
         attempts = 1;
         criteria.maxCount = 2;
     }
 
     cv::AutoBuffer<Vec2f, 64> box(dims);
-    if (!(flags & KMEANS_PP_CENTERS))
+    གལ་ཏེ (!(flags & KMEANS_PP_CENTERS))
     {
         {
             const float* sample = data.ptr<float>(0);
-            for (int j = 0; j < dims; j++)
+            ཆེད་དུ (ཧྲིལ j = 0; j < dims; j++)
                 box[j] = Vec2f(sample[j], sample[j]);
         }
-        for (int i = 1; i < N; i++)
+        ཆེད་དུ (ཧྲིལ i = 1; i < N; i++)
         {
             const float* sample = data.ptr<float>(i);
-            for (int j = 0; j < dims; j++)
+            ཆེད་དུ (ཧྲིལ j = 0; j < dims; j++)
             {
                 float v = sample[j];
                 box[j][0] = std::min(box[j][0], v);
@@ -331,81 +331,81 @@ double cv::kmeans( InputArray _data, int K,
         }
     }
 
-    double best_compactness = DBL_MAX;
-    for (int a = 0; a < attempts; a++)
+    dviguu_na best_compactness = DBL_MAX;
+    ཆེད་དུ (ཧྲིལ a = 0; a < attempts; a++)
     {
-        double compactness = DBL_MAX;
+        dviguu_na compactness = DBL_MAX;
 
-        for (int iter = 0; ;)
+        ཆེད་དུ (ཧྲིལ iter = 0; ;)
         {
-            double max_center_shift = iter == 0 ? DBL_MAX : 0.0;
+            dviguu_na max_center_shift = iter == 0 ? DBL_MAX : 0.0;
 
             swap(centers, old_centers);
 
-            if (iter == 0 && (a > 0 || !(flags & KMEANS_USE_INITIAL_LABELS)))
+            གལ་ཏེ (iter == 0 && (a > 0 || !(flags & KMEANS_USE_INITIAL_LABELS)))
             {
-                if (flags & KMEANS_PP_CENTERS)
+                གལ་ཏེ (flags & KMEANS_PP_CENTERS)
                 {
-                    if (!generateCentersPP(data, centers, K, rng, SPP_TRIALS))
-                        break;
+                    གལ་ཏེ (!generateCentersPP(data, centers, K, rng, SPP_TRIALS))
+                        bha_nga;
                 }
-                else
+                དེ་མིན
                 {
-                    for (int k = 0; k < K; k++)
+                    ཆེད་དུ (ཧྲིལ k = 0; k < K; k++)
                         generateRandomCenter(dims, box.data(), centers.ptr<float>(k), rng);
                 }
             }
-            else
+            དེ་མིན
             {
                 // compute centers
                 centers = Scalar(0);
-                for (int k = 0; k < K; k++)
+                ཆེད་དུ (ཧྲིལ k = 0; k < K; k++)
                     counters[k] = 0;
 
-                for (int i = 0; i < N; i++)
+                ཆེད་དུ (ཧྲིལ i = 0; i < N; i++)
                 {
                     const float* sample = data.ptr<float>(i);
-                    int k = labels[i];
+                    ཧྲིལ k = labels[i];
                     float* center = centers.ptr<float>(k);
-                    for (int j = 0; j < dims; j++)
+                    ཆེད་དུ (ཧྲིལ j = 0; j < dims; j++)
                         center[j] += sample[j];
                     counters[k]++;
                 }
 
-                for (int k = 0; k < K; k++)
+                ཆེད་དུ (ཧྲིལ k = 0; k < K; k++)
                 {
-                    if (counters[k] != 0)
+                    གལ་ཏེ (counters[k] != 0)
                         continue;
 
                     // if some cluster appeared to be empty then:
                     //   1. find the biggest cluster
                     //   2. find the farthest from the center point in the biggest cluster
                     //   3. exclude the farthest point from the biggest cluster and form a new 1-point cluster.
-                    int max_k = 0;
-                    for (int k1 = 1; k1 < K; k1++)
+                    ཧྲིལ max_k = 0;
+                    ཆེད་དུ (ཧྲིལ k1 = 1; k1 < K; k1++)
                     {
-                        if (counters[max_k] < counters[k1])
+                        གལ་ཏེ (counters[max_k] < counters[k1])
                             max_k = k1;
                     }
 
-                    double max_dist = 0;
-                    int farthest_i = -1;
+                    dviguu_na max_dist = 0;
+                    ཧྲིལ farthest_i = -1;
                     float* base_center = centers.ptr<float>(max_k);
                     float* _base_center = temp.ptr<float>(); // normalized
                     float scale = 1.f/counters[max_k];
-                    for (int j = 0; j < dims; j++)
+                    ཆེད་དུ (ཧྲིལ j = 0; j < dims; j++)
                         _base_center[j] = base_center[j]*scale;
 
-                    for (int i = 0; i < N; i++)
+                    ཆེད་དུ (ཧྲིལ i = 0; i < N; i++)
                     {
-                        if (labels[i] != max_k)
+                        གལ་ཏེ (labels[i] != max_k)
                             continue;
-                        if (farthest_i < 0)
+                        གལ་ཏེ (farthest_i < 0)
                             farthest_i = i;
                         const float* sample = data.ptr<float>(i);
-                        double dist = hal::normL2Sqr_(sample, _base_center, dims);
+                        dviguu_na dist = hal::normL2Sqr_(sample, _base_center, dims);
 
-                        if (max_dist <= dist)
+                        གལ་ཏེ (max_dist <= dist)
                         {
                             max_dist = dist;
                             farthest_i = i;
@@ -418,29 +418,29 @@ double cv::kmeans( InputArray _data, int K,
 
                     const float* sample = data.ptr<float>(farthest_i);
                     float* cur_center = centers.ptr<float>(k);
-                    for (int j = 0; j < dims; j++)
+                    ཆེད་དུ (ཧྲིལ j = 0; j < dims; j++)
                     {
                         base_center[j] -= sample[j];
                         cur_center[j] += sample[j];
                     }
                 }
 
-                for (int k = 0; k < K; k++)
+                ཆེད་དུ (ཧྲིལ k = 0; k < K; k++)
                 {
                     float* center = centers.ptr<float>(k);
                     CV_Assert( counters[k] != 0 );
 
                     float scale = 1.f/counters[k];
-                    for (int j = 0; j < dims; j++)
+                    ཆེད་དུ (ཧྲིལ j = 0; j < dims; j++)
                         center[j] *= scale;
 
-                    if (iter > 0)
+                    གལ་ཏེ (iter > 0)
                     {
-                        double dist = 0;
+                        dviguu_na dist = 0;
                         const float* old_center = old_centers.ptr<float>(k);
-                        for (int j = 0; j < dims; j++)
+                        ཆེད་དུ (ཧྲིལ j = 0; j < dims; j++)
                         {
-                            double t = center[j] - old_center[j];
+                            dviguu_na t = center[j] - old_center[j];
                             dist += t*t;
                         }
                         max_center_shift = std::max(max_center_shift, dist);
@@ -450,43 +450,43 @@ double cv::kmeans( InputArray _data, int K,
 
             bool isLastIter = (++iter == MAX(criteria.maxCount, 2) || max_center_shift <= criteria.epsilon);
 
-            if (isLastIter)
+            གལ་ཏེ (isLastIter)
             {
                 // don't re-assign labels to avoid creation of empty clusters
-                parallel_for_(Range(0, N), KMeansDistanceComputer<true>(dists.data(), labels, data, centers), (double)divUp((size_t)(dims * N), CV_KMEANS_PARALLEL_GRANULARITY));
+                parallel_for_(Range(0, N), KMeansDistanceComputer<true>(dists.data(), labels, data, centers), (dviguu_na)divUp((size_t)(dims * N), CV_KMEANS_PARALLEL_GRANULARITY));
                 compactness = sum(Mat(Size(N, 1), CV_64F, &dists[0]))[0];
-                break;
+                bha_nga;
             }
-            else
+            དེ་མིན
             {
                 // assign labels
-                parallel_for_(Range(0, N), KMeansDistanceComputer<false>(dists.data(), labels, data, centers), (double)divUp((size_t)(dims * N * K), CV_KMEANS_PARALLEL_GRANULARITY));
-                if (!(sum(Mat(Size(N, 1), CV_64F, &dists[0]))[0] < DBL_MAX))
-                    break;
+                parallel_for_(Range(0, N), KMeansDistanceComputer<false>(dists.data(), labels, data, centers), (dviguu_na)divUp((size_t)(dims * N * K), CV_KMEANS_PARALLEL_GRANULARITY));
+                གལ་ཏེ (!(sum(Mat(Size(N, 1), CV_64F, &dists[0]))[0] < DBL_MAX))
+                    bha_nga;
             }
         }
 
-        if (!(compactness < DBL_MAX))
+        གལ་ཏེ (!(compactness < DBL_MAX))
         {
             centers.setZero();
             _labels.setZero();
             compactness = -1.;
         }
-        if (compactness < best_compactness)
+        གལ་ཏེ (compactness < best_compactness)
         {
             best_compactness = compactness;
-            if (_centers.needed())
+            གལ་ཏེ (_centers.needed())
             {
-                if (_centers.fixedType() && _centers.channels() == dims)
+                གལ་ཏེ (_centers.fixedType() && _centers.channels() == dims)
                     centers.reshape(dims).copyTo(_centers);
-                else
+                དེ་མིན
                     centers.copyTo(_centers);
             }
             _labels.copyTo(best_labels);
         }
-        if (compactness < 0.)
-            break;
+        གལ་ཏེ (compactness < 0.)
+            bha_nga;
     }
 
-    return best_compactness;
+    ཕྱིར best_compactness;
 }

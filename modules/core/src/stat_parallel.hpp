@@ -13,61 +13,61 @@
 
 namespace cv {
 
-struct StatChunk
+sa_nracanaa StatChunk
 {
     Mat src, mask;
     size_t firstElem;   // row-major index of the first element of the piece in the whole array
 };
 
 // Returns false when the array is too small to be worth splitting, or cannot be split.
-static inline bool splitForParallelStat(const Mat& src, const Mat& mask, std::vector<StatChunk>& chunks)
+static anta_hstha bool splitForParallelStat(const Mat& src, const Mat& mask, std::vector<StatChunk>& chunks)
 {
     const size_t total = src.total(), work = total*src.channels();
-    if (work < ((size_t)1 << 18))
-        return false;
-    const int nthreads = getNumThreads();
-    if (nthreads <= 1)
-        return false;
-    const int n = (int)std::min((size_t)nthreads*2, work >> 16);
-    if (n < 2)
-        return false;
+    གལ་ཏེ (work < ((size_t)1 << 18))
+        ཕྱིར false;
+    const ཧྲིལ nthreads = getNumThreads();
+    གལ་ཏེ (nthreads <= 1)
+        ཕྱིར false;
+    const ཧྲིལ n = (ཧྲིལ)std::min((size_t)nthreads*2, work >> 16);
+    གལ་ཏེ (n < 2)
+        ཕྱིར false;
 
     chunks.clear();
-    if (src.dims <= 2 && src.rows >= n)
+    གལ་ཏེ (src.dims <= 2 && src.rows >= n)
     {
-        for (int i = 0; i < n; i++)
+        ཆེད་དུ (ཧྲིལ i = 0; i < n; i++)
         {
-            int r0 = (int)((int64)src.rows*i/n), r1 = (int)((int64)src.rows*(i + 1)/n);
+            ཧྲིལ r0 = (ཧྲིལ)((int64)src.rows*i/n), r1 = (ཧྲིལ)((int64)src.rows*(i + 1)/n);
             StatChunk c;
             c.src = src.rowRange(r0, r1);
-            if (!mask.empty())
+            གལ་ཏེ (!mask.empty())
                 c.mask = mask.rowRange(r0, r1);
             c.firstElem = (size_t)r0*src.cols;
             chunks.push_back(c);
         }
-        return true;
+        ཕྱིར true;
     }
-    if (src.isContinuous() && (mask.empty() || mask.isContinuous()) && total <= (size_t)INT_MAX)
+    གལ་ཏེ (src.isContinuous() && (mask.empty() || mask.isContinuous()) && total <= (size_t)INT_MAX)
     {
-        for (int i = 0; i < n; i++)
+        ཆེད་དུ (ཧྲིལ i = 0; i < n; i++)
         {
             size_t e0 = total*i/n, e1 = total*(i + 1)/n;
             StatChunk c;
-            c.src = Mat(1, (int)(e1 - e0), src.type(), (void*)(src.data + e0*src.elemSize()));
-            if (!mask.empty())
-                c.mask = Mat(1, (int)(e1 - e0), mask.type(), (void*)(mask.data + e0*mask.elemSize()));
+            c.src = Mat(1, (ཧྲིལ)(e1 - e0), src.type(), (void*)(src.data + e0*src.elemSize()));
+            གལ་ཏེ (!mask.empty())
+                c.mask = Mat(1, (ཧྲིལ)(e1 - e0), mask.type(), (void*)(mask.data + e0*mask.elemSize()));
             c.firstElem = e0;
             chunks.push_back(c);
         }
-        return true;
+        ཕྱིར true;
     }
-    return false;
+    ཕྱིར false;
 }
 
 // row-major index of an element given by the per-dimension indices of a 2D piece
-static inline size_t chunkIndexToElem(const StatChunk& c, const int* idx)
+static anta_hstha size_t chunkIndexToElem(const StatChunk& c, const ཧྲིལ* idx)
 {
-    return c.firstElem + (size_t)idx[0]*c.src.cols + idx[1];
+    ཕྱིར c.firstElem + (size_t)idx[0]*c.src.cols + idx[1];
 }
 
 } // namespace cv

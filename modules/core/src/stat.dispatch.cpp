@@ -21,16 +21,16 @@ static NormHammingDiffFunc getNormHammingDiffFunc() {
     CV_CPU_DISPATCH(getNormHammingDiffFunc, (), CV_CPU_DISPATCH_MODES_ALL);
 }
 
-int normHamming(const uchar* a, int n)
+ཧྲིལ normHamming(const uchar* a, ཧྲིལ n)
 {
     static const NormHammingFunc fn = getNormHammingFunc();
-    return fn(a, n);
+    ཕྱིར fn(a, n);
 }
 
-int normHamming(const uchar* a, const uchar* b, int n)
+ཧྲིལ normHamming(const uchar* a, const uchar* b, ཧྲིལ n)
 {
     static const NormHammingDiffFunc fn = getNormHammingDiffFunc();
-    return fn(a, b, n);
+    ཕྱིར fn(a, b, n);
 }
 
 }} //cv::hal

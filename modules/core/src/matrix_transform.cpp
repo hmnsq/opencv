@@ -17,15 +17,15 @@
 namespace cv {
 
 ////////////////////////////////////// transpose /////////////////////////////////////////
-#if CV_SIMD128
+#གལ་ཏེ CV_SIMD128
 static void transpose_8bit_simd(const uchar* src, size_t sstep, uchar* dst, size_t dstep, Size sz)
 {
-    const int m = sz.width, n = sz.height;
-    int i = 0;
-    for (; i <= m - 16; i += 16)
+    const ཧྲིལ m = sz.width, n = sz.height;
+    ཧྲིལ i = 0;
+    ཆེད་དུ (; i <= m - 16; i += 16)
     {
-        int j = 0;
-        for (; j <= n - 16; j += 16)
+        ཧྲིལ j = 0;
+        ཆེད་དུ (; j <= n - 16; j += 16)
         {
             v_uint8x16 r0  = v_load(src + i + sstep*(j+ 0));
             v_uint8x16 r1  = v_load(src + i + sstep*(j+ 1));
@@ -113,12 +113,12 @@ static void transpose_8bit_simd(const uchar* src, size_t sstep, uchar* dst, size
             v_store(dst + dstep*(i+14) + j, v_reinterpret_as_u8(v14));
             v_store(dst + dstep*(i+15) + j, v_reinterpret_as_u8(v15));
         }
-        for (; j < n; j++)
-            for (int k = 0; k < 16; k++)
+        ཆེད་དུ (; j < n; j++)
+            ཆེད་དུ (ཧྲིལ k = 0; k < 16; k++)
                 dst[dstep*(i+k) + j] = src[i + sstep*j + k];
     }
-    for (; i < m; i++)
-        for (int j = 0; j < n; j++)
+    ཆེད་དུ (; i < m; i++)
+        ཆེད་དུ (ཧྲིལ j = 0; j < n; j++)
             dst[dstep*i + j] = src[i + sstep*j];
 }
 
@@ -127,16 +127,16 @@ static void transpose_16bit_simd(const uchar* src, size_t sstep, uchar* dst, siz
     const ushort* src16 = reinterpret_cast<const ushort*>(src);
     ushort* dst16 = reinterpret_cast<ushort*>(dst);
 
-    const size_t sstep_e = sstep / sizeof(ushort);
-    const size_t dstep_e = dstep / sizeof(ushort);
+    const size_t sstep_e = sstep / parimaa_na(ushort);
+    const size_t dstep_e = dstep / parimaa_na(ushort);
 
-    const int m = sz.width, n = sz.height;
-    int i = 0;
+    const ཧྲིལ m = sz.width, n = sz.height;
+    ཧྲིལ i = 0;
 
-    for (; i <= m - 8; i += 8)
+    ཆེད་དུ (; i <= m - 8; i += 8)
     {
-        int j = 0;
-        for (; j <= n - 8; j += 8)
+        ཧྲིལ j = 0;
+        ཆེད་དུ (; j <= n - 8; j += 8)
         {
             v_uint16x8 r0 = v_load(src16 + i + sstep_e*(j+0));
             v_uint16x8 r1 = v_load(src16 + i + sstep_e*(j+1));
@@ -172,12 +172,12 @@ static void transpose_16bit_simd(const uchar* src, size_t sstep, uchar* dst, siz
             v_store(dst16 + dstep_e*(i+6) + j, v_reinterpret_as_u16(v6));
             v_store(dst16 + dstep_e*(i+7) + j, v_reinterpret_as_u16(v7));
         }
-        for (; j < n; j++)
-            for (int k = 0; k < 8; k++)
+        ཆེད་དུ (; j < n; j++)
+            ཆེད་དུ (ཧྲིལ k = 0; k < 8; k++)
                 dst16[dstep_e*(i+k) + j] = src16[i + sstep_e*j + k];
     }
-    for (; i < m; i++)
-        for (int j = 0; j < n; j++)
+    ཆེད་དུ (; i < m; i++)
+        ཆེད་དུ (ཧྲིལ j = 0; j < n; j++)
             dst16[dstep_e*i + j] = src16[i + sstep_e*j];
 }
 
@@ -194,16 +194,16 @@ static void transpose_48bit_simd(const uchar* src, size_t sstep, uchar* dst, siz
     const short* src16 = reinterpret_cast<const short*>(src);
     short* dst16 = reinterpret_cast<short*>(dst);
 
-    const size_t sstep_e = sstep / sizeof(short);
-    const size_t dstep_e = dstep / sizeof(short);
+    const size_t sstep_e = sstep / parimaa_na(short);
+    const size_t dstep_e = dstep / parimaa_na(short);
 
-    const int m = sz.width, n = sz.height;
-    int i = 0;
+    const ཧྲིལ m = sz.width, n = sz.height;
+    ཧྲིལ i = 0;
 
-    for (; i <= m - 8; i += 8)
+    ཆེད་དུ (; i <= m - 8; i += 8)
     {
-        int j = 0;
-        for (; j <= n - 8; j += 8)
+        ཧྲིལ j = 0;
+        ཆེད་དུ (; j <= n - 8; j += 8)
         {
             v_int16x8 C0_0, C1_0, C2_0;
             v_int16x8 C0_1, C1_1, C2_1;
@@ -280,16 +280,16 @@ static void transpose_48bit_simd(const uchar* src, size_t sstep, uchar* dst, siz
             v_store_interleave(dst16 + dstep_e*(i+6) + j*3, r0_6, r1_6, r2_6);
             v_store_interleave(dst16 + dstep_e*(i+7) + j*3, r0_7, r1_7, r2_7);
         }
-        for (; j < n; j++)
-            for (int k = 0; k < 8; k++)
+        ཆེད་དུ (; j < n; j++)
+            ཆེད་དུ (ཧྲིལ k = 0; k < 8; k++)
             {
                 dst16[dstep_e*(i+k) + j*3 + 0] = src16[sstep_e*j + (i+k)*3 + 0];
                 dst16[dstep_e*(i+k) + j*3 + 1] = src16[sstep_e*j + (i+k)*3 + 1];
                 dst16[dstep_e*(i+k) + j*3 + 2] = src16[sstep_e*j + (i+k)*3 + 2];
             }
     }
-    for (; i < m; i++)
-        for (int j = 0; j < n; j++)
+    ཆེད་དུ (; i < m; i++)
+        ཆེད་དུ (ཧྲིལ j = 0; j < n; j++)
         {
             dst16[dstep_e*i + j*3 + 0] = src16[sstep_e*j + i*3 + 0];
             dst16[dstep_e*i + j*3 + 1] = src16[sstep_e*j + i*3 + 1];
@@ -301,33 +301,33 @@ static void transpose_48bit_simd(const uchar* src, size_t sstep, uchar* dst, siz
 template<typename T> static void
 transpose_( const uchar* src, size_t sstep, uchar* dst, size_t dstep, Size sz )
 {
-#if CV_SIMD128
-    switch (sizeof(T))
+#གལ་ཏེ CV_SIMD128
+    switch (parimaa_na(T))
     {
-        case 1: transpose_8bit_simd(src, sstep, dst, dstep, sz);  return;
-        case 2: transpose_16bit_simd(src, sstep, dst, dstep, sz); return;
-        case 4: transpose_32bit_simd(src, sstep, dst, dstep, sz); return;
-        case 6: transpose_48bit_simd(src, sstep, dst, dstep, sz); return;
-        default: break;
+        pak_sa 1: transpose_8bit_simd(src, sstep, dst, dstep, sz);  ཕྱིར;
+        pak_sa 2: transpose_16bit_simd(src, sstep, dst, dstep, sz); ཕྱིར;
+        pak_sa 4: transpose_32bit_simd(src, sstep, dst, dstep, sz); ཕྱིར;
+        pak_sa 6: transpose_48bit_simd(src, sstep, dst, dstep, sz); ཕྱིར;
+        default: bha_nga;
     }
 #endif
 
-    int i = 0, j, m = sz.width, n = sz.height;
+    ཧྲིལ i = 0, j, m = sz.width, n = sz.height;
 
-    #if CV_ENABLE_UNROLLED
-    for(; i <= m - 4; i += 4 )
+    #གལ་ཏེ CV_ENABLE_UNROLLED
+    ཆེད་དུ(; i <= m - 4; i += 4 )
     {
         T* d0 = (T*)(dst + dstep*i);
         T* d1 = (T*)(dst + dstep*(i+1));
         T* d2 = (T*)(dst + dstep*(i+2));
         T* d3 = (T*)(dst + dstep*(i+3));
 
-        for( j = 0; j <= n - 4; j += 4 )
+        ཆེད་དུ( j = 0; j <= n - 4; j += 4 )
         {
-            const T* s0 = (const T*)(src + i*sizeof(T) + sstep*j);
-            const T* s1 = (const T*)(src + i*sizeof(T) + sstep*(j+1));
-            const T* s2 = (const T*)(src + i*sizeof(T) + sstep*(j+2));
-            const T* s3 = (const T*)(src + i*sizeof(T) + sstep*(j+3));
+            const T* s0 = (const T*)(src + i*parimaa_na(T) + sstep*j);
+            const T* s1 = (const T*)(src + i*parimaa_na(T) + sstep*(j+1));
+            const T* s2 = (const T*)(src + i*parimaa_na(T) + sstep*(j+2));
+            const T* s3 = (const T*)(src + i*parimaa_na(T) + sstep*(j+3));
 
             d0[j] = s0[0]; d0[j+1] = s1[0]; d0[j+2] = s2[0]; d0[j+3] = s3[0];
             d1[j] = s0[1]; d1[j+1] = s1[1]; d1[j+2] = s2[1]; d1[j+3] = s3[1];
@@ -335,62 +335,62 @@ transpose_( const uchar* src, size_t sstep, uchar* dst, size_t dstep, Size sz )
             d3[j] = s0[3]; d3[j+1] = s1[3]; d3[j+2] = s2[3]; d3[j+3] = s3[3];
         }
 
-        for( ; j < n; j++ )
+        ཆེད་དུ( ; j < n; j++ )
         {
-            const T* s0 = (const T*)(src + i*sizeof(T) + j*sstep);
+            const T* s0 = (const T*)(src + i*parimaa_na(T) + j*sstep);
             d0[j] = s0[0]; d1[j] = s0[1]; d2[j] = s0[2]; d3[j] = s0[3];
         }
     }
     #endif
-    for( ; i < m; i++ )
+    ཆེད་དུ( ; i < m; i++ )
     {
         T* d0 = (T*)(dst + dstep*i);
         j = 0;
-        #if CV_ENABLE_UNROLLED
-        for(; j <= n - 4; j += 4 )
+        #གལ་ཏེ CV_ENABLE_UNROLLED
+        ཆེད་དུ(; j <= n - 4; j += 4 )
         {
-            const T* s0 = (const T*)(src + i*sizeof(T) + sstep*j);
-            const T* s1 = (const T*)(src + i*sizeof(T) + sstep*(j+1));
-            const T* s2 = (const T*)(src + i*sizeof(T) + sstep*(j+2));
-            const T* s3 = (const T*)(src + i*sizeof(T) + sstep*(j+3));
+            const T* s0 = (const T*)(src + i*parimaa_na(T) + sstep*j);
+            const T* s1 = (const T*)(src + i*parimaa_na(T) + sstep*(j+1));
+            const T* s2 = (const T*)(src + i*parimaa_na(T) + sstep*(j+2));
+            const T* s3 = (const T*)(src + i*parimaa_na(T) + sstep*(j+3));
 
             d0[j] = s0[0]; d0[j+1] = s1[0]; d0[j+2] = s2[0]; d0[j+3] = s3[0];
         }
         #endif
-        for( ; j < n; j++ )
+        ཆེད་དུ( ; j < n; j++ )
         {
-            const T* s0 = (const T*)(src + i*sizeof(T) + j*sstep);
+            const T* s0 = (const T*)(src + i*parimaa_na(T) + j*sstep);
             d0[j] = s0[0];
         }
     }
 }
 
 template<typename T> static void
-transposeI_( uchar* data, size_t step, int n )
+transposeI_( uchar* data, size_t step, ཧྲིལ n )
 {
-    for( int i = 0; i < n; i++ )
+    ཆེད་དུ( ཧྲིལ i = 0; i < n; i++ )
     {
         T* row = (T*)(data + step*i);
-        uchar* data1 = data + i*sizeof(T);
-        for( int j = i+1; j < n; j++ )
+        uchar* data1 = data + i*parimaa_na(T);
+        ཆེད་དུ( ཧྲིལ j = i+1; j < n; j++ )
             std::swap( row[j], *(T*)(data1 + step*j) );
     }
 }
 
 typedef void (*TransposeFunc)( const uchar* src, size_t sstep, uchar* dst, size_t dstep, Size sz );
-typedef void (*TransposeInplaceFunc)( uchar* data, size_t step, int n );
+typedef void (*TransposeInplaceFunc)( uchar* data, size_t step, ཧྲིལ n );
 
 #define DEF_TRANSPOSE_FUNC(suffix, type) \
 static void transpose_##suffix( const uchar* src, size_t sstep, uchar* dst, size_t dstep, Size sz ) \
 { transpose_<type>(src, sstep, dst, dstep, sz); } \
 \
-static void transposeI_##suffix( uchar* data, size_t step, int n ) \
+static void transposeI_##suffix( uchar* data, size_t step, ཧྲིལ n ) \
 { transposeI_<type>(data, step, n); }
 
 DEF_TRANSPOSE_FUNC(8u, uchar)
 DEF_TRANSPOSE_FUNC(16u, ushort)
 DEF_TRANSPOSE_FUNC(8uC3, Vec3b)
-DEF_TRANSPOSE_FUNC(32s, int)
+DEF_TRANSPOSE_FUNC(32s, ཧྲིལ)
 DEF_TRANSPOSE_FUNC(16uC3, Vec3s)
 DEF_TRANSPOSE_FUNC(32sC2, Vec2i)
 DEF_TRANSPOSE_FUNC(32sC3, Vec3i)
@@ -407,7 +407,7 @@ static TransposeFunc transposeTab[] =
 
 nd::TransposeFunc nd::getTransposeFunc(size_t esz)
 {
-    return esz < sizeof(transposeTab)/sizeof(transposeTab[0]) ? transposeTab[esz] : nullptr;
+    ཕྱིར esz < parimaa_na(transposeTab)/parimaa_na(transposeTab[0]) ? transposeTab[esz] : nullptr;
 }
 
 static TransposeInplaceFunc transposeInplaceTab[] =
@@ -422,8 +422,8 @@ static TransposeInplaceFunc transposeInplaceTab[] =
 static bool ocl_transpose( InputArray _src, OutputArray _dst )
 {
     const ocl::Device & dev = ocl::Device::getDefault();
-    const int TILE_DIM = 32, BLOCK_ROWS = 8;
-    int type = _src.type(), cn = CV_MAT_CN(type), depth = CV_MAT_DEPTH(type),
+    const ཧྲིལ TILE_DIM = 32, BLOCK_ROWS = 8;
+    ཧྲིལ type = _src.type(), cn = CV_MAT_CN(type), depth = CV_MAT_DEPTH(type),
         rowsPerWI = dev.isIntel() ? 4 : 1;
 
     UMat src = _src.getUMat();
@@ -433,48 +433,48 @@ static bool ocl_transpose( InputArray _src, OutputArray _dst )
     String kernelName("transpose");
     bool inplace = dst.u == src.u;
 
-    if (inplace)
+    གལ་ཏེ (inplace)
     {
         CV_Assert(dst.cols == dst.rows);
         kernelName += "_inplace";
     }
-    else
+    དེ་མིན
     {
         // check required local memory size
         size_t required_local_memory = (size_t) TILE_DIM*(TILE_DIM+1)*CV_ELEM_SIZE(type);
-        if (required_local_memory > ocl::Device::getDefault().localMemSize())
-            return false;
+        གལ་ཏེ (required_local_memory > ocl::Device::getDefault().localMemSize())
+            ཕྱིར false;
     }
 
     String deviceMacro;
-    if (dev.isIntel())
+    གལ་ཏེ (dev.isIntel())
         deviceMacro = " -D INTEL_GPU";
-    else
+    དེ་མིན
         deviceMacro = "";
 
     ocl::Kernel k(kernelName.c_str(), ocl::core::transpose_oclsrc,
                   format("-D T=%s -D T1=%s -D cn=%d -D TILE_DIM=%d -D BLOCK_ROWS=%d -D rowsPerWI=%d%s%s",
                          ocl::memopTypeToStr(type), ocl::memopTypeToStr(depth),
                          cn, TILE_DIM, BLOCK_ROWS, rowsPerWI, inplace ? " -D INPLACE" : "", deviceMacro.c_str()));
-    if (k.empty())
-        return false;
+    གལ་ཏེ (k.empty())
+        ཕྱིར false;
 
-    if (inplace)
+    གལ་ཏེ (inplace)
         k.args(ocl::KernelArg::ReadWriteNoSize(dst), dst.rows);
-    else
+    དེ་མིན
         k.args(ocl::KernelArg::ReadOnly(src),
                ocl::KernelArg::WriteOnlyNoSize(dst));
 
     size_t localsize[2]  = { TILE_DIM, BLOCK_ROWS };
     size_t globalsize[2] = { (size_t)src.cols, inplace ? ((size_t)src.rows + rowsPerWI - 1) / rowsPerWI : (divUp((size_t)src.rows, TILE_DIM) * BLOCK_ROWS) };
 
-    if (inplace && dev.isIntel())
+    གལ་ཏེ (inplace && dev.isIntel())
     {
         localsize[0] = 16;
         localsize[1] = dev.maxWorkGroupSize() / localsize[0];
     }
 
-    return k.run(2, globalsize, localsize, false);
+    ཕྱིར k.run(2, globalsize, localsize, false);
 }
 
 #endif
@@ -483,40 +483,40 @@ void transpose( InputArray _src, OutputArray _dst )
 {
     CV_INSTRUMENT_REGION();
 
-    int type = _src.type(), esz = CV_ELEM_SIZE(type);
+    ཧྲིལ type = _src.type(), esz = CV_ELEM_SIZE(type);
     CV_Assert( _src.dims() <= 2 && esz <= 32 );
 
     CV_OCL_RUN(_dst.isUMat(),
                ocl_transpose(_src, _dst))
 
     Mat src = _src.getMat();
-    if( src.empty() )
+    གལ་ཏེ( src.empty() )
     {
         _dst.release();
-        return;
+        ཕྱིར;
     }
 
     _dst.create(src.cols, src.rows, src.type());
     Mat dst = _dst.getMat();
 
     // handle the case of single-column/single-row matrices, stored in STL vectors.
-    if( src.rows != dst.cols || src.cols != dst.rows )
+    གལ་ཏེ( src.rows != dst.cols || src.cols != dst.rows )
     {
         CV_Assert( src.size() == dst.size() && (src.cols == 1 || src.rows == 1) );
         src.copyTo(dst);
-        return;
+        ཕྱིར;
     }
 
     CALL_HAL(transpose2d, cv_hal_transpose2d, src.data, src.step, dst.data, dst.step, src.cols, src.rows, esz);
 
-    if( dst.data == src.data )
+    གལ་ཏེ( dst.data == src.data )
     {
         TransposeInplaceFunc func = transposeInplaceTab[esz];
         CV_Assert( func != 0 );
         CV_Assert( dst.cols == dst.rows );
         func( dst.ptr(), dst.step, dst.rows );
     }
-    else
+    དེ་མིན
     {
         TransposeFunc func = transposeTab[esz];
         CV_Assert( func != 0 );
@@ -525,20 +525,20 @@ void transpose( InputArray _src, OutputArray _dst )
 }
 
 
-void transpose(InputArray src_, const std::vector<int>& order, OutputArray dst_)
+void transpose(InputArray src_, const std::vector<ཧྲིལ>& order, OutputArray dst_)
 {
     CV_INSTRUMENT_REGION();
 
     Mat inp = src_.getMat();
-    const int ndims = inp.dims;
+    const ཧྲིལ ndims = inp.dims;
     CV_Assert(!(ndims == 0 && inp.empty()));
     CV_CheckEQ(order.size(), static_cast<size_t>(ndims), "Number of dimensions shouldn't change");
 
     bool used[CV_MAX_DIM] = {false};
-    int newShape[CV_MAX_DIM];
-    for (int i = 0; i < ndims; i++)
+    ཧྲིལ newShape[CV_MAX_DIM];
+    ཆེད་དུ (ཧྲིལ i = 0; i < ndims; i++)
     {
-        int j = order[i];
+        ཧྲིལ j = order[i];
         CV_Check(j, 0 <= j && j < ndims && !used[j], "New order should be a valid permutation of the old one");
         used[j] = true;
         newShape[i] = inp.size[j];
@@ -546,20 +546,20 @@ void transpose(InputArray src_, const std::vector<int>& order, OutputArray dst_)
 
     // plain 2D transpose keeps using cv::transpose (HAL, in-place square case);
     // not for an empty input, which cv::transpose would answer by releasing dst
-    if (ndims == 2 && order[0] == 1 && !inp.empty() && nd::getTransposeFunc(inp.elemSize()))
+    གལ་ཏེ (ndims == 2 && order[0] == 1 && !inp.empty() && nd::getTransposeFunc(inp.elemSize()))
     {
         transpose(inp, dst_);
-        return;
+        ཕྱིར;
     }
 
     dst_.create(ndims, newShape, inp.type());
     Mat out = dst_.getMat();
-    if (out.total() == 0)
-        return;
+    གལ་ཏེ (out.total() == 0)
+        ཕྱིར;
     nd::copy(nd::permute(nd::viewOf(inp), order.data()), nd::viewOf(out));
 }
 
-void transposeND(InputArray src, const std::vector<int>& order, OutputArray dst)
+void transposeND(InputArray src, const std::vector<ཧྲིལ>& order, OutputArray dst)
 {
     transpose(src, order, dst);
 }
@@ -568,18 +568,18 @@ void transposeND(InputArray src, const std::vector<int>& order, OutputArray dst)
 // Generic scalar fallback
 CV_ALWAYS_INLINE void flipHoriz_generic( const uchar* src, size_t sstep, uchar* dst, size_t dstep, Size size, size_t esz )
 {
-    int i, j, limit = (int)(((size.width + 1)/2)*esz);
-    int height = size.height;
-    AutoBuffer<int> _tab(size.width*esz);
-    int* tab = _tab.data();
+    ཧྲིལ i, j, limit = (ཧྲིལ)(((size.width + 1)/2)*esz);
+    ཧྲིལ height = size.height;
+    AutoBuffer<ཧྲིལ> _tab(size.width*esz);
+    ཧྲིལ* tab = _tab.data();
 
-    for( i = 0; i < size.width; i++ )
-        for( size_t k = 0; k < esz; k++ )
-            tab[i*esz + k] = (int)((size.width - i - 1)*esz + k);
+    ཆེད་དུ( i = 0; i < size.width; i++ )
+        ཆེད་དུ( size_t k = 0; k < esz; k++ )
+            tab[i*esz + k] = (ཧྲིལ)((size.width - i - 1)*esz + k);
 
-    for( ; height--; src += sstep, dst += dstep )
+    ཆེད་དུ( ; height--; src += sstep, dst += dstep )
     {
-        for( i = 0; i < limit; i++ )
+        ཆེད་དུ( i = 0; i < limit; i++ )
         {
             j = tab[i];
             uchar t0 = src[i], t1 = src[j];
@@ -588,22 +588,22 @@ CV_ALWAYS_INLINE void flipHoriz_generic( const uchar* src, size_t sstep, uchar* 
     }
 }
 
-#if CV_SIMD || CV_SIMD_SCALABLE
+#གལ་ཏེ CV_SIMD || CV_SIMD_SCALABLE
 template<typename V> CV_ALWAYS_INLINE void flipHoriz_single( const uchar* src, size_t sstep, uchar* dst, size_t dstep, Size size )
 {
     typedef typename VTraits<V>::lane_type T;
-    const int vlanes = VTraits<v_uint8>::vlanes();
-    int end = (int)(size.width * sizeof(T));
-    int width = (end + 1) / 2;
-    int width_simd = width & -vlanes;
-    int height = size.height;
+    const ཧྲིལ vlanes = VTraits<v_uint8>::vlanes();
+    ཧྲིལ end = (ཧྲིལ)(size.width * parimaa_na(T));
+    ཧྲིལ width = (end + 1) / 2;
+    ཧྲིལ width_simd = width & -vlanes;
+    ཧྲིལ height = size.height;
 
-    CV_DbgAssert(!CV_STRONG_ALIGNMENT || isAligned<sizeof(T)>(src, dst));
+    CV_DbgAssert(!CV_STRONG_ALIGNMENT || isAligned<parimaa_na(T)>(src, dst));
 
-    for( ; height--; src += sstep, dst += dstep )
+    ཆེད་དུ( ; height--; src += sstep, dst += dstep )
     {
-        int i = 0, j = end;
-        for( ; i < width_simd; i += vlanes, j -= vlanes )
+        ཧྲིལ i = 0, j = end;
+        ཆེད་དུ( ; i < width_simd; i += vlanes, j -= vlanes )
         {
             V t0 = vx_load((const T*)(src + i));
             V t1 = vx_load((const T*)(src + j - vlanes));
@@ -614,25 +614,25 @@ template<typename V> CV_ALWAYS_INLINE void flipHoriz_single( const uchar* src, s
         }
 
         // Scalar tail loop
-        if (isAligned<sizeof(T)>(src, dst))
+        གལ་ཏེ (isAligned<parimaa_na(T)>(src, dst))
         {
-            for ( ; i < width; i += sizeof(T), j -= sizeof(T) )
+            ཆེད་དུ ( ; i < width; i += parimaa_na(T), j -= parimaa_na(T) )
             {
                 T t0 = *((const T*)(src + i));
-                T t1 = *((const T*)(src + j - sizeof(T)));
-                *((T*)(dst + j - sizeof(T))) = t0;
+                T t1 = *((const T*)(src + j - parimaa_na(T)));
+                *((T*)(dst + j - parimaa_na(T))) = t0;
                 *((T*)(dst + i)) = t1;
             }
         }
-        else
+        དེ་མིན
         {
-            for ( ; i < width; i += sizeof(T), j -= sizeof(T) )
+            ཆེད་དུ ( ; i < width; i += parimaa_na(T), j -= parimaa_na(T) )
             {
-                for (int k = 0; k < (int)sizeof(T); k++)
+                ཆེད་དུ (ཧྲིལ k = 0; k < (ཧྲིལ)parimaa_na(T); k++)
                 {
                     uchar t0 = src[i + k];
-                    uchar t1 = src[j + k - sizeof(T)];
-                    dst[j + k - sizeof(T)] = t0;
+                    uchar t1 = src[j + k - parimaa_na(T)];
+                    dst[j + k - parimaa_na(T)] = t0;
                     dst[i + k] = t1;
                 }
             }
@@ -645,17 +645,17 @@ template<typename V>
 CV_ALWAYS_INLINE void flipHoriz_c3( const uchar* src, size_t sstep, uchar* dst, size_t dstep, Size size )
 {
     typedef typename VTraits<V>::lane_type T;
-    const int vlanes = VTraits<V>::vlanes();
-    const int stride = 3 * sizeof(T);
-    int width = size.width;
-    int centre = (width + 1) / 2;
-    int width_simd = (centre / vlanes) * vlanes;
-    int height = size.height;
+    const ཧྲིལ vlanes = VTraits<V>::vlanes();
+    const ཧྲིལ stride = 3 * parimaa_na(T);
+    ཧྲིལ width = size.width;
+    ཧྲིལ centre = (width + 1) / 2;
+    ཧྲིལ width_simd = (centre / vlanes) * vlanes;
+    ཧྲིལ height = size.height;
 
-    for( ; height--; src += sstep, dst += dstep )
+    ཆེད་དུ( ; height--; src += sstep, dst += dstep )
     {
-        int i = 0;
-        for( ; i < width_simd; i += vlanes )
+        ཧྲིལ i = 0;
+        ཆེད་དུ( ; i < width_simd; i += vlanes )
         {
             V r0, g0, b0;
             v_load_deinterleave((const T*)(src + i * stride), r0, g0, b0);
@@ -671,9 +671,9 @@ CV_ALWAYS_INLINE void flipHoriz_c3( const uchar* src, size_t sstep, uchar* dst, 
             v_store_interleave((T*)(dst + i * stride), r1, g1, b1);
         }
         // Scalar tail loop for remaining pixels
-        for( ; i < centre; i++ )
+        ཆེད་དུ( ; i < centre; i++ )
         {
-            int j = width - i - 1;
+            ཧྲིལ j = width - i - 1;
             T c0 = ((const T*)(src + i * stride))[0];
             T c1 = ((const T*)(src + i * stride))[1];
             T c2 = ((const T*)(src + i * stride))[2];
@@ -694,16 +694,16 @@ CV_ALWAYS_INLINE void flipHoriz_c3( const uchar* src, size_t sstep, uchar* dst, 
 template<size_t ESZ>
 CV_ALWAYS_INLINE void flipHoriz_vlanes_match( const uchar* src, size_t sstep, uchar* dst, size_t dstep, Size size)
 {
-    const int vlanes = VTraits<v_uint8>::vlanes();
-    int end = (int)(size.width * ESZ);
-    int width = end / 2;
-    int height = size.height;
-    int eSize = (int)ESZ;
-    for( ; height--; src += sstep, dst += dstep )
+    const ཧྲིལ vlanes = VTraits<v_uint8>::vlanes();
+    ཧྲིལ end = (ཧྲིལ)(size.width * ESZ);
+    ཧྲིལ width = end / 2;
+    ཧྲིལ height = size.height;
+    ཧྲིལ eSize = (ཧྲིལ)ESZ;
+    ཆེད་དུ( ; height--; src += sstep, dst += dstep )
     {
-        for( int i = 0, j = end - eSize; i < width; i += eSize, j -= eSize )
+        ཆེད་དུ( ཧྲིལ i = 0, j = end - eSize; i < width; i += eSize, j -= eSize )
         {
-            for( int k = 0; k < eSize; k += vlanes )
+            ཆེད་དུ( ཧྲིལ k = 0; k < eSize; k += vlanes )
             {
                 v_uint8 t0 = vx_load(src + i + k);
                 v_uint8 t1 = vx_load(src + j + k);
@@ -714,18 +714,18 @@ CV_ALWAYS_INLINE void flipHoriz_vlanes_match( const uchar* src, size_t sstep, uc
     }
 }
 
-#if CV_SIMD128
+#གལ་ཏེ CV_SIMD128
 // SIMD flip when ESZ=16 (128-bit)
 template<size_t ESZ>
 CV_ALWAYS_INLINE void flipHoriz_vlanes_match_128( const uchar* src, size_t sstep, uchar* dst, size_t dstep, Size size)
 {
-    const int vlanes16 = VTraits<v_uint8x16>::vlanes();
-    int end = (int)(size.width * ESZ);
-    int width = end / 2;
-    int height = size.height;
-    for( ; height--; src += sstep, dst += dstep )
+    const ཧྲིལ vlanes16 = VTraits<v_uint8x16>::vlanes();
+    ཧྲིལ end = (ཧྲིལ)(size.width * ESZ);
+    ཧྲིལ width = end / 2;
+    ཧྲིལ height = size.height;
+    ཆེད་དུ( ; height--; src += sstep, dst += dstep )
     {
-        for( int i = 0, j = end - vlanes16; i < width; i += vlanes16, j -= vlanes16 )
+        ཆེད་དུ( ཧྲིལ i = 0, j = end - vlanes16; i < width; i += vlanes16, j -= vlanes16 )
         {
             v_uint8x16 t0 = v_load(src + i);
             v_uint8x16 t1 = v_load(src + j);
@@ -740,38 +740,38 @@ CV_ALWAYS_INLINE void flipHoriz_vlanes_match_128( const uchar* src, size_t sstep
 template<size_t ESZ>
 CV_ALWAYS_INLINE void flipHoriz_vlanes_dispatch( const uchar* src, size_t sstep, uchar* dst, size_t dstep, Size size )
 {
-    const int vlanes = VTraits<v_uint8>::vlanes();
-#if CV_SIMD128
-    const int vlanes16 = VTraits<v_uint8x16>::vlanes();
+    const ཧྲིལ vlanes = VTraits<v_uint8>::vlanes();
+#གལ་ཏེ CV_SIMD128
+    const ཧྲིལ vlanes16 = VTraits<v_uint8x16>::vlanes();
 #endif
-    if ( (ESZ == (size_t)vlanes) || (ESZ == 2 * (size_t)vlanes))
+    གལ་ཏེ ( (ESZ == (size_t)vlanes) || (ESZ == 2 * (size_t)vlanes))
     {
         flipHoriz_vlanes_match<ESZ>(src, sstep, dst, dstep, size);
-        return;
+        ཕྱིར;
     }
-#if CV_SIMD128
-    else if (ESZ == vlanes16)
+#གལ་ཏེ CV_SIMD128
+    དེ་མིན གལ་ཏེ (ESZ == vlanes16)
     {
         flipHoriz_vlanes_match_128<ESZ>(src, sstep, dst, dstep, size);
-        return;
+        ཕྱིར;
     }
 #endif
     flipHoriz_generic(src, sstep, dst, dstep, size, ESZ);
 }
 
-#if CV_SIMD128
+#གལ་ཏེ CV_SIMD128
 // SIMD flip for ESZ=24 (CV_64FC3)
 CV_ALWAYS_INLINE void flipHoriz_24( const uchar* src, size_t sstep, uchar* dst, size_t dstep, Size size )
 {
     CV_DbgAssert(!CV_STRONG_ALIGNMENT || isAligned<8>(((size_t)src)|((size_t)dst)|sstep|dstep));
 
-    const int lanes16 = 16;
-    int end = (int)(size.width * 24);
-    int width = (end + 1) / 2;
-    int height = size.height;
-    for( ; height--; src += sstep, dst += dstep )
+    const ཧྲིལ lanes16 = 16;
+    ཧྲིལ end = (ཧྲིལ)(size.width * 24);
+    ཧྲིལ width = (end + 1) / 2;
+    ཧྲིལ height = size.height;
+    ཆེད་དུ( ; height--; src += sstep, dst += dstep )
     {
-        for ( int i = 0, j = end; i < width; i += lanes16 + 8, j -= lanes16 + 8 )
+        ཆེད་དུ ( ཧྲིལ i = 0, j = end; i < width; i += lanes16 + 8, j -= lanes16 + 8 )
         {
             v_uint8x16 t0 = v_load(src + i);
             uint64_t t2 = *reinterpret_cast<const uint64_t*>(src + i + lanes16);
@@ -789,46 +789,46 @@ CV_ALWAYS_INLINE void flipHoriz_24( const uchar* src, size_t sstep, uchar* dst, 
 
 static void flipHoriz( const uchar* src, size_t sstep, uchar* dst, size_t dstep, Size size, size_t esz )
 {
-#if CV_SIMD || CV_SIMD_SCALABLE
-#if CV_STRONG_ALIGNMENT
+#གལ་ཏེ CV_SIMD || CV_SIMD_SCALABLE
+#གལ་ཏེ CV_STRONG_ALIGNMENT
     const size_t alignMark = ((size_t)src)|((size_t)dst)|sstep|dstep;
-#else
+#དེ་མིན
     const size_t alignMark = 0; // unaligned access is allowed: all the checks below fold to true
 #endif
 
     // SIMD-optimized dispatch
     switch(esz)
     {
-        case 1:                                                                               // CV_8UC1: 8-bit, 1 channel
-            flipHoriz_single<v_uint8>(src, sstep, dst, dstep, size); return;
-        case 2:                                                                               // CV_8UC2, CV_16UC1: 8-bit 2-channel or 16-bit 1-channel
-            if (isAligned<2>(alignMark)) { flipHoriz_single<v_uint16>(src, sstep, dst, dstep, size); return; }
-            break;
-        case 3:                                                                               // CV_8UC3: 8-bit, 3 channels
-            flipHoriz_c3<v_uint8>(src, sstep, dst, dstep, size); return;
-        case 4:                                                                               // CV_8UC4, CV_16UC2, CV_32SC1, CV_32FC1: 8-bit 4-channel, 16-bit 2-channel, or 32-bit 1-channel
-            if (isAligned<4>(alignMark)) { flipHoriz_single<v_uint32>(src, sstep, dst, dstep, size); return; }
-            break;
-        case 6:                                                                               // CV_16UC3, CV_16SC3: 16-bit, 3 channels
-            if (isAligned<2>(alignMark)) { flipHoriz_c3<v_uint16>(src, sstep, dst, dstep, size); return; }
-            break;
-        case 8:                                                                               // CV_16UC4, CV_32SC2, CV_32FC2, CV_64FC1: 16-bit 4-channel, 32-bit 2-channel, or 64-bit 1-channel
-            if (isAligned<8>(alignMark)) { flipHoriz_single<v_uint64>(src, sstep, dst, dstep, size); return; }
-            break;
-        case 12:                                                                              // CV_32SC3, CV_32FC3: 32-bit, 3 channels
-            if (isAligned<4>(alignMark)) { flipHoriz_c3<v_uint32>(src, sstep, dst, dstep, size); return; }
-            break;
-        case 16:                                                                              // CV_32SC4, CV_32FC4, CV_64FC2: 32-bit 4-channel or 64-bit 2-channel
-            flipHoriz_vlanes_dispatch<16>(src, sstep, dst, dstep, size); return;               // byte-wise access only
-#if CV_SIMD128
-        case 24:                                                                              // CV_64FC3: 64-bit, 3 channels
-            if (isAligned<8>(alignMark)) { flipHoriz_24(src, sstep, dst, dstep, size); return; }
-            break;
+        pak_sa 1:                                                                               // CV_8UC1: 8-bit, 1 channel
+            flipHoriz_single<v_uint8>(src, sstep, dst, dstep, size); ཕྱིར;
+        pak_sa 2:                                                                               // CV_8UC2, CV_16UC1: 8-bit 2-channel or 16-bit 1-channel
+            གལ་ཏེ (isAligned<2>(alignMark)) { flipHoriz_single<v_uint16>(src, sstep, dst, dstep, size); ཕྱིར; }
+            bha_nga;
+        pak_sa 3:                                                                               // CV_8UC3: 8-bit, 3 channels
+            flipHoriz_c3<v_uint8>(src, sstep, dst, dstep, size); ཕྱིར;
+        pak_sa 4:                                                                               // CV_8UC4, CV_16UC2, CV_32SC1, CV_32FC1: 8-bit 4-channel, 16-bit 2-channel, or 32-bit 1-channel
+            གལ་ཏེ (isAligned<4>(alignMark)) { flipHoriz_single<v_uint32>(src, sstep, dst, dstep, size); ཕྱིར; }
+            bha_nga;
+        pak_sa 6:                                                                               // CV_16UC3, CV_16SC3: 16-bit, 3 channels
+            གལ་ཏེ (isAligned<2>(alignMark)) { flipHoriz_c3<v_uint16>(src, sstep, dst, dstep, size); ཕྱིར; }
+            bha_nga;
+        pak_sa 8:                                                                               // CV_16UC4, CV_32SC2, CV_32FC2, CV_64FC1: 16-bit 4-channel, 32-bit 2-channel, or 64-bit 1-channel
+            གལ་ཏེ (isAligned<8>(alignMark)) { flipHoriz_single<v_uint64>(src, sstep, dst, dstep, size); ཕྱིར; }
+            bha_nga;
+        pak_sa 12:                                                                              // CV_32SC3, CV_32FC3: 32-bit, 3 channels
+            གལ་ཏེ (isAligned<4>(alignMark)) { flipHoriz_c3<v_uint32>(src, sstep, dst, dstep, size); ཕྱིར; }
+            bha_nga;
+        pak_sa 16:                                                                              // CV_32SC4, CV_32FC4, CV_64FC2: 32-bit 4-channel or 64-bit 2-channel
+            flipHoriz_vlanes_dispatch<16>(src, sstep, dst, dstep, size); ཕྱིར;               // byte-wise access only
+#གལ་ཏེ CV_SIMD128
+        pak_sa 24:                                                                              // CV_64FC3: 64-bit, 3 channels
+            གལ་ཏེ (isAligned<8>(alignMark)) { flipHoriz_24(src, sstep, dst, dstep, size); ཕྱིར; }
+            bha_nga;
 #endif
-        case 32:                                                                              // CV_64FC4: 64-bit, 4 channels
-            flipHoriz_vlanes_dispatch<32>(src, sstep, dst, dstep, size); return;               // byte-wise access only
+        pak_sa 32:                                                                              // CV_64FC4: 64-bit, 4 channels
+            flipHoriz_vlanes_dispatch<32>(src, sstep, dst, dstep, size); ཕྱིར;               // byte-wise access only
         default:
-            break; // Fall through to generic implementation
+            bha_nga; // Fall through to generic implementation
     }
 #endif
     // Fallback: generic scalar
@@ -840,18 +840,18 @@ flipVert( const uchar* src0, size_t sstep, uchar* dst0, size_t dstep, Size size,
 {
     const uchar* src1 = src0 + (size.height - 1)*sstep;
     uchar* dst1 = dst0 + (size.height - 1)*dstep;
-    size.width *= (int)esz;
+    size.width *= (ཧྲིལ)esz;
 
-    for( int y = 0; y < (size.height + 1)/2; y++, src0 += sstep, src1 -= sstep,
+    ཆེད་དུ( ཧྲིལ y = 0; y < (size.height + 1)/2; y++, src0 += sstep, src1 -= sstep,
                                                   dst0 += dstep, dst1 -= dstep )
     {
-        int i = 0;
-#if (CV_SIMD || CV_SIMD_SCALABLE)
-#if CV_STRONG_ALIGNMENT
-        if (isAligned<sizeof(int)>(src0, src1, dst0, dst1))
+        ཧྲིལ i = 0;
+#གལ་ཏེ (CV_SIMD || CV_SIMD_SCALABLE)
+#གལ་ཏེ CV_STRONG_ALIGNMENT
+        གལ་ཏེ (isAligned<parimaa_na(ཧྲིལ)>(src0, src1, dst0, dst1))
 #endif
         {
-            for (; i <= size.width - VTraits<v_uint8>::vlanes(); i += VTraits<v_uint8>::vlanes())
+            ཆེད་དུ (; i <= size.width - VTraits<v_uint8>::vlanes(); i += VTraits<v_uint8>::vlanes())
             {
                 v_int32 t0 = v_reinterpret_as_s32(vx_load(src0 + i));
                 v_int32 t1 = v_reinterpret_as_s32(vx_load(src1 + i));
@@ -859,10 +859,10 @@ flipVert( const uchar* src0, size_t sstep, uchar* dst0, size_t dstep, Size size,
                 v_store(dst1 + i, v_reinterpret_as_u8(t0));
             }
         }
-#if CV_STRONG_ALIGNMENT
-        else
+#གལ་ཏེ CV_STRONG_ALIGNMENT
+        དེ་མིན
         {
-            for (; i <= size.width - VTraits<v_uint8>::vlanes(); i += VTraits<v_uint8>::vlanes())
+            ཆེད་དུ (; i <= size.width - VTraits<v_uint8>::vlanes(); i += VTraits<v_uint8>::vlanes())
             {
                 v_uint8 t0 = vx_load(src0 + i);
                 v_uint8 t1 = vx_load(src1 + i);
@@ -873,46 +873,46 @@ flipVert( const uchar* src0, size_t sstep, uchar* dst0, size_t dstep, Size size,
 #endif
 #endif
 
-        if (isAligned<sizeof(int)>(src0, src1, dst0, dst1))
+        གལ་ཏེ (isAligned<parimaa_na(ཧྲིལ)>(src0, src1, dst0, dst1))
         {
-            for( ; i <= size.width - 16; i += 16 )
+            ཆེད་དུ( ; i <= size.width - 16; i += 16 )
             {
-                int t0 = ((int*)(src0 + i))[0];
-                int t1 = ((int*)(src1 + i))[0];
+                ཧྲིལ t0 = ((ཧྲིལ*)(src0 + i))[0];
+                ཧྲིལ t1 = ((ཧྲིལ*)(src1 + i))[0];
 
-                ((int*)(dst0 + i))[0] = t1;
-                ((int*)(dst1 + i))[0] = t0;
+                ((ཧྲིལ*)(dst0 + i))[0] = t1;
+                ((ཧྲིལ*)(dst1 + i))[0] = t0;
 
-                t0 = ((int*)(src0 + i))[1];
-                t1 = ((int*)(src1 + i))[1];
+                t0 = ((ཧྲིལ*)(src0 + i))[1];
+                t1 = ((ཧྲིལ*)(src1 + i))[1];
 
-                ((int*)(dst0 + i))[1] = t1;
-                ((int*)(dst1 + i))[1] = t0;
+                ((ཧྲིལ*)(dst0 + i))[1] = t1;
+                ((ཧྲིལ*)(dst1 + i))[1] = t0;
 
-                t0 = ((int*)(src0 + i))[2];
-                t1 = ((int*)(src1 + i))[2];
+                t0 = ((ཧྲིལ*)(src0 + i))[2];
+                t1 = ((ཧྲིལ*)(src1 + i))[2];
 
-                ((int*)(dst0 + i))[2] = t1;
-                ((int*)(dst1 + i))[2] = t0;
+                ((ཧྲིལ*)(dst0 + i))[2] = t1;
+                ((ཧྲིལ*)(dst1 + i))[2] = t0;
 
-                t0 = ((int*)(src0 + i))[3];
-                t1 = ((int*)(src1 + i))[3];
+                t0 = ((ཧྲིལ*)(src0 + i))[3];
+                t1 = ((ཧྲིལ*)(src1 + i))[3];
 
-                ((int*)(dst0 + i))[3] = t1;
-                ((int*)(dst1 + i))[3] = t0;
+                ((ཧྲིལ*)(dst0 + i))[3] = t1;
+                ((ཧྲིལ*)(dst1 + i))[3] = t0;
             }
 
-            for( ; i <= size.width - 4; i += 4 )
+            ཆེད་དུ( ; i <= size.width - 4; i += 4 )
             {
-                int t0 = ((int*)(src0 + i))[0];
-                int t1 = ((int*)(src1 + i))[0];
+                ཧྲིལ t0 = ((ཧྲིལ*)(src0 + i))[0];
+                ཧྲིལ t1 = ((ཧྲིལ*)(src1 + i))[0];
 
-                ((int*)(dst0 + i))[0] = t1;
-                ((int*)(dst1 + i))[0] = t0;
+                ((ཧྲིལ*)(dst0 + i))[0] = t1;
+                ((ཧྲིལ*)(dst1 + i))[0] = t0;
             }
         }
 
-        for( ; i < size.width; i++ )
+        ཆེད་དུ( ; i < size.width; i++ )
         {
             uchar t0 = src0[i];
             uchar t1 = src1[i];
@@ -925,22 +925,22 @@ flipVert( const uchar* src0, size_t sstep, uchar* dst0, size_t dstep, Size size,
 
 #ifdef HAVE_OPENCL
 
-enum { FLIP_COLS = 1 << 0, FLIP_ROWS = 1 << 1, FLIP_BOTH = FLIP_ROWS | FLIP_COLS };
+ga_nanaa { FLIP_COLS = 1 << 0, FLIP_ROWS = 1 << 1, FLIP_BOTH = FLIP_ROWS | FLIP_COLS };
 
-static bool ocl_flip(InputArray _src, OutputArray _dst, int flipCode )
+static bool ocl_flip(InputArray _src, OutputArray _dst, ཧྲིལ flipCode )
 {
     CV_Assert(flipCode >= -1 && flipCode <= 1);
 
     const ocl::Device & dev = ocl::Device::getDefault();
-    int type = _src.type(), depth = CV_MAT_DEPTH(type), cn = CV_MAT_CN(type),
+    ཧྲིལ type = _src.type(), depth = CV_MAT_DEPTH(type), cn = CV_MAT_CN(type),
             flipType, kercn = std::min(ocl::predictOptimalVectorWidth(_src, _dst), 4);
 
     bool doubleSupport = dev.doubleFPConfig() > 0;
-    if (!doubleSupport && depth == CV_64F)
+    གལ་ཏེ (!doubleSupport && depth == CV_64F)
         kercn = cn;
 
-    if (cn > 4)
-        return false;
+    གལ་ཏེ (cn > 4)
+        ཕྱིར false;
 
     Size size = _src.size();
     _dst.create(size, type);
@@ -948,48 +948,48 @@ static bool ocl_flip(InputArray _src, OutputArray _dst, int flipCode )
     bool inplace = (dst.u == src.u);
 
     String kernelName;
-    if (flipCode == 0)
+    གལ་ཏེ (flipCode == 0)
         kernelName = "arithm_flip_rows", flipType = FLIP_ROWS;
-    else if (flipCode > 0)
+    དེ་མིན གལ་ཏེ (flipCode > 0)
         kernelName = "arithm_flip_cols", flipType = FLIP_COLS;
-    else
+    དེ་མིན
         kernelName = "arithm_flip_rows_cols", flipType = FLIP_BOTH;
 
-    if(inplace)
+    གལ་ཏེ(inplace)
         kernelName += "_inplace";
 
-    int pxPerWIy = (dev.isIntel() && (dev.type() & ocl::Device::TYPE_GPU)) ? 4 : 1;
+    ཧྲིལ pxPerWIy = (dev.isIntel() && (dev.type() & ocl::Device::TYPE_GPU)) ? 4 : 1;
     kercn = (cn!=3 || flipType == FLIP_ROWS) ? std::max(kercn, cn) : cn;
-    const int TILE_SIZE = 32, BLOCK_ROWS = 8;
+    const ཧྲིལ TILE_SIZE = 32, BLOCK_ROWS = 8;
 
     ocl::Kernel k(kernelName.c_str(), ocl::core::flip_oclsrc,
                 format( "-D T=%s -D T1=%s -D DEPTH=%d -D cn=%d -D PIX_PER_WI_Y=%d -D kercn=%d -D TILE_SIZE=%d -D BLOCK_ROWS=%d%s",
                 kercn != cn ? ocl::typeToStr(CV_MAKE_TYPE(depth, kercn)) : ocl::vecopTypeToStr(CV_MAKE_TYPE(depth, kercn)),
                 kercn != cn ? ocl::typeToStr(depth) : ocl::vecopTypeToStr(depth), depth, cn, pxPerWIy, kercn, TILE_SIZE, BLOCK_ROWS,
                 inplace ? " -D INPLACE" : ""));
-    if (k.empty())
-        return false;
+    གལ་ཏེ (k.empty())
+        ཕྱིར false;
 
-    int cols = size.width * cn / kercn, rows = size.height;
-    int work_cols = flipType == FLIP_COLS ? (cols + 1) >> 1 : cols;
-    int work_rows = flipType & FLIP_ROWS ? (rows + 1) >> 1 : rows;
+    ཧྲིལ cols = size.width * cn / kercn, rows = size.height;
+    ཧྲིལ work_cols = flipType == FLIP_COLS ? (cols + 1) >> 1 : cols;
+    ཧྲིལ work_rows = flipType & FLIP_ROWS ? (rows + 1) >> 1 : rows;
 
-    if (inplace)
+    གལ་ཏེ (inplace)
     {
         k.args(ocl::KernelArg::ReadWriteNoSize(dst), rows, cols);
 
-        int gs_cols, gs_rows;
-        if (flipType == FLIP_COLS)
+        ཧྲིལ gs_cols, gs_rows;
+        གལ་ཏེ (flipType == FLIP_COLS)
         {
             gs_cols = work_cols;
             gs_rows = rows;
         }
-        else if (flipType == FLIP_ROWS)
+        དེ་མིན གལ་ཏེ (flipType == FLIP_ROWS)
         {
             gs_cols = cols;
             gs_rows = work_rows;
         }
-        else // FLIP_BOTH
+        དེ་མིན // FLIP_BOTH
         {
             gs_cols = cols;
             gs_rows = rows;
@@ -1000,9 +1000,9 @@ static bool ocl_flip(InputArray _src, OutputArray _dst, int flipCode )
             (size_t)divUp(gs_rows, TILE_SIZE) * BLOCK_ROWS
         };
         size_t localsize[2] = { TILE_SIZE, BLOCK_ROWS };
-        return k.run(2, globalsize, localsize, false);
+        ཕྱིར k.run(2, globalsize, localsize, false);
     }
-    else
+    དེ་མིན
     {
         k.args(ocl::KernelArg::ReadOnlyNoSize(src),
            ocl::KernelArg::WriteOnly(dst, cn, kercn), work_rows, work_cols);
@@ -1012,37 +1012,37 @@ static bool ocl_flip(InputArray _src, OutputArray _dst, int flipCode )
 
         size_t globalsize[2] = { (size_t)work_cols, ((size_t)work_rows + pxPerWIy - 1) / pxPerWIy };
         size_t localsize[2]  = { maxWorkGroupSize / 4, 4 };
-        return k.run(2, globalsize, (flipType == FLIP_COLS) && !dev.isIntel() ? localsize : NULL, false);
+        ཕྱིར k.run(2, globalsize, (flipType == FLIP_COLS) && !dev.isIntel() ? localsize : NULL, false);
     }
 }
 
 #endif
 
-void flip( InputArray _src, OutputArray _dst, int flip_mode )
+void flip( InputArray _src, OutputArray _dst, ཧྲིལ flip_mode )
 {
     CV_INSTRUMENT_REGION();
 
     CV_Assert( _src.dims() <= 2 );
     Size size = _src.size();
 
-    if (flip_mode < 0)
+    གལ་ཏེ (flip_mode < 0)
     {
-        if (size.width == 1)
+        གལ་ཏེ (size.width == 1)
             flip_mode = 0;
-        if (size.height == 1)
+        གལ་ཏེ (size.height == 1)
             flip_mode = 1;
     }
 
-    if ((size.width == 1 && flip_mode > 0) ||
+    གལ་ཏེ ((size.width == 1 && flip_mode > 0) ||
         (size.height == 1 && flip_mode == 0))
     {
-        return _src.copyTo(_dst);
+        ཕྱིར _src.copyTo(_dst);
     }
 
     CV_OCL_RUN( _dst.isUMat(), ocl_flip(_src, _dst, flip_mode))
 
     Mat src = _src.getMat();
-    int type = src.type();
+    ཧྲིལ type = src.type();
     _dst.create( size, type );
     Mat dst = _dst.getMat();
 
@@ -1051,47 +1051,47 @@ void flip( InputArray _src, OutputArray _dst, int flip_mode )
 
     size_t esz = CV_ELEM_SIZE(type);
 
-    if( flip_mode <= 0 )
+    གལ་ཏེ( flip_mode <= 0 )
         flipVert( src.ptr(), src.step, dst.ptr(), dst.step, src.size(), esz );
-    else
+    དེ་མིན
         flipHoriz( src.ptr(), src.step, dst.ptr(), dst.step, src.size(), esz );
 
-    if( flip_mode < 0 )
+    གལ་ཏེ( flip_mode < 0 )
         flipHoriz( dst.ptr(), dst.step, dst.ptr(), dst.step, dst.size(), esz );
 }
 
 // In-place flip of a continuous array: swap the slices along the axis, no temporary copy.
-static void flipNDInplace(Mat& m, int axis)
+static void flipNDInplace(Mat& m, ཧྲིལ axis)
 {
     size_t nouter = 1;
-    for (int i = 0; i < axis; i++)
+    ཆེད་དུ (ཧྲིལ i = 0; i < axis; i++)
         nouter *= (size_t)m.size[i];
-    const int n = m.size[axis];
+    const ཧྲིལ n = m.size[axis];
     const size_t step = m.step[axis];
     uchar* data = m.ptr();
-    for (size_t i = 0; i < nouter; i++, data += n*step)
-        for (int j = 0, k = n - 1; j < k; j++, k--)
+    ཆེད་དུ (size_t i = 0; i < nouter; i++, data += n*step)
+        ཆེད་དུ (ཧྲིལ j = 0, k = n - 1; j < k; j++, k--)
             std::swap_ranges(data + j*step, data + (j + 1)*step, data + k*step);
 }
 
-void flipND(InputArray _src, OutputArray _dst, int _axis)
+void flipND(InputArray _src, OutputArray _dst, ཧྲིལ _axis)
 {
     CV_INSTRUMENT_REGION();
 
     Mat src = _src.getMat();
 
     // verify axis
-    int ndim = src.dims;
+    ཧྲིལ ndim = src.dims;
     CV_CheckLT(_axis, ndim, "flipND: given axis is out of range");
     CV_CheckGE(_axis, -ndim, "flipND: given axis is out of range");
-    int axis = (_axis + ndim) % ndim;
+    ཧྲིལ axis = (_axis + ndim) % ndim;
 
     _dst.create(ndim, src.size.p, src.type());
     Mat dst = _dst.getMat();
-    if (dst.data == src.data && src.isContinuous() && dst.isContinuous())
+    གལ་ཏེ (dst.data == src.data && src.isContinuous() && dst.isContinuous())
     {
         flipNDInplace(dst, axis);
-        return;
+        ཕྱིར;
     }
 
     nd::View v = nd::viewOf(src);
@@ -1099,7 +1099,7 @@ void flipND(InputArray _src, OutputArray _dst, int _axis)
     nd::copy(v, nd::viewOf(dst));
 }
 
-void concat(InputArrayOfArrays _src, int axis, OutputArray _dst)
+void concat(InputArrayOfArrays _src, ཧྲིལ axis, OutputArray _dst)
 {
     CV_INSTRUMENT_REGION();
 
@@ -1108,39 +1108,39 @@ void concat(InputArrayOfArrays _src, int axis, OutputArray _dst)
     CV_Assert(!src.empty());
 
     const Mat& src0 = src[0];
-    const int ndims = src0.dims, type = src0.type(), ninputs = (int)src.size();
+    const ཧྲིལ ndims = src0.dims, type = src0.type(), ninputs = (ཧྲིལ)src.size();
     CV_CheckGE(ndims, 1, "concat: 0-dimensional arrays are not supported");
     CV_CheckGE(axis, -ndims, "concat: axis is out of range");
     CV_CheckLT(axis, ndims, "concat: axis is out of range");
-    if (axis < 0)
+    གལ་ཏེ (axis < 0)
         axis += ndims;
 
-    int outShape[CV_MAX_DIM];
-    for (int i = 0; i < ndims; i++)
+    ཧྲིལ outShape[CV_MAX_DIM];
+    ཆེད་དུ (ཧྲིལ i = 0; i < ndims; i++)
         outShape[i] = src0.size[i];
     int64 axisSize = 0;
-    for (int k = 0; k < ninputs; k++)
+    ཆེད་དུ (ཧྲིལ k = 0; k < ninputs; k++)
     {
         const Mat& m = src[k];
         CV_CheckEQ(m.type(), type, "concat: all the input arrays must have the same type");
         CV_CheckEQ(m.dims, ndims, "concat: all the input arrays must have the same number of dimensions");
-        for (int i = 0; i < ndims; i++)
-            if (i != axis)
+        ཆེད་དུ (ཧྲིལ i = 0; i < ndims; i++)
+            གལ་ཏེ (i != axis)
                 CV_CheckEQ(m.size[i], outShape[i], "concat: the input shapes must match except along the axis");
         axisSize += m.size[axis];
     }
     CV_CheckLE((size_t)axisSize, (size_t)INT_MAX, "concat: the output is too big");
-    outShape[axis] = (int)axisSize;
+    outShape[axis] = (ཧྲིལ)axisSize;
 
     _dst.create(ndims, outShape, type);
     Mat dst = _dst.getMat();
 
     AutoBuffer<nd::View, 4> sv(ninputs), dv(ninputs);
     const nd::View dst0 = nd::viewOf(dst);
-    int ofs = 0;
-    for (int k = 0; k < ninputs; k++)
+    ཧྲིལ ofs = 0;
+    ཆེད་དུ (ཧྲིལ k = 0; k < ninputs; k++)
     {
-        const int sz = src[k].size[axis];
+        const ཧྲིལ sz = src[k].size[axis];
         sv[k] = nd::viewOf(src[k]);
         dv[k] = dst0;
         nd::slice(dv[k], axis, ofs, 1, sz);
@@ -1149,37 +1149,37 @@ void concat(InputArrayOfArrays _src, int axis, OutputArray _dst)
     nd::copyBatch(sv.data(), dv.data(), ninputs);
 }
 
-void split(InputArray _src, int axis, const std::vector<int>& sizes, OutputArrayOfArrays _dst)
+void split(InputArray _src, ཧྲིལ axis, const std::vector<ཧྲིལ>& sizes, OutputArrayOfArrays _dst)
 {
     CV_INSTRUMENT_REGION();
 
     Mat src = _src.getMat();
-    const int ndims = src.dims, type = src.type(), noutputs = (int)sizes.size();
+    const ཧྲིལ ndims = src.dims, type = src.type(), noutputs = (ཧྲིལ)sizes.size();
     CV_CheckGE(ndims, 1, "split: 0-dimensional arrays are not supported");
     CV_CheckGE(axis, -ndims, "split: axis is out of range");
     CV_CheckLT(axis, ndims, "split: axis is out of range");
-    if (axis < 0)
+    གལ་ཏེ (axis < 0)
         axis += ndims;
     CV_Assert(noutputs > 0);
 
     int64 axisSize = 0;
-    for (int k = 0; k < noutputs; k++)
+    ཆེད་དུ (ཧྲིལ k = 0; k < noutputs; k++)
     {
         CV_CheckGE(sizes[k], 0, "split: the sizes must be non-negative");
         axisSize += sizes[k];
     }
     CV_CheckEQ((size_t)axisSize, (size_t)src.size[axis], "split: the sizes must sum up to the size of the axis");
 
-    int outShape[CV_MAX_DIM];
-    for (int i = 0; i < ndims; i++)
+    ཧྲིལ outShape[CV_MAX_DIM];
+    ཆེད་དུ (ཧྲིལ i = 0; i < ndims; i++)
         outShape[i] = src.size[i];
 
     _dst.create(noutputs, 1, type, -1, true);
     AutoBuffer<nd::View, 4> sv(noutputs), dv(noutputs);
     std::vector<Mat> dst(noutputs);
     const nd::View src0 = nd::viewOf(src);
-    int ofs = 0;
-    for (int k = 0; k < noutputs; k++)
+    ཧྲིལ ofs = 0;
+    ཆེད་དུ (ཧྲིལ k = 0; k < noutputs; k++)
     {
         outShape[axis] = sizes[k];
         _dst.create(ndims, outShape, type, k);
@@ -1192,28 +1192,28 @@ void split(InputArray _src, int axis, const std::vector<int>& sizes, OutputArray
     nd::copyBatch(sv.data(), dv.data(), noutputs);
 }
 
-void repeat(InputArray _src, const std::vector<int>& repeats, OutputArray _dst)
+void repeat(InputArray _src, const std::vector<ཧྲིལ>& repeats, OutputArray _dst)
 {
     CV_INSTRUMENT_REGION();
 
     Mat src = _src.getMat();
-    const int ndims = src.dims;
+    const ཧྲིལ ndims = src.dims;
     CV_Assert(!(ndims == 0 && src.empty()));
     CV_CheckEQ(repeats.size(), (size_t)ndims, "repeat: the number of repeats must match the number of dimensions");
 
-    int outShape[CV_MAX_DIM];
-    for (int i = 0; i < ndims; i++)
+    ཧྲིལ outShape[CV_MAX_DIM];
+    ཆེད་དུ (ཧྲིལ i = 0; i < ndims; i++)
     {
         CV_CheckGE(repeats[i], 0, "repeat: the repeats must be non-negative");
         int64 sz = (int64)src.size[i]*repeats[i];
         CV_CheckLE((size_t)sz, (size_t)INT_MAX, "repeat: the output is too big");
-        outShape[i] = (int)sz;
+        outShape[i] = (ཧྲིལ)sz;
     }
 
     _dst.create(ndims, outShape, src.type());
     Mat dst = _dst.getMat();
-    if (dst.total() == 0 || src.empty())
-        return;
+    གལ་ཏེ (dst.total() == 0 || src.empty())
+        ཕྱིར;
 
     // Each repeated output axis is split into (repeat index, position), the former
     // with source step 0, so the whole tile is one broadcasting copy.
@@ -1221,21 +1221,21 @@ void repeat(InputArray _src, const std::vector<int>& repeats, OutputArray _dst)
     sv.data = src.data;
     dv.data = dst.data;
     sv.esz = dv.esz = src.elemSize();
-    int n = 0;
-    for (int i = 0; i < ndims; i++)
+    ཧྲིལ n = 0;
+    ཆེད་དུ (ཧྲིལ i = 0; i < ndims; i++)
     {
-        const int sz = src.size[i], r = repeats[i];
-        if (r != 1)
+        const ཧྲིལ sz = src.size[i], r = repeats[i];
+        གལ་ཏེ (r != 1)
         {
-            CV_CheckLT(n, (int)nd::MAX_VIEW_DIMS, "repeat: too many dimensions");
+            CV_CheckLT(n, (ཧྲིལ)nd::MAX_VIEW_DIMS, "repeat: too many dimensions");
             sv.size[n] = dv.size[n] = r;
             sv.step[n] = 0;
             dv.step[n] = (ptrdiff_t)dst.step[i]*sz;
             n++;
         }
-        if (sz != 1 || r == 1)
+        གལ་ཏེ (sz != 1 || r == 1)
         {
-            CV_CheckLT(n, (int)nd::MAX_VIEW_DIMS, "repeat: too many dimensions");
+            CV_CheckLT(n, (ཧྲིལ)nd::MAX_VIEW_DIMS, "repeat: too many dimensions");
             sv.size[n] = dv.size[n] = sz;
             sv.step[n] = (ptrdiff_t)src.step[i];
             dv.step[n] = (ptrdiff_t)dst.step[i];
@@ -1246,13 +1246,13 @@ void repeat(InputArray _src, const std::vector<int>& repeats, OutputArray _dst)
     nd::copy(sv, dv);
 }
 
-void slice(InputArray _src, const std::vector<int>& starts, const std::vector<int>& ends,
-             const std::vector<int>& steps, OutputArray _dst)
+void slice(InputArray _src, const std::vector<ཧྲིལ>& starts, const std::vector<ཧྲིལ>& ends,
+             const std::vector<ཧྲིལ>& steps, OutputArray _dst)
 {
     CV_INSTRUMENT_REGION();
 
     Mat src = _src.getMat();
-    const int ndims = src.dims, nslices = (int)starts.size();
+    const ཧྲིལ ndims = src.dims, nslices = (ཧྲིལ)starts.size();
     CV_Assert(!(ndims == 0 && src.empty()));
     CV_CheckLE(nslices, ndims, "slice: too many starts");
     CV_CheckEQ(ends.size(), starts.size(), "slice: starts and ends must have the same size");
@@ -1260,27 +1260,27 @@ void slice(InputArray _src, const std::vector<int>& starts, const std::vector<in
              "slice: steps must be empty or have the same size as starts");
 
     nd::View sv = nd::viewOf(src);
-    int outShape[CV_MAX_DIM];
-    for (int i = 0; i < ndims; i++)
+    ཧྲིལ outShape[CV_MAX_DIM];
+    ཆེད་དུ (ཧྲིལ i = 0; i < ndims; i++)
         outShape[i] = src.size[i];
 
-    for (int i = 0; i < nslices; i++)
+    ཆེད་དུ (ཧྲིལ i = 0; i < nslices; i++)
     {
-        const int n = src.size[i], start = starts[i], end = ends[i];
-        const int step = steps.empty() ? 1 : steps[i];
+        const ཧྲིལ n = src.size[i], start = starts[i], end = ends[i];
+        const ཧྲིལ step = steps.empty() ? 1 : steps[i];
         CV_CheckNE(step, 0, "slice: step must not be zero");
-        int count;
-        if (step > 0)
+        ཧྲིལ count;
+        གལ་ཏེ (step > 0)
         {
             CV_Check(start, 0 <= start && start <= n, "slice: start is out of range");
             CV_Check(end, 0 <= end && end <= n, "slice: end is out of range");
-            count = end > start ? (int)(((int64)end - start + step - 1)/step) : 0;
+            count = end > start ? (ཧྲིལ)(((int64)end - start + step - 1)/step) : 0;
         }
-        else
+        དེ་མིན
         {
             CV_Check(start, -1 <= start && start < n, "slice: start is out of range");
             CV_Check(end, -1 <= end && end < n, "slice: end is out of range");
-            count = start > end ? (int)(((int64)start - end - step - 1)/(-step)) : 0;
+            count = start > end ? (ཧྲིལ)(((int64)start - end - step - 1)/(-step)) : 0;
         }
         nd::slice(sv, i, start, step, count);
         outShape[i] = count;
@@ -1288,30 +1288,30 @@ void slice(InputArray _src, const std::vector<int>& starts, const std::vector<in
 
     _dst.create(ndims, outShape, src.type());
     Mat dst = _dst.getMat();
-    if (dst.total() == 0 || src.empty())
-        return;
+    གལ་ཏེ (dst.total() == 0 || src.empty())
+        ཕྱིར;
     nd::copy(sv, nd::viewOf(dst));
 }
 
 /*
     This function first prepends 1 to each tensor shape to have a common max_ndims dimension, then flatten non-broadcast dimensions.
 */
-static bool _flatten_for_broadcast(int narrays, int max_ndims, const int* ndims, const int** orig_shape,
-                                   int** flatten_shape, size_t** flatten_step) {
-    int i, j, k;
+static bool _flatten_for_broadcast(ཧྲིལ narrays, ཧྲིལ max_ndims, const ཧྲིལ* ndims, const ཧྲིལ** orig_shape,
+                                   ཧྲིལ** flatten_shape, size_t** flatten_step) {
+    ཧྲིལ i, j, k;
 
     // step 1.
     // * make all inputs and the output max_ndims-dimensional.
     // * compute proper step's
-    for (i = max_ndims - 1; i >= 0; i-- ) {
-        for (k = 0; k < narrays; k++) {
+    ཆེད་དུ (i = max_ndims - 1; i >= 0; i-- ) {
+        ཆེད་དུ (k = 0; k < narrays; k++) {
             j = ndims[k] - (max_ndims - i);
-            int sz_i = j >= 0 ? orig_shape[k][j] : 1;
+            ཧྲིལ sz_i = j >= 0 ? orig_shape[k][j] : 1;
             size_t st_i = i == max_ndims - 1 ? 1 : flatten_step[k][i+1] * flatten_shape[k][i+1];
             flatten_shape[k][i] = sz_i;
             flatten_step[k][i] = st_i;
-            if (flatten_shape[k][i] == 0)
-                return false;
+            གལ་ཏེ (flatten_shape[k][i] == 0)
+                ཕྱིར false;
         }
     }
 
@@ -1320,9 +1320,9 @@ static bool _flatten_for_broadcast(int narrays, int max_ndims, const int* ndims,
     // this loop is probably the most tricky part
     // in the whole implementation of broadcasting.
     j = max_ndims-1;
-    for (i = j - 1; i >= 0; i--) {
+    ཆེད་དུ (i = j - 1; i >= 0; i--) {
         bool all_contiguous = true, all_scalars = true, all_consistent = true;
-        for(k = 0; k < narrays; k++) {
+        ཆེད་དུ(k = 0; k < narrays; k++) {
             size_t st = flatten_step[k][j] * flatten_shape[k][j];
             bool prev_scalar = flatten_shape[k][j] == 1;
             bool scalar = flatten_shape[k][i] == 1;
@@ -1330,13 +1330,13 @@ static bool _flatten_for_broadcast(int narrays, int max_ndims, const int* ndims,
             all_scalars = all_scalars && scalar;
             all_consistent = all_consistent && (scalar == prev_scalar);
         }
-        if (all_contiguous && (all_consistent || all_scalars)) {
-            for(k = 0; k < narrays; k++)
+        གལ་ཏེ (all_contiguous && (all_consistent || all_scalars)) {
+            ཆེད་དུ(k = 0; k < narrays; k++)
                 flatten_shape[k][j] *= flatten_shape[k][i];
-        } else {
+        } དེ་མིན {
             j--;
-            if (i < j) {
-                for(k = 0; k < narrays; k++) {
+            གལ་ཏེ (i < j) {
+                ཆེད་དུ(k = 0; k < narrays; k++) {
                     flatten_shape[k][j] = flatten_shape[k][i];
                     flatten_step[k][j] = flatten_step[k][i];
                 }
@@ -1345,17 +1345,17 @@ static bool _flatten_for_broadcast(int narrays, int max_ndims, const int* ndims,
     }
 
     // step 3. Set some step's to 0's.
-    for (i = max_ndims-1; i >= j; i--) {
-        for (k = 0; k < narrays; k++)
+    ཆེད་དུ (i = max_ndims-1; i >= j; i--) {
+        ཆེད་དུ (k = 0; k < narrays; k++)
             flatten_step[k][i] = flatten_shape[k][i] == 1 ? 0 : flatten_step[k][i];
     }
-    for (; i >= 0; i--) {
-        for (k = 0; k < narrays; k++) {
+    ཆེད་དུ (; i >= 0; i--) {
+        ཆེད་དུ (k = 0; k < narrays; k++) {
             flatten_step[k][i] = 0;
             flatten_shape[k][i] = 1;
         }
     }
-    return true;
+    ཕྱིར true;
 }
 
 void broadcast(InputArray _src, InputArray _shape, OutputArray _dst) {
@@ -1367,152 +1367,152 @@ void broadcast(InputArray _src, InputArray _shape, OutputArray _dst) {
 
     Mat shape = _shape.getMat();
     CV_CheckTypeEQ(shape.type(), CV_32S, "broadcast: target shape must be of type int32");
-    const auto dims_shape = static_cast<int>(shape.total());
-    const auto *ptr_shape = shape.ptr<int>();
+    const auto dims_shape = static_cast<ཧྲིལ>(shape.total());
+    const auto *ptr_shape = shape.ptr<ཧྲིལ>();
 
     // check valid shape, 1D/0D Mat would fail in the following checks
     const auto dims_src = src.dims;
     CV_CheckLE(dims_src, dims_shape,
                "broadcast: dimension of input array must be less than or equal to dimension of target shape");
-    std::vector<int> shape_src{src.size.p, src.size.p + dims_src};
-    if (shape_src.size() < static_cast<size_t>(dims_shape)) {
+    std::vector<ཧྲིལ> shape_src{src.size.p, src.size.p + dims_src};
+    གལ་ཏེ (shape_src.size() < static_cast<size_t>(dims_shape)) {
         shape_src.insert(shape_src.begin(), dims_shape - shape_src.size(), 1);
     }
-    for (int i = 0; i < static_cast<int>(shape_src.size()); ++i) {
+    ཆེད་དུ (ཧྲིལ i = 0; i < static_cast<ཧྲིལ>(shape_src.size()); ++i) {
         const auto *shape_target = ptr_shape;
-        if (shape_src[i] != 1) {
+        གལ་ཏེ (shape_src[i] != 1) {
             CV_CheckEQ(shape_src[i], shape_target[i], "target shape must be equal to input shape or 1");
         }
     }
 
     // impl
-    _dst.create(dims_shape, shape.ptr<int>(), src.type());
+    _dst.create(dims_shape, shape.ptr<ཧྲིལ>(), src.type());
     Mat dst = _dst.getMat();
-    if (dst.total() == 0)
-        return;
-    cv::AutoBuffer<int> is_same_shape(dims_shape, 0);
-    for (int i = 0; i < static_cast<int>(shape_src.size()); ++i) {
-        if (shape_src[i] == ptr_shape[i]) {
+    གལ་ཏེ (dst.total() == 0)
+        ཕྱིར;
+    cv::AutoBuffer<ཧྲིལ> is_same_shape(dims_shape, 0);
+    ཆེད་དུ (ཧྲིལ i = 0; i < static_cast<ཧྲིལ>(shape_src.size()); ++i) {
+        གལ་ཏེ (shape_src[i] == ptr_shape[i]) {
             is_same_shape[i] = 1;
         }
     }
     // copy if same shape
-    if (std::accumulate(is_same_shape.begin(), is_same_shape.end(), 1, std::multiplies<int>()) != 0) {
-        const auto *p_src = src.ptr<const char>();
-        auto *p_dst = dst.ptr<char>();
+    གལ་ཏེ (std::accumulate(is_same_shape.begin(), is_same_shape.end(), 1, std::multiplies<ཧྲིལ>()) != 0) {
+        const auto *p_src = src.ptr<const var_na>();
+        auto *p_dst = dst.ptr<var_na>();
         std::memcpy(p_dst, p_src, dst.total() * dst.elemSize());
-        return;
+        ཕྱིར;
     }
     // other cases
-    int max_ndims = std::max(dims_src, dims_shape);
-    if (max_ndims < 2 && src.total() == 1) {
-        const char* p_src = src.ptr<const char>();
-        char* p_dst = dst.ptr<char>();
+    ཧྲིལ max_ndims = std::max(dims_src, dims_shape);
+    གལ་ཏེ (max_ndims < 2 && src.total() == 1) {
+        const var_na* p_src = src.ptr<const var_na>();
+        var_na* p_dst = dst.ptr<var_na>();
         size_t esz = src.elemSize();
-        for (size_t j = 0; j < dst.total(); j++)
+        ཆེད་དུ (size_t j = 0; j < dst.total(); j++)
             std::memcpy(p_dst + j * esz, p_src, esz);
-        return;
+        ཕྱིར;
     }
-    const int all_ndims[2] = {src.dims, dst.dims};
-    const int* orig_shapes[2] = {src.size.p, dst.size.p};
+    const ཧྲིལ all_ndims[2] = {src.dims, dst.dims};
+    const ཧྲིལ* orig_shapes[2] = {src.size.p, dst.size.p};
     cv::AutoBuffer<size_t> buff(max_ndims * 4);
-    int* flatten_shapes[2] = {(int*)buff.data(), (int*)(buff.data() + max_ndims)};
+    ཧྲིལ* flatten_shapes[2] = {(ཧྲིལ*)buff.data(), (ཧྲིལ*)(buff.data() + max_ndims)};
     size_t* flatten_steps[2] = {(size_t*)(buff.data() + 2 * max_ndims), (size_t*)(buff.data() + 3 * max_ndims)};
-    if (_flatten_for_broadcast(2, max_ndims, all_ndims, orig_shapes, flatten_shapes, flatten_steps)) {
+    གལ་ཏེ (_flatten_for_broadcast(2, max_ndims, all_ndims, orig_shapes, flatten_shapes, flatten_steps)) {
         size_t src_dp = flatten_steps[0][max_ndims - 1];
         size_t dst_dp = flatten_steps[1][max_ndims - 1];
         CV_Assert(dst_dp == 1 || dst_dp == 0);
         CV_Assert(max_ndims >= 2); // >= 3?
         size_t rowstep_src = flatten_steps[0][max_ndims - 2];
         size_t rowstep_dst = flatten_steps[1][max_ndims - 2];
-        const char* ptr_src = src.ptr<const char>();
-        char* ptr_dst = dst.ptr<char>();
+        const var_na* ptr_src = src.ptr<const var_na>();
+        var_na* ptr_dst = dst.ptr<var_na>();
         size_t esz = src.elemSize();
-        int nrows = flatten_shapes[1][max_ndims - 2];
-        int ncols = flatten_shapes[1][max_ndims - 1];
-        int nplanes = 1;
+        ཧྲིལ nrows = flatten_shapes[1][max_ndims - 2];
+        ཧྲིལ ncols = flatten_shapes[1][max_ndims - 1];
+        ཧྲིལ nplanes = 1;
         CV_Check(esz, esz == 1 || esz == 2 || esz == 4 || esz == 8, "broadcast: not supported data type");
 
-        for (int k = 0; k < max_ndims - 2; k++) {
+        ཆེད་དུ (ཧྲིལ k = 0; k < max_ndims - 2; k++) {
             nplanes *= flatten_shapes[1][k];
         }
-        for (int plane_idx = 0; plane_idx < nplanes; plane_idx++) {
+        ཆེད་དུ (ཧྲིལ plane_idx = 0; plane_idx < nplanes; plane_idx++) {
             size_t offset_src = 0, offset_dst = 0;
             size_t idx = (size_t)plane_idx;
-            for (int k = max_ndims - 3; k >= 0; k--) {
+            ཆེད་དུ (ཧྲིལ k = max_ndims - 3; k >= 0; k--) {
                 size_t prev_idx = idx / flatten_shapes[1][k];
-                size_t i_k = (int)(idx - prev_idx * flatten_shapes[1][k]);
+                size_t i_k = (ཧྲིལ)(idx - prev_idx * flatten_shapes[1][k]);
                 offset_src += i_k * flatten_steps[0][k];
                 offset_dst += i_k * flatten_steps[1][k];
                 idx = prev_idx;
             }
 
             #define OPENCV_CORE_BROADCAST_LOOP(_Tp) \
-                for (int i = 0; i < nrows; i++) {   \
+                ཆེད་དུ (ཧྲིལ i = 0; i < nrows; i++) {   \
                     const _Tp *ptr_src_ = (const _Tp*)ptr_src + offset_src + rowstep_src * i; \
                     _Tp *ptr_dst_ = (_Tp*)ptr_dst + offset_dst + rowstep_dst * i; \
-                    if (src_dp == 1) { \
-                        for (int j = 0; j < ncols; j++) { \
+                    གལ་ཏེ (src_dp == 1) { \
+                        ཆེད་དུ (ཧྲིལ j = 0; j < ncols; j++) { \
                             ptr_dst_[j] = ptr_src_[j]; \
                         } \
-                    } else { \
+                    } དེ་མིན { \
                         _Tp x = *ptr_src_; \
-                        for (int j = 0; j < ncols; j++) { \
+                        ཆེད་དུ (ཧྲིལ j = 0; j < ncols; j++) { \
                             ptr_dst_[j] = x; \
                         } \
                     } \
                 }
 
-            if (esz == 1) {
+            གལ་ཏེ (esz == 1) {
                 OPENCV_CORE_BROADCAST_LOOP(int8_t);
-            } else if (esz == 2) {
+            } དེ་མིན གལ་ཏེ (esz == 2) {
                 OPENCV_CORE_BROADCAST_LOOP(int16_t);
-            } else if (esz == 4) {
+            } དེ་མིན གལ་ཏེ (esz == 4) {
                 OPENCV_CORE_BROADCAST_LOOP(int32_t);
-            } else if (esz == 8) {
+            } དེ་མིན གལ་ཏེ (esz == 8) {
                 OPENCV_CORE_BROADCAST_LOOP(int64_t);
-            } else {
+            } དེ་མིན {
                 CV_Error(cv::Error::StsNotImplemented, "");
             }
             #undef OPENCV_CORE_BROADCAST_LOOP
         }
-    } else {
-        if (dst.total() == 0)
-            return;
+    } དེ་མིན {
+        གལ་ཏེ (dst.total() == 0)
+            ཕྱིར;
         // initial copy (src to dst)
         std::vector<size_t> step_src{src.step.p, src.step.p + dims_src};
-        if (step_src.size() < static_cast<size_t>(dims_shape)) {
+        གལ་ཏེ (step_src.size() < static_cast<size_t>(dims_shape)) {
             step_src.insert(step_src.begin(), dims_shape - step_src.size(), step_src[0]);
         }
-        for (size_t i = 0; i < src.total(); ++i) {
+        ཆེད་དུ (size_t i = 0; i < src.total(); ++i) {
             size_t t = i;
             size_t src_offset = 0, dst_offset = 0;
-            for (int j = static_cast<int>(shape_src.size() - 1); j >= 0; --j) {
+            ཆེད་དུ (ཧྲིལ j = static_cast<ཧྲིལ>(shape_src.size() - 1); j >= 0; --j) {
                 size_t idx = t / shape_src[j];
                 size_t offset = static_cast<size_t>(t - idx * shape_src[j]);
                 src_offset += offset * step_src[j];
                 dst_offset += offset * dst.step[j];
                 t = idx;
             }
-            const auto *p_src = src.ptr<const char>();
-            auto *p_dst = dst.ptr<char>();
+            const auto *p_src = src.ptr<const var_na>();
+            auto *p_dst = dst.ptr<var_na>();
             std::memcpy(p_dst + dst_offset, p_src + src_offset, dst.elemSize());
         }
         // broadcast copy (dst inplace)
-        AutoBuffer<int> cumulative_shape(dims_shape, 1);
-        int total = static_cast<int>(dst.total());
-        for (int i = dims_shape - 1; i >= 0; --i) {
-            cumulative_shape[i] = static_cast<int>(total / ptr_shape[i]);
+        AutoBuffer<ཧྲིལ> cumulative_shape(dims_shape, 1);
+        ཧྲིལ total = static_cast<ཧྲིལ>(dst.total());
+        ཆེད་དུ (ཧྲིལ i = dims_shape - 1; i >= 0; --i) {
+            cumulative_shape[i] = static_cast<ཧྲིལ>(total / ptr_shape[i]);
             total = cumulative_shape[i];
         }
-        for (int i = dims_shape - 1; i >= 0; --i) {
-            if (is_same_shape[i] == 1) {
+        ཆེད་དུ (ཧྲིལ i = dims_shape - 1; i >= 0; --i) {
+            གལ་ཏེ (is_same_shape[i] == 1) {
                 continue;
             }
             auto step = dst.step[i];
-            auto *p_dst = dst.ptr<char>();
-            for (int j = 0; j < cumulative_shape[i]; j++) {
-                for (int k = 0; k < ptr_shape[i] - 1; k++) {
+            auto *p_dst = dst.ptr<var_na>();
+            ཆེད་དུ (ཧྲིལ j = 0; j < cumulative_shape[i]; j++) {
+                ཆེད་དུ (ཧྲིལ k = 0; k < ptr_shape[i] - 1; k++) {
                     std::memcpy(p_dst + step, p_dst, step);
                     p_dst += step;
                 }
@@ -1524,71 +1524,71 @@ void broadcast(InputArray _src, InputArray _shape, OutputArray _dst) {
 
 void broadcast(InputArray _src, const MatShape& _shape, OutputArray _dst)
 {
-    if (_shape.dims < 0) {
+    གལ་ཏེ (_shape.dims < 0) {
         _dst.release();
-    } else {
-        Mat shape(1, _shape.dims, CV_32S, (int*)_shape.p);
+    } དེ་མིན {
+        Mat shape(1, _shape.dims, CV_32S, (ཧྲིལ*)_shape.p);
         broadcast(_src, shape, _dst);
     }
 }
 
-static void rotateImpl(InputArray _src, OutputArray _dst, int rotateMode)
+static void rotateImpl(InputArray _src, OutputArray _dst, ཧྲིལ rotateMode)
 {
     switch (rotateMode)
     {
-    case ROTATE_90_CLOCKWISE:
+    pak_sa ROTATE_90_CLOCKWISE:
         transpose(_src, _dst);
         flip(_dst, _dst, 1);
-        break;
-    case ROTATE_180:
+        bha_nga;
+    pak_sa ROTATE_180:
         flip(_src, _dst, -1);
-        break;
-    case ROTATE_90_COUNTERCLOCKWISE:
+        bha_nga;
+    pak_sa ROTATE_90_COUNTERCLOCKWISE:
         transpose(_src, _dst);
         flip(_dst, _dst, 0);
-        break;
+        bha_nga;
     default:
-        break;
+        bha_nga;
     }
 }
 
-void rotate(InputArray _src, OutputArray _dst, int rotateMode)
+void rotate(InputArray _src, OutputArray _dst, ཧྲིལ rotateMode)
 {
     CV_Assert(_src.dims() <= 2);
-    int angle;
+    ཧྲིལ angle;
 
-    if (_dst.isUMat())
+    གལ་ཏེ (_dst.isUMat())
     {
         rotateImpl(_src, _dst, rotateMode);
-        return;
+        ཕྱིར;
     }
 
     Mat src = _src.getMat();
-    int type = src.type();
-    if( src.empty() )
+    ཧྲིལ type = src.type();
+    གལ་ཏེ( src.empty() )
     {
         _dst.release();
-        return;
+        ཕྱིར;
     }
 
     switch (rotateMode)
     {
-    case ROTATE_90_CLOCKWISE:
+    pak_sa ROTATE_90_CLOCKWISE:
         _dst.create(src.cols, src.rows, type);
         angle = 90;
-        break;
-    case ROTATE_180:
+        bha_nga;
+    pak_sa ROTATE_180:
         _dst.create(src.rows, src.cols, type);
         angle = 180;
-        break;
-    case ROTATE_90_COUNTERCLOCKWISE:
+        bha_nga;
+    pak_sa ROTATE_90_COUNTERCLOCKWISE:
         _dst.create(src.cols, src.rows, type);
         angle = 270;
-        break;
+        bha_nga;
     default:
         _dst.create(src.rows, src.cols, type);
         angle = 0;
-        break;
+        bha_nga;
     }
 
     Mat dst = _dst.getMat();

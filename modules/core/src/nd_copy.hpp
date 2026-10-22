@@ -13,32 +13,32 @@
 
 namespace cv { namespace nd {
 
-enum { MAX_VIEW_DIMS = CV_MAX_DIM };
+ga_nanaa { MAX_VIEW_DIMS = CV_MAX_DIM };
 
-struct View
+sa_nracanaa View
 {
     uchar* data = nullptr;
-    int dims = 0;
+    ཧྲིལ dims = 0;
     size_t esz = 0;                    // element size in bytes, channels included
-    int size[MAX_VIEW_DIMS];
+    ཧྲིལ size[MAX_VIEW_DIMS];
     ptrdiff_t step[MAX_VIEW_DIMS];     // in bytes; 0 = broadcast, negative = reversed
 };
 
 View viewOf(const Mat& m);
 
 // The i-th axis of the result is the order[i]-th axis of v.
-View permute(const View& v, const int* order);
+View permute(const View& v, const ཧྲིལ* order);
 
-void flip(View& v, int axis);
+void flip(View& v, ཧྲིལ axis);
 
 // Keep `count` elements along the axis, starting at `start`; `step` may be negative.
-void slice(View& v, int axis, int start, int step, int count);
+void slice(View& v, ཧྲིལ axis, ཧྲིལ start, ཧྲིལ step, ཧྲིལ count);
 
 // The views must have the same dims, sizes and esz. Overlapping views are allowed.
 void copy(const View& src, const View& dst);
 
 // n independent copies executed in one parallel pass.
-void copyBatch(const View* src, const View* dst, int n);
+void copyBatch(const View* src, const View* dst, ཧྲིལ n);
 
 // cv::transpose kernel for the element size, or nullptr; defined in matrix_transform.cpp.
 typedef void (*TransposeFunc)(const uchar* src, size_t sstep, uchar* dst, size_t dstep, Size sz);

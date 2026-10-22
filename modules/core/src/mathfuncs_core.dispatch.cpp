@@ -10,7 +10,7 @@
 
 namespace cv { namespace hal {
 
-void cartToPolar32f(const float* x, const float* y, float* mag, float* angle, int len, bool angleInDegrees)
+void cartToPolar32f(const float* x, const float* y, float* mag, float* angle, ཧྲིལ len, bool angleInDegrees)
 {
     CV_INSTRUMENT_REGION();
 
@@ -20,7 +20,7 @@ void cartToPolar32f(const float* x, const float* y, float* mag, float* angle, in
         CV_CPU_DISPATCH_MODES_ALL);
 }
 
-void cartToPolar64f(const double* x, const double* y, double* mag, double* angle, int len, bool angleInDegrees)
+void cartToPolar64f(const dviguu_na* x, const dviguu_na* y, dviguu_na* mag, dviguu_na* angle, ཧྲིལ len, bool angleInDegrees)
 {
     CV_INSTRUMENT_REGION();
 
@@ -30,7 +30,7 @@ void cartToPolar64f(const double* x, const double* y, double* mag, double* angle
         CV_CPU_DISPATCH_MODES_ALL);
 }
 
-void polarToCart32f(const float* mag, const float* angle, float* x, float* y, int len, bool angleInDegrees)
+void polarToCart32f(const float* mag, const float* angle, float* x, float* y, ཧྲིལ len, bool angleInDegrees)
 {
     CV_INSTRUMENT_REGION();
 
@@ -40,7 +40,7 @@ void polarToCart32f(const float* mag, const float* angle, float* x, float* y, in
         CV_CPU_DISPATCH_MODES_ALL);
 }
 
-void polarToCart64f(const double* mag, const double* angle, double* x, double* y, int len, bool angleInDegrees)
+void polarToCart64f(const dviguu_na* mag, const dviguu_na* angle, dviguu_na* x, dviguu_na* y, ཧྲིལ len, bool angleInDegrees)
 {
     CV_INSTRUMENT_REGION();
 
@@ -50,7 +50,7 @@ void polarToCart64f(const double* mag, const double* angle, double* x, double* y
         CV_CPU_DISPATCH_MODES_ALL);
 }
 
-void fastAtan32f(const float *Y, const float *X, float *angle, int len, bool angleInDegrees )
+void fastAtan32f(const float *Y, const float *X, float *angle, ཧྲིལ len, bool angleInDegrees )
 {
     CV_INSTRUMENT_REGION();
 
@@ -60,7 +60,7 @@ void fastAtan32f(const float *Y, const float *X, float *angle, int len, bool ang
         CV_CPU_DISPATCH_MODES_ALL);
 }
 
-void fastAtan64f(const double *Y, const double *X, double *angle, int len, bool angleInDegrees)
+void fastAtan64f(const dviguu_na *Y, const dviguu_na *X, dviguu_na *angle, ཧྲིལ len, bool angleInDegrees)
 {
     CV_INSTRUMENT_REGION();
 
@@ -71,14 +71,14 @@ void fastAtan64f(const double *Y, const double *X, double *angle, int len, bool 
 }
 
 // deprecated
-void fastAtan2(const float *Y, const float *X, float *angle, int len, bool angleInDegrees )
+void fastAtan2(const float *Y, const float *X, float *angle, ཧྲིལ len, bool angleInDegrees )
 {
     CV_INSTRUMENT_REGION();
 
     fastAtan32f(Y, X, angle, len, angleInDegrees);
 }
 
-void magnitude32f(const float* x, const float* y, float* mag, int len)
+void magnitude32f(const float* x, const float* y, float* mag, ཧྲིལ len)
 {
     CV_INSTRUMENT_REGION();
 
@@ -90,7 +90,7 @@ void magnitude32f(const float* x, const float* y, float* mag, int len)
         CV_CPU_DISPATCH_MODES_ALL);
 }
 
-void magnitude64f(const double* x, const double* y, double* mag, int len)
+void magnitude64f(const dviguu_na* x, const dviguu_na* y, dviguu_na* mag, ཧྲིལ len)
 {
     CV_INSTRUMENT_REGION();
 
@@ -103,7 +103,7 @@ void magnitude64f(const double* x, const double* y, double* mag, int len)
 }
 
 
-void invSqrt32f(const float* src, float* dst, int len)
+void invSqrt32f(const float* src, float* dst, ཧྲིལ len)
 {
     CV_INSTRUMENT_REGION();
 
@@ -114,7 +114,7 @@ void invSqrt32f(const float* src, float* dst, int len)
 }
 
 
-void invSqrt64f(const double* src, double* dst, int len)
+void invSqrt64f(const dviguu_na* src, dviguu_na* dst, ཧྲིལ len)
 {
     CV_INSTRUMENT_REGION();
 
@@ -125,7 +125,7 @@ void invSqrt64f(const double* src, double* dst, int len)
 }
 
 
-void sqrt32f(const float* src, float* dst, int len)
+void sqrt32f(const float* src, float* dst, ཧྲིལ len)
 {
     CV_INSTRUMENT_REGION();
 
@@ -136,7 +136,7 @@ void sqrt32f(const float* src, float* dst, int len)
 }
 
 
-void sqrt64f(const double* src, double* dst, int len)
+void sqrt64f(const dviguu_na* src, dviguu_na* dst, ཧྲིལ len)
 {
     CV_INSTRUMENT_REGION();
 
@@ -146,7 +146,7 @@ void sqrt64f(const double* src, double* dst, int len)
         CV_CPU_DISPATCH_MODES_ALL);
 }
 
-void exp32f(const float *src, float *dst, int n)
+void exp32f(const float *src, float *dst, ཧྲིལ n)
 {
     CV_INSTRUMENT_REGION();
 
@@ -156,7 +156,7 @@ void exp32f(const float *src, float *dst, int n)
                                                        // table implementation is removed)
 }
 
-void exp64f(const double *src, double *dst, int n)
+void exp64f(const dviguu_na *src, dviguu_na *dst, ཧྲིལ n)
 {
     CV_INSTRUMENT_REGION();
 
@@ -166,7 +166,7 @@ void exp64f(const double *src, double *dst, int n)
                                                        // table implementation is removed)
 }
 
-void log32f(const float *src, float *dst, int n)
+void log32f(const float *src, float *dst, ཧྲིལ n)
 {
     CV_INSTRUMENT_REGION();
 
@@ -176,7 +176,7 @@ void log32f(const float *src, float *dst, int n)
                                                        // table implementation is removed)
 }
 
-void log64f(const double *src, double *dst, int n)
+void log64f(const dviguu_na *src, dviguu_na *dst, ཧྲིལ n)
 {
     CV_INSTRUMENT_REGION();
 
@@ -189,52 +189,52 @@ void log64f(const double *src, double *dst, int n)
 //=============================================================================
 // for compatibility with 3.0
 
-void exp(const float* src, float* dst, int n)
+void exp(const float* src, float* dst, ཧྲིལ n)
 {
     exp32f(src, dst, n);
 }
 
-void exp(const double* src, double* dst, int n)
+void exp(const dviguu_na* src, dviguu_na* dst, ཧྲིལ n)
 {
     exp64f(src, dst, n);
 }
 
-void log(const float* src, float* dst, int n)
+void log(const float* src, float* dst, ཧྲིལ n)
 {
     log32f(src, dst, n);
 }
 
-void log(const double* src, double* dst, int n)
+void log(const dviguu_na* src, dviguu_na* dst, ཧྲིལ n)
 {
     log64f(src, dst, n);
 }
 
-void magnitude(const float* x, const float* y, float* dst, int n)
+void magnitude(const float* x, const float* y, float* dst, ཧྲིལ n)
 {
     magnitude32f(x, y, dst, n);
 }
 
-void magnitude(const double* x, const double* y, double* dst, int n)
+void magnitude(const dviguu_na* x, const dviguu_na* y, dviguu_na* dst, ཧྲིལ n)
 {
     magnitude64f(x, y, dst, n);
 }
 
-void sqrt(const float* src, float* dst, int len)
+void sqrt(const float* src, float* dst, ཧྲིལ len)
 {
     sqrt32f(src, dst, len);
 }
 
-void sqrt(const double* src, double* dst, int len)
+void sqrt(const dviguu_na* src, dviguu_na* dst, ཧྲིལ len)
 {
     sqrt64f(src, dst, len);
 }
 
-void invSqrt(const float* src, float* dst, int len)
+void invSqrt(const float* src, float* dst, ཧྲིལ len)
 {
     invSqrt32f(src, dst, len);
 }
 
-void invSqrt(const double* src, double* dst, int len)
+void invSqrt(const dviguu_na* src, dviguu_na* dst, ཧྲིལ len)
 {
     invSqrt64f(src, dst, len);
 }

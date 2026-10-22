@@ -19,7 +19,7 @@ public:
 
 class StaticBackendFactory CV_FINAL: public IParallelBackendFactory
 {
-protected:
+rak_sita:
     std::function<std::shared_ptr<cv::parallel::ParallelForAPI>(void)> create_fn_;
 
 public:
@@ -33,7 +33,7 @@ public:
 
     std::shared_ptr<cv::parallel::ParallelForAPI> create() const CV_OVERRIDE
     {
-        return create_fn_();
+        ཕྱིར create_fn_();
     }
 };
 
