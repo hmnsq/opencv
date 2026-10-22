@@ -5,125 +5,125 @@
 #ifndef OPENCV_CORE_BASE64_ENCODING_HPP
 #define OPENCV_CORE_BASE64_ENCODING_HPP
 
-namespace cv
+नामाकाश cv
 {
 
-namespace base64
+नामाकाश base64
 {
 /* A decorator for CvFileStorage
 * - no copyable
 * - not safe for now
 * - move constructor may be needed if C++11
 */
-uint8_t const base64_mapping[] =
+uint8_t अचर base64_mapping[] =
         "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
         "abcdefghijklmnopqrstuvwxyz"
         "0123456789+/";
 
-uint8_t const base64_padding = '=';
+uint8_t अचर base64_padding = '=';
 
-std::string make_base64_header(const char * dt);
+std::string make_base64_header(अचर वर्ण * dt);
 
-size_t base64_encode(uint8_t const * src, uint8_t * dst, size_t off, size_t cnt);
+माप_प्रकार base64_encode(uint8_t अचर * src, uint8_t * dst, माप_प्रकार off, माप_प्रकार cnt);
 
 
-int icvCalcStructSize( const char* dt, int initial_size );
+पूर्णाङ्क icvCalcStructSize( अचर वर्ण* dt, पूर्णाङ्क initial_size );
 
-class Base64ContextEmitter;
-class Impl;
+वर्ग Base64ContextEmitter;
+वर्ग Impl;
 
-class Base64Writer
+वर्ग Base64Writer
 {
-public:
-    Base64Writer(cv::FileStorage::Impl& fs, bool can_indent);
+सार्वजनिक:
+    Base64Writer(cv::FileStorage::Impl& fs, तार्किक can_indent);
     ~Base64Writer();
-    void write(const void* _data, size_t len, const char* dt);
-    template<typename _to_binary_convertor_t> void write(_to_binary_convertor_t & convertor, const char* dt);
+    शून्य लिख(अचर शून्य* _data, माप_प्रकार len, अचर वर्ण* dt);
+    ढाँचा<typename to_द्विआधारी_convertor_t> शून्य लिख(to_द्विआधारी_convertor_t & convertor, अचर वर्ण* dt);
 
-private:
-    void check_dt(const char* dt);
+गुप्त:
+    शून्य check_dt(अचर वर्ण* dt);
 
-private:
+गुप्त:
     // disable copy and assignment
-    Base64Writer(const Base64Writer &);
-    Base64Writer & operator=(const Base64Writer &);
+    Base64Writer(अचर Base64Writer &);
+    Base64Writer & चालक=(अचर Base64Writer &);
 
-private:
+गुप्त:
 
     Base64ContextEmitter * emitter;
     std::string data_type_string;
 };
 
-size_t base64_encode_buffer_size(size_t cnt, bool is_end_with_zero = true);
+माप_प्रकार base64_encode_buffer_size(माप_प्रकार cnt, तार्किक is_end_with_zero = सत्य);
 
-template<typename _uint_t> inline size_t
-to_binary(_uint_t val, uchar * cur)
+ढाँचा<typename _uint_t> अन्तःस्थ माप_प्रकार
+to_द्विआधारी(_uint_t val, uchar * cur)
 {
-    size_t delta = CHAR_BIT;
-    size_t cnt = sizeof(_uint_t);
-    while (cnt --> static_cast<size_t>(0U)) {
+    माप_प्रकार delta = अक्षर_बिट;
+    माप_प्रकार cnt = परिमाण(_uint_t);
+    जबसम्म (cnt --> static_cast<माप_प्रकार>(0U)) {
         *cur++ = static_cast<uchar>(val);
         val >>= delta;
     }
-    return sizeof(_uint_t);
+    फर्काऊ परिमाण(_uint_t);
 }
 
-template<> inline size_t to_binary(bool val, uchar * cur)
+ढाँचा<> अन्तःस्थ माप_प्रकार to_द्विआधारी(तार्किक val, uchar * cur)
 {
-    return to_binary(static_cast<uchar>(val), cur);
+    फर्काऊ to_द्विआधारी(static_cast<uchar>(val), cur);
 }
 
-template<> inline size_t to_binary(double val, uchar * cur)
+ढाँचा<> अन्तःस्थ माप_प्रकार to_द्विआधारी(द्विगुण val, uchar * cur)
 {
     Cv64suf bit64;
     bit64.f = val;
-    return to_binary(bit64.u, cur);
+    फर्काऊ to_द्विआधारी(bit64.u, cur);
 }
 
-template<> inline size_t to_binary(float val, uchar * cur)
+ढाँचा<> अन्तःस्थ माप_प्रकार to_द्विआधारी(भिन्न val, uchar * cur)
 {
     Cv32suf bit32;
     bit32.f = val;
-    return to_binary(bit32.u, cur);
+    फर्काऊ to_द्विआधारी(bit32.u, cur);
 }
 
-template<typename _primitive_t> inline size_t
-to_binary(uchar const * val, uchar * cur)
+ढाँचा<typename _primitive_t> अन्तःस्थ माप_प्रकार
+to_द्विआधारी(uchar अचर * val, uchar * cur)
 {
-    return to_binary<_primitive_t>(*reinterpret_cast<_primitive_t const *>(val), cur);
+    फर्काऊ to_द्विआधारी<_primitive_t>(*reinterpret_cast<_primitive_t अचर *>(val), cur);
 }
 
 
 
-class RawDataToBinaryConvertor
+वर्ग Raw_Data_To_द्विआधारी_Convertor
 {
-public:
+सार्वजनिक:
     // NOTE: len is already multiplied by element size here
-    RawDataToBinaryConvertor(const void* src, int len, const std::string & dt);
+    Raw_Data_To_द्विआधारी_Convertor(अचर शून्य* src, पूर्णाङ्क len, अचर std::string & dt);
 
-    inline RawDataToBinaryConvertor & operator >>(uchar * & dst);
-    inline operator bool() const;
+    अन्तःस्थ Raw_Data_To_द्विआधारी_Convertor & चालक >>(uchar * & dst);
+    अन्तःस्थ चालक तार्किक() अचर;
 
-private:
-    typedef size_t(*to_binary_t)(const uchar *, uchar *);
-    struct elem_to_binary_t
+गुप्त:
+    प्रकारनिर्देश माप_प्रकार(*to_द्विआधारी_t)(अचर uchar *, uchar *);
+    संरचना elem_to_द्विआधारी_t
     {
-        size_t      offset;
-        size_t      offset_packed;
-        to_binary_t func;
+        माप_प्रकार      offset;
+        माप_प्रकार      offset_packed;
+        to_द्विआधारी_t func;
     };
 
-private:
-    size_t make_to_binary_funcs(const std::string &dt);
+गुप्त:
+    माप_प्रकार make_to_द्विआधारी_funcs(अचर std::string &dt);
 
-private:
-    const uchar * beg;
-    const uchar * cur;
-    const uchar * end;
+गुप्त:
+    अचर uchar * beg;
+    अचर uchar * cur;
+    अचर uchar * end;
 
-    size_t step;
-    size_t step_packed;
-    std::vector<elem_to_binary_t> to_binary_funcs;
+    माप_प्रकार step;
+    माप_प्रकार step_packed;
+    std::vector<elem_to_द्विआधारी_t> to_द्विआधारी_funcs;
 };
 
 }

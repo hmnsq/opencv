@@ -2,97 +2,97 @@
 // It is subject to the license terms in the LICENSE file found in the top-level directory
 // of this distribution and at http://opencv.org/license.html
 
-#include "precomp.hpp"
-#include "persistence.hpp"
+#अन्तर्भाव "precomp.hpp"
+#अन्तर्भाव "persistence.hpp"
 
-enum
+गणना
 {
     CV_YML_INDENT = 3,
     CV_YML_INDENT_FLOW = 1
 };
 
-namespace cv
+नामाकाश cv
 {
 
-class YAMLEmitter : public FileStorageEmitter
+वर्ग YAMLEmitter : सार्वजनिक FileStorageEmitter
 {
-public:
+सार्वजनिक:
     YAMLEmitter(FileStorage_API* _fs) : fs(_fs)
     {
     }
-    virtual ~YAMLEmitter() {}
+    आभास ~YAMLEmitter() {}
 
-    FStructData startWriteStruct(const FStructData& parent, const char* key,
-                                 int struct_flags, const char* type_name=0)
+    FStructData startWriteStruct(अचर FStructData& parent, अचर वर्ण* साँचो,
+                                 पूर्णाङ्क struct_flags, अचर वर्ण* type_name=0)
     {
-        char buf[CV_FS_MAX_LEN + 1024];
-        const char* data = 0;
+        वर्ण buf[CV_FS_MAX_LEN + 1024];
+        अचर वर्ण* data = 0;
 
-        if ( type_name && *type_name == '\0' )
+        यदि ( type_name && *type_name == '\0' )
             type_name = 0;
 
-        struct_flags = (struct_flags & (FileNode::TYPE_MASK|FileNode::FLOW)) | FileNode::EMPTY;
-        if( !FileNode::isCollection(struct_flags))
+        struct_flags = (struct_flags & (File_गाँठो::TYPE_MASK|File_गाँठो::FLOW)) | File_गाँठो::EMPTY;
+        यदि( !File_गाँठो::isCollection(struct_flags))
             CV_Error( cv::Error::StsBadArg,
                      "Some collection type - FileNode::SEQ or FileNode::MAP, must be specified" );
 
-        if (type_name && memcmp(type_name, "binary", 6) == 0)
+        यदि (type_name && स_भेद(type_name, "binary", 6) == 0)
         {
             /* reset struct flag. in order not to print ']' */
-            struct_flags = FileNode::SEQ;
-            snprintf(buf, sizeof(buf), "!!binary |");
+            struct_flags = File_गाँठो::SEQ;
+            snprintf(buf, परिमाण(buf), "!!binary |");
             data = buf;
         }
-        else if( FileNode::isFlow(struct_flags))
+        अन्यथा यदि( File_गाँठो::isFlow(struct_flags))
         {
-            char c = FileNode::isMap(struct_flags) ? '{' : '[';
-            struct_flags |= FileNode::FLOW;
+            वर्ण c = File_गाँठो::isMap(struct_flags) ? '{' : '[';
+            struct_flags |= File_गाँठो::FLOW;
 
-            if( type_name )
-                snprintf( buf, sizeof(buf), "!!%s %c", type_name, c );
-            else
+            यदि( type_name )
+                snprintf( buf, परिमाण(buf), "!!%s %c", type_name, c );
+            अन्यथा
             {
                 buf[0] = c;
                 buf[1] = '\0';
             }
             data = buf;
         }
-        else if( type_name )
+        अन्यथा यदि( type_name )
         {
-            snprintf( buf, sizeof(buf), "!!%s", type_name );
+            snprintf( buf, परिमाण(buf), "!!%s", type_name );
             data = buf;
         }
 
-        writeScalar( key, data );
+        writeScalar( साँचो, data );
 
         FStructData fsd;
         fsd.indent = parent.indent;
         fsd.flags = struct_flags;
 
-        if( !FileNode::isFlow(parent.flags) )
-            fsd.indent += CV_YML_INDENT + FileNode::isFlow(struct_flags);
+        यदि( !File_गाँठो::isFlow(parent.flags) )
+            fsd.indent += CV_YML_INDENT + File_गाँठो::isFlow(struct_flags);
 
-        return fsd;
+        फर्काऊ fsd;
     }
 
-    void endWriteStruct(const FStructData& current_struct)
+    शून्य endWriteStruct(अचर FStructData& current_struct)
     {
-        char* ptr;
+        वर्ण* ptr;
 
-        int struct_flags = current_struct.flags;
+        पूर्णाङ्क struct_flags = current_struct.flags;
 
-        if( FileNode::isFlow(struct_flags) )
+        यदि( File_गाँठो::isFlow(struct_flags) )
         {
             ptr = fs->bufferPtr();
-            if( ptr > fs->bufferStart() + current_struct.indent && !FileNode::isEmptyCollection(struct_flags) )
+            यदि( ptr > fs->bufferStart() + current_struct.indent && !File_गाँठो::isEmptyCollection(struct_flags) )
                 *ptr++ = ' ';
-            *ptr++ = FileNode::isMap(struct_flags) ? '}' : ']';
+            *ptr++ = File_गाँठो::isMap(struct_flags) ? '}' : ']';
             fs->setBufferPtr(ptr);
         }
-        else if( FileNode::isEmptyCollection(struct_flags) )
+        अन्यथा यदि( File_गाँठो::isEmptyCollection(struct_flags) )
         {
             ptr = fs->flush();
-            memcpy( ptr, FileNode::isMap(struct_flags) ? "{}" : "[]", 2 );
+            स_नकल( ptr, File_गाँठो::isMap(struct_flags) ? "{}" : "[]", 2 );
             fs->setBufferPtr(ptr + 2);
         }
         /*
@@ -101,222 +101,222 @@ public:
         CV_Assert( fs->struct_indent >= 0 );*/
     }
 
-    void write(const char* key, int value)
+    शून्य लिख(अचर वर्ण* साँचो, पूर्णाङ्क value)
     {
-        char buf[128];
-        writeScalar( key, fs::itoa( value, buf, 10 ));
+        वर्ण buf[128];
+        writeScalar( साँचो, fs::itoa( value, buf, 10 ));
     }
 
-    void write(const char* key, int64_t value)
+    शून्य लिख(अचर वर्ण* साँचो, int64_t value)
     {
-        char buf[128];
-        writeScalar( key, fs::itoa( value, buf, 10, true ));
+        वर्ण buf[128];
+        writeScalar( साँचो, fs::itoa( value, buf, 10, सत्य ));
     }
 
-    void write( const char* key, double value )
+    शून्य लिख( अचर वर्ण* साँचो, द्विगुण value )
     {
-        char buf[128];
-        writeScalar( key, fs::doubleToString( buf, sizeof(buf), value, false ));
+        वर्ण buf[128];
+        writeScalar( साँचो, fs::doubleToString( buf, परिमाण(buf), value, असत्य ));
     }
 
-    void write(const char* key, const char* str, bool quote)
+    शून्य लिख(अचर वर्ण* साँचो, अचर वर्ण* str, तार्किक quote)
     {
-        char buf[CV_FS_MAX_LEN*4+16];
-        char* data = (char*)str;
-        int i, len;
+        वर्ण buf[CV_FS_MAX_LEN*4+16];
+        वर्ण* data = (वर्ण*)str;
+        पूर्णाङ्क i, len;
 
-        if( !str )
+        यदि( !str )
             CV_Error( cv::Error::StsNullPtr, "Null string pointer" );
 
-        len = (int)strlen(str);
-        if( len > CV_FS_MAX_LEN )
+        len = (पूर्णाङ्क)म_माप(str);
+        यदि( len > CV_FS_MAX_LEN )
             CV_Error( cv::Error::StsBadArg, "The written string is too long" );
 
-        if( quote || len == 0 || str[0] != str[len-1] || (str[0] != '\"' && str[0] != '\'') )
+        यदि( quote || len == 0 || str[0] != str[len-1] || (str[0] != '\"' && str[0] != '\'') )
         {
-            int need_quote = quote || len == 0 || str[0] == ' ';
+            पूर्णाङ्क need_quote = quote || len == 0 || str[0] == ' ';
             data = buf;
             *data++ = '\"';
-            for( i = 0; i < len; i++ )
+            लागि( i = 0; i < len; i++ )
             {
-                char c = str[i];
+                वर्ण c = str[i];
 
-                if( !need_quote && !cv_isalnum(c) && c != '_' && c != ' ' && c != '-' &&
+                यदि( !need_quote && !cv_isalnum(c) && c != '_' && c != ' ' && c != '-' &&
                    c != '(' && c != ')' && c != '/' && c != '+' && c != ';' )
                     need_quote = 1;
 
-                if( !cv_isalnum(c) && (!cv_isprint(c) || c == '\\' || c == '\'' || c == '\"') )
+                यदि( !cv_isalnum(c) && (!cv_isprint(c) || c == '\\' || c == '\'' || c == '\"') )
                 {
                     *data++ = '\\';
-                    if( cv_isprint(c) )
+                    यदि( cv_isprint(c) )
                         *data++ = c;
-                    else if( c == '\n' )
+                    अन्यथा यदि( c == '\n' )
                         *data++ = 'n';
-                    else if( c == '\r' )
+                    अन्यथा यदि( c == '\r' )
                         *data++ = 'r';
-                    else if( c == '\t' )
+                    अन्यथा यदि( c == '\t' )
                         *data++ = 't';
-                    else
+                    अन्यथा
                     {
-                        snprintf( data, sizeof(buf) - (data - buf), "x%02x", c );
+                        snprintf( data, परिमाण(buf) - (data - buf), "x%02x", c );
                         data += 3;
                     }
                 }
-                else
+                अन्यथा
                     *data++ = c;
             }
-            if( !need_quote && (cv_isdigit(str[0]) ||
+            यदि( !need_quote && (cv_isdigit(str[0]) ||
                                 str[0] == '+' || str[0] == '-' || str[0] == '.' ))
                 need_quote = 1;
 
-            if( need_quote )
+            यदि( need_quote )
                 *data++ = '\"';
             *data++ = '\0';
             data = buf + !need_quote;
         }
 
-        writeScalar( key, data);
+        writeScalar( साँचो, data);
     }
 
-    void writeScalar(const char* key, const char* data)
+    शून्य writeScalar(अचर वर्ण* साँचो, अचर वर्ण* data)
     {
-        fs->check_if_write_struct_is_delayed(false);
-        if ( fs->get_state_of_writing_base64() == FileStorage_API::Uncertain )
+        fs->check_if_write_struct_is_delayed(असत्य);
+        यदि ( fs->get_state_of_writing_base64() == FileStorage_API::Uncertain )
         {
             fs->switch_to_Base64_state( FileStorage_API::NotUse );
         }
-        else if ( fs->get_state_of_writing_base64() == FileStorage_API::InUse )
+        अन्यथा यदि ( fs->get_state_of_writing_base64() == FileStorage_API::InUse )
         {
             CV_Error( cv::Error::StsError, "At present, output Base64 data only." );
         }
 
-        int i, keylen = 0;
-        int datalen = 0;
-        char* ptr;
+        पूर्णाङ्क i, keylen = 0;
+        पूर्णाङ्क datalen = 0;
+        वर्ण* ptr;
 
         FStructData& current_struct = fs->getCurrentStruct();
 
-        int struct_flags = current_struct.flags;
+        पूर्णाङ्क struct_flags = current_struct.flags;
 
-        if( key && key[0] == '\0' )
-            key = 0;
+        यदि( साँचो && साँचो[0] == '\0' )
+            साँचो = 0;
 
-        if( FileNode::isCollection(struct_flags) )
+        यदि( File_गाँठो::isCollection(struct_flags) )
         {
-            if( (FileNode::isMap(struct_flags) ^ (key != 0)) )
+            यदि( (File_गाँठो::isMap(struct_flags) ^ (साँचो != 0)) )
                 CV_Error( cv::Error::StsBadArg, "An attempt to add element without a key to a map, "
                          "or add element with key to sequence" );
         }
-        else
+        अन्यथा
         {
             fs->setNonEmpty();
-            struct_flags = FileNode::EMPTY | (key ? FileNode::MAP : FileNode::SEQ);
+            struct_flags = File_गाँठो::EMPTY | (साँचो ? File_गाँठो::MAP : File_गाँठो::SEQ);
         }
 
-        if( key )
+        यदि( साँचो )
         {
-            keylen = (int)strlen(key);
-            if( keylen == 0 )
+            keylen = (पूर्णाङ्क)म_माप(साँचो);
+            यदि( keylen == 0 )
                 CV_Error( cv::Error::StsBadArg, "The key is an empty" );
 
-            if( keylen > CV_FS_MAX_LEN )
+            यदि( keylen > CV_FS_MAX_LEN )
                 CV_Error( cv::Error::StsBadArg, "The key is too long" );
         }
 
-        if( data )
-            datalen = (int)strlen(data);
+        यदि( data )
+            datalen = (पूर्णाङ्क)म_माप(data);
 
-        if( FileNode::isFlow(struct_flags) )
+        यदि( File_गाँठो::isFlow(struct_flags) )
         {
             ptr = fs->bufferPtr();
-            if( !FileNode::isEmptyCollection(struct_flags) )
+            यदि( !File_गाँठो::isEmptyCollection(struct_flags) )
                 *ptr++ = ',';
-            int new_offset = (int)(ptr - fs->bufferStart()) + keylen + datalen;
-            if( new_offset > fs->wrapMargin() && new_offset - current_struct.indent > 10 )
+            पूर्णाङ्क new_offset = (पूर्णाङ्क)(ptr - fs->bufferStart()) + keylen + datalen;
+            यदि( new_offset > fs->wrapMargin() && new_offset - current_struct.indent > 10 )
             {
                 fs->setBufferPtr(ptr);
                 ptr = fs->flush();
             }
-            else
+            अन्यथा
                 *ptr++ = ' ';
         }
-        else
+        अन्यथा
         {
             ptr = fs->flush();
-            if( !FileNode::isMap(struct_flags) )
+            यदि( !File_गाँठो::isMap(struct_flags) )
             {
                 *ptr++ = '-';
-                if( data )
+                यदि( data )
                     *ptr++ = ' ';
             }
         }
 
-        if( key )
+        यदि( साँचो )
         {
-            if( !cv_isalpha(key[0]) && key[0] != '_' )
+            यदि( !cv_isalpha(साँचो[0]) && साँचो[0] != '_' )
                 CV_Error( cv::Error::StsBadArg, "Key must start with a letter or _" );
 
             ptr = fs->resizeWriteBuffer( ptr, keylen );
 
-            for( i = 0; i < keylen; i++ )
+            लागि( i = 0; i < keylen; i++ )
             {
-                char c = key[i];
+                वर्ण c = साँचो[i];
 
                 ptr[i] = c;
-                if( !cv_isalnum(c) && c != '-' && c != '_' && c != ' ' )
+                यदि( !cv_isalnum(c) && c != '-' && c != '_' && c != ' ' )
                     CV_Error( cv::Error::StsBadArg, "Key names may only contain alphanumeric characters [a-zA-Z0-9], '-', '_' and ' '" );
             }
 
             ptr += keylen;
             *ptr++ = ':';
-            if( !FileNode::isFlow(struct_flags) && data )
+            यदि( !File_गाँठो::isFlow(struct_flags) && data )
                 *ptr++ = ' ';
         }
 
-        if( data )
+        यदि( data )
         {
             ptr = fs->resizeWriteBuffer( ptr, datalen );
-            memcpy( ptr, data, datalen );
+            स_नकल( ptr, data, datalen );
             ptr += datalen;
         }
 
         fs->setBufferPtr(ptr);
-        current_struct.flags &= ~FileNode::EMPTY;
+        current_struct.flags &= ~File_गाँठो::EMPTY;
     }
 
-    void writeComment(const char* comment, bool eol_comment)
+    शून्य writeComment(अचर वर्ण* comment, तार्किक eol_comment)
     {
-        if( !comment )
+        यदि( !comment )
             CV_Error( cv::Error::StsNullPtr, "Null comment" );
 
-        int len = (int)strlen(comment);
-        const char* eol = strchr(comment, '\n');
-        bool multiline = eol != 0;
-        char* ptr = fs->bufferPtr();
+        पूर्णाङ्क len = (पूर्णाङ्क)म_माप(comment);
+        अचर वर्ण* eol = म_अक्षर(comment, '\n');
+        तार्किक multiline = eol != 0;
+        वर्ण* ptr = fs->bufferPtr();
 
-        if( !eol_comment || multiline ||
+        यदि( !eol_comment || multiline ||
             fs->bufferEnd() - ptr < len || ptr == fs->bufferStart() )
             ptr = fs->flush();
-        else
+        अन्यथा
             *ptr++ = ' ';
 
-        while( comment )
+        जबसम्म( comment )
         {
             *ptr++ = '#';
             *ptr++ = ' ';
-            if( eol )
+            यदि( eol )
             {
-                ptr = fs->resizeWriteBuffer( ptr, (int)(eol - comment) + 1 );
-                memcpy( ptr, comment, eol - comment + 1 );
+                ptr = fs->resizeWriteBuffer( ptr, (पूर्णाङ्क)(eol - comment) + 1 );
+                स_नकल( ptr, comment, eol - comment + 1 );
                 fs->setBufferPtr(ptr + (eol - comment));
                 comment = eol + 1;
-                eol = strchr( comment, '\n' );
+                eol = म_अक्षर( comment, '\n' );
             }
-            else
+            अन्यथा
             {
-                len = (int)strlen(comment);
+                len = (पूर्णाङ्क)म_माप(comment);
                 ptr = fs->resizeWriteBuffer( ptr, len );
-                memcpy( ptr, comment, len );
+                स_नकल( ptr, comment, len );
                 fs->setBufferPtr(ptr + len);
                 comment = 0;
             }
@@ -324,214 +324,214 @@ public:
         }
     }
 
-    void startNextStream()
+    शून्य startNextStream()
     {
-        fs->puts( "...\n" );
-        fs->puts( "---\n" );
+        fs->माला_दो( "...\n" );
+        fs->माला_दो( "---\n" );
     }
 
-protected:
+रक्षित:
     FileStorage_API* fs;
 };
 
 
-class YAMLParser : public FileStorageParser
+वर्ग YAMLParser : सार्वजनिक FileStorageParser
 {
-public:
+सार्वजनिक:
     YAMLParser(FileStorage_API* _fs) : fs(_fs)
     {
     }
 
-    virtual ~YAMLParser() {}
+    आभास ~YAMLParser() {}
 
-    char* skipSpaces( char* ptr, int min_indent, int max_comment_indent )
+    वर्ण* skipSpaces( वर्ण* ptr, पूर्णाङ्क min_indent, पूर्णाङ्क max_comment_indent )
     {
-        if (!ptr)
+        यदि (!ptr)
             CV_PARSE_ERROR_CPP("Invalid input");
 
-        for(;;)
+        लागि(;;)
         {
-            while( *ptr == ' ' )
+            जबसम्म( *ptr == ' ' )
                 ptr++;
-            if( *ptr == '#' )
+            यदि( *ptr == '#' )
             {
-                if( ptr - fs->bufferStart() > max_comment_indent )
-                    return ptr;
+                यदि( ptr - fs->bufferStart() > max_comment_indent )
+                    फर्काऊ ptr;
                 *ptr = '\0';
             }
-            else if( cv_isprint(*ptr) )
+            अन्यथा यदि( cv_isprint(*ptr) )
             {
-                if( ptr - fs->bufferStart() < min_indent )
+                यदि( ptr - fs->bufferStart() < min_indent )
                     CV_PARSE_ERROR_CPP( "Incorrect indentation" );
-                break;
+                रोक;
             }
-            else if( *ptr == '\0' || *ptr == '\n' || *ptr == '\r' )
+            अन्यथा यदि( *ptr == '\0' || *ptr == '\n' || *ptr == '\r' )
             {
-                ptr = fs->gets();
-                if( !ptr )
+                ptr = fs->माला_लो();
+                यदि( !ptr )
                 {
                     // emulate end of stream
                     ptr = fs->bufferStart();
                     ptr[0] = ptr[1] = ptr[2] = '.';
                     ptr[3] = '\0';
                     fs->setEof();
-                    break;
+                    रोक;
                 }
-                else
+                अन्यथा
                 {
-                    int l = (int)strlen(ptr);
-                    if( ptr[l-1] != '\n' && ptr[l-1] != '\r' && !fs->eof() )
+                    पूर्णाङ्क l = (पूर्णाङ्क)म_माप(ptr);
+                    यदि( ptr[l-1] != '\n' && ptr[l-1] != '\r' && !fs->eof() )
                         CV_PARSE_ERROR_CPP( "Too long string or a last string w/o newline" );
                 }
             }
-            else
+            अन्यथा
                 CV_PARSE_ERROR_CPP( *ptr == '\t' ? "Tabs are prohibited in YAML!" : "Invalid character" );
         }
 
-        return ptr;
+        फर्काऊ ptr;
     }
 
-    bool getBase64Row(char* ptr, int indent, char* &beg, char* &end)
+    तार्किक getBase64Row(वर्ण* ptr, पूर्णाङ्क indent, वर्ण* &beg, वर्ण* &end)
     {
-        if (!ptr)
+        यदि (!ptr)
             CV_PARSE_ERROR_CPP("Invalid input");
 
-        beg = end = ptr = skipSpaces(ptr, 0, INT_MAX);
-        if (!ptr || !*ptr)
-            return false; // end of file
+        beg = end = ptr = skipSpaces(ptr, 0, पूर्णांक_उच्च);
+        यदि (!ptr || !*ptr)
+            फर्काऊ असत्य; // end of file
 
-        if (ptr - fs->bufferStart() != indent)
-            return false; // end of base64 data
+        यदि (ptr - fs->bufferStart() != indent)
+            फर्काऊ असत्य; // end of base64 data
 
         /* find end */
-        while(cv_isprint(*ptr)) /* no check for base64 string */
+        जबसम्म(cv_isprint(*ptr)) /* no check for base64 string */
             ++ptr;
-        if (*ptr == '\0')
+        यदि (*ptr == '\0')
             CV_PARSE_ERROR_CPP("Unexpected end of line");
 
         end = ptr;
-        return true;
+        फर्काऊ सत्य;
     }
 
 
-    char* parseKey( char* ptr, FileNode& map_node, FileNode& value_placeholder )
+    वर्ण* parse_साँचो( वर्ण* ptr, File_गाँठो& map_गाँठो, File_गाँठो& मान_placeholder )
     {
-        if (!ptr)
+        यदि (!ptr)
             CV_PARSE_ERROR_CPP("Invalid input");
 
-        char c;
-        char *endptr = ptr - 1, *saveptr;
+        वर्ण c;
+        वर्ण *endptr = ptr - 1, *saveptr;
 
-        if( *ptr == '-' )
+        यदि( *ptr == '-' )
             CV_PARSE_ERROR_CPP( "Key may not start with \'-\'" );
 
-        do c = *++endptr;
-        while( cv_isprint(c) && c != ':' );
+        गर c = *++endptr;
+        जबसम्म( cv_isprint(c) && c != ':' );
 
-        if( c != ':' )
+        यदि( c != ':' )
             CV_PARSE_ERROR_CPP( "Missing \':\'" );
 
         saveptr = endptr + 1;
-        if( endptr == ptr )
+        यदि( endptr == ptr )
             CV_PARSE_ERROR_CPP( "An empty key" );
 
-        do c = *--endptr;
-        while( c == ' ' );
+        गर c = *--endptr;
+        जबसम्म( c == ' ' );
 
         ++endptr;
 
-        value_placeholder = fs->addNode(map_node, std::string(ptr, endptr - ptr), FileNode::NONE);
+        मान_placeholder = fs->add_गाँठो(map_गाँठो, std::string(ptr, endptr - ptr), File_गाँठो::NONE);
         ptr = saveptr;
 
-        return ptr;
+        फर्काऊ ptr;
     }
 
-    char* parseValue( char* ptr, FileNode& node, int min_indent, bool is_parent_flow, int depth = 0 )
+    वर्ण* parse_मान( वर्ण* ptr, File_गाँठो& गाँठो, पूर्णाङ्क min_indent, तार्किक is_parent_flow, पूर्णाङ्क depth = 0 )
     {
-        if (!ptr)
+        यदि (!ptr)
             CV_PARSE_ERROR_CPP("Invalid input");
 
-        if( depth > CV_PERSISTENCE_MAX_DEPTH )
+        यदि( depth > CV_PERSISTENCE_MAX_DEPTH )
             CV_PARSE_ERROR_CPP("Too many nested collections");
 
-        char* endptr = 0;
-        char c = ptr[0], d = ptr[1];
-        int value_type = FileNode::NONE;
-        int len;
-        bool is_binary_string = false;
-        bool is_user = false;
+        वर्ण* endptr = 0;
+        वर्ण c = ptr[0], d = ptr[1];
+        पूर्णाङ्क value_type = File_गाँठो::NONE;
+        पूर्णाङ्क len;
+        तार्किक is_द्विआधारी_string = असत्य;
+        तार्किक is_user = असत्य;
 
-        if( c == '!' ) // handle explicit type specification
+        यदि( c == '!' ) // handle explicit type specification
         {
-            if( d == '!' || d == '^' )
+            यदि( d == '!' || d == '^' )
             {
                 ptr++;
-                is_user = true;
+                is_user = सत्य;
                 //value_type |= FileNode::USER;
             }
-            if ( d == '<') //support of full type heading from YAML 1.2
+            यदि ( d == '<') //support of full type heading from YAML 1.2
             {
-                const char* yamlTypeHeading = "<tag:yaml.org,2002:";
-                const size_t headingLength = strlen(yamlTypeHeading);
+                अचर वर्ण* yamlTypeHeading = "<tag:yaml.org,2002:";
+                अचर माप_प्रकार headingLength = म_माप(yamlTypeHeading);
 
-                char* typeEndPtr = ++ptr;
+                वर्ण* typeEndPtr = ++ptr;
 
-                do d = *++typeEndPtr;
-                while( cv_isprint(d) && d != ' ' && d != '>' );
+                गर d = *++typeEndPtr;
+                जबसम्म( cv_isprint(d) && d != ' ' && d != '>' );
 
-                if ( d == '>' && (size_t)(typeEndPtr - ptr) > headingLength )
+                यदि ( d == '>' && (माप_प्रकार)(typeEndPtr - ptr) > headingLength )
                 {
-                    if ( memcmp(ptr, yamlTypeHeading, headingLength) == 0 )
+                    यदि ( स_भेद(ptr, yamlTypeHeading, headingLength) == 0 )
                     {
                         *typeEndPtr = ' ';
                         ptr += headingLength - 1;
-                        is_user = true;
+                        is_user = सत्य;
                         //value_type |= FileNode::USER;
                     }
                 }
             }
 
             endptr = ptr++;
-            do d = *++endptr;
-            while( cv_isprint(d) && d != ' ' );
-            len = (int)(endptr - ptr);
-            if( len == 0 )
+            गर d = *++endptr;
+            जबसम्म( cv_isprint(d) && d != ' ' );
+            len = (पूर्णाङ्क)(endptr - ptr);
+            यदि( len == 0 )
                 CV_PARSE_ERROR_CPP( "Empty type name" );
             d = *endptr;
             *endptr = '\0';
 
-            if( len == 3 && !is_user )
+            यदि( len == 3 && !is_user )
             {
-                if( memcmp( ptr, "str", 3 ) == 0 )
-                    value_type = FileNode::STRING;
-                else if( memcmp( ptr, "int", 3 ) == 0 )
-                    value_type = FileNode::INT;
-                else if( memcmp( ptr, "seq", 3 ) == 0 )
-                    value_type = FileNode::SEQ;
-                else if( memcmp( ptr, "map", 3 ) == 0 )
-                    value_type = FileNode::MAP;
+                यदि( स_भेद( ptr, "str", 3 ) == 0 )
+                    value_type = File_गाँठो::STRING;
+                अन्यथा यदि( स_भेद( ptr, "int", 3 ) == 0 )
+                    value_type = File_गाँठो::INT;
+                अन्यथा यदि( स_भेद( ptr, "seq", 3 ) == 0 )
+                    value_type = File_गाँठो::SEQ;
+                अन्यथा यदि( स_भेद( ptr, "map", 3 ) == 0 )
+                    value_type = File_गाँठो::MAP;
             }
-            else if( len == 5 && !is_user )
+            अन्यथा यदि( len == 5 && !is_user )
             {
-                if( memcmp( ptr, "float", 5 ) == 0 )
-                    value_type = FileNode::REAL;
+                यदि( स_भेद( ptr, "float", 5 ) == 0 )
+                    value_type = File_गाँठो::REAL;
             }
-            else if (len == 6 && is_user)
+            अन्यथा यदि (len == 6 && is_user)
             {
-                if( memcmp( ptr, "binary", 6 ) == 0 ) {
-                    value_type = FileNode::SEQ;
-                    is_binary_string = true;
+                यदि( स_भेद( ptr, "binary", 6 ) == 0 ) {
+                    value_type = File_गाँठो::SEQ;
+                    is_द्विआधारी_string = सत्य;
 
                     /* for ignore '|' */
 
                     /**** operation with endptr ****/
                     *endptr = d;
 
-                    do {
+                    गर {
                         d = *++endptr;
-                        if (d == '|')
-                            break;
-                    } while (d == ' ');
+                        यदि (d == '|')
+                            रोक;
+                    } जबसम्म (d == ' ');
 
                     d = *++endptr;
                     *endptr = '\0';
@@ -539,364 +539,364 @@ public:
             }
 
             *endptr = d;
-            ptr = skipSpaces( endptr, min_indent, INT_MAX );
-            if (!ptr)
+            ptr = skipSpaces( endptr, min_indent, पूर्णांक_उच्च );
+            यदि (!ptr)
                 CV_PARSE_ERROR_CPP("Invalid input");
 
             c = *ptr;
 
-            if( !is_user )
+            यदि( !is_user )
             {
-                if (value_type == FileNode::STRING && c != '\'' && c != '\"')
-                    goto force_string;
-                if( value_type == FileNode::INT )
-                    goto force_int;
-                if( value_type == FileNode::REAL )
-                    goto force_real;
+                यदि (value_type == File_गाँठो::STRING && c != '\'' && c != '\"')
+                    गच्छ force_string;
+                यदि( value_type == File_गाँठो::INT )
+                    गच्छ force_int;
+                यदि( value_type == File_गाँठो::REAL )
+                    गच्छ force_real;
             }
         }
 
-        if (is_binary_string)
+        यदि (is_द्विआधारी_string)
         {
-            int indent = static_cast<int>(ptr - fs->bufferStart());
-            ptr = fs->parseBase64(ptr, indent, node);
+            पूर्णाङ्क indent = static_cast<पूर्णाङ्क>(ptr - fs->bufferStart());
+            ptr = fs->parseBase64(ptr, indent, गाँठो);
         }
-        else if( cv_isdigit(c) ||
+        अन्यथा यदि( cv_isdigit(c) ||
                 ((c == '-' || c == '+') && (cv_isdigit(d) || d == '.')) ||
                 (c == '.' && cv_isalnum(d))) // a number
         {
             endptr = ptr + (c == '-' || c == '+');
-            while( cv_isdigit(*endptr) )
+            जबसम्म( cv_isdigit(*endptr) )
                 endptr++;
-            if( *endptr == '.' || *endptr == 'e' )
+            यदि( *endptr == '.' || *endptr == 'e' )
             {
             force_real:
-                double fval = fs->strtod( ptr, &endptr );
-                node.setValue(FileNode::REAL, &fval);
+                द्विगुण fval = fs->म_से_भग्न( ptr, &endptr );
+                गाँठो.set_मान(File_गाँठो::REAL, &fval);
             }
-            else
+            अन्यथा
             {
             force_int:
                 int64_t ival = strtoll( ptr, &endptr, 0 );
-                node.setValue(FileNode::INT, &ival);
+                गाँठो.set_मान(File_गाँठो::INT, &ival);
             }
 
-            if( !endptr || endptr == ptr )
+            यदि( !endptr || endptr == ptr )
                 CV_PARSE_ERROR_CPP( "Invalid numeric value (inconsistent explicit type specification?)" );
 
             ptr = endptr;
             CV_PERSISTENCE_CHECK_END_OF_BUFFER_BUG_CPP();
         }
-        else if( c == '\'' || c == '\"' ) // an explicit string
+        अन्यथा यदि( c == '\'' || c == '\"' ) // an explicit string
         {
-            if( c == '\'' )
-                for( len = 0; len < CV_FS_MAX_LEN; )
+            यदि( c == '\'' )
+                लागि( len = 0; len < CV_FS_MAX_LEN; )
                 {
                     c = *++ptr;
-                    if( cv_isalnum(c) || (c != '\'' && cv_isprint(c)))
+                    यदि( cv_isalnum(c) || (c != '\'' && cv_isprint(c)))
                         buf[len++] = c;
-                    else if( c == '\'' )
+                    अन्यथा यदि( c == '\'' )
                     {
                         c = *++ptr;
-                        if( c != '\'' )
-                            break;
+                        यदि( c != '\'' )
+                            रोक;
                         buf[len++] = c;
                     }
-                    else
+                    अन्यथा
                         CV_PARSE_ERROR_CPP( "Invalid character" );
                 }
-            else
-                for( len = 0; len < CV_FS_MAX_LEN; )
+            अन्यथा
+                लागि( len = 0; len < CV_FS_MAX_LEN; )
                 {
                     c = *++ptr;
-                    if( cv_isalnum(c) || (c != '\\' && c != '\"' && cv_isprint(c)))
+                    यदि( cv_isalnum(c) || (c != '\\' && c != '\"' && cv_isprint(c)))
                         buf[len++] = c;
-                    else if( c == '\"' )
+                    अन्यथा यदि( c == '\"' )
                     {
                         ++ptr;
-                        break;
+                        रोक;
                     }
-                    else if( c == '\\' )
+                    अन्यथा यदि( c == '\\' )
                     {
                         d = *++ptr;
-                        if( d == '\'' )
+                        यदि( d == '\'' )
                             buf[len++] = d;
-                        else if( d == '\"' || d == '\\' || d == '\'' )
+                        अन्यथा यदि( d == '\"' || d == '\\' || d == '\'' )
                             buf[len++] = d;
-                        else if( d == 'n' )
+                        अन्यथा यदि( d == 'n' )
                             buf[len++] = '\n';
-                        else if( d == 'r' )
+                        अन्यथा यदि( d == 'r' )
                             buf[len++] = '\r';
-                        else if( d == 't' )
+                        अन्यथा यदि( d == 't' )
                             buf[len++] = '\t';
-                        else if( d == 'x' || (cv_isdigit(d) && d < '8') )
+                        अन्यथा यदि( d == 'x' || (cv_isdigit(d) && d < '8') )
                         {
-                            int val, is_hex = d == 'x';
+                            पूर्णाङ्क val, is_hex = d == 'x';
                             c = ptr[3];
                             ptr[3] = '\0';
-                            val = (int)strtol( ptr + is_hex, &endptr, is_hex ? 8 : 16 );
+                            val = (पूर्णाङ्क)म_से_दीर्घ( ptr + is_hex, &endptr, is_hex ? 8 : 16 );
                             ptr[3] = c;
-                            if( endptr == ptr + is_hex )
+                            यदि( endptr == ptr + is_hex )
                                 buf[len++] = 'x';
-                            else
+                            अन्यथा
                             {
-                                buf[len++] = (char)val;
+                                buf[len++] = (वर्ण)val;
                                 ptr = endptr;
                             }
                         }
                     }
-                    else
+                    अन्यथा
                         CV_PARSE_ERROR_CPP( "Invalid character" );
                 }
 
-            if( len >= CV_FS_MAX_LEN )
+            यदि( len >= CV_FS_MAX_LEN )
                 CV_PARSE_ERROR_CPP( "Too long string literal" );
 
-            node.setValue(FileNode::STRING, buf, len);
+            गाँठो.set_मान(File_गाँठो::STRING, buf, len);
         }
-        else if( c == '[' || c == '{' ) // collection as a flow
+        अन्यथा यदि( c == '[' || c == '{' ) // collection as a flow
         {
-            int new_min_indent = min_indent + !is_parent_flow;
-            int struct_type = c == '{' ? FileNode::MAP : FileNode::SEQ;
-            int nelems = 0;
+            पूर्णाङ्क new_min_indent = min_indent + !is_parent_flow;
+            पूर्णाङ्क struct_type = c == '{' ? File_गाँठो::MAP : File_गाँठो::SEQ;
+            पूर्णाङ्क nelems = 0;
 
-            fs->convertToCollection(struct_type, node);
+            fs->convertToCollection(struct_type, गाँठो);
             d = c == '[' ? ']' : '}';
 
-            for( ++ptr ;; nelems++ )
+            लागि( ++ptr ;; nelems++ )
             {
-                FileNode elem;
+                File_गाँठो elem;
 
-                ptr = skipSpaces( ptr, new_min_indent, INT_MAX );
-                if (!ptr)
+                ptr = skipSpaces( ptr, new_min_indent, पूर्णांक_उच्च );
+                यदि (!ptr)
                     CV_PARSE_ERROR_CPP("Invalid input");
-                if( *ptr == '}' || *ptr == ']' )
+                यदि( *ptr == '}' || *ptr == ']' )
                 {
-                    if( *ptr != d )
+                    यदि( *ptr != d )
                         CV_PARSE_ERROR_CPP( "The wrong closing bracket" );
                     ptr++;
-                    break;
+                    रोक;
                 }
 
-                if( nelems != 0 )
+                यदि( nelems != 0 )
                 {
-                    if( *ptr != ',' )
+                    यदि( *ptr != ',' )
                         CV_PARSE_ERROR_CPP( "Missing , between the elements" );
-                    ptr = skipSpaces( ptr + 1, new_min_indent, INT_MAX );
-                    if (!ptr)
+                    ptr = skipSpaces( ptr + 1, new_min_indent, पूर्णांक_उच्च );
+                    यदि (!ptr)
                         CV_PARSE_ERROR_CPP("Invalid input");
                 }
 
-                if( struct_type == FileNode::MAP )
+                यदि( struct_type == File_गाँठो::MAP )
                 {
-                    ptr = parseKey( ptr, node, elem );
-                    ptr = skipSpaces( ptr, new_min_indent, INT_MAX );
+                    ptr = parse_साँचो( ptr, गाँठो, elem );
+                    ptr = skipSpaces( ptr, new_min_indent, पूर्णांक_उच्च );
                 }
-                else
+                अन्यथा
                 {
-                    if( *ptr == ']' )
-                        break;
-                    elem = fs->addNode(node, std::string(), FileNode::NONE);
+                    यदि( *ptr == ']' )
+                        रोक;
+                    elem = fs->add_गाँठो(गाँठो, std::string(), File_गाँठो::NONE);
                 }
-                ptr = parseValue( ptr, elem, new_min_indent, true, depth + 1 );
+                ptr = parse_मान( ptr, elem, new_min_indent, सत्य, depth + 1 );
             }
-            fs->finalizeCollection(node);
+            fs->finalizeCollection(गाँठो);
         }
-        else
+        अन्यथा
         {
-            int indent, struct_type;
+            पूर्णाङ्क indent, struct_type;
 
-            if( is_parent_flow || c != '-' )
+            यदि( is_parent_flow || c != '-' )
             {
                 // implicit (one-line) string or nested block-style collection
-                if( !is_parent_flow )
+                यदि( !is_parent_flow )
                 {
-                    if( c == '?' )
+                    यदि( c == '?' )
                         CV_PARSE_ERROR_CPP( "Complex keys are not supported" );
-                    if( c == '|' || c == '>' )
+                    यदि( c == '|' || c == '>' )
                         CV_PARSE_ERROR_CPP( "Multi-line text literals are not supported" );
                 }
 
             force_string:
                 endptr = ptr - 1;
 
-                do c = *++endptr;
-                while( cv_isprint(c) &&
+                गर c = *++endptr;
+                जबसम्म( cv_isprint(c) &&
                       (!is_parent_flow || (c != ',' && c != '}' && c != ']')) &&
-                      (is_parent_flow || c != ':' || value_type == FileNode::STRING));
+                      (is_parent_flow || c != ':' || value_type == File_गाँठो::STRING));
 
-                if( endptr == ptr )
+                यदि( endptr == ptr )
                     CV_PARSE_ERROR_CPP( "Invalid character" );
 
-                if( is_parent_flow || c != ':' )
+                यदि( is_parent_flow || c != ':' )
                 {
-                    char* str_end = endptr;
-                    do c = *--str_end;
-                    while( str_end > ptr && c == ' ' );
+                    वर्ण* str_end = endptr;
+                    गर c = *--str_end;
+                    जबसम्म( str_end > ptr && c == ' ' );
                     str_end++;
-                    if ((fs->getFormat() & FileStorage::FORMAT_MASK) != FileStorage::FORMAT_YAML_1_0)
+                    यदि ((fs->getFormat() & FileStorage::FORMAT_MASK) != FileStorage::FORMAT_YAML_1_0)
                     {
-                        size_t llen = str_end - ptr;
-                        if (llen == 4 && memcmp(ptr, "true", 4) == 0) {
+                        माप_प्रकार llen = str_end - ptr;
+                        यदि (llen == 4 && स_भेद(ptr, "true", 4) == 0) {
                             int64_t ival = 1;
-                            node.setValue(FileNode::INT, &ival);
+                            गाँठो.set_मान(File_गाँठो::INT, &ival);
                             ptr = endptr;
-                            return ptr;
+                            फर्काऊ ptr;
                         }
-                        else if (llen == 5 && memcmp(ptr, "false", 5) == 0) {
+                        अन्यथा यदि (llen == 5 && स_भेद(ptr, "false", 5) == 0) {
                             int64_t ival = 0;
-                            node.setValue(FileNode::INT, &ival);
+                            गाँठो.set_मान(File_गाँठो::INT, &ival);
                             ptr = endptr;
-                            return ptr;
+                            फर्काऊ ptr;
                         }
-                        else if (llen == 4 && memcmp(ptr, "null", 4) == 0) {
+                        अन्यथा यदि (llen == 4 && स_भेद(ptr, "null", 4) == 0) {
                             ptr = endptr;
-                            return ptr;
+                            फर्काऊ ptr;
                         }
                     }
 
-                    node.setValue(FileNode::STRING, ptr, (int)(str_end - ptr));
+                    गाँठो.set_मान(File_गाँठो::STRING, ptr, (पूर्णाङ्क)(str_end - ptr));
                     ptr = endptr;
-                    return ptr;
+                    फर्काऊ ptr;
                 }
-                struct_type = FileNode::MAP;
+                struct_type = File_गाँठो::MAP;
             }
-            else
-                struct_type = FileNode::SEQ;
+            अन्यथा
+                struct_type = File_गाँठो::SEQ;
 
-            fs->convertToCollection( struct_type, node );
-            indent = (int)(ptr - fs->bufferStart());
+            fs->convertToCollection( struct_type, गाँठो );
+            indent = (पूर्णाङ्क)(ptr - fs->bufferStart());
 
-            for(;;)
+            लागि(;;)
             {
-                FileNode elem;
+                File_गाँठो elem;
 
-                if( struct_type == FileNode::MAP )
+                यदि( struct_type == File_गाँठो::MAP )
                 {
-                    ptr = parseKey( ptr, node, elem );
+                    ptr = parse_साँचो( ptr, गाँठो, elem );
                 }
-                else
+                अन्यथा
                 {
                     c = *ptr++;
-                    if( c != '-' )
+                    यदि( c != '-' )
                         CV_PARSE_ERROR_CPP( "Block sequence elements must be preceded with \'-\'" );
 
-                    elem = fs->addNode(node, std::string(), FileNode::NONE);
+                    elem = fs->add_गाँठो(गाँठो, std::string(), File_गाँठो::NONE);
                 }
-                ptr = skipSpaces( ptr, indent + 1, INT_MAX );
-                ptr = parseValue( ptr, elem, indent + 1, false, depth + 1 );
-                ptr = skipSpaces( ptr, 0, INT_MAX );
-                if( ptr - fs->bufferStart() != indent )
+                ptr = skipSpaces( ptr, indent + 1, पूर्णांक_उच्च );
+                ptr = parse_मान( ptr, elem, indent + 1, असत्य, depth + 1 );
+                ptr = skipSpaces( ptr, 0, पूर्णांक_उच्च );
+                यदि( ptr - fs->bufferStart() != indent )
                 {
-                    if( ptr - fs->bufferStart() < indent )
-                        break;
-                    else
+                    यदि( ptr - fs->bufferStart() < indent )
+                        रोक;
+                    अन्यथा
                         CV_PARSE_ERROR_CPP( "Incorrect indentation" );
                 }
-                if( memcmp( ptr, "...", 3 ) == 0 )
-                    break;
+                यदि( स_भेद( ptr, "...", 3 ) == 0 )
+                    रोक;
             }
-            fs->finalizeCollection(node);
+            fs->finalizeCollection(गाँठो);
         }
 
-        return ptr;
+        फर्काऊ ptr;
     }
 
-    bool parse( char* ptr )
+    तार्किक parse( वर्ण* ptr )
     {
-        if (!ptr)
+        यदि (!ptr)
             CV_PARSE_ERROR_CPP("Invalid input");
 
-        bool first = true;
-        bool ok = true;
-        FileNode root_collection(fs->getFS(), 0, 0);
+        तार्किक first = सत्य;
+        तार्किक ok = सत्य;
+        File_गाँठो जरा_collection(fs->getFS(), 0, 0);
 
-        for(;;)
+        लागि(;;)
         {
             // 0. skip leading comments and directives  and ...
             // 1. reach the first item
-            for(;;)
+            लागि(;;)
             {
-                ptr = skipSpaces( ptr, 0, INT_MAX );
-                if( !ptr || *ptr == '\0' )
+                ptr = skipSpaces( ptr, 0, पूर्णांक_उच्च );
+                यदि( !ptr || *ptr == '\0' )
                 {
                     ok = !first;
-                    break;
+                    रोक;
                 }
 
-                if( *ptr == '%' )
+                यदि( *ptr == '%' )
                 {
-                    if( memcmp( ptr, "%YAML", 5 ) == 0 &&
-                        memcmp( ptr, "%YAML:1.", 8 ) != 0 &&
-                        memcmp( ptr, "%YAML 1.", 8 ) != 0)
+                    यदि( स_भेद( ptr, "%YAML", 5 ) == 0 &&
+                        स_भेद( ptr, "%YAML:1.", 8 ) != 0 &&
+                        स_भेद( ptr, "%YAML 1.", 8 ) != 0)
                     {
-                        if ((fs->getFormat() & FileStorage::FORMAT_MASK) == FileStorage::FORMAT_YAML_1_0)
+                        यदि ((fs->getFormat() & FileStorage::FORMAT_MASK) == FileStorage::FORMAT_YAML_1_0)
                             CV_PARSE_ERROR_CPP( "Unsupported YAML version (it must be 1.x)" );
                     }
                     *ptr = '\0';
                 }
-                else if( *ptr == '-' )
+                अन्यथा यदि( *ptr == '-' )
                 {
-                    if( memcmp(ptr, "---", 3) == 0 )
+                    यदि( स_भेद(ptr, "---", 3) == 0 )
                     {
                         ptr += 3;
-                        break;
+                        रोक;
                     }
-                    else if( first )
-                        break;
+                    अन्यथा यदि( first )
+                        रोक;
                 }
-                else if( cv_isalnum(*ptr) || *ptr=='_')
+                अन्यथा यदि( cv_isalnum(*ptr) || *ptr=='_')
                 {
-                    if( !first )
+                    यदि( !first )
                         CV_PARSE_ERROR_CPP( "The YAML streams must start with '---', except the first one" );
-                    break;
+                    रोक;
                 }
-                else if( fs->eof() )
-                    break;
-                else
+                अन्यथा यदि( fs->eof() )
+                    रोक;
+                अन्यथा
                     CV_PARSE_ERROR_CPP( "Invalid or unsupported syntax" );
             }
 
-            if( ptr )
-                ptr = skipSpaces( ptr, 0, INT_MAX );
-            if( !ptr || !ptr[0] )
-                break;
-            if( memcmp( ptr, "...", 3 ) != 0 )
+            यदि( ptr )
+                ptr = skipSpaces( ptr, 0, पूर्णांक_उच्च );
+            यदि( !ptr || !ptr[0] )
+                रोक;
+            यदि( स_भेद( ptr, "...", 3 ) != 0 )
             {
                 // 2. parse the collection
-                FileNode root_node = fs->addNode(root_collection, std::string(), FileNode::NONE);
+                File_गाँठो जरा_गाँठो = fs->add_गाँठो(जरा_collection, std::string(), File_गाँठो::NONE);
 
-                ptr = parseValue( ptr, root_node, 0, false );
-                if( !root_node.isMap() && !root_node.isSeq() )
+                ptr = parse_मान( ptr, जरा_गाँठो, 0, असत्य );
+                यदि( !जरा_गाँठो.isMap() && !जरा_गाँठो.isSeq() )
                     CV_PARSE_ERROR_CPP( "Only collections as YAML streams are supported by this parser" );
 
                 // 3. parse until the end of file or next collection
-                ptr = skipSpaces( ptr, 0, INT_MAX );
-                if( !ptr )
-                    break;
+                ptr = skipSpaces( ptr, 0, पूर्णांक_उच्च );
+                यदि( !ptr )
+                    रोक;
             }
 
-            if( fs->eof() )
-                break;
+            यदि( fs->eof() )
+                रोक;
             ptr += 3;
-            first = false;
+            first = असत्य;
         }
 
-        return ok;
+        फर्काऊ ok;
     }
 
     FileStorage_API* fs;
-    char buf[CV_FS_MAX_LEN+1024];
+    वर्ण buf[CV_FS_MAX_LEN+1024];
 };
 
 Ptr<FileStorageEmitter> createYAMLEmitter(FileStorage_API* fs)
 {
-    return makePtr<YAMLEmitter>(fs);
+    फर्काऊ makePtr<YAMLEmitter>(fs);
 }
 
 Ptr<FileStorageParser> createYAMLParser(FileStorage_API* fs)
 {
-    return makePtr<YAMLParser>(fs);
+    फर्काऊ makePtr<YAMLParser>(fs);
 }
 
 }

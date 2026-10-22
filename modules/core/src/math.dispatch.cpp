@@ -6,13 +6,13 @@
 // arithm.dispatch.cpp: plain functions forwarding to the CPU-optimal kernel via CV_CPU_DISPATCH.
 // getElemwiseFunc (arithm.dispatch.cpp) routes the corresponding TOps here.
 
-#include "precomp.hpp"
-#include "arithm_expr.hpp"
-#include "hal_replacement.hpp"
-#include "math.simd.hpp"
-#include "math.simd_declarations.hpp"
+#अन्तर्भाव "precomp.hpp"
+#अन्तर्भाव "arithm_expr.hpp"
+#अन्तर्भाव "hal_replacement.hpp"
+#अन्तर्भाव "math.simd.hpp"
+#अन्तर्भाव "math.simd_declarations.hpp"
 
-namespace cv { namespace ew {
+नामाकाश cv { नामाकाश ew {
 
 // ---- pluggable-HAL bridge for exp/log --------------------------------------------------------
 // The raw cv_hal_* entry points return int for a reason: without an installed HAL they are stubs
@@ -22,86 +22,86 @@ namespace cv { namespace ew {
 // and parallelism on top of the vendor code; not implemented -> the engine's own v_exp/v_log
 // kernels. Uniform over ANY HAL (an external vendor one, the IPP HAL module, ...) - the get is
 // called once per program build, the probe cost is nothing next to the kernel calls that follow.
-template<typename T>
-static int halUnaryKernel(const void* src0_, size_t s0y, size_t s0x,
-                          const void*, size_t, size_t, const void*, size_t, size_t,
-                          void* dst_, size_t dsty, int width, int height,
-                          const double*, int, void* userdata)
+ढाँचा<typename T>
+स्थिर पूर्णाङ्क halUnaryKernel(अचर शून्य* src0_, माप_प्रकार s0y, माप_प्रकार s0x,
+                          अचर शून्य*, माप_प्रकार, माप_प्रकार, अचर शून्य*, माप_प्रकार, माप_प्रकार,
+                          शून्य* dst_, माप_प्रकार dsty, पूर्णाङ्क width, पूर्णाङ्क height,
+                          अचर द्विगुण*, पूर्णाङ्क, शून्य* userdata)
 {
-    typedef int (*HalFunc)(const T*, T*, int);
-    const HalFunc fn = (HalFunc)userdata;
-    s0y /= sizeof(T);
-    dsty /= sizeof(T);
+    प्रकारनिर्देश पूर्णाङ्क (*HalFunc)(अचर T*, T*, पूर्णाङ्क);
+    अचर HalFunc fn = (HalFunc)userdata;
+    s0y /= परिमाण(T);
+    dsty /= परिमाण(T);
     CV_Assert(s0x <= 1u);
-    const T* src0 = (const T*)src0_;
+    अचर T* src0 = (अचर T*)src0_;
     T* dst = (T*)dst_;
-    if (height > 1 && dsty == (size_t)width && s0y == s0x*(size_t)width) { width *= height; height = 1; }
-    const int urows = (s0y == 0 && height > 1) ? 1 : height;   // vertical broadcast: 1 row + copies
-    for (int y = 0; y < urows; y++, src0 += s0y, dst += dsty)
+    यदि (height > 1 && dsty == (माप_प्रकार)width && s0y == s0x*(माप_प्रकार)width) { width *= height; height = 1; }
+    अचर पूर्णाङ्क urows = (s0y == 0 && height > 1) ? 1 : height;   // vertical broadcast: 1 row + copies
+    लागि (पूर्णाङ्क y = 0; y < urows; y++, src0 += s0y, dst += dsty)
     {
-        int code;
-        if (s0x == 0)                     // broadcast-scalar source: one value covers the row
+        पूर्णाङ्क code;
+        यदि (s0x == 0)                     // broadcast-scalar source: one value covers the row
         {
             T v;
             code = fn(src0, &v, 1);
-            for (int x = 0; x < width; x++) dst[x] = v;
+            लागि (पूर्णाङ्क x = 0; x < width; x++) dst[x] = v;
         }
-        else
+        अन्यथा
             code = fn(src0, dst, width);
-        if (code != CV_HAL_ERROR_OK)
-            return code;                  // shouldn't happen (probed at get time) - let exec assert
+        यदि (code != CV_HAL_ERROR_OK)
+            फर्काऊ code;                  // shouldn't happen (probed at get time) - let exec assert
     }
     dst = (T*)dst_;
-    for (int y = urows; y < height; y++)
-        memcpy(dst + (size_t)y*dsty, dst, (size_t)width*sizeof(T));
-    return 0;
+    लागि (पूर्णाङ्क y = urows; y < height; y++)
+        स_नकल(dst + (माप_प्रकार)y*dsty, dst, (माप_प्रकार)width*परिमाण(T));
+    फर्काऊ 0;
 }
 
-template<typename T, typename HalFunc>
-static TKernel probeHalUnary(HalFunc fn)
+ढाँचा<typename T, typename HalFunc>
+स्थिर TKernel probeHalUnary(HalFunc fn)
 {
     T one = (T)1, r = (T)0;
-    if (fn(&one, &r, 1) == CV_HAL_ERROR_OK)
-        return {halUnaryKernel<T>, (void*)fn, 0};
-    return {};
+    यदि (fn(&one, &r, 1) == CV_HAL_ERROR_OK)
+        फर्काऊ {halUnaryKernel<T>, (शून्य*)fn, 0};
+    फर्काऊ {};
 }
 
 // The engine's OWN kernel for (op, T) - v_exp/v_log & co, no HAL/IPP tiers. The final fallback of
 // getMathFunc, and what hal::exp32f & co use as THEIR built-in implementation (the former table
 // kernels are gone), via mathSpanEngine below.
-static TKernel getEngineMathFunc(TOp op, int T)
+स्थिर TKernel getEngineMathFunc(शीर्ष op, पूर्णाङ्क T)
 {
     CV_CPU_DISPATCH(getMathFunc_,   (op, T),      CV_CPU_DISPATCH_MODES_ALL);
 }
 
 // run the engine's own math kernel over one contiguous span (the shape hal::exp32f & co need)
-void mathSpanEngine(TOp op, int depth, const void* src, void* dst, int n)
+शून्य mathSpanEngine(शीर्ष op, पूर्णाङ्क depth, अचर शून्य* src, शून्य* dst, पूर्णाङ्क n)
 {
     TKernel k = getEngineMathFunc(op, depth);
     CV_Assert(k.fptr);
-    const double noparams[4] = {};
+    अचर द्विगुण noparams[4] = {};
     k.fptr(src, 0, 1, nullptr, 0, 0, nullptr, 0, 0, dst, 0, n, 1, noparams, k.flags, k.userdata);
 }
 
-TKernel getMathFunc(TOp op, int T)
+TKernel getMathFunc(शीर्ष op, पूर्णाङ्क T)
 {
-    if ((op == OP_EXP || op == OP_LOG) && (T == CV_32F || T == CV_64F))
+    यदि ((op == OP_EXP || op == OP_LOG) && (T == CV_32F || T == CV_64F))
     {
         // IPP now rides the cv_hal_* hooks too (hal/ipp), so the single probe below picks it up
         // together with any external vendor HAL - no separate IPP tier needed here.
         // probe results are process-lifetime stable; cache them (thread-safe magic statics)
-        static const TKernel exp32 = probeHalUnary<float >(cv_hal_exp32f);
-        static const TKernel exp64 = probeHalUnary<double>(cv_hal_exp64f);
-        static const TKernel log32 = probeHalUnary<float >(cv_hal_log32f);
-        static const TKernel log64 = probeHalUnary<double>(cv_hal_log64f);
-        const TKernel* k = op == OP_EXP ? (T == CV_32F ? &exp32 : &exp64)
+        स्थिर अचर TKernel exp32 = probeHalUnary<भिन्न >(cv_hal_exp32f);
+        स्थिर अचर TKernel exp64 = probeHalUnary<द्विगुण>(cv_hal_exp64f);
+        स्थिर अचर TKernel log32 = probeHalUnary<भिन्न >(cv_hal_log32f);
+        स्थिर अचर TKernel log64 = probeHalUnary<द्विगुण>(cv_hal_log64f);
+        अचर TKernel* k = op == OP_EXP ? (T == CV_32F ? &exp32 : &exp64)
                                         : (T == CV_32F ? &log32 : &log64);
-        if (k->fptr)
-            return *k;
+        यदि (k->fptr)
+            फर्काऊ *k;
     }
-    return getEngineMathFunc(op, T);
+    फर्काऊ getEngineMathFunc(op, T);
 }
 
-TKernel getPowFunc(int T, int R)            { CV_CPU_DISPATCH(getPowFunc_,    (T, R),       CV_CPU_DISPATCH_MODES_ALL); }
+TKernel getPowFunc(पूर्णाङ्क T, पूर्णाङ्क R)            { CV_CPU_DISPATCH(getPowFunc_,    (T, R),       CV_CPU_DISPATCH_MODES_ALL); }
 
 }} // namespace cv::ew

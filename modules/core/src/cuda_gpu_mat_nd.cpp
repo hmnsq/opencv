@@ -2,38 +2,38 @@
 // It is subject to the license terms in the LICENSE file found in the top-level directory
 // of this distribution and at http://opencv.org/license.html.
 
-#include "precomp.hpp"
+#अन्तर्भाव "precomp.hpp"
 
-using namespace cv;
-using namespace cv::cuda;
+using नामाकाश cv;
+using नामाकाश cv::cuda;
 
-GpuMatND::~GpuMatND() = default;
+GpuMatND::~GpuMatND() = स्वभाव;
 
-GpuMatND::GpuMatND(const MatShape& _shape, int _type, void* _data, StepArray _step) :
+GpuMatND::GpuMatND(अचर MatShape& _shape, पूर्णाङ्क _type, शून्य* _data, StepArray _step) :
     flags(0), dims(0), data(static_cast<uchar*>(_data)), offset(0)
 {
     CV_Assert(_step.empty() || _shape.size() == _step.size() + 1 ||
-              (_shape.size() == _step.size() && _step.back() == (size_t)CV_ELEM_SIZE(_type)));
+              (_shape.size() == _step.size() && _step.back() == (माप_प्रकार)CV_ELEM_SIZE(_type)));
 
     setFields(_shape, _type, std::move(_step));
 }
 
-GpuMatND GpuMatND::operator()(const std::vector<Range>& ranges) const
+GpuMatND GpuMatND::चालक()(अचर std::vector<Range>& ranges) अचर
 {
-    CV_Assert(dims == (int)ranges.size());
+    CV_Assert(dims == (पूर्णाङ्क)ranges.size());
 
-    for (int i = 0; i < dims; ++i)
+    लागि (पूर्णाङ्क i = 0; i < dims; ++i)
     {
         Range r = ranges[i];
         CV_Assert(r == Range::all() || (0 <= r.start && r.start < r.end && r.end <= size[i]));
     }
 
-    GpuMatND ret = *this;
+    GpuMatND ret = *एतत्;
 
-    for (int i = 0; i < dims; ++i)
+    लागि (पूर्णाङ्क i = 0; i < dims; ++i)
     {
         Range r = ranges[i];
-        if (r != Range::all() && r != Range(0, ret.size[i]))
+        यदि (r != Range::all() && r != Range(0, ret.size[i]))
         {
             ret.offset += r.start * ret.step[i];
             ret.size[i] = r.size();
@@ -43,83 +43,83 @@ GpuMatND GpuMatND::operator()(const std::vector<Range>& ranges) const
 
     ret.flags = cv::updateContinuityFlag(ret.flags, dims, ret.size.data(), ret.step.data());
 
-    return ret;
+    फर्काऊ ret;
 }
 
-GpuMat GpuMatND::createGpuMatHeader(IndexArray idx, Range rowRange, Range colRange) const
+GpuMat GpuMatND::createGpuMatHeader(IndexArray idx, Range rowRange, Range colRange) अचर
 {
-    CV_Assert((int)idx.size() == dims - 2);
+    CV_Assert((पूर्णाङ्क)idx.size() == dims - 2);
 
     std::vector<Range> ranges;
-    for (int i : idx)
+    लागि (पूर्णाङ्क i : idx)
         ranges.emplace_back(i, i+1);
     ranges.push_back(rowRange);
     ranges.push_back(colRange);
 
-    return (*this)(ranges).createGpuMatHeader();
+    फर्काऊ (*एतत्)(ranges).createGpuMatHeader();
 }
 
-GpuMat GpuMatND::createGpuMatHeader() const
+GpuMat GpuMatND::createGpuMatHeader() अचर
 {
-    auto Effectively2D = [](GpuMatND m)
+    स्वतः Effectively2D = [](GpuMatND m)
     {
-        for (int i = 0; i < m.dims - 2; ++i)
-            if (m.size[i] > 1)
-                return false;
-        return true;
+        लागि (पूर्णाङ्क i = 0; i < m.dims - 2; ++i)
+            यदि (m.size[i] > 1)
+                फर्काऊ असत्य;
+        फर्काऊ सत्य;
     };
-    CV_Assert(Effectively2D(*this));
-    int rows_, cols_ = dims >= 1 ? size[dims - 1] : 1;
-    size_t step_;
-    if (dims >= 2)
+    CV_Assert(Effectively2D(*एतत्));
+    पूर्णाङ्क rows_, cols_ = dims >= 1 ? size[dims - 1] : 1;
+    माप_प्रकार step_;
+    यदि (dims >= 2)
     {
         rows_ = size[dims - 2];
         step_ = step[dims - 2];
     }
-    else
+    अन्यथा
     {
         rows_ = 1;
         step_ = cols_ * elemSize();
     }
 
-    return GpuMat(rows_, cols_, type(), getDevicePtr(), step_);
+    फर्काऊ GpuMat(rows_, cols_, type(), getDevicePtr(), step_);
 }
 
-GpuMat GpuMatND::operator()(IndexArray idx, Range rowRange, Range colRange) const
+GpuMat GpuMatND::चालक()(IndexArray idx, Range rowRange, Range colRange) अचर
 {
-    return createGpuMatHeader(idx, rowRange, colRange).clone();
+    फर्काऊ createGpuMatHeader(idx, rowRange, colRange).clone();
 }
 
-GpuMatND::operator GpuMat() const
+GpuMatND::चालक GpuMat() अचर
 {
-    return createGpuMatHeader().clone();
+    फर्काऊ createGpuMatHeader().clone();
 }
 
-void GpuMatND::setFields(MatShape _size, int _type, StepArray _step)
+शून्य GpuMatND::setFields(MatShape _size, पूर्णाङ्क _type, StepArray _step)
 {
     _type &= Mat::TYPE_MASK;
 
     flags = Mat::MAGIC_VAL + _type;
-    dims = static_cast<int>(_size.size());
+    dims = static_cast<पूर्णाङ्क>(_size.size());
     size = std::move(_size);
 
-    if (_step.empty())
+    यदि (_step.empty())
     {
         step = StepArray(dims);
 
         step.back() = elemSize();
-        for (int _i = dims - 2; _i >= 0; --_i)
+        लागि (पूर्णाङ्क _i = dims - 2; _i >= 0; --_i)
         {
-            const size_t i = _i;
+            अचर माप_प्रकार i = _i;
             step[i] = step[i+1] * size[i+1];
         }
 
         flags |= Mat::CONTINUOUS_FLAG;
     }
-    else
+    अन्यथा
     {
         step = std::move(_step);
-        if (step.size() < size.size())
+        यदि (step.size() < size.size())
           step.push_back(elemSize());
 
         flags = cv::updateContinuityFlag(flags, dims, size.data(), step.data());
@@ -131,7 +131,7 @@ void GpuMatND::setFields(MatShape _size, int _type, StepArray _step)
 
 #ifndef HAVE_CUDA
 
-GpuData::GpuData(const size_t _size)
+GpuData::GpuData(अचर माप_प्रकार _size)
     : data(nullptr), size(0)
 {
     CV_UNUSED(_size);
@@ -142,79 +142,79 @@ GpuData::~GpuData()
 {
 }
 
-void GpuMatND::create(const MatShape& _shape, int _type)
+शून्य GpuMatND::create(अचर MatShape& _shape, पूर्णाङ्क _type)
 {
     CV_UNUSED(_shape);
     CV_UNUSED(_type);
     throw_no_cuda();
 }
 
-void GpuMatND::release()
+शून्य GpuMatND::release()
 {
     throw_no_cuda();
 }
 
-GpuMatND GpuMatND::clone() const
+GpuMatND GpuMatND::clone() अचर
 {
     throw_no_cuda();
 }
 
-GpuMatND GpuMatND::clone(Stream& stream) const
+GpuMatND GpuMatND::clone(Stream& stream) अचर
 {
     CV_UNUSED(stream);
     throw_no_cuda();
 }
 
-void GpuMatND::upload(InputArray src)
+शून्य GpuMatND::upload(आगत_Array src)
 {
     CV_UNUSED(src);
     throw_no_cuda();
 }
 
-void GpuMatND::upload(InputArray src, Stream& stream)
+शून्य GpuMatND::upload(आगत_Array src, Stream& stream)
 {
     CV_UNUSED(src);
     CV_UNUSED(stream);
     throw_no_cuda();
 }
 
-void GpuMatND::download(OutputArray dst) const
+शून्य GpuMatND::download(OutputArray dst) अचर
 {
     CV_UNUSED(dst);
     throw_no_cuda();
 }
 
-void GpuMatND::download(OutputArray dst, Stream& stream) const
+शून्य GpuMatND::download(OutputArray dst, Stream& stream) अचर
 {
     CV_UNUSED(dst);
     CV_UNUSED(stream);
     throw_no_cuda();
 }
 
-void GpuMatND::fit(const MatShape& _shape, int _type)
+शून्य GpuMatND::fit(अचर MatShape& _shape, पूर्णाङ्क _type)
 {
-    auto elements_nonzero = [](const MatShape& v)
+    स्वतः elements_nonzero = [](अचर MatShape& v)
     {
-        return std::all_of(v.begin(), v.end(), [](int u){ return u > 0; });
+        फर्काऊ std::all_of(v.begin(), v.end(), [](पूर्णाङ्क u){ फर्काऊ u > 0; });
     };
     CV_Assert(!_shape.empty());
     CV_Assert(elements_nonzero(_shape));
 
     _type &= Mat::TYPE_MASK;
 
-    const size_t esz = (size_t)CV_ELEM_SIZE(_type);
-    size_t step0 = esz;
-    for (int i = (int)_shape.size() - 2; i >= 0; --i)
-        step0 *= (size_t)_shape[(size_t)i + 1];
-    const size_t requiredBytes = (size_t)_shape[0] * step0;
+    अचर माप_प्रकार esz = (माप_प्रकार)CV_ELEM_SIZE(_type);
+    माप_प्रकार step0 = esz;
+    लागि (पूर्णाङ्क i = (पूर्णाङ्क)_shape.size() - 2; i >= 0; --i)
+        step0 *= (माप_प्रकार)_shape[(माप_प्रकार)i + 1];
+    अचर माप_प्रकार requiredBytes = (माप_प्रकार)_shape[0] * step0;
 
-    const bool canReuse = !empty() && !external() && isContinuous() && !isSubmatrix() && offset == 0;
-    const size_t oldCapacity = canReuse ? totalMemSize() : 0;
+    अचर तार्किक canReuse = !empty() && !external() && isContinuous() && !isSubmatrix() && offset == 0;
+    अचर माप_प्रकार oldCapacity = canReuse ? totalMemSize() : 0;
 
-    if (!canReuse || requiredBytes > oldCapacity)
+    यदि (!canReuse || requiredBytes > oldCapacity)
     {
         create(_shape, _type);
-        return;
+        फर्काऊ;
     }
 
     setFields(_shape, _type);

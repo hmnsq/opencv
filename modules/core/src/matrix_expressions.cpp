@@ -9,209 +9,209 @@
 //
 // */
 
-#include "precomp.hpp"
-#include <opencv2/core/utils/logger.hpp>
+#अन्तर्भाव "precomp.hpp"
+#अन्तर्भाव <opencv2/core/utils/logger.hpp>
 
-namespace cv
+नामाकाश cv
 {
 
 //This and its overload below are used in various MatExpr operator overloads
 //implemented to check that Matrix operands exist.
-static void checkOperandsExist(const Mat& a)
+स्थिर शून्य checkOperandsExist(अचर Mat& a)
 {
-    if (a.empty())
+    यदि (a.empty())
     {
         CV_Error(cv::Error::StsBadArg, "Matrix operand is an empty matrix.");
     }
 }
 
-static void checkOperandsExist(const Mat& a, const Mat& b)
+स्थिर शून्य checkOperandsExist(अचर Mat& a, अचर Mat& b)
 {
-    if (a.empty() || b.empty())
+    यदि (a.empty() || b.empty())
     {
         CV_Error(cv::Error::StsBadArg, "One or more matrix operands are empty.");
     }
 }
 
 
-class MatOp_Identity CV_FINAL : public MatOp
+वर्ग MatOp_Identity CV_FINAL : सार्वजनिक MatOp
 {
-public:
+सार्वजनिक:
     MatOp_Identity() {}
-    virtual ~MatOp_Identity() {}
+    आभास ~MatOp_Identity() {}
 
-    bool elementWise(const MatExpr& /*expr*/) const CV_OVERRIDE { return true; }
-    void assign(const MatExpr& expr, Mat& m, int type=-1) const CV_OVERRIDE;
+    तार्किक elementWise(अचर Mat_अभिव्यक्ति& /*अभिव्यक्ति*/) अचर CV_OVERRIDE { फर्काऊ सत्य; }
+    शून्य assign(अचर Mat_अभिव्यक्ति& अभिव्यक्ति, Mat& m, पूर्णाङ्क type=-1) अचर CV_OVERRIDE;
 
-    static void makeExpr(MatExpr& res, const Mat& m);
+    स्थिर शून्य make_अभिव्यक्ति(Mat_अभिव्यक्ति& res, अचर Mat& m);
 };
 
-static MatOp_Identity g_MatOp_Identity;
+स्थिर MatOp_Identity g_MatOp_Identity;
 
-class MatOp_AddEx CV_FINAL : public MatOp
+वर्ग MatOp_AddEx CV_FINAL : सार्वजनिक MatOp
 {
-public:
+सार्वजनिक:
     MatOp_AddEx() {}
-    virtual ~MatOp_AddEx() {}
+    आभास ~MatOp_AddEx() {}
 
-    bool elementWise(const MatExpr& /*expr*/) const CV_OVERRIDE { return true; }
-    void assign(const MatExpr& expr, Mat& m, int type=-1) const CV_OVERRIDE;
+    तार्किक elementWise(अचर Mat_अभिव्यक्ति& /*अभिव्यक्ति*/) अचर CV_OVERRIDE { फर्काऊ सत्य; }
+    शून्य assign(अचर Mat_अभिव्यक्ति& अभिव्यक्ति, Mat& m, पूर्णाङ्क type=-1) अचर CV_OVERRIDE;
 
-    void add(const MatExpr& e1, const Scalar& s, MatExpr& res) const CV_OVERRIDE;
-    void subtract(const Scalar& s, const MatExpr& expr, MatExpr& res) const CV_OVERRIDE;
-    void multiply(const MatExpr& e1, double s, MatExpr& res) const CV_OVERRIDE;
-    void divide(double s, const MatExpr& e, MatExpr& res) const CV_OVERRIDE;
+    शून्य add(अचर Mat_अभिव्यक्ति& e1, अचर Scalar& s, Mat_अभिव्यक्ति& res) अचर CV_OVERRIDE;
+    शून्य subtract(अचर Scalar& s, अचर Mat_अभिव्यक्ति& अभिव्यक्ति, Mat_अभिव्यक्ति& res) अचर CV_OVERRIDE;
+    शून्य multiply(अचर Mat_अभिव्यक्ति& e1, द्विगुण s, Mat_अभिव्यक्ति& res) अचर CV_OVERRIDE;
+    शून्य divide(द्विगुण s, अचर Mat_अभिव्यक्ति& e, Mat_अभिव्यक्ति& res) अचर CV_OVERRIDE;
 
-    void transpose(const MatExpr& e1, MatExpr& res) const CV_OVERRIDE;
-    void abs(const MatExpr& expr, MatExpr& res) const CV_OVERRIDE;
+    शून्य transpose(अचर Mat_अभिव्यक्ति& e1, Mat_अभिव्यक्ति& res) अचर CV_OVERRIDE;
+    शून्य असल(अचर Mat_अभिव्यक्ति& अभिव्यक्ति, Mat_अभिव्यक्ति& res) अचर CV_OVERRIDE;
 
-    static void makeExpr(MatExpr& res, const Mat& a, const Mat& b, double alpha, double beta, const Scalar& s=Scalar());
+    स्थिर शून्य make_अभिव्यक्ति(Mat_अभिव्यक्ति& res, अचर Mat& a, अचर Mat& b, द्विगुण alpha, द्विगुण beta, अचर Scalar& s=Scalar());
 };
 
-static MatOp_AddEx g_MatOp_AddEx;
+स्थिर MatOp_AddEx g_MatOp_AddEx;
 
-class MatOp_Bin CV_FINAL : public MatOp
+वर्ग MatOp_Bin CV_FINAL : सार्वजनिक MatOp
 {
-public:
+सार्वजनिक:
     MatOp_Bin() {}
-    virtual ~MatOp_Bin() {}
+    आभास ~MatOp_Bin() {}
 
-    bool elementWise(const MatExpr& /*expr*/) const CV_OVERRIDE { return true; }
-    void assign(const MatExpr& expr, Mat& m, int type=-1) const CV_OVERRIDE;
+    तार्किक elementWise(अचर Mat_अभिव्यक्ति& /*अभिव्यक्ति*/) अचर CV_OVERRIDE { फर्काऊ सत्य; }
+    शून्य assign(अचर Mat_अभिव्यक्ति& अभिव्यक्ति, Mat& m, पूर्णाङ्क type=-1) अचर CV_OVERRIDE;
 
-    void multiply(const MatExpr& e1, double s, MatExpr& res) const CV_OVERRIDE;
-    void divide(double s, const MatExpr& e, MatExpr& res) const CV_OVERRIDE;
+    शून्य multiply(अचर Mat_अभिव्यक्ति& e1, द्विगुण s, Mat_अभिव्यक्ति& res) अचर CV_OVERRIDE;
+    शून्य divide(द्विगुण s, अचर Mat_अभिव्यक्ति& e, Mat_अभिव्यक्ति& res) अचर CV_OVERRIDE;
 
-    static void makeExpr(MatExpr& res, char op, const Mat& a, const Mat& b, double scale=1);
-    static void makeExpr(MatExpr& res, char op, const Mat& a, const Scalar& s);
+    स्थिर शून्य make_अभिव्यक्ति(Mat_अभिव्यक्ति& res, वर्ण op, अचर Mat& a, अचर Mat& b, द्विगुण scale=1);
+    स्थिर शून्य make_अभिव्यक्ति(Mat_अभिव्यक्ति& res, वर्ण op, अचर Mat& a, अचर Scalar& s);
 };
 
-static MatOp_Bin g_MatOp_Bin;
+स्थिर MatOp_Bin g_MatOp_Bin;
 
-class MatOp_Cmp CV_FINAL : public MatOp
+वर्ग MatOp_Cmp CV_FINAL : सार्वजनिक MatOp
 {
-public:
+सार्वजनिक:
     MatOp_Cmp() {}
-    virtual ~MatOp_Cmp() {}
+    आभास ~MatOp_Cmp() {}
 
-    bool elementWise(const MatExpr& /*expr*/) const CV_OVERRIDE { return true; }
-    void assign(const MatExpr& expr, Mat& m, int type=-1) const CV_OVERRIDE;
+    तार्किक elementWise(अचर Mat_अभिव्यक्ति& /*अभिव्यक्ति*/) अचर CV_OVERRIDE { फर्काऊ सत्य; }
+    शून्य assign(अचर Mat_अभिव्यक्ति& अभिव्यक्ति, Mat& m, पूर्णाङ्क type=-1) अचर CV_OVERRIDE;
 
-    static void makeExpr(MatExpr& res, int cmpop, const Mat& a, const Mat& b);
-    static void makeExpr(MatExpr& res, int cmpop, const Mat& a, double alpha);
+    स्थिर शून्य make_अभिव्यक्ति(Mat_अभिव्यक्ति& res, पूर्णाङ्क cmpop, अचर Mat& a, अचर Mat& b);
+    स्थिर शून्य make_अभिव्यक्ति(Mat_अभिव्यक्ति& res, पूर्णाङ्क cmpop, अचर Mat& a, द्विगुण alpha);
 };
 
-static MatOp_Cmp g_MatOp_Cmp;
+स्थिर MatOp_Cmp g_MatOp_Cmp;
 
-class MatOp_GEMM CV_FINAL : public MatOp
+वर्ग MatOp_GEMM CV_FINAL : सार्वजनिक MatOp
 {
-public:
+सार्वजनिक:
     MatOp_GEMM() {}
-    virtual ~MatOp_GEMM() {}
+    आभास ~MatOp_GEMM() {}
 
-    bool elementWise(const MatExpr& /*expr*/) const CV_OVERRIDE { return false; }
-    void assign(const MatExpr& expr, Mat& m, int type=-1) const CV_OVERRIDE;
+    तार्किक elementWise(अचर Mat_अभिव्यक्ति& /*अभिव्यक्ति*/) अचर CV_OVERRIDE { फर्काऊ असत्य; }
+    शून्य assign(अचर Mat_अभिव्यक्ति& अभिव्यक्ति, Mat& m, पूर्णाङ्क type=-1) अचर CV_OVERRIDE;
 
-    void add(const MatExpr& e1, const MatExpr& e2, MatExpr& res) const CV_OVERRIDE;
-    void subtract(const MatExpr& e1, const MatExpr& e2, MatExpr& res) const CV_OVERRIDE;
-    void multiply(const MatExpr& e, double s, MatExpr& res) const CV_OVERRIDE;
+    शून्य add(अचर Mat_अभिव्यक्ति& e1, अचर Mat_अभिव्यक्ति& e2, Mat_अभिव्यक्ति& res) अचर CV_OVERRIDE;
+    शून्य subtract(अचर Mat_अभिव्यक्ति& e1, अचर Mat_अभिव्यक्ति& e2, Mat_अभिव्यक्ति& res) अचर CV_OVERRIDE;
+    शून्य multiply(अचर Mat_अभिव्यक्ति& e, द्विगुण s, Mat_अभिव्यक्ति& res) अचर CV_OVERRIDE;
 
-    void transpose(const MatExpr& expr, MatExpr& res) const CV_OVERRIDE;
+    शून्य transpose(अचर Mat_अभिव्यक्ति& अभिव्यक्ति, Mat_अभिव्यक्ति& res) अचर CV_OVERRIDE;
 
-    Size size(const MatExpr& expr) const CV_OVERRIDE
+    Size size(अचर Mat_अभिव्यक्ति& अभिव्यक्ति) अचर CV_OVERRIDE
     {
-        return Size(
-            (expr.flags & GEMM_2_T) ? expr.b.rows : expr.b.cols,
-            (expr.flags & GEMM_1_T) ? expr.a.cols : expr.a.rows
+        फर्काऊ Size(
+            (अभिव्यक्ति.flags & GEMM_2_T) ? अभिव्यक्ति.b.rows : अभिव्यक्ति.b.cols,
+            (अभिव्यक्ति.flags & GEMM_1_T) ? अभिव्यक्ति.a.cols : अभिव्यक्ति.a.rows
         );
     }
 
-    static void makeExpr(MatExpr& res, int flags, const Mat& a, const Mat& b,
-                         double alpha=1, const Mat& c=Mat(), double beta=1);
+    स्थिर शून्य make_अभिव्यक्ति(Mat_अभिव्यक्ति& res, पूर्णाङ्क flags, अचर Mat& a, अचर Mat& b,
+                         द्विगुण alpha=1, अचर Mat& c=Mat(), द्विगुण beta=1);
 
 };
 
-static MatOp_GEMM g_MatOp_GEMM;
+स्थिर MatOp_GEMM g_MatOp_GEMM;
 
-class MatOp_Invert CV_FINAL : public MatOp
+वर्ग MatOp_Invert CV_FINAL : सार्वजनिक MatOp
 {
-public:
+सार्वजनिक:
     MatOp_Invert() {}
-    virtual ~MatOp_Invert() {}
+    आभास ~MatOp_Invert() {}
 
-    bool elementWise(const MatExpr& /*expr*/) const CV_OVERRIDE { return false; }
-    void assign(const MatExpr& expr, Mat& m, int type=-1) const CV_OVERRIDE;
+    तार्किक elementWise(अचर Mat_अभिव्यक्ति& /*अभिव्यक्ति*/) अचर CV_OVERRIDE { फर्काऊ असत्य; }
+    शून्य assign(अचर Mat_अभिव्यक्ति& अभिव्यक्ति, Mat& m, पूर्णाङ्क type=-1) अचर CV_OVERRIDE;
 
-    void matmul(const MatExpr& expr1, const MatExpr& expr2, MatExpr& res) const CV_OVERRIDE;
+    शून्य matmul(अचर Mat_अभिव्यक्ति& expr1, अचर Mat_अभिव्यक्ति& expr2, Mat_अभिव्यक्ति& res) अचर CV_OVERRIDE;
 
-    static void makeExpr(MatExpr& res, int method, const Mat& m);
+    स्थिर शून्य make_अभिव्यक्ति(Mat_अभिव्यक्ति& res, पूर्णाङ्क method, अचर Mat& m);
 };
 
-static MatOp_Invert g_MatOp_Invert;
+स्थिर MatOp_Invert g_MatOp_Invert;
 
-class MatOp_T CV_FINAL : public MatOp
+वर्ग MatOp_T CV_FINAL : सार्वजनिक MatOp
 {
-public:
+सार्वजनिक:
     MatOp_T() {}
-    virtual ~MatOp_T() {}
+    आभास ~MatOp_T() {}
 
-    bool elementWise(const MatExpr& /*expr*/) const CV_OVERRIDE { return false; }
-    void assign(const MatExpr& expr, Mat& m, int type=-1) const CV_OVERRIDE;
+    तार्किक elementWise(अचर Mat_अभिव्यक्ति& /*अभिव्यक्ति*/) अचर CV_OVERRIDE { फर्काऊ असत्य; }
+    शून्य assign(अचर Mat_अभिव्यक्ति& अभिव्यक्ति, Mat& m, पूर्णाङ्क type=-1) अचर CV_OVERRIDE;
 
-    void multiply(const MatExpr& e1, double s, MatExpr& res) const CV_OVERRIDE;
-    void transpose(const MatExpr& expr, MatExpr& res) const CV_OVERRIDE;
+    शून्य multiply(अचर Mat_अभिव्यक्ति& e1, द्विगुण s, Mat_अभिव्यक्ति& res) अचर CV_OVERRIDE;
+    शून्य transpose(अचर Mat_अभिव्यक्ति& अभिव्यक्ति, Mat_अभिव्यक्ति& res) अचर CV_OVERRIDE;
 
-    static void makeExpr(MatExpr& res, const Mat& a, double alpha=1);
+    स्थिर शून्य make_अभिव्यक्ति(Mat_अभिव्यक्ति& res, अचर Mat& a, द्विगुण alpha=1);
 };
 
-static MatOp_T g_MatOp_T;
+स्थिर MatOp_T g_MatOp_T;
 
-class MatOp_Solve CV_FINAL : public MatOp
+वर्ग MatOp_Solve CV_FINAL : सार्वजनिक MatOp
 {
-public:
+सार्वजनिक:
     MatOp_Solve() {}
-    virtual ~MatOp_Solve() {}
+    आभास ~MatOp_Solve() {}
 
-    bool elementWise(const MatExpr& /*expr*/) const CV_OVERRIDE { return false; }
-    void assign(const MatExpr& expr, Mat& m, int type=-1) const CV_OVERRIDE;
+    तार्किक elementWise(अचर Mat_अभिव्यक्ति& /*अभिव्यक्ति*/) अचर CV_OVERRIDE { फर्काऊ असत्य; }
+    शून्य assign(अचर Mat_अभिव्यक्ति& अभिव्यक्ति, Mat& m, पूर्णाङ्क type=-1) अचर CV_OVERRIDE;
 
-    static void makeExpr(MatExpr& res, int method, const Mat& a, const Mat& b);
+    स्थिर शून्य make_अभिव्यक्ति(Mat_अभिव्यक्ति& res, पूर्णाङ्क method, अचर Mat& a, अचर Mat& b);
 };
 
-static MatOp_Solve g_MatOp_Solve;
+स्थिर MatOp_Solve g_MatOp_Solve;
 
-class MatOp_Initializer CV_FINAL : public MatOp
+वर्ग MatOp_Initializer CV_FINAL : सार्वजनिक MatOp
 {
-public:
+सार्वजनिक:
     MatOp_Initializer() {}
-    virtual ~MatOp_Initializer() {}
+    आभास ~MatOp_Initializer() {}
 
-    bool elementWise(const MatExpr& /*expr*/) const CV_OVERRIDE { return false; }
-    void assign(const MatExpr& expr, Mat& m, int type=-1) const CV_OVERRIDE;
+    तार्किक elementWise(अचर Mat_अभिव्यक्ति& /*अभिव्यक्ति*/) अचर CV_OVERRIDE { फर्काऊ असत्य; }
+    शून्य assign(अचर Mat_अभिव्यक्ति& अभिव्यक्ति, Mat& m, पूर्णाङ्क type=-1) अचर CV_OVERRIDE;
 
-    void multiply(const MatExpr& e, double s, MatExpr& res) const CV_OVERRIDE;
+    शून्य multiply(अचर Mat_अभिव्यक्ति& e, द्विगुण s, Mat_अभिव्यक्ति& res) अचर CV_OVERRIDE;
 
-    static void makeExpr(MatExpr& res, int method, Size sz, int type, double alpha=1);
-    static void makeExpr(MatExpr& res, int method, int ndims, const int* sizes, int type, double alpha=1);
+    स्थिर शून्य make_अभिव्यक्ति(Mat_अभिव्यक्ति& res, पूर्णाङ्क method, Size sz, पूर्णाङ्क type, द्विगुण alpha=1);
+    स्थिर शून्य make_अभिव्यक्ति(Mat_अभिव्यक्ति& res, पूर्णाङ्क method, पूर्णाङ्क ndims, अचर पूर्णाङ्क* sizes, पूर्णाङ्क type, द्विगुण alpha=1);
 };
 
-static MatOp_Initializer* getGlobalMatOpInitializer()
+स्थिर MatOp_Initializer* getGlobalMatOpInitializer()
 {
-    CV_SINGLETON_LAZY_INIT(MatOp_Initializer, new MatOp_Initializer())
+    CV_SINGLETON_LAZY_INIT(MatOp_Initializer, नूतन MatOp_Initializer())
 }
 
-static inline bool isIdentity(const MatExpr& e) { return e.op == &g_MatOp_Identity; }
-static inline bool isAddEx(const MatExpr& e) { return e.op == &g_MatOp_AddEx; }
-static inline bool isScaled(const MatExpr& e) { return isAddEx(e) && (!e.b.data || e.beta == 0) && e.s == Scalar(); }
-static inline bool isBin(const MatExpr& e, char c) { return e.op == &g_MatOp_Bin && e.flags == c; }
-static inline bool isCmp(const MatExpr& e) { return e.op == &g_MatOp_Cmp; }
-static inline bool isReciprocal(const MatExpr& e) { return isBin(e,'/') && (!e.b.data || e.beta == 0); }
-static inline bool isT(const MatExpr& e) { return e.op == &g_MatOp_T; }
-static inline bool isInv(const MatExpr& e) { return e.op == &g_MatOp_Invert; }
-static inline bool isSolve(const MatExpr& e) { return e.op == &g_MatOp_Solve; }
+स्थिर अन्तःस्थ तार्किक isIdentity(अचर Mat_अभिव्यक्ति& e) { फर्काऊ e.op == &g_MatOp_Identity; }
+स्थिर अन्तःस्थ तार्किक isAddEx(अचर Mat_अभिव्यक्ति& e) { फर्काऊ e.op == &g_MatOp_AddEx; }
+स्थिर अन्तःस्थ तार्किक isScaled(अचर Mat_अभिव्यक्ति& e) { फर्काऊ isAddEx(e) && (!e.b.data || e.beta == 0) && e.s == Scalar(); }
+स्थिर अन्तःस्थ तार्किक isBin(अचर Mat_अभिव्यक्ति& e, वर्ण c) { फर्काऊ e.op == &g_MatOp_Bin && e.flags == c; }
+स्थिर अन्तःस्थ तार्किक isCmp(अचर Mat_अभिव्यक्ति& e) { फर्काऊ e.op == &g_MatOp_Cmp; }
+स्थिर अन्तःस्थ तार्किक isReciprocal(अचर Mat_अभिव्यक्ति& e) { फर्काऊ isBin(e,'/') && (!e.b.data || e.beta == 0); }
+स्थिर अन्तःस्थ तार्किक isT(अचर Mat_अभिव्यक्ति& e) { फर्काऊ e.op == &g_MatOp_T; }
+स्थिर अन्तःस्थ तार्किक isInv(अचर Mat_अभिव्यक्ति& e) { फर्काऊ e.op == &g_MatOp_Invert; }
+स्थिर अन्तःस्थ तार्किक isSolve(अचर Mat_अभिव्यक्ति& e) { फर्काऊ e.op == &g_MatOp_Solve; }
 //static inline bool isGEMM(const MatExpr& e) { return e.op == &g_MatOp_GEMM; }
-static inline bool isMatProd(const MatExpr& e) { return e.op == &g_MatOp_GEMM && (!e.c.data || e.beta == 0); }
-static inline bool isInitializer(const MatExpr& e) { return e.op == getGlobalMatOpInitializer(); }
+स्थिर अन्तःस्थ तार्किक isMatProd(अचर Mat_अभिव्यक्ति& e) { फर्काऊ e.op == &g_MatOp_GEMM && (!e.c.data || e.beta == 0); }
+स्थिर अन्तःस्थ तार्किक isInitializer(अचर Mat_अभिव्यक्ति& e) { फर्काऊ e.op == getGlobalMatOpInitializer(); }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -219,1138 +219,1138 @@ MatOp::MatOp() {}
 MatOp::~MatOp() {}
 
 
-bool MatOp::elementWise(const MatExpr& /*expr*/) const
+तार्किक MatOp::elementWise(अचर Mat_अभिव्यक्ति& /*अभिव्यक्ति*/) अचर
 {
-    return false;
+    फर्काऊ असत्य;
 }
 
-void MatOp::roi(const MatExpr& expr, const Range& rowRange, const Range& colRange, MatExpr& e) const
+शून्य MatOp::roi(अचर Mat_अभिव्यक्ति& अभिव्यक्ति, अचर Range& rowRange, अचर Range& colRange, Mat_अभिव्यक्ति& e) अचर
 {
-    if( elementWise(expr) )
+    यदि( elementWise(अभिव्यक्ति) )
     {
-        e = MatExpr(expr.op, expr.flags, Mat(), Mat(), Mat(),
-                    expr.alpha, expr.beta, expr.s);
-        if(expr.a.data)
-            e.a = expr.a(rowRange, colRange);
-        if(expr.b.data)
-            e.b = expr.b(rowRange, colRange);
-        if(expr.c.data)
-            e.c = expr.c(rowRange, colRange);
+        e = Mat_अभिव्यक्ति(अभिव्यक्ति.op, अभिव्यक्ति.flags, Mat(), Mat(), Mat(),
+                    अभिव्यक्ति.alpha, अभिव्यक्ति.beta, अभिव्यक्ति.s);
+        यदि(अभिव्यक्ति.a.data)
+            e.a = अभिव्यक्ति.a(rowRange, colRange);
+        यदि(अभिव्यक्ति.b.data)
+            e.b = अभिव्यक्ति.b(rowRange, colRange);
+        यदि(अभिव्यक्ति.c.data)
+            e.c = अभिव्यक्ति.c(rowRange, colRange);
     }
-    else
+    अन्यथा
     {
         Mat m;
-        expr.op->assign(expr, m);
-        e = MatExpr(&g_MatOp_Identity, 0, m(rowRange, colRange), Mat(), Mat());
+        अभिव्यक्ति.op->assign(अभिव्यक्ति, m);
+        e = Mat_अभिव्यक्ति(&g_MatOp_Identity, 0, m(rowRange, colRange), Mat(), Mat());
     }
 }
 
-void MatOp::diag(const MatExpr& expr, int d, MatExpr& e) const
+शून्य MatOp::diag(अचर Mat_अभिव्यक्ति& अभिव्यक्ति, पूर्णाङ्क d, Mat_अभिव्यक्ति& e) अचर
 {
-    if( elementWise(expr) )
+    यदि( elementWise(अभिव्यक्ति) )
     {
-        e = MatExpr(expr.op, expr.flags, Mat(), Mat(), Mat(),
-                    expr.alpha, expr.beta, expr.s);
-        if(expr.a.data)
-            e.a = expr.a.diag(d);
-        if(expr.b.data)
-            e.b = expr.b.diag(d);
-        if(expr.c.data)
-            e.c = expr.c.diag(d);
+        e = Mat_अभिव्यक्ति(अभिव्यक्ति.op, अभिव्यक्ति.flags, Mat(), Mat(), Mat(),
+                    अभिव्यक्ति.alpha, अभिव्यक्ति.beta, अभिव्यक्ति.s);
+        यदि(अभिव्यक्ति.a.data)
+            e.a = अभिव्यक्ति.a.diag(d);
+        यदि(अभिव्यक्ति.b.data)
+            e.b = अभिव्यक्ति.b.diag(d);
+        यदि(अभिव्यक्ति.c.data)
+            e.c = अभिव्यक्ति.c.diag(d);
     }
-    else
+    अन्यथा
     {
         Mat m;
-        expr.op->assign(expr, m);
-        e = MatExpr(&g_MatOp_Identity, 0, m.diag(d), Mat(), Mat());
+        अभिव्यक्ति.op->assign(अभिव्यक्ति, m);
+        e = Mat_अभिव्यक्ति(&g_MatOp_Identity, 0, m.diag(d), Mat(), Mat());
     }
 }
 
 
-void MatOp::augAssignAdd(const MatExpr& expr, Mat& m) const
+शून्य MatOp::augAssignAdd(अचर Mat_अभिव्यक्ति& अभिव्यक्ति, Mat& m) अचर
 {
     Mat temp;
-    expr.op->assign(expr, temp);
+    अभिव्यक्ति.op->assign(अभिव्यक्ति, temp);
     m += temp;
 }
 
 
-void MatOp::augAssignSubtract(const MatExpr& expr, Mat& m) const
+शून्य MatOp::augAssignSubtract(अचर Mat_अभिव्यक्ति& अभिव्यक्ति, Mat& m) अचर
 {
     Mat temp;
-    expr.op->assign(expr, temp);
+    अभिव्यक्ति.op->assign(अभिव्यक्ति, temp);
     m -= temp;
 }
 
 
-void MatOp::augAssignMultiply(const MatExpr& expr, Mat& m) const
+शून्य MatOp::augAssignMultiply(अचर Mat_अभिव्यक्ति& अभिव्यक्ति, Mat& m) अचर
 {
     Mat temp;
-    expr.op->assign(expr, temp);
+    अभिव्यक्ति.op->assign(अभिव्यक्ति, temp);
     m *= temp;
 }
 
 
-void MatOp::augAssignDivide(const MatExpr& expr, Mat& m) const
+शून्य MatOp::augAssignDivide(अचर Mat_अभिव्यक्ति& अभिव्यक्ति, Mat& m) अचर
 {
     Mat temp;
-    expr.op->assign(expr, temp);
+    अभिव्यक्ति.op->assign(अभिव्यक्ति, temp);
     m /= temp;
 }
 
 
-void MatOp::augAssignAnd(const MatExpr& expr, Mat& m) const
+शून्य MatOp::augAssignAnd(अचर Mat_अभिव्यक्ति& अभिव्यक्ति, Mat& m) अचर
 {
     Mat temp;
-    expr.op->assign(expr, temp);
+    अभिव्यक्ति.op->assign(अभिव्यक्ति, temp);
     m &= temp;
 }
 
 
-void MatOp::augAssignOr(const MatExpr& expr, Mat& m) const
+शून्य MatOp::augAssignOr(अचर Mat_अभिव्यक्ति& अभिव्यक्ति, Mat& m) अचर
 {
     Mat temp;
-    expr.op->assign(expr, temp);
+    अभिव्यक्ति.op->assign(अभिव्यक्ति, temp);
     m |= temp;
 }
 
 
-void MatOp::augAssignXor(const MatExpr& expr, Mat& m) const
+शून्य MatOp::augAssignXor(अचर Mat_अभिव्यक्ति& अभिव्यक्ति, Mat& m) अचर
 {
     Mat temp;
-    expr.op->assign(expr, temp);
+    अभिव्यक्ति.op->assign(अभिव्यक्ति, temp);
     m ^= temp;
 }
 
 
-void MatOp::add(const MatExpr& e1, const MatExpr& e2, MatExpr& res) const
+शून्य MatOp::add(अचर Mat_अभिव्यक्ति& e1, अचर Mat_अभिव्यक्ति& e2, Mat_अभिव्यक्ति& res) अचर
 {
     CV_INSTRUMENT_REGION();
 
-    if( this == e2.op )
+    यदि( एतत् == e2.op )
     {
-        double alpha = 1, beta = 1;
+        द्विगुण alpha = 1, beta = 1;
         Scalar s;
         Mat m1, m2;
-        if( isAddEx(e1) && (!e1.b.data || e1.beta == 0) )
+        यदि( isAddEx(e1) && (!e1.b.data || e1.beta == 0) )
         {
             m1 = e1.a;
             alpha = e1.alpha;
             s = e1.s;
         }
-        else
+        अन्यथा
             e1.op->assign(e1, m1);
 
-        if( isAddEx(e2) && (!e2.b.data || e2.beta == 0) )
+        यदि( isAddEx(e2) && (!e2.b.data || e2.beta == 0) )
         {
             m2 = e2.a;
             beta = e2.alpha;
             s += e2.s;
         }
-        else
+        अन्यथा
             e2.op->assign(e2, m2);
-        MatOp_AddEx::makeExpr(res, m1, m2, alpha, beta, s);
+        MatOp_AddEx::make_अभिव्यक्ति(res, m1, m2, alpha, beta, s);
     }
-    else
+    अन्यथा
         e2.op->add(e1, e2, res);
 }
 
 
-void MatOp::add(const MatExpr& expr1, const Scalar& s, MatExpr& res) const
+शून्य MatOp::add(अचर Mat_अभिव्यक्ति& expr1, अचर Scalar& s, Mat_अभिव्यक्ति& res) अचर
 {
     CV_INSTRUMENT_REGION();
 
     Mat m1;
     expr1.op->assign(expr1, m1);
-    MatOp_AddEx::makeExpr(res, m1, Mat(), 1, 0, s);
+    MatOp_AddEx::make_अभिव्यक्ति(res, m1, Mat(), 1, 0, s);
 }
 
 
-void MatOp::subtract(const MatExpr& e1, const MatExpr& e2, MatExpr& res) const
+शून्य MatOp::subtract(अचर Mat_अभिव्यक्ति& e1, अचर Mat_अभिव्यक्ति& e2, Mat_अभिव्यक्ति& res) अचर
 {
     CV_INSTRUMENT_REGION();
 
-    if( this == e2.op )
+    यदि( एतत् == e2.op )
     {
-        double alpha = 1, beta = -1;
+        द्विगुण alpha = 1, beta = -1;
         Scalar s;
         Mat m1, m2;
-        if( isAddEx(e1) && (!e1.b.data || e1.beta == 0) )
+        यदि( isAddEx(e1) && (!e1.b.data || e1.beta == 0) )
         {
             m1 = e1.a;
             alpha = e1.alpha;
             s = e1.s;
         }
-        else
+        अन्यथा
             e1.op->assign(e1, m1);
 
-        if( isAddEx(e2) && (!e2.b.data || e2.beta == 0) )
+        यदि( isAddEx(e2) && (!e2.b.data || e2.beta == 0) )
         {
             m2 = e2.a;
             beta = -e2.alpha;
             s -= e2.s;
         }
-        else
+        अन्यथा
             e2.op->assign(e2, m2);
-        MatOp_AddEx::makeExpr(res, m1, m2, alpha, beta, s);
+        MatOp_AddEx::make_अभिव्यक्ति(res, m1, m2, alpha, beta, s);
     }
-    else
+    अन्यथा
         e2.op->subtract(e1, e2, res);
 }
 
 
-void MatOp::subtract(const Scalar& s, const MatExpr& expr, MatExpr& res) const
+शून्य MatOp::subtract(अचर Scalar& s, अचर Mat_अभिव्यक्ति& अभिव्यक्ति, Mat_अभिव्यक्ति& res) अचर
 {
     CV_INSTRUMENT_REGION();
 
     Mat m;
-    expr.op->assign(expr, m);
-    MatOp_AddEx::makeExpr(res, m, Mat(), -1, 0, s);
+    अभिव्यक्ति.op->assign(अभिव्यक्ति, m);
+    MatOp_AddEx::make_अभिव्यक्ति(res, m, Mat(), -1, 0, s);
 }
 
 
-void MatOp::multiply(const MatExpr& e1, const MatExpr& e2, MatExpr& res, double scale) const
+शून्य MatOp::multiply(अचर Mat_अभिव्यक्ति& e1, अचर Mat_अभिव्यक्ति& e2, Mat_अभिव्यक्ति& res, द्विगुण scale) अचर
 {
     CV_INSTRUMENT_REGION();
 
-    if( this == e2.op )
+    यदि( एतत् == e2.op )
     {
         Mat m1, m2;
 
-        if( isReciprocal(e1) )
+        यदि( isReciprocal(e1) )
         {
-            if( isScaled(e2) )
+            यदि( isScaled(e2) )
             {
                 scale *= e2.alpha;
                 m2 = e2.a;
             }
-            else
+            अन्यथा
                 e2.op->assign(e2, m2);
 
-            MatOp_Bin::makeExpr(res, '/', m2, e1.a, scale/e1.alpha);
+            MatOp_Bin::make_अभिव्यक्ति(res, '/', m2, e1.a, scale/e1.alpha);
         }
-        else
+        अन्यथा
         {
-            char op = '*';
-            if( isScaled(e1) )
+            वर्ण op = '*';
+            यदि( isScaled(e1) )
             {
                 m1 = e1.a;
                 scale *= e1.alpha;
             }
-            else
+            अन्यथा
                 e1.op->assign(e1, m1);
 
-            if( isScaled(e2) )
+            यदि( isScaled(e2) )
             {
                 m2 = e2.a;
                 scale *= e2.alpha;
             }
-            else if( isReciprocal(e2) )
+            अन्यथा यदि( isReciprocal(e2) )
             {
                 op = '/';
                 m2 = e2.a;
                 scale *= e2.alpha;
             }
-            else
+            अन्यथा
                 e2.op->assign(e2, m2);
 
-            MatOp_Bin::makeExpr(res, op, m1, m2, scale);
+            MatOp_Bin::make_अभिव्यक्ति(res, op, m1, m2, scale);
         }
     }
-    else
+    अन्यथा
         e2.op->multiply(e1, e2, res, scale);
 }
 
 
-void MatOp::multiply(const MatExpr& expr, double s, MatExpr& res) const
+शून्य MatOp::multiply(अचर Mat_अभिव्यक्ति& अभिव्यक्ति, द्विगुण s, Mat_अभिव्यक्ति& res) अचर
 {
     CV_INSTRUMENT_REGION();
 
     Mat m;
-    expr.op->assign(expr, m);
-    MatOp_AddEx::makeExpr(res, m, Mat(), s, 0);
+    अभिव्यक्ति.op->assign(अभिव्यक्ति, m);
+    MatOp_AddEx::make_अभिव्यक्ति(res, m, Mat(), s, 0);
 }
 
 
-void MatOp::divide(const MatExpr& e1, const MatExpr& e2, MatExpr& res, double scale) const
+शून्य MatOp::divide(अचर Mat_अभिव्यक्ति& e1, अचर Mat_अभिव्यक्ति& e2, Mat_अभिव्यक्ति& res, द्विगुण scale) अचर
 {
     CV_INSTRUMENT_REGION();
 
-    if( this == e2.op )
+    यदि( एतत् == e2.op )
     {
-        if( isReciprocal(e1) && isReciprocal(e2) )
-            MatOp_Bin::makeExpr(res, '/', e2.a, e1.a, e1.alpha/e2.alpha);
-        else
+        यदि( isReciprocal(e1) && isReciprocal(e2) )
+            MatOp_Bin::make_अभिव्यक्ति(res, '/', e2.a, e1.a, e1.alpha/e2.alpha);
+        अन्यथा
         {
             Mat m1, m2;
-            char op = '/';
+            वर्ण op = '/';
 
-            if( isScaled(e1) )
+            यदि( isScaled(e1) )
             {
                 m1 = e1.a;
                 scale *= e1.alpha;
             }
-            else
+            अन्यथा
                 e1.op->assign(e1, m1);
 
-            if( isScaled(e2) )
+            यदि( isScaled(e2) )
             {
                 m2 = e2.a;
                 scale /= e2.alpha;
             }
-            else if( isReciprocal(e2) )
+            अन्यथा यदि( isReciprocal(e2) )
             {
                 m2 = e2.a;
                 scale /= e2.alpha;
                 op = '*';
             }
-            else
+            अन्यथा
                 e2.op->assign(e2, m2);
-            MatOp_Bin::makeExpr(res, op, m1, m2, scale);
+            MatOp_Bin::make_अभिव्यक्ति(res, op, m1, m2, scale);
         }
     }
-    else
+    अन्यथा
         e2.op->divide(e1, e2, res, scale);
 }
 
 
-void MatOp::divide(double s, const MatExpr& expr, MatExpr& res) const
+शून्य MatOp::divide(द्विगुण s, अचर Mat_अभिव्यक्ति& अभिव्यक्ति, Mat_अभिव्यक्ति& res) अचर
 {
     CV_INSTRUMENT_REGION();
 
     Mat m;
-    expr.op->assign(expr, m);
-    MatOp_Bin::makeExpr(res, '/', m, Mat(), s);
+    अभिव्यक्ति.op->assign(अभिव्यक्ति, m);
+    MatOp_Bin::make_अभिव्यक्ति(res, '/', m, Mat(), s);
 }
 
 
-void MatOp::abs(const MatExpr& expr, MatExpr& res) const
+शून्य MatOp::असल(अचर Mat_अभिव्यक्ति& अभिव्यक्ति, Mat_अभिव्यक्ति& res) अचर
 {
     CV_INSTRUMENT_REGION();
 
     Mat m;
-    expr.op->assign(expr, m);
-    MatOp_Bin::makeExpr(res, 'a', m, Mat());
+    अभिव्यक्ति.op->assign(अभिव्यक्ति, m);
+    MatOp_Bin::make_अभिव्यक्ति(res, 'a', m, Mat());
 }
 
 
-void MatOp::transpose(const MatExpr& expr, MatExpr& res) const
+शून्य MatOp::transpose(अचर Mat_अभिव्यक्ति& अभिव्यक्ति, Mat_अभिव्यक्ति& res) अचर
 {
     CV_INSTRUMENT_REGION();
 
     Mat m;
-    expr.op->assign(expr, m);
-    MatOp_T::makeExpr(res, m, 1);
+    अभिव्यक्ति.op->assign(अभिव्यक्ति, m);
+    MatOp_T::make_अभिव्यक्ति(res, m, 1);
 }
 
 
-void MatOp::matmul(const MatExpr& e1, const MatExpr& e2, MatExpr& res) const
+शून्य MatOp::matmul(अचर Mat_अभिव्यक्ति& e1, अचर Mat_अभिव्यक्ति& e2, Mat_अभिव्यक्ति& res) अचर
 {
-    if( this == e2.op )
+    यदि( एतत् == e2.op )
     {
-        double scale = 1;
-        int flags = 0;
+        द्विगुण scale = 1;
+        पूर्णाङ्क flags = 0;
         Mat m1, m2;
 
-        if( isT(e1) )
+        यदि( isT(e1) )
         {
             flags = cv::GEMM_1_T;
             scale = e1.alpha;
             m1 = e1.a;
         }
-        else if( isScaled(e1) )
+        अन्यथा यदि( isScaled(e1) )
         {
             scale = e1.alpha;
             m1 = e1.a;
         }
-        else
+        अन्यथा
             e1.op->assign(e1, m1);
 
-        if( isT(e2) )
+        यदि( isT(e2) )
         {
             flags |= cv::GEMM_2_T;
             scale *= e2.alpha;
             m2 = e2.a;
         }
-        else if( isScaled(e2) )
+        अन्यथा यदि( isScaled(e2) )
         {
             scale *= e2.alpha;
             m2 = e2.a;
         }
-        else
+        अन्यथा
             e2.op->assign(e2, m2);
 
-        MatOp_GEMM::makeExpr(res, flags, m1, m2, scale);
+        MatOp_GEMM::make_अभिव्यक्ति(res, flags, m1, m2, scale);
     }
-    else
+    अन्यथा
         e2.op->matmul(e1, e2, res);
 }
 
 
-void MatOp::invert(const MatExpr& expr, int method, MatExpr& res) const
+शून्य MatOp::invert(अचर Mat_अभिव्यक्ति& अभिव्यक्ति, पूर्णाङ्क method, Mat_अभिव्यक्ति& res) अचर
 {
     Mat m;
-    expr.op->assign(expr, m);
-    MatOp_Invert::makeExpr(res, method, m);
+    अभिव्यक्ति.op->assign(अभिव्यक्ति, m);
+    MatOp_Invert::make_अभिव्यक्ति(res, method, m);
 }
 
 
-Size MatOp::size(const MatExpr& expr) const
+Size MatOp::size(अचर Mat_अभिव्यक्ति& अभिव्यक्ति) अचर
 {
-    return !expr.a.empty() ? expr.a.size() : expr.b.empty() ? expr.b.size() : expr.c.size();
+    फर्काऊ !अभिव्यक्ति.a.empty() ? अभिव्यक्ति.a.size() : अभिव्यक्ति.b.empty() ? अभिव्यक्ति.b.size() : अभिव्यक्ति.c.size();
 }
 
-int MatOp::type(const MatExpr& expr) const
+पूर्णाङ्क MatOp::type(अचर Mat_अभिव्यक्ति& अभिव्यक्ति) अचर
 {
     CV_INSTRUMENT_REGION();
 
-    return !expr.a.empty() ? expr.a.type() : expr.b.empty() ? expr.b.type() : expr.c.type();
+    फर्काऊ !अभिव्यक्ति.a.empty() ? अभिव्यक्ति.a.type() : अभिव्यक्ति.b.empty() ? अभिव्यक्ति.b.type() : अभिव्यक्ति.c.type();
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////
 
-MatExpr::MatExpr(const Mat& m) : op(&g_MatOp_Identity), flags(0), a(m), b(Mat()), c(Mat()), alpha(1), beta(0), s(Scalar())
+Mat_अभिव्यक्ति::Mat_अभिव्यक्ति(अचर Mat& m) : op(&g_MatOp_Identity), flags(0), a(m), b(Mat()), c(Mat()), alpha(1), beta(0), s(Scalar())
 {
 }
 
-MatExpr MatExpr::row(int y) const
+Mat_अभिव्यक्ति Mat_अभिव्यक्ति::row(पूर्णाङ्क y) अचर
 {
-    MatExpr e;
-    op->roi(*this, Range(y, y+1), Range::all(), e);
-    return e;
+    Mat_अभिव्यक्ति e;
+    op->roi(*एतत्, Range(y, y+1), Range::all(), e);
+    फर्काऊ e;
 }
 
-MatExpr MatExpr::col(int x) const
+Mat_अभिव्यक्ति Mat_अभिव्यक्ति::col(पूर्णाङ्क x) अचर
 {
-    MatExpr e;
-    op->roi(*this, Range::all(), Range(x, x+1), e);
-    return e;
+    Mat_अभिव्यक्ति e;
+    op->roi(*एतत्, Range::all(), Range(x, x+1), e);
+    फर्काऊ e;
 }
 
-MatExpr MatExpr::diag(int d) const
+Mat_अभिव्यक्ति Mat_अभिव्यक्ति::diag(पूर्णाङ्क d) अचर
 {
-    MatExpr e;
-    op->diag(*this, d, e);
-    return e;
+    Mat_अभिव्यक्ति e;
+    op->diag(*एतत्, d, e);
+    फर्काऊ e;
 }
 
-MatExpr MatExpr::operator()( const Range& rowRange, const Range& colRange ) const
+Mat_अभिव्यक्ति Mat_अभिव्यक्ति::चालक()( अचर Range& rowRange, अचर Range& colRange ) अचर
 {
-    MatExpr e;
-    op->roi(*this, rowRange, colRange, e);
-    return e;
+    Mat_अभिव्यक्ति e;
+    op->roi(*एतत्, rowRange, colRange, e);
+    फर्काऊ e;
 }
 
-MatExpr MatExpr::operator()( const Rect& roi ) const
+Mat_अभिव्यक्ति Mat_अभिव्यक्ति::चालक()( अचर Rect& roi ) अचर
 {
-    MatExpr e;
-    op->roi(*this, Range(roi.y, roi.y + roi.height), Range(roi.x, roi.x + roi.width), e);
-    return e;
+    Mat_अभिव्यक्ति e;
+    op->roi(*एतत्, Range(roi.y, roi.y + roi.height), Range(roi.x, roi.x + roi.width), e);
+    फर्काऊ e;
 }
 
-Mat MatExpr::cross(const Mat& m) const
+Mat Mat_अभिव्यक्ति::cross(अचर Mat& m) अचर
 {
-    return ((Mat)*this).cross(m);
+    फर्काऊ ((Mat)*एतत्).cross(m);
 }
 
-double MatExpr::dot(const Mat& m) const
+द्विगुण Mat_अभिव्यक्ति::dot(अचर Mat& m) अचर
 {
-    return ((Mat)*this).dot(m);
+    फर्काऊ ((Mat)*एतत्).dot(m);
 }
 
-MatExpr MatExpr::t() const
+Mat_अभिव्यक्ति Mat_अभिव्यक्ति::t() अचर
 {
-    MatExpr e;
-    op->transpose(*this, e);
-    return e;
+    Mat_अभिव्यक्ति e;
+    op->transpose(*एतत्, e);
+    फर्काऊ e;
 }
 
-MatExpr MatExpr::inv(int method) const
+Mat_अभिव्यक्ति Mat_अभिव्यक्ति::inv(पूर्णाङ्क method) अचर
 {
-    MatExpr e;
-    op->invert(*this, method, e);
-    return e;
+    Mat_अभिव्यक्ति e;
+    op->invert(*एतत्, method, e);
+    फर्काऊ e;
 }
 
-MatExpr MatExpr::mul(const MatExpr& e, double scale) const
+Mat_अभिव्यक्ति Mat_अभिव्यक्ति::mul(अचर Mat_अभिव्यक्ति& e, द्विगुण scale) अचर
 {
-    MatExpr en;
-    op->multiply(*this, e, en, scale);
-    return en;
+    Mat_अभिव्यक्ति en;
+    op->multiply(*एतत्, e, en, scale);
+    फर्काऊ en;
 }
 
-MatExpr MatExpr::mul(const Mat& m, double scale) const
+Mat_अभिव्यक्ति Mat_अभिव्यक्ति::mul(अचर Mat& m, द्विगुण scale) अचर
 {
-    MatExpr e;
-    op->multiply(*this, MatExpr(m), e, scale);
-    return e;
+    Mat_अभिव्यक्ति e;
+    op->multiply(*एतत्, Mat_अभिव्यक्ति(m), e, scale);
+    फर्काऊ e;
 }
 
-MatExpr operator + (const Mat& a, const Mat& b)
+Mat_अभिव्यक्ति चालक + (अचर Mat& a, अचर Mat& b)
 {
     checkOperandsExist(a, b);
-    MatExpr e;
-    MatOp_AddEx::makeExpr(e, a, b, 1, 1);
-    return e;
+    Mat_अभिव्यक्ति e;
+    MatOp_AddEx::make_अभिव्यक्ति(e, a, b, 1, 1);
+    फर्काऊ e;
 }
 
-MatExpr operator + (const Mat& a, const Scalar& s)
+Mat_अभिव्यक्ति चालक + (अचर Mat& a, अचर Scalar& s)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_AddEx::makeExpr(e, a, Mat(), 1, 0, s);
-    return e;
+    Mat_अभिव्यक्ति e;
+    MatOp_AddEx::make_अभिव्यक्ति(e, a, Mat(), 1, 0, s);
+    फर्काऊ e;
 }
 
-MatExpr operator + (const Scalar& s, const Mat& a)
+Mat_अभिव्यक्ति चालक + (अचर Scalar& s, अचर Mat& a)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_AddEx::makeExpr(e, a, Mat(), 1, 0, s);
-    return e;
+    Mat_अभिव्यक्ति e;
+    MatOp_AddEx::make_अभिव्यक्ति(e, a, Mat(), 1, 0, s);
+    फर्काऊ e;
 }
 
-MatExpr operator + (const MatExpr& e, const Mat& m)
+Mat_अभिव्यक्ति चालक + (अचर Mat_अभिव्यक्ति& e, अचर Mat& m)
 {
-    MatExpr en;
-    e.op->add(e, MatExpr(m), en);
-    return en;
+    Mat_अभिव्यक्ति en;
+    e.op->add(e, Mat_अभिव्यक्ति(m), en);
+    फर्काऊ en;
 }
 
-MatExpr operator + (const Mat& m, const MatExpr& e)
+Mat_अभिव्यक्ति चालक + (अचर Mat& m, अचर Mat_अभिव्यक्ति& e)
 {
     checkOperandsExist(m);
-    MatExpr en;
-    e.op->add(e, MatExpr(m), en);
-    return en;
+    Mat_अभिव्यक्ति en;
+    e.op->add(e, Mat_अभिव्यक्ति(m), en);
+    फर्काऊ en;
 }
 
-MatExpr operator + (const MatExpr& e, const Scalar& s)
+Mat_अभिव्यक्ति चालक + (अचर Mat_अभिव्यक्ति& e, अचर Scalar& s)
 {
-    MatExpr en;
+    Mat_अभिव्यक्ति en;
     e.op->add(e, s, en);
-    return en;
+    फर्काऊ en;
 }
 
-MatExpr operator + (const Scalar& s, const MatExpr& e)
+Mat_अभिव्यक्ति चालक + (अचर Scalar& s, अचर Mat_अभिव्यक्ति& e)
 {
-    MatExpr en;
+    Mat_अभिव्यक्ति en;
     e.op->add(e, s, en);
-    return en;
+    फर्काऊ en;
 }
 
-MatExpr operator + (const MatExpr& e1, const MatExpr& e2)
+Mat_अभिव्यक्ति चालक + (अचर Mat_अभिव्यक्ति& e1, अचर Mat_अभिव्यक्ति& e2)
 {
-    MatExpr en;
+    Mat_अभिव्यक्ति en;
     e1.op->add(e1, e2, en);
-    return en;
+    फर्काऊ en;
 }
 
-MatExpr operator - (const Mat& a, const Mat& b)
+Mat_अभिव्यक्ति चालक - (अचर Mat& a, अचर Mat& b)
 {
     checkOperandsExist(a, b);
-    MatExpr e;
-    MatOp_AddEx::makeExpr(e, a, b, 1, -1);
-    return e;
+    Mat_अभिव्यक्ति e;
+    MatOp_AddEx::make_अभिव्यक्ति(e, a, b, 1, -1);
+    फर्काऊ e;
 }
 
-MatExpr operator - (const Mat& a, const Scalar& s)
+Mat_अभिव्यक्ति चालक - (अचर Mat& a, अचर Scalar& s)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_AddEx::makeExpr(e, a, Mat(), 1, 0, -s);
-    return e;
+    Mat_अभिव्यक्ति e;
+    MatOp_AddEx::make_अभिव्यक्ति(e, a, Mat(), 1, 0, -s);
+    फर्काऊ e;
 }
 
-MatExpr operator - (const Scalar& s, const Mat& a)
+Mat_अभिव्यक्ति चालक - (अचर Scalar& s, अचर Mat& a)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_AddEx::makeExpr(e, a, Mat(), -1, 0, s);
-    return e;
+    Mat_अभिव्यक्ति e;
+    MatOp_AddEx::make_अभिव्यक्ति(e, a, Mat(), -1, 0, s);
+    फर्काऊ e;
 }
 
-MatExpr operator - (const MatExpr& e, const Mat& m)
+Mat_अभिव्यक्ति चालक - (अचर Mat_अभिव्यक्ति& e, अचर Mat& m)
 {
     checkOperandsExist(m);
-    MatExpr en;
-    e.op->subtract(e, MatExpr(m), en);
-    return en;
+    Mat_अभिव्यक्ति en;
+    e.op->subtract(e, Mat_अभिव्यक्ति(m), en);
+    फर्काऊ en;
 }
 
-MatExpr operator - (const Mat& m, const MatExpr& e)
+Mat_अभिव्यक्ति चालक - (अचर Mat& m, अचर Mat_अभिव्यक्ति& e)
 {
     checkOperandsExist(m);
-    MatExpr en;
-    e.op->subtract(MatExpr(m), e, en);
-    return en;
+    Mat_अभिव्यक्ति en;
+    e.op->subtract(Mat_अभिव्यक्ति(m), e, en);
+    फर्काऊ en;
 }
 
-MatExpr operator - (const MatExpr& e, const Scalar& s)
+Mat_अभिव्यक्ति चालक - (अचर Mat_अभिव्यक्ति& e, अचर Scalar& s)
 {
-    MatExpr en;
+    Mat_अभिव्यक्ति en;
     e.op->add(e, -s, en);
-    return en;
+    फर्काऊ en;
 }
 
-MatExpr operator - (const Scalar& s, const MatExpr& e)
+Mat_अभिव्यक्ति चालक - (अचर Scalar& s, अचर Mat_अभिव्यक्ति& e)
 {
-    MatExpr en;
+    Mat_अभिव्यक्ति en;
     e.op->subtract(s, e, en);
-    return en;
+    फर्काऊ en;
 }
 
-MatExpr operator - (const MatExpr& e1, const MatExpr& e2)
+Mat_अभिव्यक्ति चालक - (अचर Mat_अभिव्यक्ति& e1, अचर Mat_अभिव्यक्ति& e2)
 {
-    MatExpr en;
+    Mat_अभिव्यक्ति en;
     e1.op->subtract(e1, e2, en);
-    return en;
+    फर्काऊ en;
 }
 
-MatExpr operator - (const Mat& m)
+Mat_अभिव्यक्ति चालक - (अचर Mat& m)
 {
     checkOperandsExist(m);
-    MatExpr e;
-    MatOp_AddEx::makeExpr(e, m, Mat(), -1, 0);
-    return e;
+    Mat_अभिव्यक्ति e;
+    MatOp_AddEx::make_अभिव्यक्ति(e, m, Mat(), -1, 0);
+    फर्काऊ e;
 }
 
-MatExpr operator - (const MatExpr& e)
+Mat_अभिव्यक्ति चालक - (अचर Mat_अभिव्यक्ति& e)
 {
-    MatExpr en;
+    Mat_अभिव्यक्ति en;
     e.op->subtract(Scalar(0), e, en);
-    return en;
+    फर्काऊ en;
 }
 
-MatExpr operator * (const Mat& a, const Mat& b)
+Mat_अभिव्यक्ति चालक * (अचर Mat& a, अचर Mat& b)
 {
     checkOperandsExist(a, b);
-    MatExpr e;
-    MatOp_GEMM::makeExpr(e, 0, a, b);
-    return e;
+    Mat_अभिव्यक्ति e;
+    MatOp_GEMM::make_अभिव्यक्ति(e, 0, a, b);
+    फर्काऊ e;
 }
 
-MatExpr operator * (const Mat& a, double s)
+Mat_अभिव्यक्ति चालक * (अचर Mat& a, द्विगुण s)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_AddEx::makeExpr(e, a, Mat(), s, 0);
-    return e;
+    Mat_अभिव्यक्ति e;
+    MatOp_AddEx::make_अभिव्यक्ति(e, a, Mat(), s, 0);
+    फर्काऊ e;
 }
 
-MatExpr operator * (double s, const Mat& a)
+Mat_अभिव्यक्ति चालक * (द्विगुण s, अचर Mat& a)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_AddEx::makeExpr(e, a, Mat(), s, 0);
-    return e;
+    Mat_अभिव्यक्ति e;
+    MatOp_AddEx::make_अभिव्यक्ति(e, a, Mat(), s, 0);
+    फर्काऊ e;
 }
 
-MatExpr operator * (const MatExpr& e, const Mat& m)
+Mat_अभिव्यक्ति चालक * (अचर Mat_अभिव्यक्ति& e, अचर Mat& m)
 {
-    MatExpr en;
-    e.op->matmul(e, MatExpr(m), en);
-    return en;
+    Mat_अभिव्यक्ति en;
+    e.op->matmul(e, Mat_अभिव्यक्ति(m), en);
+    फर्काऊ en;
 }
 
-MatExpr operator * (const Mat& m, const MatExpr& e)
+Mat_अभिव्यक्ति चालक * (अचर Mat& m, अचर Mat_अभिव्यक्ति& e)
 {
     checkOperandsExist(m);
-    MatExpr en;
-    e.op->matmul(MatExpr(m), e, en);
-    return en;
+    Mat_अभिव्यक्ति en;
+    e.op->matmul(Mat_अभिव्यक्ति(m), e, en);
+    फर्काऊ en;
 }
 
-MatExpr operator * (const MatExpr& e, double s)
+Mat_अभिव्यक्ति चालक * (अचर Mat_अभिव्यक्ति& e, द्विगुण s)
 {
-    MatExpr en;
+    Mat_अभिव्यक्ति en;
     e.op->multiply(e, s, en);
-    return en;
+    फर्काऊ en;
 }
 
-MatExpr operator * (double s, const MatExpr& e)
+Mat_अभिव्यक्ति चालक * (द्विगुण s, अचर Mat_अभिव्यक्ति& e)
 {
-    MatExpr en;
+    Mat_अभिव्यक्ति en;
     e.op->multiply(e, s, en);
-    return en;
+    फर्काऊ en;
 }
 
-MatExpr operator * (const MatExpr& e1, const MatExpr& e2)
+Mat_अभिव्यक्ति चालक * (अचर Mat_अभिव्यक्ति& e1, अचर Mat_अभिव्यक्ति& e2)
 {
-    MatExpr en;
+    Mat_अभिव्यक्ति en;
     e1.op->matmul(e1, e2, en);
-    return en;
+    फर्काऊ en;
 }
 
-MatExpr operator / (const Mat& a, const Mat& b)
+Mat_अभिव्यक्ति चालक / (अचर Mat& a, अचर Mat& b)
 {
     checkOperandsExist(a, b);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, '/', a, b);
-    return e;
+    Mat_अभिव्यक्ति e;
+    MatOp_Bin::make_अभिव्यक्ति(e, '/', a, b);
+    फर्काऊ e;
 }
 
-MatExpr operator / (const Mat& a, double s)
+Mat_अभिव्यक्ति चालक / (अचर Mat& a, द्विगुण s)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_AddEx::makeExpr(e, a, Mat(), 1./s, 0);
-    return e;
+    Mat_अभिव्यक्ति e;
+    MatOp_AddEx::make_अभिव्यक्ति(e, a, Mat(), 1./s, 0);
+    फर्काऊ e;
 }
 
-MatExpr operator / (double s, const Mat& a)
+Mat_अभिव्यक्ति चालक / (द्विगुण s, अचर Mat& a)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, '/', a, Mat(), s);
-    return e;
+    Mat_अभिव्यक्ति e;
+    MatOp_Bin::make_अभिव्यक्ति(e, '/', a, Mat(), s);
+    फर्काऊ e;
 }
 
-MatExpr operator / (const MatExpr& e, const Mat& m)
+Mat_अभिव्यक्ति चालक / (अचर Mat_अभिव्यक्ति& e, अचर Mat& m)
 {
-    MatExpr en;
-    e.op->divide(e, MatExpr(m), en);
-    return en;
+    Mat_अभिव्यक्ति en;
+    e.op->divide(e, Mat_अभिव्यक्ति(m), en);
+    फर्काऊ en;
 }
 
-MatExpr operator / (const Mat& m, const MatExpr& e)
+Mat_अभिव्यक्ति चालक / (अचर Mat& m, अचर Mat_अभिव्यक्ति& e)
 {
     checkOperandsExist(m);
-    MatExpr en;
-    e.op->divide(MatExpr(m), e, en);
-    return en;
+    Mat_अभिव्यक्ति en;
+    e.op->divide(Mat_अभिव्यक्ति(m), e, en);
+    फर्काऊ en;
 }
 
-MatExpr operator / (const MatExpr& e, double s)
+Mat_अभिव्यक्ति चालक / (अचर Mat_अभिव्यक्ति& e, द्विगुण s)
 {
-    MatExpr en;
+    Mat_अभिव्यक्ति en;
     e.op->multiply(e, 1./s, en);
-    return en;
+    फर्काऊ en;
 }
 
-MatExpr operator / (double s, const MatExpr& e)
+Mat_अभिव्यक्ति चालक / (द्विगुण s, अचर Mat_अभिव्यक्ति& e)
 {
-    MatExpr en;
+    Mat_अभिव्यक्ति en;
     e.op->divide(s, e, en);
-    return en;
+    फर्काऊ en;
 }
 
-MatExpr operator / (const MatExpr& e1, const MatExpr& e2)
+Mat_अभिव्यक्ति चालक / (अचर Mat_अभिव्यक्ति& e1, अचर Mat_अभिव्यक्ति& e2)
 {
-    MatExpr en;
+    Mat_अभिव्यक्ति en;
     e1.op->divide(e1, e2, en);
-    return en;
+    फर्काऊ en;
 }
 
-MatExpr operator < (const Mat& a, const Mat& b)
+Mat_अभिव्यक्ति चालक < (अचर Mat& a, अचर Mat& b)
 {
     checkOperandsExist(a, b);
-    MatExpr e;
-    MatOp_Cmp::makeExpr(e, cv::CMP_LT, a, b);
-    return e;
+    Mat_अभिव्यक्ति e;
+    MatOp_Cmp::make_अभिव्यक्ति(e, cv::CMP_LT, a, b);
+    फर्काऊ e;
 }
 
-MatExpr operator < (const Mat& a, double s)
+Mat_अभिव्यक्ति चालक < (अचर Mat& a, द्विगुण s)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Cmp::makeExpr(e, cv::CMP_LT, a, s);
-    return e;
+    Mat_अभिव्यक्ति e;
+    MatOp_Cmp::make_अभिव्यक्ति(e, cv::CMP_LT, a, s);
+    फर्काऊ e;
 }
 
-MatExpr operator < (double s, const Mat& a)
+Mat_अभिव्यक्ति चालक < (द्विगुण s, अचर Mat& a)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Cmp::makeExpr(e, cv::CMP_GT, a, s);
-    return e;
+    Mat_अभिव्यक्ति e;
+    MatOp_Cmp::make_अभिव्यक्ति(e, cv::CMP_GT, a, s);
+    फर्काऊ e;
 }
 
-MatExpr operator <= (const Mat& a, const Mat& b)
+Mat_अभिव्यक्ति चालक <= (अचर Mat& a, अचर Mat& b)
 {
     checkOperandsExist(a, b);
-    MatExpr e;
-    MatOp_Cmp::makeExpr(e, cv::CMP_LE, a, b);
-    return e;
+    Mat_अभिव्यक्ति e;
+    MatOp_Cmp::make_अभिव्यक्ति(e, cv::CMP_LE, a, b);
+    फर्काऊ e;
 }
 
-MatExpr operator <= (const Mat& a, double s)
+Mat_अभिव्यक्ति चालक <= (अचर Mat& a, द्विगुण s)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Cmp::makeExpr(e, cv::CMP_LE, a, s);
-    return e;
+    Mat_अभिव्यक्ति e;
+    MatOp_Cmp::make_अभिव्यक्ति(e, cv::CMP_LE, a, s);
+    फर्काऊ e;
 }
 
-MatExpr operator <= (double s, const Mat& a)
+Mat_अभिव्यक्ति चालक <= (द्विगुण s, अचर Mat& a)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Cmp::makeExpr(e, cv::CMP_GE, a, s);
-    return e;
+    Mat_अभिव्यक्ति e;
+    MatOp_Cmp::make_अभिव्यक्ति(e, cv::CMP_GE, a, s);
+    फर्काऊ e;
 }
 
-MatExpr operator == (const Mat& a, const Mat& b)
+Mat_अभिव्यक्ति चालक == (अचर Mat& a, अचर Mat& b)
 {
     checkOperandsExist(a, b);
-    MatExpr e;
-    MatOp_Cmp::makeExpr(e, cv::CMP_EQ, a, b);
-    return e;
+    Mat_अभिव्यक्ति e;
+    MatOp_Cmp::make_अभिव्यक्ति(e, cv::CMP_EQ, a, b);
+    फर्काऊ e;
 }
 
-MatExpr operator == (const Mat& a, double s)
+Mat_अभिव्यक्ति चालक == (अचर Mat& a, द्विगुण s)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Cmp::makeExpr(e, cv::CMP_EQ, a, s);
-    return e;
+    Mat_अभिव्यक्ति e;
+    MatOp_Cmp::make_अभिव्यक्ति(e, cv::CMP_EQ, a, s);
+    फर्काऊ e;
 }
 
-MatExpr operator == (double s, const Mat& a)
+Mat_अभिव्यक्ति चालक == (द्विगुण s, अचर Mat& a)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Cmp::makeExpr(e, cv::CMP_EQ, a, s);
-    return e;
+    Mat_अभिव्यक्ति e;
+    MatOp_Cmp::make_अभिव्यक्ति(e, cv::CMP_EQ, a, s);
+    फर्काऊ e;
 }
 
-MatExpr operator != (const Mat& a, const Mat& b)
+Mat_अभिव्यक्ति चालक != (अचर Mat& a, अचर Mat& b)
 {
     checkOperandsExist(a, b);
-    MatExpr e;
-    MatOp_Cmp::makeExpr(e, cv::CMP_NE, a, b);
-    return e;
+    Mat_अभिव्यक्ति e;
+    MatOp_Cmp::make_अभिव्यक्ति(e, cv::CMP_NE, a, b);
+    फर्काऊ e;
 }
 
-MatExpr operator != (const Mat& a, double s)
+Mat_अभिव्यक्ति चालक != (अचर Mat& a, द्विगुण s)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Cmp::makeExpr(e, cv::CMP_NE, a, s);
-    return e;
+    Mat_अभिव्यक्ति e;
+    MatOp_Cmp::make_अभिव्यक्ति(e, cv::CMP_NE, a, s);
+    फर्काऊ e;
 }
 
-MatExpr operator != (double s, const Mat& a)
+Mat_अभिव्यक्ति चालक != (द्विगुण s, अचर Mat& a)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Cmp::makeExpr(e, cv::CMP_NE, a, s);
-    return e;
+    Mat_अभिव्यक्ति e;
+    MatOp_Cmp::make_अभिव्यक्ति(e, cv::CMP_NE, a, s);
+    फर्काऊ e;
 }
 
-MatExpr operator >= (const Mat& a, const Mat& b)
+Mat_अभिव्यक्ति चालक >= (अचर Mat& a, अचर Mat& b)
 {
     checkOperandsExist(a, b);
-    MatExpr e;
-    MatOp_Cmp::makeExpr(e, cv::CMP_GE, a, b);
-    return e;
+    Mat_अभिव्यक्ति e;
+    MatOp_Cmp::make_अभिव्यक्ति(e, cv::CMP_GE, a, b);
+    फर्काऊ e;
 }
 
-MatExpr operator >= (const Mat& a, double s)
+Mat_अभिव्यक्ति चालक >= (अचर Mat& a, द्विगुण s)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Cmp::makeExpr(e, cv::CMP_GE, a, s);
-    return e;
+    Mat_अभिव्यक्ति e;
+    MatOp_Cmp::make_अभिव्यक्ति(e, cv::CMP_GE, a, s);
+    फर्काऊ e;
 }
 
-MatExpr operator >= (double s, const Mat& a)
+Mat_अभिव्यक्ति चालक >= (द्विगुण s, अचर Mat& a)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Cmp::makeExpr(e, cv::CMP_LE, a, s);
-    return e;
+    Mat_अभिव्यक्ति e;
+    MatOp_Cmp::make_अभिव्यक्ति(e, cv::CMP_LE, a, s);
+    फर्काऊ e;
 }
 
-MatExpr operator > (const Mat& a, const Mat& b)
+Mat_अभिव्यक्ति चालक > (अचर Mat& a, अचर Mat& b)
 {
     checkOperandsExist(a, b);
-    MatExpr e;
-    MatOp_Cmp::makeExpr(e, cv::CMP_GT, a, b);
-    return e;
+    Mat_अभिव्यक्ति e;
+    MatOp_Cmp::make_अभिव्यक्ति(e, cv::CMP_GT, a, b);
+    फर्काऊ e;
 }
 
-MatExpr operator > (const Mat& a, double s)
+Mat_अभिव्यक्ति चालक > (अचर Mat& a, द्विगुण s)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Cmp::makeExpr(e, cv::CMP_GT, a, s);
-    return e;
+    Mat_अभिव्यक्ति e;
+    MatOp_Cmp::make_अभिव्यक्ति(e, cv::CMP_GT, a, s);
+    फर्काऊ e;
 }
 
-MatExpr operator > (double s, const Mat& a)
+Mat_अभिव्यक्ति चालक > (द्विगुण s, अचर Mat& a)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Cmp::makeExpr(e, cv::CMP_LT, a, s);
-    return e;
+    Mat_अभिव्यक्ति e;
+    MatOp_Cmp::make_अभिव्यक्ति(e, cv::CMP_LT, a, s);
+    फर्काऊ e;
 }
 
-MatExpr min(const Mat& a, const Mat& b)
+Mat_अभिव्यक्ति min(अचर Mat& a, अचर Mat& b)
 {
     CV_INSTRUMENT_REGION();
 
     checkOperandsExist(a, b);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, 'm', a, b);
-    return e;
+    Mat_अभिव्यक्ति e;
+    MatOp_Bin::make_अभिव्यक्ति(e, 'm', a, b);
+    फर्काऊ e;
 }
 
-MatExpr min(const Mat& a, double s)
+Mat_अभिव्यक्ति min(अचर Mat& a, द्विगुण s)
 {
     CV_INSTRUMENT_REGION();
 
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, 'n', a, s);
-    return e;
+    Mat_अभिव्यक्ति e;
+    MatOp_Bin::make_अभिव्यक्ति(e, 'n', a, s);
+    फर्काऊ e;
 }
 
-MatExpr min(double s, const Mat& a)
+Mat_अभिव्यक्ति min(द्विगुण s, अचर Mat& a)
 {
     CV_INSTRUMENT_REGION();
 
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, 'n', a, s);
-    return e;
+    Mat_अभिव्यक्ति e;
+    MatOp_Bin::make_अभिव्यक्ति(e, 'n', a, s);
+    फर्काऊ e;
 }
 
-MatExpr max(const Mat& a, const Mat& b)
+Mat_अभिव्यक्ति max(अचर Mat& a, अचर Mat& b)
 {
     CV_INSTRUMENT_REGION();
 
     checkOperandsExist(a, b);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, 'M', a, b);
-    return e;
+    Mat_अभिव्यक्ति e;
+    MatOp_Bin::make_अभिव्यक्ति(e, 'M', a, b);
+    फर्काऊ e;
 }
 
-MatExpr max(const Mat& a, double s)
+Mat_अभिव्यक्ति max(अचर Mat& a, द्विगुण s)
 {
     CV_INSTRUMENT_REGION();
 
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, 'N', a, s);
-    return e;
+    Mat_अभिव्यक्ति e;
+    MatOp_Bin::make_अभिव्यक्ति(e, 'N', a, s);
+    फर्काऊ e;
 }
 
-MatExpr max(double s, const Mat& a)
+Mat_अभिव्यक्ति max(द्विगुण s, अचर Mat& a)
 {
     CV_INSTRUMENT_REGION();
 
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, 'N', a, s);
-    return e;
+    Mat_अभिव्यक्ति e;
+    MatOp_Bin::make_अभिव्यक्ति(e, 'N', a, s);
+    फर्काऊ e;
 }
 
-MatExpr operator & (const Mat& a, const Mat& b)
+Mat_अभिव्यक्ति चालक & (अचर Mat& a, अचर Mat& b)
 {
     checkOperandsExist(a, b);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, '&', a, b);
-    return e;
+    Mat_अभिव्यक्ति e;
+    MatOp_Bin::make_अभिव्यक्ति(e, '&', a, b);
+    फर्काऊ e;
 }
 
-MatExpr operator & (const Mat& a, const Scalar& s)
+Mat_अभिव्यक्ति चालक & (अचर Mat& a, अचर Scalar& s)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, '&', a, s);
-    return e;
+    Mat_अभिव्यक्ति e;
+    MatOp_Bin::make_अभिव्यक्ति(e, '&', a, s);
+    फर्काऊ e;
 }
 
-MatExpr operator & (const Scalar& s, const Mat& a)
+Mat_अभिव्यक्ति चालक & (अचर Scalar& s, अचर Mat& a)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, '&', a, s);
-    return e;
+    Mat_अभिव्यक्ति e;
+    MatOp_Bin::make_अभिव्यक्ति(e, '&', a, s);
+    फर्काऊ e;
 }
 
-MatExpr operator | (const Mat& a, const Mat& b)
+Mat_अभिव्यक्ति चालक | (अचर Mat& a, अचर Mat& b)
 {
     checkOperandsExist(a, b);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, '|', a, b);
-    return e;
+    Mat_अभिव्यक्ति e;
+    MatOp_Bin::make_अभिव्यक्ति(e, '|', a, b);
+    फर्काऊ e;
 }
 
-MatExpr operator | (const Mat& a, const Scalar& s)
+Mat_अभिव्यक्ति चालक | (अचर Mat& a, अचर Scalar& s)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, '|', a, s);
-    return e;
+    Mat_अभिव्यक्ति e;
+    MatOp_Bin::make_अभिव्यक्ति(e, '|', a, s);
+    फर्काऊ e;
 }
 
-MatExpr operator | (const Scalar& s, const Mat& a)
+Mat_अभिव्यक्ति चालक | (अचर Scalar& s, अचर Mat& a)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, '|', a, s);
-    return e;
+    Mat_अभिव्यक्ति e;
+    MatOp_Bin::make_अभिव्यक्ति(e, '|', a, s);
+    फर्काऊ e;
 }
 
-MatExpr operator ^ (const Mat& a, const Mat& b)
+Mat_अभिव्यक्ति चालक ^ (अचर Mat& a, अचर Mat& b)
 {
     checkOperandsExist(a, b);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, '^', a, b);
-    return e;
+    Mat_अभिव्यक्ति e;
+    MatOp_Bin::make_अभिव्यक्ति(e, '^', a, b);
+    फर्काऊ e;
 }
 
-MatExpr operator ^ (const Mat& a, const Scalar& s)
+Mat_अभिव्यक्ति चालक ^ (अचर Mat& a, अचर Scalar& s)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, '^', a, s);
-    return e;
+    Mat_अभिव्यक्ति e;
+    MatOp_Bin::make_अभिव्यक्ति(e, '^', a, s);
+    फर्काऊ e;
 }
 
-MatExpr operator ^ (const Scalar& s, const Mat& a)
+Mat_अभिव्यक्ति चालक ^ (अचर Scalar& s, अचर Mat& a)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, '^', a, s);
-    return e;
+    Mat_अभिव्यक्ति e;
+    MatOp_Bin::make_अभिव्यक्ति(e, '^', a, s);
+    फर्काऊ e;
 }
 
-MatExpr operator ~(const Mat& a)
+Mat_अभिव्यक्ति चालक ~(अचर Mat& a)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, '~', a, Scalar());
-    return e;
+    Mat_अभिव्यक्ति e;
+    MatOp_Bin::make_अभिव्यक्ति(e, '~', a, Scalar());
+    फर्काऊ e;
 }
 
-MatExpr abs(const Mat& a)
+Mat_अभिव्यक्ति असल(अचर Mat& a)
 {
     CV_INSTRUMENT_REGION();
 
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, 'a', a, Scalar());
-    return e;
+    Mat_अभिव्यक्ति e;
+    MatOp_Bin::make_अभिव्यक्ति(e, 'a', a, Scalar());
+    फर्काऊ e;
 }
 
-MatExpr abs(const MatExpr& e)
+Mat_अभिव्यक्ति असल(अचर Mat_अभिव्यक्ति& e)
 {
     CV_INSTRUMENT_REGION();
 
-    MatExpr en;
-    e.op->abs(e, en);
-    return en;
+    Mat_अभिव्यक्ति en;
+    e.op->असल(e, en);
+    फर्काऊ en;
 }
 
 
-Size MatExpr::size() const
+Size Mat_अभिव्यक्ति::size() अचर
 {
-    if( isT(*this) || isInv(*this) )
-        return Size(a.rows, a.cols);
-    if( isSolve(*this) )
-        return Size(b.cols, a.cols);
-    if( isInitializer(*this) )
-        return a.size();
-    return op ? op->size(*this) : Size();
+    यदि( isT(*एतत्) || isInv(*एतत्) )
+        फर्काऊ Size(a.rows, a.cols);
+    यदि( isSolve(*एतत्) )
+        फर्काऊ Size(b.cols, a.cols);
+    यदि( isInitializer(*एतत्) )
+        फर्काऊ a.size();
+    फर्काऊ op ? op->size(*एतत्) : Size();
 }
 
 
-int MatExpr::type() const
+पूर्णाङ्क Mat_अभिव्यक्ति::type() अचर
 {
     CV_INSTRUMENT_REGION();
 
-    if( isInitializer(*this) )
-        return a.type();
-    if( isCmp(*this) )
-        return CV_MAKETYPE(CV_8U, a.channels());
-    return op ? op->type(*this) : -1;
+    यदि( isInitializer(*एतत्) )
+        फर्काऊ a.type();
+    यदि( isCmp(*एतत्) )
+        फर्काऊ CV_MAKETYPE(CV_8U, a.channels());
+    फर्काऊ op ? op->type(*एतत्) : -1;
 }
 
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void MatOp_Identity::assign(const MatExpr& e, Mat& m, int _type) const
+शून्य MatOp_Identity::assign(अचर Mat_अभिव्यक्ति& e, Mat& m, पूर्णाङ्क _type) अचर
 {
-    if( _type == -1 || _type == e.a.type() )
+    यदि( _type == -1 || _type == e.a.type() )
         m = e.a;
-    else
+    अन्यथा
     {
         CV_Assert( CV_MAT_CN(_type) == e.a.channels() );
         e.a.convertTo(m, _type);
     }
 }
 
-inline void MatOp_Identity::makeExpr(MatExpr& res, const Mat& m)
+अन्तःस्थ शून्य MatOp_Identity::make_अभिव्यक्ति(Mat_अभिव्यक्ति& res, अचर Mat& m)
 {
-    res = MatExpr(&g_MatOp_Identity, 0, m, Mat(), Mat(), 1, 0);
+    res = Mat_अभिव्यक्ति(&g_MatOp_Identity, 0, m, Mat(), Mat(), 1, 0);
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void MatOp_AddEx::assign(const MatExpr& e, Mat& m, int _type) const
+शून्य MatOp_AddEx::assign(अचर Mat_अभिव्यक्ति& e, Mat& m, पूर्णाङ्क _type) अचर
 {
     Mat temp, &dst = _type == -1 || e.a.type() == _type ? m : temp;
-    if( e.b.data )
+    यदि( e.b.data )
     {
-        if( e.s == Scalar() || !e.s.isReal() )
+        यदि( e.s == Scalar() || !e.s.isReal() )
         {
-            if( e.alpha == 1 )
+            यदि( e.alpha == 1 )
             {
-                if( e.beta == 1 )
+                यदि( e.beta == 1 )
                     cv::add(e.a, e.b, dst);
-                else if( e.beta == -1 )
+                अन्यथा यदि( e.beta == -1 )
                     cv::subtract(e.a, e.b, dst);
-                else
+                अन्यथा
                     cv::scaleAdd(e.b, e.beta, e.a, dst);
             }
-            else if( e.beta == 1 )
+            अन्यथा यदि( e.beta == 1 )
             {
-                if( e.alpha == -1 )
+                यदि( e.alpha == -1 )
                     cv::subtract(e.b, e.a, dst);
-                else
+                अन्यथा
                     cv::scaleAdd(e.a, e.alpha, e.b, dst);
             }
-            else
+            अन्यथा
                 cv::addWeighted(e.a, e.alpha, e.b, e.beta, 0, dst);
 
-            if( !e.s.isReal() )
+            यदि( !e.s.isReal() )
                 cv::add(dst, e.s, dst);
         }
-        else
+        अन्यथा
         {
-            if (e.a.channels() > 1)
-                CV_LOG_ONCE_WARNING(NULL, "OpenCV/MatExpr: processing of multi-channel arrays might be changed in the future: "
+            यदि (e.a.channels() > 1)
+                CV_LOG_ONCE_WARNING(रिक्त, "OpenCV/MatExpr: processing of multi-channel arrays might be changed in the future: "
                                           "https://github.com/opencv/opencv/issues/16739");
             cv::addWeighted(e.a, e.alpha, e.b, e.beta, e.s[0], dst);
         }
     }
-    else if( e.s.isReal() && (dst.data != m.data || fabs(e.alpha) != 1))
+    अन्यथा यदि( e.s.isReal() && (dst.data != m.data || भ_असल(e.alpha) != 1))
     {
-        if (e.a.channels() > 1 && e.s[0] != 0.0)
-            CV_LOG_ONCE_WARNING(NULL, "OpenCV/MatExpr: processing of multi-channel arrays might be changed in the future: "
+        यदि (e.a.channels() > 1 && e.s[0] != 0.0)
+            CV_LOG_ONCE_WARNING(रिक्त, "OpenCV/MatExpr: processing of multi-channel arrays might be changed in the future: "
                                       "https://github.com/opencv/opencv/issues/16739");
         e.a.convertTo(m, _type, e.alpha, e.s[0]);
-        return;
+        फर्काऊ;
     }
-    else if( e.alpha == 1 )
+    अन्यथा यदि( e.alpha == 1 )
         cv::add(e.a, e.s, dst);
-    else if( e.alpha == -1 )
+    अन्यथा यदि( e.alpha == -1 )
         cv::subtract(e.s, e.a, dst);
-    else
+    अन्यथा
     {
         e.a.convertTo(dst, e.a.type(), e.alpha);
         cv::add(dst, e.s, dst);
     }
 
-    if( dst.data != m.data )
+    यदि( dst.data != m.data )
         dst.convertTo(m, m.type());
 }
 
 
-void MatOp_AddEx::add(const MatExpr& e, const Scalar& s, MatExpr& res) const
+शून्य MatOp_AddEx::add(अचर Mat_अभिव्यक्ति& e, अचर Scalar& s, Mat_अभिव्यक्ति& res) अचर
 {
     CV_INSTRUMENT_REGION();
 
@@ -1359,7 +1359,7 @@ void MatOp_AddEx::add(const MatExpr& e, const Scalar& s, MatExpr& res) const
 }
 
 
-void MatOp_AddEx::subtract(const Scalar& s, const MatExpr& e, MatExpr& res) const
+शून्य MatOp_AddEx::subtract(अचर Scalar& s, अचर Mat_अभिव्यक्ति& e, Mat_अभिव्यक्ति& res) अचर
 {
     CV_INSTRUMENT_REGION();
 
@@ -1369,7 +1369,7 @@ void MatOp_AddEx::subtract(const Scalar& s, const MatExpr& e, MatExpr& res) cons
     res.s = s - res.s;
 }
 
-void MatOp_AddEx::multiply(const MatExpr& e, double s, MatExpr& res) const
+शून्य MatOp_AddEx::multiply(अचर Mat_अभिव्यक्ति& e, द्विगुण s, Mat_अभिव्यक्ति& res) अचर
 {
     CV_INSTRUMENT_REGION();
 
@@ -1379,160 +1379,160 @@ void MatOp_AddEx::multiply(const MatExpr& e, double s, MatExpr& res) const
     res.s *= s;
 }
 
-void MatOp_AddEx::divide(double s, const MatExpr& e, MatExpr& res) const
+शून्य MatOp_AddEx::divide(द्विगुण s, अचर Mat_अभिव्यक्ति& e, Mat_अभिव्यक्ति& res) अचर
 {
     CV_INSTRUMENT_REGION();
 
-    if( isScaled(e) )
-        MatOp_Bin::makeExpr(res, '/', e.a, Mat(), s/e.alpha);
-    else
+    यदि( isScaled(e) )
+        MatOp_Bin::make_अभिव्यक्ति(res, '/', e.a, Mat(), s/e.alpha);
+    अन्यथा
         MatOp::divide(s, e, res);
 }
 
 
-void MatOp_AddEx::transpose(const MatExpr& e, MatExpr& res) const
+शून्य MatOp_AddEx::transpose(अचर Mat_अभिव्यक्ति& e, Mat_अभिव्यक्ति& res) अचर
 {
     CV_INSTRUMENT_REGION();
 
-    if( isScaled(e) )
-        MatOp_T::makeExpr(res, e.a, e.alpha);
-    else
+    यदि( isScaled(e) )
+        MatOp_T::make_अभिव्यक्ति(res, e.a, e.alpha);
+    अन्यथा
         MatOp::transpose(e, res);
 }
 
-void MatOp_AddEx::abs(const MatExpr& e, MatExpr& res) const
+शून्य MatOp_AddEx::असल(अचर Mat_अभिव्यक्ति& e, Mat_अभिव्यक्ति& res) अचर
 {
     CV_INSTRUMENT_REGION();
 
-    if( (!e.b.data || e.beta == 0) && fabs(e.alpha) == 1 )
-        MatOp_Bin::makeExpr(res, 'a', e.a, -e.s*e.alpha);
-    else if( e.b.data && e.alpha + e.beta == 0 && e.alpha*e.beta == -1 )
-        MatOp_Bin::makeExpr(res, 'a', e.a, e.b);
-    else
-        MatOp::abs(e, res);
+    यदि( (!e.b.data || e.beta == 0) && भ_असल(e.alpha) == 1 )
+        MatOp_Bin::make_अभिव्यक्ति(res, 'a', e.a, -e.s*e.alpha);
+    अन्यथा यदि( e.b.data && e.alpha + e.beta == 0 && e.alpha*e.beta == -1 )
+        MatOp_Bin::make_अभिव्यक्ति(res, 'a', e.a, e.b);
+    अन्यथा
+        MatOp::असल(e, res);
 }
 
-inline void MatOp_AddEx::makeExpr(MatExpr& res, const Mat& a, const Mat& b, double alpha, double beta, const Scalar& s)
+अन्तःस्थ शून्य MatOp_AddEx::make_अभिव्यक्ति(Mat_अभिव्यक्ति& res, अचर Mat& a, अचर Mat& b, द्विगुण alpha, द्विगुण beta, अचर Scalar& s)
 {
-    res = MatExpr(&g_MatOp_AddEx, 0, a, b, Mat(), alpha, beta, s);
+    res = Mat_अभिव्यक्ति(&g_MatOp_AddEx, 0, a, b, Mat(), alpha, beta, s);
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void MatOp_Bin::assign(const MatExpr& e, Mat& m, int _type) const
+शून्य MatOp_Bin::assign(अचर Mat_अभिव्यक्ति& e, Mat& m, पूर्णाङ्क _type) अचर
 {
     Mat temp, &dst = _type == -1 || e.a.type() == _type ? m : temp;
 
-    if( e.flags == '*' )
+    यदि( e.flags == '*' )
         cv::multiply(e.a, e.b, dst, e.alpha);
-    else if( e.flags == '/' && e.b.data )
+    अन्यथा यदि( e.flags == '/' && e.b.data )
         cv::divide(e.a, e.b, dst, e.alpha);
-    else if( e.flags == '/' && !e.b.data )
+    अन्यथा यदि( e.flags == '/' && !e.b.data )
         cv::divide(e.alpha, e.a, dst );
-    else if( e.flags == '&' && e.b.data )
+    अन्यथा यदि( e.flags == '&' && e.b.data )
         bitwise_and(e.a, e.b, dst);
-    else if( e.flags == '&' && !e.b.data )
+    अन्यथा यदि( e.flags == '&' && !e.b.data )
         bitwise_and(e.a, e.s, dst);
-    else if( e.flags == '|' && e.b.data )
+    अन्यथा यदि( e.flags == '|' && e.b.data )
         bitwise_or(e.a, e.b, dst);
-    else if( e.flags == '|' && !e.b.data )
+    अन्यथा यदि( e.flags == '|' && !e.b.data )
         bitwise_or(e.a, e.s, dst);
-    else if( e.flags == '^' && e.b.data )
+    अन्यथा यदि( e.flags == '^' && e.b.data )
         bitwise_xor(e.a, e.b, dst);
-    else if( e.flags == '^' && !e.b.data )
+    अन्यथा यदि( e.flags == '^' && !e.b.data )
         bitwise_xor(e.a, e.s, dst);
-    else if( e.flags == '~' && !e.b.data )
+    अन्यथा यदि( e.flags == '~' && !e.b.data )
         bitwise_not(e.a, dst);
-    else if( e.flags == 'm' )
+    अन्यथा यदि( e.flags == 'm' )
         cv::min(e.a, e.b, dst);
-    else if( e.flags == 'n' )
+    अन्यथा यदि( e.flags == 'n' )
         cv::min(e.a, e.s[0], dst);
-    else if( e.flags == 'M' )
+    अन्यथा यदि( e.flags == 'M' )
         cv::max(e.a, e.b, dst);
-    else if( e.flags == 'N' )
+    अन्यथा यदि( e.flags == 'N' )
         cv::max(e.a, e.s[0], dst);
-    else if( e.flags == 'a' && e.b.data )
+    अन्यथा यदि( e.flags == 'a' && e.b.data )
         cv::absdiff(e.a, e.b, dst);
-    else if( e.flags == 'a' && !e.b.data )
+    अन्यथा यदि( e.flags == 'a' && !e.b.data )
         cv::absdiff(e.a, e.s, dst);
-    else
+    अन्यथा
         CV_Error(cv::Error::StsError, "Unknown operation");
 
-    if( dst.data != m.data )
+    यदि( dst.data != m.data )
         dst.convertTo(m, _type);
 }
 
-void MatOp_Bin::multiply(const MatExpr& e, double s, MatExpr& res) const
+शून्य MatOp_Bin::multiply(अचर Mat_अभिव्यक्ति& e, द्विगुण s, Mat_अभिव्यक्ति& res) अचर
 {
     CV_INSTRUMENT_REGION();
 
-    if( e.flags == '*' || e.flags == '/' )
+    यदि( e.flags == '*' || e.flags == '/' )
     {
         res = e;
         res.alpha *= s;
     }
-    else
+    अन्यथा
         MatOp::multiply(e, s, res);
 }
 
-void MatOp_Bin::divide(double s, const MatExpr& e, MatExpr& res) const
+शून्य MatOp_Bin::divide(द्विगुण s, अचर Mat_अभिव्यक्ति& e, Mat_अभिव्यक्ति& res) अचर
 {
     CV_INSTRUMENT_REGION();
 
-    if( e.flags == '/' && (!e.b.data || e.beta == 0) )
-        MatOp_AddEx::makeExpr(res, e.a, Mat(), s/e.alpha, 0);
-    else
+    यदि( e.flags == '/' && (!e.b.data || e.beta == 0) )
+        MatOp_AddEx::make_अभिव्यक्ति(res, e.a, Mat(), s/e.alpha, 0);
+    अन्यथा
         MatOp::divide(s, e, res);
 }
 
-inline void MatOp_Bin::makeExpr(MatExpr& res, char op, const Mat& a, const Mat& b, double scale)
+अन्तःस्थ शून्य MatOp_Bin::make_अभिव्यक्ति(Mat_अभिव्यक्ति& res, वर्ण op, अचर Mat& a, अचर Mat& b, द्विगुण scale)
 {
-    res = MatExpr(&g_MatOp_Bin, op, a, b, Mat(), scale, b.data ? 1 : 0);
+    res = Mat_अभिव्यक्ति(&g_MatOp_Bin, op, a, b, Mat(), scale, b.data ? 1 : 0);
 }
 
-inline void MatOp_Bin::makeExpr(MatExpr& res, char op, const Mat& a, const Scalar& s)
+अन्तःस्थ शून्य MatOp_Bin::make_अभिव्यक्ति(Mat_अभिव्यक्ति& res, वर्ण op, अचर Mat& a, अचर Scalar& s)
 {
-    res = MatExpr(&g_MatOp_Bin, op, a, Mat(), Mat(), 1, 0, s);
+    res = Mat_अभिव्यक्ति(&g_MatOp_Bin, op, a, Mat(), Mat(), 1, 0, s);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void MatOp_Cmp::assign(const MatExpr& e, Mat& m, int _type) const
+शून्य MatOp_Cmp::assign(अचर Mat_अभिव्यक्ति& e, Mat& m, पूर्णाङ्क _type) अचर
 {
     Mat temp, &dst = _type == -1 || _type == CV_8U ? m : temp;
 
-    if( e.b.data )
+    यदि( e.b.data )
         cv::compare(e.a, e.b, dst, e.flags);
-    else
+    अन्यथा
         cv::compare(e.a, e.alpha, dst, e.flags);
 
-    if( dst.data != m.data )
+    यदि( dst.data != m.data )
         dst.convertTo(m, _type);
 }
 
-inline void MatOp_Cmp::makeExpr(MatExpr& res, int cmpop, const Mat& a, const Mat& b)
+अन्तःस्थ शून्य MatOp_Cmp::make_अभिव्यक्ति(Mat_अभिव्यक्ति& res, पूर्णाङ्क cmpop, अचर Mat& a, अचर Mat& b)
 {
-    res = MatExpr(&g_MatOp_Cmp, cmpop, a, b, Mat(), 1, 1);
+    res = Mat_अभिव्यक्ति(&g_MatOp_Cmp, cmpop, a, b, Mat(), 1, 1);
 }
 
-inline void MatOp_Cmp::makeExpr(MatExpr& res, int cmpop, const Mat& a, double alpha)
+अन्तःस्थ शून्य MatOp_Cmp::make_अभिव्यक्ति(Mat_अभिव्यक्ति& res, पूर्णाङ्क cmpop, अचर Mat& a, द्विगुण alpha)
 {
-    res = MatExpr(&g_MatOp_Cmp, cmpop, a, Mat(), Mat(), alpha, 1);
+    res = Mat_अभिव्यक्ति(&g_MatOp_Cmp, cmpop, a, Mat(), Mat(), alpha, 1);
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void MatOp_T::assign(const MatExpr& e, Mat& m, int _type) const
+शून्य MatOp_T::assign(अचर Mat_अभिव्यक्ति& e, Mat& m, पूर्णाङ्क _type) अचर
 {
     Mat temp, &dst = _type == -1 || _type == e.a.type() ? m : temp;
 
     cv::transpose(e.a, dst);
 
-    if( dst.data != m.data || e.alpha != 1 )
+    यदि( dst.data != m.data || e.alpha != 1 )
         dst.convertTo(m, _type, e.alpha);
 }
 
-void MatOp_T::multiply(const MatExpr& e, double s, MatExpr& res) const
+शून्य MatOp_T::multiply(अचर Mat_अभिव्यक्ति& e, द्विगुण s, Mat_अभिव्यक्ति& res) अचर
 {
     CV_INSTRUMENT_REGION();
 
@@ -1540,71 +1540,71 @@ void MatOp_T::multiply(const MatExpr& e, double s, MatExpr& res) const
     res.alpha *= s;
 }
 
-void MatOp_T::transpose(const MatExpr& e, MatExpr& res) const
+शून्य MatOp_T::transpose(अचर Mat_अभिव्यक्ति& e, Mat_अभिव्यक्ति& res) अचर
 {
     CV_INSTRUMENT_REGION();
 
-    if( e.alpha == 1 )
-        MatOp_Identity::makeExpr(res, e.a);
-    else
-        MatOp_AddEx::makeExpr(res, e.a, Mat(), e.alpha, 0);
+    यदि( e.alpha == 1 )
+        MatOp_Identity::make_अभिव्यक्ति(res, e.a);
+    अन्यथा
+        MatOp_AddEx::make_अभिव्यक्ति(res, e.a, Mat(), e.alpha, 0);
 }
 
-inline void MatOp_T::makeExpr(MatExpr& res, const Mat& a, double alpha)
+अन्तःस्थ शून्य MatOp_T::make_अभिव्यक्ति(Mat_अभिव्यक्ति& res, अचर Mat& a, द्विगुण alpha)
 {
-    res = MatExpr(&g_MatOp_T, 0, a, Mat(), Mat(), alpha, 0);
+    res = Mat_अभिव्यक्ति(&g_MatOp_T, 0, a, Mat(), Mat(), alpha, 0);
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void MatOp_GEMM::assign(const MatExpr& e, Mat& m, int _type) const
+शून्य MatOp_GEMM::assign(अचर Mat_अभिव्यक्ति& e, Mat& m, पूर्णाङ्क _type) अचर
 {
     Mat temp, &dst = _type == -1 || _type == e.a.type() ? m : temp;
 
     cv::gemm(e.a, e.b, e.alpha, e.c, e.beta, dst, e.flags);
-    if( dst.data != m.data )
+    यदि( dst.data != m.data )
         dst.convertTo(m, _type);
 }
 
-void MatOp_GEMM::add(const MatExpr& e1, const MatExpr& e2, MatExpr& res) const
+शून्य MatOp_GEMM::add(अचर Mat_अभिव्यक्ति& e1, अचर Mat_अभिव्यक्ति& e2, Mat_अभिव्यक्ति& res) अचर
 {
     CV_INSTRUMENT_REGION();
 
-    bool i1 = isIdentity(e1), i2 = isIdentity(e2);
-    double alpha1 = i1 ? 1 : e1.alpha, alpha2 = i2 ? 1 : e2.alpha;
+    तार्किक i1 = isIdentity(e1), i2 = isIdentity(e2);
+    द्विगुण alpha1 = i1 ? 1 : e1.alpha, alpha2 = i2 ? 1 : e2.alpha;
 
-    if( isMatProd(e1) && (i2 || isScaled(e2) || isT(e2)) )
-        MatOp_GEMM::makeExpr(res, (e1.flags & ~cv::GEMM_3_T)|(isT(e2) ? cv::GEMM_3_T : 0),
+    यदि( isMatProd(e1) && (i2 || isScaled(e2) || isT(e2)) )
+        MatOp_GEMM::make_अभिव्यक्ति(res, (e1.flags & ~cv::GEMM_3_T)|(isT(e2) ? cv::GEMM_3_T : 0),
                              e1.a, e1.b, alpha1, e2.a, alpha2);
-    else if( isMatProd(e2) && (i1 || isScaled(e1) || isT(e1)) )
-        MatOp_GEMM::makeExpr(res, (e2.flags & ~cv::GEMM_3_T)|(isT(e1) ? cv::GEMM_3_T : 0),
+    अन्यथा यदि( isMatProd(e2) && (i1 || isScaled(e1) || isT(e1)) )
+        MatOp_GEMM::make_अभिव्यक्ति(res, (e2.flags & ~cv::GEMM_3_T)|(isT(e1) ? cv::GEMM_3_T : 0),
                              e2.a, e2.b, alpha2, e1.a, alpha1);
-    else if( this == e2.op )
+    अन्यथा यदि( एतत् == e2.op )
         MatOp::add(e1, e2, res);
-    else
+    अन्यथा
         e2.op->add(e1, e2, res);
 }
 
-void MatOp_GEMM::subtract(const MatExpr& e1, const MatExpr& e2, MatExpr& res) const
+शून्य MatOp_GEMM::subtract(अचर Mat_अभिव्यक्ति& e1, अचर Mat_अभिव्यक्ति& e2, Mat_अभिव्यक्ति& res) अचर
 {
     CV_INSTRUMENT_REGION();
 
-    bool i1 = isIdentity(e1), i2 = isIdentity(e2);
-    double alpha1 = i1 ? 1 : e1.alpha, alpha2 = i2 ? 1 : e2.alpha;
+    तार्किक i1 = isIdentity(e1), i2 = isIdentity(e2);
+    द्विगुण alpha1 = i1 ? 1 : e1.alpha, alpha2 = i2 ? 1 : e2.alpha;
 
-    if( isMatProd(e1) && (i2 || isScaled(e2) || isT(e2)) )
-        MatOp_GEMM::makeExpr(res, (e1.flags & ~cv::GEMM_3_T)|(isT(e2) ? cv::GEMM_3_T : 0),
+    यदि( isMatProd(e1) && (i2 || isScaled(e2) || isT(e2)) )
+        MatOp_GEMM::make_अभिव्यक्ति(res, (e1.flags & ~cv::GEMM_3_T)|(isT(e2) ? cv::GEMM_3_T : 0),
                              e1.a, e1.b, alpha1, e2.a, -alpha2);
-    else if( isMatProd(e2) && (i1 || isScaled(e1) || isT(e1)) )
-        MatOp_GEMM::makeExpr(res, (e2.flags & ~cv::GEMM_3_T)|(isT(e1) ? cv::GEMM_3_T : 0),
+    अन्यथा यदि( isMatProd(e2) && (i1 || isScaled(e1) || isT(e1)) )
+        MatOp_GEMM::make_अभिव्यक्ति(res, (e2.flags & ~cv::GEMM_3_T)|(isT(e1) ? cv::GEMM_3_T : 0),
                             e2.a, e2.b, -alpha2, e1.a, alpha1);
-    else if( this == e2.op )
+    अन्यथा यदि( एतत् == e2.op )
         MatOp::subtract(e1, e2, res);
-    else
+    अन्यथा
         e2.op->subtract(e1, e2, res);
 }
 
-void MatOp_GEMM::multiply(const MatExpr& e, double s, MatExpr& res) const
+शून्य MatOp_GEMM::multiply(अचर Mat_अभिव्यक्ति& e, द्विगुण s, Mat_अभिव्यक्ति& res) अचर
 {
     CV_INSTRUMENT_REGION();
 
@@ -1613,7 +1613,7 @@ void MatOp_GEMM::multiply(const MatExpr& e, double s, MatExpr& res) const
     res.beta *= s;
 }
 
-void MatOp_GEMM::transpose(const MatExpr& e, MatExpr& res) const
+शून्य MatOp_GEMM::transpose(अचर Mat_अभिव्यक्ति& e, Mat_अभिव्यक्ति& res) अचर
 {
     CV_INSTRUMENT_REGION();
 
@@ -1624,74 +1624,74 @@ void MatOp_GEMM::transpose(const MatExpr& e, MatExpr& res) const
     swap(res.a, res.b);
 }
 
-inline void MatOp_GEMM::makeExpr(MatExpr& res, int flags, const Mat& a, const Mat& b,
-                                 double alpha, const Mat& c, double beta)
+अन्तःस्थ शून्य MatOp_GEMM::make_अभिव्यक्ति(Mat_अभिव्यक्ति& res, पूर्णाङ्क flags, अचर Mat& a, अचर Mat& b,
+                                 द्विगुण alpha, अचर Mat& c, द्विगुण beta)
 {
-    res = MatExpr(&g_MatOp_GEMM, flags, a, b, c, alpha, beta);
+    res = Mat_अभिव्यक्ति(&g_MatOp_GEMM, flags, a, b, c, alpha, beta);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void MatOp_Invert::assign(const MatExpr& e, Mat& m, int _type) const
+शून्य MatOp_Invert::assign(अचर Mat_अभिव्यक्ति& e, Mat& m, पूर्णाङ्क _type) अचर
 {
     Mat temp, &dst = _type == -1 || _type == e.a.type() ? m : temp;
 
     cv::invert(e.a, dst, e.flags);
-    if( dst.data != m.data )
+    यदि( dst.data != m.data )
         dst.convertTo(m, _type);
 }
 
-void MatOp_Invert::matmul(const MatExpr& e1, const MatExpr& e2, MatExpr& res) const
+शून्य MatOp_Invert::matmul(अचर Mat_अभिव्यक्ति& e1, अचर Mat_अभिव्यक्ति& e2, Mat_अभिव्यक्ति& res) अचर
 {
-    if( isInv(e1) && isIdentity(e2) )
-        MatOp_Solve::makeExpr(res, e1.flags, e1.a, e2.a);
-    else if( this == e2.op )
+    यदि( isInv(e1) && isIdentity(e2) )
+        MatOp_Solve::make_अभिव्यक्ति(res, e1.flags, e1.a, e2.a);
+    अन्यथा यदि( एतत् == e2.op )
         MatOp::matmul(e1, e2, res);
-    else
+    अन्यथा
         e2.op->matmul(e1, e2, res);
 }
 
-inline void MatOp_Invert::makeExpr(MatExpr& res, int method, const Mat& m)
+अन्तःस्थ शून्य MatOp_Invert::make_अभिव्यक्ति(Mat_अभिव्यक्ति& res, पूर्णाङ्क method, अचर Mat& m)
 {
-    res = MatExpr(&g_MatOp_Invert, method, m, Mat(), Mat(), 1, 0);
+    res = Mat_अभिव्यक्ति(&g_MatOp_Invert, method, m, Mat(), Mat(), 1, 0);
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void MatOp_Solve::assign(const MatExpr& e, Mat& m, int _type) const
+शून्य MatOp_Solve::assign(अचर Mat_अभिव्यक्ति& e, Mat& m, पूर्णाङ्क _type) अचर
 {
     Mat temp, &dst = _type == -1 || _type == e.a.type() ? m : temp;
 
     cv::solve(e.a, e.b, dst, e.flags);
-    if( dst.data != m.data )
+    यदि( dst.data != m.data )
         dst.convertTo(m, _type);
 }
 
-inline void MatOp_Solve::makeExpr(MatExpr& res, int method, const Mat& a, const Mat& b)
+अन्तःस्थ शून्य MatOp_Solve::make_अभिव्यक्ति(Mat_अभिव्यक्ति& res, पूर्णाङ्क method, अचर Mat& a, अचर Mat& b)
 {
-    res = MatExpr(&g_MatOp_Solve, method, a, b, Mat(), 1, 1);
+    res = Mat_अभिव्यक्ति(&g_MatOp_Solve, method, a, b, Mat(), 1, 1);
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void MatOp_Initializer::assign(const MatExpr& e, Mat& m, int _type) const
+शून्य MatOp_Initializer::assign(अचर Mat_अभिव्यक्ति& e, Mat& m, पूर्णाङ्क _type) अचर
 {
-    if( _type == -1 )
+    यदि( _type == -1 )
         _type = e.a.type();
 
     m.create(e.a.size, _type);
 
-    if( e.flags == 'I' && e.a.dims <= 2 )
+    यदि( e.flags == 'I' && e.a.dims <= 2 )
         setIdentity(m, Scalar(e.alpha));
-    else if( e.flags == '0' )
+    अन्यथा यदि( e.flags == '0' )
         m = Scalar();
-    else if( e.flags == '1' )
+    अन्यथा यदि( e.flags == '1' )
         m = Scalar(e.alpha);
-    else
+    अन्यथा
         CV_Error(cv::Error::StsError, "Invalid matrix initializer type");
 }
 
-void MatOp_Initializer::multiply(const MatExpr& e, double s, MatExpr& res) const
+शून्य MatOp_Initializer::multiply(अचर Mat_अभिव्यक्ति& e, द्विगुण s, Mat_अभिव्यक्ति& res) अचर
 {
     CV_INSTRUMENT_REGION();
 
@@ -1699,39 +1699,39 @@ void MatOp_Initializer::multiply(const MatExpr& e, double s, MatExpr& res) const
     res.alpha *= s;
 }
 
-inline void MatOp_Initializer::makeExpr(MatExpr& res, int method, Size sz, int type, double alpha)
+अन्तःस्थ शून्य MatOp_Initializer::make_अभिव्यक्ति(Mat_अभिव्यक्ति& res, पूर्णाङ्क method, Size sz, पूर्णाङ्क type, द्विगुण alpha)
 {
-    res = MatExpr(getGlobalMatOpInitializer(), method, Mat(sz, type, (void*)(size_t)0xEEEEEEEE), Mat(), Mat(), alpha, 0);
+    res = Mat_अभिव्यक्ति(getGlobalMatOpInitializer(), method, Mat(sz, type, (शून्य*)(माप_प्रकार)0xEEEEEEEE), Mat(), Mat(), alpha, 0);
 }
 
-inline void MatOp_Initializer::makeExpr(MatExpr& res, int method, int ndims, const int* sizes, int type, double alpha)
+अन्तःस्थ शून्य MatOp_Initializer::make_अभिव्यक्ति(Mat_अभिव्यक्ति& res, पूर्णाङ्क method, पूर्णाङ्क ndims, अचर पूर्णाङ्क* sizes, पूर्णाङ्क type, द्विगुण alpha)
 {
-    res = MatExpr(getGlobalMatOpInitializer(), method, Mat(ndims, sizes, type, (void*)(size_t)0xEEEEEEEE), Mat(), Mat(), alpha, 0);
+    res = Mat_अभिव्यक्ति(getGlobalMatOpInitializer(), method, Mat(ndims, sizes, type, (शून्य*)(माप_प्रकार)0xEEEEEEEE), Mat(), Mat(), alpha, 0);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-MatExpr Mat::t() const
+Mat_अभिव्यक्ति Mat::t() अचर
 {
     CV_INSTRUMENT_REGION();
 
-    checkOperandsExist(*this);
-    MatExpr e;
-    MatOp_T::makeExpr(e, *this);
-    return e;
+    checkOperandsExist(*एतत्);
+    Mat_अभिव्यक्ति e;
+    MatOp_T::make_अभिव्यक्ति(e, *एतत्);
+    फर्काऊ e;
 }
 
-MatExpr Mat::inv(int method) const
+Mat_अभिव्यक्ति Mat::inv(पूर्णाङ्क method) अचर
 {
     CV_INSTRUMENT_REGION();
 
-    MatExpr e;
-    MatOp_Invert::makeExpr(e, method, *this);
-    return e;
+    Mat_अभिव्यक्ति e;
+    MatOp_Invert::make_अभिव्यक्ति(e, method, *एतत्);
+    फर्काऊ e;
 }
 
 
-MatExpr Mat::mul(InputArray m, double scale) const
+Mat_अभिव्यक्ति Mat::mul(आगत_Array m, द्विगुण scale) अचर
 {
     CV_INSTRUMENT_REGION();
 
@@ -1740,105 +1740,105 @@ MatExpr Mat::mul(InputArray m, double scale) const
     // a non-owning view of caller memory (e.g. a scalar bound to _InputArray(const double&),
     // a Matx or a Vec) that the returned MatExpr can outlive, so snapshot it.
     // See https://github.com/opencv/opencv/issues/23577
-    if( !m.isMat() && !m.isUMat() )
+    यदि( !m.isMat() && !m.isUMat() )
         b = b.clone();
 
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, '*', *this, b, scale);
-    return e;
+    Mat_अभिव्यक्ति e;
+    MatOp_Bin::make_अभिव्यक्ति(e, '*', *एतत्, b, scale);
+    फर्काऊ e;
 }
 
-MatExpr Mat::zeros(int rows, int cols, int type)
+Mat_अभिव्यक्ति Mat::zeros(पूर्णाङ्क rows, पूर्णाङ्क cols, पूर्णाङ्क type)
 {
     CV_INSTRUMENT_REGION();
 
-    MatExpr e;
-    MatOp_Initializer::makeExpr(e, '0', Size(cols, rows), type);
-    return e;
+    Mat_अभिव्यक्ति e;
+    MatOp_Initializer::make_अभिव्यक्ति(e, '0', Size(cols, rows), type);
+    फर्काऊ e;
 }
 
-MatExpr Mat::zeros(Size size, int type)
+Mat_अभिव्यक्ति Mat::zeros(Size size, पूर्णाङ्क type)
 {
     CV_INSTRUMENT_REGION();
 
-    MatExpr e;
-    MatOp_Initializer::makeExpr(e, '0', size, type);
-    return e;
+    Mat_अभिव्यक्ति e;
+    MatOp_Initializer::make_अभिव्यक्ति(e, '0', size, type);
+    फर्काऊ e;
 }
 
-MatExpr Mat::zeros(int ndims, const int* sizes, int type)
+Mat_अभिव्यक्ति Mat::zeros(पूर्णाङ्क ndims, अचर पूर्णाङ्क* sizes, पूर्णाङ्क type)
 {
     CV_INSTRUMENT_REGION();
 
-    MatExpr e;
-    MatOp_Initializer::makeExpr(e, '0', ndims, sizes, type);
-    return e;
+    Mat_अभिव्यक्ति e;
+    MatOp_Initializer::make_अभिव्यक्ति(e, '0', ndims, sizes, type);
+    फर्काऊ e;
 }
 
-MatExpr Mat::zeros(const MatShape& shape, int type)
+Mat_अभिव्यक्ति Mat::zeros(अचर MatShape& shape, पूर्णाङ्क type)
 {
     CV_INSTRUMENT_REGION();
 
-    MatExpr e;
-    MatOp_Initializer::makeExpr(e, '0', shape.dims, shape.p, type);
-    return e;
+    Mat_अभिव्यक्ति e;
+    MatOp_Initializer::make_अभिव्यक्ति(e, '0', shape.dims, shape.p, type);
+    फर्काऊ e;
 }
 
-MatExpr Mat::ones(int rows, int cols, int type)
+Mat_अभिव्यक्ति Mat::ones(पूर्णाङ्क rows, पूर्णाङ्क cols, पूर्णाङ्क type)
 {
     CV_INSTRUMENT_REGION();
 
-    MatExpr e;
-    MatOp_Initializer::makeExpr(e, '1', Size(cols, rows), type);
-    return e;
+    Mat_अभिव्यक्ति e;
+    MatOp_Initializer::make_अभिव्यक्ति(e, '1', Size(cols, rows), type);
+    फर्काऊ e;
 }
 
-MatExpr Mat::ones(Size size, int type)
+Mat_अभिव्यक्ति Mat::ones(Size size, पूर्णाङ्क type)
 {
     CV_INSTRUMENT_REGION();
 
-    MatExpr e;
-    MatOp_Initializer::makeExpr(e, '1', size, type);
-    return e;
+    Mat_अभिव्यक्ति e;
+    MatOp_Initializer::make_अभिव्यक्ति(e, '1', size, type);
+    फर्काऊ e;
 }
 
-MatExpr Mat::ones(int ndims, const int* sizes, int type)
+Mat_अभिव्यक्ति Mat::ones(पूर्णाङ्क ndims, अचर पूर्णाङ्क* sizes, पूर्णाङ्क type)
 {
     CV_INSTRUMENT_REGION();
 
-    MatExpr e;
-    MatOp_Initializer::makeExpr(e, '1', ndims, sizes, type);
-    return e;
+    Mat_अभिव्यक्ति e;
+    MatOp_Initializer::make_अभिव्यक्ति(e, '1', ndims, sizes, type);
+    फर्काऊ e;
 }
 
-MatExpr Mat::ones(const MatShape& shape, int type)
+Mat_अभिव्यक्ति Mat::ones(अचर MatShape& shape, पूर्णाङ्क type)
 {
     CV_INSTRUMENT_REGION();
 
-    MatExpr e;
-    MatOp_Initializer::makeExpr(e, '1', shape.dims, shape.p, type);
-    return e;
+    Mat_अभिव्यक्ति e;
+    MatOp_Initializer::make_अभिव्यक्ति(e, '1', shape.dims, shape.p, type);
+    फर्काऊ e;
 }
 
-MatExpr Mat::eye(int rows, int cols, int type)
+Mat_अभिव्यक्ति Mat::eye(पूर्णाङ्क rows, पूर्णाङ्क cols, पूर्णाङ्क type)
 {
     CV_INSTRUMENT_REGION();
 
-    MatExpr e;
-    MatOp_Initializer::makeExpr(e, 'I', Size(cols, rows), type);
-    return e;
+    Mat_अभिव्यक्ति e;
+    MatOp_Initializer::make_अभिव्यक्ति(e, 'I', Size(cols, rows), type);
+    फर्काऊ e;
 }
 
-MatExpr Mat::eye(Size size, int type)
+Mat_अभिव्यक्ति Mat::eye(Size size, पूर्णाङ्क type)
 {
     CV_INSTRUMENT_REGION();
 
-    MatExpr e;
-    MatOp_Initializer::makeExpr(e, 'I', size, type);
-    return e;
+    Mat_अभिव्यक्ति e;
+    MatOp_Initializer::make_अभिव्यक्ति(e, 'I', size, type);
+    फर्काऊ e;
 }
 
-void MatExpr::swap(MatExpr& other)
+शून्य Mat_अभिव्यक्ति::swap(Mat_अभिव्यक्ति& other)
 {
     using std::swap;
 
@@ -1855,16 +1855,16 @@ void MatExpr::swap(MatExpr& other)
     swap(s, other.s);
 }
 
-_InputArray::_InputArray(const MatExpr& expr)
+आगत_Array_2::आगत_Array_2(अचर Mat_अभिव्यक्ति& अभिव्यक्ति)
 {
-    if (!isIdentity(expr))
+    यदि (!isIdentity(अभिव्यक्ति))
     {
-        Mat result = expr;  // TODO improve through refcount == 1 of expr.a (inplace operation is possible - except gemm?)
-        MatExpr result_expr(result);
-        swap(const_cast<MatExpr&>(expr), result_expr);
+        Mat result = अभिव्यक्ति;  // TODO improve through refcount == 1 of expr.a (inplace operation is possible - except gemm?)
+        Mat_अभिव्यक्ति result_अभिव्यक्ति(result);
+        swap(const_cast<Mat_अभिव्यक्ति&>(अभिव्यक्ति), result_अभिव्यक्ति);
     }
-    CV_Assert(isIdentity(expr));
-    init(FIXED_TYPE + FIXED_SIZE + MAT + ACCESS_READ, &expr.a);
+    CV_Assert(isIdentity(अभिव्यक्ति));
+    init(FIXED_TYPE + FIXED_SIZE + MAT + ACCESS_READ, &अभिव्यक्ति.a);
 }
 
 } // cv::

@@ -40,90 +40,90 @@
 //
 //M*/
 
-#include "precomp.hpp"
+#अन्तर्भाव "precomp.hpp"
 
-using namespace cv;
-using namespace cv::cuda;
+using नामाकाश cv;
+using नामाकाश cv::cuda;
 
-int cv::cuda::getCudaEnabledDeviceCount()
+पूर्णाङ्क cv::cuda::get_Cuda_Enabled_Device_गन्ती()
 {
 #ifndef HAVE_CUDA
-    return 0;
-#else
-    int count;
-    cudaError_t error = cudaGetDeviceCount(&count);
+    फर्काऊ 0;
+#अन्यथा
+    पूर्णाङ्क गन्ती_2;
+    cudaError_t error = cuda_Get_Device_गन्ती(&गन्ती_2);
 
-    if (error == cudaErrorInsufficientDriver)
-        return -1;
+    यदि (error == cudaErrorInsufficientDriver)
+        फर्काऊ -1;
 
-    if (error == cudaErrorNoDevice)
-        return 0;
+    यदि (error == cudaErrorNoDevice)
+        फर्काऊ 0;
 
     cudaSafeCall( error );
-    return count;
+    फर्काऊ गन्ती_2;
 #endif
 }
 
-void cv::cuda::setDevice(int device)
+शून्य cv::cuda::setDevice(पूर्णाङ्क device)
 {
 #ifndef HAVE_CUDA
     CV_UNUSED(device);
     throw_no_cuda();
-#else
+#अन्यथा
     cudaSafeCall( cudaSetDevice(device) );
     cudaSafeCall( cudaFree(0) );
 #endif
 }
 
-int cv::cuda::getDevice()
+पूर्णाङ्क cv::cuda::getDevice()
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    int device;
+#अन्यथा
+    पूर्णाङ्क device;
     cudaSafeCall( cudaGetDevice(&device) );
-    return device;
+    फर्काऊ device;
 #endif
 }
 
-void cv::cuda::resetDevice()
+शून्य cv::cuda::resetDevice()
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
+#अन्यथा
     cudaSafeCall( cudaDeviceReset() );
 #endif
 }
 
-bool cv::cuda::deviceSupports(FeatureSet feature_set)
+तार्किक cv::cuda::deviceSupports(FeatureSet feature_set)
 {
 #ifndef HAVE_CUDA
     CV_UNUSED(feature_set);
     throw_no_cuda();
-#else
-    static int versions[] =
+#अन्यथा
+    स्थिर पूर्णाङ्क versions[] =
     {
         -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1
     };
-    static const int cache_size = static_cast<int>(sizeof(versions) / sizeof(versions[0]));
+    स्थिर अचर पूर्णाङ्क cache_size = static_cast<पूर्णाङ्क>(परिमाण(versions) / परिमाण(versions[0]));
 
-    const int devId = getDevice();
+    अचर पूर्णाङ्क devId = getDevice();
 
-    int version;
+    पूर्णाङ्क version;
 
-    if (devId < cache_size && versions[devId] >= 0)
+    यदि (devId < cache_size && versions[devId] >= 0)
     {
         version = versions[devId];
     }
-    else
+    अन्यथा
     {
         DeviceInfo dev(devId);
         version = dev.majorVersion() * 10 + dev.minorVersion();
-        if (devId < cache_size)
+        यदि (devId < cache_size)
             versions[devId] = version;
     }
 
-    return TargetArchs::builtWith(feature_set) && (version >= feature_set);
+    फर्काऊ TargetArchs::builtWith(feature_set) && (version >= feature_set);
 #endif
 }
 
@@ -132,29 +132,29 @@ bool cv::cuda::deviceSupports(FeatureSet feature_set)
 
 #ifdef HAVE_CUDA
 
-namespace
+नामाकाश
 {
-    class CudaArch
+    वर्ग CudaArch
     {
-    public:
+    सार्वजनिक:
         CudaArch();
 
-        bool builtWith(FeatureSet feature_set) const;
-        bool hasPtx(int major, int minor) const;
-        bool hasBin(int major, int minor) const;
-        bool hasEqualOrLessPtx(int major, int minor) const;
-        bool hasEqualOrGreaterPtx(int major, int minor) const;
-        bool hasEqualOrGreaterBin(int major, int minor) const;
+        तार्किक builtWith(FeatureSet feature_set) अचर;
+        तार्किक hasPtx(पूर्णाङ्क major, पूर्णाङ्क minor) अचर;
+        तार्किक hasBin(पूर्णाङ्क major, पूर्णाङ्क minor) अचर;
+        तार्किक hasEqualOrLessPtx(पूर्णाङ्क major, पूर्णाङ्क minor) अचर;
+        तार्किक hasEqualOrGreaterPtx(पूर्णाङ्क major, पूर्णाङ्क minor) अचर;
+        तार्किक hasEqualOrGreaterBin(पूर्णाङ्क major, पूर्णाङ्क minor) अचर;
 
-    private:
-        static void fromStr(const char* set_as_str, std::vector<int>& arr);
+    गुप्त:
+        स्थिर शून्य fromStr(अचर वर्ण* set_as_str, std::vector<पूर्णाङ्क>& arr);
 
-        std::vector<int> bin;
-        std::vector<int> ptx;
-        std::vector<int> features;
+        std::vector<पूर्णाङ्क> bin;
+        std::vector<पूर्णाङ्क> ptx;
+        std::vector<पूर्णाङ्क> features;
     };
 
-    const CudaArch cudaArch;
+    अचर CudaArch cudaArch;
 
     CudaArch::CudaArch()
     {
@@ -163,57 +163,57 @@ namespace
         fromStr(CUDA_ARCH_FEATURES, features);
     }
 
-    bool CudaArch::builtWith(FeatureSet feature_set) const
+    तार्किक CudaArch::builtWith(FeatureSet feature_set) अचर
     {
-        return !features.empty() && (features.back() >= feature_set);
+        फर्काऊ !features.empty() && (features.back() >= feature_set);
     }
 
-    bool CudaArch::hasPtx(int major, int minor) const
+    तार्किक CudaArch::hasPtx(पूर्णाङ्क major, पूर्णाङ्क minor) अचर
     {
-        return std::find(ptx.begin(), ptx.end(), major * 10 + minor) != ptx.end();
+        फर्काऊ std::find(ptx.begin(), ptx.end(), major * 10 + minor) != ptx.end();
     }
 
-    bool CudaArch::hasBin(int major, int minor) const
+    तार्किक CudaArch::hasBin(पूर्णाङ्क major, पूर्णाङ्क minor) अचर
     {
-        return std::find(bin.begin(), bin.end(), major * 10 + minor) != bin.end();
+        फर्काऊ std::find(bin.begin(), bin.end(), major * 10 + minor) != bin.end();
     }
 
-    bool CudaArch::hasEqualOrLessPtx(int major, int minor) const
+    तार्किक CudaArch::hasEqualOrLessPtx(पूर्णाङ्क major, पूर्णाङ्क minor) अचर
     {
-        return !ptx.empty() && (ptx.front() <= major * 10 + minor);
+        फर्काऊ !ptx.empty() && (ptx.front() <= major * 10 + minor);
     }
 
-    bool CudaArch::hasEqualOrGreaterPtx(int major, int minor) const
+    तार्किक CudaArch::hasEqualOrGreaterPtx(पूर्णाङ्क major, पूर्णाङ्क minor) अचर
     {
-        return !ptx.empty() && (ptx.back() >= major * 10 + minor);
+        फर्काऊ !ptx.empty() && (ptx.back() >= major * 10 + minor);
     }
 
-    bool CudaArch::hasEqualOrGreaterBin(int major, int minor) const
+    तार्किक CudaArch::hasEqualOrGreaterBin(पूर्णाङ्क major, पूर्णाङ्क minor) अचर
     {
-        return !bin.empty() && (bin.back() >= major * 10 + minor);
+        फर्काऊ !bin.empty() && (bin.back() >= major * 10 + minor);
     }
 
-    void CudaArch::fromStr(const char* set_as_str, std::vector<int>& arr)
+    शून्य CudaArch::fromStr(अचर वर्ण* set_as_str, std::vector<पूर्णाङ्क>& arr)
     {
         arr.clear();
 
-        const size_t len = strlen(set_as_str);
+        अचर माप_प्रकार len = म_माप(set_as_str);
 
-        size_t pos = 0;
-        while (pos < len)
+        माप_प्रकार pos = 0;
+        जबसम्म (pos < len)
         {
-            if (isspace(set_as_str[pos]))
+            यदि (है_खाली(set_as_str[pos]))
             {
                 ++pos;
             }
-            else
+            अन्यथा
             {
-                int cur_value;
-                int chars_read;
-                int args_read = sscanf(set_as_str + pos, "%d%n", &cur_value, &chars_read);
+                पूर्णाङ्क cur_मान;
+                पूर्णाङ्क chars_read;
+                पूर्णाङ्क args_read = माला_पूछो(set_as_str + pos, "%d%n", &cur_मान, &chars_read);
                 CV_Assert( args_read == 1 );
 
-                arr.push_back(cur_value);
+                arr.push_back(cur_मान);
                 pos += chars_read;
             }
         }
@@ -224,68 +224,68 @@ namespace
 
 #endif
 
-bool cv::cuda::TargetArchs::builtWith(cv::cuda::FeatureSet feature_set)
+तार्किक cv::cuda::TargetArchs::builtWith(cv::cuda::FeatureSet feature_set)
 {
 #ifndef HAVE_CUDA
     CV_UNUSED(feature_set);
     throw_no_cuda();
-#else
-    return cudaArch.builtWith(feature_set);
+#अन्यथा
+    फर्काऊ cudaArch.builtWith(feature_set);
 #endif
 }
 
-bool cv::cuda::TargetArchs::hasPtx(int major, int minor)
+तार्किक cv::cuda::TargetArchs::hasPtx(पूर्णाङ्क major, पूर्णाङ्क minor)
 {
 #ifndef HAVE_CUDA
     CV_UNUSED(major);
     CV_UNUSED(minor);
     throw_no_cuda();
-#else
-    return cudaArch.hasPtx(major, minor);
+#अन्यथा
+    फर्काऊ cudaArch.hasPtx(major, minor);
 #endif
 }
 
-bool cv::cuda::TargetArchs::hasBin(int major, int minor)
+तार्किक cv::cuda::TargetArchs::hasBin(पूर्णाङ्क major, पूर्णाङ्क minor)
 {
 #ifndef HAVE_CUDA
     CV_UNUSED(major);
     CV_UNUSED(minor);
     throw_no_cuda();
-#else
-    return cudaArch.hasBin(major, minor);
+#अन्यथा
+    फर्काऊ cudaArch.hasBin(major, minor);
 #endif
 }
 
-bool cv::cuda::TargetArchs::hasEqualOrLessPtx(int major, int minor)
+तार्किक cv::cuda::TargetArchs::hasEqualOrLessPtx(पूर्णाङ्क major, पूर्णाङ्क minor)
 {
 #ifndef HAVE_CUDA
     CV_UNUSED(major);
     CV_UNUSED(minor);
     throw_no_cuda();
-#else
-    return cudaArch.hasEqualOrLessPtx(major, minor);
+#अन्यथा
+    फर्काऊ cudaArch.hasEqualOrLessPtx(major, minor);
 #endif
 }
 
-bool cv::cuda::TargetArchs::hasEqualOrGreaterPtx(int major, int minor)
+तार्किक cv::cuda::TargetArchs::hasEqualOrGreaterPtx(पूर्णाङ्क major, पूर्णाङ्क minor)
 {
 #ifndef HAVE_CUDA
     CV_UNUSED(major);
     CV_UNUSED(minor);
     throw_no_cuda();
-#else
-    return cudaArch.hasEqualOrGreaterPtx(major, minor);
+#अन्यथा
+    फर्काऊ cudaArch.hasEqualOrGreaterPtx(major, minor);
 #endif
 }
 
-bool cv::cuda::TargetArchs::hasEqualOrGreaterBin(int major, int minor)
+तार्किक cv::cuda::TargetArchs::hasEqualOrGreaterBin(पूर्णाङ्क major, पूर्णाङ्क minor)
 {
 #ifndef HAVE_CUDA
     CV_UNUSED(major);
     CV_UNUSED(minor);
     throw_no_cuda();
-#else
-    return cudaArch.hasEqualOrGreaterBin(major, minor);
+#अन्यथा
+    फर्काऊ cudaArch.hasEqualOrGreaterBin(major, minor);
 #endif
 }
 
@@ -294,231 +294,231 @@ bool cv::cuda::TargetArchs::hasEqualOrGreaterBin(int major, int minor)
 
 #ifdef HAVE_CUDA
 
-namespace
+नामाकाश
 {
-    class DeviceProps
+    वर्ग DeviceProps
     {
-    public:
+    सार्वजनिक:
         DeviceProps();
 
-        const cudaDeviceProp* get(int devID) const;
+        अचर cudaDeviceProp* get(पूर्णाङ्क devID) अचर;
 
-    private:
+    गुप्त:
         std::vector<cudaDeviceProp> props_;
     };
 
     DeviceProps::DeviceProps()
     {
-        int count = getCudaEnabledDeviceCount();
+        पूर्णाङ्क गन्ती_2 = get_Cuda_Enabled_Device_गन्ती();
 
-        if (count > 0)
+        यदि (गन्ती_2 > 0)
         {
-            props_.resize(count);
+            props_.resize(गन्ती_2);
 
-            for (int devID = 0; devID < count; ++devID)
+            लागि (पूर्णाङ्क devID = 0; devID < गन्ती_2; ++devID)
             {
                 cudaSafeCall( cudaGetDeviceProperties(&props_[devID], devID) );
             }
         }
     }
 
-    const cudaDeviceProp* DeviceProps::get(int devID) const
+    अचर cudaDeviceProp* DeviceProps::get(पूर्णाङ्क devID) अचर
     {
-        CV_Assert( static_cast<size_t>(devID) < props_.size() );
+        CV_Assert( static_cast<माप_प्रकार>(devID) < props_.size() );
 
-        return &props_[devID];
+        फर्काऊ &props_[devID];
     }
 
     DeviceProps& deviceProps()
     {
-        static DeviceProps props;
-        return props;
+        स्थिर DeviceProps props;
+        फर्काऊ props;
     }
 }
 
 #endif
 
-const char* cv::cuda::DeviceInfo::name() const
+अचर वर्ण* cv::cuda::DeviceInfo::name() अचर
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    return deviceProps().get(device_id_)->name;
+#अन्यथा
+    फर्काऊ deviceProps().get(device_id_)->name;
 #endif
 }
 
-size_t cv::cuda::DeviceInfo::totalGlobalMem() const
+माप_प्रकार cv::cuda::DeviceInfo::totalGlobalMem() अचर
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    return deviceProps().get(device_id_)->totalGlobalMem;
+#अन्यथा
+    फर्काऊ deviceProps().get(device_id_)->totalGlobalMem;
 #endif
 }
 
-size_t cv::cuda::DeviceInfo::sharedMemPerBlock() const
+माप_प्रकार cv::cuda::DeviceInfo::sharedMemPerBlock() अचर
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    return deviceProps().get(device_id_)->sharedMemPerBlock;
+#अन्यथा
+    फर्काऊ deviceProps().get(device_id_)->sharedMemPerBlock;
 #endif
 }
 
-int cv::cuda::DeviceInfo::regsPerBlock() const
+पूर्णाङ्क cv::cuda::DeviceInfo::regsPerBlock() अचर
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    return deviceProps().get(device_id_)->regsPerBlock;
+#अन्यथा
+    फर्काऊ deviceProps().get(device_id_)->regsPerBlock;
 #endif
 }
 
-int cv::cuda::DeviceInfo::warpSize() const
+पूर्णाङ्क cv::cuda::DeviceInfo::warpSize() अचर
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    return deviceProps().get(device_id_)->warpSize;
+#अन्यथा
+    फर्काऊ deviceProps().get(device_id_)->warpSize;
 #endif
 }
 
-size_t cv::cuda::DeviceInfo::memPitch() const
+माप_प्रकार cv::cuda::DeviceInfo::memPitch() अचर
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    return deviceProps().get(device_id_)->memPitch;
+#अन्यथा
+    फर्काऊ deviceProps().get(device_id_)->memPitch;
 #endif
 }
 
-int cv::cuda::DeviceInfo::maxThreadsPerBlock() const
+पूर्णाङ्क cv::cuda::DeviceInfo::maxThreadsPerBlock() अचर
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    return deviceProps().get(device_id_)->maxThreadsPerBlock;
+#अन्यथा
+    फर्काऊ deviceProps().get(device_id_)->maxThreadsPerBlock;
 #endif
 }
 
-Vec3i cv::cuda::DeviceInfo::maxThreadsDim() const
+Vec3i cv::cuda::DeviceInfo::maxThreadsDim() अचर
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    return Vec3i(deviceProps().get(device_id_)->maxThreadsDim);
+#अन्यथा
+    फर्काऊ Vec3i(deviceProps().get(device_id_)->maxThreadsDim);
 #endif
 }
 
-Vec3i cv::cuda::DeviceInfo::maxGridSize() const
+Vec3i cv::cuda::DeviceInfo::maxGridSize() अचर
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    return Vec3i(deviceProps().get(device_id_)->maxGridSize);
+#अन्यथा
+    फर्काऊ Vec3i(deviceProps().get(device_id_)->maxGridSize);
 #endif
 }
 
-int cv::cuda::DeviceInfo::clockRate() const
+पूर्णाङ्क cv::cuda::DeviceInfo::clockRate() अचर
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    int clockRate;
+#अन्यथा
+    पूर्णाङ्क clockRate;
     cudaSafeCall(cudaDeviceGetAttribute(&clockRate, cudaDevAttrClockRate, device_id_));
-    return clockRate;
+    फर्काऊ clockRate;
 #endif
 }
 
-size_t cv::cuda::DeviceInfo::totalConstMem() const
+माप_प्रकार cv::cuda::DeviceInfo::totalConstMem() अचर
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    return deviceProps().get(device_id_)->totalConstMem;
+#अन्यथा
+    फर्काऊ deviceProps().get(device_id_)->totalConstMem;
 #endif
 }
 
-int cv::cuda::DeviceInfo::majorVersion() const
+पूर्णाङ्क cv::cuda::DeviceInfo::majorVersion() अचर
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    return deviceProps().get(device_id_)->major;
+#अन्यथा
+    फर्काऊ deviceProps().get(device_id_)->major;
 #endif
 }
 
-int cv::cuda::DeviceInfo::minorVersion() const
+पूर्णाङ्क cv::cuda::DeviceInfo::minorVersion() अचर
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    return deviceProps().get(device_id_)->minor;
+#अन्यथा
+    फर्काऊ deviceProps().get(device_id_)->minor;
 #endif
 }
 
-size_t cv::cuda::DeviceInfo::textureAlignment() const
+माप_प्रकार cv::cuda::DeviceInfo::textureAlignment() अचर
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    return deviceProps().get(device_id_)->textureAlignment;
+#अन्यथा
+    फर्काऊ deviceProps().get(device_id_)->textureAlignment;
 #endif
 }
 
-size_t cv::cuda::DeviceInfo::texturePitchAlignment() const
+माप_प्रकार cv::cuda::DeviceInfo::texturePitchAlignment() अचर
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    return deviceProps().get(device_id_)->texturePitchAlignment;
+#अन्यथा
+    फर्काऊ deviceProps().get(device_id_)->texturePitchAlignment;
 #endif
 }
 
-int cv::cuda::DeviceInfo::multiProcessorCount() const
+पूर्णाङ्क cv::cuda::DeviceInfo::multi_Processor_गन्ती() अचर
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    return deviceProps().get(device_id_)->multiProcessorCount;
+#अन्यथा
+    फर्काऊ deviceProps().get(device_id_)->multi_Processor_गन्ती;
 #endif
 }
 
-bool cv::cuda::DeviceInfo::kernelExecTimeoutEnabled() const
+तार्किक cv::cuda::DeviceInfo::kernelExecTimeoutEnabled() अचर
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    int kernelExecTimeoutEnabled;
+#अन्यथा
+    पूर्णाङ्क kernelExecTimeoutEnabled;
     cudaSafeCall(cudaDeviceGetAttribute(&kernelExecTimeoutEnabled, cudaDevAttrKernelExecTimeout, device_id_));
-    return kernelExecTimeoutEnabled != 0;
+    फर्काऊ kernelExecTimeoutEnabled != 0;
 #endif
 }
 
-bool cv::cuda::DeviceInfo::integrated() const
+तार्किक cv::cuda::DeviceInfo::integrated() अचर
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    return deviceProps().get(device_id_)->integrated != 0;
+#अन्यथा
+    फर्काऊ deviceProps().get(device_id_)->integrated != 0;
 #endif
 }
 
-bool cv::cuda::DeviceInfo::canMapHostMemory() const
+तार्किक cv::cuda::DeviceInfo::canMapHostMemory() अचर
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    return deviceProps().get(device_id_)->canMapHostMemory != 0;
+#अन्यथा
+    फर्काऊ deviceProps().get(device_id_)->canMapHostMemory != 0;
 #endif
 }
 
-DeviceInfo::ComputeMode cv::cuda::DeviceInfo::computeMode() const
+DeviceInfo::ComputeMode cv::cuda::DeviceInfo::computeMode() अचर
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    static const ComputeMode tbl[] =
+#अन्यथा
+    स्थिर अचर ComputeMode tbl[] =
     {
         ComputeModeDefault,
         ComputeModeExclusive,
@@ -526,352 +526,352 @@ DeviceInfo::ComputeMode cv::cuda::DeviceInfo::computeMode() const
         ComputeModeExclusiveProcess
     };
 
-    int computeMode;
+    पूर्णाङ्क computeMode;
     cudaSafeCall(cudaDeviceGetAttribute(&computeMode, cudaDevAttrComputeMode, device_id_));
-    return tbl[computeMode];
+    फर्काऊ tbl[computeMode];
 #endif
 }
 
-int cv::cuda::DeviceInfo::maxTexture1D() const
+पूर्णाङ्क cv::cuda::DeviceInfo::maxTexture1D() अचर
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    return deviceProps().get(device_id_)->maxTexture1D;
+#अन्यथा
+    फर्काऊ deviceProps().get(device_id_)->maxTexture1D;
 #endif
 }
 
-int cv::cuda::DeviceInfo::maxTexture1DMipmap() const
+पूर्णाङ्क cv::cuda::DeviceInfo::maxTexture1DMipmap() अचर
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    #if CUDA_VERSION >= 5000
-        return deviceProps().get(device_id_)->maxTexture1DMipmap;
-    #else
+#अन्यथा
+    #यदि CUDA_VERSION >= 5000
+        फर्काऊ deviceProps().get(device_id_)->maxTexture1DMipmap;
+    #अन्यथा
         CV_Error(Error::StsNotImplemented, "This function requires CUDA 5.0");
-        return 0;
+        फर्काऊ 0;
     #endif
 #endif
 }
 
-int cv::cuda::DeviceInfo::maxTexture1DLinear() const
+पूर्णाङ्क cv::cuda::DeviceInfo::maxTexture1DLinear() अचर
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    #if CUDA_VERSION >= 13000
-        size_t maxWidthInElements;
+#अन्यथा
+    #यदि CUDA_VERSION >= 13000
+        माप_प्रकार maxWidthInElements;
         cudaChannelFormatDesc fmtDesc = cudaCreateChannelDesc<float4>();
         cudaSafeCall(cudaDeviceGetTexture1DLinearMaxWidth(&maxWidthInElements, &fmtDesc, device_id_));
-        return maxWidthInElements;
-    #else
-        return deviceProps().get(device_id_)->maxTexture1DLinear;
+        फर्काऊ maxWidthInElements;
+    #अन्यथा
+        फर्काऊ deviceProps().get(device_id_)->maxTexture1DLinear;
     #endif
 #endif
 }
 
-Vec2i cv::cuda::DeviceInfo::maxTexture2D() const
+Vec2i cv::cuda::DeviceInfo::maxTexture2D() अचर
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    return Vec2i(deviceProps().get(device_id_)->maxTexture2D);
+#अन्यथा
+    फर्काऊ Vec2i(deviceProps().get(device_id_)->maxTexture2D);
 #endif
 }
 
-Vec2i cv::cuda::DeviceInfo::maxTexture2DMipmap() const
+Vec2i cv::cuda::DeviceInfo::maxTexture2DMipmap() अचर
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    #if CUDA_VERSION >= 5000
-        return Vec2i(deviceProps().get(device_id_)->maxTexture2DMipmap);
-    #else
+#अन्यथा
+    #यदि CUDA_VERSION >= 5000
+        फर्काऊ Vec2i(deviceProps().get(device_id_)->maxTexture2DMipmap);
+    #अन्यथा
         CV_Error(Error::StsNotImplemented, "This function requires CUDA 5.0");
-        return Vec2i();
+        फर्काऊ Vec2i();
     #endif
 #endif
 }
 
-Vec3i cv::cuda::DeviceInfo::maxTexture2DLinear() const
+Vec3i cv::cuda::DeviceInfo::maxTexture2DLinear() अचर
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    return Vec3i(deviceProps().get(device_id_)->maxTexture2DLinear);
+#अन्यथा
+    फर्काऊ Vec3i(deviceProps().get(device_id_)->maxTexture2DLinear);
 #endif
 }
 
-Vec2i cv::cuda::DeviceInfo::maxTexture2DGather() const
+Vec2i cv::cuda::DeviceInfo::maxTexture2DGather() अचर
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    return Vec2i(deviceProps().get(device_id_)->maxTexture2DGather);
+#अन्यथा
+    फर्काऊ Vec2i(deviceProps().get(device_id_)->maxTexture2DGather);
 #endif
 }
 
-Vec3i cv::cuda::DeviceInfo::maxTexture3D() const
+Vec3i cv::cuda::DeviceInfo::maxTexture3D() अचर
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    return Vec3i(deviceProps().get(device_id_)->maxTexture3D);
+#अन्यथा
+    फर्काऊ Vec3i(deviceProps().get(device_id_)->maxTexture3D);
 #endif
 }
 
-int cv::cuda::DeviceInfo::maxTextureCubemap() const
+पूर्णाङ्क cv::cuda::DeviceInfo::maxTextureCubemap() अचर
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    return deviceProps().get(device_id_)->maxTextureCubemap;
+#अन्यथा
+    फर्काऊ deviceProps().get(device_id_)->maxTextureCubemap;
 #endif
 }
 
-Vec2i cv::cuda::DeviceInfo::maxTexture1DLayered() const
+Vec2i cv::cuda::DeviceInfo::maxTexture1DLayered() अचर
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    return Vec2i(deviceProps().get(device_id_)->maxTexture1DLayered);
+#अन्यथा
+    फर्काऊ Vec2i(deviceProps().get(device_id_)->maxTexture1DLayered);
 #endif
 }
 
-Vec3i cv::cuda::DeviceInfo::maxTexture2DLayered() const
+Vec3i cv::cuda::DeviceInfo::maxTexture2DLayered() अचर
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    return Vec3i(deviceProps().get(device_id_)->maxTexture2DLayered);
+#अन्यथा
+    फर्काऊ Vec3i(deviceProps().get(device_id_)->maxTexture2DLayered);
 #endif
 }
 
-Vec2i cv::cuda::DeviceInfo::maxTextureCubemapLayered() const
+Vec2i cv::cuda::DeviceInfo::maxTextureCubemapLayered() अचर
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    return Vec2i(deviceProps().get(device_id_)->maxTextureCubemapLayered);
+#अन्यथा
+    फर्काऊ Vec2i(deviceProps().get(device_id_)->maxTextureCubemapLayered);
 #endif
 }
 
-int cv::cuda::DeviceInfo::maxSurface1D() const
+पूर्णाङ्क cv::cuda::DeviceInfo::maxSurface1D() अचर
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    return deviceProps().get(device_id_)->maxSurface1D;
+#अन्यथा
+    फर्काऊ deviceProps().get(device_id_)->maxSurface1D;
 #endif
 }
 
-Vec2i cv::cuda::DeviceInfo::maxSurface2D() const
+Vec2i cv::cuda::DeviceInfo::maxSurface2D() अचर
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    return Vec2i(deviceProps().get(device_id_)->maxSurface2D);
+#अन्यथा
+    फर्काऊ Vec2i(deviceProps().get(device_id_)->maxSurface2D);
 #endif
 }
 
-Vec3i cv::cuda::DeviceInfo::maxSurface3D() const
+Vec3i cv::cuda::DeviceInfo::maxSurface3D() अचर
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    return Vec3i(deviceProps().get(device_id_)->maxSurface3D);
+#अन्यथा
+    फर्काऊ Vec3i(deviceProps().get(device_id_)->maxSurface3D);
 #endif
 }
 
-Vec2i cv::cuda::DeviceInfo::maxSurface1DLayered() const
+Vec2i cv::cuda::DeviceInfo::maxSurface1DLayered() अचर
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    return Vec2i(deviceProps().get(device_id_)->maxSurface1DLayered);
+#अन्यथा
+    फर्काऊ Vec2i(deviceProps().get(device_id_)->maxSurface1DLayered);
 #endif
 }
 
-Vec3i cv::cuda::DeviceInfo::maxSurface2DLayered() const
+Vec3i cv::cuda::DeviceInfo::maxSurface2DLayered() अचर
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    return Vec3i(deviceProps().get(device_id_)->maxSurface2DLayered);
+#अन्यथा
+    फर्काऊ Vec3i(deviceProps().get(device_id_)->maxSurface2DLayered);
 #endif
 }
 
-int cv::cuda::DeviceInfo::maxSurfaceCubemap() const
+पूर्णाङ्क cv::cuda::DeviceInfo::maxSurfaceCubemap() अचर
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    return deviceProps().get(device_id_)->maxSurfaceCubemap;
+#अन्यथा
+    फर्काऊ deviceProps().get(device_id_)->maxSurfaceCubemap;
 #endif
 }
 
-Vec2i cv::cuda::DeviceInfo::maxSurfaceCubemapLayered() const
+Vec2i cv::cuda::DeviceInfo::maxSurfaceCubemapLayered() अचर
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    return Vec2i(deviceProps().get(device_id_)->maxSurfaceCubemapLayered);
+#अन्यथा
+    फर्काऊ Vec2i(deviceProps().get(device_id_)->maxSurfaceCubemapLayered);
 #endif
 }
 
-size_t cv::cuda::DeviceInfo::surfaceAlignment() const
+माप_प्रकार cv::cuda::DeviceInfo::surfaceAlignment() अचर
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    return deviceProps().get(device_id_)->surfaceAlignment;
+#अन्यथा
+    फर्काऊ deviceProps().get(device_id_)->surfaceAlignment;
 #endif
 }
 
-bool cv::cuda::DeviceInfo::concurrentKernels() const
+तार्किक cv::cuda::DeviceInfo::concurrentKernels() अचर
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    return deviceProps().get(device_id_)->concurrentKernels != 0;
+#अन्यथा
+    फर्काऊ deviceProps().get(device_id_)->concurrentKernels != 0;
 #endif
 }
 
-bool cv::cuda::DeviceInfo::ECCEnabled() const
+तार्किक cv::cuda::DeviceInfo::ECCEnabled() अचर
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    return deviceProps().get(device_id_)->ECCEnabled != 0;
+#अन्यथा
+    फर्काऊ deviceProps().get(device_id_)->ECCEnabled != 0;
 #endif
 }
 
-int cv::cuda::DeviceInfo::pciBusID() const
+पूर्णाङ्क cv::cuda::DeviceInfo::pciBusID() अचर
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    return deviceProps().get(device_id_)->pciBusID;
+#अन्यथा
+    फर्काऊ deviceProps().get(device_id_)->pciBusID;
 #endif
 }
 
-int cv::cuda::DeviceInfo::pciDeviceID() const
+पूर्णाङ्क cv::cuda::DeviceInfo::pciDeviceID() अचर
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    return deviceProps().get(device_id_)->pciDeviceID;
+#अन्यथा
+    फर्काऊ deviceProps().get(device_id_)->pciDeviceID;
 #endif
 }
 
-int cv::cuda::DeviceInfo::pciDomainID() const
+पूर्णाङ्क cv::cuda::DeviceInfo::pciDomainID() अचर
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    return deviceProps().get(device_id_)->pciDomainID;
+#अन्यथा
+    फर्काऊ deviceProps().get(device_id_)->pciDomainID;
 #endif
 }
 
-bool cv::cuda::DeviceInfo::tccDriver() const
+तार्किक cv::cuda::DeviceInfo::tccDriver() अचर
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    return deviceProps().get(device_id_)->tccDriver != 0;
+#अन्यथा
+    फर्काऊ deviceProps().get(device_id_)->tccDriver != 0;
 #endif
 }
 
-int cv::cuda::DeviceInfo::asyncEngineCount() const
+पूर्णाङ्क cv::cuda::DeviceInfo::async_Engine_गन्ती() अचर
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    return deviceProps().get(device_id_)->asyncEngineCount;
+#अन्यथा
+    फर्काऊ deviceProps().get(device_id_)->async_Engine_गन्ती;
 #endif
 }
 
-bool cv::cuda::DeviceInfo::unifiedAddressing() const
+तार्किक cv::cuda::DeviceInfo::unifiedAddressing() अचर
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    return deviceProps().get(device_id_)->unifiedAddressing != 0;
+#अन्यथा
+    फर्काऊ deviceProps().get(device_id_)->unifiedAddressing != 0;
 #endif
 }
 
-int cv::cuda::DeviceInfo::memoryClockRate() const
+पूर्णाङ्क cv::cuda::DeviceInfo::memoryClockRate() अचर
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    int memoryClockRate;
+#अन्यथा
+    पूर्णाङ्क memoryClockRate;
     cudaSafeCall(cudaDeviceGetAttribute(&memoryClockRate, cudaDevAttrMemoryClockRate, device_id_));
-    return memoryClockRate;
+    फर्काऊ memoryClockRate;
 #endif
 }
 
-int cv::cuda::DeviceInfo::memoryBusWidth() const
+पूर्णाङ्क cv::cuda::DeviceInfo::memoryBusWidth() अचर
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    return deviceProps().get(device_id_)->memoryBusWidth;
+#अन्यथा
+    फर्काऊ deviceProps().get(device_id_)->memoryBusWidth;
 #endif
 }
 
-int cv::cuda::DeviceInfo::l2CacheSize() const
+पूर्णाङ्क cv::cuda::DeviceInfo::l2CacheSize() अचर
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    return deviceProps().get(device_id_)->l2CacheSize;
+#अन्यथा
+    फर्काऊ deviceProps().get(device_id_)->l2CacheSize;
 #endif
 }
 
-int cv::cuda::DeviceInfo::maxThreadsPerMultiProcessor() const
+पूर्णाङ्क cv::cuda::DeviceInfo::maxThreadsPerMultiProcessor() अचर
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    return deviceProps().get(device_id_)->maxThreadsPerMultiProcessor;
+#अन्यथा
+    फर्काऊ deviceProps().get(device_id_)->maxThreadsPerMultiProcessor;
 #endif
 }
 
-void cv::cuda::DeviceInfo::queryMemory(size_t& _totalMemory, size_t& _freeMemory) const
+शून्य cv::cuda::DeviceInfo::queryMemory(माप_प्रकार& _totalMemory, माप_प्रकार& _freeMemory) अचर
 {
 #ifndef HAVE_CUDA
     CV_UNUSED(_totalMemory);
     CV_UNUSED(_freeMemory);
     throw_no_cuda();
-#else
-    int prevDeviceID = getDevice();
-    if (prevDeviceID != device_id_)
+#अन्यथा
+    पूर्णाङ्क prevDeviceID = getDevice();
+    यदि (prevDeviceID != device_id_)
         setDevice(device_id_);
 
     cudaSafeCall( cudaMemGetInfo(&_freeMemory, &_totalMemory) );
 
-    if (prevDeviceID != device_id_)
+    यदि (prevDeviceID != device_id_)
         setDevice(prevDeviceID);
 #endif
 }
 
-bool cv::cuda::DeviceInfo::isCompatible() const
+तार्किक cv::cuda::DeviceInfo::isCompatible() अचर
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
+#अन्यथा
     // Check PTX compatibility
-    if (TargetArchs::hasEqualOrLessPtx(majorVersion(), minorVersion()))
-        return true;
+    यदि (TargetArchs::hasEqualOrLessPtx(majorVersion(), minorVersion()))
+        फर्काऊ सत्य;
 
     // Check BIN compatibility
-    for (int i = minorVersion(); i >= 0; --i)
-        if (TargetArchs::hasBin(majorVersion(), i))
-            return true;
+    लागि (पूर्णाङ्क i = minorVersion(); i >= 0; --i)
+        यदि (TargetArchs::hasBin(majorVersion(), i))
+            फर्काऊ सत्य;
 
-    return false;
+    फर्काऊ असत्य;
 #endif
 }
 
@@ -880,158 +880,158 @@ bool cv::cuda::DeviceInfo::isCompatible() const
 
 #ifdef HAVE_CUDA
 
-namespace
+नामाकाश
 {
-    int convertSMVer2Cores(int major, int minor)
+    पूर्णाङ्क convertSMVer2Cores(पूर्णाङ्क major, पूर्णाङ्क minor)
     {
         // Defines for GPU Architecture types (using the SM version to determine the # of cores per SM
-        typedef struct {
-            int SM; // 0xMm (hexadecimal notation), M = SM Major version, and m = SM minor version
-            int Cores;
+        प्रकारनिर्देश संरचना {
+            पूर्णाङ्क SM; // 0xMm (hexadecimal notation), M = SM Major version, and m = SM minor version
+            पूर्णाङ्क Cores;
         } SMtoCores;
 
         SMtoCores gpuArchCoresPerSM[] =  { { 0x10,  8 }, { 0x11,  8 }, { 0x12,  8 }, { 0x13,  8 }, { 0x20, 32 }, { 0x21, 48 }, {0x30, 192}, {0x35, 192}, { -1, -1 }  };
 
-        int index = 0;
-        while (gpuArchCoresPerSM[index].SM != -1)
+        पूर्णाङ्क index = 0;
+        जबसम्म (gpuArchCoresPerSM[index].SM != -1)
         {
-            if (gpuArchCoresPerSM[index].SM == ((major << 4) + minor) )
-                return gpuArchCoresPerSM[index].Cores;
+            यदि (gpuArchCoresPerSM[index].SM == ((major << 4) + minor) )
+                फर्काऊ gpuArchCoresPerSM[index].Cores;
             index++;
         }
 
-        return -1;
+        फर्काऊ -1;
     }
 }
 
 #endif
 
-void cv::cuda::printCudaDeviceInfo(int device)
+शून्य cv::cuda::printCudaDeviceInfo(पूर्णाङ्क device)
 {
 #ifndef HAVE_CUDA
     CV_UNUSED(device);
     throw_no_cuda();
-#else
-    int count = getCudaEnabledDeviceCount();
-    bool valid = (device >= 0) && (device < count);
+#अन्यथा
+    पूर्णाङ्क गन्ती_2 = get_Cuda_Enabled_Device_गन्ती();
+    तार्किक valid = (device >= 0) && (device < गन्ती_2);
 
-    int beg = valid ? device   : 0;
-    int end = valid ? device+1 : count;
+    पूर्णाङ्क beg = valid ? device   : 0;
+    पूर्णाङ्क end = valid ? device+1 : गन्ती_2;
 
-    printf("*** CUDA Device Query (Runtime API) version (CUDART static linking) *** \n\n");
-    printf("Device count: %d\n", count);
+    म_लिखो("*** CUDA Device Query (Runtime API) version (CUDART static linking) *** \n\n");
+    म_लिखो("Device count: %d\n", गन्ती_2);
 
-    int driverVersion = 0, runtimeVersion = 0;
+    पूर्णाङ्क driverVersion = 0, runtimeVersion = 0;
     cudaSafeCall( cudaDriverGetVersion(&driverVersion) );
     cudaSafeCall( cudaRuntimeGetVersion(&runtimeVersion) );
 
-    const char *computeMode[] = {
+    अचर वर्ण *computeMode[] = {
         "Default (multiple host threads can use ::cudaSetDevice() with device simultaneously)",
         "Exclusive (only one host thread in one process is able to use ::cudaSetDevice() with this device)",
         "Prohibited (no host thread can use ::cudaSetDevice() with this device)",
         "Exclusive Process (many threads in one process is able to use ::cudaSetDevice() with this device)",
         "Unknown",
-        NULL
+        रिक्त
     };
 
-    for(int dev = beg; dev < end; ++dev)
+    लागि(पूर्णाङ्क dev = beg; dev < end; ++dev)
     {
         cudaDeviceProp prop;
         cudaSafeCall( cudaGetDeviceProperties(&prop, dev) );
 
-        printf("\nDevice %d: \"%s\"\n", dev, prop.name);
-        printf("  CUDA Driver Version / Runtime Version          %d.%d / %d.%d\n", driverVersion/1000, driverVersion%100, runtimeVersion/1000, runtimeVersion%100);
-        printf("  CUDA Capability Major/Minor version number:    %d.%d\n", prop.major, prop.minor);
-        printf("  Total amount of global memory:                 %.0f MBytes (%llu bytes)\n", (float)prop.totalGlobalMem/1048576.0f, (unsigned long long) prop.totalGlobalMem);
+        म_लिखो("\nDevice %d: \"%s\"\n", dev, prop.name);
+        म_लिखो("  CUDA Driver Version / Runtime Version          %d.%d / %d.%d\n", driverVersion/1000, driverVersion%100, runtimeVersion/1000, runtimeVersion%100);
+        म_लिखो("  CUDA Capability Major/Minor version number:    %d.%d\n", prop.major, prop.minor);
+        म_लिखो("  Total amount of global memory:                 %.0f MBytes (%llu bytes)\n", (भिन्न)prop.totalGlobalMem/1048576.0f, (अचिन्हित दीर्घ दीर्घ) prop.totalGlobalMem);
 
-        int cores = convertSMVer2Cores(prop.major, prop.minor);
-        if (cores > 0)
-            printf("  (%2d) Multiprocessors x (%2d) CUDA Cores/MP:     %d CUDA Cores\n", prop.multiProcessorCount, cores, cores * prop.multiProcessorCount);
+        पूर्णाङ्क cores = convertSMVer2Cores(prop.major, prop.minor);
+        यदि (cores > 0)
+            म_लिखो("  (%2d) Multiprocessors x (%2d) CUDA Cores/MP:     %d CUDA Cores\n", prop.multi_Processor_गन्ती, cores, cores * prop.multi_Processor_गन्ती);
 
-        int clockRate;
+        पूर्णाङ्क clockRate;
         cudaSafeCall(cudaDeviceGetAttribute(&clockRate, cudaDevAttrClockRate, dev));
-        printf("  GPU Clock Speed:                               %.2f GHz\n", clockRate * 1e-6f);
+        म_लिखो("  GPU Clock Speed:                               %.2f GHz\n", clockRate * 1e-6f);
 
-        printf("  Max Texture Dimension Size (x,y,z)             1D=(%d), 2D=(%d,%d), 3D=(%d,%d,%d)\n",
+        म_लिखो("  Max Texture Dimension Size (x,y,z)             1D=(%d), 2D=(%d,%d), 3D=(%d,%d,%d)\n",
             prop.maxTexture1D, prop.maxTexture2D[0], prop.maxTexture2D[1],
             prop.maxTexture3D[0], prop.maxTexture3D[1], prop.maxTexture3D[2]);
-        printf("  Max Layered Texture Size (dim) x layers        1D=(%d) x %d, 2D=(%d,%d) x %d\n",
+        म_लिखो("  Max Layered Texture Size (dim) x layers        1D=(%d) x %d, 2D=(%d,%d) x %d\n",
             prop.maxTexture1DLayered[0], prop.maxTexture1DLayered[1],
             prop.maxTexture2DLayered[0], prop.maxTexture2DLayered[1], prop.maxTexture2DLayered[2]);
 
-        printf("  Total amount of constant memory:               %u bytes\n", (int)prop.totalConstMem);
-        printf("  Total amount of shared memory per block:       %u bytes\n", (int)prop.sharedMemPerBlock);
-        printf("  Total number of registers available per block: %d\n", prop.regsPerBlock);
-        printf("  Warp size:                                     %d\n", prop.warpSize);
-        printf("  Maximum number of threads per block:           %d\n", prop.maxThreadsPerBlock);
-        printf("  Maximum sizes of each dimension of a block:    %d x %d x %d\n", prop.maxThreadsDim[0], prop.maxThreadsDim[1], prop.maxThreadsDim[2]);
-        printf("  Maximum sizes of each dimension of a grid:     %d x %d x %d\n", prop.maxGridSize[0], prop.maxGridSize[1],  prop.maxGridSize[2]);
-        printf("  Maximum memory pitch:                          %u bytes\n", (int)prop.memPitch);
-        printf("  Texture alignment:                             %u bytes\n", (int)prop.textureAlignment);
+        म_लिखो("  Total amount of constant memory:               %u bytes\n", (पूर्णाङ्क)prop.totalConstMem);
+        म_लिखो("  Total amount of shared memory per block:       %u bytes\n", (पूर्णाङ्क)prop.sharedMemPerBlock);
+        म_लिखो("  Total number of registers available per block: %d\n", prop.regsPerBlock);
+        म_लिखो("  Warp size:                                     %d\n", prop.warpSize);
+        म_लिखो("  Maximum number of threads per block:           %d\n", prop.maxThreadsPerBlock);
+        म_लिखो("  Maximum sizes of each dimension of a block:    %d x %d x %d\n", prop.maxThreadsDim[0], prop.maxThreadsDim[1], prop.maxThreadsDim[2]);
+        म_लिखो("  Maximum sizes of each dimension of a grid:     %d x %d x %d\n", prop.maxGridSize[0], prop.maxGridSize[1],  prop.maxGridSize[2]);
+        म_लिखो("  Maximum memory pitch:                          %u bytes\n", (पूर्णाङ्क)prop.memPitch);
+        म_लिखो("  Texture alignment:                             %u bytes\n", (पूर्णाङ्क)prop.textureAlignment);
 
-        printf("  Concurrent copy and execution:                 %s with %d copy engine(s)\n", (prop.asyncEngineCount ? "Yes" : "No"), prop.asyncEngineCount);
-        int kernelExecTimeoutEnabled;
+        म_लिखो("  Concurrent copy and execution:                 %s with %d copy engine(s)\n", (prop.async_Engine_गन्ती ? "Yes" : "No"), prop.async_Engine_गन्ती);
+        पूर्णाङ्क kernelExecTimeoutEnabled;
         cudaSafeCall(cudaDeviceGetAttribute(&kernelExecTimeoutEnabled, cudaDevAttrKernelExecTimeout, dev));
-        printf("  Run time limit on kernels:                     %s\n", kernelExecTimeoutEnabled ? "Yes" : "No");
-        printf("  Integrated GPU sharing Host Memory:            %s\n", prop.integrated ? "Yes" : "No");
-        printf("  Support host page-locked memory mapping:       %s\n", prop.canMapHostMemory ? "Yes" : "No");
+        म_लिखो("  Run time limit on kernels:                     %s\n", kernelExecTimeoutEnabled ? "Yes" : "No");
+        म_लिखो("  Integrated GPU sharing Host Memory:            %s\n", prop.integrated ? "Yes" : "No");
+        म_लिखो("  Support host page-locked memory mapping:       %s\n", prop.canMapHostMemory ? "Yes" : "No");
 
-        printf("  Concurrent kernel execution:                   %s\n", prop.concurrentKernels ? "Yes" : "No");
-        printf("  Alignment requirement for Surfaces:            %s\n", prop.surfaceAlignment ? "Yes" : "No");
-        printf("  Device has ECC support enabled:                %s\n", prop.ECCEnabled ? "Yes" : "No");
-        printf("  Device is using TCC driver mode:               %s\n", prop.tccDriver ? "Yes" : "No");
-        printf("  Device supports Unified Addressing (UVA):      %s\n", prop.unifiedAddressing ? "Yes" : "No");
-        printf("  Device PCI Bus ID / PCI location ID:           %d / %d\n", prop.pciBusID, prop.pciDeviceID );
+        म_लिखो("  Concurrent kernel execution:                   %s\n", prop.concurrentKernels ? "Yes" : "No");
+        म_लिखो("  Alignment requirement for Surfaces:            %s\n", prop.surfaceAlignment ? "Yes" : "No");
+        म_लिखो("  Device has ECC support enabled:                %s\n", prop.ECCEnabled ? "Yes" : "No");
+        म_लिखो("  Device is using TCC driver mode:               %s\n", prop.tccDriver ? "Yes" : "No");
+        म_लिखो("  Device supports Unified Addressing (UVA):      %s\n", prop.unifiedAddressing ? "Yes" : "No");
+        म_लिखो("  Device PCI Bus ID / PCI location ID:           %d / %d\n", prop.pciBusID, prop.pciDeviceID );
 
-        int propComputeMode;
+        पूर्णाङ्क propComputeMode;
         cudaSafeCall(cudaDeviceGetAttribute(&propComputeMode, cudaDevAttrComputeMode, dev));
-        printf("  Compute Mode:\n");
-        printf("      %s \n", computeMode[propComputeMode]);
+        म_लिखो("  Compute Mode:\n");
+        म_लिखो("      %s \n", computeMode[propComputeMode]);
     }
 
-    printf("\n");
-    printf("deviceQuery, CUDA Driver = CUDART");
-    printf(", CUDA Driver Version  = %d.%d", driverVersion / 1000, driverVersion % 100);
-    printf(", CUDA Runtime Version = %d.%d", runtimeVersion/1000, runtimeVersion%100);
-    printf(", NumDevs = %d\n\n", count);
+    म_लिखो("\n");
+    म_लिखो("deviceQuery, CUDA Driver = CUDART");
+    म_लिखो(", CUDA Driver Version  = %d.%d", driverVersion / 1000, driverVersion % 100);
+    म_लिखो(", CUDA Runtime Version = %d.%d", runtimeVersion/1000, runtimeVersion%100);
+    म_लिखो(", NumDevs = %d\n\n", गन्ती_2);
 
-    fflush(stdout);
+    ख_साफ(मानक_निकास);
 #endif
 }
 
-void cv::cuda::printShortCudaDeviceInfo(int device)
+शून्य cv::cuda::printShortCudaDeviceInfo(पूर्णाङ्क device)
 {
 #ifndef HAVE_CUDA
     CV_UNUSED(device);
     throw_no_cuda();
-#else
-    int count = getCudaEnabledDeviceCount();
-    bool valid = (device >= 0) && (device < count);
+#अन्यथा
+    पूर्णाङ्क गन्ती_2 = get_Cuda_Enabled_Device_गन्ती();
+    तार्किक valid = (device >= 0) && (device < गन्ती_2);
 
-    int beg = valid ? device   : 0;
-    int end = valid ? device+1 : count;
+    पूर्णाङ्क beg = valid ? device   : 0;
+    पूर्णाङ्क end = valid ? device+1 : गन्ती_2;
 
-    int driverVersion = 0, runtimeVersion = 0;
+    पूर्णाङ्क driverVersion = 0, runtimeVersion = 0;
     cudaSafeCall( cudaDriverGetVersion(&driverVersion) );
     cudaSafeCall( cudaRuntimeGetVersion(&runtimeVersion) );
 
-    for(int dev = beg; dev < end; ++dev)
+    लागि(पूर्णाङ्क dev = beg; dev < end; ++dev)
     {
         cudaDeviceProp prop;
         cudaSafeCall( cudaGetDeviceProperties(&prop, dev) );
 
-        const char *arch_str = prop.major < 2 ? " (not Fermi)" : "";
-        printf("Device %d:  \"%s\"  %.0fMb", dev, prop.name, (float)prop.totalGlobalMem/1048576.0f);
-        printf(", sm_%d%d%s", prop.major, prop.minor, arch_str);
+        अचर वर्ण *arch_str = prop.major < 2 ? " (not Fermi)" : "";
+        म_लिखो("Device %d:  \"%s\"  %.0fMb", dev, prop.name, (भिन्न)prop.totalGlobalMem/1048576.0f);
+        म_लिखो(", sm_%d%d%s", prop.major, prop.minor, arch_str);
 
-        int cores = convertSMVer2Cores(prop.major, prop.minor);
-        if (cores > 0)
-            printf(", %d cores", cores * prop.multiProcessorCount);
+        पूर्णाङ्क cores = convertSMVer2Cores(prop.major, prop.minor);
+        यदि (cores > 0)
+            म_लिखो(", %d cores", cores * prop.multi_Processor_गन्ती);
 
-        printf(", Driver/Runtime ver.%d.%d/%d.%d\n", driverVersion/1000, driverVersion%100, runtimeVersion/1000, runtimeVersion%100);
+        म_लिखो(", Driver/Runtime ver.%d.%d/%d.%d\n", driverVersion/1000, driverVersion%100, runtimeVersion/1000, runtimeVersion%100);
     }
 
-    fflush(stdout);
+    ख_साफ(मानक_निकास);
 #endif
 }
 
@@ -1040,30 +1040,30 @@ void cv::cuda::printShortCudaDeviceInfo(int device)
 
 #ifdef HAVE_CUDA
 
-namespace
+नामाकाश
 {
     #define error_entry(entry)  { entry, #entry }
 
-    struct ErrorEntry
+    संरचना ErrorEntry
     {
-        int code;
-        const char* str;
+        पूर्णाङ्क code;
+        अचर वर्ण* str;
     };
 
-    struct ErrorEntryComparer
+    संरचना ErrorEntryComparer
     {
-        int code;
-        ErrorEntryComparer(int code_) : code(code_) {}
-        bool operator()(const ErrorEntry& e) const { return e.code == code; }
+        पूर्णाङ्क code;
+        ErrorEntryComparer(पूर्णाङ्क code_) : code(code_) {}
+        तार्किक चालक()(अचर ErrorEntry& e) अचर { फर्काऊ e.code == code; }
     };
 
-    const ErrorEntry npp_errors [] =
+    अचर ErrorEntry npp_errors [] =
     {
-    #if defined (_MSC_VER)
+    #यदि defined (_MSC_VER)
         error_entry( NPP_NOT_SUFFICIENT_COMPUTE_CAPABILITY ),
     #endif
 
-    #if NPP_VERSION < 5500
+    #यदि NPP_VERSION < 5500
         error_entry( NPP_BAD_ARG_ERROR ),
         error_entry( NPP_COEFF_ERROR ),
         error_entry( NPP_RECT_ERROR ),
@@ -1071,13 +1071,13 @@ namespace
         error_entry( NPP_MEMFREE_ERR ),
         error_entry( NPP_MEMSET_ERR ),
         error_entry( NPP_MEM_ALLOC_ERR ),
-        error_entry( NPP_HISTO_NUMBER_OF_LEVELS_ERROR ),
+        error_entry( NPP_HISTO_सङ्ख्या_OF_LEVELS_ERROR ),
         error_entry( NPP_MIRROR_FLIP_ERR ),
-        error_entry( NPP_INVALID_INPUT ),
+        error_entry( NPP_INVALID_आगत ),
         error_entry( NPP_POINTER_ERROR ),
         error_entry( NPP_WARNING ),
         error_entry( NPP_ODD_ROI_WARNING ),
-    #else
+    #अन्यथा
         error_entry( NPP_INVALID_HOST_POINTER_ERROR ),
         error_entry( NPP_INVALID_DEVICE_POINTER_ERROR ),
         error_entry( NPP_LUT_PALETTE_BITSIZE_ERROR ),
@@ -1085,15 +1085,15 @@ namespace
         error_entry( NPP_MEMFREE_ERROR ),
         error_entry( NPP_MEMSET_ERROR ),
         error_entry( NPP_QUALITY_INDEX_ERROR ),
-        error_entry( NPP_HISTOGRAM_NUMBER_OF_LEVELS_ERROR ),
+        error_entry( NPP_HISTOGRAM_सङ्ख्या_OF_LEVELS_ERROR ),
         error_entry( NPP_CHANNEL_ORDER_ERROR ),
-        error_entry( NPP_ZERO_MASK_VALUE_ERROR ),
+        error_entry( NPP_ZERO_MASK_मान_ERROR ),
         error_entry( NPP_QUADRANGLE_ERROR ),
         error_entry( NPP_RECTANGLE_ERROR ),
         error_entry( NPP_COEFFICIENT_ERROR ),
-        error_entry( NPP_NUMBER_OF_CHANNELS_ERROR ),
+        error_entry( NPP_सङ्ख्या_OF_CHANNELS_ERROR ),
         error_entry( NPP_COI_ERROR ),
-        error_entry( NPP_DIVISOR_ERROR ),
+        error_entry( NPP_भाजक_ERROR ),
         error_entry( NPP_CHANNEL_ERROR ),
         error_entry( NPP_STRIDE_ERROR ),
         error_entry( NPP_ANCHOR_ERROR ),
@@ -1122,7 +1122,7 @@ namespace
         error_entry( NPP_NOT_SUPPORTED_MODE_ERROR ),
         error_entry( NPP_ROUND_MODE_NOT_SUPPORTED_ERROR ),
         error_entry( NPP_RESIZE_NO_OPERATION_ERROR ),
-        error_entry( NPP_LUT_NUMBER_OF_LEVELS_ERROR ),
+        error_entry( NPP_LUT_सङ्ख्या_OF_LEVELS_ERROR ),
         error_entry( NPP_TEXTURE_BIND_ERROR ),
         error_entry( NPP_WRONG_INTERSECTION_ROI_ERROR ),
         error_entry( NPP_NOT_EVEN_STEP_ERROR ),
@@ -1145,12 +1145,12 @@ namespace
         error_entry( NPP_DOUBLE_SIZE_WARNING )
     };
 
-    const size_t npp_error_num = sizeof(npp_errors) / sizeof(npp_errors[0]);
+    अचर माप_प्रकार npp_error_अङ्क = परिमाण(npp_errors) / परिमाण(npp_errors[0]);
 
-    const ErrorEntry cu_errors [] =
+    अचर ErrorEntry cu_errors [] =
     {
         error_entry( CUDA_SUCCESS                              ),
-        error_entry( CUDA_ERROR_INVALID_VALUE                  ),
+        error_entry( CUDA_ERROR_INVALID_मान                  ),
         error_entry( CUDA_ERROR_OUT_OF_MEMORY                  ),
         error_entry( CUDA_ERROR_NOT_INITIALIZED                ),
         error_entry( CUDA_ERROR_DEINITIALIZED                  ),
@@ -1167,7 +1167,7 @@ namespace
         error_entry( CUDA_ERROR_UNMAP_FAILED                   ),
         error_entry( CUDA_ERROR_ARRAY_IS_MAPPED                ),
         error_entry( CUDA_ERROR_ALREADY_MAPPED                 ),
-        error_entry( CUDA_ERROR_NO_BINARY_FOR_GPU              ),
+        error_entry( CUDA_ERROR_NO_द्विआधारी_FOR_GPU              ),
         error_entry( CUDA_ERROR_ALREADY_ACQUIRED               ),
         error_entry( CUDA_ERROR_NOT_MAPPED                     ),
         error_entry( CUDA_ERROR_NOT_MAPPED_AS_ARRAY            ),
@@ -1177,7 +1177,7 @@ namespace
         error_entry( CUDA_ERROR_CONTEXT_ALREADY_IN_USE         ),
         error_entry( CUDA_ERROR_INVALID_SOURCE                 ),
         error_entry( CUDA_ERROR_FILE_NOT_FOUND                 ),
-        error_entry( CUDA_ERROR_SHARED_OBJECT_SYMBOL_NOT_FOUND ),
+        error_entry( CUDA_ERROR_SHARED_OBJECT_चिह्न_NOT_FOUND ),
         error_entry( CUDA_ERROR_SHARED_OBJECT_INIT_FAILED      ),
         error_entry( CUDA_ERROR_OPERATING_SYSTEM               ),
         error_entry( CUDA_ERROR_INVALID_HANDLE                 ),
@@ -1198,37 +1198,37 @@ namespace
         error_entry( CUDA_ERROR_UNKNOWN                        )
     };
 
-    const size_t cu_errors_num = sizeof(cu_errors) / sizeof(cu_errors[0]);
+    अचर माप_प्रकार cu_errors_अङ्क = परिमाण(cu_errors) / परिमाण(cu_errors[0]);
 
-    cv::String getErrorString(int code, const ErrorEntry* errors, size_t n)
+    cv::String getErrorString(पूर्णाङ्क code, अचर ErrorEntry* errors, माप_प्रकार n)
     {
-        size_t idx = std::find_if(errors, errors + n, ErrorEntryComparer(code)) - errors;
+        माप_प्रकार idx = std::find_if(errors, errors + n, ErrorEntryComparer(code)) - errors;
 
-        const char* msg = (idx != n) ? errors[idx].str : "Unknown error code";
-        cv::String str = cv::format("%s [Code = %d]", msg, code);
+        अचर वर्ण* सन्देश = (idx != n) ? errors[idx].str : "Unknown error code";
+        cv::String str = cv::format("%s [Code = %d]", सन्देश, code);
 
-        return str;
+        फर्काऊ str;
     }
 }
 
 #endif
 
-String cv::cuda::getNppErrorMessage(int code)
+String cv::cuda::getNppErrorMessage(पूर्णाङ्क code)
 {
 #ifndef HAVE_CUDA
     CV_UNUSED(code);
-    return String();
-#else
-    return getErrorString(code, npp_errors, npp_error_num);
+    फर्काऊ String();
+#अन्यथा
+    फर्काऊ getErrorString(code, npp_errors, npp_error_अङ्क);
 #endif
 }
 
-String cv::cuda::getCudaDriverApiErrorMessage(int code)
+String cv::cuda::getCudaDriverApiErrorMessage(पूर्णाङ्क code)
 {
 #ifndef HAVE_CUDA
     CV_UNUSED(code);
-    return String();
-#else
-    return getErrorString(code, cu_errors, cu_errors_num);
+    फर्काऊ String();
+#अन्यथा
+    फर्काऊ getErrorString(code, cu_errors, cu_errors_अङ्क);
 #endif
 }

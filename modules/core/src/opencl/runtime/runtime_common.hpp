@@ -42,16 +42,16 @@
 #ifndef __OPENCV_CORE_OCL_RUNTIME_COMMON_HPP__
 #define __OPENCV_CORE_OCL_RUNTIME_COMMON_HPP__
 
-namespace cv { namespace ocl { namespace runtime {
+नामाकाश cv { नामाकाश ocl { नामाकाश runtime {
 
-struct DynamicFnEntry
+संरचना DynamicFnEntry
 {
-    const char* fnName; // "clCreateContext"
-    void** ppFn; // &clCreateContext_pfn
+    अचर वर्ण* fnName; // "clCreateContext"
+    शून्य** ppFn; // &clCreateContext_pfn
 };
 
 } } } // namespace cv::ocl::runtime
 
-using namespace cv::ocl::runtime;
+using नामाकाश cv::ocl::runtime;
 
 #endif // __OPENCV_CORE_OCL_RUNTIME_COMMON_HPP__
