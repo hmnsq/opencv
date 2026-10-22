@@ -19,14 +19,14 @@
 // One template (vecBinaryKernel) covers the whole matrix: the work-vector type selects the native
 // same-type saturating path vs the widening f32-hub path. Adding a binary op = add one Op functor.
 
-#include "opencv2/core/hal/intrin.hpp"
-#include "convert.hpp"          // typed load/store-as helpers (cv::), and getConvert*Func
-#include "arithm_expr.hpp"      // the kernel contract: TOp / TKernel / KernelFunc
-#include <algorithm>
-#include <cmath>
-#include <cstring>
+#अन्तर्भाव "opencv2/core/hal/intrin.hpp"
+#अन्तर्भाव "convert.hpp"          // typed load/store-as helpers (cv::), and getConvert*Func
+#अन्तर्भाव "arithm_expr.hpp"      // the kernel contract: TOp / TKernel / KernelFunc
+#अन्तर्भाव <algorithm>
+#अन्तर्भाव <cmath>
+#अन्तर्भाव <cstring>
 
-namespace cv {
+नामाकाश cv {
 
 // Everything outside cv::ew::CV_CPU_OPTIMIZATION_NAMESPACE must be skipped in the
 // declarations-only re-includes (one per dispatched mode), or it gets redefined.
@@ -34,46 +34,46 @@ namespace cv {
 
 // BinaryFunc and getConvertFunc / getConvertScaleFunc come from core (precomp.hpp / convert.hpp).
 
-#if CV_SIMD128_FP16
+#जइ CV_SIMD128_FP16
 #undef CV_SIMD_16F
 #define CV_SIMD_16F 1
-#elif !defined(CV_SIMD_16F)
+#नोचेद्यदि !defined(CV_SIMD_16F)
 #define CV_SIMD_16F 0       // keep `#if CV_SIMD_16F` -Wundef-clean on builds without FP16 SIMD
 #endif
 
-#if (CV_SIMD || CV_SIMD_SCALABLE)
-static inline void vx_setall_as(const uchar* p, v_uint8& a)
+#जइ (CV_SIMD || CV_SIMD_SCALABLE)
+स्थिर अन्तःस्थ शून्य vx_setall_as(ध्रुव uchar* p, v_uint8& a)
 { a = vx_setall_u8(*p); }
-static inline void vx_setall_as(const schar* p, v_int8& a)
+स्थिर अन्तःस्थ शून्य vx_setall_as(ध्रुव schar* p, v_int8& a)
 { a = vx_setall_s8(*p); }
-static inline void vx_setall_as(const uchar* p, v_int16& a)
+स्थिर अन्तःस्थ शून्य vx_setall_as(ध्रुव uchar* p, v_int16& a)
 { a = vx_setall_s16(*p); }
-static inline void vx_setall_as(const schar* p, v_int16& a)
+स्थिर अन्तःस्थ शून्य vx_setall_as(ध्रुव schar* p, v_int16& a)
 { a = vx_setall_s16(*p); }
 
-static inline void vx_setall_as(const ushort* p, v_uint16& a)
+स्थिर अन्तःस्थ शून्य vx_setall_as(ध्रुव ushort* p, v_uint16& a)
 { a = vx_setall_u16(*p); }
-static inline void vx_setall_as(const short* p, v_int16& a)
+स्थिर अन्तःस्थ शून्य vx_setall_as(ध्रुव short* p, v_int16& a)
 { a = vx_setall_s16(*p); }
-static inline void vx_setall_as(const ushort* p, v_int32& a)
+स्थिर अन्तःस्थ शून्य vx_setall_as(ध्रुव ushort* p, v_int32& a)
 { a = vx_setall_s32(*p); }
-static inline void vx_setall_as(const short* p, v_int32& a)
+स्थिर अन्तःस्थ शून्य vx_setall_as(ध्रुव short* p, v_int32& a)
 { a = vx_setall_s32(*p); }
 
-static inline void vx_setall_as(const unsigned* p, v_uint32& a)
+स्थिर अन्तःस्थ शून्य vx_setall_as(ध्रुव unsigned* p, v_uint32& a)
 { a = vx_setall_u32(*p); }
-static inline void vx_setall_as(const int* p, v_int32& a)
+स्थिर अन्तःस्थ शून्य vx_setall_as(ध्रुव पूर्णाङ्क* p, v_int32& a)
 { a = vx_setall_s32(*p); }
 
-static inline void vx_setall_as(const uchar* p, v_float32& a)
-{ a = vx_setall_f32(float(*p)); }
-static inline void vx_setall_as(const schar* p, v_float32& a)
-{ a = vx_setall_f32(float(*p)); }
-static inline void vx_setall_as(const ushort* p, v_float32& a)
-{ a = vx_setall_f32(float(*p)); }
-static inline void vx_setall_as(const short* p, v_float32& a)
-{ a = vx_setall_f32(float(*p)); }
-static inline void vx_setall_as(const float* p, v_float32& a)
+स्थिर अन्तःस्थ शून्य vx_setall_as(ध्रुव uchar* p, v_float32& a)
+{ a = vx_setall_f32(भिन्न(*p)); }
+स्थिर अन्तःस्थ शून्य vx_setall_as(ध्रुव schar* p, v_float32& a)
+{ a = vx_setall_f32(भिन्न(*p)); }
+स्थिर अन्तःस्थ शून्य vx_setall_as(ध्रुव ushort* p, v_float32& a)
+{ a = vx_setall_f32(भिन्न(*p)); }
+स्थिर अन्तःस्थ शून्य vx_setall_as(ध्रुव short* p, v_float32& a)
+{ a = vx_setall_f32(भिन्न(*p)); }
+स्थिर अन्तःस्थ शून्य vx_setall_as(ध्रुव भिन्न* p, v_float32& a)
 { a = vx_setall_f32(*p); }
 
 // ---------------------------------------------------------------------------
@@ -88,127 +88,127 @@ static inline void vx_setall_as(const float* p, v_float32& a)
 // also have native ones - later, in the intrinsics). 32-bit lanes have no universal widening
 // multiply (no v_mul_expand for s32), so 32-bit v_mul_sat is NEON-only (EW_HAVE_MULSAT32) and
 // getMulFunc_ keeps the f64 work-vector kernels on the other backends.
-#if defined(__ARM_NEON)
-static inline v_int32  v_add_sat(const v_int32& a,  const v_int32& b)  { return v_int32(vqaddq_s32(a.val, b.val)); }
-static inline v_int32  v_sub_sat(const v_int32& a,  const v_int32& b)  { return v_int32(vqsubq_s32(a.val, b.val)); }
-static inline v_uint32 v_add_sat(const v_uint32& a, const v_uint32& b) { return v_uint32(vqaddq_u32(a.val, b.val)); }
-static inline v_uint32 v_sub_sat(const v_uint32& a, const v_uint32& b) { return v_uint32(vqsubq_u32(a.val, b.val)); }
+#जइ defined(__ARM_NEON)
+स्थिर अन्तःस्थ v_int32  v_add_sat(ध्रुव v_int32& a,  ध्रुव v_int32& b)  { प्रत्यागम v_int32(vqaddq_s32(a.val, b.val)); }
+स्थिर अन्तःस्थ v_int32  v_sub_sat(ध्रुव v_int32& a,  ध्रुव v_int32& b)  { प्रत्यागम v_int32(vqsubq_s32(a.val, b.val)); }
+स्थिर अन्तःस्थ v_uint32 v_add_sat(ध्रुव v_uint32& a, ध्रुव v_uint32& b) { प्रत्यागम v_uint32(vqaddq_u32(a.val, b.val)); }
+स्थिर अन्तःस्थ v_uint32 v_sub_sat(ध्रुव v_uint32& a, ध्रुव v_uint32& b) { प्रत्यागम v_uint32(vqsubq_u32(a.val, b.val)); }
 #define EW_HAVE_MULSAT32 1
-static inline v_uint8 v_mul_sat(const v_uint8& a, const v_uint8& b)
+स्थिर अन्तःस्थ v_uint8 v_mul_sat(ध्रुव v_uint8& a, ध्रुव v_uint8& b)
 {
-    uint16x8_t p0 = vmull_u8(vget_low_u8(a.val), vget_low_u8(b.val));
-    uint16x8_t p1 = vmull_u8(vget_high_u8(a.val), vget_high_u8(b.val));
-    return v_uint8(vcombine_u8(vqmovn_u16(p0), vqmovn_u16(p1)));
+    uint16x8_t p0 = vmull_u8(vget_नीचः_u8(a.val), vget_नीचः_u8(b.val));
+    uint16x8_t p1 = vmull_u8(vget_उच्चः_u8(a.val), vget_उच्चः_u8(b.val));
+    प्रत्यागम v_uint8(vcombine_u8(vqmovn_u16(p0), vqmovn_u16(p1)));
 }
-static inline v_int8 v_mul_sat(const v_int8& a, const v_int8& b)
+स्थिर अन्तःस्थ v_int8 v_mul_sat(ध्रुव v_int8& a, ध्रुव v_int8& b)
 {
-    int16x8_t p0 = vmull_s8(vget_low_s8(a.val), vget_low_s8(b.val));
-    int16x8_t p1 = vmull_s8(vget_high_s8(a.val), vget_high_s8(b.val));
-    return v_int8(vcombine_s8(vqmovn_s16(p0), vqmovn_s16(p1)));
+    int16x8_t p0 = vmull_s8(vget_नीचः_s8(a.val), vget_नीचः_s8(b.val));
+    int16x8_t p1 = vmull_s8(vget_उच्चः_s8(a.val), vget_उच्चः_s8(b.val));
+    प्रत्यागम v_int8(vcombine_s8(vqmovn_s16(p0), vqmovn_s16(p1)));
 }
-static inline v_uint16 v_mul_sat(const v_uint16& a, const v_uint16& b)
+स्थिर अन्तःस्थ v_uint16 v_mul_sat(ध्रुव v_uint16& a, ध्रुव v_uint16& b)
 {
-    uint32x4_t p0 = vmull_u16(vget_low_u16(a.val), vget_low_u16(b.val));
-    uint32x4_t p1 = vmull_u16(vget_high_u16(a.val), vget_high_u16(b.val));
-    return v_uint16(vcombine_u16(vqmovn_u32(p0), vqmovn_u32(p1)));
+    uint32x4_t p0 = vmull_u16(vget_नीचः_u16(a.val), vget_नीचः_u16(b.val));
+    uint32x4_t p1 = vmull_u16(vget_उच्चः_u16(a.val), vget_उच्चः_u16(b.val));
+    प्रत्यागम v_uint16(vcombine_u16(vqmovn_u32(p0), vqmovn_u32(p1)));
 }
-static inline v_int16 v_mul_sat(const v_int16& a, const v_int16& b)
+स्थिर अन्तःस्थ v_int16 v_mul_sat(ध्रुव v_int16& a, ध्रुव v_int16& b)
 {
-    int32x4_t p0 = vmull_s16(vget_low_s16(a.val), vget_low_s16(b.val));
-    int32x4_t p1 = vmull_s16(vget_high_s16(a.val), vget_high_s16(b.val));
-    return v_int16(vcombine_s16(vqmovn_s32(p0), vqmovn_s32(p1)));
+    int32x4_t p0 = vmull_s16(vget_नीचः_s16(a.val), vget_नीचः_s16(b.val));
+    int32x4_t p1 = vmull_s16(vget_उच्चः_s16(a.val), vget_उच्चः_s16(b.val));
+    प्रत्यागम v_int16(vcombine_s16(vqmovn_s32(p0), vqmovn_s32(p1)));
 }
-static inline v_uint32 v_mul_sat(const v_uint32& a, const v_uint32& b)
+स्थिर अन्तःस्थ v_uint32 v_mul_sat(ध्रुव v_uint32& a, ध्रुव v_uint32& b)
 {
-    uint64x2_t p0 = vmull_u32(vget_low_u32(a.val), vget_low_u32(b.val));
-    uint64x2_t p1 = vmull_u32(vget_high_u32(a.val), vget_high_u32(b.val));
-    return v_uint32(vcombine_u32(vqmovn_u64(p0), vqmovn_u64(p1)));
+    uint64x2_t p0 = vmull_u32(vget_नीचः_u32(a.val), vget_नीचः_u32(b.val));
+    uint64x2_t p1 = vmull_u32(vget_उच्चः_u32(a.val), vget_उच्चः_u32(b.val));
+    प्रत्यागम v_uint32(vcombine_u32(vqmovn_u64(p0), vqmovn_u64(p1)));
 }
-static inline v_int32 v_mul_sat(const v_int32& a, const v_int32& b)
+स्थिर अन्तःस्थ v_int32 v_mul_sat(ध्रुव v_int32& a, ध्रुव v_int32& b)
 {
-    int64x2_t p0 = vmull_s32(vget_low_s32(a.val), vget_low_s32(b.val));
-    int64x2_t p1 = vmull_s32(vget_high_s32(a.val), vget_high_s32(b.val));
-    return v_int32(vcombine_s32(vqmovn_s64(p0), vqmovn_s64(p1)));
+    int64x2_t p0 = vmull_s32(vget_नीचः_s32(a.val), vget_नीचः_s32(b.val));
+    int64x2_t p1 = vmull_s32(vget_उच्चः_s32(a.val), vget_उच्चः_s32(b.val));
+    प्रत्यागम v_int32(vcombine_s32(vqmovn_s64(p0), vqmovn_s64(p1)));
 }
-#else
-static inline v_int32 v_add_sat(const v_int32& a, const v_int32& b)
+#अण्णहा
+स्थिर अन्तःस्थ v_int32 v_add_sat(ध्रुव v_int32& a, ध्रुव v_int32& b)
 {
     v_int32 res = v_add(a, b);
     v_int32 ov  = v_and(v_xor(a, res), v_xor(b, res));               // sign bit set iff overflow
     v_int32 sat = v_xor(v_shr<31>(a), vx_setall_s32(INT_MAX));       // a >= 0 ? INT_MAX : INT_MIN
-    return v_select(v_lt(ov, vx_setzero_s32()), sat, res);
+    प्रत्यागम v_select(v_lt(ov, vx_setzero_s32()), sat, res);
 }
-static inline v_int32 v_sub_sat(const v_int32& a, const v_int32& b)
+स्थिर अन्तःस्थ v_int32 v_sub_sat(ध्रुव v_int32& a, ध्रुव v_int32& b)
 {
     v_int32 res = v_sub(a, b);
     v_int32 ov  = v_and(v_xor(a, b), v_xor(a, res));
     v_int32 sat = v_xor(v_shr<31>(a), vx_setall_s32(INT_MAX));
-    return v_select(v_lt(ov, vx_setzero_s32()), sat, res);
+    प्रत्यागम v_select(v_lt(ov, vx_setzero_s32()), sat, res);
 }
-static inline v_uint32 v_add_sat(const v_uint32& a, const v_uint32& b)
+स्थिर अन्तःस्थ v_uint32 v_add_sat(ध्रुव v_uint32& a, ध्रुव v_uint32& b)
 {
     v_uint32 res = v_add(a, b);
-    return v_or(res, v_lt(res, a));                                  // wrapped => all-ones
+    प्रत्यागम v_or(res, v_lt(res, a));                                  // wrapped => all-ones
 }
-static inline v_uint32 v_sub_sat(const v_uint32& a, const v_uint32& b)
+स्थिर अन्तःस्थ v_uint32 v_sub_sat(ध्रुव v_uint32& a, ध्रुव v_uint32& b)
 {
-    return v_and(v_sub(a, b), v_ge(a, b));                           // borrow => zero
+    प्रत्यागम v_and(v_sub(a, b), v_ge(a, b));                           // borrow => zero
 }
-static inline v_uint8 v_mul_sat(const v_uint8& a, const v_uint8& b)
-{ v_uint16 p0, p1; v_mul_expand(a, b, p0, p1); return v_pack(p0, p1); }
-static inline v_int8 v_mul_sat(const v_int8& a, const v_int8& b)
-{ v_int16 p0, p1; v_mul_expand(a, b, p0, p1); return v_pack(p0, p1); }
-static inline v_uint16 v_mul_sat(const v_uint16& a, const v_uint16& b)
-{ v_uint32 p0, p1; v_mul_expand(a, b, p0, p1); return v_pack(p0, p1); }
-static inline v_int16 v_mul_sat(const v_int16& a, const v_int16& b)
-{ v_int32 p0, p1; v_mul_expand(a, b, p0, p1); return v_pack(p0, p1); }
+स्थिर अन्तःस्थ v_uint8 v_mul_sat(ध्रुव v_uint8& a, ध्रुव v_uint8& b)
+{ v_uint16 p0, p1; v_mul_expand(a, b, p0, p1); प्रत्यागम v_pack(p0, p1); }
+स्थिर अन्तःस्थ v_int8 v_mul_sat(ध्रुव v_int8& a, ध्रुव v_int8& b)
+{ v_int16 p0, p1; v_mul_expand(a, b, p0, p1); प्रत्यागम v_pack(p0, p1); }
+स्थिर अन्तःस्थ v_uint16 v_mul_sat(ध्रुव v_uint16& a, ध्रुव v_uint16& b)
+{ v_uint32 p0, p1; v_mul_expand(a, b, p0, p1); प्रत्यागम v_pack(p0, p1); }
+स्थिर अन्तःस्थ v_int16 v_mul_sat(ध्रुव v_int16& a, ध्रुव v_int16& b)
+{ v_int32 p0, p1; v_mul_expand(a, b, p0, p1); प्रत्यागम v_pack(p0, p1); }
 #endif
-#if CV_SIMD_64F || CV_SIMD_SCALABLE_64F   // scalable (RVV) has v_float64 without CV_SIMD_64F
-static inline void vx_setall_as(const double*   p, v_float64& a) { a = vx_setall_f64(*p); }
-static inline void vx_setall_as(const int*      p, v_float64& a) { a = vx_setall_f64((double)*p); }
-static inline void vx_setall_as(const unsigned* p, v_float64& a) { a = vx_setall_f64((double)*p); }
-static inline void vx_setall_as(const int64_t*  p, v_float64& a) { a = vx_setall_f64((double)*p); }
-static inline void vx_setall_as(const uint64_t* p, v_float64& a) { a = vx_setall_f64((double)*p); }
+#जइ CV_SIMD_64F || CV_SIMD_SCALABLE_64F   // scalable (RVV) has v_float64 without CV_SIMD_64F
+स्थिर अन्तःस्थ शून्य vx_setall_as(ध्रुव द्विगुण*   p, v_float64& a) { a = vx_setall_f64(*p); }
+स्थिर अन्तःस्थ शून्य vx_setall_as(ध्रुव पूर्णाङ्क*      p, v_float64& a) { a = vx_setall_f64((द्विगुण)*p); }
+स्थिर अन्तःस्थ शून्य vx_setall_as(ध्रुव unsigned* p, v_float64& a) { a = vx_setall_f64((द्विगुण)*p); }
+स्थिर अन्तःस्थ शून्य vx_setall_as(ध्रुव int64_t*  p, v_float64& a) { a = vx_setall_f64((द्विगुण)*p); }
+स्थिर अन्तःस्थ शून्य vx_setall_as(ध्रुव uint64_t* p, v_float64& a) { a = vx_setall_f64((द्विगुण)*p); }
 #endif
-static inline void vx_setall_as(const bfloat* p, v_float32& a)
-{ a = vx_setall_f32(float(*p)); }
-static inline void vx_setall_as(const hfloat* p, v_float32& a)
-{ a = vx_setall_f32(float(*p)); }
+स्थिर अन्तःस्थ शून्य vx_setall_as(ध्रुव bfloat* p, v_float32& a)
+{ a = vx_setall_f32(भिन्न(*p)); }
+स्थिर अन्तःस्थ शून्य vx_setall_as(ध्रुव hfloat* p, v_float32& a)
+{ a = vx_setall_f32(भिन्न(*p)); }
 
-static inline void vx_load_pair_as(const uchar* p, v_uint8& a, v_uint8& b)
+स्थिर अन्तःस्थ शून्य vx_load_pair_as(ध्रुव uchar* p, v_uint8& a, v_uint8& b)
 {
     a = vx_load(p);
     b = vx_load(p + VTraits<v_uint8>::vlanes());
 }
 
-static inline void vx_load_pair_as(const schar* p, v_int8& a, v_int8& b)
+स्थिर अन्तःस्थ शून्य vx_load_pair_as(ध्रुव schar* p, v_int8& a, v_int8& b)
 {
     a = vx_load(p);
     b = vx_load(p + VTraits<v_int8>::vlanes());
 }
 
-static inline void vx_load_pair_as(const uchar* p, v_uint32& a, v_uint32& b)
+स्थिर अन्तःस्थ शून्य vx_load_pair_as(ध्रुव uchar* p, v_uint32& a, v_uint32& b)
 {
     v_uint16 w = vx_load_expand(p);
     v_expand(w, a, b);
 }
 
-static inline void v_store_pair_as(uchar* p, const v_uint8& a, const v_uint8& b)
+स्थिर अन्तःस्थ शून्य v_store_pair_as(uchar* p, ध्रुव v_uint8& a, ध्रुव v_uint8& b)
 {
     v_store(p, a);
     v_store(p + VTraits<v_uint8>::vlanes(), b);
 }
 
-static inline void v_store_pair_as(schar* p, const v_int8& a, const v_int8& b)
+स्थिर अन्तःस्थ शून्य v_store_pair_as(schar* p, ध्रुव v_int8& a, ध्रुव v_int8& b)
 {
     v_store(p, a);
     v_store(p + VTraits<v_int8>::vlanes(), b);
 }
 
 
-static inline void v_store_pair_as(int* p, const v_int16& a, const v_int16& b)
+स्थिर अन्तःस्थ शून्य v_store_pair_as(पूर्णाङ्क* p, ध्रुव v_int16& a, ध्रुव v_int16& b)
 {
-    const int nlanes32 = VTraits<v_int32>::vlanes();
+    ध्रुव पूर्णाङ्क nlanes32 = VTraits<v_int32>::vlanes();
     v_int32 v0, v1, v2, v3;
     v_expand(a, v0, v1);
     v_expand(b, v2, v3);
@@ -218,9 +218,9 @@ static inline void v_store_pair_as(int* p, const v_int16& a, const v_int16& b)
     v_store(p + nlanes32*3, v3);
 }
 
-static inline void v_store_pair_as(float* p, const v_int16& a, const v_int16& b)
+स्थिर अन्तःस्थ शून्य v_store_pair_as(भिन्न* p, ध्रुव v_int16& a, ध्रुव v_int16& b)
 {
-    const int nlanes32 = VTraits<v_float32>::vlanes();
+    ध्रुव पूर्णाङ्क nlanes32 = VTraits<v_float32>::vlanes();
     v_int32 v0, v1, v2, v3;
     v_expand(a, v0, v1);
     v_expand(b, v2, v3);
@@ -230,19 +230,19 @@ static inline void v_store_pair_as(float* p, const v_int16& a, const v_int16& b)
     v_store(p + nlanes32*3, v_cvt_f32(v3));
 }
 
-static inline void v_store_pair_as(float* p, const v_int32& a, const v_int32& b)
+स्थिर अन्तःस्थ शून्य v_store_pair_as(भिन्न* p, ध्रुव v_int32& a, ध्रुव v_int32& b)
 {
     v_store(p, v_cvt_f32(a));
     v_store(p + VTraits<v_float32>::vlanes(), v_cvt_f32(b));
 }
 
-static inline void v_store_pair_as(hfloat* p, const v_float32& a, const v_float32& b)
+स्थिर अन्तःस्थ शून्य v_store_pair_as(hfloat* p, ध्रुव v_float32& a, ध्रुव v_float32& b)
 {
     v_pack_store(p, a);
     v_pack_store(p + VTraits<v_float32>::vlanes(), b);
 }
 
-static inline void v_store_pair_as(bfloat* p, const v_float32& a, const v_float32& b)
+स्थिर अन्तःस्थ शून्य v_store_pair_as(bfloat* p, ध्रुव v_float32& a, ध्रुव v_float32& b)
 {
     v_pack_store(p, a);
     v_pack_store(p + VTraits<v_float32>::vlanes(), b);
@@ -251,37 +251,37 @@ static inline void v_store_pair_as(bfloat* p, const v_float32& a, const v_float3
 // Reinterpret a comparison result (whose lane type matches the operands) as the UNSIGNED integer
 // vector of the same width: u8->u8, s8->u8, u16/s16->u16, u32/s32/f32->u32. The destination type
 // drives the overload, so the compare kernel needs no per-width if constexpr.
-static inline void v_reinterpret_as(const v_uint8&  s, v_uint8&  d) { d = s; }
-static inline void v_reinterpret_as(const v_int8&   s, v_uint8&  d) { d = v_reinterpret_as_u8(s); }
-static inline void v_reinterpret_as(const v_uint16& s, v_uint16& d) { d = s; }
-static inline void v_reinterpret_as(const v_int16&  s, v_uint16& d) { d = v_reinterpret_as_u16(s); }
-static inline void v_reinterpret_as(const v_uint32& s, v_uint32& d) { d = s; }
-static inline void v_reinterpret_as(const v_int32&  s, v_uint32& d) { d = v_reinterpret_as_u32(s); }
-static inline void v_reinterpret_as(const v_float32& s, v_uint32& d) { d = v_reinterpret_as_u32(s); }
-#if CV_SIMD_16F
-static inline void v_reinterpret_as(const v_float16& s, v_uint16& d) { d = v_reinterpret_as_u16(s); }
+स्थिर अन्तःस्थ शून्य v_reinterpret_as(ध्रुव v_uint8&  s, v_uint8&  d) { d = s; }
+स्थिर अन्तःस्थ शून्य v_reinterpret_as(ध्रुव v_int8&   s, v_uint8&  d) { d = v_reinterpret_as_u8(s); }
+स्थिर अन्तःस्थ शून्य v_reinterpret_as(ध्रुव v_uint16& s, v_uint16& d) { d = s; }
+स्थिर अन्तःस्थ शून्य v_reinterpret_as(ध्रुव v_int16&  s, v_uint16& d) { d = v_reinterpret_as_u16(s); }
+स्थिर अन्तःस्थ शून्य v_reinterpret_as(ध्रुव v_uint32& s, v_uint32& d) { d = s; }
+स्थिर अन्तःस्थ शून्य v_reinterpret_as(ध्रुव v_int32&  s, v_uint32& d) { d = v_reinterpret_as_u32(s); }
+स्थिर अन्तःस्थ शून्य v_reinterpret_as(ध्रुव v_float32& s, v_uint32& d) { d = v_reinterpret_as_u32(s); }
+#जइ CV_SIMD_16F
+स्थिर अन्तःस्थ शून्य v_reinterpret_as(ध्रुव v_float16& s, v_uint16& d) { d = v_reinterpret_as_u16(s); }
 #endif
-#if CV_SIMD_64F || CV_SIMD_SCALABLE_64F
-static inline void v_reinterpret_as(const v_float64& s, v_uint64& d) { d = v_reinterpret_as_u64(s); }
+#जइ CV_SIMD_64F || CV_SIMD_SCALABLE_64F
+स्थिर अन्तःस्थ शून्य v_reinterpret_as(ध्रुव v_float64& s, v_uint64& d) { d = v_reinterpret_as_u64(s); }
 #endif
 
 // Broadcast the compare mask value (1 or 255) across the unsigned work vector.
-static inline void v_setall_mask(v_uint8&  v, uchar t) { v = vx_setall_u8(t); }
-static inline void v_setall_mask(v_uint16& v, uchar t) { v = vx_setall_u16(t); }
-static inline void v_setall_mask(v_uint32& v, uchar t) { v = vx_setall_u32(t); }
+स्थिर अन्तःस्थ शून्य v_setall_mask(v_uint8&  v, uchar t) { v = vx_setall_u8(t); }
+स्थिर अन्तःस्थ शून्य v_setall_mask(v_uint16& v, uchar t) { v = vx_setall_u16(t); }
+स्थिर अन्तःस्थ शून्य v_setall_mask(v_uint32& v, uchar t) { v = vx_setall_u32(t); }
 
 // NOTE: v_store_pair_as(uchar*, v_uint16/v_uint32, ...) - the narrowing pack-to-u8 stores we need -
 // already come from core's convert.hpp (included above), so they are not redefined here.
 
-#if CV_SIMD_16F
-static inline void vx_setall_as(const hfloat* p, v_float16& a)
+#जइ CV_SIMD_16F
+स्थिर अन्तःस्थ शून्य vx_setall_as(ध्रुव hfloat* p, v_float16& a)
 { a = vx_setall_f16(*p); }
-static inline void vx_load_pair_as(const hfloat* p, v_float16& a, v_float16& b)
+स्थिर अन्तःस्थ शून्य vx_load_pair_as(ध्रुव hfloat* p, v_float16& a, v_float16& b)
 {
     a = vx_load(p);
     b = vx_load(p + VTraits<v_float16>::vlanes());
 }
-static inline void v_store_pair_as(hfloat* p, const v_float16& a, const v_float16& b)
+स्थिर अन्तःस्थ शून्य v_store_pair_as(hfloat* p, ध्रुव v_float16& a, ध्रुव v_float16& b)
 {
     v_store(p, a);
     v_store(p + VTraits<v_float16>::vlanes(), b);
@@ -292,67 +292,67 @@ static inline void v_store_pair_as(hfloat* p, const v_float16& a, const v_float1
 
 #endif // CV_CPU_OPTIMIZATION_DECLARATIONS_ONLY
 
-namespace ew {
+नामाकाश ew {
 CV_CPU_OPTIMIZATION_NAMESPACE_BEGIN
 
 // ---- per-op kernel entry points for THIS baseline (the regular dispatchers in
 //      arithm.dispatch.cpp reach them through CV_CPU_DISPATCH). ----
-TKernel getAddFunc_(int T, int R);
-TKernel getSubFunc_(int T, int R);
-TKernel getMulFunc_(int T, int R);
-TKernel getDivFunc_(int T, int R, bool checked);
-TKernel getMinFunc_(int T, int R);
-TKernel getMaxFunc_(int T, int R);
-TKernel getAbsdiffFunc_(int T, int R);
-TKernel getHypotFunc_(int T, int R);         // hypot = sqrt(x^2+y^2), float depths, T x T -> T
-TKernel getAtan2Func_(int T, int R);         // atan2(y, x), radians (-pi, pi], float depths
-TKernel getCmpFunc_(TOp op, int T);
-TKernel getBitwiseFunc_(TOp op, int esz);                    // OP_AND / OP_OR / OP_XOR, by element size
-TKernel getNotFunc_(int esz);                                // OP_NOT, by element size
-TKernel getAddWeightedFunc_(int T, int R);                   // OP_ADDW, a*alpha+b*beta+gamma (T x T -> R)
-TKernel getSelectFunc_(int mdepth, int T);   // OP_SELECT: 1-byte mask, a/b/dst of T (by esz)
-TKernel getClampFunc_(int T);                // OP_CLAMP: min(max(x, lo), hi), all operands of T
-TKernel getCastFunc_(int sdepth, int ddepth, bool scaled);   // OP_CAST / OP_CONVERT_SCALE
+TKernel getAddFunc_(पूर्णाङ्क T, पूर्णाङ्क R);
+TKernel getSubFunc_(पूर्णाङ्क T, पूर्णाङ्क R);
+TKernel getMulFunc_(पूर्णाङ्क T, पूर्णाङ्क R);
+TKernel getDivFunc_(पूर्णाङ्क T, पूर्णाङ्क R, तार्किक checked);
+TKernel getMinFunc_(पूर्णाङ्क T, पूर्णाङ्क R);
+TKernel getMaxFunc_(पूर्णाङ्क T, पूर्णाङ्क R);
+TKernel getAbsdiffFunc_(पूर्णाङ्क T, पूर्णाङ्क R);
+TKernel getHypotFunc_(पूर्णाङ्क T, पूर्णाङ्क R);         // hypot = sqrt(x^2+y^2), float depths, T x T -> T
+TKernel getAtan2Func_(पूर्णाङ्क T, पूर्णाङ्क R);         // atan2(y, x), radians (-pi, pi], float depths
+TKernel getCmpFunc_(शिखरम् op, पूर्णाङ्क T);
+TKernel getBitwiseFunc_(शिखरम् op, पूर्णाङ्क esz);                    // OP_AND / OP_OR / OP_XOR, by element size
+TKernel getNotFunc_(पूर्णाङ्क esz);                                // OP_NOT, by element size
+TKernel getAddWeightedFunc_(पूर्णाङ्क T, पूर्णाङ्क R);                   // OP_ADDW, a*alpha+b*beta+gamma (T x T -> R)
+TKernel getSelectFunc_(पूर्णाङ्क mdepth, पूर्णाङ्क T);   // OP_SELECT: 1-byte mask, a/b/dst of T (by esz)
+TKernel getClampFunc_(पूर्णाङ्क T);                // OP_CLAMP: min(max(x, lo), hi), all operands of T
+TKernel getCastFunc_(पूर्णाङ्क sdepth, पूर्णाङ्क ddepth, तार्किक scaled);   // OP_CAST / OP_CONVERT_SCALE
 
 #ifndef CV_CPU_OPTIMIZATION_DECLARATIONS_ONLY
 
 // ===========================================================================
 // Op functors (vector + scalar). New binary ops slot in here.
 // ===========================================================================
-struct EwAdd {
+संरचना EwAdd {
     // useScalar: does the op consume the scale scalar (params[0]) in vec()/preproc()? When false,
     // vecBinaryKernel's fast 2-arg branch is taken unconditionally (the check folds at compile time);
     // when true, it is taken only if the runtime scale is exactly 1.
-    static constexpr bool useScalar = false;
-    template<typename V> static V vec(const V& a, const V& b) { return v_add(a, b); }
-#if (CV_SIMD || CV_SIMD_SCALABLE)
+    स्थिर constexpr तार्किक useScalar = मिच्छ;
+    template<typename V> स्थिर V vec(ध्रुव V& a, ध्रुव V& b) { प्रत्यागम v_add(a, b); }
+#जइ (CV_SIMD || CV_SIMD_SCALABLE)
     // 32-bit lanes: v_add wraps - use the saturating version to match the scalar int64+clamp tail
-    static v_int32  vec(const v_int32& a,  const v_int32& b)  { return v_add_sat(a, b); }
-    static v_uint32 vec(const v_uint32& a, const v_uint32& b) { return v_add_sat(a, b); }
+    स्थिर v_int32  vec(ध्रुव v_int32& a,  ध्रुव v_int32& b)  { प्रत्यागम v_add_sat(a, b); }
+    स्थिर v_uint32 vec(ध्रुव v_uint32& a, ध्रुव v_uint32& b) { प्रत्यागम v_add_sat(a, b); }
 #endif
-    template<typename V, typename S> static V vec(const V& a, const V& b, const S&) { return vec(a, b); }
-    template<typename V> static V preproc(const V& a, const V&) { return a; }
+    template<typename V, typename S> स्थिर V vec(ध्रुव V& a, ध्रुव V& b, ध्रुव S&) { प्रत्यागम vec(a, b); }
+    template<typename V> स्थिर V preproc(ध्रुव V& a, ध्रुव V&) { प्रत्यागम a; }
     // Accumulate in the promoted type, NOT in W: for the native saturating path W is the narrow
     // lane type (schar/short/...), and (W)(a+b) would wrap in 8/16 bits before saturate_cast<Tr>
     // could clamp. Letting a+b promote (narrow -> int) keeps saturation for 8/16-bit outputs and
     // the natural wrap for 32/64-bit (both matching cv::add). The SIMD path already saturates.
-    template<typename W, typename ST> static W scl(W a, W b, ST) { return W(a + b); }
+    template<typename W, typename ST> स्थिर W scl(W a, W b, ST) { प्रत्यागम W(a + b); }
 };
 
-struct EwSub {
-    static constexpr bool useScalar = false;
-    template<typename V> static V vec(const V& a, const V& b) { return v_sub(a, b); }
-#if (CV_SIMD || CV_SIMD_SCALABLE)
+संरचना EwSub {
+    स्थिर constexpr तार्किक useScalar = मिच्छ;
+    template<typename V> स्थिर V vec(ध्रुव V& a, ध्रुव V& b) { प्रत्यागम v_sub(a, b); }
+#जइ (CV_SIMD || CV_SIMD_SCALABLE)
     // 32-bit lanes: see EwAdd::vec
-    static v_int32  vec(const v_int32& a,  const v_int32& b)  { return v_sub_sat(a, b); }
-    static v_uint32 vec(const v_uint32& a, const v_uint32& b) { return v_sub_sat(a, b); }
+    स्थिर v_int32  vec(ध्रुव v_int32& a,  ध्रुव v_int32& b)  { प्रत्यागम v_sub_sat(a, b); }
+    स्थिर v_uint32 vec(ध्रुव v_uint32& a, ध्रुव v_uint32& b) { प्रत्यागम v_sub_sat(a, b); }
 #endif
-    template<typename V, typename S> static V vec(const V& a, const V& b, const S&) { return vec(a, b); }
-    template<typename V> static V preproc(const V& a, const V&) { return a; }
-    template<typename W, typename ST> static W scl(W a, W b, ST) { return W(a - b); }   // see EwAdd::scl
+    template<typename V, typename S> स्थिर V vec(ध्रुव V& a, ध्रुव V& b, ध्रुव S&) { प्रत्यागम vec(a, b); }
+    template<typename V> स्थिर V preproc(ध्रुव V& a, ध्रुव V&) { प्रत्यागम a; }
+    template<typename W, typename ST> स्थिर W scl(W a, W b, ST) { प्रत्यागम W(a - b); }   // see EwAdd::scl
     // 64-bit unsigned has no wider WT to hold a-b, so the generic path would wrap on underflow.
     // Saturate at 0 to match cv::subtract (8/16/32-bit already saturate via SIMD floor / wide WT).
-    static uint64_t scl(uint64_t a, uint64_t b, uint64_t) { return uint64_t(a >= b)*(a - b); }
+    स्थिर uint64_t scl(uint64_t a, uint64_t b, uint64_t) { प्रत्यागम uint64_t(a >= b)*(a - b); }
 };
 
 // mul/div compute in a wide FLOAT work type (W = float for <=16-bit/f16/bf/f32, double for
@@ -363,51 +363,51 @@ struct EwSub {
 // MUST stick to the numerator; it takes the scale in vec (numerator*scale/denominator) and leaves
 // preproc as identity. vecBinaryKernel always passes vscalar to vec, so every branch (incl. a broadcast
 // denominator) divides correctly. The 2-arg vec (scale==1) is the both-contiguous fast path.
-struct EwMul {
-    static constexpr bool useScalar = true;
-    template<typename V> static V vec(const V& a, const V& b) { return v_mul(a, b); }
-#if (CV_SIMD || CV_SIMD_SCALABLE)
+संरचना EwMul {
+    स्थिर constexpr तार्किक useScalar = सच्च;
+    template<typename V> स्थिर V vec(ध्रुव V& a, ध्रुव V& b) { प्रत्यागम v_mul(a, b); }
+#जइ (CV_SIMD || CV_SIMD_SCALABLE)
     // integer lanes: full product clamped to the lane type (v_mul_sat) == cv::multiply semantics
     // at scale 1. These drive the scale==1 fast path on FULL-width registers (Wvec1 = the native
     // lane vector): whole-register loads/stores, widening happens inside the multiply itself.
     // The guard matches the v_mul_sat definitions above (like EwAdd's 32-bit overloads): in
     // no-SIMD builds the vector typedefs still exist (intrin_cpp), but the helpers do not.
-    static v_uint8  vec(const v_uint8& a,  const v_uint8& b)  { return v_mul_sat(a, b); }
-    static v_int8   vec(const v_int8& a,   const v_int8& b)   { return v_mul_sat(a, b); }
-    static v_uint16 vec(const v_uint16& a, const v_uint16& b) { return v_mul_sat(a, b); }
-    static v_int16  vec(const v_int16& a,  const v_int16& b)  { return v_mul_sat(a, b); }
+    स्थिर v_uint8  vec(ध्रुव v_uint8& a,  ध्रुव v_uint8& b)  { प्रत्यागम v_mul_sat(a, b); }
+    स्थिर v_int8   vec(ध्रुव v_int8& a,   ध्रुव v_int8& b)   { प्रत्यागम v_mul_sat(a, b); }
+    स्थिर v_uint16 vec(ध्रुव v_uint16& a, ध्रुव v_uint16& b) { प्रत्यागम v_mul_sat(a, b); }
+    स्थिर v_int16  vec(ध्रुव v_int16& a,  ध्रुव v_int16& b)  { प्रत्यागम v_mul_sat(a, b); }
 #ifdef EW_HAVE_MULSAT32
-    static v_uint32 vec(const v_uint32& a, const v_uint32& b) { return v_mul_sat(a, b); }
-    static v_int32  vec(const v_int32& a,  const v_int32& b)  { return v_mul_sat(a, b); }
+    स्थिर v_uint32 vec(ध्रुव v_uint32& a, ध्रुव v_uint32& b) { प्रत्यागम v_mul_sat(a, b); }
+    स्थिर v_int32  vec(ध्रुव v_int32& a,  ध्रुव v_int32& b)  { प्रत्यागम v_mul_sat(a, b); }
 #endif
 #endif
-    template<typename V, typename S> static V vec(const V& a, const V& b, const S&) { return vec(a, b); }
-    template<typename V> static V preproc(const V& a, const V& s) { return v_mul(a, s); }
-    template<typename W, typename ST> static W scl(W a, W b, ST s) { return a * b * s; }
+    template<typename V, typename S> स्थिर V vec(ध्रुव V& a, ध्रुव V& b, ध्रुव S&) { प्रत्यागम vec(a, b); }
+    template<typename V> स्थिर V preproc(ध्रुव V& a, ध्रुव V& s) { प्रत्यागम v_mul(a, s); }
+    template<typename W, typename ST> स्थिर W scl(W a, W b, ST s) { प्रत्यागम a * b * s; }
 };
 // div has two variants by the COMMON INPUT type (matching cv::'s per-type kernel choice): integer
 // inputs guard divide-by-zero -> 0 (cv:: iscalar_div); float inputs do NOT guard (cv:: fscalar_div,
 // a/0 -> inf), which then saturates on the cast to an integer output exactly like cv::divide.
-struct EwDivInt {
-    static constexpr bool useScalar = true;
+संरचना EwDivInt {
+    स्थिर constexpr तार्किक useScalar = सच्च;
     // integer inputs computed in the float work type: guard b==0 -> 0. Scale rides the numerator (vec).
-    template<typename V> static V vec(const V& a, const V& b) {
-        const V z = v_setzero_<V>();
-        return v_select(v_eq(b, z), z, v_div(a, b));
+    template<typename V> स्थिर V vec(ध्रुव V& a, ध्रुव V& b) {
+        ध्रुव V z = v_setzero_<V>();
+        प्रत्यागम v_select(v_eq(b, z), z, v_div(a, b));
     }
-    template<typename V> static V vec(const V& a, const V& b, const V& s) {
-        const V z = v_setzero_<V>();
-        return v_select(v_eq(b, z), z, v_div(v_mul(a, s), b));
+    template<typename V> स्थिर V vec(ध्रुव V& a, ध्रुव V& b, ध्रुव V& s) {
+        ध्रुव V z = v_setzero_<V>();
+        प्रत्यागम v_select(v_eq(b, z), z, v_div(v_mul(a, s), b));
     }
-    template<typename V> static V preproc(const V& a, const V&) { return a; }   // identity: scale is in vec
-    template<typename W, typename ST> static W scl(W a, W b, ST s) { return b != W(0) ? a * s / b : W(0); }
+    template<typename V> स्थिर V preproc(ध्रुव V& a, ध्रुव V&) { प्रत्यागम a; }   // identity: scale is in vec
+    template<typename W, typename ST> स्थिर W scl(W a, W b, ST s) { प्रत्यागम b != W(0) ? a * s / b : W(0); }
 };
-struct EwDivFlt {
-    static constexpr bool useScalar = true;
-    template<typename V> static V vec(const V& a, const V& b) { return v_div(a, b); }
-    template<typename V> static V vec(const V& a, const V& b, const V& s) { return v_div(v_mul(a, s), b); }
-    template<typename V> static V preproc(const V& a, const V&) { return a; }   // identity: scale is in vec
-    template<typename W, typename ST> static W scl(W a, W b, ST s) { return a * s / b; }
+संरचना EwDivFlt {
+    स्थिर constexpr तार्किक useScalar = सच्च;
+    template<typename V> स्थिर V vec(ध्रुव V& a, ध्रुव V& b) { प्रत्यागम v_div(a, b); }
+    template<typename V> स्थिर V vec(ध्रुव V& a, ध्रुव V& b, ध्रुव V& s) { प्रत्यागम v_div(v_mul(a, s), b); }
+    template<typename V> स्थिर V preproc(ध्रुव V& a, ध्रुव V&) { प्रत्यागम a; }   // identity: scale is in vec
+    template<typename W, typename ST> स्थिर W scl(W a, W b, ST s) { प्रत्यागम a * s / b; }
 };
 
 // atan2(y, x) in RADIANS over the standard C range (-pi, pi] - the fastAtan2 minimax polynomial
@@ -415,17 +415,17 @@ struct EwDivFlt {
 // (fastAtan2 returns degrees in [0, 360)). Absolute accuracy ~1e-5 rad, same as cv::fastAtan2.
 // Generic over the universal-intrinsic float vector type.
 template<typename V>
-static inline V v_atan2(const V& y, const V& x)
+स्थिर अन्तःस्थ V v_atan2(ध्रुव V& y, ध्रुव V& x)
 {
     using LT = typename VTraits<V>::lane_type;
-    const V eps  = v_setall_<V>((LT)DBL_EPSILON);
-    const V z    = v_setzero_<V>();
-    const V p7   = v_setall_<V>((LT)-0.04432655554792128);
-    const V p5   = v_setall_<V>((LT)0.1555786518463281);
-    const V p3   = v_setall_<V>((LT)-0.3258083974640975);
-    const V p1   = v_setall_<V>((LT)0.9997878412794807);
-    const V vpi2 = v_setall_<V>((LT)(CV_PI/2));
-    const V vpi  = v_setall_<V>((LT)CV_PI);
+    ध्रुव V eps  = v_setall_<V>((LT)DBL_EPSILON);
+    ध्रुव V z    = v_setzero_<V>();
+    ध्रुव V p7   = v_setall_<V>((LT)-0.04432655554792128);
+    ध्रुव V p5   = v_setall_<V>((LT)0.1555786518463281);
+    ध्रुव V p3   = v_setall_<V>((LT)-0.3258083974640975);
+    ध्रुव V p1   = v_setall_<V>((LT)0.9997878412794807);
+    ध्रुव V vpi2 = v_setall_<V>((LT)(CV_PI/2));
+    ध्रुव V vpi  = v_setall_<V>((LT)CV_PI);
 
     V ax = v_abs(x), ay = v_abs(y);
     V c  = v_div(v_min(ax, ay), v_add(v_max(ax, ay), eps));
@@ -434,124 +434,124 @@ static inline V v_atan2(const V& y, const V& x)
     a = v_select(v_ge(ax, ay), a, v_sub(vpi2, a));
     a = v_select(v_lt(x, z), v_sub(vpi, a), a);
     a = v_select(v_lt(y, z), v_sub(z, a), a);
-    return a;
+    प्रत्यागम a;
 }
 
-struct EwAtan2 {
-    static constexpr bool useScalar = false;
-    template<typename V> static V vec(const V& a, const V& b) { return v_atan2(a, b); }   // a = y, b = x
-    template<typename V, typename S> static V vec(const V& a, const V& b, const S&) { return vec(a, b); }
-    template<typename V> static V preproc(const V& a, const V&) { return a; }
-    template<typename W, typename ST> static W scl(W a, W b, ST) { return std::atan2(a, b); }
+संरचना EwAtan2 {
+    स्थिर constexpr तार्किक useScalar = मिच्छ;
+    template<typename V> स्थिर V vec(ध्रुव V& a, ध्रुव V& b) { प्रत्यागम v_atan2(a, b); }   // a = y, b = x
+    template<typename V, typename S> स्थिर V vec(ध्रुव V& a, ध्रुव V& b, ध्रुव S&) { प्रत्यागम vec(a, b); }
+    template<typename V> स्थिर V preproc(ध्रुव V& a, ध्रुव V&) { प्रत्यागम a; }
+    template<typename W, typename ST> स्थिर W scl(W a, W b, ST) { प्रत्यागम std::atan2(a, b); }
 };
 
 // hypot(x, y) = sqrt(x^2 + y^2): NAIVE (matches cv::magnitude; overflow at |x| ~ 1e19+ for f32
 // inputs is accepted), computed in the float work type; T x T -> T over the float depths.
-struct EwHypot {
-    static constexpr bool useScalar = false;
-    template<typename V> static V vec(const V& a, const V& b) { return v_sqrt(v_fma(a, a, v_mul(b, b))); }
-    template<typename V, typename S> static V vec(const V& a, const V& b, const S&) { return vec(a, b); }
-    template<typename V> static V preproc(const V& a, const V&) { return a; }
-    template<typename W, typename ST> static W scl(W a, W b, ST) { return std::sqrt(a*a + b*b); }
+संरचना EwHypot {
+    स्थिर constexpr तार्किक useScalar = मिच्छ;
+    template<typename V> स्थिर V vec(ध्रुव V& a, ध्रुव V& b) { प्रत्यागम v_sqrt(v_fma(a, a, v_mul(b, b))); }
+    template<typename V, typename S> स्थिर V vec(ध्रुव V& a, ध्रुव V& b, ध्रुव S&) { प्रत्यागम vec(a, b); }
+    template<typename V> स्थिर V preproc(ध्रुव V& a, ध्रुव V&) { प्रत्यागम a; }
+    template<typename W, typename ST> स्थिर W scl(W a, W b, ST) { प्रत्यागम std::sqrt(a*a + b*b); }
 };
 
 // min / max / absdiff: T x T -> T (same depth in and out, no scale). v_min/v_max exist for every
 // vector lane type (64-bit ints fall back to scalar). absdiff uses v_absdiff (defined for the
 // UNSIGNED and float lane types - signed/wide depths go through the scalar path), and the scalar
 // |a-b| is computed branch-wise so it never underflows an unsigned work type.
-struct EwMin {
-    static constexpr bool useScalar = false;
-    template<typename V> static V vec(const V& a, const V& b) { return v_min(a, b); }
-    template<typename V, typename S> static V vec(const V& a, const V& b, const S&) { return vec(a, b); }
-    template<typename V> static V preproc(const V& a, const V&) { return a; }
-    template<typename W, typename ST> static W scl(W a, W b, ST) { return std::min(a, b); }
+संरचना EwMin {
+    स्थिर constexpr तार्किक useScalar = मिच्छ;
+    template<typename V> स्थिर V vec(ध्रुव V& a, ध्रुव V& b) { प्रत्यागम v_min(a, b); }
+    template<typename V, typename S> स्थिर V vec(ध्रुव V& a, ध्रुव V& b, ध्रुव S&) { प्रत्यागम vec(a, b); }
+    template<typename V> स्थिर V preproc(ध्रुव V& a, ध्रुव V&) { प्रत्यागम a; }
+    template<typename W, typename ST> स्थिर W scl(W a, W b, ST) { प्रत्यागम std::min(a, b); }
 };
-struct EwMax {
-    static constexpr bool useScalar = false;
-    template<typename V> static V vec(const V& a, const V& b) { return v_max(a, b); }
-    template<typename V, typename S> static V vec(const V& a, const V& b, const S&) { return vec(a, b); }
-    template<typename V> static V preproc(const V& a, const V&) { return a; }
-    template<typename W, typename ST> static W scl(W a, W b, ST) { return std::max(a, b); }
+संरचना EwMax {
+    स्थिर constexpr तार्किक useScalar = मिच्छ;
+    template<typename V> स्थिर V vec(ध्रुव V& a, ध्रुव V& b) { प्रत्यागम v_max(a, b); }
+    template<typename V, typename S> स्थिर V vec(ध्रुव V& a, ध्रुव V& b, ध्रुव S&) { प्रत्यागम vec(a, b); }
+    template<typename V> स्थिर V preproc(ध्रुव V& a, ध्रुव V&) { प्रत्यागम a; }
+    template<typename W, typename ST> स्थिर W scl(W a, W b, ST) { प्रत्यागम std::max(a, b); }
 };
-struct EwAbsdiff {
-    static constexpr bool useScalar = false;
+संरचना EwAbsdiff {
+    स्थिर constexpr तार्किक useScalar = मिच्छ;
     // The absdiff RESULT is the UNSIGNED type of the input width: v_absdiff(v_int8/16/32) already returns
     // v_uint8/16/32 (the true |a-b|, which can exceed the signed max), and v_absdiff on unsigned/float
     // returns the same type. vec() therefore returns THAT type (deduced), not the input V, so the kernel
     // stores it through the matching UNSIGNED v_store_pair_as (an honest same-type store) - no reinterpret,
     // no touching the saturating-narrow overloads' semantics. (This is why the kernel keeps the vec
     // result in its own variable rather than reusing the input operand.)
-    template<typename V> static auto vec(const V& a, const V& b) { return v_absdiff(a, b); }
-    template<typename V, typename S> static auto vec(const V& a, const V& b, const S&) { return v_absdiff(a, b); }
-    template<typename V> static V preproc(const V& a, const V&) { return a; }
-    template<typename W, typename ST> static W scl(W a, W b, ST) { return a > b ? W(a - b) : W(b - a); }
+    template<typename V> स्थिर auto vec(ध्रुव V& a, ध्रुव V& b) { प्रत्यागम v_absdiff(a, b); }
+    template<typename V, typename S> स्थिर auto vec(ध्रुव V& a, ध्रुव V& b, ध्रुव S&) { प्रत्यागम v_absdiff(a, b); }
+    template<typename V> स्थिर V preproc(ध्रुव V& a, ध्रुव V&) { प्रत्यागम a; }
+    template<typename W, typename ST> स्थिर W scl(W a, W b, ST) { प्रत्यागम a > b ? W(a - b) : W(b - a); }
 };
 
 // Signed T -> SAME signed T (rdepth==T): |a-b| saturated into the signed range, in ONE pass. cv::absdiff
 // keeps the signed depth, so the generic path computes absdiff->unsigned then casts back down (2 insns);
 // this fuses it. v_absdiff yields the unsigned |a-b|; v_min clamps to the signed max (already >=0), then
 // a same-width reinterpret to signed (all values now fit).
-struct EwAbsdiffS {
-    static constexpr bool useScalar = false;
-    static v_int8  vec(const v_int8&  a, const v_int8&  b) { return v_reinterpret_as_s8 (v_min(v_absdiff(a, b), vx_setall_u8 (0x7f))); }
-    static v_int16 vec(const v_int16& a, const v_int16& b) { return v_reinterpret_as_s16(v_min(v_absdiff(a, b), vx_setall_u16(0x7fff))); }
-    static v_int32 vec(const v_int32& a, const v_int32& b) { return v_reinterpret_as_s32(v_min(v_absdiff(a, b), vx_setall_u32(0x7fffffff))); }
-    template<typename V, typename S> static V vec(const V& a, const V& b, const S&) { return vec(a, b); }
-    template<typename V> static V preproc(const V& a, const V&) { return a; }
-    template<typename W, typename ST> static W scl(W a, W b, ST) { return a > b ? W(a - b) : W(b - a); }
+संरचना EwAbsdiffS {
+    स्थिर constexpr तार्किक useScalar = मिच्छ;
+    स्थिर v_int8  vec(ध्रुव v_int8&  a, ध्रुव v_int8&  b) { प्रत्यागम v_reinterpret_as_s8 (v_min(v_absdiff(a, b), vx_setall_u8 (0x7f))); }
+    स्थिर v_int16 vec(ध्रुव v_int16& a, ध्रुव v_int16& b) { प्रत्यागम v_reinterpret_as_s16(v_min(v_absdiff(a, b), vx_setall_u16(0x7fff))); }
+    स्थिर v_int32 vec(ध्रुव v_int32& a, ध्रुव v_int32& b) { प्रत्यागम v_reinterpret_as_s32(v_min(v_absdiff(a, b), vx_setall_u32(0x7fffffff))); }
+    template<typename V, typename S> स्थिर V vec(ध्रुव V& a, ध्रुव V& b, ध्रुव S&) { प्रत्यागम vec(a, b); }
+    template<typename V> स्थिर V preproc(ध्रुव V& a, ध्रुव V&) { प्रत्यागम a; }
+    template<typename W, typename ST> स्थिर W scl(W a, W b, ST) { प्रत्यागम a > b ? W(a - b) : W(b - a); }
     // 64-bit signed has no wider work type to widen into, and |INT64_MIN - b| does not fit in
     // int64_t, so the difference is taken in uint64 - exact for every pair - and then clamped.
     // The narrower widths reach this overload only through their int64 work type, where |a - b|
     // is at most 2^32 and the clamp is a no-op.
-    static int64_t scl(int64_t a, int64_t b, int64_t)
+    स्थिर int64_t scl(int64_t a, int64_t b, int64_t)
     {
-        const uint64_t d = (a > b) ? (uint64_t)a - (uint64_t)b : (uint64_t)b - (uint64_t)a;
-        return (int64_t)std::min<uint64_t>(d, (uint64_t)INT64_MAX);
+        ध्रुव uint64_t d = (a > b) ? (uint64_t)a - (uint64_t)b : (uint64_t)b - (uint64_t)a;
+        प्रत्यागम (int64_t)std::min<uint64_t>(d, (uint64_t)INT64_MAX);
     }
 };
 
 // compare: T x T -> u8 mask. cmp(a,b) is the scalar relation over a work type W (integers compare
 // directly, f16/bf16 through float); vec(a,b) is the vector relation returning an all-ones/zero mask
 // in the operand's own lane type. The kernel turns either into 0 / trueVal (1 or 255 via TKernel::flags).
-struct EwCmpEq { template<typename W> static bool cmp(W a, W b) { return a == b; }
-                 template<typename V> static V vec(const V& a, const V& b) { return v_eq(a, b); } };
-struct EwCmpNe { template<typename W> static bool cmp(W a, W b) { return a != b; }
-                 template<typename V> static V vec(const V& a, const V& b) { return v_ne(a, b); } };
+संरचना EwCmpEq { template<typename W> स्थिर तार्किक cmp(W a, W b) { प्रत्यागम a == b; }
+                 template<typename V> स्थिर V vec(ध्रुव V& a, ध्रुव V& b) { प्रत्यागम v_eq(a, b); } };
+संरचना EwCmpNe { template<typename W> स्थिर तार्किक cmp(W a, W b) { प्रत्यागम a != b; }
+                 template<typename V> स्थिर V vec(ध्रुव V& a, ध्रुव V& b) { प्रत्यागम v_ne(a, b); } };
 // LT/LE are synthesized from GT/GE via the EW_KERNEL_SWAP01 flag (a<b == b>a), so no Lt/Le kernels.
-struct EwCmpGt { template<typename W> static bool cmp(W a, W b) { return a > b; }
-                 template<typename V> static V vec(const V& a, const V& b) { return v_gt(a, b); } };
-struct EwCmpGe { template<typename W> static bool cmp(W a, W b) { return a >= b; }
-                 template<typename V> static V vec(const V& a, const V& b) { return v_ge(a, b); } };
+संरचना EwCmpGt { template<typename W> स्थिर तार्किक cmp(W a, W b) { प्रत्यागम a > b; }
+                 template<typename V> स्थिर V vec(ध्रुव V& a, ध्रुव V& b) { प्रत्यागम v_gt(a, b); } };
+संरचना EwCmpGe { template<typename W> स्थिर तार्किक cmp(W a, W b) { प्रत्यागम a >= b; }
+                 template<typename V> स्थिर V vec(ध्रुव V& a, ध्रुव V& b) { प्रत्यागम v_ge(a, b); } };
 
 // bitwise AND/OR/XOR: bit-pattern op, type-agnostic. Run on the UNSIGNED integer whose width matches
 // the element (u8/u16/u32/u64), so one functor set covers every depth. No scale, no widening (T x T ->
 // T, exactly like min/max); preproc is the identity (min/max share this shape). 64-bit uses the scalar
 // path (no widening vector helpers), the rest ride vecBinaryKernel's native same-type path.
-struct EwAnd {
-    static constexpr bool useScalar = false;
-    template<typename V> static V vec(const V& a, const V& b) { return v_and(a, b); }
-    template<typename V, typename S> static V vec(const V& a, const V& b, const S&) { return vec(a, b); }
-    template<typename V> static V preproc(const V& a, const V&) { return a; }
-    template<typename W, typename ST> static W scl(W a, W b, ST) { return W(a & b); }
+संरचना EwAnd {
+    स्थिर constexpr तार्किक useScalar = मिच्छ;
+    template<typename V> स्थिर V vec(ध्रुव V& a, ध्रुव V& b) { प्रत्यागम v_and(a, b); }
+    template<typename V, typename S> स्थिर V vec(ध्रुव V& a, ध्रुव V& b, ध्रुव S&) { प्रत्यागम vec(a, b); }
+    template<typename V> स्थिर V preproc(ध्रुव V& a, ध्रुव V&) { प्रत्यागम a; }
+    template<typename W, typename ST> स्थिर W scl(W a, W b, ST) { प्रत्यागम W(a & b); }
 };
-struct EwOr {
-    static constexpr bool useScalar = false;
-    template<typename V> static V vec(const V& a, const V& b) { return v_or(a, b); }
-    template<typename V, typename S> static V vec(const V& a, const V& b, const S&) { return vec(a, b); }
-    template<typename V> static V preproc(const V& a, const V&) { return a; }
-    template<typename W, typename ST> static W scl(W a, W b, ST) { return W(a | b); }
+संरचना EwOr {
+    स्थिर constexpr तार्किक useScalar = मिच्छ;
+    template<typename V> स्थिर V vec(ध्रुव V& a, ध्रुव V& b) { प्रत्यागम v_or(a, b); }
+    template<typename V, typename S> स्थिर V vec(ध्रुव V& a, ध्रुव V& b, ध्रुव S&) { प्रत्यागम vec(a, b); }
+    template<typename V> स्थिर V preproc(ध्रुव V& a, ध्रुव V&) { प्रत्यागम a; }
+    template<typename W, typename ST> स्थिर W scl(W a, W b, ST) { प्रत्यागम W(a | b); }
 };
-struct EwXor {
-    static constexpr bool useScalar = false;
-    template<typename V> static V vec(const V& a, const V& b) { return v_xor(a, b); }
-    template<typename V, typename S> static V vec(const V& a, const V& b, const S&) { return vec(a, b); }
-    template<typename V> static V preproc(const V& a, const V&) { return a; }
-    template<typename W, typename ST> static W scl(W a, W b, ST) { return W(a ^ b); }
+संरचना EwXor {
+    स्थिर constexpr तार्किक useScalar = मिच्छ;
+    template<typename V> स्थिर V vec(ध्रुव V& a, ध्रुव V& b) { प्रत्यागम v_xor(a, b); }
+    template<typename V, typename S> स्थिर V vec(ध्रुव V& a, ध्रुव V& b, ध्रुव S&) { प्रत्यागम vec(a, b); }
+    template<typename V> स्थिर V preproc(ध्रुव V& a, ध्रुव V&) { प्रत्यागम a; }
+    template<typename W, typename ST> स्थिर W scl(W a, W b, ST) { प्रत्यागम W(a ^ b); }
 };
 
 // Collapse a gap-free 2D tile to 1D (call with the per-operand x/y-steps).
 #define EW_TRY_COLLAPSE(NSRC) \
-    if (height > 1 && dsty == (size_t)width && \
+    जइ (height > 1 && dsty == (size_t)width && \
         s0y == s0x*(size_t)width && (NSRC < 2 || s1y == s1x*(size_t)width)) \
     { width *= height; height = 1; }
 
@@ -562,115 +562,115 @@ struct EwXor {
 //   Op       = operation functor (vec()/scl()).
 //   use_simd = compile-time switch; false => pure scalar (32/64-bit widened outputs, f64).
 // stepx in {0,1}; dst contiguous. In-place safe (see file header).
-template<typename T, typename Tr, typename WT, class Op, typename ST=WT>
-static int scalarBinaryKernel(const void* src0_, size_t s0y, size_t s0x,
-                              const void* src1_, size_t s1y, size_t s1x,
-                              const void*, size_t, size_t, void* dst_, size_t dsty,
-                              int width, int height, const double* params, int, void*)
+template<typename T, typename Tr, typename WT, वर्ग Op, typename ST=WT>
+स्थिर पूर्णाङ्क scalar_द्विमान_Kernel(ध्रुव शून्य* src0_, size_t s0y, size_t s0x,
+                              ध्रुव शून्य* src1_, size_t s1y, size_t s1x,
+                              ध्रुव शून्य*, size_t, size_t, शून्य* dst_, size_t dsty,
+                              पूर्णाङ्क width, पूर्णाङ्क height, ध्रुव द्विगुण* params, पूर्णाङ्क, शून्य*)
 {
-    if (width <= 0 || height <= 0) return 0;
-    s0y /= sizeof(T);
-    s1y /= sizeof(T);
-    dsty /= sizeof(Tr);
+    जइ (width <= 0 || height <= 0) प्रत्यागम 0;
+    s0y /= परिमाण(T);
+    s1y /= परिमाण(T);
+    dsty /= परिमाण(Tr);
     CV_Assert((s0x|s1x) == 1u || (s0x|s1x) + (size_t)width == 1u);
 
-    const T* src0 = (const T*)src0_;
-    const T* src1 = (const T*)src1_;
+    ध्रुव T* src0 = (ध्रुव T*)src0_;
+    ध्रुव T* src1 = (ध्रुव T*)src1_;
     Tr* dst = (Tr*)dst_;
     [[maybe_unused]] ST scalar = saturate_cast<ST>(params[0]);   // mul/div scale; ignored by add/sub
 
     EW_TRY_COLLAPSE(2);
-    for (int y = 0; y < height; y++, src0 += s0y, src1 += s1y, dst += dsty)
+    प्रति (पूर्णाङ्क y = 0; y < height; y++, src0 += s0y, src1 += s1y, dst += dsty)
     {
-        if (s0x == s1x) {
-            for (int x = 0; x < width; x++)
+        जइ (s0x == s1x) {
+            प्रति (पूर्णाङ्क x = 0; x < width; x++)
                 dst[x] = saturate_cast<Tr>(Op::scl((WT)src0[x], (WT)src1[x], scalar));
         }
-        else if (s0x == 0) {
+        अण्णहा जइ (s0x == 0) {
             WT sc0 = (WT)src0[0];
-            for (int x = 0; x < width; x++)
+            प्रति (पूर्णाङ्क x = 0; x < width; x++)
                 dst[x] = saturate_cast<Tr>(Op::scl(sc0, (WT)src1[x], scalar));
         }
-        else {
+        अण्णहा {
             WT sc1 = (WT)src1[0];
-            for (int x = 0; x < width; x++)
+            प्रति (पूर्णाङ्क x = 0; x < width; x++)
                 dst[x] = saturate_cast<Tr>(Op::scl((WT)src0[x], sc1, scalar));
         }
     }
-    return 0;
+    प्रत्यागम 0;
 }
 
 template<typename T, typename WT>
-static void expandScalar(const T* sc, size_t sx, int n0, WT* scbuf, int n)
+स्थिर शून्य expandScalar(ध्रुव T* sc, size_t sx, पूर्णाङ्क n0, WT* scbuf, पूर्णाङ्क n)
 {
-    if (n0 <= 0 || n <= 0) return;
-    int i = 0;
-    for (; i < n0; i++) scbuf[i] = (WT)sc[i*sx];
-    for (; i < n; i++) scbuf[i] = scbuf[i - n0];
+    जइ (n0 <= 0 || n <= 0) प्रत्यागम;
+    पूर्णाङ्क i = 0;
+    प्रति (; i < n0; i++) scbuf[i] = (WT)sc[i*sx];
+    प्रति (; i < n; i++) scbuf[i] = scbuf[i - n0];
 }
 
 // Decode the per-channel patch bytes (mask + value) from the kernel flags into small arrays. Uniform
 // (no EW_CMP_PATCH): mask = trueVal, value = 0 (an ordinary compare). Per-channel: from the 4-bit
 // fields. The compare kernels apply  result = (rawmask & mask) | value  per channel - folding the
 // former separate patch pass into the compare (one pass).
-static inline void cmpUnpackPatch(int flags, uchar trueVal, uchar mvals[4], uchar vvals[4])
+स्थिर अन्तःस्थ शून्य cmpUnpackPatch(पूर्णाङ्क flags, uchar trueVal, uchar mvals[4], uchar vvals[4])
 {
-    if (flags & EW_CMP_PATCH)
-        for (int c = 0; c < 4; c++)
+    जइ (flags & EW_CMP_PATCH)
+        प्रति (पूर्णाङ्क c = 0; c < 4; c++)
         {
-            const int f = (flags >> (EW_CMP_PATCH_SHIFT + c*4)) & 0xF;
+            ध्रुव पूर्णाङ्क f = (flags >> (EW_CMP_PATCH_SHIFT + c*4)) & 0xF;
             mvals[c] = (uchar)cmpPatchByte(f & 3);
             vvals[c] = (uchar)cmpPatchByte((f >> 2) & 3);
         }
-    else
-        for (int c = 0; c < 4; c++) { mvals[c] = trueVal; vvals[c] = 0; }
+    अण्णहा
+        प्रति (पूर्णाङ्क c = 0; c < 4; c++) { mvals[c] = trueVal; vvals[c] = 0; }
 }
 
 // Scalar comparison kernel: T x T -> u8 mask. Result is 0 (false) or `trueVal` (true), trueVal read
 // from TKernel::flags - 255 (default, matching cv::compare) or 1 (a numpy-style 0/1 mask). Integers
 // compare directly (WT == T); f16/bf16 compare through a float WT. This is the fallback for the depths
 // the SIMD kernel doesn't cover (f16/bf16/64-bit). stepx in {0,1}; dst is u8, byte step == element step.
-template<typename T, typename WT, class Cmp>
-static int scalarCompareKernel(const void* src0_, size_t s0y, size_t s0x,
-                         const void* src1_, size_t s1y, size_t s1x,
-                         const void*, size_t, size_t,
-                         void* dst_, size_t dsty, int width, int height,
-                         const double*, int flags, void*)
+template<typename T, typename WT, वर्ग Cmp>
+स्थिर पूर्णाङ्क scalarCompareKernel(ध्रुव शून्य* src0_, size_t s0y, size_t s0x,
+                         ध्रुव शून्य* src1_, size_t s1y, size_t s1x,
+                         ध्रुव शून्य*, size_t, size_t,
+                         शून्य* dst_, size_t dsty, पूर्णाङ्क width, पूर्णाङ्क height,
+                         ध्रुव द्विगुण*, पूर्णाङ्क flags, शून्य*)
 {
     // LT/LE reuse the GT/GE kernel with the operands swapped (a<b == b>a, a<=b == b>=a).
-    if (flags & EW_KERNEL_SWAP01) { std::swap(src0_, src1_); std::swap(s0y, s1y); std::swap(s0x, s1x); }
-    s0y /= sizeof(T);
-    s1y /= sizeof(T);
+    जइ (flags & EW_KERNEL_SWAP01) { std::swap(src0_, src1_); std::swap(s0y, s1y); std::swap(s0x, s1x); }
+    s0y /= परिमाण(T);
+    s1y /= परिमाण(T);
     CV_Assert((s0x|s1x) == 1u || (s0x|s1x) + (size_t)width == 1u);
 
-    const T* src0 = (const T*)src0_;
-    const T* src1 = (const T*)src1_;
+    ध्रुव T* src0 = (ध्रुव T*)src0_;
+    ध्रुव T* src1 = (ध्रुव T*)src1_;
     uchar* dst = (uchar*)dst_;
-    const uchar trueVal = (flags & EW_KERNEL_MASK1) ? 1 : 255;
+    ध्रुव uchar trueVal = (flags & EW_KERNEL_MASK1) ? 1 : 255;
     uchar mvals[4], vvals[4];
     cmpUnpackPatch(flags, trueVal, mvals, vvals);
-    const bool perch = (flags & EW_CMP_PATCH) != 0;          // per-channel fix-up (width=cn<=4)
+    ध्रुव तार्किक perch = (flags & EW_CMP_PATCH) != 0;          // per-channel fix-up (width=cn<=4)
     CV_Assert(!perch || width <= 4);                         // a per-channel patch is a short-row tile
     #define EW_CMP_APPLY(cond, x) (perch ? (uchar)(((cond) ? mvals[x] : 0) | vvals[x]) \
                                          : (uchar)((cond) ? trueVal : 0))
 
     EW_TRY_COLLAPSE(2);
-    for (int y = 0; y < height; y++, src0 += s0y, src1 += s1y, dst += dsty)
+    प्रति (पूर्णाङ्क y = 0; y < height; y++, src0 += s0y, src1 += s1y, dst += dsty)
     {
-        if (s0x == s1x) {
-            for (int x = 0; x < width; x++) dst[x] = EW_CMP_APPLY(Cmp::cmp((WT)src0[x], (WT)src1[x]), x);
+        जइ (s0x == s1x) {
+            प्रति (पूर्णाङ्क x = 0; x < width; x++) dst[x] = EW_CMP_APPLY(Cmp::cmp((WT)src0[x], (WT)src1[x]), x);
         }
-        else if (s0x == 0) {
+        अण्णहा जइ (s0x == 0) {
             WT a = (WT)src0[0];
-            for (int x = 0; x < width; x++) dst[x] = EW_CMP_APPLY(Cmp::cmp(a, (WT)src1[x]), x);
+            प्रति (पूर्णाङ्क x = 0; x < width; x++) dst[x] = EW_CMP_APPLY(Cmp::cmp(a, (WT)src1[x]), x);
         }
-        else {
+        अण्णहा {
             WT b = (WT)src1[0];
-            for (int x = 0; x < width; x++) dst[x] = EW_CMP_APPLY(Cmp::cmp((WT)src0[x], b), x);
+            प्रति (पूर्णाङ्क x = 0; x < width; x++) dst[x] = EW_CMP_APPLY(Cmp::cmp((WT)src0[x], b), x);
         }
     }
     #undef EW_CMP_APPLY
-    return 0;
+    प्रत्यागम 0;
 }
 
 // SIMD comparison kernel: T x T -> u8 mask, for the directly-comparable depths (u8/s8/u16/s16/u32/
@@ -678,31 +678,31 @@ static int scalarCompareKernel(const void* src0_, size_t s0y, size_t s0x,
 // into the unsigned int of the same width; cmpFuse packs to u8 and applies (rawmask & M) | V. The
 // per-row SIMD body runs when an operand is contiguous or broadcast; a per-channel patch (M/V differ
 // by channel) only ever arrives as a short-row (width=cn) tile and is handled there.
-template<typename T, typename Vvec, typename Uvec, class Cmp>
-static int vecCompareKernel(const void* src0_, size_t s0y, size_t s0x,
-                            const void* src1_, size_t s1y, size_t s1x,
-                            const void*, size_t, size_t,
-                            void* dst_, size_t dsty, int width, int height,
-                            const double*, int flags, void*)
+template<typename T, typename Vvec, typename Uvec, वर्ग Cmp>
+स्थिर पूर्णाङ्क vecCompareKernel(ध्रुव शून्य* src0_, size_t s0y, size_t s0x,
+                            ध्रुव शून्य* src1_, size_t s1y, size_t s1x,
+                            ध्रुव शून्य*, size_t, size_t,
+                            शून्य* dst_, size_t dsty, पूर्णाङ्क width, पूर्णाङ्क height,
+                            ध्रुव द्विगुण*, पूर्णाङ्क flags, शून्य*)
 {
     // LT/LE reuse the GT/GE kernel with the operands swapped (a<b == b>a, a<=b == b>=a).
-    if (flags & EW_KERNEL_SWAP01) { std::swap(src0_, src1_); std::swap(s0y, s1y); std::swap(s0x, s1x); }
-    s0y /= sizeof(T);
-    s1y /= sizeof(T);
+    जइ (flags & EW_KERNEL_SWAP01) { std::swap(src0_, src1_); std::swap(s0y, s1y); std::swap(s0x, s1x); }
+    s0y /= परिमाण(T);
+    s1y /= परिमाण(T);
     CV_Assert((s0x|s1x) == 1u || (s0x|s1x) + (size_t)width == 1u);
 
-    const T* src0 = (const T*)src0_;
-    const T* src1 = (const T*)src1_;
+    ध्रुव T* src0 = (ध्रुव T*)src0_;
+    ध्रुव T* src1 = (ध्रुव T*)src1_;
     uchar* dst = (uchar*)dst_;
-    const uchar trueVal = (flags & EW_KERNEL_MASK1) ? 1 : 255;
+    ध्रुव uchar trueVal = (flags & EW_KERNEL_MASK1) ? 1 : 255;
     uchar mvals[4], vvals[4];                                 // per-channel fix-up: (rawmask & m) | v
     cmpUnpackPatch(flags, trueVal, mvals, vvals);
-    const bool perch = (flags & EW_CMP_PATCH) != 0;
+    ध्रुव तार्किक perch = (flags & EW_CMP_PATCH) != 0;
     CV_Assert(!perch || width <= 4);                          // a per-channel patch is a short-row tile
 
     EW_TRY_COLLAPSE(2);
-    int y = 0;
-#if (CV_SIMD || CV_SIMD_SCALABLE)
+    पूर्णाङ्क y = 0;
+#जइ (CV_SIMD || CV_SIMD_SCALABLE)
     // Short rows (2/3/4 elements): a per-channel scalar over a multi-channel image arrives as a
     // (width=cn) x (height=pixels) tile with the scalar broadcast over rows (s?y==0). The per-row SIMD
     // below never triggers at such a tiny width, so expand the width<=4 broadcast operand (threshold
@@ -712,131 +712,131 @@ static int vecCompareKernel(const void* src0_, size_t s0y, size_t s0x,
     // widened f16/bf16->f32 path (sizeof(T) < Vvec lane) and 8-byte f64 fall through to per-row + scalar.
     // (sizeof(T) <= 4 is part of the constexpr gate: for f64 the body would compile to nothing but
     // dead stores - gcc 9 flags scbuf/bsrc/bsx as set-but-not-used there.)
-    if constexpr (sizeof(T) == sizeof(typename VTraits<Vvec>::lane_type) && sizeof(T) <= 4)
-    if (height > 1 && width <= 4 &&
+    जइ constexpr (परिमाण(T) == परिमाण(typename VTraits<Vvec>::lane_type) && परिमाण(T) <= 4)
+    जइ (height > 1 && width <= 4 &&
         ((s0y == 0 && s1y == (size_t)width*s1x) || (s1y == 0 && s0y == (size_t)width*s0x)) &&
         dsty == (size_t)width)
     {
-        const int VECSZ  = VTraits<Vvec>::vlanes();          // sizeof(T)-type lanes
-        const int VECSZ8 = VTraits<v_uint8>::vlanes();       // u8 output lanes
-        constexpr int MAXV8 = VTraits<v_uint8>::max_nlanes;
+        ध्रुव पूर्णाङ्क VECSZ  = VTraits<Vvec>::vlanes();          // sizeof(T)-type lanes
+        ध्रुव पूर्णाङ्क VECSZ8 = VTraits<v_uint8>::vlanes();       // u8 output lanes
+        constexpr पूर्णाङ्क MAXV8 = VTraits<v_uint8>::max_nlanes;
         T scbuf[MAXV8 * 3] = {};                             // interleaved threshold (elements)
         uchar mbuf[MAXV8 * 3] = {}, vbuf[MAXV8 * 3] = {};    // interleaved mask / value (bytes)
         // ^ the {} inits are for -Wmaybe-uninitialized only: expandScalar/decode fill every lane that
         //   is later read, but the compiler cannot prove it with a runtime VECSZ
-        const bool bc0 = (s0y == 0);                         // src0 is the broadcast (short) operand
-        const T* bsrc = bc0 ? src0 : src1; const size_t bsx = bc0 ? s0x : s1x;
-        const T*& src = bc0 ? src1 : src0;                   // the row-stepping operand (advanced below)
-        const size_t sy = bc0 ? s1y : s0y;
+        ध्रुव तार्किक bc0 = (s0y == 0);                         // src0 is the broadcast (short) operand
+        ध्रुव T* bsrc = bc0 ? src0 : src1; ध्रुव size_t bsx = bc0 ? s0x : s1x;
+        ध्रुव T*& src = bc0 ? src1 : src0;                   // the row-stepping operand (advanced below)
+        ध्रुव size_t sy = bc0 ? s1y : s0y;
         // The compare direction (scalar-first when bc0, array-first otherwise) is hoisted OUT of the row
         // loop with an explicit if(bc0) - the loop is written twice so no per-iteration branch remains.
         // Per branch: own unroll, threshold + interleaved M/V loaded ONCE. sizeof==1 keeps 12 vectors.
         #define EW_CMPR(r, a, b) v_reinterpret_as(Cmp::vec(a, b), r)   // rawmask -> sizeof(T)-byte uint
-        if constexpr (sizeof(T) == 1)                        // 3 u8 masks -> 3 u8 stores
+        जइ constexpr (परिमाण(T) == 1)                        // 3 u8 masks -> 3 u8 stores
         {
-            const int ewidth = VECSZ8 * 3;
+            ध्रुव पूर्णाङ्क ewidth = VECSZ8 * 3;
             expandScalar(bsrc, bsx, width, scbuf, ewidth);
             expandScalar(mvals, (size_t)1, width, mbuf, ewidth);
             expandScalar(vvals, (size_t)1, width, vbuf, ewidth);
-            const int dy = ewidth / width;
+            ध्रुव पूर्णाङ्क dy = ewidth / width;
             Vvec  sc0=vx_load(scbuf),  sc1=vx_load(scbuf+VECSZ),   sc2=vx_load(scbuf+VECSZ*2);
             v_uint8 M0=vx_load(mbuf),  M1=vx_load(mbuf+VECSZ8),    M2=vx_load(mbuf+VECSZ8*2);
             v_uint8 V0=vx_load(vbuf),  V1=vx_load(vbuf+VECSZ8),    V2=vx_load(vbuf+VECSZ8*2);
             #define EW_ROW1(A0,B0,A1,B1,A2,B2) \
-                for (; y + dy <= height; y += dy, src += sy*dy, dst += dsty*dy) { \
+                प्रति (; y + dy <= height; y += dy, src += sy*dy, dst += dsty*dy) { \
                     Uvec r0,r1,r2; EW_CMPR(r0,A0,B0); EW_CMPR(r1,A1,B1); EW_CMPR(r2,A2,B2); \
                     v_uint8 o0=v_or(v_and(r0,M0),V0),o1=v_or(v_and(r1,M1),V1),o2=v_or(v_and(r2,M2),V2); \
                     v_store(dst, o0); v_store(dst+VECSZ8, o1); v_store(dst+VECSZ8*2, o2); }
-            if (bc0) EW_ROW1(sc0,vx_load(src), sc1,vx_load(src+VECSZ), sc2,vx_load(src+VECSZ*2))
-            else     EW_ROW1(vx_load(src),sc0, vx_load(src+VECSZ),sc1, vx_load(src+VECSZ*2),sc2)
+            जइ (bc0) EW_ROW1(sc0,vx_load(src), sc1,vx_load(src+VECSZ), sc2,vx_load(src+VECSZ*2))
+            अण्णहा     EW_ROW1(vx_load(src),sc0, vx_load(src+VECSZ),sc1, vx_load(src+VECSZ*2),sc2)
             #undef EW_ROW1
         }
-        else if constexpr (sizeof(T) == 2)                   // 3 u16 masks -> 1 full + 1 half u8 store
+        अण्णहा जइ constexpr (परिमाण(T) == 2)                   // 3 u16 masks -> 1 full + 1 half u8 store
         {
-            const int ewidth = VECSZ * 3;
+            ध्रुव पूर्णाङ्क ewidth = VECSZ * 3;
             expandScalar(bsrc, bsx, width, scbuf, ewidth);
             expandScalar(mvals, (size_t)1, width, mbuf, ewidth);
             expandScalar(vvals, (size_t)1, width, vbuf, ewidth);
-            const int dy = ewidth / width;
+            ध्रुव पूर्णाङ्क dy = ewidth / width;
             Vvec  sc0=vx_load(scbuf), sc1=vx_load(scbuf+VECSZ), sc2=vx_load(scbuf+VECSZ*2);
             v_uint8 M0=vx_load(mbuf), M1=vx_load(mbuf+VECSZ8);
             v_uint8 V0=vx_load(vbuf), V1=vx_load(vbuf+VECSZ8);
             #define EW_ROW2(A0,B0,A1,B1,A2,B2) \
-                for (; y + dy <= height; y += dy, src += sy*dy, dst += dsty*dy) { \
+                प्रति (; y + dy <= height; y += dy, src += sy*dy, dst += dsty*dy) { \
                     Uvec r0,r1,r2; EW_CMPR(r0,A0,B0); EW_CMPR(r1,A1,B1); EW_CMPR(r2,A2,B2); \
                     v_uint8 b0=v_pack(r0,r1), b1=v_pack(r2,r2); \
                     v_uint8 o0=v_or(v_and(b0,M0),V0), o1=v_or(v_and(b1,M1),V1); \
-                    v_store(dst, o0); v_store_low(dst+VECSZ8, o1); }
-            if (bc0) EW_ROW2(sc0,vx_load(src), sc1,vx_load(src+VECSZ), sc2,vx_load(src+VECSZ*2))
-            else     EW_ROW2(vx_load(src),sc0, vx_load(src+VECSZ),sc1, vx_load(src+VECSZ*2),sc2)
+                    v_store(dst, o0); v_store_नीचः(dst+VECSZ8, o1); }
+            जइ (bc0) EW_ROW2(sc0,vx_load(src), sc1,vx_load(src+VECSZ), sc2,vx_load(src+VECSZ*2))
+            अण्णहा     EW_ROW2(vx_load(src),sc0, vx_load(src+VECSZ),sc1, vx_load(src+VECSZ*2),sc2)
             #undef EW_ROW2
         }
-        else if constexpr (sizeof(T) == 4)                   // sizeof==4: 6 u32 -> 3 u16 -> 1 full + 1 half u8
+        अण्णहा जइ constexpr (परिमाण(T) == 4)                   // sizeof==4: 6 u32 -> 3 u16 -> 1 full + 1 half u8
         {
-            const int ewidth = VECSZ * 6;
+            ध्रुव पूर्णाङ्क ewidth = VECSZ * 6;
             expandScalar(bsrc, bsx, width, scbuf, ewidth);
             expandScalar(mvals, (size_t)1, width, mbuf, ewidth);
             expandScalar(vvals, (size_t)1, width, vbuf, ewidth);
-            const int dy = ewidth / width;
+            ध्रुव पूर्णाङ्क dy = ewidth / width;
             Vvec sc0=vx_load(scbuf),sc1=vx_load(scbuf+VECSZ),sc2=vx_load(scbuf+VECSZ*2),
                  sc3=vx_load(scbuf+VECSZ*3),sc4=vx_load(scbuf+VECSZ*4),sc5=vx_load(scbuf+VECSZ*5);
             v_uint8 M0=vx_load(mbuf), M1=vx_load(mbuf+VECSZ8);
             v_uint8 V0=vx_load(vbuf), V1=vx_load(vbuf+VECSZ8);
             #define EW_ROW4(A0,B0,A1,B1,A2,B2,A3,B3,A4,B4,A5,B5) \
-                for (; y + dy <= height; y += dy, src += sy*dy, dst += dsty*dy) { \
+                प्रति (; y + dy <= height; y += dy, src += sy*dy, dst += dsty*dy) { \
                     Uvec r0,r1,r2,r3,r4,r5; \
                     EW_CMPR(r0,A0,B0); EW_CMPR(r1,A1,B1); EW_CMPR(r2,A2,B2); \
                     EW_CMPR(r3,A3,B3); EW_CMPR(r4,A4,B4); EW_CMPR(r5,A5,B5); \
                     v_uint16 p0=v_pack(r0,r1), p1=v_pack(r2,r3), p2=v_pack(r4,r5); \
                     v_uint8 q0=v_pack(p0,p1), q1=v_pack(p2,p2); \
                     v_uint8 o0=v_or(v_and(q0,M0),V0), o1=v_or(v_and(q1,M1),V1); \
-                    v_store(dst, o0); v_store_low(dst+VECSZ8, o1); }
-            if (bc0) EW_ROW4(sc0,vx_load(src),sc1,vx_load(src+VECSZ),sc2,vx_load(src+VECSZ*2),
+                    v_store(dst, o0); v_store_नीचः(dst+VECSZ8, o1); }
+            जइ (bc0) EW_ROW4(sc0,vx_load(src),sc1,vx_load(src+VECSZ),sc2,vx_load(src+VECSZ*2),
                              sc3,vx_load(src+VECSZ*3),sc4,vx_load(src+VECSZ*4),sc5,vx_load(src+VECSZ*5))
-            else     EW_ROW4(vx_load(src),sc0,vx_load(src+VECSZ),sc1,vx_load(src+VECSZ*2),sc2,
+            अण्णहा     EW_ROW4(vx_load(src),sc0,vx_load(src+VECSZ),sc1,vx_load(src+VECSZ*2),sc2,
                              vx_load(src+VECSZ*3),sc3,vx_load(src+VECSZ*4),sc4,vx_load(src+VECSZ*5),sc5)
             #undef EW_ROW4
         }
         #undef EW_CMPR
     }
 #endif
-    for (; y < height; y++, src0 += s0y, src1 += s1y, dst += dsty)
+    प्रति (; y < height; y++, src0 += s0y, src1 += s1y, dst += dsty)
     {
-        int x = 0;
-    #if (CV_SIMD || CV_SIMD_SCALABLE)
+        पूर्णाङ्क x = 0;
+    #जइ (CV_SIMD || CV_SIMD_SCALABLE)
         // SIMD for BOTH the contiguous case AND a broadcast operand (a per-channel scalar const has
         // step 0 - without this the scalar-vs-array compare, incl. every multi-channel scalar compare,
         // fell to the scalar tail below, ~5x slower). vx_setall broadcasts the step-0 operand once.
         // 4-vector unroll + halide right-edge backoff (reprocess the last 4*VECSZ when width is not a
         // multiple); dst is a separate mask buffer so the overlap is a harmless idempotent rewrite.
-        const int VECSZ = VTraits<Vvec>::vlanes();
-        const int VECSZ8 = VTraits<v_uint8>::vlanes();
+        ध्रुव पूर्णाङ्क VECSZ = VTraits<Vvec>::vlanes();
+        ध्रुव पूर्णाङ्क VECSZ8 = VTraits<v_uint8>::vlanes();
         v_uint8 vT; v_setall_mask(vT, trueVal);              // uniform mask (per-channel patch is short-row)
-        const bool tailTrick = width >= 4*VECSZ && src0_ != dst_ && src1_ != dst_;
+        ध्रुव तार्किक tailTrick = width >= 4*VECSZ && src0_ != dst_ && src1_ != dst_;
         // Narrow the 4 masks to u8 FIRST, then apply trueVal on the u8 result (1 and per u8 vector, not
         // per wide lane-group). One block per MASK lane width (== sizeof(T) natively, but 4 for the
         // f16/bf16->f32 widened path); a 4-vector unroll spans exactly 4*VECSZ elements.
-        constexpr size_t MW = sizeof(typename VTraits<Uvec>::lane_type);
-        #define PACK_STORE_CMP_RESULT(m0,m1,m2,m3, D) do { \
-            if constexpr (MW == 1u) { \
+        constexpr size_t MW = परिमाण(typename VTraits<Uvec>::lane_type);
+        #define PACK_STORE_CMP_RESULT(m0,m1,m2,m3, D) करेहि { \
+            जइ constexpr (MW == 1u) { \
                 v_uint8 o0=v_and(m0,vT),o1=v_and(m1,vT),o2=v_and(m2,vT),o3=v_and(m3,vT); \
                 v_store((D),o0); v_store((D)+VECSZ8,o1); v_store((D)+VECSZ8*2,o2); v_store((D)+VECSZ8*3,o3); \
-            } else if constexpr (MW == 2u) { \
+            } अण्णहा जइ constexpr (MW == 2u) { \
                 v_uint8 o0=v_and(v_pack(m0,m1),vT), o1=v_and(v_pack(m2,m3),vT); \
                 v_store((D),o0); v_store((D)+VECSZ8,o1); \
-            } else if constexpr (MW == 4u) { \
+            } अण्णहा जइ constexpr (MW == 4u) { \
                 v_uint8 o0=v_and(v_pack(v_pack(m0,m1),v_pack(m2,m3)),vT); \
                 v_store((D),o0); \
-            } else { /* sizeof==8: 4 u64 -> 2 u32 -> 1 u16 -> u8 (low half), 4*VECSZ elems -> store_low */ \
+            } अण्णहा { /* sizeof==8: 4 u64 -> 2 u32 -> 1 u16 -> u8 (low half), 4*VECSZ elems -> store_low */ \
                 v_uint16 g=v_pack(v_pack(m0,m1),v_pack(m2,m3)); \
                 v_uint8 o0=v_and(v_pack(g,g),vT); \
-                v_store_low((D),o0); \
-            } } while(0)
-        if (s0x == 1u && s1x == 1u)
+                v_store_नीचः((D),o0); \
+            } } जाव(0)
+        जइ (s0x == 1u && s1x == 1u)
         {
-            for (; x < width; x += 4*VECSZ)
+            प्रति (; x < width; x += 4*VECSZ)
             {
-                if (x + 4*VECSZ > width) { if (!tailTrick) break; x = width - 4*VECSZ; }
+                जइ (x + 4*VECSZ > width) { जइ (!tailTrick) भङ्ग; x = width - 4*VECSZ; }
                 Vvec a0, a1, a2, a3, b0, b1, b2, b3;   // vx_load_pair_as widens f16/bf16->f32, else native
                 vx_load_pair_as(src0+x, a0, a1); vx_load_pair_as(src0+x+2*VECSZ, a2, a3);
                 vx_load_pair_as(src1+x, b0, b1); vx_load_pair_as(src1+x+2*VECSZ, b2, b3);
@@ -846,12 +846,12 @@ static int vecCompareKernel(const void* src0_, size_t s0y, size_t s0x,
                 PACK_STORE_CMP_RESULT(m0, m1, m2, m3, dst+x);
             }
         }
-        else if (s1x == 0u)                       // src1 (e.g. the scalar) broadcast
+        अण्णहा जइ (s1x == 0u)                       // src1 (e.g. the scalar) broadcast
         {
             Vvec b0; vx_setall_as(src1, b0);
-            for (; x < width; x += 4*VECSZ)
+            प्रति (; x < width; x += 4*VECSZ)
             {
-                if (x + 4*VECSZ > width) { if (!tailTrick) break; x = width - 4*VECSZ; }
+                जइ (x + 4*VECSZ > width) { जइ (!tailTrick) भङ्ग; x = width - 4*VECSZ; }
                 Vvec a0, a1, a2, a3;
                 vx_load_pair_as(src0+x, a0, a1); vx_load_pair_as(src0+x+2*VECSZ, a2, a3);
                 Uvec m0, m1, m2, m3;
@@ -860,12 +860,12 @@ static int vecCompareKernel(const void* src0_, size_t s0y, size_t s0x,
                 PACK_STORE_CMP_RESULT(m0, m1, m2, m3, dst+x);
             }
         }
-        else if (s0x == 0u)                       // src0 broadcast
+        अण्णहा जइ (s0x == 0u)                       // src0 broadcast
         {
             Vvec a0; vx_setall_as(src0, a0);
-            for (; x < width; x += 4*VECSZ)
+            प्रति (; x < width; x += 4*VECSZ)
             {
-                if (x + 4*VECSZ > width) { if (!tailTrick) break; x = width - 4*VECSZ; }
+                जइ (x + 4*VECSZ > width) { जइ (!tailTrick) भङ्ग; x = width - 4*VECSZ; }
                 Vvec b0, b1, b2, b3;
                 vx_load_pair_as(src1+x, b0, b1); vx_load_pair_as(src1+x+2*VECSZ, b2, b3);
                 Uvec m0, m1, m2, m3;
@@ -880,20 +880,20 @@ static int vecCompareKernel(const void* src0_, size_t s0y, size_t s0x,
         // per-channel patch (width=cn<=4 here) indexes M/V by the channel x.
         #define EW_CMP_APPLY(cond, x) (perch ? (uchar)(((cond) ? mvals[x] : 0) | vvals[x]) \
                                              : (uchar)((cond) ? trueVal : 0))
-        if (s0x == s1x) {
-            for (; x < width; x++) dst[x] = EW_CMP_APPLY(Cmp::cmp(src0[x], src1[x]), x);
+        जइ (s0x == s1x) {
+            प्रति (; x < width; x++) dst[x] = EW_CMP_APPLY(Cmp::cmp(src0[x], src1[x]), x);
         }
-        else if (s0x == 0) {
+        अण्णहा जइ (s0x == 0) {
             T a = src0[0];
-            for (; x < width; x++) dst[x] = EW_CMP_APPLY(Cmp::cmp(a, src1[x]), x);
+            प्रति (; x < width; x++) dst[x] = EW_CMP_APPLY(Cmp::cmp(a, src1[x]), x);
         }
-        else {
+        अण्णहा {
             T b = src1[0];
-            for (; x < width; x++) dst[x] = EW_CMP_APPLY(Cmp::cmp(src0[x], b), x);
+            प्रति (; x < width; x++) dst[x] = EW_CMP_APPLY(Cmp::cmp(src0[x], b), x);
         }
         #undef EW_CMP_APPLY
     }
-    return 0;
+    प्रत्यागम 0;
 }
 
 // Unified binary kernel: T0 x T1 -> Tr (operands same depth for arithmetic; cast is separate).
@@ -903,42 +903,42 @@ static int vecCompareKernel(const void* src0_, size_t s0y, size_t s0x,
 //   Op       = operation functor (vec()/scl()).
 //   use_simd = compile-time switch; false => pure scalar (32/64-bit widened outputs, f64).
 // stepx in {0,1}; dst contiguous. In-place safe (see file header).
-template<typename T, typename Tr, typename Wvec, typename WT, class Op, typename ST=WT, typename Wvec1=Wvec>
-static int vecBinaryKernel(const void* src0_, size_t s0y, size_t s0x,
-                         const void* src1_, size_t s1y, size_t s1x,
-                         const void*, size_t, size_t,
-                         void* dst_, size_t dsty, int width, int height,
-                         const double* params, int, void*)
+template<typename T, typename Tr, typename Wvec, typename WT, वर्ग Op, typename ST=WT, typename Wvec1=Wvec>
+स्थिर पूर्णाङ्क vec_द्विमान_Kernel(ध्रुव शून्य* src0_, size_t s0y, size_t s0x,
+                         ध्रुव शून्य* src1_, size_t s1y, size_t s1x,
+                         ध्रुव शून्य*, size_t, size_t,
+                         शून्य* dst_, size_t dsty, पूर्णाङ्क width, पूर्णाङ्क height,
+                         ध्रुव द्विगुण* params, पूर्णाङ्क, शून्य*)
 {
-    if (width <= 0 || height <= 0) return 0;
-    s0y /= sizeof(T);
-    s1y /= sizeof(T);
-    dsty /= sizeof(Tr);
+    जइ (width <= 0 || height <= 0) प्रत्यागम 0;
+    s0y /= परिमाण(T);
+    s1y /= परिमाण(T);
+    dsty /= परिमाण(Tr);
 
     CV_Assert((s0x|s1x) == 1u || (s0x|s1x) + (size_t)width == 1u);
 
-    const T* src0 = (const T*)src0_;
-    const T* src1 = (const T*)src1_;
+    ध्रुव T* src0 = (ध्रुव T*)src0_;
+    ध्रुव T* src1 = (ध्रुव T*)src1_;
     Tr* dst = (Tr*)dst_;
     [[maybe_unused]] ST scalar = saturate_cast<ST>(params[0]);   // mul/div scale; ignored by add/sub
 
     EW_TRY_COLLAPSE(2);
-    int y = 0;
-#if (CV_SIMD || CV_SIMD_SCALABLE)
+    पूर्णाङ्क y = 0;
+#जइ (CV_SIMD || CV_SIMD_SCALABLE)
     using Wlane = typename VTraits<Wvec>::lane_type;
-    const int VECSZ = VTraits<Wvec>::vlanes();
-    const bool use_tail_trick = width >= VECSZ*4 && src0_ != dst_ && src1_ != dst_;
+    ध्रुव पूर्णाङ्क VECSZ = VTraits<Wvec>::vlanes();
+    ध्रुव तार्किक use_tail_trick = width >= VECSZ*4 && src0_ != dst_ && src1_ != dst_;
     [[maybe_unused]] Wvec vscalar;
     vx_setall_as(&scalar, vscalar);
-    if (height > 1 && width <= 4 &&
+    जइ (height > 1 && width <= 4 &&
         ((s0y == 0 && s1y == width*s1x) ||
          (s1y == 0 && s0y == width*s0x)) &&
         dsty == (size_t)width) {
-        constexpr int MAXVECSZ = VTraits<Wvec>::max_nlanes;
+        constexpr पूर्णाङ्क MAXVECSZ = VTraits<Wvec>::max_nlanes;
         Wlane scbuf[MAXVECSZ*6] = {};   // {} for -Wmaybe-uninitialized only (filled up to VECSZ*6)
-        const int ewidth = VECSZ*6;
+        ध्रुव पूर्णाङ्क ewidth = VECSZ*6;
         expandScalar(s0y == 0 ? src0 : src1, s0y == 0 ? s0x : s1x, width, scbuf, ewidth);
-        int dy = ewidth / width;
+        पूर्णाङ्क dy = ewidth / width;
         Wvec sc0, sc1, sc2, sc3, sc4, sc5;
         sc0 = Op::preproc(vx_load(scbuf), vscalar);
         sc1 = Op::preproc(vx_load(scbuf + VECSZ), vscalar);
@@ -947,8 +947,8 @@ static int vecBinaryKernel(const void* src0_, size_t s0y, size_t s0x,
         sc4 = Op::preproc(vx_load(scbuf + VECSZ*4), vscalar);
         sc5 = Op::preproc(vx_load(scbuf + VECSZ*5), vscalar);
 
-        if (s0y == 0) {
-            for (; y + dy <= height; y += dy, src1 += s1y*dy, dst += dsty*dy) {
+        जइ (s0y == 0) {
+            प्रति (; y + dy <= height; y += dy, src1 += s1y*dy, dst += dsty*dy) {
                 Wvec v0, v1, v2, v3, v4, v5;
                 vx_load_pair_as(src1, v0, v1);
                 vx_load_pair_as(src1 + VECSZ*2, v2, v3);
@@ -961,8 +961,8 @@ static int vecBinaryKernel(const void* src0_, size_t s0y, size_t s0x,
                 v_store_pair_as(dst + VECSZ*4, w4, w5);
             }
         }
-        else {
-            for (; y + dy <= height; y += dy, src0 += s0y*dy, dst += dsty*dy) {
+        अण्णहा {
+            प्रति (; y + dy <= height; y += dy, src0 += s0y*dy, dst += dsty*dy) {
                 Wvec v0, v1, v2, v3, v4, v5;
                 vx_load_pair_as(src0, v0, v1);
                 vx_load_pair_as(src0 + VECSZ*2, v2, v3);
@@ -977,21 +977,21 @@ static int vecBinaryKernel(const void* src0_, size_t s0y, size_t s0x,
         }
     }
 #endif
-    for (; y < height; y++, src0 += s0y, src1 += s1y, dst += dsty)
+    प्रति (; y < height; y++, src0 += s0y, src1 += s1y, dst += dsty)
     {
-        int x = 0;
-    #if (CV_SIMD || CV_SIMD_SCALABLE)
+        पूर्णाङ्क x = 0;
+    #जइ (CV_SIMD || CV_SIMD_SCALABLE)
         Wvec a0, a1, a2, a3, b0, b1, b2, b3;
-        if (s0x == s1x) {
-            if (!Op::useScalar || scalar == ST(1)) {
+        जइ (s0x == s1x) {
+            जइ (!Op::useScalar || scalar == ST(1)) {
                 // this branch runs on Wvec1, which may be WIDER-laned than Wvec (e.g. the u8 mul
                 // path: Wvec1=v_uint16 is 2x the lanes of Wvec=v_float32) - step by ITS lane count,
                 // or the pairs overlap and the tail backoff writes past the row end
-                const int VECSZ1 = VTraits<Wvec1>::vlanes();
-                const bool tail_trick1 = width >= VECSZ1*4 && src0_ != dst_ && src1_ != dst_;
-                for (; x < width; x += VECSZ1*4) {
+                ध्रुव पूर्णाङ्क VECSZ1 = VTraits<Wvec1>::vlanes();
+                ध्रुव तार्किक tail_trick1 = width >= VECSZ1*4 && src0_ != dst_ && src1_ != dst_;
+                प्रति (; x < width; x += VECSZ1*4) {
                     Wvec1 a0_, a1_, a2_, a3_, b0_, b1_, b2_, b3_;
-                    if (x + VECSZ1*4 > width) { if (!tail_trick1) break; x = width - VECSZ1*4; }
+                    जइ (x + VECSZ1*4 > width) { जइ (!tail_trick1) भङ्ग; x = width - VECSZ1*4; }
                     vx_load_pair_as(src0 + x, a0_, a1_);
                     vx_load_pair_as(src0 + x + VECSZ1*2, a2_, a3_);
                     vx_load_pair_as(src1 + x, b0_, b1_);
@@ -1002,9 +1002,9 @@ static int vecBinaryKernel(const void* src0_, size_t s0y, size_t s0x,
                     v_store_pair_as(dst + x + VECSZ1*2, c2, c3);
                 }
             }
-            else {
-                for (; x < width; x += VECSZ*4) {
-                    if (x + VECSZ*4 > width) { if (!use_tail_trick) break; x = width - VECSZ*4; }
+            अण्णहा {
+                प्रति (; x < width; x += VECSZ*4) {
+                    जइ (x + VECSZ*4 > width) { जइ (!use_tail_trick) भङ्ग; x = width - VECSZ*4; }
                     vx_load_pair_as(src0 + x, a0, a1);
                     vx_load_pair_as(src0 + x + VECSZ*2, a2, a3);
                     vx_load_pair_as(src1 + x, b0, b1);
@@ -1018,11 +1018,11 @@ static int vecBinaryKernel(const void* src0_, size_t s0y, size_t s0x,
                 }
             }
         }
-        else if (s1x == 0) {
+        अण्णहा जइ (s1x == 0) {
             vx_setall_as(src1, b0);
             b0 = Op::preproc(b0, vscalar);
-            for (; x < width; x += VECSZ*4) {
-                if (x + VECSZ*4 > width) { if (!use_tail_trick) break; x = width - VECSZ*4; }
+            प्रति (; x < width; x += VECSZ*4) {
+                जइ (x + VECSZ*4 > width) { जइ (!use_tail_trick) भङ्ग; x = width - VECSZ*4; }
                 vx_load_pair_as(src0 + x, a0, a1);
                 vx_load_pair_as(src0 + x + VECSZ*2, a2, a3);
                 auto c0 = Op::vec(a0, b0, vscalar), c1 = Op::vec(a1, b0, vscalar),
@@ -1031,11 +1031,11 @@ static int vecBinaryKernel(const void* src0_, size_t s0y, size_t s0x,
                 v_store_pair_as(dst + x + VECSZ*2, c2, c3);
             }
         }
-        else {
+        अण्णहा {
             vx_setall_as(src0, b0);
             b0 = Op::preproc(b0, vscalar);
-            for (; x < width; x += VECSZ*4) {
-                if (x + VECSZ*4 > width) { if (!use_tail_trick) break; x = width - VECSZ*4; }
+            प्रति (; x < width; x += VECSZ*4) {
+                जइ (x + VECSZ*4 > width) { जइ (!use_tail_trick) भङ्ग; x = width - VECSZ*4; }
                 vx_load_pair_as(src1 + x, a0, a1);
                 vx_load_pair_as(src1 + x + VECSZ*2, a2, a3);
                 auto c0 = Op::vec(b0, a0, vscalar), c1 = Op::vec(b0, a1, vscalar),
@@ -1045,13 +1045,13 @@ static int vecBinaryKernel(const void* src0_, size_t s0y, size_t s0x,
             }
         }
     #endif
-        for (; x < width; x++)
+        प्रति (; x < width; x++)
             dst[x] = saturate_cast<Tr>(Op::scl((WT)src0[x*s0x], (WT)src1[x*s1x], scalar));
     }
-#if (CV_SIMD || CV_SIMD_SCALABLE)
+#जइ (CV_SIMD || CV_SIMD_SCALABLE)
     vx_cleanup();
 #endif
-    return 0;
+    प्रत्यागम 0;
 }
 
 // ===========================================================================
@@ -1063,165 +1063,165 @@ static int vecBinaryKernel(const void* src0_, size_t s0y, size_t s0x,
 //    (32-bit lanes via the local v_add_sat/v_sub_sat - v_add/v_sub wrap there);
 //  - widening f32-hub (Wvec = v_float32, use_simd=true) for the widened/half/float outputs;
 //  - scalar (use_simd=false) for 64-bit results and f64 (no vector path yet).
-template<class Op>
-TKernel getAddSubFunc(int T, int R)
+template<वर्ग Op>
+TKernel getAddSubFunc(पूर्णाङ्क T, पूर्णाङ्क R)
 {
     KernelFunc fptr = nullptr;
-    switch (T)
+    विकल्प (T)
     {
-    case CV_8U:
-        fptr = R == CV_8U ? vecBinaryKernel<uchar, uchar, v_uint8, short, Op, uchar> :
-               R == CV_16S ? vecBinaryKernel<uchar, short, v_int16, short, Op, short> :
-               R == CV_32S ? vecBinaryKernel<uchar, int, v_int16, short, Op, short> :
-               R == CV_32F ? vecBinaryKernel<uchar, float, v_int16, short, Op, short> : nullptr;
-        break;
-    case CV_8S:
+    पक्ष CV_8U:
+        fptr = R == CV_8U ? vec_द्विमान_Kernel<uchar, uchar, v_uint8, short, Op, uchar> :
+               R == CV_16S ? vec_द्विमान_Kernel<uchar, short, v_int16, short, Op, short> :
+               R == CV_32S ? vec_द्विमान_Kernel<uchar, पूर्णाङ्क, v_int16, short, Op, short> :
+               R == CV_32F ? vec_द्विमान_Kernel<uchar, भिन्न, v_int16, short, Op, short> : nullptr;
+        भङ्ग;
+    पक्ष CV_8S:
         fptr =
-            R == CV_8S ? vecBinaryKernel<schar, schar, v_int8, short, Op, schar> :
-            R == CV_16S ? vecBinaryKernel<schar, short, v_int16, short, Op, short> :
-            R == CV_32S ? vecBinaryKernel<schar, int, v_int16, short, Op, short> :
-            R == CV_32F ? vecBinaryKernel<schar, float, v_int16, short, Op, short> : nullptr;
-        break;
-    case CV_16U:
-        fptr = R == CV_16U ? vecBinaryKernel<ushort, ushort, v_uint16, int, Op, ushort> :
-               R == CV_32S ? vecBinaryKernel<ushort, int, v_int32, int, Op, int> :
-               R == CV_32F ? vecBinaryKernel<ushort, float, v_int32, int, Op, int> : nullptr;
-        break;
-    case CV_16S:
-        fptr = R == CV_16S ? vecBinaryKernel<short, short, v_int16, int, Op, short> :
-               R == CV_32S ? vecBinaryKernel<short, int,   v_int32, int, Op, int> :
-               R == CV_32F ? vecBinaryKernel<short, float, v_int32, int, Op, int> : nullptr;
-        break;
-    case CV_32U:
-        fptr = R == CV_32U ? vecBinaryKernel<unsigned, unsigned, v_uint32, int64_t, Op, unsigned> :
-                R == CV_64S ? scalarBinaryKernel<unsigned, int64_t, int64_t, Op> :
-                R == CV_64F ? scalarBinaryKernel<unsigned, double, int64_t, Op> : nullptr;
-        break;
-    case CV_32S:
-        fptr = R == CV_32S ? vecBinaryKernel<int, int, v_int32, int64_t, Op, int> :
-               R == CV_64S ? scalarBinaryKernel<int, int64_t, int64_t, Op> :
-               R == CV_64F ? scalarBinaryKernel<int, double, int64_t, Op> : nullptr;
-        break;
-    case CV_64U:
-        fptr = R == CV_64U ? scalarBinaryKernel<uint64_t, uint64_t, uint64_t, Op> :
-               R == CV_64F ? scalarBinaryKernel<uint64_t, double, double, Op> : nullptr;
-        break;
-    case CV_64S:
-        fptr = R == CV_64S ? scalarBinaryKernel<int64_t, int64_t, int64_t, Op> :
-               R == CV_64F ? scalarBinaryKernel<int64_t, double, double, Op> : nullptr;
-        break;
-    case CV_16F:
+            R == CV_8S ? vec_द्विमान_Kernel<schar, schar, v_int8, short, Op, schar> :
+            R == CV_16S ? vec_द्विमान_Kernel<schar, short, v_int16, short, Op, short> :
+            R == CV_32S ? vec_द्विमान_Kernel<schar, पूर्णाङ्क, v_int16, short, Op, short> :
+            R == CV_32F ? vec_द्विमान_Kernel<schar, भिन्न, v_int16, short, Op, short> : nullptr;
+        भङ्ग;
+    पक्ष CV_16U:
+        fptr = R == CV_16U ? vec_द्विमान_Kernel<ushort, ushort, v_uint16, पूर्णाङ्क, Op, ushort> :
+               R == CV_32S ? vec_द्विमान_Kernel<ushort, पूर्णाङ्क, v_int32, पूर्णाङ्क, Op, पूर्णाङ्क> :
+               R == CV_32F ? vec_द्विमान_Kernel<ushort, भिन्न, v_int32, पूर्णाङ्क, Op, पूर्णाङ्क> : nullptr;
+        भङ्ग;
+    पक्ष CV_16S:
+        fptr = R == CV_16S ? vec_द्विमान_Kernel<short, short, v_int16, पूर्णाङ्क, Op, short> :
+               R == CV_32S ? vec_द्विमान_Kernel<short, पूर्णाङ्क,   v_int32, पूर्णाङ्क, Op, पूर्णाङ्क> :
+               R == CV_32F ? vec_द्विमान_Kernel<short, भिन्न, v_int32, पूर्णाङ्क, Op, पूर्णाङ्क> : nullptr;
+        भङ्ग;
+    पक्ष CV_32U:
+        fptr = R == CV_32U ? vec_द्विमान_Kernel<unsigned, unsigned, v_uint32, int64_t, Op, unsigned> :
+                R == CV_64S ? scalar_द्विमान_Kernel<unsigned, int64_t, int64_t, Op> :
+                R == CV_64F ? scalar_द्विमान_Kernel<unsigned, द्विगुण, int64_t, Op> : nullptr;
+        भङ्ग;
+    पक्ष CV_32S:
+        fptr = R == CV_32S ? vec_द्विमान_Kernel<पूर्णाङ्क, पूर्णाङ्क, v_int32, int64_t, Op, पूर्णाङ्क> :
+               R == CV_64S ? scalar_द्विमान_Kernel<पूर्णाङ्क, int64_t, int64_t, Op> :
+               R == CV_64F ? scalar_द्विमान_Kernel<पूर्णाङ्क, द्विगुण, int64_t, Op> : nullptr;
+        भङ्ग;
+    पक्ष CV_64U:
+        fptr = R == CV_64U ? scalar_द्विमान_Kernel<uint64_t, uint64_t, uint64_t, Op> :
+               R == CV_64F ? scalar_द्विमान_Kernel<uint64_t, द्विगुण, द्विगुण, Op> : nullptr;
+        भङ्ग;
+    पक्ष CV_64S:
+        fptr = R == CV_64S ? scalar_द्विमान_Kernel<int64_t, int64_t, int64_t, Op> :
+               R == CV_64F ? scalar_द्विमान_Kernel<int64_t, द्विगुण, द्विगुण, Op> : nullptr;
+        भङ्ग;
+    पक्ष CV_16F:
         fptr =
-        #if CV_SIMD_16F
-        R == CV_16F ? vecBinaryKernel<hfloat, hfloat, v_float16, float, Op, hfloat> :
-        #else
-        R == CV_16F ? vecBinaryKernel<hfloat, hfloat, v_float32, float, Op, float> :
+        #जइ CV_SIMD_16F
+        R == CV_16F ? vec_द्विमान_Kernel<hfloat, hfloat, v_float16, भिन्न, Op, hfloat> :
+        #अण्णहा
+        R == CV_16F ? vec_द्विमान_Kernel<hfloat, hfloat, v_float32, भिन्न, Op, भिन्न> :
         #endif
-        R == CV_32F ? vecBinaryKernel<hfloat, float, v_float32, float, Op, float> : nullptr;
-        break;
-    case CV_16BF:
+        R == CV_32F ? vec_द्विमान_Kernel<hfloat, भिन्न, v_float32, भिन्न, Op, भिन्न> : nullptr;
+        भङ्ग;
+    पक्ष CV_16BF:
         fptr =
-            R == CV_16BF ? vecBinaryKernel<bfloat, bfloat, v_float32, float, Op, float> :
-            R == CV_32F ? vecBinaryKernel<bfloat, float,  v_float32, float, Op, float> : nullptr;
-        break;
-    case CV_32F:
-        fptr = R == CV_32F ? vecBinaryKernel<float, float, v_float32, float, Op, float> : nullptr;
-        break;
-    case CV_64F:
-        #if CV_SIMD_64F || CV_SIMD_SCALABLE_64F
-        fptr = R == CV_64F ? vecBinaryKernel<double, double, v_float64, double, Op> : nullptr;
-        #else
-        fptr = R == CV_64F ? scalarBinaryKernel<double, double, double, Op> : nullptr;
+            R == CV_16BF ? vec_द्विमान_Kernel<bfloat, bfloat, v_float32, भिन्न, Op, भिन्न> :
+            R == CV_32F ? vec_द्विमान_Kernel<bfloat, भिन्न,  v_float32, भिन्न, Op, भिन्न> : nullptr;
+        भङ्ग;
+    पक्ष CV_32F:
+        fptr = R == CV_32F ? vec_द्विमान_Kernel<भिन्न, भिन्न, v_float32, भिन्न, Op, भिन्न> : nullptr;
+        भङ्ग;
+    पक्ष CV_64F:
+        #जइ CV_SIMD_64F || CV_SIMD_SCALABLE_64F
+        fptr = R == CV_64F ? vec_द्विमान_Kernel<द्विगुण, द्विगुण, v_float64, द्विगुण, Op> : nullptr;
+        #अण्णहा
+        fptr = R == CV_64F ? scalar_द्विमान_Kernel<द्विगुण, द्विगुण, द्विगुण, Op> : nullptr;
         #endif
-        break;
-    default:
+        भङ्ग;
+    स्वभाव:
         ;
     }
-    return {fptr, nullptr, 0};
+    प्रत्यागम {fptr, nullptr, 0};
 }
 
-TKernel getMulFunc_(int T, int R)
+TKernel getMulFunc_(पूर्णाङ्क T, पूर्णाङ्क R)
 {
     KernelFunc fptr = nullptr;
-    switch (T)
+    विकल्प (T)
     {
-    case CV_8U:
+    पक्ष CV_8U:
         fptr =   // scale==1 fast path: whole u8 registers, v_mul_sat widens+clamps inside; Wvec=f32 for scale
-            R == CV_8U ? vecBinaryKernel<uchar, uchar, v_float32, float, EwMul, float, v_uint8> :
-            R == CV_32F ? vecBinaryKernel<uchar, float, v_float32, float, EwMul> : nullptr;
-        break;
-    case CV_8S:
+            R == CV_8U ? vec_द्विमान_Kernel<uchar, uchar, v_float32, भिन्न, EwMul, भिन्न, v_uint8> :
+            R == CV_32F ? vec_द्विमान_Kernel<uchar, भिन्न, v_float32, भिन्न, EwMul> : nullptr;
+        भङ्ग;
+    पक्ष CV_8S:
         fptr =   // scale==1 fast path: whole s8 registers via v_mul_sat; Wvec=f32 for scale
-            R == CV_8S ? vecBinaryKernel<schar, schar, v_float32, float, EwMul, float, v_int8> :
-            R == CV_32F ? vecBinaryKernel<schar, float, v_float32, float, EwMul> : nullptr;
-        break;
-    case CV_16U:
+            R == CV_8S ? vec_द्विमान_Kernel<schar, schar, v_float32, भिन्न, EwMul, भिन्न, v_int8> :
+            R == CV_32F ? vec_द्विमान_Kernel<schar, भिन्न, v_float32, भिन्न, EwMul> : nullptr;
+        भङ्ग;
+    पक्ष CV_16U:
         fptr =   // scale==1 fast path: whole u16 registers via v_mul_sat; Wvec=f32 for scale
-            R == CV_16U ? vecBinaryKernel<ushort, ushort, v_float32, float, EwMul, float, v_uint16> :
-            R == CV_32F ? vecBinaryKernel<ushort, float,  v_float32, float, EwMul> : nullptr;
-        break;
-    case CV_16S:
+            R == CV_16U ? vec_द्विमान_Kernel<ushort, ushort, v_float32, भिन्न, EwMul, भिन्न, v_uint16> :
+            R == CV_32F ? vec_द्विमान_Kernel<ushort, भिन्न,  v_float32, भिन्न, EwMul> : nullptr;
+        भङ्ग;
+    पक्ष CV_16S:
         fptr =   // scale==1 fast path: whole s16 registers via v_mul_sat; Wvec=f32 for scale
-            R == CV_16S ? vecBinaryKernel<short, short, v_float32, float, EwMul, float, v_int16> :
-            R == CV_32F ? vecBinaryKernel<short, float, v_float32, float, EwMul> : nullptr;
-        break;
-    case CV_16F:
+            R == CV_16S ? vec_द्विमान_Kernel<short, short, v_float32, भिन्न, EwMul, भिन्न, v_int16> :
+            R == CV_32F ? vec_द्विमान_Kernel<short, भिन्न, v_float32, भिन्न, EwMul> : nullptr;
+        भङ्ग;
+    पक्ष CV_16F:
         fptr =
-            R == CV_16F ? vecBinaryKernel<hfloat, hfloat, v_float32, float, EwMul> :
-            R == CV_32F ? vecBinaryKernel<hfloat, float,  v_float32, float, EwMul> : nullptr;
-        break;
-    case CV_16BF:
+            R == CV_16F ? vec_द्विमान_Kernel<hfloat, hfloat, v_float32, भिन्न, EwMul> :
+            R == CV_32F ? vec_द्विमान_Kernel<hfloat, भिन्न,  v_float32, भिन्न, EwMul> : nullptr;
+        भङ्ग;
+    पक्ष CV_16BF:
         fptr =
-            R == CV_16BF ? vecBinaryKernel<bfloat, bfloat, v_float32, float, EwMul> :
-            R == CV_32F ? vecBinaryKernel<bfloat, float,  v_float32, float, EwMul> : nullptr;
-        break;
-    case CV_32F:
-        fptr = R == CV_32F ? vecBinaryKernel<float, float, v_float32, float, EwMul> : nullptr;
-        break;
-    case CV_32U:
+            R == CV_16BF ? vec_द्विमान_Kernel<bfloat, bfloat, v_float32, भिन्न, EwMul> :
+            R == CV_32F ? vec_द्विमान_Kernel<bfloat, भिन्न,  v_float32, भिन्न, EwMul> : nullptr;
+        भङ्ग;
+    पक्ष CV_32F:
+        fptr = R == CV_32F ? vec_द्विमान_Kernel<भिन्न, भिन्न, v_float32, भिन्न, EwMul> : nullptr;
+        भङ्ग;
+    पक्ष CV_32U:
         fptr =   // scale==1 fast path (where v_mul_sat32 exists): whole u32 registers, widening
                  // multiply + saturating narrow; the f64 work vector serves the scale path
-        #if defined(EW_HAVE_MULSAT32) && (CV_SIMD_64F || CV_SIMD_SCALABLE_64F)
-            R == CV_32U ? vecBinaryKernel<unsigned, unsigned, v_float64, double, EwMul, double, v_uint32> :
-            R == CV_64F ? vecBinaryKernel<unsigned, double,   v_float64, double, EwMul> : nullptr;
-        #elif CV_SIMD_64F || CV_SIMD_SCALABLE_64F
-            R == CV_32U ? vecBinaryKernel<unsigned, unsigned, v_float64, double, EwMul> :
-            R == CV_64F ? vecBinaryKernel<unsigned, double,   v_float64, double, EwMul> : nullptr;
-        #else
-            R == CV_32U ? scalarBinaryKernel<unsigned, unsigned, double, EwMul> :
-            R == CV_64F ? scalarBinaryKernel<unsigned, double,   double, EwMul> : nullptr;
+        #जइ defined(EW_HAVE_MULSAT32) && (CV_SIMD_64F || CV_SIMD_SCALABLE_64F)
+            R == CV_32U ? vec_द्विमान_Kernel<unsigned, unsigned, v_float64, द्विगुण, EwMul, द्विगुण, v_uint32> :
+            R == CV_64F ? vec_द्विमान_Kernel<unsigned, द्विगुण,   v_float64, द्विगुण, EwMul> : nullptr;
+        #नोचेद्यदि CV_SIMD_64F || CV_SIMD_SCALABLE_64F
+            R == CV_32U ? vec_द्विमान_Kernel<unsigned, unsigned, v_float64, द्विगुण, EwMul> :
+            R == CV_64F ? vec_द्विमान_Kernel<unsigned, द्विगुण,   v_float64, द्विगुण, EwMul> : nullptr;
+        #अण्णहा
+            R == CV_32U ? scalar_द्विमान_Kernel<unsigned, unsigned, द्विगुण, EwMul> :
+            R == CV_64F ? scalar_द्विमान_Kernel<unsigned, द्विगुण,   द्विगुण, EwMul> : nullptr;
         #endif
-        break;
-    case CV_32S:
+        भङ्ग;
+    पक्ष CV_32S:
         fptr =   // scale==1 fast path: see CV_32U
-        #if defined(EW_HAVE_MULSAT32) && (CV_SIMD_64F || CV_SIMD_SCALABLE_64F)
-            R == CV_32S ? vecBinaryKernel<int, int,    v_float64, double, EwMul, double, v_int32> :
-            R == CV_64F ? vecBinaryKernel<int, double, v_float64, double, EwMul> : nullptr;
-        #elif CV_SIMD_64F || CV_SIMD_SCALABLE_64F
-            R == CV_32S ? vecBinaryKernel<int, int,    v_float64, double, EwMul> :
-            R == CV_64F ? vecBinaryKernel<int, double, v_float64, double, EwMul> : nullptr;
-        #else
-            R == CV_32S ? scalarBinaryKernel<int, int,    double, EwMul> :
-            R == CV_64F ? scalarBinaryKernel<int, double, double, EwMul> : nullptr;
+        #जइ defined(EW_HAVE_MULSAT32) && (CV_SIMD_64F || CV_SIMD_SCALABLE_64F)
+            R == CV_32S ? vec_द्विमान_Kernel<पूर्णाङ्क, पूर्णाङ्क,    v_float64, द्विगुण, EwMul, द्विगुण, v_int32> :
+            R == CV_64F ? vec_द्विमान_Kernel<पूर्णाङ्क, द्विगुण, v_float64, द्विगुण, EwMul> : nullptr;
+        #नोचेद्यदि CV_SIMD_64F || CV_SIMD_SCALABLE_64F
+            R == CV_32S ? vec_द्विमान_Kernel<पूर्णाङ्क, पूर्णाङ्क,    v_float64, द्विगुण, EwMul> :
+            R == CV_64F ? vec_द्विमान_Kernel<पूर्णाङ्क, द्विगुण, v_float64, द्विगुण, EwMul> : nullptr;
+        #अण्णहा
+            R == CV_32S ? scalar_द्विमान_Kernel<पूर्णाङ्क, पूर्णाङ्क,    द्विगुण, EwMul> :
+            R == CV_64F ? scalar_द्विमान_Kernel<पूर्णाङ्क, द्विगुण, द्विगुण, EwMul> : nullptr;
         #endif
-        break;
-    case CV_64U:
-        fptr = R == CV_64F ? scalarBinaryKernel<uint64_t, double, double, EwMul> : nullptr;
-        break;
-    case CV_64S:
-        fptr = R == CV_64F ? scalarBinaryKernel<int64_t,  double, double, EwMul> : nullptr;
-        break;
-    case CV_64F:
-        #if CV_SIMD_64F || CV_SIMD_SCALABLE_64F
-        fptr = R == CV_64F ? vecBinaryKernel<double, double, v_float64, double, EwMul> : nullptr;
-        #else
-        fptr = R == CV_64F ? scalarBinaryKernel<double,   double, double, EwMul> : nullptr;
+        भङ्ग;
+    पक्ष CV_64U:
+        fptr = R == CV_64F ? scalar_द्विमान_Kernel<uint64_t, द्विगुण, द्विगुण, EwMul> : nullptr;
+        भङ्ग;
+    पक्ष CV_64S:
+        fptr = R == CV_64F ? scalar_द्विमान_Kernel<int64_t,  द्विगुण, द्विगुण, EwMul> : nullptr;
+        भङ्ग;
+    पक्ष CV_64F:
+        #जइ CV_SIMD_64F || CV_SIMD_SCALABLE_64F
+        fptr = R == CV_64F ? vec_द्विमान_Kernel<द्विगुण, द्विगुण, v_float64, द्विगुण, EwMul> : nullptr;
+        #अण्णहा
+        fptr = R == CV_64F ? scalar_द्विमान_Kernel<द्विगुण,   द्विगुण, द्विगुण, EwMul> : nullptr;
         #endif
-        break;
-    default:
+        भङ्ग;
+    स्वभाव:
         ;
     }
-    return {fptr, nullptr, 0};
+    प्रत्यागम {fptr, nullptr, 0};
 }
 
 // `checked` (decided by the CALLER from the ORIGINAL input types) selects the divide-by-zero
@@ -1229,166 +1229,166 @@ TKernel getMulFunc_(int T, int R)
 // EwDivFlt does not (a/0 -> inf, saturating on a later cast, as cv::divide does for float inputs).
 // It must apply on EVERY row - two wide integers (e.g. 32U / 64S) promote to a 64F work type yet
 // still need the integer guard, so the float-work rows can't hardcode EwDivFlt.
-TKernel getDivFunc_(int T, int R, bool checked)
+TKernel getDivFunc_(पूर्णाङ्क T, पूर्णाङ्क R, तार्किक checked)
 {
     KernelFunc fptr = nullptr;
     // SIMD via vecBinaryKernel: div scales the numerator in vec (a*scale/b), EwDivFlt (float a/0 -> inf,
     // saturates on cast) / EwDivInt (v_select guards b==0 -> 0 post-facto). Prefer a DIRECT T->T kernel
     // (1 pass, saturate on store) - emitBinary probes result==T first; a T->f32/f64 kernel serves an
     // explicit float dtype. Work type: f32 for <=16-bit/f16/bf16/f32; f64 for 32/64-bit.
-    #define DIV(T_, Tr_, Wv_, W_) (checked ? vecBinaryKernel<T_, Tr_, Wv_, W_, EwDivInt> \
-                                           : vecBinaryKernel<T_, Tr_, Wv_, W_, EwDivFlt>)
-#if CV_SIMD_64F || CV_SIMD_SCALABLE_64F
-    #define DIVW(T_, Tr_) DIV(T_, Tr_, v_float64, double)                 // 32/64-bit, f64 SIMD
-#else
-    #define DIVW(T_, Tr_) (checked ? scalarBinaryKernel<T_, Tr_, double, EwDivInt> \
-                                    : scalarBinaryKernel<T_, Tr_, double, EwDivFlt>)
+    #define DIV(T_, Tr_, Wv_, W_) (checked ? vec_द्विमान_Kernel<T_, Tr_, Wv_, W_, EwDivInt> \
+                                           : vec_द्विमान_Kernel<T_, Tr_, Wv_, W_, EwDivFlt>)
+#जइ CV_SIMD_64F || CV_SIMD_SCALABLE_64F
+    #define DIVW(T_, Tr_) DIV(T_, Tr_, v_float64, द्विगुण)                 // 32/64-bit, f64 SIMD
+#अण्णहा
+    #define DIVW(T_, Tr_) (checked ? scalar_द्विमान_Kernel<T_, Tr_, द्विगुण, EwDivInt> \
+                                    : scalar_द्विमान_Kernel<T_, Tr_, द्विगुण, EwDivFlt>)
 #endif
-    switch (T)
+    विकल्प (T)
     {
-    case CV_8U:   fptr = R==CV_8U  ? DIV(uchar,  uchar,  v_float32, float) : R==CV_32F ? DIV(uchar,  float, v_float32, float) : nullptr; break;
-    case CV_8S:   fptr = R==CV_8S  ? DIV(schar,  schar,  v_float32, float) : R==CV_32F ? DIV(schar,  float, v_float32, float) : nullptr; break;
-    case CV_16U:  fptr = R==CV_16U ? DIV(ushort, ushort, v_float32, float) : R==CV_32F ? DIV(ushort, float, v_float32, float) : nullptr; break;
-    case CV_16S:  fptr = R==CV_16S ? DIV(short,  short,  v_float32, float) : R==CV_32F ? DIV(short,  float, v_float32, float) : nullptr; break;
-    case CV_16F:  fptr = R==CV_16F ? DIV(hfloat, hfloat, v_float32, float) : R==CV_32F ? DIV(hfloat, float, v_float32, float) : nullptr; break;
-    case CV_16BF: fptr = R==CV_16BF? DIV(bfloat, bfloat, v_float32, float) : R==CV_32F ? DIV(bfloat, float, v_float32, float) : nullptr; break;
-    case CV_32F:  fptr = R==CV_32F ? DIV(float,  float,  v_float32, float) : nullptr; break;
-    case CV_32U:  fptr = R==CV_32U ? DIVW(unsigned, unsigned) : R==CV_64F ? DIVW(unsigned, double) : nullptr; break;
-    case CV_32S:  fptr = R==CV_32S ? DIVW(int,      int)      : R==CV_64F ? DIVW(int,      double) : nullptr; break;
-    case CV_64U:  fptr = R==CV_64F ? DIVW(uint64_t, double) : nullptr; break;
-    case CV_64S:  fptr = R==CV_64F ? DIVW(int64_t,  double) : nullptr; break;
-    case CV_64F:  fptr = R==CV_64F ? DIVW(double,   double) : nullptr; break;
-    default:      ;
+    पक्ष CV_8U:   fptr = R==CV_8U  ? DIV(uchar,  uchar,  v_float32, भिन्न) : R==CV_32F ? DIV(uchar,  भिन्न, v_float32, भिन्न) : nullptr; भङ्ग;
+    पक्ष CV_8S:   fptr = R==CV_8S  ? DIV(schar,  schar,  v_float32, भिन्न) : R==CV_32F ? DIV(schar,  भिन्न, v_float32, भिन्न) : nullptr; भङ्ग;
+    पक्ष CV_16U:  fptr = R==CV_16U ? DIV(ushort, ushort, v_float32, भिन्न) : R==CV_32F ? DIV(ushort, भिन्न, v_float32, भिन्न) : nullptr; भङ्ग;
+    पक्ष CV_16S:  fptr = R==CV_16S ? DIV(short,  short,  v_float32, भिन्न) : R==CV_32F ? DIV(short,  भिन्न, v_float32, भिन्न) : nullptr; भङ्ग;
+    पक्ष CV_16F:  fptr = R==CV_16F ? DIV(hfloat, hfloat, v_float32, भिन्न) : R==CV_32F ? DIV(hfloat, भिन्न, v_float32, भिन्न) : nullptr; भङ्ग;
+    पक्ष CV_16BF: fptr = R==CV_16BF? DIV(bfloat, bfloat, v_float32, भिन्न) : R==CV_32F ? DIV(bfloat, भिन्न, v_float32, भिन्न) : nullptr; भङ्ग;
+    पक्ष CV_32F:  fptr = R==CV_32F ? DIV(भिन्न,  भिन्न,  v_float32, भिन्न) : nullptr; भङ्ग;
+    पक्ष CV_32U:  fptr = R==CV_32U ? DIVW(unsigned, unsigned) : R==CV_64F ? DIVW(unsigned, द्विगुण) : nullptr; भङ्ग;
+    पक्ष CV_32S:  fptr = R==CV_32S ? DIVW(पूर्णाङ्क,      पूर्णाङ्क)      : R==CV_64F ? DIVW(पूर्णाङ्क,      द्विगुण) : nullptr; भङ्ग;
+    पक्ष CV_64U:  fptr = R==CV_64F ? DIVW(uint64_t, द्विगुण) : nullptr; भङ्ग;
+    पक्ष CV_64S:  fptr = R==CV_64F ? DIVW(int64_t,  द्विगुण) : nullptr; भङ्ग;
+    पक्ष CV_64F:  fptr = R==CV_64F ? DIVW(द्विगुण,   द्विगुण) : nullptr; भङ्ग;
+    स्वभाव:      ;
     }
     #undef DIV
     #undef DIVW
-    return {fptr, nullptr, 0};
+    प्रत्यागम {fptr, nullptr, 0};
 }
 
 
 // min / max: T x T -> T for every depth. Native v_min/v_max on the matching lane type (8/16/32-bit
 // ints, f16/bf16/f32); 64-bit ints use the scalar path. Op = EwMin or EwMax.
-template<class Op>
-static TKernel getMinMaxFunc(int T)
+template<वर्ग Op>
+स्थिर TKernel getMinMaxFunc(पूर्णाङ्क T)
 {
     KernelFunc fptr = nullptr;
-    switch (T)
+    विकल्प (T)
     {
-    case CV_8U:   fptr = vecBinaryKernel<uchar,    uchar,    v_uint8,   short,   Op, uchar>; break;
-    case CV_8S:   fptr = vecBinaryKernel<schar,    schar,    v_int8,    short,   Op, schar>; break;
-    case CV_16U:  fptr = vecBinaryKernel<ushort,   ushort,   v_uint16,  int,     Op, ushort>; break;
-    case CV_16S:  fptr = vecBinaryKernel<short,    short,    v_int16,   int,     Op, short>; break;
-    case CV_32U:  fptr = vecBinaryKernel<unsigned, unsigned, v_uint32,  int64_t, Op, unsigned>; break;
-    case CV_32S:  fptr = vecBinaryKernel<int,      int,      v_int32,   int64_t, Op, int>; break;
-    case CV_16F:
-        #if CV_SIMD_16F
-        fptr = vecBinaryKernel<hfloat,   hfloat,   v_float16, float,   Op, hfloat>;
-        #else
-        fptr = vecBinaryKernel<hfloat,   hfloat,   v_float32, float,   Op, float>;
+    पक्ष CV_8U:   fptr = vec_द्विमान_Kernel<uchar,    uchar,    v_uint8,   short,   Op, uchar>; भङ्ग;
+    पक्ष CV_8S:   fptr = vec_द्विमान_Kernel<schar,    schar,    v_int8,    short,   Op, schar>; भङ्ग;
+    पक्ष CV_16U:  fptr = vec_द्विमान_Kernel<ushort,   ushort,   v_uint16,  पूर्णाङ्क,     Op, ushort>; भङ्ग;
+    पक्ष CV_16S:  fptr = vec_द्विमान_Kernel<short,    short,    v_int16,   पूर्णाङ्क,     Op, short>; भङ्ग;
+    पक्ष CV_32U:  fptr = vec_द्विमान_Kernel<unsigned, unsigned, v_uint32,  int64_t, Op, unsigned>; भङ्ग;
+    पक्ष CV_32S:  fptr = vec_द्विमान_Kernel<पूर्णाङ्क,      पूर्णाङ्क,      v_int32,   int64_t, Op, पूर्णाङ्क>; भङ्ग;
+    पक्ष CV_16F:
+        #जइ CV_SIMD_16F
+        fptr = vec_द्विमान_Kernel<hfloat,   hfloat,   v_float16, भिन्न,   Op, hfloat>;
+        #अण्णहा
+        fptr = vec_द्विमान_Kernel<hfloat,   hfloat,   v_float32, भिन्न,   Op, भिन्न>;
         #endif
-        break;
-    case CV_16BF: fptr = vecBinaryKernel<bfloat, bfloat, v_float32, float, Op, float>; break;
-    case CV_32F:  fptr = vecBinaryKernel<float, float, v_float32, float, Op, float>; break;
-    case CV_64U:  fptr = scalarBinaryKernel<uint64_t, uint64_t, uint64_t, Op>; break;
-    case CV_64S:  fptr = scalarBinaryKernel<int64_t,  int64_t,  int64_t,  Op>; break;
-    #if CV_SIMD_64F || CV_SIMD_SCALABLE_64F
-    case CV_64F:  fptr = vecBinaryKernel<double, double, v_float64, double, Op, double>; break;
-    #else
-    case CV_64F:  fptr = scalarBinaryKernel<double,   double,   double,   Op>; break;
+        भङ्ग;
+    पक्ष CV_16BF: fptr = vec_द्विमान_Kernel<bfloat, bfloat, v_float32, भिन्न, Op, भिन्न>; भङ्ग;
+    पक्ष CV_32F:  fptr = vec_द्विमान_Kernel<भिन्न, भिन्न, v_float32, भिन्न, Op, भिन्न>; भङ्ग;
+    पक्ष CV_64U:  fptr = scalar_द्विमान_Kernel<uint64_t, uint64_t, uint64_t, Op>; भङ्ग;
+    पक्ष CV_64S:  fptr = scalar_द्विमान_Kernel<int64_t,  int64_t,  int64_t,  Op>; भङ्ग;
+    #जइ CV_SIMD_64F || CV_SIMD_SCALABLE_64F
+    पक्ष CV_64F:  fptr = vec_द्विमान_Kernel<द्विगुण, द्विगुण, v_float64, द्विगुण, Op, द्विगुण>; भङ्ग;
+    #अण्णहा
+    पक्ष CV_64F:  fptr = scalar_द्विमान_Kernel<द्विगुण,   द्विगुण,   द्विगुण,   Op>; भङ्ग;
     #endif
-    default:      ;
+    स्वभाव:      ;
     }
-    return {fptr, nullptr, 0};
+    प्रत्यागम {fptr, nullptr, 0};
 }
 
 // absdiff: |a-b|, T x T -> R.
-TKernel getAbsdiffFunc_(int T, int R)
+TKernel getAbsdiffFunc_(पूर्णाङ्क T, पूर्णाङ्क R)
 {
     // Signed T has TWO outputs: R==T -> EwAbsdiffS (saturating |a-b| kept in the signed range, native work,
     // ONE pass - the depth cv::absdiff keeps); R==(the unsigned type of the same width) -> EwAbsdiff (the
     // true |a-b| via v_absdiff, for an explicit unsigned dst). Unsigned/float T only produce R==T. Each case
     // returns nullptr for a wrong R (no separate rdepth guard).
     KernelFunc fptr = nullptr;
-    switch (T)
+    विकल्प (T)
     {
-    case CV_8U:   fptr = R == CV_8U  ? vecBinaryKernel<uchar,  uchar,  v_uint8,  short,   EwAbsdiff, uchar>  : nullptr; break;
-    case CV_16U:  fptr = R == CV_16U ? vecBinaryKernel<ushort, ushort, v_uint16, int,     EwAbsdiff, ushort> : nullptr; break;
-    case CV_32U:  fptr = R == CV_32U ? vecBinaryKernel<unsigned, unsigned, v_uint32, int64_t, EwAbsdiff, unsigned> : nullptr; break;
-    case CV_8S:   fptr = R == CV_8S  ? vecBinaryKernel<schar, schar, v_int8,  short,   EwAbsdiffS, schar> :
-                         R == CV_8U  ? vecBinaryKernel<schar, uchar, v_int8,  short,   EwAbsdiff,  schar> : nullptr; break;
-    case CV_16S:  fptr = R == CV_16S ? vecBinaryKernel<short, short, v_int16, int,     EwAbsdiffS, short> :
-                         R == CV_16U ? vecBinaryKernel<short, ushort, v_int16, int,     EwAbsdiff,  short> : nullptr; break;
-    case CV_32S:  fptr = R == CV_32S ? vecBinaryKernel<int,   int,   v_int32, int64_t, EwAbsdiffS, int> :
-                         R == CV_32U ? vecBinaryKernel<int, unsigned, v_int32, int64_t, EwAbsdiff,  int> : nullptr; break;
-    #if CV_SIMD_16F
-    case CV_16F:  fptr = R == CV_16F ? vecBinaryKernel<hfloat, hfloat, v_float16, float, EwAbsdiff, hfloat> : nullptr; break;
-    #else
-    case CV_16F:  fptr = R == CV_16F ? vecBinaryKernel<hfloat, hfloat, v_float32, float, EwAbsdiff, float>  : nullptr; break;
+    पक्ष CV_8U:   fptr = R == CV_8U  ? vec_द्विमान_Kernel<uchar,  uchar,  v_uint8,  short,   EwAbsdiff, uchar>  : nullptr; भङ्ग;
+    पक्ष CV_16U:  fptr = R == CV_16U ? vec_द्विमान_Kernel<ushort, ushort, v_uint16, पूर्णाङ्क,     EwAbsdiff, ushort> : nullptr; भङ्ग;
+    पक्ष CV_32U:  fptr = R == CV_32U ? vec_द्विमान_Kernel<unsigned, unsigned, v_uint32, int64_t, EwAbsdiff, unsigned> : nullptr; भङ्ग;
+    पक्ष CV_8S:   fptr = R == CV_8S  ? vec_द्विमान_Kernel<schar, schar, v_int8,  short,   EwAbsdiffS, schar> :
+                         R == CV_8U  ? vec_द्विमान_Kernel<schar, uchar, v_int8,  short,   EwAbsdiff,  schar> : nullptr; भङ्ग;
+    पक्ष CV_16S:  fptr = R == CV_16S ? vec_द्विमान_Kernel<short, short, v_int16, पूर्णाङ्क,     EwAbsdiffS, short> :
+                         R == CV_16U ? vec_द्विमान_Kernel<short, ushort, v_int16, पूर्णाङ्क,     EwAbsdiff,  short> : nullptr; भङ्ग;
+    पक्ष CV_32S:  fptr = R == CV_32S ? vec_द्विमान_Kernel<पूर्णाङ्क,   पूर्णाङ्क,   v_int32, int64_t, EwAbsdiffS, पूर्णाङ्क> :
+                         R == CV_32U ? vec_द्विमान_Kernel<पूर्णाङ्क, unsigned, v_int32, int64_t, EwAbsdiff,  पूर्णाङ्क> : nullptr; भङ्ग;
+    #जइ CV_SIMD_16F
+    पक्ष CV_16F:  fptr = R == CV_16F ? vec_द्विमान_Kernel<hfloat, hfloat, v_float16, भिन्न, EwAbsdiff, hfloat> : nullptr; भङ्ग;
+    #अण्णहा
+    पक्ष CV_16F:  fptr = R == CV_16F ? vec_द्विमान_Kernel<hfloat, hfloat, v_float32, भिन्न, EwAbsdiff, भिन्न>  : nullptr; भङ्ग;
     #endif
-    case CV_16BF: fptr = R == CV_16BF ? vecBinaryKernel<bfloat, bfloat, v_float32, float, EwAbsdiff, float> : nullptr; break;
-    case CV_32F:  fptr = R == CV_32F  ? vecBinaryKernel<float,  float,  v_float32, float, EwAbsdiff, float> : nullptr; break;
-    case CV_64U:  fptr = R == CV_64U  ? scalarBinaryKernel<uint64_t, uint64_t, uint64_t, EwAbsdiff> : nullptr; break;
-    case CV_64S:  fptr = R == CV_64S  ? scalarBinaryKernel<int64_t,  int64_t,  int64_t,  EwAbsdiffS> :
-                         R == CV_64U  ? scalarBinaryKernel<int64_t,  uint64_t, int64_t,  EwAbsdiff> : nullptr; break;
-    #if CV_SIMD_64F || CV_SIMD_SCALABLE_64F
-    case CV_64F:  fptr = R == CV_64F  ? vecBinaryKernel<double, double, v_float64, double, EwAbsdiff, double> : nullptr; break;
-    #else
-    case CV_64F:  fptr = R == CV_64F  ? scalarBinaryKernel<double, double, double, EwAbsdiff> : nullptr; break;
+    पक्ष CV_16BF: fptr = R == CV_16BF ? vec_द्विमान_Kernel<bfloat, bfloat, v_float32, भिन्न, EwAbsdiff, भिन्न> : nullptr; भङ्ग;
+    पक्ष CV_32F:  fptr = R == CV_32F  ? vec_द्विमान_Kernel<भिन्न,  भिन्न,  v_float32, भिन्न, EwAbsdiff, भिन्न> : nullptr; भङ्ग;
+    पक्ष CV_64U:  fptr = R == CV_64U  ? scalar_द्विमान_Kernel<uint64_t, uint64_t, uint64_t, EwAbsdiff> : nullptr; भङ्ग;
+    पक्ष CV_64S:  fptr = R == CV_64S  ? scalar_द्विमान_Kernel<int64_t,  int64_t,  int64_t,  EwAbsdiffS> :
+                         R == CV_64U  ? scalar_द्विमान_Kernel<int64_t,  uint64_t, int64_t,  EwAbsdiff> : nullptr; भङ्ग;
+    #जइ CV_SIMD_64F || CV_SIMD_SCALABLE_64F
+    पक्ष CV_64F:  fptr = R == CV_64F  ? vec_द्विमान_Kernel<द्विगुण, द्विगुण, v_float64, द्विगुण, EwAbsdiff, द्विगुण> : nullptr; भङ्ग;
+    #अण्णहा
+    पक्ष CV_64F:  fptr = R == CV_64F  ? scalar_द्विमान_Kernel<द्विगुण, द्विगुण, द्विगुण, EwAbsdiff> : nullptr; भङ्ग;
     #endif
-    default:      ;
+    स्वभाव:      ;
     }
-    return {fptr, nullptr, 0};
+    प्रत्यागम {fptr, nullptr, 0};
 }
 
 // compare: T x T -> u8 mask. Directly-comparable depths (u8/s8/u16/s16/u32/s32/f32) take the SIMD
 // vecCompareKernel; f16/bf16 and 64-bit int depths fall back to scalarCompareKernel. The returned kernel
 // defaults to a 255 mask in TKernel::flags (cv::compare-compatible); kernel.flags=1 gives a 0/1 mask.
-template<class Cmp>
-static KernelFunc compareByType(int T)
+template<वर्ग Cmp>
+स्थिर KernelFunc compareByType(पूर्णाङ्क T)
 {
-    switch (T)
+    विकल्प (T)
     {
-    case CV_8U:   return vecCompareKernel<uchar,    v_uint8,   v_uint8,  Cmp>;
-    case CV_8S:   return vecCompareKernel<schar,    v_int8,    v_uint8,  Cmp>;
-    case CV_16U:  return vecCompareKernel<ushort,   v_uint16,  v_uint16, Cmp>;
-    case CV_16S:  return vecCompareKernel<short,    v_int16,   v_uint16, Cmp>;
-    case CV_32U:  return vecCompareKernel<unsigned, v_uint32,  v_uint32, Cmp>;
-    case CV_32S:  return vecCompareKernel<int,      v_int32,   v_uint32, Cmp>;
-    case CV_32F:  return vecCompareKernel<float,    v_float32, v_uint32, Cmp>;
-    #if CV_SIMD_16F
-    case CV_16F:  return vecCompareKernel<hfloat,   v_float16, v_uint16, Cmp>;
-    #else
-    case CV_16F:  return vecCompareKernel<hfloat,   v_float32, v_uint32, Cmp>;   // widen f16->f32
+    पक्ष CV_8U:   प्रत्यागम vecCompareKernel<uchar,    v_uint8,   v_uint8,  Cmp>;
+    पक्ष CV_8S:   प्रत्यागम vecCompareKernel<schar,    v_int8,    v_uint8,  Cmp>;
+    पक्ष CV_16U:  प्रत्यागम vecCompareKernel<ushort,   v_uint16,  v_uint16, Cmp>;
+    पक्ष CV_16S:  प्रत्यागम vecCompareKernel<short,    v_int16,   v_uint16, Cmp>;
+    पक्ष CV_32U:  प्रत्यागम vecCompareKernel<unsigned, v_uint32,  v_uint32, Cmp>;
+    पक्ष CV_32S:  प्रत्यागम vecCompareKernel<पूर्णाङ्क,      v_int32,   v_uint32, Cmp>;
+    पक्ष CV_32F:  प्रत्यागम vecCompareKernel<भिन्न,    v_float32, v_uint32, Cmp>;
+    #जइ CV_SIMD_16F
+    पक्ष CV_16F:  प्रत्यागम vecCompareKernel<hfloat,   v_float16, v_uint16, Cmp>;
+    #अण्णहा
+    पक्ष CV_16F:  प्रत्यागम vecCompareKernel<hfloat,   v_float32, v_uint32, Cmp>;   // widen f16->f32
     #endif
-    case CV_16BF: return vecCompareKernel<bfloat,   v_float32, v_uint32, Cmp>;   // widen bf16->f32 (no native)
-    case CV_64U:  return scalarCompareKernel<uint64_t, uint64_t, Cmp>;
-    case CV_64S:  return scalarCompareKernel<int64_t,  int64_t,  Cmp>;
-    #if CV_SIMD_64F || CV_SIMD_SCALABLE_64F
-    case CV_64F:  return vecCompareKernel<double,   v_float64, v_uint64, Cmp>;
-    #else
-    case CV_64F:  return scalarCompareKernel<double,   double,   Cmp>;
+    पक्ष CV_16BF: प्रत्यागम vecCompareKernel<bfloat,   v_float32, v_uint32, Cmp>;   // widen bf16->f32 (no native)
+    पक्ष CV_64U:  प्रत्यागम scalarCompareKernel<uint64_t, uint64_t, Cmp>;
+    पक्ष CV_64S:  प्रत्यागम scalarCompareKernel<int64_t,  int64_t,  Cmp>;
+    #जइ CV_SIMD_64F || CV_SIMD_SCALABLE_64F
+    पक्ष CV_64F:  प्रत्यागम vecCompareKernel<द्विगुण,   v_float64, v_uint64, Cmp>;
+    #अण्णहा
+    पक्ष CV_64F:  प्रत्यागम scalarCompareKernel<द्विगुण,   द्विगुण,   Cmp>;
     #endif
-    default:      return nullptr;
+    स्वभाव:      प्रत्यागम nullptr;
     }
 }
 
-TKernel getCmpFunc_(TOp op, int T)
+TKernel getCmpFunc_(शिखरम् op, पूर्णाङ्क T)
 {
     // Only 4 physical kernels (eq/ne/gt/ge): LT/LE reuse GT/GE with the operands swapped
     // (a<b == b>a, a<=b == b>=a) via the EW_KERNEL_SWAP01 flag, honored by the executor.
     KernelFunc f = nullptr;
-    int flags = 0;              // mask value: 0 flag bits => 0/255 (cv::compare); EW_KERNEL_MASK1 => 0/1
-    switch (op)
+    पूर्णाङ्क flags = 0;              // mask value: 0 flag bits => 0/255 (cv::compare); EW_KERNEL_MASK1 => 0/1
+    विकल्प (op)
     {
-    case OP_CMP_EQ: f = compareByType<EwCmpEq>(T); break;
-    case OP_CMP_NE: f = compareByType<EwCmpNe>(T); break;
-    case OP_CMP_GT: f = compareByType<EwCmpGt>(T); break;
-    case OP_CMP_GE: f = compareByType<EwCmpGe>(T); break;
-    case OP_CMP_LT: f = compareByType<EwCmpGt>(T); flags = EW_KERNEL_SWAP01; break;
-    case OP_CMP_LE: f = compareByType<EwCmpGe>(T); flags = EW_KERNEL_SWAP01; break;
-    default:        ;
+    पक्ष OP_CMP_EQ: f = compareByType<EwCmpEq>(T); भङ्ग;
+    पक्ष OP_CMP_NE: f = compareByType<EwCmpNe>(T); भङ्ग;
+    पक्ष OP_CMP_GT: f = compareByType<EwCmpGt>(T); भङ्ग;
+    पक्ष OP_CMP_GE: f = compareByType<EwCmpGe>(T); भङ्ग;
+    पक्ष OP_CMP_LT: f = compareByType<EwCmpGt>(T); flags = EW_KERNEL_SWAP01; भङ्ग;
+    पक्ष OP_CMP_LE: f = compareByType<EwCmpGe>(T); flags = EW_KERNEL_SWAP01; भङ्ग;
+    स्वभाव:        ;
     }
-    return {f, nullptr, flags};
+    प्रत्यागम {f, nullptr, flags};
 }
 
 // ===========================================================================
@@ -1402,72 +1402,72 @@ TKernel getCmpFunc_(TOp op, int T)
 // bitwise NOT: ~x. Single operand -> always a full contiguous array (no broadcast), so just a flat
 // per-row complement. SIMD for 1/2/4-byte elements; 8-byte uses the scalar tail (Vvec unused there).
 template<typename T, typename Vvec>
-static int notKernel(const void* src0_, size_t s0y, size_t s0x,
-                     const void*, size_t, size_t, const void*, size_t, size_t,
-                     void* dst_, size_t dsty, int width, int height,
-                     const double*, int, void*)
+स्थिर पूर्णाङ्क notKernel(ध्रुव शून्य* src0_, size_t s0y, size_t s0x,
+                     ध्रुव शून्य*, size_t, size_t, ध्रुव शून्य*, size_t, size_t,
+                     शून्य* dst_, size_t dsty, पूर्णाङ्क width, पूर्णाङ्क height,
+                     ध्रुव द्विगुण*, पूर्णाङ्क, शून्य*)
 {
-    if (width <= 0 || height <= 0) return 0;
-    s0y /= sizeof(T);
-    dsty /= sizeof(T);
+    जइ (width <= 0 || height <= 0) प्रत्यागम 0;
+    s0y /= परिमाण(T);
+    dsty /= परिमाण(T);
     CV_Assert(s0x == 1u || width == 1);
-    const T* src0 = (const T*)src0_;
+    ध्रुव T* src0 = (ध्रुव T*)src0_;
     T* dst = (T*)dst_;
-    if (height > 1 && dsty == (size_t)width && s0y == (size_t)width) { width *= height; height = 1; }
-    for (int y = 0; y < height; y++, src0 += s0y, dst += dsty)
+    जइ (height > 1 && dsty == (size_t)width && s0y == (size_t)width) { width *= height; height = 1; }
+    प्रति (पूर्णाङ्क y = 0; y < height; y++, src0 += s0y, dst += dsty)
     {
-        int x = 0;
-    #if (CV_SIMD || CV_SIMD_SCALABLE)
-        if constexpr (sizeof(T) <= 4)
+        पूर्णाङ्क x = 0;
+    #जइ (CV_SIMD || CV_SIMD_SCALABLE)
+        जइ constexpr (परिमाण(T) <= 4)
         {
-            const int VECSZ = VTraits<Vvec>::vlanes();
-            for (; x <= width - VECSZ; x += VECSZ)
+            ध्रुव पूर्णाङ्क VECSZ = VTraits<Vvec>::vlanes();
+            प्रति (; x <= width - VECSZ; x += VECSZ)
                 v_store(dst + x, v_not(vx_load(src0 + x)));
         }
     #endif
-        for (; x < width; x++) dst[x] = (T)~src0[x];
+        प्रति (; x < width; x++) dst[x] = (T)~src0[x];
     }
-    return 0;
+    प्रत्यागम 0;
 }
 
-template<class Op>
-static KernelFunc bitwiseByEsz(int esz)
+template<वर्ग Op>
+स्थिर KernelFunc bitwiseByEsz(पूर्णाङ्क esz)
 {
-    switch (esz)
+    विकल्प (esz)
     {
-    case 1: return vecBinaryKernel<uint8_t,  uint8_t,  v_uint8,  uint8_t,  Op, uint8_t>;
-    case 2: return vecBinaryKernel<uint16_t, uint16_t, v_uint16, uint16_t, Op, uint16_t>;
-    case 4: return vecBinaryKernel<uint32_t, uint32_t, v_uint32, uint32_t, Op, uint32_t>;
-    case 8: return scalarBinaryKernel<uint64_t, uint64_t, uint64_t, Op>;
-    default: return nullptr;
+    पक्ष 1: प्रत्यागम vec_द्विमान_Kernel<uint8_t,  uint8_t,  v_uint8,  uint8_t,  Op, uint8_t>;
+    पक्ष 2: प्रत्यागम vec_द्विमान_Kernel<uint16_t, uint16_t, v_uint16, uint16_t, Op, uint16_t>;
+    पक्ष 4: प्रत्यागम vec_द्विमान_Kernel<uint32_t, uint32_t, v_uint32, uint32_t, Op, uint32_t>;
+    पक्ष 8: प्रत्यागम scalar_द्विमान_Kernel<uint64_t, uint64_t, uint64_t, Op>;
+    स्वभाव: प्रत्यागम nullptr;
     }
 }
 
-TKernel getBitwiseFunc_(TOp op, int esz)
-{
-    KernelFunc f = nullptr;
-    switch (op)
-    {
-    case OP_AND: f = bitwiseByEsz<EwAnd>(esz); break;
-    case OP_OR:  f = bitwiseByEsz<EwOr >(esz); break;
-    case OP_XOR: f = bitwiseByEsz<EwXor>(esz); break;
-    default:     ;
-    }
-    return {f, nullptr, 0};
-}
-
-TKernel getNotFunc_(int esz)
+TKernel getBitwiseFunc_(शिखरम् op, पूर्णाङ्क esz)
 {
     KernelFunc f = nullptr;
-    switch (esz)
+    विकल्प (op)
     {
-    case 1: f = notKernel<uint8_t,  v_uint8 >; break;
-    case 2: f = notKernel<uint16_t, v_uint16>; break;
-    case 4: f = notKernel<uint32_t, v_uint32>; break;
-    case 8: f = notKernel<uint64_t, v_uint32>; break;   // SIMD path compiled out for 8-byte -> scalar ~
-    default: ;
+    पक्ष OP_AND: f = bitwiseByEsz<EwAnd>(esz); भङ्ग;
+    पक्ष OP_OR:  f = bitwiseByEsz<EwOr >(esz); भङ्ग;
+    पक्ष OP_XOR: f = bitwiseByEsz<EwXor>(esz); भङ्ग;
+    स्वभाव:     ;
     }
-    return {f, nullptr, 0};
+    प्रत्यागम {f, nullptr, 0};
+}
+
+TKernel getNotFunc_(पूर्णाङ्क esz)
+{
+    KernelFunc f = nullptr;
+    विकल्प (esz)
+    {
+    पक्ष 1: f = notKernel<uint8_t,  v_uint8 >; भङ्ग;
+    पक्ष 2: f = notKernel<uint16_t, v_uint16>; भङ्ग;
+    पक्ष 4: f = notKernel<uint32_t, v_uint32>; भङ्ग;
+    पक्ष 8: f = notKernel<uint64_t, v_uint32>; भङ्ग;   // SIMD path compiled out for 8-byte -> scalar ~
+    स्वभाव: ;
+    }
+    प्रत्यागम {f, nullptr, 0};
 }
 
 // ===========================================================================
@@ -1478,40 +1478,40 @@ TKernel getNotFunc_(int esz)
 // branch: addWeighted takes plain scalar coefficients (a multi-channel scalar is not optimized, matching
 // the classic function). The broadcast branches fold the constant operand's contribution once.
 // ===========================================================================
-template<typename T, typename Tr, typename Wvec, typename WT, bool use_simd>
-static int addWeightedKernel(const void* src0_, size_t s0y, size_t s0x,
-                             const void* src1_, size_t s1y, size_t s1x,
-                             const void*, size_t, size_t,
-                             void* dst_, size_t dsty, int width, int height,
-                             const double* params, int, void*)
+template<typename T, typename Tr, typename Wvec, typename WT, तार्किक use_simd>
+स्थिर पूर्णाङ्क addWeightedKernel(ध्रुव शून्य* src0_, size_t s0y, size_t s0x,
+                             ध्रुव शून्य* src1_, size_t s1y, size_t s1x,
+                             ध्रुव शून्य*, size_t, size_t,
+                             शून्य* dst_, size_t dsty, पूर्णाङ्क width, पूर्णाङ्क height,
+                             ध्रुव द्विगुण* params, पूर्णाङ्क, शून्य*)
 {
-    if (width <= 0 || height <= 0) return 0;
-    s0y /= sizeof(T); s1y /= sizeof(T); dsty /= sizeof(Tr);
+    जइ (width <= 0 || height <= 0) प्रत्यागम 0;
+    s0y /= परिमाण(T); s1y /= परिमाण(T); dsty /= परिमाण(Tr);
     CV_Assert((s0x|s1x) == 1u || (s0x|s1x) + (size_t)width == 1u);
-    const T* src0 = (const T*)src0_;
-    const T* src1 = (const T*)src1_;
+    ध्रुव T* src0 = (ध्रुव T*)src0_;
+    ध्रुव T* src1 = (ध्रुव T*)src1_;
     Tr* dst = (Tr*)dst_;
-    const WT alpha = (WT)params[0], beta = (WT)params[1], gamma = (WT)params[2];
+    ध्रुव WT alpha = (WT)params[0], beta = (WT)params[1], gamma = (WT)params[2];
     EW_TRY_COLLAPSE(2);
-#if (CV_SIMD || CV_SIMD_SCALABLE)
+#जइ (CV_SIMD || CV_SIMD_SCALABLE)
     Wvec va{}, vb{}, vg{};
-    const int VECSZ = VTraits<Wvec>::vlanes();
-    const bool tail = width >= VECSZ*4 && src0_ != dst_ && src1_ != dst_;
-    if constexpr (use_simd) {
+    ध्रुव पूर्णाङ्क VECSZ = VTraits<Wvec>::vlanes();
+    ध्रुव तार्किक tail = width >= VECSZ*4 && src0_ != dst_ && src1_ != dst_;
+    जइ constexpr (use_simd) {
         WT fa=alpha, fb=beta, fg=gamma;
         vx_setall_as(&fa, va); vx_setall_as(&fb, vb); vx_setall_as(&fg, vg);
     }
 #endif
-    for (int y = 0; y < height; y++, src0 += s0y, src1 += s1y, dst += dsty)
+    प्रति (पूर्णाङ्क y = 0; y < height; y++, src0 += s0y, src1 += s1y, dst += dsty)
     {
-        int x = 0;
-    #if (CV_SIMD || CV_SIMD_SCALABLE)
-        if constexpr (use_simd)
+        पूर्णाङ्क x = 0;
+    #जइ (CV_SIMD || CV_SIMD_SCALABLE)
+        जइ constexpr (use_simd)
         {
             Wvec a0,a1,a2,a3,b0,b1,b2,b3;
-            if (s0x == s1x) {                                // both arrays contiguous
-                for (; x < width; x += VECSZ*4) {
-                    if (x+VECSZ*4 > width) { if (!tail) break; x = width-VECSZ*4; }
+            जइ (s0x == s1x) {                                // both arrays contiguous
+                प्रति (; x < width; x += VECSZ*4) {
+                    जइ (x+VECSZ*4 > width) { जइ (!tail) भङ्ग; x = width-VECSZ*4; }
                     vx_load_pair_as(src0+x, a0, a1); vx_load_pair_as(src0+x+VECSZ*2, a2, a3);
                     vx_load_pair_as(src1+x, b0, b1); vx_load_pair_as(src1+x+VECSZ*2, b2, b3);
                     a0=v_fma(a0,va,v_fma(b0,vb,vg)); a1=v_fma(a1,va,v_fma(b1,vb,vg));
@@ -1519,19 +1519,19 @@ static int addWeightedKernel(const void* src0_, size_t s0y, size_t s0x,
                     v_store_pair_as(dst+x, a0, a1); v_store_pair_as(dst+x+VECSZ*2, a2, a3);
                 }
             }
-            else if (s1x == 0) {                             // src1 broadcast: b*beta+gamma is constant
+            अण्णहा जइ (s1x == 0) {                             // src1 broadcast: b*beta+gamma is constant
                 Wvec bb; vx_setall_as(src1, bb); Wvec bc = v_fma(bb, vb, vg);
-                for (; x < width; x += VECSZ*4) {
-                    if (x+VECSZ*4 > width) { if (!tail) break; x = width-VECSZ*4; }
+                प्रति (; x < width; x += VECSZ*4) {
+                    जइ (x+VECSZ*4 > width) { जइ (!tail) भङ्ग; x = width-VECSZ*4; }
                     vx_load_pair_as(src0+x, a0, a1); vx_load_pair_as(src0+x+VECSZ*2, a2, a3);
                     a0=v_fma(a0,va,bc); a1=v_fma(a1,va,bc); a2=v_fma(a2,va,bc); a3=v_fma(a3,va,bc);
                     v_store_pair_as(dst+x, a0, a1); v_store_pair_as(dst+x+VECSZ*2, a2, a3);
                 }
             }
-            else {                                           // src0 broadcast: a*alpha+gamma is constant
+            अण्णहा {                                           // src0 broadcast: a*alpha+gamma is constant
                 Wvec aa; vx_setall_as(src0, aa); Wvec acg = v_fma(aa, va, vg);
-                for (; x < width; x += VECSZ*4) {
-                    if (x+VECSZ*4 > width) { if (!tail) break; x = width-VECSZ*4; }
+                प्रति (; x < width; x += VECSZ*4) {
+                    जइ (x+VECSZ*4 > width) { जइ (!tail) भङ्ग; x = width-VECSZ*4; }
                     vx_load_pair_as(src1+x, b0, b1); vx_load_pair_as(src1+x+VECSZ*2, b2, b3);
                     b0=v_fma(b0,vb,acg); b1=v_fma(b1,vb,acg); b2=v_fma(b2,vb,acg); b3=v_fma(b3,vb,acg);
                     v_store_pair_as(dst+x, b0, b1); v_store_pair_as(dst+x+VECSZ*2, b2, b3);
@@ -1539,47 +1539,47 @@ static int addWeightedKernel(const void* src0_, size_t s0y, size_t s0x,
             }
         }
     #endif
-        if (s0x == s1x) {
-            for (; x < width; x++) dst[x] = saturate_cast<Tr>((WT)src0[x]*alpha + (WT)src1[x]*beta + gamma);
-        } else if (s0x == 0) {
-            const WT ac = (WT)src0[0]*alpha + gamma;
-            for (; x < width; x++) dst[x] = saturate_cast<Tr>((WT)src1[x]*beta + ac);
-        } else {
-            const WT bc = (WT)src1[0]*beta + gamma;
-            for (; x < width; x++) dst[x] = saturate_cast<Tr>((WT)src0[x]*alpha + bc);
+        जइ (s0x == s1x) {
+            प्रति (; x < width; x++) dst[x] = saturate_cast<Tr>((WT)src0[x]*alpha + (WT)src1[x]*beta + gamma);
+        } अण्णहा जइ (s0x == 0) {
+            ध्रुव WT ac = (WT)src0[0]*alpha + gamma;
+            प्रति (; x < width; x++) dst[x] = saturate_cast<Tr>((WT)src1[x]*beta + ac);
+        } अण्णहा {
+            ध्रुव WT bc = (WT)src1[0]*beta + gamma;
+            प्रति (; x < width; x++) dst[x] = saturate_cast<Tr>((WT)src0[x]*alpha + bc);
         }
     }
-    return 0;
+    प्रत्यागम 0;
 }
 
-TKernel getAddWeightedFunc_(int T, int R)
+TKernel getAddWeightedFunc_(पूर्णाङ्क T, पूर्णाङ्क R)
 {
     KernelFunc f = nullptr;
-    #define AWS(Tt, Rr) addWeightedKernel<Tt, Rr, v_float32, float, true>
-#if CV_SIMD_64F || CV_SIMD_SCALABLE_64F
-    #define AWD(Tt, Rr) addWeightedKernel<Tt, Rr, v_float64, double, true>       // f64 SIMD
-#else
-    #define AWD(Tt, Rr) addWeightedKernel<Tt, Rr, v_float32, double, false>      // scalar (v_float32 unused)
+    #define AWS(Tt, Rr) addWeightedKernel<Tt, Rr, v_float32, भिन्न, सच्च>
+#जइ CV_SIMD_64F || CV_SIMD_SCALABLE_64F
+    #define AWD(Tt, Rr) addWeightedKernel<Tt, Rr, v_float64, द्विगुण, सच्च>       // f64 SIMD
+#अण्णहा
+    #define AWD(Tt, Rr) addWeightedKernel<Tt, Rr, v_float32, द्विगुण, मिच्छ>      // scalar (v_float32 unused)
 #endif
-    switch (T)
+    विकल्प (T)
     {
-    case CV_8U:  f = R==CV_8U  ? AWS(uint8_t,  uint8_t)  : R==CV_32F ? AWS(uint8_t,  float) : nullptr; break;
-    case CV_8S:  f = R==CV_8S  ? AWS(int8_t,   int8_t)   : R==CV_32F ? AWS(int8_t,   float) : nullptr; break;
-    case CV_16U: f = R==CV_16U ? AWS(uint16_t, uint16_t) : R==CV_32F ? AWS(uint16_t, float) : nullptr; break;
-    case CV_16S: f = R==CV_16S ? AWS(int16_t,  int16_t)  : R==CV_32F ? AWS(int16_t,  float) : nullptr; break;
-    case CV_16F: f = R==CV_16F ? AWS(hfloat,   hfloat)   : R==CV_32F ? AWS(hfloat,   float) : nullptr; break;
-    case CV_16BF:f = R==CV_32F ? AWS(bfloat,   float) : nullptr; break;
-    case CV_32F: f = R==CV_32F ? AWS(float,    float) : nullptr; break;
-    case CV_32U: f = R==CV_32U ? AWD(unsigned, unsigned) : R==CV_64F ? AWD(unsigned, double) : nullptr; break;
-    case CV_32S: f = R==CV_32S ? AWD(int,      int)      : R==CV_64F ? AWD(int,      double) : nullptr; break;
-    case CV_64U: f = R==CV_64F ? AWD(uint64_t, double) : nullptr; break;
-    case CV_64S: f = R==CV_64F ? AWD(int64_t,  double) : nullptr; break;
-    case CV_64F: f = R==CV_64F ? AWD(double,   double) : nullptr; break;
-    default: ;
+    पक्ष CV_8U:  f = R==CV_8U  ? AWS(uint8_t,  uint8_t)  : R==CV_32F ? AWS(uint8_t,  भिन्न) : nullptr; भङ्ग;
+    पक्ष CV_8S:  f = R==CV_8S  ? AWS(int8_t,   int8_t)   : R==CV_32F ? AWS(int8_t,   भिन्न) : nullptr; भङ्ग;
+    पक्ष CV_16U: f = R==CV_16U ? AWS(uint16_t, uint16_t) : R==CV_32F ? AWS(uint16_t, भिन्न) : nullptr; भङ्ग;
+    पक्ष CV_16S: f = R==CV_16S ? AWS(int16_t,  int16_t)  : R==CV_32F ? AWS(int16_t,  भिन्न) : nullptr; भङ्ग;
+    पक्ष CV_16F: f = R==CV_16F ? AWS(hfloat,   hfloat)   : R==CV_32F ? AWS(hfloat,   भिन्न) : nullptr; भङ्ग;
+    पक्ष CV_16BF:f = R==CV_32F ? AWS(bfloat,   भिन्न) : nullptr; भङ्ग;
+    पक्ष CV_32F: f = R==CV_32F ? AWS(भिन्न,    भिन्न) : nullptr; भङ्ग;
+    पक्ष CV_32U: f = R==CV_32U ? AWD(unsigned, unsigned) : R==CV_64F ? AWD(unsigned, द्विगुण) : nullptr; भङ्ग;
+    पक्ष CV_32S: f = R==CV_32S ? AWD(पूर्णाङ्क,      पूर्णाङ्क)      : R==CV_64F ? AWD(पूर्णाङ्क,      द्विगुण) : nullptr; भङ्ग;
+    पक्ष CV_64U: f = R==CV_64F ? AWD(uint64_t, द्विगुण) : nullptr; भङ्ग;
+    पक्ष CV_64S: f = R==CV_64F ? AWD(int64_t,  द्विगुण) : nullptr; भङ्ग;
+    पक्ष CV_64F: f = R==CV_64F ? AWD(द्विगुण,   द्विगुण) : nullptr; भङ्ग;
+    स्वभाव: ;
     }
     #undef AWS
     #undef AWD
-    return {f, nullptr, 0};
+    प्रत्यागम {f, nullptr, 0};
 }
 
 // ===========================================================================
@@ -1599,133 +1599,133 @@ TKernel getAddWeightedFunc_(int T, int R)
 // with a per-element mask (smx == 1); n-channel data as a tall-thin tile - channel axis = width,
 // the 1-channel mask broadcasting across it (smx == 0, one mask byte per row) - handled by the
 // interleaved fast path for 2..4 channels, per-row otherwise. Branches may broadcast (s1x/s2x == 0).
-#if (CV_SIMD || CV_SIMD_SCALABLE)
+#जइ (CV_SIMD || CV_SIMD_SCALABLE)
 // VECSZ(T) mask bytes -> T-width lanes (u8 direct, u16/u32 via expand)
-static inline v_uint8  loadSelectMask(const uchar* m, const v_uint8&)  { return vx_load(m); }
-static inline v_uint16 loadSelectMask(const uchar* m, const v_uint16&) { return vx_load_expand(m); }
-static inline v_uint32 loadSelectMask(const uchar* m, const v_uint32&) { return vx_load_expand_q(m); }
+स्थिर अन्तःस्थ v_uint8  loadSelectMask(ध्रुव uchar* m, ध्रुव v_uint8&)  { प्रत्यागम vx_load(m); }
+स्थिर अन्तःस्थ v_uint16 loadSelectMask(ध्रुव uchar* m, ध्रुव v_uint16&) { प्रत्यागम vx_load_expand(m); }
+स्थिर अन्तःस्थ v_uint32 loadSelectMask(ध्रुव uchar* m, ध्रुव v_uint32&) { प्रत्यागम vx_load_expand_q(m); }
 
-static inline void setallSelect(const uint8_t*  p, v_uint8&  a) { a = vx_setall_u8(*p); }
-static inline void setallSelect(const uint16_t* p, v_uint16& a) { a = vx_setall_u16(*p); }
-static inline void setallSelect(const uint32_t* p, v_uint32& a) { a = vx_setall_u32(*p); }
+स्थिर अन्तःस्थ शून्य setallSelect(ध्रुव uint8_t*  p, v_uint8&  a) { a = vx_setall_u8(*p); }
+स्थिर अन्तःस्थ शून्य setallSelect(ध्रुव uint16_t* p, v_uint16& a) { a = vx_setall_u16(*p); }
+स्थिर अन्तःस्थ शून्य setallSelect(ध्रुव uint32_t* p, v_uint32& a) { a = vx_setall_u32(*p); }
 #endif
 
 template<typename T, typename Tvec>
-static int selectKernel(const void* mask_, size_t smy, size_t smx,
-                        const void* src1_, size_t s1y, size_t s1x,
-                        const void* src2_, size_t s2y, size_t s2x,
-                        void* dst_, size_t dsty, int width, int height,
-                        const double*, int, void*)
+स्थिर पूर्णाङ्क selectKernel(ध्रुव शून्य* mask_, size_t smy, size_t smx,
+                        ध्रुव शून्य* src1_, size_t s1y, size_t s1x,
+                        ध्रुव शून्य* src2_, size_t s2y, size_t s2x,
+                        शून्य* dst_, size_t dsty, पूर्णाङ्क width, पूर्णाङ्क height,
+                        ध्रुव द्विगुण*, पूर्णाङ्क, शून्य*)
 {
-    s1y /= sizeof(T);                    // the 1-byte mask's smy stays in bytes == elements
-    s2y /= sizeof(T);
-    dsty /= sizeof(T);
+    s1y /= परिमाण(T);                    // the 1-byte mask's smy stays in bytes == elements
+    s2y /= परिमाण(T);
+    dsty /= परिमाण(T);
     CV_Assert(smx <= 1u && s1x <= 1u && s2x <= 1u);
 
-    const uchar* mask = (const uchar*)mask_;
-    const T* src1 = (const T*)src1_;
-    const T* src2 = (const T*)src2_;
+    ध्रुव uchar* mask = (ध्रुव uchar*)mask_;
+    ध्रुव T* src1 = (ध्रुव T*)src1_;
+    ध्रुव T* src2 = (ध्रुव T*)src2_;
     T* dst = (T*)dst_;
 
-    if (height > 1 && dsty == (size_t)width && smy == smx*(size_t)width &&
+    जइ (height > 1 && dsty == (size_t)width && smy == smx*(size_t)width &&
         s1y == s1x*(size_t)width && s2y == s2x*(size_t)width)
     { width *= height; height = 1; }
 
-    int y = 0;
-#if (CV_SIMD || CV_SIMD_SCALABLE)
-    if constexpr (sizeof(T) <= 4)
+    पूर्णाङ्क y = 0;
+#जइ (CV_SIMD || CV_SIMD_SCALABLE)
+    जइ constexpr (परिमाण(T) <= 4)
     {
-        const int VECSZ = VTraits<Tvec>::vlanes();
-        const Tvec z = v_setzero_<Tvec>();
+        ध्रुव पूर्णाङ्क VECSZ = VTraits<Tvec>::vlanes();
+        ध्रुव Tvec z = v_setzero_<Tvec>();
 
         // n-channel data under a per-pixel mask (the masked-op shape): channel axis = width (2..4),
         // one mask byte per row. Process VECSZ rows per iteration - expand the mask once and
         // interleave it across the channel lanes.
-        if (height > VECSZ && 2 <= width && width <= 4 && smx == 0u && smy == 1u &&
+        जइ (height > VECSZ && 2 <= width && width <= 4 && smx == 0u && smy == 1u &&
             s1x == 1u && s1y == (size_t)width && s2x == 1u && s2y == (size_t)width &&
             dsty == (size_t)width)
         {
-            constexpr int MAXVECSZ = VTraits<Tvec>::max_nlanes;
+            constexpr पूर्णाङ्क MAXVECSZ = VTraits<Tvec>::max_nlanes;
             T maskbuf[MAXVECSZ*4] = {};      // {} for -Wmaybe-uninitialized only (fully written)
-            const int dy = VECSZ;
-            for (; y + dy <= height; y += dy, mask += dy, src1 += width*dy, src2 += width*dy,
+            ध्रुव पूर्णाङ्क dy = VECSZ;
+            प्रति (; y + dy <= height; y += dy, mask += dy, src1 += width*dy, src2 += width*dy,
                                                           dst += width*dy)
             {
                 Tvec m0 = v_ne(loadSelectMask(mask, z), z), m1, m2, m3;
-                if (width == 2)      v_store_interleave(maskbuf, m0, m0);
-                else if (width == 3) v_store_interleave(maskbuf, m0, m0, m0);
-                else                 v_store_interleave(maskbuf, m0, m0, m0, m0);
+                जइ (width == 2)      v_store_interleave(maskbuf, m0, m0);
+                अण्णहा जइ (width == 3) v_store_interleave(maskbuf, m0, m0, m0);
+                अण्णहा                 v_store_interleave(maskbuf, m0, m0, m0, m0);
                 m0 = vx_load(maskbuf);
                 m1 = vx_load(maskbuf + VECSZ);
-                if (width > 2) m2 = vx_load(maskbuf + VECSZ*2);
-                if (width > 3) m3 = vx_load(maskbuf + VECSZ*3);
+                जइ (width > 2) m2 = vx_load(maskbuf + VECSZ*2);
+                जइ (width > 3) m3 = vx_load(maskbuf + VECSZ*3);
                 v_store(dst, v_select(m0, vx_load(src1), vx_load(src2)));
                 v_store(dst + VECSZ, v_select(m1, vx_load(src1 + VECSZ), vx_load(src2 + VECSZ)));
-                if (width > 2)
+                जइ (width > 2)
                     v_store(dst + VECSZ*2,
                             v_select(m2, vx_load(src1 + VECSZ*2), vx_load(src2 + VECSZ*2)));
-                if (width > 3)
+                जइ (width > 3)
                     v_store(dst + VECSZ*3,
                             v_select(m3, vx_load(src1 + VECSZ*3), vx_load(src2 + VECSZ*3)));
             }
             // the remaining < VECSZ rows fall through to the per-row path below
         }
-        else if (smx == 1)                                   // per-element mask - the common case
+        अण्णहा जइ (smx == 1)                                   // per-element mask - the common case
         {
             // a branch aliasing dst is fine under the backoff (idempotent select); dst == mask is not
-            const bool use_tail_trick = width >= VECSZ*2 && dst_ != mask_;
+            ध्रुव तार्किक use_tail_trick = width >= VECSZ*2 && dst_ != mask_;
             Tvec a, b;
-            for (; y < height; y++, mask += smy, src1 += s1y, src2 += s2y, dst += dsty)
+            प्रति (; y < height; y++, mask += smy, src1 += s1y, src2 += s2y, dst += dsty)
             {
                 // a row-constant branch still changes per row
-                if (s1x == 0) setallSelect(src1, a);
-                if (s2x == 0) setallSelect(src2, b);
-                int x = 0;
-                for (; x < width; x += VECSZ)
+                जइ (s1x == 0) setallSelect(src1, a);
+                जइ (s2x == 0) setallSelect(src2, b);
+                पूर्णाङ्क x = 0;
+                प्रति (; x < width; x += VECSZ)
                 {
-                    if (x + VECSZ > width) { if (!use_tail_trick || x == 0) break; x = width - VECSZ; }
+                    जइ (x + VECSZ > width) { जइ (!use_tail_trick || x == 0) भङ्ग; x = width - VECSZ; }
                     Tvec m = v_ne(loadSelectMask(mask + x, z), z);
-                    if (s1x) a = vx_load(src1 + x);
-                    if (s2x) b = vx_load(src2 + x);
+                    जइ (s1x) a = vx_load(src1 + x);
+                    जइ (s2x) b = vx_load(src2 + x);
                     v_store(dst + x, v_select(m, a, b));
                 }
-                for (; x < width; x++)
+                प्रति (; x < width; x++)
                     dst[x] = mask[x] != 0 ? src1[x*s1x] : src2[x*s2x];
             }
-            return 0;
+            प्रत्यागम 0;
         }
     }
 #endif
-    for (; y < height; y++, mask += smy, src1 += s1y, src2 += s2y, dst += dsty)
+    प्रति (; y < height; y++, mask += smy, src1 += s1y, src2 += s2y, dst += dsty)
     {
-        if (smx == 0)                     // one mask byte per row (n-channel data / broadcast mask)
+        जइ (smx == 0)                     // one mask byte per row (n-channel data / broadcast mask)
         {
-            const T* s = mask[0] != 0 ? src1 : src2;
-            const size_t sx = mask[0] != 0 ? s1x : s2x;
-            if ((const void*)s != (const void*)dst)      // row select from dst itself is a no-op
-                for (int x = 0; x < width; x++) dst[x] = s[x*sx];
+            ध्रुव T* s = mask[0] != 0 ? src1 : src2;
+            ध्रुव size_t sx = mask[0] != 0 ? s1x : s2x;
+            जइ ((ध्रुव शून्य*)s != (ध्रुव शून्य*)dst)      // row select from dst itself is a no-op
+                प्रति (पूर्णाङ्क x = 0; x < width; x++) dst[x] = s[x*sx];
         }
-        else
-            for (int x = 0; x < width; x++)
+        अण्णहा
+            प्रति (पूर्णाङ्क x = 0; x < width; x++)
                 dst[x] = mask[x] != 0 ? src1[x*s1x] : src2[x*s2x];
     }
-    return 0;
+    प्रत्यागम 0;
 }
 
-TKernel getSelectFunc_(int mdepth, int T)
+TKernel getSelectFunc_(पूर्णाङ्क mdepth, पूर्णाङ्क T)
 {
-    if (CV_ELEM_SIZE1(mdepth) != 1)      // the mask must be a 1-byte type (u8/s8/bool)
-        return {};
+    जइ (CV_ELEM_SIZE1(mdepth) != 1)      // the mask must be a 1-byte type (u8/s8/bool)
+        प्रत्यागम {};
     KernelFunc fptr = nullptr;
-    switch (CV_ELEM_SIZE1(T))
+    विकल्प (CV_ELEM_SIZE1(T))
     {
-    case 1: fptr = selectKernel<uint8_t,  v_uint8 >; break;
-    case 2: fptr = selectKernel<uint16_t, v_uint16>; break;
-    case 4: fptr = selectKernel<uint32_t, v_uint32>; break;
-    case 8: fptr = selectKernel<uint64_t, v_uint32>; break;   // SIMD path compiled out -> scalar
-    default: ;
+    पक्ष 1: fptr = selectKernel<uint8_t,  v_uint8 >; भङ्ग;
+    पक्ष 2: fptr = selectKernel<uint16_t, v_uint16>; भङ्ग;
+    पक्ष 4: fptr = selectKernel<uint32_t, v_uint32>; भङ्ग;
+    पक्ष 8: fptr = selectKernel<uint64_t, v_uint32>; भङ्ग;   // SIMD path compiled out -> scalar
+    स्वभाव: ;
     }
-    return {fptr, nullptr, 0};
+    प्रत्यागम {fptr, nullptr, 0};
 }
 
 // ===========================================================================
@@ -1737,172 +1737,172 @@ TKernel getSelectFunc_(int mdepth, int T)
 // dst aliasing lo/hi suppresses it (the store would corrupt the bounds before the re-read).
 // NaN note: v_min/v_max lane behavior on NaN is ISA-specific, matching the scalar std::min/max
 // unspecifiedness - clamp of NaN is not a contract either way.
-#if (CV_SIMD || CV_SIMD_SCALABLE)
-static inline void setallClamp(const uchar*  p, v_uint8&   a) { a = vx_setall_u8(*p); }
-static inline void setallClamp(const schar*  p, v_int8&    a) { a = vx_setall_s8(*p); }
-static inline void setallClamp(const ushort* p, v_uint16&  a) { a = vx_setall_u16(*p); }
-static inline void setallClamp(const short*  p, v_int16&   a) { a = vx_setall_s16(*p); }
-static inline void setallClamp(const unsigned* p, v_uint32& a) { a = vx_setall_u32(*p); }
-static inline void setallClamp(const int*    p, v_int32&   a) { a = vx_setall_s32(*p); }
-static inline void setallClamp(const float*  p, v_float32& a) { a = vx_setall_f32(*p); }
-#if CV_SIMD_64F || CV_SIMD_SCALABLE_64F
-static inline void setallClamp(const double* p, v_float64& a) { a = vx_setall_f64(*p); }
+#जइ (CV_SIMD || CV_SIMD_SCALABLE)
+स्थिर अन्तःस्थ शून्य setallClamp(ध्रुव uchar*  p, v_uint8&   a) { a = vx_setall_u8(*p); }
+स्थिर अन्तःस्थ शून्य setallClamp(ध्रुव schar*  p, v_int8&    a) { a = vx_setall_s8(*p); }
+स्थिर अन्तःस्थ शून्य setallClamp(ध्रुव ushort* p, v_uint16&  a) { a = vx_setall_u16(*p); }
+स्थिर अन्तःस्थ शून्य setallClamp(ध्रुव short*  p, v_int16&   a) { a = vx_setall_s16(*p); }
+स्थिर अन्तःस्थ शून्य setallClamp(ध्रुव unsigned* p, v_uint32& a) { a = vx_setall_u32(*p); }
+स्थिर अन्तःस्थ शून्य setallClamp(ध्रुव पूर्णाङ्क*    p, v_int32&   a) { a = vx_setall_s32(*p); }
+स्थिर अन्तःस्थ शून्य setallClamp(ध्रुव भिन्न*  p, v_float32& a) { a = vx_setall_f32(*p); }
+#जइ CV_SIMD_64F || CV_SIMD_SCALABLE_64F
+स्थिर अन्तःस्थ शून्य setallClamp(ध्रुव द्विगुण* p, v_float64& a) { a = vx_setall_f64(*p); }
 #endif
 #endif
 
 template<typename T, typename Tvec>
-static int clampKernel(const void* src0_, size_t s0y, size_t s0x,
-                       const void* lo_, size_t s1y, size_t s1x,
-                       const void* hi_, size_t s2y, size_t s2x,
-                       void* dst_, size_t dsty, int width, int height,
-                       const double*, int, void*)
+स्थिर पूर्णाङ्क clampKernel(ध्रुव शून्य* src0_, size_t s0y, size_t s0x,
+                       ध्रुव शून्य* lo_, size_t s1y, size_t s1x,
+                       ध्रुव शून्य* hi_, size_t s2y, size_t s2x,
+                       शून्य* dst_, size_t dsty, पूर्णाङ्क width, पूर्णाङ्क height,
+                       ध्रुव द्विगुण*, पूर्णाङ्क, शून्य*)
 {
-    s0y /= sizeof(T);
-    s1y /= sizeof(T);
-    s2y /= sizeof(T);
-    dsty /= sizeof(T);
+    s0y /= परिमाण(T);
+    s1y /= परिमाण(T);
+    s2y /= परिमाण(T);
+    dsty /= परिमाण(T);
     CV_Assert(s0x <= 1u && s1x <= 1u && s2x <= 1u);
 
-    const T* src0 = (const T*)src0_;
-    const T* lo = (const T*)lo_;
-    const T* hi = (const T*)hi_;
+    ध्रुव T* src0 = (ध्रुव T*)src0_;
+    ध्रुव T* lo = (ध्रुव T*)lo_;
+    ध्रुव T* hi = (ध्रुव T*)hi_;
     T* dst = (T*)dst_;
 
-    if (height > 1 && dsty == (size_t)width && s0y == s0x*(size_t)width &&
+    जइ (height > 1 && dsty == (size_t)width && s0y == s0x*(size_t)width &&
         s1y == s1x*(size_t)width && s2y == s2x*(size_t)width)
     { width *= height; height = 1; }
 
-    for (int y = 0; y < height; y++, src0 += s0y, lo += s1y, hi += s2y, dst += dsty)
+    प्रति (पूर्णाङ्क y = 0; y < height; y++, src0 += s0y, lo += s1y, hi += s2y, dst += dsty)
     {
-        int x = 0;
-#if (CV_SIMD || CV_SIMD_SCALABLE)
-        if (s0x == 1)
+        पूर्णाङ्क x = 0;
+#जइ (CV_SIMD || CV_SIMD_SCALABLE)
+        जइ (s0x == 1)
         {
-            const int VECSZ = VTraits<Tvec>::vlanes();
-            const bool use_tail_trick = width >= VECSZ*2 && lo_ != dst_ && hi_ != dst_;
+            ध्रुव पूर्णाङ्क VECSZ = VTraits<Tvec>::vlanes();
+            ध्रुव तार्किक use_tail_trick = width >= VECSZ*2 && lo_ != dst_ && hi_ != dst_;
             Tvec vlo, vhi;
-            if (s1x == 0) setallClamp(lo, vlo);
-            if (s2x == 0) setallClamp(hi, vhi);
-            for (; x < width; x += VECSZ)
+            जइ (s1x == 0) setallClamp(lo, vlo);
+            जइ (s2x == 0) setallClamp(hi, vhi);
+            प्रति (; x < width; x += VECSZ)
             {
-                if (x + VECSZ > width) { if (!use_tail_trick || x == 0) break; x = width - VECSZ; }
-                if (s1x) vlo = vx_load(lo + x);
-                if (s2x) vhi = vx_load(hi + x);
+                जइ (x + VECSZ > width) { जइ (!use_tail_trick || x == 0) भङ्ग; x = width - VECSZ; }
+                जइ (s1x) vlo = vx_load(lo + x);
+                जइ (s2x) vhi = vx_load(hi + x);
                 v_store(dst + x, v_min(v_max(vx_load(src0 + x), vlo), vhi));
             }
         }
 #endif
-        for (; x < width; x++)
+        प्रति (; x < width; x++)
         {
             T v = src0[x*s0x], l = lo[x*s1x], h = hi[x*s2x];
             dst[x] = std::min(std::max(v, l), h);
         }
     }
-    return 0;
+    प्रत्यागम 0;
 }
 
 // Scalar-only clamp for the depths without a native SIMD lane type here (f16/bf16 - compared in
 // float; 64-bit ints).
 template<typename T, typename WT>
-static int scalarClampKernel(const void* src0_, size_t s0y, size_t s0x,
-                             const void* lo_, size_t s1y, size_t s1x,
-                             const void* hi_, size_t s2y, size_t s2x,
-                             void* dst_, size_t dsty, int width, int height,
-                             const double*, int, void*)
+स्थिर पूर्णाङ्क scalarClampKernel(ध्रुव शून्य* src0_, size_t s0y, size_t s0x,
+                             ध्रुव शून्य* lo_, size_t s1y, size_t s1x,
+                             ध्रुव शून्य* hi_, size_t s2y, size_t s2x,
+                             शून्य* dst_, size_t dsty, पूर्णाङ्क width, पूर्णाङ्क height,
+                             ध्रुव द्विगुण*, पूर्णाङ्क, शून्य*)
 {
-    s0y /= sizeof(T); s1y /= sizeof(T); s2y /= sizeof(T); dsty /= sizeof(T);
+    s0y /= परिमाण(T); s1y /= परिमाण(T); s2y /= परिमाण(T); dsty /= परिमाण(T);
     CV_Assert(s0x <= 1u && s1x <= 1u && s2x <= 1u);
-    const T* src0 = (const T*)src0_;
-    const T* lo = (const T*)lo_;
-    const T* hi = (const T*)hi_;
+    ध्रुव T* src0 = (ध्रुव T*)src0_;
+    ध्रुव T* lo = (ध्रुव T*)lo_;
+    ध्रुव T* hi = (ध्रुव T*)hi_;
     T* dst = (T*)dst_;
-    if (height > 1 && dsty == (size_t)width && s0y == s0x*(size_t)width &&
+    जइ (height > 1 && dsty == (size_t)width && s0y == s0x*(size_t)width &&
         s1y == s1x*(size_t)width && s2y == s2x*(size_t)width)
     { width *= height; height = 1; }
-    for (int y = 0; y < height; y++, src0 += s0y, lo += s1y, hi += s2y, dst += dsty)
-        for (int x = 0; x < width; x++)
+    प्रति (पूर्णाङ्क y = 0; y < height; y++, src0 += s0y, lo += s1y, hi += s2y, dst += dsty)
+        प्रति (पूर्णाङ्क x = 0; x < width; x++)
         {
             WT v = (WT)src0[x*s0x], l = (WT)lo[x*s1x], h = (WT)hi[x*s2x];
             dst[x] = saturate_cast<T>(std::min(std::max(v, l), h));
         }
-    return 0;
+    प्रत्यागम 0;
 }
 
-TKernel getClampFunc_(int T)
+TKernel getClampFunc_(पूर्णाङ्क T)
 {
     KernelFunc fptr = nullptr;
-    switch (T)
+    विकल्प (T)
     {
-    case CV_8U:   fptr = clampKernel<uchar,    v_uint8  >; break;
-    case CV_8S:   fptr = clampKernel<schar,    v_int8   >; break;
-    case CV_16U:  fptr = clampKernel<ushort,   v_uint16 >; break;
-    case CV_16S:  fptr = clampKernel<short,    v_int16  >; break;
-    case CV_32U:  fptr = clampKernel<unsigned, v_uint32 >; break;
-    case CV_32S:  fptr = clampKernel<int,      v_int32  >; break;
-    case CV_32F:  fptr = clampKernel<float,    v_float32>; break;
-#if CV_SIMD_64F || CV_SIMD_SCALABLE_64F
-    case CV_64F:  fptr = clampKernel<double,   v_float64>; break;
-#else
-    case CV_64F:  fptr = scalarClampKernel<double, double>; break;
+    पक्ष CV_8U:   fptr = clampKernel<uchar,    v_uint8  >; भङ्ग;
+    पक्ष CV_8S:   fptr = clampKernel<schar,    v_int8   >; भङ्ग;
+    पक्ष CV_16U:  fptr = clampKernel<ushort,   v_uint16 >; भङ्ग;
+    पक्ष CV_16S:  fptr = clampKernel<short,    v_int16  >; भङ्ग;
+    पक्ष CV_32U:  fptr = clampKernel<unsigned, v_uint32 >; भङ्ग;
+    पक्ष CV_32S:  fptr = clampKernel<पूर्णाङ्क,      v_int32  >; भङ्ग;
+    पक्ष CV_32F:  fptr = clampKernel<भिन्न,    v_float32>; भङ्ग;
+#जइ CV_SIMD_64F || CV_SIMD_SCALABLE_64F
+    पक्ष CV_64F:  fptr = clampKernel<द्विगुण,   v_float64>; भङ्ग;
+#अण्णहा
+    पक्ष CV_64F:  fptr = scalarClampKernel<द्विगुण, द्विगुण>; भङ्ग;
 #endif
-    case CV_16F:  fptr = scalarClampKernel<hfloat, float>; break;
-    case CV_16BF: fptr = scalarClampKernel<bfloat, float>; break;
-    case CV_64U:  fptr = scalarClampKernel<uint64_t, uint64_t>; break;
-    case CV_64S:  fptr = scalarClampKernel<int64_t,  int64_t >; break;
-    default: ;
+    पक्ष CV_16F:  fptr = scalarClampKernel<hfloat, भिन्न>; भङ्ग;
+    पक्ष CV_16BF: fptr = scalarClampKernel<bfloat, भिन्न>; भङ्ग;
+    पक्ष CV_64U:  fptr = scalarClampKernel<uint64_t, uint64_t>; भङ्ग;
+    पक्ष CV_64S:  fptr = scalarClampKernel<int64_t,  int64_t >; भङ्ग;
+    स्वभाव: ;
     }
-    return {fptr, nullptr, 0};
+    प्रत्यागम {fptr, nullptr, 0};
 }
 
-static int expandKernel(size_t s0y, size_t s0x,
-                        void* dst_, size_t dsty, int width, int height,
-                        int esz1)
+स्थिर पूर्णाङ्क expandKernel(size_t s0y, size_t s0x,
+                        शून्य* dst_, size_t dsty, पूर्णाङ्क width, पूर्णाङ्क height,
+                        पूर्णाङ्क esz1)
 {
     uchar* dst = (uchar*)dst_;
-    if (s0x == 0u && width > 1) {
-        int h = s0y > 0u ? height : 1;
+    जइ (s0x == 0u && width > 1) {
+        पूर्णाङ्क h = s0y > 0u ? height : 1;
         CV_Assert(esz1 == 1 || esz1 == 2 || esz1 == 4 || esz1 == 8);
-        for (int y = 0; y < h; y++) {
-            if (esz1 == 1) {
+        प्रति (पूर्णाङ्क y = 0; y < h; y++) {
+            जइ (esz1 == 1) {
                 uchar* rowptr = dst + dsty*y;
                 uchar val = rowptr[0];
-                for (int x = 1; x < width; x++) rowptr[x] = val;
+                प्रति (पूर्णाङ्क x = 1; x < width; x++) rowptr[x] = val;
             }
-            else if (esz1 == 2) {
+            अण्णहा जइ (esz1 == 2) {
                 ushort* rowptr = (ushort*)(dst + dsty*y);
                 ushort val = rowptr[0];
-                for (int x = 1; x < width; x++) rowptr[x] = val;
+                प्रति (पूर्णाङ्क x = 1; x < width; x++) rowptr[x] = val;
             }
-            else if (esz1 == 4) {
+            अण्णहा जइ (esz1 == 4) {
                 unsigned* rowptr = (unsigned*)(dst + dsty*y);
                 unsigned val = rowptr[0];
-                for (int x = 1; x < width; x++) rowptr[x] = val;
+                प्रति (पूर्णाङ्क x = 1; x < width; x++) rowptr[x] = val;
             }
-            else {
+            अण्णहा {
                 uint64_t* rowptr = (uint64_t*)(dst + dsty*y);
                 uint64_t val = rowptr[0];
-                for (int x = 1; x < width; x++) rowptr[x] = val;
+                प्रति (पूर्णाङ्क x = 1; x < width; x++) rowptr[x] = val;
             }
         }
     }
 
-    if (s0y == 0) {
-        for (int y = 1; y < height; y++)
+    जइ (s0y == 0) {
+        प्रति (पूर्णाङ्क y = 1; y < height; y++)
             memcpy(dst + dsty*y, dst, (size_t)esz1*width);
     }
-    return 0;
+    प्रत्यागम 0;
 }
 
-static int castKernel(const void* src0_, size_t s0y, size_t s0x,
-                      const void*, size_t, size_t,
-                      const void*, size_t, size_t,
-                      void* dst_, size_t dsty, int width, int height,
-                      const double* params, int esz1, void* userdata)
+स्थिर पूर्णाङ्क castKernel(ध्रुव शून्य* src0_, size_t s0y, size_t s0x,
+                      ध्रुव शून्य*, size_t, size_t,
+                      ध्रुव शून्य*, size_t, size_t,
+                      शून्य* dst_, size_t dsty, पूर्णाङ्क width, पूर्णाङ्क height,
+                      ध्रुव द्विगुण* params, पूर्णाङ्क esz1, शून्य* userdata)
 {
-    BinaryFunc castfunc = (BinaryFunc)userdata;
-    castfunc((const uchar*)src0_, s0y, nullptr, 0, (uchar*)dst_, dsty,
-             Size((s0x > 0u ? width : 1), (s0y > 0u ? height : 1)), (void*)params);
-    return expandKernel(s0y, s0x, dst_, dsty, width, height, esz1);
+    द्विमान_Func castfunc = (द्विमान_Func)userdata;
+    castfunc((ध्रुव uchar*)src0_, s0y, nullptr, 0, (uchar*)dst_, dsty,
+             Size((s0x > 0u ? width : 1), (s0y > 0u ? height : 1)), (शून्य*)params);
+    प्रत्यागम expandKernel(s0y, s0x, dst_, dsty, width, height, esz1);
 }
 
 // ===========================================================================
@@ -1912,53 +1912,53 @@ static int castKernel(const void* src0_, size_t s0y, size_t s0x,
 
 // OP_CAST / OP_CONVERT_SCALE: wrap core's convert BinaryFunc (carried in kernel.userdata) in
 // castKernel, which runs it over the distinct sub-region and then expands across broadcast axes.
-TKernel getCastFunc_(int sdepth, int ddepth, bool scaled)
+TKernel getCastFunc_(पूर्णाङ्क sdepth, पूर्णाङ्क ddepth, तार्किक scaled)
 {
-    BinaryFunc cvt = scaled ? getConvertScaleFunc(sdepth, ddepth) : getConvertFunc(sdepth, ddepth);
-    return {castKernel, (void*)cvt, CV_ELEM_SIZE1(ddepth)};
+    द्विमान_Func cvt = scaled ? getConvertScaleFunc(sdepth, ddepth) : getConvertFunc(sdepth, ddepth);
+    प्रत्यागम {castKernel, (शून्य*)cvt, CV_ELEM_SIZE1(ddepth)};
 }
 
 // Non-template wrappers around the templated kernel selectors (ADD/SUB share getAddSubFunc, MIN/MAX
 // share getMinMaxFunc). min/max are T x T -> T, so R is ignored (the dispatcher validates R == T).
-TKernel getAddFunc_(int T, int R) { return getAddSubFunc<EwAdd>(T, R); }
-TKernel getSubFunc_(int T, int R) { return getAddSubFunc<EwSub>(T, R); }
-TKernel getMinFunc_(int T, int R) { (void)R; return getMinMaxFunc<EwMin>(T); }
-TKernel getMaxFunc_(int T, int R) { (void)R; return getMinMaxFunc<EwMax>(T); }
+TKernel getAddFunc_(पूर्णाङ्क T, पूर्णाङ्क R) { प्रत्यागम getAddSubFunc<EwAdd>(T, R); }
+TKernel getSubFunc_(पूर्णाङ्क T, पूर्णाङ्क R) { प्रत्यागम getAddSubFunc<EwSub>(T, R); }
+TKernel getMinFunc_(पूर्णाङ्क T, पूर्णाङ्क R) { (शून्य)R; प्रत्यागम getMinMaxFunc<EwMin>(T); }
+TKernel getMaxFunc_(पूर्णाङ्क T, पूर्णाङ्क R) { (शून्य)R; प्रत्यागम getMinMaxFunc<EwMax>(T); }
 
-TKernel getHypotFunc_(int T, int R)
+TKernel getHypotFunc_(पूर्णाङ्क T, पूर्णाङ्क R)
 {
-    if (R != T)
-        return {};
+    जइ (R != T)
+        प्रत्यागम {};
     KernelFunc fptr = nullptr;
-    switch (T)
+    विकल्प (T)
     {
-    case CV_16F:  fptr = vecBinaryKernel<hfloat, hfloat, v_float32, float, EwHypot>; break;
-    case CV_16BF: fptr = vecBinaryKernel<bfloat, bfloat, v_float32, float, EwHypot>; break;
-    case CV_32F:  fptr = vecBinaryKernel<float,  float,  v_float32, float, EwHypot>; break;
-#if CV_SIMD_64F || CV_SIMD_SCALABLE_64F
-    case CV_64F:  fptr = vecBinaryKernel<double, double, v_float64, double, EwHypot>; break;
-#else
-    case CV_64F:  fptr = scalarBinaryKernel<double, double, double, EwHypot>; break;
+    पक्ष CV_16F:  fptr = vec_द्विमान_Kernel<hfloat, hfloat, v_float32, भिन्न, EwHypot>; भङ्ग;
+    पक्ष CV_16BF: fptr = vec_द्विमान_Kernel<bfloat, bfloat, v_float32, भिन्न, EwHypot>; भङ्ग;
+    पक्ष CV_32F:  fptr = vec_द्विमान_Kernel<भिन्न,  भिन्न,  v_float32, भिन्न, EwHypot>; भङ्ग;
+#जइ CV_SIMD_64F || CV_SIMD_SCALABLE_64F
+    पक्ष CV_64F:  fptr = vec_द्विमान_Kernel<द्विगुण, द्विगुण, v_float64, द्विगुण, EwHypot>; भङ्ग;
+#अण्णहा
+    पक्ष CV_64F:  fptr = scalar_द्विमान_Kernel<द्विगुण, द्विगुण, द्विगुण, EwHypot>; भङ्ग;
 #endif
-    default: ;
+    स्वभाव: ;
     }
-    return {fptr, nullptr, 0};
+    प्रत्यागम {fptr, nullptr, 0};
 }
 
-TKernel getAtan2Func_(int T, int R)
+TKernel getAtan2Func_(पूर्णाङ्क T, पूर्णाङ्क R)
 {
-    if (R != T)
-        return {};
+    जइ (R != T)
+        प्रत्यागम {};
     KernelFunc fptr = nullptr;
-    switch (T)
+    विकल्प (T)
     {
-    case CV_16F:  fptr = vecBinaryKernel<hfloat, hfloat, v_float32, float, EwAtan2>; break;
-    case CV_16BF: fptr = vecBinaryKernel<bfloat, bfloat, v_float32, float, EwAtan2>; break;
-    case CV_32F:  fptr = vecBinaryKernel<float,  float,  v_float32, float, EwAtan2>; break;
-    case CV_64F:  fptr = scalarBinaryKernel<double, double, double, EwAtan2>; break;   // exact std::atan2
-    default: ;
+    पक्ष CV_16F:  fptr = vec_द्विमान_Kernel<hfloat, hfloat, v_float32, भिन्न, EwAtan2>; भङ्ग;
+    पक्ष CV_16BF: fptr = vec_द्विमान_Kernel<bfloat, bfloat, v_float32, भिन्न, EwAtan2>; भङ्ग;
+    पक्ष CV_32F:  fptr = vec_द्विमान_Kernel<भिन्न,  भिन्न,  v_float32, भिन्न, EwAtan2>; भङ्ग;
+    पक्ष CV_64F:  fptr = scalar_द्विमान_Kernel<द्विगुण, द्विगुण, द्विगुण, EwAtan2>; भङ्ग;   // exact std::atan2
+    स्वभाव: ;
     }
-    return {fptr, nullptr, 0};
+    प्रत्यागम {fptr, nullptr, 0};
 }
 
 #endif // CV_CPU_OPTIMIZATION_DECLARATIONS_ONLY
