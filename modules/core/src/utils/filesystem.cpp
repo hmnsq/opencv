@@ -2,180 +2,180 @@
 // It is subject to the license terms in the LICENSE file found in the top-level directory
 // of this distribution and at http://opencv.org/license.html.
 
-#include "../precomp.hpp"
+#अन्तर्भाव "../precomp.hpp"
 
-#include <opencv2/core/utils/configuration.private.hpp>
+#अन्तर्भाव <opencv2/core/utils/configuration.private.hpp>
 
-#include <opencv2/core/utils/logger.hpp>
+#अन्तर्भाव <opencv2/core/utils/logger.hpp>
 
-#include "opencv2/core/utils/filesystem.private.hpp"
-#include "opencv2/core/utils/filesystem.hpp"
+#अन्तर्भाव "opencv2/core/utils/filesystem.private.hpp"
+#अन्तर्भाव "opencv2/core/utils/filesystem.hpp"
 
 //#define DEBUG_FS_UTILS
 
 #ifdef DEBUG_FS_UTILS
-#include <iostream>
+#अन्तर्भाव <iostream>
 #define DBG(...) __VA_ARGS__
-#else
+#अन्यथा
 #define DBG(...)
 #endif
 
 
-#if OPENCV_HAVE_FILESYSTEM_SUPPORT
+#जर OPENCV_HAVE_FILESYSTEM_SUPPORT
 
 #ifdef _WIN32
 #define WIN32_LEAN_AND_MEAN
 #undef NOMINMAX
 #define NOMINMAX
-#include <windows.h>
-#include <direct.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <errno.h>
-#include <io.h>
-#include <stdio.h>
-#elif defined __linux__ || defined __APPLE__ || defined __HAIKU__ || defined __FreeBSD__ || defined __GNU__ || defined __EMSCRIPTEN__ || defined __QNX__ || defined __CYGWIN__
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-#include <unistd.h>
-#include <errno.h>
+#अन्तर्भाव <windows.h>
+#अन्तर्भाव <direct.h>
+#अन्तर्भाव <sys/types.h>
+#अन्तर्भाव <sys/stat.h>
+#अन्तर्भाव <errno.h>
+#अन्तर्भाव <io.h>
+#अन्तर्भाव <stdio.h>
+#किंवाजर defined __linux__ || defined __APPLE__ || defined __HAIKU__ || defined __FreeBSD__ || defined __GNU__ || defined __EMSCRIPTEN__ || defined __QNX__ || defined __CYGWIN__
+#अन्तर्भाव <sys/types.h>
+#अन्तर्भाव <sys/stat.h>
+#अन्तर्भाव <fcntl.h>
+#अन्तर्भाव <unistd.h>
+#अन्तर्भाव <errno.h>
 #endif
 
 #endif // OPENCV_HAVE_FILESYSTEM_SUPPORT
 
-namespace cv { namespace utils { namespace fs {
+नामाकाश cv { नामाकाश utils { नामाकाश fs {
 
 #ifdef _WIN32
-static const char native_separator = '\\';
-#else
-static const char native_separator = '/';
+स्थिर स्थिरांक अक्षर native_separator = '\\';
+#अन्यथा
+स्थिर स्थिरांक अक्षर native_separator = '/';
 #endif
 
-static inline
-bool isPathSeparator(char c)
+स्थिर ओळीत
+तार्किक isPathSeparator(अक्षर c)
 {
-    return c == '/' || c == '\\';
+    परत c == '/' || c == '\\';
 }
 
-cv::String join(const cv::String& base, const cv::String& path)
+cv::String join(स्थिरांक cv::String& base, स्थिरांक cv::String& path)
 {
-    if (base.empty())
-        return path;
-    if (path.empty())
-        return base;
+    जर (base.empty())
+        परत path;
+    जर (path.empty())
+        परत base;
 
-    bool baseSep = isPathSeparator(base[base.size() - 1]);
-    bool pathSep = isPathSeparator(path[0]);
+    तार्किक baseSep = isPathSeparator(base[base.size() - 1]);
+    तार्किक pathSep = isPathSeparator(path[0]);
     String result;
-    if (baseSep && pathSep)
+    जर (baseSep && pathSep)
     {
         result = base + path.substr(1);
     }
-    else if (!baseSep && !pathSep)
+    अन्यथा जर (!baseSep && !pathSep)
     {
         result = base + native_separator + path;
     }
-    else
+    अन्यथा
     {
         result = base + path;
     }
-    return result;
+    परत result;
 }
 
-CV_EXPORTS cv::String getParent(const cv::String &path)
+CV_EXPORTS cv::String getParent(स्थिरांक cv::String &path)
 {
     std::string::size_type loc = path.find_last_of("/\\");
-    if (loc == std::string::npos)
-        return std::string();
-    return std::string(path, 0, loc);
+    जर (loc == std::string::npos)
+        परत std::string();
+    परत std::string(path, 0, loc);
 }
 
-CV_EXPORTS std::wstring getParent(const std::wstring& path)
+CV_EXPORTS std::wstring getParent(स्थिरांक std::wstring& path)
 {
     std::wstring::size_type loc = path.find_last_of(L"/\\");
-    if (loc == std::wstring::npos)
-        return std::wstring();
-    return std::wstring(path, 0, loc);
+    जर (loc == std::wstring::npos)
+        परत std::wstring();
+    परत std::wstring(path, 0, loc);
 }
 
-#if OPENCV_HAVE_FILESYSTEM_SUPPORT
+#जर OPENCV_HAVE_FILESYSTEM_SUPPORT
 
-cv::String canonical(const cv::String& path)
+cv::String canonical(स्थिरांक cv::String& path)
 {
     cv::String result;
 #ifdef _WIN32
-    const char* result_str = _fullpath(NULL, path.c_str(), 0);
-#else
-    const char* result_str = realpath(path.c_str(), NULL);
+    स्थिरांक अक्षर* result_str = _fullpath(रिक्त, path.c_str(), 0);
+#अन्यथा
+    स्थिरांक अक्षर* result_str = realpath(path.c_str(), रिक्त);
 #endif
-    if (result_str)
+    जर (result_str)
     {
         result = cv::String(result_str);
-        free((void*)result_str);
+        मुक्त((शून्य*)result_str);
     }
-    return result.empty() ? path : result;
+    परत result.empty() ? path : result;
 }
 
 
-bool exists(const cv::String& path)
+तार्किक exists(स्थिरांक cv::String& path)
 {
     CV_INSTRUMENT_REGION();
 
-#if defined _WIN32 || defined WINCE
+#जर defined _WIN32 || defined WINCE
     BOOL status = TRUE;
     {
         WIN32_FILE_ATTRIBUTE_DATA all_attrs;
 #ifdef WINRT
-        wchar_t wpath[MAX_PATH];
-        size_t copied = mbstowcs(wpath, path.c_str(), MAX_PATH);
-        CV_Assert((copied != MAX_PATH) && (copied != (size_t)-1));
+        ब_अक्षर_प्रकार wpath[MAX_PATH];
+        माप_प्रकार copied = mbstowcs(wpath, path.c_str(), MAX_PATH);
+        CV_Assert((copied != MAX_PATH) && (copied != (माप_प्रकार)-1));
         status = ::GetFileAttributesExW(wpath, GetFileExInfoStandard, &all_attrs);
-#else
+#अन्यथा
         status = ::GetFileAttributesExA(path.c_str(), GetFileExInfoStandard, &all_attrs);
 #endif
     }
 
-    return !!status;
-#else
-    struct stat stat_buf;
-    return (0 == stat(path.c_str(), &stat_buf));
+    परत !!status;
+#अन्यथा
+    संरचना stat stat_buf;
+    परत (0 == stat(path.c_str(), &stat_buf));
 #endif
 }
 
-CV_EXPORTS void remove_all(const cv::String& path)
+CV_EXPORTS शून्य remove_all(स्थिरांक cv::String& path)
 {
-    if (!exists(path))
-        return;
-    if (isDirectory(path))
+    जर (!exists(path))
+        परत;
+    जर (isDirectory(path))
     {
         std::vector<String> entries;
-        utils::fs::glob(path, cv::String(), entries, false, true);
-        for (size_t i = 0; i < entries.size(); i++)
+        utils::fs::glob(path, cv::String(), entries, असत्य, सत्य);
+        साठी (माप_प्रकार i = 0; i < entries.size(); i++)
         {
-            const String& e = entries[i];
+            स्थिरांक String& e = entries[i];
             remove_all(e);
         }
 #ifdef _MSC_VER
-        bool result = _rmdir(path.c_str()) == 0;
-#else
-        bool result = rmdir(path.c_str()) == 0;
+        तार्किक result = _rmdir(path.c_str()) == 0;
+#अन्यथा
+        तार्किक result = सूची_हटाओ(path.c_str()) == 0;
 #endif
-        if (!result)
+        जर (!result)
         {
-            CV_LOG_ERROR(NULL, "Can't remove directory: " << path);
+            CV_LOG_ERROR(रिक्त, "Can't remove directory: " << path);
         }
     }
-    else
+    अन्यथा
     {
 #ifdef _MSC_VER
-        bool result = _unlink(path.c_str()) == 0;
-#else
-        bool result = unlink(path.c_str()) == 0;
+        तार्किक result = _unlink(path.c_str()) == 0;
+#अन्यथा
+        तार्किक result = unlink(path.c_str()) == 0;
 #endif
-        if (!result)
+        जर (!result)
         {
-            CV_LOG_ERROR(NULL, "Can't remove file: " << path);
+            CV_LOG_ERROR(रिक्त, "Can't remove file: " << path);
         }
     }
 }
@@ -184,418 +184,418 @@ CV_EXPORTS void remove_all(const cv::String& path)
 cv::String getcwd()
 {
     CV_INSTRUMENT_REGION();
-    cv::AutoBuffer<char, 4096> buf;
-#if defined WIN32 || defined _WIN32 || defined WINCE
+    cv::AutoBuffer<अक्षर, 4096> buf;
+#जर defined WIN32 || defined _WIN32 || defined WINCE
 #ifdef WINRT
-    return cv::String();
-#else
-    DWORD sz = GetCurrentDirectoryA(0, NULL);
-    buf.allocate((size_t)sz);
+    परत cv::String();
+#अन्यथा
+    DWORD sz = GetCurrentDirectoryA(0, रिक्त);
+    buf.allocate((माप_प्रकार)sz);
     sz = GetCurrentDirectoryA((DWORD)buf.size(), buf.data());
-    return cv::String(buf.data(), (size_t)sz);
+    परत cv::String(buf.data(), (माप_प्रकार)sz);
 #endif
-#elif defined __linux__ || defined __APPLE__ || defined __HAIKU__ || defined __FreeBSD__ || defined __EMSCRIPTEN__ || defined __QNX__ || defined __CYGWIN__
-    for(;;)
+#किंवाजर defined __linux__ || defined __APPLE__ || defined __HAIKU__ || defined __FreeBSD__ || defined __EMSCRIPTEN__ || defined __QNX__ || defined __CYGWIN__
+    साठी(;;)
     {
-        char* p = ::getcwd(buf.data(), buf.size());
-        if (p == NULL)
+        अक्षर* p = ::getcwd(buf.data(), buf.size());
+        जर (p == रिक्त)
         {
-            if (errno == ERANGE)
+            जर (त्रुटि_सं == दुस्फल)
             {
                 buf.allocate(buf.size() * 2);
-                continue;
+                सुरूठेवा;
             }
-            return cv::String();
+            परत cv::String();
         }
-        break;
+        थांबा;
     }
-    return cv::String(buf.data(), (size_t)strlen(buf.data()));
-#else
-    return cv::String();
+    परत cv::String(buf.data(), (माप_प्रकार)म_माप(buf.data()));
+#अन्यथा
+    परत cv::String();
 #endif
 }
 
 
-bool createDirectory(const cv::String& path)
+तार्किक createDirectory(स्थिरांक cv::String& path)
 {
     CV_INSTRUMENT_REGION();
-#if defined WIN32 || defined _WIN32 || defined WINCE
+#जर defined WIN32 || defined _WIN32 || defined WINCE
 #ifdef WINRT
-    wchar_t wpath[MAX_PATH];
-    size_t copied = mbstowcs(wpath, path.c_str(), MAX_PATH);
-    CV_Assert((copied != MAX_PATH) && (copied != (size_t)-1));
-    int result = CreateDirectoryA(wpath, NULL) ? 0 : -1;
-#else
-    int result = _mkdir(path.c_str());
+    ब_अक्षर_प्रकार wpath[MAX_PATH];
+    माप_प्रकार copied = mbstowcs(wpath, path.c_str(), MAX_PATH);
+    CV_Assert((copied != MAX_PATH) && (copied != (माप_प्रकार)-1));
+    पूर्णांक result = CreateDirectoryA(wpath, रिक्त) ? 0 : -1;
+#अन्यथा
+    पूर्णांक result = _mkdir(path.c_str());
 #endif
-#elif defined __linux__ || defined __APPLE__ || defined __HAIKU__ || defined __FreeBSD__ || defined __EMSCRIPTEN__ || defined __QNX__ || defined __CYGWIN__
-    int result = mkdir(path.c_str(), 0777);
-#else
-    int result = -1;
+#किंवाजर defined __linux__ || defined __APPLE__ || defined __HAIKU__ || defined __FreeBSD__ || defined __EMSCRIPTEN__ || defined __QNX__ || defined __CYGWIN__
+    पूर्णांक result = सूची_गढ़ो(path.c_str(), 0777);
+#अन्यथा
+    पूर्णांक result = -1;
 #endif
 
-    if (result == -1)
+    जर (result == -1)
     {
-        return isDirectory(path);
+        परत isDirectory(path);
     }
-    return true;
+    परत सत्य;
 }
 
-bool createDirectories(const cv::String& path_)
+तार्किक createDirectories(स्थिरांक cv::String& path_)
 {
     cv::String path = path_;
-    for (;;)
+    साठी (;;)
     {
-        char last_char = path.empty() ? 0 : path[path.length() - 1];
-        if (isPathSeparator(last_char))
+        अक्षर last_char = path.empty() ? 0 : path[path.length() - 1];
+        जर (isPathSeparator(last_char))
         {
             path = path.substr(0, path.length() - 1);
-            continue;
+            सुरूठेवा;
         }
-        break;
+        थांबा;
     }
 
-    if (path.empty() || path == "./" || path == ".\\" || path == ".")
-        return true;
-    if (isDirectory(path))
-        return true;
+    जर (path.empty() || path == "./" || path == ".\\" || path == ".")
+        परत सत्य;
+    जर (isDirectory(path))
+        परत सत्य;
 
-    size_t pos = path.rfind('/');
-    if (pos == cv::String::npos)
+    माप_प्रकार pos = path.rfind('/');
+    जर (pos == cv::String::npos)
         pos = path.rfind('\\');
-    if (pos != cv::String::npos)
+    जर (pos != cv::String::npos)
     {
         cv::String parent_directory = path.substr(0, pos);
-        if (!parent_directory.empty())
+        जर (!parent_directory.empty())
         {
-            if (!createDirectories(parent_directory))
-                return false;
+            जर (!createDirectories(parent_directory))
+                परत असत्य;
         }
     }
 
-    return createDirectory(path);
+    परत createDirectory(path);
 }
 
 #ifdef _WIN32
 
-struct FileLock::Impl
+संरचना FileLock::Impl
 {
-    Impl(const char* fname)
+    Impl(स्थिरांक अक्षर* fname)
     {
         // http://support.microsoft.com/kb/316609
-        int numRetries = 5;
-        do
+        पूर्णांक अंक_Retries = 5;
+        करा
         {
-            handle = ::CreateFileA(fname, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL,
-                                OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
-            if (INVALID_HANDLE_VALUE == handle)
+            handle = ::CreateFileA(fname, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE, रिक्त,
+                                OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, रिक्त);
+            जर (INVALID_HANDLE_मूल्य == handle)
             {
-                if (ERROR_SHARING_VIOLATION == GetLastError())
+                जर (ERROR_SHARING_VIOLATION == GetLastError())
                 {
-                    numRetries--;
+                    अंक_Retries--;
                     Sleep(250);
-                    continue;
+                    सुरूठेवा;
                 }
-                else
+                अन्यथा
                 {
                     CV_Error_(Error::StsAssert, ("Can't open lock file: %s", fname));
                 }
             }
-            break;
-        } while (numRetries > 0);
+            थांबा;
+        } पर्यंत (अंक_Retries > 0);
     }
     ~Impl()
     {
-        if (INVALID_HANDLE_VALUE != handle)
+        जर (INVALID_HANDLE_मूल्य != handle)
         {
             ::CloseHandle(handle);
         }
     }
 
-    bool lock()
+    तार्किक lock()
     {
         OVERLAPPED overlapped;
-        std::memset(&overlapped, 0, sizeof(overlapped));
-        return !!::LockFileEx(handle, LOCKFILE_EXCLUSIVE_LOCK, 0, MAXDWORD, MAXDWORD, &overlapped);
+        std::स_रखो(&overlapped, 0, आकार(overlapped));
+        परत !!::LockFileEx(handle, LOCKFILE_EXCLUSIVE_LOCK, 0, MAXDWORD, MAXDWORD, &overlapped);
     }
-    bool unlock()
+    तार्किक unlock()
     {
         OVERLAPPED overlapped;
-        std::memset(&overlapped, 0, sizeof(overlapped));
-        return !!::UnlockFileEx(handle, 0, MAXDWORD, MAXDWORD, &overlapped);
+        std::स_रखो(&overlapped, 0, आकार(overlapped));
+        परत !!::UnlockFileEx(handle, 0, MAXDWORD, MAXDWORD, &overlapped);
     }
 
-    bool lock_shared()
+    तार्किक lock_shared()
     {
         OVERLAPPED overlapped;
-        std::memset(&overlapped, 0, sizeof(overlapped));
-        return !!::LockFileEx(handle, 0, 0, MAXDWORD, MAXDWORD, &overlapped);
+        std::स_रखो(&overlapped, 0, आकार(overlapped));
+        परत !!::LockFileEx(handle, 0, 0, MAXDWORD, MAXDWORD, &overlapped);
     }
-    bool unlock_shared()
+    तार्किक unlock_shared()
     {
-        return unlock();
+        परत unlock();
     }
 
     HANDLE handle;
 
-private:
-    Impl(const Impl&); // disabled
-    Impl& operator=(const Impl&); // disabled
+खाजगी:
+    Impl(स्थिरांक Impl&); // disabled
+    Impl& चालक=(स्थिरांक Impl&); // disabled
 };
 
-#elif defined __linux__ || defined __APPLE__ || defined __HAIKU__ || defined __FreeBSD__ || defined __GNU__ || defined __EMSCRIPTEN__ || defined __QNX__ || defined __CYGWIN__
+#किंवाजर defined __linux__ || defined __APPLE__ || defined __HAIKU__ || defined __FreeBSD__ || defined __GNU__ || defined __EMSCRIPTEN__ || defined __QNX__ || defined __CYGWIN__
 
-struct FileLock::Impl
+संरचना FileLock::Impl
 {
-    Impl(const char* fname)
+    Impl(स्थिरांक अक्षर* fname)
     {
-        handle = ::open(fname, O_RDWR);
+        handle = ::खोलो(fname, O_RDWR);
         CV_Assert(handle != -1);
     }
     ~Impl()
     {
-        if (handle >= 0)
-            ::close(handle);
+        जर (handle >= 0)
+            ::बंद(handle);
     }
 
-    bool lock()
+    तार्किक lock()
     {
-        struct ::flock l;
-        std::memset(&l, 0, sizeof(l));
+        संरचना ::flock l;
+        std::स_रखो(&l, 0, आकार(l));
         l.l_type = F_WRLCK;
-        l.l_whence = SEEK_SET;
+        l.l_whence = शुरू_से;
         l.l_start = 0;
         l.l_len = 0;
         DBG(std::cout << "Lock..." << std::endl);
-        bool res = -1 != ::fcntl(handle, F_SETLKW, &l);
-        return res;
+        तार्किक res = -1 != ::fcntl(handle, F_SETLKW, &l);
+        परत res;
     }
-    bool unlock()
+    तार्किक unlock()
     {
-        struct ::flock l;
-        std::memset(&l, 0, sizeof(l));
+        संरचना ::flock l;
+        std::स_रखो(&l, 0, आकार(l));
         l.l_type = F_UNLCK;
-        l.l_whence = SEEK_SET;
+        l.l_whence = शुरू_से;
         l.l_start = 0;
         l.l_len = 0;
         DBG(std::cout << "Unlock..." << std::endl);
-        bool res = -1 != ::fcntl(handle, F_SETLK, &l);
-        return res;
+        तार्किक res = -1 != ::fcntl(handle, F_SETLK, &l);
+        परत res;
     }
 
-    bool lock_shared()
+    तार्किक lock_shared()
     {
-        struct ::flock l;
-        std::memset(&l, 0, sizeof(l));
+        संरचना ::flock l;
+        std::स_रखो(&l, 0, आकार(l));
         l.l_type = F_RDLCK;
-        l.l_whence = SEEK_SET;
+        l.l_whence = शुरू_से;
         l.l_start = 0;
         l.l_len = 0;
         DBG(std::cout << "Lock read..." << std::endl);
-        bool res = -1 != ::fcntl(handle, F_SETLKW, &l);
-        return res;
+        तार्किक res = -1 != ::fcntl(handle, F_SETLKW, &l);
+        परत res;
     }
-    bool unlock_shared()
+    तार्किक unlock_shared()
     {
-        return unlock();
+        परत unlock();
     }
 
-    int handle;
+    पूर्णांक handle;
 
-private:
-    Impl(const Impl&); // disabled
-    Impl& operator=(const Impl&); // disabled
+खाजगी:
+    Impl(स्थिरांक Impl&); // disabled
+    Impl& चालक=(स्थिरांक Impl&); // disabled
 };
 
 #endif
 
-FileLock::FileLock(const char* fname)
-    : pImpl(new Impl(fname))
+FileLock::FileLock(स्थिरांक अक्षर* fname)
+    : pImpl(नवीन Impl(fname))
 {
     // nothing
 }
 FileLock::~FileLock()
 {
     delete pImpl;
-    pImpl = NULL;
+    pImpl = रिक्त;
 }
 
-void FileLock::lock() { CV_Assert(pImpl->lock()); }
-void FileLock::unlock() { CV_Assert(pImpl->unlock()); }
-void FileLock::lock_shared() { CV_Assert(pImpl->lock_shared()); }
-void FileLock::unlock_shared() { CV_Assert(pImpl->unlock_shared()); }
+शून्य FileLock::lock() { CV_Assert(pImpl->lock()); }
+शून्य FileLock::unlock() { CV_Assert(pImpl->unlock()); }
+शून्य FileLock::lock_shared() { CV_Assert(pImpl->lock_shared()); }
+शून्य FileLock::unlock_shared() { CV_Assert(pImpl->unlock_shared()); }
 
 
 
-cv::String getCacheDirectory(const char* sub_directory_name, const char* configuration_name)
+cv::String getCacheDirectory(स्थिरांक अक्षर* sub_directory_name, स्थिरांक अक्षर* configuration_name)
 {
     String cache_path;
-    if (configuration_name)
+    जर (configuration_name)
     {
         cache_path = utils::getConfigurationParameterString(configuration_name, "");
     }
-    if (cache_path.empty())
+    जर (cache_path.empty())
     {
         cv::String default_cache_path;
 #ifdef _WIN32
-        wchar_t tmp_path_buf_w[MAX_PATH+1] = {0};
+        ब_अक्षर_प्रकार tmp_path_buf_w[MAX_PATH+1] = {0};
         DWORD res = GetTempPathW(MAX_PATH, tmp_path_buf_w);
-        if (res > 0 && res <= MAX_PATH)
+        जर (res > 0 && res <= MAX_PATH)
         {
             // Convert from UTF-16 to UTF-8 to support Unicode paths
-            int len = WideCharToMultiByte(CP_UTF8, 0, tmp_path_buf_w, -1, NULL, 0, NULL, NULL);
-            if (len > 0)
+            पूर्णांक len = WideCharToMultiByte(CP_UTF8, 0, tmp_path_buf_w, -1, रिक्त, 0, रिक्त, रिक्त);
+            जर (len > 0)
             {
-                std::vector<char> utf8_buf(len);
-                WideCharToMultiByte(CP_UTF8, 0, tmp_path_buf_w, -1, utf8_buf.data(), len, NULL, NULL);
+                std::vector<अक्षर> utf8_buf(len);
+                WideCharToMultiByte(CP_UTF8, 0, tmp_path_buf_w, -1, utf8_buf.data(), len, रिक्त, रिक्त);
                 default_cache_path = std::string(utf8_buf.data());
             }
         }
-#elif defined __ANDROID__
+#किंवाजर defined __ANDROID__
         // no defaults
-#elif defined __APPLE__
-        const std::string tmpdir_env = utils::getConfigurationParameterString("TMPDIR");
-        if (!tmpdir_env.empty() && utils::fs::isDirectory(tmpdir_env))
+#किंवाजर defined __APPLE__
+        स्थिरांक std::string tmpdir_env = utils::getConfigurationParameterString("TMPDIR");
+        जर (!tmpdir_env.empty() && utils::fs::isDirectory(tmpdir_env))
         {
             default_cache_path = tmpdir_env;
         }
-        else
+        अन्यथा
         {
             default_cache_path = "/tmp/";
-            CV_LOG_WARNING(NULL, "Using world accessible cache directory. This may be not secure: " << default_cache_path);
+            CV_LOG_WARNING(रिक्त, "Using world accessible cache directory. This may be not secure: " << default_cache_path);
         }
-#elif defined __linux__ || defined __HAIKU__ || defined __FreeBSD__ || defined __GNU__
+#किंवाजर defined __linux__ || defined __HAIKU__ || defined __FreeBSD__ || defined __GNU__
         // https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html
-        if (default_cache_path.empty())
+        जर (default_cache_path.empty())
         {
-            const std::string xdg_cache_env = utils::getConfigurationParameterString("XDG_CACHE_HOME");
-            if (!xdg_cache_env.empty() && utils::fs::isDirectory(xdg_cache_env))
+            स्थिरांक std::string xdg_cache_env = utils::getConfigurationParameterString("XDG_CACHE_HOME");
+            जर (!xdg_cache_env.empty() && utils::fs::isDirectory(xdg_cache_env))
             {
                 default_cache_path = xdg_cache_env;
             }
         }
-        if (default_cache_path.empty())
+        जर (default_cache_path.empty())
         {
-            const std::string home_env = utils::getConfigurationParameterString("HOME");
-            if (!home_env.empty() && utils::fs::isDirectory(home_env))
+            स्थिरांक std::string home_env = utils::getConfigurationParameterString("HOME");
+            जर (!home_env.empty() && utils::fs::isDirectory(home_env))
             {
                 cv::String home_path = home_env;
                 cv::String home_cache_path = utils::fs::join(home_path, ".cache/");
-                if (utils::fs::isDirectory(home_cache_path))
+                जर (utils::fs::isDirectory(home_cache_path))
                 {
                     default_cache_path = home_cache_path;
                 }
             }
         }
-        if (default_cache_path.empty())
+        जर (default_cache_path.empty())
         {
-            const char* temp_path = "/var/tmp/";
-            if (utils::fs::isDirectory(temp_path))
+            स्थिरांक अक्षर* temp_path = "/var/tmp/";
+            जर (utils::fs::isDirectory(temp_path))
             {
                 default_cache_path = temp_path;
-                CV_LOG_WARNING(NULL, "Using world accessible cache directory. This may be not secure: " << default_cache_path);
+                CV_LOG_WARNING(रिक्त, "Using world accessible cache directory. This may be not secure: " << default_cache_path);
             }
         }
-        if (default_cache_path.empty())
+        जर (default_cache_path.empty())
         {
             default_cache_path = "/tmp/";
-            CV_LOG_WARNING(NULL, "Using world accessible cache directory. This may be not secure: " << default_cache_path);
+            CV_LOG_WARNING(रिक्त, "Using world accessible cache directory. This may be not secure: " << default_cache_path);
         }
-#else
+#अन्यथा
         // no defaults
 #endif
-        CV_LOG_VERBOSE(NULL, 0, "default_cache_path = " << default_cache_path);
-        if (!default_cache_path.empty())
+        CV_LOG_VERBOSE(रिक्त, 0, "default_cache_path = " << default_cache_path);
+        जर (!default_cache_path.empty())
         {
-            if (utils::fs::isDirectory(default_cache_path))
+            जर (utils::fs::isDirectory(default_cache_path))
             {
                 cv::String default_cache_path_base = utils::fs::join(default_cache_path, "opencv");
                 default_cache_path = utils::fs::join(default_cache_path_base, CVAUX_STR(CV_VERSION_MAJOR) ".x" CV_VERSION_STATUS);
-                if (utils::getConfigurationParameterBool("OPENCV_CACHE_SHOW_CLEANUP_MESSAGE", true)
+                जर (utils::getConfigurationParameterBool("OPENCV_CACHE_SHOW_CLEANUP_MESSAGE", सत्य)
                     && !utils::fs::isDirectory(default_cache_path))
                 {
                     std::vector<cv::String> existedCacheDirs;
-                    try
+                    प्रयत्न
                     {
-                        utils::fs::glob_relative(default_cache_path_base, "*", existedCacheDirs, false, true);
+                        utils::fs::glob_relative(default_cache_path_base, "*", existedCacheDirs, असत्य, सत्य);
                     }
-                    catch (...)
+                    पकडा (...)
                     {
                         // ignore
                     }
-                    if (!existedCacheDirs.empty())
+                    जर (!existedCacheDirs.empty())
                     {
-                        CV_LOG_WARNING(NULL, "Creating new OpenCV cache directory: " << default_cache_path);
-                        CV_LOG_WARNING(NULL, "There are several neighbour directories, probably created by old OpenCV versions.");
-                        CV_LOG_WARNING(NULL, "Feel free to cleanup these unused directories:");
-                        for (size_t i = 0; i < existedCacheDirs.size(); i++)
+                        CV_LOG_WARNING(रिक्त, "Creating new OpenCV cache directory: " << default_cache_path);
+                        CV_LOG_WARNING(रिक्त, "There are several neighbour directories, probably created by old OpenCV versions.");
+                        CV_LOG_WARNING(रिक्त, "Feel free to cleanup these unused directories:");
+                        साठी (माप_प्रकार i = 0; i < existedCacheDirs.size(); i++)
                         {
-                            CV_LOG_WARNING(NULL, "  - " << existedCacheDirs[i]);
+                            CV_LOG_WARNING(रिक्त, "  - " << existedCacheDirs[i]);
                         }
-                        CV_LOG_WARNING(NULL, "Note: This message is showed only once.");
+                        CV_LOG_WARNING(रिक्त, "Note: This message is showed only once.");
                     }
                 }
-                if (sub_directory_name && sub_directory_name[0] != '\0')
+                जर (sub_directory_name && sub_directory_name[0] != '\0')
                     default_cache_path = utils::fs::join(default_cache_path, cv::String(sub_directory_name) + native_separator);
-                if (!utils::fs::createDirectories(default_cache_path))
+                जर (!utils::fs::createDirectories(default_cache_path))
                 {
-                    CV_LOG_DEBUG(NULL, "Can't create OpenCV cache sub-directory: " << default_cache_path);
+                    CV_LOG_DEBUG(रिक्त, "Can't create OpenCV cache sub-directory: " << default_cache_path);
                 }
-                else
+                अन्यथा
                 {
                     cache_path = default_cache_path;
                 }
             }
-            else
+            अन्यथा
             {
-                CV_LOG_INFO(NULL, "Can't find default cache directory (does it exist?): " << default_cache_path);
+                CV_LOG_INFO(रिक्त, "Can't find default cache directory (does it exist?): " << default_cache_path);
             }
         }
-        else
+        अन्यथा
         {
-            CV_LOG_DEBUG(NULL, "OpenCV has no support to discover default cache directory on the current platform");
+            CV_LOG_DEBUG(रिक्त, "OpenCV has no support to discover default cache directory on the current platform");
         }
     }
-    else
+    अन्यथा
     {
-        if (cache_path == "disabled")
-            return cache_path;
-        if (!isDirectory(cache_path))
+        जर (cache_path == "disabled")
+            परत cache_path;
+        जर (!isDirectory(cache_path))
         {
-            CV_LOG_WARNING(NULL, "Specified non-existed directory, creating OpenCV sub-directory for caching purposes: " << cache_path);
-            if (!createDirectories(cache_path))
+            CV_LOG_WARNING(रिक्त, "Specified non-existed directory, creating OpenCV sub-directory for caching purposes: " << cache_path);
+            जर (!createDirectories(cache_path))
             {
-                CV_LOG_ERROR(NULL, "Can't create OpenCV cache sub-directory: " << cache_path);
+                CV_LOG_ERROR(रिक्त, "Can't create OpenCV cache sub-directory: " << cache_path);
                 cache_path.clear();
             }
         }
     }
     CV_Assert(cache_path.empty() || utils::fs::isDirectory(cache_path));
-    if (!cache_path.empty())
+    जर (!cache_path.empty())
     {
-        if (!isPathSeparator(cache_path[cache_path.size() - 1]))
+        जर (!isPathSeparator(cache_path[cache_path.size() - 1]))
         {
             cache_path += native_separator;
         }
     }
-    return cache_path;
+    परत cache_path;
 }
 
-#else
+#अन्यथा
 #define NOT_IMPLEMENTED CV_Error(Error::StsNotImplemented, "");
-cv::String canonical(const cv::String& /*path*/) { NOT_IMPLEMENTED }
-bool exists(const cv::String& /*path*/) { NOT_IMPLEMENTED }
-void remove_all(const cv::String& /*path*/) { NOT_IMPLEMENTED }
+cv::String canonical(स्थिरांक cv::String& /*path*/) { NOT_IMPLEMENTED }
+तार्किक exists(स्थिरांक cv::String& /*path*/) { NOT_IMPLEMENTED }
+शून्य remove_all(स्थिरांक cv::String& /*path*/) { NOT_IMPLEMENTED }
 cv::String getcwd() { NOT_IMPLEMENTED }
-bool createDirectory(const cv::String& /*path*/) { NOT_IMPLEMENTED }
-bool createDirectories(const cv::String& /*path*/) { NOT_IMPLEMENTED }
-cv::String getCacheDirectory(const char* /*sub_directory_name*/, const char* /*configuration_name = NULL*/) { NOT_IMPLEMENTED }
+तार्किक createDirectory(स्थिरांक cv::String& /*path*/) { NOT_IMPLEMENTED }
+तार्किक createDirectories(स्थिरांक cv::String& /*path*/) { NOT_IMPLEMENTED }
+cv::String getCacheDirectory(स्थिरांक अक्षर* /*sub_directory_name*/, स्थिरांक अक्षर* /*configuration_name = NULL*/) { NOT_IMPLEMENTED }
 #undef NOT_IMPLEMENTED
 #endif // OPENCV_HAVE_FILESYSTEM_SUPPORT
 
 }}} // namespace
 
 
-#if OPENCV_HAVE_FILESYSTEM_SUPPORT
-#include "plugin_loader.impl.hpp"
+#जर OPENCV_HAVE_FILESYSTEM_SUPPORT
+#अन्तर्भाव "plugin_loader.impl.hpp"
 #endif

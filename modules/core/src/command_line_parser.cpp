@@ -1,250 +1,250 @@
 // This file is part of OpenCV project.
 // It is subject to the license terms in the LICENSE file found in the top-level directory
 // of this distribution and at http://opencv.org/license.html.
-#include "precomp.hpp"
-#include <sstream>
+#अन्तर्भाव "precomp.hpp"
+#अन्तर्भाव <sstream>
 
-namespace cv
+नामाकाश cv
 {
 
-namespace {
-static const char* noneValue = "<none>";
+नामाकाश {
+स्थिर स्थिरांक अक्षर* none_मूल्य = "<none>";
 
-static String cat_string(const String& str)
+स्थिर String cat_string(स्थिरांक String& str)
 {
-    int left = 0, right = (int)str.length();
-    while( left < right && str[left] == ' ' )
-        left++;
-    while( right > left && str[right-1] == ' ' )
-        right--;
-    return left >= right ? String("") : str.substr(left, right-left);
+    पूर्णांक डावा = 0, उजवा = (पूर्णांक)str.length();
+    पर्यंत( डावा < उजवा && str[डावा] == ' ' )
+        डावा++;
+    पर्यंत( उजवा > डावा && str[उजवा-1] == ' ' )
+        उजवा--;
+    परत डावा >= उजवा ? String("") : str.substr(डावा, उजवा-डावा);
 }
 }
 
-struct CommandLineParserParams
+संरचना Command_ओळ_Parser_Params
 {
-public:
+सार्वजनिक:
     String help_message;
-    String def_value;
-    std::vector<String> keys;
-    int number;
+    String def_मूल्य;
+    std::vector<String> किल्ल्या;
+    पूर्णांक संख्या;
 };
 
 
-struct CommandLineParser::Impl
+संरचना Command_ओळ_Parser::Impl
 {
-    bool error;
+    तार्किक error;
     String error_message;
     String about_message;
 
     String path_to_app;
     String app_name;
 
-    std::vector<CommandLineParserParams> data;
+    std::vector<Command_ओळ_Parser_Params> data;
 
-    std::vector<String> split_range_string(const String& str, char fs, char ss) const;
-    std::vector<String> split_string(const String& str, char symbol = ' ', bool create_empty_item = false) const;
+    std::vector<String> split_range_string(स्थिरांक String& str, अक्षर fs, अक्षर ss) स्थिरांक;
+    std::vector<String> split_string(स्थिरांक String& str, अक्षर चिन्ह = ' ', तार्किक create_empty_item = असत्य) स्थिरांक;
 
-    void apply_params(const String& key, const String& value);
-    void apply_params(int i, String value);
+    शून्य apply_params(स्थिरांक String& किल्ली, स्थिरांक String& value);
+    शून्य apply_params(पूर्णांक i, String value);
 
-    void sort_params();
-    int refcount;
+    शून्य sort_params();
+    पूर्णांक refcount;
 };
 
 
-static const char* get_type_name(Param type)
+स्थिर स्थिरांक अक्षर* get_type_name(Param type)
 {
-    if( type == Param::INT )
-        return "int";
-    if( type == Param::BOOLEAN )
-        return "bool";
-    if( type == Param::UNSIGNED_INT )
-        return "unsigned";
-    if( type == Param::UINT64 )
-        return "unsigned long long";
-    if( type == Param::FLOAT )
-        return "float";
-    if( type == Param::REAL )
-        return "double";
-    if( type == Param::STRING )
-        return "string";
-    return "unknown";
+    जर( type == Param::INT )
+        परत "int";
+    जर( type == Param::BOOLEAN )
+        परत "bool";
+    जर( type == Param::UNSIGNED_INT )
+        परत "unsigned";
+    जर( type == Param::UINT64 )
+        परत "unsigned long long";
+    जर( type == Param::FLOAT )
+        परत "float";
+    जर( type == Param::REAL )
+        परत "double";
+    जर( type == Param::STRING )
+        परत "string";
+    परत "unknown";
 }
 
-static bool parse_bool(std::string str)
+स्थिर तार्किक parse_bool(std::string str)
 {
     std::transform(str.begin(), str.end(), str.begin(), details::char_tolower);
     std::istringstream is(str);
-    bool value = false;
+    तार्किक value = असत्य;
     is >> (str.size() > 1 ? std::boolalpha : std::noboolalpha) >> value;
 
-    if (is.fail())
+    जर (is.fail())
         CV_Error_(Error::StsBadArg, ("can not convert: [%s] to [bool]", str.c_str()));
 
-    return value;
+    परत value;
 }
 
-static void from_str(const String& str, Param type, void* dst)
+स्थिर शून्य from_str(स्थिरांक String& str, Param type, शून्य* dst)
 {
     std::stringstream ss(str.c_str());
-    if( type == Param::INT )
-        ss >> *(int*)dst;
-    else if( type == Param::BOOLEAN )
+    जर( type == Param::INT )
+        ss >> *(पूर्णांक*)dst;
+    अन्यथा जर( type == Param::BOOLEAN )
     {
         std::string temp;
         ss >> temp;
-        *(bool*) dst = parse_bool(temp);
+        *(तार्किक*) dst = parse_bool(temp);
     }
-    else if( type == Param::UNSIGNED_INT )
-        ss >> *(unsigned*)dst;
-    else if( type == Param::UINT64 )
+    अन्यथा जर( type == Param::UNSIGNED_INT )
+        ss >> *(अचिन्हित*)dst;
+    अन्यथा जर( type == Param::UINT64 )
         ss >> *(uint64*)dst;
-    else if( type == Param::FLOAT )
-        ss >> *(float*)dst;
-    else if( type == Param::REAL )
-        ss >> *(double*)dst;
-    else if( type == Param::STRING )
+    अन्यथा जर( type == Param::FLOAT )
+        ss >> *(दशांश*)dst;
+    अन्यथा जर( type == Param::REAL )
+        ss >> *(द्विगुण*)dst;
+    अन्यथा जर( type == Param::STRING )
         *(String*)dst = str;
-    else if( type == Param::SCALAR)
+    अन्यथा जर( type == Param::SCALAR)
     {
         Scalar& scalar = *(Scalar*)dst;
-        for (int i = 0; i < 4 && !ss.eof(); ++i)
+        साठी (पूर्णांक i = 0; i < 4 && !ss.eof(); ++i)
             ss >> scalar[i];
     }
-    else
+    अन्यथा
         CV_Error(Error::StsBadArg, "unknown/unsupported parameter type");
 
-    if (ss.fail())
+    जर (ss.fail())
     {
         CV_Error_(Error::StsBadArg, ("can not convert: [%s] to [%s]", str.c_str(), get_type_name(type)));
     }
 }
 
-void CommandLineParser::getByName(const String& name, bool space_delete, Param type, void* dst) const
+शून्य Command_ओळ_Parser::getByName(स्थिरांक String& name, तार्किक space_delete, Param type, शून्य* dst) स्थिरांक
 {
-    try
+    प्रयत्न
     {
-        for (size_t i = 0; i < impl->data.size(); i++)
+        साठी (माप_प्रकार i = 0; i < impl->data.size(); i++)
         {
-            for (size_t j = 0; j < impl->data[i].keys.size(); j++)
+            साठी (माप_प्रकार j = 0; j < impl->data[i].किल्ल्या.size(); j++)
             {
-                if (name == impl->data[i].keys[j])
+                जर (name == impl->data[i].किल्ल्या[j])
                 {
-                    String v = impl->data[i].def_value;
-                    if (space_delete)
+                    String v = impl->data[i].def_मूल्य;
+                    जर (space_delete)
                         v = cat_string(v);
 
                     // the key was neither specified nor has a default value
-                    if((v.empty() && type != Param::STRING) || v == noneValue) {
-                        impl->error = true;
+                    जर((v.empty() && type != Param::STRING) || v == none_मूल्य) {
+                        impl->error = सत्य;
                         impl->error_message = impl->error_message + "Missing parameter: '" + name + "'\n";
-                        return;
+                        परत;
                     }
 
                     from_str(v, type, dst);
-                    return;
+                    परत;
                 }
             }
         }
     }
-    catch (const Exception& e)
+    पकडा (स्थिरांक Exception& e)
     {
-        impl->error = true;
+        impl->error = सत्य;
         impl->error_message = impl->error_message + "Parameter '"+ name + "': " + e.err + "\n";
-        return;
+        परत;
     }
 
     CV_Error_(Error::StsBadArg, ("undeclared key '%s' requested", name.c_str()));
 }
 
 
-void CommandLineParser::getByIndex(int index, bool space_delete, Param type, void* dst) const
+शून्य Command_ओळ_Parser::getByIndex(पूर्णांक index, तार्किक space_delete, Param type, शून्य* dst) स्थिरांक
 {
-    try
+    प्रयत्न
     {
-        for (size_t i = 0; i < impl->data.size(); i++)
+        साठी (माप_प्रकार i = 0; i < impl->data.size(); i++)
         {
-            if (impl->data[i].number == index)
+            जर (impl->data[i].संख्या == index)
             {
-                String v = impl->data[i].def_value;
-                if (space_delete == true) v = cat_string(v);
+                String v = impl->data[i].def_मूल्य;
+                जर (space_delete == सत्य) v = cat_string(v);
 
                 // the key was neither specified nor has a default value
-                if((v.empty() && type != Param::STRING) || v == noneValue) {
-                    impl->error = true;
+                जर((v.empty() && type != Param::STRING) || v == none_मूल्य) {
+                    impl->error = सत्य;
                     impl->error_message = impl->error_message + format("Missing parameter #%d\n", index);
-                    return;
+                    परत;
                 }
                 from_str(v, type, dst);
-                return;
+                परत;
             }
         }
     }
-    catch (const Exception& e)
+    पकडा (स्थिरांक Exception& e)
     {
-        impl->error = true;
+        impl->error = सत्य;
         impl->error_message = impl->error_message + format("Parameter #%d: ", index) + e.err + "\n";
-        return;
+        परत;
     }
 
     CV_Error_(Error::StsBadArg, ("undeclared position %d requested", index));
 }
 
-static bool cmp_params(const CommandLineParserParams & p1, const CommandLineParserParams & p2)
+स्थिर तार्किक cmp_params(स्थिरांक Command_ओळ_Parser_Params & p1, स्थिरांक Command_ओळ_Parser_Params & p2)
 {
-    if (p1.number < p2.number)
-        return true;
+    जर (p1.संख्या < p2.संख्या)
+        परत सत्य;
 
-    if (p1.number > p2.number)
-        return false;
+    जर (p1.संख्या > p2.संख्या)
+        परत असत्य;
 
-    return p1.keys[0].compare(p2.keys[0]) < 0;
+    परत p1.किल्ल्या[0].compare(p2.किल्ल्या[0]) < 0;
 }
 
-CommandLineParser::CommandLineParser(int argc, const char* const argv[], const String& keys)
+Command_ओळ_Parser::Command_ओळ_Parser(पूर्णांक argc, स्थिरांक अक्षर* स्थिरांक argv[], स्थिरांक String& किल्ल्या)
 {
-    impl = new Impl;
+    impl = नवीन Impl;
     impl->refcount = 1;
 
     // path to application
-    size_t pos_s = String(argv[0]).find_last_of("/\\");
-    if (pos_s == String::npos)
+    माप_प्रकार pos_s = String(argv[0]).find_last_of("/\\");
+    जर (pos_s == String::npos)
     {
         impl->path_to_app = "";
         impl->app_name = String(argv[0]);
     }
-    else
+    अन्यथा
     {
         impl->path_to_app = String(argv[0]).substr(0, pos_s);
         impl->app_name = String(argv[0]).substr(pos_s + 1, String(argv[0]).length() - pos_s);
     }
 
-    impl->error = false;
+    impl->error = असत्य;
     impl->error_message = "";
 
     // parse keys
-    std::vector<String> k = impl->split_range_string(keys, '{', '}');
+    std::vector<String> k = impl->split_range_string(किल्ल्या, '{', '}');
 
-    int jj = 0;
-    for (size_t i = 0; i < k.size(); i++)
+    पूर्णांक jj = 0;
+    साठी (माप_प्रकार i = 0; i < k.size(); i++)
     {
-        std::vector<String> l = impl->split_string(k[i], '|', true);
-        CommandLineParserParams p;
-        p.keys = impl->split_string(l[0]);
-        p.def_value = l[1];
+        std::vector<String> l = impl->split_string(k[i], '|', सत्य);
+        Command_ओळ_Parser_Params p;
+        p.किल्ल्या = impl->split_string(l[0]);
+        p.def_मूल्य = l[1];
         p.help_message = cat_string(l[2]);
-        p.number = -1;
-        if (p.keys.size() <= 0)
+        p.संख्या = -1;
+        जर (p.किल्ल्या.size() <= 0)
         {
-            impl->error = true;
+            impl->error = सत्य;
             impl->error_message = "Field KEYS could not be empty\n";
         }
-        else
+        अन्यथा
         {
-            if (p.keys[0][0] == '@')
+            जर (p.किल्ल्या[0][0] == '@')
             {
-                p.number = jj;
+                p.संख्या = jj;
                 jj++;
             }
 
@@ -254,25 +254,25 @@ CommandLineParser::CommandLineParser(int argc, const char* const argv[], const S
 
     // parse argv
     jj = 0;
-    for (int i = 1; i < argc; i++)
+    साठी (पूर्णांक i = 1; i < argc; i++)
     {
         String s(argv[i]);
-        bool hasSingleDash = s.length() > 1 && s[0] == '-';
+        तार्किक hasSingleDash = s.length() > 1 && s[0] == '-';
 
-        if (hasSingleDash)
+        जर (hasSingleDash)
         {
-            bool hasDoubleDash = s.length() > 2 && s[1] == '-';
-            String key = s.substr(hasDoubleDash ? 2 : 1);
+            तार्किक hasDoubleDash = s.length() > 2 && s[1] == '-';
+            String किल्ली = s.substr(hasDoubleDash ? 2 : 1);
             String value = "true";
-            size_t equalsPos = key.find('=');
+            माप_प्रकार equalsPos = किल्ली.find('=');
 
-            if(equalsPos != String::npos) {
-                value = key.substr(equalsPos + 1);
-                key = key.substr(0, equalsPos);
+            जर(equalsPos != String::npos) {
+                value = किल्ली.substr(equalsPos + 1);
+                किल्ली = किल्ली.substr(0, equalsPos);
             }
-            impl->apply_params(key, value);
+            impl->apply_params(किल्ली, value);
         }
-        else
+        अन्यथा
         {
             impl->apply_params(jj, s);
             jj++;
@@ -282,87 +282,87 @@ CommandLineParser::CommandLineParser(int argc, const char* const argv[], const S
     impl->sort_params();
 }
 
-CommandLineParser::~CommandLineParser()
+Command_ओळ_Parser::~Command_ओळ_Parser()
 {
-    if (CV_XADD(&impl->refcount, -1) == 1)
+    जर (CV_XADD(&impl->refcount, -1) == 1)
         delete impl;
 }
 
-CommandLineParser::CommandLineParser(const CommandLineParser& parser)
+Command_ओळ_Parser::Command_ओळ_Parser(स्थिरांक Command_ओळ_Parser& parser)
 {
     impl = parser.impl;
     CV_XADD(&impl->refcount, 1);
 }
 
-CommandLineParser& CommandLineParser::operator = (const CommandLineParser& parser)
+Command_ओळ_Parser& Command_ओळ_Parser::चालक = (स्थिरांक Command_ओळ_Parser& parser)
 {
-    if( this != &parser )
+    जर( हे != &parser )
     {
         CV_XADD(&parser.impl->refcount, 1);
-        if(CV_XADD(&impl->refcount, -1) == 1)
+        जर(CV_XADD(&impl->refcount, -1) == 1)
             delete impl;
         impl = parser.impl;
     }
-    return *this;
+    परत *हे;
 }
 
-void CommandLineParser::about(const String& message)
+शून्य Command_ओळ_Parser::about(स्थिरांक String& message)
 {
     impl->about_message = message;
 }
 
-void CommandLineParser::Impl::apply_params(const String& key, const String& value)
+शून्य Command_ओळ_Parser::Impl::apply_params(स्थिरांक String& किल्ली, स्थिरांक String& value)
 {
-    for (size_t i = 0; i < data.size(); i++)
+    साठी (माप_प्रकार i = 0; i < data.size(); i++)
     {
-        for (size_t k = 0; k < data[i].keys.size(); k++)
+        साठी (माप_प्रकार k = 0; k < data[i].किल्ल्या.size(); k++)
         {
-            if (key.compare(data[i].keys[k]) == 0)
+            जर (किल्ली.compare(data[i].किल्ल्या[k]) == 0)
             {
-                data[i].def_value = value;
-                break;
+                data[i].def_मूल्य = value;
+                थांबा;
             }
         }
     }
 }
 
-void CommandLineParser::Impl::apply_params(int i, String value)
+शून्य Command_ओळ_Parser::Impl::apply_params(पूर्णांक i, String value)
 {
-    for (size_t j = 0; j < data.size(); j++)
+    साठी (माप_प्रकार j = 0; j < data.size(); j++)
     {
-        if (data[j].number == i)
+        जर (data[j].संख्या == i)
         {
-            data[j].def_value = value;
-            break;
+            data[j].def_मूल्य = value;
+            थांबा;
         }
     }
 }
 
-void CommandLineParser::Impl::sort_params()
+शून्य Command_ओळ_Parser::Impl::sort_params()
 {
-    for (size_t i = 0; i < data.size(); i++)
+    साठी (माप_प्रकार i = 0; i < data.size(); i++)
     {
-        std::sort(data[i].keys.begin(), data[i].keys.end());
+        std::sort(data[i].किल्ल्या.begin(), data[i].किल्ल्या.end());
     }
 
     std::sort (data.begin(), data.end(), cmp_params);
 }
 
-String CommandLineParser::getPathToApplication() const
+String Command_ओळ_Parser::getPathToApplication() स्थिरांक
 {
-    return impl->path_to_app;
+    परत impl->path_to_app;
 }
 
-bool CommandLineParser::has(const String& name) const
+तार्किक Command_ओळ_Parser::has(स्थिरांक String& name) स्थिरांक
 {
-    for (size_t i = 0; i < impl->data.size(); i++)
+    साठी (माप_प्रकार i = 0; i < impl->data.size(); i++)
     {
-        for (size_t j = 0; j < impl->data[i].keys.size(); j++)
+        साठी (माप_प्रकार j = 0; j < impl->data[i].किल्ल्या.size(); j++)
         {
-            if (name == impl->data[i].keys[j])
+            जर (name == impl->data[i].किल्ल्या[j])
             {
-                const String v = cat_string(impl->data[i].def_value);
-                return !v.empty() && v != noneValue;
+                स्थिरांक String v = cat_string(impl->data[i].def_मूल्य);
+                परत !v.empty() && v != none_मूल्य;
             }
         }
     }
@@ -370,105 +370,105 @@ bool CommandLineParser::has(const String& name) const
     CV_Error_(Error::StsBadArg, ("undeclared key '%s' requested", name.c_str()));
 }
 
-bool CommandLineParser::check() const
+तार्किक Command_ओळ_Parser::check() स्थिरांक
 {
-    return impl->error == false;
+    परत impl->error == असत्य;
 }
 
-void CommandLineParser::printErrors() const
+शून्य Command_ओळ_Parser::printErrors() स्थिरांक
 {
-    if (impl->error)
+    जर (impl->error)
     {
-        printf("\nERRORS:\n%s\n", impl->error_message.c_str());
-        fflush(stdout);
+        म_लिखो("\nERRORS:\n%s\n", impl->error_message.c_str());
+        ख_साफ(मानक_निकास);
     }
 }
 
-void CommandLineParser::printMessage() const
+शून्य Command_ओळ_Parser::printMessage() स्थिरांक
 {
-    if (impl->about_message != "")
-        printf("%s\n", impl->about_message.c_str());
+    जर (impl->about_message != "")
+        म_लिखो("%s\n", impl->about_message.c_str());
 
-    printf("Usage: %s [params] ", impl->app_name.c_str());
+    म_लिखो("Usage: %s [params] ", impl->app_name.c_str());
 
-    for (size_t i = 0; i < impl->data.size(); i++)
+    साठी (माप_प्रकार i = 0; i < impl->data.size(); i++)
     {
-        if (impl->data[i].number > -1)
+        जर (impl->data[i].संख्या > -1)
         {
-            String name = impl->data[i].keys[0].substr(1, impl->data[i].keys[0].length() - 1);
-            printf("%s ", name.c_str());
+            String name = impl->data[i].किल्ल्या[0].substr(1, impl->data[i].किल्ल्या[0].length() - 1);
+            म_लिखो("%s ", name.c_str());
         }
     }
 
-    printf("\n\n");
+    म_लिखो("\n\n");
 
-    for (size_t i = 0; i < impl->data.size(); i++)
+    साठी (माप_प्रकार i = 0; i < impl->data.size(); i++)
     {
-        if (impl->data[i].number == -1)
+        जर (impl->data[i].संख्या == -1)
         {
-            printf("\t");
-            for (size_t j = 0; j < impl->data[i].keys.size(); j++)
+            म_लिखो("\t");
+            साठी (माप_प्रकार j = 0; j < impl->data[i].किल्ल्या.size(); j++)
             {
-                String k = impl->data[i].keys[j];
-                if (k.length() > 1)
+                String k = impl->data[i].किल्ल्या[j];
+                जर (k.length() > 1)
                 {
-                    printf("--");
+                    म_लिखो("--");
                 }
-                else
+                अन्यथा
                 {
-                    printf("-");
+                    म_लिखो("-");
                 }
-                printf("%s", k.c_str());
+                म_लिखो("%s", k.c_str());
 
-                if (j != impl->data[i].keys.size() - 1)
+                जर (j != impl->data[i].किल्ल्या.size() - 1)
                 {
-                    printf(", ");
+                    म_लिखो(", ");
                 }
             }
-            String dv = cat_string(impl->data[i].def_value);
-            if (dv.compare("") != 0)
+            String dv = cat_string(impl->data[i].def_मूल्य);
+            जर (dv.compare("") != 0)
             {
-                printf(" (value:%s)", dv.c_str());
+                म_लिखो(" (value:%s)", dv.c_str());
             }
-            printf("\n\t\t%s\n", impl->data[i].help_message.c_str());
+            म_लिखो("\n\t\t%s\n", impl->data[i].help_message.c_str());
         }
     }
-    printf("\n");
+    म_लिखो("\n");
 
-    for (size_t i = 0; i < impl->data.size(); i++)
+    साठी (माप_प्रकार i = 0; i < impl->data.size(); i++)
     {
-        if (impl->data[i].number != -1)
+        जर (impl->data[i].संख्या != -1)
         {
-            printf("\t");
-            String k = impl->data[i].keys[0];
+            म_लिखो("\t");
+            String k = impl->data[i].किल्ल्या[0];
             k = k.substr(1, k.length() - 1);
 
-            printf("%s", k.c_str());
+            म_लिखो("%s", k.c_str());
 
-            String dv = cat_string(impl->data[i].def_value);
-            if (dv.compare("") != 0)
+            String dv = cat_string(impl->data[i].def_मूल्य);
+            जर (dv.compare("") != 0)
             {
-                printf(" (value:%s)", dv.c_str());
+                म_लिखो(" (value:%s)", dv.c_str());
             }
-            printf("\n\t\t%s\n", impl->data[i].help_message.c_str());
+            म_लिखो("\n\t\t%s\n", impl->data[i].help_message.c_str());
         }
     }
 }
 
-std::vector<String> CommandLineParser::Impl::split_range_string(const String& _str, char fs, char ss) const
+std::vector<String> Command_ओळ_Parser::Impl::split_range_string(स्थिरांक String& _str, अक्षर fs, अक्षर ss) स्थिरांक
 {
     String str = _str;
     std::vector<String> vec;
     String word = "";
-    bool begin = false;
+    तार्किक begin = असत्य;
 
-    while (!str.empty())
+    पर्यंत (!str.empty())
     {
-        if (str[0] == fs)
+        जर (str[0] == fs)
         {
-            if (begin == true)
+            जर (begin == सत्य)
             {
-                throw cv::Exception(cv::Error::StsParseError,
+                फेका cv::Exception(cv::Error::StsParseError,
                          String("error in split_range_string(")
                          + str
                          + String(", ")
@@ -479,16 +479,16 @@ std::vector<String> CommandLineParser::Impl::split_range_string(const String& _s
                          "", __FILE__, __LINE__
                          );
             }
-            begin = true;
+            begin = सत्य;
             word = "";
             str = str.substr(1, str.length() - 1);
         }
 
-        if (str[0] == ss)
+        जर (str[0] == ss)
         {
-            if (begin == false)
+            जर (begin == असत्य)
             {
-                throw cv::Exception(cv::Error::StsParseError,
+                फेका cv::Exception(cv::Error::StsParseError,
                          String("error in split_range_string(")
                          + str
                          + String(", ")
@@ -499,20 +499,20 @@ std::vector<String> CommandLineParser::Impl::split_range_string(const String& _s
                          "", __FILE__, __LINE__
                          );
             }
-            begin = false;
+            begin = असत्य;
             vec.push_back(word);
         }
 
-        if (begin == true)
+        जर (begin == सत्य)
         {
             word = word + str[0];
         }
         str = str.substr(1, str.length() - 1);
     }
 
-    if (begin == true)
+    जर (begin == सत्य)
     {
-        throw cv::Exception(cv::Error::StsParseError,
+        फेका cv::Exception(cv::Error::StsParseError,
                  String("error in split_range_string(")
                  + str
                  + String(", ")
@@ -524,38 +524,38 @@ std::vector<String> CommandLineParser::Impl::split_range_string(const String& _s
                 );
     }
 
-    return vec;
+    परत vec;
 }
 
-std::vector<String> CommandLineParser::Impl::split_string(const String& _str, char symbol, bool create_empty_item) const
+std::vector<String> Command_ओळ_Parser::Impl::split_string(स्थिरांक String& _str, अक्षर चिन्ह, तार्किक create_empty_item) स्थिरांक
 {
     String str = _str;
     std::vector<String> vec;
     String word = "";
 
-    while (!str.empty())
+    पर्यंत (!str.empty())
     {
-        if (str[0] == symbol)
+        जर (str[0] == चिन्ह)
         {
-            if (!word.empty() || create_empty_item)
+            जर (!word.empty() || create_empty_item)
             {
                 vec.push_back(word);
                 word = "";
             }
         }
-        else
+        अन्यथा
         {
             word = word + str[0];
         }
         str = str.substr(1, str.length() - 1);
     }
 
-    if (word != "" || create_empty_item)
+    जर (word != "" || create_empty_item)
     {
         vec.push_back(word);
     }
 
-    return vec;
+    परत vec;
 }
 
 }

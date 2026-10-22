@@ -2,285 +2,285 @@
 // It is subject to the license terms in the LICENSE file found in the top-level directory
 // of this distribution and at http://opencv.org/license.html.
 
-#include "precomp.hpp"
-#include "opencv2/core/bindings_utils.hpp"
-#include <sstream>
-#include <iomanip>
-#include <opencv2/core/utils/filesystem.hpp>
-#include <opencv2/core/utils/filesystem.private.hpp>
+#अन्तर्भाव "precomp.hpp"
+#अन्तर्भाव "opencv2/core/bindings_utils.hpp"
+#अन्तर्भाव <sstream>
+#अन्तर्भाव <iomanip>
+#अन्तर्भाव <opencv2/core/utils/filesystem.hpp>
+#अन्तर्भाव <opencv2/core/utils/filesystem.private.hpp>
 
-namespace cv {
-static inline std::ostream& operator<<(std::ostream& os, const Rect& rect)
+नामाकाश cv {
+स्थिर ओळीत std::ostream& चालक<<(std::ostream& os, स्थिरांक Rect& rect)
 {
-    return os << "[x=" << rect.x << ", y=" << rect.y << ", w=" << rect.width << ", h=" << rect.height << ']';
+    परत os << "[x=" << rect.x << ", y=" << rect.y << ", w=" << rect.width << ", h=" << rect.height << ']';
 }
-namespace utils {
+नामाकाश utils {
 
-String dumpInputArray(InputArray argument)
+String dump_आदान_Array(आदान_Array argument)
 {
-    if (&argument == &noArray())
-        return "InputArray: noArray()";
+    जर (&argument == &noArray())
+        परत "InputArray: noArray()";
     std::ostringstream ss;
     ss << "InputArray:";
-    try {
-        do {
+    प्रयत्न {
+        करा {
             ss << (argument.empty() ? " empty()=true" : " empty()=false");
-            ss << cv::format(" kind=0x%08llx", (long long int)argument.kind());
-            ss << cv::format(" flags=0x%08llx", (long long int)argument.getFlags());
-            if (argument.getObj() == NULL)
+            ss << cv::format(" kind=0x%08llx", (दीर्घ दीर्घ पूर्णांक)argument.kind());
+            ss << cv::format(" flags=0x%08llx", (दीर्घ दीर्घ पूर्णांक)argument.getFlags());
+            जर (argument.getObj() == रिक्त)
             {
                 ss << " obj=NULL";
-                break; // done
+                थांबा; // done
             }
-            ss << cv::format(" total(-1)=%lld", (long long int)argument.total(-1));
-            int dims = argument.dims(-1);
+            ss << cv::format(" total(-1)=%lld", (दीर्घ दीर्घ पूर्णांक)argument.total(-1));
+            पूर्णांक dims = argument.dims(-1);
             ss << cv::format(" dims(-1)=%d", dims);
-            if (dims <= 2)
+            जर (dims <= 2)
             {
                 Size size = argument.size(-1);
                 ss << cv::format(" size(-1)=%dx%d", size.width, size.height);
             }
-            else
+            अन्यथा
             {
-                int sz[CV_MAX_DIM] = {0};
+                पूर्णांक sz[CV_MAX_DIM] = {0};
                 argument.sizend(sz, -1);
                 ss << " size(-1)=[";
-                for (int i = 0; i < dims; i++)
+                साठी (पूर्णांक i = 0; i < dims; i++)
                 {
-                    if (i > 0)
+                    जर (i > 0)
                         ss << ' ';
                     ss << sz[i];
                 }
                 ss << "]";
             }
             ss << " type(-1)=" << cv::typeToString(argument.type(-1));
-        } while (0);
+        } पर्यंत (0);
     }
-    catch (const std::exception& e)
+    पकडा (स्थिरांक std::exception& e)
     {
         ss << " ERROR: exception occurred: " << e.what();
     }
-    catch (...)
+    पकडा (...)
     {
         ss << " ERROR: unknown exception occurred, dump is non-complete";
     }
-    return ss.str();
+    परत ss.str();
 }
 
-CV_EXPORTS_W String dumpInputArrayOfArrays(InputArrayOfArrays argument)
+CV_EXPORTS_W String dump_आदान_Array_Of_Arrays(आदान_Array_Of_Arrays argument)
 {
-    if (&argument == &noArray())
-        return "InputArrayOfArrays: noArray()";
+    जर (&argument == &noArray())
+        परत "InputArrayOfArrays: noArray()";
     std::ostringstream ss;
     ss << "InputArrayOfArrays:";
-    try {
-        do {
+    प्रयत्न {
+        करा {
             ss << (argument.empty() ? " empty()=true" : " empty()=false");
-            ss << cv::format(" kind=0x%08llx", (long long int)argument.kind());
-            ss << cv::format(" flags=0x%08llx", (long long int)argument.getFlags());
-            if (argument.getObj() == NULL)
+            ss << cv::format(" kind=0x%08llx", (दीर्घ दीर्घ पूर्णांक)argument.kind());
+            ss << cv::format(" flags=0x%08llx", (दीर्घ दीर्घ पूर्णांक)argument.getFlags());
+            जर (argument.getObj() == रिक्त)
             {
                 ss << " obj=NULL";
-                break; // done
+                थांबा; // done
             }
-            ss << cv::format(" total(-1)=%lld", (long long int)argument.total(-1));
+            ss << cv::format(" total(-1)=%lld", (दीर्घ दीर्घ पूर्णांक)argument.total(-1));
             ss << cv::format(" dims(-1)=%d", argument.dims(-1));
             Size size = argument.size(-1);
             ss << cv::format(" size(-1)=%dx%d", size.width, size.height);
-            if (argument.total(-1) > 0)
+            जर (argument.total(-1) > 0)
             {
                 ss << " type(0)=" << cv::typeToString(argument.type(0));
-                int dims = argument.dims(0);
+                पूर्णांक dims = argument.dims(0);
                 ss << cv::format(" dims(0)=%d", dims);
-                if (dims <= 2)
+                जर (dims <= 2)
                 {
                     Size size0 = argument.size(0);
                     ss << cv::format(" size(0)=%dx%d", size0.width, size0.height);
                 }
-                else
+                अन्यथा
                 {
-                    int sz[CV_MAX_DIM] = {0};
+                    पूर्णांक sz[CV_MAX_DIM] = {0};
                     argument.sizend(sz, 0);
                     ss << " size(0)=[";
-                    for (int i = 0; i < dims; i++)
+                    साठी (पूर्णांक i = 0; i < dims; i++)
                     {
-                        if (i > 0)
+                        जर (i > 0)
                             ss << ' ';
                         ss << sz[i];
                     }
                     ss << "]";
                 }
             }
-        } while (0);
+        } पर्यंत (0);
     }
-    catch (const std::exception& e)
+    पकडा (स्थिरांक std::exception& e)
     {
         ss << " ERROR: exception occurred: " << e.what();
     }
-    catch (...)
+    पकडा (...)
     {
         ss << " ERROR: unknown exception occurred, dump is non-complete";
     }
-    return ss.str();
+    परत ss.str();
 }
 
-CV_EXPORTS_W String dumpInputOutputArray(InputOutputArray argument)
+CV_EXPORTS_W String dump_आदान_Output_Array(आदान_Output_Array argument)
 {
-    if (&argument == &noArray())
-        return "InputOutputArray: noArray()";
+    जर (&argument == &noArray())
+        परत "InputOutputArray: noArray()";
     std::ostringstream ss;
     ss << "InputOutputArray:";
-    try {
-        do {
+    प्रयत्न {
+        करा {
             ss << (argument.empty() ? " empty()=true" : " empty()=false");
-            ss << cv::format(" kind=0x%08llx", (long long int)argument.kind());
-            ss << cv::format(" flags=0x%08llx", (long long int)argument.getFlags());
-            if (argument.getObj() == NULL)
+            ss << cv::format(" kind=0x%08llx", (दीर्घ दीर्घ पूर्णांक)argument.kind());
+            ss << cv::format(" flags=0x%08llx", (दीर्घ दीर्घ पूर्णांक)argument.getFlags());
+            जर (argument.getObj() == रिक्त)
             {
                 ss << " obj=NULL";
-                break; // done
+                थांबा; // done
             }
-            ss << cv::format(" total(-1)=%lld", (long long int)argument.total(-1));
-            int dims = argument.dims(-1);
+            ss << cv::format(" total(-1)=%lld", (दीर्घ दीर्घ पूर्णांक)argument.total(-1));
+            पूर्णांक dims = argument.dims(-1);
             ss << cv::format(" dims(-1)=%d", dims);
-            if (dims <= 2)
+            जर (dims <= 2)
             {
                 Size size = argument.size(-1);
                 ss << cv::format(" size(-1)=%dx%d", size.width, size.height);
             }
-            else
+            अन्यथा
             {
-                int sz[CV_MAX_DIM] = {0};
+                पूर्णांक sz[CV_MAX_DIM] = {0};
                 argument.sizend(sz, -1);
                 ss << " size(-1)=[";
-                for (int i = 0; i < dims; i++)
+                साठी (पूर्णांक i = 0; i < dims; i++)
                 {
-                    if (i > 0)
+                    जर (i > 0)
                         ss << ' ';
                     ss << sz[i];
                 }
                 ss << "]";
             }
             ss << " type(-1)=" << cv::typeToString(argument.type(-1));
-        } while (0);
+        } पर्यंत (0);
     }
-    catch (const std::exception& e)
+    पकडा (स्थिरांक std::exception& e)
     {
         ss << " ERROR: exception occurred: " << e.what();
     }
-    catch (...)
+    पकडा (...)
     {
         ss << " ERROR: unknown exception occurred, dump is non-complete";
     }
-    return ss.str();
+    परत ss.str();
 }
 
-CV_EXPORTS_W String dumpInputOutputArrayOfArrays(InputOutputArrayOfArrays argument)
+CV_EXPORTS_W String dump_आदान_Output_Array_Of_Arrays(आदान_Output_Array_Of_Arrays argument)
 {
-    if (&argument == &noArray())
-        return "InputOutputArrayOfArrays: noArray()";
+    जर (&argument == &noArray())
+        परत "InputOutputArrayOfArrays: noArray()";
     std::ostringstream ss;
     ss << "InputOutputArrayOfArrays:";
-    try {
-        do {
+    प्रयत्न {
+        करा {
             ss << (argument.empty() ? " empty()=true" : " empty()=false");
-            ss << cv::format(" kind=0x%08llx", (long long int)argument.kind());
-            ss << cv::format(" flags=0x%08llx", (long long int)argument.getFlags());
-            if (argument.getObj() == NULL)
+            ss << cv::format(" kind=0x%08llx", (दीर्घ दीर्घ पूर्णांक)argument.kind());
+            ss << cv::format(" flags=0x%08llx", (दीर्घ दीर्घ पूर्णांक)argument.getFlags());
+            जर (argument.getObj() == रिक्त)
             {
                 ss << " obj=NULL";
-                break; // done
+                थांबा; // done
             }
-            ss << cv::format(" total(-1)=%lld", (long long int)argument.total(-1));
+            ss << cv::format(" total(-1)=%lld", (दीर्घ दीर्घ पूर्णांक)argument.total(-1));
             ss << cv::format(" dims(-1)=%d", argument.dims(-1));
             Size size = argument.size(-1);
             ss << cv::format(" size(-1)=%dx%d", size.width, size.height);
-            if (argument.total(-1) > 0)
+            जर (argument.total(-1) > 0)
             {
                 ss << " type(0)=" << cv::typeToString(argument.type(0));
-                int dims = argument.dims(0);
+                पूर्णांक dims = argument.dims(0);
                 ss << cv::format(" dims(0)=%d", dims);
-                if (dims <= 2)
+                जर (dims <= 2)
                 {
                     Size size0 = argument.size(0);
                     ss << cv::format(" size(0)=%dx%d", size0.width, size0.height);
                 }
-                else
+                अन्यथा
                 {
-                    int sz[CV_MAX_DIM] = {0};
+                    पूर्णांक sz[CV_MAX_DIM] = {0};
                     argument.sizend(sz, 0);
                     ss << " size(0)=[";
-                    for (int i = 0; i < dims; i++)
+                    साठी (पूर्णांक i = 0; i < dims; i++)
                     {
-                        if (i > 0)
+                        जर (i > 0)
                             ss << ' ';
                         ss << sz[i];
                     }
                     ss << "]";
                 }
             }
-        } while (0);
+        } पर्यंत (0);
     }
-    catch (const std::exception& e)
+    पकडा (स्थिरांक std::exception& e)
     {
         ss << " ERROR: exception occurred: " << e.what();
     }
-    catch (...)
+    पकडा (...)
     {
         ss << " ERROR: unknown exception occurred, dump is non-complete";
     }
-    return ss.str();
+    परत ss.str();
 }
 
-template <class T, class Formatter>
-static inline String dumpVector(const std::vector<T>& vec, Formatter format)
+ढाँचा <वर्ग T, वर्ग Formatter>
+स्थिर ओळीत String dumpVector(स्थिरांक std::vector<T>& vec, Formatter format)
 {
     std::ostringstream oss("[", std::ios::ate);
-    if (!vec.empty())
+    जर (!vec.empty())
     {
         format(oss) << vec[0];
-        for (std::size_t i = 1; i < vec.size(); ++i)
+        साठी (std::माप_प्रकार i = 1; i < vec.size(); ++i)
         {
             oss << ", ";
             format(oss) << vec[i];
         }
     }
     oss << "]";
-    return oss.str();
+    परत oss.str();
 }
 
-static inline std::ostream& noFormat(std::ostream& os)
+स्थिर ओळीत std::ostream& noFormat(std::ostream& os)
 {
-    return os;
+    परत os;
 }
 
-static inline std::ostream& floatFormat(std::ostream& os)
+स्थिर ओळीत std::ostream& floatFormat(std::ostream& os)
 {
-    return os << std::fixed << std::setprecision(2);
+    परत os << std::fixed << std::setprecision(2);
 }
 
-String dumpVectorOfInt(const std::vector<int>& vec)
+String dumpVectorOfInt(स्थिरांक std::vector<पूर्णांक>& vec)
 {
-    return dumpVector(vec, &noFormat);
+    परत dumpVector(vec, &noFormat);
 }
 
-String dumpVectorOfDouble(const std::vector<double>& vec)
+String dumpVectorOfDouble(स्थिरांक std::vector<द्विगुण>& vec)
 {
-    return dumpVector(vec, &floatFormat);
+    परत dumpVector(vec, &floatFormat);
 }
 
-String dumpVectorOfRect(const std::vector<Rect>& vec)
+String dumpVectorOfRect(स्थिरांक std::vector<Rect>& vec)
 {
-    return dumpVector(vec, &noFormat);
+    परत dumpVector(vec, &noFormat);
 }
 
 
-namespace fs {
+नामाकाश fs {
 cv::String getCacheDirectoryForDownloads()
 {
-#if OPENCV_HAVE_FILESYSTEM_SUPPORT
-    return cv::utils::fs::getCacheDirectory("downloads", "OPENCV_DOWNLOADS_CACHE_DIR");
-#else
+#जर OPENCV_HAVE_FILESYSTEM_SUPPORT
+    परत cv::utils::fs::getCacheDirectory("downloads", "OPENCV_DOWNLOADS_CACHE_DIR");
+#अन्यथा
     CV_Error(Error::StsNotImplemented, "File system support is disabled in this OpenCV build!");
 #endif
 }

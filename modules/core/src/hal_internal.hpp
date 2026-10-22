@@ -47,26 +47,26 @@
 
 #ifdef HAVE_LAPACK
 
-int lapack_LU32f(float* a, size_t a_step, int m, float* b, size_t b_step, int n, int* info);
-int lapack_LU64f(double* a, size_t a_step, int m, double* b, size_t b_step, int n, int* info);
-int lapack_Cholesky32f(float* a, size_t a_step, int m, float* b, size_t b_step, int n, bool* info);
-int lapack_Cholesky64f(double* a, size_t a_step, int m, double* b, size_t b_step, int n, bool* info);
-int lapack_SVD32f(float* a, size_t a_step, float* w, float* u, size_t u_step, float* vt, size_t v_step, int m, int n, int flags);
-int lapack_SVD64f(double* a, size_t a_step, double* w, double* u, size_t u_step, double* vt, size_t v_step, int m, int n, int flags);
-int lapack_QR32f(float* src1, size_t src1_step, int m, int n, int k, float* src2, size_t src2_step, float* dst, int* info);
-int lapack_QR64f(double* src1, size_t src1_step, int m, int n, int k, double* src2, size_t src2_step, double* dst, int* info);
-int lapack_gemm32f(const float* src1, size_t src1_step, const float* src2, size_t src2_step,
-                   float alpha, const float* src3, size_t src3_step, float beta, float* dst, size_t dst_step,
-                   int m, int n, int k, int flags);
-int lapack_gemm64f(const double* src1, size_t src1_step, const double* src2, size_t src2_step,
-                   double alpha, const double* src3, size_t src3_step, double beta, double* dst, size_t dst_step,
-                   int m, int n, int k, int flags);
-int lapack_gemm32fc(const float* src1, size_t src1_step, const float* src2, size_t src2_step,
-                   float alpha, const float* src3, size_t src3_step, float beta, float* dst, size_t dst_step,
-                   int m, int n, int k, int flags);
-int lapack_gemm64fc(const double* src1, size_t src1_step, const double* src2, size_t src2_step,
-                   double alpha, const double* src3, size_t src3_step, double beta, double* dst, size_t dst_step,
-                   int m, int n, int k, int flags);
+पूर्णांक lapack_LU32f(दशांश* a, माप_प्रकार a_step, पूर्णांक m, दशांश* b, माप_प्रकार b_step, पूर्णांक n, पूर्णांक* info);
+पूर्णांक lapack_LU64f(द्विगुण* a, माप_प्रकार a_step, पूर्णांक m, द्विगुण* b, माप_प्रकार b_step, पूर्णांक n, पूर्णांक* info);
+पूर्णांक lapack_Cholesky32f(दशांश* a, माप_प्रकार a_step, पूर्णांक m, दशांश* b, माप_प्रकार b_step, पूर्णांक n, तार्किक* info);
+पूर्णांक lapack_Cholesky64f(द्विगुण* a, माप_प्रकार a_step, पूर्णांक m, द्विगुण* b, माप_प्रकार b_step, पूर्णांक n, तार्किक* info);
+पूर्णांक lapack_SVD32f(दशांश* a, माप_प्रकार a_step, दशांश* w, दशांश* u, माप_प्रकार u_step, दशांश* vt, माप_प्रकार v_step, पूर्णांक m, पूर्णांक n, पूर्णांक flags);
+पूर्णांक lapack_SVD64f(द्विगुण* a, माप_प्रकार a_step, द्विगुण* w, द्विगुण* u, माप_प्रकार u_step, द्विगुण* vt, माप_प्रकार v_step, पूर्णांक m, पूर्णांक n, पूर्णांक flags);
+पूर्णांक lapack_QR32f(दशांश* src1, माप_प्रकार src1_step, पूर्णांक m, पूर्णांक n, पूर्णांक k, दशांश* src2, माप_प्रकार src2_step, दशांश* dst, पूर्णांक* info);
+पूर्णांक lapack_QR64f(द्विगुण* src1, माप_प्रकार src1_step, पूर्णांक m, पूर्णांक n, पूर्णांक k, द्विगुण* src2, माप_प्रकार src2_step, द्विगुण* dst, पूर्णांक* info);
+पूर्णांक lapack_gemm32f(स्थिरांक दशांश* src1, माप_प्रकार src1_step, स्थिरांक दशांश* src2, माप_प्रकार src2_step,
+                   दशांश alpha, स्थिरांक दशांश* src3, माप_प्रकार src3_step, दशांश beta, दशांश* dst, माप_प्रकार dst_step,
+                   पूर्णांक m, पूर्णांक n, पूर्णांक k, पूर्णांक flags);
+पूर्णांक lapack_gemm64f(स्थिरांक द्विगुण* src1, माप_प्रकार src1_step, स्थिरांक द्विगुण* src2, माप_प्रकार src2_step,
+                   द्विगुण alpha, स्थिरांक द्विगुण* src3, माप_प्रकार src3_step, द्विगुण beta, द्विगुण* dst, माप_प्रकार dst_step,
+                   पूर्णांक m, पूर्णांक n, पूर्णांक k, पूर्णांक flags);
+पूर्णांक lapack_gemm32fc(स्थिरांक दशांश* src1, माप_प्रकार src1_step, स्थिरांक दशांश* src2, माप_प्रकार src2_step,
+                   दशांश alpha, स्थिरांक दशांश* src3, माप_प्रकार src3_step, दशांश beta, दशांश* dst, माप_प्रकार dst_step,
+                   पूर्णांक m, पूर्णांक n, पूर्णांक k, पूर्णांक flags);
+पूर्णांक lapack_gemm64fc(स्थिरांक द्विगुण* src1, माप_प्रकार src1_step, स्थिरांक द्विगुण* src2, माप_प्रकार src2_step,
+                   द्विगुण alpha, स्थिरांक द्विगुण* src3, माप_प्रकार src3_step, द्विगुण beta, द्विगुण* dst, माप_प्रकार dst_step,
+                   पूर्णांक m, पूर्णांक n, पूर्णांक k, पूर्णांक flags);
 
 #undef cv_hal_LU32f
 #define cv_hal_LU32f lapack_LU32f

@@ -6,181 +6,181 @@
 
 // CUDA-backed MatAllocator for UMat (Phase P1): synchronous host<->device transfers.
 
-#include "precomp.hpp"
+#अन्तर्भाव "precomp.hpp"
 
-namespace cv { namespace cuda {
+नामाकाश cv { नामाकाश cuda {
 
 #ifndef HAVE_CUDA
 
 MatAllocator* getCudaAllocator()
 {
-    return NULL;
+    परत रिक्त;
 }
 
-#else
+#अन्यथा
 
-class CudaUMatAllocator CV_FINAL : public MatAllocator
+वर्ग CudaUMatAllocator CV_FINAL : सार्वजनिक MatAllocator
 {
-public:
-    UMatData* allocate(int dims, const int* sizes, int type, void* data0,
-                       size_t* step, AccessFlag /*flags*/, UMatUsageFlags /*usageFlags*/) const CV_OVERRIDE
+सार्वजनिक:
+    UMatData* allocate(पूर्णांक dims, स्थिरांक पूर्णांक* sizes, पूर्णांक type, शून्य* data0,
+                       माप_प्रकार* step, AccessFlag /*flags*/, UMatUsageFlags /*usageFlags*/) स्थिरांक CV_OVERRIDE
     {
-        const size_t elemSize = CV_ELEM_SIZE(type);
-        size_t total = elemSize;
-        for (int i = 0; i < dims; i++)
-            total *= (size_t)sizes[i];
+        स्थिरांक माप_प्रकार elemSize = CV_ELEM_SIZE(type);
+        माप_प्रकार total = elemSize;
+        साठी (पूर्णांक i = 0; i < dims; i++)
+            total *= (माप_प्रकार)sizes[i];
 
-        if (step)
+        जर (step)
         {
             step[dims - 1] = elemSize;
-            for (int i = dims - 2; i >= 0; i--)
-                step[i] = step[i + 1] * (size_t)sizes[i + 1];
+            साठी (पूर्णांक i = dims - 2; i >= 0; i--)
+                step[i] = step[i + 1] * (माप_प्रकार)sizes[i + 1];
         }
 
-        UMatData* u = new UMatData(this);
+        UMatData* u = नवीन UMatData(हे);
         u->size = total;
 
-        if (total > 0)
+        जर (total > 0)
             cudaSafeCall(cudaMalloc(&u->handle, total));
 
-        if (data0)
+        जर (data0)
         {
             u->data = u->origdata = static_cast<uchar*>(data0);
             u->flags |= UMatData::USER_ALLOCATED;
-            u->markDeviceCopyObsolete(true);
+            u->markDeviceCopyObsolete(सत्य);
         }
-        else
+        अन्यथा
         {
-            u->markHostCopyObsolete(true);
+            u->markHostCopyObsolete(सत्य);
         }
-        return u;
+        परत u;
     }
 
-    bool allocate(UMatData* u, AccessFlag /*accessFlags*/, UMatUsageFlags /*usageFlags*/) const CV_OVERRIDE
+    तार्किक allocate(UMatData* u, AccessFlag /*accessFlags*/, UMatUsageFlags /*usageFlags*/) स्थिरांक CV_OVERRIDE
     {
-        if (!u)
-            return false;
-        if (!u->handle && u->size > 0)
+        जर (!u)
+            परत असत्य;
+        जर (!u->handle && u->size > 0)
         {
             cudaSafeCall(cudaMalloc(&u->handle, u->size));
-            if (u->data)
-                u->markDeviceCopyObsolete(true);
-            else
-                u->markHostCopyObsolete(true);
+            जर (u->data)
+                u->markDeviceCopyObsolete(सत्य);
+            अन्यथा
+                u->markHostCopyObsolete(सत्य);
         }
-        return true;
+        परत सत्य;
     }
 
-    void deallocate(UMatData* u) const CV_OVERRIDE
+    शून्य deallocate(UMatData* u) स्थिरांक CV_OVERRIDE
     {
-        if (!u)
-            return;
-        if (u->handle)
+        जर (!u)
+            परत;
+        जर (u->handle)
             cudaSafeCall(cudaFree(u->handle));
-        if (u->data && !(u->flags & UMatData::USER_ALLOCATED))
+        जर (u->data && !(u->flags & UMatData::USER_ALLOCATED))
             fastFree(u->data);
         delete u;
     }
 
-    void map(UMatData* u, AccessFlag accessFlags) const CV_OVERRIDE
+    शून्य map(UMatData* u, AccessFlag accessFlags) स्थिरांक CV_OVERRIDE
     {
-        if (!u)
-            return;
-        if (!u->data && u->size > 0)
+        जर (!u)
+            परत;
+        जर (!u->data && u->size > 0)
             u->data = u->origdata = static_cast<uchar*>(fastMalloc(u->size));
-        if (u->hostCopyObsolete() && u->handle && u->data)
+        जर (u->hostCopyObsolete() && u->handle && u->data)
         {
             cudaSafeCall(cudaMemcpy(u->data, u->handle, u->size, cudaMemcpyDeviceToHost));
-            u->markHostCopyObsolete(false);
+            u->markHostCopyObsolete(असत्य);
         }
-        if (!!(accessFlags & ACCESS_WRITE))
-            u->markDeviceCopyObsolete(true);
+        जर (!!(accessFlags & ACCESS_WRITE))
+            u->markDeviceCopyObsolete(सत्य);
     }
 
-    void unmap(UMatData* u) const CV_OVERRIDE
+    शून्य unmap(UMatData* u) स्थिरांक CV_OVERRIDE
     {
-        if (!u)
-            return;
-        if (u->deviceCopyObsolete() && u->handle && u->data)
+        जर (!u)
+            परत;
+        जर (u->deviceCopyObsolete() && u->handle && u->data)
         {
             cudaSafeCall(cudaMemcpy(u->handle, u->data, u->size, cudaMemcpyHostToDevice));
-            u->markDeviceCopyObsolete(false);
+            u->markDeviceCopyObsolete(असत्य);
         }
     }
 
-    void download(UMatData* u, void* dstptr, int dims, const size_t sz[],
-                  const size_t srcofs[], const size_t srcstep[],
-                  const size_t dststep[]) const CV_OVERRIDE
+    शून्य download(UMatData* u, शून्य* dstptr, पूर्णांक dims, स्थिरांक माप_प्रकार sz[],
+                  स्थिरांक माप_प्रकार srcofs[], स्थिरांक माप_प्रकार srcstep[],
+                  स्थिरांक माप_प्रकार dststep[]) स्थिरांक CV_OVERRIDE
     {
-        if (!u || !u->handle || !dstptr)
-            return;
+        जर (!u || !u->handle || !dstptr)
+            परत;
         copyPlanes((uchar*)u->handle, srcofs, srcstep, (uchar*)dstptr, 0, dststep,
                    dims, sz, cudaMemcpyDeviceToHost);
     }
 
-    void upload(UMatData* u, const void* srcptr, int dims, const size_t sz[],
-                const size_t dstofs[], const size_t dststep[],
-                const size_t srcstep[]) const CV_OVERRIDE
+    शून्य upload(UMatData* u, स्थिरांक शून्य* srcptr, पूर्णांक dims, स्थिरांक माप_प्रकार sz[],
+                स्थिरांक माप_प्रकार dstofs[], स्थिरांक माप_प्रकार dststep[],
+                स्थिरांक माप_प्रकार srcstep[]) स्थिरांक CV_OVERRIDE
     {
-        if (!u || !srcptr)
-            return;
-        if (!u->handle && u->size > 0)
+        जर (!u || !srcptr)
+            परत;
+        जर (!u->handle && u->size > 0)
             cudaSafeCall(cudaMalloc(&u->handle, u->size));
-        copyPlanes((uchar*)srcptr, NULL, srcstep, (uchar*)u->handle, dstofs, dststep,
+        copyPlanes((uchar*)srcptr, रिक्त, srcstep, (uchar*)u->handle, dstofs, dststep,
                    dims, sz, cudaMemcpyHostToDevice);
-        u->markHostCopyObsolete(true);
-        u->markDeviceCopyObsolete(false);
+        u->markHostCopyObsolete(सत्य);
+        u->markDeviceCopyObsolete(असत्य);
     }
 
     // Same-world D2D only; UMat::copyTo calls copy() solely when both share this allocator.
-    void copy(UMatData* src, UMatData* dst, int dims, const size_t sz[],
-              const size_t srcofs[], const size_t srcstep[],
-              const size_t dstofs[], const size_t dststep[], bool /*sync*/) const CV_OVERRIDE
+    शून्य copy(UMatData* src, UMatData* dst, पूर्णांक dims, स्थिरांक माप_प्रकार sz[],
+              स्थिरांक माप_प्रकार srcofs[], स्थिरांक माप_प्रकार srcstep[],
+              स्थिरांक माप_प्रकार dstofs[], स्थिरांक माप_प्रकार dststep[], तार्किक /*sync*/) स्थिरांक CV_OVERRIDE
     {
-        if (!src || !dst || !src->handle || !dst->handle)
-            return;
+        जर (!src || !dst || !src->handle || !dst->handle)
+            परत;
         copyPlanes((uchar*)src->handle, srcofs, srcstep, (uchar*)dst->handle, dstofs, dststep,
                    dims, sz, cudaMemcpyDeviceToDevice);
-        dst->markHostCopyObsolete(true);
-        dst->markDeviceCopyObsolete(false);
+        dst->markHostCopyObsolete(सत्य);
+        dst->markDeviceCopyObsolete(असत्य);
     }
 
-private:
+खाजगी:
     // sz/steps follow the MatAllocator convention: the last dim carries element bytes.
-    static void copyPlanes(uchar* srcbase, const size_t srcofs[], const size_t srcstep[],
-                           uchar* dstbase, const size_t dstofs[], const size_t dststep[],
-                           int dims, const size_t sz[], cudaMemcpyKind kind)
+    स्थिर शून्य copyPlanes(uchar* srcbase, स्थिरांक माप_प्रकार srcofs[], स्थिरांक माप_प्रकार srcstep[],
+                           uchar* dstbase, स्थिरांक माप_प्रकार dstofs[], स्थिरांक माप_प्रकार dststep[],
+                           पूर्णांक dims, स्थिरांक माप_प्रकार sz[], cudaMemcpyKind kind)
     {
-        int isz[CV_MAX_DIM];
+        पूर्णांक isz[CV_MAX_DIM];
         uchar* srcptr = srcbase;
         uchar* dstptr = dstbase;
-        for (int i = 0; i < dims; i++)
+        साठी (पूर्णांक i = 0; i < dims; i++)
         {
-            CV_Assert(sz[i] <= (size_t)INT_MAX);
-            if (sz[i] == 0)
-                return;
-            if (srcofs)
+            CV_Assert(sz[i] <= (माप_प्रकार)पूर्णांक_उच्च);
+            जर (sz[i] == 0)
+                परत;
+            जर (srcofs)
                 srcptr += srcofs[i] * (i <= dims - 2 ? srcstep[i] : 1);
-            if (dstofs)
+            जर (dstofs)
                 dstptr += dstofs[i] * (i <= dims - 2 ? dststep[i] : 1);
-            isz[i] = (int)sz[i];
+            isz[i] = (पूर्णांक)sz[i];
         }
 
         Mat src(dims, isz, CV_8U, srcptr, srcstep);
         Mat dst(dims, isz, CV_8U, dstptr, dststep);
 
-        const Mat* arrays[] = { &src, &dst };
+        स्थिरांक Mat* arrays[] = { &src, &dst };
         uchar* ptrs[2];
         NAryMatIterator it(arrays, ptrs, 2);
-        const size_t planesz = it.size;
-        for (size_t j = 0; j < it.nplanes; j++, ++it)
+        स्थिरांक माप_प्रकार planesz = it.size;
+        साठी (माप_प्रकार j = 0; j < it.nplanes; j++, ++it)
             cudaSafeCall(cudaMemcpy(ptrs[1], ptrs[0], planesz, kind));
     }
 };
 
 MatAllocator* getCudaAllocator()
 {
-    CV_SINGLETON_LAZY_INIT(CudaUMatAllocator, new CudaUMatAllocator())
+    CV_SINGLETON_LAZY_INIT(CudaUMatAllocator, नवीन CudaUMatAllocator())
 }
 
 #endif

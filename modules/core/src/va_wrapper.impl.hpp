@@ -6,100 +6,100 @@
 // Not a standalone header, part of va_intel.cpp
 //
 
-#include "opencv2/core/utils/plugin_loader.private.hpp"  // DynamicLib
-#include "opencv2/core/utils/configuration.private.hpp"
+#अन्तर्भाव "opencv2/core/utils/plugin_loader.private.hpp"  // DynamicLib
+#अन्तर्भाव "opencv2/core/utils/configuration.private.hpp"
 
-namespace cv { namespace detail {
+नामाकाश cv { नामाकाश detail {
 
-typedef VAStatus (*FN_vaDeriveImage)(VADisplay dpy, VASurfaceID surface, VAImage *image);
-typedef VAStatus (*FN_vaDestroyImage)(VADisplay dpy, VAImageID image);
-typedef VAStatus (*FN_vaMapBuffer)(VADisplay dpy, VABufferID buf_id, void **pbuf);
-typedef VAStatus (*FN_vaSyncSurface)(VADisplay dpy, VASurfaceID render_target);
-typedef VAStatus (*FN_vaUnmapBuffer)(VADisplay dpy, VABufferID buf_id);
-typedef int (*FN_vaMaxNumImageFormats)(VADisplay dpy);
-typedef VAStatus (*FN_vaQueryImageFormats)(VADisplay dpy, VAImageFormat *format_list, int *num_formats);
-typedef VAStatus (*FN_vaCreateImage)(VADisplay dpy, VAImageFormat *format, int width, int height, VAImage *image);
-typedef VAStatus (*FN_vaPutImage)(VADisplay dpy, VASurfaceID surface, VAImageID image, int src_x, int src_y, unsigned int src_width, unsigned int src_height, int dest_x, int dest_y, unsigned int dest_width, unsigned int dest_height);
-typedef VAStatus (*FN_vaGetImage)(VADisplay dpy, VASurfaceID surface, int x, int y, unsigned int width, unsigned int height, VAImageID image);
+प्रकारव्याख्या VAStatus (*FN_vaDeriveImage)(VADisplay dpy, VASurfaceID surface, VAImage *image);
+प्रकारव्याख्या VAStatus (*FN_vaDestroyImage)(VADisplay dpy, VAImageID image);
+प्रकारव्याख्या VAStatus (*FN_vaMapBuffer)(VADisplay dpy, VABufferID buf_id, शून्य **pbuf);
+प्रकारव्याख्या VAStatus (*FN_vaSyncSurface)(VADisplay dpy, VASurfaceID render_target);
+प्रकारव्याख्या VAStatus (*FN_vaUnmapBuffer)(VADisplay dpy, VABufferID buf_id);
+प्रकारव्याख्या पूर्णांक (*FN_va_Max_अंक_Image_Formats)(VADisplay dpy);
+प्रकारव्याख्या VAStatus (*FN_vaQueryImageFormats)(VADisplay dpy, VAImageFormat *format_list, पूर्णांक *अंक_formats);
+प्रकारव्याख्या VAStatus (*FN_vaCreateImage)(VADisplay dpy, VAImageFormat *format, पूर्णांक width, पूर्णांक height, VAImage *image);
+प्रकारव्याख्या VAStatus (*FN_vaPutImage)(VADisplay dpy, VASurfaceID surface, VAImageID image, पूर्णांक src_x, पूर्णांक src_y, अचिन्हित पूर्णांक src_width, अचिन्हित पूर्णांक src_height, पूर्णांक dest_x, पूर्णांक dest_y, अचिन्हित पूर्णांक dest_width, अचिन्हित पूर्णांक dest_height);
+प्रकारव्याख्या VAStatus (*FN_vaGetImage)(VADisplay dpy, VASurfaceID surface, पूर्णांक x, पूर्णांक y, अचिन्हित पूर्णांक width, अचिन्हित पूर्णांक height, VAImageID image);
 
-static FN_vaDeriveImage fn_vaDeriveImage = NULL;
-static FN_vaDestroyImage fn_vaDestroyImage = NULL;
-static FN_vaMapBuffer fn_vaMapBuffer = NULL;
-static FN_vaSyncSurface fn_vaSyncSurface = NULL;
-static FN_vaUnmapBuffer fn_vaUnmapBuffer = NULL;
-static FN_vaMaxNumImageFormats fn_vaMaxNumImageFormats = NULL;
-static FN_vaQueryImageFormats fn_vaQueryImageFormats = NULL;
-static FN_vaCreateImage fn_vaCreateImage = NULL;
-static FN_vaPutImage fn_vaPutImage = NULL;
-static FN_vaGetImage fn_vaGetImage = NULL;
+स्थिर FN_vaDeriveImage fn_vaDeriveImage = रिक्त;
+स्थिर FN_vaDestroyImage fn_vaDestroyImage = रिक्त;
+स्थिर FN_vaMapBuffer fn_vaMapBuffer = रिक्त;
+स्थिर FN_vaSyncSurface fn_vaSyncSurface = रिक्त;
+स्थिर FN_vaUnmapBuffer fn_vaUnmapBuffer = रिक्त;
+स्थिर FN_va_Max_अंक_Image_Formats fn_va_Max_अंक_Image_Formats = रिक्त;
+स्थिर FN_vaQueryImageFormats fn_vaQueryImageFormats = रिक्त;
+स्थिर FN_vaCreateImage fn_vaCreateImage = रिक्त;
+स्थिर FN_vaPutImage fn_vaPutImage = रिक्त;
+स्थिर FN_vaGetImage fn_vaGetImage = रिक्त;
 
 #define vaDeriveImage fn_vaDeriveImage
 #define vaDestroyImage fn_vaDestroyImage
 #define vaMapBuffer fn_vaMapBuffer
 #define vaSyncSurface fn_vaSyncSurface
 #define vaUnmapBuffer fn_vaUnmapBuffer
-#define vaMaxNumImageFormats fn_vaMaxNumImageFormats
+#define va_Max_अंक_Image_Formats fn_va_Max_अंक_Image_Formats
 #define vaQueryImageFormats fn_vaQueryImageFormats
 #define vaCreateImage fn_vaCreateImage
 #define vaPutImage fn_vaPutImage
 #define vaGetImage fn_vaGetImage
 
 
-static std::shared_ptr<cv::plugin::impl::DynamicLib> loadLibVA()
+स्थिर std::shared_ptr<cv::plugin::impl::DynamicLib> loadLibVA()
 {
     std::shared_ptr<cv::plugin::impl::DynamicLib> lib;
-    const std::string envPath = utils::getConfigurationParameterString("OPENCV_LIBVA_RUNTIME");
-    if (!envPath.empty())
+    स्थिरांक std::string envPath = utils::getConfigurationParameterString("OPENCV_LIBVA_RUNTIME");
+    जर (!envPath.empty())
     {
         lib = std::make_shared<cv::plugin::impl::DynamicLib>(envPath);
-        return lib;
+        परत lib;
     }
-    static const char* const candidates[] = {
+    स्थिर स्थिरांक अक्षर* स्थिरांक candidates[] = {
         "libva.so",
         "libva.so.2",
         "libva.so.1",
     };
-    for (int i = 0; i < 3; ++i)
+    साठी (पूर्णांक i = 0; i < 3; ++i)
     {
         lib = std::make_shared<cv::plugin::impl::DynamicLib>(candidates[i]);
-        if (lib->isLoaded())
-            break;
+        जर (lib->isLoaded())
+            थांबा;
     }
-    return lib;
+    परत lib;
 }
-static void init_libva()
+स्थिर शून्य init_libva()
 {
-    static bool initialized = false;
-    static auto library = loadLibVA();
-    if (!initialized)
+    स्थिर तार्किक initialized = असत्य;
+    स्थिर स्वतः library = loadLibVA();
+    जर (!initialized)
     {
-        if (!library || !library->isLoaded())
+        जर (!library || !library->isLoaded())
         {
             library.reset();
             CV_Error(cv::Error::StsBadFunc, "OpenCV can't load VA library (libva)");
         }
-        auto& lib = *library.get();
-#define VA_LOAD_SYMBOL(name) fn_ ## name = reinterpret_cast<FN_ ## name>(lib.getSymbol(#name)); \
-        if (!fn_ ## name) \
+        स्वतः& lib = *library.get();
+#define VA_LOAD_चिन्ह(name) fn_ ## name = reinterpret_cast<FN_ ## name>(lib.get_चिन्ह(#name)); \
+        जर (!fn_ ## name) \
         { \
             library.reset(); \
-            initialized = true; \
+            initialized = सत्य; \
             CV_Error_(cv::Error::StsBadFunc, ("OpenCV can't load VA library (libva), missing symbol: %s", #name)); \
         }
 
-        VA_LOAD_SYMBOL(vaDeriveImage);
-        VA_LOAD_SYMBOL(vaDestroyImage);
-        VA_LOAD_SYMBOL(vaMapBuffer);
-        VA_LOAD_SYMBOL(vaSyncSurface);
-        VA_LOAD_SYMBOL(vaUnmapBuffer);
-        VA_LOAD_SYMBOL(vaMaxNumImageFormats);
-        VA_LOAD_SYMBOL(vaQueryImageFormats);
-        VA_LOAD_SYMBOL(vaCreateImage);
-        VA_LOAD_SYMBOL(vaPutImage);
-        VA_LOAD_SYMBOL(vaGetImage);
-        initialized = true;
+        VA_LOAD_चिन्ह(vaDeriveImage);
+        VA_LOAD_चिन्ह(vaDestroyImage);
+        VA_LOAD_चिन्ह(vaMapBuffer);
+        VA_LOAD_चिन्ह(vaSyncSurface);
+        VA_LOAD_चिन्ह(vaUnmapBuffer);
+        VA_LOAD_चिन्ह(va_Max_अंक_Image_Formats);
+        VA_LOAD_चिन्ह(vaQueryImageFormats);
+        VA_LOAD_चिन्ह(vaCreateImage);
+        VA_LOAD_चिन्ह(vaPutImage);
+        VA_LOAD_चिन्ह(vaGetImage);
+        initialized = सत्य;
     }
-    if (!library)
+    जर (!library)
         CV_Error(cv::Error::StsBadFunc, "OpenCV can't load/initialize VA library (libva)");
 }
 

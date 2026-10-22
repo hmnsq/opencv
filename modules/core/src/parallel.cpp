@@ -40,44 +40,44 @@
 //
 //M*/
 
-#include "precomp.hpp"
+#अन्तर्भाव "precomp.hpp"
 
-#include <opencv2/core/utils/configuration.private.hpp>
-#include <opencv2/core/utils/trace.private.hpp>
+#अन्तर्भाव <opencv2/core/utils/configuration.private.hpp>
+#अन्तर्भाव <opencv2/core/utils/trace.private.hpp>
 
-#include "opencv2/core/parallel/parallel_backend.hpp"
-#include "parallel/parallel.hpp"
+#अन्तर्भाव "opencv2/core/parallel/parallel_backend.hpp"
+#अन्तर्भाव "parallel/parallel.hpp"
 
-#if defined _WIN32 || defined WINCE
-    #include <windows.h>
+#जर defined _WIN32 || defined WINCE
+    #अन्तर्भाव <windows.h>
     #undef small
     #undef min
     #undef max
-    #undef abs
+    #undef असल
 #endif
 
-#if defined __unix__ || defined __APPLE__ || defined __GLIBC__ \
+#जर defined __unix__ || defined __APPLE__ || defined __GLIBC__ \
     || defined __HAIKU__ || defined __EMSCRIPTEN__ \
     || defined __FreeBSD__ || defined __NetBSD__ || defined __OpenBSD__
-    #include <unistd.h>
-    #include <stdio.h>
-    #include <sys/types.h>
-    #include <fstream>
-    #if defined __ANDROID__
-        #include <sys/sysconf.h>
-        #include <sys/syscall.h>
-        #include <sched.h>
-    #elif defined __APPLE__
-        #include <sys/sysctl.h>
+    #अन्तर्भाव <unistd.h>
+    #अन्तर्भाव <stdio.h>
+    #अन्तर्भाव <sys/types.h>
+    #अन्तर्भाव <fstream>
+    #जर defined __ANDROID__
+        #अन्तर्भाव <sys/sysconf.h>
+        #अन्तर्भाव <sys/syscall.h>
+        #अन्तर्भाव <sched.h>
+    #किंवाजर defined __APPLE__
+        #अन्तर्भाव <sys/sysctl.h>
     #endif
 #endif
 
-#if defined (__QNX__)
-    #include <sys/syspage.h>
+#जर defined (__QNX__)
+    #अन्तर्भाव <sys/syspage.h>
 #endif
 
 #ifndef OPENCV_DISABLE_THREAD_SUPPORT
-    #include <thread>
+    #अन्तर्भाव <thread>
 #endif
 
 #ifdef _OPENMP
@@ -88,7 +88,7 @@
     #define HAVE_GCD
 #endif
 
-#if defined _MSC_VER
+#जर defined _MSC_VER
     #define HAVE_CONCURRENCY
 #endif
 
@@ -102,134 +102,134 @@
    - HAVE_PTHREADS_PF - pthreads if available
 */
 
-#if defined HAVE_TBB
+#जर defined HAVE_TBB
     #ifndef TBB_SUPPRESS_DEPRECATED_MESSAGES  // supress warning
     #define TBB_SUPPRESS_DEPRECATED_MESSAGES 1
     #endif
-    #include "tbb/tbb.h"
-    #include "tbb/task.h"
-    #if TBB_INTERFACE_VERSION >= 8000
-        #include "tbb/task_arena.h"
+    #अन्तर्भाव "tbb/tbb.h"
+    #अन्तर्भाव "tbb/task.h"
+    #जर TBB_INTERFACE_VERSION >= 8000
+        #अन्तर्भाव "tbb/task_arena.h"
     #endif
     #undef min
     #undef max
-#elif defined HAVE_HPX
-    #include <hpx/parallel/algorithms/for_loop.hpp>
-    #include <hpx/parallel/execution.hpp>
+#किंवाजर defined HAVE_HPX
+    #अन्तर्भाव <hpx/parallel/algorithms/for_loop.hpp>
+    #अन्तर्भाव <hpx/parallel/execution.hpp>
     //
-    #include <hpx/hpx_start.hpp>
-    #include <hpx/hpx_suspend.hpp>
-    #include <hpx/include/apply.hpp>
-    #include <hpx/util/yield_while.hpp>
-    #include <hpx/include/threadmanager.hpp>
+    #अन्तर्भाव <hpx/hpx_start.hpp>
+    #अन्तर्भाव <hpx/hpx_suspend.hpp>
+    #अन्तर्भाव <hpx/include/apply.hpp>
+    #अन्तर्भाव <hpx/util/yield_while.hpp>
+    #अन्तर्भाव <hpx/include/threadmanager.hpp>
 
-#elif defined HAVE_OPENMP
-    #include <omp.h>
-#elif defined HAVE_GCD
-    #include <dispatch/dispatch.h>
-    #include <pthread.h>
-#elif defined HAVE_CONCURRENCY
-    #include <ppl.h>
-#elif defined HAVE_PTHREADS_PF
-    #include <pthread.h>
+#किंवाजर defined HAVE_OPENMP
+    #अन्तर्भाव <omp.h>
+#किंवाजर defined HAVE_GCD
+    #अन्तर्भाव <dispatch/dispatch.h>
+    #अन्तर्भाव <pthread.h>
+#किंवाजर defined HAVE_CONCURRENCY
+    #अन्तर्भाव <ppl.h>
+#किंवाजर defined HAVE_PTHREADS_PF
+    #अन्तर्भाव <pthread.h>
 #endif
 
 
-#if defined HAVE_TBB
+#जर defined HAVE_TBB
 #  define CV_PARALLEL_FRAMEWORK "tbb"
-#elif defined HAVE_HPX
+#किंवाजर defined HAVE_HPX
 #  define CV_PARALLEL_FRAMEWORK "hpx"
-#elif defined HAVE_OPENMP
+#किंवाजर defined HAVE_OPENMP
 #  define CV_PARALLEL_FRAMEWORK "openmp"
-#elif defined HAVE_GCD
+#किंवाजर defined HAVE_GCD
 #  define CV_PARALLEL_FRAMEWORK "gcd"
-#elif defined WINRT
+#किंवाजर defined WINRT
 #  define CV_PARALLEL_FRAMEWORK "winrt-concurrency"
-#elif defined HAVE_CONCURRENCY
+#किंवाजर defined HAVE_CONCURRENCY
 #  define CV_PARALLEL_FRAMEWORK "ms-concurrency"
-#elif defined HAVE_PTHREADS_PF
+#किंवाजर defined HAVE_PTHREADS_PF
 #  define CV_PARALLEL_FRAMEWORK "pthreads"
 #endif
 
-#include <atomic>
+#अन्तर्भाव <atomic>
 
-#include "parallel_impl.hpp"
+#अन्तर्भाव "parallel_impl.hpp"
 
-#include "opencv2/core/detail/exception_ptr.hpp"  // CV__EXCEPTION_PTR = 1 if std::exception_ptr is available
+#अन्तर्भाव "opencv2/core/detail/exception_ptr.hpp"  // CV__EXCEPTION_PTR = 1 if std::exception_ptr is available
 
-#include <opencv2/core/utils/fp_control_utils.hpp>
-#include <opencv2/core/utils/fp_control.private.hpp>
+#अन्तर्भाव <opencv2/core/utils/fp_control_utils.hpp>
+#अन्तर्भाव <opencv2/core/utils/fp_control.private.hpp>
 
-using namespace cv;
+using नामाकाश cv;
 
-namespace cv {
+नामाकाश cv {
 
 ParallelLoopBody::~ParallelLoopBody() {}
 
-using namespace cv::parallel;
+using नामाकाश cv::parallel;
 
-namespace {
+नामाकाश {
 
 #ifdef ENABLE_INSTRUMENTATION
-    static void SyncNodes(cv::instr::InstrNode *pNode)
+    स्थिर शून्य SyncNodes(cv::instr::Instr_गाठ *p_गाठ)
     {
-        std::vector<cv::instr::NodeDataTls*> data;
-        pNode->m_payload.m_tls.gather(data);
+        std::vector<cv::instr::गाठ_Data_Tls*> data;
+        p_गाठ->m_payload.m_tls.gather(data);
 
         uint64 ticksMax = 0;
-        int    threads  = 0;
-        for(size_t i = 0; i < data.size(); i++)
+        पूर्णांक    threads  = 0;
+        साठी(माप_प्रकार i = 0; i < data.size(); i++)
         {
-            if(data[i] && data[i]->m_ticksTotal)
+            जर(data[i] && data[i]->m_ticksTotal)
             {
                 ticksMax = MAX(ticksMax, data[i]->m_ticksTotal);
-                pNode->m_payload.m_ticksTotal -= data[i]->m_ticksTotal;
+                p_गाठ->m_payload.m_ticksTotal -= data[i]->m_ticksTotal;
                 data[i]->m_ticksTotal = 0;
                 threads++;
             }
         }
-        pNode->m_payload.m_ticksTotal += ticksMax;
-        pNode->m_payload.m_threads = MAX(pNode->m_payload.m_threads, threads);
+        p_गाठ->m_payload.m_ticksTotal += ticksMax;
+        p_गाठ->m_payload.m_threads = MAX(p_गाठ->m_payload.m_threads, threads);
 
-        for(size_t i = 0; i < pNode->m_childs.size(); i++)
-            SyncNodes(pNode->m_childs[i]);
+        साठी(माप_प्रकार i = 0; i < p_गाठ->m_childs.size(); i++)
+            SyncNodes(p_गाठ->m_childs[i]);
     }
 #endif
 
-    class ParallelLoopBodyWrapperContext
+    वर्ग ParallelLoopBodyWrapperContext
     {
-    public:
-        ParallelLoopBodyWrapperContext(const cv::ParallelLoopBody& _body, const cv::Range& _r, double _nstripes) :
-            is_rng_used(false), hasException(false)
+    सार्वजनिक:
+        ParallelLoopBodyWrapperContext(स्थिरांक cv::ParallelLoopBody& _body, स्थिरांक cv::Range& _r, द्विगुण _nstripes) :
+            is_rng_used(असत्य), hasException(असत्य)
         {
 
             body = &_body;
             wholeRange = _r;
-            double len = wholeRange.end - wholeRange.start;
+            द्विगुण len = wholeRange.end - wholeRange.start;
             nstripes = cvRound(_nstripes <= 0 ? len : MIN(MAX(_nstripes, 1.), len));
 
             // propagate main thread state
             rng = cv::theRNG();
-#if OPENCV_SUPPORTS_FP_DENORMALS_HINT && OPENCV_IMPL_FP_HINTS
+#जर OPENCV_SUPPORTS_FP_DENORMALS_HINT && OPENCV_IMPL_FP_HINTS
             details::saveFPDenormalsState(fp_denormals_base_state);
 #endif
 
 #ifdef OPENCV_TRACE
-            traceRootRegion = CV_TRACE_NS::details::getCurrentRegion();
-            traceRootContext = CV_TRACE_NS::details::getTraceManager().tls.get();
+            trace_मूळ_Region = CV_TRACE_NS::details::getCurrentRegion();
+            trace_मूळ_Context = CV_TRACE_NS::details::getTraceManager().tls.get();
 #endif
 
 #ifdef ENABLE_INSTRUMENTATION
-            pThreadRoot = cv::instr::getInstrumentTLSStruct().pCurrentNode;
+            p_Thread_मूळ = cv::instr::getInstrumentTLSStruct().p_Current_गाठ;
 #endif
         }
-        void finalize()
+        शून्य finalize()
         {
 #ifdef ENABLE_INSTRUMENTATION
-            for(size_t i = 0; i < pThreadRoot->m_childs.size(); i++)
-                SyncNodes(pThreadRoot->m_childs[i]);
+            साठी(माप_प्रकार i = 0; i < p_Thread_मूळ->m_childs.size(); i++)
+                SyncNodes(p_Thread_मूळ->m_childs[i]);
 #endif
-            if (is_rng_used)
+            जर (is_rng_used)
             {
                 // Some parallel backends execute nested jobs in the main thread,
                 // so we need to restore initial RNG state here.
@@ -240,74 +240,74 @@ namespace {
                 cv::theRNG().next();
             }
 #ifdef OPENCV_TRACE
-            if (traceRootRegion)
-                CV_TRACE_NS::details::parallelForFinalize(*traceRootRegion);
+            जर (trace_मूळ_Region)
+                CV_TRACE_NS::details::parallelForFinalize(*trace_मूळ_Region);
 #endif
 
-            if (hasException)
+            जर (hasException)
             {
-#if CV__EXCEPTION_PTR
+#जर CV__EXCEPTION_PTR
                 std::rethrow_exception(pException);
-#else
+#अन्यथा
                 CV_Error(Error::StsError, "Exception in parallel_for() body: " + exception_message);
 #endif
             }
         }
         ~ParallelLoopBodyWrapperContext() {}
 
-        const cv::ParallelLoopBody* body;
+        स्थिरांक cv::ParallelLoopBody* body;
         cv::Range wholeRange;
-        int nstripes;
+        पूर्णांक nstripes;
         cv::RNG rng;
-        mutable bool is_rng_used;
+        mutable तार्किक is_rng_used;
 #ifdef OPENCV_TRACE
-        CV_TRACE_NS::details::Region* traceRootRegion;
-        CV_TRACE_NS::details::TraceManagerThreadLocal* traceRootContext;
+        CV_TRACE_NS::details::Region* trace_मूळ_Region;
+        CV_TRACE_NS::details::TraceManagerThreadLocal* trace_मूळ_Context;
 #endif
 #ifdef ENABLE_INSTRUMENTATION
-        cv::instr::InstrNode *pThreadRoot;
+        cv::instr::Instr_गाठ *p_Thread_मूळ;
 #endif
-        bool hasException;
-#if CV__EXCEPTION_PTR
+        तार्किक hasException;
+#जर CV__EXCEPTION_PTR
         std::exception_ptr pException;
-#else
+#अन्यथा
         cv::String exception_message;
 #endif
-#if CV__EXCEPTION_PTR
-        void recordException()
-#else
-        void recordException(const cv::String& msg)
+#जर CV__EXCEPTION_PTR
+        शून्य recordException()
+#अन्यथा
+        शून्य recordException(स्थिरांक cv::String& संदेश)
 #endif
         {
 #ifndef CV_THREAD_SANITIZER
-            if (!hasException)
+            जर (!hasException)
 #endif
             {
                 cv::AutoLock lock(cv::getInitializationMutex());
-                if (!hasException)
+                जर (!hasException)
                 {
-                    hasException = true;
-#if CV__EXCEPTION_PTR
+                    hasException = सत्य;
+#जर CV__EXCEPTION_PTR
                     pException = std::current_exception();
-#else
-                    exception_message = msg;
+#अन्यथा
+                    exception_message = संदेश;
 #endif
                 }
             }
         }
 
-#if OPENCV_SUPPORTS_FP_DENORMALS_HINT && OPENCV_IMPL_FP_HINTS
+#जर OPENCV_SUPPORTS_FP_DENORMALS_HINT && OPENCV_IMPL_FP_HINTS
         details::FPDenormalsModeState fp_denormals_base_state;
 #endif
 
-    private:
-        ParallelLoopBodyWrapperContext(const ParallelLoopBodyWrapperContext&); // disabled
-        ParallelLoopBodyWrapperContext& operator=(const ParallelLoopBodyWrapperContext&); // disabled
+    खाजगी:
+        ParallelLoopBodyWrapperContext(स्थिरांक ParallelLoopBodyWrapperContext&); // disabled
+        ParallelLoopBodyWrapperContext& चालक=(स्थिरांक ParallelLoopBodyWrapperContext&); // disabled
     };
 
-    class ParallelLoopBodyWrapper : public cv::ParallelLoopBody
+    वर्ग ParallelLoopBodyWrapper : सार्वजनिक cv::ParallelLoopBody
     {
-    public:
+    सार्वजनिक:
         ParallelLoopBodyWrapper(ParallelLoopBodyWrapperContext& ctx_) :
             ctx(ctx_)
         {
@@ -315,192 +315,192 @@ namespace {
         ~ParallelLoopBodyWrapper()
         {
         }
-        void operator()(const cv::Range& sr) const CV_OVERRIDE
+        शून्य चालक()(स्थिरांक cv::Range& sr) स्थिरांक CV_OVERRIDE
         {
 #ifdef OPENCV_TRACE
             // TODO CV_TRACE_NS::details::setCurrentRegion(rootRegion);
-            if (ctx.traceRootRegion && ctx.traceRootContext)
-                CV_TRACE_NS::details::parallelForSetRootRegion(*ctx.traceRootRegion, *ctx.traceRootContext);
+            जर (ctx.trace_मूळ_Region && ctx.trace_मूळ_Context)
+                CV_TRACE_NS::details::parallel_For_Set_मूळ_Region(*ctx.trace_मूळ_Region, *ctx.trace_मूळ_Context);
             CV__TRACE_OPENCV_FUNCTION_NAME("parallel_for_body");
-            if (ctx.traceRootRegion)
-                CV_TRACE_NS::details::parallelForAttachNestedRegion(*ctx.traceRootRegion);
+            जर (ctx.trace_मूळ_Region)
+                CV_TRACE_NS::details::parallelForAttachNestedRegion(*ctx.trace_मूळ_Region);
 #endif
 
 #ifdef ENABLE_INSTRUMENTATION
             {
                 cv::instr::InstrTLSStruct *pInstrTLS = &cv::instr::getInstrumentTLSStruct();
-                pInstrTLS->pCurrentNode = ctx.pThreadRoot; // Initialize TLS node for thread
+                pInstrTLS->p_Current_गाठ = ctx.p_Thread_मूळ; // Initialize TLS node for thread
             }
             CV_INSTRUMENT_REGION();
 #endif
 
             // propagate main thread state
             cv::theRNG() = ctx.rng;
-#if OPENCV_SUPPORTS_FP_DENORMALS_HINT && OPENCV_IMPL_FP_HINTS
+#जर OPENCV_SUPPORTS_FP_DENORMALS_HINT && OPENCV_IMPL_FP_HINTS
             FPDenormalsIgnoreHintScope fp_denormals_scope(ctx.fp_denormals_base_state);
 #endif
 
             cv::Range r;
             cv::Range wholeRange = ctx.wholeRange;
-            int nstripes = ctx.nstripes;
-            r.start = (int)(wholeRange.start +
+            पूर्णांक nstripes = ctx.nstripes;
+            r.start = (पूर्णांक)(wholeRange.start +
                             ((uint64)sr.start*(wholeRange.end - wholeRange.start) + nstripes/2)/nstripes);
-            r.end = sr.end >= nstripes ? wholeRange.end : (int)(wholeRange.start +
+            r.end = sr.end >= nstripes ? wholeRange.end : (पूर्णांक)(wholeRange.start +
                             ((uint64)sr.end*(wholeRange.end - wholeRange.start) + nstripes/2)/nstripes);
 
 #ifdef OPENCV_TRACE
-            CV_TRACE_ARG_VALUE(range_start, "range.start", (int64)r.start);
-            CV_TRACE_ARG_VALUE(range_end, "range.end", (int64)r.end);
+            CV_TRACE_ARG_मूल्य(range_start, "range.start", (int64)r.start);
+            CV_TRACE_ARG_मूल्य(range_end, "range.end", (int64)r.end);
 #endif
 
-            try
+            प्रयत्न
             {
                 (*ctx.body)(r);
             }
-#if CV__EXCEPTION_PTR
-            catch (...)
+#जर CV__EXCEPTION_PTR
+            पकडा (...)
             {
                 ctx.recordException();
             }
-#else
-            catch (const cv::Exception& e)
+#अन्यथा
+            पकडा (स्थिरांक cv::Exception& e)
             {
                 ctx.recordException(e.what());
             }
-            catch (const std::exception& e)
+            पकडा (स्थिरांक std::exception& e)
             {
                 ctx.recordException(e.what());
             }
-            catch (...)
+            पकडा (...)
             {
                 ctx.recordException("Unknown exception");
             }
 #endif
 
-            if (!ctx.is_rng_used && !(cv::theRNG() == ctx.rng))
-                ctx.is_rng_used = true;
+            जर (!ctx.is_rng_used && !(cv::theRNG() == ctx.rng))
+                ctx.is_rng_used = सत्य;
         }
-        cv::Range stripeRange() const { return cv::Range(0, ctx.nstripes); }
+        cv::Range stripeRange() स्थिरांक { परत cv::Range(0, ctx.nstripes); }
 
-    protected:
+    संरक्षित:
         ParallelLoopBodyWrapperContext& ctx;
     };
 
-#if defined HAVE_TBB
-    class ProxyLoopBody : public ParallelLoopBodyWrapper
+#जर defined HAVE_TBB
+    वर्ग ProxyLoopBody : सार्वजनिक ParallelLoopBodyWrapper
     {
-    public:
+    सार्वजनिक:
         ProxyLoopBody(ParallelLoopBodyWrapperContext& ctx_)
         : ParallelLoopBodyWrapper(ctx_)
         {}
 
-        void operator ()(const tbb::blocked_range<int>& range) const
+        शून्य चालक ()(स्थिरांक tbb::blocked_range<पूर्णांक>& range) स्थिरांक
         {
-            this->ParallelLoopBodyWrapper::operator()(cv::Range(range.begin(), range.end()));
+            हे->ParallelLoopBodyWrapper::चालक()(cv::Range(range.begin(), range.end()));
         }
 
-        void operator ()() const  // run parallel job
+        शून्य चालक ()() स्थिरांक  // run parallel job
         {
-            cv::Range range = this->stripeRange();
-            tbb::parallel_for(tbb::blocked_range<int>(range.start, range.end), *this);
+            cv::Range range = हे->stripeRange();
+            tbb::parallel_for(tbb::blocked_range<पूर्णांक>(range.start, range.end), *हे);
         }
     };
-#elif defined HAVE_HPX
-    class ProxyLoopBody : public ParallelLoopBodyWrapper
+#किंवाजर defined HAVE_HPX
+    वर्ग ProxyLoopBody : सार्वजनिक ParallelLoopBodyWrapper
     {
-    public:
+    सार्वजनिक:
         ProxyLoopBody(ParallelLoopBodyWrapperContext& ctx_)
                 : ParallelLoopBodyWrapper(ctx_)
         {}
 
-        void operator ()() const  // run parallel job
+        शून्य चालक ()() स्थिरांक  // run parallel job
         {
-            cv::Range stripeRange = this->stripeRange();
+            cv::Range stripeRange = हे->stripeRange();
             hpx::parallel::for_loop(
                     hpx::parallel::execution::par,
                     stripeRange.start, stripeRange.end,
-                    [&](const int &i) { ;
-                        this->ParallelLoopBodyWrapper::operator()(
+                    [&](स्थिरांक पूर्णांक &i) { ;
+                        हे->ParallelLoopBodyWrapper::चालक()(
                                 cv::Range(i, i + 1));
                     });
         }
     };
-#elif defined HAVE_OPENMP
-    typedef ParallelLoopBodyWrapper ProxyLoopBody;
-#elif defined HAVE_GCD
-    typedef ParallelLoopBodyWrapper ProxyLoopBody;
-    static void block_function(void* context, size_t index)
+#किंवाजर defined HAVE_OPENMP
+    प्रकारव्याख्या ParallelLoopBodyWrapper ProxyLoopBody;
+#किंवाजर defined HAVE_GCD
+    प्रकारव्याख्या ParallelLoopBodyWrapper ProxyLoopBody;
+    स्थिर शून्य block_function(शून्य* context, माप_प्रकार index)
     {
         ProxyLoopBody* ptr_body = static_cast<ProxyLoopBody*>(context);
-        (*ptr_body)(cv::Range((int)index, (int)index + 1));
+        (*ptr_body)(cv::Range((पूर्णांक)index, (पूर्णांक)index + 1));
     }
-#elif defined WINRT || defined HAVE_CONCURRENCY
-    class ProxyLoopBody : public ParallelLoopBodyWrapper
+#किंवाजर defined WINRT || defined HAVE_CONCURRENCY
+    वर्ग ProxyLoopBody : सार्वजनिक ParallelLoopBodyWrapper
     {
-    public:
+    सार्वजनिक:
         ProxyLoopBody(ParallelLoopBodyWrapperContext& ctx)
         : ParallelLoopBodyWrapper(ctx)
         {}
 
-        void operator ()(int i) const
+        शून्य चालक ()(पूर्णांक i) स्थिरांक
         {
-            this->ParallelLoopBodyWrapper::operator()(cv::Range(i, i + 1));
+            हे->ParallelLoopBodyWrapper::चालक()(cv::Range(i, i + 1));
         }
     };
 
     // PPL's default auto_partitioner silently skips whole chunks of the range on
     // ARM64 (unfixed MSVC bug, developercommunity.visualstudio.com/t/1027444).
-    template <typename Body>
-    static inline void pplParallelFor(int first, int last, const Body& body)
+    ढाँचा <typename Body>
+    स्थिर ओळीत शून्य pplParallelFor(पूर्णांक first, पूर्णांक last, स्थिरांक Body& body)
     {
-#if defined(_M_ARM64) || defined(_M_ARM64EC)
+#जर defined(_M_ARM64) || defined(_M_ARM64EC)
         Concurrency::parallel_for(first, last, body, Concurrency::static_partitioner());
-#else
+#अन्यथा
         Concurrency::parallel_for(first, last, body);
 #endif
     }
-#else
-    typedef ParallelLoopBodyWrapper ProxyLoopBody;
+#अन्यथा
+    प्रकारव्याख्या ParallelLoopBodyWrapper ProxyLoopBody;
 #endif
 
-#if defined HAVE_TBB
-    #if TBB_INTERFACE_VERSION >= 8000
-        static tbb::task_arena tbbArena(tbb::task_arena::automatic);
-    #else
-        static tbb::task_scheduler_init tbbScheduler(tbb::task_scheduler_init::deferred);
+#जर defined HAVE_TBB
+    #जर TBB_INTERFACE_VERSION >= 8000
+        स्थिर tbb::task_arena tbbArena(tbb::task_arena::automatic);
+    #अन्यथा
+        स्थिर tbb::task_scheduler_init tbbScheduler(tbb::task_scheduler_init::deferred);
     #endif
-#elif defined HAVE_HPX
+#किंवाजर defined HAVE_HPX
 // nothing for HPX
-#elif defined HAVE_OPENMP
-static inline int _initMaxThreads()
+#किंवाजर defined HAVE_OPENMP
+स्थिर ओळीत पूर्णांक _initMaxThreads()
 {
-    int maxThreads = omp_get_max_threads();
-    return maxThreads;
+    पूर्णांक maxThreads = omp_get_max_threads();
+    परत maxThreads;
 }
-static int numThreadsMax = _initMaxThreads();
-#elif defined HAVE_GCD
+स्थिर पूर्णांक अंक_Threads_Max = _initMaxThreads();
+#किंवाजर defined HAVE_GCD
 // nothing for GCD
-#elif defined WINRT
+#किंवाजर defined WINRT
 // nothing for WINRT
-#elif defined HAVE_CONCURRENCY
+#किंवाजर defined HAVE_CONCURRENCY
 
-class SchedPtr
+वर्ग SchedPtr
 {
     Concurrency::Scheduler* sched_;
-public:
-    Concurrency::Scheduler* operator->() { return sched_; }
-    operator Concurrency::Scheduler*() { return sched_; }
+सार्वजनिक:
+    Concurrency::Scheduler* चालक->() { परत sched_; }
+    चालक Concurrency::Scheduler*() { परत sched_; }
 
-    void operator=(Concurrency::Scheduler* sched)
+    शून्य चालक=(Concurrency::Scheduler* sched)
     {
-        if (sched_) sched_->Release();
+        जर (sched_) sched_->Release();
         sched_ = sched;
     }
 
     SchedPtr() : sched_(0) {}
     ~SchedPtr() {}
 };
-static SchedPtr pplScheduler;
+स्थिर SchedPtr pplScheduler;
 
 #endif
 
@@ -508,128 +508,128 @@ static SchedPtr pplScheduler;
 
 /* ================================   parallel_for_  ================================ */
 
-static void parallel_for_impl(const cv::Range& range, const cv::ParallelLoopBody& body, double nstripes); // forward declaration
+स्थिर शून्य parallel_for_impl(स्थिरांक cv::Range& range, स्थिरांक cv::ParallelLoopBody& body, द्विगुण nstripes); // forward declaration
 
-void parallel_for_(const cv::Range& range, const cv::ParallelLoopBody& body, double nstripes)
+शून्य parallel_for_(स्थिरांक cv::Range& range, स्थिरांक cv::ParallelLoopBody& body, द्विगुण nstripes)
 {
 #ifdef OPENCV_TRACE
     CV__TRACE_OPENCV_FUNCTION_NAME_("parallel_for", 0);
-    CV_TRACE_ARG_VALUE(range_start, "range.start", (int64)range.start);
-    CV_TRACE_ARG_VALUE(range_end, "range.end", (int64)range.end);
-    CV_TRACE_ARG_VALUE(nstripes, "nstripes", (int64)nstripes);
+    CV_TRACE_ARG_मूल्य(range_start, "range.start", (int64)range.start);
+    CV_TRACE_ARG_मूल्य(range_end, "range.end", (int64)range.end);
+    CV_TRACE_ARG_मूल्य(nstripes, "nstripes", (int64)nstripes);
 #endif
 
     CV_INSTRUMENT_REGION_MT_FORK();
-    if (range.empty())
-        return;
+    जर (range.empty())
+        परत;
 
-    static std::atomic<bool> flagNestedParallelFor(false);
-    bool isNotNestedRegion = !flagNestedParallelFor.load();
-    if (isNotNestedRegion)
-      isNotNestedRegion = !flagNestedParallelFor.exchange(true);
-    if (isNotNestedRegion)
+    स्थिर std::atomic<तार्किक> flagNestedParallelFor(असत्य);
+    तार्किक isNotNestedRegion = !flagNestedParallelFor.load();
+    जर (isNotNestedRegion)
+      isNotNestedRegion = !flagNestedParallelFor.exchange(सत्य);
+    जर (isNotNestedRegion)
     {
-        try
+        प्रयत्न
         {
             parallel_for_impl(range, body, nstripes);
-            flagNestedParallelFor = false;
+            flagNestedParallelFor = असत्य;
         }
-        catch (...)
+        पकडा (...)
         {
-            flagNestedParallelFor = false;
-            throw;
+            flagNestedParallelFor = असत्य;
+            फेका;
         }
     }
-    else // nested parallel_for_() calls are not parallelized
+    अन्यथा // nested parallel_for_() calls are not parallelized
     {
         CV_UNUSED(nstripes);
         body(range);
     }
 }
 
-static
-void parallel_for_cb(int start, int end, void* data)
+स्थिर
+शून्य parallel_for_cb(पूर्णांक start, पूर्णांक end, शून्य* data)
 {
     CV_DbgAssert(data);
-    const cv::ParallelLoopBody& body = *(const cv::ParallelLoopBody*)data;
+    स्थिरांक cv::ParallelLoopBody& body = *(स्थिरांक cv::ParallelLoopBody*)data;
     body(Range(start, end));
 }
 
-static void parallel_for_impl(const cv::Range& range, const cv::ParallelLoopBody& body, double nstripes)
+स्थिर शून्य parallel_for_impl(स्थिरांक cv::Range& range, स्थिरांक cv::ParallelLoopBody& body, द्विगुण nstripes)
 {
-    using namespace cv::parallel;
-    if ((numThreads < 0 || numThreads > 1) && range.end - range.start > 1)
+    using नामाकाश cv::parallel;
+    जर ((अंक_Threads < 0 || अंक_Threads > 1) && range.end - range.start > 1)
     {
         ParallelLoopBodyWrapperContext ctx(body, range, nstripes);
         ProxyLoopBody pbody(ctx);
         cv::Range stripeRange = pbody.stripeRange();
-        if( stripeRange.end - stripeRange.start == 1 )
+        जर( stripeRange.end - stripeRange.start == 1 )
         {
             body(range);
-            return;
+            परत;
         }
 
         std::shared_ptr<ParallelForAPI>& api = getCurrentParallelForAPI();
-        if (api)
+        जर (api)
         {
             CV_CheckEQ(stripeRange.start, 0, "");
-            api->parallel_for(stripeRange.end, parallel_for_cb, (void*)&pbody);
+            api->parallel_for(stripeRange.end, parallel_for_cb, (शून्य*)&pbody);
             ctx.finalize();  // propagate exceptions if exists
-            return;
+            परत;
         }
 
 #ifdef CV_PARALLEL_FRAMEWORK
-#if defined HAVE_TBB
+#जर defined HAVE_TBB
 
-#if TBB_INTERFACE_VERSION >= 8000
+#जर TBB_INTERFACE_VERSION >= 8000
         tbbArena.execute(pbody);
-#else
+#अन्यथा
         pbody();
 #endif
 
-#elif defined HAVE_HPX
+#किंवाजर defined HAVE_HPX
         pbody();
 
-#elif defined HAVE_OPENMP
+#किंवाजर defined HAVE_OPENMP
 
-        #pragma omp parallel for schedule(dynamic) num_threads(numThreads > 0 ? numThreads : numThreadsMax)
-        for (int i = stripeRange.start; i < stripeRange.end; ++i)
+        #pragma omp parallel साठी schedule(dynamic) अंक_threads(अंक_Threads > 0 ? अंक_Threads : अंक_Threads_Max)
+        साठी (पूर्णांक i = stripeRange.start; i < stripeRange.end; ++i)
             pbody(Range(i, i + 1));
 
-#elif defined HAVE_GCD
+#किंवाजर defined HAVE_GCD
 
         dispatch_queue_t concurrent_queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
         dispatch_apply_f(stripeRange.end - stripeRange.start, concurrent_queue, &pbody, block_function);
 
-#elif defined WINRT
+#किंवाजर defined WINRT
 
         pplParallelFor(stripeRange.start, stripeRange.end, pbody);
 
-#elif defined HAVE_CONCURRENCY
+#किंवाजर defined HAVE_CONCURRENCY
 
-        if(!pplScheduler || pplScheduler->Id() == Concurrency::CurrentScheduler::Id())
+        जर(!pplScheduler || pplScheduler->Id() == Concurrency::CurrentScheduler::Id())
         {
             pplParallelFor(stripeRange.start, stripeRange.end, pbody);
         }
-        else
+        अन्यथा
         {
             pplScheduler->Attach();
             pplParallelFor(stripeRange.start, stripeRange.end, pbody);
             Concurrency::CurrentScheduler::Detach();
         }
 
-#elif defined HAVE_PTHREADS_PF
+#किंवाजर defined HAVE_PTHREADS_PF
 
         parallel_for_pthreads(pbody.stripeRange(), pbody, pbody.stripeRange().size());
 
-#else
+#अन्यथा
 
 #error You have hacked and compiling with unsupported parallel framework
 
 #endif
 
         ctx.finalize();  // propagate exceptions if exists
-        return;
+        परत;
 #endif // CV_PARALLEL_FRAMEWORK
     }
 
@@ -637,299 +637,299 @@ static void parallel_for_impl(const cv::Range& range, const cv::ParallelLoopBody
 }
 
 
-int getNumThreads(void)
+पूर्णांक get_अंक_Threads(शून्य)
 {
     std::shared_ptr<ParallelForAPI>& api = getCurrentParallelForAPI();
-    if (api)
+    जर (api)
     {
-        return api->getNumThreads();
+        परत api->get_अंक_Threads();
     }
 
-    if (numThreads == 0)
-        return 1;
+    जर (अंक_Threads == 0)
+        परत 1;
 
-#if defined HAVE_TBB
+#जर defined HAVE_TBB
 
-#if TBB_INTERFACE_VERSION >= 9100
-    return tbbArena.max_concurrency();
-#elif TBB_INTERFACE_VERSION >= 8000
-    return numThreads > 0
-        ? numThreads
-        : tbb::task_scheduler_init::default_num_threads();
-#else
-    return tbbScheduler.is_active()
-           ? numThreads
-           : tbb::task_scheduler_init::default_num_threads();
+#जर TBB_INTERFACE_VERSION >= 9100
+    परत tbbArena.max_concurrency();
+#किंवाजर TBB_INTERFACE_VERSION >= 8000
+    परत अंक_Threads > 0
+        ? अंक_Threads
+        : tbb::task_scheduler_init::default_अंक_threads();
+#अन्यथा
+    परत tbbScheduler.is_active()
+           ? अंक_Threads
+           : tbb::task_scheduler_init::default_अंक_threads();
 #endif
 
-#elif defined HAVE_HPX
-    return numThreads;
+#किंवाजर defined HAVE_HPX
+    परत अंक_Threads;
 
-#elif defined HAVE_OPENMP
+#किंवाजर defined HAVE_OPENMP
 
-    return numThreads > 0
-           ? numThreads
-           : numThreadsMax;
+    परत अंक_Threads > 0
+           ? अंक_Threads
+           : अंक_Threads_Max;
 
 
-#elif defined HAVE_GCD
+#किंवाजर defined HAVE_GCD
 
-    return cv::getNumberOfCPUs(); // the GCD thread pool limit
+    परत cv::get_संख्या_Of_CPUs(); // the GCD thread pool limit
 
-#elif defined WINRT
+#किंवाजर defined WINRT
 
-    return 0;
+    परत 0;
 
-#elif defined HAVE_CONCURRENCY
+#किंवाजर defined HAVE_CONCURRENCY
 
-    return (pplScheduler == 0)
-        ? Concurrency::CurrentScheduler::Get()->GetNumberOfVirtualProcessors()
-        : (1 + pplScheduler->GetNumberOfVirtualProcessors());
+    परत (pplScheduler == 0)
+        ? Concurrency::CurrentScheduler::Get()->Get_संख्या_Of_Virtual_Processors()
+        : (1 + pplScheduler->Get_संख्या_Of_Virtual_Processors());
 
-#elif defined HAVE_PTHREADS_PF
+#किंवाजर defined HAVE_PTHREADS_PF
 
-        return parallel_pthreads_get_threads_num();
+        परत parallel_pthreads_get_threads_अंक();
 
-#else
+#अन्यथा
 
-    return 1;
+    परत 1;
 
 #endif
 }
 
-unsigned defaultNumberOfThreads()
+अचिन्हित default_संख्या_Of_Threads()
 {
 #ifdef __ANDROID__
     // many modern phones/tables have 4-core CPUs. Let's use no more
     // than 2 threads by default not to overheat the devices
-    const unsigned int default_number_of_threads = 2;
-#else
-    const unsigned int default_number_of_threads = (unsigned int)std::max(1, cv::getNumberOfCPUs());
+    स्थिरांक अचिन्हित पूर्णांक default_संख्या_of_threads = 2;
+#अन्यथा
+    स्थिरांक अचिन्हित पूर्णांक default_संख्या_of_threads = (अचिन्हित पूर्णांक)std::max(1, cv::get_संख्या_Of_CPUs());
 #endif
 
-    unsigned result = default_number_of_threads;
+    अचिन्हित result = default_संख्या_of_threads;
 
-    static int config_num_threads = (int)utils::getConfigurationParameterSizeT("OPENCV_FOR_THREADS_NUM", 0);
+    स्थिर पूर्णांक config_अंक_threads = (पूर्णांक)utils::getConfigurationParameterSizeT("OPENCV_FOR_THREADS_NUM", 0);
 
-    if (config_num_threads)
+    जर (config_अंक_threads)
     {
-        result = (unsigned)std::max(1, config_num_threads);
+        result = (अचिन्हित)std::max(1, config_अंक_threads);
         //do we need upper limit of threads number?
     }
-    return result;
+    परत result;
 }
 
-void setNumThreads( int threads_ )
+शून्य set_अंक_Threads( पूर्णांक threads_ )
 {
     CV_UNUSED(threads_);
 
-    int threads = (threads_ < 0) ? defaultNumberOfThreads() : (unsigned)threads_;
-    numThreads = threads;
+    पूर्णांक threads = (threads_ < 0) ? default_संख्या_Of_Threads() : (अचिन्हित)threads_;
+    अंक_Threads = threads;
 
     std::shared_ptr<ParallelForAPI>& api = getCurrentParallelForAPI();
-    if (api)
+    जर (api)
     {
-        api->setNumThreads(numThreads);
+        api->set_अंक_Threads(अंक_Threads);
     }
 
 #ifdef HAVE_TBB
 
-#if TBB_INTERFACE_VERSION >= 8000
-    if(tbbArena.is_active()) tbbArena.terminate();
-    if(threads > 0) tbbArena.initialize(threads);
-#else
-    if(tbbScheduler.is_active()) tbbScheduler.terminate();
-    if(threads > 0) tbbScheduler.initialize(threads);
+#जर TBB_INTERFACE_VERSION >= 8000
+    जर(tbbArena.is_active()) tbbArena.terminate();
+    जर(threads > 0) tbbArena.initialize(threads);
+#अन्यथा
+    जर(tbbScheduler.is_active()) tbbScheduler.terminate();
+    जर(threads > 0) tbbScheduler.initialize(threads);
 #endif
 
-#elif defined HAVE_HPX
-    return; // nothing needed as numThreads is used
+#किंवाजर defined HAVE_HPX
+    परत; // nothing needed as numThreads is used
 
-#elif defined HAVE_OPENMP
+#किंवाजर defined HAVE_OPENMP
 
-    return; // nothing needed as num_threads clause is used in #pragma omp parallel for
+    परत; // nothing needed as num_threads clause is used in #pragma omp parallel for
 
-#elif defined HAVE_GCD
+#किंवाजर defined HAVE_GCD
 
     // unsupported
     // there is only private dispatch_queue_set_width() and only for desktop
 
-#elif defined WINRT
+#किंवाजर defined WINRT
 
-    return;
+    परत;
 
-#elif defined HAVE_CONCURRENCY
+#किंवाजर defined HAVE_CONCURRENCY
 
-    if (threads <= 0)
+    जर (threads <= 0)
     {
         pplScheduler = 0;
     }
-    else if (threads == 1)
+    अन्यथा जर (threads == 1)
     {
         // Concurrency always uses >=2 threads, so we just disable it if 1 thread is requested
-        numThreads = 0;
+        अंक_Threads = 0;
     }
-    else if (pplScheduler == 0 || 1 + pplScheduler->GetNumberOfVirtualProcessors() != (unsigned int)threads)
+    अन्यथा जर (pplScheduler == 0 || 1 + pplScheduler->Get_संख्या_Of_Virtual_Processors() != (अचिन्हित पूर्णांक)threads)
     {
         pplScheduler = Concurrency::Scheduler::Create(Concurrency::SchedulerPolicy(2,
                        Concurrency::MinConcurrency, threads-1,
                        Concurrency::MaxConcurrency, threads-1));
     }
 
-#elif defined HAVE_PTHREADS_PF
+#किंवाजर defined HAVE_PTHREADS_PF
 
-    parallel_pthreads_set_threads_num(threads);
+    parallel_pthreads_set_threads_अंक(threads);
 
 #endif
 }
 
 
-int getThreadNum()
+पूर्णांक get_Thread_अंक()
 {
     std::shared_ptr<ParallelForAPI>& api = getCurrentParallelForAPI();
-    if (api)
+    जर (api)
     {
-        return api->getThreadNum();
+        परत api->get_Thread_अंक();
     }
 
-#if defined HAVE_TBB
-    #if TBB_INTERFACE_VERSION >= 9100
-        return tbb::this_task_arena::current_thread_index();
-    #elif TBB_INTERFACE_VERSION >= 8000
-        return tbb::task_arena::current_thread_index();
-    #else
-        return 0;
+#जर defined HAVE_TBB
+    #जर TBB_INTERFACE_VERSION >= 9100
+        परत tbb::this_task_arena::current_thread_index();
+    #किंवाजर TBB_INTERFACE_VERSION >= 8000
+        परत tbb::task_arena::current_thread_index();
+    #अन्यथा
+        परत 0;
     #endif
-#elif defined HAVE_HPX
-    return (int)(hpx::get_num_worker_threads());
-#elif defined HAVE_OPENMP
-    return omp_get_thread_num();
-#elif defined HAVE_GCD
-    return (int)(size_t)(void*)pthread_self(); // no zero-based indexing
-#elif defined WINRT
-    return 0;
-#elif defined HAVE_CONCURRENCY
-    return std::max(0, (int)Concurrency::Context::VirtualProcessorId()); // zero for master thread, unique number for others but not necessary 1,2,3,...
-#elif defined HAVE_PTHREADS_PF
-    return (int)(size_t)(void*)pthread_self(); // no zero-based indexing
-#else
-    return 0;
+#किंवाजर defined HAVE_HPX
+    परत (पूर्णांक)(hpx::get_अंक_worker_threads());
+#किंवाजर defined HAVE_OPENMP
+    परत omp_get_thread_अंक();
+#किंवाजर defined HAVE_GCD
+    परत (पूर्णांक)(माप_प्रकार)(शून्य*)pthread_self(); // no zero-based indexing
+#किंवाजर defined WINRT
+    परत 0;
+#किंवाजर defined HAVE_CONCURRENCY
+    परत std::max(0, (पूर्णांक)Concurrency::Context::VirtualProcessorId()); // zero for master thread, unique number for others but not necessary 1,2,3,...
+#किंवाजर defined HAVE_PTHREADS_PF
+    परत (पूर्णांक)(माप_प्रकार)(शून्य*)pthread_self(); // no zero-based indexing
+#अन्यथा
+    परत 0;
 #endif
 }
 
 
-#if defined __linux__ || defined __GLIBC__ || defined __HAIKU__ || defined __ANDROID__
+#जर defined __linux__ || defined __GLIBC__ || defined __HAIKU__ || defined __ANDROID__
   #define CV_CPU_GROUPS_1
 #endif
 
-#if defined __linux__ || defined __ANDROID__
+#जर defined __linux__ || defined __ANDROID__
   #define CV_HAVE_CGROUPS 1
 #endif
 
-#if defined CV_CPU_GROUPS_1
-static inline
-std::string getFileContents(const char *filename)
+#जर defined CV_CPU_GROUPS_1
+स्थिर ओळीत
+std::string getFileContents(स्थिरांक अक्षर *filename)
 {
     std::ifstream ifs(filename);
-    if (!ifs.is_open())
-        return std::string();
+    जर (!ifs.is_open())
+        परत std::string();
 
-    std::string content( (std::istreambuf_iterator<char>(ifs) ),
-                         (std::istreambuf_iterator<char>()    ) );
+    std::string content( (std::istreambuf_iterator<अक्षर>(ifs) ),
+                         (std::istreambuf_iterator<अक्षर>()    ) );
 
-    if (ifs.fail())
-        return std::string();
+    जर (ifs.fail())
+        परत std::string();
 
-    return content;
+    परत content;
 }
 
-static inline
-int getNumberOfCPUsImpl(const char *filename)
+स्थिर ओळीत
+पूर्णांक get_संख्या_Of_CPUs_Impl(स्थिरांक अक्षर *filename)
 {
    std::string file_contents = getFileContents(filename);
-   if(file_contents.empty())
-       return 0;
+   जर(file_contents.empty())
+       परत 0;
 
-   char *pbuf = const_cast<char*>(file_contents.c_str());
+   अक्षर *pbuf = const_cast<अक्षर*>(file_contents.c_str());
    //parse string of form "0-1,3,5-7,10,13-15"
-   int cpusAvailable = 0;
+   पूर्णांक cpusAvailable = 0;
 
-   while(*pbuf)
+   पर्यंत(*pbuf)
    {
-      const char* pos = pbuf;
-      bool range = false;
-      while(*pbuf && *pbuf != ',')
+      स्थिरांक अक्षर* pos = pbuf;
+      तार्किक range = असत्य;
+      पर्यंत(*pbuf && *pbuf != ',')
       {
-          if(*pbuf == '-') range = true;
+          जर(*pbuf == '-') range = सत्य;
           ++pbuf;
       }
-      if(*pbuf) *pbuf++ = 0;
-      if(!range)
+      जर(*pbuf) *pbuf++ = 0;
+      जर(!range)
         ++cpusAvailable;
-      else
+      अन्यथा
       {
-          int rstart = 0, rend = 0;
-          sscanf(pos, "%d-%d", &rstart, &rend);
+          पूर्णांक rstart = 0, rend = 0;
+          माला_पूछो(pos, "%d-%d", &rstart, &rend);
           cpusAvailable += rend - rstart + 1;
       }
 
    }
-   return cpusAvailable;
+   परत cpusAvailable;
 }
 #endif
 
-#if defined CV_HAVE_CGROUPS
-static inline
-unsigned getNumberOfCPUsCFSv2()
+#जर defined CV_HAVE_CGROUPS
+स्थिर ओळीत
+अचिन्हित get_संख्या_Of_CPUs_CFSv2()
 {
-    int cfs_quota = 0;
-    int cfs_period = 0;
+    पूर्णांक cfs_quota = 0;
+    पूर्णांक cfs_period = 0;
 
     std::ifstream ss_cpu_max("/sys/fs/cgroup/cpu.max", std::ios::in | std::ios::binary);
     ss_cpu_max >> cfs_quota >> cfs_period;
 
-    if (ss_cpu_max.fail() || cfs_quota < 1 || cfs_period < 1) /* values must not be 0 or negative */
-        return 0;
+    जर (ss_cpu_max.fail() || cfs_quota < 1 || cfs_period < 1) /* values must not be 0 or negative */
+        परत 0;
 
-    return (unsigned)max(1, cfs_quota/cfs_period);
+    परत (अचिन्हित)max(1, cfs_quota/cfs_period);
 }
 
-static inline
-unsigned getNumberOfCPUsCFSv1()
+स्थिर ओळीत
+अचिन्हित get_संख्या_Of_CPUs_CFSv1()
 {
-    int cfs_quota = 0;
+    पूर्णांक cfs_quota = 0;
     {
         std::ifstream ss_period("/sys/fs/cgroup/cpu/cpu.cfs_quota_us", std::ios::in | std::ios::binary);
         ss_period >> cfs_quota;
 
-        if (ss_period.fail() || cfs_quota < 1) /* cfs_quota must not be 0 or negative */
-            return 0;
+        जर (ss_period.fail() || cfs_quota < 1) /* cfs_quota must not be 0 or negative */
+            परत 0;
     }
 
-    int cfs_period = 0;
+    पूर्णांक cfs_period = 0;
     {
         std::ifstream ss_quota("/sys/fs/cgroup/cpu/cpu.cfs_period_us", std::ios::in | std::ios::binary);
         ss_quota >> cfs_period;
 
-        if (ss_quota.fail() || cfs_period < 1)
-            return 0;
+        जर (ss_quota.fail() || cfs_period < 1)
+            परत 0;
     }
 
-    return (unsigned)max(1, cfs_quota/cfs_period);
+    परत (अचिन्हित)max(1, cfs_quota/cfs_period);
 }
 #endif
 
-template <typename T> static inline
-T minNonZero(const T& val_1, const T& val_2)
+ढाँचा <typename T> स्थिर ओळीत
+T minNonZero(स्थिरांक T& val_1, स्थिरांक T& val_2)
 {
-    if ((val_1 != 0) && (val_2 != 0))
-        return std::min(val_1, val_2);
-    return (val_1 != 0) ? val_1 : val_2;
+    जर ((val_1 != 0) && (val_2 != 0))
+        परत std::min(val_1, val_2);
+    परत (val_1 != 0) ? val_1 : val_2;
 }
 
 #ifndef OPENCV_DISABLE_THREAD_SUPPORT
-static
-int getNumberOfCPUs_()
+स्थिर
+पूर्णांक get_संख्या_Of_CPUs_2()
 {
 #ifndef OPENCV_SEMIHOSTING
     /*
@@ -937,7 +937,7 @@ int getNumberOfCPUs_()
      * the minimum most value as it has high probablity of being right and safe.
      * Return 1 if we get 0 or not found on all methods.
     */
-#if !defined(__MINGW32__) /* not implemented (2020-03) */
+#जर !defined(__MINGW32__) /* not implemented (2020-03) */
 
     /*
      * Check for this standard C++11 way, we do not return directly because
@@ -945,117 +945,117 @@ int getNumberOfCPUs_()
      * machines config not the containers or pods and as per docs this value
      * must be "considered only a hint".
     */
-    unsigned ncpus = std::thread::hardware_concurrency(); /* If the value is not well defined or not computable, returns 0 */
-#else
-    unsigned ncpus = 0; /* 0 means we have to find out some other way */
+    अचिन्हित ncpus = std::thread::hardware_concurrency(); /* If the value is not well defined or not computable, returns 0 */
+#अन्यथा
+    अचिन्हित ncpus = 0; /* 0 means we have to find out some other way */
 #endif
 
-#if defined _WIN32
+#जर defined _WIN32
 
     SYSTEM_INFO sysinfo = {};
-#if (defined(_M_ARM) || defined(_M_ARM64) || defined(_M_ARM64EC) || defined(_M_X64) || defined(WINRT)) && _WIN32_WINNT >= 0x501
+#जर (defined(_M_ARM) || defined(_M_ARM64) || defined(_M_ARM64EC) || defined(_M_X64) || defined(WINRT)) && _WIN32_WINNT >= 0x501
     GetNativeSystemInfo( &sysinfo );
-#else
+#अन्यथा
     GetSystemInfo( &sysinfo );
 #endif
-    unsigned ncpus_sysinfo = sysinfo.dwNumberOfProcessors;
+    अचिन्हित ncpus_sysinfo = sysinfo.dw_संख्या_Of_Processors;
     ncpus = minNonZero(ncpus, ncpus_sysinfo);
 
-#elif defined __APPLE__
+#किंवाजर defined __APPLE__
 
-    int numCPU=0;
-    int mib[4];
-    size_t len = sizeof(numCPU);
+    पूर्णांक अंक_CPU=0;
+    पूर्णांक mib[4];
+    माप_प्रकार len = आकार(अंक_CPU);
 
     /* set the mib for hw.ncpu */
     mib[0] = CTL_HW;
     mib[1] = HW_AVAILCPU;  // alternatively, try HW_NCPU;
 
     /* get the number of CPUs from the system */
-    sysctl(mib, 2, &numCPU, &len, NULL, 0);
+    sysctl(mib, 2, &अंक_CPU, &len, रिक्त, 0);
 
-    if( numCPU < 1 )
+    जर( अंक_CPU < 1 )
     {
         mib[1] = HW_NCPU;
-        sysctl( mib, 2, &numCPU, &len, NULL, 0 );
+        sysctl( mib, 2, &अंक_CPU, &len, रिक्त, 0 );
 
-        if( numCPU < 1 )
-            numCPU = 1;
+        जर( अंक_CPU < 1 )
+            अंक_CPU = 1;
     }
 
-    ncpus = minNonZero(ncpus, (unsigned)numCPU);
+    ncpus = minNonZero(ncpus, (अचिन्हित)अंक_CPU);
 
-#elif defined CV_CPU_GROUPS_1
+#किंवाजर defined CV_CPU_GROUPS_1
 
-#if defined CV_HAVE_CGROUPS
-    static unsigned ncpus_impl_cpuset = (unsigned)getNumberOfCPUsImpl("/sys/fs/cgroup/cpuset/cpuset.cpus");
+#जर defined CV_HAVE_CGROUPS
+    स्थिर अचिन्हित ncpus_impl_cpuset = (अचिन्हित)get_संख्या_Of_CPUs_Impl("/sys/fs/cgroup/cpuset/cpuset.cpus");
     ncpus = minNonZero(ncpus, ncpus_impl_cpuset);
 
-    static unsigned ncpus_impl_cfs_v1 = getNumberOfCPUsCFSv1();
+    स्थिर अचिन्हित ncpus_impl_cfs_v1 = get_संख्या_Of_CPUs_CFSv1();
     ncpus = minNonZero(ncpus, ncpus_impl_cfs_v1);
 
-    static unsigned ncpus_impl_cfs_v2 = getNumberOfCPUsCFSv2();
+    स्थिर अचिन्हित ncpus_impl_cfs_v2 = get_संख्या_Of_CPUs_CFSv2();
     ncpus = minNonZero(ncpus, ncpus_impl_cfs_v2);
 #endif
 
-    static unsigned ncpus_impl_devices = (unsigned)getNumberOfCPUsImpl("/sys/devices/system/cpu/online");
+    स्थिर अचिन्हित ncpus_impl_devices = (अचिन्हित)get_संख्या_Of_CPUs_Impl("/sys/devices/system/cpu/online");
     ncpus = minNonZero(ncpus, ncpus_impl_devices);
 
 #endif
 
-#if defined _GNU_SOURCE \
+#जर defined _GNU_SOURCE \
     && !defined(__MINGW32__) /* not implemented (2020-03) */ \
     && !defined(__EMSCRIPTEN__) \
     && !defined(__ANDROID__)  // TODO: add check for modern Android NDK
 
     cpu_set_t cpu_set;
-    if (0 == sched_getaffinity(0, sizeof(cpu_set), &cpu_set))
+    जर (0 == sched_getaffinity(0, आकार(cpu_set), &cpu_set))
     {
-        unsigned cpu_count_cpu_set = CPU_COUNT(&cpu_set);
-        ncpus = minNonZero(ncpus, cpu_count_cpu_set);
+        अचिन्हित cpu_मोजणी_cpu_set = CPU_COUNT(&cpu_set);
+        ncpus = minNonZero(ncpus, cpu_मोजणी_cpu_set);
     }
 
 #endif
 
-#if !defined(_WIN32) && !defined(__APPLE__) && defined(_SC_NPROCESSORS_ONLN)
+#जर !defined(_WIN32) && !defined(__APPLE__) && defined(_SC_NPROCESSORS_ONLN)
 
-    static unsigned cpu_count_sysconf = (unsigned)sysconf( _SC_NPROCESSORS_ONLN );
-    ncpus = minNonZero(ncpus, cpu_count_sysconf);
-#elif defined (__QNX__)
-    static unsigned cpu_count_sysconf = _syspage_ptr->num_cpu;
-    ncpus = minNonZero(ncpus, cpu_count_sysconf);
+    स्थिर अचिन्हित cpu_मोजणी_sysconf = (अचिन्हित)sysconf( _SC_NPROCESSORS_ONLN );
+    ncpus = minNonZero(ncpus, cpu_मोजणी_sysconf);
+#किंवाजर defined (__QNX__)
+    स्थिर अचिन्हित cpu_मोजणी_sysconf = _syspage_ptr->अंक_cpu;
+    ncpus = minNonZero(ncpus, cpu_मोजणी_sysconf);
 #endif
 
-    return ncpus != 0 ? ncpus : 1;
-#else //  OPENCV_SEMIHOSTING
-    return 1;
+    परत ncpus != 0 ? ncpus : 1;
+#अन्यथा //  OPENCV_SEMIHOSTING
+    परत 1;
 #endif //OPENCV_SEMIHOSTING
 }
 
-int getNumberOfCPUs()
+पूर्णांक get_संख्या_Of_CPUs()
 {
-    static int nCPUs = getNumberOfCPUs_();
-    return nCPUs;  // cached value
+    स्थिर पूर्णांक nCPUs = get_संख्या_Of_CPUs_2();
+    परत nCPUs;  // cached value
 }
 
-#else  // OPENCV_DISABLE_THREAD_SUPPORT
-int getNumberOfCPUs()
+#अन्यथा  // OPENCV_DISABLE_THREAD_SUPPORT
+पूर्णांक get_संख्या_Of_CPUs()
 {
-    return 1;
+    परत 1;
 }
 #endif  // OPENCV_DISABLE_THREAD_SUPPORT
 
-const char* currentParallelFramework()
+स्थिरांक अक्षर* currentParallelFramework()
 {
     std::shared_ptr<ParallelForAPI>& api = getCurrentParallelForAPI();
-    if (api)
+    जर (api)
     {
-        return api->getName();
+        परत api->getName();
     }
 #ifdef CV_PARALLEL_FRAMEWORK
-    return CV_PARALLEL_FRAMEWORK;
-#else
-    return NULL;
+    परत CV_PARALLEL_FRAMEWORK;
+#अन्यथा
+    परत रिक्त;
 #endif
 }
 

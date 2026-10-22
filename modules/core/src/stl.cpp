@@ -42,4 +42,4 @@
 //M*/
 
 
-#include "precomp.hpp"
+#अन्तर्भाव "precomp.hpp"

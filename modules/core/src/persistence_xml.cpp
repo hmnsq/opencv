@@ -3,10 +3,10 @@
 // of this distribution and at http://opencv.org/license.html
 
 
-#include "precomp.hpp"
-#include "persistence.hpp"
+#अन्तर्भाव "precomp.hpp"
+#अन्तर्भाव "persistence.hpp"
 
-enum
+गणना
 {
     CV_XML_INDENT = 2,
     CV_XML_INSIDE_COMMENT = 1,
@@ -19,636 +19,636 @@ enum
     CV_XML_DIRECTIVE_TAG = 5
 };
 
-namespace cv
+नामाकाश cv
 {
 
-class XMLEmitter : public FileStorageEmitter
+वर्ग XMLEmitter : सार्वजनिक FileStorageEmitter
 {
-public:
+सार्वजनिक:
     XMLEmitter(FileStorage_API* _fs) : fs(_fs)
     {
     }
-    virtual ~XMLEmitter() {}
+    आभासी ~XMLEmitter() {}
 
-    void writeTag( const char* key, int tag_type, const std::vector<std::string>& attrlist=std::vector<std::string>() )
+    शून्य writeTag( स्थिरांक अक्षर* किल्ली, पूर्णांक tag_type, स्थिरांक std::vector<std::string>& attrlist=std::vector<std::string>() )
     {
-        char* ptr = fs->bufferPtr();
-        int i, len = 0;
+        अक्षर* ptr = fs->bufferPtr();
+        पूर्णांक i, len = 0;
         FStructData& current_struct = fs->getCurrentStruct();
-        int struct_flags = current_struct.flags;
+        पूर्णांक struct_flags = current_struct.flags;
 
-        if( key && key[0] == '\0' )
-            key = 0;
+        जर( किल्ली && किल्ली[0] == '\0' )
+            किल्ली = 0;
 
-        if( tag_type == CV_XML_OPENING_TAG || tag_type == CV_XML_EMPTY_TAG )
+        जर( tag_type == CV_XML_OPENING_TAG || tag_type == CV_XML_EMPTY_TAG )
         {
-            if( FileNode::isCollection(struct_flags) )
+            जर( File_गाठ::isCollection(struct_flags) )
             {
-                if( FileNode::isMap(struct_flags) ^ (key != 0) )
+                जर( File_गाठ::isMap(struct_flags) ^ (किल्ली != 0) )
                     CV_Error( cv::Error::StsBadArg, "An attempt to add element without a key to a map, "
                              "or add element with key to sequence" );
             }
-            else
+            अन्यथा
             {
-                struct_flags = FileNode::EMPTY + (key ? FileNode::MAP : FileNode::SEQ);
+                struct_flags = File_गाठ::EMPTY + (किल्ली ? File_गाठ::MAP : File_गाठ::SEQ);
                 //fs->is_first = 0;
             }
 
-            if( !FileNode::isEmptyCollection(struct_flags) )
+            जर( !File_गाठ::isEmptyCollection(struct_flags) )
                 ptr = fs->flush();
         }
 
-        if( !key )
-            key = "_";
-        else if( key[0] == '_' && key[1] == '\0' )
+        जर( !किल्ली )
+            किल्ली = "_";
+        अन्यथा जर( किल्ली[0] == '_' && किल्ली[1] == '\0' )
             CV_Error( cv::Error::StsBadArg, "A single _ is a reserved tag name" );
 
-        len = (int)strlen( key );
+        len = (पूर्णांक)म_माप( किल्ली );
         *ptr++ = '<';
-        if( tag_type == CV_XML_CLOSING_TAG )
+        जर( tag_type == CV_XML_CLOSING_TAG )
         {
-            if( !attrlist.empty() )
+            जर( !attrlist.empty() )
                 CV_Error( cv::Error::StsBadArg, "Closing tag should not include any attributes" );
             *ptr++ = '/';
         }
 
-        if( !cv_isalpha(key[0]) && key[0] != '_' )
+        जर( !cv_isalpha(किल्ली[0]) && किल्ली[0] != '_' )
             CV_Error( cv::Error::StsBadArg, "Key should start with a letter or _" );
 
         ptr = fs->resizeWriteBuffer( ptr, len );
-        for( i = 0; i < len; i++ )
+        साठी( i = 0; i < len; i++ )
         {
-            char c = key[i];
-            if( !cv_isalnum(c) && c != '_' && c != '-' )
+            अक्षर c = किल्ली[i];
+            जर( !cv_isalnum(c) && c != '_' && c != '-' )
                 CV_Error( cv::Error::StsBadArg, "Key name may only contain alphanumeric characters [a-zA-Z0-9], '-' and '_'" );
             ptr[i] = c;
         }
         ptr += len;
 
-        int nattr = (int)attrlist.size();
+        पूर्णांक nattr = (पूर्णांक)attrlist.size();
         CV_Assert( nattr % 2 == 0 );
 
-        for( i = 0; i < nattr; i += 2 )
+        साठी( i = 0; i < nattr; i += 2 )
         {
-            size_t len0 = attrlist[i].size();
-            size_t len1 = attrlist[i+1].size();
+            माप_प्रकार len0 = attrlist[i].size();
+            माप_प्रकार len1 = attrlist[i+1].size();
             CV_Assert( len0 > 0 );
 
-            ptr = fs->resizeWriteBuffer( ptr, (int)(len0 + len1 + 4) );
+            ptr = fs->resizeWriteBuffer( ptr, (पूर्णांक)(len0 + len1 + 4) );
             *ptr++ = ' ';
 
-            memcpy( ptr, attrlist[i].c_str(), len0 );
+            स_नकल( ptr, attrlist[i].c_str(), len0 );
             ptr += len0;
             *ptr++ = '=';
             *ptr++ = '\"';
-            if( len1 > 0 )
-                memcpy( ptr, attrlist[i+1].c_str(), len1 );
+            जर( len1 > 0 )
+                स_नकल( ptr, attrlist[i+1].c_str(), len1 );
             ptr += len1;
             *ptr++ = '\"';
         }
 
-        if( tag_type == CV_XML_EMPTY_TAG )
+        जर( tag_type == CV_XML_EMPTY_TAG )
             *ptr++ = '/';
         *ptr++ = '>';
         fs->setBufferPtr(ptr);
-        current_struct.flags = struct_flags & ~FileNode::EMPTY;
+        current_struct.flags = struct_flags & ~File_गाठ::EMPTY;
     }
 
-    FStructData startWriteStruct(const FStructData& parent, const char* key,
-                                 int struct_flags, const char* type_name=0)
+    FStructData startWriteStruct(स्थिरांक FStructData& parent, स्थिरांक अक्षर* किल्ली,
+                                 पूर्णांक struct_flags, स्थिरांक अक्षर* type_name=0)
     {
         std::vector<std::string> attrlist;
-        if( type_name && *type_name )
+        जर( type_name && *type_name )
         {
             attrlist.push_back("type_id");
             attrlist.push_back(type_name);
         }
 
-        writeTag( key, CV_XML_OPENING_TAG, attrlist );
+        writeTag( किल्ली, CV_XML_OPENING_TAG, attrlist );
 
         FStructData current_struct;
-        current_struct.tag = key ? std::string(key) : std::string();
+        current_struct.tag = किल्ली ? std::string(किल्ली) : std::string();
         current_struct.flags = struct_flags;
         current_struct.indent = parent.indent + CV_XML_INDENT;
 
-        return current_struct;
+        परत current_struct;
     }
 
-    void endWriteStruct(const FStructData& current_struct)
+    शून्य endWriteStruct(स्थिरांक FStructData& current_struct)
     {
         writeTag( current_struct.tag.c_str(), CV_XML_CLOSING_TAG );
     }
 
-    void write(const char* key, int value)
+    शून्य लिख(स्थिरांक अक्षर* किल्ली, पूर्णांक value)
     {
-        char buf[128], *ptr = fs::itoa( value, buf, 10 );
-        writeScalar( key, ptr);
+        अक्षर buf[128], *ptr = fs::itoa( value, buf, 10 );
+        writeScalar( किल्ली, ptr);
     }
 
-    void write(const char* key, int64_t value)
+    शून्य लिख(स्थिरांक अक्षर* किल्ली, int64_t value)
     {
-        char buf[128], *ptr = fs::itoa( value, buf, 10, true );
-        writeScalar( key, ptr);
+        अक्षर buf[128], *ptr = fs::itoa( value, buf, 10, सत्य );
+        writeScalar( किल्ली, ptr);
     }
 
-    void write( const char* key, double value )
+    शून्य लिख( स्थिरांक अक्षर* किल्ली, द्विगुण value )
     {
-        char buf[128];
-        writeScalar( key, fs::doubleToString( buf, sizeof(buf), value, false ) );
+        अक्षर buf[128];
+        writeScalar( किल्ली, fs::doubleToString( buf, आकार(buf), value, असत्य ) );
     }
 
-    void write(const char* key, const char* str, bool quote)
+    शून्य लिख(स्थिरांक अक्षर* किल्ली, स्थिरांक अक्षर* str, तार्किक quote)
     {
-        char buf[CV_FS_MAX_LEN*6+16];
-        char* data = (char*)str;
-        int i, len;
+        अक्षर buf[CV_FS_MAX_LEN*6+16];
+        अक्षर* data = (अक्षर*)str;
+        पूर्णांक i, len;
 
-        if( !str )
+        जर( !str )
             CV_Error( cv::Error::StsNullPtr, "Null string pointer" );
 
-        len = (int)strlen(str);
-        if( len > CV_FS_MAX_LEN )
+        len = (पूर्णांक)म_माप(str);
+        जर( len > CV_FS_MAX_LEN )
             CV_Error( cv::Error::StsBadArg, "The written string is too long" );
 
-        if( quote || len == 0 || str[0] != '\"' || str[0] != str[len-1] )
+        जर( quote || len == 0 || str[0] != '\"' || str[0] != str[len-1] )
         {
-            bool need_quote = quote || len == 0;
+            तार्किक need_quote = quote || len == 0;
             data = buf;
             *data++ = '\"';
-            for( i = 0; i < len; i++ )
+            साठी( i = 0; i < len; i++ )
             {
-                char c = str[i];
+                अक्षर c = str[i];
 
-                if( (uchar)c >= 128 || c == ' ' )
+                जर( (uchar)c >= 128 || c == ' ' )
                 {
                     *data++ = c;
-                    need_quote = true;
+                    need_quote = सत्य;
                 }
-                else if( !cv_isprint(c) || c == '<' || c == '>' || c == '&' || c == '\'' || c == '\"' )
+                अन्यथा जर( !cv_isprint(c) || c == '<' || c == '>' || c == '&' || c == '\'' || c == '\"' )
                 {
                     *data++ = '&';
-                    if( c == '<' )
+                    जर( c == '<' )
                     {
-                        memcpy(data, "lt", 2);
+                        स_नकल(data, "lt", 2);
                         data += 2;
                     }
-                    else if( c == '>' )
+                    अन्यथा जर( c == '>' )
                     {
-                        memcpy(data, "gt", 2);
+                        स_नकल(data, "gt", 2);
                         data += 2;
                     }
-                    else if( c == '&' )
+                    अन्यथा जर( c == '&' )
                     {
-                        memcpy(data, "amp", 3);
+                        स_नकल(data, "amp", 3);
                         data += 3;
                     }
-                    else if( c == '\'' )
+                    अन्यथा जर( c == '\'' )
                     {
-                        memcpy(data, "apos", 4);
+                        स_नकल(data, "apos", 4);
                         data += 4;
                     }
-                    else if( c == '\"' )
+                    अन्यथा जर( c == '\"' )
                     {
-                        memcpy( data, "quot", 4);
+                        स_नकल( data, "quot", 4);
                         data += 4;
                     }
-                    else
+                    अन्यथा
                     {
-                        snprintf( data, sizeof(buf) - (data - buf), "#x%02x", (uchar)c );
+                        snprintf( data, आकार(buf) - (data - buf), "#x%02x", (uchar)c );
                         data += 4;
                     }
                     *data++ = ';';
                     need_quote = 1;
                 }
-                else
+                अन्यथा
                     *data++ = c;
             }
-            if( !need_quote && (cv_isdigit(str[0]) ||
+            जर( !need_quote && (cv_isdigit(str[0]) ||
                                 str[0] == '+' || str[0] == '-' || str[0] == '.' ))
-                need_quote = true;
+                need_quote = सत्य;
 
-            if( need_quote )
+            जर( need_quote )
                 *data++ = '\"';
-            len = (int)(data - buf) - !need_quote;
+            len = (पूर्णांक)(data - buf) - !need_quote;
             *data++ = '\0';
-            data = buf + (int)!need_quote;
+            data = buf + (पूर्णांक)!need_quote;
         }
 
-        writeScalar( key, data );
+        writeScalar( किल्ली, data );
     }
 
-    void writeScalar(const char* key, const char* data)
+    शून्य writeScalar(स्थिरांक अक्षर* किल्ली, स्थिरांक अक्षर* data)
     {
-        fs->check_if_write_struct_is_delayed(false);
-        if ( fs->get_state_of_writing_base64() == FileStorage_API::Uncertain )
+        fs->check_if_write_struct_is_delayed(असत्य);
+        जर ( fs->get_state_of_writing_base64() == FileStorage_API::Uncertain )
         {
             fs->switch_to_Base64_state( FileStorage_API::NotUse );
         }
-        else if ( fs->get_state_of_writing_base64() == FileStorage_API::InUse )
+        अन्यथा जर ( fs->get_state_of_writing_base64() == FileStorage_API::InUse )
         {
             CV_Error( cv::Error::StsError, "At present, output Base64 data only." );
         }
 
-        int len = (int)strlen(data);
-        if( key && *key == '\0' )
-            key = 0;
+        पूर्णांक len = (पूर्णांक)म_माप(data);
+        जर( किल्ली && *किल्ली == '\0' )
+            किल्ली = 0;
 
         FStructData& current_struct = fs->getCurrentStruct();
-        int struct_flags = current_struct.flags;
+        पूर्णांक struct_flags = current_struct.flags;
 
-        if( FileNode::isMap(struct_flags) ||
-           (!FileNode::isCollection(struct_flags) && key) )
+        जर( File_गाठ::isMap(struct_flags) ||
+           (!File_गाठ::isCollection(struct_flags) && किल्ली) )
         {
-            writeTag( key, CV_XML_OPENING_TAG );
-            char* ptr = fs->resizeWriteBuffer( fs->bufferPtr(), len );
-            memcpy( ptr, data, len );
+            writeTag( किल्ली, CV_XML_OPENING_TAG );
+            अक्षर* ptr = fs->resizeWriteBuffer( fs->bufferPtr(), len );
+            स_नकल( ptr, data, len );
             fs->setBufferPtr( ptr + len );
-            writeTag( key, CV_XML_CLOSING_TAG );
+            writeTag( किल्ली, CV_XML_CLOSING_TAG );
         }
-        else
+        अन्यथा
         {
-            char* ptr = fs->bufferPtr();
-            int new_offset = (int)(ptr - fs->bufferStart()) + len;
+            अक्षर* ptr = fs->bufferPtr();
+            पूर्णांक new_offset = (पूर्णांक)(ptr - fs->bufferStart()) + len;
 
-            if( key )
+            जर( किल्ली )
                 CV_Error( cv::Error::StsBadArg, "elements with keys can not be written to sequence" );
 
-            current_struct.flags = FileNode::SEQ;
+            current_struct.flags = File_गाठ::SEQ;
 
-            if( (new_offset > fs->wrapMargin() && new_offset - current_struct.indent > 10) ||
+            जर( (new_offset > fs->wrapMargin() && new_offset - current_struct.indent > 10) ||
                (ptr > fs->bufferStart() && ptr[-1] == '>') )
             {
                 ptr = fs->flush();
             }
-            else if( ptr > fs->bufferStart() + current_struct.indent && ptr[-1] != '>' )
+            अन्यथा जर( ptr > fs->bufferStart() + current_struct.indent && ptr[-1] != '>' )
                 *ptr++ = ' ';
 
-            memcpy( ptr, data, len );
+            स_नकल( ptr, data, len );
             fs->setBufferPtr(ptr + len);
         }
     }
 
-    void writeComment(const char* comment, bool eol_comment)
+    शून्य writeComment(स्थिरांक अक्षर* comment, तार्किक eol_comment)
     {
         FStructData& current_struct = fs->getCurrentStruct();
-        int len;
-        int multiline;
-        const char* eol;
-        char* ptr;
+        पूर्णांक len;
+        पूर्णांक multiline;
+        स्थिरांक अक्षर* eol;
+        अक्षर* ptr;
 
-        if( !comment )
+        जर( !comment )
             CV_Error( cv::Error::StsNullPtr, "Null comment" );
 
-        if( strstr(comment, "--") != 0 )
+        जर( म_माला(comment, "--") != 0 )
             CV_Error( cv::Error::StsBadArg, "Double hyphen \'--\' is not allowed in the comments" );
 
-        len = (int)strlen(comment);
-        eol = strchr(comment, '\n');
+        len = (पूर्णांक)म_माप(comment);
+        eol = म_अक्षर(comment, '\n');
         multiline = eol != 0;
         ptr = fs->bufferPtr();
 
-        if( multiline || !eol_comment || fs->bufferEnd() - ptr < len + 5 )
+        जर( multiline || !eol_comment || fs->bufferEnd() - ptr < len + 5 )
             ptr = fs->flush();
-        else if( ptr > fs->bufferStart() + current_struct.indent )
+        अन्यथा जर( ptr > fs->bufferStart() + current_struct.indent )
             *ptr++ = ' ';
 
-        if( !multiline )
+        जर( !multiline )
         {
             ptr = fs->resizeWriteBuffer( ptr, len + 5+4+1 );
             snprintf( ptr, len + 5+4+1, "<!-- %s -->", comment );
-            len = (int)strlen(ptr);
+            len = (पूर्णांक)म_माप(ptr);
         }
-        else
+        अन्यथा
         {
-            strcpy( ptr, "<!--" );
+            म_नकल( ptr, "<!--" );
             len = 4;
         }
 
         fs->setBufferPtr(ptr + len);
         ptr = fs->flush();
 
-        if( multiline )
+        जर( multiline )
         {
-            while( comment )
+            पर्यंत( comment )
             {
-                if( eol )
+                जर( eol )
                 {
-                    ptr = fs->resizeWriteBuffer( ptr, (int)(eol - comment) + 1 );
-                    memcpy( ptr, comment, eol - comment + 1 );
+                    ptr = fs->resizeWriteBuffer( ptr, (पूर्णांक)(eol - comment) + 1 );
+                    स_नकल( ptr, comment, eol - comment + 1 );
                     ptr += eol - comment;
                     comment = eol + 1;
-                    eol = strchr( comment, '\n' );
+                    eol = म_अक्षर( comment, '\n' );
                 }
-                else
+                अन्यथा
                 {
-                    len = (int)strlen(comment);
+                    len = (पूर्णांक)म_माप(comment);
                     ptr = fs->resizeWriteBuffer( ptr, len );
-                    memcpy( ptr, comment, len );
+                    स_नकल( ptr, comment, len );
                     ptr += len;
                     comment = 0;
                 }
                 fs->setBufferPtr(ptr);
                 ptr = fs->flush();
             }
-            strcpy( ptr, "-->" );
+            म_नकल( ptr, "-->" );
             fs->setBufferPtr(ptr + 3);
             fs->flush();
         }
     }
 
-    void startNextStream()
+    शून्य startNextStream()
     {
-        fs->puts( "\n<!-- next stream -->\n" );
+        fs->माला_दो( "\n<!-- next stream -->\n" );
     }
 
-protected:
+संरक्षित:
     FileStorage_API* fs;
 };
 
-class XMLParser : public FileStorageParser
+वर्ग XMLParser : सार्वजनिक FileStorageParser
 {
-public:
+सार्वजनिक:
     XMLParser(FileStorage_API* _fs) : fs(_fs)
     {
     }
 
-    virtual ~XMLParser() {}
+    आभासी ~XMLParser() {}
 
-    char* skipSpaces( char* ptr, int mode )
+    अक्षर* skipSpaces( अक्षर* ptr, पूर्णांक mode )
     {
-        if (!ptr)
+        जर (!ptr)
             CV_PARSE_ERROR_CPP("Invalid input");
 
-        int level = 0;
+        पूर्णांक level = 0;
 
-        for(;;)
+        साठी(;;)
         {
-            char c;
+            अक्षर c;
             ptr--;
 
-            if( mode == CV_XML_INSIDE_COMMENT )
+            जर( mode == CV_XML_INSIDE_COMMENT )
             {
-                do c = *++ptr;
-                while( cv_isprint_or_tab(c) && (c != '-' || ptr[1] != '-' || ptr[2] != '>') );
+                करा c = *++ptr;
+                पर्यंत( cv_isprint_or_tab(c) && (c != '-' || ptr[1] != '-' || ptr[2] != '>') );
 
-                if( c == '-' )
+                जर( c == '-' )
                 {
                     CV_Assert( ptr[1] == '-' && ptr[2] == '>' );
                     mode = 0;
                     ptr += 3;
                 }
             }
-            else if( mode == CV_XML_INSIDE_DIRECTIVE )
+            अन्यथा जर( mode == CV_XML_INSIDE_DIRECTIVE )
             {
                 // !!!NOTE!!! This is not quite correct, but should work in most cases
-                do
+                करा
                 {
                     c = *++ptr;
                     level += c == '<';
                     level -= c == '>';
-                    if( level < 0 )
-                        return ptr;
-                } while( cv_isprint_or_tab(c) );
+                    जर( level < 0 )
+                        परत ptr;
+                } पर्यंत( cv_isprint_or_tab(c) );
             }
-            else
+            अन्यथा
             {
-                do c = *++ptr;
-                while( c == ' ' || c == '\t' );
+                करा c = *++ptr;
+                पर्यंत( c == ' ' || c == '\t' );
 
-                if( c == '<' && ptr[1] == '!' && ptr[2] == '-' && ptr[3] == '-' )
+                जर( c == '<' && ptr[1] == '!' && ptr[2] == '-' && ptr[3] == '-' )
                 {
-                    if( mode != 0 )
+                    जर( mode != 0 )
                         CV_PARSE_ERROR_CPP( "Comments are not allowed here" );
                     mode = CV_XML_INSIDE_COMMENT;
                     ptr += 4;
                 }
-                else if( cv_isprint(c) )
-                    break;
+                अन्यथा जर( cv_isprint(c) )
+                    थांबा;
             }
 
-            if( !cv_isprint(*ptr) )
+            जर( !cv_isprint(*ptr) )
             {
-                if( *ptr != '\0' && *ptr != '\n' && *ptr != '\r' )
+                जर( *ptr != '\0' && *ptr != '\n' && *ptr != '\r' )
                     CV_PARSE_ERROR_CPP( "Invalid character in the stream" );
-                ptr = fs->gets();
-                if( !ptr || *ptr == '\0' )
-                    break;
+                ptr = fs->माला_लो();
+                जर( !ptr || *ptr == '\0' )
+                    थांबा;
             }
         }
-        return ptr;
+        परत ptr;
     }
 
-    bool getBase64Row(char* ptr, int /*indent*/, char* &beg, char* &end)
+    तार्किक getBase64Row(अक्षर* ptr, पूर्णांक /*indent*/, अक्षर* &beg, अक्षर* &end)
     {
         beg = end = ptr = skipSpaces(ptr, CV_XML_INSIDE_TAG);
-        if( !ptr || !*ptr )
-            return false;
+        जर( !ptr || !*ptr )
+            परत असत्य;
 
         // closing XML tag
-        if ( *beg == '<' )
-            return false;
+        जर ( *beg == '<' )
+            परत असत्य;
 
         // find end of the row
-        while( cv_isprint(*ptr) )
+        पर्यंत( cv_isprint(*ptr) )
             ++ptr;
-        if ( *ptr == '\0' )
+        जर ( *ptr == '\0' )
             CV_PARSE_ERROR_CPP( "Unexpected end of line" );
 
         end = ptr;
-        return true;
+        परत सत्य;
     }
 
-    char* parseValue( char* ptr, FileNode& node, int depth = 0 )
+    अक्षर* parse_मूल्य( अक्षर* ptr, File_गाठ& गाठ, पूर्णांक depth = 0 )
     {
-        if (!ptr)
+        जर (!ptr)
             CV_PARSE_ERROR_CPP("Invalid input");
 
-        if( depth > CV_PERSISTENCE_MAX_DEPTH )
+        जर( depth > CV_PERSISTENCE_MAX_DEPTH )
             CV_PARSE_ERROR_CPP("Too many nested collections");
 
-        FileNode new_elem;
-        bool have_space = true;
-        int value_type = node.type();
-        std::string key, key2, type_name;
+        File_गाठ new_elem;
+        तार्किक have_space = सत्य;
+        पूर्णांक value_type = गाठ.type();
+        std::string किल्ली, key2, type_name;
 
-        for(;;)
+        साठी(;;)
         {
-            char c = *ptr, d;
-            char* endptr;
+            अक्षर c = *ptr, d;
+            अक्षर* endptr;
 
             // FIXIT ptr[1], ptr[2] - out of bounds read without check or data fetch (#11061)
-            if( cv_isspace(c) || c == '\0' ||
+            जर( cv_isspace(c) || c == '\0' ||
                 (c == '<' && ptr[1] == '!' && ptr[2] == '-') )
             {
                 ptr = skipSpaces( ptr, 0 );
-                if (!ptr)
+                जर (!ptr)
                     CV_PARSE_ERROR_CPP("Invalid input");
-                have_space = true;
+                have_space = सत्य;
                 c = *ptr;
             }
 
             d = ptr[1];  // FIXIT ptr[1] - out of bounds read without check or data fetch (#11061)
 
-            if( c =='<' || c == '\0' )
+            जर( c =='<' || c == '\0' )
             {
-                int tag_type = 0;
-                int elem_type = FileNode::NONE;
+                पूर्णांक tag_type = 0;
+                पूर्णांक elem_type = File_गाठ::NONE;
 
-                if( d == '/' || c == '\0' )
-                    break;
+                जर( d == '/' || c == '\0' )
+                    थांबा;
 
-                ptr = parseTag( ptr, key, type_name, tag_type );
+                ptr = parseTag( ptr, किल्ली, type_name, tag_type );
 
-                if( tag_type == CV_XML_DIRECTIVE_TAG )
+                जर( tag_type == CV_XML_DIRECTIVE_TAG )
                     CV_PARSE_ERROR_CPP( "Directive tags are not allowed here" );
-                if( tag_type == CV_XML_EMPTY_TAG )
+                जर( tag_type == CV_XML_EMPTY_TAG )
                     CV_PARSE_ERROR_CPP( "Empty tags are not supported" );
 
                 CV_Assert(tag_type == CV_XML_OPENING_TAG);
 
                 /* for base64 string */
-                bool binary_string = false;
+                तार्किक द्विमान_string = असत्य;
 
-                if( !type_name.empty() )
+                जर( !type_name.empty() )
                 {
-                    const char* tn = type_name.c_str();
-                    if( strcmp(tn, "str") == 0 )
-                        elem_type = FileNode::STRING;
-                    else if( strcmp( tn, "map" ) == 0 )
-                        elem_type = FileNode::MAP;
-                    else if( strcmp( tn, "seq" ) == 0 )
-                        elem_type = FileNode::SEQ;
-                    else if( strcmp( tn, "binary") == 0)
-                        binary_string = true;
+                    स्थिरांक अक्षर* tn = type_name.c_str();
+                    जर( म_भेद(tn, "str") == 0 )
+                        elem_type = File_गाठ::STRING;
+                    अन्यथा जर( म_भेद( tn, "map" ) == 0 )
+                        elem_type = File_गाठ::MAP;
+                    अन्यथा जर( म_भेद( tn, "seq" ) == 0 )
+                        elem_type = File_गाठ::SEQ;
+                    अन्यथा जर( म_भेद( tn, "binary") == 0)
+                        द्विमान_string = सत्य;
                 }
 
-                new_elem = fs->addNode(node, key, elem_type, 0);
-                if (!binary_string)
-                    ptr = parseValue(ptr, new_elem, depth + 1);
-                else
+                new_elem = fs->add_गाठ(गाठ, किल्ली, elem_type, 0);
+                जर (!द्विमान_string)
+                    ptr = parse_मूल्य(ptr, new_elem, depth + 1);
+                अन्यथा
                 {
                     ptr = fs->parseBase64( ptr, 0, new_elem);
                     ptr = skipSpaces( ptr, 0 );
-                    if (!ptr)
+                    जर (!ptr)
                         CV_PARSE_ERROR_CPP("Invalid input");
                 }
 
                 ptr = parseTag( ptr, key2, type_name, tag_type );
-                if( tag_type != CV_XML_CLOSING_TAG || key2 != key )
+                जर( tag_type != CV_XML_CLOSING_TAG || key2 != किल्ली )
                     CV_PARSE_ERROR_CPP( "Mismatched closing tag" );
-                have_space = true;
+                have_space = सत्य;
             }
-            else
+            अन्यथा
             {
-                if( !have_space )
+                जर( !have_space )
                     CV_PARSE_ERROR_CPP( "There should be space between literals" );
 
-                FileNode* elem = &node;
-                if( node.type() != FileNode::NONE )
+                File_गाठ* elem = &गाठ;
+                जर( गाठ.type() != File_गाठ::NONE )
                 {
-                    fs->convertToCollection( FileNode::SEQ, node );
-                    new_elem = fs->addNode(node, std::string(), FileNode::NONE, 0);
+                    fs->convertToCollection( File_गाठ::SEQ, गाठ );
+                    new_elem = fs->add_गाठ(गाठ, std::string(), File_गाठ::NONE, 0);
                     elem = &new_elem;
                 }
 
-                if( value_type != FileNode::STRING &&
+                जर( value_type != File_गाठ::STRING &&
                    (cv_isdigit(c) || ((c == '-' || c == '+') &&
                    (cv_isdigit(d) || d == '.')) || (c == '.' && cv_isalnum(d))) ) // a number
                 {
                     endptr = ptr + (c == '-' || c == '+');
-                    while( cv_isdigit(*endptr) )
+                    पर्यंत( cv_isdigit(*endptr) )
                         endptr++;
-                    if( *endptr == '.' || *endptr == 'e' )
+                    जर( *endptr == '.' || *endptr == 'e' )
                     {
-                        double fval = fs->strtod( ptr, &endptr );
-                        elem->setValue(FileNode::REAL, &fval);
+                        द्विगुण fval = fs->म_से_भग्न( ptr, &endptr );
+                        elem->set_मूल्य(File_गाठ::REAL, &fval);
                     }
-                    else
+                    अन्यथा
                     {
                         int64_t ival = strtoll( ptr, &endptr, 0 );
-                        elem->setValue(FileNode::INT, &ival);
+                        elem->set_मूल्य(File_गाठ::INT, &ival);
                     }
 
-                    if( endptr == ptr )
+                    जर( endptr == ptr )
                         CV_PARSE_ERROR_CPP( "Invalid numeric value (inconsistent explicit type specification?)" );
 
                     ptr = endptr;
                     CV_PERSISTENCE_CHECK_END_OF_BUFFER_BUG_CPP();
                 }
-                else
+                अन्यथा
                 {
                     // string
-                    int i = 0, len, is_quoted = 0;
-                    if( c == '\"' )
+                    पूर्णांक i = 0, len, is_quoted = 0;
+                    जर( c == '\"' )
                         is_quoted = 1;
-                    else
+                    अन्यथा
                         --ptr;
                     strbuf[0] = '\0';
 
-                    for( ;; )
+                    साठी( ;; )
                     {
                         c = *++ptr;
                         CV_PERSISTENCE_CHECK_END_OF_BUFFER_BUG_CPP();
 
-                        if( !cv_isalnum(c) )
+                        जर( !cv_isalnum(c) )
                         {
-                            if( c == '\"' )
+                            जर( c == '\"' )
                             {
-                                if( !is_quoted )
+                                जर( !is_quoted )
                                     CV_PARSE_ERROR_CPP( "Literal \" is not allowed within a string. Use &quot;" );
                                 ++ptr;
-                                break;
+                                थांबा;
                             }
-                            else if( !cv_isprint(c) || c == '<' || (!is_quoted && cv_isspace(c)))
+                            अन्यथा जर( !cv_isprint(c) || c == '<' || (!is_quoted && cv_isspace(c)))
                             {
-                                if( is_quoted )
+                                जर( is_quoted )
                                     CV_PARSE_ERROR_CPP( "Closing \" is expected" );
-                                break;
+                                थांबा;
                             }
-                            else if( c == '\'' || c == '>' )
+                            अन्यथा जर( c == '\'' || c == '>' )
                             {
                                 CV_PARSE_ERROR_CPP( "Literal \' or > are not allowed. Use &apos; or &gt;" );
                             }
-                            else if( c == '&' )
+                            अन्यथा जर( c == '&' )
                             {
-                                if( *++ptr == '#' )
+                                जर( *++ptr == '#' )
                                 {
-                                    int val, base = 10;
+                                    पूर्णांक val, base = 10;
                                     ptr++;
-                                    if( *ptr == 'x' )
+                                    जर( *ptr == 'x' )
                                     {
                                         base = 16;
                                         ptr++;
                                     }
-                                    val = (int)strtol( ptr, &endptr, base );
-                                    if( (unsigned)val > (unsigned)255 ||
+                                    val = (पूर्णांक)म_से_दीर्घ( ptr, &endptr, base );
+                                    जर( (अचिन्हित)val > (अचिन्हित)255 ||
                                        !endptr || *endptr != ';' )
                                         CV_PARSE_ERROR_CPP( "Invalid numeric value in the string" );
-                                    c = (char)val;
+                                    c = (अक्षर)val;
                                 }
-                                else
+                                अन्यथा
                                 {
                                     endptr = ptr;
-                                    do c = *++endptr;
-                                    while( cv_isalnum(c) );
-                                    if( c != ';' )
+                                    करा c = *++endptr;
+                                    पर्यंत( cv_isalnum(c) );
+                                    जर( c != ';' )
                                         CV_PARSE_ERROR_CPP( "Invalid character in the symbol entity name" );
-                                    len = (int)(endptr - ptr);
-                                    if( len == 2 && memcmp( ptr, "lt", len ) == 0 )
+                                    len = (पूर्णांक)(endptr - ptr);
+                                    जर( len == 2 && स_भेद( ptr, "lt", len ) == 0 )
                                         c = '<';
-                                    else if( len == 2 && memcmp( ptr, "gt", len ) == 0 )
+                                    अन्यथा जर( len == 2 && स_भेद( ptr, "gt", len ) == 0 )
                                         c = '>';
-                                    else if( len == 3 && memcmp( ptr, "amp", len ) == 0 )
+                                    अन्यथा जर( len == 3 && स_भेद( ptr, "amp", len ) == 0 )
                                         c = '&';
-                                    else if( len == 4 && memcmp( ptr, "apos", len ) == 0 )
+                                    अन्यथा जर( len == 4 && स_भेद( ptr, "apos", len ) == 0 )
                                         c = '\'';
-                                    else if( len == 4 && memcmp( ptr, "quot", len ) == 0 )
+                                    अन्यथा जर( len == 4 && स_भेद( ptr, "quot", len ) == 0 )
                                         c = '\"';
-                                    else
+                                    अन्यथा
                                     {
-                                        if (len + 2 + i >= CV_FS_MAX_LEN)
+                                        जर (len + 2 + i >= CV_FS_MAX_LEN)
                                             CV_PARSE_ERROR_CPP("string is too long");
-                                        memcpy( strbuf + i, ptr-1, len + 2 );
+                                        स_नकल( strbuf + i, ptr-1, len + 2 );
                                         i += len + 2;
                                     }
                                 }
@@ -656,216 +656,216 @@ public:
                                 CV_PERSISTENCE_CHECK_END_OF_BUFFER_BUG_CPP();
                             }
                         }
-                        if (i + 1 >= CV_FS_MAX_LEN)
+                        जर (i + 1 >= CV_FS_MAX_LEN)
                             CV_PARSE_ERROR_CPP("Too long string literal");
                         strbuf[i++] = c;
                     }
-                    elem->setValue(FileNode::STRING, strbuf, i);
+                    elem->set_मूल्य(File_गाठ::STRING, strbuf, i);
                 }
 
-                if( value_type != FileNode::NONE && value_type != FileNode::SEQ && value_type != FileNode::MAP )
-                    break;
-                have_space = false;
+                जर( value_type != File_गाठ::NONE && value_type != File_गाठ::SEQ && value_type != File_गाठ::MAP )
+                    थांबा;
+                have_space = असत्य;
             }
         }
-        fs->finalizeCollection(node);
+        fs->finalizeCollection(गाठ);
 
-        return ptr;
+        परत ptr;
     }
 
-    char* parseTag( char* ptr, std::string& tag_name,
-                    std::string& type_name, int& tag_type )
+    अक्षर* parseTag( अक्षर* ptr, std::string& tag_name,
+                    std::string& type_name, पूर्णांक& tag_type )
     {
-        if (!ptr)
+        जर (!ptr)
             CV_PARSE_ERROR_CPP("Invalid tag input");
 
-        if( *ptr == '\0' )
+        जर( *ptr == '\0' )
             CV_PARSE_ERROR_CPP( "Unexpected end of the stream" );
 
-        if( *ptr != '<' )
+        जर( *ptr != '<' )
             CV_PARSE_ERROR_CPP( "Tag should start with \'<\'" );
 
         ptr++;
         CV_PERSISTENCE_CHECK_END_OF_BUFFER_BUG_CPP();
 
-        if( cv_isalnum(*ptr) || *ptr == '_' )
+        जर( cv_isalnum(*ptr) || *ptr == '_' )
             tag_type = CV_XML_OPENING_TAG;
-        else if( *ptr == '/' )
+        अन्यथा जर( *ptr == '/' )
         {
             tag_type = CV_XML_CLOSING_TAG;
             ptr++;
         }
-        else if( *ptr == '?' )
+        अन्यथा जर( *ptr == '?' )
         {
             tag_type = CV_XML_HEADER_TAG;
             ptr++;
         }
-        else if( *ptr == '!' )
+        अन्यथा जर( *ptr == '!' )
         {
             tag_type = CV_XML_DIRECTIVE_TAG;
             CV_Assert( ptr[1] != '-' || ptr[2] != '-' );
             ptr++;
         }
-        else
+        अन्यथा
             CV_PARSE_ERROR_CPP( "Unknown tag type" );
 
         tag_name.clear();
         type_name.clear();
 
-        for(;;)
+        साठी(;;)
         {
-            char c, *endptr;
-            if( !cv_isalpha(*ptr) && *ptr != '_' )
+            अक्षर c, *endptr;
+            जर( !cv_isalpha(*ptr) && *ptr != '_' )
                 CV_PARSE_ERROR_CPP( "Name should start with a letter or underscore" );
 
             endptr = ptr - 1;
-            do c = *++endptr;
-            while( cv_isalnum(c) || c == '_' || c == '-' );
+            करा c = *++endptr;
+            पर्यंत( cv_isalnum(c) || c == '_' || c == '-' );
 
-            std::string attrname(ptr, (size_t)(endptr - ptr));
+            std::string attrname(ptr, (माप_प्रकार)(endptr - ptr));
             ptr = endptr;
             CV_PERSISTENCE_CHECK_END_OF_BUFFER_BUG_CPP();
 
-            if( tag_name.empty() )
+            जर( tag_name.empty() )
                 tag_name = attrname;
-            else
+            अन्यथा
             {
-                if( tag_type == CV_XML_CLOSING_TAG )
+                जर( tag_type == CV_XML_CLOSING_TAG )
                     CV_PARSE_ERROR_CPP( "Closing tag should not contain any attributes" );
 
-                if( *ptr != '=' )
+                जर( *ptr != '=' )
                 {
                     ptr = skipSpaces( ptr, CV_XML_INSIDE_TAG );
-                    if (!ptr)
+                    जर (!ptr)
                         CV_PARSE_ERROR_CPP("Invalid attribute");
-                    if( *ptr != '=' )
+                    जर( *ptr != '=' )
                         CV_PARSE_ERROR_CPP( "Attribute name should be followed by \'=\'" );
                 }
 
                 c = *++ptr;
-                if( c != '\"' && c != '\'' )
+                जर( c != '\"' && c != '\'' )
                 {
                     ptr = skipSpaces( ptr, CV_XML_INSIDE_TAG );
-                    if(!ptr)
+                    जर(!ptr)
                         CV_PARSE_ERROR_CPP("Invalid attribute value");
-                    if( *ptr != '\"' && *ptr != '\'' )
+                    जर( *ptr != '\"' && *ptr != '\'' )
                         CV_PARSE_ERROR_CPP( "Attribute value should be put into single or double quotes" );
                 }
 
-                char quote = *ptr++;
+                अक्षर quote = *ptr++;
                 endptr = ptr;
-                for(;;)
+                साठी(;;)
                 {
                     c = *endptr++;
-                    if( c == quote )
-                        break;
-                    if( c == '\0' )
+                    जर( c == quote )
+                        थांबा;
+                    जर( c == '\0' )
                         CV_PARSE_ERROR_CPP( "Unexpected end of line" );
                 }
 
-                if( attrname == "type_id" )
+                जर( attrname == "type_id" )
                 {
                     CV_Assert( type_name.empty() );
-                    type_name = std::string(ptr, (size_t)(endptr - 1 - ptr));
+                    type_name = std::string(ptr, (माप_प्रकार)(endptr - 1 - ptr));
                 }
 
                 ptr = endptr;
             }
 
             c = *ptr;
-            bool have_space = cv_isspace(c) || c == '\0';
+            तार्किक have_space = cv_isspace(c) || c == '\0';
 
-            if( c != '>' )
+            जर( c != '>' )
             {
                 ptr = skipSpaces( ptr, CV_XML_INSIDE_TAG );
-                if (!ptr)
+                जर (!ptr)
                     CV_PARSE_ERROR_CPP("Invalid input");
                 c = *ptr;
             }
 
-            if( c == '>' )
+            जर( c == '>' )
             {
-                if( tag_type == CV_XML_HEADER_TAG )
+                जर( tag_type == CV_XML_HEADER_TAG )
                     CV_PARSE_ERROR_CPP( "Invalid closing tag for <?xml ..." );
                 ptr++;
-                break;
+                थांबा;
             }
-            else if( c == '?' && tag_type == CV_XML_HEADER_TAG )
+            अन्यथा जर( c == '?' && tag_type == CV_XML_HEADER_TAG )
             {
-                if( ptr[1] != '>'  )  // FIXIT ptr[1] - out of bounds read without check
+                जर( ptr[1] != '>'  )  // FIXIT ptr[1] - out of bounds read without check
                     CV_PARSE_ERROR_CPP( "Invalid closing tag for <?xml ..." );
                 ptr += 2;
-                break;
+                थांबा;
             }
-            else if( c == '/' && ptr[1] == '>' && tag_type == CV_XML_OPENING_TAG )  // FIXIT ptr[1] - out of bounds read without check
+            अन्यथा जर( c == '/' && ptr[1] == '>' && tag_type == CV_XML_OPENING_TAG )  // FIXIT ptr[1] - out of bounds read without check
             {
                 tag_type = CV_XML_EMPTY_TAG;
                 ptr += 2;
-                break;
+                थांबा;
             }
 
-            if( !have_space )
+            जर( !have_space )
                 CV_PARSE_ERROR_CPP( "There should be space between attributes" );
         }
 
-        return ptr;
+        परत ptr;
     }
 
-    bool parse(char* ptr)
+    तार्किक parse(अक्षर* ptr)
     {
         CV_Assert( fs != 0 );
 
-        std::string key, key2, type_name;
-        int tag_type = 0;
-        bool ok = false;
+        std::string किल्ली, key2, type_name;
+        पूर्णांक tag_type = 0;
+        तार्किक ok = असत्य;
 
         // CV_XML_INSIDE_TAG is used to prohibit leading comments
         ptr = skipSpaces( ptr, CV_XML_INSIDE_TAG );
-        if (!ptr)
+        जर (!ptr)
             CV_PARSE_ERROR_CPP("Invalid input");
 
-        if( memcmp( ptr, "<?xml", 5 ) != 0 )  // FIXIT ptr[1..] - out of bounds read without check
+        जर( स_भेद( ptr, "<?xml", 5 ) != 0 )  // FIXIT ptr[1..] - out of bounds read without check
             CV_PARSE_ERROR_CPP( "Valid XML should start with \'<?xml ...?>\'" );
 
-        ptr = parseTag( ptr, key, type_name, tag_type );
-        FileNode root_collection(fs->getFS(), 0, 0);
+        ptr = parseTag( ptr, किल्ली, type_name, tag_type );
+        File_गाठ मूळ_collection(fs->getFS(), 0, 0);
 
-        while( ptr && *ptr != '\0' )
+        पर्यंत( ptr && *ptr != '\0' )
         {
             ptr = skipSpaces( ptr, 0 );
-            if (!ptr)
+            जर (!ptr)
                 CV_PARSE_ERROR_CPP("Invalid input");
 
-            if( *ptr != '\0' )
+            जर( *ptr != '\0' )
             {
-                ptr = parseTag( ptr, key, type_name, tag_type );
-                if( tag_type != CV_XML_OPENING_TAG || key != "opencv_storage" )
+                ptr = parseTag( ptr, किल्ली, type_name, tag_type );
+                जर( tag_type != CV_XML_OPENING_TAG || किल्ली != "opencv_storage" )
                     CV_PARSE_ERROR_CPP( "<opencv_storage> tag is missing" );
-                FileNode root = fs->addNode(root_collection, std::string(), FileNode::MAP, 0);
-                ptr = parseValue( ptr, root );
+                File_गाठ मूळ = fs->add_गाठ(मूळ_collection, std::string(), File_गाठ::MAP, 0);
+                ptr = parse_मूल्य( ptr, मूळ );
                 ptr = parseTag( ptr, key2, type_name, tag_type );
-                if( tag_type != CV_XML_CLOSING_TAG || key != key2 )
+                जर( tag_type != CV_XML_CLOSING_TAG || किल्ली != key2 )
                     CV_PARSE_ERROR_CPP( "</opencv_storage> tag is missing" );
                 ptr = skipSpaces( ptr, 0 );
-                ok = true;
+                ok = सत्य;
             }
         }
         CV_Assert( fs->eof() );
-        return ok;
+        परत ok;
     }
 
     FileStorage_API* fs;
-    char strbuf[CV_FS_MAX_LEN+16];
+    अक्षर strbuf[CV_FS_MAX_LEN+16];
 };
 
 Ptr<FileStorageEmitter> createXMLEmitter(FileStorage_API* fs)
 {
-    return makePtr<XMLEmitter>(fs);
+    परत makePtr<XMLEmitter>(fs);
 }
 
 Ptr<FileStorageParser> createXMLParser(FileStorage_API* fs)
 {
-    return makePtr<XMLParser>(fs);
+    परत makePtr<XMLParser>(fs);
 }
 
 }

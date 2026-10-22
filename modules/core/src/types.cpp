@@ -41,47 +41,47 @@
 //
 //M*/
 
-#include "precomp.hpp"
+#अन्तर्भाव "precomp.hpp"
 
-namespace cv
+नामाकाश cv
 {
 
 ////////////////////// KeyPoint //////////////////////
 
-size_t KeyPoint::hash() const
+माप_प्रकार किल्ली_Point::hash() स्थिरांक
 {
-    size_t _Val = 2166136261U, scale = 16777619U;
+    माप_प्रकार _Val = 2166136261U, scale = 16777619U;
     Cv32suf u;
     u.f = pt.x; _Val = (scale * _Val) ^ u.u;
     u.f = pt.y; _Val = (scale * _Val) ^ u.u;
     u.f = size; _Val = (scale * _Val) ^ u.u;
     u.f = angle; _Val = (scale * _Val) ^ u.u;
     u.f = response; _Val = (scale * _Val) ^ u.u;
-    _Val = (scale * _Val) ^ ((size_t) octave);
-    _Val = (scale * _Val) ^ ((size_t) class_id);
-    return _Val;
+    _Val = (scale * _Val) ^ ((माप_प्रकार) octave);
+    _Val = (scale * _Val) ^ ((माप_प्रकार) class_id);
+    परत _Val;
 }
 
-void KeyPoint::convert(const std::vector<KeyPoint>& keypoints, std::vector<Point2f>& points2f,
-                       const std::vector<int>& keypointIndexes)
+शून्य किल्ली_Point::convert(स्थिरांक std::vector<किल्ली_Point>& keypoints, std::vector<Point2f>& points2f,
+                       स्थिरांक std::vector<पूर्णांक>& keypointIndexes)
 {
     CV_INSTRUMENT_REGION();
 
-    if( keypointIndexes.empty() )
+    जर( keypointIndexes.empty() )
     {
         points2f.resize( keypoints.size() );
-        for( size_t i = 0; i < keypoints.size(); i++ )
+        साठी( माप_प्रकार i = 0; i < keypoints.size(); i++ )
             points2f[i] = keypoints[i].pt;
     }
-    else
+    अन्यथा
     {
         points2f.resize( keypointIndexes.size() );
-        for( size_t i = 0; i < keypointIndexes.size(); i++ )
+        साठी( माप_प्रकार i = 0; i < keypointIndexes.size(); i++ )
         {
-            int idx = keypointIndexes[i];
-            if( idx >= 0 && idx < (int)keypoints.size() )
+            पूर्णांक idx = keypointIndexes[i];
+            जर( idx >= 0 && idx < (पूर्णांक)keypoints.size() )
                 points2f[i] = keypoints[idx].pt;
-            else
+            अन्यथा
             {
                 CV_Error( cv::Error::StsBadArg, "keypointIndexes has element out of range" );
                 //points2f[i] = Point2f(-1, -1);
@@ -90,96 +90,96 @@ void KeyPoint::convert(const std::vector<KeyPoint>& keypoints, std::vector<Point
     }
 }
 
-void KeyPoint::convert( const std::vector<Point2f>& points2f, std::vector<KeyPoint>& keypoints,
-                        float size, float response, int octave, int class_id )
+शून्य किल्ली_Point::convert( स्थिरांक std::vector<Point2f>& points2f, std::vector<किल्ली_Point>& keypoints,
+                        दशांश size, दशांश response, पूर्णांक octave, पूर्णांक class_id )
 {
     CV_INSTRUMENT_REGION();
 
     keypoints.resize(points2f.size());
-    for( size_t i = 0; i < points2f.size(); i++ )
-        keypoints[i] = KeyPoint(points2f[i], size, -1, response, octave, class_id);
+    साठी( माप_प्रकार i = 0; i < points2f.size(); i++ )
+        keypoints[i] = किल्ली_Point(points2f[i], size, -1, response, octave, class_id);
 }
 
-float KeyPoint::overlap( const KeyPoint& kp1, const KeyPoint& kp2 )
+दशांश किल्ली_Point::overlap( स्थिरांक किल्ली_Point& kp1, स्थिरांक किल्ली_Point& kp2 )
 {
-    float a = kp1.size * 0.5f;
-    float b = kp2.size * 0.5f;
-    float a_2 = a * a;
-    float b_2 = b * b;
+    दशांश a = kp1.size * 0.5f;
+    दशांश b = kp2.size * 0.5f;
+    दशांश a_2 = a * a;
+    दशांश b_2 = b * b;
 
     Point2f p1 = kp1.pt;
     Point2f p2 = kp2.pt;
-    float c = (float)norm( p1 - p2 );
+    दशांश c = (दशांश)norm( p1 - p2 );
 
-    float ovrl = 0.f;
+    दशांश ovrl = 0.f;
 
     // one circle is completely encovered by the other => no intersection points!
-    if( std::min( a, b ) + c <= std::max( a, b ) )
-        return std::min( a_2, b_2 ) / std::max( a_2, b_2 );
+    जर( std::min( a, b ) + c <= std::max( a, b ) )
+        परत std::min( a_2, b_2 ) / std::max( a_2, b_2 );
 
-    if( c < a + b ) // circles intersect
+    जर( c < a + b ) // circles intersect
     {
-        float c_2 = c * c;
-        float cosAlpha = ( b_2 + c_2 - a_2 ) / ( kp2.size * c );
-        float cosBeta  = ( a_2 + c_2 - b_2 ) / ( kp1.size * c );
-        float alpha = acos( cosAlpha );
-        float beta = acos( cosBeta );
-        float sinAlpha = sin(alpha);
-        float sinBeta  = sin(beta);
+        दशांश c_2 = c * c;
+        दशांश cosAlpha = ( b_2 + c_2 - a_2 ) / ( kp2.size * c );
+        दशांश cosBeta  = ( a_2 + c_2 - b_2 ) / ( kp1.size * c );
+        दशांश alpha = acos( cosAlpha );
+        दशांश beta = acos( cosBeta );
+        दशांश sinAlpha = sin(alpha);
+        दशांश sinBeta  = sin(beta);
 
-        float segmentAreaA = a_2 * beta;
-        float segmentAreaB = b_2 * alpha;
+        दशांश segmentAreaA = a_2 * beta;
+        दशांश segmentAreaB = b_2 * alpha;
 
-        float triangleAreaA = a_2 * sinBeta * cosBeta;
-        float triangleAreaB = b_2 * sinAlpha * cosAlpha;
+        दशांश triangleAreaA = a_2 * sinBeta * cosBeta;
+        दशांश triangleAreaB = b_2 * sinAlpha * cosAlpha;
 
-        float intersectionArea = segmentAreaA + segmentAreaB - triangleAreaA - triangleAreaB;
-        float unionArea = (a_2 + b_2) * (float)CV_PI - intersectionArea;
+        दशांश intersectionArea = segmentAreaA + segmentAreaB - triangleAreaA - triangleAreaB;
+        दशांश unionArea = (a_2 + b_2) * (दशांश)CV_PI - intersectionArea;
 
         ovrl = intersectionArea / unionArea;
     }
 
-    return ovrl;
+    परत ovrl;
 }
 
 ////////////////////// RotatedRect //////////////////////
 
-RotatedRect::RotatedRect(const Point2f& _point1, const Point2f& _point2, const Point2f& _point3)
+RotatedRect::RotatedRect(स्थिरांक Point2f& _point1, स्थिरांक Point2f& _point2, स्थिरांक Point2f& _point3)
 {
     Point2f _center = 0.5f * (_point1 + _point3);
     Vec2f vecs[2];
     vecs[0] = Vec2f(_point1 - _point2);
     vecs[1] = Vec2f(_point2 - _point3);
-    double x = std::max(norm(_point1), std::max(norm(_point2), norm(_point3)));
-    double a = std::min(norm(vecs[0]), norm(vecs[1]));
+    द्विगुण x = std::max(norm(_point1), std::max(norm(_point2), norm(_point3)));
+    द्विगुण a = std::min(norm(vecs[0]), norm(vecs[1]));
     // check that given sides are perpendicular
-    CV_Assert( std::fabs(vecs[0].ddot(vecs[1])) * a <= FLT_EPSILON * 9 * x * (norm(vecs[0]) * norm(vecs[1])) );
+    CV_Assert( std::भ_असल(vecs[0].ddot(vecs[1])) * a <= भग्न_अंतर * 9 * x * (norm(vecs[0]) * norm(vecs[1])) );
 
     // wd_i stores which vector (0,1) or (1,2) will make the width
     // One of them will definitely have slope within -1 to 1
-    int wd_i = 0;
-    if( std::fabs(vecs[1][1]) < std::fabs(vecs[1][0]) ) wd_i = 1;
-    int ht_i = (wd_i + 1) % 2;
+    पूर्णांक wd_i = 0;
+    जर( std::भ_असल(vecs[1][1]) < std::भ_असल(vecs[1][0]) ) wd_i = 1;
+    पूर्णांक ht_i = (wd_i + 1) % 2;
 
-    float _angle = std::atan(vecs[wd_i][1] / vecs[wd_i][0]) * 180.0f / (float) CV_PI;
-    float _width = (float) norm(vecs[wd_i]);
-    float _height = (float) norm(vecs[ht_i]);
+    दशांश _angle = std::atan(vecs[wd_i][1] / vecs[wd_i][0]) * 180.0f / (दशांश) CV_PI;
+    दशांश _width = (दशांश) norm(vecs[wd_i]);
+    दशांश _height = (दशांश) norm(vecs[ht_i]);
 
     center = _center;
     size = Size2f(_width, _height);
     angle = _angle;
 }
 
-void RotatedRect::points(Point2f pt[]) const
+शून्य RotatedRect::points(Point2f pt[]) स्थिरांक
 {
-    double _angle = angle*CV_PI/180.;
-    float b = (float)cos(_angle)*0.5f;
-    float a = (float)sin(_angle)*0.5f;
+    द्विगुण _angle = angle*CV_PI/180.;
+    दशांश b = (दशांश)cos(_angle)*0.5f;
+    दशांश a = (दशांश)sin(_angle)*0.5f;
 
-    const float ah = a*size.height;
-    const float aw = a*size.width;
-    const float bh = b*size.height;
-    const float bw = b*size.width;
+    स्थिरांक दशांश ah = a*size.height;
+    स्थिरांक दशांश aw = a*size.width;
+    स्थिरांक दशांश bh = b*size.height;
+    स्थिरांक दशांश bw = b*size.width;
     pt[0].x = center.x - ah - bw;
     pt[0].y = center.y + bh - aw;
     pt[1].x = center.x + ah - bw;
@@ -190,12 +190,12 @@ void RotatedRect::points(Point2f pt[]) const
     pt[3].y = center.y + bh + aw;
 }
 
-void RotatedRect::points(std::vector<Point2f>& pts) const {
+शून्य RotatedRect::points(std::vector<Point2f>& pts) स्थिरांक {
     pts.resize(4);
     points(pts.data());
 }
 
-Rect RotatedRect::boundingRect() const
+Rect RotatedRect::boundingRect() स्थिरांक
 {
     Point2f pt[4];
     points(pt);
@@ -205,17 +205,17 @@ Rect RotatedRect::boundingRect() const
            cvCeil(std::max(std::max(std::max(pt[0].y, pt[1].y), pt[2].y), pt[3].y)));
     r.width -= r.x - 1;
     r.height -= r.y - 1;
-    return r;
+    परत r;
 }
 
 
-Rect_<float> RotatedRect::boundingRect2f() const
+Rect_<दशांश> RotatedRect::boundingRect2f() स्थिरांक
 {
     Point2f pt[4];
     points(pt);
-    Rect_<float> r(Point_<float>(min(min(min(pt[0].x, pt[1].x), pt[2].x), pt[3].x), min(min(min(pt[0].y, pt[1].y), pt[2].y), pt[3].y)),
-                   Point_<float>(max(max(max(pt[0].x, pt[1].x), pt[2].x), pt[3].x), max(max(max(pt[0].y, pt[1].y), pt[2].y), pt[3].y)));
-    return r;
+    Rect_<दशांश> r(Point_<दशांश>(min(min(min(pt[0].x, pt[1].x), pt[2].x), pt[3].x), min(min(min(pt[0].y, pt[1].y), pt[2].y), pt[3].y)),
+                   Point_<दशांश>(max(max(max(pt[0].x, pt[1].x), pt[2].x), pt[3].x), max(max(max(pt[0].y, pt[1].y), pt[2].y), pt[3].y)));
+    परत r;
 }
 
 } // cv
