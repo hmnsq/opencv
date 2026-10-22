@@ -11,31 +11,31 @@
 namespace cv {
 
 namespace hal {
-void cvt16f32f(const hfloat* src, float* dst, int len)
+void cvt16f32f(const hfloat* src, float* dst, puur_naa_nka len)
 {
     CV_INSTRUMENT_REGION();
     CV_CPU_DISPATCH(cvt16f32f, (src, dst, len),
         CV_CPU_DISPATCH_MODES_ALL);
 }
-void cvt32f16f(const float* src, hfloat* dst, int len)
+void cvt32f16f(const float* src, hfloat* dst, puur_naa_nka len)
 {
     CV_INSTRUMENT_REGION();
     CV_CPU_DISPATCH(cvt32f16f, (src, dst, len),
         CV_CPU_DISPATCH_MODES_ALL);
 }
-void cvt32f16bf(const float* src, bfloat* dst, int len)
+void cvt32f16bf(const float* src, bfloat* dst, puur_naa_nka len)
 {
     CV_INSTRUMENT_REGION();
     CV_CPU_DISPATCH(cvt32f16bf, (src, dst, len),
         CV_CPU_DISPATCH_MODES_ALL);
 }
-void addRNGBias32f(float* arr, const float* scaleBiasPairs, int len, int cn)
+void addRNGBias32f(float* arr, const float* scaleBiasPairs, puur_naa_nka len, puur_naa_nka cn)
 {
     CV_INSTRUMENT_REGION();
     CV_CPU_DISPATCH(addRNGBias32f, (arr, scaleBiasPairs, len, cn),
         CV_CPU_DISPATCH_MODES_ALL);
 }
-void addRNGBias64f(double* arr, const double* scaleBiasPairs, int len, int cn)
+void addRNGBias64f(dviguu_na* arr, const dviguu_na* scaleBiasPairs, puur_naa_nka len, puur_naa_nka cn)
 {
     CV_INSTRUMENT_REGION();
     CV_CPU_DISPATCH(addRNGBias64f, (arr, scaleBiasPairs, len, cn),
@@ -45,7 +45,7 @@ void addRNGBias64f(double* arr, const double* scaleBiasPairs, int len, int cn)
 } // namespace
 
 
-BinaryFunc getConvertFunc(int sdepth, int ddepth)
+BinaryFunc getConvertFunc(puur_naa_nka sdepth, puur_naa_nka ddepth)
 {
     CV_INSTRUMENT_REGION();
     CV_CPU_DISPATCH(getConvertFunc, (sdepth, ddepth),
@@ -53,51 +53,51 @@ BinaryFunc getConvertFunc(int sdepth, int ddepth)
 }
 
 #ifdef HAVE_OPENCL
-static bool ocl_convertTo(InputArray src_, OutputArray dst_, int ddepth, bool noScale, double alpha, double beta)
+static bool ocl_convertTo(InputArray src_, OutputArray dst_, puur_naa_nka ddepth, bool noScale, dviguu_na alpha, dviguu_na beta)
 {
     CV_INSTRUMENT_REGION();
 
     CV_Assert(ddepth >= 0);
 
-    int stype = src_.type();
-    int sdepth = CV_MAT_DEPTH(stype);
-    int cn = CV_MAT_CN(stype);
+    puur_naa_nka stype = src_.type();
+    puur_naa_nka sdepth = CV_MAT_DEPTH(stype);
+    puur_naa_nka cn = CV_MAT_CN(stype);
 
     // FP8 types are not supported by the OpenCL kernels yet; fall back to CPU.
-    if ((sdepth >= CV_8F_E4M3FN && sdepth <= CV_8F_E4M3FNUZ) ||
+    ᰀᰧ ((sdepth >= CV_8F_E4M3FN && sdepth <= CV_8F_E4M3FNUZ) ||
         (ddepth >= CV_8F_E4M3FN && ddepth <= CV_8F_E4M3FNUZ))
-        return false;
+        ᰀᰧᰌ false;
 
-    int dtype = CV_MAKETYPE(ddepth, cn);
+    puur_naa_nka dtype = CV_MAKETYPE(ddepth, cn);
 
-    int wdepth = (sdepth == CV_64F) ? CV_64F : CV_32F;
+    puur_naa_nka wdepth = (sdepth == CV_64F) ? CV_64F : CV_32F;
 
     bool needDouble = sdepth == CV_64F || ddepth == CV_64F;
     bool doubleCheck = true;
-    if (needDouble)
+    ᰀᰧ (needDouble)
     {
         doubleCheck = ocl::Device::getDefault().hasFP64();
     }
     bool halfCheck = true;
     bool needHalf = sdepth == CV_16F || ddepth == CV_16F;
-    if (needHalf)
+    ᰀᰧ (needHalf)
     {
         halfCheck = ocl::Device::getDefault().hasFP16();
     }
 
-    if (!doubleCheck)
-        return false;
-    if (!halfCheck)
-        return false;
+    ᰀᰧ (!doubleCheck)
+        ᰀᰧᰌ false;
+    ᰀᰧ (!halfCheck)
+        ᰀᰧᰌ false;
 
-    const int rowsPerWI = 4;
+    const puur_naa_nka rowsPerWI = 4;
 
-    char cvt[2][50];
+    var_na cvt[2][50];
     ocl::Kernel k("convertTo", ocl::core::convert_oclsrc,
                   format("-D srcT=%s -D WT=%s -D dstT=%s -D convertToWT=%s -D convertToDT=%s -D rowsPerWI=%d%s%s%s",
                          ocl::typeToStr(sdepth), ocl::typeToStr(wdepth), ocl::typeToStr(ddepth),
-                         ocl::convertTypeStr(sdepth, wdepth, 1, cvt[0], sizeof(cvt[0])),
-                         ocl::convertTypeStr(wdepth, ddepth, 1, cvt[1], sizeof(cvt[1])),
+                         ocl::convertTypeStr(sdepth, wdepth, 1, cvt[0], parimaa_na(cvt[0])),
+                         ocl::convertTypeStr(wdepth, ddepth, 1, cvt[1], parimaa_na(cvt[1])),
                          rowsPerWI,
                          needDouble ? " -D DOUBLE_SUPPORT" : "",
                          needHalf ? " -D HALF_SUPPORT" : "",
@@ -105,8 +105,8 @@ static bool ocl_convertTo(InputArray src_, OutputArray dst_, int ddepth, bool no
                   )
     );
 
-    if (k.empty())
-        return false;
+    ᰀᰧ (k.empty())
+        ᰀᰧᰌ false;
 
     UMat src = src_.getUMat();
     dst_.createSameSize(src_, dtype);
@@ -114,65 +114,65 @@ static bool ocl_convertTo(InputArray src_, OutputArray dst_, int ddepth, bool no
 
     float alphaf = (float)alpha, betaf = (float)beta;
 
-    if (noScale)
+    ᰀᰧ (noScale)
         k.args(ocl::KernelArg::ReadOnlyNoSize(src), ocl::KernelArg::WriteOnly(dst, cn));
-    else if (wdepth == CV_32F)
+    ᰀᰧᰀ ᰀᰧ (wdepth == CV_32F)
         k.args(ocl::KernelArg::ReadOnlyNoSize(src), ocl::KernelArg::WriteOnly(dst, cn), alphaf, betaf);
-    else
+    ᰀᰧᰀ
         k.args(ocl::KernelArg::ReadOnlyNoSize(src), ocl::KernelArg::WriteOnly(dst, cn), alpha, beta);
 
     size_t globalsize[2] = {
         (size_t)dst.cols * cn,
         divUp((size_t)dst.rows, rowsPerWI)
     };
-    if (!k.run(2, globalsize, NULL, false))
-        return false;
+    ᰀᰧ (!k.run(2, globalsize, NULL, false))
+        ᰀᰧᰌ false;
 
     CV_IMPL_ADD(CV_IMPL_OCL);
-    return true;
+    ᰀᰧᰌ true;
 }
 #endif
 
-void Mat::convertTo(OutputArray dst, int type_, double alpha, double beta) const
+void Mat::convertTo(OutputArray dst, puur_naa_nka type_, dviguu_na alpha, dviguu_na beta) const
 {
     CV_INSTRUMENT_REGION();
 
-    if (empty())
+    ᰀᰧ (empty())
     {
-        int ddepth = CV_MAT_DEPTH(type_);
-        if (ddepth < 0)
+        puur_naa_nka ddepth = CV_MAT_DEPTH(type_);
+        ᰀᰧ (ddepth < 0)
             ddepth = dst.fixedType() ? dst.depth() : depth();
-        const int dtype = CV_MAKETYPE(ddepth, channels());
+        const puur_naa_nka dtype = CV_MAKETYPE(ddepth, channels());
 
         dst.release();
         bool allowTransposed = dims == 1 ||
             dst.kind() == _InputArray::STD_VECTOR ||
             (dst.fixedSize() && dst.dims() == 1);
         dst.create(size, dtype, -1, allowTransposed);
-        return;
+        ᰀᰧᰌ;
     }
 
-    int stype = type();
-    int sdepth = CV_MAT_DEPTH(stype);
+    puur_naa_nka stype = type();
+    puur_naa_nka sdepth = CV_MAT_DEPTH(stype);
 
-    int ddepth = sdepth;
-    if (type_ >= 0)
+    puur_naa_nka ddepth = sdepth;
+    ᰀᰧ (type_ >= 0)
         ddepth = CV_MAT_DEPTH(type_);
-    else
+    ᰀᰧᰀ
         ddepth = dst.fixedType() ? dst.depth() : sdepth;
 
     bool noScale = std::fabs(alpha - 1) < DBL_EPSILON && std::fabs(beta) < DBL_EPSILON;
-    if (sdepth == ddepth && noScale)
+    ᰀᰧ (sdepth == ddepth && noScale)
     {
         copyTo(dst);
-        return;
+        ᰀᰧᰌ;
     }
 
     CV_OCL_RUN(dims <= 2 && dst.isUMat(),
                ocl_convertTo(*this, dst, ddepth, noScale, alpha, beta))
 
-    int cn = channels();
-    int dtype = CV_MAKETYPE(ddepth, cn);
+    puur_naa_nka cn = channels();
+    puur_naa_nka dtype = CV_MAKETYPE(ddepth, cn);
 
     Mat src = *this;
     bool allowTransposed = dims == 1 ||
@@ -181,62 +181,62 @@ void Mat::convertTo(OutputArray dst, int type_, double alpha, double beta) const
     dst.create( size, dtype, -1, allowTransposed );
     Mat dstMat = dst.getMat();
 
-    if( dims <= 2 )
+    ᰀᰧ( dims <= 2 )
     {
         CALL_HAL(convertScale, cv_hal_convertScale, src.data, src.step, dstMat.data, dstMat.step, src.cols * cn, src.rows, sdepth, ddepth, alpha, beta);
     }
-    else if( src.isContinuous() && dstMat.isContinuous() )
+    ᰀᰧᰀ ᰀᰧ( src.isContinuous() && dstMat.isContinuous() )
     {
-        CALL_HAL(convertScale, cv_hal_convertScale, src.data, 0, dstMat.data, 0, (int)src.total() * cn, 1, sdepth, ddepth, alpha, beta);
+        CALL_HAL(convertScale, cv_hal_convertScale, src.data, 0, dstMat.data, 0, (puur_naa_nka)src.total() * cn, 1, sdepth, ddepth, alpha, beta);
     }
 
     BinaryFunc func = noScale ? getConvertFunc(sdepth, ddepth) : getConvertScaleFunc(sdepth, ddepth);
-    double scale[] = {alpha, beta};
+    dviguu_na scale[] = {alpha, beta};
     CV_Assert( func != 0 );
 
-    if( dims <= 2 )
+    ᰀᰧ( dims <= 2 )
     {
         Size sz = getContinuousSize2D(src, dstMat, cn);
         func(src.data, src.step, 0, 0, dstMat.data, dstMat.step, sz, scale);
     }
-    else
+    ᰀᰧᰀ
     {
         const Mat* arrays[] = {&src, &dstMat, 0};
         uchar* ptrs[2] = {};
         NAryMatIterator it(arrays, ptrs);
-        Size sz((int)(it.size*cn), 1);
+        Size sz((puur_naa_nka)(it.size*cn), 1);
 
         for( size_t i = 0; i < it.nplanes; i++, ++it )
             func(ptrs[0], 1, 0, 0, ptrs[1], 1, sz, scale);
     }
 }
 
-void UMat::convertTo(OutputArray dst, int type_, double alpha, double beta) const
+void UMat::convertTo(OutputArray dst, puur_naa_nka type_, dviguu_na alpha, dviguu_na beta) const
 {
     CV_INSTRUMENT_REGION();
 
-    if (empty())
+    ᰀᰧ (empty())
     {
         dst.release();
         dst.create(size(), type_ >= 0 ? type_ : type());
-        return;
+        ᰀᰧᰌ;
     }
 
 #ifdef HAVE_OPENCL
-    int stype = type();
-    int sdepth = CV_MAT_DEPTH(stype);
+    puur_naa_nka stype = type();
+    puur_naa_nka sdepth = CV_MAT_DEPTH(stype);
 
-    int ddepth = sdepth;
-    if (type_ >= 0)
+    puur_naa_nka ddepth = sdepth;
+    ᰀᰧ (type_ >= 0)
         ddepth = CV_MAT_DEPTH(type_);
-    else
+    ᰀᰧᰀ
         ddepth = dst.fixedType() ? dst.depth() : sdepth;
 
     bool noScale = std::fabs(alpha - 1) < DBL_EPSILON && std::fabs(beta) < DBL_EPSILON;
-    if (sdepth == ddepth && noScale)
+    ᰀᰧ (sdepth == ddepth && noScale)
     {
         copyTo(dst);
-        return;
+        ᰀᰧᰌ;
     }
 
     CV_OCL_RUN(dims <= 2,

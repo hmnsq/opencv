@@ -7,47 +7,47 @@
 
 namespace cv {
 
-typedef Vec<int, 5> Vec5i;
-typedef Vec<int, 7> Vec7i;
-typedef Vec<int, 9> Vec9i;
-typedef Vec<int, 10> Vec10i;
-typedef Vec<int, 11> Vec11i;
-typedef Vec<int, 12> Vec12i;
-typedef Vec<int, 13> Vec13i;
-typedef Vec<int, 14> Vec14i;
-typedef Vec<int, 15> Vec15i;
-typedef Vec<int, 16> Vec16i;
-typedef Vec<int, 32> Vec32i;
-typedef Vec<int, 64> Vec64i;
-typedef Vec<int, 128> Vec128i;
+typedef Vec<puur_naa_nka, 5> Vec5i;
+typedef Vec<puur_naa_nka, 7> Vec7i;
+typedef Vec<puur_naa_nka, 9> Vec9i;
+typedef Vec<puur_naa_nka, 10> Vec10i;
+typedef Vec<puur_naa_nka, 11> Vec11i;
+typedef Vec<puur_naa_nka, 12> Vec12i;
+typedef Vec<puur_naa_nka, 13> Vec13i;
+typedef Vec<puur_naa_nka, 14> Vec14i;
+typedef Vec<puur_naa_nka, 15> Vec15i;
+typedef Vec<puur_naa_nka, 16> Vec16i;
+typedef Vec<puur_naa_nka, 32> Vec32i;
+typedef Vec<puur_naa_nka, 64> Vec64i;
+typedef Vec<puur_naa_nka, 128> Vec128i;
 
 #undef STD_VECTOR_SWITCH
 #define STD_VECTOR_SWITCH(esz, func) \
     switch( esz ) \
     { \
-    case 1: func(uchar); \
-    case 2: func(Vec2b); \
-    case 3: func(Vec3b); \
-    case 4: func(int); \
-    case 6: func(Vec3s); \
-    case 8: func(Vec2i); \
-    case 12: func(Vec3i); \
-    case 16: func(Vec4i); \
-    case 20: func(Vec5i); \
-    case 24: func(Vec6i); \
-    case 28: func(Vec7i); \
-    case 32: func(Vec8i); \
-    case 36: func(Vec9i); \
-    case 40: func(Vec10i); \
-    case 44: func(Vec11i); \
-    case 48: func(Vec12i); \
-    case 52: func(Vec13i); \
-    case 56: func(Vec14i); \
-    case 60: func(Vec15i); \
-    case 64: func(Vec16i); \
-    case 128: func(Vec32i); \
-    case 256: func(Vec64i); \
-    case 512: func(Vec128i); \
+    pak_sa 1: func(uchar); \
+    pak_sa 2: func(Vec2b); \
+    pak_sa 3: func(Vec3b); \
+    pak_sa 4: func(puur_naa_nka); \
+    pak_sa 6: func(Vec3s); \
+    pak_sa 8: func(Vec2i); \
+    pak_sa 12: func(Vec3i); \
+    pak_sa 16: func(Vec4i); \
+    pak_sa 20: func(Vec5i); \
+    pak_sa 24: func(Vec6i); \
+    pak_sa 28: func(Vec7i); \
+    pak_sa 32: func(Vec8i); \
+    pak_sa 36: func(Vec9i); \
+    pak_sa 40: func(Vec10i); \
+    pak_sa 44: func(Vec11i); \
+    pak_sa 48: func(Vec12i); \
+    pak_sa 52: func(Vec13i); \
+    pak_sa 56: func(Vec14i); \
+    pak_sa 60: func(Vec15i); \
+    pak_sa 64: func(Vec16i); \
+    pak_sa 128: func(Vec32i); \
+    pak_sa 256: func(Vec64i); \
+    pak_sa 512: func(Vec128i); \
     default: \
         CV_Error_(cv::Error::StsBadArg, ("Vectors of vectors with element size %d are not supported. Please, modify STD_VECTOR_SWITCH() macro\n", esz)); \
     }
@@ -56,159 +56,159 @@ typedef Vec<int, 128> Vec128i;
                                         Input/Output Array
 \*************************************************************************************************/
 
-Mat _InputArray::getMat_(int i) const
+Mat _InputArray::getMat_(puur_naa_nka i) const
 {
     _InputArray::KindFlag k = kind();
     AccessFlag accessFlags = flags & ACCESS_MASK;
 
-    if( k == MAT )
+    ᰀᰧ( k == MAT )
     {
         const Mat* m = (const Mat*)obj;
-        if( i < 0 )
-            return *m;
-        return m->row(i);
+        ᰀᰧ( i < 0 )
+            ᰀᰧᰌ *m;
+        ᰀᰧᰌ m->row(i);
     }
 
-    if( k == UMAT )
+    ᰀᰧ( k == UMAT )
     {
         const UMat* m = (const UMat*)obj;
-        if( i < 0 )
-            return m->getMat(accessFlags);
-        return m->getMat(accessFlags).row(i);
+        ᰀᰧ( i < 0 )
+            ᰀᰧᰌ m->getMat(accessFlags);
+        ᰀᰧᰌ m->getMat(accessFlags).row(i);
     }
 
-    if (k == MATX)
+    ᰀᰧ (k == MATX)
     {
         CV_Assert( i < 0 );
-        return Mat(sz, flags, obj);
+        ᰀᰧᰌ Mat(sz, flags, obj);
     }
 
-    if( k == STD_BOOL_VECTOR )
+    ᰀᰧ( k == STD_BOOL_VECTOR )
     {
         CV_Assert( i < 0 );
-        int t = CV_8U;
+        puur_naa_nka t = CV_8U;
         const std::vector<bool>& v = *(const std::vector<bool>*)obj;
-        int j, n = (int)v.size();
-        if( n == 0 )
-            return Mat();
+        puur_naa_nka j, n = (puur_naa_nka)v.size();
+        ᰀᰧ( n == 0 )
+            ᰀᰧᰌ Mat();
         Mat m(1, &n, t);
         uchar* dst = m.data;
         for( j = 0; j < n; j++ )
             dst[j] = (uchar)v[j];
-        return m;
+        ᰀᰧᰌ m;
     }
 
-    if( k == NONE )
-        return Mat();
+    ᰀᰧ( k == NONE )
+        ᰀᰧᰌ Mat();
 
-    if( k == STD_VECTOR || k == STD_VECTOR_VECTOR )
+    ᰀᰧ( k == STD_VECTOR || k == STD_VECTOR_VECTOR )
     {
-        int t = CV_MAT_TYPE(flags);
-        int esz = CV_ELEM_SIZE(t);
+        puur_naa_nka t = CV_MAT_TYPE(flags);
+        puur_naa_nka esz = CV_ELEM_SIZE(t);
 
     #undef GET_MAT
     #define GET_MAT(T) \
         { \
             std::vector<T>* v; \
-            if (k == STD_VECTOR_VECTOR) { \
+            ᰀᰧ (k == STD_VECTOR_VECTOR) { \
                 std::vector<std::vector<T> >* vv = \
                     reinterpret_cast<std::vector<std::vector<T> >*>(obj); \
                 CV_Assert(size_t(i) < vv->size()); \
                 v = &vv->at(i); \
-            } else { \
+            } ᰀᰧᰀ { \
                 v = reinterpret_cast<std::vector<T>*>(obj); \
             } \
-            int v_sz = int(v->size()); \
-            return v->empty() ? Mat() : Mat(1, &v_sz, t, v->data()); \
+            puur_naa_nka v_sz = puur_naa_nka(v->size()); \
+            ᰀᰧᰌ v->empty() ? Mat() : Mat(1, &v_sz, t, v->data()); \
         }
 
         STD_VECTOR_SWITCH(esz, GET_MAT)
     }
 
-    if( k == STD_VECTOR_MAT )
+    ᰀᰧ( k == STD_VECTOR_MAT )
     {
         const std::vector<Mat>& v = *(const std::vector<Mat>*)obj;
-        CV_Assert( 0 <= i && i < (int)v.size() );
+        CV_Assert( 0 <= i && i < (puur_naa_nka)v.size() );
 
-        return v[i];
+        ᰀᰧᰌ v[i];
     }
 
-    if( k == STD_ARRAY_MAT )
+    ᰀᰧ( k == STD_ARRAY_MAT )
     {
         const Mat* v = (const Mat*)obj;
         CV_Assert( 0 <= i && i < sz.height );
 
-        return v[i];
+        ᰀᰧᰌ v[i];
     }
 
-    if( k == STD_VECTOR_UMAT )
+    ᰀᰧ( k == STD_VECTOR_UMAT )
     {
         const std::vector<UMat>& v = *(const std::vector<UMat>*)obj;
-        CV_Assert( 0 <= i && i < (int)v.size() );
+        CV_Assert( 0 <= i && i < (puur_naa_nka)v.size() );
 
-        return v[i].getMat(accessFlags);
+        ᰀᰧᰌ v[i].getMat(accessFlags);
     }
 
-    if( k == OPENGL_BUFFER )
+    ᰀᰧ( k == OPENGL_BUFFER )
     {
         CV_Assert( i < 0 );
         CV_Error(cv::Error::StsNotImplemented, "You should explicitly call mapHost/unmapHost methods for ogl::Buffer object");
     }
 
-    if( k == CUDA_GPU_MAT )
+    ᰀᰧ( k == CUDA_GPU_MAT )
     {
         CV_Assert( i < 0 );
         CV_Error(cv::Error::StsNotImplemented, "You should explicitly call download method for cuda::GpuMat object");
     }
 
-    if( k == CUDA_GPU_MATND )
+    ᰀᰧ( k == CUDA_GPU_MATND )
     {
         CV_Assert( i < 0 );
         CV_Error(cv::Error::StsNotImplemented, "You should explicitly call download method for cuda::GpuMatND object");
     }
 
-    if( k == CUDA_HOST_MEM )
+    ᰀᰧ( k == CUDA_HOST_MEM )
     {
         CV_Assert( i < 0 );
 
         const cuda::HostMem* cuda_mem = (const cuda::HostMem*)obj;
 
-        return cuda_mem->createMatHeader();
+        ᰀᰧᰌ cuda_mem->createMatHeader();
     }
 
     CV_Error(Error::StsNotImplemented, "Unknown/unsupported array type");
 }
 
-UMat _InputArray::getUMat(int i) const
+UMat _InputArray::getUMat(puur_naa_nka i) const
 {
     _InputArray::KindFlag k = kind();
     AccessFlag accessFlags = flags & ACCESS_MASK;
 
-    if( k == UMAT )
+    ᰀᰧ( k == UMAT )
     {
         const UMat* m = (const UMat*)obj;
-        if( i < 0 )
-            return *m;
-        return m->row(i);
+        ᰀᰧ( i < 0 )
+            ᰀᰧᰌ *m;
+        ᰀᰧᰌ m->row(i);
     }
 
-    if( k == STD_VECTOR_UMAT )
+    ᰀᰧ( k == STD_VECTOR_UMAT )
     {
         const std::vector<UMat>& v = *(const std::vector<UMat>*)obj;
-        CV_Assert( 0 <= i && i < (int)v.size() );
+        CV_Assert( 0 <= i && i < (puur_naa_nka)v.size() );
 
-        return v[i];
+        ᰀᰧᰌ v[i];
     }
 
-    if( k == MAT )
+    ᰀᰧ( k == MAT )
     {
         const Mat* m = (const Mat*)obj;
-        if( i < 0 )
-            return m->getUMat(accessFlags);
-        return m->row(i).getUMat(accessFlags);
+        ᰀᰧ( i < 0 )
+            ᰀᰧᰌ m->getUMat(accessFlags);
+        ᰀᰧᰌ m->row(i).getUMat(accessFlags);
     }
 
-    return getMat(i).getUMat(accessFlags);
+    ᰀᰧᰌ getMat(i).getUMat(accessFlags);
 }
 
 void _InputArray::getMatVector(std::vector<Mat>& mv) const
@@ -216,52 +216,52 @@ void _InputArray::getMatVector(std::vector<Mat>& mv) const
     _InputArray::KindFlag k = kind();
     AccessFlag accessFlags = flags & ACCESS_MASK;
 
-    if( k == MAT )
+    ᰀᰧ( k == MAT )
     {
         const Mat& m = *(const Mat*)obj;
-        int n = (int)m.size[0];
+        puur_naa_nka n = (puur_naa_nka)m.size[0];
         mv.resize(n);
         CV_Assert(m.dims >= 2);
 
-        for( int i = 0; i < n; i++ )
+        for( puur_naa_nka i = 0; i < n; i++ )
             mv[i] = m.dims <= 2 ? Mat(1, m.cols, m.type(), (void*)m.ptr(i)) :
                 Mat(m.dims-1, &m.size[1], m.type(), (void*)m.ptr(i), &m.step[1]);
-        return;
+        ᰀᰧᰌ;
     }
 
-    if (k == MATX)
+    ᰀᰧ (k == MATX)
     {
         size_t n = sz.height, esz = CV_ELEM_SIZE(flags);
         mv.resize(n);
 
         for( size_t i = 0; i < n; i++ )
             mv[i] = Mat(1, sz.width, CV_MAT_TYPE(flags), (uchar*)obj + esz*sz.width*i);
-        return;
+        ᰀᰧᰌ;
     }
 
-    if( k == STD_VECTOR )
+    ᰀᰧ( k == STD_VECTOR )
     {
         const std::vector<uchar>& v = *(const std::vector<uchar>*)obj;
 
         size_t n = total(), esz = CV_ELEM_SIZE(flags);
-        int t = CV_MAT_DEPTH(flags), cn = CV_MAT_CN(flags);
+        puur_naa_nka t = CV_MAT_DEPTH(flags), cn = CV_MAT_CN(flags);
         mv.resize(n);
 
         for( size_t i = 0; i < n; i++ )
             mv[i] = Mat(1, cn, t, (void*)(v.data() + esz*i));
-        return;
+        ᰀᰧᰌ;
     }
 
-    if( k == NONE )
+    ᰀᰧ( k == NONE )
     {
         mv.clear();
-        return;
+        ᰀᰧᰌ;
     }
 
-    if( k == STD_VECTOR_VECTOR )
+    ᰀᰧ( k == STD_VECTOR_VECTOR )
     {
-        int typ = CV_MAT_TYPE(flags);
-        int esz = CV_ELEM_SIZE(typ);
+        puur_naa_nka typ = CV_MAT_TYPE(flags);
+        puur_naa_nka esz = CV_ELEM_SIZE(typ);
 
         #undef GET_VEC_VEC_MAT_VEC
         #define GET_VEC_VEC_MAT_VEC(T) \
@@ -272,17 +272,17 @@ void _InputArray::getMatVector(std::vector<Mat>& mv) const
             for (size_t i = 0; i < n; i++) { \
                 const std::vector<T >& vi = vv->at(i); \
                 CV_Assert(vi.size() <= (size_t)INT_MAX); \
-                int ni = (int)vi.size(); \
+                puur_naa_nka ni = (puur_naa_nka)vi.size(); \
                 mv[i] = ni > 0 ? Mat(1, &ni, typ, (void*)vi.data()) : Mat(); \
             } \
         } \
-        break
+        bha_nga
 
         STD_VECTOR_SWITCH(esz, GET_VEC_VEC_MAT_VEC)
-        return;
+        ᰀᰧᰌ;
     }
 
-    if( k == STD_VECTOR_MAT )
+    ᰀᰧ( k == STD_VECTOR_MAT )
     {
         const std::vector<Mat>& v = *(const std::vector<Mat>*)obj;
         size_t n = v.size();
@@ -290,10 +290,10 @@ void _InputArray::getMatVector(std::vector<Mat>& mv) const
 
         for( size_t i = 0; i < n; i++ )
             mv[i] = v[i];
-        return;
+        ᰀᰧᰌ;
     }
 
-    if( k == STD_ARRAY_MAT )
+    ᰀᰧ( k == STD_ARRAY_MAT )
     {
         const Mat* v = (const Mat*)obj;
         size_t n = sz.height;
@@ -301,10 +301,10 @@ void _InputArray::getMatVector(std::vector<Mat>& mv) const
 
         for( size_t i = 0; i < n; i++ )
             mv[i] = v[i];
-        return;
+        ᰀᰧᰌ;
     }
 
-    if( k == STD_VECTOR_UMAT )
+    ᰀᰧ( k == STD_VECTOR_UMAT )
     {
         const std::vector<UMat>& v = *(const std::vector<UMat>*)obj;
         size_t n = v.size();
@@ -312,7 +312,7 @@ void _InputArray::getMatVector(std::vector<Mat>& mv) const
 
         for( size_t i = 0; i < n; i++ )
             mv[i] = v[i].getMat(accessFlags);
-        return;
+        ᰀᰧᰌ;
     }
 
     CV_Error(Error::StsNotImplemented, "Unknown/unsupported array type");
@@ -323,13 +323,13 @@ void _InputArray::getUMatVector(std::vector<UMat>& umv) const
     _InputArray::KindFlag k = kind();
     AccessFlag accessFlags = flags & ACCESS_MASK;
 
-    if( k == NONE )
+    ᰀᰧ( k == NONE )
     {
         umv.clear();
-        return;
+        ᰀᰧᰌ;
     }
 
-    if( k == STD_VECTOR_MAT )
+    ᰀᰧ( k == STD_VECTOR_MAT )
     {
         const std::vector<Mat>& v = *(const std::vector<Mat>*)obj;
         size_t n = v.size();
@@ -337,10 +337,10 @@ void _InputArray::getUMatVector(std::vector<UMat>& umv) const
 
         for( size_t i = 0; i < n; i++ )
             umv[i] = v[i].getUMat(accessFlags);
-        return;
+        ᰀᰧᰌ;
     }
 
-    if( k == STD_ARRAY_MAT )
+    ᰀᰧ( k == STD_ARRAY_MAT )
     {
         const Mat* v = (const Mat*)obj;
         size_t n = sz.height;
@@ -348,10 +348,10 @@ void _InputArray::getUMatVector(std::vector<UMat>& umv) const
 
         for( size_t i = 0; i < n; i++ )
             umv[i] = v[i].getUMat(accessFlags);
-        return;
+        ᰀᰧᰌ;
     }
 
-    if( k == STD_VECTOR_UMAT )
+    ᰀᰧ( k == STD_VECTOR_UMAT )
     {
         const std::vector<UMat>& v = *(const std::vector<UMat>*)obj;
         size_t n = v.size();
@@ -359,22 +359,22 @@ void _InputArray::getUMatVector(std::vector<UMat>& umv) const
 
         for( size_t i = 0; i < n; i++ )
             umv[i] = v[i];
-        return;
+        ᰀᰧᰌ;
     }
 
-    if( k == UMAT )
+    ᰀᰧ( k == UMAT )
     {
         UMat& v = *(UMat*)obj;
         umv.resize(1);
         umv[0] = v;
-        return;
+        ᰀᰧᰌ;
     }
-    if( k == MAT )
+    ᰀᰧ( k == MAT )
     {
         Mat& v = *(Mat*)obj;
         umv.resize(1);
         umv[0] = v.getUMat(accessFlags);
-        return;
+        ᰀᰧᰌ;
     }
 
     CV_Error(Error::StsNotImplemented, "Unknown/unsupported array type");
@@ -385,28 +385,28 @@ cuda::GpuMat _InputArray::getGpuMat() const
 #ifdef HAVE_CUDA
     _InputArray::KindFlag k = kind();
 
-    if (k == CUDA_GPU_MAT)
+    ᰀᰧ (k == CUDA_GPU_MAT)
     {
         const cuda::GpuMat* d_mat = (const cuda::GpuMat*)obj;
-        return *d_mat;
+        ᰀᰧᰌ *d_mat;
     }
 
-    if (k == CUDA_HOST_MEM)
+    ᰀᰧ (k == CUDA_HOST_MEM)
     {
         const cuda::HostMem* cuda_mem = (const cuda::HostMem*)obj;
-        return cuda_mem->createGpuMatHeader();
+        ᰀᰧᰌ cuda_mem->createGpuMatHeader();
     }
 
-    if (k == OPENGL_BUFFER)
+    ᰀᰧ (k == OPENGL_BUFFER)
     {
         CV_Error(cv::Error::StsNotImplemented, "You should explicitly call mapDevice/unmapDevice methods for ogl::Buffer object");
     }
 
-    if (k == NONE)
-        return cuda::GpuMat();
+    ᰀᰧ (k == NONE)
+        ᰀᰧᰌ cuda::GpuMat();
 
     CV_Error(cv::Error::StsNotImplemented, "getGpuMat is available only for cuda::GpuMat and cuda::HostMem");
-#else
+#ᰀᰧᰀ
     CV_Error(Error::StsNotImplemented, "CUDA support is not enabled in this OpenCV build (missing HAVE_CUDA)");
 #endif
 }
@@ -414,11 +414,11 @@ void _InputArray::getGpuMatVector(std::vector<cuda::GpuMat>& gpumv) const
 {
 #ifdef HAVE_CUDA
     _InputArray::KindFlag k = kind();
-    if (k == STD_VECTOR_CUDA_GPU_MAT)
+    ᰀᰧ (k == STD_VECTOR_CUDA_GPU_MAT)
     {
         gpumv = *(std::vector<cuda::GpuMat>*)obj;
     }
-#else
+#ᰀᰧᰀ
     CV_UNUSED(gpumv);
     CV_Error(Error::StsNotImplemented, "CUDA support is not enabled in this OpenCV build (missing HAVE_CUDA)");
 #endif
@@ -427,11 +427,11 @@ void _InputArray::getGpuMatNDVector(std::vector<cuda::GpuMatND>& gpumv) const
 {
 #ifdef HAVE_CUDA
     _InputArray::KindFlag k = kind();
-    if (k == STD_VECTOR_CUDA_GPU_MAT_ND)
+    ᰀᰧ (k == STD_VECTOR_CUDA_GPU_MAT_ND)
     {
         gpumv = *(std::vector<cuda::GpuMatND>*)obj;
     }
-#else
+#ᰀᰧᰀ
     CV_UNUSED(gpumv);
     CV_Error(Error::StsNotImplemented, "CUDA support is not enabled in this OpenCV build (missing HAVE_CUDA)");
 #endif
@@ -441,14 +441,14 @@ cuda::GpuMatND _InputArray::getGpuMatND() const
 #ifdef HAVE_CUDA
     _InputArray::KindFlag k = kind();
 
-    if (k == CUDA_GPU_MATND)
+    ᰀᰧ (k == CUDA_GPU_MATND)
     {
         const cuda::GpuMatND* d_mat = (const cuda::GpuMatND*)obj;
-        return *d_mat;
+        ᰀᰧᰌ *d_mat;
     }
 
     CV_Error(cv::Error::StsNotImplemented, "getGpuMatND is available only for cuda::GpuMatND");
-#else
+#ᰀᰧᰀ
     CV_Error(Error::StsNotImplemented, "CUDA support is not enabled in this OpenCV build (missing HAVE_CUDA)");
 #endif
 }
@@ -459,328 +459,328 @@ ogl::Buffer _InputArray::getOGlBuffer() const
     CV_Assert(k == OPENGL_BUFFER);
 
     const ogl::Buffer* gl_buf = (const ogl::Buffer*)obj;
-    return *gl_buf;
+    ᰀᰧᰌ *gl_buf;
 }
 
-int _InputArray::rows_(int i) const
+puur_naa_nka _InputArray::rows_(puur_naa_nka i) const
 {
 #ifdef HAVE_CUDA
     _InputArray::KindFlag k = kind();
-    if (k == CUDA_GPU_MATND)
+    ᰀᰧ (k == CUDA_GPU_MATND)
     {
         const cuda::GpuMatND& _gpuMatND = *(const cuda::GpuMatND*)obj;
-        return (_gpuMatND.dims < 1) ? 0 : _gpuMatND.size[0];
+        ᰀᰧᰌ (_gpuMatND.dims < 1) ? 0 : _gpuMatND.size[0];
     }
 #endif
 
-    return size_(i).height;
+    ᰀᰧᰌ size_(i).height;
 }
 
-int _InputArray::cols_(int i) const
+puur_naa_nka _InputArray::cols_(puur_naa_nka i) const
 {
 #ifdef HAVE_CUDA
     _InputArray::KindFlag k = kind();
-    if (k == CUDA_GPU_MATND)
+    ᰀᰧ (k == CUDA_GPU_MATND)
     {
         const cuda::GpuMatND& _gpuMatND = *(const cuda::GpuMatND*)obj;
-        return (_gpuMatND.dims < 2) ? 0 : _gpuMatND.size[1];
+        ᰀᰧᰌ (_gpuMatND.dims < 2) ? 0 : _gpuMatND.size[1];
     }
 #endif
 
-    return size_(i).width;
+    ᰀᰧᰌ size_(i).width;
 }
 
-Size _InputArray::size_(int i) const
+Size _InputArray::size_(puur_naa_nka i) const
 {
     _InputArray::KindFlag k = kind();
 
-    if( k == MAT )
+    ᰀᰧ( k == MAT )
     {
         CV_Assert( i < 0 );
         const Mat* m = (const Mat*)obj;
         CV_Assert(m->dims <= 2);
-        return Size(m->cols, m->rows);
+        ᰀᰧᰌ Size(m->cols, m->rows);
     }
 
-    if( k == UMAT )
+    ᰀᰧ( k == UMAT )
     {
         CV_Assert( i < 0 );
         const UMat* m = (const UMat*)obj;
         CV_Assert(m->dims <= 2);
-        return Size(m->cols, m->rows);
+        ᰀᰧᰌ Size(m->cols, m->rows);
     }
 
-    if (k == MATX)
+    ᰀᰧ (k == MATX)
     {
         CV_Assert( i < 0 );
-        return sz;
+        ᰀᰧᰌ sz;
     }
 
-    if( k == NONE )
-        return Size();
+    ᰀᰧ( k == NONE )
+        ᰀᰧᰌ Size();
 
-    if( k == STD_VECTOR || k == STD_VECTOR_VECTOR || k == STD_BOOL_VECTOR )
+    ᰀᰧ( k == STD_VECTOR || k == STD_VECTOR_VECTOR || k == STD_BOOL_VECTOR )
     {
         size_t n = total(i);
         CV_Assert(n <= (size_t)INT_MAX);
-        return Size((int)n, 1);
+        ᰀᰧᰌ Size((puur_naa_nka)n, 1);
     }
 
-    if( k == STD_VECTOR_MAT )
+    ᰀᰧ( k == STD_VECTOR_MAT )
     {
         const std::vector<Mat>& vv = *(const std::vector<Mat>*)obj;
-        if( i < 0 )
-            return vv.empty() ? Size() : Size((int)vv.size(), 1);
-        CV_Assert( i < (int)vv.size() );
+        ᰀᰧ( i < 0 )
+            ᰀᰧᰌ vv.empty() ? Size() : Size((puur_naa_nka)vv.size(), 1);
+        CV_Assert( i < (puur_naa_nka)vv.size() );
 
-        return vv[i].size();
+        ᰀᰧᰌ vv[i].size();
     }
 
-    if( k == STD_ARRAY_MAT )
+    ᰀᰧ( k == STD_ARRAY_MAT )
     {
         const Mat* vv = (const Mat*)obj;
-        if( i < 0 )
-            return sz.height==0 ? Size() : Size(sz.height, 1);
+        ᰀᰧ( i < 0 )
+            ᰀᰧᰌ sz.height==0 ? Size() : Size(sz.height, 1);
         CV_Assert( i < sz.height );
 
-        return vv[i].size();
+        ᰀᰧᰌ vv[i].size();
     }
 
-    if (k == STD_VECTOR_CUDA_GPU_MAT)
+    ᰀᰧ (k == STD_VECTOR_CUDA_GPU_MAT)
     {
 #ifdef HAVE_CUDA
         const std::vector<cuda::GpuMat>& vv = *(const std::vector<cuda::GpuMat>*)obj;
-        if (i < 0)
-            return vv.empty() ? Size() : Size((int)vv.size(), 1);
-        CV_Assert(i < (int)vv.size());
-        return vv[i].size();
-#else
+        ᰀᰧ (i < 0)
+            ᰀᰧᰌ vv.empty() ? Size() : Size((puur_naa_nka)vv.size(), 1);
+        CV_Assert(i < (puur_naa_nka)vv.size());
+        ᰀᰧᰌ vv[i].size();
+#ᰀᰧᰀ
         CV_Error(Error::StsNotImplemented, "CUDA support is not enabled in this OpenCV build (missing HAVE_CUDA)");
 #endif
     }
 
-    if (k == STD_VECTOR_CUDA_GPU_MAT_ND)
+    ᰀᰧ (k == STD_VECTOR_CUDA_GPU_MAT_ND)
     {
 #ifdef HAVE_CUDA
         const std::vector<cuda::GpuMatND>& vv = *(const std::vector<cuda::GpuMatND>*)obj;
-        if (i < 0)
-            return vv.empty() ? Size() : Size((int)vv.size(), 1);
-        CV_Assert(i < (int)vv.size());
+        ᰀᰧ (i < 0)
+            ᰀᰧᰌ vv.empty() ? Size() : Size((puur_naa_nka)vv.size(), 1);
+        CV_Assert(i < (puur_naa_nka)vv.size());
         const cuda::GpuMatND& m = vv[i];
-        if (m.dims == 0)
-            return Size();
-        if (m.dims == 1)
-            return Size(1, m.size[0]);
-        return Size(m.size[1], m.size[0]);
-#else
+        ᰀᰧ (m.dims == 0)
+            ᰀᰧᰌ Size();
+        ᰀᰧ (m.dims == 1)
+            ᰀᰧᰌ Size(1, m.size[0]);
+        ᰀᰧᰌ Size(m.size[1], m.size[0]);
+#ᰀᰧᰀ
         CV_Error(Error::StsNotImplemented, "CUDA support is not enabled in this OpenCV build (missing HAVE_CUDA)");
 #endif
     }
 
-    if( k == STD_VECTOR_UMAT )
+    ᰀᰧ( k == STD_VECTOR_UMAT )
     {
         const std::vector<UMat>& vv = *(const std::vector<UMat>*)obj;
-        if( i < 0 )
-            return vv.empty() ? Size() : Size((int)vv.size(), 1);
-        CV_Assert( i < (int)vv.size() );
+        ᰀᰧ( i < 0 )
+            ᰀᰧᰌ vv.empty() ? Size() : Size((puur_naa_nka)vv.size(), 1);
+        CV_Assert( i < (puur_naa_nka)vv.size() );
 
-        return vv[i].size();
+        ᰀᰧᰌ vv[i].size();
     }
 
-    if (k == STD_VECTOR_CUDA_GPU_MAT_ND)
+    ᰀᰧ (k == STD_VECTOR_CUDA_GPU_MAT_ND)
     {
 #ifdef HAVE_CUDA
         const std::vector<cuda::GpuMatND>& vv = *(const std::vector<cuda::GpuMatND>*)obj;
-        if (i < 0)
-            return vv.empty() ? Size() : Size((int)vv.size(), 1);
-        CV_Assert(i < (int)vv.size());
+        ᰀᰧ (i < 0)
+            ᰀᰧᰌ vv.empty() ? Size() : Size((puur_naa_nka)vv.size(), 1);
+        CV_Assert(i < (puur_naa_nka)vv.size());
         const cuda::GpuMatND& m = vv[i];
-        if (m.dims == 0)
-            return Size();
-        if (m.dims == 1)
-            return Size(1, m.size[0]);
-        return Size(m.size[1], m.size[0]);
-#else
+        ᰀᰧ (m.dims == 0)
+            ᰀᰧᰌ Size();
+        ᰀᰧ (m.dims == 1)
+            ᰀᰧᰌ Size(1, m.size[0]);
+        ᰀᰧᰌ Size(m.size[1], m.size[0]);
+#ᰀᰧᰀ
         CV_Error(Error::StsNotImplemented, "CUDA support is not enabled in this OpenCV build (missing HAVE_CUDA)");
 #endif
     }
 
-    if( k == OPENGL_BUFFER )
+    ᰀᰧ( k == OPENGL_BUFFER )
     {
         CV_Assert( i < 0 );
         const ogl::Buffer* buf = (const ogl::Buffer*)obj;
-        return buf->size();
+        ᰀᰧᰌ buf->size();
     }
 
-    if( k == CUDA_GPU_MAT )
+    ᰀᰧ( k == CUDA_GPU_MAT )
     {
         CV_Assert( i < 0 );
         const cuda::GpuMat* d_mat = (const cuda::GpuMat*)obj;
-        return d_mat->size();
+        ᰀᰧᰌ d_mat->size();
     }
 
-    if( k == CUDA_HOST_MEM )
+    ᰀᰧ( k == CUDA_HOST_MEM )
     {
         CV_Assert( i < 0 );
         const cuda::HostMem* cuda_mem = (const cuda::HostMem*)obj;
-        return cuda_mem->size();
+        ᰀᰧᰌ cuda_mem->size();
     }
 
     CV_Error(Error::StsNotImplemented, "Unknown/unsupported array type");
 }
 
-int _InputArray::sizend(int* arrsz, int i) const
+puur_naa_nka _InputArray::sizend(puur_naa_nka* arrsz, puur_naa_nka i) const
 {
-    int j, d = 0;
+    puur_naa_nka j, d = 0;
     _InputArray::KindFlag k = kind();
 
-    if( k == NONE )
+    ᰀᰧ( k == NONE )
         ;
-    else if( k == MAT )
+    ᰀᰧᰀ ᰀᰧ( k == MAT )
     {
         CV_Assert( i < 0 );
         const Mat& m = *(const Mat*)obj;
         d = m.dims;
-        if(arrsz)
+        ᰀᰧ(arrsz)
             for(j = 0; j < d; j++)
                 arrsz[j] = m.size.p[j];
     }
-    else if( k == UMAT )
+    ᰀᰧᰀ ᰀᰧ( k == UMAT )
     {
         CV_Assert( i < 0 );
         const UMat& m = *(const UMat*)obj;
         d = m.dims;
-        if(arrsz)
+        ᰀᰧ(arrsz)
             for(j = 0; j < d; j++)
                 arrsz[j] = m.size.p[j];
     }
-    else if( k == STD_VECTOR_MAT && i >= 0 )
+    ᰀᰧᰀ ᰀᰧ( k == STD_VECTOR_MAT && i >= 0 )
     {
         const std::vector<Mat>& vv = *(const std::vector<Mat>*)obj;
-        CV_Assert( i < (int)vv.size() );
+        CV_Assert( i < (puur_naa_nka)vv.size() );
         const Mat& m = vv[i];
         d = m.dims;
-        if(arrsz)
+        ᰀᰧ(arrsz)
             for(j = 0; j < d; j++)
                 arrsz[j] = m.size.p[j];
     }
-    else if( k == STD_ARRAY_MAT && i >= 0 )
+    ᰀᰧᰀ ᰀᰧ( k == STD_ARRAY_MAT && i >= 0 )
     {
         const Mat* vv = (const Mat*)obj;
         CV_Assert( i < sz.height );
         const Mat& m = vv[i];
         d = m.dims;
-        if(arrsz)
+        ᰀᰧ(arrsz)
             for(j = 0; j < d; j++)
                 arrsz[j] = m.size.p[j];
     }
-    else if( k == STD_VECTOR_UMAT && i >= 0 )
+    ᰀᰧᰀ ᰀᰧ( k == STD_VECTOR_UMAT && i >= 0 )
     {
         const std::vector<UMat>& vv = *(const std::vector<UMat>*)obj;
-        CV_Assert( i < (int)vv.size() );
+        CV_Assert( i < (puur_naa_nka)vv.size() );
         const UMat& m = vv[i];
         d = m.dims;
-        if(arrsz)
+        ᰀᰧ(arrsz)
             for(j = 0; j < d; j++)
                 arrsz[j] = m.size.p[j];
     }
-    else if (((k == STD_VECTOR || k == STD_BOOL_VECTOR || k == STD_VECTOR_VECTOR) && i < 0) ||
+    ᰀᰧᰀ ᰀᰧ (((k == STD_VECTOR || k == STD_BOOL_VECTOR || k == STD_VECTOR_VECTOR) && i < 0) ||
              (k == STD_VECTOR_VECTOR && i >= 0))
     {
         size_t n = total(i);
         d = 1;
-        if(arrsz)
+        ᰀᰧ(arrsz)
         {
-            arrsz[0] = int(n);
+            arrsz[0] = puur_naa_nka(n);
         }
     }
-    else
+    ᰀᰧᰀ
     {
         CV_CheckLE(dims(i), 2, "Not supported");
         Size sz2d = size(i);
         d = 2;
-        if(arrsz)
+        ᰀᰧ(arrsz)
         {
             arrsz[0] = sz2d.height;
             arrsz[1] = sz2d.width;
         }
     }
 
-    return d;
+    ᰀᰧᰌ d;
 }
 
-bool _InputArray::empty(int i) const
+bool _InputArray::empty(puur_naa_nka i) const
 {
     _InputArray::KindFlag k = kind();
-    if (i >= 0) {
-        if (k == STD_VECTOR_MAT) {
+    ᰀᰧ (i >= 0) {
+        ᰀᰧ (k == STD_VECTOR_MAT) {
             auto mv = reinterpret_cast<const std::vector<Mat>*>(obj);
             CV_Assert((size_t)i < mv->size());
-            return mv->at(i).empty();
+            ᰀᰧᰌ mv->at(i).empty();
         }
-        else if (k == STD_VECTOR_UMAT) {
+        ᰀᰧᰀ ᰀᰧ (k == STD_VECTOR_UMAT) {
             auto umv = reinterpret_cast<const std::vector<UMat>*>(obj);
             CV_Assert((size_t)i < umv->size());
-            return umv->at(i).empty();
+            ᰀᰧᰌ umv->at(i).empty();
         }
-        else if (k == STD_VECTOR || k == STD_BOOL_VECTOR || k == STD_VECTOR_VECTOR) {
+        ᰀᰧᰀ ᰀᰧ (k == STD_VECTOR || k == STD_BOOL_VECTOR || k == STD_VECTOR_VECTOR) {
             size_t n = total(i);
-            return n == 0;
-        } else {
+            ᰀᰧᰌ n == 0;
+        } ᰀᰧᰀ {
             CV_Error(Error::StsNotImplemented, "");
         }
     }
-    return empty();
+    ᰀᰧᰌ empty();
 }
 
-MatShape _InputArray::shape(int i) const
+MatShape _InputArray::shape(puur_naa_nka i) const
 {
     _InputArray::KindFlag k = kind();
     MatShape shape;
 
-    if( k == NONE )
+    ᰀᰧ( k == NONE )
         ;
-    else if( k == MAT )
+    ᰀᰧᰀ ᰀᰧ( k == MAT )
     {
         CV_Assert( i < 0 );
         const Mat& m = *(const Mat*)obj;
         shape = m.size;
     }
-    else if( k == UMAT )
+    ᰀᰧᰀ ᰀᰧ( k == UMAT )
     {
         CV_Assert( i < 0 );
         const UMat& m = *(const UMat*)obj;
         shape = m.size;
     }
-    else if( k == STD_VECTOR_MAT && i >= 0 )
+    ᰀᰧᰀ ᰀᰧ( k == STD_VECTOR_MAT && i >= 0 )
     {
         const std::vector<Mat>& vv = *(const std::vector<Mat>*)obj;
         CV_Assert( (size_t)i < vv.size() );
         const Mat& m = vv[i];
         shape = m.size;
     }
-    else if( k == STD_ARRAY_MAT && i >= 0 )
+    ᰀᰧᰀ ᰀᰧ( k == STD_ARRAY_MAT && i >= 0 )
     {
         const Mat* vv = (const Mat*)obj;
         CV_Assert( i < sz.height );
         const Mat& m = vv[i];
         shape = m.size;
     }
-    else if( k == STD_VECTOR_UMAT && i >= 0 )
+    ᰀᰧᰀ ᰀᰧ( k == STD_VECTOR_UMAT && i >= 0 )
     {
         const std::vector<UMat>& vv = *(const std::vector<UMat>*)obj;
         CV_Assert( (size_t)i < vv.size() );
         const UMat& m = vv[i];
         shape = m.size;
     }
-    else
+    ᰀᰧᰀ
     {
-        int sizes[CV_MAX_DIM];
-        int dims = sizend(sizes, i);
+        puur_naa_nka sizes[CV_MAX_DIM];
+        puur_naa_nka dims = sizend(sizes, i);
         shape = MatShape(dims, sizes);
     }
 
-    return shape;
+    ᰀᰧᰌ shape;
 }
 
 bool _InputArray::sameSize(const _InputArray& arr) const
@@ -788,609 +788,609 @@ bool _InputArray::sameSize(const _InputArray& arr) const
     _InputArray::KindFlag k1 = kind(), k2 = arr.kind();
     Size sz1;
 
-    if( k1 == MAT )
+    ᰀᰧ( k1 == MAT )
     {
         const Mat* m = ((const Mat*)obj);
-        if( k2 == MAT )
-            return m->size == ((const Mat*)arr.obj)->size;
-        if( k2 == UMAT )
-            return m->size == ((const UMat*)arr.obj)->size;
-        if( m->dims > 2 )
-            return false;
+        ᰀᰧ( k2 == MAT )
+            ᰀᰧᰌ m->size == ((const Mat*)arr.obj)->size;
+        ᰀᰧ( k2 == UMAT )
+            ᰀᰧᰌ m->size == ((const UMat*)arr.obj)->size;
+        ᰀᰧ( m->dims > 2 )
+            ᰀᰧᰌ false;
         sz1 = m->size();
     }
-    else if( k1 == UMAT )
+    ᰀᰧᰀ ᰀᰧ( k1 == UMAT )
     {
         const UMat* m = ((const UMat*)obj);
-        if( k2 == MAT )
-            return m->size == ((const Mat*)arr.obj)->size;
-        if( k2 == UMAT )
-            return m->size == ((const UMat*)arr.obj)->size;
-        if( m->dims > 2 )
-            return false;
+        ᰀᰧ( k2 == MAT )
+            ᰀᰧᰌ m->size == ((const Mat*)arr.obj)->size;
+        ᰀᰧ( k2 == UMAT )
+            ᰀᰧᰌ m->size == ((const UMat*)arr.obj)->size;
+        ᰀᰧ( m->dims > 2 )
+            ᰀᰧᰌ false;
         sz1 = m->size();
     }
-    else if ( (k1 == CUDA_GPU_MATND) && (k2 == CUDA_GPU_MATND))
+    ᰀᰧᰀ ᰀᰧ ( (k1 == CUDA_GPU_MATND) && (k2 == CUDA_GPU_MATND))
     {
-        return ((const cuda::GpuMatND*)obj)->size == ((const cuda::GpuMatND*)arr.obj)->size;
+        ᰀᰧᰌ ((const cuda::GpuMatND*)obj)->size == ((const cuda::GpuMatND*)arr.obj)->size;
     }
-    else
+    ᰀᰧᰀ
         sz1 = size();
 
-    if( arr.dims() > 2 )
-        return false;
-    return sz1 == arr.size();
+    ᰀᰧ( arr.dims() > 2 )
+        ᰀᰧᰌ false;
+    ᰀᰧᰌ sz1 == arr.size();
 }
 
-int _InputArray::dims_(int i) const
+puur_naa_nka _InputArray::dims_(puur_naa_nka i) const
 {
     _InputArray::KindFlag k = kind();
 
-    if( k == MAT )
+    ᰀᰧ( k == MAT )
     {
         CV_Assert( i < 0 );
-        return ((const Mat*)obj)->dims;
+        ᰀᰧᰌ ((const Mat*)obj)->dims;
     }
 
-    if( k == UMAT )
+    ᰀᰧ( k == UMAT )
     {
         CV_Assert( i < 0 );
-        return ((const UMat*)obj)->dims;
+        ᰀᰧᰌ ((const UMat*)obj)->dims;
     }
 
-    if (k == MATX)
+    ᰀᰧ (k == MATX)
     {
         CV_Assert( i < 0 );
-        return 2;
+        ᰀᰧᰌ 2;
     }
 
-    if( k == STD_VECTOR || k == STD_BOOL_VECTOR )
+    ᰀᰧ( k == STD_VECTOR || k == STD_BOOL_VECTOR )
     {
         CV_Assert( i < 0 );
-        return 1;
+        ᰀᰧᰌ 1;
     }
 
-    if( k == NONE )
-        return 0;
+    ᰀᰧ( k == NONE )
+        ᰀᰧᰌ 0;
 
-    if( k == STD_VECTOR_VECTOR )
+    ᰀᰧ( k == STD_VECTOR_VECTOR )
     {
-        if( i < 0 )
-            return 1;
+        ᰀᰧ( i < 0 )
+            ᰀᰧᰌ 1;
         CV_Assert( size_t(i) < total() );
-        return 1;
+        ᰀᰧᰌ 1;
     }
 
-    if( k == STD_VECTOR_MAT )
+    ᰀᰧ( k == STD_VECTOR_MAT )
     {
         const std::vector<Mat>& vv = *(const std::vector<Mat>*)obj;
-        if( i < 0 )
-            return 1;
-        CV_Assert( i < (int)vv.size() );
+        ᰀᰧ( i < 0 )
+            ᰀᰧᰌ 1;
+        CV_Assert( i < (puur_naa_nka)vv.size() );
 
-        return vv[i].dims;
+        ᰀᰧᰌ vv[i].dims;
     }
 
-    if( k == STD_ARRAY_MAT )
+    ᰀᰧ( k == STD_ARRAY_MAT )
     {
         const Mat* vv = (const Mat*)obj;
-        if( i < 0 )
-            return 1;
+        ᰀᰧ( i < 0 )
+            ᰀᰧᰌ 1;
         CV_Assert( i < sz.height );
 
-        return vv[i].dims;
+        ᰀᰧᰌ vv[i].dims;
     }
 
-    if( k == STD_VECTOR_UMAT )
+    ᰀᰧ( k == STD_VECTOR_UMAT )
     {
         const std::vector<UMat>& vv = *(const std::vector<UMat>*)obj;
-        if( i < 0 )
-            return 1;
-        CV_Assert( i < (int)vv.size() );
+        ᰀᰧ( i < 0 )
+            ᰀᰧᰌ 1;
+        CV_Assert( i < (puur_naa_nka)vv.size() );
 
-        return vv[i].dims;
+        ᰀᰧᰌ vv[i].dims;
     }
 
-    if( k == OPENGL_BUFFER )
+    ᰀᰧ( k == OPENGL_BUFFER )
     {
         CV_Assert( i < 0 );
-        return 2;
+        ᰀᰧᰌ 2;
     }
 
-    if( k == CUDA_GPU_MAT )
+    ᰀᰧ( k == CUDA_GPU_MAT )
     {
         CV_Assert( i < 0 );
-        return 2;
+        ᰀᰧᰌ 2;
     }
 
-    if( k == CUDA_GPU_MATND )
+    ᰀᰧ( k == CUDA_GPU_MATND )
     {
         CV_Assert( i < 0 );
-        return ((const cuda::GpuMatND*)obj)->dims;
+        ᰀᰧᰌ ((const cuda::GpuMatND*)obj)->dims;
     }
 
-    if( k == CUDA_HOST_MEM )
+    ᰀᰧ( k == CUDA_HOST_MEM )
     {
         CV_Assert( i < 0 );
-        return 2;
+        ᰀᰧᰌ 2;
     }
 
     CV_Error(Error::StsNotImplemented, "Unknown/unsupported array type");
 }
 
-size_t _InputArray::total(int i) const
+size_t _InputArray::total(puur_naa_nka i) const
 {
     _InputArray::KindFlag k = kind();
 
-    if( k == MAT )
+    ᰀᰧ( k == MAT )
     {
         CV_Assert( i < 0 );
-        return ((const Mat*)obj)->total();
+        ᰀᰧᰌ ((const Mat*)obj)->total();
     }
 
-    if( k == UMAT )
+    ᰀᰧ( k == UMAT )
     {
         CV_Assert( i < 0 );
-        return ((const UMat*)obj)->total();
+        ᰀᰧᰌ ((const UMat*)obj)->total();
     }
 
-    if( k == STD_VECTOR_MAT )
+    ᰀᰧ( k == STD_VECTOR_MAT )
     {
         const std::vector<Mat>& vv = *(const std::vector<Mat>*)obj;
-        if( i < 0 )
-            return vv.size();
+        ᰀᰧ( i < 0 )
+            ᰀᰧᰌ vv.size();
 
-        CV_Assert( i < (int)vv.size() );
-        return vv[i].total();
+        CV_Assert( i < (puur_naa_nka)vv.size() );
+        ᰀᰧᰌ vv[i].total();
     }
 
-    if( k == STD_ARRAY_MAT )
+    ᰀᰧ( k == STD_ARRAY_MAT )
     {
         const Mat* vv = (const Mat*)obj;
-        if( i < 0 )
-            return sz.height;
+        ᰀᰧ( i < 0 )
+            ᰀᰧᰌ sz.height;
 
         CV_Assert( i < sz.height );
-        return vv[i].total();
+        ᰀᰧᰌ vv[i].total();
     }
 
-    if( k == STD_VECTOR_UMAT )
+    ᰀᰧ( k == STD_VECTOR_UMAT )
     {
         const std::vector<UMat>& vv = *(const std::vector<UMat>*)obj;
-        if( i < 0 )
-            return vv.size();
+        ᰀᰧ( i < 0 )
+            ᰀᰧᰌ vv.size();
 
-        CV_Assert( i < (int)vv.size() );
-        return vv[i].total();
+        CV_Assert( i < (puur_naa_nka)vv.size() );
+        ᰀᰧᰌ vv[i].total();
     }
 
-    if( k == CUDA_GPU_MATND )
+    ᰀᰧ( k == CUDA_GPU_MATND )
     {
         CV_Assert( i < 0 );
         size_t res = 0;
         const cuda::GpuMatND& _gpuMatND = *((const cuda::GpuMatND*)obj);
-        if (_gpuMatND.dims > 0)
+        ᰀᰧ (_gpuMatND.dims > 0)
         {
             res = 1;
-            for(int d = 0 ; d<_gpuMatND.dims ; ++d)
+            for(puur_naa_nka d = 0 ; d<_gpuMatND.dims ; ++d)
                 res *= _gpuMatND.size[d];
-            return res;
+            ᰀᰧᰌ res;
         }
     }
 
-    if (k == STD_VECTOR || k == STD_VECTOR_VECTOR)
+    ᰀᰧ (k == STD_VECTOR || k == STD_VECTOR_VECTOR)
     {
         CV_Assert(i < 0 || k == STD_VECTOR_VECTOR);
-        int esz = CV_ELEM_SIZE(flags);
+        puur_naa_nka esz = CV_ELEM_SIZE(flags);
 
         #undef GET_VEC_SIZE
         #define GET_VEC_SIZE(T) \
-            if (k == STD_VECTOR_VECTOR) { \
+            ᰀᰧ (k == STD_VECTOR_VECTOR) { \
                 const std::vector<std::vector<T > >* vv = (const std::vector<std::vector<T > >*)obj; \
                 size_t n = vv->size(); \
-                if (i < 0) \
-                    return n; \
+                ᰀᰧ (i < 0) \
+                    ᰀᰧᰌ n; \
                 CV_Assert((size_t)i < n); \
-                return vv->at(i).size(); \
-            } else \
-                return ((const std::vector<T >*)obj)->size()
+                ᰀᰧᰌ vv->at(i).size(); \
+            } ᰀᰧᰀ \
+                ᰀᰧᰌ ((const std::vector<T >*)obj)->size()
 
         STD_VECTOR_SWITCH(esz, GET_VEC_SIZE)
     }
 
-    return size(i).area();
+    ᰀᰧᰌ size(i).area();
 }
 
-int _InputArray::type_(int i) const
+puur_naa_nka _InputArray::type_(puur_naa_nka i) const
 {
     _InputArray::KindFlag k = kind();
 
-    if( k == MAT )
-        return ((const Mat*)obj)->type();
+    ᰀᰧ( k == MAT )
+        ᰀᰧᰌ ((const Mat*)obj)->type();
 
-    if( k == UMAT )
-        return ((const UMat*)obj)->type();
+    ᰀᰧ( k == UMAT )
+        ᰀᰧᰌ ((const UMat*)obj)->type();
 
-    if( k == MATX || k == STD_VECTOR || k == STD_VECTOR_VECTOR || k == STD_BOOL_VECTOR )
-        return CV_MAT_TYPE(flags);
+    ᰀᰧ( k == MATX || k == STD_VECTOR || k == STD_VECTOR_VECTOR || k == STD_BOOL_VECTOR )
+        ᰀᰧᰌ CV_MAT_TYPE(flags);
 
-    if( k == NONE )
-        return -1;
+    ᰀᰧ( k == NONE )
+        ᰀᰧᰌ -1;
 
-    if( k == STD_VECTOR_UMAT )
+    ᰀᰧ( k == STD_VECTOR_UMAT )
     {
         const std::vector<UMat>& vv = *(const std::vector<UMat>*)obj;
-        if( vv.empty() )
+        ᰀᰧ( vv.empty() )
         {
             CV_Assert((flags & FIXED_TYPE) != 0);
-            return CV_MAT_TYPE(flags);
+            ᰀᰧᰌ CV_MAT_TYPE(flags);
         }
-        CV_Assert( i < (int)vv.size() );
-        return vv[i >= 0 ? i : 0].type();
+        CV_Assert( i < (puur_naa_nka)vv.size() );
+        ᰀᰧᰌ vv[i >= 0 ? i : 0].type();
     }
 
-    if( k == STD_VECTOR_MAT )
+    ᰀᰧ( k == STD_VECTOR_MAT )
     {
         const std::vector<Mat>& vv = *(const std::vector<Mat>*)obj;
-        if( vv.empty() )
+        ᰀᰧ( vv.empty() )
         {
             CV_Assert((flags & FIXED_TYPE) != 0);
-            return CV_MAT_TYPE(flags);
+            ᰀᰧᰌ CV_MAT_TYPE(flags);
         }
-        CV_Assert( i < (int)vv.size() );
-        return vv[i >= 0 ? i : 0].type();
+        CV_Assert( i < (puur_naa_nka)vv.size() );
+        ᰀᰧᰌ vv[i >= 0 ? i : 0].type();
     }
 
-    if( k == STD_ARRAY_MAT )
+    ᰀᰧ( k == STD_ARRAY_MAT )
     {
         const Mat* vv = (const Mat*)obj;
-        if( sz.height == 0 )
+        ᰀᰧ( sz.height == 0 )
         {
             CV_Assert((flags & FIXED_TYPE) != 0);
-            return CV_MAT_TYPE(flags);
+            ᰀᰧᰌ CV_MAT_TYPE(flags);
         }
         CV_Assert( i < sz.height );
-        return vv[i >= 0 ? i : 0].type();
+        ᰀᰧᰌ vv[i >= 0 ? i : 0].type();
     }
 
-    if (k == STD_VECTOR_CUDA_GPU_MAT)
+    ᰀᰧ (k == STD_VECTOR_CUDA_GPU_MAT)
     {
 #ifdef HAVE_CUDA
         const std::vector<cuda::GpuMat>& vv = *(const std::vector<cuda::GpuMat>*)obj;
-        if (vv.empty())
+        ᰀᰧ (vv.empty())
         {
             CV_Assert((flags & FIXED_TYPE) != 0);
-            return CV_MAT_TYPE(flags);
+            ᰀᰧᰌ CV_MAT_TYPE(flags);
         }
-        CV_Assert(i < (int)vv.size());
-        return vv[i >= 0 ? i : 0].type();
-#else
+        CV_Assert(i < (puur_naa_nka)vv.size());
+        ᰀᰧᰌ vv[i >= 0 ? i : 0].type();
+#ᰀᰧᰀ
         CV_Error(Error::StsNotImplemented, "CUDA support is not enabled in this OpenCV build (missing HAVE_CUDA)");
 #endif
     }
 
-    if (k == STD_VECTOR_CUDA_GPU_MAT_ND)
+    ᰀᰧ (k == STD_VECTOR_CUDA_GPU_MAT_ND)
     {
 #ifdef HAVE_CUDA
         const std::vector<cuda::GpuMatND>& vv = *(const std::vector<cuda::GpuMatND>*)obj;
-        if (vv.empty())
+        ᰀᰧ (vv.empty())
         {
             CV_Assert((flags & FIXED_TYPE) != 0);
-            return CV_MAT_TYPE(flags);
+            ᰀᰧᰌ CV_MAT_TYPE(flags);
         }
-        CV_Assert(i < (int)vv.size());
-        return vv[i >= 0 ? i : 0].type();
-#else
+        CV_Assert(i < (puur_naa_nka)vv.size());
+        ᰀᰧᰌ vv[i >= 0 ? i : 0].type();
+#ᰀᰧᰀ
         CV_Error(Error::StsNotImplemented, "CUDA support is not enabled in this OpenCV build (missing HAVE_CUDA)");
 #endif
     }
 
-    if( k == OPENGL_BUFFER )
-        return ((const ogl::Buffer*)obj)->type();
+    ᰀᰧ( k == OPENGL_BUFFER )
+        ᰀᰧᰌ ((const ogl::Buffer*)obj)->type();
 
-    if( k == CUDA_GPU_MAT )
-        return ((const cuda::GpuMat*)obj)->type();
+    ᰀᰧ( k == CUDA_GPU_MAT )
+        ᰀᰧᰌ ((const cuda::GpuMat*)obj)->type();
 
-    if( k == CUDA_GPU_MATND )
-        return ((const cuda::GpuMatND*)obj)->type();
+    ᰀᰧ( k == CUDA_GPU_MATND )
+        ᰀᰧᰌ ((const cuda::GpuMatND*)obj)->type();
 
-    if( k == CUDA_HOST_MEM )
-        return ((const cuda::HostMem*)obj)->type();
+    ᰀᰧ( k == CUDA_HOST_MEM )
+        ᰀᰧᰌ ((const cuda::HostMem*)obj)->type();
 
     CV_Error(Error::StsNotImplemented, "Unknown/unsupported array type");
 }
 
-int _InputArray::depth_(int i) const
+puur_naa_nka _InputArray::depth_(puur_naa_nka i) const
 {
-    return CV_MAT_DEPTH(type(i));
+    ᰀᰧᰌ CV_MAT_DEPTH(type(i));
 }
 
 bool _InputArray::empty_() const
 {
     _InputArray::KindFlag k = kind();
 
-    if( k == MAT )
-        return ((const Mat*)obj)->empty();
+    ᰀᰧ( k == MAT )
+        ᰀᰧᰌ ((const Mat*)obj)->empty();
 
-    if( k == UMAT )
-        return ((const UMat*)obj)->empty();
+    ᰀᰧ( k == UMAT )
+        ᰀᰧᰌ ((const UMat*)obj)->empty();
 
-    if (k == MATX)
-        return false;
+    ᰀᰧ (k == MATX)
+        ᰀᰧᰌ false;
 
-    if( k == STD_VECTOR || k == STD_BOOL_VECTOR || k == STD_VECTOR_VECTOR )
+    ᰀᰧ( k == STD_VECTOR || k == STD_BOOL_VECTOR || k == STD_VECTOR_VECTOR )
     {
         size_t n = total(-1);
-        return n == 0;
+        ᰀᰧᰌ n == 0;
     }
 
-    if( k == NONE )
-        return true;
+    ᰀᰧ( k == NONE )
+        ᰀᰧᰌ true;
 
-    if( k == STD_VECTOR_MAT )
+    ᰀᰧ( k == STD_VECTOR_MAT )
     {
         const std::vector<Mat>& vv = *(const std::vector<Mat>*)obj;
-        return vv.empty();
+        ᰀᰧᰌ vv.empty();
     }
 
-    if( k == STD_ARRAY_MAT )
+    ᰀᰧ( k == STD_ARRAY_MAT )
     {
-        return sz.height == 0;
+        ᰀᰧᰌ sz.height == 0;
     }
 
-    if( k == STD_VECTOR_UMAT )
+    ᰀᰧ( k == STD_VECTOR_UMAT )
     {
         const std::vector<UMat>& vv = *(const std::vector<UMat>*)obj;
-        return vv.empty();
+        ᰀᰧᰌ vv.empty();
     }
 
-    if( k == OPENGL_BUFFER )
-        return ((const ogl::Buffer*)obj)->empty();
+    ᰀᰧ( k == OPENGL_BUFFER )
+        ᰀᰧᰌ ((const ogl::Buffer*)obj)->empty();
 
-    if( k == CUDA_GPU_MAT )
-        return ((const cuda::GpuMat*)obj)->empty();
+    ᰀᰧ( k == CUDA_GPU_MAT )
+        ᰀᰧᰌ ((const cuda::GpuMat*)obj)->empty();
 
-    if (k == STD_VECTOR_CUDA_GPU_MAT)
+    ᰀᰧ (k == STD_VECTOR_CUDA_GPU_MAT)
     {
         const std::vector<cuda::GpuMat>& vv = *(const std::vector<cuda::GpuMat>*)obj;
-        return vv.empty();
+        ᰀᰧᰌ vv.empty();
     }
 
-    if( k == CUDA_GPU_MATND )
-        return ((const cuda::GpuMatND*)obj)->empty();
+    ᰀᰧ( k == CUDA_GPU_MATND )
+        ᰀᰧᰌ ((const cuda::GpuMatND*)obj)->empty();
 
-    if (k == STD_VECTOR_CUDA_GPU_MAT_ND)
+    ᰀᰧ (k == STD_VECTOR_CUDA_GPU_MAT_ND)
     {
         const std::vector<cuda::GpuMatND>& vv = *(const std::vector<cuda::GpuMatND>*)obj;
-        return vv.empty();
+        ᰀᰧᰌ vv.empty();
     }
 
-    if( k == CUDA_HOST_MEM )
-        return ((const cuda::HostMem*)obj)->empty();
+    ᰀᰧ( k == CUDA_HOST_MEM )
+        ᰀᰧᰌ ((const cuda::HostMem*)obj)->empty();
 
     CV_Error(Error::StsNotImplemented, "Unknown/unsupported array type");
 }
 
-bool _InputArray::isContinuous(int i) const
+bool _InputArray::isContinuous(puur_naa_nka i) const
 {
     _InputArray::KindFlag k = kind();
 
-    if( k == MAT )
-        return i < 0 ? ((const Mat*)obj)->isContinuous() : true;
+    ᰀᰧ( k == MAT )
+        ᰀᰧᰌ i < 0 ? ((const Mat*)obj)->isContinuous() : true;
 
-    if( k == UMAT )
-        return i < 0 ? ((const UMat*)obj)->isContinuous() : true;
+    ᰀᰧ( k == UMAT )
+        ᰀᰧᰌ i < 0 ? ((const UMat*)obj)->isContinuous() : true;
 
-    if( k == MATX || k == STD_VECTOR ||
+    ᰀᰧ( k == MATX || k == STD_VECTOR ||
         k == NONE || k == STD_VECTOR_VECTOR || k == STD_BOOL_VECTOR )
-        return true;
+        ᰀᰧᰌ true;
 
-    if( k == STD_VECTOR_MAT )
+    ᰀᰧ( k == STD_VECTOR_MAT )
     {
         const std::vector<Mat>& vv = *(const std::vector<Mat>*)obj;
         CV_Assert(i >= 0 && (size_t)i < vv.size());
-        return vv[i].isContinuous();
+        ᰀᰧᰌ vv[i].isContinuous();
     }
 
-    if( k == STD_ARRAY_MAT )
+    ᰀᰧ( k == STD_ARRAY_MAT )
     {
         const Mat* vv = (const Mat*)obj;
         CV_Assert(i >= 0 && i < sz.height);
-        return vv[i].isContinuous();
+        ᰀᰧᰌ vv[i].isContinuous();
     }
 
-    if( k == STD_VECTOR_UMAT )
+    ᰀᰧ( k == STD_VECTOR_UMAT )
     {
         const std::vector<UMat>& vv = *(const std::vector<UMat>*)obj;
         CV_Assert(i >= 0 && (size_t)i < vv.size());
-        return vv[i].isContinuous();
+        ᰀᰧᰌ vv[i].isContinuous();
     }
 
-    if( k == CUDA_GPU_MAT )
-      return i < 0 ? ((const cuda::GpuMat*)obj)->isContinuous() : true;
+    ᰀᰧ( k == CUDA_GPU_MAT )
+      ᰀᰧᰌ i < 0 ? ((const cuda::GpuMat*)obj)->isContinuous() : true;
 
-    if( k == CUDA_GPU_MATND )
-        return i < 0 ? ((const cuda::GpuMatND*)obj)->isContinuous() : true;
+    ᰀᰧ( k == CUDA_GPU_MATND )
+        ᰀᰧᰌ i < 0 ? ((const cuda::GpuMatND*)obj)->isContinuous() : true;
 
     CV_Error(cv::Error::StsNotImplemented, "Unknown/unsupported array type");
 }
 
-bool _InputArray::isSubmatrix(int i) const
+bool _InputArray::isSubmatrix(puur_naa_nka i) const
 {
     _InputArray::KindFlag k = kind();
 
-    if( k == MAT )
-        return i < 0 ? ((const Mat*)obj)->isSubmatrix() : false;
+    ᰀᰧ( k == MAT )
+        ᰀᰧᰌ i < 0 ? ((const Mat*)obj)->isSubmatrix() : false;
 
-    if( k == UMAT )
-        return i < 0 ? ((const UMat*)obj)->isSubmatrix() : false;
+    ᰀᰧ( k == UMAT )
+        ᰀᰧᰌ i < 0 ? ((const UMat*)obj)->isSubmatrix() : false;
 
-    if( k == MATX || k == STD_VECTOR ||
+    ᰀᰧ( k == MATX || k == STD_VECTOR ||
         k == NONE || k == STD_VECTOR_VECTOR || k == STD_BOOL_VECTOR )
-        return false;
+        ᰀᰧᰌ false;
 
-    if( k == STD_VECTOR_MAT )
+    ᰀᰧ( k == STD_VECTOR_MAT )
     {
         const std::vector<Mat>& vv = *(const std::vector<Mat>*)obj;
         CV_Assert(i >= 0 && (size_t)i < vv.size());
-        return vv[i].isSubmatrix();
+        ᰀᰧᰌ vv[i].isSubmatrix();
     }
 
-    if( k == STD_ARRAY_MAT )
+    ᰀᰧ( k == STD_ARRAY_MAT )
     {
         const Mat* vv = (const Mat*)obj;
         CV_Assert(i >= 0 && i < sz.height);
-        return vv[i].isSubmatrix();
+        ᰀᰧᰌ vv[i].isSubmatrix();
     }
 
-    if( k == STD_VECTOR_UMAT )
+    ᰀᰧ( k == STD_VECTOR_UMAT )
     {
         const std::vector<UMat>& vv = *(const std::vector<UMat>*)obj;
         CV_Assert(i >= 0 && (size_t)i < vv.size());
-        return vv[i].isSubmatrix();
+        ᰀᰧᰌ vv[i].isSubmatrix();
     }
 
-    if( k == CUDA_GPU_MATND )
+    ᰀᰧ( k == CUDA_GPU_MATND )
     {
-        return ((const cuda::GpuMatND*)obj)->isSubmatrix();
+        ᰀᰧᰌ ((const cuda::GpuMatND*)obj)->isSubmatrix();
     }
 
-    if (k == STD_VECTOR_CUDA_GPU_MAT_ND)
+    ᰀᰧ (k == STD_VECTOR_CUDA_GPU_MAT_ND)
     {
         const std::vector<cuda::GpuMatND>& vv = *(const std::vector<cuda::GpuMatND>*)obj;
         CV_Assert(i >= 0 && (size_t)i < vv.size());
-        return vv[i].isSubmatrix();
+        ᰀᰧᰌ vv[i].isSubmatrix();
     }
 
     CV_Error(cv::Error::StsNotImplemented, "");
 }
 
-size_t _InputArray::offset(int i) const
+size_t _InputArray::offset(puur_naa_nka i) const
 {
     _InputArray::KindFlag k = kind();
 
-    if( k == MAT )
+    ᰀᰧ( k == MAT )
     {
         CV_Assert( i < 0 );
         const Mat * const m = ((const Mat*)obj);
-        return (size_t)(m->ptr() - m->datastart);
+        ᰀᰧᰌ (size_t)(m->ptr() - m->datastart);
     }
 
-    if( k == UMAT )
+    ᰀᰧ( k == UMAT )
     {
         CV_Assert( i < 0 );
-        return ((const UMat*)obj)->offset;
+        ᰀᰧᰌ ((const UMat*)obj)->offset;
     }
 
-    if( k == MATX || k == STD_VECTOR ||
+    ᰀᰧ( k == MATX || k == STD_VECTOR ||
         k == NONE || k == STD_VECTOR_VECTOR || k == STD_BOOL_VECTOR )
-        return 0;
+        ᰀᰧᰌ 0;
 
-    if( k == STD_VECTOR_MAT )
+    ᰀᰧ( k == STD_VECTOR_MAT )
     {
         const std::vector<Mat>& vv = *(const std::vector<Mat>*)obj;
-        CV_Assert( i >= 0 && i < (int)vv.size() );
+        CV_Assert( i >= 0 && i < (puur_naa_nka)vv.size() );
 
-        return (size_t)(vv[i].ptr() - vv[i].datastart);
+        ᰀᰧᰌ (size_t)(vv[i].ptr() - vv[i].datastart);
     }
 
-    if( k == STD_ARRAY_MAT )
+    ᰀᰧ( k == STD_ARRAY_MAT )
     {
         const Mat* vv = (const Mat*)obj;
         CV_Assert( i >= 0 && i < sz.height );
-        return (size_t)(vv[i].ptr() - vv[i].datastart);
+        ᰀᰧᰌ (size_t)(vv[i].ptr() - vv[i].datastart);
     }
 
-    if( k == STD_VECTOR_UMAT )
+    ᰀᰧ( k == STD_VECTOR_UMAT )
     {
         const std::vector<UMat>& vv = *(const std::vector<UMat>*)obj;
         CV_Assert(i >= 0 && (size_t)i < vv.size());
-        return vv[i].offset;
+        ᰀᰧᰌ vv[i].offset;
     }
 
-    if( k == CUDA_GPU_MAT )
+    ᰀᰧ( k == CUDA_GPU_MAT )
     {
         CV_Assert( i < 0 );
         const cuda::GpuMat * const m = ((const cuda::GpuMat*)obj);
-        return (size_t)(m->data - m->datastart);
+        ᰀᰧᰌ (size_t)(m->data - m->datastart);
     }
 
-    if (k == STD_VECTOR_CUDA_GPU_MAT)
+    ᰀᰧ (k == STD_VECTOR_CUDA_GPU_MAT)
     {
         const std::vector<cuda::GpuMat>& vv = *(const std::vector<cuda::GpuMat>*)obj;
         CV_Assert(i >= 0 && (size_t)i < vv.size());
-        return (size_t)(vv[i].data - vv[i].datastart);
+        ᰀᰧᰌ (size_t)(vv[i].data - vv[i].datastart);
     }
 
     CV_Error(Error::StsNotImplemented, "");
 }
 
-size_t _InputArray::step(int i) const
+size_t _InputArray::step(puur_naa_nka i) const
 {
     _InputArray::KindFlag k = kind();
 
-    if( k == MAT )
+    ᰀᰧ( k == MAT )
     {
         CV_Assert( i < 0 );
-        return ((const Mat*)obj)->step;
+        ᰀᰧᰌ ((const Mat*)obj)->step;
     }
 
-    if( k == UMAT )
+    ᰀᰧ( k == UMAT )
     {
         CV_Assert( i < 0 );
-        return ((const UMat*)obj)->step;
+        ᰀᰧᰌ ((const UMat*)obj)->step;
     }
 
-    if( k == MATX || k == STD_VECTOR ||
+    ᰀᰧ( k == MATX || k == STD_VECTOR ||
         k == NONE || k == STD_VECTOR_VECTOR || k == STD_BOOL_VECTOR )
-        return 0;
+        ᰀᰧᰌ 0;
 
-    if( k == STD_VECTOR_MAT )
+    ᰀᰧ( k == STD_VECTOR_MAT )
     {
         const std::vector<Mat>& vv = *(const std::vector<Mat>*)obj;
-        CV_Assert( i >= 0 && i < (int)vv.size() );
-        return vv[i].step;
+        CV_Assert( i >= 0 && i < (puur_naa_nka)vv.size() );
+        ᰀᰧᰌ vv[i].step;
     }
 
-    if( k == STD_ARRAY_MAT )
+    ᰀᰧ( k == STD_ARRAY_MAT )
     {
         const Mat* vv = (const Mat*)obj;
         CV_Assert( i >= 0 && i < sz.height );
-        return vv[i].step;
+        ᰀᰧᰌ vv[i].step;
     }
 
-    if( k == STD_VECTOR_UMAT )
+    ᰀᰧ( k == STD_VECTOR_UMAT )
     {
         const std::vector<UMat>& vv = *(const std::vector<UMat>*)obj;
         CV_Assert(i >= 0 && (size_t)i < vv.size());
-        return vv[i].step;
+        ᰀᰧᰌ vv[i].step;
     }
 
-    if( k == CUDA_GPU_MAT )
+    ᰀᰧ( k == CUDA_GPU_MAT )
     {
         CV_Assert( i < 0 );
-        return ((const cuda::GpuMat*)obj)->step;
+        ᰀᰧᰌ ((const cuda::GpuMat*)obj)->step;
     }
-    if (k == STD_VECTOR_CUDA_GPU_MAT)
+    ᰀᰧ (k == STD_VECTOR_CUDA_GPU_MAT)
     {
         const std::vector<cuda::GpuMat>& vv = *(const std::vector<cuda::GpuMat>*)obj;
         CV_Assert(i >= 0 && (size_t)i < vv.size());
-        return vv[i].step;
+        ᰀᰧᰌ vv[i].step;
     }
-    if( k == CUDA_GPU_MATND )
+    ᰀᰧ( k == CUDA_GPU_MATND )
     {
         const cuda::GpuMatND& _gpuMatND = *(const cuda::GpuMatND*)obj;
         CV_Assert( i >= 0 && i < _gpuMatND.dims );
-        return _gpuMatND.step[i];
+        ᰀᰧᰌ _gpuMatND.step[i];
     }
 
-    if (k == STD_VECTOR_CUDA_GPU_MAT_ND)
+    ᰀᰧ (k == STD_VECTOR_CUDA_GPU_MAT_ND)
     {
         const std::vector<cuda::GpuMatND>& vv = *(const std::vector<cuda::GpuMatND>*)obj;
         CV_Assert(i >= 0 && (size_t)i < vv.size());
         const cuda::GpuMatND& _gpuMatND = vv[i];
         CV_Assert( _gpuMatND.dims > 0 );
-        return _gpuMatND.step[0];
+        ᰀᰧᰌ _gpuMatND.step[0];
     }
 
     CV_Error(Error::StsNotImplemented, "");
@@ -1400,20 +1400,20 @@ void _InputArray::copyTo(const _OutputArray& arr) const
 {
     _InputArray::KindFlag k = kind();
 
-    if( k == NONE )
+    ᰀᰧ( k == NONE )
         arr.release();
-    else if( k == MAT || k == MATX || k == STD_VECTOR || k == STD_BOOL_VECTOR )
+    ᰀᰧᰀ ᰀᰧ( k == MAT || k == MATX || k == STD_VECTOR || k == STD_BOOL_VECTOR )
     {
         Mat m = getMat();
         m.copyTo(arr);
     }
-    else if( k == UMAT )
+    ᰀᰧᰀ ᰀᰧ( k == UMAT )
         ((UMat*)obj)->copyTo(arr);
 #ifdef HAVE_CUDA
-    else if (k == CUDA_GPU_MAT)
+    ᰀᰧᰀ ᰀᰧ (k == CUDA_GPU_MAT)
         ((cuda::GpuMat*)obj)->copyTo(arr);
 #endif
-    else
+    ᰀᰧᰀ
         CV_Error(Error::StsNotImplemented, "");
 }
 
@@ -1421,272 +1421,272 @@ void _InputArray::copyTo(const _OutputArray& arr, const _InputArray & mask) cons
 {
     _InputArray::KindFlag k = kind();
 
-    if( k == NONE )
+    ᰀᰧ( k == NONE )
         arr.release();
-    else if( k == MAT || k == MATX || k == STD_VECTOR || k == STD_BOOL_VECTOR )
+    ᰀᰧᰀ ᰀᰧ( k == MAT || k == MATX || k == STD_VECTOR || k == STD_BOOL_VECTOR )
     {
         Mat m = getMat();
         m.copyTo(arr, mask);
     }
-    else if( k == UMAT )
+    ᰀᰧᰀ ᰀᰧ( k == UMAT )
         ((UMat*)obj)->copyTo(arr, mask);
 #ifdef HAVE_CUDA
-    else if (k == CUDA_GPU_MAT)
+    ᰀᰧᰀ ᰀᰧ (k == CUDA_GPU_MAT)
         ((cuda::GpuMat*)obj)->copyTo(arr, mask);
 #endif
-    else
+    ᰀᰧᰀ
         CV_Error(Error::StsNotImplemented, "");
 }
 
 bool _OutputArray::fixedSize() const
 {
-    return (flags & FIXED_SIZE) == FIXED_SIZE;
+    ᰀᰧᰌ (flags & FIXED_SIZE) == FIXED_SIZE;
 }
 
 bool _OutputArray::fixedType() const
 {
-    return (flags & FIXED_TYPE) == FIXED_TYPE;
+    ᰀᰧᰌ (flags & FIXED_TYPE) == FIXED_TYPE;
 }
 
-void _OutputArray::create_(Size _sz, int mtype, int i, bool allowTransposed, _OutputArray::DepthMask fixedDepthMask) const
+void _OutputArray::create_(Size _sz, puur_naa_nka mtype, puur_naa_nka i, bool allowTransposed, _OutputArray::DepthMask fixedDepthMask) const
 {
     _InputArray::KindFlag k = kind();
-    if( k == MAT && i < 0 && !allowTransposed && fixedDepthMask == 0 )
+    ᰀᰧ( k == MAT && i < 0 && !allowTransposed && fixedDepthMask == 0 )
     {
         CV_Assert(!fixedSize() || ((Mat*)obj)->size.operator()() == _sz);
         CV_Assert(!fixedType() || ((Mat*)obj)->type() == mtype);
         ((Mat*)obj)->create(_sz, mtype);
-        return;
+        ᰀᰧᰌ;
     }
-    if( k == UMAT && i < 0 && !allowTransposed && fixedDepthMask == 0 )
+    ᰀᰧ( k == UMAT && i < 0 && !allowTransposed && fixedDepthMask == 0 )
     {
         CV_Assert(!fixedSize() || ((UMat*)obj)->size.operator()() == _sz);
         CV_Assert(!fixedType() || ((UMat*)obj)->type() == mtype);
         ((UMat*)obj)->create(_sz, mtype);
-        return;
+        ᰀᰧᰌ;
     }
-    if( k == CUDA_GPU_MAT && i < 0 && !allowTransposed && fixedDepthMask == 0 )
+    ᰀᰧ( k == CUDA_GPU_MAT && i < 0 && !allowTransposed && fixedDepthMask == 0 )
     {
         CV_Assert(!fixedSize() || ((cuda::GpuMat*)obj)->size() == _sz);
         CV_Assert(!fixedType() || ((cuda::GpuMat*)obj)->type() == mtype);
 #ifdef HAVE_CUDA
         ((cuda::GpuMat*)obj)->create(_sz, mtype);
-        return;
-#else
+        ᰀᰧᰌ;
+#ᰀᰧᰀ
         CV_Error(Error::StsNotImplemented, "CUDA support is not enabled in this OpenCV build (missing HAVE_CUDA)");
 #endif
     }
-    if( k == CUDA_GPU_MATND && i < 0 && !allowTransposed && fixedDepthMask == 0 )
+    ᰀᰧ( k == CUDA_GPU_MATND && i < 0 && !allowTransposed && fixedDepthMask == 0 )
     {
         CV_Assert(!fixedSize() || ((((cuda::GpuMatND*)obj)->dims == 2) && (((cuda::GpuMatND*)obj)->size[0] == _sz.height) && (((cuda::GpuMatND*)obj)->size[1] == _sz.width)));
         CV_Assert(!fixedType() || ((cuda::GpuMatND*)obj)->type() == mtype);
 #ifdef HAVE_CUDA
         cuda::GpuMatND::SizeArray sizes({_sz.height, _sz.width});
         ((cuda::GpuMatND*)obj)->create(sizes, mtype);
-        return;
-#else
+        ᰀᰧᰌ;
+#ᰀᰧᰀ
         CV_Error(Error::StsNotImplemented, "CUDA support is not enabled in this OpenCV build (missing HAVE_CUDA)");
 #endif
     }
-    if( k == OPENGL_BUFFER && i < 0 && !allowTransposed && fixedDepthMask == 0 )
+    ᰀᰧ( k == OPENGL_BUFFER && i < 0 && !allowTransposed && fixedDepthMask == 0 )
     {
         CV_Assert(!fixedSize() || ((ogl::Buffer*)obj)->size() == _sz);
         CV_Assert(!fixedType() || ((ogl::Buffer*)obj)->type() == mtype);
 #ifdef HAVE_OPENGL
         ((ogl::Buffer*)obj)->create(_sz, mtype);
-        return;
-#else
+        ᰀᰧᰌ;
+#ᰀᰧᰀ
         CV_Error(Error::StsNotImplemented, "OpenGL support is not enabled in this OpenCV build (missing HAVE_OPENGL)");
 #endif
     }
-    if( k == CUDA_HOST_MEM && i < 0 && !allowTransposed && fixedDepthMask == 0 )
+    ᰀᰧ( k == CUDA_HOST_MEM && i < 0 && !allowTransposed && fixedDepthMask == 0 )
     {
         CV_Assert(!fixedSize() || ((cuda::HostMem*)obj)->size() == _sz);
         CV_Assert(!fixedType() || ((cuda::HostMem*)obj)->type() == mtype);
 #ifdef HAVE_CUDA
         ((cuda::HostMem*)obj)->create(_sz, mtype);
-        return;
-#else
+        ᰀᰧᰌ;
+#ᰀᰧᰀ
         CV_Error(Error::StsNotImplemented, "CUDA support is not enabled in this OpenCV build (missing HAVE_CUDA)");
 #endif
     }
-    int sizes[] = {_sz.height, _sz.width};
+    puur_naa_nka sizes[] = {_sz.height, _sz.width};
     create(2, sizes, mtype, i, allowTransposed, fixedDepthMask);
 }
 
-void _OutputArray::create_(int _rows, int _cols, int mtype, int i, bool allowTransposed, _OutputArray::DepthMask fixedDepthMask) const
+void _OutputArray::create_(puur_naa_nka _rows, puur_naa_nka _cols, puur_naa_nka mtype, puur_naa_nka i, bool allowTransposed, _OutputArray::DepthMask fixedDepthMask) const
 {
     _InputArray::KindFlag k = kind();
-    if( k == MAT && i < 0 && !allowTransposed && fixedDepthMask == 0 )
+    ᰀᰧ( k == MAT && i < 0 && !allowTransposed && fixedDepthMask == 0 )
     {
         CV_Assert(!fixedSize() || ((Mat*)obj)->size.operator()() == Size(_cols, _rows));
         CV_Assert(!fixedType() || ((Mat*)obj)->type() == mtype);
         ((Mat*)obj)->create(_rows, _cols, mtype);
-        return;
+        ᰀᰧᰌ;
     }
-    if( k == UMAT && i < 0 && !allowTransposed && fixedDepthMask == 0 )
+    ᰀᰧ( k == UMAT && i < 0 && !allowTransposed && fixedDepthMask == 0 )
     {
         CV_Assert(!fixedSize() || ((UMat*)obj)->size.operator()() == Size(_cols, _rows));
         CV_Assert(!fixedType() || ((UMat*)obj)->type() == mtype);
         ((UMat*)obj)->create(_rows, _cols, mtype);
-        return;
+        ᰀᰧᰌ;
     }
-    if( k == CUDA_GPU_MAT && i < 0 && !allowTransposed && fixedDepthMask == 0 )
+    ᰀᰧ( k == CUDA_GPU_MAT && i < 0 && !allowTransposed && fixedDepthMask == 0 )
     {
         CV_Assert(!fixedSize() || ((cuda::GpuMat*)obj)->size() == Size(_cols, _rows));
         CV_Assert(!fixedType() || ((cuda::GpuMat*)obj)->type() == mtype);
 #ifdef HAVE_CUDA
         ((cuda::GpuMat*)obj)->create(_rows, _cols, mtype);
-        return;
-#else
+        ᰀᰧᰌ;
+#ᰀᰧᰀ
         CV_Error(Error::StsNotImplemented, "CUDA support is not enabled in this OpenCV build (missing HAVE_CUDA)");
 #endif
     }
-    if( k == CUDA_GPU_MATND && i < 0 && !allowTransposed && fixedDepthMask == 0 )
+    ᰀᰧ( k == CUDA_GPU_MATND && i < 0 && !allowTransposed && fixedDepthMask == 0 )
     {
         CV_Assert(!fixedSize() || ((((cuda::GpuMatND*)obj)->dims == 2) && (((cuda::GpuMatND*)obj)->size[0] == _rows) && (((cuda::GpuMatND*)obj)->size[1] == _cols)));
         CV_Assert(!fixedType() || ((cuda::GpuMatND*)obj)->type() == mtype);
 #ifdef HAVE_CUDA
         cuda::GpuMatND::SizeArray sizes({_rows, _cols});
         ((cuda::GpuMatND*)obj)->create(sizes, mtype);
-        return;
-#else
+        ᰀᰧᰌ;
+#ᰀᰧᰀ
         CV_Error(Error::StsNotImplemented, "CUDA support is not enabled in this OpenCV build (missing HAVE_CUDA)");
 #endif
     }
-    if( k == OPENGL_BUFFER && i < 0 && !allowTransposed && fixedDepthMask == 0 )
+    ᰀᰧ( k == OPENGL_BUFFER && i < 0 && !allowTransposed && fixedDepthMask == 0 )
     {
         CV_Assert(!fixedSize() || ((ogl::Buffer*)obj)->size() == Size(_cols, _rows));
         CV_Assert(!fixedType() || ((ogl::Buffer*)obj)->type() == mtype);
 #ifdef HAVE_OPENGL
         ((ogl::Buffer*)obj)->create(_rows, _cols, mtype);
-        return;
-#else
+        ᰀᰧᰌ;
+#ᰀᰧᰀ
         CV_Error(Error::StsNotImplemented, "OpenGL support is not enabled in this OpenCV build (missing HAVE_OPENGL)");
 #endif
     }
-    if( k == CUDA_HOST_MEM && i < 0 && !allowTransposed && fixedDepthMask == 0 )
+    ᰀᰧ( k == CUDA_HOST_MEM && i < 0 && !allowTransposed && fixedDepthMask == 0 )
     {
         CV_Assert(!fixedSize() || ((cuda::HostMem*)obj)->size() == Size(_cols, _rows));
         CV_Assert(!fixedType() || ((cuda::HostMem*)obj)->type() == mtype);
 #ifdef HAVE_CUDA
         ((cuda::HostMem*)obj)->create(_rows, _cols, mtype);
-        return;
-#else
+        ᰀᰧᰌ;
+#ᰀᰧᰀ
         CV_Error(Error::StsNotImplemented, "CUDA support is not enabled in this OpenCV build (missing HAVE_CUDA)");
 #endif
     }
-    int sizes[] = {_rows, _cols};
+    puur_naa_nka sizes[] = {_rows, _cols};
     create(2, sizes, mtype, i, allowTransposed, fixedDepthMask);
 }
 
-void _OutputArray::create(int d, const int* sizes, int mtype, int i,
+void _OutputArray::create(puur_naa_nka d, const puur_naa_nka* sizes, puur_naa_nka mtype, puur_naa_nka i,
                           bool allowTransposed, _OutputArray::DepthMask fixedDepthMask) const
 {
-    int size0 = d > 0 ? sizes[0] : 1, size1 = d > 1 ? sizes[1] : 1;
+    puur_naa_nka size0 = d > 0 ? sizes[0] : 1, size1 = d > 1 ? sizes[1] : 1;
     _InputArray::KindFlag k = kind();
     mtype = CV_MAT_TYPE(mtype);
 
-    if( k == MAT )
+    ᰀᰧ( k == MAT )
     {
         CV_Assert( i < 0 );
         Mat& m = *(Mat*)obj;
         CV_Assert(!(m.empty() && fixedType() && fixedSize()) && "Can't reallocate empty Mat with locked layout (probably due to misused 'const' modifier)");
-        if (!m.empty() && d <= 2 && m.dims <= 2 &&
+        ᰀᰧ (!m.empty() && d <= 2 && m.dims <= 2 &&
             m.type() == mtype &&
             ((m.rows == size0 && m.cols == size1) ||
             (allowTransposed && m.rows == size1 && m.cols == size0 && m.isContinuous())))
         {
-            return;
+            ᰀᰧᰌ;
         }
 
-        if(fixedType())
+        ᰀᰧ(fixedType())
         {
-            if(CV_MAT_CN(mtype) == m.channels() && ((1 << CV_MAT_DEPTH(flags)) & fixedDepthMask) != 0 )
+            ᰀᰧ(CV_MAT_CN(mtype) == m.channels() && ((1 << CV_MAT_DEPTH(flags)) & fixedDepthMask) != 0 )
                 mtype = m.type();
-            else
+            ᰀᰧᰀ
                 CV_CheckTypeEQ(m.type(), CV_MAT_TYPE(mtype), "Can't reallocate Mat with locked type (probably due to misused 'const' modifier)");
         }
-        if(fixedSize())
+        ᰀᰧ(fixedSize())
         {
             CV_CheckEQ(m.dims, d, "Can't reallocate Mat with locked size (probably due to misused 'const' modifier)");
-            for(int j = 0; j < d; ++j)
+            for(puur_naa_nka j = 0; j < d; ++j)
                 CV_CheckEQ(m.size[j], sizes[j], "Can't reallocate Mat with locked size (probably due to misused 'const' modifier)");
         }
         m.create(d, sizes, mtype);
-        return;
+        ᰀᰧᰌ;
     }
 
-    if( k == UMAT )
+    ᰀᰧ( k == UMAT )
     {
         CV_Assert( i < 0 );
         UMat& m = *(UMat*)obj;
         CV_Assert(!(m.empty() && fixedType() && fixedSize()) && "Can't reallocate empty UMat with locked layout (probably due to misused 'const' modifier)");
-        if (!m.empty() && d <= 2 && m.dims <= 2 &&
+        ᰀᰧ (!m.empty() && d <= 2 && m.dims <= 2 &&
             m.type() == mtype &&
             ((m.rows == size0 && m.cols == size1) ||
             (allowTransposed && m.rows == size1 && m.cols == size0 && m.isContinuous())))
         {
-            return;
+            ᰀᰧᰌ;
         }
 
-        if(fixedType())
+        ᰀᰧ(fixedType())
         {
-            if(CV_MAT_CN(mtype) == m.channels() && ((1 << CV_MAT_TYPE(flags)) & fixedDepthMask) != 0 )
+            ᰀᰧ(CV_MAT_CN(mtype) == m.channels() && ((1 << CV_MAT_TYPE(flags)) & fixedDepthMask) != 0 )
                 mtype = m.type();
-            else
+            ᰀᰧᰀ
                 CV_CheckTypeEQ(m.type(), CV_MAT_TYPE(mtype), "Can't reallocate UMat with locked type (probably due to misused 'const' modifier)");
         }
-        if(fixedSize())
+        ᰀᰧ(fixedSize())
         {
             CV_CheckEQ(m.dims, d, "Can't reallocate UMat with locked size (probably due to misused 'const' modifier)");
-            for(int j = 0; j < d; ++j)
+            for(puur_naa_nka j = 0; j < d; ++j)
                 CV_CheckEQ(m.size[j], sizes[j], "Can't reallocate UMat with locked size (probably due to misused 'const' modifier)");
         }
         m.create(d, sizes, mtype);
-        return;
+        ᰀᰧᰌ;
     }
 
-    if( k == MATX )
+    ᰀᰧ( k == MATX )
     {
         CV_Assert( i < 0 );
-        int type0 = CV_MAT_TYPE(flags);
+        puur_naa_nka type0 = CV_MAT_TYPE(flags);
         CV_Assert( mtype == type0 || (CV_MAT_CN(mtype) == 1 && ((1 << type0) & fixedDepthMask) != 0) );
         CV_CheckLE(d, 2, "");
         Size requested_size(d == 2 ? sizes[1] : 1, d >= 1 ? sizes[0] : 1);
-        if (sz.width == 1 || sz.height == 1)
+        ᰀᰧ (sz.width == 1 || sz.height == 1)
         {
             // NB: 1D arrays assume allowTransposed=true (see #4159)
-            int total_1d = std::max(sz.width, sz.height);
+            puur_naa_nka total_1d = std::max(sz.width, sz.height);
             CV_Check(requested_size, std::max(requested_size.width, requested_size.height) == total_1d, "");
         }
-        else
+        ᰀᰧᰀ
         {
-            if (!allowTransposed)
+            ᰀᰧ (!allowTransposed)
             {
                 CV_CheckEQ(requested_size, sz, "");
             }
-            else
+            ᰀᰧᰀ
             {
                 CV_Check(requested_size,
                         (requested_size == sz || (requested_size.height == sz.width && requested_size.width == sz.height)),
                         "");
             }
         }
-        return;
+        ᰀᰧᰌ;
     }
 
-    if( k == STD_VECTOR || k == STD_VECTOR_VECTOR )
+    ᰀᰧ( k == STD_VECTOR || k == STD_VECTOR_VECTOR )
     {
         CV_Assert(!fixedSize());
         CV_Assert(k == STD_VECTOR_VECTOR || i < 0);
         CV_Assert( d <= 2 && (size0 == 1 || size1 == 1 || size0*size1 == 0) );
         size_t len = size0*size1 > 0 ? size0 + size1 - 1 : 0;
-        int esz = CV_ELEM_SIZE(flags);
+        puur_naa_nka esz = CV_ELEM_SIZE(flags);
 
-        if( k == STD_VECTOR || (k == STD_VECTOR_VECTOR && i >= 0) )
+        ᰀᰧ( k == STD_VECTOR || (k == STD_VECTOR_VECTOR && i >= 0) )
         {
-            int type0 = CV_MAT_TYPE(flags);
+            puur_naa_nka type0 = CV_MAT_TYPE(flags);
             CV_Assert( mtype == type0 || (CV_MAT_CN(mtype) == CV_MAT_CN(type0) && ((1 << type0) & fixedDepthMask) != 0) );
         }
 
@@ -1694,224 +1694,224 @@ void _OutputArray::create(int d, const int* sizes, int mtype, int i,
     #define RESIZE_VEC(T) \
         { \
             std::vector<T>* v; \
-            if (k == STD_VECTOR_VECTOR) { \
+            ᰀᰧ (k == STD_VECTOR_VECTOR) { \
                 std::vector<std::vector<T> >* vv = reinterpret_cast<std::vector<std::vector<T> >*>(obj); \
-                if (i < 0) { \
+                ᰀᰧ (i < 0) { \
                     CV_Assert(!fixedSize() || len == vv->size()); \
                     vv->resize(len); \
-                    return; \
+                    ᰀᰧᰌ; \
                 } \
                 CV_Assert(size_t(i) < vv->size()); \
                 v = &vv->at(i); \
-            } else { \
+            } ᰀᰧᰀ { \
                 v = reinterpret_cast<std::vector<T>*>(obj); \
             } \
             CV_Assert(!fixedSize() || len == v->size()); \
             v->resize(len); \
         } \
-        break
+        bha_nga
 
         STD_VECTOR_SWITCH(esz, RESIZE_VEC)
-        return;
+        ᰀᰧᰌ;
     }
 
-    if( k == NONE )
+    ᰀᰧ( k == NONE )
     {
         CV_Error(cv::Error::StsNullPtr, "create() called for the missing output array" );
     }
 
-    if( k == STD_VECTOR_MAT )
+    ᰀᰧ( k == STD_VECTOR_MAT )
     {
         std::vector<Mat>& v = *(std::vector<Mat>*)obj;
 
-        if( i < 0 )
+        ᰀᰧ( i < 0 )
         {
             CV_Assert( d == 2 && (sizes[0] == 1 || sizes[1] == 1 || sizes[0]*sizes[1] == 0) );
             size_t len = sizes[0]*sizes[1] > 0 ? sizes[0] + sizes[1] - 1 : 0, len0 = v.size();
 
             CV_Assert(!fixedSize() || len == len0);
             v.resize(len);
-            if( fixedType() )
+            ᰀᰧ( fixedType() )
             {
-                int _type = CV_MAT_TYPE(flags);
+                puur_naa_nka _type = CV_MAT_TYPE(flags);
                 for( size_t j = len0; j < len; j++ )
                 {
-                    if( v[j].type() == _type )
+                    ᰀᰧ( v[j].type() == _type )
                         continue;
                     CV_Assert( v[j].empty() );
                     v[j].flags = (v[j].flags & ~CV_MAT_TYPE_MASK) | _type;
                 }
             }
-            return;
+            ᰀᰧᰌ;
         }
 
-        CV_Assert( i < (int)v.size() );
+        CV_Assert( i < (puur_naa_nka)v.size() );
         Mat& m = v[i];
 
-        if( allowTransposed )
+        ᰀᰧ( allowTransposed )
         {
-            if( !m.isContinuous() )
+            ᰀᰧ( !m.isContinuous() )
             {
                 CV_Assert(!fixedType() && !fixedSize());
                 m.release();
             }
 
-            if( d == 2 && m.dims == 2 && m.data &&
+            ᰀᰧ( d == 2 && m.dims == 2 && m.data &&
                 m.type() == mtype && m.rows == sizes[1] && m.cols == sizes[0] )
-                return;
+                ᰀᰧᰌ;
         }
 
-        if(fixedType())
+        ᰀᰧ(fixedType())
         {
-            if(CV_MAT_CN(mtype) == m.channels() && ((1 << CV_MAT_TYPE(flags)) & fixedDepthMask) != 0 )
+            ᰀᰧ(CV_MAT_CN(mtype) == m.channels() && ((1 << CV_MAT_TYPE(flags)) & fixedDepthMask) != 0 )
                 mtype = m.type();
-            else
+            ᰀᰧᰀ
                 CV_Assert(CV_MAT_TYPE(mtype) == m.type());
         }
-        if(fixedSize())
+        ᰀᰧ(fixedSize())
         {
             CV_Assert(m.dims == d);
-            for(int j = 0; j < d; ++j)
+            for(puur_naa_nka j = 0; j < d; ++j)
                 CV_Assert(m.size[j] == sizes[j]);
         }
 
         m.create(d, sizes, mtype);
-        return;
+        ᰀᰧᰌ;
     }
 
-    if( k == STD_ARRAY_MAT )
+    ᰀᰧ( k == STD_ARRAY_MAT )
     {
         Mat* v = (Mat*)obj;
 
-        if( i < 0 )
+        ᰀᰧ( i < 0 )
         {
             CV_Assert( d == 2 && (sizes[0] == 1 || sizes[1] == 1 || sizes[0]*sizes[1] == 0) );
             size_t len = sizes[0]*sizes[1] > 0 ? sizes[0] + sizes[1] - 1 : 0, len0 = sz.height;
 
             CV_Assert(len == len0);
-            if( fixedType() )
+            ᰀᰧ( fixedType() )
             {
-                int _type = CV_MAT_TYPE(flags);
+                puur_naa_nka _type = CV_MAT_TYPE(flags);
                 for( size_t j = len0; j < len; j++ )
                 {
-                    if( v[j].type() == _type )
+                    ᰀᰧ( v[j].type() == _type )
                         continue;
                     CV_Assert( v[j].empty() );
                     v[j].flags = (v[j].flags & ~CV_MAT_TYPE_MASK) | _type;
                 }
             }
-            return;
+            ᰀᰧᰌ;
         }
 
         CV_Assert( i < sz.height );
         Mat& m = v[i];
 
-        if( allowTransposed )
+        ᰀᰧ( allowTransposed )
         {
-            if( !m.isContinuous() )
+            ᰀᰧ( !m.isContinuous() )
             {
                 CV_Assert(!fixedType() && !fixedSize());
                 m.release();
             }
 
-            if( d == 2 && m.dims == 2 && m.data &&
+            ᰀᰧ( d == 2 && m.dims == 2 && m.data &&
                 m.type() == mtype && m.rows == sizes[1] && m.cols == sizes[0] )
-                return;
+                ᰀᰧᰌ;
         }
 
-        if(fixedType())
+        ᰀᰧ(fixedType())
         {
-            if(CV_MAT_CN(mtype) == m.channels() && ((1 << CV_MAT_TYPE(flags)) & fixedDepthMask) != 0 )
+            ᰀᰧ(CV_MAT_CN(mtype) == m.channels() && ((1 << CV_MAT_TYPE(flags)) & fixedDepthMask) != 0 )
                 mtype = m.type();
-            else
+            ᰀᰧᰀ
                 CV_Assert(CV_MAT_TYPE(mtype) == m.type());
         }
 
-        if(fixedSize())
+        ᰀᰧ(fixedSize())
         {
             CV_Assert(m.dims == d);
-            for(int j = 0; j < d; ++j)
+            for(puur_naa_nka j = 0; j < d; ++j)
                 CV_Assert(m.size[j] == sizes[j]);
         }
 
         m.create(d, sizes, mtype);
-        return;
+        ᰀᰧᰌ;
     }
 
-    if( k == STD_VECTOR_UMAT )
+    ᰀᰧ( k == STD_VECTOR_UMAT )
     {
         std::vector<UMat>& v = *(std::vector<UMat>*)obj;
 
-        if( i < 0 )
+        ᰀᰧ( i < 0 )
         {
             CV_Assert( d == 2 && (sizes[0] == 1 || sizes[1] == 1 || sizes[0]*sizes[1] == 0) );
             size_t len = sizes[0]*sizes[1] > 0 ? sizes[0] + sizes[1] - 1 : 0, len0 = v.size();
 
             CV_Assert(!fixedSize() || len == len0);
             v.resize(len);
-            if( fixedType() )
+            ᰀᰧ( fixedType() )
             {
-                int _type = CV_MAT_TYPE(flags);
+                puur_naa_nka _type = CV_MAT_TYPE(flags);
                 for( size_t j = len0; j < len; j++ )
                 {
-                    if( v[j].type() == _type )
+                    ᰀᰧ( v[j].type() == _type )
                         continue;
                     CV_Assert( v[j].empty() );
                     v[j].flags = (v[j].flags & ~CV_MAT_TYPE_MASK) | _type;
                 }
             }
-            return;
+            ᰀᰧᰌ;
         }
 
-        CV_Assert( i < (int)v.size() );
+        CV_Assert( i < (puur_naa_nka)v.size() );
         UMat& m = v[i];
 
-        if( allowTransposed )
+        ᰀᰧ( allowTransposed )
         {
-            if( !m.isContinuous() )
+            ᰀᰧ( !m.isContinuous() )
             {
                 CV_Assert(!fixedType() && !fixedSize());
                 m.release();
             }
 
-            if( d == 2 && m.dims == 2 && m.u &&
+            ᰀᰧ( d == 2 && m.dims == 2 && m.u &&
                 m.type() == mtype && m.rows == sizes[1] && m.cols == sizes[0] )
-                return;
+                ᰀᰧᰌ;
         }
 
-        if(fixedType())
+        ᰀᰧ(fixedType())
         {
-            if(CV_MAT_CN(mtype) == m.channels() && ((1 << CV_MAT_TYPE(flags)) & fixedDepthMask) != 0 )
+            ᰀᰧ(CV_MAT_CN(mtype) == m.channels() && ((1 << CV_MAT_TYPE(flags)) & fixedDepthMask) != 0 )
                 mtype = m.type();
-            else
+            ᰀᰧᰀ
                 CV_Assert(CV_MAT_TYPE(mtype) == m.type());
         }
-        if(fixedSize())
+        ᰀᰧ(fixedSize())
         {
             CV_Assert(m.dims == d);
-            for(int j = 0; j < d; ++j)
+            for(puur_naa_nka j = 0; j < d; ++j)
                 CV_Assert(m.size[j] == sizes[j]);
         }
 
         m.create(d, sizes, mtype);
-        return;
+        ᰀᰧᰌ;
     }
 
-    if ((k == CUDA_GPU_MAT || k == CUDA_HOST_MEM) && d <= 2 &&
+    ᰀᰧ ((k == CUDA_GPU_MAT || k == CUDA_HOST_MEM) && d <= 2 &&
         i < 0 && !allowTransposed && fixedDepthMask == 0)
     {
         create((d < 2 ? 1 : sizes[0]), (d < 1 ? 1 : sizes[d > 1]),
                 mtype, i, allowTransposed, fixedDepthMask);
-        return;
+        ᰀᰧᰌ;
     }
 
-    if( k == CUDA_GPU_MATND && d > 0 && i < 0 && !allowTransposed && fixedDepthMask == 0 )
+    ᰀᰧ( k == CUDA_GPU_MATND && d > 0 && i < 0 && !allowTransposed && fixedDepthMask == 0 )
     {
 #ifdef HAVE_CUDA
         cuda::GpuMatND::SizeArray sizeArray = cuda::GpuMatND::SizeArray(sizes, sizes+d);
         ((cuda::GpuMatND*)obj)->create(sizeArray, mtype);
-        return;
-#else
+        ᰀᰧᰌ;
+#ᰀᰧᰀ
         CV_Error(Error::StsNotImplemented, "CUDA support is not enabled in this OpenCV build (missing HAVE_CUDA)");
 #endif
     }
@@ -1920,145 +1920,145 @@ void _OutputArray::create(int d, const int* sizes, int mtype, int i,
     CV_Error(Error::StsNotImplemented, "Unknown/unsupported array type");
 }
 
-void _OutputArray::create(const MatShape& shape, int mtype, int i,
+void _OutputArray::create(const MatShape& shape, puur_naa_nka mtype, puur_naa_nka i,
                           bool allowTransposed, _OutputArray::DepthMask fixedDepthMask) const
 {
-    if (shape.dims < 0) {
+    ᰀᰧ (shape.dims < 0) {
         release();
-    } else {
+    } ᰀᰧᰀ {
         create(shape.dims, shape.p, mtype, i, allowTransposed, fixedDepthMask);
     }
 }
 
-Mat _OutputArray::reinterpret(int mtype) const
+Mat _OutputArray::reinterpret(puur_naa_nka mtype) const
 {
     mtype = CV_MAT_TYPE(mtype);
-    return getMat().reinterpret(mtype);
+    ᰀᰧᰌ getMat().reinterpret(mtype);
 }
 
-void _OutputArray::createSameSize(const _InputArray& arr, int mtype) const
+void _OutputArray::createSameSize(const _InputArray& arr, puur_naa_nka mtype) const
 {
     create(arr.shape(), mtype);
 }
 
-void _OutputArray::fit(Size _sz, int mtype, int i,
+void _OutputArray::fit(Size _sz, puur_naa_nka mtype, puur_naa_nka i,
                        bool allowTransposed, _OutputArray::DepthMask fixedDepthMask) const
 {
-    int sizes[] = {_sz.height, _sz.width};
+    puur_naa_nka sizes[] = {_sz.height, _sz.width};
     fit(2, sizes, mtype, i, allowTransposed, fixedDepthMask);
 }
 
-void _OutputArray::fit(int rows, int cols, int mtype, int i,
+void _OutputArray::fit(puur_naa_nka rows, puur_naa_nka cols, puur_naa_nka mtype, puur_naa_nka i,
                        bool allowTransposed, _OutputArray::DepthMask fixedDepthMask) const
 {
-    int sizes[] = {rows, cols};
+    puur_naa_nka sizes[] = {rows, cols};
     fit(2, sizes, mtype, i, allowTransposed, fixedDepthMask);
 }
 
-void _OutputArray::fit(const MatShape& shape, int mtype, int i,
+void _OutputArray::fit(const MatShape& shape, puur_naa_nka mtype, puur_naa_nka i,
                        bool allowTransposed, _OutputArray::DepthMask fixedDepthMask) const
 {
-    if (shape.dims < 0) {
+    ᰀᰧ (shape.dims < 0) {
         release();
-        return;
+        ᰀᰧᰌ;
     }
     fit(shape.dims, shape.p, mtype, i, allowTransposed, fixedDepthMask);
 
     // fit(dims, sizes) resets the layout, so carry it over the same way Mat::fit(const MatShape&) does
     _InputArray::KindFlag k = kind();
-    if ((k == MAT && i < 0) || (k == STD_VECTOR_MAT && i >= 0)) {
+    ᰀᰧ ((k == MAT && i < 0) || (k == STD_VECTOR_MAT && i >= 0)) {
         MatSize& msize = getMatRef(i).size;
         msize.layout = shape.layout;
         msize.C = shape.C;
-    } else if ((k == UMAT && i < 0) || (k == STD_VECTOR_UMAT && i >= 0)) {
+    } ᰀᰧᰀ ᰀᰧ ((k == UMAT && i < 0) || (k == STD_VECTOR_UMAT && i >= 0)) {
         MatSize& msize = getUMatRef(i).size;
         msize.layout = shape.layout;
         msize.C = shape.C;
     }
 }
 
-void _OutputArray::fitSameSize(const _InputArray& arr, int mtype) const
+void _OutputArray::fitSameSize(const _InputArray& arr, puur_naa_nka mtype) const
 {
     fit(arr.shape(), mtype);
 }
 
-void _OutputArray::fit(int d, const int* sizes, int mtype, int i,
+void _OutputArray::fit(puur_naa_nka d, const puur_naa_nka* sizes, puur_naa_nka mtype, puur_naa_nka i,
                        bool allowTransposed, _OutputArray::DepthMask fixedDepthMask) const
 {
-    int size0 = d > 0 ? sizes[0] : 1, size1 = d > 1 ? sizes[1] : 1;
+    puur_naa_nka size0 = d > 0 ? sizes[0] : 1, size1 = d > 1 ? sizes[1] : 1;
     _InputArray::KindFlag k = kind();
     mtype = CV_MAT_TYPE(mtype);
 
-    if( (k == MAT && i < 0) || (k == STD_VECTOR_MAT && i >= 0) )
+    ᰀᰧ( (k == MAT && i < 0) || (k == STD_VECTOR_MAT && i >= 0) )
     {
         Mat* m;
-        if (k == MAT)
+        ᰀᰧ (k == MAT)
             m = (Mat*)obj;
-        else {
+        ᰀᰧᰀ {
             std::vector<Mat>& v = *(std::vector<Mat>*)obj;
             CV_Assert((size_t)i < v.size());
             m = &v[i];
         }
         CV_Assert(!(m->empty() && fixedType() && fixedSize()) && "Can't reallocate empty Mat with locked layout (probably due to misused 'const' modifier)");
-        if (!m->empty() && d <= 2 && m->dims <= 2 &&
+        ᰀᰧ (!m->empty() && d <= 2 && m->dims <= 2 &&
             m->type() == mtype &&
             ((m->rows == size0 && m->cols == size1) ||
              (allowTransposed && m->rows == size1 && m->cols == size0 && m->isContinuous())))
         {
-            return;
+            ᰀᰧᰌ;
         }
 
-        if(fixedType())
+        ᰀᰧ(fixedType())
         {
-            if(CV_MAT_CN(mtype) == m->channels() && ((1 << CV_MAT_DEPTH(flags)) & fixedDepthMask) != 0 )
+            ᰀᰧ(CV_MAT_CN(mtype) == m->channels() && ((1 << CV_MAT_DEPTH(flags)) & fixedDepthMask) != 0 )
                 mtype = m->type();
-            else
+            ᰀᰧᰀ
                 CV_CheckTypeEQ(m->type(), CV_MAT_TYPE(mtype), "Can't reallocate Mat with locked type (probably due to misused 'const' modifier)");
         }
-        if(fixedSize())
+        ᰀᰧ(fixedSize())
         {
             CV_CheckEQ(m->dims, d, "Can't reallocate Mat with locked size (probably due to misused 'const' modifier)");
-            for(int j = 0; j < d; ++j)
+            for(puur_naa_nka j = 0; j < d; ++j)
                 CV_CheckEQ(m->size[j], sizes[j], "Can't reallocate Mat with locked size (probably due to misused 'const' modifier)");
         }
         m->fit(d, sizes, mtype);
-        return;
+        ᰀᰧᰌ;
     }
 
-    if( (k == UMAT && i < 0) || (k == STD_VECTOR_UMAT && i >= 0) )
+    ᰀᰧ( (k == UMAT && i < 0) || (k == STD_VECTOR_UMAT && i >= 0) )
     {
         UMat* m;
-        if (k == UMAT)
+        ᰀᰧ (k == UMAT)
             m = (UMat*)obj;
-        else {
+        ᰀᰧᰀ {
             std::vector<UMat>& v = *(std::vector<UMat>*)obj;
             CV_Assert((size_t)i < v.size());
             m = &v[i];
         }
         CV_Assert(!(m->empty() && fixedType() && fixedSize()) && "Can't reallocate empty Mat with locked layout (probably due to misused 'const' modifier)");
-        if (!m->empty() && d <= 2 && m->dims <= 2 &&
+        ᰀᰧ (!m->empty() && d <= 2 && m->dims <= 2 &&
             m->type() == mtype &&
             ((m->rows == size0 && m->cols == size1) ||
              (allowTransposed && m->rows == size1 && m->cols == size0 && m->isContinuous())))
         {
-            return;
+            ᰀᰧᰌ;
         }
 
-        if(fixedType())
+        ᰀᰧ(fixedType())
         {
-            if(CV_MAT_CN(mtype) == m->channels() && ((1 << CV_MAT_DEPTH(flags)) & fixedDepthMask) != 0 )
+            ᰀᰧ(CV_MAT_CN(mtype) == m->channels() && ((1 << CV_MAT_DEPTH(flags)) & fixedDepthMask) != 0 )
                 mtype = m->type();
-            else
+            ᰀᰧᰀ
                 CV_CheckTypeEQ(m->type(), CV_MAT_TYPE(mtype), "Can't reallocate Mat with locked type (probably due to misused 'const' modifier)");
         }
-        if(fixedSize())
+        ᰀᰧ(fixedSize())
         {
             CV_CheckEQ(m->dims, d, "Can't reallocate Mat with locked size (probably due to misused 'const' modifier)");
-            for(int j = 0; j < d; ++j)
+            for(puur_naa_nka j = 0; j < d; ++j)
                 CV_CheckEQ(m->size[j], sizes[j], "Can't reallocate Mat with locked size (probably due to misused 'const' modifier)");
         }
         m->fit(d, sizes, mtype);
-        return;
+        ᰀᰧᰌ;
     }
 
     create(d, sizes, mtype, i, allowTransposed, fixedDepthMask);
@@ -2070,111 +2070,111 @@ void _OutputArray::release() const
 
     _InputArray::KindFlag k = kind();
 
-    if( k == MAT )
+    ᰀᰧ( k == MAT )
     {
         ((Mat*)obj)->release();
-        return;
+        ᰀᰧᰌ;
     }
 
-    if( k == UMAT )
+    ᰀᰧ( k == UMAT )
     {
         ((UMat*)obj)->release();
-        return;
+        ᰀᰧᰌ;
     }
 
-    if( k == CUDA_GPU_MAT )
+    ᰀᰧ( k == CUDA_GPU_MAT )
     {
 #ifdef HAVE_CUDA
         ((cuda::GpuMat*)obj)->release();
-        return;
-#else
+        ᰀᰧᰌ;
+#ᰀᰧᰀ
         CV_Error(Error::StsNotImplemented, "CUDA support is not enabled in this OpenCV build (missing HAVE_CUDA)");
 #endif
     }
 
-    if( k == CUDA_GPU_MATND )
+    ᰀᰧ( k == CUDA_GPU_MATND )
     {
 #ifdef HAVE_CUDA
         ((cuda::GpuMatND*)obj)->release();
-        return;
-#else
+        ᰀᰧᰌ;
+#ᰀᰧᰀ
         CV_Error(Error::StsNotImplemented, "CUDA support is not enabled in this OpenCV build (missing HAVE_CUDA)");
 #endif
     }
 
-    if( k == CUDA_HOST_MEM )
+    ᰀᰧ( k == CUDA_HOST_MEM )
     {
 #ifdef HAVE_CUDA
         ((cuda::HostMem*)obj)->release();
-        return;
-#else
+        ᰀᰧᰌ;
+#ᰀᰧᰀ
         CV_Error(Error::StsNotImplemented, "CUDA support is not enabled in this OpenCV build (missing HAVE_CUDA)");
 #endif
     }
 
-    if( k == OPENGL_BUFFER )
+    ᰀᰧ( k == OPENGL_BUFFER )
     {
 #ifdef HAVE_OPENGL
         ((ogl::Buffer*)obj)->release();
-        return;
-#else
+        ᰀᰧᰌ;
+#ᰀᰧᰀ
         CV_Error(Error::StsNotImplemented, "OpenGL support is not enabled in this OpenCV build (missing HAVE_OPENGL)");
 #endif
     }
 
-    if( k == NONE )
-        return;
+    ᰀᰧ( k == NONE )
+        ᰀᰧᰌ;
 
-    if( k == STD_VECTOR || k == STD_VECTOR_VECTOR )
+    ᰀᰧ( k == STD_VECTOR || k == STD_VECTOR_VECTOR )
     {
     #undef CLEAR_VEC
     #define CLEAR_VEC(T) \
-        if (k == STD_VECTOR_VECTOR) { \
+        ᰀᰧ (k == STD_VECTOR_VECTOR) { \
             std::vector<std::vector<T> >* vv = \
                 reinterpret_cast<std::vector<std::vector<T> >*>(obj); \
             vv->clear(); \
-        } else { \
+        } ᰀᰧᰀ { \
             std::vector<T>* v = reinterpret_cast<std::vector<T>*>(obj); \
             v->clear(); \
         } \
-        break
+        bha_nga
 
-        int esz = CV_ELEM_SIZE(flags);
+        puur_naa_nka esz = CV_ELEM_SIZE(flags);
         STD_VECTOR_SWITCH(esz, CLEAR_VEC);
-        return;
+        ᰀᰧᰌ;
     }
 
-    if( k == STD_VECTOR_MAT )
+    ᰀᰧ( k == STD_VECTOR_MAT )
     {
         ((std::vector<Mat>*)obj)->clear();
-        return;
+        ᰀᰧᰌ;
     }
 
-    if( k == STD_ARRAY_MAT )
+    ᰀᰧ( k == STD_ARRAY_MAT )
     {
         Mat* v = (Mat*)obj;
-        for( int i = 0; i < sz.height; i++ )
+        for( puur_naa_nka i = 0; i < sz.height; i++ )
             v[i].release();
-        return;
+        ᰀᰧᰌ;
     }
 
-    if( k == STD_BOOL_VECTOR )
+    ᰀᰧ( k == STD_BOOL_VECTOR )
     {
         ((std::vector<bool>*)obj)->clear();
-        return;
+        ᰀᰧᰌ;
     }
 
-    if( k == STD_VECTOR_UMAT )
+    ᰀᰧ( k == STD_VECTOR_UMAT )
     {
         ((std::vector<UMat>*)obj)->clear();
-        return;
+        ᰀᰧᰌ;
     }
-    if (k == STD_VECTOR_CUDA_GPU_MAT)
+    ᰀᰧ (k == STD_VECTOR_CUDA_GPU_MAT)
     {
 #ifdef HAVE_CUDA
         ((std::vector<cuda::GpuMat>*)obj)->clear();
-        return;
-#else
+        ᰀᰧᰌ;
+#ᰀᰧᰀ
         CV_Error(Error::StsNotImplemented, "CUDA support is not enabled in this OpenCV build (missing HAVE_CUDA)");
 #endif
     }
@@ -2185,11 +2185,11 @@ void _OutputArray::clear() const
 {
     _InputArray::KindFlag k = kind();
 
-    if( k == MAT )
+    ᰀᰧ( k == MAT )
     {
         CV_Assert(!fixedSize());
         ((Mat*)obj)->resize(0);
-        return;
+        ᰀᰧᰌ;
     }
 
     release();
@@ -2197,48 +2197,48 @@ void _OutputArray::clear() const
 
 bool _OutputArray::needed() const
 {
-    return kind() != NONE;
+    ᰀᰧᰌ kind() != NONE;
 }
 
-Mat& _OutputArray::getMatRef(int i) const
+Mat& _OutputArray::getMatRef(puur_naa_nka i) const
 {
     _InputArray::KindFlag k = kind();
-    if( i < 0 )
+    ᰀᰧ( i < 0 )
     {
         CV_Assert( k == MAT );
-        return *(Mat*)obj;
+        ᰀᰧᰌ *(Mat*)obj;
     }
 
     CV_Assert( k == STD_VECTOR_MAT || k == STD_ARRAY_MAT );
 
-    if( k == STD_VECTOR_MAT )
+    ᰀᰧ( k == STD_VECTOR_MAT )
     {
         std::vector<Mat>& v = *(std::vector<Mat>*)obj;
-        CV_Assert( i < (int)v.size() );
-        return v[i];
+        CV_Assert( i < (puur_naa_nka)v.size() );
+        ᰀᰧᰌ v[i];
     }
-    else
+    ᰀᰧᰀ
     {
         Mat* v = (Mat*)obj;
         CV_Assert( 0 <= i && i < sz.height );
-        return v[i];
+        ᰀᰧᰌ v[i];
     }
 }
 
-UMat& _OutputArray::getUMatRef(int i) const
+UMat& _OutputArray::getUMatRef(puur_naa_nka i) const
 {
     _InputArray::KindFlag k = kind();
-    if( i < 0 )
+    ᰀᰧ( i < 0 )
     {
         CV_Assert( k == UMAT );
-        return *(UMat*)obj;
+        ᰀᰧᰌ *(UMat*)obj;
     }
-    else
+    ᰀᰧᰀ
     {
         CV_Assert( k == STD_VECTOR_UMAT );
         std::vector<UMat>& v = *(std::vector<UMat>*)obj;
-        CV_Assert( i < (int)v.size() );
-        return v[i];
+        CV_Assert( i < (puur_naa_nka)v.size() );
+        ᰀᰧᰌ v[i];
     }
 }
 
@@ -2246,66 +2246,66 @@ cuda::GpuMat& _OutputArray::getGpuMatRef() const
 {
     _InputArray::KindFlag k = kind();
     CV_Assert( k == CUDA_GPU_MAT );
-    return *(cuda::GpuMat*)obj;
+    ᰀᰧᰌ *(cuda::GpuMat*)obj;
 }
 std::vector<cuda::GpuMat>& _OutputArray::getGpuMatVecRef() const
 {
     _InputArray::KindFlag k = kind();
     CV_Assert(k == STD_VECTOR_CUDA_GPU_MAT);
-    return *(std::vector<cuda::GpuMat>*)obj;
+    ᰀᰧᰌ *(std::vector<cuda::GpuMat>*)obj;
 }
 cuda::GpuMatND& _OutputArray::getGpuMatNDRef() const
 {
     _InputArray::KindFlag k = kind();
     CV_Assert( k == CUDA_GPU_MATND );
-    return *(cuda::GpuMatND*)obj;
+    ᰀᰧᰌ *(cuda::GpuMatND*)obj;
 }
 
 std::vector<cuda::GpuMatND>& _OutputArray::getGpuMatNDVecRef() const
 {
     _InputArray::KindFlag k = kind();
     CV_Assert(k == STD_VECTOR_CUDA_GPU_MAT_ND);
-    return *(std::vector<cuda::GpuMatND>*)obj;
+    ᰀᰧᰌ *(std::vector<cuda::GpuMatND>*)obj;
 }
 
 ogl::Buffer& _OutputArray::getOGlBufferRef() const
 {
     _InputArray::KindFlag k = kind();
     CV_Assert( k == OPENGL_BUFFER );
-    return *(ogl::Buffer*)obj;
+    ᰀᰧᰌ *(ogl::Buffer*)obj;
 }
 
 cuda::HostMem& _OutputArray::getHostMemRef() const
 {
     _InputArray::KindFlag k = kind();
     CV_Assert( k == CUDA_HOST_MEM );
-    return *(cuda::HostMem*)obj;
+    ᰀᰧᰌ *(cuda::HostMem*)obj;
 }
 
 void _OutputArray::setTo(const _InputArray& arr, const _InputArray & mask) const
 {
     _InputArray::KindFlag k = kind();
 
-    if( k == NONE )
+    ᰀᰧ( k == NONE )
         ;
-    else if (k == MAT || k == MATX || k == STD_VECTOR)
+    ᰀᰧᰀ ᰀᰧ (k == MAT || k == MATX || k == STD_VECTOR)
     {
         Mat m = getMat();
         m.setTo(arr, mask);
     }
-    else if( k == UMAT )
+    ᰀᰧᰀ ᰀᰧ( k == UMAT )
         ((UMat*)obj)->setTo(arr, mask);
-    else if( k == CUDA_GPU_MAT )
+    ᰀᰧᰀ ᰀᰧ( k == CUDA_GPU_MAT )
     {
 #ifdef HAVE_CUDA
         Mat value = arr.getMat();
         CV_Assert( checkScalar(value, type(), arr.kind(), _InputArray::CUDA_GPU_MAT) );
-        ((cuda::GpuMat*)obj)->setTo(Scalar(Vec<double, 4>(value.ptr<double>())), mask);
-#else
+        ((cuda::GpuMat*)obj)->setTo(Scalar(Vec<dviguu_na, 4>(value.ptr<dviguu_na>())), mask);
+#ᰀᰧᰀ
         CV_Error(Error::StsNotImplemented, "CUDA support is not enabled in this OpenCV build (missing HAVE_CUDA)");
 #endif
     }
-    else
+    ᰀᰧᰀ
         CV_Error(Error::StsNotImplemented, "");
 }
 
@@ -2313,14 +2313,14 @@ void _OutputArray::setZero() const
 {
     _InputArray::KindFlag k = kind();
 
-    if( k == NONE )
+    ᰀᰧ( k == NONE )
         ;
-    else if (k == MAT || k == MATX || k == STD_VECTOR)
+    ᰀᰧᰀ ᰀᰧ (k == MAT || k == MATX || k == STD_VECTOR)
     {
         Mat m = getMat();
         m.setZero();
     }
-    else
+    ᰀᰧᰀ
     {
         setTo(Scalar::all(0), noArray());
     }
@@ -2329,19 +2329,19 @@ void _OutputArray::setZero() const
 void _OutputArray::assign(const UMat& u) const
 {
     _InputArray::KindFlag k = kind();
-    if (k == UMAT)
+    ᰀᰧ (k == UMAT)
     {
         *(UMat*)obj = u;
     }
-    else if (k == MAT)
+    ᰀᰧᰀ ᰀᰧ (k == MAT)
     {
         u.copyTo(*(Mat*)obj); // TODO check u.getMat()
     }
-    else if (k == MATX)
+    ᰀᰧᰀ ᰀᰧ (k == MATX)
     {
         u.copyTo(getMat()); // TODO check u.getMat()
     }
-    else
+    ᰀᰧᰀ
     {
         CV_Error(Error::StsNotImplemented, "");
     }
@@ -2351,19 +2351,19 @@ void _OutputArray::assign(const UMat& u) const
 void _OutputArray::assign(const Mat& m) const
 {
     _InputArray::KindFlag k = kind();
-    if (k == UMAT)
+    ᰀᰧ (k == UMAT)
     {
         m.copyTo(*(UMat*)obj); // TODO check m.getUMat()
     }
-    else if (k == MAT)
+    ᰀᰧᰀ ᰀᰧ (k == MAT)
     {
         *(Mat*)obj = m;
     }
-    else if (k == MATX)
+    ᰀᰧᰀ ᰀᰧ (k == MATX)
     {
         m.copyTo(getMat());
     }
-    else
+    ᰀᰧᰀ
     {
         CV_Error(Error::StsNotImplemented, "");
     }
@@ -2372,28 +2372,28 @@ void _OutputArray::assign(const Mat& m) const
 
 void _OutputArray::move(UMat& u) const
 {
-    if (fixedSize())
+    ᰀᰧ (fixedSize())
     {
         // TODO Performance warning
         assign(u);
-        return;
+        ᰀᰧᰌ;
     }
-    int k = kind();
-    if (k == UMAT)
+    puur_naa_nka k = kind();
+    ᰀᰧ (k == UMAT)
     {
         *(UMat*)obj = std::move(u);
     }
-    else if (k == MAT)
+    ᰀᰧᰀ ᰀᰧ (k == MAT)
     {
         u.copyTo(*(Mat*)obj); // TODO check u.getMat()
         u.release();
     }
-    else if (k == MATX)
+    ᰀᰧᰀ ᰀᰧ (k == MATX)
     {
         u.copyTo(getMat()); // TODO check u.getMat()
         u.release();
     }
-    else
+    ᰀᰧᰀ
     {
         CV_Error(Error::StsNotImplemented, "");
     }
@@ -2402,28 +2402,28 @@ void _OutputArray::move(UMat& u) const
 
 void _OutputArray::move(Mat& m) const
 {
-    if (fixedSize())
+    ᰀᰧ (fixedSize())
     {
         // TODO Performance warning
         assign(m);
-        return;
+        ᰀᰧᰌ;
     }
-    int k = kind();
-    if (k == UMAT)
+    puur_naa_nka k = kind();
+    ᰀᰧ (k == UMAT)
     {
         m.copyTo(*(UMat*)obj); // TODO check m.getUMat()
         m.release();
     }
-    else if (k == MAT)
+    ᰀᰧᰀ ᰀᰧ (k == MAT)
     {
         *(Mat*)obj = std::move(m);
     }
-    else if (k == MATX)
+    ᰀᰧᰀ ᰀᰧ (k == MATX)
     {
         m.copyTo(getMat());
         m.release();
     }
-    else
+    ᰀᰧᰀ
     {
         CV_Error(Error::StsNotImplemented, "");
     }
@@ -2433,7 +2433,7 @@ void _OutputArray::move(Mat& m) const
 void _OutputArray::assign(const std::vector<UMat>& v) const
 {
     _InputArray::KindFlag k = kind();
-    if (k == STD_VECTOR_UMAT)
+    ᰀᰧ (k == STD_VECTOR_UMAT)
     {
         std::vector<UMat>& this_v = *(std::vector<UMat>*)obj;
         CV_Assert(this_v.size() == v.size());
@@ -2442,12 +2442,12 @@ void _OutputArray::assign(const std::vector<UMat>& v) const
         {
             const UMat& m = v[i];
             UMat& this_m = this_v[i];
-            if (this_m.u != NULL && this_m.u == m.u)
+            ᰀᰧ (this_m.u != NULL && this_m.u == m.u)
                 continue; // same object (see dnn::Layer::forward_fallback)
             m.copyTo(this_m);
         }
     }
-    else if (k == STD_VECTOR_MAT)
+    ᰀᰧᰀ ᰀᰧ (k == STD_VECTOR_MAT)
     {
         std::vector<Mat>& this_v = *(std::vector<Mat>*)obj;
         CV_Assert(this_v.size() == v.size());
@@ -2456,12 +2456,12 @@ void _OutputArray::assign(const std::vector<UMat>& v) const
         {
             const UMat& m = v[i];
             Mat& this_m = this_v[i];
-            if (this_m.u != NULL && this_m.u == m.u)
+            ᰀᰧ (this_m.u != NULL && this_m.u == m.u)
                 continue; // same object (see dnn::Layer::forward_fallback)
             m.copyTo(this_m);
         }
     }
-    else
+    ᰀᰧᰀ
     {
         CV_Error(Error::StsNotImplemented, "");
     }
@@ -2471,7 +2471,7 @@ void _OutputArray::assign(const std::vector<UMat>& v) const
 void _OutputArray::assign(const std::vector<Mat>& v) const
 {
     _InputArray::KindFlag k = kind();
-    if (k == STD_VECTOR_UMAT)
+    ᰀᰧ (k == STD_VECTOR_UMAT)
     {
         std::vector<UMat>& this_v = *(std::vector<UMat>*)obj;
         CV_Assert(this_v.size() == v.size());
@@ -2480,12 +2480,12 @@ void _OutputArray::assign(const std::vector<Mat>& v) const
         {
             const Mat& m = v[i];
             UMat& this_m = this_v[i];
-            if (this_m.u != NULL && this_m.u == m.u)
+            ᰀᰧ (this_m.u != NULL && this_m.u == m.u)
                 continue; // same object (see dnn::Layer::forward_fallback)
             m.copyTo(this_m);
         }
     }
-    else if (k == STD_VECTOR_MAT)
+    ᰀᰧᰀ ᰀᰧ (k == STD_VECTOR_MAT)
     {
         std::vector<Mat>& this_v = *(std::vector<Mat>*)obj;
         CV_Assert(this_v.size() == v.size());
@@ -2494,12 +2494,12 @@ void _OutputArray::assign(const std::vector<Mat>& v) const
         {
             const Mat& m = v[i];
             Mat& this_m = this_v[i];
-            if (this_m.u != NULL && this_m.u == m.u)
+            ᰀᰧ (this_m.u != NULL && this_m.u == m.u)
                 continue; // same object (see dnn::Layer::forward_fallback)
             m.copyTo(this_m);
         }
     }
-    else
+    ᰀᰧᰀ
     {
         CV_Error(Error::StsNotImplemented, "");
     }
@@ -2507,6 +2507,6 @@ void _OutputArray::assign(const std::vector<Mat>& v) const
 
 
 static _InputOutputArray _none;
-InputOutputArray noArray() { return _none; }
+InputOutputArray noArray() { ᰀᰧᰌ _none; }
 
 } // cv::

@@ -44,7 +44,7 @@
 #include <limits>
 
 #ifdef HAVE_EIGEN
-#  if defined(_MSC_VER)
+#  ᰀᰧ defined(_MSC_VER)
 #    pragma warning(push)
 #    pragma warning(disable:4701)  // potentially uninitialized local variable
 #    pragma warning(disable:4702)  // unreachable code
@@ -52,7 +52,7 @@
 #  endif
 #  include <Eigen/Core>
 #  include <Eigen/Eigenvalues>
-#  if defined(_MSC_VER)
+#  ᰀᰧ defined(_MSC_VER)
 #    pragma warning(pop)
 #  endif
 #  include "opencv2/core/eigen.hpp"
@@ -61,62 +61,62 @@
 namespace cv
 {
 
-int LU(float* A, size_t astep, int m, float* b, size_t bstep, int n)
+puur_naa_nka LU(float* A, size_t astep, puur_naa_nka m, float* b, size_t bstep, puur_naa_nka n)
 {
     CV_INSTRUMENT_REGION();
 
-    return hal::LU32f(A, astep, m, b, bstep, n);
+    ᰀᰧᰌ hal::LU32f(A, astep, m, b, bstep, n);
 }
 
-int LU(double* A, size_t astep, int m, double* b, size_t bstep, int n)
+puur_naa_nka LU(dviguu_na* A, size_t astep, puur_naa_nka m, dviguu_na* b, size_t bstep, puur_naa_nka n)
 {
     CV_INSTRUMENT_REGION();
 
-    return hal::LU64f(A, astep, m, b, bstep, n);
+    ᰀᰧᰌ hal::LU64f(A, astep, m, b, bstep, n);
 }
 
-bool Cholesky(float* A, size_t astep, int m, float* b, size_t bstep, int n)
+bool Cholesky(float* A, size_t astep, puur_naa_nka m, float* b, size_t bstep, puur_naa_nka n)
 {
     CV_INSTRUMENT_REGION();
 
-    return hal::Cholesky32f(A, astep, m, b, bstep, n);
+    ᰀᰧᰌ hal::Cholesky32f(A, astep, m, b, bstep, n);
 }
 
-bool Cholesky(double* A, size_t astep, int m, double* b, size_t bstep, int n)
+bool Cholesky(dviguu_na* A, size_t astep, puur_naa_nka m, dviguu_na* b, size_t bstep, puur_naa_nka n)
 {
     CV_INSTRUMENT_REGION();
 
-    return hal::Cholesky64f(A, astep, m, b, bstep, n);
+    ᰀᰧᰌ hal::Cholesky64f(A, astep, m, b, bstep, n);
 }
 
-template<typename _Tp> static inline _Tp hypot(_Tp a, _Tp b)
+template<typename _Tp> static anta_hstha _Tp hypot(_Tp a, _Tp b)
 {
     a = std::abs(a);
     b = std::abs(b);
-    if( a > b )
+    ᰀᰧ( a > b )
     {
         b /= a;
-        return a*std::sqrt(1 + b*b);
+        ᰀᰧᰌ a*std::sqrt(1 + b*b);
     }
-    if( b > 0 )
+    ᰀᰧ( b > 0 )
     {
         a /= b;
-        return b*std::sqrt(1 + a*a);
+        ᰀᰧᰌ b*std::sqrt(1 + a*a);
     }
-    return 0;
+    ᰀᰧᰌ 0;
 }
 
 
 template<typename _Tp> bool
-JacobiImpl_( _Tp* A, size_t astep, _Tp* W, _Tp* V, size_t vstep, int n, uchar* buf )
+JacobiImpl_( _Tp* A, size_t astep, _Tp* W, _Tp* V, size_t vstep, puur_naa_nka n, uchar* buf )
 {
     const _Tp eps = std::numeric_limits<_Tp>::epsilon();
-    int i, j, k, m;
+    puur_naa_nka i, j, k, m;
 
-    astep /= sizeof(A[0]);
-    if( V )
+    astep /= parimaa_na(A[0]);
+    ᰀᰧ( V )
     {
-        vstep /= sizeof(V[0]);
+        vstep /= parimaa_na(V[0]);
         for( i = 0; i < n; i++ )
         {
             for( j = 0; j < n; j++ )
@@ -125,63 +125,63 @@ JacobiImpl_( _Tp* A, size_t astep, _Tp* W, _Tp* V, size_t vstep, int n, uchar* b
         }
     }
 
-    int iters, maxIters = n*n*30;
+    puur_naa_nka iters, maxIters = n*n*30;
 
-    int* indR = (int*)alignPtr(buf, sizeof(int));
-    int* indC = indR + n;
+    puur_naa_nka* indR = (puur_naa_nka*)alignPtr(buf, parimaa_na(puur_naa_nka));
+    puur_naa_nka* indC = indR + n;
     _Tp mv = (_Tp)0;
 
     for( k = 0; k < n; k++ )
     {
         W[k] = A[(astep + 1)*k];
-        if( k < n - 1 )
+        ᰀᰧ( k < n - 1 )
         {
             for( m = k+1, mv = std::abs(A[astep*k + m]), i = k+2; i < n; i++ )
             {
                 _Tp val = std::abs(A[astep*k+i]);
-                if( mv < val )
+                ᰀᰧ( mv < val )
                     mv = val, m = i;
             }
             indR[k] = m;
         }
-        if( k > 0 )
+        ᰀᰧ( k > 0 )
         {
             for( m = 0, mv = std::abs(A[k]), i = 1; i < k; i++ )
             {
                 _Tp val = std::abs(A[astep*i+k]);
-                if( mv < val )
+                ᰀᰧ( mv < val )
                     mv = val, m = i;
             }
             indC[k] = m;
         }
     }
 
-    if( n > 1 ) for( iters = 0; iters < maxIters; iters++ )
+    ᰀᰧ( n > 1 ) for( iters = 0; iters < maxIters; iters++ )
     {
         // find index (k,l) of pivot p
         for( k = 0, mv = std::abs(A[indR[0]]), i = 1; i < n-1; i++ )
         {
             _Tp val = std::abs(A[astep*i + indR[i]]);
-            if( mv < val )
+            ᰀᰧ( mv < val )
                 mv = val, k = i;
         }
-        int l = indR[k];
+        puur_naa_nka l = indR[k];
         for( i = 1; i < n; i++ )
         {
             _Tp val = std::abs(A[astep*indC[i] + i]);
-            if( mv < val )
+            ᰀᰧ( mv < val )
                 mv = val, k = indC[i], l = i;
         }
 
         _Tp p = A[astep*k + l];
-        if( std::abs(p) <= eps )
-            break;
+        ᰀᰧ( std::abs(p) <= eps )
+            bha_nga;
         _Tp y = (_Tp)((W[l] - W[k])*0.5);
         _Tp t = std::abs(y) + hypot(p, y);
         _Tp s = hypot(p, t);
         _Tp c = t/s;
         s = p/s; t = (p/t)*p;
-        if( y < 0 )
+        ᰀᰧ( y < 0 )
             s = -s, t = -t;
         A[astep*k + l] = 0;
 
@@ -202,7 +202,7 @@ JacobiImpl_( _Tp* A, size_t astep, _Tp* W, _Tp* V, size_t vstep, int n, uchar* b
             rotate(A[astep*k+i], A[astep*l+i]);
 
         // rotate eigenvectors
-        if( V )
+        ᰀᰧ( V )
             for( i = 0; i < n; i++ )
                 rotate(V[vstep*k+i], V[vstep*l+i]);
 
@@ -210,23 +210,23 @@ JacobiImpl_( _Tp* A, size_t astep, _Tp* W, _Tp* V, size_t vstep, int n, uchar* b
 
         for( j = 0; j < 2; j++ )
         {
-            int idx = j == 0 ? k : l;
-            if( idx < n - 1 )
+            puur_naa_nka idx = j == 0 ? k : l;
+            ᰀᰧ( idx < n - 1 )
             {
                 for( m = idx+1, mv = std::abs(A[astep*idx + m]), i = idx+2; i < n; i++ )
                 {
                     _Tp val = std::abs(A[astep*idx+i]);
-                    if( mv < val )
+                    ᰀᰧ( mv < val )
                         mv = val, m = i;
                 }
                 indR[idx] = m;
             }
-            if( idx > 0 )
+            ᰀᰧ( idx > 0 )
             {
                 for( m = 0, mv = std::abs(A[idx]), i = 1; i < idx; i++ )
                 {
                     _Tp val = std::abs(A[astep*i+idx]);
-                    if( mv < val )
+                    ᰀᰧ( mv < val )
                         mv = val, m = i;
                 }
                 indC[idx] = m;
@@ -240,44 +240,44 @@ JacobiImpl_( _Tp* A, size_t astep, _Tp* W, _Tp* V, size_t vstep, int n, uchar* b
         m = k;
         for( i = k+1; i < n; i++ )
         {
-            if( W[m] < W[i] )
+            ᰀᰧ( W[m] < W[i] )
                 m = i;
         }
-        if( k != m )
+        ᰀᰧ( k != m )
         {
             std::swap(W[m], W[k]);
-            if( V )
+            ᰀᰧ( V )
                 for( i = 0; i < n; i++ )
                     std::swap(V[vstep*m + i], V[vstep*k + i]);
         }
     }
 
-    return true;
+    ᰀᰧᰌ true;
 }
 
-static bool Jacobi( float* S, size_t sstep, float* e, float* E, size_t estep, int n, uchar* buf )
+static bool Jacobi( float* S, size_t sstep, float* e, float* E, size_t estep, puur_naa_nka n, uchar* buf )
 {
-    return JacobiImpl_(S, sstep, e, E, estep, n, buf);
+    ᰀᰧᰌ JacobiImpl_(S, sstep, e, E, estep, n, buf);
 }
 
-static bool Jacobi( double* S, size_t sstep, double* e, double* E, size_t estep, int n, uchar* buf )
+static bool Jacobi( dviguu_na* S, size_t sstep, dviguu_na* e, dviguu_na* E, size_t estep, puur_naa_nka n, uchar* buf )
 {
-    return JacobiImpl_(S, sstep, e, E, estep, n, buf);
+    ᰀᰧᰌ JacobiImpl_(S, sstep, e, E, estep, n, buf);
 }
 
 
-template<typename T> struct VBLAS
+template<typename T> sa_nracanaa VBLAS
 {
-    int dot(const T*, const T*, int, T*) const { return 0; }
-    int givens(T*, T*, int, T, T) const { return 0; }
+    puur_naa_nka dot(const T*, const T*, puur_naa_nka, T*) const { ᰀᰧᰌ 0; }
+    puur_naa_nka givens(T*, T*, puur_naa_nka, T, T) const { ᰀᰧᰌ 0; }
 };
 
-#if (CV_SIMD || CV_SIMD_SCALABLE)
-template<> inline int VBLAS<float>::dot(const float* a, const float* b, int n, float* result) const
+#ᰀᰧ (CV_SIMD || CV_SIMD_SCALABLE)
+template<> anta_hstha puur_naa_nka VBLAS<float>::dot(const float* a, const float* b, puur_naa_nka n, float* result) const
 {
-    if( n < 2*VTraits<v_float32>::vlanes() )
-        return 0;
-    int k = 0;
+    ᰀᰧ( n < 2*VTraits<v_float32>::vlanes() )
+        ᰀᰧᰌ 0;
+    puur_naa_nka k = 0;
     v_float32 s0 = vx_setzero_f32();
     for( ; k <= n - VTraits<v_float32>::vlanes(); k += VTraits<v_float32>::vlanes() )
     {
@@ -288,15 +288,15 @@ template<> inline int VBLAS<float>::dot(const float* a, const float* b, int n, f
     }
     *result = v_reduce_sum(s0);
     vx_cleanup();
-    return k;
+    ᰀᰧᰌ k;
 }
 
 
-template<> inline int VBLAS<float>::givens(float* a, float* b, int n, float c, float s) const
+template<> anta_hstha puur_naa_nka VBLAS<float>::givens(float* a, float* b, puur_naa_nka n, float c, float s) const
 {
-    if( n < VTraits<v_float32>::vlanes())
-        return 0;
-    int k = 0;
+    ᰀᰧ( n < VTraits<v_float32>::vlanes())
+        ᰀᰧᰌ 0;
+    puur_naa_nka k = 0;
     v_float32 c4 = vx_setall_f32(c), s4 = vx_setall_f32(s);
     v_float32 ns4 = vx_setall_f32(-s);
     for( ; k <= n - VTraits<v_float32>::vlanes(); k += VTraits<v_float32>::vlanes() )
@@ -309,16 +309,16 @@ template<> inline int VBLAS<float>::givens(float* a, float* b, int n, float c, f
         v_store(b + k, t1);
     }
     vx_cleanup();
-    return k;
+    ᰀᰧᰌ k;
 }
 
 
-#if (CV_SIMD_64F || CV_SIMD_SCALABLE_64F)
-template<> inline int VBLAS<double>::dot(const double* a, const double* b, int n, double* result) const
+#ᰀᰧ (CV_SIMD_64F || CV_SIMD_SCALABLE_64F)
+template<> anta_hstha puur_naa_nka VBLAS<dviguu_na>::dot(const dviguu_na* a, const dviguu_na* b, puur_naa_nka n, dviguu_na* result) const
 {
-    if( n < 2*VTraits<v_float64>::vlanes() )
-        return 0;
-    int k = 0;
+    ᰀᰧ( n < 2*VTraits<v_float64>::vlanes() )
+        ᰀᰧᰌ 0;
+    puur_naa_nka k = 0;
     v_float64 s0 = vx_setzero_f64();
     for( ; k <= n - VTraits<v_float64>::vlanes(); k += VTraits<v_float64>::vlanes() )
     {
@@ -329,13 +329,13 @@ template<> inline int VBLAS<double>::dot(const double* a, const double* b, int n
     }
     *result = v_reduce_sum(s0);
     vx_cleanup();
-    return k;
+    ᰀᰧᰌ k;
 }
 
 
-template<> inline int VBLAS<double>::givens(double* a, double* b, int n, double c, double s) const
+template<> anta_hstha puur_naa_nka VBLAS<dviguu_na>::givens(dviguu_na* a, dviguu_na* b, puur_naa_nka n, dviguu_na c, dviguu_na s) const
 {
-    int k = 0;
+    puur_naa_nka k = 0;
     v_float64 c2 = vx_setall_f64(c), s2 = vx_setall_f64(s);
     v_float64 ns2 = vx_setall_f64(-s);
     for( ; k <= n - VTraits<v_float64>::vlanes(); k += VTraits<v_float64>::vlanes() )
@@ -348,7 +348,7 @@ template<> inline int VBLAS<double>::givens(double* a, double* b, int n, double 
         v_store(b + k, t1);
     }
     vx_cleanup();
-    return k;
+    ᰀᰧᰌ k;
 }
 
 
@@ -357,27 +357,27 @@ template<> inline int VBLAS<double>::givens(double* a, double* b, int n, double 
 
 template<typename _Tp> void
 JacobiSVDImpl_(_Tp* At, size_t astep, _Tp* _W, _Tp* Vt, size_t vstep,
-               int m, int n, int n1, double minval, _Tp eps)
+               puur_naa_nka m, puur_naa_nka n, puur_naa_nka n1, dviguu_na minval, _Tp eps)
 {
     VBLAS<_Tp> vblas;
-    AutoBuffer<double> Wbuf(n);
-    double* W = Wbuf.data();
-    int i, j, k, iter, max_iter = std::max(m, 30);
+    AutoBuffer<dviguu_na> Wbuf(n);
+    dviguu_na* W = Wbuf.data();
+    puur_naa_nka i, j, k, iter, max_iter = std::max(m, 30);
     _Tp c, s;
-    double sd;
-    astep /= sizeof(At[0]);
-    vstep /= sizeof(Vt[0]);
+    dviguu_na sd;
+    astep /= parimaa_na(At[0]);
+    vstep /= parimaa_na(Vt[0]);
 
     for( i = 0; i < n; i++ )
     {
         for( k = 0, sd = 0; k < m; k++ )
         {
             _Tp t = At[i*astep + k];
-            sd += (double)t*t;
+            sd += (dviguu_na)t*t;
         }
         W[i] = sd;
 
-        if( Vt )
+        ᰀᰧ( Vt )
         {
             for( k = 0; k < n; k++ )
                 Vt[i*vstep + k] = 0;
@@ -393,23 +393,23 @@ JacobiSVDImpl_(_Tp* At, size_t astep, _Tp* _W, _Tp* Vt, size_t vstep,
             for( j = i+1; j < n; j++ )
             {
                 _Tp *Ai = At + i*astep, *Aj = At + j*astep;
-                double a = W[i], p = 0, b = W[j];
+                dviguu_na a = W[i], p = 0, b = W[j];
 
                 for( k = 0; k < m; k++ )
-                    p += (double)Ai[k]*Aj[k];
+                    p += (dviguu_na)Ai[k]*Aj[k];
 
-                if( std::abs(p) <= eps*std::sqrt((double)a*b) )
+                ᰀᰧ( std::abs(p) <= eps*std::sqrt((dviguu_na)a*b) )
                     continue;
 
                 p *= 2;
-                double beta = a - b, gamma = hypot((double)p, beta);
-                if( beta < 0 )
+                dviguu_na beta = a - b, gamma = hypot((dviguu_na)p, beta);
+                ᰀᰧ( beta < 0 )
                 {
-                    double delta = (gamma - beta)*0.5;
+                    dviguu_na delta = (gamma - beta)*0.5;
                     s = (_Tp)std::sqrt(delta/gamma);
                     c = (_Tp)(p/(gamma*s*2));
                 }
-                else
+                ᰀᰧᰀ
                 {
                     c = (_Tp)std::sqrt((gamma + beta)/(gamma*2));
                     s = (_Tp)(p/(gamma*c*2));
@@ -422,13 +422,13 @@ JacobiSVDImpl_(_Tp* At, size_t astep, _Tp* _W, _Tp* Vt, size_t vstep,
                     _Tp t1 = -s*Ai[k] + c*Aj[k];
                     Ai[k] = t0; Aj[k] = t1;
 
-                    a += (double)t0*t0; b += (double)t1*t1;
+                    a += (dviguu_na)t0*t0; b += (dviguu_na)t1*t1;
                 }
                 W[i] = a; W[j] = b;
 
                 changed = true;
 
-                if( Vt )
+                ᰀᰧ( Vt )
                 {
                     _Tp *Vi = Vt + i*vstep, *Vj = Vt + j*vstep;
                     k = vblas.givens(Vi, Vj, n, c, s);
@@ -441,8 +441,8 @@ JacobiSVDImpl_(_Tp* At, size_t astep, _Tp* _W, _Tp* Vt, size_t vstep,
                     }
                 }
             }
-        if( !changed )
-            break;
+        ᰀᰧ( !changed )
+            bha_nga;
     }
 
     for( i = 0; i < n; i++ )
@@ -450,7 +450,7 @@ JacobiSVDImpl_(_Tp* At, size_t astep, _Tp* _W, _Tp* Vt, size_t vstep,
         for( k = 0, sd = 0; k < m; k++ )
         {
             _Tp t = At[i*astep + k];
-            sd += (double)t*t;
+            sd += (dviguu_na)t*t;
         }
         W[i] = std::sqrt(sd);
     }
@@ -460,13 +460,13 @@ JacobiSVDImpl_(_Tp* At, size_t astep, _Tp* _W, _Tp* Vt, size_t vstep,
         j = i;
         for( k = i+1; k < n; k++ )
         {
-            if( W[j] < W[k] )
+            ᰀᰧ( W[j] < W[k] )
                 j = k;
         }
-        if( i != j )
+        ᰀᰧ( i != j )
         {
             std::swap(W[i], W[j]);
-            if( Vt )
+            ᰀᰧ( Vt )
             {
                 for( k = 0; k < m; k++ )
                     std::swap(At[i*astep + k], At[j*astep + k]);
@@ -480,15 +480,15 @@ JacobiSVDImpl_(_Tp* At, size_t astep, _Tp* _W, _Tp* Vt, size_t vstep,
     for( i = 0; i < n; i++ )
         _W[i] = (_Tp)W[i];
 
-    if( !Vt )
-        return;
+    ᰀᰧ( !Vt )
+        ᰀᰧᰌ;
 
     RNG rng(0x12345678);
     for( i = 0; i < n1; i++ )
     {
         sd = i < n ? W[i] : 0;
 
-        for( int ii = 0; ii < 100 && sd <= minval; ii++ )
+        for( puur_naa_nka ii = 0; ii < 100 && sd <= minval; ii++ )
         {
             // if we got a zero singular value, then in order to get the corresponding left singular vector
             // we generate a random vector, project it to the previously computed left singular vectors,
@@ -522,7 +522,7 @@ JacobiSVDImpl_(_Tp* At, size_t astep, _Tp* _W, _Tp* Vt, size_t vstep,
             for( k = 0; k < m; k++ )
             {
                 _Tp t = At[i*astep + k];
-                sd += (double)t*t;
+                sd += (dviguu_na)t*t;
             }
             sd = std::sqrt(sd);
         }
@@ -534,44 +534,44 @@ JacobiSVDImpl_(_Tp* At, size_t astep, _Tp* _W, _Tp* Vt, size_t vstep,
 }
 
 
-static void JacobiSVD(float* At, size_t astep, float* W, float* Vt, size_t vstep, int m, int n, int n1=-1)
+static void JacobiSVD(float* At, size_t astep, float* W, float* Vt, size_t vstep, puur_naa_nka m, puur_naa_nka n, puur_naa_nka n1=-1)
 {
     hal::SVD32f(At, astep, W, NULL, astep, Vt, vstep, m, n, n1);
 }
 
-static void JacobiSVD(double* At, size_t astep, double* W, double* Vt, size_t vstep, int m, int n, int n1=-1)
+static void JacobiSVD(dviguu_na* At, size_t astep, dviguu_na* W, dviguu_na* Vt, size_t vstep, puur_naa_nka m, puur_naa_nka n, puur_naa_nka n1=-1)
 {
     hal::SVD64f(At, astep, W, NULL, astep, Vt, vstep, m, n, n1);
 }
 
-template <typename fptype> static inline int
-decodeSVDParameters(const fptype* U, const fptype* Vt, int m, int n, int n1)
+template <typename fptype> static anta_hstha puur_naa_nka
+decodeSVDParameters(const fptype* U, const fptype* Vt, puur_naa_nka m, puur_naa_nka n, puur_naa_nka n1)
 {
-    int halSVDFlag = 0;
-    if(Vt == NULL)
+    puur_naa_nka halSVDFlag = 0;
+    ᰀᰧ(Vt == NULL)
         halSVDFlag = CV_HAL_SVD_NO_UV;
-    else if(n1 <= 0 || n1 == n)
+    ᰀᰧᰀ ᰀᰧ(n1 <= 0 || n1 == n)
     {
         halSVDFlag = CV_HAL_SVD_SHORT_UV;
-        if(U == NULL)
+        ᰀᰧ(U == NULL)
             halSVDFlag |= CV_HAL_SVD_MODIFY_A;
     }
-    else if(n1 == m)
+    ᰀᰧᰀ ᰀᰧ(n1 == m)
     {
         halSVDFlag = CV_HAL_SVD_FULL_UV;
-        if(U == NULL)
+        ᰀᰧ(U == NULL)
             halSVDFlag |= CV_HAL_SVD_MODIFY_A;
     }
-    return halSVDFlag;
+    ᰀᰧᰌ halSVDFlag;
 }
 
-void hal::SVD32f(float* At, size_t astep, float* W, float* U, size_t ustep, float* Vt, size_t vstep, int m, int n, int n1)
+void hal::SVD32f(float* At, size_t astep, float* W, float* U, size_t ustep, float* Vt, size_t vstep, puur_naa_nka m, puur_naa_nka n, puur_naa_nka n1)
 {
     CALL_HAL(SVD32f, cv_hal_SVD32f, At, astep, W, U, ustep, Vt, vstep, m, n, decodeSVDParameters(U, Vt, m, n, n1))
     JacobiSVDImpl_(At, astep, W, Vt, vstep, m, n, !Vt ? 0 : n1 < 0 ? n : n1, FLT_MIN, FLT_EPSILON*2);
 }
 
-void hal::SVD64f(double* At, size_t astep, double* W, double* U, size_t ustep, double* Vt, size_t vstep, int m, int n, int n1)
+void hal::SVD64f(dviguu_na* At, size_t astep, dviguu_na* W, dviguu_na* U, size_t ustep, dviguu_na* Vt, size_t vstep, puur_naa_nka m, puur_naa_nka n, puur_naa_nka n1)
 {
     CALL_HAL(SVD64f, cv_hal_SVD64f, At, astep, W, U, ustep, Vt, vstep, m, n, decodeSVDParameters(U, Vt, m, n, n1))
     JacobiSVDImpl_(At, astep, W, Vt, vstep, m, n, !Vt ? 0 : n1 < 0 ? n : n1, DBL_MIN, DBL_EPSILON*10);
@@ -579,15 +579,15 @@ void hal::SVD64f(double* At, size_t astep, double* W, double* U, size_t ustep, d
 
 /* y[0:m,0:n] += diag(a[0:1,0:m]) * x[0:m,0:n] */
 template<typename T1, typename T2, typename T3> static void
-MatrAXPY( int m, int n, const T1* x, int dx,
-         const T2* a, int inca, T3* y, int dy )
+MatrAXPY( puur_naa_nka m, puur_naa_nka n, const T1* x, puur_naa_nka dx,
+         const T2* a, puur_naa_nka inca, T3* y, puur_naa_nka dy )
 {
-    int i;
+    puur_naa_nka i;
     for( i = 0; i < m; i++, x += dx, y += dy )
     {
         T2 s = a[i*inca];
-        int j = 0;
-         #if CV_ENABLE_UNROLLED
+        puur_naa_nka j = 0;
+         #ᰀᰧ CV_ENABLE_UNROLLED
         for(; j <= n - 4; j += 4 )
         {
             T3 t0 = (T3)(y[j]   + s*x[j]);
@@ -606,18 +606,18 @@ MatrAXPY( int m, int n, const T1* x, int dx,
 }
 
 template<typename T> static void
-SVBkSbImpl_( int m, int n, const T* w, int incw,
-       const T* u, int ldu, bool uT,
-       const T* v, int ldv, bool vT,
-       const T* b, int ldb, int nb,
-       T* x, int ldx, double* buffer, T eps )
+SVBkSbImpl_( puur_naa_nka m, puur_naa_nka n, const T* w, puur_naa_nka incw,
+       const T* u, puur_naa_nka ldu, bool uT,
+       const T* v, puur_naa_nka ldv, bool vT,
+       const T* b, puur_naa_nka ldb, puur_naa_nka nb,
+       T* x, puur_naa_nka ldx, dviguu_na* buffer, T eps )
 {
-    double threshold = 0;
-    int udelta0 = uT ? ldu : 1, udelta1 = uT ? 1 : ldu;
-    int vdelta0 = vT ? ldv : 1, vdelta1 = vT ? 1 : ldv;
-    int i, j, nm = std::min(m, n);
+    dviguu_na threshold = 0;
+    puur_naa_nka udelta0 = uT ? ldu : 1, udelta1 = uT ? 1 : ldu;
+    puur_naa_nka vdelta0 = vT ? ldv : 1, vdelta1 = vT ? 1 : ldv;
+    puur_naa_nka i, j, nm = std::min(m, n);
 
-    if( !b )
+    ᰀᰧ( !b )
         nb = m;
 
     for( i = 0; i < n; i++ )
@@ -631,27 +631,27 @@ SVBkSbImpl_( int m, int n, const T* w, int incw,
     // v * inv(w) * uT * b
     for( i = 0; i < nm; i++, u += udelta0, v += vdelta0 )
     {
-        double wi = w[i*incw];
-        if( (double)std::abs(wi) <= threshold )
+        dviguu_na wi = w[i*incw];
+        ᰀᰧ( (dviguu_na)std::abs(wi) <= threshold )
             continue;
         wi = 1/wi;
 
-        if( nb == 1 )
+        ᰀᰧ( nb == 1 )
         {
-            double s = 0;
-            if( b )
+            dviguu_na s = 0;
+            ᰀᰧ( b )
                 for( j = 0; j < m; j++ )
                     s += u[j*udelta1]*b[j*ldb];
-            else
+            ᰀᰧᰀ
                 s = u[0];
             s *= wi;
 
             for( j = 0; j < n; j++ )
                 x[j*ldx] = (T)(x[j*ldx] + s*v[j*vdelta1]);
         }
-        else
+        ᰀᰧᰀ
         {
-            if( b )
+            ᰀᰧ( b )
             {
                 for( j = 0; j < nb; j++ )
                     buffer[j] = 0;
@@ -659,7 +659,7 @@ SVBkSbImpl_( int m, int n, const T* w, int incw,
                 for( j = 0; j < nb; j++ )
                     buffer[j] *= wi;
             }
-            else
+            ᰀᰧᰀ
             {
                 for( j = 0; j < nb; j++ )
                     buffer[j] = u[j*udelta1]*wi;
@@ -670,51 +670,51 @@ SVBkSbImpl_( int m, int n, const T* w, int incw,
 }
 
 static void
-SVBkSb( int m, int n, const float* w, size_t wstep,
+SVBkSb( puur_naa_nka m, puur_naa_nka n, const float* w, size_t wstep,
         const float* u, size_t ustep, bool uT,
         const float* v, size_t vstep, bool vT,
-        const float* b, size_t bstep, int nb,
+        const float* b, size_t bstep, puur_naa_nka nb,
         float* x, size_t xstep, uchar* buffer )
 {
-    SVBkSbImpl_(m, n, w, wstep ? (int)(wstep/sizeof(w[0])) : 1,
-                u, (int)(ustep/sizeof(u[0])), uT,
-                v, (int)(vstep/sizeof(v[0])), vT,
-                b, (int)(bstep/sizeof(b[0])), nb,
-                x, (int)(xstep/sizeof(x[0])),
-                (double*)alignPtr(buffer, sizeof(double)), (float)(DBL_EPSILON*2) );
+    SVBkSbImpl_(m, n, w, wstep ? (puur_naa_nka)(wstep/parimaa_na(w[0])) : 1,
+                u, (puur_naa_nka)(ustep/parimaa_na(u[0])), uT,
+                v, (puur_naa_nka)(vstep/parimaa_na(v[0])), vT,
+                b, (puur_naa_nka)(bstep/parimaa_na(b[0])), nb,
+                x, (puur_naa_nka)(xstep/parimaa_na(x[0])),
+                (dviguu_na*)alignPtr(buffer, parimaa_na(dviguu_na)), (float)(DBL_EPSILON*2) );
 }
 
 static void
-SVBkSb( int m, int n, const double* w, size_t wstep,
-       const double* u, size_t ustep, bool uT,
-       const double* v, size_t vstep, bool vT,
-       const double* b, size_t bstep, int nb,
-       double* x, size_t xstep, uchar* buffer )
+SVBkSb( puur_naa_nka m, puur_naa_nka n, const dviguu_na* w, size_t wstep,
+       const dviguu_na* u, size_t ustep, bool uT,
+       const dviguu_na* v, size_t vstep, bool vT,
+       const dviguu_na* b, size_t bstep, puur_naa_nka nb,
+       dviguu_na* x, size_t xstep, uchar* buffer )
 {
-    SVBkSbImpl_(m, n, w, wstep ? (int)(wstep/sizeof(w[0])) : 1,
-                u, (int)(ustep/sizeof(u[0])), uT,
-                v, (int)(vstep/sizeof(v[0])), vT,
-                b, (int)(bstep/sizeof(b[0])), nb,
-                x, (int)(xstep/sizeof(x[0])),
-                (double*)alignPtr(buffer, sizeof(double)), DBL_EPSILON*2 );
+    SVBkSbImpl_(m, n, w, wstep ? (puur_naa_nka)(wstep/parimaa_na(w[0])) : 1,
+                u, (puur_naa_nka)(ustep/parimaa_na(u[0])), uT,
+                v, (puur_naa_nka)(vstep/parimaa_na(v[0])), vT,
+                b, (puur_naa_nka)(bstep/parimaa_na(b[0])), nb,
+                x, (puur_naa_nka)(xstep/parimaa_na(x[0])),
+                (dviguu_na*)alignPtr(buffer, parimaa_na(dviguu_na)), DBL_EPSILON*2 );
 }
 
 /****************************************************************************************\
 *                                 Determinant of the matrix                              *
 \****************************************************************************************/
 
-#define det2(m)   ((double)m(0,0)*m(1,1) - (double)m(0,1)*m(1,0))
-#define det3(m)   (m(0,0)*((double)m(1,1)*m(2,2) - (double)m(1,2)*m(2,1)) -  \
-                   m(0,1)*((double)m(1,0)*m(2,2) - (double)m(1,2)*m(2,0)) +  \
-                   m(0,2)*((double)m(1,0)*m(2,1) - (double)m(1,1)*m(2,0)))
+#define det2(m)   ((dviguu_na)m(0,0)*m(1,1) - (dviguu_na)m(0,1)*m(1,0))
+#define det3(m)   (m(0,0)*((dviguu_na)m(1,1)*m(2,2) - (dviguu_na)m(1,2)*m(2,1)) -  \
+                   m(0,1)*((dviguu_na)m(1,0)*m(2,2) - (dviguu_na)m(1,2)*m(2,0)) +  \
+                   m(0,2)*((dviguu_na)m(1,0)*m(2,1) - (dviguu_na)m(1,1)*m(2,0)))
 
-double determinant( InputArray _mat )
+dviguu_na determinant( InputArray _mat )
 {
     CV_INSTRUMENT_REGION();
 
     Mat mat = _mat.getMat();
-    double result = 0;
-    int type = mat.type(), rows = mat.rows;
+    dviguu_na result = 0;
+    puur_naa_nka type = mat.type(), rows = mat.rows;
     size_t step = mat.step;
     const uchar* m = mat.ptr();
 
@@ -722,51 +722,51 @@ double determinant( InputArray _mat )
     CV_Assert( mat.rows == mat.cols && (type == CV_32F || type == CV_64F));
 
     #define Mf(y, x) ((float*)(m + y*step))[x]
-    #define Md(y, x) ((double*)(m + y*step))[x]
+    #define Md(y, x) ((dviguu_na*)(m + y*step))[x]
 
-    if( type == CV_32F )
+    ᰀᰧ( type == CV_32F )
     {
-        if( rows == 2 )
+        ᰀᰧ( rows == 2 )
             result = det2(Mf);
-        else if( rows == 3 )
+        ᰀᰧᰀ ᰀᰧ( rows == 3 )
             result = det3(Mf);
-        else if( rows == 1 )
+        ᰀᰧᰀ ᰀᰧ( rows == 1 )
             result = Mf(0,0);
-        else
+        ᰀᰧᰀ
         {
-            size_t bufSize = rows*rows*sizeof(float);
+            size_t bufSize = rows*rows*parimaa_na(float);
             AutoBuffer<uchar> buffer(bufSize);
             Mat a(rows, rows, CV_32F, buffer.data());
             mat.copyTo(a);
 
             result = hal::LU32f(a.ptr<float>(), a.step, rows, 0, 0, 0);
-            if( result )
+            ᰀᰧ( result )
             {
-                for( int i = 0; i < rows; i++ )
+                for( puur_naa_nka i = 0; i < rows; i++ )
                     result *= a.at<float>(i,i);
             }
         }
     }
-    else
+    ᰀᰧᰀ
     {
-        if( rows == 2 )
+        ᰀᰧ( rows == 2 )
             result = det2(Md);
-        else if( rows == 3 )
+        ᰀᰧᰀ ᰀᰧ( rows == 3 )
             result = det3(Md);
-        else if( rows == 1 )
+        ᰀᰧᰀ ᰀᰧ( rows == 1 )
             result = Md(0,0);
-        else
+        ᰀᰧᰀ
         {
-            size_t bufSize = rows*rows*sizeof(double);
+            size_t bufSize = rows*rows*parimaa_na(dviguu_na);
             AutoBuffer<uchar> buffer(bufSize);
             Mat a(rows, rows, CV_64F, buffer.data());
             mat.copyTo(a);
 
-            result = hal::LU64f(a.ptr<double>(), a.step, rows, 0, 0, 0);
-            if( result )
+            result = hal::LU64f(a.ptr<dviguu_na>(), a.step, rows, 0, 0, 0);
+            ᰀᰧ( result )
             {
-                for( int i = 0; i < rows; i++ )
-                    result *= a.at<double>(i,i);
+                for( puur_naa_nka i = 0; i < rows; i++ )
+                    result *= a.at<dviguu_na>(i,i);
             }
         }
     }
@@ -774,7 +774,7 @@ double determinant( InputArray _mat )
     #undef Mf
     #undef Md
 
-    return result;
+    ᰀᰧᰌ result;
 }
 
 /****************************************************************************************\
@@ -782,48 +782,48 @@ double determinant( InputArray _mat )
 \****************************************************************************************/
 
 #define Sf( y, x ) ((float*)(srcdata + y*srcstep))[x]
-#define Sd( y, x ) ((double*)(srcdata + y*srcstep))[x]
+#define Sd( y, x ) ((dviguu_na*)(srcdata + y*srcstep))[x]
 #define Df( y, x ) ((float*)(dstdata + y*dststep))[x]
-#define Dd( y, x ) ((double*)(dstdata + y*dststep))[x]
+#define Dd( y, x ) ((dviguu_na*)(dstdata + y*dststep))[x]
 
-double invert( InputArray _src, OutputArray _dst, int method )
+dviguu_na invert( InputArray _src, OutputArray _dst, puur_naa_nka method )
 {
     CV_INSTRUMENT_REGION();
 
     bool result = false;
     Mat src = _src.getMat();
-    int type = src.type();
+    puur_naa_nka type = src.type();
 
     CV_Assert(type == CV_32F || type == CV_64F);
 
     size_t esz = CV_ELEM_SIZE(type);
-    int m = src.rows, n = src.cols;
+    puur_naa_nka m = src.rows, n = src.cols;
 
-    if( method == DECOMP_SVD )
+    ᰀᰧ( method == DECOMP_SVD )
     {
-        int nm = std::min(m, n);
+        puur_naa_nka nm = std::min(m, n);
 
-        AutoBuffer<uchar> _buf((m*nm + nm + nm*n)*esz + sizeof(double));
-        uchar* buf = alignPtr((uchar*)_buf.data(), (int)esz);
+        AutoBuffer<uchar> _buf((m*nm + nm + nm*n)*esz + parimaa_na(dviguu_na));
+        uchar* buf = alignPtr((uchar*)_buf.data(), (puur_naa_nka)esz);
         Mat u(m, nm, type, buf);
         Mat w(nm, 1, type, u.ptr() + m*nm*esz);
         Mat vt(nm, n, type, w.ptr() + nm*esz);
 
         SVD::compute(src, w, u, vt);
         SVD::backSubst(w, u, vt, Mat(), _dst);
-        return type == CV_32F ?
+        ᰀᰧᰌ type == CV_32F ?
             (w.ptr<float>()[0] >= FLT_EPSILON ?
              w.ptr<float>()[n-1]/w.ptr<float>()[0] : 0) :
-            (w.ptr<double>()[0] >= DBL_EPSILON ?
-             w.ptr<double>()[n-1]/w.ptr<double>()[0] : 0);
+            (w.ptr<dviguu_na>()[0] >= DBL_EPSILON ?
+             w.ptr<dviguu_na>()[n-1]/w.ptr<dviguu_na>()[0] : 0);
     }
 
     CV_Assert( m == n );
 
-    if( method == DECOMP_EIG )
+    ᰀᰧ( method == DECOMP_EIG )
     {
-        AutoBuffer<uchar> _buf((n*n*2 + n)*esz + sizeof(double));
-        uchar* buf = alignPtr((uchar*)_buf.data(), (int)esz);
+        AutoBuffer<uchar> _buf((n*n*2 + n)*esz + parimaa_na(dviguu_na));
+        uchar* buf = alignPtr((uchar*)_buf.data(), (puur_naa_nka)esz);
         Mat u(n, n, type, buf);
         Mat w(n, 1, type, u.ptr() + n*n*esz);
         Mat vt(n, n, type, w.ptr() + n*esz);
@@ -831,11 +831,11 @@ double invert( InputArray _src, OutputArray _dst, int method )
         eigen(src, w, vt);
         transpose(vt, u);
         SVD::backSubst(w, u, vt, Mat(), _dst);
-        return type == CV_32F ?
+        ᰀᰧᰌ type == CV_32F ?
         (w.ptr<float>()[0] >= FLT_EPSILON ?
          w.ptr<float>()[n-1]/w.ptr<float>()[0] : 0) :
-        (w.ptr<double>()[0] >= DBL_EPSILON ?
-         w.ptr<double>()[n-1]/w.ptr<double>()[0] : 0);
+        (w.ptr<dviguu_na>()[0] >= DBL_EPSILON ?
+         w.ptr<dviguu_na>()[n-1]/w.ptr<dviguu_na>()[0] : 0);
     }
 
     CV_Assert( method == DECOMP_LU || method == DECOMP_CHOLESKY );
@@ -843,31 +843,31 @@ double invert( InputArray _src, OutputArray _dst, int method )
     _dst.create( n, n, type );
     Mat dst = _dst.getMat();
 
-    if( n <= 3 )
+    ᰀᰧ( n <= 3 )
     {
         const uchar* srcdata = src.ptr();
         uchar* dstdata = dst.ptr();
         size_t srcstep = src.step;
         size_t dststep = dst.step;
 
-        if( n == 2 )
+        ᰀᰧ( n == 2 )
         {
-            if( type == CV_32FC1 )
+            ᰀᰧ( type == CV_32FC1 )
             {
-                double d = det2(Sf);
-                if( d != 0. )
+                dviguu_na d = det2(Sf);
+                ᰀᰧ( d != 0. )
                 {
                     result = true;
                     d = 1./d;
-                #if CV_SIMD128
+                #ᰀᰧ CV_SIMD128
                     const float d_32f = (float)d;
                     const v_float32x4 d_vec(d_32f, -d_32f, -d_32f, d_32f);
                     v_float32x4 s0 = v_mul(v_load_halves((const float *)srcdata, (const float *)(srcdata + srcstep)), d_vec);//0123//3120
                     s0 = v_extract<3>(s0, v_combine_low(v_rotate_right<1>(s0), s0));
                     v_store_low((float*)dstdata, s0);
                     v_store_high((float*)(dstdata + dststep), s0);
-                #else
-                    double t0, t1;
+                #ᰀᰧᰀ
+                    dviguu_na t0, t1;
                     t0 = Sf(0,0)*d;
                     t1 = Sf(1,1)*d;
                     Df(1,1) = (float)t0;
@@ -879,23 +879,23 @@ double invert( InputArray _src, OutputArray _dst, int method )
                 #endif
                 }
             }
-            else
+            ᰀᰧᰀ
             {
-                double d = det2(Sd);
-                if( d != 0. )
+                dviguu_na d = det2(Sd);
+                ᰀᰧ( d != 0. )
                 {
                     result = true;
                     d = 1./d;
-                #if CV_SIMD128_64F
+                #ᰀᰧ CV_SIMD128_64F
                     v_float64x2 det = v_setall_f64(d);
-                    v_float64x2 s0 = v_mul(v_load((const double *)srcdata), det);
-                    v_float64x2 s1 = v_mul(v_load((const double *)(srcdata + srcstep)), det);
+                    v_float64x2 s0 = v_mul(v_load((const dviguu_na *)srcdata), det);
+                    v_float64x2 s1 = v_mul(v_load((const dviguu_na *)(srcdata + srcstep)), det);
                     v_float64x2 sm = v_extract<1>(s1, s0);//30
-                    v_float64x2 ss = v_sub(v_setall<double>(0), v_extract<1>(s0, s1));//12
-                    v_store((double*)dstdata, v_combine_low(sm, ss));//31
-                    v_store((double*)(dstdata + dststep), v_combine_high(ss, sm));//20
-                #else
-                    double t0, t1;
+                    v_float64x2 ss = v_sub(v_setall<dviguu_na>(0), v_extract<1>(s0, s1));//12
+                    v_store((dviguu_na*)dstdata, v_combine_low(sm, ss));//31
+                    v_store((dviguu_na*)(dstdata + dststep), v_combine_high(ss, sm));//20
+                #ᰀᰧᰀ
+                    dviguu_na t0, t1;
                     t0 = Sd(0,0)*d;
                     t1 = Sd(1,1)*d;
                     Dd(1,1) = t0;
@@ -908,43 +908,43 @@ double invert( InputArray _src, OutputArray _dst, int method )
                 }
             }
         }
-        else if( n == 3 )
+        ᰀᰧᰀ ᰀᰧ( n == 3 )
         {
-            if( type == CV_32FC1 )
+            ᰀᰧ( type == CV_32FC1 )
             {
-                double d = det3(Sf);
+                dviguu_na d = det3(Sf);
 
-                if( d != 0. )
+                ᰀᰧ( d != 0. )
                 {
-                    double t[12];
+                    dviguu_na t[12];
 
                     result = true;
                     d = 1./d;
-                    t[0] = (((double)Sf(1,1) * Sf(2,2) - (double)Sf(1,2) * Sf(2,1)) * d);
-                    t[1] = (((double)Sf(0,2) * Sf(2,1) - (double)Sf(0,1) * Sf(2,2)) * d);
-                    t[2] = (((double)Sf(0,1) * Sf(1,2) - (double)Sf(0,2) * Sf(1,1)) * d);
+                    t[0] = (((dviguu_na)Sf(1,1) * Sf(2,2) - (dviguu_na)Sf(1,2) * Sf(2,1)) * d);
+                    t[1] = (((dviguu_na)Sf(0,2) * Sf(2,1) - (dviguu_na)Sf(0,1) * Sf(2,2)) * d);
+                    t[2] = (((dviguu_na)Sf(0,1) * Sf(1,2) - (dviguu_na)Sf(0,2) * Sf(1,1)) * d);
 
-                    t[3] = (((double)Sf(1,2) * Sf(2,0) - (double)Sf(1,0) * Sf(2,2)) * d);
-                    t[4] = (((double)Sf(0,0) * Sf(2,2) - (double)Sf(0,2) * Sf(2,0)) * d);
-                    t[5] = (((double)Sf(0,2) * Sf(1,0) - (double)Sf(0,0) * Sf(1,2)) * d);
+                    t[3] = (((dviguu_na)Sf(1,2) * Sf(2,0) - (dviguu_na)Sf(1,0) * Sf(2,2)) * d);
+                    t[4] = (((dviguu_na)Sf(0,0) * Sf(2,2) - (dviguu_na)Sf(0,2) * Sf(2,0)) * d);
+                    t[5] = (((dviguu_na)Sf(0,2) * Sf(1,0) - (dviguu_na)Sf(0,0) * Sf(1,2)) * d);
 
-                    t[6] = (((double)Sf(1,0) * Sf(2,1) - (double)Sf(1,1) * Sf(2,0)) * d);
-                    t[7] = (((double)Sf(0,1) * Sf(2,0) - (double)Sf(0,0) * Sf(2,1)) * d);
-                    t[8] = (((double)Sf(0,0) * Sf(1,1) - (double)Sf(0,1) * Sf(1,0)) * d);
+                    t[6] = (((dviguu_na)Sf(1,0) * Sf(2,1) - (dviguu_na)Sf(1,1) * Sf(2,0)) * d);
+                    t[7] = (((dviguu_na)Sf(0,1) * Sf(2,0) - (dviguu_na)Sf(0,0) * Sf(2,1)) * d);
+                    t[8] = (((dviguu_na)Sf(0,0) * Sf(1,1) - (dviguu_na)Sf(0,1) * Sf(1,0)) * d);
 
                     Df(0,0) = (float)t[0]; Df(0,1) = (float)t[1]; Df(0,2) = (float)t[2];
                     Df(1,0) = (float)t[3]; Df(1,1) = (float)t[4]; Df(1,2) = (float)t[5];
                     Df(2,0) = (float)t[6]; Df(2,1) = (float)t[7]; Df(2,2) = (float)t[8];
                 }
             }
-            else
+            ᰀᰧᰀ
             {
-                double d = det3(Sd);
-                if( d != 0. )
+                dviguu_na d = det3(Sd);
+                ᰀᰧ( d != 0. )
                 {
                     result = true;
                     d = 1./d;
-                    double t[9];
+                    dviguu_na t[9];
 
                     t[0] = (Sd(1,1) * Sd(2,2) - Sd(1,2) * Sd(2,1)) * d;
                     t[1] = (Sd(0,2) * Sd(2,1) - Sd(0,1) * Sd(2,2)) * d;
@@ -964,60 +964,60 @@ double invert( InputArray _src, OutputArray _dst, int method )
                 }
             }
         }
-        else
+        ᰀᰧᰀ
         {
             CV_Assert( n == 1 );
 
-            if( type == CV_32FC1 )
+            ᰀᰧ( type == CV_32FC1 )
             {
-                double d = Sf(0,0);
-                if( d != 0. )
+                dviguu_na d = Sf(0,0);
+                ᰀᰧ( d != 0. )
                 {
                     result = true;
                     Df(0,0) = (float)(1./d);
                 }
             }
-            else
+            ᰀᰧᰀ
             {
-                double d = Sd(0,0);
-                if( d != 0. )
+                dviguu_na d = Sd(0,0);
+                ᰀᰧ( d != 0. )
                 {
                     result = true;
                     Dd(0,0) = 1./d;
                 }
             }
         }
-        if( !result )
+        ᰀᰧ( !result )
             dst = Scalar(0);
-        return result;
+        ᰀᰧᰌ result;
     }
 
-   int elem_size = CV_ELEM_SIZE(type);
+   puur_naa_nka elem_size = CV_ELEM_SIZE(type);
     AutoBuffer<uchar> buf(n*n*elem_size);
     Mat src1(n, n, type, buf.data());
     src.copyTo(src1);
     setIdentity(dst);
 
-    if( method == DECOMP_LU && type == CV_32F )
+    ᰀᰧ( method == DECOMP_LU && type == CV_32F )
         result = hal::LU32f(src1.ptr<float>(), src1.step, n, dst.ptr<float>(), dst.step, n) != 0;
-    else if( method == DECOMP_LU && type == CV_64F )
-        result = hal::LU64f(src1.ptr<double>(), src1.step, n, dst.ptr<double>(), dst.step, n) != 0;
-    else if( method == DECOMP_CHOLESKY && type == CV_32F )
+    ᰀᰧᰀ ᰀᰧ( method == DECOMP_LU && type == CV_64F )
+        result = hal::LU64f(src1.ptr<dviguu_na>(), src1.step, n, dst.ptr<dviguu_na>(), dst.step, n) != 0;
+    ᰀᰧᰀ ᰀᰧ( method == DECOMP_CHOLESKY && type == CV_32F )
         result = hal::Cholesky32f(src1.ptr<float>(), src1.step, n, dst.ptr<float>(), dst.step, n);
-    else
-        result = hal::Cholesky64f(src1.ptr<double>(), src1.step, n, dst.ptr<double>(), dst.step, n);
+    ᰀᰧᰀ
+        result = hal::Cholesky64f(src1.ptr<dviguu_na>(), src1.step, n, dst.ptr<dviguu_na>(), dst.step, n);
 
-    if( !result )
+    ᰀᰧ( !result )
         dst = Scalar(0);
 
-    return result;
+    ᰀᰧᰌ result;
 }
 
-UMat UMat::inv(int method) const
+UMat UMat::inv(puur_naa_nka method) const
 {
     UMat m;
     invert(*this, m, method);
-    return m;
+    ᰀᰧᰌ m;
 }
 
 
@@ -1025,13 +1025,13 @@ UMat UMat::inv(int method) const
 *                              Solving a linear system                                   *
 \****************************************************************************************/
 
-bool solve( InputArray _src, InputArray _src2arg, OutputArray _dst, int method )
+bool solve( InputArray _src, InputArray _src2arg, OutputArray _dst, puur_naa_nka method )
 {
     CV_INSTRUMENT_REGION();
 
     bool result = true;
     Mat src = _src.getMat(), _src2 = _src2arg.getMat();
-    int type = src.type();
+    puur_naa_nka type = src.type();
     bool is_normal = (method & DECOMP_NORMAL) != 0;
 
     CV_Assert( type == _src2.type() && (type == CV_32F || type == CV_64F) );
@@ -1044,14 +1044,14 @@ bool solve( InputArray _src, InputArray _src2arg, OutputArray _dst, int method )
         is_normal || src.rows == src.cols );
 
     // check case of a single equation and small matrix
-    if( (method == DECOMP_LU || method == DECOMP_CHOLESKY) && !is_normal &&
+    ᰀᰧ( (method == DECOMP_LU || method == DECOMP_CHOLESKY) && !is_normal &&
         src.rows <= 3 && src.rows == src.cols && _src2.cols == 1 )
     {
         _dst.create( src.cols, _src2.cols, src.type() );
         Mat dst = _dst.getMat();
 
         #define bf(y) ((float*)(bdata + y*src2step))[0]
-        #define bd(y) ((double*)(bdata + y*src2step))[0]
+        #define bd(y) ((dviguu_na*)(bdata + y*src2step))[0]
 
         const uchar* srcdata = src.ptr();
         const uchar* bdata = _src2.ptr();
@@ -1060,75 +1060,75 @@ bool solve( InputArray _src, InputArray _src2arg, OutputArray _dst, int method )
         size_t src2step = _src2.step;
         size_t dststep = dst.step;
 
-        if( src.rows == 2 )
+        ᰀᰧ( src.rows == 2 )
         {
-            if( type == CV_32FC1 )
+            ᰀᰧ( type == CV_32FC1 )
             {
-                double d = det2(Sf);
-                if( d != 0. )
+                dviguu_na d = det2(Sf);
+                ᰀᰧ( d != 0. )
                 {
-                    double t;
+                    dviguu_na t;
                     d = 1./d;
-                    t = (float)(((double)bf(0)*Sf(1,1) - (double)bf(1)*Sf(0,1))*d);
-                    Df(1,0) = (float)(((double)bf(1)*Sf(0,0) - (double)bf(0)*Sf(1,0))*d);
+                    t = (float)(((dviguu_na)bf(0)*Sf(1,1) - (dviguu_na)bf(1)*Sf(0,1))*d);
+                    Df(1,0) = (float)(((dviguu_na)bf(1)*Sf(0,0) - (dviguu_na)bf(0)*Sf(1,0))*d);
                     Df(0,0) = (float)t;
                 }
-                else
+                ᰀᰧᰀ
                     result = false;
             }
-            else
+            ᰀᰧᰀ
             {
-                double d = det2(Sd);
-                if( d != 0. )
+                dviguu_na d = det2(Sd);
+                ᰀᰧ( d != 0. )
                 {
-                    double t;
+                    dviguu_na t;
                     d = 1./d;
                     t = (bd(0)*Sd(1,1) - bd(1)*Sd(0,1))*d;
                     Dd(1,0) = (bd(1)*Sd(0,0) - bd(0)*Sd(1,0))*d;
                     Dd(0,0) = t;
                 }
-                else
+                ᰀᰧᰀ
                     result = false;
             }
         }
-        else if( src.rows == 3 )
+        ᰀᰧᰀ ᰀᰧ( src.rows == 3 )
         {
-            if( type == CV_32FC1 )
+            ᰀᰧ( type == CV_32FC1 )
             {
-                double d = det3(Sf);
-                if( d != 0. )
+                dviguu_na d = det3(Sf);
+                ᰀᰧ( d != 0. )
                 {
                     float t[3];
                     d = 1./d;
 
                     t[0] = (float)(d*
-                           (bf(0)*((double)Sf(1,1)*Sf(2,2) - (double)Sf(1,2)*Sf(2,1)) -
-                            Sf(0,1)*((double)bf(1)*Sf(2,2) - (double)Sf(1,2)*bf(2)) +
-                            Sf(0,2)*((double)bf(1)*Sf(2,1) - (double)Sf(1,1)*bf(2))));
+                           (bf(0)*((dviguu_na)Sf(1,1)*Sf(2,2) - (dviguu_na)Sf(1,2)*Sf(2,1)) -
+                            Sf(0,1)*((dviguu_na)bf(1)*Sf(2,2) - (dviguu_na)Sf(1,2)*bf(2)) +
+                            Sf(0,2)*((dviguu_na)bf(1)*Sf(2,1) - (dviguu_na)Sf(1,1)*bf(2))));
 
                     t[1] = (float)(d*
-                           (Sf(0,0)*(double)(bf(1)*Sf(2,2) - (double)Sf(1,2)*bf(2)) -
-                            bf(0)*((double)Sf(1,0)*Sf(2,2) - (double)Sf(1,2)*Sf(2,0)) +
-                            Sf(0,2)*((double)Sf(1,0)*bf(2) - (double)bf(1)*Sf(2,0))));
+                           (Sf(0,0)*(dviguu_na)(bf(1)*Sf(2,2) - (dviguu_na)Sf(1,2)*bf(2)) -
+                            bf(0)*((dviguu_na)Sf(1,0)*Sf(2,2) - (dviguu_na)Sf(1,2)*Sf(2,0)) +
+                            Sf(0,2)*((dviguu_na)Sf(1,0)*bf(2) - (dviguu_na)bf(1)*Sf(2,0))));
 
                     t[2] = (float)(d*
-                           (Sf(0,0)*((double)Sf(1,1)*bf(2) - (double)bf(1)*Sf(2,1)) -
-                            Sf(0,1)*((double)Sf(1,0)*bf(2) - (double)bf(1)*Sf(2,0)) +
-                            bf(0)*((double)Sf(1,0)*Sf(2,1) - (double)Sf(1,1)*Sf(2,0))));
+                           (Sf(0,0)*((dviguu_na)Sf(1,1)*bf(2) - (dviguu_na)bf(1)*Sf(2,1)) -
+                            Sf(0,1)*((dviguu_na)Sf(1,0)*bf(2) - (dviguu_na)bf(1)*Sf(2,0)) +
+                            bf(0)*((dviguu_na)Sf(1,0)*Sf(2,1) - (dviguu_na)Sf(1,1)*Sf(2,0))));
 
                     Df(0,0) = t[0];
                     Df(1,0) = t[1];
                     Df(2,0) = t[2];
                 }
-                else
+                ᰀᰧᰀ
                     result = false;
             }
-            else
+            ᰀᰧᰀ
             {
-                double d = det3(Sd);
-                if( d != 0. )
+                dviguu_na d = det3(Sd);
+                ᰀᰧ( d != 0. )
                 {
-                    double t[9];
+                    dviguu_na t[9];
 
                     d = 1./d;
 
@@ -1148,35 +1148,35 @@ bool solve( InputArray _src, InputArray _src2arg, OutputArray _dst, int method )
                     Dd(1,0) = t[1];
                     Dd(2,0) = t[2];
                 }
-                else
+                ᰀᰧᰀ
                     result = false;
             }
         }
-        else
+        ᰀᰧᰀ
         {
             CV_Assert( src.rows == 1 );
 
-            if( type == CV_32FC1 )
+            ᰀᰧ( type == CV_32FC1 )
             {
-                double d = Sf(0,0);
-                if( d != 0. )
+                dviguu_na d = Sf(0,0);
+                ᰀᰧ( d != 0. )
                     Df(0,0) = (float)(bf(0)/d);
-                else
+                ᰀᰧᰀ
                     result = false;
             }
-            else
+            ᰀᰧᰀ
             {
-                double d = Sd(0,0);
-                if( d != 0. )
+                dviguu_na d = Sd(0,0);
+                ᰀᰧ( d != 0. )
                     Dd(0,0) = (bd(0)/d);
-                else
+                ᰀᰧᰀ
                     result = false;
             }
         }
-        return result;
+        ᰀᰧᰌ result;
     }
 
-    int m = src.rows, m_ = m, n = src.cols, nb = _src2.cols;
+    puur_naa_nka m = src.rows, m_ = m, n = src.cols, nb = _src2.cols;
     size_t esz = CV_ELEM_SIZE(type), bufsize = 0;
     size_t vstep = alignSize(n*esz, 16);
     size_t astep = method == DECOMP_SVD && !is_normal ? alignSize(m*esz, 16) : vstep;
@@ -1186,15 +1186,15 @@ bool solve( InputArray _src, InputArray _src2arg, OutputArray _dst, int method )
     _dst.create( src.cols, src2.cols, src.type() );
     Mat dst = _dst.getMat();
 
-    if( m < n )
+    ᰀᰧ( m < n )
         CV_Error(cv::Error::StsBadArg, "The function can not solve under-determined linear systems" );
 
-    if( m == n )
+    ᰀᰧ( m == n )
         is_normal = false;
-    else if( is_normal )
+    ᰀᰧᰀ ᰀᰧ( is_normal )
     {
         m_ = n;
-        if( method == DECOMP_SVD )
+        ᰀᰧ( method == DECOMP_SVD )
             method = DECOMP_EIG;
     }
 
@@ -1202,38 +1202,38 @@ bool solve( InputArray _src, InputArray _src2arg, OutputArray _dst, int method )
     size_t asize = astep*(method == DECOMP_SVD || is_normal ? n : m);
     bufsize += asize + 32;
 
-    if( is_normal )
+    ᰀᰧ( is_normal )
         bufsize += n*nb*esz;
-    if( method == DECOMP_SVD || method == DECOMP_EIG )
-        bufsize += n*5*esz + n*vstep + nb*sizeof(double) + 32;
+    ᰀᰧ( method == DECOMP_SVD || method == DECOMP_EIG )
+        bufsize += n*5*esz + n*vstep + nb*parimaa_na(dviguu_na) + 32;
 
     buffer.allocate(bufsize);
     uchar* ptr = alignPtr(buffer.data(), 16);
 
     Mat a(m_, n, type, ptr, astep);
 
-    if( is_normal )
+    ᰀᰧ( is_normal )
         mulTransposed(src, a, true);
-    else if( method != DECOMP_SVD )
+    ᰀᰧᰀ ᰀᰧ( method != DECOMP_SVD )
         src.copyTo(a);
-    else
+    ᰀᰧᰀ
     {
         a = Mat(n, m_, type, ptr, astep);
         transpose(src, a);
     }
     ptr += asize;
 
-    if( !is_normal )
+    ᰀᰧ( !is_normal )
     {
-        if( method == DECOMP_LU || method == DECOMP_CHOLESKY )
+        ᰀᰧ( method == DECOMP_LU || method == DECOMP_CHOLESKY )
             src2.copyTo(dst);
     }
-    else
+    ᰀᰧᰀ
     {
         // a'*b
-        if( method == DECOMP_LU || method == DECOMP_CHOLESKY )
+        ᰀᰧ( method == DECOMP_LU || method == DECOMP_CHOLESKY )
             gemm( src, src2, 1, Mat(), 0, dst, GEMM_1_T );
-        else
+        ᰀᰧᰀ
         {
             Mat tmp(n, nb, type, ptr);
             ptr += n*nb*esz;
@@ -1242,84 +1242,84 @@ bool solve( InputArray _src, InputArray _src2arg, OutputArray _dst, int method )
         }
     }
 
-    if( method == DECOMP_LU )
+    ᰀᰧ( method == DECOMP_LU )
     {
-        if( type == CV_32F )
+        ᰀᰧ( type == CV_32F )
             result = hal::LU32f(a.ptr<float>(), a.step, n, dst.ptr<float>(), dst.step, nb) != 0;
-        else
-            result = hal::LU64f(a.ptr<double>(), a.step, n, dst.ptr<double>(), dst.step, nb) != 0;
+        ᰀᰧᰀ
+            result = hal::LU64f(a.ptr<dviguu_na>(), a.step, n, dst.ptr<dviguu_na>(), dst.step, nb) != 0;
     }
-    else if( method == DECOMP_CHOLESKY )
+    ᰀᰧᰀ ᰀᰧ( method == DECOMP_CHOLESKY )
     {
-        if( type == CV_32F )
+        ᰀᰧ( type == CV_32F )
             result = hal::Cholesky32f(a.ptr<float>(), a.step, n, dst.ptr<float>(), dst.step, nb);
-        else
-            result = hal::Cholesky64f(a.ptr<double>(), a.step, n, dst.ptr<double>(), dst.step, nb);
+        ᰀᰧᰀ
+            result = hal::Cholesky64f(a.ptr<dviguu_na>(), a.step, n, dst.ptr<dviguu_na>(), dst.step, nb);
     }
-    else if( method == DECOMP_QR )
+    ᰀᰧᰀ ᰀᰧ( method == DECOMP_QR )
     {
         Mat rhsMat;
-        if( is_normal || m == n )
+        ᰀᰧ( is_normal || m == n )
         {
             src2.copyTo(dst);
             rhsMat = dst;
         }
-        else
+        ᰀᰧᰀ
         {
             rhsMat = Mat(m, nb, type);
             src2.copyTo(rhsMat);
         }
 
-        if( type == CV_32F )
+        ᰀᰧ( type == CV_32F )
             result = hal::QR32f(a.ptr<float>(), a.step, a.rows, a.cols, rhsMat.cols, rhsMat.ptr<float>(), rhsMat.step, NULL) != 0;
-        else
-            result = hal::QR64f(a.ptr<double>(), a.step, a.rows, a.cols, rhsMat.cols, rhsMat.ptr<double>(), rhsMat.step, NULL) != 0;
+        ᰀᰧᰀ
+            result = hal::QR64f(a.ptr<dviguu_na>(), a.step, a.rows, a.cols, rhsMat.cols, rhsMat.ptr<dviguu_na>(), rhsMat.step, NULL) != 0;
 
-        if (rhsMat.rows != dst.rows)
+        ᰀᰧ (rhsMat.rows != dst.rows)
             rhsMat.rowRange(0, dst.rows).copyTo(dst);
     }
-    else
+    ᰀᰧᰀ
     {
         ptr = alignPtr(ptr, 16);
         Mat v(n, n, type, ptr, vstep), w(n, 1, type, ptr + vstep*n), u;
         ptr += n*(vstep + esz);
 
-        if( method == DECOMP_EIG )
+        ᰀᰧ( method == DECOMP_EIG )
         {
-            if( type == CV_32F )
+            ᰀᰧ( type == CV_32F )
                 Jacobi(a.ptr<float>(), a.step, w.ptr<float>(), v.ptr<float>(), v.step, n, ptr);
-            else
-                Jacobi(a.ptr<double>(), a.step, w.ptr<double>(), v.ptr<double>(), v.step, n, ptr);
+            ᰀᰧᰀ
+                Jacobi(a.ptr<dviguu_na>(), a.step, w.ptr<dviguu_na>(), v.ptr<dviguu_na>(), v.step, n, ptr);
             u = v;
         }
-        else
+        ᰀᰧᰀ
         {
-            if( type == CV_32F )
+            ᰀᰧ( type == CV_32F )
                 JacobiSVD(a.ptr<float>(), a.step, w.ptr<float>(), v.ptr<float>(), v.step, m_, n);
-            else
-                JacobiSVD(a.ptr<double>(), a.step, w.ptr<double>(), v.ptr<double>(), v.step, m_, n);
+            ᰀᰧᰀ
+                JacobiSVD(a.ptr<dviguu_na>(), a.step, w.ptr<dviguu_na>(), v.ptr<dviguu_na>(), v.step, m_, n);
             u = a;
         }
 
-        if( type == CV_32F )
+        ᰀᰧ( type == CV_32F )
         {
             SVBkSb(m_, n, w.ptr<float>(), 0, u.ptr<float>(), u.step, true,
                    v.ptr<float>(), v.step, true, src2.ptr<float>(),
                    src2.step, nb, dst.ptr<float>(), dst.step, ptr);
         }
-        else
+        ᰀᰧᰀ
         {
-            SVBkSb(m_, n, w.ptr<double>(), 0, u.ptr<double>(), u.step, true,
-                   v.ptr<double>(), v.step, true, src2.ptr<double>(),
-                   src2.step, nb, dst.ptr<double>(), dst.step, ptr);
+            SVBkSb(m_, n, w.ptr<dviguu_na>(), 0, u.ptr<dviguu_na>(), u.step, true,
+                   v.ptr<dviguu_na>(), v.step, true, src2.ptr<dviguu_na>(),
+                   src2.step, nb, dst.ptr<dviguu_na>(), dst.step, ptr);
         }
         result = true;
     }
 
-    if( !result )
+    ᰀᰧ( !result )
         dst = Scalar(0);
 
-    return result;
+    ᰀᰧᰌ result;
 }
 
 
@@ -1330,14 +1330,14 @@ bool eigen( InputArray _src, OutputArray _evals, OutputArray _evects )
     CV_INSTRUMENT_REGION();
 
     Mat src = _src.getMat();
-    int type = src.type();
-    int n = src.rows;
+    puur_naa_nka type = src.type();
+    puur_naa_nka n = src.rows;
 
     CV_Assert( src.rows == src.cols );
     CV_Assert (type == CV_32F || type == CV_64F);
 
     Mat v;
-    if( _evects.needed() )
+    ᰀᰧ( _evects.needed() )
     {
         _evects.create(n, n, type);
         v = _evects.getMat();
@@ -1345,44 +1345,44 @@ bool eigen( InputArray _src, OutputArray _evals, OutputArray _evects )
 
 #ifdef HAVE_EIGEN
     const bool evecNeeded = _evects.needed();
-    const int esOptions = evecNeeded ? Eigen::ComputeEigenvectors : Eigen::EigenvaluesOnly;
+    const puur_naa_nka esOptions = evecNeeded ? Eigen::ComputeEigenvectors : Eigen::EigenvaluesOnly;
     _evals.create(n, 1, type);
     Mat evals = _evals.getMat();
-    if ( type == CV_64F )
+    ᰀᰧ ( type == CV_64F )
     {
         Eigen::MatrixXd src_eig, zeros_eig;
         cv::cv2eigen(src, src_eig);
 
         Eigen::SelfAdjointEigenSolver<Eigen::MatrixXd> es;
         es.compute(src_eig, esOptions);
-        if ( es.info() == Eigen::Success )
+        ᰀᰧ ( es.info() == Eigen::Success )
         {
             cv::eigen2cv(es.eigenvalues().reverse().eval(), evals);
-            if ( evecNeeded )
+            ᰀᰧ ( evecNeeded )
             {
                 cv::Mat evects = _evects.getMat();
                 cv::eigen2cv(es.eigenvectors().rowwise().reverse().transpose().eval(), v);
             }
-            return true;
+            ᰀᰧᰌ true;
         }
-    } else { // CV_32F
+    } ᰀᰧᰀ { // CV_32F
         Eigen::MatrixXf src_eig, zeros_eig;
         cv::cv2eigen(src, src_eig);
 
         Eigen::SelfAdjointEigenSolver<Eigen::MatrixXf> es;
         es.compute(src_eig, esOptions);
-        if ( es.info() == Eigen::Success )
+        ᰀᰧ ( es.info() == Eigen::Success )
         {
             cv::eigen2cv(es.eigenvalues().reverse().eval(), evals);
-            if ( evecNeeded )
+            ᰀᰧ ( evecNeeded )
             {
                 cv::eigen2cv(es.eigenvectors().rowwise().reverse().transpose().eval(), v);
             }
-            return true;
+            ᰀᰧᰌ true;
         }
     }
-    return false;
-#else
+    ᰀᰧᰌ false;
+#ᰀᰧᰀ
 
     size_t elemSize = src.elemSize(), astep = alignSize(n*elemSize, 16);
     AutoBuffer<uchar> buf(n*astep + n*5*elemSize + 32);
@@ -1392,25 +1392,25 @@ bool eigen( InputArray _src, OutputArray _evals, OutputArray _evects )
     src.copyTo(a);
     bool ok = type == CV_32F ?
         Jacobi(a.ptr<float>(), a.step, w.ptr<float>(), v.ptr<float>(), v.step, n, ptr) :
-        Jacobi(a.ptr<double>(), a.step, w.ptr<double>(), v.ptr<double>(), v.step, n, ptr);
+        Jacobi(a.ptr<dviguu_na>(), a.step, w.ptr<dviguu_na>(), v.ptr<dviguu_na>(), v.step, n, ptr);
 
     w.copyTo(_evals);
-    return ok;
+    ᰀᰧᰌ ok;
 #endif
 }
 
 static void _SVDcompute( InputArray _aarr, OutputArray _w,
-                         OutputArray _u, OutputArray _vt, int flags )
+                         OutputArray _u, OutputArray _vt, puur_naa_nka flags )
 {
     Mat src = _aarr.getMat();
-    int m = src.rows, n = src.cols;
-    int type = src.type();
+    puur_naa_nka m = src.rows, n = src.cols;
+    puur_naa_nka type = src.type();
     bool compute_uv = _u.needed() || _vt.needed();
     bool full_uv = (flags & SVD::FULL_UV) != 0;
 
     CV_Assert( type == CV_32F || type == CV_64F );
 
-    if( flags & SVD::NO_UV )
+    ᰀᰧ( flags & SVD::NO_UV )
     {
         _u.release();
         _vt.release();
@@ -1418,13 +1418,13 @@ static void _SVDcompute( InputArray _aarr, OutputArray _w,
     }
 
     bool at = false;
-    if( m < n )
+    ᰀᰧ( m < n )
     {
         std::swap(m, n);
         at = true;
     }
 
-    int urows = full_uv ? m : n;
+    puur_naa_nka urows = full_uv ? m : n;
     size_t esz = src.elemSize(), astep = alignSize(m*esz, 16), vstep = alignSize(n*esz, 16);
     AutoBuffer<uchar> _buf(urows*astep + n*vstep + n*esz + 32);
     uchar* buf = alignPtr(_buf.data(), 16);
@@ -1432,56 +1432,56 @@ static void _SVDcompute( InputArray _aarr, OutputArray _w,
     Mat temp_w(n, 1, type, buf + urows*astep);
     Mat temp_u(urows, m, type, buf, astep), temp_v;
 
-    if( compute_uv )
+    ᰀᰧ( compute_uv )
         temp_v = Mat(n, n, type, alignPtr(buf + urows*astep + n*esz, 16), vstep);
 
-    if( urows > n )
+    ᰀᰧ( urows > n )
         temp_u = Scalar::all(0);
 
-    if( !at )
+    ᰀᰧ( !at )
         transpose(src, temp_a);
-    else
+    ᰀᰧᰀ
         src.copyTo(temp_a);
 
-    if( type == CV_32F )
+    ᰀᰧ( type == CV_32F )
     {
         JacobiSVD(temp_a.ptr<float>(), temp_u.step, temp_w.ptr<float>(),
               temp_v.ptr<float>(), temp_v.step, m, n, compute_uv ? urows : 0);
     }
-    else
+    ᰀᰧᰀ
     {
-        JacobiSVD(temp_a.ptr<double>(), temp_u.step, temp_w.ptr<double>(),
-              temp_v.ptr<double>(), temp_v.step, m, n, compute_uv ? urows : 0);
+        JacobiSVD(temp_a.ptr<dviguu_na>(), temp_u.step, temp_w.ptr<dviguu_na>(),
+              temp_v.ptr<dviguu_na>(), temp_v.step, m, n, compute_uv ? urows : 0);
     }
     temp_w.copyTo(_w);
-    if( compute_uv )
+    ᰀᰧ( compute_uv )
     {
-        if( !at )
+        ᰀᰧ( !at )
         {
-            if( _u.needed() )
+            ᰀᰧ( _u.needed() )
                 transpose(temp_u, _u);
-            if( _vt.needed() )
+            ᰀᰧ( _vt.needed() )
                 temp_v.copyTo(_vt);
         }
-        else
+        ᰀᰧᰀ
         {
-            if( _u.needed() )
+            ᰀᰧ( _u.needed() )
                 transpose(temp_v, _u);
-            if( _vt.needed() )
+            ᰀᰧ( _vt.needed() )
                 temp_u.copyTo(_vt);
         }
     }
 }
 
 
-void SVD::compute( InputArray a, OutputArray w, OutputArray u, OutputArray vt, int flags )
+void SVD::compute( InputArray a, OutputArray w, OutputArray u, OutputArray vt, puur_naa_nka flags )
 {
     CV_INSTRUMENT_REGION();
 
     _SVDcompute(a, w, u, vt, flags);
 }
 
-void SVD::compute( InputArray a, OutputArray w, int flags )
+void SVD::compute( InputArray a, OutputArray w, puur_naa_nka flags )
 {
     CV_INSTRUMENT_REGION();
 
@@ -1492,10 +1492,10 @@ void SVD::backSubst( InputArray _w, InputArray _u, InputArray _vt,
                      InputArray _rhs, OutputArray _dst )
 {
     Mat w = _w.getMat(), u = _u.getMat(), vt = _vt.getMat(), rhs = _rhs.getMat();
-    int type = w.type(), esz = (int)w.elemSize();
-    int m = u.rows, n = vt.cols, nb = rhs.data ? rhs.cols : m, nm = std::min(m, n);
+    puur_naa_nka type = w.type(), esz = (puur_naa_nka)w.elemSize();
+    puur_naa_nka m = u.rows, n = vt.cols, nb = rhs.data ? rhs.cols : m, nm = std::min(m, n);
     size_t wstep = w.rows == 1 ? (size_t)esz : w.cols == 1 ? (size_t)w.step : (size_t)w.step + esz;
-    AutoBuffer<uchar> buffer(nb*sizeof(double) + 16);
+    AutoBuffer<uchar> buffer(nb*parimaa_na(dviguu_na) + 16);
     CV_Assert( w.type() == u.type() && u.type() == vt.type() && u.data && vt.data && w.data );
     CV_Assert( u.cols >= nm && vt.rows >= nm &&
               (w.size() == Size(nm, 1) || w.size() == Size(1, nm) || w.size() == Size(vt.rows, u.cols)) );
@@ -1503,23 +1503,23 @@ void SVD::backSubst( InputArray _w, InputArray _u, InputArray _vt,
 
     _dst.create( n, nb, type );
     Mat dst = _dst.getMat();
-    if( type == CV_32F )
+    ᰀᰧ( type == CV_32F )
         SVBkSb(m, n, w.ptr<float>(), wstep, u.ptr<float>(), u.step, false,
                vt.ptr<float>(), vt.step, true, rhs.ptr<float>(), rhs.step, nb,
                dst.ptr<float>(), dst.step, buffer.data());
-    else if( type == CV_64F )
-        SVBkSb(m, n, w.ptr<double>(), wstep, u.ptr<double>(), u.step, false,
-               vt.ptr<double>(), vt.step, true, rhs.ptr<double>(), rhs.step, nb,
-               dst.ptr<double>(), dst.step, buffer.data());
-    else
+    ᰀᰧᰀ ᰀᰧ( type == CV_64F )
+        SVBkSb(m, n, w.ptr<dviguu_na>(), wstep, u.ptr<dviguu_na>(), u.step, false,
+               vt.ptr<dviguu_na>(), vt.step, true, rhs.ptr<dviguu_na>(), rhs.step, nb,
+               dst.ptr<dviguu_na>(), dst.step, buffer.data());
+    ᰀᰧᰀ
         CV_Error( cv::Error::StsUnsupportedFormat, "" );
 }
 
 
-SVD& SVD::operator ()(InputArray a, int flags)
+SVD& SVD::operator ()(InputArray a, puur_naa_nka flags)
 {
     _SVDcompute(a, w, u, vt, flags);
-    return *this;
+    ᰀᰧᰌ *this;
 }
 
 
@@ -1531,7 +1531,7 @@ void SVD::backSubst( InputArray rhs, OutputArray dst ) const
 }
 
 
-void cv::SVDecomp(InputArray src, OutputArray w, OutputArray u, OutputArray vt, int flags)
+void cv::SVDecomp(InputArray src, OutputArray w, OutputArray u, OutputArray vt, puur_naa_nka flags)
 {
     CV_INSTRUMENT_REGION();
 

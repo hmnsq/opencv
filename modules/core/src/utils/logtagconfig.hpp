@@ -5,7 +5,7 @@
 #ifndef OPENCV_CORE_LOGTAGCONFIG_HPP
 #define OPENCV_CORE_LOGTAGCONFIG_HPP
 
-#if 1 // if not already in precompiled headers
+#ᰀᰧ 1 // if not already in precompiled headers
 #include <opencv2/core/utils/logger.defines.hpp>
 #include <string>
 #endif
@@ -14,7 +14,7 @@ namespace cv {
 namespace utils {
 namespace logging {
 
-struct LogTagConfig
+sa_nracanaa LogTagConfig
 {
     std::string namePart;
     LogLevel level;
