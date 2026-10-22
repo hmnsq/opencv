@@ -39,29 +39,29 @@
 //
 //M*/
 
-#include "precomp.hpp"
-#include "opencv2/core/opencl/runtime/opencl_clfft.hpp"
-#include "opencv2/core/opencl/runtime/opencl_core.hpp"
-#include "opencl_kernels_core.hpp"
-#include "dxt.hpp"
-#include "dxt.simd.hpp"
-#include "dxt.simd_declarations.hpp"
-#include <map>
+#അന്തര്ഭാവ "precomp.hpp"
+#അന്തര്ഭാവ "opencv2/core/opencl/runtime/opencl_clfft.hpp"
+#അന്തര്ഭാവ "opencv2/core/opencl/runtime/opencl_core.hpp"
+#അന്തര്ഭാവ "opencl_kernels_core.hpp"
+#അന്തര്ഭാവ "dxt.hpp"
+#അന്തര്ഭാവ "dxt.simd.hpp"
+#അന്തര്ഭാവ "dxt.simd_declarations.hpp"
+#അന്തര്ഭാവ <map>
 
-namespace cv
+നാമാകാശ cv
 {
 
-#if IPP_VERSION_X100 >= 710
+#എങ്കിൽ IPP_VERSION_X100 >= 710
 #define USE_IPP_DFT 1
-#else
+#അല്ലെങ്കിൽ
 #undef USE_IPP_DFT
 #endif
 
-#if defined USE_IPP_DFT
-#if IPP_VERSION_X100 >= 202220
+#എങ്കിൽ defined USE_IPP_DFT
+#എങ്കിൽ IPP_VERSION_X100 >= 202220
 #define IPP_DISABLE_DFT32F ((depth == CV_32F) && (ippCPUID_AVX512F&cv::ipp::getIppFeatures()))
-#else
-#define IPP_DISABLE_DFT32F false
+#അല്ലെങ്കിൽ
+#define IPP_DISABLE_DFT32F അസത്യം
 #endif
 #endif
 
@@ -71,128 +71,128 @@ namespace cv
 
 #ifdef HAVE_OPENCL
 // factorization used by the OpenCL radix selection
-static int
-DFTFactorize( int n, int* factors )
+സ്ഥിതം പൂർണ്ണസംഖ്യ
+DFTFactorize( പൂർണ്ണസംഖ്യ n, പൂർണ്ണസംഖ്യ* factors )
 {
-    int nf = 0, f, i, j;
+    പൂർണ്ണസംഖ്യ nf = 0, f, i, j;
 
-    if( n <= 5 )
+    എങ്കിൽ( n <= 5 )
     {
         factors[0] = n;
-        return 1;
+        തിരികെ 1;
     }
 
     f = (((n - 1)^n)+1) >> 1;
-    if( f > 1 )
+    എങ്കിൽ( f > 1 )
     {
         factors[nf++] = f;
         n = f == n ? 1 : n/f;
     }
 
-    for( f = 3; n > 1; )
+    വേണ്ടി( f = 3; n > 1; )
     {
-        int d = n/f;
-        if( d*f == n )
+        പൂർണ്ണസംഖ്യ d = n/f;
+        എങ്കിൽ( d*f == n )
         {
             factors[nf++] = f;
             n = d;
         }
-        else
+        അല്ലെങ്കിൽ
         {
             f += 2;
-            if( f*f > n )
-                break;
+            എങ്കിൽ( f*f > n )
+                നിർത്തുക;
         }
     }
 
-    if( n > 1 )
+    എങ്കിൽ( n > 1 )
         factors[nf++] = n;
 
     f = (factors[0] & 1) == 0;
-    for( i = f; i < (nf+f)/2; i++ )
+    വേണ്ടി( i = f; i < (nf+f)/2; i++ )
         CV_SWAP( factors[i], factors[nf-i-1+f], j );
 
-    return nf;
+    തിരികെ nf;
 }
 #endif
 
 #ifdef USE_IPP_DFT
-static IppStatus ippsDFTFwd_CToC( const Complex<float>* src, Complex<float>* dst,
-                             const void* spec, uchar* buf)
+സ്ഥിതം IppStatus ippsDFTFwd_CToC( സ്ഥിരം Complex<ദശാംശം>* src, Complex<ദശാംശം>* dst,
+                             സ്ഥിരം ശൂന്യം* spec, uchar* buf)
 {
-    return CV_INSTRUMENT_FUN_IPP(ippsDFTFwd_CToC_32fc, (const Ipp32fc*)src, (Ipp32fc*)dst,
-                                 (const IppsDFTSpec_C_32fc*)spec, buf);
+    തിരികെ CV_INSTRUMENT_FUN_IPP(ippsDFTFwd_CToC_32fc, (സ്ഥിരം Ipp32fc*)src, (Ipp32fc*)dst,
+                                 (സ്ഥിരം IppsDFTSpec_C_32fc*)spec, buf);
 }
 
-static IppStatus ippsDFTFwd_CToC( const Complex<double>* src, Complex<double>* dst,
-                             const void* spec, uchar* buf)
+സ്ഥിതം IppStatus ippsDFTFwd_CToC( സ്ഥിരം Complex<ഇരട്ട>* src, Complex<ഇരട്ട>* dst,
+                             സ്ഥിരം ശൂന്യം* spec, uchar* buf)
 {
-    return CV_INSTRUMENT_FUN_IPP(ippsDFTFwd_CToC_64fc, (const Ipp64fc*)src, (Ipp64fc*)dst,
-                                 (const IppsDFTSpec_C_64fc*)spec, buf);
+    തിരികെ CV_INSTRUMENT_FUN_IPP(ippsDFTFwd_CToC_64fc, (സ്ഥിരം Ipp64fc*)src, (Ipp64fc*)dst,
+                                 (സ്ഥിരം IppsDFTSpec_C_64fc*)spec, buf);
 }
 
-static IppStatus ippsDFTInv_CToC( const Complex<float>* src, Complex<float>* dst,
-                             const void* spec, uchar* buf)
+സ്ഥിതം IppStatus ippsDFTInv_CToC( സ്ഥിരം Complex<ദശാംശം>* src, Complex<ദശാംശം>* dst,
+                             സ്ഥിരം ശൂന്യം* spec, uchar* buf)
 {
-    return CV_INSTRUMENT_FUN_IPP(ippsDFTInv_CToC_32fc, (const Ipp32fc*)src, (Ipp32fc*)dst,
-                                 (const IppsDFTSpec_C_32fc*)spec, buf);
+    തിരികെ CV_INSTRUMENT_FUN_IPP(ippsDFTInv_CToC_32fc, (സ്ഥിരം Ipp32fc*)src, (Ipp32fc*)dst,
+                                 (സ്ഥിരം IppsDFTSpec_C_32fc*)spec, buf);
 }
 
-static IppStatus ippsDFTInv_CToC( const Complex<double>* src, Complex<double>* dst,
-                                  const void* spec, uchar* buf)
+സ്ഥിതം IppStatus ippsDFTInv_CToC( സ്ഥിരം Complex<ഇരട്ട>* src, Complex<ഇരട്ട>* dst,
+                                  സ്ഥിരം ശൂന്യം* spec, uchar* buf)
 {
-    return CV_INSTRUMENT_FUN_IPP(ippsDFTInv_CToC_64fc, (const Ipp64fc*)src, (Ipp64fc*)dst,
-                                 (const IppsDFTSpec_C_64fc*)spec, buf);
+    തിരികെ CV_INSTRUMENT_FUN_IPP(ippsDFTInv_CToC_64fc, (സ്ഥിരം Ipp64fc*)src, (Ipp64fc*)dst,
+                                 (സ്ഥിരം IppsDFTSpec_C_64fc*)spec, buf);
 }
 
-static IppStatus ippsDFTFwd_RToPack( const float* src, float* dst,
-                                     const void* spec, uchar* buf)
+സ്ഥിതം IppStatus ippsDFTFwd_RToPack( സ്ഥിരം ദശാംശം* src, ദശാംശം* dst,
+                                     സ്ഥിരം ശൂന്യം* spec, uchar* buf)
 {
-    return CV_INSTRUMENT_FUN_IPP(ippsDFTFwd_RToPack_32f, src, dst, (const IppsDFTSpec_R_32f*)spec, buf);
+    തിരികെ CV_INSTRUMENT_FUN_IPP(ippsDFTFwd_RToPack_32f, src, dst, (സ്ഥിരം IppsDFTSpec_R_32f*)spec, buf);
 }
 
-static IppStatus ippsDFTFwd_RToPack( const double* src, double* dst,
-                                     const void* spec, uchar* buf)
+സ്ഥിതം IppStatus ippsDFTFwd_RToPack( സ്ഥിരം ഇരട്ട* src, ഇരട്ട* dst,
+                                     സ്ഥിരം ശൂന്യം* spec, uchar* buf)
 {
-    return CV_INSTRUMENT_FUN_IPP(ippsDFTFwd_RToPack_64f, src, dst, (const IppsDFTSpec_R_64f*)spec, buf);
+    തിരികെ CV_INSTRUMENT_FUN_IPP(ippsDFTFwd_RToPack_64f, src, dst, (സ്ഥിരം IppsDFTSpec_R_64f*)spec, buf);
 }
 
-static IppStatus ippsDFTInv_PackToR( const float* src, float* dst,
-                                     const void* spec, uchar* buf)
+സ്ഥിതം IppStatus ippsDFTInv_PackToR( സ്ഥിരം ദശാംശം* src, ദശാംശം* dst,
+                                     സ്ഥിരം ശൂന്യം* spec, uchar* buf)
 {
-    return CV_INSTRUMENT_FUN_IPP(ippsDFTInv_PackToR_32f, src, dst, (const IppsDFTSpec_R_32f*)spec, buf);
+    തിരികെ CV_INSTRUMENT_FUN_IPP(ippsDFTInv_PackToR_32f, src, dst, (സ്ഥിരം IppsDFTSpec_R_32f*)spec, buf);
 }
 
-static IppStatus ippsDFTInv_PackToR( const double* src, double* dst,
-                                     const void* spec, uchar* buf)
+സ്ഥിതം IppStatus ippsDFTInv_PackToR( സ്ഥിരം ഇരട്ട* src, ഇരട്ട* dst,
+                                     സ്ഥിരം ശൂന്യം* spec, uchar* buf)
 {
-    return CV_INSTRUMENT_FUN_IPP(ippsDFTInv_PackToR_64f, src, dst, (const IppsDFTSpec_R_64f*)spec, buf);
+    തിരികെ CV_INSTRUMENT_FUN_IPP(ippsDFTInv_PackToR_64f, src, dst, (സ്ഥിരം IppsDFTSpec_R_64f*)spec, buf);
 }
 #endif
 
-struct OcvDftOptions;
+ഘടന OcvDftOptions;
 
-typedef void (*DFTFunc)(const OcvDftOptions & c, const void* src, void* dst);
+തരനിർവചനം ശൂന്യം (*DFTFunc)(സ്ഥിരം OcvDftOptions & c, സ്ഥിരം ശൂന്യം* src, ശൂന്യം* dst);
 
 // Per-transform options of the 1D engine: the immutable plan (shared by all rows), the kernel
 // table resolved for the current CPU, and the per-executor workspace (see dxt.hpp).
-struct OcvDftOptions {
-    double scale;
-    int n;
+ഘടന OcvDftOptions {
+    ഇരട്ട scale;
+    പൂർണ്ണസംഖ്യ n;
 
-    bool isInverse;
-    bool isComplex;     // DFT_COMPLEX_OUTPUT (forward) / complex input (inverse) for real transforms
+    തർക്കം isInverse;
+    തർക്കം isComplex;     // DFT_COMPLEX_OUTPUT (forward) / complex input (inverse) for real transforms
 
     DFTFunc dft_func;
-    bool useIpp;
+    തർക്കം useIpp;
 
 #ifdef USE_IPP_DFT
     uchar* ipp_spec;
     uchar* ipp_work;
 #endif
 
-    const DftPlan* plan;
-    const DFTKernels* kernels;
+    സ്ഥിരം DftPlan* plan;
+    സ്ഥിരം DFTKernels* kernels;
     uchar* workspace;
 
     OcvDftOptions()
@@ -202,9 +202,9 @@ struct OcvDftOptions {
         workspace = 0;
         scale = 0;
         n = 0;
-        isInverse = false;
-        isComplex = false;
-        useIpp = false;
+        isInverse = അസത്യം;
+        isComplex = അസത്യം;
+        useIpp = അസത്യം;
 #ifdef USE_IPP_DFT
         ipp_spec = 0;
         ipp_work = 0;
@@ -218,18 +218,18 @@ struct OcvDftOptions {
                      New 1D engine: kernel table, plan builder, driver
 \****************************************************************************************/
 
-static DFTKernels getDFTKernelsDispatch(int depth)
+സ്ഥിതം DFTKernels getDFTKernelsDispatch(പൂർണ്ണസംഖ്യ depth)
 {
     CV_CPU_DISPATCH(getDFTKernels_, (depth), CV_CPU_DISPATCH_MODES_ALL);
 }
 
 // The kernel tables are resolved once for the best available ISA; all further calls go
 // through the function pointers with no dispatch overhead.
-static const DFTKernels& getDFTKernels(int depth)
+സ്ഥിതം സ്ഥിരം DFTKernels& getDFTKernels(പൂർണ്ണസംഖ്യ depth)
 {
-    static const DFTKernels k32 = getDFTKernelsDispatch(CV_32F);
-    static const DFTKernels k64 = getDFTKernelsDispatch(CV_64F);
-    return depth == CV_32F ? k32 : k64;
+    സ്ഥിതം സ്ഥിരം DFTKernels k32 = getDFTKernelsDispatch(CV_32F);
+    സ്ഥിതം സ്ഥിരം DFTKernels k64 = getDFTKernelsDispatch(CV_64F);
+    തിരികെ depth == CV_32F ? k32 : k64;
 }
 
 // exp(-2*pi*i*m/M) in double precision, m in [0, M): m = B*a + b -> hi[a]*lo[b] with B a power of
@@ -237,43 +237,43 @@ static const DFTKernels& getDFTKernels(int depth)
 // sin/cos every 16 entries, so the error stays within a few ulps while only ~(B + M/B)/16 + 4
 // trigonometric calls are made (4 for small M). Cheap to build, which matters because cv::dft()
 // builds a fresh plan on every call.
-struct DftTwiddleGen
+ഘടന DftTwiddleGen
 {
-    int M, logB, maskB;
-    AutoBuffer<double, 1024> buf;
-    double *hi_re, *hi_im, *lo_re, *lo_im;
+    പൂർണ്ണസംഖ്യ M, logB, maskB;
+    AutoBuffer<ഇരട്ട, 1024> buf;
+    ഇരട്ട *hi_re, *hi_im, *lo_re, *lo_im;
 
     // re[i] + i*im[i] = w^i, i in [0, count), w = (wr, wi) = exp(i*stepAngle); the rotation
     // recurrence is re-seeded with exact sin/cos every 16 entries
-    static void fillTable(double* re, double* im, int count, double wr, double wi, double stepAngle)
+    സ്ഥിതം ശൂന്യം fillTable(ഇരട്ട* re, ഇരട്ട* im, പൂർണ്ണസംഖ്യ എണ്ണം_2, ഇരട്ട wr, ഇരട്ട wi, ഇരട്ട stepAngle)
     {
-        for (int i0 = 0; i0 < count; i0 += 16)
+        വേണ്ടി (പൂർണ്ണസംഖ്യ i0 = 0; i0 < എണ്ണം_2; i0 += 16)
         {
-            double t0 = stepAngle*i0;
-            double cr = i0 == 0 ? 1 : cos(t0), ci = i0 == 0 ? 0 : sin(t0);
-            int i1 = std::min(i0 + 16, count);
-            for (int i = i0; i < i1; i++)
+            ഇരട്ട t0 = stepAngle*i0;
+            ഇരട്ട cr = i0 == 0 ? 1 : cos(t0), ci = i0 == 0 ? 0 : sin(t0);
+            പൂർണ്ണസംഖ്യ i1 = std::min(i0 + 16, എണ്ണം_2);
+            വേണ്ടി (പൂർണ്ണസംഖ്യ i = i0; i < i1; i++)
             {
                 re[i] = cr; im[i] = ci;
-                double t = cr*wr - ci*wi;
+                ഇരട്ട t = cr*wr - ci*wi;
                 ci = cr*wi + ci*wr;
                 cr = t;
             }
         }
     }
 
-    void init(int _M)
+    ശൂന്യം init(പൂർണ്ണസംഖ്യ _M)
     {
         M = _M;
         logB = 0;
-        while ((1LL << (2*logB)) < M) logB++;   // B = 2^logB >= sqrt(M)
-        int B = 1 << logB;
+        ആകുമ്പോൾ ((1LL << (2*logB)) < M) logB++;   // B = 2^logB >= sqrt(M)
+        പൂർണ്ണസംഖ്യ B = 1 << logB;
         maskB = B - 1;
-        int nhi = (M + B - 1)/B;
+        പൂർണ്ണസംഖ്യ nhi = (M + B - 1)/B;
         buf.allocate(2*(B + nhi));
         hi_re = buf.data(); hi_im = hi_re + nhi;
         lo_re = hi_im + nhi; lo_im = lo_re + B;
-        double a = -2*CV_PI/M;
+        ഇരട്ട a = -2*CV_PI/M;
         // the two step angles are computed exactly (4 trigonometric calls in total for small M)
         fillTable(lo_re, lo_im, B, cos(a), sin(a), a);
         fillTable(hi_re, hi_im, nhi, cos(a*B), sin(a*B), a*B);
@@ -281,86 +281,86 @@ struct DftTwiddleGen
 
     // exp(-2*pi*i*m/M) for any m >= 0 (the angle is periodic: only m mod M matters; callers may
     // ask for m == M, e.g. the rotation step of a chain that covers the whole period)
-    void get(int m, double& re, double& im) const
+    ശൂന്യം get(പൂർണ്ണസംഖ്യ m, ഇരട്ട& re, ഇരട്ട& im) സ്ഥിരം
     {
         CV_DbgAssert(m >= 0);
-        if (m >= M)
+        എങ്കിൽ (m >= M)
             m %= M;
-        int a = m >> logB, b = m & maskB;
+        പൂർണ്ണസംഖ്യ a = m >> logB, b = m & maskB;
         re = hi_re[a]*lo_re[b] - hi_im[a]*lo_im[b];
         im = hi_re[a]*lo_im[b] + hi_im[a]*lo_re[b];
     }
 };
 
 template<typename T>
-void DftPlan::fillTables(size_t ntw, bool need_rtw, bool need_dct)
+ശൂന്യം DftPlan::fillTables(size_t ntw, തർക്കം need_rtw, തർക്കം need_dct)
 {
-    DftPlan& p = *this;
+    DftPlan& p = *ഇത്;
     // all angles come from one base table exp(-2*pi*i*m/M), M a multiple of every angle grid used:
     // C2C: M = nc; real kinds with even n: M = n (=2nc) or 4n for DCT (W_4n^k); odd real: M = n = nc.
-    int M = nc*(need_dct ? 8 : need_rtw ? 2 : 1);
+    പൂർണ്ണസംഖ്യ M = nc*(need_dct ? 8 : need_rtw ? 2 : 1);
     DftTwiddleGen gen;
     gen.init(M);
-    p.tw.allocate((ntw*sizeof(T) + sizeof(double) - 1)/sizeof(double) + 1);
+    p.tw.allocate((ntw*വലുപ്പം(T) + വലുപ്പം(ഇരട്ട) - 1)/വലുപ്പം(ഇരട്ട) + 1);
     T* cur = (T*)p.tw.data();
-    int maxL = 1;
-    for (int s = 0; s < p.nstages; s++)
-        if (p.stages[s].radix <= 8) maxL = std::max(maxL, p.stages[s].span);
-    AutoBuffer<double, 2048> twd_buf(2*maxL);     // leg-1 twiddles of the current stage in double
-    double* twd = twd_buf.data();
-    for (int s = 0; s < p.nstages; s++)
+    പൂർണ്ണസംഖ്യ maxL = 1;
+    വേണ്ടി (പൂർണ്ണസംഖ്യ s = 0; s < p.nstages; s++)
+        എങ്കിൽ (p.stages[s].radix <= 8) maxL = std::max(maxL, p.stages[s].span);
+    AutoBuffer<ഇരട്ട, 2048> twd_buf(2*maxL);     // leg-1 twiddles of the current stage in double
+    ഇരട്ട* twd = twd_buf.data();
+    വേണ്ടി (പൂർണ്ണസംഖ്യ s = 0; s < p.nstages; s++)
     {
         DftStage& st = p.stages[s];
-        int r = st.radix, L = st.span, ts = st.tw_stride;
+        പൂർണ്ണസംഖ്യ r = st.radix, L = st.span, ts = st.tw_stride;
         T* twr = cur; T* twi = cur + (r - 1)*ts;
         cur = twi + (r - 1)*ts;
-        int step = M/(r*L);
-        if (r <= 8)
+        പൂർണ്ണസംഖ്യ step = M/(r*L);
+        എങ്കിൽ (r <= 8)
         {
             // Leg 1 (W_{rL}^j) by K independent interleaved rotation recurrences (a single chain is
             // latency-bound), each re-seeded from the exact generator every 16 of its steps; legs
             // q >= 2 as t_q(j) = t_{q-1}(j)*t_1(j), independent per entry (error <= q ulps).
-            constexpr int K = 8;
-            double cr[K], ci[K], wr, wi;
+            constexpr പൂർണ്ണസംഖ്യ K = 8;
+            ഇരട്ട cr[K], ci[K], wr, wi;
             gen.get(K*step, wr, wi);
-            double* t1r = twd; double* t1i = twd + L;      // leg 1 kept in double for the products
-            for (int j0 = 0; j0 < L; j0 += 16*K)           // blocks of 16 steps per chain
+            ഇരട്ട* t1r = twd; ഇരട്ട* t1i = twd + L;      // leg 1 kept in double for the products
+            വേണ്ടി (പൂർണ്ണസംഖ്യ j0 = 0; j0 < L; j0 += 16*K)           // blocks of 16 steps per chain
             {
-                for (int k = 0; k < K; k++)
+                വേണ്ടി (പൂർണ്ണസംഖ്യ k = 0; k < K; k++)
                     gen.get(std::min(j0 + k, L - 1)*step, cr[k], ci[k]);
-                int j1 = std::min(j0 + 16*K, L);
-                for (int j = j0; j < j1; j += K)
-                    for (int k = 0; k < K && j + k < L; k++)
+                പൂർണ്ണസംഖ്യ j1 = std::min(j0 + 16*K, L);
+                വേണ്ടി (പൂർണ്ണസംഖ്യ j = j0; j < j1; j += K)
+                    വേണ്ടി (പൂർണ്ണസംഖ്യ k = 0; k < K && j + k < L; k++)
                     {
                         t1r[j+k] = cr[k]; t1i[j+k] = ci[k];
-                        double t = cr[k]*wr - ci[k]*wi;
+                        ഇരട്ട t = cr[k]*wr - ci[k]*wi;
                         ci[k] = cr[k]*wi + ci[k]*wr;
                         cr[k] = t;
                     }
             }
-            for (int j = 0; j < L; j++)     // separate pass: vectorizes, the recurrence loop does not
+            വേണ്ടി (പൂർണ്ണസംഖ്യ j = 0; j < L; j++)     // separate pass: vectorizes, the recurrence loop does not
             {
                 twr[j] = (T)t1r[j]; twi[j] = (T)t1i[j];
             }
-            for (int q = 2; q < r; q++)
+            വേണ്ടി (പൂർണ്ണസംഖ്യ q = 2; q < r; q++)
             {
-                const T* pr = twr + (q-2)*ts; const T* pi = twi + (q-2)*ts;
+                സ്ഥിരം T* pr = twr + (q-2)*ts; സ്ഥിരം T* pi = twi + (q-2)*ts;
                 T* tr = twr + (q-1)*ts; T* ti = twi + (q-1)*ts;
-                for (int j = 0; j < L; j++)
+                വേണ്ടി (പൂർണ്ണസംഖ്യ j = 0; j < L; j++)
                 {
-                    double ar = pr[j], ai = pi[j], br = t1r[j], bi = t1i[j];
+                    ഇരട്ട ar = pr[j], ai = pi[j], br = t1r[j], bi = t1i[j];
                     tr[j] = (T)(ar*br - ai*bi);
                     ti[j] = (T)(ar*bi + ai*br);
                 }
             }
         }
-        else
+        അല്ലെങ്കിൽ
         {
             // large odd radix: exact-ish generator lookup per entry
-            for (int q = 1; q < r; q++)
-                for (int j = 0; j < L; j++)
+            വേണ്ടി (പൂർണ്ണസംഖ്യ q = 1; q < r; q++)
+                വേണ്ടി (പൂർണ്ണസംഖ്യ j = 0; j < L; j++)
                 {
-                    double re, im;
+                    ഇരട്ട re, im;
                     gen.get(q*j*step, re, im);
                     twr[(q-1)*ts + j] = (T)re;
                     twi[(q-1)*ts + j] = (T)im;
@@ -368,15 +368,15 @@ void DftPlan::fillTables(size_t ntw, bool need_rtw, bool need_dct)
         }
         st.tw_re = twr; st.tw_im = twi;
         st.cs = st.sn = 0;
-        if (r >= 7)
+        എങ്കിൽ (r >= 7)
         {
-            int h = (r - 1)/2;
+            പൂർണ്ണസംഖ്യ h = (r - 1)/2;
             T* cs = cur; T* sn = cur + h*h;
             cur = sn + h*h;
-            for (int pp = 1; pp <= h; pp++)
-                for (int k = 1; k <= h; k++)
+            വേണ്ടി (പൂർണ്ണസംഖ്യ pp = 1; pp <= h; pp++)
+                വേണ്ടി (പൂർണ്ണസംഖ്യ k = 1; k <= h; k++)
                 {
-                    double t = 2*CV_PI*((double)pp*k/r);
+                    ഇരട്ട t = 2*CV_PI*((ഇരട്ട)pp*k/r);
                     cs[(pp-1)*h + (k-1)] = (T)cos(t);
                     sn[(pp-1)*h + (k-1)] = (T)sin(t);
                 }
@@ -384,30 +384,30 @@ void DftPlan::fillTables(size_t ntw, bool need_rtw, bool need_dct)
         }
     }
     p.rtw_re = p.rtw_im = p.dct_re = p.dct_im = 0;
-    if (need_rtw)
+    എങ്കിൽ (need_rtw)
     {
         // W_n^k, k in [0, nc]
         T* wr = cur; T* wi = cur + (nc + 1);
         cur = wi + (nc + 1);
-        int step = M/n;
-        for (int k = 0; k <= nc; k++)
+        പൂർണ്ണസംഖ്യ step = M/n;
+        വേണ്ടി (പൂർണ്ണസംഖ്യ k = 0; k <= nc; k++)
         {
-            double re, im;
+            ഇരട്ട re, im;
             gen.get(k*step, re, im);
             wr[k] = (T)re; wi[k] = (T)im;
         }
         p.rtw_re = wr; p.rtw_im = wi;
     }
-    if (need_dct)
+    എങ്കിൽ (need_dct)
     {
         // s*W_4n^k, k in [0, nc]; s = 2*sqrt(1/(2n)) forward, sqrt(1/(2n)) inverse (the original normalization)
         T* wr = cur; T* wi = cur + (nc + 1);
         cur = wi + (nc + 1);
-        double scale = (p.kind == DFT_KIND_DCT ? 2 : 1)*std::sqrt(1./(2*n));
-        int step = M/(4*n);
-        for (int k = 0; k <= nc; k++)
+        ഇരട്ട scale = (p.kind == DFT_KIND_DCT ? 2 : 1)*std::sqrt(1./(2*n));
+        പൂർണ്ണസംഖ്യ step = M/(4*n);
+        വേണ്ടി (പൂർണ്ണസംഖ്യ k = 0; k <= nc; k++)
         {
-            double re, im;
+            ഇരട്ട re, im;
             gen.get(k*step, re, im);
             wr[k] = (T)(re*scale); wi[k] = (T)(im*scale);
         }
@@ -416,71 +416,71 @@ void DftPlan::fillTables(size_t ntw, bool need_rtw, bool need_dct)
 }
 
 // See dxt.hpp for the contract (in particular where `vl` must come from).
-void DftPlan::build(int _kind, int _n, int _depth, int _vl)
+ശൂന്യം DftPlan::build(പൂർണ്ണസംഖ്യ _kind, പൂർണ്ണസംഖ്യ _n, പൂർണ്ണസംഖ്യ _depth, പൂർണ്ണസംഖ്യ _vl)
 {
-    DftPlan& p = *this;
+    DftPlan& p = *ഇത്;
     CV_Assert(_n >= 1 && _vl >= 1);
     CV_Assert(_depth == CV_32F || _depth == CV_64F);
-    bool real_kind = _kind != DFT_KIND_C2C;
-    bool dct_kind = _kind == DFT_KIND_DCT || _kind == DFT_KIND_IDCT;
-    if (dct_kind)
+    തർക്കം real_kind = _kind != DFT_KIND_C2C;
+    തർക്കം dct_kind = _kind == DFT_KIND_DCT || _kind == DFT_KIND_IDCT;
+    എങ്കിൽ (dct_kind)
         CV_Assert(_n % 2 == 0);   // cv::dct() supports even n only (n == 1 is handled by the caller)
     p.kind = _kind; p.n = _n; p.depth = _depth; p.vl = _vl;
     p.nc = real_kind && _n % 2 == 0 ? _n/2 : _n;
     CV_Assert(nc < (1 << 28));
-    size_t esz = depth == CV_32F ? sizeof(float) : sizeof(double);
-    p.real_input = kind == DFT_KIND_R2C && (n & 1) != 0;
+    size_t esz = depth == CV_32F ? വലുപ്പം(ദശാംശം) : വലുപ്പം(ഇരട്ട);
+    p.real_നിവേശം = kind == DFT_KIND_R2C && (n & 1) != 0;
     p.need_tmp = kind == DFT_KIND_C2R || kind == DFT_KIND_DCT || kind == DFT_KIND_IDCT;
-    p.pingpong = false;
+    p.pingpong = അസത്യം;
 
     // factorization: 2^k part first (fused first stage r0 + radix-4 stages), then 3s, 5s, other odd.
     // (A radix-8 middle stage was tried and measured slower on NEON: with per-leg twiddle tables it
     // does not save loads over two radix-4 stages and keeps 16 data vectors live.)
-    int k2 = 0, rest = nc;
-    while ((rest & 1) == 0) { rest >>= 1; k2++; }
-    int r0 = k2 == 0 ? 1 : k2 == 1 ? 2 : (k2 & 1) ? 8 : 4;
+    പൂർണ്ണസംഖ്യ k2 = 0, rest = nc;
+    ആകുമ്പോൾ ((rest & 1) == 0) { rest >>= 1; k2++; }
+    പൂർണ്ണസംഖ്യ r0 = k2 == 0 ? 1 : k2 == 1 ? 2 : (k2 & 1) ? 8 : 4;
     p.first_radix = r0;
-    int radices[DFT_MAX_STAGES], nst = 0;
-    for (int m = k2 - (r0 == 1 ? 0 : r0 == 2 ? 1 : r0 == 4 ? 2 : 3); m > 0; m -= 2) { CV_Assert(nst < DFT_MAX_STAGES); radices[nst++] = 4; }
+    പൂർണ്ണസംഖ്യ radices[DFT_MAX_STAGES], nst = 0;
+    വേണ്ടി (പൂർണ്ണസംഖ്യ m = k2 - (r0 == 1 ? 0 : r0 == 2 ? 1 : r0 == 4 ? 2 : 3); m > 0; m -= 2) { CV_Assert(nst < DFT_MAX_STAGES); radices[nst++] = 4; }
     rest = nc >> k2;
-    while (rest % 3 == 0) { CV_Assert(nst < DFT_MAX_STAGES); radices[nst++] = 3; rest /= 3; }
-    while (rest % 5 == 0) { CV_Assert(nst < DFT_MAX_STAGES); radices[nst++] = 5; rest /= 5; }
-    for (int f = 7; rest > 1; f += 2)
+    ആകുമ്പോൾ (rest % 3 == 0) { CV_Assert(nst < DFT_MAX_STAGES); radices[nst++] = 3; rest /= 3; }
+    ആകുമ്പോൾ (rest % 5 == 0) { CV_Assert(nst < DFT_MAX_STAGES); radices[nst++] = 5; rest /= 5; }
+    വേണ്ടി (പൂർണ്ണസംഖ്യ f = 7; rest > 1; f += 2)
     {
-        if (f*f > rest)
+        എങ്കിൽ (f*f > rest)
         {
             CV_Assert(nst < DFT_MAX_STAGES);
             radices[nst++] = rest;
-            break;
+            നിർത്തുക;
         }
-        while (rest % f == 0) { CV_Assert(nst < DFT_MAX_STAGES); radices[nst++] = f; rest /= f; }
+        ആകുമ്പോൾ (rest % f == 0) { CV_Assert(nst < DFT_MAX_STAGES); radices[nst++] = f; rest /= f; }
     }
     p.nstages = nst;
 
     // stages
-    int L = r0, max_h = 0;
+    പൂർണ്ണസംഖ്യ L = r0, max_h = 0;
     size_t ntw = 0;
-    for (int s = 0; s < nst; s++)
+    വേണ്ടി (പൂർണ്ണസംഖ്യ s = 0; s < nst; s++)
     {
         DftStage& st = p.stages[s];
-        int r = radices[s];
+        പൂർണ്ണസംഖ്യ r = radices[s];
         st.radix = r; st.span = L; st.ngroups = nc/(r*L); st.tw_stride = L;
-        if (vl > 1 && L >= vl)
+        എങ്കിൽ (vl > 1 && L >= vl)
         {
             st.mode = DFT_STAGE_FULL;
             st.nsteps = st.ngroups*((L + vl - 1)/vl);
-            if (L % vl != 0)
-                p.pingpong = true;   // back-off clamp => overlapping stores => must be out-of-place
+            എങ്കിൽ (L % vl != 0)
+                p.pingpong = സത്യം;   // back-off clamp => overlapping stores => must be out-of-place
         }
-        else
+        അല്ലെങ്കിൽ
         {
             st.mode = DFT_STAGE_SCALAR;
             st.nsteps = st.ngroups*L;
         }
         ntw += 2*(size_t)(r - 1)*st.tw_stride;
-        if (r >= 7)
+        എങ്കിൽ (r >= 7)
         {
-            int h = (r - 1)/2;
+            പൂർണ്ണസംഖ്യ h = (r - 1)/2;
             ntw += 2*(size_t)h*h;
             max_h = std::max(max_h, h);
         }
@@ -494,93 +494,93 @@ void DftPlan::build(int _kind, int _n, int _depth, int _vl)
     //    scalar gather (im index unused when real_input);
     //  - r0 > 1: the r0 inputs of group g are the column x[base(g) + q*nc/r0]; itab[base(g)] = g*r0
     //    tells the transposed first stage where the outputs of column base(g) go.
-    int seq[DFT_MAX_STAGES + 1], nseq = 0;
-    if (r0 > 1) seq[nseq++] = r0;
-    for (int s = 0; s < nst; s++) seq[nseq++] = radices[s];
-    int digits[DFT_MAX_STAGES + 1], weights[DFT_MAX_STAGES + 1];
+    പൂർണ്ണസംഖ്യ seq[DFT_MAX_STAGES + 1], nseq = 0;
+    എങ്കിൽ (r0 > 1) seq[nseq++] = r0;
+    വേണ്ടി (പൂർണ്ണസംഖ്യ s = 0; s < nst; s++) seq[nseq++] = radices[s];
+    പൂർണ്ണസംഖ്യ digits[DFT_MAX_STAGES + 1], weights[DFT_MAX_STAGES + 1];
     {
-        int Ls = 1;
-        for (int s = 0; s < nseq; s++)
+        പൂർണ്ണസംഖ്യ Ls = 1;
+        വേണ്ടി (പൂർണ്ണസംഖ്യ s = 0; s < nseq; s++)
         {
             digits[s] = 0;
             weights[s] = nc/(Ls*seq[s]);
             Ls *= seq[s];
         }
     }
-    if (r0 == 1)
+    എങ്കിൽ (r0 == 1)
     {
         p.itab.allocate(nc*2);
-        int* it_all = p.itab.data();
+        പൂർണ്ണസംഖ്യ* it_all = p.itab.data();
         // the two lowest digits are enumerated by plain nested loops, the higher ones by a counter
-        int n_in = std::min(nseq, 2);
-        int r_0 = n_in > 0 ? seq[0] : 1, w_0 = n_in > 0 ? weights[0] : 0;
-        int r_1 = n_in > 1 ? seq[1] : 1, w_1 = n_in > 1 ? weights[1] : 0;
-        for (int pos = 0, rev_hi = 0; pos < nc; )
+        പൂർണ്ണസംഖ്യ n_in = std::min(nseq, 2);
+        പൂർണ്ണസംഖ്യ r_0 = n_in > 0 ? seq[0] : 1, w_0 = n_in > 0 ? weights[0] : 0;
+        പൂർണ്ണസംഖ്യ r_1 = n_in > 1 ? seq[1] : 1, w_1 = n_in > 1 ? weights[1] : 0;
+        വേണ്ടി (പൂർണ്ണസംഖ്യ pos = 0, rev_hi = 0; pos < nc; )
         {
-            for (int d1 = 0; d1 < r_1; d1++)
+            വേണ്ടി (പൂർണ്ണസംഖ്യ d1 = 0; d1 < r_1; d1++)
             {
-                int rev = rev_hi + d1*w_1;
-                int* it = it_all + pos*2;
-                if (p.real_input)
+                പൂർണ്ണസംഖ്യ rev = rev_hi + d1*w_1;
+                പൂർണ്ണസംഖ്യ* it = it_all + pos*2;
+                എങ്കിൽ (p.real_നിവേശം)
                 {
-                    for (int d0 = 0; d0 < r_0; d0++, rev += w_0)
+                    വേണ്ടി (പൂർണ്ണസംഖ്യ d0 = 0; d0 < r_0; d0++, rev += w_0)
                     {
                         it[d0*2] = rev; it[d0*2+1] = rev;
                     }
                 }
-                else
+                അല്ലെങ്കിൽ
                 {
-                    for (int d0 = 0; d0 < r_0; d0++, rev += w_0)
+                    വേണ്ടി (പൂർണ്ണസംഖ്യ d0 = 0; d0 < r_0; d0++, rev += w_0)
                     {
                         it[d0*2] = rev*2; it[d0*2+1] = rev*2 + 1;
                     }
                 }
                 pos += r_0;
             }
-            for (int s = n_in; s < nseq; s++)
+            വേണ്ടി (പൂർണ്ണസംഖ്യ s = n_in; s < nseq; s++)
             {
                 rev_hi += weights[s];
-                if (++digits[s] < seq[s])
-                    break;
+                എങ്കിൽ (++digits[s] < seq[s])
+                    നിർത്തുക;
                 digits[s] = 0;
                 rev_hi -= seq[s]*weights[s];
             }
         }
     }
-    else
+    അല്ലെങ്കിൽ
     {
         // gtab[base(g)] = g*r0, written in increasing base order (sequential stores): base is
         // counted up with the digits s = nseq-1 (base weight 1) .. 1 (base weight weights[1]),
         // g follows incrementally with the digit weights gw[s] = L_s/r0. The two fastest digits
         // are enumerated by plain nested loops.
-        int M = nc/r0;
+        പൂർണ്ണസംഖ്യ M = nc/r0;
         p.itab.allocate(M);
-        int* gtab = p.itab.data();
-        int gw[DFT_MAX_STAGES + 1];
+        പൂർണ്ണസംഖ്യ* gtab = p.itab.data();
+        പൂർണ്ണസംഖ്യ gw[DFT_MAX_STAGES + 1];
         {
-            int Ls = 1;
-            for (int s = 0; s < nseq; s++)
+            പൂർണ്ണസംഖ്യ Ls = 1;
+            വേണ്ടി (പൂർണ്ണസംഖ്യ s = 0; s < nseq; s++)
             {
                 gw[s] = Ls/r0;      // valid for s >= 1 (L_s is a multiple of r0)
                 Ls *= seq[s];
             }
         }
-        int sa = nseq - 1, sb = nseq - 2;                  // fastest and second fastest digits
-        int r_a = sa >= 1 ? seq[sa] : 1, g_a = sa >= 1 ? gw[sa] : 0;
-        int r_b = sb >= 1 ? seq[sb] : 1, g_b = sb >= 1 ? gw[sb] : 0;
-        for (int base = 0, g_hi = 0; base < M; )
+        പൂർണ്ണസംഖ്യ sa = nseq - 1, sb = nseq - 2;                  // fastest and second fastest digits
+        പൂർണ്ണസംഖ്യ r_a = sa >= 1 ? seq[sa] : 1, g_a = sa >= 1 ? gw[sa] : 0;
+        പൂർണ്ണസംഖ്യ r_b = sb >= 1 ? seq[sb] : 1, g_b = sb >= 1 ? gw[sb] : 0;
+        വേണ്ടി (പൂർണ്ണസംഖ്യ base = 0, g_hi = 0; base < M; )
         {
-            for (int db = 0; db < r_b; db++)
+            വേണ്ടി (പൂർണ്ണസംഖ്യ db = 0; db < r_b; db++)
             {
-                int g = (g_hi + db*g_b)*r0;
-                for (int da = 0; da < r_a; da++, g += g_a*r0)
+                പൂർണ്ണസംഖ്യ g = (g_hi + db*g_b)*r0;
+                വേണ്ടി (പൂർണ്ണസംഖ്യ da = 0; da < r_a; da++, g += g_a*r0)
                     gtab[base++] = g;
             }
-            for (int s = sb - 1; s >= 1; s--)
+            വേണ്ടി (പൂർണ്ണസംഖ്യ s = sb - 1; s >= 1; s--)
             {
                 g_hi += gw[s];
-                if (++digits[s] < seq[s])
-                    break;
+                എങ്കിൽ (++digits[s] < seq[s])
+                    നിർത്തുക;
                 digits[s] = 0;
                 g_hi -= seq[s]*gw[s];
             }
@@ -588,18 +588,18 @@ void DftPlan::build(int _kind, int _n, int _depth, int _vl)
     }
 
     // twiddle tables
-    bool need_rtw = real_kind && n % 2 == 0;
-    if (need_rtw) ntw += 2*(size_t)(nc + 1);
-    if (dct_kind) ntw += 2*(size_t)(nc + 1);
-    if (depth == CV_32F)
-        fillTables<float>(ntw, need_rtw, dct_kind);
-    else
-        fillTables<double>(ntw, need_rtw, dct_kind);
+    തർക്കം need_rtw = real_kind && n % 2 == 0;
+    എങ്കിൽ (need_rtw) ntw += 2*(size_t)(nc + 1);
+    എങ്കിൽ (dct_kind) ntw += 2*(size_t)(nc + 1);
+    എങ്കിൽ (depth == CV_32F)
+        fillTables<ദശാംശം>(ntw, need_rtw, dct_kind);
+    അല്ലെങ്കിൽ
+        fillTables<ഇരട്ട>(ntw, need_rtw, dct_kind);
 
     // workspace layout (from the 64-byte aligned base): pair0 (re, im), optional pair1 (re, im) or
     // the interleaved temp, radix-odd scratch (a[h], b[h] complex per lane).
     size_t pair_bytes = 2*(size_t)nc*esz;
-    bool two_pairs = p.pingpong || p.need_tmp;
+    തർക്കം two_pairs = p.pingpong || p.need_tmp;
     p.pair1_ofs = two_pairs ? pair_bytes : 0;
     p.scratch_ofs = pair_bytes*(two_pairs ? 2 : 1);
     size_t scratch_bytes = 4*(size_t)max_h*std::max(vl, 1)*esz;
@@ -608,13 +608,13 @@ void DftPlan::build(int _kind, int _n, int _depth, int _vl)
 
 // Runs the transform described by c.plan: A (preproc) -> B stages (ping-pong) -> C (postproc).
 // No allocations. sstep/dstep are in elements (used by DCT/IDCT only; 1 otherwise).
-static void runDft(const OcvDftOptions& c, const void* src, size_t sstep, void* dst, size_t dstep,
-                   bool complex_io)
+സ്ഥിതം ശൂന്യം runDft(സ്ഥിരം OcvDftOptions& c, സ്ഥിരം ശൂന്യം* src, size_t sstep, ശൂന്യം* dst, size_t dstep,
+                   തർക്കം complex_io)
 {
-    const DftPlan& p = *c.plan;
-    const DFTKernels& k = *c.kernels;
+    സ്ഥിരം DftPlan& p = *c.plan;
+    സ്ഥിരം DFTKernels& k = *c.kernels;
     CV_DbgAssert(p.vl == k.vlanes);
-    size_t esz = p.depth == CV_32F ? sizeof(float) : sizeof(double);
+    size_t esz = p.depth == CV_32F ? വലുപ്പം(ദശാംശം) : വലുപ്പം(ഇരട്ട);
     uchar* base = alignPtr(c.workspace, 64);
     uchar* re0 = base;
     uchar* im0 = re0 + p.nc*esz;
@@ -622,25 +622,25 @@ static void runDft(const OcvDftOptions& c, const void* src, size_t sstep, void* 
     uchar* im1 = re1 + p.nc*esz;
     uchar* scratch = base + p.scratch_ofs;
 
-    const void* asrc = src;
+    സ്ഥിരം ശൂന്യം* asrc = src;
     size_t astep = sstep;
-    bool conj = false;
-    if (p.kind == DFT_KIND_C2R)
+    തർക്കം conj = അസത്യം;
+    എങ്കിൽ (p.kind == DFT_KIND_C2R)
     {
         k.preprocCCS(p, src, re1, complex_io);
-        asrc = re1; astep = 1; conj = true;
+        asrc = re1; astep = 1; conj = സത്യം;
     }
-    else if (p.kind == DFT_KIND_IDCT)
+    അല്ലെങ്കിൽ എങ്കിൽ (p.kind == DFT_KIND_IDCT)
     {
         k.preprocIDCT(p, src, sstep, re1);
-        asrc = re1; astep = 1; conj = true;
+        asrc = re1; astep = 1; conj = സത്യം;
     }
-    else if (p.kind == DFT_KIND_DCT)
+    അല്ലെങ്കിൽ എങ്കിൽ (p.kind == DFT_KIND_DCT)
     {
         k.preprocDCT(p, src, sstep, re1);
         asrc = re1; astep = 1;
     }
-    else if (p.kind == DFT_KIND_C2C)
+    അല്ലെങ്കിൽ എങ്കിൽ (p.kind == DFT_KIND_C2C)
         conj = c.isInverse;
     CV_DbgAssert(astep == 1 || p.first_radix == 1);
 
@@ -649,72 +649,72 @@ static void runDft(const OcvDftOptions& c, const void* src, size_t sstep, void* 
     pre(p, asrc, astep, re0, im0, conj);
 
     uchar *sre = re0, *sim = im0, *dre = re1, *dim = im1;
-    for (int i = 0; i < p.nstages; i++)
+    വേണ്ടി (പൂർണ്ണസംഖ്യ i = 0; i < p.nstages; i++)
     {
-        const DftStage& st = p.stages[i];
+        സ്ഥിരം DftStage& st = p.stages[i];
         DftStageFunc fn = st.radix == 4 ? k.radix4 : st.radix == 3 ? k.radix3 :
                           st.radix == 5 ? k.radix5 : k.radixOdd;
-        if (p.pingpong)
+        എങ്കിൽ (p.pingpong)
         {
             fn(st, sre, sim, dre, dim, scratch);
             std::swap(sre, dre); std::swap(sim, dim);
         }
-        else
+        അല്ലെങ്കിൽ
             fn(st, sre, sim, sre, sim, scratch);
     }
 
-    double scale = c.scale;
-    switch (p.kind)
+    ഇരട്ട scale = c.scale;
+    തിരഞ്ഞെടുപ്പ് (p.kind)
     {
-    case DFT_KIND_C2C:
+    അവസ്ഥ DFT_KIND_C2C:
         k.postprocDFT(p, sre, sim, dst, scale, c.isInverse ? -scale : scale);
-        break;
-    case DFT_KIND_R2C:
+        നിർത്തുക;
+    അവസ്ഥ DFT_KIND_R2C:
         k.postprocRealDFT(p, sre, sim, dst, scale, complex_io);
-        break;
-    case DFT_KIND_C2R:
-        if (p.nc == p.n)
+        നിർത്തുക;
+    അവസ്ഥ DFT_KIND_C2R:
+        എങ്കിൽ (p.nc == p.n)
             k.postprocReal(p, sre, dst, scale);
-        else
+        അല്ലെങ്കിൽ
             k.postprocDFT(p, sre, sim, dst, scale, -scale);
-        break;
-    case DFT_KIND_DCT:
+        നിർത്തുക;
+    അവസ്ഥ DFT_KIND_DCT:
         k.postprocDCT(p, sre, sim, dst, dstep);
-        break;
-    default:
+        നിർത്തുക;
+    സ്ഥിരസ്ഥിതി:
         CV_Assert(p.kind == DFT_KIND_IDCT);
         k.postprocIDCT(p, sre, sim, dst, dstep);
     }
 }
 
 // mixed-radix complex discrete Fourier transform (forward or inverse)
-template<typename T> static void
-DFT(const OcvDftOptions & c, const Complex<T>* src, Complex<T>* dst)
+template<typename T> സ്ഥിതം ശൂന്യം
+DFT(സ്ഥിരം OcvDftOptions & c, സ്ഥിരം Complex<T>* src, Complex<T>* dst)
 {
-    if( c.useIpp )
+    എങ്കിൽ( c.useIpp )
     {
 #ifdef USE_IPP_DFT
-        if( !c.isInverse )
+        എങ്കിൽ( !c.isInverse )
         {
-            if (ippsDFTFwd_CToC( src, dst, c.ipp_spec, c.ipp_work ) >= 0)
+            എങ്കിൽ (ippsDFTFwd_CToC( src, dst, c.ipp_spec, c.ipp_work ) >= 0)
             {
                 CV_IMPL_ADD(CV_IMPL_IPP);
-                return;
+                തിരികെ;
             }
         }
-        else
+        അല്ലെങ്കിൽ
         {
-            if (ippsDFTInv_CToC( src, dst, c.ipp_spec, c.ipp_work ) >= 0)
+            എങ്കിൽ (ippsDFTInv_CToC( src, dst, c.ipp_spec, c.ipp_work ) >= 0)
             {
                 CV_IMPL_ADD(CV_IMPL_IPP);
-                return;
+                തിരികെ;
             }
         }
         setIppErrorStatus();
 #endif
     }
 
-    runDft(c, src, 1, dst, 1, false);
+    runDft(c, src, 1, dst, 1, അസത്യം);
 }
 
 
@@ -722,27 +722,27 @@ DFT(const OcvDftOptions & c, const Complex<T>* src, Complex<T>* dst)
    output vector format:
      re(0), re(1), im(1), ... , re(n/2-1), im((n+1)/2-1) [, re((n+1)/2)] OR ...
      re(0), 0, re(1), im(1), ..., re(n/2-1), im((n+1)/2-1) [, re((n+1)/2), 0] */
-template<typename T> static void
-RealDFT(const OcvDftOptions & c, const T* src, T* dst)
+template<typename T> സ്ഥിതം ശൂന്യം
+RealDFT(സ്ഥിരം OcvDftOptions & c, സ്ഥിരം T* src, T* dst)
 {
-    int complex_output = c.isComplex;
+    പൂർണ്ണസംഖ്യ complex_output = c.isComplex;
 
-    if( c.useIpp )
+    എങ്കിൽ( c.useIpp )
     {
 #ifdef USE_IPP_DFT
-        int n = c.n;
+        പൂർണ്ണസംഖ്യ n = c.n;
         T* ipp_dst = dst + complex_output;
-        if (ippsDFTFwd_RToPack( src, ipp_dst, c.ipp_spec, c.ipp_work ) >=0)
+        എങ്കിൽ (ippsDFTFwd_RToPack( src, ipp_dst, c.ipp_spec, c.ipp_work ) >=0)
         {
-            if( complex_output )
+            എങ്കിൽ( complex_output )
             {
                 ipp_dst[-1] = ipp_dst[0];
                 ipp_dst[0] = 0;
-                if( (n & 1) == 0 )
+                എങ്കിൽ( (n & 1) == 0 )
                     ipp_dst[n] = 0;
             }
             CV_IMPL_ADD(CV_IMPL_IPP);
-            return;
+            തിരികെ;
         }
         setIppErrorStatus();
 #endif
@@ -754,67 +754,67 @@ RealDFT(const OcvDftOptions & c, const T* src, T* dst)
    input vector format:
       re[0], re[1], im[1], ... , re[n/2-1], im[n/2-1], re[n/2] OR
       re(0), 0, re(1), im(1), ..., re(n/2-1), im((n+1)/2-1) [, re((n+1)/2), 0] */
-template<typename T> static void
-CCSIDFT(const OcvDftOptions & c, const T* src, T* dst)
+template<typename T> സ്ഥിതം ശൂന്യം
+CCSIDFT(സ്ഥിരം OcvDftOptions & c, സ്ഥിരം T* src, T* dst)
 {
-    int complex_input = c.isComplex;
+    പൂർണ്ണസംഖ്യ complex_നിവേശം = c.isComplex;
 
-    if( complex_input )
+    എങ്കിൽ( complex_നിവേശം )
         CV_Assert( src != dst );
-    if( c.useIpp )
+    എങ്കിൽ( c.useIpp )
     {
 #ifdef USE_IPP_DFT
         // IPP expects the packed format; with complex input the packed spectrum is src+1 once
         // im(0) (always zero) is overwritten with re(0)
-        const T* ipp_src = src;
+        സ്ഥിരം T* ipp_src = src;
         T save_s1 = 0;
-        if( complex_input )
+        എങ്കിൽ( complex_നിവേശം )
         {
             save_s1 = src[1];
             ((T*)src)[1] = src[0];
             ipp_src = src + 1;
         }
         IppStatus status = ippsDFTInv_PackToR( ipp_src, dst, c.ipp_spec, c.ipp_work );
-        if( complex_input )
+        എങ്കിൽ( complex_നിവേശം )
             ((T*)src)[1] = save_s1;
-        if( status >= 0 )
+        എങ്കിൽ( status >= 0 )
         {
             CV_IMPL_ADD(CV_IMPL_IPP);
-            return;
+            തിരികെ;
         }
         setIppErrorStatus();
 #endif
     }
-    runDft(c, src, 1, dst, 1, complex_input != 0);
+    runDft(c, src, 1, dst, 1, complex_നിവേശം != 0);
 }
 
-static void
-CopyColumn( const uchar* _src, size_t src_step,
+സ്ഥിതം ശൂന്യം
+CopyColumn( സ്ഥിരം uchar* _src, size_t src_step,
             uchar* _dst, size_t dst_step,
-            int len, size_t elem_size )
+            പൂർണ്ണസംഖ്യ len, size_t elem_size )
 {
-    int i, t0, t1;
-    const int* src = (const int*)_src;
-    int* dst = (int*)_dst;
-    src_step /= sizeof(src[0]);
-    dst_step /= sizeof(dst[0]);
+    പൂർണ്ണസംഖ്യ i, t0, t1;
+    സ്ഥിരം പൂർണ്ണസംഖ്യ* src = (സ്ഥിരം പൂർണ്ണസംഖ്യ*)_src;
+    പൂർണ്ണസംഖ്യ* dst = (പൂർണ്ണസംഖ്യ*)_dst;
+    src_step /= വലുപ്പം(src[0]);
+    dst_step /= വലുപ്പം(dst[0]);
 
-    if( elem_size == sizeof(int) )
+    എങ്കിൽ( elem_size == വലുപ്പം(പൂർണ്ണസംഖ്യ) )
     {
-        for( i = 0; i < len; i++, src += src_step, dst += dst_step )
+        വേണ്ടി( i = 0; i < len; i++, src += src_step, dst += dst_step )
             dst[0] = src[0];
     }
-    else if( elem_size == sizeof(int)*2 )
+    അല്ലെങ്കിൽ എങ്കിൽ( elem_size == വലുപ്പം(പൂർണ്ണസംഖ്യ)*2 )
     {
-        for( i = 0; i < len; i++, src += src_step, dst += dst_step )
+        വേണ്ടി( i = 0; i < len; i++, src += src_step, dst += dst_step )
         {
             t0 = src[0]; t1 = src[1];
             dst[0] = t0; dst[1] = t1;
         }
     }
-    else if( elem_size == sizeof(int)*4 )
+    അല്ലെങ്കിൽ എങ്കിൽ( elem_size == വലുപ്പം(പൂർണ്ണസംഖ്യ)*4 )
     {
-        for( i = 0; i < len; i++, src += src_step, dst += dst_step )
+        വേണ്ടി( i = 0; i < len; i++, src += src_step, dst += dst_step )
         {
             t0 = src[0]; t1 = src[1];
             dst[0] = t0; dst[1] = t1;
@@ -829,438 +829,438 @@ CopyColumn( const uchar* _src, size_t src_step,
 // into `ncols` contiguous column buffers of `len` elements each: dst + k*len*elem_size holds
 // column k. Row-wise: each source row is read once, sequentially. (Row steps are only
 // guaranteed to be multiples of the element size, hence the byte arithmetic.)
-template<typename T> static inline void
-copyFromColumns_( const uchar* src, size_t src_step, T* dst, int ncols, int len )
+template<typename T> സ്ഥിതം വരിയിൽ ശൂന്യം
+copyFromColumns_( സ്ഥിരം uchar* src, size_t src_step, T* dst, പൂർണ്ണസംഖ്യ ncols, പൂർണ്ണസംഖ്യ len )
 {
-    for( int i = 0; i < len; i++, src += src_step )
+    വേണ്ടി( പൂർണ്ണസംഖ്യ i = 0; i < len; i++, src += src_step )
     {
-        const T* s = (const T*)src;
-        for( int k = 0; k < ncols; k++ )
+        സ്ഥിരം T* s = (സ്ഥിരം T*)src;
+        വേണ്ടി( പൂർണ്ണസംഖ്യ k = 0; k < ncols; k++ )
             dst[(size_t)k*len + i] = s[k];
     }
 }
 
-static void
-CopyFromColumns( const uchar* src, size_t src_step, uchar* dst, int ncols, int len, size_t elem_size )
+സ്ഥിതം ശൂന്യം
+CopyFromColumns( സ്ഥിരം uchar* src, size_t src_step, uchar* dst, പൂർണ്ണസംഖ്യ ncols, പൂർണ്ണസംഖ്യ len, size_t elem_size )
 {
-    if( elem_size == sizeof(int) )
-        copyFromColumns_(src, src_step, (int*)dst, ncols, len);
-    else if( elem_size == sizeof(int64) )
+    എങ്കിൽ( elem_size == വലുപ്പം(പൂർണ്ണസംഖ്യ) )
+        copyFromColumns_(src, src_step, (പൂർണ്ണസംഖ്യ*)dst, ncols, len);
+    അല്ലെങ്കിൽ എങ്കിൽ( elem_size == വലുപ്പം(int64) )
         copyFromColumns_(src, src_step, (int64*)dst, ncols, len);
-    else
+    അല്ലെങ്കിൽ
     {
-        CV_Assert( elem_size == sizeof(int64)*2 );
+        CV_Assert( elem_size == വലുപ്പം(int64)*2 );
         copyFromColumns_(src, src_step, (Vec<int64, 2>*)dst, ncols, len);
     }
 }
 
 // The inverse of CopyFromColumns: `ncols` contiguous column buffers -> `ncols` adjacent columns
 // of `dst` (row step in bytes), written row by row.
-template<typename T> static inline void
-copyToColumns_( const T* src, uchar* dst, size_t dst_step, int ncols, int len )
+template<typename T> സ്ഥിതം വരിയിൽ ശൂന്യം
+copyToColumns_( സ്ഥിരം T* src, uchar* dst, size_t dst_step, പൂർണ്ണസംഖ്യ ncols, പൂർണ്ണസംഖ്യ len )
 {
-    for( int i = 0; i < len; i++, dst += dst_step )
+    വേണ്ടി( പൂർണ്ണസംഖ്യ i = 0; i < len; i++, dst += dst_step )
     {
         T* d = (T*)dst;
-        for( int k = 0; k < ncols; k++ )
+        വേണ്ടി( പൂർണ്ണസംഖ്യ k = 0; k < ncols; k++ )
             d[k] = src[(size_t)k*len + i];
     }
 }
 
-static void
-CopyToColumns( const uchar* src, uchar* dst, size_t dst_step, int ncols, int len, size_t elem_size )
+സ്ഥിതം ശൂന്യം
+CopyToColumns( സ്ഥിരം uchar* src, uchar* dst, size_t dst_step, പൂർണ്ണസംഖ്യ ncols, പൂർണ്ണസംഖ്യ len, size_t elem_size )
 {
-    if( elem_size == sizeof(int) )
-        copyToColumns_((const int*)src, dst, dst_step, ncols, len);
-    else if( elem_size == sizeof(int64) )
-        copyToColumns_((const int64*)src, dst, dst_step, ncols, len);
-    else
+    എങ്കിൽ( elem_size == വലുപ്പം(പൂർണ്ണസംഖ്യ) )
+        copyToColumns_((സ്ഥിരം പൂർണ്ണസംഖ്യ*)src, dst, dst_step, ncols, len);
+    അല്ലെങ്കിൽ എങ്കിൽ( elem_size == വലുപ്പം(int64) )
+        copyToColumns_((സ്ഥിരം int64*)src, dst, dst_step, ncols, len);
+    അല്ലെങ്കിൽ
     {
-        CV_Assert( elem_size == sizeof(int64)*2 );
-        copyToColumns_((const Vec<int64, 2>*)src, dst, dst_step, ncols, len);
+        CV_Assert( elem_size == വലുപ്പം(int64)*2 );
+        copyToColumns_((സ്ഥിരം Vec<int64, 2>*)src, dst, dst_step, ncols, len);
     }
 }
 
-static void
-ExpandCCS( uchar* _ptr, int n, int elem_size )
+സ്ഥിതം ശൂന്യം
+ExpandCCS( uchar* _ptr, പൂർണ്ണസംഖ്യ n, പൂർണ്ണസംഖ്യ elem_size )
 {
-    int i;
-    if( elem_size == (int)sizeof(float) )
+    പൂർണ്ണസംഖ്യ i;
+    എങ്കിൽ( elem_size == (പൂർണ്ണസംഖ്യ)വലുപ്പം(ദശാംശം) )
     {
-        float* p = (float*)_ptr;
-        for( i = 1; i < (n+1)/2; i++ )
+        ദശാംശം* p = (ദശാംശം*)_ptr;
+        വേണ്ടി( i = 1; i < (n+1)/2; i++ )
         {
             p[(n-i)*2] = p[i*2-1];
             p[(n-i)*2+1] = -p[i*2];
         }
-        if( (n & 1) == 0 )
+        എങ്കിൽ( (n & 1) == 0 )
         {
             p[n] = p[n-1];
             p[n+1] = 0.f;
             n--;
         }
-        for( i = n-1; i > 0; i-- )
+        വേണ്ടി( i = n-1; i > 0; i-- )
             p[i+1] = p[i];
         p[1] = 0.f;
     }
-    else
+    അല്ലെങ്കിൽ
     {
-        double* p = (double*)_ptr;
-        for( i = 1; i < (n+1)/2; i++ )
+        ഇരട്ട* p = (ഇരട്ട*)_ptr;
+        വേണ്ടി( i = 1; i < (n+1)/2; i++ )
         {
             p[(n-i)*2] = p[i*2-1];
             p[(n-i)*2+1] = -p[i*2];
         }
-        if( (n & 1) == 0 )
+        എങ്കിൽ( (n & 1) == 0 )
         {
             p[n] = p[n-1];
             p[n+1] = 0.f;
             n--;
         }
-        for( i = n-1; i > 0; i-- )
+        വേണ്ടി( i = n-1; i > 0; i-- )
             p[i+1] = p[i];
         p[1] = 0.f;
     }
 }
 
-template<typename T, void (*fn)(const OcvDftOptions&, const T*, T*)>
-static void dftWrap(const OcvDftOptions & c, const void* src, void* dst)
+template<typename T, ശൂന്യം (*fn)(സ്ഥിരം OcvDftOptions&, സ്ഥിരം T*, T*)>
+സ്ഥിതം ശൂന്യം dftWrap(സ്ഥിരം OcvDftOptions & c, സ്ഥിരം ശൂന്യം* src, ശൂന്യം* dst)
 {
-    fn(c, (const T*)src, (T*)dst);
+    fn(c, (സ്ഥിരം T*)src, (T*)dst);
 }
 
 }
 
 #ifdef USE_IPP_DFT
-typedef IppStatus (CV_STDCALL* IppDFTGetSizeFunc)(int, int, IppHintAlgorithm, int*, int*, int*);
-typedef IppStatus (CV_STDCALL* IppDFTInitFunc)(int, int, IppHintAlgorithm, void*, uchar*);
+തരനിർവചനം IppStatus (CV_STDCALL* IppDFTGetSizeFunc)(പൂർണ്ണസംഖ്യ, പൂർണ്ണസംഖ്യ, IppHintAlgorithm, പൂർണ്ണസംഖ്യ*, പൂർണ്ണസംഖ്യ*, പൂർണ്ണസംഖ്യ*);
+തരനിർവചനം IppStatus (CV_STDCALL* IppDFTInitFunc)(പൂർണ്ണസംഖ്യ, പൂർണ്ണസംഖ്യ, IppHintAlgorithm, ശൂന്യം*, uchar*);
 
-template<typename SpecType, IppStatus (CV_STDCALL *init_fn)(int, int, IppHintAlgorithm, SpecType*, Ipp8u*)>
-static IppStatus CV_STDCALL ippDFTInitWrap(int n, int flags, IppHintAlgorithm hint, void* spec, Ipp8u* initbuf)
+template<typename SpecType, IppStatus (CV_STDCALL *init_fn)(പൂർണ്ണസംഖ്യ, പൂർണ്ണസംഖ്യ, IppHintAlgorithm, SpecType*, Ipp8u*)>
+സ്ഥിതം IppStatus CV_STDCALL ippDFTInitWrap(പൂർണ്ണസംഖ്യ n, പൂർണ്ണസംഖ്യ flags, IppHintAlgorithm hint, ശൂന്യം* spec, Ipp8u* initbuf)
 {
-    return init_fn(n, flags, hint, (SpecType*)spec, initbuf);
+    തിരികെ init_fn(n, flags, hint, (SpecType*)spec, initbuf);
 }
 #endif
 
-namespace cv
+നാമാകാശ cv
 {
-#if defined USE_IPP_DFT
+#എങ്കിൽ defined USE_IPP_DFT
 
-typedef IppStatus (CV_STDCALL* ippiDFT_C_Func)(const Ipp32fc*, int, Ipp32fc*, int, const IppiDFTSpec_C_32fc*, Ipp8u*);
-typedef IppStatus (CV_STDCALL* ippiDFT_R_Func)(const Ipp32f* , int, Ipp32f* , int, const IppiDFTSpec_R_32f* , Ipp8u*);
+തരനിർവചനം IppStatus (CV_STDCALL* ippiDFT_C_Func)(സ്ഥിരം Ipp32fc*, പൂർണ്ണസംഖ്യ, Ipp32fc*, പൂർണ്ണസംഖ്യ, സ്ഥിരം IppiDFTSpec_C_32fc*, Ipp8u*);
+തരനിർവചനം IppStatus (CV_STDCALL* ippiDFT_R_Func)(സ്ഥിരം Ipp32f* , പൂർണ്ണസംഖ്യ, Ipp32f* , പൂർണ്ണസംഖ്യ, സ്ഥിരം IppiDFTSpec_R_32f* , Ipp8u*);
 
 template <typename Dft>
-class Dft_C_IPPLoop_Invoker : public ParallelLoopBody
+വർഗ്ഗം Dft_C_IPPLoop_Invoker : പൊതു ParallelLoopBody
 {
-public:
+പൊതു:
 
-    Dft_C_IPPLoop_Invoker(const uchar * _src, size_t _src_step, uchar * _dst, size_t _dst_step, int _width,
-                          const Dft& _ippidft, int _norm_flag, bool *_ok) :
+    Dft_C_IPPLoop_Invoker(സ്ഥിരം uchar * _src, size_t _src_step, uchar * _dst, size_t _dst_step, പൂർണ്ണസംഖ്യ _width,
+                          സ്ഥിരം Dft& _ippidft, പൂർണ്ണസംഖ്യ _norm_flag, തർക്കം *_ok) :
         ParallelLoopBody(),
         src(_src), src_step(_src_step), dst(_dst), dst_step(_dst_step), width(_width),
         ippidft(_ippidft), norm_flag(_norm_flag), ok(_ok)
     {
-        *ok = true;
+        *ok = സത്യം;
     }
 
-    virtual void operator()(const Range& range) const CV_OVERRIDE
+    മായാ ശൂന്യം operator()(സ്ഥിരം Range& range) സ്ഥിരം CV_OVERRIDE
     {
         IppStatus status;
         Ipp8u* pBuffer = 0;
         Ipp8u* pMemInit= 0;
-        int sizeBuffer=0;
-        int sizeSpec=0;
-        int sizeInit=0;
+        പൂർണ്ണസംഖ്യ sizeBuffer=0;
+        പൂർണ്ണസംഖ്യ sizeSpec=0;
+        പൂർണ്ണസംഖ്യ sizeInit=0;
 
         IppiSize srcRoiSize = {width, 1};
 
         status = ippiDFTGetSize_C_32fc(srcRoiSize, norm_flag, ippAlgHintNone, &sizeSpec, &sizeInit, &sizeBuffer );
-        if ( status < 0 )
+        എങ്കിൽ ( status < 0 )
         {
-            *ok = false;
-            return;
+            *ok = അസത്യം;
+            തിരികെ;
         }
 
         IppiDFTSpec_C_32fc* pDFTSpec = (IppiDFTSpec_C_32fc*)CV_IPP_MALLOC( sizeSpec );
 
-        if ( sizeInit > 0 )
+        എങ്കിൽ ( sizeInit > 0 )
             pMemInit = (Ipp8u*)CV_IPP_MALLOC( sizeInit );
 
-        if ( sizeBuffer > 0 )
+        എങ്കിൽ ( sizeBuffer > 0 )
             pBuffer = (Ipp8u*)CV_IPP_MALLOC( sizeBuffer );
 
         status = ippiDFTInit_C_32fc( srcRoiSize, norm_flag, ippAlgHintNone, pDFTSpec, pMemInit );
 
-        if ( sizeInit > 0 )
+        എങ്കിൽ ( sizeInit > 0 )
             ippFree( pMemInit );
 
-        if ( status < 0 )
+        എങ്കിൽ ( status < 0 )
         {
             ippFree( pDFTSpec );
-            if ( sizeBuffer > 0 )
+            എങ്കിൽ ( sizeBuffer > 0 )
                 ippFree( pBuffer );
-            *ok = false;
-            return;
+            *ok = അസത്യം;
+            തിരികെ;
         }
 
-        for( int i = range.start; i < range.end; ++i)
-            if(!ippidft((Ipp32fc*)(src + src_step * i), src_step, (Ipp32fc*)(dst + dst_step * i), dst_step,
+        വേണ്ടി( പൂർണ്ണസംഖ്യ i = range.start; i < range.end; ++i)
+            എങ്കിൽ(!ippidft((Ipp32fc*)(src + src_step * i), src_step, (Ipp32fc*)(dst + dst_step * i), dst_step,
                         pDFTSpec, (Ipp8u*)pBuffer))
             {
-                *ok = false;
+                *ok = അസത്യം;
             }
 
-        if ( sizeBuffer > 0 )
+        എങ്കിൽ ( sizeBuffer > 0 )
             ippFree( pBuffer );
 
         ippFree( pDFTSpec );
         CV_IMPL_ADD(CV_IMPL_IPP|CV_IMPL_MT);
     }
 
-private:
-    const uchar * src;
+സ്വകാര്യ:
+    സ്ഥിരം uchar * src;
     size_t src_step;
     uchar * dst;
     size_t dst_step;
-    int width;
-    const Dft& ippidft;
-    int norm_flag;
-    bool *ok;
+    പൂർണ്ണസംഖ്യ width;
+    സ്ഥിരം Dft& ippidft;
+    പൂർണ്ണസംഖ്യ norm_flag;
+    തർക്കം *ok;
 
-    const Dft_C_IPPLoop_Invoker& operator= (const Dft_C_IPPLoop_Invoker&);
+    സ്ഥിരം Dft_C_IPPLoop_Invoker& operator= (സ്ഥിരം Dft_C_IPPLoop_Invoker&);
 };
 
 template <typename Dft>
-class Dft_R_IPPLoop_Invoker : public ParallelLoopBody
+വർഗ്ഗം Dft_R_IPPLoop_Invoker : പൊതു ParallelLoopBody
 {
-public:
+പൊതു:
 
-    Dft_R_IPPLoop_Invoker(const uchar * _src, size_t _src_step, uchar * _dst, size_t _dst_step, int _width,
-                          const Dft& _ippidft, int _norm_flag, bool *_ok) :
+    Dft_R_IPPLoop_Invoker(സ്ഥിരം uchar * _src, size_t _src_step, uchar * _dst, size_t _dst_step, പൂർണ്ണസംഖ്യ _width,
+                          സ്ഥിരം Dft& _ippidft, പൂർണ്ണസംഖ്യ _norm_flag, തർക്കം *_ok) :
         ParallelLoopBody(),
         src(_src), src_step(_src_step), dst(_dst), dst_step(_dst_step), width(_width),
         ippidft(_ippidft), norm_flag(_norm_flag), ok(_ok)
     {
-        *ok = true;
+        *ok = സത്യം;
     }
 
-    virtual void operator()(const Range& range) const CV_OVERRIDE
+    മായാ ശൂന്യം operator()(സ്ഥിരം Range& range) സ്ഥിരം CV_OVERRIDE
     {
         IppStatus status;
         Ipp8u* pBuffer = 0;
         Ipp8u* pMemInit= 0;
-        int sizeBuffer=0;
-        int sizeSpec=0;
-        int sizeInit=0;
+        പൂർണ്ണസംഖ്യ sizeBuffer=0;
+        പൂർണ്ണസംഖ്യ sizeSpec=0;
+        പൂർണ്ണസംഖ്യ sizeInit=0;
 
         IppiSize srcRoiSize = {width, 1};
 
         status = ippiDFTGetSize_R_32f(srcRoiSize, norm_flag, ippAlgHintNone, &sizeSpec, &sizeInit, &sizeBuffer );
-        if ( status < 0 )
+        എങ്കിൽ ( status < 0 )
         {
-            *ok = false;
-            return;
+            *ok = അസത്യം;
+            തിരികെ;
         }
 
         IppiDFTSpec_R_32f* pDFTSpec = (IppiDFTSpec_R_32f*)CV_IPP_MALLOC( sizeSpec );
 
-        if ( sizeInit > 0 )
+        എങ്കിൽ ( sizeInit > 0 )
             pMemInit = (Ipp8u*)CV_IPP_MALLOC( sizeInit );
 
-        if ( sizeBuffer > 0 )
+        എങ്കിൽ ( sizeBuffer > 0 )
             pBuffer = (Ipp8u*)CV_IPP_MALLOC( sizeBuffer );
 
         status = ippiDFTInit_R_32f( srcRoiSize, norm_flag, ippAlgHintNone, pDFTSpec, pMemInit );
 
-        if ( sizeInit > 0 )
+        എങ്കിൽ ( sizeInit > 0 )
             ippFree( pMemInit );
 
-        if ( status < 0 )
+        എങ്കിൽ ( status < 0 )
         {
             ippFree( pDFTSpec );
-            if ( sizeBuffer > 0 )
+            എങ്കിൽ ( sizeBuffer > 0 )
                 ippFree( pBuffer );
-            *ok = false;
-            return;
+            *ok = അസത്യം;
+            തിരികെ;
         }
 
-        for( int i = range.start; i < range.end; ++i)
-            if(!ippidft((float*)(src + src_step * i), src_step, (float*)(dst + dst_step * i), dst_step,
+        വേണ്ടി( പൂർണ്ണസംഖ്യ i = range.start; i < range.end; ++i)
+            എങ്കിൽ(!ippidft((ദശാംശം*)(src + src_step * i), src_step, (ദശാംശം*)(dst + dst_step * i), dst_step,
                         pDFTSpec, (Ipp8u*)pBuffer))
             {
-                *ok = false;
+                *ok = അസത്യം;
             }
 
-        if ( sizeBuffer > 0 )
+        എങ്കിൽ ( sizeBuffer > 0 )
             ippFree( pBuffer );
 
         ippFree( pDFTSpec );
         CV_IMPL_ADD(CV_IMPL_IPP|CV_IMPL_MT);
     }
 
-private:
-    const uchar * src;
+സ്വകാര്യ:
+    സ്ഥിരം uchar * src;
     size_t src_step;
     uchar * dst;
     size_t dst_step;
-    int width;
-    const Dft& ippidft;
-    int norm_flag;
-    bool *ok;
+    പൂർണ്ണസംഖ്യ width;
+    സ്ഥിരം Dft& ippidft;
+    പൂർണ്ണസംഖ്യ norm_flag;
+    തർക്കം *ok;
 
-    const Dft_R_IPPLoop_Invoker& operator= (const Dft_R_IPPLoop_Invoker&);
+    സ്ഥിരം Dft_R_IPPLoop_Invoker& operator= (സ്ഥിരം Dft_R_IPPLoop_Invoker&);
 };
 
 template <typename Dft>
-bool Dft_C_IPPLoop(const uchar * src, size_t src_step, uchar * dst, size_t dst_step, int width, int height, const Dft& ippidft, int norm_flag)
+തർക്കം Dft_C_IPPLoop(സ്ഥിരം uchar * src, size_t src_step, uchar * dst, size_t dst_step, പൂർണ്ണസംഖ്യ width, പൂർണ്ണസംഖ്യ height, സ്ഥിരം Dft& ippidft, പൂർണ്ണസംഖ്യ norm_flag)
 {
-    bool ok;
-    parallel_for_(Range(0, height), Dft_C_IPPLoop_Invoker<Dft>(src, src_step, dst, dst_step, width, ippidft, norm_flag, &ok), (width * height)/(double)(1<<16) );
-    return ok;
+    തർക്കം ok;
+    parallel_for_(Range(0, height), Dft_C_IPPLoop_Invoker<Dft>(src, src_step, dst, dst_step, width, ippidft, norm_flag, &ok), (width * height)/(ഇരട്ട)(1<<16) );
+    തിരികെ ok;
 }
 
 template <typename Dft>
-bool Dft_R_IPPLoop(const uchar * src, size_t src_step, uchar * dst, size_t dst_step, int width, int height, const Dft& ippidft, int norm_flag)
+തർക്കം Dft_R_IPPLoop(സ്ഥിരം uchar * src, size_t src_step, uchar * dst, size_t dst_step, പൂർണ്ണസംഖ്യ width, പൂർണ്ണസംഖ്യ height, സ്ഥിരം Dft& ippidft, പൂർണ്ണസംഖ്യ norm_flag)
 {
-    bool ok;
-    parallel_for_(Range(0, height), Dft_R_IPPLoop_Invoker<Dft>(src, src_step, dst, dst_step, width, ippidft, norm_flag, &ok), (width * height)/(double)(1<<16) );
-    return ok;
+    തർക്കം ok;
+    parallel_for_(Range(0, height), Dft_R_IPPLoop_Invoker<Dft>(src, src_step, dst, dst_step, width, ippidft, norm_flag, &ok), (width * height)/(ഇരട്ട)(1<<16) );
+    തിരികെ ok;
 }
 
-struct IPPDFT_C_Functor
+ഘടന IPPDFT_C_Functor
 {
     IPPDFT_C_Functor(ippiDFT_C_Func _func) : ippiDFT_CToC_32fc_C1R(_func){}
 
-    bool operator()(const Ipp32fc* src, size_t srcStep, Ipp32fc* dst, size_t dstStep, const IppiDFTSpec_C_32fc* pDFTSpec, Ipp8u* pBuffer) const
+    തർക്കം operator()(സ്ഥിരം Ipp32fc* src, size_t srcStep, Ipp32fc* dst, size_t dstStep, സ്ഥിരം IppiDFTSpec_C_32fc* pDFTSpec, Ipp8u* pBuffer) സ്ഥിരം
     {
-        return ippiDFT_CToC_32fc_C1R ? CV_INSTRUMENT_FUN_IPP(ippiDFT_CToC_32fc_C1R, src, static_cast<int>(srcStep), dst, static_cast<int>(dstStep), pDFTSpec, pBuffer) >= 0 : false;
+        തിരികെ ippiDFT_CToC_32fc_C1R ? CV_INSTRUMENT_FUN_IPP(ippiDFT_CToC_32fc_C1R, src, static_cast<പൂർണ്ണസംഖ്യ>(srcStep), dst, static_cast<പൂർണ്ണസംഖ്യ>(dstStep), pDFTSpec, pBuffer) >= 0 : അസത്യം;
     }
-private:
+സ്വകാര്യ:
     ippiDFT_C_Func ippiDFT_CToC_32fc_C1R;
 };
 
-struct IPPDFT_R_Functor
+ഘടന IPPDFT_R_Functor
 {
     IPPDFT_R_Functor(ippiDFT_R_Func _func) : ippiDFT_PackToR_32f_C1R(_func){}
 
-    bool operator()(const Ipp32f* src, size_t srcStep, Ipp32f* dst, size_t dstStep, const IppiDFTSpec_R_32f* pDFTSpec, Ipp8u* pBuffer) const
+    തർക്കം operator()(സ്ഥിരം Ipp32f* src, size_t srcStep, Ipp32f* dst, size_t dstStep, സ്ഥിരം IppiDFTSpec_R_32f* pDFTSpec, Ipp8u* pBuffer) സ്ഥിരം
     {
-        return ippiDFT_PackToR_32f_C1R ? CV_INSTRUMENT_FUN_IPP(ippiDFT_PackToR_32f_C1R, src, static_cast<int>(srcStep), dst, static_cast<int>(dstStep), pDFTSpec, pBuffer) >= 0 : false;
+        തിരികെ ippiDFT_PackToR_32f_C1R ? CV_INSTRUMENT_FUN_IPP(ippiDFT_PackToR_32f_C1R, src, static_cast<പൂർണ്ണസംഖ്യ>(srcStep), dst, static_cast<പൂർണ്ണസംഖ്യ>(dstStep), pDFTSpec, pBuffer) >= 0 : അസത്യം;
     }
-private:
+സ്വകാര്യ:
     ippiDFT_R_Func ippiDFT_PackToR_32f_C1R;
 };
 
-static bool ippi_DFT_C_32F(const uchar * src, size_t src_step, uchar * dst, size_t dst_step, int width, int height, bool inv, int norm_flag)
+സ്ഥിതം തർക്കം ippi_DFT_C_32F(സ്ഥിരം uchar * src, size_t src_step, uchar * dst, size_t dst_step, പൂർണ്ണസംഖ്യ width, പൂർണ്ണസംഖ്യ height, തർക്കം inv, പൂർണ്ണസംഖ്യ norm_flag)
 {
     CV_INSTRUMENT_REGION_IPP();
 
     IppStatus status;
     Ipp8u* pBuffer = 0;
     Ipp8u* pMemInit= 0;
-    int sizeBuffer=0;
-    int sizeSpec=0;
-    int sizeInit=0;
+    പൂർണ്ണസംഖ്യ sizeBuffer=0;
+    പൂർണ്ണസംഖ്യ sizeSpec=0;
+    പൂർണ്ണസംഖ്യ sizeInit=0;
 
     IppiSize srcRoiSize = {width, height};
 
     status = ippiDFTGetSize_C_32fc(srcRoiSize, norm_flag, ippAlgHintNone, &sizeSpec, &sizeInit, &sizeBuffer );
-    if ( status < 0 )
-        return false;
+    എങ്കിൽ ( status < 0 )
+        തിരികെ അസത്യം;
 
     IppiDFTSpec_C_32fc* pDFTSpec = (IppiDFTSpec_C_32fc*)CV_IPP_MALLOC( sizeSpec );
 
-    if ( sizeInit > 0 )
+    എങ്കിൽ ( sizeInit > 0 )
         pMemInit = (Ipp8u*)CV_IPP_MALLOC( sizeInit );
 
-    if ( sizeBuffer > 0 )
+    എങ്കിൽ ( sizeBuffer > 0 )
         pBuffer = (Ipp8u*)CV_IPP_MALLOC( sizeBuffer );
 
     status = ippiDFTInit_C_32fc( srcRoiSize, norm_flag, ippAlgHintNone, pDFTSpec, pMemInit );
 
-    if ( sizeInit > 0 )
+    എങ്കിൽ ( sizeInit > 0 )
         ippFree( pMemInit );
 
-    if ( status < 0 )
+    എങ്കിൽ ( status < 0 )
     {
         ippFree( pDFTSpec );
-        if ( sizeBuffer > 0 )
+        എങ്കിൽ ( sizeBuffer > 0 )
             ippFree( pBuffer );
-        return false;
+        തിരികെ അസത്യം;
     }
 
-    if (!inv)
-        status = CV_INSTRUMENT_FUN_IPP(ippiDFTFwd_CToC_32fc_C1R, (Ipp32fc*)src, static_cast<int>(src_step), (Ipp32fc*)dst, static_cast<int>(dst_step), pDFTSpec, pBuffer);
-    else
-        status = CV_INSTRUMENT_FUN_IPP(ippiDFTInv_CToC_32fc_C1R, (Ipp32fc*)src, static_cast<int>(src_step), (Ipp32fc*)dst, static_cast<int>(dst_step), pDFTSpec, pBuffer);
+    എങ്കിൽ (!inv)
+        status = CV_INSTRUMENT_FUN_IPP(ippiDFTFwd_CToC_32fc_C1R, (Ipp32fc*)src, static_cast<പൂർണ്ണസംഖ്യ>(src_step), (Ipp32fc*)dst, static_cast<പൂർണ്ണസംഖ്യ>(dst_step), pDFTSpec, pBuffer);
+    അല്ലെങ്കിൽ
+        status = CV_INSTRUMENT_FUN_IPP(ippiDFTInv_CToC_32fc_C1R, (Ipp32fc*)src, static_cast<പൂർണ്ണസംഖ്യ>(src_step), (Ipp32fc*)dst, static_cast<പൂർണ്ണസംഖ്യ>(dst_step), pDFTSpec, pBuffer);
 
-    if ( sizeBuffer > 0 )
+    എങ്കിൽ ( sizeBuffer > 0 )
         ippFree( pBuffer );
 
     ippFree( pDFTSpec );
 
-    if(status >= 0)
+    എങ്കിൽ(status >= 0)
     {
         CV_IMPL_ADD(CV_IMPL_IPP);
-        return true;
+        തിരികെ സത്യം;
     }
-    return false;
+    തിരികെ അസത്യം;
 }
 
-static bool ippi_DFT_R_32F(const uchar * src, size_t src_step, uchar * dst, size_t dst_step, int width, int height, bool inv, int norm_flag)
+സ്ഥിതം തർക്കം ippi_DFT_R_32F(സ്ഥിരം uchar * src, size_t src_step, uchar * dst, size_t dst_step, പൂർണ്ണസംഖ്യ width, പൂർണ്ണസംഖ്യ height, തർക്കം inv, പൂർണ്ണസംഖ്യ norm_flag)
 {
     CV_INSTRUMENT_REGION_IPP();
 
     IppStatus status;
     Ipp8u* pBuffer = 0;
     Ipp8u* pMemInit= 0;
-    int sizeBuffer=0;
-    int sizeSpec=0;
-    int sizeInit=0;
+    പൂർണ്ണസംഖ്യ sizeBuffer=0;
+    പൂർണ്ണസംഖ്യ sizeSpec=0;
+    പൂർണ്ണസംഖ്യ sizeInit=0;
 
     IppiSize srcRoiSize = {width, height};
 
     status = ippiDFTGetSize_R_32f(srcRoiSize, norm_flag, ippAlgHintNone, &sizeSpec, &sizeInit, &sizeBuffer );
-    if ( status < 0 )
-        return false;
+    എങ്കിൽ ( status < 0 )
+        തിരികെ അസത്യം;
 
     IppiDFTSpec_R_32f* pDFTSpec = (IppiDFTSpec_R_32f*)CV_IPP_MALLOC( sizeSpec );
 
-    if ( sizeInit > 0 )
+    എങ്കിൽ ( sizeInit > 0 )
         pMemInit = (Ipp8u*)CV_IPP_MALLOC( sizeInit );
 
-    if ( sizeBuffer > 0 )
+    എങ്കിൽ ( sizeBuffer > 0 )
         pBuffer = (Ipp8u*)CV_IPP_MALLOC( sizeBuffer );
 
     status = ippiDFTInit_R_32f( srcRoiSize, norm_flag, ippAlgHintNone, pDFTSpec, pMemInit );
 
-    if ( sizeInit > 0 )
+    എങ്കിൽ ( sizeInit > 0 )
         ippFree( pMemInit );
 
-    if ( status < 0 )
+    എങ്കിൽ ( status < 0 )
     {
         ippFree( pDFTSpec );
-        if ( sizeBuffer > 0 )
+        എങ്കിൽ ( sizeBuffer > 0 )
             ippFree( pBuffer );
-        return false;
+        തിരികെ അസത്യം;
     }
 
-    if (!inv)
-        status = CV_INSTRUMENT_FUN_IPP(ippiDFTFwd_RToPack_32f_C1R, (float*)src, static_cast<int>(src_step), (float*)dst, static_cast<int>(dst_step), pDFTSpec, pBuffer);
-    else
-        status = CV_INSTRUMENT_FUN_IPP(ippiDFTInv_PackToR_32f_C1R, (float*)src, static_cast<int>(src_step), (float*)dst, static_cast<int>(dst_step), pDFTSpec, pBuffer);
+    എങ്കിൽ (!inv)
+        status = CV_INSTRUMENT_FUN_IPP(ippiDFTFwd_RToPack_32f_C1R, (ദശാംശം*)src, static_cast<പൂർണ്ണസംഖ്യ>(src_step), (ദശാംശം*)dst, static_cast<പൂർണ്ണസംഖ്യ>(dst_step), pDFTSpec, pBuffer);
+    അല്ലെങ്കിൽ
+        status = CV_INSTRUMENT_FUN_IPP(ippiDFTInv_PackToR_32f_C1R, (ദശാംശം*)src, static_cast<പൂർണ്ണസംഖ്യ>(src_step), (ദശാംശം*)dst, static_cast<പൂർണ്ണസംഖ്യ>(dst_step), pDFTSpec, pBuffer);
 
-    if ( sizeBuffer > 0 )
+    എങ്കിൽ ( sizeBuffer > 0 )
         ippFree( pBuffer );
 
     ippFree( pDFTSpec );
 
-    if(status >= 0)
+    എങ്കിൽ(status >= 0)
     {
         CV_IMPL_ADD(CV_IMPL_IPP);
-        return true;
+        തിരികെ സത്യം;
     }
-    return false;
+    തിരികെ അസത്യം;
 }
 
 #endif
@@ -1268,10 +1268,10 @@ static bool ippi_DFT_R_32F(const uchar * src, size_t src_step, uchar * dst, size
 
 #ifdef HAVE_OPENCL
 
-namespace cv
+നാമാകാശ cv
 {
 
-enum FftType
+എണ്ണൽ FftType
 {
     R2R = 0, // real to CCS in case forward transform, CCS to real otherwise
     C2R = 1, // complex to real in case inverse transform
@@ -1279,61 +1279,61 @@ enum FftType
     C2C = 3  // complex to complex
 };
 
-struct OCL_FftPlan
+ഘടന OCL_FftPlan
 {
-private:
+സ്വകാര്യ:
     UMat twiddles;
     String buildOptions;
-    int thread_count;
-    int dft_size;
-    int dft_depth;
-    bool status;
+    പൂർണ്ണസംഖ്യ thread_എണ്ണം;
+    പൂർണ്ണസംഖ്യ dft_size;
+    പൂർണ്ണസംഖ്യ dft_depth;
+    തർക്കം status;
 
-public:
-    OCL_FftPlan(int _size, int _depth) : dft_size(_size), dft_depth(_depth), status(true)
+പൊതു:
+    OCL_FftPlan(പൂർണ്ണസംഖ്യ _size, പൂർണ്ണസംഖ്യ _depth) : dft_size(_size), dft_depth(_depth), status(സത്യം)
     {
         CV_Assert( dft_depth == CV_32F || dft_depth == CV_64F );
 
-        int min_radix;
-        std::vector<int> radixes, blocks;
+        പൂർണ്ണസംഖ്യ min_radix;
+        std::vector<പൂർണ്ണസംഖ്യ> radixes, blocks;
         ocl_getRadixes(dft_size, radixes, blocks, min_radix);
-        thread_count = dft_size / min_radix;
+        thread_എണ്ണം = dft_size / min_radix;
 
-        if (thread_count > (int) ocl::Device::getDefault().maxWorkGroupSize())
+        എങ്കിൽ (thread_എണ്ണം > (പൂർണ്ണസംഖ്യ) ocl::Device::getDefault().maxWorkGroupSize())
         {
-            status = false;
-            return;
+            status = അസത്യം;
+            തിരികെ;
         }
 
         // generate string with radix calls
         String radix_processing;
-        int n = 1, twiddle_size = 0;
-        for (size_t i=0; i<radixes.size(); i++)
+        പൂർണ്ണസംഖ്യ n = 1, twiddle_size = 0;
+        വേണ്ടി (size_t i=0; i<radixes.size(); i++)
         {
-            int radix = radixes[i], block = blocks[i];
-            if (block > 1)
+            പൂർണ്ണസംഖ്യ radix = radixes[i], block = blocks[i];
+            എങ്കിൽ (block > 1)
                 radix_processing += format("fft_radix%d_B%d(smem,twiddles+%d,ind,%d,%d);", radix, block, twiddle_size, n, dft_size/radix);
-            else
+            അല്ലെങ്കിൽ
                 radix_processing += format("fft_radix%d(smem,twiddles+%d,ind,%d,%d);", radix, twiddle_size, n, dft_size/radix);
             twiddle_size += (radix-1)*n;
             n *= radix;
         }
 
         twiddles.create(1, twiddle_size, CV_MAKE_TYPE(dft_depth, 2));
-        if (dft_depth == CV_32F)
-            fillRadixTable<float>(twiddles, radixes);
-        else
-            fillRadixTable<double>(twiddles, radixes);
+        എങ്കിൽ (dft_depth == CV_32F)
+            fillRadixTable<ദശാംശം>(twiddles, radixes);
+        അല്ലെങ്കിൽ
+            fillRadixTable<ഇരട്ട>(twiddles, radixes);
 
         buildOptions = format("-D LOCAL_SIZE=%d -D kercn=%d -D FT=%s -D CT=%s%s -D RADIX_PROCESS=%s",
                               dft_size, min_radix, ocl::typeToStr(dft_depth), ocl::typeToStr(CV_MAKE_TYPE(dft_depth, 2)),
                               dft_depth == CV_64F ? " -D DOUBLE_SUPPORT" : "", radix_processing.c_str());
     }
 
-    bool enqueueTransform(InputArray _src, OutputArray _dst, int num_dfts, int flags, int fftType, bool rows = true) const
+    തർക്കം enqueueTransform(നിവേശം_Array _src, OutputArray _dst, പൂർണ്ണസംഖ്യ അക്കം_dfts, പൂർണ്ണസംഖ്യ flags, പൂർണ്ണസംഖ്യ fftType, തർക്കം rows = സത്യം) സ്ഥിരം
     {
-        if (!status)
-            return false;
+        എങ്കിൽ (!status)
+            തിരികെ അസത്യം;
 
         UMat src = _src.getUMat();
         UMat dst = _dst.getUMat();
@@ -1342,24 +1342,24 @@ public:
         size_t localsize[2];
         String kernel_name;
 
-        bool is1d = (flags & DFT_ROWS) != 0 || num_dfts == 1;
-        bool inv = (flags & DFT_INVERSE) != 0;
+        തർക്കം is1d = (flags & DFT_ROWS) != 0 || അക്കം_dfts == 1;
+        തർക്കം inv = (flags & DFT_INVERSE) != 0;
         String options = buildOptions;
 
-        if (rows)
+        എങ്കിൽ (rows)
         {
-            globalsize[0] = thread_count; globalsize[1] = src.rows;
-            localsize[0] = thread_count; localsize[1] = 1;
+            globalsize[0] = thread_എണ്ണം; globalsize[1] = src.rows;
+            localsize[0] = thread_എണ്ണം; localsize[1] = 1;
             kernel_name = !inv ? "fft_multi_radix_rows" : "ifft_multi_radix_rows";
-            if ((is1d || inv) && (flags & DFT_SCALE))
+            എങ്കിൽ ((is1d || inv) && (flags & DFT_SCALE))
                 options += " -D DFT_SCALE";
         }
-        else
+        അല്ലെങ്കിൽ
         {
-            globalsize[0] = num_dfts; globalsize[1] = thread_count;
-            localsize[0] = 1; localsize[1] = thread_count;
+            globalsize[0] = അക്കം_dfts; globalsize[1] = thread_എണ്ണം;
+            localsize[0] = 1; localsize[1] = thread_എണ്ണം;
             kernel_name = !inv ? "fft_multi_radix_cols" : "ifft_multi_radix_cols";
-            if (flags & DFT_SCALE)
+            എങ്കിൽ (flags & DFT_SCALE)
                 options += " -D DFT_SCALE";
         }
 
@@ -1367,62 +1367,62 @@ public:
         options += dst.channels() == 1 ? " -D REAL_OUTPUT" : " -D COMPLEX_OUTPUT";
         options += is1d ? " -D IS_1D" : "";
 
-        if (!inv)
+        എങ്കിൽ (!inv)
         {
-            if ((is1d && src.channels() == 1) || (rows && (fftType == R2R)))
+            എങ്കിൽ ((is1d && src.channels() == 1) || (rows && (fftType == R2R)))
                 options += " -D NO_CONJUGATE";
         }
-        else
+        അല്ലെങ്കിൽ
         {
-            if (rows && (fftType == C2R || fftType == R2R))
+            എങ്കിൽ (rows && (fftType == C2R || fftType == R2R))
                 options += " -D NO_CONJUGATE";
-            if (dst.cols % 2 == 0)
+            എങ്കിൽ (dst.cols % 2 == 0)
                 options += " -D EVEN";
         }
 
         ocl::Kernel k(kernel_name.c_str(), ocl::core::fft_oclsrc, options);
-        if (k.empty())
-            return false;
+        എങ്കിൽ (k.empty())
+            തിരികെ അസത്യം;
 
-        k.args(ocl::KernelArg::ReadOnly(src), ocl::KernelArg::WriteOnly(dst), ocl::KernelArg::ReadOnlyNoSize(twiddles), thread_count, num_dfts);
-        return k.run(2, globalsize, localsize, false);
+        k.args(ocl::KernelArg::ReadOnly(src), ocl::KernelArg::WriteOnly(dst), ocl::KernelArg::ReadOnlyNoSize(twiddles), thread_എണ്ണം, അക്കം_dfts);
+        തിരികെ k.run(2, globalsize, localsize, അസത്യം);
     }
 
-private:
-    static void ocl_getRadixes(int cols, std::vector<int>& radixes, std::vector<int>& blocks, int& min_radix)
+സ്വകാര്യ:
+    സ്ഥിതം ശൂന്യം ocl_getRadixes(പൂർണ്ണസംഖ്യ cols, std::vector<പൂർണ്ണസംഖ്യ>& radixes, std::vector<പൂർണ്ണസംഖ്യ>& blocks, പൂർണ്ണസംഖ്യ& min_radix)
     {
-        int factors[34];
-        int nf = DFTFactorize(cols, factors);
+        പൂർണ്ണസംഖ്യ factors[34];
+        പൂർണ്ണസംഖ്യ nf = DFTFactorize(cols, factors);
 
-        int n = 1;
-        int factor_index = 0;
+        പൂർണ്ണസംഖ്യ n = 1;
+        പൂർണ്ണസംഖ്യ factor_index = 0;
         min_radix = INT_MAX;
 
         // 2^n transforms
-        if ((factors[factor_index] & 1) == 0)
+        എങ്കിൽ ((factors[factor_index] & 1) == 0)
         {
-            for( ; n < factors[factor_index];)
+            വേണ്ടി( ; n < factors[factor_index];)
             {
-                int radix = 2, block = 1;
-                if (8*n <= factors[0])
+                പൂർണ്ണസംഖ്യ radix = 2, block = 1;
+                എങ്കിൽ (8*n <= factors[0])
                     radix = 8;
-                else if (4*n <= factors[0])
+                അല്ലെങ്കിൽ എങ്കിൽ (4*n <= factors[0])
                 {
                     radix = 4;
-                    if (cols % 12 == 0)
+                    എങ്കിൽ (cols % 12 == 0)
                         block = 3;
-                    else if (cols % 8 == 0)
+                    അല്ലെങ്കിൽ എങ്കിൽ (cols % 8 == 0)
                         block = 2;
                 }
-                else
+                അല്ലെങ്കിൽ
                 {
-                    if (cols % 10 == 0)
+                    എങ്കിൽ (cols % 10 == 0)
                         block = 5;
-                    else if (cols % 8 == 0)
+                    അല്ലെങ്കിൽ എങ്കിൽ (cols % 8 == 0)
                         block = 4;
-                    else if (cols % 6 == 0)
+                    അല്ലെങ്കിൽ എങ്കിൽ (cols % 6 == 0)
                         block = 3;
-                    else if (cols % 4 == 0)
+                    അല്ലെങ്കിൽ എങ്കിൽ (cols % 4 == 0)
                         block = 2;
                 }
 
@@ -1435,21 +1435,21 @@ private:
         }
 
         // all the other transforms
-        for( ; factor_index < nf; factor_index++)
+        വേണ്ടി( ; factor_index < nf; factor_index++)
         {
-            int radix = factors[factor_index], block = 1;
-            if (radix == 3)
+            പൂർണ്ണസംഖ്യ radix = factors[factor_index], block = 1;
+            എങ്കിൽ (radix == 3)
             {
-                if (cols % 12 == 0)
+                എങ്കിൽ (cols % 12 == 0)
                     block = 4;
-                else if (cols % 9 == 0)
+                അല്ലെങ്കിൽ എങ്കിൽ (cols % 9 == 0)
                     block = 3;
-                else if (cols % 6 == 0)
+                അല്ലെങ്കിൽ എങ്കിൽ (cols % 6 == 0)
                     block = 2;
             }
-            else if (radix == 5)
+            അല്ലെങ്കിൽ എങ്കിൽ (radix == 5)
             {
-                if (cols % 10 == 0)
+                എങ്കിൽ (cols % 10 == 0)
                     block = 2;
             }
             radixes.push_back(radix);
@@ -1459,23 +1459,23 @@ private:
     }
 
     template <typename T>
-    static void fillRadixTable(UMat twiddles, const std::vector<int>& radixes)
+    സ്ഥിതം ശൂന്യം fillRadixTable(UMat twiddles, സ്ഥിരം std::vector<പൂർണ്ണസംഖ്യ>& radixes)
     {
         Mat tw = twiddles.getMat(ACCESS_WRITE);
         T* ptr = tw.ptr<T>();
-        int ptr_index = 0;
+        പൂർണ്ണസംഖ്യ ptr_index = 0;
 
-        int n = 1;
-        for (size_t i=0; i<radixes.size(); i++)
+        പൂർണ്ണസംഖ്യ n = 1;
+        വേണ്ടി (size_t i=0; i<radixes.size(); i++)
         {
-            int radix = radixes[i];
+            പൂർണ്ണസംഖ്യ radix = radixes[i];
             n *= radix;
 
-            for (int j=1; j<radix; j++)
+            വേണ്ടി (പൂർണ്ണസംഖ്യ j=1; j<radix; j++)
             {
-                double theta = -CV_2PI*j/n;
+                ഇരട്ട theta = -CV_2PI*j/n;
 
-                for (int k=0; k<(n/radix); k++)
+                വേണ്ടി (പൂർണ്ണസംഖ്യ k=0; k<(n/radix); k++)
                 {
                     ptr[ptr_index++] = (T) cos(k*theta);
                     ptr[ptr_index++] = (T) sin(k*theta);
@@ -1485,27 +1485,27 @@ private:
     }
 };
 
-class OCL_FftPlanCache
+വർഗ്ഗം OCL_FftPlanCache
 {
-public:
-    static OCL_FftPlanCache & getInstance()
+പൊതു:
+    സ്ഥിതം OCL_FftPlanCache & getInstance()
     {
-        CV_SINGLETON_LAZY_INIT_REF(OCL_FftPlanCache, new OCL_FftPlanCache())
+        CV_SINGLETON_LAZY_INIT_REF(OCL_FftPlanCache, പുതിയ OCL_FftPlanCache())
     }
 
-    Ptr<OCL_FftPlan> getFftPlan(int dft_size, int depth)
+    Ptr<OCL_FftPlan> getFftPlan(പൂർണ്ണസംഖ്യ dft_size, പൂർണ്ണസംഖ്യ depth)
     {
-        int key = (dft_size << 16) | (depth & 0xFFFF);
-        std::map<int, Ptr<OCL_FftPlan> >::iterator f = planStorage.find(key);
-        if (f != planStorage.end())
+        പൂർണ്ണസംഖ്യ താക്കോൽ = (dft_size << 16) | (depth & 0xFFFF);
+        std::map<പൂർണ്ണസംഖ്യ, Ptr<OCL_FftPlan> >::iterator f = planStorage.find(താക്കോൽ);
+        എങ്കിൽ (f != planStorage.end())
         {
-            return f->second;
+            തിരികെ f->second;
         }
-        else
+        അല്ലെങ്കിൽ
         {
-            Ptr<OCL_FftPlan> newPlan = Ptr<OCL_FftPlan>(new OCL_FftPlan(dft_size, depth));
-            planStorage[key] = newPlan;
-            return newPlan;
+            Ptr<OCL_FftPlan> newPlan = Ptr<OCL_FftPlan>(പുതിയ OCL_FftPlan(dft_size, depth));
+            planStorage[താക്കോൽ] = newPlan;
+            തിരികെ newPlan;
         }
     }
 
@@ -1514,130 +1514,130 @@ public:
         planStorage.clear();
     }
 
-protected:
+സംരക്ഷിത:
     OCL_FftPlanCache() :
         planStorage()
     {
     }
-    std::map<int, Ptr<OCL_FftPlan> > planStorage;
+    std::map<പൂർണ്ണസംഖ്യ, Ptr<OCL_FftPlan> > planStorage;
 };
 
-static bool ocl_dft_rows(InputArray _src, OutputArray _dst, int nonzero_rows, int flags, int fftType)
+സ്ഥിതം തർക്കം ocl_dft_rows(നിവേശം_Array _src, OutputArray _dst, പൂർണ്ണസംഖ്യ nonzero_rows, പൂർണ്ണസംഖ്യ flags, പൂർണ്ണസംഖ്യ fftType)
 {
-    int type = _src.type(), depth = CV_MAT_DEPTH(type);
+    പൂർണ്ണസംഖ്യ type = _src.type(), depth = CV_MAT_DEPTH(type);
     Ptr<OCL_FftPlan> plan = OCL_FftPlanCache::getInstance().getFftPlan(_src.cols(), depth);
-    return plan->enqueueTransform(_src, _dst, nonzero_rows, flags, fftType, true);
+    തിരികെ plan->enqueueTransform(_src, _dst, nonzero_rows, flags, fftType, സത്യം);
 }
 
-static bool ocl_dft_cols(InputArray _src, OutputArray _dst, int nonzero_cols, int flags, int fftType)
+സ്ഥിതം തർക്കം ocl_dft_cols(നിവേശം_Array _src, OutputArray _dst, പൂർണ്ണസംഖ്യ nonzero_cols, പൂർണ്ണസംഖ്യ flags, പൂർണ്ണസംഖ്യ fftType)
 {
-    int type = _src.type(), depth = CV_MAT_DEPTH(type);
+    പൂർണ്ണസംഖ്യ type = _src.type(), depth = CV_MAT_DEPTH(type);
     Ptr<OCL_FftPlan> plan = OCL_FftPlanCache::getInstance().getFftPlan(_src.rows(), depth);
-    return plan->enqueueTransform(_src, _dst, nonzero_cols, flags, fftType, false);
+    തിരികെ plan->enqueueTransform(_src, _dst, nonzero_cols, flags, fftType, അസത്യം);
 }
 
-inline FftType determineFFTType(bool real_input, bool complex_input, bool real_output, bool complex_output, bool inv)
+വരിയിൽ FftType determineFFTType(തർക്കം real_നിവേശം, തർക്കം complex_നിവേശം, തർക്കം real_output, തർക്കം complex_output, തർക്കം inv)
 {
     // output format is not specified
-    if (!real_output && !complex_output)
-        complex_output = true;
+    എങ്കിൽ (!real_output && !complex_output)
+        complex_output = സത്യം;
 
     // input or output format is ambiguous
-    if (real_input == complex_input || real_output == complex_output)
+    എങ്കിൽ (real_നിവേശം == complex_നിവേശം || real_output == complex_output)
         CV_Error(Error::StsBadArg, "Invalid FFT input or output format");
 
-    FftType result = real_input ? (real_output ? R2R : R2C) : (real_output ? C2R : C2C);
+    FftType result = real_നിവേശം ? (real_output ? R2R : R2C) : (real_output ? C2R : C2C);
 
     // Forward Complex to CCS not supported
-    if (result == C2R && !inv)
+    എങ്കിൽ (result == C2R && !inv)
         result = C2C;
 
     // Inverse CCS to Complex not supported
-    if (result == R2C && inv)
+    എങ്കിൽ (result == R2C && inv)
         result = R2R;
 
-    return result;
+    തിരികെ result;
 }
 
-static bool ocl_dft(InputArray _src, OutputArray _dst, int flags, int nonzero_rows)
+സ്ഥിതം തർക്കം ocl_dft(നിവേശം_Array _src, OutputArray _dst, പൂർണ്ണസംഖ്യ flags, പൂർണ്ണസംഖ്യ nonzero_rows)
 {
-    int type = _src.type(), cn = CV_MAT_CN(type), depth = CV_MAT_DEPTH(type);
+    പൂർണ്ണസംഖ്യ type = _src.type(), cn = CV_MAT_CN(type), depth = CV_MAT_DEPTH(type);
     Size ssize = _src.size();
-    bool doubleSupport = ocl::Device::getDefault().doubleFPConfig() > 0;
+    തർക്കം doubleSupport = ocl::Device::getDefault().doubleFPConfig() > 0;
 
-    if (!(cn == 1 || cn == 2)
+    എങ്കിൽ (!(cn == 1 || cn == 2)
         || !(depth == CV_32F || (depth == CV_64F && doubleSupport))
         || ((flags & DFT_REAL_OUTPUT) && (flags & DFT_COMPLEX_OUTPUT)))
-        return false;
+        തിരികെ അസത്യം;
 
     // if is not a multiplication of prime numbers { 2, 3, 5 }
-    if (ssize.area() != getOptimalDFTSize(ssize.area()))
-        return false;
+    എങ്കിൽ (ssize.area() != getOptimalDFTSize(ssize.area()))
+        തിരികെ അസത്യം;
 
     UMat src = _src.getUMat();
-    bool inv = (flags & DFT_INVERSE) != 0 ? 1 : 0;
+    തർക്കം inv = (flags & DFT_INVERSE) != 0 ? 1 : 0;
 
-    if( nonzero_rows <= 0 || nonzero_rows > _src.rows() )
+    എങ്കിൽ( nonzero_rows <= 0 || nonzero_rows > _src.rows() )
         nonzero_rows = _src.rows();
-    bool is1d = (flags & DFT_ROWS) != 0 || nonzero_rows == 1;
+    തർക്കം is1d = (flags & DFT_ROWS) != 0 || nonzero_rows == 1;
 
     FftType fftType = determineFFTType(cn == 1, cn == 2,
         (flags & DFT_REAL_OUTPUT) != 0, (flags & DFT_COMPLEX_OUTPUT) != 0, inv);
 
     UMat output;
-    if (fftType == C2C || fftType == R2C)
+    എങ്കിൽ (fftType == C2C || fftType == R2C)
     {
         // complex output
         _dst.createSameSize(src, CV_MAKETYPE(depth, 2));
         output = _dst.getUMat();
     }
-    else
+    അല്ലെങ്കിൽ
     {
         // real output
-        if (is1d)
+        എങ്കിൽ (is1d)
         {
             _dst.createSameSize(src, CV_MAKETYPE(depth, 1));
             output = _dst.getUMat();
         }
-        else
+        അല്ലെങ്കിൽ
         {
             _dst.createSameSize(src, CV_MAKETYPE(depth, 1));
             output.create(src.size, CV_MAKETYPE(depth, 2));
         }
     }
 
-    bool result = false;
-    if (!inv)
+    തർക്കം result = അസത്യം;
+    എങ്കിൽ (!inv)
     {
-        int nonzero_cols = fftType == R2R ? output.cols/2 + 1 : output.cols;
+        പൂർണ്ണസംഖ്യ nonzero_cols = fftType == R2R ? output.cols/2 + 1 : output.cols;
         result = ocl_dft_rows(src, output, nonzero_rows, flags, fftType);
-        if (!is1d)
+        എങ്കിൽ (!is1d)
             result = result && ocl_dft_cols(output, _dst, nonzero_cols, flags, fftType);
     }
-    else
+    അല്ലെങ്കിൽ
     {
-        if (fftType == C2C)
+        എങ്കിൽ (fftType == C2C)
         {
             // complex output
             result = ocl_dft_rows(src, output, nonzero_rows, flags, fftType);
-            if (!is1d)
+            എങ്കിൽ (!is1d)
                 result = result && ocl_dft_cols(output, output, output.cols, flags, fftType);
         }
-        else
+        അല്ലെങ്കിൽ
         {
-            if (is1d)
+            എങ്കിൽ (is1d)
             {
                 result = ocl_dft_rows(src, output, nonzero_rows, flags, fftType);
             }
-            else
+            അല്ലെങ്കിൽ
             {
-                int nonzero_cols = src.cols/2 + 1;
+                പൂർണ്ണസംഖ്യ nonzero_cols = src.cols/2 + 1;
                 result = ocl_dft_cols(src, output, nonzero_cols, flags, fftType);
                 result = result && ocl_dft_rows(output, _dst, nonzero_rows, flags, fftType);
             }
         }
     }
-    return result;
+    തിരികെ result;
 }
 
 } // namespace cv;
@@ -1646,7 +1646,7 @@ static bool ocl_dft(InputArray _src, OutputArray _dst, int flags, int nonzero_ro
 
 #ifdef HAVE_CLAMDFFT
 
-namespace cv {
+നാമാകാശ cv {
 
 #define CLAMDDFT_Assert(func) \
     { \
@@ -1654,18 +1654,18 @@ namespace cv {
         CV_Assert(s == CLFFT_SUCCESS); \
     }
 
-class PlanCache
+വർഗ്ഗം PlanCache
 {
-    struct FftPlan
+    ഘടന FftPlan
     {
-        FftPlan(const Size & _dft_size, int _src_step, int _dst_step, bool _doubleFP, bool _inplace, int _flags, FftType _fftType) :
+        FftPlan(സ്ഥിരം Size & _dft_size, പൂർണ്ണസംഖ്യ _src_step, പൂർണ്ണസംഖ്യ _dst_step, തർക്കം _doubleFP, തർക്കം _inplace, പൂർണ്ണസംഖ്യ _flags, FftType _fftType) :
             dft_size(_dft_size), src_step(_src_step), dst_step(_dst_step),
             doubleFP(_doubleFP), inplace(_inplace), flags(_flags), fftType(_fftType),
             context((cl_context)ocl::Context::getDefault().ptr()), plHandle(0)
         {
-            bool dft_inverse = (flags & DFT_INVERSE) != 0;
-            bool dft_scale = (flags & DFT_SCALE) != 0;
-            bool dft_rows = (flags & DFT_ROWS) != 0;
+            തർക്കം dft_inverse = (flags & DFT_INVERSE) != 0;
+            തർക്കം dft_scale = (flags & DFT_SCALE) != 0;
+            തർക്കം dft_rows = (flags & DFT_ROWS) != 0;
 
             clfftLayout inLayout = CLFFT_REAL, outLayout = CLFFT_REAL;
             clfftDim dim = dft_size.height == 1 || dft_rows ? CLFFT_1D : CLFFT_2D;
@@ -1674,32 +1674,32 @@ class PlanCache
             size_t clLengthsIn[3] = { (size_t)dft_size.width, dft_rows ? 1 : (size_t)dft_size.height, 1 };
             size_t clStridesIn[3] = { 1, 1, 1 };
             size_t clStridesOut[3]  = { 1, 1, 1 };
-            int elemSize = doubleFP ? sizeof(double) : sizeof(float);
+            പൂർണ്ണസംഖ്യ elemSize = doubleFP ? വലുപ്പം(ഇരട്ട) : വലുപ്പം(ദശാംശം);
 
-            switch (fftType)
+            തിരഞ്ഞെടുപ്പ് (fftType)
             {
-            case C2C:
+            അവസ്ഥ C2C:
                 inLayout = CLFFT_COMPLEX_INTERLEAVED;
                 outLayout = CLFFT_COMPLEX_INTERLEAVED;
                 clStridesIn[1] = src_step / (elemSize << 1);
                 clStridesOut[1] = dst_step / (elemSize << 1);
-                break;
-            case R2C:
+                നിർത്തുക;
+            അവസ്ഥ R2C:
                 inLayout = CLFFT_REAL;
                 outLayout = CLFFT_HERMITIAN_INTERLEAVED;
                 clStridesIn[1] = src_step / elemSize;
                 clStridesOut[1] = dst_step / (elemSize << 1);
-                break;
-            case C2R:
+                നിർത്തുക;
+            അവസ്ഥ C2R:
                 inLayout = CLFFT_HERMITIAN_INTERLEAVED;
                 outLayout = CLFFT_REAL;
                 clStridesIn[1] = src_step / (elemSize << 1);
                 clStridesOut[1] = dst_step / elemSize;
-                break;
-            case R2R:
-            default:
+                നിർത്തുക;
+            അവസ്ഥ R2R:
+            സ്ഥിരസ്ഥിതി:
                 CV_Error(Error::StsNotImplemented, "AMD Fft does not support this type");
-                break;
+                നിർത്തുക;
             }
 
             clStridesIn[2] = dft_rows ? clStridesIn[1] : dft_size.width * clStridesIn[1];
@@ -1716,12 +1716,12 @@ class PlanCache
             CLAMDDFT_Assert(clfftSetPlanOutStride(plHandle, dim, clStridesOut))
             CLAMDDFT_Assert(clfftSetPlanDistance(plHandle, clStridesIn[dim], clStridesOut[dim]))
 
-            float scale = dft_scale ? 1.0f / (dft_rows ? dft_size.width : dft_size.area()) : 1.0f;
+            ദശാംശം scale = dft_scale ? 1.0f / (dft_rows ? dft_size.width : dft_size.area()) : 1.0f;
             CLAMDDFT_Assert(clfftSetPlanScale(plHandle, dft_inverse ? CLFFT_BACKWARD : CLFFT_FORWARD, scale))
 
             // ready to bake
             cl_command_queue queue = (cl_command_queue)ocl::Queue::getDefault().ptr();
-            CLAMDDFT_Assert(clfftBakePlan(plHandle, 1, &queue, NULL, NULL))
+            CLAMDDFT_Assert(clfftBakePlan(plHandle, 1, &queue, ശൂന്യ, ശൂന്യ))
         }
 
         ~FftPlan()
@@ -1731,36 +1731,36 @@ class PlanCache
             /*clfftDestroyPlan(&plHandle);*/
         }
 
-        friend class PlanCache;
+        friend വർഗ്ഗം PlanCache;
 
-    private:
+    സ്വകാര്യ:
         Size dft_size;
-        int src_step, dst_step;
-        bool doubleFP;
-        bool inplace;
-        int flags;
+        പൂർണ്ണസംഖ്യ src_step, dst_step;
+        തർക്കം doubleFP;
+        തർക്കം inplace;
+        പൂർണ്ണസംഖ്യ flags;
         FftType fftType;
 
         cl_context context;
         clfftPlanHandle plHandle;
     };
 
-public:
-    static PlanCache & getInstance()
+പൊതു:
+    സ്ഥിതം PlanCache & getInstance()
     {
-        CV_SINGLETON_LAZY_INIT_REF(PlanCache, new PlanCache())
+        CV_SINGLETON_LAZY_INIT_REF(PlanCache, പുതിയ PlanCache())
     }
 
-    clfftPlanHandle getPlanHandle(const Size & dft_size, int src_step, int dst_step, bool doubleFP,
-                                  bool inplace, int flags, FftType fftType)
+    clfftPlanHandle getPlanHandle(സ്ഥിരം Size & dft_size, പൂർണ്ണസംഖ്യ src_step, പൂർണ്ണസംഖ്യ dst_step, തർക്കം doubleFP,
+                                  തർക്കം inplace, പൂർണ്ണസംഖ്യ flags, FftType fftType)
     {
         cl_context currentContext = (cl_context)ocl::Context::getDefault().ptr();
 
-        for (size_t i = 0, size = planStorage.size(); i < size; ++i)
+        വേണ്ടി (size_t i = 0, size = planStorage.size(); i < size; ++i)
         {
-            const FftPlan * const plan = planStorage[i];
+            സ്ഥിരം FftPlan * സ്ഥിരം plan = planStorage[i];
 
-            if (plan->dft_size == dft_size &&
+            എങ്കിൽ (plan->dft_size == dft_size &&
                 plan->flags == flags &&
                 plan->src_step == src_step &&
                 plan->dst_step == dst_step &&
@@ -1768,21 +1768,21 @@ public:
                 plan->fftType == fftType &&
                 plan->inplace == inplace)
             {
-                if (plan->context != currentContext)
+                എങ്കിൽ (plan->context != currentContext)
                 {
                     planStorage.erase(planStorage.begin() + i);
-                    break;
+                    നിർത്തുക;
                 }
 
-                return plan->plHandle;
+                തിരികെ plan->plHandle;
             }
         }
 
         // no baked plan is found, so let's create a new one
-        Ptr<FftPlan> newPlan = Ptr<FftPlan>(new FftPlan(dft_size, src_step, dst_step, doubleFP, inplace, flags, fftType));
+        Ptr<FftPlan> newPlan = Ptr<FftPlan>(പുതിയ FftPlan(dft_size, src_step, dst_step, doubleFP, inplace, flags, fftType));
         planStorage.push_back(newPlan);
 
-        return newPlan->plHandle;
+        തിരികെ newPlan->plHandle;
     }
 
     ~PlanCache()
@@ -1790,7 +1790,7 @@ public:
         planStorage.clear();
     }
 
-protected:
+സംരക്ഷിത:
     PlanCache() :
         planStorage()
     {
@@ -1799,13 +1799,13 @@ protected:
     std::vector<Ptr<FftPlan> > planStorage;
 };
 
-extern "C" {
+ബാഹ്യ "C" {
 
-static void CL_CALLBACK oclCleanupCallback(cl_event e, cl_int, void *p)
+സ്ഥിതം ശൂന്യം CL_CALLBACK oclCleanupCallback(cl_event e, cl_int, ശൂന്യം *p)
 {
     UMatData * u = (UMatData *)p;
 
-    if( u && CV_XADD(&u->urefcount, -1) == 1 )
+    എങ്കിൽ( u && CV_XADD(&u->urefcount, -1) == 1 )
         u->currAllocator->deallocate(u);
     u = 0;
 
@@ -1814,54 +1814,54 @@ static void CL_CALLBACK oclCleanupCallback(cl_event e, cl_int, void *p)
 
 }
 
-static bool ocl_dft_amdfft(InputArray _src, OutputArray _dst, int flags)
+സ്ഥിതം തർക്കം ocl_dft_amdfft(നിവേശം_Array _src, OutputArray _dst, പൂർണ്ണസംഖ്യ flags)
 {
-    int type = _src.type(), depth = CV_MAT_DEPTH(type), cn = CV_MAT_CN(type);
+    പൂർണ്ണസംഖ്യ type = _src.type(), depth = CV_MAT_DEPTH(type), cn = CV_MAT_CN(type);
     Size ssize = _src.size();
 
-    bool doubleSupport = ocl::Device::getDefault().doubleFPConfig() > 0;
-    if ( (!doubleSupport && depth == CV_64F) ||
+    തർക്കം doubleSupport = ocl::Device::getDefault().doubleFPConfig() > 0;
+    എങ്കിൽ ( (!doubleSupport && depth == CV_64F) ||
          !(type == CV_32FC1 || type == CV_32FC2 || type == CV_64FC1 || type == CV_64FC2) ||
          _src.offset() != 0)
-        return false;
+        തിരികെ അസത്യം;
 
     // if is not a multiplication of prime numbers { 2, 3, 5 }
-    if (ssize.area() != getOptimalDFTSize(ssize.area()))
-        return false;
+    എങ്കിൽ (ssize.area() != getOptimalDFTSize(ssize.area()))
+        തിരികെ അസത്യം;
 
-    int dst_complex_input = cn == 2 ? 1 : 0;
-    bool dft_inverse = (flags & DFT_INVERSE) != 0 ? 1 : 0;
-    int dft_complex_output = (flags & DFT_COMPLEX_OUTPUT) != 0;
-    bool dft_real_output = (flags & DFT_REAL_OUTPUT) != 0;
+    പൂർണ്ണസംഖ്യ dst_complex_നിവേശം = cn == 2 ? 1 : 0;
+    തർക്കം dft_inverse = (flags & DFT_INVERSE) != 0 ? 1 : 0;
+    പൂർണ്ണസംഖ്യ dft_complex_output = (flags & DFT_COMPLEX_OUTPUT) != 0;
+    തർക്കം dft_real_output = (flags & DFT_REAL_OUTPUT) != 0;
 
     CV_Assert(dft_complex_output + dft_real_output < 2);
-    FftType fftType = (FftType)(dst_complex_input << 0 | dft_complex_output << 1);
+    FftType fftType = (FftType)(dst_complex_നിവേശം << 0 | dft_complex_output << 1);
 
-    switch (fftType)
+    തിരഞ്ഞെടുപ്പ് (fftType)
     {
-    case C2C:
+    അവസ്ഥ C2C:
         _dst.create(ssize.height, ssize.width, CV_MAKE_TYPE(depth, 2));
-        break;
-    case R2C: // TODO implement it if possible
-    case C2R: // TODO implement it if possible
-    case R2R: // AMD Fft does not support this type
-    default:
-        return false;
+        നിർത്തുക;
+    അവസ്ഥ R2C: // TODO implement it if possible
+    അവസ്ഥ C2R: // TODO implement it if possible
+    അവസ്ഥ R2R: // AMD Fft does not support this type
+    സ്ഥിരസ്ഥിതി:
+        തിരികെ അസത്യം;
     }
 
     UMat src = _src.getUMat(), dst = _dst.getUMat();
-    if (!ocl::internal::isCLBuffer(src) || !ocl::internal::isCLBuffer(dst))
-        return false;
-    bool inplace = src.u == dst.u;
+    എങ്കിൽ (!ocl::internal::isCLBuffer(src) || !ocl::internal::isCLBuffer(dst))
+        തിരികെ അസത്യം;
+    തർക്കം inplace = src.u == dst.u;
 
     clfftPlanHandle plHandle = PlanCache::getInstance().
-            getPlanHandle(ssize, (int)src.step, (int)dst.step,
+            getPlanHandle(ssize, (പൂർണ്ണസംഖ്യ)src.step, (പൂർണ്ണസംഖ്യ)dst.step,
                           depth == CV_64F, inplace, flags, fftType);
 
     // get the bufferSize
     size_t bufferSize = 0;
     CLAMDDFT_Assert(clfftGetTmpBufSize(plHandle, &bufferSize))
-    UMat tmpBuffer(1, (int)bufferSize, CV_8UC1);
+    UMat tmpBuffer(1, (പൂർണ്ണസംഖ്യ)bufferSize, CV_8UC1);
 
     cl_mem srcarg = (cl_mem)src.handle(ACCESS_READ);
     cl_mem dstarg = (cl_mem)dst.handle(ACCESS_RW);
@@ -1870,12 +1870,12 @@ static bool ocl_dft_amdfft(InputArray _src, OutputArray _dst, int flags)
     cl_event e = 0;
 
     CLAMDDFT_Assert(clfftEnqueueTransform(plHandle, dft_inverse ? CLFFT_BACKWARD : CLFFT_FORWARD,
-                                          1, &queue, 0, NULL, &e,
+                                          1, &queue, 0, ശൂന്യ, &e,
                                           &srcarg, &dstarg, (cl_mem)tmpBuffer.handle(ACCESS_RW)))
 
     tmpBuffer.addref();
     clSetEventCallback(e, CL_COMPLETE, oclCleanupCallback, tmpBuffer.u);
-    return true;
+    തിരികെ സത്യം;
 }
 
 #undef DFT_ASSERT
@@ -1884,20 +1884,20 @@ static bool ocl_dft_amdfft(InputArray _src, OutputArray _dst, int flags)
 
 #endif // HAVE_CLAMDFFT
 
-namespace cv
+നാമാകാശ cv
 {
 
 template <typename T>
-static void complementComplex(T * ptr, size_t step, int n, int len, int dft_dims)
+സ്ഥിതം ശൂന്യം complementComplex(T * ptr, size_t step, പൂർണ്ണസംഖ്യ n, പൂർണ്ണസംഖ്യ len, പൂർണ്ണസംഖ്യ dft_dims)
 {
     T* p0 = (T*)ptr;
-    size_t dstep = step/sizeof(p0[0]);
-    for(int i = 0; i < len; i++ )
+    size_t dstep = step/വലുപ്പം(p0[0]);
+    വേണ്ടി(പൂർണ്ണസംഖ്യ i = 0; i < len; i++ )
     {
         T* p = p0 + dstep*i;
         T* q = dft_dims == 1 || i == 0 || i*2 == len ? p : p0 + dstep*(len-i);
 
-        for( int j = 1; j < (n+1)/2; j++ )
+        വേണ്ടി( പൂർണ്ണസംഖ്യ j = 1; j < (n+1)/2; j++ )
         {
             p[(n-j)*2] = q[j*2];
             p[(n-j)*2+1] = -q[j*2+1];
@@ -1905,15 +1905,15 @@ static void complementComplex(T * ptr, size_t step, int n, int len, int dft_dims
     }
 }
 
-static void complementComplexOutput(int depth, uchar * ptr, size_t step, int count, int len, int dft_dims)
+സ്ഥിതം ശൂന്യം complementComplexOutput(പൂർണ്ണസംഖ്യ depth, uchar * ptr, size_t step, പൂർണ്ണസംഖ്യ എണ്ണം_2, പൂർണ്ണസംഖ്യ len, പൂർണ്ണസംഖ്യ dft_dims)
 {
-    if( depth == CV_32F )
-        complementComplex((float*)ptr, step, count, len, dft_dims);
-    else
-        complementComplex((double*)ptr, step, count, len, dft_dims);
+    എങ്കിൽ( depth == CV_32F )
+        complementComplex((ദശാംശം*)ptr, step, എണ്ണം_2, len, dft_dims);
+    അല്ലെങ്കിൽ
+        complementComplex((ഇരട്ട*)ptr, step, എണ്ണം_2, len, dft_dims);
 }
 
-enum DftMode {
+എണ്ണൽ DftMode {
     InvalidDft = 0,
     FwdRealToCCS,
     FwdRealToComplex,
@@ -1923,98 +1923,98 @@ enum DftMode {
     InvComplexToComplex,
 };
 
-enum DftDims {
+എണ്ണൽ DftDims {
     InvalidDim = 0,
     OneDim,
     OneDimColWise,
     TwoDims
 };
 
-inline const char * modeName(DftMode m)
+വരിയിൽ സ്ഥിരം അക്ഷരം * modeName(DftMode m)
 {
-    switch (m)
+    തിരഞ്ഞെടുപ്പ് (m)
     {
-    case InvalidDft: return "InvalidDft";
-    case FwdRealToCCS: return "FwdRealToCCS";
-    case FwdRealToComplex: return "FwdRealToComplex";
-    case FwdComplexToComplex: return "FwdComplexToComplex";
-    case InvCCSToReal: return "InvCCSToReal";
-    case InvComplexToReal: return "InvComplexToReal";
-    case InvComplexToComplex: return "InvComplexToComplex";
+    അവസ്ഥ InvalidDft: തിരികെ "InvalidDft";
+    അവസ്ഥ FwdRealToCCS: തിരികെ "FwdRealToCCS";
+    അവസ്ഥ FwdRealToComplex: തിരികെ "FwdRealToComplex";
+    അവസ്ഥ FwdComplexToComplex: തിരികെ "FwdComplexToComplex";
+    അവസ്ഥ InvCCSToReal: തിരികെ "InvCCSToReal";
+    അവസ്ഥ InvComplexToReal: തിരികെ "InvComplexToReal";
+    അവസ്ഥ InvComplexToComplex: തിരികെ "InvComplexToComplex";
     }
-    return 0;
+    തിരികെ 0;
 }
 
-inline const char * dimsName(DftDims d)
+വരിയിൽ സ്ഥിരം അക്ഷരം * dimsName(DftDims d)
 {
-    switch (d)
+    തിരഞ്ഞെടുപ്പ് (d)
     {
-    case InvalidDim: return "InvalidDim";
-    case OneDim: return "OneDim";
-    case OneDimColWise: return "OneDimColWise";
-    case TwoDims: return "TwoDims";
+    അവസ്ഥ InvalidDim: തിരികെ "InvalidDim";
+    അവസ്ഥ OneDim: തിരികെ "OneDim";
+    അവസ്ഥ OneDimColWise: തിരികെ "OneDimColWise";
+    അവസ്ഥ TwoDims: തിരികെ "TwoDims";
     };
-    return 0;
+    തിരികെ 0;
 }
 
 template <typename T>
-inline bool isInv(T mode)
+വരിയിൽ തർക്കം isInv(T mode)
 {
-    switch ((DftMode)mode)
+    തിരഞ്ഞെടുപ്പ് ((DftMode)mode)
     {
-        case InvCCSToReal:
-        case InvComplexToReal:
-        case InvComplexToComplex: return true;
-        default: return false;
+        അവസ്ഥ InvCCSToReal:
+        അവസ്ഥ InvComplexToReal:
+        അവസ്ഥ InvComplexToComplex: തിരികെ സത്യം;
+        സ്ഥിരസ്ഥിതി: തിരികെ അസത്യം;
     }
 }
 
-inline DftMode determineMode(bool inv, int cn1, int cn2)
+വരിയിൽ DftMode determineMode(തർക്കം inv, പൂർണ്ണസംഖ്യ cn1, പൂർണ്ണസംഖ്യ cn2)
 {
-    if (!inv)
+    എങ്കിൽ (!inv)
     {
-        if (cn1 == 1 && cn2 == 1)
-            return FwdRealToCCS;
-        else if (cn1 == 1 && cn2 == 2)
-            return FwdRealToComplex;
-        else if (cn1 == 2 && cn2 == 2)
-            return FwdComplexToComplex;
+        എങ്കിൽ (cn1 == 1 && cn2 == 1)
+            തിരികെ FwdRealToCCS;
+        അല്ലെങ്കിൽ എങ്കിൽ (cn1 == 1 && cn2 == 2)
+            തിരികെ FwdRealToComplex;
+        അല്ലെങ്കിൽ എങ്കിൽ (cn1 == 2 && cn2 == 2)
+            തിരികെ FwdComplexToComplex;
     }
-    else
+    അല്ലെങ്കിൽ
     {
-        if (cn1 == 1 && cn2 == 1)
-            return InvCCSToReal;
-        else if (cn1 == 2 && cn2 == 1)
-            return InvComplexToReal;
-        else if (cn1 == 2 && cn2 == 2)
-            return InvComplexToComplex;
+        എങ്കിൽ (cn1 == 1 && cn2 == 1)
+            തിരികെ InvCCSToReal;
+        അല്ലെങ്കിൽ എങ്കിൽ (cn1 == 2 && cn2 == 1)
+            തിരികെ InvComplexToReal;
+        അല്ലെങ്കിൽ എങ്കിൽ (cn1 == 2 && cn2 == 2)
+            തിരികെ InvComplexToComplex;
     }
-    return InvalidDft;
+    തിരികെ InvalidDft;
 }
 
 
-inline DftDims determineDims(int rows, int cols, bool isRowWise, bool isContinuous)
+വരിയിൽ DftDims determineDims(പൂർണ്ണസംഖ്യ rows, പൂർണ്ണസംഖ്യ cols, തർക്കം isRowWise, തർക്കം isContinuous)
 {
     // printf("%d x %d (%d, %d)\n", rows, cols, isRowWise, isContinuous);
-    if (isRowWise)
-        return OneDim;
-    if (cols == 1 && rows > 1) // one-column-shaped input
+    എങ്കിൽ (isRowWise)
+        തിരികെ OneDim;
+    എങ്കിൽ (cols == 1 && rows > 1) // one-column-shaped input
     {
-        if (isContinuous)
-            return OneDim;
-        else
-            return OneDimColWise;
+        എങ്കിൽ (isContinuous)
+            തിരികെ OneDim;
+        അല്ലെങ്കിൽ
+            തിരികെ OneDimColWise;
     }
-    if (rows == 1)
-        return OneDim;
-    if (cols > 1 && rows > 1)
-        return TwoDims;
-    return InvalidDim;
+    എങ്കിൽ (rows == 1)
+        തിരികെ OneDim;
+    എങ്കിൽ (cols > 1 && rows > 1)
+        തിരികെ TwoDims;
+    തിരികെ InvalidDim;
 }
 
-class OcvDftBasicImpl CV_FINAL : public hal::DFT1D
+വർഗ്ഗം OcvDftBasicImpl CV_FINAL : പൊതു hal::DFT1D
 {
-public:
+പൊതു:
     OcvDftOptions opt;
     // the plan is built once in init(), the workspace is allocated once here and reused by
     // every apply() (zero allocations per transform)
@@ -2026,63 +2026,63 @@ public:
     size_t ipp_worksize;
 #endif
 
-public:
+പൊതു:
     OcvDftBasicImpl()
     {
 #ifdef USE_IPP_DFT
         ipp_worksize = 0;
 #endif
     }
-    void init(int len, int count, int depth, int flags, bool *needBuffer)
+    ശൂന്യം init(പൂർണ്ണസംഖ്യ len, പൂർണ്ണസംഖ്യ എണ്ണം_2, പൂർണ്ണസംഖ്യ depth, പൂർണ്ണസംഖ്യ flags, തർക്കം *needBuffer)
     {
-        int stage = (flags & CV_HAL_DFT_STAGE_COLS) != 0 ? 1 : 0;
+        പൂർണ്ണസംഖ്യ stage = (flags & CV_HAL_DFT_STAGE_COLS) != 0 ? 1 : 0;
         opt.isInverse = (flags & CV_HAL_DFT_INVERSE) != 0;
-        bool real_transform = (flags & CV_HAL_DFT_REAL_OUTPUT) != 0;
+        തർക്കം real_transform = (flags & CV_HAL_DFT_REAL_OUTPUT) != 0;
         opt.isComplex = (stage == 0) && (flags & CV_HAL_DFT_COMPLEX_OUTPUT) != 0;
-        bool needAnotherStage = (flags & CV_HAL_DFT_TWO_STAGE) != 0;
+        തർക്കം needAnotherStage = (flags & CV_HAL_DFT_TWO_STAGE) != 0;
 
         opt.scale = 1;
         opt.n = len;
 
-        opt.useIpp = false;
+        opt.useIpp = അസത്യം;
     #ifdef USE_IPP_DFT
         opt.ipp_spec = 0;
         opt.ipp_work = 0;
 
-        if( CV_IPP_CHECK_COND && (opt.n*count >= 64) && !IPP_DISABLE_DFT32F) // use IPP DFT if available
+        എങ്കിൽ( CV_IPP_CHECK_COND && (opt.n*എണ്ണം_2 >= 64) && !IPP_DISABLE_DFT32F) // use IPP DFT if available
         {
-            int ipp_norm_flag = (flags & CV_HAL_DFT_SCALE) == 0 ? 8 : opt.isInverse ? 2 : 1;
-            int specsize=0, initsize=0, worksize=0;
+            പൂർണ്ണസംഖ്യ ipp_norm_flag = (flags & CV_HAL_DFT_SCALE) == 0 ? 8 : opt.isInverse ? 2 : 1;
+            പൂർണ്ണസംഖ്യ specsize=0, initsize=0, worksize=0;
             IppDFTGetSizeFunc getSizeFunc = 0;
             IppDFTInitFunc initFunc = 0;
 
-            if( real_transform && stage == 0 )
+            എങ്കിൽ( real_transform && stage == 0 )
             {
-                if( depth == CV_32F )
+                എങ്കിൽ( depth == CV_32F )
                 {
                     getSizeFunc = ippsDFTGetSize_R_32f;
                     initFunc = ippDFTInitWrap<IppsDFTSpec_R_32f, ippsDFTInit_R_32f>;
                 }
-                else
+                അല്ലെങ്കിൽ
                 {
                     getSizeFunc = ippsDFTGetSize_R_64f;
                     initFunc = ippDFTInitWrap<IppsDFTSpec_R_64f, ippsDFTInit_R_64f>;
                 }
             }
-            else
+            അല്ലെങ്കിൽ
             {
-                if( depth == CV_32F )
+                എങ്കിൽ( depth == CV_32F )
                 {
                     getSizeFunc = ippsDFTGetSize_C_32fc;
                     initFunc = ippDFTInitWrap<IppsDFTSpec_C_32fc, ippsDFTInit_C_32fc>;
                 }
-                else
+                അല്ലെങ്കിൽ
                 {
                     getSizeFunc = ippsDFTGetSize_C_64fc;
                     initFunc = ippDFTInitWrap<IppsDFTSpec_C_64fc, ippsDFTInit_C_64fc>;
                 }
             }
-            if( getSizeFunc(opt.n, ipp_norm_flag, ippAlgHintNone, &specsize, &initsize, &worksize) >= 0 )
+            എങ്കിൽ( getSizeFunc(opt.n, ipp_norm_flag, ippAlgHintNone, &specsize, &initsize, &worksize) >= 0 )
             {
                 ippbuf.allocate(specsize + initsize + 64);
                 opt.ipp_spec = alignPtr(&ippbuf[0], 32);
@@ -2090,10 +2090,10 @@ public:
                 opt.ipp_work = alignPtr(&ippworkbuf[0], 32);
                 ipp_worksize = (size_t)worksize;
                 uchar* initbuf = alignPtr((uchar*)opt.ipp_spec + specsize, 32);
-                if( initFunc(opt.n, ipp_norm_flag, ippAlgHintNone, opt.ipp_spec, initbuf) >= 0 )
-                    opt.useIpp = true;
+                എങ്കിൽ( initFunc(opt.n, ipp_norm_flag, ippAlgHintNone, opt.ipp_spec, initbuf) >= 0 )
+                    opt.useIpp = സത്യം;
             }
-            else
+            അല്ലെങ്കിൽ
                 setIppErrorStatus();
         }
     #endif
@@ -2101,87 +2101,87 @@ public:
         {
             // The plan is built even when IPP is enabled: the IPP calls fall back to the generic
             // code on failure.
-            const DFTKernels& kernels = getDFTKernels(depth);
-            int kind = stage == 0 && real_transform ? (opt.isInverse ? DFT_KIND_C2R : DFT_KIND_R2C)
+            സ്ഥിരം DFTKernels& kernels = getDFTKernels(depth);
+            പൂർണ്ണസംഖ്യ kind = stage == 0 && real_transform ? (opt.isInverse ? DFT_KIND_C2R : DFT_KIND_R2C)
                                                     : DFT_KIND_C2C;
             plan.build(kind, len, depth, kernels.vlanes);
             ws.allocate(plan.ws_bytes);
             opt.plan = &plan;
             opt.kernels = &kernels;
             opt.workspace = ws.data();
-            if (needBuffer)
-                *needBuffer = false;   // the engine supports in-place for every kind
+            എങ്കിൽ (needBuffer)
+                *needBuffer = അസത്യം;   // the engine supports in-place for every kind
         }
 
         {
-            static DFTFunc dft_tbl[6] =
+            സ്ഥിതം DFTFunc dft_tbl[6] =
             {
-                dftWrap<Complexf, DFT<float>>,
-                dftWrap<float, RealDFT<float>>,
-                dftWrap<float, CCSIDFT<float>>,
-                dftWrap<Complexd, DFT<double>>,
-                dftWrap<double, RealDFT<double>>,
-                dftWrap<double, CCSIDFT<double>>
+                dftWrap<Complexf, DFT<ദശാംശം>>,
+                dftWrap<ദശാംശം, RealDFT<ദശാംശം>>,
+                dftWrap<ദശാംശം, CCSIDFT<ദശാംശം>>,
+                dftWrap<Complexd, DFT<ഇരട്ട>>,
+                dftWrap<ഇരട്ട, RealDFT<ഇരട്ട>>,
+                dftWrap<ഇരട്ട, CCSIDFT<ഇരട്ട>>
             };
-            int idx = 0;
-            if (stage == 0)
+            പൂർണ്ണസംഖ്യ idx = 0;
+            എങ്കിൽ (stage == 0)
             {
-                if (real_transform)
+                എങ്കിൽ (real_transform)
                 {
-                    if (!opt.isInverse)
+                    എങ്കിൽ (!opt.isInverse)
                         idx = 1;
-                    else
+                    അല്ലെങ്കിൽ
                         idx = 2;
                 }
             }
-            if (depth == CV_64F)
+            എങ്കിൽ (depth == CV_64F)
                 idx += 3;
 
             opt.dft_func = dft_tbl[idx];
         }
 
-        if(!needAnotherStage && (flags & CV_HAL_DFT_SCALE) != 0)
+        എങ്കിൽ(!needAnotherStage && (flags & CV_HAL_DFT_SCALE) != 0)
         {
-            int rowCount = count;
-            if (stage == 0 && (flags & CV_HAL_DFT_ROWS) != 0)
-                rowCount = 1;
-            opt.scale = 1./(len * rowCount);
+            പൂർണ്ണസംഖ്യ row_എണ്ണം = എണ്ണം_2;
+            എങ്കിൽ (stage == 0 && (flags & CV_HAL_DFT_ROWS) != 0)
+                row_എണ്ണം = 1;
+            opt.scale = 1./(len * row_എണ്ണം);
         }
     }
 
-    void apply(const uchar *src, uchar *dst) CV_OVERRIDE
+    ശൂന്യം apply(സ്ഥിരം uchar *src, uchar *dst) CV_OVERRIDE
     {
         opt.dft_func(opt, src, dst);
     }
 
     // Size of a private workspace for applyWithWorkspace(). It covers both the engine workspace
     // and, when IPP is used, the IPP work buffer (only one of them is touched per call).
-    size_t workspaceSize() const
+    size_t workspaceSize() സ്ഥിരം
     {
         size_t sz = opt.plan ? plan.ws_bytes : 0;
 #ifdef USE_IPP_DFT
-        if (opt.useIpp)
+        എങ്കിൽ (opt.useIpp)
             sz = std::max(sz, ipp_worksize + 64);
 #endif
-        return sz;
+        തിരികെ sz;
     }
 
     // Same as apply(), but with a caller-provided workspace: several threads may run the same
     // transform as long as each of them uses its own workspace. The plan is immutable and the
     // IPP spec is read-only after init, so both are shared; the IPP work buffer is per call and
     // must therefore be private to the thread, too.
-    void applyWithWorkspace(const uchar *src, uchar *dst, uchar* workspace) const
+    ശൂന്യം applyWithWorkspace(സ്ഥിരം uchar *src, uchar *dst, uchar* workspace) സ്ഥിരം
     {
         OcvDftOptions opt_ = opt;
         opt_.workspace = workspace;
 #ifdef USE_IPP_DFT
-        if (opt_.useIpp)
+        എങ്കിൽ (opt_.useIpp)
             opt_.ipp_work = alignPtr(workspace, 32);
 #endif
         opt_.dft_func(opt_, src, dst);
     }
 
-    void free() {}
+    ശൂന്യം സ്വതന്ത്രം() {}
 };
 
 // 2D transforms (and the multi-row 1D batches) distribute the rows / the column pairs over
@@ -2194,191 +2194,191 @@ public:
 // accesses do not alias in the cache (which they do when columns are copied one or two at a
 // time and the row step is a multiple of a page). The batch is sized so that the column buffers
 // stay within DFT_COLS_BATCH_BYTES (~L1-resident), between DFT_COLS_BATCH_MIN and _MAX columns.
-static const int DFT_COLS_BATCH_MIN = 4;
-static const int DFT_COLS_BATCH_MAX = 16;
-static const size_t DFT_COLS_BATCH_BYTES = 1 << 17;
+സ്ഥിതം സ്ഥിരം പൂർണ്ണസംഖ്യ DFT_COLS_BATCH_MIN = 4;
+സ്ഥിതം സ്ഥിരം പൂർണ്ണസംഖ്യ DFT_COLS_BATCH_MAX = 16;
+സ്ഥിതം സ്ഥിരം size_t DFT_COLS_BATCH_BYTES = 1 << 17;
 
-static int dftColsBatch(int len, size_t complex_elem_size)
+സ്ഥിതം പൂർണ്ണസംഖ്യ dftColsBatch(പൂർണ്ണസംഖ്യ len, size_t complex_elem_size)
 {
-    int batch = (int)(DFT_COLS_BATCH_BYTES/((size_t)len*complex_elem_size));
-    return std::max(DFT_COLS_BATCH_MIN, std::min(DFT_COLS_BATCH_MAX, batch));
+    പൂർണ്ണസംഖ്യ batch = (പൂർണ്ണസംഖ്യ)(DFT_COLS_BATCH_BYTES/((size_t)len*complex_elem_size));
+    തിരികെ std::max(DFT_COLS_BATCH_MIN, std::min(DFT_COLS_BATCH_MAX, batch));
 }
 
-static double dftParallelStripes(int count, int len)
+സ്ഥിതം ഇരട്ട dftParallelStripes(പൂർണ്ണസംഖ്യ എണ്ണം_2, പൂർണ്ണസംഖ്യ len)
 {
-    const double quantum = 0.5e6;
-    return (double)count*len*std::max(std::log((double)len)/std::log(2.), 1.)/quantum;
+    സ്ഥിരം ഇരട്ട quantum = 0.5e6;
+    തിരികെ (ഇരട്ട)എണ്ണം_2*len*std::max(std::log((ഇരട്ട)len)/std::log(2.), 1.)/quantum;
 }
 
-class OcvDftImpl CV_FINAL : public hal::DFT2D
+വർഗ്ഗം OcvDftImpl CV_FINAL : പൊതു hal::DFT2D
 {
-protected:
+സംരക്ഷിത:
     Ptr<hal::DFT1D> contextA;
     Ptr<hal::DFT1D> contextB;
-    const OcvDftBasicImpl* basicA;   // contextA/contextB when they are our own implementation
-    const OcvDftBasicImpl* basicB;   // (parallel path); 0 for external HAL contexts
-    bool needBufferA;
-    bool needBufferB;
-    bool inv;
-    int width;
-    int height;
+    സ്ഥിരം OcvDftBasicImpl* basicA;   // contextA/contextB when they are our own implementation
+    സ്ഥിരം OcvDftBasicImpl* basicB;   // (parallel path); 0 for external HAL contexts
+    തർക്കം needBufferA;
+    തർക്കം needBufferB;
+    തർക്കം inv;
+    പൂർണ്ണസംഖ്യ width;
+    പൂർണ്ണസംഖ്യ height;
     DftMode mode;
-    int elem_size;
-    int complex_elem_size;
-    int depth;
-    bool real_transform;
-    int nonzero_rows;
-    bool isRowTransform;
-    bool isScaled;
-    std::vector<int> stages;
-    bool useIpp;
-    int src_channels;
-    int dst_channels;
+    പൂർണ്ണസംഖ്യ elem_size;
+    പൂർണ്ണസംഖ്യ complex_elem_size;
+    പൂർണ്ണസംഖ്യ depth;
+    തർക്കം real_transform;
+    പൂർണ്ണസംഖ്യ nonzero_rows;
+    തർക്കം isRowTransform;
+    തർക്കം isScaled;
+    std::vector<പൂർണ്ണസംഖ്യ> stages;
+    തർക്കം useIpp;
+    പൂർണ്ണസംഖ്യ src_channels;
+    പൂർണ്ണസംഖ്യ dst_channels;
 
     AutoBuffer<uchar> tmp_bufA;
     AutoBuffer<uchar> tmp_bufB;
     AutoBuffer<uchar> buf0;
     AutoBuffer<uchar> buf1;
 
-public:
+പൊതു:
     OcvDftImpl()
     {
         basicA = basicB = 0;
-        needBufferA = false;
-        needBufferB = false;
-        inv = false;
+        needBufferA = അസത്യം;
+        needBufferB = അസത്യം;
+        inv = അസത്യം;
         width = 0;
         height = 0;
         mode = InvalidDft;
         elem_size = 0;
         complex_elem_size = 0;
         depth = 0;
-        real_transform = false;
+        real_transform = അസത്യം;
         nonzero_rows = 0;
-        isRowTransform = false;
-        isScaled = false;
-        useIpp = false;
+        isRowTransform = അസത്യം;
+        isScaled = അസത്യം;
+        useIpp = അസത്യം;
         src_channels = 0;
         dst_channels = 0;
     }
 
-    void init(int _width, int _height, int _depth, int _src_channels, int _dst_channels, int flags, int _nonzero_rows)
+    ശൂന്യം init(പൂർണ്ണസംഖ്യ _width, പൂർണ്ണസംഖ്യ _height, പൂർണ്ണസംഖ്യ _depth, പൂർണ്ണസംഖ്യ _src_channels, പൂർണ്ണസംഖ്യ _dst_channels, പൂർണ്ണസംഖ്യ flags, പൂർണ്ണസംഖ്യ _nonzero_rows)
     {
-        bool isComplex = _src_channels != _dst_channels;
+        തർക്കം isComplex = _src_channels != _dst_channels;
         nonzero_rows = _nonzero_rows;
         width = _width;
         height = _height;
         depth = _depth;
         src_channels = _src_channels;
         dst_channels = _dst_channels;
-        bool isInverse = (flags & CV_HAL_DFT_INVERSE) != 0;
-        bool isInplace = (flags & CV_HAL_DFT_IS_INPLACE) != 0;
-        bool isContinuous = (flags & CV_HAL_DFT_IS_CONTINUOUS) != 0;
+        തർക്കം isInverse = (flags & CV_HAL_DFT_INVERSE) != 0;
+        തർക്കം isInplace = (flags & CV_HAL_DFT_IS_INPLACE) != 0;
+        തർക്കം isContinuous = (flags & CV_HAL_DFT_IS_CONTINUOUS) != 0;
         mode = determineMode(isInverse, _src_channels, _dst_channels);
         inv = isInverse;
         isRowTransform = (flags & CV_HAL_DFT_ROWS) != 0;
         isScaled = (flags & CV_HAL_DFT_SCALE) != 0;
-        needBufferA = false;
-        needBufferB = false;
+        needBufferA = അസത്യം;
+        needBufferB = അസത്യം;
         real_transform = (mode != FwdComplexToComplex && mode != InvComplexToComplex);
 
-        elem_size = (depth == CV_32F) ? sizeof(float) : sizeof(double);
+        elem_size = (depth == CV_32F) ? വലുപ്പം(ദശാംശം) : വലുപ്പം(ഇരട്ട);
         complex_elem_size = elem_size * 2;
-        if( !real_transform )
+        എങ്കിൽ( !real_transform )
             elem_size = complex_elem_size;
 
-#if defined USE_IPP_DFT
+#എങ്കിൽ defined USE_IPP_DFT
         CV_IPP_CHECK()
         {
-            if (nonzero_rows == 0 && depth == CV_32F && ((width * height)>(int)(1<<6)))
+            എങ്കിൽ (nonzero_rows == 0 && depth == CV_32F && ((width * height)>(പൂർണ്ണസംഖ്യ)(1<<6)))
             {
-                if (mode == FwdComplexToComplex || mode == InvComplexToComplex || mode == FwdRealToCCS || mode == InvCCSToReal)
+                എങ്കിൽ (mode == FwdComplexToComplex || mode == InvComplexToComplex || mode == FwdRealToCCS || mode == InvCCSToReal)
                 {
-                    useIpp = true;
-                    return;
+                    useIpp = സത്യം;
+                    തിരികെ;
                 }
             }
         }
 #endif
 
         DftDims dims = determineDims(height, width, isRowTransform, isContinuous);
-        if (dims == TwoDims)
+        എങ്കിൽ (dims == TwoDims)
         {
             stages.resize(2);
-            if (mode == InvCCSToReal || mode == InvComplexToReal)
+            എങ്കിൽ (mode == InvCCSToReal || mode == InvComplexToReal)
             {
                 stages[0] = 1;
                 stages[1] = 0;
             }
-            else
+            അല്ലെങ്കിൽ
             {
                 stages[0] = 0;
                 stages[1] = 1;
             }
         }
-        else
+        അല്ലെങ്കിൽ
         {
             stages.resize(1);
-            if (dims == OneDimColWise)
+            എങ്കിൽ (dims == OneDimColWise)
                 stages[0] = 1;
-            else
+            അല്ലെങ്കിൽ
                 stages[0] = 0;
         }
 
-        for(uint stageIndex = 0; stageIndex < stages.size(); ++stageIndex)
+        വേണ്ടി(uint stageIndex = 0; stageIndex < stages.size(); ++stageIndex)
         {
-            if (stageIndex == 1)
+            എങ്കിൽ (stageIndex == 1)
             {
-                isInplace = true;
-                isComplex = false;
+                isInplace = സത്യം;
+                isComplex = അസത്യം;
             }
 
-            int stage = stages[stageIndex];
-            bool isLastStage = (stageIndex + 1 == stages.size());
+            പൂർണ്ണസംഖ്യ stage = stages[stageIndex];
+            തർക്കം isLastStage = (stageIndex + 1 == stages.size());
 
-            int len, count;
+            പൂർണ്ണസംഖ്യ len, എണ്ണം_2;
 
-            int f = 0;
-            if (inv)
+            പൂർണ്ണസംഖ്യ f = 0;
+            എങ്കിൽ (inv)
                 f |= CV_HAL_DFT_INVERSE;
-            if (isScaled)
+            എങ്കിൽ (isScaled)
                 f |= CV_HAL_DFT_SCALE;
-            if (isRowTransform)
+            എങ്കിൽ (isRowTransform)
                 f |= CV_HAL_DFT_ROWS;
-            if (isComplex)
+            എങ്കിൽ (isComplex)
                 f |= CV_HAL_DFT_COMPLEX_OUTPUT;
-            if (real_transform)
+            എങ്കിൽ (real_transform)
                 f |= CV_HAL_DFT_REAL_OUTPUT;
-            if (!isLastStage)
+            എങ്കിൽ (!isLastStage)
                 f |= CV_HAL_DFT_TWO_STAGE;
 
-            if( stage == 0 ) // row-wise transform
+            എങ്കിൽ( stage == 0 ) // row-wise transform
             {
-                if (width == 1 && !isRowTransform )
+                എങ്കിൽ (width == 1 && !isRowTransform )
                 {
                     len = height;
-                    count = width;
+                    എണ്ണം_2 = width;
                 }
-                else
+                അല്ലെങ്കിൽ
                 {
                     len = width;
-                    count = height;
+                    എണ്ണം_2 = height;
                 }
                 needBufferA = isInplace;
-                contextA = hal::DFT1D::create(len, count, depth, f, &needBufferA);
-                basicA = dynamic_cast<const OcvDftBasicImpl*>(contextA.get());
-                if (needBufferA)
+                contextA = hal::DFT1D::create(len, എണ്ണം_2, depth, f, &needBufferA);
+                basicA = dynamic_cast<സ്ഥിരം OcvDftBasicImpl*>(contextA.get());
+                എങ്കിൽ (needBufferA)
                     tmp_bufA.allocate(len * complex_elem_size);
             }
-            else
+            അല്ലെങ്കിൽ
             {
                 len = height;
-                count = width;
+                എണ്ണം_2 = width;
                 f |= CV_HAL_DFT_STAGE_COLS;
                 needBufferB = isInplace;
-                contextB = hal::DFT1D::create(len, count, depth, f, &needBufferB);
-                basicB = dynamic_cast<const OcvDftBasicImpl*>(contextB.get());
-                if (needBufferB)
+                contextB = hal::DFT1D::create(len, എണ്ണം_2, depth, f, &needBufferB);
+                basicB = dynamic_cast<സ്ഥിരം OcvDftBasicImpl*>(contextB.get());
+                എങ്കിൽ (needBufferB)
                     tmp_bufB.allocate(len * complex_elem_size);
 
                 buf0.allocate(len * complex_elem_size);
@@ -2387,214 +2387,214 @@ public:
         }
     }
 
-    void apply(const uchar * src, size_t src_step, uchar * dst, size_t dst_step) CV_OVERRIDE
+    ശൂന്യം apply(സ്ഥിരം uchar * src, size_t src_step, uchar * dst, size_t dst_step) CV_OVERRIDE
     {
-#if defined USE_IPP_DFT
-        if (useIpp)
+#എങ്കിൽ defined USE_IPP_DFT
+        എങ്കിൽ (useIpp)
         {
-            int ipp_norm_flag = !isScaled ? 8 : inv ? 2 : 1;
-            if (!isRowTransform)
+            പൂർണ്ണസംഖ്യ ipp_norm_flag = !isScaled ? 8 : inv ? 2 : 1;
+            എങ്കിൽ (!isRowTransform)
             {
-                if (mode == FwdComplexToComplex || mode == InvComplexToComplex)
+                എങ്കിൽ (mode == FwdComplexToComplex || mode == InvComplexToComplex)
                 {
-                    if (ippi_DFT_C_32F(src, src_step, dst, dst_step, width, height, inv, ipp_norm_flag))
+                    എങ്കിൽ (ippi_DFT_C_32F(src, src_step, dst, dst_step, width, height, inv, ipp_norm_flag))
                     {
                         CV_IMPL_ADD(CV_IMPL_IPP);
-                        return;
+                        തിരികെ;
                     }
                     setIppErrorStatus();
                 }
-                else if (mode == FwdRealToCCS || mode == InvCCSToReal)
+                അല്ലെങ്കിൽ എങ്കിൽ (mode == FwdRealToCCS || mode == InvCCSToReal)
                 {
-                    if (ippi_DFT_R_32F(src, src_step, dst, dst_step, width, height, inv, ipp_norm_flag))
+                    എങ്കിൽ (ippi_DFT_R_32F(src, src_step, dst, dst_step, width, height, inv, ipp_norm_flag))
                     {
                         CV_IMPL_ADD(CV_IMPL_IPP);
-                        return;
+                        തിരികെ;
                     }
                     setIppErrorStatus();
                 }
             }
-            else
+            അല്ലെങ്കിൽ
             {
-                if (mode == FwdComplexToComplex || mode == InvComplexToComplex)
+                എങ്കിൽ (mode == FwdComplexToComplex || mode == InvComplexToComplex)
                 {
                     ippiDFT_C_Func ippiFunc = inv ? (ippiDFT_C_Func)ippiDFTInv_CToC_32fc_C1R : (ippiDFT_C_Func)ippiDFTFwd_CToC_32fc_C1R;
-                    if (Dft_C_IPPLoop(src, src_step, dst, dst_step, width, height, IPPDFT_C_Functor(ippiFunc),ipp_norm_flag))
+                    എങ്കിൽ (Dft_C_IPPLoop(src, src_step, dst, dst_step, width, height, IPPDFT_C_Functor(ippiFunc),ipp_norm_flag))
                     {
                         CV_IMPL_ADD(CV_IMPL_IPP|CV_IMPL_MT);
-                        return;
+                        തിരികെ;
                     }
                     setIppErrorStatus();
                 }
-                else if (mode == FwdRealToCCS || mode == InvCCSToReal)
+                അല്ലെങ്കിൽ എങ്കിൽ (mode == FwdRealToCCS || mode == InvCCSToReal)
                 {
                     ippiDFT_R_Func ippiFunc = inv ? (ippiDFT_R_Func)ippiDFTInv_PackToR_32f_C1R : (ippiDFT_R_Func)ippiDFTFwd_RToPack_32f_C1R;
-                    if (Dft_R_IPPLoop(src, src_step, dst, dst_step, width, height, IPPDFT_R_Functor(ippiFunc),ipp_norm_flag))
+                    എങ്കിൽ (Dft_R_IPPLoop(src, src_step, dst, dst_step, width, height, IPPDFT_R_Functor(ippiFunc),ipp_norm_flag))
                     {
                         CV_IMPL_ADD(CV_IMPL_IPP|CV_IMPL_MT);
-                        return;
+                        തിരികെ;
                     }
                     setIppErrorStatus();
                 }
             }
-            return;
+            തിരികെ;
         }
 #endif
 
-        for(uint stageIndex = 0; stageIndex < stages.size(); ++stageIndex)
+        വേണ്ടി(uint stageIndex = 0; stageIndex < stages.size(); ++stageIndex)
         {
-            int stage_src_channels = src_channels;
-            int stage_dst_channels = dst_channels;
+            പൂർണ്ണസംഖ്യ stage_src_channels = src_channels;
+            പൂർണ്ണസംഖ്യ stage_dst_channels = dst_channels;
 
-            if (stageIndex == 1)
+            എങ്കിൽ (stageIndex == 1)
             {
                 src = dst;
                 src_step = dst_step;
                 stage_src_channels = stage_dst_channels;
             }
 
-            int stage = stages[stageIndex];
-            bool isLastStage = (stageIndex + 1 == stages.size());
-            bool isComplex = stage_src_channels != stage_dst_channels;
+            പൂർണ്ണസംഖ്യ stage = stages[stageIndex];
+            തർക്കം isLastStage = (stageIndex + 1 == stages.size());
+            തർക്കം isComplex = stage_src_channels != stage_dst_channels;
 
-            if( stage == 0 )
+            എങ്കിൽ( stage == 0 )
                 rowDft(src, src_step, dst, dst_step, isComplex, isLastStage);
-            else
+            അല്ലെങ്കിൽ
                 colDft(src, src_step, dst, dst_step, stage_src_channels, stage_dst_channels, isLastStage);
         }
     }
 
-protected:
+സംരക്ഷിത:
 
-    void rowDft(const uchar* src_data, size_t src_step, uchar* dst_data, size_t dst_step, bool isComplex, bool isLastStage)
+    ശൂന്യം rowDft(സ്ഥിരം uchar* src_data, size_t src_step, uchar* dst_data, size_t dst_step, തർക്കം isComplex, തർക്കം isLastStage)
     {
-        int len, count;
-        if (width == 1 && !isRowTransform )
+        പൂർണ്ണസംഖ്യ len, എണ്ണം_2;
+        എങ്കിൽ (width == 1 && !isRowTransform )
         {
             len = height;
-            count = width;
+            എണ്ണം_2 = width;
         }
-        else
+        അല്ലെങ്കിൽ
         {
             len = width;
-            count = height;
+            എണ്ണം_2 = height;
         }
-        int dptr_offset = 0;
-        int dst_full_len = len*elem_size;
+        പൂർണ്ണസംഖ്യ dptr_offset = 0;
+        പൂർണ്ണസംഖ്യ dst_full_len = len*elem_size;
 
-        if( needBufferA )
+        എങ്കിൽ( needBufferA )
         {
-            if (mode == FwdRealToCCS && (len & 1) && len > 1)
+            എങ്കിൽ (mode == FwdRealToCCS && (len & 1) && len > 1)
                 dptr_offset = elem_size;
         }
 
-        if( !inv && isComplex )
+        എങ്കിൽ( !inv && isComplex )
             dst_full_len += (len & 1) ? elem_size : complex_elem_size;
 
-        int nz = nonzero_rows;
-        if( nz <= 0 || nz > count )
-            nz = count;
+        പൂർണ്ണസംഖ്യ nz = nonzero_rows;
+        എങ്കിൽ( nz <= 0 || nz > എണ്ണം_2 )
+            nz = എണ്ണം_2;
 
         size_t ws_size = basicA ? basicA->workspaceSize() : 0;
-        double nstripes = dftParallelStripes(nz, len);
-        if( ws_size > 0 && nz > 1 && nstripes >= 1.5 )
+        ഇരട്ട nstripes = dftParallelStripes(nz, len);
+        എങ്കിൽ( ws_size > 0 && nz > 1 && nstripes >= 1.5 )
         {
             // every worker gets its own workspace (and row buffer) once per range
-            const OcvDftBasicImpl* ctx = basicA;
-            auto processRows = [&, ctx](const Range& range)
+            സ്ഥിരം OcvDftBasicImpl* ctx = basicA;
+            auto processRows = [&, ctx](സ്ഥിരം Range& range)
             {
                 AutoBuffer<uchar> ws(ws_size);
                 AutoBuffer<uchar> rowbuf(needBufferA ? len * complex_elem_size : 0);
-                for( int i = range.start; i < range.end; i++ )
+                വേണ്ടി( പൂർണ്ണസംഖ്യ i = range.start; i < range.end; i++ )
                 {
-                    const uchar* sptr = src_data + src_step * i;
+                    സ്ഥിരം uchar* sptr = src_data + src_step * i;
                     uchar* dptr0 = dst_data + dst_step * i;
                     uchar* dptr = needBufferA ? rowbuf.data() : dptr0;
                     ctx->applyWithWorkspace(sptr, dptr, ws.data());
-                    if( needBufferA )
+                    എങ്കിൽ( needBufferA )
                         memcpy( dptr0, dptr + dptr_offset, dst_full_len );
                 }
             };
             parallel_for_(Range(0, nz), processRows, nstripes);
         }
-        else
+        അല്ലെങ്കിൽ
         {
-            for( int i = 0; i < nz; i++ )
+            വേണ്ടി( പൂർണ്ണസംഖ്യ i = 0; i < nz; i++ )
             {
-                const uchar* sptr = src_data + src_step * i;
+                സ്ഥിരം uchar* sptr = src_data + src_step * i;
                 uchar* dptr0 = dst_data + dst_step * i;
                 uchar* dptr = dptr0;
 
-                if( needBufferA )
+                എങ്കിൽ( needBufferA )
                     dptr = tmp_bufA.data();
 
                 contextA->apply(sptr, dptr);
 
-                if( needBufferA )
+                എങ്കിൽ( needBufferA )
                     memcpy( dptr0, dptr + dptr_offset, dst_full_len );
             }
         }
 
-        for( int i = nz; i < count; i++ )
+        വേണ്ടി( പൂർണ്ണസംഖ്യ i = nz; i < എണ്ണം_2; i++ )
         {
             uchar* dptr0 = dst_data + dst_step * i;
             memset( dptr0, 0, dst_full_len );
         }
-        if(isLastStage &&  mode == FwdRealToComplex)
+        എങ്കിൽ(isLastStage &&  mode == FwdRealToComplex)
             complementComplexOutput(depth, dst_data, dst_step, len, nz, 1);
     }
 
-    void colDft(const uchar* src_data, size_t src_step, uchar* dst_data, size_t dst_step, int stage_src_channels, int stage_dst_channels, bool isLastStage)
+    ശൂന്യം colDft(സ്ഥിരം uchar* src_data, size_t src_step, uchar* dst_data, size_t dst_step, പൂർണ്ണസംഖ്യ stage_src_channels, പൂർണ്ണസംഖ്യ stage_dst_channels, തർക്കം isLastStage)
     {
-        int len = height;
-        int count = width;
-        int a = 0, b = count;
+        പൂർണ്ണസംഖ്യ len = height;
+        പൂർണ്ണസംഖ്യ എണ്ണം_2 = width;
+        പൂർണ്ണസംഖ്യ a = 0, b = എണ്ണം_2;
         uchar *dbuf0, *dbuf1;
-        const uchar* sptr0 = src_data;
+        സ്ഥിരം uchar* sptr0 = src_data;
         uchar* dptr0 = dst_data;
 
         dbuf0 = buf0.data(), dbuf1 = buf1.data();
 
-        if( needBufferB )
+        എങ്കിൽ( needBufferB )
         {
             dbuf1 = tmp_bufB.data();
             dbuf0 = buf1.data();
         }
 
-        if( real_transform )
+        എങ്കിൽ( real_transform )
         {
-            int even;
+            പൂർണ്ണസംഖ്യ even;
             a = 1;
-            even = (count & 1) == 0;
-            b = (count+1)/2;
-            if( !inv )
+            even = (എണ്ണം_2 & 1) == 0;
+            b = (എണ്ണം_2+1)/2;
+            എങ്കിൽ( !inv )
             {
                 memset( buf0.data(), 0, len*complex_elem_size );
                 CopyColumn( sptr0, src_step, buf0.data(), complex_elem_size, len, elem_size );
                 sptr0 += stage_dst_channels*elem_size;
-                if( even )
+                എങ്കിൽ( even )
                 {
                     memset( buf1.data(), 0, len*complex_elem_size );
-                    CopyColumn( sptr0 + (count-2)*elem_size, src_step,
+                    CopyColumn( sptr0 + (എണ്ണം_2-2)*elem_size, src_step,
                                 buf1.data(), complex_elem_size, len, elem_size );
                 }
             }
-            else if( stage_src_channels == 1 )
+            അല്ലെങ്കിൽ എങ്കിൽ( stage_src_channels == 1 )
             {
                 CopyColumn( sptr0, src_step, buf0.data(), elem_size, len, elem_size );
                 ExpandCCS( buf0.data(), len, elem_size );
-                if( even )
+                എങ്കിൽ( even )
                 {
-                    CopyColumn( sptr0 + (count-1)*elem_size, src_step,
+                    CopyColumn( sptr0 + (എണ്ണം_2-1)*elem_size, src_step,
                                 buf1.data(), elem_size, len, elem_size );
                     ExpandCCS( buf1.data(), len, elem_size );
                 }
                 sptr0 += elem_size;
             }
-            else
+            അല്ലെങ്കിൽ
             {
                 CopyColumn( sptr0, src_step, buf0.data(), complex_elem_size, len, complex_elem_size );
-                if( even )
+                എങ്കിൽ( even )
                 {
                     CopyColumn( sptr0 + b*complex_elem_size, src_step,
                                    buf1.data(), complex_elem_size, len, complex_elem_size );
@@ -2602,44 +2602,44 @@ protected:
                 sptr0 += complex_elem_size;
             }
 
-            if( even )
+            എങ്കിൽ( even )
                 contextB->apply(buf1.data(), dbuf1);
             contextB->apply(buf0.data(), dbuf0);
 
-            if( stage_dst_channels == 1 )
+            എങ്കിൽ( stage_dst_channels == 1 )
             {
-                if( !inv )
+                എങ്കിൽ( !inv )
                 {
                     // copy the half of output vector to the first/last column.
                     // before doing that, defgragment the vector
                     memcpy( dbuf0 + elem_size, dbuf0, elem_size );
                     CopyColumn( dbuf0 + elem_size, elem_size, dptr0,
                                    dst_step, len, elem_size );
-                    if( even )
+                    എങ്കിൽ( even )
                     {
                         memcpy( dbuf1 + elem_size, dbuf1, elem_size );
                         CopyColumn( dbuf1 + elem_size, elem_size,
-                                       dptr0 + (count-1)*elem_size,
+                                       dptr0 + (എണ്ണം_2-1)*elem_size,
                                        dst_step, len, elem_size );
                     }
                     dptr0 += elem_size;
                 }
-                else
+                അല്ലെങ്കിൽ
                 {
                     // copy the real part of the complex vector to the first/last column
                     CopyColumn( dbuf0, complex_elem_size, dptr0, dst_step, len, elem_size );
-                    if( even )
-                        CopyColumn( dbuf1, complex_elem_size, dptr0 + (count-1)*elem_size,
+                    എങ്കിൽ( even )
+                        CopyColumn( dbuf1, complex_elem_size, dptr0 + (എണ്ണം_2-1)*elem_size,
                                        dst_step, len, elem_size );
                     dptr0 += elem_size;
                 }
             }
-            else
+            അല്ലെങ്കിൽ
             {
                 CV_Assert( !inv );
                 CopyColumn( dbuf0, complex_elem_size, dptr0,
                                dst_step, len, complex_elem_size );
-                if( even )
+                എങ്കിൽ( even )
                     CopyColumn( dbuf1, complex_elem_size,
                                    dptr0 + b*complex_elem_size,
                                    dst_step, len, complex_elem_size );
@@ -2649,148 +2649,148 @@ protected:
 
         // the remaining columns are processed in batches of cols_batch columns: copied row-wise into
         // contiguous per-column buffers, transformed one by one, copied back row-wise
-        int ncols = b - a;
-        const int cols_batch = dftColsBatch(len, complex_elem_size);
-        int nbatches = (ncols + cols_batch - 1)/cols_batch;
+        പൂർണ്ണസംഖ്യ ncols = b - a;
+        സ്ഥിരം പൂർണ്ണസംഖ്യ cols_batch = dftColsBatch(len, complex_elem_size);
+        പൂർണ്ണസംഖ്യ nbatches = (ncols + cols_batch - 1)/cols_batch;
         size_t ws_size = basicB ? basicB->workspaceSize() : 0;
         size_t colbuf_size = (size_t)len*complex_elem_size;
-        const OcvDftBasicImpl* ctx = basicB;
-        auto processBatches = [&, ctx](const Range& range)
+        സ്ഥിരം OcvDftBasicImpl* ctx = basicB;
+        auto processBatches = [&, ctx](സ്ഥിരം Range& range)
         {
             AutoBuffer<uchar> ws(ws_size);
             AutoBuffer<uchar> cbuf(colbuf_size*cols_batch*(needBufferB ? 2 : 1));
             uchar* cbuf0 = cbuf.data();
             uchar* cdbuf0 = needBufferB ? cbuf0 + colbuf_size*cols_batch : cbuf0;
-            for( int bi = range.start; bi < range.end; bi++ )
+            വേണ്ടി( പൂർണ്ണസംഖ്യ bi = range.start; bi < range.end; bi++ )
             {
-                int c0 = bi*cols_batch;
-                int nc = std::min(cols_batch, ncols - c0);
-                const uchar* sptr = sptr0 + (size_t)c0*complex_elem_size;
+                പൂർണ്ണസംഖ്യ c0 = bi*cols_batch;
+                പൂർണ്ണസംഖ്യ nc = std::min(cols_batch, ncols - c0);
+                സ്ഥിരം uchar* sptr = sptr0 + (size_t)c0*complex_elem_size;
                 uchar* dptr = dptr0 + (size_t)c0*complex_elem_size;
                 CopyFromColumns( sptr, src_step, cbuf0, nc, len, complex_elem_size );
-                for( int k = 0; k < nc; k++ )
+                വേണ്ടി( പൂർണ്ണസംഖ്യ k = 0; k < nc; k++ )
                 {
-                    if( ctx )
+                    എങ്കിൽ( ctx )
                         ctx->applyWithWorkspace(cbuf0 + k*colbuf_size, cdbuf0 + k*colbuf_size, ws.data());
-                    else
+                    അല്ലെങ്കിൽ
                         contextB->apply(cbuf0 + k*colbuf_size, cdbuf0 + k*colbuf_size);
                 }
                 CopyToColumns( cdbuf0, dptr, dst_step, nc, len, complex_elem_size );
             }
         };
-        double nstripes = dftParallelStripes(ncols, len);
-        if( ctx && nbatches > 1 && nstripes >= 1.5 )
+        ഇരട്ട nstripes = dftParallelStripes(ncols, len);
+        എങ്കിൽ( ctx && nbatches > 1 && nstripes >= 1.5 )
             parallel_for_(Range(0, nbatches), processBatches, nstripes);
-        else
+        അല്ലെങ്കിൽ
             processBatches(Range(0, nbatches));
-        if(isLastStage && mode == FwdRealToComplex)
-            complementComplexOutput(depth, dst_data, dst_step, count, len, 2);
+        എങ്കിൽ(isLastStage && mode == FwdRealToComplex)
+            complementComplexOutput(depth, dst_data, dst_step, എണ്ണം_2, len, 2);
     }
 };
 
-struct ReplacementDFT1D : public hal::DFT1D
+ഘടന ReplacementDFT1D : പൊതു hal::DFT1D
 {
     cvhalDFT *context;
-    bool isInitialized;
+    തർക്കം isInitialized;
 
-    ReplacementDFT1D() : context(0), isInitialized(false) {}
-    bool init(int len, int count, int depth, int flags, bool *needBuffer)
+    ReplacementDFT1D() : context(0), isInitialized(അസത്യം) {}
+    തർക്കം init(പൂർണ്ണസംഖ്യ len, പൂർണ്ണസംഖ്യ എണ്ണം_2, പൂർണ്ണസംഖ്യ depth, പൂർണ്ണസംഖ്യ flags, തർക്കം *needBuffer)
     {
-        int res = cv_hal_dftInit1D(&context, len, count, depth, flags, needBuffer);
+        പൂർണ്ണസംഖ്യ res = cv_hal_dftInit1D(&context, len, എണ്ണം_2, depth, flags, needBuffer);
         isInitialized = (res == CV_HAL_ERROR_OK);
-        return isInitialized;
+        തിരികെ isInitialized;
     }
-    void apply(const uchar *src, uchar *dst) CV_OVERRIDE
+    ശൂന്യം apply(സ്ഥിരം uchar *src, uchar *dst) CV_OVERRIDE
     {
-        if (isInitialized)
+        എങ്കിൽ (isInitialized)
         {
             CALL_HAL(dft1D, cv_hal_dft1D, context, src, dst);
         }
     }
     ~ReplacementDFT1D()
     {
-        if (isInitialized)
+        എങ്കിൽ (isInitialized)
         {
             CALL_HAL(dftFree1D, cv_hal_dftFree1D, context);
         }
     }
 };
 
-struct ReplacementDFT2D : public hal::DFT2D
+ഘടന ReplacementDFT2D : പൊതു hal::DFT2D
 {
     cvhalDFT *context;
-    bool isInitialized;
+    തർക്കം isInitialized;
 
-    ReplacementDFT2D() : context(0), isInitialized(false) {}
-    bool init(int width, int height, int depth,
-              int src_channels, int dst_channels,
-              int flags, int nonzero_rows)
+    ReplacementDFT2D() : context(0), isInitialized(അസത്യം) {}
+    തർക്കം init(പൂർണ്ണസംഖ്യ width, പൂർണ്ണസംഖ്യ height, പൂർണ്ണസംഖ്യ depth,
+              പൂർണ്ണസംഖ്യ src_channels, പൂർണ്ണസംഖ്യ dst_channels,
+              പൂർണ്ണസംഖ്യ flags, പൂർണ്ണസംഖ്യ nonzero_rows)
     {
-        int res = cv_hal_dftInit2D(&context, width, height, depth, src_channels, dst_channels, flags, nonzero_rows);
+        പൂർണ്ണസംഖ്യ res = cv_hal_dftInit2D(&context, width, height, depth, src_channels, dst_channels, flags, nonzero_rows);
         isInitialized = (res == CV_HAL_ERROR_OK);
-        return isInitialized;
+        തിരികെ isInitialized;
     }
-    void apply(const uchar *src, size_t src_step, uchar *dst, size_t dst_step) CV_OVERRIDE
+    ശൂന്യം apply(സ്ഥിരം uchar *src, size_t src_step, uchar *dst, size_t dst_step) CV_OVERRIDE
     {
-        if (isInitialized)
+        എങ്കിൽ (isInitialized)
         {
             CALL_HAL(dft2D, cv_hal_dft2D, context, src, src_step, dst, dst_step);
         }
     }
     ~ReplacementDFT2D()
     {
-        if (isInitialized)
+        എങ്കിൽ (isInitialized)
         {
             CALL_HAL(dftFree2D, cv_hal_dftFree1D, context);
         }
     }
 };
 
-namespace hal {
+നാമാകാശ hal {
 
 //================== 1D ======================
 
-Ptr<DFT1D> DFT1D::create(int len, int count, int depth, int flags, bool *needBuffer)
+Ptr<DFT1D> DFT1D::create(പൂർണ്ണസംഖ്യ len, പൂർണ്ണസംഖ്യ എണ്ണം_2, പൂർണ്ണസംഖ്യ depth, പൂർണ്ണസംഖ്യ flags, തർക്കം *needBuffer)
 {
     {
-        ReplacementDFT1D *impl = new ReplacementDFT1D();
-        if (impl->init(len, count, depth, flags, needBuffer))
+        ReplacementDFT1D *impl = പുതിയ ReplacementDFT1D();
+        എങ്കിൽ (impl->init(len, എണ്ണം_2, depth, flags, needBuffer))
         {
-            return Ptr<DFT1D>(impl);
+            തിരികെ Ptr<DFT1D>(impl);
         }
         delete impl;
     }
     {
-        OcvDftBasicImpl *impl = new OcvDftBasicImpl();
-        impl->init(len, count, depth, flags, needBuffer);
-        return Ptr<DFT1D>(impl);
+        OcvDftBasicImpl *impl = പുതിയ OcvDftBasicImpl();
+        impl->init(len, എണ്ണം_2, depth, flags, needBuffer);
+        തിരികെ Ptr<DFT1D>(impl);
     }
 }
 
 //================== 2D ======================
 
-Ptr<DFT2D> DFT2D::create(int width, int height, int depth,
-                         int src_channels, int dst_channels,
-                         int flags, int nonzero_rows)
+Ptr<DFT2D> DFT2D::create(പൂർണ്ണസംഖ്യ width, പൂർണ്ണസംഖ്യ height, പൂർണ്ണസംഖ്യ depth,
+                         പൂർണ്ണസംഖ്യ src_channels, പൂർണ്ണസംഖ്യ dst_channels,
+                         പൂർണ്ണസംഖ്യ flags, പൂർണ്ണസംഖ്യ nonzero_rows)
 {
     {
-        ReplacementDFT2D *impl = new ReplacementDFT2D();
-        if (impl->init(width, height, depth, src_channels, dst_channels, flags, nonzero_rows))
+        ReplacementDFT2D *impl = പുതിയ ReplacementDFT2D();
+        എങ്കിൽ (impl->init(width, height, depth, src_channels, dst_channels, flags, nonzero_rows))
         {
-            return Ptr<DFT2D>(impl);
+            തിരികെ Ptr<DFT2D>(impl);
         }
         delete impl;
     }
     {
-        if(width == 1 && nonzero_rows > 0 )
+        എങ്കിൽ(width == 1 && nonzero_rows > 0 )
         {
             CV_Error( cv::Error::StsNotImplemented,
             "This mode (using nonzero_rows with a single-column matrix) breaks the function's logic, so it is prohibited.\n"
             "For fast convolution/correlation use 2-column matrix or single-row matrix instead" );
         }
-        OcvDftImpl *impl = new OcvDftImpl();
+        OcvDftImpl *impl = പുതിയ OcvDftImpl();
         impl->init(width, height, depth, src_channels, dst_channels, flags, nonzero_rows);
-        return Ptr<DFT2D>(impl);
+        തിരികെ Ptr<DFT2D>(impl);
     }
 }
 
@@ -2798,7 +2798,7 @@ Ptr<DFT2D> DFT2D::create(int width, int height, int depth,
 } // cv::
 
 
-void cv::dft( InputArray _src0, OutputArray _dst, int flags, int nonzero_rows )
+ശൂന്യം cv::dft( നിവേശം_Array _src0, OutputArray _dst, പൂർണ്ണസംഖ്യ flags, പൂർണ്ണസംഖ്യ nonzero_rows )
 {
     CV_INSTRUMENT_REGION();
 
@@ -2814,46 +2814,46 @@ void cv::dft( InputArray _src0, OutputArray _dst, int flags, int nonzero_rows )
 #endif
 
     Mat src0 = _src0.getMat(), src = src0;
-    if (src.empty())
+    എങ്കിൽ (src.empty())
     {
         _dst.release();
-        return;
+        തിരികെ;
     }
-    bool inv = (flags & DFT_INVERSE) != 0;
-    int type = src.type();
-    int depth = src.depth();
+    തർക്കം inv = (flags & DFT_INVERSE) != 0;
+    പൂർണ്ണസംഖ്യ type = src.type();
+    പൂർണ്ണസംഖ്യ depth = src.depth();
 
     CV_Assert( type == CV_32FC1 || type == CV_32FC2 || type == CV_64FC1 || type == CV_64FC2 );
 
     // Fail if DFT_COMPLEX_INPUT is specified, but src is not 2 channels.
-    CV_Assert( !((flags & DFT_COMPLEX_INPUT) && src.channels() != 2) );
+    CV_Assert( !((flags & DFT_COMPLEX_നിവേശം) && src.channels() != 2) );
 
-    if( !inv && src.channels() == 1 && (flags & DFT_COMPLEX_OUTPUT) )
+    എങ്കിൽ( !inv && src.channels() == 1 && (flags & DFT_COMPLEX_OUTPUT) )
         _dst.createSameSize( src, CV_MAKETYPE(depth, 2) );
-    else if( inv && src.channels() == 2 && (flags & DFT_REAL_OUTPUT) )
+    അല്ലെങ്കിൽ എങ്കിൽ( inv && src.channels() == 2 && (flags & DFT_REAL_OUTPUT) )
         _dst.createSameSize( src, depth );
-    else
+    അല്ലെങ്കിൽ
         _dst.createSameSize( src, type );
 
     Mat dst = _dst.getMat();
 
-    int f = 0;
-    if (src.isContinuous() && dst.isContinuous())
+    പൂർണ്ണസംഖ്യ f = 0;
+    എങ്കിൽ (src.isContinuous() && dst.isContinuous())
         f |= CV_HAL_DFT_IS_CONTINUOUS;
-    if (inv)
+    എങ്കിൽ (inv)
         f |= CV_HAL_DFT_INVERSE;
-    if (flags & DFT_ROWS)
+    എങ്കിൽ (flags & DFT_ROWS)
         f |= CV_HAL_DFT_ROWS;
-    if (flags & DFT_SCALE)
+    എങ്കിൽ (flags & DFT_SCALE)
         f |= CV_HAL_DFT_SCALE;
-    if (src.data == dst.data)
+    എങ്കിൽ (src.data == dst.data)
         f |= CV_HAL_DFT_IS_INPLACE;
     Ptr<hal::DFT2D> c = hal::DFT2D::create(src.cols, src.rows, depth, src.channels(), dst.channels(), f, nonzero_rows);
     c->apply(src.data, src.step, dst.data, dst.step);
 }
 
 
-void cv::idft( InputArray src, OutputArray dst, int flags, int nonzero_rows )
+ശൂന്യം cv::idft( നിവേശം_Array src, OutputArray dst, പൂർണ്ണസംഖ്യ flags, പൂർണ്ണസംഖ്യ nonzero_rows )
 {
     CV_INSTRUMENT_REGION();
 
@@ -2862,18 +2862,18 @@ void cv::idft( InputArray src, OutputArray dst, int flags, int nonzero_rows )
 
 #ifdef HAVE_OPENCL
 
-namespace cv {
+നാമാകാശ cv {
 
-static bool ocl_mulSpectrums( InputArray _srcA, InputArray _srcB,
-                              OutputArray _dst, int flags, bool conjB )
+സ്ഥിതം തർക്കം ocl_mulSpectrums( നിവേശം_Array _srcA, നിവേശം_Array _srcB,
+                              OutputArray _dst, പൂർണ്ണസംഖ്യ flags, തർക്കം conjB )
 {
-    int atype = _srcA.type(), btype = _srcB.type(),
+    പൂർണ്ണസംഖ്യ atype = _srcA.type(), btype = _srcB.type(),
             rowsPerWI = ocl::Device::getDefault().isIntel() ? 4 : 1;
     Size asize = _srcA.size(), bsize = _srcB.size();
     CV_Assert(asize == bsize);
 
-    if ( !(atype == CV_32FC2 && btype == CV_32FC2) || flags != 0 )
-        return false;
+    എങ്കിൽ ( !(atype == CV_32FC2 && btype == CV_32FC2) || flags != 0 )
+        തിരികെ അസത്യം;
 
     UMat A = _srcA.getUMat(), B = _srcB.getUMat();
     CV_Assert(A.size() == B.size());
@@ -2884,64 +2884,64 @@ static bool ocl_mulSpectrums( InputArray _srcA, InputArray _srcB,
     ocl::Kernel k("mulAndScaleSpectrums",
                   ocl::core::mulspectrums_oclsrc,
                   format("%s", conjB ? "-D CONJ" : ""));
-    if (k.empty())
-        return false;
+    എങ്കിൽ (k.empty())
+        തിരികെ അസത്യം;
 
     k.args(ocl::KernelArg::ReadOnlyNoSize(A), ocl::KernelArg::ReadOnlyNoSize(B),
            ocl::KernelArg::WriteOnly(dst), rowsPerWI);
 
     size_t globalsize[2] = { (size_t)asize.width, ((size_t)asize.height + rowsPerWI - 1) / rowsPerWI };
-    return k.run(2, globalsize, NULL, false);
+    തിരികെ k.run(2, globalsize, ശൂന്യ, അസത്യം);
 }
 
 }
 
 #endif
 
-namespace {
+നാമാകാശ {
 
-#define VAL(buf, elem) (((T*)((char*)data ## buf + (step ## buf * (elem))))[0])
+#define VAL(buf, elem) (((T*)((അക്ഷരം*)data ## buf + (step ## buf * (elem))))[0])
 #define MUL_SPECTRUMS_COL(A, B, C) \
     VAL(C, 0) = VAL(A, 0) * VAL(B, 0); \
-    for (size_t j = 1; j <= rows - 2; j += 2) \
+    വേണ്ടി (size_t j = 1; j <= rows - 2; j += 2) \
     { \
-        double a_re = VAL(A, j), a_im = VAL(A, j + 1); \
-        double b_re = VAL(B, j), b_im = VAL(B, j + 1); \
-        if (conjB) b_im = -b_im; \
-        double c_re = a_re * b_re - a_im * b_im; \
-        double c_im = a_re * b_im + a_im * b_re; \
+        ഇരട്ട a_re = VAL(A, j), a_im = VAL(A, j + 1); \
+        ഇരട്ട b_re = VAL(B, j), b_im = VAL(B, j + 1); \
+        എങ്കിൽ (conjB) b_im = -b_im; \
+        ഇരട്ട c_re = a_re * b_re - a_im * b_im; \
+        ഇരട്ട c_im = a_re * b_im + a_im * b_re; \
         VAL(C, j) = (T)c_re; VAL(C, j + 1) = (T)c_im; \
     } \
-    if ((rows & 1) == 0) \
+    എങ്കിൽ ((rows & 1) == 0) \
         VAL(C, rows-1) = VAL(A, rows-1) * VAL(B, rows-1)
 
-template <typename T, bool conjB> static inline
-void mulSpectrums_processCol_noinplace(const T* dataA, const T* dataB, T* dataC, size_t stepA, size_t stepB, size_t stepC, size_t rows)
+template <typename T, തർക്കം conjB> സ്ഥിതം വരിയിൽ
+ശൂന്യം mulSpectrums_processCol_noinplace(സ്ഥിരം T* dataA, സ്ഥിരം T* dataB, T* dataC, size_t stepA, size_t stepB, size_t stepC, size_t rows)
 {
     MUL_SPECTRUMS_COL(A, B, C);
 }
 
-template <typename T, bool conjB> static inline
-void mulSpectrums_processCol_inplaceA(const T* dataB, T* dataAC, size_t stepB, size_t stepAC, size_t rows)
+template <typename T, തർക്കം conjB> സ്ഥിതം വരിയിൽ
+ശൂന്യം mulSpectrums_processCol_inplaceA(സ്ഥിരം T* dataB, T* dataAC, size_t stepB, size_t stepAC, size_t rows)
 {
     MUL_SPECTRUMS_COL(AC, B, AC);
 }
-template <typename T, bool conjB, bool inplaceA> static inline
-void mulSpectrums_processCol(const T* dataA, const T* dataB, T* dataC, size_t stepA, size_t stepB, size_t stepC, size_t rows)
+template <typename T, തർക്കം conjB, തർക്കം inplaceA> സ്ഥിതം വരിയിൽ
+ശൂന്യം mulSpectrums_processCol(സ്ഥിരം T* dataA, സ്ഥിരം T* dataB, T* dataC, size_t stepA, size_t stepB, size_t stepC, size_t rows)
 {
-    if (inplaceA)
+    എങ്കിൽ (inplaceA)
         mulSpectrums_processCol_inplaceA<T, conjB>(dataB, dataC, stepB, stepC, rows);
-    else
+    അല്ലെങ്കിൽ
         mulSpectrums_processCol_noinplace<T, conjB>(dataA, dataB, dataC, stepA, stepB, stepC, rows);
 }
 #undef MUL_SPECTRUMS_COL
 #undef VAL
 
-template <typename T, bool conjB, bool inplaceA> static inline
-void mulSpectrums_processCols(const T* dataA, const T* dataB, T* dataC, size_t stepA, size_t stepB, size_t stepC, size_t rows, size_t cols)
+template <typename T, തർക്കം conjB, തർക്കം inplaceA> സ്ഥിതം വരിയിൽ
+ശൂന്യം mulSpectrums_processCols(സ്ഥിരം T* dataA, സ്ഥിരം T* dataB, T* dataC, size_t stepA, size_t stepB, size_t stepC, size_t rows, size_t cols)
 {
     mulSpectrums_processCol<T, conjB, inplaceA>(dataA, dataB, dataC, stepA, stepB, stepC, rows);
-    if ((cols & 1) == 0)
+    എങ്കിൽ ((cols & 1) == 0)
     {
         mulSpectrums_processCol<T, conjB, inplaceA>(dataA + cols - 1, dataB + cols - 1, dataC + cols - 1, stepA, stepB, stepC, rows);
     }
@@ -2949,86 +2949,86 @@ void mulSpectrums_processCols(const T* dataA, const T* dataB, T* dataC, size_t s
 
 #define VAL(buf, elem) (data ## buf[(elem)])
 #define MUL_SPECTRUMS_ROW(A, B, C) \
-    for (size_t j = j0; j < j1; j += 2) \
+    വേണ്ടി (size_t j = j0; j < j1; j += 2) \
     { \
-        double a_re = VAL(A, j), a_im = VAL(A, j + 1); \
-        double b_re = VAL(B, j), b_im = VAL(B, j + 1); \
-        if (conjB) b_im = -b_im; \
-        double c_re = a_re * b_re - a_im * b_im; \
-        double c_im = a_re * b_im + a_im * b_re; \
+        ഇരട്ട a_re = VAL(A, j), a_im = VAL(A, j + 1); \
+        ഇരട്ട b_re = VAL(B, j), b_im = VAL(B, j + 1); \
+        എങ്കിൽ (conjB) b_im = -b_im; \
+        ഇരട്ട c_re = a_re * b_re - a_im * b_im; \
+        ഇരട്ട c_im = a_re * b_im + a_im * b_re; \
         VAL(C, j) = (T)c_re; VAL(C, j + 1) = (T)c_im; \
     }
-template <typename T, bool conjB> static inline
-void mulSpectrums_processRow_noinplace(const T* dataA, const T* dataB, T* dataC, size_t j0, size_t j1)
+template <typename T, തർക്കം conjB> സ്ഥിതം വരിയിൽ
+ശൂന്യം mulSpectrums_processRow_noinplace(സ്ഥിരം T* dataA, സ്ഥിരം T* dataB, T* dataC, size_t j0, size_t j1)
 {
     MUL_SPECTRUMS_ROW(A, B, C);
 }
-template <typename T, bool conjB> static inline
-void mulSpectrums_processRow_inplaceA(const T* dataB, T* dataAC, size_t j0, size_t j1)
+template <typename T, തർക്കം conjB> സ്ഥിതം വരിയിൽ
+ശൂന്യം mulSpectrums_processRow_inplaceA(സ്ഥിരം T* dataB, T* dataAC, size_t j0, size_t j1)
 {
     MUL_SPECTRUMS_ROW(AC, B, AC);
 }
-template <typename T, bool conjB, bool inplaceA> static inline
-void mulSpectrums_processRow(const T* dataA, const T* dataB, T* dataC, size_t j0, size_t j1)
+template <typename T, തർക്കം conjB, തർക്കം inplaceA> സ്ഥിതം വരിയിൽ
+ശൂന്യം mulSpectrums_processRow(സ്ഥിരം T* dataA, സ്ഥിരം T* dataB, T* dataC, size_t j0, size_t j1)
 {
-    if (inplaceA)
+    എങ്കിൽ (inplaceA)
         mulSpectrums_processRow_inplaceA<T, conjB>(dataB, dataC, j0, j1);
-    else
+    അല്ലെങ്കിൽ
         mulSpectrums_processRow_noinplace<T, conjB>(dataA, dataB, dataC, j0, j1);
 }
 #undef MUL_SPECTRUMS_ROW
 #undef VAL
 
-template <typename T, bool conjB, bool inplaceA> static inline
-void mulSpectrums_processRows(const T* dataA, const T* dataB, T* dataC, size_t stepA, size_t stepB, size_t stepC, size_t rows, size_t cols, size_t j0, size_t j1, bool is_1d_CN1)
+template <typename T, തർക്കം conjB, തർക്കം inplaceA> സ്ഥിതം വരിയിൽ
+ശൂന്യം mulSpectrums_processRows(സ്ഥിരം T* dataA, സ്ഥിരം T* dataB, T* dataC, size_t stepA, size_t stepB, size_t stepC, size_t rows, size_t cols, size_t j0, size_t j1, തർക്കം is_1d_CN1)
 {
-    while (rows-- > 0)
+    ആകുമ്പോൾ (rows-- > 0)
     {
-        if (is_1d_CN1)
+        എങ്കിൽ (is_1d_CN1)
             dataC[0] = dataA[0]*dataB[0];
         mulSpectrums_processRow<T, conjB, inplaceA>(dataA, dataB, dataC, j0, j1);
-        if (is_1d_CN1 && (cols & 1) == 0)
+        എങ്കിൽ (is_1d_CN1 && (cols & 1) == 0)
             dataC[j1] = dataA[j1]*dataB[j1];
 
-        dataA = (const T*)(((char*)dataA) + stepA);
-        dataB = (const T*)(((char*)dataB) + stepB);
-        dataC =       (T*)(((char*)dataC) + stepC);
+        dataA = (സ്ഥിരം T*)(((അക്ഷരം*)dataA) + stepA);
+        dataB = (സ്ഥിരം T*)(((അക്ഷരം*)dataB) + stepB);
+        dataC =       (T*)(((അക്ഷരം*)dataC) + stepC);
     }
 }
 
 
-template <typename T, bool conjB, bool inplaceA> static inline
-void mulSpectrums_Impl_(const T* dataA, const T* dataB, T* dataC, size_t stepA, size_t stepB, size_t stepC, size_t rows, size_t cols, size_t j0, size_t j1, bool is_1d, bool isCN1)
+template <typename T, തർക്കം conjB, തർക്കം inplaceA> സ്ഥിതം വരിയിൽ
+ശൂന്യം mulSpectrums_Impl_(സ്ഥിരം T* dataA, സ്ഥിരം T* dataB, T* dataC, size_t stepA, size_t stepB, size_t stepC, size_t rows, size_t cols, size_t j0, size_t j1, തർക്കം is_1d, തർക്കം isCN1)
 {
-    if (!is_1d && isCN1)
+    എങ്കിൽ (!is_1d && isCN1)
     {
         mulSpectrums_processCols<T, conjB, inplaceA>(dataA, dataB, dataC, stepA, stepB, stepC, rows, cols);
     }
     mulSpectrums_processRows<T, conjB, inplaceA>(dataA, dataB, dataC, stepA, stepB, stepC, rows, cols, j0, j1, is_1d && isCN1);
 }
-template <typename T, bool conjB> static inline
-void mulSpectrums_Impl(const T* dataA, const T* dataB, T* dataC, size_t stepA, size_t stepB, size_t stepC, size_t rows, size_t cols, size_t j0, size_t j1, bool is_1d, bool isCN1)
+template <typename T, തർക്കം conjB> സ്ഥിതം വരിയിൽ
+ശൂന്യം mulSpectrums_Impl(സ്ഥിരം T* dataA, സ്ഥിരം T* dataB, T* dataC, size_t stepA, size_t stepB, size_t stepC, size_t rows, size_t cols, size_t j0, size_t j1, തർക്കം is_1d, തർക്കം isCN1)
 {
-    if (dataA == dataC)
-        mulSpectrums_Impl_<T, conjB, true>(dataA, dataB, dataC, stepA, stepB, stepC, rows, cols, j0, j1, is_1d, isCN1);
-    else
-        mulSpectrums_Impl_<T, conjB, false>(dataA, dataB, dataC, stepA, stepB, stepC, rows, cols, j0, j1, is_1d, isCN1);
+    എങ്കിൽ (dataA == dataC)
+        mulSpectrums_Impl_<T, conjB, സത്യം>(dataA, dataB, dataC, stepA, stepB, stepC, rows, cols, j0, j1, is_1d, isCN1);
+    അല്ലെങ്കിൽ
+        mulSpectrums_Impl_<T, conjB, അസത്യം>(dataA, dataB, dataC, stepA, stepB, stepC, rows, cols, j0, j1, is_1d, isCN1);
 }
 
 } // namespace
 
-void cv::mulSpectrums( InputArray _srcA, InputArray _srcB,
-                       OutputArray _dst, int flags, bool conjB )
+ശൂന്യം cv::mulSpectrums( നിവേശം_Array _srcA, നിവേശം_Array _srcB,
+                       OutputArray _dst, പൂർണ്ണസംഖ്യ flags, തർക്കം conjB )
 {
     CV_INSTRUMENT_REGION();
 
-    if (_srcA.empty() && _srcB.empty())
+    എങ്കിൽ (_srcA.empty() && _srcB.empty())
     {
         _dst.release();
-        return;
+        തിരികെ;
     }
 
-    int type = _srcA.type();
+    പൂർണ്ണസംഖ്യ type = _srcA.type();
     CV_Assert( type == _srcB.type() && _srcA.size() == _srcB.size() );
     CV_Assert( type == CV_32FC1 || type == CV_32FC2 || type == CV_64FC1 || type == CV_64FC2 );
     CV_Assert( !_srcA.empty() && !_srcB.empty() );
@@ -3037,7 +3037,7 @@ void cv::mulSpectrums( InputArray _srcA, InputArray _srcB,
             ocl_mulSpectrums(_srcA, _srcB, _dst, flags, conjB))
 
     Mat srcA = _srcA.getMat(), srcB = _srcB.getMat();
-    int depth = srcA.depth(), cn = srcA.channels();
+    പൂർണ്ണസംഖ്യ depth = srcA.depth(), cn = srcA.channels();
     size_t rows = srcA.rows, cols = srcA.cols;
 
     _dst.create( srcA.rows, srcA.cols, type );
@@ -3046,53 +3046,53 @@ void cv::mulSpectrums( InputArray _srcA, InputArray _srcB,
     // correct inplace support
     // Case 'dst.data == srcA.data' is handled by implementation,
     // because it is used frequently (filter2D, matchTemplate)
-    if (dst.data == srcB.data)
+    എങ്കിൽ (dst.data == srcB.data)
         srcB = srcB.clone(); // workaround for B only
 
-    bool is_1d = (flags & DFT_ROWS)
+    തർക്കം is_1d = (flags & DFT_ROWS)
         || (rows == 1)
         || (cols == 1 && srcA.isContinuous() && srcB.isContinuous() && dst.isContinuous());
 
-    if( is_1d && !(flags & DFT_ROWS) )
+    എങ്കിൽ( is_1d && !(flags & DFT_ROWS) )
         cols = cols + rows - 1, rows = 1;
 
-    bool isCN1 = cn == 1;
+    തർക്കം isCN1 = cn == 1;
     size_t j0 = isCN1 ? 1 : 0;
     size_t j1 = cols*cn - (((cols & 1) == 0 && cn == 1) ? 1 : 0);
 
-    if (depth == CV_32F)
+    എങ്കിൽ (depth == CV_32F)
     {
-        const float* dataA = srcA.ptr<float>();
-        const float* dataB = srcB.ptr<float>();
-        float* dataC = dst.ptr<float>();
-        if (!conjB)
-            mulSpectrums_Impl<float, false>(dataA, dataB, dataC, srcA.step, srcB.step, dst.step, rows, cols, j0, j1, is_1d, isCN1);
-        else
-            mulSpectrums_Impl<float, true>(dataA, dataB, dataC, srcA.step, srcB.step, dst.step, rows, cols, j0, j1, is_1d, isCN1);
+        സ്ഥിരം ദശാംശം* dataA = srcA.ptr<ദശാംശം>();
+        സ്ഥിരം ദശാംശം* dataB = srcB.ptr<ദശാംശം>();
+        ദശാംശം* dataC = dst.ptr<ദശാംശം>();
+        എങ്കിൽ (!conjB)
+            mulSpectrums_Impl<ദശാംശം, അസത്യം>(dataA, dataB, dataC, srcA.step, srcB.step, dst.step, rows, cols, j0, j1, is_1d, isCN1);
+        അല്ലെങ്കിൽ
+            mulSpectrums_Impl<ദശാംശം, സത്യം>(dataA, dataB, dataC, srcA.step, srcB.step, dst.step, rows, cols, j0, j1, is_1d, isCN1);
     }
-    else
+    അല്ലെങ്കിൽ
     {
-        const double* dataA = srcA.ptr<double>();
-        const double* dataB = srcB.ptr<double>();
-        double* dataC = dst.ptr<double>();
-        if (!conjB)
-            mulSpectrums_Impl<double, false>(dataA, dataB, dataC, srcA.step, srcB.step, dst.step, rows, cols, j0, j1, is_1d, isCN1);
-        else
-            mulSpectrums_Impl<double, true>(dataA, dataB, dataC, srcA.step, srcB.step, dst.step, rows, cols, j0, j1, is_1d, isCN1);
+        സ്ഥിരം ഇരട്ട* dataA = srcA.ptr<ഇരട്ട>();
+        സ്ഥിരം ഇരട്ട* dataB = srcB.ptr<ഇരട്ട>();
+        ഇരട്ട* dataC = dst.ptr<ഇരട്ട>();
+        എങ്കിൽ (!conjB)
+            mulSpectrums_Impl<ഇരട്ട, അസത്യം>(dataA, dataB, dataC, srcA.step, srcB.step, dst.step, rows, cols, j0, j1, is_1d, isCN1);
+        അല്ലെങ്കിൽ
+            mulSpectrums_Impl<ഇരട്ട, സത്യം>(dataA, dataB, dataC, srcA.step, srcB.step, dst.step, rows, cols, j0, j1, is_1d, isCN1);
     }
 }
 
-void cv::divSpectrums( InputArray _srcA, InputArray _srcB, OutputArray _dst, int flags, bool conjB)
+ശൂന്യം cv::divSpectrums( നിവേശം_Array _srcA, നിവേശം_Array _srcB, OutputArray _dst, പൂർണ്ണസംഖ്യ flags, തർക്കം conjB)
 {
     Mat srcA = _srcA.getMat(), srcB = _srcB.getMat();
-    if (srcA.empty() && srcB.empty())
+    എങ്കിൽ (srcA.empty() && srcB.empty())
     {
         _dst.release();
-        return;
+        തിരികെ;
     }
-    int depth = srcA.depth(), cn = srcA.channels(), type = srcA.type();
-    int rows = srcA.rows, cols = srcA.cols;
-    int j, k;
+    പൂർണ്ണസംഖ്യ depth = srcA.depth(), cn = srcA.channels(), type = srcA.type();
+    പൂർണ്ണസംഖ്യ rows = srcA.rows, cols = srcA.cols;
+    പൂർണ്ണസംഖ്യ j, k;
 
     CV_Assert( type == srcB.type() && srcA.size() == srcB.size() );
     CV_Assert( type == CV_32FC1 || type == CV_32FC2 || type == CV_64FC1 || type == CV_64FC2 );
@@ -3104,180 +3104,180 @@ void cv::divSpectrums( InputArray _srcA, InputArray _srcB, OutputArray _dst, int
     CV_Assert(dst.data != srcA.data); // non-inplace check
     CV_Assert(dst.data != srcB.data); // non-inplace check
 
-    bool is_1d = (flags & DFT_ROWS) || (rows == 1 || (cols == 1 &&
+    തർക്കം is_1d = (flags & DFT_ROWS) || (rows == 1 || (cols == 1 &&
     srcA.isContinuous() && srcB.isContinuous() && dst.isContinuous()));
 
-    if( is_1d && !(flags & DFT_ROWS) )
+    എങ്കിൽ( is_1d && !(flags & DFT_ROWS) )
         cols = cols + rows - 1, rows = 1;
 
-    int ncols = cols*cn;
-    int j0 = cn == 1;
-    int j1 = ncols - (cols % 2 == 0 && cn == 1);
+    പൂർണ്ണസംഖ്യ ncols = cols*cn;
+    പൂർണ്ണസംഖ്യ j0 = cn == 1;
+    പൂർണ്ണസംഖ്യ j1 = ncols - (cols % 2 == 0 && cn == 1);
 
-    if( depth == CV_32F )
+    എങ്കിൽ( depth == CV_32F )
     {
-        const float* dataA = srcA.ptr<float>();
-        const float* dataB = srcB.ptr<float>();
-        float* dataC = dst.ptr<float>();
-        float eps = FLT_EPSILON; // prevent div0 problems
+        സ്ഥിരം ദശാംശം* dataA = srcA.ptr<ദശാംശം>();
+        സ്ഥിരം ദശാംശം* dataB = srcB.ptr<ദശാംശം>();
+        ദശാംശം* dataC = dst.ptr<ദശാംശം>();
+        ദശാംശം eps = FLT_EPSILON; // prevent div0 problems
 
-        size_t stepA = srcA.step/sizeof(dataA[0]);
-        size_t stepB = srcB.step/sizeof(dataB[0]);
-        size_t stepC = dst.step/sizeof(dataC[0]);
+        size_t stepA = srcA.step/വലുപ്പം(dataA[0]);
+        size_t stepB = srcB.step/വലുപ്പം(dataB[0]);
+        size_t stepC = dst.step/വലുപ്പം(dataC[0]);
 
-        if( !is_1d && cn == 1 )
+        എങ്കിൽ( !is_1d && cn == 1 )
         {
-            for( k = 0; k < (cols % 2 ? 1 : 2); k++ )
+            വേണ്ടി( k = 0; k < (cols % 2 ? 1 : 2); k++ )
             {
-                if( k == 1 )
+                എങ്കിൽ( k == 1 )
                     dataA += cols - 1, dataB += cols - 1, dataC += cols - 1;
                 dataC[0] = dataA[0] / (dataB[0] + eps);
-                if( rows % 2 == 0 )
+                എങ്കിൽ( rows % 2 == 0 )
                     dataC[(rows-1)*stepC] = dataA[(rows-1)*stepA] / (dataB[(rows-1)*stepB] + eps);
-                if( !conjB )
-                    for( j = 1; j <= rows - 2; j += 2 )
+                എങ്കിൽ( !conjB )
+                    വേണ്ടി( j = 1; j <= rows - 2; j += 2 )
                     {
-                        double denom = (double)dataB[j*stepB]*dataB[j*stepB] +
-                        (double)dataB[(j+1)*stepB]*dataB[(j+1)*stepB] + (double)eps;
+                        ഇരട്ട denom = (ഇരട്ട)dataB[j*stepB]*dataB[j*stepB] +
+                        (ഇരട്ട)dataB[(j+1)*stepB]*dataB[(j+1)*stepB] + (ഇരട്ട)eps;
 
-                        double re = (double)dataA[j*stepA]*dataB[j*stepB] +
-                        (double)dataA[(j+1)*stepA]*dataB[(j+1)*stepB];
+                        ഇരട്ട re = (ഇരട്ട)dataA[j*stepA]*dataB[j*stepB] +
+                        (ഇരട്ട)dataA[(j+1)*stepA]*dataB[(j+1)*stepB];
 
-                        double im = (double)dataA[(j+1)*stepA]*dataB[j*stepB] -
-                        (double)dataA[j*stepA]*dataB[(j+1)*stepB];
+                        ഇരട്ട im = (ഇരട്ട)dataA[(j+1)*stepA]*dataB[j*stepB] -
+                        (ഇരട്ട)dataA[j*stepA]*dataB[(j+1)*stepB];
 
-                        dataC[j*stepC] = (float)(re / denom);
-                        dataC[(j+1)*stepC] = (float)(im / denom);
+                        dataC[j*stepC] = (ദശാംശം)(re / denom);
+                        dataC[(j+1)*stepC] = (ദശാംശം)(im / denom);
                     }
-                    else
-                        for( j = 1; j <= rows - 2; j += 2 )
+                    അല്ലെങ്കിൽ
+                        വേണ്ടി( j = 1; j <= rows - 2; j += 2 )
                         {
 
-                            double denom = (double)dataB[j*stepB]*dataB[j*stepB] +
-                            (double)dataB[(j+1)*stepB]*dataB[(j+1)*stepB] + (double)eps;
+                            ഇരട്ട denom = (ഇരട്ട)dataB[j*stepB]*dataB[j*stepB] +
+                            (ഇരട്ട)dataB[(j+1)*stepB]*dataB[(j+1)*stepB] + (ഇരട്ട)eps;
 
-                            double re = (double)dataA[j*stepA]*dataB[j*stepB] -
-                            (double)dataA[(j+1)*stepA]*dataB[(j+1)*stepB];
+                            ഇരട്ട re = (ഇരട്ട)dataA[j*stepA]*dataB[j*stepB] -
+                            (ഇരട്ട)dataA[(j+1)*stepA]*dataB[(j+1)*stepB];
 
-                            double im = (double)dataA[(j+1)*stepA]*dataB[j*stepB] +
-                            (double)dataA[j*stepA]*dataB[(j+1)*stepB];
+                            ഇരട്ട im = (ഇരട്ട)dataA[(j+1)*stepA]*dataB[j*stepB] +
+                            (ഇരട്ട)dataA[j*stepA]*dataB[(j+1)*stepB];
 
-                            dataC[j*stepC] = (float)(re / denom);
-                            dataC[(j+1)*stepC] = (float)(im / denom);
+                            dataC[j*stepC] = (ദശാംശം)(re / denom);
+                            dataC[(j+1)*stepC] = (ദശാംശം)(im / denom);
                         }
-                    if( k == 1 )
+                    എങ്കിൽ( k == 1 )
                         dataA -= cols - 1, dataB -= cols - 1, dataC -= cols - 1;
             }
         }
 
-        for( ; rows--; dataA += stepA, dataB += stepB, dataC += stepC )
+        വേണ്ടി( ; rows--; dataA += stepA, dataB += stepB, dataC += stepC )
         {
-            if( is_1d && cn == 1 )
+            എങ്കിൽ( is_1d && cn == 1 )
             {
                 dataC[0] = dataA[0] / (dataB[0] + eps);
-                if( cols % 2 == 0 )
+                എങ്കിൽ( cols % 2 == 0 )
                     dataC[j1] = dataA[j1] / (dataB[j1] + eps);
             }
 
-            if( !conjB )
-                for( j = j0; j < j1; j += 2 )
+            എങ്കിൽ( !conjB )
+                വേണ്ടി( j = j0; j < j1; j += 2 )
                 {
-                    double denom = (double)dataB[j]*dataB[j] + (double)dataB[j+1]*dataB[j+1] + (double)eps;
-                    double re = (double)dataA[j]*dataB[j] + (double)dataA[j+1]*dataB[j+1];
-                    double im = (double)dataA[j+1]*dataB[j] - (double)dataA[j]*dataB[j+1];
-                    dataC[j] = (float)(re / denom);
-                    dataC[j+1] = (float)(im / denom);
+                    ഇരട്ട denom = (ഇരട്ട)dataB[j]*dataB[j] + (ഇരട്ട)dataB[j+1]*dataB[j+1] + (ഇരട്ട)eps;
+                    ഇരട്ട re = (ഇരട്ട)dataA[j]*dataB[j] + (ഇരട്ട)dataA[j+1]*dataB[j+1];
+                    ഇരട്ട im = (ഇരട്ട)dataA[j+1]*dataB[j] - (ഇരട്ട)dataA[j]*dataB[j+1];
+                    dataC[j] = (ദശാംശം)(re / denom);
+                    dataC[j+1] = (ദശാംശം)(im / denom);
                 }
-                else
-                    for( j = j0; j < j1; j += 2 )
+                അല്ലെങ്കിൽ
+                    വേണ്ടി( j = j0; j < j1; j += 2 )
                     {
-                        double denom = (double)dataB[j]*dataB[j] + (double)dataB[j+1]*dataB[j+1] + (double)eps;
-                        double re = (double)dataA[j]*dataB[j] - (double)dataA[j+1]*dataB[j+1];
-                        double im = (double)dataA[j+1]*dataB[j] + (double)dataA[j]*dataB[j+1];
-                        dataC[j] = (float)(re / denom);
-                        dataC[j+1] = (float)(im / denom);
+                        ഇരട്ട denom = (ഇരട്ട)dataB[j]*dataB[j] + (ഇരട്ട)dataB[j+1]*dataB[j+1] + (ഇരട്ട)eps;
+                        ഇരട്ട re = (ഇരട്ട)dataA[j]*dataB[j] - (ഇരട്ട)dataA[j+1]*dataB[j+1];
+                        ഇരട്ട im = (ഇരട്ട)dataA[j+1]*dataB[j] + (ഇരട്ട)dataA[j]*dataB[j+1];
+                        dataC[j] = (ദശാംശം)(re / denom);
+                        dataC[j+1] = (ദശാംശം)(im / denom);
                     }
         }
     }
-    else
+    അല്ലെങ്കിൽ
     {
-        const double* dataA = srcA.ptr<double>();
-        const double* dataB = srcB.ptr<double>();
-        double* dataC = dst.ptr<double>();
-        double eps = DBL_EPSILON; // prevent div0 problems
+        സ്ഥിരം ഇരട്ട* dataA = srcA.ptr<ഇരട്ട>();
+        സ്ഥിരം ഇരട്ട* dataB = srcB.ptr<ഇരട്ട>();
+        ഇരട്ട* dataC = dst.ptr<ഇരട്ട>();
+        ഇരട്ട eps = DBL_EPSILON; // prevent div0 problems
 
-        size_t stepA = srcA.step/sizeof(dataA[0]);
-        size_t stepB = srcB.step/sizeof(dataB[0]);
-        size_t stepC = dst.step/sizeof(dataC[0]);
+        size_t stepA = srcA.step/വലുപ്പം(dataA[0]);
+        size_t stepB = srcB.step/വലുപ്പം(dataB[0]);
+        size_t stepC = dst.step/വലുപ്പം(dataC[0]);
 
-        if( !is_1d && cn == 1 )
+        എങ്കിൽ( !is_1d && cn == 1 )
         {
-            for( k = 0; k < (cols % 2 ? 1 : 2); k++ )
+            വേണ്ടി( k = 0; k < (cols % 2 ? 1 : 2); k++ )
             {
-                if( k == 1 )
+                എങ്കിൽ( k == 1 )
                     dataA += cols - 1, dataB += cols - 1, dataC += cols - 1;
                 dataC[0] = dataA[0] / (dataB[0] + eps);
-                if( rows % 2 == 0 )
+                എങ്കിൽ( rows % 2 == 0 )
                     dataC[(rows-1)*stepC] = dataA[(rows-1)*stepA] / (dataB[(rows-1)*stepB] + eps);
-                if( !conjB )
-                    for( j = 1; j <= rows - 2; j += 2 )
+                എങ്കിൽ( !conjB )
+                    വേണ്ടി( j = 1; j <= rows - 2; j += 2 )
                     {
-                        double denom = dataB[j*stepB]*dataB[j*stepB] +
+                        ഇരട്ട denom = dataB[j*stepB]*dataB[j*stepB] +
                         dataB[(j+1)*stepB]*dataB[(j+1)*stepB] + eps;
 
-                        double re = dataA[j*stepA]*dataB[j*stepB] +
+                        ഇരട്ട re = dataA[j*stepA]*dataB[j*stepB] +
                         dataA[(j+1)*stepA]*dataB[(j+1)*stepB];
 
-                        double im = dataA[(j+1)*stepA]*dataB[j*stepB] -
+                        ഇരട്ട im = dataA[(j+1)*stepA]*dataB[j*stepB] -
                         dataA[j*stepA]*dataB[(j+1)*stepB];
 
                         dataC[j*stepC] = re / denom;
                         dataC[(j+1)*stepC] = im / denom;
                     }
-                    else
-                        for( j = 1; j <= rows - 2; j += 2 )
+                    അല്ലെങ്കിൽ
+                        വേണ്ടി( j = 1; j <= rows - 2; j += 2 )
                         {
-                            double denom = dataB[j*stepB]*dataB[j*stepB] +
+                            ഇരട്ട denom = dataB[j*stepB]*dataB[j*stepB] +
                             dataB[(j+1)*stepB]*dataB[(j+1)*stepB] + eps;
 
-                            double re = dataA[j*stepA]*dataB[j*stepB] -
+                            ഇരട്ട re = dataA[j*stepA]*dataB[j*stepB] -
                             dataA[(j+1)*stepA]*dataB[(j+1)*stepB];
 
-                            double im = dataA[(j+1)*stepA]*dataB[j*stepB] +
+                            ഇരട്ട im = dataA[(j+1)*stepA]*dataB[j*stepB] +
                             dataA[j*stepA]*dataB[(j+1)*stepB];
 
                             dataC[j*stepC] = re / denom;
                             dataC[(j+1)*stepC] = im / denom;
                         }
-                    if( k == 1 )
+                    എങ്കിൽ( k == 1 )
                         dataA -= cols - 1, dataB -= cols - 1, dataC -= cols - 1;
             }
         }
 
-        for( ; rows--; dataA += stepA, dataB += stepB, dataC += stepC )
+        വേണ്ടി( ; rows--; dataA += stepA, dataB += stepB, dataC += stepC )
         {
-            if( is_1d && cn == 1 )
+            എങ്കിൽ( is_1d && cn == 1 )
             {
                 dataC[0] = dataA[0] / (dataB[0] + eps);
-                if( cols % 2 == 0 )
+                എങ്കിൽ( cols % 2 == 0 )
                     dataC[j1] = dataA[j1] / (dataB[j1] + eps);
             }
 
-            if( !conjB )
-                for( j = j0; j < j1; j += 2 )
+            എങ്കിൽ( !conjB )
+                വേണ്ടി( j = j0; j < j1; j += 2 )
                 {
-                    double denom = dataB[j]*dataB[j] + dataB[j+1]*dataB[j+1] + eps;
-                    double re = dataA[j]*dataB[j] + dataA[j+1]*dataB[j+1];
-                    double im = dataA[j+1]*dataB[j] - dataA[j]*dataB[j+1];
+                    ഇരട്ട denom = dataB[j]*dataB[j] + dataB[j+1]*dataB[j+1] + eps;
+                    ഇരട്ട re = dataA[j]*dataB[j] + dataA[j+1]*dataB[j+1];
+                    ഇരട്ട im = dataA[j+1]*dataB[j] - dataA[j]*dataB[j+1];
                     dataC[j] = re / denom;
                     dataC[j+1] = im / denom;
                 }
-                else
-                    for( j = j0; j < j1; j += 2 )
+                അല്ലെങ്കിൽ
+                    വേണ്ടി( j = j0; j < j1; j += 2 )
                     {
-                        double denom = dataB[j]*dataB[j] + dataB[j+1]*dataB[j+1] + eps;
-                        double re = dataA[j]*dataB[j] - dataA[j+1]*dataB[j+1];
-                        double im = dataA[j+1]*dataB[j] + dataA[j]*dataB[j+1];
+                        ഇരട്ട denom = dataB[j]*dataB[j] + dataB[j+1]*dataB[j+1] + eps;
+                        ഇരട്ട re = dataA[j]*dataB[j] - dataA[j+1]*dataB[j+1];
+                        ഇരട്ട im = dataA[j+1]*dataB[j] + dataA[j]*dataB[j+1];
                         dataC[j] = re / denom;
                         dataC[j+1] = im / denom;
                     }
@@ -3289,7 +3289,7 @@ void cv::divSpectrums( InputArray _srcA, InputArray _srcB, OutputArray _dst, int
                                Discrete Cosine Transform
 \****************************************************************************************/
 
-namespace cv
+നാമാകാശ cv
 {
 
 /* DCT is calculated using DFT, as described here:
@@ -3297,182 +3297,182 @@ namespace cv
 */
 // DCT-II / DCT-III through the new engine (plan kinds DFT_KIND_DCT / DFT_KIND_IDCT).
 // src_step / dst_step are in bytes.
-template<typename T> static void
-DCT( const OcvDftOptions & c, const T* src, size_t src_step, T* dst, size_t dst_step )
+template<typename T> സ്ഥിതം ശൂന്യം
+DCT( സ്ഥിരം OcvDftOptions & c, സ്ഥിരം T* src, size_t src_step, T* dst, size_t dst_step )
 {
-    if( c.n == 1 )
+    എങ്കിൽ( c.n == 1 )
     {
         dst[0] = src[0];
-        return;
+        തിരികെ;
     }
-    runDft(c, src, src_step/sizeof(T), dst, dst_step/sizeof(T), false);
+    runDft(c, src, src_step/വലുപ്പം(T), dst, dst_step/വലുപ്പം(T), അസത്യം);
 }
 
-template<typename T> static void
-IDCT( const OcvDftOptions & c, const T* src, size_t src_step, T* dst, size_t dst_step )
+template<typename T> സ്ഥിതം ശൂന്യം
+IDCT( സ്ഥിരം OcvDftOptions & c, സ്ഥിരം T* src, size_t src_step, T* dst, size_t dst_step )
 {
-    if( c.n == 1 )
+    എങ്കിൽ( c.n == 1 )
     {
         dst[0] = src[0];
-        return;
+        തിരികെ;
     }
-    runDft(c, src, src_step/sizeof(T), dst, dst_step/sizeof(T), false);
+    runDft(c, src, src_step/വലുപ്പം(T), dst, dst_step/വലുപ്പം(T), അസത്യം);
 }
 
-typedef void (*DCTFunc)(const OcvDftOptions & c, const void* src, size_t src_step,
-                        void* dst, size_t dst_step);
+തരനിർവചനം ശൂന്യം (*DCTFunc)(സ്ഥിരം OcvDftOptions & c, സ്ഥിരം ശൂന്യം* src, size_t src_step,
+                        ശൂന്യം* dst, size_t dst_step);
 
-template<typename T, void (*fn)(const OcvDftOptions&, const T*, size_t, T*, size_t)>
-static void dctWrap(const OcvDftOptions & c, const void* src, size_t src_step, void* dst, size_t dst_step)
+template<typename T, ശൂന്യം (*fn)(സ്ഥിരം OcvDftOptions&, സ്ഥിരം T*, size_t, T*, size_t)>
+സ്ഥിതം ശൂന്യം dctWrap(സ്ഥിരം OcvDftOptions & c, സ്ഥിരം ശൂന്യം* src, size_t src_step, ശൂന്യം* dst, size_t dst_step)
 {
-    fn(c, (const T*)src, src_step, (T*)dst, dst_step);
+    fn(c, (സ്ഥിരം T*)src, src_step, (T*)dst, dst_step);
 }
 
 }
 
 #ifdef HAVE_IPP
-namespace cv
+നാമാകാശ cv
 {
 
-#if IPP_VERSION_X100 >= 900
-typedef IppStatus (CV_STDCALL * ippiDCTFunc)(const Ipp32f* pSrc, int srcStep, Ipp32f* pDst, int dstStep, const void* pDCTSpec, Ipp8u* pBuffer);
-typedef IppStatus (CV_STDCALL * ippiDCTInit)(void* pDCTSpec, IppiSize roiSize, Ipp8u* pMemInit );
-typedef IppStatus (CV_STDCALL * ippiDCTGetSize)(IppiSize roiSize, int* pSizeSpec, int* pSizeInit, int* pSizeBuf);
+#എങ്കിൽ IPP_VERSION_X100 >= 900
+തരനിർവചനം IppStatus (CV_STDCALL * ippiDCTFunc)(സ്ഥിരം Ipp32f* pSrc, പൂർണ്ണസംഖ്യ srcStep, Ipp32f* pDst, പൂർണ്ണസംഖ്യ dstStep, സ്ഥിരം ശൂന്യം* pDCTSpec, Ipp8u* pBuffer);
+തരനിർവചനം IppStatus (CV_STDCALL * ippiDCTInit)(ശൂന്യം* pDCTSpec, IppiSize roiSize, Ipp8u* pMemInit );
+തരനിർവചനം IppStatus (CV_STDCALL * ippiDCTGetSize)(IppiSize roiSize, പൂർണ്ണസംഖ്യ* pSizeSpec, പൂർണ്ണസംഖ്യ* pSizeInit, പൂർണ്ണസംഖ്യ* pSizeBuf);
 
-template<typename SpecType, IppStatus (CV_STDCALL *fn)(const Ipp32f*, int, Ipp32f*, int, const SpecType*, Ipp8u*)>
-static IppStatus CV_STDCALL ippiDCTWrap(const Ipp32f* pSrc, int srcStep, Ipp32f* pDst, int dstStep, const void* pDCTSpec, Ipp8u* pBuffer)
+template<typename SpecType, IppStatus (CV_STDCALL *fn)(സ്ഥിരം Ipp32f*, പൂർണ്ണസംഖ്യ, Ipp32f*, പൂർണ്ണസംഖ്യ, സ്ഥിരം SpecType*, Ipp8u*)>
+സ്ഥിതം IppStatus CV_STDCALL ippiDCTWrap(സ്ഥിരം Ipp32f* pSrc, പൂർണ്ണസംഖ്യ srcStep, Ipp32f* pDst, പൂർണ്ണസംഖ്യ dstStep, സ്ഥിരം ശൂന്യം* pDCTSpec, Ipp8u* pBuffer)
 {
-    return fn(pSrc, srcStep, pDst, dstStep, (const SpecType*)pDCTSpec, pBuffer);
+    തിരികെ fn(pSrc, srcStep, pDst, dstStep, (സ്ഥിരം SpecType*)pDCTSpec, pBuffer);
 }
 
 template<typename SpecType, IppStatus (CV_STDCALL *fn)(SpecType*, IppiSize, Ipp8u*)>
-static IppStatus CV_STDCALL ippiDCTInitWrap(void* pDCTSpec, IppiSize roiSize, Ipp8u* pMemInit)
+സ്ഥിതം IppStatus CV_STDCALL ippiDCTInitWrap(ശൂന്യം* pDCTSpec, IppiSize roiSize, Ipp8u* pMemInit)
 {
-    return fn((SpecType*)pDCTSpec, roiSize, pMemInit);
+    തിരികെ fn((SpecType*)pDCTSpec, roiSize, pMemInit);
 }
 
-template<IppStatus (CV_STDCALL *fn)(IppiSize, int*, int*, int*)>
-static IppStatus CV_STDCALL ippiDCTGetSizeWrap(IppiSize roiSize, int* pSizeSpec, int* pSizeInit, int* pSizeBuf)
+template<IppStatus (CV_STDCALL *fn)(IppiSize, പൂർണ്ണസംഖ്യ*, പൂർണ്ണസംഖ്യ*, പൂർണ്ണസംഖ്യ*)>
+സ്ഥിതം IppStatus CV_STDCALL ippiDCTGetSizeWrap(IppiSize roiSize, പൂർണ്ണസംഖ്യ* pSizeSpec, പൂർണ്ണസംഖ്യ* pSizeInit, പൂർണ്ണസംഖ്യ* pSizeBuf)
 {
-    return fn(roiSize, pSizeSpec, pSizeInit, pSizeBuf);
+    തിരികെ fn(roiSize, pSizeSpec, pSizeInit, pSizeBuf);
 }
 
-#elif IPP_VERSION_X100 >= 700
-typedef IppStatus (CV_STDCALL * ippiDCTFunc)(const Ipp32f*, int, Ipp32f*, int, const void*, Ipp8u*);
-typedef IppStatus (CV_STDCALL * ippiDCTInitAlloc)(void**, IppiSize, IppHintAlgorithm);
-typedef IppStatus (CV_STDCALL * ippiDCTFree)(void* pDCTSpec);
-typedef IppStatus (CV_STDCALL * ippiDCTGetBufSize)(const void*, int*);
+#അല്ലെങ്കിലെങ്കിൽ IPP_VERSION_X100 >= 700
+തരനിർവചനം IppStatus (CV_STDCALL * ippiDCTFunc)(സ്ഥിരം Ipp32f*, പൂർണ്ണസംഖ്യ, Ipp32f*, പൂർണ്ണസംഖ്യ, സ്ഥിരം ശൂന്യം*, Ipp8u*);
+തരനിർവചനം IppStatus (CV_STDCALL * ippiDCTInitAlloc)(ശൂന്യം**, IppiSize, IppHintAlgorithm);
+തരനിർവചനം IppStatus (CV_STDCALL * ippiDCTFree)(ശൂന്യം* pDCTSpec);
+തരനിർവചനം IppStatus (CV_STDCALL * ippiDCTGetBufSize)(സ്ഥിരം ശൂന്യം*, പൂർണ്ണസംഖ്യ*);
 
-template<typename SpecType, IppStatus (CV_STDCALL *fn)(const Ipp32f*, int, Ipp32f*, int, const SpecType*, Ipp8u*)>
-static IppStatus CV_STDCALL ippiDCTWrap(const Ipp32f* pSrc, int srcStep, Ipp32f* pDst, int dstStep, const void* pDCTSpec, Ipp8u* pBuffer)
+template<typename SpecType, IppStatus (CV_STDCALL *fn)(സ്ഥിരം Ipp32f*, പൂർണ്ണസംഖ്യ, Ipp32f*, പൂർണ്ണസംഖ്യ, സ്ഥിരം SpecType*, Ipp8u*)>
+സ്ഥിതം IppStatus CV_STDCALL ippiDCTWrap(സ്ഥിരം Ipp32f* pSrc, പൂർണ്ണസംഖ്യ srcStep, Ipp32f* pDst, പൂർണ്ണസംഖ്യ dstStep, സ്ഥിരം ശൂന്യം* pDCTSpec, Ipp8u* pBuffer)
 {
-    return fn(pSrc, srcStep, pDst, dstStep, (const SpecType*)pDCTSpec, pBuffer);
+    തിരികെ fn(pSrc, srcStep, pDst, dstStep, (സ്ഥിരം SpecType*)pDCTSpec, pBuffer);
 }
 
 template<typename SpecType, IppStatus (CV_STDCALL *fn)(SpecType**, IppiSize, IppHintAlgorithm)>
-static IppStatus CV_STDCALL ippiDCTInitAllocWrap(void** pDCTSpec, IppiSize roiSize, IppHintAlgorithm hint)
+സ്ഥിതം IppStatus CV_STDCALL ippiDCTInitAllocWrap(ശൂന്യം** pDCTSpec, IppiSize roiSize, IppHintAlgorithm hint)
 {
-    return fn((SpecType**)pDCTSpec, roiSize, hint);
+    തിരികെ fn((SpecType**)pDCTSpec, roiSize, hint);
 }
 
 template<typename SpecType, IppStatus (CV_STDCALL *fn)(SpecType*)>
-static IppStatus CV_STDCALL ippiDCTFreeWrap(void* pDCTSpec)
+സ്ഥിതം IppStatus CV_STDCALL ippiDCTFreeWrap(ശൂന്യം* pDCTSpec)
 {
-    return fn((SpecType*)pDCTSpec);
+    തിരികെ fn((SpecType*)pDCTSpec);
 }
 
-template<typename SpecType, IppStatus (CV_STDCALL *fn)(const SpecType*, int*)>
-static IppStatus CV_STDCALL ippiDCTGetBufSizeWrap(const void* pDCTSpec, int* pSize)
+template<typename SpecType, IppStatus (CV_STDCALL *fn)(സ്ഥിരം SpecType*, പൂർണ്ണസംഖ്യ*)>
+സ്ഥിതം IppStatus CV_STDCALL ippiDCTGetBufSizeWrap(സ്ഥിരം ശൂന്യം* pDCTSpec, പൂർണ്ണസംഖ്യ* pSize)
 {
-    return fn((const SpecType*)pDCTSpec, pSize);
+    തിരികെ fn((സ്ഥിരം SpecType*)pDCTSpec, pSize);
 }
 #endif
 
-class DctIPPLoop_Invoker : public ParallelLoopBody
+വർഗ്ഗം DctIPPLoop_Invoker : പൊതു ParallelLoopBody
 {
-public:
-    DctIPPLoop_Invoker(const uchar * _src, size_t _src_step, uchar * _dst, size_t _dst_step, int _width, bool _inv, bool *_ok) :
+പൊതു:
+    DctIPPLoop_Invoker(സ്ഥിരം uchar * _src, size_t _src_step, uchar * _dst, size_t _dst_step, പൂർണ്ണസംഖ്യ _width, തർക്കം _inv, തർക്കം *_ok) :
         ParallelLoopBody(), src(_src), src_step(_src_step), dst(_dst), dst_step(_dst_step), width(_width), inv(_inv), ok(_ok)
     {
-        *ok = true;
+        *ok = സത്യം;
     }
 
-    virtual void operator()(const Range& range) const CV_OVERRIDE
+    മായാ ശൂന്യം operator()(സ്ഥിരം Range& range) സ്ഥിരം CV_OVERRIDE
     {
-        if(*ok == false)
-            return;
+        എങ്കിൽ(*ok == അസത്യം)
+            തിരികെ;
 
-#if IPP_VERSION_X100 >= 900
+#എങ്കിൽ IPP_VERSION_X100 >= 900
         IppiSize srcRoiSize = {width, 1};
 
-        int specSize    = 0;
-        int initSize    = 0;
-        int bufferSize  = 0;
+        പൂർണ്ണസംഖ്യ specSize    = 0;
+        പൂർണ്ണസംഖ്യ initSize    = 0;
+        പൂർണ്ണസംഖ്യ bufferSize  = 0;
 
-        Ipp8u* pDCTSpec = NULL;
-        Ipp8u* pBuffer  = NULL;
-        Ipp8u* pInitBuf = NULL;
+        Ipp8u* pDCTSpec = ശൂന്യ;
+        Ipp8u* pBuffer  = ശൂന്യ;
+        Ipp8u* pInitBuf = ശൂന്യ;
 
         #define IPP_RETURN              \
-            if(pDCTSpec)                \
+            എങ്കിൽ(pDCTSpec)                \
                 ippFree(pDCTSpec);      \
-            if(pBuffer)                 \
+            എങ്കിൽ(pBuffer)                 \
                 ippFree(pBuffer);       \
-            if(pInitBuf)                \
+            എങ്കിൽ(pInitBuf)                \
                 ippFree(pInitBuf);      \
-            return;
+            തിരികെ;
 
         ippiDCTFunc     ippiDCT_32f_C1R   = inv ? ippiDCTWrap<IppiDCTInvSpec_32f, ippiDCTInv_32f_C1R> : ippiDCTWrap<IppiDCTFwdSpec_32f, ippiDCTFwd_32f_C1R>;
         ippiDCTInit     ippDctInit     = inv ? ippiDCTInitWrap<IppiDCTInvSpec_32f, ippiDCTInvInit_32f> : ippiDCTInitWrap<IppiDCTFwdSpec_32f, ippiDCTFwdInit_32f>;
         ippiDCTGetSize  ippDctGetSize  = inv ? ippiDCTGetSizeWrap<ippiDCTInvGetSize_32f> : ippiDCTGetSizeWrap<ippiDCTFwdGetSize_32f>;
 
-        if(ippDctGetSize(srcRoiSize, &specSize, &initSize, &bufferSize) < 0)
+        എങ്കിൽ(ippDctGetSize(srcRoiSize, &specSize, &initSize, &bufferSize) < 0)
         {
-            *ok = false;
-            return;
+            *ok = അസത്യം;
+            തിരികെ;
         }
 
         pDCTSpec = (Ipp8u*)CV_IPP_MALLOC(specSize);
-        if(!pDCTSpec && specSize)
+        എങ്കിൽ(!pDCTSpec && specSize)
         {
-            *ok = false;
-            return;
+            *ok = അസത്യം;
+            തിരികെ;
         }
 
         pBuffer  = (Ipp8u*)CV_IPP_MALLOC(bufferSize);
-        if(!pBuffer && bufferSize)
+        എങ്കിൽ(!pBuffer && bufferSize)
         {
-            *ok = false;
+            *ok = അസത്യം;
             IPP_RETURN
         }
         pInitBuf = (Ipp8u*)CV_IPP_MALLOC(initSize);
-        if(!pInitBuf && initSize)
+        എങ്കിൽ(!pInitBuf && initSize)
         {
-            *ok = false;
+            *ok = അസത്യം;
             IPP_RETURN
         }
 
-        if(ippDctInit(pDCTSpec, srcRoiSize, pInitBuf) < 0)
+        എങ്കിൽ(ippDctInit(pDCTSpec, srcRoiSize, pInitBuf) < 0)
         {
-            *ok = false;
+            *ok = അസത്യം;
             IPP_RETURN
         }
 
-        for(int i = range.start; i < range.end; ++i)
+        വേണ്ടി(പൂർണ്ണസംഖ്യ i = range.start; i < range.end; ++i)
         {
-            if(CV_INSTRUMENT_FUN_IPP(ippiDCT_32f_C1R, (float*)(src + src_step * i), static_cast<int>(src_step), (float*)(dst + dst_step * i), static_cast<int>(dst_step), pDCTSpec, pBuffer) < 0)
+            എങ്കിൽ(CV_INSTRUMENT_FUN_IPP(ippiDCT_32f_C1R, (ദശാംശം*)(src + src_step * i), static_cast<പൂർണ്ണസംഖ്യ>(src_step), (ദശാംശം*)(dst + dst_step * i), static_cast<പൂർണ്ണസംഖ്യ>(dst_step), pDCTSpec, pBuffer) < 0)
             {
-                *ok = false;
+                *ok = അസത്യം;
                 IPP_RETURN
             }
         }
         IPP_RETURN
 #undef IPP_RETURN
-#elif IPP_VERSION_X100 >= 700
-        void* pDCTSpec;
+#അല്ലെങ്കിലെങ്കിൽ IPP_VERSION_X100 >= 700
+        ശൂന്യം* pDCTSpec;
         AutoBuffer<uchar> buf;
         uchar* pBuffer = 0;
-        int bufSize=0;
+        പൂർണ്ണസംഖ്യ bufSize=0;
 
         IppiSize srcRoiSize = {width, 1};
 
@@ -3483,122 +3483,122 @@ public:
         ippiDCTFree ippFree             = inv ? ippiDCTFreeWrap<IppiDCTInvSpec_32f, ippiDCTInvFree_32f>             : ippiDCTFreeWrap<IppiDCTFwdSpec_32f, ippiDCTFwdFree_32f>;
         ippiDCTGetBufSize ippGetBufSize = inv ? ippiDCTGetBufSizeWrap<IppiDCTInvSpec_32f, ippiDCTInvGetBufSize_32f> : ippiDCTGetBufSizeWrap<IppiDCTFwdSpec_32f, ippiDCTFwdGetBufSize_32f>;
 
-        if (ippInitAlloc(&pDCTSpec, srcRoiSize, ippAlgHintNone)>=0 && ippGetBufSize(pDCTSpec, &bufSize)>=0)
+        എങ്കിൽ (ippInitAlloc(&pDCTSpec, srcRoiSize, ippAlgHintNone)>=0 && ippGetBufSize(pDCTSpec, &bufSize)>=0)
         {
             buf.allocate( bufSize );
             pBuffer = (uchar*)buf;
 
-            for( int i = range.start; i < range.end; ++i)
+            വേണ്ടി( പൂർണ്ണസംഖ്യ i = range.start; i < range.end; ++i)
             {
-                if(ippDctFun((float*)(src + src_step * i), static_cast<int>(src_step), (float*)(dst + dst_step * i), static_cast<int>(dst_step), pDCTSpec, (Ipp8u*)pBuffer) < 0)
+                എങ്കിൽ(ippDctFun((ദശാംശം*)(src + src_step * i), static_cast<പൂർണ്ണസംഖ്യ>(src_step), (ദശാംശം*)(dst + dst_step * i), static_cast<പൂർണ്ണസംഖ്യ>(dst_step), pDCTSpec, (Ipp8u*)pBuffer) < 0)
                 {
-                    *ok = false;
-                    break;
+                    *ok = അസത്യം;
+                    നിർത്തുക;
                 }
             }
         }
-        else
-            *ok = false;
+        അല്ലെങ്കിൽ
+            *ok = അസത്യം;
 
-        if (pDCTSpec)
+        എങ്കിൽ (pDCTSpec)
             ippFree(pDCTSpec);
 
         CV_SUPPRESS_DEPRECATED_END
-#else
+#അല്ലെങ്കിൽ
         CV_UNUSED(range);
-        *ok = false;
+        *ok = അസത്യം;
 #endif
     }
 
-private:
-    const uchar * src;
+സ്വകാര്യ:
+    സ്ഥിരം uchar * src;
     size_t src_step;
     uchar * dst;
     size_t dst_step;
-    int width;
-    bool inv;
-    bool *ok;
+    പൂർണ്ണസംഖ്യ width;
+    തർക്കം inv;
+    തർക്കം *ok;
 };
 
-static bool DctIPPLoop(const uchar * src, size_t src_step, uchar * dst, size_t dst_step, int width, int height, bool inv)
+സ്ഥിതം തർക്കം DctIPPLoop(സ്ഥിരം uchar * src, size_t src_step, uchar * dst, size_t dst_step, പൂർണ്ണസംഖ്യ width, പൂർണ്ണസംഖ്യ height, തർക്കം inv)
 {
-    bool ok;
-    parallel_for_(Range(0, height), DctIPPLoop_Invoker(src, src_step, dst, dst_step, width, inv, &ok), height/(double)(1<<4) );
-    return ok;
+    തർക്കം ok;
+    parallel_for_(Range(0, height), DctIPPLoop_Invoker(src, src_step, dst, dst_step, width, inv, &ok), height/(ഇരട്ട)(1<<4) );
+    തിരികെ ok;
 }
 
-static bool ippi_DCT_32f(const uchar * src, size_t src_step, uchar * dst, size_t dst_step, int width, int height, bool inv, bool row)
+സ്ഥിതം തർക്കം ippi_DCT_32f(സ്ഥിരം uchar * src, size_t src_step, uchar * dst, size_t dst_step, പൂർണ്ണസംഖ്യ width, പൂർണ്ണസംഖ്യ height, തർക്കം inv, തർക്കം row)
 {
     CV_INSTRUMENT_REGION_IPP();
 
-    if(row)
-        return DctIPPLoop(src, src_step, dst, dst_step, width, height, inv);
-    else
+    എങ്കിൽ(row)
+        തിരികെ DctIPPLoop(src, src_step, dst, dst_step, width, height, inv);
+    അല്ലെങ്കിൽ
     {
-#if IPP_VERSION_X100 >= 900
+#എങ്കിൽ IPP_VERSION_X100 >= 900
         IppiSize srcRoiSize = {width, height};
 
-        int specSize    = 0;
-        int initSize    = 0;
-        int bufferSize  = 0;
+        പൂർണ്ണസംഖ്യ specSize    = 0;
+        പൂർണ്ണസംഖ്യ initSize    = 0;
+        പൂർണ്ണസംഖ്യ bufferSize  = 0;
 
-        Ipp8u* pDCTSpec = NULL;
-        Ipp8u* pBuffer  = NULL;
-        Ipp8u* pInitBuf = NULL;
+        Ipp8u* pDCTSpec = ശൂന്യ;
+        Ipp8u* pBuffer  = ശൂന്യ;
+        Ipp8u* pInitBuf = ശൂന്യ;
 
         #define IPP_RELEASE             \
-            if(pDCTSpec)                \
+            എങ്കിൽ(pDCTSpec)                \
                 ippFree(pDCTSpec);      \
-            if(pBuffer)                 \
+            എങ്കിൽ(pBuffer)                 \
                 ippFree(pBuffer);       \
-            if(pInitBuf)                \
+            എങ്കിൽ(pInitBuf)                \
                 ippFree(pInitBuf);      \
 
         ippiDCTFunc     ippiDCT_32f_C1R      = inv ? ippiDCTWrap<IppiDCTInvSpec_32f, ippiDCTInv_32f_C1R> : ippiDCTWrap<IppiDCTFwdSpec_32f, ippiDCTFwd_32f_C1R>;
         ippiDCTInit     ippDctInit     = inv ? ippiDCTInitWrap<IppiDCTInvSpec_32f, ippiDCTInvInit_32f> : ippiDCTInitWrap<IppiDCTFwdSpec_32f, ippiDCTFwdInit_32f>;
         ippiDCTGetSize  ippDctGetSize  = inv ? ippiDCTGetSizeWrap<ippiDCTInvGetSize_32f> : ippiDCTGetSizeWrap<ippiDCTFwdGetSize_32f>;
 
-        if(ippDctGetSize(srcRoiSize, &specSize, &initSize, &bufferSize) < 0)
-            return false;
+        എങ്കിൽ(ippDctGetSize(srcRoiSize, &specSize, &initSize, &bufferSize) < 0)
+            തിരികെ അസത്യം;
 
         pDCTSpec = (Ipp8u*)CV_IPP_MALLOC(specSize);
-        if(!pDCTSpec && specSize)
-            return false;
+        എങ്കിൽ(!pDCTSpec && specSize)
+            തിരികെ അസത്യം;
 
         pBuffer  = (Ipp8u*)CV_IPP_MALLOC(bufferSize);
-        if(!pBuffer && bufferSize)
+        എങ്കിൽ(!pBuffer && bufferSize)
         {
             IPP_RELEASE
-            return false;
+            തിരികെ അസത്യം;
         }
         pInitBuf = (Ipp8u*)CV_IPP_MALLOC(initSize);
-        if(!pInitBuf && initSize)
+        എങ്കിൽ(!pInitBuf && initSize)
         {
             IPP_RELEASE
-            return false;
+            തിരികെ അസത്യം;
         }
 
-        if(ippDctInit(pDCTSpec, srcRoiSize, pInitBuf) < 0)
+        എങ്കിൽ(ippDctInit(pDCTSpec, srcRoiSize, pInitBuf) < 0)
         {
             IPP_RELEASE
-            return false;
+            തിരികെ അസത്യം;
         }
 
-        if(CV_INSTRUMENT_FUN_IPP(ippiDCT_32f_C1R, (float*)src, static_cast<int>(src_step), (float*)dst, static_cast<int>(dst_step), pDCTSpec, pBuffer) < 0)
+        എങ്കിൽ(CV_INSTRUMENT_FUN_IPP(ippiDCT_32f_C1R, (ദശാംശം*)src, static_cast<പൂർണ്ണസംഖ്യ>(src_step), (ദശാംശം*)dst, static_cast<പൂർണ്ണസംഖ്യ>(dst_step), pDCTSpec, pBuffer) < 0)
         {
             IPP_RELEASE
-            return false;
+            തിരികെ അസത്യം;
         }
 
         IPP_RELEASE
-        return true;
+        തിരികെ സത്യം;
 #undef IPP_RELEASE
-#elif IPP_VERSION_X100 >= 700
+#അല്ലെങ്കിലെങ്കിൽ IPP_VERSION_X100 >= 700
         IppStatus status;
-        void* pDCTSpec;
+        ശൂന്യം* pDCTSpec;
         AutoBuffer<uchar> buf;
         uchar* pBuffer = 0;
-        int bufSize=0;
+        പൂർണ്ണസംഖ്യ bufSize=0;
 
         IppiSize srcRoiSize = {width, height};
 
@@ -3611,49 +3611,49 @@ static bool ippi_DCT_32f(const uchar * src, size_t src_step, uchar * dst, size_t
 
         status = ippStsErr;
 
-        if (ippInitAlloc(&pDCTSpec, srcRoiSize, ippAlgHintNone)>=0 && ippGetBufSize(pDCTSpec, &bufSize)>=0)
+        എങ്കിൽ (ippInitAlloc(&pDCTSpec, srcRoiSize, ippAlgHintNone)>=0 && ippGetBufSize(pDCTSpec, &bufSize)>=0)
         {
             buf.allocate( bufSize );
             pBuffer = (uchar*)buf;
 
-            status = ippDctFun((float*)src, static_cast<int>(src_step), (float*)dst, static_cast<int>(dst_step), pDCTSpec, (Ipp8u*)pBuffer);
+            status = ippDctFun((ദശാംശം*)src, static_cast<പൂർണ്ണസംഖ്യ>(src_step), (ദശാംശം*)dst, static_cast<പൂർണ്ണസംഖ്യ>(dst_step), pDCTSpec, (Ipp8u*)pBuffer);
         }
 
-        if (pDCTSpec)
+        എങ്കിൽ (pDCTSpec)
             ippFree(pDCTSpec);
 
         CV_SUPPRESS_DEPRECATED_END
 
-        return status >= 0;
-#else
+        തിരികെ status >= 0;
+#അല്ലെങ്കിൽ
         CV_UNUSED(src); CV_UNUSED(dst); CV_UNUSED(inv); CV_UNUSED(row);
-        return false;
+        തിരികെ അസത്യം;
 #endif
     }
 }
 }
 #endif
 
-namespace cv {
+നാമാകാശ cv {
 
-class OcvDctImpl CV_FINAL : public hal::DCT2D
+വർഗ്ഗം OcvDctImpl CV_FINAL : പൊതു hal::DCT2D
 {
-public:
+പൊതു:
     OcvDftOptions opt;
     DCTFunc dct_func;
     // per-stage plan + workspace, (re)built once per stage length, never per row
     DftPlan plan;
     AutoBuffer<uchar> ws;
-    bool isRowTransform;
-    bool isInverse;
-    bool isContinuous;
-    int start_stage;
-    int end_stage;
-    int width;
-    int height;
-    int depth;
+    തർക്കം isRowTransform;
+    തർക്കം isInverse;
+    തർക്കം isContinuous;
+    പൂർണ്ണസംഖ്യ start_stage;
+    പൂർണ്ണസംഖ്യ end_stage;
+    പൂർണ്ണസംഖ്യ width;
+    പൂർണ്ണസംഖ്യ height;
+    പൂർണ്ണസംഖ്യ depth;
 
-    void init(int _width, int _height, int _depth, int flags)
+    ശൂന്യം init(പൂർണ്ണസംഖ്യ _width, പൂർണ്ണസംഖ്യ _height, പൂർണ്ണസംഖ്യ _depth, പൂർണ്ണസംഖ്യ flags)
     {
         width = _width;
         height = _height;
@@ -3661,60 +3661,60 @@ public:
         isInverse = (flags & CV_HAL_DFT_INVERSE) != 0;
         isRowTransform = (flags & CV_HAL_DFT_ROWS) != 0;
         isContinuous = (flags & CV_HAL_DFT_IS_CONTINUOUS) != 0;
-        static DCTFunc dct_tbl[4] =
+        സ്ഥിതം DCTFunc dct_tbl[4] =
         {
-            dctWrap<float, DCT<float>>,
-            dctWrap<float, IDCT<float>>,
-            dctWrap<double, DCT<double>>,
-            dctWrap<double, IDCT<double>>
+            dctWrap<ദശാംശം, DCT<ദശാംശം>>,
+            dctWrap<ദശാംശം, IDCT<ദശാംശം>>,
+            dctWrap<ഇരട്ട, DCT<ഇരട്ട>>,
+            dctWrap<ഇരട്ട, IDCT<ഇരട്ട>>
         };
-        dct_func = dct_tbl[(int)isInverse + (depth == CV_64F)*2];
-        opt.isComplex = false;
-        opt.isInverse = false;
+        dct_func = dct_tbl[(പൂർണ്ണസംഖ്യ)isInverse + (depth == CV_64F)*2];
+        opt.isComplex = അസത്യം;
+        opt.isInverse = അസത്യം;
         opt.scale = 1.;
 
-        if (isRowTransform || height == 1 || (width == 1 && isContinuous))
+        എങ്കിൽ (isRowTransform || height == 1 || (width == 1 && isContinuous))
         {
             start_stage = end_stage = 0;
         }
-        else
+        അല്ലെങ്കിൽ
         {
             start_stage = (width == 1);
             end_stage = 1;
         }
     }
-    void apply(const uchar *src, size_t src_step, uchar *dst, size_t dst_step) CV_OVERRIDE
+    ശൂന്യം apply(സ്ഥിരം uchar *src, size_t src_step, uchar *dst, size_t dst_step) CV_OVERRIDE
     {
         CV_IPP_RUN(IPP_VERSION_X100 >= 700 && depth == CV_32F, ippi_DCT_32f(src, src_step, dst, dst_step, width, height, isInverse, isRowTransform))
 
-        int prev_len = 0;
-        int elem_size = (depth == CV_32F) ? sizeof(float) : sizeof(double);
-        const DFTKernels& kernels = getDFTKernels(depth);
+        പൂർണ്ണസംഖ്യ prev_len = 0;
+        പൂർണ്ണസംഖ്യ elem_size = (depth == CV_32F) ? വലുപ്പം(ദശാംശം) : വലുപ്പം(ഇരട്ട);
+        സ്ഥിരം DFTKernels& kernels = getDFTKernels(depth);
 
-        for(int stage = start_stage ; stage <= end_stage; stage++ )
+        വേണ്ടി(പൂർണ്ണസംഖ്യ stage = start_stage ; stage <= end_stage; stage++ )
         {
-            const uchar* sptr = src;
+            സ്ഥിരം uchar* sptr = src;
             uchar* dptr = dst;
             size_t sstep0, sstep1, dstep0, dstep1;
-            int len, count;
+            പൂർണ്ണസംഖ്യ len, എണ്ണം_2;
 
-            if( stage == 0 )
+            എങ്കിൽ( stage == 0 )
             {
                 len = width;
-                count = height;
-                if( len == 1 && !isRowTransform )
+                എണ്ണം_2 = height;
+                എങ്കിൽ( len == 1 && !isRowTransform )
                 {
                     len = height;
-                    count = 1;
+                    എണ്ണം_2 = 1;
                 }
                 sstep0 = src_step;
                 dstep0 = dst_step;
                 sstep1 = dstep1 = elem_size;
             }
-            else
+            അല്ലെങ്കിൽ
             {
                 len = height;
-                count = width;
+                എണ്ണം_2 = width;
                 sstep1 = src_step;
                 dstep1 = dst_step;
                 sstep0 = dstep0 = elem_size;
@@ -3722,11 +3722,11 @@ public:
 
             opt.n = len;
 
-            if( len != prev_len )
+            എങ്കിൽ( len != prev_len )
             {
-                if( len > 1 && (len & 1) )
+                എങ്കിൽ( len > 1 && (len & 1) )
                     CV_Error( cv::Error::StsNotImplemented, "Odd-size DCT\'s are not implemented" );
-                if( len > 1 )
+                എങ്കിൽ( len > 1 )
                 {
                     plan.build(isInverse ? DFT_KIND_IDCT : DFT_KIND_DCT, len, depth, kernels.vlanes);
                     ws.allocate(plan.ws_bytes);
@@ -3737,23 +3737,23 @@ public:
                 prev_len = len;
             }
             // otherwise reuse the plan built on the previous stage (same length, only the steps differ)
-            double nstripes = dftParallelStripes(count, len);
-            if( len > 1 && count > 1 && nstripes >= 1.5 )
+            ഇരട്ട nstripes = dftParallelStripes(എണ്ണം_2, len);
+            എങ്കിൽ( len > 1 && എണ്ണം_2 > 1 && nstripes >= 1.5 )
             {
                 // the plan is shared, every worker gets its own workspace once per range
-                auto processLines = [&](const Range& range)
+                auto process_വരികൾ = [&](സ്ഥിരം Range& range)
                 {
                     OcvDftOptions opt_ = opt;
                     AutoBuffer<uchar> ws_(plan.ws_bytes);
                     opt_.workspace = ws_.data();
-                    for( int i = range.start; i < range.end; i++ )
+                    വേണ്ടി( പൂർണ്ണസംഖ്യ i = range.start; i < range.end; i++ )
                         dct_func( opt_, sptr + i*sstep0, sstep1, dptr + i*dstep0, dstep1 );
                 };
-                parallel_for_(Range(0, count), processLines, nstripes);
+                parallel_for_(Range(0, എണ്ണം_2), process_വരികൾ, nstripes);
             }
-            else
+            അല്ലെങ്കിൽ
             {
-                for(unsigned i = 0; i < static_cast<unsigned>(count); i++ )
+                വേണ്ടി(unsigned i = 0; i < static_cast<unsigned>(എണ്ണം_2); i++ )
                     dct_func( opt, sptr + i*sstep0, sstep1, dptr + i*dstep0, dstep1 );
             }
             src = dst;
@@ -3762,78 +3762,78 @@ public:
     }
 };
 
-struct ReplacementDCT2D : public hal::DCT2D
+ഘടന ReplacementDCT2D : പൊതു hal::DCT2D
 {
     cvhalDFT *context;
-    bool isInitialized;
+    തർക്കം isInitialized;
 
-    ReplacementDCT2D() : context(0), isInitialized(false) {}
-    bool init(int width, int height, int depth, int flags)
+    ReplacementDCT2D() : context(0), isInitialized(അസത്യം) {}
+    തർക്കം init(പൂർണ്ണസംഖ്യ width, പൂർണ്ണസംഖ്യ height, പൂർണ്ണസംഖ്യ depth, പൂർണ്ണസംഖ്യ flags)
     {
-        int res = cv_hal_dctInit2D(&context, width, height, depth, flags);
+        പൂർണ്ണസംഖ്യ res = cv_hal_dctInit2D(&context, width, height, depth, flags);
         isInitialized = (res == CV_HAL_ERROR_OK);
-        return isInitialized;
+        തിരികെ isInitialized;
     }
-    void apply(const uchar *src_data, size_t src_step, uchar *dst_data, size_t dst_step) CV_OVERRIDE
+    ശൂന്യം apply(സ്ഥിരം uchar *src_data, size_t src_step, uchar *dst_data, size_t dst_step) CV_OVERRIDE
     {
-        if (isInitialized)
+        എങ്കിൽ (isInitialized)
         {
             CALL_HAL(dct2D, cv_hal_dct2D, context, src_data, src_step, dst_data, dst_step);
         }
     }
     ~ReplacementDCT2D()
     {
-        if (isInitialized)
+        എങ്കിൽ (isInitialized)
         {
             CALL_HAL(dctFree2D, cv_hal_dctFree2D, context);
         }
     }
 };
 
-namespace hal {
+നാമാകാശ hal {
 
-Ptr<DCT2D> DCT2D::create(int width, int height, int depth, int flags)
+Ptr<DCT2D> DCT2D::create(പൂർണ്ണസംഖ്യ width, പൂർണ്ണസംഖ്യ height, പൂർണ്ണസംഖ്യ depth, പൂർണ്ണസംഖ്യ flags)
 {
     {
-        ReplacementDCT2D *impl = new ReplacementDCT2D();
-        if (impl->init(width, height, depth, flags))
+        ReplacementDCT2D *impl = പുതിയ ReplacementDCT2D();
+        എങ്കിൽ (impl->init(width, height, depth, flags))
         {
-            return Ptr<DCT2D>(impl);
+            തിരികെ Ptr<DCT2D>(impl);
         }
         delete impl;
     }
     {
-        OcvDctImpl *impl = new OcvDctImpl();
+        OcvDctImpl *impl = പുതിയ OcvDctImpl();
         impl->init(width, height, depth, flags);
-        return Ptr<DCT2D>(impl);
+        തിരികെ Ptr<DCT2D>(impl);
     }
 }
 
 } // cv::hal::
 } // cv::
 
-void cv::dct( InputArray _src0, OutputArray _dst, int flags )
+ശൂന്യം cv::dct( നിവേശം_Array _src0, OutputArray _dst, പൂർണ്ണസംഖ്യ flags )
 {
     CV_INSTRUMENT_REGION();
 
     Mat src0 = _src0.getMat(), src = src0;
-    if (src.empty())
+    എങ്കിൽ (src.empty())
     {
         _dst.release();
-        return;
+        തിരികെ;
     }
-    int type = src.type(), depth = src.depth();
+    പൂർണ്ണസംഖ്യ type = src.type(), depth = src.depth();
 
     CV_Assert( type == CV_32FC1 || type == CV_64FC1 );
     _dst.create( src.rows, src.cols, type );
     Mat dst = _dst.getMat();
 
-    int f = 0;
-    if ((flags & DFT_ROWS) != 0)
+    പൂർണ്ണസംഖ്യ f = 0;
+    എങ്കിൽ ((flags & DFT_ROWS) != 0)
         f |= CV_HAL_DFT_ROWS;
-    if ((flags & DCT_INVERSE) != 0)
+    എങ്കിൽ ((flags & DCT_INVERSE) != 0)
         f |= CV_HAL_DFT_INVERSE;
-    if (src.isContinuous() && dst.isContinuous())
+    എങ്കിൽ (src.isContinuous() && dst.isContinuous())
         f |= CV_HAL_DFT_IS_CONTINUOUS;
 
     Ptr<hal::DCT2D> c = hal::DCT2D::create(src.cols, src.rows, depth, f);
@@ -3841,17 +3841,17 @@ void cv::dct( InputArray _src0, OutputArray _dst, int flags )
 }
 
 
-void cv::idct( InputArray src, OutputArray dst, int flags )
+ശൂന്യം cv::idct( നിവേശം_Array src, OutputArray dst, പൂർണ്ണസംഖ്യ flags )
 {
     CV_INSTRUMENT_REGION();
 
     dct( src, dst, flags | DCT_INVERSE );
 }
 
-namespace cv
+നാമാകാശ cv
 {
 
-static const int optimalDFTSizeTab[] = {
+സ്ഥിതം സ്ഥിരം പൂർണ്ണസംഖ്യ optimalDFTSizeTab[] = {
 1, 2, 3, 4, 5, 6, 8, 9, 10, 12, 15, 16, 18, 20, 24, 25, 27, 30, 32, 36, 40, 45, 48,
 50, 54, 60, 64, 72, 75, 80, 81, 90, 96, 100, 108, 120, 125, 128, 135, 144, 150, 160,
 162, 180, 192, 200, 216, 225, 240, 243, 250, 256, 270, 288, 300, 320, 324, 360, 375,
@@ -4034,21 +4034,21 @@ static const int optimalDFTSizeTab[] = {
 
 }
 
-int cv::getOptimalDFTSize( int size0 )
+പൂർണ്ണസംഖ്യ cv::getOptimalDFTSize( പൂർണ്ണസംഖ്യ size0 )
 {
-    int a = 0, b = sizeof(optimalDFTSizeTab)/sizeof(optimalDFTSizeTab[0]) - 1;
-    if( (unsigned)size0 >= (unsigned)optimalDFTSizeTab[b] )
-        return -1;
+    പൂർണ്ണസംഖ്യ a = 0, b = വലുപ്പം(optimalDFTSizeTab)/വലുപ്പം(optimalDFTSizeTab[0]) - 1;
+    എങ്കിൽ( (unsigned)size0 >= (unsigned)optimalDFTSizeTab[b] )
+        തിരികെ -1;
 
-    while( a < b )
+    ആകുമ്പോൾ( a < b )
     {
-        int c = (a + b) >> 1;
-        if( size0 <= optimalDFTSizeTab[c] )
+        പൂർണ്ണസംഖ്യ c = (a + b) >> 1;
+        എങ്കിൽ( size0 <= optimalDFTSizeTab[c] )
             b = c;
-        else
+        അല്ലെങ്കിൽ
             a = c+1;
     }
 
-    return optimalDFTSizeTab[b];
+    തിരികെ optimalDFTSizeTab[b];
 }
 /* End of file. */

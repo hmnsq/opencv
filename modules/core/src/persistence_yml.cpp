@@ -2,97 +2,97 @@
 // It is subject to the license terms in the LICENSE file found in the top-level directory
 // of this distribution and at http://opencv.org/license.html
 
-#include "precomp.hpp"
-#include "persistence.hpp"
+#അന്തര്ഭാവ "precomp.hpp"
+#അന്തര്ഭാവ "persistence.hpp"
 
-enum
+എണ്ണൽ
 {
     CV_YML_INDENT = 3,
     CV_YML_INDENT_FLOW = 1
 };
 
-namespace cv
+നാമാകാശ cv
 {
 
-class YAMLEmitter : public FileStorageEmitter
+വർഗ്ഗം YAMLEmitter : പൊതു FileStorageEmitter
 {
-public:
+പൊതു:
     YAMLEmitter(FileStorage_API* _fs) : fs(_fs)
     {
     }
-    virtual ~YAMLEmitter() {}
+    മായാ ~YAMLEmitter() {}
 
-    FStructData startWriteStruct(const FStructData& parent, const char* key,
-                                 int struct_flags, const char* type_name=0)
+    FStructData startWriteStruct(സ്ഥിരം FStructData& parent, സ്ഥിരം അക്ഷരം* താക്കോൽ,
+                                 പൂർണ്ണസംഖ്യ struct_flags, സ്ഥിരം അക്ഷരം* type_name=0)
     {
-        char buf[CV_FS_MAX_LEN + 1024];
-        const char* data = 0;
+        അക്ഷരം buf[CV_FS_MAX_LEN + 1024];
+        സ്ഥിരം അക്ഷരം* data = 0;
 
-        if ( type_name && *type_name == '\0' )
+        എങ്കിൽ ( type_name && *type_name == '\0' )
             type_name = 0;
 
-        struct_flags = (struct_flags & (FileNode::TYPE_MASK|FileNode::FLOW)) | FileNode::EMPTY;
-        if( !FileNode::isCollection(struct_flags))
+        struct_flags = (struct_flags & (File_കണ്ണി::TYPE_MASK|File_കണ്ണി::FLOW)) | File_കണ്ണി::EMPTY;
+        എങ്കിൽ( !File_കണ്ണി::isCollection(struct_flags))
             CV_Error( cv::Error::StsBadArg,
                      "Some collection type - FileNode::SEQ or FileNode::MAP, must be specified" );
 
-        if (type_name && memcmp(type_name, "binary", 6) == 0)
+        എങ്കിൽ (type_name && memcmp(type_name, "binary", 6) == 0)
         {
             /* reset struct flag. in order not to print ']' */
-            struct_flags = FileNode::SEQ;
-            snprintf(buf, sizeof(buf), "!!binary |");
+            struct_flags = File_കണ്ണി::SEQ;
+            snprintf(buf, വലുപ്പം(buf), "!!binary |");
             data = buf;
         }
-        else if( FileNode::isFlow(struct_flags))
+        അല്ലെങ്കിൽ എങ്കിൽ( File_കണ്ണി::isFlow(struct_flags))
         {
-            char c = FileNode::isMap(struct_flags) ? '{' : '[';
-            struct_flags |= FileNode::FLOW;
+            അക്ഷരം c = File_കണ്ണി::isMap(struct_flags) ? '{' : '[';
+            struct_flags |= File_കണ്ണി::FLOW;
 
-            if( type_name )
-                snprintf( buf, sizeof(buf), "!!%s %c", type_name, c );
-            else
+            എങ്കിൽ( type_name )
+                snprintf( buf, വലുപ്പം(buf), "!!%s %c", type_name, c );
+            അല്ലെങ്കിൽ
             {
                 buf[0] = c;
                 buf[1] = '\0';
             }
             data = buf;
         }
-        else if( type_name )
+        അല്ലെങ്കിൽ എങ്കിൽ( type_name )
         {
-            snprintf( buf, sizeof(buf), "!!%s", type_name );
+            snprintf( buf, വലുപ്പം(buf), "!!%s", type_name );
             data = buf;
         }
 
-        writeScalar( key, data );
+        writeScalar( താക്കോൽ, data );
 
         FStructData fsd;
         fsd.indent = parent.indent;
         fsd.flags = struct_flags;
 
-        if( !FileNode::isFlow(parent.flags) )
-            fsd.indent += CV_YML_INDENT + FileNode::isFlow(struct_flags);
+        എങ്കിൽ( !File_കണ്ണി::isFlow(parent.flags) )
+            fsd.indent += CV_YML_INDENT + File_കണ്ണി::isFlow(struct_flags);
 
-        return fsd;
+        തിരികെ fsd;
     }
 
-    void endWriteStruct(const FStructData& current_struct)
+    ശൂന്യം endWriteStruct(സ്ഥിരം FStructData& current_struct)
     {
-        char* ptr;
+        അക്ഷരം* ptr;
 
-        int struct_flags = current_struct.flags;
+        പൂർണ്ണസംഖ്യ struct_flags = current_struct.flags;
 
-        if( FileNode::isFlow(struct_flags) )
+        എങ്കിൽ( File_കണ്ണി::isFlow(struct_flags) )
         {
             ptr = fs->bufferPtr();
-            if( ptr > fs->bufferStart() + current_struct.indent && !FileNode::isEmptyCollection(struct_flags) )
+            എങ്കിൽ( ptr > fs->bufferStart() + current_struct.indent && !File_കണ്ണി::isEmptyCollection(struct_flags) )
                 *ptr++ = ' ';
-            *ptr++ = FileNode::isMap(struct_flags) ? '}' : ']';
+            *ptr++ = File_കണ്ണി::isMap(struct_flags) ? '}' : ']';
             fs->setBufferPtr(ptr);
         }
-        else if( FileNode::isEmptyCollection(struct_flags) )
+        അല്ലെങ്കിൽ എങ്കിൽ( File_കണ്ണി::isEmptyCollection(struct_flags) )
         {
             ptr = fs->flush();
-            memcpy( ptr, FileNode::isMap(struct_flags) ? "{}" : "[]", 2 );
+            memcpy( ptr, File_കണ്ണി::isMap(struct_flags) ? "{}" : "[]", 2 );
             fs->setBufferPtr(ptr + 2);
         }
         /*
@@ -101,179 +101,179 @@ public:
         CV_Assert( fs->struct_indent >= 0 );*/
     }
 
-    void write(const char* key, int value)
+    ശൂന്യം ലിഖ(സ്ഥിരം അക്ഷരം* താക്കോൽ, പൂർണ്ണസംഖ്യ value)
     {
-        char buf[128];
-        writeScalar( key, fs::itoa( value, buf, 10 ));
+        അക്ഷരം buf[128];
+        writeScalar( താക്കോൽ, fs::itoa( value, buf, 10 ));
     }
 
-    void write(const char* key, int64_t value)
+    ശൂന്യം ലിഖ(സ്ഥിരം അക്ഷരം* താക്കോൽ, int64_t value)
     {
-        char buf[128];
-        writeScalar( key, fs::itoa( value, buf, 10, true ));
+        അക്ഷരം buf[128];
+        writeScalar( താക്കോൽ, fs::itoa( value, buf, 10, സത്യം ));
     }
 
-    void write( const char* key, double value )
+    ശൂന്യം ലിഖ( സ്ഥിരം അക്ഷരം* താക്കോൽ, ഇരട്ട value )
     {
-        char buf[128];
-        writeScalar( key, fs::doubleToString( buf, sizeof(buf), value, false ));
+        അക്ഷരം buf[128];
+        writeScalar( താക്കോൽ, fs::doubleToString( buf, വലുപ്പം(buf), value, അസത്യം ));
     }
 
-    void write(const char* key, const char* str, bool quote)
+    ശൂന്യം ലിഖ(സ്ഥിരം അക്ഷരം* താക്കോൽ, സ്ഥിരം അക്ഷരം* str, തർക്കം quote)
     {
-        char buf[CV_FS_MAX_LEN*4+16];
-        char* data = (char*)str;
-        int i, len;
+        അക്ഷരം buf[CV_FS_MAX_LEN*4+16];
+        അക്ഷരം* data = (അക്ഷരം*)str;
+        പൂർണ്ണസംഖ്യ i, len;
 
-        if( !str )
+        എങ്കിൽ( !str )
             CV_Error( cv::Error::StsNullPtr, "Null string pointer" );
 
-        len = (int)strlen(str);
-        if( len > CV_FS_MAX_LEN )
+        len = (പൂർണ്ണസംഖ്യ)strlen(str);
+        എങ്കിൽ( len > CV_FS_MAX_LEN )
             CV_Error( cv::Error::StsBadArg, "The written string is too long" );
 
-        if( quote || len == 0 || str[0] != str[len-1] || (str[0] != '\"' && str[0] != '\'') )
+        എങ്കിൽ( quote || len == 0 || str[0] != str[len-1] || (str[0] != '\"' && str[0] != '\'') )
         {
-            int need_quote = quote || len == 0 || str[0] == ' ';
+            പൂർണ്ണസംഖ്യ need_quote = quote || len == 0 || str[0] == ' ';
             data = buf;
             *data++ = '\"';
-            for( i = 0; i < len; i++ )
+            വേണ്ടി( i = 0; i < len; i++ )
             {
-                char c = str[i];
+                അക്ഷരം c = str[i];
 
-                if( !need_quote && !cv_isalnum(c) && c != '_' && c != ' ' && c != '-' &&
+                എങ്കിൽ( !need_quote && !cv_isalnum(c) && c != '_' && c != ' ' && c != '-' &&
                    c != '(' && c != ')' && c != '/' && c != '+' && c != ';' )
                     need_quote = 1;
 
-                if( !cv_isalnum(c) && (!cv_isprint(c) || c == '\\' || c == '\'' || c == '\"') )
+                എങ്കിൽ( !cv_isalnum(c) && (!cv_isprint(c) || c == '\\' || c == '\'' || c == '\"') )
                 {
                     *data++ = '\\';
-                    if( cv_isprint(c) )
+                    എങ്കിൽ( cv_isprint(c) )
                         *data++ = c;
-                    else if( c == '\n' )
+                    അല്ലെങ്കിൽ എങ്കിൽ( c == '\n' )
                         *data++ = 'n';
-                    else if( c == '\r' )
+                    അല്ലെങ്കിൽ എങ്കിൽ( c == '\r' )
                         *data++ = 'r';
-                    else if( c == '\t' )
+                    അല്ലെങ്കിൽ എങ്കിൽ( c == '\t' )
                         *data++ = 't';
-                    else
+                    അല്ലെങ്കിൽ
                     {
-                        snprintf( data, sizeof(buf) - (data - buf), "x%02x", c );
+                        snprintf( data, വലുപ്പം(buf) - (data - buf), "x%02x", c );
                         data += 3;
                     }
                 }
-                else
+                അല്ലെങ്കിൽ
                     *data++ = c;
             }
-            if( !need_quote && (cv_isdigit(str[0]) ||
+            എങ്കിൽ( !need_quote && (cv_isdigit(str[0]) ||
                                 str[0] == '+' || str[0] == '-' || str[0] == '.' ))
                 need_quote = 1;
 
-            if( need_quote )
+            എങ്കിൽ( need_quote )
                 *data++ = '\"';
             *data++ = '\0';
             data = buf + !need_quote;
         }
 
-        writeScalar( key, data);
+        writeScalar( താക്കോൽ, data);
     }
 
-    void writeScalar(const char* key, const char* data)
+    ശൂന്യം writeScalar(സ്ഥിരം അക്ഷരം* താക്കോൽ, സ്ഥിരം അക്ഷരം* data)
     {
-        fs->check_if_write_struct_is_delayed(false);
-        if ( fs->get_state_of_writing_base64() == FileStorage_API::Uncertain )
+        fs->check_if_write_struct_is_delayed(അസത്യം);
+        എങ്കിൽ ( fs->get_state_of_writing_base64() == FileStorage_API::Uncertain )
         {
             fs->switch_to_Base64_state( FileStorage_API::NotUse );
         }
-        else if ( fs->get_state_of_writing_base64() == FileStorage_API::InUse )
+        അല്ലെങ്കിൽ എങ്കിൽ ( fs->get_state_of_writing_base64() == FileStorage_API::InUse )
         {
             CV_Error( cv::Error::StsError, "At present, output Base64 data only." );
         }
 
-        int i, keylen = 0;
-        int datalen = 0;
-        char* ptr;
+        പൂർണ്ണസംഖ്യ i, keylen = 0;
+        പൂർണ്ണസംഖ്യ datalen = 0;
+        അക്ഷരം* ptr;
 
         FStructData& current_struct = fs->getCurrentStruct();
 
-        int struct_flags = current_struct.flags;
+        പൂർണ്ണസംഖ്യ struct_flags = current_struct.flags;
 
-        if( key && key[0] == '\0' )
-            key = 0;
+        എങ്കിൽ( താക്കോൽ && താക്കോൽ[0] == '\0' )
+            താക്കോൽ = 0;
 
-        if( FileNode::isCollection(struct_flags) )
+        എങ്കിൽ( File_കണ്ണി::isCollection(struct_flags) )
         {
-            if( (FileNode::isMap(struct_flags) ^ (key != 0)) )
+            എങ്കിൽ( (File_കണ്ണി::isMap(struct_flags) ^ (താക്കോൽ != 0)) )
                 CV_Error( cv::Error::StsBadArg, "An attempt to add element without a key to a map, "
                          "or add element with key to sequence" );
         }
-        else
+        അല്ലെങ്കിൽ
         {
             fs->setNonEmpty();
-            struct_flags = FileNode::EMPTY | (key ? FileNode::MAP : FileNode::SEQ);
+            struct_flags = File_കണ്ണി::EMPTY | (താക്കോൽ ? File_കണ്ണി::MAP : File_കണ്ണി::SEQ);
         }
 
-        if( key )
+        എങ്കിൽ( താക്കോൽ )
         {
-            keylen = (int)strlen(key);
-            if( keylen == 0 )
+            keylen = (പൂർണ്ണസംഖ്യ)strlen(താക്കോൽ);
+            എങ്കിൽ( keylen == 0 )
                 CV_Error( cv::Error::StsBadArg, "The key is an empty" );
 
-            if( keylen > CV_FS_MAX_LEN )
+            എങ്കിൽ( keylen > CV_FS_MAX_LEN )
                 CV_Error( cv::Error::StsBadArg, "The key is too long" );
         }
 
-        if( data )
-            datalen = (int)strlen(data);
+        എങ്കിൽ( data )
+            datalen = (പൂർണ്ണസംഖ്യ)strlen(data);
 
-        if( FileNode::isFlow(struct_flags) )
+        എങ്കിൽ( File_കണ്ണി::isFlow(struct_flags) )
         {
             ptr = fs->bufferPtr();
-            if( !FileNode::isEmptyCollection(struct_flags) )
+            എങ്കിൽ( !File_കണ്ണി::isEmptyCollection(struct_flags) )
                 *ptr++ = ',';
-            int new_offset = (int)(ptr - fs->bufferStart()) + keylen + datalen;
-            if( new_offset > fs->wrapMargin() && new_offset - current_struct.indent > 10 )
+            പൂർണ്ണസംഖ്യ new_offset = (പൂർണ്ണസംഖ്യ)(ptr - fs->bufferStart()) + keylen + datalen;
+            എങ്കിൽ( new_offset > fs->wrapMargin() && new_offset - current_struct.indent > 10 )
             {
                 fs->setBufferPtr(ptr);
                 ptr = fs->flush();
             }
-            else
+            അല്ലെങ്കിൽ
                 *ptr++ = ' ';
         }
-        else
+        അല്ലെങ്കിൽ
         {
             ptr = fs->flush();
-            if( !FileNode::isMap(struct_flags) )
+            എങ്കിൽ( !File_കണ്ണി::isMap(struct_flags) )
             {
                 *ptr++ = '-';
-                if( data )
+                എങ്കിൽ( data )
                     *ptr++ = ' ';
             }
         }
 
-        if( key )
+        എങ്കിൽ( താക്കോൽ )
         {
-            if( !cv_isalpha(key[0]) && key[0] != '_' )
+            എങ്കിൽ( !cv_isalpha(താക്കോൽ[0]) && താക്കോൽ[0] != '_' )
                 CV_Error( cv::Error::StsBadArg, "Key must start with a letter or _" );
 
             ptr = fs->resizeWriteBuffer( ptr, keylen );
 
-            for( i = 0; i < keylen; i++ )
+            വേണ്ടി( i = 0; i < keylen; i++ )
             {
-                char c = key[i];
+                അക്ഷരം c = താക്കോൽ[i];
 
                 ptr[i] = c;
-                if( !cv_isalnum(c) && c != '-' && c != '_' && c != ' ' )
+                എങ്കിൽ( !cv_isalnum(c) && c != '-' && c != '_' && c != ' ' )
                     CV_Error( cv::Error::StsBadArg, "Key names may only contain alphanumeric characters [a-zA-Z0-9], '-', '_' and ' '" );
             }
 
             ptr += keylen;
             *ptr++ = ':';
-            if( !FileNode::isFlow(struct_flags) && data )
+            എങ്കിൽ( !File_കണ്ണി::isFlow(struct_flags) && data )
                 *ptr++ = ' ';
         }
 
-        if( data )
+        എങ്കിൽ( data )
         {
             ptr = fs->resizeWriteBuffer( ptr, datalen );
             memcpy( ptr, data, datalen );
@@ -281,40 +281,40 @@ public:
         }
 
         fs->setBufferPtr(ptr);
-        current_struct.flags &= ~FileNode::EMPTY;
+        current_struct.flags &= ~File_കണ്ണി::EMPTY;
     }
 
-    void writeComment(const char* comment, bool eol_comment)
+    ശൂന്യം writeComment(സ്ഥിരം അക്ഷരം* comment, തർക്കം eol_comment)
     {
-        if( !comment )
+        എങ്കിൽ( !comment )
             CV_Error( cv::Error::StsNullPtr, "Null comment" );
 
-        int len = (int)strlen(comment);
-        const char* eol = strchr(comment, '\n');
-        bool multiline = eol != 0;
-        char* ptr = fs->bufferPtr();
+        പൂർണ്ണസംഖ്യ len = (പൂർണ്ണസംഖ്യ)strlen(comment);
+        സ്ഥിരം അക്ഷരം* eol = strchr(comment, '\n');
+        തർക്കം multiline = eol != 0;
+        അക്ഷരം* ptr = fs->bufferPtr();
 
-        if( !eol_comment || multiline ||
+        എങ്കിൽ( !eol_comment || multiline ||
             fs->bufferEnd() - ptr < len || ptr == fs->bufferStart() )
             ptr = fs->flush();
-        else
+        അല്ലെങ്കിൽ
             *ptr++ = ' ';
 
-        while( comment )
+        ആകുമ്പോൾ( comment )
         {
             *ptr++ = '#';
             *ptr++ = ' ';
-            if( eol )
+            എങ്കിൽ( eol )
             {
-                ptr = fs->resizeWriteBuffer( ptr, (int)(eol - comment) + 1 );
+                ptr = fs->resizeWriteBuffer( ptr, (പൂർണ്ണസംഖ്യ)(eol - comment) + 1 );
                 memcpy( ptr, comment, eol - comment + 1 );
                 fs->setBufferPtr(ptr + (eol - comment));
                 comment = eol + 1;
                 eol = strchr( comment, '\n' );
             }
-            else
+            അല്ലെങ്കിൽ
             {
-                len = (int)strlen(comment);
+                len = (പൂർണ്ണസംഖ്യ)strlen(comment);
                 ptr = fs->resizeWriteBuffer( ptr, len );
                 memcpy( ptr, comment, len );
                 fs->setBufferPtr(ptr + len);
@@ -324,214 +324,214 @@ public:
         }
     }
 
-    void startNextStream()
+    ശൂന്യം startNextStream()
     {
         fs->puts( "...\n" );
         fs->puts( "---\n" );
     }
 
-protected:
+സംരക്ഷിത:
     FileStorage_API* fs;
 };
 
 
-class YAMLParser : public FileStorageParser
+വർഗ്ഗം YAMLParser : പൊതു FileStorageParser
 {
-public:
+പൊതു:
     YAMLParser(FileStorage_API* _fs) : fs(_fs)
     {
     }
 
-    virtual ~YAMLParser() {}
+    മായാ ~YAMLParser() {}
 
-    char* skipSpaces( char* ptr, int min_indent, int max_comment_indent )
+    അക്ഷരം* skipSpaces( അക്ഷരം* ptr, പൂർണ്ണസംഖ്യ min_indent, പൂർണ്ണസംഖ്യ max_comment_indent )
     {
-        if (!ptr)
+        എങ്കിൽ (!ptr)
             CV_PARSE_ERROR_CPP("Invalid input");
 
-        for(;;)
+        വേണ്ടി(;;)
         {
-            while( *ptr == ' ' )
+            ആകുമ്പോൾ( *ptr == ' ' )
                 ptr++;
-            if( *ptr == '#' )
+            എങ്കിൽ( *ptr == '#' )
             {
-                if( ptr - fs->bufferStart() > max_comment_indent )
-                    return ptr;
+                എങ്കിൽ( ptr - fs->bufferStart() > max_comment_indent )
+                    തിരികെ ptr;
                 *ptr = '\0';
             }
-            else if( cv_isprint(*ptr) )
+            അല്ലെങ്കിൽ എങ്കിൽ( cv_isprint(*ptr) )
             {
-                if( ptr - fs->bufferStart() < min_indent )
+                എങ്കിൽ( ptr - fs->bufferStart() < min_indent )
                     CV_PARSE_ERROR_CPP( "Incorrect indentation" );
-                break;
+                നിർത്തുക;
             }
-            else if( *ptr == '\0' || *ptr == '\n' || *ptr == '\r' )
+            അല്ലെങ്കിൽ എങ്കിൽ( *ptr == '\0' || *ptr == '\n' || *ptr == '\r' )
             {
                 ptr = fs->gets();
-                if( !ptr )
+                എങ്കിൽ( !ptr )
                 {
                     // emulate end of stream
                     ptr = fs->bufferStart();
                     ptr[0] = ptr[1] = ptr[2] = '.';
                     ptr[3] = '\0';
                     fs->setEof();
-                    break;
+                    നിർത്തുക;
                 }
-                else
+                അല്ലെങ്കിൽ
                 {
-                    int l = (int)strlen(ptr);
-                    if( ptr[l-1] != '\n' && ptr[l-1] != '\r' && !fs->eof() )
+                    പൂർണ്ണസംഖ്യ l = (പൂർണ്ണസംഖ്യ)strlen(ptr);
+                    എങ്കിൽ( ptr[l-1] != '\n' && ptr[l-1] != '\r' && !fs->eof() )
                         CV_PARSE_ERROR_CPP( "Too long string or a last string w/o newline" );
                 }
             }
-            else
+            അല്ലെങ്കിൽ
                 CV_PARSE_ERROR_CPP( *ptr == '\t' ? "Tabs are prohibited in YAML!" : "Invalid character" );
         }
 
-        return ptr;
+        തിരികെ ptr;
     }
 
-    bool getBase64Row(char* ptr, int indent, char* &beg, char* &end)
+    തർക്കം getBase64Row(അക്ഷരം* ptr, പൂർണ്ണസംഖ്യ indent, അക്ഷരം* &beg, അക്ഷരം* &end)
     {
-        if (!ptr)
+        എങ്കിൽ (!ptr)
             CV_PARSE_ERROR_CPP("Invalid input");
 
         beg = end = ptr = skipSpaces(ptr, 0, INT_MAX);
-        if (!ptr || !*ptr)
-            return false; // end of file
+        എങ്കിൽ (!ptr || !*ptr)
+            തിരികെ അസത്യം; // end of file
 
-        if (ptr - fs->bufferStart() != indent)
-            return false; // end of base64 data
+        എങ്കിൽ (ptr - fs->bufferStart() != indent)
+            തിരികെ അസത്യം; // end of base64 data
 
         /* find end */
-        while(cv_isprint(*ptr)) /* no check for base64 string */
+        ആകുമ്പോൾ(cv_isprint(*ptr)) /* no check for base64 string */
             ++ptr;
-        if (*ptr == '\0')
+        എങ്കിൽ (*ptr == '\0')
             CV_PARSE_ERROR_CPP("Unexpected end of line");
 
         end = ptr;
-        return true;
+        തിരികെ സത്യം;
     }
 
 
-    char* parseKey( char* ptr, FileNode& map_node, FileNode& value_placeholder )
+    അക്ഷരം* parse_താക്കോൽ( അക്ഷരം* ptr, File_കണ്ണി& map_കണ്ണി, File_കണ്ണി& മൂല്യം_placeholder )
     {
-        if (!ptr)
+        എങ്കിൽ (!ptr)
             CV_PARSE_ERROR_CPP("Invalid input");
 
-        char c;
-        char *endptr = ptr - 1, *saveptr;
+        അക്ഷരം c;
+        അക്ഷരം *endptr = ptr - 1, *saveptr;
 
-        if( *ptr == '-' )
+        എങ്കിൽ( *ptr == '-' )
             CV_PARSE_ERROR_CPP( "Key may not start with \'-\'" );
 
-        do c = *++endptr;
-        while( cv_isprint(c) && c != ':' );
+        ചെയ്യുക c = *++endptr;
+        ആകുമ്പോൾ( cv_isprint(c) && c != ':' );
 
-        if( c != ':' )
+        എങ്കിൽ( c != ':' )
             CV_PARSE_ERROR_CPP( "Missing \':\'" );
 
         saveptr = endptr + 1;
-        if( endptr == ptr )
+        എങ്കിൽ( endptr == ptr )
             CV_PARSE_ERROR_CPP( "An empty key" );
 
-        do c = *--endptr;
-        while( c == ' ' );
+        ചെയ്യുക c = *--endptr;
+        ആകുമ്പോൾ( c == ' ' );
 
         ++endptr;
 
-        value_placeholder = fs->addNode(map_node, std::string(ptr, endptr - ptr), FileNode::NONE);
+        മൂല്യം_placeholder = fs->add_കണ്ണി(map_കണ്ണി, std::string(ptr, endptr - ptr), File_കണ്ണി::NONE);
         ptr = saveptr;
 
-        return ptr;
+        തിരികെ ptr;
     }
 
-    char* parseValue( char* ptr, FileNode& node, int min_indent, bool is_parent_flow, int depth = 0 )
+    അക്ഷരം* parse_മൂല്യം( അക്ഷരം* ptr, File_കണ്ണി& കണ്ണി, പൂർണ്ണസംഖ്യ min_indent, തർക്കം is_parent_flow, പൂർണ്ണസംഖ്യ depth = 0 )
     {
-        if (!ptr)
+        എങ്കിൽ (!ptr)
             CV_PARSE_ERROR_CPP("Invalid input");
 
-        if( depth > CV_PERSISTENCE_MAX_DEPTH )
+        എങ്കിൽ( depth > CV_PERSISTENCE_MAX_DEPTH )
             CV_PARSE_ERROR_CPP("Too many nested collections");
 
-        char* endptr = 0;
-        char c = ptr[0], d = ptr[1];
-        int value_type = FileNode::NONE;
-        int len;
-        bool is_binary_string = false;
-        bool is_user = false;
+        അക്ഷരം* endptr = 0;
+        അക്ഷരം c = ptr[0], d = ptr[1];
+        പൂർണ്ണസംഖ്യ value_type = File_കണ്ണി::NONE;
+        പൂർണ്ണസംഖ്യ len;
+        തർക്കം is_ദ്വിമാന_string = അസത്യം;
+        തർക്കം is_user = അസത്യം;
 
-        if( c == '!' ) // handle explicit type specification
+        എങ്കിൽ( c == '!' ) // handle explicit type specification
         {
-            if( d == '!' || d == '^' )
+            എങ്കിൽ( d == '!' || d == '^' )
             {
                 ptr++;
-                is_user = true;
+                is_user = സത്യം;
                 //value_type |= FileNode::USER;
             }
-            if ( d == '<') //support of full type heading from YAML 1.2
+            എങ്കിൽ ( d == '<') //support of full type heading from YAML 1.2
             {
-                const char* yamlTypeHeading = "<tag:yaml.org,2002:";
-                const size_t headingLength = strlen(yamlTypeHeading);
+                സ്ഥിരം അക്ഷരം* yamlTypeHeading = "<tag:yaml.org,2002:";
+                സ്ഥിരം size_t headingLength = strlen(yamlTypeHeading);
 
-                char* typeEndPtr = ++ptr;
+                അക്ഷരം* typeEndPtr = ++ptr;
 
-                do d = *++typeEndPtr;
-                while( cv_isprint(d) && d != ' ' && d != '>' );
+                ചെയ്യുക d = *++typeEndPtr;
+                ആകുമ്പോൾ( cv_isprint(d) && d != ' ' && d != '>' );
 
-                if ( d == '>' && (size_t)(typeEndPtr - ptr) > headingLength )
+                എങ്കിൽ ( d == '>' && (size_t)(typeEndPtr - ptr) > headingLength )
                 {
-                    if ( memcmp(ptr, yamlTypeHeading, headingLength) == 0 )
+                    എങ്കിൽ ( memcmp(ptr, yamlTypeHeading, headingLength) == 0 )
                     {
                         *typeEndPtr = ' ';
                         ptr += headingLength - 1;
-                        is_user = true;
+                        is_user = സത്യം;
                         //value_type |= FileNode::USER;
                     }
                 }
             }
 
             endptr = ptr++;
-            do d = *++endptr;
-            while( cv_isprint(d) && d != ' ' );
-            len = (int)(endptr - ptr);
-            if( len == 0 )
+            ചെയ്യുക d = *++endptr;
+            ആകുമ്പോൾ( cv_isprint(d) && d != ' ' );
+            len = (പൂർണ്ണസംഖ്യ)(endptr - ptr);
+            എങ്കിൽ( len == 0 )
                 CV_PARSE_ERROR_CPP( "Empty type name" );
             d = *endptr;
             *endptr = '\0';
 
-            if( len == 3 && !is_user )
+            എങ്കിൽ( len == 3 && !is_user )
             {
-                if( memcmp( ptr, "str", 3 ) == 0 )
-                    value_type = FileNode::STRING;
-                else if( memcmp( ptr, "int", 3 ) == 0 )
-                    value_type = FileNode::INT;
-                else if( memcmp( ptr, "seq", 3 ) == 0 )
-                    value_type = FileNode::SEQ;
-                else if( memcmp( ptr, "map", 3 ) == 0 )
-                    value_type = FileNode::MAP;
+                എങ്കിൽ( memcmp( ptr, "str", 3 ) == 0 )
+                    value_type = File_കണ്ണി::STRING;
+                അല്ലെങ്കിൽ എങ്കിൽ( memcmp( ptr, "int", 3 ) == 0 )
+                    value_type = File_കണ്ണി::INT;
+                അല്ലെങ്കിൽ എങ്കിൽ( memcmp( ptr, "seq", 3 ) == 0 )
+                    value_type = File_കണ്ണി::SEQ;
+                അല്ലെങ്കിൽ എങ്കിൽ( memcmp( ptr, "map", 3 ) == 0 )
+                    value_type = File_കണ്ണി::MAP;
             }
-            else if( len == 5 && !is_user )
+            അല്ലെങ്കിൽ എങ്കിൽ( len == 5 && !is_user )
             {
-                if( memcmp( ptr, "float", 5 ) == 0 )
-                    value_type = FileNode::REAL;
+                എങ്കിൽ( memcmp( ptr, "float", 5 ) == 0 )
+                    value_type = File_കണ്ണി::REAL;
             }
-            else if (len == 6 && is_user)
+            അല്ലെങ്കിൽ എങ്കിൽ (len == 6 && is_user)
             {
-                if( memcmp( ptr, "binary", 6 ) == 0 ) {
-                    value_type = FileNode::SEQ;
-                    is_binary_string = true;
+                എങ്കിൽ( memcmp( ptr, "binary", 6 ) == 0 ) {
+                    value_type = File_കണ്ണി::SEQ;
+                    is_ദ്വിമാന_string = സത്യം;
 
                     /* for ignore '|' */
 
                     /**** operation with endptr ****/
                     *endptr = d;
 
-                    do {
+                    ചെയ്യുക {
                         d = *++endptr;
-                        if (d == '|')
-                            break;
-                    } while (d == ' ');
+                        എങ്കിൽ (d == '|')
+                            നിർത്തുക;
+                    } ആകുമ്പോൾ (d == ' ');
 
                     d = *++endptr;
                     *endptr = '\0';
@@ -540,363 +540,363 @@ public:
 
             *endptr = d;
             ptr = skipSpaces( endptr, min_indent, INT_MAX );
-            if (!ptr)
+            എങ്കിൽ (!ptr)
                 CV_PARSE_ERROR_CPP("Invalid input");
 
             c = *ptr;
 
-            if( !is_user )
+            എങ്കിൽ( !is_user )
             {
-                if (value_type == FileNode::STRING && c != '\'' && c != '\"')
-                    goto force_string;
-                if( value_type == FileNode::INT )
-                    goto force_int;
-                if( value_type == FileNode::REAL )
-                    goto force_real;
+                എങ്കിൽ (value_type == File_കണ്ണി::STRING && c != '\'' && c != '\"')
+                    പോകുക force_string;
+                എങ്കിൽ( value_type == File_കണ്ണി::INT )
+                    പോകുക force_int;
+                എങ്കിൽ( value_type == File_കണ്ണി::REAL )
+                    പോകുക force_real;
             }
         }
 
-        if (is_binary_string)
+        എങ്കിൽ (is_ദ്വിമാന_string)
         {
-            int indent = static_cast<int>(ptr - fs->bufferStart());
-            ptr = fs->parseBase64(ptr, indent, node);
+            പൂർണ്ണസംഖ്യ indent = static_cast<പൂർണ്ണസംഖ്യ>(ptr - fs->bufferStart());
+            ptr = fs->parseBase64(ptr, indent, കണ്ണി);
         }
-        else if( cv_isdigit(c) ||
+        അല്ലെങ്കിൽ എങ്കിൽ( cv_isdigit(c) ||
                 ((c == '-' || c == '+') && (cv_isdigit(d) || d == '.')) ||
                 (c == '.' && cv_isalnum(d))) // a number
         {
             endptr = ptr + (c == '-' || c == '+');
-            while( cv_isdigit(*endptr) )
+            ആകുമ്പോൾ( cv_isdigit(*endptr) )
                 endptr++;
-            if( *endptr == '.' || *endptr == 'e' )
+            എങ്കിൽ( *endptr == '.' || *endptr == 'e' )
             {
             force_real:
-                double fval = fs->strtod( ptr, &endptr );
-                node.setValue(FileNode::REAL, &fval);
+                ഇരട്ട fval = fs->strtod( ptr, &endptr );
+                കണ്ണി.set_മൂല്യം(File_കണ്ണി::REAL, &fval);
             }
-            else
+            അല്ലെങ്കിൽ
             {
             force_int:
                 int64_t ival = strtoll( ptr, &endptr, 0 );
-                node.setValue(FileNode::INT, &ival);
+                കണ്ണി.set_മൂല്യം(File_കണ്ണി::INT, &ival);
             }
 
-            if( !endptr || endptr == ptr )
+            എങ്കിൽ( !endptr || endptr == ptr )
                 CV_PARSE_ERROR_CPP( "Invalid numeric value (inconsistent explicit type specification?)" );
 
             ptr = endptr;
             CV_PERSISTENCE_CHECK_END_OF_BUFFER_BUG_CPP();
         }
-        else if( c == '\'' || c == '\"' ) // an explicit string
+        അല്ലെങ്കിൽ എങ്കിൽ( c == '\'' || c == '\"' ) // an explicit string
         {
-            if( c == '\'' )
-                for( len = 0; len < CV_FS_MAX_LEN; )
+            എങ്കിൽ( c == '\'' )
+                വേണ്ടി( len = 0; len < CV_FS_MAX_LEN; )
                 {
                     c = *++ptr;
-                    if( cv_isalnum(c) || (c != '\'' && cv_isprint(c)))
+                    എങ്കിൽ( cv_isalnum(c) || (c != '\'' && cv_isprint(c)))
                         buf[len++] = c;
-                    else if( c == '\'' )
+                    അല്ലെങ്കിൽ എങ്കിൽ( c == '\'' )
                     {
                         c = *++ptr;
-                        if( c != '\'' )
-                            break;
+                        എങ്കിൽ( c != '\'' )
+                            നിർത്തുക;
                         buf[len++] = c;
                     }
-                    else
+                    അല്ലെങ്കിൽ
                         CV_PARSE_ERROR_CPP( "Invalid character" );
                 }
-            else
-                for( len = 0; len < CV_FS_MAX_LEN; )
+            അല്ലെങ്കിൽ
+                വേണ്ടി( len = 0; len < CV_FS_MAX_LEN; )
                 {
                     c = *++ptr;
-                    if( cv_isalnum(c) || (c != '\\' && c != '\"' && cv_isprint(c)))
+                    എങ്കിൽ( cv_isalnum(c) || (c != '\\' && c != '\"' && cv_isprint(c)))
                         buf[len++] = c;
-                    else if( c == '\"' )
+                    അല്ലെങ്കിൽ എങ്കിൽ( c == '\"' )
                     {
                         ++ptr;
-                        break;
+                        നിർത്തുക;
                     }
-                    else if( c == '\\' )
+                    അല്ലെങ്കിൽ എങ്കിൽ( c == '\\' )
                     {
                         d = *++ptr;
-                        if( d == '\'' )
+                        എങ്കിൽ( d == '\'' )
                             buf[len++] = d;
-                        else if( d == '\"' || d == '\\' || d == '\'' )
+                        അല്ലെങ്കിൽ എങ്കിൽ( d == '\"' || d == '\\' || d == '\'' )
                             buf[len++] = d;
-                        else if( d == 'n' )
+                        അല്ലെങ്കിൽ എങ്കിൽ( d == 'n' )
                             buf[len++] = '\n';
-                        else if( d == 'r' )
+                        അല്ലെങ്കിൽ എങ്കിൽ( d == 'r' )
                             buf[len++] = '\r';
-                        else if( d == 't' )
+                        അല്ലെങ്കിൽ എങ്കിൽ( d == 't' )
                             buf[len++] = '\t';
-                        else if( d == 'x' || (cv_isdigit(d) && d < '8') )
+                        അല്ലെങ്കിൽ എങ്കിൽ( d == 'x' || (cv_isdigit(d) && d < '8') )
                         {
-                            int val, is_hex = d == 'x';
+                            പൂർണ്ണസംഖ്യ val, is_hex = d == 'x';
                             c = ptr[3];
                             ptr[3] = '\0';
-                            val = (int)strtol( ptr + is_hex, &endptr, is_hex ? 8 : 16 );
+                            val = (പൂർണ്ണസംഖ്യ)strtol( ptr + is_hex, &endptr, is_hex ? 8 : 16 );
                             ptr[3] = c;
-                            if( endptr == ptr + is_hex )
+                            എങ്കിൽ( endptr == ptr + is_hex )
                                 buf[len++] = 'x';
-                            else
+                            അല്ലെങ്കിൽ
                             {
-                                buf[len++] = (char)val;
+                                buf[len++] = (അക്ഷരം)val;
                                 ptr = endptr;
                             }
                         }
                     }
-                    else
+                    അല്ലെങ്കിൽ
                         CV_PARSE_ERROR_CPP( "Invalid character" );
                 }
 
-            if( len >= CV_FS_MAX_LEN )
+            എങ്കിൽ( len >= CV_FS_MAX_LEN )
                 CV_PARSE_ERROR_CPP( "Too long string literal" );
 
-            node.setValue(FileNode::STRING, buf, len);
+            കണ്ണി.set_മൂല്യം(File_കണ്ണി::STRING, buf, len);
         }
-        else if( c == '[' || c == '{' ) // collection as a flow
+        അല്ലെങ്കിൽ എങ്കിൽ( c == '[' || c == '{' ) // collection as a flow
         {
-            int new_min_indent = min_indent + !is_parent_flow;
-            int struct_type = c == '{' ? FileNode::MAP : FileNode::SEQ;
-            int nelems = 0;
+            പൂർണ്ണസംഖ്യ new_min_indent = min_indent + !is_parent_flow;
+            പൂർണ്ണസംഖ്യ struct_type = c == '{' ? File_കണ്ണി::MAP : File_കണ്ണി::SEQ;
+            പൂർണ്ണസംഖ്യ nelems = 0;
 
-            fs->convertToCollection(struct_type, node);
+            fs->convertToCollection(struct_type, കണ്ണി);
             d = c == '[' ? ']' : '}';
 
-            for( ++ptr ;; nelems++ )
+            വേണ്ടി( ++ptr ;; nelems++ )
             {
-                FileNode elem;
+                File_കണ്ണി elem;
 
                 ptr = skipSpaces( ptr, new_min_indent, INT_MAX );
-                if (!ptr)
+                എങ്കിൽ (!ptr)
                     CV_PARSE_ERROR_CPP("Invalid input");
-                if( *ptr == '}' || *ptr == ']' )
+                എങ്കിൽ( *ptr == '}' || *ptr == ']' )
                 {
-                    if( *ptr != d )
+                    എങ്കിൽ( *ptr != d )
                         CV_PARSE_ERROR_CPP( "The wrong closing bracket" );
                     ptr++;
-                    break;
+                    നിർത്തുക;
                 }
 
-                if( nelems != 0 )
+                എങ്കിൽ( nelems != 0 )
                 {
-                    if( *ptr != ',' )
+                    എങ്കിൽ( *ptr != ',' )
                         CV_PARSE_ERROR_CPP( "Missing , between the elements" );
                     ptr = skipSpaces( ptr + 1, new_min_indent, INT_MAX );
-                    if (!ptr)
+                    എങ്കിൽ (!ptr)
                         CV_PARSE_ERROR_CPP("Invalid input");
                 }
 
-                if( struct_type == FileNode::MAP )
+                എങ്കിൽ( struct_type == File_കണ്ണി::MAP )
                 {
-                    ptr = parseKey( ptr, node, elem );
+                    ptr = parse_താക്കോൽ( ptr, കണ്ണി, elem );
                     ptr = skipSpaces( ptr, new_min_indent, INT_MAX );
                 }
-                else
+                അല്ലെങ്കിൽ
                 {
-                    if( *ptr == ']' )
-                        break;
-                    elem = fs->addNode(node, std::string(), FileNode::NONE);
+                    എങ്കിൽ( *ptr == ']' )
+                        നിർത്തുക;
+                    elem = fs->add_കണ്ണി(കണ്ണി, std::string(), File_കണ്ണി::NONE);
                 }
-                ptr = parseValue( ptr, elem, new_min_indent, true, depth + 1 );
+                ptr = parse_മൂല്യം( ptr, elem, new_min_indent, സത്യം, depth + 1 );
             }
-            fs->finalizeCollection(node);
+            fs->finalizeCollection(കണ്ണി);
         }
-        else
+        അല്ലെങ്കിൽ
         {
-            int indent, struct_type;
+            പൂർണ്ണസംഖ്യ indent, struct_type;
 
-            if( is_parent_flow || c != '-' )
+            എങ്കിൽ( is_parent_flow || c != '-' )
             {
                 // implicit (one-line) string or nested block-style collection
-                if( !is_parent_flow )
+                എങ്കിൽ( !is_parent_flow )
                 {
-                    if( c == '?' )
+                    എങ്കിൽ( c == '?' )
                         CV_PARSE_ERROR_CPP( "Complex keys are not supported" );
-                    if( c == '|' || c == '>' )
+                    എങ്കിൽ( c == '|' || c == '>' )
                         CV_PARSE_ERROR_CPP( "Multi-line text literals are not supported" );
                 }
 
             force_string:
                 endptr = ptr - 1;
 
-                do c = *++endptr;
-                while( cv_isprint(c) &&
+                ചെയ്യുക c = *++endptr;
+                ആകുമ്പോൾ( cv_isprint(c) &&
                       (!is_parent_flow || (c != ',' && c != '}' && c != ']')) &&
-                      (is_parent_flow || c != ':' || value_type == FileNode::STRING));
+                      (is_parent_flow || c != ':' || value_type == File_കണ്ണി::STRING));
 
-                if( endptr == ptr )
+                എങ്കിൽ( endptr == ptr )
                     CV_PARSE_ERROR_CPP( "Invalid character" );
 
-                if( is_parent_flow || c != ':' )
+                എങ്കിൽ( is_parent_flow || c != ':' )
                 {
-                    char* str_end = endptr;
-                    do c = *--str_end;
-                    while( str_end > ptr && c == ' ' );
+                    അക്ഷരം* str_end = endptr;
+                    ചെയ്യുക c = *--str_end;
+                    ആകുമ്പോൾ( str_end > ptr && c == ' ' );
                     str_end++;
-                    if ((fs->getFormat() & FileStorage::FORMAT_MASK) != FileStorage::FORMAT_YAML_1_0)
+                    എങ്കിൽ ((fs->getFormat() & FileStorage::FORMAT_MASK) != FileStorage::FORMAT_YAML_1_0)
                     {
                         size_t llen = str_end - ptr;
-                        if (llen == 4 && memcmp(ptr, "true", 4) == 0) {
+                        എങ്കിൽ (llen == 4 && memcmp(ptr, "true", 4) == 0) {
                             int64_t ival = 1;
-                            node.setValue(FileNode::INT, &ival);
+                            കണ്ണി.set_മൂല്യം(File_കണ്ണി::INT, &ival);
                             ptr = endptr;
-                            return ptr;
+                            തിരികെ ptr;
                         }
-                        else if (llen == 5 && memcmp(ptr, "false", 5) == 0) {
+                        അല്ലെങ്കിൽ എങ്കിൽ (llen == 5 && memcmp(ptr, "false", 5) == 0) {
                             int64_t ival = 0;
-                            node.setValue(FileNode::INT, &ival);
+                            കണ്ണി.set_മൂല്യം(File_കണ്ണി::INT, &ival);
                             ptr = endptr;
-                            return ptr;
+                            തിരികെ ptr;
                         }
-                        else if (llen == 4 && memcmp(ptr, "null", 4) == 0) {
+                        അല്ലെങ്കിൽ എങ്കിൽ (llen == 4 && memcmp(ptr, "null", 4) == 0) {
                             ptr = endptr;
-                            return ptr;
+                            തിരികെ ptr;
                         }
                     }
 
-                    node.setValue(FileNode::STRING, ptr, (int)(str_end - ptr));
+                    കണ്ണി.set_മൂല്യം(File_കണ്ണി::STRING, ptr, (പൂർണ്ണസംഖ്യ)(str_end - ptr));
                     ptr = endptr;
-                    return ptr;
+                    തിരികെ ptr;
                 }
-                struct_type = FileNode::MAP;
+                struct_type = File_കണ്ണി::MAP;
             }
-            else
-                struct_type = FileNode::SEQ;
+            അല്ലെങ്കിൽ
+                struct_type = File_കണ്ണി::SEQ;
 
-            fs->convertToCollection( struct_type, node );
-            indent = (int)(ptr - fs->bufferStart());
+            fs->convertToCollection( struct_type, കണ്ണി );
+            indent = (പൂർണ്ണസംഖ്യ)(ptr - fs->bufferStart());
 
-            for(;;)
+            വേണ്ടി(;;)
             {
-                FileNode elem;
+                File_കണ്ണി elem;
 
-                if( struct_type == FileNode::MAP )
+                എങ്കിൽ( struct_type == File_കണ്ണി::MAP )
                 {
-                    ptr = parseKey( ptr, node, elem );
+                    ptr = parse_താക്കോൽ( ptr, കണ്ണി, elem );
                 }
-                else
+                അല്ലെങ്കിൽ
                 {
                     c = *ptr++;
-                    if( c != '-' )
+                    എങ്കിൽ( c != '-' )
                         CV_PARSE_ERROR_CPP( "Block sequence elements must be preceded with \'-\'" );
 
-                    elem = fs->addNode(node, std::string(), FileNode::NONE);
+                    elem = fs->add_കണ്ണി(കണ്ണി, std::string(), File_കണ്ണി::NONE);
                 }
                 ptr = skipSpaces( ptr, indent + 1, INT_MAX );
-                ptr = parseValue( ptr, elem, indent + 1, false, depth + 1 );
+                ptr = parse_മൂല്യം( ptr, elem, indent + 1, അസത്യം, depth + 1 );
                 ptr = skipSpaces( ptr, 0, INT_MAX );
-                if( ptr - fs->bufferStart() != indent )
+                എങ്കിൽ( ptr - fs->bufferStart() != indent )
                 {
-                    if( ptr - fs->bufferStart() < indent )
-                        break;
-                    else
+                    എങ്കിൽ( ptr - fs->bufferStart() < indent )
+                        നിർത്തുക;
+                    അല്ലെങ്കിൽ
                         CV_PARSE_ERROR_CPP( "Incorrect indentation" );
                 }
-                if( memcmp( ptr, "...", 3 ) == 0 )
-                    break;
+                എങ്കിൽ( memcmp( ptr, "...", 3 ) == 0 )
+                    നിർത്തുക;
             }
-            fs->finalizeCollection(node);
+            fs->finalizeCollection(കണ്ണി);
         }
 
-        return ptr;
+        തിരികെ ptr;
     }
 
-    bool parse( char* ptr )
+    തർക്കം parse( അക്ഷരം* ptr )
     {
-        if (!ptr)
+        എങ്കിൽ (!ptr)
             CV_PARSE_ERROR_CPP("Invalid input");
 
-        bool first = true;
-        bool ok = true;
-        FileNode root_collection(fs->getFS(), 0, 0);
+        തർക്കം first = സത്യം;
+        തർക്കം ok = സത്യം;
+        File_കണ്ണി വേര്_collection(fs->getFS(), 0, 0);
 
-        for(;;)
+        വേണ്ടി(;;)
         {
             // 0. skip leading comments and directives  and ...
             // 1. reach the first item
-            for(;;)
+            വേണ്ടി(;;)
             {
                 ptr = skipSpaces( ptr, 0, INT_MAX );
-                if( !ptr || *ptr == '\0' )
+                എങ്കിൽ( !ptr || *ptr == '\0' )
                 {
                     ok = !first;
-                    break;
+                    നിർത്തുക;
                 }
 
-                if( *ptr == '%' )
+                എങ്കിൽ( *ptr == '%' )
                 {
-                    if( memcmp( ptr, "%YAML", 5 ) == 0 &&
+                    എങ്കിൽ( memcmp( ptr, "%YAML", 5 ) == 0 &&
                         memcmp( ptr, "%YAML:1.", 8 ) != 0 &&
                         memcmp( ptr, "%YAML 1.", 8 ) != 0)
                     {
-                        if ((fs->getFormat() & FileStorage::FORMAT_MASK) == FileStorage::FORMAT_YAML_1_0)
+                        എങ്കിൽ ((fs->getFormat() & FileStorage::FORMAT_MASK) == FileStorage::FORMAT_YAML_1_0)
                             CV_PARSE_ERROR_CPP( "Unsupported YAML version (it must be 1.x)" );
                     }
                     *ptr = '\0';
                 }
-                else if( *ptr == '-' )
+                അല്ലെങ്കിൽ എങ്കിൽ( *ptr == '-' )
                 {
-                    if( memcmp(ptr, "---", 3) == 0 )
+                    എങ്കിൽ( memcmp(ptr, "---", 3) == 0 )
                     {
                         ptr += 3;
-                        break;
+                        നിർത്തുക;
                     }
-                    else if( first )
-                        break;
+                    അല്ലെങ്കിൽ എങ്കിൽ( first )
+                        നിർത്തുക;
                 }
-                else if( cv_isalnum(*ptr) || *ptr=='_')
+                അല്ലെങ്കിൽ എങ്കിൽ( cv_isalnum(*ptr) || *ptr=='_')
                 {
-                    if( !first )
+                    എങ്കിൽ( !first )
                         CV_PARSE_ERROR_CPP( "The YAML streams must start with '---', except the first one" );
-                    break;
+                    നിർത്തുക;
                 }
-                else if( fs->eof() )
-                    break;
-                else
+                അല്ലെങ്കിൽ എങ്കിൽ( fs->eof() )
+                    നിർത്തുക;
+                അല്ലെങ്കിൽ
                     CV_PARSE_ERROR_CPP( "Invalid or unsupported syntax" );
             }
 
-            if( ptr )
+            എങ്കിൽ( ptr )
                 ptr = skipSpaces( ptr, 0, INT_MAX );
-            if( !ptr || !ptr[0] )
-                break;
-            if( memcmp( ptr, "...", 3 ) != 0 )
+            എങ്കിൽ( !ptr || !ptr[0] )
+                നിർത്തുക;
+            എങ്കിൽ( memcmp( ptr, "...", 3 ) != 0 )
             {
                 // 2. parse the collection
-                FileNode root_node = fs->addNode(root_collection, std::string(), FileNode::NONE);
+                File_കണ്ണി വേര്_കണ്ണി = fs->add_കണ്ണി(വേര്_collection, std::string(), File_കണ്ണി::NONE);
 
-                ptr = parseValue( ptr, root_node, 0, false );
-                if( !root_node.isMap() && !root_node.isSeq() )
+                ptr = parse_മൂല്യം( ptr, വേര്_കണ്ണി, 0, അസത്യം );
+                എങ്കിൽ( !വേര്_കണ്ണി.isMap() && !വേര്_കണ്ണി.isSeq() )
                     CV_PARSE_ERROR_CPP( "Only collections as YAML streams are supported by this parser" );
 
                 // 3. parse until the end of file or next collection
                 ptr = skipSpaces( ptr, 0, INT_MAX );
-                if( !ptr )
-                    break;
+                എങ്കിൽ( !ptr )
+                    നിർത്തുക;
             }
 
-            if( fs->eof() )
-                break;
+            എങ്കിൽ( fs->eof() )
+                നിർത്തുക;
             ptr += 3;
-            first = false;
+            first = അസത്യം;
         }
 
-        return ok;
+        തിരികെ ok;
     }
 
     FileStorage_API* fs;
-    char buf[CV_FS_MAX_LEN+1024];
+    അക്ഷരം buf[CV_FS_MAX_LEN+1024];
 };
 
 Ptr<FileStorageEmitter> createYAMLEmitter(FileStorage_API* fs)
 {
-    return makePtr<YAMLEmitter>(fs);
+    തിരികെ makePtr<YAMLEmitter>(fs);
 }
 
 Ptr<FileStorageParser> createYAMLParser(FileStorage_API* fs)
 {
-    return makePtr<YAMLParser>(fs);
+    തിരികെ makePtr<YAMLParser>(fs);
 }
 
 }

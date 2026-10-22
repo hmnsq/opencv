@@ -47,141 +47,141 @@
 //
 // */
 
-#include "precomp.hpp"
-#include "opencl_kernels_core.hpp"
+#അന്തര്ഭാവ "precomp.hpp"
+#അന്തര്ഭാവ "opencl_kernels_core.hpp"
 
-namespace cv
+നാമാകാശ cv
 {
 
-template <typename T> static inline
-void scalarToRawData_(const Scalar& s, T * const buf, const int cn, const int unroll_to)
+template <typename T> സ്ഥിതം വരിയിൽ
+ശൂന്യം scalarToRawData_(സ്ഥിരം Scalar& s, T * സ്ഥിരം buf, സ്ഥിരം പൂർണ്ണസംഖ്യ cn, സ്ഥിരം പൂർണ്ണസംഖ്യ unroll_to)
 {
-    int i = 0;
-    for(; i < cn; i++)
+    പൂർണ്ണസംഖ്യ i = 0;
+    വേണ്ടി(; i < cn; i++)
         buf[i] = saturate_cast<T>(s.val[i]);
-    for(; i < unroll_to; i++)
+    വേണ്ടി(; i < unroll_to; i++)
         buf[i] = buf[i-cn];
 }
 
-void scalarToRawData(const Scalar& s, void* _buf, int type, int unroll_to)
+ശൂന്യം scalarToRawData(സ്ഥിരം Scalar& s, ശൂന്യം* _buf, പൂർണ്ണസംഖ്യ type, പൂർണ്ണസംഖ്യ unroll_to)
 {
     CV_INSTRUMENT_REGION();
 
-    const int depth = CV_MAT_DEPTH(type), cn = CV_MAT_CN(type);
+    സ്ഥിരം പൂർണ്ണസംഖ്യ depth = CV_MAT_DEPTH(type), cn = CV_MAT_CN(type);
     CV_Assert(cn <= 4);
-    switch(depth)
+    തിരഞ്ഞെടുപ്പ്(depth)
     {
-    case CV_8U:
+    അവസ്ഥ CV_8U:
         scalarToRawData_(s, (uchar*)_buf, cn, unroll_to);
-        break;
-    case CV_8S:
+        നിർത്തുക;
+    അവസ്ഥ CV_8S:
         scalarToRawData_(s, (schar*)_buf, cn, unroll_to);
-        break;
-    case CV_Bool:
-        scalarToRawData_(s, (bool*)_buf, cn, unroll_to);
-        break;
-    case CV_16U:
+        നിർത്തുക;
+    അവസ്ഥ CV_Bool:
+        scalarToRawData_(s, (തർക്കം*)_buf, cn, unroll_to);
+        നിർത്തുക;
+    അവസ്ഥ CV_16U:
         scalarToRawData_(s, (ushort*)_buf, cn, unroll_to);
-        break;
-    case CV_16S:
+        നിർത്തുക;
+    അവസ്ഥ CV_16S:
         scalarToRawData_(s, (short*)_buf, cn, unroll_to);
-        break;
-    case CV_16F:
+        നിർത്തുക;
+    അവസ്ഥ CV_16F:
         scalarToRawData_(s, (hfloat*)_buf, cn, unroll_to);
-        break;
-    case CV_16BF:
+        നിർത്തുക;
+    അവസ്ഥ CV_16BF:
         scalarToRawData_(s, (bfloat*)_buf, cn, unroll_to);
-        break;
-    case CV_8F_E4M3FN:
+        നിർത്തുക;
+    അവസ്ഥ CV_8F_E4M3FN:
         scalarToRawData_(s, (fp8_t*)_buf, cn, unroll_to);
-        break;
-    case CV_8F_E4M3FNUZ:
+        നിർത്തുക;
+    അവസ്ഥ CV_8F_E4M3FNUZ:
         scalarToRawData_(s, (fp8a_t*)_buf, cn, unroll_to);
-        break;
-    case CV_32U:
+        നിർത്തുക;
+    അവസ്ഥ CV_32U:
         scalarToRawData_(s, (unsigned*)_buf, cn, unroll_to);
-        break;
-    case CV_32S:
-        scalarToRawData_(s, (int*)_buf, cn, unroll_to);
-        break;
-    case CV_32F:
-        scalarToRawData_(s, (float*)_buf, cn, unroll_to);
-        break;
-    case CV_64U:
+        നിർത്തുക;
+    അവസ്ഥ CV_32S:
+        scalarToRawData_(s, (പൂർണ്ണസംഖ്യ*)_buf, cn, unroll_to);
+        നിർത്തുക;
+    അവസ്ഥ CV_32F:
+        scalarToRawData_(s, (ദശാംശം*)_buf, cn, unroll_to);
+        നിർത്തുക;
+    അവസ്ഥ CV_64U:
         scalarToRawData_(s, (uint64_t*)_buf, cn, unroll_to);
-        break;
-    case CV_64S:
+        നിർത്തുക;
+    അവസ്ഥ CV_64S:
         scalarToRawData_(s, (int64_t*)_buf, cn, unroll_to);
-        break;
-    case CV_64F:
-        scalarToRawData_(s, (double*)_buf, cn, unroll_to);
-        break;
-    default:
+        നിർത്തുക;
+    അവസ്ഥ CV_64F:
+        scalarToRawData_(s, (ഇരട്ട*)_buf, cn, unroll_to);
+        നിർത്തുക;
+    സ്ഥിരസ്ഥിതി:
         CV_Error(cv::Error::StsUnsupportedFormat,"");
     }
 }
 
-void convertAndUnrollScalar( const Mat& sc, int buftype, uchar* scbuf, size_t blocksize )
+ശൂന്യം convertAndUnrollScalar( സ്ഥിരം Mat& sc, പൂർണ്ണസംഖ്യ buftype, uchar* scbuf, size_t blocksize )
 {
-    int scn = (int)sc.total(), cn = CV_MAT_CN(buftype);
+    പൂർണ്ണസംഖ്യ scn = (പൂർണ്ണസംഖ്യ)sc.total(), cn = CV_MAT_CN(buftype);
     size_t esz = CV_ELEM_SIZE(buftype);
-    BinaryFunc cvtFn = getConvertFunc(sc.depth(), buftype);
+    ദ്വിമാന_Func cvtFn = getConvertFunc(sc.depth(), buftype);
     CV_Assert(cvtFn);
     cvtFn(sc.ptr(), 1, 0, 1, scbuf, 1, Size(std::min(cn, scn), 1), 0);
     // unroll the scalar
-    if( scn < cn )
+    എങ്കിൽ( scn < cn )
     {
         CV_Assert( scn == 1 );
         size_t esz1 = CV_ELEM_SIZE1(buftype);
-        for( size_t i = esz1; i < esz; i++ )
+        വേണ്ടി( size_t i = esz1; i < esz; i++ )
             scbuf[i] = scbuf[i - esz1];
     }
-    for( size_t i = esz; i < blocksize*esz; i++ )
+    വേണ്ടി( size_t i = esz; i < blocksize*esz; i++ )
         scbuf[i] = scbuf[i - esz];
 }
 
-template<typename T> static void
-copyMask_(const uchar* _src, size_t sstep, const uchar* mask, size_t mstep, uchar* _dst, size_t dstep, Size size)
+template<typename T> സ്ഥിതം ശൂന്യം
+copyMask_(സ്ഥിരം uchar* _src, size_t sstep, സ്ഥിരം uchar* mask, size_t mstep, uchar* _dst, size_t dstep, Size size)
 {
-    for( ; size.height--; mask += mstep, _src += sstep, _dst += dstep )
+    വേണ്ടി( ; size.height--; mask += mstep, _src += sstep, _dst += dstep )
     {
-        const T* src = (const T*)_src;
+        സ്ഥിരം T* src = (സ്ഥിരം T*)_src;
         T* dst = (T*)_dst;
-        int x = 0;
-         #if CV_ENABLE_UNROLLED
-        for( ; x <= size.width - 4; x += 4 )
+        പൂർണ്ണസംഖ്യ x = 0;
+         #എങ്കിൽ CV_ENABLE_UNROLLED
+        വേണ്ടി( ; x <= size.width - 4; x += 4 )
         {
-            if( mask[x] )
+            എങ്കിൽ( mask[x] )
                 dst[x] = src[x];
-            if( mask[x+1] )
+            എങ്കിൽ( mask[x+1] )
                 dst[x+1] = src[x+1];
-            if( mask[x+2] )
+            എങ്കിൽ( mask[x+2] )
                 dst[x+2] = src[x+2];
-            if( mask[x+3] )
+            എങ്കിൽ( mask[x+3] )
                 dst[x+3] = src[x+3];
         }
         #endif
-        for( ; x < size.width; x++ )
-            if( mask[x] )
+        വേണ്ടി( ; x < size.width; x++ )
+            എങ്കിൽ( mask[x] )
                 dst[x] = src[x];
     }
 }
 
-template<> void
-copyMask_<uchar>(const uchar* _src, size_t sstep, const uchar* mask, size_t mstep, uchar* _dst, size_t dstep, Size size)
+template<> ശൂന്യം
+copyMask_<uchar>(സ്ഥിരം uchar* _src, size_t sstep, സ്ഥിരം uchar* mask, size_t mstep, uchar* _dst, size_t dstep, Size size)
 {
-    CV_IPP_RUN_FAST(CV_INSTRUMENT_FUN_IPP(ippiCopy_8u_C1MR, _src, (int)sstep, _dst, (int)dstep, ippiSize(size), mask, (int)mstep) >= 0)
+    CV_IPP_RUN_FAST(CV_INSTRUMENT_FUN_IPP(ippiCopy_8u_C1MR, _src, (പൂർണ്ണസംഖ്യ)sstep, _dst, (പൂർണ്ണസംഖ്യ)dstep, ippiSize(size), mask, (പൂർണ്ണസംഖ്യ)mstep) >= 0)
 
-    for( ; size.height--; mask += mstep, _src += sstep, _dst += dstep )
+    വേണ്ടി( ; size.height--; mask += mstep, _src += sstep, _dst += dstep )
     {
-        const uchar* src = (const uchar*)_src;
+        സ്ഥിരം uchar* src = (സ്ഥിരം uchar*)_src;
         uchar* dst = (uchar*)_dst;
-        int x = 0;
-        #if (CV_SIMD || CV_SIMD_SCALABLE)
+        പൂർണ്ണസംഖ്യ x = 0;
+        #എങ്കിൽ (CV_SIMD || CV_SIMD_SCALABLE)
         {
             v_uint8 v_zero = vx_setzero_u8();
 
-            for( ; x <= size.width - VTraits<v_uint8>::vlanes(); x += VTraits<v_uint8>::vlanes() )
+            വേണ്ടി( ; x <= size.width - VTraits<v_uint8>::vlanes(); x += VTraits<v_uint8>::vlanes() )
             {
                 v_uint8 v_src   = vx_load(src  + x),
                         v_dst   = vx_load(dst  + x),
@@ -193,22 +193,22 @@ copyMask_<uchar>(const uchar* _src, size_t sstep, const uchar* mask, size_t mste
         }
         vx_cleanup();
         #endif
-        for( ; x < size.width; x++ )
-            if( mask[x] )
+        വേണ്ടി( ; x < size.width; x++ )
+            എങ്കിൽ( mask[x] )
                 dst[x] = src[x];
     }
 }
 
-template<> void
-copyMask_<Vec3b>(const uchar* _src, size_t sstep, const uchar* mask, size_t mstep, uchar* _dst, size_t dstep, Size size)
+template<> ശൂന്യം
+copyMask_<Vec3b>(സ്ഥിരം uchar* _src, size_t sstep, സ്ഥിരം uchar* mask, size_t mstep, uchar* _dst, size_t dstep, Size size)
 {
-    for( ; size.height--; mask += mstep, _src += sstep, _dst += dstep )
+    വേണ്ടി( ; size.height--; mask += mstep, _src += sstep, _dst += dstep )
     {
-        const uchar* src = (const uchar*)_src;
+        സ്ഥിരം uchar* src = (സ്ഥിരം uchar*)_src;
         uchar* dst = (uchar*)_dst;
-        int x = 0;
-#if (CV_SIMD || CV_SIMD_SCALABLE)
-        for( ; x <= size.width - VTraits<v_uint8>::vlanes(); x += VTraits<v_uint8>::vlanes() )
+        പൂർണ്ണസംഖ്യ x = 0;
+#എങ്കിൽ (CV_SIMD || CV_SIMD_SCALABLE)
+        വേണ്ടി( ; x <= size.width - VTraits<v_uint8>::vlanes(); x += VTraits<v_uint8>::vlanes() )
         {
             v_uint8 v_nmask = v_eq(vx_load(mask + x), vx_setzero_u8());
 
@@ -225,8 +225,8 @@ copyMask_<Vec3b>(const uchar* _src, size_t sstep, const uchar* mask, size_t mste
         }
         vx_cleanup();
 #endif
-        for( ; x < size.width; x++ )
-            if( mask[x] ) {
+        വേണ്ടി( ; x < size.width; x++ )
+            എങ്കിൽ( mask[x] ) {
                 dst[3 * x] = src[3 * x];
                 dst[3 * x + 1] = src[3 * x + 1];
                 dst[3 * x + 2] = src[3 * x + 2];
@@ -234,21 +234,21 @@ copyMask_<Vec3b>(const uchar* _src, size_t sstep, const uchar* mask, size_t mste
     }
 }
 
-template<> void
-copyMask_<ushort>(const uchar* _src, size_t sstep, const uchar* mask, size_t mstep, uchar* _dst, size_t dstep, Size size)
+template<> ശൂന്യം
+copyMask_<ushort>(സ്ഥിരം uchar* _src, size_t sstep, സ്ഥിരം uchar* mask, size_t mstep, uchar* _dst, size_t dstep, Size size)
 {
-    CV_IPP_RUN_FAST(CV_INSTRUMENT_FUN_IPP(ippiCopy_16u_C1MR, (const Ipp16u *)_src, (int)sstep, (Ipp16u *)_dst, (int)dstep, ippiSize(size), mask, (int)mstep) >= 0)
+    CV_IPP_RUN_FAST(CV_INSTRUMENT_FUN_IPP(ippiCopy_16u_C1MR, (സ്ഥിരം Ipp16u *)_src, (പൂർണ്ണസംഖ്യ)sstep, (Ipp16u *)_dst, (പൂർണ്ണസംഖ്യ)dstep, ippiSize(size), mask, (പൂർണ്ണസംഖ്യ)mstep) >= 0)
 
-    for( ; size.height--; mask += mstep, _src += sstep, _dst += dstep )
+    വേണ്ടി( ; size.height--; mask += mstep, _src += sstep, _dst += dstep )
     {
-        const ushort* src = (const ushort*)_src;
+        സ്ഥിരം ushort* src = (സ്ഥിരം ushort*)_src;
         ushort* dst = (ushort*)_dst;
-        int x = 0;
-        #if (CV_SIMD || CV_SIMD_SCALABLE)
+        പൂർണ്ണസംഖ്യ x = 0;
+        #എങ്കിൽ (CV_SIMD || CV_SIMD_SCALABLE)
         {
             v_uint8 v_zero = vx_setzero_u8();
 
-            for( ; x <= size.width - VTraits<v_uint8>::vlanes(); x += VTraits<v_uint8>::vlanes() )
+            വേണ്ടി( ; x <= size.width - VTraits<v_uint8>::vlanes(); x += VTraits<v_uint8>::vlanes() )
             {
                 v_uint16 v_src1 = vx_load(src + x), v_src2 = vx_load(src + x + VTraits<v_uint16>::vlanes()),
                          v_dst1 = vx_load(dst + x), v_dst2 = vx_load(dst + x + VTraits<v_uint16>::vlanes());
@@ -265,22 +265,22 @@ copyMask_<ushort>(const uchar* _src, size_t sstep, const uchar* mask, size_t mst
         }
         vx_cleanup();
         #endif
-        for( ; x < size.width; x++ )
-            if( mask[x] )
+        വേണ്ടി( ; x < size.width; x++ )
+            എങ്കിൽ( mask[x] )
                 dst[x] = src[x];
     }
 }
 
-template<> void
-copyMask_<Vec3s>(const uchar* _src, size_t sstep, const uchar* mask, size_t mstep, uchar* _dst, size_t dstep, Size size)
+template<> ശൂന്യം
+copyMask_<Vec3s>(സ്ഥിരം uchar* _src, size_t sstep, സ്ഥിരം uchar* mask, size_t mstep, uchar* _dst, size_t dstep, Size size)
 {
-    for( ; size.height--; mask += mstep, _src += sstep, _dst += dstep )
+    വേണ്ടി( ; size.height--; mask += mstep, _src += sstep, _dst += dstep )
     {
-        const ushort* src = (const ushort*)_src;
+        സ്ഥിരം ushort* src = (സ്ഥിരം ushort*)_src;
         ushort* dst = (ushort*)_dst;
-        int x = 0;
-#if (CV_SIMD || CV_SIMD_SCALABLE)
-        for( ; x <= size.width - VTraits<v_uint8>::vlanes(); x += VTraits<v_uint8>::vlanes() )
+        പൂർണ്ണസംഖ്യ x = 0;
+#എങ്കിൽ (CV_SIMD || CV_SIMD_SCALABLE)
+        വേണ്ടി( ; x <= size.width - VTraits<v_uint8>::vlanes(); x += VTraits<v_uint8>::vlanes() )
         {
             v_uint8 v_nmask = v_eq(vx_load(mask + x), vx_setzero_u8());
             v_uint8 v_nmask0, v_nmask1;
@@ -307,8 +307,8 @@ copyMask_<Vec3s>(const uchar* _src, size_t sstep, const uchar* mask, size_t mste
         }
         vx_cleanup();
 #endif
-        for( ; x < size.width; x++ )
-            if( mask[x] ) {
+        വേണ്ടി( ; x < size.width; x++ )
+            എങ്കിൽ( mask[x] ) {
                 dst[3 * x] = src[3 * x];
                 dst[3 * x + 1] = src[3 * x + 1];
                 dst[3 * x + 2] = src[3 * x + 2];
@@ -316,16 +316,16 @@ copyMask_<Vec3s>(const uchar* _src, size_t sstep, const uchar* mask, size_t mste
     }
 }
 
-template<> void
-copyMask_<int>(const uchar* _src, size_t sstep, const uchar* mask, size_t mstep, uchar* _dst, size_t dstep, Size size)
+template<> ശൂന്യം
+copyMask_<പൂർണ്ണസംഖ്യ>(സ്ഥിരം uchar* _src, size_t sstep, സ്ഥിരം uchar* mask, size_t mstep, uchar* _dst, size_t dstep, Size size)
 {
-    for( ; size.height--; mask += mstep, _src += sstep, _dst += dstep )
+    വേണ്ടി( ; size.height--; mask += mstep, _src += sstep, _dst += dstep )
     {
-        const int* src = (const int*)_src;
-        int* dst = (int*)_dst;
-        int x = 0;
-#if (CV_SIMD || CV_SIMD_SCALABLE)
-        for (; x <= size.width - VTraits<v_uint8>::vlanes(); x += VTraits<v_uint8>::vlanes())
+        സ്ഥിരം പൂർണ്ണസംഖ്യ* src = (സ്ഥിരം പൂർണ്ണസംഖ്യ*)_src;
+        പൂർണ്ണസംഖ്യ* dst = (പൂർണ്ണസംഖ്യ*)_dst;
+        പൂർണ്ണസംഖ്യ x = 0;
+#എങ്കിൽ (CV_SIMD || CV_SIMD_SCALABLE)
+        വേണ്ടി (; x <= size.width - VTraits<v_uint8>::vlanes(); x += VTraits<v_uint8>::vlanes())
         {
             v_int32 v_src0 = vx_load(src + x), v_dst0 = vx_load(dst + x);
             v_int32 v_src1 = vx_load(src + x +     VTraits<v_int32>::vlanes()), v_dst1 = vx_load(dst + x +     VTraits<v_int32>::vlanes());
@@ -351,26 +351,26 @@ copyMask_<int>(const uchar* _src, size_t sstep, const uchar* mask, size_t mstep,
         }
         vx_cleanup();
 #endif
-        for (; x < size.width; x++)
-            if ( mask[x] )
+        വേണ്ടി (; x < size.width; x++)
+            എങ്കിൽ ( mask[x] )
                 dst[x] = src[x];
     }
 }
 
-static void
-copyMaskGeneric(const uchar* _src, size_t sstep, const uchar* mask, size_t mstep, uchar* _dst, size_t dstep, Size size, void* _esz)
+സ്ഥിതം ശൂന്യം
+copyMaskGeneric(സ്ഥിരം uchar* _src, size_t sstep, സ്ഥിരം uchar* mask, size_t mstep, uchar* _dst, size_t dstep, Size size, ശൂന്യം* _esz)
 {
     size_t k, esz = *(size_t*)_esz;
-    for( ; size.height--; mask += mstep, _src += sstep, _dst += dstep )
+    വേണ്ടി( ; size.height--; mask += mstep, _src += sstep, _dst += dstep )
     {
-        const uchar* src = _src;
+        സ്ഥിരം uchar* src = _src;
         uchar* dst = _dst;
-        int x = 0;
-        for( ; x < size.width; x++, src += esz, dst += esz )
+        പൂർണ്ണസംഖ്യ x = 0;
+        വേണ്ടി( ; x < size.width; x++, src += esz, dst += esz )
         {
-            if( !mask[x] )
-                continue;
-            for( k = 0; k < esz; k++ )
+            എങ്കിൽ( !mask[x] )
+                തുടരുക;
+            വേണ്ടി( k = 0; k < esz; k++ )
                 dst[k] = src[k];
         }
     }
@@ -378,46 +378,46 @@ copyMaskGeneric(const uchar* _src, size_t sstep, const uchar* mask, size_t mstep
 
 
 #define DEF_COPY_MASK(suffix, type) \
-static void copyMask##suffix(const uchar* src, size_t sstep, const uchar* mask, size_t mstep, \
-                             uchar* dst, size_t dstep, Size size, void*) \
+സ്ഥിതം ശൂന്യം copyMask##suffix(സ്ഥിരം uchar* src, size_t sstep, സ്ഥിരം uchar* mask, size_t mstep, \
+                             uchar* dst, size_t dstep, Size size, ശൂന്യം*) \
 { \
     copyMask_<type>(src, sstep, mask, mstep, dst, dstep, size); \
 }
 
-#if defined HAVE_IPP
+#എങ്കിൽ defined HAVE_IPP
 #define DEF_COPY_MASK_F(suffix, type, ippfavor, ipptype) \
-static void copyMask##suffix(const uchar* src, size_t sstep, const uchar* mask, size_t mstep, \
-                             uchar* dst, size_t dstep, Size size, void*) \
+സ്ഥിതം ശൂന്യം copyMask##suffix(സ്ഥിരം uchar* src, size_t sstep, സ്ഥിരം uchar* mask, size_t mstep, \
+                             uchar* dst, size_t dstep, Size size, ശൂന്യം*) \
 { \
-    CV_IPP_RUN_FAST(CV_INSTRUMENT_FUN_IPP(ippiCopy_##ippfavor, (const ipptype *)src, (int)sstep, (ipptype *)dst, (int)dstep, ippiSize(size), (const Ipp8u *)mask, (int)mstep) >= 0)\
+    CV_IPP_RUN_FAST(CV_INSTRUMENT_FUN_IPP(ippiCopy_##ippfavor, (സ്ഥിരം ipptype *)src, (പൂർണ്ണസംഖ്യ)sstep, (ipptype *)dst, (പൂർണ്ണസംഖ്യ)dstep, ippiSize(size), (സ്ഥിരം Ipp8u *)mask, (പൂർണ്ണസംഖ്യ)mstep) >= 0)\
     copyMask_<type>(src, sstep, mask, mstep, dst, dstep, size); \
 }
-#else
+#അല്ലെങ്കിൽ
 #define DEF_COPY_MASK_F(suffix, type, ippfavor, ipptype) \
-static void copyMask##suffix(const uchar* src, size_t sstep, const uchar* mask, size_t mstep, \
-                             uchar* dst, size_t dstep, Size size, void*) \
+സ്ഥിതം ശൂന്യം copyMask##suffix(സ്ഥിരം uchar* src, size_t sstep, സ്ഥിരം uchar* mask, size_t mstep, \
+                             uchar* dst, size_t dstep, Size size, ശൂന്യം*) \
 { \
     copyMask_<type>(src, sstep, mask, mstep, dst, dstep, size); \
 }
 #endif
 
-#if IPP_VERSION_X100 == 901 // bug in IPP 9.0.1
+#എങ്കിൽ IPP_VERSION_X100 == 901 // bug in IPP 9.0.1
 DEF_COPY_MASK(32sC3, Vec3i)
 DEF_COPY_MASK(8uC3, Vec3b)
-#else
+#അല്ലെങ്കിൽ
 DEF_COPY_MASK_F(8uC3, Vec3b, 8u_C3MR, Ipp8u)
 DEF_COPY_MASK_F(32sC3, Vec3i, 32s_C3MR, Ipp32s)
 #endif
 DEF_COPY_MASK(8u, uchar)
 DEF_COPY_MASK(16u, ushort)
-DEF_COPY_MASK_F(32s, int, 32s_C1MR, Ipp32s)
+DEF_COPY_MASK_F(32s, പൂർണ്ണസംഖ്യ, 32s_C1MR, Ipp32s)
 DEF_COPY_MASK_F(16uC3, Vec3s, 16u_C3MR, Ipp16u)
 DEF_COPY_MASK(32sC2, Vec2i)
 DEF_COPY_MASK_F(32sC4, Vec4i, 32s_C4MR, Ipp32s)
 DEF_COPY_MASK(32sC6, Vec6i)
 DEF_COPY_MASK(32sC8, Vec8i)
 
-BinaryFunc copyMaskTab[] =
+ദ്വിമാന_Func copyMaskTab[] =
 {
     0,
     copyMask8u,
@@ -438,162 +438,162 @@ BinaryFunc copyMaskTab[] =
     copyMask32sC8
 };
 
-BinaryFunc getCopyMaskFunc(size_t esz)
+ദ്വിമാന_Func getCopyMaskFunc(size_t esz)
 {
-    return esz <= 32 && copyMaskTab[esz] ? copyMaskTab[esz] : copyMaskGeneric;
+    തിരികെ esz <= 32 && copyMaskTab[esz] ? copyMaskTab[esz] : copyMaskGeneric;
 }
 
 /* dst = src */
-void Mat::copyTo( OutputArray _dst ) const
+ശൂന്യം Mat::copyTo( OutputArray _dst ) സ്ഥിരം
 {
     CV_INSTRUMENT_REGION();
 
 #ifdef HAVE_CUDA
-    if (_dst.isGpuMat())
+    എങ്കിൽ (_dst.isGpuMat())
     {
-        _dst.getGpuMat().upload(*this);
-        return;
+        _dst.getGpuMat().upload(*ഇത്);
+        തിരികെ;
     }
 #endif
 
-    int stype = type();
-    int dtype = _dst.type();
-    if( _dst.fixedType() && dtype != stype )
+    പൂർണ്ണസംഖ്യ stype = type();
+    പൂർണ്ണസംഖ്യ dtype = _dst.type();
+    എങ്കിൽ( _dst.fixedType() && dtype != stype )
     {
         CV_Assert( CV_MAT_CN(stype) == CV_MAT_CN(dtype) );
         convertTo( _dst, dtype );
-        return;
+        തിരികെ;
     }
 
-    if( dims == 0 && empty() )
+    എങ്കിൽ( dims == 0 && empty() )
     {
         _dst.release();
-        void* obj = _dst.getObj();
-        if (_dst.isMat())
+        ശൂന്യം* obj = _dst.getObj();
+        എങ്കിൽ (_dst.isMat())
             reinterpret_cast<Mat*>(obj)->flags = Mat::MAGIC_VAL | Mat::CONTINUOUS_FLAG | stype;
-        else if (_dst.isUMat())
+        അല്ലെങ്കിൽ എങ്കിൽ (_dst.isUMat())
             reinterpret_cast<UMat*>(obj)->flags = UMat::MAGIC_VAL | UMat::CONTINUOUS_FLAG | stype;
-        else if (_dst.isGpuMat())
+        അല്ലെങ്കിൽ എങ്കിൽ (_dst.isGpuMat())
             reinterpret_cast<cuda::GpuMat*>(obj)->flags = stype;
-        return;
+        തിരികെ;
     }
 
-    bool allowTransposed = dims == 1 ||
-        _dst.kind() == _InputArray::STD_VECTOR ||
+    തർക്കം allowTransposed = dims == 1 ||
+        _dst.kind() == നിവേശം_Array_2::STD_VECTOR ||
         (_dst.fixedSize() && _dst.dims() == 1);
-    if( _dst.isUMat() )
+    എങ്കിൽ( _dst.isUMat() )
     {
         _dst.create( dims, size.p, stype, -1, allowTransposed );
-        if (empty())
-            return;
+        എങ്കിൽ (empty())
+            തിരികെ;
         UMat dst = _dst.getUMat();
-        CV_Assert(dst.u != NULL);
+        CV_Assert(dst.u != ശൂന്യ);
         size_t i, sz[CV_MAX_DIM] = {1}, dstofs[CV_MAX_DIM] = {0}, esz = CV_ELEM_SIZE(stype);
         CV_Assert(dims >= 0 && dims < CV_MAX_DIM);
-        for( i = 0; i < (size_t)dims; i++ )
+        വേണ്ടി( i = 0; i < (size_t)dims; i++ )
             sz[i] = size.p[i];
-        int lastdim = dims >= 1 ? dims-1 : 0;
+        പൂർണ്ണസംഖ്യ lastdim = dims >= 1 ? dims-1 : 0;
         sz[lastdim] *= esz;
         dst.ndoffset(dstofs);
         dstofs[lastdim] *= esz;
         dst.u->currAllocator->upload(dst.u, data, std::max(dims, 1), sz, dstofs, dst.step.p, step.p);
-        return;
+        തിരികെ;
     }
 
-    if( dims <= 2 )
+    എങ്കിൽ( dims <= 2 )
     {
         _dst.create( dims, size.p, stype, -1, allowTransposed );
         Mat dst = _dst.getMat();
-        if( data == dst.data )
-            return;
+        എങ്കിൽ( data == dst.data )
+            തിരികെ;
 
-        if( rows > 0 && cols > 0 )
+        എങ്കിൽ( rows > 0 && cols > 0 )
         {
-            Mat src = *this;
-            Size sz = getContinuousSize2D(src, dst, (int)elemSize());
+            Mat src = *ഇത്;
+            Size sz = getContinuousSize2D(src, dst, (പൂർണ്ണസംഖ്യ)elemSize());
             CV_CheckGE(sz.width, 0, "");
 
-            const uchar* sptr = src.data;
+            സ്ഥിരം uchar* sptr = src.data;
             uchar* dptr = dst.data;
 
-#if IPP_VERSION_X100 >= 201700
-            CV_IPP_RUN_FAST(CV_INSTRUMENT_FUN_IPP(ippiCopy_8u_C1R_L, sptr, (int)src.step, dptr, (int)dst.step, ippiSizeL(sz.width, sz.height)) >= 0)
+#എങ്കിൽ IPP_VERSION_X100 >= 201700
+            CV_IPP_RUN_FAST(CV_INSTRUMENT_FUN_IPP(ippiCopy_8u_C1R_L, sptr, (പൂർണ്ണസംഖ്യ)src.step, dptr, (പൂർണ്ണസംഖ്യ)dst.step, ippiSizeL(sz.width, sz.height)) >= 0)
 #endif
 
-            for (; sz.height--; sptr += src.step, dptr += dst.step)
+            വേണ്ടി (; sz.height--; sptr += src.step, dptr += dst.step)
                 memcpy(dptr, sptr, sz.width);
         }
-        return;
+        തിരികെ;
     }
 
     _dst.create( size, stype );
     Mat dst = _dst.getMat();
-    if( data == dst.data )
-        return;
+    എങ്കിൽ( data == dst.data )
+        തിരികെ;
 
-    if( total() != 0 )
+    എങ്കിൽ( total() != 0 )
     {
-        const Mat* arrays[] = { this, &dst };
+        സ്ഥിരം Mat* arrays[] = { ഇത്, &dst };
         uchar* ptrs[2] = {};
         NAryMatIterator it(arrays, ptrs, 2);
         size_t sz = it.size*elemSize();
 
-        for( size_t i = 0; i < it.nplanes; i++, ++it )
+        വേണ്ടി( size_t i = 0; i < it.nplanes; i++, ++it )
             memcpy(ptrs[1], ptrs[0], sz);
     }
 }
 
 #ifdef HAVE_IPP
-static bool ipp_copyTo(const Mat &src, Mat &dst, const Mat &mask)
+സ്ഥിതം തർക്കം ipp_copyTo(സ്ഥിരം Mat &src, Mat &dst, സ്ഥിരം Mat &mask)
 {
 #ifdef HAVE_IPP_IW_LL
     CV_INSTRUMENT_REGION_IPP();
 
-    if(mask.channels() > 1 || mask.depth() != CV_8U)
-        return false;
+    എങ്കിൽ(mask.channels() > 1 || mask.depth() != CV_8U)
+        തിരികെ അസത്യം;
 
-    if (src.dims <= 2)
+    എങ്കിൽ (src.dims <= 2)
     {
         IppiSize size = ippiSize(src.size());
-        return CV_INSTRUMENT_FUN_IPP(llwiCopyMask, src.ptr(), (int)src.step, dst.ptr(), (int)dst.step, size, (int)src.elemSize1(), src.channels(), mask.ptr(), (int)mask.step) >= 0;
+        തിരികെ CV_INSTRUMENT_FUN_IPP(llwiCopyMask, src.ptr(), (പൂർണ്ണസംഖ്യ)src.step, dst.ptr(), (പൂർണ്ണസംഖ്യ)dst.step, size, (പൂർണ്ണസംഖ്യ)src.elemSize1(), src.channels(), mask.ptr(), (പൂർണ്ണസംഖ്യ)mask.step) >= 0;
     }
-    else
+    അല്ലെങ്കിൽ
     {
-        const Mat      *arrays[] = {&src, &dst, &mask, NULL};
-        uchar          *ptrs[3]  = {NULL};
+        സ്ഥിരം Mat      *arrays[] = {&src, &dst, &mask, ശൂന്യ};
+        uchar          *ptrs[3]  = {ശൂന്യ};
         NAryMatIterator it(arrays, ptrs);
 
         IppiSize size = ippiSize(it.size, 1);
 
-        for (size_t i = 0; i < it.nplanes; i++, ++it)
+        വേണ്ടി (size_t i = 0; i < it.nplanes; i++, ++it)
         {
-            if(CV_INSTRUMENT_FUN_IPP(llwiCopyMask, ptrs[0], 0, ptrs[1], 0, size, (int)src.elemSize1(), src.channels(), ptrs[2], 0) < 0)
-                return false;
+            എങ്കിൽ(CV_INSTRUMENT_FUN_IPP(llwiCopyMask, ptrs[0], 0, ptrs[1], 0, size, (പൂർണ്ണസംഖ്യ)src.elemSize1(), src.channels(), ptrs[2], 0) < 0)
+                തിരികെ അസത്യം;
         }
-        return true;
+        തിരികെ സത്യം;
     }
-#else
+#അല്ലെങ്കിൽ
     CV_UNUSED(src); CV_UNUSED(dst); CV_UNUSED(mask);
-    return false;
+    തിരികെ അസത്യം;
 #endif
 }
 #endif
 
-void Mat::copyTo( OutputArray _dst, InputArray _mask ) const
+ശൂന്യം Mat::copyTo( OutputArray _dst, നിവേശം_Array _mask ) സ്ഥിരം
 {
     CV_INSTRUMENT_REGION();
 
     Mat mask = _mask.getMat();
-    if( !mask.data )
+    എങ്കിൽ( !mask.data )
     {
         copyTo(_dst);
-        return;
+        തിരികെ;
     }
 
-    int cn = channels(), mcn = mask.channels();
+    പൂർണ്ണസംഖ്യ cn = channels(), mcn = mask.channels();
     CV_Assert( (mask.depth() == CV_8U || mask.depth() == CV_8S || mask.depth() == CV_Bool) && (mcn == 1 || mcn == cn) );
-    bool colorMask = mcn > 1;
-    if( dims <= 2 )
+    തർക്കം colorMask = mcn > 1;
+    എങ്കിൽ( dims <= 2 )
     {
         CV_Assert( size() == mask.size() );
     }
@@ -604,7 +604,7 @@ void Mat::copyTo( OutputArray _dst, InputArray _mask ) const
         _dst.create(size, type()); // TODO Prohibit 'dst' re-creation, user should pass it explicitly with correct size/type or empty
         dst = _dst.getMat();
 
-        if (dst.data != dst0.data) // re-allocation happened
+        എങ്കിൽ (dst.data != dst0.data) // re-allocation happened
         {
 #ifdef OPENCV_FUTURE
             CV_Assert(dst0.empty() &&
@@ -614,42 +614,42 @@ void Mat::copyTo( OutputArray _dst, InputArray _mask ) const
         }
     }
 
-    CV_IPP_RUN_FAST(ipp_copyTo(*this, dst, mask))
-    if ( this->dims <= 2 ) {
-        if ( this->size() == dst.size() && this->size() == dst.size() ) {
-            CALL_HAL(copyToMask, cv_hal_copyToMasked, this->data, this->step, dst.data, dst.step, this->cols, this->rows, this->type(), mask.data, mask.step, mask.type());
+    CV_IPP_RUN_FAST(ipp_copyTo(*ഇത്, dst, mask))
+    എങ്കിൽ ( ഇത്->dims <= 2 ) {
+        എങ്കിൽ ( ഇത്->size() == dst.size() && ഇത്->size() == dst.size() ) {
+            CALL_HAL(copyToMask, cv_hal_copyToMasked, ഇത്->data, ഇത്->step, dst.data, dst.step, ഇത്->cols, ഇത്->rows, ഇത്->type(), mask.data, mask.step, mask.type());
         }
     }
-    else if ( this->isContinuous() && dst.isContinuous() && mask.isContinuous() )
+    അല്ലെങ്കിൽ എങ്കിൽ ( ഇത്->isContinuous() && dst.isContinuous() && mask.isContinuous() )
     {
-        size_t sz = this->total();
-        if (sz < INT_MAX) {
-            CALL_HAL(copyToMask, cv_hal_copyToMasked, this->data, 0, dst.data, 0, (int)sz, 1, this->type(), mask.data, 0, mask.type());
+        size_t sz = ഇത്->total();
+        എങ്കിൽ (sz < INT_MAX) {
+            CALL_HAL(copyToMask, cv_hal_copyToMasked, ഇത്->data, 0, dst.data, 0, (പൂർണ്ണസംഖ്യ)sz, 1, ഇത്->type(), mask.data, 0, mask.type());
         }
     }
 
     size_t esz = colorMask ? elemSize1() : elemSize();
-    BinaryFunc copymask = getCopyMaskFunc(esz);
+    ദ്വിമാന_Func copymask = getCopyMaskFunc(esz);
 
-    if( dims <= 2 )
+    എങ്കിൽ( dims <= 2 )
     {
-        Mat src = *this;
+        Mat src = *ഇത്;
         Size sz = getContinuousSize2D(src, dst, mask, mcn);
         copymask(src.data, src.step, mask.data, mask.step, dst.data, dst.step, sz, &esz);
-        return;
+        തിരികെ;
     }
 
-    const Mat* arrays[] = { this, &dst, &mask, 0 };
+    സ്ഥിരം Mat* arrays[] = { ഇത്, &dst, &mask, 0 };
     uchar* ptrs[3] = {};
     NAryMatIterator it(arrays, ptrs);
-    Size sz((int)(it.size*mcn), 1);
+    Size sz((പൂർണ്ണസംഖ്യ)(it.size*mcn), 1);
 
-    for( size_t i = 0; i < it.nplanes; i++, ++it )
+    വേണ്ടി( size_t i = 0; i < it.nplanes; i++, ++it )
         copymask(ptrs[0], 0, ptrs[2], 0, ptrs[1], 0, sz, &esz);
 }
 
 /* dst = src */
-void Mat::copyAt( OutputArray _dst ) const
+ശൂന്യം Mat::copyAt( OutputArray _dst ) സ്ഥിരം
 {
     CV_INSTRUMENT_REGION();
 
@@ -659,7 +659,7 @@ void Mat::copyAt( OutputArray _dst ) const
     CV_CheckEQ(size(), dst.size(), "Make the size of dst the same as src");
     copyTo(_dst);
 }
-void Mat::copyAt( OutputArray _dst, InputArray _mask ) const
+ശൂന്യം Mat::copyAt( OutputArray _dst, നിവേശം_Array _mask ) സ്ഥിരം
 {
     CV_INSTRUMENT_REGION();
 
@@ -671,184 +671,184 @@ void Mat::copyAt( OutputArray _dst, InputArray _mask ) const
 }
 
 
-static bool can_apply_memset(const Mat &mat, const Scalar &s, int &fill_value)
+സ്ഥിതം തർക്കം can_apply_memset(സ്ഥിരം Mat &mat, സ്ഥിരം Scalar &s, പൂർണ്ണസംഖ്യ &fill_മൂല്യം)
 {
     // check if depth is 1 byte.
-    switch (mat.depth())
+    തിരഞ്ഞെടുപ്പ് (mat.depth())
     {
-    case CV_8U: fill_value = saturate_cast<uchar>( s.val[0] ); break;
-    case CV_8S: fill_value = saturate_cast<schar>( s.val[0] ); break;
-    default: return false;
+    അവസ്ഥ CV_8U: fill_മൂല്യം = saturate_cast<uchar>( s.val[0] ); നിർത്തുക;
+    അവസ്ഥ CV_8S: fill_മൂല്യം = saturate_cast<schar>( s.val[0] ); നിർത്തുക;
+    സ്ഥിരസ്ഥിതി: തിരികെ അസത്യം;
     }
 
     // check if all element is same.
-    const int64* is = (const int64*)&s.val[0];
-    switch (mat.channels())
+    സ്ഥിരം int64* is = (സ്ഥിരം int64*)&s.val[0];
+    തിരഞ്ഞെടുപ്പ് (mat.channels())
     {
-    case 1: return true;
-    case 2: return (is[0] == is[1]);
-    case 3: return (is[0] == is[1] && is[1] == is[2]);
-    case 4: return (is[0] == is[1] && is[1] == is[2] && is[2] == is[3]);
-    default: return false;
+    അവസ്ഥ 1: തിരികെ സത്യം;
+    അവസ്ഥ 2: തിരികെ (is[0] == is[1]);
+    അവസ്ഥ 3: തിരികെ (is[0] == is[1] && is[1] == is[2]);
+    അവസ്ഥ 4: തിരികെ (is[0] == is[1] && is[1] == is[2] && is[2] == is[3]);
+    സ്ഥിരസ്ഥിതി: തിരികെ അസത്യം;
     }
 }
 
-Mat& Mat::operator = (const Scalar& s)
+Mat& Mat::operator = (സ്ഥിരം Scalar& s)
 {
     CV_INSTRUMENT_REGION();
 
-    if (this->empty())
-        return *this;
+    എങ്കിൽ (ഇത്->empty())
+        തിരികെ *ഇത്;
 
-    const Mat* arrays[] = { this };
+    സ്ഥിരം Mat* arrays[] = { ഇത് };
     uchar* dptr;
     NAryMatIterator it(arrays, &dptr, 1);
     size_t elsize = it.size*elemSize();
-    const int64* is = (const int64*)&s.val[0];
+    സ്ഥിരം int64* is = (സ്ഥിരം int64*)&s.val[0];
 
-    if( is[0] == 0 && is[1] == 0 && is[2] == 0 && is[3] == 0 )
+    എങ്കിൽ( is[0] == 0 && is[1] == 0 && is[2] == 0 && is[3] == 0 )
     {
-        for( size_t i = 0; i < it.nplanes; i++, ++it )
+        വേണ്ടി( size_t i = 0; i < it.nplanes; i++, ++it )
             memset( dptr, 0, elsize );
     }
-    else
+    അല്ലെങ്കിൽ
     {
-        int fill_value = 0;
-        if ( can_apply_memset(*this, s, fill_value) )
+        പൂർണ്ണസംഖ്യ fill_മൂല്യം = 0;
+        എങ്കിൽ ( can_apply_memset(*ഇത്, s, fill_മൂല്യം) )
         {
-            for (size_t i = 0; i < it.nplanes; i++, ++it)
-                memset(dptr, fill_value, elsize);
-            return *this;
+            വേണ്ടി (size_t i = 0; i < it.nplanes; i++, ++it)
+                memset(dptr, fill_മൂല്യം, elsize);
+            തിരികെ *ഇത്;
         }
 
-        if( it.nplanes > 0 )
+        എങ്കിൽ( it.nplanes > 0 )
         {
-            double scalar[12];
+            ഇരട്ട scalar[12];
             scalarToRawData(s, scalar, type(), 12);
             size_t blockSize = 12*elemSize1();
 
-            for( size_t j = 0; j < elsize; j += blockSize )
+            വേണ്ടി( size_t j = 0; j < elsize; j += blockSize )
             {
                 size_t sz = MIN(blockSize, elsize - j);
-                CV_Assert(sz <= sizeof(scalar));
+                CV_Assert(sz <= വലുപ്പം(scalar));
                 memcpy( dptr + j, scalar, sz );
             }
         }
 
-        for( size_t i = 1; i < it.nplanes; i++ )
+        വേണ്ടി( size_t i = 1; i < it.nplanes; i++ )
         {
             ++it;
             memcpy( dptr, data, elsize );
         }
     }
-    return *this;
+    തിരികെ *ഇത്;
 }
 
 #ifdef HAVE_IPP
-static bool ipp_Mat_setTo_Mat(Mat &dst, Mat &_val, Mat &mask)
+സ്ഥിതം തർക്കം ipp_Mat_setTo_Mat(Mat &dst, Mat &_val, Mat &mask)
 {
 #ifdef HAVE_IPP_IW_LL
     CV_INSTRUMENT_REGION_IPP();
 
-    if(mask.empty())
-        return false;
+    എങ്കിൽ(mask.empty())
+        തിരികെ അസത്യം;
 
-    if(mask.depth() != CV_8U || mask.channels() > 1)
-        return false;
+    എങ്കിൽ(mask.depth() != CV_8U || mask.channels() > 1)
+        തിരികെ അസത്യം;
 
-    if(dst.channels() > 4)
-        return false;
+    എങ്കിൽ(dst.channels() > 4)
+        തിരികെ അസത്യം;
 
-    if (dst.depth() == CV_32F)
+    എങ്കിൽ (dst.depth() == CV_32F)
     {
-        for (int i = 0; i < (int)(_val.total()); i++)
+        വേണ്ടി (പൂർണ്ണസംഖ്യ i = 0; i < (പൂർണ്ണസംഖ്യ)(_val.total()); i++)
         {
-            float v = (float)(_val.at<double>(i));  // cast to float
-            if (cvIsNaN(v) || cvIsInf(v))  // accept finite numbers only
-                return false;
+            ദശാംശം v = (ദശാംശം)(_val.at<ഇരട്ട>(i));  // cast to float
+            എങ്കിൽ (cvIsNaN(v) || cvIsInf(v))  // accept finite numbers only
+                തിരികെ അസത്യം;
         }
     }
 
-    if(dst.dims <= 2)
+    എങ്കിൽ(dst.dims <= 2)
     {
         IppiSize            size     = ippiSize(dst.size());
         IppDataType         dataType = ippiGetDataType(dst.depth());
-        ::ipp::IwValueFloat s;
+        ::ipp::Iw_മൂല്യം_Float s;
         convertAndUnrollScalar(_val, CV_MAKETYPE(CV_64F, dst.channels()), (uchar*)((Ipp64f*)s), 1);
 
-        return CV_INSTRUMENT_FUN_IPP(llwiSetMask, s, dst.ptr(), (int)dst.step, size, dataType, dst.channels(), mask.ptr(), (int)mask.step) >= 0;
+        തിരികെ CV_INSTRUMENT_FUN_IPP(llwiSetMask, s, dst.ptr(), (പൂർണ്ണസംഖ്യ)dst.step, size, dataType, dst.channels(), mask.ptr(), (പൂർണ്ണസംഖ്യ)mask.step) >= 0;
     }
-    else
+    അല്ലെങ്കിൽ
     {
-        const Mat      *arrays[] = {&dst, mask.empty()?NULL:&mask, NULL};
-        uchar          *ptrs[2]  = {NULL};
+        സ്ഥിരം Mat      *arrays[] = {&dst, mask.empty()?ശൂന്യ:&mask, ശൂന്യ};
+        uchar          *ptrs[2]  = {ശൂന്യ};
         NAryMatIterator it(arrays, ptrs);
 
-        IppiSize            size     = {(int)it.size, 1};
+        IppiSize            size     = {(പൂർണ്ണസംഖ്യ)it.size, 1};
         IppDataType         dataType = ippiGetDataType(dst.depth());
-        ::ipp::IwValueFloat s;
+        ::ipp::Iw_മൂല്യം_Float s;
         convertAndUnrollScalar(_val, CV_MAKETYPE(CV_64F, dst.channels()), (uchar*)((Ipp64f*)s), 1);
 
-        for( size_t i = 0; i < it.nplanes; i++, ++it)
+        വേണ്ടി( size_t i = 0; i < it.nplanes; i++, ++it)
         {
-            if(CV_INSTRUMENT_FUN_IPP(llwiSetMask, s, ptrs[0], 0, size, dataType, dst.channels(), ptrs[1], 0) < 0)
-                return false;
+            എങ്കിൽ(CV_INSTRUMENT_FUN_IPP(llwiSetMask, s, ptrs[0], 0, size, dataType, dst.channels(), ptrs[1], 0) < 0)
+                തിരികെ അസത്യം;
         }
-        return true;
+        തിരികെ സത്യം;
     }
-#else
+#അല്ലെങ്കിൽ
     CV_UNUSED(dst); CV_UNUSED(_val); CV_UNUSED(mask);
-    return false;
+    തിരികെ അസത്യം;
 #endif
 }
 #endif
 
-Mat& Mat::setTo(InputArray _value, InputArray _mask)
+Mat& Mat::setTo(നിവേശം_Array മൂല്യം, നിവേശം_Array _mask)
 {
     CV_INSTRUMENT_REGION();
 
-    if( empty() )
-        return *this;
+    എങ്കിൽ( empty() )
+        തിരികെ *ഇത്;
 
-    Mat value = _value.getMat(), mask = _mask.getMat();
+    Mat value = മൂല്യം.getMat(), mask = _mask.getMat();
 
-    CV_Assert( checkScalar(value, type(), _value.kind(), _InputArray::MAT ));
-    int cn = channels(), mcn = mask.channels();
+    CV_Assert( checkScalar(value, type(), മൂല്യം.kind(), നിവേശം_Array_2::MAT ));
+    പൂർണ്ണസംഖ്യ cn = channels(), mcn = mask.channels();
     CV_Assert( mask.empty() || ((mask.depth() == CV_8U || mask.depth() == CV_8S || mask.depth() == CV_Bool) &&
                (mcn == 1 || mcn == cn) && size == mask.size) );
 
-    CV_IPP_RUN_FAST(ipp_Mat_setTo_Mat(*this, value, mask), *this)
+    CV_IPP_RUN_FAST(ipp_Mat_setTo_Mat(*ഇത്, value, mask), *ഇത്)
 
     size_t esz = mcn > 1 ? elemSize1() : elemSize();
-    BinaryFunc copymask = getCopyMaskFunc(esz);
+    ദ്വിമാന_Func copymask = getCopyMaskFunc(esz);
 
-    const Mat* arrays[] = { this, !mask.empty() ? &mask : 0, 0 };
+    സ്ഥിരം Mat* arrays[] = { ഇത്, !mask.empty() ? &mask : 0, 0 };
     uchar* ptrs[2]={0,0};
     NAryMatIterator it(arrays, ptrs);
-    int totalsz = (int)it.size*mcn;
-    int blockSize0 = std::min(totalsz, (int)((BLOCK_SIZE + esz-1)/esz));
+    പൂർണ്ണസംഖ്യ totalsz = (പൂർണ്ണസംഖ്യ)it.size*mcn;
+    പൂർണ്ണസംഖ്യ blockSize0 = std::min(totalsz, (പൂർണ്ണസംഖ്യ)((BLOCK_SIZE + esz-1)/esz));
     blockSize0 -= blockSize0 % mcn;    // must be divisible without remainder for unrolling and advancing
     AutoBuffer<uchar> _scbuf(blockSize0*esz + 32);
-    uchar* scbuf = alignPtr((uchar*)_scbuf.data(), (int)sizeof(double));
+    uchar* scbuf = alignPtr((uchar*)_scbuf.data(), (പൂർണ്ണസംഖ്യ)വലുപ്പം(ഇരട്ട));
     convertAndUnrollScalar( value, type(), scbuf, blockSize0/mcn );
 
-    for( size_t i = 0; i < it.nplanes; i++, ++it )
+    വേണ്ടി( size_t i = 0; i < it.nplanes; i++, ++it )
     {
-        for( int j = 0; j < totalsz; j += blockSize0 )
+        വേണ്ടി( പൂർണ്ണസംഖ്യ j = 0; j < totalsz; j += blockSize0 )
         {
             Size sz(std::min(blockSize0, totalsz - j), 1);
             size_t blockSize = sz.width*esz;
-            if( ptrs[1] )
+            എങ്കിൽ( ptrs[1] )
             {
                 copymask(scbuf, 0, ptrs[1], 0, ptrs[0], 0, sz, &esz);
                 ptrs[1] += sz.width;
             }
-            else
+            അല്ലെങ്കിൽ
                 memcpy(ptrs[0], scbuf, blockSize);
             ptrs[0] += blockSize;
         }
     }
-    return *this;
+    തിരികെ *ഇത്;
 }
 
 
@@ -856,32 +856,32 @@ Mat& Mat::setZero()
 {
     CV_INSTRUMENT_REGION();
 
-    if( empty() )
-        return *this;
+    എങ്കിൽ( empty() )
+        തിരികെ *ഇത്;
 
     size_t esz = elemSize();
 
-    const Mat* arrays[] = { this, 0 };
+    സ്ഥിരം Mat* arrays[] = { ഇത്, 0 };
     uchar* ptrs[]={0};
     NAryMatIterator it(arrays, ptrs);
 
-    for( size_t i = 0; i < it.nplanes; i++, ++it )
+    വേണ്ടി( size_t i = 0; i < it.nplanes; i++, ++it )
         memset(ptrs[0], 0, esz*it.size);
-    return *this;
+    തിരികെ *ഇത്;
 }
 
 
-#if defined HAVE_OPENCL && !defined __APPLE__
+#എങ്കിൽ defined HAVE_OPENCL && !defined __APPLE__
 
-static bool ocl_repeat(InputArray _src, int ny, int nx, OutputArray _dst)
+സ്ഥിതം തർക്കം ocl_repeat(നിവേശം_Array _src, പൂർണ്ണസംഖ്യ ny, പൂർണ്ണസംഖ്യ nx, OutputArray _dst)
 {
-    if (ny == 1 && nx == 1)
+    എങ്കിൽ (ny == 1 && nx == 1)
     {
         _src.copyTo(_dst);
-        return true;
+        തിരികെ സത്യം;
     }
 
-    int type = _src.type(), depth = CV_MAT_DEPTH(type), cn = CV_MAT_CN(type),
+    പൂർണ്ണസംഖ്യ type = _src.type(), depth = CV_MAT_DEPTH(type), cn = CV_MAT_CN(type),
             rowsPerWI = ocl::Device::getDefault().isIntel() ? 4 : 1,
             kercn = ocl::predictOptimalVectorWidth(_src, _dst);
 
@@ -889,19 +889,19 @@ static bool ocl_repeat(InputArray _src, int ny, int nx, OutputArray _dst)
                   format("-D T=%s -D nx=%d -D ny=%d -D rowsPerWI=%d -D cn=%d",
                          ocl::memopTypeToStr(CV_MAKE_TYPE(depth, kercn)),
                          nx, ny, rowsPerWI, kercn));
-    if (k.empty())
-        return false;
+    എങ്കിൽ (k.empty())
+        തിരികെ അസത്യം;
 
     UMat src = _src.getUMat(), dst = _dst.getUMat();
     k.args(ocl::KernelArg::ReadOnly(src, cn, kercn), ocl::KernelArg::WriteOnlyNoSize(dst));
 
     size_t globalsize[] = { (size_t)src.cols * cn / kercn, ((size_t)src.rows + rowsPerWI - 1) / rowsPerWI };
-    return k.run(2, globalsize, NULL, false);
+    തിരികെ k.run(2, globalsize, ശൂന്യ, അസത്യം);
 }
 
 #endif
 
-void repeat(InputArray _src, int ny, int nx, OutputArray _dst)
+ശൂന്യം repeat(നിവേശം_Array _src, പൂർണ്ണസംഖ്യ ny, പൂർണ്ണസംഖ്യ nx, OutputArray _dst)
 {
     CV_INSTRUMENT_REGION();
 
@@ -910,42 +910,42 @@ void repeat(InputArray _src, int ny, int nx, OutputArray _dst)
     CV_Assert( ny > 0 && nx > 0 );
 
     Size ssize = _src.size();
-    if( ssize.empty() )
+    എങ്കിൽ( ssize.empty() )
     {
         _dst.create(0, 0, _src.type());
-        return;
+        തിരികെ;
     }
     CV_Assert( (int64_t)ssize.height * ny <= INT_MAX && (int64_t)ssize.width * nx <= INT_MAX );
     _dst.create(ssize.height*ny, ssize.width*nx, _src.type());
 
-#if !defined __APPLE__
+#എങ്കിൽ !defined __APPLE__
     CV_OCL_RUN(_dst.isUMat(),
                ocl_repeat(_src, ny, nx, _dst))
 #endif
 
     Mat src = _src.getMat(), dst = _dst.getMat();
     Size dsize = dst.size();
-    int esz = (int)src.elemSize();
-    int x, y;
+    പൂർണ്ണസംഖ്യ esz = (പൂർണ്ണസംഖ്യ)src.elemSize();
+    പൂർണ്ണസംഖ്യ x, y;
     ssize.width *= esz; dsize.width *= esz;
 
-    for( y = 0; y < ssize.height; y++ )
+    വേണ്ടി( y = 0; y < ssize.height; y++ )
     {
-        for( x = 0; x < dsize.width; x += ssize.width )
+        വേണ്ടി( x = 0; x < dsize.width; x += ssize.width )
             memcpy( dst.ptr(y) + x, src.ptr(y), ssize.width );
     }
 
-    for( ; y < dsize.height; y++ )
+    വേണ്ടി( ; y < dsize.height; y++ )
         memcpy( dst.ptr(y), dst.ptr(y - ssize.height), dsize.width );
 }
 
-Mat repeat(const Mat& src, int ny, int nx)
+Mat repeat(സ്ഥിരം Mat& src, പൂർണ്ണസംഖ്യ ny, പൂർണ്ണസംഖ്യ nx)
 {
-    if( nx == 1 && ny == 1 )
-        return src;
+    എങ്കിൽ( nx == 1 && ny == 1 )
+        തിരികെ src;
     Mat dst;
     repeat(src, ny, nx, dst);
-    return dst;
+    തിരികെ dst;
 }
 
 
@@ -961,134 +961,134 @@ Mat repeat(const Mat& src, int ny, int nx)
  * BORDER_WRAP:          cdefgh|abcdefgh|abcdefg
  * BORDER_CONSTANT:      iiiiii|abcdefgh|iiiiiii  with some specified 'i'
  */
-int cv::borderInterpolate( int p, int len, int borderType )
+പൂർണ്ണസംഖ്യ cv::borderInterpolate( പൂർണ്ണസംഖ്യ p, പൂർണ്ണസംഖ്യ len, പൂർണ്ണസംഖ്യ borderType )
 {
     CV_TRACE_FUNCTION_VERBOSE();
 
     CV_DbgAssert(len > 0);
 
 #ifdef CV_STATIC_ANALYSIS
-    if(p >= 0 && p < len)
-#else
-    if( (unsigned)p < (unsigned)len )
+    എങ്കിൽ(p >= 0 && p < len)
+#അല്ലെങ്കിൽ
+    എങ്കിൽ( (unsigned)p < (unsigned)len )
 #endif
         ;
-    else if( borderType == BORDER_REPLICATE )
+    അല്ലെങ്കിൽ എങ്കിൽ( borderType == BORDER_REPLICATE )
         p = p < 0 ? 0 : len - 1;
-    else if( borderType == BORDER_REFLECT || borderType == BORDER_REFLECT_101 )
+    അല്ലെങ്കിൽ എങ്കിൽ( borderType == BORDER_REFLECT || borderType == BORDER_REFLECT_101 )
     {
-        int delta = borderType == BORDER_REFLECT_101;
-        if( len == 1 )
-            return 0;
-        do
+        പൂർണ്ണസംഖ്യ delta = borderType == BORDER_REFLECT_101;
+        എങ്കിൽ( len == 1 )
+            തിരികെ 0;
+        ചെയ്യുക
         {
-            if( p < 0 )
+            എങ്കിൽ( p < 0 )
                 p = -p - 1 + delta;
-            else
+            അല്ലെങ്കിൽ
                 p = len - 1 - (p - len) - delta;
         }
 #ifdef CV_STATIC_ANALYSIS
-        while(p < 0 || p >= len);
-#else
-        while( (unsigned)p >= (unsigned)len );
+        ആകുമ്പോൾ(p < 0 || p >= len);
+#അല്ലെങ്കിൽ
+        ആകുമ്പോൾ( (unsigned)p >= (unsigned)len );
 #endif
     }
-    else if( borderType == BORDER_WRAP )
+    അല്ലെങ്കിൽ എങ്കിൽ( borderType == BORDER_WRAP )
     {
         CV_Assert(len > 0);
-        if( p < 0 || p >= len )
+        എങ്കിൽ( p < 0 || p >= len )
         {
             int64_t p64 = p;
             p64 %= (int64_t)len;
-            if( p64 < 0 )
+            എങ്കിൽ( p64 < 0 )
                 p64 += len;
-            p = (int)p64;
+            p = (പൂർണ്ണസംഖ്യ)p64;
         }
     }
-    else if( borderType == BORDER_CONSTANT )
+    അല്ലെങ്കിൽ എങ്കിൽ( borderType == BORDER_CONSTANT )
         p = -1;
-    else
+    അല്ലെങ്കിൽ
         CV_Error( cv::Error::StsBadArg, "Unknown/unsupported border type" );
-    return p;
+    തിരികെ p;
 }
 
-namespace
+നാമാകാശ
 {
 
-void copyMakeBorder_8u( const uchar* src, size_t srcstep, cv::Size srcroi,
+ശൂന്യം copyMakeBorder_8u( സ്ഥിരം uchar* src, size_t srcstep, cv::Size srcroi,
                         uchar* dst, size_t dststep, cv::Size dstroi,
-                        int top, int left, int cn, int borderType )
+                        പൂർണ്ണസംഖ്യ മുകൾ_2, പൂർണ്ണസംഖ്യ ഇടത്, പൂർണ്ണസംഖ്യ cn, പൂർണ്ണസംഖ്യ borderType )
 {
-    const int isz = (int)sizeof(int);
-    int i, j, k, elemSize = 1;
-    bool intMode = false;
+    സ്ഥിരം പൂർണ്ണസംഖ്യ isz = (പൂർണ്ണസംഖ്യ)വലുപ്പം(പൂർണ്ണസംഖ്യ);
+    പൂർണ്ണസംഖ്യ i, j, k, elemSize = 1;
+    തർക്കം intMode = അസത്യം;
 
-    if( (cn | srcstep | dststep | (size_t)src | (size_t)dst) % isz == 0 )
+    എങ്കിൽ( (cn | srcstep | dststep | (size_t)src | (size_t)dst) % isz == 0 )
     {
         cn /= isz;
         elemSize = isz;
-        intMode = true;
+        intMode = സത്യം;
     }
 
-    cv::AutoBuffer<int> _tab((dstroi.width - srcroi.width)*cn);
-    int* tab = _tab.data();
-    int right = dstroi.width - srcroi.width - left;
-    int bottom = dstroi.height - srcroi.height - top;
+    cv::AutoBuffer<പൂർണ്ണസംഖ്യ> _tab((dstroi.width - srcroi.width)*cn);
+    പൂർണ്ണസംഖ്യ* tab = _tab.data();
+    പൂർണ്ണസംഖ്യ വലത് = dstroi.width - srcroi.width - ഇടത്;
+    പൂർണ്ണസംഖ്യ bottom = dstroi.height - srcroi.height - മുകൾ_2;
 
-    for( i = 0; i < left; i++ )
+    വേണ്ടി( i = 0; i < ഇടത്; i++ )
     {
-        j = cv::borderInterpolate(i - left, srcroi.width, borderType)*cn;
-        for( k = 0; k < cn; k++ )
+        j = cv::borderInterpolate(i - ഇടത്, srcroi.width, borderType)*cn;
+        വേണ്ടി( k = 0; k < cn; k++ )
             tab[i*cn + k] = j + k;
     }
 
-    for( i = 0; i < right; i++ )
+    വേണ്ടി( i = 0; i < വലത്; i++ )
     {
         j = cv::borderInterpolate(srcroi.width + i, srcroi.width, borderType)*cn;
-        for( k = 0; k < cn; k++ )
-            tab[(i+left)*cn + k] = j + k;
+        വേണ്ടി( k = 0; k < cn; k++ )
+            tab[(i+ഇടത്)*cn + k] = j + k;
     }
 
     srcroi.width *= cn;
     dstroi.width *= cn;
-    left *= cn;
-    right *= cn;
+    ഇടത് *= cn;
+    വലത് *= cn;
 
-    uchar* dstInner = dst + dststep*top + left*elemSize;
+    uchar* dstInner = dst + dststep*മുകൾ_2 + ഇടത്*elemSize;
 
-    for( i = 0; i < srcroi.height; i++, dstInner += dststep, src += srcstep )
+    വേണ്ടി( i = 0; i < srcroi.height; i++, dstInner += dststep, src += srcstep )
     {
-        if( dstInner != src )
+        എങ്കിൽ( dstInner != src )
             memcpy(dstInner, src, srcroi.width*elemSize);
 
-        if( intMode )
+        എങ്കിൽ( intMode )
         {
-            const int* isrc = (int*)src;
-            int* idstInner = (int*)dstInner;
-            for( j = 0; j < left; j++ )
-                idstInner[j - left] = isrc[tab[j]];
-            for( j = 0; j < right; j++ )
-                idstInner[j + srcroi.width] = isrc[tab[j + left]];
+            സ്ഥിരം പൂർണ്ണസംഖ്യ* isrc = (പൂർണ്ണസംഖ്യ*)src;
+            പൂർണ്ണസംഖ്യ* idstInner = (പൂർണ്ണസംഖ്യ*)dstInner;
+            വേണ്ടി( j = 0; j < ഇടത്; j++ )
+                idstInner[j - ഇടത്] = isrc[tab[j]];
+            വേണ്ടി( j = 0; j < വലത്; j++ )
+                idstInner[j + srcroi.width] = isrc[tab[j + ഇടത്]];
         }
-        else
+        അല്ലെങ്കിൽ
         {
-            for( j = 0; j < left; j++ )
-                dstInner[j - left] = src[tab[j]];
-            for( j = 0; j < right; j++ )
-                dstInner[j + srcroi.width] = src[tab[j + left]];
+            വേണ്ടി( j = 0; j < ഇടത്; j++ )
+                dstInner[j - ഇടത്] = src[tab[j]];
+            വേണ്ടി( j = 0; j < വലത്; j++ )
+                dstInner[j + srcroi.width] = src[tab[j + ഇടത്]];
         }
     }
 
     dstroi.width *= elemSize;
 
-    for( i = 0; i < top; i++ )
+    വേണ്ടി( i = 0; i < മുകൾ_2; i++ )
     {
-        j = cv::borderInterpolate(i - top, srcroi.height, borderType);
-        memcpy(dst + i*dststep, dst + (top+j)*dststep, dstroi.width);
+        j = cv::borderInterpolate(i - മുകൾ_2, srcroi.height, borderType);
+        memcpy(dst + i*dststep, dst + (മുകൾ_2+j)*dststep, dstroi.width);
     }
 
-    dst += dststep*top;
-    for( i = 0; i < bottom; i++ )
+    dst += dststep*മുകൾ_2;
+    വേണ്ടി( i = 0; i < bottom; i++ )
     {
         j = cv::borderInterpolate(i + srcroi.height, srcroi.height, borderType);
         memcpy(dst + (i + srcroi.height)*dststep, dst + j*dststep, dstroi.width);
@@ -1096,42 +1096,42 @@ void copyMakeBorder_8u( const uchar* src, size_t srcstep, cv::Size srcroi,
 }
 
 
-void copyMakeConstBorder_8u( const uchar* src, size_t srcstep, cv::Size srcroi,
+ശൂന്യം copyMakeConstBorder_8u( സ്ഥിരം uchar* src, size_t srcstep, cv::Size srcroi,
                              uchar* dst, size_t dststep, cv::Size dstroi,
-                             int top, int left, int cn, const uchar* value )
+                             പൂർണ്ണസംഖ്യ മുകൾ_2, പൂർണ്ണസംഖ്യ ഇടത്, പൂർണ്ണസംഖ്യ cn, സ്ഥിരം uchar* value )
 {
-    int i, j;
+    പൂർണ്ണസംഖ്യ i, j;
     cv::AutoBuffer<uchar> _constBuf(dstroi.width*cn);
     uchar* constBuf = _constBuf.data();
-    int right = dstroi.width - srcroi.width - left;
-    int bottom = dstroi.height - srcroi.height - top;
+    പൂർണ്ണസംഖ്യ വലത് = dstroi.width - srcroi.width - ഇടത്;
+    പൂർണ്ണസംഖ്യ bottom = dstroi.height - srcroi.height - മുകൾ_2;
 
-    for( i = 0; i < dstroi.width; i++ )
+    വേണ്ടി( i = 0; i < dstroi.width; i++ )
     {
-        for( j = 0; j < cn; j++ )
+        വേണ്ടി( j = 0; j < cn; j++ )
             constBuf[i*cn + j] = value[j];
     }
 
     srcroi.width *= cn;
     dstroi.width *= cn;
-    left *= cn;
-    right *= cn;
+    ഇടത് *= cn;
+    വലത് *= cn;
 
-    uchar* dstInner = dst + dststep*top + left;
+    uchar* dstInner = dst + dststep*മുകൾ_2 + ഇടത്;
 
-    for( i = 0; i < srcroi.height; i++, dstInner += dststep, src += srcstep )
+    വേണ്ടി( i = 0; i < srcroi.height; i++, dstInner += dststep, src += srcstep )
     {
-        if( dstInner != src )
+        എങ്കിൽ( dstInner != src )
             memcpy( dstInner, src, srcroi.width );
-        memcpy( dstInner - left, constBuf, left );
-        memcpy( dstInner + srcroi.width, constBuf, right );
+        memcpy( dstInner - ഇടത്, constBuf, ഇടത് );
+        memcpy( dstInner + srcroi.width, constBuf, വലത് );
     }
 
-    for( i = 0; i < top; i++ )
+    വേണ്ടി( i = 0; i < മുകൾ_2; i++ )
         memcpy(dst + i * dststep, constBuf, dstroi.width);
 
-    dst += (top + srcroi.height) * dststep;
-    for( i = 0; i < bottom; i++ )
+    dst += (മുകൾ_2 + srcroi.height) * dststep;
+    വേണ്ടി( i = 0; i < bottom; i++ )
         memcpy(dst + i * dststep, constBuf, dstroi.width);
 }
 
@@ -1139,160 +1139,160 @@ void copyMakeConstBorder_8u( const uchar* src, size_t srcstep, cv::Size srcroi,
 
 #ifdef HAVE_OPENCL
 
-namespace cv {
+നാമാകാശ cv {
 
-static bool ocl_copyMakeBorder( InputArray _src, OutputArray _dst, int top, int bottom,
-                                int left, int right, int borderType, const Scalar& value )
+സ്ഥിതം തർക്കം ocl_copyMakeBorder( നിവേശം_Array _src, OutputArray _dst, പൂർണ്ണസംഖ്യ മുകൾ_2, പൂർണ്ണസംഖ്യ bottom,
+                                പൂർണ്ണസംഖ്യ ഇടത്, പൂർണ്ണസംഖ്യ വലത്, പൂർണ്ണസംഖ്യ borderType, സ്ഥിരം Scalar& value )
 {
-    int type = _src.type(), cn = CV_MAT_CN(type), depth = CV_MAT_DEPTH(type),
+    പൂർണ്ണസംഖ്യ type = _src.type(), cn = CV_MAT_CN(type), depth = CV_MAT_DEPTH(type),
             rowsPerWI = ocl::Device::getDefault().isIntel() ? 4 : 1;
-    bool isolated = (borderType & BORDER_ISOLATED) != 0;
+    തർക്കം isolated = (borderType & BORDER_ISOLATED) != 0;
     borderType &= ~cv::BORDER_ISOLATED;
 
-    if ( !(borderType == BORDER_CONSTANT || borderType == BORDER_REPLICATE || borderType == BORDER_REFLECT ||
+    എങ്കിൽ ( !(borderType == BORDER_CONSTANT || borderType == BORDER_REPLICATE || borderType == BORDER_REFLECT ||
            borderType == BORDER_WRAP || borderType == BORDER_REFLECT_101) ||
          cn > 4)
-        return false;
+        തിരികെ അസത്യം;
 
-    const char * const borderMap[] = { "BORDER_CONSTANT", "BORDER_REPLICATE", "BORDER_REFLECT", "BORDER_WRAP", "BORDER_REFLECT_101" };
-    int scalarcn = cn == 3 ? 4 : cn;
-    int sctype = CV_MAKETYPE(depth, scalarcn);
+    സ്ഥിരം അക്ഷരം * സ്ഥിരം borderMap[] = { "BORDER_CONSTANT", "BORDER_REPLICATE", "BORDER_REFLECT", "BORDER_WRAP", "BORDER_REFLECT_101" };
+    പൂർണ്ണസംഖ്യ scalarcn = cn == 3 ? 4 : cn;
+    പൂർണ്ണസംഖ്യ sctype = CV_MAKETYPE(depth, scalarcn);
     String buildOptions = format("-D T=%s -D %s -D T1=%s -D cn=%d -D ST=%s -D rowsPerWI=%d",
                                  ocl::memopTypeToStr(type), borderMap[borderType],
                                  ocl::memopTypeToStr(depth), cn,
                                  ocl::memopTypeToStr(sctype), rowsPerWI);
 
     ocl::Kernel k("copyMakeBorder", ocl::core::copymakeborder_oclsrc, buildOptions);
-    if (k.empty())
-        return false;
+    എങ്കിൽ (k.empty())
+        തിരികെ അസത്യം;
 
     UMat src = _src.getUMat();
-    if( src.isSubmatrix() && !isolated )
+    എങ്കിൽ( src.isSubmatrix() && !isolated )
     {
         Size wholeSize;
         Point ofs;
         src.locateROI(wholeSize, ofs);
-        int dtop = std::min(ofs.y, top);
-        int dbottom = std::min(wholeSize.height - src.rows - ofs.y, bottom);
-        int dleft = std::min(ofs.x, left);
-        int dright = std::min(wholeSize.width - src.cols - ofs.x, right);
+        പൂർണ്ണസംഖ്യ dtop = std::min(ofs.y, മുകൾ_2);
+        പൂർണ്ണസംഖ്യ dbottom = std::min(wholeSize.height - src.rows - ofs.y, bottom);
+        പൂർണ്ണസംഖ്യ dleft = std::min(ofs.x, ഇടത്);
+        പൂർണ്ണസംഖ്യ dright = std::min(wholeSize.width - src.cols - ofs.x, വലത്);
         src.adjustROI(dtop, dbottom, dleft, dright);
-        top -= dtop;
-        left -= dleft;
+        മുകൾ_2 -= dtop;
+        ഇടത് -= dleft;
         bottom -= dbottom;
-        right -= dright;
+        വലത് -= dright;
     }
 
-    _dst.create(src.rows + top + bottom, src.cols + left + right, type);
+    _dst.create(src.rows + മുകൾ_2 + bottom, src.cols + ഇടത് + വലത്, type);
     UMat dst = _dst.getUMat();
 
-    if (top == 0 && left == 0 && bottom == 0 && right == 0)
+    എങ്കിൽ (മുകൾ_2 == 0 && ഇടത് == 0 && bottom == 0 && വലത് == 0)
     {
-        if(src.u != dst.u || src.step != dst.step)
+        എങ്കിൽ(src.u != dst.u || src.step != dst.step)
             src.copyTo(dst);
-        return true;
+        തിരികെ സത്യം;
     }
 
     k.args(ocl::KernelArg::ReadOnly(src), ocl::KernelArg::WriteOnly(dst),
-           top, left, ocl::KernelArg::Constant(Mat(1, 1, sctype, value)));
+           മുകൾ_2, ഇടത്, ocl::KernelArg::Constant(Mat(1, 1, sctype, value)));
 
     size_t globalsize[2] = { (size_t)dst.cols, ((size_t)dst.rows + rowsPerWI - 1) / rowsPerWI };
-    return k.run(2, globalsize, NULL, false);
+    തിരികെ k.run(2, globalsize, ശൂന്യ, അസത്യം);
 }
 
 }
 #endif
 
 #ifdef HAVE_IPP
-namespace cv {
+നാമാകാശ cv {
 
-static bool ipp_copyMakeBorder( Mat &_src, Mat &_dst, int top, int bottom,
-                                int left, int right, int _borderType, const Scalar& value )
+സ്ഥിതം തർക്കം ipp_copyMakeBorder( Mat &_src, Mat &_dst, പൂർണ്ണസംഖ്യ മുകൾ_2, പൂർണ്ണസംഖ്യ bottom,
+                                പൂർണ്ണസംഖ്യ ഇടത്, പൂർണ്ണസംഖ്യ വലത്, പൂർണ്ണസംഖ്യ _borderType, സ്ഥിരം Scalar& value )
 {
-#if defined HAVE_IPP_IW_LL && !IPP_DISABLE_PERF_COPYMAKE
+#എങ്കിൽ defined HAVE_IPP_IW_LL && !IPP_DISABLE_PERF_COPYMAKE
     CV_INSTRUMENT_REGION_IPP();
 
-    ::ipp::IwiBorderSize borderSize(left, top, right, bottom);
+    ::ipp::IwiBorderSize borderSize(ഇടത്, മുകൾ_2, വലത്, bottom);
     ::ipp::IwiSize       size(_src.cols, _src.rows);
     IppDataType          dataType   = ippiGetDataType(_src.depth());
     IppiBorderType       borderType = ippiGetBorderType(_borderType);
-    if((int)borderType == -1)
-        return false;
+    എങ്കിൽ((പൂർണ്ണസംഖ്യ)borderType == -1)
+        തിരികെ അസത്യം;
 
-    if(_src.dims > 2)
-        return false;
+    എങ്കിൽ(_src.dims > 2)
+        തിരികെ അസത്യം;
 
-    Rect dstRect(borderSize.left, borderSize.top,
-        _dst.cols - borderSize.right - borderSize.left,
-        _dst.rows - borderSize.bottom - borderSize.top);
+    Rect dstRect(borderSize.ഇടത്, borderSize.മുകൾ_2,
+        _dst.cols - borderSize.വലത് - borderSize.ഇടത്,
+        _dst.rows - borderSize.bottom - borderSize.മുകൾ_2);
     Mat  subDst = Mat(_dst, dstRect);
     Mat *pSrc   = &_src;
 
-    return CV_INSTRUMENT_FUN_IPP(llwiCopyMakeBorder, pSrc->ptr(), pSrc->step, subDst.ptr(), subDst.step, size, dataType, _src.channels(), borderSize, borderType, &value[0]) >= 0;
-#else
-    CV_UNUSED(_src); CV_UNUSED(_dst); CV_UNUSED(top); CV_UNUSED(bottom); CV_UNUSED(left); CV_UNUSED(right);
+    തിരികെ CV_INSTRUMENT_FUN_IPP(llwiCopyMakeBorder, pSrc->ptr(), pSrc->step, subDst.ptr(), subDst.step, size, dataType, _src.channels(), borderSize, borderType, &value[0]) >= 0;
+#അല്ലെങ്കിൽ
+    CV_UNUSED(_src); CV_UNUSED(_dst); CV_UNUSED(മുകൾ_2); CV_UNUSED(bottom); CV_UNUSED(ഇടത്); CV_UNUSED(വലത്);
     CV_UNUSED(_borderType); CV_UNUSED(value);
-    return false;
+    തിരികെ അസത്യം;
 #endif
 }
 }
 #endif
 
-void cv::copyMakeBorder( InputArray _src, OutputArray _dst, int top, int bottom,
-                         int left, int right, int borderType, const Scalar& value )
+ശൂന്യം cv::copyMakeBorder( നിവേശം_Array _src, OutputArray _dst, പൂർണ്ണസംഖ്യ മുകൾ_2, പൂർണ്ണസംഖ്യ bottom,
+                         പൂർണ്ണസംഖ്യ ഇടത്, പൂർണ്ണസംഖ്യ വലത്, പൂർണ്ണസംഖ്യ borderType, സ്ഥിരം Scalar& value )
 {
     CV_INSTRUMENT_REGION();
 
-    CV_Assert( top >= 0 && bottom >= 0 && left >= 0 && right >= 0 && _src.dims() <= 2 );
+    CV_Assert( മുകൾ_2 >= 0 && bottom >= 0 && ഇടത് >= 0 && വലത് >= 0 && _src.dims() <= 2 );
     CV_Assert( !_src.empty() );
 
     Mat src = _src.getMat();
-    CV_Assert( (int64_t)src.rows + top + bottom <= INT_MAX );
-    CV_Assert( (int64_t)src.cols + left + right <= INT_MAX );
+    CV_Assert( (int64_t)src.rows + മുകൾ_2 + bottom <= INT_MAX );
+    CV_Assert( (int64_t)src.cols + ഇടത് + വലത് <= INT_MAX );
 
     CV_OCL_RUN(_dst.isUMat(),
-               ocl_copyMakeBorder(_src, _dst, top, bottom, left, right, borderType, value))
-    int type = src.type();
+               ocl_copyMakeBorder(_src, _dst, മുകൾ_2, bottom, ഇടത്, വലത്, borderType, value))
+    പൂർണ്ണസംഖ്യ type = src.type();
 
-    if( src.isSubmatrix() && (borderType & BORDER_ISOLATED) == 0 )
+    എങ്കിൽ( src.isSubmatrix() && (borderType & BORDER_ISOLATED) == 0 )
     {
         Size wholeSize;
         Point ofs;
         src.locateROI(wholeSize, ofs);
-        int dtop = std::min(ofs.y, top);
-        int dbottom = std::min(wholeSize.height - src.rows - ofs.y, bottom);
-        int dleft = std::min(ofs.x, left);
-        int dright = std::min(wholeSize.width - src.cols - ofs.x, right);
+        പൂർണ്ണസംഖ്യ dtop = std::min(ofs.y, മുകൾ_2);
+        പൂർണ്ണസംഖ്യ dbottom = std::min(wholeSize.height - src.rows - ofs.y, bottom);
+        പൂർണ്ണസംഖ്യ dleft = std::min(ofs.x, ഇടത്);
+        പൂർണ്ണസംഖ്യ dright = std::min(wholeSize.width - src.cols - ofs.x, വലത്);
         src.adjustROI(dtop, dbottom, dleft, dright);
-        top -= dtop;
-        left -= dleft;
+        മുകൾ_2 -= dtop;
+        ഇടത് -= dleft;
         bottom -= dbottom;
-        right -= dright;
+        വലത് -= dright;
     }
 
-    _dst.create( src.rows + top + bottom, src.cols + left + right, type );
+    _dst.create( src.rows + മുകൾ_2 + bottom, src.cols + ഇടത് + വലത്, type );
     Mat dst = _dst.getMat();
 
-    if(top == 0 && left == 0 && bottom == 0 && right == 0)
+    എങ്കിൽ(മുകൾ_2 == 0 && ഇടത് == 0 && bottom == 0 && വലത് == 0)
     {
-        if(src.data != dst.data || src.step != dst.step)
+        എങ്കിൽ(src.data != dst.data || src.step != dst.step)
             src.copyTo(dst);
-        return;
+        തിരികെ;
     }
 
     borderType &= ~BORDER_ISOLATED;
 
-    CV_IPP_RUN_FAST(ipp_copyMakeBorder(src, dst, top, bottom, left, right, borderType, value))
+    CV_IPP_RUN_FAST(ipp_copyMakeBorder(src, dst, മുകൾ_2, bottom, ഇടത്, വലത്, borderType, value))
 
-    if( borderType != BORDER_CONSTANT )
+    എങ്കിൽ( borderType != BORDER_CONSTANT )
         copyMakeBorder_8u( src.ptr(), src.step, src.size(),
                            dst.ptr(), dst.step, dst.size(),
-                           top, left, (int)src.elemSize(), borderType );
-    else
+                           മുകൾ_2, ഇടത്, (പൂർണ്ണസംഖ്യ)src.elemSize(), borderType );
+    അല്ലെങ്കിൽ
     {
-        int cn = src.channels(), cn1 = cn;
-        AutoBuffer<double> buf(cn);
-        if( cn > 4 )
+        പൂർണ്ണസംഖ്യ cn = src.channels(), cn1 = cn;
+        AutoBuffer<ഇരട്ട> buf(cn);
+        എങ്കിൽ( cn > 4 )
         {
             CV_Assert( value[0] == value[1] && value[0] == value[2] && value[0] == value[3] );
             cn1 = 1;
@@ -1300,7 +1300,7 @@ void cv::copyMakeBorder( InputArray _src, OutputArray _dst, int top, int bottom,
         scalarToRawData(value, buf.data(), CV_MAKETYPE(src.depth(), cn1), cn);
         copyMakeConstBorder_8u( src.ptr(), src.step, src.size(),
                                 dst.ptr(), dst.step, dst.size(),
-                                top, left, (int)src.elemSize(), (uchar*)buf.data() );
+                                മുകൾ_2, ഇടത്, (പൂർണ്ണസംഖ്യ)src.elemSize(), (uchar*)buf.data() );
     }
 }
 /* End of file. */

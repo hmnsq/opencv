@@ -3,10 +3,10 @@
 // of this distribution and at http://opencv.org/license.html
 
 
-#include "precomp.hpp"
-#include "persistence.hpp"
+#അന്തര്ഭാവ "precomp.hpp"
+#അന്തര്ഭാവ "persistence.hpp"
 
-enum
+എണ്ണൽ
 {
     CV_XML_INDENT = 2,
     CV_XML_INSIDE_COMMENT = 1,
@@ -19,268 +19,268 @@ enum
     CV_XML_DIRECTIVE_TAG = 5
 };
 
-namespace cv
+നാമാകാശ cv
 {
 
-class XMLEmitter : public FileStorageEmitter
+വർഗ്ഗം XMLEmitter : പൊതു FileStorageEmitter
 {
-public:
+പൊതു:
     XMLEmitter(FileStorage_API* _fs) : fs(_fs)
     {
     }
-    virtual ~XMLEmitter() {}
+    മായാ ~XMLEmitter() {}
 
-    void writeTag( const char* key, int tag_type, const std::vector<std::string>& attrlist=std::vector<std::string>() )
+    ശൂന്യം writeTag( സ്ഥിരം അക്ഷരം* താക്കോൽ, പൂർണ്ണസംഖ്യ tag_type, സ്ഥിരം std::vector<std::string>& attrlist=std::vector<std::string>() )
     {
-        char* ptr = fs->bufferPtr();
-        int i, len = 0;
+        അക്ഷരം* ptr = fs->bufferPtr();
+        പൂർണ്ണസംഖ്യ i, len = 0;
         FStructData& current_struct = fs->getCurrentStruct();
-        int struct_flags = current_struct.flags;
+        പൂർണ്ണസംഖ്യ struct_flags = current_struct.flags;
 
-        if( key && key[0] == '\0' )
-            key = 0;
+        എങ്കിൽ( താക്കോൽ && താക്കോൽ[0] == '\0' )
+            താക്കോൽ = 0;
 
-        if( tag_type == CV_XML_OPENING_TAG || tag_type == CV_XML_EMPTY_TAG )
+        എങ്കിൽ( tag_type == CV_XML_OPENING_TAG || tag_type == CV_XML_EMPTY_TAG )
         {
-            if( FileNode::isCollection(struct_flags) )
+            എങ്കിൽ( File_കണ്ണി::isCollection(struct_flags) )
             {
-                if( FileNode::isMap(struct_flags) ^ (key != 0) )
+                എങ്കിൽ( File_കണ്ണി::isMap(struct_flags) ^ (താക്കോൽ != 0) )
                     CV_Error( cv::Error::StsBadArg, "An attempt to add element without a key to a map, "
                              "or add element with key to sequence" );
             }
-            else
+            അല്ലെങ്കിൽ
             {
-                struct_flags = FileNode::EMPTY + (key ? FileNode::MAP : FileNode::SEQ);
+                struct_flags = File_കണ്ണി::EMPTY + (താക്കോൽ ? File_കണ്ണി::MAP : File_കണ്ണി::SEQ);
                 //fs->is_first = 0;
             }
 
-            if( !FileNode::isEmptyCollection(struct_flags) )
+            എങ്കിൽ( !File_കണ്ണി::isEmptyCollection(struct_flags) )
                 ptr = fs->flush();
         }
 
-        if( !key )
-            key = "_";
-        else if( key[0] == '_' && key[1] == '\0' )
+        എങ്കിൽ( !താക്കോൽ )
+            താക്കോൽ = "_";
+        അല്ലെങ്കിൽ എങ്കിൽ( താക്കോൽ[0] == '_' && താക്കോൽ[1] == '\0' )
             CV_Error( cv::Error::StsBadArg, "A single _ is a reserved tag name" );
 
-        len = (int)strlen( key );
+        len = (പൂർണ്ണസംഖ്യ)strlen( താക്കോൽ );
         *ptr++ = '<';
-        if( tag_type == CV_XML_CLOSING_TAG )
+        എങ്കിൽ( tag_type == CV_XML_CLOSING_TAG )
         {
-            if( !attrlist.empty() )
+            എങ്കിൽ( !attrlist.empty() )
                 CV_Error( cv::Error::StsBadArg, "Closing tag should not include any attributes" );
             *ptr++ = '/';
         }
 
-        if( !cv_isalpha(key[0]) && key[0] != '_' )
+        എങ്കിൽ( !cv_isalpha(താക്കോൽ[0]) && താക്കോൽ[0] != '_' )
             CV_Error( cv::Error::StsBadArg, "Key should start with a letter or _" );
 
         ptr = fs->resizeWriteBuffer( ptr, len );
-        for( i = 0; i < len; i++ )
+        വേണ്ടി( i = 0; i < len; i++ )
         {
-            char c = key[i];
-            if( !cv_isalnum(c) && c != '_' && c != '-' )
+            അക്ഷരം c = താക്കോൽ[i];
+            എങ്കിൽ( !cv_isalnum(c) && c != '_' && c != '-' )
                 CV_Error( cv::Error::StsBadArg, "Key name may only contain alphanumeric characters [a-zA-Z0-9], '-' and '_'" );
             ptr[i] = c;
         }
         ptr += len;
 
-        int nattr = (int)attrlist.size();
+        പൂർണ്ണസംഖ്യ nattr = (പൂർണ്ണസംഖ്യ)attrlist.size();
         CV_Assert( nattr % 2 == 0 );
 
-        for( i = 0; i < nattr; i += 2 )
+        വേണ്ടി( i = 0; i < nattr; i += 2 )
         {
             size_t len0 = attrlist[i].size();
             size_t len1 = attrlist[i+1].size();
             CV_Assert( len0 > 0 );
 
-            ptr = fs->resizeWriteBuffer( ptr, (int)(len0 + len1 + 4) );
+            ptr = fs->resizeWriteBuffer( ptr, (പൂർണ്ണസംഖ്യ)(len0 + len1 + 4) );
             *ptr++ = ' ';
 
             memcpy( ptr, attrlist[i].c_str(), len0 );
             ptr += len0;
             *ptr++ = '=';
             *ptr++ = '\"';
-            if( len1 > 0 )
+            എങ്കിൽ( len1 > 0 )
                 memcpy( ptr, attrlist[i+1].c_str(), len1 );
             ptr += len1;
             *ptr++ = '\"';
         }
 
-        if( tag_type == CV_XML_EMPTY_TAG )
+        എങ്കിൽ( tag_type == CV_XML_EMPTY_TAG )
             *ptr++ = '/';
         *ptr++ = '>';
         fs->setBufferPtr(ptr);
-        current_struct.flags = struct_flags & ~FileNode::EMPTY;
+        current_struct.flags = struct_flags & ~File_കണ്ണി::EMPTY;
     }
 
-    FStructData startWriteStruct(const FStructData& parent, const char* key,
-                                 int struct_flags, const char* type_name=0)
+    FStructData startWriteStruct(സ്ഥിരം FStructData& parent, സ്ഥിരം അക്ഷരം* താക്കോൽ,
+                                 പൂർണ്ണസംഖ്യ struct_flags, സ്ഥിരം അക്ഷരം* type_name=0)
     {
         std::vector<std::string> attrlist;
-        if( type_name && *type_name )
+        എങ്കിൽ( type_name && *type_name )
         {
             attrlist.push_back("type_id");
             attrlist.push_back(type_name);
         }
 
-        writeTag( key, CV_XML_OPENING_TAG, attrlist );
+        writeTag( താക്കോൽ, CV_XML_OPENING_TAG, attrlist );
 
         FStructData current_struct;
-        current_struct.tag = key ? std::string(key) : std::string();
+        current_struct.tag = താക്കോൽ ? std::string(താക്കോൽ) : std::string();
         current_struct.flags = struct_flags;
         current_struct.indent = parent.indent + CV_XML_INDENT;
 
-        return current_struct;
+        തിരികെ current_struct;
     }
 
-    void endWriteStruct(const FStructData& current_struct)
+    ശൂന്യം endWriteStruct(സ്ഥിരം FStructData& current_struct)
     {
         writeTag( current_struct.tag.c_str(), CV_XML_CLOSING_TAG );
     }
 
-    void write(const char* key, int value)
+    ശൂന്യം ലിഖ(സ്ഥിരം അക്ഷരം* താക്കോൽ, പൂർണ്ണസംഖ്യ value)
     {
-        char buf[128], *ptr = fs::itoa( value, buf, 10 );
-        writeScalar( key, ptr);
+        അക്ഷരം buf[128], *ptr = fs::itoa( value, buf, 10 );
+        writeScalar( താക്കോൽ, ptr);
     }
 
-    void write(const char* key, int64_t value)
+    ശൂന്യം ലിഖ(സ്ഥിരം അക്ഷരം* താക്കോൽ, int64_t value)
     {
-        char buf[128], *ptr = fs::itoa( value, buf, 10, true );
-        writeScalar( key, ptr);
+        അക്ഷരം buf[128], *ptr = fs::itoa( value, buf, 10, സത്യം );
+        writeScalar( താക്കോൽ, ptr);
     }
 
-    void write( const char* key, double value )
+    ശൂന്യം ലിഖ( സ്ഥിരം അക്ഷരം* താക്കോൽ, ഇരട്ട value )
     {
-        char buf[128];
-        writeScalar( key, fs::doubleToString( buf, sizeof(buf), value, false ) );
+        അക്ഷരം buf[128];
+        writeScalar( താക്കോൽ, fs::doubleToString( buf, വലുപ്പം(buf), value, അസത്യം ) );
     }
 
-    void write(const char* key, const char* str, bool quote)
+    ശൂന്യം ലിഖ(സ്ഥിരം അക്ഷരം* താക്കോൽ, സ്ഥിരം അക്ഷരം* str, തർക്കം quote)
     {
-        char buf[CV_FS_MAX_LEN*6+16];
-        char* data = (char*)str;
-        int i, len;
+        അക്ഷരം buf[CV_FS_MAX_LEN*6+16];
+        അക്ഷരം* data = (അക്ഷരം*)str;
+        പൂർണ്ണസംഖ്യ i, len;
 
-        if( !str )
+        എങ്കിൽ( !str )
             CV_Error( cv::Error::StsNullPtr, "Null string pointer" );
 
-        len = (int)strlen(str);
-        if( len > CV_FS_MAX_LEN )
+        len = (പൂർണ്ണസംഖ്യ)strlen(str);
+        എങ്കിൽ( len > CV_FS_MAX_LEN )
             CV_Error( cv::Error::StsBadArg, "The written string is too long" );
 
-        if( quote || len == 0 || str[0] != '\"' || str[0] != str[len-1] )
+        എങ്കിൽ( quote || len == 0 || str[0] != '\"' || str[0] != str[len-1] )
         {
-            bool need_quote = quote || len == 0;
+            തർക്കം need_quote = quote || len == 0;
             data = buf;
             *data++ = '\"';
-            for( i = 0; i < len; i++ )
+            വേണ്ടി( i = 0; i < len; i++ )
             {
-                char c = str[i];
+                അക്ഷരം c = str[i];
 
-                if( (uchar)c >= 128 || c == ' ' )
+                എങ്കിൽ( (uchar)c >= 128 || c == ' ' )
                 {
                     *data++ = c;
-                    need_quote = true;
+                    need_quote = സത്യം;
                 }
-                else if( !cv_isprint(c) || c == '<' || c == '>' || c == '&' || c == '\'' || c == '\"' )
+                അല്ലെങ്കിൽ എങ്കിൽ( !cv_isprint(c) || c == '<' || c == '>' || c == '&' || c == '\'' || c == '\"' )
                 {
                     *data++ = '&';
-                    if( c == '<' )
+                    എങ്കിൽ( c == '<' )
                     {
                         memcpy(data, "lt", 2);
                         data += 2;
                     }
-                    else if( c == '>' )
+                    അല്ലെങ്കിൽ എങ്കിൽ( c == '>' )
                     {
                         memcpy(data, "gt", 2);
                         data += 2;
                     }
-                    else if( c == '&' )
+                    അല്ലെങ്കിൽ എങ്കിൽ( c == '&' )
                     {
                         memcpy(data, "amp", 3);
                         data += 3;
                     }
-                    else if( c == '\'' )
+                    അല്ലെങ്കിൽ എങ്കിൽ( c == '\'' )
                     {
                         memcpy(data, "apos", 4);
                         data += 4;
                     }
-                    else if( c == '\"' )
+                    അല്ലെങ്കിൽ എങ്കിൽ( c == '\"' )
                     {
                         memcpy( data, "quot", 4);
                         data += 4;
                     }
-                    else
+                    അല്ലെങ്കിൽ
                     {
-                        snprintf( data, sizeof(buf) - (data - buf), "#x%02x", (uchar)c );
+                        snprintf( data, വലുപ്പം(buf) - (data - buf), "#x%02x", (uchar)c );
                         data += 4;
                     }
                     *data++ = ';';
                     need_quote = 1;
                 }
-                else
+                അല്ലെങ്കിൽ
                     *data++ = c;
             }
-            if( !need_quote && (cv_isdigit(str[0]) ||
+            എങ്കിൽ( !need_quote && (cv_isdigit(str[0]) ||
                                 str[0] == '+' || str[0] == '-' || str[0] == '.' ))
-                need_quote = true;
+                need_quote = സത്യം;
 
-            if( need_quote )
+            എങ്കിൽ( need_quote )
                 *data++ = '\"';
-            len = (int)(data - buf) - !need_quote;
+            len = (പൂർണ്ണസംഖ്യ)(data - buf) - !need_quote;
             *data++ = '\0';
-            data = buf + (int)!need_quote;
+            data = buf + (പൂർണ്ണസംഖ്യ)!need_quote;
         }
 
-        writeScalar( key, data );
+        writeScalar( താക്കോൽ, data );
     }
 
-    void writeScalar(const char* key, const char* data)
+    ശൂന്യം writeScalar(സ്ഥിരം അക്ഷരം* താക്കോൽ, സ്ഥിരം അക്ഷരം* data)
     {
-        fs->check_if_write_struct_is_delayed(false);
-        if ( fs->get_state_of_writing_base64() == FileStorage_API::Uncertain )
+        fs->check_if_write_struct_is_delayed(അസത്യം);
+        എങ്കിൽ ( fs->get_state_of_writing_base64() == FileStorage_API::Uncertain )
         {
             fs->switch_to_Base64_state( FileStorage_API::NotUse );
         }
-        else if ( fs->get_state_of_writing_base64() == FileStorage_API::InUse )
+        അല്ലെങ്കിൽ എങ്കിൽ ( fs->get_state_of_writing_base64() == FileStorage_API::InUse )
         {
             CV_Error( cv::Error::StsError, "At present, output Base64 data only." );
         }
 
-        int len = (int)strlen(data);
-        if( key && *key == '\0' )
-            key = 0;
+        പൂർണ്ണസംഖ്യ len = (പൂർണ്ണസംഖ്യ)strlen(data);
+        എങ്കിൽ( താക്കോൽ && *താക്കോൽ == '\0' )
+            താക്കോൽ = 0;
 
         FStructData& current_struct = fs->getCurrentStruct();
-        int struct_flags = current_struct.flags;
+        പൂർണ്ണസംഖ്യ struct_flags = current_struct.flags;
 
-        if( FileNode::isMap(struct_flags) ||
-           (!FileNode::isCollection(struct_flags) && key) )
+        എങ്കിൽ( File_കണ്ണി::isMap(struct_flags) ||
+           (!File_കണ്ണി::isCollection(struct_flags) && താക്കോൽ) )
         {
-            writeTag( key, CV_XML_OPENING_TAG );
-            char* ptr = fs->resizeWriteBuffer( fs->bufferPtr(), len );
+            writeTag( താക്കോൽ, CV_XML_OPENING_TAG );
+            അക്ഷരം* ptr = fs->resizeWriteBuffer( fs->bufferPtr(), len );
             memcpy( ptr, data, len );
             fs->setBufferPtr( ptr + len );
-            writeTag( key, CV_XML_CLOSING_TAG );
+            writeTag( താക്കോൽ, CV_XML_CLOSING_TAG );
         }
-        else
+        അല്ലെങ്കിൽ
         {
-            char* ptr = fs->bufferPtr();
-            int new_offset = (int)(ptr - fs->bufferStart()) + len;
+            അക്ഷരം* ptr = fs->bufferPtr();
+            പൂർണ്ണസംഖ്യ new_offset = (പൂർണ്ണസംഖ്യ)(ptr - fs->bufferStart()) + len;
 
-            if( key )
+            എങ്കിൽ( താക്കോൽ )
                 CV_Error( cv::Error::StsBadArg, "elements with keys can not be written to sequence" );
 
-            current_struct.flags = FileNode::SEQ;
+            current_struct.flags = File_കണ്ണി::SEQ;
 
-            if( (new_offset > fs->wrapMargin() && new_offset - current_struct.indent > 10) ||
+            എങ്കിൽ( (new_offset > fs->wrapMargin() && new_offset - current_struct.indent > 10) ||
                (ptr > fs->bufferStart() && ptr[-1] == '>') )
             {
                 ptr = fs->flush();
             }
-            else if( ptr > fs->bufferStart() + current_struct.indent && ptr[-1] != '>' )
+            അല്ലെങ്കിൽ എങ്കിൽ( ptr > fs->bufferStart() + current_struct.indent && ptr[-1] != '>' )
                 *ptr++ = ' ';
 
             memcpy( ptr, data, len );
@@ -288,37 +288,37 @@ public:
         }
     }
 
-    void writeComment(const char* comment, bool eol_comment)
+    ശൂന്യം writeComment(സ്ഥിരം അക്ഷരം* comment, തർക്കം eol_comment)
     {
         FStructData& current_struct = fs->getCurrentStruct();
-        int len;
-        int multiline;
-        const char* eol;
-        char* ptr;
+        പൂർണ്ണസംഖ്യ len;
+        പൂർണ്ണസംഖ്യ multiline;
+        സ്ഥിരം അക്ഷരം* eol;
+        അക്ഷരം* ptr;
 
-        if( !comment )
+        എങ്കിൽ( !comment )
             CV_Error( cv::Error::StsNullPtr, "Null comment" );
 
-        if( strstr(comment, "--") != 0 )
+        എങ്കിൽ( strstr(comment, "--") != 0 )
             CV_Error( cv::Error::StsBadArg, "Double hyphen \'--\' is not allowed in the comments" );
 
-        len = (int)strlen(comment);
+        len = (പൂർണ്ണസംഖ്യ)strlen(comment);
         eol = strchr(comment, '\n');
         multiline = eol != 0;
         ptr = fs->bufferPtr();
 
-        if( multiline || !eol_comment || fs->bufferEnd() - ptr < len + 5 )
+        എങ്കിൽ( multiline || !eol_comment || fs->bufferEnd() - ptr < len + 5 )
             ptr = fs->flush();
-        else if( ptr > fs->bufferStart() + current_struct.indent )
+        അല്ലെങ്കിൽ എങ്കിൽ( ptr > fs->bufferStart() + current_struct.indent )
             *ptr++ = ' ';
 
-        if( !multiline )
+        എങ്കിൽ( !multiline )
         {
             ptr = fs->resizeWriteBuffer( ptr, len + 5+4+1 );
             snprintf( ptr, len + 5+4+1, "<!-- %s -->", comment );
-            len = (int)strlen(ptr);
+            len = (പൂർണ്ണസംഖ്യ)strlen(ptr);
         }
-        else
+        അല്ലെങ്കിൽ
         {
             strcpy( ptr, "<!--" );
             len = 4;
@@ -327,21 +327,21 @@ public:
         fs->setBufferPtr(ptr + len);
         ptr = fs->flush();
 
-        if( multiline )
+        എങ്കിൽ( multiline )
         {
-            while( comment )
+            ആകുമ്പോൾ( comment )
             {
-                if( eol )
+                എങ്കിൽ( eol )
                 {
-                    ptr = fs->resizeWriteBuffer( ptr, (int)(eol - comment) + 1 );
+                    ptr = fs->resizeWriteBuffer( ptr, (പൂർണ്ണസംഖ്യ)(eol - comment) + 1 );
                     memcpy( ptr, comment, eol - comment + 1 );
                     ptr += eol - comment;
                     comment = eol + 1;
                     eol = strchr( comment, '\n' );
                 }
-                else
+                അല്ലെങ്കിൽ
                 {
-                    len = (int)strlen(comment);
+                    len = (പൂർണ്ണസംഖ്യ)strlen(comment);
                     ptr = fs->resizeWriteBuffer( ptr, len );
                     memcpy( ptr, comment, len );
                     ptr += len;
@@ -356,297 +356,297 @@ public:
         }
     }
 
-    void startNextStream()
+    ശൂന്യം startNextStream()
     {
         fs->puts( "\n<!-- next stream -->\n" );
     }
 
-protected:
+സംരക്ഷിത:
     FileStorage_API* fs;
 };
 
-class XMLParser : public FileStorageParser
+വർഗ്ഗം XMLParser : പൊതു FileStorageParser
 {
-public:
+പൊതു:
     XMLParser(FileStorage_API* _fs) : fs(_fs)
     {
     }
 
-    virtual ~XMLParser() {}
+    മായാ ~XMLParser() {}
 
-    char* skipSpaces( char* ptr, int mode )
+    അക്ഷരം* skipSpaces( അക്ഷരം* ptr, പൂർണ്ണസംഖ്യ mode )
     {
-        if (!ptr)
+        എങ്കിൽ (!ptr)
             CV_PARSE_ERROR_CPP("Invalid input");
 
-        int level = 0;
+        പൂർണ്ണസംഖ്യ level = 0;
 
-        for(;;)
+        വേണ്ടി(;;)
         {
-            char c;
+            അക്ഷരം c;
             ptr--;
 
-            if( mode == CV_XML_INSIDE_COMMENT )
+            എങ്കിൽ( mode == CV_XML_INSIDE_COMMENT )
             {
-                do c = *++ptr;
-                while( cv_isprint_or_tab(c) && (c != '-' || ptr[1] != '-' || ptr[2] != '>') );
+                ചെയ്യുക c = *++ptr;
+                ആകുമ്പോൾ( cv_isprint_or_tab(c) && (c != '-' || ptr[1] != '-' || ptr[2] != '>') );
 
-                if( c == '-' )
+                എങ്കിൽ( c == '-' )
                 {
                     CV_Assert( ptr[1] == '-' && ptr[2] == '>' );
                     mode = 0;
                     ptr += 3;
                 }
             }
-            else if( mode == CV_XML_INSIDE_DIRECTIVE )
+            അല്ലെങ്കിൽ എങ്കിൽ( mode == CV_XML_INSIDE_DIRECTIVE )
             {
                 // !!!NOTE!!! This is not quite correct, but should work in most cases
-                do
+                ചെയ്യുക
                 {
                     c = *++ptr;
                     level += c == '<';
                     level -= c == '>';
-                    if( level < 0 )
-                        return ptr;
-                } while( cv_isprint_or_tab(c) );
+                    എങ്കിൽ( level < 0 )
+                        തിരികെ ptr;
+                } ആകുമ്പോൾ( cv_isprint_or_tab(c) );
             }
-            else
+            അല്ലെങ്കിൽ
             {
-                do c = *++ptr;
-                while( c == ' ' || c == '\t' );
+                ചെയ്യുക c = *++ptr;
+                ആകുമ്പോൾ( c == ' ' || c == '\t' );
 
-                if( c == '<' && ptr[1] == '!' && ptr[2] == '-' && ptr[3] == '-' )
+                എങ്കിൽ( c == '<' && ptr[1] == '!' && ptr[2] == '-' && ptr[3] == '-' )
                 {
-                    if( mode != 0 )
+                    എങ്കിൽ( mode != 0 )
                         CV_PARSE_ERROR_CPP( "Comments are not allowed here" );
                     mode = CV_XML_INSIDE_COMMENT;
                     ptr += 4;
                 }
-                else if( cv_isprint(c) )
-                    break;
+                അല്ലെങ്കിൽ എങ്കിൽ( cv_isprint(c) )
+                    നിർത്തുക;
             }
 
-            if( !cv_isprint(*ptr) )
+            എങ്കിൽ( !cv_isprint(*ptr) )
             {
-                if( *ptr != '\0' && *ptr != '\n' && *ptr != '\r' )
+                എങ്കിൽ( *ptr != '\0' && *ptr != '\n' && *ptr != '\r' )
                     CV_PARSE_ERROR_CPP( "Invalid character in the stream" );
                 ptr = fs->gets();
-                if( !ptr || *ptr == '\0' )
-                    break;
+                എങ്കിൽ( !ptr || *ptr == '\0' )
+                    നിർത്തുക;
             }
         }
-        return ptr;
+        തിരികെ ptr;
     }
 
-    bool getBase64Row(char* ptr, int /*indent*/, char* &beg, char* &end)
+    തർക്കം getBase64Row(അക്ഷരം* ptr, പൂർണ്ണസംഖ്യ /*indent*/, അക്ഷരം* &beg, അക്ഷരം* &end)
     {
         beg = end = ptr = skipSpaces(ptr, CV_XML_INSIDE_TAG);
-        if( !ptr || !*ptr )
-            return false;
+        എങ്കിൽ( !ptr || !*ptr )
+            തിരികെ അസത്യം;
 
         // closing XML tag
-        if ( *beg == '<' )
-            return false;
+        എങ്കിൽ ( *beg == '<' )
+            തിരികെ അസത്യം;
 
         // find end of the row
-        while( cv_isprint(*ptr) )
+        ആകുമ്പോൾ( cv_isprint(*ptr) )
             ++ptr;
-        if ( *ptr == '\0' )
+        എങ്കിൽ ( *ptr == '\0' )
             CV_PARSE_ERROR_CPP( "Unexpected end of line" );
 
         end = ptr;
-        return true;
+        തിരികെ സത്യം;
     }
 
-    char* parseValue( char* ptr, FileNode& node, int depth = 0 )
+    അക്ഷരം* parse_മൂല്യം( അക്ഷരം* ptr, File_കണ്ണി& കണ്ണി, പൂർണ്ണസംഖ്യ depth = 0 )
     {
-        if (!ptr)
+        എങ്കിൽ (!ptr)
             CV_PARSE_ERROR_CPP("Invalid input");
 
-        if( depth > CV_PERSISTENCE_MAX_DEPTH )
+        എങ്കിൽ( depth > CV_PERSISTENCE_MAX_DEPTH )
             CV_PARSE_ERROR_CPP("Too many nested collections");
 
-        FileNode new_elem;
-        bool have_space = true;
-        int value_type = node.type();
-        std::string key, key2, type_name;
+        File_കണ്ണി new_elem;
+        തർക്കം have_space = സത്യം;
+        പൂർണ്ണസംഖ്യ value_type = കണ്ണി.type();
+        std::string താക്കോൽ, key2, type_name;
 
-        for(;;)
+        വേണ്ടി(;;)
         {
-            char c = *ptr, d;
-            char* endptr;
+            അക്ഷരം c = *ptr, d;
+            അക്ഷരം* endptr;
 
             // FIXIT ptr[1], ptr[2] - out of bounds read without check or data fetch (#11061)
-            if( cv_isspace(c) || c == '\0' ||
+            എങ്കിൽ( cv_isspace(c) || c == '\0' ||
                 (c == '<' && ptr[1] == '!' && ptr[2] == '-') )
             {
                 ptr = skipSpaces( ptr, 0 );
-                if (!ptr)
+                എങ്കിൽ (!ptr)
                     CV_PARSE_ERROR_CPP("Invalid input");
-                have_space = true;
+                have_space = സത്യം;
                 c = *ptr;
             }
 
             d = ptr[1];  // FIXIT ptr[1] - out of bounds read without check or data fetch (#11061)
 
-            if( c =='<' || c == '\0' )
+            എങ്കിൽ( c =='<' || c == '\0' )
             {
-                int tag_type = 0;
-                int elem_type = FileNode::NONE;
+                പൂർണ്ണസംഖ്യ tag_type = 0;
+                പൂർണ്ണസംഖ്യ elem_type = File_കണ്ണി::NONE;
 
-                if( d == '/' || c == '\0' )
-                    break;
+                എങ്കിൽ( d == '/' || c == '\0' )
+                    നിർത്തുക;
 
-                ptr = parseTag( ptr, key, type_name, tag_type );
+                ptr = parseTag( ptr, താക്കോൽ, type_name, tag_type );
 
-                if( tag_type == CV_XML_DIRECTIVE_TAG )
+                എങ്കിൽ( tag_type == CV_XML_DIRECTIVE_TAG )
                     CV_PARSE_ERROR_CPP( "Directive tags are not allowed here" );
-                if( tag_type == CV_XML_EMPTY_TAG )
+                എങ്കിൽ( tag_type == CV_XML_EMPTY_TAG )
                     CV_PARSE_ERROR_CPP( "Empty tags are not supported" );
 
                 CV_Assert(tag_type == CV_XML_OPENING_TAG);
 
                 /* for base64 string */
-                bool binary_string = false;
+                തർക്കം ദ്വിമാന_string = അസത്യം;
 
-                if( !type_name.empty() )
+                എങ്കിൽ( !type_name.empty() )
                 {
-                    const char* tn = type_name.c_str();
-                    if( strcmp(tn, "str") == 0 )
-                        elem_type = FileNode::STRING;
-                    else if( strcmp( tn, "map" ) == 0 )
-                        elem_type = FileNode::MAP;
-                    else if( strcmp( tn, "seq" ) == 0 )
-                        elem_type = FileNode::SEQ;
-                    else if( strcmp( tn, "binary") == 0)
-                        binary_string = true;
+                    സ്ഥിരം അക്ഷരം* tn = type_name.c_str();
+                    എങ്കിൽ( strcmp(tn, "str") == 0 )
+                        elem_type = File_കണ്ണി::STRING;
+                    അല്ലെങ്കിൽ എങ്കിൽ( strcmp( tn, "map" ) == 0 )
+                        elem_type = File_കണ്ണി::MAP;
+                    അല്ലെങ്കിൽ എങ്കിൽ( strcmp( tn, "seq" ) == 0 )
+                        elem_type = File_കണ്ണി::SEQ;
+                    അല്ലെങ്കിൽ എങ്കിൽ( strcmp( tn, "binary") == 0)
+                        ദ്വിമാന_string = സത്യം;
                 }
 
-                new_elem = fs->addNode(node, key, elem_type, 0);
-                if (!binary_string)
-                    ptr = parseValue(ptr, new_elem, depth + 1);
-                else
+                new_elem = fs->add_കണ്ണി(കണ്ണി, താക്കോൽ, elem_type, 0);
+                എങ്കിൽ (!ദ്വിമാന_string)
+                    ptr = parse_മൂല്യം(ptr, new_elem, depth + 1);
+                അല്ലെങ്കിൽ
                 {
                     ptr = fs->parseBase64( ptr, 0, new_elem);
                     ptr = skipSpaces( ptr, 0 );
-                    if (!ptr)
+                    എങ്കിൽ (!ptr)
                         CV_PARSE_ERROR_CPP("Invalid input");
                 }
 
                 ptr = parseTag( ptr, key2, type_name, tag_type );
-                if( tag_type != CV_XML_CLOSING_TAG || key2 != key )
+                എങ്കിൽ( tag_type != CV_XML_CLOSING_TAG || key2 != താക്കോൽ )
                     CV_PARSE_ERROR_CPP( "Mismatched closing tag" );
-                have_space = true;
+                have_space = സത്യം;
             }
-            else
+            അല്ലെങ്കിൽ
             {
-                if( !have_space )
+                എങ്കിൽ( !have_space )
                     CV_PARSE_ERROR_CPP( "There should be space between literals" );
 
-                FileNode* elem = &node;
-                if( node.type() != FileNode::NONE )
+                File_കണ്ണി* elem = &കണ്ണി;
+                എങ്കിൽ( കണ്ണി.type() != File_കണ്ണി::NONE )
                 {
-                    fs->convertToCollection( FileNode::SEQ, node );
-                    new_elem = fs->addNode(node, std::string(), FileNode::NONE, 0);
+                    fs->convertToCollection( File_കണ്ണി::SEQ, കണ്ണി );
+                    new_elem = fs->add_കണ്ണി(കണ്ണി, std::string(), File_കണ്ണി::NONE, 0);
                     elem = &new_elem;
                 }
 
-                if( value_type != FileNode::STRING &&
+                എങ്കിൽ( value_type != File_കണ്ണി::STRING &&
                    (cv_isdigit(c) || ((c == '-' || c == '+') &&
                    (cv_isdigit(d) || d == '.')) || (c == '.' && cv_isalnum(d))) ) // a number
                 {
                     endptr = ptr + (c == '-' || c == '+');
-                    while( cv_isdigit(*endptr) )
+                    ആകുമ്പോൾ( cv_isdigit(*endptr) )
                         endptr++;
-                    if( *endptr == '.' || *endptr == 'e' )
+                    എങ്കിൽ( *endptr == '.' || *endptr == 'e' )
                     {
-                        double fval = fs->strtod( ptr, &endptr );
-                        elem->setValue(FileNode::REAL, &fval);
+                        ഇരട്ട fval = fs->strtod( ptr, &endptr );
+                        elem->set_മൂല്യം(File_കണ്ണി::REAL, &fval);
                     }
-                    else
+                    അല്ലെങ്കിൽ
                     {
                         int64_t ival = strtoll( ptr, &endptr, 0 );
-                        elem->setValue(FileNode::INT, &ival);
+                        elem->set_മൂല്യം(File_കണ്ണി::INT, &ival);
                     }
 
-                    if( endptr == ptr )
+                    എങ്കിൽ( endptr == ptr )
                         CV_PARSE_ERROR_CPP( "Invalid numeric value (inconsistent explicit type specification?)" );
 
                     ptr = endptr;
                     CV_PERSISTENCE_CHECK_END_OF_BUFFER_BUG_CPP();
                 }
-                else
+                അല്ലെങ്കിൽ
                 {
                     // string
-                    int i = 0, len, is_quoted = 0;
-                    if( c == '\"' )
+                    പൂർണ്ണസംഖ്യ i = 0, len, is_quoted = 0;
+                    എങ്കിൽ( c == '\"' )
                         is_quoted = 1;
-                    else
+                    അല്ലെങ്കിൽ
                         --ptr;
                     strbuf[0] = '\0';
 
-                    for( ;; )
+                    വേണ്ടി( ;; )
                     {
                         c = *++ptr;
                         CV_PERSISTENCE_CHECK_END_OF_BUFFER_BUG_CPP();
 
-                        if( !cv_isalnum(c) )
+                        എങ്കിൽ( !cv_isalnum(c) )
                         {
-                            if( c == '\"' )
+                            എങ്കിൽ( c == '\"' )
                             {
-                                if( !is_quoted )
+                                എങ്കിൽ( !is_quoted )
                                     CV_PARSE_ERROR_CPP( "Literal \" is not allowed within a string. Use &quot;" );
                                 ++ptr;
-                                break;
+                                നിർത്തുക;
                             }
-                            else if( !cv_isprint(c) || c == '<' || (!is_quoted && cv_isspace(c)))
+                            അല്ലെങ്കിൽ എങ്കിൽ( !cv_isprint(c) || c == '<' || (!is_quoted && cv_isspace(c)))
                             {
-                                if( is_quoted )
+                                എങ്കിൽ( is_quoted )
                                     CV_PARSE_ERROR_CPP( "Closing \" is expected" );
-                                break;
+                                നിർത്തുക;
                             }
-                            else if( c == '\'' || c == '>' )
+                            അല്ലെങ്കിൽ എങ്കിൽ( c == '\'' || c == '>' )
                             {
                                 CV_PARSE_ERROR_CPP( "Literal \' or > are not allowed. Use &apos; or &gt;" );
                             }
-                            else if( c == '&' )
+                            അല്ലെങ്കിൽ എങ്കിൽ( c == '&' )
                             {
-                                if( *++ptr == '#' )
+                                എങ്കിൽ( *++ptr == '#' )
                                 {
-                                    int val, base = 10;
+                                    പൂർണ്ണസംഖ്യ val, base = 10;
                                     ptr++;
-                                    if( *ptr == 'x' )
+                                    എങ്കിൽ( *ptr == 'x' )
                                     {
                                         base = 16;
                                         ptr++;
                                     }
-                                    val = (int)strtol( ptr, &endptr, base );
-                                    if( (unsigned)val > (unsigned)255 ||
+                                    val = (പൂർണ്ണസംഖ്യ)strtol( ptr, &endptr, base );
+                                    എങ്കിൽ( (unsigned)val > (unsigned)255 ||
                                        !endptr || *endptr != ';' )
                                         CV_PARSE_ERROR_CPP( "Invalid numeric value in the string" );
-                                    c = (char)val;
+                                    c = (അക്ഷരം)val;
                                 }
-                                else
+                                അല്ലെങ്കിൽ
                                 {
                                     endptr = ptr;
-                                    do c = *++endptr;
-                                    while( cv_isalnum(c) );
-                                    if( c != ';' )
+                                    ചെയ്യുക c = *++endptr;
+                                    ആകുമ്പോൾ( cv_isalnum(c) );
+                                    എങ്കിൽ( c != ';' )
                                         CV_PARSE_ERROR_CPP( "Invalid character in the symbol entity name" );
-                                    len = (int)(endptr - ptr);
-                                    if( len == 2 && memcmp( ptr, "lt", len ) == 0 )
+                                    len = (പൂർണ്ണസംഖ്യ)(endptr - ptr);
+                                    എങ്കിൽ( len == 2 && memcmp( ptr, "lt", len ) == 0 )
                                         c = '<';
-                                    else if( len == 2 && memcmp( ptr, "gt", len ) == 0 )
+                                    അല്ലെങ്കിൽ എങ്കിൽ( len == 2 && memcmp( ptr, "gt", len ) == 0 )
                                         c = '>';
-                                    else if( len == 3 && memcmp( ptr, "amp", len ) == 0 )
+                                    അല്ലെങ്കിൽ എങ്കിൽ( len == 3 && memcmp( ptr, "amp", len ) == 0 )
                                         c = '&';
-                                    else if( len == 4 && memcmp( ptr, "apos", len ) == 0 )
+                                    അല്ലെങ്കിൽ എങ്കിൽ( len == 4 && memcmp( ptr, "apos", len ) == 0 )
                                         c = '\'';
-                                    else if( len == 4 && memcmp( ptr, "quot", len ) == 0 )
+                                    അല്ലെങ്കിൽ എങ്കിൽ( len == 4 && memcmp( ptr, "quot", len ) == 0 )
                                         c = '\"';
-                                    else
+                                    അല്ലെങ്കിൽ
                                     {
-                                        if (len + 2 + i >= CV_FS_MAX_LEN)
+                                        എങ്കിൽ (len + 2 + i >= CV_FS_MAX_LEN)
                                             CV_PARSE_ERROR_CPP("string is too long");
                                         memcpy( strbuf + i, ptr-1, len + 2 );
                                         i += len + 2;
@@ -656,114 +656,114 @@ public:
                                 CV_PERSISTENCE_CHECK_END_OF_BUFFER_BUG_CPP();
                             }
                         }
-                        if (i + 1 >= CV_FS_MAX_LEN)
+                        എങ്കിൽ (i + 1 >= CV_FS_MAX_LEN)
                             CV_PARSE_ERROR_CPP("Too long string literal");
                         strbuf[i++] = c;
                     }
-                    elem->setValue(FileNode::STRING, strbuf, i);
+                    elem->set_മൂല്യം(File_കണ്ണി::STRING, strbuf, i);
                 }
 
-                if( value_type != FileNode::NONE && value_type != FileNode::SEQ && value_type != FileNode::MAP )
-                    break;
-                have_space = false;
+                എങ്കിൽ( value_type != File_കണ്ണി::NONE && value_type != File_കണ്ണി::SEQ && value_type != File_കണ്ണി::MAP )
+                    നിർത്തുക;
+                have_space = അസത്യം;
             }
         }
-        fs->finalizeCollection(node);
+        fs->finalizeCollection(കണ്ണി);
 
-        return ptr;
+        തിരികെ ptr;
     }
 
-    char* parseTag( char* ptr, std::string& tag_name,
-                    std::string& type_name, int& tag_type )
+    അക്ഷരം* parseTag( അക്ഷരം* ptr, std::string& tag_name,
+                    std::string& type_name, പൂർണ്ണസംഖ്യ& tag_type )
     {
-        if (!ptr)
+        എങ്കിൽ (!ptr)
             CV_PARSE_ERROR_CPP("Invalid tag input");
 
-        if( *ptr == '\0' )
+        എങ്കിൽ( *ptr == '\0' )
             CV_PARSE_ERROR_CPP( "Unexpected end of the stream" );
 
-        if( *ptr != '<' )
+        എങ്കിൽ( *ptr != '<' )
             CV_PARSE_ERROR_CPP( "Tag should start with \'<\'" );
 
         ptr++;
         CV_PERSISTENCE_CHECK_END_OF_BUFFER_BUG_CPP();
 
-        if( cv_isalnum(*ptr) || *ptr == '_' )
+        എങ്കിൽ( cv_isalnum(*ptr) || *ptr == '_' )
             tag_type = CV_XML_OPENING_TAG;
-        else if( *ptr == '/' )
+        അല്ലെങ്കിൽ എങ്കിൽ( *ptr == '/' )
         {
             tag_type = CV_XML_CLOSING_TAG;
             ptr++;
         }
-        else if( *ptr == '?' )
+        അല്ലെങ്കിൽ എങ്കിൽ( *ptr == '?' )
         {
             tag_type = CV_XML_HEADER_TAG;
             ptr++;
         }
-        else if( *ptr == '!' )
+        അല്ലെങ്കിൽ എങ്കിൽ( *ptr == '!' )
         {
             tag_type = CV_XML_DIRECTIVE_TAG;
             CV_Assert( ptr[1] != '-' || ptr[2] != '-' );
             ptr++;
         }
-        else
+        അല്ലെങ്കിൽ
             CV_PARSE_ERROR_CPP( "Unknown tag type" );
 
         tag_name.clear();
         type_name.clear();
 
-        for(;;)
+        വേണ്ടി(;;)
         {
-            char c, *endptr;
-            if( !cv_isalpha(*ptr) && *ptr != '_' )
+            അക്ഷരം c, *endptr;
+            എങ്കിൽ( !cv_isalpha(*ptr) && *ptr != '_' )
                 CV_PARSE_ERROR_CPP( "Name should start with a letter or underscore" );
 
             endptr = ptr - 1;
-            do c = *++endptr;
-            while( cv_isalnum(c) || c == '_' || c == '-' );
+            ചെയ്യുക c = *++endptr;
+            ആകുമ്പോൾ( cv_isalnum(c) || c == '_' || c == '-' );
 
             std::string attrname(ptr, (size_t)(endptr - ptr));
             ptr = endptr;
             CV_PERSISTENCE_CHECK_END_OF_BUFFER_BUG_CPP();
 
-            if( tag_name.empty() )
+            എങ്കിൽ( tag_name.empty() )
                 tag_name = attrname;
-            else
+            അല്ലെങ്കിൽ
             {
-                if( tag_type == CV_XML_CLOSING_TAG )
+                എങ്കിൽ( tag_type == CV_XML_CLOSING_TAG )
                     CV_PARSE_ERROR_CPP( "Closing tag should not contain any attributes" );
 
-                if( *ptr != '=' )
+                എങ്കിൽ( *ptr != '=' )
                 {
                     ptr = skipSpaces( ptr, CV_XML_INSIDE_TAG );
-                    if (!ptr)
+                    എങ്കിൽ (!ptr)
                         CV_PARSE_ERROR_CPP("Invalid attribute");
-                    if( *ptr != '=' )
+                    എങ്കിൽ( *ptr != '=' )
                         CV_PARSE_ERROR_CPP( "Attribute name should be followed by \'=\'" );
                 }
 
                 c = *++ptr;
-                if( c != '\"' && c != '\'' )
+                എങ്കിൽ( c != '\"' && c != '\'' )
                 {
                     ptr = skipSpaces( ptr, CV_XML_INSIDE_TAG );
-                    if(!ptr)
+                    എങ്കിൽ(!ptr)
                         CV_PARSE_ERROR_CPP("Invalid attribute value");
-                    if( *ptr != '\"' && *ptr != '\'' )
+                    എങ്കിൽ( *ptr != '\"' && *ptr != '\'' )
                         CV_PARSE_ERROR_CPP( "Attribute value should be put into single or double quotes" );
                 }
 
-                char quote = *ptr++;
+                അക്ഷരം quote = *ptr++;
                 endptr = ptr;
-                for(;;)
+                വേണ്ടി(;;)
                 {
                     c = *endptr++;
-                    if( c == quote )
-                        break;
-                    if( c == '\0' )
+                    എങ്കിൽ( c == quote )
+                        നിർത്തുക;
+                    എങ്കിൽ( c == '\0' )
                         CV_PARSE_ERROR_CPP( "Unexpected end of line" );
                 }
 
-                if( attrname == "type_id" )
+                എങ്കിൽ( attrname == "type_id" )
                 {
                     CV_Assert( type_name.empty() );
                     type_name = std::string(ptr, (size_t)(endptr - 1 - ptr));
@@ -773,99 +773,99 @@ public:
             }
 
             c = *ptr;
-            bool have_space = cv_isspace(c) || c == '\0';
+            തർക്കം have_space = cv_isspace(c) || c == '\0';
 
-            if( c != '>' )
+            എങ്കിൽ( c != '>' )
             {
                 ptr = skipSpaces( ptr, CV_XML_INSIDE_TAG );
-                if (!ptr)
+                എങ്കിൽ (!ptr)
                     CV_PARSE_ERROR_CPP("Invalid input");
                 c = *ptr;
             }
 
-            if( c == '>' )
+            എങ്കിൽ( c == '>' )
             {
-                if( tag_type == CV_XML_HEADER_TAG )
+                എങ്കിൽ( tag_type == CV_XML_HEADER_TAG )
                     CV_PARSE_ERROR_CPP( "Invalid closing tag for <?xml ..." );
                 ptr++;
-                break;
+                നിർത്തുക;
             }
-            else if( c == '?' && tag_type == CV_XML_HEADER_TAG )
+            അല്ലെങ്കിൽ എങ്കിൽ( c == '?' && tag_type == CV_XML_HEADER_TAG )
             {
-                if( ptr[1] != '>'  )  // FIXIT ptr[1] - out of bounds read without check
+                എങ്കിൽ( ptr[1] != '>'  )  // FIXIT ptr[1] - out of bounds read without check
                     CV_PARSE_ERROR_CPP( "Invalid closing tag for <?xml ..." );
                 ptr += 2;
-                break;
+                നിർത്തുക;
             }
-            else if( c == '/' && ptr[1] == '>' && tag_type == CV_XML_OPENING_TAG )  // FIXIT ptr[1] - out of bounds read without check
+            അല്ലെങ്കിൽ എങ്കിൽ( c == '/' && ptr[1] == '>' && tag_type == CV_XML_OPENING_TAG )  // FIXIT ptr[1] - out of bounds read without check
             {
                 tag_type = CV_XML_EMPTY_TAG;
                 ptr += 2;
-                break;
+                നിർത്തുക;
             }
 
-            if( !have_space )
+            എങ്കിൽ( !have_space )
                 CV_PARSE_ERROR_CPP( "There should be space between attributes" );
         }
 
-        return ptr;
+        തിരികെ ptr;
     }
 
-    bool parse(char* ptr)
+    തർക്കം parse(അക്ഷരം* ptr)
     {
         CV_Assert( fs != 0 );
 
-        std::string key, key2, type_name;
-        int tag_type = 0;
-        bool ok = false;
+        std::string താക്കോൽ, key2, type_name;
+        പൂർണ്ണസംഖ്യ tag_type = 0;
+        തർക്കം ok = അസത്യം;
 
         // CV_XML_INSIDE_TAG is used to prohibit leading comments
         ptr = skipSpaces( ptr, CV_XML_INSIDE_TAG );
-        if (!ptr)
+        എങ്കിൽ (!ptr)
             CV_PARSE_ERROR_CPP("Invalid input");
 
-        if( memcmp( ptr, "<?xml", 5 ) != 0 )  // FIXIT ptr[1..] - out of bounds read without check
+        എങ്കിൽ( memcmp( ptr, "<?xml", 5 ) != 0 )  // FIXIT ptr[1..] - out of bounds read without check
             CV_PARSE_ERROR_CPP( "Valid XML should start with \'<?xml ...?>\'" );
 
-        ptr = parseTag( ptr, key, type_name, tag_type );
-        FileNode root_collection(fs->getFS(), 0, 0);
+        ptr = parseTag( ptr, താക്കോൽ, type_name, tag_type );
+        File_കണ്ണി വേര്_collection(fs->getFS(), 0, 0);
 
-        while( ptr && *ptr != '\0' )
+        ആകുമ്പോൾ( ptr && *ptr != '\0' )
         {
             ptr = skipSpaces( ptr, 0 );
-            if (!ptr)
+            എങ്കിൽ (!ptr)
                 CV_PARSE_ERROR_CPP("Invalid input");
 
-            if( *ptr != '\0' )
+            എങ്കിൽ( *ptr != '\0' )
             {
-                ptr = parseTag( ptr, key, type_name, tag_type );
-                if( tag_type != CV_XML_OPENING_TAG || key != "opencv_storage" )
+                ptr = parseTag( ptr, താക്കോൽ, type_name, tag_type );
+                എങ്കിൽ( tag_type != CV_XML_OPENING_TAG || താക്കോൽ != "opencv_storage" )
                     CV_PARSE_ERROR_CPP( "<opencv_storage> tag is missing" );
-                FileNode root = fs->addNode(root_collection, std::string(), FileNode::MAP, 0);
-                ptr = parseValue( ptr, root );
+                File_കണ്ണി വേര് = fs->add_കണ്ണി(വേര്_collection, std::string(), File_കണ്ണി::MAP, 0);
+                ptr = parse_മൂല്യം( ptr, വേര് );
                 ptr = parseTag( ptr, key2, type_name, tag_type );
-                if( tag_type != CV_XML_CLOSING_TAG || key != key2 )
+                എങ്കിൽ( tag_type != CV_XML_CLOSING_TAG || താക്കോൽ != key2 )
                     CV_PARSE_ERROR_CPP( "</opencv_storage> tag is missing" );
                 ptr = skipSpaces( ptr, 0 );
-                ok = true;
+                ok = സത്യം;
             }
         }
         CV_Assert( fs->eof() );
-        return ok;
+        തിരികെ ok;
     }
 
     FileStorage_API* fs;
-    char strbuf[CV_FS_MAX_LEN+16];
+    അക്ഷരം strbuf[CV_FS_MAX_LEN+16];
 };
 
 Ptr<FileStorageEmitter> createXMLEmitter(FileStorage_API* fs)
 {
-    return makePtr<XMLEmitter>(fs);
+    തിരികെ makePtr<XMLEmitter>(fs);
 }
 
 Ptr<FileStorageParser> createXMLParser(FileStorage_API* fs)
 {
-    return makePtr<XMLParser>(fs);
+    തിരികെ makePtr<XMLParser>(fs);
 }
 
 }

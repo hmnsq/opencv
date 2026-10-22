@@ -6,13 +6,13 @@
 #ifndef SRC_PERSISTENCE_HPP
 #define SRC_PERSISTENCE_HPP
 
-#include <deque>
-#include <sstream>
-#include <string>
-#include <iterator>
+#അന്തര്ഭാവ <deque>
+#അന്തര്ഭാവ <sstream>
+#അന്തര്ഭാവ <string>
+#അന്തര്ഭാവ <iterator>
 
 #define USE_ZLIB 1
-#if USE_ZLIB
+#എങ്കിൽ USE_ZLIB
 #  ifndef _LFS64_LARGEFILE
 #    define _LFS64_LARGEFILE 0
 #  endif
@@ -20,18 +20,18 @@
 #    define _FILE_OFFSET_BITS 0
 #  endif
 #  include <zlib.h>
-#else
-typedef void* gzFile;
+#അല്ലെങ്കിൽ
+തരനിർവചനം ശൂന്യം* gzFile;
 #endif
 
 //=====================================================================================
 
-static const size_t PARSER_BASE64_BUFFER_SIZE = 1024U * 1024U / 8U;
-static const int CV_PERSISTENCE_MAX_DEPTH = 1024;
+സ്ഥിതം സ്ഥിരം size_t PARSER_BASE64_BUFFER_SIZE = 1024U * 1024U / 8U;
+സ്ഥിതം സ്ഥിരം പൂർണ്ണസംഖ്യ CV_PERSISTENCE_MAX_DEPTH = 1024;
 
-namespace base64 {
+നാമാകാശ base64 {
 
-enum
+എണ്ണൽ
 {
     HEADER_SIZE         = 24,
     ENCODED_HEADER_SIZE = 32
@@ -51,76 +51,76 @@ enum
 #define cv_isprint(c)     ((uchar)(c) >= (uchar)' ')
 #define cv_isprint_or_tab(c)  ((uchar)(c) >= (uchar)' ' || (c) == '\t')
 
-inline bool cv_isalnum(char c)
+വരിയിൽ തർക്കം cv_isalnum(അക്ഷരം c)
 {
-    return ('0' <= c && c <= '9') || ('a' <= c && c <= 'z') || ('A' <= c && c <= 'Z');
+    തിരികെ ('0' <= c && c <= '9') || ('a' <= c && c <= 'z') || ('A' <= c && c <= 'Z');
 }
 
-inline bool cv_isalpha(char c)
+വരിയിൽ തർക്കം cv_isalpha(അക്ഷരം c)
 {
-    return ('a' <= c && c <= 'z') || ('A' <= c && c <= 'Z');
+    തിരികെ ('a' <= c && c <= 'z') || ('A' <= c && c <= 'Z');
 }
 
-inline bool cv_isdigit(char c)
+വരിയിൽ തർക്കം cv_isdigit(അക്ഷരം c)
 {
-    return '0' <= c && c <= '9';
+    തിരികെ '0' <= c && c <= '9';
 }
 
-inline bool cv_isspace(char c)
+വരിയിൽ തർക്കം cv_isspace(അക്ഷരം c)
 {
-    return (9 <= c && c <= 13) || c == ' ';
+    തിരികെ (9 <= c && c <= 13) || c == ' ';
 }
 
-inline char* cv_skip_BOM(char* ptr)
+വരിയിൽ അക്ഷരം* cv_skip_BOM(അക്ഷരം* ptr)
 {
-    if((uchar)ptr[0] == 0xef && (uchar)ptr[1] == 0xbb && (uchar)ptr[2] == 0xbf) //UTF-8 BOM
+    എങ്കിൽ((uchar)ptr[0] == 0xef && (uchar)ptr[1] == 0xbb && (uchar)ptr[2] == 0xbf) //UTF-8 BOM
     {
-      return ptr + 3;
+      തിരികെ ptr + 3;
     }
-    return ptr;
+    തിരികെ ptr;
 }
 
-namespace cv
+നാമാകാശ cv
 {
-namespace fs
+നാമാകാശ fs
 {
-int strcasecmp(const char* str1, const char* str2);
-char* itoa( int _val, char* buffer, int /*radix*/ );
-char* itoa( int64_t _val, char* buffer, int /*radix*/, bool _signed );
-char* floatToString( char* buf, size_t bufSize, float value, bool halfprecision, bool explicitZero );
-char* doubleToString( char* buf, size_t bufSize, double value, bool explicitZero );
+പൂർണ്ണസംഖ്യ strcasecmp(സ്ഥിരം അക്ഷരം* str1, സ്ഥിരം അക്ഷരം* str2);
+അക്ഷരം* itoa( പൂർണ്ണസംഖ്യ _val, അക്ഷരം* buffer, പൂർണ്ണസംഖ്യ /*radix*/ );
+അക്ഷരം* itoa( int64_t _val, അക്ഷരം* buffer, പൂർണ്ണസംഖ്യ /*radix*/, തർക്കം _signed );
+അക്ഷരം* floatToString( അക്ഷരം* buf, size_t bufSize, ദശാംശം value, തർക്കം halfprecision, തർക്കം explicitZero );
+അക്ഷരം* doubleToString( അക്ഷരം* buf, size_t bufSize, ഇരട്ട value, തർക്കം explicitZero );
 
-int calcStructSize( const char* dt, int initial_size );
-int calcElemSize( const char* dt, int initial_size );
-CV_DEPRECATED char* encodeFormat( int elem_type, char* dt );
-char* encodeFormat( int elem_type, char* dt, size_t dt_len );
-int decodeFormat( const char* dt, int* fmt_pairs, int max_len );
-int decodeSimpleFormat( const char* dt );
+പൂർണ്ണസംഖ്യ calcStructSize( സ്ഥിരം അക്ഷരം* dt, പൂർണ്ണസംഖ്യ initial_size );
+പൂർണ്ണസംഖ്യ calcElemSize( സ്ഥിരം അക്ഷരം* dt, പൂർണ്ണസംഖ്യ initial_size );
+CV_DEPRECATED അക്ഷരം* encodeFormat( പൂർണ്ണസംഖ്യ elem_type, അക്ഷരം* dt );
+അക്ഷരം* encodeFormat( പൂർണ്ണസംഖ്യ elem_type, അക്ഷരം* dt, size_t dt_len );
+പൂർണ്ണസംഖ്യ decodeFormat( സ്ഥിരം അക്ഷരം* dt, പൂർണ്ണസംഖ്യ* fmt_pairs, പൂർണ്ണസംഖ്യ max_len );
+പൂർണ്ണസംഖ്യ decodeSimpleFormat( സ്ഥിരം അക്ഷരം* dt );
 }
 
 
 #ifdef CV_STATIC_ANALYSIS
-#define CV_PARSE_ERROR_CPP(errmsg) do { (void)fs; abort(); } while (0)
-#else
+#define CV_PARSE_ERROR_CPP(errmsg) ചെയ്യുക { (ശൂന്യം)fs; abort(); } ആകുമ്പോൾ (0)
+#അല്ലെങ്കിൽ
 #define CV_PARSE_ERROR_CPP( errmsg ) \
     fs->parseError( CV_Func, (errmsg), __FILE__, __LINE__ )
 #endif
 
 
-#define CV_PERSISTENCE_CHECK_END_OF_BUFFER_BUG_CPP() do { \
+#define CV_PERSISTENCE_CHECK_END_OF_BUFFER_BUG_CPP() ചെയ്യുക { \
     CV_DbgAssert(ptr); \
-    if((ptr)[0] == 0 && (ptr) == fs->bufferEnd() - 1) CV_PARSE_ERROR_CPP("OpenCV persistence doesn't support very long lines"); \
-} while (0)
+    എങ്കിൽ((ptr)[0] == 0 && (ptr) == fs->bufferEnd() - 1) CV_PARSE_ERROR_CPP("OpenCV persistence doesn't support very long lines"); \
+} ആകുമ്പോൾ (0)
 
 
-class FileStorageParser;
-class FileStorageEmitter;
+വർഗ്ഗം FileStorageParser;
+വർഗ്ഗം FileStorageEmitter;
 
-struct FStructData
+ഘടന FStructData
 {
     FStructData() { indent = flags = 0; }
-    FStructData( const std::string& _struct_tag,
-                 int _struct_flags, int _struct_indent )
+    FStructData( സ്ഥിരം std::string& _struct_tag,
+                 പൂർണ്ണസംഖ്യ _struct_flags, പൂർണ്ണസംഖ്യ _struct_indent )
     {
         tag = _struct_tag;
         flags = _struct_flags;
@@ -128,88 +128,88 @@ struct FStructData
     }
 
     std::string tag;
-    int flags;
-    int indent;
+    പൂർണ്ണസംഖ്യ flags;
+    പൂർണ്ണസംഖ്യ indent;
 };
 
-class FileStorage_API
+വർഗ്ഗം FileStorage_API
 {
-public:
-    virtual ~FileStorage_API();
-    virtual FileStorage* getFS() = 0;
+പൊതു:
+    മായാ ~FileStorage_API();
+    മായാ FileStorage* getFS() = 0;
 
-    virtual int getFormat() const = 0;
+    മായാ പൂർണ്ണസംഖ്യ getFormat() സ്ഥിരം = 0;
 
-    virtual void puts( const char* str ) = 0;
-    virtual char* gets() = 0;
-    virtual bool eof() = 0;
-    virtual void setEof() = 0;
-    virtual void closeFile() = 0;
-    virtual void rewind() = 0;
-    virtual char* resizeWriteBuffer( char* ptr, int len ) = 0;
-    virtual char* bufferPtr() const = 0;
-    virtual char* bufferStart() const = 0;
-    virtual char* bufferEnd() const = 0;
-    virtual void setBufferPtr(char* ptr) = 0;
-    virtual char* flush() = 0;
-    virtual void setNonEmpty() = 0;
-    virtual int wrapMargin() const = 0;
+    മായാ ശൂന്യം puts( സ്ഥിരം അക്ഷരം* str ) = 0;
+    മായാ അക്ഷരം* gets() = 0;
+    മായാ തർക്കം eof() = 0;
+    മായാ ശൂന്യം setEof() = 0;
+    മായാ ശൂന്യം closeFile() = 0;
+    മായാ ശൂന്യം rewind() = 0;
+    മായാ അക്ഷരം* resizeWriteBuffer( അക്ഷരം* ptr, പൂർണ്ണസംഖ്യ len ) = 0;
+    മായാ അക്ഷരം* bufferPtr() സ്ഥിരം = 0;
+    മായാ അക്ഷരം* bufferStart() സ്ഥിരം = 0;
+    മായാ അക്ഷരം* bufferEnd() സ്ഥിരം = 0;
+    മായാ ശൂന്യം setBufferPtr(അക്ഷരം* ptr) = 0;
+    മായാ അക്ഷരം* flush() = 0;
+    മായാ ശൂന്യം setNonEmpty() = 0;
+    മായാ പൂർണ്ണസംഖ്യ wrapMargin() സ്ഥിരം = 0;
 
-    virtual FStructData& getCurrentStruct() = 0;
+    മായാ FStructData& getCurrentStruct() = 0;
 
-    virtual void convertToCollection( int type, FileNode& node ) = 0;
-    virtual FileNode addNode( FileNode& collection, const std::string& key,
-                               int type, const void* value=0, int len=-1 ) = 0;
-    virtual void finalizeCollection( FileNode& collection ) = 0;
-    virtual double strtod(char* ptr, char** endptr) = 0;
+    മായാ ശൂന്യം convertToCollection( പൂർണ്ണസംഖ്യ type, File_കണ്ണി& കണ്ണി ) = 0;
+    മായാ File_കണ്ണി add_കണ്ണി( File_കണ്ണി& collection, സ്ഥിരം std::string& താക്കോൽ,
+                               പൂർണ്ണസംഖ്യ type, സ്ഥിരം ശൂന്യം* value=0, പൂർണ്ണസംഖ്യ len=-1 ) = 0;
+    മായാ ശൂന്യം finalizeCollection( File_കണ്ണി& collection ) = 0;
+    മായാ ഇരട്ട strtod(അക്ഷരം* ptr, അക്ഷരം** endptr) = 0;
 
-    virtual char* parseBase64(char* ptr, int indent, FileNode& collection) = 0;
+    മായാ അക്ഷരം* parseBase64(അക്ഷരം* ptr, പൂർണ്ണസംഖ്യ indent, File_കണ്ണി& collection) = 0;
     CV_NORETURN
-    virtual void parseError(const char* funcname, const std::string& msg,
-                            const char* filename, int lineno) = 0;
+    മായാ ശൂന്യം parseError(സ്ഥിരം അക്ഷരം* funcname, സ്ഥിരം std::string& സന്ദേശം,
+                            സ്ഥിരം അക്ഷരം* filename, പൂർണ്ണസംഖ്യ lineno) = 0;
 
-private:
-    enum Base64State{
+സ്വകാര്യ:
+    എണ്ണൽ Base64State{
         Uncertain,
         NotUse,
         InUse,
     };
 
-    friend class cv::FileStorage::Impl;
-    friend class cv::FileStorage;
-    friend class JSONEmitter;
-    friend class XMLEmitter;
-    friend class YAMLEmitter;
+    friend വർഗ്ഗം cv::FileStorage::Impl;
+    friend വർഗ്ഗം cv::FileStorage;
+    friend വർഗ്ഗം JSONEmitter;
+    friend വർഗ്ഗം XMLEmitter;
+    friend വർഗ്ഗം YAMLEmitter;
 
-    virtual void check_if_write_struct_is_delayed(bool change_type_to_base64 = false) = 0;
-    virtual void switch_to_Base64_state(Base64State state) = 0;
-    virtual Base64State get_state_of_writing_base64() = 0;
-    virtual int get_space() = 0;
+    മായാ ശൂന്യം check_if_write_struct_is_delayed(തർക്കം change_type_to_base64 = അസത്യം) = 0;
+    മായാ ശൂന്യം switch_to_Base64_state(Base64State state) = 0;
+    മായാ Base64State get_state_of_writing_base64() = 0;
+    മായാ പൂർണ്ണസംഖ്യ get_space() = 0;
 };
 
-class FileStorageEmitter
+വർഗ്ഗം FileStorageEmitter
 {
-public:
-    virtual ~FileStorageEmitter() {}
+പൊതു:
+    മായാ ~FileStorageEmitter() {}
 
-    virtual FStructData startWriteStruct( const FStructData& parent, const char* key,
-                                          int struct_flags, const char* type_name=0 ) = 0;
-    virtual void endWriteStruct(const FStructData& current_struct) = 0;
-    virtual void write(const char* key, int value) = 0;
-    virtual void write(const char* key, int64_t value) = 0;
-    virtual void write(const char* key, double value) = 0;
-    virtual void write(const char* key, const char* value, bool quote) = 0;
-    virtual void writeScalar(const char* key, const char* value) = 0;
-    virtual void writeComment(const char* comment, bool eol_comment) = 0;
-    virtual void startNextStream() = 0;
+    മായാ FStructData startWriteStruct( സ്ഥിരം FStructData& parent, സ്ഥിരം അക്ഷരം* താക്കോൽ,
+                                          പൂർണ്ണസംഖ്യ struct_flags, സ്ഥിരം അക്ഷരം* type_name=0 ) = 0;
+    മായാ ശൂന്യം endWriteStruct(സ്ഥിരം FStructData& current_struct) = 0;
+    മായാ ശൂന്യം ലിഖ(സ്ഥിരം അക്ഷരം* താക്കോൽ, പൂർണ്ണസംഖ്യ value) = 0;
+    മായാ ശൂന്യം ലിഖ(സ്ഥിരം അക്ഷരം* താക്കോൽ, int64_t value) = 0;
+    മായാ ശൂന്യം ലിഖ(സ്ഥിരം അക്ഷരം* താക്കോൽ, ഇരട്ട value) = 0;
+    മായാ ശൂന്യം ലിഖ(സ്ഥിരം അക്ഷരം* താക്കോൽ, സ്ഥിരം അക്ഷരം* value, തർക്കം quote) = 0;
+    മായാ ശൂന്യം writeScalar(സ്ഥിരം അക്ഷരം* താക്കോൽ, സ്ഥിരം അക്ഷരം* value) = 0;
+    മായാ ശൂന്യം writeComment(സ്ഥിരം അക്ഷരം* comment, തർക്കം eol_comment) = 0;
+    മായാ ശൂന്യം startNextStream() = 0;
 };
 
-class FileStorageParser
+വർഗ്ഗം FileStorageParser
 {
-public:
-    virtual ~FileStorageParser() {}
-    virtual bool parse(char* ptr) = 0;
-    virtual bool getBase64Row(char* ptr, int indent, char* &beg, char* &end) = 0;
+പൊതു:
+    മായാ ~FileStorageParser() {}
+    മായാ തർക്കം parse(അക്ഷരം* ptr) = 0;
+    മായാ തർക്കം getBase64Row(അക്ഷരം* ptr, പൂർണ്ണസംഖ്യ indent, അക്ഷരം* &beg, അക്ഷരം* &end) = 0;
 };
 
 Ptr<FileStorageEmitter> createXMLEmitter(FileStorage_API* fs);

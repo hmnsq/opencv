@@ -2,81 +2,81 @@
 // It is subject to the license terms in the LICENSE file found in the top-level directory
 // of this distribution and at http://opencv.org/license.html.
 
-#include "opencv2/core/utils/buffer_area.private.hpp"
-#include "opencv2/core/utils/configuration.private.hpp"
+#അന്തര്ഭാവ "opencv2/core/utils/buffer_area.private.hpp"
+#അന്തര്ഭാവ "opencv2/core/utils/configuration.private.hpp"
 
 #ifndef OPENCV_ENABLE_MEMORY_SANITIZER
-static bool CV_BUFFER_AREA_OVERRIDE_SAFE_MODE =
-    cv::utils::getConfigurationParameterBool("OPENCV_BUFFER_AREA_ALWAYS_SAFE", false);
+സ്ഥിതം തർക്കം CV_BUFFER_AREA_OVERRIDE_SAFE_MODE =
+    cv::utils::getConfigurationParameterBool("OPENCV_BUFFER_AREA_ALWAYS_SAFE", അസത്യം);
 #endif
 
-namespace cv { namespace utils {
+നാമാകാശ cv { നാമാകാശ utils {
 
 //==================================================================================================
 
-class BufferArea::Block
+വർഗ്ഗം BufferArea::Block
 {
-private:
-    inline size_t reserve_count() const
+സ്വകാര്യ:
+    വരിയിൽ size_t reserve_എണ്ണം() സ്ഥിരം
     {
-        return alignment / type_size - 1;
+        തിരികെ alignment / type_size - 1;
     }
-public:
-    Block(void **ptr_, ushort type_size_, size_t count_, ushort alignment_)
-        : ptr(ptr_), raw_mem(0), count(count_), type_size(type_size_), alignment(alignment_)
+പൊതു:
+    Block(ശൂന്യം **ptr_, ushort type_size_, size_t എണ്ണം, ushort alignment_)
+        : ptr(ptr_), raw_mem(0), എണ്ണം_2(എണ്ണം), type_size(type_size_), alignment(alignment_)
     {
-        CV_Assert(ptr && *ptr == NULL);
+        CV_Assert(ptr && *ptr == ശൂന്യ);
     }
-    void cleanup() const
+    ശൂന്യം cleanup() സ്ഥിരം
     {
         CV_DbgAssert(ptr);
-        if (raw_mem)
+        എങ്കിൽ (raw_mem)
             fastFree(raw_mem);
     }
-    size_t getByteCount() const
+    size_t get_Byte_എണ്ണം() സ്ഥിരം
     {
-        return type_size * (count + reserve_count());
+        തിരികെ type_size * (എണ്ണം_2 + reserve_എണ്ണം());
     }
-    void real_allocate()
+    ശൂന്യം real_allocate()
     {
-        CV_Assert(ptr && *ptr == NULL);
-        const size_t allocated_count = count + reserve_count();
-        raw_mem = fastMalloc(type_size * allocated_count);
-        if (alignment != type_size)
+        CV_Assert(ptr && *ptr == ശൂന്യ);
+        സ്ഥിരം size_t allocated_എണ്ണം = എണ്ണം_2 + reserve_എണ്ണം();
+        raw_mem = fastMalloc(type_size * allocated_എണ്ണം);
+        എങ്കിൽ (alignment != type_size)
         {
             *ptr = alignPtr(raw_mem, alignment);
             CV_Assert(reinterpret_cast<size_t>(*ptr) % alignment == 0);
-            CV_Assert(static_cast<uchar*>(*ptr) + type_size * count <= static_cast<uchar*>(raw_mem) + type_size * allocated_count);
+            CV_Assert(static_cast<uchar*>(*ptr) + type_size * എണ്ണം_2 <= static_cast<uchar*>(raw_mem) + type_size * allocated_എണ്ണം);
         }
-        else
+        അല്ലെങ്കിൽ
         {
             *ptr = raw_mem;
         }
     }
 #ifndef OPENCV_ENABLE_MEMORY_SANITIZER
-    void * fast_allocate(void * buf) const
+    ശൂന്യം * fast_allocate(ശൂന്യം * buf) സ്ഥിരം
     {
-        CV_Assert(ptr && *ptr == NULL);
+        CV_Assert(ptr && *ptr == ശൂന്യ);
         buf = alignPtr(buf, alignment);
         CV_Assert(reinterpret_cast<size_t>(buf) % alignment == 0);
         *ptr = buf;
-        return static_cast<void*>(static_cast<uchar*>(*ptr) + type_size * count);
+        തിരികെ static_cast<ശൂന്യം*>(static_cast<uchar*>(*ptr) + type_size * എണ്ണം_2);
     }
 #endif
-    bool operator==(void **other) const
+    തർക്കം operator==(ശൂന്യം **other) സ്ഥിരം
     {
         CV_Assert(ptr && other);
-        return *ptr == *other;
+        തിരികെ *ptr == *other;
     }
-    void zeroFill() const
+    ശൂന്യം zeroFill() സ്ഥിരം
     {
         CV_Assert(ptr && *ptr);
-        memset(static_cast<uchar*>(*ptr), 0, count * type_size);
+        memset(static_cast<uchar*>(*ptr), 0, എണ്ണം_2 * type_size);
     }
-private:
-    void **ptr;
-    void * raw_mem;
-    size_t count;
+സ്വകാര്യ:
+    ശൂന്യം **ptr;
+    ശൂന്യം * raw_mem;
+    size_t എണ്ണം_2;
     ushort type_size;
     ushort alignment;
 };
@@ -84,15 +84,15 @@ private:
 //==================================================================================================
 
 #ifndef OPENCV_ENABLE_MEMORY_SANITIZER
-BufferArea::BufferArea(bool safe_) :
+BufferArea::BufferArea(തർക്കം safe_) :
     oneBuf(0),
     totalSize(0),
     safe(safe_ || CV_BUFFER_AREA_OVERRIDE_SAFE_MODE)
 {
     // nothing
 }
-#else
-BufferArea::BufferArea(bool safe_)
+#അല്ലെങ്കിൽ
+BufferArea::BufferArea(തർക്കം safe_)
 {
     CV_UNUSED(safe_);
 }
@@ -103,52 +103,52 @@ BufferArea::~BufferArea()
     release();
 }
 
-void BufferArea::allocate_(void **ptr, ushort type_size, size_t count, ushort alignment)
+ശൂന്യം BufferArea::allocate_(ശൂന്യം **ptr, ushort type_size, size_t എണ്ണം_2, ushort alignment)
 {
-    blocks.push_back(Block(ptr, type_size, count, alignment));
+    blocks.push_back(Block(ptr, type_size, എണ്ണം_2, alignment));
 #ifndef OPENCV_ENABLE_MEMORY_SANITIZER
-    if (!safe)
+    എങ്കിൽ (!safe)
     {
-        totalSize += blocks.back().getByteCount();
+        totalSize += blocks.back().get_Byte_എണ്ണം();
     }
-    else
+    അല്ലെങ്കിൽ
 #endif
     {
         blocks.back().real_allocate();
     }
 }
 
-void BufferArea::zeroFill_(void **ptr)
+ശൂന്യം BufferArea::zeroFill_(ശൂന്യം **ptr)
 {
-    for(std::vector<Block>::const_iterator i = blocks.begin(); i != blocks.end(); ++i)
+    വേണ്ടി(std::vector<Block>::const_iterator i = blocks.begin(); i != blocks.end(); ++i)
     {
-        if (*i == ptr)
+        എങ്കിൽ (*i == ptr)
         {
             i->zeroFill();
-            break;
+            നിർത്തുക;
         }
     }
 }
 
-void BufferArea::zeroFill()
+ശൂന്യം BufferArea::zeroFill()
 {
-    for(std::vector<Block>::const_iterator i = blocks.begin(); i != blocks.end(); ++i)
+    വേണ്ടി(std::vector<Block>::const_iterator i = blocks.begin(); i != blocks.end(); ++i)
     {
         i->zeroFill();
     }
 }
 
-void BufferArea::commit()
+ശൂന്യം BufferArea::commit()
 {
 #ifndef OPENCV_ENABLE_MEMORY_SANITIZER
-    if (!safe)
+    എങ്കിൽ (!safe)
     {
         CV_Assert(totalSize > 0);
-        CV_Assert(oneBuf == NULL);
+        CV_Assert(oneBuf == ശൂന്യ);
         CV_Assert(!blocks.empty());
         oneBuf = fastMalloc(totalSize);
-        void * ptr = oneBuf;
-        for(std::vector<Block>::const_iterator i = blocks.begin(); i != blocks.end(); ++i)
+        ശൂന്യം * ptr = oneBuf;
+        വേണ്ടി(std::vector<Block>::const_iterator i = blocks.begin(); i != blocks.end(); ++i)
         {
             ptr = i->fast_allocate(ptr);
         }
@@ -156,15 +156,15 @@ void BufferArea::commit()
 #endif
 }
 
-void BufferArea::release()
+ശൂന്യം BufferArea::release()
 {
-    for(std::vector<Block>::const_iterator i = blocks.begin(); i != blocks.end(); ++i)
+    വേണ്ടി(std::vector<Block>::const_iterator i = blocks.begin(); i != blocks.end(); ++i)
     {
         i->cleanup();
     }
     blocks.clear();
 #ifndef OPENCV_ENABLE_MEMORY_SANITIZER
-    if (oneBuf)
+    എങ്കിൽ (oneBuf)
     {
         fastFree(oneBuf);
         oneBuf = 0;

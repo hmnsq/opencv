@@ -6,37 +6,37 @@
 #ifndef SRC_STAT_HPP
 #define SRC_STAT_HPP
 
-#include "opencv2/core/mat.hpp"
+#അന്തര്ഭാവ "opencv2/core/mat.hpp"
 
-namespace cv {
+നാമാകാശ cv {
 
 #ifdef HAVE_OPENCL
 
-enum { OCL_OP_SUM = 0, OCL_OP_SUM_ABS =  1, OCL_OP_SUM_SQR = 2 };
-bool ocl_sum( InputArray _src, Scalar & res, int sum_op, InputArray _mask = noArray(),
-                     InputArray _src2 = noArray(), bool calc2 = false, const Scalar & res2 = Scalar() );
-bool ocl_minMaxIdx( InputArray _src, double* minVal, double* maxVal, int* minLoc, int* maxLoc, InputArray _mask,
-                           int ddepth = -1, bool absValues = false, InputArray _src2 = noArray(), double * maxVal2 = NULL);
+എണ്ണൽ { OCL_OP_SUM = 0, OCL_OP_SUM_ABS =  1, OCL_OP_SUM_SQR = 2 };
+തർക്കം ocl_sum( നിവേശം_Array _src, Scalar & res, പൂർണ്ണസംഖ്യ sum_op, നിവേശം_Array _mask = noArray(),
+                     നിവേശം_Array _src2 = noArray(), തർക്കം calc2 = അസത്യം, സ്ഥിരം Scalar & res2 = Scalar() );
+തർക്കം ocl_minMaxIdx( നിവേശം_Array _src, ഇരട്ട* minVal, ഇരട്ട* maxVal, പൂർണ്ണസംഖ്യ* minLoc, പൂർണ്ണസംഖ്യ* maxLoc, നിവേശം_Array _mask,
+                           പൂർണ്ണസംഖ്യ ddepth = -1, തർക്കം abs_മൂല്യങ്ങൾ = അസത്യം, നിവേശം_Array _src2 = noArray(), ഇരട്ട * maxVal2 = ശൂന്യ);
 
 template <typename T> Scalar ocl_part_sum(Mat m)
 {
     CV_Assert(m.rows == 1);
 
     Scalar s = Scalar::all(0);
-    int cn = m.channels();
-    const T * const ptr = m.ptr<T>(0);
+    പൂർണ്ണസംഖ്യ cn = m.channels();
+    സ്ഥിരം T * സ്ഥിരം ptr = m.ptr<T>(0);
 
-    for (int x = 0, w = m.cols * cn; x < w; )
-        for (int c = 0; c < cn; ++c, ++x)
+    വേണ്ടി (പൂർണ്ണസംഖ്യ x = 0, w = m.cols * cn; x < w; )
+        വേണ്ടി (പൂർണ്ണസംഖ്യ c = 0; c < cn; ++c, ++x)
             s[c] += ptr[x];
 
-    return s;
+    തിരികെ s;
 }
 
 #endif
 
-typedef int (*SumFunc)(const uchar*, const uchar* mask, uchar*, int, int);
-SumFunc getSumFunc(int depth);
+തരനിർവചനം പൂർണ്ണസംഖ്യ (*SumFunc)(സ്ഥിരം uchar*, സ്ഥിരം uchar* mask, uchar*, പൂർണ്ണസംഖ്യ, പൂർണ്ണസംഖ്യ);
+SumFunc getSumFunc(പൂർണ്ണസംഖ്യ depth);
 
 }
 

@@ -2,53 +2,53 @@
 // It is subject to the license terms in the LICENSE file found in the top-level directory
 // of this distribution and at http://opencv.org/license.html
 
-#include "precomp.hpp"
-#include "opencv2/core/mat.hpp"
+#അന്തര്ഭാവ "precomp.hpp"
+#അന്തര്ഭാവ "opencv2/core/mat.hpp"
 
-namespace cv {
+നാമാകാശ cv {
 
-typedef Vec<int, 5> Vec5i;
-typedef Vec<int, 7> Vec7i;
-typedef Vec<int, 9> Vec9i;
-typedef Vec<int, 10> Vec10i;
-typedef Vec<int, 11> Vec11i;
-typedef Vec<int, 12> Vec12i;
-typedef Vec<int, 13> Vec13i;
-typedef Vec<int, 14> Vec14i;
-typedef Vec<int, 15> Vec15i;
-typedef Vec<int, 16> Vec16i;
-typedef Vec<int, 32> Vec32i;
-typedef Vec<int, 64> Vec64i;
-typedef Vec<int, 128> Vec128i;
+തരനിർവചനം Vec<പൂർണ്ണസംഖ്യ, 5> Vec5i;
+തരനിർവചനം Vec<പൂർണ്ണസംഖ്യ, 7> Vec7i;
+തരനിർവചനം Vec<പൂർണ്ണസംഖ്യ, 9> Vec9i;
+തരനിർവചനം Vec<പൂർണ്ണസംഖ്യ, 10> Vec10i;
+തരനിർവചനം Vec<പൂർണ്ണസംഖ്യ, 11> Vec11i;
+തരനിർവചനം Vec<പൂർണ്ണസംഖ്യ, 12> Vec12i;
+തരനിർവചനം Vec<പൂർണ്ണസംഖ്യ, 13> Vec13i;
+തരനിർവചനം Vec<പൂർണ്ണസംഖ്യ, 14> Vec14i;
+തരനിർവചനം Vec<പൂർണ്ണസംഖ്യ, 15> Vec15i;
+തരനിർവചനം Vec<പൂർണ്ണസംഖ്യ, 16> Vec16i;
+തരനിർവചനം Vec<പൂർണ്ണസംഖ്യ, 32> Vec32i;
+തരനിർവചനം Vec<പൂർണ്ണസംഖ്യ, 64> Vec64i;
+തരനിർവചനം Vec<പൂർണ്ണസംഖ്യ, 128> Vec128i;
 
 #undef STD_VECTOR_SWITCH
 #define STD_VECTOR_SWITCH(esz, func) \
-    switch( esz ) \
+    തിരഞ്ഞെടുപ്പ്( esz ) \
     { \
-    case 1: func(uchar); \
-    case 2: func(Vec2b); \
-    case 3: func(Vec3b); \
-    case 4: func(int); \
-    case 6: func(Vec3s); \
-    case 8: func(Vec2i); \
-    case 12: func(Vec3i); \
-    case 16: func(Vec4i); \
-    case 20: func(Vec5i); \
-    case 24: func(Vec6i); \
-    case 28: func(Vec7i); \
-    case 32: func(Vec8i); \
-    case 36: func(Vec9i); \
-    case 40: func(Vec10i); \
-    case 44: func(Vec11i); \
-    case 48: func(Vec12i); \
-    case 52: func(Vec13i); \
-    case 56: func(Vec14i); \
-    case 60: func(Vec15i); \
-    case 64: func(Vec16i); \
-    case 128: func(Vec32i); \
-    case 256: func(Vec64i); \
-    case 512: func(Vec128i); \
-    default: \
+    അവസ്ഥ 1: func(uchar); \
+    അവസ്ഥ 2: func(Vec2b); \
+    അവസ്ഥ 3: func(Vec3b); \
+    അവസ്ഥ 4: func(പൂർണ്ണസംഖ്യ); \
+    അവസ്ഥ 6: func(Vec3s); \
+    അവസ്ഥ 8: func(Vec2i); \
+    അവസ്ഥ 12: func(Vec3i); \
+    അവസ്ഥ 16: func(Vec4i); \
+    അവസ്ഥ 20: func(Vec5i); \
+    അവസ്ഥ 24: func(Vec6i); \
+    അവസ്ഥ 28: func(Vec7i); \
+    അവസ്ഥ 32: func(Vec8i); \
+    അവസ്ഥ 36: func(Vec9i); \
+    അവസ്ഥ 40: func(Vec10i); \
+    അവസ്ഥ 44: func(Vec11i); \
+    അവസ്ഥ 48: func(Vec12i); \
+    അവസ്ഥ 52: func(Vec13i); \
+    അവസ്ഥ 56: func(Vec14i); \
+    അവസ്ഥ 60: func(Vec15i); \
+    അവസ്ഥ 64: func(Vec16i); \
+    അവസ്ഥ 128: func(Vec32i); \
+    അവസ്ഥ 256: func(Vec64i); \
+    അവസ്ഥ 512: func(Vec128i); \
+    സ്ഥിരസ്ഥിതി: \
         CV_Error_(cv::Error::StsBadArg, ("Vectors of vectors with element size %d are not supported. Please, modify STD_VECTOR_SWITCH() macro\n", esz)); \
     }
 
@@ -56,1637 +56,1637 @@ typedef Vec<int, 128> Vec128i;
                                         Input/Output Array
 \*************************************************************************************************/
 
-Mat _InputArray::getMat_(int i) const
+Mat നിവേശം_Array_2::getMat_(പൂർണ്ണസംഖ്യ i) സ്ഥിരം
 {
-    _InputArray::KindFlag k = kind();
+    നിവേശം_Array_2::KindFlag k = kind();
     AccessFlag accessFlags = flags & ACCESS_MASK;
 
-    if( k == MAT )
+    എങ്കിൽ( k == MAT )
     {
-        const Mat* m = (const Mat*)obj;
-        if( i < 0 )
-            return *m;
-        return m->row(i);
+        സ്ഥിരം Mat* m = (സ്ഥിരം Mat*)obj;
+        എങ്കിൽ( i < 0 )
+            തിരികെ *m;
+        തിരികെ m->row(i);
     }
 
-    if( k == UMAT )
+    എങ്കിൽ( k == UMAT )
     {
-        const UMat* m = (const UMat*)obj;
-        if( i < 0 )
-            return m->getMat(accessFlags);
-        return m->getMat(accessFlags).row(i);
+        സ്ഥിരം UMat* m = (സ്ഥിരം UMat*)obj;
+        എങ്കിൽ( i < 0 )
+            തിരികെ m->getMat(accessFlags);
+        തിരികെ m->getMat(accessFlags).row(i);
     }
 
-    if (k == MATX)
+    എങ്കിൽ (k == MATX)
     {
         CV_Assert( i < 0 );
-        return Mat(sz, flags, obj);
+        തിരികെ Mat(sz, flags, obj);
     }
 
-    if( k == STD_BOOL_VECTOR )
+    എങ്കിൽ( k == STD_BOOL_VECTOR )
     {
         CV_Assert( i < 0 );
-        int t = CV_8U;
-        const std::vector<bool>& v = *(const std::vector<bool>*)obj;
-        int j, n = (int)v.size();
-        if( n == 0 )
-            return Mat();
+        പൂർണ്ണസംഖ്യ t = CV_8U;
+        സ്ഥിരം std::vector<തർക്കം>& v = *(സ്ഥിരം std::vector<തർക്കം>*)obj;
+        പൂർണ്ണസംഖ്യ j, n = (പൂർണ്ണസംഖ്യ)v.size();
+        എങ്കിൽ( n == 0 )
+            തിരികെ Mat();
         Mat m(1, &n, t);
         uchar* dst = m.data;
-        for( j = 0; j < n; j++ )
+        വേണ്ടി( j = 0; j < n; j++ )
             dst[j] = (uchar)v[j];
-        return m;
+        തിരികെ m;
     }
 
-    if( k == NONE )
-        return Mat();
+    എങ്കിൽ( k == NONE )
+        തിരികെ Mat();
 
-    if( k == STD_VECTOR || k == STD_VECTOR_VECTOR )
+    എങ്കിൽ( k == STD_VECTOR || k == STD_VECTOR_VECTOR )
     {
-        int t = CV_MAT_TYPE(flags);
-        int esz = CV_ELEM_SIZE(t);
+        പൂർണ്ണസംഖ്യ t = CV_MAT_TYPE(flags);
+        പൂർണ്ണസംഖ്യ esz = CV_ELEM_SIZE(t);
 
     #undef GET_MAT
     #define GET_MAT(T) \
         { \
             std::vector<T>* v; \
-            if (k == STD_VECTOR_VECTOR) { \
+            എങ്കിൽ (k == STD_VECTOR_VECTOR) { \
                 std::vector<std::vector<T> >* vv = \
                     reinterpret_cast<std::vector<std::vector<T> >*>(obj); \
                 CV_Assert(size_t(i) < vv->size()); \
                 v = &vv->at(i); \
-            } else { \
+            } അല്ലെങ്കിൽ { \
                 v = reinterpret_cast<std::vector<T>*>(obj); \
             } \
-            int v_sz = int(v->size()); \
-            return v->empty() ? Mat() : Mat(1, &v_sz, t, v->data()); \
+            പൂർണ്ണസംഖ്യ v_sz = പൂർണ്ണസംഖ്യ(v->size()); \
+            തിരികെ v->empty() ? Mat() : Mat(1, &v_sz, t, v->data()); \
         }
 
         STD_VECTOR_SWITCH(esz, GET_MAT)
     }
 
-    if( k == STD_VECTOR_MAT )
+    എങ്കിൽ( k == STD_VECTOR_MAT )
     {
-        const std::vector<Mat>& v = *(const std::vector<Mat>*)obj;
-        CV_Assert( 0 <= i && i < (int)v.size() );
+        സ്ഥിരം std::vector<Mat>& v = *(സ്ഥിരം std::vector<Mat>*)obj;
+        CV_Assert( 0 <= i && i < (പൂർണ്ണസംഖ്യ)v.size() );
 
-        return v[i];
+        തിരികെ v[i];
     }
 
-    if( k == STD_ARRAY_MAT )
+    എങ്കിൽ( k == STD_ARRAY_MAT )
     {
-        const Mat* v = (const Mat*)obj;
+        സ്ഥിരം Mat* v = (സ്ഥിരം Mat*)obj;
         CV_Assert( 0 <= i && i < sz.height );
 
-        return v[i];
+        തിരികെ v[i];
     }
 
-    if( k == STD_VECTOR_UMAT )
+    എങ്കിൽ( k == STD_VECTOR_UMAT )
     {
-        const std::vector<UMat>& v = *(const std::vector<UMat>*)obj;
-        CV_Assert( 0 <= i && i < (int)v.size() );
+        സ്ഥിരം std::vector<UMat>& v = *(സ്ഥിരം std::vector<UMat>*)obj;
+        CV_Assert( 0 <= i && i < (പൂർണ്ണസംഖ്യ)v.size() );
 
-        return v[i].getMat(accessFlags);
+        തിരികെ v[i].getMat(accessFlags);
     }
 
-    if( k == OPENGL_BUFFER )
+    എങ്കിൽ( k == OPENGL_BUFFER )
     {
         CV_Assert( i < 0 );
         CV_Error(cv::Error::StsNotImplemented, "You should explicitly call mapHost/unmapHost methods for ogl::Buffer object");
     }
 
-    if( k == CUDA_GPU_MAT )
+    എങ്കിൽ( k == CUDA_GPU_MAT )
     {
         CV_Assert( i < 0 );
         CV_Error(cv::Error::StsNotImplemented, "You should explicitly call download method for cuda::GpuMat object");
     }
 
-    if( k == CUDA_GPU_MATND )
+    എങ്കിൽ( k == CUDA_GPU_MATND )
     {
         CV_Assert( i < 0 );
         CV_Error(cv::Error::StsNotImplemented, "You should explicitly call download method for cuda::GpuMatND object");
     }
 
-    if( k == CUDA_HOST_MEM )
+    എങ്കിൽ( k == CUDA_HOST_MEM )
     {
         CV_Assert( i < 0 );
 
-        const cuda::HostMem* cuda_mem = (const cuda::HostMem*)obj;
+        സ്ഥിരം cuda::HostMem* cuda_mem = (സ്ഥിരം cuda::HostMem*)obj;
 
-        return cuda_mem->createMatHeader();
+        തിരികെ cuda_mem->createMatHeader();
     }
 
     CV_Error(Error::StsNotImplemented, "Unknown/unsupported array type");
 }
 
-UMat _InputArray::getUMat(int i) const
+UMat നിവേശം_Array_2::getUMat(പൂർണ്ണസംഖ്യ i) സ്ഥിരം
 {
-    _InputArray::KindFlag k = kind();
+    നിവേശം_Array_2::KindFlag k = kind();
     AccessFlag accessFlags = flags & ACCESS_MASK;
 
-    if( k == UMAT )
+    എങ്കിൽ( k == UMAT )
     {
-        const UMat* m = (const UMat*)obj;
-        if( i < 0 )
-            return *m;
-        return m->row(i);
+        സ്ഥിരം UMat* m = (സ്ഥിരം UMat*)obj;
+        എങ്കിൽ( i < 0 )
+            തിരികെ *m;
+        തിരികെ m->row(i);
     }
 
-    if( k == STD_VECTOR_UMAT )
+    എങ്കിൽ( k == STD_VECTOR_UMAT )
     {
-        const std::vector<UMat>& v = *(const std::vector<UMat>*)obj;
-        CV_Assert( 0 <= i && i < (int)v.size() );
+        സ്ഥിരം std::vector<UMat>& v = *(സ്ഥിരം std::vector<UMat>*)obj;
+        CV_Assert( 0 <= i && i < (പൂർണ്ണസംഖ്യ)v.size() );
 
-        return v[i];
+        തിരികെ v[i];
     }
 
-    if( k == MAT )
+    എങ്കിൽ( k == MAT )
     {
-        const Mat* m = (const Mat*)obj;
-        if( i < 0 )
-            return m->getUMat(accessFlags);
-        return m->row(i).getUMat(accessFlags);
+        സ്ഥിരം Mat* m = (സ്ഥിരം Mat*)obj;
+        എങ്കിൽ( i < 0 )
+            തിരികെ m->getUMat(accessFlags);
+        തിരികെ m->row(i).getUMat(accessFlags);
     }
 
-    return getMat(i).getUMat(accessFlags);
+    തിരികെ getMat(i).getUMat(accessFlags);
 }
 
-void _InputArray::getMatVector(std::vector<Mat>& mv) const
+ശൂന്യം നിവേശം_Array_2::getMatVector(std::vector<Mat>& mv) സ്ഥിരം
 {
-    _InputArray::KindFlag k = kind();
+    നിവേശം_Array_2::KindFlag k = kind();
     AccessFlag accessFlags = flags & ACCESS_MASK;
 
-    if( k == MAT )
+    എങ്കിൽ( k == MAT )
     {
-        const Mat& m = *(const Mat*)obj;
-        int n = (int)m.size[0];
+        സ്ഥിരം Mat& m = *(സ്ഥിരം Mat*)obj;
+        പൂർണ്ണസംഖ്യ n = (പൂർണ്ണസംഖ്യ)m.size[0];
         mv.resize(n);
         CV_Assert(m.dims >= 2);
 
-        for( int i = 0; i < n; i++ )
-            mv[i] = m.dims <= 2 ? Mat(1, m.cols, m.type(), (void*)m.ptr(i)) :
-                Mat(m.dims-1, &m.size[1], m.type(), (void*)m.ptr(i), &m.step[1]);
-        return;
+        വേണ്ടി( പൂർണ്ണസംഖ്യ i = 0; i < n; i++ )
+            mv[i] = m.dims <= 2 ? Mat(1, m.cols, m.type(), (ശൂന്യം*)m.ptr(i)) :
+                Mat(m.dims-1, &m.size[1], m.type(), (ശൂന്യം*)m.ptr(i), &m.step[1]);
+        തിരികെ;
     }
 
-    if (k == MATX)
+    എങ്കിൽ (k == MATX)
     {
         size_t n = sz.height, esz = CV_ELEM_SIZE(flags);
         mv.resize(n);
 
-        for( size_t i = 0; i < n; i++ )
+        വേണ്ടി( size_t i = 0; i < n; i++ )
             mv[i] = Mat(1, sz.width, CV_MAT_TYPE(flags), (uchar*)obj + esz*sz.width*i);
-        return;
+        തിരികെ;
     }
 
-    if( k == STD_VECTOR )
+    എങ്കിൽ( k == STD_VECTOR )
     {
-        const std::vector<uchar>& v = *(const std::vector<uchar>*)obj;
+        സ്ഥിരം std::vector<uchar>& v = *(സ്ഥിരം std::vector<uchar>*)obj;
 
         size_t n = total(), esz = CV_ELEM_SIZE(flags);
-        int t = CV_MAT_DEPTH(flags), cn = CV_MAT_CN(flags);
+        പൂർണ്ണസംഖ്യ t = CV_MAT_DEPTH(flags), cn = CV_MAT_CN(flags);
         mv.resize(n);
 
-        for( size_t i = 0; i < n; i++ )
-            mv[i] = Mat(1, cn, t, (void*)(v.data() + esz*i));
-        return;
+        വേണ്ടി( size_t i = 0; i < n; i++ )
+            mv[i] = Mat(1, cn, t, (ശൂന്യം*)(v.data() + esz*i));
+        തിരികെ;
     }
 
-    if( k == NONE )
+    എങ്കിൽ( k == NONE )
     {
         mv.clear();
-        return;
+        തിരികെ;
     }
 
-    if( k == STD_VECTOR_VECTOR )
+    എങ്കിൽ( k == STD_VECTOR_VECTOR )
     {
-        int typ = CV_MAT_TYPE(flags);
-        int esz = CV_ELEM_SIZE(typ);
+        പൂർണ്ണസംഖ്യ typ = CV_MAT_TYPE(flags);
+        പൂർണ്ണസംഖ്യ esz = CV_ELEM_SIZE(typ);
 
         #undef GET_VEC_VEC_MAT_VEC
         #define GET_VEC_VEC_MAT_VEC(T) \
         { \
-            const std::vector<std::vector<T > >* vv = (const std::vector<std::vector<T > >*)obj; \
+            സ്ഥിരം std::vector<std::vector<T > >* vv = (സ്ഥിരം std::vector<std::vector<T > >*)obj; \
             size_t n = vv->size(); \
             mv.resize(n); \
-            for (size_t i = 0; i < n; i++) { \
-                const std::vector<T >& vi = vv->at(i); \
+            വേണ്ടി (size_t i = 0; i < n; i++) { \
+                സ്ഥിരം std::vector<T >& vi = vv->at(i); \
                 CV_Assert(vi.size() <= (size_t)INT_MAX); \
-                int ni = (int)vi.size(); \
-                mv[i] = ni > 0 ? Mat(1, &ni, typ, (void*)vi.data()) : Mat(); \
+                പൂർണ്ണസംഖ്യ ni = (പൂർണ്ണസംഖ്യ)vi.size(); \
+                mv[i] = ni > 0 ? Mat(1, &ni, typ, (ശൂന്യം*)vi.data()) : Mat(); \
             } \
         } \
-        break
+        നിർത്തുക
 
         STD_VECTOR_SWITCH(esz, GET_VEC_VEC_MAT_VEC)
-        return;
+        തിരികെ;
     }
 
-    if( k == STD_VECTOR_MAT )
+    എങ്കിൽ( k == STD_VECTOR_MAT )
     {
-        const std::vector<Mat>& v = *(const std::vector<Mat>*)obj;
+        സ്ഥിരം std::vector<Mat>& v = *(സ്ഥിരം std::vector<Mat>*)obj;
         size_t n = v.size();
         mv.resize(n);
 
-        for( size_t i = 0; i < n; i++ )
+        വേണ്ടി( size_t i = 0; i < n; i++ )
             mv[i] = v[i];
-        return;
+        തിരികെ;
     }
 
-    if( k == STD_ARRAY_MAT )
+    എങ്കിൽ( k == STD_ARRAY_MAT )
     {
-        const Mat* v = (const Mat*)obj;
+        സ്ഥിരം Mat* v = (സ്ഥിരം Mat*)obj;
         size_t n = sz.height;
         mv.resize(n);
 
-        for( size_t i = 0; i < n; i++ )
+        വേണ്ടി( size_t i = 0; i < n; i++ )
             mv[i] = v[i];
-        return;
+        തിരികെ;
     }
 
-    if( k == STD_VECTOR_UMAT )
+    എങ്കിൽ( k == STD_VECTOR_UMAT )
     {
-        const std::vector<UMat>& v = *(const std::vector<UMat>*)obj;
+        സ്ഥിരം std::vector<UMat>& v = *(സ്ഥിരം std::vector<UMat>*)obj;
         size_t n = v.size();
         mv.resize(n);
 
-        for( size_t i = 0; i < n; i++ )
+        വേണ്ടി( size_t i = 0; i < n; i++ )
             mv[i] = v[i].getMat(accessFlags);
-        return;
+        തിരികെ;
     }
 
     CV_Error(Error::StsNotImplemented, "Unknown/unsupported array type");
 }
 
-void _InputArray::getUMatVector(std::vector<UMat>& umv) const
+ശൂന്യം നിവേശം_Array_2::getUMatVector(std::vector<UMat>& umv) സ്ഥിരം
 {
-    _InputArray::KindFlag k = kind();
+    നിവേശം_Array_2::KindFlag k = kind();
     AccessFlag accessFlags = flags & ACCESS_MASK;
 
-    if( k == NONE )
+    എങ്കിൽ( k == NONE )
     {
         umv.clear();
-        return;
+        തിരികെ;
     }
 
-    if( k == STD_VECTOR_MAT )
+    എങ്കിൽ( k == STD_VECTOR_MAT )
     {
-        const std::vector<Mat>& v = *(const std::vector<Mat>*)obj;
+        സ്ഥിരം std::vector<Mat>& v = *(സ്ഥിരം std::vector<Mat>*)obj;
         size_t n = v.size();
         umv.resize(n);
 
-        for( size_t i = 0; i < n; i++ )
+        വേണ്ടി( size_t i = 0; i < n; i++ )
             umv[i] = v[i].getUMat(accessFlags);
-        return;
+        തിരികെ;
     }
 
-    if( k == STD_ARRAY_MAT )
+    എങ്കിൽ( k == STD_ARRAY_MAT )
     {
-        const Mat* v = (const Mat*)obj;
+        സ്ഥിരം Mat* v = (സ്ഥിരം Mat*)obj;
         size_t n = sz.height;
         umv.resize(n);
 
-        for( size_t i = 0; i < n; i++ )
+        വേണ്ടി( size_t i = 0; i < n; i++ )
             umv[i] = v[i].getUMat(accessFlags);
-        return;
+        തിരികെ;
     }
 
-    if( k == STD_VECTOR_UMAT )
+    എങ്കിൽ( k == STD_VECTOR_UMAT )
     {
-        const std::vector<UMat>& v = *(const std::vector<UMat>*)obj;
+        സ്ഥിരം std::vector<UMat>& v = *(സ്ഥിരം std::vector<UMat>*)obj;
         size_t n = v.size();
         umv.resize(n);
 
-        for( size_t i = 0; i < n; i++ )
+        വേണ്ടി( size_t i = 0; i < n; i++ )
             umv[i] = v[i];
-        return;
+        തിരികെ;
     }
 
-    if( k == UMAT )
+    എങ്കിൽ( k == UMAT )
     {
         UMat& v = *(UMat*)obj;
         umv.resize(1);
         umv[0] = v;
-        return;
+        തിരികെ;
     }
-    if( k == MAT )
+    എങ്കിൽ( k == MAT )
     {
         Mat& v = *(Mat*)obj;
         umv.resize(1);
         umv[0] = v.getUMat(accessFlags);
-        return;
+        തിരികെ;
     }
 
     CV_Error(Error::StsNotImplemented, "Unknown/unsupported array type");
 }
 
-cuda::GpuMat _InputArray::getGpuMat() const
+cuda::GpuMat നിവേശം_Array_2::getGpuMat() സ്ഥിരം
 {
 #ifdef HAVE_CUDA
-    _InputArray::KindFlag k = kind();
+    നിവേശം_Array_2::KindFlag k = kind();
 
-    if (k == CUDA_GPU_MAT)
+    എങ്കിൽ (k == CUDA_GPU_MAT)
     {
-        const cuda::GpuMat* d_mat = (const cuda::GpuMat*)obj;
-        return *d_mat;
+        സ്ഥിരം cuda::GpuMat* d_mat = (സ്ഥിരം cuda::GpuMat*)obj;
+        തിരികെ *d_mat;
     }
 
-    if (k == CUDA_HOST_MEM)
+    എങ്കിൽ (k == CUDA_HOST_MEM)
     {
-        const cuda::HostMem* cuda_mem = (const cuda::HostMem*)obj;
-        return cuda_mem->createGpuMatHeader();
+        സ്ഥിരം cuda::HostMem* cuda_mem = (സ്ഥിരം cuda::HostMem*)obj;
+        തിരികെ cuda_mem->createGpuMatHeader();
     }
 
-    if (k == OPENGL_BUFFER)
+    എങ്കിൽ (k == OPENGL_BUFFER)
     {
         CV_Error(cv::Error::StsNotImplemented, "You should explicitly call mapDevice/unmapDevice methods for ogl::Buffer object");
     }
 
-    if (k == NONE)
-        return cuda::GpuMat();
+    എങ്കിൽ (k == NONE)
+        തിരികെ cuda::GpuMat();
 
     CV_Error(cv::Error::StsNotImplemented, "getGpuMat is available only for cuda::GpuMat and cuda::HostMem");
-#else
+#അല്ലെങ്കിൽ
     CV_Error(Error::StsNotImplemented, "CUDA support is not enabled in this OpenCV build (missing HAVE_CUDA)");
 #endif
 }
-void _InputArray::getGpuMatVector(std::vector<cuda::GpuMat>& gpumv) const
+ശൂന്യം നിവേശം_Array_2::getGpuMatVector(std::vector<cuda::GpuMat>& gpumv) സ്ഥിരം
 {
 #ifdef HAVE_CUDA
-    _InputArray::KindFlag k = kind();
-    if (k == STD_VECTOR_CUDA_GPU_MAT)
+    നിവേശം_Array_2::KindFlag k = kind();
+    എങ്കിൽ (k == STD_VECTOR_CUDA_GPU_MAT)
     {
         gpumv = *(std::vector<cuda::GpuMat>*)obj;
     }
-#else
+#അല്ലെങ്കിൽ
     CV_UNUSED(gpumv);
     CV_Error(Error::StsNotImplemented, "CUDA support is not enabled in this OpenCV build (missing HAVE_CUDA)");
 #endif
 }
-void _InputArray::getGpuMatNDVector(std::vector<cuda::GpuMatND>& gpumv) const
+ശൂന്യം നിവേശം_Array_2::getGpuMatNDVector(std::vector<cuda::GpuMatND>& gpumv) സ്ഥിരം
 {
 #ifdef HAVE_CUDA
-    _InputArray::KindFlag k = kind();
-    if (k == STD_VECTOR_CUDA_GPU_MAT_ND)
+    നിവേശം_Array_2::KindFlag k = kind();
+    എങ്കിൽ (k == STD_VECTOR_CUDA_GPU_MAT_ND)
     {
         gpumv = *(std::vector<cuda::GpuMatND>*)obj;
     }
-#else
+#അല്ലെങ്കിൽ
     CV_UNUSED(gpumv);
     CV_Error(Error::StsNotImplemented, "CUDA support is not enabled in this OpenCV build (missing HAVE_CUDA)");
 #endif
 }
-cuda::GpuMatND _InputArray::getGpuMatND() const
+cuda::GpuMatND നിവേശം_Array_2::getGpuMatND() സ്ഥിരം
 {
 #ifdef HAVE_CUDA
-    _InputArray::KindFlag k = kind();
+    നിവേശം_Array_2::KindFlag k = kind();
 
-    if (k == CUDA_GPU_MATND)
+    എങ്കിൽ (k == CUDA_GPU_MATND)
     {
-        const cuda::GpuMatND* d_mat = (const cuda::GpuMatND*)obj;
-        return *d_mat;
+        സ്ഥിരം cuda::GpuMatND* d_mat = (സ്ഥിരം cuda::GpuMatND*)obj;
+        തിരികെ *d_mat;
     }
 
     CV_Error(cv::Error::StsNotImplemented, "getGpuMatND is available only for cuda::GpuMatND");
-#else
+#അല്ലെങ്കിൽ
     CV_Error(Error::StsNotImplemented, "CUDA support is not enabled in this OpenCV build (missing HAVE_CUDA)");
 #endif
 }
-ogl::Buffer _InputArray::getOGlBuffer() const
+ogl::Buffer നിവേശം_Array_2::getOGlBuffer() സ്ഥിരം
 {
-    _InputArray::KindFlag k = kind();
+    നിവേശം_Array_2::KindFlag k = kind();
 
     CV_Assert(k == OPENGL_BUFFER);
 
-    const ogl::Buffer* gl_buf = (const ogl::Buffer*)obj;
-    return *gl_buf;
+    സ്ഥിരം ogl::Buffer* gl_buf = (സ്ഥിരം ogl::Buffer*)obj;
+    തിരികെ *gl_buf;
 }
 
-int _InputArray::rows_(int i) const
+പൂർണ്ണസംഖ്യ നിവേശം_Array_2::rows_(പൂർണ്ണസംഖ്യ i) സ്ഥിരം
 {
 #ifdef HAVE_CUDA
-    _InputArray::KindFlag k = kind();
-    if (k == CUDA_GPU_MATND)
+    നിവേശം_Array_2::KindFlag k = kind();
+    എങ്കിൽ (k == CUDA_GPU_MATND)
     {
-        const cuda::GpuMatND& _gpuMatND = *(const cuda::GpuMatND*)obj;
-        return (_gpuMatND.dims < 1) ? 0 : _gpuMatND.size[0];
+        സ്ഥിരം cuda::GpuMatND& _gpuMatND = *(സ്ഥിരം cuda::GpuMatND*)obj;
+        തിരികെ (_gpuMatND.dims < 1) ? 0 : _gpuMatND.size[0];
     }
 #endif
 
-    return size_(i).height;
+    തിരികെ size_(i).height;
 }
 
-int _InputArray::cols_(int i) const
+പൂർണ്ണസംഖ്യ നിവേശം_Array_2::cols_(പൂർണ്ണസംഖ്യ i) സ്ഥിരം
 {
 #ifdef HAVE_CUDA
-    _InputArray::KindFlag k = kind();
-    if (k == CUDA_GPU_MATND)
+    നിവേശം_Array_2::KindFlag k = kind();
+    എങ്കിൽ (k == CUDA_GPU_MATND)
     {
-        const cuda::GpuMatND& _gpuMatND = *(const cuda::GpuMatND*)obj;
-        return (_gpuMatND.dims < 2) ? 0 : _gpuMatND.size[1];
+        സ്ഥിരം cuda::GpuMatND& _gpuMatND = *(സ്ഥിരം cuda::GpuMatND*)obj;
+        തിരികെ (_gpuMatND.dims < 2) ? 0 : _gpuMatND.size[1];
     }
 #endif
 
-    return size_(i).width;
+    തിരികെ size_(i).width;
 }
 
-Size _InputArray::size_(int i) const
+Size നിവേശം_Array_2::size_(പൂർണ്ണസംഖ്യ i) സ്ഥിരം
 {
-    _InputArray::KindFlag k = kind();
+    നിവേശം_Array_2::KindFlag k = kind();
 
-    if( k == MAT )
+    എങ്കിൽ( k == MAT )
     {
         CV_Assert( i < 0 );
-        const Mat* m = (const Mat*)obj;
+        സ്ഥിരം Mat* m = (സ്ഥിരം Mat*)obj;
         CV_Assert(m->dims <= 2);
-        return Size(m->cols, m->rows);
+        തിരികെ Size(m->cols, m->rows);
     }
 
-    if( k == UMAT )
+    എങ്കിൽ( k == UMAT )
     {
         CV_Assert( i < 0 );
-        const UMat* m = (const UMat*)obj;
+        സ്ഥിരം UMat* m = (സ്ഥിരം UMat*)obj;
         CV_Assert(m->dims <= 2);
-        return Size(m->cols, m->rows);
+        തിരികെ Size(m->cols, m->rows);
     }
 
-    if (k == MATX)
+    എങ്കിൽ (k == MATX)
     {
         CV_Assert( i < 0 );
-        return sz;
+        തിരികെ sz;
     }
 
-    if( k == NONE )
-        return Size();
+    എങ്കിൽ( k == NONE )
+        തിരികെ Size();
 
-    if( k == STD_VECTOR || k == STD_VECTOR_VECTOR || k == STD_BOOL_VECTOR )
+    എങ്കിൽ( k == STD_VECTOR || k == STD_VECTOR_VECTOR || k == STD_BOOL_VECTOR )
     {
         size_t n = total(i);
         CV_Assert(n <= (size_t)INT_MAX);
-        return Size((int)n, 1);
+        തിരികെ Size((പൂർണ്ണസംഖ്യ)n, 1);
     }
 
-    if( k == STD_VECTOR_MAT )
+    എങ്കിൽ( k == STD_VECTOR_MAT )
     {
-        const std::vector<Mat>& vv = *(const std::vector<Mat>*)obj;
-        if( i < 0 )
-            return vv.empty() ? Size() : Size((int)vv.size(), 1);
-        CV_Assert( i < (int)vv.size() );
+        സ്ഥിരം std::vector<Mat>& vv = *(സ്ഥിരം std::vector<Mat>*)obj;
+        എങ്കിൽ( i < 0 )
+            തിരികെ vv.empty() ? Size() : Size((പൂർണ്ണസംഖ്യ)vv.size(), 1);
+        CV_Assert( i < (പൂർണ്ണസംഖ്യ)vv.size() );
 
-        return vv[i].size();
+        തിരികെ vv[i].size();
     }
 
-    if( k == STD_ARRAY_MAT )
+    എങ്കിൽ( k == STD_ARRAY_MAT )
     {
-        const Mat* vv = (const Mat*)obj;
-        if( i < 0 )
-            return sz.height==0 ? Size() : Size(sz.height, 1);
+        സ്ഥിരം Mat* vv = (സ്ഥിരം Mat*)obj;
+        എങ്കിൽ( i < 0 )
+            തിരികെ sz.height==0 ? Size() : Size(sz.height, 1);
         CV_Assert( i < sz.height );
 
-        return vv[i].size();
+        തിരികെ vv[i].size();
     }
 
-    if (k == STD_VECTOR_CUDA_GPU_MAT)
+    എങ്കിൽ (k == STD_VECTOR_CUDA_GPU_MAT)
     {
 #ifdef HAVE_CUDA
-        const std::vector<cuda::GpuMat>& vv = *(const std::vector<cuda::GpuMat>*)obj;
-        if (i < 0)
-            return vv.empty() ? Size() : Size((int)vv.size(), 1);
-        CV_Assert(i < (int)vv.size());
-        return vv[i].size();
-#else
+        സ്ഥിരം std::vector<cuda::GpuMat>& vv = *(സ്ഥിരം std::vector<cuda::GpuMat>*)obj;
+        എങ്കിൽ (i < 0)
+            തിരികെ vv.empty() ? Size() : Size((പൂർണ്ണസംഖ്യ)vv.size(), 1);
+        CV_Assert(i < (പൂർണ്ണസംഖ്യ)vv.size());
+        തിരികെ vv[i].size();
+#അല്ലെങ്കിൽ
         CV_Error(Error::StsNotImplemented, "CUDA support is not enabled in this OpenCV build (missing HAVE_CUDA)");
 #endif
     }
 
-    if (k == STD_VECTOR_CUDA_GPU_MAT_ND)
+    എങ്കിൽ (k == STD_VECTOR_CUDA_GPU_MAT_ND)
     {
 #ifdef HAVE_CUDA
-        const std::vector<cuda::GpuMatND>& vv = *(const std::vector<cuda::GpuMatND>*)obj;
-        if (i < 0)
-            return vv.empty() ? Size() : Size((int)vv.size(), 1);
-        CV_Assert(i < (int)vv.size());
-        const cuda::GpuMatND& m = vv[i];
-        if (m.dims == 0)
-            return Size();
-        if (m.dims == 1)
-            return Size(1, m.size[0]);
-        return Size(m.size[1], m.size[0]);
-#else
+        സ്ഥിരം std::vector<cuda::GpuMatND>& vv = *(സ്ഥിരം std::vector<cuda::GpuMatND>*)obj;
+        എങ്കിൽ (i < 0)
+            തിരികെ vv.empty() ? Size() : Size((പൂർണ്ണസംഖ്യ)vv.size(), 1);
+        CV_Assert(i < (പൂർണ്ണസംഖ്യ)vv.size());
+        സ്ഥിരം cuda::GpuMatND& m = vv[i];
+        എങ്കിൽ (m.dims == 0)
+            തിരികെ Size();
+        എങ്കിൽ (m.dims == 1)
+            തിരികെ Size(1, m.size[0]);
+        തിരികെ Size(m.size[1], m.size[0]);
+#അല്ലെങ്കിൽ
         CV_Error(Error::StsNotImplemented, "CUDA support is not enabled in this OpenCV build (missing HAVE_CUDA)");
 #endif
     }
 
-    if( k == STD_VECTOR_UMAT )
+    എങ്കിൽ( k == STD_VECTOR_UMAT )
     {
-        const std::vector<UMat>& vv = *(const std::vector<UMat>*)obj;
-        if( i < 0 )
-            return vv.empty() ? Size() : Size((int)vv.size(), 1);
-        CV_Assert( i < (int)vv.size() );
+        സ്ഥിരം std::vector<UMat>& vv = *(സ്ഥിരം std::vector<UMat>*)obj;
+        എങ്കിൽ( i < 0 )
+            തിരികെ vv.empty() ? Size() : Size((പൂർണ്ണസംഖ്യ)vv.size(), 1);
+        CV_Assert( i < (പൂർണ്ണസംഖ്യ)vv.size() );
 
-        return vv[i].size();
+        തിരികെ vv[i].size();
     }
 
-    if (k == STD_VECTOR_CUDA_GPU_MAT_ND)
+    എങ്കിൽ (k == STD_VECTOR_CUDA_GPU_MAT_ND)
     {
 #ifdef HAVE_CUDA
-        const std::vector<cuda::GpuMatND>& vv = *(const std::vector<cuda::GpuMatND>*)obj;
-        if (i < 0)
-            return vv.empty() ? Size() : Size((int)vv.size(), 1);
-        CV_Assert(i < (int)vv.size());
-        const cuda::GpuMatND& m = vv[i];
-        if (m.dims == 0)
-            return Size();
-        if (m.dims == 1)
-            return Size(1, m.size[0]);
-        return Size(m.size[1], m.size[0]);
-#else
+        സ്ഥിരം std::vector<cuda::GpuMatND>& vv = *(സ്ഥിരം std::vector<cuda::GpuMatND>*)obj;
+        എങ്കിൽ (i < 0)
+            തിരികെ vv.empty() ? Size() : Size((പൂർണ്ണസംഖ്യ)vv.size(), 1);
+        CV_Assert(i < (പൂർണ്ണസംഖ്യ)vv.size());
+        സ്ഥിരം cuda::GpuMatND& m = vv[i];
+        എങ്കിൽ (m.dims == 0)
+            തിരികെ Size();
+        എങ്കിൽ (m.dims == 1)
+            തിരികെ Size(1, m.size[0]);
+        തിരികെ Size(m.size[1], m.size[0]);
+#അല്ലെങ്കിൽ
         CV_Error(Error::StsNotImplemented, "CUDA support is not enabled in this OpenCV build (missing HAVE_CUDA)");
 #endif
     }
 
-    if( k == OPENGL_BUFFER )
+    എങ്കിൽ( k == OPENGL_BUFFER )
     {
         CV_Assert( i < 0 );
-        const ogl::Buffer* buf = (const ogl::Buffer*)obj;
-        return buf->size();
+        സ്ഥിരം ogl::Buffer* buf = (സ്ഥിരം ogl::Buffer*)obj;
+        തിരികെ buf->size();
     }
 
-    if( k == CUDA_GPU_MAT )
+    എങ്കിൽ( k == CUDA_GPU_MAT )
     {
         CV_Assert( i < 0 );
-        const cuda::GpuMat* d_mat = (const cuda::GpuMat*)obj;
-        return d_mat->size();
+        സ്ഥിരം cuda::GpuMat* d_mat = (സ്ഥിരം cuda::GpuMat*)obj;
+        തിരികെ d_mat->size();
     }
 
-    if( k == CUDA_HOST_MEM )
+    എങ്കിൽ( k == CUDA_HOST_MEM )
     {
         CV_Assert( i < 0 );
-        const cuda::HostMem* cuda_mem = (const cuda::HostMem*)obj;
-        return cuda_mem->size();
+        സ്ഥിരം cuda::HostMem* cuda_mem = (സ്ഥിരം cuda::HostMem*)obj;
+        തിരികെ cuda_mem->size();
     }
 
     CV_Error(Error::StsNotImplemented, "Unknown/unsupported array type");
 }
 
-int _InputArray::sizend(int* arrsz, int i) const
+പൂർണ്ണസംഖ്യ നിവേശം_Array_2::sizend(പൂർണ്ണസംഖ്യ* arrsz, പൂർണ്ണസംഖ്യ i) സ്ഥിരം
 {
-    int j, d = 0;
-    _InputArray::KindFlag k = kind();
+    പൂർണ്ണസംഖ്യ j, d = 0;
+    നിവേശം_Array_2::KindFlag k = kind();
 
-    if( k == NONE )
+    എങ്കിൽ( k == NONE )
         ;
-    else if( k == MAT )
+    അല്ലെങ്കിൽ എങ്കിൽ( k == MAT )
     {
         CV_Assert( i < 0 );
-        const Mat& m = *(const Mat*)obj;
+        സ്ഥിരം Mat& m = *(സ്ഥിരം Mat*)obj;
         d = m.dims;
-        if(arrsz)
-            for(j = 0; j < d; j++)
+        എങ്കിൽ(arrsz)
+            വേണ്ടി(j = 0; j < d; j++)
                 arrsz[j] = m.size.p[j];
     }
-    else if( k == UMAT )
+    അല്ലെങ്കിൽ എങ്കിൽ( k == UMAT )
     {
         CV_Assert( i < 0 );
-        const UMat& m = *(const UMat*)obj;
+        സ്ഥിരം UMat& m = *(സ്ഥിരം UMat*)obj;
         d = m.dims;
-        if(arrsz)
-            for(j = 0; j < d; j++)
+        എങ്കിൽ(arrsz)
+            വേണ്ടി(j = 0; j < d; j++)
                 arrsz[j] = m.size.p[j];
     }
-    else if( k == STD_VECTOR_MAT && i >= 0 )
+    അല്ലെങ്കിൽ എങ്കിൽ( k == STD_VECTOR_MAT && i >= 0 )
     {
-        const std::vector<Mat>& vv = *(const std::vector<Mat>*)obj;
-        CV_Assert( i < (int)vv.size() );
-        const Mat& m = vv[i];
+        സ്ഥിരം std::vector<Mat>& vv = *(സ്ഥിരം std::vector<Mat>*)obj;
+        CV_Assert( i < (പൂർണ്ണസംഖ്യ)vv.size() );
+        സ്ഥിരം Mat& m = vv[i];
         d = m.dims;
-        if(arrsz)
-            for(j = 0; j < d; j++)
+        എങ്കിൽ(arrsz)
+            വേണ്ടി(j = 0; j < d; j++)
                 arrsz[j] = m.size.p[j];
     }
-    else if( k == STD_ARRAY_MAT && i >= 0 )
+    അല്ലെങ്കിൽ എങ്കിൽ( k == STD_ARRAY_MAT && i >= 0 )
     {
-        const Mat* vv = (const Mat*)obj;
+        സ്ഥിരം Mat* vv = (സ്ഥിരം Mat*)obj;
         CV_Assert( i < sz.height );
-        const Mat& m = vv[i];
+        സ്ഥിരം Mat& m = vv[i];
         d = m.dims;
-        if(arrsz)
-            for(j = 0; j < d; j++)
+        എങ്കിൽ(arrsz)
+            വേണ്ടി(j = 0; j < d; j++)
                 arrsz[j] = m.size.p[j];
     }
-    else if( k == STD_VECTOR_UMAT && i >= 0 )
+    അല്ലെങ്കിൽ എങ്കിൽ( k == STD_VECTOR_UMAT && i >= 0 )
     {
-        const std::vector<UMat>& vv = *(const std::vector<UMat>*)obj;
-        CV_Assert( i < (int)vv.size() );
-        const UMat& m = vv[i];
+        സ്ഥിരം std::vector<UMat>& vv = *(സ്ഥിരം std::vector<UMat>*)obj;
+        CV_Assert( i < (പൂർണ്ണസംഖ്യ)vv.size() );
+        സ്ഥിരം UMat& m = vv[i];
         d = m.dims;
-        if(arrsz)
-            for(j = 0; j < d; j++)
+        എങ്കിൽ(arrsz)
+            വേണ്ടി(j = 0; j < d; j++)
                 arrsz[j] = m.size.p[j];
     }
-    else if (((k == STD_VECTOR || k == STD_BOOL_VECTOR || k == STD_VECTOR_VECTOR) && i < 0) ||
+    അല്ലെങ്കിൽ എങ്കിൽ (((k == STD_VECTOR || k == STD_BOOL_VECTOR || k == STD_VECTOR_VECTOR) && i < 0) ||
              (k == STD_VECTOR_VECTOR && i >= 0))
     {
         size_t n = total(i);
         d = 1;
-        if(arrsz)
+        എങ്കിൽ(arrsz)
         {
-            arrsz[0] = int(n);
+            arrsz[0] = പൂർണ്ണസംഖ്യ(n);
         }
     }
-    else
+    അല്ലെങ്കിൽ
     {
         CV_CheckLE(dims(i), 2, "Not supported");
         Size sz2d = size(i);
         d = 2;
-        if(arrsz)
+        എങ്കിൽ(arrsz)
         {
             arrsz[0] = sz2d.height;
             arrsz[1] = sz2d.width;
         }
     }
 
-    return d;
+    തിരികെ d;
 }
 
-bool _InputArray::empty(int i) const
+തർക്കം നിവേശം_Array_2::empty(പൂർണ്ണസംഖ്യ i) സ്ഥിരം
 {
-    _InputArray::KindFlag k = kind();
-    if (i >= 0) {
-        if (k == STD_VECTOR_MAT) {
-            auto mv = reinterpret_cast<const std::vector<Mat>*>(obj);
+    നിവേശം_Array_2::KindFlag k = kind();
+    എങ്കിൽ (i >= 0) {
+        എങ്കിൽ (k == STD_VECTOR_MAT) {
+            auto mv = reinterpret_cast<സ്ഥിരം std::vector<Mat>*>(obj);
             CV_Assert((size_t)i < mv->size());
-            return mv->at(i).empty();
+            തിരികെ mv->at(i).empty();
         }
-        else if (k == STD_VECTOR_UMAT) {
-            auto umv = reinterpret_cast<const std::vector<UMat>*>(obj);
+        അല്ലെങ്കിൽ എങ്കിൽ (k == STD_VECTOR_UMAT) {
+            auto umv = reinterpret_cast<സ്ഥിരം std::vector<UMat>*>(obj);
             CV_Assert((size_t)i < umv->size());
-            return umv->at(i).empty();
+            തിരികെ umv->at(i).empty();
         }
-        else if (k == STD_VECTOR || k == STD_BOOL_VECTOR || k == STD_VECTOR_VECTOR) {
+        അല്ലെങ്കിൽ എങ്കിൽ (k == STD_VECTOR || k == STD_BOOL_VECTOR || k == STD_VECTOR_VECTOR) {
             size_t n = total(i);
-            return n == 0;
-        } else {
+            തിരികെ n == 0;
+        } അല്ലെങ്കിൽ {
             CV_Error(Error::StsNotImplemented, "");
         }
     }
-    return empty();
+    തിരികെ empty();
 }
 
-MatShape _InputArray::shape(int i) const
+MatShape നിവേശം_Array_2::shape(പൂർണ്ണസംഖ്യ i) സ്ഥിരം
 {
-    _InputArray::KindFlag k = kind();
+    നിവേശം_Array_2::KindFlag k = kind();
     MatShape shape;
 
-    if( k == NONE )
+    എങ്കിൽ( k == NONE )
         ;
-    else if( k == MAT )
+    അല്ലെങ്കിൽ എങ്കിൽ( k == MAT )
     {
         CV_Assert( i < 0 );
-        const Mat& m = *(const Mat*)obj;
+        സ്ഥിരം Mat& m = *(സ്ഥിരം Mat*)obj;
         shape = m.size;
     }
-    else if( k == UMAT )
+    അല്ലെങ്കിൽ എങ്കിൽ( k == UMAT )
     {
         CV_Assert( i < 0 );
-        const UMat& m = *(const UMat*)obj;
+        സ്ഥിരം UMat& m = *(സ്ഥിരം UMat*)obj;
         shape = m.size;
     }
-    else if( k == STD_VECTOR_MAT && i >= 0 )
+    അല്ലെങ്കിൽ എങ്കിൽ( k == STD_VECTOR_MAT && i >= 0 )
     {
-        const std::vector<Mat>& vv = *(const std::vector<Mat>*)obj;
+        സ്ഥിരം std::vector<Mat>& vv = *(സ്ഥിരം std::vector<Mat>*)obj;
         CV_Assert( (size_t)i < vv.size() );
-        const Mat& m = vv[i];
+        സ്ഥിരം Mat& m = vv[i];
         shape = m.size;
     }
-    else if( k == STD_ARRAY_MAT && i >= 0 )
+    അല്ലെങ്കിൽ എങ്കിൽ( k == STD_ARRAY_MAT && i >= 0 )
     {
-        const Mat* vv = (const Mat*)obj;
+        സ്ഥിരം Mat* vv = (സ്ഥിരം Mat*)obj;
         CV_Assert( i < sz.height );
-        const Mat& m = vv[i];
+        സ്ഥിരം Mat& m = vv[i];
         shape = m.size;
     }
-    else if( k == STD_VECTOR_UMAT && i >= 0 )
+    അല്ലെങ്കിൽ എങ്കിൽ( k == STD_VECTOR_UMAT && i >= 0 )
     {
-        const std::vector<UMat>& vv = *(const std::vector<UMat>*)obj;
+        സ്ഥിരം std::vector<UMat>& vv = *(സ്ഥിരം std::vector<UMat>*)obj;
         CV_Assert( (size_t)i < vv.size() );
-        const UMat& m = vv[i];
+        സ്ഥിരം UMat& m = vv[i];
         shape = m.size;
     }
-    else
+    അല്ലെങ്കിൽ
     {
-        int sizes[CV_MAX_DIM];
-        int dims = sizend(sizes, i);
+        പൂർണ്ണസംഖ്യ sizes[CV_MAX_DIM];
+        പൂർണ്ണസംഖ്യ dims = sizend(sizes, i);
         shape = MatShape(dims, sizes);
     }
 
-    return shape;
+    തിരികെ shape;
 }
 
-bool _InputArray::sameSize(const _InputArray& arr) const
+തർക്കം നിവേശം_Array_2::sameSize(സ്ഥിരം നിവേശം_Array_2& arr) സ്ഥിരം
 {
-    _InputArray::KindFlag k1 = kind(), k2 = arr.kind();
+    നിവേശം_Array_2::KindFlag k1 = kind(), k2 = arr.kind();
     Size sz1;
 
-    if( k1 == MAT )
+    എങ്കിൽ( k1 == MAT )
     {
-        const Mat* m = ((const Mat*)obj);
-        if( k2 == MAT )
-            return m->size == ((const Mat*)arr.obj)->size;
-        if( k2 == UMAT )
-            return m->size == ((const UMat*)arr.obj)->size;
-        if( m->dims > 2 )
-            return false;
+        സ്ഥിരം Mat* m = ((സ്ഥിരം Mat*)obj);
+        എങ്കിൽ( k2 == MAT )
+            തിരികെ m->size == ((സ്ഥിരം Mat*)arr.obj)->size;
+        എങ്കിൽ( k2 == UMAT )
+            തിരികെ m->size == ((സ്ഥിരം UMat*)arr.obj)->size;
+        എങ്കിൽ( m->dims > 2 )
+            തിരികെ അസത്യം;
         sz1 = m->size();
     }
-    else if( k1 == UMAT )
+    അല്ലെങ്കിൽ എങ്കിൽ( k1 == UMAT )
     {
-        const UMat* m = ((const UMat*)obj);
-        if( k2 == MAT )
-            return m->size == ((const Mat*)arr.obj)->size;
-        if( k2 == UMAT )
-            return m->size == ((const UMat*)arr.obj)->size;
-        if( m->dims > 2 )
-            return false;
+        സ്ഥിരം UMat* m = ((സ്ഥിരം UMat*)obj);
+        എങ്കിൽ( k2 == MAT )
+            തിരികെ m->size == ((സ്ഥിരം Mat*)arr.obj)->size;
+        എങ്കിൽ( k2 == UMAT )
+            തിരികെ m->size == ((സ്ഥിരം UMat*)arr.obj)->size;
+        എങ്കിൽ( m->dims > 2 )
+            തിരികെ അസത്യം;
         sz1 = m->size();
     }
-    else if ( (k1 == CUDA_GPU_MATND) && (k2 == CUDA_GPU_MATND))
+    അല്ലെങ്കിൽ എങ്കിൽ ( (k1 == CUDA_GPU_MATND) && (k2 == CUDA_GPU_MATND))
     {
-        return ((const cuda::GpuMatND*)obj)->size == ((const cuda::GpuMatND*)arr.obj)->size;
+        തിരികെ ((സ്ഥിരം cuda::GpuMatND*)obj)->size == ((സ്ഥിരം cuda::GpuMatND*)arr.obj)->size;
     }
-    else
+    അല്ലെങ്കിൽ
         sz1 = size();
 
-    if( arr.dims() > 2 )
-        return false;
-    return sz1 == arr.size();
+    എങ്കിൽ( arr.dims() > 2 )
+        തിരികെ അസത്യം;
+    തിരികെ sz1 == arr.size();
 }
 
-int _InputArray::dims_(int i) const
+പൂർണ്ണസംഖ്യ നിവേശം_Array_2::dims_(പൂർണ്ണസംഖ്യ i) സ്ഥിരം
 {
-    _InputArray::KindFlag k = kind();
+    നിവേശം_Array_2::KindFlag k = kind();
 
-    if( k == MAT )
+    എങ്കിൽ( k == MAT )
     {
         CV_Assert( i < 0 );
-        return ((const Mat*)obj)->dims;
+        തിരികെ ((സ്ഥിരം Mat*)obj)->dims;
     }
 
-    if( k == UMAT )
+    എങ്കിൽ( k == UMAT )
     {
         CV_Assert( i < 0 );
-        return ((const UMat*)obj)->dims;
+        തിരികെ ((സ്ഥിരം UMat*)obj)->dims;
     }
 
-    if (k == MATX)
+    എങ്കിൽ (k == MATX)
     {
         CV_Assert( i < 0 );
-        return 2;
+        തിരികെ 2;
     }
 
-    if( k == STD_VECTOR || k == STD_BOOL_VECTOR )
+    എങ്കിൽ( k == STD_VECTOR || k == STD_BOOL_VECTOR )
     {
         CV_Assert( i < 0 );
-        return 1;
+        തിരികെ 1;
     }
 
-    if( k == NONE )
-        return 0;
+    എങ്കിൽ( k == NONE )
+        തിരികെ 0;
 
-    if( k == STD_VECTOR_VECTOR )
+    എങ്കിൽ( k == STD_VECTOR_VECTOR )
     {
-        if( i < 0 )
-            return 1;
+        എങ്കിൽ( i < 0 )
+            തിരികെ 1;
         CV_Assert( size_t(i) < total() );
-        return 1;
+        തിരികെ 1;
     }
 
-    if( k == STD_VECTOR_MAT )
+    എങ്കിൽ( k == STD_VECTOR_MAT )
     {
-        const std::vector<Mat>& vv = *(const std::vector<Mat>*)obj;
-        if( i < 0 )
-            return 1;
-        CV_Assert( i < (int)vv.size() );
+        സ്ഥിരം std::vector<Mat>& vv = *(സ്ഥിരം std::vector<Mat>*)obj;
+        എങ്കിൽ( i < 0 )
+            തിരികെ 1;
+        CV_Assert( i < (പൂർണ്ണസംഖ്യ)vv.size() );
 
-        return vv[i].dims;
+        തിരികെ vv[i].dims;
     }
 
-    if( k == STD_ARRAY_MAT )
+    എങ്കിൽ( k == STD_ARRAY_MAT )
     {
-        const Mat* vv = (const Mat*)obj;
-        if( i < 0 )
-            return 1;
+        സ്ഥിരം Mat* vv = (സ്ഥിരം Mat*)obj;
+        എങ്കിൽ( i < 0 )
+            തിരികെ 1;
         CV_Assert( i < sz.height );
 
-        return vv[i].dims;
+        തിരികെ vv[i].dims;
     }
 
-    if( k == STD_VECTOR_UMAT )
+    എങ്കിൽ( k == STD_VECTOR_UMAT )
     {
-        const std::vector<UMat>& vv = *(const std::vector<UMat>*)obj;
-        if( i < 0 )
-            return 1;
-        CV_Assert( i < (int)vv.size() );
+        സ്ഥിരം std::vector<UMat>& vv = *(സ്ഥിരം std::vector<UMat>*)obj;
+        എങ്കിൽ( i < 0 )
+            തിരികെ 1;
+        CV_Assert( i < (പൂർണ്ണസംഖ്യ)vv.size() );
 
-        return vv[i].dims;
+        തിരികെ vv[i].dims;
     }
 
-    if( k == OPENGL_BUFFER )
-    {
-        CV_Assert( i < 0 );
-        return 2;
-    }
-
-    if( k == CUDA_GPU_MAT )
+    എങ്കിൽ( k == OPENGL_BUFFER )
     {
         CV_Assert( i < 0 );
-        return 2;
+        തിരികെ 2;
     }
 
-    if( k == CUDA_GPU_MATND )
+    എങ്കിൽ( k == CUDA_GPU_MAT )
     {
         CV_Assert( i < 0 );
-        return ((const cuda::GpuMatND*)obj)->dims;
+        തിരികെ 2;
     }
 
-    if( k == CUDA_HOST_MEM )
+    എങ്കിൽ( k == CUDA_GPU_MATND )
     {
         CV_Assert( i < 0 );
-        return 2;
+        തിരികെ ((സ്ഥിരം cuda::GpuMatND*)obj)->dims;
+    }
+
+    എങ്കിൽ( k == CUDA_HOST_MEM )
+    {
+        CV_Assert( i < 0 );
+        തിരികെ 2;
     }
 
     CV_Error(Error::StsNotImplemented, "Unknown/unsupported array type");
 }
 
-size_t _InputArray::total(int i) const
+size_t നിവേശം_Array_2::total(പൂർണ്ണസംഖ്യ i) സ്ഥിരം
 {
-    _InputArray::KindFlag k = kind();
+    നിവേശം_Array_2::KindFlag k = kind();
 
-    if( k == MAT )
+    എങ്കിൽ( k == MAT )
     {
         CV_Assert( i < 0 );
-        return ((const Mat*)obj)->total();
+        തിരികെ ((സ്ഥിരം Mat*)obj)->total();
     }
 
-    if( k == UMAT )
+    എങ്കിൽ( k == UMAT )
     {
         CV_Assert( i < 0 );
-        return ((const UMat*)obj)->total();
+        തിരികെ ((സ്ഥിരം UMat*)obj)->total();
     }
 
-    if( k == STD_VECTOR_MAT )
+    എങ്കിൽ( k == STD_VECTOR_MAT )
     {
-        const std::vector<Mat>& vv = *(const std::vector<Mat>*)obj;
-        if( i < 0 )
-            return vv.size();
+        സ്ഥിരം std::vector<Mat>& vv = *(സ്ഥിരം std::vector<Mat>*)obj;
+        എങ്കിൽ( i < 0 )
+            തിരികെ vv.size();
 
-        CV_Assert( i < (int)vv.size() );
-        return vv[i].total();
+        CV_Assert( i < (പൂർണ്ണസംഖ്യ)vv.size() );
+        തിരികെ vv[i].total();
     }
 
-    if( k == STD_ARRAY_MAT )
+    എങ്കിൽ( k == STD_ARRAY_MAT )
     {
-        const Mat* vv = (const Mat*)obj;
-        if( i < 0 )
-            return sz.height;
+        സ്ഥിരം Mat* vv = (സ്ഥിരം Mat*)obj;
+        എങ്കിൽ( i < 0 )
+            തിരികെ sz.height;
 
         CV_Assert( i < sz.height );
-        return vv[i].total();
+        തിരികെ vv[i].total();
     }
 
-    if( k == STD_VECTOR_UMAT )
+    എങ്കിൽ( k == STD_VECTOR_UMAT )
     {
-        const std::vector<UMat>& vv = *(const std::vector<UMat>*)obj;
-        if( i < 0 )
-            return vv.size();
+        സ്ഥിരം std::vector<UMat>& vv = *(സ്ഥിരം std::vector<UMat>*)obj;
+        എങ്കിൽ( i < 0 )
+            തിരികെ vv.size();
 
-        CV_Assert( i < (int)vv.size() );
-        return vv[i].total();
+        CV_Assert( i < (പൂർണ്ണസംഖ്യ)vv.size() );
+        തിരികെ vv[i].total();
     }
 
-    if( k == CUDA_GPU_MATND )
+    എങ്കിൽ( k == CUDA_GPU_MATND )
     {
         CV_Assert( i < 0 );
         size_t res = 0;
-        const cuda::GpuMatND& _gpuMatND = *((const cuda::GpuMatND*)obj);
-        if (_gpuMatND.dims > 0)
+        സ്ഥിരം cuda::GpuMatND& _gpuMatND = *((സ്ഥിരം cuda::GpuMatND*)obj);
+        എങ്കിൽ (_gpuMatND.dims > 0)
         {
             res = 1;
-            for(int d = 0 ; d<_gpuMatND.dims ; ++d)
+            വേണ്ടി(പൂർണ്ണസംഖ്യ d = 0 ; d<_gpuMatND.dims ; ++d)
                 res *= _gpuMatND.size[d];
-            return res;
+            തിരികെ res;
         }
     }
 
-    if (k == STD_VECTOR || k == STD_VECTOR_VECTOR)
+    എങ്കിൽ (k == STD_VECTOR || k == STD_VECTOR_VECTOR)
     {
         CV_Assert(i < 0 || k == STD_VECTOR_VECTOR);
-        int esz = CV_ELEM_SIZE(flags);
+        പൂർണ്ണസംഖ്യ esz = CV_ELEM_SIZE(flags);
 
         #undef GET_VEC_SIZE
         #define GET_VEC_SIZE(T) \
-            if (k == STD_VECTOR_VECTOR) { \
-                const std::vector<std::vector<T > >* vv = (const std::vector<std::vector<T > >*)obj; \
+            എങ്കിൽ (k == STD_VECTOR_VECTOR) { \
+                സ്ഥിരം std::vector<std::vector<T > >* vv = (സ്ഥിരം std::vector<std::vector<T > >*)obj; \
                 size_t n = vv->size(); \
-                if (i < 0) \
-                    return n; \
+                എങ്കിൽ (i < 0) \
+                    തിരികെ n; \
                 CV_Assert((size_t)i < n); \
-                return vv->at(i).size(); \
-            } else \
-                return ((const std::vector<T >*)obj)->size()
+                തിരികെ vv->at(i).size(); \
+            } അല്ലെങ്കിൽ \
+                തിരികെ ((സ്ഥിരം std::vector<T >*)obj)->size()
 
         STD_VECTOR_SWITCH(esz, GET_VEC_SIZE)
     }
 
-    return size(i).area();
+    തിരികെ size(i).area();
 }
 
-int _InputArray::type_(int i) const
+പൂർണ്ണസംഖ്യ നിവേശം_Array_2::type_(പൂർണ്ണസംഖ്യ i) സ്ഥിരം
 {
-    _InputArray::KindFlag k = kind();
+    നിവേശം_Array_2::KindFlag k = kind();
 
-    if( k == MAT )
-        return ((const Mat*)obj)->type();
+    എങ്കിൽ( k == MAT )
+        തിരികെ ((സ്ഥിരം Mat*)obj)->type();
 
-    if( k == UMAT )
-        return ((const UMat*)obj)->type();
+    എങ്കിൽ( k == UMAT )
+        തിരികെ ((സ്ഥിരം UMat*)obj)->type();
 
-    if( k == MATX || k == STD_VECTOR || k == STD_VECTOR_VECTOR || k == STD_BOOL_VECTOR )
-        return CV_MAT_TYPE(flags);
+    എങ്കിൽ( k == MATX || k == STD_VECTOR || k == STD_VECTOR_VECTOR || k == STD_BOOL_VECTOR )
+        തിരികെ CV_MAT_TYPE(flags);
 
-    if( k == NONE )
-        return -1;
+    എങ്കിൽ( k == NONE )
+        തിരികെ -1;
 
-    if( k == STD_VECTOR_UMAT )
+    എങ്കിൽ( k == STD_VECTOR_UMAT )
     {
-        const std::vector<UMat>& vv = *(const std::vector<UMat>*)obj;
-        if( vv.empty() )
+        സ്ഥിരം std::vector<UMat>& vv = *(സ്ഥിരം std::vector<UMat>*)obj;
+        എങ്കിൽ( vv.empty() )
         {
             CV_Assert((flags & FIXED_TYPE) != 0);
-            return CV_MAT_TYPE(flags);
+            തിരികെ CV_MAT_TYPE(flags);
         }
-        CV_Assert( i < (int)vv.size() );
-        return vv[i >= 0 ? i : 0].type();
+        CV_Assert( i < (പൂർണ്ണസംഖ്യ)vv.size() );
+        തിരികെ vv[i >= 0 ? i : 0].type();
     }
 
-    if( k == STD_VECTOR_MAT )
+    എങ്കിൽ( k == STD_VECTOR_MAT )
     {
-        const std::vector<Mat>& vv = *(const std::vector<Mat>*)obj;
-        if( vv.empty() )
+        സ്ഥിരം std::vector<Mat>& vv = *(സ്ഥിരം std::vector<Mat>*)obj;
+        എങ്കിൽ( vv.empty() )
         {
             CV_Assert((flags & FIXED_TYPE) != 0);
-            return CV_MAT_TYPE(flags);
+            തിരികെ CV_MAT_TYPE(flags);
         }
-        CV_Assert( i < (int)vv.size() );
-        return vv[i >= 0 ? i : 0].type();
+        CV_Assert( i < (പൂർണ്ണസംഖ്യ)vv.size() );
+        തിരികെ vv[i >= 0 ? i : 0].type();
     }
 
-    if( k == STD_ARRAY_MAT )
+    എങ്കിൽ( k == STD_ARRAY_MAT )
     {
-        const Mat* vv = (const Mat*)obj;
-        if( sz.height == 0 )
+        സ്ഥിരം Mat* vv = (സ്ഥിരം Mat*)obj;
+        എങ്കിൽ( sz.height == 0 )
         {
             CV_Assert((flags & FIXED_TYPE) != 0);
-            return CV_MAT_TYPE(flags);
+            തിരികെ CV_MAT_TYPE(flags);
         }
         CV_Assert( i < sz.height );
-        return vv[i >= 0 ? i : 0].type();
+        തിരികെ vv[i >= 0 ? i : 0].type();
     }
 
-    if (k == STD_VECTOR_CUDA_GPU_MAT)
+    എങ്കിൽ (k == STD_VECTOR_CUDA_GPU_MAT)
     {
 #ifdef HAVE_CUDA
-        const std::vector<cuda::GpuMat>& vv = *(const std::vector<cuda::GpuMat>*)obj;
-        if (vv.empty())
+        സ്ഥിരം std::vector<cuda::GpuMat>& vv = *(സ്ഥിരം std::vector<cuda::GpuMat>*)obj;
+        എങ്കിൽ (vv.empty())
         {
             CV_Assert((flags & FIXED_TYPE) != 0);
-            return CV_MAT_TYPE(flags);
+            തിരികെ CV_MAT_TYPE(flags);
         }
-        CV_Assert(i < (int)vv.size());
-        return vv[i >= 0 ? i : 0].type();
-#else
+        CV_Assert(i < (പൂർണ്ണസംഖ്യ)vv.size());
+        തിരികെ vv[i >= 0 ? i : 0].type();
+#അല്ലെങ്കിൽ
         CV_Error(Error::StsNotImplemented, "CUDA support is not enabled in this OpenCV build (missing HAVE_CUDA)");
 #endif
     }
 
-    if (k == STD_VECTOR_CUDA_GPU_MAT_ND)
+    എങ്കിൽ (k == STD_VECTOR_CUDA_GPU_MAT_ND)
     {
 #ifdef HAVE_CUDA
-        const std::vector<cuda::GpuMatND>& vv = *(const std::vector<cuda::GpuMatND>*)obj;
-        if (vv.empty())
+        സ്ഥിരം std::vector<cuda::GpuMatND>& vv = *(സ്ഥിരം std::vector<cuda::GpuMatND>*)obj;
+        എങ്കിൽ (vv.empty())
         {
             CV_Assert((flags & FIXED_TYPE) != 0);
-            return CV_MAT_TYPE(flags);
+            തിരികെ CV_MAT_TYPE(flags);
         }
-        CV_Assert(i < (int)vv.size());
-        return vv[i >= 0 ? i : 0].type();
-#else
+        CV_Assert(i < (പൂർണ്ണസംഖ്യ)vv.size());
+        തിരികെ vv[i >= 0 ? i : 0].type();
+#അല്ലെങ്കിൽ
         CV_Error(Error::StsNotImplemented, "CUDA support is not enabled in this OpenCV build (missing HAVE_CUDA)");
 #endif
     }
 
-    if( k == OPENGL_BUFFER )
-        return ((const ogl::Buffer*)obj)->type();
+    എങ്കിൽ( k == OPENGL_BUFFER )
+        തിരികെ ((സ്ഥിരം ogl::Buffer*)obj)->type();
 
-    if( k == CUDA_GPU_MAT )
-        return ((const cuda::GpuMat*)obj)->type();
+    എങ്കിൽ( k == CUDA_GPU_MAT )
+        തിരികെ ((സ്ഥിരം cuda::GpuMat*)obj)->type();
 
-    if( k == CUDA_GPU_MATND )
-        return ((const cuda::GpuMatND*)obj)->type();
+    എങ്കിൽ( k == CUDA_GPU_MATND )
+        തിരികെ ((സ്ഥിരം cuda::GpuMatND*)obj)->type();
 
-    if( k == CUDA_HOST_MEM )
-        return ((const cuda::HostMem*)obj)->type();
+    എങ്കിൽ( k == CUDA_HOST_MEM )
+        തിരികെ ((സ്ഥിരം cuda::HostMem*)obj)->type();
 
     CV_Error(Error::StsNotImplemented, "Unknown/unsupported array type");
 }
 
-int _InputArray::depth_(int i) const
+പൂർണ്ണസംഖ്യ നിവേശം_Array_2::depth_(പൂർണ്ണസംഖ്യ i) സ്ഥിരം
 {
-    return CV_MAT_DEPTH(type(i));
+    തിരികെ CV_MAT_DEPTH(type(i));
 }
 
-bool _InputArray::empty_() const
+തർക്കം നിവേശം_Array_2::empty_() സ്ഥിരം
 {
-    _InputArray::KindFlag k = kind();
+    നിവേശം_Array_2::KindFlag k = kind();
 
-    if( k == MAT )
-        return ((const Mat*)obj)->empty();
+    എങ്കിൽ( k == MAT )
+        തിരികെ ((സ്ഥിരം Mat*)obj)->empty();
 
-    if( k == UMAT )
-        return ((const UMat*)obj)->empty();
+    എങ്കിൽ( k == UMAT )
+        തിരികെ ((സ്ഥിരം UMat*)obj)->empty();
 
-    if (k == MATX)
-        return false;
+    എങ്കിൽ (k == MATX)
+        തിരികെ അസത്യം;
 
-    if( k == STD_VECTOR || k == STD_BOOL_VECTOR || k == STD_VECTOR_VECTOR )
+    എങ്കിൽ( k == STD_VECTOR || k == STD_BOOL_VECTOR || k == STD_VECTOR_VECTOR )
     {
         size_t n = total(-1);
-        return n == 0;
+        തിരികെ n == 0;
     }
 
-    if( k == NONE )
-        return true;
+    എങ്കിൽ( k == NONE )
+        തിരികെ സത്യം;
 
-    if( k == STD_VECTOR_MAT )
+    എങ്കിൽ( k == STD_VECTOR_MAT )
     {
-        const std::vector<Mat>& vv = *(const std::vector<Mat>*)obj;
-        return vv.empty();
+        സ്ഥിരം std::vector<Mat>& vv = *(സ്ഥിരം std::vector<Mat>*)obj;
+        തിരികെ vv.empty();
     }
 
-    if( k == STD_ARRAY_MAT )
+    എങ്കിൽ( k == STD_ARRAY_MAT )
     {
-        return sz.height == 0;
+        തിരികെ sz.height == 0;
     }
 
-    if( k == STD_VECTOR_UMAT )
+    എങ്കിൽ( k == STD_VECTOR_UMAT )
     {
-        const std::vector<UMat>& vv = *(const std::vector<UMat>*)obj;
-        return vv.empty();
+        സ്ഥിരം std::vector<UMat>& vv = *(സ്ഥിരം std::vector<UMat>*)obj;
+        തിരികെ vv.empty();
     }
 
-    if( k == OPENGL_BUFFER )
-        return ((const ogl::Buffer*)obj)->empty();
+    എങ്കിൽ( k == OPENGL_BUFFER )
+        തിരികെ ((സ്ഥിരം ogl::Buffer*)obj)->empty();
 
-    if( k == CUDA_GPU_MAT )
-        return ((const cuda::GpuMat*)obj)->empty();
+    എങ്കിൽ( k == CUDA_GPU_MAT )
+        തിരികെ ((സ്ഥിരം cuda::GpuMat*)obj)->empty();
 
-    if (k == STD_VECTOR_CUDA_GPU_MAT)
+    എങ്കിൽ (k == STD_VECTOR_CUDA_GPU_MAT)
     {
-        const std::vector<cuda::GpuMat>& vv = *(const std::vector<cuda::GpuMat>*)obj;
-        return vv.empty();
+        സ്ഥിരം std::vector<cuda::GpuMat>& vv = *(സ്ഥിരം std::vector<cuda::GpuMat>*)obj;
+        തിരികെ vv.empty();
     }
 
-    if( k == CUDA_GPU_MATND )
-        return ((const cuda::GpuMatND*)obj)->empty();
+    എങ്കിൽ( k == CUDA_GPU_MATND )
+        തിരികെ ((സ്ഥിരം cuda::GpuMatND*)obj)->empty();
 
-    if (k == STD_VECTOR_CUDA_GPU_MAT_ND)
+    എങ്കിൽ (k == STD_VECTOR_CUDA_GPU_MAT_ND)
     {
-        const std::vector<cuda::GpuMatND>& vv = *(const std::vector<cuda::GpuMatND>*)obj;
-        return vv.empty();
+        സ്ഥിരം std::vector<cuda::GpuMatND>& vv = *(സ്ഥിരം std::vector<cuda::GpuMatND>*)obj;
+        തിരികെ vv.empty();
     }
 
-    if( k == CUDA_HOST_MEM )
-        return ((const cuda::HostMem*)obj)->empty();
+    എങ്കിൽ( k == CUDA_HOST_MEM )
+        തിരികെ ((സ്ഥിരം cuda::HostMem*)obj)->empty();
 
     CV_Error(Error::StsNotImplemented, "Unknown/unsupported array type");
 }
 
-bool _InputArray::isContinuous(int i) const
+തർക്കം നിവേശം_Array_2::isContinuous(പൂർണ്ണസംഖ്യ i) സ്ഥിരം
 {
-    _InputArray::KindFlag k = kind();
+    നിവേശം_Array_2::KindFlag k = kind();
 
-    if( k == MAT )
-        return i < 0 ? ((const Mat*)obj)->isContinuous() : true;
+    എങ്കിൽ( k == MAT )
+        തിരികെ i < 0 ? ((സ്ഥിരം Mat*)obj)->isContinuous() : സത്യം;
 
-    if( k == UMAT )
-        return i < 0 ? ((const UMat*)obj)->isContinuous() : true;
+    എങ്കിൽ( k == UMAT )
+        തിരികെ i < 0 ? ((സ്ഥിരം UMat*)obj)->isContinuous() : സത്യം;
 
-    if( k == MATX || k == STD_VECTOR ||
+    എങ്കിൽ( k == MATX || k == STD_VECTOR ||
         k == NONE || k == STD_VECTOR_VECTOR || k == STD_BOOL_VECTOR )
-        return true;
+        തിരികെ സത്യം;
 
-    if( k == STD_VECTOR_MAT )
+    എങ്കിൽ( k == STD_VECTOR_MAT )
     {
-        const std::vector<Mat>& vv = *(const std::vector<Mat>*)obj;
+        സ്ഥിരം std::vector<Mat>& vv = *(സ്ഥിരം std::vector<Mat>*)obj;
         CV_Assert(i >= 0 && (size_t)i < vv.size());
-        return vv[i].isContinuous();
+        തിരികെ vv[i].isContinuous();
     }
 
-    if( k == STD_ARRAY_MAT )
+    എങ്കിൽ( k == STD_ARRAY_MAT )
     {
-        const Mat* vv = (const Mat*)obj;
+        സ്ഥിരം Mat* vv = (സ്ഥിരം Mat*)obj;
         CV_Assert(i >= 0 && i < sz.height);
-        return vv[i].isContinuous();
+        തിരികെ vv[i].isContinuous();
     }
 
-    if( k == STD_VECTOR_UMAT )
+    എങ്കിൽ( k == STD_VECTOR_UMAT )
     {
-        const std::vector<UMat>& vv = *(const std::vector<UMat>*)obj;
+        സ്ഥിരം std::vector<UMat>& vv = *(സ്ഥിരം std::vector<UMat>*)obj;
         CV_Assert(i >= 0 && (size_t)i < vv.size());
-        return vv[i].isContinuous();
+        തിരികെ vv[i].isContinuous();
     }
 
-    if( k == CUDA_GPU_MAT )
-      return i < 0 ? ((const cuda::GpuMat*)obj)->isContinuous() : true;
+    എങ്കിൽ( k == CUDA_GPU_MAT )
+      തിരികെ i < 0 ? ((സ്ഥിരം cuda::GpuMat*)obj)->isContinuous() : സത്യം;
 
-    if( k == CUDA_GPU_MATND )
-        return i < 0 ? ((const cuda::GpuMatND*)obj)->isContinuous() : true;
+    എങ്കിൽ( k == CUDA_GPU_MATND )
+        തിരികെ i < 0 ? ((സ്ഥിരം cuda::GpuMatND*)obj)->isContinuous() : സത്യം;
 
     CV_Error(cv::Error::StsNotImplemented, "Unknown/unsupported array type");
 }
 
-bool _InputArray::isSubmatrix(int i) const
+തർക്കം നിവേശം_Array_2::isSubmatrix(പൂർണ്ണസംഖ്യ i) സ്ഥിരം
 {
-    _InputArray::KindFlag k = kind();
+    നിവേശം_Array_2::KindFlag k = kind();
 
-    if( k == MAT )
-        return i < 0 ? ((const Mat*)obj)->isSubmatrix() : false;
+    എങ്കിൽ( k == MAT )
+        തിരികെ i < 0 ? ((സ്ഥിരം Mat*)obj)->isSubmatrix() : അസത്യം;
 
-    if( k == UMAT )
-        return i < 0 ? ((const UMat*)obj)->isSubmatrix() : false;
+    എങ്കിൽ( k == UMAT )
+        തിരികെ i < 0 ? ((സ്ഥിരം UMat*)obj)->isSubmatrix() : അസത്യം;
 
-    if( k == MATX || k == STD_VECTOR ||
+    എങ്കിൽ( k == MATX || k == STD_VECTOR ||
         k == NONE || k == STD_VECTOR_VECTOR || k == STD_BOOL_VECTOR )
-        return false;
+        തിരികെ അസത്യം;
 
-    if( k == STD_VECTOR_MAT )
+    എങ്കിൽ( k == STD_VECTOR_MAT )
     {
-        const std::vector<Mat>& vv = *(const std::vector<Mat>*)obj;
+        സ്ഥിരം std::vector<Mat>& vv = *(സ്ഥിരം std::vector<Mat>*)obj;
         CV_Assert(i >= 0 && (size_t)i < vv.size());
-        return vv[i].isSubmatrix();
+        തിരികെ vv[i].isSubmatrix();
     }
 
-    if( k == STD_ARRAY_MAT )
+    എങ്കിൽ( k == STD_ARRAY_MAT )
     {
-        const Mat* vv = (const Mat*)obj;
+        സ്ഥിരം Mat* vv = (സ്ഥിരം Mat*)obj;
         CV_Assert(i >= 0 && i < sz.height);
-        return vv[i].isSubmatrix();
+        തിരികെ vv[i].isSubmatrix();
     }
 
-    if( k == STD_VECTOR_UMAT )
+    എങ്കിൽ( k == STD_VECTOR_UMAT )
     {
-        const std::vector<UMat>& vv = *(const std::vector<UMat>*)obj;
+        സ്ഥിരം std::vector<UMat>& vv = *(സ്ഥിരം std::vector<UMat>*)obj;
         CV_Assert(i >= 0 && (size_t)i < vv.size());
-        return vv[i].isSubmatrix();
+        തിരികെ vv[i].isSubmatrix();
     }
 
-    if( k == CUDA_GPU_MATND )
+    എങ്കിൽ( k == CUDA_GPU_MATND )
     {
-        return ((const cuda::GpuMatND*)obj)->isSubmatrix();
+        തിരികെ ((സ്ഥിരം cuda::GpuMatND*)obj)->isSubmatrix();
     }
 
-    if (k == STD_VECTOR_CUDA_GPU_MAT_ND)
+    എങ്കിൽ (k == STD_VECTOR_CUDA_GPU_MAT_ND)
     {
-        const std::vector<cuda::GpuMatND>& vv = *(const std::vector<cuda::GpuMatND>*)obj;
+        സ്ഥിരം std::vector<cuda::GpuMatND>& vv = *(സ്ഥിരം std::vector<cuda::GpuMatND>*)obj;
         CV_Assert(i >= 0 && (size_t)i < vv.size());
-        return vv[i].isSubmatrix();
+        തിരികെ vv[i].isSubmatrix();
     }
 
     CV_Error(cv::Error::StsNotImplemented, "");
 }
 
-size_t _InputArray::offset(int i) const
+size_t നിവേശം_Array_2::offset(പൂർണ്ണസംഖ്യ i) സ്ഥിരം
 {
-    _InputArray::KindFlag k = kind();
+    നിവേശം_Array_2::KindFlag k = kind();
 
-    if( k == MAT )
+    എങ്കിൽ( k == MAT )
     {
         CV_Assert( i < 0 );
-        const Mat * const m = ((const Mat*)obj);
-        return (size_t)(m->ptr() - m->datastart);
+        സ്ഥിരം Mat * സ്ഥിരം m = ((സ്ഥിരം Mat*)obj);
+        തിരികെ (size_t)(m->ptr() - m->datastart);
     }
 
-    if( k == UMAT )
+    എങ്കിൽ( k == UMAT )
     {
         CV_Assert( i < 0 );
-        return ((const UMat*)obj)->offset;
+        തിരികെ ((സ്ഥിരം UMat*)obj)->offset;
     }
 
-    if( k == MATX || k == STD_VECTOR ||
+    എങ്കിൽ( k == MATX || k == STD_VECTOR ||
         k == NONE || k == STD_VECTOR_VECTOR || k == STD_BOOL_VECTOR )
-        return 0;
+        തിരികെ 0;
 
-    if( k == STD_VECTOR_MAT )
+    എങ്കിൽ( k == STD_VECTOR_MAT )
     {
-        const std::vector<Mat>& vv = *(const std::vector<Mat>*)obj;
-        CV_Assert( i >= 0 && i < (int)vv.size() );
+        സ്ഥിരം std::vector<Mat>& vv = *(സ്ഥിരം std::vector<Mat>*)obj;
+        CV_Assert( i >= 0 && i < (പൂർണ്ണസംഖ്യ)vv.size() );
 
-        return (size_t)(vv[i].ptr() - vv[i].datastart);
+        തിരികെ (size_t)(vv[i].ptr() - vv[i].datastart);
     }
 
-    if( k == STD_ARRAY_MAT )
+    എങ്കിൽ( k == STD_ARRAY_MAT )
     {
-        const Mat* vv = (const Mat*)obj;
+        സ്ഥിരം Mat* vv = (സ്ഥിരം Mat*)obj;
         CV_Assert( i >= 0 && i < sz.height );
-        return (size_t)(vv[i].ptr() - vv[i].datastart);
+        തിരികെ (size_t)(vv[i].ptr() - vv[i].datastart);
     }
 
-    if( k == STD_VECTOR_UMAT )
+    എങ്കിൽ( k == STD_VECTOR_UMAT )
     {
-        const std::vector<UMat>& vv = *(const std::vector<UMat>*)obj;
+        സ്ഥിരം std::vector<UMat>& vv = *(സ്ഥിരം std::vector<UMat>*)obj;
         CV_Assert(i >= 0 && (size_t)i < vv.size());
-        return vv[i].offset;
+        തിരികെ vv[i].offset;
     }
 
-    if( k == CUDA_GPU_MAT )
+    എങ്കിൽ( k == CUDA_GPU_MAT )
     {
         CV_Assert( i < 0 );
-        const cuda::GpuMat * const m = ((const cuda::GpuMat*)obj);
-        return (size_t)(m->data - m->datastart);
+        സ്ഥിരം cuda::GpuMat * സ്ഥിരം m = ((സ്ഥിരം cuda::GpuMat*)obj);
+        തിരികെ (size_t)(m->data - m->datastart);
     }
 
-    if (k == STD_VECTOR_CUDA_GPU_MAT)
+    എങ്കിൽ (k == STD_VECTOR_CUDA_GPU_MAT)
     {
-        const std::vector<cuda::GpuMat>& vv = *(const std::vector<cuda::GpuMat>*)obj;
+        സ്ഥിരം std::vector<cuda::GpuMat>& vv = *(സ്ഥിരം std::vector<cuda::GpuMat>*)obj;
         CV_Assert(i >= 0 && (size_t)i < vv.size());
-        return (size_t)(vv[i].data - vv[i].datastart);
+        തിരികെ (size_t)(vv[i].data - vv[i].datastart);
     }
 
     CV_Error(Error::StsNotImplemented, "");
 }
 
-size_t _InputArray::step(int i) const
+size_t നിവേശം_Array_2::step(പൂർണ്ണസംഖ്യ i) സ്ഥിരം
 {
-    _InputArray::KindFlag k = kind();
+    നിവേശം_Array_2::KindFlag k = kind();
 
-    if( k == MAT )
+    എങ്കിൽ( k == MAT )
     {
         CV_Assert( i < 0 );
-        return ((const Mat*)obj)->step;
+        തിരികെ ((സ്ഥിരം Mat*)obj)->step;
     }
 
-    if( k == UMAT )
+    എങ്കിൽ( k == UMAT )
     {
         CV_Assert( i < 0 );
-        return ((const UMat*)obj)->step;
+        തിരികെ ((സ്ഥിരം UMat*)obj)->step;
     }
 
-    if( k == MATX || k == STD_VECTOR ||
+    എങ്കിൽ( k == MATX || k == STD_VECTOR ||
         k == NONE || k == STD_VECTOR_VECTOR || k == STD_BOOL_VECTOR )
-        return 0;
+        തിരികെ 0;
 
-    if( k == STD_VECTOR_MAT )
+    എങ്കിൽ( k == STD_VECTOR_MAT )
     {
-        const std::vector<Mat>& vv = *(const std::vector<Mat>*)obj;
-        CV_Assert( i >= 0 && i < (int)vv.size() );
-        return vv[i].step;
+        സ്ഥിരം std::vector<Mat>& vv = *(സ്ഥിരം std::vector<Mat>*)obj;
+        CV_Assert( i >= 0 && i < (പൂർണ്ണസംഖ്യ)vv.size() );
+        തിരികെ vv[i].step;
     }
 
-    if( k == STD_ARRAY_MAT )
+    എങ്കിൽ( k == STD_ARRAY_MAT )
     {
-        const Mat* vv = (const Mat*)obj;
+        സ്ഥിരം Mat* vv = (സ്ഥിരം Mat*)obj;
         CV_Assert( i >= 0 && i < sz.height );
-        return vv[i].step;
+        തിരികെ vv[i].step;
     }
 
-    if( k == STD_VECTOR_UMAT )
+    എങ്കിൽ( k == STD_VECTOR_UMAT )
     {
-        const std::vector<UMat>& vv = *(const std::vector<UMat>*)obj;
+        സ്ഥിരം std::vector<UMat>& vv = *(സ്ഥിരം std::vector<UMat>*)obj;
         CV_Assert(i >= 0 && (size_t)i < vv.size());
-        return vv[i].step;
+        തിരികെ vv[i].step;
     }
 
-    if( k == CUDA_GPU_MAT )
+    എങ്കിൽ( k == CUDA_GPU_MAT )
     {
         CV_Assert( i < 0 );
-        return ((const cuda::GpuMat*)obj)->step;
+        തിരികെ ((സ്ഥിരം cuda::GpuMat*)obj)->step;
     }
-    if (k == STD_VECTOR_CUDA_GPU_MAT)
+    എങ്കിൽ (k == STD_VECTOR_CUDA_GPU_MAT)
     {
-        const std::vector<cuda::GpuMat>& vv = *(const std::vector<cuda::GpuMat>*)obj;
+        സ്ഥിരം std::vector<cuda::GpuMat>& vv = *(സ്ഥിരം std::vector<cuda::GpuMat>*)obj;
         CV_Assert(i >= 0 && (size_t)i < vv.size());
-        return vv[i].step;
+        തിരികെ vv[i].step;
     }
-    if( k == CUDA_GPU_MATND )
+    എങ്കിൽ( k == CUDA_GPU_MATND )
     {
-        const cuda::GpuMatND& _gpuMatND = *(const cuda::GpuMatND*)obj;
+        സ്ഥിരം cuda::GpuMatND& _gpuMatND = *(സ്ഥിരം cuda::GpuMatND*)obj;
         CV_Assert( i >= 0 && i < _gpuMatND.dims );
-        return _gpuMatND.step[i];
+        തിരികെ _gpuMatND.step[i];
     }
 
-    if (k == STD_VECTOR_CUDA_GPU_MAT_ND)
+    എങ്കിൽ (k == STD_VECTOR_CUDA_GPU_MAT_ND)
     {
-        const std::vector<cuda::GpuMatND>& vv = *(const std::vector<cuda::GpuMatND>*)obj;
+        സ്ഥിരം std::vector<cuda::GpuMatND>& vv = *(സ്ഥിരം std::vector<cuda::GpuMatND>*)obj;
         CV_Assert(i >= 0 && (size_t)i < vv.size());
-        const cuda::GpuMatND& _gpuMatND = vv[i];
+        സ്ഥിരം cuda::GpuMatND& _gpuMatND = vv[i];
         CV_Assert( _gpuMatND.dims > 0 );
-        return _gpuMatND.step[0];
+        തിരികെ _gpuMatND.step[0];
     }
 
     CV_Error(Error::StsNotImplemented, "");
 }
 
-void _InputArray::copyTo(const _OutputArray& arr) const
+ശൂന്യം നിവേശം_Array_2::copyTo(സ്ഥിരം _OutputArray& arr) സ്ഥിരം
 {
-    _InputArray::KindFlag k = kind();
+    നിവേശം_Array_2::KindFlag k = kind();
 
-    if( k == NONE )
+    എങ്കിൽ( k == NONE )
         arr.release();
-    else if( k == MAT || k == MATX || k == STD_VECTOR || k == STD_BOOL_VECTOR )
+    അല്ലെങ്കിൽ എങ്കിൽ( k == MAT || k == MATX || k == STD_VECTOR || k == STD_BOOL_VECTOR )
     {
         Mat m = getMat();
         m.copyTo(arr);
     }
-    else if( k == UMAT )
+    അല്ലെങ്കിൽ എങ്കിൽ( k == UMAT )
         ((UMat*)obj)->copyTo(arr);
 #ifdef HAVE_CUDA
-    else if (k == CUDA_GPU_MAT)
+    അല്ലെങ്കിൽ എങ്കിൽ (k == CUDA_GPU_MAT)
         ((cuda::GpuMat*)obj)->copyTo(arr);
 #endif
-    else
+    അല്ലെങ്കിൽ
         CV_Error(Error::StsNotImplemented, "");
 }
 
-void _InputArray::copyTo(const _OutputArray& arr, const _InputArray & mask) const
+ശൂന്യം നിവേശം_Array_2::copyTo(സ്ഥിരം _OutputArray& arr, സ്ഥിരം നിവേശം_Array_2 & mask) സ്ഥിരം
 {
-    _InputArray::KindFlag k = kind();
+    നിവേശം_Array_2::KindFlag k = kind();
 
-    if( k == NONE )
+    എങ്കിൽ( k == NONE )
         arr.release();
-    else if( k == MAT || k == MATX || k == STD_VECTOR || k == STD_BOOL_VECTOR )
+    അല്ലെങ്കിൽ എങ്കിൽ( k == MAT || k == MATX || k == STD_VECTOR || k == STD_BOOL_VECTOR )
     {
         Mat m = getMat();
         m.copyTo(arr, mask);
     }
-    else if( k == UMAT )
+    അല്ലെങ്കിൽ എങ്കിൽ( k == UMAT )
         ((UMat*)obj)->copyTo(arr, mask);
 #ifdef HAVE_CUDA
-    else if (k == CUDA_GPU_MAT)
+    അല്ലെങ്കിൽ എങ്കിൽ (k == CUDA_GPU_MAT)
         ((cuda::GpuMat*)obj)->copyTo(arr, mask);
 #endif
-    else
+    അല്ലെങ്കിൽ
         CV_Error(Error::StsNotImplemented, "");
 }
 
-bool _OutputArray::fixedSize() const
+തർക്കം _OutputArray::fixedSize() സ്ഥിരം
 {
-    return (flags & FIXED_SIZE) == FIXED_SIZE;
+    തിരികെ (flags & FIXED_SIZE) == FIXED_SIZE;
 }
 
-bool _OutputArray::fixedType() const
+തർക്കം _OutputArray::fixedType() സ്ഥിരം
 {
-    return (flags & FIXED_TYPE) == FIXED_TYPE;
+    തിരികെ (flags & FIXED_TYPE) == FIXED_TYPE;
 }
 
-void _OutputArray::create_(Size _sz, int mtype, int i, bool allowTransposed, _OutputArray::DepthMask fixedDepthMask) const
+ശൂന്യം _OutputArray::create_(Size _sz, പൂർണ്ണസംഖ്യ mtype, പൂർണ്ണസംഖ്യ i, തർക്കം allowTransposed, _OutputArray::DepthMask fixedDepthMask) സ്ഥിരം
 {
-    _InputArray::KindFlag k = kind();
-    if( k == MAT && i < 0 && !allowTransposed && fixedDepthMask == 0 )
+    നിവേശം_Array_2::KindFlag k = kind();
+    എങ്കിൽ( k == MAT && i < 0 && !allowTransposed && fixedDepthMask == 0 )
     {
         CV_Assert(!fixedSize() || ((Mat*)obj)->size.operator()() == _sz);
         CV_Assert(!fixedType() || ((Mat*)obj)->type() == mtype);
         ((Mat*)obj)->create(_sz, mtype);
-        return;
+        തിരികെ;
     }
-    if( k == UMAT && i < 0 && !allowTransposed && fixedDepthMask == 0 )
+    എങ്കിൽ( k == UMAT && i < 0 && !allowTransposed && fixedDepthMask == 0 )
     {
         CV_Assert(!fixedSize() || ((UMat*)obj)->size.operator()() == _sz);
         CV_Assert(!fixedType() || ((UMat*)obj)->type() == mtype);
         ((UMat*)obj)->create(_sz, mtype);
-        return;
+        തിരികെ;
     }
-    if( k == CUDA_GPU_MAT && i < 0 && !allowTransposed && fixedDepthMask == 0 )
+    എങ്കിൽ( k == CUDA_GPU_MAT && i < 0 && !allowTransposed && fixedDepthMask == 0 )
     {
         CV_Assert(!fixedSize() || ((cuda::GpuMat*)obj)->size() == _sz);
         CV_Assert(!fixedType() || ((cuda::GpuMat*)obj)->type() == mtype);
 #ifdef HAVE_CUDA
         ((cuda::GpuMat*)obj)->create(_sz, mtype);
-        return;
-#else
+        തിരികെ;
+#അല്ലെങ്കിൽ
         CV_Error(Error::StsNotImplemented, "CUDA support is not enabled in this OpenCV build (missing HAVE_CUDA)");
 #endif
     }
-    if( k == CUDA_GPU_MATND && i < 0 && !allowTransposed && fixedDepthMask == 0 )
+    എങ്കിൽ( k == CUDA_GPU_MATND && i < 0 && !allowTransposed && fixedDepthMask == 0 )
     {
         CV_Assert(!fixedSize() || ((((cuda::GpuMatND*)obj)->dims == 2) && (((cuda::GpuMatND*)obj)->size[0] == _sz.height) && (((cuda::GpuMatND*)obj)->size[1] == _sz.width)));
         CV_Assert(!fixedType() || ((cuda::GpuMatND*)obj)->type() == mtype);
 #ifdef HAVE_CUDA
         cuda::GpuMatND::SizeArray sizes({_sz.height, _sz.width});
         ((cuda::GpuMatND*)obj)->create(sizes, mtype);
-        return;
-#else
+        തിരികെ;
+#അല്ലെങ്കിൽ
         CV_Error(Error::StsNotImplemented, "CUDA support is not enabled in this OpenCV build (missing HAVE_CUDA)");
 #endif
     }
-    if( k == OPENGL_BUFFER && i < 0 && !allowTransposed && fixedDepthMask == 0 )
+    എങ്കിൽ( k == OPENGL_BUFFER && i < 0 && !allowTransposed && fixedDepthMask == 0 )
     {
         CV_Assert(!fixedSize() || ((ogl::Buffer*)obj)->size() == _sz);
         CV_Assert(!fixedType() || ((ogl::Buffer*)obj)->type() == mtype);
 #ifdef HAVE_OPENGL
         ((ogl::Buffer*)obj)->create(_sz, mtype);
-        return;
-#else
+        തിരികെ;
+#അല്ലെങ്കിൽ
         CV_Error(Error::StsNotImplemented, "OpenGL support is not enabled in this OpenCV build (missing HAVE_OPENGL)");
 #endif
     }
-    if( k == CUDA_HOST_MEM && i < 0 && !allowTransposed && fixedDepthMask == 0 )
+    എങ്കിൽ( k == CUDA_HOST_MEM && i < 0 && !allowTransposed && fixedDepthMask == 0 )
     {
         CV_Assert(!fixedSize() || ((cuda::HostMem*)obj)->size() == _sz);
         CV_Assert(!fixedType() || ((cuda::HostMem*)obj)->type() == mtype);
 #ifdef HAVE_CUDA
         ((cuda::HostMem*)obj)->create(_sz, mtype);
-        return;
-#else
+        തിരികെ;
+#അല്ലെങ്കിൽ
         CV_Error(Error::StsNotImplemented, "CUDA support is not enabled in this OpenCV build (missing HAVE_CUDA)");
 #endif
     }
-    int sizes[] = {_sz.height, _sz.width};
+    പൂർണ്ണസംഖ്യ sizes[] = {_sz.height, _sz.width};
     create(2, sizes, mtype, i, allowTransposed, fixedDepthMask);
 }
 
-void _OutputArray::create_(int _rows, int _cols, int mtype, int i, bool allowTransposed, _OutputArray::DepthMask fixedDepthMask) const
+ശൂന്യം _OutputArray::create_(പൂർണ്ണസംഖ്യ _rows, പൂർണ്ണസംഖ്യ _cols, പൂർണ്ണസംഖ്യ mtype, പൂർണ്ണസംഖ്യ i, തർക്കം allowTransposed, _OutputArray::DepthMask fixedDepthMask) സ്ഥിരം
 {
-    _InputArray::KindFlag k = kind();
-    if( k == MAT && i < 0 && !allowTransposed && fixedDepthMask == 0 )
+    നിവേശം_Array_2::KindFlag k = kind();
+    എങ്കിൽ( k == MAT && i < 0 && !allowTransposed && fixedDepthMask == 0 )
     {
         CV_Assert(!fixedSize() || ((Mat*)obj)->size.operator()() == Size(_cols, _rows));
         CV_Assert(!fixedType() || ((Mat*)obj)->type() == mtype);
         ((Mat*)obj)->create(_rows, _cols, mtype);
-        return;
+        തിരികെ;
     }
-    if( k == UMAT && i < 0 && !allowTransposed && fixedDepthMask == 0 )
+    എങ്കിൽ( k == UMAT && i < 0 && !allowTransposed && fixedDepthMask == 0 )
     {
         CV_Assert(!fixedSize() || ((UMat*)obj)->size.operator()() == Size(_cols, _rows));
         CV_Assert(!fixedType() || ((UMat*)obj)->type() == mtype);
         ((UMat*)obj)->create(_rows, _cols, mtype);
-        return;
+        തിരികെ;
     }
-    if( k == CUDA_GPU_MAT && i < 0 && !allowTransposed && fixedDepthMask == 0 )
+    എങ്കിൽ( k == CUDA_GPU_MAT && i < 0 && !allowTransposed && fixedDepthMask == 0 )
     {
         CV_Assert(!fixedSize() || ((cuda::GpuMat*)obj)->size() == Size(_cols, _rows));
         CV_Assert(!fixedType() || ((cuda::GpuMat*)obj)->type() == mtype);
 #ifdef HAVE_CUDA
         ((cuda::GpuMat*)obj)->create(_rows, _cols, mtype);
-        return;
-#else
+        തിരികെ;
+#അല്ലെങ്കിൽ
         CV_Error(Error::StsNotImplemented, "CUDA support is not enabled in this OpenCV build (missing HAVE_CUDA)");
 #endif
     }
-    if( k == CUDA_GPU_MATND && i < 0 && !allowTransposed && fixedDepthMask == 0 )
+    എങ്കിൽ( k == CUDA_GPU_MATND && i < 0 && !allowTransposed && fixedDepthMask == 0 )
     {
         CV_Assert(!fixedSize() || ((((cuda::GpuMatND*)obj)->dims == 2) && (((cuda::GpuMatND*)obj)->size[0] == _rows) && (((cuda::GpuMatND*)obj)->size[1] == _cols)));
         CV_Assert(!fixedType() || ((cuda::GpuMatND*)obj)->type() == mtype);
 #ifdef HAVE_CUDA
         cuda::GpuMatND::SizeArray sizes({_rows, _cols});
         ((cuda::GpuMatND*)obj)->create(sizes, mtype);
-        return;
-#else
+        തിരികെ;
+#അല്ലെങ്കിൽ
         CV_Error(Error::StsNotImplemented, "CUDA support is not enabled in this OpenCV build (missing HAVE_CUDA)");
 #endif
     }
-    if( k == OPENGL_BUFFER && i < 0 && !allowTransposed && fixedDepthMask == 0 )
+    എങ്കിൽ( k == OPENGL_BUFFER && i < 0 && !allowTransposed && fixedDepthMask == 0 )
     {
         CV_Assert(!fixedSize() || ((ogl::Buffer*)obj)->size() == Size(_cols, _rows));
         CV_Assert(!fixedType() || ((ogl::Buffer*)obj)->type() == mtype);
 #ifdef HAVE_OPENGL
         ((ogl::Buffer*)obj)->create(_rows, _cols, mtype);
-        return;
-#else
+        തിരികെ;
+#അല്ലെങ്കിൽ
         CV_Error(Error::StsNotImplemented, "OpenGL support is not enabled in this OpenCV build (missing HAVE_OPENGL)");
 #endif
     }
-    if( k == CUDA_HOST_MEM && i < 0 && !allowTransposed && fixedDepthMask == 0 )
+    എങ്കിൽ( k == CUDA_HOST_MEM && i < 0 && !allowTransposed && fixedDepthMask == 0 )
     {
         CV_Assert(!fixedSize() || ((cuda::HostMem*)obj)->size() == Size(_cols, _rows));
         CV_Assert(!fixedType() || ((cuda::HostMem*)obj)->type() == mtype);
 #ifdef HAVE_CUDA
         ((cuda::HostMem*)obj)->create(_rows, _cols, mtype);
-        return;
-#else
+        തിരികെ;
+#അല്ലെങ്കിൽ
         CV_Error(Error::StsNotImplemented, "CUDA support is not enabled in this OpenCV build (missing HAVE_CUDA)");
 #endif
     }
-    int sizes[] = {_rows, _cols};
+    പൂർണ്ണസംഖ്യ sizes[] = {_rows, _cols};
     create(2, sizes, mtype, i, allowTransposed, fixedDepthMask);
 }
 
-void _OutputArray::create(int d, const int* sizes, int mtype, int i,
-                          bool allowTransposed, _OutputArray::DepthMask fixedDepthMask) const
+ശൂന്യം _OutputArray::create(പൂർണ്ണസംഖ്യ d, സ്ഥിരം പൂർണ്ണസംഖ്യ* sizes, പൂർണ്ണസംഖ്യ mtype, പൂർണ്ണസംഖ്യ i,
+                          തർക്കം allowTransposed, _OutputArray::DepthMask fixedDepthMask) സ്ഥിരം
 {
-    int size0 = d > 0 ? sizes[0] : 1, size1 = d > 1 ? sizes[1] : 1;
-    _InputArray::KindFlag k = kind();
+    പൂർണ്ണസംഖ്യ size0 = d > 0 ? sizes[0] : 1, size1 = d > 1 ? sizes[1] : 1;
+    നിവേശം_Array_2::KindFlag k = kind();
     mtype = CV_MAT_TYPE(mtype);
 
-    if( k == MAT )
+    എങ്കിൽ( k == MAT )
     {
         CV_Assert( i < 0 );
         Mat& m = *(Mat*)obj;
         CV_Assert(!(m.empty() && fixedType() && fixedSize()) && "Can't reallocate empty Mat with locked layout (probably due to misused 'const' modifier)");
-        if (!m.empty() && d <= 2 && m.dims <= 2 &&
+        എങ്കിൽ (!m.empty() && d <= 2 && m.dims <= 2 &&
             m.type() == mtype &&
             ((m.rows == size0 && m.cols == size1) ||
             (allowTransposed && m.rows == size1 && m.cols == size0 && m.isContinuous())))
         {
-            return;
+            തിരികെ;
         }
 
-        if(fixedType())
+        എങ്കിൽ(fixedType())
         {
-            if(CV_MAT_CN(mtype) == m.channels() && ((1 << CV_MAT_DEPTH(flags)) & fixedDepthMask) != 0 )
+            എങ്കിൽ(CV_MAT_CN(mtype) == m.channels() && ((1 << CV_MAT_DEPTH(flags)) & fixedDepthMask) != 0 )
                 mtype = m.type();
-            else
+            അല്ലെങ്കിൽ
                 CV_CheckTypeEQ(m.type(), CV_MAT_TYPE(mtype), "Can't reallocate Mat with locked type (probably due to misused 'const' modifier)");
         }
-        if(fixedSize())
+        എങ്കിൽ(fixedSize())
         {
             CV_CheckEQ(m.dims, d, "Can't reallocate Mat with locked size (probably due to misused 'const' modifier)");
-            for(int j = 0; j < d; ++j)
+            വേണ്ടി(പൂർണ്ണസംഖ്യ j = 0; j < d; ++j)
                 CV_CheckEQ(m.size[j], sizes[j], "Can't reallocate Mat with locked size (probably due to misused 'const' modifier)");
         }
         m.create(d, sizes, mtype);
-        return;
+        തിരികെ;
     }
 
-    if( k == UMAT )
+    എങ്കിൽ( k == UMAT )
     {
         CV_Assert( i < 0 );
         UMat& m = *(UMat*)obj;
         CV_Assert(!(m.empty() && fixedType() && fixedSize()) && "Can't reallocate empty UMat with locked layout (probably due to misused 'const' modifier)");
-        if (!m.empty() && d <= 2 && m.dims <= 2 &&
+        എങ്കിൽ (!m.empty() && d <= 2 && m.dims <= 2 &&
             m.type() == mtype &&
             ((m.rows == size0 && m.cols == size1) ||
             (allowTransposed && m.rows == size1 && m.cols == size0 && m.isContinuous())))
         {
-            return;
+            തിരികെ;
         }
 
-        if(fixedType())
+        എങ്കിൽ(fixedType())
         {
-            if(CV_MAT_CN(mtype) == m.channels() && ((1 << CV_MAT_TYPE(flags)) & fixedDepthMask) != 0 )
+            എങ്കിൽ(CV_MAT_CN(mtype) == m.channels() && ((1 << CV_MAT_TYPE(flags)) & fixedDepthMask) != 0 )
                 mtype = m.type();
-            else
+            അല്ലെങ്കിൽ
                 CV_CheckTypeEQ(m.type(), CV_MAT_TYPE(mtype), "Can't reallocate UMat with locked type (probably due to misused 'const' modifier)");
         }
-        if(fixedSize())
+        എങ്കിൽ(fixedSize())
         {
             CV_CheckEQ(m.dims, d, "Can't reallocate UMat with locked size (probably due to misused 'const' modifier)");
-            for(int j = 0; j < d; ++j)
+            വേണ്ടി(പൂർണ്ണസംഖ്യ j = 0; j < d; ++j)
                 CV_CheckEQ(m.size[j], sizes[j], "Can't reallocate UMat with locked size (probably due to misused 'const' modifier)");
         }
         m.create(d, sizes, mtype);
-        return;
+        തിരികെ;
     }
 
-    if( k == MATX )
+    എങ്കിൽ( k == MATX )
     {
         CV_Assert( i < 0 );
-        int type0 = CV_MAT_TYPE(flags);
+        പൂർണ്ണസംഖ്യ type0 = CV_MAT_TYPE(flags);
         CV_Assert( mtype == type0 || (CV_MAT_CN(mtype) == 1 && ((1 << type0) & fixedDepthMask) != 0) );
         CV_CheckLE(d, 2, "");
         Size requested_size(d == 2 ? sizes[1] : 1, d >= 1 ? sizes[0] : 1);
-        if (sz.width == 1 || sz.height == 1)
+        എങ്കിൽ (sz.width == 1 || sz.height == 1)
         {
             // NB: 1D arrays assume allowTransposed=true (see #4159)
-            int total_1d = std::max(sz.width, sz.height);
+            പൂർണ്ണസംഖ്യ total_1d = std::max(sz.width, sz.height);
             CV_Check(requested_size, std::max(requested_size.width, requested_size.height) == total_1d, "");
         }
-        else
+        അല്ലെങ്കിൽ
         {
-            if (!allowTransposed)
+            എങ്കിൽ (!allowTransposed)
             {
                 CV_CheckEQ(requested_size, sz, "");
             }
-            else
+            അല്ലെങ്കിൽ
             {
                 CV_Check(requested_size,
                         (requested_size == sz || (requested_size.height == sz.width && requested_size.width == sz.height)),
                         "");
             }
         }
-        return;
+        തിരികെ;
     }
 
-    if( k == STD_VECTOR || k == STD_VECTOR_VECTOR )
+    എങ്കിൽ( k == STD_VECTOR || k == STD_VECTOR_VECTOR )
     {
         CV_Assert(!fixedSize());
         CV_Assert(k == STD_VECTOR_VECTOR || i < 0);
         CV_Assert( d <= 2 && (size0 == 1 || size1 == 1 || size0*size1 == 0) );
         size_t len = size0*size1 > 0 ? size0 + size1 - 1 : 0;
-        int esz = CV_ELEM_SIZE(flags);
+        പൂർണ്ണസംഖ്യ esz = CV_ELEM_SIZE(flags);
 
-        if( k == STD_VECTOR || (k == STD_VECTOR_VECTOR && i >= 0) )
+        എങ്കിൽ( k == STD_VECTOR || (k == STD_VECTOR_VECTOR && i >= 0) )
         {
-            int type0 = CV_MAT_TYPE(flags);
+            പൂർണ്ണസംഖ്യ type0 = CV_MAT_TYPE(flags);
             CV_Assert( mtype == type0 || (CV_MAT_CN(mtype) == CV_MAT_CN(type0) && ((1 << type0) & fixedDepthMask) != 0) );
         }
 
@@ -1694,224 +1694,224 @@ void _OutputArray::create(int d, const int* sizes, int mtype, int i,
     #define RESIZE_VEC(T) \
         { \
             std::vector<T>* v; \
-            if (k == STD_VECTOR_VECTOR) { \
+            എങ്കിൽ (k == STD_VECTOR_VECTOR) { \
                 std::vector<std::vector<T> >* vv = reinterpret_cast<std::vector<std::vector<T> >*>(obj); \
-                if (i < 0) { \
+                എങ്കിൽ (i < 0) { \
                     CV_Assert(!fixedSize() || len == vv->size()); \
                     vv->resize(len); \
-                    return; \
+                    തിരികെ; \
                 } \
                 CV_Assert(size_t(i) < vv->size()); \
                 v = &vv->at(i); \
-            } else { \
+            } അല്ലെങ്കിൽ { \
                 v = reinterpret_cast<std::vector<T>*>(obj); \
             } \
             CV_Assert(!fixedSize() || len == v->size()); \
             v->resize(len); \
         } \
-        break
+        നിർത്തുക
 
         STD_VECTOR_SWITCH(esz, RESIZE_VEC)
-        return;
+        തിരികെ;
     }
 
-    if( k == NONE )
+    എങ്കിൽ( k == NONE )
     {
         CV_Error(cv::Error::StsNullPtr, "create() called for the missing output array" );
     }
 
-    if( k == STD_VECTOR_MAT )
+    എങ്കിൽ( k == STD_VECTOR_MAT )
     {
         std::vector<Mat>& v = *(std::vector<Mat>*)obj;
 
-        if( i < 0 )
+        എങ്കിൽ( i < 0 )
         {
             CV_Assert( d == 2 && (sizes[0] == 1 || sizes[1] == 1 || sizes[0]*sizes[1] == 0) );
             size_t len = sizes[0]*sizes[1] > 0 ? sizes[0] + sizes[1] - 1 : 0, len0 = v.size();
 
             CV_Assert(!fixedSize() || len == len0);
             v.resize(len);
-            if( fixedType() )
+            എങ്കിൽ( fixedType() )
             {
-                int _type = CV_MAT_TYPE(flags);
-                for( size_t j = len0; j < len; j++ )
+                പൂർണ്ണസംഖ്യ _type = CV_MAT_TYPE(flags);
+                വേണ്ടി( size_t j = len0; j < len; j++ )
                 {
-                    if( v[j].type() == _type )
-                        continue;
+                    എങ്കിൽ( v[j].type() == _type )
+                        തുടരുക;
                     CV_Assert( v[j].empty() );
                     v[j].flags = (v[j].flags & ~CV_MAT_TYPE_MASK) | _type;
                 }
             }
-            return;
+            തിരികെ;
         }
 
-        CV_Assert( i < (int)v.size() );
+        CV_Assert( i < (പൂർണ്ണസംഖ്യ)v.size() );
         Mat& m = v[i];
 
-        if( allowTransposed )
+        എങ്കിൽ( allowTransposed )
         {
-            if( !m.isContinuous() )
+            എങ്കിൽ( !m.isContinuous() )
             {
                 CV_Assert(!fixedType() && !fixedSize());
                 m.release();
             }
 
-            if( d == 2 && m.dims == 2 && m.data &&
+            എങ്കിൽ( d == 2 && m.dims == 2 && m.data &&
                 m.type() == mtype && m.rows == sizes[1] && m.cols == sizes[0] )
-                return;
+                തിരികെ;
         }
 
-        if(fixedType())
+        എങ്കിൽ(fixedType())
         {
-            if(CV_MAT_CN(mtype) == m.channels() && ((1 << CV_MAT_TYPE(flags)) & fixedDepthMask) != 0 )
+            എങ്കിൽ(CV_MAT_CN(mtype) == m.channels() && ((1 << CV_MAT_TYPE(flags)) & fixedDepthMask) != 0 )
                 mtype = m.type();
-            else
+            അല്ലെങ്കിൽ
                 CV_Assert(CV_MAT_TYPE(mtype) == m.type());
         }
-        if(fixedSize())
+        എങ്കിൽ(fixedSize())
         {
             CV_Assert(m.dims == d);
-            for(int j = 0; j < d; ++j)
+            വേണ്ടി(പൂർണ്ണസംഖ്യ j = 0; j < d; ++j)
                 CV_Assert(m.size[j] == sizes[j]);
         }
 
         m.create(d, sizes, mtype);
-        return;
+        തിരികെ;
     }
 
-    if( k == STD_ARRAY_MAT )
+    എങ്കിൽ( k == STD_ARRAY_MAT )
     {
         Mat* v = (Mat*)obj;
 
-        if( i < 0 )
+        എങ്കിൽ( i < 0 )
         {
             CV_Assert( d == 2 && (sizes[0] == 1 || sizes[1] == 1 || sizes[0]*sizes[1] == 0) );
             size_t len = sizes[0]*sizes[1] > 0 ? sizes[0] + sizes[1] - 1 : 0, len0 = sz.height;
 
             CV_Assert(len == len0);
-            if( fixedType() )
+            എങ്കിൽ( fixedType() )
             {
-                int _type = CV_MAT_TYPE(flags);
-                for( size_t j = len0; j < len; j++ )
+                പൂർണ്ണസംഖ്യ _type = CV_MAT_TYPE(flags);
+                വേണ്ടി( size_t j = len0; j < len; j++ )
                 {
-                    if( v[j].type() == _type )
-                        continue;
+                    എങ്കിൽ( v[j].type() == _type )
+                        തുടരുക;
                     CV_Assert( v[j].empty() );
                     v[j].flags = (v[j].flags & ~CV_MAT_TYPE_MASK) | _type;
                 }
             }
-            return;
+            തിരികെ;
         }
 
         CV_Assert( i < sz.height );
         Mat& m = v[i];
 
-        if( allowTransposed )
+        എങ്കിൽ( allowTransposed )
         {
-            if( !m.isContinuous() )
+            എങ്കിൽ( !m.isContinuous() )
             {
                 CV_Assert(!fixedType() && !fixedSize());
                 m.release();
             }
 
-            if( d == 2 && m.dims == 2 && m.data &&
+            എങ്കിൽ( d == 2 && m.dims == 2 && m.data &&
                 m.type() == mtype && m.rows == sizes[1] && m.cols == sizes[0] )
-                return;
+                തിരികെ;
         }
 
-        if(fixedType())
+        എങ്കിൽ(fixedType())
         {
-            if(CV_MAT_CN(mtype) == m.channels() && ((1 << CV_MAT_TYPE(flags)) & fixedDepthMask) != 0 )
+            എങ്കിൽ(CV_MAT_CN(mtype) == m.channels() && ((1 << CV_MAT_TYPE(flags)) & fixedDepthMask) != 0 )
                 mtype = m.type();
-            else
+            അല്ലെങ്കിൽ
                 CV_Assert(CV_MAT_TYPE(mtype) == m.type());
         }
 
-        if(fixedSize())
+        എങ്കിൽ(fixedSize())
         {
             CV_Assert(m.dims == d);
-            for(int j = 0; j < d; ++j)
+            വേണ്ടി(പൂർണ്ണസംഖ്യ j = 0; j < d; ++j)
                 CV_Assert(m.size[j] == sizes[j]);
         }
 
         m.create(d, sizes, mtype);
-        return;
+        തിരികെ;
     }
 
-    if( k == STD_VECTOR_UMAT )
+    എങ്കിൽ( k == STD_VECTOR_UMAT )
     {
         std::vector<UMat>& v = *(std::vector<UMat>*)obj;
 
-        if( i < 0 )
+        എങ്കിൽ( i < 0 )
         {
             CV_Assert( d == 2 && (sizes[0] == 1 || sizes[1] == 1 || sizes[0]*sizes[1] == 0) );
             size_t len = sizes[0]*sizes[1] > 0 ? sizes[0] + sizes[1] - 1 : 0, len0 = v.size();
 
             CV_Assert(!fixedSize() || len == len0);
             v.resize(len);
-            if( fixedType() )
+            എങ്കിൽ( fixedType() )
             {
-                int _type = CV_MAT_TYPE(flags);
-                for( size_t j = len0; j < len; j++ )
+                പൂർണ്ണസംഖ്യ _type = CV_MAT_TYPE(flags);
+                വേണ്ടി( size_t j = len0; j < len; j++ )
                 {
-                    if( v[j].type() == _type )
-                        continue;
+                    എങ്കിൽ( v[j].type() == _type )
+                        തുടരുക;
                     CV_Assert( v[j].empty() );
                     v[j].flags = (v[j].flags & ~CV_MAT_TYPE_MASK) | _type;
                 }
             }
-            return;
+            തിരികെ;
         }
 
-        CV_Assert( i < (int)v.size() );
+        CV_Assert( i < (പൂർണ്ണസംഖ്യ)v.size() );
         UMat& m = v[i];
 
-        if( allowTransposed )
+        എങ്കിൽ( allowTransposed )
         {
-            if( !m.isContinuous() )
+            എങ്കിൽ( !m.isContinuous() )
             {
                 CV_Assert(!fixedType() && !fixedSize());
                 m.release();
             }
 
-            if( d == 2 && m.dims == 2 && m.u &&
+            എങ്കിൽ( d == 2 && m.dims == 2 && m.u &&
                 m.type() == mtype && m.rows == sizes[1] && m.cols == sizes[0] )
-                return;
+                തിരികെ;
         }
 
-        if(fixedType())
+        എങ്കിൽ(fixedType())
         {
-            if(CV_MAT_CN(mtype) == m.channels() && ((1 << CV_MAT_TYPE(flags)) & fixedDepthMask) != 0 )
+            എങ്കിൽ(CV_MAT_CN(mtype) == m.channels() && ((1 << CV_MAT_TYPE(flags)) & fixedDepthMask) != 0 )
                 mtype = m.type();
-            else
+            അല്ലെങ്കിൽ
                 CV_Assert(CV_MAT_TYPE(mtype) == m.type());
         }
-        if(fixedSize())
+        എങ്കിൽ(fixedSize())
         {
             CV_Assert(m.dims == d);
-            for(int j = 0; j < d; ++j)
+            വേണ്ടി(പൂർണ്ണസംഖ്യ j = 0; j < d; ++j)
                 CV_Assert(m.size[j] == sizes[j]);
         }
 
         m.create(d, sizes, mtype);
-        return;
+        തിരികെ;
     }
 
-    if ((k == CUDA_GPU_MAT || k == CUDA_HOST_MEM) && d <= 2 &&
+    എങ്കിൽ ((k == CUDA_GPU_MAT || k == CUDA_HOST_MEM) && d <= 2 &&
         i < 0 && !allowTransposed && fixedDepthMask == 0)
     {
         create((d < 2 ? 1 : sizes[0]), (d < 1 ? 1 : sizes[d > 1]),
                 mtype, i, allowTransposed, fixedDepthMask);
-        return;
+        തിരികെ;
     }
 
-    if( k == CUDA_GPU_MATND && d > 0 && i < 0 && !allowTransposed && fixedDepthMask == 0 )
+    എങ്കിൽ( k == CUDA_GPU_MATND && d > 0 && i < 0 && !allowTransposed && fixedDepthMask == 0 )
     {
 #ifdef HAVE_CUDA
         cuda::GpuMatND::SizeArray sizeArray = cuda::GpuMatND::SizeArray(sizes, sizes+d);
         ((cuda::GpuMatND*)obj)->create(sizeArray, mtype);
-        return;
-#else
+        തിരികെ;
+#അല്ലെങ്കിൽ
         CV_Error(Error::StsNotImplemented, "CUDA support is not enabled in this OpenCV build (missing HAVE_CUDA)");
 #endif
     }
@@ -1920,593 +1920,593 @@ void _OutputArray::create(int d, const int* sizes, int mtype, int i,
     CV_Error(Error::StsNotImplemented, "Unknown/unsupported array type");
 }
 
-void _OutputArray::create(const MatShape& shape, int mtype, int i,
-                          bool allowTransposed, _OutputArray::DepthMask fixedDepthMask) const
+ശൂന്യം _OutputArray::create(സ്ഥിരം MatShape& shape, പൂർണ്ണസംഖ്യ mtype, പൂർണ്ണസംഖ്യ i,
+                          തർക്കം allowTransposed, _OutputArray::DepthMask fixedDepthMask) സ്ഥിരം
 {
-    if (shape.dims < 0) {
+    എങ്കിൽ (shape.dims < 0) {
         release();
-    } else {
+    } അല്ലെങ്കിൽ {
         create(shape.dims, shape.p, mtype, i, allowTransposed, fixedDepthMask);
     }
 }
 
-Mat _OutputArray::reinterpret(int mtype) const
+Mat _OutputArray::reinterpret(പൂർണ്ണസംഖ്യ mtype) സ്ഥിരം
 {
     mtype = CV_MAT_TYPE(mtype);
-    return getMat().reinterpret(mtype);
+    തിരികെ getMat().reinterpret(mtype);
 }
 
-void _OutputArray::createSameSize(const _InputArray& arr, int mtype) const
+ശൂന്യം _OutputArray::createSameSize(സ്ഥിരം നിവേശം_Array_2& arr, പൂർണ്ണസംഖ്യ mtype) സ്ഥിരം
 {
     create(arr.shape(), mtype);
 }
 
-void _OutputArray::fit(Size _sz, int mtype, int i,
-                       bool allowTransposed, _OutputArray::DepthMask fixedDepthMask) const
+ശൂന്യം _OutputArray::fit(Size _sz, പൂർണ്ണസംഖ്യ mtype, പൂർണ്ണസംഖ്യ i,
+                       തർക്കം allowTransposed, _OutputArray::DepthMask fixedDepthMask) സ്ഥിരം
 {
-    int sizes[] = {_sz.height, _sz.width};
+    പൂർണ്ണസംഖ്യ sizes[] = {_sz.height, _sz.width};
     fit(2, sizes, mtype, i, allowTransposed, fixedDepthMask);
 }
 
-void _OutputArray::fit(int rows, int cols, int mtype, int i,
-                       bool allowTransposed, _OutputArray::DepthMask fixedDepthMask) const
+ശൂന്യം _OutputArray::fit(പൂർണ്ണസംഖ്യ rows, പൂർണ്ണസംഖ്യ cols, പൂർണ്ണസംഖ്യ mtype, പൂർണ്ണസംഖ്യ i,
+                       തർക്കം allowTransposed, _OutputArray::DepthMask fixedDepthMask) സ്ഥിരം
 {
-    int sizes[] = {rows, cols};
+    പൂർണ്ണസംഖ്യ sizes[] = {rows, cols};
     fit(2, sizes, mtype, i, allowTransposed, fixedDepthMask);
 }
 
-void _OutputArray::fit(const MatShape& shape, int mtype, int i,
-                       bool allowTransposed, _OutputArray::DepthMask fixedDepthMask) const
+ശൂന്യം _OutputArray::fit(സ്ഥിരം MatShape& shape, പൂർണ്ണസംഖ്യ mtype, പൂർണ്ണസംഖ്യ i,
+                       തർക്കം allowTransposed, _OutputArray::DepthMask fixedDepthMask) സ്ഥിരം
 {
-    if (shape.dims < 0) {
+    എങ്കിൽ (shape.dims < 0) {
         release();
-        return;
+        തിരികെ;
     }
     fit(shape.dims, shape.p, mtype, i, allowTransposed, fixedDepthMask);
 
     // fit(dims, sizes) resets the layout, so carry it over the same way Mat::fit(const MatShape&) does
-    _InputArray::KindFlag k = kind();
-    if ((k == MAT && i < 0) || (k == STD_VECTOR_MAT && i >= 0)) {
+    നിവേശം_Array_2::KindFlag k = kind();
+    എങ്കിൽ ((k == MAT && i < 0) || (k == STD_VECTOR_MAT && i >= 0)) {
         MatSize& msize = getMatRef(i).size;
         msize.layout = shape.layout;
         msize.C = shape.C;
-    } else if ((k == UMAT && i < 0) || (k == STD_VECTOR_UMAT && i >= 0)) {
+    } അല്ലെങ്കിൽ എങ്കിൽ ((k == UMAT && i < 0) || (k == STD_VECTOR_UMAT && i >= 0)) {
         MatSize& msize = getUMatRef(i).size;
         msize.layout = shape.layout;
         msize.C = shape.C;
     }
 }
 
-void _OutputArray::fitSameSize(const _InputArray& arr, int mtype) const
+ശൂന്യം _OutputArray::fitSameSize(സ്ഥിരം നിവേശം_Array_2& arr, പൂർണ്ണസംഖ്യ mtype) സ്ഥിരം
 {
     fit(arr.shape(), mtype);
 }
 
-void _OutputArray::fit(int d, const int* sizes, int mtype, int i,
-                       bool allowTransposed, _OutputArray::DepthMask fixedDepthMask) const
+ശൂന്യം _OutputArray::fit(പൂർണ്ണസംഖ്യ d, സ്ഥിരം പൂർണ്ണസംഖ്യ* sizes, പൂർണ്ണസംഖ്യ mtype, പൂർണ്ണസംഖ്യ i,
+                       തർക്കം allowTransposed, _OutputArray::DepthMask fixedDepthMask) സ്ഥിരം
 {
-    int size0 = d > 0 ? sizes[0] : 1, size1 = d > 1 ? sizes[1] : 1;
-    _InputArray::KindFlag k = kind();
+    പൂർണ്ണസംഖ്യ size0 = d > 0 ? sizes[0] : 1, size1 = d > 1 ? sizes[1] : 1;
+    നിവേശം_Array_2::KindFlag k = kind();
     mtype = CV_MAT_TYPE(mtype);
 
-    if( (k == MAT && i < 0) || (k == STD_VECTOR_MAT && i >= 0) )
+    എങ്കിൽ( (k == MAT && i < 0) || (k == STD_VECTOR_MAT && i >= 0) )
     {
         Mat* m;
-        if (k == MAT)
+        എങ്കിൽ (k == MAT)
             m = (Mat*)obj;
-        else {
+        അല്ലെങ്കിൽ {
             std::vector<Mat>& v = *(std::vector<Mat>*)obj;
             CV_Assert((size_t)i < v.size());
             m = &v[i];
         }
         CV_Assert(!(m->empty() && fixedType() && fixedSize()) && "Can't reallocate empty Mat with locked layout (probably due to misused 'const' modifier)");
-        if (!m->empty() && d <= 2 && m->dims <= 2 &&
+        എങ്കിൽ (!m->empty() && d <= 2 && m->dims <= 2 &&
             m->type() == mtype &&
             ((m->rows == size0 && m->cols == size1) ||
              (allowTransposed && m->rows == size1 && m->cols == size0 && m->isContinuous())))
         {
-            return;
+            തിരികെ;
         }
 
-        if(fixedType())
+        എങ്കിൽ(fixedType())
         {
-            if(CV_MAT_CN(mtype) == m->channels() && ((1 << CV_MAT_DEPTH(flags)) & fixedDepthMask) != 0 )
+            എങ്കിൽ(CV_MAT_CN(mtype) == m->channels() && ((1 << CV_MAT_DEPTH(flags)) & fixedDepthMask) != 0 )
                 mtype = m->type();
-            else
+            അല്ലെങ്കിൽ
                 CV_CheckTypeEQ(m->type(), CV_MAT_TYPE(mtype), "Can't reallocate Mat with locked type (probably due to misused 'const' modifier)");
         }
-        if(fixedSize())
+        എങ്കിൽ(fixedSize())
         {
             CV_CheckEQ(m->dims, d, "Can't reallocate Mat with locked size (probably due to misused 'const' modifier)");
-            for(int j = 0; j < d; ++j)
+            വേണ്ടി(പൂർണ്ണസംഖ്യ j = 0; j < d; ++j)
                 CV_CheckEQ(m->size[j], sizes[j], "Can't reallocate Mat with locked size (probably due to misused 'const' modifier)");
         }
         m->fit(d, sizes, mtype);
-        return;
+        തിരികെ;
     }
 
-    if( (k == UMAT && i < 0) || (k == STD_VECTOR_UMAT && i >= 0) )
+    എങ്കിൽ( (k == UMAT && i < 0) || (k == STD_VECTOR_UMAT && i >= 0) )
     {
         UMat* m;
-        if (k == UMAT)
+        എങ്കിൽ (k == UMAT)
             m = (UMat*)obj;
-        else {
+        അല്ലെങ്കിൽ {
             std::vector<UMat>& v = *(std::vector<UMat>*)obj;
             CV_Assert((size_t)i < v.size());
             m = &v[i];
         }
         CV_Assert(!(m->empty() && fixedType() && fixedSize()) && "Can't reallocate empty Mat with locked layout (probably due to misused 'const' modifier)");
-        if (!m->empty() && d <= 2 && m->dims <= 2 &&
+        എങ്കിൽ (!m->empty() && d <= 2 && m->dims <= 2 &&
             m->type() == mtype &&
             ((m->rows == size0 && m->cols == size1) ||
              (allowTransposed && m->rows == size1 && m->cols == size0 && m->isContinuous())))
         {
-            return;
+            തിരികെ;
         }
 
-        if(fixedType())
+        എങ്കിൽ(fixedType())
         {
-            if(CV_MAT_CN(mtype) == m->channels() && ((1 << CV_MAT_DEPTH(flags)) & fixedDepthMask) != 0 )
+            എങ്കിൽ(CV_MAT_CN(mtype) == m->channels() && ((1 << CV_MAT_DEPTH(flags)) & fixedDepthMask) != 0 )
                 mtype = m->type();
-            else
+            അല്ലെങ്കിൽ
                 CV_CheckTypeEQ(m->type(), CV_MAT_TYPE(mtype), "Can't reallocate Mat with locked type (probably due to misused 'const' modifier)");
         }
-        if(fixedSize())
+        എങ്കിൽ(fixedSize())
         {
             CV_CheckEQ(m->dims, d, "Can't reallocate Mat with locked size (probably due to misused 'const' modifier)");
-            for(int j = 0; j < d; ++j)
+            വേണ്ടി(പൂർണ്ണസംഖ്യ j = 0; j < d; ++j)
                 CV_CheckEQ(m->size[j], sizes[j], "Can't reallocate Mat with locked size (probably due to misused 'const' modifier)");
         }
         m->fit(d, sizes, mtype);
-        return;
+        തിരികെ;
     }
 
     create(d, sizes, mtype, i, allowTransposed, fixedDepthMask);
 }
 
-void _OutputArray::release() const
+ശൂന്യം _OutputArray::release() സ്ഥിരം
 {
     CV_Assert(!fixedSize());
 
-    _InputArray::KindFlag k = kind();
+    നിവേശം_Array_2::KindFlag k = kind();
 
-    if( k == MAT )
+    എങ്കിൽ( k == MAT )
     {
         ((Mat*)obj)->release();
-        return;
+        തിരികെ;
     }
 
-    if( k == UMAT )
+    എങ്കിൽ( k == UMAT )
     {
         ((UMat*)obj)->release();
-        return;
+        തിരികെ;
     }
 
-    if( k == CUDA_GPU_MAT )
+    എങ്കിൽ( k == CUDA_GPU_MAT )
     {
 #ifdef HAVE_CUDA
         ((cuda::GpuMat*)obj)->release();
-        return;
-#else
+        തിരികെ;
+#അല്ലെങ്കിൽ
         CV_Error(Error::StsNotImplemented, "CUDA support is not enabled in this OpenCV build (missing HAVE_CUDA)");
 #endif
     }
 
-    if( k == CUDA_GPU_MATND )
+    എങ്കിൽ( k == CUDA_GPU_MATND )
     {
 #ifdef HAVE_CUDA
         ((cuda::GpuMatND*)obj)->release();
-        return;
-#else
+        തിരികെ;
+#അല്ലെങ്കിൽ
         CV_Error(Error::StsNotImplemented, "CUDA support is not enabled in this OpenCV build (missing HAVE_CUDA)");
 #endif
     }
 
-    if( k == CUDA_HOST_MEM )
+    എങ്കിൽ( k == CUDA_HOST_MEM )
     {
 #ifdef HAVE_CUDA
         ((cuda::HostMem*)obj)->release();
-        return;
-#else
+        തിരികെ;
+#അല്ലെങ്കിൽ
         CV_Error(Error::StsNotImplemented, "CUDA support is not enabled in this OpenCV build (missing HAVE_CUDA)");
 #endif
     }
 
-    if( k == OPENGL_BUFFER )
+    എങ്കിൽ( k == OPENGL_BUFFER )
     {
 #ifdef HAVE_OPENGL
         ((ogl::Buffer*)obj)->release();
-        return;
-#else
+        തിരികെ;
+#അല്ലെങ്കിൽ
         CV_Error(Error::StsNotImplemented, "OpenGL support is not enabled in this OpenCV build (missing HAVE_OPENGL)");
 #endif
     }
 
-    if( k == NONE )
-        return;
+    എങ്കിൽ( k == NONE )
+        തിരികെ;
 
-    if( k == STD_VECTOR || k == STD_VECTOR_VECTOR )
+    എങ്കിൽ( k == STD_VECTOR || k == STD_VECTOR_VECTOR )
     {
     #undef CLEAR_VEC
     #define CLEAR_VEC(T) \
-        if (k == STD_VECTOR_VECTOR) { \
+        എങ്കിൽ (k == STD_VECTOR_VECTOR) { \
             std::vector<std::vector<T> >* vv = \
                 reinterpret_cast<std::vector<std::vector<T> >*>(obj); \
             vv->clear(); \
-        } else { \
+        } അല്ലെങ്കിൽ { \
             std::vector<T>* v = reinterpret_cast<std::vector<T>*>(obj); \
             v->clear(); \
         } \
-        break
+        നിർത്തുക
 
-        int esz = CV_ELEM_SIZE(flags);
+        പൂർണ്ണസംഖ്യ esz = CV_ELEM_SIZE(flags);
         STD_VECTOR_SWITCH(esz, CLEAR_VEC);
-        return;
+        തിരികെ;
     }
 
-    if( k == STD_VECTOR_MAT )
+    എങ്കിൽ( k == STD_VECTOR_MAT )
     {
         ((std::vector<Mat>*)obj)->clear();
-        return;
+        തിരികെ;
     }
 
-    if( k == STD_ARRAY_MAT )
+    എങ്കിൽ( k == STD_ARRAY_MAT )
     {
         Mat* v = (Mat*)obj;
-        for( int i = 0; i < sz.height; i++ )
+        വേണ്ടി( പൂർണ്ണസംഖ്യ i = 0; i < sz.height; i++ )
             v[i].release();
-        return;
+        തിരികെ;
     }
 
-    if( k == STD_BOOL_VECTOR )
+    എങ്കിൽ( k == STD_BOOL_VECTOR )
     {
-        ((std::vector<bool>*)obj)->clear();
-        return;
+        ((std::vector<തർക്കം>*)obj)->clear();
+        തിരികെ;
     }
 
-    if( k == STD_VECTOR_UMAT )
+    എങ്കിൽ( k == STD_VECTOR_UMAT )
     {
         ((std::vector<UMat>*)obj)->clear();
-        return;
+        തിരികെ;
     }
-    if (k == STD_VECTOR_CUDA_GPU_MAT)
+    എങ്കിൽ (k == STD_VECTOR_CUDA_GPU_MAT)
     {
 #ifdef HAVE_CUDA
         ((std::vector<cuda::GpuMat>*)obj)->clear();
-        return;
-#else
+        തിരികെ;
+#അല്ലെങ്കിൽ
         CV_Error(Error::StsNotImplemented, "CUDA support is not enabled in this OpenCV build (missing HAVE_CUDA)");
 #endif
     }
     CV_Error(Error::StsNotImplemented, "Unknown/unsupported array type");
 }
 
-void _OutputArray::clear() const
+ശൂന്യം _OutputArray::clear() സ്ഥിരം
 {
-    _InputArray::KindFlag k = kind();
+    നിവേശം_Array_2::KindFlag k = kind();
 
-    if( k == MAT )
+    എങ്കിൽ( k == MAT )
     {
         CV_Assert(!fixedSize());
         ((Mat*)obj)->resize(0);
-        return;
+        തിരികെ;
     }
 
     release();
 }
 
-bool _OutputArray::needed() const
+തർക്കം _OutputArray::needed() സ്ഥിരം
 {
-    return kind() != NONE;
+    തിരികെ kind() != NONE;
 }
 
-Mat& _OutputArray::getMatRef(int i) const
+Mat& _OutputArray::getMatRef(പൂർണ്ണസംഖ്യ i) സ്ഥിരം
 {
-    _InputArray::KindFlag k = kind();
-    if( i < 0 )
+    നിവേശം_Array_2::KindFlag k = kind();
+    എങ്കിൽ( i < 0 )
     {
         CV_Assert( k == MAT );
-        return *(Mat*)obj;
+        തിരികെ *(Mat*)obj;
     }
 
     CV_Assert( k == STD_VECTOR_MAT || k == STD_ARRAY_MAT );
 
-    if( k == STD_VECTOR_MAT )
+    എങ്കിൽ( k == STD_VECTOR_MAT )
     {
         std::vector<Mat>& v = *(std::vector<Mat>*)obj;
-        CV_Assert( i < (int)v.size() );
-        return v[i];
+        CV_Assert( i < (പൂർണ്ണസംഖ്യ)v.size() );
+        തിരികെ v[i];
     }
-    else
+    അല്ലെങ്കിൽ
     {
         Mat* v = (Mat*)obj;
         CV_Assert( 0 <= i && i < sz.height );
-        return v[i];
+        തിരികെ v[i];
     }
 }
 
-UMat& _OutputArray::getUMatRef(int i) const
+UMat& _OutputArray::getUMatRef(പൂർണ്ണസംഖ്യ i) സ്ഥിരം
 {
-    _InputArray::KindFlag k = kind();
-    if( i < 0 )
+    നിവേശം_Array_2::KindFlag k = kind();
+    എങ്കിൽ( i < 0 )
     {
         CV_Assert( k == UMAT );
-        return *(UMat*)obj;
+        തിരികെ *(UMat*)obj;
     }
-    else
+    അല്ലെങ്കിൽ
     {
         CV_Assert( k == STD_VECTOR_UMAT );
         std::vector<UMat>& v = *(std::vector<UMat>*)obj;
-        CV_Assert( i < (int)v.size() );
-        return v[i];
+        CV_Assert( i < (പൂർണ്ണസംഖ്യ)v.size() );
+        തിരികെ v[i];
     }
 }
 
-cuda::GpuMat& _OutputArray::getGpuMatRef() const
+cuda::GpuMat& _OutputArray::getGpuMatRef() സ്ഥിരം
 {
-    _InputArray::KindFlag k = kind();
+    നിവേശം_Array_2::KindFlag k = kind();
     CV_Assert( k == CUDA_GPU_MAT );
-    return *(cuda::GpuMat*)obj;
+    തിരികെ *(cuda::GpuMat*)obj;
 }
-std::vector<cuda::GpuMat>& _OutputArray::getGpuMatVecRef() const
+std::vector<cuda::GpuMat>& _OutputArray::getGpuMatVecRef() സ്ഥിരം
 {
-    _InputArray::KindFlag k = kind();
+    നിവേശം_Array_2::KindFlag k = kind();
     CV_Assert(k == STD_VECTOR_CUDA_GPU_MAT);
-    return *(std::vector<cuda::GpuMat>*)obj;
+    തിരികെ *(std::vector<cuda::GpuMat>*)obj;
 }
-cuda::GpuMatND& _OutputArray::getGpuMatNDRef() const
+cuda::GpuMatND& _OutputArray::getGpuMatNDRef() സ്ഥിരം
 {
-    _InputArray::KindFlag k = kind();
+    നിവേശം_Array_2::KindFlag k = kind();
     CV_Assert( k == CUDA_GPU_MATND );
-    return *(cuda::GpuMatND*)obj;
+    തിരികെ *(cuda::GpuMatND*)obj;
 }
 
-std::vector<cuda::GpuMatND>& _OutputArray::getGpuMatNDVecRef() const
+std::vector<cuda::GpuMatND>& _OutputArray::getGpuMatNDVecRef() സ്ഥിരം
 {
-    _InputArray::KindFlag k = kind();
+    നിവേശം_Array_2::KindFlag k = kind();
     CV_Assert(k == STD_VECTOR_CUDA_GPU_MAT_ND);
-    return *(std::vector<cuda::GpuMatND>*)obj;
+    തിരികെ *(std::vector<cuda::GpuMatND>*)obj;
 }
 
-ogl::Buffer& _OutputArray::getOGlBufferRef() const
+ogl::Buffer& _OutputArray::getOGlBufferRef() സ്ഥിരം
 {
-    _InputArray::KindFlag k = kind();
+    നിവേശം_Array_2::KindFlag k = kind();
     CV_Assert( k == OPENGL_BUFFER );
-    return *(ogl::Buffer*)obj;
+    തിരികെ *(ogl::Buffer*)obj;
 }
 
-cuda::HostMem& _OutputArray::getHostMemRef() const
+cuda::HostMem& _OutputArray::getHostMemRef() സ്ഥിരം
 {
-    _InputArray::KindFlag k = kind();
+    നിവേശം_Array_2::KindFlag k = kind();
     CV_Assert( k == CUDA_HOST_MEM );
-    return *(cuda::HostMem*)obj;
+    തിരികെ *(cuda::HostMem*)obj;
 }
 
-void _OutputArray::setTo(const _InputArray& arr, const _InputArray & mask) const
+ശൂന്യം _OutputArray::setTo(സ്ഥിരം നിവേശം_Array_2& arr, സ്ഥിരം നിവേശം_Array_2 & mask) സ്ഥിരം
 {
-    _InputArray::KindFlag k = kind();
+    നിവേശം_Array_2::KindFlag k = kind();
 
-    if( k == NONE )
+    എങ്കിൽ( k == NONE )
         ;
-    else if (k == MAT || k == MATX || k == STD_VECTOR)
+    അല്ലെങ്കിൽ എങ്കിൽ (k == MAT || k == MATX || k == STD_VECTOR)
     {
         Mat m = getMat();
         m.setTo(arr, mask);
     }
-    else if( k == UMAT )
+    അല്ലെങ്കിൽ എങ്കിൽ( k == UMAT )
         ((UMat*)obj)->setTo(arr, mask);
-    else if( k == CUDA_GPU_MAT )
+    അല്ലെങ്കിൽ എങ്കിൽ( k == CUDA_GPU_MAT )
     {
 #ifdef HAVE_CUDA
         Mat value = arr.getMat();
-        CV_Assert( checkScalar(value, type(), arr.kind(), _InputArray::CUDA_GPU_MAT) );
-        ((cuda::GpuMat*)obj)->setTo(Scalar(Vec<double, 4>(value.ptr<double>())), mask);
-#else
+        CV_Assert( checkScalar(value, type(), arr.kind(), നിവേശം_Array_2::CUDA_GPU_MAT) );
+        ((cuda::GpuMat*)obj)->setTo(Scalar(Vec<ഇരട്ട, 4>(value.ptr<ഇരട്ട>())), mask);
+#അല്ലെങ്കിൽ
         CV_Error(Error::StsNotImplemented, "CUDA support is not enabled in this OpenCV build (missing HAVE_CUDA)");
 #endif
     }
-    else
+    അല്ലെങ്കിൽ
         CV_Error(Error::StsNotImplemented, "");
 }
 
-void _OutputArray::setZero() const
+ശൂന്യം _OutputArray::setZero() സ്ഥിരം
 {
-    _InputArray::KindFlag k = kind();
+    നിവേശം_Array_2::KindFlag k = kind();
 
-    if( k == NONE )
+    എങ്കിൽ( k == NONE )
         ;
-    else if (k == MAT || k == MATX || k == STD_VECTOR)
+    അല്ലെങ്കിൽ എങ്കിൽ (k == MAT || k == MATX || k == STD_VECTOR)
     {
         Mat m = getMat();
         m.setZero();
     }
-    else
+    അല്ലെങ്കിൽ
     {
         setTo(Scalar::all(0), noArray());
     }
 }
 
-void _OutputArray::assign(const UMat& u) const
+ശൂന്യം _OutputArray::assign(സ്ഥിരം UMat& u) സ്ഥിരം
 {
-    _InputArray::KindFlag k = kind();
-    if (k == UMAT)
+    നിവേശം_Array_2::KindFlag k = kind();
+    എങ്കിൽ (k == UMAT)
     {
         *(UMat*)obj = u;
     }
-    else if (k == MAT)
+    അല്ലെങ്കിൽ എങ്കിൽ (k == MAT)
     {
         u.copyTo(*(Mat*)obj); // TODO check u.getMat()
     }
-    else if (k == MATX)
+    അല്ലെങ്കിൽ എങ്കിൽ (k == MATX)
     {
         u.copyTo(getMat()); // TODO check u.getMat()
     }
-    else
+    അല്ലെങ്കിൽ
     {
         CV_Error(Error::StsNotImplemented, "");
     }
 }
 
 
-void _OutputArray::assign(const Mat& m) const
+ശൂന്യം _OutputArray::assign(സ്ഥിരം Mat& m) സ്ഥിരം
 {
-    _InputArray::KindFlag k = kind();
-    if (k == UMAT)
+    നിവേശം_Array_2::KindFlag k = kind();
+    എങ്കിൽ (k == UMAT)
     {
         m.copyTo(*(UMat*)obj); // TODO check m.getUMat()
     }
-    else if (k == MAT)
+    അല്ലെങ്കിൽ എങ്കിൽ (k == MAT)
     {
         *(Mat*)obj = m;
     }
-    else if (k == MATX)
+    അല്ലെങ്കിൽ എങ്കിൽ (k == MATX)
     {
         m.copyTo(getMat());
     }
-    else
+    അല്ലെങ്കിൽ
     {
         CV_Error(Error::StsNotImplemented, "");
     }
 }
 
 
-void _OutputArray::move(UMat& u) const
+ശൂന്യം _OutputArray::move(UMat& u) സ്ഥിരം
 {
-    if (fixedSize())
+    എങ്കിൽ (fixedSize())
     {
         // TODO Performance warning
         assign(u);
-        return;
+        തിരികെ;
     }
-    int k = kind();
-    if (k == UMAT)
+    പൂർണ്ണസംഖ്യ k = kind();
+    എങ്കിൽ (k == UMAT)
     {
         *(UMat*)obj = std::move(u);
     }
-    else if (k == MAT)
+    അല്ലെങ്കിൽ എങ്കിൽ (k == MAT)
     {
         u.copyTo(*(Mat*)obj); // TODO check u.getMat()
         u.release();
     }
-    else if (k == MATX)
+    അല്ലെങ്കിൽ എങ്കിൽ (k == MATX)
     {
         u.copyTo(getMat()); // TODO check u.getMat()
         u.release();
     }
-    else
+    അല്ലെങ്കിൽ
     {
         CV_Error(Error::StsNotImplemented, "");
     }
 }
 
 
-void _OutputArray::move(Mat& m) const
+ശൂന്യം _OutputArray::move(Mat& m) സ്ഥിരം
 {
-    if (fixedSize())
+    എങ്കിൽ (fixedSize())
     {
         // TODO Performance warning
         assign(m);
-        return;
+        തിരികെ;
     }
-    int k = kind();
-    if (k == UMAT)
+    പൂർണ്ണസംഖ്യ k = kind();
+    എങ്കിൽ (k == UMAT)
     {
         m.copyTo(*(UMat*)obj); // TODO check m.getUMat()
         m.release();
     }
-    else if (k == MAT)
+    അല്ലെങ്കിൽ എങ്കിൽ (k == MAT)
     {
         *(Mat*)obj = std::move(m);
     }
-    else if (k == MATX)
+    അല്ലെങ്കിൽ എങ്കിൽ (k == MATX)
     {
         m.copyTo(getMat());
         m.release();
     }
-    else
+    അല്ലെങ്കിൽ
     {
         CV_Error(Error::StsNotImplemented, "");
     }
 }
 
 
-void _OutputArray::assign(const std::vector<UMat>& v) const
+ശൂന്യം _OutputArray::assign(സ്ഥിരം std::vector<UMat>& v) സ്ഥിരം
 {
-    _InputArray::KindFlag k = kind();
-    if (k == STD_VECTOR_UMAT)
+    നിവേശം_Array_2::KindFlag k = kind();
+    എങ്കിൽ (k == STD_VECTOR_UMAT)
     {
         std::vector<UMat>& this_v = *(std::vector<UMat>*)obj;
         CV_Assert(this_v.size() == v.size());
 
-        for (size_t i = 0; i < v.size(); i++)
+        വേണ്ടി (size_t i = 0; i < v.size(); i++)
         {
-            const UMat& m = v[i];
+            സ്ഥിരം UMat& m = v[i];
             UMat& this_m = this_v[i];
-            if (this_m.u != NULL && this_m.u == m.u)
-                continue; // same object (see dnn::Layer::forward_fallback)
+            എങ്കിൽ (this_m.u != ശൂന്യ && this_m.u == m.u)
+                തുടരുക; // same object (see dnn::Layer::forward_fallback)
             m.copyTo(this_m);
         }
     }
-    else if (k == STD_VECTOR_MAT)
+    അല്ലെങ്കിൽ എങ്കിൽ (k == STD_VECTOR_MAT)
     {
         std::vector<Mat>& this_v = *(std::vector<Mat>*)obj;
         CV_Assert(this_v.size() == v.size());
 
-        for (size_t i = 0; i < v.size(); i++)
+        വേണ്ടി (size_t i = 0; i < v.size(); i++)
         {
-            const UMat& m = v[i];
+            സ്ഥിരം UMat& m = v[i];
             Mat& this_m = this_v[i];
-            if (this_m.u != NULL && this_m.u == m.u)
-                continue; // same object (see dnn::Layer::forward_fallback)
+            എങ്കിൽ (this_m.u != ശൂന്യ && this_m.u == m.u)
+                തുടരുക; // same object (see dnn::Layer::forward_fallback)
             m.copyTo(this_m);
         }
     }
-    else
+    അല്ലെങ്കിൽ
     {
         CV_Error(Error::StsNotImplemented, "");
     }
 }
 
 
-void _OutputArray::assign(const std::vector<Mat>& v) const
+ശൂന്യം _OutputArray::assign(സ്ഥിരം std::vector<Mat>& v) സ്ഥിരം
 {
-    _InputArray::KindFlag k = kind();
-    if (k == STD_VECTOR_UMAT)
+    നിവേശം_Array_2::KindFlag k = kind();
+    എങ്കിൽ (k == STD_VECTOR_UMAT)
     {
         std::vector<UMat>& this_v = *(std::vector<UMat>*)obj;
         CV_Assert(this_v.size() == v.size());
 
-        for (size_t i = 0; i < v.size(); i++)
+        വേണ്ടി (size_t i = 0; i < v.size(); i++)
         {
-            const Mat& m = v[i];
+            സ്ഥിരം Mat& m = v[i];
             UMat& this_m = this_v[i];
-            if (this_m.u != NULL && this_m.u == m.u)
-                continue; // same object (see dnn::Layer::forward_fallback)
+            എങ്കിൽ (this_m.u != ശൂന്യ && this_m.u == m.u)
+                തുടരുക; // same object (see dnn::Layer::forward_fallback)
             m.copyTo(this_m);
         }
     }
-    else if (k == STD_VECTOR_MAT)
+    അല്ലെങ്കിൽ എങ്കിൽ (k == STD_VECTOR_MAT)
     {
         std::vector<Mat>& this_v = *(std::vector<Mat>*)obj;
         CV_Assert(this_v.size() == v.size());
 
-        for (size_t i = 0; i < v.size(); i++)
+        വേണ്ടി (size_t i = 0; i < v.size(); i++)
         {
-            const Mat& m = v[i];
+            സ്ഥിരം Mat& m = v[i];
             Mat& this_m = this_v[i];
-            if (this_m.u != NULL && this_m.u == m.u)
-                continue; // same object (see dnn::Layer::forward_fallback)
+            എങ്കിൽ (this_m.u != ശൂന്യ && this_m.u == m.u)
+                തുടരുക; // same object (see dnn::Layer::forward_fallback)
             m.copyTo(this_m);
         }
     }
-    else
+    അല്ലെങ്കിൽ
     {
         CV_Error(Error::StsNotImplemented, "");
     }
 }
 
 
-static _InputOutputArray _none;
-InputOutputArray noArray() { return _none; }
+സ്ഥിതം നിവേശം_Output_Array_2 _none;
+നിവേശം_Output_Array noArray() { തിരികെ _none; }
 
 } // cv::

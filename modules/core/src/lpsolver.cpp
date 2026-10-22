@@ -38,20 +38,20 @@
 // the use of this software, even if advised of the possibility of such damage.
 //
 //M*/
-#include "precomp.hpp"
-#include <climits>
-#include <algorithm>
+#അന്തര്ഭാവ "precomp.hpp"
+#അന്തര്ഭാവ <climits>
+#അന്തര്ഭാവ <algorithm>
 
 #define dprintf(x)
 #define print_matrix(x)
 
-namespace cv
+നാമാകാശ cv
 {
 
 using std::vector;
 
 #ifdef ALEX_DEBUG
-static void print_simplex_state(const Mat& c,const Mat& b,double v,const std::vector<int> N,const std::vector<int> B){
+സ്ഥിതം ശൂന്യം print_simplex_state(സ്ഥിരം Mat& c,സ്ഥിരം Mat& b,ഇരട്ട v,സ്ഥിരം std::vector<പൂർണ്ണസംഖ്യ> N,സ്ഥിരം std::vector<പൂർണ്ണസംഖ്യ> B){
     printf("\tprint simplex state\n");
 
     printf("v=%g\n",v);
@@ -70,7 +70,7 @@ static void print_simplex_state(const Mat& c,const Mat& b,double v,const std::ve
     print(Mat(B));
     printf("\n");
 }
-#else
+#അല്ലെങ്കിൽ
 #define print_simplex_state(c,b,v,N,B)
 #endif
 
@@ -80,17 +80,17 @@ static void print_simplex_state(const Mat& c,const Mat& b,double v,const std::ve
  it also initializes N and B and does not make any assumptions about their init values
  * @return SOLVELP_UNFEASIBLE if problem is unfeasible, 0 if feasible.
 */
-static int initialize_simplex(Mat_<double>& c, Mat_<double>& b,double& v,vector<int>& N,vector<int>& B,vector<unsigned int>& indexToRow);
-static inline void pivot(Mat_<double>& c,Mat_<double>& b,double& v,vector<int>& N,vector<int>& B,int leaving_index,
-        int entering_index,vector<unsigned int>& indexToRow);
+സ്ഥിതം പൂർണ്ണസംഖ്യ initialize_simplex(Mat_<ഇരട്ട>& c, Mat_<ഇരട്ട>& b,ഇരട്ട& v,vector<പൂർണ്ണസംഖ്യ>& N,vector<പൂർണ്ണസംഖ്യ>& B,vector<unsigned പൂർണ്ണസംഖ്യ>& indexToRow);
+സ്ഥിതം വരിയിൽ ശൂന്യം pivot(Mat_<ഇരട്ട>& c,Mat_<ഇരട്ട>& b,ഇരട്ട& v,vector<പൂർണ്ണസംഖ്യ>& N,vector<പൂർണ്ണസംഖ്യ>& B,പൂർണ്ണസംഖ്യ leaving_index,
+        പൂർണ്ണസംഖ്യ entering_index,vector<unsigned പൂർണ്ണസംഖ്യ>& indexToRow);
 /**@return SOLVELP_UNBOUNDED means the problem is unbdd, SOLVELP_MULTI means multiple solutions, SOLVELP_SINGLE means one solution.
  */
-static int inner_simplex(Mat_<double>& c, Mat_<double>& b,double& v,vector<int>& N,vector<int>& B,vector<unsigned int>& indexToRow);
-static void swap_columns(Mat_<double>& A,int col1,int col2);
+സ്ഥിതം പൂർണ്ണസംഖ്യ inner_simplex(Mat_<ഇരട്ട>& c, Mat_<ഇരട്ട>& b,ഇരട്ട& v,vector<പൂർണ്ണസംഖ്യ>& N,vector<പൂർണ്ണസംഖ്യ>& B,vector<unsigned പൂർണ്ണസംഖ്യ>& indexToRow);
+സ്ഥിതം ശൂന്യം swap_columns(Mat_<ഇരട്ട>& A,പൂർണ്ണസംഖ്യ col1,പൂർണ്ണസംഖ്യ col2);
 #define SWAP(type,a,b) {type tmp=(a);(a)=(b);(b)=tmp;}
 
 //return codes:-2 (no_sol - unbdd),-1(no_sol - unfsbl), 0(single_sol), 1(multiple_sol=>least_l2_norm)
-int solveLP(InputArray Func_, InputArray Constr_, OutputArray z_, double constr_eps)
+പൂർണ്ണസംഖ്യ solveLP(നിവേശം_Array Func_, നിവേശം_Array Constr_, OutputArray z_, ഇരട്ട constr_eps)
 {
     dprintf(("call to solveLP\n"));
 
@@ -99,46 +99,46 @@ int solveLP(InputArray Func_, InputArray Constr_, OutputArray z_, double constr_
     CV_Assert(Constr_.type()==CV_64FC1 || Constr_.type()==CV_32FC1);
     CV_Assert((Func_.rows()==1 && (Constr_.cols()-Func_.cols()==1))||
             (Func_.cols()==1 && (Constr_.cols()-Func_.rows()==1)));
-    if (z_.fixedType())
+    എങ്കിൽ (z_.fixedType())
         CV_CheckType(z_.type(), z_.type() == CV_64FC1 || z_.type() == CV_32FC1 || z_.type() == CV_32SC1, "");
 
     Mat Func = Func_.getMat();
     Mat Constr = Constr_.getMat();
 
     //copy arguments for we will shall modify them
-    Mat_<double> bigC=Mat_<double>(1,(Func.rows==1?Func.cols:Func.rows)+1),
-        bigB=Mat_<double>(Constr.rows,Constr.cols+1);
-    if(Func.rows==1){
+    Mat_<ഇരട്ട> bigC=Mat_<ഇരട്ട>(1,(Func.rows==1?Func.cols:Func.rows)+1),
+        bigB=Mat_<ഇരട്ട>(Constr.rows,Constr.cols+1);
+    എങ്കിൽ(Func.rows==1){
         Func.convertTo(bigC.colRange(1,bigC.cols),CV_64FC1);
-    }else{
+    }അല്ലെങ്കിൽ{
         Mat FuncT=Func.t();
         FuncT.convertTo(bigC.colRange(1,bigC.cols),CV_64FC1);
     }
     Constr.convertTo(bigB.colRange(1,bigB.cols),CV_64FC1);
-    double v=0;
-    vector<int> N,B;
-    vector<unsigned int> indexToRow;
+    ഇരട്ട v=0;
+    vector<പൂർണ്ണസംഖ്യ> N,B;
+    vector<unsigned പൂർണ്ണസംഖ്യ> indexToRow;
 
-    if(initialize_simplex(bigC,bigB,v,N,B,indexToRow)==SOLVELP_UNFEASIBLE){
-        return SOLVELP_UNFEASIBLE;
+    എങ്കിൽ(initialize_simplex(bigC,bigB,v,N,B,indexToRow)==SOLVELP_UNFEASIBLE){
+        തിരികെ SOLVELP_UNFEASIBLE;
     }
-    Mat_<double> c=bigC.colRange(1,bigC.cols),
+    Mat_<ഇരട്ട> c=bigC.colRange(1,bigC.cols),
         b=bigB.colRange(1,bigB.cols);
 
-    int res=0;
-    if((res=inner_simplex(c,b,v,N,B,indexToRow))==SOLVELP_UNBOUNDED){
-        return SOLVELP_UNBOUNDED;
+    പൂർണ്ണസംഖ്യ res=0;
+    എങ്കിൽ((res=inner_simplex(c,b,v,N,B,indexToRow))==SOLVELP_UNBOUNDED){
+        തിരികെ SOLVELP_UNBOUNDED;
     }
 
     //return the optimal solution
     Mat z(c.cols,1,CV_64FC1);
-    MatIterator_<double> it=z.begin<double>();
-    unsigned int nsize = (unsigned int)N.size();
-    for(int i=1;i<=c.cols;i++,it++){
-        if(indexToRow[i]<nsize){
+    MatIterator_<ഇരട്ട> it=z.begin<ഇരട്ട>();
+    unsigned പൂർണ്ണസംഖ്യ nsize = (unsigned പൂർണ്ണസംഖ്യ)N.size();
+    വേണ്ടി(പൂർണ്ണസംഖ്യ i=1;i<=c.cols;i++,it++){
+        എങ്കിൽ(indexToRow[i]<nsize){
             *it=0;
-        }else{
-            *it=b.at<double>(indexToRow[i]-nsize,b.cols-1);
+        }അല്ലെങ്കിൽ{
+            *it=b.at<ഇരട്ട>(indexToRow[i]-nsize,b.cols-1);
         }
     }
 
@@ -147,62 +147,62 @@ int solveLP(InputArray Func_, InputArray Constr_, OutputArray z_, double constr_
     //check constraints feasibility
     Mat prod = Constr(Rect(0, 0, Constr.cols - 1, Constr.rows)) * z;
     Mat constr_check = Constr.col(Constr.cols - 1) - prod;
-    double min_value = 0.0;
-    minMaxIdx(constr_check, &min_value);
-    if (min_value < -constr_eps)
+    ഇരട്ട min_മൂല്യം = 0.0;
+    minMaxIdx(constr_check, &min_മൂല്യം);
+    എങ്കിൽ (min_മൂല്യം < -constr_eps)
     {
-        return SOLVELP_LOST;
+        തിരികെ SOLVELP_LOST;
     }
 
-    return res;
+    തിരികെ res;
 }
 
-int solveLP(InputArray Func, InputArray Constr, OutputArray z)
+പൂർണ്ണസംഖ്യ solveLP(നിവേശം_Array Func, നിവേശം_Array Constr, OutputArray z)
 {
-    return solveLP(Func, Constr, z, 1e-12);
+    തിരികെ solveLP(Func, Constr, z, 1e-12);
 }
 
-static int initialize_simplex(Mat_<double>& c, Mat_<double>& b,double& v,vector<int>& N,vector<int>& B,vector<unsigned int>& indexToRow){
+സ്ഥിതം പൂർണ്ണസംഖ്യ initialize_simplex(Mat_<ഇരട്ട>& c, Mat_<ഇരട്ട>& b,ഇരട്ട& v,vector<പൂർണ്ണസംഖ്യ>& N,vector<പൂർണ്ണസംഖ്യ>& B,vector<unsigned പൂർണ്ണസംഖ്യ>& indexToRow){
     N.resize(c.cols);
     N[0]=0;
-    for (std::vector<int>::iterator it = N.begin()+1 ; it != N.end(); ++it){
+    വേണ്ടി (std::vector<പൂർണ്ണസംഖ്യ>::iterator it = N.begin()+1 ; it != N.end(); ++it){
         *it=it[-1]+1;
     }
     B.resize(b.rows);
-    B[0]=(int)N.size();
-    for (std::vector<int>::iterator it = B.begin()+1 ; it != B.end(); ++it){
+    B[0]=(പൂർണ്ണസംഖ്യ)N.size();
+    വേണ്ടി (std::vector<പൂർണ്ണസംഖ്യ>::iterator it = B.begin()+1 ; it != B.end(); ++it){
         *it=it[-1]+1;
     }
     indexToRow.resize(c.cols+b.rows);
     indexToRow[0]=0;
-    for (std::vector<unsigned int>::iterator it = indexToRow.begin()+1 ; it != indexToRow.end(); ++it){
+    വേണ്ടി (std::vector<unsigned പൂർണ്ണസംഖ്യ>::iterator it = indexToRow.begin()+1 ; it != indexToRow.end(); ++it){
         *it=it[-1]+1;
     }
     v=0;
 
-    int k=0;
+    പൂർണ്ണസംഖ്യ k=0;
     {
-        double min=DBL_MAX;
-        for(int i=0;i<b.rows;i++){
-            if(b(i,b.cols-1)<min){
+        ഇരട്ട min=DBL_MAX;
+        വേണ്ടി(പൂർണ്ണസംഖ്യ i=0;i<b.rows;i++){
+            എങ്കിൽ(b(i,b.cols-1)<min){
                 min=b(i,b.cols-1);
                 k=i;
             }
         }
     }
 
-    if(b(k,b.cols-1)>=0){
+    എങ്കിൽ(b(k,b.cols-1)>=0){
         N.erase(N.begin());
-        for (std::vector<unsigned int>::iterator it = indexToRow.begin()+1 ; it != indexToRow.end(); ++it){
+        വേണ്ടി (std::vector<unsigned പൂർണ്ണസംഖ്യ>::iterator it = indexToRow.begin()+1 ; it != indexToRow.end(); ++it){
             --(*it);
         }
-        return 0;
+        തിരികെ 0;
     }
 
-    Mat_<double> old_c=c.clone();
+    Mat_<ഇരട്ട> old_c=c.clone();
     c=0;
     c(0,0)=-1;
-    for(int i=0;i<b.rows;i++){
+    വേണ്ടി(പൂർണ്ണസംഖ്യ i=0;i<b.rows;i++){
         b(i,0)=-1;
     }
 
@@ -218,21 +218,21 @@ static int initialize_simplex(Mat_<double>& c, Mat_<double>& b,double& v,vector<
     dprintf(("\tAFTER INNER_SIMPLEX\n"));
     print_simplex_state(c,b,v,N,B);
 
-    unsigned int nsize = (unsigned int)N.size();
-    if(indexToRow[0]>=nsize){
-        int iterator_offset=indexToRow[0]-nsize;
-        if(b(iterator_offset,b.cols-1)>0){
-            return SOLVELP_UNFEASIBLE;
+    unsigned പൂർണ്ണസംഖ്യ nsize = (unsigned പൂർണ്ണസംഖ്യ)N.size();
+    എങ്കിൽ(indexToRow[0]>=nsize){
+        പൂർണ്ണസംഖ്യ iterator_offset=indexToRow[0]-nsize;
+        എങ്കിൽ(b(iterator_offset,b.cols-1)>0){
+            തിരികെ SOLVELP_UNFEASIBLE;
         }
         pivot(c,b,v,N,B,iterator_offset,0,indexToRow);
     }
 
-    vector<int>::iterator iterator;
+    vector<പൂർണ്ണസംഖ്യ>::iterator iterator;
     {
-        int iterator_offset=indexToRow[0];
+        പൂർണ്ണസംഖ്യ iterator_offset=indexToRow[0];
         iterator=N.begin()+iterator_offset;
         std::iter_swap(iterator,N.begin());
-        SWAP(int,indexToRow[*iterator],indexToRow[0]);
+        SWAP(പൂർണ്ണസംഖ്യ,indexToRow[*iterator],indexToRow[0]);
         swap_columns(c,iterator_offset,0);
         swap_columns(b,iterator_offset,0);
     }
@@ -243,15 +243,15 @@ static int initialize_simplex(Mat_<double>& c, Mat_<double>& b,double& v,vector<
     //start from 1, because we ignore x_0
     c=0;
     v=0;
-    for(int I=1;I<old_c.cols;I++){
-        if(indexToRow[I]<nsize){
+    വേണ്ടി(പൂർണ്ണസംഖ്യ I=1;I<old_c.cols;I++){
+        എങ്കിൽ(indexToRow[I]<nsize){
             dprintf(("I=%d from nonbasic\n",I));
-            int iterator_offset=indexToRow[I];
+            പൂർണ്ണസംഖ്യ iterator_offset=indexToRow[I];
             c(0,iterator_offset)+=old_c(0,I);
             print_matrix(c);
-        }else{
+        }അല്ലെങ്കിൽ{
             dprintf(("I=%d from basic\n",I));
-            int iterator_offset=indexToRow[I]-nsize;
+            പൂർണ്ണസംഖ്യ iterator_offset=indexToRow[I]-nsize;
             c-=old_c(0,I)*b.row(iterator_offset).colRange(0,b.cols-1);
             v+=old_c(0,I)*b(iterator_offset,b.cols-1);
             print_matrix(c);
@@ -262,50 +262,50 @@ static int initialize_simplex(Mat_<double>& c, Mat_<double>& b,double& v,vector<
     print_simplex_state(c,b,v,N,B);
 
     N.erase(N.begin());
-    for (std::vector<unsigned int>::iterator it = indexToRow.begin()+1 ; it != indexToRow.end(); ++it){
+    വേണ്ടി (std::vector<unsigned പൂർണ്ണസംഖ്യ>::iterator it = indexToRow.begin()+1 ; it != indexToRow.end(); ++it){
         --(*it);
     }
-    return 0;
+    തിരികെ 0;
 }
 
-static int inner_simplex(Mat_<double>& c, Mat_<double>& b,double& v,vector<int>& N,vector<int>& B,vector<unsigned int>& indexToRow){
+സ്ഥിതം പൂർണ്ണസംഖ്യ inner_simplex(Mat_<ഇരട്ട>& c, Mat_<ഇരട്ട>& b,ഇരട്ട& v,vector<പൂർണ്ണസംഖ്യ>& N,vector<പൂർണ്ണസംഖ്യ>& B,vector<unsigned പൂർണ്ണസംഖ്യ>& indexToRow){
 
-    for(;;){
-        MatIterator_<double> pos_ptr;
-        int e=-1,pos_ctr=0,min_var=INT_MAX;
-        bool all_nonzero=true;
-        for(pos_ptr=c.begin();pos_ptr!=c.end();pos_ptr++,pos_ctr++){
-            if(*pos_ptr==0){
-                all_nonzero=false;
+    വേണ്ടി(;;){
+        MatIterator_<ഇരട്ട> pos_ptr;
+        പൂർണ്ണസംഖ്യ e=-1,pos_ctr=0,min_var=INT_MAX;
+        തർക്കം all_nonzero=സത്യം;
+        വേണ്ടി(pos_ptr=c.begin();pos_ptr!=c.end();pos_ptr++,pos_ctr++){
+            എങ്കിൽ(*pos_ptr==0){
+                all_nonzero=അസത്യം;
             }
-            if(*pos_ptr>0){
-                if(N[pos_ctr]<min_var){
+            എങ്കിൽ(*pos_ptr>0){
+                എങ്കിൽ(N[pos_ctr]<min_var){
                     e=pos_ctr;
                     min_var=N[pos_ctr];
                 }
             }
         }
-        if(e==-1){
+        എങ്കിൽ(e==-1){
             dprintf(("hello from e==-1\n"));
             print_matrix(c);
-            if(all_nonzero==true){
-                return SOLVELP_SINGLE;
-            }else{
-                return SOLVELP_MULTI;
+            എങ്കിൽ(all_nonzero==സത്യം){
+                തിരികെ SOLVELP_SINGLE;
+            }അല്ലെങ്കിൽ{
+                തിരികെ SOLVELP_MULTI;
             }
         }
 
-        int l=-1;
+        പൂർണ്ണസംഖ്യ l=-1;
         min_var=INT_MAX;
-        double min=DBL_MAX;
-        int row_it=0;
-        MatIterator_<double> min_row_ptr=b.begin();
-        for(MatIterator_<double> it=b.begin();it!=b.end();it+=b.cols,row_it++){
-            double myite=0;
+        ഇരട്ട min=DBL_MAX;
+        പൂർണ്ണസംഖ്യ row_it=0;
+        MatIterator_<ഇരട്ട> min_row_ptr=b.begin();
+        വേണ്ടി(MatIterator_<ഇരട്ട> it=b.begin();it!=b.end();it+=b.cols,row_it++){
+            ഇരട്ട myite=0;
             //check constraints, select the tightest one, reinforcing Bland's rule
-            if((myite=it[e])>0){
-                double val=it[b.cols-1]/myite;
-                if(val<min || (val==min && B[row_it]<min_var)){
+            എങ്കിൽ((myite=it[e])>0){
+                ഇരട്ട val=it[b.cols-1]/myite;
+                എങ്കിൽ(val<min || (val==min && B[row_it]<min_var)){
                     min_var=B[row_it];
                     min_row_ptr=it;
                     min=val;
@@ -313,8 +313,8 @@ static int inner_simplex(Mat_<double>& c, Mat_<double>& b,double& v,vector<int>&
                 }
             }
         }
-        if(l==-1){
-            return SOLVELP_UNBOUNDED;
+        എങ്കിൽ(l==-1){
+            തിരികെ SOLVELP_UNBOUNDED;
         }
         dprintf(("the tightest constraint is in row %d with %g\n",l,min));
 
@@ -331,24 +331,24 @@ static int inner_simplex(Mat_<double>& c, Mat_<double>& b,double& v,vector<int>&
     }
 }
 
-static inline void pivot(Mat_<double>& c,Mat_<double>& b,double& v,vector<int>& N,vector<int>& B,
-        int leaving_index,int entering_index,vector<unsigned int>& indexToRow){
-    double Coef=b(leaving_index,entering_index);
-    for(int i=0;i<b.cols;i++){
-        if(i==entering_index){
+സ്ഥിതം വരിയിൽ ശൂന്യം pivot(Mat_<ഇരട്ട>& c,Mat_<ഇരട്ട>& b,ഇരട്ട& v,vector<പൂർണ്ണസംഖ്യ>& N,vector<പൂർണ്ണസംഖ്യ>& B,
+        പൂർണ്ണസംഖ്യ leaving_index,പൂർണ്ണസംഖ്യ entering_index,vector<unsigned പൂർണ്ണസംഖ്യ>& indexToRow){
+    ഇരട്ട Coef=b(leaving_index,entering_index);
+    വേണ്ടി(പൂർണ്ണസംഖ്യ i=0;i<b.cols;i++){
+        എങ്കിൽ(i==entering_index){
             b(leaving_index,i)=1/Coef;
-        }else{
+        }അല്ലെങ്കിൽ{
             b(leaving_index,i)/=Coef;
         }
     }
 
-    for(int i=0;i<b.rows;i++){
-        if(i!=leaving_index){
-            double coef=b(i,entering_index);
-            for(int j=0;j<b.cols;j++){
-                if(j==entering_index){
+    വേണ്ടി(പൂർണ്ണസംഖ്യ i=0;i<b.rows;i++){
+        എങ്കിൽ(i!=leaving_index){
+            ഇരട്ട coef=b(i,entering_index);
+            വേണ്ടി(പൂർണ്ണസംഖ്യ j=0;j<b.cols;j++){
+                എങ്കിൽ(j==entering_index){
                     b(i,j)=-coef*b(leaving_index,j);
-                }else{
+                }അല്ലെങ്കിൽ{
                     b(i,j)-=(coef*b(leaving_index,j));
                 }
             }
@@ -357,23 +357,23 @@ static inline void pivot(Mat_<double>& c,Mat_<double>& b,double& v,vector<int>& 
 
     //objective function
     Coef=c(0,entering_index);
-    for(int i=0;i<(b.cols-1);i++){
-        if(i==entering_index){
+    വേണ്ടി(പൂർണ്ണസംഖ്യ i=0;i<(b.cols-1);i++){
+        എങ്കിൽ(i==entering_index){
             c(0,i)=-Coef*b(leaving_index,i);
-        }else{
+        }അല്ലെങ്കിൽ{
             c(0,i)-=Coef*b(leaving_index,i);
         }
     }
     dprintf(("v was %g\n",v));
     v+=Coef*b(leaving_index,b.cols-1);
 
-    SWAP(int,N[entering_index],B[leaving_index]);
-    SWAP(int,indexToRow[N[entering_index]],indexToRow[B[leaving_index]]);
+    SWAP(പൂർണ്ണസംഖ്യ,N[entering_index],B[leaving_index]);
+    SWAP(പൂർണ്ണസംഖ്യ,indexToRow[N[entering_index]],indexToRow[B[leaving_index]]);
 }
 
-static inline void swap_columns(Mat_<double>& A,int col1,int col2){
-    for(int i=0;i<A.rows;i++){
-        double tmp=A(i,col1);
+സ്ഥിതം വരിയിൽ ശൂന്യം swap_columns(Mat_<ഇരട്ട>& A,പൂർണ്ണസംഖ്യ col1,പൂർണ്ണസംഖ്യ col2){
+    വേണ്ടി(പൂർണ്ണസംഖ്യ i=0;i<A.rows;i++){
+        ഇരട്ട tmp=A(i,col1);
         A(i,col1)=A(i,col2);
         A(i,col2)=tmp;
     }

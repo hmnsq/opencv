@@ -4,33 +4,33 @@
 // Copyright (C) 2026, BigVision LLC, all rights reserved.
 // Third party copyrights are property of their respective owners.
 
-#include "precomp.hpp"
+#അന്തര്ഭാവ "precomp.hpp"
 
-namespace cv {
+നാമാകാശ cv {
 
 // In place (dst shares the data of a continuous src) only the header changes; otherwise the
 // elements are copied into dst.
-static void reshapeTo(InputArray _src, OutputArray _dst, const MatShape& shape)
+സ്ഥിതം ശൂന്യം reshapeTo(നിവേശം_Array _src, OutputArray _dst, സ്ഥിരം MatShape& shape)
 {
     Mat src = _src.getMat();
     CV_Assert(shape.total() == src.total());
-    if (_dst.kind() == _InputArray::MAT && src.isContinuous())
+    എങ്കിൽ (_dst.kind() == നിവേശം_Array_2::MAT && src.isContinuous())
     {
         Mat& dst = _dst.getMatRef();
-        if (dst.data && dst.data == src.data)
+        എങ്കിൽ (dst.data && dst.data == src.data)
         {
             dst = src.reshape(0, shape);
-            return;
+            തിരികെ;
         }
     }
     _dst.create(shape, src.type());
     Mat dst = _dst.getMat();
-    if (dst.data == src.data)
-        return;
-    if (dst.isContinuous())
+    എങ്കിൽ (dst.data == src.data)
+        തിരികെ;
+    എങ്കിൽ (dst.isContinuous())
     {
         src.copyTo(Mat(src.dims, src.size.p, src.type(), dst.data));
-        return;
+        തിരികെ;
     }
     // create() keeps a preallocated destination of the right shape even when it is strided
     Mat tmp;
@@ -38,25 +38,25 @@ static void reshapeTo(InputArray _src, OutputArray _dst, const MatShape& shape)
     Mat(shape.dims, shape.p, src.type(), tmp.data).copyTo(dst);
 }
 
-void squeeze(InputArray src, OutputArray dst, const std::vector<int>& axes)
+ശൂന്യം squeeze(നിവേശം_Array src, OutputArray dst, സ്ഥിരം std::vector<പൂർണ്ണസംഖ്യ>& axes)
 {
     CV_INSTRUMENT_REGION();
     reshapeTo(src, dst, src.shape().squeeze(axes));
 }
 
-void unsqueeze(InputArray src, OutputArray dst, const std::vector<int>& axes)
+ശൂന്യം unsqueeze(നിവേശം_Array src, OutputArray dst, സ്ഥിരം std::vector<പൂർണ്ണസംഖ്യ>& axes)
 {
     CV_INSTRUMENT_REGION();
     reshapeTo(src, dst, src.shape().unsqueeze(axes));
 }
 
-void flatten(InputArray src, OutputArray dst, int startAxis, int endAxis)
+ശൂന്യം flatten(നിവേശം_Array src, OutputArray dst, പൂർണ്ണസംഖ്യ startAxis, പൂർണ്ണസംഖ്യ endAxis)
 {
     CV_INSTRUMENT_REGION();
     reshapeTo(src, dst, src.shape().flatten(startAxis, endAxis));
 }
 
-void reshape(InputArray src, OutputArray dst, const std::vector<int>& newShape, bool allowZero)
+ശൂന്യം reshape(നിവേശം_Array src, OutputArray dst, സ്ഥിരം std::vector<പൂർണ്ണസംഖ്യ>& newShape, തർക്കം allowZero)
 {
     CV_INSTRUMENT_REGION();
     reshapeTo(src, dst, src.shape().reshape(MatShape(newShape), allowZero));

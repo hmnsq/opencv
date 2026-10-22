@@ -2,85 +2,85 @@
 // It is subject to the license terms in the LICENSE file found in the top-level directory
 // of this distribution and at http://opencv.org/license.html
 
-#include "precomp.hpp"
-#include "persistence.hpp"
-#include "persistence_impl.hpp"
-#include "persistence_base64_encoding.hpp"
-#include <unordered_map>
-#include <iterator>
+#അന്തര്ഭാവ "precomp.hpp"
+#അന്തര്ഭാവ "persistence.hpp"
+#അന്തര്ഭാവ "persistence_impl.hpp"
+#അന്തര്ഭാവ "persistence_base64_encoding.hpp"
+#അന്തര്ഭാവ <unordered_map>
+#അന്തര്ഭാവ <iterator>
 
-#include <opencv2/core/utils/logger.hpp>
+#അന്തര്ഭാവ <opencv2/core/utils/logger.hpp>
 
 #define CV_SEQ_ELTYPE_PTR            CV_MAKE_TYPE(CV_8U, 8 /*sizeof(void*)*/)
 
-namespace cv
+നാമാകാശ cv
 {
 
-namespace fs
+നാമാകാശ fs
 {
 
-int strcasecmp(const char* s1, const char* s2)
+പൂർണ്ണസംഖ്യ strcasecmp(സ്ഥിരം അക്ഷരം* s1, സ്ഥിരം അക്ഷരം* s2)
 {
-    const char* dummy="";
-    if(!s1) s1=dummy;
-    if(!s2) s2=dummy;
+    സ്ഥിരം അക്ഷരം* dummy="";
+    എങ്കിൽ(!s1) s1=dummy;
+    എങ്കിൽ(!s2) s2=dummy;
 
     size_t len1 = strlen(s1);
     size_t len2 = strlen(s2);
     size_t i, len = std::min(len1, len2);
-    for( i = 0; i < len; i++ )
+    വേണ്ടി( i = 0; i < len; i++ )
     {
-        int d = tolower((int)s1[i]) - tolower((int)s2[i]);
-        if( d != 0 )
-            return d;
+        പൂർണ്ണസംഖ്യ d = tolower((പൂർണ്ണസംഖ്യ)s1[i]) - tolower((പൂർണ്ണസംഖ്യ)s2[i]);
+        എങ്കിൽ( d != 0 )
+            തിരികെ d;
     }
-    return len1 < len2 ? -1 : len1 > len2 ? 1 : 0;
+    തിരികെ len1 < len2 ? -1 : len1 > len2 ? 1 : 0;
 }
 
-char* itoa( int _val, char* buffer, int /*radix*/ )
+അക്ഷരം* itoa( പൂർണ്ണസംഖ്യ _val, അക്ഷരം* buffer, പൂർണ്ണസംഖ്യ /*radix*/ )
 {
-    const int radix = 10;
-    char* ptr=buffer + 23 /* enough even for 64-bit integers */;
+    സ്ഥിരം പൂർണ്ണസംഖ്യ radix = 10;
+    അക്ഷരം* ptr=buffer + 23 /* enough even for 64-bit integers */;
     unsigned val = abs(_val);
 
     *ptr = '\0';
-    do
+    ചെയ്യുക
     {
         unsigned r = val / radix;
-        *--ptr = (char)(val - (r*radix) + '0');
+        *--ptr = (അക്ഷരം)(val - (r*radix) + '0');
         val = r;
     }
-    while( val != 0 );
+    ആകുമ്പോൾ( val != 0 );
 
-    if( _val < 0 )
+    എങ്കിൽ( _val < 0 )
         *--ptr = '-';
 
-    return ptr;
+    തിരികെ ptr;
 }
 
-char* itoa( int64_t _val, char* buffer, int /*radix*/, bool _signed)
+അക്ഷരം* itoa( int64_t _val, അക്ഷരം* buffer, പൂർണ്ണസംഖ്യ /*radix*/, തർക്കം _signed)
 {
-    const int radix = 10;
-    char* ptr=buffer + 23 /* enough even for 64-bit integers */;
-    int sign = _signed && _val < 0 ? -1 : 1;
+    സ്ഥിരം പൂർണ്ണസംഖ്യ radix = 10;
+    അക്ഷരം* ptr=buffer + 23 /* enough even for 64-bit integers */;
+    പൂർണ്ണസംഖ്യ sign = _signed && _val < 0 ? -1 : 1;
     uint64_t val = !_signed ? (uint64_t)_val : abs(_val);
 
     *ptr = '\0';
-    do
+    ചെയ്യുക
     {
         uint64_t r = val / radix;
-        *--ptr = (char)(val - (r*radix) + '0');
+        *--ptr = (അക്ഷരം)(val - (r*radix) + '0');
         val = r;
     }
-    while( val != 0 );
+    ആകുമ്പോൾ( val != 0 );
 
-    if( sign < 0 )
+    എങ്കിൽ( sign < 0 )
         *--ptr = '-';
 
-    return ptr;
+    തിരികെ ptr;
 }
 
-char* doubleToString( char* buf, size_t bufSize, double value, bool explicitZero )
+അക്ഷരം* doubleToString( അക്ഷരം* buf, size_t bufSize, ഇരട്ട value, തർക്കം explicitZero )
 {
     Cv64suf val;
     unsigned ieee754_hi;
@@ -88,324 +88,324 @@ char* doubleToString( char* buf, size_t bufSize, double value, bool explicitZero
     val.f = value;
     ieee754_hi = (unsigned)(val.u >> 32);
 
-    if( (ieee754_hi & 0x7ff00000) != 0x7ff00000 )
+    എങ്കിൽ( (ieee754_hi & 0x7ff00000) != 0x7ff00000 )
     {
-        int ivalue = cvRound(value);
-        if( ivalue == value )
+        പൂർണ്ണസംഖ്യ ivalue = cvRound(value);
+        എങ്കിൽ( ivalue == value )
         {
-            if( explicitZero )
+            എങ്കിൽ( explicitZero )
                 snprintf( buf, bufSize, "%d.0", ivalue );
-            else
+            അല്ലെങ്കിൽ
                 snprintf( buf, bufSize, "%d.", ivalue );
         }
-        else
+        അല്ലെങ്കിൽ
         {
             // binary64 has 52 bit fraction with hidden bit.
             // 53 * log_10(2) is 15.955. So "%.16f" should be fine, but its test fails.
             snprintf( buf, bufSize, "%.17g", value );
 
-            char* ptr = buf;
-            if( *ptr == '+' || *ptr == '-' )
+            അക്ഷരം* ptr = buf;
+            എങ്കിൽ( *ptr == '+' || *ptr == '-' )
                 ptr++;
-            for( ; cv_isdigit(*ptr); ptr++ )
+            വേണ്ടി( ; cv_isdigit(*ptr); ptr++ )
                 ;
-            if( *ptr == ',' )
+            എങ്കിൽ( *ptr == ',' )
                 *ptr = '.';
         }
     }
-    else
+    അല്ലെങ്കിൽ
     {
         unsigned ieee754_lo = (unsigned)val.u;
-        if( (ieee754_hi & 0x7fffffff) + (ieee754_lo != 0) > 0x7ff00000 )
+        എങ്കിൽ( (ieee754_hi & 0x7fffffff) + (ieee754_lo != 0) > 0x7ff00000 )
             strcpy( buf, ".Nan" );
-        else
-            strcpy( buf, (int)ieee754_hi < 0 ? "-.Inf" : ".Inf" );
+        അല്ലെങ്കിൽ
+            strcpy( buf, (പൂർണ്ണസംഖ്യ)ieee754_hi < 0 ? "-.Inf" : ".Inf" );
     }
 
-    return buf;
+    തിരികെ buf;
 }
 
-char* floatToString( char* buf, size_t bufSize, float value, bool halfprecision, bool explicitZero )
+അക്ഷരം* floatToString( അക്ഷരം* buf, size_t bufSize, ദശാംശം value, തർക്കം halfprecision, തർക്കം explicitZero )
 {
     Cv32suf val;
     unsigned ieee754;
     val.f = value;
     ieee754 = val.u;
 
-    if( (ieee754 & 0x7f800000) != 0x7f800000 )
+    എങ്കിൽ( (ieee754 & 0x7f800000) != 0x7f800000 )
     {
-        int ivalue = cvRound(value);
-        if( ivalue == value )
+        പൂർണ്ണസംഖ്യ ivalue = cvRound(value);
+        എങ്കിൽ( ivalue == value )
         {
-            if( explicitZero )
+            എങ്കിൽ( explicitZero )
                 snprintf( buf, bufSize, "%d.0", ivalue );
-            else
+            അല്ലെങ്കിൽ
                 snprintf( buf, bufSize, "%d.", ivalue );
         }
-        else
+        അല്ലെങ്കിൽ
         {
-            if (halfprecision)
+            എങ്കിൽ (halfprecision)
             {
                 // bfloat16 has 7 bit fraction with hidden bit.
                 // binary16 has 10 bit fraction with hidden bit.
                 // 11 * log_10(2) is 3.311. So "%.4f" should be fine, but its test fails.
                 snprintf(buf, bufSize, "%.5g", value);
             }
-            else
+            അല്ലെങ്കിൽ
             {
                 // binray32 has 23 bit fraction with hidden bit.
                 // 24 * log_10(2) is 7.225. So "%.8f" should be fine, but its test fails.
                 snprintf(buf, bufSize, "%.9g", value);
             }
 
-            char* ptr = buf;
-            if( *ptr == '+' || *ptr == '-' )
+            അക്ഷരം* ptr = buf;
+            എങ്കിൽ( *ptr == '+' || *ptr == '-' )
                 ptr++;
-            for( ; cv_isdigit(*ptr); ptr++ )
+            വേണ്ടി( ; cv_isdigit(*ptr); ptr++ )
                 ;
-            if( *ptr == ',' )
+            എങ്കിൽ( *ptr == ',' )
                 *ptr = '.';
         }
     }
-    else
+    അല്ലെങ്കിൽ
     {
-        if( (ieee754 & 0x7fffffff) != 0x7f800000 )
+        എങ്കിൽ( (ieee754 & 0x7fffffff) != 0x7f800000 )
             strcpy( buf, ".Nan" );
-        else
-            strcpy( buf, (int)ieee754 < 0 ? "-.Inf" : ".Inf" );
+        അല്ലെങ്കിൽ
+            strcpy( buf, (പൂർണ്ണസംഖ്യ)ieee754 < 0 ? "-.Inf" : ".Inf" );
     }
 
-    return buf;
+    തിരികെ buf;
 }
 
-static const char symbols[] = "ucwsifdhHbUIneE";
+സ്ഥിതം സ്ഥിരം അക്ഷരം symbols[] = "ucwsifdhHbUIneE";
 
-static char typeSymbol(int depth)
+സ്ഥിതം അക്ഷരം type_ചിഹ്നം(പൂർണ്ണസംഖ്യ depth)
 {
     CV_StaticAssert(CV_64F == 6, "");
     CV_CheckDepth(depth, depth >= 0 && depth <= CV_8F_E4M3FNUZ, "");
-    return symbols[depth];
+    തിരികെ symbols[depth];
 }
 
-static int symbolToType(char c)
+സ്ഥിതം പൂർണ്ണസംഖ്യ ചിഹ്നം_To_Type(അക്ഷരം c)
 {
-    if (c == 'r')
-        return CV_SEQ_ELTYPE_PTR;
-    const char* pos = strchr( symbols, c );
-    if( !pos )
+    എങ്കിൽ (c == 'r')
+        തിരികെ CV_SEQ_ELTYPE_PTR;
+    സ്ഥിരം അക്ഷരം* pos = strchr( symbols, c );
+    എങ്കിൽ( !pos )
         CV_Error( cv::Error::StsBadArg, "Invalid data type specification" );
-    return static_cast<int>(pos - symbols);
+    തിരികെ static_cast<പൂർണ്ണസംഖ്യ>(pos - symbols);
 }
 
-char* encodeFormat(int elem_type, char* dt, size_t dt_len)
+അക്ഷരം* encodeFormat(പൂർണ്ണസംഖ്യ elem_type, അക്ഷരം* dt, size_t dt_len)
 {
-    int cn = (elem_type == CV_SEQ_ELTYPE_PTR/*CV_USRTYPE1*/) ? 1 : CV_MAT_CN(elem_type);
-    char symbol = (elem_type == CV_SEQ_ELTYPE_PTR/*CV_USRTYPE1*/) ? 'r' : typeSymbol(CV_MAT_DEPTH(elem_type));
-    snprintf(dt, dt_len, "%d%c", cn, symbol);
-    return dt + (cn == 1 ? 1 : 0);
+    പൂർണ്ണസംഖ്യ cn = (elem_type == CV_SEQ_ELTYPE_PTR/*CV_USRTYPE1*/) ? 1 : CV_MAT_CN(elem_type);
+    അക്ഷരം ചിഹ്നം = (elem_type == CV_SEQ_ELTYPE_PTR/*CV_USRTYPE1*/) ? 'r' : type_ചിഹ്നം(CV_MAT_DEPTH(elem_type));
+    snprintf(dt, dt_len, "%d%c", cn, ചിഹ്നം);
+    തിരികെ dt + (cn == 1 ? 1 : 0);
 }
 
 // Deprecated due to size of dt buffer being unknowable.
-char* encodeFormat(int elem_type, char* dt)
+അക്ഷരം* encodeFormat(പൂർണ്ണസംഖ്യ elem_type, അക്ഷരം* dt)
 {
     constexpr size_t max = 20+1+1; // UINT64_MAX + one char + nul termination.
-    return encodeFormat(elem_type, dt, max);
+    തിരികെ encodeFormat(elem_type, dt, max);
 }
 
-int decodeFormat( const char* dt, int* fmt_pairs, int max_len )
+പൂർണ്ണസംഖ്യ decodeFormat( സ്ഥിരം അക്ഷരം* dt, പൂർണ്ണസംഖ്യ* fmt_pairs, പൂർണ്ണസംഖ്യ max_len )
 {
-    int fmt_pair_count = 0;
-    int i = 0, k = 0, len = dt ? (int)strlen(dt) : 0;
+    പൂർണ്ണസംഖ്യ fmt_pair_എണ്ണം = 0;
+    പൂർണ്ണസംഖ്യ i = 0, k = 0, len = dt ? (പൂർണ്ണസംഖ്യ)strlen(dt) : 0;
 
-    if( !dt || !len )
-        return 0;
+    എങ്കിൽ( !dt || !len )
+        തിരികെ 0;
 
     CV_Assert( fmt_pairs != 0 && max_len > 0 );
     fmt_pairs[0] = 0;
     max_len *= 2;
 
-    for( ; k < len; k++ )
+    വേണ്ടി( ; k < len; k++ )
     {
-        char c = dt[k];
+        അക്ഷരം c = dt[k];
 
-        if( cv_isdigit(c) )
+        എങ്കിൽ( cv_isdigit(c) )
         {
-            int count = c - '0';
-            if( cv_isdigit(dt[k+1]) )
+            പൂർണ്ണസംഖ്യ എണ്ണം_2 = c - '0';
+            എങ്കിൽ( cv_isdigit(dt[k+1]) )
             {
-                char* endptr = 0;
-                count = (int)strtol( dt+k, &endptr, 10 );
-                k = (int)(endptr - dt) - 1;
+                അക്ഷരം* endptr = 0;
+                എണ്ണം_2 = (പൂർണ്ണസംഖ്യ)strtol( dt+k, &endptr, 10 );
+                k = (പൂർണ്ണസംഖ്യ)(endptr - dt) - 1;
             }
 
-            if( count <= 0 )
+            എങ്കിൽ( എണ്ണം_2 <= 0 )
                 CV_Error( cv::Error::StsBadArg, "Invalid data type specification" );
 
-            fmt_pairs[i] = count;
+            fmt_pairs[i] = എണ്ണം_2;
         }
-        else
+        അല്ലെങ്കിൽ
         {
-            int depth = symbolToType(c);
-            if( fmt_pairs[i] == 0 )
+            പൂർണ്ണസംഖ്യ depth = ചിഹ്നം_To_Type(c);
+            എങ്കിൽ( fmt_pairs[i] == 0 )
                 fmt_pairs[i] = 1;
             fmt_pairs[i+1] = depth;
-            if( i > 0 && fmt_pairs[i+1] == fmt_pairs[i-1] )
+            എങ്കിൽ( i > 0 && fmt_pairs[i+1] == fmt_pairs[i-1] )
                 fmt_pairs[i-2] += fmt_pairs[i];
-            else
+            അല്ലെങ്കിൽ
             {
                 i += 2;
-                if( i >= max_len )
+                എങ്കിൽ( i >= max_len )
                     CV_Error( cv::Error::StsBadArg, "Too long data type specification" );
             }
             fmt_pairs[i] = 0;
         }
     }
 
-    fmt_pair_count = i/2;
-    return fmt_pair_count;
+    fmt_pair_എണ്ണം = i/2;
+    തിരികെ fmt_pair_എണ്ണം;
 }
 
-int calcElemSize( const char* dt, int initial_size )
+പൂർണ്ണസംഖ്യ calcElemSize( സ്ഥിരം അക്ഷരം* dt, പൂർണ്ണസംഖ്യ initial_size )
 {
-    int size = 0;
-    int fmt_pairs[CV_FS_MAX_FMT_PAIRS*2], i, fmt_pair_count;
-    int comp_size;
+    പൂർണ്ണസംഖ്യ size = 0;
+    പൂർണ്ണസംഖ്യ fmt_pairs[CV_FS_MAX_FMT_PAIRS*2], i, fmt_pair_എണ്ണം;
+    പൂർണ്ണസംഖ്യ comp_size;
 
-    fmt_pair_count = decodeFormat( dt, fmt_pairs, CV_FS_MAX_FMT_PAIRS );
-    fmt_pair_count *= 2;
-    for( i = 0, size = initial_size; i < fmt_pair_count; i += 2 )
+    fmt_pair_എണ്ണം = decodeFormat( dt, fmt_pairs, CV_FS_MAX_FMT_PAIRS );
+    fmt_pair_എണ്ണം *= 2;
+    വേണ്ടി( i = 0, size = initial_size; i < fmt_pair_എണ്ണം; i += 2 )
     {
         comp_size = CV_ELEM_SIZE(fmt_pairs[i+1]);
         size = cvAlign( size, comp_size );
         size += comp_size * fmt_pairs[i];
     }
-    if( initial_size == 0 )
+    എങ്കിൽ( initial_size == 0 )
     {
         comp_size = CV_ELEM_SIZE(fmt_pairs[1]);
         size = cvAlign( size, comp_size );
     }
-    return size;
+    തിരികെ size;
 }
 
 
-int calcStructSize( const char* dt, int initial_size )
+പൂർണ്ണസംഖ്യ calcStructSize( സ്ഥിരം അക്ഷരം* dt, പൂർണ്ണസംഖ്യ initial_size )
 {
-    int size = calcElemSize( dt, initial_size );
+    പൂർണ്ണസംഖ്യ size = calcElemSize( dt, initial_size );
     size_t elem_max_size = 0;
-    for ( const char * type = dt; *type != '\0'; type++ )
+    വേണ്ടി ( സ്ഥിരം അക്ഷരം * type = dt; *type != '\0'; type++ )
     {
-        char v = *type;
-        if (v >= '0' && v <= '9')
-            continue;  // skip vector size
-        switch (v)
+        അക്ഷരം v = *type;
+        എങ്കിൽ (v >= '0' && v <= '9')
+            തുടരുക;  // skip vector size
+        തിരഞ്ഞെടുപ്പ് (v)
         {
-        case 'u': { elem_max_size = std::max( elem_max_size, sizeof(uchar ) ); break; }
-        case 'b': { elem_max_size = std::max( elem_max_size, sizeof(bool  ) ); break; }
-        case 'c': { elem_max_size = std::max( elem_max_size, sizeof(schar ) ); break; }
-        case 'w': { elem_max_size = std::max( elem_max_size, sizeof(ushort) ); break; }
-        case 's': { elem_max_size = std::max( elem_max_size, sizeof(short ) ); break; }
-        case 'i': { elem_max_size = std::max( elem_max_size, sizeof(int   ) ); break; }
-        case 'n': { elem_max_size = std::max( elem_max_size, sizeof(unsigned) ); break; }
-        case 'f': { elem_max_size = std::max( elem_max_size, sizeof(float ) ); break; }
-        case 'd': { elem_max_size = std::max( elem_max_size, sizeof(double) ); break; }
-        case 'h': { elem_max_size = std::max( elem_max_size, sizeof(hfloat)); break; }
-        case 'H': { elem_max_size = std::max( elem_max_size, sizeof(bfloat)); break; }
-        case 'e': { elem_max_size = std::max( elem_max_size, sizeof(fp8_t) ); break; }
-        case 'E': { elem_max_size = std::max( elem_max_size, sizeof(fp8a_t)); break; }
-        case 'I': { elem_max_size = std::max( elem_max_size, sizeof(int64_t)); break; }
-        case 'U': { elem_max_size = std::max( elem_max_size, sizeof(uint64_t)); break; }
-        default:
-            CV_Error_(Error::StsNotImplemented, ("Unknown type identifier: '%c' in '%s'", (char)(*type), dt));
+        അവസ്ഥ 'u': { elem_max_size = std::max( elem_max_size, വലുപ്പം(uchar ) ); നിർത്തുക; }
+        അവസ്ഥ 'b': { elem_max_size = std::max( elem_max_size, വലുപ്പം(തർക്കം  ) ); നിർത്തുക; }
+        അവസ്ഥ 'c': { elem_max_size = std::max( elem_max_size, വലുപ്പം(schar ) ); നിർത്തുക; }
+        അവസ്ഥ 'w': { elem_max_size = std::max( elem_max_size, വലുപ്പം(ushort) ); നിർത്തുക; }
+        അവസ്ഥ 's': { elem_max_size = std::max( elem_max_size, വലുപ്പം(short ) ); നിർത്തുക; }
+        അവസ്ഥ 'i': { elem_max_size = std::max( elem_max_size, വലുപ്പം(പൂർണ്ണസംഖ്യ   ) ); നിർത്തുക; }
+        അവസ്ഥ 'n': { elem_max_size = std::max( elem_max_size, വലുപ്പം(unsigned) ); നിർത്തുക; }
+        അവസ്ഥ 'f': { elem_max_size = std::max( elem_max_size, വലുപ്പം(ദശാംശം ) ); നിർത്തുക; }
+        അവസ്ഥ 'd': { elem_max_size = std::max( elem_max_size, വലുപ്പം(ഇരട്ട) ); നിർത്തുക; }
+        അവസ്ഥ 'h': { elem_max_size = std::max( elem_max_size, വലുപ്പം(hfloat)); നിർത്തുക; }
+        അവസ്ഥ 'H': { elem_max_size = std::max( elem_max_size, വലുപ്പം(bfloat)); നിർത്തുക; }
+        അവസ്ഥ 'e': { elem_max_size = std::max( elem_max_size, വലുപ്പം(fp8_t) ); നിർത്തുക; }
+        അവസ്ഥ 'E': { elem_max_size = std::max( elem_max_size, വലുപ്പം(fp8a_t)); നിർത്തുക; }
+        അവസ്ഥ 'I': { elem_max_size = std::max( elem_max_size, വലുപ്പം(int64_t)); നിർത്തുക; }
+        അവസ്ഥ 'U': { elem_max_size = std::max( elem_max_size, വലുപ്പം(uint64_t)); നിർത്തുക; }
+        സ്ഥിരസ്ഥിതി:
+            CV_Error_(Error::StsNotImplemented, ("Unknown type identifier: '%c' in '%s'", (അക്ഷരം)(*type), dt));
         }
     }
-    size = cvAlign( size, static_cast<int>(elem_max_size) );
-    return size;
+    size = cvAlign( size, static_cast<പൂർണ്ണസംഖ്യ>(elem_max_size) );
+    തിരികെ size;
 }
 
-int decodeSimpleFormat( const char* dt )
+പൂർണ്ണസംഖ്യ decodeSimpleFormat( സ്ഥിരം അക്ഷരം* dt )
 {
-    int elem_type = -1;
-    int fmt_pairs[CV_FS_MAX_FMT_PAIRS*2], fmt_pair_count;
+    പൂർണ്ണസംഖ്യ elem_type = -1;
+    പൂർണ്ണസംഖ്യ fmt_pairs[CV_FS_MAX_FMT_PAIRS*2], fmt_pair_എണ്ണം;
 
-    fmt_pair_count = decodeFormat( dt, fmt_pairs, CV_FS_MAX_FMT_PAIRS );
-    if( fmt_pair_count != 1 || fmt_pairs[0] >= CV_CN_MAX)
+    fmt_pair_എണ്ണം = decodeFormat( dt, fmt_pairs, CV_FS_MAX_FMT_PAIRS );
+    എങ്കിൽ( fmt_pair_എണ്ണം != 1 || fmt_pairs[0] >= CV_CN_MAX)
         CV_Error( cv::Error::StsError, "Too complex format for the matrix" );
 
     elem_type = CV_MAKETYPE( fmt_pairs[1], fmt_pairs[0] );
 
-    return elem_type;
+    തിരികെ elem_type;
 }
 
 }
 
-#if defined __i386__ || defined(_M_IX86) || defined __x86_64__ || defined(_M_X64) || \
+#എങ്കിൽ defined __i386__ || defined(_M_IX86) || defined __x86_64__ || defined(_M_X64) || \
     (defined (__LITTLE_ENDIAN__) && __LITTLE_ENDIAN__)
 #define CV_LITTLE_ENDIAN_MEM_ACCESS 1
-#else
+#അല്ലെങ്കിൽ
 #define CV_LITTLE_ENDIAN_MEM_ACCESS 0
 #endif
 
-static inline int readInt(const uchar* p)
+സ്ഥിതം വരിയിൽ പൂർണ്ണസംഖ്യ readInt(സ്ഥിരം uchar* p)
 {
     // On little endian CPUs, both branches produce the same result. On big endian, only the else branch does.
-#if CV_LITTLE_ENDIAN_MEM_ACCESS
-    int val;
-    memcpy(&val, p, sizeof(val));
-    return val;
-#else
-    int val = (int)(p[0] | (p[1] << 8) | (p[2] << 16) | (p[3] << 24));
-    return val;
+#എങ്കിൽ CV_LITTLE_ENDIAN_MEM_ACCESS
+    പൂർണ്ണസംഖ്യ val;
+    memcpy(&val, p, വലുപ്പം(val));
+    തിരികെ val;
+#അല്ലെങ്കിൽ
+    പൂർണ്ണസംഖ്യ val = (പൂർണ്ണസംഖ്യ)(p[0] | (p[1] << 8) | (p[2] << 16) | (p[3] << 24));
+    തിരികെ val;
 #endif
 }
 
-static inline int64_t readLong(const uchar* p)
+സ്ഥിതം വരിയിൽ int64_t readLong(സ്ഥിരം uchar* p)
 {
     // On little endian CPUs, both branches produce the same result. On big endian, only the else branch does.
-#if CV_LITTLE_ENDIAN_MEM_ACCESS
+#എങ്കിൽ CV_LITTLE_ENDIAN_MEM_ACCESS
     int64_t val;
-    memcpy(&val, p, sizeof(val));
-    return val;
-#else
+    memcpy(&val, p, വലുപ്പം(val));
+    തിരികെ val;
+#അല്ലെങ്കിൽ
     unsigned val0 = (unsigned)(p[0] | (p[1] << 8) | (p[2] << 16) | (p[3] << 24));
     unsigned val1 = (unsigned)(p[4] | (p[5] << 8) | (p[6] << 16) | (p[7] << 24));
-    return val0 | ((int64_t)val1 << 32);
+    തിരികെ val0 | ((int64_t)val1 << 32);
 #endif
 }
 
-static inline double readReal(const uchar* p)
+സ്ഥിതം വരിയിൽ ഇരട്ട readReal(സ്ഥിരം uchar* p)
 {
     // On little endian CPUs, both branches produce the same result. On big endian, only the else branch does.
-#if CV_LITTLE_ENDIAN_MEM_ACCESS
-    double val;
-    memcpy(&val, p, sizeof(val));
-    return val;
-#else
+#എങ്കിൽ CV_LITTLE_ENDIAN_MEM_ACCESS
+    ഇരട്ട val;
+    memcpy(&val, p, വലുപ്പം(val));
+    തിരികെ val;
+#അല്ലെങ്കിൽ
     unsigned val0 = (unsigned)(p[0] | (p[1] << 8) | (p[2] << 16) | (p[3] << 24));
     unsigned val1 = (unsigned)(p[4] | (p[5] << 8) | (p[6] << 16) | (p[7] << 24));
     Cv64suf val;
     val.u = val0 | ((uint64)val1 << 32);
-    return val.f;
+    തിരികെ val.f;
 #endif
 }
 
 template <typename T>
-static inline void writeInt(uchar* p, T ival)
+സ്ഥിതം വരിയിൽ ശൂന്യം writeInt(uchar* p, T ival)
 {
     // On little endian CPUs, both branches produce the same result. On big endian, only the else branch does.
-#if CV_LITTLE_ENDIAN_MEM_ACCESS
-    memcpy(p, &ival, sizeof(ival));
-#else
-    for (size_t i = 0, j = 0; i < sizeof(ival); ++i, j += 8)
+#എങ്കിൽ CV_LITTLE_ENDIAN_MEM_ACCESS
+    memcpy(p, &ival, വലുപ്പം(ival));
+#അല്ലെങ്കിൽ
+    വേണ്ടി (size_t i = 0, j = 0; i < വലുപ്പം(ival); ++i, j += 8)
         p[i] = (uchar)(ival >> j);
 #endif
 }
 
-static inline void writeReal(uchar* p, double fval)
+സ്ഥിതം വരിയിൽ ശൂന്യം writeReal(uchar* p, ഇരട്ട fval)
 {
     // On little endian CPUs, both branches produce the same result. On big endian, only the else branch does.
-#if CV_LITTLE_ENDIAN_MEM_ACCESS
-    memcpy(p, &fval, sizeof(fval));
-#else
+#എങ്കിൽ CV_LITTLE_ENDIAN_MEM_ACCESS
+    memcpy(p, &fval, വലുപ്പം(fval));
+#അല്ലെങ്കിൽ
     Cv64suf v;
     v.f = fval;
     p[0] = (uchar)v.u;
@@ -421,28 +421,28 @@ static inline void writeReal(uchar* p, double fval)
 
 
 
-void FileStorage::Impl::init() {
+ശൂന്യം FileStorage::Impl::init() {
     flags = 0;
     buffer.clear();
     bufofs = 0;
     state = UNDEFINED;
-    is_using_base64 = false;
+    is_using_base64 = അസത്യം;
     state_of_writing_base64 = FileStorage_API::Base64State::Uncertain;
-    is_write_struct_delayed = false;
-    delayed_struct_key = nullptr;
+    is_write_struct_delayed = അസത്യം;
+    delayed_struct_താക്കോൽ = nullptr;
     delayed_struct_flags = 0;
     delayed_type_name = nullptr;
     base64_writer = nullptr;
-    is_opened = false;
-    dummy_eof = false;
-    write_mode = false;
-    mem_mode = false;
+    is_opened = അസത്യം;
+    dummy_eof = അസത്യം;
+    write_mode = അസത്യം;
+    mem_mode = അസത്യം;
     space = 0;
     wrap_margin = 71;
     fmt = 0;
     file = 0;
     gzfile = 0;
-    empty_stream = true;
+    empty_stream = സത്യം;
 
     strbufv.clear();
     strbuf = 0;
@@ -472,21 +472,21 @@ FileStorage::Impl::~Impl() {
     release();
 }
 
-void FileStorage::Impl::release(String *out) {
-    if (is_opened) {
-        if (out)
+ശൂന്യം FileStorage::Impl::release(String *out) {
+    എങ്കിൽ (is_opened) {
+        എങ്കിൽ (out)
             out->clear();
-        if (write_mode) {
-            while (write_stack.size() > 1) {
+        എങ്കിൽ (write_mode) {
+            ആകുമ്പോൾ (write_അട്ടി.size() > 1) {
                 endWriteStruct();
             }
             flush();
-            if (fmt == FileStorage::FORMAT_XML)
+            എങ്കിൽ (fmt == FileStorage::FORMAT_XML)
                 puts("</opencv_storage>\n");
-            else if (fmt == FileStorage::FORMAT_JSON)
+            അല്ലെങ്കിൽ എങ്കിൽ (fmt == FileStorage::FORMAT_JSON)
                 puts("}\n");
         }
-        if (mem_mode && out) {
+        എങ്കിൽ (mem_mode && out) {
             *out = cv::String(outbuf.begin(), outbuf.end());
         }
     }
@@ -494,111 +494,111 @@ void FileStorage::Impl::release(String *out) {
     init();
 }
 
-void FileStorage::Impl::analyze_file_name(const std::string &file_name, std::vector<std::string> &params) {
+ശൂന്യം FileStorage::Impl::analyze_file_name(സ്ഥിരം std::string &file_name, std::vector<std::string> &params) {
     params.clear();
-    static const char not_file_name = '\n';
-    static const char parameter_begin = '?';
-    static const char parameter_separator = '&';
+    സ്ഥിതം സ്ഥിരം അക്ഷരം not_file_name = '\n';
+    സ്ഥിതം സ്ഥിരം അക്ഷരം parameter_begin = '?';
+    സ്ഥിതം സ്ഥിരം അക്ഷരം parameter_separator = '&';
 
-    if (file_name.find(not_file_name, (size_t) 0) != std::string::npos)
-        return;
+    എങ്കിൽ (file_name.find(not_file_name, (size_t) 0) != std::string::npos)
+        തിരികെ;
 
     size_t beg = file_name.find_last_of(parameter_begin);
     params.push_back(file_name.substr((size_t) 0, beg));
 
-    if (beg != std::string::npos) {
+    എങ്കിൽ (beg != std::string::npos) {
         size_t end = file_name.size();
         beg++;
-        for (size_t param_beg = beg, param_end = beg;
+        വേണ്ടി (size_t param_beg = beg, param_end = beg;
              param_end < end;
              param_beg = param_end + 1) {
             param_end = file_name.find_first_of(parameter_separator, param_beg);
-            if ((param_end == std::string::npos || param_end != param_beg) && param_beg + 1 < end) {
+            എങ്കിൽ ((param_end == std::string::npos || param_end != param_beg) && param_beg + 1 < end) {
                 params.push_back(file_name.substr(param_beg, param_end - param_beg));
             }
         }
     }
 }
 
-bool FileStorage::Impl::open(const char *filename_or_buf, int _flags, const char *encoding) {
-    bool ok = true;
+തർക്കം FileStorage::Impl::open(സ്ഥിരം അക്ഷരം *filename_or_buf, പൂർണ്ണസംഖ്യ _flags, സ്ഥിരം അക്ഷരം *encoding) {
+    തർക്കം ok = സത്യം;
     release();
 
-    bool append = (_flags & 3) == FileStorage::APPEND;
+    തർക്കം append = (_flags & 3) == FileStorage::APPEND;
     mem_mode = (_flags & FileStorage::MEMORY) != 0;
 
     write_mode = (_flags & 3) != 0;
-    bool write_base64 = (write_mode || append) && (_flags & FileStorage::BASE64) != 0;
+    തർക്കം write_base64 = (write_mode || append) && (_flags & FileStorage::BASE64) != 0;
 
-    bool isGZ = false;
+    തർക്കം isGZ = അസത്യം;
 
     std::vector<std::string> params;
     //if ( !mem_mode )
     {
         analyze_file_name(filename_or_buf, params);
-        if (!params.empty())
+        എങ്കിൽ (!params.empty())
             filename = params[0];
 
-        if (!write_base64 && params.size() >= 2 &&
+        എങ്കിൽ (!write_base64 && params.size() >= 2 &&
             std::find(params.begin() + 1, params.end(), std::string("base64")) != params.end())
             write_base64 = (write_mode || append);
     }
 
-    if (filename.size() == 0 && !mem_mode && !write_mode)
+    എങ്കിൽ (filename.size() == 0 && !mem_mode && !write_mode)
         CV_Error(cv::Error::StsNullPtr, "NULL or empty filename");
 
-    if (mem_mode && append)
+    എങ്കിൽ (mem_mode && append)
         CV_Error(cv::Error::StsBadFlag, "FileStorage::APPEND and FileStorage::MEMORY are not currently compatible");
 
     flags = _flags;
 
-    if (!mem_mode) {
+    എങ്കിൽ (!mem_mode) {
         size_t dot_idx = filename.find_last_of('.');
-        char compression = '\0';
+        അക്ഷരം compression = '\0';
 
-        if (dot_idx != std::string::npos)
+        എങ്കിൽ (dot_idx != std::string::npos)
         {
             std::string ext = filename.substr(dot_idx);
 
             // Instead of `ext.starts_with(".gz")
-            if (ext.size() >= 3 && (ext[1] == 'g') && (ext[2] == 'z') )
+            എങ്കിൽ (ext.size() >= 3 && (ext[1] == 'g') && (ext[2] == 'z') )
             {
-                if (ext.size() == 3)
+                എങ്കിൽ (ext.size() == 3)
                 {
                     // ".gz"
-                    isGZ = true;
+                    isGZ = സത്യം;
                 }
 
-                else if(ext.size() == 4 && cv_isdigit(ext[3]))
+                അല്ലെങ്കിൽ എങ്കിൽ(ext.size() == 4 && cv_isdigit(ext[3]))
                 {
                     // ".gz[0-9]"
-                    isGZ = true;
+                    isGZ = സത്യം;
                     compression = ext[3];
                     filename.pop_back(); // Replace `gz[0-9]' to 'gz'.
                 }
             }
         }
 
-        if (!isGZ) {
+        എങ്കിൽ (!isGZ) {
             file = fopen(filename.c_str(), !write_mode ? "rt" : !append ? "wt" : "a+t");
-            if (!file)
+            എങ്കിൽ (!file)
             {
-                CV_LOG_ERROR(NULL, "Can't open file: '" << filename << "' in " << (!write_mode ? "read" : !append ? "write" : "append") << " mode");
-                return false;
+                CV_LOG_ERROR(ശൂന്യ, "Can't open file: '" << filename << "' in " << (!write_mode ? "read" : !append ? "write" : "append") << " mode");
+                തിരികെ അസത്യം;
             }
-        } else {
-#if USE_ZLIB
-            if (append) {
+        } അല്ലെങ്കിൽ {
+#എങ്കിൽ USE_ZLIB
+            എങ്കിൽ (append) {
                 CV_Error(cv::Error::StsNotImplemented, "Appending data to compressed file is not implemented");
             }
-            char mode[] = {write_mode ? 'w' : 'r', 'b', compression ? compression : '3', '\0'};
+            അക്ഷരം mode[] = {write_mode ? 'w' : 'r', 'b', compression ? compression : '3', '\0'};
             gzfile = gzopen(filename.c_str(), mode);
-            if (!gzfile)
+            എങ്കിൽ (!gzfile)
             {
-                CV_LOG_ERROR(NULL, "Can't open archive: '" << filename << "' mode=" << mode);
-                return false;
+                CV_LOG_ERROR(ശൂന്യ, "Can't open archive: '" << filename << "' mode=" << mode);
+                തിരികെ അസത്യം;
             }
-#else
+#അല്ലെങ്കിൽ
             CV_Error(cv::Error::StsNotImplemented, "There is no compressed file storage support in this configuration");
 #endif
         }
@@ -611,23 +611,23 @@ bool FileStorage::Impl::open(const char *filename_or_buf, int _flags, const char
     wrap_margin = 71;
     fmt = FileStorage::FORMAT_AUTO;
 
-    if (write_mode) {
+    എങ്കിൽ (write_mode) {
         fmt = flags & FileStorage::FORMAT_MASK;
 
-        if (mem_mode)
+        എങ്കിൽ (mem_mode)
             outbuf.clear();
 
-        if (fmt == FileStorage::FORMAT_AUTO && !filename.empty()) {
-            const char *dot_pos = NULL;
-            const char *dot_pos2 = NULL;
+        എങ്കിൽ (fmt == FileStorage::FORMAT_AUTO && !filename.empty()) {
+            സ്ഥിരം അക്ഷരം *dot_pos = ശൂന്യ;
+            സ്ഥിരം അക്ഷരം *dot_pos2 = ശൂന്യ;
             // like strrchr() implementation, but save two last positions simultaneously
-            for (const char *pos = &filename[0]; pos[0] != 0; pos++) {
-                if (pos[0] == '.') {
+            വേണ്ടി (സ്ഥിരം അക്ഷരം *pos = &filename[0]; pos[0] != 0; pos++) {
+                എങ്കിൽ (pos[0] == '.') {
                     dot_pos2 = dot_pos;
                     dot_pos = pos;
                 }
             }
-            if (fs::strcasecmp(dot_pos, ".gz") == 0 && dot_pos2 != NULL) {
+            എങ്കിൽ (fs::strcasecmp(dot_pos, ".gz") == 0 && dot_pos2 != ശൂന്യ) {
                 dot_pos = dot_pos2;
             }
             fmt = (fs::strcasecmp(dot_pos, ".xml") == 0 || fs::strcasecmp(dot_pos, ".xml.gz") == 0)
@@ -635,68 +635,68 @@ bool FileStorage::Impl::open(const char *filename_or_buf, int _flags, const char
                   : (fs::strcasecmp(dot_pos, ".json") == 0 || fs::strcasecmp(dot_pos, ".json.gz") == 0)
                     ? FileStorage::FORMAT_JSON
                     : FileStorage::FORMAT_YAML;
-        } else if (fmt == FileStorage::FORMAT_AUTO) {
+        } അല്ലെങ്കിൽ എങ്കിൽ (fmt == FileStorage::FORMAT_AUTO) {
             fmt = FileStorage::FORMAT_XML;
         }
 
         // we use factor=6 for XML (the longest characters (' and ") are encoded with 6 bytes (&apos; and &quot;)
         // and factor=4 for YAML ( as we use 4 bytes for non ASCII characters (e.g. \xAB))
-        int buf_size = CV_FS_MAX_LEN * (fmt == FileStorage::FORMAT_XML ? 6 : 4) + 1024;
+        പൂർണ്ണസംഖ്യ buf_size = CV_FS_MAX_LEN * (fmt == FileStorage::FORMAT_XML ? 6 : 4) + 1024;
 
-        if (append) {
+        എങ്കിൽ (append) {
             fseek(file, 0, SEEK_END);
-            if (ftell(file) == 0)
-                append = false;
+            എങ്കിൽ (ftell(file) == 0)
+                append = അസത്യം;
         }
 
-        write_stack.clear();
-        empty_stream = true;
-        write_stack.push_back(FStructData("", FileNode::MAP | FileNode::EMPTY, 0));
+        write_അട്ടി.clear();
+        empty_stream = സത്യം;
+        write_അട്ടി.push_back(FStructData("", File_കണ്ണി::MAP | File_കണ്ണി::EMPTY, 0));
         buffer.reserve(buf_size + 1024);
         buffer.resize(buf_size);
         bufofs = 0;
         is_using_base64 = write_base64;
         state_of_writing_base64 = FileStorage_API::Base64State::Uncertain;
 
-        if (fmt == FileStorage::FORMAT_XML) {
+        എങ്കിൽ (fmt == FileStorage::FORMAT_XML) {
             size_t file_size = file ? (size_t) ftell(file) : (size_t) 0;
-            if (!append || file_size == 0) {
-                if (encoding && *encoding != '\0') {
-                    if (fs::strcasecmp(encoding, "UTF-16") == 0) {
+            എങ്കിൽ (!append || file_size == 0) {
+                എങ്കിൽ (encoding && *encoding != '\0') {
+                    എങ്കിൽ (fs::strcasecmp(encoding, "UTF-16") == 0) {
                         release();
                         CV_Error(cv::Error::StsBadArg, "UTF-16 XML encoding is not supported! Use 8-bit encoding\n");
                     }
 
                     CV_Assert(strlen(encoding) < 1000);
-                    char buf[1100];
-                    snprintf(buf, sizeof(buf), "<?xml version=\"1.0\" encoding=\"%s\"?>\n", encoding);
+                    അക്ഷരം buf[1100];
+                    snprintf(buf, വലുപ്പം(buf), "<?xml version=\"1.0\" encoding=\"%s\"?>\n", encoding);
                     puts(buf);
-                } else
+                } അല്ലെങ്കിൽ
                     puts("<?xml version=\"1.0\"?>\n");
                 puts("<opencv_storage>\n");
-            } else {
-                int xml_buf_size = 1 << 10;
-                char substr[] = "</opencv_storage>";
-                int last_occurrence = -1;
-                xml_buf_size = MIN(xml_buf_size, int(file_size));
+            } അല്ലെങ്കിൽ {
+                പൂർണ്ണസംഖ്യ xml_buf_size = 1 << 10;
+                അക്ഷരം substr[] = "</opencv_storage>";
+                പൂർണ്ണസംഖ്യ last_occurrence = -1;
+                xml_buf_size = MIN(xml_buf_size, പൂർണ്ണസംഖ്യ(file_size));
                 fseek(file, -xml_buf_size, SEEK_END);
                 // find the last occurrence of </opencv_storage>
-                for (;;) {
-                    int line_offset = (int) ftell(file);
-                    const char *ptr0 = this->gets(xml_buf_size);
-                    const char *ptr = NULL;
-                    if (!ptr0)
-                        break;
+                വേണ്ടി (;;) {
+                    പൂർണ്ണസംഖ്യ വരി_offset = (പൂർണ്ണസംഖ്യ) ftell(file);
+                    സ്ഥിരം അക്ഷരം *ptr0 = ഇത്->gets(xml_buf_size);
+                    സ്ഥിരം അക്ഷരം *ptr = ശൂന്യ;
+                    എങ്കിൽ (!ptr0)
+                        നിർത്തുക;
                     ptr = ptr0;
-                    for (;;) {
+                    വേണ്ടി (;;) {
                         ptr = strstr(ptr, substr);
-                        if (!ptr)
-                            break;
-                        last_occurrence = line_offset + (int) (ptr - ptr0);
+                        എങ്കിൽ (!ptr)
+                            നിർത്തുക;
+                        last_occurrence = വരി_offset + (പൂർണ്ണസംഖ്യ) (ptr - ptr0);
                         ptr += strlen(substr);
                     }
                 }
-                if (last_occurrence < 0) {
+                എങ്കിൽ (last_occurrence < 0) {
                     release();
                     CV_Error(cv::Error::StsError, "Could not find </opencv_storage> in the end of file.\n");
                 }
@@ -710,436 +710,436 @@ bool FileStorage::Impl::open(const char *filename_or_buf, int _flags, const char
                 puts("\n");
             }
 
-            emitter_do_not_use_direct_dereference = createXMLEmitter(this);
-        } else if (fmt == FileStorage::FORMAT_YAML || fmt == FileStorage::FORMAT_YAML_1_0) {
-                if (!append) {
-                    if (fmt == FileStorage::FORMAT_YAML_1_0)
+            emitter_do_not_use_direct_dereference = createXMLEmitter(ഇത്);
+        } അല്ലെങ്കിൽ എങ്കിൽ (fmt == FileStorage::FORMAT_YAML || fmt == FileStorage::FORMAT_YAML_1_0) {
+                എങ്കിൽ (!append) {
+                    എങ്കിൽ (fmt == FileStorage::FORMAT_YAML_1_0)
                         puts("%YAML:1.0\n---\n"); // Legacy Flag -> Legacy Header
-                    else
+                    അല്ലെങ്കിൽ
                         puts("%YAML 1.2\n---\n"); // Default -> Modern Header
                 }
-            else
+            അല്ലെങ്കിൽ
                 puts("...\n---\n");
 
-            emitter_do_not_use_direct_dereference = createYAMLEmitter(this);
-        } else {
+            emitter_do_not_use_direct_dereference = createYAMLEmitter(ഇത്);
+        } അല്ലെങ്കിൽ {
             CV_Assert(fmt == FileStorage::FORMAT_JSON);
-            if (!append)
+            എങ്കിൽ (!append)
                 puts("{\n");
-            else {
-                bool valid = false;
+            അല്ലെങ്കിൽ {
+                തർക്കം valid = അസത്യം;
                 long roffset = 0;
-                for (;
+                വേണ്ടി (;
                         fseek(file, roffset, SEEK_END) == 0;
                         roffset -= 1) {
-                    const char end_mark = '}';
-                    if (fgetc(file) == end_mark) {
+                    സ്ഥിരം അക്ഷരം end_mark = '}';
+                    എങ്കിൽ (fgetc(file) == end_mark) {
                         fseek(file, roffset, SEEK_END);
-                        valid = true;
-                        break;
+                        valid = സത്യം;
+                        നിർത്തുക;
                     }
                 }
 
-                if (valid) {
+                എങ്കിൽ (valid) {
                     closeFile();
                     file = fopen(filename.c_str(), "r+t");
                     CV_Assert(file != 0);
                     fseek(file, roffset, SEEK_END);
                     fputs(",", file);
-                } else {
+                } അല്ലെങ്കിൽ {
                     CV_Error(cv::Error::StsError, "Could not find '}' in the end of file.\n");
                 }
             }
-            write_stack.back().indent = 4;
-            emitter_do_not_use_direct_dereference = createJSONEmitter(this);
+            write_അട്ടി.back().indent = 4;
+            emitter_do_not_use_direct_dereference = createJSONEmitter(ഇത്);
         }
-        is_opened = true;
-    } else {
-        const size_t buf_size0 = 40;
+        is_opened = സത്യം;
+    } അല്ലെങ്കിൽ {
+        സ്ഥിരം size_t buf_size0 = 40;
         buffer.resize(buf_size0);
-        if (mem_mode) {
-            strbuf = (char *) filename_or_buf;
+        എങ്കിൽ (mem_mode) {
+            strbuf = (അക്ഷരം *) filename_or_buf;
             strbufsize = strlen(strbuf);
         }
 
-        const char *yaml_signature = "%YAML";
-        const char *json_signature = "{";
-        const char *xml_signature = "<?xml";
-        char *buf = this->gets(16);
+        സ്ഥിരം അക്ഷരം *yaml_signature = "%YAML";
+        സ്ഥിരം അക്ഷരം *json_signature = "{";
+        സ്ഥിരം അക്ഷരം *xml_signature = "<?xml";
+        അക്ഷരം *buf = ഇത്->gets(16);
         CV_Assert(buf);
-        char *bufPtr = cv_skip_BOM(buf);
+        അക്ഷരം *bufPtr = cv_skip_BOM(buf);
         size_t bufOffset = bufPtr - buf;
 
         // NOTE: Yaml 1.2 allows to skip header. Data without type signature is read as YAML
-        if (strncmp(bufPtr, yaml_signature, strlen(yaml_signature)) == 0)
+        എങ്കിൽ (strncmp(bufPtr, yaml_signature, strlen(yaml_signature)) == 0)
             fmt = FileStorage::FORMAT_YAML;
-        else if (strncmp(bufPtr, json_signature, strlen(json_signature)) == 0)
+        അല്ലെങ്കിൽ എങ്കിൽ (strncmp(bufPtr, json_signature, strlen(json_signature)) == 0)
             fmt = FileStorage::FORMAT_JSON;
-        else if (strncmp(bufPtr, xml_signature, strlen(xml_signature)) == 0)
+        അല്ലെങ്കിൽ എങ്കിൽ (strncmp(bufPtr, xml_signature, strlen(xml_signature)) == 0)
             fmt = FileStorage::FORMAT_XML;
-        else
+        അല്ലെങ്കിൽ
             fmt = FileStorage::FORMAT_YAML;
 
         rewind();
         strbufpos = bufOffset;
         bufofs = 0;
 
-        try {
-            char *ptr = bufferStart();
+        ശ്രമിക്കുക {
+            അക്ഷരം *ptr = bufferStart();
             ptr[0] = ptr[1] = ptr[2] = '\0';
-            FileNode root_nodes(fs_ext, 0, 0);
+            File_കണ്ണി വേര്_nodes(fs_ext, 0, 0);
 
-            uchar *rptr = reserveNodeSpace(root_nodes, 9);
-            *rptr = FileNode::SEQ;
+            uchar *rptr = reserve_കണ്ണി_Space(വേര്_nodes, 9);
+            *rptr = File_കണ്ണി::SEQ;
             writeInt(rptr + 1, 4);
             writeInt(rptr + 5, 0);
 
             roots.clear();
 
-            switch (fmt) {
-                case FileStorage::FORMAT_XML:
-                    parser_do_not_use_direct_dereference = createXMLParser(this);
-                    break;
-                case FileStorage::FORMAT_YAML:
-                case FileStorage::FORMAT_YAML_1_0:
-                    parser_do_not_use_direct_dereference = createYAMLParser(this);
-                    break;
-                case FileStorage::FORMAT_JSON:
-                    parser_do_not_use_direct_dereference = createJSONParser(this);
-                    break;
-                default:
+            തിരഞ്ഞെടുപ്പ് (fmt) {
+                അവസ്ഥ FileStorage::FORMAT_XML:
+                    parser_do_not_use_direct_dereference = createXMLParser(ഇത്);
+                    നിർത്തുക;
+                അവസ്ഥ FileStorage::FORMAT_YAML:
+                അവസ്ഥ FileStorage::FORMAT_YAML_1_0:
+                    parser_do_not_use_direct_dereference = createYAMLParser(ഇത്);
+                    നിർത്തുക;
+                അവസ്ഥ FileStorage::FORMAT_JSON:
+                    parser_do_not_use_direct_dereference = createJSONParser(ഇത്);
+                    നിർത്തുക;
+                സ്ഥിരസ്ഥിതി:
                     parser_do_not_use_direct_dereference = Ptr<FileStorageParser>();
             }
 
-            if (!parser_do_not_use_direct_dereference.empty()) {
+            എങ്കിൽ (!parser_do_not_use_direct_dereference.empty()) {
                 ok = getParser().parse(ptr);
-                if (ok) {
-                    finalizeCollection(root_nodes);
+                എങ്കിൽ (ok) {
+                    finalizeCollection(വേര്_nodes);
 
                     CV_Assert(!fs_data_ptrs.empty());
-                    FileNode roots_node(fs_ext, 0, 0);
-                    size_t i, nroots = roots_node.size();
-                    FileNodeIterator it = roots_node.begin();
+                    File_കണ്ണി roots_കണ്ണി(fs_ext, 0, 0);
+                    size_t i, nroots = roots_കണ്ണി.size();
+                    File_കണ്ണി_Iterator it = roots_കണ്ണി.begin();
 
-                    for (i = 0; i < nroots; i++, ++it)
+                    വേണ്ടി (i = 0; i < nroots; i++, ++it)
                         roots.push_back(*it);
                 }
             }
         }
-        catch (...)
+        പിടിക്കുക (...)
         {
             // FIXIT log error message
-            is_opened = true;
+            is_opened = സത്യം;
             release();
-            throw;
+            എറിയുക;
         }
 
         // release resources that we do not need anymore
         closeFile();
-        is_opened = true;
-        std::vector<char> tmpbuf;
+        is_opened = സത്യം;
+        std::vector<അക്ഷരം> tmpbuf;
         std::swap(buffer, tmpbuf);
         bufofs = 0;
     }
-    return ok;
+    തിരികെ ok;
 }
 
-void FileStorage::Impl::puts(const char *str) {
+ശൂന്യം FileStorage::Impl::puts(സ്ഥിരം അക്ഷരം *str) {
     CV_Assert(write_mode);
-    if (mem_mode)
+    എങ്കിൽ (mem_mode)
         std::copy(str, str + strlen(str), std::back_inserter(outbuf));
-    else if (file)
+    അല്ലെങ്കിൽ എങ്കിൽ (file)
         fputs(str, file);
-#if USE_ZLIB
-    else if (gzfile)
+#എങ്കിൽ USE_ZLIB
+    അല്ലെങ്കിൽ എങ്കിൽ (gzfile)
         gzputs(gzfile, str);
 #endif
-    else
+    അല്ലെങ്കിൽ
         CV_Error(cv::Error::StsError, "The storage is not opened");
 }
 
-char *FileStorage::Impl::getsFromFile(char *buf, int count) {
-    if (file)
-        return fgets(buf, count, file);
-#if USE_ZLIB
-    if (gzfile)
-        return gzgets(gzfile, buf, count);
+അക്ഷരം *FileStorage::Impl::getsFromFile(അക്ഷരം *buf, പൂർണ്ണസംഖ്യ എണ്ണം_2) {
+    എങ്കിൽ (file)
+        തിരികെ fgets(buf, എണ്ണം_2, file);
+#എങ്കിൽ USE_ZLIB
+    എങ്കിൽ (gzfile)
+        തിരികെ gzgets(gzfile, buf, എണ്ണം_2);
 #endif
     CV_Error(cv::Error::StsError, "The storage is not opened");
 }
 
-char *FileStorage::Impl::gets(size_t maxCount) {
-    if (strbuf) {
+അക്ഷരം *FileStorage::Impl::gets(size_t max_എണ്ണം) {
+    എങ്കിൽ (strbuf) {
         size_t i = strbufpos, len = strbufsize;
-        const char *instr = strbuf;
-        for (; i < len; i++) {
-            char c = instr[i];
-            if (c == '\0' || c == '\n') {
-                if (c == '\n')
+        സ്ഥിരം അക്ഷരം *instr = strbuf;
+        വേണ്ടി (; i < len; i++) {
+            അക്ഷരം c = instr[i];
+            എങ്കിൽ (c == '\0' || c == '\n') {
+                എങ്കിൽ (c == '\n')
                     i++;
-                break;
+                നിർത്തുക;
             }
         }
-        size_t count = i - strbufpos;
-        if (maxCount == 0 || maxCount > count)
-            maxCount = count;
-        buffer.resize(std::max(buffer.size(), maxCount + 8));
-        memcpy(&buffer[0], instr + strbufpos, maxCount);
-        buffer[maxCount] = '\0';
+        size_t എണ്ണം_2 = i - strbufpos;
+        എങ്കിൽ (max_എണ്ണം == 0 || max_എണ്ണം > എണ്ണം_2)
+            max_എണ്ണം = എണ്ണം_2;
+        buffer.resize(std::max(buffer.size(), max_എണ്ണം + 8));
+        memcpy(&buffer[0], instr + strbufpos, max_എണ്ണം);
+        buffer[max_എണ്ണം] = '\0';
         strbufpos = i;
-        return maxCount > 0 ? &buffer[0] : 0;
+        തിരികെ max_എണ്ണം > 0 ? &buffer[0] : 0;
     }
 
-    const size_t MAX_BLOCK_SIZE = INT_MAX / 2; // hopefully, that will be enough
-    if (maxCount == 0)
-        maxCount = MAX_BLOCK_SIZE;
-    else
-        CV_Assert(maxCount < MAX_BLOCK_SIZE);
+    സ്ഥിരം size_t MAX_BLOCK_SIZE = INT_MAX / 2; // hopefully, that will be enough
+    എങ്കിൽ (max_എണ്ണം == 0)
+        max_എണ്ണം = MAX_BLOCK_SIZE;
+    അല്ലെങ്കിൽ
+        CV_Assert(max_എണ്ണം < MAX_BLOCK_SIZE);
     size_t ofs = 0;
 
-    for (;;) {
-        int count = (int) std::min(buffer.size() - ofs - 16, maxCount);
-        char *ptr = getsFromFile(&buffer[ofs], count + 1);
-        if (!ptr)
-            break;
-        int delta = (int) strlen(ptr);
+    വേണ്ടി (;;) {
+        പൂർണ്ണസംഖ്യ എണ്ണം_2 = (പൂർണ്ണസംഖ്യ) std::min(buffer.size() - ofs - 16, max_എണ്ണം);
+        അക്ഷരം *ptr = getsFromFile(&buffer[ofs], എണ്ണം_2 + 1);
+        എങ്കിൽ (!ptr)
+            നിർത്തുക;
+        പൂർണ്ണസംഖ്യ delta = (പൂർണ്ണസംഖ്യ) strlen(ptr);
         ofs += delta;
-        maxCount -= delta;
-        if (delta == 0 || ptr[delta - 1] == '\n' || maxCount == 0)
-            break;
-        if (delta == count)
+        max_എണ്ണം -= delta;
+        എങ്കിൽ (delta == 0 || ptr[delta - 1] == '\n' || max_എണ്ണം == 0)
+            നിർത്തുക;
+        എങ്കിൽ (delta == എണ്ണം_2)
             buffer.resize((size_t) (buffer.size() * 1.5));
     }
-    return ofs > 0 ? &buffer[0] : 0;
+    തിരികെ ofs > 0 ? &buffer[0] : 0;
 }
 
-char *FileStorage::Impl::gets() {
-    char *ptr = this->gets(0);
-    if (!ptr) {
+അക്ഷരം *FileStorage::Impl::gets() {
+    അക്ഷരം *ptr = ഇത്->gets(0);
+    എങ്കിൽ (!ptr) {
         ptr = bufferStart();  // FIXIT Why do we need this hack? What is about other parsers JSON/YAML?
         *ptr = '\0';
         setEof();
-        return 0;
-    } else {
+        തിരികെ 0;
+    } അല്ലെങ്കിൽ {
         size_t l = strlen(ptr);
-        if (l > 0 && ptr[l - 1] != '\n' && ptr[l - 1] != '\r' && !eof()) {
+        എങ്കിൽ (l > 0 && ptr[l - 1] != '\n' && ptr[l - 1] != '\r' && !eof()) {
             ptr[l] = '\n';
             ptr[l + 1] = '\0';
         }
     }
     lineno++;
-    return ptr;
+    തിരികെ ptr;
 }
 
-bool FileStorage::Impl::eof() {
-    if (dummy_eof)
-        return true;
-    if (strbuf)
-        return strbufpos >= strbufsize;
-    if (file)
-        return feof(file) != 0;
-#if USE_ZLIB
-    if (gzfile)
-        return gzeof(gzfile) != 0;
+തർക്കം FileStorage::Impl::eof() {
+    എങ്കിൽ (dummy_eof)
+        തിരികെ സത്യം;
+    എങ്കിൽ (strbuf)
+        തിരികെ strbufpos >= strbufsize;
+    എങ്കിൽ (file)
+        തിരികെ feof(file) != 0;
+#എങ്കിൽ USE_ZLIB
+    എങ്കിൽ (gzfile)
+        തിരികെ gzeof(gzfile) != 0;
 #endif
-    return false;
+    തിരികെ അസത്യം;
 }
 
-void FileStorage::Impl::setEof() {
-    dummy_eof = true;
+ശൂന്യം FileStorage::Impl::setEof() {
+    dummy_eof = സത്യം;
 }
 
-void FileStorage::Impl::closeFile() {
-    if (file)
+ശൂന്യം FileStorage::Impl::closeFile() {
+    എങ്കിൽ (file)
         fclose(file);
-#if USE_ZLIB
-    else if (gzfile)
+#എങ്കിൽ USE_ZLIB
+    അല്ലെങ്കിൽ എങ്കിൽ (gzfile)
         gzclose(gzfile);
 #endif
     file = 0;
     gzfile = 0;
     strbuf = 0;
     strbufpos = 0;
-    is_opened = false;
+    is_opened = അസത്യം;
 }
 
-void FileStorage::Impl::rewind() {
-    if (file)
+ശൂന്യം FileStorage::Impl::rewind() {
+    എങ്കിൽ (file)
         ::rewind(file);
-#if USE_ZLIB
-    else if (gzfile)
+#എങ്കിൽ USE_ZLIB
+    അല്ലെങ്കിൽ എങ്കിൽ (gzfile)
         gzrewind(gzfile);
 #endif
     strbufpos = 0;
 }
 
-char *FileStorage::Impl::resizeWriteBuffer(char *ptr, int len) {
-    const char *buffer_end = &buffer[0] + buffer.size();
-    if (ptr + len < buffer_end)
-        return ptr;
+അക്ഷരം *FileStorage::Impl::resizeWriteBuffer(അക്ഷരം *ptr, പൂർണ്ണസംഖ്യ len) {
+    സ്ഥിരം അക്ഷരം *buffer_end = &buffer[0] + buffer.size();
+    എങ്കിൽ (ptr + len < buffer_end)
+        തിരികെ ptr;
 
-    const char *buffer_start = &buffer[0];
-    int written_len = (int) (ptr - buffer_start);
+    സ്ഥിരം അക്ഷരം *buffer_start = &buffer[0];
+    പൂർണ്ണസംഖ്യ written_len = (പൂർണ്ണസംഖ്യ) (ptr - buffer_start);
 
-    CV_Assert(written_len <= (int) buffer.size());
-    int new_size = (int) ((buffer_end - buffer_start) * 3 / 2);
+    CV_Assert(written_len <= (പൂർണ്ണസംഖ്യ) buffer.size());
+    പൂർണ്ണസംഖ്യ new_size = (പൂർണ്ണസംഖ്യ) ((buffer_end - buffer_start) * 3 / 2);
     new_size = MAX(written_len + len, new_size);
     buffer.reserve(new_size + 256);
     buffer.resize(new_size);
     bufofs = written_len;
-    return &buffer[0] + bufofs;
+    തിരികെ &buffer[0] + bufofs;
 }
 
-char *FileStorage::Impl::flush() {
-    char *buffer_start = &buffer[0];
-    char *ptr = buffer_start + bufofs;
+അക്ഷരം *FileStorage::Impl::flush() {
+    അക്ഷരം *buffer_start = &buffer[0];
+    അക്ഷരം *ptr = buffer_start + bufofs;
 
-    if (ptr > buffer_start + space) {
+    എങ്കിൽ (ptr > buffer_start + space) {
         ptr[0] = '\n';
         ptr[1] = '\0';
         puts(buffer_start);
         bufofs = 0;
     }
 
-    int indent = write_stack.back().indent;
+    പൂർണ്ണസംഖ്യ indent = write_അട്ടി.back().indent;
 
-    if (space != indent) {
+    എങ്കിൽ (space != indent) {
         memset(buffer_start, ' ', indent);
         space = indent;
     }
     bufofs = space;
     ptr = buffer_start + bufofs;
 
-    return ptr;
+    തിരികെ ptr;
 }
 
-void FileStorage::Impl::endWriteStruct() {
+ശൂന്യം FileStorage::Impl::endWriteStruct() {
     CV_Assert(write_mode);
 
-    check_if_write_struct_is_delayed(false);
-    if (state_of_writing_base64 != FileStorage_API::Uncertain)
+    check_if_write_struct_is_delayed(അസത്യം);
+    എങ്കിൽ (state_of_writing_base64 != FileStorage_API::Uncertain)
         switch_to_Base64_state(FileStorage_API::Uncertain);
 
-    CV_Assert(!write_stack.empty());
+    CV_Assert(!write_അട്ടി.empty());
 
-    FStructData &current_struct = write_stack.back();
-    if (fmt == FileStorage::FORMAT_JSON && !FileNode::isFlow(current_struct.flags) && write_stack.size() > 1)
-        current_struct.indent = write_stack[write_stack.size() - 2].indent;
+    FStructData &current_struct = write_അട്ടി.back();
+    എങ്കിൽ (fmt == FileStorage::FORMAT_JSON && !File_കണ്ണി::isFlow(current_struct.flags) && write_അട്ടി.size() > 1)
+        current_struct.indent = write_അട്ടി[write_അട്ടി.size() - 2].indent;
 
     getEmitter().endWriteStruct(current_struct);
 
-    write_stack.pop_back();
-    if (!write_stack.empty())
-        write_stack.back().flags &= ~FileNode::EMPTY;
+    write_അട്ടി.pop_back();
+    എങ്കിൽ (!write_അട്ടി.empty())
+        write_അട്ടി.back().flags &= ~File_കണ്ണി::EMPTY;
 }
 
-void FileStorage::Impl::startWriteStruct_helper(const char *key, int struct_flags,
-                                                const char *type_name) {
+ശൂന്യം FileStorage::Impl::startWriteStruct_helper(സ്ഥിരം അക്ഷരം *താക്കോൽ, പൂർണ്ണസംഖ്യ struct_flags,
+                                                സ്ഥിരം അക്ഷരം *type_name) {
     CV_Assert(write_mode);
 
-    struct_flags = (struct_flags & (FileNode::TYPE_MASK | FileNode::FLOW)) | FileNode::EMPTY;
-    if (!FileNode::isCollection(struct_flags))
+    struct_flags = (struct_flags & (File_കണ്ണി::TYPE_MASK | File_കണ്ണി::FLOW)) | File_കണ്ണി::EMPTY;
+    എങ്കിൽ (!File_കണ്ണി::isCollection(struct_flags))
         CV_Error(cv::Error::StsBadArg,
                  "Some collection type: FileNode::SEQ or FileNode::MAP must be specified");
 
-    if (type_name && type_name[0] == '\0')
+    എങ്കിൽ (type_name && type_name[0] == '\0')
         type_name = 0;
 
-    FStructData s = getEmitter().startWriteStruct(write_stack.back(), key, struct_flags, type_name);
+    FStructData s = getEmitter().startWriteStruct(write_അട്ടി.back(), താക്കോൽ, struct_flags, type_name);
 
-    write_stack.push_back(s);
-    size_t write_stack_size = write_stack.size();
-    if (write_stack_size > 1)
-        write_stack[write_stack_size - 2].flags &= ~FileNode::EMPTY;
+    write_അട്ടി.push_back(s);
+    size_t write_അട്ടി_size = write_അട്ടി.size();
+    എങ്കിൽ (write_അട്ടി_size > 1)
+        write_അട്ടി[write_അട്ടി_size - 2].flags &= ~File_കണ്ണി::EMPTY;
 
-    if (fmt != FileStorage::FORMAT_JSON && !FileNode::isFlow(s.flags))
+    എങ്കിൽ (fmt != FileStorage::FORMAT_JSON && !File_കണ്ണി::isFlow(s.flags))
         flush();
 
-    if (fmt == FileStorage::FORMAT_JSON && type_name && type_name[0] && FileNode::isMap(struct_flags)) {
-        getEmitter().write("type_id", type_name, false);
+    എങ്കിൽ (fmt == FileStorage::FORMAT_JSON && type_name && type_name[0] && File_കണ്ണി::isMap(struct_flags)) {
+        getEmitter().ലിഖ("type_id", type_name, അസത്യം);
     }
 }
 
-void FileStorage::Impl::startWriteStruct(const char *key, int struct_flags,
-                                         const char *type_name) {
-    check_if_write_struct_is_delayed(false);
-    if (state_of_writing_base64 == FileStorage_API::NotUse)
+ശൂന്യം FileStorage::Impl::startWriteStruct(സ്ഥിരം അക്ഷരം *താക്കോൽ, പൂർണ്ണസംഖ്യ struct_flags,
+                                         സ്ഥിരം അക്ഷരം *type_name) {
+    check_if_write_struct_is_delayed(അസത്യം);
+    എങ്കിൽ (state_of_writing_base64 == FileStorage_API::NotUse)
         switch_to_Base64_state(FileStorage_API::Uncertain);
 
-    if (state_of_writing_base64 == FileStorage_API::Uncertain && FileNode::isSeq(struct_flags)
+    എങ്കിൽ (state_of_writing_base64 == FileStorage_API::Uncertain && File_കണ്ണി::isSeq(struct_flags)
         && is_using_base64 && type_name == 0) {
         /* Uncertain whether output Base64 data */
-        make_write_struct_delayed(key, struct_flags, type_name);
-    } else if (type_name && memcmp(type_name, "binary", 6) == 0) {
+        make_write_struct_delayed(താക്കോൽ, struct_flags, type_name);
+    } അല്ലെങ്കിൽ എങ്കിൽ (type_name && memcmp(type_name, "binary", 6) == 0) {
         /* Must output Base64 data */
-        if ((FileNode::TYPE_MASK & struct_flags) != FileNode::SEQ)
+        എങ്കിൽ ((File_കണ്ണി::TYPE_MASK & struct_flags) != File_കണ്ണി::SEQ)
             CV_Error(cv::Error::StsBadArg, "must set 'struct_flags |= CV_NODE_SEQ' if using Base64.");
-        else if (state_of_writing_base64 != FileStorage_API::Uncertain)
+        അല്ലെങ്കിൽ എങ്കിൽ (state_of_writing_base64 != FileStorage_API::Uncertain)
             CV_Error(cv::Error::StsError, "function \'cvStartWriteStruct\' calls cannot be nested if using Base64.");
 
-        startWriteStruct_helper(key, struct_flags, "binary");
+        startWriteStruct_helper(താക്കോൽ, struct_flags, "binary");
 
-        if (state_of_writing_base64 != FileStorage_API::Uncertain)
+        എങ്കിൽ (state_of_writing_base64 != FileStorage_API::Uncertain)
             switch_to_Base64_state(FileStorage_API::Uncertain);
         switch_to_Base64_state(FileStorage_API::InUse);
-    } else {
+    } അല്ലെങ്കിൽ {
         /* Won't output Base64 data */
-        if (state_of_writing_base64 == FileStorage_API::InUse)
+        എങ്കിൽ (state_of_writing_base64 == FileStorage_API::InUse)
             CV_Error(cv::Error::StsError, "At the end of the output Base64, `cvEndWriteStruct` is needed.");
 
-        startWriteStruct_helper(key, struct_flags, type_name);
+        startWriteStruct_helper(താക്കോൽ, struct_flags, type_name);
 
-        if (state_of_writing_base64 != FileStorage_API::Uncertain)
+        എങ്കിൽ (state_of_writing_base64 != FileStorage_API::Uncertain)
             switch_to_Base64_state(FileStorage_API::Uncertain);
         switch_to_Base64_state(FileStorage_API::NotUse);
     }
 }
 
-void FileStorage::Impl::writeComment(const char *comment, bool eol_comment) {
+ശൂന്യം FileStorage::Impl::writeComment(സ്ഥിരം അക്ഷരം *comment, തർക്കം eol_comment) {
     CV_Assert(write_mode);
     getEmitter().writeComment(comment, eol_comment);
 }
 
-void FileStorage::Impl::startNextStream() {
+ശൂന്യം FileStorage::Impl::startNextStream() {
     CV_Assert(write_mode);
-    if (!empty_stream) {
-        while (!write_stack.empty())
+    എങ്കിൽ (!empty_stream) {
+        ആകുമ്പോൾ (!write_അട്ടി.empty())
             endWriteStruct();
         flush();
         getEmitter().startNextStream();
-        empty_stream = true;
-        write_stack.push_back(FStructData("", FileNode::EMPTY, 0));
+        empty_stream = സത്യം;
+        write_അട്ടി.push_back(FStructData("", File_കണ്ണി::EMPTY, 0));
         bufofs = 0;
     }
 }
 
-void FileStorage::Impl::write(const String &key, int value) {
+ശൂന്യം FileStorage::Impl::ലിഖ(സ്ഥിരം String &താക്കോൽ, പൂർണ്ണസംഖ്യ value) {
     CV_Assert(write_mode);
-    getEmitter().write(key.c_str(), value);
+    getEmitter().ലിഖ(താക്കോൽ.c_str(), value);
 }
 
-void FileStorage::Impl::write(const String &key, int64_t value) {
+ശൂന്യം FileStorage::Impl::ലിഖ(സ്ഥിരം String &താക്കോൽ, int64_t value) {
     CV_Assert(write_mode);
-    getEmitter().write(key.c_str(), value);
+    getEmitter().ലിഖ(താക്കോൽ.c_str(), value);
 }
 
-void FileStorage::Impl::write(const String &key, double value) {
+ശൂന്യം FileStorage::Impl::ലിഖ(സ്ഥിരം String &താക്കോൽ, ഇരട്ട value) {
     CV_Assert(write_mode);
-    getEmitter().write(key.c_str(), value);
+    getEmitter().ലിഖ(താക്കോൽ.c_str(), value);
 }
 
-void FileStorage::Impl::write(const String &key, const String &value) {
+ശൂന്യം FileStorage::Impl::ലിഖ(സ്ഥിരം String &താക്കോൽ, സ്ഥിരം String &value) {
     CV_Assert(write_mode);
-    getEmitter().write(key.c_str(), value.c_str(), false);
+    getEmitter().ലിഖ(താക്കോൽ.c_str(), value.c_str(), അസത്യം);
 }
 
-void FileStorage::Impl::writeRawData(const std::string &dt, const void *_data, size_t len) {
+ശൂന്യം FileStorage::Impl::writeRawData(സ്ഥിരം std::string &dt, സ്ഥിരം ശൂന്യം *_data, size_t len) {
     CV_Assert(write_mode);
 
-    if (is_using_base64 || state_of_writing_base64 == FileStorage_API::Base64State::InUse) {
+    എങ്കിൽ (is_using_base64 || state_of_writing_base64 == FileStorage_API::Base64State::InUse) {
         writeRawDataBase64(_data, len, dt.c_str());
-        return;
-    } else if (state_of_writing_base64 == FileStorage_API::Base64State::Uncertain) {
+        തിരികെ;
+    } അല്ലെങ്കിൽ എങ്കിൽ (state_of_writing_base64 == FileStorage_API::Base64State::Uncertain) {
         switch_to_Base64_state(FileStorage_API::Base64State::NotUse);
     }
 
@@ -1148,400 +1148,400 @@ void FileStorage::Impl::writeRawData(const std::string &dt, const void *_data, s
     CV_Assert(len % elemSize == 0);
     len /= elemSize;
 
-    bool explicitZero = fmt == FileStorage::FORMAT_JSON;
-    const uchar *data0 = (const uchar *) _data;
-    int fmt_pairs[CV_FS_MAX_FMT_PAIRS * 2], k, fmt_pair_count;
-    char buf[256] = "";
+    തർക്കം explicitZero = fmt == FileStorage::FORMAT_JSON;
+    സ്ഥിരം uchar *data0 = (സ്ഥിരം uchar *) _data;
+    പൂർണ്ണസംഖ്യ fmt_pairs[CV_FS_MAX_FMT_PAIRS * 2], k, fmt_pair_എണ്ണം;
+    അക്ഷരം buf[256] = "";
 
-    fmt_pair_count = fs::decodeFormat(dt.c_str(), fmt_pairs, CV_FS_MAX_FMT_PAIRS);
+    fmt_pair_എണ്ണം = fs::decodeFormat(dt.c_str(), fmt_pairs, CV_FS_MAX_FMT_PAIRS);
 
-    if (!len)
-        return;
+    എങ്കിൽ (!len)
+        തിരികെ;
 
-    if (!data0)
+    എങ്കിൽ (!data0)
         CV_Error(cv::Error::StsNullPtr, "Null data pointer");
 
-    if (fmt_pair_count == 1) {
-        fmt_pairs[0] *= (int) len;
+    എങ്കിൽ (fmt_pair_എണ്ണം == 1) {
+        fmt_pairs[0] *= (പൂർണ്ണസംഖ്യ) len;
         len = 1;
     }
 
-    for (; len--; data0 += elemSize) {
-        int offset = 0;
-        for (k = 0; k < fmt_pair_count; k++) {
-            int i, count = fmt_pairs[k * 2];
-            int elem_type = fmt_pairs[k * 2 + 1];
-            int elem_size = CV_ELEM_SIZE(elem_type);
-            const char *ptr;
+    വേണ്ടി (; len--; data0 += elemSize) {
+        പൂർണ്ണസംഖ്യ offset = 0;
+        വേണ്ടി (k = 0; k < fmt_pair_എണ്ണം; k++) {
+            പൂർണ്ണസംഖ്യ i, എണ്ണം_2 = fmt_pairs[k * 2];
+            പൂർണ്ണസംഖ്യ elem_type = fmt_pairs[k * 2 + 1];
+            പൂർണ്ണസംഖ്യ elem_size = CV_ELEM_SIZE(elem_type);
+            സ്ഥിരം അക്ഷരം *ptr;
 
             offset = cvAlign(offset, elem_size);
-            const uchar *data = data0 + offset;
+            സ്ഥിരം uchar *data = data0 + offset;
 
-            for (i = 0; i < count; i++) {
-                switch (elem_type) {
-                    case CV_8U:
+            വേണ്ടി (i = 0; i < എണ്ണം_2; i++) {
+                തിരഞ്ഞെടുപ്പ് (elem_type) {
+                    അവസ്ഥ CV_8U:
                         ptr = fs::itoa(*(uchar *) data, buf, 10);
                         data++;
-                        break;
-                    case CV_Bool:
+                        നിർത്തുക;
+                    അവസ്ഥ CV_Bool:
                         ptr = fs::itoa(*(uchar *) data != 0, buf, 10);
                         data++;
-                        break;
-                    case CV_8S:
-                        ptr = fs::itoa(*(char *) data, buf, 10);
+                        നിർത്തുക;
+                    അവസ്ഥ CV_8S:
+                        ptr = fs::itoa(*(അക്ഷരം *) data, buf, 10);
                         data++;
-                        break;
-                    case CV_16U:
+                        നിർത്തുക;
+                    അവസ്ഥ CV_16U:
                         ptr = fs::itoa(*(ushort *) data, buf, 10);
-                        data += sizeof(ushort);
-                        break;
-                    case CV_16S:
+                        data += വലുപ്പം(ushort);
+                        നിർത്തുക;
+                    അവസ്ഥ CV_16S:
                         ptr = fs::itoa(*(short *) data, buf, 10);
-                        data += sizeof(short);
-                        break;
-                    case CV_32U:
-                        ptr = fs::itoa((int64_t)*(unsigned*) data, buf, 10, false);
-                        data += sizeof(unsigned);
-                        break;
-                    case CV_32S:
-                        ptr = fs::itoa(*(int *) data, buf, 10);
-                        data += sizeof(int);
-                        break;
-                    case CV_64U:
-                        ptr = fs::itoa(*(uint64_t*) data, buf, 10, false);
-                        data += sizeof(uint64_t);
-                        break;
-                    case CV_64S:
-                        ptr = fs::itoa(*(int64_t*) data, buf, 10, true);
-                        data += sizeof(int64_t);
-                        break;
-                    case CV_32F:
-                        ptr = fs::floatToString(buf, sizeof(buf), *(float *) data, false, explicitZero);
-                        data += sizeof(float);
-                        break;
-                    case CV_64F:
-                        ptr = fs::doubleToString(buf, sizeof(buf), *(double *) data, explicitZero);
-                        data += sizeof(double);
-                        break;
-                    case CV_16F:
-                        ptr = fs::floatToString(buf, sizeof(buf), (float) *(hfloat *) data, true, explicitZero);
-                        data += sizeof(hfloat);
-                        break;
-                    case CV_16BF:
-                        ptr = fs::floatToString(buf, sizeof(buf), (float) *(bfloat *) data, true, explicitZero);
-                        data += sizeof(bfloat);
-                        break;
-                    case CV_8F_E4M3FN:
-                        ptr = fs::floatToString(buf, sizeof(buf), (float) *(fp8_t *) data, true, explicitZero);
-                        data += sizeof(fp8_t);
-                        break;
-                    case CV_8F_E4M3FNUZ:
-                        ptr = fs::floatToString(buf, sizeof(buf), (float) *(fp8a_t *) data, true, explicitZero);
-                        data += sizeof(fp8a_t);
-                        break;
-                    default:
+                        data += വലുപ്പം(short);
+                        നിർത്തുക;
+                    അവസ്ഥ CV_32U:
+                        ptr = fs::itoa((int64_t)*(unsigned*) data, buf, 10, അസത്യം);
+                        data += വലുപ്പം(unsigned);
+                        നിർത്തുക;
+                    അവസ്ഥ CV_32S:
+                        ptr = fs::itoa(*(പൂർണ്ണസംഖ്യ *) data, buf, 10);
+                        data += വലുപ്പം(പൂർണ്ണസംഖ്യ);
+                        നിർത്തുക;
+                    അവസ്ഥ CV_64U:
+                        ptr = fs::itoa(*(uint64_t*) data, buf, 10, അസത്യം);
+                        data += വലുപ്പം(uint64_t);
+                        നിർത്തുക;
+                    അവസ്ഥ CV_64S:
+                        ptr = fs::itoa(*(int64_t*) data, buf, 10, സത്യം);
+                        data += വലുപ്പം(int64_t);
+                        നിർത്തുക;
+                    അവസ്ഥ CV_32F:
+                        ptr = fs::floatToString(buf, വലുപ്പം(buf), *(ദശാംശം *) data, അസത്യം, explicitZero);
+                        data += വലുപ്പം(ദശാംശം);
+                        നിർത്തുക;
+                    അവസ്ഥ CV_64F:
+                        ptr = fs::doubleToString(buf, വലുപ്പം(buf), *(ഇരട്ട *) data, explicitZero);
+                        data += വലുപ്പം(ഇരട്ട);
+                        നിർത്തുക;
+                    അവസ്ഥ CV_16F:
+                        ptr = fs::floatToString(buf, വലുപ്പം(buf), (ദശാംശം) *(hfloat *) data, സത്യം, explicitZero);
+                        data += വലുപ്പം(hfloat);
+                        നിർത്തുക;
+                    അവസ്ഥ CV_16BF:
+                        ptr = fs::floatToString(buf, വലുപ്പം(buf), (ദശാംശം) *(bfloat *) data, സത്യം, explicitZero);
+                        data += വലുപ്പം(bfloat);
+                        നിർത്തുക;
+                    അവസ്ഥ CV_8F_E4M3FN:
+                        ptr = fs::floatToString(buf, വലുപ്പം(buf), (ദശാംശം) *(fp8_t *) data, സത്യം, explicitZero);
+                        data += വലുപ്പം(fp8_t);
+                        നിർത്തുക;
+                    അവസ്ഥ CV_8F_E4M3FNUZ:
+                        ptr = fs::floatToString(buf, വലുപ്പം(buf), (ദശാംശം) *(fp8a_t *) data, സത്യം, explicitZero);
+                        data += വലുപ്പം(fp8a_t);
+                        നിർത്തുക;
+                    സ്ഥിരസ്ഥിതി:
                         CV_Error(cv::Error::StsUnsupportedFormat, "Unsupported type");
-                        return;
+                        തിരികെ;
                 }
 
                 getEmitter().writeScalar(0, ptr);
             }
 
-            offset = (int) (data - data0);
+            offset = (പൂർണ്ണസംഖ്യ) (data - data0);
         }
     }
 }
 
-void FileStorage::Impl::workaround() {
-    check_if_write_struct_is_delayed(false);
+ശൂന്യം FileStorage::Impl::workaround() {
+    check_if_write_struct_is_delayed(അസത്യം);
 
-    if (state_of_writing_base64 != FileStorage_API::Base64State::Uncertain)
+    എങ്കിൽ (state_of_writing_base64 != FileStorage_API::Base64State::Uncertain)
         switch_to_Base64_state(FileStorage_API::Base64State::Uncertain);
 }
 
-void FileStorage::Impl::switch_to_Base64_state(FileStorage_API::Base64State new_state) {
-    const char *err_unkonwn_state = "Unexpected error, unable to determine the Base64 state.";
-    const char *err_unable_to_switch = "Unexpected error, unable to switch to this state.";
+ശൂന്യം FileStorage::Impl::switch_to_Base64_state(FileStorage_API::Base64State new_state) {
+    സ്ഥിരം അക്ഷരം *err_unkonwn_state = "Unexpected error, unable to determine the Base64 state.";
+    സ്ഥിരം അക്ഷരം *err_unable_to_switch = "Unexpected error, unable to switch to this state.";
 
     /* like a finite state machine */
-    switch (state_of_writing_base64) {
-        case FileStorage_API::Base64State::Uncertain:
-            switch (new_state) {
-                case FileStorage_API::Base64State::InUse:
+    തിരഞ്ഞെടുപ്പ് (state_of_writing_base64) {
+        അവസ്ഥ FileStorage_API::Base64State::Uncertain:
+            തിരഞ്ഞെടുപ്പ് (new_state) {
+                അവസ്ഥ FileStorage_API::Base64State::InUse:
                 {
                     CV_DbgAssert(base64_writer == 0);
-                    bool can_indent = (fmt != cv::FileStorage::Mode::FORMAT_JSON);
-                    base64_writer = new base64::Base64Writer(*this, can_indent);
-                    if (!can_indent) {
-                        char *ptr = bufferPtr();
+                    തർക്കം can_indent = (fmt != cv::FileStorage::Mode::FORMAT_JSON);
+                    base64_writer = പുതിയ base64::Base64Writer(*ഇത്, can_indent);
+                    എങ്കിൽ (!can_indent) {
+                        അക്ഷരം *ptr = bufferPtr();
                         *ptr++ = '\0';
                         puts(bufferStart());
                         setBufferPtr(bufferStart());
-                        memset(bufferStart(), 0, static_cast<int>(space));
+                        memset(bufferStart(), 0, static_cast<പൂർണ്ണസംഖ്യ>(space));
                         puts("\"$base64$");
                     }
-                    break;
+                    നിർത്തുക;
                 }
-                case FileStorage_API::Base64State::Uncertain:
-                    break;
-                case FileStorage_API::Base64State::NotUse:
-                    break;
-                default:
+                അവസ്ഥ FileStorage_API::Base64State::Uncertain:
+                    നിർത്തുക;
+                അവസ്ഥ FileStorage_API::Base64State::NotUse:
+                    നിർത്തുക;
+                സ്ഥിരസ്ഥിതി:
                     CV_Error(cv::Error::StsError, err_unkonwn_state);
-                    break;
+                    നിർത്തുക;
             }
-            break;
-        case FileStorage_API::Base64State::InUse:
-            switch (new_state) {
-                case FileStorage_API::Base64State::InUse:
-                case FileStorage_API::Base64State::NotUse:
+            നിർത്തുക;
+        അവസ്ഥ FileStorage_API::Base64State::InUse:
+            തിരഞ്ഞെടുപ്പ് (new_state) {
+                അവസ്ഥ FileStorage_API::Base64State::InUse:
+                അവസ്ഥ FileStorage_API::Base64State::NotUse:
                     CV_Error(cv::Error::StsError, err_unable_to_switch);
-                    break;
-                case FileStorage_API::Base64State::Uncertain:
+                    നിർത്തുക;
+                അവസ്ഥ FileStorage_API::Base64State::Uncertain:
                     delete base64_writer;
                     base64_writer = 0;
-                    if ( fmt == cv::FileStorage::FORMAT_JSON )
+                    എങ്കിൽ ( fmt == cv::FileStorage::FORMAT_JSON )
                     {
                         puts("\"");
                         setBufferPtr(bufferStart());
                         flush();
-                        memset(bufferStart(), 0, static_cast<int>(space) );
+                        memset(bufferStart(), 0, static_cast<പൂർണ്ണസംഖ്യ>(space) );
                         setBufferPtr(bufferStart());
                     }
-                    break;
-                default:
+                    നിർത്തുക;
+                സ്ഥിരസ്ഥിതി:
                     CV_Error(cv::Error::StsError, err_unkonwn_state);
-                    break;
+                    നിർത്തുക;
             }
-            break;
-        case FileStorage_API::Base64State::NotUse:
-            switch (new_state) {
-                case FileStorage_API::Base64State::InUse:
-                case FileStorage_API::Base64State::NotUse:
+            നിർത്തുക;
+        അവസ്ഥ FileStorage_API::Base64State::NotUse:
+            തിരഞ്ഞെടുപ്പ് (new_state) {
+                അവസ്ഥ FileStorage_API::Base64State::InUse:
+                അവസ്ഥ FileStorage_API::Base64State::NotUse:
                     CV_Error(cv::Error::StsError, err_unable_to_switch);
-                    break;
-                case FileStorage_API::Base64State::Uncertain:
-                    break;
-                default:
+                    നിർത്തുക;
+                അവസ്ഥ FileStorage_API::Base64State::Uncertain:
+                    നിർത്തുക;
+                സ്ഥിരസ്ഥിതി:
                     CV_Error(cv::Error::StsError, err_unkonwn_state);
-                    break;
+                    നിർത്തുക;
             }
-            break;
-        default:
+            നിർത്തുക;
+        സ്ഥിരസ്ഥിതി:
             CV_Error(cv::Error::StsError, err_unkonwn_state);
-            break;
+            നിർത്തുക;
     }
 
     state_of_writing_base64 = new_state;
 }
 
-void FileStorage::Impl::make_write_struct_delayed(const char *key, int struct_flags, const char *type_name) {
-    CV_Assert(is_write_struct_delayed == false);
-    CV_DbgAssert(delayed_struct_key == nullptr);
+ശൂന്യം FileStorage::Impl::make_write_struct_delayed(സ്ഥിരം അക്ഷരം *താക്കോൽ, പൂർണ്ണസംഖ്യ struct_flags, സ്ഥിരം അക്ഷരം *type_name) {
+    CV_Assert(is_write_struct_delayed == അസത്യം);
+    CV_DbgAssert(delayed_struct_താക്കോൽ == nullptr);
     CV_DbgAssert(delayed_struct_flags == 0);
     CV_DbgAssert(delayed_type_name == nullptr);
 
     delayed_struct_flags = struct_flags;
 
-    if (key != nullptr) {
-        delayed_struct_key = new char[strlen(key) + 1U];
-        strcpy(delayed_struct_key, key);
+    എങ്കിൽ (താക്കോൽ != nullptr) {
+        delayed_struct_താക്കോൽ = പുതിയ അക്ഷരം[strlen(താക്കോൽ) + 1U];
+        strcpy(delayed_struct_താക്കോൽ, താക്കോൽ);
     }
 
-    if (type_name != nullptr) {
-        delayed_type_name = new char[strlen(type_name) + 1U];
+    എങ്കിൽ (type_name != nullptr) {
+        delayed_type_name = പുതിയ അക്ഷരം[strlen(type_name) + 1U];
         strcpy(delayed_type_name, type_name);
     }
 
-    is_write_struct_delayed = true;
+    is_write_struct_delayed = സത്യം;
 }
 
-void FileStorage::Impl::check_if_write_struct_is_delayed(bool change_type_to_base64) {
-    if (is_write_struct_delayed) {
+ശൂന്യം FileStorage::Impl::check_if_write_struct_is_delayed(തർക്കം change_type_to_base64) {
+    എങ്കിൽ (is_write_struct_delayed) {
         /* save data to prevent recursive call errors */
-        std::string struct_key;
+        std::string struct_താക്കോൽ;
         std::string type_name;
-        int struct_flags = delayed_struct_flags;
+        പൂർണ്ണസംഖ്യ struct_flags = delayed_struct_flags;
 
-        if (delayed_struct_key != nullptr && *delayed_struct_key != '\0') {
-            struct_key.assign(delayed_struct_key);
+        എങ്കിൽ (delayed_struct_താക്കോൽ != nullptr && *delayed_struct_താക്കോൽ != '\0') {
+            struct_താക്കോൽ.assign(delayed_struct_താക്കോൽ);
         }
-        if (delayed_type_name != nullptr && *delayed_type_name != '\0') {
+        എങ്കിൽ (delayed_type_name != nullptr && *delayed_type_name != '\0') {
             type_name.assign(delayed_type_name);
         }
 
         /* reset */
-        delete[] delayed_struct_key;
+        delete[] delayed_struct_താക്കോൽ;
         delete[] delayed_type_name;
-        delayed_struct_key = nullptr;
+        delayed_struct_താക്കോൽ = nullptr;
         delayed_struct_flags = 0;
         delayed_type_name = nullptr;
 
-        is_write_struct_delayed = false;
+        is_write_struct_delayed = അസത്യം;
 
         /* call */
-        if (change_type_to_base64) {
-            startWriteStruct_helper(struct_key.c_str(), struct_flags, "binary");
-            if (state_of_writing_base64 != FileStorage_API::Uncertain)
+        എങ്കിൽ (change_type_to_base64) {
+            startWriteStruct_helper(struct_താക്കോൽ.c_str(), struct_flags, "binary");
+            എങ്കിൽ (state_of_writing_base64 != FileStorage_API::Uncertain)
                 switch_to_Base64_state(FileStorage_API::Uncertain);
             switch_to_Base64_state(FileStorage_API::InUse);
-        } else {
-            startWriteStruct_helper(struct_key.c_str(), struct_flags, type_name.c_str());
-            if (state_of_writing_base64 != FileStorage_API::Uncertain)
+        } അല്ലെങ്കിൽ {
+            startWriteStruct_helper(struct_താക്കോൽ.c_str(), struct_flags, type_name.c_str());
+            എങ്കിൽ (state_of_writing_base64 != FileStorage_API::Uncertain)
                 switch_to_Base64_state(FileStorage_API::Uncertain);
             switch_to_Base64_state(FileStorage_API::NotUse);
         }
     }
 }
 
-void FileStorage::Impl::writeRawDataBase64(const void *_data, size_t len, const char *dt) {
+ശൂന്യം FileStorage::Impl::writeRawDataBase64(സ്ഥിരം ശൂന്യം *_data, size_t len, സ്ഥിരം അക്ഷരം *dt) {
     CV_Assert(write_mode);
 
-    check_if_write_struct_is_delayed(true);
+    check_if_write_struct_is_delayed(സത്യം);
 
-    if (state_of_writing_base64 == FileStorage_API::Base64State::Uncertain) {
+    എങ്കിൽ (state_of_writing_base64 == FileStorage_API::Base64State::Uncertain) {
         switch_to_Base64_state(FileStorage_API::Base64State::InUse);
-    } else if (state_of_writing_base64 != FileStorage_API::Base64State::InUse) {
+    } അല്ലെങ്കിൽ എങ്കിൽ (state_of_writing_base64 != FileStorage_API::Base64State::InUse) {
         CV_Error(cv::Error::StsError, "Base64 should not be used at present.");
     }
 
-    base64_writer->write(_data, len, dt);
+    base64_writer->ലിഖ(_data, len, dt);
 }
 
-FileNode FileStorage::Impl::getFirstTopLevelNode() const {
-    return roots.empty() ? FileNode() : roots[0];
+File_കണ്ണി FileStorage::Impl::get_First_മുകൾ_Level_കണ്ണി() സ്ഥിരം {
+    തിരികെ roots.empty() ? File_കണ്ണി() : roots[0];
 }
 
-FileNode FileStorage::Impl::root(int streamIdx) const {
-    return streamIdx >= 0 && streamIdx < (int) roots.size() ? roots[streamIdx] : FileNode();
+File_കണ്ണി FileStorage::Impl::വേര്(പൂർണ്ണസംഖ്യ streamIdx) സ്ഥിരം {
+    തിരികെ streamIdx >= 0 && streamIdx < (പൂർണ്ണസംഖ്യ) roots.size() ? roots[streamIdx] : File_കണ്ണി();
 }
 
-FileNode FileStorage::Impl::operator[](const String &nodename) const {
-    return this->operator[](nodename.c_str());
+File_കണ്ണി FileStorage::Impl::operator[](സ്ഥിരം String &nodename) സ്ഥിരം {
+    തിരികെ ഇത്->operator[](nodename.c_str());
 }
 
-FileNode FileStorage::Impl::operator[](const char * /*nodename*/) const {
-    return FileNode();
+File_കണ്ണി FileStorage::Impl::operator[](സ്ഥിരം അക്ഷരം * /*nodename*/) സ്ഥിരം {
+    തിരികെ File_കണ്ണി();
 }
 
-int FileStorage::Impl::getFormat() const { return fmt; }
+പൂർണ്ണസംഖ്യ FileStorage::Impl::getFormat() സ്ഥിരം { തിരികെ fmt; }
 
-char *FileStorage::Impl::bufferPtr() const { return (char *) (&buffer[0] + bufofs); }
+അക്ഷരം *FileStorage::Impl::bufferPtr() സ്ഥിരം { തിരികെ (അക്ഷരം *) (&buffer[0] + bufofs); }
 
-char *FileStorage::Impl::bufferStart() const { return (char *) &buffer[0]; }
+അക്ഷരം *FileStorage::Impl::bufferStart() സ്ഥിരം { തിരികെ (അക്ഷരം *) &buffer[0]; }
 
-char *FileStorage::Impl::bufferEnd() const { return (char *) (&buffer[0] + buffer.size()); }
+അക്ഷരം *FileStorage::Impl::bufferEnd() സ്ഥിരം { തിരികെ (അക്ഷരം *) (&buffer[0] + buffer.size()); }
 
-void FileStorage::Impl::setBufferPtr(char *ptr) {
-    char *bufferstart = bufferStart();
+ശൂന്യം FileStorage::Impl::setBufferPtr(അക്ഷരം *ptr) {
+    അക്ഷരം *bufferstart = bufferStart();
     CV_Assert(ptr >= bufferstart && ptr <= bufferEnd());
     bufofs = ptr - bufferstart;
 }
 
-int FileStorage::Impl::wrapMargin() const { return wrap_margin; }
+പൂർണ്ണസംഖ്യ FileStorage::Impl::wrapMargin() സ്ഥിരം { തിരികെ wrap_margin; }
 
 FStructData &FileStorage::Impl::getCurrentStruct() {
-    CV_Assert(!write_stack.empty());
-    return write_stack.back();
+    CV_Assert(!write_അട്ടി.empty());
+    തിരികെ write_അട്ടി.back();
 }
 
-void FileStorage::Impl::setNonEmpty() {
-    empty_stream = false;
+ശൂന്യം FileStorage::Impl::setNonEmpty() {
+    empty_stream = അസത്യം;
 }
 
-void FileStorage::Impl::processSpecialDouble(char *buf, double *value, char **endptr) {
-    FileStorage_API *fs = this;
-    char c = buf[0];
-    int inf_hi = 0x7ff00000;
+ശൂന്യം FileStorage::Impl::processSpecialDouble(അക്ഷരം *buf, ഇരട്ട *value, അക്ഷരം **endptr) {
+    FileStorage_API *fs = ഇത്;
+    അക്ഷരം c = buf[0];
+    പൂർണ്ണസംഖ്യ inf_hi = 0x7ff00000;
 
-    if (c == '-' || c == '+') {
+    എങ്കിൽ (c == '-' || c == '+') {
         inf_hi = c == '-' ? 0xfff00000 : 0x7ff00000;
         c = *++buf;
     }
 
-    if (c != '.')
+    എങ്കിൽ (c != '.')
         CV_PARSE_ERROR_CPP("Bad format of floating-point constant");
 
     Cv64suf v;
     v.f = 0.;
-    if (toupper(buf[1]) == 'I' && toupper(buf[2]) == 'N' && toupper(buf[3]) == 'F')
+    എങ്കിൽ (toupper(buf[1]) == 'I' && toupper(buf[2]) == 'N' && toupper(buf[3]) == 'F')
         v.u = (uint64) inf_hi << 32;
-    else if (toupper(buf[1]) == 'N' && toupper(buf[2]) == 'A' && toupper(buf[3]) == 'N')
+    അല്ലെങ്കിൽ എങ്കിൽ (toupper(buf[1]) == 'N' && toupper(buf[2]) == 'A' && toupper(buf[3]) == 'N')
         v.u = (uint64) -1;
-    else
+    അല്ലെങ്കിൽ
         CV_PARSE_ERROR_CPP("Bad format of floating-point constant");
     *value = v.f;
     *endptr = buf + 4;
 }
 
-double FileStorage::Impl::strtod(char *ptr, char **endptr) {
-    double fval = ::strtod(ptr, endptr);
-    if (**endptr == '.') {
-        char *dot_pos = *endptr;
+ഇരട്ട FileStorage::Impl::strtod(അക്ഷരം *ptr, അക്ഷരം **endptr) {
+    ഇരട്ട fval = ::strtod(ptr, endptr);
+    എങ്കിൽ (**endptr == '.') {
+        അക്ഷരം *dot_pos = *endptr;
         *dot_pos = ',';
-        double fval2 = ::strtod(ptr, endptr);
+        ഇരട്ട fval2 = ::strtod(ptr, endptr);
         *dot_pos = '.';
-        if (*endptr > dot_pos)
+        എങ്കിൽ (*endptr > dot_pos)
             fval = fval2;
-        else
+        അല്ലെങ്കിൽ
             *endptr = dot_pos;
     }
 
-    if (*endptr == ptr || cv_isalpha(**endptr))
+    എങ്കിൽ (*endptr == ptr || cv_isalpha(**endptr))
         processSpecialDouble(ptr, &fval, endptr);
 
-    return fval;
+    തിരികെ fval;
 }
 
-void FileStorage::Impl::convertToCollection(int type, FileNode &node) {
-    CV_Assert(type == FileNode::SEQ || type == FileNode::MAP);
+ശൂന്യം FileStorage::Impl::convertToCollection(പൂർണ്ണസംഖ്യ type, File_കണ്ണി &കണ്ണി) {
+    CV_Assert(type == File_കണ്ണി::SEQ || type == File_കണ്ണി::MAP);
 
-    int node_type = node.type();
-    if (node_type == type)
-        return;
+    പൂർണ്ണസംഖ്യ കണ്ണി_type = കണ്ണി.type();
+    എങ്കിൽ (കണ്ണി_type == type)
+        തിരികെ;
 
-    bool named = node.isNamed();
-    uchar *ptr = node.ptr() + 1 + (named ? 4 : 0);
+    തർക്കം named = കണ്ണി.isNamed();
+    uchar *ptr = കണ്ണി.ptr() + 1 + (named ? 4 : 0);
 
     int64_t ival = 0;
-    double fval = 0;
+    ഇരട്ട fval = 0;
     std::string sval;
-    bool add_first_scalar = false;
+    തർക്കം add_first_scalar = അസത്യം;
 
-    if (node_type != FileNode::NONE) {
+    എങ്കിൽ (കണ്ണി_type != File_കണ്ണി::NONE) {
         // scalar nodes can only be converted to sequences, e.g. in XML:
         // <a>5[parser_position]... => create 5 with name "a"
         // <a>5 6[parser_position]... => 5 is converted to [5] and then 6 is added to it
         //
         // otherwise we don't know where to get the element names from
-        CV_Assert(type == FileNode::SEQ);
-        if (node_type == FileNode::INT) {
+        CV_Assert(type == File_കണ്ണി::SEQ);
+        എങ്കിൽ (കണ്ണി_type == File_കണ്ണി::INT) {
             ival = readLong(ptr);
-            add_first_scalar = true;
-        } else if (node_type == FileNode::REAL) {
+            add_first_scalar = സത്യം;
+        } അല്ലെങ്കിൽ എങ്കിൽ (കണ്ണി_type == File_കണ്ണി::REAL) {
             fval = readReal(ptr);
-            add_first_scalar = true;
-        } else if (node_type == FileNode::STRING) {
-            sval = std::string(node);
-            add_first_scalar = true;
-        } else
-            CV_Error_(Error::StsError, ("The node of type %d cannot be converted to collection", node_type));
+            add_first_scalar = സത്യം;
+        } അല്ലെങ്കിൽ എങ്കിൽ (കണ്ണി_type == File_കണ്ണി::STRING) {
+            sval = std::string(കണ്ണി);
+            add_first_scalar = സത്യം;
+        } അല്ലെങ്കിൽ
+            CV_Error_(Error::StsError, ("The node of type %d cannot be converted to collection", കണ്ണി_type));
     }
 
-    ptr = reserveNodeSpace(node, 1 + (named ? 4 : 0) + 4 + 4);
-    *ptr++ = (uchar) (type | (named ? FileNode::NAMED : 0));
+    ptr = reserve_കണ്ണി_Space(കണ്ണി, 1 + (named ? 4 : 0) + 4 + 4);
+    *ptr++ = (uchar) (type | (named ? File_കണ്ണി::NAMED : 0));
     // name has been copied automatically
-    if (named)
+    എങ്കിൽ (named)
         ptr += 4;
     // set raw_size(collection)==4, nelems(collection)==1
     writeInt(ptr, 4);
     writeInt(ptr + 4, 0);
 
-    if (add_first_scalar)
-        addNode(node, std::string(), node_type,
-                node_type == FileNode::INT ? (const void *) &ival :
-                node_type == FileNode::REAL ? (const void *) &fval :
-                node_type == FileNode::STRING ? (const void *) sval.c_str() : 0,
+    എങ്കിൽ (add_first_scalar)
+        add_കണ്ണി(കണ്ണി, std::string(), കണ്ണി_type,
+                കണ്ണി_type == File_കണ്ണി::INT ? (സ്ഥിരം ശൂന്യം *) &ival :
+                കണ്ണി_type == File_കണ്ണി::REAL ? (സ്ഥിരം ശൂന്യം *) &fval :
+                കണ്ണി_type == File_കണ്ണി::STRING ? (സ്ഥിരം ശൂന്യം *) sval.c_str() : 0,
                 -1);
 }
 
@@ -1552,15 +1552,15 @@ void FileStorage::Impl::convertToCollection(int type, FileNode &node) {
 //    a new block of sufficient size is allocated and the FileNode is placed in the beginning of it.
 // The case (a) can be used to allocate the very first node by setting blockIdx == ofs == 0.
 // In the case (b) the existing tag and the name are copied automatically.
-uchar *FileStorage::Impl::reserveNodeSpace(FileNode &node, size_t sz) {
-    bool shrinkBlock = false;
+uchar *FileStorage::Impl::reserve_കണ്ണി_Space(File_കണ്ണി &കണ്ണി, size_t sz) {
+    തർക്കം shrinkBlock = അസത്യം;
     size_t shrinkBlockIdx = 0, shrinkSize = 0;
 
     uchar *ptr = 0, *blockEnd = 0;
 
-    if (!fs_data_ptrs.empty()) {
-        size_t blockIdx = node.blockIdx;
-        size_t ofs = node.ofs;
+    എങ്കിൽ (!fs_data_ptrs.empty()) {
+        size_t blockIdx = കണ്ണി.blockIdx;
+        size_t ofs = കണ്ണി.ofs;
         CV_Assert(blockIdx == fs_data_ptrs.size() - 1);
         CV_Assert(ofs <= fs_data_blksz[blockIdx]);
         CV_Assert(freeSpaceOfs <= fs_data_blksz[blockIdx]);
@@ -1570,12 +1570,12 @@ uchar *FileStorage::Impl::reserveNodeSpace(FileNode &node, size_t sz) {
         blockEnd = fs_data_ptrs[blockIdx] + fs_data_blksz[blockIdx];
 
         CV_Assert(ptr >= fs_data_ptrs[blockIdx] && ptr <= blockEnd);
-        if (ptr + sz <= blockEnd) {
+        എങ്കിൽ (ptr + sz <= blockEnd) {
             freeSpaceOfs = ofs + sz;
-            return ptr;
+            തിരികെ ptr;
         }
 
-        if (ofs ==
+        എങ്കിൽ (ofs ==
             0)  // FileNode is a first component of this block. Resize current block instead of allocation of new one.
         {
             fs_data[blockIdx]->resize(sz);
@@ -1583,10 +1583,10 @@ uchar *FileStorage::Impl::reserveNodeSpace(FileNode &node, size_t sz) {
             fs_data_ptrs[blockIdx] = ptr;
             fs_data_blksz[blockIdx] = sz;
             freeSpaceOfs = sz;
-            return ptr;
+            തിരികെ ptr;
         }
 
-        shrinkBlock = true;
+        shrinkBlock = സത്യം;
         shrinkBlockIdx = blockIdx;
         shrinkSize = ofs;
     }
@@ -1597,13 +1597,13 @@ uchar *FileStorage::Impl::reserveNodeSpace(FileNode &node, size_t sz) {
     uchar *new_ptr = &pv->at(0);
     fs_data_ptrs.push_back(new_ptr);
     fs_data_blksz.push_back(blockSize);
-    node.blockIdx = fs_data_ptrs.size() - 1;
-    node.ofs = 0;
+    കണ്ണി.blockIdx = fs_data_ptrs.size() - 1;
+    കണ്ണി.ofs = 0;
     freeSpaceOfs = sz;
 
-    if (ptr && ptr + 5 <= blockEnd) {
+    എങ്കിൽ (ptr && ptr + 5 <= blockEnd) {
         new_ptr[0] = ptr[0];
-        if (ptr[0] & FileNode::NAMED) {
+        എങ്കിൽ (ptr[0] & File_കണ്ണി::NAMED) {
             new_ptr[1] = ptr[1];
             new_ptr[2] = ptr[2];
             new_ptr[3] = ptr[3];
@@ -1611,38 +1611,38 @@ uchar *FileStorage::Impl::reserveNodeSpace(FileNode &node, size_t sz) {
         }
     }
 
-    if (shrinkBlock) {
+    എങ്കിൽ (shrinkBlock) {
         fs_data[shrinkBlockIdx]->resize(shrinkSize);
         fs_data_blksz[shrinkBlockIdx] = shrinkSize;
     }
 
-    return new_ptr;
+    തിരികെ new_ptr;
 }
 
-unsigned FileStorage::Impl::getStringOfs(const std::string &key) const {
-    str_hash_t::const_iterator it = str_hash.find(key);
-    return it != str_hash.end() ? it->second : 0;
+unsigned FileStorage::Impl::getStringOfs(സ്ഥിരം std::string &താക്കോൽ) സ്ഥിരം {
+    str_hash_t::const_iterator it = str_hash.find(താക്കോൽ);
+    തിരികെ it != str_hash.end() ? it->second : 0;
 }
 
-FileNode FileStorage::Impl::addNode(FileNode &collection, const std::string &key,
-                                    int elem_type, const void *value, int len) {
-    FileStorage_API *fs = this;
-    bool noname = key.empty() || (fmt == FileStorage::FORMAT_XML && strcmp(key.c_str(), "_") == 0);
-    convertToCollection(noname ? FileNode::SEQ : FileNode::MAP, collection);
+File_കണ്ണി FileStorage::Impl::add_കണ്ണി(File_കണ്ണി &collection, സ്ഥിരം std::string &താക്കോൽ,
+                                    പൂർണ്ണസംഖ്യ elem_type, സ്ഥിരം ശൂന്യം *value, പൂർണ്ണസംഖ്യ len) {
+    FileStorage_API *fs = ഇത്;
+    തർക്കം noname = താക്കോൽ.empty() || (fmt == FileStorage::FORMAT_XML && strcmp(താക്കോൽ.c_str(), "_") == 0);
+    convertToCollection(noname ? File_കണ്ണി::SEQ : File_കണ്ണി::MAP, collection);
 
-    bool isseq = collection.empty() ? false : collection.isSeq();
-    if (noname != isseq)
+    തർക്കം isseq = collection.empty() ? അസത്യം : collection.isSeq();
+    എങ്കിൽ (noname != isseq)
         CV_PARSE_ERROR_CPP(noname ? "Map element should have a name" :
                            "Sequence element should not have name (use <_></_>)");
     unsigned strofs = 0;
-    if (!noname) {
-        strofs = getStringOfs(key);
-        if (!strofs) {
+    എങ്കിൽ (!noname) {
+        strofs = getStringOfs(താക്കോൽ);
+        എങ്കിൽ (!strofs) {
             strofs = (unsigned) str_hash_data.size();
-            size_t keysize = key.size() + 1;
+            size_t keysize = താക്കോൽ.size() + 1;
             str_hash_data.resize(strofs + keysize);
-            memcpy(&str_hash_data[0] + strofs, &key[0], keysize);
-            str_hash.insert(std::make_pair(key, strofs));
+            memcpy(&str_hash_data[0] + strofs, &താക്കോൽ[0], keysize);
+            str_hash.insert(std::make_pair(താക്കോൽ, strofs));
         }
     }
 
@@ -1650,63 +1650,63 @@ FileNode FileStorage::Impl::addNode(FileNode &collection, const std::string &key
 
     size_t blockIdx = fs_data_ptrs.size() - 1;
     size_t ofs = freeSpaceOfs;
-    FileNode node(fs_ext, blockIdx, ofs);
+    File_കണ്ണി കണ്ണി(fs_ext, blockIdx, ofs);
 
     size_t sz0 = 1 + (noname ? 0 : 4) + 8;
-    uchar *ptr = reserveNodeSpace(node, sz0);
+    uchar *ptr = reserve_കണ്ണി_Space(കണ്ണി, sz0);
 
-    *ptr++ = (uchar) (elem_type | (noname ? 0 : FileNode::NAMED));
-    if (elem_type == FileNode::NONE)
+    *ptr++ = (uchar) (elem_type | (noname ? 0 : File_കണ്ണി::NAMED));
+    എങ്കിൽ (elem_type == File_കണ്ണി::NONE)
         freeSpaceOfs -= 8;
 
-    if (!noname) {
-        writeInt(ptr, (int) strofs);
+    എങ്കിൽ (!noname) {
+        writeInt(ptr, (പൂർണ്ണസംഖ്യ) strofs);
         ptr += 4;
     }
 
-    if (elem_type == FileNode::SEQ || elem_type == FileNode::MAP) {
+    എങ്കിൽ (elem_type == File_കണ്ണി::SEQ || elem_type == File_കണ്ണി::MAP) {
         writeInt(ptr, 4);
         writeInt(ptr, 0);
     }
 
-    if (value)
-        node.setValue(elem_type, value, len);
+    എങ്കിൽ (value)
+        കണ്ണി.set_മൂല്യം(elem_type, value, len);
 
-    if (collection.isNamed())
+    എങ്കിൽ (collection.isNamed())
         cp += 4;
-    int nelems = readInt(cp + 5);
+    പൂർണ്ണസംഖ്യ nelems = readInt(cp + 5);
     writeInt(cp + 5, nelems + 1);
 
-    return node;
+    തിരികെ കണ്ണി;
 }
 
-void FileStorage::Impl::finalizeCollection(FileNode &collection) {
-    if (!collection.isSeq() && !collection.isMap())
-        return;
+ശൂന്യം FileStorage::Impl::finalizeCollection(File_കണ്ണി &collection) {
+    എങ്കിൽ (!collection.isSeq() && !collection.isMap())
+        തിരികെ;
     uchar *ptr0 = collection.ptr(), *ptr = ptr0 + 1;
-    if (*ptr0 & FileNode::NAMED)
+    എങ്കിൽ (*ptr0 & File_കണ്ണി::NAMED)
         ptr += 4;
     size_t blockIdx = collection.blockIdx;
     size_t ofs = collection.ofs + (size_t) (ptr + 8 - ptr0);
     size_t rawSize = 4;
     unsigned sz = (unsigned) readInt(ptr + 4);
-    if (sz > 0) {
+    എങ്കിൽ (sz > 0) {
         size_t lastBlockIdx = fs_data_ptrs.size() - 1;
 
-        for (; blockIdx < lastBlockIdx; blockIdx++) {
+        വേണ്ടി (; blockIdx < lastBlockIdx; blockIdx++) {
             rawSize += fs_data_blksz[blockIdx] - ofs;
             ofs = 0;
         }
     }
     rawSize += freeSpaceOfs - ofs;
-    writeInt(ptr, (int) rawSize);
+    writeInt(ptr, (പൂർണ്ണസംഖ്യ) rawSize);
 }
 
-void FileStorage::Impl::normalizeNodeOfs(size_t &blockIdx, size_t &ofs) const {
-    while (ofs >= fs_data_blksz[blockIdx]) {
-        if (blockIdx == fs_data_blksz.size() - 1) {
+ശൂന്യം FileStorage::Impl::normalize_കണ്ണി_Ofs(size_t &blockIdx, size_t &ofs) സ്ഥിരം {
+    ആകുമ്പോൾ (ofs >= fs_data_blksz[blockIdx]) {
+        എങ്കിൽ (blockIdx == fs_data_blksz.size() - 1) {
             CV_Assert(ofs == fs_data_blksz[blockIdx]);
-            break;
+            നിർത്തുക;
         }
         ofs -= fs_data_blksz[blockIdx];
         blockIdx++;
@@ -1714,11 +1714,11 @@ void FileStorage::Impl::normalizeNodeOfs(size_t &blockIdx, size_t &ofs) const {
 }
 
 FileStorage::Impl::Base64State FileStorage::Impl::get_state_of_writing_base64() {
-    return state_of_writing_base64;
+    തിരികെ state_of_writing_base64;
 }
 
-int FileStorage::Impl::get_space() {
-    return space;
+പൂർണ്ണസംഖ്യ FileStorage::Impl::get_space() {
+    തിരികെ space;
 }
 
 
@@ -1727,10 +1727,10 @@ FileStorage::Impl::Base64Decoder::Base64Decoder() {
     ptr = 0;
     indent = 0;
     totalchars = 0;
-    eos = true;
+    eos = സത്യം;
 }
 
-void FileStorage::Impl::Base64Decoder::init(const Ptr<FileStorageParser> &_parser, char *_ptr, int _indent) {
+ശൂന്യം FileStorage::Impl::Base64Decoder::init(സ്ഥിരം Ptr<FileStorageParser> &_parser, അക്ഷരം *_ptr, പൂർണ്ണസംഖ്യ _indent) {
     parser_do_not_use_direct_dereference = _parser;
     ptr = _ptr;
     indent = _indent;
@@ -1738,11 +1738,11 @@ void FileStorage::Impl::Base64Decoder::init(const Ptr<FileStorageParser> &_parse
     decoded.clear();
     ofs = 0;
     totalchars = 0;
-    eos = false;
+    eos = അസത്യം;
 }
 
-bool FileStorage::Impl::Base64Decoder::readMore(int needed) {
-    static const uchar base64tab[] =
+തർക്കം FileStorage::Impl::Base64Decoder::readMore(പൂർണ്ണസംഖ്യ needed) {
+    സ്ഥിതം സ്ഥിരം uchar base64tab[] =
             {
                     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
                     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -1762,43 +1762,43 @@ bool FileStorage::Impl::Base64Decoder::readMore(int needed) {
                     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
             };
 
-    if (eos)
-        return false;
+    എങ്കിൽ (eos)
+        തിരികെ അസത്യം;
 
     size_t sz = decoded.size();
     CV_Assert(ofs <= sz);
     sz -= ofs;
-    for (size_t i = 0; i < sz; i++)
+    വേണ്ടി (size_t i = 0; i < sz; i++)
         decoded[i] = decoded[ofs + i];
 
     decoded.resize(sz);
     ofs = 0;
 
     CV_Assert(ptr);
-    char *beg = 0, *end = 0;
-    bool ok = getParser().getBase64Row(ptr, indent, beg, end);
+    അക്ഷരം *beg = 0, *end = 0;
+    തർക്കം ok = getParser().getBase64Row(ptr, indent, beg, end);
     ptr = end;
     std::copy(beg, end, std::back_inserter(encoded));
     totalchars += end - beg;
 
-    if (!ok || beg == end) {
+    എങ്കിൽ (!ok || beg == end) {
         // in the end of base64 sequence pad it with '=' characters so that
         // its total length is multiple of
-        eos = true;
+        eos = സത്യം;
         size_t tc = totalchars;
-        for (; tc % 4 != 0; tc++)
+        വേണ്ടി (; tc % 4 != 0; tc++)
             encoded.push_back('=');
     }
 
-    int i = 0, j, n = (int) encoded.size();
-    if (n > 0) {
-        const uchar *tab = base64tab;
-        char *src = &encoded[0];
+    പൂർണ്ണസംഖ്യ i = 0, j, n = (പൂർണ്ണസംഖ്യ) encoded.size();
+    എങ്കിൽ (n > 0) {
+        സ്ഥിരം uchar *tab = base64tab;
+        അക്ഷരം *src = &encoded[0];
 
-        for (; i <= n - 4; i += 4) {
+        വേണ്ടി (; i <= n - 4; i += 4) {
             // dddddd cccccc bbbbbb aaaaaa => ddddddcc ccccbbbb bbaaaaaa
-            uchar d = tab[(int) (uchar) src[i]], c = tab[(int) (uchar) src[i + 1]];
-            uchar b = tab[(int) (uchar) src[i + 2]], a = tab[(int) (uchar) src[i + 3]];
+            uchar d = tab[(പൂർണ്ണസംഖ്യ) (uchar) src[i]], c = tab[(പൂർണ്ണസംഖ്യ) (uchar) src[i + 1]];
+            uchar b = tab[(പൂർണ്ണസംഖ്യ) (uchar) src[i + 2]], a = tab[(പൂർണ്ണസംഖ്യ) (uchar) src[i + 3]];
 
             decoded.push_back((uchar) ((d << 2) | (c >> 4)));
             decoded.push_back((uchar) ((c << 4) | (b >> 2)));
@@ -1806,218 +1806,218 @@ bool FileStorage::Impl::Base64Decoder::readMore(int needed) {
         }
     }
 
-    if (i > 0 && encoded[i - 1] == '=') {
-        if (i > 1 && encoded[i - 2] == '=' && !decoded.empty())
+    എങ്കിൽ (i > 0 && encoded[i - 1] == '=') {
+        എങ്കിൽ (i > 1 && encoded[i - 2] == '=' && !decoded.empty())
             decoded.pop_back();
-        if (!decoded.empty())
+        എങ്കിൽ (!decoded.empty())
             decoded.pop_back();
     }
 
     n -= i;
-    for (j = 0; j < n; j++)
+    വേണ്ടി (j = 0; j < n; j++)
         encoded[j] = encoded[i + j];
     encoded.resize(n);
 
-    return (int) decoded.size() >= needed;
+    തിരികെ (പൂർണ്ണസംഖ്യ) decoded.size() >= needed;
 }
 
 uchar FileStorage::Impl::Base64Decoder::getUInt8() {
     size_t sz = decoded.size();
-    if (ofs >= sz && !readMore(1))
-        return (uchar) 0;
-    return decoded[ofs++];
+    എങ്കിൽ (ofs >= sz && !readMore(1))
+        തിരികെ (uchar) 0;
+    തിരികെ decoded[ofs++];
 }
 
 ushort FileStorage::Impl::Base64Decoder::getUInt16() {
     size_t sz = decoded.size();
-    if (ofs + 2 > sz && !readMore(2))
-        return (ushort) 0;
+    എങ്കിൽ (ofs + 2 > sz && !readMore(2))
+        തിരികെ (ushort) 0;
     ushort val = (decoded[ofs] + (decoded[ofs + 1] << 8));
     ofs += 2;
-    return val;
+    തിരികെ val;
 }
 
-int FileStorage::Impl::Base64Decoder::getInt32() {
+പൂർണ്ണസംഖ്യ FileStorage::Impl::Base64Decoder::getInt32() {
     size_t sz = decoded.size();
-    if (ofs + 4 > sz && !readMore(4))
-        return 0;
-    int ival = readInt(&decoded[ofs]);
+    എങ്കിൽ (ofs + 4 > sz && !readMore(4))
+        തിരികെ 0;
+    പൂർണ്ണസംഖ്യ ival = readInt(&decoded[ofs]);
     ofs += 4;
-    return ival;
+    തിരികെ ival;
 }
 
 int64_t FileStorage::Impl::Base64Decoder::getInt64() {
     size_t sz = decoded.size();
-    if (ofs + 8 > sz && !readMore(8))
-        return 0;
+    എങ്കിൽ (ofs + 8 > sz && !readMore(8))
+        തിരികെ 0;
     int64_t ival = readLong(&decoded[ofs]);
     ofs += 8;
-    return ival;
+    തിരികെ ival;
 }
 
-double FileStorage::Impl::Base64Decoder::getFloat64() {
+ഇരട്ട FileStorage::Impl::Base64Decoder::getFloat64() {
     size_t sz = decoded.size();
-    if (ofs + 8 > sz && !readMore(8))
-        return 0;
-    double fval = readReal(&decoded[ofs]);
+    എങ്കിൽ (ofs + 8 > sz && !readMore(8))
+        തിരികെ 0;
+    ഇരട്ട fval = readReal(&decoded[ofs]);
     ofs += 8;
-    return fval;
+    തിരികെ fval;
 }
 
-bool FileStorage::Impl::Base64Decoder::endOfStream() const { return eos; }
+തർക്കം FileStorage::Impl::Base64Decoder::endOfStream() സ്ഥിരം { തിരികെ eos; }
 
-char *FileStorage::Impl::Base64Decoder::getPtr() const { return ptr; }
+അക്ഷരം *FileStorage::Impl::Base64Decoder::getPtr() സ്ഥിരം { തിരികെ ptr; }
 
 
-char *FileStorage::Impl::parseBase64(char *ptr, int indent, FileNode &collection) {
-    const int BASE64_HDR_SIZE = 24;
-    char dt[BASE64_HDR_SIZE + 1] = {0};
+അക്ഷരം *FileStorage::Impl::parseBase64(അക്ഷരം *ptr, പൂർണ്ണസംഖ്യ indent, File_കണ്ണി &collection) {
+    സ്ഥിരം പൂർണ്ണസംഖ്യ BASE64_HDR_SIZE = 24;
+    അക്ഷരം dt[BASE64_HDR_SIZE + 1] = {0};
     base64decoder.init(parser_do_not_use_direct_dereference, ptr, indent);
 
-    int i, k;
+    പൂർണ്ണസംഖ്യ i, k;
 
-    for (i = 0; i < BASE64_HDR_SIZE; i++)
-        dt[i] = (char) base64decoder.getUInt8();
-    for (i = 0; i < BASE64_HDR_SIZE; i++)
-        if (isspace(dt[i]))
-            break;
+    വേണ്ടി (i = 0; i < BASE64_HDR_SIZE; i++)
+        dt[i] = (അക്ഷരം) base64decoder.getUInt8();
+    വേണ്ടി (i = 0; i < BASE64_HDR_SIZE; i++)
+        എങ്കിൽ (isspace(dt[i]))
+            നിർത്തുക;
     dt[i] = '\0';
 
     CV_Assert(!base64decoder.endOfStream());
 
-    int fmt_pairs[CV_FS_MAX_FMT_PAIRS * 2];
-    int fmt_pair_count = fs::decodeFormat(dt, fmt_pairs, CV_FS_MAX_FMT_PAIRS);
+    പൂർണ്ണസംഖ്യ fmt_pairs[CV_FS_MAX_FMT_PAIRS * 2];
+    പൂർണ്ണസംഖ്യ fmt_pair_എണ്ണം = fs::decodeFormat(dt, fmt_pairs, CV_FS_MAX_FMT_PAIRS);
     int64_t ival = 0;
-    double fval = 0;
+    ഇരട്ട fval = 0;
 
-    for (;;) {
-        for (k = 0; k < fmt_pair_count; k++) {
-            int elem_type = fmt_pairs[k * 2 + 1];
-            int count = fmt_pairs[k * 2];
+    വേണ്ടി (;;) {
+        വേണ്ടി (k = 0; k < fmt_pair_എണ്ണം; k++) {
+            പൂർണ്ണസംഖ്യ elem_type = fmt_pairs[k * 2 + 1];
+            പൂർണ്ണസംഖ്യ എണ്ണം_2 = fmt_pairs[k * 2];
 
-            for (i = 0; i < count; i++) {
-                int node_type = FileNode::INT;
-                switch (elem_type) {
-                    case CV_8U:
+            വേണ്ടി (i = 0; i < എണ്ണം_2; i++) {
+                പൂർണ്ണസംഖ്യ കണ്ണി_type = File_കണ്ണി::INT;
+                തിരഞ്ഞെടുപ്പ് (elem_type) {
+                    അവസ്ഥ CV_8U:
                         ival = base64decoder.getUInt8();
-                        break;
-                    case CV_8S:
-                        ival = (char) base64decoder.getUInt8();
-                        break;
-                    case CV_Bool:
+                        നിർത്തുക;
+                    അവസ്ഥ CV_8S:
+                        ival = (അക്ഷരം) base64decoder.getUInt8();
+                        നിർത്തുക;
+                    അവസ്ഥ CV_Bool:
                         ival = base64decoder.getUInt8() != 0;
-                        break;
-                    case CV_16U:
+                        നിർത്തുക;
+                    അവസ്ഥ CV_16U:
                         ival = base64decoder.getUInt16();
-                        break;
-                    case CV_16S:
+                        നിർത്തുക;
+                    അവസ്ഥ CV_16S:
                         ival = (short) base64decoder.getUInt16();
-                        break;
-                    case CV_32U:
+                        നിർത്തുക;
+                    അവസ്ഥ CV_32U:
                         ival = base64decoder.getInt32();
-                        break;
-                    case CV_32S:
+                        നിർത്തുക;
+                    അവസ്ഥ CV_32S:
                         ival = base64decoder.getInt32();
-                        break;
-                    case CV_64U:
+                        നിർത്തുക;
+                    അവസ്ഥ CV_64U:
                         ival = base64decoder.getInt64();
-                        break;
-                    case CV_64S:
+                        നിർത്തുക;
+                    അവസ്ഥ CV_64S:
                         ival = base64decoder.getInt64();
-                        break;
-                    case CV_32F: {
+                        നിർത്തുക;
+                    അവസ്ഥ CV_32F: {
                         Cv32suf v;
                         v.i = base64decoder.getInt32();
                         fval = v.f;
-                        node_type = FileNode::REAL;
+                        കണ്ണി_type = File_കണ്ണി::REAL;
                     }
-                        break;
-                    case CV_64F:
+                        നിർത്തുക;
+                    അവസ്ഥ CV_64F:
                         fval = base64decoder.getFloat64();
-                        node_type = FileNode::REAL;
-                        break;
-                    case CV_16F:
-                        fval = float(hfloatFromBits(base64decoder.getUInt16()));
-                        node_type = FileNode::REAL;
-                        break;
-                    case CV_8F_E4M3FN:
+                        കണ്ണി_type = File_കണ്ണി::REAL;
+                        നിർത്തുക;
+                    അവസ്ഥ CV_16F:
+                        fval = ദശാംശം(hfloatFromBits(base64decoder.getUInt16()));
+                        കണ്ണി_type = File_കണ്ണി::REAL;
+                        നിർത്തുക;
+                    അവസ്ഥ CV_8F_E4M3FN:
                         fval = fp8_t::decodeLUT()[base64decoder.getUInt8()];
-                        node_type = FileNode::REAL;
-                        break;
-                    case CV_8F_E4M3FNUZ:
+                        കണ്ണി_type = File_കണ്ണി::REAL;
+                        നിർത്തുക;
+                    അവസ്ഥ CV_8F_E4M3FNUZ:
                         fval = fp8a_t::decodeLUT()[base64decoder.getUInt8()];
-                        node_type = FileNode::REAL;
-                        break;
-                    default:
+                        കണ്ണി_type = File_കണ്ണി::REAL;
+                        നിർത്തുക;
+                    സ്ഥിരസ്ഥിതി:
                         CV_Error(Error::StsUnsupportedFormat, "Unsupported type");
                 }
 
-                if (base64decoder.endOfStream())
-                    break;
-                addNode(collection, std::string(), node_type,
-                        node_type == FileNode::INT ? (void *) &ival : (void *) &fval, -1);
+                എങ്കിൽ (base64decoder.endOfStream())
+                    നിർത്തുക;
+                add_കണ്ണി(collection, std::string(), കണ്ണി_type,
+                        കണ്ണി_type == File_കണ്ണി::INT ? (ശൂന്യം *) &ival : (ശൂന്യം *) &fval, -1);
             }
         }
-        if (base64decoder.endOfStream())
-            break;
+        എങ്കിൽ (base64decoder.endOfStream())
+            നിർത്തുക;
     }
 
     finalizeCollection(collection);
-    return base64decoder.getPtr();
+    തിരികെ base64decoder.getPtr();
 }
 
-void FileStorage::Impl::parseError(const char *func_name, const std::string &err_msg, const char *source_file,
-                                   int source_line) {
-    std::string msg = format("%s(%d): %s", filename.c_str(), lineno, err_msg.c_str());
-    error(Error::StsParseError, func_name, msg.c_str(), source_file, source_line);
+ശൂന്യം FileStorage::Impl::parseError(സ്ഥിരം അക്ഷരം *func_name, സ്ഥിരം std::string &err_സന്ദേശം, സ്ഥിരം അക്ഷരം *source_file,
+                                   പൂർണ്ണസംഖ്യ source_വരി) {
+    std::string സന്ദേശം = format("%s(%d): %s", filename.c_str(), lineno, err_സന്ദേശം.c_str());
+    error(Error::StsParseError, func_name, സന്ദേശം.c_str(), source_file, source_വരി);
 }
 
-const uchar *FileStorage::Impl::getNodePtr(size_t blockIdx, size_t ofs) const {
+സ്ഥിരം uchar *FileStorage::Impl::get_കണ്ണി_Ptr(size_t blockIdx, size_t ofs) സ്ഥിരം {
     CV_Assert(blockIdx < fs_data_ptrs.size());
     CV_Assert(ofs < fs_data_blksz[blockIdx]);
 
-    return fs_data_ptrs[blockIdx] + ofs;
+    തിരികെ fs_data_ptrs[blockIdx] + ofs;
 }
 
-std::string FileStorage::Impl::getName(size_t nameofs) const {
+std::string FileStorage::Impl::getName(size_t nameofs) സ്ഥിരം {
     CV_Assert(nameofs < str_hash_data.size());
-    return std::string(&str_hash_data[nameofs]);
+    തിരികെ std::string(&str_hash_data[nameofs]);
 }
 
-FileStorage *FileStorage::Impl::getFS() { return fs_ext; }
+FileStorage *FileStorage::Impl::getFS() { തിരികെ fs_ext; }
 
 
 FileStorage::FileStorage()
     : state(0)
 {
-    p = makePtr<FileStorage::Impl>(this);
+    p = makePtr<FileStorage::Impl>(ഇത്);
 }
 
-FileStorage::FileStorage(const String& filename, int flags, const String& encoding)
+FileStorage::FileStorage(സ്ഥിരം String& filename, പൂർണ്ണസംഖ്യ flags, സ്ഥിരം String& encoding)
     : state(0)
 {
-    p = makePtr<FileStorage::Impl>(this);
-    bool ok = p->open(filename.c_str(), flags, encoding.c_str());
-    if(ok)
+    p = makePtr<FileStorage::Impl>(ഇത്);
+    തർക്കം ok = p->open(filename.c_str(), flags, encoding.c_str());
+    എങ്കിൽ(ok)
         state = FileStorage::NAME_EXPECTED + FileStorage::INSIDE_MAP;
 }
 
-void FileStorage::startWriteStruct(const String& name, int struct_flags, const String& typeName)
+ശൂന്യം FileStorage::startWriteStruct(സ്ഥിരം String& name, പൂർണ്ണസംഖ്യ struct_flags, സ്ഥിരം String& typeName)
 {
     p->startWriteStruct(name.size() ? name.c_str() : 0, struct_flags, typeName.size() ? typeName.c_str() : 0);
     elname = String();
-    if ((struct_flags & FileNode::TYPE_MASK) == FileNode::SEQ)
-        state = FileStorage::VALUE_EXPECTED;
-    else
+    എങ്കിൽ ((struct_flags & File_കണ്ണി::TYPE_MASK) == File_കണ്ണി::SEQ)
+        state = FileStorage::മൂല്യം_EXPECTED;
+    അല്ലെങ്കിൽ
         state = FileStorage::NAME_EXPECTED + FileStorage::INSIDE_MAP;
 }
 
-void FileStorage::endWriteStruct()
+ശൂന്യം FileStorage::endWriteStruct()
 {
     p->endWriteStruct();
-    state = p->write_stack.empty() || FileNode::isMap(p->write_stack.back().flags) ?
+    state = p->write_അട്ടി.empty() || File_കണ്ണി::isMap(p->write_അട്ടി.back().flags) ?
         FileStorage::NAME_EXPECTED + FileStorage::INSIDE_MAP :
-        FileStorage::VALUE_EXPECTED;
+        FileStorage::മൂല്യം_EXPECTED;
     elname = String();
 }
 
@@ -2025,955 +2025,955 @@ FileStorage::~FileStorage()
 {
 }
 
-bool FileStorage::open(const String& filename, int flags, const String& encoding)
+തർക്കം FileStorage::open(സ്ഥിരം String& filename, പൂർണ്ണസംഖ്യ flags, സ്ഥിരം String& encoding)
 {
-    try
+    ശ്രമിക്കുക
     {
-        bool ok = p->open(filename.c_str(), flags, encoding.c_str());
-        if(ok)
+        തർക്കം ok = p->open(filename.c_str(), flags, encoding.c_str());
+        എങ്കിൽ(ok)
             state = FileStorage::NAME_EXPECTED + FileStorage::INSIDE_MAP;
-        return ok;
+        തിരികെ ok;
     }
-    catch (...)
+    പിടിക്കുക (...)
     {
         release();
-        throw;  // re-throw
+        എറിയുക;  // re-throw
     }
 }
 
-bool FileStorage::isOpened() const { return p->is_opened; }
+തർക്കം FileStorage::isOpened() സ്ഥിരം { തിരികെ p->is_opened; }
 
-void FileStorage::release()
+ശൂന്യം FileStorage::release()
 {
     p->release();
 }
 
-FileNode FileStorage::root(int i) const
+File_കണ്ണി FileStorage::വേര്(പൂർണ്ണസംഖ്യ i) സ്ഥിരം
 {
-    if( p.empty() || p->roots.empty() || i < 0 || i >= (int)p->roots.size() )
-        return FileNode();
+    എങ്കിൽ( p.empty() || p->roots.empty() || i < 0 || i >= (പൂർണ്ണസംഖ്യ)p->roots.size() )
+        തിരികെ File_കണ്ണി();
 
-    return p->roots[i];
+    തിരികെ p->roots[i];
 }
 
-FileNode FileStorage::getFirstTopLevelNode() const
+File_കണ്ണി FileStorage::get_First_മുകൾ_Level_കണ്ണി() സ്ഥിരം
 {
-    FileNode r = root();
-    FileNodeIterator it = r.begin();
-    return it != r.end() ? *it : FileNode();
+    File_കണ്ണി r = വേര്();
+    File_കണ്ണി_Iterator it = r.begin();
+    തിരികെ it != r.end() ? *it : File_കണ്ണി();
 }
 
-std::string FileStorage::getDefaultObjectName(const std::string& _filename)
+std::string FileStorage::getDefaultObjectName(സ്ഥിരം std::string& _filename)
 {
-    static const char* stubname = "unnamed";
-    const char* filename = _filename.c_str();
-    const char* ptr2 = filename + _filename.size();
-    const char* ptr = ptr2 - 1;
-    cv::AutoBuffer<char> name_buf(_filename.size()+1);
+    സ്ഥിതം സ്ഥിരം അക്ഷരം* stubname = "unnamed";
+    സ്ഥിരം അക്ഷരം* filename = _filename.c_str();
+    സ്ഥിരം അക്ഷരം* ptr2 = filename + _filename.size();
+    സ്ഥിരം അക്ഷരം* ptr = ptr2 - 1;
+    cv::AutoBuffer<അക്ഷരം> name_buf(_filename.size()+1);
 
-    while( ptr >= filename && *ptr != '\\' && *ptr != '/' && *ptr != ':' )
+    ആകുമ്പോൾ( ptr >= filename && *ptr != '\\' && *ptr != '/' && *ptr != ':' )
     {
-        if( *ptr == '.' && (!*ptr2 || strncmp(ptr2, ".gz", 3) == 0) )
+        എങ്കിൽ( *ptr == '.' && (!*ptr2 || strncmp(ptr2, ".gz", 3) == 0) )
             ptr2 = ptr;
         ptr--;
     }
     ptr++;
-    if( ptr == ptr2 )
+    എങ്കിൽ( ptr == ptr2 )
         CV_Error( cv::Error::StsBadArg, "Invalid filename" );
 
-    char* name = name_buf.data();
+    അക്ഷരം* name = name_buf.data();
 
     // name must start with letter or '_'
-    if( !cv_isalpha(*ptr) && *ptr!= '_' ){
+    എങ്കിൽ( !cv_isalpha(*ptr) && *ptr!= '_' ){
         *name++ = '_';
     }
 
-    while( ptr < ptr2 )
+    ആകുമ്പോൾ( ptr < ptr2 )
     {
-        char c = *ptr++;
-        if( !cv_isalnum(c) && c != '-' && c != '_' )
+        അക്ഷരം c = *ptr++;
+        എങ്കിൽ( !cv_isalnum(c) && c != '-' && c != '_' )
             c = '_';
         *name++ = c;
     }
     *name = '\0';
     name = name_buf.data();
-    if( strcmp( name, "_" ) == 0 )
+    എങ്കിൽ( strcmp( name, "_" ) == 0 )
         strcpy( name, stubname );
-    return name;
+    തിരികെ name;
 }
 
 
-int FileStorage::getFormat() const
+പൂർണ്ണസംഖ്യ FileStorage::getFormat() സ്ഥിരം
 {
-    return p->fmt;
+    തിരികെ p->fmt;
 }
 
-FileNode FileStorage::operator [](const char* key) const
+File_കണ്ണി FileStorage::operator [](സ്ഥിരം അക്ഷരം* താക്കോൽ) സ്ഥിരം
 {
-    return this->operator[](std::string(key));
+    തിരികെ ഇത്->operator[](std::string(താക്കോൽ));
 }
 
-FileNode FileStorage::operator [](const std::string& key) const
+File_കണ്ണി FileStorage::operator [](സ്ഥിരം std::string& താക്കോൽ) സ്ഥിരം
 {
-    FileNode res;
-    for (size_t i = 0; i < p->roots.size(); i++)
+    File_കണ്ണി res;
+    വേണ്ടി (size_t i = 0; i < p->roots.size(); i++)
     {
-        res = p->roots[i][key];
-        if (!res.empty())
-            break;
+        res = p->roots[i][താക്കോൽ];
+        എങ്കിൽ (!res.empty())
+            നിർത്തുക;
     }
-    return res;
+    തിരികെ res;
 }
 
 String FileStorage::releaseAndGetString()
 {
     String buf;
     p->release(&buf);
-    return buf;
+    തിരികെ buf;
 }
 
-void FileStorage::writeRaw( const String& fmt, const void* vec, size_t len )
+ശൂന്യം FileStorage::writeRaw( സ്ഥിരം String& fmt, സ്ഥിരം ശൂന്യം* vec, size_t len )
 {
-    p->writeRawData(fmt, (const uchar*)vec, len);
+    p->writeRawData(fmt, (സ്ഥിരം uchar*)vec, len);
 }
 
-void FileStorage::writeComment( const String& comment, bool eol_comment )
+ശൂന്യം FileStorage::writeComment( സ്ഥിരം String& comment, തർക്കം eol_comment )
 {
     p->writeComment(comment.c_str(), eol_comment);
 }
 
-void writeScalar( FileStorage& fs, int value )
+ശൂന്യം writeScalar( FileStorage& fs, പൂർണ്ണസംഖ്യ value )
 {
-    fs.p->write(String(), value);
+    fs.p->ലിഖ(String(), value);
 }
 
-void writeScalar( FileStorage& fs, int64_t value )
+ശൂന്യം writeScalar( FileStorage& fs, int64_t value )
 {
-    fs.p->write(String(), value);
+    fs.p->ലിഖ(String(), value);
 }
 
-void writeScalar( FileStorage& fs, float value )
+ശൂന്യം writeScalar( FileStorage& fs, ദശാംശം value )
 {
-    fs.p->write(String(), (double)value);
+    fs.p->ലിഖ(String(), (ഇരട്ട)value);
 }
 
-void writeScalar( FileStorage& fs, double value )
+ശൂന്യം writeScalar( FileStorage& fs, ഇരട്ട value )
 {
-    fs.p->write(String(), value);
+    fs.p->ലിഖ(String(), value);
 }
 
-void writeScalar( FileStorage& fs, const String& value )
+ശൂന്യം writeScalar( FileStorage& fs, സ്ഥിരം String& value )
 {
-    fs.p->write(String(), value);
+    fs.p->ലിഖ(String(), value);
 }
 
-void write( FileStorage& fs, const String& name, int value )
+ശൂന്യം ലിഖ( FileStorage& fs, സ്ഥിരം String& name, പൂർണ്ണസംഖ്യ value )
 {
-    fs.p->write(name, value);
+    fs.p->ലിഖ(name, value);
 }
 
-void write( FileStorage& fs, const String& name, int64_t value )
+ശൂന്യം ലിഖ( FileStorage& fs, സ്ഥിരം String& name, int64_t value )
 {
-    fs.p->write(name, value);
+    fs.p->ലിഖ(name, value);
 }
 
-void write( FileStorage& fs, const String& name, float value )
+ശൂന്യം ലിഖ( FileStorage& fs, സ്ഥിരം String& name, ദശാംശം value )
 {
-    fs.p->write(name, (double)value);
+    fs.p->ലിഖ(name, (ഇരട്ട)value);
 }
 
-void write( FileStorage& fs, const String& name, double value )
+ശൂന്യം ലിഖ( FileStorage& fs, സ്ഥിരം String& name, ഇരട്ട value )
 {
-    fs.p->write(name, value);
+    fs.p->ലിഖ(name, value);
 }
 
-void write( FileStorage& fs, const String& name, const String& value )
+ശൂന്യം ലിഖ( FileStorage& fs, സ്ഥിരം String& name, സ്ഥിരം String& value )
 {
-    fs.p->write(name, value);
+    fs.p->ലിഖ(name, value);
 }
 
-void write( FileStorage& fs, const String& name, bool value )
+ശൂന്യം ലിഖ( FileStorage& fs, സ്ഥിരം String& name, തർക്കം value )
 {
-    fs.p->write(name, value);
+    fs.p->ലിഖ(name, value);
 }
 
-void FileStorage::write(const String& name, int val) { p->write(name, val); }
-void FileStorage::write(const String& name, bool val) { p->write(name, val); }
-void FileStorage::write(const String& name, int64_t val) { p->write(name, val); }
-void FileStorage::write(const String& name, double val) { p->write(name, val); }
-void FileStorage::write(const String& name, const String& val) { p->write(name, val); }
-void FileStorage::write(const String& name, const Mat& val) { cv::write(*this, name, val); }
-void FileStorage::write(const String& name, const std::vector<String>& val) { cv::write(*this, name, val); }
+ശൂന്യം FileStorage::ലിഖ(സ്ഥിരം String& name, പൂർണ്ണസംഖ്യ val) { p->ലിഖ(name, val); }
+ശൂന്യം FileStorage::ലിഖ(സ്ഥിരം String& name, തർക്കം val) { p->ലിഖ(name, val); }
+ശൂന്യം FileStorage::ലിഖ(സ്ഥിരം String& name, int64_t val) { p->ലിഖ(name, val); }
+ശൂന്യം FileStorage::ലിഖ(സ്ഥിരം String& name, ഇരട്ട val) { p->ലിഖ(name, val); }
+ശൂന്യം FileStorage::ലിഖ(സ്ഥിരം String& name, സ്ഥിരം String& val) { p->ലിഖ(name, val); }
+ശൂന്യം FileStorage::ലിഖ(സ്ഥിരം String& name, സ്ഥിരം Mat& val) { cv::ലിഖ(*ഇത്, name, val); }
+ശൂന്യം FileStorage::ലിഖ(സ്ഥിരം String& name, സ്ഥിരം std::vector<String>& val) { cv::ലിഖ(*ഇത്, name, val); }
 
-FileStorage& operator << (FileStorage& fs, const String& str)
+FileStorage& operator << (FileStorage& fs, സ്ഥിരം String& str)
 {
-    enum { NAME_EXPECTED = FileStorage::NAME_EXPECTED,
-        VALUE_EXPECTED = FileStorage::VALUE_EXPECTED,
+    എണ്ണൽ { NAME_EXPECTED = FileStorage::NAME_EXPECTED,
+        മൂല്യം_EXPECTED = FileStorage::മൂല്യം_EXPECTED,
         INSIDE_MAP = FileStorage::INSIDE_MAP };
-    const char* _str = str.c_str();
-    if( !fs.isOpened() || !_str )
-        return fs;
+    സ്ഥിരം അക്ഷരം* _str = str.c_str();
+    എങ്കിൽ( !fs.isOpened() || !_str )
+        തിരികെ fs;
     Ptr<FileStorage::Impl>& fs_impl = fs.p;
-    char c = *_str;
+    അക്ഷരം c = *_str;
 
-    if( c == '}' || c == ']' )
+    എങ്കിൽ( c == '}' || c == ']' )
     {
-        if( fs_impl->write_stack.empty() )
+        എങ്കിൽ( fs_impl->write_അട്ടി.empty() )
             CV_Error_( cv::Error::StsError, ("Extra closing '%c'", *_str) );
 
         fs_impl->workaround();
 
-        int struct_flags = fs_impl->write_stack.back().flags;
-        char expected_bracket = FileNode::isMap(struct_flags) ? '}' : ']';
-        if( c != expected_bracket )
+        പൂർണ്ണസംഖ്യ struct_flags = fs_impl->write_അട്ടി.back().flags;
+        അക്ഷരം expected_bracket = File_കണ്ണി::isMap(struct_flags) ? '}' : ']';
+        എങ്കിൽ( c != expected_bracket )
             CV_Error_( cv::Error::StsError, ("The closing '%c' does not match the opening '%c'", c, expected_bracket));
         fs_impl->endWriteStruct();
-        CV_Assert(!fs_impl->write_stack.empty());
-        struct_flags = fs_impl->write_stack.back().flags;
-        fs.state = FileNode::isMap(struct_flags) ? INSIDE_MAP + NAME_EXPECTED : VALUE_EXPECTED;
+        CV_Assert(!fs_impl->write_അട്ടി.empty());
+        struct_flags = fs_impl->write_അട്ടി.back().flags;
+        fs.state = File_കണ്ണി::isMap(struct_flags) ? INSIDE_MAP + NAME_EXPECTED : മൂല്യം_EXPECTED;
         fs.elname = String();
     }
-    else if( fs.state == NAME_EXPECTED + INSIDE_MAP )
+    അല്ലെങ്കിൽ എങ്കിൽ( fs.state == NAME_EXPECTED + INSIDE_MAP )
     {
-        if (!cv_isalpha(c) && c != '_')
+        എങ്കിൽ (!cv_isalpha(c) && c != '_')
             CV_Error_( cv::Error::StsError, ("Incorrect element name %s; should start with a letter or '_'", _str) );
         fs.elname = str;
-        fs.state = VALUE_EXPECTED + INSIDE_MAP;
+        fs.state = മൂല്യം_EXPECTED + INSIDE_MAP;
     }
-    else if( (fs.state & 3) == VALUE_EXPECTED )
+    അല്ലെങ്കിൽ എങ്കിൽ( (fs.state & 3) == മൂല്യം_EXPECTED )
     {
-        if( c == '{' || c == '[' )
+        എങ്കിൽ( c == '{' || c == '[' )
         {
-            int struct_flags = c == '{' ? FileNode::MAP : FileNode::SEQ;
-            fs.state = struct_flags == FileNode::MAP ? INSIDE_MAP + NAME_EXPECTED : VALUE_EXPECTED;
+            പൂർണ്ണസംഖ്യ struct_flags = c == '{' ? File_കണ്ണി::MAP : File_കണ്ണി::SEQ;
+            fs.state = struct_flags == File_കണ്ണി::MAP ? INSIDE_MAP + NAME_EXPECTED : മൂല്യം_EXPECTED;
             _str++;
-            if( *_str == ':' )
+            എങ്കിൽ( *_str == ':' )
             {
                 _str++;
-                if( !*_str )
-                    struct_flags |= FileNode::FLOW;
+                എങ്കിൽ( !*_str )
+                    struct_flags |= File_കണ്ണി::FLOW;
             }
             fs_impl->startWriteStruct(!fs.elname.empty() ? fs.elname.c_str() : 0, struct_flags, *_str ? _str : 0 );
             fs.elname = String();
         }
-        else
+        അല്ലെങ്കിൽ
         {
-            write( fs, fs.elname, (c == '\\' && (_str[1] == '{' || _str[1] == '}' ||
+            ലിഖ( fs, fs.elname, (c == '\\' && (_str[1] == '{' || _str[1] == '}' ||
                                 _str[1] == '[' || _str[1] == ']')) ? String(_str+1) : str );
-            if( fs.state == INSIDE_MAP + VALUE_EXPECTED )
+            എങ്കിൽ( fs.state == INSIDE_MAP + മൂല്യം_EXPECTED )
                 fs.state = INSIDE_MAP + NAME_EXPECTED;
         }
     }
-    else
+    അല്ലെങ്കിൽ
         CV_Error( cv::Error::StsError, "Invalid fs.state" );
-    return fs;
+    തിരികെ fs;
 }
 
 
-FileNode::FileNode()
-    : fs(NULL)
+File_കണ്ണി::File_കണ്ണി()
+    : fs(ശൂന്യ)
 {
     blockIdx = ofs = 0;
 }
 
-FileNode::FileNode(FileStorage::Impl* _fs, size_t _blockIdx, size_t _ofs)
+File_കണ്ണി::File_കണ്ണി(FileStorage::Impl* _fs, size_t _blockIdx, size_t _ofs)
     : fs(_fs)
 {
     blockIdx = _blockIdx;
     ofs = _ofs;
 }
 
-FileNode::FileNode(const FileStorage* _fs, size_t _blockIdx, size_t _ofs)
-    : FileNode(_fs->p.get(), _blockIdx, _ofs)
+File_കണ്ണി::File_കണ്ണി(സ്ഥിരം FileStorage* _fs, size_t _blockIdx, size_t _ofs)
+    : File_കണ്ണി(_fs->p.get(), _blockIdx, _ofs)
 {
     // nothing
 }
 
-FileNode::FileNode(const FileNode& node)
+File_കണ്ണി::File_കണ്ണി(സ്ഥിരം File_കണ്ണി& കണ്ണി)
 {
-    fs = node.fs;
-    blockIdx = node.blockIdx;
-    ofs = node.ofs;
+    fs = കണ്ണി.fs;
+    blockIdx = കണ്ണി.blockIdx;
+    ofs = കണ്ണി.ofs;
 }
 
-FileNode& FileNode::operator=(const FileNode& node)
+File_കണ്ണി& File_കണ്ണി::operator=(സ്ഥിരം File_കണ്ണി& കണ്ണി)
 {
-    fs = node.fs;
-    blockIdx = node.blockIdx;
-    ofs = node.ofs;
-    return *this;
+    fs = കണ്ണി.fs;
+    blockIdx = കണ്ണി.blockIdx;
+    ofs = കണ്ണി.ofs;
+    തിരികെ *ഇത്;
 }
 
-FileNode FileNode::operator[](const std::string& nodename) const
+File_കണ്ണി File_കണ്ണി::operator[](സ്ഥിരം std::string& nodename) സ്ഥിരം
 {
-    if(!fs)
-        return FileNode();
+    എങ്കിൽ(!fs)
+        തിരികെ File_കണ്ണി();
 
     CV_Assert( isMap() );
 
-    unsigned key = fs->getStringOfs(nodename);
+    unsigned താക്കോൽ = fs->getStringOfs(nodename);
     size_t i, sz = size();
-    FileNodeIterator it = begin();
+    File_കണ്ണി_Iterator it = begin();
 
-    for( i = 0; i < sz; i++, ++it )
+    വേണ്ടി( i = 0; i < sz; i++, ++it )
     {
-        FileNode n = *it;
-        const uchar* p = n.ptr();
+        File_കണ്ണി n = *it;
+        സ്ഥിരം uchar* p = n.ptr();
         unsigned key2 = (unsigned)readInt(p + 1);
         CV_Assert( key2 < fs->str_hash_data.size() );
-        if( key == key2 )
-            return n;
+        എങ്കിൽ( താക്കോൽ == key2 )
+            തിരികെ n;
     }
-    return FileNode();
+    തിരികെ File_കണ്ണി();
 }
 
-FileNode FileNode::operator[](const char* nodename) const
+File_കണ്ണി File_കണ്ണി::operator[](സ്ഥിരം അക്ഷരം* nodename) സ്ഥിരം
 {
-    return this->operator[](std::string(nodename));
+    തിരികെ ഇത്->operator[](std::string(nodename));
 }
 
-FileNode FileNode::operator[](int i) const
+File_കണ്ണി File_കണ്ണി::operator[](പൂർണ്ണസംഖ്യ i) സ്ഥിരം
 {
-    if(!fs)
-        return FileNode();
+    എങ്കിൽ(!fs)
+        തിരികെ File_കണ്ണി();
 
     CV_Assert( isSeq() );
 
-    int sz = (int)size();
+    പൂർണ്ണസംഖ്യ sz = (പൂർണ്ണസംഖ്യ)size();
     CV_Assert( 0 <= i && i < sz );
 
-    FileNodeIterator it = begin();
+    File_കണ്ണി_Iterator it = begin();
     it += i;
 
-    return *it;
+    തിരികെ *it;
 }
 
-std::vector<String> FileNode::keys() const
+std::vector<String> File_കണ്ണി::താക്കോലുകൾ() സ്ഥിരം
 {
     CV_Assert(isMap());
 
     std::vector<String> res;
     res.reserve(size());
-    for (FileNodeIterator it = begin(); it != end(); ++it)
+    വേണ്ടി (File_കണ്ണി_Iterator it = begin(); it != end(); ++it)
     {
         res.push_back((*it).name());
     }
-    return res;
+    തിരികെ res;
 }
 
-int FileNode::type() const
+പൂർണ്ണസംഖ്യ File_കണ്ണി::type() സ്ഥിരം
 {
-    const uchar* p = ptr();
-    if(!p)
-        return NONE;
-    return (*p & TYPE_MASK);
+    സ്ഥിരം uchar* p = ptr();
+    എങ്കിൽ(!p)
+        തിരികെ NONE;
+    തിരികെ (*p & TYPE_MASK);
 }
 
-bool FileNode::isMap(int flags) { return (flags & TYPE_MASK) == MAP; }
-bool FileNode::isSeq(int flags) { return (flags & TYPE_MASK) == SEQ; }
-bool FileNode::isCollection(int flags) { return isMap(flags) || isSeq(flags); }
-bool FileNode::isFlow(int flags) { return (flags & FLOW) != 0; }
-bool FileNode::isEmptyCollection(int flags) { return (flags & EMPTY) != 0; }
+തർക്കം File_കണ്ണി::isMap(പൂർണ്ണസംഖ്യ flags) { തിരികെ (flags & TYPE_MASK) == MAP; }
+തർക്കം File_കണ്ണി::isSeq(പൂർണ്ണസംഖ്യ flags) { തിരികെ (flags & TYPE_MASK) == SEQ; }
+തർക്കം File_കണ്ണി::isCollection(പൂർണ്ണസംഖ്യ flags) { തിരികെ isMap(flags) || isSeq(flags); }
+തർക്കം File_കണ്ണി::isFlow(പൂർണ്ണസംഖ്യ flags) { തിരികെ (flags & FLOW) != 0; }
+തർക്കം File_കണ്ണി::isEmptyCollection(പൂർണ്ണസംഖ്യ flags) { തിരികെ (flags & EMPTY) != 0; }
 
-bool FileNode::empty() const   { return fs == 0; }
-bool FileNode::isNone() const  { return type() == NONE; }
-bool FileNode::isSeq() const   { return type() == SEQ; }
-bool FileNode::isMap() const   { return type() == MAP; }
-bool FileNode::isInt() const   { return type() == INT;  }
-bool FileNode::isReal() const  { return type() == REAL; }
-bool FileNode::isString() const { return type() == STRING;  }
-bool FileNode::isNamed() const
+തർക്കം File_കണ്ണി::empty() സ്ഥിരം   { തിരികെ fs == 0; }
+തർക്കം File_കണ്ണി::isNone() സ്ഥിരം  { തിരികെ type() == NONE; }
+തർക്കം File_കണ്ണി::isSeq() സ്ഥിരം   { തിരികെ type() == SEQ; }
+തർക്കം File_കണ്ണി::isMap() സ്ഥിരം   { തിരികെ type() == MAP; }
+തർക്കം File_കണ്ണി::isInt() സ്ഥിരം   { തിരികെ type() == INT;  }
+തർക്കം File_കണ്ണി::isReal() സ്ഥിരം  { തിരികെ type() == REAL; }
+തർക്കം File_കണ്ണി::isString() സ്ഥിരം { തിരികെ type() == STRING;  }
+തർക്കം File_കണ്ണി::isNamed() സ്ഥിരം
 {
-    const uchar* p = ptr();
-    if(!p)
-        return false;
-    return (*p & NAMED) != 0;
+    സ്ഥിരം uchar* p = ptr();
+    എങ്കിൽ(!p)
+        തിരികെ അസത്യം;
+    തിരികെ (*p & NAMED) != 0;
 }
 
-std::string FileNode::name() const
+std::string File_കണ്ണി::name() സ്ഥിരം
 {
-    const uchar* p = ptr();
-    if(!p)
-        return std::string();
+    സ്ഥിരം uchar* p = ptr();
+    എങ്കിൽ(!p)
+        തിരികെ std::string();
     size_t nameofs = p[1] | (p[2]<<8) | (p[3]<<16) | (p[4]<<24);
-    return fs->getName(nameofs);
+    തിരികെ fs->getName(nameofs);
 }
 
-FileNode::operator int() const
+File_കണ്ണി::operator പൂർണ്ണസംഖ്യ() സ്ഥിരം
 {
-    const uchar* p = ptr();
-    if(!p)
-        return 0;
-    int tag = *p;
-    int type = (tag & TYPE_MASK);
+    സ്ഥിരം uchar* p = ptr();
+    എങ്കിൽ(!p)
+        തിരികെ 0;
+    പൂർണ്ണസംഖ്യ tag = *p;
+    പൂർണ്ണസംഖ്യ type = (tag & TYPE_MASK);
     p += (tag & NAMED) ? 5 : 1;
 
-    if( type == INT )
+    എങ്കിൽ( type == INT )
     {
-        return readInt(p);
+        തിരികെ readInt(p);
     }
-    else if( type == REAL )
+    അല്ലെങ്കിൽ എങ്കിൽ( type == REAL )
     {
-        return cvRound(readReal(p));
+        തിരികെ cvRound(readReal(p));
     }
-    else
-        return 0x7fffffff;
+    അല്ലെങ്കിൽ
+        തിരികെ 0x7fffffff;
 }
 
-FileNode::operator int64_t() const
+File_കണ്ണി::operator int64_t() സ്ഥിരം
 {
-    const uchar* p = ptr();
-    if(!p)
-        return 0;
-    int tag = *p;
-    int type = (tag & TYPE_MASK);
+    സ്ഥിരം uchar* p = ptr();
+    എങ്കിൽ(!p)
+        തിരികെ 0;
+    പൂർണ്ണസംഖ്യ tag = *p;
+    പൂർണ്ണസംഖ്യ type = (tag & TYPE_MASK);
     p += (tag & NAMED) ? 5 : 1;
 
-    if( type == INT )
+    എങ്കിൽ( type == INT )
     {
-        return readLong(p);
+        തിരികെ readLong(p);
     }
-    else if( type == REAL )
+    അല്ലെങ്കിൽ എങ്കിൽ( type == REAL )
     {
-        return cvRound(readReal(p));
+        തിരികെ cvRound(readReal(p));
     }
-    else
-        return 0x7fffffff;
+    അല്ലെങ്കിൽ
+        തിരികെ 0x7fffffff;
 }
 
-FileNode::operator float() const
+File_കണ്ണി::operator ദശാംശം() സ്ഥിരം
 {
-    const uchar* p = ptr();
-    if(!p)
-        return 0.f;
-    int tag = *p;
-    int type = (tag & TYPE_MASK);
+    സ്ഥിരം uchar* p = ptr();
+    എങ്കിൽ(!p)
+        തിരികെ 0.f;
+    പൂർണ്ണസംഖ്യ tag = *p;
+    പൂർണ്ണസംഖ്യ type = (tag & TYPE_MASK);
     p += (tag & NAMED) ? 5 : 1;
 
-    if( type == INT )
+    എങ്കിൽ( type == INT )
     {
-        return (float)readLong(p);
+        തിരികെ (ദശാംശം)readLong(p);
     }
-    else if( type == REAL )
+    അല്ലെങ്കിൽ എങ്കിൽ( type == REAL )
     {
-        return (float)readReal(p);
+        തിരികെ (ദശാംശം)readReal(p);
     }
-    else
-        return FLT_MAX;
+    അല്ലെങ്കിൽ
+        തിരികെ FLT_MAX;
 }
 
-FileNode::operator double() const
+File_കണ്ണി::operator ഇരട്ട() സ്ഥിരം
 {
-    const uchar* p = ptr();
-    if(!p)
-        return 0.f;
-    int tag = *p;
-    int type = (tag & TYPE_MASK);
+    സ്ഥിരം uchar* p = ptr();
+    എങ്കിൽ(!p)
+        തിരികെ 0.f;
+    പൂർണ്ണസംഖ്യ tag = *p;
+    പൂർണ്ണസംഖ്യ type = (tag & TYPE_MASK);
     p += (tag & NAMED) ? 5 : 1;
 
-    if( type == INT )
+    എങ്കിൽ( type == INT )
     {
-        return (double)readLong(p);
+        തിരികെ (ഇരട്ട)readLong(p);
     }
-    else if( type == REAL )
+    അല്ലെങ്കിൽ എങ്കിൽ( type == REAL )
     {
-        return readReal(p);
+        തിരികെ readReal(p);
     }
-    else
-        return DBL_MAX;
+    അല്ലെങ്കിൽ
+        തിരികെ DBL_MAX;
 }
 
-double FileNode::real() const  { return double(*this); }
+ഇരട്ട File_കണ്ണി::real() സ്ഥിരം  { തിരികെ ഇരട്ട(*ഇത്); }
 
-std::string FileNode::string() const
+std::string File_കണ്ണി::string() സ്ഥിരം
 {
-    const uchar* p = ptr();
-    if( !p || (*p & TYPE_MASK) != STRING )
-        return std::string();
+    സ്ഥിരം uchar* p = ptr();
+    എങ്കിൽ( !p || (*p & TYPE_MASK) != STRING )
+        തിരികെ std::string();
     p += (*p & NAMED) ? 5 : 1;
     size_t sz = (size_t)(unsigned)readInt(p);
-    return std::string((const char*)(p + 4), sz - 1);
+    തിരികെ std::string((സ്ഥിരം അക്ഷരം*)(p + 4), sz - 1);
 }
-Mat FileNode::mat() const { Mat value; read(*this, value, Mat()); return value; }
+Mat File_കണ്ണി::mat() സ്ഥിരം { Mat value; പഠ(*ഇത്, value, Mat()); തിരികെ value; }
 
-FileNodeIterator FileNode::begin() const { return FileNodeIterator(*this, false); }
-FileNodeIterator FileNode::end() const   { return FileNodeIterator(*this, true); }
+File_കണ്ണി_Iterator File_കണ്ണി::begin() സ്ഥിരം { തിരികെ File_കണ്ണി_Iterator(*ഇത്, അസത്യം); }
+File_കണ്ണി_Iterator File_കണ്ണി::end() സ്ഥിരം   { തിരികെ File_കണ്ണി_Iterator(*ഇത്, സത്യം); }
 
-void FileNode::readRaw( const std::string& fmt, void* vec, size_t len ) const
+ശൂന്യം File_കണ്ണി::readRaw( സ്ഥിരം std::string& fmt, ശൂന്യം* vec, size_t len ) സ്ഥിരം
 {
-    FileNodeIterator it = begin();
+    File_കണ്ണി_Iterator it = begin();
     it.readRaw( fmt, vec, len );
 }
 
-size_t FileNode::size() const
+size_t File_കണ്ണി::size() സ്ഥിരം
 {
-    const uchar* p = ptr();
-    if( !p )
-        return 0;
-    int tag = *p;
-    int tp = tag & TYPE_MASK;
-    if( tp == MAP || tp == SEQ )
+    സ്ഥിരം uchar* p = ptr();
+    എങ്കിൽ( !p )
+        തിരികെ 0;
+    പൂർണ്ണസംഖ്യ tag = *p;
+    പൂർണ്ണസംഖ്യ tp = tag & TYPE_MASK;
+    എങ്കിൽ( tp == MAP || tp == SEQ )
     {
-        if( tag & NAMED )
+        എങ്കിൽ( tag & NAMED )
             p += 4;
-        return (size_t)(unsigned)readInt(p + 5);
+        തിരികെ (size_t)(unsigned)readInt(p + 5);
     }
-    return tp != NONE;
+    തിരികെ tp != NONE;
 }
 
-size_t FileNode::rawSize() const
+size_t File_കണ്ണി::rawSize() സ്ഥിരം
 {
-    const uchar* p0 = ptr(), *p = p0;
-    if( !p )
-        return 0;
-    int tag = *p++;
-    int tp = tag & TYPE_MASK;
-    if( tag & NAMED )
+    സ്ഥിരം uchar* p0 = ptr(), *p = p0;
+    എങ്കിൽ( !p )
+        തിരികെ 0;
+    പൂർണ്ണസംഖ്യ tag = *p++;
+    പൂർണ്ണസംഖ്യ tp = tag & TYPE_MASK;
+    എങ്കിൽ( tag & NAMED )
         p += 4;
     size_t sz0 = (size_t)(p - p0);
-    if( tp == INT )
-        return sz0 + 8;
-    if( tp == REAL )
-        return sz0 + 8;
-    if( tp == NONE )
-        return sz0;
+    എങ്കിൽ( tp == INT )
+        തിരികെ sz0 + 8;
+    എങ്കിൽ( tp == REAL )
+        തിരികെ sz0 + 8;
+    എങ്കിൽ( tp == NONE )
+        തിരികെ sz0;
     CV_Assert( tp == STRING || tp == SEQ || tp == MAP );
-    return sz0 + 4 + readInt(p);
+    തിരികെ sz0 + 4 + readInt(p);
 }
 
-uchar* FileNode::ptr()
+uchar* File_കണ്ണി::ptr()
 {
-    return !fs ? 0 : (uchar*)fs->getNodePtr(blockIdx, ofs);
+    തിരികെ !fs ? 0 : (uchar*)fs->get_കണ്ണി_Ptr(blockIdx, ofs);
 }
 
-const uchar* FileNode::ptr() const
+സ്ഥിരം uchar* File_കണ്ണി::ptr() സ്ഥിരം
 {
-    return !fs ? 0 : fs->getNodePtr(blockIdx, ofs);
+    തിരികെ !fs ? 0 : fs->get_കണ്ണി_Ptr(blockIdx, ofs);
 }
 
-void FileNode::setValue( int type, const void* value, int len )
+ശൂന്യം File_കണ്ണി::set_മൂല്യം( പൂർണ്ണസംഖ്യ type, സ്ഥിരം ശൂന്യം* value, പൂർണ്ണസംഖ്യ len )
 {
     uchar *p = ptr();
     CV_Assert(p != 0);
 
-    int tag = *p;
-    int current_type = tag & TYPE_MASK;
+    പൂർണ്ണസംഖ്യ tag = *p;
+    പൂർണ്ണസംഖ്യ current_type = tag & TYPE_MASK;
     CV_Assert( current_type == NONE || current_type == type );
 
-    int sz = 1;
+    പൂർണ്ണസംഖ്യ sz = 1;
 
-    if( tag & NAMED )
+    എങ്കിൽ( tag & NAMED )
         sz += 4;
 
-    if( type == INT )
+    എങ്കിൽ( type == INT )
         sz += 8;
-    else if( type == REAL )
+    അല്ലെങ്കിൽ എങ്കിൽ( type == REAL )
         sz += 8;
-    else if( type == STRING )
+    അല്ലെങ്കിൽ എങ്കിൽ( type == STRING )
     {
-        if( len < 0 )
-            len = (int)strlen((const char*)value);
+        എങ്കിൽ( len < 0 )
+            len = (പൂർണ്ണസംഖ്യ)strlen((സ്ഥിരം അക്ഷരം*)value);
         sz += 4 + len + 1; // besides the string content,
                            // take the size (4 bytes) and the final '\0' into account
     }
-    else
+    അല്ലെങ്കിൽ
         CV_Error(Error::StsNotImplemented, "Only scalar types can be dynamically assigned to a file node");
 
-    p = fs->reserveNodeSpace(*this, sz);
+    p = fs->reserve_കണ്ണി_Space(*ഇത്, sz);
     *p++ = (uchar)(type | (tag & NAMED));
-    if( tag & NAMED )
+    എങ്കിൽ( tag & NAMED )
         p += 4;
 
-    if( type == INT )
+    എങ്കിൽ( type == INT )
     {
-        int64_t ival = *(const int64_t*)value;
+        int64_t ival = *(സ്ഥിരം int64_t*)value;
         writeInt(p, ival);
     }
-    else if( type == REAL )
+    അല്ലെങ്കിൽ എങ്കിൽ( type == REAL )
     {
-        double dbval = *(const double*)value;
+        ഇരട്ട dbval = *(സ്ഥിരം ഇരട്ട*)value;
         writeReal(p, dbval);
     }
-    else if( type == STRING )
+    അല്ലെങ്കിൽ എങ്കിൽ( type == STRING )
     {
-        const char* str = (const char*)value;
+        സ്ഥിരം അക്ഷരം* str = (സ്ഥിരം അക്ഷരം*)value;
         writeInt(p, len + 1);
         memcpy(p + 4, str, len);
         p[4 + len] = (uchar)'\0';
     }
 }
 
-FileNodeIterator::FileNodeIterator()
+File_കണ്ണി_Iterator::File_കണ്ണി_Iterator()
 {
     fs = 0;
     blockIdx = 0;
     ofs = 0;
     blockSize = 0;
-    nodeNElems = 0;
+    കണ്ണി_NElems = 0;
     idx = 0;
 }
 
-FileNodeIterator::FileNodeIterator( const FileNode& node, bool seekEnd )
+File_കണ്ണി_Iterator::File_കണ്ണി_Iterator( സ്ഥിരം File_കണ്ണി& കണ്ണി, തർക്കം seekEnd )
 {
-    fs = node.fs;
+    fs = കണ്ണി.fs;
     idx = 0;
-    if( !fs )
-        blockIdx = ofs = blockSize = nodeNElems = 0;
-    else
+    എങ്കിൽ( !fs )
+        blockIdx = ofs = blockSize = കണ്ണി_NElems = 0;
+    അല്ലെങ്കിൽ
     {
-        blockIdx = node.blockIdx;
-        ofs = node.ofs;
+        blockIdx = കണ്ണി.blockIdx;
+        ofs = കണ്ണി.ofs;
 
-        bool collection = node.isSeq() || node.isMap();
-        if( node.isNone() )
+        തർക്കം collection = കണ്ണി.isSeq() || കണ്ണി.isMap();
+        എങ്കിൽ( കണ്ണി.isNone() )
         {
-            nodeNElems = 0;
+            കണ്ണി_NElems = 0;
         }
-        else if( !collection )
+        അല്ലെങ്കിൽ എങ്കിൽ( !collection )
         {
-            nodeNElems = 1;
-            if( seekEnd )
+            കണ്ണി_NElems = 1;
+            എങ്കിൽ( seekEnd )
             {
                 idx = 1;
-                ofs += node.rawSize();
+                ofs += കണ്ണി.rawSize();
             }
         }
-        else
+        അല്ലെങ്കിൽ
         {
-            nodeNElems = node.size();
-            const uchar* p0 = node.ptr(), *p = p0 + 1;
-            if(*p0 & FileNode::NAMED )
+            കണ്ണി_NElems = കണ്ണി.size();
+            സ്ഥിരം uchar* p0 = കണ്ണി.ptr(), *p = p0 + 1;
+            എങ്കിൽ(*p0 & File_കണ്ണി::NAMED )
                 p += 4;
-            if( !seekEnd )
+            എങ്കിൽ( !seekEnd )
                 ofs += (p - p0) + 8;
-            else
+            അല്ലെങ്കിൽ
             {
                 size_t rawsz = (size_t)(unsigned)readInt(p);
                 ofs += (p - p0) + 4 + rawsz;
-                idx = nodeNElems;
+                idx = കണ്ണി_NElems;
             }
         }
-        fs->normalizeNodeOfs(blockIdx, ofs);
+        fs->normalize_കണ്ണി_Ofs(blockIdx, ofs);
         blockSize = fs->fs_data_blksz[blockIdx];
     }
 }
 
-FileNodeIterator::FileNodeIterator(const FileNodeIterator& it)
+File_കണ്ണി_Iterator::File_കണ്ണി_Iterator(സ്ഥിരം File_കണ്ണി_Iterator& it)
 {
     fs = it.fs;
     blockIdx = it.blockIdx;
     ofs = it.ofs;
     blockSize = it.blockSize;
-    nodeNElems = it.nodeNElems;
+    കണ്ണി_NElems = it.കണ്ണി_NElems;
     idx = it.idx;
 }
 
-FileNodeIterator& FileNodeIterator::operator=(const FileNodeIterator& it)
+File_കണ്ണി_Iterator& File_കണ്ണി_Iterator::operator=(സ്ഥിരം File_കണ്ണി_Iterator& it)
 {
     fs = it.fs;
     blockIdx = it.blockIdx;
     ofs = it.ofs;
     blockSize = it.blockSize;
-    nodeNElems = it.nodeNElems;
+    കണ്ണി_NElems = it.കണ്ണി_NElems;
     idx = it.idx;
-    return *this;
+    തിരികെ *ഇത്;
 }
 
-FileNode FileNodeIterator::operator *() const
+File_കണ്ണി File_കണ്ണി_Iterator::operator *() സ്ഥിരം
 {
-    return FileNode(idx < nodeNElems ? fs : NULL, blockIdx, ofs);
+    തിരികെ File_കണ്ണി(idx < കണ്ണി_NElems ? fs : ശൂന്യ, blockIdx, ofs);
 }
 
-FileNodeIterator& FileNodeIterator::operator ++ ()
+File_കണ്ണി_Iterator& File_കണ്ണി_Iterator::operator ++ ()
 {
-    if( idx == nodeNElems || !fs )
-        return *this;
+    എങ്കിൽ( idx == കണ്ണി_NElems || !fs )
+        തിരികെ *ഇത്;
     idx++;
-    FileNode n(fs, blockIdx, ofs);
+    File_കണ്ണി n(fs, blockIdx, ofs);
     ofs += n.rawSize();
-    if( ofs >= blockSize )
+    എങ്കിൽ( ofs >= blockSize )
     {
-        fs->normalizeNodeOfs(blockIdx, ofs);
+        fs->normalize_കണ്ണി_Ofs(blockIdx, ofs);
         blockSize = fs->fs_data_blksz[blockIdx];
     }
-    return *this;
+    തിരികെ *ഇത്;
 }
 
-FileNodeIterator FileNodeIterator::operator ++ (int)
+File_കണ്ണി_Iterator File_കണ്ണി_Iterator::operator ++ (പൂർണ്ണസംഖ്യ)
 {
-    FileNodeIterator it = *this;
-    ++(*this);
-    return it;
+    File_കണ്ണി_Iterator it = *ഇത്;
+    ++(*ഇത്);
+    തിരികെ it;
 }
 
-FileNodeIterator& FileNodeIterator::operator += (int _ofs)
+File_കണ്ണി_Iterator& File_കണ്ണി_Iterator::operator += (പൂർണ്ണസംഖ്യ _ofs)
 {
     CV_Assert( _ofs >= 0 );
-    for( ; _ofs > 0; _ofs-- )
-        this->operator ++();
-    return *this;
+    വേണ്ടി( ; _ofs > 0; _ofs-- )
+        ഇത്->operator ++();
+    തിരികെ *ഇത്;
 }
 
-FileNodeIterator& FileNodeIterator::readRaw( const String& fmt, void* _data0, size_t maxsz)
+File_കണ്ണി_Iterator& File_കണ്ണി_Iterator::readRaw( സ്ഥിരം String& fmt, ശൂന്യം* _data0, size_t maxsz)
 {
-    if( fs && idx < nodeNElems )
+    എങ്കിൽ( fs && idx < കണ്ണി_NElems )
     {
         uchar* data0 = (uchar*)_data0;
-        int fmt_pairs[CV_FS_MAX_FMT_PAIRS*2];
-        int fmt_pair_count = fs::decodeFormat( fmt.c_str(), fmt_pairs, CV_FS_MAX_FMT_PAIRS );
+        പൂർണ്ണസംഖ്യ fmt_pairs[CV_FS_MAX_FMT_PAIRS*2];
+        പൂർണ്ണസംഖ്യ fmt_pair_എണ്ണം = fs::decodeFormat( fmt.c_str(), fmt_pairs, CV_FS_MAX_FMT_PAIRS );
         size_t esz = fs::calcStructSize( fmt.c_str(), 0 );
 
         CV_Assert( maxsz % esz == 0 );
         maxsz /= esz;
 
-        for( ; maxsz > 0; maxsz--, data0 += esz )
+        വേണ്ടി( ; maxsz > 0; maxsz--, data0 += esz )
         {
             size_t offset = 0;
-            for( int k = 0; k < fmt_pair_count; k++ )
+            വേണ്ടി( പൂർണ്ണസംഖ്യ k = 0; k < fmt_pair_എണ്ണം; k++ )
             {
-                int elem_type = fmt_pairs[k*2+1];
-                int elem_size = CV_ELEM_SIZE(elem_type);
+                പൂർണ്ണസംഖ്യ elem_type = fmt_pairs[k*2+1];
+                പൂർണ്ണസംഖ്യ elem_size = CV_ELEM_SIZE(elem_type);
 
-                int count = fmt_pairs[k*2];
+                പൂർണ്ണസംഖ്യ എണ്ണം_2 = fmt_pairs[k*2];
                 offset = alignSize( offset, elem_size );
                 uchar* data = data0 + offset;
 
-                for( int i = 0; i < count; i++, ++(*this) )
+                വേണ്ടി( പൂർണ്ണസംഖ്യ i = 0; i < എണ്ണം_2; i++, ++(*ഇത്) )
                 {
-                    FileNode node = *(*this);
-                    if( node.isInt() )
+                    File_കണ്ണി കണ്ണി = *(*ഇത്);
+                    എങ്കിൽ( കണ്ണി.isInt() )
                     {
-                        int64_t ival = static_cast<int64_t>(elem_size == 8 ? (int64_t)node : (int)node);
-                        switch( elem_type )
+                        int64_t ival = static_cast<int64_t>(elem_size == 8 ? (int64_t)കണ്ണി : (പൂർണ്ണസംഖ്യ)കണ്ണി);
+                        തിരഞ്ഞെടുപ്പ്( elem_type )
                         {
-                        case CV_8U:
+                        അവസ്ഥ CV_8U:
                             *(uchar*)data = saturate_cast<uchar>(ival);
                             data++;
-                            break;
-                        case CV_8S:
-                            *(char*)data = saturate_cast<schar>(ival);
+                            നിർത്തുക;
+                        അവസ്ഥ CV_8S:
+                            *(അക്ഷരം*)data = saturate_cast<schar>(ival);
                             data++;
-                            break;
-                        case CV_Bool:
-                            *(bool*)data = ival != 0;
+                            നിർത്തുക;
+                        അവസ്ഥ CV_Bool:
+                            *(തർക്കം*)data = ival != 0;
                             data++;
-                            break;
-                        case CV_16U:
+                            നിർത്തുക;
+                        അവസ്ഥ CV_16U:
                             *(ushort*)data = saturate_cast<ushort>(ival);
-                            data += sizeof(ushort);
-                            break;
-                        case CV_16S:
+                            data += വലുപ്പം(ushort);
+                            നിർത്തുക;
+                        അവസ്ഥ CV_16S:
                             *(short*)data = saturate_cast<short>(ival);
-                            data += sizeof(short);
-                            break;
-                        case CV_32U:
+                            data += വലുപ്പം(short);
+                            നിർത്തുക;
+                        അവസ്ഥ CV_32U:
                             *(unsigned*)data = (unsigned)std::max(ival, (int64_t)0);
-                            data += sizeof(unsigned);
-                            break;
-                        case CV_32S:
-                            *(int*)data = (int)ival;
-                            data += sizeof(int);
-                            break;
-                        case CV_32F:
-                            *(float*)data = (float)ival;
-                            data += sizeof(float);
-                            break;
-                        case CV_64U:
+                            data += വലുപ്പം(unsigned);
+                            നിർത്തുക;
+                        അവസ്ഥ CV_32S:
+                            *(പൂർണ്ണസംഖ്യ*)data = (പൂർണ്ണസംഖ്യ)ival;
+                            data += വലുപ്പം(പൂർണ്ണസംഖ്യ);
+                            നിർത്തുക;
+                        അവസ്ഥ CV_32F:
+                            *(ദശാംശം*)data = (ദശാംശം)ival;
+                            data += വലുപ്പം(ദശാംശം);
+                            നിർത്തുക;
+                        അവസ്ഥ CV_64U:
                             *(uint64_t*)data = (uint64_t)ival;
-                            data += sizeof(uint64_t);
-                            break;
-                        case CV_64S:
+                            data += വലുപ്പം(uint64_t);
+                            നിർത്തുക;
+                        അവസ്ഥ CV_64S:
                             *(int64_t*)data = (int64_t)ival;
-                            data += sizeof(int64_t);
-                            break;
-                        case CV_64F:
-                            *(double*)data = (double)ival;
-                            data += sizeof(double);
-                            break;
-                        case CV_16F:
-                            *(hfloat*)data = hfloat((float)ival);
-                            data += sizeof(hfloat);
-                            break;
-                        case CV_16BF:
-                            *(bfloat*)data = bfloat((float)ival);
-                            data += sizeof(bfloat);
-                            break;
-                        case CV_8F_E4M3FN:
-                            *(fp8_t*)data = fp8_t((float)ival);
-                            data += sizeof(fp8_t);
-                            break;
-                        case CV_8F_E4M3FNUZ:
-                            *(fp8a_t*)data = fp8a_t((float)ival);
-                            data += sizeof(fp8a_t);
-                            break;
-                        default:
+                            data += വലുപ്പം(int64_t);
+                            നിർത്തുക;
+                        അവസ്ഥ CV_64F:
+                            *(ഇരട്ട*)data = (ഇരട്ട)ival;
+                            data += വലുപ്പം(ഇരട്ട);
+                            നിർത്തുക;
+                        അവസ്ഥ CV_16F:
+                            *(hfloat*)data = hfloat((ദശാംശം)ival);
+                            data += വലുപ്പം(hfloat);
+                            നിർത്തുക;
+                        അവസ്ഥ CV_16BF:
+                            *(bfloat*)data = bfloat((ദശാംശം)ival);
+                            data += വലുപ്പം(bfloat);
+                            നിർത്തുക;
+                        അവസ്ഥ CV_8F_E4M3FN:
+                            *(fp8_t*)data = fp8_t((ദശാംശം)ival);
+                            data += വലുപ്പം(fp8_t);
+                            നിർത്തുക;
+                        അവസ്ഥ CV_8F_E4M3FNUZ:
+                            *(fp8a_t*)data = fp8a_t((ദശാംശം)ival);
+                            data += വലുപ്പം(fp8a_t);
+                            നിർത്തുക;
+                        സ്ഥിരസ്ഥിതി:
                             CV_Error( Error::StsUnsupportedFormat, "Unsupported type" );
                         }
                     }
-                    else if( node.isReal() )
+                    അല്ലെങ്കിൽ എങ്കിൽ( കണ്ണി.isReal() )
                     {
-                        double fval = (double)node;
+                        ഇരട്ട fval = (ഇരട്ട)കണ്ണി;
 
-                        switch( elem_type )
+                        തിരഞ്ഞെടുപ്പ്( elem_type )
                         {
-                        case CV_8U:
+                        അവസ്ഥ CV_8U:
                             *(uchar*)data = saturate_cast<uchar>(fval);
                             data++;
-                            break;
-                        case CV_8S:
-                            *(char*)data = saturate_cast<schar>(fval);
+                            നിർത്തുക;
+                        അവസ്ഥ CV_8S:
+                            *(അക്ഷരം*)data = saturate_cast<schar>(fval);
                             data++;
-                            break;
-                        case CV_16U:
+                            നിർത്തുക;
+                        അവസ്ഥ CV_16U:
                             *(ushort*)data = saturate_cast<ushort>(fval);
-                            data += sizeof(ushort);
-                            break;
-                        case CV_16S:
+                            data += വലുപ്പം(ushort);
+                            നിർത്തുക;
+                        അവസ്ഥ CV_16S:
                             *(short*)data = saturate_cast<short>(fval);
-                            data += sizeof(short);
-                            break;
-                        case CV_32U:
-                            *(int*)data = saturate_cast<unsigned>(fval);
-                            data += sizeof(int);
-                            break;
-                        case CV_32S:
-                            *(int*)data = saturate_cast<int>(fval);
-                            data += sizeof(int);
-                            break;
-                        case CV_32F:
-                            *(float*)data = (float)fval;
-                            data += sizeof(float);
-                            break;
-                        case CV_64U:
+                            data += വലുപ്പം(short);
+                            നിർത്തുക;
+                        അവസ്ഥ CV_32U:
+                            *(പൂർണ്ണസംഖ്യ*)data = saturate_cast<unsigned>(fval);
+                            data += വലുപ്പം(പൂർണ്ണസംഖ്യ);
+                            നിർത്തുക;
+                        അവസ്ഥ CV_32S:
+                            *(പൂർണ്ണസംഖ്യ*)data = saturate_cast<പൂർണ്ണസംഖ്യ>(fval);
+                            data += വലുപ്പം(പൂർണ്ണസംഖ്യ);
+                            നിർത്തുക;
+                        അവസ്ഥ CV_32F:
+                            *(ദശാംശം*)data = (ദശാംശം)fval;
+                            data += വലുപ്പം(ദശാംശം);
+                            നിർത്തുക;
+                        അവസ്ഥ CV_64U:
                             *(uint64_t*)data = (uint64_t)round(std::max(fval, 0.));
-                            data += sizeof(uint64_t);
-                            break;
-                        case CV_64S:
+                            data += വലുപ്പം(uint64_t);
+                            നിർത്തുക;
+                        അവസ്ഥ CV_64S:
                             *(int64_t*)data = (int64_t)round(std::max(fval, 0.));
-                            data += sizeof(int64_t);
-                            break;
-                        case CV_64F:
-                            *(double*)data = fval;
-                            data += sizeof(double);
-                            break;
-                        case CV_16F:
-                            *(hfloat*)data = hfloat((float)fval);
-                            data += sizeof(hfloat);
-                            break;
-                        case CV_16BF:
-                            *(bfloat*)data = bfloat((float)fval);
-                            data += sizeof(bfloat);
-                            break;
-                        case CV_8F_E4M3FN:
-                            *(fp8_t*)data = fp8_t((float)fval);
-                            data += sizeof(fp8_t);
-                            break;
-                        case CV_8F_E4M3FNUZ:
-                            *(fp8a_t*)data = fp8a_t((float)fval);
-                            data += sizeof(fp8a_t);
-                            break;
-                        default:
+                            data += വലുപ്പം(int64_t);
+                            നിർത്തുക;
+                        അവസ്ഥ CV_64F:
+                            *(ഇരട്ട*)data = fval;
+                            data += വലുപ്പം(ഇരട്ട);
+                            നിർത്തുക;
+                        അവസ്ഥ CV_16F:
+                            *(hfloat*)data = hfloat((ദശാംശം)fval);
+                            data += വലുപ്പം(hfloat);
+                            നിർത്തുക;
+                        അവസ്ഥ CV_16BF:
+                            *(bfloat*)data = bfloat((ദശാംശം)fval);
+                            data += വലുപ്പം(bfloat);
+                            നിർത്തുക;
+                        അവസ്ഥ CV_8F_E4M3FN:
+                            *(fp8_t*)data = fp8_t((ദശാംശം)fval);
+                            data += വലുപ്പം(fp8_t);
+                            നിർത്തുക;
+                        അവസ്ഥ CV_8F_E4M3FNUZ:
+                            *(fp8a_t*)data = fp8a_t((ദശാംശം)fval);
+                            data += വലുപ്പം(fp8a_t);
+                            നിർത്തുക;
+                        സ്ഥിരസ്ഥിതി:
                             CV_Error( Error::StsUnsupportedFormat, "Unsupported type" );
                         }
                     }
-                    else
+                    അല്ലെങ്കിൽ
                         CV_Error( Error::StsError, "readRawData can only be used to read plain sequences of numbers" );
                 }
-                offset = (int)(data - data0);
+                offset = (പൂർണ്ണസംഖ്യ)(data - data0);
             }
         }
     }
 
-    return *this;
+    തിരികെ *ഇത്;
 }
 
-bool FileNodeIterator::equalTo(const FileNodeIterator& it) const
+തർക്കം File_കണ്ണി_Iterator::equalTo(സ്ഥിരം File_കണ്ണി_Iterator& it) സ്ഥിരം
 {
-    return fs == it.fs && blockIdx == it.blockIdx && ofs == it.ofs &&
-           idx == it.idx && nodeNElems == it.nodeNElems;
+    തിരികെ fs == it.fs && blockIdx == it.blockIdx && ofs == it.ofs &&
+           idx == it.idx && കണ്ണി_NElems == it.കണ്ണി_NElems;
 }
 
-size_t FileNodeIterator::remaining() const
+size_t File_കണ്ണി_Iterator::remaining() സ്ഥിരം
 {
-    return nodeNElems - idx;
+    തിരികെ കണ്ണി_NElems - idx;
 }
 
-bool operator == ( const FileNodeIterator& it1, const FileNodeIterator& it2 )
+തർക്കം operator == ( സ്ഥിരം File_കണ്ണി_Iterator& it1, സ്ഥിരം File_കണ്ണി_Iterator& it2 )
 {
-    return it1.equalTo(it2);
+    തിരികെ it1.equalTo(it2);
 }
 
-bool operator != ( const FileNodeIterator& it1, const FileNodeIterator& it2 )
+തർക്കം operator != ( സ്ഥിരം File_കണ്ണി_Iterator& it1, സ്ഥിരം File_കണ്ണി_Iterator& it2 )
 {
-    return !it1.equalTo(it2);
+    തിരികെ !it1.equalTo(it2);
 }
 
-void read(const FileNode& node, int& val, int default_val)
+ശൂന്യം പഠ(സ്ഥിരം File_കണ്ണി& കണ്ണി, പൂർണ്ണസംഖ്യ& val, പൂർണ്ണസംഖ്യ default_val)
 {
     val = default_val;
-    if( !node.empty() )
+    എങ്കിൽ( !കണ്ണി.empty() )
     {
-        val = (int)node;
+        val = (പൂർണ്ണസംഖ്യ)കണ്ണി;
     }
 }
 
-void read(const FileNode& node, int64_t& val, int64_t default_val)
+ശൂന്യം പഠ(സ്ഥിരം File_കണ്ണി& കണ്ണി, int64_t& val, int64_t default_val)
 {
     val = default_val;
-    if( !node.empty() )
+    എങ്കിൽ( !കണ്ണി.empty() )
     {
-        val = (int64_t)node;
+        val = (int64_t)കണ്ണി;
     }
 }
 
-void read(const FileNode& node, double& val, double default_val)
+ശൂന്യം പഠ(സ്ഥിരം File_കണ്ണി& കണ്ണി, ഇരട്ട& val, ഇരട്ട default_val)
 {
     val = default_val;
-    if( !node.empty() )
+    എങ്കിൽ( !കണ്ണി.empty() )
     {
-        val = (double)node;
+        val = (ഇരട്ട)കണ്ണി;
     }
 }
 
-void read(const FileNode& node, float& val, float default_val)
+ശൂന്യം പഠ(സ്ഥിരം File_കണ്ണി& കണ്ണി, ദശാംശം& val, ദശാംശം default_val)
 {
     val = default_val;
-    if( !node.empty() )
+    എങ്കിൽ( !കണ്ണി.empty() )
     {
-        val = (float)node;
+        val = (ദശാംശം)കണ്ണി;
     }
 }
 
-void read(const FileNode& node, std::string& val, const std::string& default_val)
+ശൂന്യം പഠ(സ്ഥിരം File_കണ്ണി& കണ്ണി, std::string& val, സ്ഥിരം std::string& default_val)
 {
     val = default_val;
-    if( !node.empty() )
+    എങ്കിൽ( !കണ്ണി.empty() )
     {
-        val = (std::string)node;
+        val = (std::string)കണ്ണി;
     }
 }
-void FileStorage::Impl::write(const String &key, bool value)
+ശൂന്യം FileStorage::Impl::ലിഖ(സ്ഥിരം String &താക്കോൽ, തർക്കം value)
 {
     CV_Assert(write_mode);
-    if (fmt != FileStorage::FORMAT_YAML)
+    എങ്കിൽ (fmt != FileStorage::FORMAT_YAML)
     {
         // Legacy behavior: Write as integer 1 or 0
-        getEmitter().write(key.c_str(), (int)value);
+        getEmitter().ലിഖ(താക്കോൽ.c_str(), (പൂർണ്ണസംഖ്യ)value);
     }
-    else
+    അല്ലെങ്കിൽ
     {
         // Default/Modern behavior: Write as "true" or "false"
-        getEmitter().write(key.c_str(), value ? "true" : "false", false);
+        getEmitter().ലിഖ(താക്കോൽ.c_str(), value ? "true" : "false", അസത്യം);
     }
 }
 
 FileStorage_API::~FileStorage_API() {}
 
-namespace internal
+നാമാകാശ internal
 {
 
-WriteStructContext::WriteStructContext(FileStorage& _fs, const std::string& name,
-                                       int flags, const std::string& typeName)
+WriteStructContext::WriteStructContext(FileStorage& _fs, സ്ഥിരം std::string& name,
+                                       പൂർണ്ണസംഖ്യ flags, സ്ഥിരം std::string& typeName)
 {
     fs = &_fs;
     fs->startWriteStruct(name, flags, typeName);

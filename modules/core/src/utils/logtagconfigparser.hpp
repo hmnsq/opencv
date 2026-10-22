@@ -5,44 +5,44 @@
 #ifndef OPENCV_CORE_LOGTAGCONFIGPARSER_HPP
 #define OPENCV_CORE_LOGTAGCONFIGPARSER_HPP
 
-#if 1 // if not already in precompiled headers
-#include <string>
-#include <vector>
-#include <functional>
+#എങ്കിൽ 1 // if not already in precompiled headers
+#അന്തര്ഭാവ <string>
+#അന്തര്ഭാവ <vector>
+#അന്തര്ഭാവ <functional>
 #endif
 
-#include <opencv2/core/utils/logtag.hpp>
-#include "logtagconfig.hpp"
+#അന്തര്ഭാവ <opencv2/core/utils/logtag.hpp>
+#അന്തര്ഭാവ "logtagconfig.hpp"
 
-namespace cv {
-namespace utils {
-namespace logging {
+നാമാകാശ cv {
+നാമാകാശ utils {
+നാമാകാശ logging {
 
-class LogTagConfigParser
+വർഗ്ഗം LogTagConfigParser
 {
-public:
+പൊതു:
     LogTagConfigParser(LogLevel defaultUnconfiguredGlobalLevel = LOG_LEVEL_VERBOSE);
-    explicit LogTagConfigParser(const std::string& input);
+    explicit LogTagConfigParser(സ്ഥിരം std::string& നിവേശം_2);
     ~LogTagConfigParser();
 
-public:
-    bool parse(const std::string& input);
-    bool hasMalformed() const;
-    const LogTagConfig& getGlobalConfig() const;
-    const std::vector<LogTagConfig>& getFullNameConfigs() const;
-    const std::vector<LogTagConfig>& getFirstPartConfigs() const;
-    const std::vector<LogTagConfig>& getAnyPartConfigs() const;
-    const std::vector<std::string>& getMalformed() const;
+പൊതു:
+    തർക്കം parse(സ്ഥിരം std::string& നിവേശം_2);
+    തർക്കം hasMalformed() സ്ഥിരം;
+    സ്ഥിരം LogTagConfig& getGlobalConfig() സ്ഥിരം;
+    സ്ഥിരം std::vector<LogTagConfig>& getFullNameConfigs() സ്ഥിരം;
+    സ്ഥിരം std::vector<LogTagConfig>& getFirstPartConfigs() സ്ഥിരം;
+    സ്ഥിരം std::vector<LogTagConfig>& getAnyPartConfigs() സ്ഥിരം;
+    സ്ഥിരം std::vector<std::string>& getMalformed() സ്ഥിരം;
 
-private:
-    void segmentTokens();
-    void parseNameAndLevel(const std::string& s);
-    void parseWildcard(const std::string& name, LogLevel level);
-    static std::pair<LogLevel, bool> parseLogLevel(const std::string& s);
-    static std::string toString(LogLevel level);
+സ്വകാര്യ:
+    ശൂന്യം segmentTokens();
+    ശൂന്യം parseNameAndLevel(സ്ഥിരം std::string& s);
+    ശൂന്യം parseWildcard(സ്ഥിരം std::string& name, LogLevel level);
+    സ്ഥിതം std::pair<LogLevel, തർക്കം> parseLogLevel(സ്ഥിരം std::string& s);
+    സ്ഥിതം std::string toString(LogLevel level);
 
-private:
-    std::string m_input;
+സ്വകാര്യ:
+    std::string m_നിവേശം;
     LogTagConfig m_parsedGlobal;
     std::vector<LogTagConfig> m_parsedFullName;
     std::vector<LogTagConfig> m_parsedFirstPart;

@@ -3,15 +3,15 @@
 // of this distribution and at http://opencv.org/license.html
 
 
-#include "precomp.hpp"
-#include "opencl_kernels_core.hpp"
+#അന്തര്ഭാവ "precomp.hpp"
+#അന്തര്ഭാവ "opencl_kernels_core.hpp"
 
-#include "split.simd.hpp"
-#include "split.simd_declarations.hpp" // defines CV_CPU_DISPATCH_MODES_ALL=AVX2,...,BASELINE based on CMakeLists.txt content
+#അന്തര്ഭാവ "split.simd.hpp"
+#അന്തര്ഭാവ "split.simd_declarations.hpp" // defines CV_CPU_DISPATCH_MODES_ALL=AVX2,...,BASELINE based on CMakeLists.txt content
 
-namespace cv { namespace hal {
+നാമാകാശ cv { നാമാകാശ hal {
 
-void split8u(const uchar* src, uchar** dst, int len, int cn )
+ശൂന്യം split8u(സ്ഥിരം uchar* src, uchar** dst, പൂർണ്ണസംഖ്യ len, പൂർണ്ണസംഖ്യ cn )
 {
     CV_INSTRUMENT_REGION();
     CALL_HAL(split8u, cv_hal_split8u, src,dst, len, cn)
@@ -19,7 +19,7 @@ void split8u(const uchar* src, uchar** dst, int len, int cn )
         CV_CPU_DISPATCH_MODES_ALL);
 }
 
-void split16u(const ushort* src, ushort** dst, int len, int cn )
+ശൂന്യം split16u(സ്ഥിരം ushort* src, ushort** dst, പൂർണ്ണസംഖ്യ len, പൂർണ്ണസംഖ്യ cn )
 {
     CV_INSTRUMENT_REGION();
     CALL_HAL(split16u, cv_hal_split16u, src,dst, len, cn)
@@ -27,7 +27,7 @@ void split16u(const ushort* src, ushort** dst, int len, int cn )
         CV_CPU_DISPATCH_MODES_ALL);
 }
 
-void split32s(const int* src, int** dst, int len, int cn )
+ശൂന്യം split32s(സ്ഥിരം പൂർണ്ണസംഖ്യ* src, പൂർണ്ണസംഖ്യ** dst, പൂർണ്ണസംഖ്യ len, പൂർണ്ണസംഖ്യ cn )
 {
     CV_INSTRUMENT_REGION();
     CALL_HAL(split32s, cv_hal_split32s, src,dst, len, cn)
@@ -35,7 +35,7 @@ void split32s(const int* src, int** dst, int len, int cn )
         CV_CPU_DISPATCH_MODES_ALL);
 }
 
-void split64s(const int64* src, int64** dst, int len, int cn )
+ശൂന്യം split64s(സ്ഥിരം int64* src, int64** dst, പൂർണ്ണസംഖ്യ len, പൂർണ്ണസംഖ്യ cn )
 {
     CV_INSTRUMENT_REGION();
     CALL_HAL(split64s, cv_hal_split64s, src,dst, len, cn)
@@ -49,95 +49,95 @@ void split64s(const int64* src, int64** dst, int len, int cn )
 *                                       split & merge                                    *
 \****************************************************************************************/
 
-typedef void (*SplitFunc)(const void* src, void** dst, int len, int cn);
+തരനിർവചനം ശൂന്യം (*SplitFunc)(സ്ഥിരം ശൂന്യം* src, ശൂന്യം** dst, പൂർണ്ണസംഖ്യ len, പൂർണ്ണസംഖ്യ cn);
 
-template<typename T, void (*fn)(const T*, T**, int, int)>
-static void splitWrap(const void* src, void** dst, int len, int cn)
+template<typename T, ശൂന്യം (*fn)(സ്ഥിരം T*, T**, പൂർണ്ണസംഖ്യ, പൂർണ്ണസംഖ്യ)>
+സ്ഥിതം ശൂന്യം splitWrap(സ്ഥിരം ശൂന്യം* src, ശൂന്യം** dst, പൂർണ്ണസംഖ്യ len, പൂർണ്ണസംഖ്യ cn)
 {
-    fn((const T*)src, (T**)dst, len, cn);
+    fn((സ്ഥിരം T*)src, (T**)dst, len, cn);
 }
 
-static SplitFunc getSplitFunc(int depth)
+സ്ഥിതം SplitFunc getSplitFunc(പൂർണ്ണസംഖ്യ depth)
 {
-    static SplitFunc splitTab[CV_DEPTH_MAX] =
+    സ്ഥിതം SplitFunc splitTab[CV_DEPTH_MAX] =
     {
         splitWrap<uchar, cv::hal::split8u>, splitWrap<uchar, cv::hal::split8u>,
         splitWrap<ushort, cv::hal::split16u>, splitWrap<ushort, cv::hal::split16u>,
-        splitWrap<int, cv::hal::split32s>, splitWrap<int, cv::hal::split32s>,
+        splitWrap<പൂർണ്ണസംഖ്യ, cv::hal::split32s>, splitWrap<പൂർണ്ണസംഖ്യ, cv::hal::split32s>,
         splitWrap<int64_t, cv::hal::split64s>, splitWrap<ushort, cv::hal::split16u>,
         splitWrap<ushort, cv::hal::split16u>, splitWrap<uchar, cv::hal::split8u>,
         splitWrap<int64_t, cv::hal::split64s>, splitWrap<int64_t, cv::hal::split64s>,
-        splitWrap<int, cv::hal::split32s>, splitWrap<uchar, cv::hal::split8u>,
+        splitWrap<പൂർണ്ണസംഖ്യ, cv::hal::split32s>, splitWrap<uchar, cv::hal::split8u>,
         splitWrap<uchar, cv::hal::split8u>, 0,
     };
 
-    return splitTab[depth];
+    തിരികെ splitTab[depth];
 }
 
 #ifdef HAVE_IPP
 
-static bool ipp_split(const Mat& src, Mat* mv, int channels)
+സ്ഥിതം തർക്കം ipp_split(സ്ഥിരം Mat& src, Mat* mv, പൂർണ്ണസംഖ്യ channels)
 {
 #ifdef HAVE_IPP_IW_LL
     CV_INSTRUMENT_REGION_IPP();
 
-    if(channels != 3 && channels != 4)
-        return false;
+    എങ്കിൽ(channels != 3 && channels != 4)
+        തിരികെ അസത്യം;
 
-    if(src.dims <= 2)
+    എങ്കിൽ(src.dims <= 2)
     {
         IppiSize size       = ippiSize(src.size());
-        void    *dstPtrs[4] = {NULL};
+        ശൂന്യം    *dstPtrs[4] = {ശൂന്യ};
         size_t   dstStep    = mv[0].step;
-        for(int i = 0; i < channels; i++)
+        വേണ്ടി(പൂർണ്ണസംഖ്യ i = 0; i < channels; i++)
         {
             dstPtrs[i] = mv[i].ptr();
-            if(dstStep != mv[i].step)
-                return false;
+            എങ്കിൽ(dstStep != mv[i].step)
+                തിരികെ അസത്യം;
         }
 
-        return CV_INSTRUMENT_FUN_IPP(llwiCopySplit, src.ptr(), (int)src.step, dstPtrs, (int)dstStep, size, (int)src.elemSize1(), channels, 0) >= 0;
+        തിരികെ CV_INSTRUMENT_FUN_IPP(llwiCopySplit, src.ptr(), (പൂർണ്ണസംഖ്യ)src.step, dstPtrs, (പൂർണ്ണസംഖ്യ)dstStep, size, (പൂർണ്ണസംഖ്യ)src.elemSize1(), channels, 0) >= 0;
     }
-    else
+    അല്ലെങ്കിൽ
     {
-        const Mat *arrays[5] = {NULL};
-        uchar     *ptrs[5]   = {NULL};
+        സ്ഥിരം Mat *arrays[5] = {ശൂന്യ};
+        uchar     *ptrs[5]   = {ശൂന്യ};
         arrays[0] = &src;
 
-        for(int i = 1; i < channels; i++)
+        വേണ്ടി(പൂർണ്ണസംഖ്യ i = 1; i < channels; i++)
         {
             arrays[i] = &mv[i-1];
         }
 
         NAryMatIterator it(arrays, ptrs);
-        IppiSize size = { (int)it.size, 1 };
+        IppiSize size = { (പൂർണ്ണസംഖ്യ)it.size, 1 };
 
-        for( size_t i = 0; i < it.nplanes; i++, ++it )
+        വേണ്ടി( size_t i = 0; i < it.nplanes; i++, ++it )
         {
-            if(CV_INSTRUMENT_FUN_IPP(llwiCopySplit, ptrs[0], 0, (void**)&ptrs[1], 0, size, (int)src.elemSize1(), channels, 0) < 0)
-                return false;
+            എങ്കിൽ(CV_INSTRUMENT_FUN_IPP(llwiCopySplit, ptrs[0], 0, (ശൂന്യം**)&ptrs[1], 0, size, (പൂർണ്ണസംഖ്യ)src.elemSize1(), channels, 0) < 0)
+                തിരികെ അസത്യം;
         }
-        return true;
+        തിരികെ സത്യം;
     }
-#else
+#അല്ലെങ്കിൽ
     CV_UNUSED(src); CV_UNUSED(mv); CV_UNUSED(channels);
-    return false;
+    തിരികെ അസത്യം;
 #endif
 }
 #endif
 
-void split(const Mat& src, Mat* mv)
+ശൂന്യം split(സ്ഥിരം Mat& src, Mat* mv)
 {
     CV_INSTRUMENT_REGION();
 
-    int k, depth = src.depth(), cn = src.channels();
-    if( cn == 1 )
+    പൂർണ്ണസംഖ്യ k, depth = src.depth(), cn = src.channels();
+    എങ്കിൽ( cn == 1 )
     {
         src.copyTo(mv[0]);
-        return;
+        തിരികെ;
     }
 
-    for( k = 0; k < cn; k++ )
+    വേണ്ടി( k = 0; k < cn; k++ )
     {
         mv[k].create(src.size, depth);
     }
@@ -149,12 +149,12 @@ void split(const Mat& src, Mat* mv)
 
     size_t esz = src.elemSize(), esz1 = src.elemSize1();
     size_t blocksize0 = (BLOCK_SIZE + esz-1)/esz;
-    AutoBuffer<uchar> _buf((cn+1)*(sizeof(Mat*) + sizeof(uchar*)) + 16);
-    const Mat** arrays = (const Mat**)_buf.data();
+    AutoBuffer<uchar> _buf((cn+1)*(വലുപ്പം(Mat*) + വലുപ്പം(uchar*)) + 16);
+    സ്ഥിരം Mat** arrays = (സ്ഥിരം Mat**)_buf.data();
     uchar** ptrs = (uchar**)alignPtr(arrays + cn + 1, 16);
 
     arrays[0] = &src;
-    for( k = 0; k < cn; k++ )
+    വേണ്ടി( k = 0; k < cn; k++ )
     {
         arrays[k+1] = &mv[k];
     }
@@ -163,17 +163,17 @@ void split(const Mat& src, Mat* mv)
     size_t total = it.size;
     size_t blocksize = std::min((size_t)CV_SPLIT_MERGE_MAX_BLOCK_SIZE(cn), cn <= 4 ? total : std::min(total, blocksize0));
 
-    for( size_t i = 0; i < it.nplanes; i++, ++it )
+    വേണ്ടി( size_t i = 0; i < it.nplanes; i++, ++it )
     {
-        for( size_t j = 0; j < total; j += blocksize )
+        വേണ്ടി( size_t j = 0; j < total; j += blocksize )
         {
             size_t bsz = std::min(total - j, blocksize);
-            func( ptrs[0], (void**)&ptrs[1], (int)bsz, cn );
+            func( ptrs[0], (ശൂന്യം**)&ptrs[1], (പൂർണ്ണസംഖ്യ)bsz, cn );
 
-            if( j + blocksize < total )
+            എങ്കിൽ( j + blocksize < total )
             {
                 ptrs[0] += bsz*esz;
-                for( k = 0; k < cn; k++ )
+                വേണ്ടി( k = 0; k < cn; k++ )
                     ptrs[k+1] += bsz*esz1;
             }
         }
@@ -182,13 +182,13 @@ void split(const Mat& src, Mat* mv)
 
 #ifdef HAVE_OPENCL
 
-static bool ocl_split( InputArray _m, OutputArrayOfArrays _mv )
+സ്ഥിതം തർക്കം ocl_split( നിവേശം_Array _m, OutputArrayOfArrays _mv )
 {
-    int type = _m.type(), depth = CV_MAT_DEPTH(type), cn = CV_MAT_CN(type),
+    പൂർണ്ണസംഖ്യ type = _m.type(), depth = CV_MAT_DEPTH(type), cn = CV_MAT_CN(type),
             rowsPerWI = ocl::Device::getDefault().isIntel() ? 4 : 1;
 
     String dstargs, processelem, indexdecl;
-    for (int i = 0; i < cn; ++i)
+    വേണ്ടി (പൂർണ്ണസംഖ്യ i = 0; i < cn; ++i)
     {
         dstargs += format("DECLARE_DST_PARAM(%d)", i);
         indexdecl += format("DECLARE_INDEX(%d)", i);
@@ -200,29 +200,29 @@ static bool ocl_split( InputArray _m, OutputArrayOfArrays _mv )
                          " -D PROCESS_ELEMS_N=%s -D DECLARE_INDEX_N=%s",
                          ocl::memopTypeToStr(depth), cn, dstargs.c_str(),
                          processelem.c_str(), indexdecl.c_str()));
-    if (k.empty())
-        return false;
+    എങ്കിൽ (k.empty())
+        തിരികെ അസത്യം;
 
     Size size = _m.size();
     _mv.create(cn, 1, depth);
-    for (int i = 0; i < cn; ++i)
+    വേണ്ടി (പൂർണ്ണസംഖ്യ i = 0; i < cn; ++i)
         _mv.create(size, depth, i);
 
     std::vector<UMat> dst;
     _mv.getUMatVector(dst);
 
-    int argidx = k.set(0, ocl::KernelArg::ReadOnly(_m.getUMat()));
-    for (int i = 0; i < cn; ++i)
+    പൂർണ്ണസംഖ്യ argidx = k.set(0, ocl::KernelArg::ReadOnly(_m.getUMat()));
+    വേണ്ടി (പൂർണ്ണസംഖ്യ i = 0; i < cn; ++i)
         argidx = k.set(argidx, ocl::KernelArg::WriteOnlyNoSize(dst[i]));
     k.set(argidx, rowsPerWI);
 
     size_t globalsize[2] = { (size_t)size.width, ((size_t)size.height + rowsPerWI - 1) / rowsPerWI };
-    return k.run(2, globalsize, NULL, false);
+    തിരികെ k.run(2, globalsize, ശൂന്യ, അസത്യം);
 }
 
 #endif
 
-void split(InputArray _m, OutputArrayOfArrays _mv)
+ശൂന്യം split(നിവേശം_Array _m, OutputArrayOfArrays _mv)
 {
     CV_INSTRUMENT_REGION();
 
@@ -230,17 +230,17 @@ void split(InputArray _m, OutputArrayOfArrays _mv)
                ocl_split(_m, _mv))
 
     Mat m = _m.getMat();
-    if( m.empty() )
+    എങ്കിൽ( m.empty() )
     {
         _mv.release();
-        return;
+        തിരികെ;
     }
 
     CV_Assert( !_mv.fixedType() || _mv.empty() || _mv.type() == m.depth() );
 
-    int depth = m.depth(), cn = m.channels();
+    പൂർണ്ണസംഖ്യ depth = m.depth(), cn = m.channels();
     _mv.create(cn, 1, depth);
-    for (int i = 0; i < cn; ++i)
+    വേണ്ടി (പൂർണ്ണസംഖ്യ i = 0; i < cn; ++i)
         _mv.create(m.dims, m.size.p, depth, i);
 
     std::vector<Mat> dst;

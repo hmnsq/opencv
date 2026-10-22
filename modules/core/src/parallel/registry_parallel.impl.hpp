@@ -6,168 +6,168 @@
 // Not a standalone header, part of parallel.cpp
 //
 
-#include "opencv2/core/utils/filesystem.private.hpp"  // OPENCV_HAVE_FILESYSTEM_SUPPORT
+#അന്തര്ഭാവ "opencv2/core/utils/filesystem.private.hpp"  // OPENCV_HAVE_FILESYSTEM_SUPPORT
 
-namespace cv { namespace parallel {
+നാമാകാശ cv { നാമാകാശ parallel {
 
-#if OPENCV_HAVE_FILESYSTEM_SUPPORT && defined(PARALLEL_ENABLE_PLUGINS)
+#എങ്കിൽ OPENCV_HAVE_FILESYSTEM_SUPPORT && defined(PARALLEL_ENABLE_PLUGINS)
 #define DECLARE_DYNAMIC_BACKEND(name) \
 ParallelBackendInfo { \
     1000, name, createPluginParallelBackendFactory(name) \
 },
-#else
+#അല്ലെങ്കിൽ
 #define DECLARE_DYNAMIC_BACKEND(name) /* nothing */
 #endif
 
 #define DECLARE_STATIC_BACKEND(name, createBackendAPI) \
 ParallelBackendInfo { \
-    1000, name, std::make_shared<cv::parallel::StaticBackendFactory>([=] () -> std::shared_ptr<cv::parallel::ParallelForAPI> { return createBackendAPI(); }) \
+    1000, name, std::make_shared<cv::parallel::StaticBackendFactory>([=] () -> std::shared_ptr<cv::parallel::ParallelForAPI> { തിരികെ createBackendAPI(); }) \
 },
 
-static
+സ്ഥിതം
 std::vector<ParallelBackendInfo>& getBuiltinParallelBackendsInfo()
 {
-    static std::vector<ParallelBackendInfo> g_backends
+    സ്ഥിതം std::vector<ParallelBackendInfo> g_backends
     {
 #ifdef HAVE_TBB
         DECLARE_STATIC_BACKEND("TBB", createParallelBackendTBB)
-#elif defined(PARALLEL_ENABLE_PLUGINS)
+#അല്ലെങ്കിലെങ്കിൽ defined(PARALLEL_ENABLE_PLUGINS)
         DECLARE_DYNAMIC_BACKEND("ONETBB")   // dedicated oneTBB plugin (interface >= 12000, binary incompatibe with TBB 2017-2020)
         DECLARE_DYNAMIC_BACKEND("TBB")      // generic TBB plugins
 #endif
 
 #ifdef HAVE_OPENMP
         DECLARE_STATIC_BACKEND("OPENMP", createParallelBackendOpenMP)
-#elif defined(PARALLEL_ENABLE_PLUGINS)
+#അല്ലെങ്കിലെങ്കിൽ defined(PARALLEL_ENABLE_PLUGINS)
         DECLARE_DYNAMIC_BACKEND("OPENMP")  // TODO Intel OpenMP?
 #endif
     };
-    return g_backends;
+    തിരികെ g_backends;
 }
 
-static
-bool sortByPriority(const ParallelBackendInfo &lhs, const ParallelBackendInfo &rhs)
+സ്ഥിതം
+തർക്കം sortByPriority(സ്ഥിരം ParallelBackendInfo &lhs, സ്ഥിരം ParallelBackendInfo &rhs)
 {
-    return lhs.priority > rhs.priority;
+    തിരികെ lhs.priority > rhs.priority;
 }
 
 /** @brief Manages list of enabled backends
  */
-class ParallelBackendRegistry
+വർഗ്ഗം ParallelBackendRegistry
 {
-protected:
+സംരക്ഷിത:
     std::vector<ParallelBackendInfo> enabledBackends;
     ParallelBackendRegistry()
     {
         enabledBackends = getBuiltinParallelBackendsInfo();
-        int N = (int)enabledBackends.size();
-        for (int i = 0; i < N; i++)
+        പൂർണ്ണസംഖ്യ N = (പൂർണ്ണസംഖ്യ)enabledBackends.size();
+        വേണ്ടി (പൂർണ്ണസംഖ്യ i = 0; i < N; i++)
         {
             ParallelBackendInfo& info = enabledBackends[i];
             info.priority = 1000 - i * 10;
         }
-        CV_LOG_DEBUG(NULL, "core(parallel): Builtin backends(" << N << "): " << dumpBackends());
-        if (readPrioritySettings())
+        CV_LOG_DEBUG(ശൂന്യ, "core(parallel): Builtin backends(" << N << "): " << dumpBackends());
+        എങ്കിൽ (readPrioritySettings())
         {
-            CV_LOG_INFO(NULL, "core(parallel): Updated backends priorities: " << dumpBackends());
-            N = (int)enabledBackends.size();
+            CV_LOG_INFO(ശൂന്യ, "core(parallel): Updated backends priorities: " << dumpBackends());
+            N = (പൂർണ്ണസംഖ്യ)enabledBackends.size();
         }
-        int enabled = 0;
-        for (int i = 0; i < N; i++)
+        പൂർണ്ണസംഖ്യ enabled = 0;
+        വേണ്ടി (പൂർണ്ണസംഖ്യ i = 0; i < N; i++)
         {
             ParallelBackendInfo& info = enabledBackends[enabled];
-            if (enabled != i)
+            എങ്കിൽ (enabled != i)
                 info = enabledBackends[i];
             size_t param_priority = utils::getConfigurationParameterSizeT(cv::format("OPENCV_PARALLEL_PRIORITY_%s", info.name.c_str()).c_str(), (size_t)info.priority);
-            CV_Assert(param_priority == (size_t)(int)param_priority); // overflow check
-            if (param_priority > 0)
+            CV_Assert(param_priority == (size_t)(പൂർണ്ണസംഖ്യ)param_priority); // overflow check
+            എങ്കിൽ (param_priority > 0)
             {
-                info.priority = (int)param_priority;
+                info.priority = (പൂർണ്ണസംഖ്യ)param_priority;
                 enabled++;
             }
-            else
+            അല്ലെങ്കിൽ
             {
-                CV_LOG_INFO(NULL, "core(parallel): Disable backend: " << info.name);
+                CV_LOG_INFO(ശൂന്യ, "core(parallel): Disable backend: " << info.name);
             }
         }
         enabledBackends.resize(enabled);
-        CV_LOG_DEBUG(NULL, "core(parallel): Available backends(" << enabled << "): " << dumpBackends());
+        CV_LOG_DEBUG(ശൂന്യ, "core(parallel): Available backends(" << enabled << "): " << dumpBackends());
         std::sort(enabledBackends.begin(), enabledBackends.end(), sortByPriority);
-        CV_LOG_INFO(NULL, "core(parallel): Enabled backends(" << enabled << ", sorted by priority): " << (enabledBackends.empty() ? std::string("N/A") : dumpBackends()));
+        CV_LOG_INFO(ശൂന്യ, "core(parallel): Enabled backends(" << enabled << ", sorted by priority): " << (enabledBackends.empty() ? std::string("N/A") : dumpBackends()));
     }
 
-    static std::vector<std::string> tokenize_string(const std::string& input, char token)
+    സ്ഥിതം std::vector<std::string> tokenize_string(സ്ഥിരം std::string& നിവേശം_2, അക്ഷരം token)
     {
         std::vector<std::string> result;
         std::string::size_type prev_pos = 0, pos = 0;
-        while((pos = input.find(token, pos)) != std::string::npos)
+        ആകുമ്പോൾ((pos = നിവേശം_2.find(token, pos)) != std::string::npos)
         {
-            result.push_back(input.substr(prev_pos, pos-prev_pos));
+            result.push_back(നിവേശം_2.substr(prev_pos, pos-prev_pos));
             prev_pos = ++pos;
         }
-        result.push_back(input.substr(prev_pos));
-        return result;
+        result.push_back(നിവേശം_2.substr(prev_pos));
+        തിരികെ result;
     }
-    bool readPrioritySettings()
+    തർക്കം readPrioritySettings()
     {
-        bool hasChanges = false;
+        തർക്കം hasChanges = അസത്യം;
         cv::String prioritized_backends = utils::getConfigurationParameterString("OPENCV_PARALLEL_PRIORITY_LIST");
-        if (prioritized_backends.empty())
-            return hasChanges;
-        CV_LOG_INFO(NULL, "core(parallel): Configured priority list (OPENCV_PARALLEL_PRIORITY_LIST): " << prioritized_backends);
-        const std::vector<std::string> names = tokenize_string(prioritized_backends, ',');
-        for (size_t i = 0; i < names.size(); i++)
+        എങ്കിൽ (prioritized_backends.empty())
+            തിരികെ hasChanges;
+        CV_LOG_INFO(ശൂന്യ, "core(parallel): Configured priority list (OPENCV_PARALLEL_PRIORITY_LIST): " << prioritized_backends);
+        സ്ഥിരം std::vector<std::string> names = tokenize_string(prioritized_backends, ',');
+        വേണ്ടി (size_t i = 0; i < names.size(); i++)
         {
-            const std::string& name = names[i];
-            int priority = (int)(100000 + (names.size() - i) * 1000);
-            bool found = false;
-            for (size_t k = 0; k < enabledBackends.size(); k++)
+            സ്ഥിരം std::string& name = names[i];
+            പൂർണ്ണസംഖ്യ priority = (പൂർണ്ണസംഖ്യ)(100000 + (names.size() - i) * 1000);
+            തർക്കം found = അസത്യം;
+            വേണ്ടി (size_t k = 0; k < enabledBackends.size(); k++)
             {
                 ParallelBackendInfo& info = enabledBackends[k];
-                if (name == info.name)
+                എങ്കിൽ (name == info.name)
                 {
                     info.priority = priority;
-                    CV_LOG_DEBUG(NULL, "core(parallel): New backend priority: '" << name << "' => " << info.priority);
-                    found = true;
-                    hasChanges = true;
-                    break;
+                    CV_LOG_DEBUG(ശൂന്യ, "core(parallel): New backend priority: '" << name << "' => " << info.priority);
+                    found = സത്യം;
+                    hasChanges = സത്യം;
+                    നിർത്തുക;
                 }
             }
-            if (!found)
+            എങ്കിൽ (!found)
             {
-                CV_LOG_INFO(NULL, "core(parallel): Adding parallel backend (plugin): '" << name << "'");
+                CV_LOG_INFO(ശൂന്യ, "core(parallel): Adding parallel backend (plugin): '" << name << "'");
                 enabledBackends.push_back(ParallelBackendInfo{priority, name, createPluginParallelBackendFactory(name)});
-                hasChanges = true;
+                hasChanges = സത്യം;
             }
         }
-        return hasChanges;
+        തിരികെ hasChanges;
     }
-public:
-    std::string dumpBackends() const
+പൊതു:
+    std::string dumpBackends() സ്ഥിരം
     {
         std::ostringstream os;
-        for (size_t i = 0; i < enabledBackends.size(); i++)
+        വേണ്ടി (size_t i = 0; i < enabledBackends.size(); i++)
         {
-            if (i > 0) os << "; ";
-            const ParallelBackendInfo& info = enabledBackends[i];
+            എങ്കിൽ (i > 0) os << "; ";
+            സ്ഥിരം ParallelBackendInfo& info = enabledBackends[i];
             os << info.name << '(' << info.priority << ')';
         }
-        return os.str();
+        തിരികെ os.str();
     }
 
-    static ParallelBackendRegistry& getInstance()
+    സ്ഥിതം ParallelBackendRegistry& getInstance()
     {
-        static ParallelBackendRegistry g_instance;
-        return g_instance;
+        സ്ഥിതം ParallelBackendRegistry g_instance;
+        തിരികെ g_instance;
     }
 
-    inline const std::vector<ParallelBackendInfo>& getEnabledBackends() const { return enabledBackends; }
+    വരിയിൽ സ്ഥിരം std::vector<ParallelBackendInfo>& getEnabledBackends() സ്ഥിരം { തിരികെ enabledBackends; }
 };
 
 
-const std::vector<ParallelBackendInfo>& getParallelBackendsInfo()
+സ്ഥിരം std::vector<ParallelBackendInfo>& getParallelBackendsInfo()
 {
-    return cv::parallel::ParallelBackendRegistry::getInstance().getEnabledBackends();
+    തിരികെ cv::parallel::ParallelBackendRegistry::getInstance().getEnabledBackends();
 }
 
 }} // namespace

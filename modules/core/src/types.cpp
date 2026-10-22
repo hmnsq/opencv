@@ -41,14 +41,14 @@
 //
 //M*/
 
-#include "precomp.hpp"
+#അന്തര്ഭാവ "precomp.hpp"
 
-namespace cv
+നാമാകാശ cv
 {
 
 ////////////////////// KeyPoint //////////////////////
 
-size_t KeyPoint::hash() const
+size_t താക്കോൽ_Point::hash() സ്ഥിരം
 {
     size_t _Val = 2166136261U, scale = 16777619U;
     Cv32suf u;
@@ -59,29 +59,29 @@ size_t KeyPoint::hash() const
     u.f = response; _Val = (scale * _Val) ^ u.u;
     _Val = (scale * _Val) ^ ((size_t) octave);
     _Val = (scale * _Val) ^ ((size_t) class_id);
-    return _Val;
+    തിരികെ _Val;
 }
 
-void KeyPoint::convert(const std::vector<KeyPoint>& keypoints, std::vector<Point2f>& points2f,
-                       const std::vector<int>& keypointIndexes)
+ശൂന്യം താക്കോൽ_Point::convert(സ്ഥിരം std::vector<താക്കോൽ_Point>& keypoints, std::vector<Point2f>& points2f,
+                       സ്ഥിരം std::vector<പൂർണ്ണസംഖ്യ>& keypointIndexes)
 {
     CV_INSTRUMENT_REGION();
 
-    if( keypointIndexes.empty() )
+    എങ്കിൽ( keypointIndexes.empty() )
     {
         points2f.resize( keypoints.size() );
-        for( size_t i = 0; i < keypoints.size(); i++ )
+        വേണ്ടി( size_t i = 0; i < keypoints.size(); i++ )
             points2f[i] = keypoints[i].pt;
     }
-    else
+    അല്ലെങ്കിൽ
     {
         points2f.resize( keypointIndexes.size() );
-        for( size_t i = 0; i < keypointIndexes.size(); i++ )
+        വേണ്ടി( size_t i = 0; i < keypointIndexes.size(); i++ )
         {
-            int idx = keypointIndexes[i];
-            if( idx >= 0 && idx < (int)keypoints.size() )
+            പൂർണ്ണസംഖ്യ idx = keypointIndexes[i];
+            എങ്കിൽ( idx >= 0 && idx < (പൂർണ്ണസംഖ്യ)keypoints.size() )
                 points2f[i] = keypoints[idx].pt;
-            else
+            അല്ലെങ്കിൽ
             {
                 CV_Error( cv::Error::StsBadArg, "keypointIndexes has element out of range" );
                 //points2f[i] = Point2f(-1, -1);
@@ -90,96 +90,96 @@ void KeyPoint::convert(const std::vector<KeyPoint>& keypoints, std::vector<Point
     }
 }
 
-void KeyPoint::convert( const std::vector<Point2f>& points2f, std::vector<KeyPoint>& keypoints,
-                        float size, float response, int octave, int class_id )
+ശൂന്യം താക്കോൽ_Point::convert( സ്ഥിരം std::vector<Point2f>& points2f, std::vector<താക്കോൽ_Point>& keypoints,
+                        ദശാംശം size, ദശാംശം response, പൂർണ്ണസംഖ്യ octave, പൂർണ്ണസംഖ്യ class_id )
 {
     CV_INSTRUMENT_REGION();
 
     keypoints.resize(points2f.size());
-    for( size_t i = 0; i < points2f.size(); i++ )
-        keypoints[i] = KeyPoint(points2f[i], size, -1, response, octave, class_id);
+    വേണ്ടി( size_t i = 0; i < points2f.size(); i++ )
+        keypoints[i] = താക്കോൽ_Point(points2f[i], size, -1, response, octave, class_id);
 }
 
-float KeyPoint::overlap( const KeyPoint& kp1, const KeyPoint& kp2 )
+ദശാംശം താക്കോൽ_Point::overlap( സ്ഥിരം താക്കോൽ_Point& kp1, സ്ഥിരം താക്കോൽ_Point& kp2 )
 {
-    float a = kp1.size * 0.5f;
-    float b = kp2.size * 0.5f;
-    float a_2 = a * a;
-    float b_2 = b * b;
+    ദശാംശം a = kp1.size * 0.5f;
+    ദശാംശം b = kp2.size * 0.5f;
+    ദശാംശം a_2 = a * a;
+    ദശാംശം b_2 = b * b;
 
     Point2f p1 = kp1.pt;
     Point2f p2 = kp2.pt;
-    float c = (float)norm( p1 - p2 );
+    ദശാംശം c = (ദശാംശം)norm( p1 - p2 );
 
-    float ovrl = 0.f;
+    ദശാംശം ovrl = 0.f;
 
     // one circle is completely encovered by the other => no intersection points!
-    if( std::min( a, b ) + c <= std::max( a, b ) )
-        return std::min( a_2, b_2 ) / std::max( a_2, b_2 );
+    എങ്കിൽ( std::min( a, b ) + c <= std::max( a, b ) )
+        തിരികെ std::min( a_2, b_2 ) / std::max( a_2, b_2 );
 
-    if( c < a + b ) // circles intersect
+    എങ്കിൽ( c < a + b ) // circles intersect
     {
-        float c_2 = c * c;
-        float cosAlpha = ( b_2 + c_2 - a_2 ) / ( kp2.size * c );
-        float cosBeta  = ( a_2 + c_2 - b_2 ) / ( kp1.size * c );
-        float alpha = acos( cosAlpha );
-        float beta = acos( cosBeta );
-        float sinAlpha = sin(alpha);
-        float sinBeta  = sin(beta);
+        ദശാംശം c_2 = c * c;
+        ദശാംശം cosAlpha = ( b_2 + c_2 - a_2 ) / ( kp2.size * c );
+        ദശാംശം cosBeta  = ( a_2 + c_2 - b_2 ) / ( kp1.size * c );
+        ദശാംശം alpha = acos( cosAlpha );
+        ദശാംശം beta = acos( cosBeta );
+        ദശാംശം sinAlpha = sin(alpha);
+        ദശാംശം sinBeta  = sin(beta);
 
-        float segmentAreaA = a_2 * beta;
-        float segmentAreaB = b_2 * alpha;
+        ദശാംശം segmentAreaA = a_2 * beta;
+        ദശാംശം segmentAreaB = b_2 * alpha;
 
-        float triangleAreaA = a_2 * sinBeta * cosBeta;
-        float triangleAreaB = b_2 * sinAlpha * cosAlpha;
+        ദശാംശം triangleAreaA = a_2 * sinBeta * cosBeta;
+        ദശാംശം triangleAreaB = b_2 * sinAlpha * cosAlpha;
 
-        float intersectionArea = segmentAreaA + segmentAreaB - triangleAreaA - triangleAreaB;
-        float unionArea = (a_2 + b_2) * (float)CV_PI - intersectionArea;
+        ദശാംശം intersectionArea = segmentAreaA + segmentAreaB - triangleAreaA - triangleAreaB;
+        ദശാംശം unionArea = (a_2 + b_2) * (ദശാംശം)CV_PI - intersectionArea;
 
         ovrl = intersectionArea / unionArea;
     }
 
-    return ovrl;
+    തിരികെ ovrl;
 }
 
 ////////////////////// RotatedRect //////////////////////
 
-RotatedRect::RotatedRect(const Point2f& _point1, const Point2f& _point2, const Point2f& _point3)
+RotatedRect::RotatedRect(സ്ഥിരം Point2f& _point1, സ്ഥിരം Point2f& _point2, സ്ഥിരം Point2f& _point3)
 {
     Point2f _center = 0.5f * (_point1 + _point3);
     Vec2f vecs[2];
     vecs[0] = Vec2f(_point1 - _point2);
     vecs[1] = Vec2f(_point2 - _point3);
-    double x = std::max(norm(_point1), std::max(norm(_point2), norm(_point3)));
-    double a = std::min(norm(vecs[0]), norm(vecs[1]));
+    ഇരട്ട x = std::max(norm(_point1), std::max(norm(_point2), norm(_point3)));
+    ഇരട്ട a = std::min(norm(vecs[0]), norm(vecs[1]));
     // check that given sides are perpendicular
     CV_Assert( std::fabs(vecs[0].ddot(vecs[1])) * a <= FLT_EPSILON * 9 * x * (norm(vecs[0]) * norm(vecs[1])) );
 
     // wd_i stores which vector (0,1) or (1,2) will make the width
     // One of them will definitely have slope within -1 to 1
-    int wd_i = 0;
-    if( std::fabs(vecs[1][1]) < std::fabs(vecs[1][0]) ) wd_i = 1;
-    int ht_i = (wd_i + 1) % 2;
+    പൂർണ്ണസംഖ്യ wd_i = 0;
+    എങ്കിൽ( std::fabs(vecs[1][1]) < std::fabs(vecs[1][0]) ) wd_i = 1;
+    പൂർണ്ണസംഖ്യ ht_i = (wd_i + 1) % 2;
 
-    float _angle = std::atan(vecs[wd_i][1] / vecs[wd_i][0]) * 180.0f / (float) CV_PI;
-    float _width = (float) norm(vecs[wd_i]);
-    float _height = (float) norm(vecs[ht_i]);
+    ദശാംശം _angle = std::atan(vecs[wd_i][1] / vecs[wd_i][0]) * 180.0f / (ദശാംശം) CV_PI;
+    ദശാംശം _width = (ദശാംശം) norm(vecs[wd_i]);
+    ദശാംശം _height = (ദശാംശം) norm(vecs[ht_i]);
 
     center = _center;
     size = Size2f(_width, _height);
     angle = _angle;
 }
 
-void RotatedRect::points(Point2f pt[]) const
+ശൂന്യം RotatedRect::points(Point2f pt[]) സ്ഥിരം
 {
-    double _angle = angle*CV_PI/180.;
-    float b = (float)cos(_angle)*0.5f;
-    float a = (float)sin(_angle)*0.5f;
+    ഇരട്ട _angle = angle*CV_PI/180.;
+    ദശാംശം b = (ദശാംശം)cos(_angle)*0.5f;
+    ദശാംശം a = (ദശാംശം)sin(_angle)*0.5f;
 
-    const float ah = a*size.height;
-    const float aw = a*size.width;
-    const float bh = b*size.height;
-    const float bw = b*size.width;
+    സ്ഥിരം ദശാംശം ah = a*size.height;
+    സ്ഥിരം ദശാംശം aw = a*size.width;
+    സ്ഥിരം ദശാംശം bh = b*size.height;
+    സ്ഥിരം ദശാംശം bw = b*size.width;
     pt[0].x = center.x - ah - bw;
     pt[0].y = center.y + bh - aw;
     pt[1].x = center.x + ah - bw;
@@ -190,12 +190,12 @@ void RotatedRect::points(Point2f pt[]) const
     pt[3].y = center.y + bh + aw;
 }
 
-void RotatedRect::points(std::vector<Point2f>& pts) const {
+ശൂന്യം RotatedRect::points(std::vector<Point2f>& pts) സ്ഥിരം {
     pts.resize(4);
     points(pts.data());
 }
 
-Rect RotatedRect::boundingRect() const
+Rect RotatedRect::boundingRect() സ്ഥിരം
 {
     Point2f pt[4];
     points(pt);
@@ -205,17 +205,17 @@ Rect RotatedRect::boundingRect() const
            cvCeil(std::max(std::max(std::max(pt[0].y, pt[1].y), pt[2].y), pt[3].y)));
     r.width -= r.x - 1;
     r.height -= r.y - 1;
-    return r;
+    തിരികെ r;
 }
 
 
-Rect_<float> RotatedRect::boundingRect2f() const
+Rect_<ദശാംശം> RotatedRect::boundingRect2f() സ്ഥിരം
 {
     Point2f pt[4];
     points(pt);
-    Rect_<float> r(Point_<float>(min(min(min(pt[0].x, pt[1].x), pt[2].x), pt[3].x), min(min(min(pt[0].y, pt[1].y), pt[2].y), pt[3].y)),
-                   Point_<float>(max(max(max(pt[0].x, pt[1].x), pt[2].x), pt[3].x), max(max(max(pt[0].y, pt[1].y), pt[2].y), pt[3].y)));
-    return r;
+    Rect_<ദശാംശം> r(Point_<ദശാംശം>(min(min(min(pt[0].x, pt[1].x), pt[2].x), pt[3].x), min(min(min(pt[0].y, pt[1].y), pt[2].y), pt[3].y)),
+                   Point_<ദശാംശം>(max(max(max(pt[0].x, pt[1].x), pt[2].x), pt[3].x), max(max(max(pt[0].y, pt[1].y), pt[2].y), pt[3].y)));
+    തിരികെ r;
 }
 
 } // cv

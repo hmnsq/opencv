@@ -40,90 +40,90 @@
 //
 //M*/
 
-#include "precomp.hpp"
+#അന്തര്ഭാവ "precomp.hpp"
 
-using namespace cv;
-using namespace cv::cuda;
+using നാമാകാശ cv;
+using നാമാകാശ cv::cuda;
 
-int cv::cuda::getCudaEnabledDeviceCount()
+പൂർണ്ണസംഖ്യ cv::cuda::get_Cuda_Enabled_Device_എണ്ണം()
 {
 #ifndef HAVE_CUDA
-    return 0;
-#else
-    int count;
-    cudaError_t error = cudaGetDeviceCount(&count);
+    തിരികെ 0;
+#അല്ലെങ്കിൽ
+    പൂർണ്ണസംഖ്യ എണ്ണം_2;
+    cudaError_t error = cuda_Get_Device_എണ്ണം(&എണ്ണം_2);
 
-    if (error == cudaErrorInsufficientDriver)
-        return -1;
+    എങ്കിൽ (error == cudaErrorInsufficientDriver)
+        തിരികെ -1;
 
-    if (error == cudaErrorNoDevice)
-        return 0;
+    എങ്കിൽ (error == cudaErrorNoDevice)
+        തിരികെ 0;
 
     cudaSafeCall( error );
-    return count;
+    തിരികെ എണ്ണം_2;
 #endif
 }
 
-void cv::cuda::setDevice(int device)
+ശൂന്യം cv::cuda::setDevice(പൂർണ്ണസംഖ്യ device)
 {
 #ifndef HAVE_CUDA
     CV_UNUSED(device);
     throw_no_cuda();
-#else
+#അല്ലെങ്കിൽ
     cudaSafeCall( cudaSetDevice(device) );
     cudaSafeCall( cudaFree(0) );
 #endif
 }
 
-int cv::cuda::getDevice()
+പൂർണ്ണസംഖ്യ cv::cuda::getDevice()
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    int device;
+#അല്ലെങ്കിൽ
+    പൂർണ്ണസംഖ്യ device;
     cudaSafeCall( cudaGetDevice(&device) );
-    return device;
+    തിരികെ device;
 #endif
 }
 
-void cv::cuda::resetDevice()
+ശൂന്യം cv::cuda::resetDevice()
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
+#അല്ലെങ്കിൽ
     cudaSafeCall( cudaDeviceReset() );
 #endif
 }
 
-bool cv::cuda::deviceSupports(FeatureSet feature_set)
+തർക്കം cv::cuda::deviceSupports(FeatureSet feature_set)
 {
 #ifndef HAVE_CUDA
     CV_UNUSED(feature_set);
     throw_no_cuda();
-#else
-    static int versions[] =
+#അല്ലെങ്കിൽ
+    സ്ഥിതം പൂർണ്ണസംഖ്യ versions[] =
     {
         -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1
     };
-    static const int cache_size = static_cast<int>(sizeof(versions) / sizeof(versions[0]));
+    സ്ഥിതം സ്ഥിരം പൂർണ്ണസംഖ്യ cache_size = static_cast<പൂർണ്ണസംഖ്യ>(വലുപ്പം(versions) / വലുപ്പം(versions[0]));
 
-    const int devId = getDevice();
+    സ്ഥിരം പൂർണ്ണസംഖ്യ devId = getDevice();
 
-    int version;
+    പൂർണ്ണസംഖ്യ version;
 
-    if (devId < cache_size && versions[devId] >= 0)
+    എങ്കിൽ (devId < cache_size && versions[devId] >= 0)
     {
         version = versions[devId];
     }
-    else
+    അല്ലെങ്കിൽ
     {
         DeviceInfo dev(devId);
         version = dev.majorVersion() * 10 + dev.minorVersion();
-        if (devId < cache_size)
+        എങ്കിൽ (devId < cache_size)
             versions[devId] = version;
     }
 
-    return TargetArchs::builtWith(feature_set) && (version >= feature_set);
+    തിരികെ TargetArchs::builtWith(feature_set) && (version >= feature_set);
 #endif
 }
 
@@ -132,29 +132,29 @@ bool cv::cuda::deviceSupports(FeatureSet feature_set)
 
 #ifdef HAVE_CUDA
 
-namespace
+നാമാകാശ
 {
-    class CudaArch
+    വർഗ്ഗം CudaArch
     {
-    public:
+    പൊതു:
         CudaArch();
 
-        bool builtWith(FeatureSet feature_set) const;
-        bool hasPtx(int major, int minor) const;
-        bool hasBin(int major, int minor) const;
-        bool hasEqualOrLessPtx(int major, int minor) const;
-        bool hasEqualOrGreaterPtx(int major, int minor) const;
-        bool hasEqualOrGreaterBin(int major, int minor) const;
+        തർക്കം builtWith(FeatureSet feature_set) സ്ഥിരം;
+        തർക്കം hasPtx(പൂർണ്ണസംഖ്യ major, പൂർണ്ണസംഖ്യ minor) സ്ഥിരം;
+        തർക്കം hasBin(പൂർണ്ണസംഖ്യ major, പൂർണ്ണസംഖ്യ minor) സ്ഥിരം;
+        തർക്കം hasEqualOrLessPtx(പൂർണ്ണസംഖ്യ major, പൂർണ്ണസംഖ്യ minor) സ്ഥിരം;
+        തർക്കം hasEqualOrGreaterPtx(പൂർണ്ണസംഖ്യ major, പൂർണ്ണസംഖ്യ minor) സ്ഥിരം;
+        തർക്കം hasEqualOrGreaterBin(പൂർണ്ണസംഖ്യ major, പൂർണ്ണസംഖ്യ minor) സ്ഥിരം;
 
-    private:
-        static void fromStr(const char* set_as_str, std::vector<int>& arr);
+    സ്വകാര്യ:
+        സ്ഥിതം ശൂന്യം fromStr(സ്ഥിരം അക്ഷരം* set_as_str, std::vector<പൂർണ്ണസംഖ്യ>& arr);
 
-        std::vector<int> bin;
-        std::vector<int> ptx;
-        std::vector<int> features;
+        std::vector<പൂർണ്ണസംഖ്യ> bin;
+        std::vector<പൂർണ്ണസംഖ്യ> ptx;
+        std::vector<പൂർണ്ണസംഖ്യ> features;
     };
 
-    const CudaArch cudaArch;
+    സ്ഥിരം CudaArch cudaArch;
 
     CudaArch::CudaArch()
     {
@@ -163,57 +163,57 @@ namespace
         fromStr(CUDA_ARCH_FEATURES, features);
     }
 
-    bool CudaArch::builtWith(FeatureSet feature_set) const
+    തർക്കം CudaArch::builtWith(FeatureSet feature_set) സ്ഥിരം
     {
-        return !features.empty() && (features.back() >= feature_set);
+        തിരികെ !features.empty() && (features.back() >= feature_set);
     }
 
-    bool CudaArch::hasPtx(int major, int minor) const
+    തർക്കം CudaArch::hasPtx(പൂർണ്ണസംഖ്യ major, പൂർണ്ണസംഖ്യ minor) സ്ഥിരം
     {
-        return std::find(ptx.begin(), ptx.end(), major * 10 + minor) != ptx.end();
+        തിരികെ std::find(ptx.begin(), ptx.end(), major * 10 + minor) != ptx.end();
     }
 
-    bool CudaArch::hasBin(int major, int minor) const
+    തർക്കം CudaArch::hasBin(പൂർണ്ണസംഖ്യ major, പൂർണ്ണസംഖ്യ minor) സ്ഥിരം
     {
-        return std::find(bin.begin(), bin.end(), major * 10 + minor) != bin.end();
+        തിരികെ std::find(bin.begin(), bin.end(), major * 10 + minor) != bin.end();
     }
 
-    bool CudaArch::hasEqualOrLessPtx(int major, int minor) const
+    തർക്കം CudaArch::hasEqualOrLessPtx(പൂർണ്ണസംഖ്യ major, പൂർണ്ണസംഖ്യ minor) സ്ഥിരം
     {
-        return !ptx.empty() && (ptx.front() <= major * 10 + minor);
+        തിരികെ !ptx.empty() && (ptx.front() <= major * 10 + minor);
     }
 
-    bool CudaArch::hasEqualOrGreaterPtx(int major, int minor) const
+    തർക്കം CudaArch::hasEqualOrGreaterPtx(പൂർണ്ണസംഖ്യ major, പൂർണ്ണസംഖ്യ minor) സ്ഥിരം
     {
-        return !ptx.empty() && (ptx.back() >= major * 10 + minor);
+        തിരികെ !ptx.empty() && (ptx.back() >= major * 10 + minor);
     }
 
-    bool CudaArch::hasEqualOrGreaterBin(int major, int minor) const
+    തർക്കം CudaArch::hasEqualOrGreaterBin(പൂർണ്ണസംഖ്യ major, പൂർണ്ണസംഖ്യ minor) സ്ഥിരം
     {
-        return !bin.empty() && (bin.back() >= major * 10 + minor);
+        തിരികെ !bin.empty() && (bin.back() >= major * 10 + minor);
     }
 
-    void CudaArch::fromStr(const char* set_as_str, std::vector<int>& arr)
+    ശൂന്യം CudaArch::fromStr(സ്ഥിരം അക്ഷരം* set_as_str, std::vector<പൂർണ്ണസംഖ്യ>& arr)
     {
         arr.clear();
 
-        const size_t len = strlen(set_as_str);
+        സ്ഥിരം size_t len = strlen(set_as_str);
 
         size_t pos = 0;
-        while (pos < len)
+        ആകുമ്പോൾ (pos < len)
         {
-            if (isspace(set_as_str[pos]))
+            എങ്കിൽ (isspace(set_as_str[pos]))
             {
                 ++pos;
             }
-            else
+            അല്ലെങ്കിൽ
             {
-                int cur_value;
-                int chars_read;
-                int args_read = sscanf(set_as_str + pos, "%d%n", &cur_value, &chars_read);
+                പൂർണ്ണസംഖ്യ cur_മൂല്യം;
+                പൂർണ്ണസംഖ്യ chars_read;
+                പൂർണ്ണസംഖ്യ args_read = sscanf(set_as_str + pos, "%d%n", &cur_മൂല്യം, &chars_read);
                 CV_Assert( args_read == 1 );
 
-                arr.push_back(cur_value);
+                arr.push_back(cur_മൂല്യം);
                 pos += chars_read;
             }
         }
@@ -224,68 +224,68 @@ namespace
 
 #endif
 
-bool cv::cuda::TargetArchs::builtWith(cv::cuda::FeatureSet feature_set)
+തർക്കം cv::cuda::TargetArchs::builtWith(cv::cuda::FeatureSet feature_set)
 {
 #ifndef HAVE_CUDA
     CV_UNUSED(feature_set);
     throw_no_cuda();
-#else
-    return cudaArch.builtWith(feature_set);
+#അല്ലെങ്കിൽ
+    തിരികെ cudaArch.builtWith(feature_set);
 #endif
 }
 
-bool cv::cuda::TargetArchs::hasPtx(int major, int minor)
+തർക്കം cv::cuda::TargetArchs::hasPtx(പൂർണ്ണസംഖ്യ major, പൂർണ്ണസംഖ്യ minor)
 {
 #ifndef HAVE_CUDA
     CV_UNUSED(major);
     CV_UNUSED(minor);
     throw_no_cuda();
-#else
-    return cudaArch.hasPtx(major, minor);
+#അല്ലെങ്കിൽ
+    തിരികെ cudaArch.hasPtx(major, minor);
 #endif
 }
 
-bool cv::cuda::TargetArchs::hasBin(int major, int minor)
+തർക്കം cv::cuda::TargetArchs::hasBin(പൂർണ്ണസംഖ്യ major, പൂർണ്ണസംഖ്യ minor)
 {
 #ifndef HAVE_CUDA
     CV_UNUSED(major);
     CV_UNUSED(minor);
     throw_no_cuda();
-#else
-    return cudaArch.hasBin(major, minor);
+#അല്ലെങ്കിൽ
+    തിരികെ cudaArch.hasBin(major, minor);
 #endif
 }
 
-bool cv::cuda::TargetArchs::hasEqualOrLessPtx(int major, int minor)
+തർക്കം cv::cuda::TargetArchs::hasEqualOrLessPtx(പൂർണ്ണസംഖ്യ major, പൂർണ്ണസംഖ്യ minor)
 {
 #ifndef HAVE_CUDA
     CV_UNUSED(major);
     CV_UNUSED(minor);
     throw_no_cuda();
-#else
-    return cudaArch.hasEqualOrLessPtx(major, minor);
+#അല്ലെങ്കിൽ
+    തിരികെ cudaArch.hasEqualOrLessPtx(major, minor);
 #endif
 }
 
-bool cv::cuda::TargetArchs::hasEqualOrGreaterPtx(int major, int minor)
+തർക്കം cv::cuda::TargetArchs::hasEqualOrGreaterPtx(പൂർണ്ണസംഖ്യ major, പൂർണ്ണസംഖ്യ minor)
 {
 #ifndef HAVE_CUDA
     CV_UNUSED(major);
     CV_UNUSED(minor);
     throw_no_cuda();
-#else
-    return cudaArch.hasEqualOrGreaterPtx(major, minor);
+#അല്ലെങ്കിൽ
+    തിരികെ cudaArch.hasEqualOrGreaterPtx(major, minor);
 #endif
 }
 
-bool cv::cuda::TargetArchs::hasEqualOrGreaterBin(int major, int minor)
+തർക്കം cv::cuda::TargetArchs::hasEqualOrGreaterBin(പൂർണ്ണസംഖ്യ major, പൂർണ്ണസംഖ്യ minor)
 {
 #ifndef HAVE_CUDA
     CV_UNUSED(major);
     CV_UNUSED(minor);
     throw_no_cuda();
-#else
-    return cudaArch.hasEqualOrGreaterBin(major, minor);
+#അല്ലെങ്കിൽ
+    തിരികെ cudaArch.hasEqualOrGreaterBin(major, minor);
 #endif
 }
 
@@ -294,231 +294,231 @@ bool cv::cuda::TargetArchs::hasEqualOrGreaterBin(int major, int minor)
 
 #ifdef HAVE_CUDA
 
-namespace
+നാമാകാശ
 {
-    class DeviceProps
+    വർഗ്ഗം DeviceProps
     {
-    public:
+    പൊതു:
         DeviceProps();
 
-        const cudaDeviceProp* get(int devID) const;
+        സ്ഥിരം cudaDeviceProp* get(പൂർണ്ണസംഖ്യ devID) സ്ഥിരം;
 
-    private:
+    സ്വകാര്യ:
         std::vector<cudaDeviceProp> props_;
     };
 
     DeviceProps::DeviceProps()
     {
-        int count = getCudaEnabledDeviceCount();
+        പൂർണ്ണസംഖ്യ എണ്ണം_2 = get_Cuda_Enabled_Device_എണ്ണം();
 
-        if (count > 0)
+        എങ്കിൽ (എണ്ണം_2 > 0)
         {
-            props_.resize(count);
+            props_.resize(എണ്ണം_2);
 
-            for (int devID = 0; devID < count; ++devID)
+            വേണ്ടി (പൂർണ്ണസംഖ്യ devID = 0; devID < എണ്ണം_2; ++devID)
             {
                 cudaSafeCall( cudaGetDeviceProperties(&props_[devID], devID) );
             }
         }
     }
 
-    const cudaDeviceProp* DeviceProps::get(int devID) const
+    സ്ഥിരം cudaDeviceProp* DeviceProps::get(പൂർണ്ണസംഖ്യ devID) സ്ഥിരം
     {
         CV_Assert( static_cast<size_t>(devID) < props_.size() );
 
-        return &props_[devID];
+        തിരികെ &props_[devID];
     }
 
     DeviceProps& deviceProps()
     {
-        static DeviceProps props;
-        return props;
+        സ്ഥിതം DeviceProps props;
+        തിരികെ props;
     }
 }
 
 #endif
 
-const char* cv::cuda::DeviceInfo::name() const
+സ്ഥിരം അക്ഷരം* cv::cuda::DeviceInfo::name() സ്ഥിരം
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    return deviceProps().get(device_id_)->name;
+#അല്ലെങ്കിൽ
+    തിരികെ deviceProps().get(device_id_)->name;
 #endif
 }
 
-size_t cv::cuda::DeviceInfo::totalGlobalMem() const
+size_t cv::cuda::DeviceInfo::totalGlobalMem() സ്ഥിരം
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    return deviceProps().get(device_id_)->totalGlobalMem;
+#അല്ലെങ്കിൽ
+    തിരികെ deviceProps().get(device_id_)->totalGlobalMem;
 #endif
 }
 
-size_t cv::cuda::DeviceInfo::sharedMemPerBlock() const
+size_t cv::cuda::DeviceInfo::sharedMemPerBlock() സ്ഥിരം
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    return deviceProps().get(device_id_)->sharedMemPerBlock;
+#അല്ലെങ്കിൽ
+    തിരികെ deviceProps().get(device_id_)->sharedMemPerBlock;
 #endif
 }
 
-int cv::cuda::DeviceInfo::regsPerBlock() const
+പൂർണ്ണസംഖ്യ cv::cuda::DeviceInfo::regsPerBlock() സ്ഥിരം
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    return deviceProps().get(device_id_)->regsPerBlock;
+#അല്ലെങ്കിൽ
+    തിരികെ deviceProps().get(device_id_)->regsPerBlock;
 #endif
 }
 
-int cv::cuda::DeviceInfo::warpSize() const
+പൂർണ്ണസംഖ്യ cv::cuda::DeviceInfo::warpSize() സ്ഥിരം
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    return deviceProps().get(device_id_)->warpSize;
+#അല്ലെങ്കിൽ
+    തിരികെ deviceProps().get(device_id_)->warpSize;
 #endif
 }
 
-size_t cv::cuda::DeviceInfo::memPitch() const
+size_t cv::cuda::DeviceInfo::memPitch() സ്ഥിരം
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    return deviceProps().get(device_id_)->memPitch;
+#അല്ലെങ്കിൽ
+    തിരികെ deviceProps().get(device_id_)->memPitch;
 #endif
 }
 
-int cv::cuda::DeviceInfo::maxThreadsPerBlock() const
+പൂർണ്ണസംഖ്യ cv::cuda::DeviceInfo::maxThreadsPerBlock() സ്ഥിരം
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    return deviceProps().get(device_id_)->maxThreadsPerBlock;
+#അല്ലെങ്കിൽ
+    തിരികെ deviceProps().get(device_id_)->maxThreadsPerBlock;
 #endif
 }
 
-Vec3i cv::cuda::DeviceInfo::maxThreadsDim() const
+Vec3i cv::cuda::DeviceInfo::maxThreadsDim() സ്ഥിരം
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    return Vec3i(deviceProps().get(device_id_)->maxThreadsDim);
+#അല്ലെങ്കിൽ
+    തിരികെ Vec3i(deviceProps().get(device_id_)->maxThreadsDim);
 #endif
 }
 
-Vec3i cv::cuda::DeviceInfo::maxGridSize() const
+Vec3i cv::cuda::DeviceInfo::maxGridSize() സ്ഥിരം
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    return Vec3i(deviceProps().get(device_id_)->maxGridSize);
+#അല്ലെങ്കിൽ
+    തിരികെ Vec3i(deviceProps().get(device_id_)->maxGridSize);
 #endif
 }
 
-int cv::cuda::DeviceInfo::clockRate() const
+പൂർണ്ണസംഖ്യ cv::cuda::DeviceInfo::clockRate() സ്ഥിരം
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    int clockRate;
+#അല്ലെങ്കിൽ
+    പൂർണ്ണസംഖ്യ clockRate;
     cudaSafeCall(cudaDeviceGetAttribute(&clockRate, cudaDevAttrClockRate, device_id_));
-    return clockRate;
+    തിരികെ clockRate;
 #endif
 }
 
-size_t cv::cuda::DeviceInfo::totalConstMem() const
+size_t cv::cuda::DeviceInfo::totalConstMem() സ്ഥിരം
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    return deviceProps().get(device_id_)->totalConstMem;
+#അല്ലെങ്കിൽ
+    തിരികെ deviceProps().get(device_id_)->totalConstMem;
 #endif
 }
 
-int cv::cuda::DeviceInfo::majorVersion() const
+പൂർണ്ണസംഖ്യ cv::cuda::DeviceInfo::majorVersion() സ്ഥിരം
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    return deviceProps().get(device_id_)->major;
+#അല്ലെങ്കിൽ
+    തിരികെ deviceProps().get(device_id_)->major;
 #endif
 }
 
-int cv::cuda::DeviceInfo::minorVersion() const
+പൂർണ്ണസംഖ്യ cv::cuda::DeviceInfo::minorVersion() സ്ഥിരം
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    return deviceProps().get(device_id_)->minor;
+#അല്ലെങ്കിൽ
+    തിരികെ deviceProps().get(device_id_)->minor;
 #endif
 }
 
-size_t cv::cuda::DeviceInfo::textureAlignment() const
+size_t cv::cuda::DeviceInfo::textureAlignment() സ്ഥിരം
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    return deviceProps().get(device_id_)->textureAlignment;
+#അല്ലെങ്കിൽ
+    തിരികെ deviceProps().get(device_id_)->textureAlignment;
 #endif
 }
 
-size_t cv::cuda::DeviceInfo::texturePitchAlignment() const
+size_t cv::cuda::DeviceInfo::texturePitchAlignment() സ്ഥിരം
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    return deviceProps().get(device_id_)->texturePitchAlignment;
+#അല്ലെങ്കിൽ
+    തിരികെ deviceProps().get(device_id_)->texturePitchAlignment;
 #endif
 }
 
-int cv::cuda::DeviceInfo::multiProcessorCount() const
+പൂർണ്ണസംഖ്യ cv::cuda::DeviceInfo::multi_Processor_എണ്ണം() സ്ഥിരം
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    return deviceProps().get(device_id_)->multiProcessorCount;
+#അല്ലെങ്കിൽ
+    തിരികെ deviceProps().get(device_id_)->multi_Processor_എണ്ണം;
 #endif
 }
 
-bool cv::cuda::DeviceInfo::kernelExecTimeoutEnabled() const
+തർക്കം cv::cuda::DeviceInfo::kernelExecTimeoutEnabled() സ്ഥിരം
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    int kernelExecTimeoutEnabled;
+#അല്ലെങ്കിൽ
+    പൂർണ്ണസംഖ്യ kernelExecTimeoutEnabled;
     cudaSafeCall(cudaDeviceGetAttribute(&kernelExecTimeoutEnabled, cudaDevAttrKernelExecTimeout, device_id_));
-    return kernelExecTimeoutEnabled != 0;
+    തിരികെ kernelExecTimeoutEnabled != 0;
 #endif
 }
 
-bool cv::cuda::DeviceInfo::integrated() const
+തർക്കം cv::cuda::DeviceInfo::integrated() സ്ഥിരം
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    return deviceProps().get(device_id_)->integrated != 0;
+#അല്ലെങ്കിൽ
+    തിരികെ deviceProps().get(device_id_)->integrated != 0;
 #endif
 }
 
-bool cv::cuda::DeviceInfo::canMapHostMemory() const
+തർക്കം cv::cuda::DeviceInfo::canMapHostMemory() സ്ഥിരം
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    return deviceProps().get(device_id_)->canMapHostMemory != 0;
+#അല്ലെങ്കിൽ
+    തിരികെ deviceProps().get(device_id_)->canMapHostMemory != 0;
 #endif
 }
 
-DeviceInfo::ComputeMode cv::cuda::DeviceInfo::computeMode() const
+DeviceInfo::ComputeMode cv::cuda::DeviceInfo::computeMode() സ്ഥിരം
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    static const ComputeMode tbl[] =
+#അല്ലെങ്കിൽ
+    സ്ഥിതം സ്ഥിരം ComputeMode tbl[] =
     {
         ComputeModeDefault,
         ComputeModeExclusive,
@@ -526,352 +526,352 @@ DeviceInfo::ComputeMode cv::cuda::DeviceInfo::computeMode() const
         ComputeModeExclusiveProcess
     };
 
-    int computeMode;
+    പൂർണ്ണസംഖ്യ computeMode;
     cudaSafeCall(cudaDeviceGetAttribute(&computeMode, cudaDevAttrComputeMode, device_id_));
-    return tbl[computeMode];
+    തിരികെ tbl[computeMode];
 #endif
 }
 
-int cv::cuda::DeviceInfo::maxTexture1D() const
+പൂർണ്ണസംഖ്യ cv::cuda::DeviceInfo::maxTexture1D() സ്ഥിരം
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    return deviceProps().get(device_id_)->maxTexture1D;
+#അല്ലെങ്കിൽ
+    തിരികെ deviceProps().get(device_id_)->maxTexture1D;
 #endif
 }
 
-int cv::cuda::DeviceInfo::maxTexture1DMipmap() const
+പൂർണ്ണസംഖ്യ cv::cuda::DeviceInfo::maxTexture1DMipmap() സ്ഥിരം
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    #if CUDA_VERSION >= 5000
-        return deviceProps().get(device_id_)->maxTexture1DMipmap;
-    #else
+#അല്ലെങ്കിൽ
+    #എങ്കിൽ CUDA_VERSION >= 5000
+        തിരികെ deviceProps().get(device_id_)->maxTexture1DMipmap;
+    #അല്ലെങ്കിൽ
         CV_Error(Error::StsNotImplemented, "This function requires CUDA 5.0");
-        return 0;
+        തിരികെ 0;
     #endif
 #endif
 }
 
-int cv::cuda::DeviceInfo::maxTexture1DLinear() const
+പൂർണ്ണസംഖ്യ cv::cuda::DeviceInfo::maxTexture1DLinear() സ്ഥിരം
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    #if CUDA_VERSION >= 13000
+#അല്ലെങ്കിൽ
+    #എങ്കിൽ CUDA_VERSION >= 13000
         size_t maxWidthInElements;
         cudaChannelFormatDesc fmtDesc = cudaCreateChannelDesc<float4>();
         cudaSafeCall(cudaDeviceGetTexture1DLinearMaxWidth(&maxWidthInElements, &fmtDesc, device_id_));
-        return maxWidthInElements;
-    #else
-        return deviceProps().get(device_id_)->maxTexture1DLinear;
+        തിരികെ maxWidthInElements;
+    #അല്ലെങ്കിൽ
+        തിരികെ deviceProps().get(device_id_)->maxTexture1DLinear;
     #endif
 #endif
 }
 
-Vec2i cv::cuda::DeviceInfo::maxTexture2D() const
+Vec2i cv::cuda::DeviceInfo::maxTexture2D() സ്ഥിരം
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    return Vec2i(deviceProps().get(device_id_)->maxTexture2D);
+#അല്ലെങ്കിൽ
+    തിരികെ Vec2i(deviceProps().get(device_id_)->maxTexture2D);
 #endif
 }
 
-Vec2i cv::cuda::DeviceInfo::maxTexture2DMipmap() const
+Vec2i cv::cuda::DeviceInfo::maxTexture2DMipmap() സ്ഥിരം
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    #if CUDA_VERSION >= 5000
-        return Vec2i(deviceProps().get(device_id_)->maxTexture2DMipmap);
-    #else
+#അല്ലെങ്കിൽ
+    #എങ്കിൽ CUDA_VERSION >= 5000
+        തിരികെ Vec2i(deviceProps().get(device_id_)->maxTexture2DMipmap);
+    #അല്ലെങ്കിൽ
         CV_Error(Error::StsNotImplemented, "This function requires CUDA 5.0");
-        return Vec2i();
+        തിരികെ Vec2i();
     #endif
 #endif
 }
 
-Vec3i cv::cuda::DeviceInfo::maxTexture2DLinear() const
+Vec3i cv::cuda::DeviceInfo::maxTexture2DLinear() സ്ഥിരം
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    return Vec3i(deviceProps().get(device_id_)->maxTexture2DLinear);
+#അല്ലെങ്കിൽ
+    തിരികെ Vec3i(deviceProps().get(device_id_)->maxTexture2DLinear);
 #endif
 }
 
-Vec2i cv::cuda::DeviceInfo::maxTexture2DGather() const
+Vec2i cv::cuda::DeviceInfo::maxTexture2DGather() സ്ഥിരം
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    return Vec2i(deviceProps().get(device_id_)->maxTexture2DGather);
+#അല്ലെങ്കിൽ
+    തിരികെ Vec2i(deviceProps().get(device_id_)->maxTexture2DGather);
 #endif
 }
 
-Vec3i cv::cuda::DeviceInfo::maxTexture3D() const
+Vec3i cv::cuda::DeviceInfo::maxTexture3D() സ്ഥിരം
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    return Vec3i(deviceProps().get(device_id_)->maxTexture3D);
+#അല്ലെങ്കിൽ
+    തിരികെ Vec3i(deviceProps().get(device_id_)->maxTexture3D);
 #endif
 }
 
-int cv::cuda::DeviceInfo::maxTextureCubemap() const
+പൂർണ്ണസംഖ്യ cv::cuda::DeviceInfo::maxTextureCubemap() സ്ഥിരം
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    return deviceProps().get(device_id_)->maxTextureCubemap;
+#അല്ലെങ്കിൽ
+    തിരികെ deviceProps().get(device_id_)->maxTextureCubemap;
 #endif
 }
 
-Vec2i cv::cuda::DeviceInfo::maxTexture1DLayered() const
+Vec2i cv::cuda::DeviceInfo::maxTexture1DLayered() സ്ഥിരം
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    return Vec2i(deviceProps().get(device_id_)->maxTexture1DLayered);
+#അല്ലെങ്കിൽ
+    തിരികെ Vec2i(deviceProps().get(device_id_)->maxTexture1DLayered);
 #endif
 }
 
-Vec3i cv::cuda::DeviceInfo::maxTexture2DLayered() const
+Vec3i cv::cuda::DeviceInfo::maxTexture2DLayered() സ്ഥിരം
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    return Vec3i(deviceProps().get(device_id_)->maxTexture2DLayered);
+#അല്ലെങ്കിൽ
+    തിരികെ Vec3i(deviceProps().get(device_id_)->maxTexture2DLayered);
 #endif
 }
 
-Vec2i cv::cuda::DeviceInfo::maxTextureCubemapLayered() const
+Vec2i cv::cuda::DeviceInfo::maxTextureCubemapLayered() സ്ഥിരം
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    return Vec2i(deviceProps().get(device_id_)->maxTextureCubemapLayered);
+#അല്ലെങ്കിൽ
+    തിരികെ Vec2i(deviceProps().get(device_id_)->maxTextureCubemapLayered);
 #endif
 }
 
-int cv::cuda::DeviceInfo::maxSurface1D() const
+പൂർണ്ണസംഖ്യ cv::cuda::DeviceInfo::maxSurface1D() സ്ഥിരം
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    return deviceProps().get(device_id_)->maxSurface1D;
+#അല്ലെങ്കിൽ
+    തിരികെ deviceProps().get(device_id_)->maxSurface1D;
 #endif
 }
 
-Vec2i cv::cuda::DeviceInfo::maxSurface2D() const
+Vec2i cv::cuda::DeviceInfo::maxSurface2D() സ്ഥിരം
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    return Vec2i(deviceProps().get(device_id_)->maxSurface2D);
+#അല്ലെങ്കിൽ
+    തിരികെ Vec2i(deviceProps().get(device_id_)->maxSurface2D);
 #endif
 }
 
-Vec3i cv::cuda::DeviceInfo::maxSurface3D() const
+Vec3i cv::cuda::DeviceInfo::maxSurface3D() സ്ഥിരം
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    return Vec3i(deviceProps().get(device_id_)->maxSurface3D);
+#അല്ലെങ്കിൽ
+    തിരികെ Vec3i(deviceProps().get(device_id_)->maxSurface3D);
 #endif
 }
 
-Vec2i cv::cuda::DeviceInfo::maxSurface1DLayered() const
+Vec2i cv::cuda::DeviceInfo::maxSurface1DLayered() സ്ഥിരം
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    return Vec2i(deviceProps().get(device_id_)->maxSurface1DLayered);
+#അല്ലെങ്കിൽ
+    തിരികെ Vec2i(deviceProps().get(device_id_)->maxSurface1DLayered);
 #endif
 }
 
-Vec3i cv::cuda::DeviceInfo::maxSurface2DLayered() const
+Vec3i cv::cuda::DeviceInfo::maxSurface2DLayered() സ്ഥിരം
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    return Vec3i(deviceProps().get(device_id_)->maxSurface2DLayered);
+#അല്ലെങ്കിൽ
+    തിരികെ Vec3i(deviceProps().get(device_id_)->maxSurface2DLayered);
 #endif
 }
 
-int cv::cuda::DeviceInfo::maxSurfaceCubemap() const
+പൂർണ്ണസംഖ്യ cv::cuda::DeviceInfo::maxSurfaceCubemap() സ്ഥിരം
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    return deviceProps().get(device_id_)->maxSurfaceCubemap;
+#അല്ലെങ്കിൽ
+    തിരികെ deviceProps().get(device_id_)->maxSurfaceCubemap;
 #endif
 }
 
-Vec2i cv::cuda::DeviceInfo::maxSurfaceCubemapLayered() const
+Vec2i cv::cuda::DeviceInfo::maxSurfaceCubemapLayered() സ്ഥിരം
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    return Vec2i(deviceProps().get(device_id_)->maxSurfaceCubemapLayered);
+#അല്ലെങ്കിൽ
+    തിരികെ Vec2i(deviceProps().get(device_id_)->maxSurfaceCubemapLayered);
 #endif
 }
 
-size_t cv::cuda::DeviceInfo::surfaceAlignment() const
+size_t cv::cuda::DeviceInfo::surfaceAlignment() സ്ഥിരം
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    return deviceProps().get(device_id_)->surfaceAlignment;
+#അല്ലെങ്കിൽ
+    തിരികെ deviceProps().get(device_id_)->surfaceAlignment;
 #endif
 }
 
-bool cv::cuda::DeviceInfo::concurrentKernels() const
+തർക്കം cv::cuda::DeviceInfo::concurrentKernels() സ്ഥിരം
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    return deviceProps().get(device_id_)->concurrentKernels != 0;
+#അല്ലെങ്കിൽ
+    തിരികെ deviceProps().get(device_id_)->concurrentKernels != 0;
 #endif
 }
 
-bool cv::cuda::DeviceInfo::ECCEnabled() const
+തർക്കം cv::cuda::DeviceInfo::ECCEnabled() സ്ഥിരം
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    return deviceProps().get(device_id_)->ECCEnabled != 0;
+#അല്ലെങ്കിൽ
+    തിരികെ deviceProps().get(device_id_)->ECCEnabled != 0;
 #endif
 }
 
-int cv::cuda::DeviceInfo::pciBusID() const
+പൂർണ്ണസംഖ്യ cv::cuda::DeviceInfo::pciBusID() സ്ഥിരം
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    return deviceProps().get(device_id_)->pciBusID;
+#അല്ലെങ്കിൽ
+    തിരികെ deviceProps().get(device_id_)->pciBusID;
 #endif
 }
 
-int cv::cuda::DeviceInfo::pciDeviceID() const
+പൂർണ്ണസംഖ്യ cv::cuda::DeviceInfo::pciDeviceID() സ്ഥിരം
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    return deviceProps().get(device_id_)->pciDeviceID;
+#അല്ലെങ്കിൽ
+    തിരികെ deviceProps().get(device_id_)->pciDeviceID;
 #endif
 }
 
-int cv::cuda::DeviceInfo::pciDomainID() const
+പൂർണ്ണസംഖ്യ cv::cuda::DeviceInfo::pciDomainID() സ്ഥിരം
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    return deviceProps().get(device_id_)->pciDomainID;
+#അല്ലെങ്കിൽ
+    തിരികെ deviceProps().get(device_id_)->pciDomainID;
 #endif
 }
 
-bool cv::cuda::DeviceInfo::tccDriver() const
+തർക്കം cv::cuda::DeviceInfo::tccDriver() സ്ഥിരം
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    return deviceProps().get(device_id_)->tccDriver != 0;
+#അല്ലെങ്കിൽ
+    തിരികെ deviceProps().get(device_id_)->tccDriver != 0;
 #endif
 }
 
-int cv::cuda::DeviceInfo::asyncEngineCount() const
+പൂർണ്ണസംഖ്യ cv::cuda::DeviceInfo::async_Engine_എണ്ണം() സ്ഥിരം
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    return deviceProps().get(device_id_)->asyncEngineCount;
+#അല്ലെങ്കിൽ
+    തിരികെ deviceProps().get(device_id_)->async_Engine_എണ്ണം;
 #endif
 }
 
-bool cv::cuda::DeviceInfo::unifiedAddressing() const
+തർക്കം cv::cuda::DeviceInfo::unifiedAddressing() സ്ഥിരം
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    return deviceProps().get(device_id_)->unifiedAddressing != 0;
+#അല്ലെങ്കിൽ
+    തിരികെ deviceProps().get(device_id_)->unifiedAddressing != 0;
 #endif
 }
 
-int cv::cuda::DeviceInfo::memoryClockRate() const
+പൂർണ്ണസംഖ്യ cv::cuda::DeviceInfo::memoryClockRate() സ്ഥിരം
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    int memoryClockRate;
+#അല്ലെങ്കിൽ
+    പൂർണ്ണസംഖ്യ memoryClockRate;
     cudaSafeCall(cudaDeviceGetAttribute(&memoryClockRate, cudaDevAttrMemoryClockRate, device_id_));
-    return memoryClockRate;
+    തിരികെ memoryClockRate;
 #endif
 }
 
-int cv::cuda::DeviceInfo::memoryBusWidth() const
+പൂർണ്ണസംഖ്യ cv::cuda::DeviceInfo::memoryBusWidth() സ്ഥിരം
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    return deviceProps().get(device_id_)->memoryBusWidth;
+#അല്ലെങ്കിൽ
+    തിരികെ deviceProps().get(device_id_)->memoryBusWidth;
 #endif
 }
 
-int cv::cuda::DeviceInfo::l2CacheSize() const
+പൂർണ്ണസംഖ്യ cv::cuda::DeviceInfo::l2CacheSize() സ്ഥിരം
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    return deviceProps().get(device_id_)->l2CacheSize;
+#അല്ലെങ്കിൽ
+    തിരികെ deviceProps().get(device_id_)->l2CacheSize;
 #endif
 }
 
-int cv::cuda::DeviceInfo::maxThreadsPerMultiProcessor() const
+പൂർണ്ണസംഖ്യ cv::cuda::DeviceInfo::maxThreadsPerMultiProcessor() സ്ഥിരം
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
-    return deviceProps().get(device_id_)->maxThreadsPerMultiProcessor;
+#അല്ലെങ്കിൽ
+    തിരികെ deviceProps().get(device_id_)->maxThreadsPerMultiProcessor;
 #endif
 }
 
-void cv::cuda::DeviceInfo::queryMemory(size_t& _totalMemory, size_t& _freeMemory) const
+ശൂന്യം cv::cuda::DeviceInfo::queryMemory(size_t& _totalMemory, size_t& _freeMemory) സ്ഥിരം
 {
 #ifndef HAVE_CUDA
     CV_UNUSED(_totalMemory);
     CV_UNUSED(_freeMemory);
     throw_no_cuda();
-#else
-    int prevDeviceID = getDevice();
-    if (prevDeviceID != device_id_)
+#അല്ലെങ്കിൽ
+    പൂർണ്ണസംഖ്യ prevDeviceID = getDevice();
+    എങ്കിൽ (prevDeviceID != device_id_)
         setDevice(device_id_);
 
     cudaSafeCall( cudaMemGetInfo(&_freeMemory, &_totalMemory) );
 
-    if (prevDeviceID != device_id_)
+    എങ്കിൽ (prevDeviceID != device_id_)
         setDevice(prevDeviceID);
 #endif
 }
 
-bool cv::cuda::DeviceInfo::isCompatible() const
+തർക്കം cv::cuda::DeviceInfo::isCompatible() സ്ഥിരം
 {
 #ifndef HAVE_CUDA
     throw_no_cuda();
-#else
+#അല്ലെങ്കിൽ
     // Check PTX compatibility
-    if (TargetArchs::hasEqualOrLessPtx(majorVersion(), minorVersion()))
-        return true;
+    എങ്കിൽ (TargetArchs::hasEqualOrLessPtx(majorVersion(), minorVersion()))
+        തിരികെ സത്യം;
 
     // Check BIN compatibility
-    for (int i = minorVersion(); i >= 0; --i)
-        if (TargetArchs::hasBin(majorVersion(), i))
-            return true;
+    വേണ്ടി (പൂർണ്ണസംഖ്യ i = minorVersion(); i >= 0; --i)
+        എങ്കിൽ (TargetArchs::hasBin(majorVersion(), i))
+            തിരികെ സത്യം;
 
-    return false;
+    തിരികെ അസത്യം;
 #endif
 }
 
@@ -880,61 +880,61 @@ bool cv::cuda::DeviceInfo::isCompatible() const
 
 #ifdef HAVE_CUDA
 
-namespace
+നാമാകാശ
 {
-    int convertSMVer2Cores(int major, int minor)
+    പൂർണ്ണസംഖ്യ convertSMVer2Cores(പൂർണ്ണസംഖ്യ major, പൂർണ്ണസംഖ്യ minor)
     {
         // Defines for GPU Architecture types (using the SM version to determine the # of cores per SM
-        typedef struct {
-            int SM; // 0xMm (hexadecimal notation), M = SM Major version, and m = SM minor version
-            int Cores;
+        തരനിർവചനം ഘടന {
+            പൂർണ്ണസംഖ്യ SM; // 0xMm (hexadecimal notation), M = SM Major version, and m = SM minor version
+            പൂർണ്ണസംഖ്യ Cores;
         } SMtoCores;
 
         SMtoCores gpuArchCoresPerSM[] =  { { 0x10,  8 }, { 0x11,  8 }, { 0x12,  8 }, { 0x13,  8 }, { 0x20, 32 }, { 0x21, 48 }, {0x30, 192}, {0x35, 192}, { -1, -1 }  };
 
-        int index = 0;
-        while (gpuArchCoresPerSM[index].SM != -1)
+        പൂർണ്ണസംഖ്യ index = 0;
+        ആകുമ്പോൾ (gpuArchCoresPerSM[index].SM != -1)
         {
-            if (gpuArchCoresPerSM[index].SM == ((major << 4) + minor) )
-                return gpuArchCoresPerSM[index].Cores;
+            എങ്കിൽ (gpuArchCoresPerSM[index].SM == ((major << 4) + minor) )
+                തിരികെ gpuArchCoresPerSM[index].Cores;
             index++;
         }
 
-        return -1;
+        തിരികെ -1;
     }
 }
 
 #endif
 
-void cv::cuda::printCudaDeviceInfo(int device)
+ശൂന്യം cv::cuda::printCudaDeviceInfo(പൂർണ്ണസംഖ്യ device)
 {
 #ifndef HAVE_CUDA
     CV_UNUSED(device);
     throw_no_cuda();
-#else
-    int count = getCudaEnabledDeviceCount();
-    bool valid = (device >= 0) && (device < count);
+#അല്ലെങ്കിൽ
+    പൂർണ്ണസംഖ്യ എണ്ണം_2 = get_Cuda_Enabled_Device_എണ്ണം();
+    തർക്കം valid = (device >= 0) && (device < എണ്ണം_2);
 
-    int beg = valid ? device   : 0;
-    int end = valid ? device+1 : count;
+    പൂർണ്ണസംഖ്യ beg = valid ? device   : 0;
+    പൂർണ്ണസംഖ്യ end = valid ? device+1 : എണ്ണം_2;
 
     printf("*** CUDA Device Query (Runtime API) version (CUDART static linking) *** \n\n");
-    printf("Device count: %d\n", count);
+    printf("Device count: %d\n", എണ്ണം_2);
 
-    int driverVersion = 0, runtimeVersion = 0;
+    പൂർണ്ണസംഖ്യ driverVersion = 0, runtimeVersion = 0;
     cudaSafeCall( cudaDriverGetVersion(&driverVersion) );
     cudaSafeCall( cudaRuntimeGetVersion(&runtimeVersion) );
 
-    const char *computeMode[] = {
+    സ്ഥിരം അക്ഷരം *computeMode[] = {
         "Default (multiple host threads can use ::cudaSetDevice() with device simultaneously)",
         "Exclusive (only one host thread in one process is able to use ::cudaSetDevice() with this device)",
         "Prohibited (no host thread can use ::cudaSetDevice() with this device)",
         "Exclusive Process (many threads in one process is able to use ::cudaSetDevice() with this device)",
         "Unknown",
-        NULL
+        ശൂന്യ
     };
 
-    for(int dev = beg; dev < end; ++dev)
+    വേണ്ടി(പൂർണ്ണസംഖ്യ dev = beg; dev < end; ++dev)
     {
         cudaDeviceProp prop;
         cudaSafeCall( cudaGetDeviceProperties(&prop, dev) );
@@ -942,13 +942,13 @@ void cv::cuda::printCudaDeviceInfo(int device)
         printf("\nDevice %d: \"%s\"\n", dev, prop.name);
         printf("  CUDA Driver Version / Runtime Version          %d.%d / %d.%d\n", driverVersion/1000, driverVersion%100, runtimeVersion/1000, runtimeVersion%100);
         printf("  CUDA Capability Major/Minor version number:    %d.%d\n", prop.major, prop.minor);
-        printf("  Total amount of global memory:                 %.0f MBytes (%llu bytes)\n", (float)prop.totalGlobalMem/1048576.0f, (unsigned long long) prop.totalGlobalMem);
+        printf("  Total amount of global memory:                 %.0f MBytes (%llu bytes)\n", (ദശാംശം)prop.totalGlobalMem/1048576.0f, (unsigned long long) prop.totalGlobalMem);
 
-        int cores = convertSMVer2Cores(prop.major, prop.minor);
-        if (cores > 0)
-            printf("  (%2d) Multiprocessors x (%2d) CUDA Cores/MP:     %d CUDA Cores\n", prop.multiProcessorCount, cores, cores * prop.multiProcessorCount);
+        പൂർണ്ണസംഖ്യ cores = convertSMVer2Cores(prop.major, prop.minor);
+        എങ്കിൽ (cores > 0)
+            printf("  (%2d) Multiprocessors x (%2d) CUDA Cores/MP:     %d CUDA Cores\n", prop.multi_Processor_എണ്ണം, cores, cores * prop.multi_Processor_എണ്ണം);
 
-        int clockRate;
+        പൂർണ്ണസംഖ്യ clockRate;
         cudaSafeCall(cudaDeviceGetAttribute(&clockRate, cudaDevAttrClockRate, dev));
         printf("  GPU Clock Speed:                               %.2f GHz\n", clockRate * 1e-6f);
 
@@ -959,18 +959,18 @@ void cv::cuda::printCudaDeviceInfo(int device)
             prop.maxTexture1DLayered[0], prop.maxTexture1DLayered[1],
             prop.maxTexture2DLayered[0], prop.maxTexture2DLayered[1], prop.maxTexture2DLayered[2]);
 
-        printf("  Total amount of constant memory:               %u bytes\n", (int)prop.totalConstMem);
-        printf("  Total amount of shared memory per block:       %u bytes\n", (int)prop.sharedMemPerBlock);
+        printf("  Total amount of constant memory:               %u bytes\n", (പൂർണ്ണസംഖ്യ)prop.totalConstMem);
+        printf("  Total amount of shared memory per block:       %u bytes\n", (പൂർണ്ണസംഖ്യ)prop.sharedMemPerBlock);
         printf("  Total number of registers available per block: %d\n", prop.regsPerBlock);
         printf("  Warp size:                                     %d\n", prop.warpSize);
         printf("  Maximum number of threads per block:           %d\n", prop.maxThreadsPerBlock);
         printf("  Maximum sizes of each dimension of a block:    %d x %d x %d\n", prop.maxThreadsDim[0], prop.maxThreadsDim[1], prop.maxThreadsDim[2]);
         printf("  Maximum sizes of each dimension of a grid:     %d x %d x %d\n", prop.maxGridSize[0], prop.maxGridSize[1],  prop.maxGridSize[2]);
-        printf("  Maximum memory pitch:                          %u bytes\n", (int)prop.memPitch);
-        printf("  Texture alignment:                             %u bytes\n", (int)prop.textureAlignment);
+        printf("  Maximum memory pitch:                          %u bytes\n", (പൂർണ്ണസംഖ്യ)prop.memPitch);
+        printf("  Texture alignment:                             %u bytes\n", (പൂർണ്ണസംഖ്യ)prop.textureAlignment);
 
-        printf("  Concurrent copy and execution:                 %s with %d copy engine(s)\n", (prop.asyncEngineCount ? "Yes" : "No"), prop.asyncEngineCount);
-        int kernelExecTimeoutEnabled;
+        printf("  Concurrent copy and execution:                 %s with %d copy engine(s)\n", (prop.async_Engine_എണ്ണം ? "Yes" : "No"), prop.async_Engine_എണ്ണം);
+        പൂർണ്ണസംഖ്യ kernelExecTimeoutEnabled;
         cudaSafeCall(cudaDeviceGetAttribute(&kernelExecTimeoutEnabled, cudaDevAttrKernelExecTimeout, dev));
         printf("  Run time limit on kernels:                     %s\n", kernelExecTimeoutEnabled ? "Yes" : "No");
         printf("  Integrated GPU sharing Host Memory:            %s\n", prop.integrated ? "Yes" : "No");
@@ -983,7 +983,7 @@ void cv::cuda::printCudaDeviceInfo(int device)
         printf("  Device supports Unified Addressing (UVA):      %s\n", prop.unifiedAddressing ? "Yes" : "No");
         printf("  Device PCI Bus ID / PCI location ID:           %d / %d\n", prop.pciBusID, prop.pciDeviceID );
 
-        int propComputeMode;
+        പൂർണ്ണസംഖ്യ propComputeMode;
         cudaSafeCall(cudaDeviceGetAttribute(&propComputeMode, cudaDevAttrComputeMode, dev));
         printf("  Compute Mode:\n");
         printf("      %s \n", computeMode[propComputeMode]);
@@ -993,40 +993,40 @@ void cv::cuda::printCudaDeviceInfo(int device)
     printf("deviceQuery, CUDA Driver = CUDART");
     printf(", CUDA Driver Version  = %d.%d", driverVersion / 1000, driverVersion % 100);
     printf(", CUDA Runtime Version = %d.%d", runtimeVersion/1000, runtimeVersion%100);
-    printf(", NumDevs = %d\n\n", count);
+    printf(", NumDevs = %d\n\n", എണ്ണം_2);
 
     fflush(stdout);
 #endif
 }
 
-void cv::cuda::printShortCudaDeviceInfo(int device)
+ശൂന്യം cv::cuda::printShortCudaDeviceInfo(പൂർണ്ണസംഖ്യ device)
 {
 #ifndef HAVE_CUDA
     CV_UNUSED(device);
     throw_no_cuda();
-#else
-    int count = getCudaEnabledDeviceCount();
-    bool valid = (device >= 0) && (device < count);
+#അല്ലെങ്കിൽ
+    പൂർണ്ണസംഖ്യ എണ്ണം_2 = get_Cuda_Enabled_Device_എണ്ണം();
+    തർക്കം valid = (device >= 0) && (device < എണ്ണം_2);
 
-    int beg = valid ? device   : 0;
-    int end = valid ? device+1 : count;
+    പൂർണ്ണസംഖ്യ beg = valid ? device   : 0;
+    പൂർണ്ണസംഖ്യ end = valid ? device+1 : എണ്ണം_2;
 
-    int driverVersion = 0, runtimeVersion = 0;
+    പൂർണ്ണസംഖ്യ driverVersion = 0, runtimeVersion = 0;
     cudaSafeCall( cudaDriverGetVersion(&driverVersion) );
     cudaSafeCall( cudaRuntimeGetVersion(&runtimeVersion) );
 
-    for(int dev = beg; dev < end; ++dev)
+    വേണ്ടി(പൂർണ്ണസംഖ്യ dev = beg; dev < end; ++dev)
     {
         cudaDeviceProp prop;
         cudaSafeCall( cudaGetDeviceProperties(&prop, dev) );
 
-        const char *arch_str = prop.major < 2 ? " (not Fermi)" : "";
-        printf("Device %d:  \"%s\"  %.0fMb", dev, prop.name, (float)prop.totalGlobalMem/1048576.0f);
+        സ്ഥിരം അക്ഷരം *arch_str = prop.major < 2 ? " (not Fermi)" : "";
+        printf("Device %d:  \"%s\"  %.0fMb", dev, prop.name, (ദശാംശം)prop.totalGlobalMem/1048576.0f);
         printf(", sm_%d%d%s", prop.major, prop.minor, arch_str);
 
-        int cores = convertSMVer2Cores(prop.major, prop.minor);
-        if (cores > 0)
-            printf(", %d cores", cores * prop.multiProcessorCount);
+        പൂർണ്ണസംഖ്യ cores = convertSMVer2Cores(prop.major, prop.minor);
+        എങ്കിൽ (cores > 0)
+            printf(", %d cores", cores * prop.multi_Processor_എണ്ണം);
 
         printf(", Driver/Runtime ver.%d.%d/%d.%d\n", driverVersion/1000, driverVersion%100, runtimeVersion/1000, runtimeVersion%100);
     }
@@ -1040,30 +1040,30 @@ void cv::cuda::printShortCudaDeviceInfo(int device)
 
 #ifdef HAVE_CUDA
 
-namespace
+നാമാകാശ
 {
     #define error_entry(entry)  { entry, #entry }
 
-    struct ErrorEntry
+    ഘടന ErrorEntry
     {
-        int code;
-        const char* str;
+        പൂർണ്ണസംഖ്യ code;
+        സ്ഥിരം അക്ഷരം* str;
     };
 
-    struct ErrorEntryComparer
+    ഘടന ErrorEntryComparer
     {
-        int code;
-        ErrorEntryComparer(int code_) : code(code_) {}
-        bool operator()(const ErrorEntry& e) const { return e.code == code; }
+        പൂർണ്ണസംഖ്യ code;
+        ErrorEntryComparer(പൂർണ്ണസംഖ്യ code_) : code(code_) {}
+        തർക്കം operator()(സ്ഥിരം ErrorEntry& e) സ്ഥിരം { തിരികെ e.code == code; }
     };
 
-    const ErrorEntry npp_errors [] =
+    സ്ഥിരം ErrorEntry npp_errors [] =
     {
-    #if defined (_MSC_VER)
+    #എങ്കിൽ defined (_MSC_VER)
         error_entry( NPP_NOT_SUFFICIENT_COMPUTE_CAPABILITY ),
     #endif
 
-    #if NPP_VERSION < 5500
+    #എങ്കിൽ NPP_VERSION < 5500
         error_entry( NPP_BAD_ARG_ERROR ),
         error_entry( NPP_COEFF_ERROR ),
         error_entry( NPP_RECT_ERROR ),
@@ -1071,13 +1071,13 @@ namespace
         error_entry( NPP_MEMFREE_ERR ),
         error_entry( NPP_MEMSET_ERR ),
         error_entry( NPP_MEM_ALLOC_ERR ),
-        error_entry( NPP_HISTO_NUMBER_OF_LEVELS_ERROR ),
+        error_entry( NPP_HISTO_സംഖ്യ_OF_LEVELS_ERROR ),
         error_entry( NPP_MIRROR_FLIP_ERR ),
-        error_entry( NPP_INVALID_INPUT ),
+        error_entry( NPP_INVALID_നിവേശം ),
         error_entry( NPP_POINTER_ERROR ),
         error_entry( NPP_WARNING ),
         error_entry( NPP_ODD_ROI_WARNING ),
-    #else
+    #അല്ലെങ്കിൽ
         error_entry( NPP_INVALID_HOST_POINTER_ERROR ),
         error_entry( NPP_INVALID_DEVICE_POINTER_ERROR ),
         error_entry( NPP_LUT_PALETTE_BITSIZE_ERROR ),
@@ -1085,15 +1085,15 @@ namespace
         error_entry( NPP_MEMFREE_ERROR ),
         error_entry( NPP_MEMSET_ERROR ),
         error_entry( NPP_QUALITY_INDEX_ERROR ),
-        error_entry( NPP_HISTOGRAM_NUMBER_OF_LEVELS_ERROR ),
+        error_entry( NPP_HISTOGRAM_സംഖ്യ_OF_LEVELS_ERROR ),
         error_entry( NPP_CHANNEL_ORDER_ERROR ),
-        error_entry( NPP_ZERO_MASK_VALUE_ERROR ),
+        error_entry( NPP_ZERO_MASK_മൂല്യം_ERROR ),
         error_entry( NPP_QUADRANGLE_ERROR ),
         error_entry( NPP_RECTANGLE_ERROR ),
         error_entry( NPP_COEFFICIENT_ERROR ),
-        error_entry( NPP_NUMBER_OF_CHANNELS_ERROR ),
+        error_entry( NPP_സംഖ്യ_OF_CHANNELS_ERROR ),
         error_entry( NPP_COI_ERROR ),
-        error_entry( NPP_DIVISOR_ERROR ),
+        error_entry( NPP_ഹാരകം_ERROR ),
         error_entry( NPP_CHANNEL_ERROR ),
         error_entry( NPP_STRIDE_ERROR ),
         error_entry( NPP_ANCHOR_ERROR ),
@@ -1122,7 +1122,7 @@ namespace
         error_entry( NPP_NOT_SUPPORTED_MODE_ERROR ),
         error_entry( NPP_ROUND_MODE_NOT_SUPPORTED_ERROR ),
         error_entry( NPP_RESIZE_NO_OPERATION_ERROR ),
-        error_entry( NPP_LUT_NUMBER_OF_LEVELS_ERROR ),
+        error_entry( NPP_LUT_സംഖ്യ_OF_LEVELS_ERROR ),
         error_entry( NPP_TEXTURE_BIND_ERROR ),
         error_entry( NPP_WRONG_INTERSECTION_ROI_ERROR ),
         error_entry( NPP_NOT_EVEN_STEP_ERROR ),
@@ -1145,12 +1145,12 @@ namespace
         error_entry( NPP_DOUBLE_SIZE_WARNING )
     };
 
-    const size_t npp_error_num = sizeof(npp_errors) / sizeof(npp_errors[0]);
+    സ്ഥിരം size_t npp_error_അക്കം = വലുപ്പം(npp_errors) / വലുപ്പം(npp_errors[0]);
 
-    const ErrorEntry cu_errors [] =
+    സ്ഥിരം ErrorEntry cu_errors [] =
     {
         error_entry( CUDA_SUCCESS                              ),
-        error_entry( CUDA_ERROR_INVALID_VALUE                  ),
+        error_entry( CUDA_ERROR_INVALID_മൂല്യം                  ),
         error_entry( CUDA_ERROR_OUT_OF_MEMORY                  ),
         error_entry( CUDA_ERROR_NOT_INITIALIZED                ),
         error_entry( CUDA_ERROR_DEINITIALIZED                  ),
@@ -1167,7 +1167,7 @@ namespace
         error_entry( CUDA_ERROR_UNMAP_FAILED                   ),
         error_entry( CUDA_ERROR_ARRAY_IS_MAPPED                ),
         error_entry( CUDA_ERROR_ALREADY_MAPPED                 ),
-        error_entry( CUDA_ERROR_NO_BINARY_FOR_GPU              ),
+        error_entry( CUDA_ERROR_NO_ദ്വിമാന_FOR_GPU              ),
         error_entry( CUDA_ERROR_ALREADY_ACQUIRED               ),
         error_entry( CUDA_ERROR_NOT_MAPPED                     ),
         error_entry( CUDA_ERROR_NOT_MAPPED_AS_ARRAY            ),
@@ -1177,7 +1177,7 @@ namespace
         error_entry( CUDA_ERROR_CONTEXT_ALREADY_IN_USE         ),
         error_entry( CUDA_ERROR_INVALID_SOURCE                 ),
         error_entry( CUDA_ERROR_FILE_NOT_FOUND                 ),
-        error_entry( CUDA_ERROR_SHARED_OBJECT_SYMBOL_NOT_FOUND ),
+        error_entry( CUDA_ERROR_SHARED_OBJECT_ചിഹ്നം_NOT_FOUND ),
         error_entry( CUDA_ERROR_SHARED_OBJECT_INIT_FAILED      ),
         error_entry( CUDA_ERROR_OPERATING_SYSTEM               ),
         error_entry( CUDA_ERROR_INVALID_HANDLE                 ),
@@ -1198,37 +1198,37 @@ namespace
         error_entry( CUDA_ERROR_UNKNOWN                        )
     };
 
-    const size_t cu_errors_num = sizeof(cu_errors) / sizeof(cu_errors[0]);
+    സ്ഥിരം size_t cu_errors_അക്കം = വലുപ്പം(cu_errors) / വലുപ്പം(cu_errors[0]);
 
-    cv::String getErrorString(int code, const ErrorEntry* errors, size_t n)
+    cv::String getErrorString(പൂർണ്ണസംഖ്യ code, സ്ഥിരം ErrorEntry* errors, size_t n)
     {
         size_t idx = std::find_if(errors, errors + n, ErrorEntryComparer(code)) - errors;
 
-        const char* msg = (idx != n) ? errors[idx].str : "Unknown error code";
-        cv::String str = cv::format("%s [Code = %d]", msg, code);
+        സ്ഥിരം അക്ഷരം* സന്ദേശം = (idx != n) ? errors[idx].str : "Unknown error code";
+        cv::String str = cv::format("%s [Code = %d]", സന്ദേശം, code);
 
-        return str;
+        തിരികെ str;
     }
 }
 
 #endif
 
-String cv::cuda::getNppErrorMessage(int code)
+String cv::cuda::getNppErrorMessage(പൂർണ്ണസംഖ്യ code)
 {
 #ifndef HAVE_CUDA
     CV_UNUSED(code);
-    return String();
-#else
-    return getErrorString(code, npp_errors, npp_error_num);
+    തിരികെ String();
+#അല്ലെങ്കിൽ
+    തിരികെ getErrorString(code, npp_errors, npp_error_അക്കം);
 #endif
 }
 
-String cv::cuda::getCudaDriverApiErrorMessage(int code)
+String cv::cuda::getCudaDriverApiErrorMessage(പൂർണ്ണസംഖ്യ code)
 {
 #ifndef HAVE_CUDA
     CV_UNUSED(code);
-    return String();
-#else
-    return getErrorString(code, cu_errors, cu_errors_num);
+    തിരികെ String();
+#അല്ലെങ്കിൽ
+    തിരികെ getErrorString(code, cu_errors, cu_errors_അക്കം);
 #endif
 }

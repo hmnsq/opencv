@@ -41,143 +41,143 @@
 //
 //M*/
 
-#include "precomp.hpp"
-#include <opencv2/core/utils/configuration.private.hpp>
-#include <opencv2/core/hal/hal.hpp>
+#അന്തര്ഭാവ "precomp.hpp"
+#അന്തര്ഭാവ <opencv2/core/utils/configuration.private.hpp>
+#അന്തര്ഭാവ <opencv2/core/hal/hal.hpp>
 
 ////////////////////////////////////////// kmeans ////////////////////////////////////////////
 
-namespace cv
+നാമാകാശ cv
 {
 
-static int CV_KMEANS_PARALLEL_GRANULARITY = (int)utils::getConfigurationParameterSizeT("OPENCV_KMEANS_PARALLEL_GRANULARITY", 1000);
+സ്ഥിതം പൂർണ്ണസംഖ്യ CV_KMEANS_PARALLEL_GRANULARITY = (പൂർണ്ണസംഖ്യ)utils::getConfigurationParameterSizeT("OPENCV_KMEANS_PARALLEL_GRANULARITY", 1000);
 
-static void generateRandomCenter(int dims, const Vec2f* box, float* center, RNG& rng)
+സ്ഥിതം ശൂന്യം generateRandomCenter(പൂർണ്ണസംഖ്യ dims, സ്ഥിരം Vec2f* box, ദശാംശം* center, RNG& rng)
 {
-    float margin = 1.f/dims;
-    for (int j = 0; j < dims; j++)
-        center[j] = ((float)rng*(1.f+margin*2.f)-margin)*(box[j][1] - box[j][0]) + box[j][0];
+    ദശാംശം margin = 1.f/dims;
+    വേണ്ടി (പൂർണ്ണസംഖ്യ j = 0; j < dims; j++)
+        center[j] = ((ദശാംശം)rng*(1.f+margin*2.f)-margin)*(box[j][1] - box[j][0]) + box[j][0];
 }
 
-class KMeansPPDistanceComputer : public ParallelLoopBody
+വർഗ്ഗം KMeansPPDistanceComputer : പൊതു ParallelLoopBody
 {
-public:
-    KMeansPPDistanceComputer(float *tdist2_, const Mat& data_, const float *dist_, int ci_) :
+പൊതു:
+    KMeansPPDistanceComputer(ദശാംശം *tdist2_, സ്ഥിരം Mat& data_, സ്ഥിരം ദശാംശം *dist_, പൂർണ്ണസംഖ്യ ci_) :
         tdist2(tdist2_), data(data_), dist(dist_), ci(ci_)
     { }
 
-    void operator()( const cv::Range& range ) const CV_OVERRIDE
+    ശൂന്യം operator()( സ്ഥിരം cv::Range& range ) സ്ഥിരം CV_OVERRIDE
     {
         CV_TRACE_FUNCTION();
-        const int begin = range.start;
-        const int end = range.end;
-        const int dims = data.cols;
+        സ്ഥിരം പൂർണ്ണസംഖ്യ begin = range.start;
+        സ്ഥിരം പൂർണ്ണസംഖ്യ end = range.end;
+        സ്ഥിരം പൂർണ്ണസംഖ്യ dims = data.cols;
 
-        for (int i = begin; i<end; i++)
+        വേണ്ടി (പൂർണ്ണസംഖ്യ i = begin; i<end; i++)
         {
-            tdist2[i] = std::min(hal::normL2Sqr_(data.ptr<float>(i), data.ptr<float>(ci), dims), dist[i]);
+            tdist2[i] = std::min(hal::normL2Sqr_(data.ptr<ദശാംശം>(i), data.ptr<ദശാംശം>(ci), dims), dist[i]);
         }
     }
 
-private:
-    KMeansPPDistanceComputer& operator=(const KMeansPPDistanceComputer&); // = delete
+സ്വകാര്യ:
+    KMeansPPDistanceComputer& operator=(സ്ഥിരം KMeansPPDistanceComputer&); // = delete
 
-    float *tdist2;
-    const Mat& data;
-    const float *dist;
-    const int ci;
+    ദശാംശം *tdist2;
+    സ്ഥിരം Mat& data;
+    സ്ഥിരം ദശാംശം *dist;
+    സ്ഥിരം പൂർണ്ണസംഖ്യ ci;
 };
 
 /*
 k-means center initialization using the following algorithm:
 Arthur & Vassilvitskii (2007) k-means++: The Advantages of Careful Seeding
 */
-static bool generateCentersPP(const Mat& data, Mat& _out_centers,
-                              int K, RNG& rng, int trials)
+സ്ഥിതം തർക്കം generateCentersPP(സ്ഥിരം Mat& data, Mat& _out_centers,
+                              പൂർണ്ണസംഖ്യ K, RNG& rng, പൂർണ്ണസംഖ്യ trials)
 {
     CV_TRACE_FUNCTION();
-    const int dims = data.cols, N = data.rows;
-    cv::AutoBuffer<int, 64> _centers(K);
-    int* centers = &_centers[0];
-    cv::AutoBuffer<float, 0> _dist(N*3);
-    float* dist = &_dist[0], *tdist = dist + N, *tdist2 = tdist + N;
-    double sum0 = 0;
+    സ്ഥിരം പൂർണ്ണസംഖ്യ dims = data.cols, N = data.rows;
+    cv::AutoBuffer<പൂർണ്ണസംഖ്യ, 64> _centers(K);
+    പൂർണ്ണസംഖ്യ* centers = &_centers[0];
+    cv::AutoBuffer<ദശാംശം, 0> _dist(N*3);
+    ദശാംശം* dist = &_dist[0], *tdist = dist + N, *tdist2 = tdist + N;
+    ഇരട്ട sum0 = 0;
 
     centers[0] = (unsigned)rng % N;
 
-    for (int i = 0; i < N; i++)
+    വേണ്ടി (പൂർണ്ണസംഖ്യ i = 0; i < N; i++)
     {
-        dist[i] = hal::normL2Sqr_(data.ptr<float>(i), data.ptr<float>(centers[0]), dims);
+        dist[i] = hal::normL2Sqr_(data.ptr<ദശാംശം>(i), data.ptr<ദശാംശം>(centers[0]), dims);
         sum0 += dist[i];
     }
-    if (!(sum0 < DBL_MAX))
-        return false;
+    എങ്കിൽ (!(sum0 < DBL_MAX))
+        തിരികെ അസത്യം;
 
-    for (int k = 1; k < K; k++)
+    വേണ്ടി (പൂർണ്ണസംഖ്യ k = 1; k < K; k++)
     {
-        double bestSum = DBL_MAX;
-        int bestCenter = -1;
+        ഇരട്ട bestSum = DBL_MAX;
+        പൂർണ്ണസംഖ്യ bestCenter = -1;
 
-        for (int j = 0; j < trials; j++)
+        വേണ്ടി (പൂർണ്ണസംഖ്യ j = 0; j < trials; j++)
         {
-            double p = (double)rng*sum0;
-            int ci = 0;
-            for (; ci < N - 1; ci++)
+            ഇരട്ട p = (ഇരട്ട)rng*sum0;
+            പൂർണ്ണസംഖ്യ ci = 0;
+            വേണ്ടി (; ci < N - 1; ci++)
             {
                 p -= dist[ci];
-                if (p <= 0)
-                    break;
+                എങ്കിൽ (p <= 0)
+                    നിർത്തുക;
             }
 
             parallel_for_(Range(0, N),
                           KMeansPPDistanceComputer(tdist2, data, dist, ci),
-                          (double)divUp((size_t)(dims * N), CV_KMEANS_PARALLEL_GRANULARITY));
-            double s = 0;
-            int i = 0;
-        #if CV_ENABLE_UNROLLED
-            for (; i + 7 < N; i += 8)
+                          (ഇരട്ട)divUp((size_t)(dims * N), CV_KMEANS_PARALLEL_GRANULARITY));
+            ഇരട്ട s = 0;
+            പൂർണ്ണസംഖ്യ i = 0;
+        #എങ്കിൽ CV_ENABLE_UNROLLED
+            വേണ്ടി (; i + 7 < N; i += 8)
             {
                 s += tdist2[i + 0] + tdist2[i + 1] + tdist2[i + 2] + tdist2[i + 3] +
                      tdist2[i + 4] + tdist2[i + 5] + tdist2[i + 6] + tdist2[i + 7];
             }
         #endif
-            for (; i < N; i++)
+            വേണ്ടി (; i < N; i++)
             {
                 s += tdist2[i];
             }
 
-            if (s < bestSum)
+            എങ്കിൽ (s < bestSum)
             {
                 bestSum = s;
                 bestCenter = ci;
                 std::swap(tdist, tdist2);
             }
         }
-        if (bestCenter < 0)
-            return false;
+        എങ്കിൽ (bestCenter < 0)
+            തിരികെ അസത്യം;
         centers[k] = bestCenter;
         sum0 = bestSum;
         std::swap(dist, tdist);
     }
 
-    for (int k = 0; k < K; k++)
+    വേണ്ടി (പൂർണ്ണസംഖ്യ k = 0; k < K; k++)
     {
-        const float* src = data.ptr<float>(centers[k]);
-        float* dst = _out_centers.ptr<float>(k);
-        for (int j = 0; j < dims; j++)
+        സ്ഥിരം ദശാംശം* src = data.ptr<ദശാംശം>(centers[k]);
+        ദശാംശം* dst = _out_centers.ptr<ദശാംശം>(k);
+        വേണ്ടി (പൂർണ്ണസംഖ്യ j = 0; j < dims; j++)
             dst[j] = src[j];
     }
-    return true;
+    തിരികെ സത്യം;
 }
 
-template<bool onlyDistance>
-class KMeansDistanceComputer : public ParallelLoopBody
+template<തർക്കം onlyDistance>
+വർഗ്ഗം KMeansDistanceComputer : പൊതു ParallelLoopBody
 {
-public:
-    KMeansDistanceComputer( double *distances_,
-                            int *labels_,
-                            const Mat& data_,
-                            const Mat& centers_)
+പൊതു:
+    KMeansDistanceComputer( ഇരട്ട *distances_,
+                            പൂർണ്ണസംഖ്യ *labels_,
+                            സ്ഥിരം Mat& data_,
+                            സ്ഥിരം Mat& centers_)
         : distances(distances_),
           labels(labels_),
           data(data_),
@@ -185,39 +185,39 @@ public:
     {
     }
 
-    void operator()(const Range& range) const CV_OVERRIDE
+    ശൂന്യം operator()(സ്ഥിരം Range& range) സ്ഥിരം CV_OVERRIDE
     {
         CV_TRACE_FUNCTION();
-        const int begin = range.start;
-        const int end = range.end;
-        const int K = centers.rows;
-        const int dims = centers.cols;
+        സ്ഥിരം പൂർണ്ണസംഖ്യ begin = range.start;
+        സ്ഥിരം പൂർണ്ണസംഖ്യ end = range.end;
+        സ്ഥിരം പൂർണ്ണസംഖ്യ K = centers.rows;
+        സ്ഥിരം പൂർണ്ണസംഖ്യ dims = centers.cols;
 
-        for (int i = begin; i < end; ++i)
+        വേണ്ടി (പൂർണ്ണസംഖ്യ i = begin; i < end; ++i)
         {
-            const float *sample = data.ptr<float>(i);
-            if (onlyDistance)
+            സ്ഥിരം ദശാംശം *sample = data.ptr<ദശാംശം>(i);
+            എങ്കിൽ (onlyDistance)
             {
-                const float* center = centers.ptr<float>(labels[i]);
+                സ്ഥിരം ദശാംശം* center = centers.ptr<ദശാംശം>(labels[i]);
                 distances[i] = hal::normL2Sqr_(sample, center, dims);
-                continue;
+                തുടരുക;
             }
-            else
+            അല്ലെങ്കിൽ
             {
-                int k_best = 0;
-                double min_dist = DBL_MAX;
+                പൂർണ്ണസംഖ്യ k_best = 0;
+                ഇരട്ട min_dist = DBL_MAX;
 
-                for (int k = 0; k < K; k++)
+                വേണ്ടി (പൂർണ്ണസംഖ്യ k = 0; k < K; k++)
                 {
-                    const float* center = centers.ptr<float>(k);
-                    const double dist = hal::normL2Sqr_(sample, center, dims);
-                    if (!(dist <= FLT_MAX))
+                    സ്ഥിരം ദശാംശം* center = centers.ptr<ദശാംശം>(k);
+                    സ്ഥിരം ഇരട്ട dist = hal::normL2Sqr_(sample, center, dims);
+                    എങ്കിൽ (!(dist <= FLT_MAX))
                     {
                         min_dist = DBL_MAX;
-                        break;
+                        നിർത്തുക;
                     }
 
-                    if (min_dist > dist)
+                    എങ്കിൽ (min_dist > dist)
                     {
                         min_dist = dist;
                         k_best = k;
@@ -230,54 +230,54 @@ public:
         }
     }
 
-private:
-    KMeansDistanceComputer& operator=(const KMeansDistanceComputer&); // = delete
+സ്വകാര്യ:
+    KMeansDistanceComputer& operator=(സ്ഥിരം KMeansDistanceComputer&); // = delete
 
-    double *distances;
-    int *labels;
-    const Mat& data;
-    const Mat& centers;
+    ഇരട്ട *distances;
+    പൂർണ്ണസംഖ്യ *labels;
+    സ്ഥിരം Mat& data;
+    സ്ഥിരം Mat& centers;
 };
 
 }
 
-double cv::kmeans( InputArray _data, int K,
-                   InputOutputArray _bestLabels,
-                   TermCriteria criteria, int attempts,
-                   int flags, OutputArray _centers )
+ഇരട്ട cv::kmeans( നിവേശം_Array _data, പൂർണ്ണസംഖ്യ K,
+                   നിവേശം_Output_Array _bestLabels,
+                   TermCriteria criteria, പൂർണ്ണസംഖ്യ attempts,
+                   പൂർണ്ണസംഖ്യ flags, OutputArray _centers )
 {
     CV_INSTRUMENT_REGION();
-    const int SPP_TRIALS = 3;
+    സ്ഥിരം പൂർണ്ണസംഖ്യ SPP_TRIALS = 3;
     Mat data0 = _data.getMat();
-    const bool isrow = data0.rows == 1;
-    const int N = isrow ? data0.cols : data0.rows;
-    const int dims = (isrow ? 1 : data0.cols)*data0.channels();
-    const int type = data0.depth();
+    സ്ഥിരം തർക്കം isrow = data0.rows == 1;
+    സ്ഥിരം പൂർണ്ണസംഖ്യ N = isrow ? data0.cols : data0.rows;
+    സ്ഥിരം പൂർണ്ണസംഖ്യ dims = (isrow ? 1 : data0.cols)*data0.channels();
+    സ്ഥിരം പൂർണ്ണസംഖ്യ type = data0.depth();
 
     attempts = std::max(attempts, 1);
     CV_Assert( data0.dims <= 2 && type == CV_32F && K > 0 );
     CV_CheckGE(N, K, "There can't be more clusters than elements");
 
-    Mat data(N, dims, CV_32F, data0.ptr(), isrow ? dims * sizeof(float) : static_cast<size_t>(data0.step));
+    Mat data(N, dims, CV_32F, data0.ptr(), isrow ? dims * വലുപ്പം(ദശാംശം) : static_cast<size_t>(data0.step));
 
-    _bestLabels.create(N, 1, CV_32S, -1, true);
+    _bestLabels.create(N, 1, CV_32S, -1, സത്യം);
 
     Mat _labels, best_labels = _bestLabels.getMat();
-    if (flags & KMEANS_USE_INITIAL_LABELS)
+    എങ്കിൽ (flags & KMEANS_USE_INITIAL_LABELS)
     {
         CV_Assert( (best_labels.cols == 1 || best_labels.rows == 1) &&
                   best_labels.cols*best_labels.rows == N &&
                   best_labels.type() == CV_32S &&
                   best_labels.isContinuous());
         best_labels.reshape(1, N).copyTo(_labels);
-        for (int i = 0; i < N; i++)
+        വേണ്ടി (പൂർണ്ണസംഖ്യ i = 0; i < N; i++)
         {
-            CV_Assert((unsigned)_labels.at<int>(i) < (unsigned)K);
+            CV_Assert((unsigned)_labels.at<പൂർണ്ണസംഖ്യ>(i) < (unsigned)K);
         }
     }
-    else
+    അല്ലെങ്കിൽ
     {
-        if (!((best_labels.cols == 1 || best_labels.rows == 1) &&
+        എങ്കിൽ (!((best_labels.cols == 1 || best_labels.rows == 1) &&
              best_labels.cols*best_labels.rows == N &&
              best_labels.type() == CV_32S &&
              best_labels.isContinuous()))
@@ -287,125 +287,125 @@ double cv::kmeans( InputArray _data, int K,
         }
         _labels.create(best_labels.size(), best_labels.type());
     }
-    int* labels = _labels.ptr<int>();
+    പൂർണ്ണസംഖ്യ* labels = _labels.ptr<പൂർണ്ണസംഖ്യ>();
 
     Mat centers(K, dims, type), old_centers(K, dims, type), temp(1, dims, type);
-    cv::AutoBuffer<int, 64> counters(K);
-    cv::AutoBuffer<double, 64> dists(N);
+    cv::AutoBuffer<പൂർണ്ണസംഖ്യ, 64> counters(K);
+    cv::AutoBuffer<ഇരട്ട, 64> dists(N);
     RNG& rng = theRNG();
 
-    if (criteria.type & TermCriteria::EPS)
+    എങ്കിൽ (criteria.type & TermCriteria::EPS)
         criteria.epsilon = std::max(criteria.epsilon, 0.);
-    else
+    അല്ലെങ്കിൽ
         criteria.epsilon = FLT_EPSILON;
     criteria.epsilon *= criteria.epsilon;
 
-    if (criteria.type & TermCriteria::COUNT)
-        criteria.maxCount = std::min(std::max(criteria.maxCount, 2), 100);
-    else
-        criteria.maxCount = 100;
+    എങ്കിൽ (criteria.type & TermCriteria::എണ്ണം_3)
+        criteria.max_എണ്ണം = std::min(std::max(criteria.max_എണ്ണം, 2), 100);
+    അല്ലെങ്കിൽ
+        criteria.max_എണ്ണം = 100;
 
-    if (K == 1)
+    എങ്കിൽ (K == 1)
     {
         attempts = 1;
-        criteria.maxCount = 2;
+        criteria.max_എണ്ണം = 2;
     }
 
     cv::AutoBuffer<Vec2f, 64> box(dims);
-    if (!(flags & KMEANS_PP_CENTERS))
+    എങ്കിൽ (!(flags & KMEANS_PP_CENTERS))
     {
         {
-            const float* sample = data.ptr<float>(0);
-            for (int j = 0; j < dims; j++)
+            സ്ഥിരം ദശാംശം* sample = data.ptr<ദശാംശം>(0);
+            വേണ്ടി (പൂർണ്ണസംഖ്യ j = 0; j < dims; j++)
                 box[j] = Vec2f(sample[j], sample[j]);
         }
-        for (int i = 1; i < N; i++)
+        വേണ്ടി (പൂർണ്ണസംഖ്യ i = 1; i < N; i++)
         {
-            const float* sample = data.ptr<float>(i);
-            for (int j = 0; j < dims; j++)
+            സ്ഥിരം ദശാംശം* sample = data.ptr<ദശാംശം>(i);
+            വേണ്ടി (പൂർണ്ണസംഖ്യ j = 0; j < dims; j++)
             {
-                float v = sample[j];
+                ദശാംശം v = sample[j];
                 box[j][0] = std::min(box[j][0], v);
                 box[j][1] = std::max(box[j][1], v);
             }
         }
     }
 
-    double best_compactness = DBL_MAX;
-    for (int a = 0; a < attempts; a++)
+    ഇരട്ട best_compactness = DBL_MAX;
+    വേണ്ടി (പൂർണ്ണസംഖ്യ a = 0; a < attempts; a++)
     {
-        double compactness = DBL_MAX;
+        ഇരട്ട compactness = DBL_MAX;
 
-        for (int iter = 0; ;)
+        വേണ്ടി (പൂർണ്ണസംഖ്യ iter = 0; ;)
         {
-            double max_center_shift = iter == 0 ? DBL_MAX : 0.0;
+            ഇരട്ട max_center_shift = iter == 0 ? DBL_MAX : 0.0;
 
             swap(centers, old_centers);
 
-            if (iter == 0 && (a > 0 || !(flags & KMEANS_USE_INITIAL_LABELS)))
+            എങ്കിൽ (iter == 0 && (a > 0 || !(flags & KMEANS_USE_INITIAL_LABELS)))
             {
-                if (flags & KMEANS_PP_CENTERS)
+                എങ്കിൽ (flags & KMEANS_PP_CENTERS)
                 {
-                    if (!generateCentersPP(data, centers, K, rng, SPP_TRIALS))
-                        break;
+                    എങ്കിൽ (!generateCentersPP(data, centers, K, rng, SPP_TRIALS))
+                        നിർത്തുക;
                 }
-                else
+                അല്ലെങ്കിൽ
                 {
-                    for (int k = 0; k < K; k++)
-                        generateRandomCenter(dims, box.data(), centers.ptr<float>(k), rng);
+                    വേണ്ടി (പൂർണ്ണസംഖ്യ k = 0; k < K; k++)
+                        generateRandomCenter(dims, box.data(), centers.ptr<ദശാംശം>(k), rng);
                 }
             }
-            else
+            അല്ലെങ്കിൽ
             {
                 // compute centers
                 centers = Scalar(0);
-                for (int k = 0; k < K; k++)
+                വേണ്ടി (പൂർണ്ണസംഖ്യ k = 0; k < K; k++)
                     counters[k] = 0;
 
-                for (int i = 0; i < N; i++)
+                വേണ്ടി (പൂർണ്ണസംഖ്യ i = 0; i < N; i++)
                 {
-                    const float* sample = data.ptr<float>(i);
-                    int k = labels[i];
-                    float* center = centers.ptr<float>(k);
-                    for (int j = 0; j < dims; j++)
+                    സ്ഥിരം ദശാംശം* sample = data.ptr<ദശാംശം>(i);
+                    പൂർണ്ണസംഖ്യ k = labels[i];
+                    ദശാംശം* center = centers.ptr<ദശാംശം>(k);
+                    വേണ്ടി (പൂർണ്ണസംഖ്യ j = 0; j < dims; j++)
                         center[j] += sample[j];
                     counters[k]++;
                 }
 
-                for (int k = 0; k < K; k++)
+                വേണ്ടി (പൂർണ്ണസംഖ്യ k = 0; k < K; k++)
                 {
-                    if (counters[k] != 0)
-                        continue;
+                    എങ്കിൽ (counters[k] != 0)
+                        തുടരുക;
 
                     // if some cluster appeared to be empty then:
                     //   1. find the biggest cluster
                     //   2. find the farthest from the center point in the biggest cluster
                     //   3. exclude the farthest point from the biggest cluster and form a new 1-point cluster.
-                    int max_k = 0;
-                    for (int k1 = 1; k1 < K; k1++)
+                    പൂർണ്ണസംഖ്യ max_k = 0;
+                    വേണ്ടി (പൂർണ്ണസംഖ്യ k1 = 1; k1 < K; k1++)
                     {
-                        if (counters[max_k] < counters[k1])
+                        എങ്കിൽ (counters[max_k] < counters[k1])
                             max_k = k1;
                     }
 
-                    double max_dist = 0;
-                    int farthest_i = -1;
-                    float* base_center = centers.ptr<float>(max_k);
-                    float* _base_center = temp.ptr<float>(); // normalized
-                    float scale = 1.f/counters[max_k];
-                    for (int j = 0; j < dims; j++)
+                    ഇരട്ട max_dist = 0;
+                    പൂർണ്ണസംഖ്യ farthest_i = -1;
+                    ദശാംശം* base_center = centers.ptr<ദശാംശം>(max_k);
+                    ദശാംശം* _base_center = temp.ptr<ദശാംശം>(); // normalized
+                    ദശാംശം scale = 1.f/counters[max_k];
+                    വേണ്ടി (പൂർണ്ണസംഖ്യ j = 0; j < dims; j++)
                         _base_center[j] = base_center[j]*scale;
 
-                    for (int i = 0; i < N; i++)
+                    വേണ്ടി (പൂർണ്ണസംഖ്യ i = 0; i < N; i++)
                     {
-                        if (labels[i] != max_k)
-                            continue;
-                        if (farthest_i < 0)
+                        എങ്കിൽ (labels[i] != max_k)
+                            തുടരുക;
+                        എങ്കിൽ (farthest_i < 0)
                             farthest_i = i;
-                        const float* sample = data.ptr<float>(i);
-                        double dist = hal::normL2Sqr_(sample, _base_center, dims);
+                        സ്ഥിരം ദശാംശം* sample = data.ptr<ദശാംശം>(i);
+                        ഇരട്ട dist = hal::normL2Sqr_(sample, _base_center, dims);
 
-                        if (max_dist <= dist)
+                        എങ്കിൽ (max_dist <= dist)
                         {
                             max_dist = dist;
                             farthest_i = i;
@@ -416,31 +416,31 @@ double cv::kmeans( InputArray _data, int K,
                     counters[k]++;
                     labels[farthest_i] = k;
 
-                    const float* sample = data.ptr<float>(farthest_i);
-                    float* cur_center = centers.ptr<float>(k);
-                    for (int j = 0; j < dims; j++)
+                    സ്ഥിരം ദശാംശം* sample = data.ptr<ദശാംശം>(farthest_i);
+                    ദശാംശം* cur_center = centers.ptr<ദശാംശം>(k);
+                    വേണ്ടി (പൂർണ്ണസംഖ്യ j = 0; j < dims; j++)
                     {
                         base_center[j] -= sample[j];
                         cur_center[j] += sample[j];
                     }
                 }
 
-                for (int k = 0; k < K; k++)
+                വേണ്ടി (പൂർണ്ണസംഖ്യ k = 0; k < K; k++)
                 {
-                    float* center = centers.ptr<float>(k);
+                    ദശാംശം* center = centers.ptr<ദശാംശം>(k);
                     CV_Assert( counters[k] != 0 );
 
-                    float scale = 1.f/counters[k];
-                    for (int j = 0; j < dims; j++)
+                    ദശാംശം scale = 1.f/counters[k];
+                    വേണ്ടി (പൂർണ്ണസംഖ്യ j = 0; j < dims; j++)
                         center[j] *= scale;
 
-                    if (iter > 0)
+                    എങ്കിൽ (iter > 0)
                     {
-                        double dist = 0;
-                        const float* old_center = old_centers.ptr<float>(k);
-                        for (int j = 0; j < dims; j++)
+                        ഇരട്ട dist = 0;
+                        സ്ഥിരം ദശാംശം* old_center = old_centers.ptr<ദശാംശം>(k);
+                        വേണ്ടി (പൂർണ്ണസംഖ്യ j = 0; j < dims; j++)
                         {
-                            double t = center[j] - old_center[j];
+                            ഇരട്ട t = center[j] - old_center[j];
                             dist += t*t;
                         }
                         max_center_shift = std::max(max_center_shift, dist);
@@ -448,45 +448,45 @@ double cv::kmeans( InputArray _data, int K,
                 }
             }
 
-            bool isLastIter = (++iter == MAX(criteria.maxCount, 2) || max_center_shift <= criteria.epsilon);
+            തർക്കം isLastIter = (++iter == MAX(criteria.max_എണ്ണം, 2) || max_center_shift <= criteria.epsilon);
 
-            if (isLastIter)
+            എങ്കിൽ (isLastIter)
             {
                 // don't re-assign labels to avoid creation of empty clusters
-                parallel_for_(Range(0, N), KMeansDistanceComputer<true>(dists.data(), labels, data, centers), (double)divUp((size_t)(dims * N), CV_KMEANS_PARALLEL_GRANULARITY));
+                parallel_for_(Range(0, N), KMeansDistanceComputer<സത്യം>(dists.data(), labels, data, centers), (ഇരട്ട)divUp((size_t)(dims * N), CV_KMEANS_PARALLEL_GRANULARITY));
                 compactness = sum(Mat(Size(N, 1), CV_64F, &dists[0]))[0];
-                break;
+                നിർത്തുക;
             }
-            else
+            അല്ലെങ്കിൽ
             {
                 // assign labels
-                parallel_for_(Range(0, N), KMeansDistanceComputer<false>(dists.data(), labels, data, centers), (double)divUp((size_t)(dims * N * K), CV_KMEANS_PARALLEL_GRANULARITY));
-                if (!(sum(Mat(Size(N, 1), CV_64F, &dists[0]))[0] < DBL_MAX))
-                    break;
+                parallel_for_(Range(0, N), KMeansDistanceComputer<അസത്യം>(dists.data(), labels, data, centers), (ഇരട്ട)divUp((size_t)(dims * N * K), CV_KMEANS_PARALLEL_GRANULARITY));
+                എങ്കിൽ (!(sum(Mat(Size(N, 1), CV_64F, &dists[0]))[0] < DBL_MAX))
+                    നിർത്തുക;
             }
         }
 
-        if (!(compactness < DBL_MAX))
+        എങ്കിൽ (!(compactness < DBL_MAX))
         {
             centers.setZero();
             _labels.setZero();
             compactness = -1.;
         }
-        if (compactness < best_compactness)
+        എങ്കിൽ (compactness < best_compactness)
         {
             best_compactness = compactness;
-            if (_centers.needed())
+            എങ്കിൽ (_centers.needed())
             {
-                if (_centers.fixedType() && _centers.channels() == dims)
+                എങ്കിൽ (_centers.fixedType() && _centers.channels() == dims)
                     centers.reshape(dims).copyTo(_centers);
-                else
+                അല്ലെങ്കിൽ
                     centers.copyTo(_centers);
             }
             _labels.copyTo(best_labels);
         }
-        if (compactness < 0.)
-            break;
+        എങ്കിൽ (compactness < 0.)
+            നിർത്തുക;
     }
 
-    return best_compactness;
+    തിരികെ best_compactness;
 }

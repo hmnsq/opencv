@@ -5,25 +5,25 @@
 #ifndef OPENCV_CORE_PARALLEL_FACTORY_HPP
 #define OPENCV_CORE_PARALLEL_FACTORY_HPP
 
-#include "opencv2/core/parallel/parallel_backend.hpp"
+#അന്തര്ഭാവ "opencv2/core/parallel/parallel_backend.hpp"
 
-namespace cv { namespace parallel {
+നാമാകാശ cv { നാമാകാശ parallel {
 
-class IParallelBackendFactory
+വർഗ്ഗം IParallelBackendFactory
 {
-public:
-    virtual ~IParallelBackendFactory() {}
-    virtual std::shared_ptr<cv::parallel::ParallelForAPI> create() const = 0;
+പൊതു:
+    മായാ ~IParallelBackendFactory() {}
+    മായാ std::shared_ptr<cv::parallel::ParallelForAPI> create() സ്ഥിരം = 0;
 };
 
 
-class StaticBackendFactory CV_FINAL: public IParallelBackendFactory
+വർഗ്ഗം StaticBackendFactory CV_FINAL: പൊതു IParallelBackendFactory
 {
-protected:
-    std::function<std::shared_ptr<cv::parallel::ParallelForAPI>(void)> create_fn_;
+സംരക്ഷിത:
+    std::function<std::shared_ptr<cv::parallel::ParallelForAPI>(ശൂന്യം)> create_fn_;
 
-public:
-    StaticBackendFactory(std::function<std::shared_ptr<cv::parallel::ParallelForAPI>(void)>&& create_fn)
+പൊതു:
+    StaticBackendFactory(std::function<std::shared_ptr<cv::parallel::ParallelForAPI>(ശൂന്യം)>&& create_fn)
         : create_fn_(create_fn)
     {
         // nothing
@@ -31,9 +31,9 @@ public:
 
     ~StaticBackendFactory() CV_OVERRIDE {}
 
-    std::shared_ptr<cv::parallel::ParallelForAPI> create() const CV_OVERRIDE
+    std::shared_ptr<cv::parallel::ParallelForAPI> create() സ്ഥിരം CV_OVERRIDE
     {
-        return create_fn_();
+        തിരികെ create_fn_();
     }
 };
 
@@ -41,7 +41,7 @@ public:
 // PluginBackendFactory is implemented in plugin_wrapper.cpp
 //
 
-std::shared_ptr<IParallelBackendFactory> createPluginParallelBackendFactory(const std::string& baseName);
+std::shared_ptr<IParallelBackendFactory> createPluginParallelBackendFactory(സ്ഥിരം std::string& baseName);
 
 }}  // namespace
 

@@ -2,72 +2,72 @@
 // It is subject to the license terms in the LICENSE file found in the top-level directory
 // of this distribution and at http://opencv.org/license.html.
 
-#include "precomp.hpp"
+#അന്തര്ഭാവ "precomp.hpp"
 
-#include <opencv2/core/utils/configuration.private.hpp>
-#include <opencv2/core/utils/logger.hpp>
-#include "utils/logtagmanager.hpp"
-#include "utils/logtagconfigparser.hpp"
+#അന്തര്ഭാവ <opencv2/core/utils/configuration.private.hpp>
+#അന്തര്ഭാവ <opencv2/core/utils/logger.hpp>
+#അന്തര്ഭാവ "utils/logtagmanager.hpp"
+#അന്തര്ഭാവ "utils/logtagconfigparser.hpp"
 
-#include <sstream>
-#include <iostream>
-#include <fstream>
-#include <atomic>
+#അന്തര്ഭാവ <sstream>
+#അന്തര്ഭാവ <iostream>
+#അന്തര്ഭാവ <fstream>
+#അന്തര്ഭാവ <atomic>
 
 #ifdef __ANDROID__
 # include <android/log.h>
 #endif
 
-namespace cv {
-namespace utils {
-namespace logging {
+നാമാകാശ cv {
+നാമാകാശ utils {
+നാമാകാശ logging {
 
-namespace internal
+നാമാകാശ internal
 {
 
 // Combining several things that require static dynamic initialization in a
 // well-defined order into a struct.
 //
-struct GlobalLoggingInitStruct
+ഘടന GlobalLoggingInitStruct
 {
-public:
-#if defined NDEBUG
-    static const bool m_isDebugBuild = false;
-#else
-    static const bool m_isDebugBuild = true;
+പൊതു:
+#എങ്കിൽ defined NDEBUG
+    സ്ഥിതം സ്ഥിരം തർക്കം m_isDebugBuild = അസത്യം;
+#അല്ലെങ്കിൽ
+    സ്ഥിതം സ്ഥിരം തർക്കം m_isDebugBuild = സത്യം;
 #endif
 
-public:
-    static LogLevel m_defaultUnconfiguredGlobalLevel;
+പൊതു:
+    സ്ഥിതം LogLevel m_defaultUnconfiguredGlobalLevel;
 
-public:
+പൊതു:
     LogTagManager logTagManager;
 
     GlobalLoggingInitStruct()
         : logTagManager(m_defaultUnconfiguredGlobalLevel)
     {
-        (void)getInitializationMutex();  // ensure initialization of global objects
+        (ശൂന്യം)getInitializationMutex();  // ensure initialization of global objects
 
         applyConfigString();
         handleMalformed();
     }
 
-private:
-    void applyConfigString()
+സ്വകാര്യ:
+    ശൂന്യം applyConfigString()
     {
         logTagManager.setConfigString(utils::getConfigurationParameterString("OPENCV_LOG_LEVEL", ""));
     }
 
-    void handleMalformed()
+    ശൂന്യം handleMalformed()
     {
         // need to print warning for malformed log tag config strings?
-        if (m_isDebugBuild)
+        എങ്കിൽ (m_isDebugBuild)
         {
-            const auto& parser = logTagManager.getConfigParser();
-            if (parser.hasMalformed())
+            സ്ഥിരം auto& parser = logTagManager.getConfigParser();
+            എങ്കിൽ (parser.hasMalformed())
             {
-                const auto& malformedList = parser.getMalformed();
-                for (const auto& malformed : malformedList)
+                സ്ഥിരം auto& malformedList = parser.getMalformed();
+                വേണ്ടി (സ്ഥിരം auto& malformed : malformedList)
                 {
                     std::cout << "Malformed log level config: \"" << malformed << "\"\n";
                 }
@@ -93,9 +93,9 @@ LogLevel GlobalLoggingInitStruct::m_defaultUnconfiguredGlobalLevel = GlobalLoggi
 // An initialization guard function only guarantees initialization upon
 // the first call to this function.
 //
-static GlobalLoggingInitStruct& getGlobalLoggingInitStruct()
+സ്ഥിതം GlobalLoggingInitStruct& getGlobalLoggingInitStruct()
 {
-    CV_SINGLETON_LAZY_INIT_REF(GlobalLoggingInitStruct, new GlobalLoggingInitStruct());
+    CV_SINGLETON_LAZY_INIT_REF(GlobalLoggingInitStruct, പുതിയ GlobalLoggingInitStruct());
 }
 
 // To ensure that the combined struct defined above is initialized even
@@ -103,193 +103,193 @@ static GlobalLoggingInitStruct& getGlobalLoggingInitStruct()
 // instance of a struct is defined below, which will call the
 // initialization guard function.
 //
-struct GlobalLoggingInitCall
+ഘടന GlobalLoggingInitCall
 {
     GlobalLoggingInitCall()
     {
         getGlobalLoggingInitStruct();
-        (void)getGlobalLogTag();  // complete initialization of logger structures
+        (ശൂന്യം)getGlobalLogTag();  // complete initialization of logger structures
     }
 };
 
-static GlobalLoggingInitCall globalLoggingInitCall;
+സ്ഥിതം GlobalLoggingInitCall globalLoggingInitCall;
 
-static LogTagManager& getLogTagManager()
+സ്ഥിതം LogTagManager& getLogTagManager()
 {
-    static LogTagManager& logTagManagerInstance = getGlobalLoggingInitStruct().logTagManager;
-    return logTagManagerInstance;
+    സ്ഥിതം LogTagManager& logTagManagerInstance = getGlobalLoggingInitStruct().logTagManager;
+    തിരികെ logTagManagerInstance;
 }
 
-static LogLevel& getLogLevelVariable()
+സ്ഥിതം LogLevel& getLogLevelVariable()
 {
-    static LogLevel& refGlobalLogLevel = getGlobalLogTag()->level;
-    return refGlobalLogLevel;
+    സ്ഥിതം LogLevel& refGlobalLogLevel = getGlobalLogTag()->level;
+    തിരികെ refGlobalLogLevel;
 }
 
 LogTag* getGlobalLogTag()
 {
-    static LogTag* globalLogTagPtr = getGlobalLoggingInitStruct().logTagManager.get("global");
-    return globalLogTagPtr;
+    സ്ഥിതം LogTag* globalLogTagPtr = getGlobalLoggingInitStruct().logTagManager.get("global");
+    തിരികെ globalLogTagPtr;
 }
 
 } // namespace
 
-void registerLogTag(LogTag* plogtag)
+ശൂന്യം registerLogTag(LogTag* plogtag)
 {
-    if (!plogtag || !plogtag->name)
+    എങ്കിൽ (!plogtag || !plogtag->name)
     {
-        return;
+        തിരികെ;
     }
     internal::getLogTagManager().assign(plogtag->name, plogtag);
 }
 
-void setLogTagLevel(const char* tag, LogLevel level)
+ശൂന്യം setLogTagLevel(സ്ഥിരം അക്ഷരം* tag, LogLevel level)
 {
-    if (!tag)
+    എങ്കിൽ (!tag)
     {
-        return;
+        തിരികെ;
     }
     internal::getLogTagManager().setLevelByFullName(std::string(tag), level);
 }
 
-LogLevel getLogTagLevel(const char* tag)
+LogLevel getLogTagLevel(സ്ഥിരം അക്ഷരം* tag)
 {
-    if (!tag)
+    എങ്കിൽ (!tag)
     {
-        return getLogLevel();
+        തിരികെ getLogLevel();
     }
-    const LogTag* ptr = internal::getLogTagManager().get(std::string(tag));
-    if (!ptr)
+    സ്ഥിരം LogTag* ptr = internal::getLogTagManager().get(std::string(tag));
+    എങ്കിൽ (!ptr)
     {
-        return getLogLevel();
+        തിരികെ getLogLevel();
     }
-    return ptr->level;
+    തിരികെ ptr->level;
 }
 
 LogLevel setLogLevel(LogLevel logLevel)
 {
     // note: not thread safe, use sparingly and do not critically depend on outcome
     LogLevel& refGlobalLevel = internal::getLogLevelVariable();
-    const LogLevel old = refGlobalLevel;
+    സ്ഥിരം LogLevel old = refGlobalLevel;
     refGlobalLevel = logLevel;
-    return old;
+    തിരികെ old;
 }
 
 LogLevel getLogLevel()
 {
-    return internal::getLogLevelVariable();
+    തിരികെ internal::getLogLevelVariable();
 }
 
-namespace internal {
+നാമാകാശ internal {
 
-namespace //unnamed
+നാമാകാശ //unnamed
 {
     std::atomic<WriteLogMessageFuncType> stc_userWriteLogMessageFunc{};
     std::atomic<WriteLogMessageExFuncType> stc_userWriteLogMessageExFunc{};
 } //unnamed
 
-static int getShowTimestampMode()
+സ്ഥിതം പൂർണ്ണസംഖ്യ getShowTimestampMode()
 {
-    static bool param_timestamp_enable = utils::getConfigurationParameterBool("OPENCV_LOG_TIMESTAMP", true);
-    static bool param_timestamp_ns_enable = utils::getConfigurationParameterBool("OPENCV_LOG_TIMESTAMP_NS", false);
-    return (param_timestamp_enable ? 1 : 0) + (param_timestamp_ns_enable ? 2 : 0);
+    സ്ഥിതം തർക്കം param_timestamp_enable = utils::getConfigurationParameterBool("OPENCV_LOG_TIMESTAMP", സത്യം);
+    സ്ഥിതം തർക്കം param_timestamp_ns_enable = utils::getConfigurationParameterBool("OPENCV_LOG_TIMESTAMP_NS", അസത്യം);
+    തിരികെ (param_timestamp_enable ? 1 : 0) + (param_timestamp_ns_enable ? 2 : 0);
 }
 
-void writeLogMessage(LogLevel logLevel, const char* message)
+ശൂന്യം writeLogMessage(LogLevel logLevel, സ്ഥിരം അക്ഷരം* message)
 {
     WriteLogMessageFuncType userFunc = stc_userWriteLogMessageFunc.load();
-    if (userFunc && userFunc != writeLogMessage)
+    എങ്കിൽ (userFunc && userFunc != writeLogMessage)
     {
         (*userFunc)(logLevel, message);
-        return;
+        തിരികെ;
     }
 
-    const int threadID = cv::utils::getThreadID();
+    സ്ഥിരം പൂർണ്ണസംഖ്യ threadID = cv::utils::getThreadID();
 
     std::string message_id;
-    switch (getShowTimestampMode())
+    തിരഞ്ഞെടുപ്പ് (getShowTimestampMode())
     {
-        case 1: message_id = cv::format("%d@%0.3f", threadID, getTimestampNS() * 1e-9); break;
-        case 1+2: message_id = cv::format("%d@%llu", threadID, (long long unsigned int)getTimestampNS()); break;
-        default: message_id = cv::format("%d", threadID); break;
+        അവസ്ഥ 1: message_id = cv::format("%d@%0.3f", threadID, getTimestampNS() * 1e-9); നിർത്തുക;
+        അവസ്ഥ 1+2: message_id = cv::format("%d@%llu", threadID, (long long unsigned പൂർണ്ണസംഖ്യ)getTimestampNS()); നിർത്തുക;
+        സ്ഥിരസ്ഥിതി: message_id = cv::format("%d", threadID); നിർത്തുക;
     }
 
     std::ostringstream ss;
-    switch (logLevel)
+    തിരഞ്ഞെടുപ്പ് (logLevel)
     {
-    case LOG_LEVEL_FATAL:   ss << "[FATAL:" << message_id << "] " << message << std::endl; break;
-    case LOG_LEVEL_ERROR:   ss << "[ERROR:" << message_id << "] " << message << std::endl; break;
-    case LOG_LEVEL_WARNING: ss << "[ WARN:" << message_id << "] " << message << std::endl; break;
-    case LOG_LEVEL_INFO:    ss << "[ INFO:" << message_id << "] " << message << std::endl; break;
-    case LOG_LEVEL_DEBUG:   ss << "[DEBUG:" << message_id << "] " << message << std::endl; break;
-    case LOG_LEVEL_VERBOSE: ss << message << std::endl; break;
-    case LOG_LEVEL_SILENT: return;  // avoid compiler warning about incomplete switch
-    case ENUM_LOG_LEVEL_FORCE_INT: return;  // avoid compiler warning about incomplete switch
+    അവസ്ഥ LOG_LEVEL_FATAL:   ss << "[FATAL:" << message_id << "] " << message << std::endl; നിർത്തുക;
+    അവസ്ഥ LOG_LEVEL_ERROR:   ss << "[ERROR:" << message_id << "] " << message << std::endl; നിർത്തുക;
+    അവസ്ഥ LOG_LEVEL_WARNING: ss << "[ WARN:" << message_id << "] " << message << std::endl; നിർത്തുക;
+    അവസ്ഥ LOG_LEVEL_INFO:    ss << "[ INFO:" << message_id << "] " << message << std::endl; നിർത്തുക;
+    അവസ്ഥ LOG_LEVEL_DEBUG:   ss << "[DEBUG:" << message_id << "] " << message << std::endl; നിർത്തുക;
+    അവസ്ഥ LOG_LEVEL_VERBOSE: ss << message << std::endl; നിർത്തുക;
+    അവസ്ഥ LOG_LEVEL_SILENT: തിരികെ;  // avoid compiler warning about incomplete switch
+    അവസ്ഥ ENUM_LOG_LEVEL_FORCE_INT: തിരികെ;  // avoid compiler warning about incomplete switch
     }
 #ifdef __ANDROID__
-    int android_logLevel = ANDROID_LOG_INFO;
-    switch (logLevel)
+    പൂർണ്ണസംഖ്യ android_logLevel = ANDROID_LOG_INFO;
+    തിരഞ്ഞെടുപ്പ് (logLevel)
     {
-    case LOG_LEVEL_FATAL:   android_logLevel = ANDROID_LOG_FATAL; break;
-    case LOG_LEVEL_ERROR:   android_logLevel = ANDROID_LOG_ERROR; break;
-    case LOG_LEVEL_WARNING: android_logLevel = ANDROID_LOG_WARN; break;
-    case LOG_LEVEL_INFO:    android_logLevel = ANDROID_LOG_INFO; break;
-    case LOG_LEVEL_DEBUG:   android_logLevel = ANDROID_LOG_DEBUG; break;
-    case LOG_LEVEL_VERBOSE: android_logLevel = ANDROID_LOG_VERBOSE; break;
-    default:
-        break;
+    അവസ്ഥ LOG_LEVEL_FATAL:   android_logLevel = ANDROID_LOG_FATAL; നിർത്തുക;
+    അവസ്ഥ LOG_LEVEL_ERROR:   android_logLevel = ANDROID_LOG_ERROR; നിർത്തുക;
+    അവസ്ഥ LOG_LEVEL_WARNING: android_logLevel = ANDROID_LOG_WARN; നിർത്തുക;
+    അവസ്ഥ LOG_LEVEL_INFO:    android_logLevel = ANDROID_LOG_INFO; നിർത്തുക;
+    അവസ്ഥ LOG_LEVEL_DEBUG:   android_logLevel = ANDROID_LOG_DEBUG; നിർത്തുക;
+    അവസ്ഥ LOG_LEVEL_VERBOSE: android_logLevel = ANDROID_LOG_VERBOSE; നിർത്തുക;
+    സ്ഥിരസ്ഥിതി:
+        നിർത്തുക;
     }
     __android_log_print(android_logLevel, "OpenCV/" CV_VERSION, "%s", ss.str().c_str());
 #endif
     std::ostream* out = (logLevel <= LOG_LEVEL_WARNING) ? &std::cerr : &std::cout;
     (*out) << ss.str();
-    if (logLevel <= LOG_LEVEL_WARNING)
+    എങ്കിൽ (logLevel <= LOG_LEVEL_WARNING)
     {
         (*out) << std::flush;
     }
 }
 
-static const char* stripSourceFilePathPrefix(const char* file)
+സ്ഥിതം സ്ഥിരം അക്ഷരം* stripSourceFilePathPrefix(സ്ഥിരം അക്ഷരം* file)
 {
     CV_Assert(file);
-    const char* pos = file;
-    const char* strip_pos = NULL;
-    char ch = 0;
-    while ((ch = pos[0]) != 0)
+    സ്ഥിരം അക്ഷരം* pos = file;
+    സ്ഥിരം അക്ഷരം* strip_pos = ശൂന്യ;
+    അക്ഷരം ch = 0;
+    ആകുമ്പോൾ ((ch = pos[0]) != 0)
     {
         ++pos;
-        if (ch == '/' || ch == '\\')
+        എങ്കിൽ (ch == '/' || ch == '\\')
             strip_pos = pos;
     }
-    if (strip_pos == NULL || strip_pos == pos/*eos*/)
-        return file;
-    return strip_pos;
+    എങ്കിൽ (strip_pos == ശൂന്യ || strip_pos == pos/*eos*/)
+        തിരികെ file;
+    തിരികെ strip_pos;
 }
 
-void writeLogMessageEx(LogLevel logLevel, const char* tag, const char* file, int line, const char* func, const char* message)
+ശൂന്യം writeLogMessageEx(LogLevel logLevel, സ്ഥിരം അക്ഷരം* tag, സ്ഥിരം അക്ഷരം* file, പൂർണ്ണസംഖ്യ വരി, സ്ഥിരം അക്ഷരം* func, സ്ഥിരം അക്ഷരം* message)
 {
     WriteLogMessageExFuncType userFunc = stc_userWriteLogMessageExFunc.load();
-    if (userFunc && userFunc != writeLogMessageEx)
+    എങ്കിൽ (userFunc && userFunc != writeLogMessageEx)
     {
-        (*userFunc)(logLevel, tag, file, line, func, message);
-        return;
+        (*userFunc)(logLevel, tag, file, വരി, func, message);
+        തിരികെ;
     }
 
     std::ostringstream strm;
-    if (tag)
+    എങ്കിൽ (tag)
     {
         strm << tag << ' ';
     }
-    if (file)
+    എങ്കിൽ (file)
     {
         strm << stripSourceFilePathPrefix(file);
-        if (line > 0)
+        എങ്കിൽ (വരി > 0)
         {
-            strm << ':' << line;
+            strm << ':' << വരി;
         }
         strm << ' ';
     }
-    if (func)
+    എങ്കിൽ (func)
     {
         strm << func << ' ';
     }
@@ -297,18 +297,18 @@ void writeLogMessageEx(LogLevel logLevel, const char* tag, const char* file, int
     writeLogMessage(logLevel, strm.str().c_str());
 }
 
-void replaceWriteLogMessage(WriteLogMessageFuncType f)
+ശൂന്യം replaceWriteLogMessage(WriteLogMessageFuncType f)
 {
-    if (f == writeLogMessage)
+    എങ്കിൽ (f == writeLogMessage)
     {
         f = nullptr;
     }
     stc_userWriteLogMessageFunc.store(f);
 }
 
-void replaceWriteLogMessageEx(WriteLogMessageExFuncType f)
+ശൂന്യം replaceWriteLogMessageEx(WriteLogMessageExFuncType f)
 {
-    if (f == writeLogMessageEx)
+    എങ്കിൽ (f == writeLogMessageEx)
     {
         f = nullptr;
     }

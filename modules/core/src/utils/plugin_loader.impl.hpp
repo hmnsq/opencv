@@ -6,72 +6,72 @@
 // Not a standalone header, part of filesystem.cpp
 //
 
-#include "opencv2/core/utils/plugin_loader.private.hpp"
+#അന്തര്ഭാവ "opencv2/core/utils/plugin_loader.private.hpp"
 
-#if !OPENCV_HAVE_FILESYSTEM_SUPPORT
+#എങ്കിൽ !OPENCV_HAVE_FILESYSTEM_SUPPORT
 #error "Invalid build configuration"
 #endif
 
-#if 0  // TODO
+#എങ്കിൽ 0  // TODO
 #ifdef NDEBUG
 #define CV_LOG_STRIP_LEVEL CV_LOG_LEVEL_DEBUG + 1
-#else
+#അല്ലെങ്കിൽ
 #define CV_LOG_STRIP_LEVEL CV_LOG_LEVEL_VERBOSE + 1
 #endif
-#include <opencv2/core/utils/logger.hpp>
+#അന്തര്ഭാവ <opencv2/core/utils/logger.hpp>
 #endif
 
-namespace cv { namespace plugin { namespace impl {
+നാമാകാശ cv { നാമാകാശ plugin { നാമാകാശ impl {
 
-DynamicLib::DynamicLib(const FileSystemPath_t& filename)
-    : handle(0), fname(filename), disableAutoUnloading_(false)
+DynamicLib::DynamicLib(സ്ഥിരം FileSystemPath_t& filename)
+    : handle(0), fname(filename), disableAutoUnloading_(അസത്യം)
 {
     libraryLoad(filename);
 }
 
 DynamicLib::~DynamicLib()
 {
-    if (!disableAutoUnloading_)
+    എങ്കിൽ (!disableAutoUnloading_)
     {
         libraryRelease();
     }
-    else if (handle)
+    അല്ലെങ്കിൽ എങ്കിൽ (handle)
     {
-        CV_LOG_INFO(NULL, "skip auto unloading (disabled): " << toPrintablePath(fname));
+        CV_LOG_INFO(ശൂന്യ, "skip auto unloading (disabled): " << toPrintablePath(fname));
         handle = 0;
     }
 }
 
-void* DynamicLib::getSymbol(const char* symbolName) const
+ശൂന്യം* DynamicLib::get_ചിഹ്നം(സ്ഥിരം അക്ഷരം* ചിഹ്നം_Name) സ്ഥിരം
 {
-    if (!handle)
+    എങ്കിൽ (!handle)
     {
-        return 0;
+        തിരികെ 0;
     }
-    void* res = getSymbol_(handle, symbolName);
-    if (!res)
+    ശൂന്യം* res = get_ചിഹ്നം_2(handle, ചിഹ്നം_Name);
+    എങ്കിൽ (!res)
     {
-        CV_LOG_DEBUG(NULL, "No symbol '" << symbolName << "' in " << toPrintablePath(fname));
+        CV_LOG_DEBUG(ശൂന്യ, "No symbol '" << ചിഹ്നം_Name << "' in " << toPrintablePath(fname));
     }
-    return res;
+    തിരികെ res;
 }
 
-std::string DynamicLib::getName() const
+std::string DynamicLib::getName() സ്ഥിരം
 {
-    return toPrintablePath(fname);
+    തിരികെ toPrintablePath(fname);
 }
 
-void DynamicLib::libraryLoad(const FileSystemPath_t& filename)
+ശൂന്യം DynamicLib::libraryLoad(സ്ഥിരം FileSystemPath_t& filename)
 {
     handle = libraryLoad_(filename);
-    CV_LOG_INFO(NULL, "load " << toPrintablePath(filename) << " => " << (handle ? "OK" : "FAILED"));
+    CV_LOG_INFO(ശൂന്യ, "load " << toPrintablePath(filename) << " => " << (handle ? "OK" : "FAILED"));
 }
 
-void DynamicLib::libraryRelease()
+ശൂന്യം DynamicLib::libraryRelease()
 {
-    if (handle)
+    എങ്കിൽ (handle)
     {
-        CV_LOG_INFO(NULL, "unload "<< toPrintablePath(fname));
+        CV_LOG_INFO(ശൂന്യ, "unload "<< toPrintablePath(fname));
         libraryRelease_(handle);
         handle = 0;
     }

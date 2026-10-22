@@ -6,181 +6,181 @@
 
 // CUDA-backed MatAllocator for UMat (Phase P1): synchronous host<->device transfers.
 
-#include "precomp.hpp"
+#അന്തര്ഭാവ "precomp.hpp"
 
-namespace cv { namespace cuda {
+നാമാകാശ cv { നാമാകാശ cuda {
 
 #ifndef HAVE_CUDA
 
 MatAllocator* getCudaAllocator()
 {
-    return NULL;
+    തിരികെ ശൂന്യ;
 }
 
-#else
+#അല്ലെങ്കിൽ
 
-class CudaUMatAllocator CV_FINAL : public MatAllocator
+വർഗ്ഗം CudaUMatAllocator CV_FINAL : പൊതു MatAllocator
 {
-public:
-    UMatData* allocate(int dims, const int* sizes, int type, void* data0,
-                       size_t* step, AccessFlag /*flags*/, UMatUsageFlags /*usageFlags*/) const CV_OVERRIDE
+പൊതു:
+    UMatData* allocate(പൂർണ്ണസംഖ്യ dims, സ്ഥിരം പൂർണ്ണസംഖ്യ* sizes, പൂർണ്ണസംഖ്യ type, ശൂന്യം* data0,
+                       size_t* step, AccessFlag /*flags*/, UMatUsageFlags /*usageFlags*/) സ്ഥിരം CV_OVERRIDE
     {
-        const size_t elemSize = CV_ELEM_SIZE(type);
+        സ്ഥിരം size_t elemSize = CV_ELEM_SIZE(type);
         size_t total = elemSize;
-        for (int i = 0; i < dims; i++)
+        വേണ്ടി (പൂർണ്ണസംഖ്യ i = 0; i < dims; i++)
             total *= (size_t)sizes[i];
 
-        if (step)
+        എങ്കിൽ (step)
         {
             step[dims - 1] = elemSize;
-            for (int i = dims - 2; i >= 0; i--)
+            വേണ്ടി (പൂർണ്ണസംഖ്യ i = dims - 2; i >= 0; i--)
                 step[i] = step[i + 1] * (size_t)sizes[i + 1];
         }
 
-        UMatData* u = new UMatData(this);
+        UMatData* u = പുതിയ UMatData(ഇത്);
         u->size = total;
 
-        if (total > 0)
+        എങ്കിൽ (total > 0)
             cudaSafeCall(cudaMalloc(&u->handle, total));
 
-        if (data0)
+        എങ്കിൽ (data0)
         {
             u->data = u->origdata = static_cast<uchar*>(data0);
             u->flags |= UMatData::USER_ALLOCATED;
-            u->markDeviceCopyObsolete(true);
+            u->markDeviceCopyObsolete(സത്യം);
         }
-        else
+        അല്ലെങ്കിൽ
         {
-            u->markHostCopyObsolete(true);
+            u->markHostCopyObsolete(സത്യം);
         }
-        return u;
+        തിരികെ u;
     }
 
-    bool allocate(UMatData* u, AccessFlag /*accessFlags*/, UMatUsageFlags /*usageFlags*/) const CV_OVERRIDE
+    തർക്കം allocate(UMatData* u, AccessFlag /*accessFlags*/, UMatUsageFlags /*usageFlags*/) സ്ഥിരം CV_OVERRIDE
     {
-        if (!u)
-            return false;
-        if (!u->handle && u->size > 0)
+        എങ്കിൽ (!u)
+            തിരികെ അസത്യം;
+        എങ്കിൽ (!u->handle && u->size > 0)
         {
             cudaSafeCall(cudaMalloc(&u->handle, u->size));
-            if (u->data)
-                u->markDeviceCopyObsolete(true);
-            else
-                u->markHostCopyObsolete(true);
+            എങ്കിൽ (u->data)
+                u->markDeviceCopyObsolete(സത്യം);
+            അല്ലെങ്കിൽ
+                u->markHostCopyObsolete(സത്യം);
         }
-        return true;
+        തിരികെ സത്യം;
     }
 
-    void deallocate(UMatData* u) const CV_OVERRIDE
+    ശൂന്യം deallocate(UMatData* u) സ്ഥിരം CV_OVERRIDE
     {
-        if (!u)
-            return;
-        if (u->handle)
+        എങ്കിൽ (!u)
+            തിരികെ;
+        എങ്കിൽ (u->handle)
             cudaSafeCall(cudaFree(u->handle));
-        if (u->data && !(u->flags & UMatData::USER_ALLOCATED))
+        എങ്കിൽ (u->data && !(u->flags & UMatData::USER_ALLOCATED))
             fastFree(u->data);
         delete u;
     }
 
-    void map(UMatData* u, AccessFlag accessFlags) const CV_OVERRIDE
+    ശൂന്യം map(UMatData* u, AccessFlag accessFlags) സ്ഥിരം CV_OVERRIDE
     {
-        if (!u)
-            return;
-        if (!u->data && u->size > 0)
+        എങ്കിൽ (!u)
+            തിരികെ;
+        എങ്കിൽ (!u->data && u->size > 0)
             u->data = u->origdata = static_cast<uchar*>(fastMalloc(u->size));
-        if (u->hostCopyObsolete() && u->handle && u->data)
+        എങ്കിൽ (u->hostCopyObsolete() && u->handle && u->data)
         {
             cudaSafeCall(cudaMemcpy(u->data, u->handle, u->size, cudaMemcpyDeviceToHost));
-            u->markHostCopyObsolete(false);
+            u->markHostCopyObsolete(അസത്യം);
         }
-        if (!!(accessFlags & ACCESS_WRITE))
-            u->markDeviceCopyObsolete(true);
+        എങ്കിൽ (!!(accessFlags & ACCESS_WRITE))
+            u->markDeviceCopyObsolete(സത്യം);
     }
 
-    void unmap(UMatData* u) const CV_OVERRIDE
+    ശൂന്യം unmap(UMatData* u) സ്ഥിരം CV_OVERRIDE
     {
-        if (!u)
-            return;
-        if (u->deviceCopyObsolete() && u->handle && u->data)
+        എങ്കിൽ (!u)
+            തിരികെ;
+        എങ്കിൽ (u->deviceCopyObsolete() && u->handle && u->data)
         {
             cudaSafeCall(cudaMemcpy(u->handle, u->data, u->size, cudaMemcpyHostToDevice));
-            u->markDeviceCopyObsolete(false);
+            u->markDeviceCopyObsolete(അസത്യം);
         }
     }
 
-    void download(UMatData* u, void* dstptr, int dims, const size_t sz[],
-                  const size_t srcofs[], const size_t srcstep[],
-                  const size_t dststep[]) const CV_OVERRIDE
+    ശൂന്യം download(UMatData* u, ശൂന്യം* dstptr, പൂർണ്ണസംഖ്യ dims, സ്ഥിരം size_t sz[],
+                  സ്ഥിരം size_t srcofs[], സ്ഥിരം size_t srcstep[],
+                  സ്ഥിരം size_t dststep[]) സ്ഥിരം CV_OVERRIDE
     {
-        if (!u || !u->handle || !dstptr)
-            return;
+        എങ്കിൽ (!u || !u->handle || !dstptr)
+            തിരികെ;
         copyPlanes((uchar*)u->handle, srcofs, srcstep, (uchar*)dstptr, 0, dststep,
                    dims, sz, cudaMemcpyDeviceToHost);
     }
 
-    void upload(UMatData* u, const void* srcptr, int dims, const size_t sz[],
-                const size_t dstofs[], const size_t dststep[],
-                const size_t srcstep[]) const CV_OVERRIDE
+    ശൂന്യം upload(UMatData* u, സ്ഥിരം ശൂന്യം* srcptr, പൂർണ്ണസംഖ്യ dims, സ്ഥിരം size_t sz[],
+                സ്ഥിരം size_t dstofs[], സ്ഥിരം size_t dststep[],
+                സ്ഥിരം size_t srcstep[]) സ്ഥിരം CV_OVERRIDE
     {
-        if (!u || !srcptr)
-            return;
-        if (!u->handle && u->size > 0)
+        എങ്കിൽ (!u || !srcptr)
+            തിരികെ;
+        എങ്കിൽ (!u->handle && u->size > 0)
             cudaSafeCall(cudaMalloc(&u->handle, u->size));
-        copyPlanes((uchar*)srcptr, NULL, srcstep, (uchar*)u->handle, dstofs, dststep,
+        copyPlanes((uchar*)srcptr, ശൂന്യ, srcstep, (uchar*)u->handle, dstofs, dststep,
                    dims, sz, cudaMemcpyHostToDevice);
-        u->markHostCopyObsolete(true);
-        u->markDeviceCopyObsolete(false);
+        u->markHostCopyObsolete(സത്യം);
+        u->markDeviceCopyObsolete(അസത്യം);
     }
 
     // Same-world D2D only; UMat::copyTo calls copy() solely when both share this allocator.
-    void copy(UMatData* src, UMatData* dst, int dims, const size_t sz[],
-              const size_t srcofs[], const size_t srcstep[],
-              const size_t dstofs[], const size_t dststep[], bool /*sync*/) const CV_OVERRIDE
+    ശൂന്യം copy(UMatData* src, UMatData* dst, പൂർണ്ണസംഖ്യ dims, സ്ഥിരം size_t sz[],
+              സ്ഥിരം size_t srcofs[], സ്ഥിരം size_t srcstep[],
+              സ്ഥിരം size_t dstofs[], സ്ഥിരം size_t dststep[], തർക്കം /*sync*/) സ്ഥിരം CV_OVERRIDE
     {
-        if (!src || !dst || !src->handle || !dst->handle)
-            return;
+        എങ്കിൽ (!src || !dst || !src->handle || !dst->handle)
+            തിരികെ;
         copyPlanes((uchar*)src->handle, srcofs, srcstep, (uchar*)dst->handle, dstofs, dststep,
                    dims, sz, cudaMemcpyDeviceToDevice);
-        dst->markHostCopyObsolete(true);
-        dst->markDeviceCopyObsolete(false);
+        dst->markHostCopyObsolete(സത്യം);
+        dst->markDeviceCopyObsolete(അസത്യം);
     }
 
-private:
+സ്വകാര്യ:
     // sz/steps follow the MatAllocator convention: the last dim carries element bytes.
-    static void copyPlanes(uchar* srcbase, const size_t srcofs[], const size_t srcstep[],
-                           uchar* dstbase, const size_t dstofs[], const size_t dststep[],
-                           int dims, const size_t sz[], cudaMemcpyKind kind)
+    സ്ഥിതം ശൂന്യം copyPlanes(uchar* srcbase, സ്ഥിരം size_t srcofs[], സ്ഥിരം size_t srcstep[],
+                           uchar* dstbase, സ്ഥിരം size_t dstofs[], സ്ഥിരം size_t dststep[],
+                           പൂർണ്ണസംഖ്യ dims, സ്ഥിരം size_t sz[], cudaMemcpyKind kind)
     {
-        int isz[CV_MAX_DIM];
+        പൂർണ്ണസംഖ്യ isz[CV_MAX_DIM];
         uchar* srcptr = srcbase;
         uchar* dstptr = dstbase;
-        for (int i = 0; i < dims; i++)
+        വേണ്ടി (പൂർണ്ണസംഖ്യ i = 0; i < dims; i++)
         {
             CV_Assert(sz[i] <= (size_t)INT_MAX);
-            if (sz[i] == 0)
-                return;
-            if (srcofs)
+            എങ്കിൽ (sz[i] == 0)
+                തിരികെ;
+            എങ്കിൽ (srcofs)
                 srcptr += srcofs[i] * (i <= dims - 2 ? srcstep[i] : 1);
-            if (dstofs)
+            എങ്കിൽ (dstofs)
                 dstptr += dstofs[i] * (i <= dims - 2 ? dststep[i] : 1);
-            isz[i] = (int)sz[i];
+            isz[i] = (പൂർണ്ണസംഖ്യ)sz[i];
         }
 
         Mat src(dims, isz, CV_8U, srcptr, srcstep);
         Mat dst(dims, isz, CV_8U, dstptr, dststep);
 
-        const Mat* arrays[] = { &src, &dst };
+        സ്ഥിരം Mat* arrays[] = { &src, &dst };
         uchar* ptrs[2];
         NAryMatIterator it(arrays, ptrs, 2);
-        const size_t planesz = it.size;
-        for (size_t j = 0; j < it.nplanes; j++, ++it)
+        സ്ഥിരം size_t planesz = it.size;
+        വേണ്ടി (size_t j = 0; j < it.nplanes; j++, ++it)
             cudaSafeCall(cudaMemcpy(ptrs[1], ptrs[0], planesz, kind));
     }
 };
 
 MatAllocator* getCudaAllocator()
 {
-    CV_SINGLETON_LAZY_INIT(CudaUMatAllocator, new CudaUMatAllocator())
+    CV_SINGLETON_LAZY_INIT(CudaUMatAllocator, പുതിയ CudaUMatAllocator())
 }
 
 #endif

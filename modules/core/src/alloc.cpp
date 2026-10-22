@@ -40,190 +40,190 @@
 //
 //M*/
 
-#include "precomp.hpp"
+#അന്തര്ഭാവ "precomp.hpp"
 
-#include <opencv2/core/utils/logger.defines.hpp>
+#അന്തര്ഭാവ <opencv2/core/utils/logger.defines.hpp>
 #undef CV_LOG_STRIP_LEVEL
 #define CV_LOG_STRIP_LEVEL CV_LOG_LEVEL_VERBOSE + 1
-#include <opencv2/core/utils/logger.hpp>
-#include <opencv2/core/utils/configuration.private.hpp>
+#അന്തര്ഭാവ <opencv2/core/utils/logger.hpp>
+#അന്തര്ഭാവ <opencv2/core/utils/configuration.private.hpp>
 
-#define CV__ALLOCATOR_STATS_LOG(...) CV_LOG_VERBOSE(NULL, 0, "alloc.cpp: " << __VA_ARGS__)
-#include "opencv2/core/utils/allocator_stats.impl.hpp"
+#define CV__ALLOCATOR_STATS_LOG(...) CV_LOG_VERBOSE(ശൂന്യ, 0, "alloc.cpp: " << __VA_ARGS__)
+#അന്തര്ഭാവ "opencv2/core/utils/allocator_stats.impl.hpp"
 #undef CV__ALLOCATOR_STATS_LOG
 
 //#define OPENCV_ALLOC_ENABLE_STATISTICS
 
 
 #ifdef HAVE_POSIX_MEMALIGN
-#include <stdlib.h>
-#elif defined HAVE_MALLOC_H
-#include <malloc.h>
+#അന്തര്ഭാവ <stdlib.h>
+#അല്ലെങ്കിലെങ്കിൽ defined HAVE_MALLOC_H
+#അന്തര്ഭാവ <malloc.h>
 #endif
 
 #ifdef OPENCV_ALLOC_ENABLE_STATISTICS
 #define OPENCV_ALLOC_STATISTICS_LIMIT 4096  // don't track buffers less than N bytes
-#include <map>
+#അന്തര്ഭാവ <map>
 #endif
 
-namespace cv {
+നാമാകാശ cv {
 
-static void* OutOfMemoryError(size_t size)
+സ്ഥിതം ശൂന്യം* OutOfMemoryError(size_t size)
 {
     CV_Error_(cv::Error::StsNoMem, ("Failed to allocate %llu bytes", (unsigned long long)size));
 }
 
 CV_EXPORTS cv::utils::AllocatorStatisticsInterface& getAllocatorStatistics();
 
-static cv::utils::AllocatorStatistics allocator_stats;
+സ്ഥിതം cv::utils::AllocatorStatistics allocator_stats;
 
 cv::utils::AllocatorStatisticsInterface& getAllocatorStatistics()
 {
-    return allocator_stats;
+    തിരികെ allocator_stats;
 }
 
-#if defined HAVE_POSIX_MEMALIGN || defined HAVE_MEMALIGN || defined HAVE_WIN32_ALIGNED_MALLOC
-static bool readMemoryAlignmentParameter()
+#എങ്കിൽ defined HAVE_POSIX_MEMALIGN || defined HAVE_MEMALIGN || defined HAVE_WIN32_ALIGNED_MALLOC
+സ്ഥിതം തർക്കം readMemoryAlignmentParameter()
 {
-    bool value = true;
-#if defined(__GLIBC__) && defined(__linux__) \
+    തർക്കം value = സത്യം;
+#എങ്കിൽ defined(__GLIBC__) && defined(__linux__) \
     && !defined(CV_STATIC_ANALYSIS) \
     && !defined(OPENCV_ENABLE_MEMORY_SANITIZER) \
     && !defined(FUZZING_BUILD_MODE_UNSAFE_FOR_PRODUCTION)  /* oss-fuzz */ \
     && !defined(_WIN32)  /* MinGW? */
     {
         // https://github.com/opencv/opencv/issues/15526
-        value = false;
+        value = അസത്യം;
     }
 #endif
     value = cv::utils::getConfigurationParameterBool("OPENCV_ENABLE_MEMALIGN", value);  // should not call fastMalloc() internally
     // TODO add checks for valgrind, ASAN if value == false
-    return value;
+    തിരികെ value;
 }
 
-#if defined _MSC_VER
+#എങ്കിൽ defined _MSC_VER
 #pragma warning(suppress:4714)  // preventive: const marked as __forceinline not inlined
-static __forceinline
-#else
-static inline
+സ്ഥിതം __forceinline
+#അല്ലെങ്കിൽ
+സ്ഥിതം വരിയിൽ
 #endif
-bool isAlignedAllocationEnabled()
+തർക്കം isAlignedAllocationEnabled()
 {
     // use construct on first use idiom https://isocpp.org/wiki/faq/ctors#static-init-order-on-first-use
     // details: https://github.com/opencv/opencv/issues/15691
-    static bool useMemalign = readMemoryAlignmentParameter();
-    return useMemalign;
+    സ്ഥിതം തർക്കം useMemalign = readMemoryAlignmentParameter();
+    തിരികെ useMemalign;
 }
 
 // need for this static const is disputed; retaining as it doesn't cause harm
-static const bool g_force_initialization_memalign_flag
-#if defined __GNUC__
+സ്ഥിതം സ്ഥിരം തർക്കം g_force_initialization_memalign_flag
+#എങ്കിൽ defined __GNUC__
     __attribute__((unused))
 #endif
     = isAlignedAllocationEnabled();
 #endif
 
 #ifdef OPENCV_ALLOC_ENABLE_STATISTICS
-static inline
-void* fastMalloc_(size_t size)
-#else
-void* fastMalloc(size_t size)
+സ്ഥിതം വരിയിൽ
+ശൂന്യം* fastMalloc_(size_t size)
+#അല്ലെങ്കിൽ
+ശൂന്യം* fastMalloc(size_t size)
 #endif
 {
 #ifdef HAVE_POSIX_MEMALIGN
-    if (isAlignedAllocationEnabled())
+    എങ്കിൽ (isAlignedAllocationEnabled())
     {
-        void* ptr = NULL;
-        if(posix_memalign(&ptr, CV_MALLOC_ALIGN, size))
-            ptr = NULL;
-        if(!ptr)
-            return OutOfMemoryError(size);
-        return ptr;
+        ശൂന്യം* ptr = ശൂന്യ;
+        എങ്കിൽ(posix_memalign(&ptr, CV_MALLOC_ALIGN, size))
+            ptr = ശൂന്യ;
+        എങ്കിൽ(!ptr)
+            തിരികെ OutOfMemoryError(size);
+        തിരികെ ptr;
     }
-#elif defined HAVE_MEMALIGN
-    if (isAlignedAllocationEnabled())
+#അല്ലെങ്കിലെങ്കിൽ defined HAVE_MEMALIGN
+    എങ്കിൽ (isAlignedAllocationEnabled())
     {
-        void* ptr = memalign(CV_MALLOC_ALIGN, size);
-        if(!ptr)
-            return OutOfMemoryError(size);
-        return ptr;
+        ശൂന്യം* ptr = memalign(CV_MALLOC_ALIGN, size);
+        എങ്കിൽ(!ptr)
+            തിരികെ OutOfMemoryError(size);
+        തിരികെ ptr;
     }
-#elif defined HAVE_WIN32_ALIGNED_MALLOC
-    if (isAlignedAllocationEnabled())
+#അല്ലെങ്കിലെങ്കിൽ defined HAVE_WIN32_ALIGNED_MALLOC
+    എങ്കിൽ (isAlignedAllocationEnabled())
     {
-        void* ptr = _aligned_malloc(size, CV_MALLOC_ALIGN);
-        if(!ptr)
-            return OutOfMemoryError(size);
-        return ptr;
+        ശൂന്യം* ptr = _aligned_malloc(size, CV_MALLOC_ALIGN);
+        എങ്കിൽ(!ptr)
+            തിരികെ OutOfMemoryError(size);
+        തിരികെ ptr;
     }
 #endif
-    uchar* udata = (uchar*)malloc(size + sizeof(void*) + CV_MALLOC_ALIGN);
-    if(!udata)
-        return OutOfMemoryError(size);
+    uchar* udata = (uchar*)malloc(size + വലുപ്പം(ശൂന്യം*) + CV_MALLOC_ALIGN);
+    എങ്കിൽ(!udata)
+        തിരികെ OutOfMemoryError(size);
     uchar** adata = alignPtr((uchar**)udata + 1, CV_MALLOC_ALIGN);
     adata[-1] = udata;
-    return adata;
+    തിരികെ adata;
 }
 
 #ifdef OPENCV_ALLOC_ENABLE_STATISTICS
-static inline
-void fastFree_(void* ptr)
-#else
-void fastFree(void* ptr)
+സ്ഥിതം വരിയിൽ
+ശൂന്യം fastFree_(ശൂന്യം* ptr)
+#അല്ലെങ്കിൽ
+ശൂന്യം fastFree(ശൂന്യം* ptr)
 #endif
 {
-#if defined HAVE_POSIX_MEMALIGN || defined HAVE_MEMALIGN
-    if (isAlignedAllocationEnabled())
+#എങ്കിൽ defined HAVE_POSIX_MEMALIGN || defined HAVE_MEMALIGN
+    എങ്കിൽ (isAlignedAllocationEnabled())
     {
-        free(ptr);
-        return;
+        സ്വതന്ത്രം(ptr);
+        തിരികെ;
     }
-#elif defined HAVE_WIN32_ALIGNED_MALLOC
-    if (isAlignedAllocationEnabled())
+#അല്ലെങ്കിലെങ്കിൽ defined HAVE_WIN32_ALIGNED_MALLOC
+    എങ്കിൽ (isAlignedAllocationEnabled())
     {
         _aligned_free(ptr);
-        return;
+        തിരികെ;
     }
 #endif
-    if(ptr)
+    എങ്കിൽ(ptr)
     {
         uchar* udata = ((uchar**)ptr)[-1];
         CV_DbgAssert(udata < (uchar*)ptr &&
-               ((uchar*)ptr - udata) <= (ptrdiff_t)(sizeof(void*)+CV_MALLOC_ALIGN));
-        free(udata);
+               ((uchar*)ptr - udata) <= (ptrdiff_t)(വലുപ്പം(ശൂന്യം*)+CV_MALLOC_ALIGN));
+        സ്വതന്ത്രം(udata);
     }
 }
 
 #ifdef OPENCV_ALLOC_ENABLE_STATISTICS
 
-static
+സ്ഥിതം
 Mutex& getAllocationStatisticsMutex()
 {
-    static Mutex* p_alloc_mutex = allocSingletonNew<Mutex>();
+    സ്ഥിതം Mutex* p_alloc_mutex = allocSingletonNew<Mutex>();
     CV_Assert(p_alloc_mutex);
-    return *p_alloc_mutex;
+    തിരികെ *p_alloc_mutex;
 }
 
-static std::map<void*, size_t> allocated_buffers;  // guarded by getAllocationStatisticsMutex()
+സ്ഥിതം std::map<ശൂന്യം*, size_t> allocated_buffers;  // guarded by getAllocationStatisticsMutex()
 
-void* fastMalloc(size_t size)
+ശൂന്യം* fastMalloc(size_t size)
 {
-    void* res = fastMalloc_(size);
-    if (res && size >= OPENCV_ALLOC_STATISTICS_LIMIT)
+    ശൂന്യം* res = fastMalloc_(size);
+    എങ്കിൽ (res && size >= OPENCV_ALLOC_STATISTICS_LIMIT)
     {
         cv::AutoLock lock(getAllocationStatisticsMutex());
         allocated_buffers.insert(std::make_pair(res, size));
         allocator_stats.onAllocate(size);
     }
-    return res;
+    തിരികെ res;
 }
 
-void fastFree(void* ptr)
+ശൂന്യം fastFree(ശൂന്യം* ptr)
 {
     {
         cv::AutoLock lock(getAllocationStatisticsMutex());
-        std::map<void*, size_t>::iterator i = allocated_buffers.find(ptr);
-        if (i != allocated_buffers.end())
+        std::map<ശൂന്യം*, size_t>::iterator i = allocated_buffers.find(ptr);
+        എങ്കിൽ (i != allocated_buffers.end())
         {
             size_t size = i->second;
             allocator_stats.onFree(size);

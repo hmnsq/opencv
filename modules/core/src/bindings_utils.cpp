@@ -2,285 +2,285 @@
 // It is subject to the license terms in the LICENSE file found in the top-level directory
 // of this distribution and at http://opencv.org/license.html.
 
-#include "precomp.hpp"
-#include "opencv2/core/bindings_utils.hpp"
-#include <sstream>
-#include <iomanip>
-#include <opencv2/core/utils/filesystem.hpp>
-#include <opencv2/core/utils/filesystem.private.hpp>
+#അന്തര്ഭാവ "precomp.hpp"
+#അന്തര്ഭാവ "opencv2/core/bindings_utils.hpp"
+#അന്തര്ഭാവ <sstream>
+#അന്തര്ഭാവ <iomanip>
+#അന്തര്ഭാവ <opencv2/core/utils/filesystem.hpp>
+#അന്തര്ഭാവ <opencv2/core/utils/filesystem.private.hpp>
 
-namespace cv {
-static inline std::ostream& operator<<(std::ostream& os, const Rect& rect)
+നാമാകാശ cv {
+സ്ഥിതം വരിയിൽ std::ostream& operator<<(std::ostream& os, സ്ഥിരം Rect& rect)
 {
-    return os << "[x=" << rect.x << ", y=" << rect.y << ", w=" << rect.width << ", h=" << rect.height << ']';
+    തിരികെ os << "[x=" << rect.x << ", y=" << rect.y << ", w=" << rect.width << ", h=" << rect.height << ']';
 }
-namespace utils {
+നാമാകാശ utils {
 
-String dumpInputArray(InputArray argument)
+String dump_നിവേശം_Array(നിവേശം_Array argument)
 {
-    if (&argument == &noArray())
-        return "InputArray: noArray()";
+    എങ്കിൽ (&argument == &noArray())
+        തിരികെ "InputArray: noArray()";
     std::ostringstream ss;
     ss << "InputArray:";
-    try {
-        do {
+    ശ്രമിക്കുക {
+        ചെയ്യുക {
             ss << (argument.empty() ? " empty()=true" : " empty()=false");
-            ss << cv::format(" kind=0x%08llx", (long long int)argument.kind());
-            ss << cv::format(" flags=0x%08llx", (long long int)argument.getFlags());
-            if (argument.getObj() == NULL)
+            ss << cv::format(" kind=0x%08llx", (long long പൂർണ്ണസംഖ്യ)argument.kind());
+            ss << cv::format(" flags=0x%08llx", (long long പൂർണ്ണസംഖ്യ)argument.getFlags());
+            എങ്കിൽ (argument.getObj() == ശൂന്യ)
             {
                 ss << " obj=NULL";
-                break; // done
+                നിർത്തുക; // done
             }
-            ss << cv::format(" total(-1)=%lld", (long long int)argument.total(-1));
-            int dims = argument.dims(-1);
+            ss << cv::format(" total(-1)=%lld", (long long പൂർണ്ണസംഖ്യ)argument.total(-1));
+            പൂർണ്ണസംഖ്യ dims = argument.dims(-1);
             ss << cv::format(" dims(-1)=%d", dims);
-            if (dims <= 2)
+            എങ്കിൽ (dims <= 2)
             {
                 Size size = argument.size(-1);
                 ss << cv::format(" size(-1)=%dx%d", size.width, size.height);
             }
-            else
+            അല്ലെങ്കിൽ
             {
-                int sz[CV_MAX_DIM] = {0};
+                പൂർണ്ണസംഖ്യ sz[CV_MAX_DIM] = {0};
                 argument.sizend(sz, -1);
                 ss << " size(-1)=[";
-                for (int i = 0; i < dims; i++)
+                വേണ്ടി (പൂർണ്ണസംഖ്യ i = 0; i < dims; i++)
                 {
-                    if (i > 0)
+                    എങ്കിൽ (i > 0)
                         ss << ' ';
                     ss << sz[i];
                 }
                 ss << "]";
             }
             ss << " type(-1)=" << cv::typeToString(argument.type(-1));
-        } while (0);
+        } ആകുമ്പോൾ (0);
     }
-    catch (const std::exception& e)
+    പിടിക്കുക (സ്ഥിരം std::exception& e)
     {
         ss << " ERROR: exception occurred: " << e.what();
     }
-    catch (...)
+    പിടിക്കുക (...)
     {
         ss << " ERROR: unknown exception occurred, dump is non-complete";
     }
-    return ss.str();
+    തിരികെ ss.str();
 }
 
-CV_EXPORTS_W String dumpInputArrayOfArrays(InputArrayOfArrays argument)
+CV_EXPORTS_W String dump_നിവേശം_Array_Of_Arrays(നിവേശം_Array_Of_Arrays argument)
 {
-    if (&argument == &noArray())
-        return "InputArrayOfArrays: noArray()";
+    എങ്കിൽ (&argument == &noArray())
+        തിരികെ "InputArrayOfArrays: noArray()";
     std::ostringstream ss;
     ss << "InputArrayOfArrays:";
-    try {
-        do {
+    ശ്രമിക്കുക {
+        ചെയ്യുക {
             ss << (argument.empty() ? " empty()=true" : " empty()=false");
-            ss << cv::format(" kind=0x%08llx", (long long int)argument.kind());
-            ss << cv::format(" flags=0x%08llx", (long long int)argument.getFlags());
-            if (argument.getObj() == NULL)
+            ss << cv::format(" kind=0x%08llx", (long long പൂർണ്ണസംഖ്യ)argument.kind());
+            ss << cv::format(" flags=0x%08llx", (long long പൂർണ്ണസംഖ്യ)argument.getFlags());
+            എങ്കിൽ (argument.getObj() == ശൂന്യ)
             {
                 ss << " obj=NULL";
-                break; // done
+                നിർത്തുക; // done
             }
-            ss << cv::format(" total(-1)=%lld", (long long int)argument.total(-1));
+            ss << cv::format(" total(-1)=%lld", (long long പൂർണ്ണസംഖ്യ)argument.total(-1));
             ss << cv::format(" dims(-1)=%d", argument.dims(-1));
             Size size = argument.size(-1);
             ss << cv::format(" size(-1)=%dx%d", size.width, size.height);
-            if (argument.total(-1) > 0)
+            എങ്കിൽ (argument.total(-1) > 0)
             {
                 ss << " type(0)=" << cv::typeToString(argument.type(0));
-                int dims = argument.dims(0);
+                പൂർണ്ണസംഖ്യ dims = argument.dims(0);
                 ss << cv::format(" dims(0)=%d", dims);
-                if (dims <= 2)
+                എങ്കിൽ (dims <= 2)
                 {
                     Size size0 = argument.size(0);
                     ss << cv::format(" size(0)=%dx%d", size0.width, size0.height);
                 }
-                else
+                അല്ലെങ്കിൽ
                 {
-                    int sz[CV_MAX_DIM] = {0};
+                    പൂർണ്ണസംഖ്യ sz[CV_MAX_DIM] = {0};
                     argument.sizend(sz, 0);
                     ss << " size(0)=[";
-                    for (int i = 0; i < dims; i++)
+                    വേണ്ടി (പൂർണ്ണസംഖ്യ i = 0; i < dims; i++)
                     {
-                        if (i > 0)
+                        എങ്കിൽ (i > 0)
                             ss << ' ';
                         ss << sz[i];
                     }
                     ss << "]";
                 }
             }
-        } while (0);
+        } ആകുമ്പോൾ (0);
     }
-    catch (const std::exception& e)
+    പിടിക്കുക (സ്ഥിരം std::exception& e)
     {
         ss << " ERROR: exception occurred: " << e.what();
     }
-    catch (...)
+    പിടിക്കുക (...)
     {
         ss << " ERROR: unknown exception occurred, dump is non-complete";
     }
-    return ss.str();
+    തിരികെ ss.str();
 }
 
-CV_EXPORTS_W String dumpInputOutputArray(InputOutputArray argument)
+CV_EXPORTS_W String dump_നിവേശം_Output_Array(നിവേശം_Output_Array argument)
 {
-    if (&argument == &noArray())
-        return "InputOutputArray: noArray()";
+    എങ്കിൽ (&argument == &noArray())
+        തിരികെ "InputOutputArray: noArray()";
     std::ostringstream ss;
     ss << "InputOutputArray:";
-    try {
-        do {
+    ശ്രമിക്കുക {
+        ചെയ്യുക {
             ss << (argument.empty() ? " empty()=true" : " empty()=false");
-            ss << cv::format(" kind=0x%08llx", (long long int)argument.kind());
-            ss << cv::format(" flags=0x%08llx", (long long int)argument.getFlags());
-            if (argument.getObj() == NULL)
+            ss << cv::format(" kind=0x%08llx", (long long പൂർണ്ണസംഖ്യ)argument.kind());
+            ss << cv::format(" flags=0x%08llx", (long long പൂർണ്ണസംഖ്യ)argument.getFlags());
+            എങ്കിൽ (argument.getObj() == ശൂന്യ)
             {
                 ss << " obj=NULL";
-                break; // done
+                നിർത്തുക; // done
             }
-            ss << cv::format(" total(-1)=%lld", (long long int)argument.total(-1));
-            int dims = argument.dims(-1);
+            ss << cv::format(" total(-1)=%lld", (long long പൂർണ്ണസംഖ്യ)argument.total(-1));
+            പൂർണ്ണസംഖ്യ dims = argument.dims(-1);
             ss << cv::format(" dims(-1)=%d", dims);
-            if (dims <= 2)
+            എങ്കിൽ (dims <= 2)
             {
                 Size size = argument.size(-1);
                 ss << cv::format(" size(-1)=%dx%d", size.width, size.height);
             }
-            else
+            അല്ലെങ്കിൽ
             {
-                int sz[CV_MAX_DIM] = {0};
+                പൂർണ്ണസംഖ്യ sz[CV_MAX_DIM] = {0};
                 argument.sizend(sz, -1);
                 ss << " size(-1)=[";
-                for (int i = 0; i < dims; i++)
+                വേണ്ടി (പൂർണ്ണസംഖ്യ i = 0; i < dims; i++)
                 {
-                    if (i > 0)
+                    എങ്കിൽ (i > 0)
                         ss << ' ';
                     ss << sz[i];
                 }
                 ss << "]";
             }
             ss << " type(-1)=" << cv::typeToString(argument.type(-1));
-        } while (0);
+        } ആകുമ്പോൾ (0);
     }
-    catch (const std::exception& e)
+    പിടിക്കുക (സ്ഥിരം std::exception& e)
     {
         ss << " ERROR: exception occurred: " << e.what();
     }
-    catch (...)
+    പിടിക്കുക (...)
     {
         ss << " ERROR: unknown exception occurred, dump is non-complete";
     }
-    return ss.str();
+    തിരികെ ss.str();
 }
 
-CV_EXPORTS_W String dumpInputOutputArrayOfArrays(InputOutputArrayOfArrays argument)
+CV_EXPORTS_W String dump_നിവേശം_Output_Array_Of_Arrays(നിവേശം_Output_Array_Of_Arrays argument)
 {
-    if (&argument == &noArray())
-        return "InputOutputArrayOfArrays: noArray()";
+    എങ്കിൽ (&argument == &noArray())
+        തിരികെ "InputOutputArrayOfArrays: noArray()";
     std::ostringstream ss;
     ss << "InputOutputArrayOfArrays:";
-    try {
-        do {
+    ശ്രമിക്കുക {
+        ചെയ്യുക {
             ss << (argument.empty() ? " empty()=true" : " empty()=false");
-            ss << cv::format(" kind=0x%08llx", (long long int)argument.kind());
-            ss << cv::format(" flags=0x%08llx", (long long int)argument.getFlags());
-            if (argument.getObj() == NULL)
+            ss << cv::format(" kind=0x%08llx", (long long പൂർണ്ണസംഖ്യ)argument.kind());
+            ss << cv::format(" flags=0x%08llx", (long long പൂർണ്ണസംഖ്യ)argument.getFlags());
+            എങ്കിൽ (argument.getObj() == ശൂന്യ)
             {
                 ss << " obj=NULL";
-                break; // done
+                നിർത്തുക; // done
             }
-            ss << cv::format(" total(-1)=%lld", (long long int)argument.total(-1));
+            ss << cv::format(" total(-1)=%lld", (long long പൂർണ്ണസംഖ്യ)argument.total(-1));
             ss << cv::format(" dims(-1)=%d", argument.dims(-1));
             Size size = argument.size(-1);
             ss << cv::format(" size(-1)=%dx%d", size.width, size.height);
-            if (argument.total(-1) > 0)
+            എങ്കിൽ (argument.total(-1) > 0)
             {
                 ss << " type(0)=" << cv::typeToString(argument.type(0));
-                int dims = argument.dims(0);
+                പൂർണ്ണസംഖ്യ dims = argument.dims(0);
                 ss << cv::format(" dims(0)=%d", dims);
-                if (dims <= 2)
+                എങ്കിൽ (dims <= 2)
                 {
                     Size size0 = argument.size(0);
                     ss << cv::format(" size(0)=%dx%d", size0.width, size0.height);
                 }
-                else
+                അല്ലെങ്കിൽ
                 {
-                    int sz[CV_MAX_DIM] = {0};
+                    പൂർണ്ണസംഖ്യ sz[CV_MAX_DIM] = {0};
                     argument.sizend(sz, 0);
                     ss << " size(0)=[";
-                    for (int i = 0; i < dims; i++)
+                    വേണ്ടി (പൂർണ്ണസംഖ്യ i = 0; i < dims; i++)
                     {
-                        if (i > 0)
+                        എങ്കിൽ (i > 0)
                             ss << ' ';
                         ss << sz[i];
                     }
                     ss << "]";
                 }
             }
-        } while (0);
+        } ആകുമ്പോൾ (0);
     }
-    catch (const std::exception& e)
+    പിടിക്കുക (സ്ഥിരം std::exception& e)
     {
         ss << " ERROR: exception occurred: " << e.what();
     }
-    catch (...)
+    പിടിക്കുക (...)
     {
         ss << " ERROR: unknown exception occurred, dump is non-complete";
     }
-    return ss.str();
+    തിരികെ ss.str();
 }
 
-template <class T, class Formatter>
-static inline String dumpVector(const std::vector<T>& vec, Formatter format)
+template <വർഗ്ഗം T, വർഗ്ഗം Formatter>
+സ്ഥിതം വരിയിൽ String dumpVector(സ്ഥിരം std::vector<T>& vec, Formatter format)
 {
     std::ostringstream oss("[", std::ios::ate);
-    if (!vec.empty())
+    എങ്കിൽ (!vec.empty())
     {
         format(oss) << vec[0];
-        for (std::size_t i = 1; i < vec.size(); ++i)
+        വേണ്ടി (std::size_t i = 1; i < vec.size(); ++i)
         {
             oss << ", ";
             format(oss) << vec[i];
         }
     }
     oss << "]";
-    return oss.str();
+    തിരികെ oss.str();
 }
 
-static inline std::ostream& noFormat(std::ostream& os)
+സ്ഥിതം വരിയിൽ std::ostream& noFormat(std::ostream& os)
 {
-    return os;
+    തിരികെ os;
 }
 
-static inline std::ostream& floatFormat(std::ostream& os)
+സ്ഥിതം വരിയിൽ std::ostream& floatFormat(std::ostream& os)
 {
-    return os << std::fixed << std::setprecision(2);
+    തിരികെ os << std::fixed << std::setprecision(2);
 }
 
-String dumpVectorOfInt(const std::vector<int>& vec)
+String dumpVectorOfInt(സ്ഥിരം std::vector<പൂർണ്ണസംഖ്യ>& vec)
 {
-    return dumpVector(vec, &noFormat);
+    തിരികെ dumpVector(vec, &noFormat);
 }
 
-String dumpVectorOfDouble(const std::vector<double>& vec)
+String dumpVectorOfDouble(സ്ഥിരം std::vector<ഇരട്ട>& vec)
 {
-    return dumpVector(vec, &floatFormat);
+    തിരികെ dumpVector(vec, &floatFormat);
 }
 
-String dumpVectorOfRect(const std::vector<Rect>& vec)
+String dumpVectorOfRect(സ്ഥിരം std::vector<Rect>& vec)
 {
-    return dumpVector(vec, &noFormat);
+    തിരികെ dumpVector(vec, &noFormat);
 }
 
 
-namespace fs {
+നാമാകാശ fs {
 cv::String getCacheDirectoryForDownloads()
 {
-#if OPENCV_HAVE_FILESYSTEM_SUPPORT
-    return cv::utils::fs::getCacheDirectory("downloads", "OPENCV_DOWNLOADS_CACHE_DIR");
-#else
+#എങ്കിൽ OPENCV_HAVE_FILESYSTEM_SUPPORT
+    തിരികെ cv::utils::fs::getCacheDirectory("downloads", "OPENCV_DOWNLOADS_CACHE_DIR");
+#അല്ലെങ്കിൽ
     CV_Error(Error::StsNotImplemented, "File system support is disabled in this OpenCV build!");
 #endif
 }

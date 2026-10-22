@@ -2,9 +2,9 @@
 // It is subject to the license terms in the LICENSE file found in the top-level directory
 // of this distribution and at http://opencv.org/license.html
 
-#include "precomp.hpp"
-#include "opencv2/core/mat.hpp"
-#include "opencl_kernels_core.hpp"
+#അന്തര്ഭാവ "precomp.hpp"
+#അന്തര്ഭാവ "opencv2/core/mat.hpp"
+#അന്തര്ഭാവ "opencl_kernels_core.hpp"
 
 #define IPP_DISABLE_REDUCE 1
 #define IPP_DISABLE_SORT   0
@@ -13,7 +13,7 @@
                                         Matrix Operations
 \*************************************************************************************************/
 
-void cv::swap( Mat& a, Mat& b )
+ശൂന്യം cv::swap( Mat& a, Mat& b )
 {
     std::swap(a.flags, b.flags);
     std::swap(a.dims, b.dims);
@@ -31,18 +31,18 @@ void cv::swap( Mat& a, Mat& b )
 }
 
 
-void cv::hconcat(const Mat* src, size_t nsrc, OutputArray _dst)
+ശൂന്യം cv::hconcat(സ്ഥിരം Mat* src, size_t nsrc, OutputArray _dst)
 {
     CV_INSTRUMENT_REGION();
 
-    if( nsrc == 0 || !src )
+    എങ്കിൽ( nsrc == 0 || !src )
     {
         _dst.release();
-        return;
+        തിരികെ;
     }
 
-    int totalCols = 0, cols = 0;
-    for( size_t i = 0; i < nsrc; i++ )
+    പൂർണ്ണസംഖ്യ totalCols = 0, cols = 0;
+    വേണ്ടി( size_t i = 0; i < nsrc; i++ )
     {
         CV_Assert( src[i].dims <= 2 &&
                    src[i].rows == src[0].rows &&
@@ -51,7 +51,7 @@ void cv::hconcat(const Mat* src, size_t nsrc, OutputArray _dst)
     }
     _dst.create( src[0].rows, totalCols, src[0].type());
     Mat dst = _dst.getMat();
-    for( size_t i = 0; i < nsrc; i++ )
+    വേണ്ടി( size_t i = 0; i < nsrc; i++ )
     {
         Mat dpart = dst(Rect(cols, 0, src[i].cols, src[i].rows));
         src[i].copyTo(dpart);
@@ -59,7 +59,7 @@ void cv::hconcat(const Mat* src, size_t nsrc, OutputArray _dst)
     }
 }
 
-void cv::hconcat(InputArray src1, InputArray src2, OutputArray dst)
+ശൂന്യം cv::hconcat(നിവേശം_Array src1, നിവേശം_Array src2, OutputArray dst)
 {
     CV_INSTRUMENT_REGION();
 
@@ -67,7 +67,7 @@ void cv::hconcat(InputArray src1, InputArray src2, OutputArray dst)
     hconcat(src, 2, dst);
 }
 
-void cv::hconcat(InputArray _src, OutputArray dst)
+ശൂന്യം cv::hconcat(നിവേശം_Array _src, OutputArray dst)
 {
     CV_INSTRUMENT_REGION();
 
@@ -76,18 +76,18 @@ void cv::hconcat(InputArray _src, OutputArray dst)
     hconcat(!src.empty() ? &src[0] : nullptr, src.size(), dst);
 }
 
-void cv::vconcat(const Mat* src, size_t nsrc, OutputArray _dst)
+ശൂന്യം cv::vconcat(സ്ഥിരം Mat* src, size_t nsrc, OutputArray _dst)
 {
     CV_TRACE_FUNCTION_SKIP_NESTED()
 
-    if( nsrc == 0 || !src )
+    എങ്കിൽ( nsrc == 0 || !src )
     {
         _dst.release();
-        return;
+        തിരികെ;
     }
 
-    int totalRows = 0, rows = 0;
-    for( size_t i = 0; i < nsrc; i++ )
+    പൂർണ്ണസംഖ്യ totalRows = 0, rows = 0;
+    വേണ്ടി( size_t i = 0; i < nsrc; i++ )
     {
         CV_Assert(src[i].dims <= 2 &&
                   src[i].cols == src[0].cols &&
@@ -96,7 +96,7 @@ void cv::vconcat(const Mat* src, size_t nsrc, OutputArray _dst)
     }
     _dst.create( totalRows, src[0].cols, src[0].type());
     Mat dst = _dst.getMat();
-    for( size_t i = 0; i < nsrc; i++ )
+    വേണ്ടി( size_t i = 0; i < nsrc; i++ )
     {
         Mat dpart(dst, Rect(0, rows, src[i].cols, src[i].rows));
         src[i].copyTo(dpart);
@@ -104,7 +104,7 @@ void cv::vconcat(const Mat* src, size_t nsrc, OutputArray _dst)
     }
 }
 
-void cv::vconcat(InputArray src1, InputArray src2, OutputArray dst)
+ശൂന്യം cv::vconcat(നിവേശം_Array src1, നിവേശം_Array src2, OutputArray dst)
 {
     CV_INSTRUMENT_REGION();
 
@@ -112,7 +112,7 @@ void cv::vconcat(InputArray src1, InputArray src2, OutputArray dst)
     vconcat(src, 2, dst);
 }
 
-void cv::vconcat(InputArray _src, OutputArray dst)
+ശൂന്യം cv::vconcat(നിവേശം_Array _src, OutputArray dst)
 {
     CV_INSTRUMENT_REGION();
 
@@ -125,19 +125,19 @@ void cv::vconcat(InputArray _src, OutputArray dst)
 
 #ifdef HAVE_OPENCL
 
-namespace cv {
+നാമാകാശ cv {
 
-static bool ocl_setIdentity( InputOutputArray _m, const Scalar& s )
+സ്ഥിതം തർക്കം ocl_setIdentity( നിവേശം_Output_Array _m, സ്ഥിരം Scalar& s )
 {
-    int type = _m.type(), depth = CV_MAT_DEPTH(type), cn = CV_MAT_CN(type), kercn = cn, rowsPerWI = 1;
-    int sctype = CV_MAKE_TYPE(depth, cn == 3 ? 4 : cn);
-    if (ocl::Device::getDefault().isIntel())
+    പൂർണ്ണസംഖ്യ type = _m.type(), depth = CV_MAT_DEPTH(type), cn = CV_MAT_CN(type), kercn = cn, rowsPerWI = 1;
+    പൂർണ്ണസംഖ്യ sctype = CV_MAKE_TYPE(depth, cn == 3 ? 4 : cn);
+    എങ്കിൽ (ocl::Device::getDefault().isIntel())
     {
         rowsPerWI = 4;
-        if (cn == 1)
+        എങ്കിൽ (cn == 1)
         {
             kercn = std::min(ocl::predictOptimalVectorWidth(_m), 4);
-            if (kercn != 4)
+            എങ്കിൽ (kercn != 4)
                 kercn = 1;
         }
     }
@@ -148,22 +148,22 @@ static bool ocl_setIdentity( InputOutputArray _m, const Scalar& s )
                          ocl::memopTypeToStr(depth), cn,
                          ocl::memopTypeToStr(sctype),
                          kercn, rowsPerWI));
-    if (k.empty())
-        return false;
+    എങ്കിൽ (k.empty())
+        തിരികെ അസത്യം;
 
     UMat m = _m.getUMat();
     k.args(ocl::KernelArg::WriteOnly(m, cn, kercn),
            ocl::KernelArg::Constant(Mat(1, 1, sctype, s)));
 
     size_t globalsize[2] = { (size_t)m.cols * cn / kercn, ((size_t)m.rows + rowsPerWI - 1) / rowsPerWI };
-    return k.run(2, globalsize, nullptr, false);
+    തിരികെ k.run(2, globalsize, nullptr, അസത്യം);
 }
 
 }
 
 #endif
 
-void cv::setIdentity( InputOutputArray _m, const Scalar& s )
+ശൂന്യം cv::setIdentity( നിവേശം_Output_Array _m, സ്ഥിരം Scalar& s )
 {
     CV_INSTRUMENT_REGION();
 
@@ -173,36 +173,36 @@ void cv::setIdentity( InputOutputArray _m, const Scalar& s )
                ocl_setIdentity(_m, s))
 
     Mat m = _m.getMat();
-    int rows = m.rows, cols = m.cols, type = m.type();
+    പൂർണ്ണസംഖ്യ rows = m.rows, cols = m.cols, type = m.type();
 
-    if( type == CV_32FC1 )
+    എങ്കിൽ( type == CV_32FC1 )
     {
-        float* data = m.ptr<float>();
-        float val = (float)s[0];
-        size_t step = m.step/sizeof(data[0]);
+        ദശാംശം* data = m.ptr<ദശാംശം>();
+        ദശാംശം val = (ദശാംശം)s[0];
+        size_t step = m.step/വലുപ്പം(data[0]);
 
-        for( int i = 0; i < rows; i++, data += step )
+        വേണ്ടി( പൂർണ്ണസംഖ്യ i = 0; i < rows; i++, data += step )
         {
-            for( int j = 0; j < cols; j++ )
+            വേണ്ടി( പൂർണ്ണസംഖ്യ j = 0; j < cols; j++ )
                 data[j] = 0;
-            if( i < cols )
+            എങ്കിൽ( i < cols )
                 data[i] = val;
         }
     }
-    else if( type == CV_64FC1 )
+    അല്ലെങ്കിൽ എങ്കിൽ( type == CV_64FC1 )
     {
-        double* data = m.ptr<double>();
-        double val = s[0];
-        size_t step = m.step/sizeof(data[0]);
+        ഇരട്ട* data = m.ptr<ഇരട്ട>();
+        ഇരട്ട val = s[0];
+        size_t step = m.step/വലുപ്പം(data[0]);
 
-        for( int i = 0; i < rows; i++, data += step )
+        വേണ്ടി( പൂർണ്ണസംഖ്യ i = 0; i < rows; i++, data += step )
         {
             std::fill(data, data + cols, 0.0);
-            if (i < cols)
+            എങ്കിൽ (i < cols)
                 data[i] = val;
         }
     }
-    else
+    അല്ലെങ്കിൽ
     {
         m = Scalar(0);
         m.diag() = s;
@@ -210,60 +210,60 @@ void cv::setIdentity( InputOutputArray _m, const Scalar& s )
 }
 
 
-namespace cv {
+നാമാകാശ cv {
 
-UMat UMat::eye(int rows, int cols, int type, UMatUsageFlags usageFlags)
+UMat UMat::eye(പൂർണ്ണസംഖ്യ rows, പൂർണ്ണസംഖ്യ cols, പൂർണ്ണസംഖ്യ type, UMatUsageFlags usageFlags)
 {
-    return UMat::eye(Size(cols, rows), type, usageFlags);
+    തിരികെ UMat::eye(Size(cols, rows), type, usageFlags);
 }
 
-UMat UMat::eye(Size size, int type, UMatUsageFlags usageFlags)
+UMat UMat::eye(Size size, പൂർണ്ണസംഖ്യ type, UMatUsageFlags usageFlags)
 {
     UMat m(size, type, usageFlags);
     setIdentity(m);
-    return m;
+    തിരികെ m;
 }
 
 }  // namespace
 
 //////////////////////////////////////////// trace ///////////////////////////////////////////
 
-cv::Scalar cv::trace( InputArray _m )
+cv::Scalar cv::trace( നിവേശം_Array _m )
 {
     CV_INSTRUMENT_REGION();
 
     Mat m = _m.getMat();
     CV_Assert( m.dims <= 2 );
-    int type = m.type();
-    int nm = std::min(m.rows, m.cols);
+    പൂർണ്ണസംഖ്യ type = m.type();
+    പൂർണ്ണസംഖ്യ nm = std::min(m.rows, m.cols);
 
-    if( type == CV_32FC1 )
+    എങ്കിൽ( type == CV_32FC1 )
     {
-        const float* ptr = m.ptr<float>();
-        size_t step = m.step/sizeof(ptr[0]) + 1;
-        double _s = 0;
-        for( int i = 0; i < nm; i++ )
+        സ്ഥിരം ദശാംശം* ptr = m.ptr<ദശാംശം>();
+        size_t step = m.step/വലുപ്പം(ptr[0]) + 1;
+        ഇരട്ട _s = 0;
+        വേണ്ടി( പൂർണ്ണസംഖ്യ i = 0; i < nm; i++ )
             _s += ptr[i*step];
-        return _s;
+        തിരികെ _s;
     }
 
-    if( type == CV_64FC1 )
+    എങ്കിൽ( type == CV_64FC1 )
     {
-        const double* ptr = m.ptr<double>();
-        size_t step = m.step/sizeof(ptr[0]) + 1;
-        double _s = 0;
-        for( int i = 0; i < nm; i++ )
+        സ്ഥിരം ഇരട്ട* ptr = m.ptr<ഇരട്ട>();
+        size_t step = m.step/വലുപ്പം(ptr[0]) + 1;
+        ഇരട്ട _s = 0;
+        വേണ്ടി( പൂർണ്ണസംഖ്യ i = 0; i < nm; i++ )
             _s += ptr[i*step];
-        return _s;
+        തിരികെ _s;
     }
 
-    return cv::sum(m.diag());
+    തിരികെ cv::sum(m.diag());
 }
 
 
 ////////////////////////////////////// completeSymm /////////////////////////////////////////
 
-void cv::completeSymm( InputOutputArray _m, bool LtoR )
+ശൂന്യം cv::completeSymm( നിവേശം_Output_Array _m, തർക്കം LtoR )
 {
     CV_INSTRUMENT_REGION();
 
@@ -271,101 +271,101 @@ void cv::completeSymm( InputOutputArray _m, bool LtoR )
     size_t step = m.step, esz = m.elemSize();
     CV_Assert( m.dims <= 2 && m.rows == m.cols );
 
-    int rows = m.rows;
-    int j0 = 0, j1 = rows;
+    പൂർണ്ണസംഖ്യ rows = m.rows;
+    പൂർണ്ണസംഖ്യ j0 = 0, j1 = rows;
 
     uchar* data = m.ptr();
-    for( int i = 0; i < rows; i++ )
+    വേണ്ടി( പൂർണ്ണസംഖ്യ i = 0; i < rows; i++ )
     {
-        if( !LtoR ) j1 = i; else j0 = i+1;
-        for( int j = j0; j < j1; j++ )
+        എങ്കിൽ( !LtoR ) j1 = i; അല്ലെങ്കിൽ j0 = i+1;
+        വേണ്ടി( പൂർണ്ണസംഖ്യ j = j0; j < j1; j++ )
             memcpy(data + (i*step + j*esz), data + (j*step + i*esz), esz);
     }
 }
 
 
-cv::Mat cv::Mat::cross(InputArray _m) const
+cv::Mat cv::Mat::cross(നിവേശം_Array _m) സ്ഥിരം
 {
     Mat m = _m.getMat();
-    int tp = type(), d = CV_MAT_DEPTH(tp);
+    പൂർണ്ണസംഖ്യ tp = type(), d = CV_MAT_DEPTH(tp);
     CV_Assert( dims <= 2 && m.dims <= 2 && size() == m.size() && tp == m.type() &&
         ((rows == 3 && cols == 1) || (cols*channels() == 3 && rows == 1)));
     Mat result(rows, cols, tp);
 
-    if( d == CV_32F )
+    എങ്കിൽ( d == CV_32F )
     {
-        const float *a = (const float*)data, *b = (const float*)m.data;
-        float* c = (float*)result.data;
-        size_t lda = rows > 1 ? step/sizeof(a[0]) : 1;
-        size_t ldb = rows > 1 ? m.step/sizeof(b[0]) : 1;
+        സ്ഥിരം ദശാംശം *a = (സ്ഥിരം ദശാംശം*)data, *b = (സ്ഥിരം ദശാംശം*)m.data;
+        ദശാംശം* c = (ദശാംശം*)result.data;
+        size_t lda = rows > 1 ? step/വലുപ്പം(a[0]) : 1;
+        size_t ldb = rows > 1 ? m.step/വലുപ്പം(b[0]) : 1;
 
         c[0] = a[lda] * b[ldb*2] - a[lda*2] * b[ldb];
         c[1] = a[lda*2] * b[0] - a[0] * b[ldb*2];
         c[2] = a[0] * b[ldb] - a[lda] * b[0];
     }
-    else if( d == CV_64F )
+    അല്ലെങ്കിൽ എങ്കിൽ( d == CV_64F )
     {
-        const double *a = (const double*)data, *b = (const double*)m.data;
-        double* c = (double*)result.data;
-        size_t lda = rows > 1 ? step/sizeof(a[0]) : 1;
-        size_t ldb = rows > 1 ? m.step/sizeof(b[0]) : 1;
+        സ്ഥിരം ഇരട്ട *a = (സ്ഥിരം ഇരട്ട*)data, *b = (സ്ഥിരം ഇരട്ട*)m.data;
+        ഇരട്ട* c = (ഇരട്ട*)result.data;
+        size_t lda = rows > 1 ? step/വലുപ്പം(a[0]) : 1;
+        size_t ldb = rows > 1 ? m.step/വലുപ്പം(b[0]) : 1;
 
         c[0] = a[lda] * b[ldb*2] - a[lda*2] * b[ldb];
         c[1] = a[lda*2] * b[0] - a[0] * b[ldb*2];
         c[2] = a[0] * b[ldb] - a[lda] * b[0];
     }
 
-    return result;
+    തിരികെ result;
 }
 
 
 ////////////////////////////////////////// reduce ////////////////////////////////////////////
 
-namespace cv
+നാമാകാശ cv
 {
 
-typedef void (*ReduceSumFunc)(const Mat& src, Mat& dst);
-ReduceSumFunc getReduceCSumFunc(int sdepth, int ddepth);
-ReduceSumFunc getReduceRSumFunc(int sdepth, int ddepth);
-ReduceSumFunc getReduceRSum2Func(int sdepth, int ddepth);
+തരനിർവചനം ശൂന്യം (*ReduceSumFunc)(സ്ഥിരം Mat& src, Mat& dst);
+ReduceSumFunc getReduceCSumFunc(പൂർണ്ണസംഖ്യ sdepth, പൂർണ്ണസംഖ്യ ddepth);
+ReduceSumFunc getReduceRSumFunc(പൂർണ്ണസംഖ്യ sdepth, പൂർണ്ണസംഖ്യ ddepth);
+ReduceSumFunc getReduceRSum2Func(പൂർണ്ണസംഖ്യ sdepth, പൂർണ്ണസംഖ്യ ddepth);
 
 template <typename T, typename WT, typename Op>
-struct ReduceR_SIMD
+ഘടന ReduceR_SIMD
 {
-    int operator()(const T*, int start, int, WT*, const Op&) const
+    പൂർണ്ണസംഖ്യ operator()(സ്ഥിരം T*, പൂർണ്ണസംഖ്യ start, പൂർണ്ണസംഖ്യ, WT*, സ്ഥിരം Op&) സ്ഥിരം
     {
-        return start;
+        തിരികെ start;
     }
 };
 
 
-template<typename T, typename ST, typename WT, class Op, class OpInit>
-class ReduceR_Invoker : public ParallelLoopBody
+template<typename T, typename ST, typename WT, വർഗ്ഗം Op, വർഗ്ഗം OpInit>
+വർഗ്ഗം ReduceR_Invoker : പൊതു ParallelLoopBody
 {
-public:
-  ReduceR_Invoker(const Mat& aSrcmat, Mat& aDstmat, Op& aOp, OpInit& aOpInit)
+പൊതു:
+  ReduceR_Invoker(സ്ഥിരം Mat& aSrcmat, Mat& aDstmat, Op& aOp, OpInit& aOpInit)
                  :srcmat(aSrcmat),dstmat(aDstmat),op(aOp),opInit(aOpInit),buffer(srcmat.size().width*srcmat.channels())
   {
   }
-  void operator()(const Range& range) const CV_OVERRIDE
+  ശൂന്യം operator()(സ്ഥിരം Range& range) സ്ഥിരം CV_OVERRIDE
   {
-    const T* src = srcmat.ptr<T>();
-    const size_t srcstep = srcmat.step/sizeof(src[0]);
+    സ്ഥിരം T* src = srcmat.ptr<T>();
+    സ്ഥിരം size_t srcstep = srcmat.step/വലുപ്പം(src[0]);
     WT* buf = buffer.data();
     ST* dst = dstmat.ptr<ST>();
-    int i = 0;
+    പൂർണ്ണസംഖ്യ i = 0;
 
-    for( i = range.start ; i < range.end; i++ )
+    വേണ്ടി( i = range.start ; i < range.end; i++ )
         buf[i] = opInit(src[i]);
 
-    int height = srcmat.size().height;
-    for( ; --height; )
+    പൂർണ്ണസംഖ്യ height = srcmat.size().height;
+    വേണ്ടി( ; --height; )
     {
         src += srcstep;
         ReduceR_SIMD<T, WT, Op> simd_op;
         i = simd_op(src, range.start, range.end, buf, op);
-        #if CV_ENABLE_UNROLLED
-        for(; i <= range.end - 4; i += 4 )
+        #എങ്കിൽ CV_ENABLE_UNROLLED
+        വേണ്ടി(; i <= range.end - 4; i += 4 )
         {
             WT s0, s1;
             s0 = op(buf[i], (WT)src[i]);
@@ -377,25 +377,25 @@ public:
             buf[i+2] = s0; buf[i+3] = s1;
         }
         #endif
-        for( ; i < range.end; i++ )
+        വേണ്ടി( ; i < range.end; i++ )
             buf[i] = op(buf[i], (WT)src[i]);
     }
 
-    for( i = range.start ; i < range.end; i++ )
+    വേണ്ടി( i = range.start ; i < range.end; i++ )
         dst[i] = (ST)buf[i];
   }
-private:
-  const Mat& srcmat;
+സ്വകാര്യ:
+  സ്ഥിരം Mat& srcmat;
   Mat& dstmat;
   Op& op;
   OpInit& opInit;
   mutable AutoBuffer<WT> buffer;
 };
 
-template<typename T, typename ST, class Op, class OpInit = OpNop<ST> > static void
-reduceR_( const Mat& srcmat, Mat& dstmat)
+template<typename T, typename ST, വർഗ്ഗം Op, വർഗ്ഗം OpInit = OpNop<ST> > സ്ഥിതം ശൂന്യം
+reduceR_( സ്ഥിരം Mat& srcmat, Mat& dstmat)
 {
-    typedef typename Op::rtype WT;
+    തരനിർവചനം typename Op::rtype WT;
     Op op;
     OpInit opInit;
 
@@ -404,53 +404,53 @@ reduceR_( const Mat& srcmat, Mat& dstmat)
     parallel_for_(Range(0, srcmat.size().width*srcmat.channels()), body, srcmat.size().width*CV_ELEM_SIZE(srcmat.depth())/64);
 }
 
-template<typename T, typename ST, typename WT, class Op, class OpInit>
-class ReduceC_Invoker : public ParallelLoopBody
+template<typename T, typename ST, typename WT, വർഗ്ഗം Op, വർഗ്ഗം OpInit>
+വർഗ്ഗം ReduceC_Invoker : പൊതു ParallelLoopBody
 {
-public:
-  ReduceC_Invoker(const Mat& aSrcmat, Mat& aDstmat, Op& aOp, OpInit& aOpInit)
+പൊതു:
+  ReduceC_Invoker(സ്ഥിരം Mat& aSrcmat, Mat& aDstmat, Op& aOp, OpInit& aOpInit)
                  :srcmat(aSrcmat),dstmat(aDstmat),op(aOp),opInit(aOpInit)
   {
   }
-  void operator()(const Range& range) const CV_OVERRIDE
+  ശൂന്യം operator()(സ്ഥിരം Range& range) സ്ഥിരം CV_OVERRIDE
   {
-    const int cn = srcmat.channels();
-    const int width = srcmat.size().width*cn;
+    സ്ഥിരം പൂർണ്ണസംഖ്യ cn = srcmat.channels();
+    സ്ഥിരം പൂർണ്ണസംഖ്യ width = srcmat.size().width*cn;
     AutoBuffer<WT> cumul(cn);
-    for( int y = range.start; y < range.end; y++ )
+    വേണ്ടി( പൂർണ്ണസംഖ്യ y = range.start; y < range.end; y++ )
     {
-        const T* src = srcmat.ptr<T>(y);
+        സ്ഥിരം T* src = srcmat.ptr<T>(y);
         ST* dst = dstmat.ptr<ST>(y);
-        if( width == cn )
+        എങ്കിൽ( width == cn )
         {
-          for( int k = 0; k < cn; k++ )
+          വേണ്ടി( പൂർണ്ണസംഖ്യ k = 0; k < cn; k++ )
               dst[k] = (ST)opInit(src[k]);
         }
-        else
+        അല്ലെങ്കിൽ
         {
-            for(int k = 0; k < cn ; ++k )
+            വേണ്ടി(പൂർണ്ണസംഖ്യ k = 0; k < cn ; ++k )
               cumul[k] = opInit(src[k]);
-            for(int k = cn ; k < width ; k += cn )
+            വേണ്ടി(പൂർണ്ണസംഖ്യ k = cn ; k < width ; k += cn )
             {
-                for (int c = 0 ; c < cn ; ++c)
+                വേണ്ടി (പൂർണ്ണസംഖ്യ c = 0 ; c < cn ; ++c)
                   cumul[c] = op(cumul[c], src[k+c]);
             }
-            for(int k = 0 ; k < cn ; ++k )
+            വേണ്ടി(പൂർണ്ണസംഖ്യ k = 0 ; k < cn ; ++k )
               dst[k] = (ST)cumul[k];
         }
     }
   }
-private:
-  const Mat& srcmat;
+സ്വകാര്യ:
+  സ്ഥിരം Mat& srcmat;
   Mat& dstmat;
   Op& op;
   OpInit& opInit;
 };
 
-template<typename T, typename ST, class Op, class OpInit = OpNop<ST> > static void
-reduceC_( const Mat& srcmat, Mat& dstmat)
+template<typename T, typename ST, വർഗ്ഗം Op, വർഗ്ഗം OpInit = OpNop<ST> > സ്ഥിതം ശൂന്യം
+reduceC_( സ്ഥിരം Mat& srcmat, Mat& dstmat)
 {
-    typedef typename Op::rtype WT;
+    തരനിർവചനം typename Op::rtype WT;
     Op op;
     OpInit opInit;
 
@@ -458,58 +458,58 @@ reduceC_( const Mat& srcmat, Mat& dstmat)
     parallel_for_(Range(0, srcmat.size().height), body);
 }
 
-typedef void (*ReduceFunc)( const Mat& src, Mat& dst );
+തരനിർവചനം ശൂന്യം (*ReduceFunc)( സ്ഥിരം Mat& src, Mat& dst );
 
 }
 
-#define reduceSumR8u32s  reduceR_<uchar, int,   OpAdd<int>, OpNop<int> >
-#define reduceSumR8u32f  reduceR_<uchar, float, OpAdd<int>, OpNop<int> >
-#define reduceSumR8u64f  reduceR_<uchar, double,OpAdd<int>, OpNop<int> >
-#define reduceSumR16u32f reduceR_<ushort,float, OpAdd<float> >
-#define reduceSumR16u64f reduceR_<ushort,double,OpAdd<double> >
-#define reduceSumR16s32f reduceR_<short, float, OpAdd<float> >
-#define reduceSumR16s64f reduceR_<short, double,OpAdd<double> >
-#define reduceSumR32f32f reduceR_<float, float, OpAdd<float> >
-#define reduceSumR32f64f reduceR_<float, double,OpAdd<double> >
-#define reduceSumR64f64f reduceR_<double,double,OpAdd<double> >
+#define reduceSumR8u32s  reduceR_<uchar, പൂർണ്ണസംഖ്യ,   OpAdd<പൂർണ്ണസംഖ്യ>, OpNop<പൂർണ്ണസംഖ്യ> >
+#define reduceSumR8u32f  reduceR_<uchar, ദശാംശം, OpAdd<പൂർണ്ണസംഖ്യ>, OpNop<പൂർണ്ണസംഖ്യ> >
+#define reduceSumR8u64f  reduceR_<uchar, ഇരട്ട,OpAdd<പൂർണ്ണസംഖ്യ>, OpNop<പൂർണ്ണസംഖ്യ> >
+#define reduceSumR16u32f reduceR_<ushort,ദശാംശം, OpAdd<ദശാംശം> >
+#define reduceSumR16u64f reduceR_<ushort,ഇരട്ട,OpAdd<ഇരട്ട> >
+#define reduceSumR16s32f reduceR_<short, ദശാംശം, OpAdd<ദശാംശം> >
+#define reduceSumR16s64f reduceR_<short, ഇരട്ട,OpAdd<ഇരട്ട> >
+#define reduceSumR32f32f reduceR_<ദശാംശം, ദശാംശം, OpAdd<ദശാംശം> >
+#define reduceSumR32f64f reduceR_<ദശാംശം, ഇരട്ട,OpAdd<ഇരട്ട> >
+#define reduceSumR64f64f reduceR_<ഇരട്ട,ഇരട്ട,OpAdd<ഇരട്ട> >
 
-#define reduceSum2R8u32s  reduceR_<uchar, int,   OpAddSqr<int>,   OpSqr<int> >
-#define reduceSum2R8u32f  reduceR_<uchar, float, OpAddSqr<int>,   OpSqr<int> >
-#define reduceSum2R8u64f  reduceR_<uchar, double,OpAddSqr<int>,   OpSqr<int> >
-#define reduceSum2R16u32f reduceR_<ushort,float, OpAddSqr<float>, OpSqr<float> >
-#define reduceSum2R16u64f reduceR_<ushort,double,OpAddSqr<double>,OpSqr<double> >
-#define reduceSum2R16s32f reduceR_<short, float, OpAddSqr<float>, OpSqr<float> >
-#define reduceSum2R16s64f reduceR_<short, double,OpAddSqr<double>,OpSqr<double> >
-#define reduceSum2R32f32f reduceR_<float, float, OpAddSqr<float>, OpSqr<float> >
-#define reduceSum2R32f64f reduceR_<float, double,OpAddSqr<double>,OpSqr<double> >
-#define reduceSum2R64f64f reduceR_<double,double,OpAddSqr<double>,OpSqr<double> >
+#define reduceSum2R8u32s  reduceR_<uchar, പൂർണ്ണസംഖ്യ,   OpAddSqr<പൂർണ്ണസംഖ്യ>,   OpSqr<പൂർണ്ണസംഖ്യ> >
+#define reduceSum2R8u32f  reduceR_<uchar, ദശാംശം, OpAddSqr<പൂർണ്ണസംഖ്യ>,   OpSqr<പൂർണ്ണസംഖ്യ> >
+#define reduceSum2R8u64f  reduceR_<uchar, ഇരട്ട,OpAddSqr<പൂർണ്ണസംഖ്യ>,   OpSqr<പൂർണ്ണസംഖ്യ> >
+#define reduceSum2R16u32f reduceR_<ushort,ദശാംശം, OpAddSqr<ദശാംശം>, OpSqr<ദശാംശം> >
+#define reduceSum2R16u64f reduceR_<ushort,ഇരട്ട,OpAddSqr<ഇരട്ട>,OpSqr<ഇരട്ട> >
+#define reduceSum2R16s32f reduceR_<short, ദശാംശം, OpAddSqr<ദശാംശം>, OpSqr<ദശാംശം> >
+#define reduceSum2R16s64f reduceR_<short, ഇരട്ട,OpAddSqr<ഇരട്ട>,OpSqr<ഇരട്ട> >
+#define reduceSum2R32f32f reduceR_<ദശാംശം, ദശാംശം, OpAddSqr<ദശാംശം>, OpSqr<ദശാംശം> >
+#define reduceSum2R32f64f reduceR_<ദശാംശം, ഇരട്ട,OpAddSqr<ഇരട്ട>,OpSqr<ഇരട്ട> >
+#define reduceSum2R64f64f reduceR_<ഇരട്ട,ഇരട്ട,OpAddSqr<ഇരട്ട>,OpSqr<ഇരട്ട> >
 
 #define reduceMaxR8u  reduceR_<uchar, uchar, OpMax<uchar> >
 #define reduceMaxR16u reduceR_<ushort,ushort,OpMax<ushort> >
 #define reduceMaxR16s reduceR_<short, short, OpMax<short> >
-#define reduceMaxR32f reduceR_<float, float, OpMax<float> >
-#define reduceMaxR64f reduceR_<double,double,OpMax<double> >
+#define reduceMaxR32f reduceR_<ദശാംശം, ദശാംശം, OpMax<ദശാംശം> >
+#define reduceMaxR64f reduceR_<ഇരട്ട,ഇരട്ട,OpMax<ഇരട്ട> >
 
 #define reduceMinR8u  reduceR_<uchar, uchar, OpMin<uchar> >
 #define reduceMinR16u reduceR_<ushort,ushort,OpMin<ushort> >
 #define reduceMinR16s reduceR_<short, short, OpMin<short> >
-#define reduceMinR32f reduceR_<float, float, OpMin<float> >
-#define reduceMinR64f reduceR_<double,double,OpMin<double> >
+#define reduceMinR32f reduceR_<ദശാംശം, ദശാംശം, OpMin<ദശാംശം> >
+#define reduceMinR64f reduceR_<ഇരട്ട,ഇരട്ട,OpMin<ഇരട്ട> >
 
-#if defined(HAVE_IPP) && !IPP_DISABLE_REDUCE
-static inline bool ipp_reduceSumC_8u16u16s32f_64f(const cv::Mat& srcmat, cv::Mat& dstmat)
+#എങ്കിൽ defined(HAVE_IPP) && !IPP_DISABLE_REDUCE
+സ്ഥിതം വരിയിൽ തർക്കം ipp_reduceSumC_8u16u16s32f_64f(സ്ഥിരം cv::Mat& srcmat, cv::Mat& dstmat)
 {
-    int sstep = (int)srcmat.step, stype = srcmat.type(),
+    പൂർണ്ണസംഖ്യ sstep = (പൂർണ്ണസംഖ്യ)srcmat.step, stype = srcmat.type(),
             ddepth = dstmat.depth();
 
     IppiSize roisize = { srcmat.size().width, 1 };
 
-    typedef IppStatus (CV_STDCALL * IppiSum)(const void * pSrc, int srcStep, IppiSize roiSize, Ipp64f* pSum);
-    typedef IppStatus (CV_STDCALL * IppiSumHint)(const void * pSrc, int srcStep, IppiSize roiSize, Ipp64f* pSum, IppHintAlgorithm hint);
+    തരനിർവചനം IppStatus (CV_STDCALL * IppiSum)(സ്ഥിരം ശൂന്യം * pSrc, പൂർണ്ണസംഖ്യ srcStep, IppiSize roiSize, Ipp64f* pSum);
+    തരനിർവചനം IppStatus (CV_STDCALL * IppiSumHint)(സ്ഥിരം ശൂന്യം * pSrc, പൂർണ്ണസംഖ്യ srcStep, IppiSize roiSize, Ipp64f* pSum, IppHintAlgorithm hint);
     IppiSum ippiSum = 0;
     IppiSumHint ippiSumHint = 0;
 
-    if(ddepth == CV_64F)
+    എങ്കിൽ(ddepth == CV_64F)
     {
         ippiSum =
             stype == CV_8UC1 ? (IppiSum)ippiSum_8u_C1R :
@@ -527,42 +527,42 @@ static inline bool ipp_reduceSumC_8u16u16s32f_64f(const cv::Mat& srcmat, cv::Mat
             stype == CV_32FC4 ? (IppiSumHint)ippiSum_32f_C4R : 0;
     }
 
-    if(ippiSum)
+    എങ്കിൽ(ippiSum)
     {
-        for(int y = 0; y < srcmat.size().height; y++)
+        വേണ്ടി(പൂർണ്ണസംഖ്യ y = 0; y < srcmat.size().height; y++)
         {
-            if(CV_INSTRUMENT_FUN_IPP(ippiSum, srcmat.ptr(y), sstep, roisize, dstmat.ptr<Ipp64f>(y)) < 0)
-                return false;
+            എങ്കിൽ(CV_INSTRUMENT_FUN_IPP(ippiSum, srcmat.ptr(y), sstep, roisize, dstmat.ptr<Ipp64f>(y)) < 0)
+                തിരികെ അസത്യം;
         }
-        return true;
+        തിരികെ സത്യം;
     }
-    else if(ippiSumHint)
+    അല്ലെങ്കിൽ എങ്കിൽ(ippiSumHint)
     {
-        for(int y = 0; y < srcmat.size().height; y++)
+        വേണ്ടി(പൂർണ്ണസംഖ്യ y = 0; y < srcmat.size().height; y++)
         {
-            if(CV_INSTRUMENT_FUN_IPP(ippiSumHint, srcmat.ptr(y), sstep, roisize, dstmat.ptr<Ipp64f>(y), ippAlgHintAccurate) < 0)
-                return false;
+            എങ്കിൽ(CV_INSTRUMENT_FUN_IPP(ippiSumHint, srcmat.ptr(y), sstep, roisize, dstmat.ptr<Ipp64f>(y), ippAlgHintAccurate) < 0)
+                തിരികെ അസത്യം;
         }
-        return true;
+        തിരികെ സത്യം;
     }
 
-    return false;
+    തിരികെ അസത്യം;
 }
 
-static inline void reduceSumC_8u16u16s32f_64f(const cv::Mat& srcmat, cv::Mat& dstmat)
+സ്ഥിതം വരിയിൽ ശൂന്യം reduceSumC_8u16u16s32f_64f(സ്ഥിരം cv::Mat& srcmat, cv::Mat& dstmat)
 {
     CV_IPP_RUN_FAST(ipp_reduceSumC_8u16u16s32f_64f(srcmat, dstmat));
 
     cv::ReduceFunc func = 0;
 
-    if(dstmat.depth() == CV_64F)
+    എങ്കിൽ(dstmat.depth() == CV_64F)
     {
-        int sdepth = CV_MAT_DEPTH(srcmat.type());
+        പൂർണ്ണസംഖ്യ sdepth = CV_MAT_DEPTH(srcmat.type());
         func =
-            sdepth == CV_8U ? (cv::ReduceFunc)cv::reduceC_<uchar, double,   cv::OpAdd<double> > :
-            sdepth == CV_16U ? (cv::ReduceFunc)cv::reduceC_<ushort, double,   cv::OpAdd<double> > :
-            sdepth == CV_16S ? (cv::ReduceFunc)cv::reduceC_<short, double,   cv::OpAdd<double> > :
-            sdepth == CV_32F ? (cv::ReduceFunc)cv::reduceC_<float, double,   cv::OpAdd<double> > : 0;
+            sdepth == CV_8U ? (cv::ReduceFunc)cv::reduceC_<uchar, ഇരട്ട,   cv::OpAdd<ഇരട്ട> > :
+            sdepth == CV_16U ? (cv::ReduceFunc)cv::reduceC_<ushort, ഇരട്ട,   cv::OpAdd<ഇരട്ട> > :
+            sdepth == CV_16S ? (cv::ReduceFunc)cv::reduceC_<short, ഇരട്ട,   cv::OpAdd<ഇരട്ട> > :
+            sdepth == CV_32F ? (cv::ReduceFunc)cv::reduceC_<ദശാംശം, ഇരട്ട,   cv::OpAdd<ഇരട്ട> > : 0;
     }
     CV_Assert(func);
 
@@ -571,126 +571,126 @@ static inline void reduceSumC_8u16u16s32f_64f(const cv::Mat& srcmat, cv::Mat& ds
 
 #endif
 
-#define reduceSumC8u32s  reduceC_<uchar, int,   OpAdd<int>, OpNop<int> >
-#define reduceSumC8u32f  reduceC_<uchar, float, OpAdd<int>, OpNop<int> >
-#define reduceSumC16u32f reduceC_<ushort,float, OpAdd<float> >
-#define reduceSumC16s32f reduceC_<short, float, OpAdd<float> >
-#define reduceSumC32f32f reduceC_<float, float, OpAdd<float> >
-#define reduceSumC64f64f reduceC_<double,double,OpAdd<double> >
+#define reduceSumC8u32s  reduceC_<uchar, പൂർണ്ണസംഖ്യ,   OpAdd<പൂർണ്ണസംഖ്യ>, OpNop<പൂർണ്ണസംഖ്യ> >
+#define reduceSumC8u32f  reduceC_<uchar, ദശാംശം, OpAdd<പൂർണ്ണസംഖ്യ>, OpNop<പൂർണ്ണസംഖ്യ> >
+#define reduceSumC16u32f reduceC_<ushort,ദശാംശം, OpAdd<ദശാംശം> >
+#define reduceSumC16s32f reduceC_<short, ദശാംശം, OpAdd<ദശാംശം> >
+#define reduceSumC32f32f reduceC_<ദശാംശം, ദശാംശം, OpAdd<ദശാംശം> >
+#define reduceSumC64f64f reduceC_<ഇരട്ട,ഇരട്ട,OpAdd<ഇരട്ട> >
 
-#define reduceSum2C8u32s  reduceC_<uchar, int,   OpAddSqr<int>,   OpSqr<int> >
-#define reduceSum2C8u32f  reduceC_<uchar, float, OpAddSqr<int>,   OpSqr<int> >
-#define reduceSum2C16u32f reduceC_<ushort,float, OpAddSqr<float>, OpSqr<float> >
-#define reduceSum2C16s32f reduceC_<short, float, OpAddSqr<float>, OpSqr<float> >
-#define reduceSum2C32f32f reduceC_<float, float, OpAddSqr<float>, OpSqr<float> >
-#define reduceSum2C64f64f reduceC_<double,double,OpAddSqr<double>,OpSqr<double> >
+#define reduceSum2C8u32s  reduceC_<uchar, പൂർണ്ണസംഖ്യ,   OpAddSqr<പൂർണ്ണസംഖ്യ>,   OpSqr<പൂർണ്ണസംഖ്യ> >
+#define reduceSum2C8u32f  reduceC_<uchar, ദശാംശം, OpAddSqr<പൂർണ്ണസംഖ്യ>,   OpSqr<പൂർണ്ണസംഖ്യ> >
+#define reduceSum2C16u32f reduceC_<ushort,ദശാംശം, OpAddSqr<ദശാംശം>, OpSqr<ദശാംശം> >
+#define reduceSum2C16s32f reduceC_<short, ദശാംശം, OpAddSqr<ദശാംശം>, OpSqr<ദശാംശം> >
+#define reduceSum2C32f32f reduceC_<ദശാംശം, ദശാംശം, OpAddSqr<ദശാംശം>, OpSqr<ദശാംശം> >
+#define reduceSum2C64f64f reduceC_<ഇരട്ട,ഇരട്ട,OpAddSqr<ഇരട്ട>,OpSqr<ഇരട്ട> >
 
-#if defined(HAVE_IPP) && !IPP_DISABLE_REDUCE
+#എങ്കിൽ defined(HAVE_IPP) && !IPP_DISABLE_REDUCE
 #define reduceSumC8u64f  reduceSumC_8u16u16s32f_64f
 #define reduceSumC16u64f reduceSumC_8u16u16s32f_64f
 #define reduceSumC16s64f reduceSumC_8u16u16s32f_64f
 #define reduceSumC32f64f reduceSumC_8u16u16s32f_64f
-#else
-#define reduceSumC8u64f  reduceC_<uchar, double,OpAdd<int>, OpNop<int> >
-#define reduceSumC16u64f reduceC_<ushort,double,OpAdd<double> >
-#define reduceSumC16s64f reduceC_<short, double,OpAdd<double> >
-#define reduceSumC32f64f reduceC_<float, double,OpAdd<double> >
+#അല്ലെങ്കിൽ
+#define reduceSumC8u64f  reduceC_<uchar, ഇരട്ട,OpAdd<പൂർണ്ണസംഖ്യ>, OpNop<പൂർണ്ണസംഖ്യ> >
+#define reduceSumC16u64f reduceC_<ushort,ഇരട്ട,OpAdd<ഇരട്ട> >
+#define reduceSumC16s64f reduceC_<short, ഇരട്ട,OpAdd<ഇരട്ട> >
+#define reduceSumC32f64f reduceC_<ദശാംശം, ഇരട്ട,OpAdd<ഇരട്ട> >
 #endif
 
-#define reduceSum2C8u64f  reduceC_<uchar, double,OpAddSqr<int>,   OpSqr<int> >
-#define reduceSum2C16u64f reduceC_<ushort,double,OpAddSqr<double>,OpSqr<double> >
-#define reduceSum2C16s64f reduceC_<short, double,OpAddSqr<double>,OpSqr<double> >
-#define reduceSum2C32f64f reduceC_<float, double,OpAddSqr<double>,OpSqr<double> >
+#define reduceSum2C8u64f  reduceC_<uchar, ഇരട്ട,OpAddSqr<പൂർണ്ണസംഖ്യ>,   OpSqr<പൂർണ്ണസംഖ്യ> >
+#define reduceSum2C16u64f reduceC_<ushort,ഇരട്ട,OpAddSqr<ഇരട്ട>,OpSqr<ഇരട്ട> >
+#define reduceSum2C16s64f reduceC_<short, ഇരട്ട,OpAddSqr<ഇരട്ട>,OpSqr<ഇരട്ട> >
+#define reduceSum2C32f64f reduceC_<ദശാംശം, ഇരട്ട,OpAddSqr<ഇരട്ട>,OpSqr<ഇരട്ട> >
 
-#if defined(HAVE_IPP) && !IPP_DISABLE_REDUCE
+#എങ്കിൽ defined(HAVE_IPP) && !IPP_DISABLE_REDUCE
 #define REDUCE_OP(favor, optype, type1, type2) \
-static inline bool ipp_reduce##optype##C##favor(const cv::Mat& srcmat, cv::Mat& dstmat) \
+സ്ഥിതം വരിയിൽ തർക്കം ipp_reduce##optype##C##favor(സ്ഥിരം cv::Mat& srcmat, cv::Mat& dstmat) \
 { \
-    if((srcmat.channels() == 1)) \
+    എങ്കിൽ((srcmat.channels() == 1)) \
     { \
-        int sstep = (int)srcmat.step; \
-        typedef Ipp##favor IppType; \
+        പൂർണ്ണസംഖ്യ sstep = (പൂർണ്ണസംഖ്യ)srcmat.step; \
+        തരനിർവചനം Ipp##favor IppType; \
         IppiSize roisize = ippiSize(srcmat.size().width, 1);\
-        for(int y = 0; y < srcmat.size().height; y++)\
+        വേണ്ടി(പൂർണ്ണസംഖ്യ y = 0; y < srcmat.size().height; y++)\
         {\
-            if(CV_INSTRUMENT_FUN_IPP(ippi##optype##_##favor##_C1R, srcmat.ptr<IppType>(y), sstep, roisize, dstmat.ptr<IppType>(y)) < 0)\
-                return false;\
+            എങ്കിൽ(CV_INSTRUMENT_FUN_IPP(ippi##optype##_##favor##_C1R, srcmat.ptr<IppType>(y), sstep, roisize, dstmat.ptr<IppType>(y)) < 0)\
+                തിരികെ അസത്യം;\
         }\
-        return true;\
+        തിരികെ സത്യം;\
     }\
-    return false; \
+    തിരികെ അസത്യം; \
 } \
-static inline void reduce##optype##C##favor(const cv::Mat& srcmat, cv::Mat& dstmat) \
+സ്ഥിതം വരിയിൽ ശൂന്യം reduce##optype##C##favor(സ്ഥിരം cv::Mat& srcmat, cv::Mat& dstmat) \
 { \
     CV_IPP_RUN_FAST(ipp_reduce##optype##C##favor(srcmat, dstmat)); \
     cv::reduceC_ < type1, type2, cv::Op##optype < type2 > >(srcmat, dstmat); \
 }
 #endif
 
-#if defined(HAVE_IPP) && !IPP_DISABLE_REDUCE
+#എങ്കിൽ defined(HAVE_IPP) && !IPP_DISABLE_REDUCE
 REDUCE_OP(8u, Max, uchar, uchar)
 REDUCE_OP(16u, Max, ushort, ushort)
 REDUCE_OP(16s, Max, short, short)
-REDUCE_OP(32f, Max, float, float)
-#else
+REDUCE_OP(32f, Max, ദശാംശം, ദശാംശം)
+#അല്ലെങ്കിൽ
 #define reduceMaxC8u  reduceC_<uchar, uchar, OpMax<uchar> >
 #define reduceMaxC16u reduceC_<ushort,ushort,OpMax<ushort> >
 #define reduceMaxC16s reduceC_<short, short, OpMax<short> >
-#define reduceMaxC32f reduceC_<float, float, OpMax<float> >
+#define reduceMaxC32f reduceC_<ദശാംശം, ദശാംശം, OpMax<ദശാംശം> >
 #endif
-#define reduceMaxC64f reduceC_<double,double,OpMax<double> >
+#define reduceMaxC64f reduceC_<ഇരട്ട,ഇരട്ട,OpMax<ഇരട്ട> >
 
-#if defined(HAVE_IPP) && !IPP_DISABLE_REDUCE
+#എങ്കിൽ defined(HAVE_IPP) && !IPP_DISABLE_REDUCE
 REDUCE_OP(8u, Min, uchar, uchar)
 REDUCE_OP(16u, Min, ushort, ushort)
 REDUCE_OP(16s, Min, short, short)
-REDUCE_OP(32f, Min, float, float)
-#else
+REDUCE_OP(32f, Min, ദശാംശം, ദശാംശം)
+#അല്ലെങ്കിൽ
 #define reduceMinC8u  reduceC_<uchar, uchar, OpMin<uchar> >
 #define reduceMinC16u reduceC_<ushort,ushort,OpMin<ushort> >
 #define reduceMinC16s reduceC_<short, short, OpMin<short> >
-#define reduceMinC32f reduceC_<float, float, OpMin<float> >
+#define reduceMinC32f reduceC_<ദശാംശം, ദശാംശം, OpMin<ദശാംശം> >
 #endif
-#define reduceMinC64f reduceC_<double,double,OpMin<double> >
+#define reduceMinC64f reduceC_<ഇരട്ട,ഇരട്ട,OpMin<ഇരട്ട> >
 
 #ifdef HAVE_OPENCL
 
-namespace cv {
+നാമാകാശ cv {
 
-static bool ocl_reduce(InputArray _src, OutputArray _dst,
-                       int dim, int op, int op0, int stype, int dtype)
+സ്ഥിതം തർക്കം ocl_reduce(നിവേശം_Array _src, OutputArray _dst,
+                       പൂർണ്ണസംഖ്യ dim, പൂർണ്ണസംഖ്യ op, പൂർണ്ണസംഖ്യ op0, പൂർണ്ണസംഖ്യ stype, പൂർണ്ണസംഖ്യ dtype)
 {
-    const int min_opt_cols = 128, buf_cols = 32;
-    int sdepth = CV_MAT_DEPTH(stype), cn = CV_MAT_CN(stype),
+    സ്ഥിരം പൂർണ്ണസംഖ്യ min_opt_cols = 128, buf_cols = 32;
+    പൂർണ്ണസംഖ്യ sdepth = CV_MAT_DEPTH(stype), cn = CV_MAT_CN(stype),
             ddepth = CV_MAT_DEPTH(dtype), ddepth0 = ddepth;
-    const ocl::Device &defDev = ocl::Device::getDefault();
-    bool doubleSupport = defDev.doubleFPConfig() > 0;
+    സ്ഥിരം ocl::Device &defDev = ocl::Device::getDefault();
+    തർക്കം doubleSupport = defDev.doubleFPConfig() > 0;
 
     size_t wgs = defDev.maxWorkGroupSize();
-    bool useOptimized = 1 == dim && _src.cols() > min_opt_cols && (wgs >= buf_cols);
+    തർക്കം useOptimized = 1 == dim && _src.cols() > min_opt_cols && (wgs >= buf_cols);
 
-    if (!doubleSupport && (sdepth == CV_64F || ddepth == CV_64F))
-        return false;
+    എങ്കിൽ (!doubleSupport && (sdepth == CV_64F || ddepth == CV_64F))
+        തിരികെ അസത്യം;
 
-    if (op == REDUCE_AVG)
+    എങ്കിൽ (op == REDUCE_AVG)
     {
-        if (sdepth < CV_32S && ddepth < CV_32S)
+        എങ്കിൽ (sdepth < CV_32S && ddepth < CV_32S)
             ddepth = CV_32S;
     }
 
-    const char * const ops[5] = { "OCL_CV_REDUCE_SUM", "OCL_CV_REDUCE_AVG",
+    സ്ഥിരം അക്ഷരം * സ്ഥിരം ops[5] = { "OCL_CV_REDUCE_SUM", "OCL_CV_REDUCE_AVG",
                                   "OCL_CV_REDUCE_MAX", "OCL_CV_REDUCE_MIN",
                                   "OCL_CV_REDUCE_SUM2"};
-    int wdepth = std::max(ddepth, CV_32F);
-    if (useOptimized)
+    പൂർണ്ണസംഖ്യ wdepth = std::max(ddepth, CV_32F);
+    എങ്കിൽ (useOptimized)
     {
         size_t tileHeight = (size_t)(wgs / buf_cols);
-        if (defDev.isIntel())
+        എങ്കിൽ (defDev.isIntel())
         {
-            static const size_t maxItemInGroupCount = 16;
-            tileHeight = min(tileHeight, defDev.localMemSize() / buf_cols / CV_ELEM_SIZE(CV_MAKETYPE(wdepth, cn)) / maxItemInGroupCount);
+            സ്ഥിതം സ്ഥിരം size_t max_Item_In_Group_എണ്ണം = 16;
+            tileHeight = min(tileHeight, defDev.localMemSize() / buf_cols / CV_ELEM_SIZE(CV_MAKETYPE(wdepth, cn)) / max_Item_In_Group_എണ്ണം);
         }
-        char cvt[3][50];
+        അക്ഷരം cvt[3][50];
         cv::String build_opt = format("-D OP_REDUCE_PRE -D BUF_COLS=%d -D TILE_HEIGHT=%zu -D %s -D dim=1"
                                             " -D cn=%d -D ddepth=%d"
                                             " -D srcT=%s -D bufT=%s -D dstT=%s"
@@ -699,45 +699,45 @@ static bool ocl_reduce(InputArray _src, OutputArray _dst,
                                             ocl::typeToStr(sdepth),
                                             ocl::typeToStr(ddepth),
                                             ocl::typeToStr(ddepth0),
-                                            ocl::convertTypeStr(ddepth, wdepth, 1, cvt[0], sizeof(cvt[0])),
-                                            ocl::convertTypeStr(sdepth, ddepth, 1, cvt[1], sizeof(cvt[1])),
-                                            ocl::convertTypeStr(wdepth, ddepth0, 1, cvt[2], sizeof(cvt[2])),
+                                            ocl::convertTypeStr(ddepth, wdepth, 1, cvt[0], വലുപ്പം(cvt[0])),
+                                            ocl::convertTypeStr(sdepth, ddepth, 1, cvt[1], വലുപ്പം(cvt[1])),
+                                            ocl::convertTypeStr(wdepth, ddepth0, 1, cvt[2], വലുപ്പം(cvt[2])),
                                             doubleSupport ? " -D DOUBLE_SUPPORT" : "");
         ocl::Kernel k("reduce_horz_opt", ocl::core::reduce2_oclsrc, build_opt);
-        if (k.empty())
-            return false;
+        എങ്കിൽ (k.empty())
+            തിരികെ അസത്യം;
         UMat src = _src.getUMat();
         Size dsize(1, src.rows);
         _dst.create(dsize, dtype);
         UMat dst = _dst.getUMat();
 
-        if (op0 == REDUCE_AVG)
+        എങ്കിൽ (op0 == REDUCE_AVG)
             k.args(ocl::KernelArg::ReadOnly(src),
                       ocl::KernelArg::WriteOnlyNoSize(dst), 1.0f / src.cols);
-        else
+        അല്ലെങ്കിൽ
             k.args(ocl::KernelArg::ReadOnly(src),
                       ocl::KernelArg::WriteOnlyNoSize(dst));
 
         size_t localSize[2] = { (size_t)buf_cols, (size_t)tileHeight};
         size_t globalSize[2] = { (size_t)buf_cols, (size_t)src.rows };
-        return k.run(2, globalSize, localSize, false);
+        തിരികെ k.run(2, globalSize, localSize, അസത്യം);
     }
-    else
+    അല്ലെങ്കിൽ
     {
-        char cvt[2][50];
+        അക്ഷരം cvt[2][50];
         cv::String build_opt = format("-D %s -D dim=%d -D cn=%d -D ddepth=%d"
                                       " -D srcT=%s -D dstT=%s -D dstT0=%s -D convertToWT=%s"
                                       " -D convertToDT=%s -D convertToDT0=%s%s",
                                       ops[op], dim, cn, ddepth, ocl::typeToStr(useOptimized ? ddepth : sdepth),
                                       ocl::typeToStr(ddepth), ocl::typeToStr(ddepth0),
-                                      ocl::convertTypeStr(ddepth, wdepth, 1, cvt[0], sizeof(cvt[0])),
-                                      ocl::convertTypeStr(sdepth, ddepth, 1, cvt[0], sizeof(cvt[0])),
-                                      ocl::convertTypeStr(wdepth, ddepth0, 1, cvt[1], sizeof(cvt[1])),
+                                      ocl::convertTypeStr(ddepth, wdepth, 1, cvt[0], വലുപ്പം(cvt[0])),
+                                      ocl::convertTypeStr(sdepth, ddepth, 1, cvt[0], വലുപ്പം(cvt[0])),
+                                      ocl::convertTypeStr(wdepth, ddepth0, 1, cvt[1], വലുപ്പം(cvt[1])),
                                       doubleSupport ? " -D DOUBLE_SUPPORT" : "");
 
         ocl::Kernel k("reduce", ocl::core::reduce2_oclsrc, build_opt);
-        if (k.empty())
-            return false;
+        എങ്കിൽ (k.empty())
+            തിരികെ അസത്യം;
 
         UMat src = _src.getUMat();
         Size dsize(dim == 0 ? src.cols : 1, dim == 0 ? 1 : src.rows);
@@ -747,13 +747,13 @@ static bool ocl_reduce(InputArray _src, OutputArray _dst,
         ocl::KernelArg srcarg = ocl::KernelArg::ReadOnly(src),
                 temparg = ocl::KernelArg::WriteOnlyNoSize(dst);
 
-        if (op0 == REDUCE_AVG)
+        എങ്കിൽ (op0 == REDUCE_AVG)
             k.args(srcarg, temparg, 1.0f / (dim == 0 ? src.rows : src.cols));
-        else
+        അല്ലെങ്കിൽ
             k.args(srcarg, temparg);
 
         size_t globalsize = std::max(dsize.width, dsize.height);
-        return k.run(1, &globalsize, NULL, false);
+        തിരികെ k.run(1, &globalsize, ശൂന്യ, അസത്യം);
     }
 }
 
@@ -761,23 +761,23 @@ static bool ocl_reduce(InputArray _src, OutputArray _dst,
 
 #endif
 
-void cv::reduce(InputArray _src, OutputArray _dst, int dim, int op, int dtype)
+ശൂന്യം cv::reduce(നിവേശം_Array _src, OutputArray _dst, പൂർണ്ണസംഖ്യ dim, പൂർണ്ണസംഖ്യ op, പൂർണ്ണസംഖ്യ dtype)
 {
     CV_INSTRUMENT_REGION();
 
-    if (_src.dims() > 2 || op > REDUCE_SUM2)
+    എങ്കിൽ (_src.dims() > 2 || op > REDUCE_SUM2)
     {
         CV_CheckGE(dim, -_src.dims(), "reduce: dim is out of range");
         CV_CheckLT(dim, _src.dims(), "reduce: dim is out of range");
-        cv::reduce(_src, _dst, cv::ReduceParams(op, {dim}, true, dtype < 0 && _dst.fixedType() ? _dst.depth() : dtype));
-        return;
+        cv::reduce(_src, _dst, cv::ReduceParams(op, {dim}, സത്യം, dtype < 0 && _dst.fixedType() ? _dst.depth() : dtype));
+        തിരികെ;
     }
-    int op0 = op;
-    int stype = _src.type(), sdepth = CV_MAT_DEPTH(stype), cn = CV_MAT_CN(stype);
-    if( dtype < 0 )
+    പൂർണ്ണസംഖ്യ op0 = op;
+    പൂർണ്ണസംഖ്യ stype = _src.type(), sdepth = CV_MAT_DEPTH(stype), cn = CV_MAT_CN(stype);
+    എങ്കിൽ( dtype < 0 )
         dtype = _dst.fixedType() ? _dst.type() : stype;
     dtype = CV_MAKETYPE(dtype >= 0 ? dtype : stype, cn);
-    int ddepth = CV_MAT_DEPTH(dtype);
+    പൂർണ്ണസംഖ്യ ddepth = CV_MAT_DEPTH(dtype);
 
     CV_Assert( cn == CV_MAT_CN(dtype) );
     CV_Assert( op == REDUCE_SUM || op == REDUCE_MAX ||
@@ -789,15 +789,15 @@ void cv::reduce(InputArray _src, OutputArray _dst, int dim, int op, int dtype)
 
     // Fake reference to source. Resolves issue 8693 in case of src == dst.
     UMat srcUMat;
-    if (_src.isUMat())
+    എങ്കിൽ (_src.isUMat())
         srcUMat = _src.getUMat();
 
     Mat src = _src.getMat();
-    if (src.empty()) {
+    എങ്കിൽ (src.empty()) {
         src.convertTo(_dst, dtype);
-        return;
+        തിരികെ;
     }
-    if (src.dims <= 1) {
+    എങ്കിൽ (src.dims <= 1) {
         CV_Assert(dim == 0);
         dim = 1;
     }
@@ -805,10 +805,10 @@ void cv::reduce(InputArray _src, OutputArray _dst, int dim, int op, int dtype)
     _dst.create(dim == 0 ? 1 : src.rows, dim == 0 ? src.cols : 1, dtype);
     Mat dst = _dst.getMat(), temp = dst;
 
-    if( op == REDUCE_AVG )
+    എങ്കിൽ( op == REDUCE_AVG )
     {
         op = REDUCE_SUM;
-        if( sdepth < CV_32S && ddepth < CV_32S )
+        എങ്കിൽ( sdepth < CV_32S && ddepth < CV_32S )
         {
             temp.create(dst.rows, dst.cols, CV_32SC(cn));
             ddepth = CV_32S;
@@ -816,255 +816,255 @@ void cv::reduce(InputArray _src, OutputArray _dst, int dim, int op, int dtype)
     }
 
     ReduceFunc func = 0;
-    if( dim == 0 )
+    എങ്കിൽ( dim == 0 )
     {
-        if( op == REDUCE_SUM )
+        എങ്കിൽ( op == REDUCE_SUM )
         {
             ReduceSumFunc simd_func = getReduceRSumFunc(sdepth, ddepth);
-            if(simd_func)
+            എങ്കിൽ(simd_func)
                 func = (ReduceFunc)simd_func;
-            else if(sdepth == CV_8U && ddepth == CV_32S)
+            അല്ലെങ്കിൽ എങ്കിൽ(sdepth == CV_8U && ddepth == CV_32S)
                 func = reduceSumR8u32s;
-            else if(sdepth == CV_8U && ddepth == CV_32F)
+            അല്ലെങ്കിൽ എങ്കിൽ(sdepth == CV_8U && ddepth == CV_32F)
                 func = reduceSumR8u32f;
-            else if(sdepth == CV_8U && ddepth == CV_64F)
+            അല്ലെങ്കിൽ എങ്കിൽ(sdepth == CV_8U && ddepth == CV_64F)
                 func = reduceSumR8u64f;
-            else if(sdepth == CV_16U && ddepth == CV_32F)
+            അല്ലെങ്കിൽ എങ്കിൽ(sdepth == CV_16U && ddepth == CV_32F)
                 func = reduceSumR16u32f;
-            else if(sdepth == CV_16U && ddepth == CV_64F)
+            അല്ലെങ്കിൽ എങ്കിൽ(sdepth == CV_16U && ddepth == CV_64F)
                 func = reduceSumR16u64f;
-            else if(sdepth == CV_16S && ddepth == CV_32F)
+            അല്ലെങ്കിൽ എങ്കിൽ(sdepth == CV_16S && ddepth == CV_32F)
                 func = reduceSumR16s32f;
-            else if(sdepth == CV_16S && ddepth == CV_64F)
+            അല്ലെങ്കിൽ എങ്കിൽ(sdepth == CV_16S && ddepth == CV_64F)
                 func = reduceSumR16s64f;
-            else if(sdepth == CV_32F && ddepth == CV_32F)
+            അല്ലെങ്കിൽ എങ്കിൽ(sdepth == CV_32F && ddepth == CV_32F)
                 func = reduceSumR32f32f;
-            else if(sdepth == CV_32F && ddepth == CV_64F)
+            അല്ലെങ്കിൽ എങ്കിൽ(sdepth == CV_32F && ddepth == CV_64F)
                 func = reduceSumR32f64f;
-            else if(sdepth == CV_64F && ddepth == CV_64F)
+            അല്ലെങ്കിൽ എങ്കിൽ(sdepth == CV_64F && ddepth == CV_64F)
                 func = reduceSumR64f64f;
         }
-        else if(op == REDUCE_MAX)
+        അല്ലെങ്കിൽ എങ്കിൽ(op == REDUCE_MAX)
         {
-            if(sdepth == CV_8U && ddepth == CV_8U)
+            എങ്കിൽ(sdepth == CV_8U && ddepth == CV_8U)
                 func = reduceMaxR8u;
-            else if(sdepth == CV_16U && ddepth == CV_16U)
+            അല്ലെങ്കിൽ എങ്കിൽ(sdepth == CV_16U && ddepth == CV_16U)
                 func = reduceMaxR16u;
-            else if(sdepth == CV_16S && ddepth == CV_16S)
+            അല്ലെങ്കിൽ എങ്കിൽ(sdepth == CV_16S && ddepth == CV_16S)
                 func = reduceMaxR16s;
-            else if(sdepth == CV_32F && ddepth == CV_32F)
+            അല്ലെങ്കിൽ എങ്കിൽ(sdepth == CV_32F && ddepth == CV_32F)
                 func = reduceMaxR32f;
-            else if(sdepth == CV_64F && ddepth == CV_64F)
+            അല്ലെങ്കിൽ എങ്കിൽ(sdepth == CV_64F && ddepth == CV_64F)
                 func = reduceMaxR64f;
         }
-        else if(op == REDUCE_MIN)
+        അല്ലെങ്കിൽ എങ്കിൽ(op == REDUCE_MIN)
         {
-            if(sdepth == CV_8U && ddepth == CV_8U)
+            എങ്കിൽ(sdepth == CV_8U && ddepth == CV_8U)
                 func = reduceMinR8u;
-            else if(sdepth == CV_16U && ddepth == CV_16U)
+            അല്ലെങ്കിൽ എങ്കിൽ(sdepth == CV_16U && ddepth == CV_16U)
                 func = reduceMinR16u;
-            else if(sdepth == CV_16S && ddepth == CV_16S)
+            അല്ലെങ്കിൽ എങ്കിൽ(sdepth == CV_16S && ddepth == CV_16S)
                 func = reduceMinR16s;
-            else if(sdepth == CV_32F && ddepth == CV_32F)
+            അല്ലെങ്കിൽ എങ്കിൽ(sdepth == CV_32F && ddepth == CV_32F)
                 func = reduceMinR32f;
-            else if(sdepth == CV_64F && ddepth == CV_64F)
+            അല്ലെങ്കിൽ എങ്കിൽ(sdepth == CV_64F && ddepth == CV_64F)
                 func = reduceMinR64f;
         }
-        else if( op == REDUCE_SUM2 )
+        അല്ലെങ്കിൽ എങ്കിൽ( op == REDUCE_SUM2 )
         {
             ReduceSumFunc simd_func = getReduceRSum2Func(sdepth, ddepth);
-            if(simd_func)
+            എങ്കിൽ(simd_func)
                 func = simd_func;
-            else if(sdepth == CV_8U && ddepth == CV_32S)
+            അല്ലെങ്കിൽ എങ്കിൽ(sdepth == CV_8U && ddepth == CV_32S)
                 func = reduceSum2R8u32s;
-            else if(sdepth == CV_8U && ddepth == CV_32F)
+            അല്ലെങ്കിൽ എങ്കിൽ(sdepth == CV_8U && ddepth == CV_32F)
                 func = reduceSum2R8u32f;
-            else if(sdepth == CV_8U && ddepth == CV_64F)
+            അല്ലെങ്കിൽ എങ്കിൽ(sdepth == CV_8U && ddepth == CV_64F)
                 func = reduceSum2R8u64f;
-            else if(sdepth == CV_16U && ddepth == CV_32F)
+            അല്ലെങ്കിൽ എങ്കിൽ(sdepth == CV_16U && ddepth == CV_32F)
                 func = reduceSum2R16u32f;
-            else if(sdepth == CV_16U && ddepth == CV_64F)
+            അല്ലെങ്കിൽ എങ്കിൽ(sdepth == CV_16U && ddepth == CV_64F)
                 func = reduceSum2R16u64f;
-            else if(sdepth == CV_16S && ddepth == CV_32F)
+            അല്ലെങ്കിൽ എങ്കിൽ(sdepth == CV_16S && ddepth == CV_32F)
                 func = reduceSum2R16s32f;
-            else if(sdepth == CV_16S && ddepth == CV_64F)
+            അല്ലെങ്കിൽ എങ്കിൽ(sdepth == CV_16S && ddepth == CV_64F)
                 func = reduceSum2R16s64f;
-            else if(sdepth == CV_32F && ddepth == CV_32F)
+            അല്ലെങ്കിൽ എങ്കിൽ(sdepth == CV_32F && ddepth == CV_32F)
                 func = reduceSum2R32f32f;
-            else if(sdepth == CV_32F && ddepth == CV_64F)
+            അല്ലെങ്കിൽ എങ്കിൽ(sdepth == CV_32F && ddepth == CV_64F)
                 func = reduceSum2R32f64f;
-            else if(sdepth == CV_64F && ddepth == CV_64F)
+            അല്ലെങ്കിൽ എങ്കിൽ(sdepth == CV_64F && ddepth == CV_64F)
                 func = reduceSum2R64f64f;
         }
     }
-    else
+    അല്ലെങ്കിൽ
     {
-        if(op == REDUCE_SUM)
+        എങ്കിൽ(op == REDUCE_SUM)
         {
             ReduceSumFunc simd_func = getReduceCSumFunc(sdepth, ddepth);
-            if(simd_func)
+            എങ്കിൽ(simd_func)
                 func = (ReduceFunc)simd_func;
-            else if(sdepth == CV_8U && ddepth == CV_32S)
+            അല്ലെങ്കിൽ എങ്കിൽ(sdepth == CV_8U && ddepth == CV_32S)
                 func = reduceSumC8u32s;
-            else if(sdepth == CV_8U && ddepth == CV_32F)
+            അല്ലെങ്കിൽ എങ്കിൽ(sdepth == CV_8U && ddepth == CV_32F)
                 func = reduceSumC8u32f;
-            else if(sdepth == CV_8U && ddepth == CV_64F)
+            അല്ലെങ്കിൽ എങ്കിൽ(sdepth == CV_8U && ddepth == CV_64F)
                 func = reduceSumC8u64f;
-            else if(sdepth == CV_16U && ddepth == CV_32F)
+            അല്ലെങ്കിൽ എങ്കിൽ(sdepth == CV_16U && ddepth == CV_32F)
                 func = reduceSumC16u32f;
-            else if(sdepth == CV_16U && ddepth == CV_64F)
+            അല്ലെങ്കിൽ എങ്കിൽ(sdepth == CV_16U && ddepth == CV_64F)
                 func = reduceSumC16u64f;
-            else if(sdepth == CV_16S && ddepth == CV_32F)
+            അല്ലെങ്കിൽ എങ്കിൽ(sdepth == CV_16S && ddepth == CV_32F)
                 func = reduceSumC16s32f;
-            else if(sdepth == CV_16S && ddepth == CV_64F)
+            അല്ലെങ്കിൽ എങ്കിൽ(sdepth == CV_16S && ddepth == CV_64F)
                 func = reduceSumC16s64f;
-            else if(sdepth == CV_32F && ddepth == CV_32F)
+            അല്ലെങ്കിൽ എങ്കിൽ(sdepth == CV_32F && ddepth == CV_32F)
                 func = reduceSumC32f32f;
-            else if(sdepth == CV_32F && ddepth == CV_64F)
+            അല്ലെങ്കിൽ എങ്കിൽ(sdepth == CV_32F && ddepth == CV_64F)
                 func = reduceSumC32f64f;
-            else if(sdepth == CV_64F && ddepth == CV_64F)
+            അല്ലെങ്കിൽ എങ്കിൽ(sdepth == CV_64F && ddepth == CV_64F)
                 func = reduceSumC64f64f;
         }
-        else if(op == REDUCE_MAX)
+        അല്ലെങ്കിൽ എങ്കിൽ(op == REDUCE_MAX)
         {
-            if(sdepth == CV_8U && ddepth == CV_8U)
+            എങ്കിൽ(sdepth == CV_8U && ddepth == CV_8U)
                 func = reduceMaxC8u;
-            else if(sdepth == CV_16U && ddepth == CV_16U)
+            അല്ലെങ്കിൽ എങ്കിൽ(sdepth == CV_16U && ddepth == CV_16U)
                 func = reduceMaxC16u;
-            else if(sdepth == CV_16S && ddepth == CV_16S)
+            അല്ലെങ്കിൽ എങ്കിൽ(sdepth == CV_16S && ddepth == CV_16S)
                 func = reduceMaxC16s;
-            else if(sdepth == CV_32F && ddepth == CV_32F)
+            അല്ലെങ്കിൽ എങ്കിൽ(sdepth == CV_32F && ddepth == CV_32F)
                 func = reduceMaxC32f;
-            else if(sdepth == CV_64F && ddepth == CV_64F)
+            അല്ലെങ്കിൽ എങ്കിൽ(sdepth == CV_64F && ddepth == CV_64F)
                 func = reduceMaxC64f;
         }
-        else if(op == REDUCE_MIN)
+        അല്ലെങ്കിൽ എങ്കിൽ(op == REDUCE_MIN)
         {
-            if(sdepth == CV_8U && ddepth == CV_8U)
+            എങ്കിൽ(sdepth == CV_8U && ddepth == CV_8U)
                 func = reduceMinC8u;
-            else if(sdepth == CV_16U && ddepth == CV_16U)
+            അല്ലെങ്കിൽ എങ്കിൽ(sdepth == CV_16U && ddepth == CV_16U)
                 func = reduceMinC16u;
-            else if(sdepth == CV_16S && ddepth == CV_16S)
+            അല്ലെങ്കിൽ എങ്കിൽ(sdepth == CV_16S && ddepth == CV_16S)
                 func = reduceMinC16s;
-            else if(sdepth == CV_32F && ddepth == CV_32F)
+            അല്ലെങ്കിൽ എങ്കിൽ(sdepth == CV_32F && ddepth == CV_32F)
                 func = reduceMinC32f;
-            else if(sdepth == CV_64F && ddepth == CV_64F)
+            അല്ലെങ്കിൽ എങ്കിൽ(sdepth == CV_64F && ddepth == CV_64F)
                 func = reduceMinC64f;
         }
-        else if(op == REDUCE_SUM2)
+        അല്ലെങ്കിൽ എങ്കിൽ(op == REDUCE_SUM2)
         {
-            if(sdepth == CV_8U && ddepth == CV_32S)
+            എങ്കിൽ(sdepth == CV_8U && ddepth == CV_32S)
                 func = reduceSum2C8u32s;
-            else if(sdepth == CV_8U && ddepth == CV_32F)
+            അല്ലെങ്കിൽ എങ്കിൽ(sdepth == CV_8U && ddepth == CV_32F)
                 func = reduceSum2C8u32f;
-            else if(sdepth == CV_8U && ddepth == CV_64F)
+            അല്ലെങ്കിൽ എങ്കിൽ(sdepth == CV_8U && ddepth == CV_64F)
                 func = reduceSum2C8u64f;
-            else if(sdepth == CV_16U && ddepth == CV_32F)
+            അല്ലെങ്കിൽ എങ്കിൽ(sdepth == CV_16U && ddepth == CV_32F)
                 func = reduceSum2C16u32f;
-            else if(sdepth == CV_16U && ddepth == CV_64F)
+            അല്ലെങ്കിൽ എങ്കിൽ(sdepth == CV_16U && ddepth == CV_64F)
                 func = reduceSum2C16u64f;
-            else if(sdepth == CV_16S && ddepth == CV_32F)
+            അല്ലെങ്കിൽ എങ്കിൽ(sdepth == CV_16S && ddepth == CV_32F)
                 func = reduceSum2C16s32f;
-            else if(sdepth == CV_16S && ddepth == CV_64F)
+            അല്ലെങ്കിൽ എങ്കിൽ(sdepth == CV_16S && ddepth == CV_64F)
                 func = reduceSum2C16s64f;
-            else if(sdepth == CV_32F && ddepth == CV_32F)
+            അല്ലെങ്കിൽ എങ്കിൽ(sdepth == CV_32F && ddepth == CV_32F)
                 func = reduceSum2C32f32f;
-            else if(sdepth == CV_32F && ddepth == CV_64F)
+            അല്ലെങ്കിൽ എങ്കിൽ(sdepth == CV_32F && ddepth == CV_64F)
                 func = reduceSum2C32f64f;
-            else if(sdepth == CV_64F && ddepth == CV_64F)
+            അല്ലെങ്കിൽ എങ്കിൽ(sdepth == CV_64F && ddepth == CV_64F)
                 func = reduceSum2C64f64f;
         }
     }
 
-    if( !func )
+    എങ്കിൽ( !func )
         CV_Error( cv::Error::StsUnsupportedFormat,
                   "Unsupported combination of input and output array formats" );
 
     func( src, temp );
 
-    if( op0 == REDUCE_AVG )
+    എങ്കിൽ( op0 == REDUCE_AVG )
         temp.convertTo(dst, dst.type(), 1./(dim == 0 ? src.rows : src.cols));
 }
 
 
 //////////////////////////////////////// sort ///////////////////////////////////////////
 
-namespace cv
+നാമാകാശ cv
 {
 
-template<typename T> static void sort_( const Mat& src, Mat& dst, int flags )
+template<typename T> സ്ഥിതം ശൂന്യം sort_( സ്ഥിരം Mat& src, Mat& dst, പൂർണ്ണസംഖ്യ flags )
 {
-    int n, len;
-    bool sortRows = (flags & 1) == SORT_EVERY_ROW;
-    bool inplace = src.data == dst.data;
-    bool sortDescending = (flags & SORT_DESCENDING) != 0;
+    പൂർണ്ണസംഖ്യ n, len;
+    തർക്കം sortRows = (flags & 1) == SORT_EVERY_ROW;
+    തർക്കം inplace = src.data == dst.data;
+    തർക്കം sortDescending = (flags & SORT_DESCENDING) != 0;
 
-    if( sortRows )
+    എങ്കിൽ( sortRows )
         n = src.rows, len = src.cols;
-    else
+    അല്ലെങ്കിൽ
         n = src.cols, len = src.rows;
-    parallel_for_(Range(0, n), [&](const Range& range)
+    parallel_for_(Range(0, n), [&](സ്ഥിരം Range& range)
     {
         AutoBuffer<T> buf;
-        if( !sortRows )
+        എങ്കിൽ( !sortRows )
             buf.allocate(len);
         T* bptr = buf.data();
 
-        for( int i = range.start; i < range.end; i++ )
+        വേണ്ടി( പൂർണ്ണസംഖ്യ i = range.start; i < range.end; i++ )
         {
             T* ptr = bptr;
-            if( sortRows )
+            എങ്കിൽ( sortRows )
             {
                 T* dptr = dst.ptr<T>(i);
-                if( !inplace )
+                എങ്കിൽ( !inplace )
                 {
-                    const T* sptr = src.ptr<T>(i);
-                    memcpy(dptr, sptr, sizeof(T) * len);
+                    സ്ഥിരം T* sptr = src.ptr<T>(i);
+                    memcpy(dptr, sptr, വലുപ്പം(T) * len);
                 }
                 ptr = dptr;
             }
-            else
+            അല്ലെങ്കിൽ
             {
-                for( int j = 0; j < len; j++ )
+                വേണ്ടി( പൂർണ്ണസംഖ്യ j = 0; j < len; j++ )
                     ptr[j] = src.ptr<T>(j)[i];
             }
 
             std::sort( ptr, ptr + len );
-            if( sortDescending )
+            എങ്കിൽ( sortDescending )
             {
-                for( int j = 0; j < len/2; j++ )
+                വേണ്ടി( പൂർണ്ണസംഖ്യ j = 0; j < len/2; j++ )
                     std::swap(ptr[j], ptr[len-1-j]);
             }
 
-            if( !sortRows )
-                for( int j = 0; j < len; j++ )
+            എങ്കിൽ( !sortRows )
+                വേണ്ടി( പൂർണ്ണസംഖ്യ j = 0; j < len; j++ )
                     dst.ptr<T>(j)[i] = ptr[j];
         }
     });
 }
 
 
-#if defined(HAVE_IPP) && !IPP_DISABLE_SORT
-typedef IppStatus (CV_STDCALL *IppSortFunc)(void  *pSrcDst, int    len, Ipp8u *pBuffer);
+#എങ്കിൽ defined(HAVE_IPP) && !IPP_DISABLE_SORT
+തരനിർവചനം IppStatus (CV_STDCALL *IppSortFunc)(ശൂന്യം  *pSrcDst, പൂർണ്ണസംഖ്യ    len, Ipp8u *pBuffer);
 
-template<typename T, IppStatus (CV_STDCALL *fn)(T*, int, Ipp8u*)>
-static IppStatus CV_STDCALL ippSortWrap(void* pSrcDst, int len, Ipp8u* pBuffer)
+template<typename T, IppStatus (CV_STDCALL *fn)(T*, പൂർണ്ണസംഖ്യ, Ipp8u*)>
+സ്ഥിതം IppStatus CV_STDCALL ippSortWrap(ശൂന്യം* pSrcDst, പൂർണ്ണസംഖ്യ len, Ipp8u* pBuffer)
 {
-    return fn((T*)pSrcDst, len, pBuffer);
+    തിരികെ fn((T*)pSrcDst, len, pBuffer);
 }
 
-static IppSortFunc getSortFunc(int depth, bool sortDescending)
+സ്ഥിതം IppSortFunc getSortFunc(പൂർണ്ണസംഖ്യ depth, തർക്കം sortDescending)
 {
-    if (!sortDescending)
-        return depth == CV_8U ? ippSortWrap<Ipp8u, ippsSortRadixAscend_8u_I> :
+    എങ്കിൽ (!sortDescending)
+        തിരികെ depth == CV_8U ? ippSortWrap<Ipp8u, ippsSortRadixAscend_8u_I> :
             depth == CV_16U ? ippSortWrap<Ipp16u, ippsSortRadixAscend_16u_I> :
             depth == CV_16S ? ippSortWrap<Ipp16s, ippsSortRadixAscend_16s_I> :
             depth == CV_32S ? ippSortWrap<Ipp32s, ippsSortRadixAscend_32s_I> :
             depth == CV_32F ? ippSortWrap<Ipp32f, ippsSortRadixAscend_32f_I> :
             depth == CV_64F ? ippSortWrap<Ipp64f, ippsSortRadixAscend_64f_I> :
             0;
-    else
-        return depth == CV_8U ? ippSortWrap<Ipp8u, ippsSortRadixDescend_8u_I> :
+    അല്ലെങ്കിൽ
+        തിരികെ depth == CV_8U ? ippSortWrap<Ipp8u, ippsSortRadixDescend_8u_I> :
             depth == CV_16U ? ippSortWrap<Ipp16u, ippsSortRadixDescend_16u_I> :
             depth == CV_16S ? ippSortWrap<Ipp16s, ippsSortRadixDescend_16s_I> :
             depth == CV_32S ? ippSortWrap<Ipp32s, ippsSortRadixDescend_32s_I> :
@@ -1073,68 +1073,68 @@ static IppSortFunc getSortFunc(int depth, bool sortDescending)
             0;
 }
 
-static bool ipp_sort(const Mat& src, Mat& dst, int flags)
+സ്ഥിതം തർക്കം ipp_sort(സ്ഥിരം Mat& src, Mat& dst, പൂർണ്ണസംഖ്യ flags)
 {
     CV_INSTRUMENT_REGION_IPP();
 
-    bool        sortRows        = (flags & 1) == SORT_EVERY_ROW;
-    bool        sortDescending  = (flags & SORT_DESCENDING) != 0;
-    bool        inplace         = (src.data == dst.data);
-    int         depth           = src.depth();
+    തർക്കം        sortRows        = (flags & 1) == SORT_EVERY_ROW;
+    തർക്കം        sortDescending  = (flags & SORT_DESCENDING) != 0;
+    തർക്കം        inplace         = (src.data == dst.data);
+    പൂർണ്ണസംഖ്യ         depth           = src.depth();
     IppDataType type            = ippiGetDataType(depth);
 
     IppSortFunc ippsSortRadix_I = getSortFunc(depth, sortDescending);
-    if(!ippsSortRadix_I)
-        return false;
+    എങ്കിൽ(!ippsSortRadix_I)
+        തിരികെ അസത്യം;
 
-    int n, len;
-    if( sortRows )
+    പൂർണ്ണസംഖ്യ n, len;
+    എങ്കിൽ( sortRows )
         n = src.rows, len = src.cols;
-    else
+    അല്ലെങ്കിൽ
         n = src.cols, len = src.rows;
 
-    int bufferSize;
-    if(ippsSortRadixGetBufferSize(len, type, &bufferSize) < 0)
-        return false;
+    പൂർണ്ണസംഖ്യ bufferSize;
+    എങ്കിൽ(ippsSortRadixGetBufferSize(len, type, &bufferSize) < 0)
+        തിരികെ അസത്യം;
 
     // Each row/column sorts independently, so parallelize over n like sort_ does.
     // IPP scratch (buffer) and per-column temporaries are thread-local; a shared flag
     // records IPP failures since the lambda cannot return from ipp_sort.
-    volatile bool ok = true;
-    parallel_for_(Range(0, n), [&](const Range& range)
+    അസ്ഥിര തർക്കം ok = സത്യം;
+    parallel_for_(Range(0, n), [&](സ്ഥിരം Range& range)
     {
         AutoBuffer<Ipp8u> buffer(bufferSize);
         Mat  row;
         Rect subRect(0,0,1,src.rows);
-        if( !sortRows )
+        എങ്കിൽ( !sortRows )
             row.create(1, src.rows, src.type());
 
-        for( int i = range.start; i < range.end; i++ )
+        വേണ്ടി( പൂർണ്ണസംഖ്യ i = range.start; i < range.end; i++ )
         {
-            if( !ok )
-                break;
-            void* ptr;
-            if( sortRows )
+            എങ്കിൽ( !ok )
+                നിർത്തുക;
+            ശൂന്യം* ptr;
+            എങ്കിൽ( sortRows )
             {
                 uchar* dptr = dst.ptr(i);
-                if( !inplace )
+                എങ്കിൽ( !inplace )
                     memcpy(dptr, src.ptr(i), src.cols * src.elemSize());
                 ptr = dptr;
             }
-            else
+            അല്ലെങ്കിൽ
             {
                 subRect.x = i;
                 Mat(src, subRect).copyTo(row);
                 ptr = row.ptr();
             }
 
-            if( CV_INSTRUMENT_FUN_IPP(ippsSortRadix_I, ptr, len, buffer.data()) < 0 )
+            എങ്കിൽ( CV_INSTRUMENT_FUN_IPP(ippsSortRadix_I, ptr, len, buffer.data()) < 0 )
             {
-                ok = false;
-                break;
+                ok = അസത്യം;
+                നിർത്തുക;
             }
 
-            if( !sortRows )
+            എങ്കിൽ( !sortRows )
             {
                 Mat dstSub(dst, subRect);
                 row = row.reshape(1, dstSub.rows);
@@ -1144,90 +1144,90 @@ static bool ipp_sort(const Mat& src, Mat& dst, int flags)
         }
     });
 
-    return ok;
+    തിരികെ ok;
 }
 #endif
 
-template<typename _Tp> class LessThanIdx
+template<typename _Tp> വർഗ്ഗം LessThanIdx
 {
-public:
-    LessThanIdx( const _Tp* _arr ) : arr(_arr) {}
-    bool operator()(int a, int b) const { return arr[a] < arr[b]; }
-    const _Tp* arr;
+പൊതു:
+    LessThanIdx( സ്ഥിരം _Tp* _arr ) : arr(_arr) {}
+    തർക്കം operator()(പൂർണ്ണസംഖ്യ a, പൂർണ്ണസംഖ്യ b) സ്ഥിരം { തിരികെ arr[a] < arr[b]; }
+    സ്ഥിരം _Tp* arr;
 };
 
-template<typename T> static void sortIdx_( const Mat& src, Mat& dst, int flags )
+template<typename T> സ്ഥിതം ശൂന്യം sortIdx_( സ്ഥിരം Mat& src, Mat& dst, പൂർണ്ണസംഖ്യ flags )
 {
     AutoBuffer<T> buf;
-    AutoBuffer<int> ibuf;
-    bool sortRows = (flags & 1) == SORT_EVERY_ROW;
-    bool sortDescending = (flags & SORT_DESCENDING) != 0;
+    AutoBuffer<പൂർണ്ണസംഖ്യ> ibuf;
+    തർക്കം sortRows = (flags & 1) == SORT_EVERY_ROW;
+    തർക്കം sortDescending = (flags & SORT_DESCENDING) != 0;
 
     CV_Assert( src.data != dst.data );
 
-    int n, len;
-    if( sortRows )
+    പൂർണ്ണസംഖ്യ n, len;
+    എങ്കിൽ( sortRows )
         n = src.rows, len = src.cols;
-    else
+    അല്ലെങ്കിൽ
     {
         n = src.cols, len = src.rows;
         buf.allocate(len);
         ibuf.allocate(len);
     }
     T* bptr = buf.data();
-    int* _iptr = ibuf.data();
+    പൂർണ്ണസംഖ്യ* _iptr = ibuf.data();
 
-    for( int i = 0; i < n; i++ )
+    വേണ്ടി( പൂർണ്ണസംഖ്യ i = 0; i < n; i++ )
     {
         T* ptr = bptr;
-        int* iptr = _iptr;
+        പൂർണ്ണസംഖ്യ* iptr = _iptr;
 
-        if( sortRows )
+        എങ്കിൽ( sortRows )
         {
             ptr = (T*)(src.data + src.step*i);
-            iptr = dst.ptr<int>(i);
+            iptr = dst.ptr<പൂർണ്ണസംഖ്യ>(i);
         }
-        else
+        അല്ലെങ്കിൽ
         {
-            for( int j = 0; j < len; j++ )
+            വേണ്ടി( പൂർണ്ണസംഖ്യ j = 0; j < len; j++ )
                 ptr[j] = src.ptr<T>(j)[i];
         }
-        for( int j = 0; j < len; j++ )
+        വേണ്ടി( പൂർണ്ണസംഖ്യ j = 0; j < len; j++ )
             iptr[j] = j;
 
         std::sort( iptr, iptr + len, LessThanIdx<T>(ptr) );
-        if( sortDescending )
+        എങ്കിൽ( sortDescending )
         {
-            for( int j = 0; j < len/2; j++ )
+            വേണ്ടി( പൂർണ്ണസംഖ്യ j = 0; j < len/2; j++ )
                 std::swap(iptr[j], iptr[len-1-j]);
         }
 
-        if( !sortRows )
-            for( int j = 0; j < len; j++ )
-                dst.ptr<int>(j)[i] = iptr[j];
+        എങ്കിൽ( !sortRows )
+            വേണ്ടി( പൂർണ്ണസംഖ്യ j = 0; j < len; j++ )
+                dst.ptr<പൂർണ്ണസംഖ്യ>(j)[i] = iptr[j];
     }
 }
 
-#if defined(HAVE_IPP) && !IPP_DISABLE_SORT
-typedef IppStatus (CV_STDCALL *IppSortIndexFunc)(const void*  pSrc, Ipp32s srcStrideBytes, Ipp32s *pDstIndx, int len, Ipp8u *pBuffer);
+#എങ്കിൽ defined(HAVE_IPP) && !IPP_DISABLE_SORT
+തരനിർവചനം IppStatus (CV_STDCALL *IppSortIndexFunc)(സ്ഥിരം ശൂന്യം*  pSrc, Ipp32s srcStrideBytes, Ipp32s *pDstIndx, പൂർണ്ണസംഖ്യ len, Ipp8u *pBuffer);
 
-template<typename T, IppStatus (CV_STDCALL *fn)(const T*, Ipp32s, Ipp32s*, int, Ipp8u*)>
-static IppStatus CV_STDCALL ippSortIndexWrap(const void* pSrc, Ipp32s srcStrideBytes, Ipp32s *pDstIndx, int len, Ipp8u *pBuffer)
+template<typename T, IppStatus (CV_STDCALL *fn)(സ്ഥിരം T*, Ipp32s, Ipp32s*, പൂർണ്ണസംഖ്യ, Ipp8u*)>
+സ്ഥിതം IppStatus CV_STDCALL ippSortIndexWrap(സ്ഥിരം ശൂന്യം* pSrc, Ipp32s srcStrideBytes, Ipp32s *pDstIndx, പൂർണ്ണസംഖ്യ len, Ipp8u *pBuffer)
 {
-    return fn((const T*)pSrc, srcStrideBytes, pDstIndx, len, pBuffer);
+    തിരികെ fn((സ്ഥിരം T*)pSrc, srcStrideBytes, pDstIndx, len, pBuffer);
 }
 
-static IppSortIndexFunc getSortIndexFunc(int depth, bool sortDescending)
+സ്ഥിതം IppSortIndexFunc getSortIndexFunc(പൂർണ്ണസംഖ്യ depth, തർക്കം sortDescending)
 {
-    if (!sortDescending)
-        return depth == CV_8U ? ippSortIndexWrap<Ipp8u, ippsSortRadixIndexAscend_8u> :
+    എങ്കിൽ (!sortDescending)
+        തിരികെ depth == CV_8U ? ippSortIndexWrap<Ipp8u, ippsSortRadixIndexAscend_8u> :
             depth == CV_16U ? ippSortIndexWrap<Ipp16u, ippsSortRadixIndexAscend_16u> :
             depth == CV_16S ? ippSortIndexWrap<Ipp16s, ippsSortRadixIndexAscend_16s> :
             depth == CV_32S ? ippSortIndexWrap<Ipp32s, ippsSortRadixIndexAscend_32s> :
             depth == CV_32F ? ippSortIndexWrap<Ipp32f, ippsSortRadixIndexAscend_32f> :
             0;
-    else
-        return depth == CV_8U ? ippSortIndexWrap<Ipp8u, ippsSortRadixIndexDescend_8u> :
+    അല്ലെങ്കിൽ
+        തിരികെ depth == CV_8U ? ippSortIndexWrap<Ipp8u, ippsSortRadixIndexDescend_8u> :
             depth == CV_16U ? ippSortIndexWrap<Ipp16u, ippsSortRadixIndexDescend_16u> :
             depth == CV_16S ? ippSortIndexWrap<Ipp16s, ippsSortRadixIndexDescend_16s> :
             depth == CV_32S ? ippSortIndexWrap<Ipp32s, ippsSortRadixIndexDescend_32s> :
@@ -1235,69 +1235,69 @@ static IppSortIndexFunc getSortIndexFunc(int depth, bool sortDescending)
             0;
 }
 
-static bool ipp_sortIdx( const Mat& src, Mat& dst, int flags )
+സ്ഥിതം തർക്കം ipp_sortIdx( സ്ഥിരം Mat& src, Mat& dst, പൂർണ്ണസംഖ്യ flags )
 {
     CV_INSTRUMENT_REGION_IPP();
 
-    bool        sortRows        = (flags & 1) == SORT_EVERY_ROW;
-    bool        sortDescending  = (flags & SORT_DESCENDING) != 0;
-    int         depth           = src.depth();
+    തർക്കം        sortRows        = (flags & 1) == SORT_EVERY_ROW;
+    തർക്കം        sortDescending  = (flags & SORT_DESCENDING) != 0;
+    പൂർണ്ണസംഖ്യ         depth           = src.depth();
     IppDataType type            = ippiGetDataType(depth);
 
     IppSortIndexFunc ippsSortRadixIndex = getSortIndexFunc(depth, sortDescending);
-    if(!ippsSortRadixIndex)
-        return false;
+    എങ്കിൽ(!ippsSortRadixIndex)
+        തിരികെ അസത്യം;
 
-    if(sortRows)
+    എങ്കിൽ(sortRows)
     {
         AutoBuffer<Ipp8u> buffer;
-        int               bufferSize;
-        if(ippsSortRadixIndexGetBufferSize(src.cols, type, &bufferSize) < 0)
-            return false;
+        പൂർണ്ണസംഖ്യ               bufferSize;
+        എങ്കിൽ(ippsSortRadixIndexGetBufferSize(src.cols, type, &bufferSize) < 0)
+            തിരികെ അസത്യം;
 
         buffer.allocate(bufferSize);
 
-        for(int i = 0; i < src.rows; i++)
+        വേണ്ടി(പൂർണ്ണസംഖ്യ i = 0; i < src.rows; i++)
         {
-            if(CV_INSTRUMENT_FUN_IPP(ippsSortRadixIndex, (const void*)src.ptr(i), (Ipp32s)src.step[1], (Ipp32s*)dst.ptr(i), src.cols, buffer.data()) < 0)
-                return false;
+            എങ്കിൽ(CV_INSTRUMENT_FUN_IPP(ippsSortRadixIndex, (സ്ഥിരം ശൂന്യം*)src.ptr(i), (Ipp32s)src.step[1], (Ipp32s*)dst.ptr(i), src.cols, buffer.data()) < 0)
+                തിരികെ അസത്യം;
         }
     }
-    else
+    അല്ലെങ്കിൽ
     {
         Mat  dstRow(1, dst.rows, dst.type());
         Mat  dstSub;
         Rect subRect(0,0,1,src.rows);
 
         AutoBuffer<Ipp8u> buffer;
-        int               bufferSize;
-        if(ippsSortRadixIndexGetBufferSize(src.rows, type, &bufferSize) < 0)
-            return false;
+        പൂർണ്ണസംഖ്യ               bufferSize;
+        എങ്കിൽ(ippsSortRadixIndexGetBufferSize(src.rows, type, &bufferSize) < 0)
+            തിരികെ അസത്യം;
 
         buffer.allocate(bufferSize);
 
         Ipp32s srcStep = (Ipp32s)src.step[0];
-        for(int i = 0; i < src.cols; i++)
+        വേണ്ടി(പൂർണ്ണസംഖ്യ i = 0; i < src.cols; i++)
         {
             subRect.x = i;
             dstSub = Mat(dst, subRect);
 
-            if(CV_INSTRUMENT_FUN_IPP(ippsSortRadixIndex, (const void*)src.ptr(0, i), srcStep, (Ipp32s*)dstRow.ptr(), src.rows, buffer.data()) < 0)
-                return false;
+            എങ്കിൽ(CV_INSTRUMENT_FUN_IPP(ippsSortRadixIndex, (സ്ഥിരം ശൂന്യം*)src.ptr(0, i), srcStep, (Ipp32s*)dstRow.ptr(), src.rows, buffer.data()) < 0)
+                തിരികെ അസത്യം;
 
             dstRow = dstRow.reshape(1, dstSub.rows);
             dstRow.copyTo(dstSub);
         }
     }
 
-    return true;
+    തിരികെ സത്യം;
 }
 #endif
 
-typedef void (*SortFunc)(const Mat& src, Mat& dst, int flags);
+തരനിർവചനം ശൂന്യം (*SortFunc)(സ്ഥിരം Mat& src, Mat& dst, പൂർണ്ണസംഖ്യ flags);
 }
 
-void cv::sort( InputArray _src, OutputArray _dst, int flags )
+ശൂന്യം cv::sort( നിവേശം_Array _src, OutputArray _dst, പൂർണ്ണസംഖ്യ flags )
 {
     CV_INSTRUMENT_REGION();
 
@@ -1305,14 +1305,14 @@ void cv::sort( InputArray _src, OutputArray _dst, int flags )
     CV_Assert( src.dims <= 2 && src.channels() == 1 );
     _dst.createSameSize( src, src.type() );
     Mat dst = _dst.getMat();
-#if !IPP_DISABLE_SORT
+#എങ്കിൽ !IPP_DISABLE_SORT
     CV_IPP_RUN_FAST(ipp_sort(src, dst, flags));
 #endif
 
-    static SortFunc tab[CV_DEPTH_MAX] =
+    സ്ഥിതം SortFunc tab[CV_DEPTH_MAX] =
     {
         sort_<uchar>, sort_<schar>, sort_<ushort>, sort_<short>,
-        sort_<int>, sort_<float>, sort_<double>, 0
+        sort_<പൂർണ്ണസംഖ്യ>, sort_<ദശാംശം>, sort_<ഇരട്ട>, 0
     };
     SortFunc func = tab[src.depth()];
     CV_Assert( func != 0 );
@@ -1320,26 +1320,26 @@ void cv::sort( InputArray _src, OutputArray _dst, int flags )
     func( src, dst, flags );
 }
 
-void cv::sortIdx( InputArray _src, OutputArray _dst, int flags )
+ശൂന്യം cv::sortIdx( നിവേശം_Array _src, OutputArray _dst, പൂർണ്ണസംഖ്യ flags )
 {
     CV_INSTRUMENT_REGION();
 
     Mat src = _src.getMat();
     CV_Assert( src.dims <= 2 && src.channels() == 1 );
     Mat dst = _dst.getMat();
-    if( dst.data == src.data )
+    എങ്കിൽ( dst.data == src.data )
         _dst.release();
     _dst.createSameSize( src, CV_32S );
     dst = _dst.getMat();
 
-#if !IPP_DISABLE_SORT
+#എങ്കിൽ !IPP_DISABLE_SORT
     CV_IPP_RUN_FAST(ipp_sortIdx(src, dst, flags));
 #endif
 
-    static SortFunc tab[CV_DEPTH_MAX] =
+    സ്ഥിതം SortFunc tab[CV_DEPTH_MAX] =
     {
         sortIdx_<uchar>, sortIdx_<schar>, sortIdx_<ushort>, sortIdx_<short>,
-        sortIdx_<int>, sortIdx_<float>, sortIdx_<double>, 0
+        sortIdx_<പൂർണ്ണസംഖ്യ>, sortIdx_<ദശാംശം>, sortIdx_<ഇരട്ട>, 0
     };
     SortFunc func = tab[src.depth()];
     CV_Assert( func != 0 );

@@ -40,44 +40,44 @@
 //
 //M*/
 
-#include "precomp.hpp"
+#അന്തര്ഭാവ "precomp.hpp"
 
-#include <opencv2/core/utils/configuration.private.hpp>
-#include <opencv2/core/utils/trace.private.hpp>
+#അന്തര്ഭാവ <opencv2/core/utils/configuration.private.hpp>
+#അന്തര്ഭാവ <opencv2/core/utils/trace.private.hpp>
 
-#include "opencv2/core/parallel/parallel_backend.hpp"
-#include "parallel/parallel.hpp"
+#അന്തര്ഭാവ "opencv2/core/parallel/parallel_backend.hpp"
+#അന്തര്ഭാവ "parallel/parallel.hpp"
 
-#if defined _WIN32 || defined WINCE
-    #include <windows.h>
+#എങ്കിൽ defined _WIN32 || defined WINCE
+    #അന്തര്ഭാവ <windows.h>
     #undef small
     #undef min
     #undef max
     #undef abs
 #endif
 
-#if defined __unix__ || defined __APPLE__ || defined __GLIBC__ \
+#എങ്കിൽ defined __unix__ || defined __APPLE__ || defined __GLIBC__ \
     || defined __HAIKU__ || defined __EMSCRIPTEN__ \
     || defined __FreeBSD__ || defined __NetBSD__ || defined __OpenBSD__
-    #include <unistd.h>
-    #include <stdio.h>
-    #include <sys/types.h>
-    #include <fstream>
-    #if defined __ANDROID__
-        #include <sys/sysconf.h>
-        #include <sys/syscall.h>
-        #include <sched.h>
-    #elif defined __APPLE__
-        #include <sys/sysctl.h>
+    #അന്തര്ഭാവ <unistd.h>
+    #അന്തര്ഭാവ <stdio.h>
+    #അന്തര്ഭാവ <sys/types.h>
+    #അന്തര്ഭാവ <fstream>
+    #എങ്കിൽ defined __ANDROID__
+        #അന്തര്ഭാവ <sys/sysconf.h>
+        #അന്തര്ഭാവ <sys/syscall.h>
+        #അന്തര്ഭാവ <sched.h>
+    #അല്ലെങ്കിലെങ്കിൽ defined __APPLE__
+        #അന്തര്ഭാവ <sys/sysctl.h>
     #endif
 #endif
 
-#if defined (__QNX__)
-    #include <sys/syspage.h>
+#എങ്കിൽ defined (__QNX__)
+    #അന്തര്ഭാവ <sys/syspage.h>
 #endif
 
 #ifndef OPENCV_DISABLE_THREAD_SUPPORT
-    #include <thread>
+    #അന്തര്ഭാവ <thread>
 #endif
 
 #ifdef _OPENMP
@@ -88,7 +88,7 @@
     #define HAVE_GCD
 #endif
 
-#if defined _MSC_VER
+#എങ്കിൽ defined _MSC_VER
     #define HAVE_CONCURRENCY
 #endif
 
@@ -102,134 +102,134 @@
    - HAVE_PTHREADS_PF - pthreads if available
 */
 
-#if defined HAVE_TBB
+#എങ്കിൽ defined HAVE_TBB
     #ifndef TBB_SUPPRESS_DEPRECATED_MESSAGES  // supress warning
     #define TBB_SUPPRESS_DEPRECATED_MESSAGES 1
     #endif
-    #include "tbb/tbb.h"
-    #include "tbb/task.h"
-    #if TBB_INTERFACE_VERSION >= 8000
-        #include "tbb/task_arena.h"
+    #അന്തര്ഭാവ "tbb/tbb.h"
+    #അന്തര്ഭാവ "tbb/task.h"
+    #എങ്കിൽ TBB_INTERFACE_VERSION >= 8000
+        #അന്തര്ഭാവ "tbb/task_arena.h"
     #endif
     #undef min
     #undef max
-#elif defined HAVE_HPX
-    #include <hpx/parallel/algorithms/for_loop.hpp>
-    #include <hpx/parallel/execution.hpp>
+#അല്ലെങ്കിലെങ്കിൽ defined HAVE_HPX
+    #അന്തര്ഭാവ <hpx/parallel/algorithms/for_loop.hpp>
+    #അന്തര്ഭാവ <hpx/parallel/execution.hpp>
     //
-    #include <hpx/hpx_start.hpp>
-    #include <hpx/hpx_suspend.hpp>
-    #include <hpx/include/apply.hpp>
-    #include <hpx/util/yield_while.hpp>
-    #include <hpx/include/threadmanager.hpp>
+    #അന്തര്ഭാവ <hpx/hpx_start.hpp>
+    #അന്തര്ഭാവ <hpx/hpx_suspend.hpp>
+    #അന്തര്ഭാവ <hpx/include/apply.hpp>
+    #അന്തര്ഭാവ <hpx/util/yield_while.hpp>
+    #അന്തര്ഭാവ <hpx/include/threadmanager.hpp>
 
-#elif defined HAVE_OPENMP
-    #include <omp.h>
-#elif defined HAVE_GCD
-    #include <dispatch/dispatch.h>
-    #include <pthread.h>
-#elif defined HAVE_CONCURRENCY
-    #include <ppl.h>
-#elif defined HAVE_PTHREADS_PF
-    #include <pthread.h>
+#അല്ലെങ്കിലെങ്കിൽ defined HAVE_OPENMP
+    #അന്തര്ഭാവ <omp.h>
+#അല്ലെങ്കിലെങ്കിൽ defined HAVE_GCD
+    #അന്തര്ഭാവ <dispatch/dispatch.h>
+    #അന്തര്ഭാവ <pthread.h>
+#അല്ലെങ്കിലെങ്കിൽ defined HAVE_CONCURRENCY
+    #അന്തര്ഭാവ <ppl.h>
+#അല്ലെങ്കിലെങ്കിൽ defined HAVE_PTHREADS_PF
+    #അന്തര്ഭാവ <pthread.h>
 #endif
 
 
-#if defined HAVE_TBB
+#എങ്കിൽ defined HAVE_TBB
 #  define CV_PARALLEL_FRAMEWORK "tbb"
-#elif defined HAVE_HPX
+#അല്ലെങ്കിലെങ്കിൽ defined HAVE_HPX
 #  define CV_PARALLEL_FRAMEWORK "hpx"
-#elif defined HAVE_OPENMP
+#അല്ലെങ്കിലെങ്കിൽ defined HAVE_OPENMP
 #  define CV_PARALLEL_FRAMEWORK "openmp"
-#elif defined HAVE_GCD
+#അല്ലെങ്കിലെങ്കിൽ defined HAVE_GCD
 #  define CV_PARALLEL_FRAMEWORK "gcd"
-#elif defined WINRT
+#അല്ലെങ്കിലെങ്കിൽ defined WINRT
 #  define CV_PARALLEL_FRAMEWORK "winrt-concurrency"
-#elif defined HAVE_CONCURRENCY
+#അല്ലെങ്കിലെങ്കിൽ defined HAVE_CONCURRENCY
 #  define CV_PARALLEL_FRAMEWORK "ms-concurrency"
-#elif defined HAVE_PTHREADS_PF
+#അല്ലെങ്കിലെങ്കിൽ defined HAVE_PTHREADS_PF
 #  define CV_PARALLEL_FRAMEWORK "pthreads"
 #endif
 
-#include <atomic>
+#അന്തര്ഭാവ <atomic>
 
-#include "parallel_impl.hpp"
+#അന്തര്ഭാവ "parallel_impl.hpp"
 
-#include "opencv2/core/detail/exception_ptr.hpp"  // CV__EXCEPTION_PTR = 1 if std::exception_ptr is available
+#അന്തര്ഭാവ "opencv2/core/detail/exception_ptr.hpp"  // CV__EXCEPTION_PTR = 1 if std::exception_ptr is available
 
-#include <opencv2/core/utils/fp_control_utils.hpp>
-#include <opencv2/core/utils/fp_control.private.hpp>
+#അന്തര്ഭാവ <opencv2/core/utils/fp_control_utils.hpp>
+#അന്തര്ഭാവ <opencv2/core/utils/fp_control.private.hpp>
 
-using namespace cv;
+using നാമാകാശ cv;
 
-namespace cv {
+നാമാകാശ cv {
 
 ParallelLoopBody::~ParallelLoopBody() {}
 
-using namespace cv::parallel;
+using നാമാകാശ cv::parallel;
 
-namespace {
+നാമാകാശ {
 
 #ifdef ENABLE_INSTRUMENTATION
-    static void SyncNodes(cv::instr::InstrNode *pNode)
+    സ്ഥിതം ശൂന്യം SyncNodes(cv::instr::Instr_കണ്ണി *p_കണ്ണി)
     {
-        std::vector<cv::instr::NodeDataTls*> data;
-        pNode->m_payload.m_tls.gather(data);
+        std::vector<cv::instr::കണ്ണി_Data_Tls*> data;
+        p_കണ്ണി->m_payload.m_tls.gather(data);
 
         uint64 ticksMax = 0;
-        int    threads  = 0;
-        for(size_t i = 0; i < data.size(); i++)
+        പൂർണ്ണസംഖ്യ    threads  = 0;
+        വേണ്ടി(size_t i = 0; i < data.size(); i++)
         {
-            if(data[i] && data[i]->m_ticksTotal)
+            എങ്കിൽ(data[i] && data[i]->m_ticksTotal)
             {
                 ticksMax = MAX(ticksMax, data[i]->m_ticksTotal);
-                pNode->m_payload.m_ticksTotal -= data[i]->m_ticksTotal;
+                p_കണ്ണി->m_payload.m_ticksTotal -= data[i]->m_ticksTotal;
                 data[i]->m_ticksTotal = 0;
                 threads++;
             }
         }
-        pNode->m_payload.m_ticksTotal += ticksMax;
-        pNode->m_payload.m_threads = MAX(pNode->m_payload.m_threads, threads);
+        p_കണ്ണി->m_payload.m_ticksTotal += ticksMax;
+        p_കണ്ണി->m_payload.m_threads = MAX(p_കണ്ണി->m_payload.m_threads, threads);
 
-        for(size_t i = 0; i < pNode->m_childs.size(); i++)
-            SyncNodes(pNode->m_childs[i]);
+        വേണ്ടി(size_t i = 0; i < p_കണ്ണി->m_childs.size(); i++)
+            SyncNodes(p_കണ്ണി->m_childs[i]);
     }
 #endif
 
-    class ParallelLoopBodyWrapperContext
+    വർഗ്ഗം ParallelLoopBodyWrapperContext
     {
-    public:
-        ParallelLoopBodyWrapperContext(const cv::ParallelLoopBody& _body, const cv::Range& _r, double _nstripes) :
-            is_rng_used(false), hasException(false)
+    പൊതു:
+        ParallelLoopBodyWrapperContext(സ്ഥിരം cv::ParallelLoopBody& _body, സ്ഥിരം cv::Range& _r, ഇരട്ട _nstripes) :
+            is_rng_used(അസത്യം), hasException(അസത്യം)
         {
 
             body = &_body;
             wholeRange = _r;
-            double len = wholeRange.end - wholeRange.start;
+            ഇരട്ട len = wholeRange.end - wholeRange.start;
             nstripes = cvRound(_nstripes <= 0 ? len : MIN(MAX(_nstripes, 1.), len));
 
             // propagate main thread state
             rng = cv::theRNG();
-#if OPENCV_SUPPORTS_FP_DENORMALS_HINT && OPENCV_IMPL_FP_HINTS
+#എങ്കിൽ OPENCV_SUPPORTS_FP_DENORMALS_HINT && OPENCV_IMPL_FP_HINTS
             details::saveFPDenormalsState(fp_denormals_base_state);
 #endif
 
 #ifdef OPENCV_TRACE
-            traceRootRegion = CV_TRACE_NS::details::getCurrentRegion();
-            traceRootContext = CV_TRACE_NS::details::getTraceManager().tls.get();
+            trace_വേര്_Region = CV_TRACE_NS::details::getCurrentRegion();
+            trace_വേര്_Context = CV_TRACE_NS::details::getTraceManager().tls.get();
 #endif
 
 #ifdef ENABLE_INSTRUMENTATION
-            pThreadRoot = cv::instr::getInstrumentTLSStruct().pCurrentNode;
+            p_Thread_വേര് = cv::instr::getInstrumentTLSStruct().p_Current_കണ്ണി;
 #endif
         }
-        void finalize()
+        ശൂന്യം finalize()
         {
 #ifdef ENABLE_INSTRUMENTATION
-            for(size_t i = 0; i < pThreadRoot->m_childs.size(); i++)
-                SyncNodes(pThreadRoot->m_childs[i]);
+            വേണ്ടി(size_t i = 0; i < p_Thread_വേര്->m_childs.size(); i++)
+                SyncNodes(p_Thread_വേര്->m_childs[i]);
 #endif
-            if (is_rng_used)
+            എങ്കിൽ (is_rng_used)
             {
                 // Some parallel backends execute nested jobs in the main thread,
                 // so we need to restore initial RNG state here.
@@ -240,74 +240,74 @@ namespace {
                 cv::theRNG().next();
             }
 #ifdef OPENCV_TRACE
-            if (traceRootRegion)
-                CV_TRACE_NS::details::parallelForFinalize(*traceRootRegion);
+            എങ്കിൽ (trace_വേര്_Region)
+                CV_TRACE_NS::details::parallelForFinalize(*trace_വേര്_Region);
 #endif
 
-            if (hasException)
+            എങ്കിൽ (hasException)
             {
-#if CV__EXCEPTION_PTR
+#എങ്കിൽ CV__EXCEPTION_PTR
                 std::rethrow_exception(pException);
-#else
+#അല്ലെങ്കിൽ
                 CV_Error(Error::StsError, "Exception in parallel_for() body: " + exception_message);
 #endif
             }
         }
         ~ParallelLoopBodyWrapperContext() {}
 
-        const cv::ParallelLoopBody* body;
+        സ്ഥിരം cv::ParallelLoopBody* body;
         cv::Range wholeRange;
-        int nstripes;
+        പൂർണ്ണസംഖ്യ nstripes;
         cv::RNG rng;
-        mutable bool is_rng_used;
+        mutable തർക്കം is_rng_used;
 #ifdef OPENCV_TRACE
-        CV_TRACE_NS::details::Region* traceRootRegion;
-        CV_TRACE_NS::details::TraceManagerThreadLocal* traceRootContext;
+        CV_TRACE_NS::details::Region* trace_വേര്_Region;
+        CV_TRACE_NS::details::TraceManagerThreadLocal* trace_വേര്_Context;
 #endif
 #ifdef ENABLE_INSTRUMENTATION
-        cv::instr::InstrNode *pThreadRoot;
+        cv::instr::Instr_കണ്ണി *p_Thread_വേര്;
 #endif
-        bool hasException;
-#if CV__EXCEPTION_PTR
+        തർക്കം hasException;
+#എങ്കിൽ CV__EXCEPTION_PTR
         std::exception_ptr pException;
-#else
+#അല്ലെങ്കിൽ
         cv::String exception_message;
 #endif
-#if CV__EXCEPTION_PTR
-        void recordException()
-#else
-        void recordException(const cv::String& msg)
+#എങ്കിൽ CV__EXCEPTION_PTR
+        ശൂന്യം recordException()
+#അല്ലെങ്കിൽ
+        ശൂന്യം recordException(സ്ഥിരം cv::String& സന്ദേശം)
 #endif
         {
 #ifndef CV_THREAD_SANITIZER
-            if (!hasException)
+            എങ്കിൽ (!hasException)
 #endif
             {
                 cv::AutoLock lock(cv::getInitializationMutex());
-                if (!hasException)
+                എങ്കിൽ (!hasException)
                 {
-                    hasException = true;
-#if CV__EXCEPTION_PTR
+                    hasException = സത്യം;
+#എങ്കിൽ CV__EXCEPTION_PTR
                     pException = std::current_exception();
-#else
-                    exception_message = msg;
+#അല്ലെങ്കിൽ
+                    exception_message = സന്ദേശം;
 #endif
                 }
             }
         }
 
-#if OPENCV_SUPPORTS_FP_DENORMALS_HINT && OPENCV_IMPL_FP_HINTS
+#എങ്കിൽ OPENCV_SUPPORTS_FP_DENORMALS_HINT && OPENCV_IMPL_FP_HINTS
         details::FPDenormalsModeState fp_denormals_base_state;
 #endif
 
-    private:
-        ParallelLoopBodyWrapperContext(const ParallelLoopBodyWrapperContext&); // disabled
-        ParallelLoopBodyWrapperContext& operator=(const ParallelLoopBodyWrapperContext&); // disabled
+    സ്വകാര്യ:
+        ParallelLoopBodyWrapperContext(സ്ഥിരം ParallelLoopBodyWrapperContext&); // disabled
+        ParallelLoopBodyWrapperContext& operator=(സ്ഥിരം ParallelLoopBodyWrapperContext&); // disabled
     };
 
-    class ParallelLoopBodyWrapper : public cv::ParallelLoopBody
+    വർഗ്ഗം ParallelLoopBodyWrapper : പൊതു cv::ParallelLoopBody
     {
-    public:
+    പൊതു:
         ParallelLoopBodyWrapper(ParallelLoopBodyWrapperContext& ctx_) :
             ctx(ctx_)
         {
@@ -315,192 +315,192 @@ namespace {
         ~ParallelLoopBodyWrapper()
         {
         }
-        void operator()(const cv::Range& sr) const CV_OVERRIDE
+        ശൂന്യം operator()(സ്ഥിരം cv::Range& sr) സ്ഥിരം CV_OVERRIDE
         {
 #ifdef OPENCV_TRACE
             // TODO CV_TRACE_NS::details::setCurrentRegion(rootRegion);
-            if (ctx.traceRootRegion && ctx.traceRootContext)
-                CV_TRACE_NS::details::parallelForSetRootRegion(*ctx.traceRootRegion, *ctx.traceRootContext);
+            എങ്കിൽ (ctx.trace_വേര്_Region && ctx.trace_വേര്_Context)
+                CV_TRACE_NS::details::parallel_For_Set_വേര്_Region(*ctx.trace_വേര്_Region, *ctx.trace_വേര്_Context);
             CV__TRACE_OPENCV_FUNCTION_NAME("parallel_for_body");
-            if (ctx.traceRootRegion)
-                CV_TRACE_NS::details::parallelForAttachNestedRegion(*ctx.traceRootRegion);
+            എങ്കിൽ (ctx.trace_വേര്_Region)
+                CV_TRACE_NS::details::parallelForAttachNestedRegion(*ctx.trace_വേര്_Region);
 #endif
 
 #ifdef ENABLE_INSTRUMENTATION
             {
                 cv::instr::InstrTLSStruct *pInstrTLS = &cv::instr::getInstrumentTLSStruct();
-                pInstrTLS->pCurrentNode = ctx.pThreadRoot; // Initialize TLS node for thread
+                pInstrTLS->p_Current_കണ്ണി = ctx.p_Thread_വേര്; // Initialize TLS node for thread
             }
             CV_INSTRUMENT_REGION();
 #endif
 
             // propagate main thread state
             cv::theRNG() = ctx.rng;
-#if OPENCV_SUPPORTS_FP_DENORMALS_HINT && OPENCV_IMPL_FP_HINTS
+#എങ്കിൽ OPENCV_SUPPORTS_FP_DENORMALS_HINT && OPENCV_IMPL_FP_HINTS
             FPDenormalsIgnoreHintScope fp_denormals_scope(ctx.fp_denormals_base_state);
 #endif
 
             cv::Range r;
             cv::Range wholeRange = ctx.wholeRange;
-            int nstripes = ctx.nstripes;
-            r.start = (int)(wholeRange.start +
+            പൂർണ്ണസംഖ്യ nstripes = ctx.nstripes;
+            r.start = (പൂർണ്ണസംഖ്യ)(wholeRange.start +
                             ((uint64)sr.start*(wholeRange.end - wholeRange.start) + nstripes/2)/nstripes);
-            r.end = sr.end >= nstripes ? wholeRange.end : (int)(wholeRange.start +
+            r.end = sr.end >= nstripes ? wholeRange.end : (പൂർണ്ണസംഖ്യ)(wholeRange.start +
                             ((uint64)sr.end*(wholeRange.end - wholeRange.start) + nstripes/2)/nstripes);
 
 #ifdef OPENCV_TRACE
-            CV_TRACE_ARG_VALUE(range_start, "range.start", (int64)r.start);
-            CV_TRACE_ARG_VALUE(range_end, "range.end", (int64)r.end);
+            CV_TRACE_ARG_മൂല്യം(range_start, "range.start", (int64)r.start);
+            CV_TRACE_ARG_മൂല്യം(range_end, "range.end", (int64)r.end);
 #endif
 
-            try
+            ശ്രമിക്കുക
             {
                 (*ctx.body)(r);
             }
-#if CV__EXCEPTION_PTR
-            catch (...)
+#എങ്കിൽ CV__EXCEPTION_PTR
+            പിടിക്കുക (...)
             {
                 ctx.recordException();
             }
-#else
-            catch (const cv::Exception& e)
+#അല്ലെങ്കിൽ
+            പിടിക്കുക (സ്ഥിരം cv::Exception& e)
             {
                 ctx.recordException(e.what());
             }
-            catch (const std::exception& e)
+            പിടിക്കുക (സ്ഥിരം std::exception& e)
             {
                 ctx.recordException(e.what());
             }
-            catch (...)
+            പിടിക്കുക (...)
             {
                 ctx.recordException("Unknown exception");
             }
 #endif
 
-            if (!ctx.is_rng_used && !(cv::theRNG() == ctx.rng))
-                ctx.is_rng_used = true;
+            എങ്കിൽ (!ctx.is_rng_used && !(cv::theRNG() == ctx.rng))
+                ctx.is_rng_used = സത്യം;
         }
-        cv::Range stripeRange() const { return cv::Range(0, ctx.nstripes); }
+        cv::Range stripeRange() സ്ഥിരം { തിരികെ cv::Range(0, ctx.nstripes); }
 
-    protected:
+    സംരക്ഷിത:
         ParallelLoopBodyWrapperContext& ctx;
     };
 
-#if defined HAVE_TBB
-    class ProxyLoopBody : public ParallelLoopBodyWrapper
+#എങ്കിൽ defined HAVE_TBB
+    വർഗ്ഗം ProxyLoopBody : പൊതു ParallelLoopBodyWrapper
     {
-    public:
+    പൊതു:
         ProxyLoopBody(ParallelLoopBodyWrapperContext& ctx_)
         : ParallelLoopBodyWrapper(ctx_)
         {}
 
-        void operator ()(const tbb::blocked_range<int>& range) const
+        ശൂന്യം operator ()(സ്ഥിരം tbb::blocked_range<പൂർണ്ണസംഖ്യ>& range) സ്ഥിരം
         {
-            this->ParallelLoopBodyWrapper::operator()(cv::Range(range.begin(), range.end()));
+            ഇത്->ParallelLoopBodyWrapper::operator()(cv::Range(range.begin(), range.end()));
         }
 
-        void operator ()() const  // run parallel job
+        ശൂന്യം operator ()() സ്ഥിരം  // run parallel job
         {
-            cv::Range range = this->stripeRange();
-            tbb::parallel_for(tbb::blocked_range<int>(range.start, range.end), *this);
+            cv::Range range = ഇത്->stripeRange();
+            tbb::parallel_for(tbb::blocked_range<പൂർണ്ണസംഖ്യ>(range.start, range.end), *ഇത്);
         }
     };
-#elif defined HAVE_HPX
-    class ProxyLoopBody : public ParallelLoopBodyWrapper
+#അല്ലെങ്കിലെങ്കിൽ defined HAVE_HPX
+    വർഗ്ഗം ProxyLoopBody : പൊതു ParallelLoopBodyWrapper
     {
-    public:
+    പൊതു:
         ProxyLoopBody(ParallelLoopBodyWrapperContext& ctx_)
                 : ParallelLoopBodyWrapper(ctx_)
         {}
 
-        void operator ()() const  // run parallel job
+        ശൂന്യം operator ()() സ്ഥിരം  // run parallel job
         {
-            cv::Range stripeRange = this->stripeRange();
+            cv::Range stripeRange = ഇത്->stripeRange();
             hpx::parallel::for_loop(
                     hpx::parallel::execution::par,
                     stripeRange.start, stripeRange.end,
-                    [&](const int &i) { ;
-                        this->ParallelLoopBodyWrapper::operator()(
+                    [&](സ്ഥിരം പൂർണ്ണസംഖ്യ &i) { ;
+                        ഇത്->ParallelLoopBodyWrapper::operator()(
                                 cv::Range(i, i + 1));
                     });
         }
     };
-#elif defined HAVE_OPENMP
-    typedef ParallelLoopBodyWrapper ProxyLoopBody;
-#elif defined HAVE_GCD
-    typedef ParallelLoopBodyWrapper ProxyLoopBody;
-    static void block_function(void* context, size_t index)
+#അല്ലെങ്കിലെങ്കിൽ defined HAVE_OPENMP
+    തരനിർവചനം ParallelLoopBodyWrapper ProxyLoopBody;
+#അല്ലെങ്കിലെങ്കിൽ defined HAVE_GCD
+    തരനിർവചനം ParallelLoopBodyWrapper ProxyLoopBody;
+    സ്ഥിതം ശൂന്യം block_function(ശൂന്യം* context, size_t index)
     {
         ProxyLoopBody* ptr_body = static_cast<ProxyLoopBody*>(context);
-        (*ptr_body)(cv::Range((int)index, (int)index + 1));
+        (*ptr_body)(cv::Range((പൂർണ്ണസംഖ്യ)index, (പൂർണ്ണസംഖ്യ)index + 1));
     }
-#elif defined WINRT || defined HAVE_CONCURRENCY
-    class ProxyLoopBody : public ParallelLoopBodyWrapper
+#അല്ലെങ്കിലെങ്കിൽ defined WINRT || defined HAVE_CONCURRENCY
+    വർഗ്ഗം ProxyLoopBody : പൊതു ParallelLoopBodyWrapper
     {
-    public:
+    പൊതു:
         ProxyLoopBody(ParallelLoopBodyWrapperContext& ctx)
         : ParallelLoopBodyWrapper(ctx)
         {}
 
-        void operator ()(int i) const
+        ശൂന്യം operator ()(പൂർണ്ണസംഖ്യ i) സ്ഥിരം
         {
-            this->ParallelLoopBodyWrapper::operator()(cv::Range(i, i + 1));
+            ഇത്->ParallelLoopBodyWrapper::operator()(cv::Range(i, i + 1));
         }
     };
 
     // PPL's default auto_partitioner silently skips whole chunks of the range on
     // ARM64 (unfixed MSVC bug, developercommunity.visualstudio.com/t/1027444).
     template <typename Body>
-    static inline void pplParallelFor(int first, int last, const Body& body)
+    സ്ഥിതം വരിയിൽ ശൂന്യം pplParallelFor(പൂർണ്ണസംഖ്യ first, പൂർണ്ണസംഖ്യ last, സ്ഥിരം Body& body)
     {
-#if defined(_M_ARM64) || defined(_M_ARM64EC)
+#എങ്കിൽ defined(_M_ARM64) || defined(_M_ARM64EC)
         Concurrency::parallel_for(first, last, body, Concurrency::static_partitioner());
-#else
+#അല്ലെങ്കിൽ
         Concurrency::parallel_for(first, last, body);
 #endif
     }
-#else
-    typedef ParallelLoopBodyWrapper ProxyLoopBody;
+#അല്ലെങ്കിൽ
+    തരനിർവചനം ParallelLoopBodyWrapper ProxyLoopBody;
 #endif
 
-#if defined HAVE_TBB
-    #if TBB_INTERFACE_VERSION >= 8000
-        static tbb::task_arena tbbArena(tbb::task_arena::automatic);
-    #else
-        static tbb::task_scheduler_init tbbScheduler(tbb::task_scheduler_init::deferred);
+#എങ്കിൽ defined HAVE_TBB
+    #എങ്കിൽ TBB_INTERFACE_VERSION >= 8000
+        സ്ഥിതം tbb::task_arena tbbArena(tbb::task_arena::automatic);
+    #അല്ലെങ്കിൽ
+        സ്ഥിതം tbb::task_scheduler_init tbbScheduler(tbb::task_scheduler_init::deferred);
     #endif
-#elif defined HAVE_HPX
+#അല്ലെങ്കിലെങ്കിൽ defined HAVE_HPX
 // nothing for HPX
-#elif defined HAVE_OPENMP
-static inline int _initMaxThreads()
+#അല്ലെങ്കിലെങ്കിൽ defined HAVE_OPENMP
+സ്ഥിതം വരിയിൽ പൂർണ്ണസംഖ്യ _initMaxThreads()
 {
-    int maxThreads = omp_get_max_threads();
-    return maxThreads;
+    പൂർണ്ണസംഖ്യ maxThreads = omp_get_max_threads();
+    തിരികെ maxThreads;
 }
-static int numThreadsMax = _initMaxThreads();
-#elif defined HAVE_GCD
+സ്ഥിതം പൂർണ്ണസംഖ്യ അക്കം_Threads_Max = _initMaxThreads();
+#അല്ലെങ്കിലെങ്കിൽ defined HAVE_GCD
 // nothing for GCD
-#elif defined WINRT
+#അല്ലെങ്കിലെങ്കിൽ defined WINRT
 // nothing for WINRT
-#elif defined HAVE_CONCURRENCY
+#അല്ലെങ്കിലെങ്കിൽ defined HAVE_CONCURRENCY
 
-class SchedPtr
+വർഗ്ഗം SchedPtr
 {
     Concurrency::Scheduler* sched_;
-public:
-    Concurrency::Scheduler* operator->() { return sched_; }
-    operator Concurrency::Scheduler*() { return sched_; }
+പൊതു:
+    Concurrency::Scheduler* operator->() { തിരികെ sched_; }
+    operator Concurrency::Scheduler*() { തിരികെ sched_; }
 
-    void operator=(Concurrency::Scheduler* sched)
+    ശൂന്യം operator=(Concurrency::Scheduler* sched)
     {
-        if (sched_) sched_->Release();
+        എങ്കിൽ (sched_) sched_->Release();
         sched_ = sched;
     }
 
     SchedPtr() : sched_(0) {}
     ~SchedPtr() {}
 };
-static SchedPtr pplScheduler;
+സ്ഥിതം SchedPtr pplScheduler;
 
 #endif
 
@@ -508,128 +508,128 @@ static SchedPtr pplScheduler;
 
 /* ================================   parallel_for_  ================================ */
 
-static void parallel_for_impl(const cv::Range& range, const cv::ParallelLoopBody& body, double nstripes); // forward declaration
+സ്ഥിതം ശൂന്യം parallel_for_impl(സ്ഥിരം cv::Range& range, സ്ഥിരം cv::ParallelLoopBody& body, ഇരട്ട nstripes); // forward declaration
 
-void parallel_for_(const cv::Range& range, const cv::ParallelLoopBody& body, double nstripes)
+ശൂന്യം parallel_for_(സ്ഥിരം cv::Range& range, സ്ഥിരം cv::ParallelLoopBody& body, ഇരട്ട nstripes)
 {
 #ifdef OPENCV_TRACE
     CV__TRACE_OPENCV_FUNCTION_NAME_("parallel_for", 0);
-    CV_TRACE_ARG_VALUE(range_start, "range.start", (int64)range.start);
-    CV_TRACE_ARG_VALUE(range_end, "range.end", (int64)range.end);
-    CV_TRACE_ARG_VALUE(nstripes, "nstripes", (int64)nstripes);
+    CV_TRACE_ARG_മൂല്യം(range_start, "range.start", (int64)range.start);
+    CV_TRACE_ARG_മൂല്യം(range_end, "range.end", (int64)range.end);
+    CV_TRACE_ARG_മൂല്യം(nstripes, "nstripes", (int64)nstripes);
 #endif
 
     CV_INSTRUMENT_REGION_MT_FORK();
-    if (range.empty())
-        return;
+    എങ്കിൽ (range.empty())
+        തിരികെ;
 
-    static std::atomic<bool> flagNestedParallelFor(false);
-    bool isNotNestedRegion = !flagNestedParallelFor.load();
-    if (isNotNestedRegion)
-      isNotNestedRegion = !flagNestedParallelFor.exchange(true);
-    if (isNotNestedRegion)
+    സ്ഥിതം std::atomic<തർക്കം> flagNestedParallelFor(അസത്യം);
+    തർക്കം isNotNestedRegion = !flagNestedParallelFor.load();
+    എങ്കിൽ (isNotNestedRegion)
+      isNotNestedRegion = !flagNestedParallelFor.exchange(സത്യം);
+    എങ്കിൽ (isNotNestedRegion)
     {
-        try
+        ശ്രമിക്കുക
         {
             parallel_for_impl(range, body, nstripes);
-            flagNestedParallelFor = false;
+            flagNestedParallelFor = അസത്യം;
         }
-        catch (...)
+        പിടിക്കുക (...)
         {
-            flagNestedParallelFor = false;
-            throw;
+            flagNestedParallelFor = അസത്യം;
+            എറിയുക;
         }
     }
-    else // nested parallel_for_() calls are not parallelized
+    അല്ലെങ്കിൽ // nested parallel_for_() calls are not parallelized
     {
         CV_UNUSED(nstripes);
         body(range);
     }
 }
 
-static
-void parallel_for_cb(int start, int end, void* data)
+സ്ഥിതം
+ശൂന്യം parallel_for_cb(പൂർണ്ണസംഖ്യ start, പൂർണ്ണസംഖ്യ end, ശൂന്യം* data)
 {
     CV_DbgAssert(data);
-    const cv::ParallelLoopBody& body = *(const cv::ParallelLoopBody*)data;
+    സ്ഥിരം cv::ParallelLoopBody& body = *(സ്ഥിരം cv::ParallelLoopBody*)data;
     body(Range(start, end));
 }
 
-static void parallel_for_impl(const cv::Range& range, const cv::ParallelLoopBody& body, double nstripes)
+സ്ഥിതം ശൂന്യം parallel_for_impl(സ്ഥിരം cv::Range& range, സ്ഥിരം cv::ParallelLoopBody& body, ഇരട്ട nstripes)
 {
-    using namespace cv::parallel;
-    if ((numThreads < 0 || numThreads > 1) && range.end - range.start > 1)
+    using നാമാകാശ cv::parallel;
+    എങ്കിൽ ((അക്കം_Threads < 0 || അക്കം_Threads > 1) && range.end - range.start > 1)
     {
         ParallelLoopBodyWrapperContext ctx(body, range, nstripes);
         ProxyLoopBody pbody(ctx);
         cv::Range stripeRange = pbody.stripeRange();
-        if( stripeRange.end - stripeRange.start == 1 )
+        എങ്കിൽ( stripeRange.end - stripeRange.start == 1 )
         {
             body(range);
-            return;
+            തിരികെ;
         }
 
         std::shared_ptr<ParallelForAPI>& api = getCurrentParallelForAPI();
-        if (api)
+        എങ്കിൽ (api)
         {
             CV_CheckEQ(stripeRange.start, 0, "");
-            api->parallel_for(stripeRange.end, parallel_for_cb, (void*)&pbody);
+            api->parallel_for(stripeRange.end, parallel_for_cb, (ശൂന്യം*)&pbody);
             ctx.finalize();  // propagate exceptions if exists
-            return;
+            തിരികെ;
         }
 
 #ifdef CV_PARALLEL_FRAMEWORK
-#if defined HAVE_TBB
+#എങ്കിൽ defined HAVE_TBB
 
-#if TBB_INTERFACE_VERSION >= 8000
+#എങ്കിൽ TBB_INTERFACE_VERSION >= 8000
         tbbArena.execute(pbody);
-#else
+#അല്ലെങ്കിൽ
         pbody();
 #endif
 
-#elif defined HAVE_HPX
+#അല്ലെങ്കിലെങ്കിൽ defined HAVE_HPX
         pbody();
 
-#elif defined HAVE_OPENMP
+#അല്ലെങ്കിലെങ്കിൽ defined HAVE_OPENMP
 
-        #pragma omp parallel for schedule(dynamic) num_threads(numThreads > 0 ? numThreads : numThreadsMax)
-        for (int i = stripeRange.start; i < stripeRange.end; ++i)
+        #pragma omp parallel വേണ്ടി schedule(dynamic) അക്കം_threads(അക്കം_Threads > 0 ? അക്കം_Threads : അക്കം_Threads_Max)
+        വേണ്ടി (പൂർണ്ണസംഖ്യ i = stripeRange.start; i < stripeRange.end; ++i)
             pbody(Range(i, i + 1));
 
-#elif defined HAVE_GCD
+#അല്ലെങ്കിലെങ്കിൽ defined HAVE_GCD
 
         dispatch_queue_t concurrent_queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
         dispatch_apply_f(stripeRange.end - stripeRange.start, concurrent_queue, &pbody, block_function);
 
-#elif defined WINRT
+#അല്ലെങ്കിലെങ്കിൽ defined WINRT
 
         pplParallelFor(stripeRange.start, stripeRange.end, pbody);
 
-#elif defined HAVE_CONCURRENCY
+#അല്ലെങ്കിലെങ്കിൽ defined HAVE_CONCURRENCY
 
-        if(!pplScheduler || pplScheduler->Id() == Concurrency::CurrentScheduler::Id())
+        എങ്കിൽ(!pplScheduler || pplScheduler->Id() == Concurrency::CurrentScheduler::Id())
         {
             pplParallelFor(stripeRange.start, stripeRange.end, pbody);
         }
-        else
+        അല്ലെങ്കിൽ
         {
             pplScheduler->Attach();
             pplParallelFor(stripeRange.start, stripeRange.end, pbody);
             Concurrency::CurrentScheduler::Detach();
         }
 
-#elif defined HAVE_PTHREADS_PF
+#അല്ലെങ്കിലെങ്കിൽ defined HAVE_PTHREADS_PF
 
         parallel_for_pthreads(pbody.stripeRange(), pbody, pbody.stripeRange().size());
 
-#else
+#അല്ലെങ്കിൽ
 
 #error You have hacked and compiling with unsupported parallel framework
 
 #endif
 
         ctx.finalize();  // propagate exceptions if exists
-        return;
+        തിരികെ;
 #endif // CV_PARALLEL_FRAMEWORK
     }
 
@@ -637,299 +637,299 @@ static void parallel_for_impl(const cv::Range& range, const cv::ParallelLoopBody
 }
 
 
-int getNumThreads(void)
+പൂർണ്ണസംഖ്യ get_അക്കം_Threads(ശൂന്യം)
 {
     std::shared_ptr<ParallelForAPI>& api = getCurrentParallelForAPI();
-    if (api)
+    എങ്കിൽ (api)
     {
-        return api->getNumThreads();
+        തിരികെ api->get_അക്കം_Threads();
     }
 
-    if (numThreads == 0)
-        return 1;
+    എങ്കിൽ (അക്കം_Threads == 0)
+        തിരികെ 1;
 
-#if defined HAVE_TBB
+#എങ്കിൽ defined HAVE_TBB
 
-#if TBB_INTERFACE_VERSION >= 9100
-    return tbbArena.max_concurrency();
-#elif TBB_INTERFACE_VERSION >= 8000
-    return numThreads > 0
-        ? numThreads
-        : tbb::task_scheduler_init::default_num_threads();
-#else
-    return tbbScheduler.is_active()
-           ? numThreads
-           : tbb::task_scheduler_init::default_num_threads();
+#എങ്കിൽ TBB_INTERFACE_VERSION >= 9100
+    തിരികെ tbbArena.max_concurrency();
+#അല്ലെങ്കിലെങ്കിൽ TBB_INTERFACE_VERSION >= 8000
+    തിരികെ അക്കം_Threads > 0
+        ? അക്കം_Threads
+        : tbb::task_scheduler_init::default_അക്കം_threads();
+#അല്ലെങ്കിൽ
+    തിരികെ tbbScheduler.is_active()
+           ? അക്കം_Threads
+           : tbb::task_scheduler_init::default_അക്കം_threads();
 #endif
 
-#elif defined HAVE_HPX
-    return numThreads;
+#അല്ലെങ്കിലെങ്കിൽ defined HAVE_HPX
+    തിരികെ അക്കം_Threads;
 
-#elif defined HAVE_OPENMP
+#അല്ലെങ്കിലെങ്കിൽ defined HAVE_OPENMP
 
-    return numThreads > 0
-           ? numThreads
-           : numThreadsMax;
+    തിരികെ അക്കം_Threads > 0
+           ? അക്കം_Threads
+           : അക്കം_Threads_Max;
 
 
-#elif defined HAVE_GCD
+#അല്ലെങ്കിലെങ്കിൽ defined HAVE_GCD
 
-    return cv::getNumberOfCPUs(); // the GCD thread pool limit
+    തിരികെ cv::get_സംഖ്യ_Of_CPUs(); // the GCD thread pool limit
 
-#elif defined WINRT
+#അല്ലെങ്കിലെങ്കിൽ defined WINRT
 
-    return 0;
+    തിരികെ 0;
 
-#elif defined HAVE_CONCURRENCY
+#അല്ലെങ്കിലെങ്കിൽ defined HAVE_CONCURRENCY
 
-    return (pplScheduler == 0)
-        ? Concurrency::CurrentScheduler::Get()->GetNumberOfVirtualProcessors()
-        : (1 + pplScheduler->GetNumberOfVirtualProcessors());
+    തിരികെ (pplScheduler == 0)
+        ? Concurrency::CurrentScheduler::Get()->Get_സംഖ്യ_Of_Virtual_Processors()
+        : (1 + pplScheduler->Get_സംഖ്യ_Of_Virtual_Processors());
 
-#elif defined HAVE_PTHREADS_PF
+#അല്ലെങ്കിലെങ്കിൽ defined HAVE_PTHREADS_PF
 
-        return parallel_pthreads_get_threads_num();
+        തിരികെ parallel_pthreads_get_threads_അക്കം();
 
-#else
+#അല്ലെങ്കിൽ
 
-    return 1;
+    തിരികെ 1;
 
 #endif
 }
 
-unsigned defaultNumberOfThreads()
+unsigned default_സംഖ്യ_Of_Threads()
 {
 #ifdef __ANDROID__
     // many modern phones/tables have 4-core CPUs. Let's use no more
     // than 2 threads by default not to overheat the devices
-    const unsigned int default_number_of_threads = 2;
-#else
-    const unsigned int default_number_of_threads = (unsigned int)std::max(1, cv::getNumberOfCPUs());
+    സ്ഥിരം unsigned പൂർണ്ണസംഖ്യ default_സംഖ്യ_of_threads = 2;
+#അല്ലെങ്കിൽ
+    സ്ഥിരം unsigned പൂർണ്ണസംഖ്യ default_സംഖ്യ_of_threads = (unsigned പൂർണ്ണസംഖ്യ)std::max(1, cv::get_സംഖ്യ_Of_CPUs());
 #endif
 
-    unsigned result = default_number_of_threads;
+    unsigned result = default_സംഖ്യ_of_threads;
 
-    static int config_num_threads = (int)utils::getConfigurationParameterSizeT("OPENCV_FOR_THREADS_NUM", 0);
+    സ്ഥിതം പൂർണ്ണസംഖ്യ config_അക്കം_threads = (പൂർണ്ണസംഖ്യ)utils::getConfigurationParameterSizeT("OPENCV_FOR_THREADS_NUM", 0);
 
-    if (config_num_threads)
+    എങ്കിൽ (config_അക്കം_threads)
     {
-        result = (unsigned)std::max(1, config_num_threads);
+        result = (unsigned)std::max(1, config_അക്കം_threads);
         //do we need upper limit of threads number?
     }
-    return result;
+    തിരികെ result;
 }
 
-void setNumThreads( int threads_ )
+ശൂന്യം set_അക്കം_Threads( പൂർണ്ണസംഖ്യ threads_ )
 {
     CV_UNUSED(threads_);
 
-    int threads = (threads_ < 0) ? defaultNumberOfThreads() : (unsigned)threads_;
-    numThreads = threads;
+    പൂർണ്ണസംഖ്യ threads = (threads_ < 0) ? default_സംഖ്യ_Of_Threads() : (unsigned)threads_;
+    അക്കം_Threads = threads;
 
     std::shared_ptr<ParallelForAPI>& api = getCurrentParallelForAPI();
-    if (api)
+    എങ്കിൽ (api)
     {
-        api->setNumThreads(numThreads);
+        api->set_അക്കം_Threads(അക്കം_Threads);
     }
 
 #ifdef HAVE_TBB
 
-#if TBB_INTERFACE_VERSION >= 8000
-    if(tbbArena.is_active()) tbbArena.terminate();
-    if(threads > 0) tbbArena.initialize(threads);
-#else
-    if(tbbScheduler.is_active()) tbbScheduler.terminate();
-    if(threads > 0) tbbScheduler.initialize(threads);
+#എങ്കിൽ TBB_INTERFACE_VERSION >= 8000
+    എങ്കിൽ(tbbArena.is_active()) tbbArena.terminate();
+    എങ്കിൽ(threads > 0) tbbArena.initialize(threads);
+#അല്ലെങ്കിൽ
+    എങ്കിൽ(tbbScheduler.is_active()) tbbScheduler.terminate();
+    എങ്കിൽ(threads > 0) tbbScheduler.initialize(threads);
 #endif
 
-#elif defined HAVE_HPX
-    return; // nothing needed as numThreads is used
+#അല്ലെങ്കിലെങ്കിൽ defined HAVE_HPX
+    തിരികെ; // nothing needed as numThreads is used
 
-#elif defined HAVE_OPENMP
+#അല്ലെങ്കിലെങ്കിൽ defined HAVE_OPENMP
 
-    return; // nothing needed as num_threads clause is used in #pragma omp parallel for
+    തിരികെ; // nothing needed as num_threads clause is used in #pragma omp parallel for
 
-#elif defined HAVE_GCD
+#അല്ലെങ്കിലെങ്കിൽ defined HAVE_GCD
 
     // unsupported
     // there is only private dispatch_queue_set_width() and only for desktop
 
-#elif defined WINRT
+#അല്ലെങ്കിലെങ്കിൽ defined WINRT
 
-    return;
+    തിരികെ;
 
-#elif defined HAVE_CONCURRENCY
+#അല്ലെങ്കിലെങ്കിൽ defined HAVE_CONCURRENCY
 
-    if (threads <= 0)
+    എങ്കിൽ (threads <= 0)
     {
         pplScheduler = 0;
     }
-    else if (threads == 1)
+    അല്ലെങ്കിൽ എങ്കിൽ (threads == 1)
     {
         // Concurrency always uses >=2 threads, so we just disable it if 1 thread is requested
-        numThreads = 0;
+        അക്കം_Threads = 0;
     }
-    else if (pplScheduler == 0 || 1 + pplScheduler->GetNumberOfVirtualProcessors() != (unsigned int)threads)
+    അല്ലെങ്കിൽ എങ്കിൽ (pplScheduler == 0 || 1 + pplScheduler->Get_സംഖ്യ_Of_Virtual_Processors() != (unsigned പൂർണ്ണസംഖ്യ)threads)
     {
         pplScheduler = Concurrency::Scheduler::Create(Concurrency::SchedulerPolicy(2,
                        Concurrency::MinConcurrency, threads-1,
                        Concurrency::MaxConcurrency, threads-1));
     }
 
-#elif defined HAVE_PTHREADS_PF
+#അല്ലെങ്കിലെങ്കിൽ defined HAVE_PTHREADS_PF
 
-    parallel_pthreads_set_threads_num(threads);
+    parallel_pthreads_set_threads_അക്കം(threads);
 
 #endif
 }
 
 
-int getThreadNum()
+പൂർണ്ണസംഖ്യ get_Thread_അക്കം()
 {
     std::shared_ptr<ParallelForAPI>& api = getCurrentParallelForAPI();
-    if (api)
+    എങ്കിൽ (api)
     {
-        return api->getThreadNum();
+        തിരികെ api->get_Thread_അക്കം();
     }
 
-#if defined HAVE_TBB
-    #if TBB_INTERFACE_VERSION >= 9100
-        return tbb::this_task_arena::current_thread_index();
-    #elif TBB_INTERFACE_VERSION >= 8000
-        return tbb::task_arena::current_thread_index();
-    #else
-        return 0;
+#എങ്കിൽ defined HAVE_TBB
+    #എങ്കിൽ TBB_INTERFACE_VERSION >= 9100
+        തിരികെ tbb::this_task_arena::current_thread_index();
+    #അല്ലെങ്കിലെങ്കിൽ TBB_INTERFACE_VERSION >= 8000
+        തിരികെ tbb::task_arena::current_thread_index();
+    #അല്ലെങ്കിൽ
+        തിരികെ 0;
     #endif
-#elif defined HAVE_HPX
-    return (int)(hpx::get_num_worker_threads());
-#elif defined HAVE_OPENMP
-    return omp_get_thread_num();
-#elif defined HAVE_GCD
-    return (int)(size_t)(void*)pthread_self(); // no zero-based indexing
-#elif defined WINRT
-    return 0;
-#elif defined HAVE_CONCURRENCY
-    return std::max(0, (int)Concurrency::Context::VirtualProcessorId()); // zero for master thread, unique number for others but not necessary 1,2,3,...
-#elif defined HAVE_PTHREADS_PF
-    return (int)(size_t)(void*)pthread_self(); // no zero-based indexing
-#else
-    return 0;
+#അല്ലെങ്കിലെങ്കിൽ defined HAVE_HPX
+    തിരികെ (പൂർണ്ണസംഖ്യ)(hpx::get_അക്കം_worker_threads());
+#അല്ലെങ്കിലെങ്കിൽ defined HAVE_OPENMP
+    തിരികെ omp_get_thread_അക്കം();
+#അല്ലെങ്കിലെങ്കിൽ defined HAVE_GCD
+    തിരികെ (പൂർണ്ണസംഖ്യ)(size_t)(ശൂന്യം*)pthread_self(); // no zero-based indexing
+#അല്ലെങ്കിലെങ്കിൽ defined WINRT
+    തിരികെ 0;
+#അല്ലെങ്കിലെങ്കിൽ defined HAVE_CONCURRENCY
+    തിരികെ std::max(0, (പൂർണ്ണസംഖ്യ)Concurrency::Context::VirtualProcessorId()); // zero for master thread, unique number for others but not necessary 1,2,3,...
+#അല്ലെങ്കിലെങ്കിൽ defined HAVE_PTHREADS_PF
+    തിരികെ (പൂർണ്ണസംഖ്യ)(size_t)(ശൂന്യം*)pthread_self(); // no zero-based indexing
+#അല്ലെങ്കിൽ
+    തിരികെ 0;
 #endif
 }
 
 
-#if defined __linux__ || defined __GLIBC__ || defined __HAIKU__ || defined __ANDROID__
+#എങ്കിൽ defined __linux__ || defined __GLIBC__ || defined __HAIKU__ || defined __ANDROID__
   #define CV_CPU_GROUPS_1
 #endif
 
-#if defined __linux__ || defined __ANDROID__
+#എങ്കിൽ defined __linux__ || defined __ANDROID__
   #define CV_HAVE_CGROUPS 1
 #endif
 
-#if defined CV_CPU_GROUPS_1
-static inline
-std::string getFileContents(const char *filename)
+#എങ്കിൽ defined CV_CPU_GROUPS_1
+സ്ഥിതം വരിയിൽ
+std::string getFileContents(സ്ഥിരം അക്ഷരം *filename)
 {
     std::ifstream ifs(filename);
-    if (!ifs.is_open())
-        return std::string();
+    എങ്കിൽ (!ifs.is_open())
+        തിരികെ std::string();
 
-    std::string content( (std::istreambuf_iterator<char>(ifs) ),
-                         (std::istreambuf_iterator<char>()    ) );
+    std::string content( (std::istreambuf_iterator<അക്ഷരം>(ifs) ),
+                         (std::istreambuf_iterator<അക്ഷരം>()    ) );
 
-    if (ifs.fail())
-        return std::string();
+    എങ്കിൽ (ifs.fail())
+        തിരികെ std::string();
 
-    return content;
+    തിരികെ content;
 }
 
-static inline
-int getNumberOfCPUsImpl(const char *filename)
+സ്ഥിതം വരിയിൽ
+പൂർണ്ണസംഖ്യ get_സംഖ്യ_Of_CPUs_Impl(സ്ഥിരം അക്ഷരം *filename)
 {
    std::string file_contents = getFileContents(filename);
-   if(file_contents.empty())
-       return 0;
+   എങ്കിൽ(file_contents.empty())
+       തിരികെ 0;
 
-   char *pbuf = const_cast<char*>(file_contents.c_str());
+   അക്ഷരം *pbuf = const_cast<അക്ഷരം*>(file_contents.c_str());
    //parse string of form "0-1,3,5-7,10,13-15"
-   int cpusAvailable = 0;
+   പൂർണ്ണസംഖ്യ cpusAvailable = 0;
 
-   while(*pbuf)
+   ആകുമ്പോൾ(*pbuf)
    {
-      const char* pos = pbuf;
-      bool range = false;
-      while(*pbuf && *pbuf != ',')
+      സ്ഥിരം അക്ഷരം* pos = pbuf;
+      തർക്കം range = അസത്യം;
+      ആകുമ്പോൾ(*pbuf && *pbuf != ',')
       {
-          if(*pbuf == '-') range = true;
+          എങ്കിൽ(*pbuf == '-') range = സത്യം;
           ++pbuf;
       }
-      if(*pbuf) *pbuf++ = 0;
-      if(!range)
+      എങ്കിൽ(*pbuf) *pbuf++ = 0;
+      എങ്കിൽ(!range)
         ++cpusAvailable;
-      else
+      അല്ലെങ്കിൽ
       {
-          int rstart = 0, rend = 0;
+          പൂർണ്ണസംഖ്യ rstart = 0, rend = 0;
           sscanf(pos, "%d-%d", &rstart, &rend);
           cpusAvailable += rend - rstart + 1;
       }
 
    }
-   return cpusAvailable;
+   തിരികെ cpusAvailable;
 }
 #endif
 
-#if defined CV_HAVE_CGROUPS
-static inline
-unsigned getNumberOfCPUsCFSv2()
+#എങ്കിൽ defined CV_HAVE_CGROUPS
+സ്ഥിതം വരിയിൽ
+unsigned get_സംഖ്യ_Of_CPUs_CFSv2()
 {
-    int cfs_quota = 0;
-    int cfs_period = 0;
+    പൂർണ്ണസംഖ്യ cfs_quota = 0;
+    പൂർണ്ണസംഖ്യ cfs_period = 0;
 
     std::ifstream ss_cpu_max("/sys/fs/cgroup/cpu.max", std::ios::in | std::ios::binary);
     ss_cpu_max >> cfs_quota >> cfs_period;
 
-    if (ss_cpu_max.fail() || cfs_quota < 1 || cfs_period < 1) /* values must not be 0 or negative */
-        return 0;
+    എങ്കിൽ (ss_cpu_max.fail() || cfs_quota < 1 || cfs_period < 1) /* values must not be 0 or negative */
+        തിരികെ 0;
 
-    return (unsigned)max(1, cfs_quota/cfs_period);
+    തിരികെ (unsigned)max(1, cfs_quota/cfs_period);
 }
 
-static inline
-unsigned getNumberOfCPUsCFSv1()
+സ്ഥിതം വരിയിൽ
+unsigned get_സംഖ്യ_Of_CPUs_CFSv1()
 {
-    int cfs_quota = 0;
+    പൂർണ്ണസംഖ്യ cfs_quota = 0;
     {
         std::ifstream ss_period("/sys/fs/cgroup/cpu/cpu.cfs_quota_us", std::ios::in | std::ios::binary);
         ss_period >> cfs_quota;
 
-        if (ss_period.fail() || cfs_quota < 1) /* cfs_quota must not be 0 or negative */
-            return 0;
+        എങ്കിൽ (ss_period.fail() || cfs_quota < 1) /* cfs_quota must not be 0 or negative */
+            തിരികെ 0;
     }
 
-    int cfs_period = 0;
+    പൂർണ്ണസംഖ്യ cfs_period = 0;
     {
         std::ifstream ss_quota("/sys/fs/cgroup/cpu/cpu.cfs_period_us", std::ios::in | std::ios::binary);
         ss_quota >> cfs_period;
 
-        if (ss_quota.fail() || cfs_period < 1)
-            return 0;
+        എങ്കിൽ (ss_quota.fail() || cfs_period < 1)
+            തിരികെ 0;
     }
 
-    return (unsigned)max(1, cfs_quota/cfs_period);
+    തിരികെ (unsigned)max(1, cfs_quota/cfs_period);
 }
 #endif
 
-template <typename T> static inline
-T minNonZero(const T& val_1, const T& val_2)
+template <typename T> സ്ഥിതം വരിയിൽ
+T minNonZero(സ്ഥിരം T& val_1, സ്ഥിരം T& val_2)
 {
-    if ((val_1 != 0) && (val_2 != 0))
-        return std::min(val_1, val_2);
-    return (val_1 != 0) ? val_1 : val_2;
+    എങ്കിൽ ((val_1 != 0) && (val_2 != 0))
+        തിരികെ std::min(val_1, val_2);
+    തിരികെ (val_1 != 0) ? val_1 : val_2;
 }
 
 #ifndef OPENCV_DISABLE_THREAD_SUPPORT
-static
-int getNumberOfCPUs_()
+സ്ഥിതം
+പൂർണ്ണസംഖ്യ get_സംഖ്യ_Of_CPUs_2()
 {
 #ifndef OPENCV_SEMIHOSTING
     /*
@@ -937,7 +937,7 @@ int getNumberOfCPUs_()
      * the minimum most value as it has high probablity of being right and safe.
      * Return 1 if we get 0 or not found on all methods.
     */
-#if !defined(__MINGW32__) /* not implemented (2020-03) */
+#എങ്കിൽ !defined(__MINGW32__) /* not implemented (2020-03) */
 
     /*
      * Check for this standard C++11 way, we do not return directly because
@@ -946,116 +946,116 @@ int getNumberOfCPUs_()
      * must be "considered only a hint".
     */
     unsigned ncpus = std::thread::hardware_concurrency(); /* If the value is not well defined or not computable, returns 0 */
-#else
+#അല്ലെങ്കിൽ
     unsigned ncpus = 0; /* 0 means we have to find out some other way */
 #endif
 
-#if defined _WIN32
+#എങ്കിൽ defined _WIN32
 
     SYSTEM_INFO sysinfo = {};
-#if (defined(_M_ARM) || defined(_M_ARM64) || defined(_M_ARM64EC) || defined(_M_X64) || defined(WINRT)) && _WIN32_WINNT >= 0x501
+#എങ്കിൽ (defined(_M_ARM) || defined(_M_ARM64) || defined(_M_ARM64EC) || defined(_M_X64) || defined(WINRT)) && _WIN32_WINNT >= 0x501
     GetNativeSystemInfo( &sysinfo );
-#else
+#അല്ലെങ്കിൽ
     GetSystemInfo( &sysinfo );
 #endif
-    unsigned ncpus_sysinfo = sysinfo.dwNumberOfProcessors;
+    unsigned ncpus_sysinfo = sysinfo.dw_സംഖ്യ_Of_Processors;
     ncpus = minNonZero(ncpus, ncpus_sysinfo);
 
-#elif defined __APPLE__
+#അല്ലെങ്കിലെങ്കിൽ defined __APPLE__
 
-    int numCPU=0;
-    int mib[4];
-    size_t len = sizeof(numCPU);
+    പൂർണ്ണസംഖ്യ അക്കം_CPU=0;
+    പൂർണ്ണസംഖ്യ mib[4];
+    size_t len = വലുപ്പം(അക്കം_CPU);
 
     /* set the mib for hw.ncpu */
     mib[0] = CTL_HW;
     mib[1] = HW_AVAILCPU;  // alternatively, try HW_NCPU;
 
     /* get the number of CPUs from the system */
-    sysctl(mib, 2, &numCPU, &len, NULL, 0);
+    sysctl(mib, 2, &അക്കം_CPU, &len, ശൂന്യ, 0);
 
-    if( numCPU < 1 )
+    എങ്കിൽ( അക്കം_CPU < 1 )
     {
         mib[1] = HW_NCPU;
-        sysctl( mib, 2, &numCPU, &len, NULL, 0 );
+        sysctl( mib, 2, &അക്കം_CPU, &len, ശൂന്യ, 0 );
 
-        if( numCPU < 1 )
-            numCPU = 1;
+        എങ്കിൽ( അക്കം_CPU < 1 )
+            അക്കം_CPU = 1;
     }
 
-    ncpus = minNonZero(ncpus, (unsigned)numCPU);
+    ncpus = minNonZero(ncpus, (unsigned)അക്കം_CPU);
 
-#elif defined CV_CPU_GROUPS_1
+#അല്ലെങ്കിലെങ്കിൽ defined CV_CPU_GROUPS_1
 
-#if defined CV_HAVE_CGROUPS
-    static unsigned ncpus_impl_cpuset = (unsigned)getNumberOfCPUsImpl("/sys/fs/cgroup/cpuset/cpuset.cpus");
+#എങ്കിൽ defined CV_HAVE_CGROUPS
+    സ്ഥിതം unsigned ncpus_impl_cpuset = (unsigned)get_സംഖ്യ_Of_CPUs_Impl("/sys/fs/cgroup/cpuset/cpuset.cpus");
     ncpus = minNonZero(ncpus, ncpus_impl_cpuset);
 
-    static unsigned ncpus_impl_cfs_v1 = getNumberOfCPUsCFSv1();
+    സ്ഥിതം unsigned ncpus_impl_cfs_v1 = get_സംഖ്യ_Of_CPUs_CFSv1();
     ncpus = minNonZero(ncpus, ncpus_impl_cfs_v1);
 
-    static unsigned ncpus_impl_cfs_v2 = getNumberOfCPUsCFSv2();
+    സ്ഥിതം unsigned ncpus_impl_cfs_v2 = get_സംഖ്യ_Of_CPUs_CFSv2();
     ncpus = minNonZero(ncpus, ncpus_impl_cfs_v2);
 #endif
 
-    static unsigned ncpus_impl_devices = (unsigned)getNumberOfCPUsImpl("/sys/devices/system/cpu/online");
+    സ്ഥിതം unsigned ncpus_impl_devices = (unsigned)get_സംഖ്യ_Of_CPUs_Impl("/sys/devices/system/cpu/online");
     ncpus = minNonZero(ncpus, ncpus_impl_devices);
 
 #endif
 
-#if defined _GNU_SOURCE \
+#എങ്കിൽ defined _GNU_SOURCE \
     && !defined(__MINGW32__) /* not implemented (2020-03) */ \
     && !defined(__EMSCRIPTEN__) \
     && !defined(__ANDROID__)  // TODO: add check for modern Android NDK
 
     cpu_set_t cpu_set;
-    if (0 == sched_getaffinity(0, sizeof(cpu_set), &cpu_set))
+    എങ്കിൽ (0 == sched_getaffinity(0, വലുപ്പം(cpu_set), &cpu_set))
     {
-        unsigned cpu_count_cpu_set = CPU_COUNT(&cpu_set);
-        ncpus = minNonZero(ncpus, cpu_count_cpu_set);
+        unsigned cpu_എണ്ണം_cpu_set = CPU_COUNT(&cpu_set);
+        ncpus = minNonZero(ncpus, cpu_എണ്ണം_cpu_set);
     }
 
 #endif
 
-#if !defined(_WIN32) && !defined(__APPLE__) && defined(_SC_NPROCESSORS_ONLN)
+#എങ്കിൽ !defined(_WIN32) && !defined(__APPLE__) && defined(_SC_NPROCESSORS_ONLN)
 
-    static unsigned cpu_count_sysconf = (unsigned)sysconf( _SC_NPROCESSORS_ONLN );
-    ncpus = minNonZero(ncpus, cpu_count_sysconf);
-#elif defined (__QNX__)
-    static unsigned cpu_count_sysconf = _syspage_ptr->num_cpu;
-    ncpus = minNonZero(ncpus, cpu_count_sysconf);
+    സ്ഥിതം unsigned cpu_എണ്ണം_sysconf = (unsigned)sysconf( _SC_NPROCESSORS_ONLN );
+    ncpus = minNonZero(ncpus, cpu_എണ്ണം_sysconf);
+#അല്ലെങ്കിലെങ്കിൽ defined (__QNX__)
+    സ്ഥിതം unsigned cpu_എണ്ണം_sysconf = _syspage_ptr->അക്കം_cpu;
+    ncpus = minNonZero(ncpus, cpu_എണ്ണം_sysconf);
 #endif
 
-    return ncpus != 0 ? ncpus : 1;
-#else //  OPENCV_SEMIHOSTING
-    return 1;
+    തിരികെ ncpus != 0 ? ncpus : 1;
+#അല്ലെങ്കിൽ //  OPENCV_SEMIHOSTING
+    തിരികെ 1;
 #endif //OPENCV_SEMIHOSTING
 }
 
-int getNumberOfCPUs()
+പൂർണ്ണസംഖ്യ get_സംഖ്യ_Of_CPUs()
 {
-    static int nCPUs = getNumberOfCPUs_();
-    return nCPUs;  // cached value
+    സ്ഥിതം പൂർണ്ണസംഖ്യ nCPUs = get_സംഖ്യ_Of_CPUs_2();
+    തിരികെ nCPUs;  // cached value
 }
 
-#else  // OPENCV_DISABLE_THREAD_SUPPORT
-int getNumberOfCPUs()
+#അല്ലെങ്കിൽ  // OPENCV_DISABLE_THREAD_SUPPORT
+പൂർണ്ണസംഖ്യ get_സംഖ്യ_Of_CPUs()
 {
-    return 1;
+    തിരികെ 1;
 }
 #endif  // OPENCV_DISABLE_THREAD_SUPPORT
 
-const char* currentParallelFramework()
+സ്ഥിരം അക്ഷരം* currentParallelFramework()
 {
     std::shared_ptr<ParallelForAPI>& api = getCurrentParallelForAPI();
-    if (api)
+    എങ്കിൽ (api)
     {
-        return api->getName();
+        തിരികെ api->getName();
     }
 #ifdef CV_PARALLEL_FRAMEWORK
-    return CV_PARALLEL_FRAMEWORK;
-#else
-    return NULL;
+    തിരികെ CV_PARALLEL_FRAMEWORK;
+#അല്ലെങ്കിൽ
+    തിരികെ ശൂന്യ;
 #endif
 }
 

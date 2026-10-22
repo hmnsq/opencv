@@ -41,55 +41,55 @@
 //
 //M*/
 
-#include "precomp.hpp"
+#അന്തര്ഭാവ "precomp.hpp"
 
-namespace cv
+നാമാകാശ cv
 {
-    class FormattedImpl CV_FINAL : public Formatted
+    വർഗ്ഗം FormattedImpl CV_FINAL : പൊതു Formatted
     {
-        enum { STATE_PROLOGUE, STATE_EPILOGUE, STATE_INTERLUDE,
-               STATE_ROW_OPEN, STATE_ROW_CLOSE, STATE_CN_OPEN, STATE_CN_CLOSE, STATE_VALUE, STATE_FINISHED,
-               STATE_LINE_SEPARATOR, STATE_CN_SEPARATOR, STATE_VALUE_SEPARATOR };
-        enum {BRACE_ROW_OPEN = 0, BRACE_ROW_CLOSE = 1, BRACE_ROW_SEP=2, BRACE_CN_OPEN=3, BRACE_CN_CLOSE=4 };
+        എണ്ണൽ { STATE_PROLOGUE, STATE_EPILOGUE, STATE_INTERLUDE,
+               STATE_ROW_OPEN, STATE_ROW_CLOSE, STATE_CN_OPEN, STATE_CN_CLOSE, STATE_മൂല്യം, STATE_FINISHED,
+               STATE_വരി_SEPARATOR, STATE_CN_SEPARATOR, STATE_മൂല്യം_SEPARATOR };
+        എണ്ണൽ {BRACE_ROW_OPEN = 0, BRACE_ROW_CLOSE = 1, BRACE_ROW_SEP=2, BRACE_CN_OPEN=3, BRACE_CN_CLOSE=4 };
 
-        char floatFormat[8];
-        char buf[32];   // enough for double with precision up to 20
+        അക്ഷരം floatFormat[8];
+        അക്ഷരം buf[32];   // enough for double with precision up to 20
 
         Mat mtx;
-        int mcn; // == mtx.channels()
-        bool singleLine;
-        bool alignOrder;    // true when cn first order
+        പൂർണ്ണസംഖ്യ mcn; // == mtx.channels()
+        തർക്കം single_വരി;
+        തർക്കം alignOrder;    // true when cn first order
 
-        int state;
-        int row;
-        int col;
-        int cn;
+        പൂർണ്ണസംഖ്യ state;
+        പൂർണ്ണസംഖ്യ row;
+        പൂർണ്ണസംഖ്യ col;
+        പൂർണ്ണസംഖ്യ cn;
 
         String prologue;
         String epilogue;
-        char braces[5];
+        അക്ഷരം braces[5];
 
-        void (FormattedImpl::*valueToStr)();
-        void valueToStrBool() { snprintf(buf, sizeof(buf), "%d", (int)mtx.ptr<uchar>(row, col)[cn] != 0); }
-        void valueToStr8u()  { snprintf(buf, sizeof(buf), "%3d", (int)mtx.ptr<uchar>(row, col)[cn]); }
-        void valueToStr8s()  { snprintf(buf, sizeof(buf), "%3d", (int)mtx.ptr<schar>(row, col)[cn]); }
-        void valueToStr16u() { snprintf(buf, sizeof(buf), "%d", (int)mtx.ptr<ushort>(row, col)[cn]); }
-        void valueToStr16s() { snprintf(buf, sizeof(buf), "%d", (int)mtx.ptr<short>(row, col)[cn]); }
-        void valueToStr32u() { snprintf(buf, sizeof(buf), "%u", mtx.ptr<unsigned>(row, col)[cn]); }
-        void valueToStr32s() { snprintf(buf, sizeof(buf), "%d", mtx.ptr<int>(row, col)[cn]); }
-        void valueToStr32f() { snprintf(buf, sizeof(buf), floatFormat, mtx.ptr<float>(row, col)[cn]); }
-        void valueToStr64f() { snprintf(buf, sizeof(buf), floatFormat, mtx.ptr<double>(row, col)[cn]); }
-        void valueToStr64u() { snprintf(buf, sizeof(buf), "%llu", (unsigned long long)mtx.ptr<uint64_t>(row, col)[cn]); }
-        void valueToStr64s() { snprintf(buf, sizeof(buf), "%lld", (long long)mtx.ptr<int64_t>(row, col)[cn]); }
-        void valueToStr16f() { snprintf(buf, sizeof(buf), floatFormat, (float)mtx.ptr<hfloat>(row, col)[cn]); }
-        void valueToStr16bf() { snprintf(buf, sizeof(buf), floatFormat, (float)mtx.ptr<bfloat>(row, col)[cn]); }
-        void valueToStr8f()   { snprintf(buf, sizeof(buf), floatFormat, (float)mtx.ptr<fp8_t>(row, col)[cn]); }
-        void valueToStr8fnuz() { snprintf(buf, sizeof(buf), floatFormat, (float)mtx.ptr<fp8a_t>(row, col)[cn]); }
-        void valueToStrOther() { buf[0] = 0; }
+        ശൂന്യം (FormattedImpl::*മൂല്യം_To_Str)();
+        ശൂന്യം മൂല്യം_To_Str_Bool() { snprintf(buf, വലുപ്പം(buf), "%d", (പൂർണ്ണസംഖ്യ)mtx.ptr<uchar>(row, col)[cn] != 0); }
+        ശൂന്യം മൂല്യം_To_Str8u()  { snprintf(buf, വലുപ്പം(buf), "%3d", (പൂർണ്ണസംഖ്യ)mtx.ptr<uchar>(row, col)[cn]); }
+        ശൂന്യം മൂല്യം_To_Str8s()  { snprintf(buf, വലുപ്പം(buf), "%3d", (പൂർണ്ണസംഖ്യ)mtx.ptr<schar>(row, col)[cn]); }
+        ശൂന്യം മൂല്യം_To_Str16u() { snprintf(buf, വലുപ്പം(buf), "%d", (പൂർണ്ണസംഖ്യ)mtx.ptr<ushort>(row, col)[cn]); }
+        ശൂന്യം മൂല്യം_To_Str16s() { snprintf(buf, വലുപ്പം(buf), "%d", (പൂർണ്ണസംഖ്യ)mtx.ptr<short>(row, col)[cn]); }
+        ശൂന്യം മൂല്യം_To_Str32u() { snprintf(buf, വലുപ്പം(buf), "%u", mtx.ptr<unsigned>(row, col)[cn]); }
+        ശൂന്യം മൂല്യം_To_Str32s() { snprintf(buf, വലുപ്പം(buf), "%d", mtx.ptr<പൂർണ്ണസംഖ്യ>(row, col)[cn]); }
+        ശൂന്യം മൂല്യം_To_Str32f() { snprintf(buf, വലുപ്പം(buf), floatFormat, mtx.ptr<ദശാംശം>(row, col)[cn]); }
+        ശൂന്യം മൂല്യം_To_Str64f() { snprintf(buf, വലുപ്പം(buf), floatFormat, mtx.ptr<ഇരട്ട>(row, col)[cn]); }
+        ശൂന്യം മൂല്യം_To_Str64u() { snprintf(buf, വലുപ്പം(buf), "%llu", (unsigned long long)mtx.ptr<uint64_t>(row, col)[cn]); }
+        ശൂന്യം മൂല്യം_To_Str64s() { snprintf(buf, വലുപ്പം(buf), "%lld", (long long)mtx.ptr<int64_t>(row, col)[cn]); }
+        ശൂന്യം മൂല്യം_To_Str16f() { snprintf(buf, വലുപ്പം(buf), floatFormat, (ദശാംശം)mtx.ptr<hfloat>(row, col)[cn]); }
+        ശൂന്യം മൂല്യം_To_Str16bf() { snprintf(buf, വലുപ്പം(buf), floatFormat, (ദശാംശം)mtx.ptr<bfloat>(row, col)[cn]); }
+        ശൂന്യം മൂല്യം_To_Str8f()   { snprintf(buf, വലുപ്പം(buf), floatFormat, (ദശാംശം)mtx.ptr<fp8_t>(row, col)[cn]); }
+        ശൂന്യം മൂല്യം_To_Str8fnuz() { snprintf(buf, വലുപ്പം(buf), floatFormat, (ദശാംശം)mtx.ptr<fp8a_t>(row, col)[cn]); }
+        ശൂന്യം മൂല്യം_To_Str_Other() { buf[0] = 0; }
 
-    public:
+    പൊതു:
 
-        FormattedImpl(String pl, String el, Mat m, char br[5], bool sLine, bool aOrder, int precision)
+        FormattedImpl(String pl, String el, Mat m, അക്ഷരം br[5], തർക്കം s_വരി, തർക്കം aOrder, പൂർണ്ണസംഖ്യ precision)
         {
             CV_Assert(m.dims <= 2);
 
@@ -99,290 +99,290 @@ namespace cv
             mcn = m.channels();
             memcpy(braces, br, 5);
             state = STATE_PROLOGUE;
-            singleLine = sLine;
+            single_വരി = s_വരി;
             alignOrder = aOrder;
             row = col = cn =0;
 
-            if (precision < 0)
+            എങ്കിൽ (precision < 0)
             {
                 floatFormat[0] = '%';
                 floatFormat[1] = 'a';
                 floatFormat[2] = 0;
             }
-            else
+            അല്ലെങ്കിൽ
             {
-                cv_snprintf(floatFormat, sizeof(floatFormat), "%%.%dg", std::min(precision, 20));
+                cv_snprintf(floatFormat, വലുപ്പം(floatFormat), "%%.%dg", std::min(precision, 20));
             }
 
-            switch(mtx.depth())
+            തിരഞ്ഞെടുപ്പ്(mtx.depth())
             {
-                case CV_8U:  valueToStr = &FormattedImpl::valueToStr8u; break;
-                case CV_8S:  valueToStr = &FormattedImpl::valueToStr8s; break;
-                case CV_Bool: valueToStr = &FormattedImpl::valueToStrBool; break;
-                case CV_16U: valueToStr = &FormattedImpl::valueToStr16u; break;
-                case CV_16S: valueToStr = &FormattedImpl::valueToStr16s; break;
-                case CV_32U: valueToStr = &FormattedImpl::valueToStr32u; break;
-                case CV_32S: valueToStr = &FormattedImpl::valueToStr32s; break;
-                case CV_32F: valueToStr = &FormattedImpl::valueToStr32f; break;
-                case CV_64F: valueToStr = &FormattedImpl::valueToStr64f; break;
-                case CV_64U: valueToStr = &FormattedImpl::valueToStr64u; break;
-                case CV_64S: valueToStr = &FormattedImpl::valueToStr64s; break;
-                case CV_16F: valueToStr = &FormattedImpl::valueToStr16f; break;
-                case CV_16BF: valueToStr = &FormattedImpl::valueToStr16bf; break;
-                case CV_8F_E4M3FN:   valueToStr = &FormattedImpl::valueToStr8f; break;
-                case CV_8F_E4M3FNUZ: valueToStr = &FormattedImpl::valueToStr8fnuz; break;
-                default:
+                അവസ്ഥ CV_8U:  മൂല്യം_To_Str = &FormattedImpl::മൂല്യം_To_Str8u; നിർത്തുക;
+                അവസ്ഥ CV_8S:  മൂല്യം_To_Str = &FormattedImpl::മൂല്യം_To_Str8s; നിർത്തുക;
+                അവസ്ഥ CV_Bool: മൂല്യം_To_Str = &FormattedImpl::മൂല്യം_To_Str_Bool; നിർത്തുക;
+                അവസ്ഥ CV_16U: മൂല്യം_To_Str = &FormattedImpl::മൂല്യം_To_Str16u; നിർത്തുക;
+                അവസ്ഥ CV_16S: മൂല്യം_To_Str = &FormattedImpl::മൂല്യം_To_Str16s; നിർത്തുക;
+                അവസ്ഥ CV_32U: മൂല്യം_To_Str = &FormattedImpl::മൂല്യം_To_Str32u; നിർത്തുക;
+                അവസ്ഥ CV_32S: മൂല്യം_To_Str = &FormattedImpl::മൂല്യം_To_Str32s; നിർത്തുക;
+                അവസ്ഥ CV_32F: മൂല്യം_To_Str = &FormattedImpl::മൂല്യം_To_Str32f; നിർത്തുക;
+                അവസ്ഥ CV_64F: മൂല്യം_To_Str = &FormattedImpl::മൂല്യം_To_Str64f; നിർത്തുക;
+                അവസ്ഥ CV_64U: മൂല്യം_To_Str = &FormattedImpl::മൂല്യം_To_Str64u; നിർത്തുക;
+                അവസ്ഥ CV_64S: മൂല്യം_To_Str = &FormattedImpl::മൂല്യം_To_Str64s; നിർത്തുക;
+                അവസ്ഥ CV_16F: മൂല്യം_To_Str = &FormattedImpl::മൂല്യം_To_Str16f; നിർത്തുക;
+                അവസ്ഥ CV_16BF: മൂല്യം_To_Str = &FormattedImpl::മൂല്യം_To_Str16bf; നിർത്തുക;
+                അവസ്ഥ CV_8F_E4M3FN:   മൂല്യം_To_Str = &FormattedImpl::മൂല്യം_To_Str8f; നിർത്തുക;
+                അവസ്ഥ CV_8F_E4M3FNUZ: മൂല്യം_To_Str = &FormattedImpl::മൂല്യം_To_Str8fnuz; നിർത്തുക;
+                സ്ഥിരസ്ഥിതി:
                     CV_Error_(Error::StsError, ("unsupported matrix type %d\n", mtx.depth()));
             }
         }
 
-        void reset() CV_OVERRIDE
+        ശൂന്യം reset() CV_OVERRIDE
         {
             state = STATE_PROLOGUE;
         }
 
-        const char* next() CV_OVERRIDE
+        സ്ഥിരം അക്ഷരം* next() CV_OVERRIDE
         {
-            switch(state)
+            തിരഞ്ഞെടുപ്പ്(state)
             {
-                case STATE_PROLOGUE:
+                അവസ്ഥ STATE_PROLOGUE:
                     row = 0;
-                    if (mtx.empty())
+                    എങ്കിൽ (mtx.empty())
                         state = STATE_EPILOGUE;
-                    else if (alignOrder)
+                    അല്ലെങ്കിൽ എങ്കിൽ (alignOrder)
                         state = STATE_INTERLUDE;
-                    else
+                    അല്ലെങ്കിൽ
                         state = STATE_ROW_OPEN;
-                    return prologue.c_str();
-                case STATE_INTERLUDE:
+                    തിരികെ prologue.c_str();
+                അവസ്ഥ STATE_INTERLUDE:
                     state = STATE_ROW_OPEN;
-                    if (row >= mtx.rows)
+                    എങ്കിൽ (row >= mtx.rows)
                     {
-                        if (++cn >= mcn)
+                        എങ്കിൽ (++cn >= mcn)
                         {
                             state = STATE_EPILOGUE;
                             buf[0] = 0;
-                            return buf;
+                            തിരികെ buf;
                         }
-                        else
+                        അല്ലെങ്കിൽ
                             row = 0;
-                        snprintf(buf, sizeof(buf), "\n(:, :, %d) = \n", cn+1);
-                        return buf;
+                        snprintf(buf, വലുപ്പം(buf), "\n(:, :, %d) = \n", cn+1);
+                        തിരികെ buf;
                     }
-                    snprintf(buf, sizeof(buf), "(:, :, %d) = \n", cn+1);
-                    return buf;
-                case STATE_EPILOGUE:
+                    snprintf(buf, വലുപ്പം(buf), "(:, :, %d) = \n", cn+1);
+                    തിരികെ buf;
+                അവസ്ഥ STATE_EPILOGUE:
                     state = STATE_FINISHED;
-                    return epilogue.c_str();
-                case STATE_ROW_OPEN:
+                    തിരികെ epilogue.c_str();
+                അവസ്ഥ STATE_ROW_OPEN:
                     col = 0;
                     state = STATE_CN_OPEN;
                     {
                         size_t pos = 0;
-                        if (row > 0)
-                            while(pos < prologue.size() && pos < sizeof(buf) - 2)
+                        എങ്കിൽ (row > 0)
+                            ആകുമ്പോൾ(pos < prologue.size() && pos < വലുപ്പം(buf) - 2)
                                 buf[pos++] = ' ';
-                        if (braces[BRACE_ROW_OPEN])
+                        എങ്കിൽ (braces[BRACE_ROW_OPEN])
                             buf[pos++] = braces[BRACE_ROW_OPEN];
-                        if(!pos)
-                            return next();
+                        എങ്കിൽ(!pos)
+                            തിരികെ next();
                         buf[pos] = 0;
                     }
-                    return buf;
-                case STATE_ROW_CLOSE:
-                    state = STATE_LINE_SEPARATOR;
+                    തിരികെ buf;
+                അവസ്ഥ STATE_ROW_CLOSE:
+                    state = STATE_വരി_SEPARATOR;
                     ++row;
-                    if (braces[BRACE_ROW_CLOSE])
+                    എങ്കിൽ (braces[BRACE_ROW_CLOSE])
                     {
                         buf[0] = braces[BRACE_ROW_CLOSE];
                         buf[1] = row < mtx.rows ? ',' : '\0';
                         buf[2] = 0;
-                        return buf;
+                        തിരികെ buf;
                     }
-                    else if(braces[BRACE_ROW_SEP] && row < mtx.rows)
+                    അല്ലെങ്കിൽ എങ്കിൽ(braces[BRACE_ROW_SEP] && row < mtx.rows)
                     {
                         buf[0] = braces[BRACE_ROW_SEP];
                         buf[1] = 0;
-                        return buf;
+                        തിരികെ buf;
                     }
-                    return next();
-                case STATE_CN_OPEN:
-                    state = STATE_VALUE;
-                    if (!alignOrder)
+                    തിരികെ next();
+                അവസ്ഥ STATE_CN_OPEN:
+                    state = STATE_മൂല്യം;
+                    എങ്കിൽ (!alignOrder)
                         cn = 0;
-                    if (mcn > 1 && braces[BRACE_CN_OPEN])
+                    എങ്കിൽ (mcn > 1 && braces[BRACE_CN_OPEN])
                     {
                         buf[0] = braces[BRACE_CN_OPEN];
                         buf[1] = 0;
-                        return buf;
+                        തിരികെ buf;
                     }
-                    return next();
-                case STATE_CN_CLOSE:
+                    തിരികെ next();
+                അവസ്ഥ STATE_CN_CLOSE:
                     ++col;
-                    if (col >= mtx.cols)
+                    എങ്കിൽ (col >= mtx.cols)
                         state = STATE_ROW_CLOSE;
-                    else
+                    അല്ലെങ്കിൽ
                         state = STATE_CN_SEPARATOR;
-                    if (mcn > 1 && braces[BRACE_CN_CLOSE])
+                    എങ്കിൽ (mcn > 1 && braces[BRACE_CN_CLOSE])
                     {
                         buf[0] = braces[BRACE_CN_CLOSE];
                         buf[1] = 0;
-                        return buf;
+                        തിരികെ buf;
                     }
-                    return next();
-                case STATE_VALUE:
-                    (this->*valueToStr)();
+                    തിരികെ next();
+                അവസ്ഥ STATE_മൂല്യം:
+                    (ഇത്->*മൂല്യം_To_Str)();
                     state = STATE_CN_CLOSE;
-                    if (alignOrder)
-                        return buf;
-                    if (++cn < mcn)
-                        state = STATE_VALUE_SEPARATOR;
-                    return buf;
-                case STATE_FINISHED:
-                    return 0;
-                case STATE_LINE_SEPARATOR:
-                    if (row >= mtx.rows)
+                    എങ്കിൽ (alignOrder)
+                        തിരികെ buf;
+                    എങ്കിൽ (++cn < mcn)
+                        state = STATE_മൂല്യം_SEPARATOR;
+                    തിരികെ buf;
+                അവസ്ഥ STATE_FINISHED:
+                    തിരികെ 0;
+                അവസ്ഥ STATE_വരി_SEPARATOR:
+                    എങ്കിൽ (row >= mtx.rows)
                     {
-                        if (alignOrder)
+                        എങ്കിൽ (alignOrder)
                             state = STATE_INTERLUDE;
-                        else
+                        അല്ലെങ്കിൽ
                             state = STATE_EPILOGUE;
-                        return next();
+                        തിരികെ next();
                     }
                     state = STATE_ROW_OPEN;
-                    buf[0] = singleLine ? ' ' : '\n';
+                    buf[0] = single_വരി ? ' ' : '\n';
                     buf[1] = 0;
-                    return buf;
-                case STATE_CN_SEPARATOR:
+                    തിരികെ buf;
+                അവസ്ഥ STATE_CN_SEPARATOR:
                     state = STATE_CN_OPEN;
                     buf[0] = ',';
                     buf[1] = ' ';
                     buf[2] = 0;
-                    return buf;
-                case STATE_VALUE_SEPARATOR:
-                    state = STATE_VALUE;
+                    തിരികെ buf;
+                അവസ്ഥ STATE_മൂല്യം_SEPARATOR:
+                    state = STATE_മൂല്യം;
                     buf[0] = ',';
                     buf[1] = ' ';
                     buf[2] = 0;
-                    return buf;
+                    തിരികെ buf;
             }
-            return 0;
+            തിരികെ 0;
         }
     };
 
-    class FormatterBase : public Formatter
+    വർഗ്ഗം FormatterBase : പൊതു Formatter
     {
-    public:
-        FormatterBase() : prec16f(4), prec32f(8), prec64f(16), multiline(true) {}
+    പൊതു:
+        FormatterBase() : prec16f(4), prec32f(8), prec64f(16), multiline(സത്യം) {}
 
-        void set16fPrecision(int p) CV_OVERRIDE
+        ശൂന്യം set16fPrecision(പൂർണ്ണസംഖ്യ p) CV_OVERRIDE
         {
             prec16f = p;
         }
 
-        void set32fPrecision(int p) CV_OVERRIDE
+        ശൂന്യം set32fPrecision(പൂർണ്ണസംഖ്യ p) CV_OVERRIDE
         {
             prec32f = p;
         }
 
-        void set64fPrecision(int p) CV_OVERRIDE
+        ശൂന്യം set64fPrecision(പൂർണ്ണസംഖ്യ p) CV_OVERRIDE
         {
             prec64f = p;
         }
 
-        void setMultiline(bool ml) CV_OVERRIDE
+        ശൂന്യം setMultiline(തർക്കം ml) CV_OVERRIDE
         {
             multiline = ml;
         }
 
-    protected:
-        int prec16f;
-        int prec32f;
-        int prec64f;
-        int multiline;
+    സംരക്ഷിത:
+        പൂർണ്ണസംഖ്യ prec16f;
+        പൂർണ്ണസംഖ്യ prec32f;
+        പൂർണ്ണസംഖ്യ prec64f;
+        പൂർണ്ണസംഖ്യ multiline;
     };
 
-    class DefaultFormatter CV_FINAL : public FormatterBase
+    വർഗ്ഗം DefaultFormatter CV_FINAL : പൊതു FormatterBase
     {
-    public:
+    പൊതു:
 
-        Ptr<Formatted> format(const Mat& mtx) const CV_OVERRIDE
+        Ptr<Formatted> format(സ്ഥിരം Mat& mtx) സ്ഥിരം CV_OVERRIDE
         {
-            char braces[5] = {'\0', '\0', ';', '\0', '\0'};
-            return makePtr<FormattedImpl>("[", "]", mtx, &*braces,
-                mtx.rows == 1 || !multiline, false, mtx.depth() == CV_64F ? prec64f : prec32f );
+            അക്ഷരം braces[5] = {'\0', '\0', ';', '\0', '\0'};
+            തിരികെ makePtr<FormattedImpl>("[", "]", mtx, &*braces,
+                mtx.rows == 1 || !multiline, അസത്യം, mtx.depth() == CV_64F ? prec64f : prec32f );
         }
     };
 
-    class MatlabFormatter CV_FINAL : public FormatterBase
+    വർഗ്ഗം MatlabFormatter CV_FINAL : പൊതു FormatterBase
     {
-    public:
+    പൊതു:
 
-        Ptr<Formatted> format(const Mat& mtx) const CV_OVERRIDE
+        Ptr<Formatted> format(സ്ഥിരം Mat& mtx) സ്ഥിരം CV_OVERRIDE
         {
-            char braces[5] = {'\0', '\0', ';', '\0', '\0'};
-            return makePtr<FormattedImpl>("", "", mtx, &*braces,
-                mtx.rows == 1 || !multiline, true, mtx.depth() == CV_64F ? prec64f : prec32f );
+            അക്ഷരം braces[5] = {'\0', '\0', ';', '\0', '\0'};
+            തിരികെ makePtr<FormattedImpl>("", "", mtx, &*braces,
+                mtx.rows == 1 || !multiline, സത്യം, mtx.depth() == CV_64F ? prec64f : prec32f );
         }
     };
 
-    class PythonFormatter CV_FINAL : public FormatterBase
+    വർഗ്ഗം PythonFormatter CV_FINAL : പൊതു FormatterBase
     {
-    public:
+    പൊതു:
 
-        Ptr<Formatted> format(const Mat& mtx) const CV_OVERRIDE
+        Ptr<Formatted> format(സ്ഥിരം Mat& mtx) സ്ഥിരം CV_OVERRIDE
         {
-            char braces[5] = {'[', ']', ',', '[', ']'};
-            if (mtx.cols == 1)
+            അക്ഷരം braces[5] = {'[', ']', ',', '[', ']'};
+            എങ്കിൽ (mtx.cols == 1)
                 braces[0] = braces[1] = '\0';
-            return makePtr<FormattedImpl>("[", "]", mtx, &*braces,
-                mtx.rows == 1 || !multiline, false, mtx.depth() == CV_64F ? prec64f : prec32f );
+            തിരികെ makePtr<FormattedImpl>("[", "]", mtx, &*braces,
+                mtx.rows == 1 || !multiline, അസത്യം, mtx.depth() == CV_64F ? prec64f : prec32f );
         }
     };
 
-    class NumpyFormatter CV_FINAL : public FormatterBase
+    വർഗ്ഗം NumpyFormatter CV_FINAL : പൊതു FormatterBase
     {
-    public:
+    പൊതു:
 
-        Ptr<Formatted> format(const Mat& mtx) const CV_OVERRIDE
+        Ptr<Formatted> format(സ്ഥിരം Mat& mtx) സ്ഥിരം CV_OVERRIDE
         {
-            static const char* numpyTypes[CV_DEPTH_MAX] =
+            സ്ഥിതം സ്ഥിരം അക്ഷരം* numpyTypes[CV_DEPTH_MAX] =
             {
                 "uint8", "int8", "uint16", "int16", "int32", "float32", "float64",
                 "float16", "bfloat16", "bool", "uint64", "int64", "uint32",
                 "float8_e4m3fn", "float8_e4m3fnuz"
             };
-            char braces[5] = {'[', ']', ',', '[', ']'};
-            if (mtx.cols == 1)
+            അക്ഷരം braces[5] = {'[', ']', ',', '[', ']'};
+            എങ്കിൽ (mtx.cols == 1)
                 braces[0] = braces[1] = '\0';
-            return makePtr<FormattedImpl>("array([",
+            തിരികെ makePtr<FormattedImpl>("array([",
                 cv::format("], dtype='%s')", numpyTypes[mtx.depth()]), mtx, &*braces,
-                mtx.rows == 1 || !multiline, false, mtx.depth() == CV_64F ? prec64f : prec32f );
+                mtx.rows == 1 || !multiline, അസത്യം, mtx.depth() == CV_64F ? prec64f : prec32f );
         }
     };
 
-    class CSVFormatter CV_FINAL : public FormatterBase
+    വർഗ്ഗം CSVFormatter CV_FINAL : പൊതു FormatterBase
     {
-    public:
+    പൊതു:
 
-        Ptr<Formatted> format(const Mat& mtx) const CV_OVERRIDE
+        Ptr<Formatted> format(സ്ഥിരം Mat& mtx) സ്ഥിരം CV_OVERRIDE
         {
-            char braces[5] = {'\0', '\0', '\0', '\0', '\0'};
-            return makePtr<FormattedImpl>(String(),
+            അക്ഷരം braces[5] = {'\0', '\0', '\0', '\0', '\0'};
+            തിരികെ makePtr<FormattedImpl>(String(),
                 mtx.rows > 1 ? String("\n") : String(), mtx, &*braces,
-                mtx.rows == 1 || !multiline, false, mtx.depth() == CV_64F ? prec64f : prec32f );
+                mtx.rows == 1 || !multiline, അസത്യം, mtx.depth() == CV_64F ? prec64f : prec32f );
         }
     };
 
-    class CFormatter CV_FINAL : public FormatterBase
+    വർഗ്ഗം CFormatter CV_FINAL : പൊതു FormatterBase
     {
-    public:
+    പൊതു:
 
-        Ptr<Formatted> format(const Mat& mtx) const CV_OVERRIDE
+        Ptr<Formatted> format(സ്ഥിരം Mat& mtx) സ്ഥിരം CV_OVERRIDE
         {
-            char braces[5] = {'\0', '\0', ',', '\0', '\0'};
-            return makePtr<FormattedImpl>("{", "}", mtx, &*braces,
-                mtx.rows == 1 || !multiline, false, mtx.depth() == CV_64F ? prec64f : prec32f );
+            അക്ഷരം braces[5] = {'\0', '\0', ',', '\0', '\0'};
+            തിരികെ makePtr<FormattedImpl>("{", "}", mtx, &*braces,
+                mtx.rows == 1 || !multiline, അസത്യം, mtx.depth() == CV_64F ? prec64f : prec32f );
         }
     };
 
@@ -391,188 +391,188 @@ namespace cv
 
     Ptr<Formatter> Formatter::get(Formatter::FormatType fmt)
     {
-        switch(fmt)
+        തിരഞ്ഞെടുപ്പ്(fmt)
         {
-            case FMT_DEFAULT:
-                return makePtr<DefaultFormatter>();
-            case FMT_MATLAB:
-                return makePtr<MatlabFormatter>();
-            case FMT_CSV:
-                return makePtr<CSVFormatter>();
-            case FMT_PYTHON:
-                return makePtr<PythonFormatter>();
-            case FMT_NUMPY:
-                return makePtr<NumpyFormatter>();
-            case FMT_C:
-                return makePtr<CFormatter>();
+            അവസ്ഥ FMT_DEFAULT:
+                തിരികെ makePtr<DefaultFormatter>();
+            അവസ്ഥ FMT_MATLAB:
+                തിരികെ makePtr<MatlabFormatter>();
+            അവസ്ഥ FMT_CSV:
+                തിരികെ makePtr<CSVFormatter>();
+            അവസ്ഥ FMT_PYTHON:
+                തിരികെ makePtr<PythonFormatter>();
+            അവസ്ഥ FMT_NUMPY:
+                തിരികെ makePtr<NumpyFormatter>();
+            അവസ്ഥ FMT_C:
+                തിരികെ makePtr<CFormatter>();
         }
-        return makePtr<DefaultFormatter>();
+        തിരികെ makePtr<DefaultFormatter>();
     }
 
-    template<typename _Tp> struct Fmt
+    template<typename _Tp> ഘടന Fmt
     {
-        typedef int temp_type;
-        static const char* fmt() { return "%d"; }
+        തരനിർവചനം പൂർണ്ണസംഖ്യ temp_type;
+        സ്ഥിതം സ്ഥിരം അക്ഷരം* fmt() { തിരികെ "%d"; }
     };
 
-    template<> struct Fmt<uint32_t>
+    template<> ഘടന Fmt<uint32_t>
     {
-        typedef unsigned temp_type;
-        static const char* fmt() { return "%u"; }
+        തരനിർവചനം unsigned temp_type;
+        സ്ഥിതം സ്ഥിരം അക്ഷരം* fmt() { തിരികെ "%u"; }
     };
 
-    template<> struct Fmt<int64_t>
+    template<> ഘടന Fmt<int64_t>
     {
-        typedef long long temp_type;
-        static const char* fmt() { return "%lld"; }
+        തരനിർവചനം long long temp_type;
+        സ്ഥിതം സ്ഥിരം അക്ഷരം* fmt() { തിരികെ "%lld"; }
     };
 
-    template<> struct Fmt<uint64_t>
+    template<> ഘടന Fmt<uint64_t>
     {
-        typedef unsigned long long temp_type;
-        static const char* fmt() { return "%llu"; }
+        തരനിർവചനം unsigned long long temp_type;
+        സ്ഥിതം സ്ഥിരം അക്ഷരം* fmt() { തിരികെ "%llu"; }
     };
 
-    template<> struct Fmt<float>
+    template<> ഘടന Fmt<ദശാംശം>
     {
-        typedef float temp_type;
-        static const char* fmt() { return "%.5g"; }
+        തരനിർവചനം ദശാംശം temp_type;
+        സ്ഥിതം സ്ഥിരം അക്ഷരം* fmt() { തിരികെ "%.5g"; }
     };
 
-    template<> struct Fmt<double>
+    template<> ഘടന Fmt<ഇരട്ട>
     {
-        typedef double temp_type;
-        static const char* fmt() { return "%.5g"; }
+        തരനിർവചനം ഇരട്ട temp_type;
+        സ്ഥിതം സ്ഥിരം അക്ഷരം* fmt() { തിരികെ "%.5g"; }
     };
 
-    template<> struct Fmt<hfloat>
+    template<> ഘടന Fmt<hfloat>
     {
-        typedef float temp_type;
-        static const char* fmt() { return "%.5g"; }
+        തരനിർവചനം ദശാംശം temp_type;
+        സ്ഥിതം സ്ഥിരം അക്ഷരം* fmt() { തിരികെ "%.5g"; }
     };
 
-    template<> struct Fmt<bfloat>
+    template<> ഘടന Fmt<bfloat>
     {
-        typedef float temp_type;
-        static const char* fmt() { return "%.4g"; }
+        തരനിർവചനം ദശാംശം temp_type;
+        സ്ഥിതം സ്ഥിരം അക്ഷരം* fmt() { തിരികെ "%.4g"; }
     };
 
-    template<> struct Fmt<fp8_t>
+    template<> ഘടന Fmt<fp8_t>
     {
-        typedef float temp_type;
-        static const char* fmt() { return "%.4g"; }
+        തരനിർവചനം ദശാംശം temp_type;
+        സ്ഥിതം സ്ഥിരം അക്ഷരം* fmt() { തിരികെ "%.4g"; }
     };
 
-    template<> struct Fmt<fp8a_t>
+    template<> ഘടന Fmt<fp8a_t>
     {
-        typedef float temp_type;
-        static const char* fmt() { return "%.4g"; }
+        തരനിർവചനം ദശാംശം temp_type;
+        സ്ഥിതം സ്ഥിരം അക്ഷരം* fmt() { തിരികെ "%.4g"; }
     };
 
     template <typename _Tp>
-    static void pprintRow(std::ostream& strm, const _Tp* ptr, int n, size_t ofs, int edge)
+    സ്ഥിതം ശൂന്യം pprintRow(std::ostream& strm, സ്ഥിരം _Tp* ptr, പൂർണ്ണസംഖ്യ n, size_t ofs, പൂർണ്ണസംഖ്യ edge)
     {
-        char buf[128];
-        const char* fmt = Fmt<_Tp>::fmt();
-        int i, ndump = edge > 0 ? std::min(n, edge*2+1) : n;
-        if (edge == 0)
+        അക്ഷരം buf[128];
+        സ്ഥിരം അക്ഷരം* fmt = Fmt<_Tp>::fmt();
+        പൂർണ്ണസംഖ്യ i, ndump = edge > 0 ? std::min(n, edge*2+1) : n;
+        എങ്കിൽ (edge == 0)
             edge = ndump;
-        for (i = 0; i < ndump; i++) {
-            int j = n == ndump || i < edge ? i : i == edge ? -1 : n-edge*2-1+i;
-            if (i > 0)
+        വേണ്ടി (i = 0; i < ndump; i++) {
+            പൂർണ്ണസംഖ്യ j = n == ndump || i < edge ? i : i == edge ? -1 : n-edge*2-1+i;
+            എങ്കിൽ (i > 0)
                 strm << ", ";
-            if (j >= 0) {
-                snprintf(buf, sizeof(buf), fmt, (typename Fmt<_Tp>::temp_type)ptr[ofs + j]);
+            എങ്കിൽ (j >= 0) {
+                snprintf(buf, വലുപ്പം(buf), fmt, (typename Fmt<_Tp>::temp_type)ptr[ofs + j]);
                 strm << buf;
-            } else
+            } അല്ലെങ്കിൽ
                 strm << "... ";
         }
     }
 
-    static void pprintSlice(std::ostream& strm, const Mat& tensor,
-                            const size_t* step, int d,
-                            size_t ofs, int edge)
+    സ്ഥിതം ശൂന്യം pprintSlice(std::ostream& strm, സ്ഥിരം Mat& tensor,
+                            സ്ഥിരം size_t* step, പൂർണ്ണസംഖ്യ d,
+                            size_t ofs, പൂർണ്ണസംഖ്യ edge)
     {
         MatShape shape = tensor.shape();
-        int ndims = shape.dims;
-        int n = d >= ndims ? 1 : shape[d];
-        if (d >= ndims - 1) {
-            int typ = tensor.depth();
-            void* data = tensor.data;
+        പൂർണ്ണസംഖ്യ ndims = shape.dims;
+        പൂർണ്ണസംഖ്യ n = d >= ndims ? 1 : shape[d];
+        എങ്കിൽ (d >= ndims - 1) {
+            പൂർണ്ണസംഖ്യ typ = tensor.depth();
+            ശൂന്യം* data = tensor.data;
             CV_Assert(data);
             n *= tensor.channels();
-            if (typ == CV_8U)
-                pprintRow(strm, (const uint8_t*)data, n, ofs, edge);
-            else if (typ == CV_8S)
-                pprintRow(strm, (const int8_t*)data, n, ofs, edge);
-            else if (typ == CV_16U)
-                pprintRow(strm, (const uint16_t*)data, n, ofs, edge);
-            else if (typ == CV_16S)
-                pprintRow(strm, (const int16_t*)data, n, ofs, edge);
-            else if (typ == CV_32U)
-                pprintRow(strm, (const unsigned*)data, n, ofs, edge);
-            else if (typ == CV_32S)
-                pprintRow(strm, (const int*)data, n, ofs, edge);
-            else if (typ == CV_64U)
-                pprintRow(strm, (const uint64_t*)data, n, ofs, edge);
-            else if (typ == CV_64S)
-                pprintRow(strm, (const int64_t*)data, n, ofs, edge);
-            else if (typ == CV_32F)
-                pprintRow(strm, (const float*)data, n, ofs, edge);
-            else if (typ == CV_64F)
-                pprintRow(strm, (const double*)data, n, ofs, edge);
-            else if (typ == CV_16F)
-                pprintRow(strm, (const hfloat*)data, n, ofs, edge);
-            else if (typ == CV_16BF)
-                pprintRow(strm, (const bfloat*)data, n, ofs, edge);
-            else if (typ == CV_Bool)
-                pprintRow(strm, (const bool*)data, n, ofs, edge);
-            else if (typ == CV_8F_E4M3FN)
-                pprintRow(strm, (const fp8_t*)data, n, ofs, edge);
-            else if (typ == CV_8F_E4M3FNUZ)
-                pprintRow(strm, (const fp8a_t*)data, n, ofs, edge);
-            else {
+            എങ്കിൽ (typ == CV_8U)
+                pprintRow(strm, (സ്ഥിരം uint8_t*)data, n, ofs, edge);
+            അല്ലെങ്കിൽ എങ്കിൽ (typ == CV_8S)
+                pprintRow(strm, (സ്ഥിരം int8_t*)data, n, ofs, edge);
+            അല്ലെങ്കിൽ എങ്കിൽ (typ == CV_16U)
+                pprintRow(strm, (സ്ഥിരം uint16_t*)data, n, ofs, edge);
+            അല്ലെങ്കിൽ എങ്കിൽ (typ == CV_16S)
+                pprintRow(strm, (സ്ഥിരം int16_t*)data, n, ofs, edge);
+            അല്ലെങ്കിൽ എങ്കിൽ (typ == CV_32U)
+                pprintRow(strm, (സ്ഥിരം unsigned*)data, n, ofs, edge);
+            അല്ലെങ്കിൽ എങ്കിൽ (typ == CV_32S)
+                pprintRow(strm, (സ്ഥിരം പൂർണ്ണസംഖ്യ*)data, n, ofs, edge);
+            അല്ലെങ്കിൽ എങ്കിൽ (typ == CV_64U)
+                pprintRow(strm, (സ്ഥിരം uint64_t*)data, n, ofs, edge);
+            അല്ലെങ്കിൽ എങ്കിൽ (typ == CV_64S)
+                pprintRow(strm, (സ്ഥിരം int64_t*)data, n, ofs, edge);
+            അല്ലെങ്കിൽ എങ്കിൽ (typ == CV_32F)
+                pprintRow(strm, (സ്ഥിരം ദശാംശം*)data, n, ofs, edge);
+            അല്ലെങ്കിൽ എങ്കിൽ (typ == CV_64F)
+                pprintRow(strm, (സ്ഥിരം ഇരട്ട*)data, n, ofs, edge);
+            അല്ലെങ്കിൽ എങ്കിൽ (typ == CV_16F)
+                pprintRow(strm, (സ്ഥിരം hfloat*)data, n, ofs, edge);
+            അല്ലെങ്കിൽ എങ്കിൽ (typ == CV_16BF)
+                pprintRow(strm, (സ്ഥിരം bfloat*)data, n, ofs, edge);
+            അല്ലെങ്കിൽ എങ്കിൽ (typ == CV_Bool)
+                pprintRow(strm, (സ്ഥിരം തർക്കം*)data, n, ofs, edge);
+            അല്ലെങ്കിൽ എങ്കിൽ (typ == CV_8F_E4M3FN)
+                pprintRow(strm, (സ്ഥിരം fp8_t*)data, n, ofs, edge);
+            അല്ലെങ്കിൽ എങ്കിൽ (typ == CV_8F_E4M3FNUZ)
+                pprintRow(strm, (സ്ഥിരം fp8a_t*)data, n, ofs, edge);
+            അല്ലെങ്കിൽ {
                 CV_Error(Error::StsNotImplemented, "unsupported type");
             }
-        } else {
-            int i, ndump = edge > 0 ? std::min(n, edge*2+1) : n;
-            bool dots = false;
-            for (i = 0; i < ndump; i++) {
-                if (i > 0 && !dots) {
-                    int nempty_lines = ndims - 2 - d;
-                    for (int k = 0; k < nempty_lines; k++)
+        } അല്ലെങ്കിൽ {
+            പൂർണ്ണസംഖ്യ i, ndump = edge > 0 ? std::min(n, edge*2+1) : n;
+            തർക്കം dots = അസത്യം;
+            വേണ്ടി (i = 0; i < ndump; i++) {
+                എങ്കിൽ (i > 0 && !dots) {
+                    പൂർണ്ണസംഖ്യ nempty_വരികൾ = ndims - 2 - d;
+                    വേണ്ടി (പൂർണ്ണസംഖ്യ k = 0; k < nempty_വരികൾ; k++)
                         strm << "\n";
                 }
-                if (i > 0)
+                എങ്കിൽ (i > 0)
                     strm << "\n";
-                int j = n == ndump || i < edge ? i :
+                പൂർണ്ണസംഖ്യ j = n == ndump || i < edge ? i :
                         i == edge ? -1 :
                         n - edge*2 - 1 + i;
                 dots = j < 0;
-                if (!dots)
+                എങ്കിൽ (!dots)
                     pprintSlice(strm, tensor, step, d+1, ofs + j*step[d], edge);
-                else
+                അല്ലെങ്കിൽ
                     strm << "...";
             }
         }
     }
 
-    std::ostream& pprint(std::ostream& strm, InputArray array,
-                         int /*indent*/, int edge_,
-                         int wholeTensorThreshold,
-                         char parens)
+    std::ostream& pprint(std::ostream& strm, നിവേശം_Array array,
+                         പൂർണ്ണസംഖ്യ /*indent*/, പൂർണ്ണസംഖ്യ edge_,
+                         പൂർണ്ണസംഖ്യ wholeTensorThreshold,
+                         അക്ഷരം parens)
     {
-        char oparen = parens;
-        char cparen = parens == '(' ? ')' :
+        അക്ഷരം oparen = parens;
+        അക്ഷരം cparen = parens == '(' ? ')' :
                       parens == '[' ? ']' :
                       parens == '{' ? '}' :
                       parens == '<' ? '>' :
                       parens;
-        int edge = edge_ > 0 ? edge_ : 3;
+        പൂർണ്ണസംഖ്യ edge = edge_ > 0 ? edge_ : 3;
         wholeTensorThreshold = wholeTensorThreshold > 0 ? wholeTensorThreshold : 100;
 
         Mat tensor = array.getMat();
-        if (!tensor.isContinuous()) {
+        എങ്കിൽ (!tensor.isContinuous()) {
             // [TODO] print non-continous arrays without copy
             Mat temp;
             tensor.copyTo(temp);
@@ -582,28 +582,28 @@ namespace cv
         MatShape shape = tensor.shape();
         size_t sz_all = tensor.total();
 
-        if (parens)
+        എങ്കിൽ (parens)
             strm << oparen;
-        if (sz_all == 0) {
-            if (!parens)
+        എങ്കിൽ (sz_all == 0) {
+            എങ്കിൽ (!parens)
                 strm << "<empty>";
-        } else {
-            if (sz_all <= (size_t)wholeTensorThreshold)
+        } അല്ലെങ്കിൽ {
+            എങ്കിൽ (sz_all <= (size_t)wholeTensorThreshold)
                 edge = 0;
 
-            int ndims = shape.dims;
-            int cn = tensor.channels();
+            പൂർണ്ണസംഖ്യ ndims = shape.dims;
+            പൂർണ്ണസംഖ്യ cn = tensor.channels();
             size_t step[MatShape::MAX_DIMS];
             step[std::max(ndims-1, 0)] = 1;
-            for (int i = ndims-2; i >= 0; i--) {
+            വേണ്ടി (പൂർണ്ണസംഖ്യ i = ndims-2; i >= 0; i--) {
                 step[i] = step[i+1]*shape[i+1]*cn;
                 cn = 1;
             }
             pprintSlice(strm, tensor, step, 0, 0, edge);
         }
-        if (parens)
+        എങ്കിൽ (parens)
             strm << cparen;
-        return strm;
+        തിരികെ strm;
     }
 
 } // cv

@@ -40,9 +40,9 @@
 //
 //M*/
 
-#include "precomp.hpp"
+#അന്തര്ഭാവ "precomp.hpp"
 
-namespace cv
+നാമാകാശ cv
 {
 
 Algorithm::Algorithm()
@@ -55,38 +55,38 @@ Algorithm::~Algorithm()
     CV_TRACE_FUNCTION();
 }
 
-void Algorithm::write(FileStorage& fs, const String& name) const
+ശൂന്യം Algorithm::ലിഖ(FileStorage& fs, സ്ഥിരം String& name) സ്ഥിരം
 {
     CV_TRACE_FUNCTION();
-    if(name.empty())
+    എങ്കിൽ(name.empty())
     {
-        write(fs);
-        return;
+        ലിഖ(fs);
+        തിരികെ;
     }
     fs << name << "{";
-    write(fs);
+    ലിഖ(fs);
     fs << "}";
 }
 
-void Algorithm::save(const String& filename) const
+ശൂന്യം Algorithm::save(സ്ഥിരം String& filename) സ്ഥിരം
 {
     CV_TRACE_FUNCTION();
     FileStorage fs(filename, FileStorage::WRITE);
     fs << getDefaultName() << "{";
-    write(fs);
+    ലിഖ(fs);
     fs << "}";
 }
 
-String Algorithm::getDefaultName() const
+String Algorithm::getDefaultName() സ്ഥിരം
 {
     CV_TRACE_FUNCTION();
-    return String("my_object");
+    തിരികെ String("my_object");
 }
 
-void Algorithm::writeFormat(FileStorage& fs) const
+ശൂന്യം Algorithm::writeFormat(FileStorage& fs) സ്ഥിരം
 {
     CV_TRACE_FUNCTION();
-    fs << "format" << (int)3;
+    fs << "format" << (പൂർണ്ണസംഖ്യ)3;
 }
 
 }

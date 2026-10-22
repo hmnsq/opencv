@@ -40,18 +40,18 @@
 //
 //M*/
 
-#include "precomp.hpp"
+#അന്തര്ഭാവ "precomp.hpp"
 
-#if defined (__APPLE__) || defined(MACOSX)
+#എങ്കിൽ defined (__APPLE__) || defined(MACOSX)
    #define GL_SHARING_EXTENSION "cl_APPLE_gl_sharing"
-#else
+#അല്ലെങ്കിൽ
    #define GL_SHARING_EXTENSION "cl_khr_gl_sharing"
 #endif
 
 #ifdef HAVE_OPENGL
 #  include "gl_core_3_1.hpp"
 #  ifdef HAVE_CUDA
-#    if (defined(__arm__) || defined(__aarch64__)) \
+#    എങ്കിൽ (defined(__arm__) || defined(__aarch64__)) \
          && !defined(OPENCV_SKIP_CUDA_OPENGL_ARM_WORKAROUND)
 #      include <GL/gl.h>
 #      ifndef GL_VERSION
@@ -60,48 +60,48 @@
 #    endif
 #    include <cuda_gl_interop.h>
 #  endif
-#else // HAVE_OPENGL
+#അല്ലെങ്കിൽ // HAVE_OPENGL
 #  define NO_OPENGL_SUPPORT_ERROR CV_Error(cv::Error::StsBadFunc, "OpenCV was build without OpenGL support")
 #endif // HAVE_OPENGL
 
-using namespace cv;
-using namespace cv::cuda;
+using നാമാകാശ cv;
+using നാമാകാശ cv::cuda;
 
-#if defined(_MSC_VER)
+#എങ്കിൽ defined(_MSC_VER)
 #pragma warning(disable : 4702)  // unreachable code
 #endif
 
-namespace
+നാമാകാശ
 {
 #ifndef HAVE_OPENGL
-inline static CV_NORETURN void throw_no_ogl() { CV_Error(cv::Error::OpenGlNotSupported, "The library is compiled without OpenGL support"); }
-#elif defined _DEBUG
-inline static bool checkError(const char* file, const int line, const char* func = 0)
+വരിയിൽ സ്ഥിതം CV_NORETURN ശൂന്യം throw_no_ogl() { CV_Error(cv::Error::OpenGlNotSupported, "The library is compiled without OpenGL support"); }
+#അല്ലെങ്കിലെങ്കിൽ defined _DEBUG
+വരിയിൽ സ്ഥിതം തർക്കം checkError(സ്ഥിരം അക്ഷരം* file, സ്ഥിരം പൂർണ്ണസംഖ്യ വരി, സ്ഥിരം അക്ഷരം* func = 0)
 {
     GLenum err = gl::GetError();
-    if (err != gl::NO_ERROR_)
+    എങ്കിൽ (err != gl::NO_ERROR_)
     {
-        const char* msg;
-        switch (err)
+        സ്ഥിരം അക്ഷരം* സന്ദേശം;
+        തിരഞ്ഞെടുപ്പ് (err)
         {
-        case gl::INVALID_ENUM:
-            msg = "An unacceptable value is specified for an enumerated argument";
-            break;
-        case gl::INVALID_VALUE:
-            msg = "A numeric argument is out of range";
-            break;
-        case gl::INVALID_OPERATION:
-            msg = "The specified operation is not allowed in the current state";
-            break;
-        case gl::OUT_OF_MEMORY:
-            msg = "There is not enough memory left to execute the command";
-            break;
-        default:
-            msg = "Unknown error";
+        അവസ്ഥ gl::INVALID_ENUM:
+            സന്ദേശം = "An unacceptable value is specified for an enumerated argument";
+            നിർത്തുക;
+        അവസ്ഥ gl::INVALID_മൂല്യം:
+            സന്ദേശം = "A numeric argument is out of range";
+            നിർത്തുക;
+        അവസ്ഥ gl::INVALID_OPERATION:
+            സന്ദേശം = "The specified operation is not allowed in the current state";
+            നിർത്തുക;
+        അവസ്ഥ gl::OUT_OF_MEMORY:
+            സന്ദേശം = "There is not enough memory left to execute the command";
+            നിർത്തുക;
+        സ്ഥിരസ്ഥിതി:
+            സന്ദേശം = "Unknown error";
         };
-        cv::error(Error::OpenGlApiCallError, func, msg, file, line);
+        cv::error(Error::OpenGlApiCallError, func, സന്ദേശം, file, വരി);
     }
-    return true;
+    തിരികെ സത്യം;
 }
 #endif // HAVE_OPENGL
 } // namespace
@@ -109,25 +109,25 @@ inline static bool checkError(const char* file, const int line, const char* func
 #define CV_CheckGlError() CV_DbgAssert( (checkError(__FILE__, __LINE__, CV_Func)) )
 
 #ifdef HAVE_OPENGL
-namespace
+നാമാകാശ
 {
-    const GLenum gl_types[] = { gl::UNSIGNED_BYTE, gl::BYTE, gl::UNSIGNED_SHORT, gl::SHORT, gl::INT, gl::FLOAT, gl::DOUBLE };
+    സ്ഥിരം GLenum gl_types[] = { gl::UNSIGNED_BYTE, gl::BYTE, gl::UNSIGNED_SHORT, gl::SHORT, gl::INT, gl::FLOAT, gl::DOUBLE };
 }
 #endif
 
 ////////////////////////////////////////////////////////////////////////
 // setGlDevice
 
-void cv::cuda::setGlDevice(int device)
+ശൂന്യം cv::cuda::setGlDevice(പൂർണ്ണസംഖ്യ device)
 {
 #ifndef HAVE_OPENGL
     CV_UNUSED(device);
     throw_no_ogl();
-#else
+#അല്ലെങ്കിൽ
     #ifndef HAVE_CUDA
         CV_UNUSED(device);
         throw_no_cuda();
-    #else
+    #അല്ലെങ്കിൽ
         cudaSafeCall( cudaGLSetGLDevice(device) );
     #endif
 #endif
@@ -136,30 +136,30 @@ void cv::cuda::setGlDevice(int device)
 ////////////////////////////////////////////////////////////////////////
 // CudaResource
 
-#if defined(HAVE_OPENGL) && defined(HAVE_CUDA)
+#എങ്കിൽ defined(HAVE_OPENGL) && defined(HAVE_CUDA)
 
-namespace
+നാമാകാശ
 {
-    class CudaResource
+    വർഗ്ഗം CudaResource
     {
-    public:
+    പൊതു:
         CudaResource();
         ~CudaResource();
 
-        void registerBuffer(GLuint buffer);
-        void release();
+        ശൂന്യം registerBuffer(GLuint buffer);
+        ശൂന്യം release();
 
-        void copyFrom(const void* src, size_t spitch, size_t width, size_t height, cudaStream_t stream = 0);
-        void copyTo(void* dst, size_t dpitch, size_t width, size_t height, cudaStream_t stream = 0);
+        ശൂന്യം copyFrom(സ്ഥിരം ശൂന്യം* src, size_t spitch, size_t width, size_t height, cudaStream_t stream = 0);
+        ശൂന്യം copyTo(ശൂന്യം* dst, size_t dpitch, size_t width, size_t height, cudaStream_t stream = 0);
 
-        void* map(cudaStream_t stream = 0);
-        void unmap(cudaStream_t stream = 0);
+        ശൂന്യം* map(cudaStream_t stream = 0);
+        ശൂന്യം unmap(cudaStream_t stream = 0);
 
-    private:
+    സ്വകാര്യ:
         cudaGraphicsResource_t resource_;
         GLuint buffer_;
 
-        class GraphicsMapHolder;
+        വർഗ്ഗം GraphicsMapHolder;
     };
 
     CudaResource::CudaResource() : resource_(0), buffer_(0)
@@ -171,12 +171,12 @@ namespace
         release();
     }
 
-    void CudaResource::registerBuffer(GLuint buffer)
+    ശൂന്യം CudaResource::registerBuffer(GLuint buffer)
     {
         CV_DbgAssert( buffer != 0 );
 
-        if (buffer_ == buffer)
-            return;
+        എങ്കിൽ (buffer_ == buffer)
+            തിരികെ;
 
         cudaGraphicsResource_t resource;
         cudaSafeCall( cudaGraphicsGLRegisterBuffer(&resource, buffer, cudaGraphicsMapFlagsNone) );
@@ -187,99 +187,99 @@ namespace
         buffer_ = buffer;
     }
 
-    void CudaResource::release()
+    ശൂന്യം CudaResource::release()
     {
-        if (resource_)
+        എങ്കിൽ (resource_)
             cudaGraphicsUnregisterResource(resource_);
 
         resource_ = 0;
         buffer_ = 0;
     }
 
-    class CudaResource::GraphicsMapHolder
+    വർഗ്ഗം CudaResource::GraphicsMapHolder
     {
-    public:
+    പൊതു:
         GraphicsMapHolder(cudaGraphicsResource_t* resource, cudaStream_t stream);
         ~GraphicsMapHolder();
 
-        void reset();
+        ശൂന്യം reset();
 
-    private:
+    സ്വകാര്യ:
         cudaGraphicsResource_t* resource_;
         cudaStream_t stream_;
     };
 
     CudaResource::GraphicsMapHolder::GraphicsMapHolder(cudaGraphicsResource_t* resource, cudaStream_t stream) : resource_(resource), stream_(stream)
     {
-        if (resource_)
+        എങ്കിൽ (resource_)
             cudaSafeCall( cudaGraphicsMapResources(1, resource_, stream_) );
     }
 
     CudaResource::GraphicsMapHolder::~GraphicsMapHolder()
     {
-        if (resource_)
+        എങ്കിൽ (resource_)
             cudaGraphicsUnmapResources(1, resource_, stream_);
     }
 
-    void CudaResource::GraphicsMapHolder::reset()
+    ശൂന്യം CudaResource::GraphicsMapHolder::reset()
     {
         resource_ = 0;
     }
 
-    void CudaResource::copyFrom(const void* src, size_t spitch, size_t width, size_t height, cudaStream_t stream)
+    ശൂന്യം CudaResource::copyFrom(സ്ഥിരം ശൂന്യം* src, size_t spitch, size_t width, size_t height, cudaStream_t stream)
     {
         CV_DbgAssert( resource_ != 0 );
 
         GraphicsMapHolder h(&resource_, stream);
         CV_UNUSED(h);
 
-        void* dst;
+        ശൂന്യം* dst;
         size_t size;
         cudaSafeCall( cudaGraphicsResourceGetMappedPointer(&dst, &size, resource_) );
 
         CV_DbgAssert( width * height == size );
 
-        if (stream == 0)
+        എങ്കിൽ (stream == 0)
             cudaSafeCall( cudaMemcpy2D(dst, width, src, spitch, width, height, cudaMemcpyDeviceToDevice) );
-        else
+        അല്ലെങ്കിൽ
             cudaSafeCall( cudaMemcpy2DAsync(dst, width, src, spitch, width, height, cudaMemcpyDeviceToDevice, stream) );
     }
 
-    void CudaResource::copyTo(void* dst, size_t dpitch, size_t width, size_t height, cudaStream_t stream)
+    ശൂന്യം CudaResource::copyTo(ശൂന്യം* dst, size_t dpitch, size_t width, size_t height, cudaStream_t stream)
     {
         CV_DbgAssert( resource_ != 0 );
 
         GraphicsMapHolder h(&resource_, stream);
         CV_UNUSED(h);
 
-        void* src;
+        ശൂന്യം* src;
         size_t size;
         cudaSafeCall( cudaGraphicsResourceGetMappedPointer(&src, &size, resource_) );
 
         CV_DbgAssert( width * height == size );
 
-        if (stream == 0)
+        എങ്കിൽ (stream == 0)
             cudaSafeCall( cudaMemcpy2D(dst, dpitch, src, width, width, height, cudaMemcpyDeviceToDevice) );
-        else
+        അല്ലെങ്കിൽ
             cudaSafeCall( cudaMemcpy2DAsync(dst, dpitch, src, width, width, height, cudaMemcpyDeviceToDevice, stream) );
     }
 
-    void* CudaResource::map(cudaStream_t stream)
+    ശൂന്യം* CudaResource::map(cudaStream_t stream)
     {
         CV_DbgAssert( resource_ != 0 );
 
         GraphicsMapHolder h(&resource_, stream);
 
-        void* ptr;
+        ശൂന്യം* ptr;
         size_t size;
         cudaSafeCall( cudaGraphicsResourceGetMappedPointer(&ptr, &size, resource_) );
 
         h.reset();
 
-        return ptr;
+        തിരികെ ptr;
     }
 
-    void CudaResource::unmap(cudaStream_t stream)
+    ശൂന്യം CudaResource::unmap(cudaStream_t stream)
     {
         CV_Assert( resource_ != 0 );
 
@@ -294,72 +294,72 @@ namespace
 
 #ifndef HAVE_OPENGL
 
-class cv::ogl::Buffer::Impl
+വർഗ്ഗം cv::ogl::Buffer::Impl
 {
 };
 
-#else
+#അല്ലെങ്കിൽ
 
-class cv::ogl::Buffer::Impl
+വർഗ്ഗം cv::ogl::Buffer::Impl
 {
-public:
-    static const Ptr<Impl>& empty();
+പൊതു:
+    സ്ഥിതം സ്ഥിരം Ptr<Impl>& empty();
 
-    Impl(GLuint bufId, bool autoRelease);
-    Impl(GLsizeiptr size, const GLvoid* data, GLenum target, bool autoRelease);
+    Impl(GLuint bufId, തർക്കം autoRelease);
+    Impl(GLsizeiptr size, സ്ഥിരം GLvoid* data, GLenum target, തർക്കം autoRelease);
     ~Impl();
 
-    void bind(GLenum target) const;
+    ശൂന്യം bind(GLenum target) സ്ഥിരം;
 
-    void copyFrom(GLuint srcBuf, GLsizeiptr size);
+    ശൂന്യം copyFrom(GLuint srcBuf, GLsizeiptr size);
 
-    void copyFrom(GLsizeiptr size, const GLvoid* data);
-    void copyTo(GLsizeiptr size, GLvoid* data) const;
+    ശൂന്യം copyFrom(GLsizeiptr size, സ്ഥിരം GLvoid* data);
+    ശൂന്യം copyTo(GLsizeiptr size, GLvoid* data) സ്ഥിരം;
 
-    void resize(GLsizeiptr size, GLenum target);
+    ശൂന്യം resize(GLsizeiptr size, GLenum target);
 
-    void* mapHost(GLenum access);
-    void unmapHost();
+    ശൂന്യം* mapHost(GLenum access);
+    ശൂന്യം unmapHost();
 
 #ifdef HAVE_CUDA
-    void copyFrom(const void* src, size_t spitch, size_t width, size_t height, cudaStream_t stream = 0);
-    void copyTo(void* dst, size_t dpitch, size_t width, size_t height, cudaStream_t stream = 0) const;
+    ശൂന്യം copyFrom(സ്ഥിരം ശൂന്യം* src, size_t spitch, size_t width, size_t height, cudaStream_t stream = 0);
+    ശൂന്യം copyTo(ശൂന്യം* dst, size_t dpitch, size_t width, size_t height, cudaStream_t stream = 0) സ്ഥിരം;
 
-    void* mapDevice(cudaStream_t stream = 0);
-    void unmapDevice(cudaStream_t stream = 0);
+    ശൂന്യം* mapDevice(cudaStream_t stream = 0);
+    ശൂന്യം unmapDevice(cudaStream_t stream = 0);
 #endif
 
-    void setAutoRelease(bool flag) { autoRelease_ = flag; }
+    ശൂന്യം setAutoRelease(തർക്കം flag) { autoRelease_ = flag; }
 
-    GLuint bufId() const { return bufId_; }
+    GLuint bufId() സ്ഥിരം { തിരികെ bufId_; }
 
-private:
+സ്വകാര്യ:
     Impl();
 
     GLuint bufId_;
-    bool autoRelease_;
+    തർക്കം autoRelease_;
 
 #ifdef HAVE_CUDA
     mutable CudaResource cudaResource_;
 #endif
 };
 
-const Ptr<cv::ogl::Buffer::Impl>& cv::ogl::Buffer::Impl::empty()
+സ്ഥിരം Ptr<cv::ogl::Buffer::Impl>& cv::ogl::Buffer::Impl::empty()
 {
-    static Ptr<Impl> p(new Impl);
-    return p;
+    സ്ഥിതം Ptr<Impl> p(പുതിയ Impl);
+    തിരികെ p;
 }
 
-cv::ogl::Buffer::Impl::Impl() : bufId_(0), autoRelease_(false)
+cv::ogl::Buffer::Impl::Impl() : bufId_(0), autoRelease_(അസത്യം)
 {
 }
 
-cv::ogl::Buffer::Impl::Impl(GLuint abufId, bool autoRelease) : bufId_(abufId), autoRelease_(autoRelease)
+cv::ogl::Buffer::Impl::Impl(GLuint abufId, തർക്കം autoRelease) : bufId_(abufId), autoRelease_(autoRelease)
 {
     CV_Assert( gl::IsBuffer(abufId) == gl::TRUE_ );
 }
 
-cv::ogl::Buffer::Impl::Impl(GLsizeiptr size, const GLvoid* data, GLenum target, bool autoRelease) : bufId_(0), autoRelease_(autoRelease)
+cv::ogl::Buffer::Impl::Impl(GLsizeiptr size, സ്ഥിരം GLvoid* data, GLenum target, തർക്കം autoRelease) : bufId_(0), autoRelease_(autoRelease)
 {
     gl::GenBuffers(1, &bufId_);
     CV_CheckGlError();
@@ -378,17 +378,17 @@ cv::ogl::Buffer::Impl::Impl(GLsizeiptr size, const GLvoid* data, GLenum target, 
 
 cv::ogl::Buffer::Impl::~Impl()
 {
-    if (autoRelease_ && bufId_)
+    എങ്കിൽ (autoRelease_ && bufId_)
         gl::DeleteBuffers(1, &bufId_);
 }
 
-void cv::ogl::Buffer::Impl::bind(GLenum target) const
+ശൂന്യം cv::ogl::Buffer::Impl::bind(GLenum target) സ്ഥിരം
 {
     gl::BindBuffer(target, bufId_);
     CV_CheckGlError();
 }
 
-void cv::ogl::Buffer::Impl::copyFrom(GLuint srcBuf, GLsizeiptr size)
+ശൂന്യം cv::ogl::Buffer::Impl::copyFrom(GLuint srcBuf, GLsizeiptr size)
 {
     gl::BindBuffer(gl::COPY_WRITE_BUFFER, bufId_);
     CV_CheckGlError();
@@ -400,7 +400,7 @@ void cv::ogl::Buffer::Impl::copyFrom(GLuint srcBuf, GLsizeiptr size)
     CV_CheckGlError();
 }
 
-void cv::ogl::Buffer::Impl::copyFrom(GLsizeiptr size, const GLvoid* data)
+ശൂന്യം cv::ogl::Buffer::Impl::copyFrom(GLsizeiptr size, സ്ഥിരം GLvoid* data)
 {
     gl::BindBuffer(gl::COPY_WRITE_BUFFER, bufId_);
     CV_CheckGlError();
@@ -409,7 +409,7 @@ void cv::ogl::Buffer::Impl::copyFrom(GLsizeiptr size, const GLvoid* data)
     CV_CheckGlError();
 }
 
-void cv::ogl::Buffer::Impl::resize(GLsizeiptr size, GLenum target)
+ശൂന്യം cv::ogl::Buffer::Impl::resize(GLsizeiptr size, GLenum target)
 {
     gl::BindBuffer(target, bufId_);
     CV_CheckGlError();
@@ -422,7 +422,7 @@ void cv::ogl::Buffer::Impl::resize(GLsizeiptr size, GLenum target)
     CV_CheckGlError();
 }
 
-void cv::ogl::Buffer::Impl::copyTo(GLsizeiptr size, GLvoid* data) const
+ശൂന്യം cv::ogl::Buffer::Impl::copyTo(GLsizeiptr size, GLvoid* data) സ്ഥിരം
 {
     gl::BindBuffer(gl::COPY_READ_BUFFER, bufId_);
     CV_CheckGlError();
@@ -431,7 +431,7 @@ void cv::ogl::Buffer::Impl::copyTo(GLsizeiptr size, GLvoid* data) const
     CV_CheckGlError();
 }
 
-void* cv::ogl::Buffer::Impl::mapHost(GLenum access)
+ശൂന്യം* cv::ogl::Buffer::Impl::mapHost(GLenum access)
 {
     gl::BindBuffer(gl::COPY_READ_BUFFER, bufId_);
     CV_CheckGlError();
@@ -439,35 +439,35 @@ void* cv::ogl::Buffer::Impl::mapHost(GLenum access)
     GLvoid* data = gl::MapBuffer(gl::COPY_READ_BUFFER, access);
     CV_CheckGlError();
 
-    return data;
+    തിരികെ data;
 }
 
-void cv::ogl::Buffer::Impl::unmapHost()
+ശൂന്യം cv::ogl::Buffer::Impl::unmapHost()
 {
     gl::UnmapBuffer(gl::COPY_READ_BUFFER);
 }
 
 #ifdef HAVE_CUDA
 
-void cv::ogl::Buffer::Impl::copyFrom(const void* src, size_t spitch, size_t width, size_t height, cudaStream_t stream)
+ശൂന്യം cv::ogl::Buffer::Impl::copyFrom(സ്ഥിരം ശൂന്യം* src, size_t spitch, size_t width, size_t height, cudaStream_t stream)
 {
     cudaResource_.registerBuffer(bufId_);
     cudaResource_.copyFrom(src, spitch, width, height, stream);
 }
 
-void cv::ogl::Buffer::Impl::copyTo(void* dst, size_t dpitch, size_t width, size_t height, cudaStream_t stream) const
+ശൂന്യം cv::ogl::Buffer::Impl::copyTo(ശൂന്യം* dst, size_t dpitch, size_t width, size_t height, cudaStream_t stream) സ്ഥിരം
 {
     cudaResource_.registerBuffer(bufId_);
     cudaResource_.copyTo(dst, dpitch, width, height, stream);
 }
 
-void* cv::ogl::Buffer::Impl::mapDevice(cudaStream_t stream)
+ശൂന്യം* cv::ogl::Buffer::Impl::mapDevice(cudaStream_t stream)
 {
     cudaResource_.registerBuffer(bufId_);
-    return cudaResource_.map(stream);
+    തിരികെ cudaResource_.map(stream);
 }
 
-void cv::ogl::Buffer::Impl::unmapDevice(cudaStream_t stream)
+ശൂന്യം cv::ogl::Buffer::Impl::unmapDevice(cudaStream_t stream)
 {
     cudaResource_.unmap(stream);
 }
@@ -480,12 +480,12 @@ cv::ogl::Buffer::Buffer() : rows_(0), cols_(0), type_(0)
 {
 #ifndef HAVE_OPENGL
     throw_no_ogl();
-#else
+#അല്ലെങ്കിൽ
     impl_ = Impl::empty();
 #endif
 }
 
-cv::ogl::Buffer::Buffer(int arows, int acols, int atype, unsigned int abufId, bool autoRelease) : rows_(0), cols_(0), type_(0)
+cv::ogl::Buffer::Buffer(പൂർണ്ണസംഖ്യ arows, പൂർണ്ണസംഖ്യ acols, പൂർണ്ണസംഖ്യ atype, unsigned പൂർണ്ണസംഖ്യ abufId, തർക്കം autoRelease) : rows_(0), cols_(0), type_(0)
 {
 #ifndef HAVE_OPENGL
     CV_UNUSED(arows);
@@ -494,15 +494,15 @@ cv::ogl::Buffer::Buffer(int arows, int acols, int atype, unsigned int abufId, bo
     CV_UNUSED(abufId);
     CV_UNUSED(autoRelease);
     throw_no_ogl();
-#else
-    impl_.reset(new Impl(abufId, autoRelease));
+#അല്ലെങ്കിൽ
+    impl_.reset(പുതിയ Impl(abufId, autoRelease));
     rows_ = arows;
     cols_ = acols;
     type_ = atype;
 #endif
 }
 
-cv::ogl::Buffer::Buffer(Size asize, int atype, unsigned int abufId, bool autoRelease) : rows_(0), cols_(0), type_(0)
+cv::ogl::Buffer::Buffer(Size asize, പൂർണ്ണസംഖ്യ atype, unsigned പൂർണ്ണസംഖ്യ abufId, തർക്കം autoRelease) : rows_(0), cols_(0), type_(0)
 {
 #ifndef HAVE_OPENGL
     CV_UNUSED(asize);
@@ -510,47 +510,47 @@ cv::ogl::Buffer::Buffer(Size asize, int atype, unsigned int abufId, bool autoRel
     CV_UNUSED(abufId);
     CV_UNUSED(autoRelease);
     throw_no_ogl();
-#else
-    impl_.reset(new Impl(abufId, autoRelease));
+#അല്ലെങ്കിൽ
+    impl_.reset(പുതിയ Impl(abufId, autoRelease));
     rows_ = asize.height;
     cols_ = asize.width;
     type_ = atype;
 #endif
 }
 
-cv::ogl::Buffer::Buffer(InputArray arr, Target target, bool autoRelease) : rows_(0), cols_(0), type_(0)
+cv::ogl::Buffer::Buffer(നിവേശം_Array arr, Target target, തർക്കം autoRelease) : rows_(0), cols_(0), type_(0)
 {
 #ifndef HAVE_OPENGL
     CV_UNUSED(arr);
     CV_UNUSED(target);
     CV_UNUSED(autoRelease);
     throw_no_ogl();
-#else
-    const int kind = arr.kind();
+#അല്ലെങ്കിൽ
+    സ്ഥിരം പൂർണ്ണസംഖ്യ kind = arr.kind();
 
-    switch (kind)
+    തിരഞ്ഞെടുപ്പ് (kind)
     {
-    case _InputArray::OPENGL_BUFFER:
-    case _InputArray::CUDA_GPU_MAT:
+    അവസ്ഥ നിവേശം_Array_2::OPENGL_BUFFER:
+    അവസ്ഥ നിവേശം_Array_2::CUDA_GPU_MAT:
         copyFrom(arr, target, autoRelease);
-        break;
+        നിർത്തുക;
 
-    default:
+    സ്ഥിരസ്ഥിതി:
         {
             Mat mat = arr.getMat();
             CV_Assert( mat.isContinuous() );
-            const GLsizeiptr asize = mat.rows * mat.cols * mat.elemSize();
-            impl_.reset(new Impl(asize, mat.data, target, autoRelease));
+            സ്ഥിരം GLsizeiptr asize = mat.rows * mat.cols * mat.elemSize();
+            impl_.reset(പുതിയ Impl(asize, mat.data, target, autoRelease));
             rows_ = mat.rows;
             cols_ = mat.cols;
             type_ = mat.type();
-            break;
+            നിർത്തുക;
         }
     }
 #endif
 }
 
-void cv::ogl::Buffer::create(int arows, int acols, int atype, Target target, bool autoRelease)
+ശൂന്യം cv::ogl::Buffer::create(പൂർണ്ണസംഖ്യ arows, പൂർണ്ണസംഖ്യ acols, പൂർണ്ണസംഖ്യ atype, Target target, തർക്കം autoRelease)
 {
 #ifndef HAVE_OPENGL
     CV_UNUSED(arows);
@@ -559,18 +559,18 @@ void cv::ogl::Buffer::create(int arows, int acols, int atype, Target target, boo
     CV_UNUSED(target);
     CV_UNUSED(autoRelease);
     throw_no_ogl();
-#else
-    if (rows_ != arows || cols_ != acols || type_ != atype)
+#അല്ലെങ്കിൽ
+    എങ്കിൽ (rows_ != arows || cols_ != acols || type_ != atype)
     {
-        const GLsizeiptr asize = (GLsizeiptr)arows * acols * CV_ELEM_SIZE(atype);
+        സ്ഥിരം GLsizeiptr asize = (GLsizeiptr)arows * acols * CV_ELEM_SIZE(atype);
         // resize in place when sole owner (keeps the GL id); else allocate fresh (copy-on-write)
-        if (impl_->bufId() != 0 && impl_.use_count() == 1)
+        എങ്കിൽ (impl_->bufId() != 0 && impl_.use_count() == 1)
         {
             impl_->resize(asize, target);
             impl_->setAutoRelease(autoRelease);
         }
-        else
-            impl_.reset(new Impl(asize, 0, target, autoRelease));
+        അല്ലെങ്കിൽ
+            impl_.reset(പുതിയ Impl(asize, 0, target, autoRelease));
         rows_ = arows;
         cols_ = acols;
         type_ = atype;
@@ -578,11 +578,11 @@ void cv::ogl::Buffer::create(int arows, int acols, int atype, Target target, boo
 #endif
 }
 
-void cv::ogl::Buffer::release()
+ശൂന്യം cv::ogl::Buffer::release()
 {
 #ifdef HAVE_OPENGL
-    if (impl_)
-        impl_->setAutoRelease(true);
+    എങ്കിൽ (impl_)
+        impl_->setAutoRelease(സത്യം);
     impl_ = Impl::empty();
     rows_ = 0;
     cols_ = 0;
@@ -590,52 +590,52 @@ void cv::ogl::Buffer::release()
 #endif
 }
 
-void cv::ogl::Buffer::setAutoRelease(bool flag)
+ശൂന്യം cv::ogl::Buffer::setAutoRelease(തർക്കം flag)
 {
 #ifndef HAVE_OPENGL
     CV_UNUSED(flag);
     throw_no_ogl();
-#else
+#അല്ലെങ്കിൽ
     impl_->setAutoRelease(flag);
 #endif
 }
 
-void cv::ogl::Buffer::copyFrom(InputArray arr, Target target, bool autoRelease)
+ശൂന്യം cv::ogl::Buffer::copyFrom(നിവേശം_Array arr, Target target, തർക്കം autoRelease)
 {
 #ifndef HAVE_OPENGL
     CV_UNUSED(arr);
     CV_UNUSED(target);
     CV_UNUSED(autoRelease);
     throw_no_ogl();
-#else
-    const int kind = arr.kind();
+#അല്ലെങ്കിൽ
+    സ്ഥിരം പൂർണ്ണസംഖ്യ kind = arr.kind();
 
-    const Size asize = arr.size();
-    const int atype = arr.type();
+    സ്ഥിരം Size asize = arr.size();
+    സ്ഥിരം പൂർണ്ണസംഖ്യ atype = arr.type();
     create(asize, atype, target, autoRelease);
 
-    switch (kind)
+    തിരഞ്ഞെടുപ്പ് (kind)
     {
-    case _InputArray::OPENGL_BUFFER:
+    അവസ്ഥ നിവേശം_Array_2::OPENGL_BUFFER:
         {
             ogl::Buffer buf = arr.getOGlBuffer();
             impl_->copyFrom(buf.bufId(), asize.area() * CV_ELEM_SIZE(atype));
-            break;
+            നിർത്തുക;
         }
 
-    case _InputArray::CUDA_GPU_MAT:
+    അവസ്ഥ നിവേശം_Array_2::CUDA_GPU_MAT:
         {
             #ifndef HAVE_CUDA
                 throw_no_cuda();
-            #else
+            #അല്ലെങ്കിൽ
                 GpuMat dmat = arr.getGpuMat();
                 impl_->copyFrom(dmat.data, dmat.step, dmat.cols * dmat.elemSize(), dmat.rows);
             #endif
 
-            break;
+            നിർത്തുക;
         }
 
-    default:
+    സ്ഥിരസ്ഥിതി:
         {
             Mat mat = arr.getMat();
             CV_Assert( mat.isContinuous() );
@@ -645,7 +645,7 @@ void cv::ogl::Buffer::copyFrom(InputArray arr, Target target, bool autoRelease)
 #endif
 }
 
-void cv::ogl::Buffer::copyFrom(InputArray arr, cuda::Stream& stream, Target target, bool autoRelease)
+ശൂന്യം cv::ogl::Buffer::copyFrom(നിവേശം_Array arr, cuda::Stream& stream, Target target, തർക്കം autoRelease)
 {
 #ifndef HAVE_OPENGL
     CV_UNUSED(arr);
@@ -653,14 +653,14 @@ void cv::ogl::Buffer::copyFrom(InputArray arr, cuda::Stream& stream, Target targ
     CV_UNUSED(target);
     CV_UNUSED(autoRelease);
     throw_no_ogl();
-#else
+#അല്ലെങ്കിൽ
     #ifndef HAVE_CUDA
         CV_UNUSED(arr);
         CV_UNUSED(stream);
         CV_UNUSED(target);
         CV_UNUSED(autoRelease);
         throw_no_cuda();
-    #else
+    #അല്ലെങ്കിൽ
         GpuMat dmat = arr.getGpuMat();
 
         create(dmat.size(), dmat.type(), target, autoRelease);
@@ -670,36 +670,36 @@ void cv::ogl::Buffer::copyFrom(InputArray arr, cuda::Stream& stream, Target targ
 #endif
 }
 
-void cv::ogl::Buffer::copyTo(OutputArray arr) const
+ശൂന്യം cv::ogl::Buffer::copyTo(OutputArray arr) സ്ഥിരം
 {
 #ifndef HAVE_OPENGL
     CV_UNUSED(arr);
     throw_no_ogl();
-#else
-    const int kind = arr.kind();
+#അല്ലെങ്കിൽ
+    സ്ഥിരം പൂർണ്ണസംഖ്യ kind = arr.kind();
 
-    switch (kind)
+    തിരഞ്ഞെടുപ്പ് (kind)
     {
-    case _InputArray::OPENGL_BUFFER:
+    അവസ്ഥ നിവേശം_Array_2::OPENGL_BUFFER:
         {
-            arr.getOGlBufferRef().copyFrom(*this);
-            break;
+            arr.getOGlBufferRef().copyFrom(*ഇത്);
+            നിർത്തുക;
         }
 
-    case _InputArray::CUDA_GPU_MAT:
+    അവസ്ഥ നിവേശം_Array_2::CUDA_GPU_MAT:
         {
             #ifndef HAVE_CUDA
                 throw_no_cuda();
-            #else
+            #അല്ലെങ്കിൽ
                 GpuMat& dmat = arr.getGpuMatRef();
                 dmat.create(rows_, cols_, type_);
                 impl_->copyTo(dmat.data, dmat.step, dmat.cols * dmat.elemSize(), dmat.rows);
             #endif
 
-            break;
+            നിർത്തുക;
         }
 
-    default:
+    സ്ഥിരസ്ഥിതി:
         {
             arr.create(rows_, cols_, type_);
             Mat mat = arr.getMat();
@@ -710,18 +710,18 @@ void cv::ogl::Buffer::copyTo(OutputArray arr) const
 #endif
 }
 
-void cv::ogl::Buffer::copyTo(OutputArray arr, cuda::Stream& stream) const
+ശൂന്യം cv::ogl::Buffer::copyTo(OutputArray arr, cuda::Stream& stream) സ്ഥിരം
 {
 #ifndef HAVE_OPENGL
     CV_UNUSED(arr);
     CV_UNUSED(stream);
     throw_no_ogl();
-#else
+#അല്ലെങ്കിൽ
     #ifndef HAVE_CUDA
         CV_UNUSED(arr);
         CV_UNUSED(stream);
         throw_no_cuda();
-    #else
+    #അല്ലെങ്കിൽ
         arr.create(rows_, cols_, type_);
         GpuMat dmat = arr.getGpuMat();
         impl_->copyTo(dmat.data, dmat.step, dmat.cols * dmat.elemSize(), dmat.rows, cuda::StreamAccessor::getStream(stream));
@@ -729,35 +729,35 @@ void cv::ogl::Buffer::copyTo(OutputArray arr, cuda::Stream& stream) const
 #endif
 }
 
-cv::ogl::Buffer cv::ogl::Buffer::clone(Target target, bool autoRelease) const
+cv::ogl::Buffer cv::ogl::Buffer::clone(Target target, തർക്കം autoRelease) സ്ഥിരം
 {
 #ifndef HAVE_OPENGL
     CV_UNUSED(target);
     CV_UNUSED(autoRelease);
     throw_no_ogl();
-#else
+#അല്ലെങ്കിൽ
     ogl::Buffer buf;
-    buf.copyFrom(*this, target, autoRelease);
-    return buf;
+    buf.copyFrom(*ഇത്, target, autoRelease);
+    തിരികെ buf;
 #endif
 }
 
-void cv::ogl::Buffer::bind(Target target) const
+ശൂന്യം cv::ogl::Buffer::bind(Target target) സ്ഥിരം
 {
 #ifndef HAVE_OPENGL
     CV_UNUSED(target);
     throw_no_ogl();
-#else
+#അല്ലെങ്കിൽ
     impl_->bind(target);
 #endif
 }
 
-void cv::ogl::Buffer::unbind(Target target)
+ശൂന്യം cv::ogl::Buffer::unbind(Target target)
 {
 #ifndef HAVE_OPENGL
     CV_UNUSED(target);
     throw_no_ogl();
-#else
+#അല്ലെങ്കിൽ
     gl::BindBuffer(target, 0);
     CV_CheckGlError();
 #endif
@@ -768,17 +768,17 @@ Mat cv::ogl::Buffer::mapHost(Access access)
 #ifndef HAVE_OPENGL
     CV_UNUSED(access);
     throw_no_ogl();
-#else
-    return Mat(rows_, cols_, type_, impl_->mapHost(access));
+#അല്ലെങ്കിൽ
+    തിരികെ Mat(rows_, cols_, type_, impl_->mapHost(access));
 #endif
 }
 
-void cv::ogl::Buffer::unmapHost()
+ശൂന്യം cv::ogl::Buffer::unmapHost()
 {
 #ifndef HAVE_OPENGL
     throw_no_ogl();
-#else
-    return impl_->unmapHost();
+#അല്ലെങ്കിൽ
+    തിരികെ impl_->unmapHost();
 #endif
 }
 
@@ -786,23 +786,23 @@ GpuMat cv::ogl::Buffer::mapDevice()
 {
 #ifndef HAVE_OPENGL
     throw_no_ogl();
-#else
+#അല്ലെങ്കിൽ
     #ifndef HAVE_CUDA
         throw_no_cuda();
-    #else
-        return GpuMat(rows_, cols_, type_, impl_->mapDevice());
+    #അല്ലെങ്കിൽ
+        തിരികെ GpuMat(rows_, cols_, type_, impl_->mapDevice());
     #endif
 #endif
 }
 
-void cv::ogl::Buffer::unmapDevice()
+ശൂന്യം cv::ogl::Buffer::unmapDevice()
 {
 #ifndef HAVE_OPENGL
     throw_no_ogl();
-#else
+#അല്ലെങ്കിൽ
     #ifndef HAVE_CUDA
         throw_no_cuda();
-    #else
+    #അല്ലെങ്കിൽ
         impl_->unmapDevice();
     #endif
 #endif
@@ -813,37 +813,37 @@ cuda::GpuMat cv::ogl::Buffer::mapDevice(cuda::Stream& stream)
 #ifndef HAVE_OPENGL
     CV_UNUSED(stream);
     throw_no_ogl();
-#else
+#അല്ലെങ്കിൽ
     #ifndef HAVE_CUDA
         CV_UNUSED(stream);
         throw_no_cuda();
-    #else
-        return GpuMat(rows_, cols_, type_, impl_->mapDevice(cuda::StreamAccessor::getStream(stream)));
+    #അല്ലെങ്കിൽ
+        തിരികെ GpuMat(rows_, cols_, type_, impl_->mapDevice(cuda::StreamAccessor::getStream(stream)));
     #endif
 #endif
 }
 
-void cv::ogl::Buffer::unmapDevice(cuda::Stream& stream)
+ശൂന്യം cv::ogl::Buffer::unmapDevice(cuda::Stream& stream)
 {
 #ifndef HAVE_OPENGL
     CV_UNUSED(stream);
     throw_no_ogl();
-#else
+#അല്ലെങ്കിൽ
     #ifndef HAVE_CUDA
         CV_UNUSED(stream);
         throw_no_cuda();
-    #else
+    #അല്ലെങ്കിൽ
         impl_->unmapDevice(cuda::StreamAccessor::getStream(stream));
     #endif
 #endif
 }
 
-unsigned int cv::ogl::Buffer::bufId() const
+unsigned പൂർണ്ണസംഖ്യ cv::ogl::Buffer::bufId() സ്ഥിരം
 {
 #ifndef HAVE_OPENGL
     throw_no_ogl();
-#else
-    return impl_->bufId();
+#അല്ലെങ്കിൽ
+    തിരികെ impl_->bufId();
 #endif
 }
 
@@ -853,53 +853,53 @@ unsigned int cv::ogl::Buffer::bufId() const
 
 #ifndef HAVE_OPENGL
 
-class cv::ogl::Texture2D::Impl
+വർഗ്ഗം cv::ogl::Texture2D::Impl
 {
 };
 
-#else
+#അല്ലെങ്കിൽ
 
-class cv::ogl::Texture2D::Impl
+വർഗ്ഗം cv::ogl::Texture2D::Impl
 {
-public:
-    static const Ptr<Impl> empty();
+പൊതു:
+    സ്ഥിതം സ്ഥിരം Ptr<Impl> empty();
 
-    Impl(GLuint texId, bool autoRelease);
-    Impl(GLint internalFormat, GLsizei width, GLsizei height, GLenum format, GLenum type, const GLvoid* pixels, bool autoRelease);
+    Impl(GLuint texId, തർക്കം autoRelease);
+    Impl(GLint internalFormat, GLsizei width, GLsizei height, GLenum format, GLenum type, സ്ഥിരം GLvoid* pixels, തർക്കം autoRelease);
     ~Impl();
 
-    void copyFrom(GLsizei width, GLsizei height, GLenum format, GLenum type, const GLvoid *pixels);
-    void copyTo(GLenum format, GLenum type, GLvoid* pixels) const;
+    ശൂന്യം copyFrom(GLsizei width, GLsizei height, GLenum format, GLenum type, സ്ഥിരം GLvoid *pixels);
+    ശൂന്യം copyTo(GLenum format, GLenum type, GLvoid* pixels) സ്ഥിരം;
 
-    void bind() const;
+    ശൂന്യം bind() സ്ഥിരം;
 
-    void setAutoRelease(bool flag) { autoRelease_ = flag; }
+    ശൂന്യം setAutoRelease(തർക്കം flag) { autoRelease_ = flag; }
 
-    GLuint texId() const { return texId_; }
+    GLuint texId() സ്ഥിരം { തിരികെ texId_; }
 
-private:
+സ്വകാര്യ:
     Impl();
 
     GLuint texId_;
-    bool autoRelease_;
+    തർക്കം autoRelease_;
 };
 
-const Ptr<cv::ogl::Texture2D::Impl> cv::ogl::Texture2D::Impl::empty()
+സ്ഥിരം Ptr<cv::ogl::Texture2D::Impl> cv::ogl::Texture2D::Impl::empty()
 {
-    static Ptr<Impl> p(new Impl);
-    return p;
+    സ്ഥിതം Ptr<Impl> p(പുതിയ Impl);
+    തിരികെ p;
 }
 
-cv::ogl::Texture2D::Impl::Impl() : texId_(0), autoRelease_(false)
+cv::ogl::Texture2D::Impl::Impl() : texId_(0), autoRelease_(അസത്യം)
 {
 }
 
-cv::ogl::Texture2D::Impl::Impl(GLuint atexId, bool autoRelease) : texId_(atexId), autoRelease_(autoRelease)
+cv::ogl::Texture2D::Impl::Impl(GLuint atexId, തർക്കം autoRelease) : texId_(atexId), autoRelease_(autoRelease)
 {
     CV_Assert( gl::IsTexture(atexId) == gl::TRUE_ );
 }
 
-cv::ogl::Texture2D::Impl::Impl(GLint internalFormat, GLsizei width, GLsizei height, GLenum format, GLenum type, const GLvoid* pixels, bool autoRelease) : texId_(0), autoRelease_(autoRelease)
+cv::ogl::Texture2D::Impl::Impl(GLint internalFormat, GLsizei width, GLsizei height, GLenum format, GLenum type, സ്ഥിരം GLvoid* pixels, തർക്കം autoRelease) : texId_(0), autoRelease_(autoRelease)
 {
     gl::GenTextures(1, &texId_);
     CV_CheckGlError();
@@ -921,11 +921,11 @@ cv::ogl::Texture2D::Impl::Impl(GLint internalFormat, GLsizei width, GLsizei heig
 
 cv::ogl::Texture2D::Impl::~Impl()
 {
-    if (autoRelease_ && texId_)
+    എങ്കിൽ (autoRelease_ && texId_)
         gl::DeleteTextures(1, &texId_);
 }
 
-void cv::ogl::Texture2D::Impl::copyFrom(GLsizei width, GLsizei height, GLenum format, GLenum type, const GLvoid *pixels)
+ശൂന്യം cv::ogl::Texture2D::Impl::copyFrom(GLsizei width, GLsizei height, GLenum format, GLenum type, സ്ഥിരം GLvoid *pixels)
 {
     gl::BindTexture(gl::TEXTURE_2D, texId_);
     CV_CheckGlError();
@@ -940,7 +940,7 @@ void cv::ogl::Texture2D::Impl::copyFrom(GLsizei width, GLsizei height, GLenum fo
     CV_CheckGlError();
 }
 
-void cv::ogl::Texture2D::Impl::copyTo(GLenum format, GLenum type, GLvoid* pixels) const
+ശൂന്യം cv::ogl::Texture2D::Impl::copyTo(GLenum format, GLenum type, GLvoid* pixels) സ്ഥിരം
 {
     gl::BindTexture(gl::TEXTURE_2D, texId_);
     CV_CheckGlError();
@@ -952,7 +952,7 @@ void cv::ogl::Texture2D::Impl::copyTo(GLenum format, GLenum type, GLvoid* pixels
     CV_CheckGlError();
 }
 
-void cv::ogl::Texture2D::Impl::bind() const
+ശൂന്യം cv::ogl::Texture2D::Impl::bind() സ്ഥിരം
 {
     gl::BindTexture(gl::TEXTURE_2D, texId_);
     CV_CheckGlError();
@@ -964,12 +964,12 @@ cv::ogl::Texture2D::Texture2D() : rows_(0), cols_(0), format_(NONE)
 {
 #ifndef HAVE_OPENGL
     throw_no_ogl();
-#else
+#അല്ലെങ്കിൽ
     impl_ = Impl::empty();
 #endif
 }
 
-cv::ogl::Texture2D::Texture2D(int arows, int acols, Format aformat, unsigned int atexId, bool autoRelease) : rows_(0), cols_(0), format_(NONE)
+cv::ogl::Texture2D::Texture2D(പൂർണ്ണസംഖ്യ arows, പൂർണ്ണസംഖ്യ acols, Format aformat, unsigned പൂർണ്ണസംഖ്യ atexId, തർക്കം autoRelease) : rows_(0), cols_(0), format_(NONE)
 {
 #ifndef HAVE_OPENGL
     CV_UNUSED(arows);
@@ -978,15 +978,15 @@ cv::ogl::Texture2D::Texture2D(int arows, int acols, Format aformat, unsigned int
     CV_UNUSED(atexId);
     CV_UNUSED(autoRelease);
     throw_no_ogl();
-#else
-    impl_.reset(new Impl(atexId, autoRelease));
+#അല്ലെങ്കിൽ
+    impl_.reset(പുതിയ Impl(atexId, autoRelease));
     rows_ = arows;
     cols_ = acols;
     format_ = aformat;
 #endif
 }
 
-cv::ogl::Texture2D::Texture2D(Size asize, Format aformat, unsigned int atexId, bool autoRelease) : rows_(0), cols_(0), format_(NONE)
+cv::ogl::Texture2D::Texture2D(Size asize, Format aformat, unsigned പൂർണ്ണസംഖ്യ atexId, തർക്കം autoRelease) : rows_(0), cols_(0), format_(NONE)
 {
 #ifndef HAVE_OPENGL
     CV_UNUSED(asize);
@@ -994,75 +994,75 @@ cv::ogl::Texture2D::Texture2D(Size asize, Format aformat, unsigned int atexId, b
     CV_UNUSED(atexId);
     CV_UNUSED(autoRelease);
     throw_no_ogl();
-#else
-    impl_.reset(new Impl(atexId, autoRelease));
+#അല്ലെങ്കിൽ
+    impl_.reset(പുതിയ Impl(atexId, autoRelease));
     rows_ = asize.height;
     cols_ = asize.width;
     format_ = aformat;
 #endif
 }
 
-cv::ogl::Texture2D::Texture2D(InputArray arr, bool autoRelease) : rows_(0), cols_(0), format_(NONE)
+cv::ogl::Texture2D::Texture2D(നിവേശം_Array arr, തർക്കം autoRelease) : rows_(0), cols_(0), format_(NONE)
 {
 #ifndef HAVE_OPENGL
     CV_UNUSED(arr);
     CV_UNUSED(autoRelease);
     throw_no_ogl();
-#else
-    const int kind = arr.kind();
+#അല്ലെങ്കിൽ
+    സ്ഥിരം പൂർണ്ണസംഖ്യ kind = arr.kind();
 
-    const Size asize = arr.size();
-    const int atype = arr.type();
+    സ്ഥിരം Size asize = arr.size();
+    സ്ഥിരം പൂർണ്ണസംഖ്യ atype = arr.type();
 
-    const int depth = CV_MAT_DEPTH(atype);
-    const int cn = CV_MAT_CN(atype);
+    സ്ഥിരം പൂർണ്ണസംഖ്യ depth = CV_MAT_DEPTH(atype);
+    സ്ഥിരം പൂർണ്ണസംഖ്യ cn = CV_MAT_CN(atype);
 
     CV_Assert( depth <= CV_32F );
     CV_Assert( cn == 1 || cn == 3 || cn == 4 );
 
-    const Format internalFormats[] =
+    സ്ഥിരം Format internalFormats[] =
     {
         NONE, DEPTH_COMPONENT, NONE, RGB, RGBA
     };
-    const GLenum srcFormats[] =
+    സ്ഥിരം GLenum srcFormats[] =
     {
         0, gl::DEPTH_COMPONENT, 0, gl::BGR, gl::BGRA
     };
 
-    switch (kind)
+    തിരഞ്ഞെടുപ്പ് (kind)
     {
-    case _InputArray::OPENGL_BUFFER:
+    അവസ്ഥ നിവേശം_Array_2::OPENGL_BUFFER:
         {
             ogl::Buffer buf = arr.getOGlBuffer();
             buf.bind(ogl::Buffer::PIXEL_UNPACK_BUFFER);
-            impl_.reset(new Impl(internalFormats[cn], asize.width, asize.height, srcFormats[cn], gl_types[depth], 0, autoRelease));
+            impl_.reset(പുതിയ Impl(internalFormats[cn], asize.width, asize.height, srcFormats[cn], gl_types[depth], 0, autoRelease));
             ogl::Buffer::unbind(ogl::Buffer::PIXEL_UNPACK_BUFFER);
-            break;
+            നിർത്തുക;
         }
 
-    case _InputArray::CUDA_GPU_MAT:
+    അവസ്ഥ നിവേശം_Array_2::CUDA_GPU_MAT:
         {
             #ifndef HAVE_CUDA
                 throw_no_cuda();
-            #else
+            #അല്ലെങ്കിൽ
                 GpuMat dmat = arr.getGpuMat();
                 ogl::Buffer buf(dmat, ogl::Buffer::PIXEL_UNPACK_BUFFER);
-                buf.setAutoRelease(true);
+                buf.setAutoRelease(സത്യം);
                 buf.bind(ogl::Buffer::PIXEL_UNPACK_BUFFER);
-                impl_.reset(new Impl(internalFormats[cn], asize.width, asize.height, srcFormats[cn], gl_types[depth], 0, autoRelease));
+                impl_.reset(പുതിയ Impl(internalFormats[cn], asize.width, asize.height, srcFormats[cn], gl_types[depth], 0, autoRelease));
                 ogl::Buffer::unbind(ogl::Buffer::PIXEL_UNPACK_BUFFER);
             #endif
 
-            break;
+            നിർത്തുക;
         }
 
-    default:
+    സ്ഥിരസ്ഥിതി:
         {
             Mat mat = arr.getMat();
             CV_Assert( mat.isContinuous() );
             ogl::Buffer::unbind(ogl::Buffer::PIXEL_UNPACK_BUFFER);
-            impl_.reset(new Impl(internalFormats[cn], asize.width, asize.height, srcFormats[cn], gl_types[depth], mat.data, autoRelease));
-            break;
+            impl_.reset(പുതിയ Impl(internalFormats[cn], asize.width, asize.height, srcFormats[cn], gl_types[depth], mat.data, autoRelease));
+            നിർത്തുക;
         }
     }
 
@@ -1072,7 +1072,7 @@ cv::ogl::Texture2D::Texture2D(InputArray arr, bool autoRelease) : rows_(0), cols
 #endif
 }
 
-void cv::ogl::Texture2D::create(int arows, int acols, Format aformat, bool autoRelease)
+ശൂന്യം cv::ogl::Texture2D::create(പൂർണ്ണസംഖ്യ arows, പൂർണ്ണസംഖ്യ acols, Format aformat, തർക്കം autoRelease)
 {
 #ifndef HAVE_OPENGL
     CV_UNUSED(arows);
@@ -1080,11 +1080,11 @@ void cv::ogl::Texture2D::create(int arows, int acols, Format aformat, bool autoR
     CV_UNUSED(aformat);
     CV_UNUSED(autoRelease);
     throw_no_ogl();
-#else
-    if (rows_ != arows || cols_ != acols || format_ != aformat)
+#അല്ലെങ്കിൽ
+    എങ്കിൽ (rows_ != arows || cols_ != acols || format_ != aformat)
     {
         ogl::Buffer::unbind(ogl::Buffer::PIXEL_UNPACK_BUFFER);
-        impl_.reset(new Impl(aformat, acols, arows, aformat, gl::FLOAT, 0, autoRelease));
+        impl_.reset(പുതിയ Impl(aformat, acols, arows, aformat, gl::FLOAT, 0, autoRelease));
         rows_ = arows;
         cols_ = acols;
         format_ = aformat;
@@ -1092,11 +1092,11 @@ void cv::ogl::Texture2D::create(int arows, int acols, Format aformat, bool autoR
 #endif
 }
 
-void cv::ogl::Texture2D::release()
+ശൂന്യം cv::ogl::Texture2D::release()
 {
 #ifdef HAVE_OPENGL
-    if (impl_)
-        impl_->setAutoRelease(true);
+    എങ്കിൽ (impl_)
+        impl_->setAutoRelease(സത്യം);
     impl_ = Impl::empty();
     rows_ = 0;
     cols_ = 0;
@@ -1104,73 +1104,73 @@ void cv::ogl::Texture2D::release()
 #endif
 }
 
-void cv::ogl::Texture2D::setAutoRelease(bool flag)
+ശൂന്യം cv::ogl::Texture2D::setAutoRelease(തർക്കം flag)
 {
 #ifndef HAVE_OPENGL
     CV_UNUSED(flag);
     throw_no_ogl();
-#else
+#അല്ലെങ്കിൽ
     impl_->setAutoRelease(flag);
 #endif
 }
 
-void cv::ogl::Texture2D::copyFrom(InputArray arr, bool autoRelease)
+ശൂന്യം cv::ogl::Texture2D::copyFrom(നിവേശം_Array arr, തർക്കം autoRelease)
 {
 #ifndef HAVE_OPENGL
     CV_UNUSED(arr);
     CV_UNUSED(autoRelease);
     throw_no_ogl();
-#else
-    const int kind = arr.kind();
+#അല്ലെങ്കിൽ
+    സ്ഥിരം പൂർണ്ണസംഖ്യ kind = arr.kind();
 
-    const Size asize = arr.size();
-    const int atype = arr.type();
+    സ്ഥിരം Size asize = arr.size();
+    സ്ഥിരം പൂർണ്ണസംഖ്യ atype = arr.type();
 
-    const int depth = CV_MAT_DEPTH(atype);
-    const int cn = CV_MAT_CN(atype);
+    സ്ഥിരം പൂർണ്ണസംഖ്യ depth = CV_MAT_DEPTH(atype);
+    സ്ഥിരം പൂർണ്ണസംഖ്യ cn = CV_MAT_CN(atype);
 
     CV_Assert( depth <= CV_32F );
     CV_Assert( cn == 1 || cn == 3 || cn == 4 );
 
-    const Format internalFormats[] =
+    സ്ഥിരം Format internalFormats[] =
     {
         NONE, DEPTH_COMPONENT, NONE, RGB, RGBA
     };
-    const GLenum srcFormats[] =
+    സ്ഥിരം GLenum srcFormats[] =
     {
         0, gl::DEPTH_COMPONENT, 0, gl::BGR, gl::BGRA
     };
 
     create(asize, internalFormats[cn], autoRelease);
 
-    switch(kind)
+    തിരഞ്ഞെടുപ്പ്(kind)
     {
-    case _InputArray::OPENGL_BUFFER:
+    അവസ്ഥ നിവേശം_Array_2::OPENGL_BUFFER:
         {
             ogl::Buffer buf = arr.getOGlBuffer();
             buf.bind(ogl::Buffer::PIXEL_UNPACK_BUFFER);
             impl_->copyFrom(asize.width, asize.height, srcFormats[cn], gl_types[depth], 0);
             ogl::Buffer::unbind(ogl::Buffer::PIXEL_UNPACK_BUFFER);
-            break;
+            നിർത്തുക;
         }
 
-    case _InputArray::CUDA_GPU_MAT:
+    അവസ്ഥ നിവേശം_Array_2::CUDA_GPU_MAT:
         {
             #ifndef HAVE_CUDA
                 throw_no_cuda();
-            #else
+            #അല്ലെങ്കിൽ
                 GpuMat dmat = arr.getGpuMat();
                 ogl::Buffer buf(dmat, ogl::Buffer::PIXEL_UNPACK_BUFFER);
-                buf.setAutoRelease(true);
+                buf.setAutoRelease(സത്യം);
                 buf.bind(ogl::Buffer::PIXEL_UNPACK_BUFFER);
                 impl_->copyFrom(asize.width, asize.height, srcFormats[cn], gl_types[depth], 0);
                 ogl::Buffer::unbind(ogl::Buffer::PIXEL_UNPACK_BUFFER);
             #endif
 
-            break;
+            നിർത്തുക;
         }
 
-    default:
+    സ്ഥിരസ്ഥിതി:
         {
             Mat mat = arr.getMat();
             CV_Assert( mat.isContinuous() );
@@ -1181,48 +1181,48 @@ void cv::ogl::Texture2D::copyFrom(InputArray arr, bool autoRelease)
 #endif
 }
 
-void cv::ogl::Texture2D::copyTo(OutputArray arr, int ddepth, bool autoRelease) const
+ശൂന്യം cv::ogl::Texture2D::copyTo(OutputArray arr, പൂർണ്ണസംഖ്യ ddepth, തർക്കം autoRelease) സ്ഥിരം
 {
 #ifndef HAVE_OPENGL
     CV_UNUSED(arr);
     CV_UNUSED(ddepth);
     CV_UNUSED(autoRelease);
     throw_no_ogl();
-#else
-    const int kind = arr.kind();
+#അല്ലെങ്കിൽ
+    സ്ഥിരം പൂർണ്ണസംഖ്യ kind = arr.kind();
 
-    const int cn = format_ == DEPTH_COMPONENT ? 1: format_ == RGB ? 3 : 4;
-    const GLenum dstFormat = format_ == DEPTH_COMPONENT ? gl::DEPTH_COMPONENT : format_ == RGB ? gl::BGR : gl::BGRA;
+    സ്ഥിരം പൂർണ്ണസംഖ്യ cn = format_ == DEPTH_COMPONENT ? 1: format_ == RGB ? 3 : 4;
+    സ്ഥിരം GLenum dstFormat = format_ == DEPTH_COMPONENT ? gl::DEPTH_COMPONENT : format_ == RGB ? gl::BGR : gl::BGRA;
 
-    switch(kind)
+    തിരഞ്ഞെടുപ്പ്(kind)
     {
-    case _InputArray::OPENGL_BUFFER:
+    അവസ്ഥ നിവേശം_Array_2::OPENGL_BUFFER:
         {
             ogl::Buffer& buf = arr.getOGlBufferRef();
             buf.create(rows_, cols_, CV_MAKE_TYPE(ddepth, cn), ogl::Buffer::PIXEL_PACK_BUFFER, autoRelease);
             buf.bind(ogl::Buffer::PIXEL_PACK_BUFFER);
             impl_->copyTo(dstFormat, gl_types[ddepth], 0);
             ogl::Buffer::unbind(ogl::Buffer::PIXEL_PACK_BUFFER);
-            break;
+            നിർത്തുക;
         }
 
-    case _InputArray::CUDA_GPU_MAT:
+    അവസ്ഥ നിവേശം_Array_2::CUDA_GPU_MAT:
         {
             #ifndef HAVE_CUDA
                 throw_no_cuda();
-            #else
+            #അല്ലെങ്കിൽ
                 ogl::Buffer buf(rows_, cols_, CV_MAKE_TYPE(ddepth, cn), ogl::Buffer::PIXEL_PACK_BUFFER);
-                buf.setAutoRelease(true);
+                buf.setAutoRelease(സത്യം);
                 buf.bind(ogl::Buffer::PIXEL_PACK_BUFFER);
                 impl_->copyTo(dstFormat, gl_types[ddepth], 0);
                 ogl::Buffer::unbind(ogl::Buffer::PIXEL_PACK_BUFFER);
                 buf.copyTo(arr);
             #endif
 
-            break;
+            നിർത്തുക;
         }
 
-    default:
+    സ്ഥിരസ്ഥിതി:
         {
             arr.create(rows_, cols_, CV_MAKE_TYPE(ddepth, cn));
             Mat mat = arr.getMat();
@@ -1234,21 +1234,21 @@ void cv::ogl::Texture2D::copyTo(OutputArray arr, int ddepth, bool autoRelease) c
 #endif
 }
 
-void cv::ogl::Texture2D::bind() const
+ശൂന്യം cv::ogl::Texture2D::bind() സ്ഥിരം
 {
 #ifndef HAVE_OPENGL
     throw_no_ogl();
-#else
+#അല്ലെങ്കിൽ
     impl_->bind();
 #endif
 }
 
-unsigned int cv::ogl::Texture2D::texId() const
+unsigned പൂർണ്ണസംഖ്യ cv::ogl::Texture2D::texId() സ്ഥിരം
 {
 #ifndef HAVE_OPENGL
     throw_no_ogl();
-#else
-    return impl_->texId();
+#അല്ലെങ്കിൽ
+    തിരികെ impl_->texId();
 #endif
 }
 
@@ -1258,43 +1258,43 @@ unsigned int cv::ogl::Texture2D::texId() const
 
 #ifndef HAVE_OPENGL
 
-class cv::ogl::TextureBuffer::Impl
+വർഗ്ഗം cv::ogl::TextureBuffer::Impl
 {
 };
 
-#else
+#അല്ലെങ്കിൽ
 
-class cv::ogl::TextureBuffer::Impl
+വർഗ്ഗം cv::ogl::TextureBuffer::Impl
 {
-public:
-    static const Ptr<Impl> empty();
+പൊതു:
+    സ്ഥിതം സ്ഥിരം Ptr<Impl> empty();
 
     Impl();
-    Impl(GLenum internalFormat, GLuint bufId, bool autoRelease);
+    Impl(GLenum internalFormat, GLuint bufId, തർക്കം autoRelease);
     ~Impl();
 
-    void bind(GLint unit) const;
+    ശൂന്യം bind(GLint unit) സ്ഥിരം;
 
-    void setAutoRelease(bool flag) { autoRelease_ = flag; }
+    ശൂന്യം setAutoRelease(തർക്കം flag) { autoRelease_ = flag; }
 
-    GLuint texId() const { return texId_; }
+    GLuint texId() സ്ഥിരം { തിരികെ texId_; }
 
-private:
+സ്വകാര്യ:
     GLuint texId_;
-    bool autoRelease_;
+    തർക്കം autoRelease_;
 };
 
-const Ptr<cv::ogl::TextureBuffer::Impl> cv::ogl::TextureBuffer::Impl::empty()
+സ്ഥിരം Ptr<cv::ogl::TextureBuffer::Impl> cv::ogl::TextureBuffer::Impl::empty()
 {
-    static Ptr<Impl> p = makePtr<Impl>();
-    return p;
+    സ്ഥിതം Ptr<Impl> p = makePtr<Impl>();
+    തിരികെ p;
 }
 
-cv::ogl::TextureBuffer::Impl::Impl() : texId_(0), autoRelease_(false)
+cv::ogl::TextureBuffer::Impl::Impl() : texId_(0), autoRelease_(അസത്യം)
 {
 }
 
-cv::ogl::TextureBuffer::Impl::Impl(GLenum internalFormat, GLuint bufId, bool autoRelease) : texId_(0), autoRelease_(autoRelease)
+cv::ogl::TextureBuffer::Impl::Impl(GLenum internalFormat, GLuint bufId, തർക്കം autoRelease) : texId_(0), autoRelease_(autoRelease)
 {
     gl::GenTextures(1, &texId_);
     CV_CheckGlError();
@@ -1313,11 +1313,11 @@ cv::ogl::TextureBuffer::Impl::Impl(GLenum internalFormat, GLuint bufId, bool aut
 
 cv::ogl::TextureBuffer::Impl::~Impl()
 {
-    if (autoRelease_ && texId_)
+    എങ്കിൽ (autoRelease_ && texId_)
         gl::DeleteTextures(1, &texId_);
 }
 
-void cv::ogl::TextureBuffer::Impl::bind(GLint unit) const
+ശൂന്യം cv::ogl::TextureBuffer::Impl::bind(GLint unit) സ്ഥിരം
 {
     gl::ActiveTexture(gl::TEXTURE0 + unit);
     CV_CheckGlError();
@@ -1332,32 +1332,32 @@ cv::ogl::TextureBuffer::TextureBuffer() : format_(NONE)
 {
 #ifndef HAVE_OPENGL
     throw_no_ogl();
-#else
+#അല്ലെങ്കിൽ
     impl_ = Impl::empty();
 #endif
 }
 
-cv::ogl::TextureBuffer::TextureBuffer(const Buffer& buf, Format aformat, bool autoRelease) : format_(NONE)
+cv::ogl::TextureBuffer::TextureBuffer(സ്ഥിരം Buffer& buf, Format aformat, തർക്കം autoRelease) : format_(NONE)
 {
 #ifndef HAVE_OPENGL
     CV_UNUSED(buf);
     CV_UNUSED(aformat);
     CV_UNUSED(autoRelease);
     throw_no_ogl();
-#else
+#അല്ലെങ്കിൽ
     impl_ = Impl::empty();
     create(buf, aformat, autoRelease);
 #endif
 }
 
-void cv::ogl::TextureBuffer::create(const Buffer& buf, Format aformat, bool autoRelease)
+ശൂന്യം cv::ogl::TextureBuffer::create(സ്ഥിരം Buffer& buf, Format aformat, തർക്കം autoRelease)
 {
 #ifndef HAVE_OPENGL
     CV_UNUSED(buf);
     CV_UNUSED(aformat);
     CV_UNUSED(autoRelease);
     throw_no_ogl();
-#else
+#അല്ലെങ്കിൽ
     CV_Assert( !buf.empty() );
     CV_Assert( aformat != NONE );
 
@@ -1367,54 +1367,54 @@ void cv::ogl::TextureBuffer::create(const Buffer& buf, Format aformat, bool auto
 #endif
 }
 
-void cv::ogl::TextureBuffer::release()
+ശൂന്യം cv::ogl::TextureBuffer::release()
 {
 #ifdef HAVE_OPENGL
-    if (impl_)
-        impl_->setAutoRelease(true);
+    എങ്കിൽ (impl_)
+        impl_->setAutoRelease(സത്യം);
     impl_ = Impl::empty();
 #endif
     buf_ = Buffer();
     format_ = NONE;
 }
 
-void cv::ogl::TextureBuffer::setAutoRelease(bool flag)
+ശൂന്യം cv::ogl::TextureBuffer::setAutoRelease(തർക്കം flag)
 {
 #ifndef HAVE_OPENGL
     CV_UNUSED(flag);
     throw_no_ogl();
-#else
+#അല്ലെങ്കിൽ
     impl_->setAutoRelease(flag);
 #endif
 }
 
-void cv::ogl::TextureBuffer::bind(int unit) const
+ശൂന്യം cv::ogl::TextureBuffer::bind(പൂർണ്ണസംഖ്യ unit) സ്ഥിരം
 {
 #ifndef HAVE_OPENGL
     CV_UNUSED(unit);
     throw_no_ogl();
-#else
+#അല്ലെങ്കിൽ
     CV_Assert( unit >= 0 );
     impl_->bind(unit);
 #endif
 }
 
-cv::ogl::TextureBuffer::Format cv::ogl::TextureBuffer::format() const
+cv::ogl::TextureBuffer::Format cv::ogl::TextureBuffer::format() സ്ഥിരം
 {
-    return format_;
+    തിരികെ format_;
 }
 
-bool cv::ogl::TextureBuffer::empty() const
+തർക്കം cv::ogl::TextureBuffer::empty() സ്ഥിരം
 {
-    return format_ == NONE;
+    തിരികെ format_ == NONE;
 }
 
-unsigned int cv::ogl::TextureBuffer::texId() const
+unsigned പൂർണ്ണസംഖ്യ cv::ogl::TextureBuffer::texId() സ്ഥിരം
 {
 #ifndef HAVE_OPENGL
     throw_no_ogl();
-#else
-    return impl_->texId();
+#അല്ലെങ്കിൽ
+    തിരികെ impl_->texId();
 #endif
 }
 
@@ -1422,84 +1422,84 @@ unsigned int cv::ogl::TextureBuffer::texId() const
 ////////////////////////////////////////////////////////////////////////
 // ogl::Arrays
 
-void cv::ogl::Arrays::setVertexArray(InputArray vertex)
+ശൂന്യം cv::ogl::Arrays::setVertexArray(നിവേശം_Array vertex)
 {
-    const int cn = vertex.channels();
-    const int depth = vertex.depth();
+    സ്ഥിരം പൂർണ്ണസംഖ്യ cn = vertex.channels();
+    സ്ഥിരം പൂർണ്ണസംഖ്യ depth = vertex.depth();
 
     CV_Assert( cn == 2 || cn == 3 || cn == 4 );
     CV_Assert( depth == CV_16S || depth == CV_32S || depth == CV_32F || depth == CV_64F );
 
-    if (vertex.kind() == _InputArray::OPENGL_BUFFER)
+    എങ്കിൽ (vertex.kind() == നിവേശം_Array_2::OPENGL_BUFFER)
         vertex_ = vertex.getOGlBuffer();
-    else
+    അല്ലെങ്കിൽ
         vertex_.copyFrom(vertex);
 
     size_ = vertex_.size().area();
 }
 
-void cv::ogl::Arrays::resetVertexArray()
+ശൂന്യം cv::ogl::Arrays::resetVertexArray()
 {
     vertex_.release();
     size_ = 0;
 }
 
-void cv::ogl::Arrays::setColorArray(InputArray color)
+ശൂന്യം cv::ogl::Arrays::setColorArray(നിവേശം_Array color)
 {
-    const int cn = color.channels();
+    സ്ഥിരം പൂർണ്ണസംഖ്യ cn = color.channels();
 
     CV_Assert( cn == 3 || cn == 4 );
 
-    if (color.kind() == _InputArray::OPENGL_BUFFER)
+    എങ്കിൽ (color.kind() == നിവേശം_Array_2::OPENGL_BUFFER)
         color_ = color.getOGlBuffer();
-    else
+    അല്ലെങ്കിൽ
         color_.copyFrom(color);
 }
 
-void cv::ogl::Arrays::resetColorArray()
+ശൂന്യം cv::ogl::Arrays::resetColorArray()
 {
     color_.release();
 }
 
-void cv::ogl::Arrays::setNormalArray(InputArray normal)
+ശൂന്യം cv::ogl::Arrays::setNormalArray(നിവേശം_Array normal)
 {
-    const int cn = normal.channels();
-    const int depth = normal.depth();
+    സ്ഥിരം പൂർണ്ണസംഖ്യ cn = normal.channels();
+    സ്ഥിരം പൂർണ്ണസംഖ്യ depth = normal.depth();
 
     CV_Assert( cn == 3 );
     CV_Assert( depth == CV_8S || depth == CV_16S || depth == CV_32S || depth == CV_32F || depth == CV_64F );
 
-    if (normal.kind() == _InputArray::OPENGL_BUFFER)
+    എങ്കിൽ (normal.kind() == നിവേശം_Array_2::OPENGL_BUFFER)
         normal_ = normal.getOGlBuffer();
-    else
+    അല്ലെങ്കിൽ
         normal_.copyFrom(normal);
 }
 
-void cv::ogl::Arrays::resetNormalArray()
+ശൂന്യം cv::ogl::Arrays::resetNormalArray()
 {
     normal_.release();
 }
 
-void cv::ogl::Arrays::setTexCoordArray(InputArray texCoord)
+ശൂന്യം cv::ogl::Arrays::setTexCoordArray(നിവേശം_Array texCoord)
 {
-    const int cn = texCoord.channels();
-    const int depth = texCoord.depth();
+    സ്ഥിരം പൂർണ്ണസംഖ്യ cn = texCoord.channels();
+    സ്ഥിരം പൂർണ്ണസംഖ്യ depth = texCoord.depth();
 
     CV_Assert( cn >= 1 && cn <= 4 );
     CV_Assert( depth == CV_16S || depth == CV_32S || depth == CV_32F || depth == CV_64F );
 
-    if (texCoord.kind() == _InputArray::OPENGL_BUFFER)
+    എങ്കിൽ (texCoord.kind() == നിവേശം_Array_2::OPENGL_BUFFER)
         texCoord_ = texCoord.getOGlBuffer();
-    else
+    അല്ലെങ്കിൽ
         texCoord_.copyFrom(texCoord);
 }
 
-void cv::ogl::Arrays::resetTexCoordArray()
+ശൂന്യം cv::ogl::Arrays::resetTexCoordArray()
 {
     texCoord_.release();
 }
 
-void cv::ogl::Arrays::release()
+ശൂന്യം cv::ogl::Arrays::release()
 {
     resetVertexArray();
     resetColorArray();
@@ -1507,12 +1507,12 @@ void cv::ogl::Arrays::release()
     resetTexCoordArray();
 }
 
-void cv::ogl::Arrays::setAutoRelease(bool flag)
+ശൂന്യം cv::ogl::Arrays::setAutoRelease(തർക്കം flag)
 {
 #ifndef HAVE_OPENGL
     CV_UNUSED(flag);
     throw_no_ogl();
-#else
+#അല്ലെങ്കിൽ
     vertex_.setAutoRelease(flag);
     color_.setAutoRelease(flag);
     normal_.setAutoRelease(flag);
@@ -1520,21 +1520,21 @@ void cv::ogl::Arrays::setAutoRelease(bool flag)
 #endif
 }
 
-void cv::ogl::Arrays::bind() const
+ശൂന്യം cv::ogl::Arrays::bind() സ്ഥിരം
 {
 #ifndef HAVE_OPENGL
     throw_no_ogl();
-#else
+#അല്ലെങ്കിൽ
     CV_Assert( texCoord_.empty() || texCoord_.size().area() == size_ );
     CV_Assert( normal_.empty() || normal_.size().area() == size_ );
     CV_Assert( color_.empty() || color_.size().area() == size_ );
 
-    if (texCoord_.empty())
+    എങ്കിൽ (texCoord_.empty())
     {
         gl::DisableClientState(gl::TEXTURE_COORD_ARRAY);
         CV_CheckGlError();
     }
-    else
+    അല്ലെങ്കിൽ
     {
         gl::EnableClientState(gl::TEXTURE_COORD_ARRAY);
         CV_CheckGlError();
@@ -1545,12 +1545,12 @@ void cv::ogl::Arrays::bind() const
         CV_CheckGlError();
     }
 
-    if (normal_.empty())
+    എങ്കിൽ (normal_.empty())
     {
         gl::DisableClientState(gl::NORMAL_ARRAY);
         CV_CheckGlError();
     }
-    else
+    അല്ലെങ്കിൽ
     {
         gl::EnableClientState(gl::NORMAL_ARRAY);
         CV_CheckGlError();
@@ -1561,30 +1561,30 @@ void cv::ogl::Arrays::bind() const
         CV_CheckGlError();
     }
 
-    if (color_.empty())
+    എങ്കിൽ (color_.empty())
     {
         gl::DisableClientState(gl::COLOR_ARRAY);
         CV_CheckGlError();
     }
-    else
+    അല്ലെങ്കിൽ
     {
         gl::EnableClientState(gl::COLOR_ARRAY);
         CV_CheckGlError();
 
         color_.bind(ogl::Buffer::ARRAY_BUFFER);
 
-        const int cn = color_.channels();
+        സ്ഥിരം പൂർണ്ണസംഖ്യ cn = color_.channels();
 
         gl::ColorPointer(cn, gl_types[color_.depth()], 0, 0);
         CV_CheckGlError();
     }
 
-    if (vertex_.empty())
+    എങ്കിൽ (vertex_.empty())
     {
         gl::DisableClientState(gl::VERTEX_ARRAY);
         CV_CheckGlError();
     }
-    else
+    അല്ലെങ്കിൽ
     {
         gl::EnableClientState(gl::VERTEX_ARRAY);
         CV_CheckGlError();
@@ -1604,50 +1604,50 @@ void cv::ogl::Arrays::bind() const
 
 #ifndef HAVE_OPENGL
 
-class cv::ogl::VertexArray::Impl
+വർഗ്ഗം cv::ogl::VertexArray::Impl
 {
 };
 
-#else
+#അല്ലെങ്കിൽ
 
-class cv::ogl::VertexArray::Impl
+വർഗ്ഗം cv::ogl::VertexArray::Impl
 {
-public:
-    static const Ptr<Impl>& empty();
+പൊതു:
+    സ്ഥിതം സ്ഥിരം Ptr<Impl>& empty();
 
-    Impl(GLuint vaId, bool autoRelease);
-    Impl(std::initializer_list<Attribute> attributes, bool autoRelease);
+    Impl(GLuint vaId, തർക്കം autoRelease);
+    Impl(std::initializer_list<Attribute> attributes, തർക്കം autoRelease);
     ~Impl();
 
-    void bind();
+    ശൂന്യം bind();
 
-    void setAutoRelease(bool flag) { autoRelease_ = flag; }
+    ശൂന്യം setAutoRelease(തർക്കം flag) { autoRelease_ = flag; }
 
-    GLuint vaId() const { return vaId_; }
+    GLuint vaId() സ്ഥിരം { തിരികെ vaId_; }
 
-private:
+സ്വകാര്യ:
     Impl();
 
     GLuint vaId_;
-    bool autoRelease_;
+    തർക്കം autoRelease_;
 };
 
-const Ptr<cv::ogl::VertexArray::Impl>& cv::ogl::VertexArray::Impl::empty()
+സ്ഥിരം Ptr<cv::ogl::VertexArray::Impl>& cv::ogl::VertexArray::Impl::empty()
 {
-    static Ptr<Impl> p(new Impl);
-    return p;
+    സ്ഥിതം Ptr<Impl> p(പുതിയ Impl);
+    തിരികെ p;
 }
 
-cv::ogl::VertexArray::Impl::Impl() : vaId_(0), autoRelease_(false)
+cv::ogl::VertexArray::Impl::Impl() : vaId_(0), autoRelease_(അസത്യം)
 {
 }
 
-cv::ogl::VertexArray::Impl::Impl(GLuint vaId, bool autoRelease) : vaId_(vaId), autoRelease_(autoRelease)
+cv::ogl::VertexArray::Impl::Impl(GLuint vaId, തർക്കം autoRelease) : vaId_(vaId), autoRelease_(autoRelease)
 {
     CV_Assert( gl::IsVertexArray(vaId) == gl::TRUE_ );
 }
 
-cv::ogl::VertexArray::Impl::Impl(std::initializer_list<Attribute> attributes, bool autoRelease) : vaId_(0), autoRelease_(autoRelease)
+cv::ogl::VertexArray::Impl::Impl(std::initializer_list<Attribute> attributes, തർക്കം autoRelease) : vaId_(0), autoRelease_(autoRelease)
 {
     gl::GenVertexArrays(1, &vaId_);
     CV_CheckGlError();
@@ -1656,21 +1656,21 @@ cv::ogl::VertexArray::Impl::Impl(std::initializer_list<Attribute> attributes, bo
     gl::BindVertexArray(vaId_);
     CV_CheckGlError();
 
-    for (auto& attribute : attributes)
+    വേണ്ടി (auto& attribute : attributes)
     {
         attribute.buffer_.bind(Buffer::ARRAY_BUFFER);
-        if (attribute.integer_)
+        എങ്കിൽ (attribute.integer_)
         {
             gl::VertexAttribIPointer(
                 attribute.shader_loc_,
                 attribute.size_,
                 attribute.type_,
                 static_cast<GLsizei>(attribute.stride_),
-                reinterpret_cast<const void*>(attribute.offset_)
+                reinterpret_cast<സ്ഥിരം ശൂന്യം*>(attribute.offset_)
             );
             CV_CheckGlError();
         }
-        else
+        അല്ലെങ്കിൽ
         {
             gl::VertexAttribPointer(
                 attribute.shader_loc_,
@@ -1678,7 +1678,7 @@ cv::ogl::VertexArray::Impl::Impl(std::initializer_list<Attribute> attributes, bo
                 attribute.type_,
                 attribute.normalized_,
                 static_cast<GLsizei>(attribute.stride_),
-                reinterpret_cast<const void*>(attribute.offset_)
+                reinterpret_cast<സ്ഥിരം ശൂന്യം*>(attribute.offset_)
             );
             CV_CheckGlError();
         }
@@ -1690,11 +1690,11 @@ cv::ogl::VertexArray::Impl::Impl(std::initializer_list<Attribute> attributes, bo
 
 cv::ogl::VertexArray::Impl::~Impl()
 {
-    if (autoRelease_ && vaId_)
+    എങ്കിൽ (autoRelease_ && vaId_)
         gl::DeleteVertexArrays(1, &vaId_);
 }
 
-void cv::ogl::VertexArray::Impl::bind()
+ശൂന്യം cv::ogl::VertexArray::Impl::bind()
 {
     gl::BindVertexArray(vaId_);
     CV_CheckGlError();
@@ -1706,74 +1706,74 @@ cv::ogl::VertexArray::VertexArray()
 {
 #ifndef HAVE_OPENGL
     throw_no_ogl();
-#else
+#അല്ലെങ്കിൽ
     impl_ = Impl::empty();
 #endif
 }
 
-cv::ogl::VertexArray::VertexArray(std::initializer_list<Attribute> attributes, bool autoRelease)
+cv::ogl::VertexArray::VertexArray(std::initializer_list<Attribute> attributes, തർക്കം autoRelease)
 {
 #ifndef HAVE_OPENGL
     CV_UNUSED(attributes); CV_UNUSED(autoRelease);
     throw_no_ogl();
-#else
-    impl_.reset(new Impl(attributes, autoRelease));
+#അല്ലെങ്കിൽ
+    impl_.reset(പുതിയ Impl(attributes, autoRelease));
 #endif
 }
 
-void cv::ogl::VertexArray::create(std::initializer_list<Attribute> attributes, bool autoRelease)
+ശൂന്യം cv::ogl::VertexArray::create(std::initializer_list<Attribute> attributes, തർക്കം autoRelease)
 {
 #ifndef HAVE_OPENGL
     CV_UNUSED(attributes); CV_UNUSED(autoRelease);
     throw_no_ogl();
-#else
-    impl_.reset(new Impl(attributes, autoRelease));
+#അല്ലെങ്കിൽ
+    impl_.reset(പുതിയ Impl(attributes, autoRelease));
 #endif
 }
 
-void cv::ogl::VertexArray::release()
+ശൂന്യം cv::ogl::VertexArray::release()
 {
 #ifdef HAVE_OPENGL
-    if (impl_)
-        impl_->setAutoRelease(true);
+    എങ്കിൽ (impl_)
+        impl_->setAutoRelease(സത്യം);
     impl_ = Impl::empty();
 #endif
 }
 
-void cv::ogl::VertexArray::setAutoRelease(bool flag)
+ശൂന്യം cv::ogl::VertexArray::setAutoRelease(തർക്കം flag)
 {
 #ifndef HAVE_OPENGL
     CV_UNUSED(flag);
     throw_no_ogl();
-#else
+#അല്ലെങ്കിൽ
     impl_->setAutoRelease(flag);
 #endif
 }
 
-void cv::ogl::VertexArray::bind() const
+ശൂന്യം cv::ogl::VertexArray::bind() സ്ഥിരം
 {
 #ifndef HAVE_OPENGL
     throw_no_ogl();
-#else
+#അല്ലെങ്കിൽ
     impl_->bind();
 #endif
 }
 
-void cv::ogl::VertexArray::unbind()
+ശൂന്യം cv::ogl::VertexArray::unbind()
 {
 #ifndef HAVE_OPENGL
     throw_no_ogl();
-#else
+#അല്ലെങ്കിൽ
     gl::BindVertexArray(0);
 #endif
 }
 
-unsigned int cv::ogl::VertexArray::vaId() const
+unsigned പൂർണ്ണസംഖ്യ cv::ogl::VertexArray::vaId() സ്ഥിരം
 {
 #ifndef HAVE_OPENGL
     throw_no_ogl();
-#else
-    return impl_->vaId();
+#അല്ലെങ്കിൽ
+    തിരികെ impl_->vaId();
 #endif
 }
 
@@ -1782,48 +1782,48 @@ unsigned int cv::ogl::VertexArray::vaId() const
 
 #ifndef HAVE_OPENGL
 
-class cv::ogl::Shader::Impl
+വർഗ്ഗം cv::ogl::Shader::Impl
 {
 };
 
-#else
+#അല്ലെങ്കിൽ
 
-class cv::ogl::Shader::Impl
+വർഗ്ഗം cv::ogl::Shader::Impl
 {
-public:
-    static const Ptr<Impl>& empty();
+പൊതു:
+    സ്ഥിതം സ്ഥിരം Ptr<Impl>& empty();
 
-    Impl(GLuint shaderId, bool autoRelease);
-    Impl(const char* src, GLenum type, bool autoRelease);
+    Impl(GLuint shaderId, തർക്കം autoRelease);
+    Impl(സ്ഥിരം അക്ഷരം* src, GLenum type, തർക്കം autoRelease);
     ~Impl();
 
-    void setAutoRelease(bool flag) { autoRelease_ = flag; }
+    ശൂന്യം setAutoRelease(തർക്കം flag) { autoRelease_ = flag; }
 
-    GLuint shaderId() const { return shaderId_; }
+    GLuint shaderId() സ്ഥിരം { തിരികെ shaderId_; }
 
-private:
+സ്വകാര്യ:
     Impl();
 
     GLuint shaderId_;
-    bool autoRelease_;
+    തർക്കം autoRelease_;
 };
 
-const Ptr<cv::ogl::Shader::Impl>& cv::ogl::Shader::Impl::empty()
+സ്ഥിരം Ptr<cv::ogl::Shader::Impl>& cv::ogl::Shader::Impl::empty()
 {
-    static Ptr<Impl> p(new Impl);
-    return p;
+    സ്ഥിതം Ptr<Impl> p(പുതിയ Impl);
+    തിരികെ p;
 }
 
-cv::ogl::Shader::Impl::Impl() : shaderId_(0), autoRelease_(false)
+cv::ogl::Shader::Impl::Impl() : shaderId_(0), autoRelease_(അസത്യം)
 {
 }
 
-cv::ogl::Shader::Impl::Impl(GLuint shaderId, bool autoRelease) : shaderId_(shaderId), autoRelease_(autoRelease)
+cv::ogl::Shader::Impl::Impl(GLuint shaderId, തർക്കം autoRelease) : shaderId_(shaderId), autoRelease_(autoRelease)
 {
     CV_Assert( gl::IsShader(shaderId) == gl::TRUE_ );
 }
 
-cv::ogl::Shader::Impl::Impl(const char* src, GLenum type, bool autoRelease) : shaderId_(0), autoRelease_(autoRelease)
+cv::ogl::Shader::Impl::Impl(സ്ഥിരം അക്ഷരം* src, GLenum type, തർക്കം autoRelease) : shaderId_(0), autoRelease_(autoRelease)
 {
     shaderId_ = gl::CreateShader(type);
     CV_CheckGlError();
@@ -1834,7 +1834,7 @@ cv::ogl::Shader::Impl::Impl(const char* src, GLenum type, bool autoRelease) : sh
     gl::ShaderSource(shaderId_, 1, &src, 0);
     gl::CompileShader(shaderId_);
     gl::GetShaderiv(shaderId_, gl::COMPILE_STATUS, &status);
-    if (!status) {
+    എങ്കിൽ (!status) {
         String info_log;
         gl::GetShaderiv(shaderId_, gl::INFO_LOG_LENGTH, &status);
         info_log.resize(status);
@@ -1847,7 +1847,7 @@ cv::ogl::Shader::Impl::Impl(const char* src, GLenum type, bool autoRelease) : sh
 
 cv::ogl::Shader::Impl::~Impl()
 {
-    if (autoRelease_ && shaderId_)
+    എങ്കിൽ (autoRelease_ && shaderId_)
         gl::DeleteShader(shaderId_);
 }
 
@@ -1857,63 +1857,63 @@ cv::ogl::Shader::Shader() : type_(ShaderType::VERTEX)
 {
 #ifndef HAVE_OPENGL
     throw_no_ogl();
-#else
+#അല്ലെങ്കിൽ
     impl_ = Impl::empty();
 #endif
 }
 
-cv::ogl::Shader::Shader(const char* src, ShaderType type, bool autoRelease) : type_(type)
+cv::ogl::Shader::Shader(സ്ഥിരം അക്ഷരം* src, ShaderType type, തർക്കം autoRelease) : type_(type)
 {
 #ifndef HAVE_OPENGL
     CV_UNUSED(src); CV_UNUSED(type); CV_UNUSED(autoRelease);
     throw_no_ogl();
-#else
-    impl_.reset(new Impl(src, type, autoRelease));
+#അല്ലെങ്കിൽ
+    impl_.reset(പുതിയ Impl(src, type, autoRelease));
 #endif
 }
 
-void cv::ogl::Shader::create(const char* src, ShaderType type, bool autoRelease)
+ശൂന്യം cv::ogl::Shader::create(സ്ഥിരം അക്ഷരം* src, ShaderType type, തർക്കം autoRelease)
 {
 #ifndef HAVE_OPENGL
     CV_UNUSED(src); CV_UNUSED(type); CV_UNUSED(autoRelease);
     throw_no_ogl();
-#else
-    impl_.reset(new Impl(src, type, autoRelease));
+#അല്ലെങ്കിൽ
+    impl_.reset(പുതിയ Impl(src, type, autoRelease));
     type_ = type;
 #endif
 }
 
-void cv::ogl::Shader::release()
+ശൂന്യം cv::ogl::Shader::release()
 {
 #ifdef HAVE_OPENGL
-    if (impl_)
-        impl_->setAutoRelease(true);
+    എങ്കിൽ (impl_)
+        impl_->setAutoRelease(സത്യം);
     impl_ = Impl::empty();
 #endif
 }
 
-void cv::ogl::Shader::setAutoRelease(bool flag)
+ശൂന്യം cv::ogl::Shader::setAutoRelease(തർക്കം flag)
 {
 #ifndef HAVE_OPENGL
     CV_UNUSED(flag);
     throw_no_ogl();
-#else
+#അല്ലെങ്കിൽ
     impl_->setAutoRelease(flag);
 #endif
 }
 
-unsigned int cv::ogl::Shader::shaderId() const
+unsigned പൂർണ്ണസംഖ്യ cv::ogl::Shader::shaderId() സ്ഥിരം
 {
 #ifndef HAVE_OPENGL
     throw_no_ogl();
-#else
-    return impl_->shaderId();
+#അല്ലെങ്കിൽ
+    തിരികെ impl_->shaderId();
 #endif
 }
 
-cv::ogl::Shader::ShaderType cv::ogl::Shader::type() const
+cv::ogl::Shader::ShaderType cv::ogl::Shader::type() സ്ഥിരം
 {
-    return type_;
+    തിരികെ type_;
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1921,55 +1921,55 @@ cv::ogl::Shader::ShaderType cv::ogl::Shader::type() const
 
 #ifndef HAVE_OPENGL
 
-class cv::ogl::Program::Impl
+വർഗ്ഗം cv::ogl::Program::Impl
 {
 };
 
-#else
+#അല്ലെങ്കിൽ
 
-class cv::ogl::Program::Impl
+വർഗ്ഗം cv::ogl::Program::Impl
 {
-public:
-    static const Ptr<Impl>& empty();
+പൊതു:
+    സ്ഥിതം സ്ഥിരം Ptr<Impl>& empty();
 
-    Impl(GLuint programId, bool autoRelease);
-    Impl(const Shader& vert, const Shader& frag, bool autoRelease);
+    Impl(GLuint programId, തർക്കം autoRelease);
+    Impl(സ്ഥിരം Shader& vert, സ്ഥിരം Shader& frag, തർക്കം autoRelease);
     ~Impl();
 
-    void bind();
+    ശൂന്യം bind();
 
-    int getAttributeLocation(const char* name) const;
-    int getUniformLocation(const char* name) const;
+    പൂർണ്ണസംഖ്യ getAttributeLocation(സ്ഥിരം അക്ഷരം* name) സ്ഥിരം;
+    പൂർണ്ണസംഖ്യ getUniformLocation(സ്ഥിരം അക്ഷരം* name) സ്ഥിരം;
 
-    void setAutoRelease(bool flag) { autoRelease_ = flag; }
+    ശൂന്യം setAutoRelease(തർക്കം flag) { autoRelease_ = flag; }
 
-    GLuint programId() const { return programId_; }
+    GLuint programId() സ്ഥിരം { തിരികെ programId_; }
 
-private:
+സ്വകാര്യ:
     Impl();
 
     Shader vert_;
     Shader frag_;
     GLuint programId_;
-    bool autoRelease_;
+    തർക്കം autoRelease_;
 };
 
-const Ptr<cv::ogl::Program::Impl>& cv::ogl::Program::Impl::empty()
+സ്ഥിരം Ptr<cv::ogl::Program::Impl>& cv::ogl::Program::Impl::empty()
 {
-    static Ptr<Impl> p(new Impl);
-    return p;
+    സ്ഥിതം Ptr<Impl> p(പുതിയ Impl);
+    തിരികെ p;
 }
 
-cv::ogl::Program::Impl::Impl() : programId_(0), autoRelease_(false)
+cv::ogl::Program::Impl::Impl() : programId_(0), autoRelease_(അസത്യം)
 {
 }
 
-cv::ogl::Program::Impl::Impl(GLuint programId, bool autoRelease) : programId_(programId), autoRelease_(autoRelease)
+cv::ogl::Program::Impl::Impl(GLuint programId, തർക്കം autoRelease) : programId_(programId), autoRelease_(autoRelease)
 {
     CV_Assert( gl::IsProgram(programId) == gl::TRUE_ );
 }
 
-cv::ogl::Program::Impl::Impl(const Shader& vert, const Shader& frag, bool autoRelease) : programId_(0), autoRelease_(autoRelease)
+cv::ogl::Program::Impl::Impl(സ്ഥിരം Shader& vert, സ്ഥിരം Shader& frag, തർക്കം autoRelease) : programId_(0), autoRelease_(autoRelease)
 {
     programId_ = gl::CreateProgram();
     CV_CheckGlError();
@@ -1985,7 +1985,7 @@ cv::ogl::Program::Impl::Impl(const Shader& vert, const Shader& frag, bool autoRe
     GLint status;
     gl::LinkProgram(programId_);
     gl::GetProgramiv(programId_, gl::LINK_STATUS, &status);
-    if (!status) {
+    എങ്കിൽ (!status) {
         String info_log;
         gl::GetProgramiv(programId_, gl::INFO_LOG_LENGTH, &status);
         info_log.resize(status);
@@ -2001,30 +2001,30 @@ cv::ogl::Program::Impl::Impl(const Shader& vert, const Shader& frag, bool autoRe
 
 cv::ogl::Program::Impl::~Impl()
 {
-    if (autoRelease_ && programId_)
+    എങ്കിൽ (autoRelease_ && programId_)
         gl::DeleteProgram(programId_);
 }
 
-void cv::ogl::Program::Impl::bind()
+ശൂന്യം cv::ogl::Program::Impl::bind()
 {
     gl::UseProgram(programId_);
     CV_CheckGlError();
 }
 
-int cv::ogl::Program::Impl::getAttributeLocation(const char* name) const
+പൂർണ്ണസംഖ്യ cv::ogl::Program::Impl::getAttributeLocation(സ്ഥിരം അക്ഷരം* name) സ്ഥിരം
 {
     // -1 if absent (e.g. optimized out); caller decides.
-    int location = gl::GetAttribLocation(programId_, name);
+    പൂർണ്ണസംഖ്യ location = gl::GetAttribLocation(programId_, name);
     CV_CheckGlError();
-    return location;
+    തിരികെ location;
 }
 
-int cv::ogl::Program::Impl::getUniformLocation(const char* name) const
+പൂർണ്ണസംഖ്യ cv::ogl::Program::Impl::getUniformLocation(സ്ഥിരം അക്ഷരം* name) സ്ഥിരം
 {
     // -1 if absent (e.g. optimized out); caller decides.
-    int location = gl::GetUniformLocation(programId_, name);
+    പൂർണ്ണസംഖ്യ location = gl::GetUniformLocation(programId_, name);
     CV_CheckGlError();
-    return location;
+    തിരികെ location;
 }
 
 #endif // HAVE_OPENGL
@@ -2033,169 +2033,169 @@ cv::ogl::Program::Program()
 {
 #ifndef HAVE_OPENGL
     throw_no_ogl();
-#else
+#അല്ലെങ്കിൽ
     impl_ = Impl::empty();
 #endif
 }
 
-cv::ogl::Program::Program(const Shader& vert, const Shader& frag, bool autoRelease)
+cv::ogl::Program::Program(സ്ഥിരം Shader& vert, സ്ഥിരം Shader& frag, തർക്കം autoRelease)
 {
 #ifndef HAVE_OPENGL
     CV_UNUSED(vert); CV_UNUSED(frag); CV_UNUSED(autoRelease);
     throw_no_ogl();
-#else
-    impl_.reset(new Impl(vert, frag, autoRelease));
+#അല്ലെങ്കിൽ
+    impl_.reset(പുതിയ Impl(vert, frag, autoRelease));
 #endif
 }
 
-void cv::ogl::Program::create(const Shader& vert, const Shader& frag, bool autoRelease)
+ശൂന്യം cv::ogl::Program::create(സ്ഥിരം Shader& vert, സ്ഥിരം Shader& frag, തർക്കം autoRelease)
 {
 #ifndef HAVE_OPENGL
     CV_UNUSED(vert); CV_UNUSED(frag); CV_UNUSED(autoRelease);
     throw_no_ogl();
-#else
-    impl_.reset(new Impl(vert, frag, autoRelease));
+#അല്ലെങ്കിൽ
+    impl_.reset(പുതിയ Impl(vert, frag, autoRelease));
 #endif
 }
 
-void cv::ogl::Program::release()
+ശൂന്യം cv::ogl::Program::release()
 {
 #ifdef HAVE_OPENGL
-    if (impl_)
-        impl_->setAutoRelease(true);
+    എങ്കിൽ (impl_)
+        impl_->setAutoRelease(സത്യം);
     impl_ = Impl::empty();
 #endif
 }
 
-void cv::ogl::Program::setAutoRelease(bool flag)
+ശൂന്യം cv::ogl::Program::setAutoRelease(തർക്കം flag)
 {
 #ifndef HAVE_OPENGL
     CV_UNUSED(flag);
     throw_no_ogl();
-#else
+#അല്ലെങ്കിൽ
     impl_->setAutoRelease(flag);
 #endif
 }
 
-void cv::ogl::Program::bind() const
+ശൂന്യം cv::ogl::Program::bind() സ്ഥിരം
 {
 #ifndef HAVE_OPENGL
     throw_no_ogl();
-#else
+#അല്ലെങ്കിൽ
     impl_->bind();
 #endif
 }
 
-void cv::ogl::Program::unbind()
+ശൂന്യം cv::ogl::Program::unbind()
 {
 #ifndef HAVE_OPENGL
     throw_no_ogl();
-#else
+#അല്ലെങ്കിൽ
     gl::UseProgram(0);
 #endif
 }
 
-int cv::ogl::Program::getAttributeLocation(const char* name) const
+പൂർണ്ണസംഖ്യ cv::ogl::Program::getAttributeLocation(സ്ഥിരം അക്ഷരം* name) സ്ഥിരം
 {
 #ifndef HAVE_OPENGL
     CV_UNUSED(name);
     throw_no_ogl();
-#else
-    return impl_->getAttributeLocation(name);
+#അല്ലെങ്കിൽ
+    തിരികെ impl_->getAttributeLocation(name);
 #endif
 }
 
-int cv::ogl::Program::getUniformLocation(const char* name) const
+പൂർണ്ണസംഖ്യ cv::ogl::Program::getUniformLocation(സ്ഥിരം അക്ഷരം* name) സ്ഥിരം
 {
 #ifndef HAVE_OPENGL
     CV_UNUSED(name);
     throw_no_ogl();
-#else
-    return impl_->getUniformLocation(name);
+#അല്ലെങ്കിൽ
+    തിരികെ impl_->getUniformLocation(name);
 #endif
 }
 
-void cv::ogl::Program::setUniformVec3(int loc, Vec3f vec)
+ശൂന്യം cv::ogl::Program::setUniformVec3(പൂർണ്ണസംഖ്യ loc, Vec3f vec)
 {
 #ifndef HAVE_OPENGL
     CV_UNUSED(loc); CV_UNUSED(vec);
     throw_no_ogl();
-#else
+#അല്ലെങ്കിൽ
     gl::Uniform3f(loc, vec(0), vec(1), vec(2));
 #endif
 }
 
-void cv::ogl::Program::setUniformVec2(int loc, Vec2f vec)
+ശൂന്യം cv::ogl::Program::setUniformVec2(പൂർണ്ണസംഖ്യ loc, Vec2f vec)
 {
 #ifndef HAVE_OPENGL
     CV_UNUSED(loc); CV_UNUSED(vec);
     throw_no_ogl();
-#else
+#അല്ലെങ്കിൽ
     gl::Uniform2f(loc, vec(0), vec(1));
 #endif
 }
 
-void cv::ogl::Program::setUniformVec4(int loc, Vec4f vec)
+ശൂന്യം cv::ogl::Program::setUniformVec4(പൂർണ്ണസംഖ്യ loc, Vec4f vec)
 {
 #ifndef HAVE_OPENGL
     CV_UNUSED(loc); CV_UNUSED(vec);
     throw_no_ogl();
-#else
+#അല്ലെങ്കിൽ
     gl::Uniform4f(loc, vec(0), vec(1), vec(2), vec(3));
 #endif
 }
 
-void cv::ogl::Program::setUniformMat4x4(int loc, Matx44f mat)
+ശൂന്യം cv::ogl::Program::setUniformMat4x4(പൂർണ്ണസംഖ്യ loc, Matx44f mat)
 {
 #ifndef HAVE_OPENGL
     CV_UNUSED(loc); CV_UNUSED(mat);
     throw_no_ogl();
-#else
-    gl::UniformMatrix4fv(loc, 1, true, mat.val);
+#അല്ലെങ്കിൽ
+    gl::UniformMatrix4fv(loc, 1, സത്യം, mat.val);
 #endif
 }
 
-void cv::ogl::Program::setUniform1f(int loc, float value)
+ശൂന്യം cv::ogl::Program::setUniform1f(പൂർണ്ണസംഖ്യ loc, ദശാംശം value)
 {
 #ifndef HAVE_OPENGL
     CV_UNUSED(loc); CV_UNUSED(value);
     throw_no_ogl();
-#else
+#അല്ലെങ്കിൽ
     gl::Uniform1f(loc, value);
 #endif
 }
 
-void cv::ogl::Program::setUniform1i(int loc, int value)
+ശൂന്യം cv::ogl::Program::setUniform1i(പൂർണ്ണസംഖ്യ loc, പൂർണ്ണസംഖ്യ value)
 {
 #ifndef HAVE_OPENGL
     CV_UNUSED(loc); CV_UNUSED(value);
     throw_no_ogl();
-#else
+#അല്ലെങ്കിൽ
     gl::Uniform1i(loc, value);
 #endif
 }
 
-unsigned int cv::ogl::Program::programId() const
+unsigned പൂർണ്ണസംഖ്യ cv::ogl::Program::programId() സ്ഥിരം
 {
 #ifndef HAVE_OPENGL
     throw_no_ogl();
-#else
-    return impl_->programId();
+#അല്ലെങ്കിൽ
+    തിരികെ impl_->programId();
 #endif
 }
 
 ////////////////////////////////////////////////////////////////////////
 // Rendering
 
-void cv::ogl::render(const ogl::Texture2D& tex, Rect_<double> wndRect, Rect_<double> texRect)
+ശൂന്യം cv::ogl::render(സ്ഥിരം ogl::Texture2D& tex, Rect_<ഇരട്ട> wndRect, Rect_<ഇരട്ട> texRect)
 {
 #ifndef HAVE_OPENGL
     CV_UNUSED(tex);
     CV_UNUSED(wndRect);
     CV_UNUSED(texRect);
     throw_no_ogl();
-#else
-    if (!tex.empty())
+#അല്ലെങ്കിൽ
+    എങ്കിൽ (!tex.empty())
     {
         gl::MatrixMode(gl::PROJECTION);
         gl::LoadIdentity();
@@ -2220,14 +2220,14 @@ void cv::ogl::render(const ogl::Texture2D& tex, Rect_<double> wndRect, Rect_<dou
         gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_MIN_FILTER, gl::LINEAR);
         CV_CheckGlError();
 
-        const double vertex[] =
+        സ്ഥിരം ഇരട്ട vertex[] =
         {
             wndRect.x, wndRect.y, 0.0,
             wndRect.x, (wndRect.y + wndRect.height), 0.0,
             wndRect.x + wndRect.width, (wndRect.y + wndRect.height), 0.0,
             wndRect.x + wndRect.width, wndRect.y, 0.0
         };
-        const double texCoords[] =
+        സ്ഥിരം ഇരട്ട texCoords[] =
         {
             texRect.x, texRect.y,
             texRect.x, texRect.y + texRect.height,
@@ -2259,15 +2259,15 @@ void cv::ogl::render(const ogl::Texture2D& tex, Rect_<double> wndRect, Rect_<dou
 #endif
 }
 
-void cv::ogl::render(const ogl::Arrays& arr, int mode, Scalar color)
+ശൂന്യം cv::ogl::render(സ്ഥിരം ogl::Arrays& arr, പൂർണ്ണസംഖ്യ mode, Scalar color)
 {
 #ifndef HAVE_OPENGL
     CV_UNUSED(arr);
     CV_UNUSED(mode);
     CV_UNUSED(color);
     throw_no_ogl();
-#else
-    if (!arr.empty())
+#അല്ലെങ്കിൽ
+    എങ്കിൽ (!arr.empty())
     {
         gl::Color3d(color[0] / 255.0, color[1] / 255.0, color[2] / 255.0);
 
@@ -2278,7 +2278,7 @@ void cv::ogl::render(const ogl::Arrays& arr, int mode, Scalar color)
 #endif
 }
 
-void cv::ogl::render(const ogl::Arrays& arr, InputArray indices, int mode, Scalar color)
+ശൂന്യം cv::ogl::render(സ്ഥിരം ogl::Arrays& arr, നിവേശം_Array indices, പൂർണ്ണസംഖ്യ mode, Scalar color)
 {
 #ifndef HAVE_OPENGL
     CV_UNUSED(arr);
@@ -2286,32 +2286,32 @@ void cv::ogl::render(const ogl::Arrays& arr, InputArray indices, int mode, Scala
     CV_UNUSED(mode);
     CV_UNUSED(color);
     throw_no_ogl();
-#else
-    if (!arr.empty() && !indices.empty())
+#അല്ലെങ്കിൽ
+    എങ്കിൽ (!arr.empty() && !indices.empty())
     {
         gl::Color3d(color[0] / 255.0, color[1] / 255.0, color[2] / 255.0);
 
         arr.bind();
 
-        const int kind = indices.kind();
+        സ്ഥിരം പൂർണ്ണസംഖ്യ kind = indices.kind();
 
-        switch (kind)
+        തിരഞ്ഞെടുപ്പ് (kind)
         {
-        case _InputArray::OPENGL_BUFFER :
+        അവസ്ഥ നിവേശം_Array_2::OPENGL_BUFFER :
             {
                 ogl::Buffer buf = indices.getOGlBuffer();
 
-                const int depth = buf.depth();
+                സ്ഥിരം പൂർണ്ണസംഖ്യ depth = buf.depth();
 
                 CV_Assert( buf.channels() == 1 );
                 CV_Assert( depth <= CV_32S );
 
                 GLenum type;
-                if (depth < CV_16U)
+                എങ്കിൽ (depth < CV_16U)
                     type = gl::UNSIGNED_BYTE;
-                else if (depth < CV_32S)
+                അല്ലെങ്കിൽ എങ്കിൽ (depth < CV_32S)
                     type = gl::UNSIGNED_SHORT;
-                else
+                അല്ലെങ്കിൽ
                     type = gl::UNSIGNED_INT;
 
                 buf.bind(ogl::Buffer::ELEMENT_ARRAY_BUFFER);
@@ -2320,25 +2320,25 @@ void cv::ogl::render(const ogl::Arrays& arr, InputArray indices, int mode, Scala
 
                 ogl::Buffer::unbind(ogl::Buffer::ELEMENT_ARRAY_BUFFER);
 
-                break;
+                നിർത്തുക;
             }
 
-        default:
+        സ്ഥിരസ്ഥിതി:
             {
                 Mat mat = indices.getMat();
 
-                const int depth = mat.depth();
+                സ്ഥിരം പൂർണ്ണസംഖ്യ depth = mat.depth();
 
                 CV_Assert( mat.channels() == 1 );
                 CV_Assert( depth <= CV_32S );
                 CV_Assert( mat.isContinuous() );
 
                 GLenum type;
-                if (depth < CV_16U)
+                എങ്കിൽ (depth < CV_16U)
                     type = gl::UNSIGNED_BYTE;
-                else if (depth < CV_32S)
+                അല്ലെങ്കിൽ എങ്കിൽ (depth < CV_32S)
                     type = gl::UNSIGNED_SHORT;
-                else
+                അല്ലെങ്കിൽ
                     type = gl::UNSIGNED_INT;
 
                 ogl::Buffer::unbind(ogl::Buffer::ELEMENT_ARRAY_BUFFER);
@@ -2350,96 +2350,96 @@ void cv::ogl::render(const ogl::Arrays& arr, InputArray indices, int mode, Scala
 #endif
 }
 
-void cv::ogl::clearColor(Scalar color)
+ശൂന്യം cv::ogl::clearColor(Scalar color)
 {
 #ifndef HAVE_OPENGL
     CV_UNUSED(color);
     throw_no_ogl();
-#else
+#അല്ലെങ്കിൽ
     gl::ClearColor(static_cast<GLfloat>(color[0] / 255.0), static_cast<GLfloat>(color[1] / 255.0),
                    static_cast<GLfloat>(color[2] / 255.0), static_cast<GLfloat>(color[3] / 255.0));
     gl::Clear(gl::COLOR_BUFFER_BIT);
 #endif // HAVE_OPENGL
 }
 
-void cv::ogl::clearDepth(float depth)
+ശൂന്യം cv::ogl::clearDepth(ദശാംശം depth)
 {
 #ifndef HAVE_OPENGL
     CV_UNUSED(depth);
     throw_no_ogl();
-#else
+#അല്ലെങ്കിൽ
     gl::ClearDepth(depth);
     gl::Clear(gl::DEPTH_BUFFER_BIT);
 #endif // HAVE_OPENGL
 }
 
-void cv::ogl::drawArrays(int first, int count, int mode)
+ശൂന്യം cv::ogl::drawArrays(പൂർണ്ണസംഖ്യ first, പൂർണ്ണസംഖ്യ എണ്ണം_2, പൂർണ്ണസംഖ്യ mode)
 {
 #ifndef HAVE_OPENGL
-    CV_UNUSED(first); CV_UNUSED(count); CV_UNUSED(mode);
+    CV_UNUSED(first); CV_UNUSED(എണ്ണം_2); CV_UNUSED(mode);
     throw_no_ogl();
-#else
-    gl::DrawArrays(mode, first, count);
+#അല്ലെങ്കിൽ
+    gl::DrawArrays(mode, first, എണ്ണം_2);
 #endif // HAVE_OPENGL
 }
 
-void cv::ogl::drawElements(int first, int count, int type, int mode)
+ശൂന്യം cv::ogl::drawElements(പൂർണ്ണസംഖ്യ first, പൂർണ്ണസംഖ്യ എണ്ണം_2, പൂർണ്ണസംഖ്യ type, പൂർണ്ണസംഖ്യ mode)
 {
 #ifndef HAVE_OPENGL
-    CV_UNUSED(first); CV_UNUSED(count); CV_UNUSED(type); CV_UNUSED(mode);
+    CV_UNUSED(first); CV_UNUSED(എണ്ണം_2); CV_UNUSED(type); CV_UNUSED(mode);
     throw_no_ogl();
-#else
-    gl::DrawElements(mode, count, type, reinterpret_cast<const void*>(static_cast<size_t>(first)));
+#അല്ലെങ്കിൽ
+    gl::DrawElements(mode, എണ്ണം_2, type, reinterpret_cast<സ്ഥിരം ശൂന്യം*>(static_cast<size_t>(first)));
 #endif
 }
 
-void cv::ogl::drawElementsInstanced(int first, int count, int type, int mode, int instanceCount)
+ശൂന്യം cv::ogl::drawElementsInstanced(പൂർണ്ണസംഖ്യ first, പൂർണ്ണസംഖ്യ എണ്ണം_2, പൂർണ്ണസംഖ്യ type, പൂർണ്ണസംഖ്യ mode, പൂർണ്ണസംഖ്യ instance_എണ്ണം)
 {
 #ifndef HAVE_OPENGL
-    CV_UNUSED(first); CV_UNUSED(count); CV_UNUSED(type); CV_UNUSED(mode); CV_UNUSED(instanceCount);
+    CV_UNUSED(first); CV_UNUSED(എണ്ണം_2); CV_UNUSED(type); CV_UNUSED(mode); CV_UNUSED(instance_എണ്ണം);
     throw_no_ogl();
-#else
-    gl::DrawElementsInstanced(mode, count, type, reinterpret_cast<const void*>(static_cast<size_t>(first)), instanceCount);
+#അല്ലെങ്കിൽ
+    gl::DrawElementsInstanced(mode, എണ്ണം_2, type, reinterpret_cast<സ്ഥിരം ശൂന്യം*>(static_cast<size_t>(first)), instance_എണ്ണം);
     CV_CheckGlError();
 #endif
 }
 
-void cv::ogl::blendFunc(int sfactor, int dfactor)
+ശൂന്യം cv::ogl::blendFunc(പൂർണ്ണസംഖ്യ sfactor, പൂർണ്ണസംഖ്യ dfactor)
 {
 #ifndef HAVE_OPENGL
     CV_UNUSED(sfactor); CV_UNUSED(dfactor);
     throw_no_ogl();
-#else
+#അല്ലെങ്കിൽ
     gl::BlendFunc(sfactor, dfactor);
 #endif
 }
 
-void cv::ogl::depthMask(bool flag)
+ശൂന്യം cv::ogl::depthMask(തർക്കം flag)
 {
 #ifndef HAVE_OPENGL
     CV_UNUSED(flag);
     throw_no_ogl();
-#else
+#അല്ലെങ്കിൽ
     gl::DepthMask(flag ? gl::TRUE_ : gl::FALSE_);
 #endif
 }
 
-void cv::ogl::enable(int cap)
+ശൂന്യം cv::ogl::enable(പൂർണ്ണസംഖ്യ cap)
 {
 #ifndef HAVE_OPENGL
     CV_UNUSED(cap);
     throw_no_ogl();
-#else
+#അല്ലെങ്കിൽ
     gl::Enable(cap);
 #endif
 }
 
-void cv::ogl::disable(int cap)
+ശൂന്യം cv::ogl::disable(പൂർണ്ണസംഖ്യ cap)
 {
 #ifndef HAVE_OPENGL
     CV_UNUSED(cap);
     throw_no_ogl();
-#else
+#അല്ലെങ്കിൽ
     gl::Disable(cap);
 #endif
 }
@@ -2452,29 +2452,29 @@ void cv::ogl::disable(int cap)
 #  include "opencv2/core/opencl/runtime/opencl_gl.hpp"
 #  ifdef cl_khr_gl_sharing
 #    define HAVE_OPENCL_OPENGL_SHARING
-#  else
+#  അല്ലെങ്കിൽ
 #    define NO_OPENCL_SHARING_ERROR CV_Error(cv::Error::StsBadFunc, "OpenCV was build without OpenCL/OpenGL sharing support")
 #  endif
-#else // HAVE_OPENCL
+#അല്ലെങ്കിൽ // HAVE_OPENCL
 #  define NO_OPENCL_SUPPORT_ERROR CV_Error(cv::Error::StsBadFunc, "OpenCV was build without OpenCL support")
 #endif // HAVE_OPENCL
 
-#if defined(HAVE_OPENGL)
-#  if defined(__ANDROID__)
+#എങ്കിൽ defined(HAVE_OPENGL)
+#  എങ്കിൽ defined(__ANDROID__)
 #    include <EGL/egl.h>
 #  elif defined(__linux__)
 #    include <GL/glx.h>
 #  endif
 #endif // HAVE_OPENGL
 
-namespace cv { namespace ogl {
+നാമാകാശ cv { നാമാകാശ ogl {
 
-#if defined(HAVE_OPENCL) && defined(HAVE_OPENGL) && defined(HAVE_OPENCL_OPENGL_SHARING)
+#എങ്കിൽ defined(HAVE_OPENCL) && defined(HAVE_OPENGL) && defined(HAVE_OPENCL_OPENGL_SHARING)
 // Check to avoid crash in OpenCL runtime: https://github.com/opencv/opencv/issues/5209
-static void checkOpenCLVersion()
+സ്ഥിതം ശൂന്യം checkOpenCLVersion()
 {
-    using namespace cv::ocl;
-    const Device& device = Device::getDefault();
+    using നാമാകാശ cv::ocl;
+    സ്ഥിരം Device& device = Device::getDefault();
     //CV_Assert(!device.empty());
     cl_device_id dev = (cl_device_id)device.ptr();
     CV_Assert(dev);
@@ -2482,14 +2482,14 @@ static void checkOpenCLVersion()
     cl_platform_id platform_id = 0;
     size_t sz = 0;
 
-    cl_int status = clGetDeviceInfo(dev, CL_DEVICE_PLATFORM, sizeof(platform_id), &platform_id, &sz);
-    CV_Assert(status == CL_SUCCESS && sz == sizeof(cl_platform_id));
+    cl_int status = clGetDeviceInfo(dev, CL_DEVICE_PLATFORM, വലുപ്പം(platform_id), &platform_id, &sz);
+    CV_Assert(status == CL_SUCCESS && sz == വലുപ്പം(cl_platform_id));
     CV_Assert(platform_id);
 
     PlatformInfo pi(&platform_id);
-    int versionMajor = pi.versionMajor();
-    int versionMinor = pi.versionMinor();
-    if (versionMajor < 1 || (versionMajor == 1 && versionMinor <= 1))
+    പൂർണ്ണസംഖ്യ versionMajor = pi.versionMajor();
+    പൂർണ്ണസംഖ്യ versionMinor = pi.versionMinor();
+    എങ്കിൽ (versionMajor < 1 || (versionMajor == 1 && versionMinor <= 1))
         CV_Error_(cv::Error::OpenCLApiCallError,
             ("OpenCL: clCreateFromGLTexture requires OpenCL 1.2+ version: %d.%d - %s (%s)",
                 versionMajor, versionMinor, pi.name().c_str(), pi.version().c_str())
@@ -2497,94 +2497,94 @@ static void checkOpenCLVersion()
 }
 #endif
 
-namespace ocl {
+നാമാകാശ ocl {
 
 Context& initializeContextFromGL()
 {
-#if !defined(HAVE_OPENGL)
+#എങ്കിൽ !defined(HAVE_OPENGL)
     NO_OPENGL_SUPPORT_ERROR;
-#elif !defined(HAVE_OPENCL)
+#അല്ലെങ്കിലെങ്കിൽ !defined(HAVE_OPENCL)
     NO_OPENCL_SUPPORT_ERROR;
-#elif !defined(HAVE_OPENCL_OPENGL_SHARING)
+#അല്ലെങ്കിലെങ്കിൽ !defined(HAVE_OPENCL_OPENGL_SHARING)
     NO_OPENCL_SHARING_ERROR;
-#else
+#അല്ലെങ്കിൽ
     cl_uint platformsCnt = 0;
     cl_uint devCnt = 0;
     cl_device_id* devices = nullptr;
     cl_uint devUsed = 0;
     cl_context context = nullptr;
 
-    cl_int status = clGetPlatformIDs(0, NULL, &platformsCnt);
-    if (status != CL_SUCCESS)
+    cl_int status = clGetPlatformIDs(0, ശൂന്യ, &platformsCnt);
+    എങ്കിൽ (status != CL_SUCCESS)
         CV_Error_(cv::Error::OpenCLInitError, ("OpenCL: Can't get number of platforms: %d", status));
-    if (platformsCnt == 0)
+    എങ്കിൽ (platformsCnt == 0)
         CV_Error(cv::Error::OpenCLInitError, "OpenCL: No available platforms");
 
     std::vector<cl_platform_id> platforms(platformsCnt);
-    status = clGetPlatformIDs(platformsCnt, &platforms[0], NULL);
-    if (status != CL_SUCCESS)
+    status = clGetPlatformIDs(platformsCnt, &platforms[0], ശൂന്യ);
+    എങ്കിൽ (status != CL_SUCCESS)
         CV_Error_(cv::Error::OpenCLInitError, ("OpenCL: Can't get platforms: %d", status));
 
 
     // TODO Filter platforms by name from OPENCV_OPENCL_DEVICE
-    bool sharingSupported = false;
+    തർക്കം sharingSupported = അസത്യം;
 
-    for (unsigned int i = 0; (!sharingSupported && (i < platformsCnt)); ++i) {
-        status = clGetDeviceIDs(platforms[i], CL_DEVICE_TYPE_GPU, 0, NULL, &devCnt);
-        if (status != CL_SUCCESS)
+    വേണ്ടി (unsigned പൂർണ്ണസംഖ്യ i = 0; (!sharingSupported && (i < platformsCnt)); ++i) {
+        status = clGetDeviceIDs(platforms[i], CL_DEVICE_TYPE_GPU, 0, ശൂന്യ, &devCnt);
+        എങ്കിൽ (status != CL_SUCCESS)
             CV_Error_(cv::Error::OpenCLInitError, ("OpenCL: No devices available: %d", status));
 
-        try {
-            devices = new cl_device_id[devCnt];
+        ശ്രമിക്കുക {
+            devices = പുതിയ cl_device_id[devCnt];
 
-            status = clGetDeviceIDs(platforms[i], CL_DEVICE_TYPE_GPU, devCnt, devices, NULL);
-            if (status != CL_SUCCESS)
+            status = clGetDeviceIDs(platforms[i], CL_DEVICE_TYPE_GPU, devCnt, devices, ശൂന്യ);
+            എങ്കിൽ (status != CL_SUCCESS)
                 CV_Error_(cv::Error::OpenCLInitError, ("OpenCL: Can't get platform devices: %d", status));
 
-            for (unsigned int j = 0; (!sharingSupported && (j < devCnt)); ++j) {
+            വേണ്ടി (unsigned പൂർണ്ണസംഖ്യ j = 0; (!sharingSupported && (j < devCnt)); ++j) {
                 size_t extensionSize;
-                status = clGetDeviceInfo(devices[j], CL_DEVICE_EXTENSIONS, 0, NULL, &extensionSize );
-                if (status != CL_SUCCESS)
+                status = clGetDeviceInfo(devices[j], CL_DEVICE_EXTENSIONS, 0, ശൂന്യ, &extensionSize );
+                എങ്കിൽ (status != CL_SUCCESS)
                     CV_Error_(cv::Error::OpenCLInitError, ("OpenCL: No devices available: %d", status));
 
-                if(extensionSize > 0)
+                എങ്കിൽ(extensionSize > 0)
                 {
                     std::string devString(extensionSize, '\0');
                     status = clGetDeviceInfo(devices[j], CL_DEVICE_EXTENSIONS, devString.size(), &devString[0], &extensionSize);
-                    if (status != CL_SUCCESS)
-                        continue;
-                    if (extensionSize > 0 && devString.size() >= extensionSize)
+                    എങ്കിൽ (status != CL_SUCCESS)
+                        തുടരുക;
+                    എങ്കിൽ (extensionSize > 0 && devString.size() >= extensionSize)
                         devString.resize(extensionSize - 1);
 
                     size_t oldPos = 0;
                     size_t spacePos = devString.find(' ', oldPos); // extensions string is space delimited
-                    while (spacePos != devString.npos) {
-                        if (strcmp(GL_SHARING_EXTENSION,
+                    ആകുമ്പോൾ (spacePos != devString.npos) {
+                        എങ്കിൽ (strcmp(GL_SHARING_EXTENSION,
                                 devString.substr(oldPos, spacePos - oldPos).c_str())
                                 == 0) {
                             // Device supports context sharing with OpenGL
                             devUsed = i;
-                            sharingSupported = true;
-                            break;
+                            sharingSupported = സത്യം;
+                            നിർത്തുക;
                         }
-                        do {
+                        ചെയ്യുക {
                             oldPos = spacePos + 1;
                             spacePos = devString.find(' ', oldPos);
-                        } while (spacePos == oldPos);
+                        } ആകുമ്പോൾ (spacePos == oldPos);
                     }
                 }
             }
-        } catch(...) {
+        } പിടിക്കുക(...) {
             CV_Error(cv::Error::OpenCLInitError, "OpenCL: Exception thrown during device information gathering");
-            if(devices != nullptr) {
+            എങ്കിൽ(devices != nullptr) {
                 delete[] devices;
             }
-            continue;
+            തുടരുക;
         }
 
-        if (sharingSupported) {
+        എങ്കിൽ (sharingSupported) {
             // Define OS-specific context properties and create the OpenCL context
-#if defined (__APPLE__)
+#എങ്കിൽ defined (__APPLE__)
                 CGLContextObj cglContext = CGLGetCurrentContext();
                 CGLShareGroupObj cglShareGroup = CGLGetShareGroup(cglContext);
                 cl_context_properties props[] =
@@ -2592,8 +2592,8 @@ Context& initializeContextFromGL()
                     CL_CONTEXT_PROPERTY_USE_CGL_SHAREGROUP_APPLE, (cl_context_properties)cglShareGroup,
                     0
                 };
-                context = clCreateContext(props, 0,0, NULL, NULL, &ciErrNum);
-#elif defined(__ANDROID__)
+                context = clCreateContext(props, 0,0, ശൂന്യ, ശൂന്യ, &ci_Err_അക്കം);
+#അല്ലെങ്കിലെങ്കിൽ defined(__ANDROID__)
                 cl_context_properties props[] =
                 {
                     CL_GL_CONTEXT_KHR, (cl_context_properties)glXGetCurrentContext(),
@@ -2601,8 +2601,8 @@ Context& initializeContextFromGL()
                     CL_CONTEXT_PLATFORM, (cl_context_properties)platforms[i],
                     0
                 };
-                context = clCreateContext(props, 1, &devices[devUsed], NULL, NULL, &status);
-#elif defined(_WIN32)
+                context = clCreateContext(props, 1, &devices[devUsed], ശൂന്യ, ശൂന്യ, &status);
+#അല്ലെങ്കിലെങ്കിൽ defined(_WIN32)
                 cl_context_properties props[] =
                 {
                     CL_GL_CONTEXT_KHR, (cl_context_properties)wglGetCurrentContext(),
@@ -2610,8 +2610,8 @@ Context& initializeContextFromGL()
                     CL_CONTEXT_PLATFORM, (cl_context_properties)platforms[i],
                     0
                 };
-                context = clCreateContext(props, 1, &devices[devUsed], NULL, NULL, &status);
-#elif defined(__linux__)
+                context = clCreateContext(props, 1, &devices[devUsed], ശൂന്യ, ശൂന്യ, &status);
+#അല്ലെങ്കിലെങ്കിൽ defined(__linux__)
                 cl_context_properties props[] =
                 {
                     CL_GL_CONTEXT_KHR, (cl_context_properties)glXGetCurrentContext(),
@@ -2619,14 +2619,14 @@ Context& initializeContextFromGL()
                     CL_CONTEXT_PLATFORM, (cl_context_properties)platforms[i],
                     0
                 };
-                context = clCreateContext(props, 1, &devices[devUsed], NULL, NULL, &status);
+                context = clCreateContext(props, 1, &devices[devUsed], ശൂന്യ, ശൂന്യ, &status);
 #endif
         }
 
-        if (status != CL_SUCCESS)
+        എങ്കിൽ (status != CL_SUCCESS)
             CV_Error_(cv::Error::OpenCLInitError, ("OpenCL: Can't create context for OpenGL interop: %d", status));
-        else
-            break;
+        അല്ലെങ്കിൽ
+            നിർത്തുക;
     }
 
 
@@ -2637,26 +2637,26 @@ Context& initializeContextFromGL()
     clReleaseDevice(devices[devUsed]);
     clReleaseContext(context);
     clExecCtx.bind();
-    return const_cast<Context&>(clExecCtx.getContext());
+    തിരികെ const_cast<Context&>(clExecCtx.getContext());
 #endif
 }
 
 } // namespace cv::ogl::ocl
 
-void convertToGLTexture2D(InputArray src, Texture2D& texture)
+ശൂന്യം convertToGLTexture2D(നിവേശം_Array src, Texture2D& texture)
 {
     CV_UNUSED(src); CV_UNUSED(texture);
-#if !defined(HAVE_OPENGL)
+#എങ്കിൽ !defined(HAVE_OPENGL)
     NO_OPENGL_SUPPORT_ERROR;
-#elif !defined(HAVE_OPENCL)
+#അല്ലെങ്കിലെങ്കിൽ !defined(HAVE_OPENCL)
     NO_OPENCL_SUPPORT_ERROR;
-#elif !defined(HAVE_OPENCL_OPENGL_SHARING)
+#അല്ലെങ്കിലെങ്കിൽ !defined(HAVE_OPENCL_OPENGL_SHARING)
     NO_OPENCL_SHARING_ERROR;
-#else
+#അല്ലെങ്കിൽ
     Size srcSize = src.size();
-    CV_Assert(srcSize.width == (int)texture.cols() && srcSize.height == (int)texture.rows());
+    CV_Assert(srcSize.width == (പൂർണ്ണസംഖ്യ)texture.cols() && srcSize.height == (പൂർണ്ണസംഖ്യ)texture.rows());
 
-    using namespace cv::ocl;
+    using നാമാകാശ cv::ocl;
     Context& ctx = Context::getDefault();
     cl_context context = (cl_context)ctx.ptr();
 
@@ -2670,53 +2670,53 @@ void convertToGLTexture2D(InputArray src, Texture2D& texture)
 
     cl_int status = 0;
     cl_mem clImage = clCreateFromGLTexture(context, CL_MEM_WRITE_ONLY, gl::TEXTURE_2D, 0, texture.texId(), &status);
-    if (status != CL_SUCCESS)
+    എങ്കിൽ (status != CL_SUCCESS)
         CV_Error_(cv::Error::OpenCLApiCallError, ("OpenCL: clCreateFromGLTexture failed: %d", status));
 
     cl_mem clBuffer = (cl_mem)u.handle(ACCESS_READ);
 
     cl_command_queue q = (cl_command_queue)Queue::getDefault().ptr();
-    status = clEnqueueAcquireGLObjects(q, 1, &clImage, 0, NULL, NULL);
-    if (status != CL_SUCCESS)
+    status = clEnqueueAcquireGLObjects(q, 1, &clImage, 0, ശൂന്യ, ശൂന്യ);
+    എങ്കിൽ (status != CL_SUCCESS)
         CV_Error_(cv::Error::OpenCLApiCallError, ("OpenCL: clEnqueueAcquireGLObjects failed: %d", status));
     size_t offset = 0; // TODO
     size_t dst_origin[3] = {0, 0, 0};
     size_t region[3] = { (size_t)u.cols, (size_t)u.rows, 1};
-    status = clEnqueueCopyBufferToImage(q, clBuffer, clImage, offset, dst_origin, region, 0, NULL, NULL);
-    if (status != CL_SUCCESS)
+    status = clEnqueueCopyBufferToImage(q, clBuffer, clImage, offset, dst_origin, region, 0, ശൂന്യ, ശൂന്യ);
+    എങ്കിൽ (status != CL_SUCCESS)
         CV_Error_(cv::Error::OpenCLApiCallError, ("OpenCL: clEnqueueCopyBufferToImage failed: %d", status));
-    status = clEnqueueReleaseGLObjects(q, 1, &clImage, 0, NULL, NULL);
-    if (status != CL_SUCCESS)
+    status = clEnqueueReleaseGLObjects(q, 1, &clImage, 0, ശൂന്യ, ശൂന്യ);
+    എങ്കിൽ (status != CL_SUCCESS)
         CV_Error_(cv::Error::OpenCLApiCallError, ("OpenCL: clEnqueueReleaseGLObjects failed: %d", status));
 
     status = clFinish(q); // TODO Use events
-    if (status != CL_SUCCESS)
+    എങ്കിൽ (status != CL_SUCCESS)
         CV_Error_(cv::Error::OpenCLApiCallError, ("OpenCL: clFinish failed: %d", status));
 
     status = clReleaseMemObject(clImage); // TODO RAII
-    if (status != CL_SUCCESS)
+    എങ്കിൽ (status != CL_SUCCESS)
         CV_Error_(cv::Error::OpenCLApiCallError, ("OpenCL: clReleaseMemObject failed: %d", status));
 #endif
 }
 
-void convertFromGLTexture2D(const Texture2D& texture, OutputArray dst)
+ശൂന്യം convertFromGLTexture2D(സ്ഥിരം Texture2D& texture, OutputArray dst)
 {
     CV_UNUSED(texture); CV_UNUSED(dst);
-#if !defined(HAVE_OPENGL)
+#എങ്കിൽ !defined(HAVE_OPENGL)
     NO_OPENGL_SUPPORT_ERROR;
-#elif !defined(HAVE_OPENCL)
+#അല്ലെങ്കിലെങ്കിൽ !defined(HAVE_OPENCL)
     NO_OPENCL_SUPPORT_ERROR;
-#elif !defined(HAVE_OPENCL_OPENGL_SHARING)
+#അല്ലെങ്കിലെങ്കിൽ !defined(HAVE_OPENCL_OPENGL_SHARING)
     NO_OPENCL_SHARING_ERROR;
-#else
+#അല്ലെങ്കിൽ
     // check texture format
-    const int dtype = CV_8UC4;
+    സ്ഥിരം പൂർണ്ണസംഖ്യ dtype = CV_8UC4;
     CV_Assert(texture.format() == Texture2D::RGBA);
 
-    int textureType = dtype;
+    പൂർണ്ണസംഖ്യ textureType = dtype;
     CV_Assert(textureType >= 0);
 
-    using namespace cv::ocl;
+    using നാമാകാശ cv::ocl;
     Context& ctx = Context::getDefault();
     cl_context context = (cl_context)ctx.ptr();
 
@@ -2732,115 +2732,115 @@ void convertFromGLTexture2D(const Texture2D& texture, OutputArray dst)
 
     cl_int status = 0;
     cl_mem clImage = clCreateFromGLTexture(context, CL_MEM_READ_ONLY, gl::TEXTURE_2D, 0, texture.texId(), &status);
-    if (status != CL_SUCCESS)
+    എങ്കിൽ (status != CL_SUCCESS)
         CV_Error_(cv::Error::OpenCLApiCallError, ("OpenCL: clCreateFromGLTexture failed: %d", status));
 
     cl_mem clBuffer = (cl_mem)u.handle(ACCESS_READ);
 
     cl_command_queue q = (cl_command_queue)Queue::getDefault().ptr();
-    status = clEnqueueAcquireGLObjects(q, 1, &clImage, 0, NULL, NULL);
-    if (status != CL_SUCCESS)
+    status = clEnqueueAcquireGLObjects(q, 1, &clImage, 0, ശൂന്യ, ശൂന്യ);
+    എങ്കിൽ (status != CL_SUCCESS)
         CV_Error_(cv::Error::OpenCLApiCallError, ("OpenCL: clEnqueueAcquireGLObjects failed: %d", status));
     size_t offset = 0; // TODO
     size_t src_origin[3] = {0, 0, 0};
     size_t region[3] = { (size_t)u.cols, (size_t)u.rows, 1};
-    status = clEnqueueCopyImageToBuffer(q, clImage, clBuffer, src_origin, region, offset, 0, NULL, NULL);
-    if (status != CL_SUCCESS)
+    status = clEnqueueCopyImageToBuffer(q, clImage, clBuffer, src_origin, region, offset, 0, ശൂന്യ, ശൂന്യ);
+    എങ്കിൽ (status != CL_SUCCESS)
         CV_Error_(cv::Error::OpenCLApiCallError, ("OpenCL: clEnqueueCopyImageToBuffer failed: %d", status));
-    status = clEnqueueReleaseGLObjects(q, 1, &clImage, 0, NULL, NULL);
-    if (status != CL_SUCCESS)
+    status = clEnqueueReleaseGLObjects(q, 1, &clImage, 0, ശൂന്യ, ശൂന്യ);
+    എങ്കിൽ (status != CL_SUCCESS)
         CV_Error_(cv::Error::OpenCLApiCallError, ("OpenCL: clEnqueueReleaseGLObjects failed: %d", status));
 
     status = clFinish(q); // TODO Use events
-    if (status != CL_SUCCESS)
+    എങ്കിൽ (status != CL_SUCCESS)
         CV_Error_(cv::Error::OpenCLApiCallError, ("OpenCL: clFinish failed: %d", status));
 
     status = clReleaseMemObject(clImage); // TODO RAII
-    if (status != CL_SUCCESS)
+    എങ്കിൽ (status != CL_SUCCESS)
         CV_Error_(cv::Error::OpenCLApiCallError, ("OpenCL: clReleaseMemObject failed: %d", status));
 #endif
 }
 
 //void mapGLBuffer(const Buffer& buffer, UMat& dst, AccessFlag accessFlags)
-UMat mapGLBuffer(const Buffer& buffer, AccessFlag accessFlags)
+UMat mapGLBuffer(സ്ഥിരം Buffer& buffer, AccessFlag accessFlags)
 {
     CV_UNUSED(buffer); CV_UNUSED(accessFlags);
-#if !defined(HAVE_OPENGL)
+#എങ്കിൽ !defined(HAVE_OPENGL)
     NO_OPENGL_SUPPORT_ERROR;
-#elif !defined(HAVE_OPENCL)
+#അല്ലെങ്കിലെങ്കിൽ !defined(HAVE_OPENCL)
     NO_OPENCL_SUPPORT_ERROR;
-#elif !defined(HAVE_OPENCL_OPENGL_SHARING)
+#അല്ലെങ്കിലെങ്കിൽ !defined(HAVE_OPENCL_OPENGL_SHARING)
     NO_OPENCL_SHARING_ERROR;
-#else
-    using namespace cv::ocl;
+#അല്ലെങ്കിൽ
+    using നാമാകാശ cv::ocl;
     Context& ctx = Context::getDefault();
     cl_context context = (cl_context)ctx.ptr();
     cl_command_queue clQueue = (cl_command_queue)Queue::getDefault().ptr();
 
-    int clAccessFlags = 0;
-    switch (accessFlags & (ACCESS_READ|ACCESS_WRITE))
+    പൂർണ്ണസംഖ്യ clAccessFlags = 0;
+    തിരഞ്ഞെടുപ്പ് (accessFlags & (ACCESS_READ|ACCESS_WRITE))
     {
-    default:
-    case ACCESS_READ+ACCESS_WRITE:
+    സ്ഥിരസ്ഥിതി:
+    അവസ്ഥ ACCESS_READ+ACCESS_WRITE:
         clAccessFlags = CL_MEM_READ_WRITE;
-        break;
-    case ACCESS_READ:
+        നിർത്തുക;
+    അവസ്ഥ ACCESS_READ:
         clAccessFlags = CL_MEM_READ_ONLY;
-        break;
-    case ACCESS_WRITE:
+        നിർത്തുക;
+    അവസ്ഥ ACCESS_WRITE:
         clAccessFlags = CL_MEM_WRITE_ONLY;
-        break;
+        നിർത്തുക;
     }
 
     cl_int status = 0;
     cl_mem clBuffer = clCreateFromGLBuffer(context, clAccessFlags, buffer.bufId(), &status);
-    if (status != CL_SUCCESS)
+    എങ്കിൽ (status != CL_SUCCESS)
         CV_Error_(cv::Error::OpenCLApiCallError, ("OpenCL: clCreateFromGLBuffer failed: %d", status));
 
     gl::Finish();
 
-    status = clEnqueueAcquireGLObjects(clQueue, 1, &clBuffer, 0, NULL, NULL);
-    if (status != CL_SUCCESS)
+    status = clEnqueueAcquireGLObjects(clQueue, 1, &clBuffer, 0, ശൂന്യ, ശൂന്യ);
+    എങ്കിൽ (status != CL_SUCCESS)
         CV_Error_(cv::Error::OpenCLApiCallError, ("OpenCL: clEnqueueAcquireGLObjects failed: %d", status));
 
     size_t step = buffer.cols() * buffer.elemSize();
-    int rows = buffer.rows();
-    int cols = buffer.cols();
-    int type = buffer.type();
+    പൂർണ്ണസംഖ്യ rows = buffer.rows();
+    പൂർണ്ണസംഖ്യ cols = buffer.cols();
+    പൂർണ്ണസംഖ്യ type = buffer.type();
 
     UMat u;
     convertFromBuffer(clBuffer, step, rows, cols, type, u);
-    return u;
+    തിരികെ u;
 #endif
 }
 
-void unmapGLBuffer(UMat& u)
+ശൂന്യം unmapGLBuffer(UMat& u)
 {
     CV_UNUSED(u);
-#if !defined(HAVE_OPENGL)
+#എങ്കിൽ !defined(HAVE_OPENGL)
     NO_OPENGL_SUPPORT_ERROR;
-#elif !defined(HAVE_OPENCL)
+#അല്ലെങ്കിലെങ്കിൽ !defined(HAVE_OPENCL)
     NO_OPENCL_SUPPORT_ERROR;
-#elif !defined(HAVE_OPENCL_OPENGL_SHARING)
+#അല്ലെങ്കിലെങ്കിൽ !defined(HAVE_OPENCL_OPENGL_SHARING)
     NO_OPENCL_SHARING_ERROR;
-#else
-    using namespace cv::ocl;
+#അല്ലെങ്കിൽ
+    using നാമാകാശ cv::ocl;
     cl_command_queue clQueue = (cl_command_queue)Queue::getDefault().ptr();
 
     cl_mem clBuffer = (cl_mem)u.handle(ACCESS_READ);
 
     u.release();
 
-    cl_int status = clEnqueueReleaseGLObjects(clQueue, 1, &clBuffer, 0, NULL, NULL);
-    if (status != CL_SUCCESS)
+    cl_int status = clEnqueueReleaseGLObjects(clQueue, 1, &clBuffer, 0, ശൂന്യ, ശൂന്യ);
+    എങ്കിൽ (status != CL_SUCCESS)
         CV_Error_(cv::Error::OpenCLApiCallError, ("OpenCL: clEnqueueReleaseGLObjects failed: %d", status));
 
     status = clFinish(clQueue);
-    if (status != CL_SUCCESS)
+    എങ്കിൽ (status != CL_SUCCESS)
         CV_Error_(cv::Error::OpenCLApiCallError, ("OpenCL: clFinish failed: %d", status));
 
     status = clReleaseMemObject(clBuffer);
-    if (status != CL_SUCCESS)
+    എങ്കിൽ (status != CL_SUCCESS)
         CV_Error_(cv::Error::OpenCLApiCallError, ("OpenCL: clReleaseMemObject failed: %d", status));
 #endif
 }

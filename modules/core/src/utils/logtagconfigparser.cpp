@@ -2,303 +2,303 @@
 // It is subject to the license terms in the LICENSE file found in the top-level directory
 // of this distribution and at http://opencv.org/license.html.
 
-#include "../precomp.hpp"
-#include "logtagconfigparser.hpp"
+#അന്തര്ഭാവ "../precomp.hpp"
+#അന്തര്ഭാവ "logtagconfigparser.hpp"
 
-namespace cv {
-namespace utils {
-namespace logging {
+നാമാകാശ cv {
+നാമാകാശ utils {
+നാമാകാശ logging {
 
 LogTagConfigParser::LogTagConfigParser(LogLevel defaultUnconfiguredGlobalLevel)
 {
     m_parsedGlobal.namePart = "global";
-    m_parsedGlobal.isGlobal = true;
-    m_parsedGlobal.hasPrefixWildcard = false;
-    m_parsedGlobal.hasSuffixWildcard = false;
+    m_parsedGlobal.isGlobal = സത്യം;
+    m_parsedGlobal.hasPrefixWildcard = അസത്യം;
+    m_parsedGlobal.hasSuffixWildcard = അസത്യം;
     m_parsedGlobal.level = defaultUnconfiguredGlobalLevel;
 }
 
-LogTagConfigParser::LogTagConfigParser(const std::string& input)
+LogTagConfigParser::LogTagConfigParser(സ്ഥിരം std::string& നിവേശം_2)
 {
-    parse(input);
+    parse(നിവേശം_2);
 }
 
 LogTagConfigParser::~LogTagConfigParser()
 {
 }
 
-bool LogTagConfigParser::parse(const std::string& input)
+തർക്കം LogTagConfigParser::parse(സ്ഥിരം std::string& നിവേശം_2)
 {
-    m_input = input;
+    m_നിവേശം = നിവേശം_2;
     segmentTokens();
-    return (m_malformed.empty());
+    തിരികെ (m_malformed.empty());
 }
 
-bool LogTagConfigParser::hasMalformed() const
+തർക്കം LogTagConfigParser::hasMalformed() സ്ഥിരം
 {
-    return !m_malformed.empty();
+    തിരികെ !m_malformed.empty();
 }
 
-const LogTagConfig& LogTagConfigParser::getGlobalConfig() const
+സ്ഥിരം LogTagConfig& LogTagConfigParser::getGlobalConfig() സ്ഥിരം
 {
-    return m_parsedGlobal;
+    തിരികെ m_parsedGlobal;
 }
 
-const std::vector<LogTagConfig>& LogTagConfigParser::getFullNameConfigs() const
+സ്ഥിരം std::vector<LogTagConfig>& LogTagConfigParser::getFullNameConfigs() സ്ഥിരം
 {
-    return m_parsedFullName;
+    തിരികെ m_parsedFullName;
 }
 
-const std::vector<LogTagConfig>& LogTagConfigParser::getFirstPartConfigs() const
+സ്ഥിരം std::vector<LogTagConfig>& LogTagConfigParser::getFirstPartConfigs() സ്ഥിരം
 {
-    return m_parsedFirstPart;
+    തിരികെ m_parsedFirstPart;
 }
 
-const std::vector<LogTagConfig>& LogTagConfigParser::getAnyPartConfigs() const
+സ്ഥിരം std::vector<LogTagConfig>& LogTagConfigParser::getAnyPartConfigs() സ്ഥിരം
 {
-    return m_parsedAnyPart;
+    തിരികെ m_parsedAnyPart;
 }
 
-const std::vector<std::string>& LogTagConfigParser::getMalformed() const
+സ്ഥിരം std::vector<std::string>& LogTagConfigParser::getMalformed() സ്ഥിരം
 {
-    return m_malformed;
+    തിരികെ m_malformed;
 }
 
-void LogTagConfigParser::segmentTokens()
+ശൂന്യം LogTagConfigParser::segmentTokens()
 {
-    const size_t len = m_input.length();
+    സ്ഥിരം size_t len = m_നിവേശം.length();
     std::vector<std::pair<size_t, size_t>> startStops;
-    bool wasSeparator = true;
-    for (size_t pos = 0u; pos < len; ++pos)
+    തർക്കം wasSeparator = സത്യം;
+    വേണ്ടി (size_t pos = 0u; pos < len; ++pos)
     {
-        char c = m_input[pos];
-        bool isSeparator = (c == ' ' || c == '\t' || c == ';');
-        if (!isSeparator)
+        അക്ഷരം c = m_നിവേശം[pos];
+        തർക്കം isSeparator = (c == ' ' || c == '\t' || c == ';');
+        എങ്കിൽ (!isSeparator)
         {
-            if (wasSeparator)
+            എങ്കിൽ (wasSeparator)
             {
                 startStops.emplace_back(pos, pos + 1u);
             }
-            else
+            അല്ലെങ്കിൽ
             {
                 startStops.back().second = pos + 1u;
             }
         }
         wasSeparator = isSeparator;
     }
-    for (const auto& startStop : startStops)
+    വേണ്ടി (സ്ഥിരം auto& startStop : startStops)
     {
-        const auto s = m_input.substr(startStop.first, startStop.second - startStop.first);
+        സ്ഥിരം auto s = m_നിവേശം.substr(startStop.first, startStop.second - startStop.first);
         parseNameAndLevel(s);
     }
 }
 
-void LogTagConfigParser::parseNameAndLevel(const std::string& s)
+ശൂന്യം LogTagConfigParser::parseNameAndLevel(സ്ഥിരം std::string& s)
 {
-    const size_t npos = std::string::npos;
-    const size_t len = s.length();
+    സ്ഥിരം size_t npos = std::string::npos;
+    സ്ഥിരം size_t len = s.length();
     size_t colonIdx = s.find_first_of(":=");
-    if (colonIdx == npos)
+    എങ്കിൽ (colonIdx == npos)
     {
         // See if the whole string is a log level
         auto parsedLevel = parseLogLevel(s);
-        if (parsedLevel.second)
+        എങ്കിൽ (parsedLevel.second)
         {
             // If it is, assume the log level is for global
             parseWildcard("", parsedLevel.first);
-            return;
+            തിരികെ;
         }
-        else
+        അല്ലെങ്കിൽ
         {
             // not sure what to do.
             m_malformed.push_back(s);
-            return;
+            തിരികെ;
         }
     }
-    if (colonIdx == 0u || colonIdx + 1u == len)
+    എങ്കിൽ (colonIdx == 0u || colonIdx + 1u == len)
     {
         // malformed (colon or equal sign at beginning or end), cannot do anything
         m_malformed.push_back(s);
-        return;
+        തിരികെ;
     }
     size_t colonIdx2 = s.find_first_of(":=", colonIdx + 1u);
-    if (colonIdx2 != npos)
+    എങ്കിൽ (colonIdx2 != npos)
     {
         // malformed (more than one colon or equal sign), cannot do anything
         m_malformed.push_back(s);
-        return;
+        തിരികെ;
     }
     auto parsedLevel = parseLogLevel(s.substr(colonIdx + 1u));
-    if (parsedLevel.second)
+    എങ്കിൽ (parsedLevel.second)
     {
         parseWildcard(s.substr(0u, colonIdx), parsedLevel.first);
-        return;
+        തിരികെ;
     }
-    else
+    അല്ലെങ്കിൽ
     {
         // Cannot recognize the right side of the colon or equal sign.
         // Not sure what to do.
         m_malformed.push_back(s);
-        return;
+        തിരികെ;
     }
 }
 
-void LogTagConfigParser::parseWildcard(const std::string& name, LogLevel level)
+ശൂന്യം LogTagConfigParser::parseWildcard(സ്ഥിരം std::string& name, LogLevel level)
 {
-    const size_t npos = std::string::npos;
-    const size_t len = name.length();
-    if (len == 0u)
+    സ്ഥിരം size_t npos = std::string::npos;
+    സ്ഥിരം size_t len = name.length();
+    എങ്കിൽ (len == 0u)
     {
         m_parsedGlobal.level = level;
-        return;
+        തിരികെ;
     }
-    const bool hasPrefixWildcard = (name[0u] == '*');
-    if (hasPrefixWildcard && len == 1u)
+    സ്ഥിരം തർക്കം hasPrefixWildcard = (name[0u] == '*');
+    എങ്കിൽ (hasPrefixWildcard && len == 1u)
     {
         m_parsedGlobal.level = level;
-        return;
+        തിരികെ;
     }
-    const size_t firstNonWildcard = name.find_first_not_of("*.");
-    if (hasPrefixWildcard && firstNonWildcard == npos)
+    സ്ഥിരം size_t firstNonWildcard = name.find_first_not_of("*.");
+    എങ്കിൽ (hasPrefixWildcard && firstNonWildcard == npos)
     {
         m_parsedGlobal.level = level;
-        return;
+        തിരികെ;
     }
-    const bool hasSuffixWildcard = (name[len - 1u] == '*');
-    const size_t lastNonWildcard = name.find_last_not_of("*.");
+    സ്ഥിരം തർക്കം hasSuffixWildcard = (name[len - 1u] == '*');
+    സ്ഥിരം size_t lastNonWildcard = name.find_last_not_of("*.");
     std::string trimmedNamePart = name.substr(firstNonWildcard, lastNonWildcard - firstNonWildcard + 1u);
     // The case of a single asterisk has been handled above;
     // here we only handle the explicit use of "global" in the log config string.
-    const bool isGlobal = (trimmedNamePart == "global");
-    if (isGlobal)
+    സ്ഥിരം തർക്കം isGlobal = (trimmedNamePart == "global");
+    എങ്കിൽ (isGlobal)
     {
         m_parsedGlobal.level = level;
-        return;
+        തിരികെ;
     }
-    LogTagConfig result(trimmedNamePart, level, false, hasPrefixWildcard, hasSuffixWildcard);
-    if (hasPrefixWildcard)
+    LogTagConfig result(trimmedNamePart, level, അസത്യം, hasPrefixWildcard, hasSuffixWildcard);
+    എങ്കിൽ (hasPrefixWildcard)
     {
         m_parsedAnyPart.emplace_back(std::move(result));
     }
-    else if (hasSuffixWildcard)
+    അല്ലെങ്കിൽ എങ്കിൽ (hasSuffixWildcard)
     {
         m_parsedFirstPart.emplace_back(std::move(result));
     }
-    else
+    അല്ലെങ്കിൽ
     {
         m_parsedFullName.emplace_back(std::move(result));
     }
 }
 
-std::pair<LogLevel, bool> LogTagConfigParser::parseLogLevel(const std::string& s)
+std::pair<LogLevel, തർക്കം> LogTagConfigParser::parseLogLevel(സ്ഥിരം std::string& s)
 {
-    const auto falseDontCare = std::make_pair(LOG_LEVEL_VERBOSE, false);
-    const auto make_parsed_result = [](LogLevel lev) -> std::pair<LogLevel, bool>
+    സ്ഥിരം auto falseDontCare = std::make_pair(LOG_LEVEL_VERBOSE, അസത്യം);
+    സ്ഥിരം auto make_parsed_result = [](LogLevel lev) -> std::pair<LogLevel, തർക്കം>
     {
-        return std::make_pair(lev, true);
+        തിരികെ std::make_pair(lev, സത്യം);
     };
-    const size_t len = s.length();
-    if (len >= 1u)
+    സ്ഥിരം size_t len = s.length();
+    എങ്കിൽ (len >= 1u)
     {
-        const char c = (char)std::toupper(s[0]);
-        switch (c)
+        സ്ഥിരം അക്ഷരം c = (അക്ഷരം)std::toupper(s[0]);
+        തിരഞ്ഞെടുപ്പ് (c)
         {
-        case '0':
-            if (len == 1u)
+        അവസ്ഥ '0':
+            എങ്കിൽ (len == 1u)
             {
-                return make_parsed_result(LOG_LEVEL_SILENT);
+                തിരികെ make_parsed_result(LOG_LEVEL_SILENT);
             }
-            break;
-        case 'D':
-            if (len == 1u ||
+            നിർത്തുക;
+        അവസ്ഥ 'D':
+            എങ്കിൽ (len == 1u ||
                 (len == 5u && cv::toUpperCase(s) == "DEBUG"))
             {
-                return make_parsed_result(LOG_LEVEL_DEBUG);
+                തിരികെ make_parsed_result(LOG_LEVEL_DEBUG);
             }
-            if ((len == 7u && cv::toUpperCase(s) == "DISABLE") ||
+            എങ്കിൽ ((len == 7u && cv::toUpperCase(s) == "DISABLE") ||
                 (len == 8u && cv::toUpperCase(s) == "DISABLED"))
             {
-                return make_parsed_result(LOG_LEVEL_SILENT);
+                തിരികെ make_parsed_result(LOG_LEVEL_SILENT);
             }
-            break;
-        case 'E':
-            if (len == 1u ||
+            നിർത്തുക;
+        അവസ്ഥ 'E':
+            എങ്കിൽ (len == 1u ||
                 (len == 5u && cv::toUpperCase(s) == "ERROR"))
             {
-                return make_parsed_result(LOG_LEVEL_ERROR);
+                തിരികെ make_parsed_result(LOG_LEVEL_ERROR);
             }
-            break;
-        case 'F':
-            if (len == 1u ||
+            നിർത്തുക;
+        അവസ്ഥ 'F':
+            എങ്കിൽ (len == 1u ||
                 (len == 5u && cv::toUpperCase(s) == "FATAL"))
             {
-                return make_parsed_result(LOG_LEVEL_FATAL);
+                തിരികെ make_parsed_result(LOG_LEVEL_FATAL);
             }
-            break;
-        case 'I':
-            if (len == 1u ||
+            നിർത്തുക;
+        അവസ്ഥ 'I':
+            എങ്കിൽ (len == 1u ||
                 (len == 4u && cv::toUpperCase(s) == "INFO"))
             {
-                return make_parsed_result(LOG_LEVEL_INFO);
+                തിരികെ make_parsed_result(LOG_LEVEL_INFO);
             }
-            break;
-        case 'O':
-            if (len == 3u && cv::toUpperCase(s) == "OFF")
+            നിർത്തുക;
+        അവസ്ഥ 'O':
+            എങ്കിൽ (len == 3u && cv::toUpperCase(s) == "OFF")
             {
-                return make_parsed_result(LOG_LEVEL_SILENT);
+                തിരികെ make_parsed_result(LOG_LEVEL_SILENT);
             }
-            break;
-        case 'S':
-            if (len == 1u ||
+            നിർത്തുക;
+        അവസ്ഥ 'S':
+            എങ്കിൽ (len == 1u ||
                 (len == 6u && cv::toUpperCase(s) == "SILENT"))
             {
-                return make_parsed_result(LOG_LEVEL_SILENT);
+                തിരികെ make_parsed_result(LOG_LEVEL_SILENT);
             }
-            break;
-        case 'V':
-            if (len == 1u ||
+            നിർത്തുക;
+        അവസ്ഥ 'V':
+            എങ്കിൽ (len == 1u ||
                 (len == 7u && cv::toUpperCase(s) == "VERBOSE"))
             {
-                return make_parsed_result(LOG_LEVEL_VERBOSE);
+                തിരികെ make_parsed_result(LOG_LEVEL_VERBOSE);
             }
-            break;
-        case 'W':
-            if (len == 1u ||
+            നിർത്തുക;
+        അവസ്ഥ 'W':
+            എങ്കിൽ (len == 1u ||
                 (len == 4u && cv::toUpperCase(s) == "WARN") ||
                 (len == 7u && cv::toUpperCase(s) == "WARNING") ||
                 (len == 8u && cv::toUpperCase(s) == "WARNINGS"))
             {
-                return make_parsed_result(LOG_LEVEL_WARNING);
+                തിരികെ make_parsed_result(LOG_LEVEL_WARNING);
             }
-            break;
-        default:
-            break;
+            നിർത്തുക;
+        സ്ഥിരസ്ഥിതി:
+            നിർത്തുക;
         }
         // fall through
     }
-    return falseDontCare;
+    തിരികെ falseDontCare;
 }
 
 std::string LogTagConfigParser::toString(LogLevel level)
 {
-    switch (level)
+    തിരഞ്ഞെടുപ്പ് (level)
     {
-    case LOG_LEVEL_SILENT:
-        return "SILENT";
-    case LOG_LEVEL_FATAL:
-        return "FATAL";
-    case LOG_LEVEL_ERROR:
-        return "ERROR";
-    case LOG_LEVEL_WARNING:
-        return "WARNING";
-    case LOG_LEVEL_INFO:
-        return "INFO";
-    case LOG_LEVEL_DEBUG:
-        return "DEBUG";
-    case LOG_LEVEL_VERBOSE:
-        return "VERBOSE";
-    default:
-        return std::to_string((int)level);
+    അവസ്ഥ LOG_LEVEL_SILENT:
+        തിരികെ "SILENT";
+    അവസ്ഥ LOG_LEVEL_FATAL:
+        തിരികെ "FATAL";
+    അവസ്ഥ LOG_LEVEL_ERROR:
+        തിരികെ "ERROR";
+    അവസ്ഥ LOG_LEVEL_WARNING:
+        തിരികെ "WARNING";
+    അവസ്ഥ LOG_LEVEL_INFO:
+        തിരികെ "INFO";
+    അവസ്ഥ LOG_LEVEL_DEBUG:
+        തിരികെ "DEBUG";
+    അവസ്ഥ LOG_LEVEL_VERBOSE:
+        തിരികെ "VERBOSE";
+    സ്ഥിരസ്ഥിതി:
+        തിരികെ std::to_string((പൂർണ്ണസംഖ്യ)level);
     }
 }
 

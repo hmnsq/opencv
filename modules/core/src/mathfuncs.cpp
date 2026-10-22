@@ -41,45 +41,45 @@
 //
 //M*/
 
-#include "precomp.hpp"
-#include "opencl_kernels_core.hpp"
-#include <atomic>
-#include <limits>
-#include <iostream>
-#include <algorithm>
-#include <cmath>
-#include "mathfuncs.hpp"
-#include "arithm_expr.hpp"      // the element-wise engine: getMathFunc + TExpr for cv::exp/log/sqrt
+#അന്തര്ഭാവ "precomp.hpp"
+#അന്തര്ഭാവ "opencl_kernels_core.hpp"
+#അന്തര്ഭാവ <atomic>
+#അന്തര്ഭാവ <limits>
+#അന്തര്ഭാവ <iostream>
+#അന്തര്ഭാവ <algorithm>
+#അന്തര്ഭാവ <cmath>
+#അന്തര്ഭാവ "mathfuncs.hpp"
+#അന്തര്ഭാവ "arithm_expr.hpp"      // the element-wise engine: getMathFunc + TExpr for cv::exp/log/sqrt
 
-namespace cv
+നാമാകാശ cv
 {
 
-typedef void (*MathFunc)(const void* src, void* dst, int len);
+തരനിർവചനം ശൂന്യം (*MathFunc)(സ്ഥിരം ശൂന്യം* src, ശൂന്യം* dst, പൂർണ്ണസംഖ്യ len);
 
 #ifdef HAVE_OPENCL
 
-enum { OCL_OP_LOG=0, OCL_OP_EXP=1, OCL_OP_MAG=2, OCL_OP_PHASE_DEGREES=3, OCL_OP_PHASE_RADIANS=4 };
+എണ്ണൽ { OCL_OP_LOG=0, OCL_OP_EXP=1, OCL_OP_MAG=2, OCL_OP_PHASE_DEGREES=3, OCL_OP_PHASE_RADIANS=4 };
 
-static const char* oclop2str[] = { "OP_LOG", "OP_EXP", "OP_MAG", "OP_PHASE_DEGREES", "OP_PHASE_RADIANS", 0 };
+സ്ഥിതം സ്ഥിരം അക്ഷരം* oclop2str[] = { "OP_LOG", "OP_EXP", "OP_MAG", "OP_PHASE_DEGREES", "OP_PHASE_RADIANS", 0 };
 
-static bool ocl_math_op(InputArray _src1, InputArray _src2, OutputArray _dst, int oclop)
+സ്ഥിതം തർക്കം ocl_math_op(നിവേശം_Array _src1, നിവേശം_Array _src2, OutputArray _dst, പൂർണ്ണസംഖ്യ oclop)
 {
-    int type = _src1.type(), depth = CV_MAT_DEPTH(type), cn = CV_MAT_CN(type);
-    int kercn = oclop == OCL_OP_PHASE_DEGREES ||
+    പൂർണ്ണസംഖ്യ type = _src1.type(), depth = CV_MAT_DEPTH(type), cn = CV_MAT_CN(type);
+    പൂർണ്ണസംഖ്യ kercn = oclop == OCL_OP_PHASE_DEGREES ||
             oclop == OCL_OP_PHASE_RADIANS ? 1 : ocl::predictOptimalVectorWidth(_src1, _src2, _dst);
 
-    const ocl::Device d = ocl::Device::getDefault();
-    bool double_support = d.doubleFPConfig() > 0;
-    if (!double_support && depth == CV_64F)
-        return false;
-    int rowsPerWI = d.isIntel() ? 4 : 1;
+    സ്ഥിരം ocl::Device d = ocl::Device::getDefault();
+    തർക്കം double_support = d.doubleFPConfig() > 0;
+    എങ്കിൽ (!double_support && depth == CV_64F)
+        തിരികെ അസത്യം;
+    പൂർണ്ണസംഖ്യ rowsPerWI = d.isIntel() ? 4 : 1;
 
     ocl::Kernel k("KF", ocl::core::arithm_oclsrc,
                   format("-D %s -D %s -D dstT=%s -D DEPTH_dst=%d -D rowsPerWI=%d%s", _src2.empty() ? "UNARY_OP" : "BINARY_OP",
                          oclop2str[oclop], ocl::typeToStr(CV_MAKE_TYPE(depth, kercn)), depth, rowsPerWI,
                          double_support ? " -D DOUBLE_SUPPORT" : ""));
-    if (k.empty())
-        return false;
+    എങ്കിൽ (k.empty())
+        തിരികെ അസത്യം;
 
     UMat src1 = _src1.getUMat(), src2 = _src2.getUMat();
     _dst.createSameSize(src1, type);
@@ -89,13 +89,13 @@ static bool ocl_math_op(InputArray _src1, InputArray _src2, OutputArray _dst, in
             src2arg = ocl::KernelArg::ReadOnlyNoSize(src2),
             dstarg = ocl::KernelArg::WriteOnly(dst, cn, kercn);
 
-    if (src2.empty())
+    എങ്കിൽ (src2.empty())
         k.args(src1arg, dstarg);
-    else
+    അല്ലെങ്കിൽ
         k.args(src1arg, src2arg, dstarg);
 
     size_t globalsize[] = { (size_t)src1.cols * cn / kercn, ((size_t)src1.rows + rowsPerWI - 1) / rowsPerWI };
-    return k.run(2, globalsize, 0, false);
+    തിരികെ k.run(2, globalsize, 0, അസത്യം);
 }
 
 #endif
@@ -104,14 +104,14 @@ static bool ocl_math_op(InputArray _src1, InputArray _src2, OutputArray _dst, in
    Fast cube root by Ken Turkowski
    (http://www.worldserver.com/turk/computergraphics/papers.html)
 \* ************************************************************************** */
-CV_DISABLE_UBSAN float cubeRoot( float value )
+CV_DISABLE_UBSAN ദശാംശം cube_വേര്( ദശാംശം value )
 {
     CV_INSTRUMENT_REGION();
 
-    float fr;
+    ദശാംശം fr;
     Cv32suf v, m;
-    int ix, s;
-    int ex, shx;
+    പൂർണ്ണസംഖ്യ ix, s;
+    പൂർണ്ണസംഖ്യ ex, shx;
 
     v.f = value;
     ix = v.i & 0x7fffffff;
@@ -125,7 +125,7 @@ CV_DISABLE_UBSAN float cubeRoot( float value )
 
     /* 0.125 <= fr < 1.0 */
     /* Use quartic rational polynomial with error < 2^(-24) */
-    fr = (float)(((((45.2548339756803022511987494 * fr +
+    fr = (ദശാംശം)(((((45.2548339756803022511987494 * fr +
     192.2798368355061050458134625) * fr +
     119.1654824285581628956914143) * fr +
     13.43250139086239872172837314) * fr +
@@ -140,18 +140,18 @@ CV_DISABLE_UBSAN float cubeRoot( float value )
     m.f = value;
     v.f = fr;
     v.i = (v.i + (ex << 23) + s) & (m.i*2 != 0 ? -1 : 0);
-    return v.f;
+    തിരികെ v.f;
 }
 
 /****************************************************************************************\
 *                                  Cartezian -> Polar                                    *
 \****************************************************************************************/
 
-void magnitude( InputArray src1, InputArray src2, OutputArray dst )
+ശൂന്യം magnitude( നിവേശം_Array src1, നിവേശം_Array src2, OutputArray dst )
 {
     CV_INSTRUMENT_REGION();
 
-    int type = src1.type(), depth = src1.depth(), cn = src1.channels();
+    പൂർണ്ണസംഖ്യ type = src1.type(), depth = src1.depth(), cn = src1.channels();
     CV_Assert( src1.size() == src2.size() && type == src2.type() && (depth == CV_32F || depth == CV_64F));
 
     CV_OCL_RUN(dst.isUMat() && src1.dims() <= 2 && src2.dims() <= 2,
@@ -161,33 +161,33 @@ void magnitude( InputArray src1, InputArray src2, OutputArray dst )
     dst.create(X.size, X.type());
     Mat Mag = dst.getMat();
 
-    const Mat* arrays[] = {&X, &Y, &Mag, 0};
+    സ്ഥിരം Mat* arrays[] = {&X, &Y, &Mag, 0};
     uchar* ptrs[3] = {};
     NAryMatIterator it(arrays, ptrs);
-    int len = (int)it.size*cn;
+    പൂർണ്ണസംഖ്യ len = (പൂർണ്ണസംഖ്യ)it.size*cn;
 
-    for( size_t i = 0; i < it.nplanes; i++, ++it )
+    വേണ്ടി( size_t i = 0; i < it.nplanes; i++, ++it )
     {
-        if( depth == CV_32F )
+        എങ്കിൽ( depth == CV_32F )
         {
-            const float *x = (const float*)ptrs[0], *y = (const float*)ptrs[1];
-            float *mag = (float*)ptrs[2];
+            സ്ഥിരം ദശാംശം *x = (സ്ഥിരം ദശാംശം*)ptrs[0], *y = (സ്ഥിരം ദശാംശം*)ptrs[1];
+            ദശാംശം *mag = (ദശാംശം*)ptrs[2];
             hal::magnitude32f( x, y, mag, len );
         }
-        else
+        അല്ലെങ്കിൽ
         {
-            const double *x = (const double*)ptrs[0], *y = (const double*)ptrs[1];
-            double *mag = (double*)ptrs[2];
+            സ്ഥിരം ഇരട്ട *x = (സ്ഥിരം ഇരട്ട*)ptrs[0], *y = (സ്ഥിരം ഇരട്ട*)ptrs[1];
+            ഇരട്ട *mag = (ഇരട്ട*)ptrs[2];
             hal::magnitude64f( x, y, mag, len );
         }
     }
 }
 
-void phase( InputArray src1, InputArray src2, OutputArray dst, bool angleInDegrees )
+ശൂന്യം phase( നിവേശം_Array src1, നിവേശം_Array src2, OutputArray dst, തർക്കം angleInDegrees )
 {
     CV_INSTRUMENT_REGION();
 
-    int type = src1.type(), depth = src1.depth(), cn = src1.channels();
+    പൂർണ്ണസംഖ്യ type = src1.type(), depth = src1.depth(), cn = src1.channels();
     CV_Assert( src1.size() == src2.size() && type == src2.type() && (depth == CV_32F || depth == CV_64F));
 
     CV_OCL_RUN(dst.isUMat() && src1.dims() <= 2 && src2.dims() <= 2,
@@ -197,26 +197,26 @@ void phase( InputArray src1, InputArray src2, OutputArray dst, bool angleInDegre
     dst.create( X.size, type );
     Mat Angle = dst.getMat();
 
-    const Mat* arrays[] = {&X, &Y, &Angle, 0};
+    സ്ഥിരം Mat* arrays[] = {&X, &Y, &Angle, 0};
     uchar* ptrs[3] = {};
     NAryMatIterator it(arrays, ptrs);
-    int j, total = (int)(it.size*cn), blockSize = total;
+    പൂർണ്ണസംഖ്യ j, total = (പൂർണ്ണസംഖ്യ)(it.size*cn), blockSize = total;
     size_t esz1 = X.elemSize1();
-    for( size_t i = 0; i < it.nplanes; i++, ++it )
+    വേണ്ടി( size_t i = 0; i < it.nplanes; i++, ++it )
     {
-        for( j = 0; j < total; j += blockSize )
+        വേണ്ടി( j = 0; j < total; j += blockSize )
         {
-            int len = std::min(total - j, blockSize);
-            if( depth == CV_32F )
+            പൂർണ്ണസംഖ്യ len = std::min(total - j, blockSize);
+            എങ്കിൽ( depth == CV_32F )
             {
-                const float *x = (const float*)ptrs[0], *y = (const float*)ptrs[1];
-                float *angle = (float*)ptrs[2];
+                സ്ഥിരം ദശാംശം *x = (സ്ഥിരം ദശാംശം*)ptrs[0], *y = (സ്ഥിരം ദശാംശം*)ptrs[1];
+                ദശാംശം *angle = (ദശാംശം*)ptrs[2];
                 hal::fastAtan32f( y, x, angle, len, angleInDegrees );
             }
-            else
+            അല്ലെങ്കിൽ
             {
-                const double *x = (const double*)ptrs[0], *y = (const double*)ptrs[1];
-                double *angle = (double*)ptrs[2];
+                സ്ഥിരം ഇരട്ട *x = (സ്ഥിരം ഇരട്ട*)ptrs[0], *y = (സ്ഥിരം ഇരട്ട*)ptrs[1];
+                ഇരട്ട *angle = (ഇരട്ട*)ptrs[2];
                 hal::fastAtan64f(y, x, angle, len, angleInDegrees);
             }
             ptrs[0] += len*esz1;
@@ -228,23 +228,23 @@ void phase( InputArray src1, InputArray src2, OutputArray dst, bool angleInDegre
 
 #ifdef HAVE_OPENCL
 
-static bool ocl_cartToPolar( InputArray _src1, InputArray _src2,
-                             OutputArray _dst1, OutputArray _dst2, bool angleInDegrees )
+സ്ഥിതം തർക്കം ocl_cartToPolar( നിവേശം_Array _src1, നിവേശം_Array _src2,
+                             OutputArray _dst1, OutputArray _dst2, തർക്കം angleInDegrees )
 {
-    const ocl::Device & d = ocl::Device::getDefault();
-    int type = _src1.type(), depth = CV_MAT_DEPTH(type), cn = CV_MAT_CN(type),
+    സ്ഥിരം ocl::Device & d = ocl::Device::getDefault();
+    പൂർണ്ണസംഖ്യ type = _src1.type(), depth = CV_MAT_DEPTH(type), cn = CV_MAT_CN(type),
             rowsPerWI = d.isIntel() ? 4 : 1;
-    bool doubleSupport = d.doubleFPConfig() > 0;
+    തർക്കം doubleSupport = d.doubleFPConfig() > 0;
 
-    const bool _src1IsDstMag = (_src1.getObj() == _dst1.getObj());
-    const bool _src1IsDstAngle = (_src1.getObj() == _dst2.getObj());
-    const bool _src2IsDstMag = (_src2.getObj() == _dst1.getObj());
-    const bool _src2IsDstAngle = (_src2.getObj() == _dst2.getObj());
+    സ്ഥിരം തർക്കം _src1IsDstMag = (_src1.getObj() == _dst1.getObj());
+    സ്ഥിരം തർക്കം _src1IsDstAngle = (_src1.getObj() == _dst2.getObj());
+    സ്ഥിരം തർക്കം _src2IsDstMag = (_src2.getObj() == _dst1.getObj());
+    സ്ഥിരം തർക്കം _src2IsDstAngle = (_src2.getObj() == _dst2.getObj());
 
-    if ( !(_src1.dims() <= 2 && _src2.dims() <= 2 &&
+    എങ്കിൽ ( !(_src1.dims() <= 2 && _src2.dims() <= 2 &&
            (depth == CV_32F || depth == CV_64F) && type == _src2.type()) ||
          (depth == CV_64F && !doubleSupport) )
-        return false;
+        തിരികെ അസത്യം;
 
     ocl::Kernel k("KF", ocl::core::arithm_oclsrc,
                   format("-D BINARY_OP -D dstT=%s -D DEPTH_dst=%d -D rowsPerWI=%d -D OP_CTP_%s%s%s%s%s%s",
@@ -256,8 +256,8 @@ static bool ocl_cartToPolar( InputArray _src1, InputArray _src2,
                          _src2IsDstMag   ? " -D SRC2_IS_DST_MAG" : "",
                          _src2IsDstAngle ? " -D SRC2_IS_DST_ANGLE" : ""
                          ));
-    if (k.empty())
-        return false;
+    എങ്കിൽ (k.empty())
+        തിരികെ അസത്യം;
 
     UMat src1 = _src1.getUMat(), src2 = _src2.getUMat();
     Size size = src1.size();
@@ -273,13 +273,13 @@ static bool ocl_cartToPolar( InputArray _src1, InputArray _src2,
            ocl::KernelArg::WriteOnlyNoSize(dst2));
 
     size_t globalsize[2] = { (size_t)dst1.cols * cn, ((size_t)dst1.rows + rowsPerWI - 1) / rowsPerWI };
-    return k.run(2, globalsize, NULL, false);
+    തിരികെ k.run(2, globalsize, ശൂന്യ, അസത്യം);
 }
 
 #endif
 
-void cartToPolar( InputArray src1, InputArray src2,
-                  OutputArray dst1, OutputArray dst2, bool angleInDegrees )
+ശൂന്യം cartToPolar( നിവേശം_Array src1, നിവേശം_Array src2,
+                  OutputArray dst1, OutputArray dst2, തർക്കം angleInDegrees )
 {
     CV_INSTRUMENT_REGION();
 
@@ -289,33 +289,33 @@ void cartToPolar( InputArray src1, InputArray src2,
             ocl_cartToPolar(src1, src2, dst1, dst2, angleInDegrees))
 
     Mat X = src1.getMat(), Y = src2.getMat();
-    int type = X.type(), depth = X.depth(), cn = X.channels();
+    പൂർണ്ണസംഖ്യ type = X.type(), depth = X.depth(), cn = X.channels();
     CV_Assert( X.size == Y.size && type == Y.type() && (depth == CV_32F || depth == CV_64F));
     dst1.create( X.size, type );
     dst2.create( X.size, type );
     Mat Mag = dst1.getMat(), Angle = dst2.getMat();
 
-    const Mat* arrays[] = {&X, &Y, &Mag, &Angle, 0};
+    സ്ഥിരം Mat* arrays[] = {&X, &Y, &Mag, &Angle, 0};
     uchar* ptrs[4] = {};
     NAryMatIterator it(arrays, ptrs);
-    int j, total = (int)(it.size*cn), blockSize = std::min(total, ((BLOCK_SIZE+cn-1)/cn)*cn);
+    പൂർണ്ണസംഖ്യ j, total = (പൂർണ്ണസംഖ്യ)(it.size*cn), blockSize = std::min(total, ((BLOCK_SIZE+cn-1)/cn)*cn);
     size_t esz1 = X.elemSize1();
 
-    for( size_t i = 0; i < it.nplanes; i++, ++it )
+    വേണ്ടി( size_t i = 0; i < it.nplanes; i++, ++it )
     {
-        for( j = 0; j < total; j += blockSize )
+        വേണ്ടി( j = 0; j < total; j += blockSize )
         {
-            int len = std::min(total - j, blockSize);
-            if( depth == CV_32F )
+            പൂർണ്ണസംഖ്യ len = std::min(total - j, blockSize);
+            എങ്കിൽ( depth == CV_32F )
             {
-                const float *x = (const float*)ptrs[0], *y = (const float*)ptrs[1];
-                float *mag = (float*)ptrs[2], *angle = (float*)ptrs[3];
+                സ്ഥിരം ദശാംശം *x = (സ്ഥിരം ദശാംശം*)ptrs[0], *y = (സ്ഥിരം ദശാംശം*)ptrs[1];
+                ദശാംശം *mag = (ദശാംശം*)ptrs[2], *angle = (ദശാംശം*)ptrs[3];
                 hal::cartToPolar32f( x, y, mag, angle, len, angleInDegrees );
             }
-            else
+            അല്ലെങ്കിൽ
             {
-                const double *x = (const double*)ptrs[0], *y = (const double*)ptrs[1];
-                double *mag = (double*)ptrs[2], *angle = (double*)ptrs[3];
+                സ്ഥിരം ഇരട്ട *x = (സ്ഥിരം ഇരട്ട*)ptrs[0], *y = (സ്ഥിരം ഇരട്ട*)ptrs[1];
+                ഇരട്ട *mag = (ഇരട്ട*)ptrs[2], *angle = (ഇരട്ട*)ptrs[3];
                 hal::cartToPolar64f(x, y, mag, angle, len, angleInDegrees);
             }
             ptrs[0] += len*esz1;
@@ -333,21 +333,21 @@ void cartToPolar( InputArray src1, InputArray src2,
 
 #ifdef HAVE_OPENCL
 
-static bool ocl_polarToCart( InputArray _mag, InputArray _angle,
-                             OutputArray _dst1, OutputArray _dst2, bool angleInDegrees )
+സ്ഥിതം തർക്കം ocl_polarToCart( നിവേശം_Array _mag, നിവേശം_Array _angle,
+                             OutputArray _dst1, OutputArray _dst2, തർക്കം angleInDegrees )
 {
-    const ocl::Device & d = ocl::Device::getDefault();
-    int type = _angle.type(), depth = CV_MAT_DEPTH(type), cn = CV_MAT_CN(type),
+    സ്ഥിരം ocl::Device & d = ocl::Device::getDefault();
+    പൂർണ്ണസംഖ്യ type = _angle.type(), depth = CV_MAT_DEPTH(type), cn = CV_MAT_CN(type),
             rowsPerWI = d.isIntel() ? 4 : 1;
-    bool doubleSupport = d.doubleFPConfig() > 0;
+    തർക്കം doubleSupport = d.doubleFPConfig() > 0;
 
-    const bool _src1IsDstX = (_mag.getObj() == _dst1.getObj());
-    const bool _src1IsDstY = (_mag.getObj() == _dst2.getObj());
-    const bool _src2IsDstX = (_angle.getObj() == _dst1.getObj());
-    const bool _src2IsDstY = (_angle.getObj() == _dst2.getObj());
+    സ്ഥിരം തർക്കം _src1IsDstX = (_mag.getObj() == _dst1.getObj());
+    സ്ഥിരം തർക്കം _src1IsDstY = (_mag.getObj() == _dst2.getObj());
+    സ്ഥിരം തർക്കം _src2IsDstX = (_angle.getObj() == _dst1.getObj());
+    സ്ഥിരം തർക്കം _src2IsDstY = (_angle.getObj() == _dst2.getObj());
 
-    if ( !doubleSupport && depth == CV_64F )
-        return false;
+    എങ്കിൽ ( !doubleSupport && depth == CV_64F )
+        തിരികെ അസത്യം;
 
     ocl::Kernel k("KF", ocl::core::arithm_oclsrc,
                   format("-D dstT=%s -D DEPTH_dst=%d -D rowsPerWI=%d -D BINARY_OP -D OP_PTC_%s%s%s%s%s%s",
@@ -359,8 +359,8 @@ static bool ocl_polarToCart( InputArray _mag, InputArray _angle,
                          _src1IsDstY ? " -D SRC1_IS_DST_Y" : "",
                          _src2IsDstX   ? " -D SRC2_IS_DST_X" : "",
                          _src2IsDstY ? " -D SRC2_IS_DST_Y" : ""));
-    if (k.empty())
-        return false;
+    എങ്കിൽ (k.empty())
+        തിരികെ അസത്യം;
 
     UMat mag = _mag.getUMat(), angle = _angle.getUMat();
     Size size = angle.size();
@@ -376,19 +376,19 @@ static bool ocl_polarToCart( InputArray _mag, InputArray _angle,
            ocl::KernelArg::WriteOnlyNoSize(dst2));
 
     size_t globalsize[2] = { (size_t)dst1.cols * cn, ((size_t)dst1.rows + rowsPerWI - 1) / rowsPerWI };
-    return k.run(2, globalsize, NULL, false);
+    തിരികെ k.run(2, globalsize, ശൂന്യ, അസത്യം);
 }
 
 #endif
 
-void polarToCart( InputArray src1, InputArray src2,
-                  OutputArray dst1, OutputArray dst2, bool angleInDegrees )
+ശൂന്യം polarToCart( നിവേശം_Array src1, നിവേശം_Array src2,
+                  OutputArray dst1, OutputArray dst2, തർക്കം angleInDegrees )
 {
     CV_INSTRUMENT_REGION();
 
     CV_Assert(dst1.getObj() != dst2.getObj());
 
-    int type = src2.type(), depth = CV_MAT_DEPTH(type), cn = CV_MAT_CN(type);
+    പൂർണ്ണസംഖ്യ type = src2.type(), depth = CV_MAT_DEPTH(type), cn = CV_MAT_CN(type);
     CV_Assert((depth == CV_32F || depth == CV_64F) && (src1.empty() || src1.type() == type));
 
     CV_OCL_RUN(!src1.empty() && src2.dims() <= 2 && dst1.isUMat() && dst2.isUMat(),
@@ -400,31 +400,31 @@ void polarToCart( InputArray src1, InputArray src2,
     dst2.create( Angle.size, type );
     Mat X = dst1.getMat(), Y = dst2.getMat();
 
-    const Mat* arrays[] = {&Mag, &Angle, &X, &Y, 0};
+    സ്ഥിരം Mat* arrays[] = {&Mag, &Angle, &X, &Y, 0};
     uchar* ptrs[4] = {};
     NAryMatIterator it(arrays, ptrs);
-    int j, total = (int)(it.size*cn), blockSize = std::min(total, ((BLOCK_SIZE+cn-1)/cn)*cn);
+    പൂർണ്ണസംഖ്യ j, total = (പൂർണ്ണസംഖ്യ)(it.size*cn), blockSize = std::min(total, ((BLOCK_SIZE+cn-1)/cn)*cn);
     size_t esz1 = Angle.elemSize1();
 
-    for( size_t i = 0; i < it.nplanes; i++, ++it )
+    വേണ്ടി( size_t i = 0; i < it.nplanes; i++, ++it )
     {
-        for( j = 0; j < total; j += blockSize )
+        വേണ്ടി( j = 0; j < total; j += blockSize )
         {
-            int len = std::min(total - j, blockSize);
-            if ( depth == CV_32F )
+            പൂർണ്ണസംഖ്യ len = std::min(total - j, blockSize);
+            എങ്കിൽ ( depth == CV_32F )
             {
-                const float *mag = (const float*)ptrs[0], *angle = (const float*)ptrs[1];
-                float *x = (float*)ptrs[2], *y = (float*)ptrs[3];
+                സ്ഥിരം ദശാംശം *mag = (സ്ഥിരം ദശാംശം*)ptrs[0], *angle = (സ്ഥിരം ദശാംശം*)ptrs[1];
+                ദശാംശം *x = (ദശാംശം*)ptrs[2], *y = (ദശാംശം*)ptrs[3];
                 hal::polarToCart32f( mag, angle, x, y, len, angleInDegrees );
             }
-            else
+            അല്ലെങ്കിൽ
             {
-                const double *mag = (const double*)ptrs[0], *angle = (const double*)ptrs[1];
-                double *x = (double*)ptrs[2], *y = (double*)ptrs[3];
+                സ്ഥിരം ഇരട്ട *mag = (സ്ഥിരം ഇരട്ട*)ptrs[0], *angle = (സ്ഥിരം ഇരട്ട*)ptrs[1];
+                ഇരട്ട *x = (ഇരട്ട*)ptrs[2], *y = (ഇരട്ട*)ptrs[3];
                 hal::polarToCart64f( mag, angle, x, y, len, angleInDegrees );
             }
 
-            if( ptrs[0] )
+            എങ്കിൽ( ptrs[0] )
                 ptrs[0] += len*esz1;
             ptrs[1] += len*esz1;
             ptrs[2] += len*esz1;
@@ -445,44 +445,44 @@ void polarToCart( InputArray src1, InputArray src2,
 //    parallel_for machinery - their setup dominates at these sizes.
 //  - everything else (large arrays - worth parallelizing; ROIs - need real steps): the usual
 //    1-instruction program via compile()/exec().
-enum { MATH_OP_SMALL = 100000 };     // elements; tune with a benchmark if the crossover moves
+എണ്ണൽ { MATH_OP_SMALL = 100000 };     // elements; tune with a benchmark if the crossover moves
 
-static void math_op(ew::TOp op, InputArray _src, OutputArray _dst)
+സ്ഥിതം ശൂന്യം math_op(ew::മുകൾ op, നിവേശം_Array _src, OutputArray _dst)
 {
-    int type = _src.type(), depth = CV_MAT_DEPTH(type);
+    പൂർണ്ണസംഖ്യ type = _src.type(), depth = CV_MAT_DEPTH(type);
     CV_Assert(depth == CV_16F || depth == CV_16BF || depth == CV_32F || depth == CV_64F);
 
     Mat src = _src.getMat();
     _dst.createSameSize(_src, type);   // whole-shape transfer (layout & future metadata included)
     Mat dst = _dst.getMat();
-    if (src.empty())
-        return;
+    എങ്കിൽ (src.empty())
+        തിരികെ;
 
-    const size_t total = src.total() * src.channels();
-    if (src.isContinuous() && dst.isContinuous() && total <= (size_t)MATH_OP_SMALL)
+    സ്ഥിരം size_t total = src.total() * src.channels();
+    എങ്കിൽ (src.isContinuous() && dst.isContinuous() && total <= (size_t)MATH_OP_SMALL)
     {
         ew::TKernel k = ew::getMathFunc(op, depth);
         CV_Assert(k.fptr);
-        static const double noparams[4] = {};
+        സ്ഥിതം സ്ഥിരം ഇരട്ട noparams[4] = {};
         k.fptr(src.data, 0, 1, nullptr, 0, 0, nullptr, 0, 0,
-               dst.data, 0, (int)total, 1, noparams, k.flags, k.userdata);
-        return;
+               dst.data, 0, (പൂർണ്ണസംഖ്യ)total, 1, noparams, k.flags, k.userdata);
+        തിരികെ;
     }
 
     ew::TExpr p;
-    const int a = p.addInput(depth);
-    const int out = p.addOutput(depth);
+    സ്ഥിരം പൂർണ്ണസംഖ്യ a = p.add_നിവേശം(depth);
+    സ്ഥിരം പൂർണ്ണസംഖ്യ out = p.addOutput(depth);
     p.moveToOutput(p.emitUnary(op, a, depth), out);
     p.compile();
-    const Mat* inputs[] = { &src };
+    സ്ഥിരം Mat* inputs[] = { &src };
     p.exec(inputs, &dst);
 }
 
-void exp( InputArray _src, OutputArray _dst )
+ശൂന്യം exp( നിവേശം_Array _src, OutputArray _dst )
 {
     CV_INSTRUMENT_REGION();
 
-    [[maybe_unused]] int depth = _src.depth();   // consumed by CV_OCL_RUN only
+    [[maybe_unused]] പൂർണ്ണസംഖ്യ depth = _src.depth();   // consumed by CV_OCL_RUN only
 
     CV_OCL_RUN(_dst.isUMat() && _src.dims() <= 2 && (depth == CV_32F || depth == CV_64F),
                ocl_math_op(_src, noArray(), _dst, OCL_OP_EXP))
@@ -495,11 +495,11 @@ void exp( InputArray _src, OutputArray _dst )
 *                                          L O G                                         *
 \****************************************************************************************/
 
-void log( InputArray _src, OutputArray _dst )
+ശൂന്യം log( നിവേശം_Array _src, OutputArray _dst )
 {
     CV_INSTRUMENT_REGION();
 
-    [[maybe_unused]] int depth = _src.depth();   // consumed by CV_OCL_RUN only
+    [[maybe_unused]] പൂർണ്ണസംഖ്യ depth = _src.depth();   // consumed by CV_OCL_RUN only
 
     CV_OCL_RUN( _dst.isUMat() && _src.dims() <= 2 && (depth == CV_32F || depth == CV_64F),
                 ocl_math_op(_src, noArray(), _dst, OCL_OP_LOG))
@@ -512,35 +512,35 @@ void log( InputArray _src, OutputArray _dst )
 \****************************************************************************************/
 
 template <typename T, typename WT>
-struct iPow_SIMD
+ഘടന iPow_SIMD
 {
-    int operator() ( const T *, T *, int, int)
+    പൂർണ്ണസംഖ്യ operator() ( സ്ഥിരം T *, T *, പൂർണ്ണസംഖ്യ, പൂർണ്ണസംഖ്യ)
     {
-        return 0;
+        തിരികെ 0;
     }
 };
 
-#if (CV_SIMD || CV_SIMD_SCALABLE)
+#എങ്കിൽ (CV_SIMD || CV_SIMD_SCALABLE)
 
 template <>
-struct iPow_SIMD<uchar, unsigned>
+ഘടന iPow_SIMD<uchar, unsigned>
 {
-    int operator() ( const uchar * src, uchar * dst, int len, int power )
+    പൂർണ്ണസംഖ്യ operator() ( സ്ഥിരം uchar * src, uchar * dst, പൂർണ്ണസംഖ്യ len, പൂർണ്ണസംഖ്യ power )
     {
-        int i = 0;
+        പൂർണ്ണസംഖ്യ i = 0;
         v_uint32 v_1 = vx_setall_u32(1u);
 
-        for ( ; i <= len - VTraits<v_uint16>::vlanes(); i += VTraits<v_uint16>::vlanes())
+        വേണ്ടി ( ; i <= len - VTraits<v_uint16>::vlanes(); i += VTraits<v_uint16>::vlanes())
         {
             v_uint32 v_a1 = v_1, v_a2 = v_1;
             v_uint16 v = vx_load_expand(src + i);
             v_uint32 v_b1, v_b2;
             v_expand(v, v_b1, v_b2);
-            int p = power;
+            പൂർണ്ണസംഖ്യ p = power;
 
-            while( p > 1 )
+            ആകുമ്പോൾ( p > 1 )
             {
-                if (p & 1)
+                എങ്കിൽ (p & 1)
                 {
                     v_a1 = v_mul(v_a1, v_b1);
                     v_a2 = v_mul(v_a2, v_b2);
@@ -558,29 +558,29 @@ struct iPow_SIMD<uchar, unsigned>
         }
         vx_cleanup();
 
-        return i;
+        തിരികെ i;
     }
 };
 
 template <>
-struct iPow_SIMD<schar, int>
+ഘടന iPow_SIMD<schar, പൂർണ്ണസംഖ്യ>
 {
-    int operator() ( const schar * src, schar * dst, int len, int power)
+    പൂർണ്ണസംഖ്യ operator() ( സ്ഥിരം schar * src, schar * dst, പൂർണ്ണസംഖ്യ len, പൂർണ്ണസംഖ്യ power)
     {
-        int i = 0;
+        പൂർണ്ണസംഖ്യ i = 0;
         v_int32 v_1 = vx_setall_s32(1);
 
-        for ( ; i <= len - VTraits<v_int16>::vlanes(); i += VTraits<v_int16>::vlanes())
+        വേണ്ടി ( ; i <= len - VTraits<v_int16>::vlanes(); i += VTraits<v_int16>::vlanes())
         {
             v_int32 v_a1 = v_1, v_a2 = v_1;
             v_int16 v = vx_load_expand(src + i);
             v_int32 v_b1, v_b2;
             v_expand(v, v_b1, v_b2);
-            int p = power;
+            പൂർണ്ണസംഖ്യ p = power;
 
-            while( p > 1 )
+            ആകുമ്പോൾ( p > 1 )
             {
-                if (p & 1)
+                എങ്കിൽ (p & 1)
                 {
                     v_a1 = v_mul(v_a1, v_b1);
                     v_a2 = v_mul(v_a2, v_b2);
@@ -598,29 +598,29 @@ struct iPow_SIMD<schar, int>
         }
         vx_cleanup();
 
-        return i;
+        തിരികെ i;
     }
 };
 
 template <>
-struct iPow_SIMD<ushort, unsigned>
+ഘടന iPow_SIMD<ushort, unsigned>
 {
-    int operator() ( const ushort * src, ushort * dst, int len, int power)
+    പൂർണ്ണസംഖ്യ operator() ( സ്ഥിരം ushort * src, ushort * dst, പൂർണ്ണസംഖ്യ len, പൂർണ്ണസംഖ്യ power)
     {
-        int i = 0;
+        പൂർണ്ണസംഖ്യ i = 0;
         v_uint32 v_1 = vx_setall_u32(1u);
 
-        for ( ; i <= len - VTraits<v_uint16>::vlanes(); i += VTraits<v_uint16>::vlanes())
+        വേണ്ടി ( ; i <= len - VTraits<v_uint16>::vlanes(); i += VTraits<v_uint16>::vlanes())
         {
             v_uint32 v_a1 = v_1, v_a2 = v_1;
             v_uint16 v = vx_load(src + i);
             v_uint32 v_b1, v_b2;
             v_expand(v, v_b1, v_b2);
-            int p = power;
+            പൂർണ്ണസംഖ്യ p = power;
 
-            while( p > 1 )
+            ആകുമ്പോൾ( p > 1 )
             {
-                if (p & 1)
+                എങ്കിൽ (p & 1)
                 {
                     v_a1 = v_mul(v_a1, v_b1);
                     v_a2 = v_mul(v_a2, v_b2);
@@ -638,29 +638,29 @@ struct iPow_SIMD<ushort, unsigned>
         }
         vx_cleanup();
 
-        return i;
+        തിരികെ i;
     }
 };
 
 template <>
-struct iPow_SIMD<short, int>
+ഘടന iPow_SIMD<short, പൂർണ്ണസംഖ്യ>
 {
-    int operator() ( const short * src, short * dst, int len, int power)
+    പൂർണ്ണസംഖ്യ operator() ( സ്ഥിരം short * src, short * dst, പൂർണ്ണസംഖ്യ len, പൂർണ്ണസംഖ്യ power)
     {
-        int i = 0;
+        പൂർണ്ണസംഖ്യ i = 0;
         v_int32 v_1 = vx_setall_s32(1);
 
-        for ( ; i <= len - VTraits<v_int16>::vlanes(); i += VTraits<v_int16>::vlanes())
+        വേണ്ടി ( ; i <= len - VTraits<v_int16>::vlanes(); i += VTraits<v_int16>::vlanes())
         {
             v_int32 v_a1 = v_1, v_a2 = v_1;
             v_int16 v = vx_load(src + i);
             v_int32 v_b1, v_b2;
             v_expand(v, v_b1, v_b2);
-            int p = power;
+            പൂർണ്ണസംഖ്യ p = power;
 
-            while( p > 1 )
+            ആകുമ്പോൾ( p > 1 )
             {
-                if (p & 1)
+                എങ്കിൽ (p & 1)
                 {
                     v_a1 = v_mul(v_a1, v_b1);
                     v_a2 = v_mul(v_a2, v_b2);
@@ -678,27 +678,27 @@ struct iPow_SIMD<short, int>
         }
         vx_cleanup();
 
-        return i;
+        തിരികെ i;
     }
 };
 
 template <>
-struct iPow_SIMD<int, int>
+ഘടന iPow_SIMD<പൂർണ്ണസംഖ്യ, പൂർണ്ണസംഖ്യ>
 {
-    int operator() ( const int * src, int * dst, int len, int power)
+    പൂർണ്ണസംഖ്യ operator() ( സ്ഥിരം പൂർണ്ണസംഖ്യ * src, പൂർണ്ണസംഖ്യ * dst, പൂർണ്ണസംഖ്യ len, പൂർണ്ണസംഖ്യ power)
     {
-        int i = 0;
+        പൂർണ്ണസംഖ്യ i = 0;
         v_int32 v_1 = vx_setall_s32(1);
 
-        for ( ; i <= len - VTraits<v_int32>::vlanes()*2; i += VTraits<v_int32>::vlanes()*2)
+        വേണ്ടി ( ; i <= len - VTraits<v_int32>::vlanes()*2; i += VTraits<v_int32>::vlanes()*2)
         {
             v_int32 v_a1 = v_1, v_a2 = v_1;
             v_int32 v_b1 = vx_load(src + i), v_b2 = vx_load(src + i + VTraits<v_int32>::vlanes());
-            int p = power;
+            പൂർണ്ണസംഖ്യ p = power;
 
-            while( p > 1 )
+            ആകുമ്പോൾ( p > 1 )
             {
-                if (p & 1)
+                എങ്കിൽ (p & 1)
                 {
                     v_a1 = v_mul(v_a1, v_b1);
                     v_a2 = v_mul(v_a2, v_b2);
@@ -716,32 +716,32 @@ struct iPow_SIMD<int, int>
         }
         vx_cleanup();
 
-        return i;
+        തിരികെ i;
     }
 };
 
 template <>
-struct iPow_SIMD<float, float>
+ഘടന iPow_SIMD<ദശാംശം, ദശാംശം>
 {
-    int operator() ( const float * src, float * dst, int len, int power)
+    പൂർണ്ണസംഖ്യ operator() ( സ്ഥിരം ദശാംശം * src, ദശാംശം * dst, പൂർണ്ണസംഖ്യ len, പൂർണ്ണസംഖ്യ power)
     {
-        int i = 0;
+        പൂർണ്ണസംഖ്യ i = 0;
         v_float32 v_1 = vx_setall_f32(1.f);
 
-        for ( ; i <= len - VTraits<v_float32>::vlanes()*2; i += VTraits<v_float32>::vlanes()*2)
+        വേണ്ടി ( ; i <= len - VTraits<v_float32>::vlanes()*2; i += VTraits<v_float32>::vlanes()*2)
         {
             v_float32 v_a1 = v_1, v_a2 = v_1;
             v_float32 v_b1 = vx_load(src + i), v_b2 = vx_load(src + i + VTraits<v_float32>::vlanes());
-            int p = std::abs(power);
-            if( power < 0 )
+            പൂർണ്ണസംഖ്യ p = std::abs(power);
+            എങ്കിൽ( power < 0 )
             {
                 v_b1 = v_div(v_1, v_b1);
                 v_b2 = v_div(v_1, v_b2);
             }
 
-            while( p > 1 )
+            ആകുമ്പോൾ( p > 1 )
             {
-                if (p & 1)
+                എങ്കിൽ (p & 1)
                 {
                     v_a1 = v_mul(v_a1, v_b1);
                     v_a2 = v_mul(v_a2, v_b2);
@@ -759,33 +759,33 @@ struct iPow_SIMD<float, float>
         }
         vx_cleanup();
 
-        return i;
+        തിരികെ i;
     }
 };
 
-#if (CV_SIMD_64F || CV_SIMD_SCALABLE_64F)
+#എങ്കിൽ (CV_SIMD_64F || CV_SIMD_SCALABLE_64F)
 template <>
-struct iPow_SIMD<double, double>
+ഘടന iPow_SIMD<ഇരട്ട, ഇരട്ട>
 {
-    int operator() ( const double * src, double * dst, int len, int power)
+    പൂർണ്ണസംഖ്യ operator() ( സ്ഥിരം ഇരട്ട * src, ഇരട്ട * dst, പൂർണ്ണസംഖ്യ len, പൂർണ്ണസംഖ്യ power)
     {
-        int i = 0;
+        പൂർണ്ണസംഖ്യ i = 0;
         v_float64 v_1 = vx_setall_f64(1.);
 
-        for ( ; i <= len - VTraits<v_float64>::vlanes()*2; i += VTraits<v_float64>::vlanes()*2)
+        വേണ്ടി ( ; i <= len - VTraits<v_float64>::vlanes()*2; i += VTraits<v_float64>::vlanes()*2)
         {
             v_float64 v_a1 = v_1, v_a2 = v_1;
             v_float64 v_b1 = vx_load(src + i), v_b2 = vx_load(src + i + VTraits<v_float64>::vlanes());
-            int p = std::abs(power);
-            if( power < 0 )
+            പൂർണ്ണസംഖ്യ p = std::abs(power);
+            എങ്കിൽ( power < 0 )
             {
                 v_b1 = v_div(v_1, v_b1);
                 v_b2 = v_div(v_1, v_b2);
             }
 
-            while( p > 1 )
+            ആകുമ്പോൾ( p > 1 )
             {
-                if (p & 1)
+                എങ്കിൽ (p & 1)
                 {
                     v_a1 = v_mul(v_a1, v_b1);
                     v_a2 = v_mul(v_a2, v_b2);
@@ -803,7 +803,7 @@ struct iPow_SIMD<double, double>
         }
         vx_cleanup();
 
-        return i;
+        തിരികെ i;
     }
 };
 #endif
@@ -811,36 +811,36 @@ struct iPow_SIMD<double, double>
 #endif
 
 template<typename T, typename WT>
-static void
-iPow_i( const void* _src, void* _dst, int len, int power )
+സ്ഥിതം ശൂന്യം
+iPow_i( സ്ഥിരം ശൂന്യം* _src, ശൂന്യം* _dst, പൂർണ്ണസംഖ്യ len, പൂർണ്ണസംഖ്യ power )
 {
-    const T* src = (const T*)_src;
+    സ്ഥിരം T* src = (സ്ഥിരം T*)_src;
     T* dst = (T*)_dst;
-    if( power < 0 )
+    എങ്കിൽ( power < 0 )
     {
         T tab[5] =
         {
             saturate_cast<T>(power == -1 ? -1 : 0), saturate_cast<T>((power & 1) ? -1 : 1),
             std::numeric_limits<T>::max(), 1, saturate_cast<T>(power == -1 ? 1 : 0)
         };
-        for( int i = 0; i < len; i++ )
+        വേണ്ടി( പൂർണ്ണസംഖ്യ i = 0; i < len; i++ )
         {
             T val = src[i];
             dst[i] = cv_abs(val) <= 2 ? tab[val + 2] : (T)0;
         }
     }
-    else
+    അല്ലെങ്കിൽ
     {
         iPow_SIMD<T, WT> vop;
-        int i = vop(src, dst, len, power);
+        പൂർണ്ണസംഖ്യ i = vop(src, dst, len, power);
 
-        for( ; i < len; i++ )
+        വേണ്ടി( ; i < len; i++ )
         {
             WT a = 1, b = src[i];
-            int p = power;
-            while( p > 1 )
+            പൂർണ്ണസംഖ്യ p = power;
+            ആകുമ്പോൾ( p > 1 )
             {
-                if( p & 1 )
+                എങ്കിൽ( p & 1 )
                     a *= b;
                 b *= b;
                 p >>= 1;
@@ -853,25 +853,25 @@ iPow_i( const void* _src, void* _dst, int len, int power )
 }
 
 template<typename T>
-static void
-iPow_f( const void* _src, void* _dst, int len, int power0 )
+സ്ഥിതം ശൂന്യം
+iPow_f( സ്ഥിരം ശൂന്യം* _src, ശൂന്യം* _dst, പൂർണ്ണസംഖ്യ len, പൂർണ്ണസംഖ്യ power0 )
 {
-    const T* src = (const T*)_src;
+    സ്ഥിരം T* src = (സ്ഥിരം T*)_src;
     T* dst = (T*)_dst;
     iPow_SIMD<T, T> vop;
-    int i = vop(src, dst, len, power0);
-    int power = std::abs(power0);
+    പൂർണ്ണസംഖ്യ i = vop(src, dst, len, power0);
+    പൂർണ്ണസംഖ്യ power = std::abs(power0);
 
-    for( ; i < len; i++ )
+    വേണ്ടി( ; i < len; i++ )
     {
         T a = 1, b = src[i];
-        int p = power;
-        if( power0 < 0 )
+        പൂർണ്ണസംഖ്യ p = power;
+        എങ്കിൽ( power0 < 0 )
             b = 1/b;
 
-        while( p > 1 )
+        ആകുമ്പോൾ( p > 1 )
         {
-            if( p & 1 )
+            എങ്കിൽ( p & 1 )
                 a *= b;
             b *= b;
             p >>= 1;
@@ -882,54 +882,54 @@ iPow_f( const void* _src, void* _dst, int len, int power0 )
     }
 }
 
-typedef void (*IPowFunc)( const void* src, void* dst, int len, int power );
+തരനിർവചനം ശൂന്യം (*IPowFunc)( സ്ഥിരം ശൂന്യം* src, ശൂന്യം* dst, പൂർണ്ണസംഖ്യ len, പൂർണ്ണസംഖ്യ power );
 
-static IPowFunc ipowTab[CV_DEPTH_MAX] =
+സ്ഥിതം IPowFunc ipowTab[CV_DEPTH_MAX] =
 {
-    iPow_i<uchar, unsigned>, iPow_i<schar, int>, iPow_i<ushort, unsigned>, iPow_i<short, int>,
-    iPow_i<int, int>, iPow_f<float>, iPow_f<double>, 0
+    iPow_i<uchar, unsigned>, iPow_i<schar, പൂർണ്ണസംഖ്യ>, iPow_i<ushort, unsigned>, iPow_i<short, പൂർണ്ണസംഖ്യ>,
+    iPow_i<പൂർണ്ണസംഖ്യ, പൂർണ്ണസംഖ്യ>, iPow_f<ദശാംശം>, iPow_f<ഇരട്ട>, 0
 };
 
 #ifdef HAVE_OPENCL
 
-static bool ocl_pow(InputArray _src, double power, OutputArray _dst,
-                    bool is_ipower, int ipower)
+സ്ഥിതം തർക്കം ocl_pow(നിവേശം_Array _src, ഇരട്ട power, OutputArray _dst,
+                    തർക്കം is_ipower, പൂർണ്ണസംഖ്യ ipower)
 {
-    const ocl::Device & d = ocl::Device::getDefault();
-    int type = _src.type(), depth = CV_MAT_DEPTH(type), cn = CV_MAT_CN(type),
+    സ്ഥിരം ocl::Device & d = ocl::Device::getDefault();
+    പൂർണ്ണസംഖ്യ type = _src.type(), depth = CV_MAT_DEPTH(type), cn = CV_MAT_CN(type),
             rowsPerWI = d.isIntel() ? 4 : 1;
-    bool doubleSupport = d.doubleFPConfig() > 0;
+    തർക്കം doubleSupport = d.doubleFPConfig() > 0;
 
     _dst.createSameSize(_src, type);
-    if (is_ipower)
+    എങ്കിൽ (is_ipower)
     {
-        if( ipower < 0 )
+        എങ്കിൽ( ipower < 0 )
         {
-            if( depth == CV_32F || depth == CV_64F )
-                is_ipower = false;
-            else
-                return false;
+            എങ്കിൽ( depth == CV_32F || depth == CV_64F )
+                is_ipower = അസത്യം;
+            അല്ലെങ്കിൽ
+                തിരികെ അസത്യം;
         }
     }
 
-    if (depth == CV_64F && !doubleSupport)
-        return false;
+    എങ്കിൽ (depth == CV_64F && !doubleSupport)
+        തിരികെ അസത്യം;
 
-    bool issqrt = std::abs(power - 0.5) < DBL_EPSILON;
-    const char * const op = issqrt ? "OP_SQRT" : is_ipower ? "OP_POWN" : "OP_POW";
+    തർക്കം issqrt = std::abs(power - 0.5) < DBL_EPSILON;
+    സ്ഥിരം അക്ഷരം * സ്ഥിരം op = issqrt ? "OP_SQRT" : is_ipower ? "OP_POWN" : "OP_POW";
 
     // Note: channels are unrolled
 
     std::string extra_opts ="";
-    if (is_ipower)
+    എങ്കിൽ (is_ipower)
     {
-        int wdepth = CV_32F;
-        if (depth == CV_64F)
+        പൂർണ്ണസംഖ്യ wdepth = CV_32F;
+        എങ്കിൽ (depth == CV_64F)
             wdepth = CV_64F;
-        else if (depth == CV_16F)
+        അല്ലെങ്കിൽ എങ്കിൽ (depth == CV_16F)
             wdepth = CV_16F;
 
-        char cvt[2][50];
+        അക്ഷരം cvt[2][50];
         extra_opts = format(
             " -D srcT1=%s -DsrcT1_C1=%s"
             " -D srcT2=int -D workST=int"
@@ -940,8 +940,8 @@ static bool ocl_pow(InputArray _src, double power, OutputArray _dst,
             ocl::typeToStr(CV_MAKE_TYPE(depth, 1)),
             ocl::typeToStr(CV_MAKE_TYPE(wdepth, 1)),
             wdepth,
-            ocl::convertTypeStr(depth, wdepth, 1, cvt[0], sizeof(cvt[0])),
-            ocl::convertTypeStr(wdepth, depth, 1, cvt[1], sizeof(cvt[1])),
+            ocl::convertTypeStr(depth, wdepth, 1, cvt[0], വലുപ്പം(cvt[0])),
+            ocl::convertTypeStr(wdepth, depth, 1, cvt[1], വലുപ്പം(cvt[1])),
             ocl::typeToStr(wdepth)
         );
     }
@@ -953,8 +953,8 @@ static bool ocl_pow(InputArray _src, double power, OutputArray _dst,
                          " -D UNARY_OP=1",
                          extra_opts.empty() ? "" : extra_opts.c_str(),
                          doubleSupport ? " -D DOUBLE_SUPPORT" : ""));
-    if (k.empty())
-        return false;
+    എങ്കിൽ (k.empty())
+        തിരികെ അസത്യം;
 
     UMat src = _src.getUMat();
     _dst.createSameSize(src, type);
@@ -963,76 +963,76 @@ static bool ocl_pow(InputArray _src, double power, OutputArray _dst,
     ocl::KernelArg srcarg = ocl::KernelArg::ReadOnlyNoSize(src),
             dstarg = ocl::KernelArg::WriteOnly(dst, cn);
 
-    if (issqrt)
+    എങ്കിൽ (issqrt)
         k.args(srcarg, dstarg);
-    else if (is_ipower)
+    അല്ലെങ്കിൽ എങ്കിൽ (is_ipower)
         k.args(srcarg, dstarg, ipower);
-    else
+    അല്ലെങ്കിൽ
     {
-        if (depth == CV_32F)
-            k.args(srcarg, dstarg, (float)power);
-        else
+        എങ്കിൽ (depth == CV_32F)
+            k.args(srcarg, dstarg, (ദശാംശം)power);
+        അല്ലെങ്കിൽ
             k.args(srcarg, dstarg, power);
     }
 
     size_t globalsize[2] = { (size_t)dst.cols *  cn, ((size_t)dst.rows + rowsPerWI - 1) / rowsPerWI };
-    return k.run(2, globalsize, NULL, false);
+    തിരികെ k.run(2, globalsize, ശൂന്യ, അസത്യം);
 }
 
 #endif
 
-void pow( InputArray _src, double power, OutputArray _dst )
+ശൂന്യം pow( നിവേശം_Array _src, ഇരട്ട power, OutputArray _dst )
 {
     CV_INSTRUMENT_REGION();
 
-    int type = _src.type(), depth = CV_MAT_DEPTH(type),
+    പൂർണ്ണസംഖ്യ type = _src.type(), depth = CV_MAT_DEPTH(type),
             cn = CV_MAT_CN(type), ipower = cvRound(power);
-    bool is_ipower = fabs(ipower - power) < DBL_EPSILON;
+    തർക്കം is_ipower = fabs(ipower - power) < DBL_EPSILON;
 #ifdef HAVE_OPENCL
-    bool useOpenCL = _dst.isUMat() && _src.dims() <= 2;
+    തർക്കം useOpenCL = _dst.isUMat() && _src.dims() <= 2;
 #endif
 
-    if (is_ipower)
+    എങ്കിൽ (is_ipower)
     {
-        switch( ipower )
+        തിരഞ്ഞെടുപ്പ്( ipower )
         {
-        case 0:
+        അവസ്ഥ 0:
             _dst.createSameSize(_src, type);
             _dst.setTo(Scalar::all(1));
-            return;
-        case 1:
+            തിരികെ;
+        അവസ്ഥ 1:
             _src.copyTo(_dst);
-            return;
-        case 2:
+            തിരികെ;
+        അവസ്ഥ 2:
             multiply(_src, _src, _dst);
-            return;
+            തിരികെ;
         }
     }
 
     CV_OCL_RUN(useOpenCL, ocl_pow(_src, power, _dst, is_ipower, ipower))
 
-    const bool floatDepth = depth == CV_16F || depth == CV_16BF || depth == CV_32F || depth == CV_64F;
+    സ്ഥിരം തർക്കം floatDepth = depth == CV_16F || depth == CV_16BF || depth == CV_32F || depth == CV_64F;
 
     // INTEGER array ** INTEGER power: keep the classic iPow kernels (an exact multiply chain with
     // the classic wrap-around semantics) - full bit-exact compatibility for whoever relies on it.
     // Everything else - any power on a float array, a fractional power on an integer one (computed
     // in the float domain and saturated back), plus the 32U/64-bit depths iPow never supported -
     // goes through the engine below.
-    if( is_ipower && !floatDepth && ipowTab[depth] )
+    എങ്കിൽ( is_ipower && !floatDepth && ipowTab[depth] )
     {
         Mat src = _src.getMat();
         _dst.createSameSize(_src, type);
         Mat dst = _dst.getMat();
 
-        const Mat* arrays[] = {&src, &dst, 0};
+        സ്ഥിരം Mat* arrays[] = {&src, &dst, 0};
         uchar* ptrs[2] = {};
         NAryMatIterator it(arrays, ptrs);
-        int len = (int)(it.size*cn);
+        പൂർണ്ണസംഖ്യ len = (പൂർണ്ണസംഖ്യ)(it.size*cn);
         IPowFunc func = ipowTab[depth];
 
-        for( size_t i = 0; i < it.nplanes; i++, ++it )
+        വേണ്ടി( size_t i = 0; i < it.nplanes; i++, ++it )
             func( ptrs[0], ptrs[1], len, ipower );
-        return;
+        തിരികെ;
     }
 
     // The engine path, two tiers like math_op: the pow kernel special-cases the exponents
@@ -1041,123 +1041,123 @@ void pow( InputArray _src, double power, OutputArray _dst )
     Mat src = _src.getMat();
     _dst.createSameSize(_src, type);
     Mat dst = _dst.getMat();
-    if (src.empty())
-        return;
+    എങ്കിൽ (src.empty())
+        തിരികെ;
 
-    const size_t total = src.total() * cn;
-    if (floatDepth && src.isContinuous() && dst.isContinuous() && total <= (size_t)MATH_OP_SMALL)
+    സ്ഥിരം size_t total = src.total() * cn;
+    എങ്കിൽ (floatDepth && src.isContinuous() && dst.isContinuous() && total <= (size_t)MATH_OP_SMALL)
     {
         ew::TKernel k = ew::getPowFunc(depth, depth);
-        if (k.fptr)
+        എങ്കിൽ (k.fptr)
         {
-            double pvstore;                    // the broadcast exponent, stored as T
-            void* pv = &pvstore;
-            switch (depth)
+            ഇരട്ട pvstore;                    // the broadcast exponent, stored as T
+            ശൂന്യം* pv = &pvstore;
+            തിരഞ്ഞെടുപ്പ് (depth)
             {
-            case CV_16F:  *(hfloat*)pv = saturate_cast<hfloat>(power); break;
-            case CV_16BF: *(bfloat*)pv = saturate_cast<bfloat>(power); break;
-            case CV_32F:  *(float*)pv = (float)power; break;
-            default:      pvstore = power; break;
+            അവസ്ഥ CV_16F:  *(hfloat*)pv = saturate_cast<hfloat>(power); നിർത്തുക;
+            അവസ്ഥ CV_16BF: *(bfloat*)pv = saturate_cast<bfloat>(power); നിർത്തുക;
+            അവസ്ഥ CV_32F:  *(ദശാംശം*)pv = (ദശാംശം)power; നിർത്തുക;
+            സ്ഥിരസ്ഥിതി:      pvstore = power; നിർത്തുക;
             }
-            static const double noparams[4] = {};
+            സ്ഥിതം സ്ഥിരം ഇരട്ട noparams[4] = {};
             k.fptr(src.data, 0, 1, pv, 0, 0, nullptr, 0, 0,
-                   dst.data, 0, (int)total, 1, noparams, k.flags, k.userdata);
-            return;
+                   dst.data, 0, (പൂർണ്ണസംഖ്യ)total, 1, noparams, k.flags, k.userdata);
+            തിരികെ;
         }
     }
 
     ew::TExpr prog;
-    const int a = prog.addInput(depth);
-    const int c = prog.addConst(ew::EW_DEPTH_NONE, Scalar(power), 1);
-    const int out = prog.addOutput(depth);
-    prog.moveToOutput(prog.emitBinary(ew::OP_POW, a, c, depth), out);
+    സ്ഥിരം പൂർണ്ണസംഖ്യ a = prog.add_നിവേശം(depth);
+    സ്ഥിരം പൂർണ്ണസംഖ്യ c = prog.addConst(ew::EW_DEPTH_NONE, Scalar(power), 1);
+    സ്ഥിരം പൂർണ്ണസംഖ്യ out = prog.addOutput(depth);
+    prog.moveToOutput(prog.emit_ദ്വിമാന(ew::OP_POW, a, c, depth), out);
     prog.compile();
-    const Mat* inputs[] = { &src };
+    സ്ഥിരം Mat* inputs[] = { &src };
     prog.exec(inputs, &dst);
 }
 
-void sqrt(InputArray a, OutputArray b)
+ശൂന്യം sqrt(നിവേശം_Array a, OutputArray b)
 {
     CV_INSTRUMENT_REGION();
 
-    if (b.isUMat() && a.dims() <= 2)     // the OpenCL route (via ocl_pow) is unchanged
+    എങ്കിൽ (b.isUMat() && a.dims() <= 2)     // the OpenCL route (via ocl_pow) is unchanged
     {
         cv::pow(a, 0.5, b);
-        return;
+        തിരികെ;
     }
     math_op(ew::OP_SQRT, a, b);
 }
 
 /************************** CheckArray for NaN's, Inf's *********************************/
 
-template<int cv_mat_type> struct mat_type_assotiations{};
+template<പൂർണ്ണസംഖ്യ cv_mat_type> ഘടന mat_type_assotiations{};
 
-template<> struct mat_type_assotiations<CV_8U>
+template<> ഘടന mat_type_assotiations<CV_8U>
 {
-    typedef unsigned char type;
-    static const type min_allowable = 0x0;
-    static const type max_allowable = 0xFF;
+    തരനിർവചനം unsigned അക്ഷരം type;
+    സ്ഥിതം സ്ഥിരം type min_allowable = 0x0;
+    സ്ഥിതം സ്ഥിരം type max_allowable = 0xFF;
 };
 
-template<> struct mat_type_assotiations<CV_8S>
+template<> ഘടന mat_type_assotiations<CV_8S>
 {
-    typedef signed char type;
-    static const type min_allowable = SCHAR_MIN;
-    static const type max_allowable = SCHAR_MAX;
+    തരനിർവചനം signed അക്ഷരം type;
+    സ്ഥിതം സ്ഥിരം type min_allowable = SCHAR_MIN;
+    സ്ഥിതം സ്ഥിരം type max_allowable = SCHAR_MAX;
 };
 
-template<> struct mat_type_assotiations<CV_16U>
+template<> ഘടന mat_type_assotiations<CV_16U>
 {
-    typedef unsigned short type;
-    static const type min_allowable = 0x0;
-    static const type max_allowable = USHRT_MAX;
+    തരനിർവചനം unsigned short type;
+    സ്ഥിതം സ്ഥിരം type min_allowable = 0x0;
+    സ്ഥിതം സ്ഥിരം type max_allowable = USHRT_MAX;
 };
-template<> struct mat_type_assotiations<CV_16S>
+template<> ഘടന mat_type_assotiations<CV_16S>
 {
-    typedef signed short type;
-    static const type min_allowable = SHRT_MIN;
-    static const type max_allowable = SHRT_MAX;
-};
-
-template<> struct mat_type_assotiations<CV_32S>
-{
-    typedef int type;
-    static const type min_allowable = (-INT_MAX - 1);
-    static const type max_allowable = INT_MAX;
+    തരനിർവചനം signed short type;
+    സ്ഥിതം സ്ഥിരം type min_allowable = SHRT_MIN;
+    സ്ഥിതം സ്ഥിരം type max_allowable = SHRT_MAX;
 };
 
-template<int depth>
-static bool checkIntegerRange(cv::Mat src, Point& bad_pt, int minVal, int maxVal)
+template<> ഘടന mat_type_assotiations<CV_32S>
 {
-    typedef mat_type_assotiations<depth> type_ass;
+    തരനിർവചനം പൂർണ്ണസംഖ്യ type;
+    സ്ഥിതം സ്ഥിരം type min_allowable = (-INT_MAX - 1);
+    സ്ഥിതം സ്ഥിരം type max_allowable = INT_MAX;
+};
 
-    if (minVal < type_ass::min_allowable && maxVal > type_ass::max_allowable)
+template<പൂർണ്ണസംഖ്യ depth>
+സ്ഥിതം തർക്കം checkIntegerRange(cv::Mat src, Point& bad_pt, പൂർണ്ണസംഖ്യ minVal, പൂർണ്ണസംഖ്യ maxVal)
+{
+    തരനിർവചനം mat_type_assotiations<depth> type_ass;
+
+    എങ്കിൽ (minVal < type_ass::min_allowable && maxVal > type_ass::max_allowable)
     {
-        return true;
+        തിരികെ സത്യം;
     }
-    else if (minVal > type_ass::max_allowable || maxVal < type_ass::min_allowable || maxVal < minVal)
+    അല്ലെങ്കിൽ എങ്കിൽ (minVal > type_ass::max_allowable || maxVal < type_ass::min_allowable || maxVal < minVal)
     {
         bad_pt = cv::Point(0,0);
-        return false;
+        തിരികെ അസത്യം;
     }
     cv::Mat as_one_channel = src.reshape(1,0);
 
-    for (int j = 0; j < as_one_channel.rows; ++j)
-        for (int i = 0; i < as_one_channel.cols; ++i)
+    വേണ്ടി (പൂർണ്ണസംഖ്യ j = 0; j < as_one_channel.rows; ++j)
+        വേണ്ടി (പൂർണ്ണസംഖ്യ i = 0; i < as_one_channel.cols; ++i)
         {
             typename type_ass::type v = as_one_channel.at<typename type_ass::type>(j ,i);
-            if (v < minVal || v > maxVal)
+            എങ്കിൽ (v < minVal || v > maxVal)
             {
                 bad_pt.y = j;
                 bad_pt.x = i / src.channels();
-                return false;
+                തിരികെ അസത്യം;
             }
         }
 
-    return true;
+    തിരികെ സത്യം;
 }
 
-typedef bool (*check_range_function)(cv::Mat src, Point& bad_pt, int minVal, int maxVal);
+തരനിർവചനം തർക്കം (*check_range_function)(cv::Mat src, Point& bad_pt, പൂർണ്ണസംഖ്യ minVal, പൂർണ്ണസംഖ്യ maxVal);
 
 check_range_function check_range_functions[] =
 {
@@ -1169,112 +1169,112 @@ check_range_function check_range_functions[] =
 };
 
 template<typename T>
-static void checkTypedRange(Mat& src, Point& badPt, double minVal, double maxVal)
+സ്ഥിതം ശൂന്യം checkTypedRange(Mat& src, Point& badPt, ഇരട്ട minVal, ഇരട്ട maxVal)
 {
-    int loc = 0;
-    int cn = src.channels();
+    പൂർണ്ണസംഖ്യ loc = 0;
+    പൂർണ്ണസംഖ്യ cn = src.channels();
     Size size = getContinuousSize2D(src, cn);
-    const T* isrc = src.ptr<T>();
-    size_t step = src.step / sizeof(isrc[0]);
+    സ്ഥിരം T* isrc = src.ptr<T>();
+    size_t step = src.step / വലുപ്പം(isrc[0]);
 
-    for( ; badPt.x < 0 && size.height--; loc += size.width, isrc += step )
+    വേണ്ടി( ; badPt.x < 0 && size.height--; loc += size.width, isrc += step )
     {
-        for( int i = 0; i < size.width; i++ )
+        വേണ്ടി( പൂർണ്ണസംഖ്യ i = 0; i < size.width; i++ )
         {
-            double val = (double)isrc[i];
-            if( !(val >= minVal && val < maxVal) )
+            ഇരട്ട val = (ഇരട്ട)isrc[i];
+            എങ്കിൽ( !(val >= minVal && val < maxVal) )
             {
-                int pixelId = (loc + i) / cn;
+                പൂർണ്ണസംഖ്യ pixelId = (loc + i) / cn;
                 badPt = Point(pixelId % src.cols, pixelId / src.cols);
-                break;
+                നിർത്തുക;
             }
         }
     }
 }
 
-bool checkRange(InputArray _src, bool quiet, Point* pt, double minVal, double maxVal)
+തർക്കം checkRange(നിവേശം_Array _src, തർക്കം quiet, Point* pt, ഇരട്ട minVal, ഇരട്ട maxVal)
 {
     CV_INSTRUMENT_REGION();
 
     Mat src = _src.getMat();
 
-    if ( src.dims > 2 )
+    എങ്കിൽ ( src.dims > 2 )
     {
-        CV_Assert(pt == NULL); // no way to provide location info
+        CV_Assert(pt == ശൂന്യ); // no way to provide location info
 
-        const Mat* arrays[] = {&src, 0};
+        സ്ഥിരം Mat* arrays[] = {&src, 0};
         Mat planes[1];
         NAryMatIterator it(arrays, planes);
 
-        for ( size_t i = 0; i < it.nplanes; i++, ++it )
+        വേണ്ടി ( size_t i = 0; i < it.nplanes; i++, ++it )
         {
-            if (!checkRange( it.planes[0], quiet, NULL, minVal, maxVal ))
+            എങ്കിൽ (!checkRange( it.planes[0], quiet, ശൂന്യ, minVal, maxVal ))
             {
-                return false;
+                തിരികെ അസത്യം;
             }
         }
-        return true;
+        തിരികെ സത്യം;
     }
 
-    int depth = src.depth();
+    പൂർണ്ണസംഖ്യ depth = src.depth();
     Point badPt(-1, -1);
 
-    if (depth < CV_32F)
+    എങ്കിൽ (depth < CV_32F)
     {
-        int minVali = minVal <= INT_MIN ? INT_MIN : cvFloor(minVal);
-        int maxVali = maxVal > INT_MAX ? INT_MAX : cvCeil(maxVal) - 1;
+        പൂർണ്ണസംഖ്യ minVali = minVal <= INT_MIN ? INT_MIN : cvFloor(minVal);
+        പൂർണ്ണസംഖ്യ maxVali = maxVal > INT_MAX ? INT_MAX : cvCeil(maxVal) - 1;
 
         (check_range_functions[depth])(src, badPt, minVali, maxVali);
     }
-    else
+    അല്ലെങ്കിൽ
     {
-        int i, loc = 0;
-        int cn = src.channels();
+        പൂർണ്ണസംഖ്യ i, loc = 0;
+        പൂർണ്ണസംഖ്യ cn = src.channels();
         Size size = getContinuousSize2D(src, cn);
 
-        if( depth == CV_16F )
+        എങ്കിൽ( depth == CV_16F )
         {
             checkTypedRange<hfloat>(src, badPt, minVal, maxVal);
         }
-        else if( depth == CV_16BF )
+        അല്ലെങ്കിൽ എങ്കിൽ( depth == CV_16BF )
         {
             checkTypedRange<bfloat>(src, badPt, minVal, maxVal);
         }
-        else if( depth == CV_32F )
+        അല്ലെങ്കിൽ എങ്കിൽ( depth == CV_32F )
         {
             Cv32suf a, b;
-            int ia, ib;
-            const int* isrc = src.ptr<int>();
-            size_t step = src.step/sizeof(isrc[0]);
+            പൂർണ്ണസംഖ്യ ia, ib;
+            സ്ഥിരം പൂർണ്ണസംഖ്യ* isrc = src.ptr<പൂർണ്ണസംഖ്യ>();
+            size_t step = src.step/വലുപ്പം(isrc[0]);
 
-            a.f = (float)std::max(minVal, (double)-FLT_MAX);
-            b.f = (float)std::min(maxVal, (double)FLT_MAX);
+            a.f = (ദശാംശം)std::max(minVal, (ഇരട്ട)-FLT_MAX);
+            b.f = (ദശാംശം)std::min(maxVal, (ഇരട്ട)FLT_MAX);
 
             ia = CV_TOGGLE_FLT(a.i);
             ib = CV_TOGGLE_FLT(b.i);
 
-            for( ; badPt.x < 0 && size.height--; loc += size.width, isrc += step )
+            വേണ്ടി( ; badPt.x < 0 && size.height--; loc += size.width, isrc += step )
             {
-                for( i = 0; i < size.width; i++ )
+                വേണ്ടി( i = 0; i < size.width; i++ )
                 {
-                    int val = isrc[i];
+                    പൂർണ്ണസംഖ്യ val = isrc[i];
                     val = CV_TOGGLE_FLT(val);
 
-                    if( val < ia || val >= ib )
+                    എങ്കിൽ( val < ia || val >= ib )
                     {
-                        int pixelId = (loc + i) / cn;
+                        പൂർണ്ണസംഖ്യ pixelId = (loc + i) / cn;
                         badPt = Point(pixelId % src.cols, pixelId / src.cols);
-                        break;
+                        നിർത്തുക;
                     }
                 }
             }
         }
-        else if( depth == CV_64F )
+        അല്ലെങ്കിൽ എങ്കിൽ( depth == CV_64F )
         {
             Cv64suf a, b;
             int64 ia, ib;
-            const int64* isrc = src.ptr<int64>();
-            size_t step = src.step/sizeof(isrc[0]);
+            സ്ഥിരം int64* isrc = src.ptr<int64>();
+            size_t step = src.step/വലുപ്പം(isrc[0]);
 
             a.f = minVal;
             b.f = maxVal;
@@ -1282,58 +1282,58 @@ bool checkRange(InputArray _src, bool quiet, Point* pt, double minVal, double ma
             ia = CV_TOGGLE_DBL(a.i);
             ib = CV_TOGGLE_DBL(b.i);
 
-            for( ; badPt.x < 0 && size.height--; loc += size.width, isrc += step )
+            വേണ്ടി( ; badPt.x < 0 && size.height--; loc += size.width, isrc += step )
             {
-                for( i = 0; i < size.width; i++ )
+                വേണ്ടി( i = 0; i < size.width; i++ )
                 {
                     int64 val = isrc[i];
                     val = CV_TOGGLE_DBL(val);
 
-                    if( val < ia || val >= ib )
+                    എങ്കിൽ( val < ia || val >= ib )
                     {
-                        int pixelId = (loc + i) / cn;
+                        പൂർണ്ണസംഖ്യ pixelId = (loc + i) / cn;
                         badPt = Point(pixelId % src.cols, pixelId / src.cols);
-                        break;
+                        നിർത്തുക;
                     }
                 }
             }
         }
-        else if( depth == CV_Bool )
+        അല്ലെങ്കിൽ എങ്കിൽ( depth == CV_Bool )
         {
             checkTypedRange<uchar>(src, badPt, minVal, maxVal);
         }
-        else if( depth == CV_32U )
+        അല്ലെങ്കിൽ എങ്കിൽ( depth == CV_32U )
         {
             checkTypedRange<uint32_t>(src, badPt, minVal, maxVal);
         }
-        else if( depth == CV_64U )
+        അല്ലെങ്കിൽ എങ്കിൽ( depth == CV_64U )
         {
             checkTypedRange<uint64_t>(src, badPt, minVal, maxVal);
         }
-        else if( depth == CV_64S )
+        അല്ലെങ്കിൽ എങ്കിൽ( depth == CV_64S )
         {
             checkTypedRange<int64_t>(src, badPt, minVal, maxVal);
         }
-        else
+        അല്ലെങ്കിൽ
         {
             CV_Error(Error::StsUnsupportedFormat, "Unsupported matrix depth in checkRange");
         }
     }
 
-    if( badPt.x >= 0 )
+    എങ്കിൽ( badPt.x >= 0 )
     {
-        if( pt )
+        എങ്കിൽ( pt )
             *pt = badPt;
-        if( !quiet )
+        എങ്കിൽ( !quiet )
         {
-            cv::String value_str;
-            value_str << src(cv::Range(badPt.y, badPt.y + 1), cv::Range(badPt.x, badPt.x + 1));
+            cv::String മൂല്യം_str;
+            മൂല്യം_str << src(cv::Range(badPt.y, badPt.y + 1), cv::Range(badPt.x, badPt.x + 1));
             CV_Error_( cv::Error::StsOutOfRange,
-            ("the value at (%d, %d)=%s is out of range [%f, %f)", badPt.x, badPt.y, value_str.c_str(), minVal, maxVal));
+            ("the value at (%d, %d)=%s is out of range [%f, %f)", badPt.x, badPt.y, മൂല്യം_str.c_str(), minVal, maxVal));
         }
-        return false;
+        തിരികെ അസത്യം;
     }
-    return true;
+    തിരികെ സത്യം;
 }
 
 } // namespace cv
@@ -1362,13 +1362,13 @@ bool checkRange(InputArray _src, bool quiet, Point* pt, double minVal, double ma
   -----------------------------------------------------------------------
 */
 
-int cv::solveCubic( InputArray _coeffs, OutputArray _roots )
+പൂർണ്ണസംഖ്യ cv::solveCubic( നിവേശം_Array _coeffs, OutputArray _roots )
 {
     CV_INSTRUMENT_REGION();
 
-    const int n0 = 3;
+    സ്ഥിരം പൂർണ്ണസംഖ്യ n0 = 3;
     Mat coeffs = _coeffs.getMat();
-    int ctype = coeffs.type();
+    പൂർണ്ണസംഖ്യ ctype = coeffs.type();
 
     CV_Assert( ctype == CV_32F || ctype == CV_64F );
     CV_Assert( (coeffs.size() == Size(n0, 1) ||
@@ -1376,70 +1376,70 @@ int cv::solveCubic( InputArray _coeffs, OutputArray _roots )
                 coeffs.size() == Size(1, n0) ||
                 coeffs.size() == Size(1, n0+1)) );
 
-    _roots.create(n0, 1, ctype, -1, true, _OutputArray::DEPTH_MASK_FLT);
+    _roots.create(n0, 1, ctype, -1, സത്യം, _OutputArray::DEPTH_MASK_FLT);
     Mat roots = _roots.getMat();
 
-    int i = -1, n = 0;
-    double a0 = 1., a1, a2, a3;
-    double x0 = 0., x1 = 0., x2 = 0.;
-    int ncoeffs = coeffs.rows + coeffs.cols - 1;
+    പൂർണ്ണസംഖ്യ i = -1, n = 0;
+    ഇരട്ട a0 = 1., a1, a2, a3;
+    ഇരട്ട x0 = 0., x1 = 0., x2 = 0.;
+    പൂർണ്ണസംഖ്യ ncoeffs = coeffs.rows + coeffs.cols - 1;
 
-    if( ctype == CV_32FC1 )
+    എങ്കിൽ( ctype == CV_32FC1 )
     {
-        if( ncoeffs == 4 )
-            a0 = coeffs.at<float>(++i);
+        എങ്കിൽ( ncoeffs == 4 )
+            a0 = coeffs.at<ദശാംശം>(++i);
 
-        a1 = coeffs.at<float>(i+1);
-        a2 = coeffs.at<float>(i+2);
-        a3 = coeffs.at<float>(i+3);
+        a1 = coeffs.at<ദശാംശം>(i+1);
+        a2 = coeffs.at<ദശാംശം>(i+2);
+        a3 = coeffs.at<ദശാംശം>(i+3);
     }
-    else
+    അല്ലെങ്കിൽ
     {
-        if( ncoeffs == 4 )
-            a0 = coeffs.at<double>(++i);
+        എങ്കിൽ( ncoeffs == 4 )
+            a0 = coeffs.at<ഇരട്ട>(++i);
 
-        a1 = coeffs.at<double>(i+1);
-        a2 = coeffs.at<double>(i+2);
-        a3 = coeffs.at<double>(i+3);
+        a1 = coeffs.at<ഇരട്ട>(i+1);
+        a2 = coeffs.at<ഇരട്ട>(i+2);
+        a3 = coeffs.at<ഇരട്ട>(i+3);
     }
 
     // Fix for Issue #27748: Normalize coefficients to avoid overflow/underflow
     // and correctly detect negligible cubic terms.
-    double max_coeff = std::max({std::abs(a0), std::abs(a1), std::abs(a2), std::abs(a3)});
+    ഇരട്ട max_coeff = std::max({std::abs(a0), std::abs(a1), std::abs(a2), std::abs(a3)});
 
     // If max_coeff is effectively zero, the equation is 0=0
-    if (max_coeff < std::numeric_limits<double>::epsilon())
-        return -1;
+    എങ്കിൽ (max_coeff < std::numeric_limits<ഇരട്ട>::epsilon())
+        തിരികെ -1;
 
     // Check if the cubic term is negligible relative to the largest coefficient
-    if( std::abs(a0) < std::numeric_limits<double>::epsilon() * max_coeff )
+    എങ്കിൽ( std::abs(a0) < std::numeric_limits<ഇരട്ട>::epsilon() * max_coeff )
     {
-        if( std::abs(a1) < std::numeric_limits<double>::epsilon() * max_coeff )
+        എങ്കിൽ( std::abs(a1) < std::numeric_limits<ഇരട്ട>::epsilon() * max_coeff )
         {
-            if( std::abs(a2) < std::numeric_limits<double>::epsilon() * max_coeff )
-                n = std::abs(a3) < std::numeric_limits<double>::epsilon() * max_coeff ? -1 : 0;
-            else
+            എങ്കിൽ( std::abs(a2) < std::numeric_limits<ഇരട്ട>::epsilon() * max_coeff )
+                n = std::abs(a3) < std::numeric_limits<ഇരട്ട>::epsilon() * max_coeff ? -1 : 0;
+            അല്ലെങ്കിൽ
             {
                 // linear equation
                 x0 = -a3/a2;
                 n = 1;
             }
         }
-        else
+        അല്ലെങ്കിൽ
         {
             // quadratic equation
-            double d = a2*a2 - 4*a1*a3;
-            if( d >= 0 )
+            ഇരട്ട d = a2*a2 - 4*a1*a3;
+            എങ്കിൽ( d >= 0 )
             {
                 d = std::sqrt(d);
-                double q1 = (-a2 + d) * 0.5;
-                double q2 = (a2 + d) * -0.5;
-                if( std::abs(q1) > std::abs(q2) )
+                ഇരട്ട q1 = (-a2 + d) * 0.5;
+                ഇരട്ട q2 = (a2 + d) * -0.5;
+                എങ്കിൽ( std::abs(q1) > std::abs(q2) )
                 {
                     x0 = q1 / a1;
                     x1 = a3 / q1;
                 }
-                else
+                അല്ലെങ്കിൽ
                 {
                     x0 = q2 / a1;
                     x1 = a3 / q2;
@@ -1448,11 +1448,11 @@ int cv::solveCubic( InputArray _coeffs, OutputArray _roots )
             }
         }
     }
-    else
+    അല്ലെങ്കിൽ
     {
         // cubic equation
         // Normalize coefficients in-place to prevent overflow/instability
-        double scale = 1.0 / max_coeff;
+        ഇരട്ട scale = 1.0 / max_coeff;
         a0 *= scale;
         a1 *= scale;
         a2 *= scale;
@@ -1463,9 +1463,9 @@ int cv::solveCubic( InputArray _coeffs, OutputArray _roots )
         a2 *= a0;
         a3 *= a0;
 
-        double Q = (a1 * a1 - 3 * a2) * (1./9);
-        double R = (a1 * (2 * a1 * a1 - 9 * a2) + 27 * a3) * (1./54);
-        double Qcubed = Q * Q * Q;
+        ഇരട്ട Q = (a1 * a1 - 3 * a2) * (1./9);
+        ഇരട്ട R = (a1 * (2 * a1 * a1 - 9 * a2) + 27 * a3) * (1./54);
+        ഇരട്ട Qcubed = Q * Q * Q;
 
         /*
           Here we expand expression `Qcubed - R * R` for `d` variable
@@ -1474,21 +1474,21 @@ int cv::solveCubic( InputArray _coeffs, OutputArray _roots )
 
           And then we additionally group terms to further reduce rounding error.
         */
-        double d = (a1 * a1 * (a2 * a2 - 4 * a1 * a3) + 2 * a2 * (9 * a1 * a3 - 2 * a2 * a2) - 27 * a3 * a3) * (1./108);
+        ഇരട്ട d = (a1 * a1 * (a2 * a2 - 4 * a1 * a3) + 2 * a2 * (9 * a1 * a3 - 2 * a2 * a2) - 27 * a3 * a3) * (1./108);
 
-        if( d > 0 )
+        എങ്കിൽ( d > 0 )
         {
-            double theta = acos(R / sqrt(Qcubed));
-            double sqrtQ = sqrt(Q);
-            double t0 = -2 * sqrtQ;
-            double t1 = theta * (1./3);
-            double t2 = a1 * (1./3);
+            ഇരട്ട theta = acos(R / sqrt(Qcubed));
+            ഇരട്ട sqrtQ = sqrt(Q);
+            ഇരട്ട t0 = -2 * sqrtQ;
+            ഇരട്ട t1 = theta * (1./3);
+            ഇരട്ട t2 = a1 * (1./3);
             x0 = t0 * cos(t1) - t2;
             x1 = t0 * cos(t1 + (2.*CV_PI/3)) - t2;
             x2 = t0 * cos(t1 + (4.*CV_PI/3)) - t2;
             n = 3;
         }
-        else if( d == 0 )
+        അല്ലെങ്കിൽ എങ്കിൽ( d == 0 )
         {
             x0 = -2*std::cbrt(R) - a1/3;
             x1 = std::cbrt(R) - a1/3;
@@ -1496,71 +1496,71 @@ int cv::solveCubic( InputArray _coeffs, OutputArray _roots )
             n = x0 == x1 ? 1 : 2;
             x1 = x0 == x1 ? 0 : x1;
         }
-        else
+        അല്ലെങ്കിൽ
         {
-            double e;
+            ഇരട്ട e;
             d = sqrt(-d);
             e = std::cbrt(d + fabs(R));
-            if( R > 0 )
+            എങ്കിൽ( R > 0 )
                 e = -e;
             x0 = (e + Q / e) - a1 * (1./3);
             n = 1;
         }
     }
 
-    if( roots.type() == CV_32FC1 )
+    എങ്കിൽ( roots.type() == CV_32FC1 )
     {
-        roots.at<float>(0) = (float)x0;
-        roots.at<float>(1) = (float)x1;
-        roots.at<float>(2) = (float)x2;
+        roots.at<ദശാംശം>(0) = (ദശാംശം)x0;
+        roots.at<ദശാംശം>(1) = (ദശാംശം)x1;
+        roots.at<ദശാംശം>(2) = (ദശാംശം)x2;
     }
-    else
+    അല്ലെങ്കിൽ
     {
-        roots.at<double>(0) = x0;
-        roots.at<double>(1) = x1;
-        roots.at<double>(2) = x2;
+        roots.at<ഇരട്ട>(0) = x0;
+        roots.at<ഇരട്ട>(1) = x1;
+        roots.at<ഇരട്ട>(2) = x2;
     }
 
-    return n;
+    തിരികെ n;
 }
 
 /* finds complex roots of a polynomial using Durand-Kerner method:
    http://en.wikipedia.org/wiki/Durand%E2%80%93Kerner_method */
-double cv::solvePoly( InputArray _coeffs0, OutputArray _roots0, int maxIters )
+ഇരട്ട cv::solvePoly( നിവേശം_Array _coeffs0, OutputArray _roots0, പൂർണ്ണസംഖ്യ maxIters )
 {
     CV_INSTRUMENT_REGION();
 
-    typedef Complex<double> C;
+    തരനിർവചനം Complex<ഇരട്ട> C;
 
-    double maxDiff = 0;
-    int iter, i, j;
+    ഇരട്ട maxDiff = 0;
+    പൂർണ്ണസംഖ്യ iter, i, j;
     Mat coeffs0 = _coeffs0.getMat();
-    int ctype = _coeffs0.type();
-    int cdepth = CV_MAT_DEPTH(ctype);
+    പൂർണ്ണസംഖ്യ ctype = _coeffs0.type();
+    പൂർണ്ണസംഖ്യ cdepth = CV_MAT_DEPTH(ctype);
 
     CV_Assert( CV_MAT_DEPTH(ctype) >= CV_32F && CV_MAT_CN(ctype) <= 2 );
     CV_Assert( (coeffs0.rows == 1 || coeffs0.cols == 1) && coeffs0.total() >= 2 );
 
-    int n0 = coeffs0.cols + coeffs0.rows - 2, n = n0;
+    പൂർണ്ണസംഖ്യ n0 = coeffs0.cols + coeffs0.rows - 2, n = n0;
 
-    _roots0.create(n, 1, CV_MAKETYPE(cdepth, 2), -1, true, _OutputArray::DEPTH_MASK_FLT);
+    _roots0.create(n, 1, CV_MAKETYPE(cdepth, 2), -1, സത്യം, _OutputArray::DEPTH_MASK_FLT);
     Mat roots0 = _roots0.getMat();
 
     AutoBuffer<C> buf(n*2+2);
     C *coeffs = buf.data(), *roots = coeffs + n + 1;
     Mat coeffs1(coeffs0.size(), CV_MAKETYPE(CV_64F, coeffs0.channels()), coeffs0.channels() == 2 ? coeffs : roots);
     coeffs0.convertTo(coeffs1, coeffs1.type());
-    if( coeffs0.channels() == 1 )
+    എങ്കിൽ( coeffs0.channels() == 1 )
     {
-        const double* rcoeffs = (const double*)roots;
-        for( i = 0; i <= n; i++ )
+        സ്ഥിരം ഇരട്ട* rcoeffs = (സ്ഥിരം ഇരട്ട*)roots;
+        വേണ്ടി( i = 0; i <= n; i++ )
             coeffs[i] = C(rcoeffs[i], 0);
     }
 
-    for( ; n > 1; n-- )
+    വേണ്ടി( ; n > 1; n-- )
     {
-        if( std::abs(coeffs[n].re) + std::abs(coeffs[n].im) > DBL_EPSILON )
-            break;
+        എങ്കിൽ( std::abs(coeffs[n].re) + std::abs(coeffs[n].im) > DBL_EPSILON )
+            നിർത്തുക;
     }
     CV_Assert( std::abs(coeffs[n].re) + std::abs(coeffs[n].im) > DBL_EPSILON );
 
@@ -1569,116 +1569,116 @@ double cv::solvePoly( InputArray _coeffs0, OutputArray _roots0, int maxIters )
     // https://link.springer.com/article/10.1007/BF01935059
     // We put the initial points equidistantly on a circle on the complex plane. This code computes the circle radius as in the paper.
     Mat absCoeffs(n + 1, 1, CV_64F);
-    for( i = 0; i <= n; i++ )
-        absCoeffs.at<double>(i) = abs(coeffs[i]);
+    വേണ്ടി( i = 0; i <= n; i++ )
+        absCoeffs.at<ഇരട്ട>(i) = abs(coeffs[i]);
 
-    int nonZeroCoeffs = 0;
+    പൂർണ്ണസംഖ്യ nonZeroCoeffs = 0;
     Mat u(n, 1, CV_64F, Scalar(0)), v(n, 1, CV_64F, Scalar(0));
-    for( i = 0; i <= n; i++ )
+    വേണ്ടി( i = 0; i <= n; i++ )
     {
-        double coeff = absCoeffs.at<double>(i);
-        if( coeff > DBL_EPSILON )
+        ഇരട്ട coeff = absCoeffs.at<ഇരട്ട>(i);
+        എങ്കിൽ( coeff > DBL_EPSILON )
         {
-            if( i != n )
-                u.at<double>(i) = 2.0 * pow(coeff / absCoeffs.at<double>(n), 1.0 / (n - i));
-            if( i != 0 )
-                v.at<double>(i - 1) = 0.5 * pow(absCoeffs.at<double>(0) / coeff, 1.0 / i);
+            എങ്കിൽ( i != n )
+                u.at<ഇരട്ട>(i) = 2.0 * pow(coeff / absCoeffs.at<ഇരട്ട>(n), 1.0 / (n - i));
+            എങ്കിൽ( i != 0 )
+                v.at<ഇരട്ട>(i - 1) = 0.5 * pow(absCoeffs.at<ഇരട്ട>(0) / coeff, 1.0 / i);
             nonZeroCoeffs++;
         }
     }
-    double scale = 1;
-    if( nonZeroCoeffs > 2 )
+    ഇരട്ട scale = 1;
+    എങ്കിൽ( nonZeroCoeffs > 2 )
     {
         Point maxU, minV;
         minMaxLoc(u, nullptr, nullptr, nullptr, &maxU);
         minMaxLoc(v, nullptr, nullptr, &minV);
-        u.at<double>(maxU) = 0;
-        v.at<double>(minV) = 0;
+        u.at<ഇരട്ട>(maxU) = 0;
+        v.at<ഇരട്ട>(minV) = 0;
         scale = (sum(u).val[0] + sum(v).val[0]) / (2 * nonZeroCoeffs - 2);
     }
 
     C p(scale, 0), r(cos(CV_2PI / n), sin(CV_2PI / n));
 
-    for( i = 0; i < n; i++ )
+    വേണ്ടി( i = 0; i < n; i++ )
     {
         roots[i] = p;
         p = p * r;
     }
 
     maxIters = maxIters <= 0 ? 1000 : maxIters;
-    for( iter = 0; iter < maxIters; iter++ )
+    വേണ്ടി( iter = 0; iter < maxIters; iter++ )
     {
         maxDiff = 0;
-        for( i = 0; i < n; i++ )
+        വേണ്ടി( i = 0; i < n; i++ )
         {
             p = roots[i];
             C num = coeffs[n], denom = coeffs[n];
-            int num_same_root = 1;
-            for( j = 0; j < n; j++ )
+            പൂർണ്ണസംഖ്യ അക്കം_same_വേര് = 1;
+            വേണ്ടി( j = 0; j < n; j++ )
             {
                 num = num*p + coeffs[n-j-1];
-                if( j != i )
+                എങ്കിൽ( j != i )
                 {
-                    if ( (p - roots[j]).re != 0 || (p - roots[j]).im != 0 )
+                    എങ്കിൽ ( (p - roots[j]).re != 0 || (p - roots[j]).im != 0 )
                         denom = denom * (p - roots[j]);
-                    else
-                        num_same_root++;
+                    അല്ലെങ്കിൽ
+                        അക്കം_same_വേര്++;
                 }
             }
             num /= denom;
-            if( num_same_root > 1)
+            എങ്കിൽ( അക്കം_same_വേര് > 1)
             {
-                double old_num_re = num.re;
-                double old_num_im = num.im;
-                int square_root_times = num_same_root % 2 == 0 ? num_same_root / 2 : num_same_root / 2 - 1;
+                ഇരട്ട old_അക്കം_re = num.re;
+                ഇരട്ട old_അക്കം_im = num.im;
+                പൂർണ്ണസംഖ്യ square_വേര്_times = അക്കം_same_വേര് % 2 == 0 ? അക്കം_same_വേര് / 2 : അക്കം_same_വേര് / 2 - 1;
 
-                for( j = 0; j < square_root_times; j++)
+                വേണ്ടി( j = 0; j < square_വേര്_times; j++)
                 {
-                    num.re = old_num_re*old_num_re + old_num_im*old_num_im;
+                    num.re = old_അക്കം_re*old_അക്കം_re + old_അക്കം_im*old_അക്കം_im;
                     num.re = sqrt(num.re);
-                    num.re += old_num_re;
-                    num.im = num.re - old_num_re;
+                    num.re += old_അക്കം_re;
+                    num.im = num.re - old_അക്കം_re;
                     num.re /= 2;
                     num.re = sqrt(num.re);
 
                     num.im /= 2;
                     num.im = sqrt(num.im);
-                    if( old_num_re < 0 ) num.im = -num.im;
+                    എങ്കിൽ( old_അക്കം_re < 0 ) num.im = -num.im;
                 }
 
-                if( num_same_root % 2 != 0){
+                എങ്കിൽ( അക്കം_same_വേര് % 2 != 0){
                     Mat cube_coefs(4, 1, CV_64FC1);
                     Mat cube_roots(3, 1, CV_64FC2);
-                    cube_coefs.at<double>(3) = -(std::pow(old_num_re, 3));
-                    cube_coefs.at<double>(2) = -(15*std::pow(old_num_re, 2) + 27*std::pow(old_num_im, 2));
-                    cube_coefs.at<double>(1) = -48*old_num_re;
-                    cube_coefs.at<double>(0) = 64;
+                    cube_coefs.at<ഇരട്ട>(3) = -(std::pow(old_അക്കം_re, 3));
+                    cube_coefs.at<ഇരട്ട>(2) = -(15*std::pow(old_അക്കം_re, 2) + 27*std::pow(old_അക്കം_im, 2));
+                    cube_coefs.at<ഇരട്ട>(1) = -48*old_അക്കം_re;
+                    cube_coefs.at<ഇരട്ട>(0) = 64;
                     solveCubic(cube_coefs, cube_roots);
 
-                    num.re = std::cbrt(cube_roots.at<double>(0));
-                    num.im = sqrt(std::pow(num.re, 2) / 3 - old_num_re / (3*num.re));
+                    num.re = std::cbrt(cube_roots.at<ഇരട്ട>(0));
+                    num.im = sqrt(std::pow(num.re, 2) / 3 - old_അക്കം_re / (3*num.re));
                 }
             }
             roots[i] = p - num;
             maxDiff = std::max(maxDiff, cv::abs(num));
         }
-        if( maxDiff <= 0 )
-            break;
+        എങ്കിൽ( maxDiff <= 0 )
+            നിർത്തുക;
     }
 
-    if( coeffs0.channels() == 1 )
+    എങ്കിൽ( coeffs0.channels() == 1 )
     {
-        const double verySmallEps = 1e-100;
-        for( i = 0; i < n; i++ )
-            if( fabs(roots[i].im) < verySmallEps )
+        സ്ഥിരം ഇരട്ട verySmallEps = 1e-100;
+        വേണ്ടി( i = 0; i < n; i++ )
+            എങ്കിൽ( fabs(roots[i].im) < verySmallEps )
                 roots[i].im = 0;
     }
 
-    for( ; n < n0; n++ )
+    വേണ്ടി( ; n < n0; n++ )
         roots[n+1] = roots[n];
 
     Mat(roots0.size(), CV_64FC2, roots).convertTo(roots0, roots0.type());
-    return maxDiff;
+    തിരികെ maxDiff;
 }
 
 

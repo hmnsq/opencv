@@ -2,147 +2,147 @@
 // It is subject to the license terms in the LICENSE file found in the top-level directory
 // of this distribution and at http://opencv.org/license.html.
 
-#include "precomp.hpp"
-#include "opencv2/core/async.hpp"
-#include "opencv2/core/detail/async_promise.hpp"
+#അന്തര്ഭാവ "precomp.hpp"
+#അന്തര്ഭാവ "opencv2/core/async.hpp"
+#അന്തര്ഭാവ "opencv2/core/detail/async_promise.hpp"
 
-#include "opencv2/core/cvstd.hpp"
+#അന്തര്ഭാവ "opencv2/core/cvstd.hpp"
 
-#include <opencv2/core/utils/logger.defines.hpp>
+#അന്തര്ഭാവ <opencv2/core/utils/logger.defines.hpp>
 #undef CV_LOG_STRIP_LEVEL
 #define CV_LOG_STRIP_LEVEL CV_LOG_LEVEL_DEBUG + 1
-#include <opencv2/core/utils/logger.hpp>
+#അന്തര്ഭാവ <opencv2/core/utils/logger.hpp>
 
 #ifndef OPENCV_DISABLE_THREAD_SUPPORT
 
-#include <mutex>
-#include <condition_variable>
-#include <chrono>
+#അന്തര്ഭാവ <mutex>
+#അന്തര്ഭാവ <condition_variable>
+#അന്തര്ഭാവ <chrono>
 
-namespace cv {
+നാമാകാശ cv {
 
 /**
 Manages shared state of asynchronous result
 */
-struct AsyncArray::Impl
+ഘടന AsyncArray::Impl
 {
-    int refcount;
-    void addrefFuture() CV_NOEXCEPT { CV_XADD(&refcount_future, 1); CV_XADD(&refcount, 1); } \
-    void releaseFuture() CV_NOEXCEPT { CV_XADD(&refcount_future, -1); if(1 == CV_XADD(&refcount, -1)) delete this; } \
-    int refcount_future;
-    void addrefPromise() CV_NOEXCEPT { CV_XADD(&refcount_promise, 1); CV_XADD(&refcount, 1); } \
-    void releasePromise() CV_NOEXCEPT { CV_XADD(&refcount_promise, -1); if(1 == CV_XADD(&refcount, -1)) delete this; } \
-    int refcount_promise;
+    പൂർണ്ണസംഖ്യ refcount;
+    ശൂന്യം addrefFuture() CV_NOEXCEPT { CV_XADD(&refcount_future, 1); CV_XADD(&refcount, 1); } \
+    ശൂന്യം releaseFuture() CV_NOEXCEPT { CV_XADD(&refcount_future, -1); എങ്കിൽ(1 == CV_XADD(&refcount, -1)) delete ഇത്; } \
+    പൂർണ്ണസംഖ്യ refcount_future;
+    ശൂന്യം addrefPromise() CV_NOEXCEPT { CV_XADD(&refcount_promise, 1); CV_XADD(&refcount, 1); } \
+    ശൂന്യം releasePromise() CV_NOEXCEPT { CV_XADD(&refcount_promise, -1); എങ്കിൽ(1 == CV_XADD(&refcount, -1)) delete ഇത്; } \
+    പൂർണ്ണസംഖ്യ refcount_promise;
 
     mutable std::mutex mtx;
     mutable std::condition_variable cond_var;
 
-    mutable bool has_result; // Mat, UMat or exception
+    mutable തർക്കം has_result; // Mat, UMat or exception
 
     mutable cv::Ptr<Mat> result_mat;
     mutable cv::Ptr<UMat> result_umat;
 
 
-    bool has_exception;
-#if CV__EXCEPTION_PTR
+    തർക്കം has_exception;
+#എങ്കിൽ CV__EXCEPTION_PTR
     std::exception_ptr exception;
 #endif
     cv::Exception cv_exception;
 
-    mutable bool result_is_fetched;
+    mutable തർക്കം result_is_fetched;
 
-    bool future_is_returned;
+    തർക്കം future_is_returned;
 
     Impl()
         : refcount(1), refcount_future(0), refcount_promise(1)
-        , has_result(false)
-        , has_exception(false)
-        , result_is_fetched(false)
-        , future_is_returned(false)
+        , has_result(അസത്യം)
+        , has_exception(അസത്യം)
+        , result_is_fetched(അസത്യം)
+        , future_is_returned(അസത്യം)
     {
         // nothing
     }
 
     ~Impl()
     {
-        if (has_result && !result_is_fetched)
+        എങ്കിൽ (has_result && !result_is_fetched)
         {
-            CV_LOG_INFO(NULL, "Asynchronous result has not been fetched");
+            CV_LOG_INFO(ശൂന്യ, "Asynchronous result has not been fetched");
         }
     }
 
-    bool get(OutputArray dst, int64 timeoutNs) const
+    തർക്കം get(OutputArray dst, int64 timeoutNs) സ്ഥിരം
     {
         CV_Assert(!result_is_fetched);
-        if (!has_result)
+        എങ്കിൽ (!has_result)
         {
-            if(refcount_promise == 0)
+            എങ്കിൽ(refcount_promise == 0)
                 CV_Error(Error::StsInternal, "Asynchronous result producer has been destroyed");
-            if (!wait_for(timeoutNs))
-                return false;
+            എങ്കിൽ (!wait_for(timeoutNs))
+                തിരികെ അസത്യം;
         }
         std::unique_lock<std::mutex> lock(mtx);
-        if (has_result)
+        എങ്കിൽ (has_result)
         {
-            if (!result_mat.empty())
+            എങ്കിൽ (!result_mat.empty())
             {
                 dst.move(*result_mat.get());
                 result_mat.release();
-                result_is_fetched = true;
-                return true;
+                result_is_fetched = സത്യം;
+                തിരികെ സത്യം;
             }
-            if (!result_umat.empty())
+            എങ്കിൽ (!result_umat.empty())
             {
                 dst.move(*result_umat.get());
                 result_umat.release();
-                result_is_fetched = true;
-                return true;
+                result_is_fetched = സത്യം;
+                തിരികെ സത്യം;
             }
-#if CV__EXCEPTION_PTR
-            if (has_exception && exception)
+#എങ്കിൽ CV__EXCEPTION_PTR
+            എങ്കിൽ (has_exception && exception)
             {
-                result_is_fetched = true;
+                result_is_fetched = സത്യം;
                 std::rethrow_exception(exception);
             }
 #endif
-            if (has_exception)
+            എങ്കിൽ (has_exception)
             {
-                result_is_fetched = true;
-                throw cv_exception;
+                result_is_fetched = സത്യം;
+                എറിയുക cv_exception;
             }
             CV_Error(Error::StsInternal, "AsyncArray: invalid state of 'has_result = true'");
         }
         CV_Assert(!has_result);
         CV_Assert(timeoutNs < 0);
-        return false;
+        തിരികെ അസത്യം;
     }
 
-    bool valid() const CV_NOEXCEPT
+    തർക്കം valid() സ്ഥിരം CV_NOEXCEPT
     {
-        if (result_is_fetched)
-            return false;
-        if (refcount_promise == 0 && !has_result)
-            return false;
-        return true;
+        എങ്കിൽ (result_is_fetched)
+            തിരികെ അസത്യം;
+        എങ്കിൽ (refcount_promise == 0 && !has_result)
+            തിരികെ അസത്യം;
+        തിരികെ സത്യം;
     }
 
-    bool wait_for(int64 timeoutNs) const
+    തർക്കം wait_for(int64 timeoutNs) സ്ഥിരം
     {
         CV_Assert(valid());
-        if (has_result)
-            return has_result;
-        if (timeoutNs == 0)
-            return has_result;
-        CV_LOG_INFO(NULL, "Waiting for async result ...");
+        എങ്കിൽ (has_result)
+            തിരികെ has_result;
+        എങ്കിൽ (timeoutNs == 0)
+            തിരികെ has_result;
+        CV_LOG_INFO(ശൂന്യ, "Waiting for async result ...");
         std::unique_lock<std::mutex> lock(mtx);
-        const auto cond_pred = [&]{ return has_result == true; };
-        if (timeoutNs > 0)
-            return cond_var.wait_for(lock, std::chrono::nanoseconds(timeoutNs), cond_pred);
-        else
+        സ്ഥിരം auto cond_pred = [&]{ തിരികെ has_result == സത്യം; };
+        എങ്കിൽ (timeoutNs > 0)
+            തിരികെ cond_var.wait_for(lock, std::chrono::nanoseconds(timeoutNs), cond_pred);
+        അല്ലെങ്കിൽ
         {
             cond_var.wait(lock, cond_pred);
             CV_Assert(has_result);
-            return true;
+            തിരികെ സത്യം;
         }
     }
 
@@ -151,164 +151,164 @@ struct AsyncArray::Impl
         CV_Assert(refcount_future == 0);
         AsyncArray result;
         addrefFuture();
-        result.p = this;
-        future_is_returned = true;
-        return result;
+        result.p = ഇത്;
+        future_is_returned = സത്യം;
+        തിരികെ result;
     }
 
-    void setValue(InputArray value)
+    ശൂന്യം set_മൂല്യം(നിവേശം_Array value)
     {
-        if (future_is_returned && refcount_future == 0)
+        എങ്കിൽ (future_is_returned && refcount_future == 0)
             CV_Error(Error::StsError, "Associated AsyncArray has been destroyed");
         std::unique_lock<std::mutex> lock(mtx);
         CV_Assert(!has_result);
-        int k = value.kind();
-        if (k == _InputArray::UMAT)
+        പൂർണ്ണസംഖ്യ k = value.kind();
+        എങ്കിൽ (k == നിവേശം_Array_2::UMAT)
         {
             result_umat = makePtr<UMat>();
             value.copyTo(*result_umat.get());
         }
-        else
+        അല്ലെങ്കിൽ
         {
             result_mat = makePtr<Mat>();
             value.copyTo(*result_mat.get());
         }
-        has_result = true;
+        has_result = സത്യം;
         cond_var.notify_all();
     }
 
-#if CV__EXCEPTION_PTR
-    void setException(std::exception_ptr e)
+#എങ്കിൽ CV__EXCEPTION_PTR
+    ശൂന്യം setException(std::exception_ptr e)
     {
-        if (future_is_returned && refcount_future == 0)
+        എങ്കിൽ (future_is_returned && refcount_future == 0)
             CV_Error(Error::StsError, "Associated AsyncArray has been destroyed");
         std::unique_lock<std::mutex> lock(mtx);
         CV_Assert(!has_result);
-        has_exception = true;
+        has_exception = സത്യം;
         exception = e;
-        has_result = true;
+        has_result = സത്യം;
         cond_var.notify_all();
     }
 #endif
 
-    void setException(const cv::Exception e)
+    ശൂന്യം setException(സ്ഥിരം cv::Exception e)
     {
-        if (future_is_returned && refcount_future == 0)
+        എങ്കിൽ (future_is_returned && refcount_future == 0)
             CV_Error(Error::StsError, "Associated AsyncArray has been destroyed");
         std::unique_lock<std::mutex> lock(mtx);
         CV_Assert(!has_result);
-        has_exception = true;
+        has_exception = സത്യം;
         cv_exception = e;
-        has_result = true;
+        has_result = സത്യം;
         cond_var.notify_all();
     }
 };
 
 }  // namespace
 
-#else  // OPENCV_DISABLE_THREAD_SUPPORT
+#അല്ലെങ്കിൽ  // OPENCV_DISABLE_THREAD_SUPPORT
 
-namespace cv {
+നാമാകാശ cv {
 
 // no threading
-struct AsyncArray::Impl
+ഘടന AsyncArray::Impl
 {
-    int refcount;
-    void addrefFuture() CV_NOEXCEPT { refcount_future++; refcount++; }
-    void releaseFuture() CV_NOEXCEPT { refcount_future--; if (0 == --refcount) delete this; }
-    int refcount_future;
-    void addrefPromise() CV_NOEXCEPT { refcount_promise++; refcount++; } \
-    void releasePromise() CV_NOEXCEPT { refcount_promise--; if (0 == --refcount) delete this; }
-    int refcount_promise;
+    പൂർണ്ണസംഖ്യ refcount;
+    ശൂന്യം addrefFuture() CV_NOEXCEPT { refcount_future++; refcount++; }
+    ശൂന്യം releaseFuture() CV_NOEXCEPT { refcount_future--; എങ്കിൽ (0 == --refcount) delete ഇത്; }
+    പൂർണ്ണസംഖ്യ refcount_future;
+    ശൂന്യം addrefPromise() CV_NOEXCEPT { refcount_promise++; refcount++; } \
+    ശൂന്യം releasePromise() CV_NOEXCEPT { refcount_promise--; എങ്കിൽ (0 == --refcount) delete ഇത്; }
+    പൂർണ്ണസംഖ്യ refcount_promise;
 
-    mutable bool has_result; // Mat, UMat or exception
+    mutable തർക്കം has_result; // Mat, UMat or exception
 
     mutable cv::Ptr<Mat> result_mat;
     mutable cv::Ptr<UMat> result_umat;
 
 
-    bool has_exception;
-#if CV__EXCEPTION_PTR
+    തർക്കം has_exception;
+#എങ്കിൽ CV__EXCEPTION_PTR
     std::exception_ptr exception;
 #endif
     cv::Exception cv_exception;
 
-    mutable bool result_is_fetched;
+    mutable തർക്കം result_is_fetched;
 
-    bool future_is_returned;
+    തർക്കം future_is_returned;
 
     Impl()
         : refcount(1), refcount_future(0), refcount_promise(1)
-        , has_result(false)
-        , has_exception(false)
-        , result_is_fetched(false)
-        , future_is_returned(false)
+        , has_result(അസത്യം)
+        , has_exception(അസത്യം)
+        , result_is_fetched(അസത്യം)
+        , future_is_returned(അസത്യം)
     {
         // nothing
     }
 
     ~Impl()
     {
-        if (has_result && !result_is_fetched)
+        എങ്കിൽ (has_result && !result_is_fetched)
         {
-            CV_LOG_INFO(NULL, "Asynchronous result has not been fetched");
+            CV_LOG_INFO(ശൂന്യ, "Asynchronous result has not been fetched");
         }
     }
 
-    bool get(OutputArray dst, int64 timeoutNs) const
+    തർക്കം get(OutputArray dst, int64 timeoutNs) സ്ഥിരം
     {
         CV_Assert(!result_is_fetched);
-        if (!has_result)
+        എങ്കിൽ (!has_result)
         {
             CV_UNUSED(timeoutNs);
             CV_Error(Error::StsError, "Result is not produced (unable to wait for result in OPENCV_DISABLE_THREAD_SUPPORT mode)");
         }
-        if (!result_mat.empty())
+        എങ്കിൽ (!result_mat.empty())
         {
             dst.move(*result_mat.get());
             result_mat.release();
-            result_is_fetched = true;
-            return true;
+            result_is_fetched = സത്യം;
+            തിരികെ സത്യം;
         }
-        if (!result_umat.empty())
+        എങ്കിൽ (!result_umat.empty())
         {
             dst.move(*result_umat.get());
             result_umat.release();
-            result_is_fetched = true;
-            return true;
+            result_is_fetched = സത്യം;
+            തിരികെ സത്യം;
         }
-#if CV__EXCEPTION_PTR
-        if (has_exception && exception)
+#എങ്കിൽ CV__EXCEPTION_PTR
+        എങ്കിൽ (has_exception && exception)
         {
-            result_is_fetched = true;
+            result_is_fetched = സത്യം;
             std::rethrow_exception(exception);
         }
 #endif
-        if (has_exception)
+        എങ്കിൽ (has_exception)
         {
-            result_is_fetched = true;
-            throw cv_exception;
+            result_is_fetched = സത്യം;
+            എറിയുക cv_exception;
         }
         CV_Error(Error::StsInternal, "AsyncArray: invalid state of 'has_result = true'");
-        return false;
+        തിരികെ അസത്യം;
     }
 
-    bool valid() const CV_NOEXCEPT
+    തർക്കം valid() സ്ഥിരം CV_NOEXCEPT
     {
-        if (result_is_fetched)
-            return false;
-        if (refcount_promise == 0 && !has_result)
-            return false;
-        return true;
+        എങ്കിൽ (result_is_fetched)
+            തിരികെ അസത്യം;
+        എങ്കിൽ (refcount_promise == 0 && !has_result)
+            തിരികെ അസത്യം;
+        തിരികെ സത്യം;
     }
 
-    bool wait_for(int64 timeoutNs) const
+    തർക്കം wait_for(int64 timeoutNs) സ്ഥിരം
     {
         CV_Assert(valid());
-        if (has_result)
-            return has_result;
-        if (timeoutNs == 0)
-            return has_result;
+        എങ്കിൽ (has_result)
+            തിരികെ has_result;
+        എങ്കിൽ (timeoutNs == 0)
+            തിരികെ has_result;
         CV_Error(Error::StsError, "Unable to wait in OPENCV_DISABLE_THREAD_SUPPORT mode");
     }
 
@@ -317,50 +317,50 @@ struct AsyncArray::Impl
         CV_Assert(refcount_future == 0);
         AsyncArray result;
         addrefFuture();
-        result.p = this;
-        future_is_returned = true;
-        return result;
+        result.p = ഇത്;
+        future_is_returned = സത്യം;
+        തിരികെ result;
     }
 
-    void setValue(InputArray value)
+    ശൂന്യം set_മൂല്യം(നിവേശം_Array value)
     {
-        if (future_is_returned && refcount_future == 0)
+        എങ്കിൽ (future_is_returned && refcount_future == 0)
             CV_Error(Error::StsError, "Associated AsyncArray has been destroyed");
         CV_Assert(!has_result);
-        int k = value.kind();
-        if (k == _InputArray::UMAT)
+        പൂർണ്ണസംഖ്യ k = value.kind();
+        എങ്കിൽ (k == നിവേശം_Array_2::UMAT)
         {
             result_umat = makePtr<UMat>();
             value.copyTo(*result_umat.get());
         }
-        else
+        അല്ലെങ്കിൽ
         {
             result_mat = makePtr<Mat>();
             value.copyTo(*result_mat.get());
         }
-        has_result = true;
+        has_result = സത്യം;
     }
 
-#if CV__EXCEPTION_PTR
-    void setException(std::exception_ptr e)
+#എങ്കിൽ CV__EXCEPTION_PTR
+    ശൂന്യം setException(std::exception_ptr e)
     {
-        if (future_is_returned && refcount_future == 0)
+        എങ്കിൽ (future_is_returned && refcount_future == 0)
             CV_Error(Error::StsError, "Associated AsyncArray has been destroyed");
         CV_Assert(!has_result);
-        has_exception = true;
+        has_exception = സത്യം;
         exception = e;
-        has_result = true;
+        has_result = സത്യം;
     }
 #endif
 
-    void setException(const cv::Exception e)
+    ശൂന്യം setException(സ്ഥിരം cv::Exception e)
     {
-        if (future_is_returned && refcount_future == 0)
+        എങ്കിൽ (future_is_returned && refcount_future == 0)
             CV_Error(Error::StsError, "Associated AsyncArray has been destroyed");
         CV_Assert(!has_result);
-        has_exception = true;
+        has_exception = സത്യം;
         cv_exception = e;
-        has_result = true;
+        has_result = സത്യം;
     }
 };
 
@@ -368,10 +368,10 @@ struct AsyncArray::Impl
 
 #endif  // OPENCV_DISABLE_THREAD_SUPPORT
 
-namespace cv {
+നാമാകാശ cv {
 
 AsyncArray::AsyncArray() CV_NOEXCEPT
-    : p(NULL)
+    : p(ശൂന്യ)
 {
 }
 
@@ -380,54 +380,54 @@ AsyncArray::~AsyncArray() CV_NOEXCEPT
     release();
 }
 
-AsyncArray::AsyncArray(const AsyncArray& o) CV_NOEXCEPT
+AsyncArray::AsyncArray(സ്ഥിരം AsyncArray& o) CV_NOEXCEPT
     : p(o.p)
 {
-    if (p)
+    എങ്കിൽ (p)
         p->addrefFuture();
 }
 
-AsyncArray& AsyncArray::operator=(const AsyncArray& o) CV_NOEXCEPT
+AsyncArray& AsyncArray::operator=(സ്ഥിരം AsyncArray& o) CV_NOEXCEPT
 {
     Impl* newp = o.p;
-    if (newp)
+    എങ്കിൽ (newp)
         newp->addrefFuture();
     release();
     p = newp;
-    return *this;
+    തിരികെ *ഇത്;
 }
 
-void AsyncArray::release() CV_NOEXCEPT
+ശൂന്യം AsyncArray::release() CV_NOEXCEPT
 {
     Impl* impl = p;
-    p = NULL;
-    if (impl)
+    p = ശൂന്യ;
+    എങ്കിൽ (impl)
         impl->releaseFuture();
 }
 
-bool AsyncArray::get(OutputArray dst, int64 timeoutNs) const
+തർക്കം AsyncArray::get(OutputArray dst, int64 timeoutNs) സ്ഥിരം
 {
     CV_Assert(p);
-    return p->get(dst, timeoutNs);
+    തിരികെ p->get(dst, timeoutNs);
 }
 
-void AsyncArray::get(OutputArray dst) const
+ശൂന്യം AsyncArray::get(OutputArray dst) സ്ഥിരം
 {
     CV_Assert(p);
-    bool res = p->get(dst, -1);
+    തർക്കം res = p->get(dst, -1);
     CV_Assert(res);
 }
 
-bool AsyncArray::wait_for(int64 timeoutNs) const
+തർക്കം AsyncArray::wait_for(int64 timeoutNs) സ്ഥിരം
 {
     CV_Assert(p);
-    return p->wait_for(timeoutNs);
+    തിരികെ p->wait_for(timeoutNs);
 }
 
-bool AsyncArray::valid() const CV_NOEXCEPT
+തർക്കം AsyncArray::valid() സ്ഥിരം CV_NOEXCEPT
 {
-    if (!p) return false;
-    return p->valid();
+    എങ്കിൽ (!p) തിരികെ അസത്യം;
+    തിരികെ p->valid();
 }
 
 
@@ -436,7 +436,7 @@ bool AsyncArray::valid() const CV_NOEXCEPT
 //
 
 AsyncPromise::AsyncPromise() CV_NOEXCEPT
-    : p(new AsyncArray::Impl())
+    : p(പുതിയ AsyncArray::Impl())
 {
 }
 
@@ -445,54 +445,54 @@ AsyncPromise::~AsyncPromise() CV_NOEXCEPT
     release();
 }
 
-AsyncPromise::AsyncPromise(const AsyncPromise& o) CV_NOEXCEPT
+AsyncPromise::AsyncPromise(സ്ഥിരം AsyncPromise& o) CV_NOEXCEPT
     : p(o.p)
 {
-    if (p)
+    എങ്കിൽ (p)
         p->addrefPromise();
 }
 
-AsyncPromise& AsyncPromise::operator=(const AsyncPromise& o) CV_NOEXCEPT
+AsyncPromise& AsyncPromise::operator=(സ്ഥിരം AsyncPromise& o) CV_NOEXCEPT
 {
     Impl* newp = o.p;
-    if (newp)
+    എങ്കിൽ (newp)
         newp->addrefPromise();
     release();
     p = newp;
-    return *this;
+    തിരികെ *ഇത്;
 }
 
-void AsyncPromise::release() CV_NOEXCEPT
+ശൂന്യം AsyncPromise::release() CV_NOEXCEPT
 {
     Impl* impl = p;
-    p = NULL;
-    if (impl)
+    p = ശൂന്യ;
+    എങ്കിൽ (impl)
         impl->releasePromise();
 }
 
 AsyncArray AsyncPromise::getArrayResult()
 {
     CV_Assert(p);
-    return p->getArrayResult();
+    തിരികെ p->getArrayResult();
 }
 
-void AsyncPromise::setValue(InputArray value)
+ശൂന്യം AsyncPromise::set_മൂല്യം(നിവേശം_Array value)
 {
     CV_Assert(p);
-    return p->setValue(value);
+    തിരികെ p->set_മൂല്യം(value);
 }
 
-void AsyncPromise::setException(const cv::Exception& exception)
+ശൂന്യം AsyncPromise::setException(സ്ഥിരം cv::Exception& exception)
 {
     CV_Assert(p);
-    return p->setException(exception);
+    തിരികെ p->setException(exception);
 }
 
-#if CV__EXCEPTION_PTR
-void AsyncPromise::setException(std::exception_ptr exception)
+#എങ്കിൽ CV__EXCEPTION_PTR
+ശൂന്യം AsyncPromise::setException(std::exception_ptr exception)
 {
     CV_Assert(p);
-    return p->setException(exception);
+    തിരികെ p->setException(exception);
 }
 #endif
 
