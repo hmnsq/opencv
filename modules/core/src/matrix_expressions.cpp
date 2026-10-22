@@ -9,209 +9,209 @@
 //
 // */
 
-#include "precomp.hpp"
-#include <opencv2/core/utils/logger.hpp>
+#અન્તર્ભાવ "precomp.hpp"
+#અન્તર્ભાવ <opencv2/core/utils/logger.hpp>
 
-namespace cv
+નામાકાશ cv
 {
 
 //This and its overload below are used in various MatExpr operator overloads
 //implemented to check that Matrix operands exist.
-static void checkOperandsExist(const Mat& a)
+સ્થિર શૂન્ય checkOperandsExist(અચલ Mat& a)
 {
-    if (a.empty())
+    જો (a.empty())
     {
         CV_Error(cv::Error::StsBadArg, "Matrix operand is an empty matrix.");
     }
 }
 
-static void checkOperandsExist(const Mat& a, const Mat& b)
+સ્થિર શૂન્ય checkOperandsExist(અચલ Mat& a, અચલ Mat& b)
 {
-    if (a.empty() || b.empty())
+    જો (a.empty() || b.empty())
     {
         CV_Error(cv::Error::StsBadArg, "One or more matrix operands are empty.");
     }
 }
 
 
-class MatOp_Identity CV_FINAL : public MatOp
+વર્ગ MatOp_Identity CV_FINAL : જાહેર MatOp
 {
-public:
+જાહેર:
     MatOp_Identity() {}
-    virtual ~MatOp_Identity() {}
+    આભાસી ~MatOp_Identity() {}
 
-    bool elementWise(const MatExpr& /*expr*/) const CV_OVERRIDE { return true; }
-    void assign(const MatExpr& expr, Mat& m, int type=-1) const CV_OVERRIDE;
+    તાર્કિક elementWise(અચલ Mat_પદાવલિ& /*પદાવલિ*/) અચલ CV_OVERRIDE { પાછા સાચું; }
+    શૂન્ય assign(અચલ Mat_પદાવલિ& પદાવલિ, Mat& m, પૂર્ણાંક type=-1) અચલ CV_OVERRIDE;
 
-    static void makeExpr(MatExpr& res, const Mat& m);
+    સ્થિર શૂન્ય make_પદાવલિ(Mat_પદાવલિ& res, અચલ Mat& m);
 };
 
-static MatOp_Identity g_MatOp_Identity;
+સ્થિર MatOp_Identity g_MatOp_Identity;
 
-class MatOp_AddEx CV_FINAL : public MatOp
+વર્ગ MatOp_AddEx CV_FINAL : જાહેર MatOp
 {
-public:
+જાહેર:
     MatOp_AddEx() {}
-    virtual ~MatOp_AddEx() {}
+    આભાસી ~MatOp_AddEx() {}
 
-    bool elementWise(const MatExpr& /*expr*/) const CV_OVERRIDE { return true; }
-    void assign(const MatExpr& expr, Mat& m, int type=-1) const CV_OVERRIDE;
+    તાર્કિક elementWise(અચલ Mat_પદાવલિ& /*પદાવલિ*/) અચલ CV_OVERRIDE { પાછા સાચું; }
+    શૂન્ય assign(અચલ Mat_પદાવલિ& પદાવલિ, Mat& m, પૂર્ણાંક type=-1) અચલ CV_OVERRIDE;
 
-    void add(const MatExpr& e1, const Scalar& s, MatExpr& res) const CV_OVERRIDE;
-    void subtract(const Scalar& s, const MatExpr& expr, MatExpr& res) const CV_OVERRIDE;
-    void multiply(const MatExpr& e1, double s, MatExpr& res) const CV_OVERRIDE;
-    void divide(double s, const MatExpr& e, MatExpr& res) const CV_OVERRIDE;
+    શૂન્ય add(અચલ Mat_પદાવલિ& e1, અચલ Scalar& s, Mat_પદાવલિ& res) અચલ CV_OVERRIDE;
+    શૂન્ય subtract(અચલ Scalar& s, અચલ Mat_પદાવલિ& પદાવલિ, Mat_પદાવલિ& res) અચલ CV_OVERRIDE;
+    શૂન્ય multiply(અચલ Mat_પદાવલિ& e1, દ્વિગુણ s, Mat_પદાવલિ& res) અચલ CV_OVERRIDE;
+    શૂન્ય divide(દ્વિગુણ s, અચલ Mat_પદાવલિ& e, Mat_પદાવલિ& res) અચલ CV_OVERRIDE;
 
-    void transpose(const MatExpr& e1, MatExpr& res) const CV_OVERRIDE;
-    void abs(const MatExpr& expr, MatExpr& res) const CV_OVERRIDE;
+    શૂન્ય transpose(અચલ Mat_પદાવલિ& e1, Mat_પદાવલિ& res) અચલ CV_OVERRIDE;
+    શૂન્ય abs(અચલ Mat_પદાવલિ& પદાવલિ, Mat_પદાવલિ& res) અચલ CV_OVERRIDE;
 
-    static void makeExpr(MatExpr& res, const Mat& a, const Mat& b, double alpha, double beta, const Scalar& s=Scalar());
+    સ્થિર શૂન્ય make_પદાવલિ(Mat_પદાવલિ& res, અચલ Mat& a, અચલ Mat& b, દ્વિગુણ alpha, દ્વિગુણ beta, અચલ Scalar& s=Scalar());
 };
 
-static MatOp_AddEx g_MatOp_AddEx;
+સ્થિર MatOp_AddEx g_MatOp_AddEx;
 
-class MatOp_Bin CV_FINAL : public MatOp
+વર્ગ MatOp_Bin CV_FINAL : જાહેર MatOp
 {
-public:
+જાહેર:
     MatOp_Bin() {}
-    virtual ~MatOp_Bin() {}
+    આભાસી ~MatOp_Bin() {}
 
-    bool elementWise(const MatExpr& /*expr*/) const CV_OVERRIDE { return true; }
-    void assign(const MatExpr& expr, Mat& m, int type=-1) const CV_OVERRIDE;
+    તાર્કિક elementWise(અચલ Mat_પદાવલિ& /*પદાવલિ*/) અચલ CV_OVERRIDE { પાછા સાચું; }
+    શૂન્ય assign(અચલ Mat_પદાવલિ& પદાવલિ, Mat& m, પૂર્ણાંક type=-1) અચલ CV_OVERRIDE;
 
-    void multiply(const MatExpr& e1, double s, MatExpr& res) const CV_OVERRIDE;
-    void divide(double s, const MatExpr& e, MatExpr& res) const CV_OVERRIDE;
+    શૂન્ય multiply(અચલ Mat_પદાવલિ& e1, દ્વિગુણ s, Mat_પદાવલિ& res) અચલ CV_OVERRIDE;
+    શૂન્ય divide(દ્વિગુણ s, અચલ Mat_પદાવલિ& e, Mat_પદાવલિ& res) અચલ CV_OVERRIDE;
 
-    static void makeExpr(MatExpr& res, char op, const Mat& a, const Mat& b, double scale=1);
-    static void makeExpr(MatExpr& res, char op, const Mat& a, const Scalar& s);
+    સ્થિર શૂન્ય make_પદાવલિ(Mat_પદાવલિ& res, અક્ષર op, અચલ Mat& a, અચલ Mat& b, દ્વિગુણ scale=1);
+    સ્થિર શૂન્ય make_પદાવલિ(Mat_પદાવલિ& res, અક્ષર op, અચલ Mat& a, અચલ Scalar& s);
 };
 
-static MatOp_Bin g_MatOp_Bin;
+સ્થિર MatOp_Bin g_MatOp_Bin;
 
-class MatOp_Cmp CV_FINAL : public MatOp
+વર્ગ MatOp_Cmp CV_FINAL : જાહેર MatOp
 {
-public:
+જાહેર:
     MatOp_Cmp() {}
-    virtual ~MatOp_Cmp() {}
+    આભાસી ~MatOp_Cmp() {}
 
-    bool elementWise(const MatExpr& /*expr*/) const CV_OVERRIDE { return true; }
-    void assign(const MatExpr& expr, Mat& m, int type=-1) const CV_OVERRIDE;
+    તાર્કિક elementWise(અચલ Mat_પદાવલિ& /*પદાવલિ*/) અચલ CV_OVERRIDE { પાછા સાચું; }
+    શૂન્ય assign(અચલ Mat_પદાવલિ& પદાવલિ, Mat& m, પૂર્ણાંક type=-1) અચલ CV_OVERRIDE;
 
-    static void makeExpr(MatExpr& res, int cmpop, const Mat& a, const Mat& b);
-    static void makeExpr(MatExpr& res, int cmpop, const Mat& a, double alpha);
+    સ્થિર શૂન્ય make_પદાવલિ(Mat_પદાવલિ& res, પૂર્ણાંક cmpop, અચલ Mat& a, અચલ Mat& b);
+    સ્થિર શૂન્ય make_પદાવલિ(Mat_પદાવલિ& res, પૂર્ણાંક cmpop, અચલ Mat& a, દ્વિગુણ alpha);
 };
 
-static MatOp_Cmp g_MatOp_Cmp;
+સ્થિર MatOp_Cmp g_MatOp_Cmp;
 
-class MatOp_GEMM CV_FINAL : public MatOp
+વર્ગ MatOp_GEMM CV_FINAL : જાહેર MatOp
 {
-public:
+જાહેર:
     MatOp_GEMM() {}
-    virtual ~MatOp_GEMM() {}
+    આભાસી ~MatOp_GEMM() {}
 
-    bool elementWise(const MatExpr& /*expr*/) const CV_OVERRIDE { return false; }
-    void assign(const MatExpr& expr, Mat& m, int type=-1) const CV_OVERRIDE;
+    તાર્કિક elementWise(અચલ Mat_પદાવલિ& /*પદાવલિ*/) અચલ CV_OVERRIDE { પાછા ખોટું; }
+    શૂન્ય assign(અચલ Mat_પદાવલિ& પદાવલિ, Mat& m, પૂર્ણાંક type=-1) અચલ CV_OVERRIDE;
 
-    void add(const MatExpr& e1, const MatExpr& e2, MatExpr& res) const CV_OVERRIDE;
-    void subtract(const MatExpr& e1, const MatExpr& e2, MatExpr& res) const CV_OVERRIDE;
-    void multiply(const MatExpr& e, double s, MatExpr& res) const CV_OVERRIDE;
+    શૂન્ય add(અચલ Mat_પદાવલિ& e1, અચલ Mat_પદાવલિ& e2, Mat_પદાવલિ& res) અચલ CV_OVERRIDE;
+    શૂન્ય subtract(અચલ Mat_પદાવલિ& e1, અચલ Mat_પદાવલિ& e2, Mat_પદાવલિ& res) અચલ CV_OVERRIDE;
+    શૂન્ય multiply(અચલ Mat_પદાવલિ& e, દ્વિગુણ s, Mat_પદાવલિ& res) અચલ CV_OVERRIDE;
 
-    void transpose(const MatExpr& expr, MatExpr& res) const CV_OVERRIDE;
+    શૂન્ય transpose(અચલ Mat_પદાવલિ& પદાવલિ, Mat_પદાવલિ& res) અચલ CV_OVERRIDE;
 
-    Size size(const MatExpr& expr) const CV_OVERRIDE
+    Size size(અચલ Mat_પદાવલિ& પદાવલિ) અચલ CV_OVERRIDE
     {
-        return Size(
-            (expr.flags & GEMM_2_T) ? expr.b.rows : expr.b.cols,
-            (expr.flags & GEMM_1_T) ? expr.a.cols : expr.a.rows
+        પાછા Size(
+            (પદાવલિ.flags & GEMM_2_T) ? પદાવલિ.b.rows : પદાવલિ.b.cols,
+            (પદાવલિ.flags & GEMM_1_T) ? પદાવલિ.a.cols : પદાવલિ.a.rows
         );
     }
 
-    static void makeExpr(MatExpr& res, int flags, const Mat& a, const Mat& b,
-                         double alpha=1, const Mat& c=Mat(), double beta=1);
+    સ્થિર શૂન્ય make_પદાવલિ(Mat_પદાવલિ& res, પૂર્ણાંક flags, અચલ Mat& a, અચલ Mat& b,
+                         દ્વિગુણ alpha=1, અચલ Mat& c=Mat(), દ્વિગુણ beta=1);
 
 };
 
-static MatOp_GEMM g_MatOp_GEMM;
+સ્થિર MatOp_GEMM g_MatOp_GEMM;
 
-class MatOp_Invert CV_FINAL : public MatOp
+વર્ગ MatOp_Invert CV_FINAL : જાહેર MatOp
 {
-public:
+જાહેર:
     MatOp_Invert() {}
-    virtual ~MatOp_Invert() {}
+    આભાસી ~MatOp_Invert() {}
 
-    bool elementWise(const MatExpr& /*expr*/) const CV_OVERRIDE { return false; }
-    void assign(const MatExpr& expr, Mat& m, int type=-1) const CV_OVERRIDE;
+    તાર્કિક elementWise(અચલ Mat_પદાવલિ& /*પદાવલિ*/) અચલ CV_OVERRIDE { પાછા ખોટું; }
+    શૂન્ય assign(અચલ Mat_પદાવલિ& પદાવલિ, Mat& m, પૂર્ણાંક type=-1) અચલ CV_OVERRIDE;
 
-    void matmul(const MatExpr& expr1, const MatExpr& expr2, MatExpr& res) const CV_OVERRIDE;
+    શૂન્ય matmul(અચલ Mat_પદાવલિ& expr1, અચલ Mat_પદાવલિ& expr2, Mat_પદાવલિ& res) અચલ CV_OVERRIDE;
 
-    static void makeExpr(MatExpr& res, int method, const Mat& m);
+    સ્થિર શૂન્ય make_પદાવલિ(Mat_પદાવલિ& res, પૂર્ણાંક method, અચલ Mat& m);
 };
 
-static MatOp_Invert g_MatOp_Invert;
+સ્થિર MatOp_Invert g_MatOp_Invert;
 
-class MatOp_T CV_FINAL : public MatOp
+વર્ગ MatOp_T CV_FINAL : જાહેર MatOp
 {
-public:
+જાહેર:
     MatOp_T() {}
-    virtual ~MatOp_T() {}
+    આભાસી ~MatOp_T() {}
 
-    bool elementWise(const MatExpr& /*expr*/) const CV_OVERRIDE { return false; }
-    void assign(const MatExpr& expr, Mat& m, int type=-1) const CV_OVERRIDE;
+    તાર્કિક elementWise(અચલ Mat_પદાવલિ& /*પદાવલિ*/) અચલ CV_OVERRIDE { પાછા ખોટું; }
+    શૂન્ય assign(અચલ Mat_પદાવલિ& પદાવલિ, Mat& m, પૂર્ણાંક type=-1) અચલ CV_OVERRIDE;
 
-    void multiply(const MatExpr& e1, double s, MatExpr& res) const CV_OVERRIDE;
-    void transpose(const MatExpr& expr, MatExpr& res) const CV_OVERRIDE;
+    શૂન્ય multiply(અચલ Mat_પદાવલિ& e1, દ્વિગુણ s, Mat_પદાવલિ& res) અચલ CV_OVERRIDE;
+    શૂન્ય transpose(અચલ Mat_પદાવલિ& પદાવલિ, Mat_પદાવલિ& res) અચલ CV_OVERRIDE;
 
-    static void makeExpr(MatExpr& res, const Mat& a, double alpha=1);
+    સ્થિર શૂન્ય make_પદાવલિ(Mat_પદાવલિ& res, અચલ Mat& a, દ્વિગુણ alpha=1);
 };
 
-static MatOp_T g_MatOp_T;
+સ્થિર MatOp_T g_MatOp_T;
 
-class MatOp_Solve CV_FINAL : public MatOp
+વર્ગ MatOp_Solve CV_FINAL : જાહેર MatOp
 {
-public:
+જાહેર:
     MatOp_Solve() {}
-    virtual ~MatOp_Solve() {}
+    આભાસી ~MatOp_Solve() {}
 
-    bool elementWise(const MatExpr& /*expr*/) const CV_OVERRIDE { return false; }
-    void assign(const MatExpr& expr, Mat& m, int type=-1) const CV_OVERRIDE;
+    તાર્કિક elementWise(અચલ Mat_પદાવલિ& /*પદાવલિ*/) અચલ CV_OVERRIDE { પાછા ખોટું; }
+    શૂન્ય assign(અચલ Mat_પદાવલિ& પદાવલિ, Mat& m, પૂર્ણાંક type=-1) અચલ CV_OVERRIDE;
 
-    static void makeExpr(MatExpr& res, int method, const Mat& a, const Mat& b);
+    સ્થિર શૂન્ય make_પદાવલિ(Mat_પદાવલિ& res, પૂર્ણાંક method, અચલ Mat& a, અચલ Mat& b);
 };
 
-static MatOp_Solve g_MatOp_Solve;
+સ્થિર MatOp_Solve g_MatOp_Solve;
 
-class MatOp_Initializer CV_FINAL : public MatOp
+વર્ગ MatOp_Initializer CV_FINAL : જાહેર MatOp
 {
-public:
+જાહેર:
     MatOp_Initializer() {}
-    virtual ~MatOp_Initializer() {}
+    આભાસી ~MatOp_Initializer() {}
 
-    bool elementWise(const MatExpr& /*expr*/) const CV_OVERRIDE { return false; }
-    void assign(const MatExpr& expr, Mat& m, int type=-1) const CV_OVERRIDE;
+    તાર્કિક elementWise(અચલ Mat_પદાવલિ& /*પદાવલિ*/) અચલ CV_OVERRIDE { પાછા ખોટું; }
+    શૂન્ય assign(અચલ Mat_પદાવલિ& પદાવલિ, Mat& m, પૂર્ણાંક type=-1) અચલ CV_OVERRIDE;
 
-    void multiply(const MatExpr& e, double s, MatExpr& res) const CV_OVERRIDE;
+    શૂન્ય multiply(અચલ Mat_પદાવલિ& e, દ્વિગુણ s, Mat_પદાવલિ& res) અચલ CV_OVERRIDE;
 
-    static void makeExpr(MatExpr& res, int method, Size sz, int type, double alpha=1);
-    static void makeExpr(MatExpr& res, int method, int ndims, const int* sizes, int type, double alpha=1);
+    સ્થિર શૂન્ય make_પદાવલિ(Mat_પદાવલિ& res, પૂર્ણાંક method, Size sz, પૂર્ણાંક type, દ્વિગુણ alpha=1);
+    સ્થિર શૂન્ય make_પદાવલિ(Mat_પદાવલિ& res, પૂર્ણાંક method, પૂર્ણાંક ndims, અચલ પૂર્ણાંક* sizes, પૂર્ણાંક type, દ્વિગુણ alpha=1);
 };
 
-static MatOp_Initializer* getGlobalMatOpInitializer()
+સ્થિર MatOp_Initializer* getGlobalMatOpInitializer()
 {
-    CV_SINGLETON_LAZY_INIT(MatOp_Initializer, new MatOp_Initializer())
+    CV_SINGLETON_LAZY_INIT(MatOp_Initializer, નવું MatOp_Initializer())
 }
 
-static inline bool isIdentity(const MatExpr& e) { return e.op == &g_MatOp_Identity; }
-static inline bool isAddEx(const MatExpr& e) { return e.op == &g_MatOp_AddEx; }
-static inline bool isScaled(const MatExpr& e) { return isAddEx(e) && (!e.b.data || e.beta == 0) && e.s == Scalar(); }
-static inline bool isBin(const MatExpr& e, char c) { return e.op == &g_MatOp_Bin && e.flags == c; }
-static inline bool isCmp(const MatExpr& e) { return e.op == &g_MatOp_Cmp; }
-static inline bool isReciprocal(const MatExpr& e) { return isBin(e,'/') && (!e.b.data || e.beta == 0); }
-static inline bool isT(const MatExpr& e) { return e.op == &g_MatOp_T; }
-static inline bool isInv(const MatExpr& e) { return e.op == &g_MatOp_Invert; }
-static inline bool isSolve(const MatExpr& e) { return e.op == &g_MatOp_Solve; }
+સ્થિર અંતઃરેખ તાર્કિક isIdentity(અચલ Mat_પદાવલિ& e) { પાછા e.op == &g_MatOp_Identity; }
+સ્થિર અંતઃરેખ તાર્કિક isAddEx(અચલ Mat_પદાવલિ& e) { પાછા e.op == &g_MatOp_AddEx; }
+સ્થિર અંતઃરેખ તાર્કિક isScaled(અચલ Mat_પદાવલિ& e) { પાછા isAddEx(e) && (!e.b.data || e.beta == 0) && e.s == Scalar(); }
+સ્થિર અંતઃરેખ તાર્કિક isBin(અચલ Mat_પદાવલિ& e, અક્ષર c) { પાછા e.op == &g_MatOp_Bin && e.flags == c; }
+સ્થિર અંતઃરેખ તાર્કિક isCmp(અચલ Mat_પદાવલિ& e) { પાછા e.op == &g_MatOp_Cmp; }
+સ્થિર અંતઃરેખ તાર્કિક isReciprocal(અચલ Mat_પદાવલિ& e) { પાછા isBin(e,'/') && (!e.b.data || e.beta == 0); }
+સ્થિર અંતઃરેખ તાર્કિક isT(અચલ Mat_પદાવલિ& e) { પાછા e.op == &g_MatOp_T; }
+સ્થિર અંતઃરેખ તાર્કિક isInv(અચલ Mat_પદાવલિ& e) { પાછા e.op == &g_MatOp_Invert; }
+સ્થિર અંતઃરેખ તાર્કિક isSolve(અચલ Mat_પદાવલિ& e) { પાછા e.op == &g_MatOp_Solve; }
 //static inline bool isGEMM(const MatExpr& e) { return e.op == &g_MatOp_GEMM; }
-static inline bool isMatProd(const MatExpr& e) { return e.op == &g_MatOp_GEMM && (!e.c.data || e.beta == 0); }
-static inline bool isInitializer(const MatExpr& e) { return e.op == getGlobalMatOpInitializer(); }
+સ્થિર અંતઃરેખ તાર્કિક isMatProd(અચલ Mat_પદાવલિ& e) { પાછા e.op == &g_MatOp_GEMM && (!e.c.data || e.beta == 0); }
+સ્થિર અંતઃરેખ તાર્કિક isInitializer(અચલ Mat_પદાવલિ& e) { પાછા e.op == getGlobalMatOpInitializer(); }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -219,1138 +219,1138 @@ MatOp::MatOp() {}
 MatOp::~MatOp() {}
 
 
-bool MatOp::elementWise(const MatExpr& /*expr*/) const
+તાર્કિક MatOp::elementWise(અચલ Mat_પદાવલિ& /*પદાવલિ*/) અચલ
 {
-    return false;
+    પાછા ખોટું;
 }
 
-void MatOp::roi(const MatExpr& expr, const Range& rowRange, const Range& colRange, MatExpr& e) const
+શૂન્ય MatOp::roi(અચલ Mat_પદાવલિ& પદાવલિ, અચલ Range& rowRange, અચલ Range& colRange, Mat_પદાવલિ& e) અચલ
 {
-    if( elementWise(expr) )
+    જો( elementWise(પદાવલિ) )
     {
-        e = MatExpr(expr.op, expr.flags, Mat(), Mat(), Mat(),
-                    expr.alpha, expr.beta, expr.s);
-        if(expr.a.data)
-            e.a = expr.a(rowRange, colRange);
-        if(expr.b.data)
-            e.b = expr.b(rowRange, colRange);
-        if(expr.c.data)
-            e.c = expr.c(rowRange, colRange);
+        e = Mat_પદાવલિ(પદાવલિ.op, પદાવલિ.flags, Mat(), Mat(), Mat(),
+                    પદાવલિ.alpha, પદાવલિ.beta, પદાવલિ.s);
+        જો(પદાવલિ.a.data)
+            e.a = પદાવલિ.a(rowRange, colRange);
+        જો(પદાવલિ.b.data)
+            e.b = પદાવલિ.b(rowRange, colRange);
+        જો(પદાવલિ.c.data)
+            e.c = પદાવલિ.c(rowRange, colRange);
     }
-    else
+    નહીંતર
     {
         Mat m;
-        expr.op->assign(expr, m);
-        e = MatExpr(&g_MatOp_Identity, 0, m(rowRange, colRange), Mat(), Mat());
+        પદાવલિ.op->assign(પદાવલિ, m);
+        e = Mat_પદાવલિ(&g_MatOp_Identity, 0, m(rowRange, colRange), Mat(), Mat());
     }
 }
 
-void MatOp::diag(const MatExpr& expr, int d, MatExpr& e) const
+શૂન્ય MatOp::diag(અચલ Mat_પદાવલિ& પદાવલિ, પૂર્ણાંક d, Mat_પદાવલિ& e) અચલ
 {
-    if( elementWise(expr) )
+    જો( elementWise(પદાવલિ) )
     {
-        e = MatExpr(expr.op, expr.flags, Mat(), Mat(), Mat(),
-                    expr.alpha, expr.beta, expr.s);
-        if(expr.a.data)
-            e.a = expr.a.diag(d);
-        if(expr.b.data)
-            e.b = expr.b.diag(d);
-        if(expr.c.data)
-            e.c = expr.c.diag(d);
+        e = Mat_પદાવલિ(પદાવલિ.op, પદાવલિ.flags, Mat(), Mat(), Mat(),
+                    પદાવલિ.alpha, પદાવલિ.beta, પદાવલિ.s);
+        જો(પદાવલિ.a.data)
+            e.a = પદાવલિ.a.diag(d);
+        જો(પદાવલિ.b.data)
+            e.b = પદાવલિ.b.diag(d);
+        જો(પદાવલિ.c.data)
+            e.c = પદાવલિ.c.diag(d);
     }
-    else
+    નહીંતર
     {
         Mat m;
-        expr.op->assign(expr, m);
-        e = MatExpr(&g_MatOp_Identity, 0, m.diag(d), Mat(), Mat());
+        પદાવલિ.op->assign(પદાવલિ, m);
+        e = Mat_પદાવલિ(&g_MatOp_Identity, 0, m.diag(d), Mat(), Mat());
     }
 }
 
 
-void MatOp::augAssignAdd(const MatExpr& expr, Mat& m) const
+શૂન્ય MatOp::augAssignAdd(અચલ Mat_પદાવલિ& પદાવલિ, Mat& m) અચલ
 {
     Mat temp;
-    expr.op->assign(expr, temp);
+    પદાવલિ.op->assign(પદાવલિ, temp);
     m += temp;
 }
 
 
-void MatOp::augAssignSubtract(const MatExpr& expr, Mat& m) const
+શૂન્ય MatOp::augAssignSubtract(અચલ Mat_પદાવલિ& પદાવલિ, Mat& m) અચલ
 {
     Mat temp;
-    expr.op->assign(expr, temp);
+    પદાવલિ.op->assign(પદાવલિ, temp);
     m -= temp;
 }
 
 
-void MatOp::augAssignMultiply(const MatExpr& expr, Mat& m) const
+શૂન્ય MatOp::augAssignMultiply(અચલ Mat_પદાવલિ& પદાવલિ, Mat& m) અચલ
 {
     Mat temp;
-    expr.op->assign(expr, temp);
+    પદાવલિ.op->assign(પદાવલિ, temp);
     m *= temp;
 }
 
 
-void MatOp::augAssignDivide(const MatExpr& expr, Mat& m) const
+શૂન્ય MatOp::augAssignDivide(અચલ Mat_પદાવલિ& પદાવલિ, Mat& m) અચલ
 {
     Mat temp;
-    expr.op->assign(expr, temp);
+    પદાવલિ.op->assign(પદાવલિ, temp);
     m /= temp;
 }
 
 
-void MatOp::augAssignAnd(const MatExpr& expr, Mat& m) const
+શૂન્ય MatOp::augAssignAnd(અચલ Mat_પદાવલિ& પદાવલિ, Mat& m) અચલ
 {
     Mat temp;
-    expr.op->assign(expr, temp);
+    પદાવલિ.op->assign(પદાવલિ, temp);
     m &= temp;
 }
 
 
-void MatOp::augAssignOr(const MatExpr& expr, Mat& m) const
+શૂન્ય MatOp::augAssignOr(અચલ Mat_પદાવલિ& પદાવલિ, Mat& m) અચલ
 {
     Mat temp;
-    expr.op->assign(expr, temp);
+    પદાવલિ.op->assign(પદાવલિ, temp);
     m |= temp;
 }
 
 
-void MatOp::augAssignXor(const MatExpr& expr, Mat& m) const
+શૂન્ય MatOp::augAssignXor(અચલ Mat_પદાવલિ& પદાવલિ, Mat& m) અચલ
 {
     Mat temp;
-    expr.op->assign(expr, temp);
+    પદાવલિ.op->assign(પદાવલિ, temp);
     m ^= temp;
 }
 
 
-void MatOp::add(const MatExpr& e1, const MatExpr& e2, MatExpr& res) const
+શૂન્ય MatOp::add(અચલ Mat_પદાવલિ& e1, અચલ Mat_પદાવલિ& e2, Mat_પદાવલિ& res) અચલ
 {
     CV_INSTRUMENT_REGION();
 
-    if( this == e2.op )
+    જો( આ == e2.op )
     {
-        double alpha = 1, beta = 1;
+        દ્વિગુણ alpha = 1, beta = 1;
         Scalar s;
         Mat m1, m2;
-        if( isAddEx(e1) && (!e1.b.data || e1.beta == 0) )
+        જો( isAddEx(e1) && (!e1.b.data || e1.beta == 0) )
         {
             m1 = e1.a;
             alpha = e1.alpha;
             s = e1.s;
         }
-        else
+        નહીંતર
             e1.op->assign(e1, m1);
 
-        if( isAddEx(e2) && (!e2.b.data || e2.beta == 0) )
+        જો( isAddEx(e2) && (!e2.b.data || e2.beta == 0) )
         {
             m2 = e2.a;
             beta = e2.alpha;
             s += e2.s;
         }
-        else
+        નહીંતર
             e2.op->assign(e2, m2);
-        MatOp_AddEx::makeExpr(res, m1, m2, alpha, beta, s);
+        MatOp_AddEx::make_પદાવલિ(res, m1, m2, alpha, beta, s);
     }
-    else
+    નહીંતર
         e2.op->add(e1, e2, res);
 }
 
 
-void MatOp::add(const MatExpr& expr1, const Scalar& s, MatExpr& res) const
+શૂન્ય MatOp::add(અચલ Mat_પદાવલિ& expr1, અચલ Scalar& s, Mat_પદાવલિ& res) અચલ
 {
     CV_INSTRUMENT_REGION();
 
     Mat m1;
     expr1.op->assign(expr1, m1);
-    MatOp_AddEx::makeExpr(res, m1, Mat(), 1, 0, s);
+    MatOp_AddEx::make_પદાવલિ(res, m1, Mat(), 1, 0, s);
 }
 
 
-void MatOp::subtract(const MatExpr& e1, const MatExpr& e2, MatExpr& res) const
+શૂન્ય MatOp::subtract(અચલ Mat_પદાવલિ& e1, અચલ Mat_પદાવલિ& e2, Mat_પદાવલિ& res) અચલ
 {
     CV_INSTRUMENT_REGION();
 
-    if( this == e2.op )
+    જો( આ == e2.op )
     {
-        double alpha = 1, beta = -1;
+        દ્વિગુણ alpha = 1, beta = -1;
         Scalar s;
         Mat m1, m2;
-        if( isAddEx(e1) && (!e1.b.data || e1.beta == 0) )
+        જો( isAddEx(e1) && (!e1.b.data || e1.beta == 0) )
         {
             m1 = e1.a;
             alpha = e1.alpha;
             s = e1.s;
         }
-        else
+        નહીંતર
             e1.op->assign(e1, m1);
 
-        if( isAddEx(e2) && (!e2.b.data || e2.beta == 0) )
+        જો( isAddEx(e2) && (!e2.b.data || e2.beta == 0) )
         {
             m2 = e2.a;
             beta = -e2.alpha;
             s -= e2.s;
         }
-        else
+        નહીંતર
             e2.op->assign(e2, m2);
-        MatOp_AddEx::makeExpr(res, m1, m2, alpha, beta, s);
+        MatOp_AddEx::make_પદાવલિ(res, m1, m2, alpha, beta, s);
     }
-    else
+    નહીંતર
         e2.op->subtract(e1, e2, res);
 }
 
 
-void MatOp::subtract(const Scalar& s, const MatExpr& expr, MatExpr& res) const
+શૂન્ય MatOp::subtract(અચલ Scalar& s, અચલ Mat_પદાવલિ& પદાવલિ, Mat_પદાવલિ& res) અચલ
 {
     CV_INSTRUMENT_REGION();
 
     Mat m;
-    expr.op->assign(expr, m);
-    MatOp_AddEx::makeExpr(res, m, Mat(), -1, 0, s);
+    પદાવલિ.op->assign(પદાવલિ, m);
+    MatOp_AddEx::make_પદાવલિ(res, m, Mat(), -1, 0, s);
 }
 
 
-void MatOp::multiply(const MatExpr& e1, const MatExpr& e2, MatExpr& res, double scale) const
+શૂન્ય MatOp::multiply(અચલ Mat_પદાવલિ& e1, અચલ Mat_પદાવલિ& e2, Mat_પદાવલિ& res, દ્વિગુણ scale) અચલ
 {
     CV_INSTRUMENT_REGION();
 
-    if( this == e2.op )
+    જો( આ == e2.op )
     {
         Mat m1, m2;
 
-        if( isReciprocal(e1) )
+        જો( isReciprocal(e1) )
         {
-            if( isScaled(e2) )
+            જો( isScaled(e2) )
             {
                 scale *= e2.alpha;
                 m2 = e2.a;
             }
-            else
+            નહીંતર
                 e2.op->assign(e2, m2);
 
-            MatOp_Bin::makeExpr(res, '/', m2, e1.a, scale/e1.alpha);
+            MatOp_Bin::make_પદાવલિ(res, '/', m2, e1.a, scale/e1.alpha);
         }
-        else
+        નહીંતર
         {
-            char op = '*';
-            if( isScaled(e1) )
+            અક્ષર op = '*';
+            જો( isScaled(e1) )
             {
                 m1 = e1.a;
                 scale *= e1.alpha;
             }
-            else
+            નહીંતર
                 e1.op->assign(e1, m1);
 
-            if( isScaled(e2) )
+            જો( isScaled(e2) )
             {
                 m2 = e2.a;
                 scale *= e2.alpha;
             }
-            else if( isReciprocal(e2) )
+            નહીંતર જો( isReciprocal(e2) )
             {
                 op = '/';
                 m2 = e2.a;
                 scale *= e2.alpha;
             }
-            else
+            નહીંતર
                 e2.op->assign(e2, m2);
 
-            MatOp_Bin::makeExpr(res, op, m1, m2, scale);
+            MatOp_Bin::make_પદાવલિ(res, op, m1, m2, scale);
         }
     }
-    else
+    નહીંતર
         e2.op->multiply(e1, e2, res, scale);
 }
 
 
-void MatOp::multiply(const MatExpr& expr, double s, MatExpr& res) const
+શૂન્ય MatOp::multiply(અચલ Mat_પદાવલિ& પદાવલિ, દ્વિગુણ s, Mat_પદાવલિ& res) અચલ
 {
     CV_INSTRUMENT_REGION();
 
     Mat m;
-    expr.op->assign(expr, m);
-    MatOp_AddEx::makeExpr(res, m, Mat(), s, 0);
+    પદાવલિ.op->assign(પદાવલિ, m);
+    MatOp_AddEx::make_પદાવલિ(res, m, Mat(), s, 0);
 }
 
 
-void MatOp::divide(const MatExpr& e1, const MatExpr& e2, MatExpr& res, double scale) const
+શૂન્ય MatOp::divide(અચલ Mat_પદાવલિ& e1, અચલ Mat_પદાવલિ& e2, Mat_પદાવલિ& res, દ્વિગુણ scale) અચલ
 {
     CV_INSTRUMENT_REGION();
 
-    if( this == e2.op )
+    જો( આ == e2.op )
     {
-        if( isReciprocal(e1) && isReciprocal(e2) )
-            MatOp_Bin::makeExpr(res, '/', e2.a, e1.a, e1.alpha/e2.alpha);
-        else
+        જો( isReciprocal(e1) && isReciprocal(e2) )
+            MatOp_Bin::make_પદાવલિ(res, '/', e2.a, e1.a, e1.alpha/e2.alpha);
+        નહીંતર
         {
             Mat m1, m2;
-            char op = '/';
+            અક્ષર op = '/';
 
-            if( isScaled(e1) )
+            જો( isScaled(e1) )
             {
                 m1 = e1.a;
                 scale *= e1.alpha;
             }
-            else
+            નહીંતર
                 e1.op->assign(e1, m1);
 
-            if( isScaled(e2) )
+            જો( isScaled(e2) )
             {
                 m2 = e2.a;
                 scale /= e2.alpha;
             }
-            else if( isReciprocal(e2) )
+            નહીંતર જો( isReciprocal(e2) )
             {
                 m2 = e2.a;
                 scale /= e2.alpha;
                 op = '*';
             }
-            else
+            નહીંતર
                 e2.op->assign(e2, m2);
-            MatOp_Bin::makeExpr(res, op, m1, m2, scale);
+            MatOp_Bin::make_પદાવલિ(res, op, m1, m2, scale);
         }
     }
-    else
+    નહીંતર
         e2.op->divide(e1, e2, res, scale);
 }
 
 
-void MatOp::divide(double s, const MatExpr& expr, MatExpr& res) const
+શૂન્ય MatOp::divide(દ્વિગુણ s, અચલ Mat_પદાવલિ& પદાવલિ, Mat_પદાવલિ& res) અચલ
 {
     CV_INSTRUMENT_REGION();
 
     Mat m;
-    expr.op->assign(expr, m);
-    MatOp_Bin::makeExpr(res, '/', m, Mat(), s);
+    પદાવલિ.op->assign(પદાવલિ, m);
+    MatOp_Bin::make_પદાવલિ(res, '/', m, Mat(), s);
 }
 
 
-void MatOp::abs(const MatExpr& expr, MatExpr& res) const
+શૂન્ય MatOp::abs(અચલ Mat_પદાવલિ& પદાવલિ, Mat_પદાવલિ& res) અચલ
 {
     CV_INSTRUMENT_REGION();
 
     Mat m;
-    expr.op->assign(expr, m);
-    MatOp_Bin::makeExpr(res, 'a', m, Mat());
+    પદાવલિ.op->assign(પદાવલિ, m);
+    MatOp_Bin::make_પદાવલિ(res, 'a', m, Mat());
 }
 
 
-void MatOp::transpose(const MatExpr& expr, MatExpr& res) const
+શૂન્ય MatOp::transpose(અચલ Mat_પદાવલિ& પદાવલિ, Mat_પદાવલિ& res) અચલ
 {
     CV_INSTRUMENT_REGION();
 
     Mat m;
-    expr.op->assign(expr, m);
-    MatOp_T::makeExpr(res, m, 1);
+    પદાવલિ.op->assign(પદાવલિ, m);
+    MatOp_T::make_પદાવલિ(res, m, 1);
 }
 
 
-void MatOp::matmul(const MatExpr& e1, const MatExpr& e2, MatExpr& res) const
+શૂન્ય MatOp::matmul(અચલ Mat_પદાવલિ& e1, અચલ Mat_પદાવલિ& e2, Mat_પદાવલિ& res) અચલ
 {
-    if( this == e2.op )
+    જો( આ == e2.op )
     {
-        double scale = 1;
-        int flags = 0;
+        દ્વિગુણ scale = 1;
+        પૂર્ણાંક flags = 0;
         Mat m1, m2;
 
-        if( isT(e1) )
+        જો( isT(e1) )
         {
             flags = cv::GEMM_1_T;
             scale = e1.alpha;
             m1 = e1.a;
         }
-        else if( isScaled(e1) )
+        નહીંતર જો( isScaled(e1) )
         {
             scale = e1.alpha;
             m1 = e1.a;
         }
-        else
+        નહીંતર
             e1.op->assign(e1, m1);
 
-        if( isT(e2) )
+        જો( isT(e2) )
         {
             flags |= cv::GEMM_2_T;
             scale *= e2.alpha;
             m2 = e2.a;
         }
-        else if( isScaled(e2) )
+        નહીંતર જો( isScaled(e2) )
         {
             scale *= e2.alpha;
             m2 = e2.a;
         }
-        else
+        નહીંતર
             e2.op->assign(e2, m2);
 
-        MatOp_GEMM::makeExpr(res, flags, m1, m2, scale);
+        MatOp_GEMM::make_પદાવલિ(res, flags, m1, m2, scale);
     }
-    else
+    નહીંતર
         e2.op->matmul(e1, e2, res);
 }
 
 
-void MatOp::invert(const MatExpr& expr, int method, MatExpr& res) const
+શૂન્ય MatOp::invert(અચલ Mat_પદાવલિ& પદાવલિ, પૂર્ણાંક method, Mat_પદાવલિ& res) અચલ
 {
     Mat m;
-    expr.op->assign(expr, m);
-    MatOp_Invert::makeExpr(res, method, m);
+    પદાવલિ.op->assign(પદાવલિ, m);
+    MatOp_Invert::make_પદાવલિ(res, method, m);
 }
 
 
-Size MatOp::size(const MatExpr& expr) const
+Size MatOp::size(અચલ Mat_પદાવલિ& પદાવલિ) અચલ
 {
-    return !expr.a.empty() ? expr.a.size() : expr.b.empty() ? expr.b.size() : expr.c.size();
+    પાછા !પદાવલિ.a.empty() ? પદાવલિ.a.size() : પદાવલિ.b.empty() ? પદાવલિ.b.size() : પદાવલિ.c.size();
 }
 
-int MatOp::type(const MatExpr& expr) const
+પૂર્ણાંક MatOp::type(અચલ Mat_પદાવલિ& પદાવલિ) અચલ
 {
     CV_INSTRUMENT_REGION();
 
-    return !expr.a.empty() ? expr.a.type() : expr.b.empty() ? expr.b.type() : expr.c.type();
+    પાછા !પદાવલિ.a.empty() ? પદાવલિ.a.type() : પદાવલિ.b.empty() ? પદાવલિ.b.type() : પદાવલિ.c.type();
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////
 
-MatExpr::MatExpr(const Mat& m) : op(&g_MatOp_Identity), flags(0), a(m), b(Mat()), c(Mat()), alpha(1), beta(0), s(Scalar())
+Mat_પદાવલિ::Mat_પદાવલિ(અચલ Mat& m) : op(&g_MatOp_Identity), flags(0), a(m), b(Mat()), c(Mat()), alpha(1), beta(0), s(Scalar())
 {
 }
 
-MatExpr MatExpr::row(int y) const
+Mat_પદાવલિ Mat_પદાવલિ::row(પૂર્ણાંક y) અચલ
 {
-    MatExpr e;
-    op->roi(*this, Range(y, y+1), Range::all(), e);
-    return e;
+    Mat_પદાવલિ e;
+    op->roi(*આ, Range(y, y+1), Range::all(), e);
+    પાછા e;
 }
 
-MatExpr MatExpr::col(int x) const
+Mat_પદાવલિ Mat_પદાવલિ::col(પૂર્ણાંક x) અચલ
 {
-    MatExpr e;
-    op->roi(*this, Range::all(), Range(x, x+1), e);
-    return e;
+    Mat_પદાવલિ e;
+    op->roi(*આ, Range::all(), Range(x, x+1), e);
+    પાછા e;
 }
 
-MatExpr MatExpr::diag(int d) const
+Mat_પદાવલિ Mat_પદાવલિ::diag(પૂર્ણાંક d) અચલ
 {
-    MatExpr e;
-    op->diag(*this, d, e);
-    return e;
+    Mat_પદાવલિ e;
+    op->diag(*આ, d, e);
+    પાછા e;
 }
 
-MatExpr MatExpr::operator()( const Range& rowRange, const Range& colRange ) const
+Mat_પદાવલિ Mat_પદાવલિ::operator()( અચલ Range& rowRange, અચલ Range& colRange ) અચલ
 {
-    MatExpr e;
-    op->roi(*this, rowRange, colRange, e);
-    return e;
+    Mat_પદાવલિ e;
+    op->roi(*આ, rowRange, colRange, e);
+    પાછા e;
 }
 
-MatExpr MatExpr::operator()( const Rect& roi ) const
+Mat_પદાવલિ Mat_પદાવલિ::operator()( અચલ Rect& roi ) અચલ
 {
-    MatExpr e;
-    op->roi(*this, Range(roi.y, roi.y + roi.height), Range(roi.x, roi.x + roi.width), e);
-    return e;
+    Mat_પદાવલિ e;
+    op->roi(*આ, Range(roi.y, roi.y + roi.height), Range(roi.x, roi.x + roi.width), e);
+    પાછા e;
 }
 
-Mat MatExpr::cross(const Mat& m) const
+Mat Mat_પદાવલિ::cross(અચલ Mat& m) અચલ
 {
-    return ((Mat)*this).cross(m);
+    પાછા ((Mat)*આ).cross(m);
 }
 
-double MatExpr::dot(const Mat& m) const
+દ્વિગુણ Mat_પદાવલિ::dot(અચલ Mat& m) અચલ
 {
-    return ((Mat)*this).dot(m);
+    પાછા ((Mat)*આ).dot(m);
 }
 
-MatExpr MatExpr::t() const
+Mat_પદાવલિ Mat_પદાવલિ::t() અચલ
 {
-    MatExpr e;
-    op->transpose(*this, e);
-    return e;
+    Mat_પદાવલિ e;
+    op->transpose(*આ, e);
+    પાછા e;
 }
 
-MatExpr MatExpr::inv(int method) const
+Mat_પદાવલિ Mat_પદાવલિ::inv(પૂર્ણાંક method) અચલ
 {
-    MatExpr e;
-    op->invert(*this, method, e);
-    return e;
+    Mat_પદાવલિ e;
+    op->invert(*આ, method, e);
+    પાછા e;
 }
 
-MatExpr MatExpr::mul(const MatExpr& e, double scale) const
+Mat_પદાવલિ Mat_પદાવલિ::mul(અચલ Mat_પદાવલિ& e, દ્વિગુણ scale) અચલ
 {
-    MatExpr en;
-    op->multiply(*this, e, en, scale);
-    return en;
+    Mat_પદાવલિ en;
+    op->multiply(*આ, e, en, scale);
+    પાછા en;
 }
 
-MatExpr MatExpr::mul(const Mat& m, double scale) const
+Mat_પદાવલિ Mat_પદાવલિ::mul(અચલ Mat& m, દ્વિગુણ scale) અચલ
 {
-    MatExpr e;
-    op->multiply(*this, MatExpr(m), e, scale);
-    return e;
+    Mat_પદાવલિ e;
+    op->multiply(*આ, Mat_પદાવલિ(m), e, scale);
+    પાછા e;
 }
 
-MatExpr operator + (const Mat& a, const Mat& b)
+Mat_પદાવલિ operator + (અચલ Mat& a, અચલ Mat& b)
 {
     checkOperandsExist(a, b);
-    MatExpr e;
-    MatOp_AddEx::makeExpr(e, a, b, 1, 1);
-    return e;
+    Mat_પદાવલિ e;
+    MatOp_AddEx::make_પદાવલિ(e, a, b, 1, 1);
+    પાછા e;
 }
 
-MatExpr operator + (const Mat& a, const Scalar& s)
+Mat_પદાવલિ operator + (અચલ Mat& a, અચલ Scalar& s)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_AddEx::makeExpr(e, a, Mat(), 1, 0, s);
-    return e;
+    Mat_પદાવલિ e;
+    MatOp_AddEx::make_પદાવલિ(e, a, Mat(), 1, 0, s);
+    પાછા e;
 }
 
-MatExpr operator + (const Scalar& s, const Mat& a)
+Mat_પદાવલિ operator + (અચલ Scalar& s, અચલ Mat& a)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_AddEx::makeExpr(e, a, Mat(), 1, 0, s);
-    return e;
+    Mat_પદાવલિ e;
+    MatOp_AddEx::make_પદાવલિ(e, a, Mat(), 1, 0, s);
+    પાછા e;
 }
 
-MatExpr operator + (const MatExpr& e, const Mat& m)
+Mat_પદાવલિ operator + (અચલ Mat_પદાવલિ& e, અચલ Mat& m)
 {
-    MatExpr en;
-    e.op->add(e, MatExpr(m), en);
-    return en;
+    Mat_પદાવલિ en;
+    e.op->add(e, Mat_પદાવલિ(m), en);
+    પાછા en;
 }
 
-MatExpr operator + (const Mat& m, const MatExpr& e)
+Mat_પદાવલિ operator + (અચલ Mat& m, અચલ Mat_પદાવલિ& e)
 {
     checkOperandsExist(m);
-    MatExpr en;
-    e.op->add(e, MatExpr(m), en);
-    return en;
+    Mat_પદાવલિ en;
+    e.op->add(e, Mat_પદાવલિ(m), en);
+    પાછા en;
 }
 
-MatExpr operator + (const MatExpr& e, const Scalar& s)
+Mat_પદાવલિ operator + (અચલ Mat_પદાવલિ& e, અચલ Scalar& s)
 {
-    MatExpr en;
+    Mat_પદાવલિ en;
     e.op->add(e, s, en);
-    return en;
+    પાછા en;
 }
 
-MatExpr operator + (const Scalar& s, const MatExpr& e)
+Mat_પદાવલિ operator + (અચલ Scalar& s, અચલ Mat_પદાવલિ& e)
 {
-    MatExpr en;
+    Mat_પદાવલિ en;
     e.op->add(e, s, en);
-    return en;
+    પાછા en;
 }
 
-MatExpr operator + (const MatExpr& e1, const MatExpr& e2)
+Mat_પદાવલિ operator + (અચલ Mat_પદાવલિ& e1, અચલ Mat_પદાવલિ& e2)
 {
-    MatExpr en;
+    Mat_પદાવલિ en;
     e1.op->add(e1, e2, en);
-    return en;
+    પાછા en;
 }
 
-MatExpr operator - (const Mat& a, const Mat& b)
+Mat_પદાવલિ operator - (અચલ Mat& a, અચલ Mat& b)
 {
     checkOperandsExist(a, b);
-    MatExpr e;
-    MatOp_AddEx::makeExpr(e, a, b, 1, -1);
-    return e;
+    Mat_પદાવલિ e;
+    MatOp_AddEx::make_પદાવલિ(e, a, b, 1, -1);
+    પાછા e;
 }
 
-MatExpr operator - (const Mat& a, const Scalar& s)
+Mat_પદાવલિ operator - (અચલ Mat& a, અચલ Scalar& s)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_AddEx::makeExpr(e, a, Mat(), 1, 0, -s);
-    return e;
+    Mat_પદાવલિ e;
+    MatOp_AddEx::make_પદાવલિ(e, a, Mat(), 1, 0, -s);
+    પાછા e;
 }
 
-MatExpr operator - (const Scalar& s, const Mat& a)
+Mat_પદાવલિ operator - (અચલ Scalar& s, અચલ Mat& a)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_AddEx::makeExpr(e, a, Mat(), -1, 0, s);
-    return e;
+    Mat_પદાવલિ e;
+    MatOp_AddEx::make_પદાવલિ(e, a, Mat(), -1, 0, s);
+    પાછા e;
 }
 
-MatExpr operator - (const MatExpr& e, const Mat& m)
+Mat_પદાવલિ operator - (અચલ Mat_પદાવલિ& e, અચલ Mat& m)
 {
     checkOperandsExist(m);
-    MatExpr en;
-    e.op->subtract(e, MatExpr(m), en);
-    return en;
+    Mat_પદાવલિ en;
+    e.op->subtract(e, Mat_પદાવલિ(m), en);
+    પાછા en;
 }
 
-MatExpr operator - (const Mat& m, const MatExpr& e)
+Mat_પદાવલિ operator - (અચલ Mat& m, અચલ Mat_પદાવલિ& e)
 {
     checkOperandsExist(m);
-    MatExpr en;
-    e.op->subtract(MatExpr(m), e, en);
-    return en;
+    Mat_પદાવલિ en;
+    e.op->subtract(Mat_પદાવલિ(m), e, en);
+    પાછા en;
 }
 
-MatExpr operator - (const MatExpr& e, const Scalar& s)
+Mat_પદાવલિ operator - (અચલ Mat_પદાવલિ& e, અચલ Scalar& s)
 {
-    MatExpr en;
+    Mat_પદાવલિ en;
     e.op->add(e, -s, en);
-    return en;
+    પાછા en;
 }
 
-MatExpr operator - (const Scalar& s, const MatExpr& e)
+Mat_પદાવલિ operator - (અચલ Scalar& s, અચલ Mat_પદાવલિ& e)
 {
-    MatExpr en;
+    Mat_પદાવલિ en;
     e.op->subtract(s, e, en);
-    return en;
+    પાછા en;
 }
 
-MatExpr operator - (const MatExpr& e1, const MatExpr& e2)
+Mat_પદાવલિ operator - (અચલ Mat_પદાવલિ& e1, અચલ Mat_પદાવલિ& e2)
 {
-    MatExpr en;
+    Mat_પદાવલિ en;
     e1.op->subtract(e1, e2, en);
-    return en;
+    પાછા en;
 }
 
-MatExpr operator - (const Mat& m)
+Mat_પદાવલિ operator - (અચલ Mat& m)
 {
     checkOperandsExist(m);
-    MatExpr e;
-    MatOp_AddEx::makeExpr(e, m, Mat(), -1, 0);
-    return e;
+    Mat_પદાવલિ e;
+    MatOp_AddEx::make_પદાવલિ(e, m, Mat(), -1, 0);
+    પાછા e;
 }
 
-MatExpr operator - (const MatExpr& e)
+Mat_પદાવલિ operator - (અચલ Mat_પદાવલિ& e)
 {
-    MatExpr en;
+    Mat_પદાવલિ en;
     e.op->subtract(Scalar(0), e, en);
-    return en;
+    પાછા en;
 }
 
-MatExpr operator * (const Mat& a, const Mat& b)
+Mat_પદાવલિ operator * (અચલ Mat& a, અચલ Mat& b)
 {
     checkOperandsExist(a, b);
-    MatExpr e;
-    MatOp_GEMM::makeExpr(e, 0, a, b);
-    return e;
+    Mat_પદાવલિ e;
+    MatOp_GEMM::make_પદાવલિ(e, 0, a, b);
+    પાછા e;
 }
 
-MatExpr operator * (const Mat& a, double s)
+Mat_પદાવલિ operator * (અચલ Mat& a, દ્વિગુણ s)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_AddEx::makeExpr(e, a, Mat(), s, 0);
-    return e;
+    Mat_પદાવલિ e;
+    MatOp_AddEx::make_પદાવલિ(e, a, Mat(), s, 0);
+    પાછા e;
 }
 
-MatExpr operator * (double s, const Mat& a)
+Mat_પદાવલિ operator * (દ્વિગુણ s, અચલ Mat& a)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_AddEx::makeExpr(e, a, Mat(), s, 0);
-    return e;
+    Mat_પદાવલિ e;
+    MatOp_AddEx::make_પદાવલિ(e, a, Mat(), s, 0);
+    પાછા e;
 }
 
-MatExpr operator * (const MatExpr& e, const Mat& m)
+Mat_પદાવલિ operator * (અચલ Mat_પદાવલિ& e, અચલ Mat& m)
 {
-    MatExpr en;
-    e.op->matmul(e, MatExpr(m), en);
-    return en;
+    Mat_પદાવલિ en;
+    e.op->matmul(e, Mat_પદાવલિ(m), en);
+    પાછા en;
 }
 
-MatExpr operator * (const Mat& m, const MatExpr& e)
+Mat_પદાવલિ operator * (અચલ Mat& m, અચલ Mat_પદાવલિ& e)
 {
     checkOperandsExist(m);
-    MatExpr en;
-    e.op->matmul(MatExpr(m), e, en);
-    return en;
+    Mat_પદાવલિ en;
+    e.op->matmul(Mat_પદાવલિ(m), e, en);
+    પાછા en;
 }
 
-MatExpr operator * (const MatExpr& e, double s)
+Mat_પદાવલિ operator * (અચલ Mat_પદાવલિ& e, દ્વિગુણ s)
 {
-    MatExpr en;
+    Mat_પદાવલિ en;
     e.op->multiply(e, s, en);
-    return en;
+    પાછા en;
 }
 
-MatExpr operator * (double s, const MatExpr& e)
+Mat_પદાવલિ operator * (દ્વિગુણ s, અચલ Mat_પદાવલિ& e)
 {
-    MatExpr en;
+    Mat_પદાવલિ en;
     e.op->multiply(e, s, en);
-    return en;
+    પાછા en;
 }
 
-MatExpr operator * (const MatExpr& e1, const MatExpr& e2)
+Mat_પદાવલિ operator * (અચલ Mat_પદાવલિ& e1, અચલ Mat_પદાવલિ& e2)
 {
-    MatExpr en;
+    Mat_પદાવલિ en;
     e1.op->matmul(e1, e2, en);
-    return en;
+    પાછા en;
 }
 
-MatExpr operator / (const Mat& a, const Mat& b)
+Mat_પદાવલિ operator / (અચલ Mat& a, અચલ Mat& b)
 {
     checkOperandsExist(a, b);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, '/', a, b);
-    return e;
+    Mat_પદાવલિ e;
+    MatOp_Bin::make_પદાવલિ(e, '/', a, b);
+    પાછા e;
 }
 
-MatExpr operator / (const Mat& a, double s)
+Mat_પદાવલિ operator / (અચલ Mat& a, દ્વિગુણ s)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_AddEx::makeExpr(e, a, Mat(), 1./s, 0);
-    return e;
+    Mat_પદાવલિ e;
+    MatOp_AddEx::make_પદાવલિ(e, a, Mat(), 1./s, 0);
+    પાછા e;
 }
 
-MatExpr operator / (double s, const Mat& a)
+Mat_પદાવલિ operator / (દ્વિગુણ s, અચલ Mat& a)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, '/', a, Mat(), s);
-    return e;
+    Mat_પદાવલિ e;
+    MatOp_Bin::make_પદાવલિ(e, '/', a, Mat(), s);
+    પાછા e;
 }
 
-MatExpr operator / (const MatExpr& e, const Mat& m)
+Mat_પદાવલિ operator / (અચલ Mat_પદાવલિ& e, અચલ Mat& m)
 {
-    MatExpr en;
-    e.op->divide(e, MatExpr(m), en);
-    return en;
+    Mat_પદાવલિ en;
+    e.op->divide(e, Mat_પદાવલિ(m), en);
+    પાછા en;
 }
 
-MatExpr operator / (const Mat& m, const MatExpr& e)
+Mat_પદાવલિ operator / (અચલ Mat& m, અચલ Mat_પદાવલિ& e)
 {
     checkOperandsExist(m);
-    MatExpr en;
-    e.op->divide(MatExpr(m), e, en);
-    return en;
+    Mat_પદાવલિ en;
+    e.op->divide(Mat_પદાવલિ(m), e, en);
+    પાછા en;
 }
 
-MatExpr operator / (const MatExpr& e, double s)
+Mat_પદાવલિ operator / (અચલ Mat_પદાવલિ& e, દ્વિગુણ s)
 {
-    MatExpr en;
+    Mat_પદાવલિ en;
     e.op->multiply(e, 1./s, en);
-    return en;
+    પાછા en;
 }
 
-MatExpr operator / (double s, const MatExpr& e)
+Mat_પદાવલિ operator / (દ્વિગુણ s, અચલ Mat_પદાવલિ& e)
 {
-    MatExpr en;
+    Mat_પદાવલિ en;
     e.op->divide(s, e, en);
-    return en;
+    પાછા en;
 }
 
-MatExpr operator / (const MatExpr& e1, const MatExpr& e2)
+Mat_પદાવલિ operator / (અચલ Mat_પદાવલિ& e1, અચલ Mat_પદાવલિ& e2)
 {
-    MatExpr en;
+    Mat_પદાવલિ en;
     e1.op->divide(e1, e2, en);
-    return en;
+    પાછા en;
 }
 
-MatExpr operator < (const Mat& a, const Mat& b)
+Mat_પદાવલિ operator < (અચલ Mat& a, અચલ Mat& b)
 {
     checkOperandsExist(a, b);
-    MatExpr e;
-    MatOp_Cmp::makeExpr(e, cv::CMP_LT, a, b);
-    return e;
+    Mat_પદાવલિ e;
+    MatOp_Cmp::make_પદાવલિ(e, cv::CMP_LT, a, b);
+    પાછા e;
 }
 
-MatExpr operator < (const Mat& a, double s)
+Mat_પદાવલિ operator < (અચલ Mat& a, દ્વિગુણ s)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Cmp::makeExpr(e, cv::CMP_LT, a, s);
-    return e;
+    Mat_પદાવલિ e;
+    MatOp_Cmp::make_પદાવલિ(e, cv::CMP_LT, a, s);
+    પાછા e;
 }
 
-MatExpr operator < (double s, const Mat& a)
+Mat_પદાવલિ operator < (દ્વિગુણ s, અચલ Mat& a)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Cmp::makeExpr(e, cv::CMP_GT, a, s);
-    return e;
+    Mat_પદાવલિ e;
+    MatOp_Cmp::make_પદાવલિ(e, cv::CMP_GT, a, s);
+    પાછા e;
 }
 
-MatExpr operator <= (const Mat& a, const Mat& b)
+Mat_પદાવલિ operator <= (અચલ Mat& a, અચલ Mat& b)
 {
     checkOperandsExist(a, b);
-    MatExpr e;
-    MatOp_Cmp::makeExpr(e, cv::CMP_LE, a, b);
-    return e;
+    Mat_પદાવલિ e;
+    MatOp_Cmp::make_પદાવલિ(e, cv::CMP_LE, a, b);
+    પાછા e;
 }
 
-MatExpr operator <= (const Mat& a, double s)
+Mat_પદાવલિ operator <= (અચલ Mat& a, દ્વિગુણ s)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Cmp::makeExpr(e, cv::CMP_LE, a, s);
-    return e;
+    Mat_પદાવલિ e;
+    MatOp_Cmp::make_પદાવલિ(e, cv::CMP_LE, a, s);
+    પાછા e;
 }
 
-MatExpr operator <= (double s, const Mat& a)
+Mat_પદાવલિ operator <= (દ્વિગુણ s, અચલ Mat& a)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Cmp::makeExpr(e, cv::CMP_GE, a, s);
-    return e;
+    Mat_પદાવલિ e;
+    MatOp_Cmp::make_પદાવલિ(e, cv::CMP_GE, a, s);
+    પાછા e;
 }
 
-MatExpr operator == (const Mat& a, const Mat& b)
+Mat_પદાવલિ operator == (અચલ Mat& a, અચલ Mat& b)
 {
     checkOperandsExist(a, b);
-    MatExpr e;
-    MatOp_Cmp::makeExpr(e, cv::CMP_EQ, a, b);
-    return e;
+    Mat_પદાવલિ e;
+    MatOp_Cmp::make_પદાવલિ(e, cv::CMP_EQ, a, b);
+    પાછા e;
 }
 
-MatExpr operator == (const Mat& a, double s)
+Mat_પદાવલિ operator == (અચલ Mat& a, દ્વિગુણ s)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Cmp::makeExpr(e, cv::CMP_EQ, a, s);
-    return e;
+    Mat_પદાવલિ e;
+    MatOp_Cmp::make_પદાવલિ(e, cv::CMP_EQ, a, s);
+    પાછા e;
 }
 
-MatExpr operator == (double s, const Mat& a)
+Mat_પદાવલિ operator == (દ્વિગુણ s, અચલ Mat& a)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Cmp::makeExpr(e, cv::CMP_EQ, a, s);
-    return e;
+    Mat_પદાવલિ e;
+    MatOp_Cmp::make_પદાવલિ(e, cv::CMP_EQ, a, s);
+    પાછા e;
 }
 
-MatExpr operator != (const Mat& a, const Mat& b)
+Mat_પદાવલિ operator != (અચલ Mat& a, અચલ Mat& b)
 {
     checkOperandsExist(a, b);
-    MatExpr e;
-    MatOp_Cmp::makeExpr(e, cv::CMP_NE, a, b);
-    return e;
+    Mat_પદાવલિ e;
+    MatOp_Cmp::make_પદાવલિ(e, cv::CMP_NE, a, b);
+    પાછા e;
 }
 
-MatExpr operator != (const Mat& a, double s)
+Mat_પદાવલિ operator != (અચલ Mat& a, દ્વિગુણ s)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Cmp::makeExpr(e, cv::CMP_NE, a, s);
-    return e;
+    Mat_પદાવલિ e;
+    MatOp_Cmp::make_પદાવલિ(e, cv::CMP_NE, a, s);
+    પાછા e;
 }
 
-MatExpr operator != (double s, const Mat& a)
+Mat_પદાવલિ operator != (દ્વિગુણ s, અચલ Mat& a)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Cmp::makeExpr(e, cv::CMP_NE, a, s);
-    return e;
+    Mat_પદાવલિ e;
+    MatOp_Cmp::make_પદાવલિ(e, cv::CMP_NE, a, s);
+    પાછા e;
 }
 
-MatExpr operator >= (const Mat& a, const Mat& b)
+Mat_પદાવલિ operator >= (અચલ Mat& a, અચલ Mat& b)
 {
     checkOperandsExist(a, b);
-    MatExpr e;
-    MatOp_Cmp::makeExpr(e, cv::CMP_GE, a, b);
-    return e;
+    Mat_પદાવલિ e;
+    MatOp_Cmp::make_પદાવલિ(e, cv::CMP_GE, a, b);
+    પાછા e;
 }
 
-MatExpr operator >= (const Mat& a, double s)
+Mat_પદાવલિ operator >= (અચલ Mat& a, દ્વિગુણ s)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Cmp::makeExpr(e, cv::CMP_GE, a, s);
-    return e;
+    Mat_પદાવલિ e;
+    MatOp_Cmp::make_પદાવલિ(e, cv::CMP_GE, a, s);
+    પાછા e;
 }
 
-MatExpr operator >= (double s, const Mat& a)
+Mat_પદાવલિ operator >= (દ્વિગુણ s, અચલ Mat& a)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Cmp::makeExpr(e, cv::CMP_LE, a, s);
-    return e;
+    Mat_પદાવલિ e;
+    MatOp_Cmp::make_પદાવલિ(e, cv::CMP_LE, a, s);
+    પાછા e;
 }
 
-MatExpr operator > (const Mat& a, const Mat& b)
+Mat_પદાવલિ operator > (અચલ Mat& a, અચલ Mat& b)
 {
     checkOperandsExist(a, b);
-    MatExpr e;
-    MatOp_Cmp::makeExpr(e, cv::CMP_GT, a, b);
-    return e;
+    Mat_પદાવલિ e;
+    MatOp_Cmp::make_પદાવલિ(e, cv::CMP_GT, a, b);
+    પાછા e;
 }
 
-MatExpr operator > (const Mat& a, double s)
+Mat_પદાવલિ operator > (અચલ Mat& a, દ્વિગુણ s)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Cmp::makeExpr(e, cv::CMP_GT, a, s);
-    return e;
+    Mat_પદાવલિ e;
+    MatOp_Cmp::make_પદાવલિ(e, cv::CMP_GT, a, s);
+    પાછા e;
 }
 
-MatExpr operator > (double s, const Mat& a)
+Mat_પદાવલિ operator > (દ્વિગુણ s, અચલ Mat& a)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Cmp::makeExpr(e, cv::CMP_LT, a, s);
-    return e;
+    Mat_પદાવલિ e;
+    MatOp_Cmp::make_પદાવલિ(e, cv::CMP_LT, a, s);
+    પાછા e;
 }
 
-MatExpr min(const Mat& a, const Mat& b)
+Mat_પદાવલિ min(અચલ Mat& a, અચલ Mat& b)
 {
     CV_INSTRUMENT_REGION();
 
     checkOperandsExist(a, b);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, 'm', a, b);
-    return e;
+    Mat_પદાવલિ e;
+    MatOp_Bin::make_પદાવલિ(e, 'm', a, b);
+    પાછા e;
 }
 
-MatExpr min(const Mat& a, double s)
+Mat_પદાવલિ min(અચલ Mat& a, દ્વિગુણ s)
 {
     CV_INSTRUMENT_REGION();
 
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, 'n', a, s);
-    return e;
+    Mat_પદાવલિ e;
+    MatOp_Bin::make_પદાવલિ(e, 'n', a, s);
+    પાછા e;
 }
 
-MatExpr min(double s, const Mat& a)
+Mat_પદાવલિ min(દ્વિગુણ s, અચલ Mat& a)
 {
     CV_INSTRUMENT_REGION();
 
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, 'n', a, s);
-    return e;
+    Mat_પદાવલિ e;
+    MatOp_Bin::make_પદાવલિ(e, 'n', a, s);
+    પાછા e;
 }
 
-MatExpr max(const Mat& a, const Mat& b)
+Mat_પદાવલિ max(અચલ Mat& a, અચલ Mat& b)
 {
     CV_INSTRUMENT_REGION();
 
     checkOperandsExist(a, b);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, 'M', a, b);
-    return e;
+    Mat_પદાવલિ e;
+    MatOp_Bin::make_પદાવલિ(e, 'M', a, b);
+    પાછા e;
 }
 
-MatExpr max(const Mat& a, double s)
+Mat_પદાવલિ max(અચલ Mat& a, દ્વિગુણ s)
 {
     CV_INSTRUMENT_REGION();
 
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, 'N', a, s);
-    return e;
+    Mat_પદાવલિ e;
+    MatOp_Bin::make_પદાવલિ(e, 'N', a, s);
+    પાછા e;
 }
 
-MatExpr max(double s, const Mat& a)
+Mat_પદાવલિ max(દ્વિગુણ s, અચલ Mat& a)
 {
     CV_INSTRUMENT_REGION();
 
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, 'N', a, s);
-    return e;
+    Mat_પદાવલિ e;
+    MatOp_Bin::make_પદાવલિ(e, 'N', a, s);
+    પાછા e;
 }
 
-MatExpr operator & (const Mat& a, const Mat& b)
+Mat_પદાવલિ operator & (અચલ Mat& a, અચલ Mat& b)
 {
     checkOperandsExist(a, b);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, '&', a, b);
-    return e;
+    Mat_પદાવલિ e;
+    MatOp_Bin::make_પદાવલિ(e, '&', a, b);
+    પાછા e;
 }
 
-MatExpr operator & (const Mat& a, const Scalar& s)
+Mat_પદાવલિ operator & (અચલ Mat& a, અચલ Scalar& s)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, '&', a, s);
-    return e;
+    Mat_પદાવલિ e;
+    MatOp_Bin::make_પદાવલિ(e, '&', a, s);
+    પાછા e;
 }
 
-MatExpr operator & (const Scalar& s, const Mat& a)
+Mat_પદાવલિ operator & (અચલ Scalar& s, અચલ Mat& a)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, '&', a, s);
-    return e;
+    Mat_પદાવલિ e;
+    MatOp_Bin::make_પદાવલિ(e, '&', a, s);
+    પાછા e;
 }
 
-MatExpr operator | (const Mat& a, const Mat& b)
+Mat_પદાવલિ operator | (અચલ Mat& a, અચલ Mat& b)
 {
     checkOperandsExist(a, b);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, '|', a, b);
-    return e;
+    Mat_પદાવલિ e;
+    MatOp_Bin::make_પદાવલિ(e, '|', a, b);
+    પાછા e;
 }
 
-MatExpr operator | (const Mat& a, const Scalar& s)
+Mat_પદાવલિ operator | (અચલ Mat& a, અચલ Scalar& s)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, '|', a, s);
-    return e;
+    Mat_પદાવલિ e;
+    MatOp_Bin::make_પદાવલિ(e, '|', a, s);
+    પાછા e;
 }
 
-MatExpr operator | (const Scalar& s, const Mat& a)
+Mat_પદાવલિ operator | (અચલ Scalar& s, અચલ Mat& a)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, '|', a, s);
-    return e;
+    Mat_પદાવલિ e;
+    MatOp_Bin::make_પદાવલિ(e, '|', a, s);
+    પાછા e;
 }
 
-MatExpr operator ^ (const Mat& a, const Mat& b)
+Mat_પદાવલિ operator ^ (અચલ Mat& a, અચલ Mat& b)
 {
     checkOperandsExist(a, b);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, '^', a, b);
-    return e;
+    Mat_પદાવલિ e;
+    MatOp_Bin::make_પદાવલિ(e, '^', a, b);
+    પાછા e;
 }
 
-MatExpr operator ^ (const Mat& a, const Scalar& s)
+Mat_પદાવલિ operator ^ (અચલ Mat& a, અચલ Scalar& s)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, '^', a, s);
-    return e;
+    Mat_પદાવલિ e;
+    MatOp_Bin::make_પદાવલિ(e, '^', a, s);
+    પાછા e;
 }
 
-MatExpr operator ^ (const Scalar& s, const Mat& a)
+Mat_પદાવલિ operator ^ (અચલ Scalar& s, અચલ Mat& a)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, '^', a, s);
-    return e;
+    Mat_પદાવલિ e;
+    MatOp_Bin::make_પદાવલિ(e, '^', a, s);
+    પાછા e;
 }
 
-MatExpr operator ~(const Mat& a)
+Mat_પદાવલિ operator ~(અચલ Mat& a)
 {
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, '~', a, Scalar());
-    return e;
+    Mat_પદાવલિ e;
+    MatOp_Bin::make_પદાવલિ(e, '~', a, Scalar());
+    પાછા e;
 }
 
-MatExpr abs(const Mat& a)
+Mat_પદાવલિ abs(અચલ Mat& a)
 {
     CV_INSTRUMENT_REGION();
 
     checkOperandsExist(a);
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, 'a', a, Scalar());
-    return e;
+    Mat_પદાવલિ e;
+    MatOp_Bin::make_પદાવલિ(e, 'a', a, Scalar());
+    પાછા e;
 }
 
-MatExpr abs(const MatExpr& e)
+Mat_પદાવલિ abs(અચલ Mat_પદાવલિ& e)
 {
     CV_INSTRUMENT_REGION();
 
-    MatExpr en;
+    Mat_પદાવલિ en;
     e.op->abs(e, en);
-    return en;
+    પાછા en;
 }
 
 
-Size MatExpr::size() const
+Size Mat_પદાવલિ::size() અચલ
 {
-    if( isT(*this) || isInv(*this) )
-        return Size(a.rows, a.cols);
-    if( isSolve(*this) )
-        return Size(b.cols, a.cols);
-    if( isInitializer(*this) )
-        return a.size();
-    return op ? op->size(*this) : Size();
+    જો( isT(*આ) || isInv(*આ) )
+        પાછા Size(a.rows, a.cols);
+    જો( isSolve(*આ) )
+        પાછા Size(b.cols, a.cols);
+    જો( isInitializer(*આ) )
+        પાછા a.size();
+    પાછા op ? op->size(*આ) : Size();
 }
 
 
-int MatExpr::type() const
+પૂર્ણાંક Mat_પદાવલિ::type() અચલ
 {
     CV_INSTRUMENT_REGION();
 
-    if( isInitializer(*this) )
-        return a.type();
-    if( isCmp(*this) )
-        return CV_MAKETYPE(CV_8U, a.channels());
-    return op ? op->type(*this) : -1;
+    જો( isInitializer(*આ) )
+        પાછા a.type();
+    જો( isCmp(*આ) )
+        પાછા CV_MAKETYPE(CV_8U, a.channels());
+    પાછા op ? op->type(*આ) : -1;
 }
 
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void MatOp_Identity::assign(const MatExpr& e, Mat& m, int _type) const
+શૂન્ય MatOp_Identity::assign(અચલ Mat_પદાવલિ& e, Mat& m, પૂર્ણાંક _type) અચલ
 {
-    if( _type == -1 || _type == e.a.type() )
+    જો( _type == -1 || _type == e.a.type() )
         m = e.a;
-    else
+    નહીંતર
     {
         CV_Assert( CV_MAT_CN(_type) == e.a.channels() );
         e.a.convertTo(m, _type);
     }
 }
 
-inline void MatOp_Identity::makeExpr(MatExpr& res, const Mat& m)
+અંતઃરેખ શૂન્ય MatOp_Identity::make_પદાવલિ(Mat_પદાવલિ& res, અચલ Mat& m)
 {
-    res = MatExpr(&g_MatOp_Identity, 0, m, Mat(), Mat(), 1, 0);
+    res = Mat_પદાવલિ(&g_MatOp_Identity, 0, m, Mat(), Mat(), 1, 0);
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void MatOp_AddEx::assign(const MatExpr& e, Mat& m, int _type) const
+શૂન્ય MatOp_AddEx::assign(અચલ Mat_પદાવલિ& e, Mat& m, પૂર્ણાંક _type) અચલ
 {
     Mat temp, &dst = _type == -1 || e.a.type() == _type ? m : temp;
-    if( e.b.data )
+    જો( e.b.data )
     {
-        if( e.s == Scalar() || !e.s.isReal() )
+        જો( e.s == Scalar() || !e.s.isReal() )
         {
-            if( e.alpha == 1 )
+            જો( e.alpha == 1 )
             {
-                if( e.beta == 1 )
+                જો( e.beta == 1 )
                     cv::add(e.a, e.b, dst);
-                else if( e.beta == -1 )
+                નહીંતર જો( e.beta == -1 )
                     cv::subtract(e.a, e.b, dst);
-                else
+                નહીંતર
                     cv::scaleAdd(e.b, e.beta, e.a, dst);
             }
-            else if( e.beta == 1 )
+            નહીંતર જો( e.beta == 1 )
             {
-                if( e.alpha == -1 )
+                જો( e.alpha == -1 )
                     cv::subtract(e.b, e.a, dst);
-                else
+                નહીંતર
                     cv::scaleAdd(e.a, e.alpha, e.b, dst);
             }
-            else
+            નહીંતર
                 cv::addWeighted(e.a, e.alpha, e.b, e.beta, 0, dst);
 
-            if( !e.s.isReal() )
+            જો( !e.s.isReal() )
                 cv::add(dst, e.s, dst);
         }
-        else
+        નહીંતર
         {
-            if (e.a.channels() > 1)
-                CV_LOG_ONCE_WARNING(NULL, "OpenCV/MatExpr: processing of multi-channel arrays might be changed in the future: "
+            જો (e.a.channels() > 1)
+                CV_LOG_ONCE_WARNING(ખાલી, "OpenCV/MatExpr: processing of multi-channel arrays might be changed in the future: "
                                           "https://github.com/opencv/opencv/issues/16739");
             cv::addWeighted(e.a, e.alpha, e.b, e.beta, e.s[0], dst);
         }
     }
-    else if( e.s.isReal() && (dst.data != m.data || fabs(e.alpha) != 1))
+    નહીંતર જો( e.s.isReal() && (dst.data != m.data || fabs(e.alpha) != 1))
     {
-        if (e.a.channels() > 1 && e.s[0] != 0.0)
-            CV_LOG_ONCE_WARNING(NULL, "OpenCV/MatExpr: processing of multi-channel arrays might be changed in the future: "
+        જો (e.a.channels() > 1 && e.s[0] != 0.0)
+            CV_LOG_ONCE_WARNING(ખાલી, "OpenCV/MatExpr: processing of multi-channel arrays might be changed in the future: "
                                       "https://github.com/opencv/opencv/issues/16739");
         e.a.convertTo(m, _type, e.alpha, e.s[0]);
-        return;
+        પાછા;
     }
-    else if( e.alpha == 1 )
+    નહીંતર જો( e.alpha == 1 )
         cv::add(e.a, e.s, dst);
-    else if( e.alpha == -1 )
+    નહીંતર જો( e.alpha == -1 )
         cv::subtract(e.s, e.a, dst);
-    else
+    નહીંતર
     {
         e.a.convertTo(dst, e.a.type(), e.alpha);
         cv::add(dst, e.s, dst);
     }
 
-    if( dst.data != m.data )
+    જો( dst.data != m.data )
         dst.convertTo(m, m.type());
 }
 
 
-void MatOp_AddEx::add(const MatExpr& e, const Scalar& s, MatExpr& res) const
+શૂન્ય MatOp_AddEx::add(અચલ Mat_પદાવલિ& e, અચલ Scalar& s, Mat_પદાવલિ& res) અચલ
 {
     CV_INSTRUMENT_REGION();
 
@@ -1359,7 +1359,7 @@ void MatOp_AddEx::add(const MatExpr& e, const Scalar& s, MatExpr& res) const
 }
 
 
-void MatOp_AddEx::subtract(const Scalar& s, const MatExpr& e, MatExpr& res) const
+શૂન્ય MatOp_AddEx::subtract(અચલ Scalar& s, અચલ Mat_પદાવલિ& e, Mat_પદાવલિ& res) અચલ
 {
     CV_INSTRUMENT_REGION();
 
@@ -1369,7 +1369,7 @@ void MatOp_AddEx::subtract(const Scalar& s, const MatExpr& e, MatExpr& res) cons
     res.s = s - res.s;
 }
 
-void MatOp_AddEx::multiply(const MatExpr& e, double s, MatExpr& res) const
+શૂન્ય MatOp_AddEx::multiply(અચલ Mat_પદાવલિ& e, દ્વિગુણ s, Mat_પદાવલિ& res) અચલ
 {
     CV_INSTRUMENT_REGION();
 
@@ -1379,160 +1379,160 @@ void MatOp_AddEx::multiply(const MatExpr& e, double s, MatExpr& res) const
     res.s *= s;
 }
 
-void MatOp_AddEx::divide(double s, const MatExpr& e, MatExpr& res) const
+શૂન્ય MatOp_AddEx::divide(દ્વિગુણ s, અચલ Mat_પદાવલિ& e, Mat_પદાવલિ& res) અચલ
 {
     CV_INSTRUMENT_REGION();
 
-    if( isScaled(e) )
-        MatOp_Bin::makeExpr(res, '/', e.a, Mat(), s/e.alpha);
-    else
+    જો( isScaled(e) )
+        MatOp_Bin::make_પદાવલિ(res, '/', e.a, Mat(), s/e.alpha);
+    નહીંતર
         MatOp::divide(s, e, res);
 }
 
 
-void MatOp_AddEx::transpose(const MatExpr& e, MatExpr& res) const
+શૂન્ય MatOp_AddEx::transpose(અચલ Mat_પદાવલિ& e, Mat_પદાવલિ& res) અચલ
 {
     CV_INSTRUMENT_REGION();
 
-    if( isScaled(e) )
-        MatOp_T::makeExpr(res, e.a, e.alpha);
-    else
+    જો( isScaled(e) )
+        MatOp_T::make_પદાવલિ(res, e.a, e.alpha);
+    નહીંતર
         MatOp::transpose(e, res);
 }
 
-void MatOp_AddEx::abs(const MatExpr& e, MatExpr& res) const
+શૂન્ય MatOp_AddEx::abs(અચલ Mat_પદાવલિ& e, Mat_પદાવલિ& res) અચલ
 {
     CV_INSTRUMENT_REGION();
 
-    if( (!e.b.data || e.beta == 0) && fabs(e.alpha) == 1 )
-        MatOp_Bin::makeExpr(res, 'a', e.a, -e.s*e.alpha);
-    else if( e.b.data && e.alpha + e.beta == 0 && e.alpha*e.beta == -1 )
-        MatOp_Bin::makeExpr(res, 'a', e.a, e.b);
-    else
+    જો( (!e.b.data || e.beta == 0) && fabs(e.alpha) == 1 )
+        MatOp_Bin::make_પદાવલિ(res, 'a', e.a, -e.s*e.alpha);
+    નહીંતર જો( e.b.data && e.alpha + e.beta == 0 && e.alpha*e.beta == -1 )
+        MatOp_Bin::make_પદાવલિ(res, 'a', e.a, e.b);
+    નહીંતર
         MatOp::abs(e, res);
 }
 
-inline void MatOp_AddEx::makeExpr(MatExpr& res, const Mat& a, const Mat& b, double alpha, double beta, const Scalar& s)
+અંતઃરેખ શૂન્ય MatOp_AddEx::make_પદાવલિ(Mat_પદાવલિ& res, અચલ Mat& a, અચલ Mat& b, દ્વિગુણ alpha, દ્વિગુણ beta, અચલ Scalar& s)
 {
-    res = MatExpr(&g_MatOp_AddEx, 0, a, b, Mat(), alpha, beta, s);
+    res = Mat_પદાવલિ(&g_MatOp_AddEx, 0, a, b, Mat(), alpha, beta, s);
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void MatOp_Bin::assign(const MatExpr& e, Mat& m, int _type) const
+શૂન્ય MatOp_Bin::assign(અચલ Mat_પદાવલિ& e, Mat& m, પૂર્ણાંક _type) અચલ
 {
     Mat temp, &dst = _type == -1 || e.a.type() == _type ? m : temp;
 
-    if( e.flags == '*' )
+    જો( e.flags == '*' )
         cv::multiply(e.a, e.b, dst, e.alpha);
-    else if( e.flags == '/' && e.b.data )
+    નહીંતર જો( e.flags == '/' && e.b.data )
         cv::divide(e.a, e.b, dst, e.alpha);
-    else if( e.flags == '/' && !e.b.data )
+    નહીંતર જો( e.flags == '/' && !e.b.data )
         cv::divide(e.alpha, e.a, dst );
-    else if( e.flags == '&' && e.b.data )
+    નહીંતર જો( e.flags == '&' && e.b.data )
         bitwise_and(e.a, e.b, dst);
-    else if( e.flags == '&' && !e.b.data )
+    નહીંતર જો( e.flags == '&' && !e.b.data )
         bitwise_and(e.a, e.s, dst);
-    else if( e.flags == '|' && e.b.data )
+    નહીંતર જો( e.flags == '|' && e.b.data )
         bitwise_or(e.a, e.b, dst);
-    else if( e.flags == '|' && !e.b.data )
+    નહીંતર જો( e.flags == '|' && !e.b.data )
         bitwise_or(e.a, e.s, dst);
-    else if( e.flags == '^' && e.b.data )
+    નહીંતર જો( e.flags == '^' && e.b.data )
         bitwise_xor(e.a, e.b, dst);
-    else if( e.flags == '^' && !e.b.data )
+    નહીંતર જો( e.flags == '^' && !e.b.data )
         bitwise_xor(e.a, e.s, dst);
-    else if( e.flags == '~' && !e.b.data )
+    નહીંતર જો( e.flags == '~' && !e.b.data )
         bitwise_not(e.a, dst);
-    else if( e.flags == 'm' )
+    નહીંતર જો( e.flags == 'm' )
         cv::min(e.a, e.b, dst);
-    else if( e.flags == 'n' )
+    નહીંતર જો( e.flags == 'n' )
         cv::min(e.a, e.s[0], dst);
-    else if( e.flags == 'M' )
+    નહીંતર જો( e.flags == 'M' )
         cv::max(e.a, e.b, dst);
-    else if( e.flags == 'N' )
+    નહીંતર જો( e.flags == 'N' )
         cv::max(e.a, e.s[0], dst);
-    else if( e.flags == 'a' && e.b.data )
+    નહીંતર જો( e.flags == 'a' && e.b.data )
         cv::absdiff(e.a, e.b, dst);
-    else if( e.flags == 'a' && !e.b.data )
+    નહીંતર જો( e.flags == 'a' && !e.b.data )
         cv::absdiff(e.a, e.s, dst);
-    else
+    નહીંતર
         CV_Error(cv::Error::StsError, "Unknown operation");
 
-    if( dst.data != m.data )
+    જો( dst.data != m.data )
         dst.convertTo(m, _type);
 }
 
-void MatOp_Bin::multiply(const MatExpr& e, double s, MatExpr& res) const
+શૂન્ય MatOp_Bin::multiply(અચલ Mat_પદાવલિ& e, દ્વિગુણ s, Mat_પદાવલિ& res) અચલ
 {
     CV_INSTRUMENT_REGION();
 
-    if( e.flags == '*' || e.flags == '/' )
+    જો( e.flags == '*' || e.flags == '/' )
     {
         res = e;
         res.alpha *= s;
     }
-    else
+    નહીંતર
         MatOp::multiply(e, s, res);
 }
 
-void MatOp_Bin::divide(double s, const MatExpr& e, MatExpr& res) const
+શૂન્ય MatOp_Bin::divide(દ્વિગુણ s, અચલ Mat_પદાવલિ& e, Mat_પદાવલિ& res) અચલ
 {
     CV_INSTRUMENT_REGION();
 
-    if( e.flags == '/' && (!e.b.data || e.beta == 0) )
-        MatOp_AddEx::makeExpr(res, e.a, Mat(), s/e.alpha, 0);
-    else
+    જો( e.flags == '/' && (!e.b.data || e.beta == 0) )
+        MatOp_AddEx::make_પદાવલિ(res, e.a, Mat(), s/e.alpha, 0);
+    નહીંતર
         MatOp::divide(s, e, res);
 }
 
-inline void MatOp_Bin::makeExpr(MatExpr& res, char op, const Mat& a, const Mat& b, double scale)
+અંતઃરેખ શૂન્ય MatOp_Bin::make_પદાવલિ(Mat_પદાવલિ& res, અક્ષર op, અચલ Mat& a, અચલ Mat& b, દ્વિગુણ scale)
 {
-    res = MatExpr(&g_MatOp_Bin, op, a, b, Mat(), scale, b.data ? 1 : 0);
+    res = Mat_પદાવલિ(&g_MatOp_Bin, op, a, b, Mat(), scale, b.data ? 1 : 0);
 }
 
-inline void MatOp_Bin::makeExpr(MatExpr& res, char op, const Mat& a, const Scalar& s)
+અંતઃરેખ શૂન્ય MatOp_Bin::make_પદાવલિ(Mat_પદાવલિ& res, અક્ષર op, અચલ Mat& a, અચલ Scalar& s)
 {
-    res = MatExpr(&g_MatOp_Bin, op, a, Mat(), Mat(), 1, 0, s);
+    res = Mat_પદાવલિ(&g_MatOp_Bin, op, a, Mat(), Mat(), 1, 0, s);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void MatOp_Cmp::assign(const MatExpr& e, Mat& m, int _type) const
+શૂન્ય MatOp_Cmp::assign(અચલ Mat_પદાવલિ& e, Mat& m, પૂર્ણાંક _type) અચલ
 {
     Mat temp, &dst = _type == -1 || _type == CV_8U ? m : temp;
 
-    if( e.b.data )
+    જો( e.b.data )
         cv::compare(e.a, e.b, dst, e.flags);
-    else
+    નહીંતર
         cv::compare(e.a, e.alpha, dst, e.flags);
 
-    if( dst.data != m.data )
+    જો( dst.data != m.data )
         dst.convertTo(m, _type);
 }
 
-inline void MatOp_Cmp::makeExpr(MatExpr& res, int cmpop, const Mat& a, const Mat& b)
+અંતઃરેખ શૂન્ય MatOp_Cmp::make_પદાવલિ(Mat_પદાવલિ& res, પૂર્ણાંક cmpop, અચલ Mat& a, અચલ Mat& b)
 {
-    res = MatExpr(&g_MatOp_Cmp, cmpop, a, b, Mat(), 1, 1);
+    res = Mat_પદાવલિ(&g_MatOp_Cmp, cmpop, a, b, Mat(), 1, 1);
 }
 
-inline void MatOp_Cmp::makeExpr(MatExpr& res, int cmpop, const Mat& a, double alpha)
+અંતઃરેખ શૂન્ય MatOp_Cmp::make_પદાવલિ(Mat_પદાવલિ& res, પૂર્ણાંક cmpop, અચલ Mat& a, દ્વિગુણ alpha)
 {
-    res = MatExpr(&g_MatOp_Cmp, cmpop, a, Mat(), Mat(), alpha, 1);
+    res = Mat_પદાવલિ(&g_MatOp_Cmp, cmpop, a, Mat(), Mat(), alpha, 1);
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void MatOp_T::assign(const MatExpr& e, Mat& m, int _type) const
+શૂન્ય MatOp_T::assign(અચલ Mat_પદાવલિ& e, Mat& m, પૂર્ણાંક _type) અચલ
 {
     Mat temp, &dst = _type == -1 || _type == e.a.type() ? m : temp;
 
     cv::transpose(e.a, dst);
 
-    if( dst.data != m.data || e.alpha != 1 )
+    જો( dst.data != m.data || e.alpha != 1 )
         dst.convertTo(m, _type, e.alpha);
 }
 
-void MatOp_T::multiply(const MatExpr& e, double s, MatExpr& res) const
+શૂન્ય MatOp_T::multiply(અચલ Mat_પદાવલિ& e, દ્વિગુણ s, Mat_પદાવલિ& res) અચલ
 {
     CV_INSTRUMENT_REGION();
 
@@ -1540,71 +1540,71 @@ void MatOp_T::multiply(const MatExpr& e, double s, MatExpr& res) const
     res.alpha *= s;
 }
 
-void MatOp_T::transpose(const MatExpr& e, MatExpr& res) const
+શૂન્ય MatOp_T::transpose(અચલ Mat_પદાવલિ& e, Mat_પદાવલિ& res) અચલ
 {
     CV_INSTRUMENT_REGION();
 
-    if( e.alpha == 1 )
-        MatOp_Identity::makeExpr(res, e.a);
-    else
-        MatOp_AddEx::makeExpr(res, e.a, Mat(), e.alpha, 0);
+    જો( e.alpha == 1 )
+        MatOp_Identity::make_પદાવલિ(res, e.a);
+    નહીંતર
+        MatOp_AddEx::make_પદાવલિ(res, e.a, Mat(), e.alpha, 0);
 }
 
-inline void MatOp_T::makeExpr(MatExpr& res, const Mat& a, double alpha)
+અંતઃરેખ શૂન્ય MatOp_T::make_પદાવલિ(Mat_પદાવલિ& res, અચલ Mat& a, દ્વિગુણ alpha)
 {
-    res = MatExpr(&g_MatOp_T, 0, a, Mat(), Mat(), alpha, 0);
+    res = Mat_પદાવલિ(&g_MatOp_T, 0, a, Mat(), Mat(), alpha, 0);
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void MatOp_GEMM::assign(const MatExpr& e, Mat& m, int _type) const
+શૂન્ય MatOp_GEMM::assign(અચલ Mat_પદાવલિ& e, Mat& m, પૂર્ણાંક _type) અચલ
 {
     Mat temp, &dst = _type == -1 || _type == e.a.type() ? m : temp;
 
     cv::gemm(e.a, e.b, e.alpha, e.c, e.beta, dst, e.flags);
-    if( dst.data != m.data )
+    જો( dst.data != m.data )
         dst.convertTo(m, _type);
 }
 
-void MatOp_GEMM::add(const MatExpr& e1, const MatExpr& e2, MatExpr& res) const
+શૂન્ય MatOp_GEMM::add(અચલ Mat_પદાવલિ& e1, અચલ Mat_પદાવલિ& e2, Mat_પદાવલિ& res) અચલ
 {
     CV_INSTRUMENT_REGION();
 
-    bool i1 = isIdentity(e1), i2 = isIdentity(e2);
-    double alpha1 = i1 ? 1 : e1.alpha, alpha2 = i2 ? 1 : e2.alpha;
+    તાર્કિક i1 = isIdentity(e1), i2 = isIdentity(e2);
+    દ્વિગુણ alpha1 = i1 ? 1 : e1.alpha, alpha2 = i2 ? 1 : e2.alpha;
 
-    if( isMatProd(e1) && (i2 || isScaled(e2) || isT(e2)) )
-        MatOp_GEMM::makeExpr(res, (e1.flags & ~cv::GEMM_3_T)|(isT(e2) ? cv::GEMM_3_T : 0),
+    જો( isMatProd(e1) && (i2 || isScaled(e2) || isT(e2)) )
+        MatOp_GEMM::make_પદાવલિ(res, (e1.flags & ~cv::GEMM_3_T)|(isT(e2) ? cv::GEMM_3_T : 0),
                              e1.a, e1.b, alpha1, e2.a, alpha2);
-    else if( isMatProd(e2) && (i1 || isScaled(e1) || isT(e1)) )
-        MatOp_GEMM::makeExpr(res, (e2.flags & ~cv::GEMM_3_T)|(isT(e1) ? cv::GEMM_3_T : 0),
+    નહીંતર જો( isMatProd(e2) && (i1 || isScaled(e1) || isT(e1)) )
+        MatOp_GEMM::make_પદાવલિ(res, (e2.flags & ~cv::GEMM_3_T)|(isT(e1) ? cv::GEMM_3_T : 0),
                              e2.a, e2.b, alpha2, e1.a, alpha1);
-    else if( this == e2.op )
+    નહીંતર જો( આ == e2.op )
         MatOp::add(e1, e2, res);
-    else
+    નહીંતર
         e2.op->add(e1, e2, res);
 }
 
-void MatOp_GEMM::subtract(const MatExpr& e1, const MatExpr& e2, MatExpr& res) const
+શૂન્ય MatOp_GEMM::subtract(અચલ Mat_પદાવલિ& e1, અચલ Mat_પદાવલિ& e2, Mat_પદાવલિ& res) અચલ
 {
     CV_INSTRUMENT_REGION();
 
-    bool i1 = isIdentity(e1), i2 = isIdentity(e2);
-    double alpha1 = i1 ? 1 : e1.alpha, alpha2 = i2 ? 1 : e2.alpha;
+    તાર્કિક i1 = isIdentity(e1), i2 = isIdentity(e2);
+    દ્વિગુણ alpha1 = i1 ? 1 : e1.alpha, alpha2 = i2 ? 1 : e2.alpha;
 
-    if( isMatProd(e1) && (i2 || isScaled(e2) || isT(e2)) )
-        MatOp_GEMM::makeExpr(res, (e1.flags & ~cv::GEMM_3_T)|(isT(e2) ? cv::GEMM_3_T : 0),
+    જો( isMatProd(e1) && (i2 || isScaled(e2) || isT(e2)) )
+        MatOp_GEMM::make_પદાવલિ(res, (e1.flags & ~cv::GEMM_3_T)|(isT(e2) ? cv::GEMM_3_T : 0),
                              e1.a, e1.b, alpha1, e2.a, -alpha2);
-    else if( isMatProd(e2) && (i1 || isScaled(e1) || isT(e1)) )
-        MatOp_GEMM::makeExpr(res, (e2.flags & ~cv::GEMM_3_T)|(isT(e1) ? cv::GEMM_3_T : 0),
+    નહીંતર જો( isMatProd(e2) && (i1 || isScaled(e1) || isT(e1)) )
+        MatOp_GEMM::make_પદાવલિ(res, (e2.flags & ~cv::GEMM_3_T)|(isT(e1) ? cv::GEMM_3_T : 0),
                             e2.a, e2.b, -alpha2, e1.a, alpha1);
-    else if( this == e2.op )
+    નહીંતર જો( આ == e2.op )
         MatOp::subtract(e1, e2, res);
-    else
+    નહીંતર
         e2.op->subtract(e1, e2, res);
 }
 
-void MatOp_GEMM::multiply(const MatExpr& e, double s, MatExpr& res) const
+શૂન્ય MatOp_GEMM::multiply(અચલ Mat_પદાવલિ& e, દ્વિગુણ s, Mat_પદાવલિ& res) અચલ
 {
     CV_INSTRUMENT_REGION();
 
@@ -1613,7 +1613,7 @@ void MatOp_GEMM::multiply(const MatExpr& e, double s, MatExpr& res) const
     res.beta *= s;
 }
 
-void MatOp_GEMM::transpose(const MatExpr& e, MatExpr& res) const
+શૂન્ય MatOp_GEMM::transpose(અચલ Mat_પદાવલિ& e, Mat_પદાવલિ& res) અચલ
 {
     CV_INSTRUMENT_REGION();
 
@@ -1624,74 +1624,74 @@ void MatOp_GEMM::transpose(const MatExpr& e, MatExpr& res) const
     swap(res.a, res.b);
 }
 
-inline void MatOp_GEMM::makeExpr(MatExpr& res, int flags, const Mat& a, const Mat& b,
-                                 double alpha, const Mat& c, double beta)
+અંતઃરેખ શૂન્ય MatOp_GEMM::make_પદાવલિ(Mat_પદાવલિ& res, પૂર્ણાંક flags, અચલ Mat& a, અચલ Mat& b,
+                                 દ્વિગુણ alpha, અચલ Mat& c, દ્વિગુણ beta)
 {
-    res = MatExpr(&g_MatOp_GEMM, flags, a, b, c, alpha, beta);
+    res = Mat_પદાવલિ(&g_MatOp_GEMM, flags, a, b, c, alpha, beta);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void MatOp_Invert::assign(const MatExpr& e, Mat& m, int _type) const
+શૂન્ય MatOp_Invert::assign(અચલ Mat_પદાવલિ& e, Mat& m, પૂર્ણાંક _type) અચલ
 {
     Mat temp, &dst = _type == -1 || _type == e.a.type() ? m : temp;
 
     cv::invert(e.a, dst, e.flags);
-    if( dst.data != m.data )
+    જો( dst.data != m.data )
         dst.convertTo(m, _type);
 }
 
-void MatOp_Invert::matmul(const MatExpr& e1, const MatExpr& e2, MatExpr& res) const
+શૂન્ય MatOp_Invert::matmul(અચલ Mat_પદાવલિ& e1, અચલ Mat_પદાવલિ& e2, Mat_પદાવલિ& res) અચલ
 {
-    if( isInv(e1) && isIdentity(e2) )
-        MatOp_Solve::makeExpr(res, e1.flags, e1.a, e2.a);
-    else if( this == e2.op )
+    જો( isInv(e1) && isIdentity(e2) )
+        MatOp_Solve::make_પદાવલિ(res, e1.flags, e1.a, e2.a);
+    નહીંતર જો( આ == e2.op )
         MatOp::matmul(e1, e2, res);
-    else
+    નહીંતર
         e2.op->matmul(e1, e2, res);
 }
 
-inline void MatOp_Invert::makeExpr(MatExpr& res, int method, const Mat& m)
+અંતઃરેખ શૂન્ય MatOp_Invert::make_પદાવલિ(Mat_પદાવલિ& res, પૂર્ણાંક method, અચલ Mat& m)
 {
-    res = MatExpr(&g_MatOp_Invert, method, m, Mat(), Mat(), 1, 0);
+    res = Mat_પદાવલિ(&g_MatOp_Invert, method, m, Mat(), Mat(), 1, 0);
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void MatOp_Solve::assign(const MatExpr& e, Mat& m, int _type) const
+શૂન્ય MatOp_Solve::assign(અચલ Mat_પદાવલિ& e, Mat& m, પૂર્ણાંક _type) અચલ
 {
     Mat temp, &dst = _type == -1 || _type == e.a.type() ? m : temp;
 
     cv::solve(e.a, e.b, dst, e.flags);
-    if( dst.data != m.data )
+    જો( dst.data != m.data )
         dst.convertTo(m, _type);
 }
 
-inline void MatOp_Solve::makeExpr(MatExpr& res, int method, const Mat& a, const Mat& b)
+અંતઃરેખ શૂન્ય MatOp_Solve::make_પદાવલિ(Mat_પદાવલિ& res, પૂર્ણાંક method, અચલ Mat& a, અચલ Mat& b)
 {
-    res = MatExpr(&g_MatOp_Solve, method, a, b, Mat(), 1, 1);
+    res = Mat_પદાવલિ(&g_MatOp_Solve, method, a, b, Mat(), 1, 1);
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void MatOp_Initializer::assign(const MatExpr& e, Mat& m, int _type) const
+શૂન્ય MatOp_Initializer::assign(અચલ Mat_પદાવલિ& e, Mat& m, પૂર્ણાંક _type) અચલ
 {
-    if( _type == -1 )
+    જો( _type == -1 )
         _type = e.a.type();
 
     m.create(e.a.size, _type);
 
-    if( e.flags == 'I' && e.a.dims <= 2 )
+    જો( e.flags == 'I' && e.a.dims <= 2 )
         setIdentity(m, Scalar(e.alpha));
-    else if( e.flags == '0' )
+    નહીંતર જો( e.flags == '0' )
         m = Scalar();
-    else if( e.flags == '1' )
+    નહીંતર જો( e.flags == '1' )
         m = Scalar(e.alpha);
-    else
+    નહીંતર
         CV_Error(cv::Error::StsError, "Invalid matrix initializer type");
 }
 
-void MatOp_Initializer::multiply(const MatExpr& e, double s, MatExpr& res) const
+શૂન્ય MatOp_Initializer::multiply(અચલ Mat_પદાવલિ& e, દ્વિગુણ s, Mat_પદાવલિ& res) અચલ
 {
     CV_INSTRUMENT_REGION();
 
@@ -1699,39 +1699,39 @@ void MatOp_Initializer::multiply(const MatExpr& e, double s, MatExpr& res) const
     res.alpha *= s;
 }
 
-inline void MatOp_Initializer::makeExpr(MatExpr& res, int method, Size sz, int type, double alpha)
+અંતઃરેખ શૂન્ય MatOp_Initializer::make_પદાવલિ(Mat_પદાવલિ& res, પૂર્ણાંક method, Size sz, પૂર્ણાંક type, દ્વિગુણ alpha)
 {
-    res = MatExpr(getGlobalMatOpInitializer(), method, Mat(sz, type, (void*)(size_t)0xEEEEEEEE), Mat(), Mat(), alpha, 0);
+    res = Mat_પદાવલિ(getGlobalMatOpInitializer(), method, Mat(sz, type, (શૂન્ય*)(size_t)0xEEEEEEEE), Mat(), Mat(), alpha, 0);
 }
 
-inline void MatOp_Initializer::makeExpr(MatExpr& res, int method, int ndims, const int* sizes, int type, double alpha)
+અંતઃરેખ શૂન્ય MatOp_Initializer::make_પદાવલિ(Mat_પદાવલિ& res, પૂર્ણાંક method, પૂર્ણાંક ndims, અચલ પૂર્ણાંક* sizes, પૂર્ણાંક type, દ્વિગુણ alpha)
 {
-    res = MatExpr(getGlobalMatOpInitializer(), method, Mat(ndims, sizes, type, (void*)(size_t)0xEEEEEEEE), Mat(), Mat(), alpha, 0);
+    res = Mat_પદાવલિ(getGlobalMatOpInitializer(), method, Mat(ndims, sizes, type, (શૂન્ય*)(size_t)0xEEEEEEEE), Mat(), Mat(), alpha, 0);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-MatExpr Mat::t() const
+Mat_પદાવલિ Mat::t() અચલ
 {
     CV_INSTRUMENT_REGION();
 
-    checkOperandsExist(*this);
-    MatExpr e;
-    MatOp_T::makeExpr(e, *this);
-    return e;
+    checkOperandsExist(*આ);
+    Mat_પદાવલિ e;
+    MatOp_T::make_પદાવલિ(e, *આ);
+    પાછા e;
 }
 
-MatExpr Mat::inv(int method) const
+Mat_પદાવલિ Mat::inv(પૂર્ણાંક method) અચલ
 {
     CV_INSTRUMENT_REGION();
 
-    MatExpr e;
-    MatOp_Invert::makeExpr(e, method, *this);
-    return e;
+    Mat_પદાવલિ e;
+    MatOp_Invert::make_પદાવલિ(e, method, *આ);
+    પાછા e;
 }
 
 
-MatExpr Mat::mul(InputArray m, double scale) const
+Mat_પદાવલિ Mat::mul(આગત_Array m, દ્વિગુણ scale) અચલ
 {
     CV_INSTRUMENT_REGION();
 
@@ -1740,105 +1740,105 @@ MatExpr Mat::mul(InputArray m, double scale) const
     // a non-owning view of caller memory (e.g. a scalar bound to _InputArray(const double&),
     // a Matx or a Vec) that the returned MatExpr can outlive, so snapshot it.
     // See https://github.com/opencv/opencv/issues/23577
-    if( !m.isMat() && !m.isUMat() )
+    જો( !m.isMat() && !m.isUMat() )
         b = b.clone();
 
-    MatExpr e;
-    MatOp_Bin::makeExpr(e, '*', *this, b, scale);
-    return e;
+    Mat_પદાવલિ e;
+    MatOp_Bin::make_પદાવલિ(e, '*', *આ, b, scale);
+    પાછા e;
 }
 
-MatExpr Mat::zeros(int rows, int cols, int type)
+Mat_પદાવલિ Mat::zeros(પૂર્ણાંક rows, પૂર્ણાંક cols, પૂર્ણાંક type)
 {
     CV_INSTRUMENT_REGION();
 
-    MatExpr e;
-    MatOp_Initializer::makeExpr(e, '0', Size(cols, rows), type);
-    return e;
+    Mat_પદાવલિ e;
+    MatOp_Initializer::make_પદાવલિ(e, '0', Size(cols, rows), type);
+    પાછા e;
 }
 
-MatExpr Mat::zeros(Size size, int type)
+Mat_પદાવલિ Mat::zeros(Size size, પૂર્ણાંક type)
 {
     CV_INSTRUMENT_REGION();
 
-    MatExpr e;
-    MatOp_Initializer::makeExpr(e, '0', size, type);
-    return e;
+    Mat_પદાવલિ e;
+    MatOp_Initializer::make_પદાવલિ(e, '0', size, type);
+    પાછા e;
 }
 
-MatExpr Mat::zeros(int ndims, const int* sizes, int type)
+Mat_પદાવલિ Mat::zeros(પૂર્ણાંક ndims, અચલ પૂર્ણાંક* sizes, પૂર્ણાંક type)
 {
     CV_INSTRUMENT_REGION();
 
-    MatExpr e;
-    MatOp_Initializer::makeExpr(e, '0', ndims, sizes, type);
-    return e;
+    Mat_પદાવલિ e;
+    MatOp_Initializer::make_પદાવલિ(e, '0', ndims, sizes, type);
+    પાછા e;
 }
 
-MatExpr Mat::zeros(const MatShape& shape, int type)
+Mat_પદાવલિ Mat::zeros(અચલ MatShape& shape, પૂર્ણાંક type)
 {
     CV_INSTRUMENT_REGION();
 
-    MatExpr e;
-    MatOp_Initializer::makeExpr(e, '0', shape.dims, shape.p, type);
-    return e;
+    Mat_પદાવલિ e;
+    MatOp_Initializer::make_પદાવલિ(e, '0', shape.dims, shape.p, type);
+    પાછા e;
 }
 
-MatExpr Mat::ones(int rows, int cols, int type)
+Mat_પદાવલિ Mat::ones(પૂર્ણાંક rows, પૂર્ણાંક cols, પૂર્ણાંક type)
 {
     CV_INSTRUMENT_REGION();
 
-    MatExpr e;
-    MatOp_Initializer::makeExpr(e, '1', Size(cols, rows), type);
-    return e;
+    Mat_પદાવલિ e;
+    MatOp_Initializer::make_પદાવલિ(e, '1', Size(cols, rows), type);
+    પાછા e;
 }
 
-MatExpr Mat::ones(Size size, int type)
+Mat_પદાવલિ Mat::ones(Size size, પૂર્ણાંક type)
 {
     CV_INSTRUMENT_REGION();
 
-    MatExpr e;
-    MatOp_Initializer::makeExpr(e, '1', size, type);
-    return e;
+    Mat_પદાવલિ e;
+    MatOp_Initializer::make_પદાવલિ(e, '1', size, type);
+    પાછા e;
 }
 
-MatExpr Mat::ones(int ndims, const int* sizes, int type)
+Mat_પદાવલિ Mat::ones(પૂર્ણાંક ndims, અચલ પૂર્ણાંક* sizes, પૂર્ણાંક type)
 {
     CV_INSTRUMENT_REGION();
 
-    MatExpr e;
-    MatOp_Initializer::makeExpr(e, '1', ndims, sizes, type);
-    return e;
+    Mat_પદાવલિ e;
+    MatOp_Initializer::make_પદાવલિ(e, '1', ndims, sizes, type);
+    પાછા e;
 }
 
-MatExpr Mat::ones(const MatShape& shape, int type)
+Mat_પદાવલિ Mat::ones(અચલ MatShape& shape, પૂર્ણાંક type)
 {
     CV_INSTRUMENT_REGION();
 
-    MatExpr e;
-    MatOp_Initializer::makeExpr(e, '1', shape.dims, shape.p, type);
-    return e;
+    Mat_પદાવલિ e;
+    MatOp_Initializer::make_પદાવલિ(e, '1', shape.dims, shape.p, type);
+    પાછા e;
 }
 
-MatExpr Mat::eye(int rows, int cols, int type)
+Mat_પદાવલિ Mat::eye(પૂર્ણાંક rows, પૂર્ણાંક cols, પૂર્ણાંક type)
 {
     CV_INSTRUMENT_REGION();
 
-    MatExpr e;
-    MatOp_Initializer::makeExpr(e, 'I', Size(cols, rows), type);
-    return e;
+    Mat_પદાવલિ e;
+    MatOp_Initializer::make_પદાવલિ(e, 'I', Size(cols, rows), type);
+    પાછા e;
 }
 
-MatExpr Mat::eye(Size size, int type)
+Mat_પદાવલિ Mat::eye(Size size, પૂર્ણાંક type)
 {
     CV_INSTRUMENT_REGION();
 
-    MatExpr e;
-    MatOp_Initializer::makeExpr(e, 'I', size, type);
-    return e;
+    Mat_પદાવલિ e;
+    MatOp_Initializer::make_પદાવલિ(e, 'I', size, type);
+    પાછા e;
 }
 
-void MatExpr::swap(MatExpr& other)
+શૂન્ય Mat_પદાવલિ::swap(Mat_પદાવલિ& other)
 {
     using std::swap;
 
@@ -1855,16 +1855,16 @@ void MatExpr::swap(MatExpr& other)
     swap(s, other.s);
 }
 
-_InputArray::_InputArray(const MatExpr& expr)
+આગત_Array_2::આગત_Array_2(અચલ Mat_પદાવલિ& પદાવલિ)
 {
-    if (!isIdentity(expr))
+    જો (!isIdentity(પદાવલિ))
     {
-        Mat result = expr;  // TODO improve through refcount == 1 of expr.a (inplace operation is possible - except gemm?)
-        MatExpr result_expr(result);
-        swap(const_cast<MatExpr&>(expr), result_expr);
+        Mat result = પદાવલિ;  // TODO improve through refcount == 1 of expr.a (inplace operation is possible - except gemm?)
+        Mat_પદાવલિ result_પદાવલિ(result);
+        swap(const_cast<Mat_પદાવલિ&>(પદાવલિ), result_પદાવલિ);
     }
-    CV_Assert(isIdentity(expr));
-    init(FIXED_TYPE + FIXED_SIZE + MAT + ACCESS_READ, &expr.a);
+    CV_Assert(isIdentity(પદાવલિ));
+    init(FIXED_TYPE + FIXED_SIZE + MAT + ACCESS_READ, &પદાવલિ.a);
 }
 
 } // cv::

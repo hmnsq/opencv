@@ -24,144 +24,144 @@
 
 #ifdef HAVE_OPENCL
 
-namespace cv
+નામાકાશ cv
 {
 
-static bool intel_gpu_gemm(
+સ્થિર તાર્કિક intel_gpu_gemm(
     UMat A, Size sizeA,
     UMat B, Size sizeB,
     UMat D, Size sizeD,
-    double alpha, double beta,
-    bool atrans, bool btrans,
-    bool& isPropagatedC2D
+    દ્વિગુણ alpha, દ્વિગુણ beta,
+    તાર્કિક atrans, તાર્કિક btrans,
+    તાર્કિક& isPropagatedC2D
 )
 {
     CV_UNUSED(sizeB);
 
-    int M = sizeD.height, N = sizeD.width, K = ((atrans)? sizeA.height : sizeA.width);
+    પૂર્ણાંક M = sizeD.height, N = sizeD.width, K = ((atrans)? sizeA.height : sizeA.width);
 
-    if (M < 4 || N < 4 || K < 4)  // vload4
-        return false;
+    જો (M < 4 || N < 4 || K < 4)  // vload4
+        પાછા ખોટું;
 
-    CV_LOG_VERBOSE(NULL, 0, "M=" << M << " N=" << N << " K=" << K);
+    CV_LOG_VERBOSE(ખાલી, 0, "M=" << M << " N=" << N << " K=" << K);
 
     std::string kernelName;
 
-    unsigned int lx = 8, ly = 4;
-    unsigned int dx = 4, dy = 8;
+    unsigned પૂર્ણાંક lx = 8, ly = 4;
+    unsigned પૂર્ણાંક dx = 4, dy = 8;
 
-    if(!atrans && !btrans)
+    જો(!atrans && !btrans)
     {
-        if (M % 32 == 0 && N % 32 == 0 && K % 16 == 0)
+        જો (M % 32 == 0 && N % 32 == 0 && K % 16 == 0)
         {
             kernelName = "intelblas_gemm_buffer_NN_sp";
         }
-        else
+        નહીંતર
         {
-            if (M % 2 != 0)
-                return false;
+            જો (M % 2 != 0)
+                પાછા ખોટું;
             // vload4(0, dst_write0) - 4 cols
             // multiply by lx: 8
-            if (N % (4*8) != 0)
-                return false;
+            જો (N % (4*8) != 0)
+                પાછા ખોટું;
             kernelName = "intelblas_gemm_buffer_NN";
         }
     }
-    else if(atrans && !btrans)
+    નહીંતર જો(atrans && !btrans)
     {
-        if (M % 32 != 0)
-            return false;
-        if (N % 32 != 0)
-            return false;
+        જો (M % 32 != 0)
+            પાછા ખોટું;
+        જો (N % 32 != 0)
+            પાછા ખોટું;
         kernelName = "intelblas_gemm_buffer_TN";
     }
-    else if(!atrans && btrans)
+    નહીંતર જો(!atrans && btrans)
     {
-        if (K % 4 != 0)
-            return false;
+        જો (K % 4 != 0)
+            પાછા ખોટું;
         kernelName = "intelblas_gemm_buffer_NT";
         ly = 16;
         dx = 1;
     }
-    else
+    નહીંતર
     {
-        if (M % 32 != 0)
-            return false;
-        if (N % 32 != 0)
-            return false;
-        if (K % 16 != 0)
-            return false;
+        જો (M % 32 != 0)
+            પાછા ખોટું;
+        જો (N % 32 != 0)
+            પાછા ખોટું;
+        જો (K % 16 != 0)
+            પાછા ખોટું;
         kernelName = "intelblas_gemm_buffer_TT";
     }
 
-    CV_LOG_DEBUG(NULL, "kernel: " << kernelName << "  (M=" << M << " N=" << N << " K=" << K << ")");
+    CV_LOG_DEBUG(ખાલી, "kernel: " << kernelName << "  (M=" << M << " N=" << N << " K=" << K << ")");
 
-    const size_t gx = divUp((size_t)N, dx);
-    const size_t gy = divUp((size_t)M, dy);
+    અચલ size_t gx = divUp((size_t)N, dx);
+    અચલ size_t gy = divUp((size_t)M, dy);
 
     size_t local[] = {lx, ly, 1};
     size_t global[] = {roundUp(gx, lx), roundUp(gy, ly), 1};
 
     ocl::Queue q;
     String errmsg;
-    const ocl::Program program = ocl::Context::getDefault().getProg(ocl::core::intel_gemm_oclsrc, "", errmsg);
+    અચલ ocl::Program program = ocl::Context::getDefault().getProg(ocl::core::intel_gemm_oclsrc, "", errmsg);
 
-    if(!atrans && btrans)
+    જો(!atrans && btrans)
     {
         ocl::Kernel k(kernelName.c_str(), program);
-        if (k.empty())
+        જો (k.empty())
         {
-            return false;
+            પાછા ખોટું;
         }
 
         k.args(ocl::KernelArg::PtrReadOnly(A),
-               (int) (A.offset / sizeof(float)),
+               (પૂર્ણાંક) (A.offset / કદ(દશાંશ)),
                ocl::KernelArg::PtrReadOnly(B),
-               (int) (B.offset / sizeof(float)),
+               (પૂર્ણાંક) (B.offset / કદ(દશાંશ)),
                ocl::KernelArg::PtrWriteOnly(D),
-               (int) (D.offset / sizeof(float)),
+               (પૂર્ણાંક) (D.offset / કદ(દશાંશ)),
                M, N, K,
-               (float)alpha,
-               (float)beta,
-               (int)(A.step / sizeof(float)),
-               (int)(B.step / sizeof(float)),
-               (int)(D.step / sizeof(float))
+               (દશાંશ)alpha,
+               (દશાંશ)beta,
+               (પૂર્ણાંક)(A.step / કદ(દશાંશ)),
+               (પૂર્ણાંક)(B.step / કદ(દશાંશ)),
+               (પૂર્ણાંક)(D.step / કદ(દશાંશ))
         );
 
-        bool ret = k.run(2, global, local, false, q);
-        return ret;
+        તાર્કિક ret = k.run(2, global, local, ખોટું, q);
+        પાછા ret;
     }
-    else
+    નહીંતર
     {
-        int stride = (M * N < 1024 * 1024) ? 10000000 : 256;
+        પૂર્ણાંક stride = (M * N < 1024 * 1024) ? 10000000 : 256;
 
-        for(int start_index = 0; start_index < K; start_index += stride)
+        માટે(પૂર્ણાંક start_index = 0; start_index < K; start_index += stride)
         {
              ocl::Kernel k(kernelName.c_str(), program);
              k.args(ocl::KernelArg::PtrReadOnly(A),
-                    (int) (A.offset / sizeof(float)),
+                    (પૂર્ણાંક) (A.offset / કદ(દશાંશ)),
                     ocl::KernelArg::PtrReadOnly(B),
-                    (int) (B.offset / sizeof(float)),
+                    (પૂર્ણાંક) (B.offset / કદ(દશાંશ)),
                     ocl::KernelArg::PtrWriteOnly(D),
-                    (int) (D.offset / sizeof(float)),
+                    (પૂર્ણાંક) (D.offset / કદ(દશાંશ)),
                     M, N, K,
-                    (float)alpha,
-                    (float)beta,
-                    (int)(A.step / sizeof(float)),
-                    (int)(B.step / sizeof(float)),
-                    (int)(D.step / sizeof(float)),
-                    (int) start_index,                          // 14 start_index
+                    (દશાંશ)alpha,
+                    (દશાંશ)beta,
+                    (પૂર્ણાંક)(A.step / કદ(દશાંશ)),
+                    (પૂર્ણાંક)(B.step / કદ(દશાંશ)),
+                    (પૂર્ણાંક)(D.step / કદ(દશાંશ)),
+                    (પૂર્ણાંક) start_index,                          // 14 start_index
                     stride);
 
-            bool ret = k.run(2, global, local, false, q);
-            if (!ret)
+            તાર્કિક ret = k.run(2, global, local, ખોટું, q);
+            જો (!ret)
             {
-                if (start_index != 0)
-                    isPropagatedC2D = false;  // D array content is changed, need to rewrite
-                return false;
+                જો (start_index != 0)
+                    isPropagatedC2D = ખોટું;  // D array content is changed, need to rewrite
+                પાછા ખોટું;
             }
         }
-        return true;
+        પાછા સાચું;
     }
 }
 

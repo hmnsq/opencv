@@ -5,117 +5,117 @@
 #ifndef OPENCV_CORE_PERSISTENCE_IMPL_HPP
 #define OPENCV_CORE_PERSISTENCE_IMPL_HPP
 
-#include "persistence.hpp"
-#include "persistence_base64_encoding.hpp"
-#include <unordered_map>
-#include <iterator>
+#અન્તર્ભાવ "persistence.hpp"
+#અન્તર્ભાવ "persistence_base64_encoding.hpp"
+#અન્તર્ભાવ <unordered_map>
+#અન્તર્ભાવ <iterator>
 
 
-namespace cv
+નામાકાશ cv
 {
 
-enum Base64State{
+ગણના Base64State{
     Uncertain,
     NotUse,
     InUse,
 };
 
-class cv::FileStorage::Impl : public FileStorage_API
+વર્ગ cv::FileStorage::Impl : જાહેર FileStorage_API
 {
-public:
-    void init();
+જાહેર:
+    શૂન્ય init();
 
     Impl(FileStorage* _fs);
 
-    virtual ~Impl();
+    આભાસી ~Impl();
 
-    void release(String* out=0);
+    શૂન્ય release(String* out=0);
 
-    void analyze_file_name( const std::string& file_name, std::vector<std::string>& params );
+    શૂન્ય analyze_file_name( અચલ std::string& file_name, std::vector<std::string>& params );
 
-    bool open( const char* filename_or_buf, int _flags, const char* encoding );
+    તાર્કિક open( અચલ અક્ષર* filename_or_buf, પૂર્ણાંક _flags, અચલ અક્ષર* encoding );
 
-    void puts( const char* str );
+    શૂન્ય puts( અચલ અક્ષર* str );
 
-    char* getsFromFile( char* buf, int count );
+    અક્ષર* getsFromFile( અક્ષર* buf, પૂર્ણાંક ગણતરી_2 );
 
-    char* gets( size_t maxCount );
+    અક્ષર* gets( size_t max_ગણતરી );
 
-    char* gets();
+    અક્ષર* gets();
 
-    bool eof();
+    તાર્કિક eof();
 
-    void setEof();
+    શૂન્ય setEof();
 
-    void closeFile();
+    શૂન્ય closeFile();
 
-    void rewind();
+    શૂન્ય rewind();
 
-    char* resizeWriteBuffer( char* ptr, int len );
+    અક્ષર* resizeWriteBuffer( અક્ષર* ptr, પૂર્ણાંક len );
 
-    char* flush();
+    અક્ષર* flush();
 
-    void endWriteStruct();
+    શૂન્ય endWriteStruct();
 
-    void startWriteStruct_helper( const char* key, int struct_flags,
-                                  const char* type_name );
+    શૂન્ય startWriteStruct_helper( અચલ અક્ષર* ચાવી, પૂર્ણાંક struct_flags,
+                                  અચલ અક્ષર* type_name );
 
-    void startWriteStruct( const char* key, int struct_flags,
-                           const char* type_name );
+    શૂન્ય startWriteStruct( અચલ અક્ષર* ચાવી, પૂર્ણાંક struct_flags,
+                           અચલ અક્ષર* type_name );
 
-    void writeComment( const char* comment, bool eol_comment );
+    શૂન્ય writeComment( અચલ અક્ષર* comment, તાર્કિક eol_comment );
 
-    void startNextStream();
+    શૂન્ય startNextStream();
 
-    void write( const String& key, int value );
+    શૂન્ય લિખ( અચલ String& ચાવી, પૂર્ણાંક value );
 
-    void write( const String& key, bool value );
+    શૂન્ય લિખ( અચલ String& ચાવી, તાર્કિક value );
 
-    void write( const String& key, int64_t value );
+    શૂન્ય લિખ( અચલ String& ચાવી, int64_t value );
 
-    void write( const String& key, double value );
+    શૂન્ય લિખ( અચલ String& ચાવી, દ્વિગુણ value );
 
-    void write( const String& key, const String& value );
+    શૂન્ય લિખ( અચલ String& ચાવી, અચલ String& value );
 
-    void writeRawData( const std::string& dt, const void* _data, size_t len );
+    શૂન્ય writeRawData( અચલ std::string& dt, અચલ શૂન્ય* _data, size_t len );
 
-    void workaround();
+    શૂન્ય workaround();
 
-    void switch_to_Base64_state( FileStorage_API::Base64State new_state);
+    શૂન્ય switch_to_Base64_state( FileStorage_API::Base64State new_state);
 
-    void make_write_struct_delayed( const char* key, int struct_flags, const char* type_name );
+    શૂન્ય make_write_struct_delayed( અચલ અક્ષર* ચાવી, પૂર્ણાંક struct_flags, અચલ અક્ષર* type_name );
 
-    void check_if_write_struct_is_delayed( bool change_type_to_base64 );
+    શૂન્ય check_if_write_struct_is_delayed( તાર્કિક change_type_to_base64 );
 
-    void writeRawDataBase64(const void* _data, size_t len, const char* dt );
+    શૂન્ય writeRawDataBase64(અચલ શૂન્ય* _data, size_t len, અચલ અક્ષર* dt );
 
     String releaseAndGetString();
 
-    FileNode getFirstTopLevelNode() const;
+    File_ગાંઠ get_First_ટોચ_Level_ગાંઠ() અચલ;
 
-    FileNode root(int streamIdx=0) const;
+    File_ગાંઠ મૂળ(પૂર્ણાંક streamIdx=0) અચલ;
 
-    FileNode operator[](const String& nodename) const;
+    File_ગાંઠ operator[](અચલ String& nodename) અચલ;
 
-    FileNode operator[](const char* /*nodename*/) const;
+    File_ગાંઠ operator[](અચલ અક્ષર* /*nodename*/) અચલ;
 
-    virtual int getFormat() const CV_OVERRIDE;
+    આભાસી પૂર્ણાંક getFormat() અચલ CV_OVERRIDE;
 
-    char* bufferPtr() const;
-    char* bufferStart() const;
-    char* bufferEnd() const;
-    void setBufferPtr(char* ptr);
-    int wrapMargin() const;
+    અક્ષર* bufferPtr() અચલ;
+    અક્ષર* bufferStart() અચલ;
+    અક્ષર* bufferEnd() અચલ;
+    શૂન્ય setBufferPtr(અક્ષર* ptr);
+    પૂર્ણાંક wrapMargin() અચલ;
 
     FStructData& getCurrentStruct();
 
-    void setNonEmpty();
+    શૂન્ય setNonEmpty();
 
-    void processSpecialDouble( char* buf, double* value, char** endptr );
+    શૂન્ય processSpecialDouble( અક્ષર* buf, દ્વિગુણ* value, અક્ષર** endptr );
 
-    double strtod( char* ptr, char** endptr );
+    દ્વિગુણ strtod( અક્ષર* ptr, અક્ષર** endptr );
 
-    void convertToCollection(int type, FileNode& node);
+    શૂન્ય convertToCollection(પૂર્ણાંક type, File_ગાંઠ& ગાંઠ);
 
     // a) allocates new FileNode (for that just set blockIdx to the last block and ofs to freeSpaceOfs) or
     // b) reallocates just created new node (blockIdx and ofs must be taken from FileNode).
@@ -124,130 +124,130 @@ public:
     //    a new block of sufficient size is allocated and the FileNode is placed in the beginning of it.
     // The case (a) can be used to allocate the very first node by setting blockIdx == ofs == 0.
     // In the case (b) the existing tag and the name are copied automatically.
-    uchar* reserveNodeSpace(FileNode& node, size_t sz);
+    uchar* reserve_ગાંઠ_Space(File_ગાંઠ& ગાંઠ, size_t sz);
 
-    unsigned getStringOfs( const std::string& key ) const;
+    unsigned getStringOfs( અચલ std::string& ચાવી ) અચલ;
 
-    FileNode addNode( FileNode& collection, const std::string& key,
-                      int elem_type, const void* value, int len );
+    File_ગાંઠ add_ગાંઠ( File_ગાંઠ& collection, અચલ std::string& ચાવી,
+                      પૂર્ણાંક elem_type, અચલ શૂન્ય* value, પૂર્ણાંક len );
 
-    void finalizeCollection( FileNode& collection );
+    શૂન્ય finalizeCollection( File_ગાંઠ& collection );
 
-    void normalizeNodeOfs(size_t& blockIdx, size_t& ofs) const;
+    શૂન્ય normalize_ગાંઠ_Ofs(size_t& blockIdx, size_t& ofs) અચલ;
 
     Base64State get_state_of_writing_base64();
 
-    int get_space();
+    પૂર્ણાંક get_space();
 
-    class Base64Decoder
+    વર્ગ Base64Decoder
     {
-    public:
+    જાહેર:
         Base64Decoder();
-        void init(const Ptr<FileStorageParser>& _parser, char* _ptr, int _indent);
+        શૂન્ય init(અચલ Ptr<FileStorageParser>& _parser, અક્ષર* _ptr, પૂર્ણાંક _indent);
 
-        bool readMore(int needed);
+        તાર્કિક readMore(પૂર્ણાંક needed);
 
         uchar getUInt8();
 
         ushort getUInt16();
 
-        int getInt32();
+        પૂર્ણાંક getInt32();
 
         int64_t getInt64();
 
-        double getFloat64();
+        દ્વિગુણ getFloat64();
 
-        bool endOfStream() const;
-        char* getPtr() const;
-    protected:
+        તાર્કિક endOfStream() અચલ;
+        અક્ષર* getPtr() અચલ;
+    સુરક્ષિત:
 
         Ptr<FileStorageParser> parser_do_not_use_direct_dereference;
-        FileStorageParser& getParser() const
+        FileStorageParser& getParser() અચલ
         {
-            if (!parser_do_not_use_direct_dereference)
+            જો (!parser_do_not_use_direct_dereference)
                 CV_Error(Error::StsNullPtr, "Parser is not available");
-            return *parser_do_not_use_direct_dereference;
+            પાછા *parser_do_not_use_direct_dereference;
         }
-        char* ptr;
-        int indent;
-        std::vector<char> encoded;
+        અક્ષર* ptr;
+        પૂર્ણાંક indent;
+        std::vector<અક્ષર> encoded;
         std::vector<uchar> decoded;
         size_t ofs;
         size_t totalchars;
-        bool eos;
+        તાર્કિક eos;
     };
 
-    char* parseBase64(char* ptr, int indent, FileNode& collection);
+    અક્ષર* parseBase64(અક્ષર* ptr, પૂર્ણાંક indent, File_ગાંઠ& collection);
 
-    void parseError( const char* func_name, const std::string& err_msg, const char* source_file, int source_line );
+    શૂન્ય parseError( અચલ અક્ષર* func_name, અચલ std::string& err_સંદેશ, અચલ અક્ષર* source_file, પૂર્ણાંક source_લીટી );
 
-    const uchar* getNodePtr(size_t blockIdx, size_t ofs) const;
+    અચલ uchar* get_ગાંઠ_Ptr(size_t blockIdx, size_t ofs) અચલ;
 
-    std::string getName( size_t nameofs ) const;
+    std::string getName( size_t nameofs ) અચલ;
 
     FileStorage* getFS();
 
     FileStorage* fs_ext;
 
     std::string filename;
-    int flags;
-    bool empty_stream;
+    પૂર્ણાંક flags;
+    તાર્કિક empty_stream;
 
     FILE* file;
     gzFile gzfile;
 
-    bool is_opened;
-    bool dummy_eof;
-    bool write_mode;
-    bool mem_mode;
-    int fmt;
+    તાર્કિક is_opened;
+    તાર્કિક dummy_eof;
+    તાર્કિક write_mode;
+    તાર્કિક mem_mode;
+    પૂર્ણાંક fmt;
 
     State state; //!< current state of the FileStorage (used only for writing)
-    bool is_using_base64;
-    bool is_write_struct_delayed;
-    char* delayed_struct_key;
-    int   delayed_struct_flags;
-    char* delayed_type_name;
+    તાર્કિક is_using_base64;
+    તાર્કિક is_write_struct_delayed;
+    અક્ષર* delayed_struct_ચાવી;
+    પૂર્ણાંક   delayed_struct_flags;
+    અક્ષર* delayed_type_name;
     FileStorage_API::Base64State state_of_writing_base64;
 
-    int space, wrap_margin;
-    std::deque<FStructData> write_stack;
-    std::vector<char> buffer;
+    પૂર્ણાંક space, wrap_margin;
+    std::deque<FStructData> write_ઢગલો;
+    std::vector<અક્ષર> buffer;
     size_t bufofs;
 
-    std::deque<char> outbuf;
+    std::deque<અક્ષર> outbuf;
 
     Ptr<FileStorageEmitter> emitter_do_not_use_direct_dereference;
     FileStorageEmitter& getEmitter()
     {
-        if (!emitter_do_not_use_direct_dereference)
+        જો (!emitter_do_not_use_direct_dereference)
             CV_Error(Error::StsNullPtr, "Emitter is not available");
-        return *emitter_do_not_use_direct_dereference;
+        પાછા *emitter_do_not_use_direct_dereference;
     }
     Ptr<FileStorageParser> parser_do_not_use_direct_dereference;
-    FileStorageParser& getParser() const
+    FileStorageParser& getParser() અચલ
     {
-        if (!parser_do_not_use_direct_dereference)
+        જો (!parser_do_not_use_direct_dereference)
             CV_Error(Error::StsNullPtr, "Parser is not available");
-        return *parser_do_not_use_direct_dereference;
+        પાછા *parser_do_not_use_direct_dereference;
     }
     Base64Decoder base64decoder;
     base64::Base64Writer* base64_writer;
 
-    std::vector<FileNode> roots;
+    std::vector<File_ગાંઠ> roots;
     std::vector<Ptr<std::vector<uchar> > > fs_data;
     std::vector<uchar*> fs_data_ptrs;
     std::vector<size_t> fs_data_blksz;
     size_t freeSpaceOfs;
-    typedef std::unordered_map<std::string, unsigned> str_hash_t;
+    પ્રકારવ્યાખ્યા std::unordered_map<std::string, unsigned> str_hash_t;
     str_hash_t str_hash;
-    std::vector<char> str_hash_data;
+    std::vector<અક્ષર> str_hash_data;
 
-    std::vector<char> strbufv;
-    char* strbuf;
+    std::vector<અક્ષર> strbufv;
+    અક્ષર* strbuf;
     size_t strbufsize;
     size_t strbufpos;
-    int lineno;
+    પૂર્ણાંક lineno;
 };
 
 }

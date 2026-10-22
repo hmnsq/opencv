@@ -2,32 +2,32 @@
 // It is subject to the license terms in the LICENSE file found in the top-level directory
 // of this distribution and at http://opencv.org/license.html
 
-#include "precomp.hpp"
-#include "opencv2/core/mat.hpp"
+#અન્તર્ભાવ "precomp.hpp"
+#અન્તર્ભાવ "opencv2/core/mat.hpp"
 
-namespace cv {
+નામાકાશ cv {
 
 NAryMatIterator::NAryMatIterator()
     : arrays(0), planes(0), ptrs(0), narrays(0), nplanes(0), size(0), iterdepth(0), idx(0)
 {
 }
 
-NAryMatIterator::NAryMatIterator(const Mat** _arrays, Mat* _planes, int _narrays)
+NAryMatIterator::NAryMatIterator(અચલ Mat** _arrays, Mat* _planes, પૂર્ણાંક _narrays)
 : arrays(0), planes(0), ptrs(0), narrays(0), nplanes(0), size(0), iterdepth(0), idx(0)
 {
     init(_arrays, _planes, 0, _narrays);
 }
 
-NAryMatIterator::NAryMatIterator(const Mat** _arrays, uchar** _ptrs, int _narrays)
+NAryMatIterator::NAryMatIterator(અચલ Mat** _arrays, uchar** _ptrs, પૂર્ણાંક _narrays)
     : arrays(0), planes(0), ptrs(0), narrays(0), nplanes(0), size(0), iterdepth(0), idx(0)
 {
     init(_arrays, 0, _ptrs, _narrays);
 }
 
-void NAryMatIterator::init(const Mat** _arrays, Mat* _planes, uchar** _ptrs, int _narrays)
+શૂન્ય NAryMatIterator::init(અચલ Mat** _arrays, Mat* _planes, uchar** _ptrs, પૂર્ણાંક _narrays)
 {
     CV_Assert( _arrays && (_ptrs || _planes) );
-    int i, j, d1=0, i0 = -1, d = -1;
+    પૂર્ણાંક i, j, d1=0, i0 = -1, d = -1;
 
     arrays = _arrays;
     ptrs = _ptrs;
@@ -36,9 +36,9 @@ void NAryMatIterator::init(const Mat** _arrays, Mat* _planes, uchar** _ptrs, int
     nplanes = 0;
     size = 0;
 
-    if( narrays < 0 )
+    જો( narrays < 0 )
     {
-        for( i = 0; _arrays[i] != 0; i++ )
+        માટે( i = 0; _arrays[i] != 0; i++ )
             ;
         narrays = i;
         CV_Assert(narrays <= 1000);
@@ -46,261 +46,261 @@ void NAryMatIterator::init(const Mat** _arrays, Mat* _planes, uchar** _ptrs, int
 
     iterdepth = 0;
 
-    for( i = 0; i < narrays; i++ )
+    માટે( i = 0; i < narrays; i++ )
     {
         CV_Assert(arrays[i] != 0);
-        const Mat& A = *arrays[i];
-        if( ptrs )
+        અચલ Mat& A = *arrays[i];
+        જો( ptrs )
             ptrs[i] = A.data;
 
-        if( !A.data )
-            continue;
+        જો( !A.data )
+            ચાલુ;
 
-        if( i0 < 0 )
+        જો( i0 < 0 )
         {
             i0 = i;
             d = A.dims;
 
             // find the first dimensionality which is different from 1;
             // in any of the arrays the first "d1" step do not affect the continuity
-            for( d1 = 0; d1 < d; d1++ )
-                if( A.size[d1] > 1 )
-                    break;
+            માટે( d1 = 0; d1 < d; d1++ )
+                જો( A.size[d1] > 1 )
+                    તોડો;
         }
-        else
+        નહીંતર
             CV_Assert( A.size == arrays[i0]->size );
 
-        if( !A.isContinuous() )
+        જો( !A.isContinuous() )
         {
             CV_Assert( A.step[d-1] == A.elemSize() );
-            for( j = d-1; j > d1; j-- )
-                if( A.step[j]*A.size[j] < A.step[j-1] )
-                    break;
+            માટે( j = d-1; j > d1; j-- )
+                જો( A.step[j]*A.size[j] < A.step[j-1] )
+                    તોડો;
             iterdepth = std::max(iterdepth, j);
         }
     }
 
-    if( i0 >= 0 )
+    જો( i0 >= 0 )
     {
         size = arrays[i0]->size[std::max(d-1, 0)];
-        for( j = d-1; j > iterdepth; j-- )
+        માટે( j = d-1; j > iterdepth; j-- )
         {
             int64 total1 = (int64)size*arrays[i0]->size[j-1];
-            if( total1 != (int)total1 )
-                break;
-            size = (int)total1;
+            જો( total1 != (પૂર્ણાંક)total1 )
+                તોડો;
+            size = (પૂર્ણાંક)total1;
         }
 
         iterdepth = j;
-        if( iterdepth == d1 )
+        જો( iterdepth == d1 )
             iterdepth = 0;
 
         nplanes = 1;
-        for( j = iterdepth-1; j >= 0; j-- )
+        માટે( j = iterdepth-1; j >= 0; j-- )
             nplanes *= arrays[i0]->size[j];
     }
-    else
+    નહીંતર
         iterdepth = 0;
 
     idx = 0;
 
-    if( !planes )
-        return;
+    જો( !planes )
+        પાછા;
 
-    for( i = 0; i < narrays; i++ )
+    માટે( i = 0; i < narrays; i++ )
     {
         CV_Assert(arrays[i] != 0);
-        const Mat& A = *arrays[i];
+        અચલ Mat& A = *arrays[i];
 
-        if( !A.data )
+        જો( !A.data )
         {
             planes[i] = Mat();
-            continue;
+            ચાલુ;
         }
 
-        planes[i] = Mat(1, (int)size, A.type(), A.data);
+        planes[i] = Mat(1, (પૂર્ણાંક)size, A.type(), A.data);
     }
 }
 
 
 NAryMatIterator& NAryMatIterator::operator ++()
 {
-    if( idx >= nplanes-1 )
-        return *this;
+    જો( idx >= nplanes-1 )
+        પાછા *આ;
     ++idx;
 
-    if( iterdepth == 1 )
+    જો( iterdepth == 1 )
     {
-        if( ptrs )
+        જો( ptrs )
         {
-            for( int i = 0; i < narrays; i++ )
+            માટે( પૂર્ણાંક i = 0; i < narrays; i++ )
             {
-                if( !ptrs[i] )
-                    continue;
+                જો( !ptrs[i] )
+                    ચાલુ;
                 ptrs[i] = arrays[i]->data + arrays[i]->step[0]*idx;
             }
         }
-        if( planes )
+        જો( planes )
         {
-            for( int i = 0; i < narrays; i++ )
+            માટે( પૂર્ણાંક i = 0; i < narrays; i++ )
             {
-                if( !planes[i].data )
-                    continue;
+                જો( !planes[i].data )
+                    ચાલુ;
                 planes[i].data = arrays[i]->data + arrays[i]->step[0]*idx;
             }
         }
     }
-    else
+    નહીંતર
     {
-        for( int i = 0; i < narrays; i++ )
+        માટે( પૂર્ણાંક i = 0; i < narrays; i++ )
         {
-            const Mat& A = *arrays[i];
-            if( !A.data )
-                continue;
-            int _idx = (int)idx;
+            અચલ Mat& A = *arrays[i];
+            જો( !A.data )
+                ચાલુ;
+            પૂર્ણાંક _idx = (પૂર્ણાંક)idx;
             uchar* data = A.data;
-            for( int j = iterdepth-1; j >= 0 && _idx > 0; j-- )
+            માટે( પૂર્ણાંક j = iterdepth-1; j >= 0 && _idx > 0; j-- )
             {
-                int szi = A.size[j], t = _idx/szi;
+                પૂર્ણાંક szi = A.size[j], t = _idx/szi;
                 data += (_idx - t * szi)*A.step[j];
                 _idx = t;
             }
-            if( ptrs )
+            જો( ptrs )
                 ptrs[i] = data;
-            if( planes )
+            જો( planes )
                 planes[i].data = data;
         }
     }
 
-    return *this;
+    પાછા *આ;
 }
 
-NAryMatIterator NAryMatIterator::operator ++(int)
+NAryMatIterator NAryMatIterator::operator ++(પૂર્ણાંક)
 {
-    NAryMatIterator it = *this;
-    ++*this;
-    return it;
+    NAryMatIterator it = *આ;
+    ++*આ;
+    પાછા it;
 }
 
 //==================================================================================================
 
-Point MatConstIterator::pos() const
+Point MatConstIterator::pos() અચલ
 {
-    if( !m )
-        return Point();
+    જો( !m )
+        પાછા Point();
     CV_DbgAssert(m->dims <= 2);
 
     ptrdiff_t ofs = ptr - m->ptr();
-    int y = (int)(ofs/m->step[0]);
-    return Point((int)((ofs - y*m->step[0])/elemSize), y);
+    પૂર્ણાંક y = (પૂર્ણાંક)(ofs/m->step[0]);
+    પાછા Point((પૂર્ણાંક)((ofs - y*m->step[0])/elemSize), y);
 }
 
-void MatConstIterator::pos(int* _idx) const
+શૂન્ય MatConstIterator::pos(પૂર્ણાંક* _idx) અચલ
 {
     CV_Assert(m != 0 && _idx);
     ptrdiff_t ofs = ptr - m->ptr();
-    for( int i = 0; i < m->dims; i++ )
+    માટે( પૂર્ણાંક i = 0; i < m->dims; i++ )
     {
         size_t s = m->step[i], v = ofs/s;
         ofs -= v*s;
-        _idx[i] = (int)v;
+        _idx[i] = (પૂર્ણાંક)v;
     }
 }
 
-ptrdiff_t MatConstIterator::lpos() const
+ptrdiff_t MatConstIterator::lpos() અચલ
 {
-    if(!m)
-        return 0;
-    if( m->isContinuous() )
-        return (ptr - sliceStart)/elemSize;
+    જો(!m)
+        પાછા 0;
+    જો( m->isContinuous() )
+        પાછા (ptr - sliceStart)/elemSize;
     ptrdiff_t ofs = ptr - m->ptr();
-    int i, d = m->dims;
-    if( d == 2 )
+    પૂર્ણાંક i, d = m->dims;
+    જો( d == 2 )
     {
         ptrdiff_t y = ofs/m->step[0];
-        return y*m->cols + (ofs - y*m->step[0])/elemSize;
+        પાછા y*m->cols + (ofs - y*m->step[0])/elemSize;
     }
     ptrdiff_t result = 0;
-    for( i = 0; i < d; i++ )
+    માટે( i = 0; i < d; i++ )
     {
         size_t s = m->step[i], v = ofs/s;
         ofs -= v*s;
         result = result*m->size[i] + v;
     }
-    return result;
+    પાછા result;
 }
 
-void MatConstIterator::seek(ptrdiff_t ofs, bool relative)
+શૂન્ય MatConstIterator::seek(ptrdiff_t ofs, તાર્કિક relative)
 {
-    if( m->isContinuous() )
+    જો( m->isContinuous() )
     {
         ptr = (relative ? ptr : sliceStart) + ofs*elemSize;
-        if( ptr < sliceStart )
+        જો( ptr < sliceStart )
             ptr = sliceStart;
-        else if( ptr > sliceEnd )
+        નહીંતર જો( ptr > sliceEnd )
             ptr = sliceEnd;
-        return;
+        પાછા;
     }
 
-    int d = m->dims;
-    if( d == 2 )
+    પૂર્ણાંક d = m->dims;
+    જો( d == 2 )
     {
         ptrdiff_t ofs0, y;
-        if( relative )
+        જો( relative )
         {
             ofs0 = ptr - m->ptr();
             y = ofs0/m->step[0];
             ofs += y*m->cols + (ofs0 - y*m->step[0])/elemSize;
         }
         y = ofs/m->cols;
-        int y1 = std::min(std::max((int)y, 0), m->rows-1);
+        પૂર્ણાંક y1 = std::min(std::max((પૂર્ણાંક)y, 0), m->rows-1);
         sliceStart = m->ptr(y1);
         sliceEnd = sliceStart + m->cols*elemSize;
         ptr = y < 0 ? sliceStart : y >= m->rows ? sliceEnd :
             sliceStart + (ofs - y*m->cols)*elemSize;
-        return;
+        પાછા;
     }
 
-    if( relative )
+    જો( relative )
         ofs += lpos();
 
-    if( ofs < 0 )
+    જો( ofs < 0 )
         ofs = 0;
 
-    int szi = m->size[d-1];
+    પૂર્ણાંક szi = m->size[d-1];
     ptrdiff_t t = ofs/szi;
-    int v = (int)(ofs - t*szi);
+    પૂર્ણાંક v = (પૂર્ણાંક)(ofs - t*szi);
     ofs = t;
     ptr = m->ptr() + v*elemSize;
     sliceStart = m->ptr();
 
-    for( int i = d-2; i >= 0; i-- )
+    માટે( પૂર્ણાંક i = d-2; i >= 0; i-- )
     {
         szi = m->size[i];
         t = ofs/szi;
-        v = (int)(ofs - t*szi);
+        v = (પૂર્ણાંક)(ofs - t*szi);
         ofs = t;
         sliceStart += v*m->step[i];
     }
 
     sliceEnd = sliceStart + m->size[d-1]*elemSize;
-    if( ofs > 0 )
+    જો( ofs > 0 )
         ptr = sliceEnd;
-    else
+    નહીંતર
         ptr = sliceStart + (ptr - m->ptr());
 }
 
-void MatConstIterator::seek(const int* _idx, bool relative)
+શૂન્ય MatConstIterator::seek(અચલ પૂર્ણાંક* _idx, તાર્કિક relative)
 {
-    int d = m->dims;
+    પૂર્ણાંક d = m->dims;
     ptrdiff_t ofs = 0;
-    if( !_idx )
+    જો( !_idx )
         ;
-    else if( d == 2 )
+    નહીંતર જો( d == 2 )
         ofs = _idx[0]*m->size[1] + _idx[1];
-    else
+    નહીંતર
     {
-        for( int i = 0; i < d; i++ )
+        માટે( પૂર્ણાંક i = 0; i < d; i++ )
             ofs = ofs*m->size[i] + _idx[i];
     }
     seek(ofs, relative);
@@ -308,50 +308,50 @@ void MatConstIterator::seek(const int* _idx, bool relative)
 
 //==================================================================================================
 
-SparseMatConstIterator::SparseMatConstIterator(const SparseMat* _m) : m((SparseMat*)_m), hashidx(0), ptr(0)
+SparseMatConstIterator::SparseMatConstIterator(અચલ SparseMat* _m) : m((SparseMat*)_m), hashidx(0), ptr(0)
 {
-    if(!_m || !_m->hdr)
-        return;
+    જો(!_m || !_m->hdr)
+        પાછા;
     SparseMat::Hdr& hdr = *m->hdr;
-    const std::vector<size_t>& htab = hdr.hashtab;
+    અચલ std::vector<size_t>& htab = hdr.hashtab;
     size_t i, hsize = htab.size();
-    for( i = 0; i < hsize; i++ )
+    માટે( i = 0; i < hsize; i++ )
     {
         size_t nidx = htab[i];
-        if( nidx )
+        જો( nidx )
         {
             hashidx = i;
-            ptr = &hdr.pool[nidx] + hdr.valueOffset;
-            return;
+            ptr = &hdr.pool[nidx] + hdr.કિંમત_Offset;
+            પાછા;
         }
     }
 }
 
 SparseMatConstIterator& SparseMatConstIterator::operator ++()
 {
-    if( !ptr || !m || !m->hdr )
-        return *this;
+    જો( !ptr || !m || !m->hdr )
+        પાછા *આ;
     SparseMat::Hdr& hdr = *m->hdr;
-    size_t next = ((const SparseMat::Node*)(ptr - hdr.valueOffset))->next;
-    if( next )
+    size_t next = ((અચલ SparseMat::Node*)(ptr - hdr.કિંમત_Offset))->next;
+    જો( next )
     {
-        ptr = &hdr.pool[next] + hdr.valueOffset;
-        return *this;
+        ptr = &hdr.pool[next] + hdr.કિંમત_Offset;
+        પાછા *આ;
     }
     size_t i = hashidx + 1, sz = hdr.hashtab.size();
-    for( ; i < sz; i++ )
+    માટે( ; i < sz; i++ )
     {
         size_t nidx = hdr.hashtab[i];
-        if( nidx )
+        જો( nidx )
         {
             hashidx = i;
-            ptr = &hdr.pool[nidx] + hdr.valueOffset;
-            return *this;
+            ptr = &hdr.pool[nidx] + hdr.કિંમત_Offset;
+            પાછા *આ;
         }
     }
     hashidx = sz;
     ptr = 0;
-    return *this;
+    પાછા *આ;
 }
 
 } // cv::

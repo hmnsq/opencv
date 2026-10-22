@@ -5,25 +5,25 @@
 #ifndef OPENCV_CORE_PARALLEL_FACTORY_HPP
 #define OPENCV_CORE_PARALLEL_FACTORY_HPP
 
-#include "opencv2/core/parallel/parallel_backend.hpp"
+#અન્તર્ભાવ "opencv2/core/parallel/parallel_backend.hpp"
 
-namespace cv { namespace parallel {
+નામાકાશ cv { નામાકાશ parallel {
 
-class IParallelBackendFactory
+વર્ગ IParallelBackendFactory
 {
-public:
-    virtual ~IParallelBackendFactory() {}
-    virtual std::shared_ptr<cv::parallel::ParallelForAPI> create() const = 0;
+જાહેર:
+    આભાસી ~IParallelBackendFactory() {}
+    આભાસી std::shared_ptr<cv::parallel::ParallelForAPI> create() અચલ = 0;
 };
 
 
-class StaticBackendFactory CV_FINAL: public IParallelBackendFactory
+વર્ગ StaticBackendFactory CV_FINAL: જાહેર IParallelBackendFactory
 {
-protected:
-    std::function<std::shared_ptr<cv::parallel::ParallelForAPI>(void)> create_fn_;
+સુરક્ષિત:
+    std::function<std::shared_ptr<cv::parallel::ParallelForAPI>(શૂન્ય)> create_fn_;
 
-public:
-    StaticBackendFactory(std::function<std::shared_ptr<cv::parallel::ParallelForAPI>(void)>&& create_fn)
+જાહેર:
+    StaticBackendFactory(std::function<std::shared_ptr<cv::parallel::ParallelForAPI>(શૂન્ય)>&& create_fn)
         : create_fn_(create_fn)
     {
         // nothing
@@ -31,9 +31,9 @@ public:
 
     ~StaticBackendFactory() CV_OVERRIDE {}
 
-    std::shared_ptr<cv::parallel::ParallelForAPI> create() const CV_OVERRIDE
+    std::shared_ptr<cv::parallel::ParallelForAPI> create() અચલ CV_OVERRIDE
     {
-        return create_fn_();
+        પાછા create_fn_();
     }
 };
 
@@ -41,7 +41,7 @@ public:
 // PluginBackendFactory is implemented in plugin_wrapper.cpp
 //
 
-std::shared_ptr<IParallelBackendFactory> createPluginParallelBackendFactory(const std::string& baseName);
+std::shared_ptr<IParallelBackendFactory> createPluginParallelBackendFactory(અચલ std::string& baseName);
 
 }}  // namespace
 

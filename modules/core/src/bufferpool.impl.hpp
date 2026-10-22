@@ -7,20 +7,20 @@
 #ifndef __OPENCV_CORE_BUFFER_POOL_IMPL_HPP__
 #define __OPENCV_CORE_BUFFER_POOL_IMPL_HPP__
 
-#include "opencv2/core/bufferpool.hpp"
+#અન્તર્ભાવ "opencv2/core/bufferpool.hpp"
 
-namespace cv {
+નામાકાશ cv {
 
-class DummyBufferPoolController : public BufferPoolController
+વર્ગ DummyBufferPoolController : જાહેર BufferPoolController
 {
-public:
+જાહેર:
     DummyBufferPoolController() { }
-    virtual ~DummyBufferPoolController() { }
+    આભાસી ~DummyBufferPoolController() { }
 
-    virtual size_t getReservedSize() const CV_OVERRIDE { return (size_t)-1; }
-    virtual size_t getMaxReservedSize() const CV_OVERRIDE { return (size_t)-1; }
-    virtual void setMaxReservedSize(size_t size) CV_OVERRIDE { CV_UNUSED(size); }
-    virtual void freeAllReservedBuffers() CV_OVERRIDE { }
+    આભાસી size_t getReservedSize() અચલ CV_OVERRIDE { પાછા (size_t)-1; }
+    આભાસી size_t getMaxReservedSize() અચલ CV_OVERRIDE { પાછા (size_t)-1; }
+    આભાસી શૂન્ય setMaxReservedSize(size_t size) CV_OVERRIDE { CV_UNUSED(size); }
+    આભાસી શૂન્ય freeAllReservedBuffers() CV_OVERRIDE { }
 };
 
 } // namespace

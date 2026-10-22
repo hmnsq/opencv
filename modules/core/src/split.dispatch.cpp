@@ -3,15 +3,15 @@
 // of this distribution and at http://opencv.org/license.html
 
 
-#include "precomp.hpp"
-#include "opencl_kernels_core.hpp"
+#અન્તર્ભાવ "precomp.hpp"
+#અન્તર્ભાવ "opencl_kernels_core.hpp"
 
-#include "split.simd.hpp"
-#include "split.simd_declarations.hpp" // defines CV_CPU_DISPATCH_MODES_ALL=AVX2,...,BASELINE based on CMakeLists.txt content
+#અન્તર્ભાવ "split.simd.hpp"
+#અન્તર્ભાવ "split.simd_declarations.hpp" // defines CV_CPU_DISPATCH_MODES_ALL=AVX2,...,BASELINE based on CMakeLists.txt content
 
-namespace cv { namespace hal {
+નામાકાશ cv { નામાકાશ hal {
 
-void split8u(const uchar* src, uchar** dst, int len, int cn )
+શૂન્ય split8u(અચલ uchar* src, uchar** dst, પૂર્ણાંક len, પૂર્ણાંક cn )
 {
     CV_INSTRUMENT_REGION();
     CALL_HAL(split8u, cv_hal_split8u, src,dst, len, cn)
@@ -19,7 +19,7 @@ void split8u(const uchar* src, uchar** dst, int len, int cn )
         CV_CPU_DISPATCH_MODES_ALL);
 }
 
-void split16u(const ushort* src, ushort** dst, int len, int cn )
+શૂન્ય split16u(અચલ ushort* src, ushort** dst, પૂર્ણાંક len, પૂર્ણાંક cn )
 {
     CV_INSTRUMENT_REGION();
     CALL_HAL(split16u, cv_hal_split16u, src,dst, len, cn)
@@ -27,7 +27,7 @@ void split16u(const ushort* src, ushort** dst, int len, int cn )
         CV_CPU_DISPATCH_MODES_ALL);
 }
 
-void split32s(const int* src, int** dst, int len, int cn )
+શૂન્ય split32s(અચલ પૂર્ણાંક* src, પૂર્ણાંક** dst, પૂર્ણાંક len, પૂર્ણાંક cn )
 {
     CV_INSTRUMENT_REGION();
     CALL_HAL(split32s, cv_hal_split32s, src,dst, len, cn)
@@ -35,7 +35,7 @@ void split32s(const int* src, int** dst, int len, int cn )
         CV_CPU_DISPATCH_MODES_ALL);
 }
 
-void split64s(const int64* src, int64** dst, int len, int cn )
+શૂન્ય split64s(અચલ int64* src, int64** dst, પૂર્ણાંક len, પૂર્ણાંક cn )
 {
     CV_INSTRUMENT_REGION();
     CALL_HAL(split64s, cv_hal_split64s, src,dst, len, cn)
@@ -49,95 +49,95 @@ void split64s(const int64* src, int64** dst, int len, int cn )
 *                                       split & merge                                    *
 \****************************************************************************************/
 
-typedef void (*SplitFunc)(const void* src, void** dst, int len, int cn);
+પ્રકારવ્યાખ્યા શૂન્ય (*SplitFunc)(અચલ શૂન્ય* src, શૂન્ય** dst, પૂર્ણાંક len, પૂર્ણાંક cn);
 
-template<typename T, void (*fn)(const T*, T**, int, int)>
-static void splitWrap(const void* src, void** dst, int len, int cn)
+template<typename T, શૂન્ય (*fn)(અચલ T*, T**, પૂર્ણાંક, પૂર્ણાંક)>
+સ્થિર શૂન્ય splitWrap(અચલ શૂન્ય* src, શૂન્ય** dst, પૂર્ણાંક len, પૂર્ણાંક cn)
 {
-    fn((const T*)src, (T**)dst, len, cn);
+    fn((અચલ T*)src, (T**)dst, len, cn);
 }
 
-static SplitFunc getSplitFunc(int depth)
+સ્થિર SplitFunc getSplitFunc(પૂર્ણાંક depth)
 {
-    static SplitFunc splitTab[CV_DEPTH_MAX] =
+    સ્થિર SplitFunc splitTab[CV_DEPTH_MAX] =
     {
         splitWrap<uchar, cv::hal::split8u>, splitWrap<uchar, cv::hal::split8u>,
         splitWrap<ushort, cv::hal::split16u>, splitWrap<ushort, cv::hal::split16u>,
-        splitWrap<int, cv::hal::split32s>, splitWrap<int, cv::hal::split32s>,
+        splitWrap<પૂર્ણાંક, cv::hal::split32s>, splitWrap<પૂર્ણાંક, cv::hal::split32s>,
         splitWrap<int64_t, cv::hal::split64s>, splitWrap<ushort, cv::hal::split16u>,
         splitWrap<ushort, cv::hal::split16u>, splitWrap<uchar, cv::hal::split8u>,
         splitWrap<int64_t, cv::hal::split64s>, splitWrap<int64_t, cv::hal::split64s>,
-        splitWrap<int, cv::hal::split32s>, splitWrap<uchar, cv::hal::split8u>,
+        splitWrap<પૂર્ણાંક, cv::hal::split32s>, splitWrap<uchar, cv::hal::split8u>,
         splitWrap<uchar, cv::hal::split8u>, 0,
     };
 
-    return splitTab[depth];
+    પાછા splitTab[depth];
 }
 
 #ifdef HAVE_IPP
 
-static bool ipp_split(const Mat& src, Mat* mv, int channels)
+સ્થિર તાર્કિક ipp_split(અચલ Mat& src, Mat* mv, પૂર્ણાંક channels)
 {
 #ifdef HAVE_IPP_IW_LL
     CV_INSTRUMENT_REGION_IPP();
 
-    if(channels != 3 && channels != 4)
-        return false;
+    જો(channels != 3 && channels != 4)
+        પાછા ખોટું;
 
-    if(src.dims <= 2)
+    જો(src.dims <= 2)
     {
         IppiSize size       = ippiSize(src.size());
-        void    *dstPtrs[4] = {NULL};
+        શૂન્ય    *dstPtrs[4] = {ખાલી};
         size_t   dstStep    = mv[0].step;
-        for(int i = 0; i < channels; i++)
+        માટે(પૂર્ણાંક i = 0; i < channels; i++)
         {
             dstPtrs[i] = mv[i].ptr();
-            if(dstStep != mv[i].step)
-                return false;
+            જો(dstStep != mv[i].step)
+                પાછા ખોટું;
         }
 
-        return CV_INSTRUMENT_FUN_IPP(llwiCopySplit, src.ptr(), (int)src.step, dstPtrs, (int)dstStep, size, (int)src.elemSize1(), channels, 0) >= 0;
+        પાછા CV_INSTRUMENT_FUN_IPP(llwiCopySplit, src.ptr(), (પૂર્ણાંક)src.step, dstPtrs, (પૂર્ણાંક)dstStep, size, (પૂર્ણાંક)src.elemSize1(), channels, 0) >= 0;
     }
-    else
+    નહીંતર
     {
-        const Mat *arrays[5] = {NULL};
-        uchar     *ptrs[5]   = {NULL};
+        અચલ Mat *arrays[5] = {ખાલી};
+        uchar     *ptrs[5]   = {ખાલી};
         arrays[0] = &src;
 
-        for(int i = 1; i < channels; i++)
+        માટે(પૂર્ણાંક i = 1; i < channels; i++)
         {
             arrays[i] = &mv[i-1];
         }
 
         NAryMatIterator it(arrays, ptrs);
-        IppiSize size = { (int)it.size, 1 };
+        IppiSize size = { (પૂર્ણાંક)it.size, 1 };
 
-        for( size_t i = 0; i < it.nplanes; i++, ++it )
+        માટે( size_t i = 0; i < it.nplanes; i++, ++it )
         {
-            if(CV_INSTRUMENT_FUN_IPP(llwiCopySplit, ptrs[0], 0, (void**)&ptrs[1], 0, size, (int)src.elemSize1(), channels, 0) < 0)
-                return false;
+            જો(CV_INSTRUMENT_FUN_IPP(llwiCopySplit, ptrs[0], 0, (શૂન્ય**)&ptrs[1], 0, size, (પૂર્ણાંક)src.elemSize1(), channels, 0) < 0)
+                પાછા ખોટું;
         }
-        return true;
+        પાછા સાચું;
     }
-#else
+#નહીંતર
     CV_UNUSED(src); CV_UNUSED(mv); CV_UNUSED(channels);
-    return false;
+    પાછા ખોટું;
 #endif
 }
 #endif
 
-void split(const Mat& src, Mat* mv)
+શૂન્ય split(અચલ Mat& src, Mat* mv)
 {
     CV_INSTRUMENT_REGION();
 
-    int k, depth = src.depth(), cn = src.channels();
-    if( cn == 1 )
+    પૂર્ણાંક k, depth = src.depth(), cn = src.channels();
+    જો( cn == 1 )
     {
         src.copyTo(mv[0]);
-        return;
+        પાછા;
     }
 
-    for( k = 0; k < cn; k++ )
+    માટે( k = 0; k < cn; k++ )
     {
         mv[k].create(src.size, depth);
     }
@@ -149,12 +149,12 @@ void split(const Mat& src, Mat* mv)
 
     size_t esz = src.elemSize(), esz1 = src.elemSize1();
     size_t blocksize0 = (BLOCK_SIZE + esz-1)/esz;
-    AutoBuffer<uchar> _buf((cn+1)*(sizeof(Mat*) + sizeof(uchar*)) + 16);
-    const Mat** arrays = (const Mat**)_buf.data();
+    AutoBuffer<uchar> _buf((cn+1)*(કદ(Mat*) + કદ(uchar*)) + 16);
+    અચલ Mat** arrays = (અચલ Mat**)_buf.data();
     uchar** ptrs = (uchar**)alignPtr(arrays + cn + 1, 16);
 
     arrays[0] = &src;
-    for( k = 0; k < cn; k++ )
+    માટે( k = 0; k < cn; k++ )
     {
         arrays[k+1] = &mv[k];
     }
@@ -163,17 +163,17 @@ void split(const Mat& src, Mat* mv)
     size_t total = it.size;
     size_t blocksize = std::min((size_t)CV_SPLIT_MERGE_MAX_BLOCK_SIZE(cn), cn <= 4 ? total : std::min(total, blocksize0));
 
-    for( size_t i = 0; i < it.nplanes; i++, ++it )
+    માટે( size_t i = 0; i < it.nplanes; i++, ++it )
     {
-        for( size_t j = 0; j < total; j += blocksize )
+        માટે( size_t j = 0; j < total; j += blocksize )
         {
             size_t bsz = std::min(total - j, blocksize);
-            func( ptrs[0], (void**)&ptrs[1], (int)bsz, cn );
+            func( ptrs[0], (શૂન્ય**)&ptrs[1], (પૂર્ણાંક)bsz, cn );
 
-            if( j + blocksize < total )
+            જો( j + blocksize < total )
             {
                 ptrs[0] += bsz*esz;
-                for( k = 0; k < cn; k++ )
+                માટે( k = 0; k < cn; k++ )
                     ptrs[k+1] += bsz*esz1;
             }
         }
@@ -182,13 +182,13 @@ void split(const Mat& src, Mat* mv)
 
 #ifdef HAVE_OPENCL
 
-static bool ocl_split( InputArray _m, OutputArrayOfArrays _mv )
+સ્થિર તાર્કિક ocl_split( આગત_Array _m, OutputArrayOfArrays _mv )
 {
-    int type = _m.type(), depth = CV_MAT_DEPTH(type), cn = CV_MAT_CN(type),
+    પૂર્ણાંક type = _m.type(), depth = CV_MAT_DEPTH(type), cn = CV_MAT_CN(type),
             rowsPerWI = ocl::Device::getDefault().isIntel() ? 4 : 1;
 
     String dstargs, processelem, indexdecl;
-    for (int i = 0; i < cn; ++i)
+    માટે (પૂર્ણાંક i = 0; i < cn; ++i)
     {
         dstargs += format("DECLARE_DST_PARAM(%d)", i);
         indexdecl += format("DECLARE_INDEX(%d)", i);
@@ -200,29 +200,29 @@ static bool ocl_split( InputArray _m, OutputArrayOfArrays _mv )
                          " -D PROCESS_ELEMS_N=%s -D DECLARE_INDEX_N=%s",
                          ocl::memopTypeToStr(depth), cn, dstargs.c_str(),
                          processelem.c_str(), indexdecl.c_str()));
-    if (k.empty())
-        return false;
+    જો (k.empty())
+        પાછા ખોટું;
 
     Size size = _m.size();
     _mv.create(cn, 1, depth);
-    for (int i = 0; i < cn; ++i)
+    માટે (પૂર્ણાંક i = 0; i < cn; ++i)
         _mv.create(size, depth, i);
 
     std::vector<UMat> dst;
     _mv.getUMatVector(dst);
 
-    int argidx = k.set(0, ocl::KernelArg::ReadOnly(_m.getUMat()));
-    for (int i = 0; i < cn; ++i)
+    પૂર્ણાંક argidx = k.set(0, ocl::KernelArg::ReadOnly(_m.getUMat()));
+    માટે (પૂર્ણાંક i = 0; i < cn; ++i)
         argidx = k.set(argidx, ocl::KernelArg::WriteOnlyNoSize(dst[i]));
     k.set(argidx, rowsPerWI);
 
     size_t globalsize[2] = { (size_t)size.width, ((size_t)size.height + rowsPerWI - 1) / rowsPerWI };
-    return k.run(2, globalsize, NULL, false);
+    પાછા k.run(2, globalsize, ખાલી, ખોટું);
 }
 
 #endif
 
-void split(InputArray _m, OutputArrayOfArrays _mv)
+શૂન્ય split(આગત_Array _m, OutputArrayOfArrays _mv)
 {
     CV_INSTRUMENT_REGION();
 
@@ -230,17 +230,17 @@ void split(InputArray _m, OutputArrayOfArrays _mv)
                ocl_split(_m, _mv))
 
     Mat m = _m.getMat();
-    if( m.empty() )
+    જો( m.empty() )
     {
         _mv.release();
-        return;
+        પાછા;
     }
 
     CV_Assert( !_mv.fixedType() || _mv.empty() || _mv.type() == m.depth() );
 
-    int depth = m.depth(), cn = m.channels();
+    પૂર્ણાંક depth = m.depth(), cn = m.channels();
     _mv.create(cn, 1, depth);
-    for (int i = 0; i < cn; ++i)
+    માટે (પૂર્ણાંક i = 0; i < cn; ++i)
         _mv.create(m.dims, m.size.p, depth, i);
 
     std::vector<Mat> dst;

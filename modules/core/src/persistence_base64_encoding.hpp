@@ -5,125 +5,125 @@
 #ifndef OPENCV_CORE_BASE64_ENCODING_HPP
 #define OPENCV_CORE_BASE64_ENCODING_HPP
 
-namespace cv
+નામાકાશ cv
 {
 
-namespace base64
+નામાકાશ base64
 {
 /* A decorator for CvFileStorage
 * - no copyable
 * - not safe for now
 * - move constructor may be needed if C++11
 */
-uint8_t const base64_mapping[] =
+uint8_t અચલ base64_mapping[] =
         "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
         "abcdefghijklmnopqrstuvwxyz"
         "0123456789+/";
 
-uint8_t const base64_padding = '=';
+uint8_t અચલ base64_padding = '=';
 
-std::string make_base64_header(const char * dt);
+std::string make_base64_header(અચલ અક્ષર * dt);
 
-size_t base64_encode(uint8_t const * src, uint8_t * dst, size_t off, size_t cnt);
+size_t base64_encode(uint8_t અચલ * src, uint8_t * dst, size_t off, size_t cnt);
 
 
-int icvCalcStructSize( const char* dt, int initial_size );
+પૂર્ણાંક icvCalcStructSize( અચલ અક્ષર* dt, પૂર્ણાંક initial_size );
 
-class Base64ContextEmitter;
-class Impl;
+વર્ગ Base64ContextEmitter;
+વર્ગ Impl;
 
-class Base64Writer
+વર્ગ Base64Writer
 {
-public:
-    Base64Writer(cv::FileStorage::Impl& fs, bool can_indent);
+જાહેર:
+    Base64Writer(cv::FileStorage::Impl& fs, તાર્કિક can_indent);
     ~Base64Writer();
-    void write(const void* _data, size_t len, const char* dt);
-    template<typename _to_binary_convertor_t> void write(_to_binary_convertor_t & convertor, const char* dt);
+    શૂન્ય લિખ(અચલ શૂન્ય* _data, size_t len, અચલ અક્ષર* dt);
+    template<typename to_દ્વિઅંકી_convertor_t> શૂન્ય લિખ(to_દ્વિઅંકી_convertor_t & convertor, અચલ અક્ષર* dt);
 
-private:
-    void check_dt(const char* dt);
+ખાનગી:
+    શૂન્ય check_dt(અચલ અક્ષર* dt);
 
-private:
+ખાનગી:
     // disable copy and assignment
-    Base64Writer(const Base64Writer &);
-    Base64Writer & operator=(const Base64Writer &);
+    Base64Writer(અચલ Base64Writer &);
+    Base64Writer & operator=(અચલ Base64Writer &);
 
-private:
+ખાનગી:
 
     Base64ContextEmitter * emitter;
     std::string data_type_string;
 };
 
-size_t base64_encode_buffer_size(size_t cnt, bool is_end_with_zero = true);
+size_t base64_encode_buffer_size(size_t cnt, તાર્કિક is_end_with_zero = સાચું);
 
-template<typename _uint_t> inline size_t
-to_binary(_uint_t val, uchar * cur)
+template<typename _uint_t> અંતઃરેખ size_t
+to_દ્વિઅંકી(_uint_t val, uchar * cur)
 {
     size_t delta = CHAR_BIT;
-    size_t cnt = sizeof(_uint_t);
-    while (cnt --> static_cast<size_t>(0U)) {
+    size_t cnt = કદ(_uint_t);
+    જ્યારે (cnt --> static_cast<size_t>(0U)) {
         *cur++ = static_cast<uchar>(val);
         val >>= delta;
     }
-    return sizeof(_uint_t);
+    પાછા કદ(_uint_t);
 }
 
-template<> inline size_t to_binary(bool val, uchar * cur)
+template<> અંતઃરેખ size_t to_દ્વિઅંકી(તાર્કિક val, uchar * cur)
 {
-    return to_binary(static_cast<uchar>(val), cur);
+    પાછા to_દ્વિઅંકી(static_cast<uchar>(val), cur);
 }
 
-template<> inline size_t to_binary(double val, uchar * cur)
+template<> અંતઃરેખ size_t to_દ્વિઅંકી(દ્વિગુણ val, uchar * cur)
 {
     Cv64suf bit64;
     bit64.f = val;
-    return to_binary(bit64.u, cur);
+    પાછા to_દ્વિઅંકી(bit64.u, cur);
 }
 
-template<> inline size_t to_binary(float val, uchar * cur)
+template<> અંતઃરેખ size_t to_દ્વિઅંકી(દશાંશ val, uchar * cur)
 {
     Cv32suf bit32;
     bit32.f = val;
-    return to_binary(bit32.u, cur);
+    પાછા to_દ્વિઅંકી(bit32.u, cur);
 }
 
-template<typename _primitive_t> inline size_t
-to_binary(uchar const * val, uchar * cur)
+template<typename _primitive_t> અંતઃરેખ size_t
+to_દ્વિઅંકી(uchar અચલ * val, uchar * cur)
 {
-    return to_binary<_primitive_t>(*reinterpret_cast<_primitive_t const *>(val), cur);
+    પાછા to_દ્વિઅંકી<_primitive_t>(*reinterpret_cast<_primitive_t અચલ *>(val), cur);
 }
 
 
 
-class RawDataToBinaryConvertor
+વર્ગ Raw_Data_To_દ્વિઅંકી_Convertor
 {
-public:
+જાહેર:
     // NOTE: len is already multiplied by element size here
-    RawDataToBinaryConvertor(const void* src, int len, const std::string & dt);
+    Raw_Data_To_દ્વિઅંકી_Convertor(અચલ શૂન્ય* src, પૂર્ણાંક len, અચલ std::string & dt);
 
-    inline RawDataToBinaryConvertor & operator >>(uchar * & dst);
-    inline operator bool() const;
+    અંતઃરેખ Raw_Data_To_દ્વિઅંકી_Convertor & operator >>(uchar * & dst);
+    અંતઃરેખ operator તાર્કિક() અચલ;
 
-private:
-    typedef size_t(*to_binary_t)(const uchar *, uchar *);
-    struct elem_to_binary_t
+ખાનગી:
+    પ્રકારવ્યાખ્યા size_t(*to_દ્વિઅંકી_t)(અચલ uchar *, uchar *);
+    સંરચના elem_to_દ્વિઅંકી_t
     {
         size_t      offset;
         size_t      offset_packed;
-        to_binary_t func;
+        to_દ્વિઅંકી_t func;
     };
 
-private:
-    size_t make_to_binary_funcs(const std::string &dt);
+ખાનગી:
+    size_t make_to_દ્વિઅંકી_funcs(અચલ std::string &dt);
 
-private:
-    const uchar * beg;
-    const uchar * cur;
-    const uchar * end;
+ખાનગી:
+    અચલ uchar * beg;
+    અચલ uchar * cur;
+    અચલ uchar * end;
 
     size_t step;
     size_t step_packed;
-    std::vector<elem_to_binary_t> to_binary_funcs;
+    std::vector<elem_to_દ્વિઅંકી_t> to_દ્વિઅંકી_funcs;
 };
 
 }

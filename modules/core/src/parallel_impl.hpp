@@ -4,13 +4,13 @@
 #ifndef OPENCV_CORE_PARALLEL_IMPL_HPP
 #define OPENCV_CORE_PARALLEL_IMPL_HPP
 
-namespace cv {
+નામાકાશ cv {
 
-unsigned defaultNumberOfThreads();
+unsigned default_સંખ્યા_Of_Threads();
 
-void parallel_for_pthreads(const Range& range, const ParallelLoopBody& body, double nstripes);
-size_t parallel_pthreads_get_threads_num();
-void parallel_pthreads_set_threads_num(int num);
+શૂન્ય parallel_for_pthreads(અચલ Range& range, અચલ ParallelLoopBody& body, દ્વિગુણ nstripes);
+size_t parallel_pthreads_get_threads_અંક();
+શૂન્ય parallel_pthreads_set_threads_અંક(પૂર્ણાંક num);
 
 }
 

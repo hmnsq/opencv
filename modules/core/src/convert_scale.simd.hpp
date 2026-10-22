@@ -3,14 +3,14 @@
 // of this distribution and at http://opencv.org/license.html
 
 
-#include "precomp.hpp"
-#include "convert.hpp"
+#અન્તર્ભાવ "precomp.hpp"
+#અન્તર્ભાવ "convert.hpp"
 
-namespace cv {
+નામાકાશ cv {
 CV_CPU_OPTIMIZATION_NAMESPACE_BEGIN
 
-BinaryFunc getCvtScaleAbsFunc(int depth);
-BinaryFunc getConvertScaleFunc(int sdepth, int ddepth);
+દ્વિઅંકી_Func getCvtScaleAbsFunc(પૂર્ણાંક depth);
+દ્વિઅંકી_Func getConvertScaleFunc(પૂર્ણાંક sdepth, પૂર્ણાંક ddepth);
 
 #ifndef CV_CPU_OPTIMIZATION_DECLARATIONS_ONLY
 
@@ -18,36 +18,36 @@ BinaryFunc getConvertScaleFunc(int sdepth, int ddepth);
 *                                convertScale[Abs]                                       *
 \****************************************************************************************/
 
-template<typename _Ts, typename _Td> inline void
-cvtabs_32f( const _Ts* src, size_t sstep, _Td* dst, size_t dstep,
-            Size size, float a, float b )
+template<typename _Ts, typename _Td> અંતઃરેખ શૂન્ય
+cvtabs_32f( અચલ _Ts* src, size_t sstep, _Td* dst, size_t dstep,
+            Size size, દશાંશ a, દશાંશ b )
 {
-#if (CV_SIMD || CV_SIMD_SCALABLE)
+#જો (CV_SIMD || CV_SIMD_SCALABLE)
     v_float32 va = vx_setall_f32(a), vb = vx_setall_f32(b);
-    const int VECSZ = VTraits<v_float32>::vlanes()*2;
+    અચલ પૂર્ણાંક VECSZ = VTraits<v_float32>::vlanes()*2;
     // GCC miscompiles this scalable block only on VLEN=128 RVV (opencv/issues/26936);
     // use scalar there, keep SIMD on wider vectors. Ask the hardware for VLEN directly:
     // vlanes() would depend on the LMUL the universal intrinsics happen to use.
-#if (CV_RVV && CV_SIMD_SCALABLE && defined(__GNUC__) && !defined(__clang__))
-    const bool useSIMD = __riscv_vlenb()*8 != 128;
-#else
-    const bool useSIMD = true;
+#જો (CV_RVV && CV_SIMD_SCALABLE && defined(__GNUC__) && !defined(__clang__))
+    અચલ તાર્કિક useSIMD = __riscv_vlenb()*8 != 128;
+#નહીંતર
+    અચલ તાર્કિક useSIMD = સાચું;
 #endif
 #endif
-    sstep /= sizeof(src[0]);
-    dstep /= sizeof(dst[0]);
+    sstep /= કદ(src[0]);
+    dstep /= કદ(dst[0]);
 
-    for( int i = 0; i < size.height; i++, src += sstep, dst += dstep )
+    માટે( પૂર્ણાંક i = 0; i < size.height; i++, src += sstep, dst += dstep )
     {
-        int j = 0;
-#if (CV_SIMD || CV_SIMD_SCALABLE)
-        if( useSIMD )
-        for( ; j < size.width; j += VECSZ )
+        પૂર્ણાંક j = 0;
+#જો (CV_SIMD || CV_SIMD_SCALABLE)
+        જો( useSIMD )
+        માટે( ; j < size.width; j += VECSZ )
         {
-            if( j > size.width - VECSZ )
+            જો( j > size.width - VECSZ )
             {
-                if( j == 0 || src == (_Ts*)dst )
-                    break;
+                જો( j == 0 || src == (_Ts*)dst )
+                    તોડો;
                 j = size.width - VECSZ;
             }
             v_float32 v0, v1;
@@ -57,48 +57,48 @@ cvtabs_32f( const _Ts* src, size_t sstep, _Td* dst, size_t dstep,
             v_store_pair_as(dst + j, v_abs(v0), v_abs(v1));
         }
 #endif
-        for( ; j < size.width; j++ )
+        માટે( ; j < size.width; j++ )
             dst[j] = saturate_cast<_Td>(std::abs(src[j]*a + b));
     }
 }
 
-static void
-cvtabs_32f( const bool* src_, size_t sstep,
+સ્થિર શૂન્ય
+cvtabs_32f( અચલ તાર્કિક* src_, size_t sstep,
             uchar* dst, size_t dstep,
-            Size size, float a, float b )
+            Size size, દશાંશ a, દશાંશ b )
 {
-    const uchar* src = (const uchar*)src_;
+    અચલ uchar* src = (અચલ uchar*)src_;
     uchar v0 = saturate_cast<uchar>(std::abs(b));
     uchar v1 = saturate_cast<uchar>(std::abs(a + b));
-    for( int i = 0; i < size.height; i++, src += sstep, dst += dstep )
+    માટે( પૂર્ણાંક i = 0; i < size.height; i++, src += sstep, dst += dstep )
     {
-        for (int j = 0; j < size.width; j++)
+        માટે (પૂર્ણાંક j = 0; j < size.width; j++)
             dst[j] = src[j] != 0 ? v1 : v0;
     }
 }
 
-template<typename _Ts, typename _Td> inline void
-cvt_32f( const _Ts* src, size_t sstep, _Td* dst, size_t dstep,
-         Size size, float a, float b )
+template<typename _Ts, typename _Td> અંતઃરેખ શૂન્ય
+cvt_32f( અચલ _Ts* src, size_t sstep, _Td* dst, size_t dstep,
+         Size size, દશાંશ a, દશાંશ b )
 {
-#if (CV_SIMD || (CV_SIMD_SCALABLE && !(defined(__GNUC__) && !defined(__clang__))) )
+#જો (CV_SIMD || (CV_SIMD_SCALABLE && !(defined(__GNUC__) && !defined(__clang__))) )
     v_float32 va = vx_setall_f32(a), vb = vx_setall_f32(b);
-    const int VECSZ = VTraits<v_float32>::vlanes()*2;
+    અચલ પૂર્ણાંક VECSZ = VTraits<v_float32>::vlanes()*2;
 #endif
-    sstep /= sizeof(src[0]);
-    dstep /= sizeof(dst[0]);
+    sstep /= કદ(src[0]);
+    dstep /= કદ(dst[0]);
 
-    for( int i = 0; i < size.height; i++, src += sstep, dst += dstep )
+    માટે( પૂર્ણાંક i = 0; i < size.height; i++, src += sstep, dst += dstep )
     {
-        int j = 0;
+        પૂર્ણાંક j = 0;
 // Excluding GNU in CV_SIMD_SCALABLE because of "opencv/issues/26936"
-#if (CV_SIMD || (CV_SIMD_SCALABLE && !(defined(__GNUC__) && !defined(__clang__))) )
-        for( ; j < size.width; j += VECSZ )
+#જો (CV_SIMD || (CV_SIMD_SCALABLE && !(defined(__GNUC__) && !defined(__clang__))) )
+        માટે( ; j < size.width; j += VECSZ )
         {
-            if( j > size.width - VECSZ )
+            જો( j > size.width - VECSZ )
             {
-                if( j == 0 || src == (_Ts*)dst )
-                    break;
+                જો( j == 0 || src == (_Ts*)dst )
+                    તોડો;
                 j = size.width - VECSZ;
             }
             v_float32 v0, v1;
@@ -108,33 +108,33 @@ cvt_32f( const _Ts* src, size_t sstep, _Td* dst, size_t dstep,
             v_store_pair_as(dst + j, v0, v1);
         }
 #endif
-        for( ; j < size.width; j++ )
+        માટે( ; j < size.width; j++ )
             dst[j] = saturate_cast<_Td>(src[j]*a + b);
     }
 }
 
 // variant for conversions 16f <-> ... w/o unrolling
-template<typename _Ts, typename _Td> inline void
-cvt1_32f( const _Ts* src, size_t sstep, _Td* dst, size_t dstep,
-          Size size, float a, float b )
+template<typename _Ts, typename _Td> અંતઃરેખ શૂન્ય
+cvt1_32f( અચલ _Ts* src, size_t sstep, _Td* dst, size_t dstep,
+          Size size, દશાંશ a, દશાંશ b )
 {
-#if (CV_SIMD || CV_SIMD_SCALABLE)
+#જો (CV_SIMD || CV_SIMD_SCALABLE)
     v_float32 va = vx_setall_f32(a), vb = vx_setall_f32(b);
-    const int VECSZ = VTraits<v_float32>::vlanes();
+    અચલ પૂર્ણાંક VECSZ = VTraits<v_float32>::vlanes();
 #endif
-    sstep /= sizeof(src[0]);
-    dstep /= sizeof(dst[0]);
+    sstep /= કદ(src[0]);
+    dstep /= કદ(dst[0]);
 
-    for( int i = 0; i < size.height; i++, src += sstep, dst += dstep )
+    માટે( પૂર્ણાંક i = 0; i < size.height; i++, src += sstep, dst += dstep )
     {
-        int j = 0;
-#if (CV_SIMD || CV_SIMD_SCALABLE)
-        for( ; j < size.width; j += VECSZ )
+        પૂર્ણાંક j = 0;
+#જો (CV_SIMD || CV_SIMD_SCALABLE)
+        માટે( ; j < size.width; j += VECSZ )
         {
-            if( j > size.width - VECSZ )
+            જો( j > size.width - VECSZ )
             {
-                if( j == 0 || src == (_Ts*)dst )
-                    break;
+                જો( j == 0 || src == (_Ts*)dst )
+                    તોડો;
                 j = size.width - VECSZ;
             }
             v_float32 v0;
@@ -143,34 +143,34 @@ cvt1_32f( const _Ts* src, size_t sstep, _Td* dst, size_t dstep,
             v_store_as(dst + j, v0);
         }
 #endif
-        for( ; j < size.width; j++ )
+        માટે( ; j < size.width; j++ )
             dst[j] = saturate_cast<_Td>(src[j]*a + b);
     }
 }
 
 
-template<typename _Ts, typename _Td> inline void
-cvt_64f( const _Ts* src, size_t sstep, _Td* dst, size_t dstep,
-         Size size, double a, double b )
+template<typename _Ts, typename _Td> અંતઃરેખ શૂન્ય
+cvt_64f( અચલ _Ts* src, size_t sstep, _Td* dst, size_t dstep,
+         Size size, દ્વિગુણ a, દ્વિગુણ b )
 {
-#if (CV_SIMD_64F || (CV_SIMD_SCALABLE_64F && !(defined(__GNUC__) && !defined(__clang__))) )
+#જો (CV_SIMD_64F || (CV_SIMD_SCALABLE_64F && !(defined(__GNUC__) && !defined(__clang__))) )
     v_float64 va = vx_setall_f64(a), vb = vx_setall_f64(b);
-    const int VECSZ = VTraits<v_float64>::vlanes()*2;
+    અચલ પૂર્ણાંક VECSZ = VTraits<v_float64>::vlanes()*2;
 #endif
-    sstep /= sizeof(src[0]);
-    dstep /= sizeof(dst[0]);
+    sstep /= કદ(src[0]);
+    dstep /= કદ(dst[0]);
 
-    for( int i = 0; i < size.height; i++, src += sstep, dst += dstep )
+    માટે( પૂર્ણાંક i = 0; i < size.height; i++, src += sstep, dst += dstep )
     {
-        int j = 0;
+        પૂર્ણાંક j = 0;
 // Excluding GNU in CV_SIMD_SCALABLE because of "opencv/issues/26936"
-#if (CV_SIMD_64F || (CV_SIMD_SCALABLE_64F && !(defined(__GNUC__) && !defined(__clang__))) )
-        for( ; j < size.width; j += VECSZ )
+#જો (CV_SIMD_64F || (CV_SIMD_SCALABLE_64F && !(defined(__GNUC__) && !defined(__clang__))) )
+        માટે( ; j < size.width; j += VECSZ )
         {
-            if( j > size.width - VECSZ )
+            જો( j > size.width - VECSZ )
             {
-                if( j == 0 || src == (_Ts*)dst )
-                    break;
+                જો( j == 0 || src == (_Ts*)dst )
+                    તોડો;
                 j = size.width - VECSZ;
             }
             v_float64 v0, v1;
@@ -180,7 +180,7 @@ cvt_64f( const _Ts* src, size_t sstep, _Td* dst, size_t dstep,
             v_store_pair_as(dst + j, v0, v1);
         }
 #endif
-        for( ; j < size.width; j++ )
+        માટે( ; j < size.width; j++ )
             dst[j] = saturate_cast<_Td>(src[j]*a + b);
     }
 }
@@ -188,343 +188,343 @@ cvt_64f( const _Ts* src, size_t sstep, _Td* dst, size_t dstep,
 //==================================================================================================
 
 #define DEF_CVT_SCALE_ABS_FUNC(suffix, cvt, stype, dtype, wtype) \
-static void cvtScaleAbs##suffix( const uchar* src_, size_t sstep, const uchar*, size_t, \
-                                 uchar* dst_, size_t dstep, Size size, void* scale_) \
+સ્થિર શૂન્ય cvtScaleAbs##suffix( અચલ uchar* src_, size_t sstep, અચલ uchar*, size_t, \
+                                 uchar* dst_, size_t dstep, Size size, શૂન્ય* scale_) \
 { \
-    const stype* src = (const stype*)src_; \
+    અચલ stype* src = (અચલ stype*)src_; \
     dtype* dst = (dtype*)dst_; \
-    double* scale = (double*)scale_; \
+    દ્વિગુણ* scale = (દ્વિગુણ*)scale_; \
     cvt(src, sstep, dst, dstep, size, (wtype)scale[0], (wtype)scale[1]); \
 }
 
 
 #define DEF_CVT_SCALE_FUNC(suffix, cvt, stype, dtype, wtype) \
-static void cvtScale##suffix( const uchar* src_, size_t sstep, const uchar*, size_t, \
-                              uchar* dst_, size_t dstep, Size size, void* scale_) \
+સ્થિર શૂન્ય cvtScale##suffix( અચલ uchar* src_, size_t sstep, અચલ uchar*, size_t, \
+                              uchar* dst_, size_t dstep, Size size, શૂન્ય* scale_) \
 { \
-    const stype* src = (const stype*)src_; \
+    અચલ stype* src = (અચલ stype*)src_; \
     dtype* dst = (dtype*)dst_; \
-    double* scale = (double*)scale_; \
+    દ્વિગુણ* scale = (દ્વિગુણ*)scale_; \
     cvt(src, sstep, dst, dstep, size, (wtype)scale[0], (wtype)scale[1]); \
 }
 
 #define DEF_CVT_SCALE2BOOL_FUNC(suffix, stype, wtype) \
-static void cvtScale##suffix( const uchar* src_, size_t sstep, const uchar*, size_t, \
-                              uchar* dst, size_t dstep, Size size, void* scale_) \
+સ્થિર શૂન્ય cvtScale##suffix( અચલ uchar* src_, size_t sstep, અચલ uchar*, size_t, \
+                              uchar* dst, size_t dstep, Size size, શૂન્ય* scale_) \
 { \
-    const stype* src = (const stype*)src_; \
-    const double* scale = (const double*)scale_; \
+    અચલ stype* src = (અચલ stype*)src_; \
+    અચલ દ્વિગુણ* scale = (અચલ દ્વિગુણ*)scale_; \
     wtype a = (wtype)scale[0], b = (wtype)scale[1]; \
-    sstep /= sizeof(src[0]); \
-    for( int i = 0; i < size.height; i++, src += sstep, dst += dstep ) \
-        for (int j = 0; j < size.width; j++) \
-            dst[j] = (bool)((wtype)src[j]*a + b != 0); \
+    sstep /= કદ(src[0]); \
+    માટે( પૂર્ણાંક i = 0; i < size.height; i++, src += sstep, dst += dstep ) \
+        માટે (પૂર્ણાંક j = 0; j < size.width; j++) \
+            dst[j] = (તાર્કિક)((wtype)src[j]*a + b != 0); \
 }
 
 #define DEF_CVT_SCALEBOOL2_FUNC(suffix, dtype, wtype) \
-static void cvtScale##suffix( const uchar* src, size_t sstep, const uchar*, size_t, \
-                              uchar* dst_, size_t dstep, Size size, void* scale_) \
+સ્થિર શૂન્ય cvtScale##suffix( અચલ uchar* src, size_t sstep, અચલ uchar*, size_t, \
+                              uchar* dst_, size_t dstep, Size size, શૂન્ય* scale_) \
 { \
     dtype* dst = (dtype*)dst_; \
-    const double* scale = (const double*)scale_; \
+    અચલ દ્વિગુણ* scale = (અચલ દ્વિગુણ*)scale_; \
     wtype a = (wtype)scale[0], b = (wtype)scale[1]; \
     dtype v0 = saturate_cast<dtype>(b), v1 = saturate_cast<dtype>(a + b); \
-    dstep /= sizeof(dst[0]); \
-    for( int i = 0; i < size.height; i++, src += sstep, dst += dstep ) \
-        for (int j = 0; j < size.width; j++) \
+    dstep /= કદ(dst[0]); \
+    માટે( પૂર્ણાંક i = 0; i < size.height; i++, src += sstep, dst += dstep ) \
+        માટે (પૂર્ણાંક j = 0; j < size.width; j++) \
             dst[j] = src[j] != 0 ? v1 : v0; \
 }
 
-DEF_CVT_SCALE_ABS_FUNC(8u,    cvtabs_32f, uchar,  uchar, float)
-DEF_CVT_SCALE_ABS_FUNC(8s8u,  cvtabs_32f, schar,  uchar, float)
-DEF_CVT_SCALE_ABS_FUNC(8b8u,  cvtabs_32f, bool,  uchar, float)
-DEF_CVT_SCALE_ABS_FUNC(16u8u, cvtabs_32f, ushort, uchar, float)
-DEF_CVT_SCALE_ABS_FUNC(16s8u, cvtabs_32f, short,  uchar, float)
-DEF_CVT_SCALE_ABS_FUNC(32u8u, cvtabs_32f, unsigned, uchar, float)
-DEF_CVT_SCALE_ABS_FUNC(32s8u, cvtabs_32f, int,    uchar, float)
-DEF_CVT_SCALE_ABS_FUNC(32f8u, cvtabs_32f, float,  uchar, float)
-DEF_CVT_SCALE_ABS_FUNC(64u8u, cvtabs_32f, uint64_t, uchar, float)
-DEF_CVT_SCALE_ABS_FUNC(64s8u, cvtabs_32f, int64_t, uchar, float)
-DEF_CVT_SCALE_ABS_FUNC(64f8u, cvtabs_32f, double, uchar, float)
-DEF_CVT_SCALE_ABS_FUNC(16f8u, cvtabs_32f, hfloat, uchar, float)
-DEF_CVT_SCALE_ABS_FUNC(16bf8u, cvtabs_32f, bfloat, uchar, float)
+DEF_CVT_SCALE_ABS_FUNC(8u,    cvtabs_32f, uchar,  uchar, દશાંશ)
+DEF_CVT_SCALE_ABS_FUNC(8s8u,  cvtabs_32f, schar,  uchar, દશાંશ)
+DEF_CVT_SCALE_ABS_FUNC(8b8u,  cvtabs_32f, તાર્કિક,  uchar, દશાંશ)
+DEF_CVT_SCALE_ABS_FUNC(16u8u, cvtabs_32f, ushort, uchar, દશાંશ)
+DEF_CVT_SCALE_ABS_FUNC(16s8u, cvtabs_32f, short,  uchar, દશાંશ)
+DEF_CVT_SCALE_ABS_FUNC(32u8u, cvtabs_32f, unsigned, uchar, દશાંશ)
+DEF_CVT_SCALE_ABS_FUNC(32s8u, cvtabs_32f, પૂર્ણાંક,    uchar, દશાંશ)
+DEF_CVT_SCALE_ABS_FUNC(32f8u, cvtabs_32f, દશાંશ,  uchar, દશાંશ)
+DEF_CVT_SCALE_ABS_FUNC(64u8u, cvtabs_32f, uint64_t, uchar, દશાંશ)
+DEF_CVT_SCALE_ABS_FUNC(64s8u, cvtabs_32f, int64_t, uchar, દશાંશ)
+DEF_CVT_SCALE_ABS_FUNC(64f8u, cvtabs_32f, દ્વિગુણ, uchar, દશાંશ)
+DEF_CVT_SCALE_ABS_FUNC(16f8u, cvtabs_32f, hfloat, uchar, દશાંશ)
+DEF_CVT_SCALE_ABS_FUNC(16bf8u, cvtabs_32f, bfloat, uchar, દશાંશ)
 
-DEF_CVT_SCALE_FUNC(8u,     cvt_32f, uchar,  uchar, float)
-DEF_CVT_SCALE_FUNC(8s8u,   cvt_32f, schar,  uchar, float)
-DEF_CVT_SCALE_FUNC(16u8u,  cvt_32f, ushort, uchar, float)
-DEF_CVT_SCALE_FUNC(16s8u,  cvt_32f, short,  uchar, float)
-DEF_CVT_SCALE_FUNC(32u8u,  cvt_32f, unsigned, uchar, float)
-DEF_CVT_SCALE_FUNC(32s8u,  cvt_32f, int,    uchar, float)
-DEF_CVT_SCALE_FUNC(32f8u,  cvt_32f, float,  uchar, float)
-DEF_CVT_SCALE_FUNC(64f8u,  cvt_32f, double, uchar, float)
-DEF_CVT_SCALE_FUNC(64u8u,  cvt_32f, uint64_t, uchar, float)
-DEF_CVT_SCALE_FUNC(64s8u,  cvt_32f, int64_t, uchar, float)
-DEF_CVT_SCALE_FUNC(16f8u,  cvt_32f, hfloat, uchar, float)
-DEF_CVT_SCALE_FUNC(16bf8u, cvt_32f, bfloat, uchar, float)
+DEF_CVT_SCALE_FUNC(8u,     cvt_32f, uchar,  uchar, દશાંશ)
+DEF_CVT_SCALE_FUNC(8s8u,   cvt_32f, schar,  uchar, દશાંશ)
+DEF_CVT_SCALE_FUNC(16u8u,  cvt_32f, ushort, uchar, દશાંશ)
+DEF_CVT_SCALE_FUNC(16s8u,  cvt_32f, short,  uchar, દશાંશ)
+DEF_CVT_SCALE_FUNC(32u8u,  cvt_32f, unsigned, uchar, દશાંશ)
+DEF_CVT_SCALE_FUNC(32s8u,  cvt_32f, પૂર્ણાંક,    uchar, દશાંશ)
+DEF_CVT_SCALE_FUNC(32f8u,  cvt_32f, દશાંશ,  uchar, દશાંશ)
+DEF_CVT_SCALE_FUNC(64f8u,  cvt_32f, દ્વિગુણ, uchar, દશાંશ)
+DEF_CVT_SCALE_FUNC(64u8u,  cvt_32f, uint64_t, uchar, દશાંશ)
+DEF_CVT_SCALE_FUNC(64s8u,  cvt_32f, int64_t, uchar, દશાંશ)
+DEF_CVT_SCALE_FUNC(16f8u,  cvt_32f, hfloat, uchar, દશાંશ)
+DEF_CVT_SCALE_FUNC(16bf8u, cvt_32f, bfloat, uchar, દશાંશ)
 
-DEF_CVT_SCALE_FUNC(8u8s,   cvt_32f, uchar,  schar, float)
-DEF_CVT_SCALE_FUNC(8s,     cvt_32f, schar,  schar, float)
-DEF_CVT_SCALE_FUNC(16u8s,  cvt_32f, ushort, schar, float)
-DEF_CVT_SCALE_FUNC(16s8s,  cvt_32f, short,  schar, float)
-DEF_CVT_SCALE_FUNC(32u8s,  cvt_32f, unsigned, schar, float)
-DEF_CVT_SCALE_FUNC(32s8s,  cvt_32f, int,    schar, float)
-DEF_CVT_SCALE_FUNC(32f8s,  cvt_32f, float,  schar, float)
-DEF_CVT_SCALE_FUNC(64f8s,  cvt_32f, double, schar, float)
-DEF_CVT_SCALE_FUNC(64u8s,  cvt_32f, uint64_t, schar, float)
-DEF_CVT_SCALE_FUNC(64s8s,  cvt_32f, int64_t, schar, float)
-DEF_CVT_SCALE_FUNC(16f8s,  cvt_32f, hfloat, schar, float)
-DEF_CVT_SCALE_FUNC(16bf8s, cvt_32f, bfloat, schar, float)
+DEF_CVT_SCALE_FUNC(8u8s,   cvt_32f, uchar,  schar, દશાંશ)
+DEF_CVT_SCALE_FUNC(8s,     cvt_32f, schar,  schar, દશાંશ)
+DEF_CVT_SCALE_FUNC(16u8s,  cvt_32f, ushort, schar, દશાંશ)
+DEF_CVT_SCALE_FUNC(16s8s,  cvt_32f, short,  schar, દશાંશ)
+DEF_CVT_SCALE_FUNC(32u8s,  cvt_32f, unsigned, schar, દશાંશ)
+DEF_CVT_SCALE_FUNC(32s8s,  cvt_32f, પૂર્ણાંક,    schar, દશાંશ)
+DEF_CVT_SCALE_FUNC(32f8s,  cvt_32f, દશાંશ,  schar, દશાંશ)
+DEF_CVT_SCALE_FUNC(64f8s,  cvt_32f, દ્વિગુણ, schar, દશાંશ)
+DEF_CVT_SCALE_FUNC(64u8s,  cvt_32f, uint64_t, schar, દશાંશ)
+DEF_CVT_SCALE_FUNC(64s8s,  cvt_32f, int64_t, schar, દશાંશ)
+DEF_CVT_SCALE_FUNC(16f8s,  cvt_32f, hfloat, schar, દશાંશ)
+DEF_CVT_SCALE_FUNC(16bf8s, cvt_32f, bfloat, schar, દશાંશ)
 
-DEF_CVT_SCALE2BOOL_FUNC(8u8b, uchar, float)
-DEF_CVT_SCALE2BOOL_FUNC(8s8b, schar, float)
-DEF_CVT_SCALE2BOOL_FUNC(16u8b, ushort, float)
-DEF_CVT_SCALE2BOOL_FUNC(16s8b, short, float)
-DEF_CVT_SCALE2BOOL_FUNC(32u8b, unsigned, float)
-DEF_CVT_SCALE2BOOL_FUNC(32s8b, int, float)
-DEF_CVT_SCALE2BOOL_FUNC(32f8b, float, float)
-DEF_CVT_SCALE2BOOL_FUNC(64f8b, double, float)
-DEF_CVT_SCALE2BOOL_FUNC(64u8b, uint64_t, float)
-DEF_CVT_SCALE2BOOL_FUNC(64s8b, int64_t, float)
-DEF_CVT_SCALE2BOOL_FUNC(16f8b, hfloat, float)
-DEF_CVT_SCALE2BOOL_FUNC(16bf8b, bfloat, float)
+DEF_CVT_SCALE2BOOL_FUNC(8u8b, uchar, દશાંશ)
+DEF_CVT_SCALE2BOOL_FUNC(8s8b, schar, દશાંશ)
+DEF_CVT_SCALE2BOOL_FUNC(16u8b, ushort, દશાંશ)
+DEF_CVT_SCALE2BOOL_FUNC(16s8b, short, દશાંશ)
+DEF_CVT_SCALE2BOOL_FUNC(32u8b, unsigned, દશાંશ)
+DEF_CVT_SCALE2BOOL_FUNC(32s8b, પૂર્ણાંક, દશાંશ)
+DEF_CVT_SCALE2BOOL_FUNC(32f8b, દશાંશ, દશાંશ)
+DEF_CVT_SCALE2BOOL_FUNC(64f8b, દ્વિગુણ, દશાંશ)
+DEF_CVT_SCALE2BOOL_FUNC(64u8b, uint64_t, દશાંશ)
+DEF_CVT_SCALE2BOOL_FUNC(64s8b, int64_t, દશાંશ)
+DEF_CVT_SCALE2BOOL_FUNC(16f8b, hfloat, દશાંશ)
+DEF_CVT_SCALE2BOOL_FUNC(16bf8b, bfloat, દશાંશ)
 
-DEF_CVT_SCALE_FUNC(8u16u,  cvt_32f, uchar,  ushort, float)
-DEF_CVT_SCALE_FUNC(8s16u,  cvt_32f, schar,  ushort, float)
-DEF_CVT_SCALE_FUNC(16u,    cvt_32f, ushort, ushort, float)
-DEF_CVT_SCALE_FUNC(16s16u, cvt_32f, short,  ushort, float)
-DEF_CVT_SCALE_FUNC(32u16u, cvt_32f, unsigned, ushort, float)
-DEF_CVT_SCALE_FUNC(32s16u, cvt_32f, int,    ushort, float)
-DEF_CVT_SCALE_FUNC(32f16u, cvt_32f, float,  ushort, float)
-DEF_CVT_SCALE_FUNC(64f16u, cvt_32f, double, ushort, float)
-DEF_CVT_SCALE_FUNC(64u16u, cvt_32f, uint64_t, ushort, float)
-DEF_CVT_SCALE_FUNC(64s16u, cvt_32f, int64_t, ushort, float)
-DEF_CVT_SCALE_FUNC(16f16u, cvt1_32f, hfloat, ushort, float)
-DEF_CVT_SCALE_FUNC(16bf16u, cvt1_32f, bfloat, ushort, float)
+DEF_CVT_SCALE_FUNC(8u16u,  cvt_32f, uchar,  ushort, દશાંશ)
+DEF_CVT_SCALE_FUNC(8s16u,  cvt_32f, schar,  ushort, દશાંશ)
+DEF_CVT_SCALE_FUNC(16u,    cvt_32f, ushort, ushort, દશાંશ)
+DEF_CVT_SCALE_FUNC(16s16u, cvt_32f, short,  ushort, દશાંશ)
+DEF_CVT_SCALE_FUNC(32u16u, cvt_32f, unsigned, ushort, દશાંશ)
+DEF_CVT_SCALE_FUNC(32s16u, cvt_32f, પૂર્ણાંક,    ushort, દશાંશ)
+DEF_CVT_SCALE_FUNC(32f16u, cvt_32f, દશાંશ,  ushort, દશાંશ)
+DEF_CVT_SCALE_FUNC(64f16u, cvt_32f, દ્વિગુણ, ushort, દશાંશ)
+DEF_CVT_SCALE_FUNC(64u16u, cvt_32f, uint64_t, ushort, દશાંશ)
+DEF_CVT_SCALE_FUNC(64s16u, cvt_32f, int64_t, ushort, દશાંશ)
+DEF_CVT_SCALE_FUNC(16f16u, cvt1_32f, hfloat, ushort, દશાંશ)
+DEF_CVT_SCALE_FUNC(16bf16u, cvt1_32f, bfloat, ushort, દશાંશ)
 
-DEF_CVT_SCALE_FUNC(8u16s,  cvt_32f, uchar,  short, float)
-DEF_CVT_SCALE_FUNC(8s16s,  cvt_32f, schar,  short, float)
-DEF_CVT_SCALE_FUNC(16u16s, cvt_32f, ushort, short, float)
-DEF_CVT_SCALE_FUNC(16s,    cvt_32f, short,  short, float)
-DEF_CVT_SCALE_FUNC(32u16s, cvt_32f, unsigned, short, float)
-DEF_CVT_SCALE_FUNC(32s16s, cvt_32f, int,    short, float)
-DEF_CVT_SCALE_FUNC(32f16s, cvt_32f, float,  short, float)
-DEF_CVT_SCALE_FUNC(64f16s, cvt_32f, double, short, float)
-DEF_CVT_SCALE_FUNC(64u16s, cvt_32f, uint64_t, short, float)
-DEF_CVT_SCALE_FUNC(64s16s, cvt_32f, int64_t, short, float)
-DEF_CVT_SCALE_FUNC(16f16s, cvt1_32f, hfloat, short, float)
-DEF_CVT_SCALE_FUNC(16bf16s, cvt1_32f, bfloat, short, float)
+DEF_CVT_SCALE_FUNC(8u16s,  cvt_32f, uchar,  short, દશાંશ)
+DEF_CVT_SCALE_FUNC(8s16s,  cvt_32f, schar,  short, દશાંશ)
+DEF_CVT_SCALE_FUNC(16u16s, cvt_32f, ushort, short, દશાંશ)
+DEF_CVT_SCALE_FUNC(16s,    cvt_32f, short,  short, દશાંશ)
+DEF_CVT_SCALE_FUNC(32u16s, cvt_32f, unsigned, short, દશાંશ)
+DEF_CVT_SCALE_FUNC(32s16s, cvt_32f, પૂર્ણાંક,    short, દશાંશ)
+DEF_CVT_SCALE_FUNC(32f16s, cvt_32f, દશાંશ,  short, દશાંશ)
+DEF_CVT_SCALE_FUNC(64f16s, cvt_32f, દ્વિગુણ, short, દશાંશ)
+DEF_CVT_SCALE_FUNC(64u16s, cvt_32f, uint64_t, short, દશાંશ)
+DEF_CVT_SCALE_FUNC(64s16s, cvt_32f, int64_t, short, દશાંશ)
+DEF_CVT_SCALE_FUNC(16f16s, cvt1_32f, hfloat, short, દશાંશ)
+DEF_CVT_SCALE_FUNC(16bf16s, cvt1_32f, bfloat, short, દશાંશ)
 
-DEF_CVT_SCALE_FUNC(8u32u,  cvt_32f, uchar,  unsigned, float)
-DEF_CVT_SCALE_FUNC(8s32u,  cvt_32f, schar,  unsigned, float)
-DEF_CVT_SCALE_FUNC(16u32u, cvt_32f, ushort, unsigned, float)
-DEF_CVT_SCALE_FUNC(16s32u, cvt_32f, short,  unsigned, float)
-DEF_CVT_SCALE_FUNC(32u, cvt_32f, unsigned, unsigned, float)
-DEF_CVT_SCALE_FUNC(32s32u, cvt_64f, int,    unsigned, double)
-DEF_CVT_SCALE_FUNC(32f32u, cvt_32f, float,  unsigned, float)
-DEF_CVT_SCALE_FUNC(64f32u, cvt_64f, double, unsigned, double)
-DEF_CVT_SCALE_FUNC(64u32u, cvt_32f, uint64_t, unsigned, float)
-DEF_CVT_SCALE_FUNC(64s32u, cvt_32f, int64_t, unsigned, float)
-DEF_CVT_SCALE_FUNC(16f32u, cvt1_32f, hfloat, unsigned, float)
-DEF_CVT_SCALE_FUNC(16bf32u, cvt1_32f, bfloat, unsigned, float)
+DEF_CVT_SCALE_FUNC(8u32u,  cvt_32f, uchar,  unsigned, દશાંશ)
+DEF_CVT_SCALE_FUNC(8s32u,  cvt_32f, schar,  unsigned, દશાંશ)
+DEF_CVT_SCALE_FUNC(16u32u, cvt_32f, ushort, unsigned, દશાંશ)
+DEF_CVT_SCALE_FUNC(16s32u, cvt_32f, short,  unsigned, દશાંશ)
+DEF_CVT_SCALE_FUNC(32u, cvt_32f, unsigned, unsigned, દશાંશ)
+DEF_CVT_SCALE_FUNC(32s32u, cvt_64f, પૂર્ણાંક,    unsigned, દ્વિગુણ)
+DEF_CVT_SCALE_FUNC(32f32u, cvt_32f, દશાંશ,  unsigned, દશાંશ)
+DEF_CVT_SCALE_FUNC(64f32u, cvt_64f, દ્વિગુણ, unsigned, દ્વિગુણ)
+DEF_CVT_SCALE_FUNC(64u32u, cvt_32f, uint64_t, unsigned, દશાંશ)
+DEF_CVT_SCALE_FUNC(64s32u, cvt_32f, int64_t, unsigned, દશાંશ)
+DEF_CVT_SCALE_FUNC(16f32u, cvt1_32f, hfloat, unsigned, દશાંશ)
+DEF_CVT_SCALE_FUNC(16bf32u, cvt1_32f, bfloat, unsigned, દશાંશ)
 
-DEF_CVT_SCALE_FUNC(8u32s,  cvt_32f, uchar,  int, float)
-DEF_CVT_SCALE_FUNC(8s32s,  cvt_32f, schar,  int, float)
-DEF_CVT_SCALE_FUNC(16u32s, cvt_32f, ushort, int, float)
-DEF_CVT_SCALE_FUNC(16s32s, cvt_32f, short,  int, float)
-DEF_CVT_SCALE_FUNC(32u32s, cvt_32f, unsigned, int, float)
-DEF_CVT_SCALE_FUNC(32s,    cvt_64f, int,    int, double)
-DEF_CVT_SCALE_FUNC(32f32s, cvt_32f, float,  int, float)
-DEF_CVT_SCALE_FUNC(64f32s, cvt_64f, double, int, double)
-DEF_CVT_SCALE_FUNC(64u32s, cvt_32f, uint64_t, int, float)
-DEF_CVT_SCALE_FUNC(64s32s, cvt_32f, int64_t, int, float)
-DEF_CVT_SCALE_FUNC(16f32s, cvt1_32f, hfloat, int, float)
-DEF_CVT_SCALE_FUNC(16bf32s, cvt1_32f, bfloat, int, float)
+DEF_CVT_SCALE_FUNC(8u32s,  cvt_32f, uchar,  પૂર્ણાંક, દશાંશ)
+DEF_CVT_SCALE_FUNC(8s32s,  cvt_32f, schar,  પૂર્ણાંક, દશાંશ)
+DEF_CVT_SCALE_FUNC(16u32s, cvt_32f, ushort, પૂર્ણાંક, દશાંશ)
+DEF_CVT_SCALE_FUNC(16s32s, cvt_32f, short,  પૂર્ણાંક, દશાંશ)
+DEF_CVT_SCALE_FUNC(32u32s, cvt_32f, unsigned, પૂર્ણાંક, દશાંશ)
+DEF_CVT_SCALE_FUNC(32s,    cvt_64f, પૂર્ણાંક,    પૂર્ણાંક, દ્વિગુણ)
+DEF_CVT_SCALE_FUNC(32f32s, cvt_32f, દશાંશ,  પૂર્ણાંક, દશાંશ)
+DEF_CVT_SCALE_FUNC(64f32s, cvt_64f, દ્વિગુણ, પૂર્ણાંક, દ્વિગુણ)
+DEF_CVT_SCALE_FUNC(64u32s, cvt_32f, uint64_t, પૂર્ણાંક, દશાંશ)
+DEF_CVT_SCALE_FUNC(64s32s, cvt_32f, int64_t, પૂર્ણાંક, દશાંશ)
+DEF_CVT_SCALE_FUNC(16f32s, cvt1_32f, hfloat, પૂર્ણાંક, દશાંશ)
+DEF_CVT_SCALE_FUNC(16bf32s, cvt1_32f, bfloat, પૂર્ણાંક, દશાંશ)
 
-DEF_CVT_SCALE_FUNC(8u32f,  cvt_32f, uchar,  float, float)
-DEF_CVT_SCALE_FUNC(8s32f,  cvt_32f, schar,  float, float)
-DEF_CVT_SCALE_FUNC(16u32f, cvt_32f, ushort, float, float)
-DEF_CVT_SCALE_FUNC(16s32f, cvt_32f, short,  float, float)
-DEF_CVT_SCALE_FUNC(32u32f, cvt_32f, unsigned, float, float)
-DEF_CVT_SCALE_FUNC(32s32f, cvt_32f, int,    float, float)
-DEF_CVT_SCALE_FUNC(32f,    cvt_32f, float,  float, float)
-DEF_CVT_SCALE_FUNC(64f32f, cvt_64f, double, float, double)
-DEF_CVT_SCALE_FUNC(64u32f, cvt_32f, uint64_t, float, float)
-DEF_CVT_SCALE_FUNC(64s32f, cvt_32f, int64_t, float, float)
-DEF_CVT_SCALE_FUNC(16f32f, cvt1_32f, hfloat, float, float)
-DEF_CVT_SCALE_FUNC(16bf32f, cvt1_32f, bfloat, float, float)
+DEF_CVT_SCALE_FUNC(8u32f,  cvt_32f, uchar,  દશાંશ, દશાંશ)
+DEF_CVT_SCALE_FUNC(8s32f,  cvt_32f, schar,  દશાંશ, દશાંશ)
+DEF_CVT_SCALE_FUNC(16u32f, cvt_32f, ushort, દશાંશ, દશાંશ)
+DEF_CVT_SCALE_FUNC(16s32f, cvt_32f, short,  દશાંશ, દશાંશ)
+DEF_CVT_SCALE_FUNC(32u32f, cvt_32f, unsigned, દશાંશ, દશાંશ)
+DEF_CVT_SCALE_FUNC(32s32f, cvt_32f, પૂર્ણાંક,    દશાંશ, દશાંશ)
+DEF_CVT_SCALE_FUNC(32f,    cvt_32f, દશાંશ,  દશાંશ, દશાંશ)
+DEF_CVT_SCALE_FUNC(64f32f, cvt_64f, દ્વિગુણ, દશાંશ, દ્વિગુણ)
+DEF_CVT_SCALE_FUNC(64u32f, cvt_32f, uint64_t, દશાંશ, દશાંશ)
+DEF_CVT_SCALE_FUNC(64s32f, cvt_32f, int64_t, દશાંશ, દશાંશ)
+DEF_CVT_SCALE_FUNC(16f32f, cvt1_32f, hfloat, દશાંશ, દશાંશ)
+DEF_CVT_SCALE_FUNC(16bf32f, cvt1_32f, bfloat, દશાંશ, દશાંશ)
 
-DEF_CVT_SCALE_FUNC(8u64f,  cvt_64f, uchar,  double, double)
-DEF_CVT_SCALE_FUNC(8s64f,  cvt_64f, schar,  double, double)
-DEF_CVT_SCALE_FUNC(16u64f, cvt_64f, ushort, double, double)
-DEF_CVT_SCALE_FUNC(16s64f, cvt_64f, short,  double, double)
-DEF_CVT_SCALE_FUNC(32u64f, cvt_64f, unsigned, double, double)
-DEF_CVT_SCALE_FUNC(32s64f, cvt_64f, int,    double, double)
-DEF_CVT_SCALE_FUNC(32f64f, cvt_64f, float,  double, double)
-DEF_CVT_SCALE_FUNC(64f,    cvt_64f, double, double, double)
-DEF_CVT_SCALE_FUNC(64u64f, cvt_64f, uint64_t, double, double)
-DEF_CVT_SCALE_FUNC(64s64f, cvt_64f, int64_t, double, double)
-DEF_CVT_SCALE_FUNC(16f64f, cvt_64f, hfloat, double, double)
-DEF_CVT_SCALE_FUNC(16bf64f, cvt_64f, bfloat, double, double)
+DEF_CVT_SCALE_FUNC(8u64f,  cvt_64f, uchar,  દ્વિગુણ, દ્વિગુણ)
+DEF_CVT_SCALE_FUNC(8s64f,  cvt_64f, schar,  દ્વિગુણ, દ્વિગુણ)
+DEF_CVT_SCALE_FUNC(16u64f, cvt_64f, ushort, દ્વિગુણ, દ્વિગુણ)
+DEF_CVT_SCALE_FUNC(16s64f, cvt_64f, short,  દ્વિગુણ, દ્વિગુણ)
+DEF_CVT_SCALE_FUNC(32u64f, cvt_64f, unsigned, દ્વિગુણ, દ્વિગુણ)
+DEF_CVT_SCALE_FUNC(32s64f, cvt_64f, પૂર્ણાંક,    દ્વિગુણ, દ્વિગુણ)
+DEF_CVT_SCALE_FUNC(32f64f, cvt_64f, દશાંશ,  દ્વિગુણ, દ્વિગુણ)
+DEF_CVT_SCALE_FUNC(64f,    cvt_64f, દ્વિગુણ, દ્વિગુણ, દ્વિગુણ)
+DEF_CVT_SCALE_FUNC(64u64f, cvt_64f, uint64_t, દ્વિગુણ, દ્વિગુણ)
+DEF_CVT_SCALE_FUNC(64s64f, cvt_64f, int64_t, દ્વિગુણ, દ્વિગુણ)
+DEF_CVT_SCALE_FUNC(16f64f, cvt_64f, hfloat, દ્વિગુણ, દ્વિગુણ)
+DEF_CVT_SCALE_FUNC(16bf64f, cvt_64f, bfloat, દ્વિગુણ, દ્વિગુણ)
 
-DEF_CVT_SCALE_FUNC(8u64u,  cvt_64f, uchar,  uint64_t, double)
-DEF_CVT_SCALE_FUNC(8s64u,  cvt_64f, schar,  uint64_t, double)
-DEF_CVT_SCALE_FUNC(16u64u, cvt_64f, ushort, uint64_t, double)
-DEF_CVT_SCALE_FUNC(16s64u, cvt_64f, short,  uint64_t, double)
-DEF_CVT_SCALE_FUNC(32u64u, cvt_64f, unsigned, uint64_t, double)
-DEF_CVT_SCALE_FUNC(32s64u, cvt_64f, int,    uint64_t, double)
-DEF_CVT_SCALE_FUNC(32f64u, cvt_64f, float,  uint64_t, double)
-DEF_CVT_SCALE_FUNC(64f64u, cvt_64f, double, uint64_t, double)
-DEF_CVT_SCALE_FUNC(64u, cvt_64f, uint64_t, uint64_t, double)
-DEF_CVT_SCALE_FUNC(64s64u, cvt_64f, int64_t, uint64_t, double)
-DEF_CVT_SCALE_FUNC(16f64u, cvt_64f, hfloat, uint64_t, double)
-DEF_CVT_SCALE_FUNC(16bf64u, cvt_64f, bfloat, uint64_t, double)
+DEF_CVT_SCALE_FUNC(8u64u,  cvt_64f, uchar,  uint64_t, દ્વિગુણ)
+DEF_CVT_SCALE_FUNC(8s64u,  cvt_64f, schar,  uint64_t, દ્વિગુણ)
+DEF_CVT_SCALE_FUNC(16u64u, cvt_64f, ushort, uint64_t, દ્વિગુણ)
+DEF_CVT_SCALE_FUNC(16s64u, cvt_64f, short,  uint64_t, દ્વિગુણ)
+DEF_CVT_SCALE_FUNC(32u64u, cvt_64f, unsigned, uint64_t, દ્વિગુણ)
+DEF_CVT_SCALE_FUNC(32s64u, cvt_64f, પૂર્ણાંક,    uint64_t, દ્વિગુણ)
+DEF_CVT_SCALE_FUNC(32f64u, cvt_64f, દશાંશ,  uint64_t, દ્વિગુણ)
+DEF_CVT_SCALE_FUNC(64f64u, cvt_64f, દ્વિગુણ, uint64_t, દ્વિગુણ)
+DEF_CVT_SCALE_FUNC(64u, cvt_64f, uint64_t, uint64_t, દ્વિગુણ)
+DEF_CVT_SCALE_FUNC(64s64u, cvt_64f, int64_t, uint64_t, દ્વિગુણ)
+DEF_CVT_SCALE_FUNC(16f64u, cvt_64f, hfloat, uint64_t, દ્વિગુણ)
+DEF_CVT_SCALE_FUNC(16bf64u, cvt_64f, bfloat, uint64_t, દ્વિગુણ)
 
-DEF_CVT_SCALE_FUNC(8u64s,  cvt_64f, uchar,  int64_t, double)
-DEF_CVT_SCALE_FUNC(8s64s,  cvt_64f, schar,  int64_t, double)
-DEF_CVT_SCALE_FUNC(16u64s, cvt_64f, ushort, int64_t, double)
-DEF_CVT_SCALE_FUNC(16s64s, cvt_64f, short,  int64_t, double)
-DEF_CVT_SCALE_FUNC(32u64s, cvt_64f, unsigned, int64_t, double)
-DEF_CVT_SCALE_FUNC(32s64s, cvt_64f, int,    int64_t, double)
-DEF_CVT_SCALE_FUNC(32f64s, cvt_64f, float,  int64_t, double)
-DEF_CVT_SCALE_FUNC(64f64s, cvt_64f, double, int64_t, double)
-DEF_CVT_SCALE_FUNC(64u64s, cvt_64f, uint64_t, int64_t, double)
-DEF_CVT_SCALE_FUNC(64s, cvt_64f, int64_t, int64_t, double)
-DEF_CVT_SCALE_FUNC(16f64s, cvt_64f, hfloat, int64_t, double)
-DEF_CVT_SCALE_FUNC(16bf64s, cvt_64f, bfloat, int64_t, double)
+DEF_CVT_SCALE_FUNC(8u64s,  cvt_64f, uchar,  int64_t, દ્વિગુણ)
+DEF_CVT_SCALE_FUNC(8s64s,  cvt_64f, schar,  int64_t, દ્વિગુણ)
+DEF_CVT_SCALE_FUNC(16u64s, cvt_64f, ushort, int64_t, દ્વિગુણ)
+DEF_CVT_SCALE_FUNC(16s64s, cvt_64f, short,  int64_t, દ્વિગુણ)
+DEF_CVT_SCALE_FUNC(32u64s, cvt_64f, unsigned, int64_t, દ્વિગુણ)
+DEF_CVT_SCALE_FUNC(32s64s, cvt_64f, પૂર્ણાંક,    int64_t, દ્વિગુણ)
+DEF_CVT_SCALE_FUNC(32f64s, cvt_64f, દશાંશ,  int64_t, દ્વિગુણ)
+DEF_CVT_SCALE_FUNC(64f64s, cvt_64f, દ્વિગુણ, int64_t, દ્વિગુણ)
+DEF_CVT_SCALE_FUNC(64u64s, cvt_64f, uint64_t, int64_t, દ્વિગુણ)
+DEF_CVT_SCALE_FUNC(64s, cvt_64f, int64_t, int64_t, દ્વિગુણ)
+DEF_CVT_SCALE_FUNC(16f64s, cvt_64f, hfloat, int64_t, દ્વિગુણ)
+DEF_CVT_SCALE_FUNC(16bf64s, cvt_64f, bfloat, int64_t, દ્વિગુણ)
 
-DEF_CVT_SCALE_FUNC(8u16f,  cvt1_32f, uchar,  hfloat, float)
-DEF_CVT_SCALE_FUNC(8s16f,  cvt1_32f, schar,  hfloat, float)
-DEF_CVT_SCALE_FUNC(16u16f, cvt1_32f, ushort, hfloat, float)
-DEF_CVT_SCALE_FUNC(16s16f, cvt1_32f, short,  hfloat, float)
-DEF_CVT_SCALE_FUNC(32u16f, cvt1_32f, unsigned, hfloat, float)
-DEF_CVT_SCALE_FUNC(32s16f, cvt1_32f, int,    hfloat, float)
-DEF_CVT_SCALE_FUNC(32f16f, cvt1_32f, float,  hfloat, float)
-DEF_CVT_SCALE_FUNC(64f16f, cvt1_32f, double, hfloat, float)
-DEF_CVT_SCALE_FUNC(64u16f, cvt1_32f, uint64_t, hfloat, float)
-DEF_CVT_SCALE_FUNC(64s16f, cvt1_32f, int64_t, hfloat, float)
-DEF_CVT_SCALE_FUNC(16f,    cvt1_32f, hfloat, hfloat, float)
-DEF_CVT_SCALE_FUNC(16bf16f, cvt1_32f, bfloat, hfloat, float)
+DEF_CVT_SCALE_FUNC(8u16f,  cvt1_32f, uchar,  hfloat, દશાંશ)
+DEF_CVT_SCALE_FUNC(8s16f,  cvt1_32f, schar,  hfloat, દશાંશ)
+DEF_CVT_SCALE_FUNC(16u16f, cvt1_32f, ushort, hfloat, દશાંશ)
+DEF_CVT_SCALE_FUNC(16s16f, cvt1_32f, short,  hfloat, દશાંશ)
+DEF_CVT_SCALE_FUNC(32u16f, cvt1_32f, unsigned, hfloat, દશાંશ)
+DEF_CVT_SCALE_FUNC(32s16f, cvt1_32f, પૂર્ણાંક,    hfloat, દશાંશ)
+DEF_CVT_SCALE_FUNC(32f16f, cvt1_32f, દશાંશ,  hfloat, દશાંશ)
+DEF_CVT_SCALE_FUNC(64f16f, cvt1_32f, દ્વિગુણ, hfloat, દશાંશ)
+DEF_CVT_SCALE_FUNC(64u16f, cvt1_32f, uint64_t, hfloat, દશાંશ)
+DEF_CVT_SCALE_FUNC(64s16f, cvt1_32f, int64_t, hfloat, દશાંશ)
+DEF_CVT_SCALE_FUNC(16f,    cvt1_32f, hfloat, hfloat, દશાંશ)
+DEF_CVT_SCALE_FUNC(16bf16f, cvt1_32f, bfloat, hfloat, દશાંશ)
 
-DEF_CVT_SCALE_FUNC(8u16bf,  cvt1_32f, uchar,  bfloat, float)
-DEF_CVT_SCALE_FUNC(8s16bf,  cvt1_32f, schar,  bfloat, float)
-DEF_CVT_SCALE_FUNC(16u16bf, cvt1_32f, ushort, bfloat, float)
-DEF_CVT_SCALE_FUNC(16s16bf, cvt1_32f, short,  bfloat, float)
-DEF_CVT_SCALE_FUNC(32u16bf, cvt1_32f, unsigned, bfloat, float)
-DEF_CVT_SCALE_FUNC(32s16bf, cvt1_32f, int,    bfloat, float)
-DEF_CVT_SCALE_FUNC(32f16bf, cvt1_32f, float,  bfloat, float)
-DEF_CVT_SCALE_FUNC(64f16bf, cvt1_32f, double, bfloat, float)
-DEF_CVT_SCALE_FUNC(64u16bf, cvt1_32f, uint64_t, bfloat, float)
-DEF_CVT_SCALE_FUNC(64s16bf, cvt1_32f, int64_t, bfloat, float)
-DEF_CVT_SCALE_FUNC(16f16bf, cvt1_32f, hfloat, bfloat, float)
-DEF_CVT_SCALE_FUNC(16bf, cvt1_32f, bfloat, bfloat, float)
+DEF_CVT_SCALE_FUNC(8u16bf,  cvt1_32f, uchar,  bfloat, દશાંશ)
+DEF_CVT_SCALE_FUNC(8s16bf,  cvt1_32f, schar,  bfloat, દશાંશ)
+DEF_CVT_SCALE_FUNC(16u16bf, cvt1_32f, ushort, bfloat, દશાંશ)
+DEF_CVT_SCALE_FUNC(16s16bf, cvt1_32f, short,  bfloat, દશાંશ)
+DEF_CVT_SCALE_FUNC(32u16bf, cvt1_32f, unsigned, bfloat, દશાંશ)
+DEF_CVT_SCALE_FUNC(32s16bf, cvt1_32f, પૂર્ણાંક,    bfloat, દશાંશ)
+DEF_CVT_SCALE_FUNC(32f16bf, cvt1_32f, દશાંશ,  bfloat, દશાંશ)
+DEF_CVT_SCALE_FUNC(64f16bf, cvt1_32f, દ્વિગુણ, bfloat, દશાંશ)
+DEF_CVT_SCALE_FUNC(64u16bf, cvt1_32f, uint64_t, bfloat, દશાંશ)
+DEF_CVT_SCALE_FUNC(64s16bf, cvt1_32f, int64_t, bfloat, દશાંશ)
+DEF_CVT_SCALE_FUNC(16f16bf, cvt1_32f, hfloat, bfloat, દશાંશ)
+DEF_CVT_SCALE_FUNC(16bf, cvt1_32f, bfloat, bfloat, દશાંશ)
 
-DEF_CVT_SCALEBOOL2_FUNC(8b8u, uchar, float)
-DEF_CVT_SCALEBOOL2_FUNC(8b8s, schar, float)
-DEF_CVT_SCALEBOOL2_FUNC(8b, bool, float)
-DEF_CVT_SCALEBOOL2_FUNC(8b16u, ushort, float)
-DEF_CVT_SCALEBOOL2_FUNC(8b16s, short, float)
-DEF_CVT_SCALEBOOL2_FUNC(8b32u, unsigned, float)
-DEF_CVT_SCALEBOOL2_FUNC(8b32s, int, float)
-DEF_CVT_SCALEBOOL2_FUNC(8b32f, float, float)
-DEF_CVT_SCALEBOOL2_FUNC(8b64u, uint64_t, double)
-DEF_CVT_SCALEBOOL2_FUNC(8b64s, int64_t, double)
-DEF_CVT_SCALEBOOL2_FUNC(8b64f, double, double)
-DEF_CVT_SCALEBOOL2_FUNC(8b16f, hfloat, float)
-DEF_CVT_SCALEBOOL2_FUNC(8b16bf, bfloat, float)
+DEF_CVT_SCALEBOOL2_FUNC(8b8u, uchar, દશાંશ)
+DEF_CVT_SCALEBOOL2_FUNC(8b8s, schar, દશાંશ)
+DEF_CVT_SCALEBOOL2_FUNC(8b, તાર્કિક, દશાંશ)
+DEF_CVT_SCALEBOOL2_FUNC(8b16u, ushort, દશાંશ)
+DEF_CVT_SCALEBOOL2_FUNC(8b16s, short, દશાંશ)
+DEF_CVT_SCALEBOOL2_FUNC(8b32u, unsigned, દશાંશ)
+DEF_CVT_SCALEBOOL2_FUNC(8b32s, પૂર્ણાંક, દશાંશ)
+DEF_CVT_SCALEBOOL2_FUNC(8b32f, દશાંશ, દશાંશ)
+DEF_CVT_SCALEBOOL2_FUNC(8b64u, uint64_t, દ્વિગુણ)
+DEF_CVT_SCALEBOOL2_FUNC(8b64s, int64_t, દ્વિગુણ)
+DEF_CVT_SCALEBOOL2_FUNC(8b64f, દ્વિગુણ, દ્વિગુણ)
+DEF_CVT_SCALEBOOL2_FUNC(8b16f, hfloat, દશાંશ)
+DEF_CVT_SCALEBOOL2_FUNC(8b16bf, bfloat, દશાંશ)
 
 // FP8 src -> CV_8U abs|scale|shift (scalar)
 #define DEF_CVT_SCALE_ABS_SCALAR_FUNC(suffix, stype) \
-static void cvtScaleAbs##suffix( const uchar* src_, size_t sstep, const uchar*, size_t, \
-                                 uchar* dst, size_t dstep, Size size, void* scale_) \
+સ્થિર શૂન્ય cvtScaleAbs##suffix( અચલ uchar* src_, size_t sstep, અચલ uchar*, size_t, \
+                                 uchar* dst, size_t dstep, Size size, શૂન્ય* scale_) \
 { \
-    const stype* src = (const stype*)src_; \
-    const double* scale = (const double*)scale_; \
-    float a = (float)scale[0], b = (float)scale[1]; \
-    sstep /= sizeof(src[0]); \
-    for( int i = 0; i < size.height; i++, src += sstep, dst += dstep ) \
-        for (int j = 0; j < size.width; j++) \
-            dst[j] = saturate_cast<uchar>(std::abs((float)src[j]*a + b)); \
+    અચલ stype* src = (અચલ stype*)src_; \
+    અચલ દ્વિગુણ* scale = (અચલ દ્વિગુણ*)scale_; \
+    દશાંશ a = (દશાંશ)scale[0], b = (દશાંશ)scale[1]; \
+    sstep /= કદ(src[0]); \
+    માટે( પૂર્ણાંક i = 0; i < size.height; i++, src += sstep, dst += dstep ) \
+        માટે (પૂર્ણાંક j = 0; j < size.width; j++) \
+            dst[j] = saturate_cast<uchar>(std::abs((દશાંશ)src[j]*a + b)); \
 }
 DEF_CVT_SCALE_ABS_SCALAR_FUNC(8fe4m3u8u, fp8a_t)
 DEF_CVT_SCALE_ABS_SCALAR_FUNC(8fe4m38u,  fp8_t)
 
-BinaryFunc getCvtScaleAbsFunc(int depth)
+દ્વિઅંકી_Func getCvtScaleAbsFunc(પૂર્ણાંક depth)
 {
-    BinaryFunc func =
-        depth == CV_8F_E4M3FN ? (BinaryFunc)cvtScaleAbs8fe4m38u :
-        depth == CV_8F_E4M3FNUZ ? (BinaryFunc)cvtScaleAbs8fe4m3u8u :
-        depth == CV_8U ? (BinaryFunc)cvtScaleAbs8u :
-        depth == CV_8S ? (BinaryFunc)cvtScaleAbs8s8u :
-        depth == CV_Bool ? (BinaryFunc)cvtScaleAbs8b8u :
-        depth == CV_16U ? (BinaryFunc)cvtScaleAbs16u8u :
-        depth == CV_16S ? (BinaryFunc)cvtScaleAbs16s8u :
-        depth == CV_16F ? (BinaryFunc)cvtScaleAbs16f8u :
-        depth == CV_16BF ? (BinaryFunc)cvtScaleAbs16bf8u :
-        depth == CV_32U ? (BinaryFunc)cvtScaleAbs32u8u :
-        depth == CV_32S ? (BinaryFunc)cvtScaleAbs32s8u :
-        depth == CV_32F ? (BinaryFunc)cvtScaleAbs32f8u :
-        depth == CV_64U ? (BinaryFunc)cvtScaleAbs64u8u :
-        depth == CV_64S ? (BinaryFunc)cvtScaleAbs64s8u :
-        depth == CV_64F ? (BinaryFunc)cvtScaleAbs64f8u : 0;
+    દ્વિઅંકી_Func func =
+        depth == CV_8F_E4M3FN ? (દ્વિઅંકી_Func)cvtScaleAbs8fe4m38u :
+        depth == CV_8F_E4M3FNUZ ? (દ્વિઅંકી_Func)cvtScaleAbs8fe4m3u8u :
+        depth == CV_8U ? (દ્વિઅંકી_Func)cvtScaleAbs8u :
+        depth == CV_8S ? (દ્વિઅંકી_Func)cvtScaleAbs8s8u :
+        depth == CV_Bool ? (દ્વિઅંકી_Func)cvtScaleAbs8b8u :
+        depth == CV_16U ? (દ્વિઅંકી_Func)cvtScaleAbs16u8u :
+        depth == CV_16S ? (દ્વિઅંકી_Func)cvtScaleAbs16s8u :
+        depth == CV_16F ? (દ્વિઅંકી_Func)cvtScaleAbs16f8u :
+        depth == CV_16BF ? (દ્વિઅંકી_Func)cvtScaleAbs16bf8u :
+        depth == CV_32U ? (દ્વિઅંકી_Func)cvtScaleAbs32u8u :
+        depth == CV_32S ? (દ્વિઅંકી_Func)cvtScaleAbs32s8u :
+        depth == CV_32F ? (દ્વિઅંકી_Func)cvtScaleAbs32f8u :
+        depth == CV_64U ? (દ્વિઅંકી_Func)cvtScaleAbs64u8u :
+        depth == CV_64S ? (દ્વિઅંકી_Func)cvtScaleAbs64s8u :
+        depth == CV_64F ? (દ્વિઅંકી_Func)cvtScaleAbs64f8u : 0;
     CV_Assert(func != 0);
-    return func;
+    પાછા func;
 }
 
 //////////////////// FP8 scaled conversions — scalar via saturate_cast(src*a+b) ////////////////////
 #define DEF_CVT_SCALE_SCALAR_FUNC(suffix, stype, dtype, wtype) \
-static void cvtScale##suffix( const uchar* src_, size_t sstep, const uchar*, size_t, \
-                              uchar* dst_, size_t dstep, Size size, void* scale_) \
+સ્થિર શૂન્ય cvtScale##suffix( અચલ uchar* src_, size_t sstep, અચલ uchar*, size_t, \
+                              uchar* dst_, size_t dstep, Size size, શૂન્ય* scale_) \
 { \
-    const stype* src = (const stype*)src_; dtype* dst = (dtype*)dst_; \
-    const double* scale = (const double*)scale_; \
+    અચલ stype* src = (અચલ stype*)src_; dtype* dst = (dtype*)dst_; \
+    અચલ દ્વિગુણ* scale = (અચલ દ્વિગુણ*)scale_; \
     wtype a = (wtype)scale[0], b = (wtype)scale[1]; \
-    sstep /= sizeof(src[0]); dstep /= sizeof(dst[0]); \
-    for( int i = 0; i < size.height; i++, src += sstep, dst += dstep ) \
-        for (int j = 0; j < size.width; j++) \
+    sstep /= કદ(src[0]); dstep /= કદ(dst[0]); \
+    માટે( પૂર્ણાંક i = 0; i < size.height; i++, src += sstep, dst += dstep ) \
+        માટે (પૂર્ણાંક j = 0; j < size.width; j++) \
             dst[j] = saturate_cast<dtype>((wtype)src[j]*a + b); \
 }
 
 // double intermediate so coarse FP8 grids round identically to the (double-precision) reference
 #define DEF_CVT_SCALE_FP8(S, T) \
-    DEF_CVT_SCALE_SCALAR_FUNC(S##8u,   T, uchar, double)     DEF_CVT_SCALE_SCALAR_FUNC(8u##S,   uchar, T, double) \
-    DEF_CVT_SCALE_SCALAR_FUNC(S##8s,   T, schar, double)     DEF_CVT_SCALE_SCALAR_FUNC(8s##S,   schar, T, double) \
-    DEF_CVT_SCALE_SCALAR_FUNC(S##16u,  T, ushort, double)    DEF_CVT_SCALE_SCALAR_FUNC(16u##S,  ushort, T, double) \
-    DEF_CVT_SCALE_SCALAR_FUNC(S##16s,  T, short, double)     DEF_CVT_SCALE_SCALAR_FUNC(16s##S,  short, T, double) \
-    DEF_CVT_SCALE_SCALAR_FUNC(S##32u,  T, unsigned, double)  DEF_CVT_SCALE_SCALAR_FUNC(32u##S,  unsigned, T, double) \
-    DEF_CVT_SCALE_SCALAR_FUNC(S##32s,  T, int, double)       DEF_CVT_SCALE_SCALAR_FUNC(32s##S,  int, T, double) \
-    DEF_CVT_SCALE_SCALAR_FUNC(S##32f,  T, float, double) \
-    DEF_CVT_SCALE_SCALAR_FUNC(S##64f,  T, double, double)    DEF_CVT_SCALE_SCALAR_FUNC(64f##S,  double, T, double) \
-    DEF_CVT_SCALE_SCALAR_FUNC(S##16f,  T, hfloat, double)    DEF_CVT_SCALE_SCALAR_FUNC(16f##S,  hfloat, T, double) \
-    DEF_CVT_SCALE_SCALAR_FUNC(S##16bf, T, bfloat, double)    DEF_CVT_SCALE_SCALAR_FUNC(16bf##S, bfloat, T, double) \
-    DEF_CVT_SCALE_SCALAR_FUNC(S##64u,  T, uint64_t, double)  DEF_CVT_SCALE_SCALAR_FUNC(64u##S,  uint64_t, T, double) \
-    DEF_CVT_SCALE_SCALAR_FUNC(S##64s,  T, int64_t, double)   DEF_CVT_SCALE_SCALAR_FUNC(64s##S,  int64_t, T, double) \
-    DEF_CVT_SCALE_SCALAR_FUNC(S##8b,   T, bool, double) \
-    DEF_CVT_SCALE_SCALAR_FUNC(S##8fe4m3,  T, fp8_t, double)   DEF_CVT_SCALE_SCALAR_FUNC(S##8fe4m3u, T, fp8a_t, double)
+    DEF_CVT_SCALE_SCALAR_FUNC(S##8u,   T, uchar, દ્વિગુણ)     DEF_CVT_SCALE_SCALAR_FUNC(8u##S,   uchar, T, દ્વિગુણ) \
+    DEF_CVT_SCALE_SCALAR_FUNC(S##8s,   T, schar, દ્વિગુણ)     DEF_CVT_SCALE_SCALAR_FUNC(8s##S,   schar, T, દ્વિગુણ) \
+    DEF_CVT_SCALE_SCALAR_FUNC(S##16u,  T, ushort, દ્વિગુણ)    DEF_CVT_SCALE_SCALAR_FUNC(16u##S,  ushort, T, દ્વિગુણ) \
+    DEF_CVT_SCALE_SCALAR_FUNC(S##16s,  T, short, દ્વિગુણ)     DEF_CVT_SCALE_SCALAR_FUNC(16s##S,  short, T, દ્વિગુણ) \
+    DEF_CVT_SCALE_SCALAR_FUNC(S##32u,  T, unsigned, દ્વિગુણ)  DEF_CVT_SCALE_SCALAR_FUNC(32u##S,  unsigned, T, દ્વિગુણ) \
+    DEF_CVT_SCALE_SCALAR_FUNC(S##32s,  T, પૂર્ણાંક, દ્વિગુણ)       DEF_CVT_SCALE_SCALAR_FUNC(32s##S,  પૂર્ણાંક, T, દ્વિગુણ) \
+    DEF_CVT_SCALE_SCALAR_FUNC(S##32f,  T, દશાંશ, દ્વિગુણ) \
+    DEF_CVT_SCALE_SCALAR_FUNC(S##64f,  T, દ્વિગુણ, દ્વિગુણ)    DEF_CVT_SCALE_SCALAR_FUNC(64f##S,  દ્વિગુણ, T, દ્વિગુણ) \
+    DEF_CVT_SCALE_SCALAR_FUNC(S##16f,  T, hfloat, દ્વિગુણ)    DEF_CVT_SCALE_SCALAR_FUNC(16f##S,  hfloat, T, દ્વિગુણ) \
+    DEF_CVT_SCALE_SCALAR_FUNC(S##16bf, T, bfloat, દ્વિગુણ)    DEF_CVT_SCALE_SCALAR_FUNC(16bf##S, bfloat, T, દ્વિગુણ) \
+    DEF_CVT_SCALE_SCALAR_FUNC(S##64u,  T, uint64_t, દ્વિગુણ)  DEF_CVT_SCALE_SCALAR_FUNC(64u##S,  uint64_t, T, દ્વિગુણ) \
+    DEF_CVT_SCALE_SCALAR_FUNC(S##64s,  T, int64_t, દ્વિગુણ)   DEF_CVT_SCALE_SCALAR_FUNC(64s##S,  int64_t, T, દ્વિગુણ) \
+    DEF_CVT_SCALE_SCALAR_FUNC(S##8b,   T, તાર્કિક, દ્વિગુણ) \
+    DEF_CVT_SCALE_SCALAR_FUNC(S##8fe4m3,  T, fp8_t, દ્વિગુણ)   DEF_CVT_SCALE_SCALAR_FUNC(S##8fe4m3u, T, fp8a_t, દ્વિગુણ)
 
 DEF_CVT_SCALE_FP8(8fe4m3,  fp8_t)
 DEF_CVT_SCALE_FP8(8fe4m3u, fp8a_t)
 
 // convertTo(dst, depth, alpha, beta) path -- real quantization. Reuses convert.hpp's fast path.
 // Double precision here matches the scalar reference (wtype)x*a+b bit-for-bit.
-template<int bias, bool fnuz> static void
-cvtScaleF32ToFp8(const uchar* src_, size_t sstep, const uchar*, size_t,
-                 uchar* dst, size_t dstep, Size size, void* scale_)
+template<પૂર્ણાંક bias, તાર્કિક fnuz> સ્થિર શૂન્ય
+cvtScaleF32ToFp8(અચલ uchar* src_, size_t sstep, અચલ uchar*, size_t,
+                 uchar* dst, size_t dstep, Size size, શૂન્ય* scale_)
 {
     CV_INSTRUMENT_REGION();
-    const float* src = (const float*)src_;
-    const double* scale = (const double*)scale_;
-    double a = scale[0], b = scale[1];
-    sstep /= sizeof(src[0]);
+    અચલ દશાંશ* src = (અચલ દશાંશ*)src_;
+    અચલ દ્વિગુણ* scale = (અચલ દ્વિગુણ*)scale_;
+    દ્વિગુણ a = scale[0], b = scale[1];
+    sstep /= કદ(src[0]);
 
-    for (int i = 0; i < size.height; i++, src += sstep, dst += dstep)
+    માટે (પૂર્ણાંક i = 0; i < size.height; i++, src += sstep, dst += dstep)
     {
-        int j = 0;
-#if (CV_SIMD_64F || CV_SIMD_SCALABLE_64F)
+        પૂર્ણાંક j = 0;
+#જો (CV_SIMD_64F || CV_SIMD_SCALABLE_64F)
         v_float64 va = vx_setall_f64(a), vb = vx_setall_f64(b);
-        const int LANES32 = VTraits<v_float32>::vlanes();
-        const int VECSZ = LANES32 * 4;
-        float scaled[VTraits<v_float32>::max_nlanes * 4];
-        for (; j <= size.width - VECSZ; j += VECSZ)
+        અચલ પૂર્ણાંક LANES32 = VTraits<v_float32>::vlanes();
+        અચલ પૂર્ણાંક VECSZ = LANES32 * 4;
+        દશાંશ scaled[VTraits<v_float32>::max_nlanes * 4];
+        માટે (; j <= size.width - VECSZ; j += VECSZ)
         {
             v_float32 vf0, vf1, vf2, vf3;
             v_float64 d0, d1;
@@ -557,20 +557,20 @@ cvtScaleF32ToFp8(const uchar* src_, size_t sstep, const uchar*, size_t,
         }
         vx_cleanup();
 #endif
-        for (; j < size.width; j++)
-            dst[j] = fp8_detail::encodeE4M3((float)((double)src[j]*a + b), bias, fnuz);
+        માટે (; j < size.width; j++)
+            dst[j] = fp8_detail::encodeE4M3((દશાંશ)((દ્વિગુણ)src[j]*a + b), bias, fnuz);
     }
 }
-static void cvtScale32f8fe4m3(const uchar* s, size_t ss, const uchar* p, size_t ps, uchar* d, size_t ds, Size sz, void* x)
-{ cvtScaleF32ToFp8<7, false>(s, ss, p, ps, d, ds, sz, x); }
-static void cvtScale32f8fe4m3u(const uchar* s, size_t ss, const uchar* p, size_t ps, uchar* d, size_t ds, Size sz, void* x)
-{ cvtScaleF32ToFp8<8, true>(s, ss, p, ps, d, ds, sz, x); }
+સ્થિર શૂન્ય cvtScale32f8fe4m3(અચલ uchar* s, size_t ss, અચલ uchar* p, size_t ps, uchar* d, size_t ds, Size sz, શૂન્ય* x)
+{ cvtScaleF32ToFp8<7, ખોટું>(s, ss, p, ps, d, ds, sz, x); }
+સ્થિર શૂન્ય cvtScale32f8fe4m3u(અચલ uchar* s, size_t ss, અચલ uchar* p, size_t ps, uchar* d, size_t ds, Size sz, શૂન્ય* x)
+{ cvtScaleF32ToFp8<8, સાચું>(s, ss, p, ps, d, ds, sz, x); }
 
-BinaryFunc getConvertScaleFunc(int sdepth_, int ddepth_)
+દ્વિઅંકી_Func getConvertScaleFunc(પૂર્ણાંક sdepth_, પૂર્ણાંક ddepth_)
 {
-    int sdepth = CV_MAT_DEPTH(sdepth_);
-    int ddepth = CV_MAT_DEPTH(ddepth_);
-    BinaryFunc func =
+    પૂર્ણાંક sdepth = CV_MAT_DEPTH(sdepth_);
+    પૂર્ણાંક ddepth = CV_MAT_DEPTH(ddepth_);
+    દ્વિઅંકી_Func func =
         ddepth == CV_8U ? (
             sdepth == CV_8U ? cvtScale8u :
             sdepth == CV_8S ? cvtScale8s8u :
@@ -828,7 +828,7 @@ BinaryFunc getConvertScaleFunc(int sdepth_, int ddepth_)
             0) :
         0;
     CV_Assert(func != 0);
-    return func;
+    પાછા func;
 }
 
 #endif

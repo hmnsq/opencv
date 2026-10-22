@@ -1,201 +1,201 @@
 // This file is part of OpenCV project.
 // It is subject to the license terms in the LICENSE file found in the top-level directory
 // of this distribution and at http://opencv.org/license.html.
-#include "../precomp.hpp"
-#include "parallel.hpp"
+#અન્તર્ભાવ "../precomp.hpp"
+#અન્તર્ભાવ "parallel.hpp"
 
-#include <opencv2/core/utils/configuration.private.hpp>
-#include <opencv2/core/utils/logger.defines.hpp>
+#અન્તર્ભાવ <opencv2/core/utils/configuration.private.hpp>
+#અન્તર્ભાવ <opencv2/core/utils/logger.defines.hpp>
 #ifdef NDEBUG
 #define CV_LOG_STRIP_LEVEL CV_LOG_LEVEL_DEBUG + 1
-#else
+#નહીંતર
 #define CV_LOG_STRIP_LEVEL CV_LOG_LEVEL_VERBOSE + 1
 #endif
-#include <opencv2/core/utils/logger.hpp>
+#અન્તર્ભાવ <opencv2/core/utils/logger.hpp>
 
 
-#include "registry_parallel.hpp"
-#include "registry_parallel.impl.hpp"
+#અન્તર્ભાવ "registry_parallel.hpp"
+#અન્તર્ભાવ "registry_parallel.impl.hpp"
 
-#include "plugin_parallel_api.hpp"
-#include "plugin_parallel_wrapper.impl.hpp"
+#અન્તર્ભાવ "plugin_parallel_api.hpp"
+#અન્તર્ભાવ "plugin_parallel_wrapper.impl.hpp"
 
 
-namespace cv { namespace parallel {
+નામાકાશ cv { નામાકાશ parallel {
 
-int numThreads = -1;
+પૂર્ણાંક અંક_Threads = -1;
 
 ParallelForAPI::~ParallelForAPI()
 {
     // nothing
 }
 
-static
+સ્થિર
 std::string& getParallelBackendName()
 {
-    static std::string g_backendName = toUpperCase(cv::utils::getConfigurationParameterString("OPENCV_PARALLEL_BACKEND", ""));
-    return g_backendName;
+    સ્થિર std::string g_backendName = toUpperCase(cv::utils::getConfigurationParameterString("OPENCV_PARALLEL_BACKEND", ""));
+    પાછા g_backendName;
 }
 
-static bool g_initializedParallelForAPI = false;
+સ્થિર તાર્કિક g_initializedParallelForAPI = ખોટું;
 
-static
+સ્થિર
 std::shared_ptr<ParallelForAPI> createParallelForAPI()
 {
-    const std::string& name = getParallelBackendName();
-    bool isKnown = false;
-    const auto& backends = getParallelBackendsInfo();
-    if (!name.empty())
+    અચલ std::string& name = getParallelBackendName();
+    તાર્કિક isKnown = ખોટું;
+    અચલ auto& backends = getParallelBackendsInfo();
+    જો (!name.empty())
     {
-        CV_LOG_INFO(NULL, "core(parallel): requested backend name: " << name);
+        CV_LOG_INFO(ખાલી, "core(parallel): requested backend name: " << name);
     }
-    for (size_t i = 0; i < backends.size(); i++)
+    માટે (size_t i = 0; i < backends.size(); i++)
     {
-        const auto& info = backends[i];
-        if (!name.empty())
+        અચલ auto& info = backends[i];
+        જો (!name.empty())
         {
-            if (name != info.name)
+            જો (name != info.name)
             {
-                continue;
+                ચાલુ;
             }
-            isKnown = true;
+            isKnown = સાચું;
         }
-        try
+        પ્રયાસ
         {
-            CV_LOG_DEBUG(NULL, "core(parallel): trying backend: " << info.name << " (priority=" << info.priority << ")");
-            if (!info.backendFactory)
+            CV_LOG_DEBUG(ખાલી, "core(parallel): trying backend: " << info.name << " (priority=" << info.priority << ")");
+            જો (!info.backendFactory)
             {
-                CV_LOG_DEBUG(NULL, "core(parallel): factory is not available (plugins require filesystem support): " << info.name);
-                continue;
+                CV_LOG_DEBUG(ખાલી, "core(parallel): factory is not available (plugins require filesystem support): " << info.name);
+                ચાલુ;
             }
             std::shared_ptr<ParallelForAPI> backend = info.backendFactory->create();
-            if (!backend)
+            જો (!backend)
             {
-                CV_LOG_DEBUG(NULL, "core(parallel): not available: " << info.name);
-                continue;
+                CV_LOG_DEBUG(ખાલી, "core(parallel): not available: " << info.name);
+                ચાલુ;
             }
-            CV_LOG_INFO(NULL, "core(parallel): using backend: " << info.name << " (priority=" << info.priority << ")");
-            g_initializedParallelForAPI = true;
+            CV_LOG_INFO(ખાલી, "core(parallel): using backend: " << info.name << " (priority=" << info.priority << ")");
+            g_initializedParallelForAPI = સાચું;
             getParallelBackendName() = info.name;
-            return backend;
+            પાછા backend;
         }
-        catch (const std::exception& e)
+        પકડો (અચલ std::exception& e)
         {
-            CV_LOG_WARNING(NULL, "core(parallel): can't initialize " << info.name << " backend: " << e.what());
+            CV_LOG_WARNING(ખાલી, "core(parallel): can't initialize " << info.name << " backend: " << e.what());
         }
-        catch (...)
+        પકડો (...)
         {
-            CV_LOG_WARNING(NULL, "core(parallel): can't initialize " << info.name << " backend: Unknown C++ exception");
+            CV_LOG_WARNING(ખાલી, "core(parallel): can't initialize " << info.name << " backend: Unknown C++ exception");
         }
     }
-    if (name.empty())
+    જો (name.empty())
     {
-        CV_LOG_DEBUG(NULL, "core(parallel): fallback on builtin code");
+        CV_LOG_DEBUG(ખાલી, "core(parallel): fallback on builtin code");
     }
-    else
+    નહીંતર
     {
-        if (!isKnown)
+        જો (!isKnown)
         {
-            CV_LOG_INFO(NULL, "core(parallel): unknown backend: " << name << ", fallback on builtin code");
+            CV_LOG_INFO(ખાલી, "core(parallel): unknown backend: " << name << ", fallback on builtin code");
         }
-        else
+        નહીંતર
         {
-            CV_LOG_INFO(NULL, "core(parallel): backend=" << name << " is not available, fallback on builtin code");
+            CV_LOG_INFO(ખાલી, "core(parallel): backend=" << name << " is not available, fallback on builtin code");
         }
     }
-    g_initializedParallelForAPI = true;
+    g_initializedParallelForAPI = સાચું;
     getParallelBackendName() = std::string();
-    return std::shared_ptr<ParallelForAPI>();
+    પાછા std::shared_ptr<ParallelForAPI>();
 }
 
-static inline
+સ્થિર અંતઃરેખ
 std::shared_ptr<ParallelForAPI> createDefaultParallelForAPI()
 {
-    CV_LOG_DEBUG(NULL, "core(parallel): Initializing parallel backend...");
-    return createParallelForAPI();
+    CV_LOG_DEBUG(ખાલી, "core(parallel): Initializing parallel backend...");
+    પાછા createParallelForAPI();
 }
 
 std::shared_ptr<ParallelForAPI>& getCurrentParallelForAPI()
 {
-    static std::shared_ptr<ParallelForAPI> g_currentParallelForAPI = createDefaultParallelForAPI();
-    return g_currentParallelForAPI;
+    સ્થિર std::shared_ptr<ParallelForAPI> g_currentParallelForAPI = createDefaultParallelForAPI();
+    પાછા g_currentParallelForAPI;
 }
 
-void setParallelForBackend(const std::shared_ptr<ParallelForAPI>& api, bool propagateNumThreads)
+શૂન્ય setParallelForBackend(અચલ std::shared_ptr<ParallelForAPI>& api, તાર્કિક propagate_અંક_Threads)
 {
     getCurrentParallelForAPI() = api;
-    if (propagateNumThreads && api)
+    જો (propagate_અંક_Threads && api)
     {
-        setNumThreads(numThreads);
+        set_અંક_Threads(અંક_Threads);
     }
 }
 
-bool setParallelForBackend(const std::string& backendName, bool propagateNumThreads)
+તાર્કિક setParallelForBackend(અચલ std::string& backendName, તાર્કિક propagate_અંક_Threads)
 {
     CV_TRACE_FUNCTION();
 
-    bool saved_initialized = g_initializedParallelForAPI;
+    તાર્કિક saved_initialized = g_initializedParallelForAPI;
     std::string saved_backendName = getParallelBackendName();
     std::shared_ptr<ParallelForAPI> saved_backend;  // don't call getCurrentParallelForAPI() if g_initializedParallelForAPI = false to avoid unnecessary "default" initialization
 
     std::string backendName_u = toUpperCase(backendName);
-    if (g_initializedParallelForAPI)
+    જો (g_initializedParallelForAPI)
     {
         // ... already initialized
-        if (getParallelBackendName() == backendName_u)
+        જો (getParallelBackendName() == backendName_u)
         {
-            CV_LOG_INFO(NULL, "core(parallel): backend is already activated: " << (backendName.empty() ? "builtin(legacy)" : backendName));
-            return true;
+            CV_LOG_INFO(ખાલી, "core(parallel): backend is already activated: " << (backendName.empty() ? "builtin(legacy)" : backendName));
+            પાછા સાચું;
         }
-        else
+        નહીંતર
         {
             saved_backend = getCurrentParallelForAPI();
             // ... re-create new
-            CV_LOG_DEBUG(NULL, "core(parallel): replacing parallel backend (old=" << saved_backendName << " new=" << backendName << ")...");
+            CV_LOG_DEBUG(ખાલી, "core(parallel): replacing parallel backend (old=" << saved_backendName << " new=" << backendName << ")...");
             getParallelBackendName() = backendName_u;
             getCurrentParallelForAPI() = createParallelForAPI();
         }
     }
-    else
+    નહીંતર
     {
         // ... no backend exists, just specify the name (initialization is triggered by getCurrentParallelForAPI() call)
         getParallelBackendName() = backendName_u;
     }
     std::shared_ptr<ParallelForAPI> api = getCurrentParallelForAPI();
-    if (!api)
+    જો (!api)
     {
-        if (!backendName.empty())
+        જો (!backendName.empty())
         {
             // restore previous backend or build default
             getParallelBackendName() = saved_backendName;
-            if (saved_initialized)
+            જો (saved_initialized)
             {
-                CV_LOG_WARNING(NULL, "core(parallel): backend is not available: " << backendName << " (keep previous)");
+                CV_LOG_WARNING(ખાલી, "core(parallel): backend is not available: " << backendName << " (keep previous)");
                 getCurrentParallelForAPI() = saved_backend;
             }
-            else
+            નહીંતર
             {
-                CV_LOG_WARNING(NULL, "core(parallel): backend is not available: " << backendName << " (use default)");
-                g_initializedParallelForAPI = false;
+                CV_LOG_WARNING(ખાલી, "core(parallel): backend is not available: " << backendName << " (use default)");
+                g_initializedParallelForAPI = ખોટું;
                 getCurrentParallelForAPI() = createDefaultParallelForAPI();
             }
-            return false;
+            પાછા ખોટું;
         }
-        else
+        નહીંતર
         {
-            CV_LOG_WARNING(NULL, "core(parallel): switched to builtin code (legacy)");
+            CV_LOG_WARNING(ખાલી, "core(parallel): switched to builtin code (legacy)");
         }
     }
-    if (!backendName_u.empty())
+    જો (!backendName_u.empty())
     {
         CV_Assert(backendName_u == getParallelBackendName());  // data race?
     }
 
-    if (propagateNumThreads)
+    જો (propagate_અંક_Threads)
     {
-        setNumThreads(numThreads);
+        set_અંક_Threads(અંક_Threads);
     }
-    return true;
+    પાછા સાચું;
 }
 
 }}  // namespace

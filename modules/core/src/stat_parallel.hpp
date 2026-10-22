@@ -11,63 +11,63 @@
 #ifndef OPENCV_CORE_STAT_PARALLEL_HPP
 #define OPENCV_CORE_STAT_PARALLEL_HPP
 
-namespace cv {
+નામાકાશ cv {
 
-struct StatChunk
+સંરચના StatChunk
 {
     Mat src, mask;
     size_t firstElem;   // row-major index of the first element of the piece in the whole array
 };
 
 // Returns false when the array is too small to be worth splitting, or cannot be split.
-static inline bool splitForParallelStat(const Mat& src, const Mat& mask, std::vector<StatChunk>& chunks)
+સ્થિર અંતઃરેખ તાર્કિક splitForParallelStat(અચલ Mat& src, અચલ Mat& mask, std::vector<StatChunk>& chunks)
 {
-    const size_t total = src.total(), work = total*src.channels();
-    if (work < ((size_t)1 << 18))
-        return false;
-    const int nthreads = getNumThreads();
-    if (nthreads <= 1)
-        return false;
-    const int n = (int)std::min((size_t)nthreads*2, work >> 16);
-    if (n < 2)
-        return false;
+    અચલ size_t total = src.total(), work = total*src.channels();
+    જો (work < ((size_t)1 << 18))
+        પાછા ખોટું;
+    અચલ પૂર્ણાંક nthreads = get_અંક_Threads();
+    જો (nthreads <= 1)
+        પાછા ખોટું;
+    અચલ પૂર્ણાંક n = (પૂર્ણાંક)std::min((size_t)nthreads*2, work >> 16);
+    જો (n < 2)
+        પાછા ખોટું;
 
     chunks.clear();
-    if (src.dims <= 2 && src.rows >= n)
+    જો (src.dims <= 2 && src.rows >= n)
     {
-        for (int i = 0; i < n; i++)
+        માટે (પૂર્ણાંક i = 0; i < n; i++)
         {
-            int r0 = (int)((int64)src.rows*i/n), r1 = (int)((int64)src.rows*(i + 1)/n);
+            પૂર્ણાંક r0 = (પૂર્ણાંક)((int64)src.rows*i/n), r1 = (પૂર્ણાંક)((int64)src.rows*(i + 1)/n);
             StatChunk c;
             c.src = src.rowRange(r0, r1);
-            if (!mask.empty())
+            જો (!mask.empty())
                 c.mask = mask.rowRange(r0, r1);
             c.firstElem = (size_t)r0*src.cols;
             chunks.push_back(c);
         }
-        return true;
+        પાછા સાચું;
     }
-    if (src.isContinuous() && (mask.empty() || mask.isContinuous()) && total <= (size_t)INT_MAX)
+    જો (src.isContinuous() && (mask.empty() || mask.isContinuous()) && total <= (size_t)INT_MAX)
     {
-        for (int i = 0; i < n; i++)
+        માટે (પૂર્ણાંક i = 0; i < n; i++)
         {
             size_t e0 = total*i/n, e1 = total*(i + 1)/n;
             StatChunk c;
-            c.src = Mat(1, (int)(e1 - e0), src.type(), (void*)(src.data + e0*src.elemSize()));
-            if (!mask.empty())
-                c.mask = Mat(1, (int)(e1 - e0), mask.type(), (void*)(mask.data + e0*mask.elemSize()));
+            c.src = Mat(1, (પૂર્ણાંક)(e1 - e0), src.type(), (શૂન્ય*)(src.data + e0*src.elemSize()));
+            જો (!mask.empty())
+                c.mask = Mat(1, (પૂર્ણાંક)(e1 - e0), mask.type(), (શૂન્ય*)(mask.data + e0*mask.elemSize()));
             c.firstElem = e0;
             chunks.push_back(c);
         }
-        return true;
+        પાછા સાચું;
     }
-    return false;
+    પાછા ખોટું;
 }
 
 // row-major index of an element given by the per-dimension indices of a 2D piece
-static inline size_t chunkIndexToElem(const StatChunk& c, const int* idx)
+સ્થિર અંતઃરેખ size_t chunkIndexToElem(અચલ StatChunk& c, અચલ પૂર્ણાંક* idx)
 {
-    return c.firstElem + (size_t)idx[0]*c.src.cols + idx[1];
+    પાછા c.firstElem + (size_t)idx[0]*c.src.cols + idx[1];
 }
 
 } // namespace cv

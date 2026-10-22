@@ -42,19 +42,19 @@
 //
 //M*/
 
-#include "precomp.hpp"
-#include "hal_internal.hpp"
+#અન્તર્ભાવ "precomp.hpp"
+#અન્તર્ભાવ "hal_internal.hpp"
 
 #ifdef HAVE_LAPACK
 
-#include "opencv_lapack.h"
+#અન્તર્ભાવ "opencv_lapack.h"
 
-#include <cmath>
-#include <algorithm>
-#include <typeinfo>
-#include <limits>
-#include <complex>
-#include <vector>
+#અન્તર્ભાવ <cmath>
+#અન્તર્ભાવ <algorithm>
+#અન્તર્ભાવ <typeinfo>
+#અન્તર્ભાવ <limits>
+#અન્તર્ભાવ <complex>
+#અન્તર્ભાવ <vector>
 
 #define HAL_GEMM_SMALL_COMPLEX_MATRIX_THRESH 100
 #define HAL_GEMM_SMALL_MATRIX_THRESH 100
@@ -63,304 +63,304 @@
 #define HAL_LU_SMALL_MATRIX_THRESH 100
 #define HAL_CHOLESKY_SMALL_MATRIX_THRESH 100
 
-#if defined(__clang__) && defined(__has_feature)
-#if __has_feature(memory_sanitizer)
-#include <sanitizer/msan_interface.h>
+#જો defined(__clang__) && defined(__has_feature)
+#જો __has_feature(memory_sanitizer)
+#અન્તર્ભાવ <sanitizer/msan_interface.h>
 #define CV_ANNOTATE_MEMORY_IS_INITIALIZED(address, size) \
 __msan_unpoison(address, size)
 #define CV_ANNOTATE_NO_SANITIZE_MEMORY __attribute__((no_sanitize("memory")))
 #endif
 #endif
 #ifndef CV_ANNOTATE_MEMORY_IS_INITIALIZED
-#define CV_ANNOTATE_MEMORY_IS_INITIALIZED(address, size) do { } while(0)
+#define CV_ANNOTATE_MEMORY_IS_INITIALIZED(address, size) કરો { } જ્યારે(0)
 #define CV_ANNOTATE_NO_SANITIZE_MEMORY
 #endif
 
-#if defined(__APPLE__) && defined(__clang__)
+#જો defined(__APPLE__) && defined(__clang__)
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
 #endif
 
 //lapack stores matrices in column-major order so transposing is needed everywhere
-template <typename fptype> static inline void
+template <typename fptype> સ્થિર અંતઃરેખ શૂન્ય
 transpose_square_inplace(fptype *src, size_t src_ld, size_t m)
 {
-    for(size_t i = 0; i < m - 1; i++)
-        for(size_t j = i + 1; j < m; j++)
+    માટે(size_t i = 0; i < m - 1; i++)
+        માટે(size_t j = i + 1; j < m; j++)
             std::swap(src[j*src_ld + i], src[i*src_ld + j]);
 }
 
-template <typename fptype> static inline void
-transpose(const fptype *src, size_t src_ld, fptype* dst, size_t dst_ld, size_t m, size_t n)
+template <typename fptype> સ્થિર અંતઃરેખ શૂન્ય
+transpose(અચલ fptype *src, size_t src_ld, fptype* dst, size_t dst_ld, size_t m, size_t n)
 {
-    for(size_t i = 0; i < m; i++)
-        for(size_t j = 0; j < n; j++)
+    માટે(size_t i = 0; i < m; i++)
+        માટે(size_t j = 0; j < n; j++)
             dst[j*dst_ld + i] = src[i*src_ld + j];
 }
 
-template <typename fptype> static inline void
-copy_matrix(const fptype *src, size_t src_ld, fptype* dst, size_t dst_ld, size_t m, size_t n)
+template <typename fptype> સ્થિર અંતઃરેખ શૂન્ય
+copy_matrix(અચલ fptype *src, size_t src_ld, fptype* dst, size_t dst_ld, size_t m, size_t n)
 {
-    for(size_t i = 0; i < m; i++)
-        for(size_t j = 0; j < n; j++)
+    માટે(size_t i = 0; i < m; i++)
+        માટે(size_t j = 0; j < n; j++)
             dst[i*dst_ld + j] = src[i*src_ld + j];
 }
 
-template <typename fptype> static inline void
-set_value(fptype *dst, size_t dst_ld, fptype value, size_t m, size_t n)
+template <typename fptype> સ્થિર અંતઃરેખ શૂન્ય
+set_કિંમત_2(fptype *dst, size_t dst_ld, fptype value, size_t m, size_t n)
 {
-    for(size_t i = 0; i < m; i++)
-        for(size_t j = 0; j < n; j++)
+    માટે(size_t i = 0; i < m; i++)
+        માટે(size_t j = 0; j < n; j++)
             dst[i*dst_ld + j] = value;
 }
 
 // MSAN can't see that the fortran LAPACK functions initialize `info`
-template <typename fptype> static inline int
-CV_ANNOTATE_NO_SANITIZE_MEMORY lapack_LU(fptype* a, size_t a_step, int m, fptype* b, size_t b_step, int n, int* info)
+template <typename fptype> સ્થિર અંતઃરેખ પૂર્ણાંક
+CV_ANNOTATE_NO_SANITIZE_MEMORY lapack_LU(fptype* a, size_t a_step, પૂર્ણાંક m, fptype* b, size_t b_step, પૂર્ણાંક n, પૂર્ણાંક* info)
 {
-#if defined (ACCELERATE_NEW_LAPACK) && defined (ACCELERATE_LAPACK_ILP64)
+#જો defined (ACCELERATE_NEW_LAPACK) && defined (ACCELERATE_LAPACK_ILP64)
     cv::AutoBuffer<long> piv_buff(m);
-    long lda = (long)(a_step / sizeof(fptype));
+    long lda = (long)(a_step / કદ(fptype));
     long _m = static_cast<long>(m), _n = static_cast<long>(n);
     long _info[1];
-#else
-    cv::AutoBuffer<int> piv_buff(m);
-    int lda = (int)(a_step / sizeof(fptype));
-    int _m = m, _n = n;
-    int* _info = info;
+#નહીંતર
+    cv::AutoBuffer<પૂર્ણાંક> piv_buff(m);
+    પૂર્ણાંક lda = (પૂર્ણાંક)(a_step / કદ(fptype));
+    પૂર્ણાંક _m = m, _n = n;
+    પૂર્ણાંક* _info = info;
 #endif
     auto piv = piv_buff.data();
 
     transpose_square_inplace(a, lda, m);
 
-    if(b)
+    જો(b)
     {
-        if(n == 1 && b_step == sizeof(fptype))
+        જો(n == 1 && b_step == કદ(fptype))
         {
-            if(typeid(fptype) == typeid(float))
-                sgesv_(&_m, &_n, (float*)a, &lda, piv, (float*)b, &_m, _info);
-            else if(typeid(fptype) == typeid(double))
-                dgesv_(&_m, &_n, (double*)a, &lda, piv, (double*)b, &_m, _info);
+            જો(typeid(fptype) == typeid(દશાંશ))
+                sgesv_(&_m, &_n, (દશાંશ*)a, &lda, piv, (દશાંશ*)b, &_m, _info);
+            નહીંતર જો(typeid(fptype) == typeid(દ્વિગુણ))
+                dgesv_(&_m, &_n, (દ્વિગુણ*)a, &lda, piv, (દ્વિગુણ*)b, &_m, _info);
         }
-        else
+        નહીંતર
         {
-            int ldb = (int)(b_step / sizeof(fptype));
+            પૂર્ણાંક ldb = (પૂર્ણાંક)(b_step / કદ(fptype));
             std::vector<fptype> tmpB(m*n+1);
 
             transpose(b, ldb, &tmpB[0], m, m, n);
 
-            if(typeid(fptype) == typeid(float))
-                sgesv_(&_m, &_n, (float*)a, &lda, piv, (float*)&tmpB[0], &_m, _info);
-            else if(typeid(fptype) == typeid(double))
-                dgesv_(&_m, &_n, (double*)a, &lda, piv, (double*)&tmpB[0], &_m, _info);
+            જો(typeid(fptype) == typeid(દશાંશ))
+                sgesv_(&_m, &_n, (દશાંશ*)a, &lda, piv, (દશાંશ*)&tmpB[0], &_m, _info);
+            નહીંતર જો(typeid(fptype) == typeid(દ્વિગુણ))
+                dgesv_(&_m, &_n, (દ્વિગુણ*)a, &lda, piv, (દ્વિગુણ*)&tmpB[0], &_m, _info);
 
             transpose(&tmpB[0], m, b, ldb, n, m);
         }
     }
-    else
+    નહીંતર
     {
-        if(typeid(fptype) == typeid(float))
-            sgetrf_(&_m, &_m, (float*)a, &lda, piv, _info);
-        else if(typeid(fptype) == typeid(double))
-            dgetrf_(&_m, &_m, (double*)a, &lda, piv, _info);
+        જો(typeid(fptype) == typeid(દશાંશ))
+            sgetrf_(&_m, &_m, (દશાંશ*)a, &lda, piv, _info);
+        નહીંતર જો(typeid(fptype) == typeid(દ્વિગુણ))
+            dgetrf_(&_m, &_m, (દ્વિગુણ*)a, &lda, piv, _info);
     }
 
-#if defined (ACCELERATE_NEW_LAPACK) && defined (ACCELERATE_LAPACK_ILP64)
-    *info = static_cast<int>(_info[0]);
+#જો defined (ACCELERATE_NEW_LAPACK) && defined (ACCELERATE_LAPACK_ILP64)
+    *info = static_cast<પૂર્ણાંક>(_info[0]);
 #endif
-    int retcode = *info >= 0 ? CV_HAL_ERROR_OK : CV_HAL_ERROR_NOT_IMPLEMENTED;
+    પૂર્ણાંક retcode = *info >= 0 ? CV_HAL_ERROR_OK : CV_HAL_ERROR_NOT_IMPLEMENTED;
 
-    int sign = 0;
-    if(*info == 0)
+    પૂર્ણાંક sign = 0;
+    જો(*info == 0)
     {
-        for(int i = 0; i < m; i++)
+        માટે(પૂર્ણાંક i = 0; i < m; i++)
             sign ^= piv[i] != i + 1;
         *info = sign ? -1 : 1;
     }
-    else
+    નહીંતર
         *info = 0; //in opencv LU function zero means error
 
-    return retcode;
+    પાછા retcode;
 }
 
-template <typename fptype> static inline int
-lapack_Cholesky(fptype* a, size_t a_step, int m, fptype* b, size_t b_step, int n, bool* info)
+template <typename fptype> સ્થિર અંતઃરેખ પૂર્ણાંક
+lapack_Cholesky(fptype* a, size_t a_step, પૂર્ણાંક m, fptype* b, size_t b_step, પૂર્ણાંક n, તાર્કિક* info)
 {
-#if defined (ACCELERATE_NEW_LAPACK) && defined (ACCELERATE_LAPACK_ILP64)
+#જો defined (ACCELERATE_NEW_LAPACK) && defined (ACCELERATE_LAPACK_ILP64)
     long _m = static_cast<long>(m), _n = static_cast<long>(n);
     long lapackStatus = 0;
-    long lda = (long)(a_step / sizeof(fptype));
-#else
-    int _m = m, _n = n;
-    int lapackStatus = 0;
-    int lda = (int)(a_step / sizeof(fptype));
+    long lda = (long)(a_step / કદ(fptype));
+#નહીંતર
+    પૂર્ણાંક _m = m, _n = n;
+    પૂર્ણાંક lapackStatus = 0;
+    પૂર્ણાંક lda = (પૂર્ણાંક)(a_step / કદ(fptype));
 #endif
-    char L[] = {'L', '\0'};
+    અક્ષર L[] = {'L', '\0'};
 
-    if(b)
+    જો(b)
     {
-        if(n == 1 && b_step == sizeof(fptype))
+        જો(n == 1 && b_step == કદ(fptype))
         {
-            if(typeid(fptype) == typeid(float))
-                OCV_LAPACK_FUNC(sposv)(L, &_m, &_n, (float*)a, &lda, (float*)b, &_m, &lapackStatus);
-            else if(typeid(fptype) == typeid(double))
-                OCV_LAPACK_FUNC(dposv)(L, &_m, &_n, (double*)a, &lda, (double*)b, &_m, &lapackStatus);
+            જો(typeid(fptype) == typeid(દશાંશ))
+                OCV_LAPACK_FUNC(sposv)(L, &_m, &_n, (દશાંશ*)a, &lda, (દશાંશ*)b, &_m, &lapackStatus);
+            નહીંતર જો(typeid(fptype) == typeid(દ્વિગુણ))
+                OCV_LAPACK_FUNC(dposv)(L, &_m, &_n, (દ્વિગુણ*)a, &lda, (દ્વિગુણ*)b, &_m, &lapackStatus);
         }
-        else
+        નહીંતર
         {
-            int ldb = (int)(b_step / sizeof(fptype));
-            fptype* tmpB = new fptype[m*n];
+            પૂર્ણાંક ldb = (પૂર્ણાંક)(b_step / કદ(fptype));
+            fptype* tmpB = નવું fptype[m*n];
             transpose(b, ldb, tmpB, m, m, n);
 
-            if(typeid(fptype) == typeid(float))
-                OCV_LAPACK_FUNC(sposv)(L, &_m, &_n, (float*)a, &lda, (float*)tmpB, &_m, &lapackStatus);
-            else if(typeid(fptype) == typeid(double))
-                OCV_LAPACK_FUNC(dposv)(L, &_m, &_n, (double*)a, &lda, (double*)tmpB, &_m, &lapackStatus);
+            જો(typeid(fptype) == typeid(દશાંશ))
+                OCV_LAPACK_FUNC(sposv)(L, &_m, &_n, (દશાંશ*)a, &lda, (દશાંશ*)tmpB, &_m, &lapackStatus);
+            નહીંતર જો(typeid(fptype) == typeid(દ્વિગુણ))
+                OCV_LAPACK_FUNC(dposv)(L, &_m, &_n, (દ્વિગુણ*)a, &lda, (દ્વિગુણ*)tmpB, &_m, &lapackStatus);
 
             transpose(tmpB, m, b, ldb, n, m);
             delete[] tmpB;
         }
     }
-    else
+    નહીંતર
     {
-        if(typeid(fptype) == typeid(float))
-            OCV_LAPACK_FUNC(spotrf)(L, &_m, (float*)a, &lda, &lapackStatus);
-        else if(typeid(fptype) == typeid(double))
-            OCV_LAPACK_FUNC(dpotrf)(L, &_m, (double*)a, &lda, &lapackStatus);
+        જો(typeid(fptype) == typeid(દશાંશ))
+            OCV_LAPACK_FUNC(spotrf)(L, &_m, (દશાંશ*)a, &lda, &lapackStatus);
+        નહીંતર જો(typeid(fptype) == typeid(દ્વિગુણ))
+            OCV_LAPACK_FUNC(dpotrf)(L, &_m, (દ્વિગુણ*)a, &lda, &lapackStatus);
     }
 
-    if(lapackStatus == 0) *info = true;
-    else *info = false; //in opencv Cholesky function false means error
+    જો(lapackStatus == 0) *info = સાચું;
+    નહીંતર *info = ખોટું; //in opencv Cholesky function false means error
 
-    return lapackStatus >= 0 ? CV_HAL_ERROR_OK : CV_HAL_ERROR_NOT_IMPLEMENTED;
+    પાછા lapackStatus >= 0 ? CV_HAL_ERROR_OK : CV_HAL_ERROR_NOT_IMPLEMENTED;
 }
 
-template <typename fptype> static inline int
-lapack_SVD(fptype* a, size_t a_step, fptype *w, fptype* u, size_t u_step, fptype* vt, size_t v_step, int m, int n, int flags, int* info)
+template <typename fptype> સ્થિર અંતઃરેખ પૂર્ણાંક
+lapack_SVD(fptype* a, size_t a_step, fptype *w, fptype* u, size_t u_step, fptype* vt, size_t v_step, પૂર્ણાંક m, પૂર્ણાંક n, પૂર્ણાંક flags, પૂર્ણાંક* info)
 {
-#if defined (ACCELERATE_NEW_LAPACK) && defined (ACCELERATE_LAPACK_ILP64)
+#જો defined (ACCELERATE_NEW_LAPACK) && defined (ACCELERATE_LAPACK_ILP64)
     long _m = static_cast<long>(m), _n = static_cast<long>(n);
     long _info[1];
-    long lda = (long)(a_step / sizeof(fptype));
-    long ldv = (long)(v_step / sizeof(fptype));
-    long ldu = (long)(u_step / sizeof(fptype));
+    long lda = (long)(a_step / કદ(fptype));
+    long ldv = (long)(v_step / કદ(fptype));
+    long ldu = (long)(u_step / કદ(fptype));
     long lwork = -1;
     cv::AutoBuffer<long> iworkBuf_(8 * std::min(m, n));
-#else
-    int _m = m, _n = n;
-    int* _info = info;
-    int lda = (int)(a_step / sizeof(fptype));
-    int ldv = (int)(v_step / sizeof(fptype));
-    int ldu = (int)(u_step / sizeof(fptype));
-    int lwork = -1;
-    cv::AutoBuffer<int> iworkBuf_(8 * std::min(m, n));
+#નહીંતર
+    પૂર્ણાંક _m = m, _n = n;
+    પૂર્ણાંક* _info = info;
+    પૂર્ણાંક lda = (પૂર્ણાંક)(a_step / કદ(fptype));
+    પૂર્ણાંક ldv = (પૂર્ણાંક)(v_step / કદ(fptype));
+    પૂર્ણાંક ldu = (પૂર્ણાંક)(u_step / કદ(fptype));
+    પૂર્ણાંક lwork = -1;
+    cv::AutoBuffer<પૂર્ણાંક> iworkBuf_(8 * std::min(m, n));
 #endif
     auto iworkBuf = iworkBuf_.data();
     std::vector<fptype> ubuf;
     fptype work1 = 0;
 
     //A already transposed and m>=n
-    char mode[] = { ' ', '\0'};
-    if(flags & CV_HAL_SVD_NO_UV)
+    અક્ષર mode[] = { ' ', '\0'};
+    જો(flags & CV_HAL_SVD_NO_UV)
     {
         ldv = 1;
         mode[0] = 'N';
     }
-    else if((flags & CV_HAL_SVD_SHORT_UV) && (flags & CV_HAL_SVD_MODIFY_A)) //short SVD, U stored in a
+    નહીંતર જો((flags & CV_HAL_SVD_SHORT_UV) && (flags & CV_HAL_SVD_MODIFY_A)) //short SVD, U stored in a
         mode[0] = 'O';
-    else if((flags & CV_HAL_SVD_SHORT_UV) && !(flags & CV_HAL_SVD_MODIFY_A)) //short SVD, U stored in u if m>=n
+    નહીંતર જો((flags & CV_HAL_SVD_SHORT_UV) && !(flags & CV_HAL_SVD_MODIFY_A)) //short SVD, U stored in u if m>=n
         mode[0] = 'S';
-    else if(flags & CV_HAL_SVD_FULL_UV) //full SVD, U stored in u or in a
+    નહીંતર જો(flags & CV_HAL_SVD_FULL_UV) //full SVD, U stored in u or in a
         mode[0] = 'A';
 
-    if((flags & CV_HAL_SVD_MODIFY_A) && (flags & CV_HAL_SVD_FULL_UV)) //U stored in a
+    જો((flags & CV_HAL_SVD_MODIFY_A) && (flags & CV_HAL_SVD_FULL_UV)) //U stored in a
     {
         ubuf.resize(m*m);
         u = &ubuf[0];
         ldu = m;
     }
 
-    if(typeid(fptype) == typeid(float))
-        OCV_LAPACK_FUNC(sgesdd)(mode, &_m, &_n, (float*)a, &lda, (float*)w, (float*)u, &ldu, (float*)vt, &ldv, (float*)&work1, &lwork, iworkBuf, _info);
-    else if(typeid(fptype) == typeid(double))
-        OCV_LAPACK_FUNC(dgesdd)(mode, &_m, &_n, (double*)a, &lda, (double*)w, (double*)u, &ldu, (double*)vt, &ldv, (double*)&work1, &lwork, iworkBuf, _info);
+    જો(typeid(fptype) == typeid(દશાંશ))
+        OCV_LAPACK_FUNC(sgesdd)(mode, &_m, &_n, (દશાંશ*)a, &lda, (દશાંશ*)w, (દશાંશ*)u, &ldu, (દશાંશ*)vt, &ldv, (દશાંશ*)&work1, &lwork, iworkBuf, _info);
+    નહીંતર જો(typeid(fptype) == typeid(દ્વિગુણ))
+        OCV_LAPACK_FUNC(dgesdd)(mode, &_m, &_n, (દ્વિગુણ*)a, &lda, (દ્વિગુણ*)w, (દ્વિગુણ*)u, &ldu, (દ્વિગુણ*)vt, &ldv, (દ્વિગુણ*)&work1, &lwork, iworkBuf, _info);
 
-    if(*info < 0)
-        return CV_HAL_ERROR_NOT_IMPLEMENTED;
+    જો(*info < 0)
+        પાછા CV_HAL_ERROR_NOT_IMPLEMENTED;
 
-    lwork = (int)round(work1); //optimal buffer size
+    lwork = (પૂર્ણાંક)round(work1); //optimal buffer size
     std::vector<fptype> buffer(lwork + 1);
 
     // Make sure MSAN sees the memory as having been written.
     // MSAN does not think it has been written because a different language is called.
     // Note: we do this here because if dgesdd is C++, MSAN errors can be reported within it.
-    CV_ANNOTATE_MEMORY_IS_INITIALIZED(buffer.data(), sizeof(fptype) * (lwork + 1));
+    CV_ANNOTATE_MEMORY_IS_INITIALIZED(buffer.data(), કદ(fptype) * (lwork + 1));
 
-    if(typeid(fptype) == typeid(float))
-        OCV_LAPACK_FUNC(sgesdd)(mode, &_m, &_n, (float*)a, &lda, (float*)w, (float*)u, &ldu, (float*)vt, &ldv, (float*)&buffer[0], &lwork, iworkBuf, _info);
-    else if(typeid(fptype) == typeid(double))
-        OCV_LAPACK_FUNC(dgesdd)(mode, &_m, &_n, (double*)a, &lda, (double*)w, (double*)u, &ldu, (double*)vt, &ldv, (double*)&buffer[0], &lwork, iworkBuf, _info);
+    જો(typeid(fptype) == typeid(દશાંશ))
+        OCV_LAPACK_FUNC(sgesdd)(mode, &_m, &_n, (દશાંશ*)a, &lda, (દશાંશ*)w, (દશાંશ*)u, &ldu, (દશાંશ*)vt, &ldv, (દશાંશ*)&buffer[0], &lwork, iworkBuf, _info);
+    નહીંતર જો(typeid(fptype) == typeid(દ્વિગુણ))
+        OCV_LAPACK_FUNC(dgesdd)(mode, &_m, &_n, (દ્વિગુણ*)a, &lda, (દ્વિગુણ*)w, (દ્વિગુણ*)u, &ldu, (દ્વિગુણ*)vt, &ldv, (દ્વિગુણ*)&buffer[0], &lwork, iworkBuf, _info);
 
-#if defined (ACCELERATE_NEW_LAPACK) && defined (ACCELERATE_LAPACK_ILP64)
-    *info = static_cast<int>(_info[0]);
+#જો defined (ACCELERATE_NEW_LAPACK) && defined (ACCELERATE_LAPACK_ILP64)
+    *info = static_cast<પૂર્ણાંક>(_info[0]);
 #endif
 
     // Make sure MSAN sees the memory as having been written.
     // MSAN does not think it has been written because a different language was called.
     CV_ANNOTATE_MEMORY_IS_INITIALIZED(a, a_step * n);
-    if (u)
+    જો (u)
       CV_ANNOTATE_MEMORY_IS_INITIALIZED(u, u_step * m);
-    if (vt)
+    જો (vt)
       CV_ANNOTATE_MEMORY_IS_INITIALIZED(vt, v_step * n);
-    if (w)
-      CV_ANNOTATE_MEMORY_IS_INITIALIZED(w, sizeof(fptype) * std::min(m, n));
+    જો (w)
+      CV_ANNOTATE_MEMORY_IS_INITIALIZED(w, કદ(fptype) * std::min(m, n));
 
-    if(!(flags & CV_HAL_SVD_NO_UV))
+    જો(!(flags & CV_HAL_SVD_NO_UV))
         transpose_square_inplace(vt, ldv, n);
 
-    if((flags & CV_HAL_SVD_MODIFY_A) && (flags & CV_HAL_SVD_FULL_UV))
+    જો((flags & CV_HAL_SVD_MODIFY_A) && (flags & CV_HAL_SVD_FULL_UV))
     {
-        for(int i = 0; i < m; i++)
-            for(int j = 0; j < m; j++)
+        માટે(પૂર્ણાંક i = 0; i < m; i++)
+            માટે(પૂર્ણાંક j = 0; j < m; j++)
                 a[i*lda + j] = u[i*m + j];
     }
 
-    if(*info < 0)
-        return CV_HAL_ERROR_NOT_IMPLEMENTED;
-    return CV_HAL_ERROR_OK;
+    જો(*info < 0)
+        પાછા CV_HAL_ERROR_NOT_IMPLEMENTED;
+    પાછા CV_HAL_ERROR_OK;
 }
 
-template <typename fptype> static inline int
-lapack_QR(fptype* a, size_t a_step, int m, int n, int k, fptype* b, size_t b_step, fptype* dst, int* info)
+template <typename fptype> સ્થિર અંતઃરેખ પૂર્ણાંક
+lapack_QR(fptype* a, size_t a_step, પૂર્ણાંક m, પૂર્ણાંક n, પૂર્ણાંક k, fptype* b, size_t b_step, fptype* dst, પૂર્ણાંક* info)
 {
-#if defined (ACCELERATE_NEW_LAPACK) && defined (ACCELERATE_LAPACK_ILP64)
+#જો defined (ACCELERATE_NEW_LAPACK) && defined (ACCELERATE_LAPACK_ILP64)
     long _m = static_cast<long>(m), _n = static_cast<long>(n), _k = static_cast<long>(k);
     long _info[1];
-    long lda = (long)(a_step / sizeof(fptype));
+    long lda = (long)(a_step / કદ(fptype));
     long lwork = -1;
     long ldtmpA;
-#else
-    int _m = m, _n = n, _k = k;
-    int* _info = info;
-    int lda = (int)(a_step / sizeof(fptype));
-    int lwork = -1;
-    int ldtmpA;
+#નહીંતર
+    પૂર્ણાંક _m = m, _n = n, _k = k;
+    પૂર્ણાંક* _info = info;
+    પૂર્ણાંક lda = (પૂર્ણાંક)(a_step / કદ(fptype));
+    પૂર્ણાંક lwork = -1;
+    પૂર્ણાંક ldtmpA;
 #endif
 
-    char mode[] = { 'N', '\0' };
-    if(m < n)
-        return CV_HAL_ERROR_NOT_IMPLEMENTED;
+    અક્ષર mode[] = { 'N', '\0' };
+    જો(m < n)
+        પાછા CV_HAL_ERROR_NOT_IMPLEMENTED;
 
     std::vector<fptype> tmpAMemHolder;
     fptype* tmpA;
 
-    if (m == n)
+    જો (m == n)
     {
         transpose_square_inplace(a, lda, m);
         tmpA = a;
         ldtmpA = lda;
     }
-    else
+    નહીંતર
     {
         tmpAMemHolder.resize(m*n);
         tmpA = &tmpAMemHolder.front();
@@ -370,357 +370,357 @@ lapack_QR(fptype* a, size_t a_step, int m, int n, int k, fptype* b, size_t b_ste
 
     fptype work1 = 0.;
 
-    if (b)
+    જો (b)
     {
-        if (k == 1 && b_step == sizeof(fptype))
+        જો (k == 1 && b_step == કદ(fptype))
         {
-            if (typeid(fptype) == typeid(float))
-                OCV_LAPACK_FUNC(sgels)(mode, &_m, &_n, &_k, (float*)tmpA, &ldtmpA, (float*)b, &_m, (float*)&work1, &lwork, _info);
-            else if (typeid(fptype) == typeid(double))
-                OCV_LAPACK_FUNC(dgels)(mode, &_m, &_n, &_k, (double*)tmpA, &ldtmpA, (double*)b, &_m, (double*)&work1, &lwork, _info);
+            જો (typeid(fptype) == typeid(દશાંશ))
+                OCV_LAPACK_FUNC(sgels)(mode, &_m, &_n, &_k, (દશાંશ*)tmpA, &ldtmpA, (દશાંશ*)b, &_m, (દશાંશ*)&work1, &lwork, _info);
+            નહીંતર જો (typeid(fptype) == typeid(દ્વિગુણ))
+                OCV_LAPACK_FUNC(dgels)(mode, &_m, &_n, &_k, (દ્વિગુણ*)tmpA, &ldtmpA, (દ્વિગુણ*)b, &_m, (દ્વિગુણ*)&work1, &lwork, _info);
 
-            CV_ANNOTATE_MEMORY_IS_INITIALIZED(info, sizeof(int));
-            if (*info < 0)
-                return CV_HAL_ERROR_NOT_IMPLEMENTED;
+            CV_ANNOTATE_MEMORY_IS_INITIALIZED(info, કદ(પૂર્ણાંક));
+            જો (*info < 0)
+                પાછા CV_HAL_ERROR_NOT_IMPLEMENTED;
 
             lwork = cvRound(work1); //optimal buffer size
             std::vector<fptype> workBufMemHolder(lwork + 1);
             fptype* buffer = &workBufMemHolder.front();
 
-            if (typeid(fptype) == typeid(float))
-                OCV_LAPACK_FUNC(sgels)(mode, &_m, &_n, &_k, (float*)tmpA, &ldtmpA, (float*)b, &_m, (float*)buffer, &lwork, _info);
-            else if (typeid(fptype) == typeid(double))
-                OCV_LAPACK_FUNC(dgels)(mode, &_m, &_n, &_k, (double*)tmpA, &ldtmpA, (double*)b, &_m, (double*)buffer, &lwork, _info);
+            જો (typeid(fptype) == typeid(દશાંશ))
+                OCV_LAPACK_FUNC(sgels)(mode, &_m, &_n, &_k, (દશાંશ*)tmpA, &ldtmpA, (દશાંશ*)b, &_m, (દશાંશ*)buffer, &lwork, _info);
+            નહીંતર જો (typeid(fptype) == typeid(દ્વિગુણ))
+                OCV_LAPACK_FUNC(dgels)(mode, &_m, &_n, &_k, (દ્વિગુણ*)tmpA, &ldtmpA, (દ્વિગુણ*)b, &_m, (દ્વિગુણ*)buffer, &lwork, _info);
         }
-        else
+        નહીંતર
         {
             std::vector<fptype> tmpBMemHolder(m*k);
             fptype* tmpB = &tmpBMemHolder.front();
-            int ldb = (int)(b_step / sizeof(fptype));
+            પૂર્ણાંક ldb = (પૂર્ણાંક)(b_step / કદ(fptype));
             transpose(b, ldb, tmpB, m, m, k);
 
-            if (typeid(fptype) == typeid(float))
-                OCV_LAPACK_FUNC(sgels)(mode, &_m, &_n, &_k, (float*)tmpA, &ldtmpA, (float*)tmpB, &_m, (float*)&work1, &lwork, _info);
-            else if (typeid(fptype) == typeid(double))
-                OCV_LAPACK_FUNC(dgels)(mode, &_m, &_n, &_k, (double*)tmpA, &ldtmpA, (double*)tmpB, &_m, (double*)&work1, &lwork, _info);
+            જો (typeid(fptype) == typeid(દશાંશ))
+                OCV_LAPACK_FUNC(sgels)(mode, &_m, &_n, &_k, (દશાંશ*)tmpA, &ldtmpA, (દશાંશ*)tmpB, &_m, (દશાંશ*)&work1, &lwork, _info);
+            નહીંતર જો (typeid(fptype) == typeid(દ્વિગુણ))
+                OCV_LAPACK_FUNC(dgels)(mode, &_m, &_n, &_k, (દ્વિગુણ*)tmpA, &ldtmpA, (દ્વિગુણ*)tmpB, &_m, (દ્વિગુણ*)&work1, &lwork, _info);
 
-            CV_ANNOTATE_MEMORY_IS_INITIALIZED(info, sizeof(int));
-            if (*info < 0)
-                return CV_HAL_ERROR_NOT_IMPLEMENTED;
+            CV_ANNOTATE_MEMORY_IS_INITIALIZED(info, કદ(પૂર્ણાંક));
+            જો (*info < 0)
+                પાછા CV_HAL_ERROR_NOT_IMPLEMENTED;
 
             lwork = cvRound(work1); //optimal buffer size
             std::vector<fptype> workBufMemHolder(lwork + 1);
             fptype* buffer = &workBufMemHolder.front();
 
-            if (typeid(fptype) == typeid(float))
-                OCV_LAPACK_FUNC(sgels)(mode, &_m, &_n, &_k, (float*)tmpA, &ldtmpA, (float*)tmpB, &_m, (float*)buffer, &lwork, _info);
-            else if (typeid(fptype) == typeid(double))
-                OCV_LAPACK_FUNC(dgels)(mode, &_m, &_n, &_k, (double*)tmpA, &ldtmpA, (double*)tmpB, &_m, (double*)buffer, &lwork, _info);
+            જો (typeid(fptype) == typeid(દશાંશ))
+                OCV_LAPACK_FUNC(sgels)(mode, &_m, &_n, &_k, (દશાંશ*)tmpA, &ldtmpA, (દશાંશ*)tmpB, &_m, (દશાંશ*)buffer, &lwork, _info);
+            નહીંતર જો (typeid(fptype) == typeid(દ્વિગુણ))
+                OCV_LAPACK_FUNC(dgels)(mode, &_m, &_n, &_k, (દ્વિગુણ*)tmpA, &ldtmpA, (દ્વિગુણ*)tmpB, &_m, (દ્વિગુણ*)buffer, &lwork, _info);
 
             transpose(tmpB, m, b, ldb, k, m);
         }
     }
-    else
+    નહીંતર
     {
-        if (typeid(fptype) == typeid(float))
-            sgeqrf_(&_m, &_n, (float*)tmpA, &ldtmpA, (float*)dst, (float*)&work1, &lwork, _info);
-        else if (typeid(fptype) == typeid(double))
-            dgeqrf_(&_m, &_n, (double*)tmpA, &ldtmpA, (double*)dst, (double*)&work1, &lwork, _info);
+        જો (typeid(fptype) == typeid(દશાંશ))
+            sgeqrf_(&_m, &_n, (દશાંશ*)tmpA, &ldtmpA, (દશાંશ*)dst, (દશાંશ*)&work1, &lwork, _info);
+        નહીંતર જો (typeid(fptype) == typeid(દ્વિગુણ))
+            dgeqrf_(&_m, &_n, (દ્વિગુણ*)tmpA, &ldtmpA, (દ્વિગુણ*)dst, (દ્વિગુણ*)&work1, &lwork, _info);
 
-        CV_ANNOTATE_MEMORY_IS_INITIALIZED(info, sizeof(int));
-        if (*info < 0)
-            return CV_HAL_ERROR_NOT_IMPLEMENTED;
+        CV_ANNOTATE_MEMORY_IS_INITIALIZED(info, કદ(પૂર્ણાંક));
+        જો (*info < 0)
+            પાછા CV_HAL_ERROR_NOT_IMPLEMENTED;
 
         lwork = cvRound(work1); //optimal buffer size
         std::vector<fptype> workBufMemHolder(lwork + 1);
         fptype* buffer = &workBufMemHolder.front();
 
-        if (typeid(fptype) == typeid(float))
-            sgeqrf_(&_m, &_n, (float*)tmpA, &ldtmpA, (float*)dst, (float*)buffer, &lwork, _info);
-        else if (typeid(fptype) == typeid(double))
-            dgeqrf_(&_m, &_n, (double*)tmpA, &ldtmpA, (double*)dst, (double*)buffer, &lwork, _info);
+        જો (typeid(fptype) == typeid(દશાંશ))
+            sgeqrf_(&_m, &_n, (દશાંશ*)tmpA, &ldtmpA, (દશાંશ*)dst, (દશાંશ*)buffer, &lwork, _info);
+        નહીંતર જો (typeid(fptype) == typeid(દ્વિગુણ))
+            dgeqrf_(&_m, &_n, (દ્વિગુણ*)tmpA, &ldtmpA, (દ્વિગુણ*)dst, (દ્વિગુણ*)buffer, &lwork, _info);
     }
 
-    CV_ANNOTATE_MEMORY_IS_INITIALIZED(info, sizeof(int));
-    if (m == n)
+    CV_ANNOTATE_MEMORY_IS_INITIALIZED(info, કદ(પૂર્ણાંક));
+    જો (m == n)
         transpose_square_inplace(a, lda, m);
-    else
+    નહીંતર
         transpose(tmpA, m, a, lda, n, m);
 
-#if defined (ACCELERATE_NEW_LAPACK) && defined (ACCELERATE_LAPACK_ILP64)
-    *info = static_cast<int>(_info[0]);
+#જો defined (ACCELERATE_NEW_LAPACK) && defined (ACCELERATE_LAPACK_ILP64)
+    *info = static_cast<પૂર્ણાંક>(_info[0]);
 #endif
 
-    if (*info != 0)
+    જો (*info != 0)
         *info = 0;
-    else
+    નહીંતર
         *info = 1;
 
-    return CV_HAL_ERROR_OK;
+    પાછા CV_HAL_ERROR_OK;
 }
 
-template <typename fptype> static inline int
-lapack_gemm(const fptype *src1, size_t src1_step, const fptype *src2, size_t src2_step, fptype alpha,
-            const fptype *src3, size_t src3_step, fptype beta, fptype *dst, size_t dst_step, int a_m, int a_n, int d_n, int flags)
+template <typename fptype> સ્થિર અંતઃરેખ પૂર્ણાંક
+lapack_gemm(અચલ fptype *src1, size_t src1_step, અચલ fptype *src2, size_t src2_step, fptype alpha,
+            અચલ fptype *src3, size_t src3_step, fptype beta, fptype *dst, size_t dst_step, પૂર્ણાંક a_m, પૂર્ણાંક a_n, પૂર્ણાંક d_n, પૂર્ણાંક flags)
 {
-    int ldsrc1 = (int)(src1_step / sizeof(fptype));
-    int ldsrc2 = (int)(src2_step / sizeof(fptype));
-    int ldsrc3 = (int)(src3_step / sizeof(fptype));
-    int lddst = (int)(dst_step / sizeof(fptype));
-    int c_m, c_n, d_m;
+    પૂર્ણાંક ldsrc1 = (પૂર્ણાંક)(src1_step / કદ(fptype));
+    પૂર્ણાંક ldsrc2 = (પૂર્ણાંક)(src2_step / કદ(fptype));
+    પૂર્ણાંક ldsrc3 = (પૂર્ણાંક)(src3_step / કદ(fptype));
+    પૂર્ણાંક lddst = (પૂર્ણાંક)(dst_step / કદ(fptype));
+    પૂર્ણાંક c_m, c_n, d_m;
     CBLAS_TRANSPOSE transA, transB;
 
-    if(flags & CV_HAL_GEMM_2_T)
+    જો(flags & CV_HAL_GEMM_2_T)
     {
         transB = CblasTrans;
-        if(flags & CV_HAL_GEMM_1_T )
+        જો(flags & CV_HAL_GEMM_1_T )
         {
             d_m = a_n;
         }
-        else
+        નહીંતર
         {
             d_m = a_m;
         }
     }
-    else
+    નહીંતર
     {
         transB = CblasNoTrans;
-        if(flags & CV_HAL_GEMM_1_T )
+        જો(flags & CV_HAL_GEMM_1_T )
         {
             d_m = a_n;
         }
-        else
+        નહીંતર
         {
             d_m = a_m;
         }
     }
 
-    if(flags & CV_HAL_GEMM_3_T)
+    જો(flags & CV_HAL_GEMM_3_T)
     {
         c_m = d_n;
         c_n = d_m;
     }
-    else
+    નહીંતર
     {
         c_m = d_m;
         c_n = d_n;
     }
 
-    if(flags & CV_HAL_GEMM_1_T )
+    જો(flags & CV_HAL_GEMM_1_T )
     {
         transA = CblasTrans;
         std::swap(a_n, a_m);
     }
-    else
+    નહીંતર
     {
         transA = CblasNoTrans;
     }
 
-    if(src3 != dst && beta != 0.0 && src3_step != 0) {
-        if(flags & CV_HAL_GEMM_3_T)
+    જો(src3 != dst && beta != 0.0 && src3_step != 0) {
+        જો(flags & CV_HAL_GEMM_3_T)
             transpose(src3, ldsrc3, dst, lddst, c_m, c_n);
-        else
+        નહીંતર
             copy_matrix(src3, ldsrc3, dst, lddst, c_m, c_n);
     }
-    else if (src3 == dst && (flags & CV_HAL_GEMM_3_T)) //actually transposing C in this case done by openCV
-        return CV_HAL_ERROR_NOT_IMPLEMENTED;
-    else if(src3_step == 0 && beta != 0.0)
-        set_value(dst, lddst, (fptype)0.0, d_m, d_n);
+    નહીંતર જો (src3 == dst && (flags & CV_HAL_GEMM_3_T)) //actually transposing C in this case done by openCV
+        પાછા CV_HAL_ERROR_NOT_IMPLEMENTED;
+    નહીંતર જો(src3_step == 0 && beta != 0.0)
+        set_કિંમત_2(dst, lddst, (fptype)0.0, d_m, d_n);
 
-    if(typeid(fptype) == typeid(float))
-        cblas_sgemm(CblasRowMajor, transA, transB, a_m, d_n, a_n, (float)alpha, (float*)src1, ldsrc1, (float*)src2, ldsrc2, (float)beta, (float*)dst, lddst);
-    else if(typeid(fptype) == typeid(double))
-        cblas_dgemm(CblasRowMajor, transA, transB, a_m, d_n, a_n, (double)alpha, (double*)src1, ldsrc1, (double*)src2, ldsrc2, (double)beta, (double*)dst, lddst);
+    જો(typeid(fptype) == typeid(દશાંશ))
+        cblas_sgemm(CblasRowMajor, transA, transB, a_m, d_n, a_n, (દશાંશ)alpha, (દશાંશ*)src1, ldsrc1, (દશાંશ*)src2, ldsrc2, (દશાંશ)beta, (દશાંશ*)dst, lddst);
+    નહીંતર જો(typeid(fptype) == typeid(દ્વિગુણ))
+        cblas_dgemm(CblasRowMajor, transA, transB, a_m, d_n, a_n, (દ્વિગુણ)alpha, (દ્વિગુણ*)src1, ldsrc1, (દ્વિગુણ*)src2, ldsrc2, (દ્વિગુણ)beta, (દ્વિગુણ*)dst, lddst);
 
-    return CV_HAL_ERROR_OK;
+    પાછા CV_HAL_ERROR_OK;
 }
 
-template <typename fptype> static inline int
-lapack_gemm_c(const fptype *src1, size_t src1_step, const fptype *src2, size_t src2_step, fptype alpha,
-            const fptype *src3, size_t src3_step, fptype beta, fptype *dst, size_t dst_step, int a_m, int a_n, int d_n, int flags)
+template <typename fptype> સ્થિર અંતઃરેખ પૂર્ણાંક
+lapack_gemm_c(અચલ fptype *src1, size_t src1_step, અચલ fptype *src2, size_t src2_step, fptype alpha,
+            અચલ fptype *src3, size_t src3_step, fptype beta, fptype *dst, size_t dst_step, પૂર્ણાંક a_m, પૂર્ણાંક a_n, પૂર્ણાંક d_n, પૂર્ણાંક flags)
 {
-    int ldsrc1 = (int)(src1_step / sizeof(std::complex<fptype>));
-    int ldsrc2 = (int)(src2_step / sizeof(std::complex<fptype>));
-    int ldsrc3 = (int)(src3_step / sizeof(std::complex<fptype>));
-    int lddst = (int)(dst_step / sizeof(std::complex<fptype>));
-    int c_m, c_n, d_m;
+    પૂર્ણાંક ldsrc1 = (પૂર્ણાંક)(src1_step / કદ(std::complex<fptype>));
+    પૂર્ણાંક ldsrc2 = (પૂર્ણાંક)(src2_step / કદ(std::complex<fptype>));
+    પૂર્ણાંક ldsrc3 = (પૂર્ણાંક)(src3_step / કદ(std::complex<fptype>));
+    પૂર્ણાંક lddst = (પૂર્ણાંક)(dst_step / કદ(std::complex<fptype>));
+    પૂર્ણાંક c_m, c_n, d_m;
     CBLAS_TRANSPOSE transA, transB;
     std::complex<fptype> cAlpha(alpha, 0.0);
     std::complex<fptype> cBeta(beta, 0.0);
 
-    if(flags & CV_HAL_GEMM_2_T)
+    જો(flags & CV_HAL_GEMM_2_T)
     {
         transB = CblasTrans;
-        if(flags & CV_HAL_GEMM_1_T )
+        જો(flags & CV_HAL_GEMM_1_T )
         {
             d_m = a_n;
         }
-        else
+        નહીંતર
         {
             d_m = a_m;
         }
     }
-    else
+    નહીંતર
     {
         transB = CblasNoTrans;
-        if(flags & CV_HAL_GEMM_1_T )
+        જો(flags & CV_HAL_GEMM_1_T )
         {
             d_m = a_n;
         }
-        else
+        નહીંતર
         {
             d_m = a_m;
         }
     }
 
-    if(flags & CV_HAL_GEMM_3_T)
+    જો(flags & CV_HAL_GEMM_3_T)
     {
         c_m = d_n;
         c_n = d_m;
     }
-    else
+    નહીંતર
     {
         c_m = d_m;
         c_n = d_n;
     }
 
-    if(flags & CV_HAL_GEMM_1_T )
+    જો(flags & CV_HAL_GEMM_1_T )
     {
         transA = CblasTrans;
         std::swap(a_n, a_m);
     }
-    else
+    નહીંતર
     {
         transA = CblasNoTrans;
     }
 
-    if(src3 != dst && beta != 0.0 && src3_step != 0) {
-        if(flags & CV_HAL_GEMM_3_T)
+    જો(src3 != dst && beta != 0.0 && src3_step != 0) {
+        જો(flags & CV_HAL_GEMM_3_T)
             transpose((std::complex<fptype>*)src3, ldsrc3, (std::complex<fptype>*)dst, lddst, c_m, c_n);
-        else
+        નહીંતર
             copy_matrix((std::complex<fptype>*)src3, ldsrc3, (std::complex<fptype>*)dst, lddst, c_m, c_n);
     }
-    else if (src3 == dst && (flags & CV_HAL_GEMM_3_T)) //actually transposing C in this case done by openCV
-        return CV_HAL_ERROR_NOT_IMPLEMENTED;
-    else if(src3_step == 0 && beta != 0.0)
-        set_value((std::complex<fptype>*)dst, lddst, std::complex<fptype>(0.0, 0.0), d_m, d_n);
+    નહીંતર જો (src3 == dst && (flags & CV_HAL_GEMM_3_T)) //actually transposing C in this case done by openCV
+        પાછા CV_HAL_ERROR_NOT_IMPLEMENTED;
+    નહીંતર જો(src3_step == 0 && beta != 0.0)
+        set_કિંમત_2((std::complex<fptype>*)dst, lddst, std::complex<fptype>(0.0, 0.0), d_m, d_n);
 
     // FIXME: this is a workaround. Support ILP64 in HAL API.
-#if defined (ACCELERATE_NEW_LAPACK) && defined (ACCELERATE_LAPACK_ILP64)
-    int M = a_m, N = d_n, K = a_n;
-    if(typeid(fptype) == typeid(float)) {
-        auto src1_cast = (std::complex<float>*)(src1);
-        auto src2_cast = (std::complex<float>*)(src2);
-        auto dst_cast = (std::complex<float>*)(dst);
+#જો defined (ACCELERATE_NEW_LAPACK) && defined (ACCELERATE_LAPACK_ILP64)
+    પૂર્ણાંક M = a_m, N = d_n, K = a_n;
+    જો(typeid(fptype) == typeid(દશાંશ)) {
+        auto src1_cast = (std::complex<દશાંશ>*)(src1);
+        auto src2_cast = (std::complex<દશાંશ>*)(src2);
+        auto dst_cast = (std::complex<દશાંશ>*)(dst);
         long lda = ldsrc1, ldb = ldsrc2, ldc = lddst;
-        cblas_cgemm(CblasRowMajor, transA, transB, M, N, K, (std::complex<float>*)&cAlpha, src1_cast, lda, src2_cast, ldb, (std::complex<float>*)&cBeta, dst_cast, ldc);
+        cblas_cgemm(CblasRowMajor, transA, transB, M, N, K, (std::complex<દશાંશ>*)&cAlpha, src1_cast, lda, src2_cast, ldb, (std::complex<દશાંશ>*)&cBeta, dst_cast, ldc);
     }
-    else if(typeid(fptype) == typeid(double)) {
-        auto src1_cast = (std::complex<double>*)(src1);
-        auto src2_cast = (std::complex<double>*)(src2);
-        auto dst_cast = (std::complex<double>*)(dst);
+    નહીંતર જો(typeid(fptype) == typeid(દ્વિગુણ)) {
+        auto src1_cast = (std::complex<દ્વિગુણ>*)(src1);
+        auto src2_cast = (std::complex<દ્વિગુણ>*)(src2);
+        auto dst_cast = (std::complex<દ્વિગુણ>*)(dst);
         long lda = ldsrc1, ldb = ldsrc2, ldc = lddst;
-        cblas_zgemm(CblasRowMajor, transA, transB, M, N, K, (std::complex<double>*)&cAlpha, src1_cast, lda, src2_cast, ldb, (std::complex<double>*)&cBeta, dst_cast, ldc);
+        cblas_zgemm(CblasRowMajor, transA, transB, M, N, K, (std::complex<દ્વિગુણ>*)&cAlpha, src1_cast, lda, src2_cast, ldb, (std::complex<દ્વિગુણ>*)&cBeta, dst_cast, ldc);
     }
-#else
-    if(typeid(fptype) == typeid(float))
-        cblas_cgemm(CblasRowMajor, transA, transB, a_m, d_n, a_n, (float*)reinterpret_cast<fptype(&)[2]>(cAlpha), (float*)src1, ldsrc1, (float*)src2, ldsrc2, (float*)reinterpret_cast<fptype(&)[2]>(cBeta), (float*)dst, lddst);
-    else if(typeid(fptype) == typeid(double))
-        cblas_zgemm(CblasRowMajor, transA, transB, a_m, d_n, a_n, (double*)reinterpret_cast<fptype(&)[2]>(cAlpha), (double*)src1, ldsrc1, (double*)src2, ldsrc2, (double*)reinterpret_cast<fptype(&)[2]>(cBeta), (double*)dst, lddst);
+#નહીંતર
+    જો(typeid(fptype) == typeid(દશાંશ))
+        cblas_cgemm(CblasRowMajor, transA, transB, a_m, d_n, a_n, (દશાંશ*)reinterpret_cast<fptype(&)[2]>(cAlpha), (દશાંશ*)src1, ldsrc1, (દશાંશ*)src2, ldsrc2, (દશાંશ*)reinterpret_cast<fptype(&)[2]>(cBeta), (દશાંશ*)dst, lddst);
+    નહીંતર જો(typeid(fptype) == typeid(દ્વિગુણ))
+        cblas_zgemm(CblasRowMajor, transA, transB, a_m, d_n, a_n, (દ્વિગુણ*)reinterpret_cast<fptype(&)[2]>(cAlpha), (દ્વિગુણ*)src1, ldsrc1, (દ્વિગુણ*)src2, ldsrc2, (દ્વિગુણ*)reinterpret_cast<fptype(&)[2]>(cBeta), (દ્વિગુણ*)dst, lddst);
 #endif
 
-    return CV_HAL_ERROR_OK;
+    પાછા CV_HAL_ERROR_OK;
 }
-int lapack_LU32f(float* a, size_t a_step, int m, float* b, size_t b_step, int n, int* info)
+પૂર્ણાંક lapack_LU32f(દશાંશ* a, size_t a_step, પૂર્ણાંક m, દશાંશ* b, size_t b_step, પૂર્ણાંક n, પૂર્ણાંક* info)
 {
-    if(m < HAL_LU_SMALL_MATRIX_THRESH)
-        return CV_HAL_ERROR_NOT_IMPLEMENTED;
-    return lapack_LU(a, a_step, m, b, b_step, n, info);
+    જો(m < HAL_LU_SMALL_MATRIX_THRESH)
+        પાછા CV_HAL_ERROR_NOT_IMPLEMENTED;
+    પાછા lapack_LU(a, a_step, m, b, b_step, n, info);
 }
 
-int lapack_LU64f(double* a, size_t a_step, int m, double* b, size_t b_step, int n, int* info)
+પૂર્ણાંક lapack_LU64f(દ્વિગુણ* a, size_t a_step, પૂર્ણાંક m, દ્વિગુણ* b, size_t b_step, પૂર્ણાંક n, પૂર્ણાંક* info)
 {
-    if(m < HAL_LU_SMALL_MATRIX_THRESH)
-        return CV_HAL_ERROR_NOT_IMPLEMENTED;
-    return lapack_LU(a, a_step, m, b, b_step, n, info);
+    જો(m < HAL_LU_SMALL_MATRIX_THRESH)
+        પાછા CV_HAL_ERROR_NOT_IMPLEMENTED;
+    પાછા lapack_LU(a, a_step, m, b, b_step, n, info);
 }
 
-int lapack_Cholesky32f(float* a, size_t a_step, int m, float* b, size_t b_step, int n, bool *info)
+પૂર્ણાંક lapack_Cholesky32f(દશાંશ* a, size_t a_step, પૂર્ણાંક m, દશાંશ* b, size_t b_step, પૂર્ણાંક n, તાર્કિક *info)
 {
-    if(m < HAL_CHOLESKY_SMALL_MATRIX_THRESH)
-        return CV_HAL_ERROR_NOT_IMPLEMENTED;
-    return lapack_Cholesky(a, a_step, m, b, b_step, n, info);
+    જો(m < HAL_CHOLESKY_SMALL_MATRIX_THRESH)
+        પાછા CV_HAL_ERROR_NOT_IMPLEMENTED;
+    પાછા lapack_Cholesky(a, a_step, m, b, b_step, n, info);
 }
 
-int lapack_Cholesky64f(double* a, size_t a_step, int m, double* b, size_t b_step, int n, bool *info)
+પૂર્ણાંક lapack_Cholesky64f(દ્વિગુણ* a, size_t a_step, પૂર્ણાંક m, દ્વિગુણ* b, size_t b_step, પૂર્ણાંક n, તાર્કિક *info)
 {
-    if(m < HAL_CHOLESKY_SMALL_MATRIX_THRESH)
-        return CV_HAL_ERROR_NOT_IMPLEMENTED;
-    return lapack_Cholesky(a, a_step, m, b, b_step, n, info);
+    જો(m < HAL_CHOLESKY_SMALL_MATRIX_THRESH)
+        પાછા CV_HAL_ERROR_NOT_IMPLEMENTED;
+    પાછા lapack_Cholesky(a, a_step, m, b, b_step, n, info);
 }
 
-int lapack_SVD32f(float* a, size_t a_step, float *w, float* u, size_t u_step, float* vt, size_t v_step, int m, int n, int flags)
+પૂર્ણાંક lapack_SVD32f(દશાંશ* a, size_t a_step, દશાંશ *w, દશાંશ* u, size_t u_step, દશાંશ* vt, size_t v_step, પૂર્ણાંક m, પૂર્ણાંક n, પૂર્ણાંક flags)
 {
-    if(m < HAL_SVD_SMALL_MATRIX_THRESH || n <= 0)
-        return CV_HAL_ERROR_NOT_IMPLEMENTED;
-    int info = 0;
-    return lapack_SVD(a, a_step, w, u, u_step, vt, v_step, m, n, flags, &info);
+    જો(m < HAL_SVD_SMALL_MATRIX_THRESH || n <= 0)
+        પાછા CV_HAL_ERROR_NOT_IMPLEMENTED;
+    પૂર્ણાંક info = 0;
+    પાછા lapack_SVD(a, a_step, w, u, u_step, vt, v_step, m, n, flags, &info);
 }
 
-int lapack_SVD64f(double* a, size_t a_step, double *w, double* u, size_t u_step, double* vt, size_t v_step, int m, int n, int flags)
+પૂર્ણાંક lapack_SVD64f(દ્વિગુણ* a, size_t a_step, દ્વિગુણ *w, દ્વિગુણ* u, size_t u_step, દ્વિગુણ* vt, size_t v_step, પૂર્ણાંક m, પૂર્ણાંક n, પૂર્ણાંક flags)
 {
-    if(m < HAL_SVD_SMALL_MATRIX_THRESH || n <= 0)
-        return CV_HAL_ERROR_NOT_IMPLEMENTED;
-    int info = 0;
-    return lapack_SVD(a, a_step, w, u, u_step, vt, v_step, m, n, flags, &info);
+    જો(m < HAL_SVD_SMALL_MATRIX_THRESH || n <= 0)
+        પાછા CV_HAL_ERROR_NOT_IMPLEMENTED;
+    પૂર્ણાંક info = 0;
+    પાછા lapack_SVD(a, a_step, w, u, u_step, vt, v_step, m, n, flags, &info);
 }
 
-int lapack_QR32f(float* src1, size_t src1_step, int m, int n, int k, float* src2, size_t src2_step, float* dst, int* info)
+પૂર્ણાંક lapack_QR32f(દશાંશ* src1, size_t src1_step, પૂર્ણાંક m, પૂર્ણાંક n, પૂર્ણાંક k, દશાંશ* src2, size_t src2_step, દશાંશ* dst, પૂર્ણાંક* info)
 {
-    if (m < HAL_QR_SMALL_MATRIX_THRESH)
-      return CV_HAL_ERROR_NOT_IMPLEMENTED;
-    return lapack_QR(src1, src1_step, m, n, k, src2, src2_step, dst, info);
+    જો (m < HAL_QR_SMALL_MATRIX_THRESH)
+      પાછા CV_HAL_ERROR_NOT_IMPLEMENTED;
+    પાછા lapack_QR(src1, src1_step, m, n, k, src2, src2_step, dst, info);
 }
 
-int lapack_QR64f(double* src1, size_t src1_step, int m, int n, int k, double* src2, size_t src2_step, double* dst, int* info)
+પૂર્ણાંક lapack_QR64f(દ્વિગુણ* src1, size_t src1_step, પૂર્ણાંક m, પૂર્ણાંક n, પૂર્ણાંક k, દ્વિગુણ* src2, size_t src2_step, દ્વિગુણ* dst, પૂર્ણાંક* info)
 {
-    if (m < HAL_QR_SMALL_MATRIX_THRESH)
-      return CV_HAL_ERROR_NOT_IMPLEMENTED;
-    return lapack_QR(src1, src1_step, m, n, k, src2, src2_step, dst, info);
+    જો (m < HAL_QR_SMALL_MATRIX_THRESH)
+      પાછા CV_HAL_ERROR_NOT_IMPLEMENTED;
+    પાછા lapack_QR(src1, src1_step, m, n, k, src2, src2_step, dst, info);
 }
 
-int lapack_gemm32f(const float *src1, size_t src1_step, const float *src2, size_t src2_step, float alpha,
-                   const float *src3, size_t src3_step, float beta, float *dst, size_t dst_step, int m, int n, int k, int flags)
+પૂર્ણાંક lapack_gemm32f(અચલ દશાંશ *src1, size_t src1_step, અચલ દશાંશ *src2, size_t src2_step, દશાંશ alpha,
+                   અચલ દશાંશ *src3, size_t src3_step, દશાંશ beta, દશાંશ *dst, size_t dst_step, પૂર્ણાંક m, પૂર્ણાંક n, પૂર્ણાંક k, પૂર્ણાંક flags)
 {
-    if(m < HAL_GEMM_SMALL_MATRIX_THRESH)
-        return CV_HAL_ERROR_NOT_IMPLEMENTED;
-    return lapack_gemm(src1, src1_step, src2, src2_step, alpha, src3, src3_step, beta, dst, dst_step, m, n, k, flags);
+    જો(m < HAL_GEMM_SMALL_MATRIX_THRESH)
+        પાછા CV_HAL_ERROR_NOT_IMPLEMENTED;
+    પાછા lapack_gemm(src1, src1_step, src2, src2_step, alpha, src3, src3_step, beta, dst, dst_step, m, n, k, flags);
 }
 
-int lapack_gemm64f(const double *src1, size_t src1_step, const double *src2, size_t src2_step, double alpha,
-                   const double *src3, size_t src3_step, double beta, double *dst, size_t dst_step, int m, int n, int k, int flags)
+પૂર્ણાંક lapack_gemm64f(અચલ દ્વિગુણ *src1, size_t src1_step, અચલ દ્વિગુણ *src2, size_t src2_step, દ્વિગુણ alpha,
+                   અચલ દ્વિગુણ *src3, size_t src3_step, દ્વિગુણ beta, દ્વિગુણ *dst, size_t dst_step, પૂર્ણાંક m, પૂર્ણાંક n, પૂર્ણાંક k, પૂર્ણાંક flags)
 {
-    if(m < HAL_GEMM_SMALL_MATRIX_THRESH)
-        return CV_HAL_ERROR_NOT_IMPLEMENTED;
-    return lapack_gemm(src1, src1_step, src2, src2_step, alpha, src3, src3_step, beta, dst, dst_step, m, n, k, flags);
+    જો(m < HAL_GEMM_SMALL_MATRIX_THRESH)
+        પાછા CV_HAL_ERROR_NOT_IMPLEMENTED;
+    પાછા lapack_gemm(src1, src1_step, src2, src2_step, alpha, src3, src3_step, beta, dst, dst_step, m, n, k, flags);
 }
 
-int lapack_gemm32fc(const float *src1, size_t src1_step, const float *src2, size_t src2_step, float alpha,
-                   const float *src3, size_t src3_step, float beta, float *dst, size_t dst_step, int m, int n, int k, int flags)
+પૂર્ણાંક lapack_gemm32fc(અચલ દશાંશ *src1, size_t src1_step, અચલ દશાંશ *src2, size_t src2_step, દશાંશ alpha,
+                   અચલ દશાંશ *src3, size_t src3_step, દશાંશ beta, દશાંશ *dst, size_t dst_step, પૂર્ણાંક m, પૂર્ણાંક n, પૂર્ણાંક k, પૂર્ણાંક flags)
 {
-    if(m < HAL_GEMM_SMALL_COMPLEX_MATRIX_THRESH)
-        return CV_HAL_ERROR_NOT_IMPLEMENTED;
-    return lapack_gemm_c(src1, src1_step, src2, src2_step, alpha, src3, src3_step, beta, dst, dst_step, m, n, k, flags);
+    જો(m < HAL_GEMM_SMALL_COMPLEX_MATRIX_THRESH)
+        પાછા CV_HAL_ERROR_NOT_IMPLEMENTED;
+    પાછા lapack_gemm_c(src1, src1_step, src2, src2_step, alpha, src3, src3_step, beta, dst, dst_step, m, n, k, flags);
 }
-int lapack_gemm64fc(const double *src1, size_t src1_step, const double *src2, size_t src2_step, double alpha,
-                   const double *src3, size_t src3_step, double beta, double *dst, size_t dst_step, int m, int n, int k, int flags)
+પૂર્ણાંક lapack_gemm64fc(અચલ દ્વિગુણ *src1, size_t src1_step, અચલ દ્વિગુણ *src2, size_t src2_step, દ્વિગુણ alpha,
+                   અચલ દ્વિગુણ *src3, size_t src3_step, દ્વિગુણ beta, દ્વિગુણ *dst, size_t dst_step, પૂર્ણાંક m, પૂર્ણાંક n, પૂર્ણાંક k, પૂર્ણાંક flags)
 {
-    if(m < HAL_GEMM_SMALL_COMPLEX_MATRIX_THRESH)
-        return CV_HAL_ERROR_NOT_IMPLEMENTED;
-    return lapack_gemm_c(src1, src1_step, src2, src2_step, alpha, src3, src3_step, beta, dst, dst_step, m, n, k, flags);
+    જો(m < HAL_GEMM_SMALL_COMPLEX_MATRIX_THRESH)
+        પાછા CV_HAL_ERROR_NOT_IMPLEMENTED;
+    પાછા lapack_gemm_c(src1, src1_step, src2, src2_step, alpha, src3, src3_step, beta, dst, dst_step, m, n, k, flags);
 }
 
-#if defined(__APPLE__) && defined(__clang__)
+#જો defined(__APPLE__) && defined(__clang__)
 #pragma clang diagnostic pop
 #endif
 
