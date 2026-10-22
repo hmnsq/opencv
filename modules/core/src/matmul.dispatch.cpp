@@ -61,19 +61,19 @@ namespace cv
 
 #ifdef HAVE_CLAMDBLAS
 
-static bool ocl_gemm_amdblas( InputArray matA, InputArray matB, double alpha,
-                      InputArray matC, double beta, OutputArray matD, int flags )
+static bool ocl_gemm_amdblas( InputArray matA, InputArray matB, dviguu_na alpha,
+                      InputArray matC, dviguu_na beta, OutputArray matD, จำนวนเต็ม flags )
 {
-    int type = matA.type(), esz = CV_ELEM_SIZE(type);
+    จำนวนเต็ม type = matA.type(), esz = CV_ELEM_SIZE(type);
     bool haveC = matC.kind() != cv::_InputArray::NONE;
     Size sizeA = matA.size(), sizeB = matB.size(), sizeC = haveC ? matC.size() : Size(0, 0);
     bool atrans = (flags & GEMM_1_T) != 0, btrans = (flags & GEMM_2_T) != 0, ctrans = (flags & GEMM_3_T) != 0;
 
-    if (atrans)
+    ถ้า (atrans)
         sizeA = Size(sizeA.height, sizeA.width);
-    if (btrans)
+    ถ้า (btrans)
         sizeB = Size(sizeB.height, sizeB.width);
-    if (haveC && ctrans)
+    ถ้า (haveC && ctrans)
         sizeC = Size(sizeC.height, sizeC.width);
 
     Size sizeD(sizeB.width, sizeA.height);
@@ -82,30 +82,30 @@ static bool ocl_gemm_amdblas( InputArray matA, InputArray matB, double alpha,
     CV_Assert( sizeA.width == sizeB.height && (!haveC || sizeC == sizeD) );
 
     matD.create(sizeD, type);
-    if ( matA.offset() % esz != 0 || matA.step() % esz != 0 ||
+    ถ้า ( matA.offset() % esz != 0 || matA.step() % esz != 0 ||
          matB.offset() % esz != 0 || matB.step() % esz != 0 ||
          (haveC && (matC.offset() % esz != 0 || matC.step() % esz != 0)) )
-        return false;
+        คืน false;
 
     UMat A = matA.getUMat(), B = matB.getUMat(), D = matD.getUMat();
-    if (!ocl::internal::isCLBuffer(A) || !ocl::internal::isCLBuffer(B) || !ocl::internal::isCLBuffer(D))
+    ถ้า (!ocl::internal::isCLBuffer(A) || !ocl::internal::isCLBuffer(B) || !ocl::internal::isCLBuffer(D))
     {
-        return false;
+        คืน false;
     }
-    if (haveC)
+    ถ้า (haveC)
     {
         UMat C = matC.getUMat();
-        if (!ocl::internal::isCLBuffer(C))
-            return false;
+        ถ้า (!ocl::internal::isCLBuffer(C))
+            คืน false;
     }
-    if (haveC)
+    ถ้า (haveC)
         ctrans ? transpose(matC, D) : matC.copyTo(D);
-    else
+    มิฉะนั้น
         D.setTo(Scalar::all(0));
 
-    int M = sizeD.height, N = sizeD.width, K = sizeA.width;
-    int lda = (int)A.step / esz, ldb = (int)B.step / esz, ldc = (int)D.step / esz;
-    int offa = (int)A.offset / esz, offb = (int)B.offset / esz, offc = (int)D.offset / esz;
+    จำนวนเต็ม M = sizeD.height, N = sizeD.width, K = sizeA.width;
+    จำนวนเต็ม lda = (จำนวนเต็ม)A.step / esz, ldb = (จำนวนเต็ม)B.step / esz, ldc = (จำนวนเต็ม)D.step / esz;
+    จำนวนเต็ม offa = (จำนวนเต็ม)A.offset / esz, offb = (จำนวนเต็ม)B.offset / esz, offc = (จำนวนเต็ม)D.offset / esz;
 
     cl_command_queue clq = (cl_command_queue)ocl::Queue::getDefault().ptr();
     clblasTranspose transA = atrans ? clblasTrans : clblasNoTrans;
@@ -113,19 +113,19 @@ static bool ocl_gemm_amdblas( InputArray matA, InputArray matB, double alpha,
     clblasOrder order = clblasRowMajor;
     clblasStatus status = clblasSuccess;
 
-    if (type == CV_32FC1)
+    ถ้า (type == CV_32FC1)
         status = clblasSgemm(order, transA, transB, M, N, K,
                              (cl_float)alpha, (const cl_mem)A.handle(ACCESS_READ), offa, lda,
                              (const cl_mem)B.handle(ACCESS_READ), offb, ldb,
                              (cl_float)beta, (cl_mem)D.handle(ACCESS_RW), offc, ldc,
                              1, &clq, 0, NULL, NULL);
-    else if (type == CV_64FC1)
+    มิฉะนั้น ถ้า (type == CV_64FC1)
         status = clblasDgemm(order, transA, transB, M, N, K,
                              alpha, (const cl_mem)A.handle(ACCESS_READ), offa, lda,
                              (const cl_mem)B.handle(ACCESS_READ), offb, ldb,
                              beta, (cl_mem)D.handle(ACCESS_RW), offc, ldc,
                              1, &clq, 0, NULL, NULL);
-    else if (type == CV_32FC2)
+    มิฉะนั้น ถ้า (type == CV_32FC2)
     {
          cl_float2 alpha_2 = { { (cl_float)alpha, 0 } };
          cl_float2 beta_2  = { { (cl_float)beta, 0 } };
@@ -135,7 +135,7 @@ static bool ocl_gemm_amdblas( InputArray matA, InputArray matB, double alpha,
                               beta_2, (cl_mem)D.handle(ACCESS_RW), offc, ldc,
                               1, &clq, 0, NULL, NULL);
     }
-    else if (type == CV_64FC2)
+    มิฉะนั้น ถ้า (type == CV_64FC2)
     {
         cl_double2 alpha_2 = { { alpha, 0 } };
         cl_double2 beta_2  = { { beta, 0 } };
@@ -145,21 +145,21 @@ static bool ocl_gemm_amdblas( InputArray matA, InputArray matB, double alpha,
                              beta_2, (cl_mem)D.handle(ACCESS_RW), offc, ldc,
                              1, &clq, 0, NULL, NULL);
     }
-    else
+    มิฉะนั้น
         CV_Error(Error::StsUnsupportedFormat, "");
 
-    return status == clblasSuccess;
+    คืน status == clblasSuccess;
 }
 
 #endif
 
 #ifdef HAVE_OPENCL
-static bool ocl_gemm( InputArray matA, InputArray matB, double alpha,
-                      InputArray matC, double beta, OutputArray matD, int flags )
+static bool ocl_gemm( InputArray matA, InputArray matB, dviguu_na alpha,
+                      InputArray matC, dviguu_na beta, OutputArray matD, จำนวนเต็ม flags )
 {
-    int type = matA.type();
-    int depth = CV_MAT_DEPTH(type);
-    int cn = CV_MAT_CN(type);
+    จำนวนเต็ม type = matA.type();
+    จำนวนเต็ม depth = CV_MAT_DEPTH(type);
+    จำนวนเต็ม cn = CV_MAT_CN(type);
 
     CV_CheckTypeEQ(type, matB.type(), "");
     CV_CheckType(type, type == CV_32FC1 || type == CV_64FC1 || type == CV_32FC2 || type == CV_64FC2, "");
@@ -167,28 +167,28 @@ static bool ocl_gemm( InputArray matA, InputArray matB, double alpha,
     const ocl::Device & dev = ocl::Device::getDefault();
     bool doubleSupport = dev.doubleFPConfig() > 0;
 
-    if (!doubleSupport && depth == CV_64F)
-        return false;
+    ถ้า (!doubleSupport && depth == CV_64F)
+        คืน false;
 
     bool haveC = matC.kind() != cv::_InputArray::NONE;
     Size sizeA = matA.size(), sizeB = matB.size(), sizeC = haveC ? matC.size() : Size(0, 0);
     bool atrans = (flags & GEMM_1_T) != 0, btrans = (flags & GEMM_2_T) != 0, ctrans = (flags & GEMM_3_T) != 0;
 
-    if (haveC)
+    ถ้า (haveC)
         CV_CheckTypeEQ(type, matC.type(), "");
 
     Size sizeD(((btrans) ? sizeB.height : sizeB.width),
                ((atrans) ? sizeA.width : sizeA.height));
 
-    if (atrans)
+    ถ้า (atrans)
         sizeA = Size(sizeA.height, sizeA.width);
-    if (btrans)
+    ถ้า (btrans)
         sizeB = Size(sizeB.height, sizeB.width);
-    if (haveC && ctrans)
+    ถ้า (haveC && ctrans)
         sizeC = Size(sizeC.height, sizeC.width);
 
     CV_CheckEQ(sizeA.width, sizeB.height, "");
-    if (haveC)
+    ถ้า (haveC)
         CV_CheckEQ(sizeC, sizeD, "");
 
     UMat A = matA.getUMat();
@@ -199,14 +199,14 @@ static bool ocl_gemm( InputArray matA, InputArray matB, double alpha,
 
     bool isPropagatedC2D = false;  // D content is updated with C / C.t()
 
-    if (dev.intelSubgroupsSupport() && (depth == CV_32F) && cn == 1)
+    ถ้า (dev.intelSubgroupsSupport() && (depth == CV_32F) && cn == 1)
     {
-        if (haveC && beta != 0.0)
+        ถ้า (haveC && beta != 0.0)
         {
             ctrans ? transpose(matC, D) : matC.copyTo(D);
             isPropagatedC2D = true;
         }
-        else
+        มิฉะนั้น
         {
             beta = 0.0;
         }
@@ -218,32 +218,32 @@ static bool ocl_gemm( InputArray matA, InputArray matB, double alpha,
                                   beta,
                                   atrans, btrans,
                                   isPropagatedC2D);
-        if (res)
-            return true;
+        ถ้า (res)
+            คืน true;
         // fallback on generic OpenCL code
     }
 
-    if (sizeD.width < 8 || sizeD.height < 8)
-        return false;
+    ถ้า (sizeD.width < 8 || sizeD.height < 8)
+        คืน false;
 
     String opts;
 
-    int wg_size = (int)dev.maxWorkGroupSize();
-    int sizeDmin = std::min(sizeD.width, sizeD.height);
+    จำนวนเต็ม wg_size = (จำนวนเต็ม)dev.maxWorkGroupSize();
+    จำนวนเต็ม sizeDmin = std::min(sizeD.width, sizeD.height);
     wg_size = std::min(wg_size, sizeDmin * sizeDmin);
-    int block_size = (wg_size / (32*cn) < 32) ? (wg_size / (16*cn) < 16) ? (wg_size / (8*cn) < 8) ? 1 : 8 : 16 : 32;
+    จำนวนเต็ม block_size = (wg_size / (32*cn) < 32) ? (wg_size / (16*cn) < 16) ? (wg_size / (8*cn) < 8) ? 1 : 8 : 16 : 32;
 
-    if (atrans)
+    ถ้า (atrans)
         A = A.t();
 
-    if (btrans)
+    ถ้า (btrans)
         B = B.t();
 
-    if (haveC && !isPropagatedC2D)
+    ถ้า (haveC && !isPropagatedC2D)
         ctrans ? transpose(matC, D) : matC.copyTo(D);
 
-    int vectorWidths[] = { 4, 4, 2, 2, 1, 4, cn, -1 };
-    int kercn = ocl::checkOptimalVectorWidth(vectorWidths, B, D);
+    จำนวนเต็ม vectorWidths[] = { 4, 4, 2, 2, 1, 4, cn, -1 };
+    จำนวนเต็ม kercn = ocl::checkOptimalVectorWidth(vectorWidths, B, D);
 
     opts += format(" -D T=%s -D T1=%s -D WT=%s -D cn=%d -D kercn=%d -D LOCAL_SIZE=%d%s%s%s",
                       ocl::typeToStr(type), ocl::typeToStr(depth), ocl::typeToStr(CV_MAKETYPE(depth, kercn)),
@@ -253,15 +253,15 @@ static bool ocl_gemm( InputArray matA, InputArray matB, double alpha,
                       doubleSupport ? " -D DOUBLE_SUPPORT" : "");
 
     ocl::Kernel k("gemm", cv::ocl::core::gemm_oclsrc, opts);
-    if (k.empty())
-        return false;
+    ถ้า (k.empty())
+        คืน false;
 
-    if (depth == CV_64F)
+    ถ้า (depth == CV_64F)
         k.args(ocl::KernelArg::ReadOnlyNoSize(A),
                ocl::KernelArg::ReadOnlyNoSize(B, cn, kercn),
                ocl::KernelArg::ReadWrite(D, cn, kercn),
                sizeA.width, alpha, beta);
-    else
+    มิฉะนั้น
         k.args(ocl::KernelArg::ReadOnlyNoSize(A),
                ocl::KernelArg::ReadOnlyNoSize(B, cn, kercn),
                ocl::KernelArg::ReadWrite(D, cn, kercn),
@@ -270,7 +270,7 @@ static bool ocl_gemm( InputArray matA, InputArray matB, double alpha,
     size_t globalsize[2] = { (size_t)sizeD.width * cn / kercn, (size_t)sizeD.height};
     size_t localsize[2] = { (size_t)block_size, (size_t)block_size};
 
-    return k.run(2, globalsize, block_size !=1 ? localsize : NULL, false);
+    คืน k.run(2, globalsize, block_size !=1 ? localsize : NULL, false);
 }
 #endif
 
@@ -279,27 +279,27 @@ namespace hal {
 
 void gemm32f(const float* src1, size_t src1_step, const float* src2, size_t src2_step,
              float alpha, const float* src3, size_t src3_step, float beta, float* dst, size_t dst_step,
-             int m_a, int n_a, int n_d, int flags)
+             จำนวนเต็ม m_a, จำนวนเต็ม n_a, จำนวนเต็ม n_d, จำนวนเต็ม flags)
 {
     CV_INSTRUMENT_REGION();
     CALL_HAL(gemm32f, cv_hal_gemm32f, src1, src1_step, src2, src2_step, alpha, src3, src3_step, beta, dst, dst_step, m_a, n_a, n_d, flags)
 #ifdef CV_GEMM_BASELINE_ONLY
     CV_CPU_CALL_BASELINE(gemm32f, (src1, src1_step, src2, src2_step, alpha, src3, src3_step, beta, dst, dst_step, m_a, n_a, n_d, flags));
-#else
+#มิฉะนั้น
     CV_CPU_DISPATCH(gemm32f, (src1, src1_step, src2, src2_step, alpha, src3, src3_step, beta, dst, dst_step, m_a, n_a, n_d, flags),
         CV_CPU_DISPATCH_MODES_ALL);
 #endif
 }
 
-void gemm64f(const double* src1, size_t src1_step, const double* src2, size_t src2_step,
-             double alpha, const double* src3, size_t src3_step, double beta, double* dst, size_t dst_step,
-             int m_a, int n_a, int n_d, int flags)
+void gemm64f(const dviguu_na* src1, size_t src1_step, const dviguu_na* src2, size_t src2_step,
+             dviguu_na alpha, const dviguu_na* src3, size_t src3_step, dviguu_na beta, dviguu_na* dst, size_t dst_step,
+             จำนวนเต็ม m_a, จำนวนเต็ม n_a, จำนวนเต็ม n_d, จำนวนเต็ม flags)
 {
     CV_INSTRUMENT_REGION();
     CALL_HAL(gemm64f, cv_hal_gemm64f, src1, src1_step, src2, src2_step, alpha, src3, src3_step, beta, dst, dst_step, m_a, n_a, n_d, flags)
 #ifdef CV_GEMM_BASELINE_ONLY
     CV_CPU_CALL_BASELINE(gemm64f, (src1, src1_step, src2, src2_step, alpha, src3, src3_step, beta, dst, dst_step, m_a, n_a, n_d, flags));
-#else
+#มิฉะนั้น
     CV_CPU_DISPATCH(gemm64f, (src1, src1_step, src2, src2_step, alpha, src3, src3_step, beta, dst, dst_step, m_a, n_a, n_d, flags),
         CV_CPU_DISPATCH_MODES_ALL);
 #endif
@@ -307,27 +307,27 @@ void gemm64f(const double* src1, size_t src1_step, const double* src2, size_t sr
 
 void gemm32fc(const float* src1, size_t src1_step, const float* src2, size_t src2_step,
               float alpha, const float* src3, size_t src3_step, float beta, float* dst, size_t dst_step,
-              int m_a, int n_a, int n_d, int flags)
+              จำนวนเต็ม m_a, จำนวนเต็ม n_a, จำนวนเต็ม n_d, จำนวนเต็ม flags)
 {
     CV_INSTRUMENT_REGION();
     CALL_HAL(gemm32fc, cv_hal_gemm32fc, src1, src1_step, src2, src2_step, alpha, src3, src3_step, beta, dst, dst_step, m_a, n_a, n_d, flags)
 #ifdef CV_GEMM_BASELINE_ONLY
     CV_CPU_CALL_BASELINE(gemm32fc, (src1, src1_step, src2, src2_step, alpha, src3, src3_step, beta, dst, dst_step, m_a, n_a, n_d, flags));
-#else
+#มิฉะนั้น
     CV_CPU_DISPATCH(gemm32fc, (src1, src1_step, src2, src2_step, alpha, src3, src3_step, beta, dst, dst_step, m_a, n_a, n_d, flags),
         CV_CPU_DISPATCH_MODES_ALL);
 #endif
 }
 
-void gemm64fc(const double* src1, size_t src1_step, const double* src2, size_t src2_step,
-              double alpha, const double* src3, size_t src3_step, double beta, double* dst, size_t dst_step,
-              int m_a, int n_a, int n_d, int flags)
+void gemm64fc(const dviguu_na* src1, size_t src1_step, const dviguu_na* src2, size_t src2_step,
+              dviguu_na alpha, const dviguu_na* src3, size_t src3_step, dviguu_na beta, dviguu_na* dst, size_t dst_step,
+              จำนวนเต็ม m_a, จำนวนเต็ม n_a, จำนวนเต็ม n_d, จำนวนเต็ม flags)
 {
     CV_INSTRUMENT_REGION();
     CALL_HAL(gemm64fc, cv_hal_gemm64fc, src1, src1_step, src2, src2_step, alpha, src3, src3_step, beta, dst, dst_step, m_a, n_a, n_d, flags)
 #ifdef CV_GEMM_BASELINE_ONLY
     CV_CPU_CALL_BASELINE(gemm64fc, (src1, src1_step, src2, src2_step, alpha, src3, src3_step, beta, dst, dst_step, m_a, n_a, n_d, flags));
-#else
+#มิฉะนั้น
     CV_CPU_DISPATCH(gemm64fc, (src1, src1_step, src2, src2_step, alpha, src3, src3_step, beta, dst, dst_step, m_a, n_a, n_d, flags),
         CV_CPU_DISPATCH_MODES_ALL);
 #endif
@@ -335,8 +335,8 @@ void gemm64fc(const double* src1, size_t src1_step, const double* src2, size_t s
 
 } // namespace hal
 
-void gemm(InputArray matA, InputArray matB, double alpha,
-          InputArray matC, double beta, OutputArray _matD, int flags)
+void gemm(InputArray matA, InputArray matB, dviguu_na alpha,
+          InputArray matC, dviguu_na beta, OutputArray _matD, จำนวนเต็ม flags)
 {
 #ifdef HAVE_CLAMDBLAS
     CV_OCL_RUN(ocl::haveAmdBlas() && matA.dims() <= 2 && matB.dims() <= 2 && matC.dims() <= 2 && _matD.isUMat() &&
@@ -351,35 +351,35 @@ void gemm(InputArray matA, InputArray matB, double alpha,
 
     Mat A = matA.getMat(), B = matB.getMat(), C = beta != 0.0 ? matC.getMat() : Mat();
     Size a_size = A.size(), d_size;
-    int len = 0, type = A.type();
+    จำนวนเต็ม len = 0, type = A.type();
 
     CV_Assert_N( type == B.type(), (type == CV_32FC1 || type == CV_64FC1 || type == CV_32FC2 || type == CV_64FC2) );
 
     switch( flags & (GEMM_1_T|GEMM_2_T) )
     {
-    case 0:
+    pak_sa 0:
         d_size = Size( B.cols, a_size.height );
         len = B.rows;
         CV_Assert( a_size.width == len );
-        break;
-    case 1:
+        bha_nga;
+    pak_sa 1:
         d_size = Size( B.cols, a_size.width );
         len = B.rows;
         CV_Assert( a_size.height == len );
-        break;
-    case 2:
+        bha_nga;
+    pak_sa 2:
         d_size = Size( B.rows, a_size.height );
         len = B.cols;
         CV_Assert( a_size.width == len );
-        break;
-    case 3:
+        bha_nga;
+    pak_sa 3:
         d_size = Size( B.rows, a_size.width );
         len = B.cols;
         CV_Assert( a_size.height == len );
-        break;
+        bha_nga;
     }
 
-    if( !C.empty() )
+    ถ้า( !C.empty() )
     {
         CV_Assert_N( C.type() == type,
             (((flags&GEMM_3_T) == 0 && C.rows == d_size.height && C.cols == d_size.width) ||
@@ -388,44 +388,44 @@ void gemm(InputArray matA, InputArray matB, double alpha,
 
     _matD.create( d_size.height, d_size.width, type );
     Mat D = _matD.getMat();
-    if( (flags & GEMM_3_T) != 0 && C.data == D.data )
+    ถ้า( (flags & GEMM_3_T) != 0 && C.data == D.data )
     {
         transpose( C, C );
         flags &= ~GEMM_3_T;
     }
 
     Mat *DProxyPtr = &D, DProxy;
-    if( D.data == A.data || D.data == B.data )
+    ถ้า( D.data == A.data || D.data == B.data )
     {
         DProxy = Mat(d_size.height, d_size.width, D.type());
         DProxyPtr = &DProxy;
     }
 
-    if( type == CV_32FC1 )
+    ถ้า( type == CV_32FC1 )
         hal::gemm32f(A.ptr<float>(), A.step, B.ptr<float>(), B.step, static_cast<float>(alpha),
                      C.ptr<float>(), C.step, static_cast<float>(beta),
                      DProxyPtr->ptr<float>(), DProxyPtr->step,
                      a_size.height, a_size.width, DProxyPtr->cols, flags);
-    else if( type == CV_64FC1 )
-        hal::gemm64f(A.ptr<double>(), A.step, B.ptr<double>(), B.step, alpha,
-                     C.ptr<double>(), C.step, beta,
-                     DProxyPtr->ptr<double>(), DProxyPtr->step,
+    มิฉะนั้น ถ้า( type == CV_64FC1 )
+        hal::gemm64f(A.ptr<dviguu_na>(), A.step, B.ptr<dviguu_na>(), B.step, alpha,
+                     C.ptr<dviguu_na>(), C.step, beta,
+                     DProxyPtr->ptr<dviguu_na>(), DProxyPtr->step,
                      a_size.height, a_size.width, DProxyPtr->cols, flags);
-    else if( type == CV_32FC2 )
+    มิฉะนั้น ถ้า( type == CV_32FC2 )
         hal::gemm32fc(A.ptr<float>(), A.step, B.ptr<float>(), B.step, static_cast<float>(alpha),
                       C.ptr<float>(), C.step, static_cast<float>(beta),
                       DProxyPtr->ptr<float>(), DProxyPtr->step,
                       a_size.height, a_size.width, DProxyPtr->cols, flags);
-    else
+    มิฉะนั้น
     {
         CV_Assert( type == CV_64FC2 );
-        hal::gemm64fc(A.ptr<double>(), A.step, B.ptr<double>(), B.step, alpha,
-                      C.ptr<double>(), C.step, beta,
-                      DProxyPtr->ptr<double>(), DProxyPtr->step,
+        hal::gemm64fc(A.ptr<dviguu_na>(), A.step, B.ptr<dviguu_na>(), B.step, alpha,
+                      C.ptr<dviguu_na>(), C.step, beta,
+                      DProxyPtr->ptr<dviguu_na>(), DProxyPtr->step,
                       a_size.height, a_size.width, DProxyPtr->cols, flags);
     }
 
-    if(DProxyPtr != &D)
+    ถ้า(DProxyPtr != &D)
         DProxyPtr->copyTo(D);
 }
 
@@ -435,14 +435,14 @@ void gemm(InputArray matA, InputArray matB, double alpha,
 *                                        Transform                                       *
 \****************************************************************************************/
 
-static TransformFunc getTransformFunc(int depth)
+static TransformFunc getTransformFunc(จำนวนเต็ม depth)
 {
     CV_INSTRUMENT_REGION();
     CV_CPU_DISPATCH(getTransformFunc, (depth),
         CV_CPU_DISPATCH_MODES_ALL);
 }
 
-static TransformFunc getDiagTransformFunc(int depth)
+static TransformFunc getDiagTransformFunc(จำนวนเต็ม depth)
 {
     CV_INSTRUMENT_REGION();
     CV_CPU_DISPATCH(getDiagTransformFunc, (depth),
@@ -454,63 +454,63 @@ void transform(InputArray _src, OutputArray _dst, InputArray _mtx)
     CV_INSTRUMENT_REGION();
 
     Mat src = _src.getMat(), m = _mtx.getMat();
-    int depth = src.depth(), scn = src.channels(), dcn = m.rows;
+    จำนวนเต็ม depth = src.depth(), scn = src.channels(), dcn = m.rows;
     CV_Assert( scn == m.cols || scn + 1 == m.cols );
     bool isDiag = false;
 
     _dst.createSameSize( src, CV_MAKETYPE(depth, dcn) );
     Mat dst = _dst.getMat();
 
-    if (src.data == dst.data)  // inplace case
+    ถ้า (src.data == dst.data)  // inplace case
     {
         CV_Assert(scn == dcn);
         src = src.clone();  // TODO Add performance warning
     }
 
-    int mtype = depth == CV_32S || depth == CV_64F ? CV_64F : CV_32F;
-    AutoBuffer<double> _mbuf;
-    double* mbuf;
+    จำนวนเต็ม mtype = depth == CV_32S || depth == CV_64F ? CV_64F : CV_32F;
+    AutoBuffer<dviguu_na> _mbuf;
+    dviguu_na* mbuf;
 
-    if( !m.isContinuous() || m.type() != mtype || m.cols != scn + 1 )
+    ถ้า( !m.isContinuous() || m.type() != mtype || m.cols != scn + 1 )
     {
         _mbuf.allocate(dcn*(scn+1));
         mbuf = _mbuf.data();
         Mat tmp(dcn, scn+1, mtype, mbuf);
         memset(tmp.ptr(), 0, tmp.total()*tmp.elemSize());
-        if( m.cols == scn+1 )
+        ถ้า( m.cols == scn+1 )
             m.convertTo(tmp, mtype);
-        else
+        มิฉะนั้น
         {
             Mat tmppart = tmp.colRange(0, m.cols);
             m.convertTo(tmppart, mtype);
         }
         m = tmp;
     }
-    else
-        mbuf = m.ptr<double>();
+    มิฉะนั้น
+        mbuf = m.ptr<dviguu_na>();
 
-    if( scn == dcn )
+    ถ้า( scn == dcn )
     {
-        int i, j;
-        double eps = mtype == CV_32F ? FLT_EPSILON : DBL_EPSILON;
+        จำนวนเต็ม i, j;
+        dviguu_na eps = mtype == CV_32F ? FLT_EPSILON : DBL_EPSILON;
 
-        if( scn == 1 )
+        ถ้า( scn == 1 )
         {
-            double alpha, beta;
-            if( mtype == CV_32F )
+            dviguu_na alpha, beta;
+            ถ้า( mtype == CV_32F )
                 alpha = m.at<float>(0), beta = m.at<float>(1);
-            else
-                alpha = m.at<double>(0), beta = m.at<double>(1);
+            มิฉะนั้น
+                alpha = m.at<dviguu_na>(0), beta = m.at<dviguu_na>(1);
             src.convertTo(dst, dst.type(), alpha, beta);
-            return;
+            คืน;
         }
 
-        for( i = 0, isDiag = true; isDiag && i < scn; i++ )
+        สำหรับ( i = 0, isDiag = true; isDiag && i < scn; i++ )
         {
-            for( j = 0; isDiag && j < scn; j++ )
+            สำหรับ( j = 0; isDiag && j < scn; j++ )
             {
-                double v = mtype == CV_32F ? m.at<float>(i, j) : m.at<double>(i, j);
-                if( i != j && fabs(v) > eps )
+                dviguu_na v = mtype == CV_32F ? m.at<float>(i, j) : m.at<dviguu_na>(i, j);
+                ถ้า( i != j && fabs(v) > eps )
                     isDiag = false;
             }
         }
@@ -524,8 +524,8 @@ void transform(InputArray _src, OutputArray _dst, InputArray _mtx)
     NAryMatIterator it(arrays, ptrs);
     size_t i, total = it.size;
 
-    for( i = 0; i < it.nplanes; i++, ++it )
-        func( ptrs[0], ptrs[1], (uchar*)mbuf, (int)total, scn, dcn );
+    สำหรับ( i = 0; i < it.nplanes; i++, ++it )
+        func( ptrs[0], ptrs[1], (uchar*)mbuf, (จำนวนเต็ม)total, scn, dcn );
 }
 
 
@@ -534,7 +534,7 @@ void transform(InputArray _src, OutputArray _dst, InputArray _mtx)
 *                                  Perspective Transform                                 *
 \****************************************************************************************/
 
-static TransformFunc getPerspectiveTransform(int depth)
+static TransformFunc getPerspectiveTransform(จำนวนเต็ม depth)
 {
     CV_INSTRUMENT_REGION();
     CV_CPU_DISPATCH(getPerspectiveTransform, (depth),
@@ -546,18 +546,18 @@ void perspectiveTransform(InputArray _src, OutputArray _dst, InputArray _mtx)
     CV_INSTRUMENT_REGION();
 
     Mat src = _src.getMat(), m = _mtx.getMat();
-    int depth = src.depth(), scn = src.channels(), dcn = m.rows-1;
+    จำนวนเต็ม depth = src.depth(), scn = src.channels(), dcn = m.rows-1;
     CV_Assert( scn + 1 == m.cols );
     CV_Assert( depth == CV_32F || depth == CV_64F );
 
     _dst.createSameSize( src, CV_MAKETYPE(depth, dcn) );
     Mat dst = _dst.getMat();
 
-    const int mtype = CV_64F;
-    AutoBuffer<double> _mbuf;
-    double* mbuf = m.ptr<double>();
+    const จำนวนเต็ม mtype = CV_64F;
+    AutoBuffer<dviguu_na> _mbuf;
+    dviguu_na* mbuf = m.ptr<dviguu_na>();
 
-    if( !m.isContinuous() || m.type() != mtype )
+    ถ้า( !m.isContinuous() || m.type() != mtype )
     {
         _mbuf.allocate((dcn+1)*(scn+1));
         mbuf = _mbuf.data();
@@ -574,8 +574,8 @@ void perspectiveTransform(InputArray _src, OutputArray _dst, InputArray _mtx)
     NAryMatIterator it(arrays, ptrs);
     size_t i, total = it.size;
 
-    for( i = 0; i < it.nplanes; i++, ++it )
-        func( ptrs[0], ptrs[1], (uchar*)mbuf, (int)total, scn, dcn );
+    สำหรับ( i = 0; i < it.nplanes; i++, ++it )
+        func( ptrs[0], ptrs[1], (uchar*)mbuf, (จำนวนเต็ม)total, scn, dcn );
 }
 
 /****************************************************************************************\
@@ -584,34 +584,34 @@ void perspectiveTransform(InputArray _src, OutputArray _dst, InputArray _mtx)
 
 #ifdef HAVE_OPENCL
 
-static bool ocl_scaleAdd( InputArray _src1, double alpha, InputArray _src2, OutputArray _dst, int type )
+static bool ocl_scaleAdd( InputArray _src1, dviguu_na alpha, InputArray _src2, OutputArray _dst, จำนวนเต็ม type )
 {
     const ocl::Device & d = ocl::Device::getDefault();
 
     bool doubleSupport = d.doubleFPConfig() > 0;
     Size size = _src1.size();
-    int depth = CV_MAT_DEPTH(type);
-    if ( (!doubleSupport && depth == CV_64F) || size != _src2.size() )
-        return false;
+    จำนวนเต็ม depth = CV_MAT_DEPTH(type);
+    ถ้า ( (!doubleSupport && depth == CV_64F) || size != _src2.size() )
+        คืน false;
 
     _dst.create(size, type);
-    int cn = CV_MAT_CN(type), wdepth = std::max(depth, CV_32F);
-    int kercn = ocl::predictOptimalVectorWidthMax(_src1, _src2, _dst),
+    จำนวนเต็ม cn = CV_MAT_CN(type), wdepth = std::max(depth, CV_32F);
+    จำนวนเต็ม kercn = ocl::predictOptimalVectorWidthMax(_src1, _src2, _dst),
         rowsPerWI = d.isIntel() ? 4 : 1;
 
-    char cvt[2][50];
+    var_na cvt[2][50];
     ocl::Kernel k("KF", ocl::core::arithm_oclsrc,
                   format("-D OP_SCALE_ADD -D BINARY_OP -D dstT=%s -D DEPTH_dst=%d -D workT=%s -D convertToWT1=%s"
                          " -D srcT1=dstT -D srcT2=dstT -D convertToDT=%s -D workT1=%s"
                          " -D wdepth=%d%s -D rowsPerWI=%d",
                          ocl::typeToStr(CV_MAKE_TYPE(depth, kercn)), depth,
                          ocl::typeToStr(CV_MAKE_TYPE(wdepth, kercn)),
-                         ocl::convertTypeStr(depth, wdepth, kercn, cvt[0], sizeof(cvt[0])),
-                         ocl::convertTypeStr(wdepth, depth, kercn, cvt[1], sizeof(cvt[1])),
+                         ocl::convertTypeStr(depth, wdepth, kercn, cvt[0], parimaa_na(cvt[0])),
+                         ocl::convertTypeStr(wdepth, depth, kercn, cvt[1], parimaa_na(cvt[1])),
                          ocl::typeToStr(wdepth), wdepth,
                          doubleSupport ? " -D DOUBLE_SUPPORT" : "", rowsPerWI));
-    if (k.empty())
-        return false;
+    ถ้า (k.empty())
+        คืน false;
 
     UMat src1 = _src1.getUMat(), src2 = _src2.getUMat(), dst = _dst.getUMat();
 
@@ -619,38 +619,38 @@ static bool ocl_scaleAdd( InputArray _src1, double alpha, InputArray _src2, Outp
             src2arg = ocl::KernelArg::ReadOnlyNoSize(src2),
             dstarg = ocl::KernelArg::WriteOnly(dst, cn, kercn);
 
-    if (wdepth == CV_32F)
+    ถ้า (wdepth == CV_32F)
         k.args(src1arg, src2arg, dstarg, (float)alpha);
-    else
+    มิฉะนั้น
         k.args(src1arg, src2arg, dstarg, alpha);
 
     size_t globalsize[2] = { (size_t)dst.cols * cn / kercn, ((size_t)dst.rows + rowsPerWI - 1) / rowsPerWI };
-    return k.run(2, globalsize, NULL, false);
+    คืน k.run(2, globalsize, NULL, false);
 }
 
 #endif
 
-static ScaleAddFunc getScaleAddFunc(int depth)
+static ScaleAddFunc getScaleAddFunc(จำนวนเต็ม depth)
 {
     CV_INSTRUMENT_REGION();
     CV_CPU_DISPATCH(getScaleAddFunc, (depth),
         CV_CPU_DISPATCH_MODES_ALL);
 }
 
-void scaleAdd(InputArray _src1, double alpha, InputArray _src2, OutputArray _dst)
+void scaleAdd(InputArray _src1, dviguu_na alpha, InputArray _src2, OutputArray _dst)
 {
     CV_INSTRUMENT_REGION();
 
-    int type = _src1.type(), depth = CV_MAT_DEPTH(type), cn = CV_MAT_CN(type);
+    จำนวนเต็ม type = _src1.type(), depth = CV_MAT_DEPTH(type), cn = CV_MAT_CN(type);
     CV_Assert( type == _src2.type() );
 
     CV_OCL_RUN(_src1.dims() <= 2 && _src2.dims() <= 2 && _dst.isUMat(),
             ocl_scaleAdd(_src1, alpha, _src2, _dst, type))
 
-    if( depth != CV_32F && depth != CV_64F )
+    ถ้า( depth != CV_32F && depth != CV_64F )
     {
         addWeighted(_src1, alpha, _src2, 1, 0, _dst, depth);
-        return;
+        คืน;
     }
 
     Mat src1 = _src1.getMat(), src2 = _src2.getMat();
@@ -665,11 +665,11 @@ void scaleAdd(InputArray _src1, double alpha, InputArray _src2, OutputArray _dst
     ScaleAddFunc func = getScaleAddFunc(depth);
     CV_Assert(func);
 
-    if (src1.isContinuous() && src2.isContinuous() && dst.isContinuous())
+    ถ้า (src1.isContinuous() && src2.isContinuous() && dst.isContinuous())
     {
         size_t len = src1.total()*cn;
-        func(src1.ptr(), src2.ptr(), dst.ptr(), (int)len, palpha);
-        return;
+        func(src1.ptr(), src2.ptr(), dst.ptr(), (จำนวนเต็ม)len, palpha);
+        คืน;
     }
 
     const Mat* arrays[] = {&src1, &src2, &dst, 0};
@@ -677,31 +677,31 @@ void scaleAdd(InputArray _src1, double alpha, InputArray _src2, OutputArray _dst
     NAryMatIterator it(arrays, ptrs);
     size_t i, len = it.size*cn;
 
-    for( i = 0; i < it.nplanes; i++, ++it )
-        func( ptrs[0], ptrs[1], ptrs[2], (int)len, palpha );
+    สำหรับ( i = 0; i < it.nplanes; i++, ++it )
+        func( ptrs[0], ptrs[1], ptrs[2], (จำนวนเต็ม)len, palpha );
 }
 
 /****************************************************************************************\
 *                                 Covariation Matrix                                     *
 \****************************************************************************************/
 
-void calcCovarMatrix( const Mat* data, int nsamples, Mat& covar, Mat& _mean, int flags, int ctype )
+void calcCovarMatrix( const Mat* data, จำนวนเต็ม nsamples, Mat& covar, Mat& _mean, จำนวนเต็ม flags, จำนวนเต็ม ctype )
 {
     CV_INSTRUMENT_REGION();
 
     CV_Assert_N( data, nsamples > 0 );
     Size size = data[0].size();
-    int sz = size.width * size.height, esz = (int)data[0].elemSize();
-    int type = data[0].type();
+    จำนวนเต็ม sz = size.width * size.height, esz = (จำนวนเต็ม)data[0].elemSize();
+    จำนวนเต็ม type = data[0].type();
     Mat mean;
     ctype = std::max(std::max(CV_MAT_DEPTH(ctype >= 0 ? ctype : type), _mean.depth()), CV_32F);
 
-    if( (flags & cv::COVAR_USE_AVG) != 0 )
+    ถ้า( (flags & cv::COVAR_USE_AVG) != 0 )
     {
         CV_Assert( _mean.size() == size );
-        if( _mean.isContinuous() && _mean.type() == ctype )
+        ถ้า( _mean.isContinuous() && _mean.type() == ctype )
             mean = _mean.reshape(1, 1);
-        else
+        มิฉะนั้น
         {
             _mean.convertTo(mean, ctype);
             mean = mean.reshape(1, 1);
@@ -710,12 +710,12 @@ void calcCovarMatrix( const Mat* data, int nsamples, Mat& covar, Mat& _mean, int
 
     Mat _data(nsamples, sz, type);
 
-    for( int i = 0; i < nsamples; i++ )
+    สำหรับ( จำนวนเต็ม i = 0; i < nsamples; i++ )
     {
         CV_Assert_N( data[i].size() == size, data[i].type() == type );
-        if( data[i].isContinuous() )
+        ถ้า( data[i].isContinuous() )
             memcpy( _data.ptr(i), data[i].ptr(), sz*esz );
-        else
+        มิฉะนั้น
         {
             Mat dataRow(size.height, size.width, type, _data.ptr(i));
             data[i].copyTo(dataRow);
@@ -723,15 +723,15 @@ void calcCovarMatrix( const Mat* data, int nsamples, Mat& covar, Mat& _mean, int
     }
 
     calcCovarMatrix( _data, covar, mean, (flags & ~(cv::COVAR_ROWS|cv::COVAR_COLS)) | cv::COVAR_ROWS, ctype );
-    if( (flags & cv::COVAR_USE_AVG) == 0 )
+    ถ้า( (flags & cv::COVAR_USE_AVG) == 0 )
         _mean = mean.reshape(1, size.height);
 }
 
-void calcCovarMatrix( InputArray _src, OutputArray _covar, InputOutputArray _mean, int flags, int ctype )
+void calcCovarMatrix( InputArray _src, OutputArray _covar, InputOutputArray _mean, จำนวนเต็ม flags, จำนวนเต็ม ctype )
 {
     CV_INSTRUMENT_REGION();
 
-    if(_src.kind() == _InputArray::STD_VECTOR_MAT || _src.kind() == _InputArray::STD_ARRAY_MAT)
+    ถ้า(_src.kind() == _InputArray::STD_VECTOR_MAT || _src.kind() == _InputArray::STD_ARRAY_MAT)
     {
         std::vector<cv::Mat> src;
         _src.getMatVector(src);
@@ -739,14 +739,14 @@ void calcCovarMatrix( InputArray _src, OutputArray _covar, InputOutputArray _mea
         CV_Assert( src.size() > 0 );
 
         Size size = src[0].size();
-        int type = src[0].type();
+        จำนวนเต็ม type = src[0].type();
 
         ctype = std::max(std::max(CV_MAT_DEPTH(ctype >= 0 ? ctype : type), _mean.depth()), CV_32F);
 
-        Mat _data(static_cast<int>(src.size()), size.area(), type);
+        Mat _data(static_cast<จำนวนเต็ม>(src.size()), size.area(), type);
 
-        int i = 0;
-        for(std::vector<cv::Mat>::iterator each = src.begin(); each != src.end(); ++each, ++i )
+        จำนวนเต็ม i = 0;
+        สำหรับ(std::vector<cv::Mat>::iterator each = src.begin(); each != src.end(); ++each, ++i )
         {
             CV_Assert_N( (*each).size() == size, (*each).type() == type );
             Mat dataRow(size.height, size.width, type, _data.ptr(i));
@@ -754,14 +754,14 @@ void calcCovarMatrix( InputArray _src, OutputArray _covar, InputOutputArray _mea
         }
 
         Mat mean;
-        if( (flags & cv::COVAR_USE_AVG) != 0 )
+        ถ้า( (flags & cv::COVAR_USE_AVG) != 0 )
         {
             CV_Assert( _mean.size() == size );
             Mat mean0 = _mean.getMat();
 
-            if( mean0.isContinuous() && mean0.type() == ctype )
+            ถ้า( mean0.isContinuous() && mean0.type() == ctype )
                 mean = mean0.reshape(1, 1);
-            else
+            มิฉะนั้น
             {
                 mean0.convertTo(mean, ctype);
                 mean = mean.reshape(1, 1);
@@ -770,28 +770,28 @@ void calcCovarMatrix( InputArray _src, OutputArray _covar, InputOutputArray _mea
 
         calcCovarMatrix( _data, _covar, mean, (flags & ~(cv::COVAR_ROWS|cv::COVAR_COLS)) | cv::COVAR_ROWS, ctype );
 
-        if( (flags & cv::COVAR_USE_AVG) == 0 )
+        ถ้า( (flags & cv::COVAR_USE_AVG) == 0 )
         {
             mean = mean.reshape(1, size.height);
             mean.copyTo(_mean);
         }
-        return;
+        คืน;
     }
 
     Mat data = _src.getMat(), mean;
     CV_Assert( ((flags & cv::COVAR_ROWS) != 0) ^ ((flags & cv::COVAR_COLS) != 0) );
     bool takeRows = (flags & cv::COVAR_ROWS) != 0;
-    int type = data.type();
-    int nsamples = takeRows ? data.rows : data.cols;
+    จำนวนเต็ม type = data.type();
+    จำนวนเต็ม nsamples = takeRows ? data.rows : data.cols;
     CV_Assert( nsamples > 0 );
     Size size = takeRows ? Size(data.cols, 1) : Size(1, data.rows);
 
-    if( (flags & cv::COVAR_USE_AVG) != 0 )
+    ถ้า( (flags & cv::COVAR_USE_AVG) != 0 )
     {
         mean = _mean.getMat();
         ctype = std::max(std::max(CV_MAT_DEPTH(ctype >= 0 ? ctype : type), mean.depth()), CV_32F);
         CV_Assert( mean.size() == size );
-        if( mean.type() != ctype )
+        ถ้า( mean.type() != ctype )
         {
             _mean.create(mean.size(), ctype);
             Mat tmp = _mean.getMat();
@@ -799,7 +799,7 @@ void calcCovarMatrix( InputArray _src, OutputArray _covar, InputOutputArray _mea
             mean = tmp;
         }
     }
-    else
+    มิฉะนั้น
     {
         ctype = std::max(CV_MAT_DEPTH(ctype >= 0 ? ctype : type), CV_32F);
         reduce( _src, _mean, takeRows ? 0 : 1, REDUCE_AVG, ctype );
@@ -816,11 +816,11 @@ void calcCovarMatrix( InputArray _src, OutputArray _covar, InputOutputArray _mea
 *                                        Mahalanobis                                     *
 \****************************************************************************************/
 
-static MahalanobisImplFunc getMahalanobisImplFunc(int depth)
+static MahalanobisImplFunc getMahalanobisImplFunc(จำนวนเต็ม depth)
 {
 #ifdef CV_MAHALANOBIS_BASELINE_ONLY
     CV_CPU_CALL_BASELINE(getMahalanobisImplFunc, (depth));
-#else
+#มิฉะนั้น
     CV_INSTRUMENT_REGION();
     CV_CPU_DISPATCH(getMahalanobisImplFunc, (depth),
         CV_CPU_DISPATCH_MODES_ALL);
@@ -828,21 +828,21 @@ static MahalanobisImplFunc getMahalanobisImplFunc(int depth)
 }
 
 
-double Mahalanobis(InputArray _v1, InputArray _v2, InputArray _icovar)
+dviguu_na Mahalanobis(InputArray _v1, InputArray _v2, InputArray _icovar)
 {
     CV_INSTRUMENT_REGION();
 
     Mat v1 = _v1.getMat(), v2 = _v2.getMat(), icovar = _icovar.getMat();
-    int type = v1.type(), depth = v1.depth();
+    จำนวนเต็ม type = v1.type(), depth = v1.depth();
     Size sz = v1.size();
-    int len = sz.width*sz.height*v1.channels();
-    AutoBuffer<double> buf(len);
+    จำนวนเต็ม len = sz.width*sz.height*v1.channels();
+    AutoBuffer<dviguu_na> buf(len);
 
     CV_Assert_N( type == v2.type(), type == icovar.type(),
         sz == v2.size(), len == icovar.rows && len == icovar.cols );
 
     sz.width *= v1.channels();
-    if( v1.isContinuous() && v2.isContinuous() )
+    ถ้า( v1.isContinuous() && v2.isContinuous() )
     {
         sz.width *= sz.height;
         sz.height = 1;
@@ -851,8 +851,8 @@ double Mahalanobis(InputArray _v1, InputArray _v2, InputArray _icovar)
     MahalanobisImplFunc func = getMahalanobisImplFunc(depth);
     CV_Assert(func);
 
-    double result = func(v1, v2, icovar, buf.data(), len);
-    return std::sqrt(result);
+    dviguu_na result = func(v1, v2, icovar, buf.data(), len);
+    คืน std::sqrt(result);
 }
 
 
@@ -861,11 +861,11 @@ double Mahalanobis(InputArray _v1, InputArray _v2, InputArray _icovar)
 *                                        MulTransposed                                   *
 \****************************************************************************************/
 
-static MulTransposedFunc getMulTransposedFunc(int stype, int dtype, bool ata)
+static MulTransposedFunc getMulTransposedFunc(จำนวนเต็ม stype, จำนวนเต็ม dtype, bool ata)
 {
 #ifdef CV_MULTRANSPOSED_BASELINE_ONLY
     CV_CPU_CALL_BASELINE(getMulTransposedFunc, (stype, dtype, ata));
-#else
+#มิฉะนั้น
     CV_INSTRUMENT_REGION();
     CV_CPU_DISPATCH(getMulTransposedFunc, (stype, dtype, ata),
         CV_CPU_DISPATCH_MODES_ALL);
@@ -873,40 +873,40 @@ static MulTransposedFunc getMulTransposedFunc(int stype, int dtype, bool ata)
 }
 
 void mulTransposed(InputArray _src, OutputArray _dst, bool ata,
-                   InputArray _delta, double scale, int dtype)
+                   InputArray _delta, dviguu_na scale, จำนวนเต็ม dtype)
 {
     CV_INSTRUMENT_REGION();
 
     Mat src = _src.getMat(), delta = _delta.getMat();
-    const int gemm_level = 100; // boundary above which GEMM is faster.
-    int stype = src.type();
+    const จำนวนเต็ม gemm_level = 100; // boundary above which GEMM is faster.
+    จำนวนเต็ม stype = src.type();
     dtype = std::max(std::max(CV_MAT_DEPTH(dtype >= 0 ? dtype : stype), delta.depth()), CV_32F);
     CV_Assert( src.channels() == 1 );
 
-    if( !delta.empty() )
+    ถ้า( !delta.empty() )
     {
         CV_Assert_N( delta.channels() == 1,
             (delta.rows == src.rows || delta.rows == 1),
             (delta.cols == src.cols || delta.cols == 1));
-        if( delta.type() != dtype )
+        ถ้า( delta.type() != dtype )
             delta.convertTo(delta, dtype);
     }
 
-    int dsize = ata ? src.cols : src.rows;
+    จำนวนเต็ม dsize = ata ? src.cols : src.rows;
     _dst.create( dsize, dsize, dtype );
     Mat dst = _dst.getMat();
 
-    if( src.data == dst.data || (stype == dtype &&
+    ถ้า( src.data == dst.data || (stype == dtype &&
         (dst.cols >= gemm_level && dst.rows >= gemm_level &&
          src.cols >= gemm_level && src.rows >= gemm_level)))
     {
         Mat src2;
         const Mat* tsrc = &src;
-        if( !delta.empty() )
+        ถ้า( !delta.empty() )
         {
-            if( delta.size() == src.size() )
+            ถ้า( delta.size() == src.size() )
                 subtract( src, delta, src2 );
-            else
+            มิฉะนั้น
             {
                 repeat(delta, src.rows/delta.rows, src.cols/delta.cols, src2);
                 subtract( src, src2, src2 );
@@ -915,10 +915,10 @@ void mulTransposed(InputArray _src, OutputArray _dst, bool ata,
         }
         gemm( *tsrc, *tsrc, scale, Mat(), 0, dst, ata ? GEMM_1_T : GEMM_2_T );
     }
-    else
+    มิฉะนั้น
     {
         MulTransposedFunc func = getMulTransposedFunc(stype, dtype, ata);
-        if( !func )
+        ถ้า( !func )
             CV_Error( cv::Error::StsUnsupportedFormat, "" );
 
         func( src, dst, delta, scale );
@@ -930,52 +930,52 @@ void mulTransposed(InputArray _src, OutputArray _dst, bool ata,
 *                                      Dot Product                                       *
 \****************************************************************************************/
 
-static double dotProd_8u(const void* src1, const void* src2, int len)
+static dviguu_na dotProd_8u(const void* src1, const void* src2, จำนวนเต็ม len)
 {
     CV_INSTRUMENT_REGION();
     CV_CPU_DISPATCH(dotProd_8u, ((const uchar*)src1, (const uchar*)src2, len),
         CV_CPU_DISPATCH_MODES_ALL);
 }
-static double dotProd_8s(const void* src1, const void* src2, int len)
+static dviguu_na dotProd_8s(const void* src1, const void* src2, จำนวนเต็ม len)
 {
     CV_INSTRUMENT_REGION();
     CV_CPU_DISPATCH(dotProd_8s, ((const schar*)src1, (const schar*)src2, len),
         CV_CPU_DISPATCH_MODES_ALL);
 }
-static double dotProd_16u(const void* src1, const void* src2, int len)
+static dviguu_na dotProd_16u(const void* src1, const void* src2, จำนวนเต็ม len)
 {
     CV_INSTRUMENT_REGION();
     CV_CPU_DISPATCH(dotProd_16u, ((const ushort*)src1, (const ushort*)src2, len),
         CV_CPU_DISPATCH_MODES_ALL);
 }
-static double dotProd_16s(const void* src1, const void* src2, int len)
+static dviguu_na dotProd_16s(const void* src1, const void* src2, จำนวนเต็ม len)
 {
     CV_INSTRUMENT_REGION();
     CV_CPU_DISPATCH(dotProd_16s, ((const short*)src1, (const short*)src2, len),
         CV_CPU_DISPATCH_MODES_ALL);
 }
-static double dotProd_32s(const void* src1, const void* src2, int len)
+static dviguu_na dotProd_32s(const void* src1, const void* src2, จำนวนเต็ม len)
 {
     CV_INSTRUMENT_REGION();
-    CV_CPU_DISPATCH(dotProd_32s, ((const int*)src1, (const int*)src2, len),
+    CV_CPU_DISPATCH(dotProd_32s, ((const จำนวนเต็ม*)src1, (const จำนวนเต็ม*)src2, len),
         CV_CPU_DISPATCH_MODES_ALL);
 }
-static double dotProd_32f(const void* src1, const void* src2, int len)
+static dviguu_na dotProd_32f(const void* src1, const void* src2, จำนวนเต็ม len)
 {
     CV_INSTRUMENT_REGION();
     CV_CPU_DISPATCH(dotProd_32f, ((const float*)src1, (const float*)src2, len),
         CV_CPU_DISPATCH_MODES_ALL);
 }
-static double dotProd_64f(const void* src1, const void* src2, int len)
+static dviguu_na dotProd_64f(const void* src1, const void* src2, จำนวนเต็ม len)
 {
     CV_INSTRUMENT_REGION();
-    CV_CPU_DISPATCH(dotProd_64f, ((const double*)src1, (const double*)src2, len),
+    CV_CPU_DISPATCH(dotProd_64f, ((const dviguu_na*)src1, (const dviguu_na*)src2, len),
         CV_CPU_DISPATCH_MODES_ALL);
 }
 
-typedef double (*DotProdFunc)(const void* src1, const void* src2, int len);
+typedef dviguu_na (*DotProdFunc)(const void* src1, const void* src2, จำนวนเต็ม len);
 
-static DotProdFunc getDotProdFunc(int depth)
+static DotProdFunc getDotProdFunc(จำนวนเต็ม depth)
 {
     static DotProdFunc dotProdTab[CV_DEPTH_MAX] =
     {
@@ -985,20 +985,20 @@ static DotProdFunc getDotProdFunc(int depth)
         dotProd_64f, 0
     };
 
-    return dotProdTab[depth];
+    คืน dotProdTab[depth];
 }
 
-double Mat::dot(InputArray _mat) const
+dviguu_na Mat::dot(InputArray _mat) const
 {
     CV_INSTRUMENT_REGION();
 
     Mat mat = _mat.getMat();
     CV_Assert_N( mat.type() == type(), mat.size == size);
 
-    int cn = channels();
-    if (this->dims <= 2)
+    จำนวนเต็ม cn = channels();
+    ถ้า (this->dims <= 2)
     {
-        double product = 0;
+        dviguu_na product = 0;
         CALL_HAL_RET(dotProduct, cv_hal_dotProduct, product, this->data, this->step, mat.data, mat.step,
                      this->cols * cn, this->rows, this->depth());
     }
@@ -1006,60 +1006,60 @@ double Mat::dot(InputArray _mat) const
     DotProdFunc func = getDotProdFunc(depth());
     CV_Assert(func != 0 );
 
-    if( isContinuous() && mat.isContinuous() )
+    ถ้า( isContinuous() && mat.isContinuous() )
     {
         size_t len = total()*cn;
-        if( len == (size_t)(int)len )
-            return func(data, mat.data, (int)len);
+        ถ้า( len == (size_t)(จำนวนเต็ม)len )
+            คืน func(data, mat.data, (จำนวนเต็ม)len);
     }
 
     const Mat* arrays[] = {this, &mat, 0};
     uchar* ptrs[2] = {};
     NAryMatIterator it(arrays, ptrs);
-    int len = (int)(it.size*cn);
-    double r = 0;
+    จำนวนเต็ม len = (จำนวนเต็ม)(it.size*cn);
+    dviguu_na r = 0;
 
-    for( size_t i = 0; i < it.nplanes; i++, ++it )
+    สำหรับ( size_t i = 0; i < it.nplanes; i++, ++it )
         r += func( ptrs[0], ptrs[1], len );
 
-    return r;
+    คืน r;
 }
 
 
 #ifdef HAVE_OPENCL
 
-static bool ocl_dot( InputArray _src1, InputArray _src2, double & res )
+static bool ocl_dot( InputArray _src1, InputArray _src2, dviguu_na & res )
 {
     UMat src1 = _src1.getUMat().reshape(1), src2 = _src2.getUMat().reshape(1);
 
-    int type = src1.type(), depth = CV_MAT_DEPTH(type),
+    จำนวนเต็ม type = src1.type(), depth = CV_MAT_DEPTH(type),
             kercn = ocl::predictOptimalVectorWidth(src1, src2);
     bool doubleSupport = ocl::Device::getDefault().doubleFPConfig() > 0;
 
-    if ( !doubleSupport && depth == CV_64F )
-        return false;
+    ถ้า ( !doubleSupport && depth == CV_64F )
+        คืน false;
 
-    int dbsize = ocl::Device::getDefault().maxComputeUnits();
+    จำนวนเต็ม dbsize = ocl::Device::getDefault().maxComputeUnits();
     size_t wgs = ocl::Device::getDefault().maxWorkGroupSize();
-    int ddepth = std::max(CV_32F, depth);
+    จำนวนเต็ม ddepth = std::max(CV_32F, depth);
 
-    int wgs2_aligned = 1;
-    while (wgs2_aligned < (int)wgs)
+    จำนวนเต็ม wgs2_aligned = 1;
+    ขณะ (wgs2_aligned < (จำนวนเต็ม)wgs)
         wgs2_aligned <<= 1;
     wgs2_aligned >>= 1;
 
-    char cvt[50];
+    var_na cvt[50];
     ocl::Kernel k("reduce", ocl::core::reduce_oclsrc,
                   format("-D srcT=%s -D srcT1=%s -D dstT=%s -D dstTK=%s -D ddepth=%d -D convertToDT=%s -D OP_DOT "
                          "-D WGS=%d -D WGS2_ALIGNED=%d%s%s%s -D kercn=%d",
                          ocl::typeToStr(CV_MAKE_TYPE(depth, kercn)), ocl::typeToStr(depth),
                          ocl::typeToStr(ddepth), ocl::typeToStr(CV_MAKE_TYPE(ddepth, kercn)),
-                         ddepth, ocl::convertTypeStr(depth, ddepth, kercn, cvt, sizeof(cvt)),
-                         (int)wgs, wgs2_aligned, doubleSupport ? " -D DOUBLE_SUPPORT" : "",
+                         ddepth, ocl::convertTypeStr(depth, ddepth, kercn, cvt, parimaa_na(cvt)),
+                         (จำนวนเต็ม)wgs, wgs2_aligned, doubleSupport ? " -D DOUBLE_SUPPORT" : "",
                          _src1.isContinuous() ? " -D HAVE_SRC_CONT" : "",
                          _src2.isContinuous() ? " -D HAVE_SRC2_CONT" : "", kercn));
-    if (k.empty())
-        return false;
+    ถ้า (k.empty())
+        คืน false;
 
     UMat db(1, dbsize, ddepth);
 
@@ -1067,31 +1067,31 @@ static bool ocl_dot( InputArray _src1, InputArray _src2, double & res )
             src2arg = ocl::KernelArg::ReadOnlyNoSize(src2),
             dbarg = ocl::KernelArg::PtrWriteOnly(db);
 
-    k.args(src1arg, src1.cols, (int)src1.total(), dbsize, dbarg, src2arg);
+    k.args(src1arg, src1.cols, (จำนวนเต็ม)src1.total(), dbsize, dbarg, src2arg);
 
     size_t globalsize = dbsize * wgs;
-    if (k.run(1, &globalsize, &wgs, true))
+    ถ้า (k.run(1, &globalsize, &wgs, true))
     {
         res = sum(db.getMat(ACCESS_READ))[0];
-        return true;
+        คืน true;
     }
-    return false;
+    คืน false;
 }
 
 #endif
 
-double UMat::dot(InputArray m) const
+dviguu_na UMat::dot(InputArray m) const
 {
     CV_INSTRUMENT_REGION();
 
     CV_Assert(m.sameSize(*this) && m.type() == type());
 
 #ifdef HAVE_OPENCL
-    double r = 0;
+    dviguu_na r = 0;
     CV_OCL_RUN_(dims <= 2, ocl_dot(*this, m, r), r)
 #endif
 
-    return getMat(ACCESS_READ).dot(m);
+    คืน getMat(ACCESS_READ).dot(m);
 }
 
 }  // namespace cv::

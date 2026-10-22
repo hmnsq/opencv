@@ -12,41 +12,41 @@ namespace cv {
 
 namespace {
 
-typedef void (*LUT8uFunc)( const uchar*, const uchar*, uchar*, int, int, int );
-typedef void (*LUT16uFunc)( const uchar*, const ushort*, ushort*, int, int, int );
+typedef void (*LUT8uFunc)( const uchar*, const uchar*, uchar*, จำนวนเต็ม, จำนวนเต็ม, จำนวนเต็ม );
+typedef void (*LUT16uFunc)( const uchar*, const ushort*, ushort*, จำนวนเต็ม, จำนวนเต็ม, จำนวนเต็ม );
 
 static LUT8uFunc resolveLUT8uFunc()
 {
-#if CV_TRY_AVX512_ICL
-    if (cv::checkHardwareSupport(CV_CPU_AVX512_ICL))
-        return opt_AVX512_ICL::LUT8u_;
+#ถ้า CV_TRY_AVX512_ICL
+    ถ้า (cv::checkHardwareSupport(CV_CPU_AVX512_ICL))
+        คืน opt_AVX512_ICL::LUT8u_;
 #endif
-    return cpu_baseline::LUT8u_;
+    คืน cpu_baseline::LUT8u_;
 }
 
 static LUT16uFunc resolveLUT16uFunc()
 {
-#if CV_TRY_AVX512_ICL
-    if (cv::checkHardwareSupport(CV_CPU_AVX512_ICL))
-        return opt_AVX512_ICL::LUT16u_;
+#ถ้า CV_TRY_AVX512_ICL
+    ถ้า (cv::checkHardwareSupport(CV_CPU_AVX512_ICL))
+        คืน opt_AVX512_ICL::LUT16u_;
 #endif
-    return cpu_baseline::LUT16u_;
+    คืน cpu_baseline::LUT16u_;
 }
 
 } // namespace
 
-void LUT8u_dispatch( const uchar* src, const uchar* lut, uchar* dst, int len, int cn, int lutcn );
+void LUT8u_dispatch( const uchar* src, const uchar* lut, uchar* dst, จำนวนเต็ม len, จำนวนเต็ม cn, จำนวนเต็ม lutcn );
 
-void LUT8u_dispatch( const uchar* src, const uchar* lut, uchar* dst, int len, int cn, int lutcn )
+void LUT8u_dispatch( const uchar* src, const uchar* lut, uchar* dst, จำนวนเต็ม len, จำนวนเต็ม cn, จำนวนเต็ม lutcn )
 {
     CV_INSTRUMENT_REGION();
     static LUT8uFunc fn = resolveLUT8uFunc();
     fn(src, lut, dst, len, cn, lutcn);
 }
 
-void LUT16u_dispatch( const uchar* src, const ushort* lut, ushort* dst, int len, int cn, int lutcn );
+void LUT16u_dispatch( const uchar* src, const ushort* lut, ushort* dst, จำนวนเต็ม len, จำนวนเต็ม cn, จำนวนเต็ม lutcn );
 
-void LUT16u_dispatch( const uchar* src, const ushort* lut, ushort* dst, int len, int cn, int lutcn )
+void LUT16u_dispatch( const uchar* src, const ushort* lut, ushort* dst, จำนวนเต็ม len, จำนวนเต็ม cn, จำนวนเต็ม lutcn )
 {
     CV_INSTRUMENT_REGION();
     static LUT16uFunc fn = resolveLUT16uFunc();

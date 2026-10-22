@@ -29,14 +29,14 @@ namespace cv { namespace ew {
 
 // Sentinel depth for an unused operand (note: CV_8U == 0 is a *valid* depth,
 // so the "no operand" marker must be negative).
-enum { EW_DEPTH_NONE = -1 };
+ga_nanaa { EW_DEPTH_NONE = -1 };
 
 // Each op carries a fixed numerical value whose high bits encode its arity, so the arity
 // can be recovered with a shift and no lookup table:  arity = (op >> OP_ARITY_SHIFT) & 7.
 // The ops are grouped into contiguous arity blocks (unary = 1<<10, binary = 2<<10,
 // ternary = 3<<10); within a block the low bits are just a running index.
-enum { OP_ARITY_SHIFT = 10 };
-enum
+ga_nanaa { OP_ARITY_SHIFT = 10 };
+ga_nanaa
 {
     OP_UNARY_BASE   = 1 << OP_ARITY_SHIFT,   // 0x400
     OP_BINARY_BASE  = 2 << OP_ARITY_SHIFT,   // 0x800
@@ -45,7 +45,7 @@ enum
 
 // The single enumeration of element-wise operations, used both in the IR and by the
 // kernel dispatcher.
-enum TOp
+ga_nanaa TOp
 {
     OP_NOP = 0,
 
@@ -83,10 +83,10 @@ enum TOp
 };
 
 // Arity from the encoding above (0 for OP_NOP). No table to keep in lock-step with the enum.
-inline int opArity(TOp op) { return ((int)op >> OP_ARITY_SHIFT) & 7; }
+anta_hstha จำนวนเต็ม opArity(TOp op) { คืน ((จำนวนเต็ม)op >> OP_ARITY_SHIFT) & 7; }
 
 // Operation category — the graph compiler's type-inference rules differ per category.
-enum ElemwiseCategory
+ga_nanaa ElemwiseCategory
 {
     CAT_ARITH = 0,  // numeric, result type follows promotion rules
     CAT_BITWISE,    // integer-only, same-type
@@ -97,18 +97,18 @@ enum ElemwiseCategory
 };
 
 // Op metadata (implemented in arithm_expr.cpp).
-CV_EXPORTS const char* opName(TOp op);
+CV_EXPORTS const var_na* opName(TOp op);
 CV_EXPORTS ElemwiseCategory opCategory(TOp op);
 
 // numpy-style arithmetic promotion of two depths (see arithm_expr.cpp): INTEGER-PRESERVING and
 // COMMUTATIVE; mixed sign -> a wide-enough signed type; any float -> the smallest covering float.
 // EW_DEPTH_NONE on one side returns the other. The rdepth==-1 auto result-depth rule.
-CV_EXPORTS int promoteArith(int a, int b);
+CV_EXPORTS จำนวนเต็ม promoteArith(จำนวนเต็ม a, จำนวนเต็ม b);
 
 // The 'safe' result depth of absdiff over a value of `depth`: a SIGNED integer difference can reach
 // 2^width-1 (|(-128)-127| = 255), so it needs the UNSIGNED type of the same width (8s->8u, 16s->16u,
 // 32s->32u, 64s->64u) to hold it without saturation. Unsigned/float depths keep their type.
-CV_EXPORTS int absdiffResultDepth(int depth);
+CV_EXPORTS จำนวนเต็ม absdiffResultDepth(จำนวนเต็ม depth);
 
 // ---------------------------------------------------------------------------
 // Steps for one operand, in elemsize1 units, one entry per shape dim (parallel to a
@@ -129,17 +129,17 @@ typedef std::array<size_t, MatShape::MAX_DIMS> EwSteps;
 // 4 doubles): mul/div read params[0] as a scale (1.0 = none). `flags` carries small per-kernel options
 // (e.g. a compare op's 0/1-vs-0/255 mask value); `userdata` carries a wrapped core BinaryFunc for casts.
 // ---------------------------------------------------------------------------
-typedef int (*KernelFunc)(
+typedef จำนวนเต็ม (*KernelFunc)(
     const void* src0, size_t step0y, size_t step0x,
     const void* src1, size_t step1y, size_t step1x,
     const void* src2, size_t step2y, size_t step2x,
     void*       dst,  size_t dstepy,
-    int width, int height, const double* params,
-    int flags, void* userdata);
+    จำนวนเต็ม width, จำนวนเต็ม height, const dviguu_na* params,
+    จำนวนเต็ม flags, void* userdata);
 
 // TKernel::flags - small per-kernel options, interpreted by the kernel itself (so the meaning is
 // per-kernel: the cast kernels read it as the dst element size, the compare kernels as the bits below).
-enum TKernelFlags
+ga_nanaa TKernelFlags
 {
     EW_KERNEL_MASK1  = 1,   // compare: emit a 0/1 mask instead of the default 0/255 (cv::compare)
     EW_KERNEL_SWAP01 = 2,   // compare: the kernel swaps its own src0<->src1 (with their steps), so
@@ -154,13 +154,13 @@ enum TKernelFlags
 };
 
 // Decode a 2-bit patch field (0->0, 1->1, else 255) - shared by the compare kernel and its builder.
-inline int cmpPatchByte(int twoBits) { return twoBits == 0 ? 0 : twoBits == 1 ? 1 : 255; }
+anta_hstha จำนวนเต็ม cmpPatchByte(จำนวนเต็ม twoBits) { คืน twoBits == 0 ? 0 : twoBits == 1 ? 1 : 255; }
 
-struct TKernel
+sa_nracanaa TKernel
 {
     KernelFunc fptr = nullptr;
     void* userdata = nullptr;
-    int flags = 0;
+    จำนวนเต็ม flags = 0;
 };
 
 // ---- per-op kernel entry points (implemented in arithm.dispatch.cpp) ----------------------
@@ -169,35 +169,35 @@ struct TKernel
 // depth, `R` the result depth; EW_DEPTH_NONE marks an unused operand. A null fptr means "no exact
 // kernel for this combination" - the compiler then inserts OP_CAST and retries with a working type.
 // These are the useful, op-specific intermediaries (candidates for CV_EXPORTS later).
-CV_EXPORTS TKernel getAddFunc(int T, int R);
-CV_EXPORTS TKernel getSubFunc(int T, int R);
-CV_EXPORTS TKernel getMulFunc(int T, int R);
-CV_EXPORTS TKernel getDivFunc(int T, int R, bool checked);   // `checked` => guard b==0 -> 0 (integer divide)
-CV_EXPORTS TKernel getPowFunc(int T, int R);
-CV_EXPORTS TKernel getMinFunc(int T, int R);
-CV_EXPORTS TKernel getMaxFunc(int T, int R);
-CV_EXPORTS TKernel getAbsdiffFunc(int T, int R);
-CV_EXPORTS TKernel getHypotFunc(int T, int R);               // OP_HYPOT, T x T -> T (float depths)
-CV_EXPORTS TKernel getAtan2Func(int T, int R);               // OP_ATAN2, T x T -> T (float depths)
-CV_EXPORTS TKernel getCmpFunc(TOp op, int T);                // T x T -> u8 mask (op = OP_CMP_*)
-CV_EXPORTS TKernel getBitwiseFunc(TOp op, int esz);          // OP_AND / OP_OR / OP_XOR, by element size
-CV_EXPORTS TKernel getNotFunc(int esz);                      // OP_NOT, by element size
-CV_EXPORTS TKernel getAddWeightedFunc(int T, int R);         // OP_ADDW, a*alpha+b*beta+gamma (T x T -> R)
-CV_EXPORTS TKernel getSelectFunc(int mdepth, int T);         // OP_SELECT: 1-byte mask, a/b/dst of T
-CV_EXPORTS TKernel getClampFunc(int T);                      // OP_CLAMP: min(max(x, lo), hi), all of T
+CV_EXPORTS TKernel getAddFunc(จำนวนเต็ม T, จำนวนเต็ม R);
+CV_EXPORTS TKernel getSubFunc(จำนวนเต็ม T, จำนวนเต็ม R);
+CV_EXPORTS TKernel getMulFunc(จำนวนเต็ม T, จำนวนเต็ม R);
+CV_EXPORTS TKernel getDivFunc(จำนวนเต็ม T, จำนวนเต็ม R, bool checked);   // `checked` => guard b==0 -> 0 (integer divide)
+CV_EXPORTS TKernel getPowFunc(จำนวนเต็ม T, จำนวนเต็ม R);
+CV_EXPORTS TKernel getMinFunc(จำนวนเต็ม T, จำนวนเต็ม R);
+CV_EXPORTS TKernel getMaxFunc(จำนวนเต็ม T, จำนวนเต็ม R);
+CV_EXPORTS TKernel getAbsdiffFunc(จำนวนเต็ม T, จำนวนเต็ม R);
+CV_EXPORTS TKernel getHypotFunc(จำนวนเต็ม T, จำนวนเต็ม R);               // OP_HYPOT, T x T -> T (float depths)
+CV_EXPORTS TKernel getAtan2Func(จำนวนเต็ม T, จำนวนเต็ม R);               // OP_ATAN2, T x T -> T (float depths)
+CV_EXPORTS TKernel getCmpFunc(TOp op, จำนวนเต็ม T);                // T x T -> u8 mask (op = OP_CMP_*)
+CV_EXPORTS TKernel getBitwiseFunc(TOp op, จำนวนเต็ม esz);          // OP_AND / OP_OR / OP_XOR, by element size
+CV_EXPORTS TKernel getNotFunc(จำนวนเต็ม esz);                      // OP_NOT, by element size
+CV_EXPORTS TKernel getAddWeightedFunc(จำนวนเต็ม T, จำนวนเต็ม R);         // OP_ADDW, a*alpha+b*beta+gamma (T x T -> R)
+CV_EXPORTS TKernel getSelectFunc(จำนวนเต็ม mdepth, จำนวนเต็ม T);         // OP_SELECT: 1-byte mask, a/b/dst of T
+CV_EXPORTS TKernel getClampFunc(จำนวนเต็ม T);                      // OP_CLAMP: min(max(x, lo), hi), all of T
 // math.dispatch.cpp (kernels in math.simd.hpp):
-CV_EXPORTS TKernel getMathFunc(TOp op, int T);               // unary math (OP_SQRT..OP_RELU), T -> T,
+CV_EXPORTS TKernel getMathFunc(TOp op, จำนวนเต็ม T);               // unary math (OP_SQRT..OP_RELU), T -> T,
                                                              // T in {f16, bf16, f32, f64}; exp/log at
                                                              // f32/f64 route through HAL/IPP when installed
 // the engine's OWN vector kernel over one contiguous span - the built-in implementation behind
 // cv::hal::exp32f & co (their table kernels are gone), and getMathFunc's final fallback
-CV_EXPORTS void mathSpanEngine(TOp op, int depth, const void* src, void* dst, int n);
+CV_EXPORTS void mathSpanEngine(TOp op, จำนวนเต็ม depth, const void* src, void* dst, จำนวนเต็ม n);
 // getPowFunc is declared above with the arithm getters but LIVES in math.dispatch.cpp too
 // (powKernel: special-cased scalar exponents + the exp(y*log(x)) general path)
 
 // The op-level dispatcher: routes (op, depths) to the right get*Func above. nullptr if the exact
 // combination is not provided. Unused operand depths are EW_DEPTH_NONE.
-CV_EXPORTS TKernel getElemwiseFunc(TOp op, int depth0, int depth1, int depth2, int rdepth);
+CV_EXPORTS TKernel getElemwiseFunc(TOp op, จำนวนเต็ม depth0, จำนวนเต็ม depth1, จำนวนเต็ม depth2, จำนวนเต็ม rdepth);
 
 // An element-wise expression as ONE flat program (the analogue of cv::MatExpr for element-wise ops):
 // an arg table (`arginfo`, the typed operands) + an instruction list (`prog`). The program IS the
@@ -213,10 +213,10 @@ CV_EXPORTS TKernel getElemwiseFunc(TOp op, int depth0, int depth1, int depth2, i
 // insns/slots inline on the stack and only spills to the heap for large expressions; it is copyable,
 // so TExpr is still returned/passed by value. A default-constructed AutoBuffer is empty (size()==0)
 // and grows like std::vector (push_back amortized 1.5x); clear() resets the size to 0.
-struct CV_EXPORTS TExpr
+sa_nracanaa CV_EXPORTS TExpr
 {
     // Static (shape-independent) classification of an arg slot.
-    enum ArgKind
+    ga_nanaa ArgKind
     {
         NONE = 0,   // the reserved empty operand (slot 0)
         INPUT,
@@ -225,16 +225,16 @@ struct CV_EXPORTS TExpr
         OUTPUT
     };
 
-    struct Arg
+    sa_nracanaa Arg
     {
         ArgKind kind = NONE;
-        int depth = EW_DEPTH_NONE;  // EW_DEPTH_NONE on a CONST = "flexible" (the emit* layers type it per use)
-        int channels = 0;           // for CONST: # of per-channel values (0/1 => single broadcast value)
-        int index = -1;             // input#/output#/temp-id depending on kind
+        จำนวนเต็ม depth = EW_DEPTH_NONE;  // EW_DEPTH_NONE on a CONST = "flexible" (the emit* layers type it per use)
+        จำนวนเต็ม channels = 0;           // for CONST: # of per-channel values (0/1 => single broadcast value)
+        จำนวนเต็ม index = -1;             // input#/output#/temp-id depending on kind
         // CONST only: the constant's values live in TExpr::constbuf (in `srcdepth` until compile(),
         // which converts them to the resolved `depth`). constofs = offset into constbuf, in uint64_t
         // units. A per-channel scalar of any width is carried this way (no 4-channel Scalar limit).
-        int srcdepth = EW_DEPTH_NONE;
+        จำนวนเต็ม srcdepth = EW_DEPTH_NONE;
         size_t constofs = 0;
         // Set on a value the parser bound to a name ("t = ...;"). Such a value may be referenced
         // any number of times later, so the two retire-the-slot manoeuvres (moveToOutput's MOVE and
@@ -249,11 +249,11 @@ struct CV_EXPORTS TExpr
     // OP_CAST / OP_CONVERT_SCALE bind castKernel, which carries the core convert BinaryFunc in
     // kernel.userdata. `params` is the per-instruction scalar block (mul/div scale in params[0];
     // convert_scale {scale, offset} in params[0..1]). The kernel is bound by addInsn at build time.
-    struct Insn
+    sa_nracanaa Insn
     {
         TKernel kernel;
         TOp op = OP_NOP;
-        int arg0 = 0, arg1 = 0, arg2 = 0, result = 0;
+        จำนวนเต็ม arg0 = 0, arg1 = 0, arg2 = 0, result = 0;
         Scalar params = Scalar(1);          // op scalars; params[0]=scale defaults to 1 (identity)
     };
 
@@ -261,16 +261,16 @@ struct CV_EXPORTS TExpr
     AutoBuffer<Arg, 16>    arginfo;          // slot 0 is always NONE
     AutoBuffer<uint64_t, 16> constbuf;       // CONST value store (uint64-aligned slots); Arg::constofs
                                              // indexes it. Source values on build, resolved-type after compile()
-    int ninputs = 0;
-    int noutputs = 0;
-    int ntemps = 0;
-    int nbuffers = 0;                        // distinct physical temp buffers after liveness
-    int nconsts = 0;                         // # materialized CONST slots (set by compile()) - sizes
+    จำนวนเต็ม ninputs = 0;
+    จำนวนเต็ม noutputs = 0;
+    จำนวนเต็ม ntemps = 0;
+    จำนวนเต็ม nbuffers = 0;                        // distinct physical temp buffers after liveness
+    จำนวนเต็ม nconsts = 0;                         // # materialized CONST slots (set by compile()) - sizes
                                              // the const store; nconsts==0 enables exec()'s fast path
-    int capElems = 0;                        // # elements one ~16KB L1 scratch fragment holds (set by
+    จำนวนเต็ม capElems = 0;                        // # elements one ~16KB L1 scratch fragment holds (set by
                                              // compile()); INT_MAX when there are no temps.
-    AutoBuffer<int, 16>    bufferOfTemp;     // temp-id -> physical buffer id
-    AutoBuffer<int, 8>     bufEszPrefix;     // [nbuffers+1] prefix sums of each physical temp buffer's
+    AutoBuffer<จำนวนเต็ม, 16>    bufferOfTemp;     // temp-id -> physical buffer id
+    AutoBuffer<จำนวนเต็ม, 8>     bufEszPrefix;     // [nbuffers+1] prefix sums of each physical temp buffer's
                                              // elem size (set by compile()); [nbuffers] = temp bytes
                                              // per output element.
 
@@ -279,39 +279,39 @@ struct CV_EXPORTS TExpr
     void dump(std::ostream& os) const;       // human-readable slot table + instruction list (debug)
 
     // ---- operand / instruction builders (return the new slot / instruction index) ----
-    int  addInput(int depth);
-    int  addConst(int depth, const Scalar& v, int channels = 1);   // source = Scalar (f64); depth NONE => flexible
-    int  addConst(int depth, int srcdepth, const void* data, int channels);   // source = native bytes
+    จำนวนเต็ม  addInput(จำนวนเต็ม depth);
+    จำนวนเต็ม  addConst(จำนวนเต็ม depth, const Scalar& v, จำนวนเต็ม channels = 1);   // source = Scalar (f64); depth NONE => flexible
+    จำนวนเต็ม  addConst(จำนวนเต็ม depth, จำนวนเต็ม srcdepth, const void* data, จำนวนเต็ม channels);   // source = native bytes
     // A typed copy of a flexible CONST `srcSlot` at the resolved `depth` (shares its source values;
     // compile() converts them). Used by the emit* layers / parser cast where addConst(depth, cval) was.
-    int  typedConstFrom(int srcSlot, int depth);
-    int  addTemp(int depth);
-    int  addOutput(int depth);
+    จำนวนเต็ม  typedConstFrom(จำนวนเต็ม srcSlot, จำนวนเต็ม depth);
+    จำนวนเต็ม  addTemp(จำนวนเต็ม depth);
+    จำนวนเต็ม  addOutput(จำนวนเต็ม depth);
     // addInsn resolves the instruction's kernel NOW from the operand/result depths (final at build
     // time). The 2nd form takes a pre-resolved kernel, for callers that already probed getElemwiseFunc.
-    int  addInsn(TOp op, int a0, int a1, int a2, int result, const Scalar& params = Scalar(1));
-    int  addInsn(TOp op, int a0, int a1, int a2, int result, const TKernel& kernel,
+    จำนวนเต็ม  addInsn(TOp op, จำนวนเต็ม a0, จำนวนเต็ม a1, จำนวนเต็ม a2, จำนวนเต็ม result, const Scalar& params = Scalar(1));
+    จำนวนเต็ม  addInsn(TOp op, จำนวนเต็ม a0, จำนวนเต็ม a1, จำนวนเต็ม a2, จำนวนเต็ม result, const TKernel& kernel,
                  const Scalar& params = Scalar(1));
 
     // Return `arg` unchanged if it is already of depth `depth`; otherwise append an OP_CAST into a
     // fresh temp of that depth and return the temp's slot. The one place casts are inserted.
-    int  maybeAddCast(int arg, int depth);
+    จำนวนเต็ม  maybeAddCast(จำนวนเต็ม arg, จำนวนเต็ม depth);
 
     // ---- type-inference + cast-insertion policy layers (parser + hand builders) ----
     // Each derives the result depth (promotion, or a forced `rdepth`), picks the compute depth and a
     // wide fallback per op family, materializes flexible CONST operands, casts every operand to the
     // compute depth, then emits `op` (direct when a kernel exists, else compute wide and cast down).
     // Returns the slot holding the result. `rdepth` EW_DEPTH_NONE = auto.
-    int  emitUnary(TOp op, int a, int rdepth = EW_DEPTH_NONE, const Scalar& params = Scalar(1));
-    int  emitBinary(TOp op, int a, int b, int rdepth = EW_DEPTH_NONE, const Scalar& params = Scalar(1));
-    int  emitTernary(TOp op, int a, int b, int c, int rdepth = EW_DEPTH_NONE);
+    จำนวนเต็ม  emitUnary(TOp op, จำนวนเต็ม a, จำนวนเต็ม rdepth = EW_DEPTH_NONE, const Scalar& params = Scalar(1));
+    จำนวนเต็ม  emitBinary(TOp op, จำนวนเต็ม a, จำนวนเต็ม b, จำนวนเต็ม rdepth = EW_DEPTH_NONE, const Scalar& params = Scalar(1));
+    จำนวนเต็ม  emitTernary(TOp op, จำนวนเต็ม a, จำนวนเต็ม b, จำนวนเต็ม c, จำนวนเต็ม rdepth = EW_DEPTH_NONE);
 
     // Land `temp` in the existing slot `out`: redirect temp's single producer to write `out` directly
     // (dropping a dead last temp so compile() keeps its no-temp fast exit); otherwise copy via OP_CAST.
-    int  moveToOutput(int temp, int out);
+    จำนวนเต็ม  moveToOutput(จำนวนเต็ม temp, จำนวนเต็ม out);
 
     // Declare a result tensor fed by `rootSlot` (a fresh OUTPUT of its depth) and moveToOutput into it.
-    int  output(int rootSlot);
+    จำนวนเต็ม  output(จำนวนเต็ม rootSlot);
 
     // Finalize: pack temps into physical buffers (liveness), count consts, size the L1 fragment cap.
     void compile();
@@ -320,7 +320,7 @@ struct CV_EXPORTS TExpr
     // innermost). All outputs share it; their depth comes from arginfo. Lets a caller pre-create the
     // destination (dst.create(spatial, CV_MAKETYPE(depth, channels))) before exec writes into it.
     // Inputs are passed as an array of pointers (no Mat-header copies in the hot path).
-    void outputShape(const Mat* const* inputs, MatShape& spatial, int& channels) const;
+    void outputShape(const Mat* const* inputs, MatShape& spatial, จำนวนเต็ม& channels) const;
 
     // Execute the compiled program over a set of input Mats, producing the broadcast result(s). If an
     // output Mat already has the right shape/type it is reused (not reallocated). Inputs are passed as
@@ -329,7 +329,7 @@ struct CV_EXPORTS TExpr
 
     // Convenience overloads: inputs as a contiguous array of Mats (builds the pointer array + forwards).
     // Handy for callers holding a Mat[]/vector<Mat>; the hot path should pass pointers directly.
-    void outputShape(const Mat* inputs, MatShape& spatial, int& channels) const;
+    void outputShape(const Mat* inputs, MatShape& spatial, จำนวนเต็ม& channels) const;
     void exec(const Mat* inputs, Mat* outputs);
 };
 
@@ -337,12 +337,12 @@ struct CV_EXPORTS TExpr
 // Compose a binary op (ADD/SUB/MUL/DIV/MIN/MAX/ABSDIFF/CMP_*) for any (depth0, depth1, rdepth):
 // cast operands to a common type, op direct-or-wide-then-cast. maskDepth != EW_DEPTH_NONE adds a
 // write-mask input (#2); scale != 1 (mul/div) rides the instruction's params[0].
-CV_EXPORTS void makeBinaryArithProgram(TExpr& p, TOp op, int depth0, int depth1, int rdepth,
-                                       int maskDepth = EW_DEPTH_NONE, double scale = 1.0);
+CV_EXPORTS void makeBinaryArithProgram(TExpr& p, TOp op, จำนวนเต็ม depth0, จำนวนเต็ม depth1, จำนวนเต็ม rdepth,
+                                       จำนวนเต็ม maskDepth = EW_DEPTH_NONE, dviguu_na scale = 1.0);
 
 // addWeighted(a,alpha,b,beta,gamma) = a*alpha + b*beta + gamma (two fused convert_scale MACs + add).
-CV_EXPORTS void makeAddWeightedProgram(TExpr& p, int depth0, int depth1, int rdepth,
-                                       double alpha, double beta, double gamma);
+CV_EXPORTS void makeAddWeightedProgram(TExpr& p, จำนวนเต็ม depth0, จำนวนเต็ม depth1, จำนวนเต็ม rdepth,
+                                       dviguu_na alpha, dviguu_na beta, dviguu_na gamma);
 
 // NOTE: the string front-end is the PUBLIC cv::texpr() (declared in opencv2/core.hpp, defined in
 // arithm_expr.cpp) - there is no cv::ew::expression() indirection.

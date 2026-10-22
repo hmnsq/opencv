@@ -39,7 +39,7 @@
 //
 //M*/
 
-#if defined(HAVE_DIRECTX)
+#ถ้า defined(HAVE_DIRECTX)
 #include <d3d11.h>
 #include <d3d10.h>
 #include <d3d9.h>

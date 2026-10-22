@@ -87,41 +87,41 @@ static void _initSystem()
 static Mutex* __initialization_mutex = NULL;
 Mutex& getInitializationMutex()
 {
-    if (__initialization_mutex == NULL)
+    ถ้า (__initialization_mutex == NULL)
     {
         (void)_initSystem();
         __initialization_mutex = new Mutex();
     }
-    return *__initialization_mutex;
+    คืน *__initialization_mutex;
 }
 // force initialization (single-threaded environment)
 Mutex* __initialization_mutex_initializer = &getInitializationMutex();
 
 static bool param_dumpErrors = utils::getConfigurationParameterBool("OPENCV_DUMP_ERRORS",
-#if defined(_DEBUG) || defined(__ANDROID__)
+#ถ้า defined(_DEBUG) || defined(__ANDROID__)
     true
-#else
+#มิฉะนั้น
     false
 #endif
 );
 
-void* allocSingletonBuffer(size_t size) { return fastMalloc(size); }
-void* allocSingletonNewBuffer(size_t size) { return malloc(size); }
+void* allocSingletonBuffer(size_t size) { คืน fastMalloc(size); }
+void* allocSingletonNewBuffer(size_t size) { คืน malloc(size); }
 
 
 } // namespace cv
 
 #ifndef CV_ERROR_SET_TERMINATE_HANDLER  // build config option
-# if defined(_WIN32)
+# ถ้า defined(_WIN32)
 #   define CV_ERROR_SET_TERMINATE_HANDLER 1
 # endif
 #endif
-#if defined(CV_ERROR_SET_TERMINATE_HANDLER) && !CV_ERROR_SET_TERMINATE_HANDLER
+#ถ้า defined(CV_ERROR_SET_TERMINATE_HANDLER) && !CV_ERROR_SET_TERMINATE_HANDLER
 # undef CV_ERROR_SET_TERMINATE_HANDLER
 #endif
 
 #ifdef _MSC_VER
-# if _MSC_VER >= 1700
+# ถ้า _MSC_VER >= 1700
 #  pragma warning(disable:4447) // Disable warning 'main' signature found without threading model
 # endif
 #endif
@@ -130,29 +130,29 @@ void* allocSingletonNewBuffer(size_t size) { return malloc(size); }
 #include <cstdlib>        // std::abort
 #endif
 
-#if defined __ANDROID__ || defined __unix__ || defined __FreeBSD__ || defined __OpenBSD__ || defined __HAIKU__ || defined __Fuchsia__ || defined __QNX__
+#ถ้า defined __ANDROID__ || defined __unix__ || defined __FreeBSD__ || defined __OpenBSD__ || defined __HAIKU__ || defined __Fuchsia__ || defined __QNX__
 #  include <unistd.h>
 #  include <fcntl.h>
-#if defined __QNX__
+#ถ้า defined __QNX__
 #  include <sys/elf.h>
 #  include <sys/auxv.h>
 using Elf64_auxv_t = auxv64_t;
 #  include <elfdefinitions.h>
 const uint64_t AT_HWCAP = NT_GNU_HWCAP;
-#else
+#มิฉะนั้น
 #  include <elf.h>
 #endif
-#if defined __ANDROID__ || defined __linux__
+#ถ้า defined __ANDROID__ || defined __linux__
 #  include <linux/auxvec.h>
 #endif
 #endif
 
-#if defined __ANDROID__ && defined HAVE_CPUFEATURES
+#ถ้า defined __ANDROID__ && defined HAVE_CPUFEATURES
 #  include <cpu-features.h>
 #endif
 
 
-#if ((defined __ppc64__ || defined __PPC64__) && (defined HAVE_GETAUXVAL || defined HAVE_ELF_AUX_INFO))
+#ถ้า ((defined __ppc64__ || defined __PPC64__) && (defined HAVE_GETAUXVAL || defined HAVE_ELF_AUX_INFO))
 # include "sys/auxv.h"
 # ifndef AT_HWCAP2
 #   define AT_HWCAP2 26
@@ -168,22 +168,22 @@ const uint64_t AT_HWCAP = NT_GNU_HWCAP;
 # endif
 #endif
 
-#if defined __loongarch64
+#ถ้า defined __loongarch64
 #include "sys/auxv.h"
 #define LA_HWCAP_LSX   (1<<4)
 #define LA_HWCAP_LASX  (1<<5)
 #endif
 
-#if defined _WIN32 || defined WINCE
+#ถ้า defined _WIN32 || defined WINCE
 #ifndef _WIN32_WINNT           // This is needed for the declaration of TryEnterCriticalSection in winbase.h with Visual Studio 2005 (and older?)
   #define _WIN32_WINNT 0x0400  // http://msdn.microsoft.com/en-us/library/ms686857(VS.85).aspx
 #endif
 #include <windows.h>
 #include <combaseapi.h>
-#if (_WIN32_WINNT >= 0x0602)
+#ถ้า (_WIN32_WINNT >= 0x0602)
   #include <synchapi.h>
 #endif
-#if ((_WIN32_WINNT >= 0x0600) && !defined(CV_DISABLE_FLS)) || defined(CV_FORCE_FLS)
+#ถ้า ((_WIN32_WINNT >= 0x0600) && !defined(CV_DISABLE_FLS)) || defined(CV_FORCE_FLS)
   #include <fibersapi.h>
   #define CV_USE_FLS
 #endif
@@ -203,8 +203,8 @@ const uint64_t AT_HWCAP = NT_GNU_HWCAP;
 std::wstring GetTempPathWinRT()
 {
 #ifdef __cplusplus_winrt
-    return std::wstring(Windows::Storage::ApplicationData::Current->TemporaryFolder->Path->Data());
-#else
+    คืน std::wstring(Windows::Storage::ApplicationData::Current->TemporaryFolder->Path->Data());
+#มิฉะนั้น
     Microsoft::WRL::ComPtr<ABI::Windows::Storage::IApplicationDataStatics> appdataFactory;
     Microsoft::WRL::ComPtr<ABI::Windows::Storage::IApplicationData> appdataRef;
     Microsoft::WRL::ComPtr<ABI::Windows::Storage::IStorageFolder> storagefolderRef;
@@ -212,23 +212,23 @@ std::wstring GetTempPathWinRT()
     HSTRING str;
     HSTRING_HEADER hstrHead;
     std::wstring wstr;
-    if (FAILED(WindowsCreateStringReference(RuntimeClass_Windows_Storage_ApplicationData,
+    ถ้า (FAILED(WindowsCreateStringReference(RuntimeClass_Windows_Storage_ApplicationData,
                                             (UINT32)wcslen(RuntimeClass_Windows_Storage_ApplicationData), &hstrHead, &str)))
-        return wstr;
-    if (FAILED(RoGetActivationFactory(str, IID_PPV_ARGS(appdataFactory.ReleaseAndGetAddressOf()))))
-        return wstr;
-    if (FAILED(appdataFactory->get_Current(appdataRef.ReleaseAndGetAddressOf())))
-        return wstr;
-    if (FAILED(appdataRef->get_TemporaryFolder(storagefolderRef.ReleaseAndGetAddressOf())))
-        return wstr;
-    if (FAILED(storagefolderRef.As(&storageitemRef)))
-        return wstr;
+        คืน wstr;
+    ถ้า (FAILED(RoGetActivationFactory(str, IID_PPV_ARGS(appdataFactory.ReleaseAndGetAddressOf()))))
+        คืน wstr;
+    ถ้า (FAILED(appdataFactory->get_Current(appdataRef.ReleaseAndGetAddressOf())))
+        คืน wstr;
+    ถ้า (FAILED(appdataRef->get_TemporaryFolder(storagefolderRef.ReleaseAndGetAddressOf())))
+        คืน wstr;
+    ถ้า (FAILED(storagefolderRef.As(&storageitemRef)))
+        คืน wstr;
     str = NULL;
-    if (FAILED(storageitemRef->get_Path(&str)))
-        return wstr;
+    ถ้า (FAILED(storageitemRef->get_Path(&str)))
+        คืน wstr;
     wstr = WindowsGetStringRawBuffer(str, NULL);
     WindowsDeleteString(str);
-    return wstr;
+    คืน wstr;
 #endif
 }
 
@@ -238,23 +238,23 @@ std::wstring GetTempFileNameWinRT(std::wstring prefix)
     GUID g;
     CoCreateGuid(&g);
     wchar_t* mask = L"%08x_%04x_%04x_%02x%02x_%02x%02x%02x%02x%02x%02x";
-    swprintf(&guidStr[0], sizeof(guidStr)/sizeof(wchar_t), mask,
+    swprintf(&guidStr[0], parimaa_na(guidStr)/parimaa_na(wchar_t), mask,
              g.Data1, g.Data2, g.Data3, UINT(g.Data4[0]), UINT(g.Data4[1]),
              UINT(g.Data4[2]), UINT(g.Data4[3]), UINT(g.Data4[4]),
              UINT(g.Data4[5]), UINT(g.Data4[6]), UINT(g.Data4[7]));
 
-    return prefix.append(std::wstring(guidStr));
+    คืน prefix.append(std::wstring(guidStr));
 }
 
 #endif
-#else
+#มิฉะนั้น
 #ifndef OPENCV_DISABLE_THREAD_SUPPORT
 #include <pthread.h>
 #endif
 #include <sys/time.h>
 #include <time.h>
 
-#if defined __MACH__ && defined __APPLE__
+#ถ้า defined __MACH__ && defined __APPLE__
 #include <mach/mach.h>
 #include <mach/mach_time.h>
 #include <sys/sysctl.h>
@@ -266,11 +266,11 @@ std::wstring GetTempFileNameWinRT(std::wstring prefix)
 #include "omp.h"
 #endif
 
-#if defined __unix__ || defined __APPLE__ || defined __EMSCRIPTEN__ || defined __FreeBSD__ || defined __OpenBSD__ || defined __GLIBC__ || defined __HAIKU__
+#ถ้า defined __unix__ || defined __APPLE__ || defined __EMSCRIPTEN__ || defined __FreeBSD__ || defined __OpenBSD__ || defined __GLIBC__ || defined __HAIKU__
 #include <unistd.h>
 #include <stdio.h>
 #include <sys/types.h>
-#if defined __ANDROID__
+#ถ้า defined __ANDROID__
 #include <sys/sysconf.h>
 #endif
 #endif
@@ -283,19 +283,19 @@ std::wstring GetTempFileNameWinRT(std::wstring prefix)
 DECLARE_CV_CPUID_X86
 #endif
 #ifndef CV_CPUID_X86
-  #if defined _MSC_VER && (defined _M_IX86 || defined _M_X64)
-    #if _MSC_VER >= 1400  // MSVS 2005
+  #ถ้า defined _MSC_VER && (defined _M_IX86 || defined _M_X64)
+    #ถ้า _MSC_VER >= 1400  // MSVS 2005
       #include <intrin.h>  // __cpuidex()
       #define CV_CPUID_X86 __cpuidex
-    #else
+    #มิฉะนั้น
       #error "Required MSVS 2005+"
     #endif
   #elif defined __GNUC__ && (defined __i386__ || defined __x86_64__)
-    static void cv_cpuid(int* cpuid_data, int reg_eax, int reg_ecx)
+    static void cv_cpuid(จำนวนเต็ม* cpuid_data, จำนวนเต็ม reg_eax, จำนวนเต็ม reg_ecx)
     {
-        int __eax = reg_eax, __ebx = 0, __ecx = reg_ecx, __edx = 0;
+        จำนวนเต็ม __eax = reg_eax, __ebx = 0, __ecx = reg_ecx, __edx = 0;
 // tested with available compilers (-fPIC -O2 -m32/-m64): https://godbolt.org/
-#if !defined(__PIC__) \
+#ถ้า !defined(__PIC__) \
     || defined(__x86_64__) || __GNUC__ >= 5 \
     || defined(__clang__) || defined(__INTEL_COMPILER)
         __asm__("cpuid\n\t"
@@ -307,7 +307,7 @@ DECLARE_CV_CPUID_X86
                 "xchg{l}\t{%%}ebx, %1\n\t"
                 : "+a" (__eax), "=&r" (__ebx), "+c" (__ecx), "=d" (__edx)
         );
-#else
+#มิฉะนั้น
 #error "Configuration error"
 #endif
         cpuid_data[0] = __eax; cpuid_data[1] = __ebx; cpuid_data[2] = __ecx; cpuid_data[3] = __edx;
@@ -323,7 +323,7 @@ namespace cv
 
 Exception::Exception() { code = Error::StsOk; line = 0; }
 
-Exception::Exception(Error::Code _code, const String& _err, const String& _func, const String& _file, int _line)
+Exception::Exception(Error::Code _code, const String& _err, const String& _func, const String& _file, จำนวนเต็ม _line)
 : code(_code), err(_err), func(_func), file(_file), line(_line)
 {
     formatMessage();
@@ -334,115 +334,115 @@ Exception::~Exception() CV_NOEXCEPT {}
 /*!
  \return the error description and the context as a text string.
  */
-const char* Exception::what() const CV_NOEXCEPT { return msg.c_str(); }
+const var_na* Exception::what() const CV_NOEXCEPT { คืน msg.c_str(); }
 
 void Exception::formatMessage()
 {
     size_t pos = err.find('\n');
     bool multiline = pos != cv::String::npos;
-    if (multiline)
+    ถ้า (multiline)
     {
         std::stringstream ss;
         size_t prev_pos = 0;
-        while (pos != cv::String::npos)
+        ขณะ (pos != cv::String::npos)
         {
            ss << "> " << err.substr(prev_pos, pos - prev_pos) << std::endl;
            prev_pos = pos + 1;
            pos = err.find('\n', prev_pos);
         }
         ss << "> " << err.substr(prev_pos);
-        if (err[err.size() - 1] != '\n')
+        ถ้า (err[err.size() - 1] != '\n')
             ss << std::endl;
         err = ss.str();
     }
-    if (func.size() > 0)
+    ถ้า (func.size() > 0)
     {
-        if (multiline)
+        ถ้า (multiline)
             msg = format("OpenCV(%s) %s:%d: error: (%d:%s) in function '%s'\n%s", CV_VERSION, file.c_str(), line, code, codeMessage(), func.c_str(), err.c_str());
-        else
+        มิฉะนั้น
             msg = format("OpenCV(%s) %s:%d: error: (%d:%s) %s in function '%s'\n", CV_VERSION, file.c_str(), line, code, codeMessage(), err.c_str(), func.c_str());
     }
-    else
+    มิฉะนั้น
     {
         msg = format("OpenCV(%s) %s:%d: error: (%d:%s) %s%s", CV_VERSION, file.c_str(), line, code, codeMessage(), err.c_str(), multiline ? "" : "\n");
     }
 }
 
-const char * Exception::codeMessage() const
+const var_na * Exception::codeMessage() const
 {
     switch (code)
     {
-    case cv::Error::StsOk :                  return "No Error";
-    case cv::Error::StsBackTrace :           return "Backtrace";
-    case cv::Error::StsError :               return "Unspecified error";
-    case cv::Error::StsInternal :            return "Internal error";
-    case cv::Error::StsNoMem :               return "Insufficient memory";
-    case cv::Error::StsBadArg :              return "Bad argument";
-    case cv::Error::StsNoConv :              return "Iterations do not converge";
-    case cv::Error::StsAutoTrace :           return "Autotrace call";
-    case cv::Error::StsBadSize :             return "Incorrect size of input array";
-    case cv::Error::StsNullPtr :             return "Null pointer";
-    case cv::Error::StsDivByZero :           return "Division by zero occurred";
-    case cv::Error::BadStep :                return "Image step is wrong";
-    case cv::Error::StsInplaceNotSupported : return "Inplace operation is not supported";
-    case cv::Error::StsObjectNotFound :      return "Requested object was not found";
-    case cv::Error::BadDepth :               return "Input image depth is not supported by function";
-    case cv::Error::StsUnmatchedFormats :    return "Formats of input arguments do not match";
-    case cv::Error::StsUnmatchedSizes :      return "Sizes of input arguments do not match";
-    case cv::Error::StsOutOfRange :          return "One of the arguments\' values is out of range";
-    case cv::Error::StsUnsupportedFormat :   return "Unsupported format or combination of formats";
-    case cv::Error::BadCOI :                 return "Input COI is not supported";
-    case cv::Error::BadNumChannels :         return "Bad number of channels";
-    case cv::Error::StsBadFlag :             return "Bad flag (parameter or structure field)";
-    case cv::Error::StsBadPoint :            return "Bad parameter of type CvPoint";
-    case cv::Error::StsBadMask :             return "Bad type of mask argument";
-    case cv::Error::StsParseError :          return "Parsing error";
-    case cv::Error::StsNotImplemented :      return "The function/feature is not implemented";
-    case cv::Error::StsBadMemBlock :         return "Memory block has been corrupted";
-    case cv::Error::StsAssert :              return "Assertion failed";
-    case cv::Error::GpuNotSupported :        return "No CUDA support";
-    case cv::Error::GpuApiCallError :        return "Gpu API call";
-    case cv::Error::OpenGlNotSupported :     return "No OpenGL support";
-    case cv::Error::OpenGlApiCallError :     return "OpenGL API call";
-    case cv::Error::OpenCLApiCallError :     return "OpenCL API call error";
-    case cv::Error::OpenCLDoubleNotSupported:return "OpenCL device does not support double";
-    case cv::Error::OpenCLInitError :        return "OpenCL initialization error";
-    case cv::Error::OpenCLNoAMDBlasFft :     return "Missing OpenCL AMD BLAS FFT";
+    pak_sa cv::Error::StsOk :                  คืน "No Error";
+    pak_sa cv::Error::StsBackTrace :           คืน "Backtrace";
+    pak_sa cv::Error::StsError :               คืน "Unspecified error";
+    pak_sa cv::Error::StsInternal :            คืน "Internal error";
+    pak_sa cv::Error::StsNoMem :               คืน "Insufficient memory";
+    pak_sa cv::Error::StsBadArg :              คืน "Bad argument";
+    pak_sa cv::Error::StsNoConv :              คืน "Iterations do not converge";
+    pak_sa cv::Error::StsAutoTrace :           คืน "Autotrace call";
+    pak_sa cv::Error::StsBadSize :             คืน "Incorrect size of input array";
+    pak_sa cv::Error::StsNullPtr :             คืน "Null pointer";
+    pak_sa cv::Error::StsDivByZero :           คืน "Division by zero occurred";
+    pak_sa cv::Error::BadStep :                คืน "Image step is wrong";
+    pak_sa cv::Error::StsInplaceNotSupported : คืน "Inplace operation is not supported";
+    pak_sa cv::Error::StsObjectNotFound :      คืน "Requested object was not found";
+    pak_sa cv::Error::BadDepth :               คืน "Input image depth is not supported by function";
+    pak_sa cv::Error::StsUnmatchedFormats :    คืน "Formats of input arguments do not match";
+    pak_sa cv::Error::StsUnmatchedSizes :      คืน "Sizes of input arguments do not match";
+    pak_sa cv::Error::StsOutOfRange :          คืน "One of the arguments\' values is out of range";
+    pak_sa cv::Error::StsUnsupportedFormat :   คืน "Unsupported format or combination of formats";
+    pak_sa cv::Error::BadCOI :                 คืน "Input COI is not supported";
+    pak_sa cv::Error::BadNumChannels :         คืน "Bad number of channels";
+    pak_sa cv::Error::StsBadFlag :             คืน "Bad flag (parameter or structure field)";
+    pak_sa cv::Error::StsBadPoint :            คืน "Bad parameter of type CvPoint";
+    pak_sa cv::Error::StsBadMask :             คืน "Bad type of mask argument";
+    pak_sa cv::Error::StsParseError :          คืน "Parsing error";
+    pak_sa cv::Error::StsNotImplemented :      คืน "The function/feature is not implemented";
+    pak_sa cv::Error::StsBadMemBlock :         คืน "Memory block has been corrupted";
+    pak_sa cv::Error::StsAssert :              คืน "Assertion failed";
+    pak_sa cv::Error::GpuNotSupported :        คืน "No CUDA support";
+    pak_sa cv::Error::GpuApiCallError :        คืน "Gpu API call";
+    pak_sa cv::Error::OpenGlNotSupported :     คืน "No OpenGL support";
+    pak_sa cv::Error::OpenGlApiCallError :     คืน "OpenGL API call";
+    pak_sa cv::Error::OpenCLApiCallError :     คืน "OpenCL API call error";
+    pak_sa cv::Error::OpenCLDoubleNotSupported:คืน "OpenCL device does not support double";
+    pak_sa cv::Error::OpenCLInitError :        คืน "OpenCL initialization error";
+    pak_sa cv::Error::OpenCLNoAMDBlasFft :     คืน "Missing OpenCL AMD BLAS FFT";
     default:
     {
-        static char buf[256] {0};
-        snprintf(buf, sizeof(buf), "Unknown %s code %d", code >= 0 ? "status":"error", code);
-        return buf;
+        static var_na buf[256] {0};
+        snprintf(buf, parimaa_na(buf), "Unknown %s code %d", code >= 0 ? "status":"error", code);
+        คืน buf;
     }
     };
 
 }
 
-static const char* g_hwFeatureNames[CV_HARDWARE_MAX_FEATURE] = { NULL };
+static const var_na* g_hwFeatureNames[CV_HARDWARE_MAX_FEATURE] = { NULL };
 
-static const char* getHWFeatureName(int id)
+static const var_na* getHWFeatureName(จำนวนเต็ม id)
 {
-    return (0 <= id && id < CV_HARDWARE_MAX_FEATURE) ? g_hwFeatureNames[id] : NULL;
+    คืน (0 <= id && id < CV_HARDWARE_MAX_FEATURE) ? g_hwFeatureNames[id] : NULL;
 }
-static const char* getHWFeatureNameSafe(int id)
+static const var_na* getHWFeatureNameSafe(จำนวนเต็ม id)
 {
-    const char* name = getHWFeatureName(id);
-    return name ? name : "Unknown feature";
+    const var_na* name = getHWFeatureName(id);
+    คืน name ? name : "Unknown feature";
 }
 
-struct HWFeatures
+sa_nracanaa HWFeatures
 {
-    enum { MAX_FEATURE = CV_HARDWARE_MAX_FEATURE };
+    ga_nanaa { MAX_FEATURE = CV_HARDWARE_MAX_FEATURE };
 
     HWFeatures(bool run_initialize = false)
     {
-        if (run_initialize)
+        ถ้า (run_initialize)
             initialize();
     }
 
     static void initializeNames()
     {
-        for (int i = 0; i < CV_HARDWARE_MAX_FEATURE; i++)
+        สำหรับ (จำนวนเต็ม i = 0; i < CV_HARDWARE_MAX_FEATURE; i++)
         {
             g_hwFeatureNames[i] = 0;
         }
@@ -505,7 +505,7 @@ struct HWFeatures
 
     void initialize(void)
     {
-        if (utils::getConfigurationParameterBool("OPENCV_DUMP_CONFIG"))
+        ถ้า (utils::getConfigurationParameterBool("OPENCV_DUMP_CONFIG"))
         {
             fprintf(stderr, "\nOpenCV build configuration is:\n%s\n",
                 cv::getBuildInformation().c_str());
@@ -514,13 +514,13 @@ struct HWFeatures
         initializeNames();
 
     #ifdef CV_CPUID_X86
-        int cpuid_data[4] = { 0, 0, 0, 0 };
-        int cpuid_data_ex[4] = { 0, 0, 0, 0 };
+        จำนวนเต็ม cpuid_data[4] = { 0, 0, 0, 0 };
+        จำนวนเต็ม cpuid_data_ex[4] = { 0, 0, 0, 0 };
 
         CV_CPUID_X86(cpuid_data, 1, 0/*unused*/);
 
-        int x86_family = (cpuid_data[0] >> 8) & 15;
-        if( x86_family >= 6 )
+        จำนวนเต็ม x86_family = (cpuid_data[0] >> 8) & 15;
+        ถ้า( x86_family >= 6 )
         {
             have[CV_CPU_MMX]    = (cpuid_data[3] & (1<<23)) != 0;
             have[CV_CPU_SSE]    = (cpuid_data[3] & (1<<25)) != 0;
@@ -557,29 +557,29 @@ struct HWFeatures
             have[CV_CPU_AVX_5124FMAPS]    = (cpuid_data_ex[3] & (1<<3))  != 0;
 
             // CPUID leaf 7, subleaf 1 for AVX-VNNI
-            int cpuid_data_ex1[4] = { 0, 0, 0, 0 };
+            จำนวนเต็ม cpuid_data_ex1[4] = { 0, 0, 0, 0 };
             CV_CPUID_X86(cpuid_data_ex1, 7, 1);
             have[CV_CPU_AVX_VNNI]         = (cpuid_data_ex1[0] & (1<<4))  != 0;
 
             bool have_AVX_OS_support = true;
             bool have_AVX512_OS_support = true;
-            if (!(cpuid_data[2] & (1<<27)))
+            ถ้า (!(cpuid_data[2] & (1<<27)))
                 have_AVX_OS_support = false; // OS uses XSAVE_XRSTORE and CPU support AVX
-            else
+            มิฉะนั้น
             {
-                int xcr0 = 0;
+                จำนวนเต็ม xcr0 = 0;
             #ifdef _XCR_XFEATURE_ENABLED_MASK // requires immintrin.h
-                xcr0 = (int)_xgetbv(_XCR_XFEATURE_ENABLED_MASK);
+                xcr0 = (จำนวนเต็ม)_xgetbv(_XCR_XFEATURE_ENABLED_MASK);
             #elif defined __GNUC__ && (defined __i386__ || defined __x86_64__)
                 __asm__ ("xgetbv\n\t" : "=a" (xcr0) : "c" (0) : "%edx" );
             #endif
-                if ((xcr0 & 0x6) != 0x6)
+                ถ้า ((xcr0 & 0x6) != 0x6)
                     have_AVX_OS_support = false; // YMM registers
-                if ((xcr0 & 0xe6) != 0xe6)
+                ถ้า ((xcr0 & 0xe6) != 0xe6)
                     have_AVX512_OS_support = false; // ZMM registers
             }
 
-            if (!have_AVX_OS_support)
+            ถ้า (!have_AVX_OS_support)
             {
                 have[CV_CPU_AVX] = false;
                 have[CV_CPU_FP16] = false;
@@ -587,7 +587,7 @@ struct HWFeatures
                 have[CV_CPU_FMA3] = false;
                 have[CV_CPU_AVX_VNNI] = false;
             }
-            if (!have_AVX_OS_support || !have_AVX512_OS_support)
+            ถ้า (!have_AVX_OS_support || !have_AVX512_OS_support)
             {
                 have[CV_CPU_AVX_512F] = false;
                 have[CV_CPU_AVX_512BW] = false;
@@ -607,7 +607,7 @@ struct HWFeatures
             }
 
             have[CV_CPU_AVX512_COMMON] = have[CV_CPU_AVX_512F] && have[CV_CPU_AVX_512CD];
-            if (have[CV_CPU_AVX512_COMMON])
+            ถ้า (have[CV_CPU_AVX512_COMMON])
             {
                 have[CV_CPU_AVX512_KNL] = have[CV_CPU_AVX_512ER]  && have[CV_CPU_AVX_512PF];
                 have[CV_CPU_AVX512_KNM] = have[CV_CPU_AVX512_KNL] && have[CV_CPU_AVX_5124FMAPS] &&
@@ -620,7 +620,7 @@ struct HWFeatures
                                           have[CV_CPU_AVX_512VNNI] &&
                                           have[CV_CPU_AVX_512VBMI2] && have[CV_CPU_AVX_512BITALG] && have[CV_CPU_AVX_512VPOPCNTDQ];
             }
-            else
+            มิฉะนั้น
             {
                 have[CV_CPU_AVX512_KNL] = false;
                 have[CV_CPU_AVX512_KNM] = false;
@@ -632,28 +632,28 @@ struct HWFeatures
         }
     #endif // CV_CPUID_X86
 
-    #if defined __ANDROID__ || defined __linux__ || defined __QNX__
+    #ถ้า defined __ANDROID__ || defined __linux__ || defined __QNX__
     #ifdef __aarch64__
         have[CV_CPU_NEON] = true;
         have[CV_CPU_FP16] = true;
-        int cpufile = open("/proc/self/auxv", O_RDONLY);
+        จำนวนเต็ม cpufile = open("/proc/self/auxv", O_RDONLY);
 
-        if (cpufile >= 0)
+        ถ้า (cpufile >= 0)
         {
             Elf64_auxv_t auxv;
-            const size_t size_auxv_t = sizeof(auxv);
+            const size_t size_auxv_t = parimaa_na(auxv);
 
-            while ((size_t)read(cpufile, &auxv, size_auxv_t) == size_auxv_t)
+            ขณะ ((size_t)read(cpufile, &auxv, size_auxv_t) == size_auxv_t)
             {
                 // see https://elixir.bootlin.com/linux/latest/source/arch/arm64/include/uapi/asm/hwcap.h
-                if (auxv.a_type == AT_HWCAP)
+                ถ้า (auxv.a_type == AT_HWCAP)
                 {
                     have[CV_CPU_NEON_DOTPROD] = (auxv.a_un.a_val & (1 << 20)) != 0; // HWCAP_ASIMDDP
                     have[CV_CPU_NEON_FP16] = (auxv.a_un.a_val & (1 << 10)) != 0; // HWCAP_ASIMDHP
                     have[CV_CPU_SVE] = (auxv.a_un.a_val & (1 << 22)) != 0; // HWCAP_SVE
                 }
-#if defined(AT_HWCAP2)
-                else if (auxv.a_type == AT_HWCAP2)
+#ถ้า defined(AT_HWCAP2)
+                มิฉะนั้น ถ้า (auxv.a_type == AT_HWCAP2)
                 {
                     have[CV_CPU_NEON_BF16] = (auxv.a_un.a_val & (1 << 14)) != 0; // HWCAP2_BF16
                 }
@@ -663,42 +663,42 @@ struct HWFeatures
             close(cpufile);
         }
     #elif defined __arm__ && defined __ANDROID__
-      #if defined HAVE_CPUFEATURES
+      #ถ้า defined HAVE_CPUFEATURES
         CV_LOG_INFO(NULL, "calling android_getCpuFeatures() ...");
         uint64_t features = android_getCpuFeatures();
         CV_LOG_INFO(NULL, cv::format("calling android_getCpuFeatures() ... Done (%llx)", (long long)features));
         have[CV_CPU_NEON] = (features & ANDROID_CPU_ARM_FEATURE_NEON) != 0;
         have[CV_CPU_FP16] = (features & ANDROID_CPU_ARM_FEATURE_VFP_FP16) != 0;
-      #else
+      #มิฉะนั้น
         CV_LOG_INFO(NULL, "cpufeatures library is not available for CPU detection");
-        #if CV_NEON
+        #ถ้า CV_NEON
         CV_LOG_INFO(NULL, "- NEON instructions is enabled via build flags");
         have[CV_CPU_NEON] = true;
-        #else
+        #มิฉะนั้น
         CV_LOG_INFO(NULL, "- NEON instructions is NOT enabled via build flags");
         #endif
-        #if CV_FP16
+        #ถ้า CV_FP16
         CV_LOG_INFO(NULL, "- FP16 instructions is enabled via build flags");
         have[CV_CPU_FP16] = true;
-        #else
+        #มิฉะนั้น
         CV_LOG_INFO(NULL, "- FP16 instructions is NOT enabled via build flags");
         #endif
       #endif
     #elif defined __arm__
-        int cpufile = open("/proc/self/auxv", O_RDONLY);
+        จำนวนเต็ม cpufile = open("/proc/self/auxv", O_RDONLY);
 
-        if (cpufile >= 0)
+        ถ้า (cpufile >= 0)
         {
             Elf32_auxv_t auxv;
-            const size_t size_auxv_t = sizeof(auxv);
+            const size_t size_auxv_t = parimaa_na(auxv);
 
-            while ((size_t)read(cpufile, &auxv, size_auxv_t) == size_auxv_t)
+            ขณะ ((size_t)read(cpufile, &auxv, size_auxv_t) == size_auxv_t)
             {
-                if (auxv.a_type == AT_HWCAP)
+                ถ้า (auxv.a_type == AT_HWCAP)
                 {
                     have[CV_CPU_NEON] = (auxv.a_un.a_val & 4096) != 0;
                     have[CV_CPU_FP16] = (auxv.a_un.a_val & 2) != 0;
-                    break;
+                    bha_nga;
                 }
             }
 
@@ -706,39 +706,39 @@ struct HWFeatures
         }
     #endif
     #elif (defined __APPLE__)
-    #if defined __ARM_NEON
+    #ถ้า defined __ARM_NEON
         have[CV_CPU_NEON] = true;
     #endif
-    #if (defined __ARM_FP  && (((__ARM_FP & 0x2) != 0) && defined __ARM_NEON))
+    #ถ้า (defined __ARM_FP  && (((__ARM_FP & 0x2) != 0) && defined __ARM_NEON))
         have[CV_CPU_FP16] = have[CV_CPU_NEON_FP16] = true;
     #endif
     // system.cpp may be compiled w/o special -march=armv8...+dotprod, -march=armv8...+bf16 etc.,
     // so we check for the features in any case, no mater what are the compile flags.
     // We check the real hardware capabilities here.
-    int has_feat_dotprod = 0;
-    size_t has_feat_dotprod_size = sizeof(has_feat_dotprod);
+    จำนวนเต็ม has_feat_dotprod = 0;
+    size_t has_feat_dotprod_size = parimaa_na(has_feat_dotprod);
     sysctlbyname("hw.optional.arm.FEAT_DotProd", &has_feat_dotprod, &has_feat_dotprod_size, NULL, 0);
-    if (has_feat_dotprod) {
+    ถ้า (has_feat_dotprod) {
         have[CV_CPU_NEON_DOTPROD] = true;
     }
-    int has_feat_bf16 = 0;
-    size_t has_feat_bf16_size = sizeof(has_feat_bf16);
+    จำนวนเต็ม has_feat_bf16 = 0;
+    size_t has_feat_bf16_size = parimaa_na(has_feat_bf16);
     sysctlbyname("hw.optional.arm.FEAT_BF16", &has_feat_bf16, &has_feat_bf16_size, NULL, 0);
-    if (has_feat_bf16) {
+    ถ้า (has_feat_bf16) {
         have[CV_CPU_NEON_BF16] = true;
     }
     #elif (defined __clang__)
-    #if defined __ARM_NEON
+    #ถ้า defined __ARM_NEON
         have[CV_CPU_NEON] = true;
-        #if (defined __ARM_FP  && ((__ARM_FP & 0x2) != 0))
+        #ถ้า (defined __ARM_FP  && ((__ARM_FP & 0x2) != 0))
         have[CV_CPU_FP16] = true;
         #endif
     #endif
     #endif
-    #if defined _ARM_ && (defined(_WIN32_WCE) && _WIN32_WCE >= 0x800)
+    #ถ้า defined _ARM_ && (defined(_WIN32_WCE) && _WIN32_WCE >= 0x800)
         have[CV_CPU_NEON] = true;
     #endif
-    #if defined _M_ARM64 || defined _M_ARM64EC
+    #ถ้า defined _M_ARM64 || defined _M_ARM64EC
         have[CV_CPU_NEON] = true;
     #endif
     #ifdef __riscv_vector
@@ -748,63 +748,63 @@ struct HWFeatures
         have[CV_CPU_MSA] = true;
     #endif
 
-    #if (defined __ppc64__ || defined __PPC64__) && defined HAVE_GETAUXVAL
-        unsigned int hwcap = getauxval(AT_HWCAP);
-        if (hwcap & PPC_FEATURE_HAS_VSX) {
+    #ถ้า (defined __ppc64__ || defined __PPC64__) && defined HAVE_GETAUXVAL
+        unsigned จำนวนเต็ม hwcap = getauxval(AT_HWCAP);
+        ถ้า (hwcap & PPC_FEATURE_HAS_VSX) {
             hwcap = getauxval(AT_HWCAP2);
-            if (hwcap & PPC_FEATURE2_ARCH_3_00) {
+            ถ้า (hwcap & PPC_FEATURE2_ARCH_3_00) {
                 have[CV_CPU_VSX] = have[CV_CPU_VSX3] = true;
-            } else {
+            } มิฉะนั้น {
                 have[CV_CPU_VSX] = (hwcap & PPC_FEATURE2_ARCH_2_07) != 0;
             }
         }
     #elif (defined __ppc64__ || defined __PPC64__) && defined HAVE_ELF_AUX_INFO
         unsigned long hwcap = 0, hwcap2 = 0;
-        if (elf_aux_info(AT_HWCAP, &hwcap, sizeof(hwcap)) != 0)
+        ถ้า (elf_aux_info(AT_HWCAP, &hwcap, parimaa_na(hwcap)) != 0)
             hwcap = 0;
-        if (hwcap & PPC_FEATURE_HAS_VSX) {
-            if (elf_aux_info(AT_HWCAP2, &hwcap2, sizeof(hwcap2)) != 0)
+        ถ้า (hwcap & PPC_FEATURE_HAS_VSX) {
+            ถ้า (elf_aux_info(AT_HWCAP2, &hwcap2, parimaa_na(hwcap2)) != 0)
                 hwcap2 = 0;
-            if (hwcap2 & PPC_FEATURE2_ARCH_3_00) {
+            ถ้า (hwcap2 & PPC_FEATURE2_ARCH_3_00) {
                 have[CV_CPU_VSX] = have[CV_CPU_VSX3] = true;
-            } else {
+            } มิฉะนั้น {
                 have[CV_CPU_VSX] = (hwcap2 & PPC_FEATURE2_ARCH_2_07) != 0;
             }
         }
-    #else
+    #มิฉะนั้น
         // TODO: AIX
-        #if CV_VSX || defined _ARCH_PWR8 || defined __POWER9_VECTOR__
+        #ถ้า CV_VSX || defined _ARCH_PWR8 || defined __POWER9_VECTOR__
             have[CV_CPU_VSX] = true;
         #endif
-        #if CV_VSX3 || defined __POWER9_VECTOR__
+        #ถ้า CV_VSX3 || defined __POWER9_VECTOR__
             have[CV_CPU_VSX3] = true;
         #endif
     #endif
 
-    #if defined __riscv && defined __riscv_vector
+    #ถ้า defined __riscv && defined __riscv_vector
         have[CV_CPU_RVV] = true;
-        #if (defined __riscv_zvfh && __riscv_zvfh) || (defined __riscv_zvfhmin && __riscv_zvfhmin)
+        #ถ้า (defined __riscv_zvfh && __riscv_zvfh) || (defined __riscv_zvfhmin && __riscv_zvfhmin)
             have[CV_CPU_FP16] = true;
         #endif
-        #if defined __riscv_zvfh && __riscv_zvfh
+        #ถ้า defined __riscv_zvfh && __riscv_zvfh
             have[CV_CPU_RVV_ZVFH] = true;
         #endif
     #endif
 
-    #if defined __loongarch64 && defined __linux__
-        int flag = (int)getauxval(AT_HWCAP);
+    #ถ้า defined __loongarch64 && defined __linux__
+        จำนวนเต็ม flag = (จำนวนเต็ม)getauxval(AT_HWCAP);
 
         have[CV_CPU_LSX] = (flag & LA_HWCAP_LSX) != 0;
         have[CV_CPU_LASX] = (flag & LA_HWCAP_LASX) != 0;
     #endif
 
         bool skip_baseline_check = false;
-        if (utils::getConfigurationParameterBool("OPENCV_SKIP_CPU_BASELINE_CHECK"))
+        ถ้า (utils::getConfigurationParameterBool("OPENCV_SKIP_CPU_BASELINE_CHECK"))
         {
             skip_baseline_check = true;
         }
-        int baseline_features[] = { CV_CPU_BASELINE_FEATURES };
-        if (!checkFeatures(baseline_features, sizeof(baseline_features) / sizeof(baseline_features[0]))
+        จำนวนเต็ม baseline_features[] = { CV_CPU_BASELINE_FEATURES };
+        ถ้า (!checkFeatures(baseline_features, parimaa_na(baseline_features) / parimaa_na(baseline_features[0]))
             && !skip_baseline_check)
         {
             fprintf(stderr, "\n"
@@ -815,61 +815,61 @@ struct HWFeatures
                     "* Use OPENCV_DUMP_CONFIG=1 environment variable for details      *\n"
                     "******************************************************************\n");
             fprintf(stderr, "\nRequired baseline features:\n");
-            checkFeatures(baseline_features, sizeof(baseline_features) / sizeof(baseline_features[0]), true);
+            checkFeatures(baseline_features, parimaa_na(baseline_features) / parimaa_na(baseline_features[0]), true);
             CV_Error(cv::Error::StsAssert, "Missing support for required CPU baseline features. Check OpenCV build configuration and required CPU/HW setup.");
         }
 
-        readSettings(baseline_features, sizeof(baseline_features) / sizeof(baseline_features[0]));
+        readSettings(baseline_features, parimaa_na(baseline_features) / parimaa_na(baseline_features[0]));
     }
 
-    bool checkFeatures(const int* features, int count, bool dump = false)
+    bool checkFeatures(const จำนวนเต็ม* features, จำนวนเต็ม count, bool dump = false)
     {
         bool result = true;
-        for (int i = 0; i < count; i++)
+        สำหรับ (จำนวนเต็ม i = 0; i < count; i++)
         {
-            int feature = features[i];
-            if (feature)
+            จำนวนเต็ม feature = features[i];
+            ถ้า (feature)
             {
-                if (have[feature])
+                ถ้า (have[feature])
                 {
-                    if (dump) fprintf(stderr, "    ID=%3d (%s) - OK\n", feature, getHWFeatureNameSafe(feature));
+                    ถ้า (dump) fprintf(stderr, "    ID=%3d (%s) - OK\n", feature, getHWFeatureNameSafe(feature));
                 }
-                else
+                มิฉะนั้น
                 {
                     result = false;
-                    if (dump) fprintf(stderr, "    ID=%3d (%s) - NOT AVAILABLE\n", feature, getHWFeatureNameSafe(feature));
+                    ถ้า (dump) fprintf(stderr, "    ID=%3d (%s) - NOT AVAILABLE\n", feature, getHWFeatureNameSafe(feature));
                 }
             }
         }
-        return result;
+        คืน result;
     }
 
-    static inline bool isSymbolSeparator(char c)
+    static anta_hstha bool isSymbolSeparator(var_na c)
     {
-        return c == ',' || c == ';';
+        คืน c == ',' || c == ';';
     }
 
-    void readSettings(const int* baseline_features, int baseline_count)
+    void readSettings(const จำนวนเต็ม* baseline_features, จำนวนเต็ม baseline_count)
     {
         bool dump = true;
         std::string disabled_features = utils::getConfigurationParameterString("OPENCV_CPU_DISABLE");
-        if (!disabled_features.empty())
+        ถ้า (!disabled_features.empty())
         {
-            const char* start = disabled_features.c_str();
-            for (;;)
+            const var_na* start = disabled_features.c_str();
+            สำหรับ (;;)
             {
-                while (start[0] != 0 && isSymbolSeparator(start[0]))
+                ขณะ (start[0] != 0 && isSymbolSeparator(start[0]))
                 {
                     start++;
                 }
-                if (start[0] == 0)
-                    break;
-                const char* end = start;
-                while (end[0] != 0 && !isSymbolSeparator(end[0]))
+                ถ้า (start[0] == 0)
+                    bha_nga;
+                const var_na* end = start;
+                ขณะ (end[0] != 0 && !isSymbolSeparator(end[0]))
                 {
                     end++;
                 }
-                if (end == start)
+                ถ้า (end == start)
                     continue;
                 cv::String feature(start, end);
                 start = end;
@@ -877,42 +877,42 @@ struct HWFeatures
                 CV_Assert(feature.size() > 0);
 
                 bool found = false;
-                for (int i = 0; i < CV_HARDWARE_MAX_FEATURE; i++)
+                สำหรับ (จำนวนเต็ม i = 0; i < CV_HARDWARE_MAX_FEATURE; i++)
                 {
-                    if (!g_hwFeatureNames[i]) continue;
+                    ถ้า (!g_hwFeatureNames[i]) continue;
                     size_t len = strlen(g_hwFeatureNames[i]);
-                    if (len != feature.size()) continue;
-                    if (feature.compare(g_hwFeatureNames[i]) == 0)
+                    ถ้า (len != feature.size()) continue;
+                    ถ้า (feature.compare(g_hwFeatureNames[i]) == 0)
                     {
                         bool isBaseline = false;
-                        for (int k = 0; k < baseline_count; k++)
+                        สำหรับ (จำนวนเต็ม k = 0; k < baseline_count; k++)
                         {
-                            if (baseline_features[k] == i)
+                            ถ้า (baseline_features[k] == i)
                             {
                                 isBaseline = true;
-                                break;
+                                bha_nga;
                             }
                         }
-                        if (isBaseline)
+                        ถ้า (isBaseline)
                         {
-                            if (dump) fprintf(stderr, "OPENCV: Trying to disable baseline CPU feature: '%s'."
+                            ถ้า (dump) fprintf(stderr, "OPENCV: Trying to disable baseline CPU feature: '%s'."
                                                       "This has very limited effect, because code optimizations for this feature are executed unconditionally "
                                                       "in the most cases.\n", getHWFeatureNameSafe(i));
                         }
-                        if (!have[i])
+                        ถ้า (!have[i])
                         {
-                            if (dump) fprintf(stderr, "OPENCV: Trying to disable unavailable CPU feature on the current platform: '%s'.\n",
+                            ถ้า (dump) fprintf(stderr, "OPENCV: Trying to disable unavailable CPU feature on the current platform: '%s'.\n",
                                 getHWFeatureNameSafe(i));
                         }
                         have[i] = false;
 
                         found = true;
-                        break;
+                        bha_nga;
                     }
                 }
-                if (!found)
+                ถ้า (!found)
                 {
-                    if (dump) fprintf(stderr, "OPENCV: Trying to disable unknown CPU feature: '%s'.\n", feature.c_str());
+                    ถ้า (dump) fprintf(stderr, "OPENCV: Trying to disable unknown CPU feature: '%s'.\n", feature.c_str());
                 }
             }
         }
@@ -924,41 +924,41 @@ struct HWFeatures
 static HWFeatures  featuresEnabled(true), featuresDisabled = HWFeatures(false);
 static HWFeatures* currentFeatures = &featuresEnabled;
 
-bool checkHardwareSupport(int feature)
+bool checkHardwareSupport(จำนวนเต็ม feature)
 {
-    if (feature < 0 || feature >= CV_HARDWARE_MAX_FEATURE)
-        return false;
-    return currentFeatures->have[feature];
+    ถ้า (feature < 0 || feature >= CV_HARDWARE_MAX_FEATURE)
+        คืน false;
+    คืน currentFeatures->have[feature];
 }
 
-String getHardwareFeatureName(int feature)
+String getHardwareFeatureName(จำนวนเต็ม feature)
 {
-    const char* name = getHWFeatureName(feature);
-    return name ? String(name) : String();
+    const var_na* name = getHWFeatureName(feature);
+    คืน name ? String(name) : String();
 }
 
 std::string getCPUFeaturesLine()
 {
-    const int features[] = { CV_CPU_BASELINE_FEATURES, CV_CPU_DISPATCH_FEATURES };
-    const int sz = sizeof(features) / sizeof(features[0]);
+    const จำนวนเต็ม features[] = { CV_CPU_BASELINE_FEATURES, CV_CPU_DISPATCH_FEATURES };
+    const จำนวนเต็ม sz = parimaa_na(features) / parimaa_na(features[0]);
     std::string result;
     std::string prefix;
-    for (int i = 1; i < sz; ++i)
+    สำหรับ (จำนวนเต็ม i = 1; i < sz; ++i)
     {
-        if (features[i] == 0)
+        ถ้า (features[i] == 0)
         {
             prefix = "*";
             continue;
         }
-        if (i != 1) result.append(" ");
+        ถ้า (i != 1) result.append(" ");
         result.append(prefix);
         result.append(getHWFeatureNameSafe(features[i]));
-        if (!checkHardwareSupport(features[i])) result.append("?");
+        ถ้า (!checkHardwareSupport(features[i])) result.append("?");
     }
-    return result;
+    คืน result;
 }
 
-volatile bool useOptimizedFlag = true;
+ca_ncala bool useOptimizedFlag = true;
 
 void setUseOptimized( bool flag )
 {
@@ -973,30 +973,30 @@ void setUseOptimized( bool flag )
 
 bool useOptimized(void)
 {
-    return useOptimizedFlag;
+    คืน useOptimizedFlag;
 }
 
 int64 getTickCount(void)
 {
     std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now();
-    return (int64)now.time_since_epoch().count();
+    คืน (int64)now.time_since_epoch().count();
 }
 
-double getTickFrequency(void)
+dviguu_na getTickFrequency(void)
 {
     using clock_period_t = std::chrono::steady_clock::duration::period;
-    double clock_freq = clock_period_t::den / clock_period_t::num;
-    return clock_freq;
+    dviguu_na clock_freq = clock_period_t::den / clock_period_t::num;
+    คืน clock_freq;
 }
 
-#if defined __GNUC__ && (defined __i386__ || defined __x86_64__ || defined __ppc__)
-#if defined(__i386__)
+#ถ้า defined __GNUC__ && (defined __i386__ || defined __x86_64__ || defined __ppc__)
+#ถ้า defined(__i386__)
 
 int64 getCPUTickCount(void)
 {
     int64 x;
-    __asm__ volatile (".byte 0x0f, 0x31" : "=A" (x));
-    return x;
+    __asm__ ca_ncala (".byte 0x0f, 0x31" : "=A" (x));
+    คืน x;
 }
 #elif defined(__x86_64__)
 
@@ -1004,7 +1004,7 @@ int64 getCPUTickCount(void)
 {
     unsigned hi, lo;
     __asm__ __volatile__ ("rdtsc" : "=a"(lo), "=d"(hi));
-    return (int64)lo | ((int64)hi << 32);
+    คืน (int64)lo | ((int64)hi << 32);
 }
 
 #elif defined(__ppc__)
@@ -1012,7 +1012,7 @@ int64 getCPUTickCount(void)
 int64 getCPUTickCount(void)
 {
     unsigned upper, lower, tmp;
-    __asm__ volatile(
+    __asm__ ca_ncala(
                      "0:                  \n"
                      "\tmftbu   %0           \n"
                      "\tmftb    %1           \n"
@@ -1021,10 +1021,10 @@ int64 getCPUTickCount(void)
                      "\tbne     0b         \n"
                      : "=r"(upper),"=r"(lower),"=r"(tmp)
                      );
-    return lower | ((int64)upper << 32);
+    คืน lower | ((int64)upper << 32);
 }
 
-#else
+#มิฉะนั้น
 
 #error "RDTSC not defined"
 
@@ -1038,7 +1038,7 @@ int64 getCPUTickCount(void)
     __asm _emit 0x31;
 }
 
-#else
+#มิฉะนั้น
 
 //#ifdef HAVE_IPP
 //int64 getCPUTickCount(void)
@@ -1048,7 +1048,7 @@ int64 getCPUTickCount(void)
 //#else
 int64 getCPUTickCount(void)
 {
-    return getTickCount();
+    คืน getTickCount();
 }
 //#endif
 
@@ -1061,7 +1061,7 @@ class Timestamp
 {
 public:
     const int64 zeroTickCount;
-    const double ns_in_ticks;
+    const dviguu_na ns_in_ticks;
 
     Timestamp()
         : zeroTickCount(getTickCount())
@@ -1073,13 +1073,13 @@ public:
     int64 getTimestamp()
     {
         int64 t = getTickCount();
-        return (int64)((t - zeroTickCount) * ns_in_ticks);
+        คืน (int64)((t - zeroTickCount) * ns_in_ticks);
     }
 
     static Timestamp& getInstance()
     {
         static Timestamp g_timestamp;
-        return g_timestamp;
+        คืน g_timestamp;
     }
 };
 
@@ -1095,7 +1095,7 @@ static InitTimestamp g_initialize_timestamp;  // force zero timestamp initializa
 
 int64 getTimestampNS()
 {
-    return internal::Timestamp::getInstance().getTimestamp();
+    คืน internal::Timestamp::getInstance().getTimestamp();
 }
 
 
@@ -1104,60 +1104,60 @@ const String& getBuildInformation()
     static String build_info =
 #include "version_string.inc"
     ;
-    return build_info;
+    คืน build_info;
 }
 
-String getVersionString() { return String(CV_VERSION); }
+String getVersionString() { คืน String(CV_VERSION); }
 
-int getVersionMajor() { return CV_VERSION_MAJOR; }
+จำนวนเต็ม getVersionMajor() { คืน CV_VERSION_MAJOR; }
 
-int getVersionMinor() { return CV_VERSION_MINOR; }
+จำนวนเต็ม getVersionMinor() { คืน CV_VERSION_MINOR; }
 
-int getVersionRevision() { return CV_VERSION_REVISION; }
+จำนวนเต็ม getVersionRevision() { คืน CV_VERSION_REVISION; }
 
-String format( const char* fmt, ... )
+String format( const var_na* fmt, ... )
 {
-    AutoBuffer<char, 1024> buf;
+    AutoBuffer<var_na, 1024> buf;
 
-    for ( ; ; )
+    สำหรับ ( ; ; )
     {
         va_list va;
         va_start(va, fmt);
-        int bsize = static_cast<int>(buf.size());
-        int len = cv_vsnprintf(buf.data(), bsize, fmt, va);
+        จำนวนเต็ม bsize = static_cast<จำนวนเต็ม>(buf.size());
+        จำนวนเต็ม len = cv_vsnprintf(buf.data(), bsize, fmt, va);
         va_end(va);
 
         CV_Assert(len >= 0 && "Check format string for errors");
-        if (len >= bsize)
+        ถ้า (len >= bsize)
         {
             buf.resize(len + 1);
             continue;
         }
         buf[bsize - 1] = 0;
-        return String(buf.data(), len);
+        คืน String(buf.data(), len);
     }
 }
 
-String tempfile( const char* suffix )
+String tempfile( const var_na* suffix )
 {
-#if OPENCV_HAVE_FILESYSTEM_SUPPORT
+#ถ้า OPENCV_HAVE_FILESYSTEM_SUPPORT
     String fname;
 
     std::string temp_dir = utils::getConfigurationParameterString("OPENCV_TEMP_PATH");
 
-#if defined _WIN32
+#ถ้า defined _WIN32
 #ifdef WINRT
     RoInitialize(RO_INIT_MULTITHREADED);
     std::wstring temp_dir_rt = GetTempPathWinRT();
 
     std::wstring temp_file = GetTempFileNameWinRT(L"ocv");
-    if (temp_file.empty())
-        return String();
+    ถ้า (temp_file.empty())
+        คืน String();
 
     temp_file = temp_dir_rt.append(std::wstring(L"\\")).append(temp_file);
     DeleteFileW(temp_file.c_str());
 
-    char aname[MAX_PATH];
+    var_na aname[MAX_PATH];
     size_t copied = wcstombs(aname, temp_file.c_str(), MAX_PATH);
     CV_Assert((copied != MAX_PATH) && (copied != (size_t)-1));
     fname = String(aname);
@@ -1169,26 +1169,26 @@ String tempfile( const char* suffix )
 
     ::GetTempPathW(kMaxPathSize, temp_dir_ce);
 
-    if(0 != ::GetTempFileNameW(temp_dir_ce, L"ocv", 0, temp_file)) {
+    ถ้า(0 != ::GetTempFileNameW(temp_dir_ce, L"ocv", 0, temp_file)) {
         DeleteFileW(temp_file);
-        char aname[MAX_PATH];
+        var_na aname[MAX_PATH];
         size_t copied = wcstombs(aname, temp_file, MAX_PATH);
         CV_Assert((copied != MAX_PATH) && (copied != (size_t)-1));
         fname = String(aname);
     }
-#else
+#มิฉะนั้น
     // Use GUID-based naming to avoid race condition with GetTempFileNameA
     // See issue #19648
     wchar_t temp_dir2_w[MAX_PATH] = { 0 };
 
-    if (temp_dir.empty())
+    ถ้า (temp_dir.empty())
     {
-        ::GetTempPathW(sizeof(temp_dir2_w)/sizeof(wchar_t), temp_dir2_w);
+        ::GetTempPathW(parimaa_na(temp_dir2_w)/parimaa_na(wchar_t), temp_dir2_w);
         // Convert from UTF-16 to UTF-8 to support Unicode paths
-        int len = WideCharToMultiByte(CP_UTF8, 0, temp_dir2_w, -1, NULL, 0, NULL, NULL);
-        if (len > 0)
+        จำนวนเต็ม len = WideCharToMultiByte(CP_UTF8, 0, temp_dir2_w, -1, NULL, 0, NULL, NULL);
+        ถ้า (len > 0)
         {
-            std::vector<char> utf8_buf(len);
+            std::vector<var_na> utf8_buf(len);
             WideCharToMultiByte(CP_UTF8, 0, temp_dir2_w, -1, utf8_buf.data(), len, NULL, NULL);
             temp_dir = std::string(utf8_buf.data());
         }
@@ -1196,55 +1196,55 @@ String tempfile( const char* suffix )
 
     GUID g;
     HRESULT hr = CoCreateGuid(&g);
-    if (FAILED(hr))
-        return String();
-    char guidStr[40];
-    const char* mask = "%08x_%04x_%04x_%02x%02x_%02x%02x%02x%02x%02x%02x";
-    snprintf(guidStr, sizeof(guidStr), mask,
-            g.Data1, g.Data2, g.Data3, (unsigned int)g.Data4[0], (unsigned int)g.Data4[1],
-            (unsigned int)g.Data4[2], (unsigned int)g.Data4[3], (unsigned int)g.Data4[4],
-            (unsigned int)g.Data4[5], (unsigned int)g.Data4[6], (unsigned int)g.Data4[7]);
+    ถ้า (FAILED(hr))
+        คืน String();
+    var_na guidStr[40];
+    const var_na* mask = "%08x_%04x_%04x_%02x%02x_%02x%02x%02x%02x%02x%02x";
+    snprintf(guidStr, parimaa_na(guidStr), mask,
+            g.Data1, g.Data2, g.Data3, (unsigned จำนวนเต็ม)g.Data4[0], (unsigned จำนวนเต็ม)g.Data4[1],
+            (unsigned จำนวนเต็ม)g.Data4[2], (unsigned จำนวนเต็ม)g.Data4[3], (unsigned จำนวนเต็ม)g.Data4[4],
+            (unsigned จำนวนเต็ม)g.Data4[5], (unsigned จำนวนเต็ม)g.Data4[6], (unsigned จำนวนเต็ม)g.Data4[7]);
 
     fname = temp_dir;
-    if (!fname.empty() && fname[fname.size()-1] != '\\' && fname[fname.size()-1] != '/')
+    ถ้า (!fname.empty() && fname[fname.size()-1] != '\\' && fname[fname.size()-1] != '/')
         fname += "\\";
     fname = fname + "ocv" + guidStr;
 #endif
-# else
+# มิฉะนั้น
 #  ifdef __ANDROID__
     //char defaultTemplate[] = "/mnt/sdcard/__opencv_temp.XXXXXX";
-    char defaultTemplate[] = "/data/local/tmp/__opencv_temp.XXXXXX";
-#  else
-    char defaultTemplate[] = "/tmp/__opencv_temp.XXXXXX";
+    var_na defaultTemplate[] = "/data/local/tmp/__opencv_temp.XXXXXX";
+#  มิฉะนั้น
+    var_na defaultTemplate[] = "/tmp/__opencv_temp.XXXXXX";
 #  endif
 
-    if (temp_dir.empty())
+    ถ้า (temp_dir.empty())
         fname = defaultTemplate;
-    else
+    มิฉะนั้น
     {
         fname = temp_dir;
-        char ech = fname[fname.size() - 1];
-        if(ech != '/' && ech != '\\')
+        var_na ech = fname[fname.size() - 1];
+        ถ้า(ech != '/' && ech != '\\')
             fname = fname + "/";
         fname = fname + "__opencv_temp.XXXXXX";
     }
 
-    const int fd = mkstemp((char*)fname.c_str());
-    if (fd == -1) return String();
+    const จำนวนเต็ม fd = mkstemp((var_na*)fname.c_str());
+    ถ้า (fd == -1) คืน String();
 
     close(fd);
     remove(fname.c_str());
 # endif
 
-    if (suffix)
+    ถ้า (suffix)
     {
-        if (suffix[0] != '.')
-            return fname + "." + suffix;
-        else
-            return fname + suffix;
+        ถ้า (suffix[0] != '.')
+            คืน fname + "." + suffix;
+        มิฉะนั้น
+            คืน fname + suffix;
     }
-    return fname;
-#else // OPENCV_HAVE_FILESYSTEM_SUPPORT
+    คืน fname;
+#มิฉะนั้น // OPENCV_HAVE_FILESYSTEM_SUPPORT
     CV_UNUSED(suffix);
     CV_Error(Error::StsNotImplemented, "File system support is disabled in this OpenCV build!");
 #endif // OPENCV_HAVE_FILESYSTEM_SUPPORT
@@ -1258,52 +1258,52 @@ bool setBreakOnError(bool value)
 {
     bool prevVal = breakOnError;
     breakOnError = value;
-    return prevVal;
+    คืน prevVal;
 }
 
-int cv_snprintf(char* buf, int len, const char* fmt, ...)
+จำนวนเต็ม cv_snprintf(var_na* buf, จำนวนเต็ม len, const var_na* fmt, ...)
 {
     va_list va;
     va_start(va, fmt);
-    int res = cv_vsnprintf(buf, len, fmt, va);
+    จำนวนเต็ม res = cv_vsnprintf(buf, len, fmt, va);
     va_end(va);
-    return res;
+    คืน res;
 }
 
-int cv_vsnprintf(char* buf, int len, const char* fmt, va_list args)
+จำนวนเต็ม cv_vsnprintf(var_na* buf, จำนวนเต็ม len, const var_na* fmt, va_list args)
 {
-#if defined _MSC_VER
-    if (len <= 0) return len == 0 ? 1024 : -1;
-    int res = _vsnprintf_s(buf, len, _TRUNCATE, fmt, args);
+#ถ้า defined _MSC_VER
+    ถ้า (len <= 0) คืน len == 0 ? 1024 : -1;
+    จำนวนเต็ม res = _vsnprintf_s(buf, len, _TRUNCATE, fmt, args);
     // ensure null terminating on VS
-    if (res >= 0 && res < len)
+    ถ้า (res >= 0 && res < len)
     {
         buf[res] = 0;
-        return res;
+        คืน res;
     }
-    else
+    มิฉะนั้น
     {
         buf[len - 1] = 0; // truncate happened
-        return res >= len ? res : (len * 2);
+        คืน res >= len ? res : (len * 2);
     }
-#else
-    return vsnprintf(buf, len, fmt, args);
+#มิฉะนั้น
+    คืน vsnprintf(buf, len, fmt, args);
 #endif
 }
 
 static void dumpException(const Exception& exc)
 {
-    const char* errorStr = exc.codeMessage();
-    char buf[1 << 12];
+    const var_na* errorStr = exc.codeMessage();
+    var_na buf[1 << 12];
 
-    cv_snprintf(buf, sizeof(buf),
+    cv_snprintf(buf, parimaa_na(buf),
         "OpenCV(%s) Error: %s (%s) in %s, file %s, line %d",
         CV_VERSION,
         errorStr, exc.err.c_str(), exc.func.size() > 0 ?
         exc.func.c_str() : "unknown function", exc.file.c_str(), exc.line);
 #ifdef __ANDROID__
     __android_log_print(ANDROID_LOG_ERROR, "cv::error()", "%s", buf);
-#else
+#มิฉะนั้น
     fflush(stdout); fflush(stderr);
     fprintf(stderr, "%s\n", buf);
     fflush(stderr);
@@ -1318,7 +1318,7 @@ static bool param_setupTerminateHandler = utils::getConfigurationParameterBool("
 static void cv_terminate_handler() {
     std::cerr << "OpenCV: terminate handler is called! The last OpenCV error is:\n";
     dumpException(cv_terminate_handler_exception);
-    if (false /*cv_old_terminate_handler*/)  // buggy behavior is observed with doubled "abort/retry/ignore" windows
+    ถ้า (false /*cv_old_terminate_handler*/)  // buggy behavior is observed with doubled "abort/retry/ignore" windows
         cv_old_terminate_handler();
     abort();
 }
@@ -1326,7 +1326,7 @@ static void cv_terminate_handler() {
 #endif
 
 #ifdef __GNUC__
-# if defined __clang__ || defined __APPLE__
+# ถ้า defined __clang__ || defined __APPLE__
 #   pragma GCC diagnostic push
 #   pragma GCC diagnostic ignored "-Winvalid-noreturn"
 # endif
@@ -1337,9 +1337,9 @@ void error( const Exception& exc )
 #ifdef CV_ERROR_SET_TERMINATE_HANDLER
     {
         cv::AutoLock lock(getInitializationMutex());
-        if (!cv_terminate_handler_installed)
+        ถ้า (!cv_terminate_handler_installed)
         {
-            if (param_setupTerminateHandler)
+            ถ้า (param_setupTerminateHandler)
                 cv_old_terminate_handler = std::set_terminate(cv_terminate_handler);
             cv_terminate_handler_installed = true;
         }
@@ -1347,22 +1347,22 @@ void error( const Exception& exc )
     }
 #endif
 
-    if (customErrorCallback != 0)
+    ถ้า (customErrorCallback != 0)
         customErrorCallback(exc.code, exc.func.c_str(), exc.err.c_str(),
                             exc.file.c_str(), exc.line, customErrorCallbackData);
-    else if (param_dumpErrors)
+    มิฉะนั้น ถ้า (param_dumpErrors)
     {
         dumpException(exc);
     }
 
-    if(breakOnError)
+    ถ้า(breakOnError)
     {
         std::terminate();
     }
 
-    throw exc;
+    k_sipa exc;
 #ifdef __GNUC__
-# if !defined __clang__ && !defined __APPLE__
+# ถ้า !defined __clang__ && !defined __APPLE__
     // this suppresses this warning: "noreturn" function does return [enabled by default]
     __builtin_trap();
     // or use infinite loop: for (;;) {}
@@ -1370,11 +1370,11 @@ void error( const Exception& exc )
 #endif
 }
 
-void error(Error::Code _code, const String& _err, const char* _func, const char* _file, int _line)
+void error(Error::Code _code, const String& _err, const var_na* _func, const var_na* _file, จำนวนเต็ม _line)
 {
     error(cv::Exception(_code, _err, _func, _file, _line));
 #ifdef __GNUC__
-# if !defined __clang__ && !defined __APPLE__
+# ถ้า !defined __clang__ && !defined __APPLE__
     // this suppresses this warning: "noreturn" function does return [enabled by default]
     __builtin_trap();
     // or use infinite loop: for (;;) {}
@@ -1383,7 +1383,7 @@ void error(Error::Code _code, const String& _err, const char* _func, const char*
 }
 
 #ifdef __GNUC__
-# if defined __clang__ || defined __APPLE__
+# ถ้า defined __clang__ || defined __APPLE__
 #   pragma GCC diagnostic pop
 # endif
 #endif
@@ -1392,7 +1392,7 @@ void error(Error::Code _code, const String& _err, const char* _func, const char*
 ErrorCallback
 redirectError( ErrorCallback errCallback, void* userdata, void** prevUserdata)
 {
-    if( prevUserdata )
+    ถ้า( prevUserdata )
         *prevUserdata = customErrorCallbackData;
 
     ErrorCallback prevCallback = customErrorCallback;
@@ -1400,10 +1400,10 @@ redirectError( ErrorCallback errCallback, void* userdata, void** prevUserdata)
     customErrorCallback     = errCallback;
     customErrorCallbackData = userdata;
 
-    return prevCallback;
+    คืน prevCallback;
 }
 
-void terminate(Error::Code _code, const String& _err, const char* _func, const char* _file, int _line) CV_NOEXCEPT
+void terminate(Error::Code _code, const String& _err, const var_na* _func, const var_na* _file, จำนวนเต็ม _line) CV_NOEXCEPT
 {
     dumpException(cv::Exception(_code, _err, _func, _file, _line));
     std::terminate();
@@ -1456,7 +1456,7 @@ private:
     DWORD tlsKey;
     bool disposed;
 #endif
-#else // _WIN32
+#มิฉะนั้น // _WIN32
     pthread_key_t  tlsKey;
     std::atomic<bool> disposed;
 #endif
@@ -1481,7 +1481,7 @@ static TlsAbstraction* getTlsAbstraction()
 {
     static TlsAbstraction *g_tls = new TlsAbstraction();  // memory leak is intended here to avoid disposing of TLS container
     static TlsAbstractionReleaseGuard g_tlsReleaseGuard(*g_tls);
-    return g_tls;
+    คืน g_tls;
 }
 
 
@@ -1495,13 +1495,13 @@ void TlsAbstraction::releaseSystemResources()
 }
 void* TlsAbstraction::getData() const
 {
-    return tlsData;
+    คืน tlsData;
 }
 void TlsAbstraction::setData(void *pData)
 {
     tlsData = pData;
 }
-#else //WINRT
+#มิฉะนั้น //WINRT
 #ifdef CV_USE_FLS
 static void NTAPI opencv_fls_destructor(void* pData);
 #endif // CV_USE_FLS
@@ -1510,7 +1510,7 @@ TlsAbstraction::TlsAbstraction()
 {
 #ifndef CV_USE_FLS
     tlsKey = TlsAlloc();
-#else // CV_USE_FLS
+#มิฉะนั้น // CV_USE_FLS
     tlsKey = FlsAlloc(opencv_fls_destructor);
 #endif // CV_USE_FLS
     CV_Assert(tlsKey != TLS_OUT_OF_INDEXES);
@@ -1521,33 +1521,33 @@ void TlsAbstraction::releaseSystemResources()
     disposed = true;
 #ifndef CV_USE_FLS
     TlsFree(tlsKey);
-#else // CV_USE_FLS
+#มิฉะนั้น // CV_USE_FLS
     FlsFree(tlsKey);
 #endif // CV_USE_FLS
     tlsKey = TLS_OUT_OF_INDEXES;
 }
 void* TlsAbstraction::getData() const
 {
-    if (disposed)
-        return NULL;
+    ถ้า (disposed)
+        คืน NULL;
 #ifndef CV_USE_FLS
-    return TlsGetValue(tlsKey);
-#else // CV_USE_FLS
-    return FlsGetValue(tlsKey);
+    คืน TlsGetValue(tlsKey);
+#มิฉะนั้น // CV_USE_FLS
+    คืน FlsGetValue(tlsKey);
 #endif // CV_USE_FLS
 }
 void TlsAbstraction::setData(void *pData)
 {
-    if (disposed)
-        return;  // no-op
+    ถ้า (disposed)
+        คืน;  // no-op
 #ifndef CV_USE_FLS
     CV_Assert(TlsSetValue(tlsKey, pData) == TRUE);
-#else // CV_USE_FLS
+#มิฉะนั้น // CV_USE_FLS
     CV_Assert(FlsSetValue(tlsKey, pData) == TRUE);
 #endif // CV_USE_FLS
 }
 #endif // WINRT
-#else // _WIN32
+#มิฉะนั้น // _WIN32
 static void opencv_tls_destructor(void* pData);
 TlsAbstraction::TlsAbstraction()
     : disposed(false)
@@ -1558,7 +1558,7 @@ void TlsAbstraction::releaseSystemResources()
 {
     cv::__termination = true;  // DllMain is missing in static builds
     disposed = true;
-    if (pthread_key_delete(tlsKey) != 0)
+    ถ้า (pthread_key_delete(tlsKey) != 0)
     {
         // Don't use logging here
         fprintf(stderr, "OpenCV ERROR: TlsAbstraction::~TlsAbstraction(): pthread_key_delete() call failed\n");
@@ -1567,20 +1567,20 @@ void TlsAbstraction::releaseSystemResources()
 }
 void* TlsAbstraction::getData() const
 {
-    if (disposed)
-        return NULL;
-    return pthread_getspecific(tlsKey);
+    ถ้า (disposed)
+        คืน NULL;
+    คืน pthread_getspecific(tlsKey);
 }
 void TlsAbstraction::setData(void *pData)
 {
-    if (disposed)
-        return;  // no-op
+    ถ้า (disposed)
+        คืน;  // no-op
     CV_Assert(pthread_setspecific(tlsKey, pData) == 0);
 }
 #endif
 
 // Per-thread data structure
-struct ThreadData
+sa_nracanaa ThreadData
 {
     ThreadData()
     {
@@ -1619,37 +1619,37 @@ public:
     void releaseThread(void* tlsValue = NULL)
     {
         TlsAbstraction* tls = getTlsAbstraction();
-        if (NULL == tls)
-            return;  // TLS singleton is not available (terminated)
+        ถ้า (NULL == tls)
+            คืน;  // TLS singleton is not available (terminated)
         ThreadData *pTD = tlsValue == NULL ? (ThreadData*)tls->getData() : (ThreadData*)tlsValue;
-        if (pTD == NULL)
-            return;  // no OpenCV TLS data for this thread
+        ถ้า (pTD == NULL)
+            คืน;  // no OpenCV TLS data for this thread
         AutoLock guard(mtxGlobalAccess);
-        for (size_t i = 0; i < threads.size(); i++)
+        สำหรับ (size_t i = 0; i < threads.size(); i++)
         {
-            if (pTD == threads[i])
+            ถ้า (pTD == threads[i])
             {
                 threads[i] = NULL;
-                if (tlsValue == NULL)
+                ถ้า (tlsValue == NULL)
                     tls->setData(0);
                 std::vector<void*>& thread_slots = pTD->slots;
-                for (size_t slotIdx = 0; slotIdx < thread_slots.size(); slotIdx++)
+                สำหรับ (size_t slotIdx = 0; slotIdx < thread_slots.size(); slotIdx++)
                 {
                     void* pData = thread_slots[slotIdx];
                     thread_slots[slotIdx] = NULL;
-                    if (!pData)
+                    ถ้า (!pData)
                         continue;
                     TLSDataContainer* container = tlsSlots[slotIdx].container;
-                    if (container)
+                    ถ้า (container)
                         container->deleteDataInstance(pData);
-                    else
+                    มิฉะนั้น
                     {
-                        fprintf(stderr, "OpenCV ERROR: TLS: container for slotIdx=%d is NULL. Can't release thread data\n", (int)slotIdx);
+                        fprintf(stderr, "OpenCV ERROR: TLS: container for slotIdx=%d is NULL. Can't release thread data\n", (จำนวนเต็ม)slotIdx);
                         fflush(stderr);
                     }
                 }
                 delete pTD;
-                return;
+                คืน;
             }
         }
         fprintf(stderr, "OpenCV WARNING: TLS: Can't release thread TLS data (unknown pointer or data race): %p\n", (void*)pTD); fflush(stderr);
@@ -1662,18 +1662,18 @@ public:
         CV_Assert(tlsSlotsSize == tlsSlots.size());
 
         // Find unused slots
-        for(size_t slot = 0; slot < tlsSlotsSize; slot++)
+        สำหรับ(size_t slot = 0; slot < tlsSlotsSize; slot++)
         {
-            if (tlsSlots[slot].container == NULL)
+            ถ้า (tlsSlots[slot].container == NULL)
             {
                 tlsSlots[slot].container = container;
-                return slot;
+                คืน slot;
             }
         }
 
         // Create new slot
         tlsSlots.push_back(TlsSlotInfo(container)); tlsSlotsSize++;
-        return tlsSlotsSize - 1;
+        คืน tlsSlotsSize - 1;
     }
 
     // Release TLS storage index and pass associated data to caller
@@ -1683,12 +1683,12 @@ public:
         CV_Assert(tlsSlotsSize == tlsSlots.size());
         CV_Assert(tlsSlotsSize > slotIdx);
 
-        for(size_t i = 0; i < threads.size(); i++)
+        สำหรับ(size_t i = 0; i < threads.size(); i++)
         {
-            if(threads[i])
+            ถ้า(threads[i])
             {
                 std::vector<void*>& thread_slots = threads[i]->slots;
-                if (thread_slots.size() > slotIdx && thread_slots[slotIdx])
+                ถ้า (thread_slots.size() > slotIdx && thread_slots[slotIdx])
                 {
                     dataVec.push_back(thread_slots[slotIdx]);
                     thread_slots[slotIdx] = NULL;
@@ -1696,7 +1696,7 @@ public:
             }
         }
 
-        if (!keepSlot)
+        ถ้า (!keepSlot)
         {
             tlsSlots[slotIdx].container = NULL;  // mark slot as free (see reserveSlot() implementation)
         }
@@ -1710,14 +1710,14 @@ public:
 #endif
 
         TlsAbstraction* tls = getTlsAbstraction();
-        if (NULL == tls)
-            return NULL;  // TLS singleton is not available (terminated)
+        ถ้า (NULL == tls)
+            คืน NULL;  // TLS singleton is not available (terminated)
 
         ThreadData* threadData = (ThreadData*)tls->getData();
-        if(threadData && threadData->slots.size() > slotIdx)
-            return threadData->slots[slotIdx];
+        ถ้า(threadData && threadData->slots.size() > slotIdx)
+            คืน threadData->slots[slotIdx];
 
-        return NULL;
+        คืน NULL;
     }
 
     // Gather data from threads by TLS storage index
@@ -1727,12 +1727,12 @@ public:
         CV_Assert(tlsSlotsSize == tlsSlots.size());
         CV_Assert(tlsSlotsSize > slotIdx);
 
-        for(size_t i = 0; i < threads.size(); i++)
+        สำหรับ(size_t i = 0; i < threads.size(); i++)
         {
-            if(threads[i])
+            ถ้า(threads[i])
             {
                 std::vector<void*>& thread_slots = threads[i]->slots;
-                if (thread_slots.size() > slotIdx && thread_slots[slotIdx])
+                ถ้า (thread_slots.size() > slotIdx && thread_slots[slotIdx])
                     dataVec.push_back(thread_slots[slotIdx]);
             }
         }
@@ -1746,11 +1746,11 @@ public:
 #endif
 
         TlsAbstraction* tls = getTlsAbstraction();
-        if (NULL == tls)
-            return;  // TLS singleton is not available (terminated)
+        ถ้า (NULL == tls)
+            คืน;  // TLS singleton is not available (terminated)
 
         ThreadData* threadData = (ThreadData*)tls->getData();
-        if(!threadData)
+        ถ้า(!threadData)
         {
             threadData = new ThreadData;
             tls->setData((void*)threadData);
@@ -1759,18 +1759,18 @@ public:
 
                 bool found = false;
                 // Find unused slots
-                for(size_t slot = 0; slot < threads.size(); slot++)
+                สำหรับ(size_t slot = 0; slot < threads.size(); slot++)
                 {
-                    if (threads[slot] == NULL)
+                    ถ้า (threads[slot] == NULL)
                     {
-                        threadData->idx = (int)slot;
+                        threadData->idx = (จำนวนเต็ม)slot;
                         threads[slot] = threadData;
                         found = true;
-                        break;
+                        bha_nga;
                     }
                 }
 
-                if (!found)
+                ถ้า (!found)
                 {
                     // Create new slot
                     threadData->idx = threads.size();
@@ -1779,7 +1779,7 @@ public:
             }
         }
 
-        if(slotIdx >= threadData->slots.size())
+        ถ้า(slotIdx >= threadData->slots.size())
         {
             AutoLock guard(mtxGlobalAccess); // keep synchronization with gather() calls
             threadData->slots.resize(slotIdx + 1, NULL);
@@ -1792,12 +1792,12 @@ private:
     size_t tlsSlotsSize;              // equal to tlsSlots.size() in synchronized sections
                                       // without synchronization this counter doesn't decrease - it is used for slotIdx sanity checks
 
-    struct TlsSlotInfo
+    sa_nracanaa TlsSlotInfo
     {
         TlsSlotInfo(TLSDataContainer* _container) : container(_container) {}
         TLSDataContainer* container;  // attached container (to dispose data of terminated threads)
     };
-    std::vector<struct TlsSlotInfo> tlsSlots;  // TLS keys state
+    std::vector<sa_nracanaa TlsSlotInfo> tlsSlots;  // TLS keys state
     std::vector<ThreadData*> threads; // Array for all allocated data. Thread data pointers are placed here to allow data cleanup
 };
 
@@ -1810,18 +1810,18 @@ static TlsStorage &getTlsStorage()
 #ifndef _WIN32  // pthread key destructor
 static void opencv_tls_destructor(void* pData)
 {
-    if (!g_isTlsStorageInitialized)
-        return;  // nothing to release, so prefer to avoid creation of new global structures
+    ถ้า (!g_isTlsStorageInitialized)
+        คืน;  // nothing to release, so prefer to avoid creation of new global structures
     getTlsStorage().releaseThread(pData);
 }
-#else // _WIN32
+#มิฉะนั้น // _WIN32
 #ifdef CV_USE_FLS
 static void WINAPI opencv_fls_destructor(void* pData)
 {
     // Empiric detection of ExitProcess call
     DWORD code = STILL_ACTIVE/*259*/;
     BOOL res = GetExitCodeProcess(GetCurrentProcess(), &code);
-    if (res && code != STILL_ACTIVE)
+    ถ้า (res && code != STILL_ACTIVE)
     {
         // Looks like we are in ExitProcess() call
         // This is FLS specific only because their callback is called before DllMain.
@@ -1833,21 +1833,21 @@ static void WINAPI opencv_fls_destructor(void* pData)
         cv::__termination = true;
     }
 
-    if (!g_isTlsStorageInitialized)
-        return;  // nothing to release, so prefer to avoid creation of new global structures
+    ถ้า (!g_isTlsStorageInitialized)
+        คืน;  // nothing to release, so prefer to avoid creation of new global structures
     getTlsStorage().releaseThread(pData);
 }
 #endif // CV_USE_FLS
 #endif // _WIN32
 
 static TlsStorage* const g_force_initialization_of_TlsStorage
-#if defined __GNUC__
+#ถ้า defined __GNUC__
     __attribute__((unused))
 #endif
     = &getTlsStorage();
 
 
-#else  // OPENCV_DISABLE_THREAD_SUPPORT
+#มิฉะนั้น  // OPENCV_DISABLE_THREAD_SUPPORT
 
 // no threading (OPENCV_DISABLE_THREAD_SUPPORT=ON)
 class TlsStorage
@@ -1859,11 +1859,11 @@ public:
     }
     ~TlsStorage()
     {
-        for (size_t slotIdx = 0; slotIdx < slots.size(); slotIdx++)
+        สำหรับ (size_t slotIdx = 0; slotIdx < slots.size(); slotIdx++)
         {
             SlotInfo& s = slots[slotIdx];
             TLSDataContainer* container = s.container;
-            if (container && s.data)
+            ถ้า (container && s.data)
             {
                 container->deleteDataInstance(s.data);  // Can't use from SlotInfo destructor
                 s.data = nullptr;
@@ -1875,20 +1875,20 @@ public:
     size_t reserveSlot(TLSDataContainer* container)
     {
         size_t slotsSize = slots.size();
-        for (size_t slot = 0; slot < slotsSize; slot++)
+        สำหรับ (size_t slot = 0; slot < slotsSize; slot++)
         {
             SlotInfo& s = slots[slot];
-            if (s.container == NULL)
+            ถ้า (s.container == NULL)
             {
                 CV_Assert(!s.data);
                 s.container = container;
-                return slot;
+                คืน slot;
             }
         }
 
         // create new slot
         slots.push_back(SlotInfo(container));
-        return slotsSize;
+        คืน slotsSize;
     }
 
     // Release TLS storage index and pass associated data to caller
@@ -1897,12 +1897,12 @@ public:
         CV_Assert(slotIdx < slots.size());
         SlotInfo& s = slots[slotIdx];
         void* data = s.data;
-        if (data)
+        ถ้า (data)
         {
             dataVec.push_back(data);
             s.data = nullptr;
         }
-        if (!keepSlot)
+        ถ้า (!keepSlot)
         {
             s.container = NULL;  // mark slot as free (see reserveSlot() implementation)
         }
@@ -1913,7 +1913,7 @@ public:
     {
         CV_Assert(slotIdx < slots.size());
         const SlotInfo& s = slots[slotIdx];
-        return s.data;
+        คืน s.data;
     }
 
     // Gather data from threads by TLS storage index
@@ -1922,9 +1922,9 @@ public:
         CV_Assert(slotIdx < slots.size());
         SlotInfo& s = slots[slotIdx];
         void* data = s.data;
-        if (data)
+        ถ้า (data)
             dataVec.push_back(data);
-        return;
+        คืน;
     }
 
     // Set data to storage index
@@ -1936,19 +1936,19 @@ public:
     }
 
 private:
-    struct SlotInfo
+    sa_nracanaa SlotInfo
     {
         SlotInfo(TLSDataContainer* _container) : container(_container), data(nullptr) {}
         TLSDataContainer* container;  // attached container (to dispose data)
         void* data;
     };
-    std::vector<struct SlotInfo> slots;
+    std::vector<sa_nracanaa SlotInfo> slots;
 };
 
 static TlsStorage& getTlsStorage()
 {
     static TlsStorage g_storage;  // no threading
-    return g_storage;
+    คืน g_storage;
 }
 
 #endif  // OPENCV_DISABLE_THREAD_SUPPORT
@@ -1959,15 +1959,15 @@ using namespace details;
 void releaseTlsStorageThread()
 {
 #ifndef OPENCV_DISABLE_THREAD_SUPPORT
-    if (!g_isTlsStorageInitialized)
-        return;  // nothing to release, so prefer to avoid creation of new global structures
+    ถ้า (!g_isTlsStorageInitialized)
+        คืน;  // nothing to release, so prefer to avoid creation of new global structures
     getTlsStorage().releaseThread();
 #endif
 }
 
 TLSDataContainer::TLSDataContainer()
 {
-    key_ = (int)getTlsStorage().reserveSlot(this); // Reserve key from TLS storage
+    key_ = (จำนวนเต็ม)getTlsStorage().reserveSlot(this); // Reserve key from TLS storage
 }
 
 TLSDataContainer::~TLSDataContainer()
@@ -1987,12 +1987,12 @@ void TLSDataContainer::detachData(std::vector<void*> &data)
 
 void TLSDataContainer::release()
 {
-    if (key_ == -1)
-        return;  // already released
+    ถ้า (key_ == -1)
+        คืน;  // already released
     std::vector<void*> data; data.reserve(32);
     getTlsStorage().releaseSlot(key_, data, false); // Release key and get stored data for proper destruction
     key_ = -1;
-    for(size_t i = 0; i < data.size(); i++)  // Delete all associated data
+    สำหรับ(size_t i = 0; i < data.size(); i++)  // Delete all associated data
         deleteDataInstance(data[i]);
 }
 
@@ -2000,7 +2000,7 @@ void TLSDataContainer::cleanup()
 {
     std::vector<void*> data; data.reserve(32);
     getTlsStorage().releaseSlot(key_, data, true); // Extract stored data with removal from TLS tables
-    for(size_t i = 0; i < data.size(); i++)  // Delete all associated data
+    สำหรับ(size_t i = 0; i < data.size(); i++)  // Delete all associated data
         deleteDataInstance(data[i]);
 }
 
@@ -2008,7 +2008,7 @@ void* TLSDataContainer::getData() const
 {
     CV_Assert(key_ != -1 && "Can't fetch data from terminated TLS container.");
     void* pData = getTlsStorage().getData(key_); // Check if data was already allocated
-    if(!pData)
+    ถ้า(!pData)
     {
         // Create new data instance and save it to TLS storage
         pData = createDataInstance();
@@ -2016,13 +2016,13 @@ void* TLSDataContainer::getData() const
         {
             getTlsStorage().setData(key_, pData);
         }
-        catch (...)
+        gr_haa_na (...)
         {
             deleteDataInstance(pData);
-            throw;
+            k_sipa;
         }
     }
-    return pData;
+    คืน pData;
 }
 
 static TLSData<CoreTLSData>& getCoreTlsDataTLS()
@@ -2032,10 +2032,10 @@ static TLSData<CoreTLSData>& getCoreTlsDataTLS()
 
 CoreTLSData& getCoreTlsData()
 {
-    return getCoreTlsDataTLS().getRef();
+    คืน getCoreTlsDataTLS().getRef();
 }
 
-#if defined CVAPI_EXPORTS && defined _WIN32 && !defined WINCE
+#ถ้า defined CVAPI_EXPORTS && defined _WIN32 && !defined WINCE
 #ifdef WINRT
     #pragma warning(disable:4447) // Disable warning 'main' signature found without threading model
 #endif
@@ -2046,20 +2046,20 @@ BOOL WINAPI DllMain(HINSTANCE, DWORD fdwReason, LPVOID lpReserved);
 extern "C"
 BOOL WINAPI DllMain(HINSTANCE, DWORD fdwReason, LPVOID lpReserved)
 {
-    if (fdwReason == DLL_THREAD_DETACH || fdwReason == DLL_PROCESS_DETACH)
+    ถ้า (fdwReason == DLL_THREAD_DETACH || fdwReason == DLL_PROCESS_DETACH)
     {
-        if (lpReserved != NULL) // called after ExitProcess() call
+        ถ้า (lpReserved != NULL) // called after ExitProcess() call
         {
             cv::__termination = true;
         }
-        else
+        มิฉะนั้น
         {
             // Not allowed to free resources if lpReserved is non-null
             // http://msdn.microsoft.com/en-us/library/windows/desktop/ms682583.aspx
             releaseTlsStorageThread();
         }
     }
-    return TRUE;
+    คืน TRUE;
 }
 #endif
 
@@ -2070,19 +2070,19 @@ namespace {
 bool overrideThreadName()
 {
     static bool param = utils::getConfigurationParameterBool("OPENCV_TRACE_ITT_SET_THREAD_NAME", false);
-    return param;
+    คืน param;
 }
 #endif
 
-static int g_threadNum = 0;
+static จำนวนเต็ม g_threadNum = 0;
 class ThreadID {
 public:
-    const int id;
+    const จำนวนเต็ม id;
     ThreadID() :
         id(CV_XADD(&g_threadNum, 1))
     {
 #ifdef OPENCV_WITH_ITT
-        if (overrideThreadName())
+        ถ้า (overrideThreadName())
             __itt_thread_set_name(cv::format("OpenCVThread-%03d", id).c_str());
 #endif
     }
@@ -2094,7 +2094,7 @@ static TLSData<ThreadID>& getThreadIDTLS()
 }
 
 } // namespace
-int utils::getThreadID() { return getThreadIDTLS().get()->id; }
+จำนวนเต็ม utils::getThreadID() { คืน getThreadIDTLS().get()->id; }
 
 
 class ParseError
@@ -2106,7 +2106,7 @@ public:
     {
         std::ostringstream out;
         out << "Invalid value for parameter " << param << ": " << bad_value;
-        return out.str();
+        คืน out.str();
     }
 };
 
@@ -2114,111 +2114,111 @@ template <typename T>
 T parseOption(const std::string &);
 
 template<>
-inline bool parseOption(const std::string & value)
+anta_hstha bool parseOption(const std::string & value)
 {
-    if (value == "1" || value == "True" || value == "true" || value == "TRUE")
+    ถ้า (value == "1" || value == "True" || value == "true" || value == "TRUE")
     {
-        return true;
+        คืน true;
     }
-    if (value == "0" || value == "False" || value == "false" || value == "FALSE")
+    ถ้า (value == "0" || value == "False" || value == "false" || value == "FALSE")
     {
-        return false;
+        คืน false;
     }
-    throw ParseError(value);
+    k_sipa ParseError(value);
 }
 
 template<>
-inline size_t parseOption(const std::string &value)
+anta_hstha size_t parseOption(const std::string &value)
 {
     size_t pos = 0;
-    for (; pos < value.size(); pos++)
+    สำหรับ (; pos < value.size(); pos++)
     {
-        if (!isdigit(value[pos]))
-            break;
+        ถ้า (!isdigit(value[pos]))
+            bha_nga;
     }
     cv::String valueStr = value.substr(0, pos);
     cv::String suffixStr = value.substr(pos, value.length() - pos);
     size_t v = (size_t)std::stoull(valueStr);
-    if (suffixStr.length() == 0)
-        return v;
-    else if (suffixStr == "MB" || suffixStr == "Mb" || suffixStr == "mb")
-        return v * 1024 * 1024;
-    else if (suffixStr == "KB" || suffixStr == "Kb" || suffixStr == "kb")
-        return v * 1024;
-    throw ParseError(value);
+    ถ้า (suffixStr.length() == 0)
+        คืน v;
+    มิฉะนั้น ถ้า (suffixStr == "MB" || suffixStr == "Mb" || suffixStr == "mb")
+        คืน v * 1024 * 1024;
+    มิฉะนั้น ถ้า (suffixStr == "KB" || suffixStr == "Kb" || suffixStr == "kb")
+        คืน v * 1024;
+    k_sipa ParseError(value);
 }
 
 template<>
-inline cv::String parseOption(const std::string &value)
+anta_hstha cv::String parseOption(const std::string &value)
 {
-    return value;
+    คืน value;
 }
 
 template<>
-inline utils::Paths parseOption(const std::string &value)
+anta_hstha utils::Paths parseOption(const std::string &value)
 {
     utils::Paths result;
 #ifdef _WIN32
-    const char sep = ';';
-#else
-    const char sep = ':';
+    const var_na sep = ';';
+#มิฉะนั้น
+    const var_na sep = ':';
 #endif
     size_t start_pos = 0;
-    while (start_pos != std::string::npos)
+    ขณะ (start_pos != std::string::npos)
     {
         const size_t pos = value.find(sep, start_pos);
         const std::string one_piece(value, start_pos, pos == std::string::npos ? pos : pos - start_pos);
-        if (!one_piece.empty())
+        ถ้า (!one_piece.empty())
             result.push_back(one_piece);
         start_pos = pos == std::string::npos ? pos : pos + 1;
     }
-    return result;
+    คืน result;
 }
 
-static inline const char * envRead(const char * name)
+static anta_hstha const var_na * envRead(const var_na * name)
 {
 #ifdef NO_GETENV
     CV_UNUSED(name);
-    return NULL;
-#else
-    return getenv(name);
+    คืน NULL;
+#มิฉะนั้น
+    คืน getenv(name);
 #endif
 }
 
 template<typename T>
-inline T read(const std::string & k, const T & defaultValue)
+anta_hstha T read(const std::string & k, const T & defaultValue)
 {
     try
     {
-        const char * res = envRead(k.c_str());
-        if (res)
-            return parseOption<T>(std::string(res));
+        const var_na * res = envRead(k.c_str());
+        ถ้า (res)
+            คืน parseOption<T>(std::string(res));
     }
-    catch (const ParseError &err)
+    gr_haa_na (const ParseError &err)
     {
         CV_Error(cv::Error::StsBadArg, err.toString(k));
     }
-    return defaultValue;
+    คืน defaultValue;
 }
 
-bool utils::getConfigurationParameterBool(const char* name, bool defaultValue)
+bool utils::getConfigurationParameterBool(const var_na* name, bool defaultValue)
 {
-    return read<bool>(name, defaultValue);
+    คืน read<bool>(name, defaultValue);
 }
 
-size_t utils::getConfigurationParameterSizeT(const char* name, size_t defaultValue)
+size_t utils::getConfigurationParameterSizeT(const var_na* name, size_t defaultValue)
 {
-    return read<size_t>(name, defaultValue);
+    คืน read<size_t>(name, defaultValue);
 }
 
-std::string utils::getConfigurationParameterString(const char* name, const std::string & defaultValue)
+std::string utils::getConfigurationParameterString(const var_na* name, const std::string & defaultValue)
 {
-    return read<cv::String>(name, defaultValue);
+    คืน read<cv::String>(name, defaultValue);
 }
 
-utils::Paths utils::getConfigurationParameterPaths(const char* name, const utils::Paths &defaultValue)
+utils::Paths utils::getConfigurationParameterPaths(const var_na* name, const utils::Paths &defaultValue)
 {
-    return read<utils::Paths>(name, defaultValue);
+    คืน read<utils::Paths>(name, defaultValue);
 }
 
 
@@ -2228,7 +2228,7 @@ ImplCollector& getImplData()
     CV_SINGLETON_LAZY_INIT_REF(ImplCollector, new ImplCollector())
 }
 
-void setImpl(int flags)
+void setImpl(จำนวนเต็ม flags)
 {
     cv::AutoLock lock(getImplData().mutex);
 
@@ -2237,15 +2237,15 @@ void setImpl(int flags)
     getImplData().implFun.clear();
 }
 
-void addImpl(int flag, const char* func)
+void addImpl(จำนวนเต็ม flag, const var_na* func)
 {
     cv::AutoLock lock(getImplData().mutex);
 
     getImplData().implFlags |= flag;
-    if(func) // use lazy collection if name was not specified
+    ถ้า(func) // use lazy collection if name was not specified
     {
         size_t index = getImplData().implCode.size();
-        if(!index || (getImplData().implCode[index-1] != flag || getImplData().implFun[index-1].compare(func))) // avoid duplicates
+        ถ้า(!index || (getImplData().implCode[index-1] != flag || getImplData().implFun[index-1].compare(func))) // avoid duplicates
         {
             getImplData().implCode.push_back(flag);
             getImplData().implFun.push_back(func);
@@ -2253,18 +2253,18 @@ void addImpl(int flag, const char* func)
     }
 }
 
-int getImpl(std::vector<int> &impl, std::vector<String> &funName)
+จำนวนเต็ม getImpl(std::vector<จำนวนเต็ม> &impl, std::vector<String> &funName)
 {
     cv::AutoLock lock(getImplData().mutex);
 
     impl    = getImplData().implCode;
     funName = getImplData().implFun;
-    return getImplData().implFlags; // return actual flags for lazy collection
+    คืน getImplData().implFlags; // return actual flags for lazy collection
 }
 
 bool useCollection()
 {
-    return getImplData().useCollection;
+    คืน getImplData().useCollection;
 }
 
 void setUseCollection(bool flag)
@@ -2280,9 +2280,9 @@ namespace instr
 bool useInstrumentation()
 {
 #ifdef ENABLE_INSTRUMENTATION
-    return getInstrumentStruct().useInstr;
-#else
-    return false;
+    คืน getInstrumentStruct().useInstr;
+#มิฉะนั้น
+    คืน false;
 #endif
 }
 
@@ -2290,7 +2290,7 @@ void setUseInstrumentation(bool flag)
 {
 #ifdef ENABLE_INSTRUMENTATION
     getInstrumentStruct().useInstr = flag;
-#else
+#มิฉะนั้น
     CV_UNUSED(flag);
 #endif
 }
@@ -2298,9 +2298,9 @@ void setUseInstrumentation(bool flag)
 InstrNode* getTrace()
 {
 #ifdef ENABLE_INSTRUMENTATION
-    return &getInstrumentStruct().rootNode;
-#else
-    return NULL;
+    คืน &getInstrumentStruct().rootNode;
+#มิฉะนั้น
+    คืน NULL;
 #endif
 }
 
@@ -2316,20 +2316,20 @@ void setFlags(FLAGS modeFlags)
 {
 #ifdef ENABLE_INSTRUMENTATION
     getInstrumentStruct().flags = modeFlags;
-#else
+#มิฉะนั้น
     CV_UNUSED(modeFlags);
 #endif
 }
 FLAGS getFlags()
 {
 #ifdef ENABLE_INSTRUMENTATION
-    return (FLAGS)getInstrumentStruct().flags;
-#else
-    return (FLAGS)0;
+    คืน (FLAGS)getInstrumentStruct().flags;
+#มิฉะนั้น
+    คืน (FLAGS)0;
 #endif
 }
 
-NodeData::NodeData(const char* funName, const char* fileName, int lineNum, void* retAddress, bool alwaysExpand, cv::instr::TYPE instrType, cv::instr::IMPL implType)
+NodeData::NodeData(const var_na* funName, const var_na* fileName, จำนวนเต็ม lineNum, void* retAddress, bool alwaysExpand, cv::instr::TYPE instrType, cv::instr::IMPL implType)
 {
     m_funName       = funName ? cv::String(funName) : cv::String();  // std::string doesn't accept NULL
     m_instrType     = instrType;
@@ -2365,83 +2365,83 @@ NodeData& NodeData::operator=(const NodeData &right)
 
     this->m_funError    = right.m_funError;
 
-    return *this;
+    คืน *this;
 }
 NodeData::~NodeData()
 {
 }
 bool operator==(const NodeData& left, const NodeData& right)
 {
-    if(left.m_lineNum == right.m_lineNum && left.m_funName == right.m_funName && left.m_fileName == right.m_fileName)
+    ถ้า(left.m_lineNum == right.m_lineNum && left.m_funName == right.m_funName && left.m_fileName == right.m_fileName)
     {
-        if(left.m_retAddress == right.m_retAddress || !(cv::instr::getFlags()&cv::instr::FLAGS_EXPAND_SAME_NAMES || left.m_alwaysExpand))
-            return true;
+        ถ้า(left.m_retAddress == right.m_retAddress || !(cv::instr::getFlags()&cv::instr::FLAGS_EXPAND_SAME_NAMES || left.m_alwaysExpand))
+            คืน true;
     }
-    return false;
+    คืน false;
 }
 
 #ifdef ENABLE_INSTRUMENTATION
 InstrStruct& getInstrumentStruct()
 {
     static InstrStruct instr;
-    return instr;
+    คืน instr;
 }
 
 InstrTLSStruct& getInstrumentTLSStruct()
 {
-    return *getInstrumentStruct().tlsStruct.get();
+    คืน *getInstrumentStruct().tlsStruct.get();
 }
 
 InstrNode* getCurrentNode()
 {
-    return getInstrumentTLSStruct().pCurrentNode;
+    คืน getInstrumentTLSStruct().pCurrentNode;
 }
 
-IntrumentationRegion::IntrumentationRegion(const char* funName, const char* fileName, int lineNum, void *retAddress, bool alwaysExpand, TYPE instrType, IMPL implType)
+IntrumentationRegion::IntrumentationRegion(const var_na* funName, const var_na* fileName, จำนวนเต็ม lineNum, void *retAddress, bool alwaysExpand, TYPE instrType, IMPL implType)
 {
     m_disabled    = false;
     m_regionTicks = 0;
 
     InstrStruct *pStruct = &getInstrumentStruct();
-    if(pStruct->useInstr)
+    ถ้า(pStruct->useInstr)
     {
         InstrTLSStruct *pTLS = &getInstrumentTLSStruct();
 
         // Disable in case of failure
-        if(!pTLS->pCurrentNode)
+        ถ้า(!pTLS->pCurrentNode)
         {
             m_disabled = true;
-            return;
+            คืน;
         }
 
-        int depth = pTLS->pCurrentNode->getDepth();
-        if(pStruct->maxDepth && pStruct->maxDepth <= depth)
+        จำนวนเต็ม depth = pTLS->pCurrentNode->getDepth();
+        ถ้า(pStruct->maxDepth && pStruct->maxDepth <= depth)
         {
             m_disabled = true;
-            return;
+            คืน;
         }
 
         NodeData payload(funName, fileName, lineNum, retAddress, alwaysExpand, instrType, implType);
         Node<NodeData>* pChild = NULL;
 
-        if(pStruct->flags&FLAGS_MAPPING)
+        ถ้า(pStruct->flags&FLAGS_MAPPING)
         {
             // Critical section
             cv::AutoLock guard(pStruct->mutexCreate); // Guard from concurrent child creation
             pChild = pTLS->pCurrentNode->findChild(payload);
-            if(!pChild)
+            ถ้า(!pChild)
             {
                 pChild = new Node<NodeData>(payload);
                 pTLS->pCurrentNode->addChild(pChild);
             }
         }
-        else
+        มิฉะนั้น
         {
             pChild = pTLS->pCurrentNode->findChild(payload);
-            if(!pChild)
+            ถ้า(!pChild)
             {
                 m_disabled = true;
-                return;
+                คืน;
             }
         }
         pTLS->pCurrentNode = pChild;
@@ -2453,13 +2453,13 @@ IntrumentationRegion::IntrumentationRegion(const char* funName, const char* file
 IntrumentationRegion::~IntrumentationRegion()
 {
     InstrStruct *pStruct = &getInstrumentStruct();
-    if(pStruct->useInstr)
+    ถ้า(pStruct->useInstr)
     {
-        if(!m_disabled)
+        ถ้า(!m_disabled)
         {
             InstrTLSStruct *pTLS = &getInstrumentTLSStruct();
 
-            if (pTLS->pCurrentNode->m_payload.m_implType == cv::instr::IMPL_OPENCL &&
+            ถ้า (pTLS->pCurrentNode->m_payload.m_implType == cv::instr::IMPL_OPENCL &&
                 (pTLS->pCurrentNode->m_payload.m_instrType == cv::instr::TYPE_FUN ||
                     pTLS->pCurrentNode->m_payload.m_instrType == cv::instr::TYPE_WRAPPER))
             {
@@ -2485,16 +2485,16 @@ namespace ipp
 {
 
 #ifdef HAVE_IPP
-struct IPPInitSingleton
+sa_nracanaa IPPInitSingleton
 {
 public:
     IPPInitSingleton()
     {
         useIPP         = true;
 
-#if defined(OPENCV_ALGO_HINT_DEFAULT)
+#ถ้า defined(OPENCV_ALGO_HINT_DEFAULT)
         useIPP_NE      = OPENCV_ALGO_HINT_DEFAULT == cv::ALGO_HINT_APPROX;
-#else
+#มิฉะนั้น
         useIPP_NE      = false;
 #endif
         ippStatus      = 0;
@@ -2507,18 +2507,18 @@ public:
         pIppLibInfo    = NULL;
 
         ippStatus = ippGetCpuFeatures(&cpuFeatures, NULL);
-        if(ippStatus < 0)
+        ถ้า(ippStatus < 0)
         {
             CV_LOG_ERROR(NULL, "ERROR: IPP cannot detect CPU features, IPP was disabled");
             useIPP = false;
-            return;
+            คืน;
         }
         ippFeatures = cpuFeatures;
 
         std::string env = utils::getConfigurationParameterString("OPENCV_IPP");
-        if(!env.empty())
+        ถ้า(!env.empty())
         {
-#if IPP_VERSION_X100 >= 201900
+#ถ้า IPP_VERSION_X100 >= 201900
             const Ipp64u minorFeatures = ippCPUID_MOVBE|ippCPUID_AES|ippCPUID_CLMUL|ippCPUID_ABR|ippCPUID_RDRAND|ippCPUID_F16C|
                 ippCPUID_ADCOX|ippCPUID_RDSEED|ippCPUID_PREFETCHW|ippCPUID_SHA|ippCPUID_MPX|ippCPUID_AVX512CD|ippCPUID_AVX512ER|
                 ippCPUID_AVX512PF|ippCPUID_AVX512BW|ippCPUID_AVX512DQ|ippCPUID_AVX512VL|ippCPUID_AVX512VBMI|ippCPUID_AVX512_4FMADDPS|
@@ -2531,33 +2531,33 @@ public:
             const Ipp64u minorFeatures = ippCPUID_MOVBE|ippCPUID_AES|ippCPUID_CLMUL|ippCPUID_ABR|ippCPUID_RDRAND|ippCPUID_F16C|
                 ippCPUID_ADCOX|ippCPUID_RDSEED|ippCPUID_PREFETCHW|ippCPUID_SHA|ippCPUID_AVX512CD|ippCPUID_AVX512ER|
                 ippCPUID_AVX512PF|ippCPUID_AVX512BW|ippCPUID_AVX512DQ|ippCPUID_AVX512VL|ippCPUID_AVX512VBMI;
-#else
+#มิฉะนั้น
             const Ipp64u minorFeatures = 0;
 #endif
 
             env = toLowerCase(env);
-            if(env.substr(0, 2) == "ne")
+            ถ้า(env.substr(0, 2) == "ne")
             {
                 useIPP_NE = true;
                 env = env.substr(3, env.size());
             }
 
-            if(env == "disabled")
+            ถ้า(env == "disabled")
             {
                 CV_LOG_WARNING(NULL, "WARNING: IPP was disabled by OPENCV_IPP environment variable");
                 useIPP = false;
             }
-            else if(env == "sse42")
+            มิฉะนั้น ถ้า(env == "sse42")
                 ippFeatures = minorFeatures|ippCPUID_SSE2|ippCPUID_SSE3|ippCPUID_SSSE3|ippCPUID_SSE41|ippCPUID_SSE42;
-            else if(env == "avx2")
+            มิฉะนั้น ถ้า(env == "avx2")
                 ippFeatures = minorFeatures|ippCPUID_SSE2|ippCPUID_SSE3|ippCPUID_SSSE3|ippCPUID_SSE41|ippCPUID_SSE42|ippCPUID_AVX|ippCPUID_AVX2;
-#if IPP_VERSION_X100 >= 201700
-#if defined (_M_AMD64) || defined (__x86_64__)
-            else if(env == "avx512")
+#ถ้า IPP_VERSION_X100 >= 201700
+#ถ้า defined (_M_AMD64) || defined (__x86_64__)
+            มิฉะนั้น ถ้า(env == "avx512")
                 ippFeatures = minorFeatures|ippCPUID_SSE2|ippCPUID_SSE3|ippCPUID_SSSE3|ippCPUID_SSE41|ippCPUID_SSE42|ippCPUID_AVX|ippCPUID_AVX2|ippCPUID_AVX512F;
 #endif
 #endif
-            else
+            มิฉะนั้น
                 CV_LOG_ERROR(NULL, "ERROR: Improper value of OPENCV_IPP: " << env.c_str() << ". Correct values are: disabled, sse42, avx2, avx512 (Intel64 only)");
 
             // Trim unsupported features
@@ -2565,12 +2565,12 @@ public:
         }
 
         // Disable AVX1 since we don't track regressions for it. SSE42 will be used instead
-        if(cpuFeatures&ippCPUID_AVX && !(cpuFeatures&ippCPUID_AVX2))
+        ถ้า(cpuFeatures&ippCPUID_AVX && !(cpuFeatures&ippCPUID_AVX2))
             ippFeatures &= ~((Ipp64u)ippCPUID_AVX);
 
         // IPP integrations in OpenCV support only SSE4.2, AVX2 and AVX-512 optimizations.
-        if(!(
-#if IPP_VERSION_X100 >= 201700
+        ถ้า(!(
+#ถ้า IPP_VERSION_X100 >= 201700
             cpuFeatures&ippCPUID_AVX512F ||
 #endif
             cpuFeatures&ippCPUID_AVX2 ||
@@ -2578,38 +2578,38 @@ public:
             ))
         {
             useIPP = false;
-            return;
+            คืน;
         }
 
-        if(ippFeatures == cpuFeatures)
+        ถ้า(ippFeatures == cpuFeatures)
             IPP_INITIALIZER(0)
-        else
+        มิฉะนั้น
             IPP_INITIALIZER(ippFeatures)
         ippFeatures = ippGetEnabledCpuFeatures();
 
         // Detect top level optimizations to make comparison easier for optimizations dependent conditions
-#if IPP_VERSION_X100 >= 201700
-        if(ippFeatures&ippCPUID_AVX512F)
+#ถ้า IPP_VERSION_X100 >= 201700
+        ถ้า(ippFeatures&ippCPUID_AVX512F)
         {
-            if((ippFeatures&ippCPUID_AVX512_SKX) == ippCPUID_AVX512_SKX)
+            ถ้า((ippFeatures&ippCPUID_AVX512_SKX) == ippCPUID_AVX512_SKX)
                 ippTopFeatures = ippCPUID_AVX512_SKX;
-            else if((ippFeatures&ippCPUID_AVX512_KNL) == ippCPUID_AVX512_KNL)
+            มิฉะนั้น ถ้า((ippFeatures&ippCPUID_AVX512_KNL) == ippCPUID_AVX512_KNL)
                 ippTopFeatures = ippCPUID_AVX512_KNL;
-            else
+            มิฉะนั้น
                 ippTopFeatures = ippCPUID_AVX512F; // Unknown AVX512 configuration
         }
-        else
+        มิฉะนั้น
 #endif
-        if(ippFeatures&ippCPUID_AVX2)
+        ถ้า(ippFeatures&ippCPUID_AVX2)
             ippTopFeatures = ippCPUID_AVX2;
-        else if(ippFeatures&ippCPUID_SSE42)
+        มิฉะนั้น ถ้า(ippFeatures&ippCPUID_SSE42)
             ippTopFeatures = ippCPUID_SSE42;
 
         pIppLibInfo = ippiGetLibVersion();
 
         // workaround: https://github.com/opencv/opencv/issues/12959
         std::string ippName(pIppLibInfo->Name ? pIppLibInfo->Name : "");
-        if (ippName.find("SSE4.2") != std::string::npos)
+        ถ้า (ippName.find("SSE4.2") != std::string::npos)
         {
             ippTopFeatures = ippCPUID_SSE42;
         }
@@ -2619,10 +2619,10 @@ public:
     bool        useIPP;
     bool        useIPP_NE;
 
-    int         ippStatus;  // 0 - all is ok, -1 - IPP functions failed
-    const char *funcname;
-    const char *filename;
-    int         linen;
+    จำนวนเต็ม         ippStatus;  // 0 - all is ok, -1 - IPP functions failed
+    const var_na *funcname;
+    const var_na *filename;
+    จำนวนเต็ม         linen;
     Ipp64u      ippFeatures;
     Ipp64u      cpuFeatures;
     Ipp64u      ippTopFeatures;
@@ -2638,46 +2638,46 @@ static IPPInitSingleton& getIPPSingleton()
 unsigned long long getIppFeatures()
 {
 #ifdef HAVE_IPP
-    return getIPPSingleton().ippFeatures;
-#else
-    return 0;
+    คืน getIPPSingleton().ippFeatures;
+#มิฉะนั้น
+    คืน 0;
 #endif
 }
 
 #ifdef HAVE_IPP
 unsigned long long getIppTopFeatures()
 {
-    return getIPPSingleton().ippTopFeatures;
+    คืน getIPPSingleton().ippTopFeatures;
 }
 #endif
 
-void setIppStatus(int status, const char * const _funcname, const char * const _filename, int _line)
+void setIppStatus(จำนวนเต็ม status, const var_na * const _funcname, const var_na * const _filename, จำนวนเต็ม _line)
 {
 #ifdef HAVE_IPP
     getIPPSingleton().ippStatus = status;
     getIPPSingleton().funcname = _funcname;
     getIPPSingleton().filename = _filename;
     getIPPSingleton().linen = _line;
-#else
+#มิฉะนั้น
     CV_UNUSED(status); CV_UNUSED(_funcname); CV_UNUSED(_filename); CV_UNUSED(_line);
 #endif
 }
 
-int getIppStatus()
+จำนวนเต็ม getIppStatus()
 {
 #ifdef HAVE_IPP
-    return getIPPSingleton().ippStatus;
-#else
-    return 0;
+    คืน getIPPSingleton().ippStatus;
+#มิฉะนั้น
+    คืน 0;
 #endif
 }
 
 String getIppErrorLocation()
 {
 #ifdef HAVE_IPP
-    return format("%s:%d %s", getIPPSingleton().filename ? getIPPSingleton().filename : "", getIPPSingleton().linen, getIPPSingleton().funcname ? getIPPSingleton().funcname : "");
-#else
-    return String();
+    คืน format("%s:%d %s", getIPPSingleton().filename ? getIPPSingleton().filename : "", getIPPSingleton().linen, getIPPSingleton().funcname ? getIPPSingleton().funcname : "");
+#มิฉะนั้น
+    คืน String();
 #endif
 }
 
@@ -2685,12 +2685,12 @@ String getIppVersion()
 {
 #ifdef HAVE_IPP
     const IppLibraryVersion *pInfo = getIPPSingleton().pIppLibInfo;
-    if(pInfo)
-        return format("%s %s %s", pInfo->Name, pInfo->Version, pInfo->BuildDate);
-    else
-        return String("error");
-#else
-    return String("disabled");
+    ถ้า(pInfo)
+        คืน format("%s %s %s", pInfo->Name, pInfo->Version, pInfo->BuildDate);
+    มิฉะนั้น
+        คืน String("error");
+#มิฉะนั้น
+    คืน String("disabled");
 #endif
 }
 
@@ -2698,13 +2698,13 @@ bool useIPP()
 {
 #ifdef HAVE_IPP
     CoreTLSData& data = getCoreTlsData();
-    if (data.useIPP < 0)
+    ถ้า (data.useIPP < 0)
     {
         data.useIPP = getIPPSingleton().useIPP;
     }
-    return (data.useIPP > 0);
-#else
-    return false;
+    คืน (data.useIPP > 0);
+#มิฉะนั้น
+    คืน false;
 #endif
 }
 
@@ -2713,7 +2713,7 @@ void setUseIPP(bool flag)
     CoreTLSData& data = getCoreTlsData();
 #ifdef HAVE_IPP
     data.useIPP = (getIPPSingleton().useIPP)?flag:false;
-#else
+#มิฉะนั้น
     CV_UNUSED(flag);
     data.useIPP = false;
 #endif
@@ -2723,13 +2723,13 @@ bool useIPP_NotExact()
 {
 #ifdef HAVE_IPP
     CoreTLSData& data = getCoreTlsData();
-    if (data.useIPP_NE < 0)
+    ถ้า (data.useIPP_NE < 0)
     {
         data.useIPP_NE = getIPPSingleton().useIPP_NE;
     }
-    return (data.useIPP_NE > 0);
-#else
-    return false;
+    คืน (data.useIPP_NE > 0);
+#มิฉะนั้น
+    คืน false;
 #endif
 }
 
@@ -2738,7 +2738,7 @@ void setUseIPP_NotExact(bool flag)
     CoreTLSData& data = getCoreTlsData();
 #ifdef HAVE_IPP
     data.useIPP_NE = flag;
-#else
+#มิฉะนั้น
     CV_UNUSED(flag);
     data.useIPP_NE = false;
 #endif
@@ -2749,7 +2749,7 @@ void setUseIPP_NotExact(bool flag)
 
 namespace details {
 
-#if OPENCV_IMPL_FP_HINTS_X86
+#ถ้า OPENCV_IMPL_FP_HINTS_X86
 #ifndef _MM_DENORMALS_ZERO_ON  // requires pmmintrin.h (SSE3)
 #define _MM_DENORMALS_ZERO_ON 0x0040
 #endif
@@ -2760,10 +2760,10 @@ namespace details {
 
 void setFPDenormalsIgnoreHint(bool ignore, CV_OUT FPDenormalsModeState& state)
 {
-#if OPENCV_IMPL_FP_HINTS_X86
+#ถ้า OPENCV_IMPL_FP_HINTS_X86
     unsigned mask = _MM_FLUSH_ZERO_MASK;
     unsigned value = ignore ? _MM_FLUSH_ZERO_ON : 0;
-    if (featuresEnabled.have[CPU_SSE3])
+    ถ้า (featuresEnabled.have[CPU_SSE3])
     {
         mask |= _MM_DENORMALS_ZERO_MASK;
         value |= ignore ? _MM_DENORMALS_ZERO_ON : 0;
@@ -2776,16 +2776,16 @@ void setFPDenormalsIgnoreHint(bool ignore, CV_OUT FPDenormalsModeState& state)
     state.reserved[0] = (uint32_t)mask;
     state.reserved[1] = (uint32_t)old_value;
     _mm_setcsr(flags);
-#else
+#มิฉะนั้น
     CV_UNUSED(ignore); CV_UNUSED(state);
 #endif
 }
 
-int saveFPDenormalsState(CV_OUT FPDenormalsModeState& state)
+จำนวนเต็ม saveFPDenormalsState(CV_OUT FPDenormalsModeState& state)
 {
-#if OPENCV_IMPL_FP_HINTS_X86
+#ถ้า OPENCV_IMPL_FP_HINTS_X86
     unsigned mask = _MM_FLUSH_ZERO_MASK;
-    if (featuresEnabled.have[CPU_SSE3])
+    ถ้า (featuresEnabled.have[CPU_SSE3])
     {
         mask |= _MM_DENORMALS_ZERO_MASK;
     }
@@ -2794,28 +2794,28 @@ int saveFPDenormalsState(CV_OUT FPDenormalsModeState& state)
     // save state
     state.reserved[0] = (uint32_t)mask;
     state.reserved[1] = (uint32_t)old_value;
-    return 2;
-#else
+    คืน 2;
+#มิฉะนั้น
     CV_UNUSED(state);
-    return 0;
+    คืน 0;
 #endif
 }
 
 bool restoreFPDenormalsState(const FPDenormalsModeState& state)
 {
-#if OPENCV_IMPL_FP_HINTS_X86
+#ถ้า OPENCV_IMPL_FP_HINTS_X86
     const unsigned mask = (unsigned)state.reserved[0];
     CV_DbgAssert(mask != 0); // invalid state (ensure that state is properly saved earlier)
     const unsigned value = (unsigned)state.reserved[1];
-    CV_DbgCheck((int)value, value == (value & mask), "invalid SSE FP state");
+    CV_DbgCheck((จำนวนเต็ม)value, value == (value & mask), "invalid SSE FP state");
     const unsigned old_flags = _mm_getcsr();
     unsigned flags = (old_flags & ~mask) | value;
     CV_LOG_DEBUG(NULL, "core: restore FP mxcsr flags = " << cv::format("0x%08x", flags));
     _mm_setcsr(flags);
-    return true;
-#else
+    คืน true;
+#มิฉะนั้น
     CV_UNUSED(state);
-    return false;
+    คืน false;
 #endif
 }
 
@@ -2824,9 +2824,9 @@ bool restoreFPDenormalsState(const FPDenormalsModeState& state)
 AlgorithmHint getDefaultAlgorithmHint()
 {
 #ifdef OPENCV_ALGO_HINT_DEFAULT
-    return OPENCV_ALGO_HINT_DEFAULT;
-#else
-    return ALGO_HINT_ACCURATE;
+    คืน OPENCV_ALGO_HINT_DEFAULT;
+#มิฉะนั้น
+    คืน ALGO_HINT_ACCURATE;
 #endif
 };
 

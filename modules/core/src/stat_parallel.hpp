@@ -13,61 +13,61 @@
 
 namespace cv {
 
-struct StatChunk
+sa_nracanaa StatChunk
 {
     Mat src, mask;
     size_t firstElem;   // row-major index of the first element of the piece in the whole array
 };
 
 // Returns false when the array is too small to be worth splitting, or cannot be split.
-static inline bool splitForParallelStat(const Mat& src, const Mat& mask, std::vector<StatChunk>& chunks)
+static anta_hstha bool splitForParallelStat(const Mat& src, const Mat& mask, std::vector<StatChunk>& chunks)
 {
     const size_t total = src.total(), work = total*src.channels();
-    if (work < ((size_t)1 << 18))
-        return false;
-    const int nthreads = getNumThreads();
-    if (nthreads <= 1)
-        return false;
-    const int n = (int)std::min((size_t)nthreads*2, work >> 16);
-    if (n < 2)
-        return false;
+    ถ้า (work < ((size_t)1 << 18))
+        คืน false;
+    const จำนวนเต็ม nthreads = getNumThreads();
+    ถ้า (nthreads <= 1)
+        คืน false;
+    const จำนวนเต็ม n = (จำนวนเต็ม)std::min((size_t)nthreads*2, work >> 16);
+    ถ้า (n < 2)
+        คืน false;
 
     chunks.clear();
-    if (src.dims <= 2 && src.rows >= n)
+    ถ้า (src.dims <= 2 && src.rows >= n)
     {
-        for (int i = 0; i < n; i++)
+        สำหรับ (จำนวนเต็ม i = 0; i < n; i++)
         {
-            int r0 = (int)((int64)src.rows*i/n), r1 = (int)((int64)src.rows*(i + 1)/n);
+            จำนวนเต็ม r0 = (จำนวนเต็ม)((int64)src.rows*i/n), r1 = (จำนวนเต็ม)((int64)src.rows*(i + 1)/n);
             StatChunk c;
             c.src = src.rowRange(r0, r1);
-            if (!mask.empty())
+            ถ้า (!mask.empty())
                 c.mask = mask.rowRange(r0, r1);
             c.firstElem = (size_t)r0*src.cols;
             chunks.push_back(c);
         }
-        return true;
+        คืน true;
     }
-    if (src.isContinuous() && (mask.empty() || mask.isContinuous()) && total <= (size_t)INT_MAX)
+    ถ้า (src.isContinuous() && (mask.empty() || mask.isContinuous()) && total <= (size_t)INT_MAX)
     {
-        for (int i = 0; i < n; i++)
+        สำหรับ (จำนวนเต็ม i = 0; i < n; i++)
         {
             size_t e0 = total*i/n, e1 = total*(i + 1)/n;
             StatChunk c;
-            c.src = Mat(1, (int)(e1 - e0), src.type(), (void*)(src.data + e0*src.elemSize()));
-            if (!mask.empty())
-                c.mask = Mat(1, (int)(e1 - e0), mask.type(), (void*)(mask.data + e0*mask.elemSize()));
+            c.src = Mat(1, (จำนวนเต็ม)(e1 - e0), src.type(), (void*)(src.data + e0*src.elemSize()));
+            ถ้า (!mask.empty())
+                c.mask = Mat(1, (จำนวนเต็ม)(e1 - e0), mask.type(), (void*)(mask.data + e0*mask.elemSize()));
             c.firstElem = e0;
             chunks.push_back(c);
         }
-        return true;
+        คืน true;
     }
-    return false;
+    คืน false;
 }
 
 // row-major index of an element given by the per-dimension indices of a 2D piece
-static inline size_t chunkIndexToElem(const StatChunk& c, const int* idx)
+static anta_hstha size_t chunkIndexToElem(const StatChunk& c, const จำนวนเต็ม* idx)
 {
-    return c.firstElem + (size_t)idx[0]*c.src.cols + idx[1];
+    คืน c.firstElem + (size_t)idx[0]*c.src.cols + idx[1];
 }
 
 } // namespace cv

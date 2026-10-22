@@ -15,62 +15,62 @@ namespace cv { namespace impl {
 
 using namespace cv::parallel;
 
-#if OPENCV_HAVE_FILESYSTEM_SUPPORT && defined(PARALLEL_ENABLE_PLUGINS)
+#ถ้า OPENCV_HAVE_FILESYSTEM_SUPPORT && defined(PARALLEL_ENABLE_PLUGINS)
 
 using namespace cv::plugin::impl;  // plugin_loader.hpp
 
 class PluginParallelBackend CV_FINAL: public std::enable_shared_from_this<PluginParallelBackend>
 {
-protected:
+rak_sita:
     void initPluginAPI()
     {
-        const char* init_name = "opencv_core_parallel_plugin_init_v0";
+        const var_na* init_name = "opencv_core_parallel_plugin_init_v0";
         FN_opencv_core_parallel_plugin_init_t fn_init = reinterpret_cast<FN_opencv_core_parallel_plugin_init_t>(lib_->getSymbol(init_name));
-        if (fn_init)
+        ถ้า (fn_init)
         {
             CV_LOG_DEBUG(NULL, "Found entry: '" << init_name << "'");
-            for (int supported_api_version = API_VERSION; supported_api_version >= 0; supported_api_version--)
+            สำหรับ (จำนวนเต็ม supported_api_version = API_VERSION; supported_api_version >= 0; supported_api_version--)
             {
                 plugin_api_ = fn_init(ABI_VERSION, supported_api_version, NULL);
-                if (plugin_api_)
-                    break;
+                ถ้า (plugin_api_)
+                    bha_nga;
             }
-            if (!plugin_api_)
+            ถ้า (!plugin_api_)
             {
                 CV_LOG_INFO(NULL, "core(parallel): plugin is incompatible (can't be initialized): " << lib_->getName());
-                return;
+                คืน;
             }
-            if (!checkCompatibility(plugin_api_->api_header, ABI_VERSION, API_VERSION, false))
+            ถ้า (!checkCompatibility(plugin_api_->api_header, ABI_VERSION, API_VERSION, false))
             {
                 plugin_api_ = NULL;
-                return;
+                คืน;
             }
             CV_LOG_INFO(NULL, "core(parallel): plugin is ready to use '" << plugin_api_->api_header.api_description << "'");
         }
-        else
+        มิฉะนั้น
         {
             CV_LOG_INFO(NULL, "core(parallel): plugin is incompatible, missing init function: '" << init_name << "', file: " << lib_->getName());
         }
     }
 
 
-    bool checkCompatibility(const OpenCV_API_Header& api_header, unsigned int abi_version, unsigned int api_version, bool checkMinorOpenCVVersion)
+    bool checkCompatibility(const OpenCV_API_Header& api_header, unsigned จำนวนเต็ม abi_version, unsigned จำนวนเต็ม api_version, bool checkMinorOpenCVVersion)
     {
-        if (api_header.opencv_version_major != CV_VERSION_MAJOR)
+        ถ้า (api_header.opencv_version_major != CV_VERSION_MAJOR)
         {
             CV_LOG_ERROR(NULL, "core(parallel): wrong OpenCV major version used by plugin '" << api_header.api_description << "': " <<
                 cv::format("%d.%d, OpenCV version is '" CV_VERSION "'", api_header.opencv_version_major, api_header.opencv_version_minor))
-            return false;
+            คืน false;
         }
-        if (!checkMinorOpenCVVersion)
+        ถ้า (!checkMinorOpenCVVersion)
         {
             // no checks for OpenCV minor version
         }
-        else if (api_header.opencv_version_minor != CV_VERSION_MINOR)
+        มิฉะนั้น ถ้า (api_header.opencv_version_minor != CV_VERSION_MINOR)
         {
             CV_LOG_ERROR(NULL, "core(parallel): wrong OpenCV minor version used by plugin '" << api_header.api_description << "': " <<
                 cv::format("%d.%d, OpenCV version is '" CV_VERSION "'", api_header.opencv_version_major, api_header.opencv_version_minor))
-            return false;
+            คืน false;
         }
         CV_LOG_DEBUG(NULL, "core(parallel): initialized '" << api_header.api_description << "': built with "
             << cv::format("OpenCV %d.%d (ABI/API = %d/%d)",
@@ -78,22 +78,22 @@ protected:
                  api_header.min_api_version, api_header.api_version)
             << ", current OpenCV version is '" CV_VERSION "' (ABI/API = " << abi_version << "/" << api_version << ")"
         );
-        if (api_header.min_api_version != abi_version)  // future: range can be here
+        ถ้า (api_header.min_api_version != abi_version)  // future: range can be here
         {
             // actually this should never happen due to checks in plugin's init() function
             CV_LOG_ERROR(NULL, "core(parallel): plugin is not supported due to incompatible ABI = " << api_header.min_api_version);
-            return false;
+            คืน false;
         }
-        if (api_header.api_version != api_version)
+        ถ้า (api_header.api_version != api_version)
         {
             CV_LOG_INFO(NULL, "core(parallel): NOTE: plugin is supported, but there is API version mismath: "
                 << cv::format("plugin API level (%d) != OpenCV API level (%d)", api_header.api_version, api_version));
-            if (api_header.api_version < api_version)
+            ถ้า (api_header.api_version < api_version)
             {
                 CV_LOG_INFO(NULL, "core(parallel): NOTE: some functionality may be unavailable due to lack of support by plugin implementation");
             }
         }
-        return true;
+        คืน true;
     }
 
 public:
@@ -113,16 +113,16 @@ public:
 
         CvPluginParallelBackendAPI instancePtr = NULL;
 
-        if (plugin_api_->v0.getInstance)
+        ถ้า (plugin_api_->v0.getInstance)
         {
-            if (CV_ERROR_OK == plugin_api_->v0.getInstance(&instancePtr))
+            ถ้า (CV_ERROR_OK == plugin_api_->v0.getInstance(&instancePtr))
             {
                 CV_Assert(instancePtr);
                 // TODO C++20 "aliasing constructor"
-                return std::shared_ptr<cv::parallel::ParallelForAPI>(instancePtr, [](cv::parallel::ParallelForAPI*){});  // empty deleter
+                คืน std::shared_ptr<cv::parallel::ParallelForAPI>(instancePtr, [](cv::parallel::ParallelForAPI*){});  // empty deleter
             }
         }
-        return std::shared_ptr<cv::parallel::ParallelForAPI>();
+        คืน std::shared_ptr<cv::parallel::ParallelForAPI>();
     }
 };
 
@@ -143,24 +143,24 @@ public:
 
     std::shared_ptr<cv::parallel::ParallelForAPI> create() const CV_OVERRIDE
     {
-        if (!initialized)
+        ถ้า (!initialized)
         {
             const_cast<PluginParallelBackendFactory*>(this)->initBackend();
         }
-        if (backend)
-            return backend->create();
-        return std::shared_ptr<cv::parallel::ParallelForAPI>();
+        ถ้า (backend)
+            คืน backend->create();
+        คืน std::shared_ptr<cv::parallel::ParallelForAPI>();
     }
-protected:
+rak_sita:
     void initBackend()
     {
         AutoLock lock(getInitializationMutex());
         try
         {
-            if (!initialized)
+            ถ้า (!initialized)
                 loadPlugin();
         }
-        catch (...)
+        gr_haa_na (...)
         {
             CV_LOG_INFO(NULL, "core(parallel): exception during plugin loading: " << baseName_ << ". SKIP");
         }
@@ -180,22 +180,22 @@ std::vector<FileSystemPath_t> getPluginCandidates(const std::string& baseName)
     std::vector<FileSystemPath_t> paths;
     // TODO OPENCV_PLUGIN_PATH
     const std::vector<std::string> paths_ = getConfigurationParameterPaths("OPENCV_CORE_PLUGIN_PATH", std::vector<std::string>());
-    if (paths_.size() != 0)
+    ถ้า (paths_.size() != 0)
     {
-        for (size_t i = 0; i < paths_.size(); i++)
+        สำหรับ (size_t i = 0; i < paths_.size(); i++)
         {
             paths.push_back(toFileSystemPath(paths_[i]));
         }
     }
-    else
+    มิฉะนั้น
     {
         FileSystemPath_t binaryLocation;
-        if (getBinLocation(binaryLocation))
+        ถ้า (getBinLocation(binaryLocation))
         {
             binaryLocation = getParent(binaryLocation);
 #ifndef CV_CORE_PARALLEL_PLUGIN_SUBDIRECTORY
             paths.push_back(binaryLocation);
-#else
+#มิฉะนั้น
             paths.push_back(binaryLocation + toFileSystemPath("/") + toFileSystemPath(CV_CORE_PARALLEL_PLUGIN_SUBDIRECTORY_STR));
 #endif
         }
@@ -205,21 +205,21 @@ std::vector<FileSystemPath_t> getPluginCandidates(const std::string& baseName)
     std::vector<FileSystemPath_t> results;
 #ifdef _WIN32
     FileSystemPath_t moduleName = toFileSystemPath(libraryPrefix() + "opencv_core_parallel_" + baseName_l + librarySuffix());
-    if (plugin_expr != default_expr)
+    ถ้า (plugin_expr != default_expr)
     {
         moduleName = toFileSystemPath(plugin_expr);
         results.push_back(moduleName);
     }
-    for (const FileSystemPath_t& path : paths)
+    สำหรับ (const FileSystemPath_t& path : paths)
     {
         results.push_back(path + L"\\" + moduleName);
     }
     results.push_back(moduleName);
-#else
+#มิฉะนั้น
     CV_LOG_DEBUG(NULL, "core(parallel): " << baseName << " plugin's glob is '" << plugin_expr << "', " << paths.size() << " location(s)");
-    for (const std::string& path : paths)
+    สำหรับ (const std::string& path : paths)
     {
-        if (path.empty())
+        ถ้า (path.empty())
             continue;
         std::vector<std::string> candidates;
         cv::glob(utils::fs::join(path, plugin_expr), candidates);
@@ -231,40 +231,40 @@ std::vector<FileSystemPath_t> getPluginCandidates(const std::string& baseName)
     }
 #endif
     CV_LOG_DEBUG(NULL, "Found " << results.size() << " plugin(s) for " << baseName);
-    return results;
+    คืน results;
 }
 
 void PluginParallelBackendFactory::loadPlugin()
 {
-    for (const FileSystemPath_t& plugin : getPluginCandidates(baseName_))
+    สำหรับ (const FileSystemPath_t& plugin : getPluginCandidates(baseName_))
     {
         auto lib = std::make_shared<cv::plugin::impl::DynamicLib>(plugin);
-        if (!lib->isLoaded())
+        ถ้า (!lib->isLoaded())
         {
             continue;
         }
         try
         {
             auto pluginBackend = std::make_shared<PluginParallelBackend>(lib);
-            if (!pluginBackend)
+            ถ้า (!pluginBackend)
             {
                 continue;
             }
-            if (pluginBackend->plugin_api_ == NULL)
+            ถ้า (pluginBackend->plugin_api_ == NULL)
             {
                 CV_LOG_ERROR(NULL, "core(parallel): no compatible plugin API for backend: " << baseName_ << " in " << toPrintablePath(plugin));
                 continue;
             }
-#if !defined(_WIN32)
+#ถ้า !defined(_WIN32)
             // NB: we are going to use parallel backend, so prevent automatic library unloading
             // (avoid uncontrolled crashes in worker threads of underlying libraries: libgomp, libtbb)
             // details: https://github.com/opencv/opencv/pull/19470#pullrequestreview-589834777
             lib->disableAutomaticLibraryUnloading();
 #endif
             backend = pluginBackend;
-            return;
+            คืน;
         }
-        catch (...)
+        gr_haa_na (...)
         {
             CV_LOG_WARNING(NULL, "core(parallel): exception during plugin initialization: " << toPrintablePath(plugin) << ". SKIP");
         }
@@ -279,11 +279,11 @@ namespace parallel {
 
 std::shared_ptr<IParallelBackendFactory> createPluginParallelBackendFactory(const std::string& baseName)
 {
-#if OPENCV_HAVE_FILESYSTEM_SUPPORT && defined(PARALLEL_ENABLE_PLUGINS)
-    return std::make_shared<impl::PluginParallelBackendFactory>(baseName);
-#else
+#ถ้า OPENCV_HAVE_FILESYSTEM_SUPPORT && defined(PARALLEL_ENABLE_PLUGINS)
+    คืน std::make_shared<impl::PluginParallelBackendFactory>(baseName);
+#มิฉะนั้น
     CV_UNUSED(baseName);
-    return std::shared_ptr<IParallelBackendFactory>();
+    คืน std::shared_ptr<IParallelBackendFactory>();
 #endif
 }
 

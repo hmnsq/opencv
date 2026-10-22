@@ -12,31 +12,31 @@ namespace cv {
 
 #ifdef HAVE_OPENCL
 
-enum { OCL_OP_SUM = 0, OCL_OP_SUM_ABS =  1, OCL_OP_SUM_SQR = 2 };
-bool ocl_sum( InputArray _src, Scalar & res, int sum_op, InputArray _mask = noArray(),
+ga_nanaa { OCL_OP_SUM = 0, OCL_OP_SUM_ABS =  1, OCL_OP_SUM_SQR = 2 };
+bool ocl_sum( InputArray _src, Scalar & res, จำนวนเต็ม sum_op, InputArray _mask = noArray(),
                      InputArray _src2 = noArray(), bool calc2 = false, const Scalar & res2 = Scalar() );
-bool ocl_minMaxIdx( InputArray _src, double* minVal, double* maxVal, int* minLoc, int* maxLoc, InputArray _mask,
-                           int ddepth = -1, bool absValues = false, InputArray _src2 = noArray(), double * maxVal2 = NULL);
+bool ocl_minMaxIdx( InputArray _src, dviguu_na* minVal, dviguu_na* maxVal, จำนวนเต็ม* minLoc, จำนวนเต็ม* maxLoc, InputArray _mask,
+                           จำนวนเต็ม ddepth = -1, bool absValues = false, InputArray _src2 = noArray(), dviguu_na * maxVal2 = NULL);
 
 template <typename T> Scalar ocl_part_sum(Mat m)
 {
     CV_Assert(m.rows == 1);
 
     Scalar s = Scalar::all(0);
-    int cn = m.channels();
+    จำนวนเต็ม cn = m.channels();
     const T * const ptr = m.ptr<T>(0);
 
-    for (int x = 0, w = m.cols * cn; x < w; )
-        for (int c = 0; c < cn; ++c, ++x)
+    สำหรับ (จำนวนเต็ม x = 0, w = m.cols * cn; x < w; )
+        สำหรับ (จำนวนเต็ม c = 0; c < cn; ++c, ++x)
             s[c] += ptr[x];
 
-    return s;
+    คืน s;
 }
 
 #endif
 
-typedef int (*SumFunc)(const uchar*, const uchar* mask, uchar*, int, int);
-SumFunc getSumFunc(int depth);
+typedef จำนวนเต็ม (*SumFunc)(const uchar*, const uchar* mask, uchar*, จำนวนเต็ม, จำนวนเต็ม);
+SumFunc getSumFunc(จำนวนเต็ม depth);
 
 }
 

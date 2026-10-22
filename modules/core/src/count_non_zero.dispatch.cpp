@@ -12,7 +12,7 @@
 
 namespace cv {
 
-static CountNonZeroFunc getCountNonZeroTab(int depth)
+static CountNonZeroFunc getCountNonZeroTab(จำนวนเต็ม depth)
 {
     CV_INSTRUMENT_REGION();
     CV_CPU_DISPATCH(getCountNonZeroTab, (depth),
@@ -20,19 +20,19 @@ static CountNonZeroFunc getCountNonZeroTab(int depth)
 }
 
 #ifdef HAVE_OPENCL
-static bool ocl_countNonZero( InputArray _src, int & res )
+static bool ocl_countNonZero( InputArray _src, จำนวนเต็ม & res )
 {
-    int type = _src.type(), depth = CV_MAT_DEPTH(type), kercn = ocl::predictOptimalVectorWidth(_src);
+    จำนวนเต็ม type = _src.type(), depth = CV_MAT_DEPTH(type), kercn = ocl::predictOptimalVectorWidth(_src);
     bool doubleSupport = ocl::Device::getDefault().doubleFPConfig() > 0;
 
-    if (depth == CV_64F && !doubleSupport)
-        return false;
+    ถ้า (depth == CV_64F && !doubleSupport)
+        คืน false;
 
-    int dbsize = ocl::Device::getDefault().maxComputeUnits();
+    จำนวนเต็ม dbsize = ocl::Device::getDefault().maxComputeUnits();
     size_t wgs = ocl::Device::getDefault().maxWorkGroupSize();
 
-    int wgs2_aligned = 1;
-    while (wgs2_aligned < (int)wgs)
+    จำนวนเต็ม wgs2_aligned = 1;
+    ขณะ (wgs2_aligned < (จำนวนเต็ม)wgs)
         wgs2_aligned <<= 1;
     wgs2_aligned >>= 1;
 
@@ -40,91 +40,91 @@ static bool ocl_countNonZero( InputArray _src, int & res )
                   format("-D srcT=%s -D srcT1=%s -D cn=1 -D OP_COUNT_NON_ZERO"
                          " -D WGS=%d -D kercn=%d -D WGS2_ALIGNED=%d%s%s",
                          ocl::typeToStr(CV_MAKE_TYPE(depth, kercn)),
-                         ocl::typeToStr(depth), (int)wgs, kercn,
+                         ocl::typeToStr(depth), (จำนวนเต็ม)wgs, kercn,
                          wgs2_aligned, doubleSupport ? " -D DOUBLE_SUPPORT" : "",
                          _src.isContinuous() ? " -D HAVE_SRC_CONT" : ""));
-    if (k.empty())
-        return false;
+    ถ้า (k.empty())
+        คืน false;
 
     UMat src = _src.getUMat(), db(1, dbsize, CV_32SC1);
-    k.args(ocl::KernelArg::ReadOnlyNoSize(src), src.cols, (int)src.total(),
+    k.args(ocl::KernelArg::ReadOnlyNoSize(src), src.cols, (จำนวนเต็ม)src.total(),
            dbsize, ocl::KernelArg::PtrWriteOnly(db));
 
     size_t globalsize = dbsize * wgs;
-    if (k.run(1, &globalsize, &wgs, true))
-        return res = saturate_cast<int>(cv::sum(db.getMat(ACCESS_READ))[0]), true;
-    return false;
+    ถ้า (k.run(1, &globalsize, &wgs, true))
+        คืน res = saturate_cast<จำนวนเต็ม>(cv::sum(db.getMat(ACCESS_READ))[0]), true;
+    คืน false;
 }
 #endif
 
-#if defined HAVE_IPP
-static bool ipp_countNonZero( Mat &src, int &res )
+#ถ้า defined HAVE_IPP
+static bool ipp_countNonZero( Mat &src, จำนวนเต็ม &res )
 {
     CV_INSTRUMENT_REGION_IPP();
 
-#if IPP_VERSION_X100 < 201801
+#ถ้า IPP_VERSION_X100 < 201801
     // Poor performance of SSE42
-    if(cv::ipp::getIppTopFeatures() == ippCPUID_SSE42)
-        return false;
+    ถ้า(cv::ipp::getIppTopFeatures() == ippCPUID_SSE42)
+        คืน false;
 #endif
 
     Ipp32s  count = 0;
-    int     depth = src.depth();
+    จำนวนเต็ม     depth = src.depth();
 
-    if(src.dims <= 2)
+    ถ้า(src.dims <= 2)
     {
         IppStatus status;
         IppiSize  size = {src.cols*src.channels(), src.rows};
 
-        if(depth == CV_8U)
-            status = CV_INSTRUMENT_FUN_IPP(ippiCountInRange_8u_C1R, (const Ipp8u *)src.ptr(), (int)src.step, size, &count, 0, 0);
-        else if(depth == CV_32F)
-            status = CV_INSTRUMENT_FUN_IPP(ippiCountInRange_32f_C1R, (const Ipp32f *)src.ptr(), (int)src.step, size, &count, 0, 0);
-        else
-            return false;
+        ถ้า(depth == CV_8U)
+            status = CV_INSTRUMENT_FUN_IPP(ippiCountInRange_8u_C1R, (const Ipp8u *)src.ptr(), (จำนวนเต็ม)src.step, size, &count, 0, 0);
+        มิฉะนั้น ถ้า(depth == CV_32F)
+            status = CV_INSTRUMENT_FUN_IPP(ippiCountInRange_32f_C1R, (const Ipp32f *)src.ptr(), (จำนวนเต็ม)src.step, size, &count, 0, 0);
+        มิฉะนั้น
+            คืน false;
 
-        if(status < 0)
-            return false;
+        ถ้า(status < 0)
+            คืน false;
 
         res = size.width*size.height - count;
     }
-    else
+    มิฉะนั้น
     {
         IppStatus       status;
         const Mat      *arrays[] = {&src, NULL};
         Mat            planes[1];
         NAryMatIterator it(arrays, planes, 1);
-        IppiSize        size  = {(int)it.size*src.channels(), 1};
+        IppiSize        size  = {(จำนวนเต็ม)it.size*src.channels(), 1};
         res = 0;
-        for (size_t i = 0; i < it.nplanes; i++, ++it)
+        สำหรับ (size_t i = 0; i < it.nplanes; i++, ++it)
         {
-            if(depth == CV_8U)
-                status = CV_INSTRUMENT_FUN_IPP(ippiCountInRange_8u_C1R, it.planes->ptr<Ipp8u>(), (int)it.planes->step, size, &count, 0, 0);
-            else if(depth == CV_32F)
-                status = CV_INSTRUMENT_FUN_IPP(ippiCountInRange_32f_C1R, it.planes->ptr<Ipp32f>(), (int)it.planes->step, size, &count, 0, 0);
-            else
-                return false;
+            ถ้า(depth == CV_8U)
+                status = CV_INSTRUMENT_FUN_IPP(ippiCountInRange_8u_C1R, it.planes->ptr<Ipp8u>(), (จำนวนเต็ม)it.planes->step, size, &count, 0, 0);
+            มิฉะนั้น ถ้า(depth == CV_32F)
+                status = CV_INSTRUMENT_FUN_IPP(ippiCountInRange_32f_C1R, it.planes->ptr<Ipp32f>(), (จำนวนเต็ม)it.planes->step, size, &count, 0, 0);
+            มิฉะนั้น
+                คืน false;
 
-            if(status < 0 || (int)it.planes->total()*src.channels() < count)
-                return false;
+            ถ้า(status < 0 || (จำนวนเต็ม)it.planes->total()*src.channels() < count)
+                คืน false;
 
-            res += (int)it.planes->total()*src.channels() - count;
+            res += (จำนวนเต็ม)it.planes->total()*src.channels() - count;
         }
     }
 
-    return true;
+    คืน true;
 }
 #endif
 
-int countNonZero(InputArray _src)
+จำนวนเต็ม countNonZero(InputArray _src)
 {
     CV_INSTRUMENT_REGION();
 
-    int type = _src.type(), cn = CV_MAT_CN(type);
+    จำนวนเต็ม type = _src.type(), cn = CV_MAT_CN(type);
     CV_Assert( cn == 1 );
 
-#if defined HAVE_OPENCL || defined HAVE_IPP
-    int res = -1;
+#ถ้า defined HAVE_OPENCL || defined HAVE_IPP
+    จำนวนเต็ม res = -1;
 #endif
 
 #ifdef HAVE_OPENCL
@@ -142,12 +142,12 @@ int countNonZero(InputArray _src)
     const Mat* arrays[] = {&src, 0};
     uchar* ptrs[1] = {};
     NAryMatIterator it(arrays, ptrs);
-    int total = (int)it.size, nz = 0;
+    จำนวนเต็ม total = (จำนวนเต็ม)it.size, nz = 0;
 
-    for( size_t i = 0; i < it.nplanes; i++, ++it )
+    สำหรับ( size_t i = 0; i < it.nplanes; i++, ++it )
         nz += func( ptrs[0], total );
 
-    return nz;
+    คืน nz;
 }
 
 void findNonZero(InputArray _src, OutputArray _idx)
@@ -155,92 +155,92 @@ void findNonZero(InputArray _src, OutputArray _idx)
     Mat src = _src.getMat();
     CV_Assert( src.channels() == 1 && src.dims == 2 );
 
-    int depth = src.depth();
+    จำนวนเต็ม depth = src.depth();
     std::vector<Point> idxvec;
-    int rows = src.rows, cols = src.cols;
-    AutoBuffer<int> buf_(cols + 1);
-    int* buf = buf_.data();
+    จำนวนเต็ม rows = src.rows, cols = src.cols;
+    AutoBuffer<จำนวนเต็ม> buf_(cols + 1);
+    จำนวนเต็ม* buf = buf_.data();
 
-    for( int i = 0; i < rows; i++ )
+    สำหรับ( จำนวนเต็ม i = 0; i < rows; i++ )
     {
-        int j, k = 0;
+        จำนวนเต็ม j, k = 0;
         const uchar* ptr8 = src.ptr(i);
-        if( depth == CV_8U || depth == CV_8S || depth == CV_Bool || depth == CV_8F_E4M3FNUZ )
+        ถ้า( depth == CV_8U || depth == CV_8S || depth == CV_Bool || depth == CV_8F_E4M3FNUZ )
         {
             j = 0;
-#if (CV_SIMD || CV_SIMD_SCALABLE)
+#ถ้า (CV_SIMD || CV_SIMD_SCALABLE)
             // skip whole SIMD blocks of zeros; only scan blocks that contain a non-zero byte
-            const int vlanes = VTraits<v_uint8>::vlanes();
+            const จำนวนเต็ม vlanes = VTraits<v_uint8>::vlanes();
             const v_uint8 vzero = vx_setzero_u8();
-            for( ; j <= cols - vlanes; j += vlanes )
+            สำหรับ( ; j <= cols - vlanes; j += vlanes )
             {
-                if( !v_check_any(v_ne(vx_load(ptr8 + j), vzero)) )
+                ถ้า( !v_check_any(v_ne(vx_load(ptr8 + j), vzero)) )
                     continue;
-                for( int t = j; t < j + vlanes; t++ )
-                    if( ptr8[t] != 0 ) buf[k++] = t;
+                สำหรับ( จำนวนเต็ม t = j; t < j + vlanes; t++ )
+                    ถ้า( ptr8[t] != 0 ) buf[k++] = t;
             }
 #endif
-            for( ; j < cols; j++ )
-                if( ptr8[j] != 0 ) buf[k++] = j;
+            สำหรับ( ; j < cols; j++ )
+                ถ้า( ptr8[j] != 0 ) buf[k++] = j;
         }
-        else if( depth == CV_16U || depth == CV_16S )
+        มิฉะนั้น ถ้า( depth == CV_16U || depth == CV_16S )
         {
             const ushort* ptr16 = (const ushort*)ptr8;
-            for( j = 0; j < cols; j++ )
-                if( ptr16[j] != 0 ) buf[k++] = j;
+            สำหรับ( j = 0; j < cols; j++ )
+                ถ้า( ptr16[j] != 0 ) buf[k++] = j;
         }
-        else if( depth == CV_32S || depth == CV_32U )
+        มิฉะนั้น ถ้า( depth == CV_32S || depth == CV_32U )
         {
-            const int* ptr32s = (const int*)ptr8;
-            for( j = 0; j < cols; j++ )
-                if( ptr32s[j] != 0 ) buf[k++] = j;
+            const จำนวนเต็ม* ptr32s = (const จำนวนเต็ม*)ptr8;
+            สำหรับ( j = 0; j < cols; j++ )
+                ถ้า( ptr32s[j] != 0 ) buf[k++] = j;
         }
-        else if( depth == CV_64S || depth == CV_64U )
+        มิฉะนั้น ถ้า( depth == CV_64S || depth == CV_64U )
         {
             const int64* ptr64s = (const int64*)ptr8;
-            for( j = 0; j < cols; j++ )
-                if( ptr64s[j] != 0 ) buf[k++] = j;
+            สำหรับ( j = 0; j < cols; j++ )
+                ถ้า( ptr64s[j] != 0 ) buf[k++] = j;
         }
-        else if( depth == CV_32F )
+        มิฉะนั้น ถ้า( depth == CV_32F )
         {
-            const int* ptr32s = (const int*)ptr8;
-            for( j = 0; j < cols; j++ )
-                if( (ptr32s[j]<<1) != 0 ) buf[k++] = j;
+            const จำนวนเต็ม* ptr32s = (const จำนวนเต็ม*)ptr8;
+            สำหรับ( j = 0; j < cols; j++ )
+                ถ้า( (ptr32s[j]<<1) != 0 ) buf[k++] = j;
         }
-        else if( depth == CV_16F || depth == CV_16BF )
+        มิฉะนั้น ถ้า( depth == CV_16F || depth == CV_16BF )
         {
             const ushort* ptr16 = (const ushort*)ptr8;
-            for( j = 0; j < cols; j++ )
+            สำหรับ( j = 0; j < cols; j++ )
                 // mask sign bit so -0 (0x8000) is treated as zero; cannot use <<1 here
                 // because ushort is promoted to int and the sign bit would not be discarded
-                if( (ptr16[j] & 0x7fff) != 0 ) buf[k++] = j;
+                ถ้า( (ptr16[j] & 0x7fff) != 0 ) buf[k++] = j;
         }
-        else if( depth == CV_8F_E4M3FN )
+        มิฉะนั้น ถ้า( depth == CV_8F_E4M3FN )
         {
-            for( j = 0; j < cols; j++ )
+            สำหรับ( j = 0; j < cols; j++ )
                 // mask sign bit so -0 (0x80) is treated as zero
-                if( (ptr8[j] & 0x7f) != 0 ) buf[k++] = j;
+                ถ้า( (ptr8[j] & 0x7f) != 0 ) buf[k++] = j;
         }
-        else
+        มิฉะนั้น
         {
             const int64* ptr64s = (const int64*)ptr8;
-            for( j = 0; j < cols; j++ )
-                if( (ptr64s[j]<<1) != 0 ) buf[k++] = j;
+            สำหรับ( j = 0; j < cols; j++ )
+                ถ้า( (ptr64s[j]<<1) != 0 ) buf[k++] = j;
         }
 
-        if( k > 0 )
+        ถ้า( k > 0 )
         {
             size_t sz = idxvec.size();
             idxvec.resize(sz + k);
-            for( j = 0; j < k; j++ )
+            สำหรับ( j = 0; j < k; j++ )
                 idxvec[sz + j] = Point(buf[j], i);
         }
     }
 
-    if( idxvec.empty() || (_idx.kind() == _InputArray::MAT && !_idx.getMatRef().isContinuous()) )
+    ถ้า( idxvec.empty() || (_idx.kind() == _InputArray::MAT && !_idx.getMatRef().isContinuous()) )
         _idx.release();
 
-    if( !idxvec.empty() )
+    ถ้า( !idxvec.empty() )
         Mat(idxvec).copyTo(_idx);
 }
 
