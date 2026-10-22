@@ -14,7 +14,7 @@
 namespace cv
 {
 
-SumFunc getSumFunc(int depth)
+SumFunc getSumFunc(số_nguyên depth)
 {
     CV_INSTRUMENT_REGION();
     CV_CPU_DISPATCH(getSumFunc, (depth),
@@ -23,7 +23,7 @@ SumFunc getSumFunc(int depth)
 
 #ifdef HAVE_OPENCL
 
-bool ocl_sum( InputArray _src, Scalar & res, int sum_op, InputArray _mask,
+bool ocl_sum( InputArray _src, Scalar & res, số_nguyên sum_op, InputArray _mask,
                      InputArray _src2, bool calc2, const Scalar & res2 )
 {
     CV_Assert(sum_op == OCL_OP_SUM || sum_op == OCL_OP_SUM_ABS || sum_op == OCL_OP_SUM_SQR);
@@ -32,27 +32,27 @@ bool ocl_sum( InputArray _src, Scalar & res, int sum_op, InputArray _mask,
     bool doubleSupport = dev.doubleFPConfig() > 0,
         haveMask = _mask.kind() != _InputArray::NONE,
         haveSrc2 = _src2.kind() != _InputArray::NONE;
-    int type = _src.type(), depth = CV_MAT_DEPTH(type), cn = CV_MAT_CN(type),
+    số_nguyên type = _src.type(), depth = CV_MAT_DEPTH(type), cn = CV_MAT_CN(type),
             kercn = cn == 1 && !haveMask ? ocl::predictOptimalVectorWidth(_src, _src2) : 1,
             mcn = std::max(cn, kercn);
     CV_Assert(!haveSrc2 || _src2.type() == type);
-    int convert_cn = haveSrc2 ? mcn : cn;
+    số_nguyên convert_cn = haveSrc2 ? mcn : cn;
 
-    if ( (!doubleSupport && depth == CV_64F) || cn > 4 )
-        return false;
+    nếu ( (!doubleSupport && depth == CV_64F) || cn > 4 )
+        trả_về false;
 
-    if (depth >= CV_16F)
-        return false;
+    nếu (depth >= CV_16F)
+        trả_về false;
 
-    int ngroups = dev.maxComputeUnits(), dbsize = ngroups * (calc2 ? 2 : 1);
+    số_nguyên ngroups = dev.maxComputeUnits(), dbsize = ngroups * (calc2 ? 2 : 1);
     size_t wgs = dev.maxWorkGroupSize();
 
-    int ddepth = std::max(sum_op == OCL_OP_SUM_SQR ? CV_32F : CV_32S, depth),
+    số_nguyên ddepth = std::max(sum_op == OCL_OP_SUM_SQR ? CV_32F : CV_32S, depth),
             dtype = CV_MAKE_TYPE(ddepth, cn);
     CV_Assert(!haveMask || _mask.type() == CV_8U || _mask.type() == CV_8S || _mask.type() == CV_Bool);
 
-    int wgs2_aligned = 1;
-    while (wgs2_aligned < (int)wgs)
+    số_nguyên wgs2_aligned = 1;
+    trong_khi (wgs2_aligned < (số_nguyên)wgs)
         wgs2_aligned <<= 1;
     wgs2_aligned >>= 1;
 
@@ -64,7 +64,7 @@ bool ocl_sum( InputArray _src, Scalar & res, int sum_op, InputArray _mask,
                          ocl::typeToStr(dtype), ocl::typeToStr(CV_MAKE_TYPE(ddepth, mcn)),
                          ocl::typeToStr(ddepth), ddepth, cn,
                          ocl::convertTypeStr(depth, ddepth, mcn, cvt[0], sizeof(cvt[0])),
-                         opMap[sum_op], (int)wgs, wgs2_aligned,
+                         opMap[sum_op], (số_nguyên)wgs, wgs2_aligned,
                          doubleSupport ? " -D DOUBLE_SUPPORT" : "",
                          haveMask ? " -D HAVE_MASK" : "",
                          _src.isContinuous() ? " -D HAVE_SRC_CONT" : "",
@@ -74,8 +74,8 @@ bool ocl_sum( InputArray _src, Scalar & res, int sum_op, InputArray _mask,
                          depth <= CV_32S && ddepth == CV_32S ? ocl::convertTypeStr(CV_8U, ddepth, convert_cn, cvt[1], sizeof(cvt[1])) : "noconvert");
 
     ocl::Kernel k("reduce", ocl::core::reduce_oclsrc, opts);
-    if (k.empty())
-        return false;
+    nếu (k.empty())
+        trả_về false;
 
     UMat src = _src.getUMat(), src2 = _src2.getUMat(),
         db(1, dbsize, dtype), mask = _mask.getUMat();
@@ -85,36 +85,36 @@ bool ocl_sum( InputArray _src, Scalar & res, int sum_op, InputArray _mask,
             maskarg = ocl::KernelArg::ReadOnlyNoSize(mask),
             src2arg = ocl::KernelArg::ReadOnlyNoSize(src2);
 
-    if (haveMask)
+    nếu (haveMask)
     {
-        if (haveSrc2)
-            k.args(srcarg, src.cols, (int)src.total(), ngroups, dbarg, maskarg, src2arg);
-        else
-            k.args(srcarg, src.cols, (int)src.total(), ngroups, dbarg, maskarg);
+        nếu (haveSrc2)
+            k.args(srcarg, src.cols, (số_nguyên)src.total(), ngroups, dbarg, maskarg, src2arg);
+        không_thì
+            k.args(srcarg, src.cols, (số_nguyên)src.total(), ngroups, dbarg, maskarg);
     }
-    else
+    không_thì
     {
-        if (haveSrc2)
-            k.args(srcarg, src.cols, (int)src.total(), ngroups, dbarg, src2arg);
-        else
-            k.args(srcarg, src.cols, (int)src.total(), ngroups, dbarg);
+        nếu (haveSrc2)
+            k.args(srcarg, src.cols, (số_nguyên)src.total(), ngroups, dbarg, src2arg);
+        không_thì
+            k.args(srcarg, src.cols, (số_nguyên)src.total(), ngroups, dbarg);
     }
 
     size_t globalsize = ngroups * wgs;
-    if (k.run(1, &globalsize, &wgs, true))
+    nếu (k.run(1, &globalsize, &wgs, true))
     {
         typedef Scalar (*part_sum)(Mat m);
-        part_sum funcs[3] = { ocl_part_sum<int>, ocl_part_sum<float>, ocl_part_sum<double> },
+        part_sum funcs[3] = { ocl_part_sum<số_nguyên>, ocl_part_sum<float>, ocl_part_sum<double> },
                 func = funcs[ddepth - CV_32S];
 
         Mat mres = db.getMat(ACCESS_READ);
-        if (calc2)
+        nếu (calc2)
             const_cast<Scalar &>(res2) = func(mres.colRange(ngroups, dbsize));
 
         res = func(mres.colRange(0, ngroups));
-        return true;
+        trả_về true;
     }
-    return false;
+    trả_về false;
 }
 
 #endif
@@ -123,22 +123,22 @@ bool ocl_sum( InputArray _src, Scalar & res, int sum_op, InputArray _mask,
 static Scalar sum_(const Mat& src)
 {
     Scalar _res;
-    int cn = src.channels();
+    số_nguyên cn = src.channels();
 
-    if (src.dims <= 2)
+    nếu (src.dims <= 2)
     {
         CALL_HAL_RET2(sum, cv_hal_sum, _res, src.data, src.step, src.type(), src.cols, src.rows, &_res[0]);
     }
-    else if (src.isContinuous())
+    không_thì nếu (src.isContinuous())
     {
-        CALL_HAL_RET2(sum, cv_hal_sum, _res, src.data, 0, src.type(), (int)src.total(), 1, &_res[0]);
+        CALL_HAL_RET2(sum, cv_hal_sum, _res, src.data, 0, src.type(), (số_nguyên)src.total(), 1, &_res[0]);
     }
 
-    int k, depth = src.depth();
+    số_nguyên k, depth = src.depth();
     SumFunc func = getSumFunc(depth);
-    if (func == nullptr) {
-        if (depth == CV_Bool && cn == 1)
-            return Scalar((double)countNonZero(src));
+    nếu (func == nullptr) {
+        nếu (depth == CV_Bool && cn == 1)
+            trả_về Scalar((double)countNonZero(src));
         CV_Error_(Error::StsNotImplemented, ("sum: %s input is not supported, convert the input to another type (e.g. CV_32F) first",
                                             typeToString(src.type()).c_str()));
     }
@@ -146,41 +146,41 @@ static Scalar sum_(const Mat& src)
     const Mat* arrays[] = {&src, 0};
     uchar* ptrs[1] = {};
     NAryMatIterator it(arrays, ptrs);
-    int total = (int)it.size, blockSize = total, partialBlockSize = 0;
-    int j, count = 0;
-    int _buf[CV_CN_MAX];
-    int* buf = (int*)&_res[0];
+    số_nguyên total = (số_nguyên)it.size, blockSize = total, partialBlockSize = 0;
+    số_nguyên j, count = 0;
+    số_nguyên _buf[CV_CN_MAX];
+    số_nguyên* buf = (số_nguyên*)&_res[0];
     size_t esz = 0;
     bool partialSumIsInt = depth < CV_32S;
     bool blockSum = partialSumIsInt || depth == CV_16F || depth == CV_16BF;
 
-    if( blockSum )
+    nếu( blockSum )
     {
         partialBlockSize = depth <= CV_8S ? (1 << 23) : (1 << 15);
         blockSize = std::min(blockSize, partialBlockSize);
         buf = _buf;
-        for( k = 0; k < cn; k++ )
+        cho( k = 0; k < cn; k++ )
             buf[k] = 0;
         esz = src.elemSize();
     }
 
-    for( size_t i = 0; i < it.nplanes; i++, ++it )
+    cho( size_t i = 0; i < it.nplanes; i++, ++it )
     {
-        for( j = 0; j < total; j += blockSize )
+        cho( j = 0; j < total; j += blockSize )
         {
-            int bsz = std::min(total - j, blockSize);
+            số_nguyên bsz = std::min(total - j, blockSize);
             func( ptrs[0], 0, (uchar*)buf, bsz, cn );
             count += bsz;
-            if( blockSum && (count + blockSize >= partialBlockSize || (i+1 >= it.nplanes && j+bsz >= total)) )
+            nếu( blockSum && (count + blockSize >= partialBlockSize || (i+1 >= it.nplanes && j+bsz >= total)) )
             {
-                if (partialSumIsInt) {
-                    for( k = 0; k < cn; k++ )
+                nếu (partialSumIsInt) {
+                    cho( k = 0; k < cn; k++ )
                     {
                         _res[k] += buf[k];
                         buf[k] = 0;
                     }
-                } else {
-                    for( k = 0; k < cn; k++ )
+                } không_thì {
+                    cho( k = 0; k < cn; k++ )
                     {
                         _res[k] += ((float*)buf)[k];
                         buf[k] = 0;
@@ -191,7 +191,7 @@ static Scalar sum_(const Mat& src)
             ptrs[0] += bsz*esz;
         }
     }
-    return _res;
+    trả_về _res;
 }
 
 Scalar sum(InputArray _src)
@@ -209,18 +209,18 @@ Scalar sum(InputArray _src)
     CV_CheckLE( src.channels(), 4, "cv::sum does not support more than 4 channels" );
 
     std::vector<StatChunk> chunks;
-    if (!splitForParallelStat(src, Mat(), chunks))
-        return sum_(src);
+    nếu (!splitForParallelStat(src, Mat(), chunks))
+        trả_về sum_(src);
 
     std::vector<Scalar> part(chunks.size());
-    parallel_for_(Range(0, (int)chunks.size()), [&](const Range& r)
+    parallel_for_(Range(0, (số_nguyên)chunks.size()), [&](const Range& r)
     {
-        for (int i = r.start; i < r.end; i++)
+        cho (số_nguyên i = r.start; i < r.end; i++)
             part[i] = sum_(chunks[i].src);
     });
-    for (const Scalar& v : part)
+    cho (const Scalar& v : part)
         _res += v;
-    return _res;
+    trả_về _res;
 }
 
 } // namespace

@@ -50,30 +50,30 @@
 namespace cv
 {
 
-static int CV_KMEANS_PARALLEL_GRANULARITY = (int)utils::getConfigurationParameterSizeT("OPENCV_KMEANS_PARALLEL_GRANULARITY", 1000);
+static số_nguyên CV_KMEANS_PARALLEL_GRANULARITY = (số_nguyên)utils::getConfigurationParameterSizeT("OPENCV_KMEANS_PARALLEL_GRANULARITY", 1000);
 
-static void generateRandomCenter(int dims, const Vec2f* box, float* center, RNG& rng)
+static void generateRandomCenter(số_nguyên dims, const Vec2f* box, float* center, RNG& rng)
 {
     float margin = 1.f/dims;
-    for (int j = 0; j < dims; j++)
+    cho (số_nguyên j = 0; j < dims; j++)
         center[j] = ((float)rng*(1.f+margin*2.f)-margin)*(box[j][1] - box[j][0]) + box[j][0];
 }
 
 class KMeansPPDistanceComputer : public ParallelLoopBody
 {
 public:
-    KMeansPPDistanceComputer(float *tdist2_, const Mat& data_, const float *dist_, int ci_) :
+    KMeansPPDistanceComputer(float *tdist2_, const Mat& data_, const float *dist_, số_nguyên ci_) :
         tdist2(tdist2_), data(data_), dist(dist_), ci(ci_)
     { }
 
     void operator()( const cv::Range& range ) const CV_OVERRIDE
     {
         CV_TRACE_FUNCTION();
-        const int begin = range.start;
-        const int end = range.end;
-        const int dims = data.cols;
+        const số_nguyên begin = range.start;
+        const số_nguyên end = range.end;
+        const số_nguyên dims = data.cols;
 
-        for (int i = begin; i<end; i++)
+        cho (số_nguyên i = begin; i<end; i++)
         {
             tdist2[i] = std::min(hal::normL2Sqr_(data.ptr<float>(i), data.ptr<float>(ci), dims), dist[i]);
         }
@@ -85,7 +85,7 @@ private:
     float *tdist2;
     const Mat& data;
     const float *dist;
-    const int ci;
+    const số_nguyên ci;
 };
 
 /*
@@ -93,39 +93,39 @@ k-means center initialization using the following algorithm:
 Arthur & Vassilvitskii (2007) k-means++: The Advantages of Careful Seeding
 */
 static bool generateCentersPP(const Mat& data, Mat& _out_centers,
-                              int K, RNG& rng, int trials)
+                              số_nguyên K, RNG& rng, số_nguyên trials)
 {
     CV_TRACE_FUNCTION();
-    const int dims = data.cols, N = data.rows;
-    cv::AutoBuffer<int, 64> _centers(K);
-    int* centers = &_centers[0];
+    const số_nguyên dims = data.cols, N = data.rows;
+    cv::AutoBuffer<số_nguyên, 64> _centers(K);
+    số_nguyên* centers = &_centers[0];
     cv::AutoBuffer<float, 0> _dist(N*3);
     float* dist = &_dist[0], *tdist = dist + N, *tdist2 = tdist + N;
     double sum0 = 0;
 
     centers[0] = (unsigned)rng % N;
 
-    for (int i = 0; i < N; i++)
+    cho (số_nguyên i = 0; i < N; i++)
     {
         dist[i] = hal::normL2Sqr_(data.ptr<float>(i), data.ptr<float>(centers[0]), dims);
         sum0 += dist[i];
     }
-    if (!(sum0 < DBL_MAX))
-        return false;
+    nếu (!(sum0 < DBL_MAX))
+        trả_về false;
 
-    for (int k = 1; k < K; k++)
+    cho (số_nguyên k = 1; k < K; k++)
     {
         double bestSum = DBL_MAX;
-        int bestCenter = -1;
+        số_nguyên bestCenter = -1;
 
-        for (int j = 0; j < trials; j++)
+        cho (số_nguyên j = 0; j < trials; j++)
         {
             double p = (double)rng*sum0;
-            int ci = 0;
-            for (; ci < N - 1; ci++)
+            số_nguyên ci = 0;
+            cho (; ci < N - 1; ci++)
             {
                 p -= dist[ci];
-                if (p <= 0)
+                nếu (p <= 0)
                     break;
             }
 
@@ -133,41 +133,41 @@ static bool generateCentersPP(const Mat& data, Mat& _out_centers,
                           KMeansPPDistanceComputer(tdist2, data, dist, ci),
                           (double)divUp((size_t)(dims * N), CV_KMEANS_PARALLEL_GRANULARITY));
             double s = 0;
-            int i = 0;
-        #if CV_ENABLE_UNROLLED
-            for (; i + 7 < N; i += 8)
+            số_nguyên i = 0;
+        #nếu CV_ENABLE_UNROLLED
+            cho (; i + 7 < N; i += 8)
             {
                 s += tdist2[i + 0] + tdist2[i + 1] + tdist2[i + 2] + tdist2[i + 3] +
                      tdist2[i + 4] + tdist2[i + 5] + tdist2[i + 6] + tdist2[i + 7];
             }
         #endif
-            for (; i < N; i++)
+            cho (; i < N; i++)
             {
                 s += tdist2[i];
             }
 
-            if (s < bestSum)
+            nếu (s < bestSum)
             {
                 bestSum = s;
                 bestCenter = ci;
                 std::swap(tdist, tdist2);
             }
         }
-        if (bestCenter < 0)
-            return false;
+        nếu (bestCenter < 0)
+            trả_về false;
         centers[k] = bestCenter;
         sum0 = bestSum;
         std::swap(dist, tdist);
     }
 
-    for (int k = 0; k < K; k++)
+    cho (số_nguyên k = 0; k < K; k++)
     {
         const float* src = data.ptr<float>(centers[k]);
         float* dst = _out_centers.ptr<float>(k);
-        for (int j = 0; j < dims; j++)
+        cho (số_nguyên j = 0; j < dims; j++)
             dst[j] = src[j];
     }
-    return true;
+    trả_về true;
 }
 
 template<bool onlyDistance>
@@ -175,7 +175,7 @@ class KMeansDistanceComputer : public ParallelLoopBody
 {
 public:
     KMeansDistanceComputer( double *distances_,
-                            int *labels_,
+                            số_nguyên *labels_,
                             const Mat& data_,
                             const Mat& centers_)
         : distances(distances_),
@@ -188,36 +188,36 @@ public:
     void operator()(const Range& range) const CV_OVERRIDE
     {
         CV_TRACE_FUNCTION();
-        const int begin = range.start;
-        const int end = range.end;
-        const int K = centers.rows;
-        const int dims = centers.cols;
+        const số_nguyên begin = range.start;
+        const số_nguyên end = range.end;
+        const số_nguyên K = centers.rows;
+        const số_nguyên dims = centers.cols;
 
-        for (int i = begin; i < end; ++i)
+        cho (số_nguyên i = begin; i < end; ++i)
         {
             const float *sample = data.ptr<float>(i);
-            if (onlyDistance)
+            nếu (onlyDistance)
             {
                 const float* center = centers.ptr<float>(labels[i]);
                 distances[i] = hal::normL2Sqr_(sample, center, dims);
                 continue;
             }
-            else
+            không_thì
             {
-                int k_best = 0;
+                số_nguyên k_best = 0;
                 double min_dist = DBL_MAX;
 
-                for (int k = 0; k < K; k++)
+                cho (số_nguyên k = 0; k < K; k++)
                 {
                     const float* center = centers.ptr<float>(k);
                     const double dist = hal::normL2Sqr_(sample, center, dims);
-                    if (!(dist <= FLT_MAX))
+                    nếu (!(dist <= FLT_MAX))
                     {
                         min_dist = DBL_MAX;
                         break;
                     }
 
-                    if (min_dist > dist)
+                    nếu (min_dist > dist)
                     {
                         min_dist = dist;
                         k_best = k;
@@ -234,25 +234,25 @@ private:
     KMeansDistanceComputer& operator=(const KMeansDistanceComputer&); // = delete
 
     double *distances;
-    int *labels;
+    số_nguyên *labels;
     const Mat& data;
     const Mat& centers;
 };
 
 }
 
-double cv::kmeans( InputArray _data, int K,
+double cv::kmeans( InputArray _data, số_nguyên K,
                    InputOutputArray _bestLabels,
-                   TermCriteria criteria, int attempts,
-                   int flags, OutputArray _centers )
+                   TermCriteria criteria, số_nguyên attempts,
+                   số_nguyên flags, OutputArray _centers )
 {
     CV_INSTRUMENT_REGION();
-    const int SPP_TRIALS = 3;
+    const số_nguyên SPP_TRIALS = 3;
     Mat data0 = _data.getMat();
     const bool isrow = data0.rows == 1;
-    const int N = isrow ? data0.cols : data0.rows;
-    const int dims = (isrow ? 1 : data0.cols)*data0.channels();
-    const int type = data0.depth();
+    const số_nguyên N = isrow ? data0.cols : data0.rows;
+    const số_nguyên dims = (isrow ? 1 : data0.cols)*data0.channels();
+    const số_nguyên type = data0.depth();
 
     attempts = std::max(attempts, 1);
     CV_Assert( data0.dims <= 2 && type == CV_32F && K > 0 );
@@ -263,21 +263,21 @@ double cv::kmeans( InputArray _data, int K,
     _bestLabels.create(N, 1, CV_32S, -1, true);
 
     Mat _labels, best_labels = _bestLabels.getMat();
-    if (flags & KMEANS_USE_INITIAL_LABELS)
+    nếu (flags & KMEANS_USE_INITIAL_LABELS)
     {
         CV_Assert( (best_labels.cols == 1 || best_labels.rows == 1) &&
                   best_labels.cols*best_labels.rows == N &&
                   best_labels.type() == CV_32S &&
                   best_labels.isContinuous());
         best_labels.reshape(1, N).copyTo(_labels);
-        for (int i = 0; i < N; i++)
+        cho (số_nguyên i = 0; i < N; i++)
         {
-            CV_Assert((unsigned)_labels.at<int>(i) < (unsigned)K);
+            CV_Assert((unsigned)_labels.at<số_nguyên>(i) < (unsigned)K);
         }
     }
-    else
+    không_thì
     {
-        if (!((best_labels.cols == 1 || best_labels.rows == 1) &&
+        nếu (!((best_labels.cols == 1 || best_labels.rows == 1) &&
              best_labels.cols*best_labels.rows == N &&
              best_labels.type() == CV_32S &&
              best_labels.isContinuous()))
@@ -287,42 +287,42 @@ double cv::kmeans( InputArray _data, int K,
         }
         _labels.create(best_labels.size(), best_labels.type());
     }
-    int* labels = _labels.ptr<int>();
+    số_nguyên* labels = _labels.ptr<số_nguyên>();
 
     Mat centers(K, dims, type), old_centers(K, dims, type), temp(1, dims, type);
-    cv::AutoBuffer<int, 64> counters(K);
+    cv::AutoBuffer<số_nguyên, 64> counters(K);
     cv::AutoBuffer<double, 64> dists(N);
     RNG& rng = theRNG();
 
-    if (criteria.type & TermCriteria::EPS)
+    nếu (criteria.type & TermCriteria::EPS)
         criteria.epsilon = std::max(criteria.epsilon, 0.);
-    else
+    không_thì
         criteria.epsilon = FLT_EPSILON;
     criteria.epsilon *= criteria.epsilon;
 
-    if (criteria.type & TermCriteria::COUNT)
+    nếu (criteria.type & TermCriteria::COUNT)
         criteria.maxCount = std::min(std::max(criteria.maxCount, 2), 100);
-    else
+    không_thì
         criteria.maxCount = 100;
 
-    if (K == 1)
+    nếu (K == 1)
     {
         attempts = 1;
         criteria.maxCount = 2;
     }
 
     cv::AutoBuffer<Vec2f, 64> box(dims);
-    if (!(flags & KMEANS_PP_CENTERS))
+    nếu (!(flags & KMEANS_PP_CENTERS))
     {
         {
             const float* sample = data.ptr<float>(0);
-            for (int j = 0; j < dims; j++)
+            cho (số_nguyên j = 0; j < dims; j++)
                 box[j] = Vec2f(sample[j], sample[j]);
         }
-        for (int i = 1; i < N; i++)
+        cho (số_nguyên i = 1; i < N; i++)
         {
             const float* sample = data.ptr<float>(i);
-            for (int j = 0; j < dims; j++)
+            cho (số_nguyên j = 0; j < dims; j++)
             {
                 float v = sample[j];
                 box[j][0] = std::min(box[j][0], v);
@@ -332,80 +332,80 @@ double cv::kmeans( InputArray _data, int K,
     }
 
     double best_compactness = DBL_MAX;
-    for (int a = 0; a < attempts; a++)
+    cho (số_nguyên a = 0; a < attempts; a++)
     {
         double compactness = DBL_MAX;
 
-        for (int iter = 0; ;)
+        cho (số_nguyên iter = 0; ;)
         {
             double max_center_shift = iter == 0 ? DBL_MAX : 0.0;
 
             swap(centers, old_centers);
 
-            if (iter == 0 && (a > 0 || !(flags & KMEANS_USE_INITIAL_LABELS)))
+            nếu (iter == 0 && (a > 0 || !(flags & KMEANS_USE_INITIAL_LABELS)))
             {
-                if (flags & KMEANS_PP_CENTERS)
+                nếu (flags & KMEANS_PP_CENTERS)
                 {
-                    if (!generateCentersPP(data, centers, K, rng, SPP_TRIALS))
+                    nếu (!generateCentersPP(data, centers, K, rng, SPP_TRIALS))
                         break;
                 }
-                else
+                không_thì
                 {
-                    for (int k = 0; k < K; k++)
+                    cho (số_nguyên k = 0; k < K; k++)
                         generateRandomCenter(dims, box.data(), centers.ptr<float>(k), rng);
                 }
             }
-            else
+            không_thì
             {
                 // compute centers
                 centers = Scalar(0);
-                for (int k = 0; k < K; k++)
+                cho (số_nguyên k = 0; k < K; k++)
                     counters[k] = 0;
 
-                for (int i = 0; i < N; i++)
+                cho (số_nguyên i = 0; i < N; i++)
                 {
                     const float* sample = data.ptr<float>(i);
-                    int k = labels[i];
+                    số_nguyên k = labels[i];
                     float* center = centers.ptr<float>(k);
-                    for (int j = 0; j < dims; j++)
+                    cho (số_nguyên j = 0; j < dims; j++)
                         center[j] += sample[j];
                     counters[k]++;
                 }
 
-                for (int k = 0; k < K; k++)
+                cho (số_nguyên k = 0; k < K; k++)
                 {
-                    if (counters[k] != 0)
+                    nếu (counters[k] != 0)
                         continue;
 
                     // if some cluster appeared to be empty then:
                     //   1. find the biggest cluster
                     //   2. find the farthest from the center point in the biggest cluster
                     //   3. exclude the farthest point from the biggest cluster and form a new 1-point cluster.
-                    int max_k = 0;
-                    for (int k1 = 1; k1 < K; k1++)
+                    số_nguyên max_k = 0;
+                    cho (số_nguyên k1 = 1; k1 < K; k1++)
                     {
-                        if (counters[max_k] < counters[k1])
+                        nếu (counters[max_k] < counters[k1])
                             max_k = k1;
                     }
 
                     double max_dist = 0;
-                    int farthest_i = -1;
+                    số_nguyên farthest_i = -1;
                     float* base_center = centers.ptr<float>(max_k);
                     float* _base_center = temp.ptr<float>(); // normalized
                     float scale = 1.f/counters[max_k];
-                    for (int j = 0; j < dims; j++)
+                    cho (số_nguyên j = 0; j < dims; j++)
                         _base_center[j] = base_center[j]*scale;
 
-                    for (int i = 0; i < N; i++)
+                    cho (số_nguyên i = 0; i < N; i++)
                     {
-                        if (labels[i] != max_k)
+                        nếu (labels[i] != max_k)
                             continue;
-                        if (farthest_i < 0)
+                        nếu (farthest_i < 0)
                             farthest_i = i;
                         const float* sample = data.ptr<float>(i);
                         double dist = hal::normL2Sqr_(sample, _base_center, dims);
 
-                        if (max_dist <= dist)
+                        nếu (max_dist <= dist)
                         {
                             max_dist = dist;
                             farthest_i = i;
@@ -418,27 +418,27 @@ double cv::kmeans( InputArray _data, int K,
 
                     const float* sample = data.ptr<float>(farthest_i);
                     float* cur_center = centers.ptr<float>(k);
-                    for (int j = 0; j < dims; j++)
+                    cho (số_nguyên j = 0; j < dims; j++)
                     {
                         base_center[j] -= sample[j];
                         cur_center[j] += sample[j];
                     }
                 }
 
-                for (int k = 0; k < K; k++)
+                cho (số_nguyên k = 0; k < K; k++)
                 {
                     float* center = centers.ptr<float>(k);
                     CV_Assert( counters[k] != 0 );
 
                     float scale = 1.f/counters[k];
-                    for (int j = 0; j < dims; j++)
+                    cho (số_nguyên j = 0; j < dims; j++)
                         center[j] *= scale;
 
-                    if (iter > 0)
+                    nếu (iter > 0)
                     {
                         double dist = 0;
                         const float* old_center = old_centers.ptr<float>(k);
-                        for (int j = 0; j < dims; j++)
+                        cho (số_nguyên j = 0; j < dims; j++)
                         {
                             double t = center[j] - old_center[j];
                             dist += t*t;
@@ -450,43 +450,43 @@ double cv::kmeans( InputArray _data, int K,
 
             bool isLastIter = (++iter == MAX(criteria.maxCount, 2) || max_center_shift <= criteria.epsilon);
 
-            if (isLastIter)
+            nếu (isLastIter)
             {
                 // don't re-assign labels to avoid creation of empty clusters
                 parallel_for_(Range(0, N), KMeansDistanceComputer<true>(dists.data(), labels, data, centers), (double)divUp((size_t)(dims * N), CV_KMEANS_PARALLEL_GRANULARITY));
                 compactness = sum(Mat(Size(N, 1), CV_64F, &dists[0]))[0];
                 break;
             }
-            else
+            không_thì
             {
                 // assign labels
                 parallel_for_(Range(0, N), KMeansDistanceComputer<false>(dists.data(), labels, data, centers), (double)divUp((size_t)(dims * N * K), CV_KMEANS_PARALLEL_GRANULARITY));
-                if (!(sum(Mat(Size(N, 1), CV_64F, &dists[0]))[0] < DBL_MAX))
+                nếu (!(sum(Mat(Size(N, 1), CV_64F, &dists[0]))[0] < DBL_MAX))
                     break;
             }
         }
 
-        if (!(compactness < DBL_MAX))
+        nếu (!(compactness < DBL_MAX))
         {
             centers.setZero();
             _labels.setZero();
             compactness = -1.;
         }
-        if (compactness < best_compactness)
+        nếu (compactness < best_compactness)
         {
             best_compactness = compactness;
-            if (_centers.needed())
+            nếu (_centers.needed())
             {
-                if (_centers.fixedType() && _centers.channels() == dims)
+                nếu (_centers.fixedType() && _centers.channels() == dims)
                     centers.reshape(dims).copyTo(_centers);
-                else
+                không_thì
                     centers.copyTo(_centers);
             }
             _labels.copyTo(best_labels);
         }
-        if (compactness < 0.)
+        nếu (compactness < 0.)
             break;
     }
 
-    return best_compactness;
+    trả_về best_compactness;
 }

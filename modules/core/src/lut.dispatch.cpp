@@ -12,41 +12,41 @@ namespace cv {
 
 namespace {
 
-typedef void (*LUT8uFunc)( const uchar*, const uchar*, uchar*, int, int, int );
-typedef void (*LUT16uFunc)( const uchar*, const ushort*, ushort*, int, int, int );
+typedef void (*LUT8uFunc)( const uchar*, const uchar*, uchar*, số_nguyên, số_nguyên, số_nguyên );
+typedef void (*LUT16uFunc)( const uchar*, const ushort*, ushort*, số_nguyên, số_nguyên, số_nguyên );
 
 static LUT8uFunc resolveLUT8uFunc()
 {
-#if CV_TRY_AVX512_ICL
-    if (cv::checkHardwareSupport(CV_CPU_AVX512_ICL))
-        return opt_AVX512_ICL::LUT8u_;
+#nếu CV_TRY_AVX512_ICL
+    nếu (cv::checkHardwareSupport(CV_CPU_AVX512_ICL))
+        trả_về opt_AVX512_ICL::LUT8u_;
 #endif
-    return cpu_baseline::LUT8u_;
+    trả_về cpu_baseline::LUT8u_;
 }
 
 static LUT16uFunc resolveLUT16uFunc()
 {
-#if CV_TRY_AVX512_ICL
-    if (cv::checkHardwareSupport(CV_CPU_AVX512_ICL))
-        return opt_AVX512_ICL::LUT16u_;
+#nếu CV_TRY_AVX512_ICL
+    nếu (cv::checkHardwareSupport(CV_CPU_AVX512_ICL))
+        trả_về opt_AVX512_ICL::LUT16u_;
 #endif
-    return cpu_baseline::LUT16u_;
+    trả_về cpu_baseline::LUT16u_;
 }
 
 } // namespace
 
-void LUT8u_dispatch( const uchar* src, const uchar* lut, uchar* dst, int len, int cn, int lutcn );
+void LUT8u_dispatch( const uchar* src, const uchar* lut, uchar* dst, số_nguyên len, số_nguyên cn, số_nguyên lutcn );
 
-void LUT8u_dispatch( const uchar* src, const uchar* lut, uchar* dst, int len, int cn, int lutcn )
+void LUT8u_dispatch( const uchar* src, const uchar* lut, uchar* dst, số_nguyên len, số_nguyên cn, số_nguyên lutcn )
 {
     CV_INSTRUMENT_REGION();
     static LUT8uFunc fn = resolveLUT8uFunc();
     fn(src, lut, dst, len, cn, lutcn);
 }
 
-void LUT16u_dispatch( const uchar* src, const ushort* lut, ushort* dst, int len, int cn, int lutcn );
+void LUT16u_dispatch( const uchar* src, const ushort* lut, ushort* dst, số_nguyên len, số_nguyên cn, số_nguyên lutcn );
 
-void LUT16u_dispatch( const uchar* src, const ushort* lut, ushort* dst, int len, int cn, int lutcn )
+void LUT16u_dispatch( const uchar* src, const ushort* lut, ushort* dst, số_nguyên len, số_nguyên cn, số_nguyên lutcn )
 {
     CV_INSTRUMENT_REGION();
     static LUT16uFunc fn = resolveLUT16uFunc();

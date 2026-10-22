@@ -15,7 +15,7 @@
 
 namespace cv {
 
-static MinMaxIdxFunc getMinMaxIdxFunc(int depth)
+static MinMaxIdxFunc getMinMaxIdxFunc(số_nguyên depth)
 {
     CV_INSTRUMENT_REGION();
     CV_CPU_DISPATCH(getMinMaxIdxFunc, (depth),
@@ -24,22 +24,22 @@ static MinMaxIdxFunc getMinMaxIdxFunc(int depth)
 
 // The function expects 1-based indexing for ofs
 // Zero is treated as invalid offset (not found)
-static void ofs2idx(const Mat& a, size_t ofs, int* idx)
+static void ofs2idx(const Mat& a, size_t ofs, số_nguyên* idx)
 {
-    int i, d = a.dims;
-    if( ofs > 0 )
+    số_nguyên i, d = a.dims;
+    nếu( ofs > 0 )
     {
         ofs--;
-        for( i = d-1; i >= 0; i-- )
+        cho( i = d-1; i >= 0; i-- )
         {
-            int sz = a.size[i];
-            idx[i] = (int)(ofs % sz);
+            số_nguyên sz = a.size[i];
+            idx[i] = (số_nguyên)(ofs % sz);
             ofs /= sz;
         }
     }
-    else
+    không_thì
     {
-        for( i = d-1; i >= 0; i-- )
+        cho( i = d-1; i >= 0; i-- )
             idx[i] = -1;
     }
 }
@@ -50,8 +50,8 @@ static void ofs2idx(const Mat& a, size_t ofs, int* idx)
 
 template <typename T>
 void getMinMaxRes(const Mat & db, double * minVal, double * maxVal,
-                  int* minLoc, int* maxLoc,
-                  int groupnum, int cols, double * maxVal2)
+                  số_nguyên* minLoc, số_nguyên* maxLoc,
+                  số_nguyên groupnum, số_nguyên cols, double * maxVal2)
 {
     uint index_max = std::numeric_limits<uint>::max();
     T minval = std::numeric_limits<T>::max();
@@ -61,82 +61,82 @@ void getMinMaxRes(const Mat & db, double * minVal, double * maxVal,
     size_t index = 0;
     const T * minptr = NULL, * maxptr = NULL, * maxptr2 = NULL;
     const uint * minlocptr = NULL, * maxlocptr = NULL;
-    if (minVal || minLoc)
+    nếu (minVal || minLoc)
     {
         minptr = db.ptr<T>();
         index += sizeof(T) * groupnum;
         index = alignSize(index, MINMAX_STRUCT_ALIGNMENT);
     }
-    if (maxVal || maxLoc)
+    nếu (maxVal || maxLoc)
     {
         maxptr = (const T *)(db.ptr() + index);
         index += sizeof(T) * groupnum;
         index = alignSize(index, MINMAX_STRUCT_ALIGNMENT);
     }
-    if (minLoc)
+    nếu (minLoc)
     {
         minlocptr = (const uint *)(db.ptr() + index);
         index += sizeof(uint) * groupnum;
         index = alignSize(index, MINMAX_STRUCT_ALIGNMENT);
     }
-    if (maxLoc)
+    nếu (maxLoc)
     {
         maxlocptr = (const uint *)(db.ptr() + index);
         index += sizeof(uint) * groupnum;
         index = alignSize(index, MINMAX_STRUCT_ALIGNMENT);
     }
-    if (maxVal2)
+    nếu (maxVal2)
         maxptr2 = (const T *)(db.ptr() + index);
 
-    for (int i = 0; i < groupnum; i++)
+    cho (số_nguyên i = 0; i < groupnum; i++)
     {
-        if (minptr && minptr[i] <= minval)
+        nếu (minptr && minptr[i] <= minval)
         {
-            if (minptr[i] == minval)
+            nếu (minptr[i] == minval)
             {
-                if (minlocptr)
+                nếu (minlocptr)
                     minloc = std::min(minlocptr[i], minloc);
             }
-            else
+            không_thì
             {
-                if (minlocptr)
+                nếu (minlocptr)
                     minloc = minlocptr[i];
                 minval = minptr[i];
             }
         }
-        if (maxptr && maxptr[i] >= maxval)
+        nếu (maxptr && maxptr[i] >= maxval)
         {
-            if (maxptr[i] == maxval)
+            nếu (maxptr[i] == maxval)
             {
-                if (maxlocptr)
+                nếu (maxlocptr)
                     maxloc = std::min(maxlocptr[i], maxloc);
             }
-            else
+            không_thì
             {
-                if (maxlocptr)
+                nếu (maxlocptr)
                     maxloc = maxlocptr[i];
                 maxval = maxptr[i];
             }
         }
-        if (maxptr2 && maxptr2[i] > maxval2)
+        nếu (maxptr2 && maxptr2[i] > maxval2)
             maxval2 = maxptr2[i];
     }
     bool zero_mask = (minLoc && minloc == index_max) ||
     (maxLoc && maxloc == index_max);
 
-    if (minVal)
+    nếu (minVal)
         *minVal = zero_mask ? 0 : (double)minval;
-    if (maxVal)
+    nếu (maxVal)
         *maxVal = zero_mask ? 0 : (double)maxval;
-    if (maxVal2)
+    nếu (maxVal2)
         *maxVal2 = zero_mask ? 0 : (double)maxval2;
 
-    if (minLoc)
+    nếu (minLoc)
     {
         minLoc[0] = zero_mask ? -1 : minloc / cols;
         minLoc[1] = zero_mask ? -1 : minloc % cols;
     }
-    if (maxLoc)
+    nếu (maxLoc)
     {
         maxLoc[0] = zero_mask ? -1 : maxloc / cols;
         maxLoc[1] = zero_mask ? -1 : maxloc % cols;
@@ -144,56 +144,56 @@ void getMinMaxRes(const Mat & db, double * minVal, double * maxVal,
 }
 
 typedef void (*getMinMaxResFunc)(const Mat & db, double * minVal, double * maxVal,
-                                 int * minLoc, int *maxLoc, int gropunum, int cols, double * maxVal2);
+                                 số_nguyên * minLoc, số_nguyên *maxLoc, số_nguyên gropunum, số_nguyên cols, double * maxVal2);
 
-bool ocl_minMaxIdx( InputArray _src, double* minVal, double* maxVal, int* minLoc, int* maxLoc, InputArray _mask,
-                   int ddepth, bool absValues, InputArray _src2, double * maxVal2)
+bool ocl_minMaxIdx( InputArray _src, double* minVal, double* maxVal, số_nguyên* minLoc, số_nguyên* maxLoc, InputArray _mask,
+                   số_nguyên ddepth, bool absValues, InputArray _src2, double * maxVal2)
 {
     const ocl::Device & dev = ocl::Device::getDefault();
 
 #ifdef __ANDROID__
-    if (dev.isNVidia())
-        return false;
+    nếu (dev.isNVidia())
+        trả_về false;
 #endif
 
-    if (dev.deviceVersionMajor() == 1 && dev.deviceVersionMinor() < 2)
+    nếu (dev.deviceVersionMajor() == 1 && dev.deviceVersionMinor() < 2)
     {
         // 'static' storage class specifier used by "minmaxloc" is available from OpenCL 1.2+ only
-        return false;
+        trả_về false;
     }
 
     bool doubleSupport = dev.doubleFPConfig() > 0, haveMask = !_mask.empty(),
     haveSrc2 = _src2.kind() != _InputArray::NONE;
-    int type = _src.type(), depth = CV_MAT_DEPTH(type), cn = CV_MAT_CN(type),
+    số_nguyên type = _src.type(), depth = CV_MAT_DEPTH(type), cn = CV_MAT_CN(type),
     kercn = haveMask ? cn : std::min(4, ocl::predictOptimalVectorWidth(_src, _src2));
 
-    if (depth >= CV_16F)
-        return false;
+    nếu (depth >= CV_16F)
+        trả_về false;
 
     // disabled following modes since it occasionally fails on AMD devices (e.g. A10-6800K, sep. 2014)
-    if ((haveMask || type == CV_32FC1) && dev.isAMD())
-        return false;
+    nếu ((haveMask || type == CV_32FC1) && dev.isAMD())
+        trả_về false;
 
     CV_Assert( (cn == 1 && (!haveMask || _mask.type() == CV_8U || _mask.type() == CV_8S || _mask.type() == CV_Bool)) ||
               (cn >= 1 && !minLoc && !maxLoc) );
 
-    if (ddepth < 0)
+    nếu (ddepth < 0)
         ddepth = depth;
 
     CV_Assert(!haveSrc2 || _src2.type() == type);
 
-    if (depth == CV_32S || depth == CV_8S || depth == CV_32U || depth == CV_64U ||
+    nếu (depth == CV_32S || depth == CV_8S || depth == CV_32U || depth == CV_64U ||
         depth == CV_64S || depth == CV_16F || depth == CV_16BF)
-        return false;
+        trả_về false;
 
-    if ((depth == CV_64F || ddepth == CV_64F) && !doubleSupport)
-        return false;
+    nếu ((depth == CV_64F || ddepth == CV_64F) && !doubleSupport)
+        trả_về false;
 
-    int groupnum = dev.maxComputeUnits();
+    số_nguyên groupnum = dev.maxComputeUnits();
     size_t wgs = dev.maxWorkGroupSize();
 
-    int wgs2_aligned = 1;
-    while (wgs2_aligned < (int)wgs)
+    số_nguyên wgs2_aligned = 1;
+    trong_khi (wgs2_aligned < (số_nguyên)wgs)
         wgs2_aligned <<= 1;
     wgs2_aligned >>= 1;
 
@@ -202,11 +202,11 @@ bool ocl_minMaxIdx( InputArray _src, double* minVal, double* maxVal, int* minLoc
 
     // in case of mask we must know whether mask is filled with zeros or not
     // so let's calculate min or max location, if it's undefined, so mask is zeros
-    if (!(needMaxLoc || needMinLoc) && haveMask)
+    nếu (!(needMaxLoc || needMinLoc) && haveMask)
     {
-        if (needMinVal)
+        nếu (needMinVal)
             needMinLoc = true;
-        else
+        không_thì
             needMaxLoc = true;
     }
 
@@ -215,7 +215,7 @@ bool ocl_minMaxIdx( InputArray _src, double* minVal, double* maxVal, int* minLoc
                          " -D WGS2_ALIGNED=%d%s%s%s -D kercn=%d%s%s%s%s"
                          " -D dstT1=%s -D dstT=%s -D convertToDT=%s%s%s%s%s -D wdepth=%d -D convertFromU=%s"
                          " -D MINMAX_STRUCT_ALIGNMENT=%d",
-                         depth, ocl::typeToStr(depth), haveMask ? " -D HAVE_MASK" : "", (int)wgs,
+                         depth, ocl::typeToStr(depth), haveMask ? " -D HAVE_MASK" : "", (số_nguyên)wgs,
                          ocl::typeToStr(CV_MAKE_TYPE(depth, kercn)), wgs2_aligned,
                          doubleSupport ? " -D DOUBLE_SUPPORT" : "",
                          _src.isContinuous() ? " -D HAVE_SRC_CONT" : "",
@@ -231,45 +231,45 @@ bool ocl_minMaxIdx( InputArray _src, double* minVal, double* maxVal, int* minLoc
                          MINMAX_STRUCT_ALIGNMENT);
 
     ocl::Kernel k("minmaxloc", ocl::core::minmaxloc_oclsrc, opts);
-    if (k.empty())
-        return false;
+    nếu (k.empty())
+        trả_về false;
 
-    int esz = CV_ELEM_SIZE(ddepth), esz32s = CV_ELEM_SIZE1(CV_32S),
+    số_nguyên esz = CV_ELEM_SIZE(ddepth), esz32s = CV_ELEM_SIZE1(CV_32S),
     dbsize = groupnum * ((needMinVal ? esz : 0) + (needMaxVal ? esz : 0) +
                          (needMinLoc ? esz32s : 0) + (needMaxLoc ? esz32s : 0) +
                          (maxVal2 ? esz : 0))
     + 5 * MINMAX_STRUCT_ALIGNMENT;
     UMat src = _src.getUMat(), src2 = _src2.getUMat(), db(1, dbsize, CV_8UC1), mask = _mask.getUMat();
 
-    if (cn > 1 && !haveMask)
+    nếu (cn > 1 && !haveMask)
     {
         src = src.reshape(1);
         src2 = src2.reshape(1);
     }
 
-    if (haveSrc2)
+    nếu (haveSrc2)
     {
-        if (!haveMask)
-            k.args(ocl::KernelArg::ReadOnlyNoSize(src), src.cols, (int)src.total(),
+        nếu (!haveMask)
+            k.args(ocl::KernelArg::ReadOnlyNoSize(src), src.cols, (số_nguyên)src.total(),
                    groupnum, ocl::KernelArg::PtrWriteOnly(db), ocl::KernelArg::ReadOnlyNoSize(src2));
-        else
-            k.args(ocl::KernelArg::ReadOnlyNoSize(src), src.cols, (int)src.total(),
+        không_thì
+            k.args(ocl::KernelArg::ReadOnlyNoSize(src), src.cols, (số_nguyên)src.total(),
                    groupnum, ocl::KernelArg::PtrWriteOnly(db), ocl::KernelArg::ReadOnlyNoSize(mask),
                    ocl::KernelArg::ReadOnlyNoSize(src2));
     }
-    else
+    không_thì
     {
-        if (!haveMask)
-            k.args(ocl::KernelArg::ReadOnlyNoSize(src), src.cols, (int)src.total(),
+        nếu (!haveMask)
+            k.args(ocl::KernelArg::ReadOnlyNoSize(src), src.cols, (số_nguyên)src.total(),
                    groupnum, ocl::KernelArg::PtrWriteOnly(db));
-        else
-            k.args(ocl::KernelArg::ReadOnlyNoSize(src), src.cols, (int)src.total(),
+        không_thì
+            k.args(ocl::KernelArg::ReadOnlyNoSize(src), src.cols, (số_nguyên)src.total(),
                    groupnum, ocl::KernelArg::PtrWriteOnly(db), ocl::KernelArg::ReadOnlyNoSize(mask));
     }
 
     size_t globalsize = groupnum * wgs;
-    if (!k.run(1, &globalsize, &wgs, true))
-        return false;
+    nếu (!k.run(1, &globalsize, &wgs, true))
+        trả_về false;
 
     static const getMinMaxResFunc functab[7] =
     {
@@ -277,7 +277,7 @@ bool ocl_minMaxIdx( InputArray _src, double* minVal, double* maxVal, int* minLoc
         getMinMaxRes<char>,
         getMinMaxRes<ushort>,
         getMinMaxRes<short>,
-        getMinMaxRes<int>,
+        getMinMaxRes<số_nguyên>,
         getMinMaxRes<float>,
         getMinMaxRes<double>
     };
@@ -285,13 +285,13 @@ bool ocl_minMaxIdx( InputArray _src, double* minVal, double* maxVal, int* minLoc
     CV_Assert(ddepth <= CV_64F);
     getMinMaxResFunc func = functab[ddepth];
 
-    int locTemp[2];
+    số_nguyên locTemp[2];
     func(db.getMat(ACCESS_READ), minVal, maxVal,
          needMinLoc ? minLoc ? minLoc : locTemp : minLoc,
          needMaxLoc ? maxLoc ? maxLoc : locTemp : maxLoc,
          groupnum, src.cols, maxVal2);
 
-    return true;
+    trả_về true;
 }
 
 #endif
@@ -300,11 +300,11 @@ bool ocl_minMaxIdx( InputArray _src, double* minVal, double* maxVal, int* minLoc
 
 // serial implementation, also used for the pieces of the parallel version
 static void minMaxIdx_(cv::InputArray _src, double* minVal,
-                       double* maxVal, int* minIdx, int* maxIdx,
+                       double* maxVal, số_nguyên* minIdx, số_nguyên* maxIdx,
                        cv::InputArray _mask)
 {
     using namespace cv;
-    int type = _src.type(), depth = CV_MAT_DEPTH(type), cn = CV_MAT_CN(type);
+    số_nguyên type = _src.type(), depth = CV_MAT_DEPTH(type), cn = CV_MAT_CN(type);
     CV_Assert( (cn == 1 && (_mask.empty() || _mask.type() == CV_8U || _mask.type() == CV_8S || _mask.type() == CV_Bool)) ||
                (cn > 1 && _mask.empty() && !minIdx && !maxIdx) );
 
@@ -313,9 +313,9 @@ static void minMaxIdx_(cv::InputArray _src, double* minVal,
 
     Mat src = _src.getMat(), mask = _mask.getMat();
 
-    if (src.dims <= 2)
+    nếu (src.dims <= 2)
     {
-        if ((size_t)src.step == (size_t)mask.step || mask.empty())
+        nếu ((size_t)src.step == (size_t)mask.step || mask.empty())
         {
             CALL_HAL(minMaxIdx, cv_hal_minMaxIdx, src.data, src.step, src.cols*cn, src.rows,
                      src.depth(), minVal, maxVal, minIdx, maxIdx, mask.data);
@@ -323,21 +323,21 @@ static void minMaxIdx_(cv::InputArray _src, double* minVal,
         CALL_HAL(minMaxIdxMaskStep, cv_hal_minMaxIdxMaskStep, src.data, src.step, src.cols*cn, src.rows,
                  src.depth(), minVal, maxVal, minIdx, maxIdx, mask.data, mask.step);
     }
-    else if (src.isContinuous() && (mask.isContinuous() || mask.empty()))
+    không_thì nếu (src.isContinuous() && (mask.isContinuous() || mask.empty()))
     {
-        int res = cv_hal_minMaxIdx(src.data, 0, (int)src.total()*cn, 1, src.depth(),
+        số_nguyên res = cv_hal_minMaxIdx(src.data, 0, (số_nguyên)src.total()*cn, 1, src.depth(),
                                    minVal, maxVal, minIdx, maxIdx, mask.data);
 
-        if (res == CV_HAL_ERROR_OK)
+        nếu (res == CV_HAL_ERROR_OK)
         {
             // minIdx[0] and minIdx[0] are always 0 for "flatten" version
-            if (minIdx)
+            nếu (minIdx)
                 ofs2idx(src, minIdx[1]+1, minIdx);
-            if (maxIdx)
+            nếu (maxIdx)
                 ofs2idx(src, maxIdx[1]+1, maxIdx);
-            return;
+            trả_về;
         }
-        else if (res != CV_HAL_ERROR_NOT_IMPLEMENTED)
+        không_thì nếu (res != CV_HAL_ERROR_NOT_IMPLEMENTED)
         {
             CV_Error_(cv::Error::StsInternal,
             ("HAL implementation minMaxIdx ==> " CVAUX_STR(cv_hal_minMaxIdx) " returned %d (0x%08x)", res, res));
@@ -354,72 +354,72 @@ static void minMaxIdx_(cv::InputArray _src, double* minVal,
     size_t minidx = 0, maxidx = 0;
     size_t startidx = 1;
     union {
-        int i;
+        số_nguyên i;
         float f;
         double d;
         int64 L;
         uint64 UL;
     } minval, maxval;
-    int planeSize = (int)it.size*cn;
+    số_nguyên planeSize = (số_nguyên)it.size*cn;
     minval.L = maxval.L = 0;
 
-    for( size_t i = 0; i < it.nplanes; i++, ++it, startidx += planeSize )
+    cho( size_t i = 0; i < it.nplanes; i++, ++it, startidx += planeSize )
         func( ptrs[0], ptrs[1], &minval.L, &maxval.L, &minidx, &maxidx, planeSize, startidx );
 
     double dminval, dmaxval;
-    if( depth <= CV_32S || depth == CV_Bool )
+    nếu( depth <= CV_32S || depth == CV_Bool )
         dminval = minval.i, dmaxval = maxval.i;
-    else if( depth == CV_32F || depth == CV_16F || depth == CV_16BF )
+    không_thì nếu( depth == CV_32F || depth == CV_16F || depth == CV_16BF )
         dminval = minval.f, dmaxval = maxval.f;
-    else if( depth == CV_64F )
+    không_thì nếu( depth == CV_64F )
         dminval = minval.d, dmaxval = maxval.d;
-    else if( depth == CV_64S || depth == CV_32U )
+    không_thì nếu( depth == CV_64S || depth == CV_32U )
         dminval = (double)minval.L, dmaxval = (double)maxval.L;
-    else {
+    không_thì {
         CV_Assert(depth == CV_64U);
         dminval = (double)minval.UL, dmaxval = (double)maxval.UL;
     }
 
-    if( minVal )
+    nếu( minVal )
         *minVal = dminval;
-    if( maxVal )
+    nếu( maxVal )
         *maxVal = dmaxval;
 
-    if( minIdx )
+    nếu( minIdx )
         ofs2idx(src, minidx, minIdx);
-    if( maxIdx )
+    nếu( maxIdx )
         ofs2idx(src, maxidx, maxIdx);
 }
 
 void cv::minMaxIdx(InputArray _src, double* minVal,
-                   double* maxVal, int* minIdx, int* maxIdx,
+                   double* maxVal, số_nguyên* minIdx, số_nguyên* maxIdx,
                    InputArray _mask)
 {
     CV_INSTRUMENT_REGION();
 
     std::vector<StatChunk> chunks;
-    if (!_src.isUMat())
+    nếu (!_src.isUMat())
     {
         Mat src = _src.getMat(), mask = _mask.getMat();
-        const int cn = src.channels();
+        const số_nguyên cn = src.channels();
         const bool argsOk = (cn == 1 && (mask.empty() || ((mask.type() == CV_8U || mask.type() == CV_8S ||
                              mask.type() == CV_Bool) && src.size == mask.size))) ||
                             (cn > 1 && mask.empty() && !minIdx && !maxIdx);
-        if (argsOk && splitForParallelStat(src, mask, chunks))
+        nếu (argsOk && splitForParallelStat(src, mask, chunks))
         {
-            const int n = (int)chunks.size();
+            const số_nguyên n = (số_nguyên)chunks.size();
             std::vector<double> mn(n), mx(n);
             std::vector<size_t> imn(n, 0), imx(n, 0);   // 1-based row-major indices, 0 = no element
             parallel_for_(Range(0, n), [&](const Range& r)
             {
-                for (int i = r.start; i < r.end; i++)
+                cho (số_nguyên i = r.start; i < r.end; i++)
                 {
-                    int a[2] = {-1, -1}, b[2] = {-1, -1};
+                    số_nguyên a[2] = {-1, -1}, b[2] = {-1, -1};
                     minMaxIdx_(chunks[i].src, &mn[i], &mx[i], cn == 1 ? a : nullptr, cn == 1 ? b : nullptr,
                                chunks[i].mask);
-                    if (cn > 1)
+                    nếu (cn > 1)
                         imn[i] = imx[i] = 1;
-                    else if (a[0] >= 0)
+                    không_thì nếu (a[0] >= 0)
                     {
                         imn[i] = chunkIndexToElem(chunks[i], a) + 1;
                         imx[i] = chunkIndexToElem(chunks[i], b) + 1;
@@ -428,19 +428,19 @@ void cv::minMaxIdx(InputArray _src, double* minVal,
             });
             // pieces are in memory order, so taking the first strict improvement keeps the
             // first occurrence, as in the serial version
-            int bmin = -1, bmax = -1;
-            for (int i = 0; i < n; i++)
+            số_nguyên bmin = -1, bmax = -1;
+            cho (số_nguyên i = 0; i < n; i++)
             {
-                if (imn[i] == 0)
+                nếu (imn[i] == 0)
                     continue;
-                if (bmin < 0 || mn[i] < mn[bmin]) bmin = i;
-                if (bmax < 0 || mx[i] > mx[bmax]) bmax = i;
+                nếu (bmin < 0 || mn[i] < mn[bmin]) bmin = i;
+                nếu (bmax < 0 || mx[i] > mx[bmax]) bmax = i;
             }
-            if (minVal) *minVal = bmin >= 0 ? mn[bmin] : 0;
-            if (maxVal) *maxVal = bmax >= 0 ? mx[bmax] : 0;
-            if (minIdx) ofs2idx(src, bmin >= 0 ? imn[bmin] : 0, minIdx);
-            if (maxIdx) ofs2idx(src, bmax >= 0 ? imx[bmax] : 0, maxIdx);
-            return;
+            nếu (minVal) *minVal = bmin >= 0 ? mn[bmin] : 0;
+            nếu (maxVal) *maxVal = bmax >= 0 ? mx[bmax] : 0;
+            nếu (minIdx) ofs2idx(src, bmin >= 0 ? imn[bmin] : 0, minIdx);
+            nếu (maxIdx) ofs2idx(src, bmax >= 0 ? imx[bmax] : 0, maxIdx);
+            trả_về;
         }
     }
     minMaxIdx_(_src, minVal, maxVal, minIdx, maxIdx, _mask);
@@ -451,21 +451,21 @@ void cv::minMaxLoc( InputArray _img, double* minVal, double* maxVal,
 {
     CV_INSTRUMENT_REGION();
 
-    int dims = _img.dims();
+    số_nguyên dims = _img.dims();
     CV_CheckLE(dims, 2, "");
 
-    minMaxIdx(_img, minVal, maxVal, (int*)minLoc, (int*)maxLoc, mask);
-    if( minLoc) {
-        if (dims == 2)
+    minMaxIdx(_img, minVal, maxVal, (số_nguyên*)minLoc, (số_nguyên*)maxLoc, mask);
+    nếu( minLoc) {
+        nếu (dims == 2)
             std::swap(minLoc->x, minLoc->y);
-        else {
+        không_thì {
             minLoc->y = 0;
         }
     }
-    if( maxLoc) {
-        if (dims == 2)
+    nếu( maxLoc) {
+        nếu (dims == 2)
             std::swap(maxLoc->x, maxLoc->y);
-        else {
+        không_thì {
             maxLoc->y = 0;
         }
     }
@@ -482,7 +482,7 @@ enum class ReduceMode
 template <typename T>
 struct reduceMinMaxImpl
 {
-    void operator()(const cv::Mat& src, cv::Mat& dst, ReduceMode mode, const int axis) const
+    void operator()(const cv::Mat& src, cv::Mat& dst, ReduceMode mode, const số_nguyên axis) const
     {
         switch(mode)
         {
@@ -502,7 +502,7 @@ struct reduceMinMaxImpl
     }
 
     template <template<class> class Cmp>
-    static void reduceMinMaxApply(const cv::Mat& src, cv::Mat& dst, const int axis)
+    static void reduceMinMaxApply(const cv::Mat& src, cv::Mat& dst, const số_nguyên axis)
     {
         Cmp<T> cmp;
 
@@ -517,21 +517,21 @@ struct reduceMinMaxImpl
 
         const size_t mid_step = src.total(axis + 1);
 
-        for (size_t outer = 0; outer < outer_size; ++outer)
+        cho (size_t outer = 0; outer < outer_size; ++outer)
         {
             const size_t outer_offset = outer * outer_step;
             const size_t dst_offset = outer * dst_step;
-            for (size_t mid = 0; mid != mid_size; ++mid)
+            cho (size_t mid = 0; mid != mid_size; ++mid)
             {
                 const size_t src_offset = outer_offset + mid * mid_step;
-                for (size_t inner = 0; inner < mid_step; inner++)
+                cho (size_t inner = 0; inner < mid_step; inner++)
                 {
                     int32_t& index = dst_ptr[dst_offset + inner];
 
                     const size_t prev = outer_offset + index * mid_step + inner;
                     const size_t curr = src_offset + inner;
 
-                    if (cmp(src_ptr[curr], src_ptr[prev]))
+                    nếu (cmp(src_ptr[curr], src_ptr[prev]))
                     {
                         index = static_cast<int32_t>(mid);
                     }
@@ -541,49 +541,49 @@ struct reduceMinMaxImpl
     }
 };
 
-static void reduceMinMax(cv::InputArray src, cv::OutputArray dst, ReduceMode mode, int axis)
+static void reduceMinMax(cv::InputArray src, cv::OutputArray dst, ReduceMode mode, số_nguyên axis)
 {
     CV_INSTRUMENT_REGION();
 
     cv::Mat srcMat = src.getMat();
-    int dims = std::max(1, srcMat.dims);
+    số_nguyên dims = std::max(1, srcMat.dims);
     axis = (axis + dims) % dims;
     CV_Assert(srcMat.channels() == 1 && axis >= 0 && axis <= srcMat.dims);
 
-    std::vector<int> sizes(srcMat.dims);
+    std::vector<số_nguyên> sizes(srcMat.dims);
     std::copy(srcMat.size.p, srcMat.size.p + srcMat.dims, sizes.begin());
-    if(!sizes.empty())
+    nếu(!sizes.empty())
         sizes[axis] = 1;
 
     dst.create(srcMat.dims, sizes.data(), CV_32SC1); // indices
     cv::Mat dstMat = dst.getMat();
     dstMat.setTo(cv::Scalar::all(0));
 
-    if (!srcMat.isContinuous())
+    nếu (!srcMat.isContinuous())
     {
         srcMat = srcMat.clone();
     }
 
     bool needs_copy = !dstMat.isContinuous();
-    if (needs_copy)
+    nếu (needs_copy)
     {
         dstMat = dstMat.clone();
     }
 
     cv::detail::depthDispatch<reduceMinMaxImpl>(srcMat.depth(), srcMat, dstMat, mode, axis);
 
-    if (needs_copy)
+    nếu (needs_copy)
     {
         dstMat.copyTo(dst);
     }
 }
 
-void cv::reduceArgMin(InputArray src, OutputArray dst, int axis, bool lastIndex)
+void cv::reduceArgMin(InputArray src, OutputArray dst, số_nguyên axis, bool lastIndex)
 {
     reduceMinMax(src, dst, lastIndex ? ReduceMode::LAST_MIN : ReduceMode::FIRST_MIN, axis);
 }
 
-void cv::reduceArgMax(InputArray src, OutputArray dst, int axis, bool lastIndex)
+void cv::reduceArgMax(InputArray src, OutputArray dst, số_nguyên axis, bool lastIndex)
 {
     reduceMinMax(src, dst, lastIndex ? ReduceMode::LAST_MAX : ReduceMode::FIRST_MAX, axis);
 }

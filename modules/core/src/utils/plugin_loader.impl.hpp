@@ -8,14 +8,14 @@
 
 #include "opencv2/core/utils/plugin_loader.private.hpp"
 
-#if !OPENCV_HAVE_FILESYSTEM_SUPPORT
+#nếu !OPENCV_HAVE_FILESYSTEM_SUPPORT
 #error "Invalid build configuration"
 #endif
 
-#if 0  // TODO
+#nếu 0  // TODO
 #ifdef NDEBUG
 #define CV_LOG_STRIP_LEVEL CV_LOG_LEVEL_DEBUG + 1
-#else
+#không_thì
 #define CV_LOG_STRIP_LEVEL CV_LOG_LEVEL_VERBOSE + 1
 #endif
 #include <opencv2/core/utils/logger.hpp>
@@ -31,11 +31,11 @@ DynamicLib::DynamicLib(const FileSystemPath_t& filename)
 
 DynamicLib::~DynamicLib()
 {
-    if (!disableAutoUnloading_)
+    nếu (!disableAutoUnloading_)
     {
         libraryRelease();
     }
-    else if (handle)
+    không_thì nếu (handle)
     {
         CV_LOG_INFO(NULL, "skip auto unloading (disabled): " << toPrintablePath(fname));
         handle = 0;
@@ -44,21 +44,21 @@ DynamicLib::~DynamicLib()
 
 void* DynamicLib::getSymbol(const char* symbolName) const
 {
-    if (!handle)
+    nếu (!handle)
     {
-        return 0;
+        trả_về 0;
     }
     void* res = getSymbol_(handle, symbolName);
-    if (!res)
+    nếu (!res)
     {
         CV_LOG_DEBUG(NULL, "No symbol '" << symbolName << "' in " << toPrintablePath(fname));
     }
-    return res;
+    trả_về res;
 }
 
 std::string DynamicLib::getName() const
 {
-    return toPrintablePath(fname);
+    trả_về toPrintablePath(fname);
 }
 
 void DynamicLib::libraryLoad(const FileSystemPath_t& filename)
@@ -69,7 +69,7 @@ void DynamicLib::libraryLoad(const FileSystemPath_t& filename)
 
 void DynamicLib::libraryRelease()
 {
-    if (handle)
+    nếu (handle)
     {
         CV_LOG_INFO(NULL, "unload "<< toPrintablePath(fname));
         libraryRelease_(handle);

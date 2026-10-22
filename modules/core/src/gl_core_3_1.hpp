@@ -43,13 +43,13 @@
 #ifndef OPENGL_NOLOAD_STYLE_HPP
 #define OPENGL_NOLOAD_STYLE_HPP
 
-#if defined(__gl_h_) || defined(__GL_H__)
+#nếu defined(__gl_h_) || defined(__GL_H__)
 #error Attempt to include auto-generated header after including gl.h
 #endif
-#if defined(__glext_h_) || defined(__GLEXT_H_)
+#nếu defined(__glext_h_) || defined(__GLEXT_H_)
 #error Attempt to include auto-generated header after including glext.h
 #endif
-#if defined(__gl_ATI_h_)
+#nếu defined(__gl_ATI_h_)
 #error Attempt to include auto-generated header after including glATI.h
 #endif
 
@@ -60,7 +60,7 @@
 #define __gl_ATI_h_
 
 #ifndef APIENTRY
-    #if defined(__MINGW32__)
+    #nếu defined(__MINGW32__)
         #ifndef WIN32_LEAN_AND_MEAN
             #define WIN32_LEAN_AND_MEAN 1
         #endif
@@ -76,32 +76,32 @@
             #define NOMINMAX
         #endif
         #include <windows.h>
-    #else
+    #không_thì
         #define APIENTRY
     #endif
 #endif // APIENTRY
 
 #ifndef CODEGEN_FUNCPTR
     #define CODEGEN_REMOVE_FUNCPTR
-    #if defined(_WIN32)
+    #nếu defined(_WIN32)
         #define CODEGEN_FUNCPTR APIENTRY
-    #else
+    #không_thì
         #define CODEGEN_FUNCPTR
     #endif
 #endif // CODEGEN_FUNCPTR
 
 #ifndef GL_LOAD_GEN_BASIC_OPENGL_TYPEDEFS
 #define GL_LOAD_GEN_BASIC_OPENGL_TYPEDEFS
-    typedef unsigned int GLenum;
+    typedef unsigned số_nguyên GLenum;
     typedef unsigned char GLboolean;
-    typedef unsigned int GLbitfield;
+    typedef unsigned số_nguyên GLbitfield;
     typedef signed char GLbyte;
     typedef short GLshort;
-    typedef int GLint;
-    typedef int GLsizei;
+    typedef số_nguyên GLint;
+    typedef số_nguyên GLsizei;
     typedef unsigned char GLubyte;
     typedef unsigned short GLushort;
-    typedef unsigned int GLuint;
+    typedef unsigned số_nguyên GLuint;
     typedef float GLfloat;
     typedef float GLclampf;
     typedef double GLdouble;
@@ -131,7 +131,7 @@
 #ifndef GL_ARB_shader_objects
     // GL types for program/shader text and shader object handles
     typedef char GLcharARB;
-    typedef unsigned int GLhandleARB;
+    typedef unsigned số_nguyên GLhandleARB;
 #endif
 
 // GL type for "half" precision (s10e5) float data in host memory
@@ -148,17 +148,17 @@
 
     // Define int32_t, int64_t, and uint64_t types for UST/MSC
     // (as used in the GL_EXT_timer_query extension)
-    #if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L
+    #nếu defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901L
         #include <inttypes.h>
     #elif defined(__sun__) || defined(__digital__)
         #include <inttypes.h>
-        #if defined(__STDC__)
-            #if defined(__arch64__) || defined(_LP64)
-                typedef long int int64_t;
-                typedef unsigned long int uint64_t;
-            #else
-                typedef long long int int64_t;
-                typedef unsigned long long int uint64_t;
+        #nếu defined(__STDC__)
+            #nếu defined(__arch64__) || defined(_LP64)
+                typedef long số_nguyên int64_t;
+                typedef unsigned long số_nguyên uint64_t;
+            #không_thì
+                typedef long long số_nguyên int64_t;
+                typedef unsigned long long số_nguyên uint64_t;
             #endif // __arch64__
         #endif // __STDC__
     #elif defined( __VMS ) || defined(__sgi)
@@ -166,16 +166,16 @@
     #elif defined(__SCO__) || defined(__USLC__)
         #include <stdint.h>
     #elif defined(__UNIXOS2__) || defined(__SOL64__)
-        typedef long int int32_t;
-        typedef long long int int64_t;
-        typedef unsigned long long int uint64_t;
+        typedef long số_nguyên int32_t;
+        typedef long long số_nguyên int64_t;
+        typedef unsigned long long số_nguyên uint64_t;
     #elif defined(_WIN32) && defined(__GNUC__)
         #include <stdint.h>
     #elif defined(_WIN32)
         typedef __int32 int32_t;
         typedef __int64 int64_t;
         typedef unsigned __int64 uint64_t;
-    #else
+    #không_thì
         // Fallback if nothing above works
         #include <inttypes.h>
     #endif

@@ -29,13 +29,13 @@ LogTagManager::~LogTagManager()
 void LogTagManager::setConfigString(const std::string& configString, bool apply /*true*/)
 {
     m_config->parse(configString);
-    if (m_config->hasMalformed())
+    nếu (m_config->hasMalformed())
     {
-        return;
+        trả_về;
     }
-    if (!apply)
+    nếu (!apply)
     {
-        return;
+        trả_về;
     }
     // The following code is arranged with "priority by overwriting",
     // where when the same log tag has multiple matches, the last code
@@ -48,15 +48,15 @@ void LogTagManager::setConfigString(const std::string& configString, bool apply 
     //
     const auto& globalConfig = m_config->getGlobalConfig();
     m_globalLogTag->level = globalConfig.level;
-    for (const auto& config : m_config->getFirstPartConfigs())
+    cho (const auto& config : m_config->getFirstPartConfigs())
     {
         setLevelByFirstPart(config.namePart, config.level);
     }
-    for (const auto& config : m_config->getAnyPartConfigs())
+    cho (const auto& config : m_config->getAnyPartConfigs())
     {
         setLevelByAnyPart(config.namePart, config.level);
     }
-    for (const auto& config : m_config->getFullNameConfigs())
+    cho (const auto& config : m_config->getFullNameConfigs())
     {
         setLevelByFullName(config.namePart, config.level);
     }
@@ -64,7 +64,7 @@ void LogTagManager::setConfigString(const std::string& configString, bool apply 
 
 LogTagConfigParser& LogTagManager::getConfigParser() const
 {
-    return *m_config;
+    trả_về *m_config;
 }
 
 void LogTagManager::assign(const std::string& fullName, LogTag* ptr)
@@ -76,19 +76,19 @@ void LogTagManager::assign(const std::string& fullName, LogTag* ptr)
     m_nameTable.addOrLookupFullName(result);
     FullNameInfo& fullNameInfo = *result.m_fullNameInfoPtr;
     const bool isPtrChanged = (fullNameInfo.logTagPtr != ptr);
-    if (!isPtrChanged)
+    nếu (!isPtrChanged)
     {
-        return;
+        trả_về;
     }
     fullNameInfo.logTagPtr = ptr;
-    if (!ptr)
+    nếu (!ptr)
     {
-        return;
+        trả_về;
     }
     const bool hasAppliedFullNameConfig = internal_applyFullNameConfigToTag(fullNameInfo);
-    if (hasAppliedFullNameConfig)
+    nếu (hasAppliedFullNameConfig)
     {
-        return;
+        trả_về;
     }
     internal_applyNamePartConfigToSpecificTag(result);
 }
@@ -104,11 +104,11 @@ LogTag* LogTagManager::get(const std::string& fullName)
     CV_TRACE_FUNCTION();
     LockType lock(m_mutex);
     FullNameInfo* fullNameInfoPtr = m_nameTable.getFullNameInfo(fullName);
-    if (fullNameInfoPtr && fullNameInfoPtr->logTagPtr)
+    nếu (fullNameInfoPtr && fullNameInfoPtr->logTagPtr)
     {
-        return fullNameInfoPtr->logTagPtr;
+        trả_về fullNameInfoPtr->logTagPtr;
     }
-    return nullptr;
+    trả_về nullptr;
 }
 
 void LogTagManager::setLevelByFullName(const std::string& fullName, LogLevel level)
@@ -119,18 +119,18 @@ void LogTagManager::setLevelByFullName(const std::string& fullName, LogLevel lev
     result.m_findCrossReferences = false;
     m_nameTable.addOrLookupFullName(result);
     FullNameInfo& fullNameInfo = *result.m_fullNameInfoPtr;
-    if (fullNameInfo.parsedLevel.scope == MatchingScope::Full &&
+    nếu (fullNameInfo.parsedLevel.scope == MatchingScope::Full &&
         fullNameInfo.parsedLevel.level == level)
     {
         // skip additional processing if nothing changes.
-        return;
+        trả_về;
     }
     // update the cached configured value.
     fullNameInfo.parsedLevel.scope = MatchingScope::Full;
     fullNameInfo.parsedLevel.level = level;
     // update the actual tag, if already registered.
     LogTag* logTagPtr = fullNameInfo.logTagPtr;
-    if (logTagPtr)
+    nếu (logTagPtr)
     {
         logTagPtr->level = level;
     }
@@ -156,11 +156,11 @@ void LogTagManager::setLevelByNamePart(const std::string& namePart, LogLevel lev
     result.m_findCrossReferences = true;
     m_nameTable.addOrLookupNamePart(result);
     NamePartInfo& namePartInfo = *result.m_namePartInfoPtr;
-    if (namePartInfo.parsedLevel.scope == scope &&
+    nếu (namePartInfo.parsedLevel.scope == scope &&
         namePartInfo.parsedLevel.level == level)
     {
         // skip additional processing if nothing changes.
-        return;
+        trả_về;
     }
     namePartInfo.parsedLevel.scope = scope;
     namePartInfo.parsedLevel.level = level;
@@ -173,20 +173,20 @@ std::vector<std::string> LogTagManager::splitNameParts(const std::string& fullNa
     const size_t len = fullName.length();
     std::vector<std::string> nameParts;
     size_t start = 0u;
-    while (start < len)
+    trong_khi (start < len)
     {
         size_t nextPeriod = fullName.find('.', start);
-        if (nextPeriod == npos)
+        nếu (nextPeriod == npos)
         {
             nextPeriod = len;
         }
-        if (nextPeriod >= start + 1u)
+        nếu (nextPeriod >= start + 1u)
         {
             nameParts.emplace_back(fullName.substr(start, nextPeriod - start));
         }
         start = nextPeriod + 1u;
     }
-    return nameParts;
+    trả_về nameParts;
 }
 
 bool LogTagManager::internal_isNamePartMatch(MatchingScope scope, size_t matchingPos)
@@ -194,42 +194,42 @@ bool LogTagManager::internal_isNamePartMatch(MatchingScope scope, size_t matchin
     switch (scope)
     {
     case MatchingScope::FirstNamePart:
-        return (matchingPos == 0u);
+        trả_về (matchingPos == 0u);
     case MatchingScope::AnyNamePart:
-        return true;
+        trả_về true;
     case MatchingScope::None:
     case MatchingScope::Full:
     default:
-        return false;
+        trả_về false;
     }
 }
 
 bool LogTagManager::internal_applyFullNameConfigToTag(FullNameInfo& fullNameInfo)
 {
-    if (!fullNameInfo.logTagPtr)
+    nếu (!fullNameInfo.logTagPtr)
     {
-        return false;
+        trả_về false;
     }
-    if (fullNameInfo.parsedLevel.scope == MatchingScope::Full)
+    nếu (fullNameInfo.parsedLevel.scope == MatchingScope::Full)
     {
         fullNameInfo.logTagPtr->level = fullNameInfo.parsedLevel.level;
-        return true;
+        trả_về true;
     }
-    return false;
+    trả_về false;
 }
 
 bool LogTagManager::internal_applyNamePartConfigToSpecificTag(FullNameLookupResult& fullNameResult)
 {
     const FullNameInfo& fullNameInfo = *fullNameResult.m_fullNameInfoPtr;
     LogTag* const logTag = fullNameInfo.logTagPtr;
-    if (!logTag)
+    nếu (!logTag)
     {
-        return false;
+        trả_về false;
     }
     CV_Assert(fullNameResult.m_findCrossReferences);
     const auto& crossReferences = fullNameResult.m_crossReferences;
     const size_t matchingNamePartCount = crossReferences.size();
-    for (size_t k = 0u; k < matchingNamePartCount; ++k)
+    cho (size_t k = 0u; k < matchingNamePartCount; ++k)
     {
         const auto& match = crossReferences.at(k);
         const auto& namePartInfo = *match.m_namePartInfo;
@@ -238,13 +238,13 @@ bool LogTagManager::internal_applyNamePartConfigToSpecificTag(FullNameLookupResu
         const LogLevel level = parsedLevel.level;
         const size_t matchingPos = match.m_matchingPos;
         const bool isMatch = internal_isNamePartMatch(scope, matchingPos);
-        if (isMatch)
+        nếu (isMatch)
         {
             logTag->level = level;
-            return true;
+            trả_về true;
         }
     }
-    return false;
+    trả_về false;
 }
 
 void LogTagManager::internal_applyNamePartConfigToMatchingTags(NamePartLookupResult& namePartResult)
@@ -255,21 +255,21 @@ void LogTagManager::internal_applyNamePartConfigToMatchingTags(NamePartLookupRes
     NamePartInfo& namePartInfo = *namePartResult.m_namePartInfoPtr;
     const MatchingScope scope = namePartInfo.parsedLevel.scope;
     CV_Assert(scope != MatchingScope::Full);
-    if (scope == MatchingScope::None)
+    nếu (scope == MatchingScope::None)
     {
-        return;
+        trả_về;
     }
     const LogLevel level = namePartInfo.parsedLevel.level;
-    for (size_t k = 0u; k < matchingFullNameCount; ++k)
+    cho (size_t k = 0u; k < matchingFullNameCount; ++k)
     {
         const auto& match = crossReferences.at(k);
         FullNameInfo& fullNameInfo = *match.m_fullNameInfo;
         LogTag* logTagPtr = fullNameInfo.logTagPtr;
-        if (!logTagPtr)
+        nếu (!logTagPtr)
         {
             continue;
         }
-        if (fullNameInfo.parsedLevel.scope == MatchingScope::Full)
+        nếu (fullNameInfo.parsedLevel.scope == MatchingScope::Full)
         {
             // If the full name already has valid config, that full name config
             // has precedence over name part config.
@@ -277,7 +277,7 @@ void LogTagManager::internal_applyNamePartConfigToMatchingTags(NamePartLookupRes
         }
         const size_t matchingPos = match.m_matchingPos;
         const bool isMatch = internal_isNamePartMatch(scope, matchingPos);
-        if (!isMatch)
+        nếu (!isMatch)
         {
             continue;
         }
@@ -292,7 +292,7 @@ void LogTagManager::NameTable::addOrLookupFullName(FullNameLookupResult& result)
     result.m_nameParts = LogTagManager::splitNameParts(result.m_fullName);
     internal_addOrLookupNameParts(result.m_nameParts, result.m_namePartIds);
     const bool isNew = fullNameIdAndFlag.second;
-    if (isNew)
+    nếu (isNew)
     {
         internal_addCrossReference(result.m_fullNameId, result.m_namePartIds);
     }
@@ -302,7 +302,7 @@ void LogTagManager::NameTable::addOrLookupFullName(FullNameLookupResult& result)
     // by the vector append operations earlier in this function.
     // ======
     result.m_fullNameInfoPtr = internal_getFullNameInfo(result.m_fullNameId);
-    if (result.m_findCrossReferences)
+    nếu (result.m_findCrossReferences)
     {
         internal_findMatchingNamePartsForFullName(result);
     }
@@ -312,7 +312,7 @@ void LogTagManager::NameTable::addOrLookupNamePart(NamePartLookupResult& result)
 {
     result.m_namePartId = internal_addOrLookupNamePart(result.m_namePart);
     result.m_namePartInfoPtr = internal_getNamePartInfo(result.m_namePartId);
-    if (result.m_findCrossReferences)
+    nếu (result.m_findCrossReferences)
     {
         internal_findMatchingFullNamesForNamePart(result);
     }
@@ -321,14 +321,14 @@ void LogTagManager::NameTable::addOrLookupNamePart(NamePartLookupResult& result)
 std::pair<size_t, bool> LogTagManager::NameTable::internal_addOrLookupFullName(const std::string& fullName)
 {
     const auto fullNameIdIter = m_fullNameIds.find(fullName);
-    if (fullNameIdIter != m_fullNameIds.end())
+    nếu (fullNameIdIter != m_fullNameIds.end())
     {
-        return std::make_pair(fullNameIdIter->second, false);
+        trả_về std::make_pair(fullNameIdIter->second, false);
     }
     const size_t fullNameId = m_fullNameInfos.size();
     m_fullNameInfos.emplace_back(FullNameInfo{});
     m_fullNameIds.emplace(fullName, fullNameId);
-    return std::make_pair(fullNameId, true);
+    trả_về std::make_pair(fullNameId, true);
 }
 
 void LogTagManager::NameTable::internal_addOrLookupNameParts(const std::vector<std::string>& nameParts,
@@ -336,7 +336,7 @@ void LogTagManager::NameTable::internal_addOrLookupNameParts(const std::vector<s
 {
     const size_t namePartCount = nameParts.size();
     namePartIds.resize(namePartCount, ~(size_t)0u);
-    for (size_t namePartIndex = 0u; namePartIndex < namePartCount; ++namePartIndex)
+    cho (size_t namePartIndex = 0u; namePartIndex < namePartCount; ++namePartIndex)
     {
         const std::string& namePart = nameParts.at(namePartIndex);
         const size_t namePartId = internal_addOrLookupNamePart(namePart);
@@ -347,20 +347,20 @@ void LogTagManager::NameTable::internal_addOrLookupNameParts(const std::vector<s
 size_t LogTagManager::NameTable::internal_addOrLookupNamePart(const std::string& namePart)
 {
     const auto namePartIter = m_namePartIds.find(namePart);
-    if (namePartIter != m_namePartIds.end())
+    nếu (namePartIter != m_namePartIds.end())
     {
-        return namePartIter->second;
+        trả_về namePartIter->second;
     }
     const size_t namePartId = m_namePartInfos.size();
     m_namePartInfos.emplace_back(NamePartInfo{});
     m_namePartIds.emplace(namePart, namePartId);
-    return namePartId;
+    trả_về namePartId;
 }
 
 void LogTagManager::NameTable::internal_addCrossReference(size_t fullNameId, const std::vector<size_t>& namePartIds)
 {
     const size_t namePartCount = namePartIds.size();
-    for (size_t namePartPos = 0u; namePartPos < namePartCount; ++namePartPos)
+    cho (size_t namePartPos = 0u; namePartPos < namePartCount; ++namePartPos)
     {
         const size_t namePartId = namePartIds.at(namePartPos);
         m_fullNameToNamePartIds.emplace(fullNameId, std::make_pair(namePartId, namePartPos));
@@ -371,22 +371,22 @@ void LogTagManager::NameTable::internal_addCrossReference(size_t fullNameId, con
 LogTagManager::FullNameInfo* LogTagManager::NameTable::getFullNameInfo(const std::string& fullName)
 {
     const auto fullNameIdIter = m_fullNameIds.find(fullName);
-    if (fullNameIdIter == m_fullNameIds.end())
+    nếu (fullNameIdIter == m_fullNameIds.end())
     {
-        return nullptr;
+        trả_về nullptr;
     }
     const size_t fullNameId = fullNameIdIter->second;
-    return internal_getFullNameInfo(fullNameId);
+    trả_về internal_getFullNameInfo(fullNameId);
 }
 
 LogTagManager::FullNameInfo* LogTagManager::NameTable::internal_getFullNameInfo(size_t fullNameId)
 {
-    return std::addressof(m_fullNameInfos.at(fullNameId));
+    trả_về std::addressof(m_fullNameInfos.at(fullNameId));
 }
 
 LogTagManager::NamePartInfo* LogTagManager::NameTable::internal_getNamePartInfo(size_t namePartId)
 {
-    return std::addressof(m_namePartInfos.at(namePartId));
+    trả_về std::addressof(m_namePartInfos.at(namePartId));
 }
 
 void LogTagManager::NameTable::internal_findMatchingNamePartsForFullName(FullNameLookupResult& fullNameResult)
@@ -398,7 +398,7 @@ void LogTagManager::NameTable::internal_findMatchingNamePartsForFullName(FullNam
     auto& crossReferences = fullNameResult.m_crossReferences;
     crossReferences.clear();
     crossReferences.reserve(namePartCount);
-    for (size_t matchingPos = 0u; matchingPos < namePartCount; ++matchingPos)
+    cho (size_t matchingPos = 0u; matchingPos < namePartCount; ++matchingPos)
     {
         const size_t namePartId = namePartIds.at(matchingPos);
         NamePartInfo* namePartInfo = internal_getNamePartInfo(namePartId);
@@ -417,7 +417,7 @@ void LogTagManager::NameTable::internal_findMatchingFullNamesForNamePart(NamePar
     const auto namePartToFullNameIterPair = m_namePartToFullNameIds.equal_range(result.m_namePartId);
     const auto iterBegin = namePartToFullNameIterPair.first;
     const auto iterEnd = namePartToFullNameIterPair.second;
-    for (auto iter = iterBegin; iter != iterEnd; ++iter)
+    cho (auto iter = iterBegin; iter != iterEnd; ++iter)
     {
         const size_t fullNameId = iter->second.first;
         const size_t matchingPos = iter->second.second;

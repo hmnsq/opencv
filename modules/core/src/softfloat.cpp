@@ -202,11 +202,11 @@ static bool f64_lt( float64_t, float64_t );
 | Ported from OpenCV and fdlibm and added for usability
 *----------------------------------------------------------------------------*/
 
-static float32_t f32_powi( float32_t x, int y);
-static float64_t f64_powi( float64_t x, int y);
+static float32_t f32_powi( float32_t x, số_nguyên y);
+static float64_t f64_powi( float64_t x, số_nguyên y);
 static float64_t f64_sin_kernel(float64_t x);
 static float64_t f64_cos_kernel(float64_t x);
-static void f64_sincos_reduce(const float64_t& x, float64_t& y, int& n);
+static void f64_sincos_reduce(const float64_t& x, float64_t& y, số_nguyên& n);
 
 static float32_t f32_exp( float32_t x);
 static float64_t f64_exp(float64_t x);
@@ -227,20 +227,20 @@ softfloat::softfloat( const uint64_t a ) { *this = ui64_to_f32(a); }
 softfloat::softfloat( const  int32_t a ) { *this =  i32_to_f32(a); }
 softfloat::softfloat( const  int64_t a ) { *this =  i64_to_f32(a); }
 
-softfloat::operator softdouble() const { return f32_to_f64(*this); }
+softfloat::operator softdouble() const { trả_về f32_to_f64(*this); }
 
-softfloat softfloat::operator + (const softfloat& a) const { return f32_add(*this, a); }
-softfloat softfloat::operator - (const softfloat& a) const { return f32_sub(*this, a); }
-softfloat softfloat::operator * (const softfloat& a) const { return f32_mul(*this, a); }
-softfloat softfloat::operator / (const softfloat& a) const { return f32_div(*this, a); }
-softfloat softfloat::operator % (const softfloat& a) const { return f32_rem(*this, a); }
+softfloat softfloat::operator + (const softfloat& a) const { trả_về f32_add(*this, a); }
+softfloat softfloat::operator - (const softfloat& a) const { trả_về f32_sub(*this, a); }
+softfloat softfloat::operator * (const softfloat& a) const { trả_về f32_mul(*this, a); }
+softfloat softfloat::operator / (const softfloat& a) const { trả_về f32_div(*this, a); }
+softfloat softfloat::operator % (const softfloat& a) const { trả_về f32_rem(*this, a); }
 
-bool softfloat::operator == ( const softfloat& a ) const { return  f32_eq(*this, a); }
-bool softfloat::operator != ( const softfloat& a ) const { return !f32_eq(*this, a); }
-bool softfloat::operator >  ( const softfloat& a ) const { return  f32_lt(a, *this); }
-bool softfloat::operator >= ( const softfloat& a ) const { return  f32_le(a, *this); }
-bool softfloat::operator <  ( const softfloat& a ) const { return  f32_lt(*this, a); }
-bool softfloat::operator <= ( const softfloat& a ) const { return  f32_le(*this, a); }
+bool softfloat::operator == ( const softfloat& a ) const { trả_về  f32_eq(*this, a); }
+bool softfloat::operator != ( const softfloat& a ) const { trả_về !f32_eq(*this, a); }
+bool softfloat::operator >  ( const softfloat& a ) const { trả_về  f32_lt(a, *this); }
+bool softfloat::operator >= ( const softfloat& a ) const { trả_về  f32_le(a, *this); }
+bool softfloat::operator <  ( const softfloat& a ) const { trả_về  f32_lt(*this, a); }
+bool softfloat::operator <= ( const softfloat& a ) const { trả_về  f32_le(*this, a); }
 
 softdouble::softdouble( const uint32_t a ) { *this = ui32_to_f64(a); }
 softdouble::softdouble( const uint64_t a ) { *this = ui64_to_f64(a); }
@@ -249,58 +249,58 @@ softdouble::softdouble( const  int64_t a ) { *this =  i64_to_f64(a); }
 
 }
 
-int cvTrunc(const cv::softfloat& a) { return cv::f32_to_i32_r_minMag(a, false); }
-int cvRound(const cv::softfloat& a) { return cv::f32_to_i32(a, cv::round_near_even, false); }
-int cvFloor(const cv::softfloat& a) { return cv::f32_to_i32(a, cv::round_min, false); }
-int cvCeil (const cv::softfloat& a) { return cv::f32_to_i32(a, cv::round_max, false); }
+số_nguyên cvTrunc(const cv::softfloat& a) { trả_về cv::f32_to_i32_r_minMag(a, false); }
+số_nguyên cvRound(const cv::softfloat& a) { trả_về cv::f32_to_i32(a, cv::round_near_even, false); }
+số_nguyên cvFloor(const cv::softfloat& a) { trả_về cv::f32_to_i32(a, cv::round_min, false); }
+số_nguyên cvCeil (const cv::softfloat& a) { trả_về cv::f32_to_i32(a, cv::round_max, false); }
 
-int cvTrunc(const cv::softdouble& a) { return cv::f64_to_i32_r_minMag(a, false); }
-int cvRound(const cv::softdouble& a) { return cv::f64_to_i32(a, cv::round_near_even, false); }
-int cvFloor(const cv::softdouble& a) { return cv::f64_to_i32(a, cv::round_min, false); }
-int cvCeil (const cv::softdouble& a) { return cv::f64_to_i32(a, cv::round_max, false); }
+số_nguyên cvTrunc(const cv::softdouble& a) { trả_về cv::f64_to_i32_r_minMag(a, false); }
+số_nguyên cvRound(const cv::softdouble& a) { trả_về cv::f64_to_i32(a, cv::round_near_even, false); }
+số_nguyên cvFloor(const cv::softdouble& a) { trả_về cv::f64_to_i32(a, cv::round_min, false); }
+số_nguyên cvCeil (const cv::softdouble& a) { trả_về cv::f64_to_i32(a, cv::round_max, false); }
 
-int64_t cvRound64(const cv::softdouble& a) { return cv::f64_to_i64(a, cv::round_near_even, false); }
+int64_t cvRound64(const cv::softdouble& a) { trả_về cv::f64_to_i64(a, cv::round_near_even, false); }
 
 namespace cv
 {
-softdouble::operator softfloat() const { return f64_to_f32(*this); }
+softdouble::operator softfloat() const { trả_về f64_to_f32(*this); }
 
-softdouble softdouble::operator + (const softdouble& a) const { return f64_add(*this, a); }
-softdouble softdouble::operator - (const softdouble& a) const { return f64_sub(*this, a); }
-softdouble softdouble::operator * (const softdouble& a) const { return f64_mul(*this, a); }
-softdouble softdouble::operator / (const softdouble& a) const { return f64_div(*this, a); }
-softdouble softdouble::operator % (const softdouble& a) const { return f64_rem(*this, a); }
+softdouble softdouble::operator + (const softdouble& a) const { trả_về f64_add(*this, a); }
+softdouble softdouble::operator - (const softdouble& a) const { trả_về f64_sub(*this, a); }
+softdouble softdouble::operator * (const softdouble& a) const { trả_về f64_mul(*this, a); }
+softdouble softdouble::operator / (const softdouble& a) const { trả_về f64_div(*this, a); }
+softdouble softdouble::operator % (const softdouble& a) const { trả_về f64_rem(*this, a); }
 
-bool softdouble::operator == (const softdouble& a) const { return  f64_eq(*this, a); }
-bool softdouble::operator != (const softdouble& a) const { return !f64_eq(*this, a); }
-bool softdouble::operator >  (const softdouble& a) const { return  f64_lt(a, *this); }
-bool softdouble::operator >= (const softdouble& a) const { return  f64_le(a, *this); }
-bool softdouble::operator <  (const softdouble& a) const { return  f64_lt(*this, a); }
-bool softdouble::operator <= (const softdouble& a) const { return  f64_le(*this, a); }
+bool softdouble::operator == (const softdouble& a) const { trả_về  f64_eq(*this, a); }
+bool softdouble::operator != (const softdouble& a) const { trả_về !f64_eq(*this, a); }
+bool softdouble::operator >  (const softdouble& a) const { trả_về  f64_lt(a, *this); }
+bool softdouble::operator >= (const softdouble& a) const { trả_về  f64_le(a, *this); }
+bool softdouble::operator <  (const softdouble& a) const { trả_về  f64_lt(*this, a); }
+bool softdouble::operator <= (const softdouble& a) const { trả_về  f64_le(*this, a); }
 
 /*----------------------------------------------------------------------------
 | Overloads for math functions
 *----------------------------------------------------------------------------*/
 
-softfloat  mulAdd( const softfloat&  a, const softfloat&  b, const softfloat & c) { return f32_mulAdd(a, b, c); }
-softdouble mulAdd( const softdouble& a, const softdouble& b, const softdouble& c) { return f64_mulAdd(a, b, c); }
+softfloat  mulAdd( const softfloat&  a, const softfloat&  b, const softfloat & c) { trả_về f32_mulAdd(a, b, c); }
+softdouble mulAdd( const softdouble& a, const softdouble& b, const softdouble& c) { trả_về f64_mulAdd(a, b, c); }
 
-softfloat  sqrt( const softfloat&  a ) { return f32_sqrt(a); }
-softdouble sqrt( const softdouble& a ) { return f64_sqrt(a); }
+softfloat  sqrt( const softfloat&  a ) { trả_về f32_sqrt(a); }
+softdouble sqrt( const softdouble& a ) { trả_về f64_sqrt(a); }
 
-softfloat  exp( const softfloat&  a) { return f32_exp(a); }
-softdouble exp( const softdouble& a) { return f64_exp(a); }
+softfloat  exp( const softfloat&  a) { trả_về f32_exp(a); }
+softdouble exp( const softdouble& a) { trả_về f64_exp(a); }
 
-softfloat  log( const softfloat&  a ) { return f32_log(a); }
-softdouble log( const softdouble& a ) { return f64_log(a); }
+softfloat  log( const softfloat&  a ) { trả_về f32_log(a); }
+softdouble log( const softdouble& a ) { trả_về f64_log(a); }
 
-softfloat  pow( const softfloat&  a, const softfloat&  b) { return f32_pow(a, b); }
-softdouble pow( const softdouble& a, const softdouble& b) { return f64_pow(a, b); }
+softfloat  pow( const softfloat&  a, const softfloat&  b) { trả_về f32_pow(a, b); }
+softdouble pow( const softdouble& a, const softdouble& b) { trả_về f64_pow(a, b); }
 
-softfloat cbrt(const softfloat& a) { return f32_cbrt(a); }
+softfloat cbrt(const softfloat& a) { trả_về f32_cbrt(a); }
 
-softdouble sin(const softdouble& a) { return f64_sin(a); }
-softdouble cos(const softdouble& a) { return f64_cos(a); }
+softdouble sin(const softdouble& a) { trả_về f64_sin(a); }
+softdouble cos(const softdouble& a) { trả_về f64_cos(a); }
 
 /*----------------------------------------------------------------------------
 | The values to return on conversions to 32-bit integer formats that raise an
@@ -328,7 +328,7 @@ struct commonNaN {
     bool sign;
 #ifndef WORDS_BIGENDIAN
     uint64_t v0, v64;
-#else
+#không_thì
     uint64_t v64, v0;
 #endif
 };
@@ -410,7 +410,7 @@ static uint_fast64_t softfloat_propagateNaNF64UI( uint_fast64_t uiA, uint_fast64
 struct uint128 { uint64_t v0, v64; };
 struct uint64_extra { uint64_t extra, v; };
 struct uint128_extra { uint64_t extra; struct uint128 v; };
-#else
+#không_thì
 struct uint128 { uint64_t v64, v0; };
 struct uint64_extra { uint64_t v, extra; };
 struct uint128_extra { struct uint128 v; uint64_t extra; };
@@ -460,7 +460,7 @@ static float64_t softfloat_mulAddF64( uint_fast64_t, uint_fast64_t, uint_fast64_
 *----------------------------------------------------------------------------*/
 
 static inline uint64_t softfloat_shortShiftRightJam64( uint64_t a, uint_fast8_t dist )
-{ return a>>dist | ((a & (((uint_fast64_t) 1<<dist) - 1)) != 0); }
+{ trả_về a>>dist | ((a & (((uint_fast64_t) 1<<dist) - 1)) != 0); }
 
 /*----------------------------------------------------------------------------
 | Shifts 'a' right by the number of bits given in 'dist', which must not
@@ -475,7 +475,7 @@ static inline uint64_t softfloat_shortShiftRightJam64( uint64_t a, uint_fast8_t 
 static inline uint32_t softfloat_shiftRightJam32( uint32_t a, uint_fast16_t dist )
 {
     //fixed unsigned unary minus: -x == ~x + 1
-    return (dist < 31) ? a>>dist | ((uint32_t) (a<<((~dist + 1) & 31)) != 0) : (a != 0);
+    trả_về (dist < 31) ? a>>dist | ((uint32_t) (a<<((~dist + 1) & 31)) != 0) : (a != 0);
 }
 
 /*----------------------------------------------------------------------------
@@ -490,7 +490,7 @@ static inline uint32_t softfloat_shiftRightJam32( uint32_t a, uint_fast16_t dist
 static inline uint64_t softfloat_shiftRightJam64( uint64_t a, uint_fast32_t dist )
 {
     //fixed unsigned unary minus: -x == ~x + 1
-    return (dist < 63) ? a>>dist | ((uint64_t) (a<<((~dist + 1) & 63)) != 0) : (a != 0);
+    trả_về (dist < 63) ? a>>dist | ((uint64_t) (a<<((~dist + 1) & 63)) != 0) : (a != 0);
 }
 
 /*----------------------------------------------------------------------------
@@ -524,16 +524,16 @@ static const uint_least8_t softfloat_countLeadingZeros8[256] = {
 static inline uint_fast8_t softfloat_countLeadingZeros32( uint32_t a )
 {
     uint_fast8_t count = 0;
-    if ( a < 0x10000 ) {
+    nếu ( a < 0x10000 ) {
         count = 16;
         a <<= 16;
     }
-    if ( a < 0x1000000 ) {
+    nếu ( a < 0x1000000 ) {
         count += 8;
         a <<= 8;
     }
     count += softfloat_countLeadingZeros8[a>>24];
-    return count;
+    trả_về count;
 }
 
 /*----------------------------------------------------------------------------
@@ -573,7 +573,7 @@ static uint_fast8_t softfloat_countLeadingZeros64( uint64_t a );
 | returned is also always within the range 0.5 to 1; thus, the most-
 | significant bit of the result is always set.
 *----------------------------------------------------------------------------*/
-static uint32_t softfloat_approxRecipSqrt32_1( unsigned int oddExpA, uint32_t a );
+static uint32_t softfloat_approxRecipSqrt32_1( unsigned số_nguyên oddExpA, uint32_t a );
 
 static const uint16_t softfloat_approxRecipSqrt_1k0s[16] = {
     0xB4C9, 0xFFAB, 0xAA7D, 0xF11C, 0xA1C5, 0xE4C7, 0x9A43, 0xDA29,
@@ -593,7 +593,7 @@ static inline struct uint128 softfloat_shortShiftLeft128( uint64_t a64, uint64_t
     struct uint128 z;
     z.v64 = a64<<dist | a0>>(-dist & 63);
     z.v0 = a0<<dist;
-    return z;
+    trả_về z;
 }
 
 /*----------------------------------------------------------------------------
@@ -611,7 +611,7 @@ static inline struct uint128 softfloat_shortShiftRightJam128(uint64_t a64, uint6
     z.v0 =
         a64<<(negDist & 63) | a0>>dist
             | ((uint64_t) (a0<<(negDist & 63)) != 0);
-    return z;
+    trả_về z;
 }
 
 /*----------------------------------------------------------------------------
@@ -636,7 +636,7 @@ static inline struct uint128 softfloat_add128( uint64_t a64, uint64_t a0, uint64
     struct uint128 z;
     z.v0 = a0 + b0;
     z.v64 = a64 + b64 + (z.v0 < a0);
-    return z;
+    trả_về z;
 }
 
 /*----------------------------------------------------------------------------
@@ -650,7 +650,7 @@ static inline struct uint128 softfloat_sub128( uint64_t a64, uint64_t a0, uint64
     z.v0 = a0 - b0;
     z.v64 = a64 - b64;
     z.v64 -= (a0 < b0);
-    return z;
+    trả_về z;
 }
 
 /*----------------------------------------------------------------------------
@@ -668,10 +668,10 @@ static float32_t f32_add( float32_t a, float32_t b )
     uint_fast32_t uiA = a.v;
     uint_fast32_t uiB = b.v;
 
-    if ( signF32UI( uiA ^ uiB ) ) {
-        return softfloat_subMagsF32( uiA, uiB );
-    } else {
-        return softfloat_addMagsF32( uiA, uiB );
+    nếu ( signF32UI( uiA ^ uiB ) ) {
+        trả_về softfloat_subMagsF32( uiA, uiB );
+    } không_thì {
+        trả_về softfloat_addMagsF32( uiA, uiB );
     }
 }
 
@@ -705,23 +705,23 @@ static float32_t f32_div( float32_t a, float32_t b )
     signZ = signA ^ signB;
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
-    if ( expA == 0xFF ) {
-        if ( sigA ) goto propagateNaN;
-        if ( expB == 0xFF ) {
-            if ( sigB ) goto propagateNaN;
+    nếu ( expA == 0xFF ) {
+        nếu ( sigA ) goto propagateNaN;
+        nếu ( expB == 0xFF ) {
+            nếu ( sigB ) goto propagateNaN;
             goto invalid;
         }
         goto infinity;
     }
-    if ( expB == 0xFF ) {
-        if ( sigB ) goto propagateNaN;
+    nếu ( expB == 0xFF ) {
+        nếu ( sigB ) goto propagateNaN;
         goto zero;
     }
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
-    if ( ! expB ) {
-        if ( ! sigB ) {
-            if ( ! (expA | sigA) ) goto invalid;
+    nếu ( ! expB ) {
+        nếu ( ! sigB ) {
+            nếu ( ! (expA | sigA) ) goto invalid;
             raiseFlags( flag_infinite );
             goto infinity;
         }
@@ -729,8 +729,8 @@ static float32_t f32_div( float32_t a, float32_t b )
         expB = normExpSig.exp;
         sigB = normExpSig.sig;
     }
-    if ( ! expA ) {
-        if ( ! sigA ) goto zero;
+    nếu ( ! expA ) {
+        nếu ( ! sigA ) goto zero;
         normExpSig = softfloat_normSubnormalF32Sig( sigA );
         expA = normExpSig.exp;
         sigA = normExpSig.sig;
@@ -740,15 +740,15 @@ static float32_t f32_div( float32_t a, float32_t b )
     expZ = expA - expB + 0x7E;
     sigA |= 0x00800000;
     sigB |= 0x00800000;
-    if ( sigA < sigB ) {
+    nếu ( sigA < sigB ) {
         --expZ;
         sig64A = (uint_fast64_t) sigA<<31;
-    } else {
+    } không_thì {
         sig64A = (uint_fast64_t) sigA<<30;
     }
     sigZ = (uint_fast32_t)(sig64A / sigB); // fixed warning on type cast
-    if ( ! (sigZ & 0x3F) ) sigZ |= ((uint_fast64_t) sigB * sigZ != sig64A);
-    return softfloat_roundPackToF32( signZ, expZ, sigZ );
+    nếu ( ! (sigZ & 0x3F) ) sigZ |= ((uint_fast64_t) sigB * sigZ != sig64A);
+    trả_về softfloat_roundPackToF32( signZ, expZ, sigZ );
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
  propagateNaN:
@@ -770,7 +770,7 @@ static float32_t f32_div( float32_t a, float32_t b )
  zero:
     uiZ = packToF32UI( signZ, 0, 0 );
  uiZ:
-    return float32_t::fromRaw(uiZ);
+    trả_về float32_t::fromRaw(uiZ);
 }
 
 static bool f32_eq( float32_t a, float32_t b )
@@ -780,13 +780,13 @@ static bool f32_eq( float32_t a, float32_t b )
 
     uiA = a.v;
     uiB = b.v;
-    if ( isNaNF32UI( uiA ) || isNaNF32UI( uiB ) )
+    nếu ( isNaNF32UI( uiA ) || isNaNF32UI( uiB ) )
     {
-        if (softfloat_isSigNaNF32UI( uiA ) || softfloat_isSigNaNF32UI( uiB ) )
+        nếu (softfloat_isSigNaNF32UI( uiA ) || softfloat_isSigNaNF32UI( uiB ) )
             raiseFlags( flag_invalid );
-        return false;
+        trả_về false;
     }
-    return (uiA == uiB) || ! (uint32_t) ((uiA | uiB)<<1);
+    trả_về (uiA == uiB) || ! (uint32_t) ((uiA | uiB)<<1);
 }
 
 static bool f32_le( float32_t a, float32_t b )
@@ -797,14 +797,14 @@ static bool f32_le( float32_t a, float32_t b )
 
     uiA = a.v;
     uiB = b.v;
-    if ( isNaNF32UI( uiA ) || isNaNF32UI( uiB ) )
+    nếu ( isNaNF32UI( uiA ) || isNaNF32UI( uiB ) )
     {
         raiseFlags( flag_invalid );
-        return false;
+        trả_về false;
     }
     signA = signF32UI( uiA );
     signB = signF32UI( uiB );
-    return (signA != signB) ? signA || ! (uint32_t) ((uiA | uiB)<<1)
+    trả_về (signA != signB) ? signA || ! (uint32_t) ((uiA | uiB)<<1)
                             : (uiA == uiB) || (signA ^ (uiA < uiB));
 }
 
@@ -815,14 +815,14 @@ static bool f32_lt( float32_t a, float32_t b )
     bool signA, signB;
 
     uiA = a.v; uiB = b.v;
-    if ( isNaNF32UI( uiA ) || isNaNF32UI( uiB ) )
+    nếu ( isNaNF32UI( uiA ) || isNaNF32UI( uiB ) )
     {
         raiseFlags( flag_invalid );
-        return false;
+        trả_về false;
     }
     signA = signF32UI( uiA );
     signB = signF32UI( uiB );
-    return (signA != signB) ? signA && ((uint32_t) ((uiA | uiB)<<1) != 0)
+    trả_về (signA != signB) ? signA && ((uint32_t) ((uiA | uiB)<<1) != 0)
                             : (uiA != uiB) && (signA ^ (uiA < uiB));
 }
 
@@ -835,7 +835,7 @@ static float32_t f32_mulAdd( float32_t a, float32_t b, float32_t c )
     uiA = a.v;
     uiB = b.v;
     uiC = c.v;
-    return softfloat_mulAddF32( uiA, uiB, uiC, 0 );
+    trả_về softfloat_mulAddF32( uiA, uiB, uiC, 0 );
 }
 
 static float32_t f32_mul( float32_t a, float32_t b )
@@ -867,26 +867,26 @@ static float32_t f32_mul( float32_t a, float32_t b )
     signZ = signA ^ signB;
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
-    if ( expA == 0xFF ) {
-        if ( sigA || ((expB == 0xFF) && sigB) ) goto propagateNaN;
+    nếu ( expA == 0xFF ) {
+        nếu ( sigA || ((expB == 0xFF) && sigB) ) goto propagateNaN;
         magBits = expB | sigB;
         goto infArg;
     }
-    if ( expB == 0xFF ) {
-        if ( sigB ) goto propagateNaN;
+    nếu ( expB == 0xFF ) {
+        nếu ( sigB ) goto propagateNaN;
         magBits = expA | sigA;
         goto infArg;
     }
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
-    if ( ! expA ) {
-        if ( ! sigA ) goto zero;
+    nếu ( ! expA ) {
+        nếu ( ! sigA ) goto zero;
         normExpSig = softfloat_normSubnormalF32Sig( sigA );
         expA = normExpSig.exp;
         sigA = normExpSig.sig;
     }
-    if ( ! expB ) {
-        if ( ! sigB ) goto zero;
+    nếu ( ! expB ) {
+        nếu ( ! sigB ) goto zero;
         normExpSig = softfloat_normSubnormalF32Sig( sigB );
         expB = normExpSig.exp;
         sigB = normExpSig.sig;
@@ -897,11 +897,11 @@ static float32_t f32_mul( float32_t a, float32_t b )
     sigA = (sigA | 0x00800000)<<7;
     sigB = (sigB | 0x00800000)<<8;
     sigZ = (uint_fast32_t)softfloat_shortShiftRightJam64( (uint_fast64_t) sigA * sigB, 32 ); //fixed warning on type cast
-    if ( sigZ < 0x40000000 ) {
+    nếu ( sigZ < 0x40000000 ) {
         --expZ;
         sigZ <<= 1;
     }
-    return softfloat_roundPackToF32( signZ, expZ, sigZ );
+    trả_về softfloat_roundPackToF32( signZ, expZ, sigZ );
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
  propagateNaN:
@@ -910,10 +910,10 @@ static float32_t f32_mul( float32_t a, float32_t b )
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
  infArg:
-    if ( ! magBits ) {
+    nếu ( ! magBits ) {
         raiseFlags( flag_invalid );
         uiZ = defaultNaNF32UI;
-    } else {
+    } không_thì {
         uiZ = packToF32UI( signZ, 0xFF, 0 );
     }
     goto uiZ;
@@ -922,7 +922,7 @@ static float32_t f32_mul( float32_t a, float32_t b )
  zero:
     uiZ = packToF32UI( signZ, 0, 0 );
  uiZ:
-    return float32_t::fromRaw(uiZ);
+    trả_về float32_t::fromRaw(uiZ);
 }
 
 static float32_t f32_rem( float32_t a, float32_t b )
@@ -952,24 +952,24 @@ static float32_t f32_rem( float32_t a, float32_t b )
     sigB = fracF32UI( uiB );
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
-    if ( expA == 0xFF ) {
-        if ( sigA || ((expB == 0xFF) && sigB) ) goto propagateNaN;
+    nếu ( expA == 0xFF ) {
+        nếu ( sigA || ((expB == 0xFF) && sigB) ) goto propagateNaN;
         goto invalid;
     }
-    if ( expB == 0xFF ) {
-        if ( sigB ) goto propagateNaN;
-        return a;
+    nếu ( expB == 0xFF ) {
+        nếu ( sigB ) goto propagateNaN;
+        trả_về a;
     }
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
-    if ( ! expB ) {
-        if ( ! sigB ) goto invalid;
+    nếu ( ! expB ) {
+        nếu ( ! sigB ) goto invalid;
         normExpSig = softfloat_normSubnormalF32Sig( sigB );
         expB = normExpSig.exp;
         sigB = normExpSig.sig;
     }
-    if ( ! expA ) {
-        if ( ! sigA ) return a;
+    nếu ( ! expA ) {
+        nếu ( ! sigA ) trả_về a;
         normExpSig = softfloat_normSubnormalF32Sig( sigA );
         expA = normExpSig.exp;
         sigA = normExpSig.sig;
@@ -979,18 +979,18 @@ static float32_t f32_rem( float32_t a, float32_t b )
     rem = sigA | 0x00800000;
     sigB |= 0x00800000;
     expDiff = expA - expB;
-    if ( expDiff < 1 ) {
-        if ( expDiff < -1 ) return a;
+    nếu ( expDiff < 1 ) {
+        nếu ( expDiff < -1 ) trả_về a;
         sigB <<= 6;
-        if ( expDiff ) {
+        nếu ( expDiff ) {
             rem <<= 5;
             q = 0;
-        } else {
+        } không_thì {
             rem <<= 6;
             q = (sigB <= rem);
-            if ( q ) rem -= sigB;
+            nếu ( q ) rem -= sigB;
         }
-    } else {
+    } không_thì {
         recip32 = softfloat_approxRecip32_1( sigB<<8 );
         /*--------------------------------------------------------------------
         | Changing the shift of `rem' here requires also changing the initial
@@ -1004,9 +1004,9 @@ static float32_t f32_rem( float32_t a, float32_t b )
         | which is believed to be the maximum possible.
         *--------------------------------------------------------------------*/
         sigB <<= 6;
-        for (;;) {
+        cho (;;) {
             q = (rem * (uint_fast64_t) recip32)>>32;
-            if ( expDiff < 0 ) break;
+            nếu ( expDiff < 0 ) break;
             //fixed unsigned unary minus: -x == ~x + 1
             rem = ~(q * (uint32_t) sigB) + 1;
             expDiff -= 29;
@@ -1023,16 +1023,16 @@ static float32_t f32_rem( float32_t a, float32_t b )
         altRem = rem;
         ++q;
         rem -= sigB;
-    } while ( ! (rem & 0x80000000) );
+    } trong_khi ( ! (rem & 0x80000000) );
     meanRem = rem + altRem;
-    if ( (meanRem & 0x80000000) || (! meanRem && (q & 1)) ) rem = altRem;
+    nếu ( (meanRem & 0x80000000) || (! meanRem && (q & 1)) ) rem = altRem;
     signRem = signA;
-    if ( 0x80000000 <= rem ) {
+    nếu ( 0x80000000 <= rem ) {
         signRem = ! signRem;
         //fixed unsigned unary minus: -x == ~x + 1
         rem = ~rem + 1;
     }
-    return softfloat_normRoundPackToF32( signRem, expB, rem );
+    trả_về softfloat_normRoundPackToF32( signRem, expB, rem );
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
  propagateNaN:
@@ -1042,7 +1042,7 @@ static float32_t f32_rem( float32_t a, float32_t b )
     raiseFlags( flag_invalid );
     uiZ = defaultNaNF32UI;
  uiZ:
-    return float32_t::fromRaw(uiZ);
+    trả_về float32_t::fromRaw(uiZ);
 }
 
 static float32_t f32_roundToInt( float32_t a, uint_fast8_t roundingMode, bool exact )
@@ -1057,57 +1057,57 @@ static float32_t f32_roundToInt( float32_t a, uint_fast8_t roundingMode, bool ex
     exp = expF32UI( uiA );
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
-    if ( exp <= 0x7E ) {
-        if ( ! (uint32_t) (uiA<<1) ) return a;
-        if ( exact ) raiseFlags(flag_inexact);
+    nếu ( exp <= 0x7E ) {
+        nếu ( ! (uint32_t) (uiA<<1) ) trả_về a;
+        nếu ( exact ) raiseFlags(flag_inexact);
         uiZ = uiA & packToF32UI( 1, 0, 0 );
         switch ( roundingMode ) {
          case round_near_even:
-            if ( ! fracF32UI( uiA ) ) break;
+            nếu ( ! fracF32UI( uiA ) ) break;
             [[fallthrough]];
          case round_near_maxMag:
-            if ( exp == 0x7E ) uiZ |= packToF32UI( 0, 0x7F, 0 );
+            nếu ( exp == 0x7E ) uiZ |= packToF32UI( 0, 0x7F, 0 );
             break;
          case round_min:
-            if ( uiZ ) uiZ = packToF32UI( 1, 0x7F, 0 );
+            nếu ( uiZ ) uiZ = packToF32UI( 1, 0x7F, 0 );
             break;
          case round_max:
-            if ( ! uiZ ) uiZ = packToF32UI( 0, 0x7F, 0 );
+            nếu ( ! uiZ ) uiZ = packToF32UI( 0, 0x7F, 0 );
             break;
         }
         goto uiZ;
     }
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
-    if ( 0x96 <= exp ) {
-        if ( (exp == 0xFF) && fracF32UI( uiA ) ) {
+    nếu ( 0x96 <= exp ) {
+        nếu ( (exp == 0xFF) && fracF32UI( uiA ) ) {
             uiZ = softfloat_propagateNaNF32UI( uiA, 0 );
             goto uiZ;
         }
-        return a;
+        trả_về a;
     }
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
     uiZ = uiA;
     lastBitMask = (uint_fast32_t) 1<<(0x96 - exp);
     roundBitsMask = lastBitMask - 1;
-    if ( roundingMode == round_near_maxMag ) {
+    nếu ( roundingMode == round_near_maxMag ) {
         uiZ += lastBitMask>>1;
-    } else if ( roundingMode == round_near_even ) {
+    } không_thì nếu ( roundingMode == round_near_even ) {
         uiZ += lastBitMask>>1;
-        if ( ! (uiZ & roundBitsMask) ) uiZ &= ~lastBitMask;
-    } else if (
+        nếu ( ! (uiZ & roundBitsMask) ) uiZ &= ~lastBitMask;
+    } không_thì nếu (
         roundingMode
             == (signF32UI( uiZ ) ? round_min : round_max)
     ) {
         uiZ += roundBitsMask;
     }
     uiZ &= ~roundBitsMask;
-    if ( exact && (uiZ != uiA) ) {
+    nếu ( exact && (uiZ != uiA) ) {
         raiseFlags(flag_inexact);
     }
  uiZ:
-    return float32_t::fromRaw(uiZ);
+    trả_về float32_t::fromRaw(uiZ);
 }
 
 static float32_t f32_sqrt( float32_t a )
@@ -1129,24 +1129,24 @@ static float32_t f32_sqrt( float32_t a )
     sigA  = fracF32UI( uiA );
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
-    if ( expA == 0xFF ) {
-        if ( sigA ) {
+    nếu ( expA == 0xFF ) {
+        nếu ( sigA ) {
             uiZ = softfloat_propagateNaNF32UI( uiA, 0 );
             goto uiZ;
         }
-        if ( ! signA ) return a;
+        nếu ( ! signA ) trả_về a;
         goto invalid;
     }
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
-    if ( signA ) {
-        if ( ! (expA | sigA) ) return a;
+    nếu ( signA ) {
+        nếu ( ! (expA | sigA) ) trả_về a;
         goto invalid;
     }
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
-    if ( ! expA ) {
-        if ( ! sigA ) return a;
+    nếu ( ! expA ) {
+        nếu ( ! sigA ) trả_về a;
         normExpSig = softfloat_normSubnormalF32Sig( sigA );
         expA = normExpSig.exp;
         sigA = normExpSig.sig;
@@ -1159,28 +1159,28 @@ static float32_t f32_sqrt( float32_t a )
     sigZ =
         ((uint_fast64_t) sigA * softfloat_approxRecipSqrt32_1( expA, sigA ))
             >>32;
-    if ( expA ) sigZ >>= 1;
+    nếu ( expA ) sigZ >>= 1;
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
     sigZ += 2;
-    if ( (sigZ & 0x3F) < 2 ) {
+    nếu ( (sigZ & 0x3F) < 2 ) {
         shiftedSigZ = sigZ>>2;
         negRem = shiftedSigZ * shiftedSigZ;
         sigZ &= ~3;
-        if ( negRem & 0x80000000 ) {
+        nếu ( negRem & 0x80000000 ) {
             sigZ |= 1;
-        } else {
-            if ( negRem ) --sigZ;
+        } không_thì {
+            nếu ( negRem ) --sigZ;
         }
     }
-    return softfloat_roundPackToF32( 0, expZ, sigZ );
+    trả_về softfloat_roundPackToF32( 0, expZ, sigZ );
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
  invalid:
     raiseFlags( flag_invalid );
     uiZ = defaultNaNF32UI;
  uiZ:
-    return float32_t::fromRaw(uiZ);
+    trả_về float32_t::fromRaw(uiZ);
 }
 
 static float32_t f32_sub( float32_t a, float32_t b )
@@ -1190,10 +1190,10 @@ static float32_t f32_sub( float32_t a, float32_t b )
 
     uiA = a.v;
     uiB = b.v;
-    if ( signF32UI( uiA ^ uiB ) ) {
-        return softfloat_addMagsF32( uiA, uiB );
-    } else {
-        return softfloat_subMagsF32( uiA, uiB );
+    nếu ( signF32UI( uiA ^ uiB ) ) {
+        trả_về softfloat_addMagsF32( uiA, uiB );
+    } không_thì {
+        trả_về softfloat_subMagsF32( uiA, uiB );
     }
 }
 
@@ -1215,19 +1215,19 @@ static float64_t f32_to_f64( float32_t a )
     frac = fracF32UI( uiA );
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
-    if ( exp == 0xFF ) {
-        if ( frac ) {
+    nếu ( exp == 0xFF ) {
+        nếu ( frac ) {
             softfloat_f32UIToCommonNaN( uiA, &commonNaN );
             uiZ = softfloat_commonNaNToF64UI( &commonNaN );
-        } else {
+        } không_thì {
             uiZ = packToF64UI( sign, 0x7FF, 0 );
         }
         goto uiZ;
     }
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
-    if ( ! exp ) {
-        if ( ! frac ) {
+    nếu ( ! exp ) {
+        nếu ( ! frac ) {
             uiZ = packToF64UI( sign, 0, 0 );
             goto uiZ;
         }
@@ -1239,7 +1239,7 @@ static float64_t f32_to_f64( float32_t a )
     *------------------------------------------------------------------------*/
     uiZ = packToF64UI( sign, exp + 0x380, (uint_fast64_t) frac<<29 );
  uiZ:
-    return float64_t::fromRaw(uiZ);
+    trả_về float64_t::fromRaw(uiZ);
 }
 
 static int_fast32_t f32_to_i32( float32_t a, uint_fast8_t roundingMode, bool exact )
@@ -1259,25 +1259,25 @@ static int_fast32_t f32_to_i32( float32_t a, uint_fast8_t roundingMode, bool exa
     sig  = fracF32UI( uiA );
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
-#if (i32_fromNaN != i32_fromPosOverflow) || (i32_fromNaN != i32_fromNegOverflow)
-    if ( (exp == 0xFF) && sig ) {
-#if (i32_fromNaN == i32_fromPosOverflow)
+#nếu (i32_fromNaN != i32_fromPosOverflow) || (i32_fromNaN != i32_fromNegOverflow)
+    nếu ( (exp == 0xFF) && sig ) {
+#nếu (i32_fromNaN == i32_fromPosOverflow)
         sign = 0;
 #elif (i32_fromNaN == i32_fromNegOverflow)
         sign = 1;
-#else
+#không_thì
         raiseFlags( flag_invalid );
-        return i32_fromNaN;
+        trả_về i32_fromNaN;
 #endif
     }
 #endif
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
-    if ( exp ) sig |= 0x00800000;
+    nếu ( exp ) sig |= 0x00800000;
     sig64 = (uint_fast64_t) sig<<32;
     shiftDist = 0xAA - exp;
-    if ( 0 < shiftDist ) sig64 = softfloat_shiftRightJam64( sig64, shiftDist );
-    return softfloat_roundToI32( sign, sig64, roundingMode, exact );
+    nếu ( 0 < shiftDist ) sig64 = softfloat_shiftRightJam64( sig64, shiftDist );
+    trả_về softfloat_roundToI32( sign, sig64, roundingMode, exact );
 }
 
 static int_fast32_t f32_to_i32_r_minMag( float32_t a, bool exact )
@@ -1297,19 +1297,19 @@ static int_fast32_t f32_to_i32_r_minMag( float32_t a, bool exact )
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
     shiftDist = 0x9E - exp;
-    if ( 32 <= shiftDist ) {
-        if ( exact && (exp | sig) ) {
+    nếu ( 32 <= shiftDist ) {
+        nếu ( exact && (exp | sig) ) {
             raiseFlags(flag_inexact);
         }
-        return 0;
+        trả_về 0;
     }
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
     sign = signF32UI( uiA );
-    if ( shiftDist <= 0 ) {
-        if ( uiA == packToF32UI( 1, 0x9E, 0 ) ) return -0x7FFFFFFF - 1;
+    nếu ( shiftDist <= 0 ) {
+        nếu ( uiA == packToF32UI( 1, 0x9E, 0 ) ) trả_về -0x7FFFFFFF - 1;
         raiseFlags( flag_invalid );
-        return
+        trả_về
             (exp == 0xFF) && sig ? i32_fromNaN
                 : sign ? i32_fromNegOverflow : i32_fromPosOverflow;
     }
@@ -1317,10 +1317,10 @@ static int_fast32_t f32_to_i32_r_minMag( float32_t a, bool exact )
     *------------------------------------------------------------------------*/
     sig = (sig | 0x00800000)<<8;
     absZ = sig>>shiftDist;
-    if ( exact && ((uint_fast32_t) absZ<<shiftDist != sig) ) {
+    nếu ( exact && ((uint_fast32_t) absZ<<shiftDist != sig) ) {
         raiseFlags(flag_inexact);
     }
-    return sign ? -absZ : absZ;
+    trả_về sign ? -absZ : absZ;
 }
 
 static float64_t f64_add( float64_t a, float64_t b )
@@ -1334,10 +1334,10 @@ static float64_t f64_add( float64_t a, float64_t b )
     signA = signF64UI( uiA );
     uiB = b.v;
     signB = signF64UI( uiB );
-    if ( signA == signB ) {
-        return softfloat_addMagsF64( uiA, uiB, signA );
-    } else {
-        return softfloat_subMagsF64( uiA, uiB, signA );
+    nếu ( signA == signB ) {
+        trả_về softfloat_addMagsF64( uiA, uiB, signA );
+    } không_thì {
+        trả_về softfloat_subMagsF64( uiA, uiB, signA );
     }
 }
 
@@ -1373,23 +1373,23 @@ static float64_t f64_div( float64_t a, float64_t b )
     signZ = signA ^ signB;
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
-    if ( expA == 0x7FF ) {
-        if ( sigA ) goto propagateNaN;
-        if ( expB == 0x7FF ) {
-            if ( sigB ) goto propagateNaN;
+    nếu ( expA == 0x7FF ) {
+        nếu ( sigA ) goto propagateNaN;
+        nếu ( expB == 0x7FF ) {
+            nếu ( sigB ) goto propagateNaN;
             goto invalid;
         }
         goto infinity;
     }
-    if ( expB == 0x7FF ) {
-        if ( sigB ) goto propagateNaN;
+    nếu ( expB == 0x7FF ) {
+        nếu ( sigB ) goto propagateNaN;
         goto zero;
     }
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
-    if ( ! expB ) {
-        if ( ! sigB ) {
-            if ( ! (expA | sigA) ) goto invalid;
+    nếu ( ! expB ) {
+        nếu ( ! sigB ) {
+            nếu ( ! (expA | sigA) ) goto invalid;
             raiseFlags( flag_infinite );
             goto infinity;
         }
@@ -1397,8 +1397,8 @@ static float64_t f64_div( float64_t a, float64_t b )
         expB = normExpSig.exp;
         sigB = normExpSig.sig;
     }
-    if ( ! expA ) {
-        if ( ! sigA ) goto zero;
+    nếu ( ! expA ) {
+        nếu ( ! sigA ) goto zero;
         normExpSig = softfloat_normSubnormalF64Sig( sigA );
         expA = normExpSig.exp;
         sigA = normExpSig.sig;
@@ -1408,10 +1408,10 @@ static float64_t f64_div( float64_t a, float64_t b )
     expZ = expA - expB + 0x3FE;
     sigA |= UINT64_C( 0x0010000000000000 );
     sigB |= UINT64_C( 0x0010000000000000 );
-    if ( sigA < sigB ) {
+    nếu ( sigA < sigB ) {
         --expZ;
         sigA <<= 11;
-    } else {
+    } không_thì {
         sigA <<= 10;
     }
     sigB <<= 11;
@@ -1425,20 +1425,20 @@ static float64_t f64_div( float64_t a, float64_t b )
     sigZ = ((uint_fast64_t) sig32Z<<32) + ((uint_fast64_t) q<<4);
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
-    if ( (sigZ & 0x1FF) < 4<<4 ) {
+    nếu ( (sigZ & 0x1FF) < 4<<4 ) {
         q &= ~7;
         sigZ &= ~(uint_fast64_t) 0x7F;
         doubleTerm = q<<1;
         rem =
             ((rem - (uint_fast64_t) doubleTerm * (uint32_t) (sigB>>32))<<28)
                 - (uint_fast64_t) doubleTerm * ((uint32_t) sigB>>4);
-        if ( rem & UINT64_C( 0x8000000000000000 ) ) {
+        nếu ( rem & UINT64_C( 0x8000000000000000 ) ) {
             sigZ -= 1<<7;
-        } else {
-            if ( rem ) sigZ |= 1;
+        } không_thì {
+            nếu ( rem ) sigZ |= 1;
         }
     }
-    return softfloat_roundPackToF64( signZ, expZ, sigZ );
+    trả_về softfloat_roundPackToF64( signZ, expZ, sigZ );
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
  propagateNaN:
@@ -1460,7 +1460,7 @@ static float64_t f64_div( float64_t a, float64_t b )
  zero:
     uiZ = packToF64UI( signZ, 0, 0 );
  uiZ:
-    return float64_t::fromRaw(uiZ);
+    trả_về float64_t::fromRaw(uiZ);
 }
 
 static bool f64_eq( float64_t a, float64_t b )
@@ -1470,13 +1470,13 @@ static bool f64_eq( float64_t a, float64_t b )
 
     uiA = a.v;
     uiB = b.v;
-    if ( isNaNF64UI( uiA ) || isNaNF64UI( uiB ) )
+    nếu ( isNaNF64UI( uiA ) || isNaNF64UI( uiB ) )
     {
-        if ( softfloat_isSigNaNF64UI( uiA ) || softfloat_isSigNaNF64UI( uiB ) )
+        nếu ( softfloat_isSigNaNF64UI( uiA ) || softfloat_isSigNaNF64UI( uiB ) )
             raiseFlags( flag_invalid );
-        return false;
+        trả_về false;
     }
-    return (uiA == uiB) || ! ((uiA | uiB) & UINT64_C( 0x7FFFFFFFFFFFFFFF ));
+    trả_về (uiA == uiB) || ! ((uiA | uiB) & UINT64_C( 0x7FFFFFFFFFFFFFFF ));
 }
 
 static bool f64_le( float64_t a, float64_t b )
@@ -1487,13 +1487,13 @@ static bool f64_le( float64_t a, float64_t b )
 
     uiA = a.v;
     uiB = b.v;
-    if ( isNaNF64UI( uiA ) || isNaNF64UI( uiB ) ) {
+    nếu ( isNaNF64UI( uiA ) || isNaNF64UI( uiB ) ) {
         raiseFlags( flag_invalid );
-        return false;
+        trả_về false;
     }
     signA = signF64UI( uiA );
     signB = signF64UI( uiB );
-    return (signA != signB) ? signA || ! ((uiA | uiB) & UINT64_C( 0x7FFFFFFFFFFFFFFF ))
+    trả_về (signA != signB) ? signA || ! ((uiA | uiB) & UINT64_C( 0x7FFFFFFFFFFFFFFF ))
                             : (uiA == uiB) || (signA ^ (uiA < uiB));
 }
 
@@ -1505,13 +1505,13 @@ static bool f64_lt( float64_t a, float64_t b )
 
     uiA = a.v;
     uiB = b.v;
-    if ( isNaNF64UI( uiA ) || isNaNF64UI( uiB ) ) {
+    nếu ( isNaNF64UI( uiA ) || isNaNF64UI( uiB ) ) {
         raiseFlags( flag_invalid );
-        return false;
+        trả_về false;
     }
     signA = signF64UI( uiA );
     signB = signF64UI( uiB );
-    return (signA != signB) ? signA && ((uiA | uiB) & UINT64_C( 0x7FFFFFFFFFFFFFFF ))
+    trả_về (signA != signB) ? signA && ((uiA | uiB) & UINT64_C( 0x7FFFFFFFFFFFFFFF ))
                             : (uiA != uiB) && (signA ^ (uiA < uiB));
 }
 
@@ -1524,7 +1524,7 @@ static float64_t f64_mulAdd( float64_t a, float64_t b, float64_t c )
     uiA = a.v;
     uiB = b.v;
     uiC = c.v;
-    return softfloat_mulAddF64( uiA, uiB, uiC, 0 );
+    trả_về softfloat_mulAddF64( uiA, uiB, uiC, 0 );
 }
 
 static float64_t f64_mul( float64_t a, float64_t b )
@@ -1557,26 +1557,26 @@ static float64_t f64_mul( float64_t a, float64_t b )
     signZ = signA ^ signB;
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
-    if ( expA == 0x7FF ) {
-        if ( sigA || ((expB == 0x7FF) && sigB) ) goto propagateNaN;
+    nếu ( expA == 0x7FF ) {
+        nếu ( sigA || ((expB == 0x7FF) && sigB) ) goto propagateNaN;
         magBits = expB | sigB;
         goto infArg;
     }
-    if ( expB == 0x7FF ) {
-        if ( sigB ) goto propagateNaN;
+    nếu ( expB == 0x7FF ) {
+        nếu ( sigB ) goto propagateNaN;
         magBits = expA | sigA;
         goto infArg;
     }
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
-    if ( ! expA ) {
-        if ( ! sigA ) goto zero;
+    nếu ( ! expA ) {
+        nếu ( ! sigA ) goto zero;
         normExpSig = softfloat_normSubnormalF64Sig( sigA );
         expA = normExpSig.exp;
         sigA = normExpSig.sig;
     }
-    if ( ! expB ) {
-        if ( ! sigB ) goto zero;
+    nếu ( ! expB ) {
+        nếu ( ! sigB ) goto zero;
         normExpSig = softfloat_normSubnormalF64Sig( sigB );
         expB = normExpSig.exp;
         sigB = normExpSig.sig;
@@ -1589,11 +1589,11 @@ static float64_t f64_mul( float64_t a, float64_t b )
     sig128Z = softfloat_mul64To128( sigA, sigB );
     sigZ = sig128Z.v64 | (sig128Z.v0 != 0);
 
-    if ( sigZ < UINT64_C( 0x4000000000000000 ) ) {
+    nếu ( sigZ < UINT64_C( 0x4000000000000000 ) ) {
         --expZ;
         sigZ <<= 1;
     }
-    return softfloat_roundPackToF64( signZ, expZ, sigZ );
+    trả_về softfloat_roundPackToF64( signZ, expZ, sigZ );
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
  propagateNaN:
@@ -1602,10 +1602,10 @@ static float64_t f64_mul( float64_t a, float64_t b )
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
  infArg:
-    if ( ! magBits ) {
+    nếu ( ! magBits ) {
         raiseFlags( flag_invalid );
         uiZ = defaultNaNF64UI;
-    } else {
+    } không_thì {
         uiZ = packToF64UI( signZ, 0x7FF, 0 );
     }
     goto uiZ;
@@ -1614,7 +1614,7 @@ static float64_t f64_mul( float64_t a, float64_t b )
  zero:
     uiZ = packToF64UI( signZ, 0, 0 );
  uiZ:
-    return float64_t::fromRaw(uiZ);
+    trả_về float64_t::fromRaw(uiZ);
 }
 
 static float64_t f64_rem( float64_t a, float64_t b )
@@ -1646,27 +1646,27 @@ static float64_t f64_rem( float64_t a, float64_t b )
     sigB = fracF64UI( uiB );
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
-    if ( expA == 0x7FF ) {
-        if ( sigA || ((expB == 0x7FF) && sigB) ) goto propagateNaN;
+    nếu ( expA == 0x7FF ) {
+        nếu ( sigA || ((expB == 0x7FF) && sigB) ) goto propagateNaN;
         goto invalid;
     }
-    if ( expB == 0x7FF ) {
-        if ( sigB ) goto propagateNaN;
-        return a;
+    nếu ( expB == 0x7FF ) {
+        nếu ( sigB ) goto propagateNaN;
+        trả_về a;
     }
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
-    if ( expA < expB - 1 ) return a;
+    nếu ( expA < expB - 1 ) trả_về a;
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
-    if ( ! expB ) {
-        if ( ! sigB ) goto invalid;
+    nếu ( ! expB ) {
+        nếu ( ! sigB ) goto invalid;
         normExpSig = softfloat_normSubnormalF64Sig( sigB );
         expB = normExpSig.exp;
         sigB = normExpSig.sig;
     }
-    if ( ! expA ) {
-        if ( ! sigA ) return a;
+    nếu ( ! expA ) {
+        nếu ( ! sigA ) trả_về a;
         normExpSig = softfloat_normSubnormalF64Sig( sigA );
         expA = normExpSig.exp;
         sigA = normExpSig.sig;
@@ -1676,18 +1676,18 @@ static float64_t f64_rem( float64_t a, float64_t b )
     rem = sigA | UINT64_C( 0x0010000000000000 );
     sigB |= UINT64_C( 0x0010000000000000 );
     expDiff = expA - expB;
-    if ( expDiff < 1 ) {
-        if ( expDiff < -1 ) return a;
+    nếu ( expDiff < 1 ) {
+        nếu ( expDiff < -1 ) trả_về a;
         sigB <<= 9;
-        if ( expDiff ) {
+        nếu ( expDiff ) {
             rem <<= 8;
             q = 0;
-        } else {
+        } không_thì {
             rem <<= 9;
             q = (sigB <= rem);
-            if ( q ) rem -= sigB;
+            nếu ( q ) rem -= sigB;
         }
-    } else {
+    } không_thì {
         recip32 = softfloat_approxRecip32_1( sigB>>21 );
         /*--------------------------------------------------------------------
         | Changing the shift of `rem' here requires also changing the initial
@@ -1701,13 +1701,13 @@ static float64_t f64_rem( float64_t a, float64_t b )
         | the maximum possible.
         *--------------------------------------------------------------------*/
         sigB <<= 9;
-        for (;;) {
+        cho (;;) {
             q64 = (uint32_t) (rem>>32) * (uint_fast64_t) recip32;
-            if ( expDiff < 0 ) break;
+            nếu ( expDiff < 0 ) break;
             q = (q64 + 0x80000000)>>32;
             rem <<= 29;
             rem -= q * (uint64_t) sigB;
-            if ( rem & UINT64_C( 0x8000000000000000 ) ) rem += sigB;
+            nếu ( rem & UINT64_C( 0x8000000000000000 ) ) rem += sigB;
             expDiff -= 29;
         }
         /*--------------------------------------------------------------------
@@ -1715,7 +1715,7 @@ static float64_t f64_rem( float64_t a, float64_t b )
         *--------------------------------------------------------------------*/
         q = (uint32_t) (q64>>32)>>(~expDiff & 31);
         rem = (rem<<(expDiff + 30)) - q * (uint64_t) sigB;
-        if ( rem & UINT64_C( 0x8000000000000000 ) ) {
+        nếu ( rem & UINT64_C( 0x8000000000000000 ) ) {
             altRem = rem + sigB;
             goto selectRem;
         }
@@ -1726,21 +1726,21 @@ static float64_t f64_rem( float64_t a, float64_t b )
         altRem = rem;
         ++q;
         rem -= sigB;
-    } while ( ! (rem & UINT64_C( 0x8000000000000000 )) );
+    } trong_khi ( ! (rem & UINT64_C( 0x8000000000000000 )) );
  selectRem:
     meanRem = rem + altRem;
-    if (
+    nếu (
         (meanRem & UINT64_C( 0x8000000000000000 )) || (! meanRem && (q & 1))
     ) {
         rem = altRem;
     }
     signRem = signA;
-    if ( rem & UINT64_C( 0x8000000000000000 ) ) {
+    nếu ( rem & UINT64_C( 0x8000000000000000 ) ) {
         signRem = ! signRem;
         //fixed unsigned unary minus: -x == ~x + 1
         rem = ~rem + 1;
     }
-    return softfloat_normRoundPackToF64( signRem, expB, rem );
+    trả_về softfloat_normRoundPackToF64( signRem, expB, rem );
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
  propagateNaN:
@@ -1750,7 +1750,7 @@ static float64_t f64_rem( float64_t a, float64_t b )
     raiseFlags( flag_invalid );
     uiZ = defaultNaNF64UI;
  uiZ:
-    return float64_t::fromRaw(uiZ);
+    trả_về float64_t::fromRaw(uiZ);
 }
 
 static float64_t f64_roundToInt( float64_t a, uint_fast8_t roundingMode, bool exact )
@@ -1765,57 +1765,57 @@ static float64_t f64_roundToInt( float64_t a, uint_fast8_t roundingMode, bool ex
     exp = expF64UI( uiA );
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
-    if ( exp <= 0x3FE ) {
-        if ( ! (uiA & UINT64_C( 0x7FFFFFFFFFFFFFFF )) ) return a;
-        if ( exact ) raiseFlags(flag_inexact);
+    nếu ( exp <= 0x3FE ) {
+        nếu ( ! (uiA & UINT64_C( 0x7FFFFFFFFFFFFFFF )) ) trả_về a;
+        nếu ( exact ) raiseFlags(flag_inexact);
         uiZ = uiA & packToF64UI( 1, 0, 0 );
         switch ( roundingMode ) {
          case round_near_even:
-            if ( ! fracF64UI( uiA ) ) break;
+            nếu ( ! fracF64UI( uiA ) ) break;
             [[fallthrough]];
          case round_near_maxMag:
-            if ( exp == 0x3FE ) uiZ |= packToF64UI( 0, 0x3FF, 0 );
+            nếu ( exp == 0x3FE ) uiZ |= packToF64UI( 0, 0x3FF, 0 );
             break;
          case round_min:
-            if ( uiZ ) uiZ = packToF64UI( 1, 0x3FF, 0 );
+            nếu ( uiZ ) uiZ = packToF64UI( 1, 0x3FF, 0 );
             break;
          case round_max:
-            if ( ! uiZ ) uiZ = packToF64UI( 0, 0x3FF, 0 );
+            nếu ( ! uiZ ) uiZ = packToF64UI( 0, 0x3FF, 0 );
             break;
         }
         goto uiZ;
     }
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
-    if ( 0x433 <= exp ) {
-        if ( (exp == 0x7FF) && fracF64UI( uiA ) ) {
+    nếu ( 0x433 <= exp ) {
+        nếu ( (exp == 0x7FF) && fracF64UI( uiA ) ) {
             uiZ = softfloat_propagateNaNF64UI( uiA, 0 );
             goto uiZ;
         }
-        return a;
+        trả_về a;
     }
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
     uiZ = uiA;
     lastBitMask = (uint_fast64_t) 1<<(0x433 - exp);
     roundBitsMask = lastBitMask - 1;
-    if ( roundingMode == round_near_maxMag ) {
+    nếu ( roundingMode == round_near_maxMag ) {
         uiZ += lastBitMask>>1;
-    } else if ( roundingMode == round_near_even ) {
+    } không_thì nếu ( roundingMode == round_near_even ) {
         uiZ += lastBitMask>>1;
-        if ( ! (uiZ & roundBitsMask) ) uiZ &= ~lastBitMask;
-    } else if (
+        nếu ( ! (uiZ & roundBitsMask) ) uiZ &= ~lastBitMask;
+    } không_thì nếu (
         roundingMode
             == (signF64UI( uiZ ) ? round_min : round_max)
     ) {
         uiZ += roundBitsMask;
     }
     uiZ &= ~roundBitsMask;
-    if ( exact && (uiZ != uiA) ) {
+    nếu ( exact && (uiZ != uiA) ) {
         raiseFlags(flag_inexact);
     }
  uiZ:
-    return float64_t::fromRaw(uiZ);
+    trả_về float64_t::fromRaw(uiZ);
 }
 
 static float64_t f64_sqrt( float64_t a )
@@ -1839,24 +1839,24 @@ static float64_t f64_sqrt( float64_t a )
     sigA  = fracF64UI( uiA );
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
-    if ( expA == 0x7FF ) {
-        if ( sigA ) {
+    nếu ( expA == 0x7FF ) {
+        nếu ( sigA ) {
             uiZ = softfloat_propagateNaNF64UI( uiA, 0 );
             goto uiZ;
         }
-        if ( ! signA ) return a;
+        nếu ( ! signA ) trả_về a;
         goto invalid;
     }
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
-    if ( signA ) {
-        if ( ! (expA | sigA) ) return a;
+    nếu ( signA ) {
+        nếu ( ! (expA | sigA) ) trả_về a;
         goto invalid;
     }
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
-    if ( ! expA ) {
-        if ( ! sigA ) return a;
+    nếu ( ! expA ) {
+        nếu ( ! sigA ) trả_về a;
         normExpSig = softfloat_normSubnormalF64Sig( sigA );
         expA = normExpSig.exp;
         sigA = normExpSig.sig;
@@ -1872,10 +1872,10 @@ static float64_t f64_sqrt( float64_t a )
     sig32A = (uint32_t)(sigA>>21); //fixed warning on type cast
     recipSqrt32 = softfloat_approxRecipSqrt32_1( expA, sig32A );
     sig32Z = ((uint_fast64_t) sig32A * recipSqrt32)>>32;
-    if ( expA ) {
+    nếu ( expA ) {
         sigA <<= 8;
         sig32Z >>= 1;
-    } else {
+    } không_thì {
         sigA <<= 9;
     }
     rem = sigA - (uint_fast64_t) sig32Z * sig32Z;
@@ -1883,24 +1883,24 @@ static float64_t f64_sqrt( float64_t a )
     sigZ = ((uint_fast64_t) sig32Z<<32 | 1<<5) + ((uint_fast64_t) q<<3);
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
-    if ( (sigZ & 0x1FF) < 0x22 ) {
+    nếu ( (sigZ & 0x1FF) < 0x22 ) {
         sigZ &= ~(uint_fast64_t) 0x3F;
         shiftedSigZ = sigZ>>6;
         rem = (sigA<<52) - shiftedSigZ * shiftedSigZ;
-        if ( rem & UINT64_C( 0x8000000000000000 ) ) {
+        nếu ( rem & UINT64_C( 0x8000000000000000 ) ) {
             --sigZ;
-        } else {
-            if ( rem ) sigZ |= 1;
+        } không_thì {
+            nếu ( rem ) sigZ |= 1;
         }
     }
-    return softfloat_roundPackToF64( 0, expZ, sigZ );
+    trả_về softfloat_roundPackToF64( 0, expZ, sigZ );
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
  invalid:
     raiseFlags( flag_invalid );
     uiZ = defaultNaNF64UI;
  uiZ:
-    return float64_t::fromRaw(uiZ);
+    trả_về float64_t::fromRaw(uiZ);
 }
 
 static float64_t f64_sub( float64_t a, float64_t b )
@@ -1915,10 +1915,10 @@ static float64_t f64_sub( float64_t a, float64_t b )
     uiB = b.v;
     signB = signF64UI( uiB );
 
-    if ( signA == signB ) {
-        return softfloat_subMagsF64( uiA, uiB, signA );
-    } else {
-        return softfloat_addMagsF64( uiA, uiB, signA );
+    nếu ( signA == signB ) {
+        trả_về softfloat_subMagsF64( uiA, uiB, signA );
+    } không_thì {
+        trả_về softfloat_addMagsF64( uiA, uiB, signA );
     }
 }
 
@@ -1939,11 +1939,11 @@ static float32_t f64_to_f32( float64_t a )
     frac = fracF64UI( uiA );
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
-    if ( exp == 0x7FF ) {
-        if ( frac ) {
+    nếu ( exp == 0x7FF ) {
+        nếu ( frac ) {
             softfloat_f64UIToCommonNaN( uiA, &commonNaN );
             uiZ = softfloat_commonNaNToF32UI( &commonNaN );
-        } else {
+        } không_thì {
             uiZ = packToF32UI( sign, 0xFF, 0 );
         }
         goto uiZ;
@@ -1951,15 +1951,15 @@ static float32_t f64_to_f32( float64_t a )
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
     frac32 = (uint_fast32_t)softfloat_shortShiftRightJam64( frac, 22 ); //fixed warning on type cast
-    if ( ! (exp | frac32) ) {
+    nếu ( ! (exp | frac32) ) {
         uiZ = packToF32UI( sign, 0, 0 );
         goto uiZ;
     }
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
-    return softfloat_roundPackToF32( sign, exp - 0x381, frac32 | 0x40000000 );
+    trả_về softfloat_roundPackToF32( sign, exp - 0x381, frac32 | 0x40000000 );
  uiZ:
-    return float32_t::fromRaw(uiZ);
+    trả_về float32_t::fromRaw(uiZ);
 }
 
 static int_fast32_t f64_to_i32( float64_t a, uint_fast8_t roundingMode, bool exact )
@@ -1978,24 +1978,24 @@ static int_fast32_t f64_to_i32( float64_t a, uint_fast8_t roundingMode, bool exa
     sig  = fracF64UI( uiA );
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
-#if (i32_fromNaN != i32_fromPosOverflow) || (i32_fromNaN != i32_fromNegOverflow)
-    if ( (exp == 0x7FF) && sig ) {
-#if (i32_fromNaN == i32_fromPosOverflow)
+#nếu (i32_fromNaN != i32_fromPosOverflow) || (i32_fromNaN != i32_fromNegOverflow)
+    nếu ( (exp == 0x7FF) && sig ) {
+#nếu (i32_fromNaN == i32_fromPosOverflow)
         sign = 0;
 #elif (i32_fromNaN == i32_fromNegOverflow)
         sign = 1;
-#else
+#không_thì
         raiseFlags( flag_invalid );
-        return i32_fromNaN;
+        trả_về i32_fromNaN;
 #endif
     }
 #endif
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
-    if ( exp ) sig |= UINT64_C( 0x0010000000000000 );
+    nếu ( exp ) sig |= UINT64_C( 0x0010000000000000 );
     shiftDist = 0x427 - exp;
-    if ( 0 < shiftDist ) sig = softfloat_shiftRightJam64( sig, shiftDist );
-    return softfloat_roundToI32( sign, sig, roundingMode, exact );
+    nếu ( 0 < shiftDist ) sig = softfloat_shiftRightJam64( sig, shiftDist );
+    trả_về softfloat_roundToI32( sign, sig, roundingMode, exact );
 }
 
 static int_fast64_t f64_to_i64(float64_t a, uint_fast8_t roundingMode, bool exact )
@@ -2014,42 +2014,42 @@ static int_fast64_t f64_to_i64(float64_t a, uint_fast8_t roundingMode, bool exac
     sig = fracF64UI(uiA);
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
-#if (i64_fromNaN != i64_fromPosOverflow) || (i64_fromNaN != i64_fromNegOverflow)
-    if ((exp == 0x7FF) && sig) {
-#if (i64_fromNaN == i64_fromPosOverflow)
+#nếu (i64_fromNaN != i64_fromPosOverflow) || (i64_fromNaN != i64_fromNegOverflow)
+    nếu ((exp == 0x7FF) && sig) {
+#nếu (i64_fromNaN == i64_fromPosOverflow)
         sign = 0;
 #elif (i64_fromNaN == i64_fromNegOverflow)
         sign = 1;
-#else
+#không_thì
         raiseFlags(flag_invalid);
-        return i64_fromNaN;
+        trả_về i64_fromNaN;
 #endif
     }
 #endif
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
-    if (exp) sig |= UINT64_C(0x0010000000000000);
+    nếu (exp) sig |= UINT64_C(0x0010000000000000);
     shiftDist = 0x433 - exp;
-    if (shiftDist <= 0) {
+    nếu (shiftDist <= 0) {
         bool isValid = shiftDist >= -11;
-        if (isValid)
+        nếu (isValid)
         {
             uint_fast64_t z = sig << -shiftDist;
-            if (0 == (z & UINT64_C(0x8000000000000000)))
+            nếu (0 == (z & UINT64_C(0x8000000000000000)))
             {
-                return sign ? -(int_fast64_t)z : (int_fast64_t)z;
+                trả_về sign ? -(int_fast64_t)z : (int_fast64_t)z;
             }
         }
         raiseFlags(flag_invalid);
-        return sign ? i64_fromNegOverflow : i64_fromPosOverflow;
+        trả_về sign ? i64_fromNegOverflow : i64_fromPosOverflow;
     }
-    else {
-        if (shiftDist < 64)
-            return
+    không_thì {
+        nếu (shiftDist < 64)
+            trả_về
                 softfloat_roundToI64(
                     sign, sig >> shiftDist, sig << (-shiftDist & 63), roundingMode, exact);
-        else
-            return
+        không_thì
+            trả_về
                 softfloat_roundToI64(
                     sign, 0, (shiftDist == 64) ? sig : (sig != 0), roundingMode, exact);
     }
@@ -2072,26 +2072,26 @@ static int_fast32_t f64_to_i32_r_minMag( float64_t a, bool exact )
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
     shiftDist = 0x433 - exp;
-    if ( 53 <= shiftDist ) {
-        if ( exact && (exp | sig) ) {
+    nếu ( 53 <= shiftDist ) {
+        nếu ( exact && (exp | sig) ) {
             raiseFlags(flag_inexact);
         }
-        return 0;
+        trả_về 0;
     }
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
     sign = signF64UI( uiA );
-    if ( shiftDist < 22 ) {
-        if (
+    nếu ( shiftDist < 22 ) {
+        nếu (
             sign && (exp == 0x41E) && (sig < UINT64_C( 0x0000000000200000 ))
         ) {
-            if ( exact && sig ) {
+            nếu ( exact && sig ) {
                 raiseFlags(flag_inexact);
             }
-            return -0x7FFFFFFF - 1;
+            trả_về -0x7FFFFFFF - 1;
         }
         raiseFlags( flag_invalid );
-        return
+        trả_về
             (exp == 0x7FF) && sig ? i32_fromNaN
                 : sign ? i32_fromNegOverflow : i32_fromPosOverflow;
     }
@@ -2099,10 +2099,10 @@ static int_fast32_t f64_to_i32_r_minMag( float64_t a, bool exact )
     *------------------------------------------------------------------------*/
     sig |= UINT64_C( 0x0010000000000000 );
     absZ = (int_fast32_t)(sig>>shiftDist); //fixed warning on type cast
-    if ( exact && ((uint_fast64_t) (uint_fast32_t) absZ<<shiftDist != sig) ) {
+    nếu ( exact && ((uint_fast64_t) (uint_fast32_t) absZ<<shiftDist != sig) ) {
         raiseFlags(flag_inexact);
     }
-    return sign ? -absZ : absZ;
+    trả_về sign ? -absZ : absZ;
 }
 
 static float32_t i32_to_f32( int32_t a )
@@ -2111,12 +2111,12 @@ static float32_t i32_to_f32( int32_t a )
     uint_fast32_t absA;
 
     sign = (a < 0);
-    if ( ! (a & 0x7FFFFFFF) ) {
-        return float32_t::fromRaw(sign ? packToF32UI( 1, 0x9E, 0 ) : 0);
+    nếu ( ! (a & 0x7FFFFFFF) ) {
+        trả_về float32_t::fromRaw(sign ? packToF32UI( 1, 0x9E, 0 ) : 0);
     }
     //fixed unsigned unary minus: -x == ~x + 1
     absA = sign ? (~(uint_fast32_t) a + 1) : (uint_fast32_t) a;
-    return softfloat_normRoundPackToF32( sign, 0x9C, absA );
+    trả_về softfloat_normRoundPackToF32( sign, 0x9C, absA );
 }
 
 static float64_t i32_to_f64( int32_t a )
@@ -2126,9 +2126,9 @@ static float64_t i32_to_f64( int32_t a )
     uint_fast32_t absA;
     int_fast8_t shiftDist;
 
-    if ( ! a ) {
+    nếu ( ! a ) {
         uiZ = 0;
-    } else {
+    } không_thì {
         sign = (a < 0);
         //fixed unsigned unary minus: -x == ~x + 1
         absA = sign ? (~(uint_fast32_t) a + 1) : (uint_fast32_t) a;
@@ -2137,7 +2137,7 @@ static float64_t i32_to_f64( int32_t a )
             packToF64UI(
                 sign, 0x432 - shiftDist, (uint_fast64_t) absA<<shiftDist );
     }
-    return float64_t::fromRaw(uiZ);
+    trả_về float64_t::fromRaw(uiZ);
 }
 
 static float32_t i64_to_f32( int64_t a )
@@ -2151,15 +2151,15 @@ static float32_t i64_to_f32( int64_t a )
     //fixed unsigned unary minus: -x == ~x + 1
     absA = sign ? (~(uint_fast64_t) a + 1) : (uint_fast64_t) a;
     shiftDist = softfloat_countLeadingZeros64( absA ) - 40;
-    if ( 0 <= shiftDist ) {
-        return float32_t::fromRaw(a ? packToF32UI(sign, 0x95 - shiftDist, (uint_fast32_t) absA<<shiftDist ) : 0);
-    } else {
+    nếu ( 0 <= shiftDist ) {
+        trả_về float32_t::fromRaw(a ? packToF32UI(sign, 0x95 - shiftDist, (uint_fast32_t) absA<<shiftDist ) : 0);
+    } không_thì {
         shiftDist += 7;
         sig =
             (shiftDist < 0)
                 ? (uint_fast32_t) softfloat_shortShiftRightJam64( absA, -shiftDist ) //fixed warning on type cast
                 : (uint_fast32_t) absA<<shiftDist;
-        return softfloat_roundPackToF32( sign, 0x9C - shiftDist, sig );
+        trả_về softfloat_roundPackToF32( sign, 0x9C - shiftDist, sig );
     }
 }
 
@@ -2169,12 +2169,12 @@ static float64_t i64_to_f64( int64_t a )
     uint_fast64_t absA;
 
     sign = (a < 0);
-    if ( ! (a & UINT64_C( 0x7FFFFFFFFFFFFFFF )) ) {
-        return float64_t::fromRaw(sign ? packToF64UI( 1, 0x43E, 0 ) : 0);
+    nếu ( ! (a & UINT64_C( 0x7FFFFFFFFFFFFFFF )) ) {
+        trả_về float64_t::fromRaw(sign ? packToF64UI( 1, 0x43E, 0 ) : 0);
     }
     //fixed unsigned unary minus: -x == ~x + 1
     absA = sign ? (~(uint_fast64_t) a + 1) : (uint_fast64_t) a;
-    return softfloat_normRoundPackToF64( sign, 0x43C, absA );
+    trả_về softfloat_normRoundPackToF64( sign, 0x43C, absA );
 }
 
 static float32_t softfloat_addMagsF32( uint_fast32_t uiA, uint_fast32_t uiB )
@@ -2198,44 +2198,44 @@ static float32_t softfloat_addMagsF32( uint_fast32_t uiA, uint_fast32_t uiB )
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
     expDiff = expA - expB;
-    if ( ! expDiff ) {
+    nếu ( ! expDiff ) {
         /*--------------------------------------------------------------------
         *--------------------------------------------------------------------*/
-        if ( ! expA ) {
+        nếu ( ! expA ) {
             uiZ = uiA + sigB;
             goto uiZ;
         }
-        if ( expA == 0xFF ) {
-            if ( sigA | sigB ) goto propagateNaN;
+        nếu ( expA == 0xFF ) {
+            nếu ( sigA | sigB ) goto propagateNaN;
             uiZ = uiA;
             goto uiZ;
         }
         signZ = signF32UI( uiA );
         expZ = expA;
         sigZ = 0x01000000 + sigA + sigB;
-        if ( ! (sigZ & 1) && (expZ < 0xFE) ) {
+        nếu ( ! (sigZ & 1) && (expZ < 0xFE) ) {
             uiZ = packToF32UI( signZ, expZ, sigZ>>1 );
             goto uiZ;
         }
         sigZ <<= 6;
-    } else {
+    } không_thì {
         /*--------------------------------------------------------------------
         *--------------------------------------------------------------------*/
         signZ = signF32UI( uiA );
         sigA <<= 6;
         sigB <<= 6;
-        if ( expDiff < 0 ) {
-            if ( expB == 0xFF ) {
-                if ( sigB ) goto propagateNaN;
+        nếu ( expDiff < 0 ) {
+            nếu ( expB == 0xFF ) {
+                nếu ( sigB ) goto propagateNaN;
                 uiZ = packToF32UI( signZ, 0xFF, 0 );
                 goto uiZ;
             }
             expZ = expB;
             sigA += expA ? 0x20000000 : sigA;
             sigA = softfloat_shiftRightJam32( sigA, -expDiff );
-        } else {
-            if ( expA == 0xFF ) {
-                if ( sigA ) goto propagateNaN;
+        } không_thì {
+            nếu ( expA == 0xFF ) {
+                nếu ( sigA ) goto propagateNaN;
                 uiZ = uiA;
                 goto uiZ;
             }
@@ -2244,18 +2244,18 @@ static float32_t softfloat_addMagsF32( uint_fast32_t uiA, uint_fast32_t uiB )
             sigB = softfloat_shiftRightJam32( sigB, expDiff );
         }
         sigZ = 0x20000000 + sigA + sigB;
-        if ( sigZ < 0x40000000 ) {
+        nếu ( sigZ < 0x40000000 ) {
             --expZ;
             sigZ <<= 1;
         }
     }
-    return softfloat_roundPackToF32( signZ, expZ, sigZ );
+    trả_về softfloat_roundPackToF32( signZ, expZ, sigZ );
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
  propagateNaN:
     uiZ = softfloat_propagateNaNF32UI( uiA, uiB );
  uiZ:
-    return float32_t::fromRaw(uiZ);
+    trả_về float32_t::fromRaw(uiZ);
 }
 
 static float64_t
@@ -2279,71 +2279,71 @@ static float64_t
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
     expDiff = expA - expB;
-    if ( ! expDiff ) {
+    nếu ( ! expDiff ) {
         /*--------------------------------------------------------------------
         *--------------------------------------------------------------------*/
-        if ( ! expA ) {
+        nếu ( ! expA ) {
             uiZ = uiA + sigB;
             goto uiZ;
         }
-        if ( expA == 0x7FF ) {
-            if ( sigA | sigB ) goto propagateNaN;
+        nếu ( expA == 0x7FF ) {
+            nếu ( sigA | sigB ) goto propagateNaN;
             uiZ = uiA;
             goto uiZ;
         }
         expZ = expA;
         sigZ = UINT64_C( 0x0020000000000000 ) + sigA + sigB;
         sigZ <<= 9;
-    } else {
+    } không_thì {
         /*--------------------------------------------------------------------
         *--------------------------------------------------------------------*/
         sigA <<= 9;
         sigB <<= 9;
-        if ( expDiff < 0 ) {
-            if ( expB == 0x7FF ) {
-                if ( sigB ) goto propagateNaN;
+        nếu ( expDiff < 0 ) {
+            nếu ( expB == 0x7FF ) {
+                nếu ( sigB ) goto propagateNaN;
                 uiZ = packToF64UI( signZ, 0x7FF, 0 );
                 goto uiZ;
             }
             expZ = expB;
-            if ( expA ) {
+            nếu ( expA ) {
                 sigA += UINT64_C( 0x2000000000000000 );
-            } else {
+            } không_thì {
                 sigA <<= 1;
             }
             sigA = softfloat_shiftRightJam64( sigA, -expDiff );
-        } else {
-            if ( expA == 0x7FF ) {
-                if ( sigA ) goto propagateNaN;
+        } không_thì {
+            nếu ( expA == 0x7FF ) {
+                nếu ( sigA ) goto propagateNaN;
                 uiZ = uiA;
                 goto uiZ;
             }
             expZ = expA;
-            if ( expB ) {
+            nếu ( expB ) {
                 sigB += UINT64_C( 0x2000000000000000 );
-            } else {
+            } không_thì {
                 sigB <<= 1;
             }
             sigB = softfloat_shiftRightJam64( sigB, expDiff );
         }
         sigZ = UINT64_C( 0x2000000000000000 ) + sigA + sigB;
-        if ( sigZ < UINT64_C( 0x4000000000000000 ) ) {
+        nếu ( sigZ < UINT64_C( 0x4000000000000000 ) ) {
             --expZ;
             sigZ <<= 1;
         }
     }
-    return softfloat_roundPackToF64( signZ, expZ, sigZ );
+    trả_về softfloat_roundPackToF64( signZ, expZ, sigZ );
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
  propagateNaN:
     uiZ = softfloat_propagateNaNF64UI( uiA, uiB );
  uiZ:
-    return float64_t::fromRaw(uiZ);
+    trả_về float64_t::fromRaw(uiZ);
 }
 
-static uint32_t softfloat_approxRecipSqrt32_1( unsigned int oddExpA, uint32_t a )
+static uint32_t softfloat_approxRecipSqrt32_1( unsigned số_nguyên oddExpA, uint32_t a )
 {
-    int index;
+    số_nguyên index;
     uint16_t eps, r0;
     uint_fast32_t ESqrR0;
     uint32_t sigma0;
@@ -2356,15 +2356,15 @@ static uint32_t softfloat_approxRecipSqrt32_1( unsigned int oddExpA, uint32_t a 
              - ((softfloat_approxRecipSqrt_1k1s[index] * (uint_fast32_t) eps)
                     >>20);
     ESqrR0 = (uint_fast32_t) r0 * r0;
-    if ( ! oddExpA ) ESqrR0 <<= 1;
+    nếu ( ! oddExpA ) ESqrR0 <<= 1;
     sigma0 = ~(uint_fast32_t) (((uint32_t) ESqrR0 * (uint_fast64_t) a)>>23);
     r = (uint_fast32_t)(((uint_fast32_t) r0<<16) + ((r0 * (uint_fast64_t) sigma0)>>25)); //fixed warning on type cast
     sqrSigma0 = ((uint_fast64_t) sigma0 * sigma0)>>32;
     r += ((uint32_t) ((r>>1) + (r>>3) - ((uint_fast32_t) r0<<14))
               * (uint_fast64_t) sqrSigma0)
              >>48;
-    if ( ! (r & 0x80000000) ) r = 0x80000000;
-    return r;
+    nếu ( ! (r & 0x80000000) ) r = 0x80000000;
+    trả_về r;
 }
 
 /*----------------------------------------------------------------------------
@@ -2373,7 +2373,7 @@ static uint32_t softfloat_approxRecipSqrt32_1( unsigned int oddExpA, uint32_t a 
 *----------------------------------------------------------------------------*/
 static uint_fast32_t softfloat_commonNaNToF32UI( const struct commonNaN *aPtr )
 {
-    return (uint_fast32_t) aPtr->sign<<31 | 0x7FC00000 | aPtr->v64>>41;
+    trả_về (uint_fast32_t) aPtr->sign<<31 | 0x7FC00000 | aPtr->v64>>41;
 }
 
 /*----------------------------------------------------------------------------
@@ -2382,7 +2382,7 @@ static uint_fast32_t softfloat_commonNaNToF32UI( const struct commonNaN *aPtr )
 *----------------------------------------------------------------------------*/
 static uint_fast64_t softfloat_commonNaNToF64UI( const struct commonNaN *aPtr )
 {
-    return
+    trả_về
         (uint_fast64_t) aPtr->sign<<63 | UINT64_C( 0x7FF8000000000000 )
             | aPtr->v64>>12;
 }
@@ -2394,23 +2394,23 @@ static uint_fast8_t softfloat_countLeadingZeros64( uint64_t a )
 
     count = 0;
     a32 = a>>32;
-    if ( ! a32 ) {
+    nếu ( ! a32 ) {
         count = 32;
         a32 = (uint32_t) a; //fixed warning on type cast
     }
     /*------------------------------------------------------------------------
     | From here, result is current count + count leading zeros of `a32'.
     *------------------------------------------------------------------------*/
-    if ( a32 < 0x10000 ) {
+    nếu ( a32 < 0x10000 ) {
         count += 16;
         a32 <<= 16;
     }
-    if ( a32 < 0x1000000 ) {
+    nếu ( a32 < 0x1000000 ) {
         count += 8;
         a32 <<= 8;
     }
     count += softfloat_countLeadingZeros8[a32>>24];
-    return count;
+    trả_về count;
 }
 
 /*----------------------------------------------------------------------------
@@ -2421,7 +2421,7 @@ static uint_fast8_t softfloat_countLeadingZeros64( uint64_t a )
 *----------------------------------------------------------------------------*/
 static void softfloat_f32UIToCommonNaN( uint_fast32_t uiA, struct commonNaN *zPtr )
 {
-    if ( softfloat_isSigNaNF32UI( uiA ) ) {
+    nếu ( softfloat_isSigNaNF32UI( uiA ) ) {
         raiseFlags( flag_invalid );
     }
     zPtr->sign = (uiA>>31) != 0;
@@ -2437,7 +2437,7 @@ static void softfloat_f32UIToCommonNaN( uint_fast32_t uiA, struct commonNaN *zPt
 *----------------------------------------------------------------------------*/
 static void softfloat_f64UIToCommonNaN( uint_fast64_t uiA, struct commonNaN *zPtr )
 {
-    if ( softfloat_isSigNaNF64UI( uiA ) ) {
+    nếu ( softfloat_isSigNaNF64UI( uiA ) ) {
         raiseFlags( flag_invalid );
     }
     zPtr->sign = (uiA>>63) != 0;
@@ -2463,7 +2463,7 @@ static struct uint128 softfloat_mul64To128( uint64_t a, uint64_t b )
     mid <<= 32;
     z.v0 += mid;
     z.v64 += (z.v0 < mid);
-    return z;
+    trả_về z;
 }
 
 static float32_t
@@ -2505,18 +2505,18 @@ static float32_t
     signProd = signA ^ signB ^ (op == softfloat_mulAdd_subProd);
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
-    if ( expA == 0xFF ) {
-        if ( sigA || ((expB == 0xFF) && sigB) ) goto propagateNaN_ABC;
+    nếu ( expA == 0xFF ) {
+        nếu ( sigA || ((expB == 0xFF) && sigB) ) goto propagateNaN_ABC;
         magBits = expB | sigB;
         goto infProdArg;
     }
-    if ( expB == 0xFF ) {
-        if ( sigB ) goto propagateNaN_ABC;
+    nếu ( expB == 0xFF ) {
+        nếu ( sigB ) goto propagateNaN_ABC;
         magBits = expA | sigA;
         goto infProdArg;
     }
-    if ( expC == 0xFF ) {
-        if ( sigC ) {
+    nếu ( expC == 0xFF ) {
+        nếu ( sigC ) {
             uiZ = 0;
             goto propagateNaN_ZC;
         }
@@ -2525,14 +2525,14 @@ static float32_t
     }
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
-    if ( ! expA ) {
-        if ( ! sigA ) goto zeroProd;
+    nếu ( ! expA ) {
+        nếu ( ! sigA ) goto zeroProd;
         normExpSig = softfloat_normSubnormalF32Sig( sigA );
         expA = normExpSig.exp;
         sigA = normExpSig.sig;
     }
-    if ( ! expB ) {
-        if ( ! sigB ) goto zeroProd;
+    nếu ( ! expB ) {
+        nếu ( ! sigB ) goto zeroProd;
         normExpSig = softfloat_normSubnormalF32Sig( sigB );
         expB = normExpSig.exp;
         sigB = normExpSig.sig;
@@ -2543,13 +2543,13 @@ static float32_t
     sigA = (sigA | 0x00800000)<<7;
     sigB = (sigB | 0x00800000)<<7;
     sigProd = (uint_fast64_t) sigA * sigB;
-    if ( sigProd < UINT64_C( 0x2000000000000000 ) ) {
+    nếu ( sigProd < UINT64_C( 0x2000000000000000 ) ) {
         --expProd;
         sigProd <<= 1;
     }
     signZ = signProd;
-    if ( ! expC ) {
-        if ( ! sigC ) {
+    nếu ( ! expC ) {
+        nếu ( ! sigC ) {
             expZ = expProd - 1;
             sigZ = (uint_fast32_t) softfloat_shortShiftRightJam64( sigProd, 31 ); //fixed warning on type cast
             goto roundPack;
@@ -2562,13 +2562,13 @@ static float32_t
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
     expDiff = expProd - expC;
-    if ( signProd == signC ) {
+    nếu ( signProd == signC ) {
         /*--------------------------------------------------------------------
         *--------------------------------------------------------------------*/
-        if ( expDiff <= 0 ) {
+        nếu ( expDiff <= 0 ) {
             expZ = expC;
             sigZ = sigC + (uint_fast32_t) softfloat_shiftRightJam64( sigProd, 32 - expDiff ); //fixed warning on type cast
-        } else {
+        } không_thì {
             expZ = expProd;
             sig64Z =
                 sigProd
@@ -2576,42 +2576,42 @@ static float32_t
                           (uint_fast64_t) sigC<<32, expDiff );
             sigZ = (uint_fast32_t) softfloat_shortShiftRightJam64( sig64Z, 32 ); //fixed warning on type cast
         }
-        if ( sigZ < 0x40000000 ) {
+        nếu ( sigZ < 0x40000000 ) {
             --expZ;
             sigZ <<= 1;
         }
-    } else {
+    } không_thì {
         /*--------------------------------------------------------------------
         *--------------------------------------------------------------------*/
         sig64C = (uint_fast64_t) sigC<<32;
-        if ( expDiff < 0 ) {
+        nếu ( expDiff < 0 ) {
             signZ = signC;
             expZ = expC;
             sig64Z = sig64C - softfloat_shiftRightJam64( sigProd, -expDiff );
-        } else if ( ! expDiff ) {
+        } không_thì nếu ( ! expDiff ) {
             expZ = expProd;
             sig64Z = sigProd - sig64C;
-            if ( ! sig64Z ) goto completeCancellation;
-            if ( sig64Z & UINT64_C( 0x8000000000000000 ) ) {
+            nếu ( ! sig64Z ) goto completeCancellation;
+            nếu ( sig64Z & UINT64_C( 0x8000000000000000 ) ) {
                 signZ = ! signZ;
                 //fixed unsigned unary minus: -x == ~x + 1
                 sig64Z = ~sig64Z + 1;
             }
-        } else {
+        } không_thì {
             expZ = expProd;
             sig64Z = sigProd - softfloat_shiftRightJam64( sig64C, expDiff );
         }
         shiftDist = softfloat_countLeadingZeros64( sig64Z ) - 1;
         expZ -= shiftDist;
         shiftDist -= 32;
-        if ( shiftDist < 0 ) {
+        nếu ( shiftDist < 0 ) {
             sigZ = (uint_fast32_t) softfloat_shortShiftRightJam64( sig64Z, -shiftDist ); //fixed warning on type cast
-        } else {
+        } không_thì {
             sigZ = (uint_fast32_t) sig64Z<<shiftDist;
         }
     }
  roundPack:
-    return softfloat_roundPackToF32( signZ, expZ, sigZ );
+    trả_về softfloat_roundPackToF32( signZ, expZ, sigZ );
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
  propagateNaN_ABC:
@@ -2620,11 +2620,11 @@ static float32_t
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
  infProdArg:
-    if ( magBits ) {
+    nếu ( magBits ) {
         uiZ = packToF32UI( signProd, 0xFF, 0 );
-        if ( expC != 0xFF ) goto uiZ;
-        if ( sigC ) goto propagateNaN_ZC;
-        if ( signProd == signC ) goto uiZ;
+        nếu ( expC != 0xFF ) goto uiZ;
+        nếu ( sigC ) goto propagateNaN_ZC;
+        nếu ( signProd == signC ) goto uiZ;
     }
     raiseFlags( flag_invalid );
     uiZ = defaultNaNF32UI;
@@ -2635,13 +2635,13 @@ static float32_t
     *------------------------------------------------------------------------*/
  zeroProd:
     uiZ = uiC;
-    if ( ! (expC | sigC) && (signProd != signC) ) {
+    nếu ( ! (expC | sigC) && (signProd != signC) ) {
  completeCancellation:
         uiZ =
             packToF32UI((globalRoundingMode == round_min), 0, 0 );
     }
  uiZ:
-    return float32_t::fromRaw(uiZ);
+    trả_về float32_t::fromRaw(uiZ);
 }
 
 static float64_t
@@ -2681,18 +2681,18 @@ static float64_t
     signZ = signA ^ signB ^ (op == softfloat_mulAdd_subProd);
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
-    if ( expA == 0x7FF ) {
-        if ( sigA || ((expB == 0x7FF) && sigB) ) goto propagateNaN_ABC;
+    nếu ( expA == 0x7FF ) {
+        nếu ( sigA || ((expB == 0x7FF) && sigB) ) goto propagateNaN_ABC;
         magBits = expB | sigB;
         goto infProdArg;
     }
-    if ( expB == 0x7FF ) {
-        if ( sigB ) goto propagateNaN_ABC;
+    nếu ( expB == 0x7FF ) {
+        nếu ( sigB ) goto propagateNaN_ABC;
         magBits = expA | sigA;
         goto infProdArg;
     }
-    if ( expC == 0x7FF ) {
-        if ( sigC ) {
+    nếu ( expC == 0x7FF ) {
+        nếu ( sigC ) {
             uiZ = 0;
             goto propagateNaN_ZC;
         }
@@ -2701,14 +2701,14 @@ static float64_t
     }
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
-    if ( ! expA ) {
-        if ( ! sigA ) goto zeroProd;
+    nếu ( ! expA ) {
+        nếu ( ! sigA ) goto zeroProd;
         normExpSig = softfloat_normSubnormalF64Sig( sigA );
         expA = normExpSig.exp;
         sigA = normExpSig.sig;
     }
-    if ( ! expB ) {
-        if ( ! sigB ) goto zeroProd;
+    nếu ( ! expB ) {
+        nếu ( ! sigB ) goto zeroProd;
         normExpSig = softfloat_normSubnormalF64Sig( sigB );
         expB = normExpSig.exp;
         sigB = normExpSig.sig;
@@ -2719,14 +2719,14 @@ static float64_t
     sigA = (sigA | UINT64_C( 0x0010000000000000 ))<<10;
     sigB = (sigB | UINT64_C( 0x0010000000000000 ))<<10;
     sig128Z = softfloat_mul64To128( sigA, sigB );
-    if ( sig128Z.v64 < UINT64_C( 0x2000000000000000 ) ) {
+    nếu ( sig128Z.v64 < UINT64_C( 0x2000000000000000 ) ) {
         --expZ;
         sig128Z =
             softfloat_add128(
                 sig128Z.v64, sig128Z.v0, sig128Z.v64, sig128Z.v0 );
     }
-    if ( ! expC ) {
-        if ( ! sigC ) {
+    nếu ( ! expC ) {
+        nếu ( ! sigC ) {
             --expZ;
             sigZ = sig128Z.v64<<1 | (sig128Z.v0 != 0);
             goto roundPack;
@@ -2741,64 +2741,64 @@ static float64_t
     //fixed initialization
     sig128C.v0 = sig128C.v64 = 0;
     expDiff = expZ - expC;
-    if ( expDiff < 0 ) {
+    nếu ( expDiff < 0 ) {
         expZ = expC;
-        if ( (signZ == signC) || (expDiff < -1) ) {
+        nếu ( (signZ == signC) || (expDiff < -1) ) {
             sig128Z.v64 = softfloat_shiftRightJam64( sig128Z.v64, -expDiff );
-        } else {
+        } không_thì {
             sig128Z =
                 softfloat_shortShiftRightJam128( sig128Z.v64, sig128Z.v0, 1 );
         }
-    } else if ( expDiff ) {
+    } không_thì nếu ( expDiff ) {
         sig128C = softfloat_shiftRightJam128( sigC, 0, expDiff );
     }
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
-    if ( signZ == signC ) {
+    nếu ( signZ == signC ) {
         /*--------------------------------------------------------------------
         *--------------------------------------------------------------------*/
-        if ( expDiff <= 0 ) {
+        nếu ( expDiff <= 0 ) {
             sigZ = (sigC + sig128Z.v64) | (sig128Z.v0 != 0);
-        } else {
+        } không_thì {
             sig128Z =
                 softfloat_add128(
                     sig128Z.v64, sig128Z.v0, sig128C.v64, sig128C.v0 );
             sigZ = sig128Z.v64 | (sig128Z.v0 != 0);
         }
-        if ( sigZ < UINT64_C( 0x4000000000000000 ) ) {
+        nếu ( sigZ < UINT64_C( 0x4000000000000000 ) ) {
             --expZ;
             sigZ <<= 1;
         }
-    } else {
+    } không_thì {
         /*--------------------------------------------------------------------
         *--------------------------------------------------------------------*/
-        if ( expDiff < 0 ) {
+        nếu ( expDiff < 0 ) {
             signZ = signC;
             sig128Z = softfloat_sub128( sigC, 0, sig128Z.v64, sig128Z.v0 );
-        } else if ( ! expDiff ) {
+        } không_thì nếu ( ! expDiff ) {
             sig128Z.v64 = sig128Z.v64 - sigC;
-            if ( ! (sig128Z.v64 | sig128Z.v0) ) goto completeCancellation;
-            if ( sig128Z.v64 & UINT64_C( 0x8000000000000000 ) ) {
+            nếu ( ! (sig128Z.v64 | sig128Z.v0) ) goto completeCancellation;
+            nếu ( sig128Z.v64 & UINT64_C( 0x8000000000000000 ) ) {
                 signZ = ! signZ;
                 sig128Z = softfloat_sub128( 0, 0, sig128Z.v64, sig128Z.v0 );
             }
-        } else {
+        } không_thì {
             sig128Z =
                 softfloat_sub128(
                     sig128Z.v64, sig128Z.v0, sig128C.v64, sig128C.v0 );
         }
         /*--------------------------------------------------------------------
         *--------------------------------------------------------------------*/
-        if ( ! sig128Z.v64 ) {
+        nếu ( ! sig128Z.v64 ) {
             expZ -= 64;
             sig128Z.v64 = sig128Z.v0;
             sig128Z.v0 = 0;
         }
         shiftDist = softfloat_countLeadingZeros64( sig128Z.v64 ) - 1;
         expZ -= shiftDist;
-        if ( shiftDist < 0 ) {
+        nếu ( shiftDist < 0 ) {
             sigZ = softfloat_shortShiftRightJam64( sig128Z.v64, -shiftDist );
-        } else {
+        } không_thì {
             sig128Z =
                 softfloat_shortShiftLeft128(
                     sig128Z.v64, sig128Z.v0, shiftDist );
@@ -2807,7 +2807,7 @@ static float64_t
         sigZ |= (sig128Z.v0 != 0);
     }
  roundPack:
-    return softfloat_roundPackToF64( signZ, expZ, sigZ );
+    trả_về softfloat_roundPackToF64( signZ, expZ, sigZ );
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
  propagateNaN_ABC:
@@ -2816,11 +2816,11 @@ static float64_t
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
  infProdArg:
-    if ( magBits ) {
+    nếu ( magBits ) {
         uiZ = packToF64UI( signZ, 0x7FF, 0 );
-        if ( expC != 0x7FF ) goto uiZ;
-        if ( sigC ) goto propagateNaN_ZC;
-        if ( signZ == signC ) goto uiZ;
+        nếu ( expC != 0x7FF ) goto uiZ;
+        nếu ( sigC ) goto propagateNaN_ZC;
+        nếu ( signZ == signC ) goto uiZ;
     }
     raiseFlags( flag_invalid );
     uiZ = defaultNaNF64UI;
@@ -2831,13 +2831,13 @@ static float64_t
     *------------------------------------------------------------------------*/
  zeroProd:
     uiZ = uiC;
-    if ( ! (expC | sigC) && (signZ != signC) ) {
+    nếu ( ! (expC | sigC) && (signZ != signC) ) {
  completeCancellation:
         uiZ =
             packToF64UI((globalRoundingMode == round_min), 0, 0 );
     }
  uiZ:
-    return float64_t::fromRaw(uiZ);
+    trả_về float64_t::fromRaw(uiZ);
 }
 
 static float32_t
@@ -2847,10 +2847,10 @@ static float32_t
 
     shiftDist = softfloat_countLeadingZeros32( sig ) - 1;
     exp -= shiftDist;
-    if ( (7 <= shiftDist) && ((unsigned int) exp < 0xFD) ) {
-        return float32_t::fromRaw(packToF32UI( sign, sig ? exp : 0, sig<<(shiftDist - 7) ));
-    } else {
-        return softfloat_roundPackToF32( sign, exp, sig<<shiftDist );
+    nếu ( (7 <= shiftDist) && ((unsigned số_nguyên) exp < 0xFD) ) {
+        trả_về float32_t::fromRaw(packToF32UI( sign, sig ? exp : 0, sig<<(shiftDist - 7) ));
+    } không_thì {
+        trả_về softfloat_roundPackToF32( sign, exp, sig<<shiftDist );
     }
 }
 
@@ -2861,10 +2861,10 @@ static float64_t
 
     shiftDist = softfloat_countLeadingZeros64( sig ) - 1;
     exp -= shiftDist;
-    if ( (10 <= shiftDist) && ((unsigned int) exp < 0x7FD) ) {
-        return float64_t::fromRaw(packToF64UI( sign, sig ? exp : 0, sig<<(shiftDist - 10) ));
-    } else {
-        return softfloat_roundPackToF64( sign, exp, sig<<shiftDist );
+    nếu ( (10 <= shiftDist) && ((unsigned số_nguyên) exp < 0x7FD) ) {
+        trả_về float64_t::fromRaw(packToF64UI( sign, sig ? exp : 0, sig<<(shiftDist - 10) ));
+    } không_thì {
+        trả_về softfloat_roundPackToF64( sign, exp, sig<<shiftDist );
     }
 }
 
@@ -2876,7 +2876,7 @@ static struct exp16_sig32 softfloat_normSubnormalF32Sig( uint_fast32_t sig )
     shiftDist = softfloat_countLeadingZeros32( sig ) - 8;
     z.exp = 1 - shiftDist;
     z.sig = sig<<shiftDist;
-    return z;
+    trả_về z;
 }
 
 static struct exp16_sig64 softfloat_normSubnormalF64Sig( uint_fast64_t sig )
@@ -2887,7 +2887,7 @@ static struct exp16_sig64 softfloat_normSubnormalF64Sig( uint_fast64_t sig )
     shiftDist = softfloat_countLeadingZeros64( sig ) - 11;
     z.exp = 1 - shiftDist;
     z.sig = sig<<shiftDist;
-    return z;
+    trả_về z;
 }
 
 /*----------------------------------------------------------------------------
@@ -2902,11 +2902,11 @@ static uint_fast32_t
     bool isSigNaNA;
 
     isSigNaNA = softfloat_isSigNaNF32UI( uiA );
-    if ( isSigNaNA || softfloat_isSigNaNF32UI( uiB ) ) {
+    nếu ( isSigNaNA || softfloat_isSigNaNF32UI( uiB ) ) {
         raiseFlags( flag_invalid );
-        if ( isSigNaNA ) return uiA | 0x00400000;
+        nếu ( isSigNaNA ) trả_về uiA | 0x00400000;
     }
-    return (isNaNF32UI( uiA ) ? uiA : uiB) | 0x00400000;
+    trả_về (isNaNF32UI( uiA ) ? uiA : uiB) | 0x00400000;
 }
 
 /*----------------------------------------------------------------------------
@@ -2921,11 +2921,11 @@ static uint_fast64_t
     bool isSigNaNA;
 
     isSigNaNA = softfloat_isSigNaNF64UI( uiA );
-    if ( isSigNaNA || softfloat_isSigNaNF64UI( uiB ) ) {
+    nếu ( isSigNaNA || softfloat_isSigNaNF64UI( uiB ) ) {
         raiseFlags( flag_invalid );
-        if ( isSigNaNA ) return uiA | UINT64_C( 0x0008000000000000 );
+        nếu ( isSigNaNA ) trả_về uiA | UINT64_C( 0x0008000000000000 );
     }
-    return (isNaNF64UI( uiA ) ? uiA : uiB) | UINT64_C( 0x0008000000000000 );
+    trả_về (isNaNF64UI( uiA ) ? uiA : uiB) | UINT64_C( 0x0008000000000000 );
 }
 
 static float32_t
@@ -2942,7 +2942,7 @@ static float32_t
     roundingMode = globalRoundingMode;
     roundNearEven = (roundingMode == round_near_even);
     roundIncrement = 0x40;
-    if ( ! roundNearEven && (roundingMode != round_near_maxMag) ) {
+    nếu ( ! roundNearEven && (roundingMode != round_near_maxMag) ) {
         roundIncrement =
             (roundingMode
                  == (sign ? round_min : round_max))
@@ -2952,8 +2952,8 @@ static float32_t
     roundBits = sig & 0x7F;
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
-    if ( 0xFD <= (unsigned int) exp ) {
-        if ( exp < 0 ) {
+    nếu ( 0xFD <= (unsigned số_nguyên) exp ) {
+        nếu ( exp < 0 ) {
             /*----------------------------------------------------------------
             *----------------------------------------------------------------*/
             isTiny =
@@ -2962,10 +2962,10 @@ static float32_t
             sig = softfloat_shiftRightJam32( sig, -exp );
             exp = 0;
             roundBits = sig & 0x7F;
-            if ( isTiny && roundBits ) {
+            nếu ( isTiny && roundBits ) {
                 raiseFlags( flag_underflow );
             }
-        } else if ( (0xFD < exp) || (0x80000000 <= sig + roundIncrement) ) {
+        } không_thì nếu ( (0xFD < exp) || (0x80000000 <= sig + roundIncrement) ) {
             /*----------------------------------------------------------------
             *----------------------------------------------------------------*/
             raiseFlags(
@@ -2977,21 +2977,21 @@ static float32_t
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
     sig = (sig + roundIncrement)>>7;
-    if ( roundBits ) {
+    nếu ( roundBits ) {
         raiseFlags(flag_inexact);
-        if ( roundingMode == round_odd ) {
+        nếu ( roundingMode == round_odd ) {
             sig |= 1;
             goto packReturn;
         }
     }
     sig &= ~(uint_fast32_t) (! (roundBits ^ 0x40) & roundNearEven);
-    if ( ! sig ) exp = 0;
+    nếu ( ! sig ) exp = 0;
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
  packReturn:
     uiZ = packToF32UI( sign, exp, sig );
  uiZ:
-    return float32_t::fromRaw(uiZ);
+    trả_về float32_t::fromRaw(uiZ);
 }
 
 static float64_t
@@ -3008,7 +3008,7 @@ static float64_t
     roundingMode = globalRoundingMode;
     roundNearEven = (roundingMode == round_near_even);
     roundIncrement = 0x200;
-    if ( ! roundNearEven && (roundingMode != round_near_maxMag) ) {
+    nếu ( ! roundNearEven && (roundingMode != round_near_maxMag) ) {
         roundIncrement =
             (roundingMode
                  == (sign ? round_min : round_max))
@@ -3018,8 +3018,8 @@ static float64_t
     roundBits = sig & 0x3FF;
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
-    if ( 0x7FD <= (uint16_t) exp ) {
-        if ( exp < 0 ) {
+    nếu ( 0x7FD <= (uint16_t) exp ) {
+        nếu ( exp < 0 ) {
             /*----------------------------------------------------------------
             *----------------------------------------------------------------*/
             isTiny =
@@ -3029,10 +3029,10 @@ static float64_t
             sig = softfloat_shiftRightJam64( sig, -exp );
             exp = 0;
             roundBits = sig & 0x3FF;
-            if ( isTiny && roundBits ) {
+            nếu ( isTiny && roundBits ) {
                 raiseFlags( flag_underflow );
             }
-        } else if (
+        } không_thì nếu (
             (0x7FD < exp)
                 || (UINT64_C( 0x8000000000000000 ) <= sig + roundIncrement)
         ) {
@@ -3047,21 +3047,21 @@ static float64_t
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
     sig = (sig + roundIncrement)>>10;
-    if ( roundBits ) {
+    nếu ( roundBits ) {
         raiseFlags(flag_inexact);
-        if ( roundingMode == round_odd ) {
+        nếu ( roundingMode == round_odd ) {
             sig |= 1;
             goto packReturn;
         }
     }
     sig &= ~(uint_fast64_t) (! (roundBits ^ 0x200) & roundNearEven);
-    if ( ! sig ) exp = 0;
+    nếu ( ! sig ) exp = 0;
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
  packReturn:
     uiZ = packToF64UI( sign, exp, sig );
  uiZ:
-    return float64_t::fromRaw(uiZ);
+    trả_về float64_t::fromRaw(uiZ);
 }
 
 static int_fast32_t
@@ -3078,7 +3078,7 @@ static int_fast32_t
     *------------------------------------------------------------------------*/
     roundNearEven = (roundingMode == round_near_even);
     roundIncrement = 0x800;
-    if ( ! roundNearEven && (roundingMode != round_near_maxMag) ) {
+    nếu ( ! roundNearEven && (roundingMode != round_near_maxMag) ) {
         roundIncrement =
             (roundingMode
                  == (sign ? round_min : round_max))
@@ -3087,22 +3087,22 @@ static int_fast32_t
     }
     roundBits = sig & 0xFFF;
     sig += roundIncrement;
-    if ( sig & UINT64_C( 0xFFFFF00000000000 ) ) goto invalid;
+    nếu ( sig & UINT64_C( 0xFFFFF00000000000 ) ) goto invalid;
     sig32 = (uint_fast32_t)(sig>>12); //fixed warning on type cast
     sig32 &= ~(uint_fast32_t) (! (roundBits ^ 0x800) & roundNearEven);
     //fixed unsigned unary minus: -x == ~x + 1
     uZ.ui = sign ? (~sig32 + 1) : sig32;
     z = uZ.i;
-    if ( z && ((z < 0) ^ sign) ) goto invalid;
-    if ( exact && roundBits ) {
+    nếu ( z && ((z < 0) ^ sign) ) goto invalid;
+    nếu ( exact && roundBits ) {
         raiseFlags(flag_inexact);
     }
-    return z;
+    trả_về z;
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
  invalid:
     raiseFlags( flag_invalid );
-    return sign ? i32_fromNegOverflow : i32_fromPosOverflow;
+    trả_về sign ? i32_fromNegOverflow : i32_fromPosOverflow;
 }
 
 static int_fast64_t
@@ -3117,15 +3117,15 @@ static int_fast64_t
     *------------------------------------------------------------------------*/
     roundNearEven = (roundingMode == round_near_even);
     doIncrement = (UINT64_C(0x8000000000000000) <= sigExtra);
-    if (!roundNearEven && (roundingMode != round_near_maxMag)) {
+    nếu (!roundNearEven && (roundingMode != round_near_maxMag)) {
         doIncrement =
             (roundingMode
                 == (sign ? round_min : round_max))
             && sigExtra;
     }
-    if (doIncrement) {
+    nếu (doIncrement) {
         ++sig;
-        if (!sig) goto invalid;
+        nếu (!sig) goto invalid;
         sig &=
             ~(uint_fast64_t)
             (!(sigExtra & UINT64_C(0x7FFFFFFFFFFFFFFF))
@@ -3133,16 +3133,16 @@ static int_fast64_t
     }
     uZ.ui = sign ? (~sig + 1) : sig;
     z = uZ.i;
-    if (z && ((z < 0) ^ sign)) goto invalid;
-    if (exact && sigExtra) {
+    nếu (z && ((z < 0) ^ sign)) goto invalid;
+    nếu (exact && sigExtra) {
         raiseFlags(flag_inexact);
     }
-    return z;
+    trả_về z;
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
 invalid:
     raiseFlags(flag_invalid);
-    return sign ? i64_fromNegOverflow : i64_fromPosOverflow;
+    trả_về sign ? i64_fromNegOverflow : i64_fromPosOverflow;
 }
 
 static struct uint128
@@ -3151,14 +3151,14 @@ static struct uint128
     uint_fast8_t u8NegDist;
     struct uint128 z;
 
-    if ( dist < 64 ) {
+    nếu ( dist < 64 ) {
         //fixed unsigned unary minus: -x == ~x + 1 , fixed type cast
         u8NegDist = (uint_fast8_t)(~dist + 1);
         z.v64 = a64>>dist;
         z.v0 =
             a64<<(u8NegDist & 63) | a0>>dist
                 | ((uint64_t) (a0<<(u8NegDist & 63)) != 0);
-    } else {
+    } không_thì {
         z.v64 = 0;
         z.v0 =
             (dist < 127)
@@ -3167,7 +3167,7 @@ static struct uint128
                              != 0)
                 : ((a64 | a0) != 0);
     }
-    return z;
+    trả_về z;
 }
 
 static float32_t softfloat_subMagsF32( uint_fast32_t uiA, uint_fast32_t uiB )
@@ -3193,48 +3193,48 @@ static float32_t softfloat_subMagsF32( uint_fast32_t uiA, uint_fast32_t uiB )
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
     expDiff = expA - expB;
-    if ( ! expDiff ) {
+    nếu ( ! expDiff ) {
         /*--------------------------------------------------------------------
         *--------------------------------------------------------------------*/
-        if ( expA == 0xFF ) {
-            if ( sigA | sigB ) goto propagateNaN;
+        nếu ( expA == 0xFF ) {
+            nếu ( sigA | sigB ) goto propagateNaN;
             raiseFlags( flag_invalid );
             uiZ = defaultNaNF32UI;
             goto uiZ;
         }
         sigDiff = sigA - sigB;
-        if ( ! sigDiff ) {
+        nếu ( ! sigDiff ) {
             uiZ =
                 packToF32UI(
                     (globalRoundingMode == round_min), 0, 0 );
             goto uiZ;
         }
-        if ( expA ) --expA;
+        nếu ( expA ) --expA;
         signZ = signF32UI( uiA );
-        if ( sigDiff < 0 ) {
+        nếu ( sigDiff < 0 ) {
             signZ = ! signZ;
             sigDiff = -sigDiff;
         }
         shiftDist = softfloat_countLeadingZeros32( sigDiff ) - 8;
         expZ = expA - shiftDist;
-        if ( expZ < 0 ) {
+        nếu ( expZ < 0 ) {
             shiftDist = (int_fast8_t)expA; //fixed type cast
             expZ = 0;
         }
         uiZ = packToF32UI( signZ, expZ, sigDiff<<shiftDist );
         goto uiZ;
-    } else {
+    } không_thì {
         /*--------------------------------------------------------------------
         *--------------------------------------------------------------------*/
         signZ = signF32UI( uiA );
         sigA <<= 7;
         sigB <<= 7;
-        if ( expDiff < 0 ) {
+        nếu ( expDiff < 0 ) {
             /*----------------------------------------------------------------
             *----------------------------------------------------------------*/
             signZ = ! signZ;
-            if ( expB == 0xFF ) {
-                if ( sigB ) goto propagateNaN;
+            nếu ( expB == 0xFF ) {
+                nếu ( sigB ) goto propagateNaN;
                 uiZ = packToF32UI( signZ, 0xFF, 0 );
                 goto uiZ;
             }
@@ -3242,11 +3242,11 @@ static float32_t softfloat_subMagsF32( uint_fast32_t uiA, uint_fast32_t uiB )
             sigX = sigB | 0x40000000;
             sigY = sigA + (expA ? 0x40000000 : sigA);
             expDiff = -expDiff;
-        } else {
+        } không_thì {
             /*----------------------------------------------------------------
             *----------------------------------------------------------------*/
-            if ( expA == 0xFF ) {
-                if ( sigA ) goto propagateNaN;
+            nếu ( expA == 0xFF ) {
+                nếu ( sigA ) goto propagateNaN;
                 uiZ = uiA;
                 goto uiZ;
             }
@@ -3254,7 +3254,7 @@ static float32_t softfloat_subMagsF32( uint_fast32_t uiA, uint_fast32_t uiB )
             sigX = sigA | 0x40000000;
             sigY = sigB + (expB ? 0x40000000 : sigB);
         }
-        return
+        trả_về
             softfloat_normRoundPackToF32(
                 signZ, expZ, sigX - softfloat_shiftRightJam32( sigY, expDiff )
             );
@@ -3264,7 +3264,7 @@ static float32_t softfloat_subMagsF32( uint_fast32_t uiA, uint_fast32_t uiB )
  propagateNaN:
     uiZ = softfloat_propagateNaNF32UI( uiA, uiB );
  uiZ:
-    return float32_t::fromRaw(uiZ);
+    trả_về float32_t::fromRaw(uiZ);
 }
 
 static float64_t
@@ -3290,46 +3290,46 @@ static float64_t
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
     expDiff = expA - expB;
-    if ( ! expDiff ) {
+    nếu ( ! expDiff ) {
         /*--------------------------------------------------------------------
         *--------------------------------------------------------------------*/
-        if ( expA == 0x7FF ) {
-            if ( sigA | sigB ) goto propagateNaN;
+        nếu ( expA == 0x7FF ) {
+            nếu ( sigA | sigB ) goto propagateNaN;
             raiseFlags( flag_invalid );
             uiZ = defaultNaNF64UI;
             goto uiZ;
         }
         sigDiff = sigA - sigB;
-        if ( ! sigDiff ) {
+        nếu ( ! sigDiff ) {
             uiZ =
                 packToF64UI(
                     (globalRoundingMode == round_min), 0, 0 );
             goto uiZ;
         }
-        if ( expA ) --expA;
-        if ( sigDiff < 0 ) {
+        nếu ( expA ) --expA;
+        nếu ( sigDiff < 0 ) {
             signZ = ! signZ;
             sigDiff = -sigDiff;
         }
         shiftDist = softfloat_countLeadingZeros64( sigDiff ) - 11;
         expZ = expA - shiftDist;
-        if ( expZ < 0 ) {
+        nếu ( expZ < 0 ) {
             shiftDist = (int_fast8_t)expA; //fixed type cast
             expZ = 0;
         }
         uiZ = packToF64UI( signZ, expZ, sigDiff<<shiftDist );
         goto uiZ;
-    } else {
+    } không_thì {
         /*--------------------------------------------------------------------
         *--------------------------------------------------------------------*/
         sigA <<= 10;
         sigB <<= 10;
-        if ( expDiff < 0 ) {
+        nếu ( expDiff < 0 ) {
             /*----------------------------------------------------------------
             *----------------------------------------------------------------*/
             signZ = ! signZ;
-            if ( expB == 0x7FF ) {
-                if ( sigB ) goto propagateNaN;
+            nếu ( expB == 0x7FF ) {
+                nếu ( sigB ) goto propagateNaN;
                 uiZ = packToF64UI( signZ, 0x7FF, 0 );
                 goto uiZ;
             }
@@ -3338,11 +3338,11 @@ static float64_t
             sigB |= UINT64_C( 0x4000000000000000 );
             expZ = expB;
             sigZ = sigB - sigA;
-        } else {
+        } không_thì {
             /*----------------------------------------------------------------
             *----------------------------------------------------------------*/
-            if ( expA == 0x7FF ) {
-                if ( sigA ) goto propagateNaN;
+            nếu ( expA == 0x7FF ) {
+                nếu ( sigA ) goto propagateNaN;
                 uiZ = uiA;
                 goto uiZ;
             }
@@ -3352,25 +3352,25 @@ static float64_t
             expZ = expA;
             sigZ = sigA - sigB;
         }
-        return softfloat_normRoundPackToF64( signZ, expZ - 1, sigZ );
+        trả_về softfloat_normRoundPackToF64( signZ, expZ - 1, sigZ );
     }
     /*------------------------------------------------------------------------
     *------------------------------------------------------------------------*/
  propagateNaN:
     uiZ = softfloat_propagateNaNF64UI( uiA, uiB );
  uiZ:
-    return float64_t::fromRaw(uiZ);
+    trả_về float64_t::fromRaw(uiZ);
 }
 
 static float32_t ui32_to_f32( uint32_t a )
 {
-    if ( ! a ) {
-        return float32_t::fromRaw(0);
+    nếu ( ! a ) {
+        trả_về float32_t::fromRaw(0);
     }
-    if ( a & 0x80000000 ) {
-        return softfloat_roundPackToF32( 0, 0x9D, a>>1 | (a & 1) );
-    } else {
-        return softfloat_normRoundPackToF32( 0, 0x9C, a );
+    nếu ( a & 0x80000000 ) {
+        trả_về softfloat_roundPackToF32( 0, 0x9D, a>>1 | (a & 1) );
+    } không_thì {
+        trả_về softfloat_normRoundPackToF32( 0, 0x9C, a );
     }
 }
 
@@ -3379,14 +3379,14 @@ static float64_t ui32_to_f64( uint32_t a )
     uint_fast64_t uiZ;
     int_fast8_t shiftDist;
 
-    if ( ! a ) {
+    nếu ( ! a ) {
         uiZ = 0;
-    } else {
+    } không_thì {
         shiftDist = softfloat_countLeadingZeros32( a ) + 21;
         uiZ =
             packToF64UI( 0, 0x432 - shiftDist, (uint_fast64_t) a<<shiftDist );
     }
-    return float64_t::fromRaw(uiZ);
+    trả_về float64_t::fromRaw(uiZ);
 }
 
 static float32_t ui64_to_f32( uint64_t a )
@@ -3395,28 +3395,28 @@ static float32_t ui64_to_f32( uint64_t a )
     uint_fast32_t sig;
 
     shiftDist = softfloat_countLeadingZeros64( a ) - 40;
-    if ( 0 <= shiftDist ) {
-        return float32_t::fromRaw(a ? packToF32UI(0, 0x95 - shiftDist, (uint_fast32_t) a<<shiftDist ) : 0);
-    } else {
+    nếu ( 0 <= shiftDist ) {
+        trả_về float32_t::fromRaw(a ? packToF32UI(0, 0x95 - shiftDist, (uint_fast32_t) a<<shiftDist ) : 0);
+    } không_thì {
         shiftDist += 7;
         sig =
             (shiftDist < 0) ? (uint_fast32_t) softfloat_shortShiftRightJam64( a, -shiftDist ) //fixed warning on type cast
                 : (uint_fast32_t) a<<shiftDist;
-        return softfloat_roundPackToF32( 0, 0x9C - shiftDist, sig );
+        trả_về softfloat_roundPackToF32( 0, 0x9C - shiftDist, sig );
     }
 }
 
 static float64_t ui64_to_f64( uint64_t a )
 {
-    if ( ! a ) {
-        return float64_t::fromRaw(0);
+    nếu ( ! a ) {
+        trả_về float64_t::fromRaw(0);
     }
-    if ( a & UINT64_C( 0x8000000000000000 ) ) {
-        return
+    nếu ( a & UINT64_C( 0x8000000000000000 ) ) {
+        trả_về
             softfloat_roundPackToF64(
                 0, 0x43D, softfloat_shortShiftRightJam64( a, 1 ) );
-    } else {
-        return softfloat_normRoundPackToF64( 0, 0x43C, a );
+    } không_thì {
+        trả_về softfloat_normRoundPackToF64( 0, 0x43C, a );
     }
 }
 
@@ -3507,8 +3507,8 @@ static const float64_t exp_max_val(3000*(1 << EXPTAB_SCALE)); // log10(DBL_MAX) 
 static float32_t f32_exp( float32_t x)
 {
     //special cases
-    if(x.isNaN()) return float32_t::nan();
-    if(x.isInf()) return (x == float32_t::inf()) ? x : float32_t::zero();
+    nếu(x.isNaN()) trả_về float32_t::nan();
+    nếu(x.isInf()) trả_về (x == float32_t::inf()) ? x : float32_t::zero();
 
     static const float64_t
         A4 = float64_t::one() / EXPPOLY_32F_A0,
@@ -3517,26 +3517,26 @@ static float32_t f32_exp( float32_t x)
         A1 = float64_t::fromRaw(0x3fac6af0d93cf576) / EXPPOLY_32F_A0; // .5550339366753125211915322047004666939128e-1 / EXPPOLY_32F_A0;
 
     float64_t x0;
-    if(expF32UI(x.v) > 127 + 10)
+    nếu(expF32UI(x.v) > 127 + 10)
         x0 = signF32UI(x.v) ? -exp_max_val : exp_max_val;
-    else
+    không_thì
         x0 = f32_to_f64(x) * exp_prescale;
 
-    int val0 = f64_to_i32(x0, round_near_even, false);
-    int t = (val0 >> EXPTAB_SCALE) + 1023;
+    số_nguyên val0 = f64_to_i32(x0, round_near_even, false);
+    số_nguyên t = (val0 >> EXPTAB_SCALE) + 1023;
     t = t < 0 ? 0 : (t > 2047 ? 2047 : t);
     float64_t buf; buf.v = packToF64UI(0, t, 0);
 
     x0 = (x0 - f64_roundToInt(x0, round_near_even, false)) * exp_postscale;
 
-    return (buf * EXPPOLY_32F_A0 * float64_t::fromRaw(expTab[val0 & EXPTAB_MASK]) * ((((x0 + A1)*x0 + A2)*x0 + A3)*x0 + A4));
+    trả_về (buf * EXPPOLY_32F_A0 * float64_t::fromRaw(expTab[val0 & EXPTAB_MASK]) * ((((x0 + A1)*x0 + A2)*x0 + A3)*x0 + A4));
 }
 
 static float64_t f64_exp(float64_t x)
 {
     //special cases
-    if(x.isNaN()) return float64_t::nan();
-    if(x.isInf()) return (x == float64_t::inf()) ? x : float64_t::zero();
+    nếu(x.isNaN()) trả_về float64_t::nan();
+    nếu(x.isInf()) trả_về (x == float64_t::inf()) ? x : float64_t::zero();
 
     static const float64_t
         A5 = float64_t::one() / EXPPOLY_32F_A0,
@@ -3547,19 +3547,19 @@ static float64_t f64_exp(float64_t x)
         A0 = float64_t::fromRaw(0x3f55e7aa1566c2a4) / EXPPOLY_32F_A0; // .13369713757180123244806654839424e-2 / EXPPOLY_32F_A0
 
     float64_t x0;
-    if(expF64UI(x.v) > 1023 + 10)
+    nếu(expF64UI(x.v) > 1023 + 10)
         x0 = signF64UI(x.v) ? -exp_max_val : exp_max_val;
-    else
+    không_thì
         x0 = x * exp_prescale;
 
-    int val0 = cvRound(x0);
-    int t = (val0 >> EXPTAB_SCALE) + 1023;
+    số_nguyên val0 = cvRound(x0);
+    số_nguyên t = (val0 >> EXPTAB_SCALE) + 1023;
     t = t < 0 ? 0 : (t > 2047 ? 2047 : t);
     float64_t buf; buf.v = packToF64UI(0, t, 0);
 
     x0 = (x0 - f64_roundToInt(x0, round_near_even, false)) * exp_postscale;
 
-    return buf * EXPPOLY_32F_A0 * float64_t::fromRaw(expTab[val0 & EXPTAB_MASK]) * (((((A0*x0 + A1)*x0 + A2)*x0 + A3)*x0 + A4)*x0 + A5);
+    trả_về buf * EXPPOLY_32F_A0 * float64_t::fromRaw(expTab[val0 & EXPTAB_MASK]) * (((((A0*x0 + A1)*x0 + A2)*x0 + A3)*x0 + A4)*x0 + A5);
 }
 
 #undef EXPTAB_SCALE
@@ -3835,11 +3835,11 @@ static const float64_t ln_2 = float64_t::fromRaw(0x3fe62e42fefa39ef);
 static float32_t f32_log(float32_t x)
 {
     //special cases
-    if(x.isNaN() || x < float32_t::zero()) return float32_t::nan();
-    if(x == float32_t::zero()) return -float32_t::inf();
+    nếu(x.isNaN() || x < float32_t::zero()) trả_về float32_t::nan();
+    nếu(x == float32_t::zero()) trả_về -float32_t::inf();
 
     //first 8 bits of mantissa
-    int h0 = (x.v >> (23 - LOGTAB_SCALE)) & ((1 << LOGTAB_SCALE) - 1);
+    số_nguyên h0 = (x.v >> (23 - LOGTAB_SCALE)) & ((1 << LOGTAB_SCALE) - 1);
     //buf == 0.00000000_the_rest_mantissa_bits
     float64_t buf; buf.v = packToF64UI(0, 1023, ((uint64_t)x.v << 29) & ((1LL << (52 - LOGTAB_SCALE)) - 1));
     buf -= float64_t::one();
@@ -3849,18 +3849,18 @@ static float32_t f32_log(float32_t x)
 
     float64_t x0 = buf * tab1;
     //if last elements of icvLogTab
-    if(h0 == 255) x0 += float64_t(-float64_t::one() / float64_t(512));
+    nếu(h0 == 255) x0 += float64_t(-float64_t::one() / float64_t(512));
 
     float64_t y0 = ln_2 * float64_t(expF32UI(x.v) - 127) + tab0 + x0*x0*x0/float64_t(3) - x0*x0/float64_t(2) + x0;
 
-    return y0;
+    trả_về y0;
 }
 
 static float64_t f64_log(float64_t x)
 {
     //special cases
-    if(x.isNaN() || x < float64_t::zero()) return float64_t::nan();
-    if(x == float64_t::zero()) return -float64_t::inf();
+    nếu(x.isNaN() || x < float64_t::zero()) trả_về float64_t::nan();
+    nếu(x == float64_t::zero()) trả_về -float64_t::inf();
 
     static const float64_t
     A7(1),
@@ -3873,7 +3873,7 @@ static float64_t f64_log(float64_t x)
     A0(-float64_t::one() / float64_t(8));
 
     //first 8 bits of mantissa
-    int h0 = (x.v >> (52 - LOGTAB_SCALE)) & ((1 << LOGTAB_SCALE) - 1);
+    số_nguyên h0 = (x.v >> (52 - LOGTAB_SCALE)) & ((1 << LOGTAB_SCALE) - 1);
     //buf == 0.00000000_the_rest_mantissa_bits
     float64_t buf; buf.v = packToF64UI(0, 1023, x.v & ((1LL << (52 - LOGTAB_SCALE)) - 1));
     buf -= float64_t::one();
@@ -3883,10 +3883,10 @@ static float64_t f64_log(float64_t x)
 
     float64_t x0 = buf * tab1;
     //if last elements of icvLogTab
-    if(h0 == 255) x0 += float64_t(-float64_t::one()/float64_t(512));
+    nếu(h0 == 255) x0 += float64_t(-float64_t::one()/float64_t(512));
     float64_t xq = x0*x0;
 
-    return ln_2 * float64_t( expF64UI(x.v) - 1023) + tab0 + (((A0*xq + A2)*xq + A4)*xq + A6)*xq +
+    trả_về ln_2 * float64_t( expF64UI(x.v) - 1023) + tab0 + (((A0*xq + A2)*xq + A4)*xq + A6)*xq +
            (((A1*xq + A3)*xq + A5)*xq + A7)*x0;
 }
 
@@ -3897,12 +3897,12 @@ static float64_t f64_log(float64_t x)
 static float32_t f32_cbrt(float32_t x)
 {
     //special cases
-    if (x.isNaN()) return float32_t::nan();
-    if (x.isInf()) return x;
+    nếu (x.isNaN()) trả_về float32_t::nan();
+    nếu (x.isInf()) trả_về x;
 
-    int s = signF32UI(x.v);
-    int ex = expF32UI(x.v) - 127;
-    int shx = ex % 3;
+    số_nguyên s = signF32UI(x.v);
+    số_nguyên ex = expF32UI(x.v) - 127;
+    số_nguyên shx = ex % 3;
     shx -= shx >= 0 ? 3 : 0;
     ex = (ex - shx) / 3 - 1; /* exponent of cube root */
     float64_t fr; fr.v = packToF64UI(0, shx + 1023, ((uint64_t)fracF32UI(x.v)) << 29);
@@ -3926,7 +3926,7 @@ static float32_t f32_cbrt(float32_t x)
 
     // checks for "+0" and "-0", reset sign bit
     float32_t y; y.v = ((x.v & ((1u << 31) - 1)) != 0) ? packToF32UI(s, ex + 127, (uint32_t)(fracF64UI(fr.v) >> 29)) : 0;
-    return y;
+    trả_về y;
 }
 
 /// POW functions ///
@@ -3939,23 +3939,23 @@ static float32_t f32_pow( float32_t x, float32_t y)
     bool useInf = (y > zero) == (ax > one);
     float32_t v;
     //special cases
-    if(ynan) v = nan;
-    else if(yinf) v = (ax == one || xnan) ? nan : (useInf ? inf : zero);
-    else if(y == zero) v = one;
-    else if(y == one ) v = x;
-    else //here y is ok
+    nếu(ynan) v = nan;
+    không_thì nếu(yinf) v = (ax == one || xnan) ? nan : (useInf ? inf : zero);
+    không_thì nếu(y == zero) v = one;
+    không_thì nếu(y == one ) v = x;
+    không_thì //here y is ok
     {
-        if(xnan) v = nan;
-        else if(xinf) v = (y < zero) ? zero : inf;
-        else if(y == f32_roundToInt(y, round_near_even, false)) v = f32_powi(x, f32_to_i32(y, round_near_even, false));
-        else if(x  < zero) v = nan;
+        nếu(xnan) v = nan;
+        không_thì nếu(xinf) v = (y < zero) ? zero : inf;
+        không_thì nếu(y == f32_roundToInt(y, round_near_even, false)) v = f32_powi(x, f32_to_i32(y, round_near_even, false));
+        không_thì nếu(x  < zero) v = nan;
         // (0 ** 0) == 1
-        else if(x == zero) v = (y < zero) ? inf : (y == zero ? one : zero);
+        không_thì nếu(x == zero) v = (y < zero) ? inf : (y == zero ? one : zero);
         // here x and y are ok
-        else v = f32_exp(y * f32_log(x));
+        không_thì v = f32_exp(y * f32_log(x));
     }
 
-    return v;
+    trả_về v;
 }
 
 static float64_t f64_pow( float64_t x, float64_t y)
@@ -3966,43 +3966,43 @@ static float64_t f64_pow( float64_t x, float64_t y)
     bool useInf = (y > zero) == (ax > one);
     float64_t v;
     //special cases
-    if(ynan) v = nan;
-    else if(yinf) v = (ax == one || xnan) ? nan : (useInf ? inf : zero);
-    else if(y == zero) v = one;
-    else if(y == one ) v = x;
-    else //here y is ok
+    nếu(ynan) v = nan;
+    không_thì nếu(yinf) v = (ax == one || xnan) ? nan : (useInf ? inf : zero);
+    không_thì nếu(y == zero) v = one;
+    không_thì nếu(y == one ) v = x;
+    không_thì //here y is ok
     {
-        if(xnan) v = nan;
-        else if(xinf) v = (y < zero) ? zero : inf;
-        else if(y == f64_roundToInt(y, round_near_even, false)) v = f64_powi(x, f64_to_i32(y, round_near_even, false));
-        else if(x  < zero) v = nan;
+        nếu(xnan) v = nan;
+        không_thì nếu(xinf) v = (y < zero) ? zero : inf;
+        không_thì nếu(y == f64_roundToInt(y, round_near_even, false)) v = f64_powi(x, f64_to_i32(y, round_near_even, false));
+        không_thì nếu(x  < zero) v = nan;
         // (0 ** 0) == 1
-        else if(x == zero) v = (y < zero) ? inf : (y == zero ? one : zero);
+        không_thì nếu(x == zero) v = (y < zero) ? inf : (y == zero ? one : zero);
         // here x and y are ok
-        else v = f64_exp(y * f64_log(x));
+        không_thì v = f64_exp(y * f64_log(x));
     }
 
-    return v;
+    trả_về v;
 }
 
 // These functions are for internal use only
 
-static float32_t f32_powi( float32_t x, int y)
+static float32_t f32_powi( float32_t x, số_nguyên y)
 {
     float32_t v;
     //special case: (0 ** 0) == 1
-    if(x == float32_t::zero())
+    nếu(x == float32_t::zero())
         v = (y < 0) ? float32_t::inf() : (y == 0 ? float32_t::one() : float32_t::zero());
     // here x and y are ok
-    else
+    không_thì
     {
         float32_t a = float32_t::one(), b = x;
-        int p = std::abs(y);
-        if( y < 0 )
+        số_nguyên p = std::abs(y);
+        nếu( y < 0 )
             b = float32_t::one()/b;
-        while( p > 1 )
+        trong_khi( p > 1 )
         {
-            if( p & 1 )
+            nếu( p & 1 )
                 a *= b;
             b *= b;
             p >>= 1;
@@ -4010,25 +4010,25 @@ static float32_t f32_powi( float32_t x, int y)
         v = a * b;
     }
 
-    return v;
+    trả_về v;
 }
 
-static float64_t f64_powi( float64_t x, int y)
+static float64_t f64_powi( float64_t x, số_nguyên y)
 {
     float64_t v;
     //special case: (0 ** 0) == 1
-    if(x == float64_t::zero())
+    nếu(x == float64_t::zero())
         v = (y < 0) ? float64_t::inf() : (y == 0 ? float64_t::one() : float64_t::zero());
     // here x and y are ok
-    else
+    không_thì
     {
         float64_t a = float64_t::one(), b = x;
-        int p = std::abs(y);
-        if( y < 0 )
+        số_nguyên p = std::abs(y);
+        nếu( y < 0 )
             b = float64_t::one()/b;
-        while( p > 1 )
+        trong_khi( p > 1 )
         {
-            if( p & 1 )
+            nếu( p & 1 )
                 a *= b;
             b *= b;
             p >>= 1;
@@ -4036,7 +4036,7 @@ static float64_t f64_powi( float64_t x, int y)
         v = a * b;
     }
 
-    return v;
+    trả_về v;
 }
 
 /*
@@ -4096,14 +4096,14 @@ S6  = float64_t::fromRaw( 0x3DE5D93A5ACFD57C );
 
 static float64_t f64_sin_kernel(float64_t x)
 {
-    if(x.getExp() < -27)
+    nếu(x.getExp() < -27)
     {
-        if(x != x.zero()) raiseFlags(flag_inexact);
-        return x;
+        nếu(x != x.zero()) raiseFlags(flag_inexact);
+        trả_về x;
     }
 
     float64_t z = x*x;
-    return x*mulAdd(z, mulAdd(z, mulAdd(z, mulAdd(z, mulAdd(z, mulAdd(z,
+    trả_về x*mulAdd(z, mulAdd(z, mulAdd(z, mulAdd(z, mulAdd(z, mulAdd(z,
                     S6, S5), S4), S3), S2), S1), x.one());
 }
 
@@ -4163,40 +4163,40 @@ C6  = float64_t::fromRaw( 0xBDA8FAE9BE8838D4 );
 
 static float64_t f64_cos_kernel(float64_t x)
 {
-    if(x.getExp() < -27)
+    nếu(x.getExp() < -27)
     {
-        if(x != x.zero()) raiseFlags(flag_inexact);
-        return x.one();
+        nếu(x != x.zero()) raiseFlags(flag_inexact);
+        trả_về x.one();
     }
 
     float64_t z = x*x;
-    return mulAdd(mulAdd(z, mulAdd(z, mulAdd(z, mulAdd(z, mulAdd(z, mulAdd(z,
+    trả_về mulAdd(mulAdd(z, mulAdd(z, mulAdd(z, mulAdd(z, mulAdd(z, mulAdd(z,
                   C6, C5), C4), C3), C2), C1), -half), z, x.one());
 }
 
-static void f64_sincos_reduce(const float64_t& x, float64_t& y, int& n)
+static void f64_sincos_reduce(const float64_t& x, float64_t& y, số_nguyên& n)
 {
-    if(abs(x) < piby4)
+    nếu(abs(x) < piby4)
     {
         n = 0, y = x;
     }
-    else
+    không_thì
     {
         /* argument reduction needed */
         float64_t p = f64_rem(x, pi2);
         float64_t v = p - float64_t::eps().setExp(-10);
-        if(abs(v) <= piby4)
+        nếu(abs(v) <= piby4)
         {
             n = 0; y = p;
         }
-        else if(abs(v) <= (float64_t(3)*piby4))
+        không_thì nếu(abs(v) <= (float64_t(3)*piby4))
         {
             n = (p > 0) ? 1 : 3;
             y = (p > 0) ? p - piby2 : p + piby2;
-            if(p > 0) n = 1, y = p - piby2;
-            else      n = 3, y = p + piby2;
+            nếu(p > 0) n = 1, y = p - piby2;
+            không_thì      n = 3, y = p + piby2;
         }
-        else
+        không_thì
         {
             n = 2;
             y = (p > 0) ? p - p.pi() : p + p.pi();
@@ -4236,16 +4236,16 @@ static void f64_sincos_reduce(const float64_t& x, float64_t& y, int& n)
 
 static float64_t f64_sin( float64_t x )
 {
-    if(x.isInf() || x.isNaN()) return x.nan();
+    nếu(x.isInf() || x.isNaN()) trả_về x.nan();
 
-    float64_t y; int n;
+    float64_t y; số_nguyên n;
     f64_sincos_reduce(x, y, n);
     switch (n)
     {
-    case 0:  return  f64_sin_kernel(y);
-    case 1:  return  f64_cos_kernel(y);
-    case 2:  return -f64_sin_kernel(y);
-    default: return -f64_cos_kernel(y);
+    case 0:  trả_về  f64_sin_kernel(y);
+    case 1:  trả_về  f64_cos_kernel(y);
+    case 2:  trả_về -f64_sin_kernel(y);
+    default: trả_về -f64_cos_kernel(y);
     }
 }
 
@@ -4281,16 +4281,16 @@ static float64_t f64_sin( float64_t x )
 
 static float64_t f64_cos( float64_t x )
 {
-    if(x.isInf() || x.isNaN()) return x.nan();
+    nếu(x.isInf() || x.isNaN()) trả_về x.nan();
 
-    float64_t y; int n;
+    float64_t y; số_nguyên n;
     f64_sincos_reduce(x, y, n);
     switch (n)
     {
-    case 0:  return  f64_cos_kernel(y);
-    case 1:  return -f64_sin_kernel(y);
-    case 2:  return -f64_cos_kernel(y);
-    default: return  f64_sin_kernel(y);
+    case 0:  trả_về  f64_cos_kernel(y);
+    case 1:  trả_về -f64_sin_kernel(y);
+    case 2:  trả_về -f64_cos_kernel(y);
+    default: trả_về  f64_sin_kernel(y);
     }
 }
 

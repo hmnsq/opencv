@@ -9,7 +9,7 @@ namespace cv {
 
 std::string layoutToString(DataLayout layout)
 {
-    return
+    trả_về
         layout == DATA_LAYOUT_ND ? "ND" :
         layout == DATA_LAYOUT_NCHW ? "NCHW" :
         layout == DATA_LAYOUT_NHWC ? "NHWC" :
@@ -22,33 +22,33 @@ std::string layoutToString(DataLayout layout)
 
 bool operator == (const MatShape& size1, const MatShape& size2)
 {
-    if (size1.dims != size2.dims)
-        return false;
-    if (size1.layout != size2.layout &&
+    nếu (size1.dims != size2.dims)
+        trả_về false;
+    nếu (size1.layout != size2.layout &&
         size1.layout != DATA_LAYOUT_UNKNOWN &&
         size2.layout != DATA_LAYOUT_UNKNOWN)
-        return false;
-    if (size1.layout == DATA_LAYOUT_BLOCK &&
+        trả_về false;
+    nếu (size1.layout == DATA_LAYOUT_BLOCK &&
         size2.layout == DATA_LAYOUT_BLOCK &&
         size1.C != size2.C)
-        return false;
-    for (int i = 0; i < size1.dims; i++) {
-        if (size1.p[i] != size2.p[i])
-            return false;
+        trả_về false;
+    cho (số_nguyên i = 0; i < size1.dims; i++) {
+        nếu (size1.p[i] != size2.p[i])
+            trả_về false;
     }
-    return true;
+    trả_về true;
 }
 
 bool operator != (const MatShape& size1, const MatShape& size2)
 {
-    return !(size1 == size2);
+    trả_về !(size1 == size2);
 }
 
 /////////////////////////// MatShape ////////////////////////////////
 
 MatShape MatShape::scalar()
 {
-    return MatShape(0);
+    trả_về MatShape(0);
 }
 
 void MatShape::clear()
@@ -56,16 +56,16 @@ void MatShape::clear()
     dims = -1;
     layout = DATA_LAYOUT_UNKNOWN;
     C = 0;
-    for (int i = 0; i < MAX_DIMS; i++)
+    cho (số_nguyên i = 0; i < MAX_DIMS; i++)
         p[i] = 0;
 }
 
-void MatShape::resize(size_t newSize, int value)
+void MatShape::resize(size_t newSize, số_nguyên value)
 {
     CV_Assert(newSize < (size_t)MAX_DIMS);
-    int old_dims = std::max(dims, 0);
-    dims = (int)newSize;
-    for (int i = old_dims; i < dims; i++)
+    số_nguyên old_dims = std::max(dims, 0);
+    dims = (số_nguyên)newSize;
+    cho (số_nguyên i = old_dims; i < dims; i++)
         p[i] = value;
 }
 
@@ -74,160 +74,160 @@ void MatShape::reserve(size_t)
     // no op; maybe need to add a check for overflow, but we check it anyway in other operations
 }
 
-void MatShape::assign(size_t newSize, int value)
+void MatShape::assign(size_t newSize, số_nguyên value)
 {
     CV_Assert(newSize < (size_t)MAX_DIMS);
-    dims = (int)newSize;
-    for (int i = 0; i < dims; i++)
+    dims = (số_nguyên)newSize;
+    cho (số_nguyên i = 0; i < dims; i++)
         p[i] = value;
 }
 
-void MatShape::assign(int newSize, int value)
+void MatShape::assign(số_nguyên newSize, số_nguyên value)
 {
     assign((size_t)newSize, value);
 }
 
-void MatShape::assign(const int* begin, const int* end)
+void MatShape::assign(const số_nguyên* begin, const số_nguyên* end)
 {
     assign_(begin, end);
 }
 
-void MatShape::assign_(const int* begin, const int* end)
+void MatShape::assign_(const số_nguyên* begin, const số_nguyên* end)
 {
     ptrdiff_t newSize = end - begin;
     CV_Assert(0 <= newSize && newSize < (ptrdiff_t)MAX_DIMS);
-    dims = (int)newSize;
-    for (int i = 0; i < dims; i++)
+    dims = (số_nguyên)newSize;
+    cho (số_nguyên i = 0; i < dims; i++)
         p[i] = begin[i];
 }
 
-int* MatShape::begin() { return p; }
-const int* MatShape::begin() const { return p; }
-int* MatShape::end() { return p + std::max(dims, 0); }
-const int* MatShape::end() const { return p + std::max(dims, 0); }
-int& MatShape::back() { return p[std::max(dims-1, 0)]; }
-const int& MatShape::back() const { return p[std::max(dims-1, 0)]; }
+số_nguyên* MatShape::begin() { trả_về p; }
+const số_nguyên* MatShape::begin() const { trả_về p; }
+số_nguyên* MatShape::end() { trả_về p + std::max(dims, 0); }
+const số_nguyên* MatShape::end() const { trả_về p + std::max(dims, 0); }
+số_nguyên& MatShape::back() { trả_về p[std::max(dims-1, 0)]; }
+const số_nguyên& MatShape::back() const { trả_về p[std::max(dims-1, 0)]; }
 
-void MatShape::push_back(int value)
+void MatShape::push_back(số_nguyên value)
 {
     CV_Assert(dims+1 < MAX_DIMS);
     dims = std::max(dims+1, 1);
     p[dims-1] = value;
 }
 
-void MatShape::emplace_back(int value)
+void MatShape::emplace_back(số_nguyên value)
 {
     push_back(value);
 }
 
-void MatShape::insert(int* where, int value)
+void MatShape::insert(số_nguyên* where, số_nguyên value)
 {
-    int old_dims = std::max(dims, 0);
+    số_nguyên old_dims = std::max(dims, 0);
     CV_Assert(old_dims+1 < MAX_DIMS);
     ptrdiff_t ofs = where - p;
     CV_Assert(0 <= ofs && ofs <= old_dims);
     dims = old_dims+1;
-    for (int i = old_dims-1; i >= (int)ofs; i--)
+    cho (số_nguyên i = old_dims-1; i >= (số_nguyên)ofs; i--)
         p[i+1] = p[i];
     p[ofs] = value;
 }
 
-void MatShape::insert(int* where, size_t count, int value)
+void MatShape::insert(số_nguyên* where, size_t count, số_nguyên value)
 {
-    int old_dims = std::max(dims, 0);
+    số_nguyên old_dims = std::max(dims, 0);
     CV_Assert((size_t)(old_dims+count) < (size_t)MAX_DIMS);
     ptrdiff_t ofs = where - p;
     CV_Assert(0 <= ofs && ofs <= old_dims);
-    dims = (int)(old_dims+count);
-    for (int i = old_dims-1; i >= (int)ofs; i--)
+    dims = (số_nguyên)(old_dims+count);
+    cho (số_nguyên i = old_dims-1; i >= (số_nguyên)ofs; i--)
         p[i+count] = p[i];
-    for (int i = 0; i < (int)count; i++)
+    cho (số_nguyên i = 0; i < (số_nguyên)count; i++)
         p[i+ofs] = value;
 }
 
-void MatShape::insert(int* where, int count, int value)
+void MatShape::insert(số_nguyên* where, số_nguyên count, số_nguyên value)
 {
     insert(where, (size_t)count, value);
 }
 
-void MatShape::insert(int* where, const int* begin, const int* end)
+void MatShape::insert(số_nguyên* where, const số_nguyên* begin, const số_nguyên* end)
 {
     insert_(where, begin, end);
 }
 
-void MatShape::insert_(int* where, const int* begin, const int* end)
+void MatShape::insert_(số_nguyên* where, const số_nguyên* begin, const số_nguyên* end)
 {
-    int old_dims = std::max(dims, 0);
+    số_nguyên old_dims = std::max(dims, 0);
     ptrdiff_t delta = end - begin;
     CV_Assert(0 <= delta && old_dims+delta < MAX_DIMS);
     ptrdiff_t ofs = where - p;
     CV_Assert(0 <= ofs && ofs <= old_dims);
-    dims = (int)(old_dims+delta);
-    for (int i = old_dims-1; i >= (int)ofs; i--)
+    dims = (số_nguyên)(old_dims+delta);
+    cho (số_nguyên i = old_dims-1; i >= (số_nguyên)ofs; i--)
         p[i+delta] = p[i];
-    for (int i = 0; i < (int)delta; i++)
+    cho (số_nguyên i = 0; i < (số_nguyên)delta; i++)
         p[i+ofs] = begin[i];
 }
 
-void MatShape::erase(int* where)
+void MatShape::erase(số_nguyên* where)
 {
     CV_Assert(dims > 0);
     ptrdiff_t ofs = where - p;
     CV_Assert(0 <= ofs && ofs <= dims);
-    if (ofs == dims)
-        return;
+    nếu (ofs == dims)
+        trả_về;
     dims--;
-    for (int i = (int)ofs+1; i <= dims; i++)
+    cho (số_nguyên i = (số_nguyên)ofs+1; i <= dims; i++)
         p[i-1] = p[i];
 }
 
 size_t MatShape::total() const
 {
     size_t result = 1;
-    if (dims < 0)
-        return 0;
-    for (int i = 0; i < dims; i++)
+    nếu (dims < 0)
+        trả_về 0;
+    cho (số_nguyên i = 0; i < dims; i++)
         result *= p[i];
-    return result;
+    trả_về result;
 }
 
-std::vector<int> MatShape::vec() const
+std::vector<số_nguyên> MatShape::vec() const
 {
-    if (dims < 0)
-        return std::vector<int>(1, 0);
-    return std::vector<int>(p, p + dims);
+    nếu (dims < 0)
+        trả_về std::vector<số_nguyên>(1, 0);
+    trả_về std::vector<số_nguyên>(p, p + dims);
 }
 
 std::string MatShape::str() const
 {
     std::stringstream sstrm;
-    if (empty()) {
+    nếu (empty()) {
         sstrm << "<empty>";
-    } else if (dims == 0) {
+    } không_thì nếu (dims == 0) {
         sstrm << "<scalar>";
-    } else {
+    } không_thì {
         sstrm << "[";
-        for (int i = 0; i < dims; i++) {
+        cho (số_nguyên i = 0; i < dims; i++) {
             sstrm << (i > 0 ? " x " : "") << p[i];
         }
         sstrm << "]";
     }
-    return sstrm.str();
+    trả_về sstrm.str();
 }
 
-static void finalizeBlockLayout(MatShape& size, int C=0)
+static void finalizeBlockLayout(MatShape& size, số_nguyên C=0)
 {
-    if (size.layout == DATA_LAYOUT_BLOCK) {
+    nếu (size.layout == DATA_LAYOUT_BLOCK) {
         CV_Assert(size.dims >= 4);
-        int C0 = size.p[size.dims-1];
+        số_nguyên C0 = size.p[size.dims-1];
         CV_Assert(C0 > 1 && (C0 & (C0-1)) == 0);
         size.C = C > 0 ? C : size.p[1]*size.p[size.dims-1];
-    } else {
+    } không_thì {
         size.C = 0;
     }
-    for (int i = std::max(size.dims, 0); i < MatShape::MAX_DIMS; i++)
+    cho (số_nguyên i = std::max(size.dims, 0); i < MatShape::MAX_DIMS; i++)
         size.p[i] = 0;
-    if (size.dims == 0)
+    nếu (size.dims == 0)
         size.p[0] = 1;
 }
 
@@ -236,70 +236,70 @@ MatShape::MatShape()
     clear();
 }
 
-MatShape::MatShape(size_t dims_, const int* size_, DataLayout layout_, int C_)
+MatShape::MatShape(size_t dims_, const số_nguyên* size_, DataLayout layout_, số_nguyên C_)
 {
     layout = layout_;
     CV_Assert(dims_ <= (size_t)MAX_DIMS);
-    dims = (int)dims_;
-    for (int i = 0; i < dims; i++) {
+    dims = (số_nguyên)dims_;
+    cho (số_nguyên i = 0; i < dims; i++) {
         p[i] = size_ ? size_[i] : 0;
     }
     finalizeBlockLayout(*this, C_);
 }
 
-MatShape::MatShape(size_t dims_, int value, DataLayout layout_)
+MatShape::MatShape(size_t dims_, số_nguyên value, DataLayout layout_)
 {
     layout = layout_;
     CV_Assert(dims_ <= (size_t)MAX_DIMS);
-    dims = (int)dims_;
-    for (int i = 0; i < dims; i++) {
+    dims = (số_nguyên)dims_;
+    cho (số_nguyên i = 0; i < dims; i++) {
         p[i] = value;
     }
     finalizeBlockLayout(*this, 0);
 }
 
-MatShape::MatShape(std::initializer_list<int> shape)
+MatShape::MatShape(std::initializer_list<số_nguyên> shape)
 {
     layout = DATA_LAYOUT_UNKNOWN;
     CV_Assert(shape.size() <= (size_t)MAX_DIMS);
-    dims = (int)shape.size();
+    dims = (số_nguyên)shape.size();
     auto it = shape.begin();
-    for (int i = 0; i < dims; i++, ++it) {
+    cho (số_nguyên i = 0; i < dims; i++, ++it) {
         p[i] = *it;
     }
     finalizeBlockLayout(*this, 0);
 }
 
-MatShape::MatShape(int dims_, int value, DataLayout layout_)
+MatShape::MatShape(số_nguyên dims_, số_nguyên value, DataLayout layout_)
 {
     layout = layout_;
     CV_Assert(dims_ <= MAX_DIMS);
     dims = dims_;
-    for (int i = 0; i < dims; i++) {
+    cho (số_nguyên i = 0; i < dims; i++) {
         p[i] = value;
     }
     finalizeBlockLayout(*this, 0);
 }
 
-MatShape::MatShape(const std::vector<int>& shape_, DataLayout layout_, int C_)
+MatShape::MatShape(const std::vector<số_nguyên>& shape_, DataLayout layout_, số_nguyên C_)
 {
     layout = layout_;
     size_t shape_size = shape_.size();
     CV_Assert(shape_size < (size_t)MAX_DIMS);
-    dims = (int)shape_size;
-    for (int i = 0; i < dims; i++) {
+    dims = (số_nguyên)shape_size;
+    cho (số_nguyên i = 0; i < dims; i++) {
         p[i] = shape_[i];
     }
     finalizeBlockLayout(*this, C_);
 }
 
-MatShape::MatShape(const int* begin, const int* end, DataLayout layout_, int C_)
+MatShape::MatShape(const số_nguyên* begin, const số_nguyên* end, DataLayout layout_, số_nguyên C_)
 {
     layout = layout_;
     ptrdiff_t shape_size = end - begin;
     CV_Assert(0 <= shape_size && shape_size < MAX_DIMS);
-    dims = (int)shape_size;
-    for (int i = 0; i < dims; i++) {
+    dims = (số_nguyên)shape_size;
+    cho (số_nguyên i = 0; i < dims; i++) {
         p[i] = begin[i];
     }
     finalizeBlockLayout(*this, C_);
@@ -310,38 +310,38 @@ MatShape::MatShape(const MatShape& shape)
     dims = shape.dims;
     layout = shape.layout;
     C = shape.C;
-    for (int i = 0; i < MAX_DIMS; i++)
+    cho (số_nguyên i = 0; i < MAX_DIMS; i++)
         p[i] = shape.p[i];
 }
 
 MatShape& MatShape::operator = (const MatShape& shape)
 {
-    if (this != &shape) {
+    nếu (this != &shape) {
         dims = shape.dims;
         layout = shape.layout;
         C = shape.C;
-        for (int i = 0; i < MAX_DIMS; i++)
+        cho (số_nguyên i = 0; i < MAX_DIMS; i++)
             p[i] = shape.p[i];
     }
-    return *this;
+    trả_về *this;
 }
 
 bool MatShape::hasSymbols() const
 {
-    for (int i = 0; i < dims; i++) {
-        if (p[i] < 0)
-            return true;
+    cho (số_nguyên i = 0; i < dims; i++) {
+        nếu (p[i] < 0)
+            trả_về true;
     }
-    return false;
+    trả_về false;
 }
 
-int MatShape::channels() const
+số_nguyên MatShape::channels() const
 {
     CV_Assert(layout == DATA_LAYOUT_BLOCK || layout == DATA_LAYOUT_NCHW || layout == DATA_LAYOUT_NHWC);
-    return layout == DATA_LAYOUT_BLOCK ? C : p[layout == DATA_LAYOUT_NCHW ? 1 : dims-1];
+    trả_về layout == DATA_LAYOUT_BLOCK ? C : p[layout == DATA_LAYOUT_NCHW ? 1 : dims-1];
 }
 
-MatShape MatShape::toLayout(DataLayout newLayout, int C0) const
+MatShape MatShape::toLayout(DataLayout newLayout, số_nguyên C0) const
 {
     CV_Assert(layout == DATA_LAYOUT_BLOCK || layout == DATA_LAYOUT_NCHW || layout == DATA_LAYOUT_NHWC);
     CV_Assert(newLayout == DATA_LAYOUT_BLOCK || newLayout == DATA_LAYOUT_NCHW || newLayout == DATA_LAYOUT_NHWC);
@@ -349,14 +349,14 @@ MatShape MatShape::toLayout(DataLayout newLayout, int C0) const
     MatShape newsize = *this;
     newsize.layout = newLayout;
 
-    if (newLayout == DATA_LAYOUT_BLOCK) {
+    nếu (newLayout == DATA_LAYOUT_BLOCK) {
         // any => BLOCK
         CV_Assert_N(C0 > 1, (C0 & (C0-1)) == 0);
-        int Corig = channels();
+        số_nguyên Corig = channels();
         newsize.C = Corig;
 
-        if (layout == DATA_LAYOUT_NHWC) {
-            for (int i = 2; i < dims; i++) {
+        nếu (layout == DATA_LAYOUT_NHWC) {
+            cho (số_nguyên i = 2; i < dims; i++) {
                 newsize.p[i] = p[i-1];
             }
         }
@@ -364,43 +364,43 @@ MatShape MatShape::toLayout(DataLayout newLayout, int C0) const
         newsize.dims += layout != DATA_LAYOUT_BLOCK;
         newsize.p[1] = (Corig + C0 - 1)/C0;
         newsize.p[newsize.dims-1] = C0;
-    } else if (layout == DATA_LAYOUT_BLOCK) {
+    } không_thì nếu (layout == DATA_LAYOUT_BLOCK) {
         // BLOCK => any (except for BLOCK, which is handled above)
         newsize.C = 0;
-        if (newLayout == DATA_LAYOUT_NHWC) {
-            for (int i = 2; i < dims; i++) {
+        nếu (newLayout == DATA_LAYOUT_NHWC) {
+            cho (số_nguyên i = 2; i < dims; i++) {
                 newsize.p[i-1] = p[i];
             }
         }
         newsize.p[newLayout == DATA_LAYOUT_NCHW ? 1 : dims-2] = C;
         newsize.dims--;
-    } else {
+    } không_thì {
         CV_Assert_N(C0 <= 1);
 
-        if (newLayout == layout)
-            return newsize;
+        nếu (newLayout == layout)
+            trả_về newsize;
 
         // NHWC => NCHW
-        if (newLayout == DATA_LAYOUT_NCHW) {
-            for (int i = 2; i < dims; i++)
+        nếu (newLayout == DATA_LAYOUT_NCHW) {
+            cho (số_nguyên i = 2; i < dims; i++)
                 newsize.p[i] = p[i-1];
             newsize.p[1] = p[dims-1];
-        } else {
+        } không_thì {
             // NCHW => NHWC
-            for (int i = 2; i < dims; i++)
+            cho (số_nguyên i = 2; i < dims; i++)
                 newsize.p[i-1] = p[i];
             newsize.p[dims-1] = p[1];
         }
     }
 
-    return newsize;
+    trả_về newsize;
 }
 
-static int normalizeShapeAxis(int axis, int dims)
+static số_nguyên normalizeShapeAxis(số_nguyên axis, số_nguyên dims)
 {
     CV_CheckGE(axis, -dims, "axis is out of range");
     CV_CheckLT(axis, dims, "axis is out of range");
-    return axis < 0 ? axis + dims : axis;
+    trả_về axis < 0 ? axis + dims : axis;
 }
 
 // The semantic NCHW form {N, C, spatial...} of a block ('NC1HWC0') shape, so that axes and
@@ -408,36 +408,36 @@ static int normalizeShapeAxis(int axis, int dims)
 static MatShape toSemantic(const MatShape& shape)
 {
     CV_CheckGE(shape.dims, 3, "a block shape is {N, C1, spatial..., C0}");
-    return shape.toLayout(DATA_LAYOUT_NCHW);
+    trả_về shape.toLayout(DATA_LAYOUT_NCHW);
 }
 
 // Blocks such a result again. Once N or C changes, elements cross the padded C0 lanes and
 // the data needs a repack, which a shape operation cannot express.
 static MatShape toBlockOf(MatShape result, const MatShape& src, const char* op)
 {
-    if (result.dims < 2 || result.p[0] != src.p[0] || result.p[1] != src.C)
+    nếu (result.dims < 2 || result.p[0] != src.p[0] || result.p[1] != src.C)
         CV_Error_(Error::StsNotImplemented,
                   ("%s: the block layout is kept only when the batch and the channel axes stay "
                    "unchanged; convert the shape with toLayout() first", op));
-    CV_CheckLE(result.dims + 1, (int)MatShape::MAX_DIMS, "too many dimensions");
+    CV_CheckLE(result.dims + 1, (số_nguyên)MatShape::MAX_DIMS, "too many dimensions");
     result.layout = DATA_LAYOUT_NCHW;
-    return result.toLayout(DATA_LAYOUT_BLOCK, src.p[src.dims-1]);
+    trả_về result.toLayout(DATA_LAYOUT_BLOCK, src.p[src.dims-1]);
 }
 
-MatShape MatShape::squeeze(const std::vector<int>& axes) const
+MatShape MatShape::squeeze(const std::vector<số_nguyên>& axes) const
 {
     CV_Assert(dims >= 0);
-    if (layout == DATA_LAYOUT_BLOCK)
-        return toBlockOf(toSemantic(*this).squeeze(axes), *this, "squeeze");
+    nếu (layout == DATA_LAYOUT_BLOCK)
+        trả_về toBlockOf(toSemantic(*this).squeeze(axes), *this, "squeeze");
     bool remove[MAX_DIMS] = {false};
-    if (axes.empty())
+    nếu (axes.empty())
     {
-        for (int i = 0; i < dims; i++)
+        cho (số_nguyên i = 0; i < dims; i++)
             remove[i] = p[i] == 1;
     }
-    for (int a : axes)
+    cho (số_nguyên a : axes)
     {
-        int i = normalizeShapeAxis(a, dims);
+        số_nguyên i = normalizeShapeAxis(a, dims);
         CV_Check(a, !remove[i], "squeeze: duplicate axis");
         CV_Check(p[i], p[i] == 1, "squeeze: the size of a squeezed axis must be 1");
         remove[i] = true;
@@ -445,86 +445,86 @@ MatShape MatShape::squeeze(const std::vector<int>& axes) const
     // a new number of axes: the layout of this shape does not apply
     MatShape result;
     result.dims = 0;
-    for (int i = 0; i < dims; i++)
-        if (!remove[i])
+    cho (số_nguyên i = 0; i < dims; i++)
+        nếu (!remove[i])
             result.p[result.dims++] = p[i];
-    return result;
+    trả_về result;
 }
 
-MatShape MatShape::unsqueeze(const std::vector<int>& axes) const
+MatShape MatShape::unsqueeze(const std::vector<số_nguyên>& axes) const
 {
     CV_Assert(dims >= 0);
-    if (layout == DATA_LAYOUT_BLOCK)
-        return toBlockOf(toSemantic(*this).unsqueeze(axes), *this, "unsqueeze");
-    const int outDims = dims + (int)axes.size();
-    CV_CheckLE(outDims, (int)MAX_DIMS, "unsqueeze: too many dimensions");
+    nếu (layout == DATA_LAYOUT_BLOCK)
+        trả_về toBlockOf(toSemantic(*this).unsqueeze(axes), *this, "unsqueeze");
+    const số_nguyên outDims = dims + (số_nguyên)axes.size();
+    CV_CheckLE(outDims, (số_nguyên)MAX_DIMS, "unsqueeze: too many dimensions");
     bool insert[MAX_DIMS] = {false};
-    for (int a : axes)
+    cho (số_nguyên a : axes)
     {
-        int i = normalizeShapeAxis(a, outDims);
+        số_nguyên i = normalizeShapeAxis(a, outDims);
         CV_Check(a, !insert[i], "unsqueeze: duplicate axis");
         insert[i] = true;
     }
     // a new number of axes: the layout of this shape does not apply
     MatShape result;
     result.dims = outDims;
-    for (int i = 0, j = 0; i < outDims; i++)
+    cho (số_nguyên i = 0, j = 0; i < outDims; i++)
         result.p[i] = insert[i] ? 1 : p[j++];
-    return result;
+    trả_về result;
 }
 
-MatShape MatShape::flatten(int startAxis, int endAxis) const
+MatShape MatShape::flatten(số_nguyên startAxis, số_nguyên endAxis) const
 {
     CV_Assert(dims >= 0);
-    if (layout == DATA_LAYOUT_BLOCK)
-        return toBlockOf(toSemantic(*this).flatten(startAxis, endAxis), *this, "flatten");
-    if (dims == 0)
+    nếu (layout == DATA_LAYOUT_BLOCK)
+        trả_về toBlockOf(toSemantic(*this).flatten(startAxis, endAxis), *this, "flatten");
+    nếu (dims == 0)
     {
         CV_Check(startAxis, startAxis == 0 || startAxis == -1, "flatten: axis is out of range");
         CV_Check(endAxis, endAxis == 0 || endAxis == -1, "flatten: axis is out of range");
-        return MatShape({1});
+        trả_về MatShape({1});
     }
-    int start = normalizeShapeAxis(startAxis, dims), end = normalizeShapeAxis(endAxis, dims);
+    số_nguyên start = normalizeShapeAxis(startAxis, dims), end = normalizeShapeAxis(endAxis, dims);
     CV_CheckLE(start, end, "flatten: startAxis must not follow endAxis");
     int64 merged = 1;
-    for (int i = start; i <= end; i++)
+    cho (số_nguyên i = start; i <= end; i++)
         merged *= p[i];
     CV_CheckLE((double)merged, (double)INT_MAX, "flatten: the result is too big");
     // a new number of axes: the layout of this shape does not apply
     MatShape result;
     result.dims = 0;
-    for (int i = 0; i < dims; i++)
+    cho (số_nguyên i = 0; i < dims; i++)
     {
-        if (i == start)
-            result.p[result.dims++] = (int)merged;
-        else if (i < start || i > end)
+        nếu (i == start)
+            result.p[result.dims++] = (số_nguyên)merged;
+        không_thì nếu (i < start || i > end)
             result.p[result.dims++] = p[i];
     }
-    return result;
+    trả_về result;
 }
 
 MatShape MatShape::reshape(const MatShape& newShape, bool allowZero) const
 {
     CV_Assert(dims >= 0 && newShape.dims >= 0);
-    if (layout == DATA_LAYOUT_BLOCK)
-        return toBlockOf(toSemantic(*this).reshape(newShape, allowZero), *this, "reshape");
+    nếu (layout == DATA_LAYOUT_BLOCK)
+        trả_về toBlockOf(toSemantic(*this).reshape(newShape, allowZero), *this, "reshape");
     // a new number of axes: neither the layout of this shape nor the one of the spec applies
     MatShape result;
     result.dims = newShape.dims;
     std::copy(newShape.p, newShape.p + newShape.dims, result.p);
-    int inferred = -1;
+    số_nguyên inferred = -1;
     int64 known = 1;
-    for (int i = 0; i < result.dims; i++)
+    cho (số_nguyên i = 0; i < result.dims; i++)
     {
-        int& sz = result.p[i];
-        if (sz == -1)
+        số_nguyên& sz = result.p[i];
+        nếu (sz == -1)
         {
             CV_Check(i, inferred < 0, "reshape: at most one axis may be -1");
             inferred = i;
             continue;
         }
         CV_Check(sz, sz >= 0, "reshape: sizes must be -1 or non-negative");
-        if (sz == 0 && !allowZero)
+        nếu (sz == 0 && !allowZero)
         {
             CV_Check(i, i < dims, "reshape: 0 refers to an axis the source does not have");
             sz = p[i];
@@ -532,27 +532,27 @@ MatShape MatShape::reshape(const MatShape& newShape, bool allowZero) const
         known *= sz;
     }
     const int64 total_ = (int64)total();
-    if (inferred >= 0)
+    nếu (inferred >= 0)
     {
         CV_Check((double)known, known != 0, "reshape: cannot infer the -1 axis next to a zero-size axis");
         CV_Check((double)total_, total_ % known == 0, "reshape: the number of elements does not match");
         CV_CheckLE((double)(total_/known), (double)INT_MAX, "reshape: the result is too big");
-        result.p[inferred] = (int)(total_/known);
+        result.p[inferred] = (số_nguyên)(total_/known);
     }
-    else if (known != total_)
+    không_thì nếu (known != total_)
         CV_Error_(Error::StsBadArg, ("reshape: the number of elements does not match: %lld vs %lld",
                                      (long long)known, (long long)total_));
-    return result;
+    trả_về result;
 }
 
 MatShape MatShape::expand(const MatShape& another) const
 {
-    if (dims == 0)
-        return another;
-    if (another.dims == 0)
-        return *this;
+    nếu (dims == 0)
+        trả_về another;
+    nếu (another.dims == 0)
+        trả_về *this;
 
-    if ((layout == DATA_LAYOUT_NCHW || layout == DATA_LAYOUT_NHWC) &&
+    nếu ((layout == DATA_LAYOUT_NCHW || layout == DATA_LAYOUT_NHWC) &&
         (another.layout == DATA_LAYOUT_NCHW || another.layout == DATA_LAYOUT_NHWC)) {
         CV_Assert(layout == another.layout);
     }
@@ -561,24 +561,24 @@ MatShape MatShape::expand(const MatShape& another) const
 
     MatShape result;
 
-    if (dims < 0 || another.dims < 0)
-        return result;
+    nếu (dims < 0 || another.dims < 0)
+        trả_về result;
 
     result = *this;
     result.dims = std::max(dims, another.dims);
     result.layout = layout == DATA_LAYOUT_UNKNOWN ? another.layout :
         layout == DATA_LAYOUT_ND && (another.layout == DATA_LAYOUT_NCHW ||
         another.layout == DATA_LAYOUT_NHWC) ? another.layout : layout;
-    for (int i = result.dims-1; i >= 0; i--) {
-        int i1 = i - (result.dims - dims);
-        int i2 = i - (result.dims - another.dims);
-        int sz1 = i1 < 0 ? 1 : p[i1];
-        int sz2 = i2 < 0 ? 1 : another.p[i2];
+    cho (số_nguyên i = result.dims-1; i >= 0; i--) {
+        số_nguyên i1 = i - (result.dims - dims);
+        số_nguyên i2 = i - (result.dims - another.dims);
+        số_nguyên sz1 = i1 < 0 ? 1 : p[i1];
+        số_nguyên sz2 = i2 < 0 ? 1 : another.p[i2];
         CV_Assert(sz1 == sz2 || sz1 == 1 || sz2 == 1);
         // [TODO] handle symbolic shapes
         result.p[i] = sz1 != 1 ? sz1 : sz2;
     }
-    return result;
+    trả_về result;
 }
 
 /////////////////////////// MatAllocator ////////////////////////////
@@ -589,29 +589,29 @@ void MatAllocator::map(UMatData*, AccessFlag) const
 
 void MatAllocator::unmap(UMatData* u) const
 {
-    if(u->urefcount == 0 && u->refcount == 0)
+    nếu(u->urefcount == 0 && u->refcount == 0)
     {
         deallocate(u);
     }
 }
 
 void MatAllocator::download(UMatData* u, void* dstptr,
-         int dims, const size_t sz[],
+         số_nguyên dims, const size_t sz[],
          const size_t srcofs[], const size_t srcstep[],
          const size_t dststep[]) const
 {
-    if(!u)
-        return;
-    int isz[CV_MAX_DIM];
+    nếu(!u)
+        trả_về;
+    số_nguyên isz[CV_MAX_DIM];
     uchar* srcptr = u->data;
-    for( int i = 0; i < dims; i++ )
+    cho( số_nguyên i = 0; i < dims; i++ )
     {
         CV_Assert( sz[i] <= (size_t)INT_MAX );
-        if( sz[i] == 0 )
-            return;
-        if( srcofs )
+        nếu( sz[i] == 0 )
+            trả_về;
+        nếu( srcofs )
             srcptr += srcofs[i]*(i <= dims-2 ? srcstep[i] : 1);
-        isz[i] = (int)sz[i];
+        isz[i] = (số_nguyên)sz[i];
     }
 
     Mat src(dims, isz, CV_8U, srcptr, srcstep);
@@ -622,27 +622,27 @@ void MatAllocator::download(UMatData* u, void* dstptr,
     NAryMatIterator it(arrays, ptrs, 2);
     size_t planesz = it.size;
 
-    for( size_t j = 0; j < it.nplanes; j++, ++it )
+    cho( size_t j = 0; j < it.nplanes; j++, ++it )
         memcpy(ptrs[1], ptrs[0], planesz);
 }
 
 
-void MatAllocator::upload(UMatData* u, const void* srcptr, int dims, const size_t sz[],
+void MatAllocator::upload(UMatData* u, const void* srcptr, số_nguyên dims, const size_t sz[],
                     const size_t dstofs[], const size_t dststep[],
                     const size_t srcstep[]) const
 {
-    if(!u)
-        return;
-    int isz[CV_MAX_DIM];
+    nếu(!u)
+        trả_về;
+    số_nguyên isz[CV_MAX_DIM];
     uchar* dstptr = u->data;
-    for( int i = 0; i < dims; i++ )
+    cho( số_nguyên i = 0; i < dims; i++ )
     {
         CV_Assert( sz[i] <= (size_t)INT_MAX );
-        if( sz[i] == 0 )
-            return;
-        if( dstofs )
+        nếu( sz[i] == 0 )
+            trả_về;
+        nếu( dstofs )
             dstptr += dstofs[i]*(i <= dims-2 ? dststep[i] : 1);
-        isz[i] = (int)sz[i];
+        isz[i] = (số_nguyên)sz[i];
     }
 
     Mat src(dims, isz, CV_8U, (void*)srcptr, srcstep);
@@ -653,31 +653,31 @@ void MatAllocator::upload(UMatData* u, const void* srcptr, int dims, const size_
     NAryMatIterator it(arrays, ptrs, 2);
     size_t planesz = it.size;
 
-    for( size_t j = 0; j < it.nplanes; j++, ++it )
+    cho( size_t j = 0; j < it.nplanes; j++, ++it )
         memcpy(ptrs[1], ptrs[0], planesz);
 }
 
-void MatAllocator::copy(UMatData* usrc, UMatData* udst, int dims, const size_t sz[],
+void MatAllocator::copy(UMatData* usrc, UMatData* udst, số_nguyên dims, const size_t sz[],
                   const size_t srcofs[], const size_t srcstep[],
                   const size_t dstofs[], const size_t dststep[], bool /*sync*/) const
 {
     CV_INSTRUMENT_REGION();
 
-    if(!usrc || !udst)
-        return;
-    int isz[CV_MAX_DIM];
+    nếu(!usrc || !udst)
+        trả_về;
+    số_nguyên isz[CV_MAX_DIM];
     uchar* srcptr = usrc->data;
     uchar* dstptr = udst->data;
-    for( int i = 0; i < dims; i++ )
+    cho( số_nguyên i = 0; i < dims; i++ )
     {
         CV_Assert( sz[i] <= (size_t)INT_MAX );
-        if( sz[i] == 0 )
-            return;
-        if( srcofs )
+        nếu( sz[i] == 0 )
+            trả_về;
+        nếu( srcofs )
             srcptr += srcofs[i]*(i <= dims-2 ? srcstep[i] : 1);
-        if( dstofs )
+        nếu( dstofs )
             dstptr += dstofs[i]*(i <= dims-2 ? dststep[i] : 1);
-        isz[i] = (int)sz[i];
+        isz[i] = (số_nguyên)sz[i];
     }
 
     Mat src(dims, isz, CV_8U, srcptr, srcstep);
@@ -688,7 +688,7 @@ void MatAllocator::copy(UMatData* usrc, UMatData* udst, int dims, const size_t s
     NAryMatIterator it(arrays, ptrs, 2);
     size_t planesz = it.size;
 
-    for( size_t j = 0; j < it.nplanes; j++, ++it )
+    cho( size_t j = 0; j < it.nplanes; j++, ++it )
         memcpy(ptrs[1], ptrs[0], planesz);
 }
 
@@ -696,26 +696,26 @@ BufferPoolController* MatAllocator::getBufferPoolController(const char* id) cons
 {
     CV_UNUSED(id);
     static DummyBufferPoolController dummy;
-    return &dummy;
+    trả_về &dummy;
 }
 
 class StdMatAllocator CV_FINAL : public MatAllocator
 {
 public:
-    UMatData* allocate(int dims, const int* sizes, int type,
+    UMatData* allocate(số_nguyên dims, const số_nguyên* sizes, số_nguyên type,
                        void* data0, size_t* step, AccessFlag /*flags*/, UMatUsageFlags /*usageFlags*/) const CV_OVERRIDE
     {
         size_t total = CV_ELEM_SIZE(type);
-        for( int i = dims-1; i >= 0; i-- )
+        cho( số_nguyên i = dims-1; i >= 0; i-- )
         {
-            if( step )
+            nếu( step )
             {
-                if( data0 && step[i] != CV_AUTOSTEP )
+                nếu( data0 && step[i] != CV_AUTOSTEP )
                 {
                     CV_Assert(total <= step[i]);
                     total = step[i];
                 }
-                else
+                không_thì
                     step[i] = total;
             }
             total *= sizes[i];
@@ -724,26 +724,26 @@ public:
         UMatData* u = new UMatData(this);
         u->data = u->origdata = data;
         u->size = total;
-        if(data0)
+        nếu(data0)
             u->flags |= UMatData::USER_ALLOCATED;
 
-        return u;
+        trả_về u;
     }
 
     bool allocate(UMatData* u, AccessFlag /*accessFlags*/, UMatUsageFlags /*usageFlags*/) const CV_OVERRIDE
     {
-        if(!u) return false;
-        return true;
+        nếu(!u) trả_về false;
+        trả_về true;
     }
 
     void deallocate(UMatData* u) const CV_OVERRIDE
     {
-        if(!u)
-            return;
+        nếu(!u)
+            trả_về;
 
         CV_Assert(u->urefcount == 0);
         CV_Assert(u->refcount == 0);
-        if( !(u->flags & UMatData::USER_ALLOCATED) )
+        nếu( !(u->flags & UMatData::USER_ALLOCATED) )
         {
             fastFree(u->origdata);
             u->origdata = 0;
@@ -756,12 +756,12 @@ static
 MatAllocator*& getDefaultAllocatorMatRef()
 {
     static MatAllocator* g_matAllocator = Mat::getStdAllocator();
-    return g_matAllocator;
+    trả_về g_matAllocator;
 }
 
 MatAllocator* Mat::getDefaultAllocator()
 {
-    return getDefaultAllocatorMatRef();
+    trả_về getDefaultAllocatorMatRef();
 }
 
 void Mat::setDefaultAllocator(MatAllocator* allocator)
@@ -776,56 +776,56 @@ MatAllocator* Mat::getStdAllocator()
 
 //==================================================================================================
 
-void setSize( Mat& m, int _dims, const int* _sz, const size_t* _steps, bool autoSteps)
+void setSize( Mat& m, số_nguyên _dims, const số_nguyên* _sz, const size_t* _steps, bool autoSteps)
 {
     CV_Assert( 0 <= _dims && _dims <= CV_MAX_DIM && _dims <= MatShape::MAX_DIMS);
 
     m.dims = _dims;
     m.size = MatShape(_dims, _sz);
     m.step[std::max(_dims-1, 0)] = CV_ELEM_SIZE(m.flags);
-    for (int i = _dims-2; i >= 0; i--) {
+    cho (số_nguyên i = _dims-2; i >= 0; i--) {
         size_t autostep = m.size[i+1]*m.step[i+1];
-        if (_steps) {
+        nếu (_steps) {
             m.step[i] = _steps[i];
             //CV_Assert(m.step[i] >= autostep);
-        } else if (autoSteps) {
+        } không_thì nếu (autoSteps) {
             m.step[i] = autostep;
-        } else {
+        } không_thì {
             m.step[i] = 0;
         }
     }
 
-    if( _dims <= 2 )
+    nếu( _dims <= 2 )
     {
         m.cols = _dims == 0 ? 1 : _sz ? _sz[_dims > 1] : 0;
         m.rows = _dims < 2 ? 1 : _sz ? _sz[0] : 0;
-    } else {
+    } không_thì {
         m.cols = m.rows = -1;
     }
 }
 
-int updateContinuityFlag(int flags, int dims, const int* size, const size_t* step)
+số_nguyên updateContinuityFlag(số_nguyên flags, số_nguyên dims, const số_nguyên* size, const size_t* step)
 {
-    int i, j;
-    if (dims <= 1)
-        return flags | Mat::CONTINUOUS_FLAG;
-    for( i = 0; i < dims; i++ )
+    số_nguyên i, j;
+    nếu (dims <= 1)
+        trả_về flags | Mat::CONTINUOUS_FLAG;
+    cho( i = 0; i < dims; i++ )
     {
-        if( size[i] > 1 )
+        nếu( size[i] > 1 )
             break;
     }
 
     uint64 t = (uint64)size[std::min(i, dims-1)]*CV_MAT_CN(flags);
-    for( j = dims-1; j > i; j-- )
+    cho( j = dims-1; j > i; j-- )
     {
         t *= size[j];
-        if( step[j]*size[j] < step[j-1] )
+        nếu( step[j]*size[j] < step[j-1] )
             break;
     }
 
-    if( j <= i && t == (uint64)(int)t )
-        return flags | Mat::CONTINUOUS_FLAG;
-    return flags & ~Mat::CONTINUOUS_FLAG;
+    nếu( j <= i && t == (uint64)(số_nguyên)t )
+        trả_về flags | Mat::CONTINUOUS_FLAG;
+    trả_về flags & ~Mat::CONTINUOUS_FLAG;
 }
 
 void Mat::updateContinuityFlag()
@@ -836,25 +836,25 @@ void Mat::updateContinuityFlag()
 void finalizeHdr(Mat& m)
 {
     m.updateContinuityFlag();
-    int d = m.dims;
-    if( d > 2 )
+    số_nguyên d = m.dims;
+    nếu( d > 2 )
         m.rows = m.cols = -1;
-    if(m.u)
+    nếu(m.u)
         m.datastart = m.data = m.u->data;
-    if( m.data && d > 0 )
+    nếu( m.data && d > 0 )
     {
         m.datalimit = m.datastart + m.size[0]*m.step[0];
-        if( m.size[0] > 0 )
+        nếu( m.size[0] > 0 )
         {
-            int lastdim = d > 0 ? d - 1 : 0;
+            số_nguyên lastdim = d > 0 ? d - 1 : 0;
             m.dataend = m.ptr() + m.size[lastdim]*m.step[lastdim];
-            for( int i = 0; i < d-1; i++ )
+            cho( số_nguyên i = 0; i < d-1; i++ )
                 m.dataend += (m.size[i] - 1)*m.step[i];
         }
-        else
+        không_thì
             m.dataend = m.datalimit;
     }
-    else
+    không_thì
         m.dataend = m.datalimit = m.data;
 }
 
@@ -865,14 +865,14 @@ Mat::Mat() CV_NOEXCEPT
       datalimit(0), allocator(0), u(0)
 {}
 
-Mat::Mat(int _rows, int _cols, int _type)
+Mat::Mat(số_nguyên _rows, số_nguyên _cols, số_nguyên _type)
     : flags(MAGIC_VAL), dims(0), rows(0), cols(0), data(0), datastart(0), dataend(0),
       datalimit(0), allocator(0), u(0)
 {
     create(_rows, _cols, _type);
 }
 
-Mat::Mat(int _rows, int _cols, int _type, const Scalar& _s)
+Mat::Mat(số_nguyên _rows, số_nguyên _cols, số_nguyên _type, const Scalar& _s)
     : flags(MAGIC_VAL), dims(0), rows(0), cols(0), data(0), datastart(0), dataend(0),
       datalimit(0), allocator(0), u(0)
 {
@@ -880,14 +880,14 @@ Mat::Mat(int _rows, int _cols, int _type, const Scalar& _s)
     *this = _s;
 }
 
-Mat::Mat(Size _sz, int _type)
+Mat::Mat(Size _sz, số_nguyên _type)
     : flags(MAGIC_VAL), dims(0), rows(0), cols(0), data(0), datastart(0), dataend(0),
       datalimit(0), allocator(0), u(0)
 {
     create( _sz.height, _sz.width, _type );
 }
 
-Mat::Mat(Size _sz, int _type, const Scalar& _s)
+Mat::Mat(Size _sz, số_nguyên _type, const Scalar& _s)
     : flags(MAGIC_VAL), dims(0), rows(0), cols(0), data(0), datastart(0), dataend(0),
       datalimit(0), allocator(0), u(0)
 {
@@ -895,14 +895,14 @@ Mat::Mat(Size _sz, int _type, const Scalar& _s)
     *this = _s;
 }
 
-Mat::Mat(int _dims, const int* _sz, int _type)
+Mat::Mat(số_nguyên _dims, const số_nguyên* _sz, số_nguyên _type)
     : flags(MAGIC_VAL), dims(0), rows(0), cols(0), data(0), datastart(0), dataend(0),
       datalimit(0), allocator(0), u(0)
 {
     create(_dims, _sz, _type);
 }
 
-Mat::Mat(int _dims, const int* _sz, int _type, const Scalar& _s)
+Mat::Mat(số_nguyên _dims, const số_nguyên* _sz, số_nguyên _type, const Scalar& _s)
     : flags(MAGIC_VAL), dims(0), rows(0), cols(0), data(0), datastart(0), dataend(0),
       datalimit(0), allocator(0), u(0)
 {
@@ -910,14 +910,14 @@ Mat::Mat(int _dims, const int* _sz, int _type, const Scalar& _s)
     *this = _s;
 }
 
-Mat::Mat(const std::vector<int>& _sz, int _type)
+Mat::Mat(const std::vector<số_nguyên>& _sz, số_nguyên _type)
     : flags(MAGIC_VAL), dims(0), rows(0), cols(0), data(0), datastart(0), dataend(0),
       datalimit(0), allocator(0), u(0)
 {
     create(_sz, _type);
 }
 
-Mat::Mat(const std::vector<int>& _sz, int _type, const Scalar& _s)
+Mat::Mat(const std::vector<số_nguyên>& _sz, số_nguyên _type, const Scalar& _s)
     : flags(MAGIC_VAL), dims(0), rows(0), cols(0), data(0), datastart(0), dataend(0),
       datalimit(0), allocator(0), u(0)
 {
@@ -925,21 +925,21 @@ Mat::Mat(const std::vector<int>& _sz, int _type, const Scalar& _s)
     *this = _s;
 }
 
-Mat::Mat(const MatShape& _shape, int _type)
+Mat::Mat(const MatShape& _shape, số_nguyên _type)
     : flags(MAGIC_VAL), dims(0), rows(0), cols(0), data(0), datastart(0), dataend(0),
       datalimit(0), allocator(0), u(0)
 {
     create(_shape, _type);
 }
 
-Mat::Mat(std::initializer_list<int> _shape, int _type)
+Mat::Mat(std::initializer_list<số_nguyên> _shape, số_nguyên _type)
     : flags(MAGIC_VAL), dims(0), rows(0), cols(0), data(0), datastart(0), dataend(0),
       datalimit(0), allocator(0), u(0)
 {
     create(_shape, _type);
 }
 
-Mat::Mat(const MatShape& _shape, int _type, const Scalar& _s)
+Mat::Mat(const MatShape& _shape, số_nguyên _type, const Scalar& _s)
     : flags(MAGIC_VAL), dims(0), rows(0), cols(0), data(0), datastart(0), dataend(0),
       datalimit(0), allocator(0), u(0)
 {
@@ -947,7 +947,7 @@ Mat::Mat(const MatShape& _shape, int _type, const Scalar& _s)
     *this = _s;
 }
 
-Mat::Mat(std::initializer_list<int> _shape, int _type, const Scalar& _s)
+Mat::Mat(std::initializer_list<số_nguyên> _shape, số_nguyên _type, const Scalar& _s)
     : flags(MAGIC_VAL), dims(0), rows(0), cols(0), data(0), datastart(0), dataend(0),
       datalimit(0), allocator(0), u(0)
 {
@@ -960,11 +960,11 @@ Mat::Mat(const Mat& m)
       datastart(m.datastart), dataend(m.dataend), datalimit(m.datalimit), allocator(m.allocator),
       u(m.u), size(m.size), step(m.step)
 {
-    if( u )
+    nếu( u )
         CV_XADD(&u->refcount, 1);
 }
 
-Mat::Mat(int _rows, int _cols, int _type, void* _data, size_t _step)
+Mat::Mat(số_nguyên _rows, số_nguyên _cols, số_nguyên _type, void* _data, size_t _step)
     : flags(MAGIC_VAL + (_type & TYPE_MASK)), dims(2), rows(_rows), cols(_cols),
       data((uchar*)_data), datastart((uchar*)_data), dataend(0), datalimit(0),
       allocator(0), u(0), size(2)
@@ -973,14 +973,14 @@ Mat::Mat(int _rows, int _cols, int _type, void* _data, size_t _step)
 
     size_t esz = CV_ELEM_SIZE(_type), esz1 = CV_ELEM_SIZE1(_type);
     size_t minstep = cols * esz;
-    if( _step == AUTO_STEP )
+    nếu( _step == AUTO_STEP )
     {
         _step = minstep;
     }
-    else
+    không_thì
     {
         CV_Assert( _step >= minstep );
-        if (_step % esz1 != 0)
+        nếu (_step % esz1 != 0)
         {
             CV_Error(Error::BadStep, "Step must be a multiple of esz1");
         }
@@ -994,7 +994,7 @@ Mat::Mat(int _rows, int _cols, int _type, void* _data, size_t _step)
     updateContinuityFlag();
 }
 
-Mat::Mat(Size _sz, int _type, void* _data, size_t _step)
+Mat::Mat(Size _sz, số_nguyên _type, void* _data, size_t _step)
     : flags(MAGIC_VAL + (_type & TYPE_MASK)), dims(2), rows(_sz.height), cols(_sz.width),
       data((uchar*)_data), datastart((uchar*)_data), dataend(0), datalimit(0),
       allocator(0), u(0), size(2)
@@ -1003,15 +1003,15 @@ Mat::Mat(Size _sz, int _type, void* _data, size_t _step)
 
     size_t esz = CV_ELEM_SIZE(_type), esz1 = CV_ELEM_SIZE1(_type);
     size_t minstep = cols*esz;
-    if( _step == AUTO_STEP || (_step < minstep && rows == 1))
+    nếu( _step == AUTO_STEP || (_step < minstep && rows == 1))
     {
         _step = minstep;
     }
-    else
+    không_thì
     {
         CV_CheckGE(_step, minstep, "");
 
-        if (_step % esz1 != 0)
+        nếu (_step % esz1 != 0)
         {
             CV_Error(Error::BadStep, "Step must be a multiple of esz1");
         }
@@ -1033,9 +1033,9 @@ Mat::~Mat()
 
 Mat& Mat::operator = (const Mat& m)
 {
-    if( this != &m )
+    nếu( this != &m )
     {
-        if( m.u )
+        nếu( m.u )
             CV_XADD(&m.u->refcount, 1);
         release();
         flags = m.flags;
@@ -1051,150 +1051,150 @@ Mat& Mat::operator = (const Mat& m)
         allocator = m.allocator;
         u = m.u;
     }
-    return *this;
+    trả_về *this;
 }
 
 Mat Mat::clone() const
 {
     Mat m;
     copyTo(m);
-    return m;
+    trả_về m;
 }
 
-void Mat::assignTo( Mat& m, int _type ) const
+void Mat::assignTo( Mat& m, số_nguyên _type ) const
 {
-    if( _type < 0 )
+    nếu( _type < 0 )
         m = *this;
-    else
+    không_thì
         convertTo(m, _type);
 }
 
-void Mat::create(int _rows, int _cols, int _type)
+void Mat::create(số_nguyên _rows, số_nguyên _cols, số_nguyên _type)
 {
     _type &= TYPE_MASK;
-    if( dims <= 2 && rows == _rows && cols == _cols && type() == _type && data )
-        return;
-    int sz[] = {_rows, _cols};
+    nếu( dims <= 2 && rows == _rows && cols == _cols && type() == _type && data )
+        trả_về;
+    số_nguyên sz[] = {_rows, _cols};
     create(2, sz, _type);
 }
 
-void Mat::create(Size _sz, int _type)
+void Mat::create(Size _sz, số_nguyên _type)
 {
     create(_sz.height, _sz.width, _type);
 }
 
-void Mat::createSameSize(InputArray m, int type)
+void Mat::createSameSize(InputArray m, số_nguyên type)
 {
     MatShape msize = m.shape();
     create(msize, type);
 }
 
-void Mat::fit(int _dims, const int* _sizes, int _type)
+void Mat::fit(số_nguyên _dims, const số_nguyên* _sizes, số_nguyên _type)
 {
     size_t oldTotalBytes = u ? u->size : 0;
     size_t esz = CV_ELEM_SIZE(_type), newTotal = _dims >= 0;
-    for (int i = 0; i < _dims; i++)
+    cho (số_nguyên i = 0; i < _dims; i++)
         newTotal *= _sizes[i];
     size_t newTotalBytes = newTotal*esz;
-    if (newTotalBytes > 0 && (!isContinuous() ||
+    nếu (newTotalBytes > 0 && (!isContinuous() ||
                               newTotalBytes > oldTotalBytes ||
                               data != datastart)) {
         create(_dims, _sizes, _type);
-    } else {
+    } không_thì {
         flags = (flags & ~Mat::TYPE_MASK) | CV_MAT_TYPE(_type);
-        int _dummy_size = 0;
+        số_nguyên _dummy_size = 0;
         setSize(*this, (_dims >= 0 ? _dims : 1), (_dims >= 0 ? _sizes : &_dummy_size), nullptr, true);
         finalizeHdr(*this);
     }
 }
 
-void Mat::fit(const std::vector<int>& _shape, int _type)
+void Mat::fit(const std::vector<số_nguyên>& _shape, số_nguyên _type)
 {
-    fit((int)_shape.size(), _shape.data(), _type);
+    fit((số_nguyên)_shape.size(), _shape.data(), _type);
 }
 
-void Mat::fit(const MatShape& _shape, int _type)
+void Mat::fit(const MatShape& _shape, số_nguyên _type)
 {
     fit(_shape.dims, _shape.p, _type);
     size.layout = _shape.layout;
     size.C = _shape.C;
 }
 
-void Mat::fit(std::initializer_list<int> _shape, int _type)
+void Mat::fit(std::initializer_list<số_nguyên> _shape, số_nguyên _type)
 {
-    int new_shape[MatShape::MAX_DIMS];
-    int new_ndims = (int)_shape.size();
+    số_nguyên new_shape[MatShape::MAX_DIMS];
+    số_nguyên new_ndims = (số_nguyên)_shape.size();
     CV_Assert(new_ndims <= MatShape::MAX_DIMS);
     auto it = _shape.begin();
-    for (int i = 0; i < new_ndims; i++, ++it)
+    cho (số_nguyên i = 0; i < new_ndims; i++, ++it)
         new_shape[i] = *it;
     fit(new_ndims, new_shape, _type);
 }
 
-void Mat::fit(int _rows, int _cols, int _type)
+void Mat::fit(số_nguyên _rows, số_nguyên _cols, số_nguyên _type)
 {
     _type &= TYPE_MASK;
-    int sz[] = {_rows, _cols};
+    số_nguyên sz[] = {_rows, _cols};
     fit(2, sz, _type);
 }
 
-void Mat::fit(Size _sz, int _type)
+void Mat::fit(Size _sz, số_nguyên _type)
 {
     fit(_sz.height, _sz.width, _type);
 }
 
-void Mat::fitSameSize(InputArray m, int _type)
+void Mat::fitSameSize(InputArray m, số_nguyên _type)
 {
     fit(m.shape(), _type);
 }
 
 void Mat::addref()
 {
-    if( u )
+    nếu( u )
         CV_XADD(&u->refcount, 1);
 }
 
 void Mat::release()
 {
-    if( u && CV_XADD(&u->refcount, -1) == 1 )
+    nếu( u && CV_XADD(&u->refcount, -1) == 1 )
         deallocate();
     u = NULL;
     datastart = dataend = datalimit = data = 0;
-    for(int i = 0; i < dims; i++)
+    cho(số_nguyên i = 0; i < dims; i++)
         size.p[i] = 0;
     flags = (flags & CV_MAT_TYPE_MASK) | MAGIC_VAL;
     dims = rows = cols = 0;
     size.clear();
 }
 
-size_t Mat::step1(int i) const
+size_t Mat::step1(số_nguyên i) const
 {
-    return step.p[i] / elemSize1();
+    trả_về step.p[i] / elemSize1();
 }
 
 bool Mat::empty() const
 {
-    return data == 0 || total() == 0;
+    trả_về data == 0 || total() == 0;
 }
 
 size_t Mat::total() const
 {
-    if( dims <= 2 )
-        return (size_t)rows * cols;
+    nếu( dims <= 2 )
+        trả_về (size_t)rows * cols;
     size_t p = 1;
-    for( int i = 0; i < dims; i++ )
+    cho( số_nguyên i = 0; i < dims; i++ )
         p *= size[i];
-    return p;
+    trả_về p;
 }
 
-size_t Mat::total(int startDim, int endDim) const
+size_t Mat::total(số_nguyên startDim, số_nguyên endDim) const
 {
     CV_Assert( 0 <= startDim && startDim <= endDim);
     size_t p = 1;
-    int endDim_ = endDim <= dims ? endDim : dims;
-    for( int i = startDim; i < endDim_; i++ )
+    số_nguyên endDim_ = endDim <= dims ? endDim : dims;
+    cho( số_nguyên i = startDim; i < endDim_; i++ )
         p *= size[i];
-    return p;
+    trả_về p;
 }
 
 Mat::Mat(Mat&& m) CV_NOEXCEPT
@@ -1212,8 +1212,8 @@ Mat::Mat(Mat&& m) CV_NOEXCEPT
 
 Mat& Mat::operator = (Mat&& m)
 {
-    if (this == &m)
-      return *this;
+    nếu (this == &m)
+      trả_về *this;
 
     release();
     flags = m.flags; dims = m.dims; rows = m.rows; cols = m.cols; data = m.data;
@@ -1225,48 +1225,48 @@ Mat& Mat::operator = (Mat&& m)
     m.data = NULL; m.datastart = NULL; m.dataend = NULL; m.datalimit = NULL;
     m.allocator = NULL;
     m.u = NULL;
-    return *this;
+    trả_về *this;
 }
 
 
-void Mat::create(int d0, const int* _sizes, int _type)
+void Mat::create(số_nguyên d0, const số_nguyên* _sizes, số_nguyên _type)
 {
-    int sz1 = 1, d = d0;
-    int i;
-    if (d == 0) {
+    số_nguyên sz1 = 1, d = d0;
+    số_nguyên i;
+    nếu (d == 0) {
         d = 1;
-        _sizes = (const int*)&sz1;
+        _sizes = (const số_nguyên*)&sz1;
     }
     CV_Assert(0 <= d && d <= CV_MAX_DIM && _sizes);
     _type = CV_MAT_TYPE(_type);
 
-    if( data && d == dims && _type == type() )
+    nếu( data && d == dims && _type == type() )
     {
-        for( i = 0; i < d; i++ )
-            if( size[i] != _sizes[i] )
+        cho( i = 0; i < d; i++ )
+            nếu( size[i] != _sizes[i] )
                 break;
-        if( i == d )
-            return;
+        nếu( i == d )
+            trả_về;
     }
 
-    int _sizes_backup[CV_MAX_DIM]; // #5991
-    if (_sizes == (this->size.p))
+    số_nguyên _sizes_backup[CV_MAX_DIM]; // #5991
+    nếu (_sizes == (this->size.p))
     {
-        for(i = 0; i < d; i++ )
+        cho(i = 0; i < d; i++ )
             _sizes_backup[i] = _sizes[i];
         _sizes = _sizes_backup;
     }
 
     release();
-    if( d == 0 )
-        return;
+    nếu( d == 0 )
+        trả_về;
     flags = (_type & CV_MAT_TYPE_MASK) | MAGIC_VAL;
     setSize(*this, d, _sizes, 0, true);
 
-    if( total() > 0 )
+    nếu( total() > 0 )
     {
         MatAllocator *a = allocator, *a0 = getDefaultAllocator();
-        if(!a)
+        nếu(!a)
             a = a0;
         try
         {
@@ -1276,7 +1276,7 @@ void Mat::create(int d0, const int* _sizes, int _type)
         }
         catch (...)
         {
-            if (a == a0)
+            nếu (a == a0)
                 throw;
             u = a0->allocate(dims, size.p, _type, 0, step.p, ACCESS_RW /* ignored */, USAGE_DEFAULT);
             CV_Assert(u != 0);
@@ -1290,29 +1290,29 @@ void Mat::create(int d0, const int* _sizes, int _type)
     size.dims = dims = d0;
 }
 
-void Mat::create(const std::vector<int>& _sizes, int _type)
+void Mat::create(const std::vector<số_nguyên>& _sizes, số_nguyên _type)
 {
-    create((int)_sizes.size(), _sizes.data(), _type);
+    create((số_nguyên)_sizes.size(), _sizes.data(), _type);
 }
 
-void Mat::create(const MatShape& _shape, int _type)
+void Mat::create(const MatShape& _shape, số_nguyên _type)
 {
-    if (_shape.dims < 0) {
+    nếu (_shape.dims < 0) {
         release();
-        return;
+        trả_về;
     }
     create(_shape.dims, _shape.p, _type);
     size.layout = _shape.layout;
     size.C = _shape.C;
 }
 
-void Mat::create(std::initializer_list<int> _shape, int _type)
+void Mat::create(std::initializer_list<số_nguyên> _shape, số_nguyên _type)
 {
-    int new_shape[MatShape::MAX_DIMS];
-    int new_ndims = (int)_shape.size();
+    số_nguyên new_shape[MatShape::MAX_DIMS];
+    số_nguyên new_ndims = (số_nguyên)_shape.size();
     CV_Assert(new_ndims <= MatShape::MAX_DIMS);
     auto it = _shape.begin();
-    for (int i = 0; i < new_ndims; i++, ++it)
+    cho (số_nguyên i = 0; i < new_ndims; i++, ++it)
         new_shape[i] = *it;
 
     create(new_ndims, new_shape, _type);
@@ -1329,7 +1329,7 @@ void Mat::copySize(const Mat& m)
 
 void Mat::deallocate()
 {
-    if(u)
+    nếu(u)
     {
         UMatData* u_ = u;
         u = NULL;
@@ -1345,21 +1345,21 @@ Mat::Mat(const Mat& m, const Range& _rowRange, const Range& _colRange)
     CV_Assert(m.dims >= 2 ||
               (m.dims == 1 && (_rowRange == Range::all() ||
                                _rowRange == Range(0, m.rows))));
-    if( m.dims > 2 )
+    nếu( m.dims > 2 )
     {
         Range rs[MatShape::MAX_DIMS];
         rs[0] = _rowRange;
         rs[1] = _colRange;
-        for( int i = 2; i < m.dims; i++ )
+        cho( số_nguyên i = 2; i < m.dims; i++ )
             rs[i] = Range::all();
         *this = m(rs);
-        return;
+        trả_về;
     }
 
     *this = m;
     try
     {
-        if( _rowRange != Range::all() && _rowRange != Range(0,rows) )
+        nếu( _rowRange != Range::all() && _rowRange != Range(0,rows) )
         {
             CV_Assert( 0 <= _rowRange.start && _rowRange.start <= _rowRange.end
                        && _rowRange.end <= m.rows );
@@ -1368,7 +1368,7 @@ Mat::Mat(const Mat& m, const Range& _rowRange, const Range& _colRange)
             flags |= SUBMATRIX_FLAG;
         }
 
-        if( _colRange != Range::all() && _colRange != Range(0,cols) )
+        nếu( _colRange != Range::all() && _colRange != Range(0,cols) )
         {
             CV_Assert( 0 <= _colRange.start && _colRange.start <= _colRange.end
                        && _colRange.end <= m.cols );
@@ -1385,7 +1385,7 @@ Mat::Mat(const Mat& m, const Range& _rowRange, const Range& _colRange)
 
     updateContinuityFlag();
 
-    if( rows <= 0 || cols <= 0 )
+    nếu( rows <= 0 || cols <= 0 )
     {
         release();
         rows = cols = 0;
@@ -1405,7 +1405,7 @@ Mat::Mat(const Mat& m, const Rect& roi)
     data += roi.x*esz;
     CV_Assert( 0 <= roi.x && 0 <= roi.width && roi.x + roi.width <= m.cols &&
               0 <= roi.y && 0 <= roi.height && roi.y + roi.height <= m.rows );
-    if( roi.width < m.cols || roi.height < m.rows )
+    nếu( roi.width < m.cols || roi.height < m.rows )
         flags |= SUBMATRIX_FLAG;
 
     size[0] = rows;
@@ -1415,7 +1415,7 @@ Mat::Mat(const Mat& m, const Rect& roi)
     updateContinuityFlag();
 
     addref();
-    if( rows <= 0 || cols <= 0 )
+    nếu( rows <= 0 || cols <= 0 )
     {
         rows = cols = 0;
         release();
@@ -1423,59 +1423,59 @@ Mat::Mat(const Mat& m, const Rect& roi)
 }
 
 
-Mat::Mat(int _dims, const int* _sizes, int _type, void* _data, const size_t* _steps)
+Mat::Mat(số_nguyên _dims, const số_nguyên* _sizes, số_nguyên _type, void* _data, const size_t* _steps)
     : flags(MAGIC_VAL), dims(0), rows(0), cols(0), data(0), datastart(0), dataend(0),
       datalimit(0), allocator(0), u(0)
 {
     flags |= CV_MAT_TYPE(_type);
     datastart = data = (uchar*)_data;
-    if (_dims > 0 || _data != nullptr)
+    nếu (_dims > 0 || _data != nullptr)
         setSize(*this, _dims, _sizes, _steps, true);
     finalizeHdr(*this);
 }
 
 
-Mat::Mat(const std::vector<int>& _sizes, int _type, void* _data, const size_t* _steps)
+Mat::Mat(const std::vector<số_nguyên>& _sizes, số_nguyên _type, void* _data, const size_t* _steps)
     : flags(MAGIC_VAL), dims(0), rows(0), cols(0), data(0), datastart(0), dataend(0),
       datalimit(0), allocator(0), u(0)
 {
     flags |= CV_MAT_TYPE(_type);
     datastart = data = (uchar*)_data;
-    int _dims = (int)_sizes.size();
-    if (_dims > 0 || _data != nullptr)
+    số_nguyên _dims = (số_nguyên)_sizes.size();
+    nếu (_dims > 0 || _data != nullptr)
         setSize(*this, _dims, _sizes.data(), _steps, true);
     finalizeHdr(*this);
 }
 
-Mat::Mat(const MatShape& _shape, int _type, void* _data, const size_t* _steps)
+Mat::Mat(const MatShape& _shape, số_nguyên _type, void* _data, const size_t* _steps)
     : flags(MAGIC_VAL), dims(0), rows(0), cols(0), data(0), datastart(0), dataend(0),
       datalimit(0), allocator(0), u(0)
 {
     flags |= CV_MAT_TYPE(_type);
     datastart = data = (uchar*)_data;
-    if (_shape.dims >= 0) {
+    nếu (_shape.dims >= 0) {
         setSize(*this, _shape.dims, _shape.p, _steps, true);
     }
-    else {
+    không_thì {
         CV_Assert(!data);
     }
     finalizeHdr(*this);
 }
 
-Mat::Mat(std::initializer_list<int> _shape, int _type, void* _data, const size_t* _steps)
+Mat::Mat(std::initializer_list<số_nguyên> _shape, số_nguyên _type, void* _data, const size_t* _steps)
     : flags(MAGIC_VAL), dims(0), rows(0), cols(0), data(0), datastart(0), dataend(0),
       datalimit(0), allocator(0), u(0)
 {
-    int new_shape[MatShape::MAX_DIMS];
-    int _dims = (int)_shape.size();
+    số_nguyên new_shape[MatShape::MAX_DIMS];
+    số_nguyên _dims = (số_nguyên)_shape.size();
     CV_Assert(_dims <= MatShape::MAX_DIMS);
     auto it = _shape.begin();
-    for (int i = 0; i < _dims; i++, ++it)
+    cho (số_nguyên i = 0; i < _dims; i++, ++it)
         new_shape[i] = *it;
 
     flags |= CV_MAT_TYPE(_type);
     datastart = data = (uchar*)_data;
-    if (_dims > 0 || _data != nullptr)
+    nếu (_dims > 0 || _data != nullptr)
         setSize(*this, _dims, new_shape, _steps, true);
     finalizeHdr(*this);
 }
@@ -1484,19 +1484,19 @@ Mat::Mat(const Mat& m, const Range* ranges)
     : flags(MAGIC_VAL), dims(0), rows(0), cols(0), data(0), datastart(0), dataend(0),
       datalimit(0), allocator(0), u(0)
 {
-    int d = m.dims;
+    số_nguyên d = m.dims;
 
     CV_Assert(ranges);
-    for( int i = 0; i < d; i++ )
+    cho( số_nguyên i = 0; i < d; i++ )
     {
         Range r = ranges[i];
         CV_Assert( r == Range::all() || (0 <= r.start && r.start < r.end && r.end <= m.size[i]) );
     }
     *this = m;
-    for( int i = 0; i < d; i++ )
+    cho( số_nguyên i = 0; i < d; i++ )
     {
         Range r = ranges[i];
-        if( r != Range::all() && r != Range(0, size.p[i]))
+        nếu( r != Range::all() && r != Range(0, size.p[i]))
         {
             size.p[i] = r.end - r.start;
             data += r.start*step.p[i];
@@ -1504,7 +1504,7 @@ Mat::Mat(const Mat& m, const Range* ranges)
         }
     }
 
-    if (d <= 2) {
+    nếu (d <= 2) {
         rows = d == 2 ? size[0] : 1;
         cols = d <= 0 ? (d >= 0) : size[d > 1];
     }
@@ -1515,19 +1515,19 @@ Mat::Mat(const Mat& m, const std::vector<Range>& ranges)
     : flags(MAGIC_VAL), dims(0), rows(0), cols(0), data(0), datastart(0), dataend(0),
     datalimit(0), allocator(0), u(0)
 {
-    int d = m.dims;
+    số_nguyên d = m.dims;
 
-    CV_Assert((int)ranges.size() == d);
-    for (int i = 0; i < d; i++)
+    CV_Assert((số_nguyên)ranges.size() == d);
+    cho (số_nguyên i = 0; i < d; i++)
     {
         Range r = ranges[i];
         CV_Assert(r == Range::all() || (0 <= r.start && r.start < r.end && r.end <= m.size[i]));
     }
     *this = m;
-    for (int i = 0; i < d; i++)
+    cho (số_nguyên i = 0; i < d; i++)
     {
         Range r = ranges[i];
-        if (r != Range::all() && r != Range(0, size.p[i]))
+        nếu (r != Range::all() && r != Range(0, size.p[i]))
         {
             size.p[i] = r.end - r.start;
             data += r.start*step.p[i];
@@ -1535,7 +1535,7 @@ Mat::Mat(const Mat& m, const std::vector<Range>& ranges)
         }
     }
 
-    if (d <= 2) {
+    nếu (d <= 2) {
         rows = d == 2 ? size[0] : 1;
         cols = d <= 0 ? (d >= 0) : size[d > 1];
     }
@@ -1543,19 +1543,19 @@ Mat::Mat(const Mat& m, const std::vector<Range>& ranges)
 }
 
 
-Mat Mat::diag(int d) const
+Mat Mat::diag(số_nguyên d) const
 {
     CV_Assert( dims == 2 );
     Mat m = *this;
     size_t esz = elemSize();
-    int len;
+    số_nguyên len;
 
-    if( d >= 0 )
+    nếu( d >= 0 )
     {
         len = std::min(cols - d, rows);
         m.data += esz*d;
     }
-    else
+    không_thì
     {
         len = std::min(rows + d, cols);
         m.data -= step[0]*d;
@@ -1568,10 +1568,10 @@ Mat Mat::diag(int d) const
 
     m.updateContinuityFlag();
 
-    if( size() != Size(1,1) )
+    nếu( size() != Size(1,1) )
         m.flags |= SUBMATRIX_FLAG;
 
-    return m;
+    trả_về m;
 }
 
 
@@ -1580,14 +1580,14 @@ void Mat::pop_back(size_t nelems)
     CV_Assert( nelems <= (size_t)size.p[0] );
     CV_Assert( dims >= 1 );
 
-    if( isSubmatrix() )
-        *this = rowRange(0, size.p[0] - (int)nelems);
-    else
+    nếu( isSubmatrix() )
+        *this = rowRange(0, size.p[0] - (số_nguyên)nelems);
+    không_thì
     {
-        size.p[0] -= (int)nelems;
-        if (dims == 2)
+        size.p[0] -= (số_nguyên)nelems;
+        nếu (dims == 2)
             rows = size.p[0];
-        else if (dims == 1)
+        không_thì nếu (dims == 1)
             cols = size.p[0];
         dataend -= nelems*step.p[0];
     }
@@ -1597,21 +1597,21 @@ void Mat::pop_back(size_t nelems)
 void Mat::push_back_(const void* elem)
 {
     size_t r = size.p[0];
-    if( isSubmatrix() || dataend + step.p[0] > datalimit )
+    nếu( isSubmatrix() || dataend + step.p[0] > datalimit )
         reserve( std::max(r + 1, (r*3+1)/2) );
 
     size_t esz = elemSize();
     memcpy(data + r*step.p[0], elem, esz);
-    size.p[0] = int(r + 1);
-    if (dims == 2)
+    size.p[0] = số_nguyên(r + 1);
+    nếu (dims == 2)
         rows = size.p[0];
-    else if (dims == 1)
+    không_thì nếu (dims == 1)
         cols = size.p[0];
     dataend += step.p[0];
     uint64 tsz = size.p[0];
-    for( int i = 1; i < dims; i++ )
+    cho( số_nguyên i = 1; i < dims; i++ )
         tsz *= size.p[i];
-    if( esz < step.p[0] || tsz != (uint64)(int)tsz )
+    nếu( esz < step.p[0] || tsz != (uint64)(số_nguyên)tsz )
         flags &= ~CONTINUOUS_FLAG;
 }
 
@@ -1620,29 +1620,29 @@ void Mat::reserve(size_t nelems)
 {
     const size_t MIN_SIZE = 64;
 
-    CV_Assert( (int)nelems >= 0 );
-    if( !isSubmatrix() && step.p[0] != 0 && data + step.p[0]*nelems <= datalimit )
-        return;
+    CV_Assert( (số_nguyên)nelems >= 0 );
+    nếu( !isSubmatrix() && step.p[0] != 0 && data + step.p[0]*nelems <= datalimit )
+        trả_về;
 
-    int r = size.p[0];
-    if( (size_t)r >= nelems)
-        return;
+    số_nguyên r = size.p[0];
+    nếu( (size_t)r >= nelems)
+        trả_về;
 
     MatShape newsize = size;
     size_t esz = elemSize();
     newsize.dims = std::max(newsize.dims, 1);
-    if (dims > 1 && r == 0 && step.p[0] == 0) {
+    nếu (dims > 1 && r == 0 && step.p[0] == 0) {
         step.p[0] = size.p[1] * (dims == 2 ? esz : step.p[1]);
     }
-    newsize.p[0] = (int)nelems;
+    newsize.p[0] = (số_nguyên)nelems;
     size_t newbytes = newsize.total() * esz;
-    if (newbytes < MIN_SIZE) {
+    nếu (newbytes < MIN_SIZE) {
         newsize.p[0] = 1;
-        newsize.p[0] = int(MIN_SIZE / newsize.total() / esz);
+        newsize.p[0] = số_nguyên(MIN_SIZE / newsize.total() / esz);
     }
 
     Mat m(newsize, type());
-    if( r > 0)
+    nếu( r > 0)
     {
         Mat mpart = m.rowRange(0, r);
         copyTo(mpart);
@@ -1651,9 +1651,9 @@ void Mat::reserve(size_t nelems)
     *this = m;
     size.p[0] = r;
 
-    if (dims == 2)
+    nếu (dims == 2)
         rows = size.p[0];
-    else if (dims == 1)
+    không_thì nếu (dims == 1)
         cols = size.p[0];
     dataend = data + step.p[0]*r;
 }
@@ -1662,25 +1662,25 @@ void Mat::reserve(size_t nelems)
 void Mat::reserveBuffer(size_t nbytes)
 {
     size_t esz = 1;
-    int mtype = CV_8UC1;
-    if (!empty())
+    số_nguyên mtype = CV_8UC1;
+    nếu (!empty())
     {
-        if (!isSubmatrix() && data + nbytes <= dataend)//Should it be datalimit?
-            return;
+        nếu (!isSubmatrix() && data + nbytes <= dataend)//Should it be datalimit?
+            trả_về;
         esz = elemSize();
         mtype = type();
     }
 
     size_t nelems = (nbytes - 1) / esz + 1;
 
-#if SIZE_MAX > UINT_MAX
+#nếu SIZE_MAX > UINT_MAX
     CV_Assert(nelems <= size_t(INT_MAX)*size_t(INT_MAX));
-    int newrows = nelems > size_t(INT_MAX) ? nelems > 0x400*size_t(INT_MAX) ? nelems > 0x100000 * size_t(INT_MAX) ? nelems > 0x40000000 * size_t(INT_MAX) ?
+    số_nguyên newrows = nelems > size_t(INT_MAX) ? nelems > 0x400*size_t(INT_MAX) ? nelems > 0x100000 * size_t(INT_MAX) ? nelems > 0x40000000 * size_t(INT_MAX) ?
                   size_t(INT_MAX) : 0x40000000 : 0x100000 : 0x400 : 1;
-#else
-    int newrows = nelems > size_t(INT_MAX) ? 2 : 1;
+#không_thì
+    số_nguyên newrows = nelems > size_t(INT_MAX) ? 2 : 1;
 #endif
-    int newcols = (int)((nelems - 1) / newrows + 1);
+    số_nguyên newcols = (số_nguyên)((nelems - 1) / newrows + 1);
 
     create(newrows, newcols, mtype);
 }
@@ -1688,18 +1688,18 @@ void Mat::reserveBuffer(size_t nbytes)
 
 void Mat::resize(size_t nelems)
 {
-    int r = size.p[0];
-    if( r == (int)nelems )
-        return;
-    CV_Assert( (int)nelems >= 0 );
+    số_nguyên r = size.p[0];
+    nếu( r == (số_nguyên)nelems )
+        trả_về;
+    CV_Assert( (số_nguyên)nelems >= 0 );
 
-    if( isSubmatrix() || data + step.p[0]*nelems > datalimit )
+    nếu( isSubmatrix() || data + step.p[0]*nelems > datalimit )
         reserve(nelems);
 
-    size.p[0] = (int)nelems;
-    if (dims == 2)
+    size.p[0] = (số_nguyên)nelems;
+    nếu (dims == 2)
         rows = size.p[0];
-    else if (dims == 1)
+    không_thì nếu (dims == 1)
         cols = size.p[0];
     dataend += (size.p[0] - r)*(int64_t)step.p[0];
 
@@ -1709,10 +1709,10 @@ void Mat::resize(size_t nelems)
 
 void Mat::resize(size_t nelems, const Scalar& s)
 {
-    int saveRows = size.p[0];
+    số_nguyên saveRows = size.p[0];
     resize(nelems);
 
-    if( size.p[0] > saveRows )
+    nếu( size.p[0] > saveRows )
     {
         Mat part = rowRange(saveRows, size.p[0]);
         part = s;
@@ -1723,53 +1723,53 @@ void Mat::push_back(const Mat& elems)
 {
     size_t r = size.p[0];
     size_t delta = elems.size.p[0];
-    if( delta == 0 )
-        return;
-    if( this == &elems )
+    nếu( delta == 0 )
+        trả_về;
+    nếu( this == &elems )
     {
         Mat tmp = elems;
         push_back(tmp);
-        return;
+        trả_về;
     }
-    if( !data )
+    nếu( !data )
     {
         *this = elems.clone();
-        return;
+        trả_về;
     }
     CV_Assert(dims > 0);
 
     size.p[0] = elems.size.p[0];
     bool eq = size == elems.size;
-    size.p[0] = int(r);
-    if( !eq )
+    size.p[0] = số_nguyên(r);
+    nếu( !eq )
         CV_Error(cv::Error::StsUnmatchedSizes, "Pushed vector length is not equal to matrix row length");
-    if( type() != elems.type() )
+    nếu( type() != elems.type() )
         CV_Error(cv::Error::StsUnmatchedFormats, "Pushed vector type is not the same as matrix type");
     size_t esz = elemSize();
     size_t minstep = dims <= 1 ? esz : size.p[1] * (dims == 2 ? esz : step.p[1]);
     size_t step0 = step.p[0];
-    if (step0 < minstep) {
-        if (size.p[0] <= 1)
+    nếu (step0 < minstep) {
+        nếu (size.p[0] <= 1)
             step.p[0] = step0 = minstep;
     }
 
-    if( isSubmatrix() || dataend + step0*delta > datalimit )
+    nếu( isSubmatrix() || dataend + step0*delta > datalimit )
         reserve( std::max(r + delta, (r*3+1)/2) );
 
-    size.p[0] += int(delta);
-    if (dims == 2)
+    size.p[0] += số_nguyên(delta);
+    nếu (dims == 2)
         rows = size.p[0];
-    else if (dims == 1)
+    không_thì nếu (dims == 1)
         cols = size.p[0];
     dataend += step0*delta;
 
     //updateContinuityFlag(*this);
 
-    if( isContinuous() && elems.isContinuous() )
+    nếu( isContinuous() && elems.isContinuous() )
         memcpy(data + r*step0, elems.data, elems.total()*elems.elemSize());
-    else
+    không_thì
     {
-        Mat part = rowRange(int(r), int(r + delta));
+        Mat part = rowRange(số_nguyên(r), số_nguyên(r + delta));
         elems.copyTo(part);
     }
 }
@@ -1781,58 +1781,58 @@ void Mat::locateROI( Size& wholeSize, Point& ofs ) const
     size_t esz = elemSize(), minstep;
     ptrdiff_t delta1 = data - datastart, delta2 = dataend - datastart;
 
-    if( delta1 == 0 )
+    nếu( delta1 == 0 )
         ofs.x = ofs.y = 0;
-    else
+    không_thì
     {
-        ofs.y = (int)(delta1/step[0]);
-        ofs.x = (int)((delta1 - step[0]*ofs.y)/esz);
+        ofs.y = (số_nguyên)(delta1/step[0]);
+        ofs.x = (số_nguyên)((delta1 - step[0]*ofs.y)/esz);
         CV_DbgAssert( data == datastart + ofs.y*step[0] + ofs.x*esz );
     }
     minstep = (ofs.x + cols)*esz;
-    wholeSize.height = (int)((delta2 - minstep)/step[0] + 1);
+    wholeSize.height = (số_nguyên)((delta2 - minstep)/step[0] + 1);
     wholeSize.height = std::max(wholeSize.height, ofs.y + rows);
-    wholeSize.width = (int)((delta2 - step*(wholeSize.height-1))/esz);
+    wholeSize.width = (số_nguyên)((delta2 - step*(wholeSize.height-1))/esz);
     wholeSize.width = std::max(wholeSize.width, ofs.x + cols);
 }
 
-Mat& Mat::adjustROI( int dtop, int dbottom, int dleft, int dright )
+Mat& Mat::adjustROI( số_nguyên dtop, số_nguyên dbottom, số_nguyên dleft, số_nguyên dright )
 {
     CV_Assert( dims <= 2 && step[0] > 0 );
     Size wholeSize; Point ofs;
     size_t esz = elemSize();
     locateROI( wholeSize, ofs );
-    int row1 = std::min(std::max(ofs.y - dtop, 0), wholeSize.height), row2 = std::max(0, std::min(ofs.y + rows + dbottom, wholeSize.height));
-    int col1 = std::min(std::max(ofs.x - dleft, 0), wholeSize.width), col2 = std::max(0, std::min(ofs.x + cols + dright, wholeSize.width));
-    if(row1 > row2)
+    số_nguyên row1 = std::min(std::max(ofs.y - dtop, 0), wholeSize.height), row2 = std::max(0, std::min(ofs.y + rows + dbottom, wholeSize.height));
+    số_nguyên col1 = std::min(std::max(ofs.x - dleft, 0), wholeSize.width), col2 = std::max(0, std::min(ofs.x + cols + dright, wholeSize.width));
+    nếu(row1 > row2)
         std::swap(row1, row2);
-    if(col1 > col2)
+    nếu(col1 > col2)
         std::swap(col1, col2);
 
-    if (dims == 1) {
+    nếu (dims == 1) {
         data += (col1 - ofs.x)*(std::ptrdiff_t)esz;
         cols = col2 - col1;
         size.p[0] = cols;
-    } else {
+    } không_thì {
         data += (row1 - ofs.y)*(std::ptrdiff_t)step + (col1 - ofs.x)*(std::ptrdiff_t)esz;
         rows = row2 - row1; cols = col2 - col1;
         size.p[0] = rows; size.p[1] = cols;
         updateContinuityFlag();
     }
-    return *this;
+    trả_về *this;
 }
 
-Mat Mat::reshape(int new_cn, int new_rows) const
+Mat Mat::reshape(số_nguyên new_cn, số_nguyên new_rows) const
 {
-    int cn = channels();
+    số_nguyên cn = channels();
     Mat hdr = *this;
 
-    if( new_cn == 0 )
+    nếu( new_cn == 0 )
         new_cn = cn;
 
-    if( dims > 2 )
+    nếu( dims > 2 )
     {
-        if( new_rows == 0 )
+        nếu( new_rows == 0 )
         {
             // special case: just change the number of channnels; retain the same shape,
             // except for the last, innermost dimension
@@ -1840,42 +1840,42 @@ Mat Mat::reshape(int new_cn, int new_rows) const
             hdr.flags = (hdr.flags & ~CV_MAT_CN_MASK) | ((new_cn-1) << CV_CN_SHIFT);
             hdr.step[dims-1] = CV_ELEM_SIZE(hdr.flags);
             hdr.size[dims-1] = hdr.size[dims-1]*cn / new_cn;
-            return hdr;
+            trả_về hdr;
         }
         CV_Assert( new_rows > 0 );
-        int sz[] = { new_rows, (int)(total()*cn/new_rows) };
-        return reshape(new_cn, 2, sz);
+        số_nguyên sz[] = { new_rows, (số_nguyên)(total()*cn/new_rows) };
+        trả_về reshape(new_cn, 2, sz);
     }
 
-    int total_width = cols * cn;
+    số_nguyên total_width = cols * cn;
 
-    if( (new_cn > total_width || total_width % new_cn != 0) && new_rows == 0 )
+    nếu( (new_cn > total_width || total_width % new_cn != 0) && new_rows == 0 )
         new_rows = rows * total_width / new_cn;
 
-    if( new_rows != 0 && new_rows != rows )
+    nếu( new_rows != 0 && new_rows != rows )
     {
-        int total_size = total_width * rows;
-        if( !isContinuous() )
+        số_nguyên total_size = total_width * rows;
+        nếu( !isContinuous() )
             CV_Error( cv::Error::BadStep,
             "The matrix is not continuous, thus its number of rows can not be changed" );
 
         total_width = total_size / new_rows;
 
-        if( total_width * new_rows != total_size )
+        nếu( total_width * new_rows != total_size )
             CV_Error( cv::Error::StsBadArg, "The total number of matrix elements "
                                     "is not divisible by the new number of rows" );
 
         hdr.size[0] = hdr.rows = new_rows;
         hdr.step[0] = total_width * elemSize1();
-    } else {
+    } không_thì {
         hdr.size[0] = hdr.rows = rows;
-        if (dims <= 1)
+        nếu (dims <= 1)
             hdr.step[0] = cols * CV_ELEM_SIZE(flags);
     }
 
-    int new_width = total_width / new_cn;
+    số_nguyên new_width = total_width / new_cn;
 
-    if( new_width * new_cn != total_width )
+    nếu( new_width * new_cn != total_width )
         CV_Error( cv::Error::BadNumChannels,
         "The total width is not divisible by the new number of channels" );
 
@@ -1883,58 +1883,58 @@ Mat Mat::reshape(int new_cn, int new_rows) const
     hdr.size[1] = hdr.cols = new_width;
     hdr.flags = (hdr.flags & ~CV_MAT_CN_MASK) | ((new_cn-1) << CV_CN_SHIFT);
     hdr.step[1] = CV_ELEM_SIZE(hdr.flags);
-    return hdr;
+    trả_về hdr;
 }
 
-Mat Mat::reshape(int _cn, int _newndims, const int* _newsz) const
+Mat Mat::reshape(số_nguyên _cn, số_nguyên _newndims, const số_nguyên* _newsz) const
 {
-    if(_newndims == dims)
+    nếu(_newndims == dims)
     {
-        if(_newsz == 0)
-            return reshape(_cn);
-        if(_newndims == 2)
-            return reshape(_cn, _newsz[0]);
+        nếu(_newsz == 0)
+            trả_về reshape(_cn);
+        nếu(_newndims == 2)
+            trả_về reshape(_cn, _newsz[0]);
     }
 
-    if (isContinuous())
+    nếu (isContinuous())
     {
         CV_Assert(_cn >= 0 && _newndims >= 0 && _newndims <= CV_MAX_DIM && (_newndims == 0 || _newsz != 0));
 
-        if (_cn == 0)
+        nếu (_cn == 0)
             _cn = this->channels();
-        else
+        không_thì
             CV_Assert(_cn <= CV_CN_MAX);
 
         size_t total_elem1_ref = this->total() * this->channels();
         size_t total_elem1 = _cn;
 
-        AutoBuffer<int, 4> newsz_buf( (size_t)_newndims );
+        AutoBuffer<số_nguyên, 4> newsz_buf( (size_t)_newndims );
 
-        int m1_idx = -1;
+        số_nguyên m1_idx = -1;
 
-        for (int i = 0; i < _newndims; i++)
+        cho (số_nguyên i = 0; i < _newndims; i++)
         {
-            if (_newsz[i] >= 0) {
-                if (_newsz[i] == 0 && i < dims)
+            nếu (_newsz[i] >= 0) {
+                nếu (_newsz[i] == 0 && i < dims)
                     newsz_buf[i] = size.p[i];
-                else
+                không_thì
                     newsz_buf[i] = _newsz[i];
                 total_elem1 *= (size_t)newsz_buf[i];
-            } else {
-                if (m1_idx >= 0)
+            } không_thì {
+                nếu (m1_idx >= 0)
                     CV_Error(cv::Error::StsBadSize, "More than one '-1' occured in the new shape");
                 m1_idx = i;
             }
         }
 
-        if (m1_idx >= 0) {
-            if (total_elem1 == 0) {
+        nếu (m1_idx >= 0) {
+            nếu (total_elem1 == 0) {
                 CV_Assert(total_elem1_ref == 0);
                 total_elem1 = 1;
             }
             CV_Assert(total_elem1_ref % total_elem1 == 0);
-            newsz_buf[m1_idx] = (int)(total_elem1_ref / total_elem1);
-        } else if (total_elem1 != total_elem1_ref) {
+            newsz_buf[m1_idx] = (số_nguyên)(total_elem1_ref / total_elem1);
+        } không_thì nếu (total_elem1 != total_elem1_ref) {
             CV_Error(cv::Error::StsUnmatchedSizes, "Requested and source matrices have different count of elements");
         }
 
@@ -1942,128 +1942,128 @@ Mat Mat::reshape(int _cn, int _newndims, const int* _newsz) const
         hdr.flags = (hdr.flags & ~CV_MAT_CN_MASK) | ((_cn-1) << CV_CN_SHIFT);
         setSize(hdr, _newndims, newsz_buf.data(), NULL, true);
 
-        return hdr;
+        trả_về hdr;
     }
 
     CV_Error(cv::Error::StsNotImplemented, "Reshaping of n-dimensional non-continuous matrices is not supported yet");
     // TBD
 }
 
-Mat Mat::reshape(int _cn, const std::vector<int>& _newshape) const
+Mat Mat::reshape(số_nguyên _cn, const std::vector<số_nguyên>& _newshape) const
 {
-    int newdims = (int)_newshape.size();
-    if(newdims == 0 && empty())
+    số_nguyên newdims = (số_nguyên)_newshape.size();
+    nếu(newdims == 0 && empty())
     {
-        return *this;
+        trả_về *this;
     }
 
-    return reshape(_cn, newdims, newdims > 0 ? &_newshape[0] : 0);
+    trả_về reshape(_cn, newdims, newdims > 0 ? &_newshape[0] : 0);
 }
 
-Mat Mat::reshape(int _cn, const MatShape& _newshape) const
+Mat Mat::reshape(số_nguyên _cn, const MatShape& _newshape) const
 {
-    if (_newshape.dims < 0) {
-        int newshape[] = {0};
-        return reshape(_cn, 1, newshape);
+    nếu (_newshape.dims < 0) {
+        số_nguyên newshape[] = {0};
+        trả_về reshape(_cn, 1, newshape);
     }
-    return reshape(_cn, _newshape.dims, _newshape.p);
+    trả_về reshape(_cn, _newshape.dims, _newshape.p);
 }
 
-Mat Mat::reshape(int _cn, std::initializer_list<int> newshape_) const
+Mat Mat::reshape(số_nguyên _cn, std::initializer_list<số_nguyên> newshape_) const
 {
-    int newshape[MatShape::MAX_DIMS];
+    số_nguyên newshape[MatShape::MAX_DIMS];
     size_t i, newshape_dims = newshape_.size();
     CV_Assert(newshape_dims <= (size_t)MatShape::MAX_DIMS);
     auto it = newshape_.begin();
-    for (i = 0; i < newshape_dims; i++, ++it)
+    cho (i = 0; i < newshape_dims; i++, ++it)
         newshape[i] = *it;
-    return reshape(_cn, (int)newshape_dims, newshape);
+    trả_về reshape(_cn, (số_nguyên)newshape_dims, newshape);
 }
 
-Mat Mat::reinterpret(int type) const
+Mat Mat::reinterpret(số_nguyên type) const
 {
     type = CV_MAT_TYPE(type);
     CV_Assert(CV_ELEM_SIZE(this->type()) == CV_ELEM_SIZE(type));
     Mat m = *this;
     m.flags = (m.flags & ~CV_MAT_TYPE_MASK) | type;
     m.updateContinuityFlag();
-    return m;
+    trả_về m;
 }
 
 Mat Mat::diag(const Mat& d)
 {
     CV_Assert( d.cols == 1 || d.rows == 1 );
-    int len = d.rows + d.cols - 1;
+    số_nguyên len = d.rows + d.cols - 1;
     Mat m(len, len, d.type(), Scalar(0));
     Mat md = m.diag();
-    if( d.cols == 1 )
+    nếu( d.cols == 1 )
         d.copyTo(md);
-    else
+    không_thì
         transpose(d, md);
-    return m;
+    trả_về m;
 }
 
-int Mat::checkVector(int _elemChannels, int _depth, bool _requireContinuous) const
+số_nguyên Mat::checkVector(số_nguyên _elemChannels, số_nguyên _depth, bool _requireContinuous) const
 {
-    return data && (depth() == _depth || _depth <= 0) &&
+    trả_về data && (depth() == _depth || _depth <= 0) &&
         (isContinuous() || !_requireContinuous) &&
         ((dims <= 2 && (((rows == 1 || cols == 1) && channels() == _elemChannels) ||
                         (cols == _elemChannels && channels() == 1))) ||
         (dims == 3 && channels() == 1 && size.p[2] == _elemChannels && (size.p[0] == 1 || size.p[1] == 1) &&
          (isContinuous() || step.p[1] == step.p[2]*size.p[2])))
-    ? (int)(total()*channels()/_elemChannels) : -1;
+    ? (số_nguyên)(total()*channels()/_elemChannels) : -1;
 }
 
 
-static inline Size getContinuousSize_(int flags, int cols, int rows, int widthScale)
+static inline Size getContinuousSize_(số_nguyên flags, số_nguyên cols, số_nguyên rows, số_nguyên widthScale)
 {
     int64 sz = (int64)cols * rows * widthScale;
     bool has_int_overflow = sz >= INT_MAX;
     bool isContiguous = (flags & Mat::CONTINUOUS_FLAG) != 0;
-    return (isContiguous && !has_int_overflow)
-            ? Size((int)sz, 1)
+    trả_về (isContiguous && !has_int_overflow)
+            ? Size((số_nguyên)sz, 1)
             : Size(cols * widthScale, rows);
 }
 
-Size getContinuousSize2D(Mat& m1, int widthScale)
+Size getContinuousSize2D(Mat& m1, số_nguyên widthScale)
 {
     CV_CheckLE(m1.dims, 2, "");
-    return getContinuousSize_(m1.flags,
+    trả_về getContinuousSize_(m1.flags,
                               m1.cols, m1.rows, widthScale);
 }
-Size getContinuousSize2D(Mat& m1, Mat& m2, int widthScale)
+Size getContinuousSize2D(Mat& m1, Mat& m2, số_nguyên widthScale)
 {
     CV_CheckLE(m1.dims, 2, "");
     CV_CheckLE(m2.dims, 2, "");
     const Size sz1 = m1.size();
-    if (sz1 != m2.size())  // reshape all matrixes to the same size (#4159)
+    nếu (sz1 != m2.size())  // reshape all matrixes to the same size (#4159)
     {
         size_t total_sz = m1.total();
         CV_CheckEQ(total_sz, m2.total(), "");
         bool is_m1_vector = m1.cols == 1 || m1.rows == 1;
         bool is_m2_vector = m2.cols == 1 || m2.rows == 1;
         CV_Assert(is_m1_vector); CV_Assert(is_m2_vector);
-        int total = (int)total_sz;  // vector-column
+        số_nguyên total = (số_nguyên)total_sz;  // vector-column
         bool isContiguous = ((m1.flags & m2.flags) & Mat::CONTINUOUS_FLAG) != 0;
         bool has_int_overflow = ((int64)total_sz * widthScale) >= INT_MAX;
-        if (isContiguous && !has_int_overflow)
+        nếu (isContiguous && !has_int_overflow)
             total = 1; // vector-row
         m1 = m1.reshape(0, total);
         m2 = m2.reshape(0, total);
         CV_Assert(m1.cols == m2.cols && m1.rows == m2.rows);
-        return Size(m1.cols * widthScale, m1.rows);
+        trả_về Size(m1.cols * widthScale, m1.rows);
     }
-    return getContinuousSize_(m1.flags & m2.flags,
+    trả_về getContinuousSize_(m1.flags & m2.flags,
                               m1.cols, m1.rows, widthScale);
 }
 
-Size getContinuousSize2D(Mat& m1, Mat& m2, Mat& m3, int widthScale)
+Size getContinuousSize2D(Mat& m1, Mat& m2, Mat& m3, số_nguyên widthScale)
 {
     CV_CheckLE(m1.dims, 2, "");
     CV_CheckLE(m2.dims, 2, "");
     CV_CheckLE(m3.dims, 2, "");
     const Size sz1 = m1.size();
-    if (sz1 != m2.size() || sz1 != m3.size())  // reshape all matrixes to the same size (#4159)
+    nếu (sz1 != m2.size() || sz1 != m3.size())  // reshape all matrixes to the same size (#4159)
     {
         size_t total_sz = m1.total();
         CV_CheckEQ(total_sz, m2.total(), "");
@@ -2072,18 +2072,18 @@ Size getContinuousSize2D(Mat& m1, Mat& m2, Mat& m3, int widthScale)
         bool is_m2_vector = m2.cols == 1 || m2.rows == 1;
         bool is_m3_vector = m3.cols == 1 || m3.rows == 1;
         CV_Assert(is_m1_vector); CV_Assert(is_m2_vector); CV_Assert(is_m3_vector);
-        int total = (int)total_sz;  // vector-column
+        số_nguyên total = (số_nguyên)total_sz;  // vector-column
         bool isContiguous = ((m1.flags & m2.flags & m3.flags) & Mat::CONTINUOUS_FLAG) != 0;
         bool has_int_overflow = ((int64)total_sz * widthScale) >= INT_MAX;
-        if (isContiguous && !has_int_overflow)
+        nếu (isContiguous && !has_int_overflow)
             total = 1; // vector-row
         m1 = m1.reshape(0, total);
         m2 = m2.reshape(0, total);
         m3 = m3.reshape(0, total);
         CV_Assert(m1.cols == m2.cols && m1.rows == m2.rows && m1.cols == m3.cols && m1.rows == m3.rows);
-        return Size(m1.cols * widthScale, m1.rows);
+        trả_về Size(m1.cols * widthScale, m1.rows);
     }
-    return getContinuousSize_(m1.flags & m2.flags & m3.flags,
+    trả_về getContinuousSize_(m1.flags & m2.flags & m3.flags,
                               m1.cols, m1.rows, widthScale);
 }
 

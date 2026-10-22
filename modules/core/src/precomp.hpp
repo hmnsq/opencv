@@ -50,7 +50,7 @@
 
 #ifdef BUILD_PLUGIN
 #include "opencv2/core/utility.hpp"
-#else  // BUILD_PLUGIN
+#không_thì  // BUILD_PLUGIN
 
 #include "opencv2/opencv_modules.hpp"
 #include "cvconfig.h"
@@ -115,7 +115,7 @@ template<typename T1, typename T2=T1, typename T3=T1> struct OpNop
     typedef T1 type1;
     typedef T2 type2;
     typedef T3 rtype;
-    T3 operator ()(const T1 a) const { return saturate_cast<T3>(a); }
+    T3 operator ()(const T1 a) const { trả_về saturate_cast<T3>(a); }
 };
 
 template<typename T1, typename T2=T1, typename T3=T1> struct OpSqr
@@ -123,7 +123,7 @@ template<typename T1, typename T2=T1, typename T3=T1> struct OpSqr
     typedef T1 type1;
     typedef T2 type2;
     typedef T3 rtype;
-    T3 operator ()(const T1 a) const { return saturate_cast<T3>(a)*saturate_cast<T3>(a); }
+    T3 operator ()(const T1 a) const { trả_về saturate_cast<T3>(a)*saturate_cast<T3>(a); }
 };
 
 template<typename T1, typename T2=T1, typename T3=T1> struct OpAdd
@@ -131,7 +131,7 @@ template<typename T1, typename T2=T1, typename T3=T1> struct OpAdd
     typedef T1 type1;
     typedef T2 type2;
     typedef T3 rtype;
-    T3 operator ()(const T1 a, const T2 b) const { return saturate_cast<T3>(a + b); }
+    T3 operator ()(const T1 a, const T2 b) const { trả_về saturate_cast<T3>(a + b); }
 };
 
 template<typename T1, typename T2=T1, typename T3=T1> struct OpAddSqr
@@ -139,7 +139,7 @@ template<typename T1, typename T2=T1, typename T3=T1> struct OpAddSqr
     typedef T1 type1;
     typedef T2 type2;
     typedef T3 rtype;
-    T3 operator ()(const T1 a, const T2 b) const { return saturate_cast<T3>(a + saturate_cast<T3>(b)*saturate_cast<T3>(b)); }
+    T3 operator ()(const T1 a, const T2 b) const { trả_về saturate_cast<T3>(a + saturate_cast<T3>(b)*saturate_cast<T3>(b)); }
 };
 
 template<typename T1, typename T2=T1, typename T3=T1> struct OpSub
@@ -147,7 +147,7 @@ template<typename T1, typename T2=T1, typename T3=T1> struct OpSub
     typedef T1 type1;
     typedef T2 type2;
     typedef T3 rtype;
-    T3 operator ()(const T1 a, const T2 b) const { return saturate_cast<T3>(a - b); }
+    T3 operator ()(const T1 a, const T2 b) const { trả_về saturate_cast<T3>(a - b); }
 };
 
 template<typename T1, typename T2=T1, typename T3=T1> struct OpRSub
@@ -155,7 +155,7 @@ template<typename T1, typename T2=T1, typename T3=T1> struct OpRSub
     typedef T1 type1;
     typedef T2 type2;
     typedef T3 rtype;
-    T3 operator ()(const T1 a, const T2 b) const { return saturate_cast<T3>(b - a); }
+    T3 operator ()(const T1 a, const T2 b) const { trả_về saturate_cast<T3>(b - a); }
 };
 
 template<typename T> struct OpMin
@@ -163,7 +163,7 @@ template<typename T> struct OpMin
     typedef T type1;
     typedef T type2;
     typedef T rtype;
-    T operator ()(const T a, const T b) const { return std::min(a, b); }
+    T operator ()(const T a, const T b) const { trả_về std::min(a, b); }
 };
 
 template<typename T> struct OpMax
@@ -171,7 +171,7 @@ template<typename T> struct OpMax
     typedef T type1;
     typedef T type2;
     typedef T rtype;
-    T operator ()(const T a, const T b) const { return std::max(a, b); }
+    T operator ()(const T a, const T b) const { trả_về std::max(a, b); }
 };
 
 template<typename T> struct OpAbsDiff
@@ -179,7 +179,7 @@ template<typename T> struct OpAbsDiff
     typedef T type1;
     typedef T type2;
     typedef T rtype;
-    T operator()(T a, T b) const { return a > b ? a - b : b - a; }
+    T operator()(T a, T b) const { trả_về a > b ? a - b : b - a; }
 };
 
 // specializations to prevent "-0" results
@@ -188,14 +188,14 @@ template<> struct OpAbsDiff<float>
     typedef float type1;
     typedef float type2;
     typedef float rtype;
-    float operator()(float a, float b) const { return std::abs(a - b); }
+    float operator()(float a, float b) const { trả_về std::abs(a - b); }
 };
 template<> struct OpAbsDiff<double>
 {
     typedef double type1;
     typedef double type2;
     typedef double rtype;
-    double operator()(double a, double b) const { return std::abs(a - b); }
+    double operator()(double a, double b) const { trả_về std::abs(a - b); }
 };
 
 template<typename T> struct OpAnd
@@ -203,7 +203,7 @@ template<typename T> struct OpAnd
     typedef T type1;
     typedef T type2;
     typedef T rtype;
-    T operator()( T a, T b ) const { return a & b; }
+    T operator()( T a, T b ) const { trả_về a & b; }
 };
 
 template<typename T> struct OpOr
@@ -211,7 +211,7 @@ template<typename T> struct OpOr
     typedef T type1;
     typedef T type2;
     typedef T rtype;
-    T operator()( T a, T b ) const { return a | b; }
+    T operator()( T a, T b ) const { trả_về a | b; }
 };
 
 template<typename T> struct OpXor
@@ -219,7 +219,7 @@ template<typename T> struct OpXor
     typedef T type1;
     typedef T type2;
     typedef T rtype;
-    T operator()( T a, T b ) const { return a ^ b; }
+    T operator()( T a, T b ) const { trả_về a ^ b; }
 };
 
 template<typename T> struct OpNot
@@ -227,24 +227,24 @@ template<typename T> struct OpNot
     typedef T type1;
     typedef T type2;
     typedef T rtype;
-    T operator()( T a, T ) const { return ~a; }
+    T operator()( T a, T ) const { trả_về ~a; }
 };
 
 template<> inline uchar OpAdd<uchar>::operator ()(uchar a, uchar b) const
-{ return CV_FAST_CAST_8U(a + b); }
+{ trả_về CV_FAST_CAST_8U(a + b); }
 
 template<> inline uchar OpSub<uchar>::operator ()(uchar a, uchar b) const
-{ return CV_FAST_CAST_8U(a - b); }
+{ trả_về CV_FAST_CAST_8U(a - b); }
 
 template<> inline short OpAbsDiff<short>::operator ()(short a, short b) const
-{ return saturate_cast<short>(std::abs(a - b)); }
+{ trả_về saturate_cast<short>(std::abs(a - b)); }
 
 template<> inline schar OpAbsDiff<schar>::operator ()(schar a, schar b) const
-{ return saturate_cast<schar>(std::abs(a - b)); }
+{ trả_về saturate_cast<schar>(std::abs(a - b)); }
 
-template<> inline uchar OpMin<uchar>::operator ()(uchar a, uchar b) const { return CV_MIN_8U(a, b); }
+template<> inline uchar OpMin<uchar>::operator ()(uchar a, uchar b) const { trả_về CV_MIN_8U(a, b); }
 
-template<> inline uchar OpMax<uchar>::operator ()(uchar a, uchar b) const { return CV_MAX_8U(a, b); }
+template<> inline uchar OpMax<uchar>::operator ()(uchar a, uchar b) const { trả_về CV_MAX_8U(a, b); }
 
 typedef void (*UnaryFunc)(const uchar* src1, size_t step1,
                        uchar* dst, size_t step, Size sz,
@@ -257,15 +257,15 @@ typedef void (*BinaryFunc)(const uchar* src1, size_t step1,
 
 typedef void (*BinaryFuncC)(const void* src1, size_t step1,
                        const void* src2, size_t step2,
-                       void* dst, size_t step, int width, int height,
+                       void* dst, size_t step, số_nguyên width, số_nguyên height,
                        void*);
 
 // Exported so the new element-wise expression engine can reuse the already-optimized,
 // CPU-dispatched convert / convert-scale kernels through a thin ElemwiseFunc adapter,
 // instead of re-implementing the whole cast matrix. (Prototype: declarations are mirrored
 // engine-side; relocate into a public core header at integration time.)
-CV_EXPORTS BinaryFunc getConvertFunc(int sdepth, int ddepth);
-CV_EXPORTS BinaryFunc getConvertScaleFunc(int sdepth, int ddepth);
+CV_EXPORTS BinaryFunc getConvertFunc(số_nguyên sdepth, số_nguyên ddepth);
+CV_EXPORTS BinaryFunc getConvertScaleFunc(số_nguyên sdepth, số_nguyên ddepth);
 BinaryFunc getCopyMaskFunc(size_t esz);
 
 /* default memory block for sparse array elements */
@@ -280,54 +280,54 @@ BinaryFunc getCopyMaskFunc(size_t esz);
 // There is some mess in code with vectors representation.
 // Both vector-column / vector-rows are used with dims=2 (as Mat2D always).
 // Reshape matrices if necessary (in case of vectors) and returns size with scaled width.
-Size getContinuousSize2D(Mat& m1, int widthScale=1);
-Size getContinuousSize2D(Mat& m1, Mat& m2, int widthScale=1);
-Size getContinuousSize2D(Mat& m1, Mat& m2, Mat& m3, int widthScale=1);
+Size getContinuousSize2D(Mat& m1, số_nguyên widthScale=1);
+Size getContinuousSize2D(Mat& m1, Mat& m2, số_nguyên widthScale=1);
+Size getContinuousSize2D(Mat& m1, Mat& m2, Mat& m3, số_nguyên widthScale=1);
 
-void setSize( Mat& m, int _dims, const int* _sz, const size_t* _steps, bool autoSteps=false );
+void setSize( Mat& m, số_nguyên _dims, const số_nguyên* _sz, const size_t* _steps, bool autoSteps=false );
 void finalizeHdr(Mat& m);
-int updateContinuityFlag(int flags, int dims, const int* size, const size_t* step);
+số_nguyên updateContinuityFlag(số_nguyên flags, số_nguyên dims, const số_nguyên* size, const size_t* step);
 
 struct NoVec
 {
-    size_t operator()(const void*, const void*, void*, size_t) const { return 0; }
+    size_t operator()(const void*, const void*, void*, size_t) const { trả_về 0; }
 };
 
 #define CV_SPLIT_MERGE_MAX_BLOCK_SIZE(cn) ((INT_MAX/4)/(cn)) // HAL implementation accepts 'int' len, so INT_MAX doesn't work here
 
 enum { BLOCK_SIZE = 1024 };
 
-#if defined HAVE_IPP && (IPP_VERSION_X100 >= 700)
+#nếu defined HAVE_IPP && (IPP_VERSION_X100 >= 700)
 #define ARITHM_USE_IPP 1
-#else
+#không_thì
 #define ARITHM_USE_IPP 0
 #endif
 
-inline bool checkScalar(const Mat& sc, int atype, _InputArray::KindFlag sckind, _InputArray::KindFlag akind)
+inline bool checkScalar(const Mat& sc, số_nguyên atype, _InputArray::KindFlag sckind, _InputArray::KindFlag akind)
 {
-    if( sc.dims > 2 || !sc.isContinuous() )
-        return false;
+    nếu( sc.dims > 2 || !sc.isContinuous() )
+        trả_về false;
     Size sz = sc.size();
-    if(sz.width != 1 && sz.height != 1)
-        return false;
-    int cn = CV_MAT_CN(atype);
-    if( akind == _InputArray::MATX && sckind != _InputArray::MATX )
-        return false;
-    return sz == Size(1, 1) || sz == Size(1, cn) || sz == Size(cn, 1) ||
+    nếu(sz.width != 1 && sz.height != 1)
+        trả_về false;
+    số_nguyên cn = CV_MAT_CN(atype);
+    nếu( akind == _InputArray::MATX && sckind != _InputArray::MATX )
+        trả_về false;
+    trả_về sz == Size(1, 1) || sz == Size(1, cn) || sz == Size(cn, 1) ||
            (sz == Size(1, 4) && sc.type() == CV_64F && cn <= 4);
 }
 
-inline bool checkScalar(InputArray sc, int atype, _InputArray::KindFlag sckind, _InputArray::KindFlag akind)
+inline bool checkScalar(InputArray sc, số_nguyên atype, _InputArray::KindFlag sckind, _InputArray::KindFlag akind)
 {
-    if( sc.dims() > 2 || !sc.isContinuous() )
-        return false;
+    nếu( sc.dims() > 2 || !sc.isContinuous() )
+        trả_về false;
     Size sz = sc.size();
-    if(sz.width != 1 && sz.height != 1)
-        return false;
-    int cn = CV_MAT_CN(atype);
-    if( akind == _InputArray::MATX && sckind != _InputArray::MATX )
-        return false;
-    return sz == Size(1, 1) || sz == Size(1, cn) || sz == Size(cn, 1) ||
+    nếu(sz.width != 1 && sz.height != 1)
+        trả_về false;
+    số_nguyên cn = CV_MAT_CN(atype);
+    nếu( akind == _InputArray::MATX && sckind != _InputArray::MATX )
+        trả_về false;
+    trả_về sz == Size(1, 1) || sz == Size(1, cn) || sz == Size(cn, 1) ||
            (sz == Size(1, 4) && sc.type() == CV_64F && cn <= 4);
 }
 
@@ -335,7 +335,7 @@ inline bool checkScalar(InputArray sc, int atype, _InputArray::KindFlag sckind, 
 // single channel.
 inline bool sameShapeAsArg(const _InputArray& sc, const _InputArray& arr)
 {
-    return arr.channels() == 1 && sc.sameSize(arr);
+    trả_về arr.channels() == 1 && sc.sameSize(arr);
 }
 
 // New element-wise engine scalar handling. A genuine number / Scalar / Vec / Matx operand to an
@@ -351,19 +351,19 @@ inline bool sameShapeAsArg(const _InputArray& sc, const _InputArray& arr)
 inline bool isScalarArg(const _InputArray& sc, const _InputArray& arr)
 {
     const _InputArray::KindFlag kind = sc.kind();
-    const int cn = arr.channels();
-    if (kind == _InputArray::MATX)
+    const số_nguyên cn = arr.channels();
+    nếu (kind == _InputArray::MATX)
     {
         Size sz = sc.getSz();
-        int scn0 = sz.width * sz.height;
+        số_nguyên scn0 = sz.width * sz.height;
         // A genuine scalar is a 1D MATX (a Vec/Scalar/number: one of width/height is 1). A 2D MATX
         // (e.g. a Matx33) is a real matrix operand and rides broadcasting - never a scalar.
-        if (scn0 != sz.width + sz.height - 1)
-            return false;
+        nếu (scn0 != sz.width + sz.height - 1)
+            trả_về false;
         // Per-channel match (incl. Vec<_,N> for an N-channel array), a 4-elem Scalar on a <4-channel
         // array, or a single broadcast value. No 4-channel cap: a multichannel scalar rides as a 0-dim
         // per-channel CONST over the caller's data (not squeezed into a 4-slot Scalar).
-        return scn0 == cn || (cn < 4 && scn0 == 4) || scn0 == 1;
+        trả_về scn0 == cn || (cn < 4 && scn0 == 4) || scn0 == 1;
     }
     // the bindings-style Scalar column. dims must be exactly 2: a 1-D [4] CV_64F array is an honest
     // broadcast operand. Direct field reads (no _InputArray getter dispatch) - this runs on EVERY
@@ -372,19 +372,19 @@ inline bool isScalarArg(const _InputArray& sc, const _InputArray& arr)
     // element-wise, exactly as in 4.x (see sameShapeAsArg). That covers both the non-continuous
     // partner that fails this very test (e.g. P.col(0)) and a genuine Scalar partner, which keeps
     // its per-channel semantics because only the Mat/UMat side is demoted.
-    if (kind == _InputArray::MAT)
+    nếu (kind == _InputArray::MAT)
     {
         const Mat& m = *(const Mat*)sc.getObj();
-        return m.rows == 4 && m.cols == 1 && cn <= 4 && m.dims == 2 &&
+        trả_về m.rows == 4 && m.cols == 1 && cn <= 4 && m.dims == 2 &&
                m.type() == CV_64F && m.isContinuous() && !sameShapeAsArg(sc, arr);
     }
-    if (kind == _InputArray::UMAT)
+    nếu (kind == _InputArray::UMAT)
     {
         const UMat& m = *(const UMat*)sc.getObj();
-        return m.rows == 4 && m.cols == 1 && cn <= 4 && m.dims == 2 &&
+        trả_về m.rows == 4 && m.cols == 1 && cn <= 4 && m.dims == 2 &&
                m.type() == CV_64F && m.isContinuous() && !sameShapeAsArg(sc, arr);
     }
-    return false;
+    trả_về false;
 }
 
 // The remaining old arithm_op checkScalar geometry: a real Mat/UMat that LOOKS like a scalar - 1x1
@@ -392,30 +392,30 @@ inline bool isScalarArg(const _InputArray& sc, const _InputArray& arr)
 // arithm_op treats such an operand as a per-channel scalar ONLY as a fallback, when the shapes are
 // not broadcast-compatible - a call that is valid under numpy rules keeps its numpy meaning, one
 // that would throw gets the 4.x scalar semantics instead.
-inline bool isScalarLikeMat(const _InputArray& sc, int cn)
+inline bool isScalarLikeMat(const _InputArray& sc, số_nguyên cn)
 {
     // direct field reads, like isScalarArg: this probe also runs per engine call (see arithm_op's
     // compat fallback). `rows != 1 && cols != 1` exits in two inline compares for ordinary arrays.
-    int rows, cols, nval;
+    số_nguyên rows, cols, nval;
     bool continuous;
     const _InputArray::KindFlag kind = sc.kind();
-    if (kind == _InputArray::MAT)
+    nếu (kind == _InputArray::MAT)
     {
         const Mat& m = *(const Mat*)sc.getObj();
-        if ((m.rows != 1 && m.cols != 1) || m.dims > 2) return false;
+        nếu ((m.rows != 1 && m.cols != 1) || m.dims > 2) trả_về false;
         rows = m.rows; cols = m.cols; nval = rows * cols * m.channels(); continuous = m.isContinuous();
     }
-    else if (kind == _InputArray::UMAT)
+    không_thì nếu (kind == _InputArray::UMAT)
     {
         const UMat& m = *(const UMat*)sc.getObj();
-        if ((m.rows != 1 && m.cols != 1) || m.dims > 2) return false;
+        nếu ((m.rows != 1 && m.cols != 1) || m.dims > 2) trả_về false;
         rows = m.rows; cols = m.cols; nval = rows * cols * m.channels(); continuous = m.isContinuous();
     }
-    else
-        return false;
-    if (!continuous || nval > 4 || (nval != 1 && nval != cn))
-        return false;
-    return (rows == 1 && cols == 1) || (rows == cn && cols == 1) || (rows == 1 && cols == cn);
+    không_thì
+        trả_về false;
+    nếu (!continuous || nval > 4 || (nval != 1 && nval != cn))
+        trả_về false;
+    trả_về (rows == 1 && cols == 1) || (rows == cn && cols == 1) || (rows == 1 && cols == cn);
 }
 
 // The size of the caller-provided stack buffer for scalarArgElems (4 slots of the widest depth).
@@ -426,69 +426,69 @@ enum { EW_SCALAR_BUF_SIZE = 4 * sizeof(double) };
 // A UMAT scalar's values are copied device->host into `scbuf` (>= EW_SCALAR_BUF_SIZE bytes, on the
 // CALLER's stack - no heap, no UMat::getMat mapping machinery for 32 bytes of data).
 // p/d receive the data pointer and depth; returns the value count (elems x channels).
-inline int scalarArgElems(const _InputArray& sc, const uchar*& p, int& d, uchar* scbuf)
+inline số_nguyên scalarArgElems(const _InputArray& sc, const uchar*& p, số_nguyên& d, uchar* scbuf)
 {
     const _InputArray::KindFlag kind = sc.kind();
-    if (kind == _InputArray::MAT)
+    nếu (kind == _InputArray::MAT)
     {
         const Mat& m = *(const Mat*)sc.getObj();
         p = m.data;
         d = m.depth();
-        return (int)m.total() * m.channels();
+        trả_về (số_nguyên)m.total() * m.channels();
     }
-    if (kind == _InputArray::UMAT)
+    nếu (kind == _InputArray::UMAT)
     {
         const UMat& u = *(const UMat*)sc.getObj();
         d = u.depth();
-        int n = (int)u.total() * u.channels();
-        CV_Assert(n * (int)CV_ELEM_SIZE1(d) <= (int)EW_SCALAR_BUF_SIZE);
+        số_nguyên n = (số_nguyên)u.total() * u.channels();
+        CV_Assert(n * (số_nguyên)CV_ELEM_SIZE1(d) <= (số_nguyên)EW_SCALAR_BUF_SIZE);
         Mat header(u.dims, u.size.p, u.type(), scbuf);   // header over the caller's stack buffer
         u.copyTo(header);                                // create() is a no-op (exact match) -> the
         p = scbuf;                                       // copy lands straight in scbuf
-        return n;
+        trả_về n;
     }
     p = (const uchar*)sc.getObj();
     d = sc.depth();
     Size sz = sc.getSz();
-    return sz.width * sz.height;
+    trả_về sz.width * sz.height;
 }
 
 // Read one element of depth `d` at p as a double (no Mat, no convertTo, no dispatcher).
-inline double elemToDouble(int d, const uchar* p)
+inline double elemToDouble(số_nguyên d, const uchar* p)
 {
     switch (d)
     {
-    case CV_8U:   return *(const uchar*)p;
-    case CV_8S:   return *(const schar*)p;
-    case CV_16U:  return *(const ushort*)p;
-    case CV_16S:  return *(const short*)p;
-    case CV_32U:  return *(const unsigned*)p;
-    case CV_32S:  return *(const int*)p;
-    case CV_64U:  return (double)*(const uint64_t*)p;
-    case CV_64S:  return (double)*(const int64_t*)p;
-    case CV_16F:  return (float)*(const hfloat*)p;
-    case CV_16BF: return (float)*(const bfloat*)p;
-    case CV_32F:  return *(const float*)p;
-    case CV_64F:  return *(const double*)p;
+    case CV_8U:   trả_về *(const uchar*)p;
+    case CV_8S:   trả_về *(const schar*)p;
+    case CV_16U:  trả_về *(const ushort*)p;
+    case CV_16S:  trả_về *(const short*)p;
+    case CV_32U:  trả_về *(const unsigned*)p;
+    case CV_32S:  trả_về *(const số_nguyên*)p;
+    case CV_64U:  trả_về (double)*(const uint64_t*)p;
+    case CV_64S:  trả_về (double)*(const int64_t*)p;
+    case CV_16F:  trả_về (float)*(const hfloat*)p;
+    case CV_16BF: trả_về (float)*(const bfloat*)p;
+    case CV_32F:  trả_về *(const float*)p;
+    case CV_64F:  trả_về *(const double*)p;
     default:      CV_Error(Error::StsUnsupportedFormat, "unsupported scalar depth");
     }
 }
 
 // Extract a scalar operand's values (see isScalarArg) as up to 4 doubles, straight from its
 // storage. Returns the element count.
-inline int readScalarArg(const _InputArray& sc, Scalar& out)
+inline số_nguyên readScalarArg(const _InputArray& sc, Scalar& out)
 {
     out = Scalar();                      // unused channels stay 0 (independent of the caller's Scalar)
-    const uchar* p; int d; uchar scbuf[EW_SCALAR_BUF_SIZE];
-    int n = scalarArgElems(sc, p, d, scbuf);
+    const uchar* p; số_nguyên d; uchar scbuf[EW_SCALAR_BUF_SIZE];
+    số_nguyên n = scalarArgElems(sc, p, d, scbuf);
     CV_Assert(n <= 4);                   // Scalar holds 4 slots; isScalarArg admits more only for MATX
     size_t esz = CV_ELEM_SIZE1(d);
-    for (int i = 0; i < n; i++)
+    cho (số_nguyên i = 0; i < n; i++)
         out[i] = elemToDouble(d, p + (size_t)i * esz);
-    return n;
+    trả_về n;
 }
 
-void convertAndUnrollScalar( const Mat& sc, int buftype, uchar* scbuf, size_t blocksize );
+void convertAndUnrollScalar( const Mat& sc, số_nguyên buftype, uchar* scbuf, size_t blocksize );
 
 #ifdef CV_COLLECT_IMPL_DATA
 struct ImplCollector
@@ -500,8 +500,8 @@ struct ImplCollector
     }
     bool useCollection; // enable/disable impl data collection
 
-    int implFlags;
-    std::vector<int>    implCode;
+    số_nguyên implFlags;
+    std::vector<số_nguyên>    implCode;
     std::vector<String> implFun;
 
     cv::Mutex mutex;
@@ -522,23 +522,23 @@ struct CoreTLSData
 //#ifdef HAVE_OPENCL
     ocl::OpenCLExecutionContext oclExecutionContext;
     bool oclExecutionContextInitialized;
-    int useOpenCL; // 1 - use, 0 - do not use, -1 - auto/not initialized
+    số_nguyên useOpenCL; // 1 - use, 0 - do not use, -1 - auto/not initialized
 //#endif
-    int useIPP;    // 1 - use, 0 - do not use, -1 - auto/not initialized
-    int useIPP_NE; // 1 - use, 0 - do not use, -1 - auto/not initialized
+    số_nguyên useIPP;    // 1 - use, 0 - do not use, -1 - auto/not initialized
+    số_nguyên useIPP_NE; // 1 - use, 0 - do not use, -1 - auto/not initialized
 };
 
 CoreTLSData& getCoreTlsData();
 
-#if defined(BUILD_SHARED_LIBS)
-#if defined _WIN32 || defined WINCE
+#nếu defined(BUILD_SHARED_LIBS)
+#nếu defined _WIN32 || defined WINCE
 #define CL_RUNTIME_EXPORT __declspec(dllexport)
 #elif defined __GNUC__
 #define CL_RUNTIME_EXPORT __attribute__ ((visibility ("default")))
-#else
+#không_thì
 #define CL_RUNTIME_EXPORT
 #endif
-#else
+#không_thì
 #define CL_RUNTIME_EXPORT
 #endif
 
@@ -555,15 +555,15 @@ int64 getTimestampNS();
 
 #define CV_SINGLETON_LAZY_INIT_(TYPE, INITIALIZER, RET_VALUE) \
     static TYPE* const instance = INITIALIZER; \
-    return RET_VALUE;
+    trả_về RET_VALUE;
 
 #define CV_SINGLETON_LAZY_INIT(TYPE, INITIALIZER) CV_SINGLETON_LAZY_INIT_(TYPE, INITIALIZER, instance)
 #define CV_SINGLETON_LAZY_INIT_REF(TYPE, INITIALIZER) CV_SINGLETON_LAZY_INIT_(TYPE, INITIALIZER, *instance)
 
 CV_EXPORTS void releaseTlsStorageThread();
 
-int cv_snprintf(char* buf, int len, const char* fmt, ...);
-int cv_vsnprintf(char* buf, int len, const char* fmt, va_list args);
+số_nguyên cv_snprintf(char* buf, số_nguyên len, const char* fmt, ...);
+số_nguyên cv_vsnprintf(char* buf, số_nguyên len, const char* fmt, va_list args);
 }
 
 #endif  // BUILD_PLUGIN

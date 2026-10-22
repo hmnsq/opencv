@@ -8,28 +8,28 @@ from common import remove_comments, getTokens, getParameters, postProcessParamet
 
 
 try:
-    if len(sys.argv) > 1:
+    nếu len(sys.argv) > 1:
         f = open(sys.argv[1], "r")
-    else:
+    không_thì:
         f = sys.stdin
 except:
     sys.exit("ERROR. Can't open input file")
 
 fns = []
 
-while True:
+trong_khi True:
     line = f.readline()
-    if len(line) == 0:
+    nếu len(line) == 0:
         break
     assert isinstance(line, str)
     line = line.strip()
-    if line.startswith('CLFFTAPI'):
+    nếu line.startswith('CLFFTAPI'):
         line = re.sub(r'\n', r'', line)
-        while True:
+        trong_khi True:
             nl = f.readline()
             nl = nl.strip()
             nl = re.sub(r'\n', r'', nl)
-            if len(nl) == 0:
+            nếu len(nl) == 0:
                 break;
             line += ' ' + nl
 
@@ -43,16 +43,16 @@ while True:
         calling = []
 
         i = 0
-        while True:
-            if parts[i] == "CLFFTAPI":
+        trong_khi True:
+            nếu parts[i] == "CLFFTAPI":
                 modifiers.append(parts[i])
-            else:
+            không_thì:
                 break
             i += 1
-        while (i < len(parts)):
-            if not parts[i] == '(':
+        trong_khi (i < len(parts)):
+            nếu not parts[i] == '(':
                 ret.append(parts[i])
-            else:
+            không_thì:
                 del ret[-1]
                 i -= 1
                 break
@@ -68,7 +68,7 @@ while True:
 
         params = getParameters(i, parts)
 
-        if len(params) > 0 and params[0] == 'void':
+        nếu len(params) > 0 and params[0] == 'void':
             del params[0]
 
         fn['params'] = params

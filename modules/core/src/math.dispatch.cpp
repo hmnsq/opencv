@@ -23,59 +23,59 @@ namespace cv { namespace ew {
 // kernels. Uniform over ANY HAL (an external vendor one, the IPP HAL module, ...) - the get is
 // called once per program build, the probe cost is nothing next to the kernel calls that follow.
 template<typename T>
-static int halUnaryKernel(const void* src0_, size_t s0y, size_t s0x,
+static số_nguyên halUnaryKernel(const void* src0_, size_t s0y, size_t s0x,
                           const void*, size_t, size_t, const void*, size_t, size_t,
-                          void* dst_, size_t dsty, int width, int height,
-                          const double*, int, void* userdata)
+                          void* dst_, size_t dsty, số_nguyên width, số_nguyên height,
+                          const double*, số_nguyên, void* userdata)
 {
-    typedef int (*HalFunc)(const T*, T*, int);
+    typedef số_nguyên (*HalFunc)(const T*, T*, số_nguyên);
     const HalFunc fn = (HalFunc)userdata;
     s0y /= sizeof(T);
     dsty /= sizeof(T);
     CV_Assert(s0x <= 1u);
     const T* src0 = (const T*)src0_;
     T* dst = (T*)dst_;
-    if (height > 1 && dsty == (size_t)width && s0y == s0x*(size_t)width) { width *= height; height = 1; }
-    const int urows = (s0y == 0 && height > 1) ? 1 : height;   // vertical broadcast: 1 row + copies
-    for (int y = 0; y < urows; y++, src0 += s0y, dst += dsty)
+    nếu (height > 1 && dsty == (size_t)width && s0y == s0x*(size_t)width) { width *= height; height = 1; }
+    const số_nguyên urows = (s0y == 0 && height > 1) ? 1 : height;   // vertical broadcast: 1 row + copies
+    cho (số_nguyên y = 0; y < urows; y++, src0 += s0y, dst += dsty)
     {
-        int code;
-        if (s0x == 0)                     // broadcast-scalar source: one value covers the row
+        số_nguyên code;
+        nếu (s0x == 0)                     // broadcast-scalar source: one value covers the row
         {
             T v;
             code = fn(src0, &v, 1);
-            for (int x = 0; x < width; x++) dst[x] = v;
+            cho (số_nguyên x = 0; x < width; x++) dst[x] = v;
         }
-        else
+        không_thì
             code = fn(src0, dst, width);
-        if (code != CV_HAL_ERROR_OK)
-            return code;                  // shouldn't happen (probed at get time) - let exec assert
+        nếu (code != CV_HAL_ERROR_OK)
+            trả_về code;                  // shouldn't happen (probed at get time) - let exec assert
     }
     dst = (T*)dst_;
-    for (int y = urows; y < height; y++)
+    cho (số_nguyên y = urows; y < height; y++)
         memcpy(dst + (size_t)y*dsty, dst, (size_t)width*sizeof(T));
-    return 0;
+    trả_về 0;
 }
 
 template<typename T, typename HalFunc>
 static TKernel probeHalUnary(HalFunc fn)
 {
     T one = (T)1, r = (T)0;
-    if (fn(&one, &r, 1) == CV_HAL_ERROR_OK)
-        return {halUnaryKernel<T>, (void*)fn, 0};
-    return {};
+    nếu (fn(&one, &r, 1) == CV_HAL_ERROR_OK)
+        trả_về {halUnaryKernel<T>, (void*)fn, 0};
+    trả_về {};
 }
 
 // The engine's OWN kernel for (op, T) - v_exp/v_log & co, no HAL/IPP tiers. The final fallback of
 // getMathFunc, and what hal::exp32f & co use as THEIR built-in implementation (the former table
 // kernels are gone), via mathSpanEngine below.
-static TKernel getEngineMathFunc(TOp op, int T)
+static TKernel getEngineMathFunc(TOp op, số_nguyên T)
 {
     CV_CPU_DISPATCH(getMathFunc_,   (op, T),      CV_CPU_DISPATCH_MODES_ALL);
 }
 
 // run the engine's own math kernel over one contiguous span (the shape hal::exp32f & co need)
-void mathSpanEngine(TOp op, int depth, const void* src, void* dst, int n)
+void mathSpanEngine(TOp op, số_nguyên depth, const void* src, void* dst, số_nguyên n)
 {
     TKernel k = getEngineMathFunc(op, depth);
     CV_Assert(k.fptr);
@@ -83,9 +83,9 @@ void mathSpanEngine(TOp op, int depth, const void* src, void* dst, int n)
     k.fptr(src, 0, 1, nullptr, 0, 0, nullptr, 0, 0, dst, 0, n, 1, noparams, k.flags, k.userdata);
 }
 
-TKernel getMathFunc(TOp op, int T)
+TKernel getMathFunc(TOp op, số_nguyên T)
 {
-    if ((op == OP_EXP || op == OP_LOG) && (T == CV_32F || T == CV_64F))
+    nếu ((op == OP_EXP || op == OP_LOG) && (T == CV_32F || T == CV_64F))
     {
         // IPP now rides the cv_hal_* hooks too (hal/ipp), so the single probe below picks it up
         // together with any external vendor HAL - no separate IPP tier needed here.
@@ -96,12 +96,12 @@ TKernel getMathFunc(TOp op, int T)
         static const TKernel log64 = probeHalUnary<double>(cv_hal_log64f);
         const TKernel* k = op == OP_EXP ? (T == CV_32F ? &exp32 : &exp64)
                                         : (T == CV_32F ? &log32 : &log64);
-        if (k->fptr)
-            return *k;
+        nếu (k->fptr)
+            trả_về *k;
     }
-    return getEngineMathFunc(op, T);
+    trả_về getEngineMathFunc(op, T);
 }
 
-TKernel getPowFunc(int T, int R)            { CV_CPU_DISPATCH(getPowFunc_,    (T, R),       CV_CPU_DISPATCH_MODES_ALL); }
+TKernel getPowFunc(số_nguyên T, số_nguyên R)            { CV_CPU_DISPATCH(getPowFunc_,    (T, R),       CV_CPU_DISPATCH_MODES_ALL); }
 
 }} // namespace cv::ew

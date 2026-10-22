@@ -12,7 +12,7 @@
 #include <iterator>
 
 #define USE_ZLIB 1
-#if USE_ZLIB
+#nếu USE_ZLIB
 #  ifndef _LFS64_LARGEFILE
 #    define _LFS64_LARGEFILE 0
 #  endif
@@ -20,14 +20,14 @@
 #    define _FILE_OFFSET_BITS 0
 #  endif
 #  include <zlib.h>
-#else
+#không_thì
 typedef void* gzFile;
 #endif
 
 //=====================================================================================
 
 static const size_t PARSER_BASE64_BUFFER_SIZE = 1024U * 1024U / 8U;
-static const int CV_PERSISTENCE_MAX_DEPTH = 1024;
+static const số_nguyên CV_PERSISTENCE_MAX_DEPTH = 1024;
 
 namespace base64 {
 
@@ -53,55 +53,55 @@ enum
 
 inline bool cv_isalnum(char c)
 {
-    return ('0' <= c && c <= '9') || ('a' <= c && c <= 'z') || ('A' <= c && c <= 'Z');
+    trả_về ('0' <= c && c <= '9') || ('a' <= c && c <= 'z') || ('A' <= c && c <= 'Z');
 }
 
 inline bool cv_isalpha(char c)
 {
-    return ('a' <= c && c <= 'z') || ('A' <= c && c <= 'Z');
+    trả_về ('a' <= c && c <= 'z') || ('A' <= c && c <= 'Z');
 }
 
 inline bool cv_isdigit(char c)
 {
-    return '0' <= c && c <= '9';
+    trả_về '0' <= c && c <= '9';
 }
 
 inline bool cv_isspace(char c)
 {
-    return (9 <= c && c <= 13) || c == ' ';
+    trả_về (9 <= c && c <= 13) || c == ' ';
 }
 
 inline char* cv_skip_BOM(char* ptr)
 {
-    if((uchar)ptr[0] == 0xef && (uchar)ptr[1] == 0xbb && (uchar)ptr[2] == 0xbf) //UTF-8 BOM
+    nếu((uchar)ptr[0] == 0xef && (uchar)ptr[1] == 0xbb && (uchar)ptr[2] == 0xbf) //UTF-8 BOM
     {
-      return ptr + 3;
+      trả_về ptr + 3;
     }
-    return ptr;
+    trả_về ptr;
 }
 
 namespace cv
 {
 namespace fs
 {
-int strcasecmp(const char* str1, const char* str2);
-char* itoa( int _val, char* buffer, int /*radix*/ );
-char* itoa( int64_t _val, char* buffer, int /*radix*/, bool _signed );
+số_nguyên strcasecmp(const char* str1, const char* str2);
+char* itoa( số_nguyên _val, char* buffer, số_nguyên /*radix*/ );
+char* itoa( int64_t _val, char* buffer, số_nguyên /*radix*/, bool _signed );
 char* floatToString( char* buf, size_t bufSize, float value, bool halfprecision, bool explicitZero );
 char* doubleToString( char* buf, size_t bufSize, double value, bool explicitZero );
 
-int calcStructSize( const char* dt, int initial_size );
-int calcElemSize( const char* dt, int initial_size );
-CV_DEPRECATED char* encodeFormat( int elem_type, char* dt );
-char* encodeFormat( int elem_type, char* dt, size_t dt_len );
-int decodeFormat( const char* dt, int* fmt_pairs, int max_len );
-int decodeSimpleFormat( const char* dt );
+số_nguyên calcStructSize( const char* dt, số_nguyên initial_size );
+số_nguyên calcElemSize( const char* dt, số_nguyên initial_size );
+CV_DEPRECATED char* encodeFormat( số_nguyên elem_type, char* dt );
+char* encodeFormat( số_nguyên elem_type, char* dt, size_t dt_len );
+số_nguyên decodeFormat( const char* dt, số_nguyên* fmt_pairs, số_nguyên max_len );
+số_nguyên decodeSimpleFormat( const char* dt );
 }
 
 
 #ifdef CV_STATIC_ANALYSIS
-#define CV_PARSE_ERROR_CPP(errmsg) do { (void)fs; abort(); } while (0)
-#else
+#define CV_PARSE_ERROR_CPP(errmsg) do { (void)fs; abort(); } trong_khi (0)
+#không_thì
 #define CV_PARSE_ERROR_CPP( errmsg ) \
     fs->parseError( CV_Func, (errmsg), __FILE__, __LINE__ )
 #endif
@@ -109,8 +109,8 @@ int decodeSimpleFormat( const char* dt );
 
 #define CV_PERSISTENCE_CHECK_END_OF_BUFFER_BUG_CPP() do { \
     CV_DbgAssert(ptr); \
-    if((ptr)[0] == 0 && (ptr) == fs->bufferEnd() - 1) CV_PARSE_ERROR_CPP("OpenCV persistence doesn't support very long lines"); \
-} while (0)
+    nếu((ptr)[0] == 0 && (ptr) == fs->bufferEnd() - 1) CV_PARSE_ERROR_CPP("OpenCV persistence doesn't support very long lines"); \
+} trong_khi (0)
 
 
 class FileStorageParser;
@@ -120,7 +120,7 @@ struct FStructData
 {
     FStructData() { indent = flags = 0; }
     FStructData( const std::string& _struct_tag,
-                 int _struct_flags, int _struct_indent )
+                 số_nguyên _struct_flags, số_nguyên _struct_indent )
     {
         tag = _struct_tag;
         flags = _struct_flags;
@@ -128,8 +128,8 @@ struct FStructData
     }
 
     std::string tag;
-    int flags;
-    int indent;
+    số_nguyên flags;
+    số_nguyên indent;
 };
 
 class FileStorage_API
@@ -138,7 +138,7 @@ public:
     virtual ~FileStorage_API();
     virtual FileStorage* getFS() = 0;
 
-    virtual int getFormat() const = 0;
+    virtual số_nguyên getFormat() const = 0;
 
     virtual void puts( const char* str ) = 0;
     virtual char* gets() = 0;
@@ -146,27 +146,27 @@ public:
     virtual void setEof() = 0;
     virtual void closeFile() = 0;
     virtual void rewind() = 0;
-    virtual char* resizeWriteBuffer( char* ptr, int len ) = 0;
+    virtual char* resizeWriteBuffer( char* ptr, số_nguyên len ) = 0;
     virtual char* bufferPtr() const = 0;
     virtual char* bufferStart() const = 0;
     virtual char* bufferEnd() const = 0;
     virtual void setBufferPtr(char* ptr) = 0;
     virtual char* flush() = 0;
     virtual void setNonEmpty() = 0;
-    virtual int wrapMargin() const = 0;
+    virtual số_nguyên wrapMargin() const = 0;
 
     virtual FStructData& getCurrentStruct() = 0;
 
-    virtual void convertToCollection( int type, FileNode& node ) = 0;
+    virtual void convertToCollection( số_nguyên type, FileNode& node ) = 0;
     virtual FileNode addNode( FileNode& collection, const std::string& key,
-                               int type, const void* value=0, int len=-1 ) = 0;
+                               số_nguyên type, const void* value=0, số_nguyên len=-1 ) = 0;
     virtual void finalizeCollection( FileNode& collection ) = 0;
     virtual double strtod(char* ptr, char** endptr) = 0;
 
-    virtual char* parseBase64(char* ptr, int indent, FileNode& collection) = 0;
+    virtual char* parseBase64(char* ptr, số_nguyên indent, FileNode& collection) = 0;
     CV_NORETURN
     virtual void parseError(const char* funcname, const std::string& msg,
-                            const char* filename, int lineno) = 0;
+                            const char* filename, số_nguyên lineno) = 0;
 
 private:
     enum Base64State{
@@ -184,7 +184,7 @@ private:
     virtual void check_if_write_struct_is_delayed(bool change_type_to_base64 = false) = 0;
     virtual void switch_to_Base64_state(Base64State state) = 0;
     virtual Base64State get_state_of_writing_base64() = 0;
-    virtual int get_space() = 0;
+    virtual số_nguyên get_space() = 0;
 };
 
 class FileStorageEmitter
@@ -193,9 +193,9 @@ public:
     virtual ~FileStorageEmitter() {}
 
     virtual FStructData startWriteStruct( const FStructData& parent, const char* key,
-                                          int struct_flags, const char* type_name=0 ) = 0;
+                                          số_nguyên struct_flags, const char* type_name=0 ) = 0;
     virtual void endWriteStruct(const FStructData& current_struct) = 0;
-    virtual void write(const char* key, int value) = 0;
+    virtual void write(const char* key, số_nguyên value) = 0;
     virtual void write(const char* key, int64_t value) = 0;
     virtual void write(const char* key, double value) = 0;
     virtual void write(const char* key, const char* value, bool quote) = 0;
@@ -209,7 +209,7 @@ class FileStorageParser
 public:
     virtual ~FileStorageParser() {}
     virtual bool parse(char* ptr) = 0;
-    virtual bool getBase64Row(char* ptr, int indent, char* &beg, char* &end) = 0;
+    virtual bool getBase64Row(char* ptr, số_nguyên indent, char* &beg, char* &end) = 0;
 };
 
 Ptr<FileStorageEmitter> createXMLEmitter(FileStorage_API* fs);

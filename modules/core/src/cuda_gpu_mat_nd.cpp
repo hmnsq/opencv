@@ -9,7 +9,7 @@ using namespace cv::cuda;
 
 GpuMatND::~GpuMatND() = default;
 
-GpuMatND::GpuMatND(const MatShape& _shape, int _type, void* _data, StepArray _step) :
+GpuMatND::GpuMatND(const MatShape& _shape, số_nguyên _type, void* _data, StepArray _step) :
     flags(0), dims(0), data(static_cast<uchar*>(_data)), offset(0)
 {
     CV_Assert(_step.empty() || _shape.size() == _step.size() + 1 ||
@@ -20,9 +20,9 @@ GpuMatND::GpuMatND(const MatShape& _shape, int _type, void* _data, StepArray _st
 
 GpuMatND GpuMatND::operator()(const std::vector<Range>& ranges) const
 {
-    CV_Assert(dims == (int)ranges.size());
+    CV_Assert(dims == (số_nguyên)ranges.size());
 
-    for (int i = 0; i < dims; ++i)
+    cho (số_nguyên i = 0; i < dims; ++i)
     {
         Range r = ranges[i];
         CV_Assert(r == Range::all() || (0 <= r.start && r.start < r.end && r.end <= size[i]));
@@ -30,10 +30,10 @@ GpuMatND GpuMatND::operator()(const std::vector<Range>& ranges) const
 
     GpuMatND ret = *this;
 
-    for (int i = 0; i < dims; ++i)
+    cho (số_nguyên i = 0; i < dims; ++i)
     {
         Range r = ranges[i];
-        if (r != Range::all() && r != Range(0, ret.size[i]))
+        nếu (r != Range::all() && r != Range(0, ret.size[i]))
         {
             ret.offset += r.start * ret.step[i];
             ret.size[i] = r.size();
@@ -43,72 +43,72 @@ GpuMatND GpuMatND::operator()(const std::vector<Range>& ranges) const
 
     ret.flags = cv::updateContinuityFlag(ret.flags, dims, ret.size.data(), ret.step.data());
 
-    return ret;
+    trả_về ret;
 }
 
 GpuMat GpuMatND::createGpuMatHeader(IndexArray idx, Range rowRange, Range colRange) const
 {
-    CV_Assert((int)idx.size() == dims - 2);
+    CV_Assert((số_nguyên)idx.size() == dims - 2);
 
     std::vector<Range> ranges;
-    for (int i : idx)
+    cho (số_nguyên i : idx)
         ranges.emplace_back(i, i+1);
     ranges.push_back(rowRange);
     ranges.push_back(colRange);
 
-    return (*this)(ranges).createGpuMatHeader();
+    trả_về (*this)(ranges).createGpuMatHeader();
 }
 
 GpuMat GpuMatND::createGpuMatHeader() const
 {
     auto Effectively2D = [](GpuMatND m)
     {
-        for (int i = 0; i < m.dims - 2; ++i)
-            if (m.size[i] > 1)
-                return false;
-        return true;
+        cho (số_nguyên i = 0; i < m.dims - 2; ++i)
+            nếu (m.size[i] > 1)
+                trả_về false;
+        trả_về true;
     };
     CV_Assert(Effectively2D(*this));
-    int rows_, cols_ = dims >= 1 ? size[dims - 1] : 1;
+    số_nguyên rows_, cols_ = dims >= 1 ? size[dims - 1] : 1;
     size_t step_;
-    if (dims >= 2)
+    nếu (dims >= 2)
     {
         rows_ = size[dims - 2];
         step_ = step[dims - 2];
     }
-    else
+    không_thì
     {
         rows_ = 1;
         step_ = cols_ * elemSize();
     }
 
-    return GpuMat(rows_, cols_, type(), getDevicePtr(), step_);
+    trả_về GpuMat(rows_, cols_, type(), getDevicePtr(), step_);
 }
 
 GpuMat GpuMatND::operator()(IndexArray idx, Range rowRange, Range colRange) const
 {
-    return createGpuMatHeader(idx, rowRange, colRange).clone();
+    trả_về createGpuMatHeader(idx, rowRange, colRange).clone();
 }
 
 GpuMatND::operator GpuMat() const
 {
-    return createGpuMatHeader().clone();
+    trả_về createGpuMatHeader().clone();
 }
 
-void GpuMatND::setFields(MatShape _size, int _type, StepArray _step)
+void GpuMatND::setFields(MatShape _size, số_nguyên _type, StepArray _step)
 {
     _type &= Mat::TYPE_MASK;
 
     flags = Mat::MAGIC_VAL + _type;
-    dims = static_cast<int>(_size.size());
+    dims = static_cast<số_nguyên>(_size.size());
     size = std::move(_size);
 
-    if (_step.empty())
+    nếu (_step.empty())
     {
         step = StepArray(dims);
 
         step.back() = elemSize();
-        for (int _i = dims - 2; _i >= 0; --_i)
+        cho (số_nguyên _i = dims - 2; _i >= 0; --_i)
         {
             const size_t i = _i;
             step[i] = step[i+1] * size[i+1];
@@ -116,10 +116,10 @@ void GpuMatND::setFields(MatShape _size, int _type, StepArray _step)
 
         flags |= Mat::CONTINUOUS_FLAG;
     }
-    else
+    không_thì
     {
         step = std::move(_step);
-        if (step.size() < size.size())
+        nếu (step.size() < size.size())
           step.push_back(elemSize());
 
         flags = cv::updateContinuityFlag(flags, dims, size.data(), step.data());
@@ -142,7 +142,7 @@ GpuData::~GpuData()
 {
 }
 
-void GpuMatND::create(const MatShape& _shape, int _type)
+void GpuMatND::create(const MatShape& _shape, số_nguyên _type)
 {
     CV_UNUSED(_shape);
     CV_UNUSED(_type);
@@ -191,11 +191,11 @@ void GpuMatND::download(OutputArray dst, Stream& stream) const
     throw_no_cuda();
 }
 
-void GpuMatND::fit(const MatShape& _shape, int _type)
+void GpuMatND::fit(const MatShape& _shape, số_nguyên _type)
 {
     auto elements_nonzero = [](const MatShape& v)
     {
-        return std::all_of(v.begin(), v.end(), [](int u){ return u > 0; });
+        trả_về std::all_of(v.begin(), v.end(), [](số_nguyên u){ trả_về u > 0; });
     };
     CV_Assert(!_shape.empty());
     CV_Assert(elements_nonzero(_shape));
@@ -204,17 +204,17 @@ void GpuMatND::fit(const MatShape& _shape, int _type)
 
     const size_t esz = (size_t)CV_ELEM_SIZE(_type);
     size_t step0 = esz;
-    for (int i = (int)_shape.size() - 2; i >= 0; --i)
+    cho (số_nguyên i = (số_nguyên)_shape.size() - 2; i >= 0; --i)
         step0 *= (size_t)_shape[(size_t)i + 1];
     const size_t requiredBytes = (size_t)_shape[0] * step0;
 
     const bool canReuse = !empty() && !external() && isContinuous() && !isSubmatrix() && offset == 0;
     const size_t oldCapacity = canReuse ? totalMemSize() : 0;
 
-    if (!canReuse || requiredBytes > oldCapacity)
+    nếu (!canReuse || requiredBytes > oldCapacity)
     {
         create(_shape, _type);
-        return;
+        trả_về;
     }
 
     setFields(_shape, _type);

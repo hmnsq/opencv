@@ -10,18 +10,18 @@
 
 namespace cv { namespace parallel {
 
-#if OPENCV_HAVE_FILESYSTEM_SUPPORT && defined(PARALLEL_ENABLE_PLUGINS)
+#nếu OPENCV_HAVE_FILESYSTEM_SUPPORT && defined(PARALLEL_ENABLE_PLUGINS)
 #define DECLARE_DYNAMIC_BACKEND(name) \
 ParallelBackendInfo { \
     1000, name, createPluginParallelBackendFactory(name) \
 },
-#else
+#không_thì
 #define DECLARE_DYNAMIC_BACKEND(name) /* nothing */
 #endif
 
 #define DECLARE_STATIC_BACKEND(name, createBackendAPI) \
 ParallelBackendInfo { \
-    1000, name, std::make_shared<cv::parallel::StaticBackendFactory>([=] () -> std::shared_ptr<cv::parallel::ParallelForAPI> { return createBackendAPI(); }) \
+    1000, name, std::make_shared<cv::parallel::StaticBackendFactory>([=] () -> std::shared_ptr<cv::parallel::ParallelForAPI> { trả_về createBackendAPI(); }) \
 },
 
 static
@@ -42,13 +42,13 @@ std::vector<ParallelBackendInfo>& getBuiltinParallelBackendsInfo()
         DECLARE_DYNAMIC_BACKEND("OPENMP")  // TODO Intel OpenMP?
 #endif
     };
-    return g_backends;
+    trả_về g_backends;
 }
 
 static
 bool sortByPriority(const ParallelBackendInfo &lhs, const ParallelBackendInfo &rhs)
 {
-    return lhs.priority > rhs.priority;
+    trả_về lhs.priority > rhs.priority;
 }
 
 /** @brief Manages list of enabled backends
@@ -60,32 +60,32 @@ protected:
     ParallelBackendRegistry()
     {
         enabledBackends = getBuiltinParallelBackendsInfo();
-        int N = (int)enabledBackends.size();
-        for (int i = 0; i < N; i++)
+        số_nguyên N = (số_nguyên)enabledBackends.size();
+        cho (số_nguyên i = 0; i < N; i++)
         {
             ParallelBackendInfo& info = enabledBackends[i];
             info.priority = 1000 - i * 10;
         }
         CV_LOG_DEBUG(NULL, "core(parallel): Builtin backends(" << N << "): " << dumpBackends());
-        if (readPrioritySettings())
+        nếu (readPrioritySettings())
         {
             CV_LOG_INFO(NULL, "core(parallel): Updated backends priorities: " << dumpBackends());
-            N = (int)enabledBackends.size();
+            N = (số_nguyên)enabledBackends.size();
         }
-        int enabled = 0;
-        for (int i = 0; i < N; i++)
+        số_nguyên enabled = 0;
+        cho (số_nguyên i = 0; i < N; i++)
         {
             ParallelBackendInfo& info = enabledBackends[enabled];
-            if (enabled != i)
+            nếu (enabled != i)
                 info = enabledBackends[i];
             size_t param_priority = utils::getConfigurationParameterSizeT(cv::format("OPENCV_PARALLEL_PRIORITY_%s", info.name.c_str()).c_str(), (size_t)info.priority);
-            CV_Assert(param_priority == (size_t)(int)param_priority); // overflow check
-            if (param_priority > 0)
+            CV_Assert(param_priority == (size_t)(số_nguyên)param_priority); // overflow check
+            nếu (param_priority > 0)
             {
-                info.priority = (int)param_priority;
+                info.priority = (số_nguyên)param_priority;
                 enabled++;
             }
-            else
+            không_thì
             {
                 CV_LOG_INFO(NULL, "core(parallel): Disable backend: " << info.name);
             }
@@ -100,31 +100,31 @@ protected:
     {
         std::vector<std::string> result;
         std::string::size_type prev_pos = 0, pos = 0;
-        while((pos = input.find(token, pos)) != std::string::npos)
+        trong_khi((pos = input.find(token, pos)) != std::string::npos)
         {
             result.push_back(input.substr(prev_pos, pos-prev_pos));
             prev_pos = ++pos;
         }
         result.push_back(input.substr(prev_pos));
-        return result;
+        trả_về result;
     }
     bool readPrioritySettings()
     {
         bool hasChanges = false;
         cv::String prioritized_backends = utils::getConfigurationParameterString("OPENCV_PARALLEL_PRIORITY_LIST");
-        if (prioritized_backends.empty())
-            return hasChanges;
+        nếu (prioritized_backends.empty())
+            trả_về hasChanges;
         CV_LOG_INFO(NULL, "core(parallel): Configured priority list (OPENCV_PARALLEL_PRIORITY_LIST): " << prioritized_backends);
         const std::vector<std::string> names = tokenize_string(prioritized_backends, ',');
-        for (size_t i = 0; i < names.size(); i++)
+        cho (size_t i = 0; i < names.size(); i++)
         {
             const std::string& name = names[i];
-            int priority = (int)(100000 + (names.size() - i) * 1000);
+            số_nguyên priority = (số_nguyên)(100000 + (names.size() - i) * 1000);
             bool found = false;
-            for (size_t k = 0; k < enabledBackends.size(); k++)
+            cho (size_t k = 0; k < enabledBackends.size(); k++)
             {
                 ParallelBackendInfo& info = enabledBackends[k];
-                if (name == info.name)
+                nếu (name == info.name)
                 {
                     info.priority = priority;
                     CV_LOG_DEBUG(NULL, "core(parallel): New backend priority: '" << name << "' => " << info.priority);
@@ -133,41 +133,41 @@ protected:
                     break;
                 }
             }
-            if (!found)
+            nếu (!found)
             {
                 CV_LOG_INFO(NULL, "core(parallel): Adding parallel backend (plugin): '" << name << "'");
                 enabledBackends.push_back(ParallelBackendInfo{priority, name, createPluginParallelBackendFactory(name)});
                 hasChanges = true;
             }
         }
-        return hasChanges;
+        trả_về hasChanges;
     }
 public:
     std::string dumpBackends() const
     {
         std::ostringstream os;
-        for (size_t i = 0; i < enabledBackends.size(); i++)
+        cho (size_t i = 0; i < enabledBackends.size(); i++)
         {
-            if (i > 0) os << "; ";
+            nếu (i > 0) os << "; ";
             const ParallelBackendInfo& info = enabledBackends[i];
             os << info.name << '(' << info.priority << ')';
         }
-        return os.str();
+        trả_về os.str();
     }
 
     static ParallelBackendRegistry& getInstance()
     {
         static ParallelBackendRegistry g_instance;
-        return g_instance;
+        trả_về g_instance;
     }
 
-    inline const std::vector<ParallelBackendInfo>& getEnabledBackends() const { return enabledBackends; }
+    inline const std::vector<ParallelBackendInfo>& getEnabledBackends() const { trả_về enabledBackends; }
 };
 
 
 const std::vector<ParallelBackendInfo>& getParallelBackendsInfo()
 {
-    return cv::parallel::ParallelBackendRegistry::getInstance().getEnabledBackends();
+    trả_về cv::parallel::ParallelBackendRegistry::getInstance().getEnabledBackends();
 }
 
 }} // namespace
