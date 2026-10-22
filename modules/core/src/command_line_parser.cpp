@@ -1,250 +1,250 @@
 // This file is part of OpenCV project.
 // It is subject to the license terms in the LICENSE file found in the top-level directory
 // of this distribution and at http://opencv.org/license.html.
-#include "precomp.hpp"
-#include <sstream>
+#ضمن "precomp.hpp"
+#ضمن <sstream>
 
-namespace cv
+نطاق cv
 {
 
-namespace {
-static const char* noneValue = "<none>";
+نطاق {
+ساكن ثابت حرف* none_نيلاي = "<none>";
 
-static String cat_string(const String& str)
+ساكن String cat_string(ثابت String& str)
 {
-    int left = 0, right = (int)str.length();
-    while( left < right && str[left] == ' ' )
-        left++;
-    while( right > left && str[right-1] == ' ' )
-        right--;
-    return left >= right ? String("") : str.substr(left, right-left);
+    صحيح کيري = 0, کانن = (صحيح)str.length();
+    طالما( کيري < کانن && str[کيري] == ' ' )
+        کيري++;
+    طالما( کانن > کيري && str[کانن-1] == ' ' )
+        کانن--;
+    أرجع کيري >= کانن ? String("") : str.substr(کيري, کانن-کيري);
 }
 }
 
-struct CommandLineParserParams
+بنية Command_باريس_Parser_Params
 {
-public:
+عام:
     String help_message;
-    String def_value;
-    std::vector<String> keys;
-    int number;
+    String def_نيلاي;
+    std::vector<String> کونچي_سموا;
+    صحيح نومبور;
 };
 
 
-struct CommandLineParser::Impl
+بنية Command_باريس_Parser::Impl
 {
-    bool error;
+    منطقي error;
     String error_message;
     String about_message;
 
     String path_to_app;
     String app_name;
 
-    std::vector<CommandLineParserParams> data;
+    std::vector<Command_باريس_Parser_Params> data;
 
-    std::vector<String> split_range_string(const String& str, char fs, char ss) const;
-    std::vector<String> split_string(const String& str, char symbol = ' ', bool create_empty_item = false) const;
+    std::vector<String> split_range_string(ثابت String& str, حرف fs, حرف ss) ثابت;
+    std::vector<String> split_string(ثابت String& str, حرف سيمبول = ' ', منطقي create_empty_item = خطأ) ثابت;
 
-    void apply_params(const String& key, const String& value);
-    void apply_params(int i, String value);
+    فراغ apply_params(ثابت String& کونچي, ثابت String& value);
+    فراغ apply_params(صحيح i, String value);
 
-    void sort_params();
-    int refcount;
+    فراغ sort_params();
+    صحيح refcount;
 };
 
 
-static const char* get_type_name(Param type)
+ساكن ثابت حرف* get_type_name(Param type)
 {
-    if( type == Param::INT )
-        return "int";
-    if( type == Param::BOOLEAN )
-        return "bool";
-    if( type == Param::UNSIGNED_INT )
-        return "unsigned";
-    if( type == Param::UINT64 )
-        return "unsigned long long";
-    if( type == Param::FLOAT )
-        return "float";
-    if( type == Param::REAL )
-        return "double";
-    if( type == Param::STRING )
-        return "string";
-    return "unknown";
+    إذا( type == Param::INT )
+        أرجع "int";
+    إذا( type == Param::BOOLEAN )
+        أرجع "bool";
+    إذا( type == Param::UNSIGNED_INT )
+        أرجع "unsigned";
+    إذا( type == Param::UINT64 )
+        أرجع "unsigned long long";
+    إذا( type == Param::FLOAT )
+        أرجع "float";
+    إذا( type == Param::REAL )
+        أرجع "double";
+    إذا( type == Param::STRING )
+        أرجع "string";
+    أرجع "unknown";
 }
 
-static bool parse_bool(std::string str)
+ساكن منطقي parse_bool(std::string str)
 {
     std::transform(str.begin(), str.end(), str.begin(), details::char_tolower);
     std::istringstream is(str);
-    bool value = false;
+    منطقي value = خطأ;
     is >> (str.size() > 1 ? std::boolalpha : std::noboolalpha) >> value;
 
-    if (is.fail())
+    إذا (is.fail())
         CV_Error_(Error::StsBadArg, ("can not convert: [%s] to [bool]", str.c_str()));
 
-    return value;
+    أرجع value;
 }
 
-static void from_str(const String& str, Param type, void* dst)
+ساكن فراغ from_str(ثابت String& str, Param type, فراغ* dst)
 {
     std::stringstream ss(str.c_str());
-    if( type == Param::INT )
-        ss >> *(int*)dst;
-    else if( type == Param::BOOLEAN )
+    إذا( type == Param::INT )
+        ss >> *(صحيح*)dst;
+    وإلا إذا( type == Param::BOOLEAN )
     {
         std::string temp;
         ss >> temp;
-        *(bool*) dst = parse_bool(temp);
+        *(منطقي*) dst = parse_bool(temp);
     }
-    else if( type == Param::UNSIGNED_INT )
+    وإلا إذا( type == Param::UNSIGNED_INT )
         ss >> *(unsigned*)dst;
-    else if( type == Param::UINT64 )
+    وإلا إذا( type == Param::UINT64 )
         ss >> *(uint64*)dst;
-    else if( type == Param::FLOAT )
-        ss >> *(float*)dst;
-    else if( type == Param::REAL )
-        ss >> *(double*)dst;
-    else if( type == Param::STRING )
+    وإلا إذا( type == Param::FLOAT )
+        ss >> *(عائم*)dst;
+    وإلا إذا( type == Param::REAL )
+        ss >> *(مزدوج*)dst;
+    وإلا إذا( type == Param::STRING )
         *(String*)dst = str;
-    else if( type == Param::SCALAR)
+    وإلا إذا( type == Param::SCALAR)
     {
         Scalar& scalar = *(Scalar*)dst;
-        for (int i = 0; i < 4 && !ss.eof(); ++i)
+        لكل (صحيح i = 0; i < 4 && !ss.eof(); ++i)
             ss >> scalar[i];
     }
-    else
+    وإلا
         CV_Error(Error::StsBadArg, "unknown/unsupported parameter type");
 
-    if (ss.fail())
+    إذا (ss.fail())
     {
         CV_Error_(Error::StsBadArg, ("can not convert: [%s] to [%s]", str.c_str(), get_type_name(type)));
     }
 }
 
-void CommandLineParser::getByName(const String& name, bool space_delete, Param type, void* dst) const
+فراغ Command_باريس_Parser::getByName(ثابت String& name, منطقي space_delete, Param type, فراغ* dst) ثابت
 {
-    try
+    حاول
     {
-        for (size_t i = 0; i < impl->data.size(); i++)
+        لكل (size_t i = 0; i < impl->data.size(); i++)
         {
-            for (size_t j = 0; j < impl->data[i].keys.size(); j++)
+            لكل (size_t j = 0; j < impl->data[i].کونچي_سموا.size(); j++)
             {
-                if (name == impl->data[i].keys[j])
+                إذا (name == impl->data[i].کونچي_سموا[j])
                 {
-                    String v = impl->data[i].def_value;
-                    if (space_delete)
+                    String v = impl->data[i].def_نيلاي;
+                    إذا (space_delete)
                         v = cat_string(v);
 
                     // the key was neither specified nor has a default value
-                    if((v.empty() && type != Param::STRING) || v == noneValue) {
+                    إذا((v.empty() && type != Param::STRING) || v == none_نيلاي) {
                         impl->error = true;
                         impl->error_message = impl->error_message + "Missing parameter: '" + name + "'\n";
-                        return;
+                        أرجع;
                     }
 
                     from_str(v, type, dst);
-                    return;
+                    أرجع;
                 }
             }
         }
     }
-    catch (const Exception& e)
+    امسك (ثابت Exception& e)
     {
         impl->error = true;
         impl->error_message = impl->error_message + "Parameter '"+ name + "': " + e.err + "\n";
-        return;
+        أرجع;
     }
 
     CV_Error_(Error::StsBadArg, ("undeclared key '%s' requested", name.c_str()));
 }
 
 
-void CommandLineParser::getByIndex(int index, bool space_delete, Param type, void* dst) const
+فراغ Command_باريس_Parser::getByIndex(صحيح index, منطقي space_delete, Param type, فراغ* dst) ثابت
 {
-    try
+    حاول
     {
-        for (size_t i = 0; i < impl->data.size(); i++)
+        لكل (size_t i = 0; i < impl->data.size(); i++)
         {
-            if (impl->data[i].number == index)
+            إذا (impl->data[i].نومبور == index)
             {
-                String v = impl->data[i].def_value;
-                if (space_delete == true) v = cat_string(v);
+                String v = impl->data[i].def_نيلاي;
+                إذا (space_delete == true) v = cat_string(v);
 
                 // the key was neither specified nor has a default value
-                if((v.empty() && type != Param::STRING) || v == noneValue) {
+                إذا((v.empty() && type != Param::STRING) || v == none_نيلاي) {
                     impl->error = true;
                     impl->error_message = impl->error_message + format("Missing parameter #%d\n", index);
-                    return;
+                    أرجع;
                 }
                 from_str(v, type, dst);
-                return;
+                أرجع;
             }
         }
     }
-    catch (const Exception& e)
+    امسك (ثابت Exception& e)
     {
         impl->error = true;
         impl->error_message = impl->error_message + format("Parameter #%d: ", index) + e.err + "\n";
-        return;
+        أرجع;
     }
 
     CV_Error_(Error::StsBadArg, ("undeclared position %d requested", index));
 }
 
-static bool cmp_params(const CommandLineParserParams & p1, const CommandLineParserParams & p2)
+ساكن منطقي cmp_params(ثابت Command_باريس_Parser_Params & p1, ثابت Command_باريس_Parser_Params & p2)
 {
-    if (p1.number < p2.number)
-        return true;
+    إذا (p1.نومبور < p2.نومبور)
+        أرجع true;
 
-    if (p1.number > p2.number)
-        return false;
+    إذا (p1.نومبور > p2.نومبور)
+        أرجع خطأ;
 
-    return p1.keys[0].compare(p2.keys[0]) < 0;
+    أرجع p1.کونچي_سموا[0].compare(p2.کونچي_سموا[0]) < 0;
 }
 
-CommandLineParser::CommandLineParser(int argc, const char* const argv[], const String& keys)
+Command_باريس_Parser::Command_باريس_Parser(صحيح argc, ثابت حرف* ثابت argv[], ثابت String& کونچي_سموا)
 {
-    impl = new Impl;
+    impl = جديد Impl;
     impl->refcount = 1;
 
     // path to application
     size_t pos_s = String(argv[0]).find_last_of("/\\");
-    if (pos_s == String::npos)
+    إذا (pos_s == String::npos)
     {
         impl->path_to_app = "";
         impl->app_name = String(argv[0]);
     }
-    else
+    وإلا
     {
         impl->path_to_app = String(argv[0]).substr(0, pos_s);
         impl->app_name = String(argv[0]).substr(pos_s + 1, String(argv[0]).length() - pos_s);
     }
 
-    impl->error = false;
+    impl->error = خطأ;
     impl->error_message = "";
 
     // parse keys
-    std::vector<String> k = impl->split_range_string(keys, '{', '}');
+    std::vector<String> k = impl->split_range_string(کونچي_سموا, '{', '}');
 
-    int jj = 0;
-    for (size_t i = 0; i < k.size(); i++)
+    صحيح jj = 0;
+    لكل (size_t i = 0; i < k.size(); i++)
     {
         std::vector<String> l = impl->split_string(k[i], '|', true);
-        CommandLineParserParams p;
-        p.keys = impl->split_string(l[0]);
-        p.def_value = l[1];
+        Command_باريس_Parser_Params p;
+        p.کونچي_سموا = impl->split_string(l[0]);
+        p.def_نيلاي = l[1];
         p.help_message = cat_string(l[2]);
-        p.number = -1;
-        if (p.keys.size() <= 0)
+        p.نومبور = -1;
+        إذا (p.کونچي_سموا.size() <= 0)
         {
             impl->error = true;
             impl->error_message = "Field KEYS could not be empty\n";
         }
-        else
+        وإلا
         {
-            if (p.keys[0][0] == '@')
+            إذا (p.کونچي_سموا[0][0] == '@')
             {
-                p.number = jj;
+                p.نومبور = jj;
                 jj++;
             }
 
@@ -254,25 +254,25 @@ CommandLineParser::CommandLineParser(int argc, const char* const argv[], const S
 
     // parse argv
     jj = 0;
-    for (int i = 1; i < argc; i++)
+    لكل (صحيح i = 1; i < argc; i++)
     {
         String s(argv[i]);
-        bool hasSingleDash = s.length() > 1 && s[0] == '-';
+        منطقي hasSingleDash = s.length() > 1 && s[0] == '-';
 
-        if (hasSingleDash)
+        إذا (hasSingleDash)
         {
-            bool hasDoubleDash = s.length() > 2 && s[1] == '-';
-            String key = s.substr(hasDoubleDash ? 2 : 1);
+            منطقي hasDoubleDash = s.length() > 2 && s[1] == '-';
+            String کونچي = s.substr(hasDoubleDash ? 2 : 1);
             String value = "true";
-            size_t equalsPos = key.find('=');
+            size_t equalsPos = کونچي.find('=');
 
-            if(equalsPos != String::npos) {
-                value = key.substr(equalsPos + 1);
-                key = key.substr(0, equalsPos);
+            إذا(equalsPos != String::npos) {
+                value = کونچي.substr(equalsPos + 1);
+                کونچي = کونچي.substr(0, equalsPos);
             }
-            impl->apply_params(key, value);
+            impl->apply_params(کونچي, value);
         }
-        else
+        وإلا
         {
             impl->apply_params(jj, s);
             jj++;
@@ -282,87 +282,87 @@ CommandLineParser::CommandLineParser(int argc, const char* const argv[], const S
     impl->sort_params();
 }
 
-CommandLineParser::~CommandLineParser()
+Command_باريس_Parser::~Command_باريس_Parser()
 {
-    if (CV_XADD(&impl->refcount, -1) == 1)
+    إذا (CV_XADD(&impl->refcount, -1) == 1)
         delete impl;
 }
 
-CommandLineParser::CommandLineParser(const CommandLineParser& parser)
+Command_باريس_Parser::Command_باريس_Parser(ثابت Command_باريس_Parser& parser)
 {
     impl = parser.impl;
     CV_XADD(&impl->refcount, 1);
 }
 
-CommandLineParser& CommandLineParser::operator = (const CommandLineParser& parser)
+Command_باريس_Parser& Command_باريس_Parser::operator = (ثابت Command_باريس_Parser& parser)
 {
-    if( this != &parser )
+    إذا( هذا != &parser )
     {
         CV_XADD(&parser.impl->refcount, 1);
-        if(CV_XADD(&impl->refcount, -1) == 1)
+        إذا(CV_XADD(&impl->refcount, -1) == 1)
             delete impl;
         impl = parser.impl;
     }
-    return *this;
+    أرجع *هذا;
 }
 
-void CommandLineParser::about(const String& message)
+فراغ Command_باريس_Parser::about(ثابت String& message)
 {
     impl->about_message = message;
 }
 
-void CommandLineParser::Impl::apply_params(const String& key, const String& value)
+فراغ Command_باريس_Parser::Impl::apply_params(ثابت String& کونچي, ثابت String& value)
 {
-    for (size_t i = 0; i < data.size(); i++)
+    لكل (size_t i = 0; i < data.size(); i++)
     {
-        for (size_t k = 0; k < data[i].keys.size(); k++)
+        لكل (size_t k = 0; k < data[i].کونچي_سموا.size(); k++)
         {
-            if (key.compare(data[i].keys[k]) == 0)
+            إذا (کونچي.compare(data[i].کونچي_سموا[k]) == 0)
             {
-                data[i].def_value = value;
-                break;
+                data[i].def_نيلاي = value;
+                اكسر;
             }
         }
     }
 }
 
-void CommandLineParser::Impl::apply_params(int i, String value)
+فراغ Command_باريس_Parser::Impl::apply_params(صحيح i, String value)
 {
-    for (size_t j = 0; j < data.size(); j++)
+    لكل (size_t j = 0; j < data.size(); j++)
     {
-        if (data[j].number == i)
+        إذا (data[j].نومبور == i)
         {
-            data[j].def_value = value;
-            break;
+            data[j].def_نيلاي = value;
+            اكسر;
         }
     }
 }
 
-void CommandLineParser::Impl::sort_params()
+فراغ Command_باريس_Parser::Impl::sort_params()
 {
-    for (size_t i = 0; i < data.size(); i++)
+    لكل (size_t i = 0; i < data.size(); i++)
     {
-        std::sort(data[i].keys.begin(), data[i].keys.end());
+        std::sort(data[i].کونچي_سموا.begin(), data[i].کونچي_سموا.end());
     }
 
     std::sort (data.begin(), data.end(), cmp_params);
 }
 
-String CommandLineParser::getPathToApplication() const
+String Command_باريس_Parser::getPathToApplication() ثابت
 {
-    return impl->path_to_app;
+    أرجع impl->path_to_app;
 }
 
-bool CommandLineParser::has(const String& name) const
+منطقي Command_باريس_Parser::has(ثابت String& name) ثابت
 {
-    for (size_t i = 0; i < impl->data.size(); i++)
+    لكل (size_t i = 0; i < impl->data.size(); i++)
     {
-        for (size_t j = 0; j < impl->data[i].keys.size(); j++)
+        لكل (size_t j = 0; j < impl->data[i].کونچي_سموا.size(); j++)
         {
-            if (name == impl->data[i].keys[j])
+            إذا (name == impl->data[i].کونچي_سموا[j])
             {
-                const String v = cat_string(impl->data[i].def_value);
-                return !v.empty() && v != noneValue;
+                ثابت String v = cat_string(impl->data[i].def_نيلاي);
+                أرجع !v.empty() && v != none_نيلاي;
             }
         }
     }
@@ -370,63 +370,63 @@ bool CommandLineParser::has(const String& name) const
     CV_Error_(Error::StsBadArg, ("undeclared key '%s' requested", name.c_str()));
 }
 
-bool CommandLineParser::check() const
+منطقي Command_باريس_Parser::check() ثابت
 {
-    return impl->error == false;
+    أرجع impl->error == خطأ;
 }
 
-void CommandLineParser::printErrors() const
+فراغ Command_باريس_Parser::printErrors() ثابت
 {
-    if (impl->error)
+    إذا (impl->error)
     {
         printf("\nERRORS:\n%s\n", impl->error_message.c_str());
         fflush(stdout);
     }
 }
 
-void CommandLineParser::printMessage() const
+فراغ Command_باريس_Parser::printMessage() ثابت
 {
-    if (impl->about_message != "")
+    إذا (impl->about_message != "")
         printf("%s\n", impl->about_message.c_str());
 
     printf("Usage: %s [params] ", impl->app_name.c_str());
 
-    for (size_t i = 0; i < impl->data.size(); i++)
+    لكل (size_t i = 0; i < impl->data.size(); i++)
     {
-        if (impl->data[i].number > -1)
+        إذا (impl->data[i].نومبور > -1)
         {
-            String name = impl->data[i].keys[0].substr(1, impl->data[i].keys[0].length() - 1);
+            String name = impl->data[i].کونچي_سموا[0].substr(1, impl->data[i].کونچي_سموا[0].length() - 1);
             printf("%s ", name.c_str());
         }
     }
 
     printf("\n\n");
 
-    for (size_t i = 0; i < impl->data.size(); i++)
+    لكل (size_t i = 0; i < impl->data.size(); i++)
     {
-        if (impl->data[i].number == -1)
+        إذا (impl->data[i].نومبور == -1)
         {
             printf("\t");
-            for (size_t j = 0; j < impl->data[i].keys.size(); j++)
+            لكل (size_t j = 0; j < impl->data[i].کونچي_سموا.size(); j++)
             {
-                String k = impl->data[i].keys[j];
-                if (k.length() > 1)
+                String k = impl->data[i].کونچي_سموا[j];
+                إذا (k.length() > 1)
                 {
                     printf("--");
                 }
-                else
+                وإلا
                 {
                     printf("-");
                 }
                 printf("%s", k.c_str());
 
-                if (j != impl->data[i].keys.size() - 1)
+                إذا (j != impl->data[i].کونچي_سموا.size() - 1)
                 {
                     printf(", ");
                 }
             }
-            String dv = cat_string(impl->data[i].def_value);
-            if (dv.compare("") != 0)
+            String dv = cat_string(impl->data[i].def_نيلاي);
+            إذا (dv.compare("") != 0)
             {
                 printf(" (value:%s)", dv.c_str());
             }
@@ -435,18 +435,18 @@ void CommandLineParser::printMessage() const
     }
     printf("\n");
 
-    for (size_t i = 0; i < impl->data.size(); i++)
+    لكل (size_t i = 0; i < impl->data.size(); i++)
     {
-        if (impl->data[i].number != -1)
+        إذا (impl->data[i].نومبور != -1)
         {
             printf("\t");
-            String k = impl->data[i].keys[0];
+            String k = impl->data[i].کونچي_سموا[0];
             k = k.substr(1, k.length() - 1);
 
             printf("%s", k.c_str());
 
-            String dv = cat_string(impl->data[i].def_value);
-            if (dv.compare("") != 0)
+            String dv = cat_string(impl->data[i].def_نيلاي);
+            إذا (dv.compare("") != 0)
             {
                 printf(" (value:%s)", dv.c_str());
             }
@@ -455,20 +455,20 @@ void CommandLineParser::printMessage() const
     }
 }
 
-std::vector<String> CommandLineParser::Impl::split_range_string(const String& _str, char fs, char ss) const
+std::vector<String> Command_باريس_Parser::Impl::split_range_string(ثابت String& _str, حرف fs, حرف ss) ثابت
 {
     String str = _str;
     std::vector<String> vec;
     String word = "";
-    bool begin = false;
+    منطقي begin = خطأ;
 
-    while (!str.empty())
+    طالما (!str.empty())
     {
-        if (str[0] == fs)
+        إذا (str[0] == fs)
         {
-            if (begin == true)
+            إذا (begin == true)
             {
-                throw cv::Exception(cv::Error::StsParseError,
+                ارم cv::Exception(cv::Error::StsParseError,
                          String("error in split_range_string(")
                          + str
                          + String(", ")
@@ -484,11 +484,11 @@ std::vector<String> CommandLineParser::Impl::split_range_string(const String& _s
             str = str.substr(1, str.length() - 1);
         }
 
-        if (str[0] == ss)
+        إذا (str[0] == ss)
         {
-            if (begin == false)
+            إذا (begin == خطأ)
             {
-                throw cv::Exception(cv::Error::StsParseError,
+                ارم cv::Exception(cv::Error::StsParseError,
                          String("error in split_range_string(")
                          + str
                          + String(", ")
@@ -499,20 +499,20 @@ std::vector<String> CommandLineParser::Impl::split_range_string(const String& _s
                          "", __FILE__, __LINE__
                          );
             }
-            begin = false;
+            begin = خطأ;
             vec.push_back(word);
         }
 
-        if (begin == true)
+        إذا (begin == true)
         {
             word = word + str[0];
         }
         str = str.substr(1, str.length() - 1);
     }
 
-    if (begin == true)
+    إذا (begin == true)
     {
-        throw cv::Exception(cv::Error::StsParseError,
+        ارم cv::Exception(cv::Error::StsParseError,
                  String("error in split_range_string(")
                  + str
                  + String(", ")
@@ -524,38 +524,38 @@ std::vector<String> CommandLineParser::Impl::split_range_string(const String& _s
                 );
     }
 
-    return vec;
+    أرجع vec;
 }
 
-std::vector<String> CommandLineParser::Impl::split_string(const String& _str, char symbol, bool create_empty_item) const
+std::vector<String> Command_باريس_Parser::Impl::split_string(ثابت String& _str, حرف سيمبول, منطقي create_empty_item) ثابت
 {
     String str = _str;
     std::vector<String> vec;
     String word = "";
 
-    while (!str.empty())
+    طالما (!str.empty())
     {
-        if (str[0] == symbol)
+        إذا (str[0] == سيمبول)
         {
-            if (!word.empty() || create_empty_item)
+            إذا (!word.empty() || create_empty_item)
             {
                 vec.push_back(word);
                 word = "";
             }
         }
-        else
+        وإلا
         {
             word = word + str[0];
         }
         str = str.substr(1, str.length() - 1);
     }
 
-    if (word != "" || create_empty_item)
+    إذا (word != "" || create_empty_item)
     {
         vec.push_back(word);
     }
 
-    return vec;
+    أرجع vec;
 }
 
 }

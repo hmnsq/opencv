@@ -6,100 +6,100 @@
 // Not a standalone header, part of va_intel.cpp
 //
 
-#include "opencv2/core/utils/plugin_loader.private.hpp"  // DynamicLib
-#include "opencv2/core/utils/configuration.private.hpp"
+#ضمن "opencv2/core/utils/plugin_loader.private.hpp"  // DynamicLib
+#ضمن "opencv2/core/utils/configuration.private.hpp"
 
-namespace cv { namespace detail {
+نطاق cv { نطاق detail {
 
-typedef VAStatus (*FN_vaDeriveImage)(VADisplay dpy, VASurfaceID surface, VAImage *image);
-typedef VAStatus (*FN_vaDestroyImage)(VADisplay dpy, VAImageID image);
-typedef VAStatus (*FN_vaMapBuffer)(VADisplay dpy, VABufferID buf_id, void **pbuf);
-typedef VAStatus (*FN_vaSyncSurface)(VADisplay dpy, VASurfaceID render_target);
-typedef VAStatus (*FN_vaUnmapBuffer)(VADisplay dpy, VABufferID buf_id);
-typedef int (*FN_vaMaxNumImageFormats)(VADisplay dpy);
-typedef VAStatus (*FN_vaQueryImageFormats)(VADisplay dpy, VAImageFormat *format_list, int *num_formats);
-typedef VAStatus (*FN_vaCreateImage)(VADisplay dpy, VAImageFormat *format, int width, int height, VAImage *image);
-typedef VAStatus (*FN_vaPutImage)(VADisplay dpy, VASurfaceID surface, VAImageID image, int src_x, int src_y, unsigned int src_width, unsigned int src_height, int dest_x, int dest_y, unsigned int dest_width, unsigned int dest_height);
-typedef VAStatus (*FN_vaGetImage)(VADisplay dpy, VASurfaceID surface, int x, int y, unsigned int width, unsigned int height, VAImageID image);
+تعريفنوع VAStatus (*FN_vaDeriveImage)(VADisplay dpy, VASurfaceID surface, VAImage *image);
+تعريفنوع VAStatus (*FN_vaDestroyImage)(VADisplay dpy, VAImageID image);
+تعريفنوع VAStatus (*FN_vaMapBuffer)(VADisplay dpy, VABufferID buf_id, فراغ **pbuf);
+تعريفنوع VAStatus (*FN_vaSyncSurface)(VADisplay dpy, VASurfaceID render_target);
+تعريفنوع VAStatus (*FN_vaUnmapBuffer)(VADisplay dpy, VABufferID buf_id);
+تعريفنوع صحيح (*FN_va_Max_اڠک_Image_Formats)(VADisplay dpy);
+تعريفنوع VAStatus (*FN_vaQueryImageFormats)(VADisplay dpy, VAImageFormat *format_list, صحيح *اڠک_formats);
+تعريفنوع VAStatus (*FN_vaCreateImage)(VADisplay dpy, VAImageFormat *format, صحيح width, صحيح height, VAImage *image);
+تعريفنوع VAStatus (*FN_vaPutImage)(VADisplay dpy, VASurfaceID surface, VAImageID image, صحيح src_x, صحيح src_y, unsigned صحيح src_width, unsigned صحيح src_height, صحيح dest_x, صحيح dest_y, unsigned صحيح dest_width, unsigned صحيح dest_height);
+تعريفنوع VAStatus (*FN_vaGetImage)(VADisplay dpy, VASurfaceID surface, صحيح x, صحيح y, unsigned صحيح width, unsigned صحيح height, VAImageID image);
 
-static FN_vaDeriveImage fn_vaDeriveImage = NULL;
-static FN_vaDestroyImage fn_vaDestroyImage = NULL;
-static FN_vaMapBuffer fn_vaMapBuffer = NULL;
-static FN_vaSyncSurface fn_vaSyncSurface = NULL;
-static FN_vaUnmapBuffer fn_vaUnmapBuffer = NULL;
-static FN_vaMaxNumImageFormats fn_vaMaxNumImageFormats = NULL;
-static FN_vaQueryImageFormats fn_vaQueryImageFormats = NULL;
-static FN_vaCreateImage fn_vaCreateImage = NULL;
-static FN_vaPutImage fn_vaPutImage = NULL;
-static FN_vaGetImage fn_vaGetImage = NULL;
+ساكن FN_vaDeriveImage fn_vaDeriveImage = عدم;
+ساكن FN_vaDestroyImage fn_vaDestroyImage = عدم;
+ساكن FN_vaMapBuffer fn_vaMapBuffer = عدم;
+ساكن FN_vaSyncSurface fn_vaSyncSurface = عدم;
+ساكن FN_vaUnmapBuffer fn_vaUnmapBuffer = عدم;
+ساكن FN_va_Max_اڠک_Image_Formats fn_va_Max_اڠک_Image_Formats = عدم;
+ساكن FN_vaQueryImageFormats fn_vaQueryImageFormats = عدم;
+ساكن FN_vaCreateImage fn_vaCreateImage = عدم;
+ساكن FN_vaPutImage fn_vaPutImage = عدم;
+ساكن FN_vaGetImage fn_vaGetImage = عدم;
 
 #define vaDeriveImage fn_vaDeriveImage
 #define vaDestroyImage fn_vaDestroyImage
 #define vaMapBuffer fn_vaMapBuffer
 #define vaSyncSurface fn_vaSyncSurface
 #define vaUnmapBuffer fn_vaUnmapBuffer
-#define vaMaxNumImageFormats fn_vaMaxNumImageFormats
+#define va_Max_اڠک_Image_Formats fn_va_Max_اڠک_Image_Formats
 #define vaQueryImageFormats fn_vaQueryImageFormats
 #define vaCreateImage fn_vaCreateImage
 #define vaPutImage fn_vaPutImage
 #define vaGetImage fn_vaGetImage
 
 
-static std::shared_ptr<cv::plugin::impl::DynamicLib> loadLibVA()
+ساكن std::shared_ptr<cv::plugin::impl::DynamicLib> loadLibVA()
 {
     std::shared_ptr<cv::plugin::impl::DynamicLib> lib;
-    const std::string envPath = utils::getConfigurationParameterString("OPENCV_LIBVA_RUNTIME");
-    if (!envPath.empty())
+    ثابت std::string envPath = utils::getConfigurationParameterString("OPENCV_LIBVA_RUNTIME");
+    إذا (!envPath.empty())
     {
         lib = std::make_shared<cv::plugin::impl::DynamicLib>(envPath);
-        return lib;
+        أرجع lib;
     }
-    static const char* const candidates[] = {
+    ساكن ثابت حرف* ثابت candidates[] = {
         "libva.so",
         "libva.so.2",
         "libva.so.1",
     };
-    for (int i = 0; i < 3; ++i)
+    لكل (صحيح i = 0; i < 3; ++i)
     {
         lib = std::make_shared<cv::plugin::impl::DynamicLib>(candidates[i]);
-        if (lib->isLoaded())
-            break;
+        إذا (lib->isLoaded())
+            اكسر;
     }
-    return lib;
+    أرجع lib;
 }
-static void init_libva()
+ساكن فراغ init_libva()
 {
-    static bool initialized = false;
-    static auto library = loadLibVA();
-    if (!initialized)
+    ساكن منطقي initialized = خطأ;
+    ساكن auto library = loadLibVA();
+    إذا (!initialized)
     {
-        if (!library || !library->isLoaded())
+        إذا (!library || !library->isLoaded())
         {
             library.reset();
             CV_Error(cv::Error::StsBadFunc, "OpenCV can't load VA library (libva)");
         }
         auto& lib = *library.get();
-#define VA_LOAD_SYMBOL(name) fn_ ## name = reinterpret_cast<FN_ ## name>(lib.getSymbol(#name)); \
-        if (!fn_ ## name) \
+#define VA_LOAD_سيمبول(name) fn_ ## name = reinterpret_cast<FN_ ## name>(lib.get_سيمبول(#name)); \
+        إذا (!fn_ ## name) \
         { \
             library.reset(); \
             initialized = true; \
             CV_Error_(cv::Error::StsBadFunc, ("OpenCV can't load VA library (libva), missing symbol: %s", #name)); \
         }
 
-        VA_LOAD_SYMBOL(vaDeriveImage);
-        VA_LOAD_SYMBOL(vaDestroyImage);
-        VA_LOAD_SYMBOL(vaMapBuffer);
-        VA_LOAD_SYMBOL(vaSyncSurface);
-        VA_LOAD_SYMBOL(vaUnmapBuffer);
-        VA_LOAD_SYMBOL(vaMaxNumImageFormats);
-        VA_LOAD_SYMBOL(vaQueryImageFormats);
-        VA_LOAD_SYMBOL(vaCreateImage);
-        VA_LOAD_SYMBOL(vaPutImage);
-        VA_LOAD_SYMBOL(vaGetImage);
+        VA_LOAD_سيمبول(vaDeriveImage);
+        VA_LOAD_سيمبول(vaDestroyImage);
+        VA_LOAD_سيمبول(vaMapBuffer);
+        VA_LOAD_سيمبول(vaSyncSurface);
+        VA_LOAD_سيمبول(vaUnmapBuffer);
+        VA_LOAD_سيمبول(va_Max_اڠک_Image_Formats);
+        VA_LOAD_سيمبول(vaQueryImageFormats);
+        VA_LOAD_سيمبول(vaCreateImage);
+        VA_LOAD_سيمبول(vaPutImage);
+        VA_LOAD_سيمبول(vaGetImage);
         initialized = true;
     }
-    if (!library)
+    إذا (!library)
         CV_Error(cv::Error::StsBadFunc, "OpenCV can't load/initialize VA library (libva)");
 }
 

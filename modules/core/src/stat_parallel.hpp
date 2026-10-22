@@ -11,63 +11,63 @@
 #ifndef OPENCV_CORE_STAT_PARALLEL_HPP
 #define OPENCV_CORE_STAT_PARALLEL_HPP
 
-namespace cv {
+نطاق cv {
 
-struct StatChunk
+بنية StatChunk
 {
     Mat src, mask;
     size_t firstElem;   // row-major index of the first element of the piece in the whole array
 };
 
 // Returns false when the array is too small to be worth splitting, or cannot be split.
-static inline bool splitForParallelStat(const Mat& src, const Mat& mask, std::vector<StatChunk>& chunks)
+ساكن مضمن منطقي splitForParallelStat(ثابت Mat& src, ثابت Mat& mask, std::vector<StatChunk>& chunks)
 {
-    const size_t total = src.total(), work = total*src.channels();
-    if (work < ((size_t)1 << 18))
-        return false;
-    const int nthreads = getNumThreads();
-    if (nthreads <= 1)
-        return false;
-    const int n = (int)std::min((size_t)nthreads*2, work >> 16);
-    if (n < 2)
-        return false;
+    ثابت size_t total = src.total(), work = total*src.channels();
+    إذا (work < ((size_t)1 << 18))
+        أرجع خطأ;
+    ثابت صحيح nthreads = get_اڠک_Threads();
+    إذا (nthreads <= 1)
+        أرجع خطأ;
+    ثابت صحيح n = (صحيح)std::min((size_t)nthreads*2, work >> 16);
+    إذا (n < 2)
+        أرجع خطأ;
 
     chunks.clear();
-    if (src.dims <= 2 && src.rows >= n)
+    إذا (src.dims <= 2 && src.rows >= n)
     {
-        for (int i = 0; i < n; i++)
+        لكل (صحيح i = 0; i < n; i++)
         {
-            int r0 = (int)((int64)src.rows*i/n), r1 = (int)((int64)src.rows*(i + 1)/n);
+            صحيح r0 = (صحيح)((int64)src.rows*i/n), r1 = (صحيح)((int64)src.rows*(i + 1)/n);
             StatChunk c;
             c.src = src.rowRange(r0, r1);
-            if (!mask.empty())
+            إذا (!mask.empty())
                 c.mask = mask.rowRange(r0, r1);
             c.firstElem = (size_t)r0*src.cols;
             chunks.push_back(c);
         }
-        return true;
+        أرجع true;
     }
-    if (src.isContinuous() && (mask.empty() || mask.isContinuous()) && total <= (size_t)INT_MAX)
+    إذا (src.isContinuous() && (mask.empty() || mask.isContinuous()) && total <= (size_t)INT_MAX)
     {
-        for (int i = 0; i < n; i++)
+        لكل (صحيح i = 0; i < n; i++)
         {
             size_t e0 = total*i/n, e1 = total*(i + 1)/n;
             StatChunk c;
-            c.src = Mat(1, (int)(e1 - e0), src.type(), (void*)(src.data + e0*src.elemSize()));
-            if (!mask.empty())
-                c.mask = Mat(1, (int)(e1 - e0), mask.type(), (void*)(mask.data + e0*mask.elemSize()));
+            c.src = Mat(1, (صحيح)(e1 - e0), src.type(), (فراغ*)(src.data + e0*src.elemSize()));
+            إذا (!mask.empty())
+                c.mask = Mat(1, (صحيح)(e1 - e0), mask.type(), (فراغ*)(mask.data + e0*mask.elemSize()));
             c.firstElem = e0;
             chunks.push_back(c);
         }
-        return true;
+        أرجع true;
     }
-    return false;
+    أرجع خطأ;
 }
 
 // row-major index of an element given by the per-dimension indices of a 2D piece
-static inline size_t chunkIndexToElem(const StatChunk& c, const int* idx)
+ساكن مضمن size_t chunkIndexToElem(ثابت StatChunk& c, ثابت صحيح* idx)
 {
-    return c.firstElem + (size_t)idx[0]*c.src.cols + idx[1];
+    أرجع c.firstElem + (size_t)idx[0]*c.src.cols + idx[1];
 }
 
 } // namespace cv
