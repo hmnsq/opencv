@@ -52,32 +52,32 @@ namespace cv
 
 PCA::PCA() {}
 
-PCA::PCA(InputArray data, InputArray _mean, int flags, int maxComponents)
+PCA::PCA(InputArray data, InputArray _mean, ကိန်းပြည့် flags, ကိန်းပြည့် maxComponents)
 {
     operator()(data, _mean, flags, maxComponents);
 }
 
-PCA::PCA(InputArray data, InputArray _mean, int flags, double retainedVariance)
+PCA::PCA(InputArray data, InputArray _mean, ကိန်းပြည့် flags, dviguu_na retainedVariance)
 {
     operator()(data, _mean, flags, retainedVariance);
 }
 
-PCA& PCA::operator()(InputArray _data, InputArray __mean, int flags, int maxComponents)
+PCA& PCA::operator()(InputArray _data, InputArray __mean, ကိန်းပြည့် flags, ကိန်းပြည့် maxComponents)
 {
     Mat data = _data.getMat(), _mean = __mean.getMat();
-    int covar_flags = cv::COVAR_SCALE;
-    int len, in_count;
+    ကိန်းပြည့် covar_flags = cv::COVAR_SCALE;
+    ကိန်းပြည့် len, in_count;
     Size mean_sz;
 
     CV_Assert( data.channels() == 1 );
-    if( flags & PCA::DATA_AS_COL )
+    အကယ်၍( flags & PCA::DATA_AS_COL )
     {
         len = data.rows;
         in_count = data.cols;
         covar_flags |= cv::COVAR_COLS;
         mean_sz = Size(1, len);
     }
-    else
+    မဟုတ်ပါက
     {
         len = data.cols;
         in_count = data.rows;
@@ -85,21 +85,21 @@ PCA& PCA::operator()(InputArray _data, InputArray __mean, int flags, int maxComp
         mean_sz = Size(len, 1);
     }
 
-    int count = std::min(len, in_count), out_count = count;
-    if( maxComponents > 0 )
+    ကိန်းပြည့် count = std::min(len, in_count), out_count = count;
+    အကယ်၍( maxComponents > 0 )
         out_count = std::min(count, maxComponents);
 
     // "scrambled" way to compute PCA (when cols(A)>rows(A)):
     // B = A'A; B*x=b*x; C = AA'; C*y=c*y -> AA'*y=c*y -> A'A*(A'*y)=c*(A'*y) -> c = b, x=A'*y
-    if( len <= in_count )
+    အကယ်၍( len <= in_count )
         covar_flags |= cv::COVAR_NORMAL;
 
-    int ctype = std::max(CV_32F, data.depth());
+    ကိန်းပြည့် ctype = std::max(CV_32F, data.depth());
     mean.create( mean_sz, ctype );
 
     Mat covar( count, count, ctype );
 
-    if( !_mean.empty() )
+    အကယ်၍( !_mean.empty() )
     {
         CV_Assert( _mean.size() == mean_sz );
         _mean.convertTo(mean, ctype);
@@ -109,17 +109,17 @@ PCA& PCA::operator()(InputArray _data, InputArray __mean, int flags, int maxComp
     calcCovarMatrix( data, covar, mean, covar_flags, ctype );
     eigen( covar, eigenvalues, eigenvectors );
 
-    if( !(covar_flags & cv::COVAR_NORMAL) )
+    အကယ်၍( !(covar_flags & cv::COVAR_NORMAL) )
     {
         // PCA::DATA_AS_ROW: cols(A)>rows(A). x=A'*y -> x'=y'*A
         // PCA::DATA_AS_COL: rows(A)>cols(A). x=A''*y -> x'=y'*A'
         Mat tmp_data, tmp_mean = repeat(mean, data.rows/mean.rows, data.cols/mean.cols);
-        if( data.type() != ctype || tmp_mean.data == mean.data )
+        အကယ်၍( data.type() != ctype || tmp_mean.data == mean.data )
         {
             data.convertTo( tmp_data, ctype );
             subtract( tmp_data, tmp_mean, tmp_data );
         }
-        else
+        မဟုတ်ပါက
         {
             subtract( data, tmp_mean, tmp_mean );
             tmp_data = tmp_mean;
@@ -131,21 +131,21 @@ PCA& PCA::operator()(InputArray _data, InputArray __mean, int flags, int maxComp
         eigenvectors = evects1;
 
         // normalize eigenvectors
-        int i;
-        for( i = 0; i < out_count; i++ )
+        ကိန်းပြည့် i;
+        အတွက်( i = 0; i < out_count; i++ )
         {
             Mat vec = eigenvectors.row(i);
             normalize(vec, vec);
         }
     }
 
-    if( count > out_count )
+    အကယ်၍( count > out_count )
     {
         // use clone() to physically copy the data and thus deallocate the original matrices
         eigenvalues = eigenvalues.rowRange(0,out_count).clone();
         eigenvectors = eigenvectors.rowRange(0,out_count).clone();
     }
-    return *this;
+    ပြန်ပေး *this;
 }
 
 void PCA::write(FileStorage& fs ) const
@@ -169,51 +169,51 @@ void PCA::read(const FileNode& fn)
 }
 
 template <typename T>
-int computeCumulativeEnergy(const Mat& eigenvalues, double retainedVariance)
+ကိန်းပြည့် computeCumulativeEnergy(const Mat& eigenvalues, dviguu_na retainedVariance)
 {
     CV_DbgAssert( eigenvalues.type() == DataType<T>::type );
 
     Mat g(eigenvalues.size(), DataType<T>::type);
 
-    for(int ig = 0; ig < g.rows; ig++)
+    အတွက်(ကိန်းပြည့် ig = 0; ig < g.rows; ig++)
     {
         g.at<T>(ig, 0) = 0;
-        for(int im = 0; im <= ig; im++)
+        အတွက်(ကိန်းပြည့် im = 0; im <= ig; im++)
         {
             g.at<T>(ig,0) += eigenvalues.at<T>(im,0);
         }
     }
 
-    int L;
+    ကိန်းပြည့် L;
 
-    for(L = 0; L < eigenvalues.rows; L++)
+    အတွက်(L = 0; L < eigenvalues.rows; L++)
     {
-        double energy = g.at<T>(L, 0) / g.at<T>(g.rows - 1, 0);
-        if(energy > retainedVariance)
-            break;
+        dviguu_na energy = g.at<T>(L, 0) / g.at<T>(g.rows - 1, 0);
+        အကယ်၍(energy > retainedVariance)
+            bha_nga;
     }
 
     L = std::max(2, L);
 
-    return L;
+    ပြန်ပေး L;
 }
 
-PCA& PCA::operator()(InputArray _data, InputArray __mean, int flags, double retainedVariance)
+PCA& PCA::operator()(InputArray _data, InputArray __mean, ကိန်းပြည့် flags, dviguu_na retainedVariance)
 {
     Mat data = _data.getMat(), _mean = __mean.getMat();
-    int covar_flags = cv::COVAR_SCALE;
-    int len, in_count;
+    ကိန်းပြည့် covar_flags = cv::COVAR_SCALE;
+    ကိန်းပြည့် len, in_count;
     Size mean_sz;
 
     CV_Assert( data.channels() == 1 );
-    if( flags & PCA::DATA_AS_COL )
+    အကယ်၍( flags & PCA::DATA_AS_COL )
     {
         len = data.rows;
         in_count = data.cols;
         covar_flags |= cv::COVAR_COLS;
         mean_sz = Size(1, len);
     }
-    else
+    မဟုတ်ပါက
     {
         len = data.cols;
         in_count = data.rows;
@@ -223,19 +223,19 @@ PCA& PCA::operator()(InputArray _data, InputArray __mean, int flags, double reta
 
     CV_Assert( retainedVariance > 0 && retainedVariance <= 1 );
 
-    int count = std::min(len, in_count);
+    ကိန်းပြည့် count = std::min(len, in_count);
 
     // "scrambled" way to compute PCA (when cols(A)>rows(A)):
     // B = A'A; B*x=b*x; C = AA'; C*y=c*y -> AA'*y=c*y -> A'A*(A'*y)=c*(A'*y) -> c = b, x=A'*y
-    if( len <= in_count )
+    အကယ်၍( len <= in_count )
         covar_flags |= cv::COVAR_NORMAL;
 
-    int ctype = std::max(CV_32F, data.depth());
+    ကိန်းပြည့် ctype = std::max(CV_32F, data.depth());
     mean.create( mean_sz, ctype );
 
     Mat covar( count, count, ctype );
 
-    if( !_mean.empty() )
+    အကယ်၍( !_mean.empty() )
     {
         CV_Assert( _mean.size() == mean_sz );
         _mean.convertTo(mean, ctype);
@@ -245,17 +245,17 @@ PCA& PCA::operator()(InputArray _data, InputArray __mean, int flags, double reta
     calcCovarMatrix( data, covar, mean, covar_flags, ctype );
     eigen( covar, eigenvalues, eigenvectors );
 
-    if( !(covar_flags & cv::COVAR_NORMAL) )
+    အကယ်၍( !(covar_flags & cv::COVAR_NORMAL) )
     {
         // PCA::DATA_AS_ROW: cols(A)>rows(A). x=A'*y -> x'=y'*A
         // PCA::DATA_AS_COL: rows(A)>cols(A). x=A''*y -> x'=y'*A'
         Mat tmp_data, tmp_mean = repeat(mean, data.rows/mean.rows, data.cols/mean.cols);
-        if( data.type() != ctype || tmp_mean.data == mean.data )
+        အကယ်၍( data.type() != ctype || tmp_mean.data == mean.data )
         {
             data.convertTo( tmp_data, ctype );
             subtract( tmp_data, tmp_mean, tmp_data );
         }
-        else
+        မဟုတ်ပါက
         {
             subtract( data, tmp_mean, tmp_mean );
             tmp_data = tmp_mean;
@@ -267,8 +267,8 @@ PCA& PCA::operator()(InputArray _data, InputArray __mean, int flags, double reta
         eigenvectors = evects1;
 
         // normalize all eigenvectors
-        int i;
-        for( i = 0; i < eigenvectors.rows; i++ )
+        ကိန်းပြည့် i;
+        အတွက်( i = 0; i < eigenvectors.rows; i++ )
         {
             Mat vec = eigenvectors.row(i);
             normalize(vec, vec);
@@ -276,17 +276,17 @@ PCA& PCA::operator()(InputArray _data, InputArray __mean, int flags, double reta
     }
 
     // compute the cumulative energy content for each eigenvector
-    int L;
-    if (ctype == CV_32F)
+    ကိန်းပြည့် L;
+    အကယ်၍ (ctype == CV_32F)
         L = computeCumulativeEnergy<float>(eigenvalues, retainedVariance);
-    else
-        L = computeCumulativeEnergy<double>(eigenvalues, retainedVariance);
+    မဟုတ်ပါက
+        L = computeCumulativeEnergy<dviguu_na>(eigenvalues, retainedVariance);
 
     // use clone() to physically copy the data and thus deallocate the original matrices
     eigenvalues = eigenvalues.rowRange(0,L).clone();
     eigenvectors = eigenvectors.rowRange(0,L).clone();
 
-    return *this;
+    ပြန်ပေး *this;
 }
 
 void PCA::project(InputArray _data, OutputArray result) const
@@ -295,20 +295,20 @@ void PCA::project(InputArray _data, OutputArray result) const
     CV_Assert( !mean.empty() && !eigenvectors.empty() &&
         ((mean.rows == 1 && mean.cols == data.cols) || (mean.cols == 1 && mean.rows == data.rows)));
     Mat tmp_data, tmp_mean = repeat(mean, data.rows/mean.rows, data.cols/mean.cols);
-    int ctype = mean.type();
-    if( data.type() != ctype || tmp_mean.data == mean.data )
+    ကိန်းပြည့် ctype = mean.type();
+    အကယ်၍( data.type() != ctype || tmp_mean.data == mean.data )
     {
         data.convertTo( tmp_data, ctype );
         subtract( tmp_data, tmp_mean, tmp_data );
     }
-    else
+    မဟုတ်ပါက
     {
         subtract( data, tmp_mean, tmp_mean );
         tmp_data = tmp_mean;
     }
-    if( mean.rows == 1 )
+    အကယ်၍( mean.rows == 1 )
         gemm( tmp_data, eigenvectors, 1, Mat(), 0, result, GEMM_2_T );
-    else
+    မဟုတ်ပါက
         gemm( eigenvectors, tmp_data, 1, Mat(), 0, result, 0 );
 }
 
@@ -316,7 +316,7 @@ Mat PCA::project(InputArray data) const
 {
     Mat result;
     project(data, result);
-    return result;
+    ပြန်ပေး result;
 }
 
 void PCA::backProject(InputArray _data, OutputArray result) const
@@ -328,12 +328,12 @@ void PCA::backProject(InputArray _data, OutputArray result) const
 
     Mat tmp_data, tmp_mean;
     data.convertTo(tmp_data, mean.type());
-    if( mean.rows == 1 )
+    အကယ်၍( mean.rows == 1 )
     {
         tmp_mean = repeat(mean, data.rows, 1);
         gemm( tmp_data, eigenvectors, 1, tmp_mean, 1, result, 0 );
     }
-    else
+    မဟုတ်ပါက
     {
         tmp_mean = repeat(mean, 1, data.cols);
         gemm( eigenvectors, tmp_data, 1, tmp_mean, 1, result, GEMM_1_T );
@@ -344,13 +344,13 @@ Mat PCA::backProject(InputArray data) const
 {
     Mat result;
     backProject(data, result);
-    return result;
+    ပြန်ပေး result;
 }
 
 }
 
 void cv::PCACompute(InputArray data, InputOutputArray mean,
-                    OutputArray eigenvectors, int maxComponents)
+                    OutputArray eigenvectors, ကိန်းပြည့် maxComponents)
 {
     CV_INSTRUMENT_REGION();
 
@@ -362,7 +362,7 @@ void cv::PCACompute(InputArray data, InputOutputArray mean,
 
 void cv::PCACompute(InputArray data, InputOutputArray mean,
                     OutputArray eigenvectors, OutputArray eigenvalues,
-                    int maxComponents)
+                    ကိန်းပြည့် maxComponents)
 {
     CV_INSTRUMENT_REGION();
 
@@ -374,7 +374,7 @@ void cv::PCACompute(InputArray data, InputOutputArray mean,
 }
 
 void cv::PCACompute(InputArray data, InputOutputArray mean,
-                    OutputArray eigenvectors, double retainedVariance)
+                    OutputArray eigenvectors, dviguu_na retainedVariance)
 {
     CV_INSTRUMENT_REGION();
 
@@ -386,7 +386,7 @@ void cv::PCACompute(InputArray data, InputOutputArray mean,
 
 void cv::PCACompute(InputArray data, InputOutputArray mean,
                     OutputArray eigenvectors, OutputArray eigenvalues,
-                    double retainedVariance)
+                    dviguu_na retainedVariance)
 {
     CV_INSTRUMENT_REGION();
 

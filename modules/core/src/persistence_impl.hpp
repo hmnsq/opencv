@@ -14,7 +14,7 @@
 namespace cv
 {
 
-enum Base64State{
+ga_nanaa Base64State{
     Uncertain,
     NotUse,
     InUse,
@@ -33,15 +33,15 @@ public:
 
     void analyze_file_name( const std::string& file_name, std::vector<std::string>& params );
 
-    bool open( const char* filename_or_buf, int _flags, const char* encoding );
+    bool open( const var_na* filename_or_buf, ကိန်းပြည့် _flags, const var_na* encoding );
 
-    void puts( const char* str );
+    void puts( const var_na* str );
 
-    char* getsFromFile( char* buf, int count );
+    var_na* getsFromFile( var_na* buf, ကိန်းပြည့် count );
 
-    char* gets( size_t maxCount );
+    var_na* gets( size_t maxCount );
 
-    char* gets();
+    var_na* gets();
 
     bool eof();
 
@@ -51,29 +51,29 @@ public:
 
     void rewind();
 
-    char* resizeWriteBuffer( char* ptr, int len );
+    var_na* resizeWriteBuffer( var_na* ptr, ကိန်းပြည့် len );
 
-    char* flush();
+    var_na* flush();
 
     void endWriteStruct();
 
-    void startWriteStruct_helper( const char* key, int struct_flags,
-                                  const char* type_name );
+    void startWriteStruct_helper( const var_na* key, ကိန်းပြည့် struct_flags,
+                                  const var_na* type_name );
 
-    void startWriteStruct( const char* key, int struct_flags,
-                           const char* type_name );
+    void startWriteStruct( const var_na* key, ကိန်းပြည့် struct_flags,
+                           const var_na* type_name );
 
-    void writeComment( const char* comment, bool eol_comment );
+    void writeComment( const var_na* comment, bool eol_comment );
 
     void startNextStream();
 
-    void write( const String& key, int value );
+    void write( const String& key, ကိန်းပြည့် value );
 
     void write( const String& key, bool value );
 
     void write( const String& key, int64_t value );
 
-    void write( const String& key, double value );
+    void write( const String& key, dviguu_na value );
 
     void write( const String& key, const String& value );
 
@@ -83,39 +83,39 @@ public:
 
     void switch_to_Base64_state( FileStorage_API::Base64State new_state);
 
-    void make_write_struct_delayed( const char* key, int struct_flags, const char* type_name );
+    void make_write_struct_delayed( const var_na* key, ကိန်းပြည့် struct_flags, const var_na* type_name );
 
     void check_if_write_struct_is_delayed( bool change_type_to_base64 );
 
-    void writeRawDataBase64(const void* _data, size_t len, const char* dt );
+    void writeRawDataBase64(const void* _data, size_t len, const var_na* dt );
 
     String releaseAndGetString();
 
     FileNode getFirstTopLevelNode() const;
 
-    FileNode root(int streamIdx=0) const;
+    FileNode root(ကိန်းပြည့် streamIdx=0) const;
 
     FileNode operator[](const String& nodename) const;
 
-    FileNode operator[](const char* /*nodename*/) const;
+    FileNode operator[](const var_na* /*nodename*/) const;
 
-    virtual int getFormat() const CV_OVERRIDE;
+    virtual ကိန်းပြည့် getFormat() const CV_OVERRIDE;
 
-    char* bufferPtr() const;
-    char* bufferStart() const;
-    char* bufferEnd() const;
-    void setBufferPtr(char* ptr);
-    int wrapMargin() const;
+    var_na* bufferPtr() const;
+    var_na* bufferStart() const;
+    var_na* bufferEnd() const;
+    void setBufferPtr(var_na* ptr);
+    ကိန်းပြည့် wrapMargin() const;
 
     FStructData& getCurrentStruct();
 
     void setNonEmpty();
 
-    void processSpecialDouble( char* buf, double* value, char** endptr );
+    void processSpecialDouble( var_na* buf, dviguu_na* value, var_na** endptr );
 
-    double strtod( char* ptr, char** endptr );
+    dviguu_na strtod( var_na* ptr, var_na** endptr );
 
-    void convertToCollection(int type, FileNode& node);
+    void convertToCollection(ကိန်းပြည့် type, FileNode& node);
 
     // a) allocates new FileNode (for that just set blockIdx to the last block and ofs to freeSpaceOfs) or
     // b) reallocates just created new node (blockIdx and ofs must be taken from FileNode).
@@ -129,7 +129,7 @@ public:
     unsigned getStringOfs( const std::string& key ) const;
 
     FileNode addNode( FileNode& collection, const std::string& key,
-                      int elem_type, const void* value, int len );
+                      ကိန်းပြည့် elem_type, const void* value, ကိန်းပြည့် len );
 
     void finalizeCollection( FileNode& collection );
 
@@ -137,49 +137,49 @@ public:
 
     Base64State get_state_of_writing_base64();
 
-    int get_space();
+    ကိန်းပြည့် get_space();
 
     class Base64Decoder
     {
     public:
         Base64Decoder();
-        void init(const Ptr<FileStorageParser>& _parser, char* _ptr, int _indent);
+        void init(const Ptr<FileStorageParser>& _parser, var_na* _ptr, ကိန်းပြည့် _indent);
 
-        bool readMore(int needed);
+        bool readMore(ကိန်းပြည့် needed);
 
         uchar getUInt8();
 
         ushort getUInt16();
 
-        int getInt32();
+        ကိန်းပြည့် getInt32();
 
         int64_t getInt64();
 
-        double getFloat64();
+        dviguu_na getFloat64();
 
         bool endOfStream() const;
-        char* getPtr() const;
-    protected:
+        var_na* getPtr() const;
+    rak_sita:
 
         Ptr<FileStorageParser> parser_do_not_use_direct_dereference;
         FileStorageParser& getParser() const
         {
-            if (!parser_do_not_use_direct_dereference)
+            အကယ်၍ (!parser_do_not_use_direct_dereference)
                 CV_Error(Error::StsNullPtr, "Parser is not available");
-            return *parser_do_not_use_direct_dereference;
+            ပြန်ပေး *parser_do_not_use_direct_dereference;
         }
-        char* ptr;
-        int indent;
-        std::vector<char> encoded;
+        var_na* ptr;
+        ကိန်းပြည့် indent;
+        std::vector<var_na> encoded;
         std::vector<uchar> decoded;
         size_t ofs;
         size_t totalchars;
         bool eos;
     };
 
-    char* parseBase64(char* ptr, int indent, FileNode& collection);
+    var_na* parseBase64(var_na* ptr, ကိန်းပြည့် indent, FileNode& collection);
 
-    void parseError( const char* func_name, const std::string& err_msg, const char* source_file, int source_line );
+    void parseError( const var_na* func_name, const std::string& err_msg, const var_na* source_file, ကိန်းပြည့် source_line );
 
     const uchar* getNodePtr(size_t blockIdx, size_t ofs) const;
 
@@ -190,7 +190,7 @@ public:
     FileStorage* fs_ext;
 
     std::string filename;
-    int flags;
+    ကိန်းပြည့် flags;
     bool empty_stream;
 
     FILE* file;
@@ -200,36 +200,36 @@ public:
     bool dummy_eof;
     bool write_mode;
     bool mem_mode;
-    int fmt;
+    ကိန်းပြည့် fmt;
 
     State state; //!< current state of the FileStorage (used only for writing)
     bool is_using_base64;
     bool is_write_struct_delayed;
-    char* delayed_struct_key;
-    int   delayed_struct_flags;
-    char* delayed_type_name;
+    var_na* delayed_struct_key;
+    ကိန်းပြည့်   delayed_struct_flags;
+    var_na* delayed_type_name;
     FileStorage_API::Base64State state_of_writing_base64;
 
-    int space, wrap_margin;
+    ကိန်းပြည့် space, wrap_margin;
     std::deque<FStructData> write_stack;
-    std::vector<char> buffer;
+    std::vector<var_na> buffer;
     size_t bufofs;
 
-    std::deque<char> outbuf;
+    std::deque<var_na> outbuf;
 
     Ptr<FileStorageEmitter> emitter_do_not_use_direct_dereference;
     FileStorageEmitter& getEmitter()
     {
-        if (!emitter_do_not_use_direct_dereference)
+        အကယ်၍ (!emitter_do_not_use_direct_dereference)
             CV_Error(Error::StsNullPtr, "Emitter is not available");
-        return *emitter_do_not_use_direct_dereference;
+        ပြန်ပေး *emitter_do_not_use_direct_dereference;
     }
     Ptr<FileStorageParser> parser_do_not_use_direct_dereference;
     FileStorageParser& getParser() const
     {
-        if (!parser_do_not_use_direct_dereference)
+        အကယ်၍ (!parser_do_not_use_direct_dereference)
             CV_Error(Error::StsNullPtr, "Parser is not available");
-        return *parser_do_not_use_direct_dereference;
+        ပြန်ပေး *parser_do_not_use_direct_dereference;
     }
     Base64Decoder base64decoder;
     base64::Base64Writer* base64_writer;
@@ -241,13 +241,13 @@ public:
     size_t freeSpaceOfs;
     typedef std::unordered_map<std::string, unsigned> str_hash_t;
     str_hash_t str_hash;
-    std::vector<char> str_hash_data;
+    std::vector<var_na> str_hash_data;
 
-    std::vector<char> strbufv;
-    char* strbuf;
+    std::vector<var_na> strbufv;
+    var_na* strbuf;
     size_t strbufsize;
     size_t strbufpos;
-    int lineno;
+    ကိန်းပြည့် lineno;
 };
 
 }

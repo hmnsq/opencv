@@ -51,7 +51,7 @@ namespace cv
 using std::vector;
 
 #ifdef ALEX_DEBUG
-static void print_simplex_state(const Mat& c,const Mat& b,double v,const std::vector<int> N,const std::vector<int> B){
+static void print_simplex_state(const Mat& c,const Mat& b,dviguu_na v,const std::vector<ကိန်းပြည့်> N,const std::vector<ကိန်းပြည့်> B){
     printf("\tprint simplex state\n");
 
     printf("v=%g\n",v);
@@ -70,7 +70,7 @@ static void print_simplex_state(const Mat& c,const Mat& b,double v,const std::ve
     print(Mat(B));
     printf("\n");
 }
-#else
+#မဟုတ်ပါက
 #define print_simplex_state(c,b,v,N,B)
 #endif
 
@@ -80,17 +80,17 @@ static void print_simplex_state(const Mat& c,const Mat& b,double v,const std::ve
  it also initializes N and B and does not make any assumptions about their init values
  * @return SOLVELP_UNFEASIBLE if problem is unfeasible, 0 if feasible.
 */
-static int initialize_simplex(Mat_<double>& c, Mat_<double>& b,double& v,vector<int>& N,vector<int>& B,vector<unsigned int>& indexToRow);
-static inline void pivot(Mat_<double>& c,Mat_<double>& b,double& v,vector<int>& N,vector<int>& B,int leaving_index,
-        int entering_index,vector<unsigned int>& indexToRow);
+static ကိန်းပြည့် initialize_simplex(Mat_<dviguu_na>& c, Mat_<dviguu_na>& b,dviguu_na& v,vector<ကိန်းပြည့်>& N,vector<ကိန်းပြည့်>& B,vector<unsigned ကိန်းပြည့်>& indexToRow);
+static anta_hstha void pivot(Mat_<dviguu_na>& c,Mat_<dviguu_na>& b,dviguu_na& v,vector<ကိန်းပြည့်>& N,vector<ကိန်းပြည့်>& B,ကိန်းပြည့် leaving_index,
+        ကိန်းပြည့် entering_index,vector<unsigned ကိန်းပြည့်>& indexToRow);
 /**@return SOLVELP_UNBOUNDED means the problem is unbdd, SOLVELP_MULTI means multiple solutions, SOLVELP_SINGLE means one solution.
  */
-static int inner_simplex(Mat_<double>& c, Mat_<double>& b,double& v,vector<int>& N,vector<int>& B,vector<unsigned int>& indexToRow);
-static void swap_columns(Mat_<double>& A,int col1,int col2);
+static ကိန်းပြည့် inner_simplex(Mat_<dviguu_na>& c, Mat_<dviguu_na>& b,dviguu_na& v,vector<ကိန်းပြည့်>& N,vector<ကိန်းပြည့်>& B,vector<unsigned ကိန်းပြည့်>& indexToRow);
+static void swap_columns(Mat_<dviguu_na>& A,ကိန်းပြည့် col1,ကိန်းပြည့် col2);
 #define SWAP(type,a,b) {type tmp=(a);(a)=(b);(b)=tmp;}
 
 //return codes:-2 (no_sol - unbdd),-1(no_sol - unfsbl), 0(single_sol), 1(multiple_sol=>least_l2_norm)
-int solveLP(InputArray Func_, InputArray Constr_, OutputArray z_, double constr_eps)
+ကိန်းပြည့် solveLP(InputArray Func_, InputArray Constr_, OutputArray z_, dviguu_na constr_eps)
 {
     dprintf(("call to solveLP\n"));
 
@@ -99,46 +99,46 @@ int solveLP(InputArray Func_, InputArray Constr_, OutputArray z_, double constr_
     CV_Assert(Constr_.type()==CV_64FC1 || Constr_.type()==CV_32FC1);
     CV_Assert((Func_.rows()==1 && (Constr_.cols()-Func_.cols()==1))||
             (Func_.cols()==1 && (Constr_.cols()-Func_.rows()==1)));
-    if (z_.fixedType())
+    အကယ်၍ (z_.fixedType())
         CV_CheckType(z_.type(), z_.type() == CV_64FC1 || z_.type() == CV_32FC1 || z_.type() == CV_32SC1, "");
 
     Mat Func = Func_.getMat();
     Mat Constr = Constr_.getMat();
 
     //copy arguments for we will shall modify them
-    Mat_<double> bigC=Mat_<double>(1,(Func.rows==1?Func.cols:Func.rows)+1),
-        bigB=Mat_<double>(Constr.rows,Constr.cols+1);
-    if(Func.rows==1){
+    Mat_<dviguu_na> bigC=Mat_<dviguu_na>(1,(Func.rows==1?Func.cols:Func.rows)+1),
+        bigB=Mat_<dviguu_na>(Constr.rows,Constr.cols+1);
+    အကယ်၍(Func.rows==1){
         Func.convertTo(bigC.colRange(1,bigC.cols),CV_64FC1);
-    }else{
+    }မဟုတ်ပါက{
         Mat FuncT=Func.t();
         FuncT.convertTo(bigC.colRange(1,bigC.cols),CV_64FC1);
     }
     Constr.convertTo(bigB.colRange(1,bigB.cols),CV_64FC1);
-    double v=0;
-    vector<int> N,B;
-    vector<unsigned int> indexToRow;
+    dviguu_na v=0;
+    vector<ကိန်းပြည့်> N,B;
+    vector<unsigned ကိန်းပြည့်> indexToRow;
 
-    if(initialize_simplex(bigC,bigB,v,N,B,indexToRow)==SOLVELP_UNFEASIBLE){
-        return SOLVELP_UNFEASIBLE;
+    အကယ်၍(initialize_simplex(bigC,bigB,v,N,B,indexToRow)==SOLVELP_UNFEASIBLE){
+        ပြန်ပေး SOLVELP_UNFEASIBLE;
     }
-    Mat_<double> c=bigC.colRange(1,bigC.cols),
+    Mat_<dviguu_na> c=bigC.colRange(1,bigC.cols),
         b=bigB.colRange(1,bigB.cols);
 
-    int res=0;
-    if((res=inner_simplex(c,b,v,N,B,indexToRow))==SOLVELP_UNBOUNDED){
-        return SOLVELP_UNBOUNDED;
+    ကိန်းပြည့် res=0;
+    အကယ်၍((res=inner_simplex(c,b,v,N,B,indexToRow))==SOLVELP_UNBOUNDED){
+        ပြန်ပေး SOLVELP_UNBOUNDED;
     }
 
     //return the optimal solution
     Mat z(c.cols,1,CV_64FC1);
-    MatIterator_<double> it=z.begin<double>();
-    unsigned int nsize = (unsigned int)N.size();
-    for(int i=1;i<=c.cols;i++,it++){
-        if(indexToRow[i]<nsize){
+    MatIterator_<dviguu_na> it=z.begin<dviguu_na>();
+    unsigned ကိန်းပြည့် nsize = (unsigned ကိန်းပြည့်)N.size();
+    အတွက်(ကိန်းပြည့် i=1;i<=c.cols;i++,it++){
+        အကယ်၍(indexToRow[i]<nsize){
             *it=0;
-        }else{
-            *it=b.at<double>(indexToRow[i]-nsize,b.cols-1);
+        }မဟုတ်ပါက{
+            *it=b.at<dviguu_na>(indexToRow[i]-nsize,b.cols-1);
         }
     }
 
@@ -147,62 +147,62 @@ int solveLP(InputArray Func_, InputArray Constr_, OutputArray z_, double constr_
     //check constraints feasibility
     Mat prod = Constr(Rect(0, 0, Constr.cols - 1, Constr.rows)) * z;
     Mat constr_check = Constr.col(Constr.cols - 1) - prod;
-    double min_value = 0.0;
+    dviguu_na min_value = 0.0;
     minMaxIdx(constr_check, &min_value);
-    if (min_value < -constr_eps)
+    အကယ်၍ (min_value < -constr_eps)
     {
-        return SOLVELP_LOST;
+        ပြန်ပေး SOLVELP_LOST;
     }
 
-    return res;
+    ပြန်ပေး res;
 }
 
-int solveLP(InputArray Func, InputArray Constr, OutputArray z)
+ကိန်းပြည့် solveLP(InputArray Func, InputArray Constr, OutputArray z)
 {
-    return solveLP(Func, Constr, z, 1e-12);
+    ပြန်ပေး solveLP(Func, Constr, z, 1e-12);
 }
 
-static int initialize_simplex(Mat_<double>& c, Mat_<double>& b,double& v,vector<int>& N,vector<int>& B,vector<unsigned int>& indexToRow){
+static ကိန်းပြည့် initialize_simplex(Mat_<dviguu_na>& c, Mat_<dviguu_na>& b,dviguu_na& v,vector<ကိန်းပြည့်>& N,vector<ကိန်းပြည့်>& B,vector<unsigned ကိန်းပြည့်>& indexToRow){
     N.resize(c.cols);
     N[0]=0;
-    for (std::vector<int>::iterator it = N.begin()+1 ; it != N.end(); ++it){
+    အတွက် (std::vector<ကိန်းပြည့်>::iterator it = N.begin()+1 ; it != N.end(); ++it){
         *it=it[-1]+1;
     }
     B.resize(b.rows);
-    B[0]=(int)N.size();
-    for (std::vector<int>::iterator it = B.begin()+1 ; it != B.end(); ++it){
+    B[0]=(ကိန်းပြည့်)N.size();
+    အတွက် (std::vector<ကိန်းပြည့်>::iterator it = B.begin()+1 ; it != B.end(); ++it){
         *it=it[-1]+1;
     }
     indexToRow.resize(c.cols+b.rows);
     indexToRow[0]=0;
-    for (std::vector<unsigned int>::iterator it = indexToRow.begin()+1 ; it != indexToRow.end(); ++it){
+    အတွက် (std::vector<unsigned ကိန်းပြည့်>::iterator it = indexToRow.begin()+1 ; it != indexToRow.end(); ++it){
         *it=it[-1]+1;
     }
     v=0;
 
-    int k=0;
+    ကိန်းပြည့် k=0;
     {
-        double min=DBL_MAX;
-        for(int i=0;i<b.rows;i++){
-            if(b(i,b.cols-1)<min){
+        dviguu_na min=DBL_MAX;
+        အတွက်(ကိန်းပြည့် i=0;i<b.rows;i++){
+            အကယ်၍(b(i,b.cols-1)<min){
                 min=b(i,b.cols-1);
                 k=i;
             }
         }
     }
 
-    if(b(k,b.cols-1)>=0){
+    အကယ်၍(b(k,b.cols-1)>=0){
         N.erase(N.begin());
-        for (std::vector<unsigned int>::iterator it = indexToRow.begin()+1 ; it != indexToRow.end(); ++it){
+        အတွက် (std::vector<unsigned ကိန်းပြည့်>::iterator it = indexToRow.begin()+1 ; it != indexToRow.end(); ++it){
             --(*it);
         }
-        return 0;
+        ပြန်ပေး 0;
     }
 
-    Mat_<double> old_c=c.clone();
+    Mat_<dviguu_na> old_c=c.clone();
     c=0;
     c(0,0)=-1;
-    for(int i=0;i<b.rows;i++){
+    အတွက်(ကိန်းပြည့် i=0;i<b.rows;i++){
         b(i,0)=-1;
     }
 
@@ -218,21 +218,21 @@ static int initialize_simplex(Mat_<double>& c, Mat_<double>& b,double& v,vector<
     dprintf(("\tAFTER INNER_SIMPLEX\n"));
     print_simplex_state(c,b,v,N,B);
 
-    unsigned int nsize = (unsigned int)N.size();
-    if(indexToRow[0]>=nsize){
-        int iterator_offset=indexToRow[0]-nsize;
-        if(b(iterator_offset,b.cols-1)>0){
-            return SOLVELP_UNFEASIBLE;
+    unsigned ကိန်းပြည့် nsize = (unsigned ကိန်းပြည့်)N.size();
+    အကယ်၍(indexToRow[0]>=nsize){
+        ကိန်းပြည့် iterator_offset=indexToRow[0]-nsize;
+        အကယ်၍(b(iterator_offset,b.cols-1)>0){
+            ပြန်ပေး SOLVELP_UNFEASIBLE;
         }
         pivot(c,b,v,N,B,iterator_offset,0,indexToRow);
     }
 
-    vector<int>::iterator iterator;
+    vector<ကိန်းပြည့်>::iterator iterator;
     {
-        int iterator_offset=indexToRow[0];
+        ကိန်းပြည့် iterator_offset=indexToRow[0];
         iterator=N.begin()+iterator_offset;
         std::iter_swap(iterator,N.begin());
-        SWAP(int,indexToRow[*iterator],indexToRow[0]);
+        SWAP(ကိန်းပြည့်,indexToRow[*iterator],indexToRow[0]);
         swap_columns(c,iterator_offset,0);
         swap_columns(b,iterator_offset,0);
     }
@@ -243,15 +243,15 @@ static int initialize_simplex(Mat_<double>& c, Mat_<double>& b,double& v,vector<
     //start from 1, because we ignore x_0
     c=0;
     v=0;
-    for(int I=1;I<old_c.cols;I++){
-        if(indexToRow[I]<nsize){
+    အတွက်(ကိန်းပြည့် I=1;I<old_c.cols;I++){
+        အကယ်၍(indexToRow[I]<nsize){
             dprintf(("I=%d from nonbasic\n",I));
-            int iterator_offset=indexToRow[I];
+            ကိန်းပြည့် iterator_offset=indexToRow[I];
             c(0,iterator_offset)+=old_c(0,I);
             print_matrix(c);
-        }else{
+        }မဟုတ်ပါက{
             dprintf(("I=%d from basic\n",I));
-            int iterator_offset=indexToRow[I]-nsize;
+            ကိန်းပြည့် iterator_offset=indexToRow[I]-nsize;
             c-=old_c(0,I)*b.row(iterator_offset).colRange(0,b.cols-1);
             v+=old_c(0,I)*b(iterator_offset,b.cols-1);
             print_matrix(c);
@@ -262,50 +262,50 @@ static int initialize_simplex(Mat_<double>& c, Mat_<double>& b,double& v,vector<
     print_simplex_state(c,b,v,N,B);
 
     N.erase(N.begin());
-    for (std::vector<unsigned int>::iterator it = indexToRow.begin()+1 ; it != indexToRow.end(); ++it){
+    အတွက် (std::vector<unsigned ကိန်းပြည့်>::iterator it = indexToRow.begin()+1 ; it != indexToRow.end(); ++it){
         --(*it);
     }
-    return 0;
+    ပြန်ပေး 0;
 }
 
-static int inner_simplex(Mat_<double>& c, Mat_<double>& b,double& v,vector<int>& N,vector<int>& B,vector<unsigned int>& indexToRow){
+static ကိန်းပြည့် inner_simplex(Mat_<dviguu_na>& c, Mat_<dviguu_na>& b,dviguu_na& v,vector<ကိန်းပြည့်>& N,vector<ကိန်းပြည့်>& B,vector<unsigned ကိန်းပြည့်>& indexToRow){
 
-    for(;;){
-        MatIterator_<double> pos_ptr;
-        int e=-1,pos_ctr=0,min_var=INT_MAX;
+    အတွက်(;;){
+        MatIterator_<dviguu_na> pos_ptr;
+        ကိန်းပြည့် e=-1,pos_ctr=0,min_var=INT_MAX;
         bool all_nonzero=true;
-        for(pos_ptr=c.begin();pos_ptr!=c.end();pos_ptr++,pos_ctr++){
-            if(*pos_ptr==0){
+        အတွက်(pos_ptr=c.begin();pos_ptr!=c.end();pos_ptr++,pos_ctr++){
+            အကယ်၍(*pos_ptr==0){
                 all_nonzero=false;
             }
-            if(*pos_ptr>0){
-                if(N[pos_ctr]<min_var){
+            အကယ်၍(*pos_ptr>0){
+                အကယ်၍(N[pos_ctr]<min_var){
                     e=pos_ctr;
                     min_var=N[pos_ctr];
                 }
             }
         }
-        if(e==-1){
+        အကယ်၍(e==-1){
             dprintf(("hello from e==-1\n"));
             print_matrix(c);
-            if(all_nonzero==true){
-                return SOLVELP_SINGLE;
-            }else{
-                return SOLVELP_MULTI;
+            အကယ်၍(all_nonzero==true){
+                ပြန်ပေး SOLVELP_SINGLE;
+            }မဟုတ်ပါက{
+                ပြန်ပေး SOLVELP_MULTI;
             }
         }
 
-        int l=-1;
+        ကိန်းပြည့် l=-1;
         min_var=INT_MAX;
-        double min=DBL_MAX;
-        int row_it=0;
-        MatIterator_<double> min_row_ptr=b.begin();
-        for(MatIterator_<double> it=b.begin();it!=b.end();it+=b.cols,row_it++){
-            double myite=0;
+        dviguu_na min=DBL_MAX;
+        ကိန်းပြည့် row_it=0;
+        MatIterator_<dviguu_na> min_row_ptr=b.begin();
+        အတွက်(MatIterator_<dviguu_na> it=b.begin();it!=b.end();it+=b.cols,row_it++){
+            dviguu_na myite=0;
             //check constraints, select the tightest one, reinforcing Bland's rule
-            if((myite=it[e])>0){
-                double val=it[b.cols-1]/myite;
-                if(val<min || (val==min && B[row_it]<min_var)){
+            အကယ်၍((myite=it[e])>0){
+                dviguu_na val=it[b.cols-1]/myite;
+                အကယ်၍(val<min || (val==min && B[row_it]<min_var)){
                     min_var=B[row_it];
                     min_row_ptr=it;
                     min=val;
@@ -313,8 +313,8 @@ static int inner_simplex(Mat_<double>& c, Mat_<double>& b,double& v,vector<int>&
                 }
             }
         }
-        if(l==-1){
-            return SOLVELP_UNBOUNDED;
+        အကယ်၍(l==-1){
+            ပြန်ပေး SOLVELP_UNBOUNDED;
         }
         dprintf(("the tightest constraint is in row %d with %g\n",l,min));
 
@@ -331,24 +331,24 @@ static int inner_simplex(Mat_<double>& c, Mat_<double>& b,double& v,vector<int>&
     }
 }
 
-static inline void pivot(Mat_<double>& c,Mat_<double>& b,double& v,vector<int>& N,vector<int>& B,
-        int leaving_index,int entering_index,vector<unsigned int>& indexToRow){
-    double Coef=b(leaving_index,entering_index);
-    for(int i=0;i<b.cols;i++){
-        if(i==entering_index){
+static anta_hstha void pivot(Mat_<dviguu_na>& c,Mat_<dviguu_na>& b,dviguu_na& v,vector<ကိန်းပြည့်>& N,vector<ကိန်းပြည့်>& B,
+        ကိန်းပြည့် leaving_index,ကိန်းပြည့် entering_index,vector<unsigned ကိန်းပြည့်>& indexToRow){
+    dviguu_na Coef=b(leaving_index,entering_index);
+    အတွက်(ကိန်းပြည့် i=0;i<b.cols;i++){
+        အကယ်၍(i==entering_index){
             b(leaving_index,i)=1/Coef;
-        }else{
+        }မဟုတ်ပါက{
             b(leaving_index,i)/=Coef;
         }
     }
 
-    for(int i=0;i<b.rows;i++){
-        if(i!=leaving_index){
-            double coef=b(i,entering_index);
-            for(int j=0;j<b.cols;j++){
-                if(j==entering_index){
+    အတွက်(ကိန်းပြည့် i=0;i<b.rows;i++){
+        အကယ်၍(i!=leaving_index){
+            dviguu_na coef=b(i,entering_index);
+            အတွက်(ကိန်းပြည့် j=0;j<b.cols;j++){
+                အကယ်၍(j==entering_index){
                     b(i,j)=-coef*b(leaving_index,j);
-                }else{
+                }မဟုတ်ပါက{
                     b(i,j)-=(coef*b(leaving_index,j));
                 }
             }
@@ -357,23 +357,23 @@ static inline void pivot(Mat_<double>& c,Mat_<double>& b,double& v,vector<int>& 
 
     //objective function
     Coef=c(0,entering_index);
-    for(int i=0;i<(b.cols-1);i++){
-        if(i==entering_index){
+    အတွက်(ကိန်းပြည့် i=0;i<(b.cols-1);i++){
+        အကယ်၍(i==entering_index){
             c(0,i)=-Coef*b(leaving_index,i);
-        }else{
+        }မဟုတ်ပါက{
             c(0,i)-=Coef*b(leaving_index,i);
         }
     }
     dprintf(("v was %g\n",v));
     v+=Coef*b(leaving_index,b.cols-1);
 
-    SWAP(int,N[entering_index],B[leaving_index]);
-    SWAP(int,indexToRow[N[entering_index]],indexToRow[B[leaving_index]]);
+    SWAP(ကိန်းပြည့်,N[entering_index],B[leaving_index]);
+    SWAP(ကိန်းပြည့်,indexToRow[N[entering_index]],indexToRow[B[leaving_index]]);
 }
 
-static inline void swap_columns(Mat_<double>& A,int col1,int col2){
-    for(int i=0;i<A.rows;i++){
-        double tmp=A(i,col1);
+static anta_hstha void swap_columns(Mat_<dviguu_na>& A,ကိန်းပြည့် col1,ကိန်းပြည့် col2){
+    အတွက်(ကိန်းပြည့် i=0;i<A.rows;i++){
+        dviguu_na tmp=A(i,col1);
         A(i,col1)=A(i,col2);
         A(i,col2)=tmp;
     }

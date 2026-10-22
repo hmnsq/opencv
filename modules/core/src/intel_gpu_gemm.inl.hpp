@@ -31,66 +31,66 @@ static bool intel_gpu_gemm(
     UMat A, Size sizeA,
     UMat B, Size sizeB,
     UMat D, Size sizeD,
-    double alpha, double beta,
+    dviguu_na alpha, dviguu_na beta,
     bool atrans, bool btrans,
     bool& isPropagatedC2D
 )
 {
     CV_UNUSED(sizeB);
 
-    int M = sizeD.height, N = sizeD.width, K = ((atrans)? sizeA.height : sizeA.width);
+    ကိန်းပြည့် M = sizeD.height, N = sizeD.width, K = ((atrans)? sizeA.height : sizeA.width);
 
-    if (M < 4 || N < 4 || K < 4)  // vload4
-        return false;
+    အကယ်၍ (M < 4 || N < 4 || K < 4)  // vload4
+        ပြန်ပေး false;
 
     CV_LOG_VERBOSE(NULL, 0, "M=" << M << " N=" << N << " K=" << K);
 
     std::string kernelName;
 
-    unsigned int lx = 8, ly = 4;
-    unsigned int dx = 4, dy = 8;
+    unsigned ကိန်းပြည့် lx = 8, ly = 4;
+    unsigned ကိန်းပြည့် dx = 4, dy = 8;
 
-    if(!atrans && !btrans)
+    အကယ်၍(!atrans && !btrans)
     {
-        if (M % 32 == 0 && N % 32 == 0 && K % 16 == 0)
+        အကယ်၍ (M % 32 == 0 && N % 32 == 0 && K % 16 == 0)
         {
             kernelName = "intelblas_gemm_buffer_NN_sp";
         }
-        else
+        မဟုတ်ပါက
         {
-            if (M % 2 != 0)
-                return false;
+            အကယ်၍ (M % 2 != 0)
+                ပြန်ပေး false;
             // vload4(0, dst_write0) - 4 cols
             // multiply by lx: 8
-            if (N % (4*8) != 0)
-                return false;
+            အကယ်၍ (N % (4*8) != 0)
+                ပြန်ပေး false;
             kernelName = "intelblas_gemm_buffer_NN";
         }
     }
-    else if(atrans && !btrans)
+    မဟုတ်ပါက အကယ်၍(atrans && !btrans)
     {
-        if (M % 32 != 0)
-            return false;
-        if (N % 32 != 0)
-            return false;
+        အကယ်၍ (M % 32 != 0)
+            ပြန်ပေး false;
+        အကယ်၍ (N % 32 != 0)
+            ပြန်ပေး false;
         kernelName = "intelblas_gemm_buffer_TN";
     }
-    else if(!atrans && btrans)
+    မဟုတ်ပါက အကယ်၍(!atrans && btrans)
     {
-        if (K % 4 != 0)
-            return false;
+        အကယ်၍ (K % 4 != 0)
+            ပြန်ပေး false;
         kernelName = "intelblas_gemm_buffer_NT";
         ly = 16;
         dx = 1;
     }
-    else
+    မဟုတ်ပါက
     {
-        if (M % 32 != 0)
-            return false;
-        if (N % 32 != 0)
-            return false;
-        if (K % 16 != 0)
-            return false;
+        အကယ်၍ (M % 32 != 0)
+            ပြန်ပေး false;
+        အကယ်၍ (N % 32 != 0)
+            ပြန်ပေး false;
+        အကယ်၍ (K % 16 != 0)
+            ပြန်ပေး false;
         kernelName = "intelblas_gemm_buffer_TT";
     }
 
@@ -106,62 +106,62 @@ static bool intel_gpu_gemm(
     String errmsg;
     const ocl::Program program = ocl::Context::getDefault().getProg(ocl::core::intel_gemm_oclsrc, "", errmsg);
 
-    if(!atrans && btrans)
+    အကယ်၍(!atrans && btrans)
     {
         ocl::Kernel k(kernelName.c_str(), program);
-        if (k.empty())
+        အကယ်၍ (k.empty())
         {
-            return false;
+            ပြန်ပေး false;
         }
 
         k.args(ocl::KernelArg::PtrReadOnly(A),
-               (int) (A.offset / sizeof(float)),
+               (ကိန်းပြည့်) (A.offset / parimaa_na(float)),
                ocl::KernelArg::PtrReadOnly(B),
-               (int) (B.offset / sizeof(float)),
+               (ကိန်းပြည့်) (B.offset / parimaa_na(float)),
                ocl::KernelArg::PtrWriteOnly(D),
-               (int) (D.offset / sizeof(float)),
+               (ကိန်းပြည့်) (D.offset / parimaa_na(float)),
                M, N, K,
                (float)alpha,
                (float)beta,
-               (int)(A.step / sizeof(float)),
-               (int)(B.step / sizeof(float)),
-               (int)(D.step / sizeof(float))
+               (ကိန်းပြည့်)(A.step / parimaa_na(float)),
+               (ကိန်းပြည့်)(B.step / parimaa_na(float)),
+               (ကိန်းပြည့်)(D.step / parimaa_na(float))
         );
 
         bool ret = k.run(2, global, local, false, q);
-        return ret;
+        ပြန်ပေး ret;
     }
-    else
+    မဟုတ်ပါက
     {
-        int stride = (M * N < 1024 * 1024) ? 10000000 : 256;
+        ကိန်းပြည့် stride = (M * N < 1024 * 1024) ? 10000000 : 256;
 
-        for(int start_index = 0; start_index < K; start_index += stride)
+        အတွက်(ကိန်းပြည့် start_index = 0; start_index < K; start_index += stride)
         {
              ocl::Kernel k(kernelName.c_str(), program);
              k.args(ocl::KernelArg::PtrReadOnly(A),
-                    (int) (A.offset / sizeof(float)),
+                    (ကိန်းပြည့်) (A.offset / parimaa_na(float)),
                     ocl::KernelArg::PtrReadOnly(B),
-                    (int) (B.offset / sizeof(float)),
+                    (ကိန်းပြည့်) (B.offset / parimaa_na(float)),
                     ocl::KernelArg::PtrWriteOnly(D),
-                    (int) (D.offset / sizeof(float)),
+                    (ကိန်းပြည့်) (D.offset / parimaa_na(float)),
                     M, N, K,
                     (float)alpha,
                     (float)beta,
-                    (int)(A.step / sizeof(float)),
-                    (int)(B.step / sizeof(float)),
-                    (int)(D.step / sizeof(float)),
-                    (int) start_index,                          // 14 start_index
+                    (ကိန်းပြည့်)(A.step / parimaa_na(float)),
+                    (ကိန်းပြည့်)(B.step / parimaa_na(float)),
+                    (ကိန်းပြည့်)(D.step / parimaa_na(float)),
+                    (ကိန်းပြည့်) start_index,                          // 14 start_index
                     stride);
 
             bool ret = k.run(2, global, local, false, q);
-            if (!ret)
+            အကယ်၍ (!ret)
             {
-                if (start_index != 0)
+                အကယ်၍ (start_index != 0)
                     isPropagatedC2D = false;  // D array content is changed, need to rewrite
-                return false;
+                ပြန်ပေး false;
             }
         }
-        return true;
+        ပြန်ပေး true;
     }
 }
 

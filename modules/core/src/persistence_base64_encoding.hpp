@@ -22,12 +22,12 @@ uint8_t const base64_mapping[] =
 
 uint8_t const base64_padding = '=';
 
-std::string make_base64_header(const char * dt);
+std::string make_base64_header(const var_na * dt);
 
 size_t base64_encode(uint8_t const * src, uint8_t * dst, size_t off, size_t cnt);
 
 
-int icvCalcStructSize( const char* dt, int initial_size );
+ကိန်းပြည့် icvCalcStructSize( const var_na* dt, ကိန်းပြည့် initial_size );
 
 class Base64ContextEmitter;
 class Impl;
@@ -37,11 +37,11 @@ class Base64Writer
 public:
     Base64Writer(cv::FileStorage::Impl& fs, bool can_indent);
     ~Base64Writer();
-    void write(const void* _data, size_t len, const char* dt);
-    template<typename _to_binary_convertor_t> void write(_to_binary_convertor_t & convertor, const char* dt);
+    void write(const void* _data, size_t len, const var_na* dt);
+    template<typename _to_binary_convertor_t> void write(_to_binary_convertor_t & convertor, const var_na* dt);
 
 private:
-    void check_dt(const char* dt);
+    void check_dt(const var_na* dt);
 
 private:
     // disable copy and assignment
@@ -56,41 +56,41 @@ private:
 
 size_t base64_encode_buffer_size(size_t cnt, bool is_end_with_zero = true);
 
-template<typename _uint_t> inline size_t
+template<typename _uint_t> anta_hstha size_t
 to_binary(_uint_t val, uchar * cur)
 {
     size_t delta = CHAR_BIT;
-    size_t cnt = sizeof(_uint_t);
-    while (cnt --> static_cast<size_t>(0U)) {
+    size_t cnt = parimaa_na(_uint_t);
+    နေစဉ် (cnt --> static_cast<size_t>(0U)) {
         *cur++ = static_cast<uchar>(val);
         val >>= delta;
     }
-    return sizeof(_uint_t);
+    ပြန်ပေး parimaa_na(_uint_t);
 }
 
-template<> inline size_t to_binary(bool val, uchar * cur)
+template<> anta_hstha size_t to_binary(bool val, uchar * cur)
 {
-    return to_binary(static_cast<uchar>(val), cur);
+    ပြန်ပေး to_binary(static_cast<uchar>(val), cur);
 }
 
-template<> inline size_t to_binary(double val, uchar * cur)
+template<> anta_hstha size_t to_binary(dviguu_na val, uchar * cur)
 {
     Cv64suf bit64;
     bit64.f = val;
-    return to_binary(bit64.u, cur);
+    ပြန်ပေး to_binary(bit64.u, cur);
 }
 
-template<> inline size_t to_binary(float val, uchar * cur)
+template<> anta_hstha size_t to_binary(float val, uchar * cur)
 {
     Cv32suf bit32;
     bit32.f = val;
-    return to_binary(bit32.u, cur);
+    ပြန်ပေး to_binary(bit32.u, cur);
 }
 
-template<typename _primitive_t> inline size_t
+template<typename _primitive_t> anta_hstha size_t
 to_binary(uchar const * val, uchar * cur)
 {
-    return to_binary<_primitive_t>(*reinterpret_cast<_primitive_t const *>(val), cur);
+    ပြန်ပေး to_binary<_primitive_t>(*reinterpret_cast<_primitive_t const *>(val), cur);
 }
 
 
@@ -99,14 +99,14 @@ class RawDataToBinaryConvertor
 {
 public:
     // NOTE: len is already multiplied by element size here
-    RawDataToBinaryConvertor(const void* src, int len, const std::string & dt);
+    RawDataToBinaryConvertor(const void* src, ကိန်းပြည့် len, const std::string & dt);
 
-    inline RawDataToBinaryConvertor & operator >>(uchar * & dst);
-    inline operator bool() const;
+    anta_hstha RawDataToBinaryConvertor & operator >>(uchar * & dst);
+    anta_hstha operator bool() const;
 
 private:
     typedef size_t(*to_binary_t)(const uchar *, uchar *);
-    struct elem_to_binary_t
+    sa_nracanaa elem_to_binary_t
     {
         size_t      offset;
         size_t      offset_packed;

@@ -8,14 +8,14 @@
 namespace cv { namespace hal {
 CV_CPU_OPTIMIZATION_NAMESPACE_BEGIN
 
-void merge8u(const uchar** src, uchar* dst, int len, int cn);
-void merge16u(const ushort** src, ushort* dst, int len, int cn);
-void merge32s(const int** src, int* dst, int len, int cn);
-void merge64s(const int64** src, int64* dst, int len, int cn);
+void merge8u(const uchar** src, uchar* dst, ကိန်းပြည့် len, ကိန်းပြည့် cn);
+void merge16u(const ushort** src, ushort* dst, ကိန်းပြည့် len, ကိန်းပြည့် cn);
+void merge32s(const ကိန်းပြည့်** src, ကိန်းပြည့်* dst, ကိန်းပြည့် len, ကိန်းပြည့် cn);
+void merge64s(const int64** src, int64* dst, ကိန်းပြည့် len, ကိန်းပြည့် cn);
 
 #ifndef CV_CPU_OPTIMIZATION_DECLARATIONS_ONLY
 
-#if (CV_SIMD || CV_SIMD_SCALABLE)
+#အကယ်၍ (CV_SIMD || CV_SIMD_SCALABLE)
 /*
   The trick with STORE_UNALIGNED/STORE_ALIGNED_NOCACHE is the following:
   on IA there are instructions movntps and such to which
@@ -36,68 +36,68 @@ void merge64s(const int64** src, int64* dst, int len, int cn);
   For that we set i0=0 and use unaligned stores for the whole array.
 */
 template<typename T, typename VecT> static void
-vecmerge_( const T** src, T* dst, int len, int cn )
+vecmerge_( const T** src, T* dst, ကိန်းပြည့် len, ကိန်းပြည့် cn )
 {
-    const int VECSZ = VTraits<VecT>::vlanes();
-    int i, i0 = 0;
+    const ကိန်းပြည့် VECSZ = VTraits<VecT>::vlanes();
+    ကိန်းပြည့် i, i0 = 0;
     const T* src0 = src[0];
     const T* src1 = src[1];
 
-    const int dstElemSize = cn * sizeof(T);
-    int r = (int)((size_t)(void*)dst % (VECSZ*sizeof(T)));
+    const ကိန်းပြည့် dstElemSize = cn * parimaa_na(T);
+    ကိန်းပြည့် r = (ကိန်းပြည့်)((size_t)(void*)dst % (VECSZ*parimaa_na(T)));
     hal::StoreMode mode = hal::STORE_ALIGNED_NOCACHE;
-    if( r != 0 )
+    အကယ်၍( r != 0 )
     {
         mode = hal::STORE_UNALIGNED;
-        if (r % dstElemSize == 0 && len > VECSZ*2)
+        အကယ်၍ (r % dstElemSize == 0 && len > VECSZ*2)
             i0 = VECSZ - (r / dstElemSize);
     }
 
-    if( cn == 2 )
+    အကယ်၍( cn == 2 )
     {
-        for( i = 0; i < len; i += VECSZ )
+        အတွက်( i = 0; i < len; i += VECSZ )
         {
-            if( i > len - VECSZ )
+            အကယ်၍( i > len - VECSZ )
             {
                 i = len - VECSZ;
                 mode = hal::STORE_UNALIGNED;
             }
             VecT a = vx_load(src0 + i), b = vx_load(src1 + i);
             v_store_interleave(dst + i*cn, a, b, mode);
-            if( i < i0 )
+            အကယ်၍( i < i0 )
             {
                 i = i0 - VECSZ;
                 mode = hal::STORE_ALIGNED_NOCACHE;
             }
         }
     }
-    else if( cn == 3 )
+    မဟုတ်ပါက အကယ်၍( cn == 3 )
     {
         const T* src2 = src[2];
-        for( i = 0; i < len; i += VECSZ )
+        အတွက်( i = 0; i < len; i += VECSZ )
         {
-            if( i > len - VECSZ )
+            အကယ်၍( i > len - VECSZ )
             {
                 i = len - VECSZ;
                 mode = hal::STORE_UNALIGNED;
             }
             VecT a = vx_load(src0 + i), b = vx_load(src1 + i), c = vx_load(src2 + i);
             v_store_interleave(dst + i*cn, a, b, c, mode);
-            if( i < i0 )
+            အကယ်၍( i < i0 )
             {
                 i = i0 - VECSZ;
                 mode = hal::STORE_ALIGNED_NOCACHE;
             }
         }
     }
-    else
+    မဟုတ်ပါက
     {
         CV_Assert( cn == 4 );
         const T* src2 = src[2];
         const T* src3 = src[3];
-        for( i = 0; i < len; i += VECSZ )
+        အတွက်( i = 0; i < len; i += VECSZ )
         {
-            if( i > len - VECSZ )
+            အကယ်၍( i > len - VECSZ )
             {
                 i = len - VECSZ;
                 mode = hal::STORE_UNALIGNED;
@@ -105,7 +105,7 @@ vecmerge_( const T** src, T* dst, int len, int cn )
             VecT a = vx_load(src0 + i), b = vx_load(src1 + i);
             VecT c = vx_load(src2 + i), d = vx_load(src3 + i);
             v_store_interleave(dst + i*cn, a, b, c, d, mode);
-            if( i < i0 )
+            အကယ်၍( i < i0 )
             {
                 i = i0 - VECSZ;
                 mode = hal::STORE_ALIGNED_NOCACHE;
@@ -117,52 +117,52 @@ vecmerge_( const T** src, T* dst, int len, int cn )
 #endif
 
 template<typename T> static void
-merge_( const T** src, T* dst, int len, int cn )
+merge_( const T** src, T* dst, ကိန်းပြည့် len, ကိန်းပြည့် cn )
 {
-    int k = cn % 4 ? cn % 4 : 4;
-    int i, j;
-    if( k == 1 )
+    ကိန်းပြည့် k = cn % 4 ? cn % 4 : 4;
+    ကိန်းပြည့် i, j;
+    အကယ်၍( k == 1 )
     {
         const T* src0 = src[0];
-        for( i = j = 0; i < len; i++, j += cn )
+        အတွက်( i = j = 0; i < len; i++, j += cn )
             dst[j] = src0[i];
     }
-    else if( k == 2 )
+    မဟုတ်ပါက အကယ်၍( k == 2 )
     {
         const T *src0 = src[0], *src1 = src[1];
         i = j = 0;
-        for( ; i < len; i++, j += cn )
+        အတွက်( ; i < len; i++, j += cn )
         {
             dst[j] = src0[i];
             dst[j+1] = src1[i];
         }
     }
-    else if( k == 3 )
+    မဟုတ်ပါက အကယ်၍( k == 3 )
     {
         const T *src0 = src[0], *src1 = src[1], *src2 = src[2];
         i = j = 0;
-        for( ; i < len; i++, j += cn )
+        အတွက်( ; i < len; i++, j += cn )
         {
             dst[j] = src0[i];
             dst[j+1] = src1[i];
             dst[j+2] = src2[i];
         }
     }
-    else
+    မဟုတ်ပါက
     {
         const T *src0 = src[0], *src1 = src[1], *src2 = src[2], *src3 = src[3];
         i = j = 0;
-        for( ; i < len; i++, j += cn )
+        အတွက်( ; i < len; i++, j += cn )
         {
             dst[j] = src0[i]; dst[j+1] = src1[i];
             dst[j+2] = src2[i]; dst[j+3] = src3[i];
         }
     }
 
-    for( ; k < cn; k += 4 )
+    အတွက်( ; k < cn; k += 4 )
     {
         const T *src0 = src[k], *src1 = src[k+1], *src2 = src[k+2], *src3 = src[k+3];
-        for( i = 0, j = k; i < len; i++, j += cn )
+        အတွက်( i = 0, j = k; i < len; i++, j += cn )
         {
             dst[j] = src0[i]; dst[j+1] = src1[i];
             dst[j+2] = src2[i]; dst[j+3] = src3[i];
@@ -170,46 +170,46 @@ merge_( const T** src, T* dst, int len, int cn )
     }
 }
 
-void merge8u(const uchar** src, uchar* dst, int len, int cn )
+void merge8u(const uchar** src, uchar* dst, ကိန်းပြည့် len, ကိန်းပြည့် cn )
 {
     CV_INSTRUMENT_REGION();
-#if (CV_SIMD || CV_SIMD_SCALABLE)
-    if( len >= VTraits<v_uint8>::vlanes() && 2 <= cn && cn <= 4 )
+#အကယ်၍ (CV_SIMD || CV_SIMD_SCALABLE)
+    အကယ်၍( len >= VTraits<v_uint8>::vlanes() && 2 <= cn && cn <= 4 )
         vecmerge_<uchar, v_uint8>(src, dst, len, cn);
-    else
+    မဟုတ်ပါက
 #endif
         merge_(src, dst, len, cn);
 }
 
-void merge16u(const ushort** src, ushort* dst, int len, int cn )
+void merge16u(const ushort** src, ushort* dst, ကိန်းပြည့် len, ကိန်းပြည့် cn )
 {
     CV_INSTRUMENT_REGION();
-#if (CV_SIMD || CV_SIMD_SCALABLE)
-    if( len >= VTraits<v_uint16>::vlanes() && 2 <= cn && cn <= 4 )
+#အကယ်၍ (CV_SIMD || CV_SIMD_SCALABLE)
+    အကယ်၍( len >= VTraits<v_uint16>::vlanes() && 2 <= cn && cn <= 4 )
         vecmerge_<ushort, v_uint16>(src, dst, len, cn);
-    else
+    မဟုတ်ပါက
 #endif
         merge_(src, dst, len, cn);
 }
 
-void merge32s(const int** src, int* dst, int len, int cn )
+void merge32s(const ကိန်းပြည့်** src, ကိန်းပြည့်* dst, ကိန်းပြည့် len, ကိန်းပြည့် cn )
 {
     CV_INSTRUMENT_REGION();
-#if (CV_SIMD || CV_SIMD_SCALABLE)
-    if( len >= VTraits<v_int32>::vlanes() && 2 <= cn && cn <= 4 )
-        vecmerge_<int, v_int32>(src, dst, len, cn);
-    else
+#အကယ်၍ (CV_SIMD || CV_SIMD_SCALABLE)
+    အကယ်၍( len >= VTraits<v_int32>::vlanes() && 2 <= cn && cn <= 4 )
+        vecmerge_<ကိန်းပြည့်, v_int32>(src, dst, len, cn);
+    မဟုတ်ပါက
 #endif
         merge_(src, dst, len, cn);
 }
 
-void merge64s(const int64** src, int64* dst, int len, int cn )
+void merge64s(const int64** src, int64* dst, ကိန်းပြည့် len, ကိန်းပြည့် cn )
 {
     CV_INSTRUMENT_REGION();
-#if (CV_SIMD || CV_SIMD_SCALABLE)
-    if( len >= VTraits<v_int64>::vlanes() && 2 <= cn && cn <= 4 )
+#အကယ်၍ (CV_SIMD || CV_SIMD_SCALABLE)
+    အကယ်၍( len >= VTraits<v_int64>::vlanes() && 2 <= cn && cn <= 4 )
         vecmerge_<int64, v_int64>(src, dst, len, cn);
-    else
+    မဟုတ်ပါက
 #endif
         merge_(src, dst, len, cn);
 }
